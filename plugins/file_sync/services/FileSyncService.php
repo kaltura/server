@@ -46,7 +46,7 @@ class FileSyncService extends KalturaBaseService
 		$pager->attachToCriteria($c);
 		$dbList = FileSyncPeer::doSelect($c);
 		
-		$list = KalturaFileSyncArray::fromDbArray($dbList);
+		$list = KalturaFileSyncArray::fromDbArray($dbList, $this->getResponseProfile());
 		$response = new KalturaFileSyncListResponse();
 		$response->objects = $list;
 		$response->totalCount = $totalCount;
@@ -86,7 +86,7 @@ class FileSyncService extends KalturaBaseService
 		$dbFileSync->save();
 		
 		$fileSync = new KalturaFileSync();
-		$fileSync->fromObject($dbFileSync);
+		$fileSync->fromObject($dbFileSync, $this->getResponseProfile());
 		return $fileSync;
 	}
 	

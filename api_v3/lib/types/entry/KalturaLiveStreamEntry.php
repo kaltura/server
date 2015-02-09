@@ -147,12 +147,12 @@ class KalturaLiveStreamEntry extends KalturaLiveEntry
 	/* (non-PHPdoc)
 	 * @see KalturaMediaEntry::fromObject()
 	 */
-	public function fromObject ( $dbObject )
+	public function fromObject($dbObject, IResponseProfile $responseProfile = null)
 	{
 		if(!($dbObject instanceof LiveStreamEntry))
 			return;
 			
-		parent::fromObject($dbObject);
+		parent::fromObject($dbObject, $responseProfile);
 	}
 	
 	/* (non-PHPdoc)

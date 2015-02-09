@@ -442,7 +442,7 @@ class KalturaBatchJob extends KalturaObject implements IFilterable
 		$this->workerId = $dbBatchJobLock->getWorkerId();
 	}
 	
-	public function fromObject($dbBatchJob)
+	public function fromObject($dbBatchJob, IResponseProfile $responseProfile = null)
 	{
 		KalturaLog::err("From object (batch job) is unsupported without a batch job lock.");
 		throw new KalturaAPIException ( KalturaErrors::INTERNAL_SERVERL_ERROR);
@@ -450,7 +450,7 @@ class KalturaBatchJob extends KalturaObject implements IFilterable
 	
 	public function fromBatchJob($dbBatchJob, BatchJobLock $dbBatchJobLock = null) 
 	{
-		parent::fromObject( $dbBatchJob );
+		parent::fromObject($dbBatchJob);
 		$this->queueTime = $dbBatchJob->getQueueTime(null); // to return the timestamp and not string
 		$this->finishTime = $dbBatchJob->getFinishTime(null); // to return the timestamp and not string
 		

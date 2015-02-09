@@ -5,13 +5,13 @@
  */
 class KalturaRemotePathArray extends KalturaTypedArray
 {
-	public static function fromFileSyncArray(array $arr)
+	public static function fromDbArray(array $arr = null, IResponseProfile $responseProfile = null)
 	{
 		$newArr = new KalturaRemotePathArray();
 		foreach($arr as $obj)
 		{
 			$nObj = new KalturaRemotePath();
-			$nObj->fromObject($obj);
+			$nObj->fromObject($obj, $responseProfile);
 			$newArr[] = $nObj;
 		}
 		

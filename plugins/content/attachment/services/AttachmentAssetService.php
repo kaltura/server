@@ -90,7 +90,7 @@ class AttachmentAssetService extends KalturaAssetService
 		$dbAttachmentAsset->save();
 
 		$attachmentAsset = new KalturaAttachmentAsset();
-		$attachmentAsset->fromObject($dbAttachmentAsset);
+		$attachmentAsset->fromObject($dbAttachmentAsset, $this->getResponseProfile());
 		return $attachmentAsset;
     }
     
@@ -139,7 +139,7 @@ class AttachmentAssetService extends KalturaAssetService
    			kEventsManager::raiseEvent(new kObjectAddedEvent($dbAttachmentAsset));
    		
 		$attachmentAsset = new KalturaAttachmentAsset();
-		$attachmentAsset->fromObject($dbAttachmentAsset);
+		$attachmentAsset->fromObject($dbAttachmentAsset, $this->getResponseProfile());
 		return $attachmentAsset;
     }
 	
@@ -168,7 +168,7 @@ class AttachmentAssetService extends KalturaAssetService
     	$dbAttachmentAsset->save();
 		
 		$attachmentAsset = new KalturaAttachmentAsset();
-		$attachmentAsset->fromObject($dbAttachmentAsset);
+		$attachmentAsset->fromObject($dbAttachmentAsset, $this->getResponseProfile());
 		return $attachmentAsset;
     }
     
@@ -413,7 +413,7 @@ class AttachmentAssetService extends KalturaAssetService
 		$fileSyncs = FileSyncPeer::doSelect($c);
 			
 		$listResponse = new KalturaRemotePathListResponse();
-		$listResponse->objects = KalturaRemotePathArray::fromFileSyncArray($fileSyncs);
+		$listResponse->objects = KalturaRemotePathArray::fromDbArray($fileSyncs, $this->getResponseProfile());
 		$listResponse->totalCount = count($listResponse->objects);
 		return $listResponse;
 	}
@@ -485,7 +485,7 @@ class AttachmentAssetService extends KalturaAssetService
 			throw new KalturaAPIException(KalturaAttachmentErrors::ATTACHMENT_ASSET_ID_NOT_FOUND, $attachmentAssetId);
 		
 		$attachmentAssets = new KalturaAttachmentAsset();
-		$attachmentAssets->fromObject($attachmentAssetsDb);
+		$attachmentAssets->fromObject($attachmentAssetsDb, $this->getResponseProfile());
 		return $attachmentAssets;
 	}
 	
@@ -527,7 +527,7 @@ class AttachmentAssetService extends KalturaAssetService
 			$totalCount = assetPeer::doCount($c);
 		}
 				
-		$list = KalturaAttachmentAssetArray::fromDbArray($dbList);
+		$list = KalturaAttachmentAssetArray::fromDbArray($dbList, $this->getResponseProfile());
 		$response = new KalturaAttachmentAssetListResponse();
 		$response->objects = $list;
 		$response->totalCount = $totalCount;

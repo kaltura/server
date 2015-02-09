@@ -5,13 +5,13 @@
  */
 class KalturaUiConfAdminArray extends KalturaTypedArray
 {
-	public static function fromUiConfAdminArray($arr)
+	public static function fromDbArray(array $arr, IResponseProfile $responseProfile = null)
 	{
 		$newArr = new KalturaUiConfAdminArray();
 		foreach ( $arr as $obj )
 		{
 			$nObj = new KalturaUiConfAdmin();
-			$nObj->fromUiConf( $obj );
+			$nObj->fromObject($obj, $responseProfile);
 			$newArr[] = $nObj;
 		}
 		
@@ -23,4 +23,3 @@ class KalturaUiConfAdminArray extends KalturaTypedArray
 		return parent::__construct("KalturaUiConfAdmin");
 	}
 }
-?>

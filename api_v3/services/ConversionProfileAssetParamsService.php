@@ -56,7 +56,7 @@ class ConversionProfileAssetParamsService extends KalturaBaseService
 		$pager->attachToCriteria($c);
 		$dbList = flavorParamsConversionProfilePeer::doSelect($c);
 		
-		$list = KalturaConversionProfileAssetParamsArray::fromDbArray($dbList);
+		$list = KalturaConversionProfileAssetParamsArray::fromDbArray($dbList, $this->getResponseProfile());
 		$response = new KalturaConversionProfileAssetParamsListResponse();
 		$response->objects = $list;
 		$response->totalCount = $totalCount;
@@ -85,7 +85,7 @@ class ConversionProfileAssetParamsService extends KalturaBaseService
 		$conversionProfileAssetParams->toUpdatableObject($flavorParamsConversionProfile);
 		$flavorParamsConversionProfile->save();
 			
-		$conversionProfileAssetParams->fromObject($flavorParamsConversionProfile);
+		$conversionProfileAssetParams->fromObject($flavorParamsConversionProfile, $this->getResponseProfile());
 		return $conversionProfileAssetParams;
 	}
 }

@@ -5,7 +5,7 @@
  */
 class KalturaDistributionFieldConfigArray extends KalturaTypedArray
 {
-	public static function fromDbArray($arr)
+	public static function fromDbArray($arr, IResponseProfile $responseProfile = null)
 	{
 		$newArr = new KalturaDistributionFieldConfigArray();
 		if ($arr == null)
@@ -14,7 +14,7 @@ class KalturaDistributionFieldConfigArray extends KalturaTypedArray
 		foreach ($arr as $obj)
 		{
     		$nObj = new KalturaDistributionFieldConfig();
-			$nObj->fromObject($obj);
+			$nObj->fromObject($obj, $responseProfile);
 			$newArr[] = $nObj;
 		}
 		

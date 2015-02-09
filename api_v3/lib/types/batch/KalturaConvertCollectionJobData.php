@@ -49,6 +49,7 @@ class KalturaConvertCollectionJobData extends KalturaConvartableJobData
 		"inputXmlLocalPath" ,
 		"inputXmlRemoteUrl" ,
 		"commandLinesStr" ,
+		"flavors" ,
 	);
 
 	public function getMapBetweenObjects ( )
@@ -56,12 +57,6 @@ class KalturaConvertCollectionJobData extends KalturaConvartableJobData
 		return array_merge ( parent::getMapBetweenObjects() , self::$map_between_objects );
 	}
 
-	public function fromObject ( $source_object  )
-	{
-		parent::fromObject($source_object);
-		$this->flavors = KalturaConvertCollectionFlavorDataArray::fromConvertCollectionFlavorDataArray($source_object->getFlavors());
-	}
-	
 	public function toObject($dbData = null, $props_to_skip = array()) 
 	{
 		if(is_null($dbData))

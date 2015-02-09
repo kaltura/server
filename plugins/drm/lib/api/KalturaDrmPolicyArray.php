@@ -5,13 +5,13 @@
  */
 class KalturaDrmPolicyArray extends KalturaTypedArray
 {
-	public static function fromDbArray ( $arr )
+	public static function fromDbArray($arr, IResponseProfile $responseProfile = null)
 	{
 		$newArr = new KalturaDrmPolicyArray();
 		foreach ( $arr as $obj )
 		{
 		    $nObj = KalturaDrmPolicy::getInstanceByType($obj->getProvider());
-			$nObj->fromObject( $obj );
+			$nObj->fromObject($obj, $responseProfile);
 			$newArr[] = $nObj;
 		}
 		

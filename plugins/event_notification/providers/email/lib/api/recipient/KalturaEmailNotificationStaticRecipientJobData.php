@@ -36,10 +36,10 @@ class KalturaEmailNotificationStaticRecipientJobData extends KalturaEmailNotific
 	/* (non-PHPdoc)
 	 * @see KalturaObject::fromObject($source_object)
 	 */
-	public function fromObject($dbObject)
+	public function fromObject($dbObject, IResponseProfile $responseProfile = null)
 	{
 		/* @var $dbObject kEmailNotificationStaticRecipientJobData */
-		parent::fromObject($dbObject);
+		parent::fromObject($dbObject, $responseProfile);
 		$this->setProviderType();
 		
 		$this->emailRecipients = KalturaKeyValueArray::fromKeyValueArray($dbObject->getEmailRecipients());

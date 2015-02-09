@@ -69,7 +69,7 @@ class UserRoleService extends KalturaBaseService
 		$dbUserRole->save();
 		
 		$userRole = new KalturaUserRole();
-		$userRole->fromObject($dbUserRole);
+		$userRole->fromObject($dbUserRole, $this->getResponseProfile());
 		
 		return $userRole;
 	}
@@ -92,7 +92,7 @@ class UserRoleService extends KalturaBaseService
 		}
 			
 		$userRole = new KalturaUserRole();
-		$userRole->fromObject($dbUserRole);
+		$userRole->fromObject($dbUserRole, $this->getResponseProfile());
 		
 		return $userRole;
 	}
@@ -145,7 +145,7 @@ class UserRoleService extends KalturaBaseService
 		$dbUserRole->save();
 	
 		$userRole = new KalturaUserRole();
-		$userRole->fromObject($dbUserRole);
+		$userRole->fromObject($dbUserRole, $this->getResponseProfile());
 		
 		return $userRole;
 	}
@@ -181,7 +181,7 @@ class UserRoleService extends KalturaBaseService
 		$dbUserRole->save();
 			
 		$userRole = new KalturaUserRole();
-		$userRole->fromObject($dbUserRole);
+		$userRole->fromObject($dbUserRole, $this->getResponseProfile());
 		
 		return $userRole;
 	}
@@ -213,7 +213,7 @@ class UserRoleService extends KalturaBaseService
 		$list = UserRolePeer::doSelect($c);
 		
 		$response = new KalturaUserRoleListResponse();
-		$response->objects = KalturaUserRoleArray::fromDbArray($list);
+		$response->objects = KalturaUserRoleArray::fromDbArray($list, $this->getResponseProfile());
 		$response->totalCount = $count;
 		
 		return $response;
@@ -244,7 +244,7 @@ class UserRoleService extends KalturaBaseService
 		$newDbRole->save();
 		
 		$userRole = new KalturaUserRole();
-		$userRole->fromObject($newDbRole);
+		$userRole->fromObject($newDbRole, $this->getResponseProfile());
 		
 		return $userRole;
 	}

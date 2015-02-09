@@ -5,7 +5,7 @@
  */
 class KalturaVirusScanProfileArray extends KalturaTypedArray
 {
-	public static function fromDbArray($arr)
+	public static function fromDbArray($arr, IResponseProfile $responseProfile = null)
 	{
 		$newArr = new KalturaVirusScanProfileArray();
 		if ($arr == null)
@@ -14,7 +14,7 @@ class KalturaVirusScanProfileArray extends KalturaTypedArray
 		foreach ($arr as $obj)
 		{
     		$nObj = new KalturaVirusScanProfile();
-			$nObj->fromObject($obj);
+			$nObj->fromObject($obj, $responseProfile);
 			$newArr[] = $nObj;
 		}
 		

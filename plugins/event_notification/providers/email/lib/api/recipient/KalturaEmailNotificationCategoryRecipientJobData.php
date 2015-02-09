@@ -35,9 +35,9 @@ class KalturaEmailNotificationCategoryRecipientJobData extends KalturaEmailNotif
 	/* (non-PHPdoc)
 	 * @see KalturaObject::fromObject($source_object)
 	 */
-	public function fromObject($source_object)
+	public function fromObject($source_object, IResponseProfile $responseProfile = null)
 	{
-		parent::fromObject($source_object);
+		parent::fromObject($source_object, $responseProfile);
 		$this->setProviderType();
 		if ($source_object->getCategoryUserFilter())
 		{

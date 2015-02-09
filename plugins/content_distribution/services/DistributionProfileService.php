@@ -44,7 +44,7 @@ class DistributionProfileService extends KalturaBaseService
 		$dbDistributionProfile->save();
 		
 		$distributionProfile = KalturaDistributionProfileFactory::createKalturaDistributionProfile($dbDistributionProfile->getProviderType());
-		$distributionProfile->fromObject($dbDistributionProfile);
+		$distributionProfile->fromObject($dbDistributionProfile, $this->getResponseProfile());
 		return $distributionProfile;
 	}
 	
@@ -63,7 +63,7 @@ class DistributionProfileService extends KalturaBaseService
 			throw new KalturaAPIException(ContentDistributionErrors::DISTRIBUTION_PROFILE_NOT_FOUND, $id);
 			
 		$distributionProfile = KalturaDistributionProfileFactory::createKalturaDistributionProfile($dbDistributionProfile->getProviderType());
-		$distributionProfile->fromObject($dbDistributionProfile);
+		$distributionProfile->fromObject($dbDistributionProfile, $this->getResponseProfile());
 		return $distributionProfile;
 	}
 	
@@ -89,7 +89,7 @@ class DistributionProfileService extends KalturaBaseService
 		$dbDistributionProfile->save();
 		
 		$distributionProfile = KalturaDistributionProfileFactory::createKalturaDistributionProfile($dbDistributionProfile->getProviderType());
-		$distributionProfile->fromObject($dbDistributionProfile);
+		$distributionProfile->fromObject($dbDistributionProfile, $this->getResponseProfile());
 		return $distributionProfile;
 	}
 	
@@ -112,7 +112,7 @@ class DistributionProfileService extends KalturaBaseService
 		$dbDistributionProfile->save();
 		
 		$distributionProfile = KalturaDistributionProfileFactory::createKalturaDistributionProfile($dbDistributionProfile->getProviderType());
-		$distributionProfile->fromObject($dbDistributionProfile);
+		$distributionProfile->fromObject($dbDistributionProfile, $this->getResponseProfile());
 		return $distributionProfile;
 	}
 	
@@ -164,7 +164,7 @@ class DistributionProfileService extends KalturaBaseService
 		$list = DistributionProfilePeer::doSelect($c);
 		
 		$response = new KalturaDistributionProfileListResponse();
-		$response->objects = KalturaDistributionProfileArray::fromDbArray($list);
+		$response->objects = KalturaDistributionProfileArray::fromDbArray($list, $this->getResponseProfile());
 		$response->totalCount = $count;
 	
 		return $response;
@@ -209,7 +209,7 @@ class DistributionProfileService extends KalturaBaseService
 		$totalCount = DistributionProfilePeer::doCount($c);
 		$pager->attachToCriteria($c);
 		$list = DistributionProfilePeer::doSelect($c);
-		$newList = KalturaDistributionProfileArray::fromDbArray($list);
+		$newList = KalturaDistributionProfileArray::fromDbArray($list, $this->getResponseProfile());
 		
 		$response = new KalturaDistributionProfileListResponse();
 		$response->totalCount = $totalCount;

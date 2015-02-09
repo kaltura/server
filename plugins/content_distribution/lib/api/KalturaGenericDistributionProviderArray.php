@@ -5,7 +5,7 @@
  */
 class KalturaGenericDistributionProviderArray extends KalturaTypedArray
 {
-	public static function fromGenericDistributionProvidersArray($arr)
+	public static function fromDbArray(array $arr, IResponseProfile $responseProfile = null)
 	{
 		$newArr = new KalturaGenericDistributionProviderArray();
 		if ($arr == null)
@@ -14,7 +14,7 @@ class KalturaGenericDistributionProviderArray extends KalturaTypedArray
 		foreach ($arr as $obj)
 		{
     		$nObj = new KalturaGenericDistributionProvider();
-			$nObj->fromObject($obj);
+			$nObj->fromObject($obj, $responseProfile);
 			$newArr[] = $nObj;
 		}
 		

@@ -5,7 +5,7 @@
  */
 class KalturaAnnotationArray extends KalturaTypedArray
 {
-	public static function fromDbArray($arr)
+	public static function fromDbArray($arr, IResponseProfile $responseProfile = null)
 	{
 		$newArr = new KalturaAnnotationArray();
 		if ($arr == null)
@@ -14,7 +14,7 @@ class KalturaAnnotationArray extends KalturaTypedArray
 		foreach ($arr as $obj)
 		{
     		$nObj = new KalturaAnnotation();
-			$nObj->fromObject($obj);
+			$nObj->fromObject($obj, $responseProfile);
 			$newArr[] = $nObj;
 		}
 		

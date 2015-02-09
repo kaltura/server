@@ -5,7 +5,7 @@
  */
 class KalturaMixEntryArray extends KalturaTypedArray
 {
-	public static function fromEntryArray ( $arr )
+	public static function fromDbArray($arr, IResponseProfile $responseProfile = null)
 	{
 		$newArr = new KalturaMixEntryArray();
 		if ($arr == null)
@@ -13,7 +13,7 @@ class KalturaMixEntryArray extends KalturaTypedArray
 		foreach ($arr as $obj)
 		{
 			$nObj = new KalturaMixEntry();
-			$nObj->fromObject($obj);
+			$nObj->fromObject($obj, $responseProfile);
 			$newArr[] = $nObj;
 		}
 		

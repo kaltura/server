@@ -5,7 +5,7 @@
  */
 class KalturaAttUverseDistributionFileArray extends KalturaTypedArray
 {
-	public static function fromDbArray($arr)
+	public static function fromDbArray($arr, IResponseProfile $responseProfile = null)
 	{
 		$newArr = new KalturaAttUverseDistributionFileArray();
 		if ($arr == null)
@@ -14,7 +14,7 @@ class KalturaAttUverseDistributionFileArray extends KalturaTypedArray
 		foreach ($arr as $obj)
 		{
 			$nObj = new KalturaAttUverseDistributionFile();
-			$nObj->fromObject($obj);
+			$nObj->fromObject($obj, $responseProfile);
 			$newArr[] = $nObj;
 		}
 

@@ -5,7 +5,7 @@
  */
 class KalturaBatchHistoryDataArray extends KalturaTypedArray
 {
-	public static function fromDbArray($arr)
+	public static function fromDbArray($arr, IResponseProfile $responseProfile = null)
 	{
 		$newArr = new KalturaBatchHistoryDataArray();
 		if ($arr == null)
@@ -14,7 +14,7 @@ class KalturaBatchHistoryDataArray extends KalturaTypedArray
 		foreach ($arr as $obj)
 		{
     		$nObj = new KalturaBatchHistoryData();
-			$nObj->fromObject($obj);
+			$nObj->fromObject($obj, $responseProfile);
 			$newArr[] = $nObj;
 		}
 		

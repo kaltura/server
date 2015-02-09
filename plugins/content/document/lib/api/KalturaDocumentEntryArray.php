@@ -5,7 +5,7 @@
  */
 class KalturaDocumentEntryArray extends KalturaTypedArray
 {
-	public static function fromEntryArray ( $arr )
+	public static function fromDbArray($arr, IResponseProfile $responseProfile = null)
 	{
 		$newArr = new KalturaDocumentEntryArray();
 		if ($arr == null)
@@ -13,7 +13,7 @@ class KalturaDocumentEntryArray extends KalturaTypedArray
 		foreach ($arr as $obj)
 		{
 			$nObj = new KalturaDocumentEntry();
-			$nObj->fromObject($obj);
+			$nObj->fromObject($obj, $responseProfile);
 			$newArr[] = $nObj;
 		}
 		

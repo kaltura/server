@@ -5,7 +5,7 @@
  */
 class KalturaConditionArray extends KalturaTypedArray
 {
-	public static function fromDbArray($arr)
+	public static function fromDbArray($arr, IResponseProfile $responseProfile = null)
 	{
 		$newArr = new KalturaConditionArray();
 		if ($arr == null)
@@ -19,7 +19,7 @@ class KalturaConditionArray extends KalturaTypedArray
 				KalturaLog::alert("Object [" . get_class($obj) . "] type [" . $obj->getType() . "] could not be translated to API object");
 				continue;
 			}
-			$nObj->fromObject($obj);
+			$nObj->fromObject($obj, $responseProfile);
 			$newArr[] = $nObj;
 		}
 		

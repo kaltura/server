@@ -5,7 +5,7 @@
  */
 class KalturaPlayReadyRightArray extends KalturaTypedArray
 {
-	public static function fromDbArray($arr)
+	public static function fromDbArray($arr, IResponseProfile $responseProfile = null)
 	{
 		$newArr = new KalturaPlayReadyRightArray();
 		if ($arr == null)
@@ -16,7 +16,7 @@ class KalturaPlayReadyRightArray extends KalturaTypedArray
 			$nObj = self::getInstanceByDbObject($obj);
 			if($nObj)
 			{
-				$nObj->fromObject($obj);
+				$nObj->fromObject($obj, $responseProfile);
 				$newArr[] = $nObj;
 			}
 		}

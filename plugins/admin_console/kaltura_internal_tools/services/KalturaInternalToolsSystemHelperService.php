@@ -22,7 +22,7 @@ class KalturaInternalToolsSystemHelperService extends KalturaBaseService
 		$ks =  ks::fromSecureString ( $str );
 		
 		$ksFromSecureString = new KalturaInternalToolsSession();
-		$ksFromSecureString->fromObject($ks);
+		$ksFromSecureString->fromObject($ks, $this->getResponseProfile());
 		
 		return $ksFromSecureString;
 	}

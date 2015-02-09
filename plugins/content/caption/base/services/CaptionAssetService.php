@@ -81,7 +81,7 @@ class CaptionAssetService extends KalturaAssetService
 		$dbCaptionAsset->save();
 
 		$captionAsset = new KalturaCaptionAsset();
-		$captionAsset->fromObject($dbCaptionAsset);
+		$captionAsset->fromObject($dbCaptionAsset, $this->getResponseProfile());
 		return $captionAsset;
     }
     
@@ -131,7 +131,7 @@ class CaptionAssetService extends KalturaAssetService
    			kEventsManager::raiseEvent(new kObjectDataChangedEvent($dbCaptionAsset));
    		
 		$captionAsset = new KalturaCaptionAsset();
-		$captionAsset->fromObject($dbCaptionAsset);
+		$captionAsset->fromObject($dbCaptionAsset, $this->getResponseProfile());
 		return $captionAsset;
     }
 	
@@ -163,7 +163,7 @@ class CaptionAssetService extends KalturaAssetService
 			$this->setAsDefaultAction($dbCaptionAsset->getId());
 			
 		$captionAsset = new KalturaCaptionAsset();
-		$captionAsset->fromObject($dbCaptionAsset);
+		$captionAsset->fromObject($dbCaptionAsset, $this->getResponseProfile());
 		return $captionAsset;
     }
     
@@ -476,7 +476,7 @@ class CaptionAssetService extends KalturaAssetService
 		$fileSyncs = FileSyncPeer::doSelect($c);
 			
 		$listResponse = new KalturaRemotePathListResponse();
-		$listResponse->objects = KalturaRemotePathArray::fromFileSyncArray($fileSyncs);
+		$listResponse->objects = KalturaRemotePathArray::fromDbArray($fileSyncs, $this->getResponseProfile());
 		$listResponse->totalCount = count($listResponse->objects);
 		return $listResponse;
 	}
@@ -642,7 +642,7 @@ class CaptionAssetService extends KalturaAssetService
 			throw new KalturaAPIException(KalturaCaptionErrors::CAPTION_ASSET_ID_NOT_FOUND, $captionAssetId);
 		
 		$captionAssets = new KalturaCaptionAsset();
-		$captionAssets->fromObject($captionAssetsDb);
+		$captionAssets->fromObject($captionAssetsDb, $this->getResponseProfile());
 		return $captionAssets;
 	}
 	
@@ -684,7 +684,7 @@ class CaptionAssetService extends KalturaAssetService
 			$totalCount = assetPeer::doCount($c);
 		}
 		
-		$list = KalturaCaptionAssetArray::fromDbArray($dbList);
+		$list = KalturaCaptionAssetArray::fromDbArray($dbList, $this->getResponseProfile());
 		$response = new KalturaCaptionAssetListResponse();
 		$response->objects = $list;
 		$response->totalCount = $totalCount;

@@ -31,7 +31,7 @@ class LiveChannelSegmentService extends KalturaBaseService
 		$dbLiveChannelSegment->save();
 		
 		$liveChannelSegment = new KalturaLiveChannelSegment();
-		$liveChannelSegment->fromObject($dbLiveChannelSegment);
+		$liveChannelSegment->fromObject($dbLiveChannelSegment, $this->getResponseProfile());
 		return $liveChannelSegment;
 	}
 	
@@ -51,7 +51,7 @@ class LiveChannelSegmentService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::LIVE_CHANNEL_SEGMENT_ID_NOT_FOUND, $id);
 			
 		$liveChannelSegment = new KalturaLiveChannelSegment();
-		$liveChannelSegment->fromObject($dbLiveChannelSegment);
+		$liveChannelSegment->fromObject($dbLiveChannelSegment, $this->getResponseProfile());
 		return $liveChannelSegment;
 	}
 	
@@ -75,7 +75,7 @@ class LiveChannelSegmentService extends KalturaBaseService
 		$dbLiveChannelSegment->save();
 		
 		$liveChannelSegment = new KalturaLiveChannelSegment();
-		$liveChannelSegment->fromObject($dbLiveChannelSegment);
+		$liveChannelSegment->fromObject($dbLiveChannelSegment, $this->getResponseProfile());
 		return $liveChannelSegment;
 	}
 	
@@ -124,7 +124,7 @@ class LiveChannelSegmentService extends KalturaBaseService
 		$pager->attachToCriteria($c);
 		$dbList = LiveChannelSegmentPeer::doSelect($c);
 		
-		$list = KalturaLiveChannelSegmentArray::fromDbArray($dbList);
+		$list = KalturaLiveChannelSegmentArray::fromDbArray($dbList, $this->getResponseProfile());
 		$response = new KalturaLiveChannelSegmentListResponse();
 		$response->objects = $list;
 		$response->totalCount = $totalCount;

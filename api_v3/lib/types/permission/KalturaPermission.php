@@ -134,9 +134,9 @@ class KalturaPermission extends KalturaObject implements IFilterable
 		return $dbObject;
 	}
 	
-	public function fromObject ($source_object)
+	public function fromObject($source_object, IResponseProfile $responseProfile = null)
 	{
-		parent::fromObject($source_object);
+		parent::fromObject($source_object, $responseProfile);
 		
 		// copy permission items IDs
 		$itemIdsArray = $source_object->getPermissionItemIds();

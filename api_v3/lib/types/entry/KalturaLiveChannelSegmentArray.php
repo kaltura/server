@@ -5,7 +5,7 @@
  */
 class KalturaLiveChannelSegmentArray extends KalturaTypedArray
 {
-	public static function fromEntryArray ( $arr )
+	public static function fromDbArray($arr, IResponseProfile $responseProfile = null)
 	{
 		$newArr = new KalturaLiveChannelSegmentArray();
 		if ($arr == null)
@@ -14,7 +14,7 @@ class KalturaLiveChannelSegmentArray extends KalturaTypedArray
 		foreach ($arr as $obj)
 		{
 			$nObj = new KalturaLiveChannelSegment();
-			$nObj->fromObject($obj);
+			$nObj->fromObject($obj, $responseProfile);
 			$newArr[] = $nObj;
 		}
 		

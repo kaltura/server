@@ -74,7 +74,7 @@ class MixingService extends KalturaEntryService
 		
 		$kshow->setShowEntry($dbEntry);
 		$kshow->save();
-		$mixEntry->fromObject($dbEntry);
+		$mixEntry->fromObject($dbEntry, $this->getResponseProfile());
 		
 		myNotificationMgr::createNotification(kNotificationJobData::NOTIFICATION_TYPE_ENTRY_ADD, $dbEntry);
 		
@@ -125,7 +125,7 @@ class MixingService extends KalturaEntryService
 			$dbEntry->setDataContent($mixEntry->dataContent, true, true);
 			
 		$dbEntry->save();
-		$mixEntry->fromObject($dbEntry);
+		$mixEntry->fromObject($dbEntry, $this->getResponseProfile());
 		
 		try
 		{
@@ -171,7 +171,7 @@ class MixingService extends KalturaEntryService
 		$filter->typeEqual = KalturaEntryType::MIX; 
 	    list($list, $totalCount) = parent::listEntriesByFilter($filter, $pager);
 	    
-	    $newList = KalturaMixEntryArray::fromEntryArray($list);
+	    $newList = KalturaMixEntryArray::fromDbArray($list, $this->getResponseProfile());
 		$response = new KalturaMixListResponse();
 		$response->objects = $newList;
 		$response->totalCount = $totalCount;
@@ -228,7 +228,7 @@ class MixingService extends KalturaEntryService
 		$newEntry = $newKshow->getShowEntry();
 		
 		$newMixEntry = new KalturaMixEntry();
-		$newMixEntry->fromObject($newEntry);
+		$newMixEntry->fromObject($newEntry, $this->getResponseProfile());
 		
 		myNotificationMgr::createNotification(kNotificationJobData::NOTIFICATION_TYPE_ENTRY_ADD, $newEntry);
 		
@@ -303,7 +303,7 @@ class MixingService extends KalturaEntryService
 		}
 		
 		$mixEntry = new KalturaMixEntry();
-		$mixEntry->fromObject($dbMixEntry);
+		$mixEntry->fromObject($dbMixEntry, $this->getResponseProfile());
 		
 		return $mixEntry;
 	}
@@ -323,7 +323,7 @@ class MixingService extends KalturaEntryService
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $mediaEntryId);
 			
 		 $list = roughcutEntry::getAllRoughcuts($mediaEntryId);
-		 $newList = KalturaMixEntryArray::fromEntryArray($list);
+		 $newList = KalturaMixEntryArray::fromDbArray($list, $this->getResponseProfile());
 		 return $newList;
 	}
 	
@@ -359,7 +359,7 @@ class MixingService extends KalturaEntryService
 		
 		$dbEntries = entryPeer::doSelect($c);
 
-		$mediaEntries = KalturaMediaEntryArray::fromEntryArray($dbEntries);
+		$mediaEntries = KalturaMediaEntryArray::fromDbArray($dbEntries, $this->getResponseProfile());
 		
 		return $mediaEntries;
 	}

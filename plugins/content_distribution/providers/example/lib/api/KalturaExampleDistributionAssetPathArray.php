@@ -5,7 +5,7 @@
  */
 class KalturaExampleDistributionAssetPathArray extends KalturaTypedArray
 {
-	public static function fromDbArray($arr)
+	public static function fromDbArray($arr, IResponseProfile $responseProfile = null)
 	{
 		$newArr = new KalturaExampleDistributionAssetPathArray();
 		if ($arr == null)
@@ -14,7 +14,7 @@ class KalturaExampleDistributionAssetPathArray extends KalturaTypedArray
 		foreach ($arr as $obj)
 		{
     		$nObj = new KalturaExampleDistributionAssetPath();
-			$nObj->fromObject($obj);
+			$nObj->fromObject($obj, $responseProfile);
 			$newArr[] = $nObj;
 		}
 		

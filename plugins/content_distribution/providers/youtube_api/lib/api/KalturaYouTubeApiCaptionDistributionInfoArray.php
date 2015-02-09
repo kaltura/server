@@ -5,7 +5,7 @@
  */
 class KalturaYouTubeApiCaptionDistributionInfoArray extends KalturaTypedArray
 {
-	public static function fromDbArray(array $arr)
+	public static function fromDbArray(array $arr, IResponseProfile $responseProfile = null)
 	{
 		$newArr = new KalturaYouTubeApiCaptionDistributionInfoArray();
 		if ($arr == null)
@@ -14,7 +14,7 @@ class KalturaYouTubeApiCaptionDistributionInfoArray extends KalturaTypedArray
 		foreach ($arr as $obj)
 		{
 			$nObj = new KalturaYouTubeApiCaptionDistributionInfo();
-			$nObj->fromObject($obj);
+			$nObj->fromObject($obj, $responseProfile);
 			$newArr[] = $nObj;
 		}
 		

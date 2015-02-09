@@ -91,7 +91,7 @@ class DropFolderService extends KalturaBaseService
 		
 		// return the saved object
 		$dropFolder = KalturaDropFolder::getInstanceByType($dbDropFolder->getType());
-		$dropFolder->fromObject($dbDropFolder);
+		$dropFolder->fromObject($dbDropFolder, $this->getResponseProfile());
 		return $dropFolder;
 		
 	}
@@ -114,7 +114,7 @@ class DropFolderService extends KalturaBaseService
 		}
 			
 		$dropFolder = KalturaDropFolder::getInstanceByType($dbDropFolder->getType());
-		$dropFolder->fromObject($dbDropFolder);
+		$dropFolder->fromObject($dbDropFolder, $this->getResponseProfile());
 		
 		return $dropFolder;
 	}
@@ -168,7 +168,7 @@ class DropFolderService extends KalturaBaseService
 		$dbDropFolder->save();
 	
 		$dropFolder = KalturaDropFolder::getInstanceByType($dbDropFolder->getType());
-		$dropFolder->fromObject($dbDropFolder);
+		$dropFolder->fromObject($dbDropFolder, $this->getResponseProfile());
 		
 		return $dropFolder;
 	}
@@ -194,7 +194,7 @@ class DropFolderService extends KalturaBaseService
 		$dbDropFolder->save();
 			
 		$dropFolder = KalturaDropFolder::getInstanceByType($dbDropFolder->getType());
-		$dropFolder->fromObject($dbDropFolder);
+		$dropFolder->fromObject($dbDropFolder, $this->getResponseProfile());
 		
 		return $dropFolder;
 	}
@@ -224,7 +224,7 @@ class DropFolderService extends KalturaBaseService
 		$list = DropFolderPeer::doSelect($c);
 		
 		$response = new KalturaDropFolderListResponse();
-		$response->objects = KalturaDropFolderArray::fromDbArray($list);
+		$response->objects = KalturaDropFolderArray::fromDbArray($list, $this->getResponseProfile());
 		$response->totalCount = $count;
 		
 		return $response;

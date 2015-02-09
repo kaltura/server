@@ -391,7 +391,8 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 	 	"rootEntryId",
 	 	"parentEntryId",
 	 	"entitledUsersEdit" => "entitledPusersEdit",
-	 	"entitledUsersPublish" => "entitledPusersPublish"
+	 	"entitledUsersPublish" => "entitledPusersPublish",
+	 	"operationAttributes"
 	 );
 		 
 	public function getMapBetweenObjects()
@@ -443,16 +444,15 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 		return $dbObject;
 	}
 	
-	public function fromObject($sourceObject)
+	public function fromObject($sourceObject, IResponseProfile $responseProfile = null)
 	{
 		if(!$sourceObject)
 			return;
 			
-		parent::fromObject($sourceObject);
+		parent::fromObject($sourceObject, $responseProfile);
 		
 		$this->startDate = $sourceObject->getStartDate(null);
 		$this->endDate = $sourceObject->getEndDate(null);
-		$this->operationAttributes = KalturaOperationAttributesArray::fromOperationAttributesArray($sourceObject->getOperationAttributes());
 		
 		$partnerId = kCurrentContext::$ks_partner_id ? kCurrentContext::$ks_partner_id : kCurrentContext::$partner_id;
 		

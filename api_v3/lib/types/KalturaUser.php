@@ -277,12 +277,12 @@ class KalturaUser extends KalturaObject implements IFilterable
 	}
 	
 	
-	public function fromObject($sourceObject)
+	public function fromObject($sourceObject, IResponseProfile $responseProfile = null)
 	{
 		if(!$sourceObject)
 			return;
 			
-		parent::fromObject($sourceObject);
+		parent::fromObject($sourceObject, $responseProfile);
 		// full name is deprecated and was split to firstName + lastName
 		// this is for backward compatibility
 		$this->fullName = $sourceObject->getFullName();

@@ -28,7 +28,7 @@ class ReportAdminService extends KalturaBaseService
 		$report->toInsertableObject($dbReport);
 		$dbReport->save();
 		
-		$report->fromObject($dbReport);
+		$report->fromObject($dbReport, $this->getResponseProfile());
 		return $report;
 	}
 	
@@ -44,7 +44,7 @@ class ReportAdminService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::REPORT_NOT_FOUND, $id);
 			
 		$report = new KalturaReport();
-		$report->fromObject($dbReport);
+		$report->fromObject($dbReport, $this->getResponseProfile());
 		return $report;
 	}
 	
@@ -73,7 +73,7 @@ class ReportAdminService extends KalturaBaseService
 		$c->setLimit(null);
 		$totalCount = ReportPeer::doCount($c);
 
-		$list = KalturaReportArray::fromDbArray($dbList);
+		$list = KalturaReportArray::fromDbArray($dbList, $this->getResponseProfile());
 		$response = new KalturaReportListResponse();
 		$response->objects = $list;
 		$response->totalCount = $totalCount;
@@ -95,7 +95,7 @@ class ReportAdminService extends KalturaBaseService
 		$report->toUpdatableObject($dbReport);
 		$dbReport->save();
 		
-		$report->fromObject($dbReport);
+		$report->fromObject($dbReport, $this->getResponseProfile());
 		return $report;
 	}
 	

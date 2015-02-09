@@ -173,9 +173,9 @@ class KalturaConversionProfile extends KalturaObject implements IFilterable
 		return array_merge ( parent::getMapBetweenObjects() , self::$map_between_objects );
 	}
 	
-	public function fromObject($sourceObject)
+	public function fromObject($sourceObject, IResponseProfile $responseProfile = null)
 	{
-		parent::fromObject($sourceObject);
+		parent::fromObject($sourceObject, $responseProfile);
 		
 		$this->xslTransformation = $sourceObject->getXsl();
 		

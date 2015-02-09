@@ -5,7 +5,7 @@
  */
 class KalturaAttachmentAssetArray extends KalturaTypedArray
 {
-	public static function fromDbArray($arr)
+	public static function fromDbArray($arr, IResponseProfile $responseProfile = null)
 	{
 		$newArr = new KalturaAttachmentAssetArray();
 		if ($arr == null)
@@ -14,7 +14,7 @@ class KalturaAttachmentAssetArray extends KalturaTypedArray
 		foreach ($arr as $obj)
 		{
     		$nObj = new KalturaAttachmentAsset();
-			$nObj->fromObject($obj);
+			$nObj->fromObject($obj, $responseProfile);
 			$newArr[] = $nObj;
 		}
 		

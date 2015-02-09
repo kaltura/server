@@ -5,7 +5,7 @@
  */
 class KalturaMetadataProfileFieldArray extends KalturaTypedArray
 {
-	public static function fromMetadataProfileFieldArray($arr)
+	public static function fromDbArray(array $arr, IResponseProfile $responseProfile = null)
 	{
 		$newArr = new KalturaMetadataProfileFieldArray();
 		if ($arr == null)
@@ -14,7 +14,7 @@ class KalturaMetadataProfileFieldArray extends KalturaTypedArray
 		foreach ($arr as $obj)
 		{
     		$nObj = new KalturaMetadataProfileField();
-			$nObj->fromObject($obj);
+			$nObj->fromObject($obj, $responseProfile);
 			$newArr[] = $nObj;
 		}
 		

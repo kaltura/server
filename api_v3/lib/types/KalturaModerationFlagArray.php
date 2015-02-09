@@ -5,13 +5,13 @@
  */
 class KalturaModerationFlagArray extends KalturaTypedArray
 {
-	public static function fromModerationFlagArray($arr)
+	public static function fromDbArray(array $arr = null, IResponseProfile $responseProfile = null)
 	{
 		$newArr = new KalturaModerationFlagArray();
 		foreach($arr as $obj)
 		{
 			$nObj = new KalturaModerationFlag();
-			$nObj->fromObject($obj);
+			$nObj->fromObject($obj, $responseProfile);
 			$newArr[] = $nObj;
 		}
 		
@@ -23,4 +23,3 @@ class KalturaModerationFlagArray extends KalturaTypedArray
 		return parent::__construct("KalturaModerationFlag");
 	}
 }
-?>

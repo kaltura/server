@@ -5,7 +5,7 @@
  */
 class KalturaDwhHourlyPartnerArray extends KalturaTypedArray
 {
-	public static function fromDbArray($arr)
+	public static function fromDbArray($arr, IResponseProfile $responseProfile = null)
 	{
 		$newArr = new KalturaDwhHourlyPartnerArray();
 		if ($arr == null)
@@ -14,7 +14,7 @@ class KalturaDwhHourlyPartnerArray extends KalturaTypedArray
 		foreach ($arr as $obj)
 		{
     		$nObj = new KalturaDwhHourlyPartner();
-			$nObj->fromObject($obj);
+			$nObj->fromObject($obj, $responseProfile);
 			$newArr[] = $nObj;
 		}
 		

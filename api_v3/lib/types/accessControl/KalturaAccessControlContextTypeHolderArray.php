@@ -6,7 +6,7 @@
  */
 class KalturaAccessControlContextTypeHolderArray extends KalturaTypedArray
 {
-	public static function fromDbArray($arr)
+	public static function fromDbArray($arr, IResponseProfile $responseProfile = null)
 	{
 		$newArr = new KalturaAccessControlContextTypeHolderArray();
 		if ($arr == null)

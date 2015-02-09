@@ -8,7 +8,7 @@
  */
 class KalturaAssetDistributionConditionsArray extends KalturaTypedArray
 {
-	public static function fromDbArray(array $arr)
+	public static function fromDbArray(array $arr, IResponseProfile $responseProfile = null)
 	{
 		$newArr = new KalturaAssetDistributionConditionsArray();
 		if ($arr == null)
@@ -23,7 +23,7 @@ class KalturaAssetDistributionConditionsArray extends KalturaTypedArray
 					break;
 			}
 
-			$nObj->fromObject($obj);
+			$nObj->fromObject($obj, $responseProfile);
 			$newArr[] = $nObj;
 		}
 

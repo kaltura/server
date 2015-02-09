@@ -76,9 +76,12 @@ class KalturaCEError extends KalturaObject
 		return array_merge ( parent::getMapBetweenObjects() , self::$map_between_objects );
 	}
 
-	public function fromKceInstallationError ( KceInstallationError $kceError )
+	/* (non-PHPdoc)
+	 * @see KalturaObject::fromObject($srcObj, $responseProfile)
+	 */
+	public function fromObject($srcObj, IResponseProfile $responseProfile = null)
 	{
-		parent::fromObject( $kceError );
+		parent::fromObject($srcObj, $responseProfile);
 	}
 	
 	public function toKceInstallationError () 
@@ -87,4 +90,3 @@ class KalturaCEError extends KalturaObject
 		return parent::toObject( $kceError );
 	}
 }
-?>

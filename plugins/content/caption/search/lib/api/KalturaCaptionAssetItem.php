@@ -46,11 +46,11 @@ class KalturaCaptionAssetItem extends KalturaObject
 		return array_merge ( parent::getMapBetweenObjects() , self::$map_between_objects );
 	}
 	
-	public function fromObject($source_object)
+	public function fromObject($source_object, IResponseProfile $responseProfile = null)
 	{
 		/* @var $source_object CaptionAssetItem */
 		
-		$ret = parent::fromObject($source_object);
+		$ret = parent::fromObject($source_object, $responseProfile);
 		
 		$this->asset = new KalturaCaptionAsset();
 		$this->asset->fromObject($source_object->getAsset());

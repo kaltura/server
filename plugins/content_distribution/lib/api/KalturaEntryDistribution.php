@@ -234,12 +234,12 @@ class KalturaEntryDistribution extends KalturaObject implements IFilterable
 		return parent::toObject($dbObject, $skip);
 	}
 	
-	public function fromObject($sourceObject)
+	public function fromObject($sourceObject, IResponseProfile $responseProfile = null)
 	{
 		if(!$sourceObject)
 			return;
 			
-		parent::fromObject($sourceObject);
+		parent::fromObject($sourceObject, $responseProfile);
 		
 		$this->sunStatus = $sourceObject->getSunStatus();
 		$this->sunrise = $sourceObject->getSunrise(null);

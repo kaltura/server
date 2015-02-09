@@ -27,10 +27,10 @@ class KalturaHttpNotificationDataFields extends KalturaHttpNotificationData
 	/* (non-PHPdoc)
 	 * @see KalturaObject::fromObject($srcObj)
 	 */
-	public function fromObject($srcObj)
+	public function fromObject($srcObj, IResponseProfile $responseProfile = null)
 	{
 		/* @var $srcObj kHttpNotificationDataFields */
-		parent::fromObject($srcObj);
+		parent::fromObject($srcObj, $responseProfile);
 		$this->data = $srcObj->getData();
 	}
 	

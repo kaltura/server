@@ -11,13 +11,13 @@ class KalturaRemoteStorageResourceArray extends KalturaTypedArray
 	 * @param array<kRemoteStorageResource> $arr
 	 * @return KalturaRemoteStorageResourceArray
 	 */
-	public static function fromObjectArray(array $arr)
+	public static function fromDbArray(array $arr, IResponseProfile $responseProfile = null)
 	{
 		$newArr = new KalturaRemoteStorageResourceArray();
 		foreach($arr as $obj)
 		{
 			$nObj = new KalturaRemoteStorageResource();
-			$nObj->fromObject($obj);
+			$nObj->fromObject($obj, $responseProfile);
 			$newArr[] = $nObj;
 		}
 

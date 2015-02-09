@@ -30,6 +30,11 @@ abstract class KalturaBaseService
 	 * @var KalturaPartner
 	 */
 	private $operating_partner = null;
+	
+	/**
+	 * @var IResponseProfile
+	 */
+	private $responseProfile = null;
 	 
 	
 	protected $private_partner_data = null; /// will be used internally and from the actual services for setting the
@@ -86,6 +91,19 @@ abstract class KalturaBaseService
 		return false;
 	} 
 		
+	public function setResponseProfile(IResponseProfile $responseProfile = null)
+	{
+		$this->responseProfile = $responseProfile;
+	}
+		
+	/**
+	 * @return IResponseProfile
+	 */
+	protected function getResponseProfile()
+	{
+		return $this->responseProfile;
+	}
+	
 	public function initService($serviceId, $serviceName, $actionName)
 	{	
 		// init service and action name

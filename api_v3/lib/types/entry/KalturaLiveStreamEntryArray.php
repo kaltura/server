@@ -5,7 +5,7 @@
  */
 class KalturaLiveStreamEntryArray extends KalturaTypedArray
 {
-	public static function fromEntryArray ( $arr )
+	public static function fromDbArray($arr, IResponseProfile $responseProfile = null)
 	{
 		$newArr = new KalturaLiveStreamEntryArray();
 		if ($arr == null)
@@ -13,7 +13,7 @@ class KalturaLiveStreamEntryArray extends KalturaTypedArray
 		foreach ($arr as $obj)
 		{
 			$nObj = new KalturaLiveStreamEntry();
-			$nObj->fromObject($obj);
+			$nObj->fromObject($obj, $responseProfile);
 			$newArr[] = $nObj;
 		}
 		

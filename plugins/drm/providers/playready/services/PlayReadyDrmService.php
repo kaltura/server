@@ -36,7 +36,7 @@ class PlayReadyDrmService extends KalturaBaseService
 		$keyId = kPlayReadyAESContentKeyGenerator::generatePlayReadyKeyId();		
 		$contentKey = $this->createContentKeyObject($keySeed, $keyId);
 		$response = new KalturaPlayReadyContentKey();
-		$response->fromObject($contentKey);
+		$response->fromObject($contentKey, $this->getResponseProfile());
 		return $response;
 	}
 	
@@ -57,7 +57,7 @@ class PlayReadyDrmService extends KalturaBaseService
 		{
 			$contentKeysArr[] = $this->createContentKeyObject($keySeed, $keyId);
 		}	
-		$response = KalturaPlayReadyContentKeyArray::fromDbArray($contentKeysArr);	
+		$response = KalturaPlayReadyContentKeyArray::fromDbArray($contentKeysArr, $this->getResponseProfile());	
 		return $response;
 	}
 
@@ -112,7 +112,7 @@ class PlayReadyDrmService extends KalturaBaseService
 			
 		$contentKey = $this->createContentKeyObject($keySeed, $keyId);
 		$response = new KalturaPlayReadyContentKey();
-		$response->fromObject($contentKey);
+		$response->fromObject($contentKey, $this->getResponseProfile());
 		
 		return $response;				
 	}
@@ -147,7 +147,7 @@ class PlayReadyDrmService extends KalturaBaseService
 		list($beginDate, $expirationDate, $removalDate) = $this->calculateLicenseDates($dbPolicy, $entry);
 		
 		$policy = new KalturaPlayReadyPolicy();
-		$policy->fromObject($dbPolicy);
+		$policy->fromObject($dbPolicy, $this->getResponseProfile());
 		
 		$this->registerDevice($deviceId, $deviceType);
 		

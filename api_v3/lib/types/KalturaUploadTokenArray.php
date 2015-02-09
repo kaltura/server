@@ -5,13 +5,13 @@
  */
 class KalturaUploadTokenArray extends KalturaTypedArray
 {
-	public static function fromUploadTokenArray($arr)
+	public static function fromDbArray(array $arr, IResponseProfile $responseProfile = null)
 	{
 		$newArr = new KalturaUploadTokenArray();
 		foreach($arr as $obj)
 		{
 			$nObj = new KalturaUploadToken();
-			$nObj->fromObject($obj);
+			$nObj->fromObject($obj, $responseProfile);
 			$newArr[] = $nObj;
 		}
 		
@@ -23,4 +23,3 @@ class KalturaUploadTokenArray extends KalturaTypedArray
 		return parent::__construct("KalturaUploadToken");
 	}
 }
-?>

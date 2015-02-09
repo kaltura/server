@@ -31,7 +31,7 @@ class AccessControlService extends KalturaBaseService
 		$dbAccessControl->save();
 		
 		$accessControl = new KalturaAccessControl();
-		$accessControl->fromObject($dbAccessControl);
+		$accessControl->fromObject($dbAccessControl, $this->getResponseProfile());
 		return $accessControl;
 	}
 	
@@ -49,7 +49,7 @@ class AccessControlService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::ACCESS_CONTROL_ID_NOT_FOUND, $id);
 			
 		$accessControl = new KalturaAccessControl();
-		$accessControl->fromObject($dbAccessControl);
+		$accessControl->fromObject($dbAccessControl, $this->getResponseProfile());
 		return $accessControl;
 	}
 	
@@ -83,7 +83,7 @@ class AccessControlService extends KalturaBaseService
 		$dbAccessControl->save();
 		
 		$accessControl = new KalturaAccessControl();
-		$accessControl->fromObject($dbAccessControl);
+		$accessControl->fromObject($dbAccessControl, $this->getResponseProfile());
 		return $accessControl;
 	}
 	
@@ -144,7 +144,7 @@ class AccessControlService extends KalturaBaseService
 		$pager->attachToCriteria($c);
 		$dbList = accessControlPeer::doSelect($c);
 		
-		$list = KalturaAccessControlArray::fromDbArray($dbList);
+		$list = KalturaAccessControlArray::fromDbArray($dbList, $this->getResponseProfile());
 		$response = new KalturaAccessControlListResponse();
 		$response->objects = $list;
 		$response->totalCount = $totalCount;

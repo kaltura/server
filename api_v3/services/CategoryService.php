@@ -64,7 +64,7 @@ class CategoryService extends KalturaBaseService
 		}
 		
 		$category = new KalturaCategory();
-		$category->fromObject($categoryDb);
+		$category->fromObject($categoryDb, $this->getResponseProfile());
 		
 		return $category;
 	}
@@ -83,7 +83,7 @@ class CategoryService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::CATEGORY_NOT_FOUND, $id);
 		
 		$category = new KalturaCategory();
-		$category->fromObject($categoryDb);
+		$category->fromObject($categoryDb, $this->getResponseProfile());
 		return $category;
 	}
 	
@@ -145,7 +145,7 @@ class CategoryService extends KalturaBaseService
 		}
 		
 		$category = new KalturaCategory();
-		$category->fromObject($categoryDb);
+		$category->fromObject($categoryDb, $this->getResponseProfile());
 		return $category;
 	}
 	
@@ -229,7 +229,7 @@ class CategoryService extends KalturaBaseService
 		$dbList = categoryPeer::doSelect($c);
 		$totalCount = $c->getRecordsCount();
 		
-		$list = KalturaCategoryArray::fromCategoryArray($dbList);
+		$list = KalturaCategoryArray::fromDbArray($dbList, $this->getResponseProfile());
 		
 		$response = new KalturaCategoryListResponse();
 		$response->objects = $list;

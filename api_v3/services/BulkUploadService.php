@@ -48,7 +48,7 @@ class BulkUploadService extends KalturaBaseService
 		$dbJob = kJobsManager::addBulkUploadJob($this->getPartner(), $data, $coreBulkUploadType);
 		$dbJobLog = BatchJobLogPeer::retrieveByBatchJobId($dbJob->getId());
 		$bulkUpload = new KalturaBulkUpload();
-		$bulkUpload->fromObject($dbJobLog);
+		$bulkUpload->fromObject($dbJobLog, $this->getResponseProfile());
 		
 		return $bulkUpload;
 	}
@@ -118,7 +118,7 @@ class BulkUploadService extends KalturaBaseService
 		    throw new KalturaAPIException(KalturaErrors::BULK_UPLOAD_NOT_FOUND, $id);
 		    
 		$ret = new KalturaBulkUpload();
-		$ret->fromObject($batchJob);
+		$ret->fromObject($batchJob, $this->getResponseProfile());
 		return $ret;
 	}
 	
@@ -256,7 +256,7 @@ function serveAction($id)
 		
 		$batchJobLog = BatchJobLogPeer::retrieveByBatchJobId($id);
 		$ret = new KalturaBulkUpload();
-		$ret->fromObject($batchJobLog);
+		$ret->fromObject($batchJobLog, $this->getResponseProfile());
 		return $ret;
 	}
 }

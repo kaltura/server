@@ -5,13 +5,13 @@
  */
 class KalturaSchedulerWorkerArray extends KalturaTypedArray
 {
-	public static function fromSchedulerWorkerArray( $arr )
+	public static function fromDbArray(array $arr, IResponseProfile $responseProfile = null)
 	{
 		$newArr = new KalturaSchedulerWorkerArray();
 		foreach ( $arr as $obj )
 		{
 			$nObj = new KalturaSchedulerWorker();
-			$nObj->fromObject($obj);
+			$nObj->fromObject($obj, $responseProfile);
 			$newArr[] = $nObj;
 		}
 		
@@ -36,4 +36,3 @@ class KalturaSchedulerWorkerArray extends KalturaTypedArray
 		return parent::__construct ( "KalturaSchedulerWorker" );
 	}
 }
-?>

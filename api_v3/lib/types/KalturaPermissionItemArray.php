@@ -5,7 +5,7 @@
  */
 class KalturaPermissionItemArray extends KalturaTypedArray
 {
-	public static function fromDbArray($arr)
+	public static function fromDbArray($arr, IResponseProfile $responseProfile = null)
 	{
 		$newArr = new KalturaPermissionItemArray();
 		if ($arr == null)
@@ -23,7 +23,7 @@ class KalturaPermissionItemArray extends KalturaTypedArray
 				KalturaLog::crit('Unknown permission item type ['.$obj->getType().'] defined with id ['.$obj->getId().'] - skipping!');
 				continue;
 			}
-			$nObj->fromObject($obj);
+			$nObj->fromObject($obj, $responseProfile);
 			$newArr[] = $nObj;
 		}
 		

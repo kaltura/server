@@ -134,9 +134,9 @@ class KalturaBulkUploadJobData extends KalturaJobData
 	/* (non-PHPdoc)
 	 * @see KalturaObject::fromObject()
 	 */
-	public function fromObject($source_object)
+	public function fromObject($source_object, IResponseProfile $responseProfile = null)
 	{
-	    parent::fromObject($source_object);
+	    parent::fromObject($source_object, $responseProfile);
 	    
 	    /* @var $source_object kBulkUploadJobData */
 	    $this->objectData = null;

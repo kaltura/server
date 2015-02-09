@@ -5,7 +5,7 @@
  */
 class KalturaFileSyncArray extends KalturaTypedArray
 {
-	public static function fromDbArray($arr)
+	public static function fromDbArray($arr, IResponseProfile $responseProfile = null)
 	{
 		$newArr = new KalturaFileSyncArray();
 		if ($arr == null)
@@ -14,7 +14,7 @@ class KalturaFileSyncArray extends KalturaTypedArray
 		foreach ($arr as $obj)
 		{
     		$nObj = new KalturaFileSync();
-			$nObj->fromObject($obj);
+			$nObj->fromObject($obj, $responseProfile);
 			$newArr[] = $nObj;
 		}
 		

@@ -5,7 +5,7 @@
  */
 class KalturaShortLinkArray extends KalturaTypedArray
 {
-	public static function fromDbArray($arr)
+	public static function fromDbArray($arr, IResponseProfile $responseProfile = null)
 	{
 		$newArr = new KalturaShortLinkArray();
 		if ($arr == null)
@@ -14,7 +14,7 @@ class KalturaShortLinkArray extends KalturaTypedArray
 		foreach ($arr as $obj)
 		{
     		$nObj = new KalturaShortLink();
-			$nObj->fromObject($obj);
+			$nObj->fromObject($obj, $responseProfile);
 			$newArr[] = $nObj;
 		}
 		

@@ -183,6 +183,28 @@ class KalturaRequestDeserializer
 		return $serviceArguments;
 	}
 	
+	/**
+	 * @return IResponseProfile
+	 */
+	protected function getResponseProfile($paramName = 'responseProfile') {
+		if(!isset($this->paramsGrouped[$paramName])){
+			return null;
+		}
+		
+		if(isset($this->paramsGrouped[$paramName]['id'])){
+			return ResponseProfilePeer::retrieveByPK($this->paramsGrouped['responseProfileId']);
+		}
+		if(isset($this->paramsGrouped[$paramName]['name'])){
+			return ResponseProfilePeer::retrieveBySystemName($this->paramsGrouped['responseProfileName']);
+		}
+		
+		$typeReflector = KalturaTypeReflectorCacher::get('KalturaNestedResponseProfile');
+		$responseProfile = $this->buildObject($typeReflector, $this->paramsGrouped[$paramName], $paramName);
+		/* @var $responseProfile KalturaNestedResponseProfile */
+		
+		return $responseProfile->toObject();
+	}
+	
 	protected function validateParameter($name, $value, $constraintsObj) {
 		$constraints = $constraintsObj->getConstraints();
 		if(array_key_exists(KalturaDocCommentParser::MIN_LENGTH_CONSTRAINT, $constraints))

@@ -86,7 +86,7 @@ class CuePointService extends KalturaBaseService
 			return null;
 		}
 			
-		$cuePoint->fromObject($dbCuePoint);
+		$cuePoint->fromObject($dbCuePoint, $this->getResponseProfile());
 		return $cuePoint;
 	}
 	
@@ -111,7 +111,7 @@ class CuePointService extends KalturaBaseService
 		}
 		
 		$response = new KalturaCuePointListResponse();
-		$response->objects = KalturaCuePointArray::fromDbArray($list);
+		$response->objects = KalturaCuePointArray::fromDbArray($list, $this->getResponseProfile());
 		$response->totalCount = count($list);
 	
 		return $response;
@@ -171,7 +171,7 @@ class CuePointService extends KalturaBaseService
 		if(!$cuePoint)
 			return null;
 			
-		$cuePoint->fromObject($dbCuePoint);
+		$cuePoint->fromObject($dbCuePoint, $this->getResponseProfile());
 		return $cuePoint;
 	}
 	
@@ -226,7 +226,7 @@ class CuePointService extends KalturaBaseService
 		$list = CuePointPeer::doSelect($c);
 		
 		$response = new KalturaCuePointListResponse();
-		$response->objects = KalturaCuePointArray::fromDbArray($list);
+		$response->objects = KalturaCuePointArray::fromDbArray($list, $this->getResponseProfile());
 		$response->totalCount = $c->getRecordsCount();
 	
 		return $response;
@@ -287,7 +287,7 @@ class CuePointService extends KalturaBaseService
 		$dbCuePoint->setKuserId($this->getKuser()->getId()); 
 		$dbCuePoint->save();
 		
-		$cuePoint->fromObject($dbCuePoint);
+		$cuePoint->fromObject($dbCuePoint, $this->getResponseProfile());
 		return $cuePoint;
 	}
 	

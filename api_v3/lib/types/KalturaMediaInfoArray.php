@@ -5,7 +5,7 @@
  */
 class KalturaMediaInfoArray extends KalturaTypedArray
 {
-	public static function fromDbArray($arr)
+	public static function fromDbArray($arr, IResponseProfile $responseProfile = null)
 	{
 		$newArr = new KalturaMediaInfoArray();
 		if ($arr == null)
@@ -14,7 +14,7 @@ class KalturaMediaInfoArray extends KalturaTypedArray
 		foreach ($arr as $obj)
 		{
     		$nObj = new KalturaMediaInfo();
-			$nObj->fromObject($obj);
+			$nObj->fromObject($obj, $responseProfile);
 			$newArr[] = $nObj;
 		}
 		

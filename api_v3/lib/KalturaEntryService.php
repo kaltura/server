@@ -1127,7 +1127,7 @@ class KalturaEntryService extends KalturaBaseService
 				
 		myNotificationMgr::createNotification( kNotificationJobData::NOTIFICATION_TYPE_ENTRY_ADD, $dbEntry);
 
-		$newEntry->fromObject($dbEntry);
+		$newEntry->fromObject($dbEntry, $this->getResponseProfile());
 		return $newEntry;
 	}
 	
@@ -1148,7 +1148,7 @@ class KalturaEntryService extends KalturaBaseService
 		
 		$entry = KalturaEntryFactory::getInstanceByType($dbEntry->getType(), $isAdmin);
 		
-		$entry->fromObject($dbEntry);
+		$entry->fromObject($dbEntry, $this->getResponseProfile());
 
 		return $entry;
 	}
@@ -1174,7 +1174,7 @@ class KalturaEntryService extends KalturaBaseService
 		$fileSyncs = FileSyncPeer::doSelect($c);
 
 		$listResponse = new KalturaRemotePathListResponse();
-		$listResponse->objects = KalturaRemotePathArray::fromFileSyncArray($fileSyncs);
+		$listResponse->objects = KalturaRemotePathArray::fromDbArray($fileSyncs, $this->getResponseProfile());
 		$listResponse->totalCount = count($listResponse->objects);
 		return $listResponse;
 	}
@@ -1508,7 +1508,7 @@ class KalturaEntryService extends KalturaBaseService
 		/* @var $dbEntry entry */
 		
 		$updatedOccurred = $dbEntry->save();
-		$entry->fromObject($dbEntry);
+		$entry->fromObject($dbEntry, $this->getResponseProfile());
 		
 		try 
 		{
@@ -1566,7 +1566,7 @@ class KalturaEntryService extends KalturaBaseService
 		myEntryUtils::updateThumbnailFromFile($dbEntry, $url, $fileSyncType);
 		
 		$entry = KalturaEntryFactory::getInstanceByType($dbEntry->getType());
-		$entry->fromObject($dbEntry);
+		$entry->fromObject($dbEntry, $this->getResponseProfile());
 		
 		return $entry;
 	}
@@ -1591,7 +1591,7 @@ class KalturaEntryService extends KalturaBaseService
 		myEntryUtils::updateThumbnailFromFile($dbEntry, $fileData["tmp_name"], $fileSyncType);
 		
 		$entry = KalturaEntryFactory::getInstanceByType($dbEntry->getType());
-		$entry->fromObject($dbEntry);
+		$entry->fromObject($dbEntry, $this->getResponseProfile());
 		
 		return $entry;
 	}
@@ -1642,7 +1642,7 @@ class KalturaEntryService extends KalturaBaseService
 			$isAdmin = $ks->isAdmin();
 			
 		$mediaEntry = KalturaEntryFactory::getInstanceByType($dbEntry->getType(), $isAdmin);
-		$mediaEntry->fromObject($dbEntry);
+		$mediaEntry->fromObject($dbEntry, $this->getResponseProfile());
 		
 		return $mediaEntry;
 	}
@@ -1683,7 +1683,7 @@ class KalturaEntryService extends KalturaBaseService
 		$updateOccurred = $dbEntry->save();
 		
 		$moderationFlag = new KalturaModerationFlag();
-		$moderationFlag->fromObject($dbModerationFlag);
+		$moderationFlag->fromObject($dbModerationFlag, $this->getResponseProfile());
 		
 		// need to notify the partner that an entry was flagged - use the OLD moderation onject that is required for the 
 		// NOTIFICATION_TYPE_ENTRY_REPORT notification
@@ -1750,7 +1750,7 @@ class KalturaEntryService extends KalturaBaseService
 		$pager->attachToCriteria($c);
 		$list = moderationFlagPeer::doSelect($c);
 		
-		$newList = KalturaModerationFlagArray::fromModerationFlagArray($list);
+		$newList = KalturaModerationFlagArray::fromDbArray($list, $this->getResponseProfile());
 		$response = new KalturaModerationFlagListResponse();
 		$response->objects = $newList;
 		$response->totalCount = $totalCount;

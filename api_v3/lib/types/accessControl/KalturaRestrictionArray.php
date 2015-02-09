@@ -6,7 +6,7 @@
  */
 class KalturaRestrictionArray extends KalturaTypedArray
 {
-	public static function fromDbArray($arr)
+	public static function fromDbArray($arr, IResponseProfile $responseProfile = null)
 	{
 		$newArr = new KalturaRestrictionArray();
 		if ($arr == null)
@@ -15,7 +15,7 @@ class KalturaRestrictionArray extends KalturaTypedArray
 		foreach ($arr as $obj)
 		{
 			$nObj = self::getInstanceByDbObject($obj);
-			$nObj->fromObject($obj);
+			$nObj->fromObject($obj, $responseProfile);
 			$newArr[] = $nObj;
 		}
 		

@@ -10,7 +10,7 @@ class KalturaReportArray extends KalturaTypedArray
 		return parent::__construct("KalturaReport");
 	}
 	
-	public static function fromDbArray($arr)
+	public static function fromDbArray($arr, IResponseProfile $responseProfile = null)
 	{
 		$newArr = new KalturaReportArray();
 		if ($arr == null)
@@ -19,7 +19,7 @@ class KalturaReportArray extends KalturaTypedArray
 		foreach ($arr as $obj)
 		{
     		$nObj = new KalturaReport();
-			$nObj->fromObject($obj);
+			$nObj->fromObject($obj, $responseProfile);
 			$newArr[] = $nObj;
 		}
 		

@@ -38,7 +38,7 @@ class UiConfAdminService extends KalturaBaseService
 		$dbUiConf->save();
 		
 		$uiConf = new KalturaUiConfAdmin();
-		$uiConf->fromUiConf($dbUiConf);
+		$uiConf->fromObject($dbUiConf, $this->getResponseProfile());
 		
 		return $uiConf;
 	}
@@ -66,7 +66,7 @@ class UiConfAdminService extends KalturaBaseService
 		$dbUiConf->save();
 		
 		$uiConf = new KalturaUiConfAdmin();
-		$uiConf->fromObject($dbUiConf);
+		$uiConf->fromObject($dbUiConf, $this->getResponseProfile());
 		
 		return $uiConf;
 	}
@@ -88,7 +88,7 @@ class UiConfAdminService extends KalturaBaseService
 			throw new KalturaAPIException(APIErrors::INVALID_UI_CONF_ID, $id);
 			
 		$uiConf = new KalturaUiConfAdmin();
-		$uiConf->fromObject($dbUiConf);
+		$uiConf->fromObject($dbUiConf, $this->getResponseProfile());
 		
 		return $uiConf;
 	}
@@ -141,7 +141,7 @@ class UiConfAdminService extends KalturaBaseService
 		$pager->attachToCriteria($c);
 		$list = uiConfPeer::doSelect($c);
 		
-		$newList = KalturaUiConfAdminArray::fromUiConfAdminArray($list);
+		$newList = KalturaUiConfAdminArray::fromDbArray($list, $this->getResponseProfile());
 		
 		$response = new KalturaUiConfAdminListResponse();
 		$response->objects = $newList;

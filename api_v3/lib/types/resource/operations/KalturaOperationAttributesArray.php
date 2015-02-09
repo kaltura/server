@@ -5,7 +5,7 @@
  */
 class KalturaOperationAttributesArray extends KalturaTypedArray
 {
-	public static function fromOperationAttributesArray(array $arr)
+	public static function fromDbArray(array $arr = null, IResponseProfile $responseProfile = null)
 	{
 		$newArr = new KalturaOperationAttributesArray();
 		if(is_null($arr))
@@ -15,7 +15,7 @@ class KalturaOperationAttributesArray extends KalturaTypedArray
 		{
 			$class = $obj->getApiType();
 			$nObj = new $class();
-			$nObj->fromObject($obj);
+			$nObj->fromObject($obj, $responseProfile);
 			$newArr[] = $nObj;
 		}
 		

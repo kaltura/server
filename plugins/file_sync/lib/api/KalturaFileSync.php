@@ -292,9 +292,9 @@ class KalturaFileSync extends KalturaObject implements IFilterable
 		return parent::toObject($dbFileSync, $propsToSkip);
 	}
 	
-	public function fromObject ( $source_object  )
+	public function fromObject($source_object, IResponseProfile $responseProfile = null)
 	{
-		parent::fromObject($source_object);
+		parent::fromObject($source_object, $responseProfile);
 		
 		$this->fileUrl = $source_object->getExternalUrl($this->getEntryId($source_object));
 		$this->readyAt = $source_object->getReadyAt(null);

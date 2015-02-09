@@ -86,7 +86,7 @@ class BaseEntryService extends KalturaEntryService
 		
     	myNotificationMgr::createNotification(kNotificationJobData::NOTIFICATION_TYPE_ENTRY_ADD, $dbEntry, $dbEntry->getPartnerId(), null, null, null, $dbEntry->getId());
     	
-	    $entry->fromObject($dbEntry);
+	    $entry->fromObject($dbEntry, $this->getResponseProfile());
 	    return $entry;
     }
 	
@@ -319,7 +319,7 @@ class BaseEntryService extends KalturaEntryService
 	    
 	    myNotificationMgr::createNotification( kNotificationJobData::NOTIFICATION_TYPE_ENTRY_ADD, $dbEntry);
 
-	    $entry->fromObject($dbEntry);
+	    $entry->fromObject($dbEntry, $this->getResponseProfile());
 	    return $entry;
     }
     
@@ -394,7 +394,7 @@ class BaseEntryService extends KalturaEntryService
 		
 		
 		$baseEntry = new KalturaBaseEntry();
-		$baseEntry->fromObject($dbEntry);
+		$baseEntry->fromObject($dbEntry, $this->getResponseProfile());
 		
 		switch($dbEntry->getType())
     	{
@@ -402,7 +402,7 @@ class BaseEntryService extends KalturaEntryService
 				$service = new MediaService();
     			$service->initService('media', 'media', $this->actionName);
 				$service->replaceResource($resource, $dbEntry, $conversionProfileId, $advancedOptions);
-		    	$baseEntry->fromObject($dbEntry);
+		    	$baseEntry->fromObject($dbEntry, $this->getResponseProfile());
     			return $baseEntry;
 				
 			case entryType::MIX:
@@ -443,7 +443,7 @@ class BaseEntryService extends KalturaEntryService
 	 	foreach($list as $dbEntry)
 	 	{
 	 		$entry = KalturaEntryFactory::getInstanceByType($dbEntry->getType(), $isAdmin);
-		    $entry->fromObject($dbEntry);
+		    $entry->fromObject($dbEntry, $this->getResponseProfile());
 		    $newList[] = $entry;
 	 	}
 	 	
@@ -481,7 +481,7 @@ class BaseEntryService extends KalturaEntryService
 		if($ks)
 			$isAdmin = $ks->isAdmin();
 			
-	    $newList = KalturaBaseEntryArray::fromEntryArray($list, $isAdmin);
+	    $newList = KalturaBaseEntryArray::fromDbArray($list, $this->getResponseProfile(), $isAdmin);
 		$response = new KalturaBaseEntryListResponse();
 		$response->objects = $newList;
 		$response->totalCount = $totalCount;
@@ -523,7 +523,7 @@ class BaseEntryService extends KalturaEntryService
 		
 		$totalCount = $c->getRecordsCount();
 				
-	    $newList = KalturaBaseEntryArray::fromEntryArray($list, false);
+	    $newList = KalturaBaseEntryArray::fromDbArray($list, $this->getResponseProfile());
 		$response = new KalturaBaseEntryListResponse();
 		$response->objects = $newList;
 		$response->totalCount = $totalCount;
@@ -771,7 +771,7 @@ class BaseEntryService extends KalturaEntryService
 	    //TODO: implement export errors
 	    
 		$entry = KalturaEntryFactory::getInstanceByType($dbEntry->getType());
-		$entry->fromObject($dbEntry);
+		$entry->fromObject($dbEntry, $this->getResponseProfile());
 	    return $entry;
 	    
 	}

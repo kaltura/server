@@ -5,13 +5,13 @@
  */
 class KalturaWidgetArray extends KalturaTypedArray
 {
-	public static function fromWidgetArray ( $arr )
+	public static function fromDbArray(array $arr, IResponseProfile $responseProfile = null)
 	{
 		$newArr = new KalturaWidgetArray();
 		foreach ( $arr as $obj )
 		{
 			$nObj = new KalturaWidget();
-			$nObj->fromWidget( $obj );
+			$nObj->fromObject($obj, $responseProfile);
 			$newArr[] = $nObj;
 		}
 		
@@ -23,4 +23,3 @@ class KalturaWidgetArray extends KalturaTypedArray
 		return parent::__construct ( "KalturaWidget" );
 	}
 }
-?>

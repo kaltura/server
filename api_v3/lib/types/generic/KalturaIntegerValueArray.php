@@ -11,7 +11,7 @@ class KalturaIntegerValueArray extends KalturaTypedArray
 	 * @param array<string|kIntegerValue> $strings
 	 * @return KalturaIntegerValueArray
 	 */
-	public static function fromDbArray(array $ints = null)
+	public static function fromDbArray(array $ints = null, IResponseProfile $responseProfile = null)
 	{
 		$intArray = new KalturaIntegerValueArray();
 		if($ints && is_array($ints))
@@ -22,7 +22,7 @@ class KalturaIntegerValueArray extends KalturaTypedArray
 				
 				if($int instanceof kValue)
 				{
-					$intObject->fromObject($int);
+					$intObject->fromObject($int, $responseProfile);;
 				}
 				else
 				{					

@@ -52,7 +52,7 @@ class ShortLinkService extends KalturaBaseService
 		$list = ShortLinkPeer::doSelect($c);
 		
 		$response = new KalturaShortLinkListResponse();
-		$response->objects = KalturaShortLinkArray::fromDbArray($list);
+		$response->objects = KalturaShortLinkArray::fromDbArray($list, $this->getResponseProfile());
 		$response->totalCount = $count;
 		
 		return $response;
@@ -85,7 +85,7 @@ class ShortLinkService extends KalturaBaseService
 		$dbShortLink->save();
 		
 		$shortLink = new KalturaShortLink();
-		$shortLink->fromObject($dbShortLink);
+		$shortLink->fromObject($dbShortLink, $this->getResponseProfile());
 		
 		return $shortLink;
 	}
@@ -106,7 +106,7 @@ class ShortLinkService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $id);
 			
 		$shortLink = new KalturaShortLink();
-		$shortLink->fromObject($dbShortLink);
+		$shortLink->fromObject($dbShortLink, $this->getResponseProfile());
 		
 		return $shortLink;
 	}
@@ -132,7 +132,7 @@ class ShortLinkService extends KalturaBaseService
 		$dbShortLink = $shortLink->toUpdatableObject($dbShortLink);
 		$dbShortLink->save();
 	
-		$shortLink->fromObject($dbShortLink);
+		$shortLink->fromObject($dbShortLink, $this->getResponseProfile());
 		
 		return $shortLink;
 	}
@@ -157,7 +157,7 @@ class ShortLinkService extends KalturaBaseService
 		$dbShortLink->save();
 			
 		$shortLink = new KalturaShortLink();
-		$shortLink->fromObject($dbShortLink);
+		$shortLink->fromObject($dbShortLink, $this->getResponseProfile());
 		
 		return $shortLink;
 	}

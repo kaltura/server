@@ -342,7 +342,7 @@ class KalturaPartner extends KalturaObject implements IFilterable
 		return $this;
 	}
 	
-	public function fromObject ( $source_object  )
+	public function fromObject($source_object, IResponseProfile $responseProfile = null)
 	{
 		return self::fromPartner($source_object);
 	}

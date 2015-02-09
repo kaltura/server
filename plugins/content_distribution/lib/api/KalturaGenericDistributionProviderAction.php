@@ -136,9 +136,9 @@ class KalturaGenericDistributionProviderAction extends KalturaObject implements 
 		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
 	}
 	
-	public function fromObject($source_object)
+	public function fromObject($source_object, IResponseProfile $responseProfile = null)
 	{
-		parent::fromObject($source_object);
+		parent::fromObject($source_object, $responseProfile);
 
 		$key = $source_object->getSyncKey(GenericDistributionProviderAction::FILE_SYNC_DISTRIBUTION_PROVIDER_ACTION_MRSS_TRANSFORMER);
 		$this->mrssTransformer = kFileSyncUtils::file_get_contents($key, true, false);

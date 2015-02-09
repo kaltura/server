@@ -100,7 +100,7 @@ abstract class KalturaObject
 		$thisProps = $thisRef->getProperties();
 	
 		// generate file header
-		$result = "<?php\nclass {$fromObjectClass} extends {$srcObjClass}\n{\n\tstatic function fromObject(\$apiObj, \$srcObj)\n\t{\n";
+		$result = "<?php\nclass {$fromObjectClass} extends {$srcObjClass}\n{\n\tstatic function fromObject(\$apiObj, \$srcObj, IResponseProfile \$responseProfile = null)\n\t{\n";
 	
 		if ($thisRef->requiresReadPermission())
 		{
@@ -255,9 +255,10 @@ abstract class KalturaObject
 			if ($thisProps[$apiPropName]->requiresReadPermission())
 			{
 				$declaringClass = $this->getDeclaringClassName($apiPropName);
-				$curCode = "if (kPermissionManager::getReadPermitted('{$declaringClass}', '{$apiPropName}'))\n\t\t{\n\t\t\t{$curCode}\n\t\t}";
+				$curCode = "if (kPermissionManager::getReadPermitted('{$declaringClass}', '{$apiPropName}'))\n\t\t{\n\t\t\t" . implode("\n\t\t\t", explode("\n", $curCode)) . "\n\t\t}";
 			}
 	
+			$curCode = "if (isset(\$get['{$apiPropName}']))\n\t\t{\n\t\t\t" . implode("\n\t\t\t", explode("\n", $curCode)) . "\n\t\t}";
 			$mappingFuncCode[$apiPropName] = $curCode;
 		}
 	
@@ -269,10 +270,13 @@ abstract class KalturaObject
 			array_unshift($mappingFuncCode, '$customData = unserialize($srcObj->custom_data);');
 		}
 	
-		return $result . "\t\t" . implode("\n\t\t", $mappingFuncCode) . "\n\t}\n}";
+		$result .= "\t\t\$get = array(" . implode("\n\t\t", array_keys($mappingFuncCode)) . "\n\t\t);\n\t}\n}";
+		$result .= "\t\t" . implode("\n\t\t", $mappingFuncCode) . "\n\t}\n}";
+		
+		return $result;
 	}
 	
-	public function fromObject($srcObj)
+	public function fromObject($srcObj, IResponseProfile $responseProfile = null)
 	{
 		$thisClass = get_class($this);
 		$srcObjClass = get_class($srcObj);
@@ -298,7 +302,7 @@ abstract class KalturaObject
 			require_once($cacheFileName);
 		}
 	
-		$fromObjectClass::fromObject($this, $srcObj);
+		$fromObjectClass::fromObject($this, $srcObj, $responseProfile);
 	}
 	
 	public function fromArray ( $source_array )

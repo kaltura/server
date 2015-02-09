@@ -35,7 +35,7 @@ class EventNotificationTemplateService extends KalturaBaseService
 		
 		// return the saved object
 		$eventNotificationTemplate = KalturaEventNotificationTemplate::getInstanceByType($dbEventNotificationTemplate->getType());
-		$eventNotificationTemplate->fromObject($dbEventNotificationTemplate);
+		$eventNotificationTemplate->fromObject($dbEventNotificationTemplate, $this->getResponseProfile());
 		return $eventNotificationTemplate;
 		
 	}
@@ -83,7 +83,7 @@ class EventNotificationTemplateService extends KalturaBaseService
 	
 		// return the saved object
 		$newEventNotificationTemplate = KalturaEventNotificationTemplate::getInstanceByType($newDbEventNotificationTemplate->getType());
-		$newEventNotificationTemplate->fromObject($newDbEventNotificationTemplate);
+		$newEventNotificationTemplate->fromObject($newDbEventNotificationTemplate, $this->getResponseProfile());
 		return $newEventNotificationTemplate;
 		
 	}
@@ -106,7 +106,7 @@ class EventNotificationTemplateService extends KalturaBaseService
 			
 		// return the found object
 		$eventNotificationTemplate = KalturaEventNotificationTemplate::getInstanceByType($dbEventNotificationTemplate->getType());
-		$eventNotificationTemplate->fromObject($dbEventNotificationTemplate);
+		$eventNotificationTemplate->fromObject($dbEventNotificationTemplate, $this->getResponseProfile());
 		return $eventNotificationTemplate;
 	}
 	
@@ -134,7 +134,7 @@ class EventNotificationTemplateService extends KalturaBaseService
 	
 		// return the saved object
 		$eventNotificationTemplate = KalturaEventNotificationTemplate::getInstanceByType($dbEventNotificationTemplate->getType());
-		$eventNotificationTemplate->fromObject($dbEventNotificationTemplate);
+		$eventNotificationTemplate->fromObject($dbEventNotificationTemplate, $this->getResponseProfile());
 		return $eventNotificationTemplate;
 	}
 
@@ -169,7 +169,7 @@ class EventNotificationTemplateService extends KalturaBaseService
 	
 		// return the saved object
 		$eventNotificationTemplate = KalturaEventNotificationTemplate::getInstanceByType($dbEventNotificationTemplate->getType());
-		$eventNotificationTemplate->fromObject($dbEventNotificationTemplate);
+		$eventNotificationTemplate->fromObject($dbEventNotificationTemplate, $this->getResponseProfile());
 		return $eventNotificationTemplate;
 	}
 
@@ -220,7 +220,7 @@ class EventNotificationTemplateService extends KalturaBaseService
 		$list = EventNotificationTemplatePeer::doSelect($c);
 		
 		$response = new KalturaEventNotificationTemplateListResponse();
-		$response->objects = KalturaEventNotificationTemplateArray::fromDbArray($list);
+		$response->objects = KalturaEventNotificationTemplateArray::fromDbArray($list, $this->getResponseProfile());
 		$response->totalCount = $count;
 		
 		return $response;
@@ -265,7 +265,7 @@ class EventNotificationTemplateService extends KalturaBaseService
 		$totalCount = EventNotificationTemplatePeer::doCount($c);
 		$pager->attachToCriteria($c);
 		$list = EventNotificationTemplatePeer::doSelect($c);
-		$newList = KalturaEventNotificationTemplateArray::fromDbArray($list);
+		$newList = KalturaEventNotificationTemplateArray::fromDbArray($list, $this->getResponseProfile());
 		
 		$response = new KalturaEventNotificationTemplateListResponse();
 		$response->totalCount = $totalCount;
@@ -347,7 +347,7 @@ class EventNotificationTemplateService extends KalturaBaseService
 		$results = EventNotificationTemplatePeer::doSelect($criteria);
 		
 		$response = new KalturaEventNotificationTemplateListResponse();
-		$response->objects = KalturaEventNotificationTemplateArray::fromDbArray($results);
+		$response->objects = KalturaEventNotificationTemplateArray::fromDbArray($results, $this->getResponseProfile());
 		$response->totalCount = $count;
 		
 		return $response;

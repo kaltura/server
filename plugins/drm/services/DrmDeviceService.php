@@ -50,7 +50,7 @@ class DrmDeviceService extends KalturaBaseService
 		
 		// return the saved object
 		$drmDevice = KalturaDrmDevice::getInstanceByType($dbDrmDevice->getProvider());
-		$drmDevice->fromObject($dbDrmDevice);
+		$drmDevice->fromObject($dbDrmDevice, $this->getResponseProfile());
 		return $drmDevice;
 		
 	}
@@ -73,7 +73,7 @@ class DrmDeviceService extends KalturaBaseService
 		}
 			
 		$drmDevice = KalturaDrmDevice::getInstanceByType($dbDrmDevice->getProvider());
-		$drmDevice->fromObject($dbDrmDevice);
+		$drmDevice->fromObject($dbDrmDevice, $this->getResponseProfile());
 		
 		return $drmDevice;
 	}
@@ -101,7 +101,7 @@ class DrmDeviceService extends KalturaBaseService
 		$dbDrmDevice->save();
 	
 		$drmDevice = KalturaDrmDevice::getInstanceByType($dbDrmDevice->getProvider());
-		$drmDevice->fromObject($dbDrmDevice);
+		$drmDevice->fromObject($dbDrmDevice, $this->getResponseProfile());
 		
 		return $drmDevice;
 	}
@@ -127,7 +127,7 @@ class DrmDeviceService extends KalturaBaseService
 		$dbDrmDevice->save();
 			
 		$drmDevice = KalturaDrmDevice::getInstanceByType($dbDrmDevice->getProvider());
-		$drmDevice->fromObject($dbDrmDevice);
+		$drmDevice->fromObject($dbDrmDevice, $this->getResponseProfile());
 		
 		return $drmDevice;
 	}
@@ -156,7 +156,7 @@ class DrmDeviceService extends KalturaBaseService
 		$list = DrmDevicePeer::doSelect($c);
 		
 		$response = new KalturaDrmDeviceListResponse();
-		$response->objects = KalturaDrmDeviceArray::fromDbArray($list);
+		$response->objects = KalturaDrmDeviceArray::fromDbArray($list, $this->getResponseProfile());
 		$response->totalCount = $count;
 		
 		return $response;

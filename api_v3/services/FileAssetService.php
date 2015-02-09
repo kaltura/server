@@ -29,7 +29,7 @@ class FileAssetService extends KalturaBaseService
 		$dbFileAsset->save();
 		
 		$fileAsset = new KalturaFileAsset();
-		$fileAsset->fromObject($dbFileAsset);
+		$fileAsset->fromObject($dbFileAsset, $this->getResponseProfile());
 		return $fileAsset;
 	}
 	
@@ -49,7 +49,7 @@ class FileAssetService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::FILE_ASSET_ID_NOT_FOUND, $id);
 			
 		$fileAsset = new KalturaFileAsset();
-		$fileAsset->fromObject($dbFileAsset);
+		$fileAsset->fromObject($dbFileAsset, $this->getResponseProfile());
 		return $fileAsset;
 	}
 	
@@ -73,7 +73,7 @@ class FileAssetService extends KalturaBaseService
 		$dbFileAsset->save();
 		
 		$fileAsset = new KalturaFileAsset();
-		$fileAsset->fromObject($dbFileAsset);
+		$fileAsset->fromObject($dbFileAsset, $this->getResponseProfile());
 		return $fileAsset;
 	}
 	
@@ -136,7 +136,7 @@ class FileAssetService extends KalturaBaseService
     	$this->attachContentResource($dbFileAsset, $kContentResource);
 		
 		$fileAsset = new KalturaFileAsset();
-		$fileAsset->fromObject($dbFileAsset);
+		$fileAsset->fromObject($dbFileAsset, $this->getResponseProfile());
 		return $fileAsset;
     }
     
@@ -267,7 +267,7 @@ class FileAssetService extends KalturaBaseService
 		$dbList = FileAssetPeer::doSelect($c);
 		
 		$response = new KalturaFileAssetListResponse();
-		$response->objects = KalturaFileAssetArray::fromDbArray($dbList);
+		$response->objects = KalturaFileAssetArray::fromDbArray($dbList, $this->getResponseProfile());
 		$response->totalCount = $totalCount;
 		return $response;    
 	}

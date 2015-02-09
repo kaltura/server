@@ -5,7 +5,7 @@
  */
 class KalturaRuleArray extends KalturaTypedArray
 {
-	public static function fromDbArray($arr)
+	public static function fromDbArray($arr, IResponseProfile $responseProfile = null)
 	{
 		KalturaLog::debug(print_r($arr, true));
 		$newArr = new KalturaRuleArray();
@@ -15,7 +15,7 @@ class KalturaRuleArray extends KalturaTypedArray
 		foreach ($arr as $obj)
 		{
     		$nObj = new KalturaRule();
-			$nObj->fromObject($obj);
+			$nObj->fromObject($obj, $responseProfile);
 			$newArr[] = $nObj;
 		}
 		

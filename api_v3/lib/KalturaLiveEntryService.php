@@ -121,7 +121,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 		}
 		
 		$entry = KalturaEntryFactory::getInstanceByType($dbEntry->getType());
-		$entry->fromObject($dbEntry);
+		$entry->fromObject($dbEntry, $this->getResponseProfile());
 		return $entry;
 	}
 
@@ -205,7 +205,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 		$dbEntry->save();
 		
 		$entry = KalturaEntryFactory::getInstanceByType($dbEntry->getType());
-		$entry->fromObject($dbEntry);
+		$entry->fromObject($dbEntry, $this->getResponseProfile());
 		return $entry;
 	}
 
@@ -281,7 +281,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 		$dbEntry->save();
 		
 		$entry = KalturaEntryFactory::getInstanceByType($dbEntry->getType());
-		$entry->fromObject($dbEntry);
+		$entry->fromObject($dbEntry, $this->getResponseProfile());
 		return $entry;
 	}
 

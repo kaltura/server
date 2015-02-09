@@ -11,7 +11,7 @@ class KalturaLiveStreamPushPublishConfigurationArray extends KalturaTypedArray
 	 * @param array $dbArray
 	 * @return KalturaLiveStreamPushPublishConfiguration
 	 */
-	public static function fromDbArray(array $dbArray = null)
+	public static function fromDbArray(array $dbArray = null, IResponseProfile $responseProfile = null)
 	{
 		$array = new KalturaLiveStreamConfigurationArray();
 		if($dbArray && is_array($dbArray))
@@ -20,7 +20,7 @@ class KalturaLiveStreamPushPublishConfigurationArray extends KalturaTypedArray
 			{
 				/* @var $object kLiveStreamPushPublishConfiguration */
 				$configObject = KalturaLiveStreamPushPublishConfiguration::getInstance(get_class($object));
-				$configObject->fromObject($object);
+				$configObject->fromObject($object, $responseProfile);;
 				$array[] = $configObject;
 			}
 		}

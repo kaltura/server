@@ -9,7 +9,7 @@ class KalturaSearchItemArray extends KalturaTypedArray
 	 * @param array $arr
 	 * @return KalturaSearchItemArray
 	 */
-	public static function fromSearchItemArray(array $arr = null)
+	public static function fromDbArray(array $arr = null, IResponseProfile $responseProfile = null)
 	{
 		$newArr = new KalturaSearchItemArray();
 		if(!$arr || !count($arr))
@@ -25,7 +25,7 @@ class KalturaSearchItemArray extends KalturaTypedArray
 			}
 				
 			$nObj = new $kalturaClass();
-			$nObj->fromObject( $obj );
+			$nObj->fromObject($obj, $responseProfile);
 			$newArr[] = $nObj;
 		}
 		

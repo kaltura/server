@@ -122,7 +122,7 @@ class KalturaBulkUpload extends KalturaObject implements IFilterable
 		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
 	}
 	
-	public function fromObject($batchJobObject)
+	public function fromObject($batchJobObject, IResponseProfile $responseProfile = null)
 	{
 	    /* @var $batchJobObject BatchJobLog */
 	    if (is_null($batchJobObject))
@@ -133,7 +133,7 @@ class KalturaBulkUpload extends KalturaObject implements IFilterable
 		if($batchJobObject->getJobType() != BatchJobType::BULKUPLOAD)
 			throw new Exception("Bulk upload object can be initialized from bulk upload job only");
 		
-		parent::fromObject($batchJobObject);
+		parent::fromObject($batchJobObject, $responseProfile);
 		
 		$this->uploadedOn = $batchJobObject->getCreatedAt(null);
 		

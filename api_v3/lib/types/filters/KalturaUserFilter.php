@@ -52,9 +52,9 @@ class KalturaUserFilter extends KalturaUserBaseFilter
 		return $object_to_fill;		
 	}
 	
-	public function fromObject ( $source_object )
+	public function fromObject($source_object, IResponseProfile $responseProfile = null)
 	{
-		parent::fromObject($source_object);
+		parent::fromObject($source_object, $responseProfile);
 		
 		$loginDataIdGreaterOrEqualValue =  $source_object->get('_gte_login_data_id');
 		$loginDataIdLessThanOrNullValue =  $source_object->get('_ltornull_login_data_id');

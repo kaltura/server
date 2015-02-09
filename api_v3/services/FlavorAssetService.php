@@ -80,7 +80,7 @@ class FlavorAssetService extends KalturaAssetService
 		$dbFlavorAsset->save();
     	
 		$flavorAsset = KalturaFlavorAsset::getInstanceByType($type);
- 		$flavorAsset->fromObject($dbFlavorAsset);
+ 		$flavorAsset->fromObject($dbFlavorAsset, $this->getResponseProfile());
 		return $flavorAsset;
     }
     
@@ -110,7 +110,7 @@ class FlavorAssetService extends KalturaAssetService
    		$dbFlavorAsset->save();
 		
 		$flavorAsset = KalturaFlavorAsset::getInstanceByType($dbFlavorAsset->getType());
-		$flavorAsset->fromObject($dbFlavorAsset);
+		$flavorAsset->fromObject($dbFlavorAsset, $this->getResponseProfile());
 		return $flavorAsset;
     }
     
@@ -160,7 +160,7 @@ class FlavorAssetService extends KalturaAssetService
    			kEventsManager::raiseEvent(new kObjectAddedEvent($dbFlavorAsset));
    		
 		$flavorAsset = KalturaFlavorAsset::getInstanceByType($dbFlavorAsset->getType());
-		$flavorAsset->fromObject($dbFlavorAsset);
+		$flavorAsset->fromObject($dbFlavorAsset, $this->getResponseProfile());
 		return $flavorAsset;
     }
     
@@ -403,7 +403,7 @@ class FlavorAssetService extends KalturaAssetService
 			throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND, $id);
 			
 		$flavorAsset = KalturaFlavorAsset::getInstanceByType($flavorAssetDb->getType());
-		$flavorAsset->fromObject($flavorAssetDb);
+		$flavorAsset->fromObject($flavorAssetDb, $this->getResponseProfile());
 		return $flavorAsset;
 	}
 	
@@ -430,7 +430,7 @@ class FlavorAssetService extends KalturaAssetService
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 					
 		$flavorAssetsDb = assetPeer::retrieveFlavorsByEntryId($entryId);
-		$flavorAssets = KalturaFlavorAssetArray::fromDbArray($flavorAssetsDb);
+		$flavorAssets = KalturaFlavorAssetArray::fromDbArray($flavorAssetsDb, $this->getResponseProfile());
 		return $flavorAssets;
 	}
 	
@@ -510,7 +510,7 @@ class FlavorAssetService extends KalturaAssetService
 			$totalCount = assetPeer::doCount($c);
 		}
 		
-		$list = KalturaFlavorAssetArray::fromDbArray($dbList);
+		$list = KalturaFlavorAssetArray::fromDbArray($dbList, $this->getResponseProfile());
 		$response = new KalturaFlavorAssetListResponse();
 		$response->objects = $list;
 		$response->totalCount = $totalCount;
@@ -544,7 +544,7 @@ class FlavorAssetService extends KalturaAssetService
 		if (count($flavorAssetsDb) == 0)
 			throw new KalturaAPIException(KalturaErrors::NO_FLAVORS_FOUND);
 			
-		$flavorAssets = KalturaFlavorAssetArray::fromDbArray($flavorAssetsDb);
+		$flavorAssets = KalturaFlavorAssetArray::fromDbArray($flavorAssetsDb, $this->getResponseProfile());
 		
 		return $flavorAssets;
 	}
@@ -733,7 +733,7 @@ class FlavorAssetService extends KalturaAssetService
 		$fileSyncs = FileSyncPeer::doSelect($c);
 			
 		$listResponse = new KalturaRemotePathListResponse();
-		$listResponse->objects = KalturaRemotePathArray::fromFileSyncArray($fileSyncs);
+		$listResponse->objects = KalturaRemotePathArray::fromDbArray($fileSyncs, $this->getResponseProfile());
 		$listResponse->totalCount = count($listResponse->objects);
 		return $listResponse;
 	}
@@ -842,13 +842,13 @@ class FlavorAssetService extends KalturaAssetService
 			$flavorAssetWithParams = new KalturaFlavorAssetWithParams();
 			$flavorAssetWithParams->entryId = $entryId;
 			$flavorAsset = KalturaFlavorAsset::getInstanceByType($flavorAssetDb->getType());
-			$flavorAsset->fromObject($flavorAssetDb);
+			$flavorAsset->fromObject($flavorAssetDb, $this->getResponseProfile());
 			$flavorAssetWithParams->flavorAsset = $flavorAsset;
 			if (isset($flavorParamsArray[$flavorParamsId]))
 			{
 				$flavorParamsDb = $flavorParamsArray[$flavorParamsId];
 				$flavorParams = KalturaFlavorParamsFactory::getFlavorParamsInstance($flavorParamsDb->getType());
-				$flavorParams->fromObject($flavorParamsDb);
+				$flavorParams->fromObject($flavorParamsDb, $this->getResponseProfile());
 				$flavorAssetWithParams->flavorParams = $flavorParams;
 
 				// we want to log which flavor params are in use, there could be more
@@ -876,7 +876,7 @@ class FlavorAssetService extends KalturaAssetService
 				continue;
 			}
 			$flavorParams = KalturaFlavorParamsFactory::getFlavorParamsInstance($flavorParamsDb->getType());
-			$flavorParams->fromObject($flavorParamsDb);
+			$flavorParams->fromObject($flavorParamsDb, $this->getResponseProfile());
 			
 			$flavorAssetWithParams = new KalturaFlavorAssetWithParams();
 			$flavorAssetWithParams->entryId = $entryId;

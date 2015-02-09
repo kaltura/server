@@ -5,7 +5,7 @@
  */
 class KalturaFlavorAssetArray extends KalturaTypedArray
 {
-	public static function fromDbArray($arr)
+	public static function fromDbArray($arr, IResponseProfile $responseProfile = null)
 	{
 		$newArr = new KalturaFlavorAssetArray();
 		if ($arr == null)
@@ -14,7 +14,7 @@ class KalturaFlavorAssetArray extends KalturaTypedArray
 		foreach ($arr as $obj)
 		{
     		$nObj = KalturaFlavorAsset::getInstanceByType($obj->getType());
-			$nObj->fromObject($obj);
+			$nObj->fromObject($obj, $responseProfile);
 			$newArr[] = $nObj;
 		}
 		

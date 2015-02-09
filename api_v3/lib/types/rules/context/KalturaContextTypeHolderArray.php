@@ -5,7 +5,7 @@
  */
 class KalturaContextTypeHolderArray extends KalturaTypedArray
 {
-	public static function fromDbArray($arr)
+	public static function fromDbArray($arr, IResponseProfile $responseProfile = null)
 	{
 		$newArr = new KalturaContextTypeHolderArray();
 		if ($arr == null)

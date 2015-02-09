@@ -5,7 +5,7 @@
  */
 class KalturaPlayReadyDigitalAudioOPIdHolderArray extends KalturaTypedArray
 {
-	public static function fromDbArray($arr)
+	public static function fromDbArray($arr, IResponseProfile $responseProfile = null)
 	{
 		$newArr = new KalturaPlayReadyDigitalAudioOPIdHolderArray();
 		if ($arr == null)

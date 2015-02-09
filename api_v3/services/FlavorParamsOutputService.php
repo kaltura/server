@@ -32,7 +32,7 @@ class FlavorParamsOutputService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::FLAVOR_PARAMS_OUTPUT_ID_NOT_FOUND, $id);
 			
 		$flavorParamsOutput = KalturaFlavorParamsFactory::getFlavorParamsOutputInstance($flavorParamsOutputDb->getType());
-		$flavorParamsOutput->fromObject($flavorParamsOutputDb);
+		$flavorParamsOutput->fromObject($flavorParamsOutputDb, $this->getResponseProfile());
 		
 		return $flavorParamsOutput;
 	}
@@ -68,7 +68,7 @@ class FlavorParamsOutputService extends KalturaBaseService
 		$pager->attachToCriteria($c);
 		$dbList = assetParamsOutputPeer::doSelect($c);
 		
-		$list = KalturaFlavorParamsOutputArray::fromDbArray($dbList);
+		$list = KalturaFlavorParamsOutputArray::fromDbArray($dbList, $this->getResponseProfile());
 		$response = new KalturaFlavorParamsOutputListResponse();
 		$response->objects = $list;
 		$response->totalCount = $totalCount;

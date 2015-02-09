@@ -5,13 +5,13 @@
  */
 class KalturaUserLoginDataArray extends KalturaTypedArray
 {
-	public static function fromUserLoginDataArray ( $arr )
+	public static function fromDbArray(array $arr, IResponseProfile $responseProfile = null)
 	{
 		$newArr = new KalturaUserLoginDataArray();
 		foreach ( $arr as $obj )
 		{
 			$nObj = new KalturaUserLoginData();
-			$nObj->fromObject( $obj );
+			$nObj->fromObject($obj, $responseProfile);
 			$newArr[] = $nObj;
 		}
 		
@@ -24,4 +24,3 @@ class KalturaUserLoginDataArray extends KalturaTypedArray
 		return parent::__construct ( "KalturaUserLoginData" );
 	}
 }
-?>

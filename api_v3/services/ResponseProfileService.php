@@ -27,7 +27,7 @@ class ResponseProfileService extends KalturaBaseService
 		$dbResponseProfile->save();
 		
 		$responseProfile = new KalturaResponseProfile();
-		$responseProfile->fromObject($dbResponseProfile);
+		$responseProfile->fromObject($dbResponseProfile, $this->getResponseProfile());
 		return $responseProfile;
 	}
 	
@@ -47,7 +47,7 @@ class ResponseProfileService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::RESPONSE_PROFILE_ID_NOT_FOUND, $id);
 			
 		$responseProfile = new KalturaResponseProfile();
-		$responseProfile->fromObject($dbResponseProfile);
+		$responseProfile->fromObject($dbResponseProfile, $this->getResponseProfile());
 		return $responseProfile;
 	}
 	
@@ -71,7 +71,7 @@ class ResponseProfileService extends KalturaBaseService
 		$dbResponseProfile->save();
 		
 		$responseProfile = new KalturaResponseProfile();
-		$responseProfile->fromObject($dbResponseProfile);
+		$responseProfile->fromObject($dbResponseProfile, $this->getResponseProfile());
 		return $responseProfile;
 	}
 	
@@ -120,7 +120,7 @@ class ResponseProfileService extends KalturaBaseService
 		$pager->attachToCriteria($c);
 		$dbList = ResponseProfilePeer::doSelect($c);
 		
-		$list = KalturaResponseProfileArray::fromDbArray($dbList);
+		$list = KalturaResponseProfileArray::fromDbArray($dbList, $this->getResponseProfile());
 		$response = new KalturaResponseProfileListResponse();
 		$response->objects = $list;
 		$response->totalCount = $totalCount;

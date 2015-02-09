@@ -82,8 +82,8 @@ class KalturaDispatcher
 		KalturaLog::debug("Dispatching service [".$service."], action [".$action."], reqIndex [".
 			kCurrentContext::$multiRequest_index."] with params " . print_r($this->arguments, true));
 
-		$serviceInstance = $actionReflector->getServiceInstance();
-
+		$responseProfile = $deserializer->getResponseProfile();
+		
 		kPermissionManager::init(kConf::get('enable_cache'));
 		kEntitlementUtils::initEntitlementEnforcement();
 		
@@ -108,7 +108,7 @@ class KalturaDispatcher
 		
 		// initialize the service before invoking the action on it
 		// action reflector will init the service to maintain the pluginable action transparency
-		$actionReflector->initService();
+		$actionReflector->initService($responseProfile);
 		
 		$invokeStart = microtime(true);
 		KalturaLog::debug("Invoke start");

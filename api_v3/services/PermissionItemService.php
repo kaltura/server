@@ -45,7 +45,7 @@ class PermissionItemService extends KalturaBaseService
 		$dbPermissionItem->save();
 		
 		$permissionItem = new KalturaPermissionItem();
-		$permissionItem->fromObject($dbPermissionItem);
+		$permissionItem->fromObject($dbPermissionItem, $this->getResponseProfile());
 		
 		return $permissionItem;
 	}
@@ -77,7 +77,7 @@ class PermissionItemService extends KalturaBaseService
 			$permissionItem = new KalturaPermissionItem();
 		}
 		
-		$permissionItem->fromObject($dbPermissionItem);
+		$permissionItem->fromObject($dbPermissionItem, $this->getResponseProfile());
 		
 		return $permissionItem;
 	}
@@ -106,7 +106,7 @@ class PermissionItemService extends KalturaBaseService
 		$dbPermissionItem->save();
 	
 		$permissionItem = new KalturaPermissionItem();
-		$permissionItem->fromObject($dbPermissionItem);
+		$permissionItem->fromObject($dbPermissionItem, $this->getResponseProfile());
 		
 		return $permissionItem;
 	}
@@ -132,7 +132,7 @@ class PermissionItemService extends KalturaBaseService
 		$dbPermissionItem->delete();
 			
 		$permissionItem = new KalturaPermissionItem();
-		$permissionItem->fromObject($dbPermissionItem);
+		$permissionItem->fromObject($dbPermissionItem, $this->getResponseProfile());
 		
 		return $permissionItem;
 	}
@@ -163,7 +163,7 @@ class PermissionItemService extends KalturaBaseService
 		$list = PermissionItemPeer::doSelect($c);
 		
 		$response = new KalturaPermissionItemListResponse();
-		$response->objects = KalturaPermissionItemArray::fromDbArray($list);
+		$response->objects = KalturaPermissionItemArray::fromDbArray($list, $this->getResponseProfile());
 		$response->totalCount = $count;
 		
 		return $response;

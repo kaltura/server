@@ -97,12 +97,12 @@ class KalturaVirusScanProfile extends KalturaObject implements IFilterable
 		return $dbObject;
 	}
 	
-	public function fromObject($sourceObject)
+	public function fromObject($sourceObject, IResponseProfile $responseProfile = null)
 	{
 		if(!$sourceObject)
 			return;
 			
-		parent::fromObject($sourceObject);
+		parent::fromObject($sourceObject, $responseProfile);
 		
 		$entryFilter = $sourceObject->getEntryFilterObject();
 		if($entryFilter)

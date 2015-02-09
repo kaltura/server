@@ -32,7 +32,7 @@ class ThumbParamsOutputService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::THUMB_PARAMS_OUTPUT_ID_NOT_FOUND, $id);
 			
 		$thumbParamsOutput = new KalturaThumbParamsOutput();
-		$thumbParamsOutput->fromObject($thumbParamsOutputDb);
+		$thumbParamsOutput->fromObject($thumbParamsOutputDb, $this->getResponseProfile());
 		
 		return $thumbParamsOutput;
 	}
@@ -68,7 +68,7 @@ class ThumbParamsOutputService extends KalturaBaseService
 		$pager->attachToCriteria($c);
 		$dbList = assetParamsOutputPeer::doSelect($c);
 		
-		$list = KalturaThumbParamsOutputArray::fromDbArray($dbList);
+		$list = KalturaThumbParamsOutputArray::fromDbArray($dbList, $this->getResponseProfile());
 		$response = new KalturaThumbParamsOutputListResponse();
 		$response->objects = $list;
 		$response->totalCount = $totalCount;

@@ -5,7 +5,7 @@
  */
 class KalturaDistributionValidationErrorArray extends KalturaTypedArray
 {
-	public static function fromDbArray(array $arr)
+	public static function fromDbArray(array $arr, IResponseProfile $responseProfile = null)
 	{
 		$newArr = new KalturaDistributionValidationErrorArray();
 		if ($arr == null)
@@ -50,7 +50,7 @@ class KalturaDistributionValidationErrorArray extends KalturaTypedArray
 			if(!$nObj)
 				continue;
 				
-			$nObj->fromObject($obj);
+			$nObj->fromObject($obj, $responseProfile);
 			$newArr[] = $nObj;
 		}
 		

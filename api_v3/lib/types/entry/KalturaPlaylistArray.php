@@ -5,14 +5,14 @@
  */
 class KalturaPlaylistArray extends KalturaTypedArray
 {
-	public static function fromPlaylistArray ( $arr )
+	public static function fromDbArray(array $arr = null, IResponseProfile $responseProfile = null)
 	{
 		$newArr = new KalturaPlaylistArray();
 		if ( $arr == null ) return $newArr;
 		foreach ( $arr as $obj )
 		{
 			$nObj = new KalturaPlaylist();
-			$nObj->fromObject(  $obj );
+			$nObj->fromObject($obj, $responseProfile);
 			$newArr[] = $nObj;
 		}
 		

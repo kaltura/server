@@ -59,7 +59,7 @@ class BulkService extends KalturaBaseService
 			return null;
 			
 		$bulkUpload = new KalturaBulkUpload();
-		$bulkUpload->fromObject($dbJobLog);
+		$bulkUpload->fromObject($dbJobLog, $this->getResponseProfile());
 		
 		return $bulkUpload;
 	}
@@ -104,7 +104,7 @@ class BulkService extends KalturaBaseService
 			return null;
 		
 		$bulkUpload = new KalturaBulkUpload();
-		$bulkUpload->fromObject($dbJobLog);
+		$bulkUpload->fromObject($dbJobLog, $this->getResponseProfile());
 		
 		return $bulkUpload;
 	}
@@ -147,7 +147,7 @@ class BulkService extends KalturaBaseService
 			return null;
 		
 		$bulkUpload = new KalturaBulkUpload();
-		$bulkUpload->fromObject($dbJobLog);
+		$bulkUpload->fromObject($dbJobLog, $this->getResponseProfile());
 		
 		return $bulkUpload;
 	}
@@ -190,7 +190,7 @@ class BulkService extends KalturaBaseService
 			return null;
 			
 		$bulkUpload = new KalturaBulkUpload();
-		$bulkUpload->fromObject($dbJobLog);
+		$bulkUpload->fromObject($dbJobLog, $this->getResponseProfile());
 		
 		return $bulkUpload;
 	}
@@ -243,7 +243,7 @@ class BulkService extends KalturaBaseService
 			return null;
 		
 		$bulkUpload = new KalturaBulkUpload();
-		$bulkUpload->fromObject($dbJobLog);
+		$bulkUpload->fromObject($dbJobLog, $this->getResponseProfile());
 		
 		return $bulkUpload;
 	}	
@@ -267,7 +267,7 @@ class BulkService extends KalturaBaseService
 		    throw new KalturaAPIException(KalturaErrors::BULK_UPLOAD_NOT_FOUND, $id);
 		    
 		$ret = new KalturaBulkUpload();
-		$ret->fromObject($batchJob);
+		$ret->fromObject($batchJob, $this->getResponseProfile());
 		return $ret;
 	}
 	
@@ -412,7 +412,7 @@ class BulkService extends KalturaBaseService
 		
 		$ret = new KalturaBulkUpload();
 		if ($batchJobLog)
-    		$ret->fromObject($batchJobLog);
+    		$ret->fromObject($batchJobLog, $this->getResponseProfile());
     	
     	return $ret;
 	}

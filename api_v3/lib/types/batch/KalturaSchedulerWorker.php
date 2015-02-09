@@ -133,7 +133,7 @@ class KalturaSchedulerWorker extends KalturaObject
 		"schedulerConfiguredId",
 		"type",
 		"name",
-		"name",
+		"configs",
 	);
 	
 	public function getMapBetweenObjects()
@@ -155,9 +155,9 @@ class KalturaSchedulerWorker extends KalturaObject
 	 * @param SchedulerWorker $dbData
 	 * @return KalturaScheduler
 	 */
-	public function fromObject($dbData)
+	public function fromObject($dbData, IResponseProfile $responseProfile = null)
 	{
-		parent::fromObject($dbData);
+		parent::fromObject($dbData, $responseProfile);
 		
 		$this->typeName = BatchJob::getTypeName($this->type);
 		
@@ -167,8 +167,6 @@ class KalturaSchedulerWorker extends KalturaObject
 		
 		$this->lastStatus = $dbData->getLastStatus(null);
 		$this->lastStatusStr = date('d-m-Y H:i:s', $this->lastStatus);
-		
-		$this->configs = KalturaSchedulerConfigArray::fromSchedulerConfigArray($dbData->getConfigs());
 		
 		return $this;
 	}
@@ -181,7 +179,6 @@ class KalturaSchedulerWorker extends KalturaObject
 	{
 		$this->fromObject($dbData);
 		
-		$this->configs = KalturaSchedulerConfigArray::fromSchedulerConfigArray($dbData->getConfigs());
 		$this->lockedJobs = KalturaBatchJobArray::fromBatchJobArray($dbData->getLockedJobs());
 		
 		$this->avgWait = BatchJobPeer::doAvgTimeDiff($this->type, BatchJobPeer::CREATED_AT, BatchJobPeer::QUEUE_TIME, myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2));

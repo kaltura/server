@@ -137,7 +137,7 @@ class CaptionAssetItemService extends KalturaBaseService
 		
 		$dbList = CaptionAssetItemPeer::doSelect($captionAssetItemCriteria);
 		
-		$list = KalturaCaptionAssetItemArray::fromDbArray($dbList);
+		$list = KalturaCaptionAssetItemArray::fromDbArray($dbList, $this->getResponseProfile());
 		$response = new KalturaCaptionAssetItemListResponse();
 		$response->objects = $list;
 		$response->totalCount = $captionAssetItemCriteria->getRecordsCount();
@@ -264,7 +264,7 @@ class CaptionAssetItemService extends KalturaBaseService
 					$dbList[] = $entriesMapping[$entryId];
 			}
 		}
-		$list = KalturaBaseEntryArray::fromEntryArray($dbList);
+		$list = KalturaBaseEntryArray::fromDbArray($dbList, $this->getResponseProfile());
 		$response = new KalturaBaseEntryListResponse();
 		$response->objects = $list;
 		$response->totalCount = $counter;

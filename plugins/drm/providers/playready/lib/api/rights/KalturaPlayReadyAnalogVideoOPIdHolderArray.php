@@ -5,7 +5,7 @@
  */
 class KalturaPlayReadyAnalogVideoOPIdHolderArray extends KalturaTypedArray
 {
-	public static function fromDbArray($arr)
+	public static function fromDbArray($arr, IResponseProfile $responseProfile = null)
 	{
 		$newArr = new KalturaPlayReadyAnalogVideoOPIdHolderArray();
 		if ($arr == null)

@@ -126,7 +126,7 @@ class DocumentsService extends KalturaEntryService
 		
 		myNotificationMgr::createNotification( kNotificationJobData::NOTIFICATION_TYPE_ENTRY_ADD, $dbEntry);
 
-		$documentEntry->fromObject($dbEntry);
+		$documentEntry->fromObject($dbEntry, $this->getResponseProfile());
 		return $documentEntry;
 		
 	}
@@ -249,7 +249,7 @@ class DocumentsService extends KalturaEntryService
 			$dbEntry->setDesiredVersion($version);
 			
 		$docEntry = new KalturaDocumentEntry();
-		$docEntry->fromObject($dbEntry);
+		$docEntry->fromObject($dbEntry, $this->getResponseProfile());
 
 		return $docEntry;
 	}
@@ -300,7 +300,7 @@ class DocumentsService extends KalturaEntryService
 	    $filter->typeEqual = KalturaEntryType::DOCUMENT;
 	    list($list, $totalCount) = parent::listEntriesByFilter($filter, $pager);
 	    
-	    $newList = KalturaDocumentEntryArray::fromEntryArray($list);
+	    $newList = KalturaDocumentEntryArray::fromDbArray($list, $this->getResponseProfile());
 		$response = new KalturaDocumentListResponse();
 		$response->objects = $newList;
 		$response->totalCount = $totalCount;

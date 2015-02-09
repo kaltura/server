@@ -12,6 +12,19 @@ class KalturaRemoteStorageResources extends KalturaContentResource
 	 * @var KalturaRemoteStorageResourceArray
 	 */
 	public $resources;
+
+	private static $map_between_objects = array
+	(
+		'resources',
+	);
+
+	/* (non-PHPdoc)
+	 * @see KalturaObject::getMapBetweenObjects()
+	 */
+	public function getMapBetweenObjects ( )
+	{
+		return array_merge ( parent::getMapBetweenObjects() , self::$map_between_objects );
+	}
 	
 	/* (non-PHPdoc)
 	 * @see KalturaObject::validateForUsage($sourceObject, $propertiesToSkip)
@@ -43,16 +56,5 @@ class KalturaRemoteStorageResources extends KalturaContentResource
 		$object_to_fill->setResources($resources);
 		
 		return parent::toObject($object_to_fill, $props_to_skip);
-	}
-	
-	/* (non-PHPdoc)
-	 * @see KalturaObject::fromObject($srcObj)
-	 */
-	public function fromObject($source_object)
-	{
-		/* @var $source_object kRemoteStorageResources */
-		parent::fromObject($source_object);
-		
-		$this->resources = KalturaRemoteStorageResourceArray::fromObjectArray($source_object->getResources());
 	}
 }

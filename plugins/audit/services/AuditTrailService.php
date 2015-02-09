@@ -49,7 +49,7 @@ class AuditTrailService extends KalturaBaseService
 			return null;
 		
 		$auditTrail = new KalturaAuditTrail();
-		$auditTrail->fromObject($dbAuditTrail);
+		$auditTrail->fromObject($dbAuditTrail, $this->getResponseProfile());
 		
 		return $auditTrail;
 	}
@@ -70,7 +70,7 @@ class AuditTrailService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $id);
 			
 		$auditTrail = new KalturaAuditTrail();
-		$auditTrail->fromObject($dbAuditTrail);
+		$auditTrail->fromObject($dbAuditTrail, $this->getResponseProfile());
 		
 		return $auditTrail;
 	}
@@ -101,7 +101,7 @@ class AuditTrailService extends KalturaBaseService
 		$list = AuditTrailPeer::doSelect($c);
 		
 		$response = new KalturaAuditTrailListResponse();
-		$response->objects = KalturaAuditTrailArray::fromDbArray($list);
+		$response->objects = KalturaAuditTrailArray::fromDbArray($list, $this->getResponseProfile());
 		$response->totalCount = $count;
 		
 		return $response;

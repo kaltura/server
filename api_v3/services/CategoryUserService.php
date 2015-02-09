@@ -52,7 +52,7 @@ class CategoryUserService extends KalturaBaseService
 		$dbCategoryKuser->setPartnerId($this->getPartnerId());
 		$dbCategoryKuser->save();
 		
-		$categoryUser->fromObject($dbCategoryKuser);
+		$categoryUser->fromObject($dbCategoryKuser, $this->getResponseProfile());
 		return $categoryUser;
 	}
 	
@@ -83,7 +83,7 @@ class CategoryUserService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::INVALID_CATEGORY_USER_ID, $categoryId, $userId);
 			
 		$categoryUser = new KalturaCategoryUser();
-		$categoryUser->fromObject($dbCategoryKuser);
+		$categoryUser->fromObject($dbCategoryKuser, $this->getResponseProfile());
 		
 		return $categoryUser;
 	}
@@ -118,7 +118,7 @@ class CategoryUserService extends KalturaBaseService
 				
 		$dbCategoryKuser->save();
 		
-		$categoryUser->fromObject($dbCategoryKuser);
+		$categoryUser->fromObject($dbCategoryKuser, $this->getResponseProfile());
 		return $categoryUser;
 		
 	}
@@ -205,7 +205,7 @@ class CategoryUserService extends KalturaBaseService
 		$dbCategoryKuser->save();
 		
 		$categoryUser = new KalturaCategoryUser();
-		$categoryUser->fromObject($dbCategoryKuser);
+		$categoryUser->fromObject($dbCategoryKuser, $this->getResponseProfile());
 		return $categoryUser;
 	} 
 	
@@ -239,7 +239,7 @@ class CategoryUserService extends KalturaBaseService
 		$dbCategoryKuser->save();
 		
 		$categoryUser = new KalturaCategoryUser();
-		$categoryUser->fromObject($dbCategoryKuser);
+		$categoryUser->fromObject($dbCategoryKuser, $this->getResponseProfile());
 		return $categoryUser;
 	} 
 	
@@ -372,7 +372,7 @@ class CategoryUserService extends KalturaBaseService
 		$list = categoryKuserPeer::doSelect($c);
 		$totalCount = $c->getRecordsCount();
 		
-		$newList = KalturaCategoryUserArray::fromDbArray($list);
+		$newList = KalturaCategoryUserArray::fromDbArray($list, $this->getResponseProfile());
 		
 		$response = new KalturaCategoryUserListResponse();
 		$response->objects = $newList;

@@ -115,9 +115,12 @@ class KalturaWidget extends KalturaObject implements IFilterable
 		return array_merge ( parent::getMapBetweenObjects() , self::$map_between_objects );
 	}
 
-	public function fromWidget ( widget $entry )
+	/* (non-PHPdoc)
+	 * @see KalturaObject::fromObject($srcObj, $responseProfile)
+	 */
+	public function fromObject($srcObj, IResponseProfile $responseProfile = null)
 	{
-		parent::fromObject( $entry );
+		parent::fromObject($srcObj, $responseProfile);
 	}
 	
 	public function toWidget () 

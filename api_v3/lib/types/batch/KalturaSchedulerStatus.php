@@ -96,15 +96,15 @@ class KalturaSchedulerStatus extends KalturaObject
 		return array_merge(parent::getMapBetweenObjects(), self::$mapBetweenObjects);
 	}
 
-	public function fromObject($dbData)
+	public function fromObject($dbData, IResponseProfile $responseProfile = null)
 	{
-		parent::fromObject($dbData);
+		parent::fromObject($dbData, $responseProfile);
 		
 		$statusesArray = $dbData->getStatuses();
 		if(is_array($statusesArray))
 			$this->statuses = KalturaSchedulerStatusArray::fromValuesArray($statusesArray, $this->schedulerId, $this->schedulerConfiguredId, $this->id, $this->configuredId, $this->type);
 		
-		$this->configs = KalturaSchedulerConfigArray::fromSchedulerConfigArray($dbData->getConfigs());
+		$this->configs = KalturaSchedulerConfigArray::fromDbArray($dbData->getConfigs());
 		$this->lockedJobs = KalturaBatchJobArray::fromBatchJobArray($dbData->getLockedJobs());
 		
 		return $this;

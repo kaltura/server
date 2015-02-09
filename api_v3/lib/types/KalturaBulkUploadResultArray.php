@@ -5,13 +5,13 @@
  */
 class KalturaBulkUploadResultArray extends KalturaTypedArray
 {
-	public static function fromBulkUploadResultArray( $arr )
+	public static function fromDbArray($arr, IResponseProfile $responseProfile = null)
 	{
 		$newArr = new KalturaBulkUploadResultArray();
 		foreach ( $arr as $obj )
 		{
 			$nObj = new KalturaBulkUploadResult();
-			$nObj->fromObject( $obj );
+			$nObj->fromObject($obj, $responseProfile);
 			$newArr[] = $nObj;
 		}
 		
@@ -23,4 +23,3 @@ class KalturaBulkUploadResultArray extends KalturaTypedArray
 		return parent::__construct ( "KalturaBulkUploadResult" );
 	}
 }
-?>

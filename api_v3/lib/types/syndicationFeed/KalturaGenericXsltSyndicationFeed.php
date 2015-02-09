@@ -30,9 +30,9 @@ class KalturaGenericXsltSyndicationFeed extends KalturaGenericSyndicationFeed
 		$this->type = KalturaSyndicationFeedType::KALTURA_XSLT;
 	}
 	
-	public function fromObject($source_object)
+	public function fromObject($source_object, IResponseProfile $responseProfile = null)
 	{
-		parent::fromObject($source_object);
+		parent::fromObject($source_object, $responseProfile);
 
 		$key = $source_object->getSyncKey(genericSyndicationFeed::FILE_SYNC_SYNDICATION_FEED_XSLT);
 		$this->xslt = kFileSyncUtils::file_get_contents($key, true, false);

@@ -6,7 +6,7 @@
  */
 class KalturaAccessControlActionArray extends KalturaTypedArray
 {
-	public static function fromDbArray($arr)
+	public static function fromDbArray($arr, IResponseProfile $responseProfile = null)
 	{
 		$newArr = new KalturaAccessControlActionArray();
 		if ($arr == null)
@@ -18,7 +18,7 @@ class KalturaAccessControlActionArray extends KalturaTypedArray
 			if(!$nObj)
 				throw new kCoreException("No API object found for core object [" . get_class($obj) . "] with type [" . $obj->getType() . "]", kCoreException::OBJECT_API_TYPE_NOT_FOUND);
 				
-			$nObj->fromObject($obj);
+			$nObj->fromObject($obj, $responseProfile);
 			$newArr[] = $nObj;
 		}
 		

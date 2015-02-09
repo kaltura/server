@@ -44,9 +44,9 @@ class KalturaMixEntry extends KalturaPlayableEntry
 		return array_merge ( parent::getMapBetweenObjects() , self::$map_between_objects );
 	}
 	
-    public function fromObject($entry)
+    public function fromObject($entry, IResponseProfile $responseProfile = null)
 	{
-		parent::fromObject($entry);
+		parent::fromObject($entry, $responseProfile);
 
 		if ($entry->getEditorType() == "kalturaAdvancedEditor" || $entry->getEditorType() == "Keditor")
 		    $this->editorType = KalturaEditorType::ADVANCED;

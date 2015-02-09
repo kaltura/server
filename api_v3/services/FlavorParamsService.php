@@ -65,7 +65,7 @@ class FlavorParamsService extends KalturaBaseService
 		$flavorParamsDb->save();
 		
 		$flavorParams = KalturaFlavorParamsFactory::getFlavorParamsInstance($flavorParamsDb->getType());
-		$flavorParams->fromObject($flavorParamsDb);
+		$flavorParams->fromObject($flavorParamsDb, $this->getResponseProfile());
 		return $flavorParams;
 	}
 	
@@ -84,7 +84,7 @@ class FlavorParamsService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::FLAVOR_PARAMS_ID_NOT_FOUND, $id);
 			
 		$flavorParams = KalturaFlavorParamsFactory::getFlavorParamsInstance($flavorParamsDb->getType());
-		$flavorParams->fromObject($flavorParamsDb);
+		$flavorParams->fromObject($flavorParamsDb, $this->getResponseProfile());
 		
 		return $flavorParams;
 	}
@@ -110,7 +110,7 @@ class FlavorParamsService extends KalturaBaseService
 		$flavorParamsDb->save();
 			
 		$flavorParams = KalturaFlavorParamsFactory::getFlavorParamsInstance($flavorParamsDb->getType());
-		$flavorParams->fromObject($flavorParamsDb);
+		$flavorParams->fromObject($flavorParamsDb, $this->getResponseProfile());
 		return $flavorParams;
 	}
 	
@@ -163,7 +163,7 @@ class FlavorParamsService extends KalturaBaseService
 		$c->setLimit(null);
 		$totalCount = assetParamsPeer::doCount($c);
 
-		$list = KalturaFlavorParamsArray::fromDbArray($dbList);
+		$list = KalturaFlavorParamsArray::fromDbArray($dbList, $this->getResponseProfile());
 		$response = new KalturaFlavorParamsListResponse();
 		$response->objects = $list;
 		$response->totalCount = $totalCount;
@@ -191,7 +191,7 @@ class FlavorParamsService extends KalturaBaseService
 			$flavorParamsDb[] = $item->getassetParams();
 		}
 		
-		$flavorParams = KalturaFlavorParamsArray::fromDbArray($flavorParamsDb);
+		$flavorParams = KalturaFlavorParamsArray::fromDbArray($flavorParamsDb, $this->getResponseProfile());
 		
 		return $flavorParams; 
 	}

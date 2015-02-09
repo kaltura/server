@@ -5,13 +5,13 @@
  */
 class KalturaCategoryEntryArray extends KalturaTypedArray
 {
-	public static function fromCategoryEntryArray($arr)
+	public static function fromDbArray(array $arr, IResponseProfile $responseProfile = null)
 	{
 		$newArr = new KalturaCategoryEntryArray();
 		foreach($arr as $obj)
 		{
 			$nObj = new KalturaCategoryEntry();
-			$nObj->fromObject($obj);
+			$nObj->fromObject($obj, $responseProfile);
 			$newArr[] = $nObj;
 		}
 		

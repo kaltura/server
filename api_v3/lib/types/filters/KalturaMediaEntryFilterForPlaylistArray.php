@@ -5,12 +5,12 @@
  */
 class KalturaMediaEntryFilterForPlaylistArray extends KalturaTypedArray
 {
-	public function fromArray($arr)
+	public static function fromDbArray(array $arr = null, IResponseProfile $responseProfile = null)
 	{
 		foreach ( $arr as $obj )
 		{
 			$nObj = new KalturaMediaEntryFilterForPlaylist();
-			$nObj->fromObject($obj);
+			$nObj->fromObject($obj, $responseProfile);
 			$newArr[] = $nObj;
 		}
 		
@@ -22,4 +22,3 @@ class KalturaMediaEntryFilterForPlaylistArray extends KalturaTypedArray
 		return parent::__construct ( "KalturaMediaEntryFilterForPlaylist" );
 	}
 }
-?>

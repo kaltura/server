@@ -59,7 +59,7 @@ class ThumbParamsService extends KalturaBaseService
 		$thumbParamsDb->setPartnerId($this->getPartnerId());
 		$thumbParamsDb->save();
 		
-		$thumbParams->fromObject($thumbParamsDb);
+		$thumbParams->fromObject($thumbParamsDb, $this->getResponseProfile());
 		return $thumbParams;
 	}
 	
@@ -78,7 +78,7 @@ class ThumbParamsService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::FLAVOR_PARAMS_ID_NOT_FOUND, $id);
 			
 		$thumbParams = KalturaFlavorParamsFactory::getFlavorParamsInstance($thumbParamsDb->getType());
-		$thumbParams->fromObject($thumbParamsDb);
+		$thumbParams->fromObject($thumbParamsDb, $this->getResponseProfile());
 		
 		return $thumbParams;
 	}
@@ -100,7 +100,7 @@ class ThumbParamsService extends KalturaBaseService
 		$thumbParams->toUpdatableObject($thumbParamsDb);
 		$thumbParamsDb->save();
 			
-		$thumbParams->fromObject($thumbParamsDb);
+		$thumbParams->fromObject($thumbParamsDb, $this->getResponseProfile());
 		return $thumbParams;
 	}
 	
@@ -152,7 +152,7 @@ class ThumbParamsService extends KalturaBaseService
 		$c->setLimit(null);
 		$totalCount = assetParamsPeer::doCount($c);
 
-		$list = KalturaThumbParamsArray::fromDbArray($dbList);
+		$list = KalturaThumbParamsArray::fromDbArray($dbList, $this->getResponseProfile());
 		$response = new KalturaThumbParamsListResponse();
 		$response->objects = $list;
 		$response->totalCount = $totalCount;
@@ -180,7 +180,7 @@ class ThumbParamsService extends KalturaBaseService
 			$thumbParamsDb[] = $item->getassetParams();
 		}
 		
-		$thumbParams = KalturaThumbParamsArray::fromDbArray($thumbParamsDb);
+		$thumbParams = KalturaThumbParamsArray::fromDbArray($thumbParamsDb, $this->getResponseProfile());
 		
 		return $thumbParams; 
 	}

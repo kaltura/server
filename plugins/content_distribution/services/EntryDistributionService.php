@@ -51,7 +51,7 @@ class EntryDistributionService extends KalturaBaseService
 		$dbEntryDistribution->save();
 		
 		$entryDistribution = new KalturaEntryDistribution();
-		$entryDistribution->fromObject($dbEntryDistribution);
+		$entryDistribution->fromObject($dbEntryDistribution, $this->getResponseProfile());
 		return $entryDistribution;
 	}
 	
@@ -70,7 +70,7 @@ class EntryDistributionService extends KalturaBaseService
 			throw new KalturaAPIException(ContentDistributionErrors::ENTRY_DISTRIBUTION_NOT_FOUND, $id);
 			
 		$entryDistribution = new KalturaEntryDistribution();
-		$entryDistribution->fromObject($dbEntryDistribution);
+		$entryDistribution->fromObject($dbEntryDistribution, $this->getResponseProfile());
 		return $entryDistribution;
 	}
 	
@@ -110,7 +110,7 @@ class EntryDistributionService extends KalturaBaseService
 		$dbEntryDistribution->save();
 
 		$entryDistribution = new KalturaEntryDistribution();
-		$entryDistribution->fromObject($dbEntryDistribution);
+		$entryDistribution->fromObject($dbEntryDistribution, $this->getResponseProfile());
 		return $entryDistribution;
 	}
 	
@@ -133,7 +133,7 @@ class EntryDistributionService extends KalturaBaseService
 		$dbEntryDistribution->save();
 		
 		$entryDistribution = new KalturaEntryDistribution();
-		$entryDistribution->fromObject($dbEntryDistribution);
+		$entryDistribution->fromObject($dbEntryDistribution, $this->getResponseProfile());
 		return $entryDistribution;
 	}
 	
@@ -181,7 +181,7 @@ class EntryDistributionService extends KalturaBaseService
 		$list = EntryDistributionPeer::doSelect($c);
 		
 		$response = new KalturaEntryDistributionListResponse();
-		$response->objects = KalturaEntryDistributionArray::fromDbArray($list);
+		$response->objects = KalturaEntryDistributionArray::fromDbArray($list, $this->getResponseProfile());
 		$response->totalCount = $count;
 	
 		return $response;
@@ -229,7 +229,7 @@ class EntryDistributionService extends KalturaBaseService
 
 		$dbEntryDistribution->reload();
 		$entryDistribution = new KalturaEntryDistribution();
-		$entryDistribution->fromObject($dbEntryDistribution);
+		$entryDistribution->fromObject($dbEntryDistribution, $this->getResponseProfile());
 		return $entryDistribution;
 	}
 
@@ -271,7 +271,7 @@ class EntryDistributionService extends KalturaBaseService
 
 		$dbEntryDistribution->reload();
 		$entryDistribution = new KalturaEntryDistribution();
-		$entryDistribution->fromObject($dbEntryDistribution);
+		$entryDistribution->fromObject($dbEntryDistribution, $this->getResponseProfile());
 		return $entryDistribution;
 	}
 
@@ -311,7 +311,7 @@ class EntryDistributionService extends KalturaBaseService
 
 		$dbEntryDistribution->reload();
 		$entryDistribution = new KalturaEntryDistribution();
-		$entryDistribution->fromObject($dbEntryDistribution);
+		$entryDistribution->fromObject($dbEntryDistribution, $this->getResponseProfile());
 		return $entryDistribution;
 	}
 
@@ -353,7 +353,7 @@ class EntryDistributionService extends KalturaBaseService
 
 		$dbEntryDistribution->reload();
 		$entryDistribution = new KalturaEntryDistribution();
-		$entryDistribution->fromObject($dbEntryDistribution);
+		$entryDistribution->fromObject($dbEntryDistribution, $this->getResponseProfile());
 		return $entryDistribution;
 	}
 
@@ -409,7 +409,7 @@ class EntryDistributionService extends KalturaBaseService
 		}
 
 		$entryDistribution = new KalturaEntryDistribution();
-		$entryDistribution->fromObject($dbEntryDistribution);
+		$entryDistribution->fromObject($dbEntryDistribution, $this->getResponseProfile());
 		return $entryDistribution;
 	}
 

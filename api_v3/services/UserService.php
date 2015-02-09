@@ -89,7 +89,7 @@ class UserService extends KalturaBaseUserService
 		}	
 			
 		$newUser = new KalturaUser();
-		$newUser->fromObject($dbUser);
+		$newUser->fromObject($dbUser, $this->getResponseProfile());
 		
 		return $newUser;
 	}
@@ -168,7 +168,7 @@ class UserService extends KalturaBaseUserService
 		}
 				
 		$user = new KalturaUser();
-		$user->fromObject($dbUser);
+		$user->fromObject($dbUser, $this->getResponseProfile());
 		
 		return $user;
 	}
@@ -199,7 +199,7 @@ class UserService extends KalturaBaseUserService
 			throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID, $userId);
 
 		$user = new KalturaUser();
-		$user->fromObject($dbUser);
+		$user->fromObject($dbUser, $this->getResponseProfile());
 		
 		return $user;
 	}
@@ -232,7 +232,7 @@ class UserService extends KalturaBaseUserService
 			throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID, $loginId);
 		
 		$user = new KalturaUser();
-		$user->fromObject($kuser);
+		$user->fromObject($kuser, $this->getResponseProfile());
 		
 		return $user;
 	}
@@ -267,7 +267,7 @@ class UserService extends KalturaBaseUserService
 		$dbUser->save();
 		
 		$user = new KalturaUser();
-		$user->fromObject($dbUser);
+		$user->fromObject($dbUser, $this->getResponseProfile());
 		
 		return $user;
 	}
@@ -314,7 +314,7 @@ class UserService extends KalturaBaseUserService
 		
 		$totalCount = $c->getRecordsCount();
 
-		$newList = KalturaUserArray::fromUserArray($list);
+		$newList = KalturaUserArray::fromDbArray($list, $this->getResponseProfile());
 		$response = new KalturaUserListResponse();
 		$response->objects = $newList;
 		$response->totalCount = $totalCount;
@@ -517,7 +517,7 @@ class UserService extends KalturaBaseUserService
 		}
 		
 		$apiUser = new KalturaUser();
-		$apiUser->fromObject($user);
+		$apiUser->fromObject($user, $this->getResponseProfile());
 		return $apiUser;
 	}
 	
@@ -583,7 +583,7 @@ class UserService extends KalturaBaseUserService
 		}
 		
 		$apiUser = new KalturaUser();
-		$apiUser->fromObject($user);
+		$apiUser->fromObject($user, $this->getResponseProfile());
 		return $apiUser;
 	}
 	

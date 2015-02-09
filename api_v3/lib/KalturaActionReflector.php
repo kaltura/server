@@ -243,10 +243,15 @@ class KalturaActionReflector extends KalturaReflector
 	/**
 	 * Transparently call the initService() of the real service class.
 	 */
-	public function initService ()
+	public function initService(IResponseProfile $responseProfile = null)
 	{
 		KalturaLog::debug("Create or retrieve instance of action class [". $this->_actionClass ."]");
 		$instance = $this->getServiceInstance();
+		
+		if($responseProfile)
+		{
+			$instance->setResponseProfile($responseProfile);
+		}
 		
 		$instance->initService($this->_actionServiceId, $this->getActionClassInfo()->serviceName, $this->getActionInfo()->action);
 	}

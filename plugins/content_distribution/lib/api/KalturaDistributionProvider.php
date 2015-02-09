@@ -63,9 +63,9 @@ abstract class KalturaDistributionProvider extends KalturaObject implements IFil
 		'name',
 	);
 
-	public function fromObject($sourceObject)
+	public function fromObject($sourceObject, IResponseProfile $responseProfile = null)
 	{
-		parent::fromObject($sourceObject);
+		parent::fromObject($sourceObject, $responseProfile);
 		
 		$this->scheduleUpdateEnabled = $sourceObject->isScheduleUpdateEnabled();
 		$this->availabilityUpdateEnabled = $sourceObject->isAvailabilityUpdateEnabled();

@@ -5,7 +5,7 @@
  */
 class KalturaDistributionProfileArray extends KalturaTypedArray
 {
-	public static function fromDbArray($arr)
+	public static function fromDbArray($arr, IResponseProfile $responseProfile = null)
 	{
 		$newArr = new KalturaDistributionProfileArray();
 		if ($arr == null)
@@ -19,7 +19,7 @@ class KalturaDistributionProfileArray extends KalturaTypedArray
     			KalturaLog::err("Distribution Profile Factory could not find matching profile type for provider [" . $obj->getProviderType() . "]");
     			continue;
     		}
-			$nObj->fromObject($obj);
+			$nObj->fromObject($obj, $responseProfile);
 			$newArr[] = $nObj;
 		}
 		

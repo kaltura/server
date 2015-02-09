@@ -49,9 +49,9 @@ class KalturaDataEntry extends KalturaBaseEntry
 		return parent::toObject($dbDataEntry, $propsToSkip);
 	}
 	
-	public function fromObject($dbDataEntry)
+	public function fromObject($dbDataEntry, IResponseProfile $responseProfile = null)
 	{
-		parent::fromObject($dbDataEntry);
+		parent::fromObject($dbDataEntry, $responseProfile);
 		//$retrieveDataContentByGet = $dbDataEntry->getFromCustomData('retrieveDataContentByGet');
 		$retrieveDataContentByGet = $dbDataEntry->getRetrieveDataContentByGet();
 		$this->retrieveDataContentByGet = $retrieveDataContentByGet;

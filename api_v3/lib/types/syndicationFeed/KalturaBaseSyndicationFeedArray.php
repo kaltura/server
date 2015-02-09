@@ -5,14 +5,14 @@
  */
 class KalturaBaseSyndicationFeedArray extends KalturaTypedArray
 {
-	public static function fromSyndicationFeedArray ( $arr )
+	public static function fromDbArray(array $arr, IResponseProfile $responseProfile = null)
 	{
 		$newArr = new KalturaBaseSyndicationFeedArray();
 		if ( $arr == null ) return $newArr;
 		foreach ( $arr as $obj )
 		{
 			$nObj = KalturaSyndicationFeedFactory::getInstanceByType($obj->getType());
-			$nObj->fromObject(  $obj );
+			$nObj->fromObject($obj, $responseProfile);
 			$newArr[] = $nObj;
 		}
 		

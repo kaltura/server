@@ -53,9 +53,9 @@ class KalturaExtendingItemMrssParameter extends KalturaObject
 	/* (non-PHPdoc)
 	 * @see KalturaObject::fromObject($source_object)
 	 */
-	public function fromObject ($dbObject)
+	public function fromObject($dbObject, IResponseProfile $responseProfile = null)
 	{
-		parent::fromObject($dbObject);
+		parent::fromObject($dbObject, $responseProfile);
 		
 		/* @var $dbObject kExtendingItemMrssParameter */
 		$identifierType = get_class($dbObject->getIdentifier());

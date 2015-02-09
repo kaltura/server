@@ -5,7 +5,7 @@
  */
 class KalturaEventNotificationTemplateArray extends KalturaTypedArray
 {
-	public static function fromDbArray($arr)
+	public static function fromDbArray($arr, IResponseProfile $responseProfile = null)
 	{
 		$newArr = new KalturaEventNotificationTemplateArray();
 		if ($arr == null)
@@ -19,7 +19,7 @@ class KalturaEventNotificationTemplateArray extends KalturaTypedArray
     			KalturaLog::err("Event notification template could not find matching type for [" . $obj->getType() . "]");
     			continue;
     		}
-			$nObj->fromObject($obj);
+			$nObj->fromObject($obj, $responseProfile);
 			$newArr[] = $nObj;
 		}
 		

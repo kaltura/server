@@ -35,7 +35,7 @@ class ExternalMediaService extends KalturaEntryService
 		$trackEntry->setDescription(__METHOD__ . ":" . __LINE__ . "::ENTRY_EXTERNAL_MEDIA");
 		TrackEntry::addTrackEntry($trackEntry);
 		
-		$entry->fromObject($dbEntry);
+		$entry->fromObject($dbEntry, $this->getResponseProfile());
 		return $entry;
 	}
 	
@@ -98,7 +98,7 @@ class ExternalMediaService extends KalturaEntryService
 		list($list, $totalCount) = parent::listEntriesByFilter($filter, $pager);
 		
 		$response = new KalturaExternalMediaEntryListResponse();
-		$response->objects = KalturaExternalMediaEntryArray::fromDbArray($list);
+		$response->objects = KalturaExternalMediaEntryArray::fromDbArray($list, $this->getResponseProfile());
 		$response->totalCount = $totalCount;
 		return $response;
 	}

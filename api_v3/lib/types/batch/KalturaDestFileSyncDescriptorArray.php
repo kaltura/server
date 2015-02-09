@@ -5,7 +5,7 @@
  */
 class KalturaDestFileSyncDescriptorArray extends KalturaTypedArray
 {
-	public static function fromDbArray($arr)
+	public static function fromDbArray($arr, IResponseProfile $responseProfile = null)
 	{
 		$newArr = new KalturaDestFileSyncDescriptorArray();
 		if ($arr == null)
@@ -13,7 +13,7 @@ class KalturaDestFileSyncDescriptorArray extends KalturaTypedArray
 		foreach ($arr as $obj)
 		{
     		$nObj = new KalturaDestFileSyncDescriptor();
-			$nObj->fromObject($obj);
+			$nObj->fromObject($obj, $responseProfile);
 			$newArr[] = $nObj;
 		}
 		

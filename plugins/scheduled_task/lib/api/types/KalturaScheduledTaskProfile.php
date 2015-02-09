@@ -171,9 +171,9 @@ class KalturaScheduledTaskProfile extends KalturaObject implements IFilterable
 	/**
 	 * @param ScheduledTaskProfile $srcObj
 	 */
-	public function fromObject($srcObj)
+	public function fromObject($srcObj, IResponseProfile $responseProfile = null)
 	{
-		parent::fromObject($srcObj);
+		parent::fromObject($srcObj, $responseProfile);
 		$this->objectTasks = KalturaObjectTaskArray::fromDbArray($srcObj->getObjectTasks());
 		$filterType = $srcObj->getObjectFilterApiType();
 		if (!class_exists($filterType))

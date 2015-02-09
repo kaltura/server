@@ -5,13 +5,13 @@
  */
 class KalturaControlPanelCommandArray extends KalturaTypedArray
 {
-	public static function fromControlPanelCommandArray ( $arr )
+	public static function fromDbArray(array $arr, IResponseProfile $responseProfile = null)
 	{
 		$newArr = new KalturaControlPanelCommandArray();
 		foreach ( $arr as $obj )
 		{
 			$nObj = new KalturaControlPanelCommand();
-			$nObj->fromObject($obj);
+			$nObj->fromObject($obj, $responseProfile);
 			$newArr[] = $nObj;
 		}
 		
@@ -23,4 +23,3 @@ class KalturaControlPanelCommandArray extends KalturaTypedArray
 		return parent::__construct ( "KalturaControlPanelCommand" );
 	}
 }
-?>

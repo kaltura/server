@@ -5,13 +5,13 @@
  */
 class KalturaConvertCollectionFlavorDataArray extends KalturaTypedArray
 {
-	public static function fromConvertCollectionFlavorDataArray( $arr )
+	public static function fromDbArray(array $arr, IResponseProfile $responseProfile = null)
 	{
 		$newArr = new KalturaConvertCollectionFlavorDataArray();
 		foreach ( $arr as $obj )
 		{
 			$nObj = new KalturaConvertCollectionFlavorData();
-			$nObj->fromObject($obj);
+			$nObj->fromObject($obj, $responseProfile);
 			$newArr[] = $nObj;
 		}
 		

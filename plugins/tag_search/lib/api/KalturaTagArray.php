@@ -11,7 +11,7 @@ class KalturaTagArray extends KalturaTypedArray
      * @param array $arr
      * @return KalturaTagArray
      */
-    public static function fromDbArray($arr)
+    public static function fromDbArray($arr, IResponseProfile $responseProfile = null)
 	{
 		$newArr = new KalturaTagArray();
 		if ($arr == null)
@@ -20,7 +20,7 @@ class KalturaTagArray extends KalturaTypedArray
 		foreach ($arr as $obj)
 		{
 			$nObj = new KalturaTag();
-			$nObj->fromObject($obj);
+			$nObj->fromObject($obj, $responseProfile);
 			$newArr[] = $nObj;
 		}
 		

@@ -5,7 +5,7 @@
  */
 class KalturaThumbParamsArray extends KalturaTypedArray
 {
-	public static function fromDbArray($arr)
+	public static function fromDbArray($arr, IResponseProfile $responseProfile = null)
 	{
 		$newArr = new KalturaThumbParamsArray();
 		if ($arr == null)
@@ -14,7 +14,7 @@ class KalturaThumbParamsArray extends KalturaTypedArray
 		foreach ($arr as $obj)
 		{
 			$nObj = KalturaFlavorParamsFactory::getFlavorParamsInstance($obj->getType());
-			$nObj->fromObject($obj);
+			$nObj->fromObject($obj, $responseProfile);
 			$newArr[] = $nObj;
 		}
 		

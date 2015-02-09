@@ -11,7 +11,7 @@ class KalturaStringValueArray extends KalturaTypedArray
 	 * @param array<string|kStringValue> $strings
 	 * @return KalturaStringValueArray
 	 */
-	public static function fromDbArray(array $strings = null)
+	public static function fromDbArray(array $strings = null, IResponseProfile $responseProfile = null)
 	{
 		$stringArray = new KalturaStringValueArray();
 		if($strings && is_array($strings))
@@ -22,7 +22,7 @@ class KalturaStringValueArray extends KalturaTypedArray
 				
 				if($string instanceof kValue)
 				{
-					$stringObject->fromObject($string);
+					$stringObject->fromObject($string, $responseProfile);;
 				}
 				else
 				{					

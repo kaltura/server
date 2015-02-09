@@ -52,7 +52,7 @@ class MediaInfoService extends KalturaBaseService
 		$pager->attachToCriteria($c);
 		$dbList = mediaInfoPeer::doSelect($c);
 		
-		$list = KalturaMediaInfoArray::fromDbArray($dbList);
+		$list = KalturaMediaInfoArray::fromDbArray($dbList, $this->getResponseProfile());
 		$response = new KalturaMediaInfoListResponse();
 		$response->objects = $list;
 		$response->totalCount = $totalCount;

@@ -5,7 +5,7 @@
  */
 class KalturaTrackEntryArray extends KalturaTypedArray
 {
-	public static function fromDbArray($arr)
+	public static function fromDbArray($arr, IResponseProfile $responseProfile = null)
 	{
 		$newArr = new KalturaTrackEntryArray();
 		if ($arr == null)
@@ -14,7 +14,7 @@ class KalturaTrackEntryArray extends KalturaTypedArray
 		foreach ($arr as $obj)
 		{
     		$nObj = new KalturaTrackEntry();
-			$nObj->fromObject($obj);
+			$nObj->fromObject($obj, $responseProfile);
 			$newArr[] = $nObj;
 		}
 		

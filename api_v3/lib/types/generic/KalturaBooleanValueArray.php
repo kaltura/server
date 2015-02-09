@@ -11,7 +11,7 @@ class KalturaBooleanValueArray extends KalturaTypedArray
 	 * @param array<string|kBooleanValue> $strings
 	 * @return KalturaBooleanValueArray
 	 */
-	public static function fromDbArray(array $bools = null)
+	public static function fromDbArray(array $bools = null, IResponseProfile $responseProfile = null)
 	{
 		$boolArray = new KalturaBooleanValueArray();
 		if($bools && is_array($bools))
@@ -22,7 +22,7 @@ class KalturaBooleanValueArray extends KalturaTypedArray
 				
 				if($bool instanceof kValue)
 				{
-					$boolObject->fromObject($bool);
+					$boolObject->fromObject($bool, $responseProfile);;
 				}
 				else
 				{					

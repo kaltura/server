@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:php="http://php.net/xsl" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:media="http://search.yahoo.com/mrss/" xmlns:fn="http://www.w3.org/2005/xpath-functions" exclude-result-prefixes="xs fn">
   <xsl:output method="xml" encoding="UTF-8" indent="yes" />
   <xsl:variable name="distributionProfileName" select="''"/>

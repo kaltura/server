@@ -201,9 +201,9 @@ class KalturaDropFolderFile extends KalturaObject implements IFilterable
 		return $dbObject;
 	}
 	
-	public function fromObject ($source_object)
+	public function fromObject($source_object, IResponseProfile $responseProfile = null)
 	{
-		parent::fromObject($source_object);
+		parent::fromObject($source_object, $responseProfile);
 		
 		$this->uploadStartDetectedAt = $source_object->getUploadStartDetectedAt(null);
 		$this->uploadEndDetectedAt = $source_object->getUploadEndDetectedAt(null);

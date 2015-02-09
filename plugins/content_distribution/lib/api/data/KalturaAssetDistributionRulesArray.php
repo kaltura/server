@@ -8,7 +8,7 @@
  */
 class KalturaAssetDistributionRulesArray extends KalturaTypedArray
 {
-	public static function fromDbArray(array $arr)
+	public static function fromDbArray(array $arr, IResponseProfile $responseProfile = null)
 	{
 		$newArr = new KalturaAssetDistributionRulesArray();
 		if ($arr == null)
@@ -17,7 +17,7 @@ class KalturaAssetDistributionRulesArray extends KalturaTypedArray
 		foreach ($arr as $obj)
 		{
 			$nObj = new KalturaAssetDistributionRule();
-			$nObj->fromObject($obj);
+			$nObj->fromObject($obj, $responseProfile);
 			$newArr[] = $nObj;
 		}
 

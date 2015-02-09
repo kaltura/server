@@ -29,9 +29,9 @@ class KalturaAuditTrailChangeInfo extends KalturaAuditTrailInfo
 	/**
 	 * @param kAuditTrailChangeInfo $auditTrailInfo
 	 */
-	public function fromObject($auditTrailInfo)
+	public function fromObject($auditTrailInfo, IResponseProfile $responseProfile = null)
 	{
-		parent::fromObject($auditTrailInfo);
+		parent::fromObject($auditTrailInfo, $responseProfile);
 		
 		$this->changedItems = KalturaAuditTrailChangeItemArray::fromDbArray($auditTrailInfo->getChangedItems());
 	}

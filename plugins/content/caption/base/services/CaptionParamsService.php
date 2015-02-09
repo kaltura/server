@@ -61,7 +61,7 @@ class CaptionParamsService extends KalturaBaseService
 		$captionParamsDb->setPartnerId($this->getPartnerId());
 		$captionParamsDb->save();
 		
-		$captionParams->fromObject($captionParamsDb);
+		$captionParams->fromObject($captionParamsDb, $this->getResponseProfile());
 		return $captionParams;
 	}
 	
@@ -80,7 +80,7 @@ class CaptionParamsService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::FLAVOR_PARAMS_ID_NOT_FOUND, $id);
 			
 		$captionParams = KalturaFlavorParamsFactory::getFlavorParamsInstance($captionParamsDb->getType());
-		$captionParams->fromObject($captionParamsDb);
+		$captionParams->fromObject($captionParamsDb, $this->getResponseProfile());
 		
 		return $captionParams;
 	}
@@ -105,7 +105,7 @@ class CaptionParamsService extends KalturaBaseService
 		$captionParams->toUpdatableObject($captionParamsDb);
 		$captionParamsDb->save();
 			
-		$captionParams->fromObject($captionParamsDb);
+		$captionParams->fromObject($captionParamsDb, $this->getResponseProfile());
 		return $captionParams;
 	}
 	
@@ -157,7 +157,7 @@ class CaptionParamsService extends KalturaBaseService
 		$c->setLimit(null);
 		$totalCount = assetParamsPeer::doCount($c);
 
-		$list = KalturaCaptionParamsArray::fromDbArray($dbList);
+		$list = KalturaCaptionParamsArray::fromDbArray($dbList, $this->getResponseProfile());
 		$response = new KalturaCaptionParamsListResponse();
 		$response->objects = $list;
 		$response->totalCount = $totalCount;

@@ -5,7 +5,7 @@
  */
 class KalturaPlayReadyContentKeyArray extends KalturaTypedArray
 {
-	public static function fromDbArray($arr)
+	public static function fromDbArray($arr, IResponseProfile $responseProfile = null)
 	{
 		$newArr = new KalturaPlayReadyContentKeyArray();
 		if ($arr == null)
@@ -14,7 +14,7 @@ class KalturaPlayReadyContentKeyArray extends KalturaTypedArray
 		foreach ($arr as $obj)
 		{
 			$nObj = new KalturaPlayReadyContentKey();
-			$nObj->fromObject($obj);
+			$nObj->fromObject($obj, $responseProfile);
 			$newArr[] = $nObj;
 		}
 		

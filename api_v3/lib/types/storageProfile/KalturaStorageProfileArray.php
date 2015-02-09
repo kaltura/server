@@ -5,14 +5,14 @@
  */
 class KalturaStorageProfileArray extends KalturaTypedArray
 {
-	public static function fromStorageProfileArray(array $arr)
+	public static function fromDbArray(array $arr, IResponseProfile $responseProfile = null)
 	{
 		$newArr = new KalturaStorageProfileArray();
 		foreach($arr as $obj)
 		{
 		    /* @var $obj StorageProfile */
 			$nObj = KalturaStorageProfile::getInstanceByType($obj->getProtocol());
-			$nObj->fromObject($obj);
+			$nObj->fromObject($obj, $responseProfile);
 			$newArr[] = $nObj;
 		}
 		
@@ -24,4 +24,3 @@ class KalturaStorageProfileArray extends KalturaTypedArray
 		return parent::__construct ( "KalturaStorageProfile" );
 	}
 }
-?>

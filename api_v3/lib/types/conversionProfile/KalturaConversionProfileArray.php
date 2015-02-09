@@ -5,7 +5,7 @@
  */
 class KalturaConversionProfileArray extends KalturaTypedArray
 {
-	public static function fromDbArray($arr)
+	public static function fromDbArray($arr, IResponseProfile $responseProfile = null)
 	{
 		$newArr = new KalturaConversionProfileArray();
 		if ($arr == null)
@@ -14,7 +14,7 @@ class KalturaConversionProfileArray extends KalturaTypedArray
 		foreach ($arr as $obj)
 		{
     		$nObj = new KalturaConversionProfile();
-			$nObj->fromObject($obj);
+			$nObj->fromObject($obj, $responseProfile);
 			$newArr[] = $nObj;
 		}
 		

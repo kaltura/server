@@ -5,7 +5,7 @@
  */
 class KalturaAccessControlProfileArray extends KalturaTypedArray
 {
-	public static function fromDbArray($arr)
+	public static function fromDbArray($arr, IResponseProfile $responseProfile = null)
 	{
 		$newArr = new KalturaAccessControlProfileArray();
 		if ($arr == null)
@@ -14,7 +14,7 @@ class KalturaAccessControlProfileArray extends KalturaTypedArray
 		foreach ($arr as $obj)
 		{
     		$nObj = new KalturaAccessControlProfile();
-			$nObj->fromObject($obj);
+			$nObj->fromObject($obj, $responseProfile);
 			$newArr[] = $nObj;
 		}
 		

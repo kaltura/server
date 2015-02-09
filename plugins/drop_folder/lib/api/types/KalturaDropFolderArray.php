@@ -5,13 +5,13 @@
  */
 class KalturaDropFolderArray extends KalturaTypedArray
 {
-	public static function fromDbArray ( $arr )
+	public static function fromDbArray($arr, IResponseProfile $responseProfile = null)
 	{
 		$newArr = new KalturaDropFolderArray();
 		foreach ( $arr as $obj )
 		{
 		    $nObj = KalturaDropFolder::getInstanceByType($obj->getType());
-			$nObj->fromObject( $obj );
+			$nObj->fromObject($obj, $responseProfile);
 			$newArr[] = $nObj;
 		}
 		

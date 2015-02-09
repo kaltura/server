@@ -44,10 +44,10 @@ class KalturaHttpNotificationDataText extends KalturaHttpNotificationData
 	/* (non-PHPdoc)
 	 * @see KalturaObject::fromObject()
 	 */
-	public function fromObject($dbObject)
+	public function fromObject($dbObject, IResponseProfile $responseProfile = null)
 	{
 		/* @var $dbObject kHttpNotificationDataText */
-		parent::fromObject($dbObject);
+		parent::fromObject($dbObject, $responseProfile);
 		
 		$contentType = get_class($dbObject->getContent());
 		KalturaLog::debug("Loading KalturaStringValue from type [$contentType]");

@@ -5,7 +5,7 @@
  */
 class KalturaEventNotificationParameterArray extends KalturaTypedArray
 {
-	public static function fromDbArray($arr)
+	public static function fromDbArray($arr, IResponseProfile $responseProfile = null)
 	{
 		$newArr = new KalturaEventNotificationParameterArray();
 		if ($arr == null)
@@ -30,7 +30,7 @@ class KalturaEventNotificationParameterArray extends KalturaTypedArray
 			
 			if($nObj)
 			{
-				$nObj->fromObject($obj);
+				$nObj->fromObject($obj, $responseProfile);
 				$newArr[] = $nObj;
 			}
 		}

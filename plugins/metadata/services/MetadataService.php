@@ -85,7 +85,7 @@ class MetadataService extends KalturaBaseService
 		kEventsManager::raiseEvent(new kObjectDataChangedEvent($dbMetadata));
 				
 		$metadata = new KalturaMetadata();
-		$metadata->fromObject($dbMetadata);
+		$metadata->fromObject($dbMetadata, $this->getResponseProfile());
 		
 		return $metadata;
 	}
@@ -216,7 +216,7 @@ class MetadataService extends KalturaBaseService
 			throw new KalturaAPIException(MetadataErrors::METADATA_NOT_FOUND, $id);
 			
 		$metadata = new KalturaMetadata();
-		$metadata->fromObject($dbMetadata);
+		$metadata->fromObject($dbMetadata, $this->getResponseProfile());
 		
 		return $metadata;
 	}
@@ -296,7 +296,7 @@ class MetadataService extends KalturaBaseService
 		}
 		
 		$metadata = new KalturaMetadata();
-		$metadata->fromObject($dbMetadata);
+		$metadata->fromObject($dbMetadata, $this->getResponseProfile());
 			
 		return $metadata;
 	}	
@@ -424,7 +424,7 @@ class MetadataService extends KalturaBaseService
 		$list = MetadataPeer::doSelect($c);
 		
 		$response = new KalturaMetadataListResponse();
-		$response->objects = KalturaMetadataArray::fromDbArray($list);
+		$response->objects = KalturaMetadataArray::fromDbArray($list, $this->getResponseProfile());
 		$response->totalCount = $count;
 		
 		return $response;

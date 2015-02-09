@@ -5,7 +5,7 @@
  */
 class KalturaDeliveryProfileArray extends KalturaTypedArray
 {
-	public static function fromDbArray($arr)
+	public static function fromDbArray($arr, IResponseProfile $responseProfile = null)
 	{
 		$newArr = new KalturaDeliveryProfileArray();
 		if ($arr == null)
@@ -14,7 +14,7 @@ class KalturaDeliveryProfileArray extends KalturaTypedArray
 		foreach ($arr as $obj)
 		{
     		$nObj = KalturaDeliveryProfileFactory::getDeliveryProfileInstanceByType($obj->getType());
-			$nObj->fromObject($obj);
+			$nObj->fromObject($obj, $responseProfile);
 			$newArr[] = $nObj;
 		}
 		

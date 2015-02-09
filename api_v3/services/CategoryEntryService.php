@@ -105,7 +105,7 @@ class CategoryEntryService extends KalturaBaseService
 		myNotificationMgr::createNotification(kNotificationJobData::NOTIFICATION_TYPE_ENTRY_UPDATE, $entry);
 		
 		$categoryEntry = new KalturaCategoryEntry();
-		$categoryEntry->fromObject($dbCategoryEntry);
+		$categoryEntry->fromObject($dbCategoryEntry, $this->getResponseProfile());
 
 		return $categoryEntry;
 	}
@@ -286,7 +286,7 @@ class CategoryEntryService extends KalturaBaseService
 				$totalCount = categoryEntryPeer::doCount($c);
 		}
 			
-		$categoryEntrylist = KalturaCategoryEntryArray::fromCategoryEntryArray($dbCategoriesEntry);
+		$categoryEntrylist = KalturaCategoryEntryArray::fromDbArray($dbCategoriesEntry, $this->getResponseProfile());
 		$response = new KalturaCategoryEntryListResponse();
 		$response->objects = $categoryEntrylist;
 		$response->totalCount = $totalCount; // no pager since category entry is limited to ENTRY::MAX_CATEGORIES_PER_ENTRY

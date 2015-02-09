@@ -17,19 +17,13 @@ class KalturaSearchOperator extends KalturaSearchItem
 
 	private static $map_between_objects = array
 	(
-		"type"
+		"type",
+		"items",
 	);
 
 	public function getMapBetweenObjects ( )
 	{
 		return array_merge ( parent::getMapBetweenObjects() , self::$map_between_objects );
-	}
-	
-	public function fromObject ( $source_object  )
-	{
-		parent::fromObject($source_object);
-		
-		$this->items = KalturaSearchItemArray::fromSearchItemArray($source_object->getItems());
 	}
 	
 	public function toObject ( $object_to_fill = null , $props_to_skip = array() )

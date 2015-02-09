@@ -46,7 +46,7 @@ class KalturaFilter extends KalturaObject
 	
 	// not supposed to be populated from core objects
 /*		
-	protected function fromObject ( $source_object  )
+	protected function fromObject($source_object, IResponseProfile $responseProfile = null)
 	{
 		foreach ( $this->getMapBetweenObjects() as $this_prop => $object_prop )
 		{
@@ -134,7 +134,7 @@ class KalturaFilter extends KalturaObject
 		return $object_to_fill;		
 	}	
 	
-	public function fromObject ( $source_object )
+	public function fromObject($source_object, IResponseProfile $responseProfile = null)
 	{
 		$reflector = KalturaTypeReflectorCacher::get(get_class($this));
 		
