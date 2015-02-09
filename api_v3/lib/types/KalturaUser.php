@@ -17,6 +17,12 @@ class KalturaUser extends KalturaObject implements IFilterable
 	 * @filter eq
 	 */
 	public $partnerId;
+
+	/**
+	 * @var KalturaUserType
+	 * @filter eq,in
+	 */
+	public $type;
 	
 	/**
 	 * @var string
@@ -210,7 +216,6 @@ class KalturaUser extends KalturaObject implements IFilterable
 	 * @var string
 	 */
 	public $allowedPartnerIds;
-	
 
 	/**
 	 * @var string
@@ -221,6 +226,7 @@ class KalturaUser extends KalturaObject implements IFilterable
 	(
 		"id" => "puserId", 
 		"partnerId",
+		"type",
 		"screenName",
 		"email",
 		"dateOfBirth",
@@ -247,7 +253,7 @@ class KalturaUser extends KalturaObject implements IFilterable
 		"roleNames" => "userRoleNames",
 		"isAccountOwner",
 		"allowedPartnerIds" => "allowedPartners",
-		"allowedPartnerPackages"
+		"allowedPartnerPackages",
 	);
 
 	public function getMapBetweenObjects ( )

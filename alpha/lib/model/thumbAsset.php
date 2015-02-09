@@ -26,6 +26,19 @@ class thumbAsset extends asset
 	{
 		$finalPath = '/api_v3/index.php/service/thumbAsset/action/serve';
 		$finalPath .= '/thumbAssetId/' . $this->getId();
+		if($this->getVersion() > 1)
+		{
+			$finalPath .= '/v/' . $this->getVersion();
+		}
+		
+		$partner = PartnerPeer::retrieveByPK($this->getPartnerId());
+		$entry = $this->getentry();
+		
+		$partnerVersion = $partner->getCacheThumbnailVersion();
+		$entryVersion = $entry->getCacheThumbnailVersion();
+		
+		$finalPath .= ($partnerVersion ? "/pv/$partnerVersion" : '');
+		$finalPath .= ($entryVersion ? "/ev/$entryVersion" : '');
 						
 		return $finalPath;
 	}

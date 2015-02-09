@@ -129,11 +129,11 @@ class KAsyncConcat extends KJobHandlerWorker
 	 * @param unknown_type $clipDuration
 	 * @return boolean
 	 */
-	public static function concatFiles($ffmpegBin, $ffprobeBin, array $filesArr, $outFilename, $clipStart = null, $clipDuration = null)
+	protected static function concatFiles($ffmpegBin, $ffprobeBin, array $filesArr, $outFilename, $clipStart = null, $clipDuration = null)
 	{
 		KalturaLog::log("Started");
 		$fixLargeDeltaFlag = null;
-		$srcBr = null;
+		$chunkBr = null;
 		$concateStr = null;
 	
 		/*
@@ -151,6 +151,9 @@ class KAsyncConcat extends KJobHandlerWorker
 		$mi = null;
 		foreach($filesArr as $fileName) {
 			$i++;
+				/*
+				 * Get chunk file media-info
+				 */
 			$ffParser = new KFFMpegMediaParser($fileName, $ffmpegBin, $ffprobeBin);
 			$mi = null;
 			try {
@@ -160,58 +163,80 @@ class KAsyncConcat extends KJobHandlerWorker
 				KalturaLog::log(print_r($ex,1));
 			}
 				/*
-				 * Calculate src-br for cliping flow
+				 * Calculate chunk-br for the cliping flow
 				 */
 			if(isset($clipStr)) {
 				if(isset($mi->containerBitRate) && $mi->containerBitRate>0)
-					$srcBr+= $mi->containerBitRate;
+					$chunkBr+= $mi->containerBitRate;
 				else if(isset($mi->videoBitRate) && $mi->videoBitRate>0)
-					$srcBr+= $mi->videoBitRate;
+					$chunkBr+= $mi->videoBitRate;
 				else if(isset($mi->audioBitRate) && $mi->audioBitRate>0)
-					$srcBr+= $mi->audioBitRate;
+					$chunkBr+= $mi->audioBitRate;
 			}
 	
 				/*
-				 * Evaluate chunk duration for drift validation
+				 * On last chunk file - 
+				 * - no duration delta validity tests
+				 * - pack the final concat string and finish the loop
 				 */
-			if(isset($mi->containerDuration) && $mi->containerDuration>0)
-				$duration = $mi->containerDuration;
-			else if(isset($mi->videoDuration) && $mi->videoDuration>0)
-				$duration = $mi->videoDuration;
-			else if(isset($mi->audioDuration) && $mi->audioDuration>0)
-				$duration = $mi->audioDuration;
-			else
-				$duration = 0;
-	
-			$concateStr.="$fileName";
-			if($i<$filesArrCnt){
-				$concateStr.="|";
-				KalturaLog::log("Chunk duration($duration), Wowza chunk setting(".KAsyncConcat::LiveChunkDuration."),max-allowed-delta (".KAsyncConcat::MaxChunkDelta.") ");
-				if(!isset($fixLargeDeltaFlag) && $duration>0 && abs($duration-KAsyncConcat::LiveChunkDuration)>KAsyncConcat::MaxChunkDelta){
+			if($i==$filesArrCnt){
+				$concateStr = "concat:\"$concateStr$fileName\"";
+				break;
+			}
+			else {
+				$concateStr.= "$fileName|";
+			}
+			
+				/*
+				 * Evaluate chunk duration for drift validation
+				 * - only one duration anomaly is required to set the drift fix flag, no need to check following chunk files
+				 */
+			if(!isset($fixLargeDeltaFlag)) {
+				if(isset($mi->containerDuration) && $mi->containerDuration>0)
+					$duration = $mi->containerDuration;
+				else if(isset($mi->videoDuration) && $mi->videoDuration>0)
+					$duration = $mi->videoDuration;
+				else if(isset($mi->audioDuration) && $mi->audioDuration>0)
+					$duration = $mi->audioDuration;
+				else
+					$duration = 0;
+
+				if($duration>0 && abs($duration-KAsyncConcat::LiveChunkDuration)>KAsyncConcat::MaxChunkDelta){
 					$fixLargeDeltaFlag = true;
 				}
+				KalturaLog::log("Chunk duration($duration), Wowza chunk setting(".KAsyncConcat::LiveChunkDuration."),max-allowed-delta(".KAsyncConcat::MaxChunkDelta."),fixLargeDeltaFlag($fixLargeDeltaFlag) ");
 			}
-			else
-				$concateStr = "concat:\"$concateStr\"";
 		}
 	
+			/*
+			 * For clip flow - set converion to x264,
+			 * otherwise - just copy video
+			 */
 		if(isset($clipStr))	{
 			$videoParamStr = "-c:v libx264";
-			if(isset($srcBr) && $srcBr>0 && $filesArrCnt>0) {
-				$srcBr = round($srcBr/$filesArrCnt);
-				$videoParamStr.= " -b:v $srcBr" . "k";
+			if(isset($chunkBr) && $chunkBr>0 && $filesArrCnt>0) {
+				$chunkBr = round($chunkBr/$filesArrCnt);
+				$videoParamStr.= " -b:v $chunkBr" . "k";
 			}
 			$videoParamStr.= " -subq 7 -qcomp 0.6 -qmin 10 -qmax 50 -qdiff 4 -bf 16 -coder 1 -refs 6 -x264opts b-pyramid:weightb:mixed-refs:8x8dct:no-fast-pskip=0 -vprofile high  -pix_fmt yuv420p -threads 4";
 		}
 		else
 			$videoParamStr = "-c:v copy";
 	
+			/*
+			 * For AAC source - copy audio,
+			 * otherwise - convert to AAC
+			 */
 		if(isset($mi) && isset($mi->audioFormat) && $mi->audioFormat=="aac")
 			$audioParamStr = "-c:a copy";
 		else
 			$audioParamStr = "-c:a libfdk_aac";
 		$audioParamStr.= " -bsf:a aac_adtstoasc";
 	
+			/*
+			 * For fix-durtion-delta flow - split the input concat to separate video and audio streams,
+			 * otherwise - normal single input
+			 */
 		if($fixLargeDeltaFlag) {
 			KalturaLog::log("Will attempt to fix the audio-video drift ");
 			$cmdStr = "$ffmpegBin -probesize 15M -analyzeduration 25M -i $concateStr -probesize 15M -analyzeduration 25M -i $concateStr";

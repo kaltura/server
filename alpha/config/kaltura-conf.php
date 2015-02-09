@@ -233,5 +233,8 @@ return array (
     'ResponseProfileTableMap' => 'lib/model/map/ResponseProfileTableMap.php',
     'ResponseProfilePeer' => 'lib/model/ResponseProfilePeer.php',
     'ResponseProfile' => 'lib/model/ResponseProfile.php',
+    'KuserKgroupTableMap' => 'lib/model/map/KuserKgroupTableMap.php',
+    'KuserKgroupPeer' => 'lib/model/KuserKgroupPeer.php',
+    'KuserKgroup' => 'lib/model/KuserKgroup.php',
   ),
 );

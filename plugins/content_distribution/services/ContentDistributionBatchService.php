@@ -147,7 +147,7 @@ class ContentDistributionBatchService extends KalturaBaseService
 		if(!kFileSyncUtils::fileSync_exists($syncKey))
 			throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_IS_NOT_READY, $asset->getId());
 
-		list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($syncKey, true, false);
+		list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($syncKey, true, false, false);
 		if(!$fileSync)
 			throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND, $asset->getId());
 

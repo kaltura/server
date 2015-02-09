@@ -47,6 +47,7 @@ interface DeliveryProfileType extends BaseEnum
 	
 	const LIVE_HLS = 1001;
 	const LIVE_HDS = 1002;
+	const LIVE_DASH = 1003;
 	const LIVE_RTMP = 1005;
 	
 	const LIVE_AKAMAI_HDS = 1013;

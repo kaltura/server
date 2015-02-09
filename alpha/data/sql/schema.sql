@@ -7,68 +7,69 @@ SET FOREIGN_KEY_CHECKS = 0;
 #-- kuser
 #-----------------------------------------------------------------------------
 
-DROP TABLE IF EXISTS kuser;
+DROP TABLE IF EXISTS `kuser`;
 
 
-CREATE TABLE kuser
+CREATE TABLE `kuser`
 (
-	id INTEGER  NOT NULL AUTO_INCREMENT,
-	login_data_id INTEGER,
-	is_admin TINYINT,
-	screen_name VARCHAR(100),
-	full_name VARCHAR(40),
-	first_name VARCHAR(40),
-	last_name VARCHAR(40),
-	email VARCHAR(100),
-	sha1_password VARCHAR(40),
-	salt VARCHAR(32),
-	date_of_birth DATE,
-	country VARCHAR(2),
-	state VARCHAR(16),
-	city VARCHAR(30),
-	zip VARCHAR(10),
-	url_list VARCHAR(256),
-	picture VARCHAR(1024),
-	icon TINYINT,
-	about_me VARCHAR(4096),
-	tags TEXT,
-	tagline VARCHAR(256),
-	network_highschool VARCHAR(30),
-	network_college VARCHAR(30),
-	network_other VARCHAR(30),
-	mobile_num VARCHAR(16),
-	mature_content TINYINT,
-	gender TINYINT,
-	registration_ip INTEGER,
-	registration_cookie VARCHAR(256),
-	im_list VARCHAR(256),
-	views INTEGER default 0,
-	fans INTEGER default 0,
-	entries INTEGER default 0,
-	storage_size INTEGER default 0,
-	produced_kshows INTEGER default 0,
-	status INTEGER,
-	created_at DATETIME,
-	updated_at DATETIME,
-	partner_id INTEGER default 0,
-	display_in_search TINYINT,
-	partner_data VARCHAR(4096),
-	puser_id VARCHAR(100),
-	admin_tags TEXT,
-	indexed_partner_data_int INTEGER,
-	indexed_partner_data_string VARCHAR(64),
-	custom_data TEXT,
-	PRIMARY KEY (id),
-	KEY screen_name_index(screen_name),
-	KEY full_name_index(full_name),
-	KEY network_college_index(network_college),
-	KEY network_highschool_index(network_highschool),
-	KEY entries_index(entries),
-	KEY views_index(views),
-	KEY display_in_search_index(display_in_search),
-	KEY partner_indexed_partner_data_int(partner_id, indexed_partner_data_int),
-	KEY partner_indexed_partner_data_string(partner_id, indexed_partner_data_string),
-	KEY login_data_id_index(login_data_id)
+	`id` INTEGER  NOT NULL AUTO_INCREMENT,
+	`login_data_id` INTEGER,
+	`is_admin` TINYINT,
+	`screen_name` VARCHAR(100),
+	`full_name` VARCHAR(40),
+	`first_name` VARCHAR(40),
+	`last_name` VARCHAR(40),
+	`email` VARCHAR(100),
+	`sha1_password` VARCHAR(40),
+	`salt` VARCHAR(32),
+	`date_of_birth` DATE,
+	`country` VARCHAR(2),
+	`state` VARCHAR(16),
+	`city` VARCHAR(30),
+	`zip` VARCHAR(10),
+	`url_list` VARCHAR(256),
+	`picture` VARCHAR(48),
+	`icon` TINYINT,
+	`about_me` VARCHAR(4096),
+	`tags` TEXT,
+	`tagline` VARCHAR(256),
+	`network_highschool` VARCHAR(30),
+	`network_college` VARCHAR(30),
+	`network_other` VARCHAR(30),
+	`mobile_num` VARCHAR(16),
+	`mature_content` TINYINT,
+	`gender` TINYINT,
+	`registration_ip` INTEGER,
+	`registration_cookie` VARCHAR(256),
+	`im_list` VARCHAR(256),
+	`views` INTEGER default 0,
+	`fans` INTEGER default 0,
+	`entries` INTEGER default 0,
+	`storage_size` INTEGER default 0,
+	`produced_kshows` INTEGER default 0,
+	`status` INTEGER,
+	`created_at` DATETIME,
+	`updated_at` DATETIME,
+	`partner_id` INTEGER default 0,
+	`display_in_search` TINYINT,
+	`partner_data` VARCHAR(4096),
+	`puser_id` VARCHAR(100),
+	`admin_tags` TEXT,
+	`indexed_partner_data_int` INTEGER,
+	`indexed_partner_data_string` VARCHAR(64),
+	`custom_data` TEXT,
+	`type` TINYINT,
+	PRIMARY KEY (`id`),
+	KEY `screen_name_index`(`screen_name`),
+	KEY `full_name_index`(`full_name`),
+	KEY `network_college_index`(`network_college`),
+	KEY `network_highschool_index`(`network_highschool`),
+	KEY `entries_index`(`entries`),
+	KEY `views_index`(`views`),
+	KEY `display_in_search_index`(`display_in_search`),
+	KEY `partner_indexed_partner_data_int`(`partner_id`, `indexed_partner_data_int`),
+	KEY `partner_indexed_partner_data_string`(`partner_id`, `indexed_partner_data_string`),
+	KEY `login_data_id_index`(`login_data_id`)
 )Type=InnoDB;
 
 #-----------------------------------------------------------------------------
@@ -2361,6 +2362,37 @@ CREATE TABLE response_profile
 	custom_data TEXT,
 	PRIMARY KEY (id),
 	KEY partner_status(partner_id, status)
+)Type=InnoDB;
+
+#-----------------------------------------------------------------------------
+#-- kuser_kgroup
+#-----------------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `kuser_kgroup`;
+
+
+CREATE TABLE `kuser_kgroup`
+(
+	`id` BIGINT  NOT NULL AUTO_INCREMENT,
+	`kuser_id` INTEGER  NOT NULL,
+	`puser_id` VARCHAR(100) NOT NULL,
+	`kgroup_id` INTEGER  NOT NULL,
+	`pgroup_id` VARCHAR(100) NOT NULL,
+	`status` TINYINT  NOT NULL,
+	`partner_id` INTEGER  NOT NULL,
+	`created_at` DATETIME,
+	`updated_at` DATETIME,
+	`custom_data` TEXT,
+	PRIMARY KEY (`id`),
+	KEY `partner_kuser_index`(`kuser_id`, `status`),
+	KEY `partner_kgroup_index`(`kgroup_id`, `status`),
+	KEY `partner_index`(`partner_id`, `status`),
+	CONSTRAINT `kuser_kgroup_FK_1`
+	FOREIGN KEY (`kgroup_id`)
+	REFERENCES `kuser` (`id`),
+	CONSTRAINT `kuser_kgroup_FK_2`
+	FOREIGN KEY (`kuser_id`)
+	REFERENCES `kuser` (`id`)
 )Type=InnoDB;
 
 # This restores the fkey checks, after having unset them earlier
