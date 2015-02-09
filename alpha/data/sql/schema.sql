@@ -58,7 +58,7 @@ CREATE TABLE `kuser`
 	`indexed_partner_data_int` INTEGER,
 	`indexed_partner_data_string` VARCHAR(64),
 	`custom_data` TEXT,
-	`type` TINYINT,
+	`type` INTEGER,
 	PRIMARY KEY (`id`),
 	KEY `screen_name_index`(`screen_name`),
 	KEY `full_name_index`(`full_name`),

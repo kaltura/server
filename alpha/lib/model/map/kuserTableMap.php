@@ -83,7 +83,7 @@ class kuserTableMap extends TableMap {
 		$this->addColumn('INDEXED_PARTNER_DATA_INT', 'IndexedPartnerDataInt', 'INTEGER', false, null, null);
 		$this->addColumn('INDEXED_PARTNER_DATA_STRING', 'IndexedPartnerDataString', 'VARCHAR', false, 64, null);
 		$this->addColumn('CUSTOM_DATA', 'CustomData', 'LONGVARCHAR', false, null, null);
-		$this->addColumn('TYPE', 'Type', 'TINYINT', false, null, null);
+		$this->addColumn('TYPE', 'Type', 'INTEGER', false, null, null);
 		// validators
 	} // initialize()
 

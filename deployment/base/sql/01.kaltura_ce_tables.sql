@@ -1296,7 +1296,7 @@ CREATE TABLE IF NOT EXISTS `kuser` (
   `indexed_partner_data_int` int(11) DEFAULT NULL,
   `indexed_partner_data_string` varchar(64) DEFAULT NULL,
   `custom_data` text,
-  `type` tinyint(4),
+  `type` int(11),
   PRIMARY KEY (`id`),
   KEY `partner_created_at_indes` (`partner_id`,`created_at`),
   KEY `partner_puser_id` (`partner_id`,`puser_id`),
