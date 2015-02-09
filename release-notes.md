@@ -1,6 +1,18 @@
 
 
 ----------
+# Jupiter-10.5.0 #
+
+##Live Audio/Video async fix##
+- Issue ID: SUP-2942
+
+### Configuration ###
+- Add "params.ffprobeCmd = ffprobe" to 
+- - configurations/batch/workers.ini - KAsyncExtractMedia
+- - configurations/batch/live.workers.ini - KAsyncConcat
+
+
+----------
 # Jupiter-10.4.0 #
 
 ##Caption added HTTP Notifications##
