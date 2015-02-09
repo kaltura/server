@@ -1,4 +1,18 @@
 
+##Flavor-asset status HTTP Notifications##
+- Issue Type: new feature
+- Issue ID: PS-2065
+
+### Configuration ###
+None
+
+###Installation  
+- Run:  
+php /opt/kaltura/app/tests/standAloneClient/exec.php /opt/kaltura/app/tests/standAloneClient/flavorAssetHttpNotifications.xml  
+
+#### Known Issues & Limitations ####
+
+None.
 
 ----------
 # Jupiter-10.5.0 #
@@ -41,6 +55,10 @@ None
 ###Installation  
 - Run:  
 php /opt/kaltura/app/tests/standAloneClient/exec.php /opt/kaltura/app/tests/standAloneClient/captionAssetHttpNotifications.xml  
+
+#### Known Issues & Limitations ####
+
+None.  
 
 ##Drop Folder Email Notifications##
 - Issue Type - new feature 
