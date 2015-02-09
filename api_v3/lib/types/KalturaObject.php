@@ -270,7 +270,7 @@ abstract class KalturaObject
 			$result .= "\t\t\$customData = unserialize(\$srcObj->custom_data);\n";
 		}
 	
-		$result .= "\t\t\$get = array('" . implode("',\n\t\t'", array_keys($mappingFuncCode)) . "'\n\t\t);\n\t}\n}";
+		$result .= "\t\t\$get = array(\n\t\t\t'" . implode("',\n\t\t\t'", array_keys($mappingFuncCode)) . "'\n\t\t);\n";
 		$result .= "\t\t" . implode("\n\t\t", $mappingFuncCode) . "\n\t}\n}";
 		
 		return $result;
