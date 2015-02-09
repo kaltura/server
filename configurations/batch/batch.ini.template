@@ -196,6 +196,7 @@ friendlyName										= Extract Media
 type												= KAsyncExtractMedia
 scriptPath											= batches/ExtractMedia/KAsyncExtractMediaExe.php
 params.mediaInfoCmd									= @BIN_DIR@/mediainfo
+params.ffprobeCmd									= @BIN_DIR@/ffprobe
 
 [KAsyncConvertWorker : JobHandlerWorker]
 type												= KAsyncConvert
@@ -640,7 +641,7 @@ scriptPath											= batches/ConvertLiveSegment/KAsyncConvertLiveSegmentExe.ph
 id													= 500
 type												= KAsyncConcat
 scriptPath											= batches/Concat/KAsyncConcatExe.php
-
+params.ffprobeCmd									= @BIN_DIR@/ffprobe
 
 
 [KAsyncValidateLiveMediaServers : PeriodicWorker]
