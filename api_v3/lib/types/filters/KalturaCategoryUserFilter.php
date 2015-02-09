@@ -40,4 +40,11 @@ class KalturaCategoryUserFilter extends KalturaCategoryUserBaseFilter
 	 * @var string
 	 */
 	public $freeText;
+
+	/**
+	 * Return a list of categoryUser that related to the userId in this field by groups
+	 * @var string
+	 */
+	public $relatedGroupsByUserId;
+
 }

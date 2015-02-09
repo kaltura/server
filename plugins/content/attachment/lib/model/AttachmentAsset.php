@@ -29,7 +29,20 @@ class AttachmentAsset extends asset
 	{
 		$finalPath = '/api_v3/index.php/service/attachment_attachmentAsset/action/serve';
 		$finalPath .= '/attachmentAssetId/' . $this->getId();
-				
+		if($this->getVersion() > 1)
+		{
+			$finalPath .= '/v/' . $this->getVersion();
+		}
+		
+		$partner = PartnerPeer::retrieveByPK($this->getPartnerId());
+		$entry = $this->getentry();
+		
+		$partnerVersion = $partner->getFromCustomData('cache_attachment_version');
+		$entryVersion = $entry->getFromCustomData('cache_attachment_version');
+		
+		$finalPath .= ($partnerVersion ? "/pv/$partnerVersion" : '');
+		$finalPath .= ($entryVersion ? "/ev/$entryVersion" : '');
+		
 		return $finalPath;
 	}
 }

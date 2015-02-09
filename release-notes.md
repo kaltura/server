@@ -1,5 +1,46 @@
+
 ----------
-# Jupiter-10.4.0 #
+# Jupiter-10.5.0 #
+
+##Flavor-asset status HTTP Notifications##
+- Issue Type: new feature
+- Issue ID: PS-2065
+
+### Configuration ###
+None
+
+###Installation  
+- Run:  
+php /opt/kaltura/app/tests/standAloneClient/exec.php /opt/kaltura/app/tests/standAloneClient/flavorAssetHttpNotifications.xml  
+
+#### Known Issues & Limitations ####
+
+None.
+
+##Support MPEG-DASH Delivery Profile##
+- Issue Type: New Feature
+- Issue ID: PLAT-2064
+
+#### Configuration ####
+
+None.
+
+#### Deployment Scripts ####
+
+		php deployment/updates/scripts/2014_12_08_create_dash_delivery_profile.php
+
+#### Known Issues & Limitations ####
+
+No client side (player) failover support.  
+
+##Live Audio/Video async fix##
+- Issue ID: SUP-2942
+
+### Configuration ###
+- Add "params.ffprobeCmd = ffprobe" to 
+- - configurations/batch/workers.ini - KAsyncExtractMedia
+- - configurations/batch/live.workers.ini - KAsyncConcat
+
 
 ## Business Process Management Integration ##
 Integration with Activiti BPM engine
@@ -112,6 +153,12 @@ None
 - Run:  
 php /opt/kaltura/app/tests/standAloneClient/exec.php /opt/kaltura/app/tests/standAloneClient/captionAssetHttpNotifications.xml  
 
+#### Known Issues & Limitations ####
+
+None.  
+
+----------
+# Jupiter-10.4.0 #
 
 ##Drop Folder Email Notifications##
 - Issue Type - new feature 
@@ -312,7 +359,6 @@ None.
 
 None.
 
-
 ##add user->get permission to basic user role##
 - Issue Type: Customer request
 - Issue ID: SUP-2899
@@ -323,7 +369,7 @@ None.
 
 #### Deployment Scripts ####
 
-		php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2014_11_30_BASE_USER_SESSION_PERMISSION_add_USER_GET_permissions.php
+		php deployment/updates/scripts/add_permissions/2014_11_30_BASE_USER_SESSION_PERMISSION_add_USER_GET_permissions.php
 
 #### Known Issues & Limitations ####
 
@@ -846,7 +892,13 @@ Integration in process.
 ## Thumbnail encoder ##
 reverting the current encoder to the old one
 
-- Issue Type: Bug fix
+- Issue Type: 
+- 
+- 
+- 
+- 
+- 
+- Bug fix
 - Issue ID: SUP-2581
 
 #### Configuration ####
