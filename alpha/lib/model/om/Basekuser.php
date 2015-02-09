@@ -303,6 +303,7 @@ abstract class Basekuser extends BaseObject  implements Persistent {
 
 	/**
 	 * The value for the type field.
+	 * Note: this column has a database default value of: 0
 	 * @var        int
 	 */
 	protected $type;
@@ -526,6 +527,7 @@ abstract class Basekuser extends BaseObject  implements Persistent {
 		$this->storage_size = 0;
 		$this->produced_kshows = 0;
 		$this->partner_id = 0;
+		$this->type = 0;
 	}
 
 	/**
@@ -2249,7 +2251,7 @@ abstract class Basekuser extends BaseObject  implements Persistent {
 			$v = (int) $v;
 		}
 
-		if ($this->type !== $v) {
+		if ($this->type !== $v || $this->isNew()) {
 			$this->type = $v;
 			$this->modifiedColumns[] = kuserPeer::TYPE;
 		}
@@ -2288,6 +2290,10 @@ abstract class Basekuser extends BaseObject  implements Persistent {
 			}
 
 			if ($this->partner_id !== 0) {
+				return false;
+			}
+
+			if ($this->type !== 0) {
 				return false;
 			}
 
