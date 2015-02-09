@@ -20,69 +20,10 @@ class kEventNotificationFlowManager implements kGenericEventConsumer
 		foreach($this->notificationTemplates as $notificationTemplate)
 		{
 			/* @var $notificationTemplate EventNotificationTemplate */
-			
-			$parentJob = null;
-			if(method_exists($event, 'getRaisedJob'))
-			{
-				$parentJob = $event->getRaisedJob();
-			}
-			
-			$entryId = null;
-			if(method_exists($event, 'getObject'))
-			{
-				$object = $event->getObject();
-				if($object instanceof entry)
-					$entryId = $object->getId();
-				elseif(method_exists($event, 'getEntryId'))
-					$entryId = $object->getEntryId();
-			}
-			
 			$scope = $event->getScope();
-			$type = $notificationTemplate->getType();
-			$jobData = $notificationTemplate->getJobData($scope);
-			self::addEventNotificationDispatchJob($type, $jobData, $scope->getPartnerId(), $entryId, $parentJob);
+			$notificationTemplate->dispatch($scope);
 		}
 		return true;
-	}
-
-	/**
-	 * @param int $eventNotificationType
-	 * @param kEventNotificationDispatchJobData $jobData
-	 * @param string $partnerId
-	 * @param string $entryId
-	 * @param BatchJob $parentJob
-	 * @return BatchJob
-	 */
-	public static function addEventNotificationDispatchJob($eventNotificationType, kEventNotificationDispatchJobData $jobData, $partnerId = null, $entryId = null, BatchJob $parentJob = null) 
-	{
-		$jobType = EventNotificationPlugin::getBatchJobTypeCoreValue(EventNotificationBatchType::EVENT_NOTIFICATION_HANDLER);
-		$batchJob = null;
-		
-		if ($parentJob)
-		{
-			$batchJob = $parentJob->createChild($jobType, $eventNotificationType, false);
-		}
-		else
-		{
-			$batchJob = new BatchJob();
-			$batchJob->setEntryId($entryId);
-			if (!$partnerId)
-				$partnerId = kCurrentContext::getCurrentPartnerId();
-				
-			$batchJob->setPartnerId($partnerId);
-		}
-		
-		KalturaLog::log("Creating event notification dispatch job on template id [" . $jobData->getTemplateId() . "] engine[$eventNotificationType]");
-		
-		$batchJob->setObjectId($entryId);
-		$batchJob->setObjectType(BatchJobObjectType::ENTRY);
-		$batchJob->setStatus(BatchJob::BATCHJOB_STATUS_DONT_PROCESS);
-		
-		$batchJob = kJobsManager::addJob($batchJob, $jobData, $jobType, $eventNotificationType);
-		$jobData->setJobId($batchJob->getId());
-		$batchJob->setData($jobData);
-		
-		return kJobsManager::updateBatchJob($batchJob, BatchJob::BATCHJOB_STATUS_PENDING);
 	}
 
 	/**

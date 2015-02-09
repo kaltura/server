@@ -5,6 +5,10 @@
  */
 class KalturaJobData extends KalturaObject
 {
+	public function __construct($subType = null)
+	{
+	}
+	
 	/**
 	 * Extended by job data objects to reflect plugin enum values 
 	 * 
