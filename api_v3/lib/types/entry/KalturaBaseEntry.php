@@ -336,6 +336,7 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 	 * 
 	 * @var string
 	 * @requiresPermission insert,update
+	 * @filter matchand
 	 */
 	public $entitledUsersEdit;
 		
@@ -344,6 +345,7 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 	 * 
 	 * @var string
 	 * @requiresPermission insert,update
+	 * @filter matchand
 	 */
 	public $entitledUsersPublish;	
 	

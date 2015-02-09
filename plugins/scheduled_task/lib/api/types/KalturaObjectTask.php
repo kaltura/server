@@ -12,10 +12,16 @@ abstract class KalturaObjectTask extends KalturaObject
 	 */
 	public $type;
 
+	/**
+	 * @var bool
+	 */
+	public $stopProcessingOnError;
+
 	/*
 	 */
 	private static $map_between_objects = array(
 		'type',
+		'stopProcessingOnError',
 	);
 
 	/* (non-PHPdoc)
@@ -34,6 +40,14 @@ abstract class KalturaObjectTask extends KalturaObject
 		return parent::toObject($dbObject, $skip);
 	}
 
+	/**
+	 * @param array $propertiesToSkip
+	 */
+	public function validateForInsert($propertiesToSkip = array())
+	{
+		$this->validatePropertyNotNull('stopProcessingOnError');
+	}
+
 	static function getInstanceByDbObject(kObjectTask $dbObject)
 	{
 		switch($dbObject->getType())
@@ -48,6 +62,8 @@ abstract class KalturaObjectTask extends KalturaObject
 				return new KalturaConvertEntryFlavorsObjectTask();
 			case ObjectTaskType::DELETE_LOCAL_CONTENT:
 				return new KalturaDeleteLocalContentObjectTask();
+			case ObjectTaskType::STORAGE_EXPORT:
+				return new KalturaStorageExportObjectTask();
 			default:
 				return KalturaPluginManager::loadObject('KalturaObjectTask', $dbObject->getType());
 		}

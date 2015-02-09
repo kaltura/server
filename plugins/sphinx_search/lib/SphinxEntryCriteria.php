@@ -173,10 +173,18 @@ class SphinxEntryCriteria extends SphinxCriteria
 	
 		if($filter->is_set('_is_live'))
 		{
-			$this->addCondition(entryIndex::DYNAMIC_ATTRIBUTES . '.' . LiveEntry::IS_LIVE . ' = ' . $filter->get('_is_live'));
+			$this->addCondition(entryIndex::DYNAMIC_ATTRIBUTES . '.' . LiveEntry::IS_LIVE . ' = ' . ($filter->get('_is_live') == '1' ? '1' : '0') );
 			$filter->unsetByName('_is_live');
 		}
 		
+		if($filter->is_set('_is_recorded_entry_id_empty'))
+		{
+			$fieldName = entryIndex::DYNAMIC_ATTRIBUTES . '.' . LiveEntry::RECORDED_ENTRY_ID;
+			$this->addWhere( "$fieldName " . ($filter->get('_is_recorded_entry_id_empty') ? "IS" : "IS NOT") . " NULL" );
+
+			$filter->unsetByName('_is_recorded_entry_id_empty');
+		}
+
 		$matchOrRoots = array();
 		if($filter->is_set('_eq_root_entry_id'))
 		{
@@ -248,61 +256,28 @@ class SphinxEntryCriteria extends SphinxCriteria
 			$advancedSearch = $filter->getAdvancedSearch();
 			if($advancedSearch)
 			{
-				$additionalConditions = $advancedSearch->getFreeTextConditions($filter->getPartnerSearchScope(), $freeTexts);
+				$metadataProfileFieldIds = array();
+
+				if ($advancedSearch instanceof MetadataSearchFilter)
+				{
+					$metadataProfileFields = array();
+					$metadataProfileFieldIds = array();
+
+					$metadataProfileId = $advancedSearch->getMetadataProfileId();
+
+					if ($metadataProfileId)
+					{
+						$metadataProfileFields = MetadataProfileFieldPeer::retrieveActiveByMetadataProfileId($metadataProfileId);
+
+						foreach($metadataProfileFields as $metadataProfileField)
+							$metadataProfileFieldIds[] = $metadataProfileField->getId();
+					}
+				}
+
+				$additionalConditions = $advancedSearch->getFreeTextConditions($filter->getPartnerSearchScope(), $freeTexts , $metadataProfileFieldIds);
 			}
 			
-			if(preg_match('/^"[^"]+"$/', $freeTexts))
-			{
-				$freeText = str_replace('"', '', $freeTexts);
-				$freeText = SphinxUtils::escapeString($freeText);
-				$freeText = "^$freeText$";
-				$additionalConditions[] = "@(" . entryFilter::FREE_TEXT_FIELDS . ") $freeText";
-			}
-			else
-			{
-				if(strpos($freeTexts, baseObjectFilter::IN_SEPARATOR) > 0)
-				{
-					str_replace(baseObjectFilter::AND_SEPARATOR, baseObjectFilter::IN_SEPARATOR, $freeTexts);
-				
-					$freeTextsArr = explode(baseObjectFilter::IN_SEPARATOR, $freeTexts);
-					foreach($freeTextsArr as $valIndex => $valValue)
-					{
-						if(!is_numeric($valValue) && strlen($valValue) <= 0)
-							unset($freeTextsArr[$valIndex]);
-						else
-							$freeTextsArr[$valIndex] = SphinxUtils::escapeString($valValue);
-					}
-							
-					foreach($freeTextsArr as $freeText)
-					{
-						$additionalConditions[] = "@(" . entryFilter::FREE_TEXT_FIELDS . ") $freeText";
-					}
-				}
-				else
-				{
-					$freeTextsArr = explode(baseObjectFilter::AND_SEPARATOR, $freeTexts);
-					foreach($freeTextsArr as $valIndex => $valValue)
-					{
-						if(!is_numeric($valValue) && strlen($valValue) <= 0)
-							unset($freeTextsArr[$valIndex]);
-						else
-							$freeTextsArr[$valIndex] = SphinxUtils::escapeString($valValue);
-					}
-							
-					$freeTextsArr = array_unique($freeTextsArr);
-					$freeTextExpr = implode(baseObjectFilter::AND_SEPARATOR, $freeTextsArr);
-					$additionalConditions[] = "@(" . entryFilter::FREE_TEXT_FIELDS . ") $freeTextExpr";
-				}
-			}
-			if(count($additionalConditions))
-			{	
-				$additionalConditions = array_unique($additionalConditions);
-				$matches = reset($additionalConditions);
-				if(count($additionalConditions) > 1)
-					$matches = '( ' . implode(' ) | ( ', $additionalConditions) . ' )';
-					
-				$this->matchClause[] = $matches;
-			}
+			$this->addFreeTextToMatchClauseByMatchFields($freeTexts, entryFilter::FREE_TEXT_FIELDS, $additionalConditions);
 		}
 		$filter->unsetByName('_free_text');
 		

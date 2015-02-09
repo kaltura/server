@@ -6,10 +6,10 @@
 //
 //
 
-#import "WVSettings.h"
+#import "KWVSettings.h"
 #import "WViPhoneAPI.h"
 
-@implementation WVSettings
+@implementation KWVSettings
 
 @synthesize drmServer, portalId;
 

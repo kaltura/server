@@ -39,18 +39,19 @@ class kBroadcastUrlManager
 	
 	public function setEntryBroadcastingUrls (LiveStreamEntry $dbEntry)
 	{
-		$hostname = $this->getHostname(kDataCenterMgr::getCurrentDcId(), $dbEntry->getSource());
+		$currentDc = kDataCenterMgr::getCurrentDcId();
+		$hostname = $this->getHostname($currentDc, $dbEntry->getSource());
 		
 		$dbEntry->setPrimaryBroadcastingUrl($this->getBroadcastUrl($dbEntry, kBroadcastUrlManager::PROTOCOL_RTMP, $hostname, kBroadcastUrlManager::PRIMARY_MEDIA_SERVER_INDEX));		
 		$dbEntry->setPrimaryRtspBroadcastingUrl($this->getBroadcastUrl($dbEntry, kBroadcastUrlManager::PROTOCOL_RTSP, $hostname, kBroadcastUrlManager::PRIMARY_MEDIA_SERVER_INDEX, true));
 			
-		$otherDCs = kDataCenterMgr::getAllDcs();
-		if(count($otherDCs))
+		$configuration = $this->getConfiguration();
+		foreach($configuration as $dc => $config)
 		{
-			$otherDc = reset($otherDCs);
-			$otherDcId = $otherDc['id'];
-			
-			$hostname = $this->getHostname($otherDcId, $dbEntry->getSource());
+			if(!is_numeric($dc) || $dc == $currentDc)
+				continue;
+				
+			$hostname = $this->getHostname($dc, $dbEntry->getSource());
 			
 			$dbEntry->setSecondaryBroadcastingUrl($this->getBroadcastUrl($dbEntry, kBroadcastUrlManager::PROTOCOL_RTMP, $hostname, kBroadcastUrlManager::SECONDARY_MEDIA_SERVER_INDEX));
 			$dbEntry->setSecondaryRtspBroadcastingUrl($this->getBroadcastUrl($dbEntry, kBroadcastUrlManager::PROTOCOL_RTSP, $hostname, kBroadcastUrlManager::SECONDARY_MEDIA_SERVER_INDEX, true));
@@ -70,10 +71,16 @@ class kBroadcastUrlManager
 		return $constantNames[$sourceType];
 	}
 	
+	protected function getConfiguration ($dc = null)
+	{
+		$partner = PartnerPeer::retrieveByPK($this->partnerId);
+		return $partner->getLiveStreamBroadcastUrlConfigurations($dc);
+	}
+	
 	protected function getHostname ($dc, $sourceType)
 	{
 		$applicationSuffix = $this->getPostfixValue($sourceType);
-		$mediaServerConfig = kConf::get($dc, 'broadcast');
+		$mediaServerConfig = $this->getConfiguration($dc);
 		$url = $mediaServerConfig['domain'];
 		$port = $this->getPort($dc);
 		
@@ -92,7 +99,7 @@ class kBroadcastUrlManager
 	{
 		$port = kBroadcastUrlManager::DEFAULT_PORT;
 	
-		$broadcastConfig = kConf::getMap('broadcast');	
+		$broadcastConfig = $this->getConfiguration();	
 		if(isset($broadcastConfig['port']))
 		{
 			$port = $broadcastConfig['port'];

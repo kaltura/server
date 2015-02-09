@@ -6,5 +6,6 @@
  compress
  dateext
  notifempty
+ su root kaltura
 }
 

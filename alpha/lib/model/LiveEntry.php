@@ -7,6 +7,8 @@ abstract class LiveEntry extends entry
 {
 	const IS_LIVE = 'isLive';
 	const FIRST_BROADCAST = 'first_broadcast';
+	const RECORDED_ENTRY_ID = 'recorded_entry_id';
+
 	const DEFAULT_CACHE_EXPIRY = 120;
 	
 	const CUSTOM_DATA_NAMESPACE_MEDIA_SERVERS = 'mediaServers';
@@ -230,12 +232,18 @@ abstract class LiveEntry extends entry
 	public function getLastElapsedRecordingTime()		{ return $this->getFromCustomData( "lastElapsedRecordingTime", null, 0 ); }
 	public function setLastElapsedRecordingTime( $v )	{ $this->putInCustomData( "lastElapsedRecordingTime" , $v ); }
 
+	public function setRecordedSegmentsInfo( $v )	{ $this->putInCustomData('recordedSegmentsInfo', $v); }
+	public function getRecordedSegmentsInfo()		{ return $this->getFromCustomData('recordedSegmentsInfo', null, new kRecordedSegmentsInfo()); }
+
 	public function setStreamName ( $v )	{	$this->putInCustomData ( "streamName" , $v );	}
 	public function getStreamName (  )	{	return $this->getFromCustomData( "streamName", null, $this->getId() . '_%i' );	}
 	
 	public function setFirstBroadcast ( $v )	{	$this->putInCustomData ( "first_broadcast" , $v );	}
 	public function getFirstBroadcast (  )	{	return $this->getFromCustomData( "first_broadcast");	}
 	
+	public function setCurrentBroadcastStartTime( $v )	{ $this->putInCustomData ( "currentBroadcastStartTime" , $v ); }
+	public function getCurrentBroadcastStartTime()		{ return $this->getFromCustomData( "currentBroadcastStartTime", null, 0 ); }
+
 	public function setLastBroadcast ( $v )	{	$this->putInCustomData ( "last_broadcast" , $v );	}
 	public function getLastBroadcast (  )	{	return $this->getFromCustomData( "last_broadcast");	}
 	
@@ -265,9 +273,9 @@ abstract class LiveEntry extends entry
 			$this->putInCustomData('live_stream_configurations', $v);
 	}
 	
-	public function getLiveStreamConfigurationByProtocol($format, $protocol, $tag = null, $currentDcOnly = false)
+	public function getLiveStreamConfigurationByProtocol($format, $protocol, $tag = null, $currentDcOnly = false, array $flavorParamsIds = array())
 	{
-		$configurations = $this->getLiveStreamConfigurations($protocol, $tag, $currentDcOnly);
+		$configurations = $this->getLiveStreamConfigurations($protocol, $tag, $currentDcOnly, $flavorParamsIds);
 		foreach($configurations as $configuration)
 		{
 			/* @var $configuration kLiveStreamConfiguration */
@@ -278,7 +286,7 @@ abstract class LiveEntry extends entry
 		return null;
 	}
 	
-	public function getLiveStreamConfigurations($protocol = 'http', $tag = null, $currentDcOnly = false)
+	public function getLiveStreamConfigurations($protocol = 'http', $tag = null, $currentDcOnly = false, array $flavorParamsIds = array())
 	{
 		$configurations = array();
 		if (!in_array($this->getSource(), self::$kalturaLiveSourceTypes))
@@ -373,37 +381,52 @@ abstract class LiveEntry extends entry
 			$streamName = $this->getId();
 			if(is_null($tag) && ($this->getConversionProfileId() || $this->getType() == entryType::LIVE_CHANNEL))
 				$tag = 'all';
+		
+			$queryString = array();
+			if($this->getDvrStatus() == DVRStatus::ENABLED)
+			{
+				$queryString[] = 'DVR';
+			}
 			
-			if($tag)
+			if(count($flavorParamsIds) === 1)
+			{
+				$streamName .= '_' . reset($flavorParamsIds);
+			}
+			elseif(count($flavorParamsIds) > 1)
+			{
+				$tag = implode('_', $flavorParamsIds);
+				$queryString[] = 'flavorIds=' . implode(',', $flavorParamsIds);
+				
 				$streamName = "smil:{$streamName}_{$tag}.smil";
+			}
+			elseif($tag)
+			{
+				$streamName = "smil:{$streamName}_{$tag}.smil";
+			}
+			
+			if(count($queryString))
+			{
+				$queryString = '?' . implode('&', $queryString);
+			}
+			else
+			{
+				$queryString = '';
+			}
 			
 			$rtmpStreamUrl = $manifestUrl;
 			
 			$manifestUrl .= $streamName;
-			$hlsStreamUrl = "$manifestUrl/playlist.m3u8";
-			$hdsStreamUrl = "$manifestUrl/manifest.f4m";
-			$slStreamUrl = "$manifestUrl/Manifest";
-			$mpdStreamUrl = "$manifestUrl/manifest.mpd";
+			$hlsStreamUrl = "$manifestUrl/playlist.m3u8" . $queryString;
+			$hdsStreamUrl = "$manifestUrl/manifest.f4m" . $queryString;
+			$slStreamUrl = "$manifestUrl/Manifest" . $queryString;
+			$mpdStreamUrl = "$manifestUrl/manifest.mpd" . $queryString;
 			
 			if($backupManifestUrl)
 			{
 				$backupManifestUrl .= "$backupApplicationName/";
 				$backupManifestUrl .= $streamName;
-				$hlsBackupStreamUrl = "$backupManifestUrl/playlist.m3u8";
-				$hdsBackupStreamUrl = "$backupManifestUrl/manifest.f4m";
-			}
-			
-			if($this->getDvrStatus() == DVRStatus::ENABLED)
-			{
-				$hlsStreamUrl .= "?DVR";
-				$hdsStreamUrl .= "?DVR";
-				$slStreamUrl .= "?dvr";
-				
-				if($backupManifestUrl)
-				{
-					$hlsBackupStreamUrl .= "?DVR";
-					$hdsBackupStreamUrl .= "?DVR";
-				}
+				$hlsBackupStreamUrl = "$backupManifestUrl/playlist.m3u8" . $queryString;
+				$hdsBackupStreamUrl = "$backupManifestUrl/manifest.f4m" . $queryString;
 			}
 		}
 			
@@ -609,7 +632,9 @@ abstract class LiveEntry extends entry
 	{
 		$dynamicAttributes = array(
 				LiveEntry::IS_LIVE => intval($this->hasMediaServer()),
-				LiveEntry::FIRST_BROADCAST => $this->getFirstBroadcast());
+				LiveEntry::FIRST_BROADCAST => $this->getFirstBroadcast(),
+				LiveEntry::RECORDED_ENTRY_ID => $this->getRecordedEntryId(),
+		);
 		
 		return array_merge( $dynamicAttributes, parent::getDynamicAttributes() ); 
 	}
@@ -709,5 +734,18 @@ abstract class LiveEntry extends entry
 		}
 	}
 	
+	public function setRecordingOptions(kLiveEntryRecordingOptions $recordingOptions)
+	{
+		$this->putInCustomData("recording_options", serialize($recordingOptions));
+	}
 	
+	public function getRecordingOptions()
+	{
+		$recordingOptions = $this->getFromCustomData("recording_options");
+		
+		if($recordingOptions)
+			$recordingOptions = unserialize($recordingOptions);
+		
+		return $recordingOptions; 
+	}
 }

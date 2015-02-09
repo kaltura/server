@@ -3,7 +3,7 @@
 /**
  * Stats Service
  *
- * @service stats
+ * @service liveStats
  * @package api
  * @subpackage services
  */

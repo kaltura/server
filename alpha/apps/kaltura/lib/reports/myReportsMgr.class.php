@@ -40,6 +40,7 @@ class myReportsMgr
 	const REPORT_TYPE_OPERATION_SYSTEM = 22;
 	const REPORT_TYPE_BROWSERS = 23;
 	const REPORT_TYPE_LIVE = 24;
+	const REPORT_TYPE_TOP_PLAYBACK_CONTEXT = 25;
 
 	const REPORTS_TABLE_MAX_QUERY_SIZE = 20000;
 	const REPORTS_CSV_MAX_QUERY_SIZE = 130000;
@@ -58,7 +59,9 @@ class myReportsMgr
 										
 	static $end_user_filter_get_count_reports = array (self::REPORT_TYPE_PLATFORMS,
 										self::REPORT_TYPE_OPERATION_SYSTEM, 
-										self::REPORT_TYPE_BROWSERS);
+										self::REPORT_TYPE_BROWSERS,
+										self::REPORT_TYPE_TOP_CONTENT,
+										self::REPORT_TYPE_TOP_PLAYBACK_CONTEXT);
 										
 
 	public static function runQuery ( $query_file , $map , $debug = false )
@@ -670,7 +673,7 @@ class myReportsMgr
 			$input_filter->from_date . $input_filter->to_date . $input_filter->keywords . $input_filter->search_in_admin_tags . $input_filter->search_in_tags . $input_filter->interval .
 			$object_ids . $input_filter->categories;
 		if ($input_filter instanceof endUserReportsInputFilter)
-			$key = $key .  $input_filter->application . $input_filter->userIds . $input_filter->playbackContext;
+			$key = $key .  $input_filter->application . $input_filter->userIds . $input_filter->playbackContext . $input_filter->ancestorPlaybackContext;
 		return $key;
 	}
 	
@@ -730,23 +733,30 @@ class myReportsMgr
 			$category_ids_clause = "1=1"; 
 			if ($input_filter instanceof endUserReportsInputFilter)
 			{
-				if ($input_filter->playbackContext)
+				if ($input_filter->playbackContext || $input_filter->ancestorPlaybackContext)
 				{
 					$categoryFilter = new categoryFilter();
-					$categoryFilter->set("_in_full_name", $input_filter->playbackContext);
-					$c = KalturaCriteria::create(categoryPeer::OM_CLASS);
-					$categoryFilter->attachToCriteria($c);
-					$c->applyFilters();
-				
-					$categoryIdsFromDB = $c->getFetchedIds();
-				
-					if (count($categoryIdsFromDB))
-						$categoryIds = implode(",", $categoryIdsFromDB);
-					else
+					if ($input_filter->playbackContext && $input_filter->ancestorPlaybackContext)
 						$categoryIds = category::CATEGORY_ID_THAT_DOES_NOT_EXIST;
+					else {
+						if ($input_filter->playbackContext)
+							$categoryFilter->set("_in_full_name", $input_filter->playbackContext);
+						if ($input_filter->ancestorPlaybackContext)
+							$categoryFilter->set("_matchor_likex_full_name", $input_filter->ancestorPlaybackContext);
+						
+						$c = KalturaCriteria::create(categoryPeer::OM_CLASS);
+						$categoryFilter->attachToCriteria($c);
+						$c->applyFilters();
+					
+						$categoryIdsFromDB = $c->getFetchedIds();
+					
+						if (count($categoryIdsFromDB))
+							$categoryIds = implode(",", $categoryIdsFromDB);
+						else
+							$categoryIds = category::CATEGORY_ID_THAT_DOES_NOT_EXIST;
+					}
 							
 					$category_ids_clause = "ev.context_id in ( $categoryIds )";
-						
 				}
 			}
 			
@@ -914,7 +924,8 @@ class myReportsMgr
 		self::REPORT_TYPE_PLATFORMS => 'platforms',
 		self::REPORT_TYPE_OPERATION_SYSTEM => 'os',
 		self::REPORT_TYPE_BROWSERS => 'browsers',
-		self::REPORT_TYPE_LIVE => "live" ,
+		self::REPORT_TYPE_LIVE => "live",
+		self::REPORT_TYPE_TOP_PLAYBACK_CONTEXT => "top_playback_context",
 	
 	);
 	
@@ -1111,6 +1122,14 @@ class myReportsMgr
 			),
 			"live" => array (
 				"count_plays"
+			),
+			"top_playback_context" => array (
+				"count_plays" ,	
+				"sum_time_viewed" ,
+				"avg_time_viewed" ,
+				"count_loads" ,
+				"avg_view_drop_off",
+				"load_play_ratio" ,		
 			)
 		);
 		
@@ -1268,7 +1287,7 @@ class myReportsMgr
 	{
 		kApiCache::disableConditionalCache();
 	
-		$mysql_function = (strpos($query, 'CALL') === false)? 'mysql': 'mysqli';
+		$mysql_function = 'mysqli';
 		
 		$db_config = kConf::get( "reports_db_config" );
 		$timeout = isset ( $db_config["timeout"] ) ? $db_config["timeout"] : 40;
@@ -1432,13 +1451,14 @@ class endUserReportsInputFilter extends reportsInputFilter
 	public $application;
 	public $userIds;
 	public $playbackContext;
+	public $ancestorPlaybackContext;
 	
 	public function getFilterBy() {
 		$filterBy = ""; 
-		if ($this->playbackContext != null) 
+		if ($this->playbackContext != null || $this->ancestorPlaybackContext != null) 
 			$filterBy = "_by_context";
 		if ($this->userIds != null) 
-			$filterBy = "_by_user";
+			$filterBy = $filterBy . "_by_user";
 		if ($this->application != null)
 			$filterBy = $filterBy . "_by_app";
 

@@ -38,6 +38,7 @@ class kFlowHelper
 		$flavorAsset = flavorAsset::getInstance();
 		$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_QUEUED);
 		$flavorAsset->incrementVersion();
+		$flavorAsset->addTags(array(flavorParams::TAG_SOURCE));
 		$flavorAsset->setIsOriginal(true);
 		$flavorAsset->setFlavorParamsId(flavorParams::SOURCE_FLAVOR_ID);
 		$flavorAsset->setPartnerId($partnerId);
@@ -127,7 +128,12 @@ class kFlowHelper
 		// IMAGE media entries
 		if ($dbEntry->getType() == entryType::MEDIA_CLIP && $dbEntry->getMediaType() == entry::ENTRY_MEDIA_TYPE_IMAGE)
 		{
+			//setting the entry's data so it can be used for creating file-syncs' file-path version & extension - in kFileSyncUtils::moveFromFile
+			//without saving - the updated entry object exists in the instance pool
+			$dbEntry->setData(".jpg");
+			
 			$syncKey = $dbEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA);
+
 			try
 			{
 				kFileSyncUtils::moveFromFile($data->getDestFileLocalPath(), $syncKey, true, false, $data->getCacheOnly());
@@ -1805,7 +1811,7 @@ class kFlowHelper
 			{
 				if(self::isAssetExportFinished($fileSync, $asset))
 				{
-					if(!is_null($asset->getentry()->getReplacedEntryId()))
+					if(!is_null($asset->getentry()) && !is_null($asset->getentry()->getReplacedEntryId()))
 						self::handleEntryReplacementFileSyncDeletion($fileSync, array(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET, asset::FILE_SYNC_ASSET_SUB_TYPE_ISM, asset::FILE_SYNC_ASSET_SUB_TYPE_ISMC));
 					
 					self::conditionalAssetLocalFileSyncsDelete($fileSync, $asset);
@@ -2661,17 +2667,8 @@ class kFlowHelper
 		$secret = $partner->getSecret ();
 		$privilege = ks::PRIVILEGE_DOWNLOAD . ":" . $file_name;
 	
-		$maxExpiry = 3 * 24 * 60 * 60;
-		$expiry = $partner->getKsMaxExpiryInSeconds();
-		if(!$expiry || ($expiry > $maxExpiry))
-			$expiry = $maxExpiry;
-	
-		$result = kSessionUtils::startKSession ( $partner_id, $secret, null, $ksStr, $expiry, false, "", $privilege );
-	
-		if ($result < 0) {
-			KalturaLog::err("Failed to create KS for Live report export download url");
-			return null;
-		}
+		$expiry = kConf::get("live_report_export_expiry", 'local', 3 * 24 * 60 * 60);
+		$ksStr = kSessionBase::generateSession($partner->getKSVersion(), $partner->getAdminSecret(), null, ks::TYPE_KS, $partner_id, $expiry, $privilege);
 			
 		//url is built with DC url in order to be directed to the same DC of the saved file
 		$url = kDataCenterMgr::getCurrentDcUrl() . "/api_v3/index.php/service/liveReports/action/serveReport/ks/$ksStr/id/$file_name/$downloadName";

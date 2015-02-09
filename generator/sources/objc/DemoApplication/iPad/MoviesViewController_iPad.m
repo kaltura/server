@@ -17,6 +17,9 @@
 @synthesize media;
 @synthesize category;
 @synthesize mostPopular;
+@synthesize entryInfoView;
+
+const CGRect PlayeriPadCGRect = { { 50.0f, 90.0f }, { 320.0f, 180.0f } };
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -75,7 +78,7 @@
 }
 
 - (IBAction)closeInfoButtonPressed:(UIButton *)button {
-
+    [self stopAndRemovePlayer];
     [viewInfo removeFromSuperview];
     
 }
@@ -120,17 +123,18 @@
 #pragma -;
 
 - (void)playButtonPressed {
-    
-    if ([self.media count] > 0) {
-        
-        KalturaMediaEntry *mediaEntry = [self.media objectAtIndex:0];
-        NSLog(@"@", mediaEntry);
-        PlayerViewController_iPad *controller = [[PlayerViewController_iPad alloc] initWithNibName:@"PlayerViewController_iPad" bundle:nil];
-        controller.mediaEntry = mediaEntry;
-        [self.navigationController pushViewController:controller animated:YES];
-        [controller release];
-        
-    }
+
+    [self openMediaInfoByIndex: currentMovieInd];
+//    if ([self.media count] > 0) {
+//        
+//        KalturaMediaEntry *mediaEntry = [self.media objectAtIndex:0];
+//        NSLog(@"@", mediaEntry);
+//        PlayerViewController_iPad *controller = [[PlayerViewController_iPad alloc] initWithNibName:@"PlayerViewController_iPad" bundle:nil];
+//        controller.mediaEntry = mediaEntry;
+//        [self.navigationController pushViewController:controller animated:YES];
+//        [controller release];
+//        
+//    }
     
 }
 
@@ -243,7 +247,7 @@ NSInteger playsPadSort(id media1, id media2, void *reverse)
 
 - (void)mailComposeController:(MFMailComposeViewController*)_controller didFinishWithResult:(MFMailComposeResult)result error:(NSError*)error {
 	
-    [self dismissModalViewControllerAnimated:YES];    
+    [self dismissViewControllerAnimated:YES completion:nil];
     
 }
 
@@ -271,7 +275,7 @@ NSInteger playsPadSort(id media1, id media2, void *reverse)
             NSString *str = [NSString stringWithFormat:@"I just saw this great video on Kaltura mobile app, check it out:\n%@", [[Client instance] getShareURL:mediaEntry]];
             [_controller setMessageBody:str isHTML:NO];
             
-            [self presentModalViewController:_controller animated:YES];
+            [self presentViewController:_controller animated:YES completion:nil];
             [_controller release];
             
         } else {
@@ -324,7 +328,7 @@ NSInteger playsPadSort(id media1, id media2, void *reverse)
     
     [self.view addSubview:viewInfo];
     
-
+    [self drawPlayer:mediaEntry];
 }
 
 #pragma -
@@ -349,7 +353,7 @@ NSInteger playsPadSort(id media1, id media2, void *reverse)
             
             if ([self.media count] > 3) {
                 
-                int _count = [self.media count] - 3;
+                int _count = (int)[self.media count] - 3;
                 
                 count += _count / 4 + (_count % 4 > 0 ? 1 : 0);
                 
@@ -363,7 +367,7 @@ NSInteger playsPadSort(id media1, id media2, void *reverse)
         
         NSArray *array = [[Client instance] getCategories];
         
-        count = [array count];
+        count = (int)[array count];
         
         if (mostPopular) count++;
     }
@@ -392,7 +396,7 @@ NSInteger playsPadSort(id media1, id media2, void *reverse)
             
             cell.selectionStyle = UITableViewCellSelectionStyleNone;
             
-            int index = indexPath.row;
+            int index = (int)indexPath.row;
             
             cell.index = index;
             cell.parentController = self;
@@ -452,7 +456,7 @@ NSInteger playsPadSort(id media1, id media2, void *reverse)
             
             cell.selectionStyle = UITableViewCellSelectionStyleNone;
             
-            int index = (indexPath.row - 1) * 4 + 3;
+            int index = (int)(indexPath.row - 1) * 4 + 3;
             
             cell.index = index;
             cell.parentController = self;
@@ -546,7 +550,7 @@ NSInteger playsPadSort(id media1, id media2, void *reverse)
 
     if (tableView.tag == 1) {
         
-        currentCategoryInd = indexPath.row;
+        currentCategoryInd = (int)indexPath.row;
         
         if (mostPopular && indexPath.row == 0) {
         
@@ -611,6 +615,11 @@ NSInteger playsPadSort(id media1, id media2, void *reverse)
     
 }
 
+- (void)viewWillDisappear:(BOOL)animated {
+    [super viewWillDisappear:animated];
+    [self stopAndRemovePlayer];
+}
+
 - (void)viewDidLoad
 {
     [super viewDidLoad];
@@ -646,6 +655,7 @@ NSInteger playsPadSort(id media1, id media2, void *reverse)
 
 - (void)viewDidUnload
 {
+    [self setEntryInfoView:nil];
     [super viewDidUnload];
     // Release any retained subviews of the main view.
     // e.g. self.myOutlet = nil;
@@ -657,12 +667,89 @@ NSInteger playsPadSort(id media1, id media2, void *reverse)
 	return YES;
 }
 
+- (void)stopAndRemovePlayer{
+    NSLog(@"stopAndRemovePlayer Enter");
+    
+    [playerViewController stopAndRemovePlayer];
+    [playerViewController.view removeFromSuperview];
+    [playerViewController removeFromParentViewController];
+    playerViewController = nil;
+    
+    NSLog(@"stopAndRemovePlayer Exit");
+}
+
+- (void)drawPlayer: (KalturaMediaEntry *)mediaEntry{
+    
+    [[UIDevice currentDevice] beginGeneratingDeviceOrientationNotifications];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector( orientationDidChange: )
+                                                 name:UIDeviceOrientationDidChangeNotification
+                                               object:nil];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector( toggleFullscreen: )
+                                                 name:@"toggleFullscreenNotification"
+                                               object:nil];
+    
+    [self.navigationController setDelegate:self];
+    
+    if ( !playerViewController ) {
+        playerViewController = [[ KPViewController alloc] init];
+        
+        playerViewController.view.frame = PlayeriPadCGRect;
+    }
+    
+    [entryInfoView addSubview:playerViewController.view];
+    [self reDrawPlayer: PlayeriPadCGRect.origin.x right: PlayeriPadCGRect.origin.y width: PlayeriPadCGRect.size.width height: PlayeriPadCGRect.size.height];
+    
+    NSString *iframeUrl = [[Client instance] getIframeURL:mediaEntry];
+    [playerViewController setWebViewURL: iframeUrl];
+}
+
+- (void)reDrawPlayer: (CGFloat )top right: (CGFloat )right width: (CGFloat )width height: (CGFloat )height
+{
+    NSLog(@"reDrawPlayer Enter");
+    
+    [playerViewController resizePlayerView:(CGRect){right, top, width, height}];
+    
+    NSLog(@"reDrawPlayer Exit");
+}
+
+-(void) orientationDidChange:(NSNotification *)notification {
+    NSLog(@"orientationDidChange Enter");
+    
+    [ playerViewController checkOrientationStatus ];
+    
+    NSLog(@"orientationDidChange Exit");
+}
+
+- (void)toggleFullscreen:(NSNotification *)note {
+    NSLog(@"toggleFullscreen Enter");
+    
+    NSDictionary *theData = [note userInfo];
+    if (theData != nil) {
+        NSNumber *n = [theData objectForKey:@"isFullScreen"];
+        BOOL isFullScreen = [n boolValue];
+        
+        if ( isFullScreen ) {
+            [[[UIApplication sharedApplication] delegate].window addSubview:playerViewController.view];
+        }
+        else if( !isFullScreen ){
+            [entryInfoView addSubview:playerViewController.view];
+        }
+    }
+    
+    NSLog(@"toggleFullscreen Exit");
+}
+
 #pragma mark -
 
 - (void)dealloc {
     
     [self.media removeAllObjects];
     [self.media release];
+    [self.entryInfoView release];
     
     [super dealloc];
     

@@ -355,4 +355,9 @@ class AnnotationPlugin extends KalturaPlugin implements IKalturaServices, IKaltu
 			
 		return $scene;
 	}
+	
+	public static function getTypesToIndexOnEntry()
+	{
+		return array(self::getCuePointTypeCoreValue(AnnotationCuePointType::ANNOTATION));
+	}
 }

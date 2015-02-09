@@ -22,8 +22,10 @@ class LiveReportAudienceEngine extends LiveReportEngine {
 		$endTime =  $args[LiveReportConstants::TIME_REFERENCE_PARAM];
 		$timeRange = LiveReportConstants::SECONDS_36_HOURS;
 		
+		$fix = 0; // The report is inclussive, therefore starting from the the second request we shouldn't query twice
 		for($curTime = $endTime - $timeRange; $curTime < $endTime ; $curTime = $curTime + self::TIME_CHUNK) {
-			$this->executeAudienceQuery($fp, $curTime, $curTime + self::TIME_CHUNK, $args);
+			$this->executeAudienceQuery($fp, $curTime + $fix, $curTime + self::TIME_CHUNK, $args);
+			$fix = LiveReportConstants::SECONDS_10;
 		}
 		
 	}

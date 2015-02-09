@@ -70,13 +70,13 @@ public final class ParseUtils {
 		return 0;
 	}
 	
-	public static float parseFloat(String txt) {
+	public static double parseDouble(String txt) {
 		if (txt.length() != 0) {
 			try {
-				return Float.parseFloat(txt);
+				return Double.parseDouble(txt);
 			} catch (NumberFormatException nfe) {
 				if (logger.isEnabled())
-					logger.warn("Failed to parse [" + txt + "] as float", nfe);
+					logger.warn("Failed to parse [" + txt + "] as double", nfe);
 			}
 		}
 		return 0;

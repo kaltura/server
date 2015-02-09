@@ -127,6 +127,8 @@ class entryFilter extends baseObjectFilter
 			"_eq_root_entry_id",
 			"_in_root_entry_id",
 			"_eq_parent_entry_id",
+			"_matchand_entitled_kusers_edit",
+			"_matchand_entitled_kusers_publish",
 			"_is_root",
 			"_matchand_roots",
 			"_notin_roots",
@@ -138,7 +140,12 @@ class entryFilter extends baseObjectFilter
 			"_gte_last_played_at",
 			"_lte_last_played_at",
 			"_is_live",
-			) , NULL );
+			"_eq_source",
+			"_not_source",
+			"_in_source",
+			"_notin_source",
+			"_is_recorded_entry_id_empty",
+		) , NULL );
 
 		$this->allowed_order_fields = array ( "created_at" , "updated_at" , "views", "name", "media_date" , 
 			"type" , "media_type" , "plays" , "views" , "rank" , "moderation_count" , "moderation_status" , 

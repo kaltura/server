@@ -9,22 +9,35 @@ abstract class LiveReportExporter {
 	protected $dateFormatter;
 	
 	public function __construct(KalturaLiveReportExportJobData $data, $reportNameFormat, $timeRange) {
+		
+		// Init parameters
 		$this->params[LiveReportConstants::IS_LIVE] = false;
 		$this->params[LiveReportConstants::TIME_REFERENCE_PARAM] = $data->timeReference;
 		if($data->entryIds)
 			$this->params[LiveReportConstants::ENTRY_IDS] = $data->entryIds;
 		
-		$this->dateFormatter = new LiveReportDateFormatter($data->timeZoneOffset);
-		
+		$this->dateFormatter = new LiveReportDateFormatter(LiveReportConstants::DATE_FORMAT_INTERNAL, $data->timeZoneOffset);
 		$fromTime = $this->dateFormatter->format($data->timeReference - $timeRange);
 		$toTime = $this->dateFormatter->format($data->timeReference);
-		
 		$this->params[self::TIME_RANGE] = $fromTime . " - " . $toTime;
+		
+		// Create file name
+		$this->createReportFileName($data, $reportNameFormat, $timeRange);
+	}
+	
+	/**
+	 * generates the report fie name.
+	 * The Format is:
+	 * Export_<uniqid>_fileName 
+	 */
+	protected function createReportFileName(KalturaLiveReportExportJobData $data, $reportNameFormat, $timeRange) {
+		$formatter = new LiveReportDateFormatter(LiveReportConstants::DATE_FORMAT_EXTERNAL, $data->timeZoneOffset);
+		$fromTime = $formatter->format($data->timeReference - $timeRange);
+		$toTime = $formatter->format($data->timeReference);
 		
 		$fileNamePrefix = "Export_" . substr(uniqid(),-5);
 		$this->fileName = $data->outputPath . DIRECTORY_SEPARATOR . $fileNamePrefix . "_" . $reportNameFormat;
 		$this->fileName = vsprintf($this->fileName, array($fromTime, $toTime));
-		
 		$data->outputPath =  $this->fileName;
 	}
 	
@@ -86,10 +99,19 @@ abstract class LiveReportEntryExporter extends LiveReportExporter {
 		
 		$this->liveEntriesEngines = array(
 				new LiveReportConstantStringEngine(LiveReportConstants::ROWS_SEPARATOR),
-				new LiveReportEntryExactTimeEngine("audience", LiveReportConstants::SECONDS_60, "Total Plays:"),
+				new LiveReportEntryExactTimeEngine("audience", LiveReportConstants::SECONDS_60, "Total Audience:"),
 				new LiveReportEntryQueryEngine("secondsViewed", LiveReportConstants::SECONDS_36_HOURS, "Seconds Viewed:"),
 				new LiveReportEntryQueryEngine("bufferTime", LiveReportConstants::SECONDS_60, "Average Buffering Time per Minute (seconds):"),
 				new LiveReportEntryQueryEngine("avgBitrate", LiveReportConstants::SECONDS_60, "Average Bitrate (kbps):"),
 				new LiveReportConstantStringEngine(LiveReportConstants::ROWS_SEPARATOR));
+	}
+	
+	protected function getHeadersEngines($reportType) {
+		return array(
+				new LiveReportConstantStringEngine("Report Type:". LiveReportConstants::CELLS_SEPARATOR . $reportType),
+				new LiveReportConstantStringEngine("Entry Id:". LiveReportConstants::CELLS_SEPARATOR ."%s", array(LiveReportConstants::ENTRY_IDS)),
+				new LiveReportEntryEngine("name", "Entry Name:", new LiveReportStringFormatter(), true),
+				new LiveReportConstantStringEngine(LiveReportConstants::ROWS_SEPARATOR),
+				new LiveReportConstantStringEngine("Time Range:". LiveReportConstants::CELLS_SEPARATOR ."%s", array(self::TIME_RANGE)));
 	}
 }

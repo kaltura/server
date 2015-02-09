@@ -11,6 +11,8 @@ define('APIV3_GETFEED_MARKER', '[syndicationFeedRenderer] [global] DEBUG: getFee
 define('DB_HOST_NAME', 'dbgoeshere');
 define('DB_USER_NAME', 'root');
 define('DB_PASSWORD', 'root');
+define('DB_PORT', 3306);
+define('DB_NAME','kaltura');
 
 define('IP_ADDRESS_SALT', '');
 
@@ -97,15 +99,14 @@ class PartnerSecretPool
 
 	public function __construct()
 	{
-		$this->link = mysql_connect(DB_HOST_NAME, DB_USER_NAME, DB_PASSWORD)
-			or die('Error: Could not connect: ' . mysql_error() . "\n");
-
-		mysql_select_db('kaltura', $this->link) or die("Error: Could not select 'kaltura' database\n");
+	    $this->link = mysqli_connect(DB_HOST_NAME, DB_USER_NAME, DB_PASSWORD, DB_NAME, DB_PORT)
+		or die('Error: Could not connect: ' . mysqli_connect_error() . "\n");
+		mysqli_select_db($this->link,DB_NAME) or die("Error: Could not select 'kaltura' database\n");
 	}
 
 	public function __destruct()
 	{
-		mysql_close($this->link);
+	    mysqli_close($this->link);
 	}
 
 	public function getPartnerSecret($partnerId)
@@ -116,8 +117,8 @@ class PartnerSecretPool
 			return null;
 			
 		$query = "SELECT admin_secret FROM partner WHERE id='{$partnerId}'";
-		$result = mysql_query($query, $this->link) or die('Error: Select from func table query failed: ' . mysql_error() . "\n");
-		$line = mysql_fetch_array($result, MYSQL_NUM);
+		$result = mysqli_query($this->link,$query) or die('Error: Select from func table query failed: ' . mysqli_error($link) . "\n");
+		$line = mysqli_fetch_array($result, MYSQLI_NUM);
 		if (!$line)
 			return null;
 		$this->secrets[$partnerId] = $line[0];

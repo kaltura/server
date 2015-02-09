@@ -2,8 +2,19 @@
 /**
  * @package plugins.cuePoint
  */
-class kThumbCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEventConsumer
+class kThumbCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEventConsumer, kObjectAddedEventConsumer
 {
+	/* (non-PHPdoc)
+	 * @see kObjectAddedEventConsumer::shouldConsumeAddedEvent()
+	 */
+	public function shouldConsumeAddedEvent(BaseObject $object)
+	{
+		if($object instanceof timedThumbAsset && $object->getStatus() == asset::ASSET_STATUS_READY)
+			return true;
+			
+		return false;
+	}
+	
 	/* (non-PHPdoc)
 	 * @see kObjectDeletedEventConsumer::shouldConsumeDeletedEvent()
 	 */
@@ -19,6 +30,58 @@ class kThumbCuePointManager implements kObjectDeletedEventConsumer, kObjectChang
 	}
 	
 	/* (non-PHPdoc)
+	 * @see kObjectChangedEventConsumer::shouldConsumeChangedEvent()
+	*/
+	public function shouldConsumeChangedEvent(BaseObject $object, array $modifiedColumns)
+	{
+		if(self::isTimedThumbAssetChangedToReady($object, $modifiedColumns))
+		{
+			return true;
+		}
+		
+		return false;
+	}
+	
+	/* (non-PHPdoc)
+	 * @see kObjectAddedEventConsumer::objectAdded()
+	 */
+	public function objectAdded(BaseObject $object, BatchJob $raisedJob = null)
+	{
+		$cuePoint = $this->getCuePointByTimedThumbAsset($object);
+
+		if(!$cuePoint)
+			return true;
+			
+		if($cuePoint->getStatus() == CuePointStatus::PENDING)
+		{
+			$cuePoint->setStatus(CuePointStatus::READY);
+			$cuePoint->save();	
+		}
+		
+		return true;;
+	}
+	
+	
+	/* (non-PHPdoc)
+	 * @see kObjectChangedEventConsumer::objectChanged()
+	 */
+	public function objectChanged(BaseObject $object, array $modifiedColumns)
+	{
+		$cuePoint = $this->getCuePointByTimedThumbAsset($object);
+		
+		if(!$cuePoint)
+			return true;
+			
+		if($cuePoint->getStatus() == CuePointStatus::PENDING)
+		{
+			$cuePoint->setStatus(CuePointStatus::READY);
+			$cuePoint->save();	
+		}
+		
+		return true;
+	}
+	
+	/* (non-PHPdoc)
 	 * @see kObjectDeletedEventConsumer::objectDeleted()
 	 */
 	public function objectDeleted(BaseObject $object, BatchJob $raisedJob = null) 
@@ -30,6 +93,14 @@ class kThumbCuePointManager implements kObjectDeletedEventConsumer, kObjectChang
 			$this->timedThumbAssetDeleted($object);
 			
 		return true;
+	}
+	
+	public static function isTimedThumbAssetChangedToReady(BaseObject $object, array $modifiedColumns)
+	{
+		if($object instanceof timedThumbAsset && in_array(assetPeer::STATUS, $modifiedColumns) && $object->getStatus() == asset::ASSET_STATUS_READY)
+		{
+				return true;
+		}
 	}
 	
 	/**
@@ -61,83 +132,23 @@ class kThumbCuePointManager implements kObjectDeletedEventConsumer, kObjectChang
 			$dbCuePoint->save();
 		}
 	}
-
-	/* (non-PHPdoc)
-	 * @see kObjectChangedEventConsumer::shouldConsumeChangedEvent()
-	*/
-	public function shouldConsumeChangedEvent(BaseObject $object, array $modifiedColumns)
-	{
-		if ( $object instanceof timedThumbAsset
-				&& $object->getStatus() == thumbAsset::ASSET_STATUS_READY && in_array(assetPeer::STATUS, $modifiedColumns) )
+	
+	public function getCuePointByTimedThumbAsset(timedThumbAsset $timedThumbAsset)
+	{		
+		$cuePointId = $timedThumbAsset->getCuePointID();
+		if(!$cuePointId)
 		{
-			return true;
+			KalturaLog::debug("CuePoint Id not found on object");
+			return null;
 		}
-
-		return false;
-	}
-
-	/* (non-PHPdoc)
-	 * @see kObjectChangedEventConsumer::objectChanged()
-	 */
-	public function objectChanged(BaseObject $object, array $modifiedColumns)
-	{
-		$this->copyCuePointToVodIfLiveEntry( $object );
-	}
-
-	protected function copyCuePointToVodIfLiveEntry( $timedThumbAsset )
-	{
-		$thumbCuePoint = CuePointPeer::retrieveByPK( $timedThumbAsset->getCuePointID() );
-
-		if ( ! $thumbCuePoint )
+			
+		$cuePoint = CuePointPeer::retrieveByPK($cuePointId);
+		if(!$cuePoint)
 		{
-			return;
+			KalturaLog::debug("CuePoint with ID [$cuePointId] not found");
+			return null;
 		}
-
-		$entry = entryPeer::retrieveByPK( $thumbCuePoint->getEntryId() );
-
-		if ( $entry->getType() != entryType::LIVE_STREAM )
-		{
-			return;
-		}
-
-		$vodEntryId = $entry->getRecordedEntryId();
-
-		if ( ! $vodEntryId )
-		{
-			return;
-		}
-
-		$vodEntry = entryPeer::retrieveByPK( $vodEntryId );
-
-		if ( ! $vodEntry )
-		{
-			return;
-		}
-
-		KalturaLog::log("Saving the live entry [{$entry->getId()}] cue point [{$thumbCuePoint->getId()}] and timed thumb asset [{$timedThumbAsset->getId()}] to the associated VOD entry [{$vodEntryId}]");
-
-		// Clone the cue point to the VOD entry
-		$vodThumbCuePoint = $thumbCuePoint->copy();
-		$vodThumbCuePoint->setEntryId( $vodEntryId );
-		$vodThumbCuePoint->setAssetId( "" );
-		$vodThumbCuePoint->save();
-
-		$timedThumbAssetCuePointID = $timedThumbAsset->getCuePointID();	// Remember the current thumb asset's cue point id
-		$timedThumbAsset->setCuePointID( $vodThumbCuePoint->getId() );	// Set the VOD cue point's id
-		$timedThumbAsset->setCustomDataObj();							// Write the cached custom data object into the thumb asset
-
-		// Make a copy of the current thumb asset
-		// copyToEntry will create a filesync softlink to the original filesync
-		$vodTimedThumbAsset = $timedThumbAsset->copyToEntry( $vodEntryId, $vodEntry->getPartnerId() );
-
-		// Restore the thumb asset's prev. cue point id (for good measures)
-		$timedThumbAsset->setCuePointID( $timedThumbAssetCuePointID );
-		$timedThumbAsset->setCustomDataObj();
-
-		// Save the VOD entry's thumb asset
-		$vodTimedThumbAsset->setCuePointID( $vodThumbCuePoint->getId() );
-		$vodTimedThumbAsset->save();
-
-		KalturaLog::log("Saved recorded entry cue point [{$vodThumbCuePoint->getId()}] and timed thumb asset [{$vodTimedThumbAsset->getId()}]");
+		
+		return $cuePoint;
 	}
 }

@@ -755,7 +755,8 @@ $plannedDur = 0;
 		if($source->_dar!="" && $source->_dar>0){
 			$darSrc = $source->_dar;
 			$diff = abs(1-$darSrc/$darSrcFrame);
-			if($diff>0.1) {
+				// Less strict diff (original was diff>0.1) test to allow hadling of 5:4 to 4:3 adjustments
+			if($diff>0.05) {  
 				$widSrc = $darSrc*$hgtSrc;
 				$darSrcFrame = $darSrc;
 			}
@@ -1231,6 +1232,24 @@ $plannedDur = 0;
 		&& !$targetAud->IsFormatOf(array(KDLAudioTarget::COPY))
 		&& ($source->IsFormatOf(array('nellymoser'))||($source->_sampleRate && $source->_sampleRate>0 && $source->_sampleRate<16000))) {
 			$targetAud->_useResampleFilter = true;
+		}
+			/*
+			 * Check for 'down' mix audio, it requires special ffmpeg processing 
+			 */
+		if(isset($contentStreams) && isset($contentStreams->audio) && count($contentStreams->audio)==1 
+		&& isset($contentStreams->audio[0]->audioChannelLayout)
+		&& $contentStreams->audio[0]->audioChannelLayout==KDLAudioLayouts::DOWNMIX){
+			$targetAud->_downmix = true;
+		}
+
+
+			/*
+			 * Check for 'down' mix audio, it requires special ffmpeg processing 
+			 */
+		if(isset($contentStreams) && isset($contentStreams->audio) && count($contentStreams->audio)==1 
+		&& isset($contentStreams->audio[0]->audioChannelLayout)
+		&& $contentStreams->audio[0]->audioChannelLayout==KDLAudioLayouts::DOWNMIX){
+			$targetAud->_downmix = true;
 		}
 
 		return $targetAud;

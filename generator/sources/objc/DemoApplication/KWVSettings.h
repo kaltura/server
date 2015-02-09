@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 
-@interface WVSettings : NSObject {
+@interface KWVSettings : NSObject {
     
     NSString* drmServer;
 	NSString* portalId;

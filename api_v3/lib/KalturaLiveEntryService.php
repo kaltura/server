@@ -41,31 +41,28 @@ class KalturaLiveEntryService extends KalturaEntryService
 	 * @param KalturaMediaServerIndex $mediaServerIndex
 	 * @param KalturaDataCenterContentResource $resource
 	 * @param float $duration in seconds
+	 * @param bool $isLastChunk Is this the last recorded chunk in the current session (i.e. following a stream stop event)
 	 * @return KalturaLiveEntry The updated live entry
 	 * 
 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
 	 */
-	function appendRecordingAction($entryId, $assetId, $mediaServerIndex, KalturaDataCenterContentResource $resource, $duration)
+	function appendRecordingAction($entryId, $assetId, $mediaServerIndex, KalturaDataCenterContentResource $resource, $duration, $isLastChunk = false)
 	{
 		$dbEntry = entryPeer::retrieveByPK($entryId);
 		if (!$dbEntry || !($dbEntry instanceof LiveEntry))
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
-		
+
 		$dbAsset = assetPeer::retrieveById($assetId);
 		if (!$dbAsset || !($dbAsset instanceof liveAsset))
 			throw new KalturaAPIException(KalturaErrors::ASSET_ID_NOT_FOUND, $assetId);
 			
-		$currentDuration = $dbEntry->getLengthInMsecs();
-		if(!$currentDuration)
-			$currentDuration = 0;
-		$currentDuration += ($duration * 1000);
+		$lastDuration = $dbEntry->getLengthInMsecs();
+		if(!$lastDuration)
+			$lastDuration = 0;
+
+		$liveSegmentDurationInMsec = (int)($duration * 1000);
+		$currentDuration = $lastDuration + $liveSegmentDurationInMsec;
 		
-		if($dbAsset->hasTag(assetParams::TAG_RECORDING_ANCHOR) && $mediaServerIndex == KalturaMediaServerIndex::PRIMARY)
-		{
-			$dbEntry->setLengthInMsecs($currentDuration);
-			$dbEntry->save();
-		}
-	
 		$maxRecordingDuration = (kConf::get('max_live_recording_duration_hours') + 1) * 60 * 60 * 1000;
 		if($currentDuration > $maxRecordingDuration)
 		{
@@ -82,6 +79,31 @@ class KalturaLiveEntryService extends KalturaEntryService
 			chgrp($filename, kConf::get('content_group'));
 			chmod($filename, 0640);
 		}
+
+		if($dbAsset->hasTag(assetParams::TAG_RECORDING_ANCHOR) && $mediaServerIndex == KalturaMediaServerIndex::PRIMARY)
+		{
+			KalturaLog::debug("Appending assetId $assetId to entryId $entryId");
+
+			$dbEntry->setLengthInMsecs($currentDuration);
+
+			// Extract the exact video segment duration from the recorded file
+			$mediaInfoParser = new KMediaInfoMediaParser($filename, kConf::get('bin_path_mediainfo'));
+			$recordedSegmentDurationInMsec = $mediaInfoParser->getMediaInfo()->videoDuration;
+
+			$currentSegmentVodToLiveDeltaTime = $liveSegmentDurationInMsec - $recordedSegmentDurationInMsec;
+			$recordedSegmentsInfo = $dbEntry->getRecordedSegmentsInfo();
+			$recordedSegmentsInfo->addSegment( $lastDuration, $recordedSegmentDurationInMsec, $currentSegmentVodToLiveDeltaTime );
+			$dbEntry->setRecordedSegmentsInfo( $recordedSegmentsInfo );
+
+			if ( $isLastChunk )
+			{
+				// Save last elapsed recording time
+				$dbEntry->setLastElapsedRecordingTime( $currentDuration );
+			}
+
+			$dbEntry->save();
+		}
+
 		kJobsManager::addConvertLiveSegmentJob(null, $dbAsset, $mediaServerIndex, $filename, $currentDuration);
 		
 		if($mediaServerIndex == KalturaMediaServerIndex::PRIMARY)
@@ -94,7 +116,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 			$recordedEntry = entryPeer::retrieveByPK($dbEntry->getRecordedEntryId());
 			if($recordedEntry)
 			{
-				$this->ingestAsset($recordedEntry, $dbAsset->getFlavorParamsId(), $filename);
+				$this->ingestAsset($recordedEntry, $dbAsset, $filename);
 			}
 		}
 		
@@ -103,8 +125,9 @@ class KalturaLiveEntryService extends KalturaEntryService
 		return $entry;
 	}
 
-	private function ingestAsset(entry $entry, $flavorParamsId, $filename)
-	{	
+	private function ingestAsset(entry $entry, $dbAsset, $filename)
+	{
+		$flavorParamsId = $dbAsset->getFlavorParamsId();
 		$flavorParams = assetParamsPeer::retrieveByPKNoFilter($flavorParamsId);
 		
 		// is first chunk
@@ -122,6 +145,10 @@ class KalturaLiveEntryService extends KalturaEntryService
 		$recordedAsset->setStatus(asset::FLAVOR_ASSET_STATUS_QUEUED);
 		$recordedAsset->setFlavorParamsId($flavorParams->getId());
 		$recordedAsset->setFromAssetParams($flavorParams);
+		if ( $dbAsset->hasTag(assetParams::TAG_RECORDING_ANCHOR) )
+		{
+			$recordedAsset->addTags(array(assetParams::TAG_RECORDING_ANCHOR));
+		}
 		
 		if($flavorParams->hasTag(assetParams::TAG_SOURCE))
 		{
@@ -245,7 +272,17 @@ class KalturaLiveEntryService extends KalturaEntryService
 		{
 			$dbEntry->setRedirectEntryId($dbEntry->getRecordedEntryId());
 		}
-		
+
+		if ( count( $dbEntry->getMediaServers() ) == 0 )
+		{
+			// Reset currentBroadcastStartTime
+			// Note that this value is set in the media-server, at KalturaLiveManager::onPublish()
+			if ( $dbEntry->getCurrentBroadcastStartTime() )
+			{
+				$dbEntry->setCurrentBroadcastStartTime( 0 );
+			}
+		}
+
 		$dbEntry->save();
 		
 		$entry = KalturaEntryFactory::getInstanceByType($dbEntry->getType());

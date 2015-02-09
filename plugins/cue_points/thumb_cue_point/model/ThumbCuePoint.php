@@ -35,4 +35,71 @@ class ThumbCuePoint extends CuePoint implements IMetadataObject
 	{
 		return ThumbCuePointMetadataPlugin::getMetadataObjectTypeCoreValue(ThumbCuePointMetadataObjectType::THUMB_CUE_POINT);
 	}
+
+	public function copyFromLiveToVodEntry( $liveEntry, $vodEntry, $adjustedStartTime )
+	{
+		// Clone the cue point to the destination entry
+		$vodThumbCuePoint = parent::copyToEntry( $vodEntry );
+
+		$timedThumbAsset = assetPeer::retrieveById($this->getAssetId());
+		if ( ! $timedThumbAsset )
+		{
+			KalturaLog::debug("Can't retrieve timedThumbAsset with id: {$this->getAssetId()}");
+			return;
+		}
+
+		// Offset the startTime according to the duration gap between the live and VOD entries
+		$vodThumbCuePoint->setStartTime( $adjustedStartTime );
+		$vodThumbCuePoint->save(); // Must save in order to produce an id
+
+		$timedThumbAsset->setCuePointID( $vodThumbCuePoint->getId() );	// Set the destination cue point's id
+		$timedThumbAsset->setCustomDataObj();							// Write the cached custom data object into the thumb asset
+
+		// Make a copy of the current thumb asset
+		// copyToEntry will create a filesync softlink to the original filesync
+		$vodTimedThumbAsset = $timedThumbAsset->copyToEntry( $vodEntry->getId(), $vodEntry->getPartnerId() );
+		$vodThumbCuePoint->setAssetId( $vodTimedThumbAsset->getId() );
+		$vodThumbCuePoint->save();
+
+		// Restore the thumb asset's prev. cue point id (for good measures)
+		$timedThumbAsset->setCuePointID( $this->getId() );
+		$timedThumbAsset->setCustomDataObj();
+
+		// Save the destination entry's thumb asset
+		$vodTimedThumbAsset->setCuePointID( $vodThumbCuePoint->getId() );
+		$vodTimedThumbAsset->save();
+
+		KalturaLog::log("Saved cue point [{$vodThumbCuePoint->getId()}] and timed thumb asset [{$vodTimedThumbAsset->getId()}]");
+	}
+	
+	/* (non-PHPdoc)
+	 * @see BaseCuePoint::preInsert()
+	 */
+	public function preInsert(PropelPDO $con = null)
+	{
+		$subType = $this->getSubType();
+		if(!isset($subType))
+			$this->setSubType(ThumbCuePointSubType::SLIDE);
+		
+		if($this->getSubType() == ThumbCuePointSubType::SLIDE)
+			$this->setStatus(CuePointStatus::PENDING);
+		
+		return parent::preInsert($con);
+	}
+	
+	public function contributeData()
+	{
+		$data = null;
+		
+		if($this->getText())
+			$data = $data . $this->getText() . ' ';
+		
+		if($this->getName())
+			$data = $data . $this->getName() . ' ';
+		
+		if($this->getTags())
+			$data = $data . $this->getTags() . ' ';
+		
+		return $data;
+	}
 }

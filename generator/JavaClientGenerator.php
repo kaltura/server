@@ -420,6 +420,11 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 			case "string" :
 			case "bool" :
 			case "float" :
+				if ( $propType == "float" )
+				{
+					$propType = "double";
+				}
+
 				$txtIsUsed = true;
 				$parsedProperty = "ParseUtils.parse".ucfirst($propType)."(txt)";
 				if ($isEnum) 
@@ -707,6 +712,11 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 			case "float" :
 			case "bool" :
 			case "string" :
+				if ( $resultType == "float" )
+				{
+					$resultType = "double";
+				}
+
 				$this->appendLine ( "        String resultText = resultXmlElement.getTextContent();" );
 				$returnCall .= "return ParseUtils.parse" . ucwords($resultType) . "(resultText);";
 				break;
@@ -840,7 +850,7 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 		switch ($propType) 
 		{
 		case "float" :
-			return "Float.MIN_VALUE";
+			return "Double.MIN_VALUE";
 			
 		case "bigint" :
 			return "Long.MIN_VALUE";
@@ -947,7 +957,7 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 			return "boolean";
 
 		case "float" :
-			return "float";
+			return "double";
 
 		case "bigint" :
 			return "long";

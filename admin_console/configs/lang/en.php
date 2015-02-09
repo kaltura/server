@@ -339,6 +339,7 @@ return array(
 	'KalturaUiConfObjType::PLAYER_SL' => 'Player Silverlight',
 	'KalturaUiConfObjType::CLIENTSIDE_ENCODER' => 'Client Side Encoder',
 	'Kaltura_Client_Enum_UiConfObjType::KSR' => 'Kaltura Screen Recorder',
+	'Kaltura_Client_Enum_UiConfObjType::WEBCASTING' => 'Kaltura Webcasting Studio',
 	 
     
 	//batch index
