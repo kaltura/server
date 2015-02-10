@@ -62,7 +62,8 @@ $html5Version = $_GET['playerVersion'];
 			html += '<b>HDS URL:</b> <a href="' + hdsUrl + '" target="_tab">' + hdsUrl + '</a>';
 			$('#lblUrl').html(html);
 
-			loadAdminPlayer(hdsUrl);
+			 mw.setConfig('Kaltura.LeadWithHTML5', true);
+			loadAdminPlayer(entryId, uiConfId);
 			loadUserPlayer(entryId, uiConfId);
 			startSession();
 		}
@@ -93,60 +94,49 @@ $html5Version = $_GET['playerVersion'];
 		}
 
 		function loadUserPlayer(entryId, uiConfId){
-            mw.setConfig('LeadWithHLSOnFlash', true);
-            mw.setConfig('Kaltura.LeadWithHTML5', true);
             kWidget.embed({
                     targetId: 'userPlayerContainer',
                     wid: '_' + partnerId,
                     "uiconf_id": uiConfId,
                     "flashvars": {
                             "streamerType": "auto",
-                            autoPlay: true
+                            "autoPlay": true,
+                            "LeadWithHLSOnFlash": true
                     },
                     "cache_st": 1410340114,
                     "entry_id": entryId
             });
 		}
 
-		function loadAdminPlayer(url){
-
-            var swfVersionStr = '11.1.0';
-            var xiSwfUrlStr = 'playerProductInstall.swf';
-            
-            var flashvars = {
-            	url: url,
-            	onSyncPoint: 'onSyncPoint'
-            };
-            
-            var params = {
-            	quality: 'high',
-            	bgcolor: '#ffffff',
-            	allowscriptaccess: 'sameDomain',
-            	allowfullscreen: 'true'
-            };
-            
-            var attributes = {
-            	id: 'Player',
-            	name: 'Player',
-            	align: 'middle'
-            };
-            
-            swfobject.embedSWF(
-                'Player.swf', 'adminPlayerContainer', 
-                '400', '333', 
-                swfVersionStr, xiSwfUrlStr, 
-                flashvars, params, attributes);
-            swfobject.createCSS('#adminPlayerContainer', 'display:block;text-align:left;');
+		function loadAdminPlayer(entryId, uiConfId){
+		     kWidget.embed({
+					 targetId: 'adminPlayerContainer',
+					 wid: '_' + partnerId,
+					 "uiconf_id": uiConfId,
+					 "flashvars": {
+							 "streamerType": "hds",
+							 "autoPlay": true,
+							 "LeadWithHLSOnFlash": false
+					 },
+					 "cache_st": 1410340114,
+					 "entry_id": entryId,
+					 "readyCallback": function( playerId ){
+						var adminKdp = document.getElementById( playerId );
+						adminKdp.addJsListener( 'videoMetadataReceived', 'onSyncPoint' );
+					}
+			 });
 		}
 
 		function onSyncPoint(metadata){
-			var date = new Date();
-			lastSyncPointTime = date.getTime();
-			lastSyncPointOffset = metadata.offset;
-			lastSyncPointTimestamp = metadata.timestamp;
+			if ( metadata && metadata.objectType == "KalturaSyncPoint") {
+				var date = new Date();
+				lastSyncPointTime = date.getTime();
+				lastSyncPointOffset = metadata.offset;
+				lastSyncPointTimestamp = metadata.timestamp;
 
-			$('#btnSendAd').removeAttr('disabled');
-			log('Ads Enabled last offset:' + lastSyncPointOffset + ' last timestamp: ' + lastSyncPointTimestamp);
+				$('#btnSendAd').removeAttr('disabled');
+				log('Ads Enabled last offset:' + lastSyncPointOffset + ' last timestamp: ' + lastSyncPointTimestamp);
+			}
 		}
 		
 		function enableAds(){
@@ -335,7 +325,7 @@ $html5Version = $_GET['playerVersion'];
 		</td>	
 		<tr>
 			<td colspan="2">
-				<input id="btnSendAd" type="button" onclick="sendAd()" disabled="disabled" value="Big Red Button" style="background-color: red; height: 50px; font-size: 15pt;" />
+				<input id="btnSendAd" type="button" onclick="sendAd()" disabled="disabled" value="Insert Ad" style="background-color: red; height: 50px; font-size: 15pt;" />
 			</td>
 		</tr>
 		<tr>
