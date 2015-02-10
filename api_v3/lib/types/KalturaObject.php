@@ -276,14 +276,14 @@ abstract class KalturaObject
 			if($responseProfile->getType() == ResponseProfileType::INCLUDE_FIELDS){
 				$get = array_intersect($get, $responseProfile->getFields());
 			}
-			else
+			else{
 				$get = array_diff($get, $responseProfile->getFields());
 			}
 		}
 		$get = array_flip($get);
 		';
 		
-		$result .= "\t\t" . implode("\n\t\t", $mappingFuncCode) . "\n\t}\n}";
+		$result .= implode("\n\t\t", $mappingFuncCode) . "\n\t}\n}";
 		
 		return $result;
 	}
