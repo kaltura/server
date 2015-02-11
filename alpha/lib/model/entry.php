@@ -1882,6 +1882,11 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		return implode(',', unserialize($entitledUserPuserEdit));
 	}
 	
+	public function isEntitledPuserEdit( $puser )
+	{
+		return in_array( (string)$puser, explode( ',', $this->getEntitledPusersEdit() ) );
+	}
+
 	public function setEntitledPusersPublish($v)
 	{
 		$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
@@ -1929,6 +1934,11 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		return implode(',', unserialize($entitledUserPuserPublish));
 	}
 	
+	public function isEntitledPuserPublish( $puser )
+	{
+		return in_array( (string)$puser, explode( ',', $this->getEntitledPusersPublish() ) );
+	}
+
 	public function getRoots()
 	{
 		// the prefix required becaue combined sphinx match is rrequired,

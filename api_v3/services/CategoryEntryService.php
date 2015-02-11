@@ -141,9 +141,34 @@ class CategoryEntryService extends KalturaBaseService
 			$entry->getKuserId() != kCurrentContext::getCurrentKsKuserId() && 
 			$entry->getCreatorKuserId() != kCurrentContext::getCurrentKsKuserId())
 		{
-			$categoryKuser = categoryKuserPeer::retrievePermittedKuserInCategory($categoryId, kCurrentContext::getCurrentKsKuserId());
-			if(!$categoryKuser || $categoryKuser->getPermissionLevel() != CategoryKuserPermissionLevel::MANAGER)
-				throw new KalturaAPIException(KalturaErrors::CANNOT_REMOVE_ENTRY_FROM_CATEGORY);		
+			$kuserIsEntitled = false;
+			$kuser = categoryKuserPeer::retrievePermittedKuserInCategory($categoryId, kCurrentContext::getCurrentKsKuserId());
+
+			// First pass: check if kuser is a manager
+			if ( $kuser )
+			{
+				if ( $kuser->getPermissionLevel() == CategoryKuserPermissionLevel::MANAGER )
+				{
+					$kuserIsEntitled = true;
+				}
+			}
+			else
+			{
+				$kuser = kuserPeer::retrieveByPK( kCurrentContext::getCurrentKsKuserId() );
+			}
+
+			// Second pass: check if kuser is a co-publisher
+			if ( ! $kuserIsEntitled
+					&& $kuser
+					&& $entry->isEntitledPuserPublish( $kuser->getPuserId() ) )
+			{
+				$kuserIsEntitled = true;
+			}
+
+			if ( ! $kuserIsEntitled )
+			{
+				throw new KalturaAPIException(KalturaErrors::CANNOT_REMOVE_ENTRY_FROM_CATEGORY);
+			}
 		}
 			
 		$dbCategoryEntry = categoryEntryPeer::retrieveByCategoryIdAndEntryId($categoryId, $entryId);
