@@ -34,9 +34,7 @@ class UnicornDistributionEngine extends DistributionEngine implements IDistribut
 		if(!$data->providerData || !($data->providerData instanceof KalturaUnicornDistributionJobProviderData))
 			KalturaLog::err("Provider data must be of type KalturaUnicornDistributionJobProviderData");
 		
-		$this->handleSubmit($data, $data->distributionProfile, $data->providerData);
-		
-		return false;
+		return $this->handleSubmit($data, $data->distributionProfile, $data->providerData);
 	}
 
 	/* (non-PHPdoc)
@@ -198,6 +196,8 @@ class UnicornDistributionEngine extends DistributionEngine implements IDistribut
 			KalturaLog::debug("Remote ID [$remoteId]");
 			$data->remoteId = $remoteId;
 		}
+		
+		return !$providerData->mediaChanged;
 	}
 	
 	/**

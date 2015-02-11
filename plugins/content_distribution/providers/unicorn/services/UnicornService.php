@@ -63,6 +63,19 @@ class UnicornService extends KalturaBaseService
 			
 		kJobsManager::updateBatchJob($batchJob, KalturaBatchJobStatus::FINISHED);
 		
+		$data = $batchJob->getData();
+		/* @var $data kDistributionJobData */
+		
+		$providerData = $data->getProviderData();
+		/* @var $providerData kUnicornDistributionJobProviderData */
+		
+		$entryDistribution = EntryDistributionPeer::retrieveByPK($data->getEntryDistributionId());
+		if($entryDistribution)
+		{
+			$entryDistribution->putInCustomData(kUnicornDistributionJobProviderData::CUSTOM_DATA_FLAVOR_ASSET_OLD_VERSION, $providerData->getFlavorAssetVersion());
+			$entryDistribution->save();
+		}
+		
 		if($batchJob->getJobType() == $submitCoreType)
 		{
 			$this->attachRemoteAssetResource($batchJob->getEntry(), $batchJob->getData());
