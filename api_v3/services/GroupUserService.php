@@ -179,6 +179,15 @@ class GroupUserService extends KalturaBaseService
 			$c->add(kuserPeer::TYPE, KuserType::USER);
 			$kusers = kuserPeer::doSelect($c);
 
+			if (!$kusers)
+			{
+				$response = new KalturaGroupUserListResponse();
+				$response->objects = new KalturaGroupUserArray();
+				$response->totalCount = 0;
+
+				return $response;
+			}
+
 			$usersIds = array();
 			foreach($kusers as $kuser)
 			{
@@ -199,6 +208,15 @@ class GroupUserService extends KalturaBaseService
 			$c->add(kuserPeer::PUSER_ID, $groupIdIn, Criteria::IN);
 			$c->add(kuserPeer::TYPE, KuserType::GROUP);
 			$kusers = kuserPeer::doSelect($c);
+
+			if (!$kusers)
+			{
+				$response = new KalturaGroupUserListResponse();
+				$response->objects = new KalturaGroupUserArray();
+				$response->totalCount = 0;
+
+				return $response;
+			}
 
 			$groupIdIn = array();
 			foreach($kusers as $kuser)

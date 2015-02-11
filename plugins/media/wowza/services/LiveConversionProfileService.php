@@ -42,6 +42,7 @@ class LiveConversionProfileService extends KalturaBaseService
 		$entry = null;
 		if (!kCurrentContext::$ks)
 		{
+			kEntitlementUtils::initEntitlementEnforcement(null, false);
 			$entry = kCurrentContext::initPartnerByEntryId($entryId);
 			
 			if (!$entry || $entry->getStatus() == entryStatus::DELETED)
