@@ -516,7 +516,7 @@ class entryPeer extends BaseentryPeer
 		$partnerEntitlement = $partner->getDefaultEntitlementEnforcement();
 
 		kEntitlementUtils::initEntitlementEnforcement($partnerId , false);
-		$count = self::doCriteriaBasedCount($c);
+		$entryCount = self::doCriteriaBasedCount($c);
 		if ($partnerEntitlement)
 			kEntitlementUtils::initEntitlementEnforcement($partnerId , true);
 
