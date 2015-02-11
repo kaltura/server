@@ -14,6 +14,8 @@ class entryPeer extends BaseentryPeer
 	const CREATOR_KUSER_ID = 'entry.CREATOR_KUSER_ID';
 	const ENTRY_ID = 'entry.ENTRY_ID';
 
+	const ENTRIES_PER_ACCESS_CONTROL_UPDATE_LIMIT = 1000;
+
 	private static $s_default_count_limit = 301;
 	private static $filerResults = false;
 
@@ -480,6 +482,12 @@ class entryPeer extends BaseentryPeer
 		return 0;
 	}
 
+	public static function doCriteriaBasedCount(KalturaCriteria $criteria , $con = null)
+	{
+		$criteria->applyFilters();
+		$count = $criteria->getRecordsCount();
+		return $count;
+	}
 
 /* -------------------- Critera filter functions -------------------- */
 
@@ -498,6 +506,23 @@ class entryPeer extends BaseentryPeer
 
 	public static function updateAccessControl($partnerId, $oldAccessControlId, $newAccessControlId)
 	{
+		$c = KalturaCriteria::create(entryPeer::OM_CLASS);
+
+		//trying to fetch more entries than the $entryCount limit
+		$c->setMaxRecords(self::ENTRIES_PER_ACCESS_CONTROL_UPDATE_LIMIT + 1);
+		$c->add(entryPeer::ACCESS_CONTROL_ID, $oldAccessControlId);
+
+		$partner = PartnerPeer::retrieveByPK($partnerId);
+		$partnerEntitlement = $partner->getDefaultEntitlementEnforcement();
+
+		kEntitlementUtils::initEntitlementEnforcement($partnerId , false);
+		$count = self::doCriteriaBasedCount($c);
+		if ($partnerEntitlement)
+			kEntitlementUtils::initEntitlementEnforcement($partnerId , true);
+
+		if ($entryCount > self::ENTRIES_PER_ACCESS_CONTROL_UPDATE_LIMIT)
+			throw new kCoreException("exceeded max entries per access control update limit",kCoreException::EXCEEDED_MAX_ENTRIES_PER_ACCESS_CONTROL_UPDATE_LIMIT);		
+
 		$selectCriteria = new Criteria();
 		$selectCriteria->add(entryPeer::PARTNER_ID, $partnerId);
 		$selectCriteria->add(entryPeer::ACCESS_CONTROL_ID, $oldAccessControlId);
