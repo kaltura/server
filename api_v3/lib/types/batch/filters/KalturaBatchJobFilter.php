@@ -138,4 +138,42 @@ class KalturaBatchJobFilter extends KalturaBatchJobBaseFilter
 		
 		return $batchJobFilter;
 	}
+
+	/* (non-PHPdoc)
+	 * @see KalturaFilter::getListResponse()
+	 */
+	public function getListResponse(KalturaFilterPager $pager, KalturaResponseProfileBase $responseProfile = null)
+	{
+		$batchJobFilter = new BatchJobFilter(true);
+		$this->toObject($batchJobFilter);
+		
+		$c = new Criteria();
+		
+		$batchJobFilter->attachToCriteria($c);
+		
+		if(!$pager)
+		   $pager = new KalturaFilterPager();
+		
+		$pager->attachToCriteria($c);
+		
+		myDbHelper::$use_alternative_con = myDbHelper::DB_HELPER_CONN_PROPEL2;
+		
+		$list = BatchJobPeer::doSelect($c);
+		
+		$c->setLimit(false);
+		$count = BatchJobPeer::doCount($c);
+
+		$newList = KalturaBatchJobArray::fromStatisticsBatchJobArray($list);
+		
+		$response = new KalturaBatchJobListResponse();
+		$response->objects = $newList;
+		$response->totalCount = $count;
+		
+		myDbHelper::$use_alternative_con = null;
+		
+		return $response;
+	}
+		
+	}
+
 }

@@ -472,20 +472,12 @@ class BaseEntryService extends KalturaEntryService
 	 */
 	function listAction(KalturaBaseEntryFilter $filter = null, KalturaFilterPager $pager = null)
 	{
-	    myDbHelper::$use_alternative_con = myDbHelper::DB_HELPER_CONN_PROPEL3;
+		if(!$filter)
+		{
+			$filter = new KalturaBaseEntryFilter();
+		}
 		
-	    list($list, $totalCount) = parent::listEntriesByFilter($filter, $pager);
-	    
-		$ks = $this->getKs();
-		$isAdmin = false;
-		if($ks)
-			$isAdmin = $ks->isAdmin();
-			
-	    $newList = KalturaBaseEntryArray::fromDbArray($list, $this->getResponseProfile(), $isAdmin);
-		$response = new KalturaBaseEntryListResponse();
-		$response->objects = $newList;
-		$response->totalCount = $totalCount;
-		return $response;
+		return $filter->getListResponse($pager, $this->getResponseProfile());
 	}
 	
 	/**

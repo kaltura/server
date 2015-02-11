@@ -52,10 +52,9 @@ abstract class KalturaFilter extends KalturaObject
 	/**
 	 * @param KalturaFilterPager $pager
 	 * @param KalturaResponseProfileBase $responseProfile
-	 * @param IBaseObject $parentObject
 	 * @return KalturaListResponse
 	 */
-	abstract public function getListResponse(KalturaFilterPager $pager, KalturaResponseProfileBase $responseProfile = null, IBaseObject $parentObject = null);
+	abstract public function getListResponse(KalturaFilterPager $pager, KalturaResponseProfileBase $responseProfile = null);
 	
 	public function toObject ( $object_to_fill = null, $props_to_skip = array() )
 	{

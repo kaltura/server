@@ -5,8 +5,9 @@
  */
 class KalturaBaseEntryArray extends KalturaTypedArray
 {
-	public static function fromDbArray($arr, KalturaResponseProfileBase $responseProfile = null, $isAdmin = false)
+	public static function fromDbArray($arr, KalturaResponseProfileBase $responseProfile = null)
 	{
+		$isAdmin = kCurrentContext::$is_admin_session;
 		$newArr = new KalturaBaseEntryArray();
 		if ($arr == null)
 			return $newArr;

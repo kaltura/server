@@ -337,7 +337,13 @@ abstract class KalturaObject
 		{
 			/* @var $relatedProfile KalturaNestedResponseProfileBase */
 			$relatedProfile = $relatedProfile->get();
-			$this->relatedObjects[$relatedProfile->name] = $relatedProfile->filter->getListResponse($relatedProfile->pager, $relatedProfile, $srcObj);
+			$filter = clone $relatedProfile->filter;
+			foreach($relatedProfile->relations as $relation)
+			{
+				/* @var $relation KalturaResponseProfileRelation */
+				$relation->apply($filter, $this);
+			}
+			$this->relatedObjects[$relatedProfile->name] = $filter->getListResponse($relatedProfile->pager, $relatedProfile);
 		}
 	}
 	
