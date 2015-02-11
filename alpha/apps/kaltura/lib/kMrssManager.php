@@ -436,6 +436,9 @@ class kMrssManager
 		$kalturaFileSync = kFileSyncUtils::getReadyInternalFileSyncForKey($syncKey);
 	
 		$urlManager = DeliveryProfilePeer::getDeliveryProfile($entry->getId(), PlaybackProtocol::SILVER_LIGHT);
+		if(is_null($urlManager))
+			return;
+		
 		$urlManager->initDeliveryDynamicAttributes($kalturaFileSync);
 		
 		$partner = $entry->getPartner();
@@ -462,6 +465,9 @@ class kMrssManager
 		if($externalFileSync)
 		{
 			$urlManager = DeliveryProfilePeer::getRemoteDeliveryByStorageId($externalFileSync->getDc(), $entry->getId(), PlaybackProtocol::SILVER_LIGHT);
+			if(is_null($urlManager))
+				return;
+			
 			$url = $urlManager->getFileSyncUrl($externalFileSync, false);
 			$urlPrefix = $urlManager->getUrl();
 			$mrss->addChild('ismUrl',$urlPrefix.$url);
