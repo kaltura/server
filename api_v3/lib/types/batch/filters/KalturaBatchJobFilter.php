@@ -107,6 +107,14 @@ class KalturaBatchJobFilter extends KalturaBatchJobBaseFilter
 		KalturaLog::debug("Filter sub types translated from [$jobSubTypeIn] to [$dbJobSubType]");
 		return $dbJobSubType;
 	}
+
+	/* (non-PHPdoc)
+	 * @see KalturaFilter::getCoreFilter()
+	 */
+	protected function getCoreFilter()
+	{
+		return new BatchJobFilter();
+	}
 	
 	/**
 	 * @param int $jobType

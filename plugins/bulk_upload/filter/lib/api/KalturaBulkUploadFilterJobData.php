@@ -56,7 +56,7 @@ class KalturaBulkUploadFilterJobData extends KalturaBulkUploadJobData
 	/* (non-PHPdoc)
 	 * @see KalturaObject::fromObject()
 	 */
-	public function fromObject($source_object, IResponseProfile $responseProfile = null)
+	public function fromObject($source_object, KalturaResponseProfileBase $responseProfile = null)
 	{
 	    parent::fromObject($source_object, $responseProfile);
 	    

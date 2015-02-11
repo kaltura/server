@@ -96,7 +96,7 @@ class KalturaSchedulerStatus extends KalturaObject
 		return array_merge(parent::getMapBetweenObjects(), self::$mapBetweenObjects);
 	}
 
-	public function fromObject($dbData, IResponseProfile $responseProfile = null)
+	public function fromObject($dbData, KalturaResponseProfileBase $responseProfile = null)
 	{
 		parent::fromObject($dbData, $responseProfile);
 		

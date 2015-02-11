@@ -42,10 +42,7 @@ class KalturaNestedResponseProfileHolder extends KalturaNestedResponseProfileBas
 		$this->validatePropertyNotNull(array('id', 'systemName'));
 	}
 	
-	/* (non-PHPdoc)
-	 * @see KalturaObject::toObject
-	 */
-	public function toObject($object = null, $propertiesToSkip = array())
+	protected function setId()
 	{
 		if(is_null($this->id))
 		{
@@ -56,11 +53,31 @@ class KalturaNestedResponseProfileHolder extends KalturaNestedResponseProfileBas
 			}
 			$this->id = $responseProfile->getId();
 		}
+	}
+	
+	/* (non-PHPdoc)
+	 * @see KalturaObject::toObject
+	 */
+	public function toObject($object = null, $propertiesToSkip = array())
+	{
+		$this->setId();
 		
 		if(is_null($object))
 		{
 			$object = new kResponseProfileHolder();
 		}
 		parent::toObject($object, $propertiesToSkip);
+	}
+	
+	/* (non-PHPdoc)
+	 * @see KalturaResponseProfileBase::getRelatedProfiles()
+	 */
+	public function getRelatedProfiles()
+	{
+		$this->setId();
+		$coreResponseProfile = ResponseProfilePeer::retrieveByPK($this->id);
+		$responseProfile = new KalturaResponseProfile($coreResponseProfile);
+		
+		return $responseProfile->getRelatedProfiles();
 	}
 }

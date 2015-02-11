@@ -5,7 +5,7 @@
  */
 class KalturaGenericDistributionProviderActionArray extends KalturaTypedArray
 {
-	public static function fromDbArray($arr, IResponseProfile $responseProfile = null)
+	public static function fromDbArray($arr, KalturaResponseProfileBase $responseProfile = null)
 	{
 		$newArr = new KalturaGenericDistributionProviderActionArray();
 		if ($arr == null)

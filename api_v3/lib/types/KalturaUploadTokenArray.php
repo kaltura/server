@@ -5,7 +5,7 @@
  */
 class KalturaUploadTokenArray extends KalturaTypedArray
 {
-	public static function fromDbArray(array $arr, IResponseProfile $responseProfile = null)
+	public static function fromDbArray(array $arr, KalturaResponseProfileBase $responseProfile = null)
 	{
 		$newArr = new KalturaUploadTokenArray();
 		foreach($arr as $obj)

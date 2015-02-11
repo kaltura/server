@@ -5,4 +5,11 @@
  */
 class KalturaDrmDeviceFilter extends KalturaDrmDeviceBaseFilter
 {
+	/* (non-PHPdoc)
+	 * @see KalturaFilter::getCoreFilter()
+	 */
+	protected function getCoreFilter()
+	{
+		return new DrmDeviceFilter();
+	}
 }

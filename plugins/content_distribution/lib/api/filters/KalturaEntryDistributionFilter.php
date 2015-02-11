@@ -5,4 +5,11 @@
  */
 class KalturaEntryDistributionFilter extends KalturaEntryDistributionBaseFilter
 {
+	/* (non-PHPdoc)
+	 * @see KalturaFilter::getCoreFilter()
+	 */
+	protected function getCoreFilter()
+	{
+		return new EntryDistributionFilter();
+	}
 }

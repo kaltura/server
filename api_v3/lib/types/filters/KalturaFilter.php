@@ -3,7 +3,7 @@
  * @package api
  * @subpackage filters
  */
-class KalturaFilter extends KalturaObject
+abstract class KalturaFilter extends KalturaObject
 {
 	const LT = "lt";
 	const LTE = "lte";
@@ -44,22 +44,18 @@ class KalturaFilter extends KalturaObject
 	 */
 	public $advancedSearch;
 	
-	// not supposed to be populated from core objects
-/*		
-	protected function fromObject($source_object, IResponseProfile $responseProfile = null)
-	{
-		foreach ( $this->getMapBetweenObjects() as $this_prop => $object_prop )
-		{
-//	echo "Mapping $this_prop => $entry_prop<br>";
-			if ( is_numeric( $this_prop) ) $this_prop = $object_prop;
-//	echo "setting  $this_prop => $entry_prop<br>";
-			$this->$this_prop = call_user_func(array ( $source_object ,"get{$object_prop}"  ) );
-		}
-	}
-*/
-	// must fill an object of type baseObjectFilter
+	/**
+	 * @return baseObjectFilter
+	 */
+	abstract protected function getCoreFilter();
+	
 	public function toObject ( $object_to_fill = null, $props_to_skip = array() )
 	{
+		if(is_null($object_to_fill))
+		{
+			$object_to_fill = $this->getCoreFilter();
+		}
+		
 	    // translate the order by properties
 	    $newOrderBy = "";
 	    $orderByMap = $this->getOrderByMap();
@@ -134,7 +130,7 @@ class KalturaFilter extends KalturaObject
 		return $object_to_fill;		
 	}	
 	
-	public function fromObject($source_object, IResponseProfile $responseProfile = null)
+	public function fromObject($source_object, KalturaResponseProfileBase $responseProfile = null)
 	{
 		$reflector = KalturaTypeReflectorCacher::get(get_class($this));
 		

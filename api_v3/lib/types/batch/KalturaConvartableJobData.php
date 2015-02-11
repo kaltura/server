@@ -99,7 +99,7 @@ class KalturaConvartableJobData extends KalturaJobData
 	/* (non-PHPdoc)
 	 * @see KalturaObject::fromObject($srcObj)
 	 */
-	public function fromObject($srcObj, IResponseProfile $responseProfile = null) 
+	public function fromObject($srcObj, KalturaResponseProfileBase $responseProfile = null) 
 	{
 		/* @var $srcObj kConvartableJobData */
 		$srcObj->migrateOldSerializedData();

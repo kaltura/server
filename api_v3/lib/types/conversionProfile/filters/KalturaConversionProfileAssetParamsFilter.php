@@ -14,12 +14,20 @@ class KalturaConversionProfileAssetParamsFilter extends KalturaConversionProfile
 	 * @var KalturaAssetParamsFilter
 	 */
 	public $assetParamsIdFilter;
+
+	/* (non-PHPdoc)
+	 * @see KalturaFilter::getCoreFilter()
+	 */
+	protected function getCoreFilter()
+	{
+		return new assetParamsConversionProfileFilter();
+	}
 	
+	/* (non-PHPdoc)
+	 * @see KalturaFilter::toObject()
+	 */
 	public function toObject($object_to_fill = null, $props_to_skip = array())
 	{
-		if(!$object_to_fill)
-			$object_to_fill = new assetParamsConversionProfileFilter();
-			
 		$conversionProfileCriteria = new Criteria();
 		
 		if($this->conversionProfileIdEqual)

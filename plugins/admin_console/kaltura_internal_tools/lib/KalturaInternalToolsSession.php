@@ -48,7 +48,7 @@ class KalturaInternalToolsSession extends KalturaObject
 	 */
 	public $privileges;
 	
-	public function fromObject($source_object, IResponseProfile $responseProfile = null)
+	public function fromObject($source_object, KalturaResponseProfileBase $responseProfile = null)
 	{
 		$this->partner_id = $source_object->partner_id;
 		$this->valid_until = $source_object->valid_until;

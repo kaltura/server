@@ -10,16 +10,13 @@ class KalturaCategoryUserFilter extends KalturaCategoryUserBaseFilter
 		"freeText" => "_mlikeor_screen_name-puser_id",
 		"categoryDirectMembers" => "_category_direct_members",
 	);
-	
+
 	/* (non-PHPdoc)
-	 * @see KalturaObject::toObject()
+	 * @see KalturaFilter::getCoreFilter()
 	 */
-	public function toObject($coreFilter = null, $props_to_skip = array()) 
+	protected function getCoreFilter()
 	{
-		if(is_null($coreFilter))
-			$coreFilter = new categoryKuserFilter();
-			
-		return parent::toObject($coreFilter, $props_to_skip);
+		return new categoryKuserFilter();
 	}
 	
 	public function getMapBetweenObjects()

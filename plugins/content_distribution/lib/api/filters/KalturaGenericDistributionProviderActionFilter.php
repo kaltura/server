@@ -5,4 +5,11 @@
  */
 class KalturaGenericDistributionProviderActionFilter extends KalturaGenericDistributionProviderActionBaseFilter
 {
+	/* (non-PHPdoc)
+	 * @see KalturaFilter::getCoreFilter()
+	 */
+	protected function getCoreFilter()
+	{
+		return new GenericDistributionProviderActionFilter();
+	}
 }

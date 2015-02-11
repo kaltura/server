@@ -5,7 +5,7 @@
  */
 class KalturaModerationFlagArray extends KalturaTypedArray
 {
-	public static function fromDbArray(array $arr = null, IResponseProfile $responseProfile = null)
+	public static function fromDbArray(array $arr = null, KalturaResponseProfileBase $responseProfile = null)
 	{
 		$newArr = new KalturaModerationFlagArray();
 		foreach($arr as $obj)

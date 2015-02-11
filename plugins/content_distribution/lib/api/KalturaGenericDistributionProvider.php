@@ -133,7 +133,7 @@ class KalturaGenericDistributionProvider extends KalturaDistributionProvider
 		return $object;		
 	}
 
-	public function fromObject($sourceObject, IResponseProfile $responseProfile = null)
+	public function fromObject($sourceObject, KalturaResponseProfileBase $responseProfile = null)
 	{
 		parent::fromObject($sourceObject, $responseProfile);
 		

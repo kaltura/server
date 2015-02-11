@@ -33,12 +33,20 @@ class KalturaUserFilter extends KalturaUserBaseFilter
 	{
 		return array_merge(parent::getOrderByMap(), self::$order_by_map);
 	}
+
+	/* (non-PHPdoc)
+	 * @see KalturaFilter::getCoreFilter()
+	 */
+	protected function getCoreFilter()
+	{
+		return new kuserFilter();
+	}
 	
+	/* (non-PHPdoc)
+	 * @see KalturaFilter::toObject()
+	 */
 	public function toObject ( $object_to_fill = null, $props_to_skip = array() )
 	{
-		if (!$object_to_fill)
-			$object_to_fill = new kuserFilter();
-		
 		$object_to_fill =  parent::toObject($object_to_fill, $props_to_skip);
 		
 		if (!is_null($this->loginEnabledEqual)) {
@@ -52,7 +60,7 @@ class KalturaUserFilter extends KalturaUserBaseFilter
 		return $object_to_fill;		
 	}
 	
-	public function fromObject($source_object, IResponseProfile $responseProfile = null)
+	public function fromObject($source_object, KalturaResponseProfileBase $responseProfile = null)
 	{
 		parent::fromObject($source_object, $responseProfile);
 		

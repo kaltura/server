@@ -442,7 +442,7 @@ class KalturaBatchJob extends KalturaObject implements IFilterable
 		$this->workerId = $dbBatchJobLock->getWorkerId();
 	}
 	
-	public function fromObject($dbBatchJob, IResponseProfile $responseProfile = null)
+	public function fromObject($dbBatchJob, KalturaResponseProfileBase $responseProfile = null)
 	{
 		KalturaLog::err("From object (batch job) is unsupported without a batch job lock.");
 		throw new KalturaAPIException ( KalturaErrors::INTERNAL_SERVERL_ERROR);

@@ -22,7 +22,7 @@ class KalturaDeleteJobData extends KalturaJobData
 		return parent::toObject($dbData, $props_to_skip);
 	}
 	
-	public function fromObject($dbData, IResponseProfile $responseProfile = null) 
+	public function fromObject($dbData, KalturaResponseProfileBase $responseProfile = null) 
 	{
 		/* @var $dbData kDeleteJobData */
 		$filter = $dbData->getFilter();

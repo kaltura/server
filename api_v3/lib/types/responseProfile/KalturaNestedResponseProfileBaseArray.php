@@ -5,7 +5,7 @@
  */
 class KalturaNestedResponseProfileBaseArray extends KalturaTypedArray
 {
-	public static function fromDbArray($arr, IResponseProfile $responseProfile = null)
+	public static function fromDbArray($arr, KalturaResponseProfileBase $responseProfile = null)
 	{
 		$newArr = new KalturaNestedResponseProfileBaseArray();
 		if ($arr == null)
@@ -26,7 +26,7 @@ class KalturaNestedResponseProfileBaseArray extends KalturaTypedArray
 		return $newArr;
 	}
 
-	static function getInstanceByDbObject(IResponseProfileBase $dbObject)
+	static function getInstanceByDbObject(KalturaResponseProfileBaseBase $dbObject)
 	{
 		switch(get_class($dbObject))
 		{

@@ -62,7 +62,7 @@ class KalturaEmailNotificationCategoryRecipientProvider extends KalturaEmailNoti
 	/* (non-PHPdoc)
 	 * @see KalturaObject::fromObject($source_object)
 	 */
-	public function fromObject($dbObject, IResponseProfile $responseProfile = null)
+	public function fromObject($dbObject, KalturaResponseProfileBase $responseProfile = null)
 	{
 		parent::fromObject($dbObject, $responseProfile);
 		/* @var $dbObject kEmailNotificationCategoryRecipientProvider */

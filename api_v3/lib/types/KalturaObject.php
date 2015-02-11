@@ -288,7 +288,7 @@ abstract class KalturaObject
 		return $result;
 	}
 	
-	public function fromObject($srcObj, IResponseProfile $responseProfile = null)
+	public function fromObject($srcObj, KalturaResponseProfileBase $responseProfile = null)
 	{
 		$thisClass = get_class($this);
 		$srcObjClass = get_class($srcObj);
@@ -314,7 +314,16 @@ abstract class KalturaObject
 			require_once($cacheFileName);
 		}
 	
-		$fromObjectClass::fromObject($this, $srcObj, $responseProfile);
+		$coreResponseProfile = $responseProfile ? $responseProfile->toObject() : null;
+		$fromObjectClass::fromObject($this, $srcObj, $coreResponseProfile);
+		
+		
+		foreach($responseProfile->getRelatedProfiles() as $relatedProfile)
+		{
+			/* @var $relatedProfile KalturaNestedResponseProfileBase */
+			$filter = $relatedProfile->getFilter();
+			$this->relatedObjects[$relatedProfile->getName()] = $filter->getListResponse($srcObj);
+		}
 	}
 	
 	public function fromArray ( $source_array )

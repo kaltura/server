@@ -44,7 +44,7 @@ class KalturaMixEntry extends KalturaPlayableEntry
 		return array_merge ( parent::getMapBetweenObjects() , self::$map_between_objects );
 	}
 	
-    public function fromObject($entry, IResponseProfile $responseProfile = null)
+    public function fromObject($entry, KalturaResponseProfileBase $responseProfile = null)
 	{
 		parent::fromObject($entry, $responseProfile);
 

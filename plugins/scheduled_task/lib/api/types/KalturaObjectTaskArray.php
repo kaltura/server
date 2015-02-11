@@ -11,7 +11,7 @@ class KalturaObjectTaskArray extends KalturaTypedArray
 		parent::__construct('KalturaObjectTask');
 	}
 
-	public static function fromDbArray(array $dbArray, IResponseProfile $responseProfile = null)
+	public static function fromDbArray(array $dbArray, KalturaResponseProfileBase $responseProfile = null)
 	{
 		$apiArray = new KalturaObjectTaskArray();
 		foreach($dbArray as $dbObject)

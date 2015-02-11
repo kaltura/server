@@ -5,11 +5,11 @@
  */
 class KalturaPermissionItemFilter extends KalturaPermissionItemBaseFilter
 {
-	public function toObject ( $object_to_fill = null, $props_to_skip = array() )
+	/* (non-PHPdoc)
+	 * @see KalturaFilter::getCoreFilter()
+	 */
+	protected function getCoreFilter()
 	{
-		if(is_null($object_to_fill))
-			$object_to_fill = new PermissionItemFilter();
-			
-		return parent::toObject($object_to_fill, $props_to_skip);		
-	}	
+		return new PermissionItemFilter();
+	}
 }

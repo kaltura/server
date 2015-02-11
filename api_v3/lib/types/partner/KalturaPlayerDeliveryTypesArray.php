@@ -10,7 +10,7 @@ class KalturaPlayerDeliveryTypesArray extends KalturaTypedArray
 		return parent::__construct("KalturaPlayerDeliveryType");
 	}
 
-	public static function fromDbArray(array $arr, IResponseProfile $responseProfile = null)
+	public static function fromDbArray(array $arr, KalturaResponseProfileBase $responseProfile = null)
 	{
 		$ret = new KalturaPlayerDeliveryTypesArray();
 		foreach($arr as $id => $item)

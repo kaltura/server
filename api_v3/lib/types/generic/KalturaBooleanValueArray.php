@@ -11,7 +11,7 @@ class KalturaBooleanValueArray extends KalturaTypedArray
 	 * @param array<string|kBooleanValue> $strings
 	 * @return KalturaBooleanValueArray
 	 */
-	public static function fromDbArray(array $bools = null, IResponseProfile $responseProfile = null)
+	public static function fromDbArray(array $bools = null, KalturaResponseProfileBase $responseProfile = null)
 	{
 		$boolArray = new KalturaBooleanValueArray();
 		if($bools && is_array($bools))

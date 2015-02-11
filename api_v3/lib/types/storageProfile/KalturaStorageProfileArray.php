@@ -5,7 +5,7 @@
  */
 class KalturaStorageProfileArray extends KalturaTypedArray
 {
-	public static function fromDbArray(array $arr, IResponseProfile $responseProfile = null)
+	public static function fromDbArray(array $arr, KalturaResponseProfileBase $responseProfile = null)
 	{
 		$newArr = new KalturaStorageProfileArray();
 		foreach($arr as $obj)

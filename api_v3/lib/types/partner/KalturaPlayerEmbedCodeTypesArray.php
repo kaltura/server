@@ -10,7 +10,7 @@ class KalturaPlayerEmbedCodeTypesArray extends KalturaTypedArray
 		return parent::__construct("KalturaPlayerEmbedCodeType");
 	}
 	
-	public static function fromDbArray(array $arr, IResponseProfile $responseProfile = null)
+	public static function fromDbArray(array $arr, KalturaResponseProfileBase $responseProfile = null)
 	{
 		$ret = new KalturaPlayerEmbedCodeTypesArray();
 		foreach($arr as $id => $item)

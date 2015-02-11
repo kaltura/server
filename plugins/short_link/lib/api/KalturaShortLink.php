@@ -87,7 +87,7 @@ class KalturaShortLink extends KalturaObject implements IFilterable
 		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
 	}
 	
-	public function fromObject($object, IResponseProfile $responseProfile = null)
+	public function fromObject($object, KalturaResponseProfileBase $responseProfile = null)
 	{
 		parent::fromObject($object, $responseProfile);
 		$this->expiresAt = $object->getExpiresAt(null);

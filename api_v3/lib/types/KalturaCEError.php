@@ -79,7 +79,7 @@ class KalturaCEError extends KalturaObject
 	/* (non-PHPdoc)
 	 * @see KalturaObject::fromObject($srcObj, $responseProfile)
 	 */
-	public function fromObject($srcObj, IResponseProfile $responseProfile = null)
+	public function fromObject($srcObj, KalturaResponseProfileBase $responseProfile = null)
 	{
 		parent::fromObject($srcObj, $responseProfile);
 	}

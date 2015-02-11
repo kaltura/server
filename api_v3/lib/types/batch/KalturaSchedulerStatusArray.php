@@ -5,7 +5,7 @@
  */
 class KalturaSchedulerStatusArray extends KalturaTypedArray
 {
-	public static function fromDbArray(array $arr, IResponseProfile $responseProfile = null)
+	public static function fromDbArray(array $arr, KalturaResponseProfileBase $responseProfile = null)
 	{
 		$newArr = new KalturaSchedulerStatusArray();
 		foreach ( $arr as $obj )

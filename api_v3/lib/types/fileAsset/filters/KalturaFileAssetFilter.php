@@ -17,6 +17,14 @@ class KalturaFileAssetFilter extends KalturaFileAssetBaseFilter
 	{
 		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
 	}
+
+	/* (non-PHPdoc)
+	 * @see KalturaFilter::getCoreFilter()
+	 */
+	protected function getCoreFilter()
+	{
+		return new fileAssetFilter();
+	}
 	
 	/* (non-PHPdoc)
 	 * @see KalturaFilter::toObject()

@@ -76,7 +76,7 @@ class KalturaCaptionAsset extends KalturaAsset
 		return array_merge ( parent::getMapBetweenObjects() , self::$map_between_objects );
 	}
 	
-	public function fromObject($source_object, IResponseProfile $responseProfile = null)
+	public function fromObject($source_object, KalturaResponseProfileBase $responseProfile = null)
 	{
 		$ret = parent::fromObject($source_object, $responseProfile);
 				

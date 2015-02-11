@@ -24,6 +24,14 @@ class KalturaAuditTrailFilter extends KalturaAuditTrailBaseFilter
 	{
 		return array_merge(parent::getOrderByMap(), self::$order_by_map);
 	}
+
+	/* (non-PHPdoc)
+	 * @see KalturaFilter::getCoreFilter()
+	 */
+	protected function getCoreFilter()
+	{
+		return new AuditTrailFilter();
+	}
 	
 	/**
 	 * @param AuditTrailFilter $auditTrailFilter
@@ -32,9 +40,6 @@ class KalturaAuditTrailFilter extends KalturaAuditTrailBaseFilter
 	 */
 	public function toObject($auditTrailFilter = null, $propsToSkip = array())
 	{
-		if(!$auditTrailFilter)
-			$auditTrailFilter = new AuditTrailFilter();
-			
 		if(isset($this->userIdEqual))
 		{
 			$kuser = kuserPeer::getKuserByPartnerAndUid(kCurrentContext::$ks_partner_id, $this->userIdEqual, true);

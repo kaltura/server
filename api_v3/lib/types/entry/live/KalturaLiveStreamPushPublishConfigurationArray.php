@@ -11,7 +11,7 @@ class KalturaLiveStreamPushPublishConfigurationArray extends KalturaTypedArray
 	 * @param array $dbArray
 	 * @return KalturaLiveStreamPushPublishConfiguration
 	 */
-	public static function fromDbArray(array $dbArray = null, IResponseProfile $responseProfile = null)
+	public static function fromDbArray(array $dbArray = null, KalturaResponseProfileBase $responseProfile = null)
 	{
 		$array = new KalturaLiveStreamConfigurationArray();
 		if($dbArray && is_array($dbArray))

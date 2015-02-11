@@ -11,7 +11,7 @@ class KalturaRemoteStorageResourceArray extends KalturaTypedArray
 	 * @param array<kRemoteStorageResource> $arr
 	 * @return KalturaRemoteStorageResourceArray
 	 */
-	public static function fromDbArray(array $arr, IResponseProfile $responseProfile = null)
+	public static function fromDbArray(array $arr, KalturaResponseProfileBase $responseProfile = null)
 	{
 		$newArr = new KalturaRemoteStorageResourceArray();
 		foreach($arr as $obj)

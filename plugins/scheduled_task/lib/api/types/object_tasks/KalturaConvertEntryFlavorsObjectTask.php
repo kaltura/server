@@ -36,7 +36,7 @@ class KalturaConvertEntryFlavorsObjectTask extends KalturaObjectTask
 		return $dbObject;
 	}
 
-	public function fromObject($srcObj, IResponseProfile $responseProfile = null)
+	public function fromObject($srcObj, KalturaResponseProfileBase $responseProfile = null)
 	{
 		parent::fromObject($srcObj, $responseProfile);
 

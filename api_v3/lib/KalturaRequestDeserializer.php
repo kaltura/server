@@ -184,25 +184,26 @@ class KalturaRequestDeserializer
 	}
 	
 	/**
-	 * @return IResponseProfile
+	 * @return KalturaResponseProfileBase
 	 */
 	public function getResponseProfile($paramName = 'responseProfile') {
 		if(!isset($this->paramsGrouped[$paramName])){
 			return null;
 		}
 		
+		$responseProfile = null;
 		if(isset($this->paramsGrouped[$paramName]['id'])){
-			return ResponseProfilePeer::retrieveByPK($this->paramsGrouped['responseProfileId']);
+			$responseProfile = ResponseProfilePeer::retrieveByPK($this->paramsGrouped['responseProfileId']);
 		}
 		if(isset($this->paramsGrouped[$paramName]['name'])){
-			return ResponseProfilePeer::retrieveBySystemName($this->paramsGrouped['responseProfileName']);
+			$responseProfile = ResponseProfilePeer::retrieveBySystemName($this->paramsGrouped['responseProfileName']);
+		}
+		if($responseProfile){
+			return new KalturaResponseProfile($responseProfile);
 		}
 		
 		$typeReflector = KalturaTypeReflectorCacher::get('KalturaNestedResponseProfile');
-		$responseProfile = $this->buildObject($typeReflector, $this->paramsGrouped[$paramName], $paramName);
-		/* @var $responseProfile KalturaNestedResponseProfile */
-		
-		return $responseProfile->toObject();
+		return $this->buildObject($typeReflector, $this->paramsGrouped[$paramName], $paramName);
 	}
 	
 	protected function validateParameter($name, $value, $constraintsObj) {

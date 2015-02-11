@@ -11,7 +11,7 @@ class KalturaTagArray extends KalturaTypedArray
      * @param array $arr
      * @return KalturaTagArray
      */
-    public static function fromDbArray($arr, IResponseProfile $responseProfile = null)
+    public static function fromDbArray($arr, KalturaResponseProfileBase $responseProfile = null)
 	{
 		$newArr = new KalturaTagArray();
 		if ($arr == null)

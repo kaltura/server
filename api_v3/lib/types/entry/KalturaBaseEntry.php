@@ -444,7 +444,7 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 		return $dbObject;
 	}
 	
-	public function fromObject($sourceObject, IResponseProfile $responseProfile = null)
+	public function fromObject($sourceObject, KalturaResponseProfileBase $responseProfile = null)
 	{
 		if(!$sourceObject)
 			return;

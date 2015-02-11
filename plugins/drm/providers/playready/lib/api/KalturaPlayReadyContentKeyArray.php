@@ -5,7 +5,7 @@
  */
 class KalturaPlayReadyContentKeyArray extends KalturaTypedArray
 {
-	public static function fromDbArray($arr, IResponseProfile $responseProfile = null)
+	public static function fromDbArray($arr, KalturaResponseProfileBase $responseProfile = null)
 	{
 		$newArr = new KalturaPlayReadyContentKeyArray();
 		if ($arr == null)

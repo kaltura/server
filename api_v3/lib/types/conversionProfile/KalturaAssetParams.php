@@ -150,7 +150,7 @@ class KalturaAssetParams extends KalturaObject implements IFilterable
 	/* (non-PHPdoc)
 	 * @see KalturaObject::fromObject()
 	 */
-	public function fromObject($source_object, IResponseProfile $responseProfile = null)
+	public function fromObject($source_object, KalturaResponseProfileBase $responseProfile = null)
 	{
 		/* @var $source_object assetParams */
 		$this->requiredPermissions = KalturaStringArray::fromStringArray($source_object->getRequiredPermissions());

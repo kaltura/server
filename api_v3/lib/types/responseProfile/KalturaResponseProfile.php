@@ -3,7 +3,7 @@
  * @package api
  * @subpackage objects
  */
-class KalturaResponseProfile extends KalturaObject implements IFilterable
+class KalturaResponseProfile extends KalturaResponseProfileBase implements IFilterable
 {
 	/**
 	 * Auto generated numeric identifier
@@ -75,6 +75,14 @@ class KalturaResponseProfile extends KalturaObject implements IFilterable
 	 */
 	public $relatedProfiles;
 	
+	public function __construct(ResponseProfile $responseProfile = null)
+	{
+		if($responseProfile)
+		{
+			$this->fromObject($responseProfile);
+		}
+	}
+	
 	private static $map_between_objects = array(
 		'id', 
 		'name', 
@@ -116,6 +124,19 @@ class KalturaResponseProfile extends KalturaObject implements IFilterable
 			$object = new ResponseProfile();
 		}
 		parent::toObject($object, $propertiesToSkip);
+	}
+	
+	/* (non-PHPdoc)
+	 * @see KalturaResponseProfileBase::getRelatedProfiles()
+	 */
+	public function getRelatedProfiles()
+	{
+		if($this->relatedProfiles)
+		{
+			return $this->relatedProfiles;
+		}
+		
+		return array();
 	}
 	
 	/* (non-PHPdoc)

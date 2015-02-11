@@ -30,6 +30,14 @@ class KalturaCuePointFilter extends KalturaCuePointBaseFilter
 					$this->getFormattedPropertyNameWithClassName('entryIdEqual') . '/' . $this->getFormattedPropertyNameWithClassName('entryIdIn'));
 	}
 
+	/* (non-PHPdoc)
+	 * @see KalturaFilter::getCoreFilter()
+	 */
+	protected function getCoreFilter()
+	{
+		return new CuePointFilter();
+	}
+	
 	/**
 	 * @param CuePointFilter $cuePointFilter
 	 * @param array $propsToSkip
@@ -38,8 +46,6 @@ class KalturaCuePointFilter extends KalturaCuePointBaseFilter
 	public function toObject($cuePointFilter = null, $propsToSkip = array())
 	{
 		$this->validateEntryIdFiltered();
-		if(!$cuePointFilter)
-			$cuePointFilter = new CuePointFilter();
 			
 		if(isset($this->userIdEqual)){
 			$dbKuser = kuserPeer::getKuserByPartnerAndUid(kCurrentContext::$ks_partner_id, $this->userIdEqual);

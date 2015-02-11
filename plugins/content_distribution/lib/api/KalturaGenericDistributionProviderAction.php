@@ -136,7 +136,7 @@ class KalturaGenericDistributionProviderAction extends KalturaObject implements 
 		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
 	}
 	
-	public function fromObject($source_object, IResponseProfile $responseProfile = null)
+	public function fromObject($source_object, KalturaResponseProfileBase $responseProfile = null)
 	{
 		parent::fromObject($source_object, $responseProfile);
 

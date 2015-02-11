@@ -218,7 +218,7 @@ class KalturaDropFolder extends KalturaObject implements IFilterable
 		return $dbObject;
 	}
 	
-	public function fromObject($source_object, IResponseProfile $responseProfile = null)
+	public function fromObject($source_object, KalturaResponseProfileBase $responseProfile = null)
 	{
 		parent::fromObject($source_object, $responseProfile);
 		$dbFileHandlerConfig = $source_object->getFileHandlerConfig();

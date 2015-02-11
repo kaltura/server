@@ -60,11 +60,25 @@ class KalturaNestedResponseProfile extends KalturaNestedResponseProfileBase
 	/* (non-PHPdoc)
 	 * @see KalturaObject::toObject($object_to_fill, $props_to_skip)
 	 */
-	public function toObject($object = null, $propertiesToSkip = array()){
+	public function toObject($object = null, $propertiesToSkip = array())
+	{
 		if(is_null($object))
 		{
 			$object = new kResponseProfile();
 		}
 		parent::toObject($object, $propertiesToSkip);
+	}
+	
+	/* (non-PHPdoc)
+	 * @see KalturaResponseProfileBase::getRelatedProfiles()
+	 */
+	public function getRelatedProfiles()
+	{
+		if($this->relatedProfiles)
+		{
+			return $this->relatedProfiles;
+		}
+		
+		return array();
 	}
 }

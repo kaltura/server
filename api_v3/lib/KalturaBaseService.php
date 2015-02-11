@@ -32,7 +32,7 @@ abstract class KalturaBaseService
 	private $operating_partner = null;
 	
 	/**
-	 * @var IResponseProfile
+	 * @var KalturaResponseProfileBase
 	 */
 	private $responseProfile = null;
 	 
@@ -91,13 +91,13 @@ abstract class KalturaBaseService
 		return false;
 	} 
 		
-	public function setResponseProfile(IResponseProfile $responseProfile = null)
+	public function setResponseProfile(KalturaResponseProfileBase $responseProfile = null)
 	{
 		$this->responseProfile = $responseProfile;
 	}
 		
 	/**
-	 * @return IResponseProfile
+	 * @return KalturaResponseProfileBase
 	 */
 	protected function getResponseProfile()
 	{

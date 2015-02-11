@@ -9,13 +9,19 @@ class KalturaGroupUserFilter extends KalturaGroupUserBaseFilter
 	static private $map_between_objects = array	();
 
 	/* (non-PHPdoc)
+	 * @see KalturaFilter::getCoreFilter()
+	 */
+	protected function getCoreFilter()
+	{
+		return new KuserKgroupFilter();
+	}
+	
+	/* (non-PHPdoc)
 	 * @see KalturaObject::toObject()
 	 */
 	public function toObject($coreFilter = null, $props_to_skip = array()) 
 	{
 		$this->validateUserIdOrGroupIdFiltered();
-		if(is_null($coreFilter))
-			$coreFilter = new KuserKgroupFilter();
 			
 		return parent::toObject($coreFilter, $props_to_skip);
 	}
