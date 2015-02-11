@@ -44,6 +44,8 @@ function formatResponse($resp, $indent = '', $varName = null)
 {
 	global $DATE_FIELD_SUFFIXES;
 	
+	$returnCode = 0;
+	
 	switch (gettype($resp))
 	{
 	case 'integer':
@@ -52,7 +54,7 @@ function formatResponse($resp, $indent = '', $varName = null)
 			foreach ($DATE_FIELD_SUFFIXES as $dateSuffix)
 			{
 				if (substr($varName, -strlen($dateSuffix)) === $dateSuffix) 
-					return "{$resp}\t(" . date('Y-m-d H:i:s', $resp) . ")";						
+					return array("{$resp}\t(" . date('Y-m-d H:i:s', $resp) . ")", $returnCode);						
 			}
 		}
 		
@@ -60,16 +62,22 @@ function formatResponse($resp, $indent = '', $varName = null)
 	case 'double':
 	case 'string':
 	case 'NULL':
-		return (string)$resp;
+		return array((string)$resp, $returnCode);
 		
 	case 'array':
 		$result = "array";
 		foreach ($resp as $index => $elem)
 		{
-			$value = formatResponse($elem, $indent . "\t", $index);
+			list($value, $internalReturnCode) = formatResponse($elem, $indent . "\t", $index);
 			$result .= "\n{$indent}\t{$index}\t{$value}";
 		}
-		return $result;
+		
+		if ($indent == "" && isset($resp['objectType']) && strpos($resp['objectType'], 'Exception') !== false)
+		{
+			$returnCode = 1;
+		}
+		
+		return array($result, $returnCode);
 		
 	case 'object':
 		$properties = get_object_vars($resp);
@@ -79,10 +87,10 @@ function formatResponse($resp, $indent = '', $varName = null)
 		{
 			if ($name == '__PHP_Incomplete_Class_Name')
 				continue;
-			$value = formatResponse($value, $indent . "\t", $name);
+			list($value, $internalReturnCode) = formatResponse($value, $indent . "\t", $name);
 			$result .= "\n{$indent}\t{$name}\t{$value}";
 		}
-		return $result;
+		return array($result, $returnCode);
 	}
 }
 
@@ -122,7 +130,8 @@ if (count($arguments) < 2)
 {
 	$usage = "Usage: kalcli [switches] <service> <action> [<param1> <param2> ...]\nOptions:\n";
 	$usage .= KalturaCommandLineParser::getArgumentsUsage($commandLineSwitches);
-	die($usage);
+	echo $usage;
+	exit(1);
 }
 
 $service = trim($arguments[0]);
@@ -262,6 +271,7 @@ if (isset($options['log']))
 
 // issue the request
 $result = $curlWrapper->getUrl($url, $params);
+$returnCode = $result === false ? 1 : 0;
 
 if (isset($options['log']))
 {
@@ -275,7 +285,7 @@ if (isset($options['log']))
 		$sessionId = $matches[1];
 		printLogFiltered($logPortion, $sessionId);
 	}
-	die;
+	exit($returnCode);
 }
 
 // output the response
@@ -289,7 +299,8 @@ if (!isset($options['head']))
 		$unserializedResult = @unserialize($result);
 		if ($unserializedResult !== false || $result === 'b:0;')
 		{
-			$result = formatResponse($unserializedResult) . "\n";
+			list($result, $returnCode) = formatResponse($unserializedResult);
+			$result .= "\n";
 		}
 	}
 	echo $result;
@@ -297,3 +308,5 @@ if (!isset($options['head']))
 
 if (isset($options['time']) && !is_null($curlWrapper->totalTime))
 	echo "execution time\t{$curlWrapper->totalTime}\n";
+
+exit($returnCode);
