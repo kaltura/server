@@ -39,7 +39,19 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 			foreach($externalStorages as $externalStorage)
 			{
 				if($externalStorage->getTrigger() == StorageProfile::STORAGE_TEMP_TRIGGER_MODERATION_APPROVED)
-					self::exportEntry($object, $externalStorage);
+				{
+					try
+					{
+						self::exportEntry($object, $externalStorage);
+					}
+					catch (kCoreException $e)
+					{
+						if ($e->getCode()==kCoreException::PROFILE_STATUS_DISABLED)
+						{
+							continue;
+						}
+					}
+				}
 			}
 		}
 		
@@ -113,11 +125,11 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 	 */
 	public static function exportEntry(entry $entry, StorageProfile $externalStorage)
 	{
-        if($externalStorage->getStatus()==StorageProfile::STORAGE_STATUS_DISABLED)
-        {
-            throw new kCoreException("Export entry operation failed since profile status is disabled",kCoreException::PROFILE_STATUS_DISABLED);
-        }
-
+		if($externalStorage->getStatus()==StorageProfile::STORAGE_STATUS_DISABLED)
+		{
+			throw new kCoreException("Export entry operation failed since profile status is disabled",kCoreException::PROFILE_STATUS_DISABLED);
+		}
+		
         $flavorAssets = assetPeer::retrieveFlavorsByEntryIdAndStatus($entry->getId(), null, array(asset::ASSET_STATUS_READY, asset::ASSET_STATUS_EXPORTING));
 		foreach ($flavorAssets as $flavorAsset) 
 		{
