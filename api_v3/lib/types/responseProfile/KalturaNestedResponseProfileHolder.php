@@ -9,8 +9,6 @@ class KalturaNestedResponseProfileHolder extends KalturaNestedResponseProfileBas
 	 * Auto generated numeric identifier
 	 * 
 	 * @var int
-	 * @readonly
-	 * @filter eq,in
 	 */
 	public $id;
 	
@@ -18,12 +16,12 @@ class KalturaNestedResponseProfileHolder extends KalturaNestedResponseProfileBas
 	 * Unique system name
 	 * 
 	 * @var string
-	 * @filter eq,in
 	 */
 	public $systemName;
 	
 	private static $map_between_objects = array(
 		'id', 
+		'systemName', 
 	);
 	
 	/* (non-PHPdoc)
@@ -42,30 +40,16 @@ class KalturaNestedResponseProfileHolder extends KalturaNestedResponseProfileBas
 		$this->validatePropertyNotNull(array('id', 'systemName'));
 	}
 	
-	protected function setId()
-	{
-		if(is_null($this->id))
-		{
-			$responseProfile = ResponseProfilePeer::retrieveBySystemName($this->systemName);
-			if(!$responseProfile) 
-			{
-				throw new KalturaAPIException(KalturaErrors::RESPONSE_PROFILE_NAME_NOT_FOUND, $this->systemName);
-			}
-			$this->id = $responseProfile->getId();
-		}
-	}
-	
 	/* (non-PHPdoc)
 	 * @see KalturaObject::toObject
 	 */
 	public function toObject($object = null, $propertiesToSkip = array())
 	{
-		$this->setId();
-		
 		if(is_null($object))
 		{
 			$object = new kResponseProfileHolder();
 		}
+		
 		parent::toObject($object, $propertiesToSkip);
 	}
 	
@@ -74,10 +58,25 @@ class KalturaNestedResponseProfileHolder extends KalturaNestedResponseProfileBas
 	 */
 	public function getRelatedProfiles()
 	{
-		$this->setId();
-		$coreResponseProfile = ResponseProfilePeer::retrieveByPK($this->id);
-		$responseProfile = new KalturaResponseProfile($coreResponseProfile);
-		
+		$responseProfile = $this->get();
 		return $responseProfile->getRelatedProfiles();
+	}
+
+	/* (non-PHPdoc)
+	 * @see KalturaNestedResponseProfileBase::get()
+	 */
+	public function get()
+	{
+		$responseProfile = null;
+		if($this->id)
+		{
+			$responseProfile = ResponseProfilePeer::retrieveByPK($this->id);
+		}
+		elseif($this->systemName)
+		{
+			$responseProfile = ResponseProfilePeer::retrieveBySystemName($this->systemName);
+		}
+		
+		return new KalturaResponseProfile($responseProfile);
 	}
 }

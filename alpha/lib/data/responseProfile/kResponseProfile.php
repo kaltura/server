@@ -14,22 +14,32 @@ class kResponseProfile implements IResponseProfile
 	private $name;
 	
 	/**
-	 * @var KalturaResponseProfileType
+	 * @var ResponseProfileType
 	 */
 	private $type;
 	
 	/**
-	 * @var KalturaStringArray
+	 * @var array
 	 */
 	private $fields;
 	
 	/**
-	 * @var KalturaResponseProfileConditionArray
+	 * @var baseObjectFilter
 	 */
-	private $conditions;
+	private $filter;
 	
 	/**
-	 * @var KalturaNestedResponseProfileBaseArray
+	 * @var string
+	 */
+	private $filterApiClassName;
+	
+	/**
+	 * @var kFilterPager
+	 */
+	private $pager;
+	
+	/**
+	 * @var array<IResponseProfileBase>
 	 */
 	private $relatedProfiles;
 	
@@ -41,6 +51,54 @@ class kResponseProfile implements IResponseProfile
 		return $this;
 	}
 	
+	/* (non-PHPdoc)
+	 * @see IResponseProfile::getFilterApiClassName()
+	 */
+	public function getFilterApiClassName()
+	{
+		return $this->filterApiClassName;
+	}
+
+	/* (non-PHPdoc)
+	 * @see IResponseProfile::setFilterApiClassName()
+	 */
+	public function setFilterApiClassName($filterApiClassName)
+	{
+		$this->filterApiClassName = $filterApiClassName;
+	}
+
+	/* (non-PHPdoc)
+	 * @see IResponseProfile::getFilter()
+	 */
+	public function getFilter()
+	{
+		return $this->filter;
+	}
+
+	/* (non-PHPdoc)
+	 * @see IResponseProfile::getPager()
+	 */
+	public function getPager()
+	{
+		return $this->pager;
+	}
+
+	/* (non-PHPdoc)
+	 * @see IResponseProfile::setFilter()
+	 */
+	public function setFilter(baseObjectFilter $filter)
+	{
+		$this->filter = $filter;
+	}
+
+	/* (non-PHPdoc)
+	 * @see IResponseProfile::setPager()
+	 */
+	public function setPager(kFilterPager $pager)
+	{
+		$this->pager = $pager;
+	}
+
 	/* (non-PHPdoc)
 	 * @see IResponseProfile::getName()
 	 */
@@ -103,21 +161,5 @@ class kResponseProfile implements IResponseProfile
 	public function setRelatedProfiles($relatedProfiles)
 	{
 		$this->relatedProfiles = $relatedProfiles;
-	}
-	
-	/**
-	 * @return array<kCondition>
-	 */
-	public function getConditions()
-	{
-		return $this->conditions;
-	}
-
-	/**
-	 * @param array<kCondition> $conditions
-	 */
-	public function setConditions($conditions)
-	{
-		$this->conditions = $conditions;
 	}
 }

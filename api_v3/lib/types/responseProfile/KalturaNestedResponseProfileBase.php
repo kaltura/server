@@ -6,8 +6,7 @@
 abstract class KalturaNestedResponseProfileBase extends KalturaResponseProfileBase
 {
 	/**
-	 * @param KalturaObject $this
-	 * @return KalturaFilter
+	 * @return KalturaResponseProfileBase
 	 */
-	abstract public function getFilter($this, $srcObj);
+	abstract public function get();
 }

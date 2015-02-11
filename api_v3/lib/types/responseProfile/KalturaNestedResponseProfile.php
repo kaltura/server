@@ -23,9 +23,14 @@ class KalturaNestedResponseProfile extends KalturaNestedResponseProfileBase
 	public $fields;
 	
 	/**
-	 * @var KalturaConditionArray
+	 * @var KalturaFilter
 	 */
-	public $conditions;
+	public $filter;
+	
+	/**
+	 * @var KalturaFilterPager
+	 */
+	public $pager;
 	
 	/**
 	 * @var KalturaNestedResponseProfileBaseArray
@@ -36,7 +41,8 @@ class KalturaNestedResponseProfile extends KalturaNestedResponseProfileBase
 		'name', 
 		'type',
 		'fields',
-		'conditions',
+		'filter',
+		'pager',
 		'relatedProfiles',
 	);
 	
@@ -80,5 +86,13 @@ class KalturaNestedResponseProfile extends KalturaNestedResponseProfileBase
 		}
 		
 		return array();
+	}
+
+	/* (non-PHPdoc)
+	 * @see KalturaNestedResponseProfileBase::get()
+	 */
+	public function get()
+	{
+		return $this;
 	}
 }

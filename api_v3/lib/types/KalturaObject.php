@@ -288,6 +288,22 @@ abstract class KalturaObject
 		return $result;
 	}
 	
+	public function shouldGet($propertyName, KalturaResponseProfileBase $responseProfile = null)
+	{
+		if($responseProfile){
+			$coreResponseProfile = $responseProfile->toObject();
+			$fields = array_flip($coreResponseProfile->getFields());
+			if($coreResponseProfile->getType() == ResponseProfileType::INCLUDE_FIELDS){
+				return isset($fields[$propertyName]);
+			}
+			else{
+				return !isset($fields[$propertyName]);
+			}
+		}
+		
+		return true;
+	}
+	
 	public function fromObject($srcObj, KalturaResponseProfileBase $responseProfile = null)
 	{
 		$thisClass = get_class($this);
@@ -317,12 +333,11 @@ abstract class KalturaObject
 		$coreResponseProfile = $responseProfile ? $responseProfile->toObject() : null;
 		$fromObjectClass::fromObject($this, $srcObj, $coreResponseProfile);
 		
-		
 		foreach($responseProfile->getRelatedProfiles() as $relatedProfile)
 		{
 			/* @var $relatedProfile KalturaNestedResponseProfileBase */
-			$filter = $relatedProfile->getFilter();
-			$this->relatedObjects[$relatedProfile->getName()] = $filter->getListResponse($srcObj);
+			$relatedProfile = $relatedProfile->get();
+			$this->relatedObjects[$relatedProfile->name] = $relatedProfile->filter->getListResponse($relatedProfile->pager, $relatedProfile, $srcObj);
 		}
 	}
 	

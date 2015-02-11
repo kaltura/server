@@ -23,6 +23,21 @@ interface IResponseProfile extends IResponseProfileBase
 	public function getRelatedProfiles();
 	
 	/**
+	 * @return baseObjectFilter
+	 */
+	public function getFilter();
+	
+	/**
+	 * @return string
+	 */
+	public function getFilterApiClassName();
+
+	/**
+	 * @return kFilterPager
+	 */
+	public function getPager();
+	
+	/**
 	 * @param string $v
 	 */
 	public function setName($v);
@@ -41,4 +56,19 @@ interface IResponseProfile extends IResponseProfileBase
 	 * @param array<IResponseProfileBase> $v
 	 */
 	public function setRelatedProfiles(array $v);
+
+	/**
+	 * @param baseObjectFilter $filter
+	 */
+	public function setFilter(baseObjectFilter $filter);
+
+	/**
+	 * @param string $filter
+	 */
+	public function setFilterApiClassName($filterApiClassName);
+
+	/**
+	 * @param kFilterPager $pager
+	 */
+	public function setPager(kFilterPager $pager);
 }

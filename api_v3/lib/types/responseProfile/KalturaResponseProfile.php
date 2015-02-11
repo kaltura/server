@@ -71,6 +71,16 @@ class KalturaResponseProfile extends KalturaResponseProfileBase implements IFilt
 	public $fields;
 	
 	/**
+	 * @var KalturaFilter
+	 */
+	public $filter;
+	
+	/**
+	 * @var KalturaFilterPager
+	 */
+	public $pager;
+	
+	/**
 	 * @var KalturaNestedResponseProfileBaseArray
 	 */
 	public $relatedProfiles;
@@ -93,6 +103,7 @@ class KalturaResponseProfile extends KalturaResponseProfileBase implements IFilt
 		'status',
 		'type',
 		'fields',
+		'pager',
 		'relatedProfiles',
 	);
 	
@@ -123,7 +134,28 @@ class KalturaResponseProfile extends KalturaResponseProfileBase implements IFilt
 		{
 			$object = new ResponseProfile();
 		}
+		
+		if($this->filter)
+		{
+			$object->setFilterApiClassName(get_class($this->filter));
+			$object->setFilter($this->filter->toObject());
+		}
+		
 		parent::toObject($object, $propertiesToSkip);
+	}
+	
+	/* (non-PHPdoc)
+	 * @see KalturaObject::fromObject($srcObj, $responseProfile)
+	 */
+	public function fromObject($srcObj, KalturaResponseProfileBase $responseProfile = null)
+	{
+		/* @var $srcObj ResponseProfile */
+		parent::fromObject($srcObj, $responseProfile);
+		
+		if($srcObj->getFilter() && $this->shouldGet('filter', $responseProfile))
+		{
+			
+		}
 	}
 	
 	/* (non-PHPdoc)
