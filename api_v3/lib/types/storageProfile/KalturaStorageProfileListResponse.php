@@ -3,17 +3,11 @@
  * @package api
  * @subpackage objects
  */
-class KalturaStorageProfileListResponse extends KalturaObject
+class KalturaStorageProfileListResponse extends KalturaListResponse
 {
 	/**
 	 * @var KalturaStorageProfileArray
 	 * @readonly
 	 */
 	public $objects;
-
-	/**
-	 * @var int
-	 * @readonly
-	 */
-	public $totalCount;
 }

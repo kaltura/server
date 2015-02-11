@@ -3,17 +3,11 @@
  * @package plugins.caption
  * @subpackage api.objects
  */
-class KalturaCaptionParamsListResponse extends KalturaObject
+class KalturaCaptionParamsListResponse extends KalturaListResponse
 {
 	/**
 	 * @var KalturaCaptionParamsArray
 	 * @readonly
 	 */
 	public $objects;
-
-	/**
-	 * @var int
-	 * @readonly
-	 */
-	public $totalCount;
 }

@@ -3,7 +3,7 @@
  * @package api
  * @subpackage objects
  */
-class KalturaBatchJobListResponse extends KalturaObject
+class KalturaBatchJobListResponse extends KalturaListResponse
 {
 	/**
 	 * @var KalturaBatchJobArray
@@ -11,9 +11,4 @@ class KalturaBatchJobListResponse extends KalturaObject
 	 */
 	public $objects;
 	
-	/**
-	 * @var int
-	 * @readonly
-	 */
-	public $totalCount;
 }

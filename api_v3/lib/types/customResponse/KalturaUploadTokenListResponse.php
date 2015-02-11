@@ -3,17 +3,11 @@
  * @package api
  * @subpackage objects
  */
-class KalturaUploadTokenListResponse extends KalturaObject
+class KalturaUploadTokenListResponse extends KalturaListResponse
 {
 	/**
 	 * @var KalturaUploadTokenArray
 	 * @readonly
 	 */
 	public $objects;
-
-	/**
-	 * @var int
-	 * @readonly
-	 */
-	public $totalCount;
 }

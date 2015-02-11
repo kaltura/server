@@ -3,17 +3,11 @@
  * @package plugins.dropFolder
  * @subpackage api.objects
  */
-class KalturaDropFolderFileListResponse extends KalturaObject
+class KalturaDropFolderFileListResponse extends KalturaListResponse
 {
 	/**
 	 * @var KalturaDropFolderFileArray
 	 * @readonly
 	 */
 	public $objects;
-
-	/**
-	 * @var int
-	 * @readonly
-	 */
-	public $totalCount;
 }

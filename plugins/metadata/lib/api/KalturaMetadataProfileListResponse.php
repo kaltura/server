@@ -3,17 +3,11 @@
  * @package plugins.metadata
  * @subpackage api.objects
  */
-class KalturaMetadataProfileListResponse extends KalturaObject
+class KalturaMetadataProfileListResponse extends KalturaListResponse
 {
 	/**
 	 * @var KalturaMetadataProfileArray
 	 * @readonly
 	 */
 	public $objects;
-
-	/**
-	 * @var int
-	 * @readonly
-	 */
-	public $totalCount;
 }

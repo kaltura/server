@@ -3,17 +3,11 @@
  * @package plugins.adminConsole
  * @subpackage api.objects
  */
-class KalturaTrackEntryListResponse extends KalturaObject
+class KalturaTrackEntryListResponse extends KalturaListResponse
 {
 	/**
 	 * @var KalturaTrackEntryArray
 	 * @readonly
 	 */
 	public $objects;
-
-	/**
-	 * @var int
-	 * @readonly
-	 */
-	public $totalCount;
 }

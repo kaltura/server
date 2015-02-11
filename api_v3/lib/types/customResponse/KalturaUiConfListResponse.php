@@ -3,17 +3,11 @@
  * @package api
  * @subpackage objects
  */
-class KalturaUiConfListResponse extends KalturaObject
+class KalturaUiConfListResponse extends KalturaListResponse
 {
 	/**
 	 * @var KalturaUiConfArray
 	 * @readonly
 	 */
 	public $objects;
-
-	/**
-	 * @var int
-	 * @readonly
-	 */
-	public $totalCount;
 }

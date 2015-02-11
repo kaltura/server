@@ -3,17 +3,11 @@
  * @package plugins.drm
  * @subpackage api.objects
  */
-class KalturaDrmPolicyListResponse extends KalturaObject
+class KalturaDrmPolicyListResponse extends KalturaListResponse
 {
 	/**
 	 * @var KalturaDrmPolicyArray
 	 * @readonly
 	 */
 	public $objects;
-
-	/**
-	 * @var int
-	 * @readonly
-	 */
-	public $totalCount;
 }

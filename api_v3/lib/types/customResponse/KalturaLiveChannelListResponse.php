@@ -3,17 +3,11 @@
  * @package api
  * @subpackage objects
  */
-class KalturaLiveChannelListResponse extends KalturaObject
+class KalturaLiveChannelListResponse extends KalturaListResponse
 {
 	/**
 	 * @var KalturaLiveChannelArray
 	 * @readonly
 	 */
 	public $objects;
-
-	/**
-	 * @var int
-	 * @readonly
-	 */
-	public $totalCount;
 }

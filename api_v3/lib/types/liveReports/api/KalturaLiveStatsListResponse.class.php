@@ -4,7 +4,7 @@
  * @package api
  * @subpackage objects
  */
-class KalturaLiveStatsListResponse extends KalturaObject
+class KalturaLiveStatsListResponse extends KalturaListResponse
 {				
 	/**
 	 *

@@ -3,17 +3,11 @@
  * @package api
  * @subpackage objects
  */
-class KalturaDataListResponse extends KalturaObject
+class KalturaDataListResponse extends KalturaListResponse
 {
 	/**
 	 * @var KalturaDataEntryArray
 	 * @readonly
 	 */
 	public $objects;
-
-	/**
-	 * @var int
-	 * @readonly
-	 */
-	public $totalCount;
 }

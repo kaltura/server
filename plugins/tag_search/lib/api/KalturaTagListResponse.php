@@ -3,7 +3,7 @@
  * @package plugins.tagSearch
  * @subpackage api.objects
  */
-class KalturaTagListResponse extends KalturaObject
+class KalturaTagListResponse extends KalturaListResponse
 {
     /**
 	 * @var KalturaTagArray
@@ -11,11 +11,6 @@ class KalturaTagListResponse extends KalturaObject
 	 */
 	public $objects;
 
-	/**
-	 * @var int
-	 * @readonly
-	 */
-	public $totalCount;
 	
 	public function __construct()
 	{

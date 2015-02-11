@@ -3,17 +3,11 @@
  * @package api
  * @subpackage objects
  */
-class KalturaSchedulerWorkerListResponse extends KalturaObject
+class KalturaSchedulerWorkerListResponse extends KalturaListResponse
 {
 	/**
 	 * @var KalturaSchedulerWorkerArray
 	 * @readonly
 	 */
 	public $objects;
-
-	/**
-	 * @var int
-	 * @readonly
-	 */
-	public $totalCount;
 }

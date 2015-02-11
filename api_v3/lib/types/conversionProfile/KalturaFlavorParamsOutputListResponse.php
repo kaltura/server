@@ -3,17 +3,11 @@
  * @package api
  * @subpackage objects
  */
-class KalturaFlavorParamsOutputListResponse extends KalturaObject
+class KalturaFlavorParamsOutputListResponse extends KalturaListResponse
 {
 	/**
 	 * @var KalturaFlavorParamsOutputArray
 	 * @readonly
 	 */
 	public $objects;
-
-	/**
-	 * @var int
-	 * @readonly
-	 */
-	public $totalCount;
 }
