@@ -160,7 +160,7 @@ class CategoryEntryService extends KalturaBaseService
 			// Second pass: check if kuser is a co-publisher
 			if ( ! $kuserIsEntitled
 					&& $kuser
-					&& $entry->isEntitledPuserPublish( $kuser->getPuserId() ) )
+					&& $entry->isEntitledKuserPublish( $kuser->getKuserId() ) )
 			{
 				$kuserIsEntitled = true;
 			}

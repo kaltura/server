@@ -1882,9 +1882,9 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		return implode(',', unserialize($entitledUserPuserEdit));
 	}
 	
-	public function isEntitledPuserEdit( $puser )
+	public function isEntitledKuserEdit( $kuserId )
 	{
-		return in_array( (string)$puser, explode( ',', $this->getEntitledPusersEdit() ) );
+		return in_array( trim($kuserId), explode( ',', $this->getEntitledKusersEdit() ) );
 	}
 
 	public function setEntitledPusersPublish($v)
@@ -1934,9 +1934,9 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		return implode(',', unserialize($entitledUserPuserPublish));
 	}
 	
-	public function isEntitledPuserPublish( $puser )
+	public function isEntitledKuserPublish( $kuserId )
 	{
-		return in_array( (string)$puser, explode( ',', $this->getEntitledPusersPublish() ) );
+		return in_array( trim($kuserId), explode( ',', $this->getEntitledKusersPublish() ) );
 	}
 
 	public function getRoots()
