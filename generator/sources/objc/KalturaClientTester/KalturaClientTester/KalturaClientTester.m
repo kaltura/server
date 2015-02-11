@@ -33,16 +33,15 @@
 
 // Account specific constants
 // TODO: update this
-
-#define ADMIN_SECRET (@"@YOUR_ADMIN_SECRET@")
-#define PARTNER_ID (@YOUR_PARTNER_ID@)
+#define ADMIN_SECRET (@"YOUR_ADMIN_SECRET")
+#define PARTNER_ID (54321)
 #define USER_ID (@"testUser")
 
 // Fixed constants
 #define UPLOAD_FILENAME (@"DemoVideo.flv")
 #define ENTRY_NAME (@"Media entry uploaded from ObjC client")
-#define DEFAULT_SERVICE_URL (@"@SERVICE_URL@")
-#define KALTURA_CLIENT_TEST_URL (@"@SERVICE_URL@/clientTest")
+#define DEFAULT_SERVICE_URL (@"http://www.kaltura.com")
+#define KALTURA_CLIENT_TEST_URL (@"http://www.kaltura.com/clientTest")
 
 /*
  KalturaTestDetails
