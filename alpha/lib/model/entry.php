@@ -1853,6 +1853,11 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		foreach ($entitledPusersEdit as $puserId)
 		{
 			$puserId = trim($puserId);
+			if ( $puserId === '' )
+			{
+				continue;
+			}
+
 			$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
 			$kuser = kuserPeer::getActiveKuserByPartnerAndUid($partnerId, $puserId);
 			if (!$kuser)
@@ -1901,6 +1906,10 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		foreach ($entitledPusersPublish as $puserId)
 		{
 			$puserId = trim($puserId);
+			if ( $puserId === '' )
+			{
+				continue;
+			}
 			
 			$kuser = kuserPeer::getActiveKuserByPartnerAndUid($partnerId, $puserId);
 			if (!$kuser)
