@@ -235,15 +235,22 @@ class GroupUserService extends KalturaBaseService
 		$kuserKgroupFilter->attachToCriteria($c);
 		$pager->attachToCriteria($c);
 		$c->applyFilters();
-		
+
 		$list = KuserKgroupPeer::doSelect($c);
 
 		$newList = KalturaGroupUserArray::fromDbArray($list);
-		
+
 		$response = new KalturaGroupUserListResponse();
 		$response->objects = $newList;
-		$response->totalCount = KuserKgroupPeer::doCount($c);
-		
+		$resultCount = count($newList);
+		if ($resultCount && $resultCount < $pager->pageSize)
+			$totalCount = ($pager->pageIndex - 1) * $pager->pageSize + $resultCount;
+		else
+		{
+			KalturaFilterPager::detachFromCriteria($c);
+			$totalCount = KuserKgroupPeer::doCount($c);
+		}
+		$response->totalCount = $totalCount;
 		return $response;
 	}
 
