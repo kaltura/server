@@ -54,6 +54,7 @@ Integration with Activiti BPM engine
 Add the following line:
 
 		Integration		
+		ExampleIntegration
 		IntegrationEventNotifications
 		BpmEventNotificationIntegration
 		BusinessProcessNotification
@@ -85,8 +86,9 @@ Add the following lines as new sections:
 
 
 #### Deployment Preparations ####
+# NOTE: all paths here are relative to /opt/kaltura/app
 
- - Reload configuration: `touch cache/base.reload`.
+ - Reload configuration: `touch cache/base.reload` or, on a none production ENV, reload your Apache.
  - Clear cache: `rm -rf cache/*`.
  - Install plugins: `php deployment/base/scripts/installPlugins.php`.
  - Generate clients: `php generator/generate.php`.
@@ -101,9 +103,11 @@ Add the following lines as new sections:
 
 #### Activiti Deployment Instructions ####
 
- - Install [Apache Tomcat 7](http://tomcat.apache.org/tomcat-7.0-doc/setup.html#Unix_daemon "Apache Tomcat 7")
- - Make sure $CATALINA_HOME is defined.
- - Install [Apache Ant](http://ant.apache.org/manual/installlist.html "Apache Ant")
+ - Install Apache Tomcat 7 from your distro's repository, if not available, download from: 
+ [Apache Tomcat 7](http://tomcat.apache.org/tomcat-7.0-doc/setup.html#Unix_daemon "Apache Tomcat 7")
+ - Make sure $CATALINA_HOME is set to your Tomcat basedir.
+ - Install Ant from your distro's repository, if not available, download from: 
+ [Apache Ant](http://ant.apache.org/manual/installlist.html "Apache Ant")
  - Download [Activiti 5.17.0](https://github.com/Activiti/Activiti/releases/download/activiti-5.17.0/activiti-5.17.0.zip "Activiti 5.17.0")
  - Open zip: `unzip activiti-5.17.0.zip`
  - Copy WAR files: `cp activiti-5.17.0/wars/* $CATALINA_HOME/webapps/`
@@ -137,6 +141,7 @@ Add the following lines as new sections:
 	 - Password: kermit
  - Generate java pojo and bpmn clients **(replace tokens)**: `php @APP_DIR@/generator/generate.php pojo,bpmn`
  - Edit deployment configuration file **(replace tokens)**: `cp @WEB_DIR@/content/clientlibs/bpmn/deploy/src/activiti.cfg.template.xml @WEB_DIR@/content/clientlibs/bpmn/deploy/src/activiti.cfg.xml`
+ - Download [XercesImpl JAR] (http://central.maven.org/maven2/xerces/xercesImpl/2.8.1/xercesImpl-2.8.1.jar) and extract contents to @WEB_DIR@/content/clientlibs/bpmn/deploy/src/
  - Deploy processes **(replace tokens)**:
 	 - `cd @WEB_DIR@/content/clientlibs/bpmn`
 	 - `ant`
