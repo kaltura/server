@@ -86,7 +86,7 @@ Add the following lines as new sections:
 
 
 #### Deployment Preparations ####
-# NOTE: all paths here are relative to /opt/kaltura/app
+*NOTE: all paths here are relative to /opt/kaltura/app*
 
  - Reload configuration: `touch cache/base.reload` or, on a none production ENV, reload your Apache.
  - Clear cache: `rm -rf cache/*`.
