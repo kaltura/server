@@ -376,7 +376,7 @@ class requestUtils extends infraRequestUtils
 	{
 		if ( ! is_string($origString) ) // Avoid values like KalturaNullField, for example
 		{
-			return;
+			return $origString;
 		}
 
 		// Zend_Filter_StripTags version
