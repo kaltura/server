@@ -184,7 +184,10 @@ class KalturaErrors extends APIErrors
 	const MAX_NUMBER_OF_ACCESS_CONTROLS_REACHED = "MAX_NUMBER_OF_ACCESS_CONTROLS_REACHED;MAX_NUM;Max number of \"@MAX_NUM@\" access controls was reached";
 
 	const CANNOT_DELETE_DEFAULT_ACCESS_CONTROL = "CANNOT_DELETE_DEFAULT_ACCESS_CONTROL;;Default access control cannot be deleted";
+	
+	const EXCEEDED_ENTRIES_PER_ACCESS_CONTROL_FOR_UPDATE = "EXCEEDED_ENTRIES_PER_ACCESS_CONTROL_FOR_UPDATE;id;exceeded entries per access control id @id@ for update";
 
+	const CANNOT_TRANSFER_ENTRIES_TO_ANOTHER_ACCESS_CONTROL_OBJECT = "CANNOT_TRANSFER_ENTRIES_TO_ANOTHER_ACCESS_CONTROL_OBJECT;;no default access control for current partner";
 	/**
 	 * ConversionProfile Service
 	 */
