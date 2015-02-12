@@ -482,13 +482,6 @@ class entryPeer extends BaseentryPeer
 		return 0;
 	}
 
-	public static function doCriteriaBasedIdsSelect(KalturaCriteria $criteria , $con = null)
-	{
-		$criteria->applyFilters();
-		return $criteria->getFetchedIds();
-	}
-	
-
 /* -------------------- Critera filter functions -------------------- */
 
 
@@ -516,14 +509,21 @@ class entryPeer extends BaseentryPeer
 		$partnerEntitlement = $partner->getDefaultEntitlementEnforcement();
 
 		kEntitlementUtils::initEntitlementEnforcement($partnerId , false);
-		$entryIds = self::doCriteriaBasedIdsSelect($c);
-		$entryCount = count($entryIds);
+		$entries = self::doSelect($c);
+		$entryCount = count($entries);
 
+		if ($entryCount == 0)
+			return;
+		
 		if ($entryCount > 0 && is_null($newAccessControlId))
 			throw new kCoreException("no access control to transfer entries to" , kCoreException::NO_RECIPIENT_ACCESS_CONTROL);
 
 		if ($entryCount > self::ENTRIES_PER_ACCESS_CONTROL_UPDATE_LIMIT)
 			throw new kCoreException("exceeded max entries per access control update limit",kCoreException::EXCEEDED_MAX_ENTRIES_PER_ACCESS_CONTROL_UPDATE_LIMIT);		
+
+		$entryIds = array();
+		foreach($entries as $entry)
+			$entryIds[] = $entry->getId();
 
 		$selectCriteria = new Criteria();
 		$selectCriteria->add(entryPeer::PARTNER_ID, $partnerId);
@@ -536,7 +536,6 @@ class entryPeer extends BaseentryPeer
 
 		BasePeer::doUpdate($selectCriteria, $updateValues, $con);
 
-		$entries = entryPeer::doSelect($selectCriteria);
 		foreach($entries as $entry)
 			kEventsManager::raiseEventDeferred(new kObjectReadyForIndexEvent($entry));
 
