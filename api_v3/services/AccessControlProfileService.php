@@ -42,7 +42,7 @@ class AccessControlProfileService extends KalturaBaseService
 	 */
 	function getAction($id)
 	{
-		$dbAccessControl = accessControlPeer::retrieveByPK($id);
+		$dbAccessControl = accessControlPeer::retrievByPK($id);
 		if (!$dbAccessControl)
 			throw new KalturaAPIException(KalturaErrors::ACCESS_CONTROL_ID_NOT_FOUND, $id);
 			
@@ -92,20 +92,20 @@ class AccessControlProfileService extends KalturaBaseService
 
 		if ($dbAccessControl->getIsDefault())
 			throw new KalturaAPIException(KalturaErrors::CANNOT_DELETE_DEFAULT_ACCESS_CONTROL);
-			
+
+		$dbAccessControl->setDeletedAt(time());
 		try
 		{
-			entryPeer::updateAccessControl($this->getPartnerId(), $id, $this->getPartner()->getDefaultAccessControlId());
+			$dbAccessControl->save();
 		}
 		catch(Exception $e)
 		{
 			$code = $e->getCode();
 			if ($code == kCoreException::EXCEEDED_MAX_ENTRIES_PER_ACCESS_CONTROL_UPDATE_LIMIT)
 				throw new KalturaAPIException(KalturaErrors::EXCEEDED_ENTRIES_PER_ACCESS_CONTROL_FOR_UPDATE, $id);
-		}	
-
-		$dbAccessControl->setDeletedAt(time());
-		$dbAccessControl->save();
+			if ($code == kCoreException::NO_RECIPIENT_ACCESS_CONTROL)
+				throw new KalturaAPIException(KalturaErrors::CANNOT_TRANSFER_ENTRIES_TO_ANOTHER_ACCESS_CONTROL_OBJECT);
+		}
 	}
 	
 	/**

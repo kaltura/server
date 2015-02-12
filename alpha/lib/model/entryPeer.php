@@ -482,12 +482,12 @@ class entryPeer extends BaseentryPeer
 		return 0;
 	}
 
-	public static function doCriteriaBasedCount(KalturaCriteria $criteria , $con = null)
+	public static function doCriteriaBasedIdsSelect(KalturaCriteria $criteria , $con = null)
 	{
 		$criteria->applyFilters();
-		$count = $criteria->getRecordsCount();
-		return $count;
+		return $criteria->getFetchedIds();
 	}
+	
 
 /* -------------------- Critera filter functions -------------------- */
 
@@ -504,7 +504,7 @@ class entryPeer extends BaseentryPeer
 		return true;
 	}
 
-	public static function updateAccessControl($partnerId, $oldAccessControlId, $newAccessControlId)
+	public static function updateAccessControl($partnerId, $oldAccessControlId, $newAccessControlId = null)
 	{
 		$c = KalturaCriteria::create(entryPeer::OM_CLASS);
 
@@ -516,16 +516,18 @@ class entryPeer extends BaseentryPeer
 		$partnerEntitlement = $partner->getDefaultEntitlementEnforcement();
 
 		kEntitlementUtils::initEntitlementEnforcement($partnerId , false);
-		$entryCount = self::doCriteriaBasedCount($c);
-		if ($partnerEntitlement)
-			kEntitlementUtils::initEntitlementEnforcement($partnerId , true);
+		$entryIds = self::doCriteriaBasedIdsSelect($c);
+		$entryCount = count($entryIds);
+
+		if ($entryCount > 0 && is_null($newAccessControlId))
+			throw new kCoreException("no access control to transfer entries to" , kCoreException::NO_RECIPIENT_ACCESS_CONTROL);
 
 		if ($entryCount > self::ENTRIES_PER_ACCESS_CONTROL_UPDATE_LIMIT)
 			throw new kCoreException("exceeded max entries per access control update limit",kCoreException::EXCEEDED_MAX_ENTRIES_PER_ACCESS_CONTROL_UPDATE_LIMIT);		
 
 		$selectCriteria = new Criteria();
 		$selectCriteria->add(entryPeer::PARTNER_ID, $partnerId);
-		$selectCriteria->add(entryPeer::ACCESS_CONTROL_ID, $oldAccessControlId);
+		$selectCriteria->add(entryPeer::ID, $entryIds ,Criteria::IN);
 
 		$updateValues = new Criteria();
 		$updateValues->add(entryPeer::ACCESS_CONTROL_ID, $newAccessControlId);
@@ -533,6 +535,13 @@ class entryPeer extends BaseentryPeer
 		$con = Propel::getConnection(self::DATABASE_NAME);
 
 		BasePeer::doUpdate($selectCriteria, $updateValues, $con);
+
+		$entries = entryPeer::doSelect($selectCriteria);
+		foreach($entries as $entry)
+			kEventsManager::raiseEventDeferred(new kObjectReadyForIndexEvent($entry));
+
+		if ($partnerEntitlement)
+			kEntitlementUtils::initEntitlementEnforcement($partnerId , true);
 	}
 
 	/**
