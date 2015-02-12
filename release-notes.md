@@ -108,6 +108,7 @@ Add the following lines as new sections:
  - Make sure $CATALINA_HOME is set to your Tomcat basedir.
  - Install Ant from your distro's repository, if not available, download from: 
  [Apache Ant](http://ant.apache.org/manual/installlist.html "Apache Ant")
+ - Install the Java compiler [javac]
  - Download [Activiti 5.17.0](https://github.com/Activiti/Activiti/releases/download/activiti-5.17.0/activiti-5.17.0.zip "Activiti 5.17.0")
  - Open zip: `unzip activiti-5.17.0.zip`
  - Copy WAR files: `cp activiti-5.17.0/wars/* $CATALINA_HOME/webapps/`
