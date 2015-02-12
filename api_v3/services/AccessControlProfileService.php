@@ -42,7 +42,7 @@ class AccessControlProfileService extends KalturaBaseService
 	 */
 	function getAction($id)
 	{
-		$dbAccessControl = accessControlPeer::retrievByPK($id);
+		$dbAccessControl = accessControlPeer::retrieveByPK($id);
 		if (!$dbAccessControl)
 			throw new KalturaAPIException(KalturaErrors::ACCESS_CONTROL_ID_NOT_FOUND, $id);
 			
