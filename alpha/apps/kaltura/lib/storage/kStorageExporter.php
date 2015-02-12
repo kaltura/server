@@ -28,8 +28,7 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 	}
 	
 	/* (non-PHPdoc)
-	 * @see kObjectChangedE
-	 * ventConsumer::objectChanged()
+	 * @see kObjectChangedEventConsumer::objectChanged()
 	 */
 	public function objectChanged(BaseObject $object, array $modifiedColumns)
 	{
