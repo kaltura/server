@@ -28,7 +28,8 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 	}
 	
 	/* (non-PHPdoc)
-	 * @see kObjectChangedEventConsumer::objectChanged()
+	 * @see kObjectChangedE
+	 * ventConsumer::objectChanged()
 	 */
 	public function objectChanged(BaseObject $object, array $modifiedColumns)
 	{
@@ -40,17 +41,7 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 			{
 				if($externalStorage->getTrigger() == StorageProfile::STORAGE_TEMP_TRIGGER_MODERATION_APPROVED)
 				{
-					try
-					{
-						self::exportEntry($object, $externalStorage);
-					}
-					catch (kCoreException $e)
-					{
-						if ($e->getCode()==kCoreException::PROFILE_STATUS_DISABLED)
-						{
-							continue;
-						}
-					}
+					self::tryExportEntry($object, $externalStorage);
 				}
 			}
 		}
@@ -123,6 +114,27 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 	 * @param entry $entry
 	 * @param StorageProfile $externalStorage
 	 */
+	public static function tryExportEntry(entry $entry, StorageProfile $externalStorage)
+	{
+		try 
+		{
+			self::exportEntry($entry,$externalStorage);
+			return true;
+		}
+		catch (kCoreException $e)
+		{
+			if ($e->getCode()==kCoreException::PROFILE_STATUS_DISABLED)
+			{
+				KalturaLog::debug("Profile status disabled exportEntry will not be called [{$entry->getId()}]");
+			}
+			return false;
+		}
+	}
+	
+	/**
+	 * @param entry $entry
+	 * @param StorageProfile $externalStorage
+	 */
 	public static function exportEntry(entry $entry, StorageProfile $externalStorage)
 	{
 		if($externalStorage->getStatus()==StorageProfile::STORAGE_STATUS_DISABLED)
@@ -159,7 +171,7 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 			$scope = $profile->getScope();
 			$scope->setEntryId($entry->getId());
 			if($profile->triggerFitsReadyAsset($entry->getId()) && $profile->fulfillsRules($scope))
-				self::exportEntry($entry, $profile);
+				self::tryExportEntry($entry, $profile);
 			else 
 				self::deleteExportedEntry($entry, $profile);
 		}
