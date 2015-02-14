@@ -394,6 +394,7 @@ abstract class LiveEntry extends entry
 			}
 			elseif(count($flavorParamsIds) > 1)
 			{
+				sort($flavorParamsIds);
 				$tag = implode('_', $flavorParamsIds);
 				$queryString[] = 'flavorIds=' . implode(',', $flavorParamsIds);
 				
