@@ -6,7 +6,7 @@
 					<xs:documentation>holding item elements</xs:documentation>
 				</xs:annotation>
 			</xs:element>
-			<xs:element ref="rss-extension" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element ref="rss-extension" minOccurs="0" maxOccurs="unbounded"/>
 		</xs:sequence>
 		<xs:attribute name="version" type="xs:decimal">
 			<xs:annotation>
@@ -38,7 +38,7 @@
 					<xs:documentation>Wrapper element holding multiple item elements</xs:documentation>
 				</xs:annotation>
 			</xs:element>
-			<xs:element ref="channel-extension" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element ref="channel-extension" minOccurs="0" maxOccurs="unbounded"/>
 		</xs:sequence>
 	</xs:complexType>
 	<xs:complexType name="T_items">
@@ -58,7 +58,7 @@
 				</xs:annotation>
 				<xs:simpleType>
 					<xs:restriction base="xs:string">
-						<xs:maxLength value="20" />
+						<xs:maxLength value="20"/>
 					</xs:restriction>
 				</xs:simpleType>
 			</xs:element>
@@ -83,7 +83,7 @@
 				</xs:annotation>
 				<xs:simpleType>
 					<xs:restriction base="xs:string">
-						<xs:maxLength value="60" />
+						<xs:maxLength value="60"/>
 					</xs:restriction>
 				</xs:simpleType>
 			</xs:element>
@@ -113,7 +113,7 @@
 				</xs:annotation>
 				<xs:simpleType>
 					<xs:restriction base="xs:string">
-						<xs:maxLength value="60" />
+						<xs:maxLength value="60"/>
 					</xs:restriction>
 				</xs:simpleType>
 			</xs:element>
@@ -132,7 +132,7 @@
 					<xs:documentation>Entry thumbnail URL</xs:documentation>
 				</xs:annotation>
 				<xs:complexType>
-					<xs:attribute name="url" type="xs:string" />
+					<xs:attribute name="url" type="xs:string"/>
 				</xs:complexType>
 			</xs:element>
 			<xs:element ref="tags" minOccurs="0" maxOccurs="1">
@@ -140,7 +140,7 @@
 					<xs:documentation>Entry searchable keywords</xs:documentation>
 				</xs:annotation>
 			</xs:element>
-			<xs:element ref="category" minOccurs="0" maxOccurs="1">
+			<xs:element ref="category" minOccurs="0" maxOccurs="5">
 				<xs:annotation>
 					<xs:documentation>Entry assigned categories</xs:documentation>
 				</xs:annotation>
@@ -198,7 +198,7 @@
 					</xs:annotation>
 				</xs:element>
 			</xs:choice>
-			<xs:element ref="item-extension" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element ref="item-extension" minOccurs="0" maxOccurs="unbounded"/>
 			<xs:element ref="player" minOccurs="0" maxOccurs="1">
 				<xs:annotation>
 					<xs:documentation>Embeded player</xs:documentation>
@@ -223,64 +223,19 @@
 					<xs:documentation>Comma seperated ids of flavor params that have ready flavor asset assign to the entry</xs:documentation>
 				</xs:annotation>
 			</xs:element>
-			<xs:element ref="media-extension" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="plays" minOccurs="0" maxOccurs="1" type="xs:int">
+				<xs:annotation>
+					<xs:documentation>Entry plays count in the remote site</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="views" minOccurs="0" maxOccurs="1" type="xs:int">
+				<xs:annotation>
+					<xs:documentation>Entry views count in the remote site</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element ref="media-extension" minOccurs="0" maxOccurs="unbounded"/>
 		</xs:sequence>
 	</xs:complexType>
-
-	<!-- Not yet supported <xs:complexType name="T_mix"> <xs:sequence> <xs:element 
-		name="editorType" minOccurs="1" maxOccurs="1" type="KalturaEditorType"/> 
-		<xs:element name="dataContent" minOccurs="0" maxOccurs="1"> <xs:annotation> 
-		<xs:documentation> The xml data of the mix </xs:documentation> </xs:annotation> 
-		<xs:complexType> <xs:sequence> <xs:any processContents="skip"/> </xs:sequence> 
-		</xs:complexType> </xs:element> <xs:element ref="mix-extension" minOccurs="0" 
-		maxOccurs="unbounded"/> </xs:sequence> </xs:complexType> -->
-
-	<!-- Not yet supported <xs:complexType name="T_playlist"> <xs:sequence> 
-		<xs:element name="playlistType" minOccurs="1" maxOccurs="1" type="KalturaPlaylistType"/> 
-		<xs:element name="playlistContent" minOccurs="0" maxOccurs="1"> <xs:annotation> 
-		<xs:documentation> Content of the playlist - - XML if the playlistType is 
-		dynamic - Text if the playlistType is static - URL if the playlistType is 
-		mRss </xs:documentation> </xs:annotation> </xs:element> <xs:element ref="playlist-extension" 
-		minOccurs="0" maxOccurs="unbounded"/> </xs:sequence> </xs:complexType> -->
-
-	<!-- Not yet supported <xs:complexType name="T_data"> <xs:sequence> <xs:element 
-		name="dataContent" minOccurs="0" maxOccurs="1" type="xs:string"/> <xs:element 
-		name="retrieveDataContentByGet" minOccurs="0" maxOccurs="1" type="xs:boolean"/> 
-		<xs:element ref="data-extension" minOccurs="0" maxOccurs="unbounded"/> </xs:sequence> 
-		</xs:complexType> -->
-
-	<!-- Not yet supported <xs:complexType name="T_liveStream"> <xs:complexContent> 
-		<xs:extension base="T_media"> <xs:sequence> <xs:element ref="bitrates" minOccurs="0" 
-		maxOccurs="1"/> <xs:element name="encodingIP1" minOccurs="1" maxOccurs="1"/> 
-		<xs:element name="encodingIP2" minOccurs="0" maxOccurs="1"/> <xs:element 
-		name="streamPassword" minOccurs="0" maxOccurs="1"/> <xs:element ref="liveStream-extension" 
-		minOccurs="0" maxOccurs="unbounded"/> </xs:sequence> </xs:extension> </xs:complexContent> 
-		</xs:complexType> -->
-
-	<!-- Not yet supported <xs:complexType name="T_playlists"> <xs:sequence> 
-		<xs:element name="playlist" minOccurs="1" maxOccurs="unbounded"> <xs:complexType> 
-		<xs:sequence> <xs:element name="action" minOccurs="0" maxOccurs="1"> <xs:simpleType> 
-		<xs:restriction base="xs:string"> <xs:enumeration value="new"/> <xs:enumeration 
-		value="add"/> <xs:enumeration value="remove"/> </xs:restriction> </xs:simpleType> 
-		</xs:element> <xs:element name="name" minOccurs="0" maxOccurs="1"> <xs:simpleType> 
-		<xs:restriction base="xs:string"> <xs:maxLength value="60"/> </xs:restriction> 
-		</xs:simpleType> </xs:element> </xs:sequence> <xs:attribute name="playlistId" 
-		use="optional"> <xs:simpleType> <xs:restriction base="xs:string"> <xs:maxLength 
-		value="20"/> </xs:restriction> </xs:simpleType> </xs:attribute> </xs:complexType> 
-		</xs:element> </xs:sequence> </xs:complexType> -->
-
-	<!-- Not yet supported <xs:complexType name="T_bitrate">
-			<xs:attribute name="bitrate" use="required" type="xs:int" />
-			<xs:attribute name="width" use="required" type="xs:int" />
-			<xs:attribute name="height" use="required" type="xs:int" />
-		</xs:complexType>
-		<xs:complexType name="T_bitrates">
-			<xs:sequence>
-				<xs:element ref="bitrate" minOccurs="1" maxOccurs="3" />
-			</xs:sequence>
-		</xs:complexType>
-	-->
-
 	<xs:complexType name="T_content">
 		<xs:sequence>
 			<xs:element ref="tags" minOccurs="0" maxOccurs="1">
@@ -288,7 +243,7 @@
 					<xs:documentation>Specifies specific tags you want to set for the flavor asset</xs:documentation>
 				</xs:annotation>
 			</xs:element>
-			<xs:element ref="content-extension" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element ref="content-extension" minOccurs="0" maxOccurs="unbounded"/>
 		</xs:sequence>
 		<xs:attribute name="url" type="xs:string" use="required">
 			<xs:annotation>
@@ -315,6 +270,11 @@
 				<xs:documentation>Flavor asset file extension</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
+		<xs:attribute name="createdAt" type="xs:string" use="required">
+			<xs:annotation>
+				<xs:documentation>Creation date</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
 		<xs:attribute name="isSource" type="xs:boolean" use="required">
 			<xs:annotation>
 				<xs:documentation>Is the source flavor asset</xs:documentation>
@@ -328,6 +288,11 @@
 		<xs:attribute name="width" type="xs:int" use="optional">
 			<xs:annotation>
 				<xs:documentation>Flavor width</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="fileSize" type="xs:int" use="optional">
+			<xs:annotation>
+				<xs:documentation>Flavor file size</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
 		<xs:attribute name="videoBitrate" type="xs:int" use="optional">
@@ -381,7 +346,12 @@
 					<xs:documentation>Entry searchable keywords</xs:documentation>
 				</xs:annotation>
 			</xs:element>
-			<xs:element ref="thumbnail-extension" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element ref="tags" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>Entry searchable keywords</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element ref="thumbnail-extension" minOccurs="0" maxOccurs="unbounded"/>
 		</xs:sequence>
 		<xs:attribute name="url" type="xs:string" use="required">
 			<xs:annotation>
@@ -396,6 +366,11 @@
 		<xs:attribute name="format" type="xs:string" use="required">
 			<xs:annotation>
 				<xs:documentation>Format of the thumbnail asset file</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="extension" type="xs:string" use="required">
+			<xs:annotation>
+				<xs:documentation>Extension of the thumbnail asset file</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
 		<xs:attribute name="isDefault" type="xs:boolean" use="required">
@@ -413,6 +388,16 @@
 				<xs:documentation>Thumbnail width</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
+		<xs:attribute name="fileSize" type="xs:int" use="required">
+			<xs:annotation>
+				<xs:documentation>Thumbnail file size</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="createdAt" type="xs:string" use="required">
+			<xs:annotation>
+				<xs:documentation>Creation date</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
 		<xs:attribute name="thumbParamsId" type="xs:int" use="optional">
 			<xs:annotation>
 				<xs:documentation>ID of thumbnail params that associated with the thumbnail</xs:documentation>
@@ -421,7 +406,7 @@
 	</xs:complexType>
 	<xs:complexType name="T_player">
 		<xs:sequence>
-			<xs:element ref="player-extension" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element ref="player-extension" minOccurs="0" maxOccurs="unbounded"/>
 		</xs:sequence>
 		<xs:attribute name="url" type="xs:string" use="required">
 			<xs:annotation>
@@ -561,10 +546,6 @@
 			</xs:appinfo>
 		</xs:annotation>
 	</xs:element>
-	<!-- Not yet supported <xs:element name="mix" type="T_mix"/> <xs:element 
-		name="playlist" type="T_playlist"/> <xs:element name="data" type="T_data"/> 
-		<xs:element name="liveStream" type="T_liveStream"/> <xs:element name="playlists" 
-		type="T_playlists"/> -->
 	<xs:element name="content" type="T_content">
 		<xs:annotation>
 			<xs:documentation>Flavor asset element</xs:documentation>
@@ -575,22 +556,7 @@
 						<media>
 							<mediaType>1</mediaType>
 						</media>
-						<content	url="http://kaltura.domain/path/my_flavor_asset.flv"
-									isSource="true" 
-									containerFormat="flash video" 
-									extension="flv" 
-									assetId="{flavor asset id}"
-									flavorParamsId="0"
-									flavorParamsName="Source" 
-									format="" 
-									videoBitrate="0" 
-									videoCodec="" 
-									audioBitrate="0" 
-									audioCodec="" 
-									frameRate="0" 
-									height="0" 
-									width="0"
-						>
+						<content url="http://kaltura.domain/path/my_flavor_asset.flv" isSource="true" containerFormat="flash video" extension="flv" assetId="{flavor asset id}" flavorParamsId="0" flavorParamsName="Source" format="" videoBitrate="0" videoCodec="" audioBitrate="0" audioCodec="" frameRate="0" height="0" width="0">
 							<tags>
 								<tag>example</tag>
 								<tag>my_tag</tag>
@@ -611,13 +577,7 @@
 						<media>
 							<mediaType>1</mediaType>
 						</media>
-						<thumbnail	url="http://kaltura.domain/path/my_thumbnail_asset.flv" 
-									thumbAssetId="{thumb asset id}" 
-									isDefault="false" 
-									format="" 
-									height="120" 
-									width="120"
-						>
+						<thumbnail url="http://kaltura.domain/path/my_thumbnail_asset.flv" thumbAssetId="{thumb asset id}" isDefault="false" format="" height="120" width="120">
 							<tags>
 								<tag>example</tag>
 								<tag>my_tag</tag>
@@ -638,16 +598,12 @@
 						<media>
 							<mediaType>1</mediaType>
 						</media>
-						<player	url="http://kaltura.domain/path/my_player_widget.swf"/>
+						<player url="http://kaltura.domain/path/my_player_widget.swf"/>
 					</item>
 				</example>
 			</xs:appinfo>
 		</xs:annotation>
 	</xs:element>
-	<!--  
-	<xs:element name="bitrate" type="T_bitrate" />
-	<xs:element name="bitrates" type="T_bitrates" />
-	-->
 	<xs:element name="tags" type="T_tags">
 		<xs:annotation>
 			<xs:documentation>Free text tags</xs:documentation>
@@ -658,16 +614,1064 @@
 			<xs:documentation>Category assignments for entries</xs:documentation>
 		</xs:annotation>
 	</xs:element>
+	<xs:element name="rss-extension"/>
+	<xs:element name="channel-extension"/>
+	<xs:element name="item-extension"/>
+	<xs:element name="media-extension"/>
+	<xs:element name="mix-extension"/>
+	<xs:element name="playlist-extension"/>
+	<xs:element name="data-extension"/>
+	<xs:element name="liveStream-extension"/>
+	<xs:element name="content-extension"/>
+	<xs:element name="thumbnail-extension"/>
+	<xs:element name="player-extension"/>
+		
+	<!-- metadata -->
 	
-	<xs:element name="rss-extension" />
-	<xs:element name="channel-extension" />
-	<xs:element name="item-extension" />
-	<xs:element name="media-extension" />
-	<xs:element name="mix-extension" />
-	<xs:element name="playlist-extension" />
-	<xs:element name="data-extension" />
-	<xs:element name="liveStream-extension" />
-	<xs:element name="content-extension" />
-	<xs:element name="thumbnail-extension" />
-	<xs:element name="player-extension" />
+	<xs:complexType name="T_customData">
+		<xs:sequence>
+			<xs:any namespace="##local" processContents="skip" minOccurs="1" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>Custom metadata XML according to schema profile</xs:documentation>
+				</xs:annotation>
+			</xs:any>
+		</xs:sequence>
+		
+		<xs:attribute name="metadataId" use="required" type="xs:int">
+			<xs:annotation>
+				<xs:documentation>Id of the custom metadata object</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="metadataVersion" use="required" type="xs:int">
+			<xs:annotation>
+				<xs:documentation>Version of the custom metadata object</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="metadataProfile" use="optional" type="xs:string">
+			<xs:annotation>
+				<xs:documentation>Custom metadata schema profile system name</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="metadataProfileId" use="required" type="xs:int">
+			<xs:annotation>
+				<xs:documentation>Custom metadata schema profile id</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="metadataProfileName" use="optional" type="xs:string">
+			<xs:annotation>
+				<xs:documentation>Custom metadata schema profile name</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="metadataProfileVersion" use="required" type="xs:int">
+			<xs:annotation>
+				<xs:documentation>Custom metadata schema profile version</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		
+	</xs:complexType>
+	
+	<xs:element name="customData" type="T_customData" substitutionGroup="item-extension">
+		<xs:annotation>
+			<xs:documentation>Custom metadata XML</xs:documentation>
+			<xs:appinfo>
+				<example>
+					<customData	metadataId="{metadata id}"
+								metadataVersion="1"
+								metadataProfile="MY_METADATA_PROFILE_SYSTEM_NAME}"
+								metadataProfileId="{metadata profile id}"
+								metadataProfileName="my metadata profile"
+								metadataProfileVersion="1"
+					>
+						<metadata>
+							<Text1>text test</Text1>
+							<TextMulti>test one</TextMulti>
+							<TextMulti>test two</TextMulti>
+							<List1>bbb</List1>
+							<Entry>0_5b3t2c8z</Entry>
+						</metadata>
+					</customData>
+				</example>
+			</xs:appinfo>
+		</xs:annotation>
+	</xs:element>
+				
+		
+	<!-- adCuePoint -->
+		
+	<xs:complexType name="T_scene_adCuePoint">
+		<xs:complexContent>
+			<xs:extension base="T_scene">
+				<xs:sequence>
+					<xs:element name="sceneEndTime" minOccurs="0" maxOccurs="1" type="xs:time">
+						<xs:annotation>
+							<xs:documentation>Cue point end time</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="sceneTitle" minOccurs="0" maxOccurs="1">
+						<xs:annotation>
+							<xs:documentation>Textual title</xs:documentation>
+						</xs:annotation>
+						<xs:simpleType>
+							<xs:restriction base="xs:string">
+								<xs:maxLength value="250"/>
+							</xs:restriction>
+						</xs:simpleType>
+					</xs:element>
+					<xs:element name="sourceUrl" minOccurs="0" maxOccurs="1" type="xs:string">
+						<xs:annotation>
+							<xs:documentation>The URL of the ad XML</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="adType" minOccurs="1" maxOccurs="1" type="KalturaAdType">
+						<xs:annotation>
+							<xs:documentation>Indicates the ad type</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="protocolType" minOccurs="1" maxOccurs="1" type="KalturaAdProtocolType">
+						<xs:annotation>
+							<xs:documentation>Indicates the ad protocol type</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					
+					<xs:element ref="scene-extension" minOccurs="0" maxOccurs="unbounded" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	
+	<xs:element name="scene-ad-cue-point" type="T_scene_adCuePoint" substitutionGroup="scene">
+		<xs:annotation>
+			<xs:documentation>Single ad cue point element</xs:documentation>
+			<xs:appinfo>
+				<example>
+					<scene-ad-cue-point sceneId="{scene id}" entryId="{entry id}" systemName="MY_AD_CUE_POINT_SYSTEM_NAME">
+						<sceneStartTime>00:00:05</sceneStartTime>
+						<tags>
+							<tag>sample</tag>
+							<tag>my_tag</tag>
+						</tags>
+						<sceneTitle>my ad title</sceneTitle>
+						<sourceUrl>http://source.to.my/ad.xml</sourceUrl>
+						<adType>1</adType>
+						<protocolType>1</protocolType>
+					</scene-ad-cue-point>
+				</example>
+			</xs:appinfo>
+		</xs:annotation>
+	</xs:element>
+		
+		
+	<!-- annotation -->
+	
+	<xs:complexType name="T_scene_annotation">
+		<xs:complexContent>
+			<xs:extension base="T_scene">
+				<xs:sequence>
+					<xs:element name="sceneEndTime" minOccurs="1" maxOccurs="1" type="xs:time">
+						<xs:annotation>
+							<xs:documentation>Cue point end time</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="sceneText" minOccurs="0" maxOccurs="1" type="xs:string">
+						<xs:annotation>
+							<xs:documentation>Free text description</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="parent" minOccurs="0" maxOccurs="1">
+						<xs:annotation>
+							<xs:documentation>System name of the parent annotation</xs:documentation>
+						</xs:annotation>
+						<xs:simpleType>
+							<xs:restriction base="xs:string">
+								<xs:maxLength value="120"/>
+							</xs:restriction>
+						</xs:simpleType>
+					</xs:element>
+					<xs:element name="parentId" minOccurs="0" maxOccurs="1">
+						<xs:annotation>
+							<xs:documentation>ID of the parent annotation</xs:documentation>
+						</xs:annotation>
+						<xs:simpleType>
+							<xs:restriction base="xs:string">
+								<xs:maxLength value="250"/>
+							</xs:restriction>
+						</xs:simpleType>
+					</xs:element>
+					
+					<xs:element ref="scene-extension" minOccurs="0" maxOccurs="unbounded" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	
+	<xs:element name="scene-annotation" type="T_scene_annotation" substitutionGroup="scene">
+		<xs:annotation>
+			<xs:documentation>Single annotation element</xs:documentation>
+			<xs:appinfo>
+				<example>
+					<scene-annotation sceneId="{scene id}" entryId="{entry id}">
+						<sceneStartTime>00:00:05.3</sceneStartTime>
+						<tags>
+							<tag>sample</tag>
+							<tag>my_tag</tag>
+						</tags>
+						<sceneEndTime>00:00:10</sceneEndTime>
+						<sceneText>my annotation</sceneText>
+					</scene-annotation>
+				</example>
+			</xs:appinfo>
+		</xs:annotation>
+	</xs:element>
+			
+		
+	<!-- attachment -->
+			
+	<xs:complexType name="T_attachment">
+		<xs:sequence>
+			<xs:element name="tags" minOccurs="1" maxOccurs="1" type="T_tags">
+				<xs:annotation>
+					<xs:documentation>Specifies specific tags you want to set for the flavor asset</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="filename" minOccurs="0" maxOccurs="1" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>Attachment asset file name</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="title" minOccurs="0" maxOccurs="1" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>Attachment asset title</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="description" minOccurs="0" maxOccurs="1" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>Attachment asset free text description</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element ref="attachment-extension" minOccurs="0" maxOccurs="unbounded" />
+		</xs:sequence>
+		
+		<xs:attribute name="attachmentAssetId" type="xs:string" use="optional">
+			<xs:annotation>
+				<xs:documentation>The asset unique id</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="format" type="KalturaAttachmentType" use="optional">
+			<xs:annotation>
+				<xs:documentation>Attachment asset file format</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="url" type="xs:string" use="optional">
+			<xs:annotation>
+				<xs:documentation>Attachment asset file download URL</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+						
+	</xs:complexType>
+	
+	<xs:element name="attachment-extension" />
+	<xs:element name="attachment" type="T_attachment" substitutionGroup="item-extension">
+		<xs:annotation>
+			<xs:documentation>Attachment asset element</xs:documentation>
+			<xs:appinfo>
+				<example>
+					<attachment url="http://kaltura.domain/path/to/attachment/asset/file.txt" attachmentAssetId="{attachment asset id}" format="1">
+						<tags>
+							<tag>example</tag>
+							<tag>my_tag</tag>
+						</tags>
+						<filename>my_file_name.txt</filename>
+						<title>my attachment asset title</title>
+						<description>my attachment asset free text description</description>
+					</attachment>
+				</example>
+			</xs:appinfo>
+		</xs:annotation>
+	</xs:element>
+			
+		
+	<!-- caption -->
+			
+	<xs:complexType name="T_subTitle">
+		<xs:sequence>
+			<xs:element name="tags" minOccurs="1" maxOccurs="1" type="T_tags">
+				<xs:annotation>
+					<xs:documentation>Specifies specific tags you want to set for the flavor asset</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element ref="subtitle-extension" minOccurs="0" maxOccurs="unbounded" />
+		</xs:sequence>
+		
+		<xs:attribute name="captionParamsId" type="xs:int" use="optional">
+			<xs:annotation>
+				<xs:documentation>ID of caption params that associated with the caption asset</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="captionParams" type="xs:string" use="optional">
+			<xs:annotation>
+				<xs:documentation>System name of caption params that associated with the caption asset</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="captionAssetId" type="xs:string" use="optional">
+			<xs:annotation>
+				<xs:documentation>Caption asset unique id</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="isDefault" type="xs:boolean" use="optional">
+			<xs:annotation>
+				<xs:documentation>Indicates if the caption asset is the entry default caption asset</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="format" type="KalturaCaptionType" use="optional">
+			<xs:annotation>
+				<xs:documentation>Caption asset file format</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="lang" type="KalturaLanguage" use="optional">
+			<xs:annotation>
+				<xs:documentation>Caption asset file language</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="href" type="xs:string" use="optional">
+			<xs:annotation>
+				<xs:documentation>Caption asset file download URL</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+						
+	</xs:complexType>
+	
+	<xs:element name="subtitle-extension" />
+	<xs:element name="subTitle" type="T_subTitle" substitutionGroup="item-extension">
+		<xs:annotation>
+			<xs:documentation>Caption asset element</xs:documentation>
+			<xs:appinfo>
+				<example>
+					<subTitle href="http://kaltura.domain/path/caption_file.srt" captionAssetId="{caption_asset_id}" isDefault="true" format="2" lang="Hebrew">
+						<tags>
+							<tag>example</tag>
+							<tag>my_tag</tag>
+						</tags>
+					</subTitle>
+				</example>
+			</xs:appinfo>
+		</xs:annotation>
+	</xs:element>
+		
+		
+	<!-- codeCuePoint -->
+	
+	<xs:complexType name="T_scene_codeCuePoint">
+		<xs:complexContent>
+			<xs:extension base="T_scene">
+				<xs:sequence>
+					<xs:element name="sceneEndTime" minOccurs="0" maxOccurs="1" type="xs:time">
+						<xs:annotation>
+							<xs:documentation>Cue point end time</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="code" minOccurs="0" maxOccurs="1">
+						<xs:annotation>
+							<xs:documentation>Textual code</xs:documentation>
+						</xs:annotation>
+						<xs:simpleType>
+							<xs:restriction base="xs:string">
+								<xs:maxLength value="250"/>
+							</xs:restriction>
+						</xs:simpleType>
+					</xs:element>
+					<xs:element name="description" minOccurs="0" maxOccurs="1" type="xs:string">
+						<xs:annotation>
+							<xs:documentation>Free text description</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+	
+					<xs:element ref="scene-extension" minOccurs="0" maxOccurs="unbounded" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	
+	<xs:element name="scene-code-cue-point" type="T_scene_codeCuePoint" substitutionGroup="scene">
+		<xs:annotation>
+			<xs:documentation>Single code cue point element</xs:documentation>
+			<xs:appinfo>
+				<example>
+					<scene-code-cue-point sceneId="{scene id}" entryId="{entry id}">
+						<sceneStartTime>00:00:05.3</sceneStartTime>
+						<tags>
+							<tag>sample</tag>
+							<tag>my_tag</tag>
+						</tags>
+						<code>MY_CODE</code>
+						<description>my code cue point description</description>
+					</scene-code-cue-point>
+				</example>
+			</xs:appinfo>
+		</xs:annotation>
+	</xs:element>
+		
+		
+	<!-- thumbCuePoint -->
+	
+	<xs:complexType name="T_scene_thumbCuePoint">
+		<xs:complexContent>
+			<xs:extension base="T_scene">
+				<xs:sequence>
+					<xs:element name="title" minOccurs="1" maxOccurs="1" type="xs:string"> </xs:element>
+					<xs:element name="description" minOccurs="1" maxOccurs="1" type="xs:string"> </xs:element>
+					<xs:element name="subType" minOccurs="0" maxOccurs="1" type="KalturaThumbCuePointSubType">
+						<xs:annotation>
+							<xs:documentation>Indicates the thumb cue point sub type 1 = Slide 2 = Chapter</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element ref="scene-extension" minOccurs="0" maxOccurs="unbounded" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:element name="scene-thumb-cue-point" type="T_scene_thumbCuePoint" substitutionGroup="scene">
+		<xs:annotation>
+			<xs:documentation>Single thumb cue point element</xs:documentation>
+			<xs:appinfo>
+				<example>
+					<scene-thumb-cue-point sceneId="{scene id}" entryId="{entry id}">
+						<sceneStartTime>00:00:05.3</sceneStartTime>
+						<tags>
+							<tag>my_tag</tag>
+						</tags>
+					</scene-thumb-cue-point>
+				</example>
+			</xs:appinfo>
+		</xs:annotation>
+	</xs:element>
+
+	<!-- contentDistribution -->
+	
+	<xs:complexType name="T_distribution">
+		<xs:sequence>
+			<xs:element name="remoteId" minOccurs="0" maxOccurs="1" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>Unique id in the remote site</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="sunrise" minOccurs="0" maxOccurs="1" type="xs:int">
+				<xs:annotation>
+					<xs:documentation>Time that the entry will become available in the remote site</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="sunset" minOccurs="0" maxOccurs="1" type="xs:int">
+				<xs:annotation>
+					<xs:documentation>Time that the entry will become unavailable in the remote site</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="flavorAssetIds" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>Ids of flavor assets to be submitted to the remote site</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="flavorAssetId" minOccurs="0" maxOccurs="unbounded" type="xs:string" />
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="thumbAssetIds" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>Ids of thumbnail assets to be submitted to the remote site</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="thumbAssetId" minOccurs="0" maxOccurs="unbounded" type="xs:string" />
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="assetIds" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>Ids of assets to be submitted to the remote site</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="assetId" minOccurs="0" maxOccurs="unbounded" type="xs:string" />
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="errorDescription" minOccurs="0" maxOccurs="1" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>Submission error description</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="createdAt" minOccurs="1" maxOccurs="1" type="xs:dateTime">
+				<xs:annotation>
+					<xs:documentation>Entry distribution creation date</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="updatedAt" minOccurs="1" maxOccurs="1" type="xs:dateTime">
+				<xs:annotation>
+					<xs:documentation>Entry distribution last update date</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="submittedAt" minOccurs="0" maxOccurs="1" type="xs:dateTime">
+				<xs:annotation>
+					<xs:documentation>Entry distribution submission date</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="lastReport" minOccurs="0" maxOccurs="1" type="xs:dateTime">
+				<xs:annotation>
+					<xs:documentation>Entry distribution last report date</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="dirtyStatus" minOccurs="0" maxOccurs="1" type="KalturaEntryDistributionFlag">
+				<xs:annotation>
+					<xs:documentation>Indicates that there are future action to be submitted</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="status" minOccurs="1" maxOccurs="1" type="KalturaEntryDistributionStatus">
+				<xs:annotation>
+					<xs:documentation>Entry distribution status</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="sunStatus" minOccurs="1" maxOccurs="1" type="KalturaEntryDistributionSunStatus">
+				<xs:annotation>
+					<xs:documentation>Entry distribution availability status</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="plays" minOccurs="0" maxOccurs="1" type="xs:int">
+				<xs:annotation>
+					<xs:documentation>Entry plays count in the remote site</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="views" minOccurs="0" maxOccurs="1" type="xs:int">
+				<xs:annotation>
+					<xs:documentation>Entry views count in the remote site</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="errorNumber" minOccurs="0" maxOccurs="1" type="xs:int">
+				<xs:annotation>
+					<xs:documentation>Submission error number</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="errorType" minOccurs="0" maxOccurs="1" type="KalturaBatchJobErrorTypes">
+				<xs:annotation>
+					<xs:documentation>Submission error type</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		
+			<xs:element ref="distribution-extension" minOccurs="0" maxOccurs="unbounded" />
+			
+		</xs:sequence>
+		
+		<xs:attribute name="entryDistributionId" use="required" type="xs:int">
+			<xs:annotation>
+				<xs:documentation>Entry distribution unique id</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="provider" use="optional" type="xs:string">
+			<xs:annotation>
+				<xs:documentation>Entry distribution provider</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="distributionProviderId" use="optional" type="xs:int">
+			<xs:annotation>
+				<xs:documentation>Entry distribution provider id<br/>relevant to generic providers</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="feedId" use="optional" type="xs:string">
+			<xs:annotation>
+				<xs:documentation>Entry distribution feed id<br/>relevant to syndicated providers</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="distributionProfileId" use="required" type="xs:int">
+			<xs:annotation>
+				<xs:documentation>Entry distribution profile id</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="distributionProfile" use="optional" type="xs:string">
+			<xs:annotation>
+				<xs:documentation>Entry distribution profile system name</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="distributionProfileName" use="optional" type="xs:string">
+			<xs:annotation>
+				<xs:documentation>Entry distribution profile name</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		
+	</xs:complexType>
+	
+	<xs:element name="distribution" type="T_distribution" substitutionGroup="item-extension">
+		<xs:annotation>
+			<xs:documentation>Entry distribution element</xs:documentation>
+			<xs:appinfo>
+				<example>
+					<distribution	entryDistributionId="{entry distribution id}" 
+									distributionProfileId="{distribution profile id}" 
+									distributionProfileName="My Profile"
+					>
+						<remoteId>{remote site id}</remoteId>
+						<sunrise>1305636600</sunrise>
+						<sunset>1305640200</sunset>
+						<flavorAssetIds>
+							<flavorAssetId>0_bp1qzu1d</flavorAssetId>
+							<flavorAssetId>0_bp1qzfsd</flavorAssetId>
+						</flavorAssetIds>
+						<thumbAssetIds>
+							<thumbAssetId>0_di94zu1d</thumbAssetId>
+							<thumbAssetId>0_di940sde</thumbAssetId>
+						</thumbAssetIds>
+						<errorDescription>Error: No metadata objects found</errorDescription>
+						<createdAt>2011-05-17T07:46:20</createdAt>
+						<updatedAt>2011-06-09T09:23:46</updatedAt>
+						<submittedAt>2011-05-17T08:03:00</submittedAt>
+						<dirtyStatus>3</dirtyStatus>
+						<status>8</status>
+						<sunStatus>3</sunStatus>
+						<errorType>1</errorType>
+					</distribution>
+				</example>
+			</xs:appinfo>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="distribution-extension" />
+		
+		
+	<!-- cuePoint -->
+	
+	<xs:complexType name="T_scenes">
+		<xs:sequence>
+			<xs:element ref="scene" minOccurs="1" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>Cue point element</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>	
+	
+	<xs:complexType name="T_scene" abstract="true">
+		<xs:sequence>
+			<xs:element name="sceneStartTime" minOccurs="1" maxOccurs="1" type="xs:time">
+				<xs:annotation>
+					<xs:documentation>Cue point start time</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="createdAt" minOccurs="1" maxOccurs="1" type="xs:dateTime">
+				<xs:annotation>
+					<xs:documentation>Cue point creation date</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="updatedAt" minOccurs="1" maxOccurs="1" type="xs:dateTime">
+				<xs:annotation>
+					<xs:documentation>Cue point last update date</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="userId" minOccurs="0" maxOccurs="1" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>Cue point owner user id</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element ref="tags" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>Cue point searchable keywords</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+		
+		<xs:attribute name="sceneId" use="required">
+			<xs:annotation>
+				<xs:documentation>ID of cue point to apply update/delete action on</xs:documentation>
+			</xs:annotation>
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:maxLength value="250"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="systemName" use="optional">
+			<xs:annotation>
+				<xs:documentation>System name of cue point to apply update/delete action on</xs:documentation>
+			</xs:annotation>
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:maxLength value="120"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		
+	</xs:complexType>
+	
+	<xs:element name="scenes" type="T_scenes" substitutionGroup="item-extension">
+		<xs:annotation>
+			<xs:documentation>Cue points wrapper</xs:documentation>
+			<xs:appinfo>
+				<example>
+					<scenes>
+						<scene-ad-cue-point entryId="{entry id}" systemName="MY_AD_CUE_POINT_SYSTEM_NAME">...</scene-ad-cue-point>
+						<scene-annotation entryId="{entry id}" systemName="MY_ANNOTATION_PARENT_SYSTEM_NAME">...</scene-annotation>
+						<scene-annotation entryId="{entry id}">...</scene-annotation>
+						<scene-code-cue-point entryId="{entry id}">...</scene-code-cue-point>
+						<scene-thumb-cue-point entryId="{entry id}">...</scene-thumb-cue-point>
+					</scenes>
+				</example>
+			</xs:appinfo>
+		</xs:annotation>
+	</xs:element>
+	
+	<xs:element name="scene" type="T_scene">
+		<xs:annotation>
+			<xs:documentation>
+				Base cue point element<br/>
+				Is abstract and cannot be used<br/>
+				Use the extended elements only
+			</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	
+	<xs:element name="scene-extension" />
+		
+		
+	<!-- cuePointMetadata -->
+	
+	<xs:element name="scene-customData" type="T_customData" substitutionGroup="scene-extension">
+		<xs:annotation>
+			<xs:documentation>XML for custom metadata</xs:documentation>
+			<xs:appinfo>
+				<example>
+					<scene-ad-cue-point entryId="{entry id}">
+						<sceneStartTime>00:00:05</sceneStartTime>
+						<sceneTitle>my ad title</sceneTitle>
+						<sourceUrl>http://source.to.my/ad.xml</sourceUrl>
+						<adType>1</adType>
+						<protocolType>1</protocolType>
+						<scene-customData metadataProfile="MY_AD_METADATA_PROFILE_SYSTEM_NAME">
+							<metadata>
+								<adData>my ad custom data</adData>
+							</metadata>
+						</scene-customData>
+					</scene-ad-cue-point>
+				</example>
+			</xs:appinfo>
+		</xs:annotation>
+	</xs:element>
+			
+	<!-- Kaltura enum types -->
+	
+	<xs:simpleType name="KalturaEntryType">
+		<xs:annotation><xs:documentation>http://www.kaltura.com/api_v3/testmeDoc/index.php?object=KalturaEntryType</xs:documentation></xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="-1"><xs:annotation><xs:documentation>AUTOMATIC</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="1"><xs:annotation><xs:documentation>MEDIA_CLIP</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="2"><xs:annotation><xs:documentation>MIX</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="5"><xs:annotation><xs:documentation>PLAYLIST</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="6"><xs:annotation><xs:documentation>DATA</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="7"><xs:annotation><xs:documentation>LIVE_STREAM</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="8"><xs:annotation><xs:documentation>LIVE_CHANNEL</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="10"><xs:annotation><xs:documentation>DOCUMENT</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="externalMedia.externalMedia"><xs:annotation><xs:documentation>EXTERNAL_MEDIA</xs:documentation></xs:annotation></xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+			
+	<xs:simpleType name="KalturaDynamicEnum">
+		<xs:annotation><xs:documentation>http://www.kaltura.com/api_v3/testmeDoc/index.php?object=KalturaDynamicEnum</xs:documentation></xs:annotation>
+		<xs:restriction base="xs:string">
+		</xs:restriction>
+	</xs:simpleType>
+			
+	<xs:simpleType name="KalturaLicenseType">
+		<xs:annotation><xs:documentation>http://www.kaltura.com/api_v3/testmeDoc/index.php?object=KalturaLicenseType</xs:documentation></xs:annotation>
+		<xs:restriction base="xs:int">
+			<xs:enumeration value="-1"><xs:annotation><xs:documentation>UNKNOWN</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="0"><xs:annotation><xs:documentation>NONE</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="1"><xs:annotation><xs:documentation>COPYRIGHTED</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="2"><xs:annotation><xs:documentation>PUBLIC_DOMAIN</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="3"><xs:annotation><xs:documentation>CREATIVECOMMONS_ATTRIBUTION</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="4"><xs:annotation><xs:documentation>CREATIVECOMMONS_ATTRIBUTION_SHARE_ALIKE</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="5"><xs:annotation><xs:documentation>CREATIVECOMMONS_ATTRIBUTION_NO_DERIVATIVES</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="6"><xs:annotation><xs:documentation>CREATIVECOMMONS_ATTRIBUTION_NON_COMMERCIAL</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="7"><xs:annotation><xs:documentation>CREATIVECOMMONS_ATTRIBUTION_NON_COMMERCIAL_SHARE_ALIKE</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="8"><xs:annotation><xs:documentation>CREATIVECOMMONS_ATTRIBUTION_NON_COMMERCIAL_NO_DERIVATIVES</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="9"><xs:annotation><xs:documentation>GFDL</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="10"><xs:annotation><xs:documentation>GPL</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="11"><xs:annotation><xs:documentation>AFFERO_GPL</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="12"><xs:annotation><xs:documentation>LGPL</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="13"><xs:annotation><xs:documentation>BSD</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="14"><xs:annotation><xs:documentation>APACHE</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="15"><xs:annotation><xs:documentation>MOZILLA</xs:documentation></xs:annotation></xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+			
+	<xs:simpleType name="KalturaEntryStatus">
+		<xs:annotation><xs:documentation>http://www.kaltura.com/api_v3/testmeDoc/index.php?object=KalturaEntryStatus</xs:documentation></xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="-2"><xs:annotation><xs:documentation>ERROR_IMPORTING</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="-1"><xs:annotation><xs:documentation>ERROR_CONVERTING</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="0"><xs:annotation><xs:documentation>IMPORT</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="1"><xs:annotation><xs:documentation>PRECONVERT</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="2"><xs:annotation><xs:documentation>READY</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="3"><xs:annotation><xs:documentation>DELETED</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="4"><xs:annotation><xs:documentation>PENDING</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="5"><xs:annotation><xs:documentation>MODERATE</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="6"><xs:annotation><xs:documentation>BLOCKED</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="7"><xs:annotation><xs:documentation>NO_CONTENT</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="virusScan.Infected"><xs:annotation><xs:documentation>INFECTED</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="virusScan.ScanFailure"><xs:annotation><xs:documentation>SCAN_FAILURE</xs:documentation></xs:annotation></xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+			
+	<xs:simpleType name="KalturaMediaType">
+		<xs:annotation><xs:documentation>http://www.kaltura.com/api_v3/testmeDoc/index.php?object=KalturaMediaType</xs:documentation></xs:annotation>
+		<xs:restriction base="xs:int">
+			<xs:enumeration value="1"><xs:annotation><xs:documentation>VIDEO</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="2"><xs:annotation><xs:documentation>IMAGE</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="5"><xs:annotation><xs:documentation>AUDIO</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="201"><xs:annotation><xs:documentation>LIVE_STREAM_FLASH</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="202"><xs:annotation><xs:documentation>LIVE_STREAM_WINDOWS_MEDIA</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="203"><xs:annotation><xs:documentation>LIVE_STREAM_REAL_MEDIA</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="204"><xs:annotation><xs:documentation>LIVE_STREAM_QUICKTIME</xs:documentation></xs:annotation></xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+			
+	<xs:simpleType name="KalturaAdType">
+		<xs:annotation><xs:documentation>http://www.kaltura.com/api_v3/testmeDoc/index.php?object=KalturaAdType</xs:documentation></xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="1"><xs:annotation><xs:documentation>VIDEO</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="2"><xs:annotation><xs:documentation>OVERLAY</xs:documentation></xs:annotation></xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+			
+	<xs:simpleType name="KalturaAdProtocolType">
+		<xs:annotation><xs:documentation>http://www.kaltura.com/api_v3/testmeDoc/index.php?object=KalturaAdProtocolType</xs:documentation></xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="0"><xs:annotation><xs:documentation>CUSTOM</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="1"><xs:annotation><xs:documentation>VAST</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="2"><xs:annotation><xs:documentation>VAST_2_0</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="3"><xs:annotation><xs:documentation>VPAID</xs:documentation></xs:annotation></xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+			
+	<xs:simpleType name="KalturaAttachmentType">
+		<xs:annotation><xs:documentation>http://www.kaltura.com/api_v3/testmeDoc/index.php?object=KalturaAttachmentType</xs:documentation></xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="1"><xs:annotation><xs:documentation>TEXT</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="2"><xs:annotation><xs:documentation>MEDIA</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="3"><xs:annotation><xs:documentation>DOCUMENT</xs:documentation></xs:annotation></xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+			
+	<xs:simpleType name="KalturaCaptionType">
+		<xs:annotation><xs:documentation>http://www.kaltura.com/api_v3/testmeDoc/index.php?object=KalturaCaptionType</xs:documentation></xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="1"><xs:annotation><xs:documentation>SRT</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="2"><xs:annotation><xs:documentation>DFXP</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="3"><xs:annotation><xs:documentation>WEBVTT</xs:documentation></xs:annotation></xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+			
+	<xs:simpleType name="KalturaLanguage">
+		<xs:annotation><xs:documentation>http://www.kaltura.com/api_v3/testmeDoc/index.php?object=KalturaLanguage</xs:documentation></xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="Abkhazian"><xs:annotation><xs:documentation>AB</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Afar"><xs:annotation><xs:documentation>AA</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Afrikaans"><xs:annotation><xs:documentation>AF</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Albanian"><xs:annotation><xs:documentation>SQ</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Amharic"><xs:annotation><xs:documentation>AM</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Arabic"><xs:annotation><xs:documentation>AR</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Armenian"><xs:annotation><xs:documentation>HY</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Assamese"><xs:annotation><xs:documentation>AS_</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Aymara"><xs:annotation><xs:documentation>AY</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Azerbaijani"><xs:annotation><xs:documentation>AZ</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Bashkir"><xs:annotation><xs:documentation>BA</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Basque"><xs:annotation><xs:documentation>EU</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Bengali (Bangla)"><xs:annotation><xs:documentation>BN</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Bhutani"><xs:annotation><xs:documentation>DZ</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Bihari"><xs:annotation><xs:documentation>BH</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Bislama"><xs:annotation><xs:documentation>BI</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Breton"><xs:annotation><xs:documentation>BR</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Bulgarian"><xs:annotation><xs:documentation>BG</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Burmese"><xs:annotation><xs:documentation>MY</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Byelorussian (Belarusian)"><xs:annotation><xs:documentation>BE</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Cambodian"><xs:annotation><xs:documentation>KM</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Catalan"><xs:annotation><xs:documentation>CA</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Chinese"><xs:annotation><xs:documentation>ZH</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Corsican"><xs:annotation><xs:documentation>CO</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Croatian"><xs:annotation><xs:documentation>HR</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Czech"><xs:annotation><xs:documentation>CS</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Danish"><xs:annotation><xs:documentation>DA</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Dutch"><xs:annotation><xs:documentation>NL</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="English"><xs:annotation><xs:documentation>EN</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Esperanto"><xs:annotation><xs:documentation>EO</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Estonian"><xs:annotation><xs:documentation>ET</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Faeroese"><xs:annotation><xs:documentation>FO</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Farsi"><xs:annotation><xs:documentation>FA</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Fiji"><xs:annotation><xs:documentation>FJ</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Finnish"><xs:annotation><xs:documentation>FI</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="French"><xs:annotation><xs:documentation>FR</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Frisian"><xs:annotation><xs:documentation>FY</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Galician"><xs:annotation><xs:documentation>GL</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Gaelic (Scottish)"><xs:annotation><xs:documentation>GD</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Gaelic (Manx)"><xs:annotation><xs:documentation>GV</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Georgian"><xs:annotation><xs:documentation>KA</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="German"><xs:annotation><xs:documentation>DE</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Greek"><xs:annotation><xs:documentation>EL</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Greenlandic"><xs:annotation><xs:documentation>KL</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Guarani"><xs:annotation><xs:documentation>GN</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Gujarati"><xs:annotation><xs:documentation>GU</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Hausa"><xs:annotation><xs:documentation>HA</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Hebrew"><xs:annotation><xs:documentation>HE</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Hebrew"><xs:annotation><xs:documentation>IW</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Hindi"><xs:annotation><xs:documentation>HI</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Hungarian"><xs:annotation><xs:documentation>HU</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Icelandic"><xs:annotation><xs:documentation>IS</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Indonesian"><xs:annotation><xs:documentation>ID</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Indonesian"><xs:annotation><xs:documentation>IN</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Interlingua"><xs:annotation><xs:documentation>IA</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Interlingue"><xs:annotation><xs:documentation>IE</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Inuktitut"><xs:annotation><xs:documentation>IU</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Inupiak"><xs:annotation><xs:documentation>IK</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Irish"><xs:annotation><xs:documentation>GA</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Italian"><xs:annotation><xs:documentation>IT</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Japanese"><xs:annotation><xs:documentation>JA</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Javanese"><xs:annotation><xs:documentation>JV</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Kannada"><xs:annotation><xs:documentation>KN</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Kashmiri"><xs:annotation><xs:documentation>KS</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Kazakh"><xs:annotation><xs:documentation>KK</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Kinyarwanda (Ruanda)"><xs:annotation><xs:documentation>RW</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Kirghiz"><xs:annotation><xs:documentation>KY</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Kirundi (Rundi)"><xs:annotation><xs:documentation>RN</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Korean"><xs:annotation><xs:documentation>KO</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Kurdish"><xs:annotation><xs:documentation>KU</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Laothian"><xs:annotation><xs:documentation>LO</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Latin"><xs:annotation><xs:documentation>LA</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Latvian (Lettish)"><xs:annotation><xs:documentation>LV</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Limburgish ( Limburger)"><xs:annotation><xs:documentation>LI</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Lingala"><xs:annotation><xs:documentation>LN</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Lithuanian"><xs:annotation><xs:documentation>LT</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Macedonian"><xs:annotation><xs:documentation>MK</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Malagasy"><xs:annotation><xs:documentation>MG</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Malay"><xs:annotation><xs:documentation>MS</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Malayalam"><xs:annotation><xs:documentation>ML</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Maltese"><xs:annotation><xs:documentation>MT</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Maori"><xs:annotation><xs:documentation>MI</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Marathi"><xs:annotation><xs:documentation>MR</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Moldavian"><xs:annotation><xs:documentation>MO</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Mongolian"><xs:annotation><xs:documentation>MN</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Nauru"><xs:annotation><xs:documentation>NA</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Nepali"><xs:annotation><xs:documentation>NE</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Norwegian"><xs:annotation><xs:documentation>NO</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Occitan"><xs:annotation><xs:documentation>OC</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Oriya"><xs:annotation><xs:documentation>OR_</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Oromo (Afan, Galla)"><xs:annotation><xs:documentation>OM</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Pashto (Pushto)"><xs:annotation><xs:documentation>PS</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Polish"><xs:annotation><xs:documentation>PL</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Portuguese"><xs:annotation><xs:documentation>PT</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Punjabi"><xs:annotation><xs:documentation>PA</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Quechua"><xs:annotation><xs:documentation>QU</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Rhaeto-Romance"><xs:annotation><xs:documentation>RM</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Romanian"><xs:annotation><xs:documentation>RO</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Russian"><xs:annotation><xs:documentation>RU</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Samoan"><xs:annotation><xs:documentation>SM</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Sangro"><xs:annotation><xs:documentation>SG</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Sanskrit"><xs:annotation><xs:documentation>SA</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Serbian"><xs:annotation><xs:documentation>SR</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Serbo-Croatian"><xs:annotation><xs:documentation>SH</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Sesotho"><xs:annotation><xs:documentation>ST</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Setswana"><xs:annotation><xs:documentation>TN</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Shona"><xs:annotation><xs:documentation>SN</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Sindhi"><xs:annotation><xs:documentation>SD</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Sinhalese"><xs:annotation><xs:documentation>SI</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Siswati"><xs:annotation><xs:documentation>SS</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Slovak"><xs:annotation><xs:documentation>SK</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Slovenian"><xs:annotation><xs:documentation>SL</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Somali"><xs:annotation><xs:documentation>SO</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Spanish"><xs:annotation><xs:documentation>ES</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Sundanese"><xs:annotation><xs:documentation>SU</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Swahili (Kiswahili)"><xs:annotation><xs:documentation>SW</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Swedish"><xs:annotation><xs:documentation>SV</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Tagalog"><xs:annotation><xs:documentation>TL</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Tajik"><xs:annotation><xs:documentation>TG</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Tamil"><xs:annotation><xs:documentation>TA</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Tatar"><xs:annotation><xs:documentation>TT</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Telugu"><xs:annotation><xs:documentation>TE</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Thai"><xs:annotation><xs:documentation>TH</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Tibetan"><xs:annotation><xs:documentation>BO</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Tigrinya"><xs:annotation><xs:documentation>TI</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Tonga"><xs:annotation><xs:documentation>TO</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Tsonga"><xs:annotation><xs:documentation>TS</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Turkish"><xs:annotation><xs:documentation>TR</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Turkmen"><xs:annotation><xs:documentation>TK</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Twi"><xs:annotation><xs:documentation>TW</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Uighur"><xs:annotation><xs:documentation>UG</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Ukrainian"><xs:annotation><xs:documentation>UK</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Urdu"><xs:annotation><xs:documentation>UR</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Uzbek"><xs:annotation><xs:documentation>UZ</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Vietnamese"><xs:annotation><xs:documentation>VI</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Volapuk"><xs:annotation><xs:documentation>VO</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Welsh"><xs:annotation><xs:documentation>CY</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Wolof"><xs:annotation><xs:documentation>WO</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Xhosa"><xs:annotation><xs:documentation>XH</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Yiddish"><xs:annotation><xs:documentation>YI</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Yiddish"><xs:annotation><xs:documentation>JI</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Yoruba"><xs:annotation><xs:documentation>YO</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="Zulu"><xs:annotation><xs:documentation>ZU</xs:documentation></xs:annotation></xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+			
+	<xs:simpleType name="KalturaThumbCuePointSubType">
+		<xs:annotation><xs:documentation>http://www.kaltura.com/api_v3/testmeDoc/index.php?object=KalturaThumbCuePointSubType</xs:documentation></xs:annotation>
+		<xs:restriction base="xs:int">
+			<xs:enumeration value="1"><xs:annotation><xs:documentation>SLIDE</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="2"><xs:annotation><xs:documentation>CHAPTER</xs:documentation></xs:annotation></xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+			
+	<xs:simpleType name="KalturaEntryDistributionFlag">
+		<xs:annotation><xs:documentation>http://www.kaltura.com/api_v3/testmeDoc/index.php?object=KalturaEntryDistributionFlag</xs:documentation></xs:annotation>
+		<xs:restriction base="xs:int">
+			<xs:enumeration value="0"><xs:annotation><xs:documentation>NONE</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="1"><xs:annotation><xs:documentation>SUBMIT_REQUIRED</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="2"><xs:annotation><xs:documentation>DELETE_REQUIRED</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="3"><xs:annotation><xs:documentation>UPDATE_REQUIRED</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="4"><xs:annotation><xs:documentation>ENABLE_REQUIRED</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="5"><xs:annotation><xs:documentation>DISABLE_REQUIRED</xs:documentation></xs:annotation></xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+			
+	<xs:simpleType name="KalturaEntryDistributionStatus">
+		<xs:annotation><xs:documentation>http://www.kaltura.com/api_v3/testmeDoc/index.php?object=KalturaEntryDistributionStatus</xs:documentation></xs:annotation>
+		<xs:restriction base="xs:int">
+			<xs:enumeration value="0"><xs:annotation><xs:documentation>PENDING</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="1"><xs:annotation><xs:documentation>QUEUED</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="2"><xs:annotation><xs:documentation>READY</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="3"><xs:annotation><xs:documentation>DELETED</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="4"><xs:annotation><xs:documentation>SUBMITTING</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="5"><xs:annotation><xs:documentation>UPDATING</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="6"><xs:annotation><xs:documentation>DELETING</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="7"><xs:annotation><xs:documentation>ERROR_SUBMITTING</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="8"><xs:annotation><xs:documentation>ERROR_UPDATING</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="9"><xs:annotation><xs:documentation>ERROR_DELETING</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="10"><xs:annotation><xs:documentation>REMOVED</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="11"><xs:annotation><xs:documentation>IMPORT_SUBMITTING</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="12"><xs:annotation><xs:documentation>IMPORT_UPDATING</xs:documentation></xs:annotation></xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+			
+	<xs:simpleType name="KalturaEntryDistributionSunStatus">
+		<xs:annotation><xs:documentation>http://www.kaltura.com/api_v3/testmeDoc/index.php?object=KalturaEntryDistributionSunStatus</xs:documentation></xs:annotation>
+		<xs:restriction base="xs:int">
+			<xs:enumeration value="1"><xs:annotation><xs:documentation>BEFORE_SUNRISE</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="2"><xs:annotation><xs:documentation>AFTER_SUNRISE</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="3"><xs:annotation><xs:documentation>AFTER_SUNSET</xs:documentation></xs:annotation></xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+			
+	<xs:simpleType name="KalturaBatchJobErrorTypes">
+		<xs:annotation><xs:documentation>http://www.kaltura.com/api_v3/testmeDoc/index.php?object=KalturaBatchJobErrorTypes</xs:documentation></xs:annotation>
+		<xs:restriction base="xs:int">
+			<xs:enumeration value="0"><xs:annotation><xs:documentation>APP</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="1"><xs:annotation><xs:documentation>RUNTIME</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="2"><xs:annotation><xs:documentation>HTTP</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="3"><xs:annotation><xs:documentation>CURL</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="4"><xs:annotation><xs:documentation>KALTURA_API</xs:documentation></xs:annotation></xs:enumeration>
+			<xs:enumeration value="5"><xs:annotation><xs:documentation>KALTURA_CLIENT</xs:documentation></xs:annotation></xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+			
 </xs:schema>
