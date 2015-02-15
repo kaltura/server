@@ -254,7 +254,7 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 		
 		$flavors = array();
 		$this->buildM3u8Flavors($baseUrl, $flavors);
-		if($backupUrl)
+		if($backupUrl && !$entry->getForcePrimaryDC())
 			$this->buildM3u8Flavors($backupUrl, $flavors);
 		
 		foreach ($flavors as $index => $flavor)

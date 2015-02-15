@@ -698,6 +698,16 @@ abstract class LiveEntry extends entry
 		$this->putInCustomData('push_publish_configurations', $v);
 	}
 	
+	public function getForcePrimaryDC ()
+	{
+		return $this->getFromCustomData('force_primary_dc', null, false);
+	}
+	
+	public function setForcePrimaryDC ($v)
+	{
+		$this->putInCustomData('force_primary_dc', $v);
+	}
+	
 	/**
 	 * @return boolean
 	 */
