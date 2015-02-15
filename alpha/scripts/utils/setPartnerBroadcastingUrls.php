@@ -28,7 +28,7 @@ $partner->setSecondaryBroadcastUrl($secondaryBroadcastUrl);
 
 $liveStreamConfigurations = array ('http' => $httpPlaybackUrl);
 if($httpsPlaybackUrl)
-	$liveStreamConfigurations = array ('https' => $httpsPlaybackUrl);
+	$liveStreamConfigurations['https'] = $httpsPlaybackUrl;
 
 $partner->setLiveStreamPlaybackUrlConfigurations($liveStreamConfigurations);
 $partner->save();
