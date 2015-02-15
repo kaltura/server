@@ -258,7 +258,7 @@ class SphinxEntryCriteria extends SphinxCriteria
 			{
 				$metadataProfileId = null;
 				if ($advancedSearch instanceof MetadataSearchFilter)
-        			$metadataProfileId = $advancedSearch->getMetadataProfileId();
+					$metadataProfileId = $advancedSearch->getMetadataProfileId();
 
 				$additionalConditions = $advancedSearch->getFreeTextConditions($filter->getPartnerSearchScope(), $freeTexts , $metadataProfileId);
 			}
