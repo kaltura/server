@@ -176,8 +176,6 @@ class KalturaCategoryUser extends KalturaObject implements IFilterable {
 		}
 		
 		//if user doesn't exists - create it
-		$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
-		$kuser = kuserPeer::getKuserByPartnerAndUid ($partnerId , $this->userId);
 		if(!$kuser)
 		{
 			if(!preg_match(kuser::PUSER_ID_REGEXP, $this->userId))
