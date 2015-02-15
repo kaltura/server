@@ -107,14 +107,14 @@ class AccessControlService extends KalturaBaseService
 		{
 			$dbAccessControl->save();
 		}
-		catch(Exception $e)
+		catch(kCoreException $e)
 		{
 			$code = $e->getCode();
 			switch($code)
 			{
 				case kCoreException::EXCEEDED_MAX_ENTRIES_PER_ACCESS_CONTROL_UPDATE_LIMIT :
 					throw new KalturaAPIException(KalturaErrors::EXCEEDED_ENTRIES_PER_ACCESS_CONTROL_FOR_UPDATE, $id);
-				case kCoreException::NO_RECIPIENT_ACCESS_CONTROL :
+				case kCoreException::NO_DEFAULT_ACCESS_CONTROL :
 					throw new KalturaAPIException(KalturaErrors::CANNOT_TRANSFER_ENTRIES_TO_ANOTHER_ACCESS_CONTROL_OBJECT);
 			}
 		}

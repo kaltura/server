@@ -35,8 +35,12 @@ class accessControl extends BaseaccessControl
 		{
 			if ($this->isDefault === true)
 				throw new kCoreException("Default access control profile [" . $this->getId(). "] can't be deleted", kCoreException::ACCESS_CONTROL_CANNOT_DELETE_PARTNER_DEFAULT);
-	
-			entryPeer::updateAccessControl($this->getPartnerId(), $this->id, $this->getPartner()->getDefaultAccessControlId());
+
+			$defaultAccessControl = $this->getPartner()->getDefaultAccessControlId();
+			if (!$defaultAccessControl)
+				throw new kCoreException("no default access control on partner",kCoreException::NO_DEFAULT_ACCESS_CONTROL);
+
+			entryPeer::updateAccessControl($this->getPartnerId(), $this->id, $defaultAccessControl);
 		}
 		
 		return parent::preSave($con);

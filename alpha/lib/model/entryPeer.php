@@ -497,7 +497,7 @@ class entryPeer extends BaseentryPeer
 		return true;
 	}
 
-	public static function updateAccessControl($partnerId, $oldAccessControlId, $newAccessControlId = null)
+	public static function updateAccessControl($partnerId, $oldAccessControlId, $newAccessControlId)
 	{
 		$c = KalturaCriteria::create(entryPeer::OM_CLASS);
 
@@ -514,9 +514,6 @@ class entryPeer extends BaseentryPeer
 
 		if ($entryCount == 0)
 			return;
-		
-		if ($entryCount > 0 && is_null($newAccessControlId))
-			throw new kCoreException("no access control to transfer entries to" , kCoreException::NO_RECIPIENT_ACCESS_CONTROL);
 
 		if ($entryCount > self::ENTRIES_PER_ACCESS_CONTROL_UPDATE_LIMIT)
 			throw new kCoreException("exceeded max entries per access control update limit",kCoreException::EXCEEDED_MAX_ENTRIES_PER_ACCESS_CONTROL_UPDATE_LIMIT);		
