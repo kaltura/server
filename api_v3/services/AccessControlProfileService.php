@@ -107,11 +107,9 @@ class AccessControlProfileService extends KalturaBaseService
 					throw new KalturaAPIException(KalturaErrors::EXCEEDED_ENTRIES_PER_ACCESS_CONTROL_FOR_UPDATE, $id);
 				case kCoreException::NO_DEFAULT_ACCESS_CONTROL :
 					throw new KalturaAPIException(KalturaErrors::CANNOT_TRANSFER_ENTRIES_TO_ANOTHER_ACCESS_CONTROL_OBJECT);
+				default:
+					throw $e;
 			}
-		}
-		catch(Exception $e)
-		{
-			throw $e;
 		}
 	}
 	
