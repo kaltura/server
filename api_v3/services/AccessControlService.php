@@ -101,19 +101,27 @@ class AccessControlService extends KalturaBaseService
 
 		if ($dbAccessControl->getIsDefault())
 			throw new KalturaAPIException(KalturaErrors::CANNOT_DELETE_DEFAULT_ACCESS_CONTROL);
-			
-		$c = new Criteria();
-		$c->add(entryPeer::ACCESS_CONTROL_ID, $dbAccessControl->getId());
-		
-		// move entries to the default access control
-		$entryCount = entryPeer::doCount($c);
-		if ($entryCount > 0)
-		{
-			entryPeer::updateAccessControl($this->getPartnerId(), $id, $this->getPartner()->getDefaultAccessControlId());
-		}
-			
+
 		$dbAccessControl->setDeletedAt(time());
-		$dbAccessControl->save();
+		try
+		{
+			$dbAccessControl->save();
+		}
+		catch(kCoreException $e)
+		{
+			$code = $e->getCode();
+			switch($code)
+			{
+				case kCoreException::EXCEEDED_MAX_ENTRIES_PER_ACCESS_CONTROL_UPDATE_LIMIT :
+					throw new KalturaAPIException(KalturaErrors::EXCEEDED_ENTRIES_PER_ACCESS_CONTROL_FOR_UPDATE, $id);
+				case kCoreException::NO_DEFAULT_ACCESS_CONTROL :
+					throw new KalturaAPIException(KalturaErrors::CANNOT_TRANSFER_ENTRIES_TO_ANOTHER_ACCESS_CONTROL_OBJECT);
+			}
+		}
+		catch(Exception $e)
+		{
+			throw $e;
+		}
 	}
 	
 	/**
