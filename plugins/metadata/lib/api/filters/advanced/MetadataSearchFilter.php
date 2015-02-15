@@ -300,8 +300,18 @@ class MetadataSearchFilter extends AdvancedSearchFilterOperator
 	}
 	
 	
-	public function getFreeTextConditions($partnerScope, $freeTexts , $metadataProfileFieldIds = array()) 
+	public function getFreeTextConditions($partnerScope, $freeTexts , $metadataProfileId = null) 
 	{
+		$metadataProfileFields = array();
+		$metadataProfileFieldIds = array();
+
+		if ($metadataProfileId)
+		{
+			$metadataProfileFields = MetadataProfileFieldPeer::retrieveActiveByMetadataProfileId($metadataProfileId);
+			foreach($metadataProfileFields as $metadataProfileField)
+				$metadataProfileFieldIds[] = $metadataProfileField->getId();
+		}
+
 		KalturaLog::debug("freeText [$freeTexts]");
 		$additionalConditions = array();
 		
