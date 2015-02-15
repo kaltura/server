@@ -9,7 +9,7 @@ $primaryBroadcatUrl =  $argv[2];
 $httpPlaybackUrl = $argv[3];
 
 $secondaryBroadcastUrl = null;
-if (isset($argv[4]))
+if (isset($argv[4]) && $argv[4] != 0)
 	$secondaryBroadcastUrl = $argv[4];
 	
 $httpsPlaybackUrl = null;
@@ -27,6 +27,8 @@ $partner->setPrimaryBroadcastUrl($primaryBroadcatUrl);
 $partner->setSecondaryBroadcastUrl($secondaryBroadcastUrl);
 
 $liveStreamConfigurations = array ('http' => $httpPlaybackUrl);
-$liveStreamConfigurations = array ('https' => $httpsPlaybackUrl);
+if($httpsPlaybackUrl)
+	$liveStreamConfigurations = array ('https' => $httpsPlaybackUrl);
+
 $partner->setLiveStreamPlaybackUrlConfigurations($liveStreamConfigurations);
 $partner->save();
