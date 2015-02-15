@@ -140,7 +140,7 @@ Add the following lines as new sections:
  - Open your browser to validate installation **(replace tokens)**: http://@WWW_HOST@:8080/activiti-explorer/
 	 - Username: kermit
 	 - Password: kermit
- - Generate java pojo and bpmn clients **(replace tokens)**: `php @APP_DIR@/generator/generate.php pojo,bpmn`
+ - Generate java pojo and bpmn clients **(replace tokens)**: `php @APP_DIR@/generator/generate.php pojo,bpmn,testsClient`
  - Edit deployment configuration file **(replace tokens)**: `cp @WEB_DIR@/content/clientlibs/bpmn/deploy/src/activiti.cfg.template.xml @WEB_DIR@/content/clientlibs/bpmn/deploy/src/activiti.cfg.xml`
  - Download [XercesImpl JAR] (http://central.maven.org/maven2/xerces/xercesImpl/2.8.1/xercesImpl-2.8.1.jar) and extract contents to @WEB_DIR@/content/clientlibs/bpmn/deploy/src/
  - Deploy processes **(replace tokens)**:
