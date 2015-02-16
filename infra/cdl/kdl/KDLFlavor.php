@@ -12,6 +12,7 @@ class KDLFlavor extends KDLMediaDataSet {
 	const BitrateNonComplyFlagBit = 2;
 	const MissingContentNonComplyFlagBit = 4;
 	const ForceCommandLineFlagBit = 8;
+	const FrameSizeNonComplyFlagBit = 16;
 
 	/* ---------------------
 	 * Data
@@ -37,7 +38,9 @@ class KDLFlavor extends KDLMediaDataSet {
 				 * Sveral fromats (mpeg2, theora), don't support fast seeks 
 				 */
 	public 	$_fastSeekTo = true;
-	 
+	
+	public $_optimizationPolicy = KDLOptimizationPolicy::BitrateFlagBit;
+	
 	public	$_transcoders = array();
 
 		/* --------------------------
@@ -382,7 +385,8 @@ $plannedDur = 0;
 	public function IsNonComply()
 	{
 		return ( ($this->_flags & KDLFlavor::BitrateNonComplyFlagBit)
-		||($this->_flags & KDLFlavor::MissingContentNonComplyFlagBit));
+			   ||($this->_flags & KDLFlavor::FrameSizeNonComplyFlagBit)
+			   ||($this->_flags & KDLFlavor::MissingContentNonComplyFlagBit));
 	}
 
 	/* ------------------------------
@@ -476,6 +480,23 @@ $plannedDur = 0;
 		else {
 			$target->_fastSeekTo = true;
 		}
+		
+			/*
+			 * For IMX sources, apply cropping of the top 32 pixs, if the flavor has the ImxCrop flag
+			 * 'IMX' ==> mxf/mpeg2 video/ 720x608
+			 */
+		if(isset($this->_video) && $this->_video->_isCropIMX==true
+		&& isset($source->_container) && $source->_container->IsFormatOf(array("mxf")) 
+		&& isset($source->_video) && $source->_video->IsFormatOf(array("mpeg video","mpeg2video")) 
+		&& isset($source->_video->_width) && $source->_video->_width==720
+		&& isset($source->_video->_height) && $source->_video->_height==608){
+			$target->_video->_isCropIMX=true;
+		}
+		else {
+			$target->_video->_isCropIMX=false;
+		}
+		KalturaLog::log('IsCropImx('.$target->_video->_isCropIMX.')');
+		
 			/*
 			 * Analyse the source to determine whether it contains multi-stream audio.
 			 * In case it does and the flavor has 'multiStream' set to 'auto-detect' (default action) -
@@ -506,28 +527,75 @@ $plannedDur = 0;
 		if($this->_video!="") {
 			if($source->_video!="" && ($target->_container && !($target->_container->_id==KDLContainerTarget::MP3 || $target->_container->_id==KDLContainerTarget::WMA))){
 				/*
-				 * Evaluate flavor frame-size
+				 * Evaluate target video params
 				 */
 				$target->_video = $this->evaluateTargetVideo($source->_video);
-				if($target->_video->_bitRate<$this->_video->_bitRate*KDLConstants::FlavorBitrateCompliantFactor) {
-					$target->_flags = $this->_flags | self::BitrateNonComplyFlagBit;
-					$target->_warnings[KDLConstants::VideoIndex][] = // "The target flavor bitrate {".$target->_video->_bitRate."} does not comply with the requested bitrate (".$this->_video->_bitRate.").";
-						KDLWarnings::ToString(KDLWarnings::TargetBitrateNotComply, $target->_video->_bitRate, $this->_video->_bitRate);
+				
+					/*
+					 * Apply optimization-policy to evaluate 'compliancy' state - 
+					 * if not set - use original BitRate oriented optimization
+					 */
+				if(isset($this->_optimizationPolicy))
+					$optimizationPolicy = $this->_optimizationPolicy;
+				else
+					$optimizationPolicy = KDLOptimizationPolicy::BitrateFlagBit;
+				KalturaLog::log('OptimizationPolicy('.$target->_optimizationPolicy.')');
+				
+					/*
+					 * Bitrate oriented optimization -
+					 * NonCompliant if the source bitrate significantly lower than the flavor bitrate
+					 */
+				if($optimizationPolicy & KDLOptimizationPolicy::BitrateFlagBit) {
+					if($target->_video->_bitRate<$this->_video->_bitRate*KDLConstants::FlavorBitrateComplianceFactor) {
+						$target->_flags = $this->_flags | self::BitrateNonComplyFlagBit;
+						$target->_warnings[KDLConstants::VideoIndex][] = 
+							KDLWarnings::ToString(KDLWarnings::TargetBitrateNotComply, $target->_video->_bitRate, $this->_video->_bitRate);
+					}
+				}
+					/*
+					 * Frame size oriented optimization -
+					 * NonCompliant if the source frame size significantly smaller than the flavor frame size
+					 */
+				if($optimizationPolicy & KDLOptimizationPolicy::FrameSizeFlagBit){
+					$srcVid = $source->_video;
+					$trgVid = $target->_video;
+					$flvrVid= $this->_video;
+					$param1=null;
+					$param2=null;
+					if(isset($flvrVid->_bitRate) && $flvrVid->_bitRate>0 && isset($srcVid->_bitRate) && $srcVid->_bitRate>0
+					&& $flvrVid->_bitRate/KDLConstants::FlavorBitrateComplianceFactor<$srcVid->_bitRate) 
+					{
+						if(isset($flvrVid->_width) && $flvrVid->_width>0 && isset($trgVid->_width) && $trgVid->_width 
+						&& $flvrVid->_width>$trgVid->_width/KDLConstants::FlavorFrameSizeComplianceFactor) {
+							$target->_flags = $this->_flags | self::FrameSizeNonComplyFlagBit;
+							$param1 = "w:$flvrVid->_width";
+							$param2 = "w:$trgVid->_width";
+						}
+						if(isset($flvrVid->_height) && $flvrVid->_height>0 && isset($trgVid->_height) && $trgVid->_height 
+						&& $flvrVid->_height>$trgVid->_height/KDLConstants::FlavorFrameSizeComplianceFactor) {
+							if(isset($param1)) { $param1.=","; $param2.=","; }
+							$param1.= "h:$flvrVid->_height";
+							$param2.= "h:$trgVid->_height";
+						}
+					}
+					if(isset($param1)){
+						$target->_flags = $this->_flags | self::FrameSizeNonComplyFlagBit;
+						$target->_warnings[KDLConstants::VideoIndex][] = 
+							KDLWarnings::ToString(KDLWarnings::TargetFrameSizeNotComply, $param1, $param2);
+					}
 				}
 			}
-			else {
-				if($target->_container && $target->_container->_id==KDLContainerTarget::ISMV) {
+			else if($target->_container && $target->_container->_id==KDLContainerTarget::ISMV) {
 					/*
 					 * EE cannot generate audio only ISMV, therefore switch to WMA
 					 */
-					foreach ($this->_transcoders as $trns){
-						$rv = strstr($trns->_id,"expressionEncoder.ExpressionEncoder");
-						if($rv!=false) {
-							$target->_warnings[KDLConstants::ContainerIndex][] = // "The target flavor bitrate {".$target->_video->_bitRate."} does not comply with the requested bitrate (".$this->_video->_bitRate.").";
-								KDLWarnings::ToString(KDLWarnings::ChangingFormt, $target->_container->_id, KDLContainerTarget::WMA);
-							$target->_container->_id=KDLContainerTarget::WMA;
-							break;
-						}
+				foreach ($this->_transcoders as $trns){
+					$rv = strstr($trns->_id,"expressionEncoder.ExpressionEncoder");
+					if($rv!=false) {
+						$target->_warnings[KDLConstants::ContainerIndex][] = // "The target flavor bitrate {".$target->_video->_bitRate."} does not comply with the requested bitrate (".$this->_video->_bitRate.").";
+							KDLWarnings::ToString(KDLWarnings::ChangingFormt, $target->_container->_id, KDLContainerTarget::WMA);
+						$target->_container->_id=KDLContainerTarget::WMA;
+						break;
 					}
 				}
 			}
@@ -724,7 +792,7 @@ $plannedDur = 0;
 	/* ---------------------------
 	 * evaluateTargetVideoFramesize
 	 */
-	private function evaluateTargetVideoFramesize(KDLVideoData $source, KDLVideoData $target) 
+	private static function evaluateTargetVideoFramesize(KDLVideoData $source, KDLVideoData $target) 
 	{
 		$shrinkToSource = $target->_isShrinkFramesizeToSource;
 		$invertedVideo = false;
@@ -737,7 +805,7 @@ $plannedDur = 0;
 		 *	boolean flag invertedVideo - for inverting back the source & target later on.
 		 */
 		if ((isset($source->_dar) && $source->_dar < 1) ||
-		(isset($source->_height) && isset($source->_width) && $source->_height > 0 && $source->_width > 0 && $source->_height > $source->_width))
+			(isset($source->_height) && isset($source->_width) && $source->_height > 0 && $source->_width > 0 && $source->_height > $source->_width))
 		{
 			KalturaLog::debug('inverting source');
 			self::invertVideoDimensions($source);
@@ -748,6 +816,14 @@ $plannedDur = 0;
 		$hgtSrc = $source->_height;
 		if($widSrc==0 || $hgtSrc==0)
 			return;
+			
+			/*
+			 * For IMX - reduce the height by 32 pixs
+			 */
+		if(isset($target->_isCropIMX) && $target->_isCropIMX==true) {
+			$hgtSrc-=32;
+		}
+		
 		$darSrcFrame = $widSrc/$hgtSrc;
 		/*
 		 * DAR adjustment
@@ -854,11 +930,11 @@ $plannedDur = 0;
 			 * Fixed target frame size
 			 */
 		else if($shrinkToSource) {
-			if($target->_width>$source->_width) {
-				$target->_width=$source->_width;
+			if($target->_width>$widSrc) {
+				$target->_width=$widSrc;
 			}
-			if($target->_height>$source->_height) {
-				$target->_height=$source->_height;
+			if($target->_height>$hgtSrc) {
+				$target->_height=$hgtSrc;
 			}
 		}
 
@@ -896,7 +972,7 @@ $plannedDur = 0;
 			}
 		}
 
-		$this->matchBestModConstrainedVideoFramesize($darSrcFrame, $hgtSrc, $widSrc, $modVal, $target);
+		self::matchBestModConstrainedVideoFramesize($darSrcFrame, $hgtSrc, $widSrc, $modVal, $target);
 		
 		/*
 		 *      inverting source back for conversion process.
@@ -919,7 +995,7 @@ $plannedDur = 0;
 	 *  - Compare each of them to the required AR
 	 *  - Find the setup that is closest 
 	 */
-	protected function matchBestModConstrainedVideoFramesize($darSrcFrame, $hgtSrc, $widSrc, $modVal, KDLVideoData $target) 
+	protected static function matchBestModConstrainedVideoFramesize($darSrcFrame, $hgtSrc, $widSrc, $modVal, KDLVideoData $target) 
 	{ 
 			/*
 			 * Calculate hgt & wid 'mod down' value. If not set - assign 0 
