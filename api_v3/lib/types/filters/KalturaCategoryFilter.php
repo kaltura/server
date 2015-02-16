@@ -71,4 +71,28 @@ class KalturaCategoryFilter extends KalturaCategoryBaseFilter
 	{
 		return new categoryFilter();
 	}
+
+	/* (non-PHPdoc)
+	 * @see KalturaRelatedFilter::getListResponse()
+	 */
+	public function getListResponse(KalturaFilterPager $pager, KalturaResponseProfileBase $responseProfile = null)
+	{
+		if ($filter->orderBy === null)
+			$filter->orderBy = KalturaCategoryOrderBy::DEPTH_ASC;
+			
+		$categoryFilter = $this->toObject();
+		
+		$c = KalturaCriteria::create(categoryPeer::OM_CLASS);
+		$categoryFilter->attachToCriteria($c);
+		$pager->attachToCriteria($c);
+		$dbList = categoryPeer::doSelect($c);
+		$totalCount = $c->getRecordsCount();
+		
+		$list = KalturaCategoryArray::fromDbArray($dbList, $responseProfile);
+		
+		$response = new KalturaCategoryListResponse();
+		$response->objects = $list;
+		$response->totalCount = $totalCount;
+		return $response;
+	}
 }

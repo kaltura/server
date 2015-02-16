@@ -476,6 +476,11 @@ class BaseEntryService extends KalturaEntryService
 		{
 			$filter = new KalturaBaseEntryFilter();
 		}
+			
+		if(!$pager)
+		{
+			$pager = new KalturaFilterPager();
+		}
 		
 		return $filter->getListResponse($pager, $this->getResponseProfile());
 	}

@@ -251,24 +251,10 @@ class FileAssetService extends KalturaBaseService
 	{
 		if (!$filter)
 			$filter = new KalturaFileAssetFilter();
-
-		if (!$pager)
+			
+		if(!$pager)
 			$pager = new KalturaFilterPager();
 			
-		$fileAssetFilter = new fileAssetFilter();
-		$filter->toObject($fileAssetFilter);
-
-		$c = new Criteria();
-		$fileAssetFilter->attachToCriteria($c);
-		
-		$totalCount = FileAssetPeer::doCount($c);
-		
-		$pager->attachToCriteria($c);
-		$dbList = FileAssetPeer::doSelect($c);
-		
-		$response = new KalturaFileAssetListResponse();
-		$response->objects = KalturaFileAssetArray::fromDbArray($dbList, $this->getResponseProfile());
-		$response->totalCount = $totalCount;
-		return $response;    
+		return $filter->getListResponse($pager, $this->getResponseProfile());   
 	}
 }

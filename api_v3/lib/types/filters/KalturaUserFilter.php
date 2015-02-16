@@ -126,5 +126,44 @@ class KalturaUserFilter extends KalturaUserBaseFilter
 	 * @var string
 	 */
 	public $permissionNamesMultiLikeAnd;
-	
+
+	/* (non-PHPdoc)
+	 * @see KalturaRelatedFilter::getListResponse()
+	 */
+	public function getListResponse(KalturaFilterPager $pager, KalturaResponseProfileBase $responseProfile = null)
+	{
+		$userFilter = $this->toObject();
+		
+		$c = KalturaCriteria::create(kuserPeer::OM_CLASS);
+		$userFilter->attachToCriteria($c);
+		
+		if (!is_null($filter->roleIdEqual))
+		{
+			$roleCriteria = new Criteria();
+			$roleCriteria->add ( KuserToUserRolePeer::USER_ROLE_ID , $filter->roleIdEqual );
+			$roleCriteria->addSelectColumn(KuserToUserRolePeer::KUSER_ID);
+			$rs = KuserToUserRolePeer::doSelectStmt($roleCriteria);
+			$kuserIds = $rs->fetchAll(PDO::FETCH_COLUMN);
+						
+			$c->add(kuserPeer::ID, $kuserIds, KalturaCriteria::IN);
+		}
+
+		if (is_null($filter->typeEqual) && is_null($filter->typeIn)){
+			$c->add(kuserPeer::TYPE, KuserType::USER, KalturaCriteria::EQUAL);
+		}
+		
+		$c->addAnd(kuserPeer::PUSER_ID, NULL, KalturaCriteria::ISNOTNULL);
+		
+		$pager->attachToCriteria($c);
+		$list = kuserPeer::doSelect($c);
+		
+		$totalCount = $c->getRecordsCount();
+
+		$newList = KalturaUserArray::fromDbArray($list, $responseProfile);
+		$response = new KalturaUserListResponse();
+		$response->objects = $newList;
+		$response->totalCount = $totalCount;
+		
+		return $response;
+	}
 }

@@ -17,4 +17,19 @@ class KalturaMediaEntryFilter extends KalturaMediaEntryBaseFilter
 	{
 		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
 	}
+	
+	/* (non-PHPdoc)
+	 * @see KalturaBaseEntryFilter::getListResponse()
+	 */
+	public function getListResponse(KalturaFilterPager $pager, KalturaResponseProfileBase $responseProfile = null)
+	{
+		list($list, $totalCount) = $this->doGetListResponse($pager);
+		
+	    $newList = KalturaMediaEntryArray::fromDbArray($list, $responseProfile);
+		$response = new KalturaBaseEntryListResponse();
+		$response->objects = $newList;
+		$response->totalCount = $totalCount;
+		
+		return $response;
+	}
 }

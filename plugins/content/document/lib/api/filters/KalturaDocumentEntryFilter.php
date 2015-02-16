@@ -15,4 +15,19 @@ class KalturaDocumentEntryFilter extends KalturaDocumentEntryBaseFilter
 	{
 		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
 	}
+	
+	/* (non-PHPdoc)
+	 * @see KalturaBaseEntryFilter::getListResponse()
+	 */
+	public function getListResponse(KalturaFilterPager $pager, KalturaResponseProfileBase $responseProfile = null)
+	{
+		list($list, $totalCount) = $this->doGetListResponse($pager);
+		
+	    $newList = KalturaDocumentEntryArray::fromDbArray($list, $responseProfile);
+		$response = new KalturaBaseEntryListResponse();
+		$response->objects = $newList;
+		$response->totalCount = $totalCount;
+		
+		return $response;
+	}
 }

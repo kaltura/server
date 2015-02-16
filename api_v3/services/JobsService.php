@@ -1031,7 +1031,33 @@ class JobsService extends KalturaBaseService
 		if (!$filter) 
 			$filter = new KalturaBatchJobFilter();
 			
-		return $filter->getListResponse($pager, $this->getResponseProfile());
+		$batchJobFilter = new BatchJobFilter (true);
+		$filter->toObject($batchJobFilter);
+		
+		$c = new Criteria();
+//		$c->add(BatchJobPeer::DELETED_AT, null);
+		
+		$batchJobFilter->attachToCriteria($c);
+		
+		if(!$pager)
+		   $pager = new KalturaFilterPager();
+		
+		$pager->attachToCriteria($c);
+		
+		myDbHelper::$use_alternative_con = myDbHelper::DB_HELPER_CONN_PROPEL2;
+		
+		$list = BatchJobPeer::doSelect($c);
+		
+		$c->setLimit(false);
+		$count = BatchJobPeer::doCount($c);
+
+		$newList = KalturaBatchJobArray::fromStatisticsBatchJobArray($list );
+		
+		$response = new KalturaBatchJobListResponse();
+		$response->objects = $newList;
+		$response->totalCount = $count;
+		
+		return $response;
 	}
 	
 // --------------------------------- generic functions 	--------------------------------- //	

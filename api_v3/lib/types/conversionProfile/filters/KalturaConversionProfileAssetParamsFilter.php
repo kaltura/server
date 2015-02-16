@@ -71,4 +71,26 @@ class KalturaConversionProfileAssetParamsFilter extends KalturaConversionProfile
 		
 		return parent::toObject($object_to_fill, $props_to_skip);
 	}
+
+	/* (non-PHPdoc)
+	 * @see KalturaRelatedFilter::getListResponse()
+	 */
+	public function getListResponse(KalturaFilterPager $pager, KalturaResponseProfileBase $responseProfile = null)
+	{
+		$assetParamsConversionProfileFilter = $this->toObject();
+
+		$c = new Criteria();
+		$assetParamsConversionProfileFilter->attachToCriteria($c);
+		
+		$totalCount = flavorParamsConversionProfilePeer::doCount($c);
+		
+		$pager->attachToCriteria($c);
+		$dbList = flavorParamsConversionProfilePeer::doSelect($c);
+		
+		$list = KalturaConversionProfileAssetParamsArray::fromDbArray($dbList, $this->getResponseProfile());
+		$response = new KalturaConversionProfileAssetParamsListResponse();
+		$response->objects = $list;
+		$response->totalCount = $totalCount;
+		return $response; 
+	}
 }

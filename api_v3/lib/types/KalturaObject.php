@@ -332,7 +332,10 @@ abstract class KalturaObject
 	
 		$coreResponseProfile = $responseProfile ? $responseProfile->toObject() : null;
 		$fromObjectClass::fromObject($this, $srcObj, $coreResponseProfile);
-		
+	}
+	
+	public function loadRelatedObjects(KalturaResponseProfileBase $responseProfile)
+	{
 		foreach($responseProfile->getRelatedProfiles() as $relatedProfile)
 		{
 			/* @var $relatedProfile KalturaNestedResponseProfileBase */
@@ -340,11 +343,17 @@ abstract class KalturaObject
 			$filter = clone $relatedProfile->filter;
 			foreach($relatedProfile->relations as $relation)
 			{
-				/* @var $relation KalturaResponseProfileRelation */
+				/* @var $relation KalturaResponseProfileMapping */
 				$relation->apply($filter, $this);
 			}
-			$this->relatedObjects[$relatedProfile->name] = $filter->getListResponse($relatedProfile->pager, $relatedProfile);
+			$listResponse = $filter->getListResponse($relatedProfile->pager, $relatedProfile);
+			$this->addRelatedObject($relatedProfile->name, $listResponse->objects);
 		}
+	}
+	
+	public function addRelatedObject($name, KalturaTypedArray $objects)
+	{
+		$this->relatedObjects[$name] = $objects;
 	}
 	
 	public function fromArray ( $source_array )

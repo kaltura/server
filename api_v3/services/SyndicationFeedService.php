@@ -198,8 +198,32 @@ class SyndicationFeedService extends KalturaBaseService
 	{
 		if ($filter === null)
 			$filter = new KalturaBaseSyndicationFeedFilter();
-					
-		return $filter->getListResponse($pager, $this->getResponseProfile());
+			
+		if ($filter->orderBy === null)
+			$filter->orderBy = KalturaBaseSyndicationFeedOrderBy::CREATED_AT_DESC;
+			
+		$syndicationFilter = new syndicationFeedFilter();
+		
+		$filter->toObject($syndicationFilter);
+
+		$c = new Criteria();
+		$syndicationFilter->attachToCriteria($c);
+		$c->add(syndicationFeedPeer::DISPLAY_IN_SEARCH, mySearchUtils::DISPLAY_IN_SEARCH_SYSTEM, Criteria::NOT_EQUAL);
+		
+		$totalCount = syndicationFeedPeer::doCount($c);
+                
+        if($pager === null)
+        	$pager = new KalturaFilterPager();
+                
+        $pager->attachToCriteria($c);
+		$dbList = syndicationFeedPeer::doSelect($c);
+		
+		$list = KalturaBaseSyndicationFeedArray::fromDbArray($dbList, $this->getResponseProfile());
+		$response = new KalturaBaseSyndicationFeedListResponse();
+		$response->objects = $list;
+		$response->totalCount = $totalCount;
+		return $response;
+		
 	}
 	
 	/**

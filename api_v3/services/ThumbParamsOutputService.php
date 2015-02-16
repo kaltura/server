@@ -49,29 +49,8 @@ class ThumbParamsOutputService extends KalturaBaseService
 	{
 		if (!$filter)
 			$filter = new KalturaThumbParamsOutputFilter();
-
-		if (!$pager)
-			$pager = new KalturaFilterPager();
 			
-		$thumbParamsOutputFilter = new assetParamsOutputFilter();
-		
-		$filter->toObject($thumbParamsOutputFilter);
-
-		$c = new Criteria();
-		$thumbParamsOutputFilter->attachToCriteria($c);
-		
-		$thumbTypes = KalturaPluginManager::getExtendedTypes(assetParamsOutputPeer::OM_CLASS, assetType::THUMBNAIL);
-		$c->add(assetParamsOutputPeer::TYPE, $thumbTypes, Criteria::IN);
-		
-		$totalCount = assetParamsOutputPeer::doCount($c);
-		
-		$pager->attachToCriteria($c);
-		$dbList = assetParamsOutputPeer::doSelect($c);
-		
-		$list = KalturaThumbParamsOutputArray::fromDbArray($dbList, $this->getResponseProfile());
-		$response = new KalturaThumbParamsOutputListResponse();
-		$response->objects = $list;
-		$response->totalCount = $totalCount;
-		return $response;
+		$types = KalturaPluginManager::getExtendedTypes(assetParamsOutputPeer::OM_CLASS, assetType::THUMBNAIL);
+		return $filter->getTypeListResponse($pager, $this->getResponseProfile(), $types);
 	}
 }

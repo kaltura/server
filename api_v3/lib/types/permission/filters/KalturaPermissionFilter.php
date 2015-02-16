@@ -12,4 +12,26 @@ class KalturaPermissionFilter extends KalturaPermissionBaseFilter
 	{
 		return new PermissionFilter();
 	}
+
+	/* (non-PHPdoc)
+	 * @see KalturaRelatedFilter::getListResponse()
+	 */
+	public function getListResponse(KalturaFilterPager $pager, KalturaResponseProfileBase $responseProfile = null)
+	{
+		$permissionFilter = $this->toObject();
+		
+		$c = new Criteria();
+		$permissionFilter->attachToCriteria($c);
+		$count = PermissionPeer::doCount($c);
+		
+		$pager->attachToCriteria ( $c );
+		
+		$list = PermissionPeer::doSelect($c);
+		
+		$response = new KalturaPermissionListResponse();
+		$response->objects = KalturaPermissionArray::fromDbArray($list, $responseProfile);
+		$response->totalCount = $count;
+		
+		return $response;
+	}
 }

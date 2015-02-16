@@ -23,7 +23,7 @@ class KalturaNestedResponseProfile extends KalturaNestedResponseProfileBase
 	public $fields;
 	
 	/**
-	 * @var KalturaFilter
+	 * @var KalturaRelatedFilter
 	 */
 	public $filter;
 	

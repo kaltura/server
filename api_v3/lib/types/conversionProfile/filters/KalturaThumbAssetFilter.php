@@ -22,4 +22,17 @@ class KalturaThumbAssetFilter extends KalturaThumbAssetBaseFilter
 	{
 		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
 	}
+
+	/* (non-PHPdoc)
+	 * @see KalturaAssetFilter::getTypeListResponse()
+	 */
+	public function getTypeListResponse(KalturaFilterPager $pager, KalturaResponseProfileBase $responseProfile = null, array $types = null)
+	{
+		list($list, $totalCount) = $this->doGetListResponse($pager, $types);
+		
+		$response = new KalturaThumbAssetListResponse();
+		$response->objects = KalturaThumbAssetArray::fromDbArray($list, $responseProfile);
+		$response->totalCount = $totalCount;
+		return $response;  
+	}
 }

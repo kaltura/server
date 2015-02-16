@@ -502,36 +502,8 @@ class AttachmentAssetService extends KalturaAssetService
 		if (!$filter)
 			$filter = new KalturaAssetFilter();
 
-		if (!$pager)
-			$pager = new KalturaFilterPager();
-			
-		$attachmentAssetFilter = new AssetFilter();
-		
-		$filter->toObject($attachmentAssetFilter);
-
-		$c = new Criteria();
-		$attachmentAssetFilter->attachToCriteria($c);
-		
 		$types = KalturaPluginManager::getExtendedTypes(assetPeer::OM_CLASS, AttachmentPlugin::getAssetTypeCoreValue(AttachmentAssetType::ATTACHMENT));
-		$c->add(assetPeer::TYPE, $types, Criteria::IN);
-		
-		$pager->attachToCriteria($c);
-		$dbList = assetPeer::doSelect($c);
-
-		$resultCount = count($dbList);
-		if ($resultCount && $resultCount < $pager->pageSize)
-			$totalCount = ($pager->pageIndex - 1) * $pager->pageSize + $resultCount;
-		else
-		{
-			KalturaFilterPager::detachFromCriteria($c);
-			$totalCount = assetPeer::doCount($c);
-		}
-				
-		$list = KalturaAttachmentAssetArray::fromDbArray($dbList, $this->getResponseProfile());
-		$response = new KalturaAttachmentAssetListResponse();
-		$response->objects = $list;
-		$response->totalCount = $totalCount;
-		return $response;    
+		return $filter->getTypeListResponse($pager, $this->getResponseProfile(), $types);
 	}
 	
 	/**

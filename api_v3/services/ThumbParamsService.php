@@ -133,30 +133,8 @@ class ThumbParamsService extends KalturaBaseService
 		if (!$filter)
 			$filter = new KalturaThumbParamsFilter();
 
-		if (!$pager)
-			$pager = new KalturaFilterPager();
-			
-		$thumbParamsFilter = new assetParamsFilter();
-		
-		$filter->toObject($thumbParamsFilter);
-		
-		$c = new Criteria();
-		$thumbParamsFilter->attachToCriteria($c);
-		$pager->attachToCriteria($c);
-		
-		$thumbTypes = KalturaPluginManager::getExtendedTypes(assetParamsPeer::OM_CLASS, assetType::THUMBNAIL);
-		$c->add(assetParamsPeer::TYPE, $thumbTypes, Criteria::IN);
-		
-		$dbList = assetParamsPeer::doSelect($c);
-		
-		$c->setLimit(null);
-		$totalCount = assetParamsPeer::doCount($c);
-
-		$list = KalturaThumbParamsArray::fromDbArray($dbList, $this->getResponseProfile());
-		$response = new KalturaThumbParamsListResponse();
-		$response->objects = $list;
-		$response->totalCount = $totalCount;
-		return $response;    
+		$types = KalturaPluginManager::getExtendedTypes(assetParamsPeer::OM_CLASS, assetType::THUMBNAIL);
+		return $filter->getTypeListResponse($pager, $this->getResponseProfile(), $types);
 	}
 	
 	/**

@@ -138,29 +138,7 @@ class CaptionParamsService extends KalturaBaseService
 		if (!$filter)
 			$filter = new KalturaCaptionParamsFilter();
 
-		if (!$pager)
-			$pager = new KalturaFilterPager();
-			
-		$captionParamsFilter = new assetParamsFilter();
-		
-		$filter->toObject($captionParamsFilter);
-		
-		$c = new Criteria();
-		$captionParamsFilter->attachToCriteria($c);
-		$pager->attachToCriteria($c);
-		
-		$captionTypes = KalturaPluginManager::getExtendedTypes(assetParamsPeer::OM_CLASS, CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION));
-		$c->add(assetParamsPeer::TYPE, $captionTypes, Criteria::IN);
-		
-		$dbList = assetParamsPeer::doSelect($c);
-		
-		$c->setLimit(null);
-		$totalCount = assetParamsPeer::doCount($c);
-
-		$list = KalturaCaptionParamsArray::fromDbArray($dbList, $this->getResponseProfile());
-		$response = new KalturaCaptionParamsListResponse();
-		$response->objects = $list;
-		$response->totalCount = $totalCount;
-		return $response;    
+		$types = KalturaPluginManager::getExtendedTypes(assetParamsPeer::OM_CLASS, CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION));			
+		return $filter->getTypeListResponse($pager, $this->getResponseProfile(), $types);
 	}
 }

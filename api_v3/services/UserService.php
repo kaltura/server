@@ -287,43 +287,10 @@ class UserService extends KalturaBaseUserService
 		if (!$filter)
 			$filter = new KalturaUserFilter();
 			
-		if (!$pager)
-			$pager = new KalturaFilterPager();	
-
-		$userFilter = new kuserFilter();
-		$filter->toObject($userFilter);
-		
-		$c = KalturaCriteria::create(kuserPeer::OM_CLASS);
-		$userFilter->attachToCriteria($c);
-		
-		if (!is_null($filter->roleIdEqual))
-		{
-			$roleCriteria = new Criteria();
-			$roleCriteria->add ( KuserToUserRolePeer::USER_ROLE_ID , $filter->roleIdEqual );
-			$roleCriteria->addSelectColumn(KuserToUserRolePeer::KUSER_ID);
-			$rs = KuserToUserRolePeer::doSelectStmt($roleCriteria);
-			$kuserIds = $rs->fetchAll(PDO::FETCH_COLUMN);
-						
-			$c->add(kuserPeer::ID, $kuserIds, KalturaCriteria::IN);
-		}
-
-		if (is_null($filter->typeEqual) && is_null($filter->typeIn)){
-			$c->add(kuserPeer::TYPE, KuserType::USER, KalturaCriteria::EQUAL);
-		}
-		
-		$c->addAnd(kuserPeer::PUSER_ID, NULL, KalturaCriteria::ISNOTNULL);
-		
-		$pager->attachToCriteria($c);
-		$list = kuserPeer::doSelect($c);
-		
-		$totalCount = $c->getRecordsCount();
-
-		$newList = KalturaUserArray::fromDbArray($list, $this->getResponseProfile());
-		$response = new KalturaUserListResponse();
-		$response->objects = $newList;
-		$response->totalCount = $totalCount;
-		
-		return $response;
+		if(!$pager)
+			$pager = new KalturaFilterPager();
+			
+		return $filter->getListResponse($pager, $this->getResponseProfile());
 	}
 	
 	/**

@@ -35,4 +35,25 @@ class KalturaFileAssetFilter extends KalturaFileAssetBaseFilter
 		$this->validatePropertyNotNull(array('objectIdEqual', 'objectIdIn', 'idIn', 'idEqual'));
 		return parent::toObject($object_to_fill, $props_to_skip);
 	}
+
+	/* (non-PHPdoc)
+	 * @see KalturaRelatedFilter::getListResponse()
+	 */
+	public function getListResponse(KalturaFilterPager $pager, KalturaResponseProfileBase $responseProfile = null)
+	{
+		$fileAssetFilter = $this->toObject();
+
+		$c = new Criteria();
+		$fileAssetFilter->attachToCriteria($c);
+		
+		$totalCount = FileAssetPeer::doCount($c);
+		
+		$pager->attachToCriteria($c);
+		$dbList = FileAssetPeer::doSelect($c);
+		
+		$response = new KalturaFileAssetListResponse();
+		$response->objects = KalturaFileAssetArray::fromDbArray($dbList, $responseProfile);
+		$response->totalCount = $totalCount;
+		return $response; 
+	}
 }

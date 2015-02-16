@@ -142,32 +142,9 @@ class FlavorParamsService extends KalturaBaseService
 	{
 		if (!$filter)
 			$filter = new KalturaFlavorParamsFilter();
-
-		if (!$pager)
-			$pager = new KalturaFilterPager();
 			
-		$flavorParamsFilter = new assetParamsFilter();
-		
-		$filter->toObject($flavorParamsFilter);
-		
-		$c = new Criteria();
-		$flavorParamsFilter->attachToCriteria($c);
-		
-		$pager->attachToCriteria($c);
-		
-		$flavorTypes = assetParamsPeer::retrieveAllFlavorParamsTypes();
-		$c->add(assetParamsPeer::TYPE, $flavorTypes, Criteria::IN);
-		
-		$dbList = assetParamsPeer::doSelect($c);
-		
-		$c->setLimit(null);
-		$totalCount = assetParamsPeer::doCount($c);
-
-		$list = KalturaFlavorParamsArray::fromDbArray($dbList, $this->getResponseProfile());
-		$response = new KalturaFlavorParamsListResponse();
-		$response->objects = $list;
-		$response->totalCount = $totalCount;
-		return $response;    
+		$types = assetParamsPeer::retrieveAllFlavorParamsTypes();			
+		return $filter->getTypeListResponse($pager, $this->getResponseProfile(), $types);
 	}
 	
 	/**

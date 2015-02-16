@@ -71,4 +71,57 @@ class KalturaCuePointFilter extends KalturaCuePointBaseFilter
 		
 		return parent::toObject($cuePointFilter, $propsToSkip);
 	}
+	
+	protected function doGetListResponse(KalturaFilterPager $pager, $type = null)
+	{
+		$c = KalturaCriteria::create(CuePointPeer::OM_CLASS);
+		if($type)
+		{
+			$c->add(CuePointPeer::TYPE, $type);
+		}
+
+		$entryIds = null;
+		if ($this->entryIdEqual) {
+			$entryIds = array($this->entryIdEqual);
+		} else if ($this->entryIdIn) {
+			$entryIds = explode(',', $this->entryIdIn);
+		}
+		
+		if (! is_null ( $entryIds )) {
+			$entryIds = entryPeer::filterEntriesByPartnerOrKalturaNetwork ( $entryIds, kCurrentContext::getCurrentPartnerId());
+			if (! $entryIds) {
+				return array(array(), 0);
+			}
+			
+			$this->entryIdEqual = null;
+			$this->entryIdIn = implode ( ',', $entryIds );
+		}
+
+		$cuePointFilter = $this->toObject();
+		$cuePointFilter->attachToCriteria($c);
+
+		$pager->attachToCriteria($c);
+			
+		$list = CuePointPeer::doSelect($c);
+		
+		return array($list, $c->getRecordsCount());
+	}
+	
+	public function getTypeListResponse(KalturaFilterPager $pager, KalturaResponseProfileBase $responseProfile = null, $type = null)
+	{
+		list($list, $totalCount) = $this->doGetListResponse($pager, $type);
+		$response = new KalturaCuePointListResponse();
+		$response->objects = KalturaCuePointArray::fromDbArray($list, $responseProfile);
+		$response->totalCount = $totalCount;
+	
+		return $response;
+	}
+	
+	/* (non-PHPdoc)
+	 * @see KalturaRelatedFilter::getListResponse()
+	 */
+	public function getListResponse(KalturaFilterPager $pager, KalturaResponseProfileBase $responseProfile = null)
+	{
+		return $this->getTypeListResponse($pager, $responseProfile);
+	}
 }

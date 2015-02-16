@@ -203,7 +203,7 @@ class CategoryService extends KalturaBaseService
 	{
 		if ($filter === null)
 			$filter = new KalturaCategoryFilter();
-
+	
 		if ($pager == null)
 		{
 			$pager = new KalturaFilterPager();
@@ -215,26 +215,8 @@ class CategoryService extends KalturaBaseService
 			KalturaCriteria::setMaxRecords(Partner::MAX_NUMBER_OF_CATEGORIES);
 			baseObjectFilter::setMaxInValues(Partner::MAX_NUMBER_OF_CATEGORIES);
 		}
-
-		if ($filter->orderBy === null)
-			$filter->orderBy = KalturaCategoryOrderBy::DEPTH_ASC;
-			
-		$categoryFilter = new categoryFilter();
 		
-		$filter->toObject($categoryFilter);
-		
-		$c = KalturaCriteria::create(categoryPeer::OM_CLASS);
-		$categoryFilter->attachToCriteria($c);
-		$pager->attachToCriteria($c);
-		$dbList = categoryPeer::doSelect($c);
-		$totalCount = $c->getRecordsCount();
-		
-		$list = KalturaCategoryArray::fromDbArray($dbList, $this->getResponseProfile());
-		
-		$response = new KalturaCategoryListResponse();
-		$response->objects = $list;
-		$response->totalCount = $totalCount;
-		return $response;
+		return $filter->getListResponse($pager, $this->getResponseProfile());
 	}
 	
 	/**

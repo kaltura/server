@@ -444,77 +444,11 @@ class FlavorAssetService extends KalturaAssetService
 	 */
 	function listAction(KalturaAssetFilter $filter = null, KalturaFilterPager $pager = null)
 	{
-	    myDbHelper::$use_alternative_con = myDbHelper::DB_HELPER_CONN_PROPEL2;
-	    
 		if (!$filter)
 			$filter = new KalturaAssetFilter();
-
-		if (!$pager)
-			$pager = new KalturaFilterPager();
 			
-		// verify access to the relevant entries - either same partner as the KS or kaltura network
-		if ($filter->entryIdEqual)
-		{
-			$entryIds = array($filter->entryIdEqual);
-		}
-		else if ($filter->entryIdIn)
-		{
-			$entryIds = explode(',', $filter->entryIdIn);
-		}
-		else
-		{
-			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_CANNOT_BE_NULL, 'KalturaAssetFilter::entryIdEqual/KalturaAssetFilter::entryIdIn');
-		}
-		
-		$entryIds = array_slice($entryIds, 0, baseObjectFilter::getMaxInValues());
-
-		$c = KalturaCriteria::create(entryPeer::OM_CLASS);
-		$c->addAnd(entryPeer::ID, $entryIds, Criteria::IN);
-		$criterionPartnerOrKn = $c->getNewCriterion(entryPeer::PARTNER_ID, $this->getPartnerId());
-		$criterionPartnerOrKn->addOr($c->getNewCriterion(entryPeer::DISPLAY_IN_SEARCH, mySearchUtils::DISPLAY_IN_SEARCH_KALTURA_NETWORK));
-		$c->addAnd($criterionPartnerOrKn);
-		$dbEntries = entryPeer::doSelect($c);
-		
-		if (!$dbEntries)
-			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, implode(',', $entryIds));
-		
-		$entryIds = array();
-		foreach ($dbEntries as $dbEntry)
-		{
-			$entryIds[] = $dbEntry->getId();
-		}
-
-		$filter->entryIdEqual = null;
-		$filter->entryIdIn = implode(',', $entryIds);
-
-		// get the flavors
-		$flavorAssetFilter = new AssetFilter();
-		
-		$filter->toObject($flavorAssetFilter);
-
-		$c = new Criteria();
-		$flavorAssetFilter->attachToCriteria($c);
-		
-		$flavorTypes = assetPeer::retrieveAllFlavorsTypes();
-		$c->add(assetPeer::TYPE, $flavorTypes, Criteria::IN);
-
-		$pager->attachToCriteria($c);
-		$dbList = assetPeer::doSelect($c);
-
-		$resultCount = count($dbList);
-		if ($resultCount && $resultCount < $pager->pageSize)
-			$totalCount = ($pager->pageIndex - 1) * $pager->pageSize + $resultCount;
-		else
-		{
-			KalturaFilterPager::detachFromCriteria($c);
-			$totalCount = assetPeer::doCount($c);
-		}
-		
-		$list = KalturaFlavorAssetArray::fromDbArray($dbList, $this->getResponseProfile());
-		$response = new KalturaFlavorAssetListResponse();
-		$response->objects = $list;
-		$response->totalCount = $totalCount;
-		return $response;    
+		$types = assetPeer::retrieveAllFlavorsTypes();
+		return $filter->getTypeListResponse($pager, $this->getResponseProfile(), $types);
 	}
 	
 	/**

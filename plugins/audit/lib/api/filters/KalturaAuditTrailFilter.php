@@ -59,4 +59,25 @@ class KalturaAuditTrailFilter extends KalturaAuditTrailBaseFilter
 			
 		return parent::toObject($auditTrailFilter, $propsToSkip);
 	}
+	
+	/* (non-PHPdoc)
+	 * @see KalturaRelatedFilter::getListResponse()
+	 */
+	public function getListResponse(KalturaFilterPager $pager, KalturaResponseProfileBase $responseProfile = null)
+	{
+		$auditTrailFilter = $this->toObject();
+		
+		$c = new Criteria();
+		$auditTrailFilter->attachToCriteria($c);
+		$count = AuditTrailPeer::doCount($c);
+		
+		$pager->attachToCriteria($c);
+		$list = AuditTrailPeer::doSelect($c);
+		
+		$response = new KalturaAuditTrailListResponse();
+		$response->objects = KalturaAuditTrailArray::fromDbArray($list, $responseProfile);
+		$response->totalCount = $count;
+		
+		return $response;
+	}
 }

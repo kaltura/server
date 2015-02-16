@@ -372,22 +372,7 @@ class SystemPartnerService extends KalturaBaseService
 		if (is_null($pager))
 			$pager = new KalturaFilterPager();
 			
-			
-		$userLoginDataFilter = new UserLoginDataFilter();
-		$filter->toObject($userLoginDataFilter);
-		
-		$c = new Criteria();
-		$userLoginDataFilter->attachToCriteria($c);
-		
-		$totalCount = UserLoginDataPeer::doCount($c);
-		$pager->attachToCriteria($c);
-		$list = UserLoginDataPeer::doSelect($c);
-		$newList = KalturaUserLoginDataArray::fromDbArray($list, $this->getResponseProfile());
-		
-		$response = new KalturaUserLoginDataListResponse();
-		$response->totalCount = $totalCount;
-		$response->objects = $newList;
-		return $response;
+		return $filter->getListResponse($pager, $this->getResponseProfile());
 	}
 	
 	

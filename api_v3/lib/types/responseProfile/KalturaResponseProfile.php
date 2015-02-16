@@ -71,7 +71,7 @@ class KalturaResponseProfile extends KalturaResponseProfileBase implements IFilt
 	public $fields;
 	
 	/**
-	 * @var KalturaFilter
+	 * @var KalturaRelatedFilter
 	 */
 	public $filter;
 	

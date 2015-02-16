@@ -128,26 +128,10 @@ class AccessControlService extends KalturaBaseService
 	{
 		if (!$filter)
 			$filter = new KalturaAccessControlFilter();
-
-		if (!$pager)
+			
+		if(!$pager)
 			$pager = new KalturaFilterPager();
 			
-		$accessControlFilter = new accessControlFilter();
-		
-		$filter->toObject($accessControlFilter);
-
-		$c = new Criteria();
-		$accessControlFilter->attachToCriteria($c);
-		
-		$totalCount = accessControlPeer::doCount($c);
-		
-		$pager->attachToCriteria($c);
-		$dbList = accessControlPeer::doSelect($c);
-		
-		$list = KalturaAccessControlArray::fromDbArray($dbList, $this->getResponseProfile());
-		$response = new KalturaAccessControlListResponse();
-		$response->objects = $list;
-		$response->totalCount = $totalCount;
-		return $response;    
+		return $filter->getListResponse($pager, $this->getResponseProfile());  
 	}
 }

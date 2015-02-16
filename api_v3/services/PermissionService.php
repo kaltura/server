@@ -206,24 +206,10 @@ class PermissionService extends KalturaBaseService
 		if (!$filter)
 			$filter = new KalturaPermissionFilter();
 			
-		$permissionFilter = $filter->toObject();
-		
-		$c = new Criteria();
-		$permissionFilter->attachToCriteria($c);
-		$count = PermissionPeer::doCount($c);
-		
 		if(!$pager)
-			$pager = new KalturaFilterPager ();
-		
-		$pager->attachToCriteria ( $c );
-		
-		$list = PermissionPeer::doSelect($c);
-		
-		$response = new KalturaPermissionListResponse();
-		$response->objects = KalturaPermissionArray::fromDbArray($list, $this->getResponseProfile());
-		$response->totalCount = $count;
-		
-		return $response;
+			$pager = new KalturaFilterPager();
+			
+		return $filter->getListResponse($pager, $this->getResponseProfile());
 	}
 	
 	/**

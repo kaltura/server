@@ -128,29 +128,6 @@ class KalturaBaseEntryFilter extends KalturaBaseEntryBaseFilter
 	}
 	
 	/**
-	 * Convert duration in seconds to msecs (because the duration field is mapped to length_in_msec)
-	 */
-	private function fixFilterDuration()
-	{
-		if ($this instanceof KalturaPlayableEntryFilter) // because duration filter should be supported in baseEntryService
-		{
-			if ($this->durationGreaterThan !== null)
-				$this->durationGreaterThan = $this->durationGreaterThan * 1000;
-
-			//When translating from seconds to msec need to subtract 500 msec since entries greater than 5500 msec are considered as entries with 6 sec
-			if ($this->durationGreaterThanOrEqual !== null)
-				$this->durationGreaterThanOrEqual = $this->durationGreaterThanOrEqual * 1000 - 500;
-				
-			if ($this->durationLessThan !== null)
-				$this->durationLessThan = $this->durationLessThan * 1000;
-				
-			//When translating from seconds to msec need to add 499 msec since entries less than 5499 msec are considered as entries with 5 sec
-			if ($this->durationLessThanOrEqual !== null)
-				$this->durationLessThanOrEqual = $this->durationLessThanOrEqual * 1000 + 499;
-		}
-	}
-	
-	/**
 	 * @param KalturaFilterPager $pager
 	 * @return KalturaCriteria
 	 */
@@ -170,7 +147,6 @@ class KalturaBaseEntryFilter extends KalturaBaseEntryBaseFilter
 		}
 		
 		$this->fixFilterUserId($this);
-		$this->fixFilterDuration($this);
 		
 		$entryFilter = new entryFilter();
 		$entryFilter->setPartnerSearchScope(baseObjectFilter::MATCH_KALTURA_NETWORK_AND_PRIVATE);
@@ -199,9 +175,6 @@ class KalturaBaseEntryFilter extends KalturaBaseEntryBaseFilter
 			$this->parentEntryIdEqual != null))
 			$disableWidgetSessionFilters = true;
 			
-		if (!$pager)
-			$pager = new KalturaFilterPager();
-		
 		$c = $this->prepareEntriesCriteriaFilter($pager);
 		
 		if ($disableWidgetSessionFilters)

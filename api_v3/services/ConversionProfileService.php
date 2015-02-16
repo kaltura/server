@@ -235,28 +235,11 @@ class ConversionProfileService extends KalturaBaseService
 	{
 		if (!$filter)
 			$filter = new KalturaConversionProfileFilter();
-
-		if (!$pager)
+			
+		if(!$pager)
 			$pager = new KalturaFilterPager();
 			
-		$conversionProfile2Filter = new conversionProfile2Filter();
-		
-		$filter->toObject($conversionProfile2Filter);
-
-		$c = new Criteria();
-		$conversionProfile2Filter->attachToCriteria($c);
-		
-		$totalCount = conversionProfile2Peer::doCount($c);
-		
-		$pager->attachToCriteria($c);
-		$dbList = conversionProfile2Peer::doSelect($c);
-		
-		$list = KalturaConversionProfileArray::fromDbArray($dbList, $this->getResponseProfile());
-		$list->loadFlavorParamsIds();
-		$response = new KalturaConversionProfileListResponse();
-		$response->objects = $list;
-		$response->totalCount = $totalCount;
-		return $response;    
+		return $filter->getListResponse($pager, $this->getResponseProfile());  
 	}
 	
 	/**
