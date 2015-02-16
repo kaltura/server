@@ -114,7 +114,6 @@ class ThumbCuePointPlugin extends KalturaPlugin implements IKalturaCuePoint, IKa
 	 */
 	public static function contributeToSchema($type)
 	{
-		KalturaLog::debug('XXXXXXXXXX - thumbCuePoint');
 
 		//TBD add thumb asset support to xsd
 		$coreType = kPluginableEnumsManager::apiToCore('SchemaType', $type);
