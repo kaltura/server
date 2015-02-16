@@ -792,7 +792,7 @@ $plannedDur = 0;
 	/* ---------------------------
 	 * evaluateTargetVideoFramesize
 	 */
-	private static function evaluateTargetVideoFramesize(KDLVideoData $source, KDLVideoData $target) 
+	private function evaluateTargetVideoFramesize(KDLVideoData $source, KDLVideoData $target) 
 	{
 		$shrinkToSource = $target->_isShrinkFramesizeToSource;
 		$invertedVideo = false;
@@ -995,7 +995,7 @@ $plannedDur = 0;
 	 *  - Compare each of them to the required AR
 	 *  - Find the setup that is closest 
 	 */
-	protected static function matchBestModConstrainedVideoFramesize($darSrcFrame, $hgtSrc, $widSrc, $modVal, KDLVideoData $target) 
+	protected function matchBestModConstrainedVideoFramesize($darSrcFrame, $hgtSrc, $widSrc, $modVal, KDLVideoData $target) 
 	{ 
 			/*
 			 * Calculate hgt & wid 'mod down' value. If not set - assign 0 
