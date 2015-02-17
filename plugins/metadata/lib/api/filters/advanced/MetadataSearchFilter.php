@@ -300,16 +300,19 @@ class MetadataSearchFilter extends AdvancedSearchFilterOperator
 	}
 	
 	
-	public function getFreeTextConditions($partnerScope, $freeTexts , $metadataProfileId = null) 
+	public function getFreeTextConditions($partnerScope, $freeTexts , $advancedSearch) 
 	{
-		$metadataProfileFields = array();
-		$metadataProfileFieldIds = array();
 
-		if ($metadataProfileId)
+		$metadataProfileFieldIds = array();
+		if ($advancedSearch instanceof MetadataSearchFilter)
 		{
-			$metadataProfileFields = MetadataProfileFieldPeer::retrieveActiveByMetadataProfileId($metadataProfileId);
-			foreach($metadataProfileFields as $metadataProfileField)
-				$metadataProfileFieldIds[] = $metadataProfileField->getId();
+			$metadataProfileId = $advancedSearch->getMetadataProfileId();
+			if ($metadataProfileId)
+			{
+				$metadataProfileFields = MetadataProfileFieldPeer::retrieveActiveByMetadataProfileId($metadataProfileId);
+				foreach($metadataProfileFields as $metadataProfileField)
+					$metadataProfileFieldIds[] = $metadataProfileField->getId();
+			}
 		}
 
 		KalturaLog::debug("freeText [$freeTexts]");
@@ -340,7 +343,7 @@ class MetadataSearchFilter extends AdvancedSearchFilterOperator
 				$freeText = SphinxUtils::escapeString($freeText);
 				$additionalConditions[] = $this->createSphinxSearchPhrase($partnerScope, $freeText);
 				foreach($metadataProfileFieldIds as $metadataProfileFieldId)
-					$additionalConditions[] = $this->createSphinxSearchPhrase($partnerScope, $freeTexts , $metadataProfileFieldId);
+					$additionalConditions[] = $this->createSphinxSearchPhrase($partnerScope, $freeText , $metadataProfileFieldId);
 			}
 			
 			return $additionalConditions;
@@ -356,7 +359,7 @@ class MetadataSearchFilter extends AdvancedSearchFilterOperator
 		$freeTextExpr = SphinxUtils::escapeString($freeTextExpr);
 		$additionalConditions[] =  $this->createSphinxSearchPhrase($partnerScope, $freeTextExpr);
 		foreach($metadataProfileFieldIds as $metadataProfileFieldId)
-			$additionalConditions[] = $this->createSphinxSearchPhrase($partnerScope, $freeTexts , $metadataProfileFieldId);
+			$additionalConditions[] = $this->createSphinxSearchPhrase($partnerScope, $freeTextExpr , $metadataProfileFieldId);
 
 		return $additionalConditions;
 	}
