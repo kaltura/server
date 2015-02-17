@@ -53,13 +53,14 @@ Integration with Activiti BPM engine
 
 Add the following line:
 
-		Integration		
-		ExampleIntegration
-		IntegrationEventNotifications
-		BpmEventNotificationIntegration
-		BusinessProcessNotification
-		ActivitiBusinessProcessNotification
-
+```
+Integration		
+ExampleIntegration
+IntegrationEventNotifications
+BpmEventNotificationIntegration
+BusinessProcessNotification
+ActivitiBusinessProcessNotification
+```
 *batch.ini*
 
 Add the following lines under `[template]` section:
