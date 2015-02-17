@@ -157,6 +157,10 @@ class EventNotificationTemplatePeer extends BaseEventNotificationTemplatePeer
 		return EventNotificationTemplatePeer::doSelect($criteria);
 	}
 
+	public static function getCacheInvalidationKeys()
+	{
+		return array(array("eventNotificationTemplate:partnerId=%s", self::PARTNER_ID));		
+	}
 } // EventNotificationTemplatePeer
 
 

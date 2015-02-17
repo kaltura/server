@@ -51,4 +51,8 @@ abstract class EventNotificationTemplate extends BaseEventNotificationTemplate
 			
 		$this->putInCustomData('requiredCopyTemplatePermissions', $v);
 	}
+	public function getCacheInvalidationKeys()
+	{
+		return array("eventNotificationTemplate:partnerId=".strtolower($this->getPartnerId()));
+	}
 } // EventNotificationTemplate
