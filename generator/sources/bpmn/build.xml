@@ -14,7 +14,7 @@
 				<property name="catalina.home" value="${env.CATALINA_HOME}" />		
 			</then>
 			<else>
-				<input message="Please entrer tomcat 7 home directory full path" addproperty="catalina.home" defaultvalue="/usr/share/tomcat7" />
+				<input message="Please enter tomcat 7 home directory full path" addproperty="catalina.home" defaultvalue="/usr/share/tomcat7" />
 			</else>
 		</if>		
 	</target>
