@@ -72,8 +72,12 @@ class KalturaContentDistributionSearchItem extends KalturaSearchItem
 	public function fromObject($source_object, KalturaResponseProfileBase $responseProfile = null)
 	{
 		parent::fromObject($source_object, $responseProfile);
-		$entryDistributionValidationErrors = $source_object->getEntryDistributionValidationErrors();
-		if(count($entryDistributionValidationErrors))
-			$this->entryDistributionValidationErrors = implode(',', $entryDistributionValidationErrors);
+		
+		if($this->shouldGet('entryDistributionValidationErrors', $responseProfile))
+		{
+			$entryDistributionValidationErrors = $source_object->getEntryDistributionValidationErrors();
+			if(count($entryDistributionValidationErrors))
+				$this->entryDistributionValidationErrors = implode(',', $entryDistributionValidationErrors);
+		}
 	}
 }

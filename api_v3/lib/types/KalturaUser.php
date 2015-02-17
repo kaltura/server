@@ -289,11 +289,15 @@ class KalturaUser extends KalturaObject implements IFilterable
 			return;
 			
 		parent::fromObject($sourceObject, $responseProfile);
+		
 		// full name is deprecated and was split to firstName + lastName
 		// this is for backward compatibility
-		$this->fullName = $sourceObject->getFullName();
-		$this->loginEnabled = !is_null($sourceObject->getLoginDataId());
-		$this->statusUpdatedAt = $sourceObject->getStatusUpdatedAt(null);
+		if($this->shouldGet('fullName', $responseProfile))
+			$this->fullName = $sourceObject->getFullName();
+		if($this->shouldGet('loginEnabled', $responseProfile))
+			$this->loginEnabled = !is_null($sourceObject->getLoginDataId());
+		if($this->shouldGet('statusUpdatedAt', $responseProfile))
+			$this->statusUpdatedAt = $sourceObject->getStatusUpdatedAt(null);
 	}
 	
 	public function getExtraFilters()

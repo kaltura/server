@@ -67,13 +67,20 @@ abstract class KalturaDistributionProvider extends KalturaObject implements IFil
 	{
 		parent::fromObject($sourceObject, $responseProfile);
 		
-		$this->scheduleUpdateEnabled = $sourceObject->isScheduleUpdateEnabled();
-		$this->availabilityUpdateEnabled = $sourceObject->isAvailabilityUpdateEnabled();
-		$this->deleteInsteadUpdate = $sourceObject->useDeleteInsteadOfUpdate();
-		$this->intervalBeforeSunrise = $sourceObject->getJobIntervalBeforeSunrise();
-		$this->intervalBeforeSunset = $sourceObject->getJobIntervalBeforeSunset();
-		$this->updateRequiredEntryFields = $sourceObject->getUpdateRequiredEntryFields();
-		$this->updateRequiredMetadataXPaths = $sourceObject->getUpdateRequiredMetadataXPaths();
+		if($this->shouldGet('scheduleUpdateEnabled', $responseProfile))
+			$this->scheduleUpdateEnabled = $sourceObject->isScheduleUpdateEnabled();
+		if($this->shouldGet('availabilityUpdateEnabled', $responseProfile))
+			$this->availabilityUpdateEnabled = $sourceObject->isAvailabilityUpdateEnabled();
+		if($this->shouldGet('deleteInsteadUpdate', $responseProfile))
+			$this->deleteInsteadUpdate = $sourceObject->useDeleteInsteadOfUpdate();
+		if($this->shouldGet('intervalBeforeSunrise', $responseProfile))
+			$this->intervalBeforeSunrise = $sourceObject->getJobIntervalBeforeSunrise();
+		if($this->shouldGet('intervalBeforeSunset', $responseProfile))
+			$this->intervalBeforeSunset = $sourceObject->getJobIntervalBeforeSunset();
+		if($this->shouldGet('updateRequiredEntryFields', $responseProfile))
+			$this->updateRequiredEntryFields = $sourceObject->getUpdateRequiredEntryFields();
+		if($this->shouldGet('updateRequiredMetadataXPaths', $responseProfile))
+			$this->updateRequiredMetadataXPaths = $sourceObject->getUpdateRequiredMetadataXPaths();
 	}
 	 
 		 

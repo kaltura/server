@@ -41,7 +41,10 @@ class KalturaConvertEntryFlavorsObjectTask extends KalturaObjectTask
 		parent::fromObject($srcObj, $responseProfile);
 
 		/** @var kObjectTask $srcObj */
-		$this->flavorParamsIds = implode(',', $srcObj->getDataValue('flavorParamsIds'));
-		$this->reconvert = $srcObj->getDataValue('reconvert');
+		if($this->shouldGet('flavorParamsIds', $responseProfile))
+			$this->flavorParamsIds = implode(',', $srcObj->getDataValue('flavorParamsIds'));
+			
+		if($this->shouldGet('reconvert', $responseProfile))
+			$this->reconvert = $srcObj->getDataValue('reconvert');
 	}
 }

@@ -221,18 +221,22 @@ class KalturaDropFolder extends KalturaObject implements IFilterable
 	public function fromObject($source_object, KalturaResponseProfileBase $responseProfile = null)
 	{
 		parent::fromObject($source_object, $responseProfile);
-		$dbFileHandlerConfig = $source_object->getFileHandlerConfig();
-		if ($dbFileHandlerConfig)
+		
+		if($this->shouldGet('fileHandlerConfig', $responseProfile))
 		{
-			$apiFileHandlerConfig = KalturaPluginManager::loadObject('KalturaDropFolderFileHandlerConfig', $source_object->getFileHandlerType());
-			if($apiFileHandlerConfig)
+			$dbFileHandlerConfig = $source_object->getFileHandlerConfig();
+			if ($dbFileHandlerConfig)
 			{
-				$apiFileHandlerConfig->fromObject($dbFileHandlerConfig);
-				$this->fileHandlerConfig  = $apiFileHandlerConfig;
-			}
-			else
-			{
-				KalturaLog::err("Cannot load API object for core file handler config type [" . $dbFileHandlerConfig->getHandlerType() . "]");
+				$apiFileHandlerConfig = KalturaPluginManager::loadObject('KalturaDropFolderFileHandlerConfig', $source_object->getFileHandlerType());
+				if($apiFileHandlerConfig)
+				{
+					$apiFileHandlerConfig->fromObject($dbFileHandlerConfig);
+					$this->fileHandlerConfig  = $apiFileHandlerConfig;
+				}
+				else
+				{
+					KalturaLog::err("Cannot load API object for core file handler config type [" . $dbFileHandlerConfig->getHandlerType() . "]");
+				}
 			}
 		}
 	}

@@ -205,10 +205,14 @@ class KalturaDropFolderFile extends KalturaObject implements IFilterable
 	{
 		parent::fromObject($source_object, $responseProfile);
 		
-		$this->uploadStartDetectedAt = $source_object->getUploadStartDetectedAt(null);
-		$this->uploadEndDetectedAt = $source_object->getUploadEndDetectedAt(null);
-		$this->importStartedAt = $source_object->getImportStartedAt(null);
-		$this->importEndedAt = $source_object->getImportEndedAt(null);		
+		if($this->shouldGet('uploadStartDetectedAt', $responseProfile))
+			$this->uploadStartDetectedAt = $source_object->getUploadStartDetectedAt(null);
+		if($this->shouldGet('uploadEndDetectedAt', $responseProfile))
+			$this->uploadEndDetectedAt = $source_object->getUploadEndDetectedAt(null);
+		if($this->shouldGet('importStartedAt', $responseProfile))
+			$this->importStartedAt = $source_object->getImportStartedAt(null);
+		if($this->shouldGet('importEndedAt', $responseProfile))
+			$this->importEndedAt = $source_object->getImportEndedAt(null);		
 	}
 
 	public function getExtraFilters()

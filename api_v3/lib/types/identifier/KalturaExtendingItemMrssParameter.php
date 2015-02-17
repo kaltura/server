@@ -58,19 +58,22 @@ class KalturaExtendingItemMrssParameter extends KalturaObject
 		parent::fromObject($dbObject, $responseProfile);
 		
 		/* @var $dbObject kExtendingItemMrssParameter */
-		$identifierType = get_class($dbObject->getIdentifier());
-		KalturaLog::info("Creating identifier for DB identifier type $identifierType");
-		switch ($identifierType)
+		if($this->shouldGet('identifier', $responseProfile))
 		{
-			case 'kEntryIdentifier':
-				$this->identifier = new KalturaEntryIdentifier();
-				break;
-			case 'kCategoryIdentifier':
-				$this->identifier = new KalturaCategoryIdentifier();
+			$identifierType = get_class($dbObject->getIdentifier());
+			KalturaLog::info("Creating identifier for DB identifier type $identifierType");
+			switch ($identifierType)
+			{
+				case 'kEntryIdentifier':
+					$this->identifier = new KalturaEntryIdentifier();
+					break;
+				case 'kCategoryIdentifier':
+					$this->identifier = new KalturaCategoryIdentifier();
+			}
+			
+			if ($this->identifier)
+				$this->identifier->fromObject($dbObject->getIdentifier());
 		}
-		
-		if ($this->identifier)
-			$this->identifier->fromObject($dbObject->getIdentifier());
 	}
 	
 	protected function validate ()

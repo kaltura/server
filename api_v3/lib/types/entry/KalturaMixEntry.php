@@ -48,10 +48,13 @@ class KalturaMixEntry extends KalturaPlayableEntry
 	{
 		parent::fromObject($entry, $responseProfile);
 
-		if ($entry->getEditorType() == "kalturaAdvancedEditor" || $entry->getEditorType() == "Keditor")
-		    $this->editorType = KalturaEditorType::ADVANCED;
-		else
-		    $this->editorType = KalturaEditorType::SIMPLE;
+		if($this->shouldGet('editorType', $responseProfile))
+		{
+			if ($entry->getEditorType() == "kalturaAdvancedEditor" || $entry->getEditorType() == "Keditor")
+			    $this->editorType = KalturaEditorType::ADVANCED;
+			else
+			    $this->editorType = KalturaEditorType::SIMPLE;
+		}
 	}
 	
 	public function toObject($entry = null, $skip = array())

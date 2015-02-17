@@ -77,6 +77,7 @@ class KalturaBatchHistoryData extends KalturaObject
 	public function fromObject($historyData, KalturaResponseProfileBase $responseProfile = null)
 	{
 		parent::fromObject($historyData, $responseProfile);
-		$this->timeStamp = $historyData->getTimeStamp(null); // to return the timestamp and not string
+		if($this->shouldGet('timeStamp', $responseProfile))
+			$this->timeStamp = $historyData->getTimeStamp(null); // to return the timestamp and not string
 	}
 }

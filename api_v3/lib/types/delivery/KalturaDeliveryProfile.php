@@ -165,8 +165,10 @@ class KalturaDeliveryProfile extends KalturaObject implements IFilterable
 			
 		parent::fromObject($sourceObject, $responseProfile);
 		
-		$this->recognizer = $this->transformRecognizer($sourceObject);
-		$this->tokenizer = $this->transformTokenizer($sourceObject);
+		if($this->shouldGet('recognizer', $responseProfile))
+			$this->recognizer = $this->transformRecognizer($sourceObject);
+		if($this->shouldGet('tokenizer', $responseProfile))
+			$this->tokenizer = $this->transformTokenizer($sourceObject);
 	}
 	
 	protected function transformRecognizer($sourceObject) {

@@ -140,7 +140,7 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 			
 		parent::fromObject($dbObject, $responseProfile);
 
-		if(!is_null($dbObject->getRecordingOptions()))
+		if($this->shouldGet('recordingOptions', $responseProfile) && !is_null($dbObject->getRecordingOptions()))
 		{
 			$this->recordingOptions = new KalturaLiveEntryRecordingOptions();
 			$this->recordingOptions->fromObject($dbObject->getRecordingOptions());

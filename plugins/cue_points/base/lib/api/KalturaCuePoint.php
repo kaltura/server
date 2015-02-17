@@ -146,11 +146,14 @@ abstract class KalturaCuePoint extends KalturaObject implements IFilterable
 	{
 		parent::fromObject($dbCuePoint, $responseProfile);
 		
-		if($dbCuePoint->getKuserId() !== null){
-			$dbKuser = kuserPeer::retrieveByPK($dbCuePoint->getKuserId());
-			if($dbKuser){
-				if (!kConf::hasParam('protect_userid_in_api') || !in_array($dbCuePoint->getPartnerId(), kConf::get('protect_userid_in_api')) || !in_array(kCurrentContext::getCurrentSessionType(), array(kSessionBase::SESSION_TYPE_NONE,kSessionBase::SESSION_TYPE_WIDGET)))
-					$this->userId = $dbKuser->getPuserId();
+		if($this->shouldGet('userId', $responseProfile))
+		{
+			if($dbCuePoint->getKuserId() !== null){
+				$dbKuser = kuserPeer::retrieveByPK($dbCuePoint->getKuserId());
+				if($dbKuser){
+					if (!kConf::hasParam('protect_userid_in_api') || !in_array($dbCuePoint->getPartnerId(), kConf::get('protect_userid_in_api')) || !in_array(kCurrentContext::getCurrentSessionType(), array(kSessionBase::SESSION_TYPE_NONE,kSessionBase::SESSION_TYPE_WIDGET)))
+						$this->userId = $dbKuser->getPuserId();
+				}
 			}
 		}
 	}

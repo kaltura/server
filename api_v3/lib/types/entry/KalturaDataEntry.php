@@ -53,11 +53,12 @@ class KalturaDataEntry extends KalturaBaseEntry
 	{
 		parent::fromObject($dbDataEntry, $responseProfile);
 		//$retrieveDataContentByGet = $dbDataEntry->getFromCustomData('retrieveDataContentByGet');
-		$retrieveDataContentByGet = $dbDataEntry->getRetrieveDataContentByGet();
-		$this->retrieveDataContentByGet = $retrieveDataContentByGet;
 		
-		if($retrieveDataContentByGet != true)
+		$retrieveDataContentByGet = $dbDataEntry->getRetrieveDataContentByGet();
+		if($this->shouldGet('retrieveDataContentByGet', $responseProfile))
+			$this->retrieveDataContentByGet = $retrieveDataContentByGet;
+		
+		if($retrieveDataContentByGet != true && $this->shouldGet('dataContent', $responseProfile))
 			$this->dataContent = '';
-				
 	}
 }

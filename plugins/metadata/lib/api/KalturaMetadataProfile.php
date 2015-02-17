@@ -143,14 +143,23 @@ class KalturaMetadataProfile extends KalturaObject implements IFilterable
 	{
 		parent::fromObject($source_object, $responseProfile);
 
-		$key = $source_object->getSyncKey(MetadataProfile::FILE_SYNC_METADATA_DEFINITION);
-		$this->xsd = kFileSyncUtils::file_get_contents($key, true, false);
+		if($this->shouldGet('xsd', $responseProfile))
+		{
+			$key = $source_object->getSyncKey(MetadataProfile::FILE_SYNC_METADATA_DEFINITION);
+			$this->xsd = kFileSyncUtils::file_get_contents($key, true, false);
+		}
 		
-		$key = $source_object->getSyncKey(MetadataProfile::FILE_SYNC_METADATA_VIEWS);
-		$this->views = kFileSyncUtils::file_get_contents($key, true, false);
-
-		$key = $source_object->getSyncKey(MetadataProfile::FILE_SYNC_METADATA_XSLT);
-		$this->xslt = kFileSyncUtils::file_get_contents($key, true, false);
+		if($this->shouldGet('views', $responseProfile))
+		{	
+			$key = $source_object->getSyncKey(MetadataProfile::FILE_SYNC_METADATA_VIEWS);
+			$this->views = kFileSyncUtils::file_get_contents($key, true, false);
+		}
+		
+		if($this->shouldGet('xslt', $responseProfile))
+		{
+			$key = $source_object->getSyncKey(MetadataProfile::FILE_SYNC_METADATA_XSLT);
+			$this->xslt = kFileSyncUtils::file_get_contents($key, true, false);
+		}
 	}
 	
 	/* (non-PHPdoc)

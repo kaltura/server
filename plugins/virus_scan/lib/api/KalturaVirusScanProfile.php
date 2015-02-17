@@ -104,11 +104,14 @@ class KalturaVirusScanProfile extends KalturaObject implements IFilterable
 			
 		parent::fromObject($sourceObject, $responseProfile);
 		
-		$entryFilter = $sourceObject->getEntryFilterObject();
-		if($entryFilter)
+		if($this->shouldGet('entryFilter', $responseProfile))
 		{
-			$this->entryFilter = new KalturaBaseEntryFilter();
-			$this->entryFilter->fromObject($entryFilter);
+			$entryFilter = $sourceObject->getEntryFilterObject();
+			if($entryFilter)
+			{
+				$this->entryFilter = new KalturaBaseEntryFilter();
+				$this->entryFilter->fromObject($entryFilter);
+			}
 		}
 	}
 	

@@ -241,19 +241,30 @@ class KalturaEntryDistribution extends KalturaObject implements IFilterable
 			
 		parent::fromObject($sourceObject, $responseProfile);
 		
-		$this->sunStatus = $sourceObject->getSunStatus();
-		$this->sunrise = $sourceObject->getSunrise(null);
-		$this->sunset = $sourceObject->getSunset(null);
-		$this->submittedAt = $sourceObject->getSubmittedAt(null);
-            
-		$this->validationErrors = KalturaDistributionValidationErrorArray::fromDbArray($sourceObject->getValidationErrors());
-		
-		$this->hasSubmitResultsLog = (bool)$sourceObject->getSubmitResultsVersion();
-		$this->hasSubmitSentDataLog = (bool)$sourceObject->getSubmitDataVersion();
-		$this->hasUpdateResultsLog = (bool)$sourceObject->getUpdateResultsVersion();
-		$this->hasUpdateSentDataLog = (bool)$sourceObject->getUpdateDataVersion();
-		$this->hasDeleteResultsLog = (bool)$sourceObject->getDeleteResultsVersion();
-		$this->hasDeleteSentDataLog = (bool)$sourceObject->getDeleteDataVersion();
+		if($this->shouldGet('sunStatus', $responseProfile))
+			$this->sunStatus = $sourceObject->getSunStatus();
+		if($this->shouldGet('sunrise', $responseProfile))
+			$this->sunrise = $sourceObject->getSunrise(null);
+		if($this->shouldGet('sunset', $responseProfile))
+			$this->sunset = $sourceObject->getSunset(null);
+		if($this->shouldGet('submittedAt', $responseProfile))
+			$this->submittedAt = $sourceObject->getSubmittedAt(null);
+	            
+		if($this->shouldGet('validationErrors', $responseProfile))
+			$this->validationErrors = KalturaDistributionValidationErrorArray::fromDbArray($sourceObject->getValidationErrors());
+			
+		if($this->shouldGet('hasSubmitResultsLog', $responseProfile))
+			$this->hasSubmitResultsLog = (bool)$sourceObject->getSubmitResultsVersion();
+		if($this->shouldGet('hasSubmitSentDataLog', $responseProfile))
+			$this->hasSubmitSentDataLog = (bool)$sourceObject->getSubmitDataVersion();
+		if($this->shouldGet('hasUpdateResultsLog', $responseProfile))
+			$this->hasUpdateResultsLog = (bool)$sourceObject->getUpdateResultsVersion();
+		if($this->shouldGet('hasUpdateSentDataLog', $responseProfile))
+			$this->hasUpdateSentDataLog = (bool)$sourceObject->getUpdateDataVersion();
+		if($this->shouldGet('hasDeleteResultsLog', $responseProfile))
+			$this->hasDeleteResultsLog = (bool)$sourceObject->getDeleteResultsVersion();
+		if($this->shouldGet('hasDeleteSentDataLog', $responseProfile))
+			$this->hasDeleteSentDataLog = (bool)$sourceObject->getDeleteDataVersion();
 	}
 
 	public function getExtraFilters()

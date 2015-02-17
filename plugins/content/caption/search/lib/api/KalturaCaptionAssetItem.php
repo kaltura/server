@@ -52,12 +52,18 @@ class KalturaCaptionAssetItem extends KalturaObject
 		
 		$ret = parent::fromObject($source_object, $responseProfile);
 		
-		$this->asset = new KalturaCaptionAsset();
-		$this->asset->fromObject($source_object->getAsset());
+		if($this->shouldGet('asset', $responseProfile))
+		{
+			$this->asset = new KalturaCaptionAsset();
+			$this->asset->fromObject($source_object->getAsset());
+		}
 		
-		$entry = $source_object->getEntry();
-		$this->entry = KalturaEntryFactory::getInstanceByType($entry->getType());
-		$this->entry->fromObject($entry);
+		if($this->shouldGet('entry', $responseProfile))
+		{
+			$entry = $source_object->getEntry();
+			$this->entry = KalturaEntryFactory::getInstanceByType($entry->getType());
+			$this->entry->fromObject($entry);
+		}
 			
 		return $ret;
 	}

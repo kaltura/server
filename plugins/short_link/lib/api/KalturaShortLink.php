@@ -90,7 +90,9 @@ class KalturaShortLink extends KalturaObject implements IFilterable
 	public function fromObject($object, KalturaResponseProfileBase $responseProfile = null)
 	{
 		parent::fromObject($object, $responseProfile);
-		$this->expiresAt = $object->getExpiresAt(null);
+		
+		if($this->shouldGet('expiresAt', $responseProfile))
+			$this->expiresAt = $object->getExpiresAt(null);
 	}
 	
 	public function getExtraFilters()

@@ -102,7 +102,8 @@ class KalturaMediaEntry extends KalturaPlayableEntry {
 	public function fromObject($entry, KalturaResponseProfileBase $responseProfile = null) {
 		parent::fromObject($entry, $responseProfile);
 		
-		$this->mediaDate = $entry->getMediaDate ( null );
+		if($this->shouldGet('mediaDate', $responseProfile))
+			$this->mediaDate = $entry->getMediaDate ( null );
 	}
 	
 	/* (non-PHPdoc)

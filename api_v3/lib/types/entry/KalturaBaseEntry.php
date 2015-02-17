@@ -451,8 +451,10 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 			
 		parent::fromObject($sourceObject, $responseProfile);
 		
-		$this->startDate = $sourceObject->getStartDate(null);
-		$this->endDate = $sourceObject->getEndDate(null);
+		if($this->shouldGet('startDate', $responseProfile))
+			$this->startDate = $sourceObject->getStartDate(null);
+		if($this->shouldGet('endDate', $responseProfile))
+			$this->endDate = $sourceObject->getEndDate(null);
 		
 		$partnerId = kCurrentContext::$ks_partner_id ? kCurrentContext::$ks_partner_id : kCurrentContext::$partner_id;
 		
@@ -462,8 +464,10 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 			$this->categoriesIds = null;
 		}
 		if (!kConf::hasParam('protect_userid_in_api') || !in_array($sourceObject->getPartnerId(), kConf::get('protect_userid_in_api')) || !in_array(kCurrentContext::getCurrentSessionType(), array(kSessionBase::SESSION_TYPE_NONE,kSessionBase::SESSION_TYPE_WIDGET))){
-			$this->userId = $sourceObject->getPuserId();
-			$this->creatorId = $sourceObject->getCreatorPuserId();
+			if($this->shouldGet('userId', $responseProfile))
+				$this->userId = $sourceObject->getPuserId();
+			if($this->shouldGet('creatorId', $responseProfile))
+				$this->creatorId = $sourceObject->getCreatorPuserId();
 		}
 	}
 	

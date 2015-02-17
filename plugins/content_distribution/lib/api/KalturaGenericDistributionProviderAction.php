@@ -140,14 +140,23 @@ class KalturaGenericDistributionProviderAction extends KalturaObject implements 
 	{
 		parent::fromObject($source_object, $responseProfile);
 
-		$key = $source_object->getSyncKey(GenericDistributionProviderAction::FILE_SYNC_DISTRIBUTION_PROVIDER_ACTION_MRSS_TRANSFORMER);
-		$this->mrssTransformer = kFileSyncUtils::file_get_contents($key, true, false);
-
-		$key = $source_object->getSyncKey(GenericDistributionProviderAction::FILE_SYNC_DISTRIBUTION_PROVIDER_ACTION_MRSS_VALIDATOR);
-		$this->mrssValidator = kFileSyncUtils::file_get_contents($key, true, false);
-
-		$key = $source_object->getSyncKey(GenericDistributionProviderAction::FILE_SYNC_DISTRIBUTION_PROVIDER_ACTION_RESULTS_TRANSFORMER);
-		$this->resultsTransformer = kFileSyncUtils::file_get_contents($key, true, false);
+		if($this->shouldGet('mrssTransformer', $responseProfile))
+		{
+			$key = $source_object->getSyncKey(GenericDistributionProviderAction::FILE_SYNC_DISTRIBUTION_PROVIDER_ACTION_MRSS_TRANSFORMER);
+			$this->mrssTransformer = kFileSyncUtils::file_get_contents($key, true, false);
+		}
+		
+		if($this->shouldGet('mrssValidator', $responseProfile))
+		{
+			$key = $source_object->getSyncKey(GenericDistributionProviderAction::FILE_SYNC_DISTRIBUTION_PROVIDER_ACTION_MRSS_VALIDATOR);
+			$this->mrssValidator = kFileSyncUtils::file_get_contents($key, true, false);
+		}
+			
+		if($this->shouldGet('resultsTransformer', $responseProfile))
+		{
+			$key = $source_object->getSyncKey(GenericDistributionProviderAction::FILE_SYNC_DISTRIBUTION_PROVIDER_ACTION_RESULTS_TRANSFORMER);
+			$this->resultsTransformer = kFileSyncUtils::file_get_contents($key, true, false);
+		}
 	}
 	
 	public function getExtraFilters()

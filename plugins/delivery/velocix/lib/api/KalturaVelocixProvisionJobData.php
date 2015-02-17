@@ -59,7 +59,9 @@ class KalturaVelocixProvisionJobData extends KalturaProvisionJobData
 	public function fromObject($source_object, KalturaResponseProfileBase $responseProfile = null)
 	{
 		parent::fromObject($source_object, $responseProfile);
-		$this->provisioningParams = KalturaKeyValueArray::fromKeyValueArray($source_object->getProvisioningParams());
+		
+		if($this->shouldGet('provisioningParams', $responseProfile))
+			$this->provisioningParams = KalturaKeyValueArray::fromKeyValueArray($source_object->getProvisioningParams());
 	}
 	
  	protected function toKeyValueArray($apiKeyValueArray)

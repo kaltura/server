@@ -51,10 +51,13 @@ class KalturaPdfFlavorParamsOutput extends KalturaFlavorParamsOutput
 	{
 		parent::fromObject($dbPdfFlavorParamsOutput, $responseProfile);
 		
-		if($dbPdfFlavorParamsOutput->getReadonly() == true){
-			$this->readonly = 1;
-		}else{
-			$this->readonly = 0;
+		if($this->shouldGet('readonly', $responseProfile))
+		{
+			if($dbPdfFlavorParamsOutput->getReadonly() == true){
+				$this->readonly = 1;
+			}else{
+				$this->readonly = 0;
+			}
 		}
 	}
 }

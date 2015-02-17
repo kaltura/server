@@ -28,10 +28,13 @@ class KalturaLiveStreamBitrate extends KalturaObject
 
 	public function fromObject($source_object, KalturaResponseProfileBase $responseProfile = null)
 	{
-		$this->bitrate = $source_object['bitrate'];
-		$this->width = $source_object['width'];
-		$this->height = $source_object['height'];
-		if(isset($source_object['tags']))
+		if($this->shouldGet('bitrate', $responseProfile))
+			$this->bitrate = $source_object['bitrate'];
+		if($this->shouldGet('width', $responseProfile))
+			$this->width = $source_object['width'];
+		if($this->shouldGet('height', $responseProfile))
+			$this->height = $source_object['height'];
+		if($this->shouldGet('recordingOptions', $responseProfile) && isset($source_object['tags']))
 			$this->tags = $source_object['tags'];
 	}
 	

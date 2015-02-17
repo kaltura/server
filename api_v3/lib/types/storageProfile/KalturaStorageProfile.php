@@ -327,8 +327,10 @@ class KalturaStorageProfile extends KalturaObject implements IFilterable
 	{
 	    parent::fromObject($source_object, $responseProfile);
 	    
-	    $this->pathManagerParams = KalturaKeyValueArray::fromKeyValueArray($source_object->getPathManagerParams());
-	    $this->deliveryProfileIds = KalturaKeyValueArray::fromKeyValueArray($source_object->getDeliveryProfileIds());
+		if($this->shouldGet('pathManagerParams', $responseProfile))
+	 	   $this->pathManagerParams = KalturaKeyValueArray::fromKeyValueArray($source_object->getPathManagerParams());
+		if($this->shouldGet('deliveryProfileIds', $responseProfile))
+	   	 $this->deliveryProfileIds = KalturaKeyValueArray::fromKeyValueArray($source_object->getDeliveryProfileIds());
 	}
 	
 	/* (non-PHPdoc)

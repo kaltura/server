@@ -95,7 +95,9 @@ class KalturaDistributionFieldConfig extends KalturaObject
 	public function fromObject($source_object, KalturaResponseProfileBase $responseProfile = null)
 	{
 		parent::fromObject($source_object, $responseProfile);
-		$this->updateParams = KalturaStringArray::fromStringArray($source_object->getUpdateParams());
+		
+		if($this->shouldGet('updateParams', $responseProfile))
+			$this->updateParams = KalturaStringArray::fromStringArray($source_object->getUpdateParams());
 	}
 	
 }

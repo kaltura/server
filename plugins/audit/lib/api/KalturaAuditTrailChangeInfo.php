@@ -33,6 +33,7 @@ class KalturaAuditTrailChangeInfo extends KalturaAuditTrailInfo
 	{
 		parent::fromObject($auditTrailInfo, $responseProfile);
 		
-		$this->changedItems = KalturaAuditTrailChangeItemArray::fromDbArray($auditTrailInfo->getChangedItems());
+		if($this->shouldGet('changedItems', $responseProfile))
+			$this->changedItems = KalturaAuditTrailChangeItemArray::fromDbArray($auditTrailInfo->getChangedItems());
 	}
 }

@@ -119,10 +119,11 @@ class KalturaPlaylist extends KalturaBaseEntry
 			return;
 
 		parent::fromObject($sourceObject, $responseProfile);
-		$host = requestUtils::getHost();
-		$this->executeUrl = myPlaylistUtils::toPlaylistUrl( $sourceObject , $host );
 		
-		if ($this->playlistType == KalturaPlaylistType::DYNAMIC)
+		if($this->shouldGet('executeUrl', $responseProfile))
+			$this->executeUrl = myPlaylistUtils::toPlaylistUrl( $sourceObject , requestUtils::getHost() );
+		
+		if ($this->shouldGet('filters', $responseProfile) && $this->playlistType == KalturaPlaylistType::DYNAMIC)
 			$this->playlistContentXmlToFilters();
 	}
 	
