@@ -69,22 +69,22 @@ Add the following lines under `[template]` section:
 		enabledWorkers.KAsyncIntegrateCloser				= 1
 
 Add the following lines as new sections:
+```
+[KAsyncIntegrate : JobHandlerWorker]
+id													= 570
+friendlyName										= Integrate
+type												= KAsyncIntegrate
+maximumExecutionTime								= 12000
+scriptPath											= ../plugins/integration/batch/Integrate/KAsyncIntegrateExe.php
 
-		[KAsyncIntegrate : JobHandlerWorker]
-		id													= 570
-		friendlyName										= Integrate
-		type												= KAsyncIntegrate
-		maximumExecutionTime								= 12000
-		scriptPath											= ../plugins/integration/batch/Integrate/KAsyncIntegrateExe.php
-		
-		[KAsyncIntegrateCloser : JobHandlerWorker]
-		id													= 580
-		friendlyName										= Integrate Closer
-		type												= KAsyncIntegrateCloser
-		maximumExecutionTime								= 12000
-		scriptPath											= ../plugins/integration/batch/Integrate/KAsyncIntegrateCloserExe.php
-		params.maxTimeBeforeFail							= 1000000
-
+[KAsyncIntegrateCloser : JobHandlerWorker]
+id													= 580
+friendlyName										= Integrate Closer
+type												= KAsyncIntegrateCloser
+maximumExecutionTime								= 12000
+scriptPath											= ../plugins/integration/batch/Integrate/KAsyncIntegrateCloserExe.php
+params.maxTimeBeforeFail							= 1000000
+```
 
 #### Deployment Preparations ####
 *NOTE: all paths here are relative to /opt/kaltura/app*
