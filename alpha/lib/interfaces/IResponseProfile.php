@@ -13,9 +13,14 @@ interface IResponseProfile extends IResponseProfileBase
 	public function getType();
 	
 	/**
-	 * @return array<string>
+	 * @return string
 	 */
 	public function getFields();
+	
+	/**
+	 * @return array<string>
+	 */
+	public function getFieldsArray();
 	
 	/**
 	 * @return array<IResponseProfileBase>
@@ -48,9 +53,9 @@ interface IResponseProfile extends IResponseProfileBase
 	public function setType($v);
 	
 	/**
-	 * @param array<string> $v
+	 * @param string $v
 	 */
-	public function setFields(array $v);
+	public function setFields($v);
 	
 	/**
 	 * @param array<IResponseProfileBase> $v

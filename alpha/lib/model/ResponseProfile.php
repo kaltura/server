@@ -29,6 +29,14 @@ class ResponseProfile extends BaseResponseProfile implements IResponseProfileHol
 		return $this;
 	}
 
+	/* (non-PHPdoc)
+	 * @see IResponseProfile::getFieldsArray()
+	 */
+	public function getFieldsArray()
+	{
+		return explode(',', $this->getFields());
+	}
+	
 	public function getFields()						{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_FIELDS);}
 	public function getRelatedProfiles()			{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_RELATED_PROFILES);}
 	public function getFilterApiClassName()			{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_FILTER_API_CLASS_NAME);}

@@ -10,4 +10,15 @@ class KalturaListResponse extends KalturaObject
 	 * @readonly
 	 */
 	public $totalCount;
+
+	/* (non-PHPdoc)
+	 * @see KalturaObject::loadRelatedObjects($responseProfile)
+	 */
+	public function loadRelatedObjects(KalturaResponseProfileBase $responseProfile)
+	{
+		if($this->objects)
+		{
+			$this->objects->loadRelatedObjects($responseProfile);
+		}
+	}
 }

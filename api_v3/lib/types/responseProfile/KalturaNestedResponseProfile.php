@@ -18,7 +18,9 @@ class KalturaNestedResponseProfile extends KalturaNestedResponseProfileBase
 	public $type;
 	
 	/**
-	 * @var KalturaStringArray
+	 * Comma separated fields list to be included or excluded
+	 * 
+	 * @var string
 	 */
 	public $fields;
 	
@@ -37,6 +39,11 @@ class KalturaNestedResponseProfile extends KalturaNestedResponseProfileBase
 	 */
 	public $relatedProfiles;
 	
+	/**
+	 * @var KalturaResponseProfileMappingArray
+	 */
+	public $mappings;
+	
 	private static $map_between_objects = array(
 		'name', 
 		'type',
@@ -44,6 +51,7 @@ class KalturaNestedResponseProfile extends KalturaNestedResponseProfileBase
 		'filter',
 		'pager',
 		'relatedProfiles',
+		'mappings',
 	);
 	
 	/* (non-PHPdoc)

@@ -66,7 +66,9 @@ class KalturaResponseProfile extends KalturaResponseProfileBase implements IFilt
 	public $type;
 	
 	/**
-	 * @var KalturaStringArray
+	 * Comma separated fields list to be included or excluded
+	 * 
+	 * @var string
 	 */
 	public $fields;
 	
@@ -84,6 +86,11 @@ class KalturaResponseProfile extends KalturaResponseProfileBase implements IFilt
 	 * @var KalturaNestedResponseProfileBaseArray
 	 */
 	public $relatedProfiles;
+	
+	/**
+	 * @var KalturaResponseProfileMappingArray
+	 */
+	public $mappings;
 	
 	public function __construct(ResponseProfile $responseProfile = null)
 	{
@@ -105,6 +112,7 @@ class KalturaResponseProfile extends KalturaResponseProfileBase implements IFilt
 		'fields',
 		'pager',
 		'relatedProfiles',
+		'mappings',
 	);
 	
 	/* (non-PHPdoc)
@@ -123,6 +131,40 @@ class KalturaResponseProfile extends KalturaResponseProfileBase implements IFilt
 		$this->validatePropertyMinLength('name', 2);
 		$this->validatePropertyMinLength('systemName', 2);
 		$this->validatePropertyNotNull('type');
+		
+		$maxNestingLevel = kConf::get('response_profile_max_nesting_level', 'local', 2);
+		$maxPageSize = kConf::get('response_profile_max_page_size', 'local', 100);
+		
+		$this->validateNestedObjects($maxPageSize, $maxNestingLevel);
+	}
+	
+	protected function validateNestedObjects($maxPageSize, $maxNestingLevel)
+	{
+		if(!$this->relatedProfiles)
+		{
+			return;
+		}
+		
+		if($maxNestingLevel > 0)
+		{
+			foreach($this->relatedProfiles as $relatedProfile)
+			{
+				/* @var $relatedProfile KalturaResponseProfile */
+				$relatedProfile->validateNestedObjects($maxPageSize, $maxNestingLevel - 1);
+				
+				if($relatedProfile->pager)
+				{
+					$relatedProfile->pager->validatePropertyMaxValue('pageSize', $maxPageSize, true);
+				}
+			}
+		}
+		else
+		{
+			if(count($this->relatedProfiles))
+			{
+				throw new KalturaAPIException(KalturaErrors::RESPONSE_PROFILE_MAX_NESTING_LEVEL);
+			}
+		}
 	}
 	
 	/* (non-PHPdoc)
@@ -154,7 +196,9 @@ class KalturaResponseProfile extends KalturaResponseProfileBase implements IFilt
 		
 		if($srcObj->getFilter() && $this->shouldGet('filter', $responseProfile))
 		{
-			
+			$filterApiClassName = $srcObj->getFilterApiClassName();
+			$this->filter = new $filterApiClassName();
+			$this->filter->fromObject($srcObj->getFilter());
 		}
 	}
 	

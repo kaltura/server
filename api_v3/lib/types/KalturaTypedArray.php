@@ -98,30 +98,10 @@ abstract class KalturaTypedArray extends KalturaObject implements ArrayAccess, I
 	 */
 	public function loadRelatedObjects(KalturaResponseProfileBase $responseProfile)
 	{
-		foreach($responseProfile->getRelatedProfiles() as $relatedProfile)
+		foreach($this as &$item)
 		{
-			/* @var $relatedProfile KalturaNestedResponseProfileBase */
-			$relatedProfile = $relatedProfile->get();
-			$filter = clone $relatedProfile->filter;
-			foreach($relatedProfile->relations as $relation)
-			{
-				/* @var $relation KalturaResponseProfileMapping */
-				$relation->apply($filter, $this);
-			}
-			$listResponse = $filter->getListResponse($relatedProfile->pager, $relatedProfile);
-			$relatedObjects = $listResponse->objects;
-		
-			foreach($this as &$item)
-			{
-				/* @var $item KalturaObject */
-				$relatedObjects = $listResponse->objects;
-				foreach($relatedProfile->relations as $relation)
-				{
-					/* @var $relation KalturaResponseProfileMapping */
-					$relatedObjects = $relation->filter($relatedObjects, $item);
-				}
-				$item->addRelatedObject($relatedProfile->name, $relatedObjects);
-			}
+			/* @var $item KalturaObject */
+			$item->loadRelatedObjects($responseProfile);
 		}
 	}
 }

@@ -393,7 +393,9 @@ class KalturaErrors extends APIErrors
 	const PERMISSION_ITEM_NOT_FOUND = "PERMISSION_ITEM_NOT_FOUND;;Permission item does not exists";
 
 	const PROPERTY_DEPRECATED = "PROPERTY_DEPRECTAED;PROP;The property \"@PROP@\" is deprecated and should not be used";
-
+	
+	const PROPERTY_IS_NOT_DEFINED = "PROPERTY_IS_NOT_DEFINED;PROP,TYPE;The property \"@PROP@\" is not defined on type \"@TYPE@\"";
+	
 	/*
 	 * syndication service
 	 */
@@ -562,4 +564,6 @@ class KalturaErrors extends APIErrors
 	const RESPONSE_PROFILE_NAME_NOT_FOUND = 'RESPONSE_PROFILE_NAME_NOT_FOUND;SYSTEM_NAME;Response profile name [@SYSTEM_NAME@] not found';
 	
 	const RESPONSE_PROFILE_ID_NOT_FOUND = 'RESPONSE_PROFILE_ID_NOT_FOUND;ID;Response profile id [@ID@] not found';
+	
+	const RESPONSE_PROFILE_MAX_NESTING_LEVEL = 'RESPONSE_PROFILE_MAX_NESTING_LEVEL;;Response profile cross maximum nesting level';
 }

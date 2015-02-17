@@ -124,6 +124,14 @@ class kResponseProfile implements IResponseProfile
 	}
 
 	/* (non-PHPdoc)
+	 * @see IResponseProfile::getFieldsArray()
+	 */
+	public function getFieldsArray()
+	{
+		return explode(',', $this->getFields());
+	}
+
+	/* (non-PHPdoc)
 	 * @see IResponseProfile::getRelatedProfiles()
 	 */
 	public function getRelatedProfiles()

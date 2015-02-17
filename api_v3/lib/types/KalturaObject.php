@@ -5,6 +5,11 @@
  */
 abstract class KalturaObject 
 {
+	/**
+	 * @var KalturaAssociativeArray
+	 */
+	public $relatedObjects;
+	
 	static protected $sourceFilesCache = array();
 	static protected $classPrivatesCache = array();
 	
@@ -274,10 +279,10 @@ abstract class KalturaObject
 		$result .= '
 		if($responseProfile){
 			if($responseProfile->getType() == ResponseProfileType::INCLUDE_FIELDS){
-				$get = array_intersect($get, $responseProfile->getFields());
+				$get = array_intersect($get, $responseProfile->getFieldsArray());
 			}
 			else{
-				$get = array_diff($get, $responseProfile->getFields());
+				$get = array_diff($get, $responseProfile->getFieldsArray());
 			}
 		}
 		$get = array_flip($get);
@@ -292,7 +297,7 @@ abstract class KalturaObject
 	{
 		if($responseProfile){
 			$coreResponseProfile = $responseProfile->toObject();
-			$fields = array_flip($coreResponseProfile->getFields());
+			$fields = array_flip($coreResponseProfile->getFieldsArray());
 			if($coreResponseProfile->getType() == ResponseProfileType::INCLUDE_FIELDS){
 				return isset($fields[$propertyName]);
 			}
@@ -332,6 +337,11 @@ abstract class KalturaObject
 	
 		$coreResponseProfile = $responseProfile ? $responseProfile->toObject() : null;
 		$fromObjectClass::fromObject($this, $srcObj, $coreResponseProfile);
+		
+		if($responseProfile)
+		{
+			$this->loadRelatedObjects($responseProfile);
+		}
 	}
 	
 	public function loadRelatedObjects(KalturaResponseProfileBase $responseProfile)
@@ -341,19 +351,20 @@ abstract class KalturaObject
 			/* @var $relatedProfile KalturaNestedResponseProfileBase */
 			$relatedProfile = $relatedProfile->get();
 			$filter = clone $relatedProfile->filter;
-			foreach($relatedProfile->relations as $relation)
+			foreach($relatedProfile->mappings as $mapping)
 			{
-				/* @var $relation KalturaResponseProfileMapping */
-				$relation->apply($filter, $this);
+				/* @var $mapping KalturaResponseProfileMapping */
+				$mapping->apply($filter, $this);
 			}
-			$listResponse = $filter->getListResponse($relatedProfile->pager, $relatedProfile);
-			$this->addRelatedObject($relatedProfile->name, $listResponse->objects);
+			
+			$pager = $relatedProfile->pager;
+			if(!$pager)
+			{
+				$pager = new KalturaFilterPager();
+			}
+			
+			$this->relatedObjects[$relatedProfile->name] = $filter->getListResponse($pager, $relatedProfile);
 		}
-	}
-	
-	public function addRelatedObject($name, KalturaTypedArray $objects)
-	{
-		$this->relatedObjects[$name] = $objects;
 	}
 	
 	public function fromArray ( $source_array )
