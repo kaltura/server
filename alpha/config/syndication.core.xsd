@@ -417,7 +417,7 @@
 				<xs:documentation>Format of the thumbnail asset file</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
-		<xs:attribute name="extension" type="xs:string" use="required">
+		<xs:attribute name="extension" type="xs:string" use="optional">
 			<xs:annotation>
 				<xs:documentation>Extension of the thumbnail asset file</xs:documentation>
 			</xs:annotation>
@@ -437,7 +437,7 @@
 				<xs:documentation>Thumbnail width</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
-		<xs:attribute name="fileSize" type="xs:int" use="required">
+		<xs:attribute name="fileSize" type="xs:int" use="optional">
 			<xs:annotation>
 				<xs:documentation>Thumbnail file size</xs:documentation>
 			</xs:annotation>
