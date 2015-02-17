@@ -452,24 +452,31 @@ class kEntitlementUtils
 	public static function getEntitledKuserByPrivacyContext()
 	{
 		$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
-		
+
 		$privacyContextSearch = array();
-			
+
 		$ks = ks::fromSecureString(kCurrentContext::$ks);
 		$ksPrivacyContexts = null;
 		if ($ks)
 			$ksPrivacyContexts = $ks->getPrivacyContext();
-		
+
 		if(is_null($ksPrivacyContexts) || $ksPrivacyContexts == '')
 			$ksPrivacyContexts = self::DEFAULT_CONTEXT . $partnerId;
-		
+
 		$ksPrivacyContexts = explode(',', $ksPrivacyContexts);
-		
-		foreach ($ksPrivacyContexts as $ksPrivacyContext)
-			$privacyContextSearch[] = $ksPrivacyContext . '_' . kCurrentContext::getCurrentKsKuserId();
-		
-		$privacyContextSearch[] = self::ENTRY_PRIVACY_CONTEXT . '_' . kCurrentContext::getCurrentKsKuserId();
-			
+
+		$privacyContexts = $ksPrivacyContexts;
+		$privacyContexts[] = self::ENTRY_PRIVACY_CONTEXT;
+
+		// get the groups that the user belongs to in case she is not associated to the category directly
+		$kuserIds = KuserKgroupPeer::retrieveKgroupIdsByKuserId(kCurrentContext::getCurrentKsKuserId());
+		$kuserIds[] = kCurrentContext::getCurrentKsKuserId();
+		foreach ($privacyContexts as $privacyContext){
+			foreach ( $kuserIds as $kuserId){
+				$privacyContextSearch[] = $privacyContext . '_' . $kuserId;
+			}
+		}
+
 		return $privacyContextSearch;
 	}
 		public static function getKsPrivacyContext()
