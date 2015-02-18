@@ -25,7 +25,17 @@ class KDLOperatorFfmpeg2_2 extends KDLOperatorFfmpeg2_1_3 {
 		if((isset($vid->_width) && $vid->_width>0 && isset($vid->_height) && $vid->_height>0) 
 		&& (in_array($vid->_id, array(KDLVideoTarget::H265,KDLVideoTarget::H264,KDLVideoTarget::H264B,KDLVideoTarget::H264M,KDLVideoTarget::H264H))
 			|| $vid->_arProcessingMode==4)){
-			$cmdStr.= " -aspect $vid->_width:$vid->_height"; 
+
+			/*
+			 * Look for frame-size operand,
+			 * use it to generate 'aspect' operand
+			 */
+			$cmdValsArr = explode(' ', $cmdStr);
+			if(in_array('-s', $cmdValsArr)) {
+				$key = array_search('-s', $cmdValsArr);
+				$aspectStr  = str_replace("x", ":", $cmdValsArr[$key+1]);
+				$cmdStr.= " -aspect $aspectStr"; 
+			}
 		}
 		return $cmdStr;
 	}
