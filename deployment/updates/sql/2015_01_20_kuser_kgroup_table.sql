@@ -20,4 +20,4 @@ CREATE TABLE `kuser_kgroup`
 	CONSTRAINT `kuser_kgroup_FK_2`
 	FOREIGN KEY (`kuser_id`)
 	REFERENCES `kuser` (`id`)
-)Type=InnoDB;
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
