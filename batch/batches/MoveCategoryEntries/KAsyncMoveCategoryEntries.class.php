@@ -265,5 +265,7 @@ class KAsyncMoveCategoryEntries extends KJobHandlerWorker
 		}
 		
 		KBatchBase::$kClient->category->index($data->destCategoryId);
+		
+		return $movedEntries;
 	}
 }

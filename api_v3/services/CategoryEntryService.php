@@ -39,19 +39,7 @@ class CategoryEntryService extends KalturaBaseService
 			
 		$categoryEntries = categoryEntryPeer::retrieveActiveAndPendingByEntryId($categoryEntry->entryId);
 		
-		$maxCategoriesPerEntry = entry::MAX_CATEGORIES_PER_ENTRY;
-		if(PermissionPeer::isValidForPartner(PermissionName::FEATURE_DISABLE_CATEGORY_LIMIT, $entry->getPartnerId()))
-			$maxCategoriesPerEntry = entry::MAX_CATEGORIES_PER_ENTRY_DISABLE_LIMIT_FEATURE;
-			
-		// When batch move entry between categories it's adding the new category before deleting the old one
-		if(kCurrentContext::$master_partner_id = Partner::BATCH_PARTNER_ID && kCurrentContext::$ks_object)
-		{
-			$batchJobType = kCurrentContext::$ks_object->getPrivilegeValue(ks::PRIVILEGE_BATCH_JOB_TYPE);
-			if(intval($batchJobType) == BatchJobType::MOVE_CATEGORY_ENTRIES)
-			{
-				$maxCategoriesPerEntry += 1;
-			}
-		}
+		$maxCategoriesPerEntry = $entry->getMaxCategoriesPerEntry();
 			
 		if (count($categoryEntries) >= $maxCategoriesPerEntry)
 			throw new KalturaAPIException(KalturaErrors::MAX_CATEGORIES_FOR_ENTRY_REACHED, $maxCategoriesPerEntry);
