@@ -6,12 +6,9 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 	 */
 	protected $_doc = null;
 	
-	function Php5ClientGenerator($xmlPath, $sourcePath = null)
+	function __construct($xmlPath, Zend_Config $config, $sourcePath = "sources/php5")
 	{
-		if(!$sourcePath)
-			$sourcePath = realpath("sources/php5");
-			
-		parent::ClientGeneratorFromXml($xmlPath, $sourcePath);
+		parent::__construct($xmlPath, $sourcePath, $config);
 		$this->_doc = new KDOMDocument();
 		$this->_doc->load($this->_xmlFile);
 	}

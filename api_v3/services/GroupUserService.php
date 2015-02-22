@@ -119,5 +119,4 @@ class GroupUserService extends KalturaBaseService
 			
 		return $filter->getListResponse($pager, $this->getResponseProfile());
 	}
-
 }

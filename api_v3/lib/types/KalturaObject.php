@@ -634,6 +634,8 @@ abstract class KalturaObject
 						header($this->getDeclaringClassName($propertyName).'-'.$propertyName.' error: '.$e->getMessage());
 					}
 				}
+
+				$this->validateHtmlTags($property);
 			}
 		}
 	}
@@ -687,12 +689,28 @@ abstract class KalturaObject
 						header($this->getDeclaringClassName($propertyName).'-'.$propertyName.' error: '.$e->getMessage());
 					}
 				}
+
+				$this->validateHtmlTags($property);
 			}
 		}
 		
 		return $updatableProperties;
 	}
 	
+	/**
+	 * @param KalturaPropertyInfo $property
+	 */
+	public function validateHtmlTags( $property )
+	{
+		if ( $property->getType() != 'string' )
+		{
+			return;
+		}
+
+		$propName = $property->getName();
+		return requestUtils::stripUnsafeHtmlTags($this->$propName, $propName);
+	}
+
 	public function validateForUsage($sourceObject, $propertiesToSkip = array())
 	{
 		$useableProperties = array();

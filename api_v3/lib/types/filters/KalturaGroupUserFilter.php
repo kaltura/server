@@ -105,6 +105,15 @@ class KalturaGroupUserFilter extends KalturaGroupUserBaseFilter
 			$c->add(kuserPeer::TYPE, KuserType::USER);
 			$kusers = kuserPeer::doSelect($c);
 
+			if (!$kusers)
+			{
+				$response = new KalturaGroupUserListResponse();
+				$response->objects = new KalturaGroupUserArray();
+				$response->totalCount = 0;
+
+				return $response;
+			}
+
 			$usersIds = array();
 			foreach($kusers as $kuser)
 			{
@@ -115,7 +124,7 @@ class KalturaGroupUserFilter extends KalturaGroupUserBaseFilter
 			$this->userIdIn = implode(',', $usersIds);
 		}
 
-		if($this->groupIdIn)
+		if($filter->groupIdIn)
 		{
 			$groupIdIn = explode(',', $this->groupIdIn);
 			$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
@@ -125,6 +134,15 @@ class KalturaGroupUserFilter extends KalturaGroupUserBaseFilter
 			$c->add(kuserPeer::PUSER_ID, $groupIdIn, Criteria::IN);
 			$c->add(kuserPeer::TYPE, KuserType::GROUP);
 			$kusers = kuserPeer::doSelect($c);
+
+			if (!$kusers)
+			{
+				$response = new KalturaGroupUserListResponse();
+				$response->objects = new KalturaGroupUserArray();
+				$response->totalCount = 0;
+
+				return $response;
+			}
 
 			$groupIdIn = array();
 			foreach($kusers as $kuser)
@@ -149,8 +167,15 @@ class KalturaGroupUserFilter extends KalturaGroupUserBaseFilter
 		
 		$response = new KalturaGroupUserListResponse();
 		$response->objects = $newList;
-		$response->totalCount = KuserKgroupPeer::doCount($c);
-		
+		$resultCount = count($newList);
+		if ($resultCount && $resultCount < $pager->pageSize)
+			$totalCount = ($pager->pageIndex - 1) * $pager->pageSize + $resultCount;
+		else
+		{
+			KalturaFilterPager::detachFromCriteria($c);
+			$totalCount = KuserKgroupPeer::doCount($c);
+		}
+		$response->totalCount = $totalCount;
 		return $response;
 	}
 }

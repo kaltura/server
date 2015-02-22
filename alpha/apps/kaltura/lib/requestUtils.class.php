@@ -12,6 +12,8 @@ class requestUtils extends infraRequestUtils
 	
 	private static $s_cookies_to_be_set = array();
 	
+	private static $stripTagsFilter = null;
+
 	public static function resolve($targetUrl, $referenceUrl)
 	{
 	    /* return if already absolute URL */
@@ -320,4 +322,83 @@ class requestUtils extends infraRequestUtils
 		return ( in_array ( $current_country , $ip_country_list ) );
 	}
 	
+	public static function createStripTagsFilter()
+	{
+		/*
+		Note: Move hardcoded string to ini file
+		$confAllowedTags = $kConf::get('allowedTags');
+		*/	$confAllowedTags = "{img:[src,title,alt],a:[href,rel,target],span:[class,something,cool],div:[],br:[],b:[],i:[],u:[],ol:[],ul:[],li:[],blockquote:[]}";
+
+		$allowedAttributesPerTag = preg_replace('/(\w+)/', '"\1"', $confAllowedTags);
+		$allowedAttributesPerTag = json_decode($allowedAttributesPerTag, true);
+
+		if ( is_null( $allowedAttributesPerTag ) )
+		{
+			throw new kCoreException( kCoreException::INTERNAL_SERVER_ERROR );
+		}
+
+		$allowedTagNames = array();
+		foreach ( $allowedAttributesPerTag as $tagName => $attributes )
+		{
+			$allowedTagNames[$tagName] = array();
+			if ( is_array($attributes) && count($attributes) )
+			{
+				$allowedTagNames[$tagName] = $attributes;
+			}
+		}
+
+		return new Zend_Filter_StripTags(array('allowTags' => $allowedTagNames));
+	}
+
+	public static function getStripTagsFilter()
+	{
+		$cacheKey = null;
+		if ( function_exists('apc_fetch') && function_exists('apc_store') )
+		{
+			$cacheKey = 'stripTagsFilter-' . kConf::getCachedVersionId();
+			self::$stripTagsFilter = apc_fetch($cacheKey);
+		}
+
+		if ( ! self::$stripTagsFilter )
+		{
+			self::$stripTagsFilter = self::createStripTagsFilter();
+
+			if ( $cacheKey )
+			{
+				$success = apc_store( $cacheKey, self::$stripTagsFilter );
+			}
+		}
+
+		return self::$stripTagsFilter;
+	}
+
+	public static function stripUnsafeHtmlTags( $origString, $fieldName = null )
+	{
+		if ( ! is_string($origString) ) // Avoid values like KalturaNullField, for example
+		{
+			return $origString;
+		}
+
+		// Zend_Filter_StripTags version
+		$modifiedString = self::getStripTagsFilter()->filter( $origString );
+
+		if ( strtolower( $modifiedString ) != strtolower( $origString ) )
+		{
+			$msg = kCoreException::INTERNAL_SERVER_ERROR . ": Unsafe HTML tags found" . ($fieldName ? " in [$fieldName], " : " ")
+					. "\noriginal value: [$origString]"
+					. "\nmodified value: [$modifiedString]"
+					. "\n"
+				;
+
+			$e = new kCoreException( $msg );
+
+			// We're currently in monitoring mode so we won't perform any action.
+			// Real code should be:
+			//		throw $e; ==> if we do not allow unknown tags in input
+			// or
+			//		return $modifiedString; ==> if we will force-remove unknown tags
+		}
+
+		return $origString;
+	}
 }
