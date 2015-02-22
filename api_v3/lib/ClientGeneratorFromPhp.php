@@ -361,7 +361,7 @@ abstract class ClientGeneratorFromPhp
 				$result[$subTypeReflector->getType()] = $subTypeReflector;
 		}
 		
-		if ($typeReflector->isArray())
+		if ($typeReflector->isArray() && !$typeReflector->isAbstract())
 		{
 			$arrayTypeReflector = KalturaTypeReflectorCacher::get($typeReflector->getArrayType());
 			if($arrayTypeReflector)
