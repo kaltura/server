@@ -40,7 +40,7 @@ class KalturaGenericXsltSyndicationFeed extends KalturaGenericSyndicationFeed
 			$this->xslt = kFileSyncUtils::file_get_contents($key, true, false);
 		}
 
-		if($this->shouldGet('itemXpathsToExtend, $responseProfile))
+		if($this->shouldGet('itemXpathsToExtend', $responseProfile))
 		{
 			$mrssParams = $source_object->getMrssParameters();
 			$this->itemXpathsToExtend = new KalturaExtendingItemMrssParameterArray();
