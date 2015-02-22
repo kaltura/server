@@ -148,6 +148,6 @@
 	<field name="first_name_or_last_name" indexName="(full_name,last_name)" type="null" searchableonly="yes" />
 	<field name="puser_id_or_screen_name" indexName="(puser_id,screen_name)" type="null" searchableonly="yes" />
 	<field name="plugins_data" indexName="plugins_data" type="string" searchableonly="yes" />
-    <field name="type" indexName="type" type="int" matchable="yes" />
+    <field name="type" indexName="type" getter="type" type="int" />
 </object>
 </schema>

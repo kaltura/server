@@ -210,7 +210,6 @@ class kuserIndex extends BaseIndexObject
 				"indexed_partner_data_string",
 				"permission_names",
 				"role_ids",
-				"type",
 			);
 		}
 		return self::$matchableFields;
