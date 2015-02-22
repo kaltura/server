@@ -131,7 +131,7 @@ class KalturaBaseEntryFilter extends KalturaBaseEntryBaseFilter
 	 * @param KalturaFilterPager $pager
 	 * @return KalturaCriteria
 	 */
-	protected function prepareEntriesCriteriaFilter(KalturaFilterPager $pager = null)
+	protected function prepareEntriesCriteriaFilter(KalturaFilterPager $pager)
 	{
 		// because by default we will display only READY entries, and when deleted status is requested, we don't want this to disturb
 		entryPeer::allowDeletedInCriteriaFilter(); 
