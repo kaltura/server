@@ -23,6 +23,16 @@ class KalturaFilterPager extends KalturaObject
 	 */
 	public $pageIndex = 1;	
 	
+	public function toObject($object = null, $skipProperties = array())
+	{
+		if(!$object)
+		{
+			$object = new kFilterPager();
+		}
+		
+		return parent::toObject($object, $skipProperties);
+	}
+	
 	public function attachToCriteria ( Criteria $c )
 	{
 		$this->pageSize = max(min($this->pageSize, baseObjectFilter::getMaxInValues()), 0);
