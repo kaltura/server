@@ -166,7 +166,7 @@ class kResponseProfile implements IResponseProfile
 	/* (non-PHPdoc)
 	 * @see IResponseProfile::setRelatedProfiles()
 	 */
-	public function setRelatedProfiles($relatedProfiles)
+	public function setRelatedProfiles(array $relatedProfiles)
 	{
 		$this->relatedProfiles = $relatedProfiles;
 	}
