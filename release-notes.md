@@ -10,7 +10,8 @@ None
 
 #### Deployment Scripts ####
 
-	Run: mysql deployment/updates/sql/2015_02_23_response_profile_table.sql  
+	mysql -uroot -p kaltura < deployment/updates/sql/2015_02_23_response_profile_table.sql
+	php deployment/updates/scripts/add_permissions/2015_02_23_response_profile.php  
 
 #### Known Issues & Limitations ####
 
