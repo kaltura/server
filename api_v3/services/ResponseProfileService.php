@@ -33,20 +33,20 @@ class ResponseProfileService extends KalturaBaseService
 	 * Add new response profile
 	 * 
 	 * @action add
-	 * @param KalturaResponseProfile $responseProfile
+	 * @param KalturaResponseProfile $addResponseProfile
 	 * @return KalturaResponseProfile
 	 */
-	function addAction(KalturaResponseProfile $responseProfile)
+	function addAction(KalturaResponseProfile $addResponseProfile)
 	{
-		$dbResponseProfile = $responseProfile->toInsertableObject();
+		$dbResponseProfile = $addResponseProfile->toInsertableObject();
 		/* @var $dbResponseProfile ResponseProfile */
 		$dbResponseProfile->setPartnerId($this->getPartnerId());
 		$dbResponseProfile->setStatus(ResponseProfileStatus::ENABLED);
 		$dbResponseProfile->save();
 		
-		$responseProfile = new KalturaResponseProfile();
-		$responseProfile->fromObject($dbResponseProfile, $this->getResponseProfile());
-		return $responseProfile;
+		$addResponseProfile = new KalturaResponseProfile();
+		$addResponseProfile->fromObject($dbResponseProfile, $this->getResponseProfile());
+		return $addResponseProfile;
 	}
 	
 	/**
@@ -74,23 +74,23 @@ class ResponseProfileService extends KalturaBaseService
 	 * 
 	 * @action update
 	 * @param int $id
-	 * @param KalturaResponseProfile $responseProfile
+	 * @param KalturaResponseProfile $updateResponseProfile
 	 * @return KalturaResponseProfile
 	 * 
 	 * @throws KalturaErrors::RESPONSE_PROFILE_ID_NOT_FOUND
 	 */
-	function updateAction($id, KalturaResponseProfile $responseProfile)
+	function updateAction($id, KalturaResponseProfile $updateResponseProfile)
 	{
 		$dbResponseProfile = ResponseProfilePeer::retrieveByPK($id);
 		if (!$dbResponseProfile)
 			throw new KalturaAPIException(KalturaErrors::RESPONSE_PROFILE_ID_NOT_FOUND, $id);
 		
-		$responseProfile->toUpdatableObject($dbResponseProfile);
+		$updateResponseProfile->toUpdatableObject($dbResponseProfile);
 		$dbResponseProfile->save();
 		
-		$responseProfile = new KalturaResponseProfile();
-		$responseProfile->fromObject($dbResponseProfile, $this->getResponseProfile());
-		return $responseProfile;
+		$updateResponseProfile = new KalturaResponseProfile();
+		$updateResponseProfile->fromObject($dbResponseProfile, $this->getResponseProfile());
+		return $updateResponseProfile;
 	}
 
 	/**
