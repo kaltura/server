@@ -29,10 +29,17 @@ class ResponseProfilePeer extends BaseResponseProfilePeer {
 	 * @param string $systemName
 	 * @return ResponseProfile
 	 */
-	public static function retrieveBySystemName($systemName)
+	public static function retrieveBySystemName($systemName, $exceptId = null)
 	{
 		$criteria = new Criteria(ResponseProfilePeer::DATABASE_NAME);
 		$criteria->add(ResponseProfilePeer::SYSTEM_NAME, $systemName);
+		$criteria->add(ResponseProfilePeer::STATUS, ResponseProfileStatus::ENABLED);
+		
+		if($exceptId)
+		{
+			$criteria->add(ResponseProfilePeer::ID, $exceptId, Criteria::NOT_EQUAL);
+		}
+		
 		$criteria->addDescendingOrderByColumn(ResponseProfilePeer::PARTNER_ID);
 
 		return ResponseProfilePeer::doSelectOne($criteria);

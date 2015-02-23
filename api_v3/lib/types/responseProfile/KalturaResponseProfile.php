@@ -128,14 +128,30 @@ class KalturaResponseProfile extends KalturaResponseProfileBase implements IFilt
 	 */
 	public function validateForUsage($sourceObject, $propertiesToSkip = array())
 	{
-		$this->validatePropertyMinLength('name', 2);
-		$this->validatePropertyMinLength('systemName', 2);
-		$this->validatePropertyNotNull('type');
+		// Allow null in case of update
+		$allowNull = !is_null($sourceObject);
+		
+		$this->validatePropertyMinLength('name', 2, $allowNull);
+		$this->validatePropertyMinLength('systemName', 2, $allowNull);
+		
+		if(!$allowNull)
+			$this->validatePropertyNotNull('type');
 		
 		$maxNestingLevel = kConf::get('response_profile_max_nesting_level', 'local', 2);
 		$maxPageSize = kConf::get('response_profile_max_page_size', 'local', 100);
 		
 		$this->validateNestedObjects($maxPageSize, $maxNestingLevel);
+	
+		$id = null;
+		if($sourceObject)
+			$id = $sourceObject->getId();
+			
+		if(trim($this->systemName) && !$this->isNull('systemName'))
+		{
+			$systemNameTemplates = ResponseProfilePeer::retrieveBySystemName($this->systemName, $id);
+	        if (count($systemNameTemplates))
+	            throw new KalturaAPIException(KalturaErrors::RESPONSE_PROFILE_DUPLICATE_SYSTEM_NAME, $this->systemName);
+		}
 	}
 	
 	protected function validateNestedObjects($maxPageSize, $maxNestingLevel)

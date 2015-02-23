@@ -39,7 +39,9 @@ class ResponseProfileService extends KalturaBaseService
 	function addAction(KalturaResponseProfile $responseProfile)
 	{
 		$dbResponseProfile = $responseProfile->toInsertableObject();
+		/* @var $dbResponseProfile ResponseProfile */
 		$dbResponseProfile->setPartnerId($this->getPartnerId());
+		$dbResponseProfile->setStatus(ResponseProfileStatus::ENABLED);
 		$dbResponseProfile->save();
 		
 		$responseProfile = new KalturaResponseProfile();
@@ -86,6 +88,38 @@ class ResponseProfileService extends KalturaBaseService
 		$responseProfile->toUpdatableObject($dbResponseProfile);
 		$dbResponseProfile->save();
 		
+		$responseProfile = new KalturaResponseProfile();
+		$responseProfile->fromObject($dbResponseProfile, $this->getResponseProfile());
+		return $responseProfile;
+	}
+
+	/**
+	 * Update response profile status by id
+	 * 
+	 * @action updateStatus
+	 * @param int $id
+	 * @param KalturaResponseProfileStatus $status
+	 * @return KalturaResponseProfile
+	 * 
+	 * @throws KalturaErrors::RESPONSE_PROFILE_ID_NOT_FOUND
+	 */
+	function updateStatusAction($id, $status)
+	{
+		$dbResponseProfile = ResponseProfilePeer::retrieveByPK($id);
+		if (!$dbResponseProfile)
+			throw new KalturaAPIException(KalturaErrors::RESPONSE_PROFILE_ID_NOT_FOUND, $id);
+
+		if($status == KalturaResponseProfileStatus::ENABLED)
+		{
+			//Check uniqueness of new object's system name
+			$systemNameProfile = ResponseProfilePeer::retrieveBySystemName($dbResponseProfile->getSystemName(), $id);
+			if ($systemNameProfile)
+				throw new KalturaAPIException(KalturaErrors::RESPONSE_PROFILE_DUPLICATE_SYSTEM_NAME, $dbResponseProfile->getSystemName());
+		}	
+		
+		$dbResponseProfile->setStatus($status);
+		$dbResponseProfile->save();
+	
 		$responseProfile = new KalturaResponseProfile();
 		$responseProfile->fromObject($dbResponseProfile, $this->getResponseProfile());
 		return $responseProfile;
