@@ -1,5 +1,23 @@
 
 ----------
+# Jupiter-10.6.0 #
+
+##API Response Profiles##
+- Issue Type: new feature
+
+#### Configuration ####
+None
+
+#### Deployment Scripts ####
+
+	Run: mysql deployment/updates/sql/2015_02_23_response_profile_table.sql  
+
+#### Known Issues & Limitations ####
+
+None.
+
+
+----------
 # Jupiter-10.5.0 #
 
 ##Flavor-asset status HTTP Notifications##
