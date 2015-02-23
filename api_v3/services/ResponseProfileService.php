@@ -13,6 +13,22 @@ class ResponseProfileService extends KalturaBaseService
 		$this->applyPartnerFilterForClass('ResponseProfile'); 	
 	}
 	
+	/* (non-PHPdoc)
+	 * @see KalturaBaseService::partnerGroup()
+	 */
+	protected function partnerGroup($peer = null)
+	{
+		
+		switch ($this->actionName)
+		{
+			case 'list':
+			case 'get':
+				return $this->partnerGroup . ',0';
+		}
+			
+		return $this->partnerGroup;
+	}
+	
 	/**
 	 * Add new response profile
 	 * 
