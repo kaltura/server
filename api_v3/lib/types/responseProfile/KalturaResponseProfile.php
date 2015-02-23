@@ -183,7 +183,7 @@ class KalturaResponseProfile extends KalturaResponseProfileBase implements IFilt
 			$object->setFilter($this->filter->toObject());
 		}
 		
-		parent::toObject($object, $propertiesToSkip);
+		return parent::toObject($object, $propertiesToSkip);
 	}
 	
 	/* (non-PHPdoc)
