@@ -547,6 +547,38 @@ class asset extends Baseasset implements ISyncableFile
 
 		return $this->getDownloadUrlWithExpiry(86400, $useCdn, $forceProxy, $preview);
 	}
+
+	public function getServeFlavorUrl($entry)
+	{
+		if ($entry->getType() != entryType::MEDIA_CLIP)
+			KExternalErrors::dieError(KExternalErrors::INVALID_ENTRY_TYPE);
+	
+		//$url = $deliveryProfile->getFullAssetUrl($this);
+		$url = myAssetUtils::getAssetUrl($this);
+		$extension = $this->getFileExt();
+		$name = $entry->getName();
+	
+		//adding a serveFlavor download parameter
+		$downloadAddition = "/fileName/$name.$extension";
+	
+		return $url . $downloadAddition;
+	
+	}
+	
+	public static function initDeliveryProfile($cdnHost = null , $storageProfileId = null , $format = PlaybackProtocol::HTTP , $mediaProtocol = PlaybackProtocol::HTTP , $entryId)
+	{
+		if ($storageProfileId)
+		{
+			return DeliveryProfilePeer::getRemoteDeliveryByStorageId($storageProfileId,$entryId,
+					$format, $mediaProtocol);
+		} else {
+			$cdnHostOnly = trim(preg_replace('#https?://#', '', $cdnHost), '/');
+	
+			return DeliveryProfilePeer::getLocalDeliveryByPartner($entryId, $format,
+					$mediaProtocol, $cdnHostOnly);
+		}
+	}
+	
 	
 	public function isKsNeededForDownload()
 	{
