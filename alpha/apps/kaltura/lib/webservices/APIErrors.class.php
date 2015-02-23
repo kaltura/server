@@ -415,4 +415,6 @@ class APIErrors
 	const OBJECT_NOT_FOUND = "OBJECT_NOT_FOUND;;Object not found";
 	
 	const UNKNOWN_RESPONSE_FORMAT = "UNKNOWN_RESPONSE_FORMAT;FORMAT;Response format provided [@FORMAT@] is not recognized by server";
+	
+	const PROFILE_STATUS_DISABLED = "PROFILE_STATUS_DISABLED;PROFILE_ID;Export action failed since profile [@PROFILE_ID@] is disabled";
 }

@@ -22,11 +22,10 @@ abstract class EventNotificationTemplate extends BaseEventNotificationTemplate
 	const CUSTOM_DATA_AUTOMATIC_DISPATCH_ENABLED = 'automaticDispatchEnabled';
 
 	/**
-	 * Returns job data for dispatching the event notification
+	 * Dispatch the event notification
 	 * @param kScope $scope
-	 * @return kEventNotificationDispatchJobData
-	 */
-	abstract public function getJobData(kScope $scope = null); 
+	 */ 
+	abstract public function dispatch(kScope $scope);
 
 	public function getEventConditions()									{return $this->getFromCustomData(self::CUSTOM_DATA_EVENT_CONDITIONS);}
 	public function getContentParameters()									{return $this->getFromCustomData(self::CUSTOM_DATA_CONTENT_PARAMETERS, null, array());}
@@ -51,5 +50,9 @@ abstract class EventNotificationTemplate extends BaseEventNotificationTemplate
 			$v = array_map('trim', explode(',', $v));
 			
 		$this->putInCustomData('requiredCopyTemplatePermissions', $v);
+	}
+	public function getCacheInvalidationKeys()
+	{
+		return array("eventNotificationTemplate:partnerId=".strtolower($this->getPartnerId()));
 	}
 } // EventNotificationTemplate

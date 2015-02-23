@@ -42,6 +42,7 @@ class LiveConversionProfileService extends KalturaBaseService
 		$entry = null;
 		if (!kCurrentContext::$ks)
 		{
+			kEntitlementUtils::initEntitlementEnforcement(null, false);
 			$entry = kCurrentContext::initPartnerByEntryId($entryId);
 			
 			if (!$entry || $entry->getStatus() == entryStatus::DELETED)
@@ -166,15 +167,20 @@ class LiveConversionProfileService extends KalturaBaseService
 		$video = $encode->addChild('Video');
 		$audio = $encode->addChild('Audio');
 		
+		if ($liveParams->hasTag(assetParams::TAG_AUDIO_ONLY))
+		{
+			$videoCodec = 'Disable';
+		}
+		
 		if($liveParams->hasTag(liveParams::TAG_INGEST))
 		{
-			$video->addChild('Codec', 'PassThru');
-			$audio->addChild('Codec', 'AAC');
+			$video->addChild('Codec', $videoCodec);
+			$audio->addChild('Codec', $audioCodec);
 			$audio->addChild('Bitrate', 96000);
 			
 			return;
 		}
-
+		
 		if($liveParams->getWidth() || $liveParams->getHeight() || $liveParams->getFrameRate())
 		{
 			switch ($liveParams->getVideoCodec())

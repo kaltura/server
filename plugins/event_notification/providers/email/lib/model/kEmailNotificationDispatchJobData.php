@@ -85,13 +85,6 @@ class kEmailNotificationDispatchJobData extends kEventNotificationDispatchJobDat
 	private $customHeaders;
 	
 	/**
-	 * Define the content dynamic parameters
-	 * 
-	 * @var array<key,value>
-	 */
-	private $contentParameters;
-	
-	/**
 	 * @return the $fromEmail
 	 */
 	public function getFromEmail() 
@@ -132,27 +125,11 @@ class kEmailNotificationDispatchJobData extends kEventNotificationDispatchJobDat
 	}
 
 	/**
-	 * @return array<key,value> $contentParameters
-	 */
-	public function getContentParameters()
-	{
-		return $this->contentParameters;
-	}
-
-	/**
 	 * @param int $priority of enum EmailNotificationTemplatePriority
 	 */
 	public function setPriority($priority)
 	{
 		$this->priority = $priority;
-	}
-
-	/**
-	 * @param array<key,value> $contentParameters
-	 */
-	public function setContentParameters(array $contentParameters)
-	{
-		$this->contentParameters = $contentParameters;
 	}
 	
 	/**

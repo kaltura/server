@@ -6,9 +6,9 @@ class CSharpClientGenerator extends ClientGeneratorFromXml
 	private $_classInheritance = array();
 	private $_enums = array();
 	
-	function CSharpClientGenerator($xmlPath)
+	function __construct($xmlPath, Zend_Config $config, $sourcePath = "sources/csharp")
 	{
-		parent::ClientGeneratorFromXml($xmlPath, realpath("sources/csharp"));
+		parent::__construct($xmlPath, $sourcePath, $config);
 		$this->_doc = new KDOMDocument();
 		$this->_doc->load($this->_xmlFile);
 	}

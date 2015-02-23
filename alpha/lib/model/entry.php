@@ -1853,6 +1853,11 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		foreach ($entitledPusersEdit as $puserId)
 		{
 			$puserId = trim($puserId);
+			if ( $puserId === '' )
+			{
+				continue;
+			}
+
 			$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
 			$kuser = kuserPeer::getActiveKuserByPartnerAndUid($partnerId, $puserId);
 			if (!$kuser)
@@ -1882,6 +1887,11 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		return implode(',', unserialize($entitledUserPuserEdit));
 	}
 	
+	public function isEntitledKuserEdit( $kuserId )
+	{
+		return in_array( trim($kuserId), explode( ',', $this->getEntitledKusersEdit() ) );
+	}
+
 	public function setEntitledPusersPublish($v)
 	{
 		$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
@@ -1901,6 +1911,10 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		foreach ($entitledPusersPublish as $puserId)
 		{
 			$puserId = trim($puserId);
+			if ( $puserId === '' )
+			{
+				continue;
+			}
 			
 			$kuser = kuserPeer::getActiveKuserByPartnerAndUid($partnerId, $puserId);
 			if (!$kuser)
@@ -1929,6 +1943,11 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		return implode(',', unserialize($entitledUserPuserPublish));
 	}
 	
+	public function isEntitledKuserPublish( $kuserId )
+	{
+		return in_array( trim($kuserId), explode( ',', $this->getEntitledKusersPublish() ) );
+	}
+
 	public function getRoots()
 	{
 		// the prefix required becaue combined sphinx match is rrequired,
@@ -2177,7 +2196,10 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 
 	public function setCacheFlavorVersion($v)       {$this->putInCustomData("cache_flavor_version", $v);}
 	public function getCacheFlavorVersion()       {return $this->getFromCustomData("cache_flavor_version");}
-
+	
+	public function setCacheThumbnailVersion($v)       {$this->putInCustomData("cache_thumb_version", $v);}
+	public function getCacheThumbnailVersion()       {return $this->getFromCustomData("cache_thumb_version");}
+	
 	private $m_puser_id = null;
 	public function tempSetPuserId ( $puser_id )
 	{

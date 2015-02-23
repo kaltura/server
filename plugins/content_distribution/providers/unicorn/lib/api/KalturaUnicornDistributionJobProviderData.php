@@ -20,6 +20,20 @@ class KalturaUnicornDistributionJobProviderData extends KalturaConfigurableDistr
 	public $title;
 	
 	/**
+	 * Indicates that the media content changed and therefore the job should wait for HTTP callback notification to be closed.
+	 * 
+	 * @var bool
+	 */
+	public $mediaChanged;
+	
+	/**
+	 * Flavor asset version.
+	 * 
+	 * @var string
+	 */
+	public $flavorAssetVersion;
+	
+	/**
 	 * The schema and host name to the Kaltura server, e.g. http://www.kaltura.com
 	 * 
 	 * @var string
@@ -42,14 +56,28 @@ class KalturaUnicornDistributionJobProviderData extends KalturaConfigurableDistr
 		$distributionProfileDb = DistributionProfilePeer::retrieveByPK($distributionJobData->distributionProfileId);
 		/* @var $distributionProfileDb UnicornDistributionProfile */
 		
+		$flavorAssetIds = explode(',', $entryDistributionDb->getFlavorAssetIds());
+		$flavorAssetId = reset($flavorAssetIds);
+		$flavorAsset = assetPeer::retrieveById($flavorAssetId);
+		$flavorAssetOldVersion = $entryDistributionDb->getFromCustomData(kUnicornDistributionJobProviderData::CUSTOM_DATA_FLAVOR_ASSET_OLD_VERSION);
+		$flavorAssetNewVersion = null;
+		if($flavorAsset)
+		{
+			$flavorAssetNewVersion = $flavorAsset->getVersion();
+		}
+		
 		$values = $distributionProfileDb->getAllFieldValues($entryDistributionDb);
 		$this->catalogGuid = $values[UnicornDistributionField::CATALOG_GUID];
 		$this->title = $values[UnicornDistributionField::TITLE];
+		$this->flavorAssetVersion = $flavorAssetNewVersion;
+		$this->mediaChanged = ($flavorAssetOldVersion != $flavorAssetNewVersion);
 	}
 	
 	private static $map_between_objects = array(
 		'catalogGuid',
-		'title'
+		'title',
+		'mediaChanged',
+		'flavorAssetVersion',
 	);
 	
 	/* (non-PHPdoc)

@@ -6,12 +6,9 @@ class PythonClientGenerator extends ClientGeneratorFromXml
 	 */
 	protected $_doc = null;
 	
-	function PythonClientGenerator($xmlPath, $sourcePath = null)
+	function __construct($xmlPath, Zend_Config $config, $sourcePath = "sources/python")
 	{
-		if(!$sourcePath)
-			$sourcePath = realpath("sources/python");
-			
-		parent::ClientGeneratorFromXml($xmlPath, $sourcePath);
+		parent::__construct($xmlPath, $sourcePath, $config);
 		$this->_doc = new KDOMDocument();
 		$this->_doc->load($this->_xmlFile);
 	}

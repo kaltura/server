@@ -64,7 +64,10 @@ class categoryPeer extends BasecategoryPeer
 
 			if($kuser)
 			{
-				$membersCrit = $c->getNewCriterion ( self::MEMBERS , $kuser->getId(), Criteria::LIKE);
+				// get the groups that the user belongs to in case she is not associated to the category directly
+				$kgroupIds = KuserKgroupPeer::retrieveKgroupIdsByKuserId($kuser->getId());
+				$kgroupIds[] = $kuser->getId();
+				$membersCrit = $c->getNewCriterion ( self::MEMBERS , $kgroupIds, KalturaCriteria::IN_LIKE);
 				$membersCrit->addTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
      			$crit->addOr($membersCrit);
 			}
@@ -389,10 +392,14 @@ class categoryPeer extends BasecategoryPeer
 		$ksString = kCurrentContext::$ks ? kCurrentContext::$ks : '';
 		if($ksString <> '')
 			$kuser = kCurrentContext::getCurrentKsKuser();
-		
+
+
 		if($kuser)
 		{
-			$membersCrit = $c->getNewCriterion ( self::MEMBERS , $kuser->getId(), Criteria::LIKE);
+			// get the groups that the user belongs to in case she is not associated to the category directly
+			$kgroupIds = KuserKgroupPeer::retrieveKgroupIdsByKuserId($kuser->getId());
+			$kgroupIds[] = $kuser->getId();
+			$membersCrit = $c->getNewCriterion ( self::MEMBERS , $kgroupIds, KalturaCriteria::IN_LIKE);
 			$membersCrit->addTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
    			$crit->addOr($membersCrit);
 		}
