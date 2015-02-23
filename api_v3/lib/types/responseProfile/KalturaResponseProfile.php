@@ -154,35 +154,6 @@ class KalturaResponseProfile extends KalturaResponseProfileBase implements IFilt
 		}
 	}
 	
-	protected function validateNestedObjects($maxPageSize, $maxNestingLevel)
-	{
-		if(!$this->relatedProfiles)
-		{
-			return;
-		}
-		
-		if($maxNestingLevel > 0)
-		{
-			foreach($this->relatedProfiles as $relatedProfile)
-			{
-				/* @var $relatedProfile KalturaResponseProfile */
-				$relatedProfile->validateNestedObjects($maxPageSize, $maxNestingLevel - 1);
-				
-				if($relatedProfile->pager)
-				{
-					$relatedProfile->pager->validatePropertyMaxValue('pageSize', $maxPageSize, true);
-				}
-			}
-		}
-		else
-		{
-			if(count($this->relatedProfiles))
-			{
-				throw new KalturaAPIException(KalturaErrors::RESPONSE_PROFILE_MAX_NESTING_LEVEL);
-			}
-		}
-	}
-	
 	/* (non-PHPdoc)
 	 * @see KalturaObject::toObject($object_to_fill, $props_to_skip)
 	 */
