@@ -43,7 +43,7 @@ class ResponseProfile extends BaseResponseProfile implements IResponseProfileHol
 	public function getFilter()						{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_FILTER);}
 	public function getPager()						{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_PAGER);}
 	
-	public function setFields(array $v)					{$this->putInCustomData(self::CUSTOM_DATA_FIELD_FIELDS, $v);}
+	public function setFields($v)						{$this->putInCustomData(self::CUSTOM_DATA_FIELD_FIELDS, $v);}
 	public function setRelatedProfiles(array $v)		{$this->putInCustomData(self::CUSTOM_DATA_FIELD_RELATED_PROFILES, $v);}
 	public function setFilterApiClassName($v)			{$this->putInCustomData(self::CUSTOM_DATA_FIELD_FILTER_API_CLASS_NAME, $v);}
 	public function setFilter(baseObjectFilter $v)		{$this->putInCustomData(self::CUSTOM_DATA_FIELD_FILTER, $v);}
