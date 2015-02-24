@@ -12,16 +12,17 @@ abstract class KalturaResponseProfileBase extends KalturaObject
 	
 	protected function validateNestedObjects($maxPageSize, $maxNestingLevel)
 	{
-		if(!$this->relatedProfiles)
+		$relatedProfiles = $this->getRelatedProfiles();
+		if(!$relatedProfiles)
 		{
 			return;
 		}
 		
 		if($maxNestingLevel > 0)
 		{
-			foreach($this->relatedProfiles as $relatedProfile)
+			foreach($relatedProfiles as $relatedProfile)
 			{
-				/* @var $relatedProfile KalturaResponseProfile */
+				/* @var $relatedProfile KalturaResponseProfileBase */
 				$relatedProfile->validateNestedObjects($maxPageSize, $maxNestingLevel - 1);
 				
 				if($relatedProfile->pager)
@@ -32,7 +33,7 @@ abstract class KalturaResponseProfileBase extends KalturaObject
 		}
 		else
 		{
-			if(count($this->relatedProfiles))
+			if(count($relatedProfiles))
 			{
 				throw new KalturaAPIException(KalturaErrors::RESPONSE_PROFILE_MAX_NESTING_LEVEL);
 			}
