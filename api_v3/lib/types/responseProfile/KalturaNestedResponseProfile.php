@@ -80,7 +80,7 @@ class KalturaNestedResponseProfile extends KalturaNestedResponseProfileBase
 		{
 			$object = new kResponseProfile();
 		}
-		parent::toObject($object, $propertiesToSkip);
+		return parent::toObject($object, $propertiesToSkip);
 	}
 	
 	/* (non-PHPdoc)

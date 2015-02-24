@@ -51,7 +51,7 @@ class KalturaNestedResponseProfileHolder extends KalturaNestedResponseProfileBas
 			$object = new kResponseProfileHolder();
 		}
 		
-		parent::toObject($object, $propertiesToSkip);
+		return parent::toObject($object, $propertiesToSkip);
 	}
 	
 	/* (non-PHPdoc)
