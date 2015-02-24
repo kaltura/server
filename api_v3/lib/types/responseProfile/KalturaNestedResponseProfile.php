@@ -48,7 +48,6 @@ class KalturaNestedResponseProfile extends KalturaNestedResponseProfileBase
 		'name', 
 		'type',
 		'fields',
-		'filter',
 		'pager',
 		'relatedProfiles',
 		'mappings',
@@ -70,6 +69,22 @@ class KalturaNestedResponseProfile extends KalturaNestedResponseProfileBase
 	{
 		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
 	}
+
+	/* (non-PHPdoc)
+	 * @see KalturaObject::fromObject($srcObj, $responseProfile)
+	 */
+	public function fromObject($srcObj, KalturaResponseProfileBase $responseProfile = null)
+	{
+		/* @var $srcObj kResponseProfile */
+		parent::fromObject($srcObj, $responseProfile);
+		
+		if($srcObj->getFilter() && $this->shouldGet('filter', $responseProfile))
+		{
+			$filterApiClassName = $srcObj->getFilterApiClassName();
+			$this->filter = new $filterApiClassName();
+			$this->filter->fromObject($srcObj->getFilter());
+		}
+	}
 	
 	/* (non-PHPdoc)
 	 * @see KalturaObject::toObject($object_to_fill, $props_to_skip)
@@ -80,6 +95,13 @@ class KalturaNestedResponseProfile extends KalturaNestedResponseProfileBase
 		{
 			$object = new kResponseProfile();
 		}
+		
+		if($this->filter)
+		{
+			$object->setFilterApiClassName(get_class($this->filter));
+			$object->setFilter($this->filter->toObject());
+		}
+		
 		return parent::toObject($object, $propertiesToSkip);
 	}
 	
