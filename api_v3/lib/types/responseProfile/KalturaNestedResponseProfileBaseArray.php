@@ -26,9 +26,9 @@ class KalturaNestedResponseProfileBaseArray extends KalturaTypedArray
 		return $newArr;
 	}
 
-	static function getInstanceByDbObject(KalturaResponseProfileBaseBase $dbObject)
+	static function getInstanceByDbObject(IResponseProfileBase $object)
 	{
-		switch(get_class($dbObject))
+		switch(get_class($object))
 		{
 			case 'kResponseProfile':
 				return new KalturaNestedResponseProfile();
@@ -37,7 +37,7 @@ class KalturaNestedResponseProfileBaseArray extends KalturaTypedArray
 				return new KalturaNestedResponseProfileHolder();
 				
 			default:
-				return KalturaPluginManager::loadObject('KalturaNestedResponseProfileBase', get_class($dbObject));
+				return KalturaPluginManager::loadObject('KalturaNestedResponseProfileBase', get_class($object));
 		}
 	}
 		
