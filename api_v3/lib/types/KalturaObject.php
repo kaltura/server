@@ -256,12 +256,8 @@ abstract class KalturaObject
 			else if ($thisProps[$apiPropName]->isComplexType())
 			{
 				$propertyType = $thisProps[$apiPropName]->getType();
-				$enumClass = call_user_func(array($propertyType, 'getEnumClass'));
-				if ($enumClass)
-				{
-					$curCode = "\$value = {$fieldValue};\n\t\t\$value->fromObject(\$srcObj->".$curGetter->name."());\n\t\t" . 
-					$fieldValue = '$value';
-				}
+				$curCode = "\$value = new $propertyType();\n\t\t\$value->fromObject(\$srcObj->".$curGetter->name."());\n\t\t" . 
+				$fieldValue = '$value';
 			}
 			
 	
