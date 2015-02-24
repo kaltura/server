@@ -47,7 +47,7 @@ class TestMain implements IKalturaLogger
 	
 	private function getKalturaClient($partnerId, $adminSecret, $isAdmin)
 	{
-		$kConfig = new KalturaConfiguration($partnerId);
+		$kConfig = new KalturaConfiguration();
 		$kConfig->serviceUrl = KalturaTestConfiguration::SERVICE_URL;
 		$kConfig->setLogger($this);
 		$client = new KalturaClient($kConfig);

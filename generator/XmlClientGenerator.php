@@ -110,10 +110,14 @@ class XmlClientGenerator extends ClientGeneratorFromPhp
 	    $pluginsElement = $this->_doc->createElement("plugins");
 	    $this->appendPlugins($pluginsElement);
 		
+	    $configurationsElement = $this->_doc->createElement("configurations");
+	    $this->appendConfigurations($configurationsElement);
+	    
 		$this->_xmlElement->appendChild($enumsElement);
 		$this->_xmlElement->appendChild($classesElement);
 		$this->_xmlElement->appendChild($servicesElement);
 		$this->_xmlElement->appendChild($pluginsElement);
+		$this->_xmlElement->appendChild($configurationsElement);
 	    
 		$this->addFile("KalturaClient.xml", $this->_doc->saveXML());
 	}
@@ -157,6 +161,43 @@ class XmlClientGenerator extends ClientGeneratorFromPhp
 			
 	    	$this->appendPlugin($pluginsElement, $pluginInstance);
 		}
+	}
+	
+	private function appendConfiguration(DOMElement $configurationsElement, $name, $class)
+	{
+	    $configurationElement = $this->_doc->createElement($name);
+	    
+	    $reflectClass = new ReflectionClass($class);
+		$properties = $reflectClass->getProperties(ReflectionProperty::IS_PUBLIC);
+		foreach($properties as $property)
+		{
+			if ($property->getDeclaringClass() == $reflectClass) // only properties defined in the current class, ignore the inherited
+			{
+				$parsedDocComment = new KalturaDocCommentParser($property->getDocComment());
+				$paramElement = $this->_doc->createElement($property->name);
+				$paramElement->setAttribute('type', $parsedDocComment->varType);
+			
+				if($parsedDocComment->alias)
+				{
+					$paramElement->setAttribute('alias', $parsedDocComment->alias);
+				}
+				
+				if($parsedDocComment->description)
+				{
+					$paramElement->setAttribute('description', trim($parsedDocComment->description));
+				}
+				
+				$configurationElement->appendChild($paramElement);
+			}
+		}
+						
+		$configurationsElement->appendChild($configurationElement);
+	}
+	
+	private function appendConfigurations(DOMElement $configurationsElement)
+	{
+		$this->appendConfiguration($configurationsElement, 'client', 'KalturaClientConfiguration');
+		$this->appendConfiguration($configurationsElement, 'request', 'KalturaRequestConfiguration');
 	}
 	
 	private function appendPlugin(DOMElement $pluginsElement, IKalturaPlugin $pluginInstance)

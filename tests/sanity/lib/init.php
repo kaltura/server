@@ -105,7 +105,6 @@ class SanityTestLogger implements IKalturaLogger
 
 $clientConfig = new KalturaConfiguration();
 $clientConfig->setLogger(new SanityTestLogger());
-$clientConfig->partnerId = null;
 foreach($config['client'] as $field => $value)
 	$clientConfig->$field = $value;
 

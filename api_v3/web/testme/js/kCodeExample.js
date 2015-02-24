@@ -781,7 +781,7 @@ KCodeExamplePHP.prototype.codeHeader = function (){
 
 	var jqPartnerId = this.codeError(this.codeVar("partnerId"), 'Variable partnerId must be defined');
 	
-	this.addCode(this.codeAssign(jqConfigObject.clone(true), this.codeNewInstance("KalturaConfiguration", [jqPartnerId])));
+	this.addCode(this.codeAssign(jqConfigObject.clone(true), this.codeNewInstance("KalturaConfiguration")));
 	this.addCode(this.codeAssign(this.codeObjectAttribute(jqConfigObject.clone(true), "serviceUrl"), this.codeString(KCodeExampleBase.getServiceUrl())));
 	this.addCode(this.codeAssign(this.jqClientObject.clone(true), this.codeNewInstance("KalturaClient", [jqConfigObject.clone(true)])));
 	

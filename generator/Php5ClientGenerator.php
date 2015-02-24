@@ -95,7 +95,9 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 		    	$this->writeService($serviceNode);
 		}
 		$this->appendLine();
-	    $this->writeMainClient($serviceNodes);
+		
+		$configurationNodes = $xpath->query("/xml/configurations/*");
+	    $this->writeMainClient($serviceNodes, $configurationNodes);
 	    $this->appendLine();
 	    
     	$this->addFile("KalturaClient.php", $this->getTextBlock());
@@ -621,10 +623,11 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 		return implode(', ', $arguments);
 	}
 	
-	function writeMainClient(DOMNodeList $serviceNodes)
+	function writeMainClient(DOMNodeList $serviceNodes, DOMNodeList $configurationNodes)
 	{
 		$mainClassName = 'KalturaClient';
 		$apiVersion = $this->_doc->documentElement->getAttribute('apiVersion');
+		$date = date('y-m-d');
 		
 		if($this->generateDocs)
 		{
@@ -636,11 +639,6 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 		
 		$this->appendLine("class $mainClassName extends KalturaClientBase");
 		$this->appendLine("{");
-		$this->appendLine("	/**");
-		$this->appendLine("	 * @var string");
-		$this->appendLine("	 */");
-		$this->appendLine("	protected \$apiVersion = '$apiVersion';");
-		$this->appendLine("");
 	
 		foreach($serviceNodes as $serviceNode)
 		{
@@ -668,6 +666,9 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 		$this->appendLine("	{");
 		$this->appendLine("		parent::__construct(\$config);");
 		$this->appendLine("		");
+		$this->appendLine("		\$this->setClientTag('php5:$date');");
+		$this->appendLine("		\$this->setApiVersion('$apiVersion');");
+		$this->appendLine("		");
 		
 		foreach($serviceNodes as $serviceNode)
 		{
@@ -681,7 +682,97 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 		$this->appendLine("	}");
 		$this->appendLine("	");
 	
+		foreach($configurationNodes as $configurationNode)
+		{
+			/* @var $configurationNode DOMElement */
+			$configurationName = $configurationNode->nodeName;
+			$methodsName = ucfirst($configurationName) . "Configuration";
+		
+			$this->appendLine("	public function set{$methodsName}(\$param, \$value)");
+			$this->appendLine("	{");
+			$this->appendLine("		\$this->{$configurationName}Configuration[\$param] = \$value;");
+			$this->appendLine("	}");
+			$this->appendLine("	");
+		
+			
+			$this->appendLine("	public function get{$methodsName}(\$param)");
+			$this->appendLine("	{");
+			$this->appendLine("		if(isset(\$this->{$configurationName}Configuration[\$param]))");
+			$this->appendLine("		{");
+			$this->appendLine("			return \$this->{$configurationName}Configuration[\$param];");
+			$this->appendLine("		}");
+			$this->appendLine("		");
+			$this->appendLine("		return null;");
+			$this->appendLine("	}");
+			$this->appendLine("	");
+			
+			foreach($configurationNode->childNodes as $configurationPropertyNode)
+			{
+				/* @var $configurationPropertyNode DOMElement */
+				
+				if ($configurationPropertyNode->nodeType != XML_ELEMENT_NODE)
+					continue;
+			
+				$configurationProperty = $configurationPropertyNode->localName;
+				$type = $configurationPropertyNode->getAttribute('type');
+				$description = null;
+				
+				if($configurationPropertyNode->hasAttribute('description'))
+				{
+					$description = $configurationPropertyNode->getAttribute('description');
+				}
+				
+				$this->writeConfigurationProperty($configurationName, $configurationProperty, $configurationProperty, $type, $description);
+				
+				if($configurationPropertyNode->hasAttribute('alias'))
+				{
+					$this->writeConfigurationProperty($configurationName, $configurationPropertyNode->getAttribute('alias'), $configurationProperty, $type, $description);					
+				}
+			}
+		}
+		
 		$this->appendLine("}");
+	}
+	
+	protected function writeConfigurationProperty($configurationName, $name, $paramName, $type, $description)
+	{
+		$methodsName = ucfirst($name);
+		$signitureType = $this->isSimpleType($type) ? '' : "$type ";
+	
+		
+		$this->appendLine("	/**");
+		if($description)
+		{
+			$this->appendLine("	 * $description");
+			$this->appendLine("	 * ");
+		}
+		$this->appendLine("	 * @param $type \${$name}");
+		$this->appendLine("	 */");
+		$this->appendLine("	public function set{$methodsName}({$signitureType}\${$name})");
+		$this->appendLine("	{");
+		$this->appendLine("		\$this->{$configurationName}Configuration['{$paramName}'] = \${$name};");
+		$this->appendLine("	}");
+		$this->appendLine("	");
+	
+		
+		$this->appendLine("	/**");
+		if($description)
+		{
+			$this->appendLine("	 * $description");
+			$this->appendLine("	 * ");
+		}
+		$this->appendLine("	 * @return $type");
+		$this->appendLine("	 */");
+		$this->appendLine("	public function get{$methodsName}()");
+		$this->appendLine("	{");
+		$this->appendLine("		if(isset(\$this->{$configurationName}Configuration['{$paramName}']))");
+		$this->appendLine("		{");
+		$this->appendLine("			return \$this->{$configurationName}Configuration['{$paramName}'];");
+		$this->appendLine("		}");
+		$this->appendLine("		");
+		$this->appendLine("		return null;");
+		$this->appendLine("	}");
+		$this->appendLine("	");
 	}
 	
 	protected function addFile($fileName, $fileContents, $addLicense = true)
