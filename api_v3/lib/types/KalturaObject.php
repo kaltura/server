@@ -105,7 +105,7 @@ abstract class KalturaObject
 		$thisProps = $thisRef->getProperties();
 	
 		// generate file header
-		$result = "<?php\nclass {$fromObjectClass} extends {$srcObjClass}\n{\n\tstatic function fromObject(\$apiObj, \$srcObj, IResponseProfile \$responseProfile = null)\n\t{\n";
+		$result = "<?php\nclass {$fromObjectClass} extends {$srcObjClass}\n{\n\tstatic function fromObject(\$apiObj, \$srcObj, KalturaResponseProfileBase \$responseProfile = null)\n\t{\n";
 	
 		if ($thisRef->requiresReadPermission())
 		{
@@ -278,11 +278,15 @@ abstract class KalturaObject
 		$result .= "\t\t\$get = array(\n\t\t\t'" . implode("',\n\t\t\t'", array_keys($mappingFuncCode)) . "'\n\t\t);";
 		$result .= '
 		if($responseProfile){
-			if($responseProfile->getType() == ResponseProfileType::INCLUDE_FIELDS){
-				$get = array_intersect($get, $responseProfile->getFieldsArray());
+			if($responseProfile instanceof KalturaNestedResponseProfileHolder){	
+				$responseProfile = $responseProfile->get();
+			}
+			$fieldsArray = array_map("trim", explode(",", $responseProfile->fields));
+			if($responseProfile->type == ResponseProfileType::INCLUDE_FIELDS){
+				$get = array_intersect($get, $fieldsArray);
 			}
 			else{
-				$get = array_diff($get, $responseProfile->getFieldsArray());
+				$get = array_diff($get, $fieldsArray);
 			}
 		}
 		$get = array_flip($get);
@@ -295,13 +299,20 @@ abstract class KalturaObject
 	
 	public function shouldGet($propertyName, KalturaResponseProfileBase $responseProfile = null)
 	{
-		if($responseProfile){
-			$coreResponseProfile = $responseProfile->toObject();
-			$fields = array_flip($coreResponseProfile->getFieldsArray());
-			if($coreResponseProfile->getType() == ResponseProfileType::INCLUDE_FIELDS){
+		if($responseProfile)
+		{
+			if($responseProfile instanceof KalturaNestedResponseProfileHolder)
+			{	
+				$responseProfile = $responseProfile->get();
+			}
+			
+			$fields = array_flip(array_map("trim", explode(",", $responseProfile->fields)));
+			if($responseProfile->type == ResponseProfileType::INCLUDE_FIELDS)
+			{
 				return isset($fields[$propertyName]);
 			}
-			else{
+			else
+			{
 				return !isset($fields[$propertyName]);
 			}
 		}
@@ -335,8 +346,7 @@ abstract class KalturaObject
 			require_once($cacheFileName);
 		}
 	
-		$coreResponseProfile = $responseProfile ? $responseProfile->toObject() : null;
-		$fromObjectClass::fromObject($this, $srcObj, $coreResponseProfile);
+		$fromObjectClass::fromObject($this, $srcObj, $responseProfile);
 		
 		if($responseProfile)
 		{
