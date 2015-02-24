@@ -203,6 +203,14 @@ class KalturaResponseProfile extends KalturaResponseProfileBase implements IFilt
 	}
 	
 	/* (non-PHPdoc)
+	 * @see KalturaResponseProfileBase::getPager()
+	 */
+	public function getPager()
+	{
+		return $this->pager;
+	}
+	
+	/* (non-PHPdoc)
 	 * @see IFilterable::getExtraFilters()
 	 */
 	public function getExtraFilters()

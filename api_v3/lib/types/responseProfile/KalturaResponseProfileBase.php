@@ -10,6 +10,11 @@ abstract class KalturaResponseProfileBase extends KalturaObject
 	 */
 	abstract public function getRelatedProfiles();
 	
+	/**
+	 * @return KalturaFilterPager
+	 */
+	abstract public function getPager();
+	
 	protected function validateNestedObjects($maxPageSize, $maxNestingLevel)
 	{
 		$relatedProfiles = $this->getRelatedProfiles();
@@ -25,9 +30,10 @@ abstract class KalturaResponseProfileBase extends KalturaObject
 				/* @var $relatedProfile KalturaResponseProfileBase */
 				$relatedProfile->validateNestedObjects($maxPageSize, $maxNestingLevel - 1);
 				
-				if($relatedProfile->pager)
+				$pager = $relatedProfile->getPager();
+				if($pager)
 				{
-					$relatedProfile->pager->validatePropertyMaxValue('pageSize', $maxPageSize, true);
+					$pager->validatePropertyMaxValue('pageSize', $maxPageSize, true);
 				}
 			}
 		}

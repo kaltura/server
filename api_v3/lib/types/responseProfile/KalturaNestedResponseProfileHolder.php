@@ -80,4 +80,13 @@ class KalturaNestedResponseProfileHolder extends KalturaNestedResponseProfileBas
 		
 		return new KalturaResponseProfile($responseProfile);
 	}
+	
+	/* (non-PHPdoc)
+	 * @see KalturaResponseProfileBase::getPager()
+	 */
+	public function getPager()
+	{
+		$responseProfile = $this->get();
+		return $responseProfile->getPager();
+	}
 }

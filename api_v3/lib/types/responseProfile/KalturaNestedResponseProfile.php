@@ -103,4 +103,12 @@ class KalturaNestedResponseProfile extends KalturaNestedResponseProfileBase
 	{
 		return $this;
 	}
+	
+	/* (non-PHPdoc)
+	 * @see KalturaResponseProfileBase::getPager()
+	 */
+	public function getPager()
+	{
+		return $this->pager;
+	}
 }
