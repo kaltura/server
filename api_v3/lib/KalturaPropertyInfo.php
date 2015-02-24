@@ -290,6 +290,18 @@ class KalturaPropertyInfo
 	/**
 	 * @return boolean
 	 */
+	public function isAssociativeArray()
+	{
+		$this->getTypeReflector();
+		if ($this->_typeReflector)
+			return $this->_typeReflector->isAssociativeArray();
+		else
+			return false;
+	}
+	
+	/**
+	 * @return boolean
+	 */
 	public function isAbstract()
 	{
 		$this->getTypeReflector();

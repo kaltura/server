@@ -157,9 +157,9 @@ class KalturaRequestDeserializer
 				if (isset($this->paramsGrouped[$name]) && is_array($this->paramsGrouped[$name]))
 				{
 					ksort($this->paramsGrouped[$name]);
-					foreach($this->paramsGrouped[$name] as $arrayItemParams)
+					foreach($this->paramsGrouped[$name] as $arrayItemKey => $arrayItemParams)
 					{
-						$arrayObj[] = $this->buildObject($actionParam->getArrayTypeReflector(), $arrayItemParams, $name);
+						$arrayObj[$arrayItemKey] = $this->buildObject($actionParam->getArrayTypeReflector(), $arrayItemParams, $name);
 					}
 				}
 				$serviceArguments[] = $arrayObj;
@@ -338,9 +338,9 @@ class KalturaRequestDeserializer
 			{
 				ksort($value);
 				$arrayObj = new $type();
-				foreach($value as $arrayItemParams)
+				foreach($value as $arrayItemKey => $arrayItemParams)
 				{
-					$arrayObj[] = $this->buildObject($property->getArrayTypeReflector(), $arrayItemParams, "{$objectName}:$name");
+					$arrayObj[$arrayItemKey] = $this->buildObject($property->getArrayTypeReflector(), $arrayItemParams, "{$objectName}:$name");
 				}
 				$obj->$name = $arrayObj;
 				continue;

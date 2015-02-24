@@ -6,7 +6,7 @@
 abstract class KalturaObject 
 {
 	/**
-	 * @var KalturaAssociativeArray
+	 * @var KalturaListResponseArray
 	 */
 	public $relatedObjects;
 	

@@ -331,6 +331,7 @@ class XmlClientGenerator extends ClientGeneratorFromPhp
 	    $properties = $typeReflector->getCurrentProperties();
 		foreach($properties as $property)
 		{
+			/* @var $property KalturaPropertyInfo */
 			if ($property->isServerOnly())
 			{
 				continue;
@@ -342,7 +343,12 @@ class XmlClientGenerator extends ClientGeneratorFromPhp
 			$propertyElement = $this->_doc->createElement("property");
 			$propertyElement->setAttribute("name", $propName);
 			
-			if ($property->isArray())
+			if ($property->isAssociativeArray())
+			{
+			    $propertyElement->setAttribute("type", "map");
+			    $propertyElement->setAttribute("arrayType", $property->getArrayType());
+			}
+			else if ($property->isArray())
 			{
 			    $propertyElement->setAttribute("type", "array");
 			    $propertyElement->setAttribute("arrayType", $property->getArrayType());
@@ -394,9 +400,16 @@ class XmlClientGenerator extends ClientGeneratorFromPhp
 		
 		foreach($actionParams as $actionParam)
 		{
+			/* @var $actionParam KalturaParamInfo */
 			$actionParamElement = $this->_doc->createElement("param");
 			$actionParamElement->setAttribute("name", $actionParam->getName());
-			if ($actionParam->isArray())
+			
+			if ($actionParam->isAssociativeArray())
+			{
+			    $actionParamElement->setAttribute("type", "map");
+			    $actionParamElement->setAttribute("arrayType", $actionParam->getArrayType());
+			}
+			elseif ($actionParam->isArray())
 			{
 			    $actionParamElement->setAttribute("type", "array");
 			    $actionParamElement->setAttribute("arrayType", $actionParam->getArrayType());
@@ -456,7 +469,13 @@ class XmlClientGenerator extends ClientGeneratorFromPhp
 		$arrayType = null;
 		if ($outputTypeReflector)
 		{
-		    if($outputTypeReflector->isArray())
+		    if($outputTypeReflector->isAssociativeArray())
+		    {
+		        $resultElement->setAttribute("type", "map");
+			    $arrayType = $outputTypeReflector->getArrayType();
+		        $resultElement->setAttribute("arrayType", $arrayType);
+		    }
+		    else if($outputTypeReflector->isArray())
 		    {
 		        $resultElement->setAttribute("type", "array");
 			    $arrayType = $outputTypeReflector->getArrayType();

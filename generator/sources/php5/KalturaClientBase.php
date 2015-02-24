@@ -1073,6 +1073,11 @@ abstract class KalturaServiceBase
  */
 abstract class KalturaObjectBase
 {
+	/**
+	 * @var array
+	 */
+	public $relatedObjects;
+	
 	public function __construct($params = array())
 	{
 		foreach ($params as $key => $value)

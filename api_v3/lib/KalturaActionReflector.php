@@ -105,7 +105,7 @@ class KalturaActionReflector extends KalturaReflector
 	
 	/**
 	 * Action returns array of the parameters the action method expects
-	 * @return array
+	 * @return array<KalturaParamInfo>
 	 */
 	public function getActionParams ( )
 	{

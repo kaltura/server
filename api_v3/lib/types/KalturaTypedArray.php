@@ -88,8 +88,8 @@ abstract class KalturaTypedArray extends KalturaObject implements ArrayAccess, I
 	public function toObjectsArray()
 	{
 		$array = array();
-		foreach($this->array as $obj)
-			$array[] = $obj->toObject();
+		foreach($this->array as $key => $obj)
+			$array[$key] = $obj->toObject();
 		return $array;
 	}
 	

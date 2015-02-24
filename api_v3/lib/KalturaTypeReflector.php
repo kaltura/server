@@ -505,6 +505,16 @@ class KalturaTypeReflector
 	}
 	
 	/**
+	 * Returns true when the type is (for what we know) an associative array
+	 *
+	 * @return boolean
+	 */
+	public function isAssociativeArray()
+	{
+		return is_subclass_of($this->_type, 'KalturaAssociativeArray');
+	}
+	
+	/**
 	 * When reflecting an array, returns the type of the array as string
 	 *
 	 * @return string
