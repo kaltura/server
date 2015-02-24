@@ -193,10 +193,10 @@ class KalturaRequestDeserializer
 		
 		$responseProfile = null;
 		if(isset($this->paramsGrouped[$paramName]['id'])){
-			$responseProfile = ResponseProfilePeer::retrieveByPK($this->paramsGrouped['responseProfileId']);
+			$responseProfile = ResponseProfilePeer::retrieveByPK($this->paramsGrouped[$paramName]['id']);
 		}
 		if(isset($this->paramsGrouped[$paramName]['name'])){
-			$responseProfile = ResponseProfilePeer::retrieveBySystemName($this->paramsGrouped['responseProfileName']);
+			$responseProfile = ResponseProfilePeer::retrieveBySystemName($this->paramsGrouped[$paramName]['name']);
 		}
 		if($responseProfile){
 			return new KalturaResponseProfile($responseProfile);

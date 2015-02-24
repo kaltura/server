@@ -34,7 +34,13 @@ abstract class KalturaTypedArray extends KalturaObject implements ArrayAccess, I
 			throw new Exception("'".get_class($value)."' is not an instance of '".$this->class."'");
 		
 		if ($offset === null)
+		{
 			$this->array[] = $value;
+		}
+		else
+		{
+			$this->array[$offset] = $value;
+		}
 			
 		$this->count = count ( $this->array );
 	}
@@ -42,7 +48,7 @@ abstract class KalturaTypedArray extends KalturaObject implements ArrayAccess, I
 	
 	public function offsetUnset($offset) 
 	{
-		
+		unset($this->array[$offset]);
 	}
 	
 	public function current() 
