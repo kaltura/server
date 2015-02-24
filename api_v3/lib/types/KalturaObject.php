@@ -253,6 +253,17 @@ abstract class KalturaObject
 				}
 			}
 			
+			else if ($thisProps[$apiPropName]->isComplexType())
+			{
+				$propertyType = $thisProps[$apiPropName]->getType();
+				$enumClass = call_user_func(array($propertyType, 'getEnumClass'));
+				if ($enumClass)
+				{
+					$curCode = "\$value = {$fieldValue};\n\t\t\$value->fromObject(\$srcObj->".$curGetter->name."());\n\t\t" . 
+					$fieldValue = '$value';
+				}
+			}
+			
 	
 			// add field copy code
 			$curCode .= "\$apiObj->{$apiPropName} = {$fieldValue};";
@@ -361,10 +372,14 @@ abstract class KalturaObject
 			/* @var $relatedProfile KalturaNestedResponseProfileBase */
 			$relatedProfile = $relatedProfile->get();
 			$filter = clone $relatedProfile->filter;
-			foreach($relatedProfile->mappings as $mapping)
+			
+			if($relatedProfile->mappings)
 			{
-				/* @var $mapping KalturaResponseProfileMapping */
-				$mapping->apply($filter, $this);
+				foreach($relatedProfile->mappings as $mapping)
+				{
+					/* @var $mapping KalturaResponseProfileMapping */
+					$mapping->apply($filter, $this);
+				}
 			}
 			
 			$pager = $relatedProfile->pager;

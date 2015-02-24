@@ -138,7 +138,7 @@ class KalturaTypeReflector
 	/**
 	 * Return the type properties 
 	 *
-	 * @return array
+	 * @return array<KalturaPropertyInfo>
 	 */
 	public function getProperties()
 	{
