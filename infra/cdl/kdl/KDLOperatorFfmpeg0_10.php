@@ -130,7 +130,14 @@ $fltStr = null;
 			$filters[] = $str;
 			$filters[] = 'pad='.$vid->_width.':'.$vid->_height.':(ow-iw)/2:(oh-ih)/2';
 		}
-	
+
+			/*
+			 * For IMX - crop the source
+			 */
+		if(isset($vid->_isCropIMX) && $vid->_isCropIMX==true){
+			$aaa = 0;
+			$filters[] = "crop=in_w:in_h-32:in_w:32";
+		}
 		return $filters;
 	}
 	

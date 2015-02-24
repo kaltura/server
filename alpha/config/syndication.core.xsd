@@ -140,7 +140,7 @@
 					<xs:documentation>Entry searchable keywords</xs:documentation>
 				</xs:annotation>
 			</xs:element>
-			<xs:element ref="category" minOccurs="0" maxOccurs="1">
+			<xs:element ref="category" minOccurs="0" maxOccurs="unbounded">
 				<xs:annotation>
 					<xs:documentation>Entry assigned categories</xs:documentation>
 				</xs:annotation>
@@ -223,10 +223,19 @@
 					<xs:documentation>Comma seperated ids of flavor params that have ready flavor asset assign to the entry</xs:documentation>
 				</xs:annotation>
 			</xs:element>
+			<xs:element name="plays" minOccurs="0" maxOccurs="1" type="xs:int">
+				<xs:annotation>
+					<xs:documentation>Entry plays count in the remote site</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="views" minOccurs="0" maxOccurs="1" type="xs:int">
+				<xs:annotation>
+					<xs:documentation>Entry views count in the remote site</xs:documentation>
+				</xs:annotation>
+			</xs:element>
 			<xs:element ref="media-extension" minOccurs="0" maxOccurs="unbounded" />
 		</xs:sequence>
 	</xs:complexType>
-
 	<!-- Not yet supported <xs:complexType name="T_mix"> <xs:sequence> <xs:element 
 		name="editorType" minOccurs="1" maxOccurs="1" type="KalturaEditorType"/> 
 		<xs:element name="dataContent" minOccurs="0" maxOccurs="1"> <xs:annotation> 
@@ -315,6 +324,11 @@
 				<xs:documentation>Flavor asset file extension</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
+		<xs:attribute name="createdAt" type="xs:string" use="required">
+			<xs:annotation>
+				<xs:documentation>Creation date</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
 		<xs:attribute name="isSource" type="xs:boolean" use="required">
 			<xs:annotation>
 				<xs:documentation>Is the source flavor asset</xs:documentation>
@@ -328,6 +342,11 @@
 		<xs:attribute name="width" type="xs:int" use="optional">
 			<xs:annotation>
 				<xs:documentation>Flavor width</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="fileSize" type="xs:int" use="optional">
+			<xs:annotation>
+				<xs:documentation>Flavor file size</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
 		<xs:attribute name="videoBitrate" type="xs:int" use="optional">
@@ -398,6 +417,11 @@
 				<xs:documentation>Format of the thumbnail asset file</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
+		<xs:attribute name="extension" type="xs:string" use="optional">
+			<xs:annotation>
+				<xs:documentation>Extension of the thumbnail asset file</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
 		<xs:attribute name="isDefault" type="xs:boolean" use="required">
 			<xs:annotation>
 				<xs:documentation>Is the entry default thumbnail</xs:documentation>
@@ -411,6 +435,16 @@
 		<xs:attribute name="width" type="xs:int" use="optional">
 			<xs:annotation>
 				<xs:documentation>Thumbnail width</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="fileSize" type="xs:int" use="optional">
+			<xs:annotation>
+				<xs:documentation>Thumbnail file size</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="createdAt" type="xs:string" use="required">
+			<xs:annotation>
+				<xs:documentation>Creation date</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
 		<xs:attribute name="thumbParamsId" type="xs:int" use="optional">

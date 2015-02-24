@@ -337,19 +337,19 @@ NSInteger playsPhoneSort(id media1, id media2, void *reverse)
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     // Return the number of rows in the section.
     
-    int count = [self.media count];
+    int count = (int)[self.media count];
     
     if (!isLandscape) {
         if (count > 1) {
         
-            count = ([self.media count] - 1) / 2 + (([self.media count] - 1) % 2) + 1;
+            count = ((int)[self.media count] - 1) / 2 + (((int)[self.media count] - 1) % 2) + 1;
             
         }
         
         
     } else {
         
-        count = [self.media count] / 3 + (([self.media count] % 3) > 0 ? 1 : 0);
+        count = (int)[self.media count] / 3 + (((int)[self.media count] % 3) > 0 ? 1 : 0);
         
     }
     
@@ -385,7 +385,7 @@ NSInteger playsPhoneSort(id media1, id media2, void *reverse)
         
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
         
-        int index = indexPath.row * 3;
+        int index = (int)indexPath.row * 3;
         
         cell.index = index;
         cell.parentController = self;
@@ -430,7 +430,7 @@ NSInteger playsPhoneSort(id media1, id media2, void *reverse)
         
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
         
-        int index = indexPath.row * 2 - 1;
+        int index = (int)indexPath.row * 2 - 1;
         if (index < 0) index = 0;
         
         cell.index = index;

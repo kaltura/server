@@ -4,9 +4,9 @@ class Xml2As3ClientGenerator extends ClientGeneratorFromXml
 	private $xml;
 	private $base_client_dir;
 
-	public function Xml2As3ClientGenerator($xmlFilePath)
+	function __construct($xmlPath, Zend_Config $config, $sourcePath = "sources/as3")
 	{
-		parent::ClientGeneratorFromXml($xmlFilePath, "sources/as3");
+		parent::__construct($xmlPath, $sourcePath, $config);
 	}
 
 	protected function getSingleLineCommentMarker()

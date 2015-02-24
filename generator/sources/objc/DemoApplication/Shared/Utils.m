@@ -66,7 +66,7 @@
     
     NSFileHandle *fileHandleIn = [NSFileHandle fileHandleForReadingAtPath:path];
     [fileHandleIn seekToFileOffset:offset];
-    
+    NSLog(@"OFFSET %lld", offset);
     NSData *data = [fileHandleIn readDataOfLength:CHUNK_SIZE];
     
     [data writeToFile:bufferPath atomically:NO];

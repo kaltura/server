@@ -712,7 +712,57 @@ class kRtspManifestRenderer extends kSingleUrlManifestRenderer
 	{
 		return '<html><head><meta http-equiv="refresh" content="0;url=' . htmlspecialchars($this->flavor['url']) . '"></head></html>';
 	}
+	
+}
 
+class kDashBaseManifestRenderer extends kMultiFlavorManifestRenderer
+{
+	/* (non-PHPdoc)
+	 * @see kManifestRenderer::getHeaders()
+	 */
+	protected function getHeaders()
+	{
+		return array(
+			'Access-Control-Allow-Origin: *',
+			'Content-Type: application/dash+xml',
+		);
+	}
+
+	/* (non-PHPdoc)
+	 * @see kManifestRenderer::getManifestHeader()
+	 */
+	protected function getManifestHeader ()
+	{
+		return '<?xml version="1.0" encoding="UTF-8"?>
+<MPD xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+     xmlns="urn:mpeg:dash:schema:mpd:2011"
+     xmlns:xlink="http://www.w3.org/1999/xlink"
+     xsi:schemaLocation="urn:mpeg:DASH:schema:MPD:2011 http://standards.iso.org/ittf/PubliclyAvailableStandards/MPEG-DASH_schema_files/DASH-MPD.xsd"
+     minimumUpdatePeriod="PT0S">';
+	}
+	
+	/* (non-PHPdoc)
+	 * @see kManifestRenderer::getManifestFooter()
+	 */
+	protected function getManifestFooter()
+	{
+		return '</MPD>';
+	}
+}
+
+class kDashRedirectManifestRenderer extends kDashBaseManifestRenderer
+{
+	/* (non-PHPdoc)
+	 * @see kManifestRenderer::getManifestFlavors()
+	 */
+	protected function getManifestFlavors()
+	{
+		$flavor = reset($this->flavors);
+		$url = str_replace(" ", "%20", $flavor['url']);
+		return array(
+			"<Location>$url</Location>"
+		);
+	}
 }
 
 class kRedirectManifestRenderer extends kSingleUrlManifestRenderer

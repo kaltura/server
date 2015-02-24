@@ -21,6 +21,7 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 		array(	DeliveryProfileType::LIVE_AKAMAI_HDS, 
 				DeliveryProfileType::LIVE_HDS, 
 				DeliveryProfileType::LIVE_HLS, 
+				DeliveryProfileType::LIVE_DASH, 
 				DeliveryProfileType::LIVE_RTMP);
 	
 	/**
@@ -73,6 +74,7 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 					
 			DeliveryProfileType::LIVE_HLS => 'DeliveryProfileLiveAppleHttp',
 			DeliveryProfileType::LIVE_HDS => 'DeliveryProfileLiveHds',
+			DeliveryProfileType::LIVE_DASH => 'DeliveryProfileLiveDash',
 			DeliveryProfileType::LIVE_RTMP => 'DeliveryProfileLiveRtmp',
 					
 			DeliveryProfileType::LIVE_AKAMAI_HDS => 'DeliveryProfileLiveAkamaiHds',

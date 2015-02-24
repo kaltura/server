@@ -47,6 +47,8 @@ class kuserFilter extends baseObjectFilter
 				'_mlikeor_permission_names',
 				'_eq_role_ids',		
 				'_in_role_ids',
+				'_eq_type',
+				'_in_type'
 			) ,
 			NULL
 		);

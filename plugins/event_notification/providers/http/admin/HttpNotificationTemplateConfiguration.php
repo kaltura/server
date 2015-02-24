@@ -80,7 +80,7 @@ class Form_HttpNotificationTemplateConfiguration extends Form_EventNotificationT
 	/* (non-PHPdoc)
 	 * @see Form_EventNotificationTemplateConfiguration::addTypeElements()
 	 */
-	protected function addTypeElements()
+	protected function addTypeElements(Kaltura_Client_EventNotification_Type_EventNotificationTemplate $eventNotificationTemplate)
 	{
 		$element = new Infra_Form_Html('http_title', array(
 			'content' => '<b>Notification Handler Service  Details</b>',

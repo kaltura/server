@@ -765,8 +765,19 @@ class BaseEntryService extends KalturaEntryService
 	    {
 	    	throw new KalturaAPIException(KalturaErrors::STORAGE_PROFILE_RULES_NOT_FULFILLED, $storageProfileId);
 	    }
-	    
-	    kStorageExporter::exportEntry($dbEntry, $dbStorageProfile);
+
+	    try
+	    {
+	    	kStorageExporter::exportEntry($dbEntry, $dbStorageProfile);
+	    }
+	    catch (kCoreException $e)
+	    {
+	    	if ($e->getCode()==kCoreException::PROFILE_STATUS_DISABLED)
+	    	{
+ 	    		throw new KalturaAPIException(APIErrors::PROFILE_STATUS_DISABLED,$entryId);
+	    	}
+	    }
+	     
 	    
 	    //TODO: implement export errors
 	    

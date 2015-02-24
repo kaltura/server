@@ -2,15 +2,19 @@
 require_once(dirname(__FILE__).'/../bootstrap.php');
 
 if ($argc < 4)
-	die ("Required parameters not received. Run script in the following format: php setPartnerBroadcastingUrls.php {partnerId} {parimary broadcast URL} {playback URL} [{secondary broadcast URL}]");
+	die ("Required parameters not received. Run script in the following format: php setPartnerBroadcastingUrls.php {partnerId} {parimary broadcast URL} {HTTP playback URL} [{secondary broadcast URL}] [{HTTPS playback URL}]");
 
 $partnerId = $argv[1];
 $primaryBroadcatUrl =  $argv[2];
-$playbackUrl = $argv[3];
+$httpPlaybackUrl = $argv[3];
 
 $secondaryBroadcastUrl = null;
-if (isset($argv[4]))
+if (isset($argv[4]) && $argv[4] != 0)
 	$secondaryBroadcastUrl = $argv[4];
+	
+$httpsPlaybackUrl = null;
+if (isset($argv[5]))
+	$httpsPlaybackUrl = $argv[5];
 
 $partner = PartnerPeer::retrieveByPK($partnerId);
 if (!$partner)
@@ -22,6 +26,9 @@ $partner->setBroadcastUrlManager('kPartnerBroadcastUrlManager');
 $partner->setPrimaryBroadcastUrl($primaryBroadcatUrl);
 $partner->setSecondaryBroadcastUrl($secondaryBroadcastUrl);
 
-$liveStreamConfigurations = array ('http' => $playbackUrl);
+$liveStreamConfigurations = array ('http' => $httpPlaybackUrl);
+if($httpsPlaybackUrl)
+	$liveStreamConfigurations['https'] = $httpsPlaybackUrl;
+
 $partner->setLiveStreamPlaybackUrlConfigurations($liveStreamConfigurations);
 $partner->save();

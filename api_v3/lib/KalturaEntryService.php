@@ -1507,7 +1507,7 @@ class KalturaEntryService extends KalturaBaseService
 		$dbEntry = $entry->toUpdatableObject($dbEntry);
 		/* @var $dbEntry entry */
 		
-		$dbEntry->save();
+		$updatedOccurred = $dbEntry->save();
 		$entry->fromObject($dbEntry);
 		
 		try 
@@ -1520,7 +1520,8 @@ class KalturaEntryService extends KalturaBaseService
 			KalturaLog::err($e);
 		}
 		
-		myNotificationMgr::createNotification(kNotificationJobData::NOTIFICATION_TYPE_ENTRY_UPDATE, $dbEntry);
+		if ($updatedOccurred)
+			myNotificationMgr::createNotification(kNotificationJobData::NOTIFICATION_TYPE_ENTRY_UPDATE, $dbEntry);
 		
 		return $entry;
 	}
@@ -1679,7 +1680,7 @@ class KalturaEntryService extends KalturaBaseService
 		$dbModerationFlag->save();
 		
 		$dbEntry->setModerationStatus(KalturaEntryModerationStatus::FLAGGED_FOR_REVIEW);
-		$dbEntry->save();
+		$updateOccurred = $dbEntry->save();
 		
 		$moderationFlag = new KalturaModerationFlag();
 		$moderationFlag->fromObject($dbModerationFlag);
@@ -1694,7 +1695,8 @@ class KalturaEntryService extends KalturaBaseService
 		$oldModerationObj->setObjectId( $dbEntry->getId() );
 		$oldModerationObj->setObjectType( moderation::MODERATION_OBJECT_TYPE_ENTRY );
 		$oldModerationObj->setReportCode( "" );
-		myNotificationMgr::createNotification( kNotificationJobData::NOTIFICATION_TYPE_ENTRY_REPORT, $oldModerationObj ,$dbEntry->getPartnerId());
+		if ($updateOccurred)
+			myNotificationMgr::createNotification( kNotificationJobData::NOTIFICATION_TYPE_ENTRY_REPORT, $oldModerationObj ,$dbEntry->getPartnerId());
 				
 		return $moderationFlag;
 	}
@@ -1707,9 +1709,10 @@ class KalturaEntryService extends KalturaBaseService
 			
 		$dbEntry->setModerationStatus(KalturaEntryModerationStatus::REJECTED);
 		$dbEntry->setModerationCount(0);
-		$dbEntry->save();
+		$updateOccurred = $dbEntry->save();
 		
-		myNotificationMgr::createNotification(kNotificationJobData::NOTIFICATION_TYPE_ENTRY_UPDATE , $dbEntry, null, null, null, null, $dbEntry->getId() );
+		if ($updateOccurred)
+			myNotificationMgr::createNotification(kNotificationJobData::NOTIFICATION_TYPE_ENTRY_UPDATE , $dbEntry, null, null, null, null, $dbEntry->getId() );
 //		myNotificationMgr::createNotification(kNotificationJobData::NOTIFICATION_TYPE_ENTRY_BLOCK , $dbEntry->getId());
 		
 		moderationFlagPeer::markAsModeratedByEntryId($this->getPartnerId(), $dbEntry->getId());
@@ -1723,9 +1726,10 @@ class KalturaEntryService extends KalturaBaseService
 			
 		$dbEntry->setModerationStatus(KalturaEntryModerationStatus::APPROVED);
 		$dbEntry->setModerationCount(0);
-		$dbEntry->save();
+		$updateOccurred = $dbEntry->save();
 		
-		myNotificationMgr::createNotification(kNotificationJobData::NOTIFICATION_TYPE_ENTRY_UPDATE , $dbEntry, null, null, null, null, $dbEntry->getId() );
+		if ($updateOccurred)
+			myNotificationMgr::createNotification(kNotificationJobData::NOTIFICATION_TYPE_ENTRY_UPDATE , $dbEntry, null, null, null, null, $dbEntry->getId() );
 //		myNotificationMgr::createNotification(kNotificationJobData::NOTIFICATION_TYPE_ENTRY_BLOCK , $dbEntry->getId());
 		
 		moderationFlagPeer::markAsModeratedByEntryId($this->getPartnerId(), $dbEntry->getId());
@@ -1822,25 +1826,39 @@ class KalturaEntryService extends KalturaBaseService
 				$filter->userIdEqual = -1; // no result will be returned when the user is missing
 		}
 
-        if(!empty($filter->userIdIn))
-        {
-            $userIdsArr = array();
-            $userIds = explode(',',$filter->userIdIn);
-            $userArr = kuserPeer::getKuserByPartnerAndUids($this->getPartnerId() , $userIds);
+		if(!empty($filter->userIdIn))
+		{
+			$filter->userIdIn = $this->preparePusersToKusersFilter( $filter->userIdIn );
+		}
 
-            foreach($userArr as $user)
-            {
-                $userIdsArr[] =$user->getId();
-            }
-            if(!empty($userIdsArr))
-            {
-                $filter->userIdIn = implode(',',$userIdsArr);
-            }
-            else
-            {
-                $filter->userIdIn = -1;
-            }
-        }
+		if(!empty($filter->entitledUsersEditMatchAnd))
+		{
+			$filter->entitledUsersEditMatchAnd = $this->preparePusersToKusersFilter( $filter->entitledUsersEditMatchAnd );
+		}
+
+		if(!empty($filter->entitledUsersPublishMatchAnd))
+		{
+			$filter->entitledUsersPublishMatchAnd = $this->preparePusersToKusersFilter( $filter->entitledUsersPublishMatchAnd );
+		}
+	}
+
+	private function preparePusersToKusersFilter( $puserIdsCsv )
+	{
+		$kuserIdsArr = array();
+		$puserIdsArr = explode(',',$puserIdsCsv);
+		$kuserArr = kuserPeer::getKuserByPartnerAndUids($this->getPartnerId() , $puserIdsArr);
+
+		foreach($kuserArr as $kuser)
+		{
+			$kuserIdsArr[] = $kuser->getId();
+		}
+
+		if(!empty($kuserIdsArr))
+		{
+			return implode(',',$kuserIdsArr);
+		}
+
+		return -1; // no result will be returned if no puser exists
 	}
 
 	/**

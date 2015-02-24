@@ -39,7 +39,9 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 			foreach($externalStorages as $externalStorage)
 			{
 				if($externalStorage->getTrigger() == StorageProfile::STORAGE_TEMP_TRIGGER_MODERATION_APPROVED)
-					self::exportEntry($object, $externalStorage);
+				{
+					self::tryExportEntry($object, $externalStorage);
+				}
 			}
 		}
 		
@@ -111,9 +113,35 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 	 * @param entry $entry
 	 * @param StorageProfile $externalStorage
 	 */
+	public static function tryExportEntry(entry $entry, StorageProfile $externalStorage)
+	{
+		try 
+		{
+			self::exportEntry($entry,$externalStorage);
+			return true;
+		}
+		catch (kCoreException $e)
+		{
+			if ($e->getCode()==kCoreException::PROFILE_STATUS_DISABLED)
+			{
+				KalturaLog::debug("Profile status disabled exportEntry will not be called [{$entry->getId()}]");
+			}
+			return false;
+		}
+	}
+	
+	/**
+	 * @param entry $entry
+	 * @param StorageProfile $externalStorage
+	 */
 	public static function exportEntry(entry $entry, StorageProfile $externalStorage)
 	{
-		$flavorAssets = assetPeer::retrieveFlavorsByEntryIdAndStatus($entry->getId(), null, array(asset::ASSET_STATUS_READY, asset::ASSET_STATUS_EXPORTING));
+		if($externalStorage->getStatus()==StorageProfile::STORAGE_STATUS_DISABLED)
+		{
+			throw new kCoreException("Export entry operation failed since profile status is disabled",kCoreException::PROFILE_STATUS_DISABLED);
+		}
+		
+        $flavorAssets = assetPeer::retrieveFlavorsByEntryIdAndStatus($entry->getId(), null, array(asset::ASSET_STATUS_READY, asset::ASSET_STATUS_EXPORTING));
 		foreach ($flavorAssets as $flavorAsset) 
 		{
 			self::exportFlavorAsset($flavorAsset, $externalStorage);
@@ -142,7 +170,7 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 			$scope = $profile->getScope();
 			$scope->setEntryId($entry->getId());
 			if($profile->triggerFitsReadyAsset($entry->getId()) && $profile->fulfillsRules($scope))
-				self::exportEntry($entry, $profile);
+				self::tryExportEntry($entry, $profile);
 			else 
 				self::deleteExportedEntry($entry, $profile);
 		}

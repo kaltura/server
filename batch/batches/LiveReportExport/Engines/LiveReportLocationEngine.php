@@ -9,10 +9,12 @@ class LiveReportLocation1MinEngine extends LiveReportEngine {
 	const MAX_RECORDS_PER_REQUEST = 1000;
 	const AGGREGATION_CHUNK = LiveReportConstants::SECONDS_60;
 	
-	protected $formatter;
+	protected $dateFormatter;
+	protected $nameFormatter;
 	
-	public function LiveReportLocation1MinEngine(LiveReportDateFormatter $formatter) {
-		$this->formatter = $formatter;
+	public function LiveReportLocation1MinEngine(LiveReportDateFormatter $dateFormatter) {
+		$this->dateFormatter = $dateFormatter;
+		$this->nameFormatter = new LiveReportStringFormatter();
 	}
 	
 	public function run($fp, array $args = array()) {
@@ -25,7 +27,7 @@ class LiveReportLocation1MinEngine extends LiveReportEngine {
 		$objs = array();
 		$lastTimeGroup = null;
 		
-		
+		$fix = 0; // The report is inclussive, therefore starting from the the second request we shouldn't query twice
 		for($curTime = $fromTime; $curTime < $toTime; $curTime = $curTime + self::TIME_CHUNK) {
 			$curTo = min($toTime, $curTime + self::TIME_CHUNK);
 			
@@ -34,7 +36,7 @@ class LiveReportLocation1MinEngine extends LiveReportEngine {
 			
 			while($moreResults) {
 				$pageIndex++;
-				$results = $this->getRecords($curTime, $curTo, $args[LiveReportConstants::ENTRY_IDS], $pageIndex);
+				$results = $this->getRecords($curTime + $fix, $curTo, $args[LiveReportConstants::ENTRY_IDS], $pageIndex);
 				$moreResults = self::MAX_RECORDS_PER_REQUEST * $pageIndex < $results->totalCount;
 				if($results->totalCount == 0)  
 					continue;
@@ -62,6 +64,7 @@ class LiveReportLocation1MinEngine extends LiveReportEngine {
 					
 				}
 			}
+			$fix = LiveReportConstants::SECONDS_10;
 		}
 		
 		$this->printRows($fp, $objs, $lastTimeGroup);
@@ -109,9 +112,9 @@ class LiveReportLocation1MinEngine extends LiveReportEngine {
 			$firstRecord = $records[0];
 			
 			$values = array();
-			$values[] = $this->formatter->format($lastTimeGroup);
-			$values[] = $firstRecord->country->name;
-			$values[] = $firstRecord->city->name;
+			$values[] = $this->dateFormatter->format($lastTimeGroup);
+			$values[] = $this->nameFormatter->format($firstRecord->country->name);
+			$values[] = $this->nameFormatter->format($firstRecord->city->name);
 			$values[] = $firstRecord->city->latitude;
 			$values[] = $firstRecord->city->longitude;
 			

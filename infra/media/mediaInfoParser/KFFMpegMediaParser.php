@@ -8,6 +8,8 @@ class KFFMpegMediaParser extends KBaseMediaParser
 	protected $cmdPath;
 	protected $ffmprobeBin;
 	
+	public $checkScanTypeFlag=false;
+	
 	/**
 	 * @param string $filePath
 	 * @param string $cmdPath
@@ -75,8 +77,10 @@ class KFFMpegMediaParser extends KBaseMediaParser
 		}
 		
 //		list($silenceDetect, $blackDetect) = self::checkForSilentAudioAndBlackVideo($this->cmdPath, $this->filePath, $mediaInfo);
-		$mediaInfo->scanType = self::checkForScanType($this->cmdPath, $this->filePath);
-		
+		if(isset($this->checkScanTypeFlag) && $this->checkScanTypeFlag==true)
+			$mediaInfo->scanType = self::checkForScanType($this->cmdPath, $this->filePath);
+		else
+			$mediaInfo->scanType = 0; // Progressive
 		// mov,mp4,m4a,3gp,3g2,mj2 to check is format inside
 		if(in_array($mediaInfo->containerFormat, array("mov","mp4","m4a","3gp","3g2","mj2"))){
 			$mediaInfo->isFastStart = self::checkForFastStart($this->ffprobeBin, $this->filePath);
@@ -280,9 +284,10 @@ class KFFMpegMediaParser extends KBaseMediaParser
 	 * @param unknown_type $ffmpegBin
 	 * @param unknown_type $srcFileName
 	 * @param KalturaMediaInfo $mediaInfo
-	 * @return multitype:Ambigous <NULL, string> string |NULL|multitype:Ambigous <NULL, string>
+	 * @param unknown_type $detectDur
+	 * @return multitype:Ambigous <string, NULL>
 	 */
-	public static function checkForSilentAudioAndBlackVideo($ffmpegBin, $srcFileName, KalturaMediaInfo $mediaInfo)
+	public static function checkForSilentAudioAndBlackVideo($ffmpegBin, $srcFileName, KalturaMediaInfo $mediaInfo, $detectDur=null)
 	{
 		KalturaLog::log("contDur:$mediaInfo->containerDuration,vidDur:$mediaInfo->videoDuration,audDur:$mediaInfo->audioDuration");
 	
@@ -303,7 +308,16 @@ class KFFMpegMediaParser extends KBaseMediaParser
 		else
 			$audDetectDur = 0;
 	
-		list($silenceDetected,$blackDetected) = self::detectSilentAudioAndBlackVideoIntervals($ffmpegBin, $srcFileName, $vidDetectDur, $audDetectDur);
+			/*
+			 * Limit the aud/vid detect duration to match the global detect duration,
+			 * if such duration is provided
+			 */
+		if(isset($detectDur) && $detectDur>0) {
+			if($audDetectDur>$detectDur) $audDetectDur=$detectDur;
+			if($vidDetectDur>$detectDur) $vidDetectDur=$detectDur;
+		}
+		
+		list($silenceDetected,$blackDetected) = self::detectSilentAudioAndBlackVideoIntervals($ffmpegBin, $srcFileName, $vidDetectDur, $audDetectDur, $detectDur);
 		
 		if(isset($blackDetected)){
 			list($blackStart,$blackDur) = $blackDetected[0];

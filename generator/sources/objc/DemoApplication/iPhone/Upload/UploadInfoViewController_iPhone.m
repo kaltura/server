@@ -77,19 +77,19 @@
     
     if (!isLandscape) {
         
-        labelCategory.textAlignment = UITextAlignmentLeft;
+        labelCategory.textAlignment = NSTextAlignmentLeft;
         labelCategory.frame = CGRectMake(20, 10, labelCategory.frame.size.width, labelCategory.frame.size.height);
         viewCategory.frame = CGRectMake(15, 35, viewCategory.frame.size.width, viewCategory.frame.size.height);
         
-        labelVTitle.textAlignment = UITextAlignmentLeft;
+        labelVTitle.textAlignment = NSTextAlignmentLeft;
         labelVTitle.frame = CGRectMake(20, 75, labelVTitle.frame.size.width, labelVTitle.frame.size.height);
         viewVTitle.frame = CGRectMake(15, 100, viewVTitle.frame.size.width, viewVTitle.frame.size.height);
         
-        labelDescription.textAlignment = UITextAlignmentLeft;
+        labelDescription.textAlignment = NSTextAlignmentLeft;
         labelDescription.frame = CGRectMake(20, 140, labelDescription.frame.size.width, labelDescription.frame.size.height);
         viewDescription.frame = CGRectMake(15, 165, viewDescription.frame.size.width, viewDescription.frame.size.height);
         
-        labelTags.textAlignment = UITextAlignmentLeft;
+        labelTags.textAlignment = NSTextAlignmentLeft;
         labelTags.frame = CGRectMake(20, 260, labelTags.frame.size.width, labelTags.frame.size.height);
         viewTags.frame = CGRectMake(15, 285, viewTags.frame.size.width, viewTags.frame.size.height);
         
@@ -99,19 +99,19 @@
         
     } else {
         
-        labelCategory.textAlignment = UITextAlignmentRight;
+        labelCategory.textAlignment = NSTextAlignmentRight;
         labelCategory.frame = CGRectMake(20, 10, labelCategory.frame.size.width, labelCategory.frame.size.height);
         viewCategory.frame = CGRectMake(140, 5, viewCategory.frame.size.width, viewCategory.frame.size.height);
         
-        labelVTitle.textAlignment = UITextAlignmentRight;
+        labelVTitle.textAlignment = NSTextAlignmentRight;
         labelVTitle.frame = CGRectMake(20, 45, labelVTitle.frame.size.width, labelVTitle.frame.size.height);
         viewVTitle.frame = CGRectMake(140, 40, viewVTitle.frame.size.width, viewVTitle.frame.size.height);
         
-        labelDescription.textAlignment = UITextAlignmentRight;
+        labelDescription.textAlignment = NSTextAlignmentRight;
         labelDescription.frame = CGRectMake(20, 80, labelDescription.frame.size.width, labelDescription.frame.size.height);
         viewDescription.frame = CGRectMake(140, 75, viewDescription.frame.size.width, viewDescription.frame.size.height);
         
-        labelTags.textAlignment = UITextAlignmentRight;
+        labelTags.textAlignment = NSTextAlignmentRight;
         labelTags.frame = CGRectMake(20, 170, labelTags.frame.size.width, labelTags.frame.size.height);
         viewTags.frame = CGRectMake(140, 165, viewTags.frame.size.width, viewTags.frame.size.height);
         
@@ -244,7 +244,7 @@
         
     }
     
-    selectedItem = textField.tag;
+    selectedItem = (int)textField.tag;
     
     if (selectedItem == 3) {
         
@@ -305,7 +305,7 @@
     
     [UIView commitAnimations];
     
-    selectedItem = textView.tag;
+    selectedItem = (int)textView.tag;
 }
 
 - (IBAction)categoriesPressed {
