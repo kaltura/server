@@ -83,6 +83,10 @@ class KalturaDispatcher
 			kCurrentContext::$multiRequest_index."] with params " . print_r($this->arguments, true));
 
 		$responseProfile = $deserializer->getResponseProfile();
+		if($responseProfile)
+		{
+			KalturaLog::debug("Response profile: " . print_r($responseProfile, true));
+		}
 		
 		kPermissionManager::init(kConf::get('enable_cache'));
 		kEntitlementUtils::initEntitlementEnforcement();
