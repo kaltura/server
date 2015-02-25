@@ -76,9 +76,9 @@ abstract class KalturaSerializer
     	if (is_array($object))
     	{
     		$array = array();
-    		foreach($object as $item)
+    		foreach($object as $key => $item)
 			{
-				$array[] = $this->convertTypedArraysToPhpArrays($item);
+				$array[$key] = $this->convertTypedArraysToPhpArrays($item);
 			}
 			
     		return $array;

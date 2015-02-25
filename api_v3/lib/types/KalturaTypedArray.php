@@ -5,7 +5,7 @@
  */
 abstract class KalturaTypedArray extends KalturaObject implements ArrayAccess, Iterator, Countable
 {
-	private $array = array();
+	protected $array = array();
 	private $class = "";
 	
 	/**
@@ -28,18 +28,19 @@ abstract class KalturaTypedArray extends KalturaObject implements ArrayAccess, I
 		return $this->array[$offset];
 	}
 
-	public function offsetSet($offset, $value) 
+	protected function validateType($value) 
 	{
 		if (!is_object($value) && is_subclass_of($value, $this->class))
 			throw new Exception("'".get_class($value)."' is not an instance of '".$this->class."'");
+	}
+
+	public function offsetSet($offset, $value) 
+	{
+		$this->validateType($value);
 		
 		if ($offset === null)
 		{
 			$this->array[] = $value;
-		}
-		else
-		{
-			$this->array[$offset] = $value;
 		}
 			
 		$this->count = count ( $this->array );
