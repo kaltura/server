@@ -37,12 +37,9 @@ abstract class KalturaResponseProfileBase extends KalturaObject
 				}
 			}
 		}
-		else
+		elseif(count($relatedProfiles))
 		{
-			if(count($relatedProfiles))
-			{
-				throw new KalturaAPIException(KalturaErrors::RESPONSE_PROFILE_MAX_NESTING_LEVEL);
-			}
+			throw new KalturaAPIException(KalturaErrors::RESPONSE_PROFILE_MAX_NESTING_LEVEL);
 		}
 	}
 }
