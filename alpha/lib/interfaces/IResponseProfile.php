@@ -76,4 +76,14 @@ interface IResponseProfile extends IResponseProfileBase
 	 * @param kFilterPager $pager
 	 */
 	public function setPager(kFilterPager $pager);
+	
+	/**
+	 * @return array
+	 */
+	public function getMappings();
+
+	/**
+	 * @param array<kResponseProfileMapping> $mappings
+	 */
+	public function setMappings(array $mappings);
 }

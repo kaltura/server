@@ -43,6 +43,27 @@ class kResponseProfile implements IResponseProfile
 	 */
 	private $relatedProfiles;
 	
+	/**
+	 * @var array<kResponseProfileMapping>
+	 */
+	private $mappings;
+	
+	/* (non-PHPdoc)
+	 * @see IResponseProfile::getMappings()
+	 */
+	public function getMappings()
+	{
+		return $this->mappings;
+	}
+
+	/* (non-PHPdoc)
+	 * @see IResponseProfile::setMappings()
+	 */
+	public function setMappings(array $mappings)
+	{
+		$this->mappings = $mappings;
+	}
+
 	/* (non-PHPdoc)
 	 * @see IResponseProfileBase::get()
 	 */
