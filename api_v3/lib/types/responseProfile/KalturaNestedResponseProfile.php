@@ -60,6 +60,8 @@ class KalturaNestedResponseProfile extends KalturaNestedResponseProfileBase
 	{
 		$this->validatePropertyMinLength('name', 2);
 		$this->validatePropertyNotNull('type');
+		
+		parent::validateForUsage($sourceObject, $propertiesToSkip);
 	}
 	
 	/* (non-PHPdoc)

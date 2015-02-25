@@ -39,6 +39,8 @@ class KalturaNestedResponseProfileHolder extends KalturaNestedResponseProfileBas
 	{
 		if($this->isNull('id') && $this->isNull('systemName'))
     		throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_CANNOT_BE_NULL, $this->getFormattedPropertyNameWithClassName('id') . ' and ' . $this->getFormattedPropertyNameWithClassName('systemName'));
+    		
+		parent::validateForUsage($sourceObject, $propertiesToSkip);
 	}
 	
 	/* (non-PHPdoc)

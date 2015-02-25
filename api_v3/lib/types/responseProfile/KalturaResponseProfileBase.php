@@ -14,13 +14,33 @@ abstract class KalturaResponseProfileBase extends KalturaObject
 	 * @return KalturaFilterPager
 	 */
 	abstract public function getPager();
-	
-	protected function validateNestedObjects($maxPageSize, $maxNestingLevel)
+
+	/* (non-PHPdoc)
+	 * @see KalturaObject::validateForUsage($sourceObject, $propertiesToSkip)
+	 */
+	public function validateForUsage($sourceObject, $propertiesToSkip = array())
 	{
+		$this->validateNestedObjects();
+	
+		parent::validateForUsage($sourceObject, $propertiesToSkip);
+	}
+	
+	protected function validateNestedObjects($maxPageSize = null, $maxNestingLevel = null)
+	{	
 		$relatedProfiles = $this->getRelatedProfiles();
 		if(!$relatedProfiles)
 		{
 			return;
+		}
+	
+		if(is_null($maxPageSize))
+		{
+			$maxPageSize = kConf::get('response_profile_max_page_size', 'local', 100);
+		}
+		
+		if(is_null($maxNestingLevel))
+		{
+			$maxNestingLevel = kConf::get('response_profile_max_nesting_level', 'local', 2);
 		}
 		
 		if($maxNestingLevel > 0)

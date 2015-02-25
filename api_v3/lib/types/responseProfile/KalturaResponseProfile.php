@@ -137,11 +137,6 @@ class KalturaResponseProfile extends KalturaResponseProfileBase implements IFilt
 		if(!$allowNull)
 			$this->validatePropertyNotNull('type');
 		
-		$maxNestingLevel = kConf::get('response_profile_max_nesting_level', 'local', 2);
-		$maxPageSize = kConf::get('response_profile_max_page_size', 'local', 100);
-		
-		$this->validateNestedObjects($maxPageSize, $maxNestingLevel);
-	
 		$id = null;
 		if($sourceObject)
 			$id = $sourceObject->getId();
@@ -152,6 +147,8 @@ class KalturaResponseProfile extends KalturaResponseProfileBase implements IFilt
 	        if (count($systemNameTemplates))
 	            throw new KalturaAPIException(KalturaErrors::RESPONSE_PROFILE_DUPLICATE_SYSTEM_NAME, $this->systemName);
 		}
+		
+		parent::validateForUsage($sourceObject, $propertiesToSkip);
 	}
 	
 	/* (non-PHPdoc)
