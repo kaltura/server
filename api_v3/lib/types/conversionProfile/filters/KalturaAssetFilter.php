@@ -43,7 +43,7 @@ class KalturaAssetFilter extends KalturaAssetBaseFilter
 
 		$c = KalturaCriteria::create(entryPeer::OM_CLASS);
 		$c->addAnd(entryPeer::ID, $entryIds, Criteria::IN);
-		$criterionPartnerOrKn = $c->getNewCriterion(entryPeer::PARTNER_ID, $this->getPartnerId());
+		$criterionPartnerOrKn = $c->getNewCriterion(entryPeer::PARTNER_ID, kCurrentContext::getCurrentPartnerId());
 		$criterionPartnerOrKn->addOr($c->getNewCriterion(entryPeer::DISPLAY_IN_SEARCH, mySearchUtils::DISPLAY_IN_SEARCH_KALTURA_NETWORK));
 		$c->addAnd($criterionPartnerOrKn);
 		$dbEntries = entryPeer::doSelect($c);
