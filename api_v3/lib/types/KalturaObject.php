@@ -378,6 +378,9 @@ abstract class KalturaObject
 	
 	public function loadRelatedObjects(KalturaResponseProfileBase $responseProfile)
 	{
+		// trigger validation
+		$responseProfile->toObject();
+		
 		foreach($responseProfile->getRelatedProfiles() as $relatedProfile)
 		{
 			/* @var $relatedProfile KalturaNestedResponseProfileBase */
