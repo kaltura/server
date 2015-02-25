@@ -368,6 +368,14 @@ abstract class KalturaObject
 		{
 			/* @var $relatedProfile KalturaNestedResponseProfileBase */
 			$relatedProfile = $relatedProfile->get();
+			
+			if(!$relatedProfile->filter)
+			{
+				KalturaLog::notice("Related response-profile [$relatedProfile->name] has no filter and should not be used as nested profile");
+				continue;
+			}
+			
+			KalturaLog::debug("Loading related response-profile [$relatedProfile->name] with filter [" . get_class($relatedProfile->filter) . "]");
 			$filter = clone $relatedProfile->filter;
 			
 			if($relatedProfile->mappings)
@@ -377,6 +385,10 @@ abstract class KalturaObject
 					/* @var $mapping KalturaResponseProfileMapping */
 					$mapping->apply($filter, $this);
 				}
+			}
+			else 
+			{
+				KalturaLog::debug("No mappings defined in response-profile [$relatedProfile->name]");
 			}
 			
 			$pager = $relatedProfile->pager;
