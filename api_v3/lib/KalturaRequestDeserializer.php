@@ -59,7 +59,7 @@ class KalturaRequestDeserializer
 		$serviceArguments = array();
 		foreach($actionParams as &$actionParam)
 		{
-			/** @var KalturaParamInfo $actionParam */
+			/* @var KalturaParamInfo $actionParam */
 			$type = $actionParam->getType();
 			$name = $actionParam->getName();
 
@@ -155,11 +155,21 @@ class KalturaRequestDeserializer
 			{
 				$arrayObj = new $type();
 				if (isset($this->paramsGrouped[$name]) && is_array($this->paramsGrouped[$name]))
-				{
-					ksort($this->paramsGrouped[$name]);
-					foreach($this->paramsGrouped[$name] as $arrayItemKey => $arrayItemParams)
+				{	
+					if ($actionParam->isAssociativeArray())
 					{
-						$arrayObj[$arrayItemKey] = $this->buildObject($actionParam->getArrayTypeReflector(), $arrayItemParams, $name);
+						foreach($this->paramsGrouped[$name] as $arrayItemKey => $arrayItemParams)
+						{
+							$arrayObj[$arrayItemKey] = $this->buildObject($actionParam->getArrayTypeReflector(), $arrayItemParams, $name);
+						}
+					}
+					else
+					{
+						ksort($this->paramsGrouped[$name]);
+						foreach($this->paramsGrouped[$name] as $arrayItemParams)
+						{
+							$arrayObj[] = $this->buildObject($actionParam->getArrayTypeReflector(), $arrayItemParams, $name);
+						}
 					}
 				}
 				$serviceArguments[] = $arrayObj;
