@@ -25,7 +25,23 @@ class MetadataPeer extends BaseMetadataPeer {
 		$c->addAnd(MetadataPeer::STATUS, Metadata::STATUS_VALID);
 		self::$s_criteria_filter->setFilter($c);
 	}
-	
+
+	/* (non-PHPdoc)
+	 * @see BaseCuePointPeer::doSelect()
+	 */
+	public static function doSelect(Criteria $criteria, PropelPDO $con = null)
+	{
+		$c = clone $criteria;
+
+		if($c instanceof KalturaCriteria)
+		{
+			$c->applyFilters();
+			$criteria->setRecordsCount($c->getRecordsCount());
+		}
+
+		return parent::doSelect($c, $con);
+	}
+
 	/**
 	 * Retrieve a single metadta object by object id and type.
 	 *

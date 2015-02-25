@@ -127,11 +127,15 @@ class MetadataService extends KalturaBaseService
 		$dbMetadata->setObjectId($objectId);
 		$dbMetadata->setStatus(KalturaMetadataStatus::VALID);
 
-		// validate object exists
-		$object = kMetadataManager::getObjectFromPeer($dbMetadata);
-		if(!$object)
-			throw new KalturaAPIException(MetadataErrors::INVALID_METADATA_OBJECT, $objectId);
-		
+		// dynamic objects are metadata only, skip validating object id
+		if ($objectType != KalturaMetadataObjectType::DYNAMIC_OBJECT)
+		{
+			// validate object exists
+			$object = kMetadataManager::getObjectFromPeer($dbMetadata);
+			if (!$object)
+				throw new KalturaAPIException(MetadataErrors::INVALID_METADATA_OBJECT, $objectId);
+		}
+
 		$dbMetadata->save();
 		
 		$this->deleteOldVersions($dbMetadata);
@@ -343,6 +347,7 @@ class MetadataService extends KalturaBaseService
 		$applyPartnerFilter = true;
 		if ($filter->metadataObjectTypeEqual == MetadataObjectType::ENTRY)
 		{
+			$entryIds = null;
 			if ($filter->objectIdEqual)
 			{
 				$entryIds = array($filter->objectIdEqual);

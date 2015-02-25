@@ -256,16 +256,21 @@ class kMetadataManager
 		$metadatas = MetadataPeer::retrieveAllByObject($objectType, $objectId);
 		KalturaLog::debug("Found " . count($metadatas) . " metadata object");
 		
+		return self::getMetadataValuesByMetadataObjects($metadatas);
+	}
+
+	public static function getMetadataValuesByMetadataObjects(array $metadatas)
+	{
 		$dataFieldName = MetadataPlugin::getSphinxFieldName(MetadataPlugin::SPHINX_EXPANDER_FIELD_DATA);
-		
+
 		$searchValues = array();
-		
+
 		foreach($metadatas as $metadata)
 			$searchValues = self::getDataSearchValues($metadata, $searchValues);
-		
+
 		if (isset($searchValues[$dataFieldName]))
 			$searchValues[$dataFieldName] = implode(' ', $searchValues[$dataFieldName]);
-		
+
 		return $searchValues;
 	}
 	

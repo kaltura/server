@@ -108,17 +108,16 @@ class KalturaMetadataFilter extends KalturaMetadataBaseFilter
 		}
 	
 		$metadataFilter = $this->toObject();
-		
-		$c = new Criteria();
+
+		$c = KalturaCriteria::create(MetadataPeer::OM_CLASS);
 		$metadataFilter->attachToCriteria($c);
-		$count = MetadataPeer::doCount($c);
-		
+
 		$pager->attachToCriteria($c);
 		$list = MetadataPeer::doSelect($c);
 		
 		$response = new KalturaMetadataListResponse();
 		$response->objects = KalturaMetadataArray::fromDbArray($list, $responseProfile);
-		$response->totalCount = $count;
+		$response->totalCount = $c->getRecordsCount();
 		
 		return $response;
 	}
