@@ -49,7 +49,7 @@ class KalturaResponseProfileMapping extends KalturaObject
 			$object = new kResponseProfileMapping();
 		}
 		
-		parent::toObject($object, $propertiesToSkip);
+		return parent::toObject($object, $propertiesToSkip);
 	}
 	
 	public function apply(KalturaRelatedFilter $filter, KalturaObject $parentObject)
