@@ -59,7 +59,7 @@ class KalturaRequestDeserializer
 		$serviceArguments = array();
 		foreach($actionParams as &$actionParam)
 		{
-			/** @var KalturaParamInfo $actionParam */
+			/* @var KalturaParamInfo $actionParam */
 			$type = $actionParam->getType();
 			$name = $actionParam->getName();
 
@@ -155,11 +155,21 @@ class KalturaRequestDeserializer
 			{
 				$arrayObj = new $type();
 				if (isset($this->paramsGrouped[$name]) && is_array($this->paramsGrouped[$name]))
-				{
-					ksort($this->paramsGrouped[$name]);
-					foreach($this->paramsGrouped[$name] as $arrayItemKey => $arrayItemParams)
+				{	
+					if ($actionParam->isAssociativeArray())
 					{
-						$arrayObj[$arrayItemKey] = $this->buildObject($actionParam->getArrayTypeReflector(), $arrayItemParams, $name);
+						foreach($this->paramsGrouped[$name] as $arrayItemKey => $arrayItemParams)
+						{
+							$arrayObj[$arrayItemKey] = $this->buildObject($actionParam->getArrayTypeReflector(), $arrayItemParams, $name);
+						}
+					}
+					else
+					{
+						ksort($this->paramsGrouped[$name]);
+						foreach($this->paramsGrouped[$name] as $arrayItemParams)
+						{
+							$arrayObj[] = $this->buildObject($actionParam->getArrayTypeReflector(), $arrayItemParams, $name);
+						}
 					}
 				}
 				$serviceArguments[] = $arrayObj;
@@ -336,11 +346,21 @@ class KalturaRequestDeserializer
 			
 			if ($property->isArray() && is_array($value))
 			{
-				ksort($value);
 				$arrayObj = new $type();
-				foreach($value as $arrayItemKey => $arrayItemParams)
+				if($property->isAssociativeArray())
 				{
-					$arrayObj[$arrayItemKey] = $this->buildObject($property->getArrayTypeReflector(), $arrayItemParams, "{$objectName}:$name");
+					foreach($value as $arrayItemKey => $arrayItemParams)
+					{
+						$arrayObj[$arrayItemKey] = $this->buildObject($property->getArrayTypeReflector(), $arrayItemParams, "{$objectName}:$name");
+					}
+				}
+				else
+				{
+					ksort($value);
+					foreach($value as $arrayItemParams)
+					{
+						$arrayObj[] = $this->buildObject($property->getArrayTypeReflector(), $arrayItemParams, "{$objectName}:$name");
+					}
 				}
 				$obj->$name = $arrayObj;
 				continue;
