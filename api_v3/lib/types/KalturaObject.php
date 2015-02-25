@@ -257,7 +257,7 @@ abstract class KalturaObject
 			{
 				$propertyType = $thisProps[$apiPropName]->getType();
 				$getter = $curGetter->name;
-				$curCode = "if(\$srcObj->$getter()){\n\t\t\t\$value = new $propertyType();\n\t\t\t\$value->fromObject(\$srcObj->$getter());\n\t\t}\n\t\t"; 
+				$curCode = "\$value = null;\n\t\tif(\$srcObj->$getter()){\n\t\t\t\$value = new $propertyType();\n\t\t\t\$value->fromObject(\$srcObj->$getter());\n\t\t}\n\t\t"; 
 				$fieldValue = '$value';
 			}
 			
