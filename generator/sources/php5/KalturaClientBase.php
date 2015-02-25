@@ -720,7 +720,7 @@ class KalturaClientBase
 	{
 		if ($this->isError($resultObject))
 		{
-			throw new KalturaException($resultObject["message"], $resultObject["code"]);
+			throw new KalturaException($resultObject["message"], $resultObject["code"], $resultObject["args"]);
 		}
 	}
 
@@ -1121,11 +1121,36 @@ abstract class KalturaObjectBase
  */
 class KalturaException extends Exception
 {
-    public function __construct($message, $code)
+	private $arguments;
+	
+    public function __construct($message, $code, $arguments)
     {
     	$this->code = $code;
+    	$this->arguments = $arguments;
+    	
 		parent::__construct($message);
     }
+    
+	/**
+	 * @return array
+	 */
+	public function getArguments()
+	{
+		return $this->arguments;
+	}
+    
+	/**
+	 * @return string
+	 */
+	public function getArgument($argument)
+	{
+		if(isset($this->arguments[$argument]))
+		{
+			return $this->arguments[$argument];
+		}
+		
+		return null;
+	}
 }
 
 /**
