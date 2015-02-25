@@ -368,6 +368,8 @@ abstract class KalturaObject
 		{
 			/* @var $relatedProfile KalturaNestedResponseProfileBase */
 			$relatedProfile = $relatedProfile->get();
+			
+			KalturaLog::debug("Loading related response-profile [$relatedProfile->name]");
 			$filter = clone $relatedProfile->filter;
 			
 			if($relatedProfile->mappings)

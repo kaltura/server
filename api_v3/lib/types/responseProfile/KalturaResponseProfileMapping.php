@@ -57,6 +57,8 @@ class KalturaResponseProfileMapping extends KalturaObject
 		$filterProperty = $this->filterProperty . 'Equal';
 		$parentProperty = $this->parentProperty;
 	
+		KalturaLog::debug("Mapping " . get_class($parentObject) . "::{$parentProperty}[{$parentObject->$parentProperty}] to " . get_class($filter) . "::$filterProperty");
+		
 		if(is_null($parentObject->$parentProperty))
 		{
 			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_CANNOT_BE_NULL, get_class($parentObject) . "::$parentProperty");
