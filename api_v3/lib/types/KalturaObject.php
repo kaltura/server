@@ -374,8 +374,8 @@ abstract class KalturaObject
 				KalturaLog::notice("Related response-profile [$relatedProfile->name] has no filter and should not be used as nested profile");
 				continue;
 			}
-			
 			KalturaLog::debug("Loading related response-profile [$relatedProfile->name] with filter [" . get_class($relatedProfile->filter) . "]");
+
 			$filter = clone $relatedProfile->filter;
 			
 			if($relatedProfile->mappings)
