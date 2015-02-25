@@ -16,16 +16,6 @@ class KalturaGroupUserFilter extends KalturaGroupUserBaseFilter
 		return new KuserKgroupFilter();
 	}
 	
-	/* (non-PHPdoc)
-	 * @see KalturaObject::toObject()
-	 */
-	public function toObject($coreFilter = null, $props_to_skip = array()) 
-	{
-		$this->validateUserIdOrGroupIdFiltered();
-			
-		return parent::toObject($coreFilter, $props_to_skip);
-	}
-	
 	public function getMapBetweenObjects()
 	{
 		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
@@ -43,6 +33,8 @@ class KalturaGroupUserFilter extends KalturaGroupUserBaseFilter
 	 */
 	public function getListResponse(KalturaFilterPager $pager, KalturaResponseProfileBase $responseProfile = null)
 	{
+		$this->validateUserIdOrGroupIdFiltered();
+		
 		if($this->groupIdEqual)
 		{
 			$partnerId = $this->getPartnerId();

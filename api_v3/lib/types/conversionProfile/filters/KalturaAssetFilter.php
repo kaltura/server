@@ -19,17 +19,10 @@ class KalturaAssetFilter extends KalturaAssetBaseFilter
 		return new AssetFilter();
 	}
 	
-	/* (non-PHPdoc)
-	 * @see KalturaFilter::toObject()
-	 */
-	public function toObject ( $object_to_fill = null, $props_to_skip = array() )
-	{
-		$this->validateEntryIdFiltered();
-		return parent::toObject($object_to_fill, $props_to_skip);
-	}
-
 	protected function doGetListResponse(KalturaFilterPager $pager, array $types = null)
 	{
+		$this->validateEntryIdFiltered();
+		
 	    myDbHelper::$use_alternative_con = myDbHelper::DB_HELPER_CONN_PROPEL2;
 	    
 		// verify access to the relevant entries - either same partner as the KS or kaltura network

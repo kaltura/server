@@ -38,15 +38,8 @@ class KalturaCuePointFilter extends KalturaCuePointBaseFilter
 		return new CuePointFilter();
 	}
 	
-	/**
-	 * @param CuePointFilter $cuePointFilter
-	 * @param array $propsToSkip
-	 * @return CuePointFilter
-	 */
-	public function toObject($cuePointFilter = null, $propsToSkip = array())
-	{
-		$this->validateEntryIdFiltered();
-			
+	protected function translateUserIds()
+	{		
 		if(isset($this->userIdEqual)){
 			$dbKuser = kuserPeer::getKuserByPartnerAndUid(kCurrentContext::$ks_partner_id, $this->userIdEqual);
 			if (! $dbKuser) {
@@ -54,7 +47,6 @@ class KalturaCuePointFilter extends KalturaCuePointBaseFilter
 			}
 			$this->userIdEqual = $dbKuser->getId();
 		}
-			
 		
 		if(isset($this->userIdIn)){
 			$userIds = explode(",", $this->userIdIn);
@@ -68,12 +60,13 @@ class KalturaCuePointFilter extends KalturaCuePointBaseFilter
 			
 			$this->userIdIn = $kuserIds;
 		}
-		
-		return parent::toObject($cuePointFilter, $propsToSkip);
 	}
 	
 	protected function doGetListResponse(KalturaFilterPager $pager, $type = null)
 	{
+		$this->validateEntryIdFiltered();
+		$this->translateUserIds();
+		
 		$c = KalturaCriteria::create(CuePointPeer::OM_CLASS);
 		if($type)
 		{
