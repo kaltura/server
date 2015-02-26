@@ -181,17 +181,21 @@ abstract class ClientGeneratorFromPhp
 	 * @param array $input
 	 * @param array $output
 	 */
-	private function fixTypeDependencies(array &$input, array &$output)
+	private function fixTypeDependencies(array &$input, array &$output, &$added = array())
 	{
 		foreach ($input as $typeName => $typeReflector)
 		{
 			if (array_key_exists($typeName, $output))
 				continue;		// already added
 
+			if(isset($added[$typeName]))
+				continue;
+			$added[$typeName] = true;
+
 			if (!$typeReflector->isEnum() && !$typeReflector->isStringEnum())
 			{
 				$dependencies = $this->getTypeDependencies($typeReflector);
-				$this->fixTypeDependencies($dependencies, $output);
+				$this->fixTypeDependencies($dependencies, $output, $added);
 			}
 			
 			$output[$typeName] = $typeReflector;
@@ -370,24 +374,31 @@ abstract class ClientGeneratorFromPhp
 
 		return $result;
 	}
-	
-	private function loadTypesRecursive(KalturaTypeReflector $typeReflector)
+
+	private function loadTypesRecursive(KalturaTypeReflector $typeReflector, $loaded = array())
 	{
 		if(in_array($typeReflector->getType(), $this->_typesToIgnore))
 			return;
 
+		if (isset($this->_types[$typeReflector->getType()]))
+			return;
+		
+		if(isset($loaded[$typeReflector->getType()]))
+			return;
+		
+		$loaded[$typeReflector->getType()] = true;
+			
 		$this->initClassMap();
 		if ($this->isPathExcluded($this->_classMap[$typeReflector->getType()]))
 			return;
 			
 		foreach ($this->getTypeDependencies($typeReflector) as $subTypeReflector)
 		{
-			$this->loadTypesRecursive($subTypeReflector);
+			$this->loadTypesRecursive($subTypeReflector, $loaded);
 		}
 		
 		if ($typeReflector->getType() != 'KalturaObject')
 			$this->loadChildTypes($typeReflector);
-
 	}
 	
 	protected function getTypesClassMapPath()
