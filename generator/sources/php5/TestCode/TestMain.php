@@ -27,28 +27,55 @@
 // @ignore
 // ===================================================================================================
 require_once(dirname(__FILE__) . '/../KalturaClient.php');
-require_once(dirname(__FILE__).DIRECTORY_SEPARATOR.'KalturaTestConfiguration.php');
 
 class TestMain implements IKalturaLogger
 {
+	const CONFIG_FILE = 'config.ini';
+	const CONFIG_TEMPLATE_FILE = 'config.template.ini';
+	
+	const CONFIG_ITEM_PARTNER_ID = 'partnerId';
+	const CONFIG_ITEM_ADMIN_SECRET = 'adminSecret';
+	const CONFIG_ITEM_SERVICE_URL = 'serviceUrl';
+	const CONFIG_ITEM_UPLOAD_FILE = 'uploadFile';
+	const CONFIG_ITEM_TIMEZONE = 'timezone';
+	
+	/**
+	 * @var array
+	 */
+	private $config;
+	
 	public function log($message)
 	{
 		echo date('Y-m-d H:i:s') . ' ' .  $message . "\n";
 	}
 
 	public static function run()
-	{
+	{   
 		$test = new TestMain();
+		$test->loadConfig();
 		$test->listActions();
 		$test->multiRequest();
 		$test->add();
 		echo "\nFinished running client library tests\n";
 	}
 	
+	private function loadConfig()
+	{
+		$filename = dirname(__FILE__) . DIRECTORY_SEPARATOR . self::CONFIG_FILE;
+		if(!file_exists($filename)){
+			$template = dirname(__FILE__) . DIRECTORY_SEPARATOR . self::CONFIG_TEMPLATE_FILE;
+			throw new Exception("Configuration file [$filename] not found, Use template file [$template].");
+		}
+		
+		$this->config = parse_ini_file($filename);
+		
+		date_default_timezone_set($this->config[self::CONFIG_ITEM_TIMEZONE]);
+	}
+	
 	private function getKalturaClient($partnerId, $adminSecret, $isAdmin)
 	{
 		$kConfig = new KalturaConfiguration();
-		$kConfig->serviceUrl = KalturaTestConfiguration::SERVICE_URL;
+		$kConfig->serviceUrl = $this->config[self::CONFIG_ITEM_SERVICE_URL];
 		$kConfig->setLogger($this);
 		$client = new KalturaClient($kConfig);
 		
@@ -61,7 +88,7 @@ class TestMain implements IKalturaLogger
 		}
 		catch(Exception $ex)
 		{
-			die("could not start session - check configurations in KalturaTestConfiguration class");
+			throw new Exception("Could not start session - check configurations in config.ini");
 		}
 		
 		return $client;
@@ -69,68 +96,49 @@ class TestMain implements IKalturaLogger
 	
 	public function listActions()
 	{
-		try
-		{
-			$client = $this->getKalturaClient(KalturaTestConfiguration::PARTNER_ID, KalturaTestConfiguration::ADMIN_SECRET, true);
-			$results = $client->media->listAction();
-			$entry = $results->objects[0];
-			echo "\nGot an entry: [{$entry->name}]";
-		}
-		catch(Exception $ex)
-		{
-			die($ex->getMessage());
-		}
+		$client = $this->getKalturaClient($this->config[self::CONFIG_ITEM_PARTNER_ID], $this->config[self::CONFIG_ITEM_ADMIN_SECRET], true);
+		$results = $client->media->listAction();
+		$entry = $results->objects[0];
+		echo "\nGot an entry: [{$entry->name}]";
 	}
 
 	public function multiRequest()
 	{
-		try
+		$client = $this->getKalturaClient($this->config[self::CONFIG_ITEM_PARTNER_ID], $this->config[self::CONFIG_ITEM_ADMIN_SECRET], true);
+		$client->startMultiRequest();
+		$client->baseEntry->count();
+		$client->partner->getInfo();
+		$client->partner->getUsage(2011);
+		$multiRequest = $client->doMultiRequest();
+		$partner = $multiRequest[1];
+		if(!is_object($partner) || get_class($partner) != 'KalturaPartner')
 		{
-			$client = $this->getKalturaClient(KalturaTestConfiguration::PARTNER_ID, KalturaTestConfiguration::ADMIN_SECRET, true);
-			$client->startMultiRequest();
-			$client->baseEntry->count();
-			$client->partner->getInfo();
-			$client->partner->getUsage(2011);
-			$multiRequest = $client->doMultiRequest();
-			$partner = $multiRequest[1];
-			if(!is_object($partner) || get_class($partner) != 'KalturaPartner')
-			{
-				throw new Exception("UNEXPECTED_RESULT");
-			}
-			echo "\nGot Admin User email: [{$partner->adminEmail}]";
+			throw new Exception("UNEXPECTED_RESULT");
 		}
-		catch(Exception $ex)
-		{
-			die($ex->getMessage()); 
-		}
+		echo "\nGot Admin User email: [{$partner->adminEmail}]";
 	}	
 
 	public function add()
 	{
-		try 
-		{
-			echo "\nUploading test video...";
-			$client = $this->getKalturaClient(KalturaTestConfiguration::PARTNER_ID, KalturaTestConfiguration::ADMIN_SECRET, false);
-			$filePath = KalturaTestConfiguration::UPLOAD_FILE;
-			
-			$token = $client->baseEntry->upload($filePath);
-			$entry = new KalturaMediaEntry();
-			$entry->name = "my upload entry";
-			$entry->mediaType = KalturaMediaType::VIDEO;
-			$newEntry = $client->media->addFromUploadedFile($entry, $token);
-			echo "\nUploaded a new Video entry " . $newEntry->id;
-			$client->media->delete($newEntry->id);
-			try {
-				$entry = null;
-				$entry = $client->media->get($newEntry->id);
-			} catch (KalturaException $exApi) {
-				if ($entry == null) {
-					echo "\nDeleted the entry (" . $newEntry->id .") successfully!";
-				}
+		echo "\nUploading test video...";
+		$client = $this->getKalturaClient($this->config[self::CONFIG_ITEM_PARTNER_ID], $this->config[self::CONFIG_ITEM_ADMIN_SECRET], false);
+		$filePath = $this->config[self::CONFIG_ITEM_UPLOAD_FILE];
+		
+		$token = $client->baseEntry->upload($filePath);
+		$entry = new KalturaMediaEntry();
+		$entry->name = "my upload entry";
+		$entry->mediaType = KalturaMediaType::VIDEO;
+		$newEntry = $client->media->addFromUploadedFile($entry, $token);
+		echo "\nUploaded a new Video entry " . $newEntry->id;
+		$client->media->delete($newEntry->id);
+		try {
+			$entry = null;
+			$entry = $client->media->get($newEntry->id);
+		} catch (KalturaException $exApi) {
+			if ($entry == null) {
+				echo "\nDeleted the entry (" . $newEntry->id .") successfully!";
 			}
-		} catch (KalturaException $ex) {
-			die($ex->getMessage());
-		}	
+		}
 	}
 }
 
