@@ -17,4 +17,13 @@ class KalturaAttachmentAssetFilter extends KalturaAttachmentAssetBaseFilter
 		$response->totalCount = $totalCount;
 		return $response;  
 	}
+
+	/* (non-PHPdoc)
+	 * @see KalturaAssetFilter::getListResponse()
+	 */
+	public function getListResponse(KalturaFilterPager $pager, KalturaResponseProfileBase $responseProfile = null)
+	{
+		$types = KalturaPluginManager::getExtendedTypes(assetPeer::OM_CLASS, AttachmentPlugin::getAssetTypeCoreValue(AttachmentAssetType::ATTACHMENT));
+		return $this->getTypeListResponse($pager, $responseProfile, $types);
+	}
 }

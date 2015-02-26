@@ -35,4 +35,13 @@ class KalturaThumbAssetFilter extends KalturaThumbAssetBaseFilter
 		$response->totalCount = $totalCount;
 		return $response;  
 	}
+	
+	/* (non-PHPdoc)
+	 * @see KalturaAssetFilter::getListResponse()
+	 */
+	public function getListResponse(KalturaFilterPager $pager, KalturaResponseProfileBase $responseProfile = null)
+	{
+		$types = KalturaPluginManager::getExtendedTypes(assetPeer::OM_CLASS, assetType::THUMBNAIL);
+		return $this->getTypeListResponse($pager, $responseProfile, $types);
+	}
 }
