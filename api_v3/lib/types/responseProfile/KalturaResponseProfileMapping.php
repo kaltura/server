@@ -54,10 +54,15 @@ class KalturaResponseProfileMapping extends KalturaObject
 	
 	public function apply(KalturaRelatedFilter $filter, KalturaObject $parentObject)
 	{
-		$filterProperty = $this->filterProperty . 'Equal';
+		$filterProperty = $this->filterProperty;
 		$parentProperty = $this->parentProperty;
 	
 		KalturaLog::debug("Mapping " . get_class($parentObject) . "::{$parentProperty}[{$parentObject->$parentProperty}] to " . get_class($filter) . "::$filterProperty");
+	
+		if(!property_exists($parentObject, $parentProperty))
+		{
+			throw new KalturaAPIException(KalturaErrors::PROPERTY_IS_NOT_DEFINED, $parentProperty, get_class($parentObject));
+		}
 		
 		if(is_null($parentObject->$parentProperty))
 		{
