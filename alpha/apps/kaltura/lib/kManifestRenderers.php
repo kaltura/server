@@ -118,6 +118,7 @@ abstract class kManifestRenderer
 	
 		$headers = $this->getHeaders();
 		$headers[] = "Access-Control-Allow-Origin:*";
+		$headers[] = "Access-Control-Expose-Headers: Server,range,Content-Length,Content-Range";
 		foreach ($headers as $header)
 		{
 			header($header);
@@ -723,7 +724,6 @@ class kDashBaseManifestRenderer extends kMultiFlavorManifestRenderer
 	protected function getHeaders()
 	{
 		return array(
-			'Access-Control-Allow-Origin: *',
 			'Content-Type: application/dash+xml',
 		);
 	}
