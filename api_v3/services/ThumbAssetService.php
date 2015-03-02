@@ -787,8 +787,14 @@ class ThumbAssetService extends KalturaAssetService
 	 */
 	function listAction(KalturaAssetFilter $filter = null, KalturaFilterPager $pager = null)
 	{
-		if (!$filter)
-			$filter = new KalturaAssetFilter();
+		if(!$filter)
+		{
+			$filter = new KalturaThumbAssetFilter();
+		}
+		elseif(! $filter instanceof KalturaThumbAssetFilter)
+		{
+			$filter = $filter->cast('KalturaThumbAssetFilter');
+		}
 			
 		if(!$pager)
 		{

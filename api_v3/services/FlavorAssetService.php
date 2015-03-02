@@ -444,8 +444,14 @@ class FlavorAssetService extends KalturaAssetService
 	 */
 	function listAction(KalturaAssetFilter $filter = null, KalturaFilterPager $pager = null)
 	{
-		if (!$filter)
-			$filter = new KalturaAssetFilter();
+		if(!$filter)
+		{
+			$filter = new KalturaFlavorAssetFilter();
+		}
+		elseif(! $filter instanceof KalturaFlavorAssetFilter)
+		{
+			$filter = $filter->cast('KalturaFlavorAssetFilter');
+		}
 			
 		if(!$pager)
 		{

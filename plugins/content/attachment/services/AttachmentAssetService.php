@@ -499,8 +499,14 @@ class AttachmentAssetService extends KalturaAssetService
 	 */
 	function listAction(KalturaAssetFilter $filter = null, KalturaFilterPager $pager = null)
 	{
-		if (!$filter)
-			$filter = new KalturaAssetFilter();
+		if(!$filter)
+		{
+			$filter = new KalturaAttachmentAssetFilter();
+		}
+		elseif(! $filter instanceof KalturaAttachmentAssetFilter)
+		{
+			$filter = $filter->cast('KalturaAttachmentAssetFilter');
+		}
 			
 		if(!$pager)
 		{

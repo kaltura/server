@@ -656,8 +656,14 @@ class CaptionAssetService extends KalturaAssetService
 	 */
 	function listAction(KalturaAssetFilter $filter = null, KalturaFilterPager $pager = null)
 	{
-		if (!$filter)
-			$filter = new KalturaAssetFilter();
+		if(!$filter)
+		{
+			$filter = new KalturaCaptionAssetFilter();
+		}
+		elseif(! $filter instanceof KalturaCaptionAssetFilter)
+		{
+			$filter = $filter->cast('KalturaCaptionAssetFilter');
+		}
 			
 		if(!$pager)
 		{

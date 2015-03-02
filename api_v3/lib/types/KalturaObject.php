@@ -844,4 +844,16 @@ abstract class KalturaObject
 	        }
 	    }
 	}
+
+	public function cast($className) {
+		if(!is_subclass_of($className, get_class($this)))
+			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_TYPE, get_class($this));
+			
+	    return unserialize(sprintf(
+	        'O:%d:"%s"%s',
+	        strlen($className),
+	        $className,
+	        strstr(strstr(serialize($this), '"'), ':')
+	    ));
+	}
 }
