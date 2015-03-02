@@ -267,7 +267,10 @@ abstract class KalturaObject
 				}
 			}
 			
-			else if ($thisProps[$apiPropName]->isComplexType() && !$thisProps[$apiPropName]->isEnum() && !$thisProps[$apiPropName]->isStringEnum())
+			else if (	$thisProps[$apiPropName]->isComplexType() 
+						&& !$thisProps[$apiPropName]->isEnum() 
+						&& !$thisProps[$apiPropName]->isStringEnum() 
+						&& !$thisProps[$apiPropName]->isAbstract())
 			{
 				$propertyType = $thisProps[$apiPropName]->getType();
 				$getter = $curGetter->name;
