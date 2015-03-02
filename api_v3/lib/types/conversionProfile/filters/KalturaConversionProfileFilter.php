@@ -10,7 +10,7 @@ class KalturaConversionProfileFilter extends KalturaConversionProfileBaseFilter
 	 */
 	protected function getCoreFilter()
 	{
-		return new ConversionProfileFilter();
+		return new conversionProfile2Filter();
 	}
 	
 	/* (non-PHPdoc)
