@@ -803,10 +803,17 @@ class ThumbAssetService extends KalturaAssetService
 		$thumbTypes = KalturaPluginManager::getExtendedTypes(assetPeer::OM_CLASS, assetType::THUMBNAIL);
 		$c->add(assetPeer::TYPE, $thumbTypes, Criteria::IN);
 		
-		$totalCount = assetPeer::doCount($c);
-		
 		$pager->attachToCriteria($c);
 		$dbList = assetPeer::doSelect($c);
+
+		$resultCount = count($dbList);
+		if ($resultCount && $resultCount < $pager->pageSize)
+			$totalCount = ($pager->pageIndex - 1) * $pager->pageSize + $resultCount;
+		else
+		{
+			KalturaFilterPager::detachFromCriteria($c);
+			$totalCount = assetPeer::doCount($c);
+		}
 		
 		$list = KalturaThumbAssetArray::fromDbArray($dbList);
 		$response = new KalturaThumbAssetListResponse();

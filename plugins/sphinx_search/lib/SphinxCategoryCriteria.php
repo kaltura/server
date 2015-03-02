@@ -51,58 +51,7 @@ class SphinxCategoryCriteria extends SphinxCriteria
 				$additionalConditions = $advancedSearch->getFreeTextConditions($filter->getPartnerSearchScope(), $freeTexts);
 			}
 			
-			if(preg_match('/^"[^"]+"$/', $freeTexts))
-			{
-				$freeText = str_replace('"', '', $freeTexts);
-				$freeText = SphinxUtils::escapeString($freeText);
-				$freeText = "^$freeText$";
-				$additionalConditions[] = "@(" . categoryFilter::FREE_TEXT_FIELDS . ") $freeText";
-			}
-			else
-			{
-				if(strpos($freeTexts, baseObjectFilter::IN_SEPARATOR) > 0)
-				{
-					str_replace(baseObjectFilter::AND_SEPARATOR, baseObjectFilter::IN_SEPARATOR, $freeTexts);
-				
-					$freeTextsArr = explode(baseObjectFilter::IN_SEPARATOR, $freeTexts);
-					foreach($freeTextsArr as $valIndex => $valValue)
-					{
-						if(!is_numeric($valValue) && strlen($valValue) <= 0)
-							unset($freeTextsArr[$valIndex]);
-						else
-							$freeTextsArr[$valIndex] = SphinxUtils::escapeString($valValue);
-					}
-							
-					foreach($freeTextsArr as $freeText)
-					{
-						$additionalConditions[] = "@(" . categoryFilter::FREE_TEXT_FIELDS . ") $freeText";
-					}
-				}
-				else
-				{
-					$freeTextsArr = explode(baseObjectFilter::AND_SEPARATOR, $freeTexts);
-					foreach($freeTextsArr as $valIndex => $valValue)
-					{
-						if(!is_numeric($valValue) && strlen($valValue) <= 0)
-							unset($freeTextsArr[$valIndex]);
-						else
-							$freeTextsArr[$valIndex] = SphinxUtils::escapeString($valValue);
-					}
-							
-					$freeTextsArr = array_unique($freeTextsArr);
-					$freeTextExpr = implode(baseObjectFilter::AND_SEPARATOR, $freeTextsArr);
-					$additionalConditions[] = "@(" . categoryFilter::FREE_TEXT_FIELDS . ") $freeTextExpr";
-				}
-			}
-			if(count($additionalConditions))
-			{	
-				$additionalConditions = array_unique($additionalConditions);
-				$matches = reset($additionalConditions);
-				if(count($additionalConditions) > 1)
-					$matches = '( ' . implode(' ) | ( ', $additionalConditions) . ' )';
-					
-				$this->matchClause[] = $matches;
-			}
+			$this->addFreeTextToMatchClauseByMatchFields($freeTexts, categoryFilter::FREE_TEXT_FIELDS, $additionalConditions);
 		}
 		$filter->unsetByName('_free_text');
 		
@@ -195,60 +144,7 @@ class SphinxCategoryCriteria extends SphinxCriteria
 			$names = $filter->get('_likex_name_or_reference_id');
 			KalturaLog::debug("Attach free text [$names]");
 			
-			$additionalConditions = array();
-			
-			if(preg_match('/^"[^"]+"$/', $names))
-			{
-				$name = str_replace('"', '', $names);
-				$name = SphinxUtils::escapeString($name);
-				$name = "^$name$";
-				$additionalConditions[] = "@(" . categoryFilter::NAME_REFERNCE_ID . ") $name\\\*";
-			}
-			else
-			{
-				if(strpos($names, baseObjectFilter::IN_SEPARATOR) > 0)
-				{
-					str_replace(baseObjectFilter::AND_SEPARATOR, baseObjectFilter::IN_SEPARATOR, $names);
-				
-					$namesArr = explode(baseObjectFilter::IN_SEPARATOR, $names);
-					foreach($namesArr as $valIndex => $valValue)
-					{
-						if(!is_numeric($valValue) && strlen($valValue) <= 0)
-							unset($namesArr[$valIndex]);
-						else
-							$namesArr[$valIndex] = SphinxUtils::escapeString($valValue);
-					}
-							
-					foreach($namesArr as $name)
-					{
-						$additionalConditions[] = "@(" . categoryFilter::NAME_REFERNCE_ID . ") $name\\\*";
-					}
-				}
-				else
-				{
-					$namesArr = explode(baseObjectFilter::AND_SEPARATOR, $names);
-					foreach($namesArr as $valIndex => $valValue)
-					{
-						if(!is_numeric($valValue) && strlen($valValue) <= 0)
-							unset($namesArr[$valIndex]);
-						else
-							$namesArr[$valIndex] = SphinxUtils::escapeString($valValue);
-					}
-							
-					$namesArr = array_unique($namesArr);
-					$nameExpr = implode(baseObjectFilter::AND_SEPARATOR, $namesArr);
-					$additionalConditions[] = "@(" . categoryFilter::NAME_REFERNCE_ID . ") $nameExpr\\\*";
-				}
-			}
-			if(count($additionalConditions))
-			{	
-				$additionalConditions = array_unique($additionalConditions);
-				$matches = reset($additionalConditions);
-				if(count($additionalConditions) > 1)
-					$matches = '( ' . implode(' ) | ( ', $additionalConditions) . ' )';
-					
-				$this->matchClause[] = $matches;
-			}
+			$this->addFreeTextToMatchClauseByMatchFields($names, categoryFilter::NAME_REFERNCE_ID, null, true);
 		}
 		$filter->unsetByName('_likex_name_or_reference_id');
 		

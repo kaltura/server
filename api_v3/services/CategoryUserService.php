@@ -22,7 +22,7 @@ class CategoryUserService extends KalturaBaseService
 		if (!$category)
 			throw new KalturaAPIException(KalturaErrors::CATEGORY_NOT_FOUND, $categoryUser->categoryId);						
 		
-		$currentKuserCategoryKuser = categoryKuserPeer::retrieveByCategoryIdAndActiveKuserId($categoryUser->categoryId, kCurrentContext::getCurrentKsKuserId());		
+		$currentKuserCategoryKuser = categoryKuserPeer::retrievePermittedKuserInCategory($categoryUser->categoryId, kCurrentContext::getCurrentKsKuserId());
 		if (!kEntitlementUtils::getEntitlementEnforcement())
 		{
 			$dbCategoryKuser->setStatus(CategoryKuserStatus::ACTIVE);	
@@ -161,7 +161,7 @@ class CategoryUserService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::CATEGORY_INHERIT_MEMBERS, $categoryId);		
 		
 		// only manager can remove memnger or users remove himself
-		$currentKuserCategoryKuser = categoryKuserPeer::retrieveByCategoryIdAndActiveKuserId($dbCategoryKuser->getCategoryId());
+		$currentKuserCategoryKuser = categoryKuserPeer::retrievePermittedKuserInCategory($dbCategoryKuser->getCategoryId());
 		if((!$currentKuserCategoryKuser || 
 			($currentKuserCategoryKuser->getPermissionLevel() != CategoryKuserPermissionLevel::MANAGER &&
 			 kCurrentContext::$ks_uid != $userId)) &&
@@ -196,7 +196,7 @@ class CategoryUserService extends KalturaBaseService
 		if (!$dbCategoryKuser)
 			throw new KalturaAPIException(KalturaErrors::INVALID_CATEGORY_USER_ID, $categoryId, $userId);
 		
-		$currentKuserCategoryKuser = categoryKuserPeer::retrieveByCategoryIdAndActiveKuserId($dbCategoryKuser->getCategoryId(), kCurrentContext::getCurrentKsKuserId());
+		$currentKuserCategoryKuser = categoryKuserPeer::retrievePermittedKuserInCategory($dbCategoryKuser->getCategoryId(), kCurrentContext::getCurrentKsKuserId());
 		if(kEntitlementUtils::getEntitlementEnforcement() &&
 			(!$currentKuserCategoryKuser || $currentKuserCategoryKuser->getPermissionLevel() != CategoryKuserPermissionLevel::MANAGER))
 			throw new KalturaAPIException(KalturaErrors::CANNOT_UPDATE_CATEGORY_USER);
@@ -228,7 +228,7 @@ class CategoryUserService extends KalturaBaseService
 		if (!$dbCategoryKuser)
 			throw new KalturaAPIException(KalturaErrors::INVALID_CATEGORY_USER_ID, $categoryId, $userId);
 		
-		$currentKuserCategoryKuser = categoryKuserPeer::retrieveByCategoryIdAndActiveKuserId($dbCategoryKuser->getCategoryId(), kCurrentContext::getCurrentKsKuserId());
+		$currentKuserCategoryKuser = categoryKuserPeer::retrievePermittedKuserInCategory($dbCategoryKuser->getCategoryId(), kCurrentContext::getCurrentKsKuserId());
 		if(kEntitlementUtils::getEntitlementEnforcement() &&
 			(!$currentKuserCategoryKuser || 
 			($currentKuserCategoryKuser->getPermissionLevel() != CategoryKuserPermissionLevel::MANAGER &&
@@ -255,7 +255,7 @@ class CategoryUserService extends KalturaBaseService
 	 */
 	function listAction(KalturaCategoryUserFilter $filter = null, KalturaFilterPager $pager = null)
 	{
-		if(!($filter->categoryIdEqual || $filter->categoryIdIn || $filter->categoryFullIdsStartsWith || $filter->categoryFullIdsEqual || $filter->userIdIn || $filter->userIdEqual))
+		if(!($filter->categoryIdEqual || $filter->categoryIdIn || $filter->categoryFullIdsStartsWith || $filter->categoryFullIdsEqual || $filter->userIdIn || $filter->userIdEqual || $filter->relatedGroupsByUserId))
 			throw new KalturaAPIException(KalturaErrors::MUST_FILTER_USERS_OR_CATEGORY);			
 		
 		if (!$filter)
@@ -282,6 +282,35 @@ class CategoryUserService extends KalturaBaseService
 			}
 				
 			$filter->userIdIn = implode(',', $usersIds);
+		}
+
+		if ($filter->relatedGroupsByUserId){
+			$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
+			$userIds = array();
+			$c = new Criteria();
+			$c->add(kuserPeer::PARTNER_ID, $partnerId);
+			$c->add(kuserPeer::PUSER_ID, $filter->relatedGroupsByUserId);
+			$c->add(kuserPeer::TYPE, KuserType::USER);
+			$kuser = kuserPeer::doSelectOne($c);
+			if (!$kuser){
+				$response = new KalturaCategoryUserListResponse();
+				$response->objects = new KalturaCategoryUserArray();
+				$response->totalCount = 0;
+				return $response;
+			}
+
+			$kgroupIds = KuserKgroupPeer::retrieveKgroupIdsByKuserId($kuser->getId());
+			if (!is_null($kgroupIds) && is_array($kgroupIds))
+				$userIds = $kgroupIds;
+			$userIds[] = $kuser->getId();
+
+			// if userIdIn is also set in the filter need to intersect the two arrays.
+			if(isset($filter->userIdIn)){
+				$curUserIds = explode(',',$filter->userIdIn);
+				$userIds = array_intersect($curUserIds, $userIds);
+			}
+
+			$filter->userIdIn = implode(',', $userIds);
 		}
 		
 		if($filter->userIdEqual)
@@ -423,7 +452,7 @@ class CategoryUserService extends KalturaBaseService
 		if(!$kuser)
 			throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID);
 			
-		$dbCategoryKuser = categoryKuserPeer::retrieveByCategoryIdAndActiveKuserId($categoryId, $kuser->getId());
+		$dbCategoryKuser = categoryKuserPeer::retrievePermittedKuserInCategory($categoryId, $kuser->getId(), null, false);
 		if(!$dbCategoryKuser)
 			throw new KalturaAPIException(KalturaErrors::INVALID_CATEGORY_USER_ID);
 			

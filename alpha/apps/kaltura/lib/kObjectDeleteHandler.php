@@ -147,11 +147,25 @@ class kObjectDeleteHandler implements kObjectDeletedEventConsumer
 		
 		$c = new Criteria();
 		$c->add(categoryKuserPeer::PUSER_ID, $kuser->getPuserId());
-		if(!categoryKuserPeer::doSelectOne($c)) {
-			return;
+		if(categoryKuserPeer::doSelectOne($c)) {
+			kJobsManager::addDeleteJob($kuser->getPartnerId(), DeleteObjectType::CATEGORY_USER, $filter);
 		}
-		
-		kJobsManager::addDeleteJob($kuser->getPartnerId(), DeleteObjectType::CATEGORY_USER, $filter);
+
+		if ($kuser->getType() == KuserType::USER){
+			// remove user from groups
+			KuserKgroupPeer::deleteByKuserId($kuser->getId());
+		}
+		elseif 	($kuser->getType() == KuserType::GROUP){
+			// remove users from group
+			$filter = new KuserKgroupFilter();
+			$filter->setGroupIdEqual($kuser->getPuserId());
+
+			$c = new Criteria();
+			$c->add(KuserKgroupPeer::PGROUP_ID, $kuser->getPuserId());
+			if(KuserKgroupPeer::doSelectOne($c)) {
+				kJobsManager::addDeleteJob($kuser->getPartnerId(), DeleteObjectType::GROUP_USER, $filter);
+			}
+		}
 	}
 	
 	/**

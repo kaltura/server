@@ -3,7 +3,9 @@
 interface LiveReportConstants { 
 
 	// Report Format
-	const DATE_FORMAT = "Ymd_His";
+	const DATE_FORMAT_EXTERNAL = "Ymd_His";
+	const DATE_FORMAT_INTERNAL = "Y-m-d H:i:s";
+	
 	const CELLS_SEPARATOR = ",";
 	const ROWS_SEPARATOR = "------------------";
 	

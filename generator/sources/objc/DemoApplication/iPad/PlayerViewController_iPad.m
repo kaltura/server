@@ -191,7 +191,7 @@ static NSString* flavorID = @"";
 
 - (void)bitrateButtonPressed:(UIButton *)button {
 
-    [self runWithBitrate:button.tag - 100];
+    [self runWithBitrate:(int)button.tag - 100];
     
     viewBitrates.alpha = 0.0;
 }

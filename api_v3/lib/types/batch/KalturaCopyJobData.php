@@ -44,7 +44,7 @@ class KalturaCopyJobData extends KalturaJobData
 		if(is_null($dbData))
 			$dbData = new kCopyJobData();
 			
-		$dbData->setTemplateObject($this->templateObject->toInsertableObject());	
+		$dbData->setTemplateObject($this->templateObject->toObject());
 		
 		return parent::toObject($dbData, $props_to_skip);
 	}

@@ -227,4 +227,9 @@ class CodeCuePointPlugin extends KalturaPlugin implements IKalturaCuePoint, IKal
 			
 		return $scene;
 	}
+	
+	public static function getTypesToIndexOnEntry()
+	{
+		return array();
+	}
 }

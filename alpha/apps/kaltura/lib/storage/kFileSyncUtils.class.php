@@ -849,7 +849,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 	 * @param boolean $strict  - will throw exception if not found
 	 * @return array
 	 */
-	public static function getReadyFileSyncForKey ( FileSyncKey $key , $fetch_from_remote_if_no_local = false , $strict = true )
+	public static function getReadyFileSyncForKey ( FileSyncKey $key , $fetch_from_remote_if_no_local = false , $strict = true , $resolve = true )
 	{
 		KalturaLog::debug("key [$key], fetch_from_remote_if_no_local [$fetch_from_remote_if_no_local], strict [$strict]");
 		$dc = kDataCenterMgr::getCurrentDc();
@@ -882,7 +882,9 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 			$tmp_file_sync = $file_sync;
 			// make sure not link and work on original
 			
-			$tmp_file_sync = self::resolve($file_sync);
+			if($resolve)
+				$tmp_file_sync = self::resolve($file_sync);
+				
 			if ($tmp_file_sync->getStatus() != FileSync::FILE_SYNC_STATUS_READY)
 				continue;
 			

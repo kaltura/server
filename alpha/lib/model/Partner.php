@@ -971,6 +971,7 @@ class Partner extends BasePartner
     public function setMaxBulkSizeOverageUnit($v)		{$this->putInCustomData('bulk_size_overage_unit', $v);}
     public function setAutoModerateEntryFilter($v)		{$this->putInCustomData('auto_moderate_entry_filter', $v);}
     public function setCacheFlavorVersion($v)			{$this->putInCustomData('cache_flavor_version', $v);}
+    public function setCacheThumbnailVersion($v)		{$this->putInCustomData('cache_thumb_version', $v);}
     public function setBroadcastUrlManager($v)			{$this->putInCustomData('broadcast_url_manager', $v);}
     public function setPrimaryBroadcastUrl($v)			{$this->putInCustomData('primary_broadcast_url', $v);}
 	public function setSecondaryBroadcastUrl($v)		{$this->putInCustomData('secondary_broadcast_url', $v);}
@@ -1014,11 +1015,30 @@ class Partner extends BasePartner
     public function getMaxBulkSizeOverageUnit()			{return $this->getFromCustomData('bulk_size_overage_unit');}
 	public function getAutoModerateEntryFilter()		{return $this->getFromCustomData('auto_moderate_entry_filter');}
     public function getCacheFlavorVersion()				{return $this->getFromCustomData('cache_flavor_version');}
+    public function getCacheThumbnailVersion()			{return $this->getFromCustomData('cache_thumb_version');}
     public function getBroadcastUrlManager()			{return $this->getFromCustomData('broadcast_url_manager');}
 	public function getPrimaryBroadcastUrl()			{return $this->getFromCustomData('primary_broadcast_url');}
 	public function getSecondaryBroadcastUrl()			{return $this->getFromCustomData('secondary_broadcast_url');}
 	public function getLiveStreamPlaybackUrlConfigurations()		 	{return $this->getFromCustomData('live_stream_playback_url_configurations', null, array());}
-	
+
+
+    public function setLiveStreamBroadcastUrlConfigurations($key, $value)
+    {
+    	$this->putInCustomData($key, $value, 'live_stream_broadcast_url_configurations');
+    }
+    
+	public function getLiveStreamBroadcastUrlConfigurations($dc = null)
+	{
+		$config = (!is_null($dc) ? kConf::get($dc, 'broadcast') : kConf::getMap('broadcast'));
+		
+		$partnerConfig = $this->getFromCustomData($dc, 'live_stream_broadcast_url_configurations');
+		if($partnerConfig)
+		{
+			$config = kConf::mergeConfigItem($config, $partnerConfig, true);
+		}
+		
+		return $config;
+	}
 	
 	/**
 	 * @return kAkamaiLiveParams

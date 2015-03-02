@@ -306,6 +306,10 @@ class UserService extends KalturaBaseUserService
 						
 			$c->add(kuserPeer::ID, $kuserIds, KalturaCriteria::IN);
 		}
+
+		if (is_null($filter->typeEqual) && is_null($filter->typeIn)){
+			$c->add(kuserPeer::TYPE, KuserType::USER, KalturaCriteria::EQUAL);
+		}
 		
 		$c->addAnd(kuserPeer::PUSER_ID, NULL, KalturaCriteria::ISNOTNULL);
 		

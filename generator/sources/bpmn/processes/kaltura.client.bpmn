@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.kaltura.com/bpm">
+  <process id="kaltura-client" name="kaltura-client" isExecutable="true">
+    <startEvent id="theStart" name="Start"></startEvent>
+    <sequenceFlow id="flow1" sourceRef="theStart" targetRef="init-client"></sequenceFlow>
+    <scriptTask id="init-client" name="Initiate Client" scriptFormat="javascript" activiti:autoStoreVariables="false">
+      <documentation>Define client</documentation>
+      <script>importPackage(com.kaltura.client);
+
+				var config = new com.kaltura.client.KalturaConfiguration();
+				config.setEndpoint(endPoint);
+				config.setClientTag("bpm-engine");
+
+				var client = new com.kaltura.client.KalturaClient(config);
+				execution.setVariable("client", client);
+			</script>
+    </scriptTask>
+    <sequenceFlow id="flow2" sourceRef="init-client" targetRef="generate-ks"></sequenceFlow>
+    <scriptTask id="generate-ks" name="Generate KS" scriptFormat="javascript" activiti:autoStoreVariables="false">
+      <documentation>Create KS using client side</documentation>
+      <script>importPackage(com.kaltura.client.enums);
+
+				println("Generating ks for partner [" + partnerId + "]");
+
+				var ks = client.generateSessionV2(adminSecret, "bpm", sessionType, partnerId, 86400, "");
+				client.setSessionId(ks);
+
+				println("Generated ks [" + ks + "]");
+			</script>
+    </scriptTask>
+    <sequenceFlow id="flow3" sourceRef="generate-ks" targetRef="theEnd"></sequenceFlow>
+    <endEvent id="theEnd" name="End"></endEvent>
+    <dataObject id="end-point" name="endPoint" itemSubjectRef="xsd:string"></dataObject>
+    <dataObject id="partner-id" name="partnerId" itemSubjectRef="xsd:long"></dataObject>
+    <dataObject id="admin-secret" name="adminSecret" itemSubjectRef="xsd:string"></dataObject>
+    <dataObject id="session-type" name="sessionType" itemSubjectRef="xsd:int"></dataObject>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_kaltura-client">
+    <bpmndi:BPMNPlane bpmnElement="kaltura-client" id="BPMNPlane_kaltura-client">
+      <bpmndi:BPMNShape bpmnElement="theStart" id="BPMNShape_theStart">
+        <omgdc:Bounds height="35.0" width="35.0" x="190.0" y="10.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="init-client" id="BPMNShape_init-client">
+        <omgdc:Bounds height="55.0" width="105.0" x="155.0" y="70.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="generate-ks" id="BPMNShape_generate-ks">
+        <omgdc:Bounds height="55.0" width="105.0" x="155.0" y="150.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="theEnd" id="BPMNShape_theEnd">
+        <omgdc:Bounds height="35.0" width="35.0" x="190.0" y="240.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
+        <omgdi:waypoint x="207.0" y="45.0"></omgdi:waypoint>
+        <omgdi:waypoint x="207.0" y="70.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">
+        <omgdi:waypoint x="207.0" y="125.0"></omgdi:waypoint>
+        <omgdi:waypoint x="207.0" y="150.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow3" id="BPMNEdge_flow3">
+        <omgdi:waypoint x="207.0" y="205.0"></omgdi:waypoint>
+        <omgdi:waypoint x="207.0" y="240.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

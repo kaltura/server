@@ -20,6 +20,8 @@ class KObjectTaskEngineFactory
 				return new KObjectTaskConvertEntryFlavorsEngine();
 			case ObjectTaskType::DELETE_LOCAL_CONTENT:
 				return new KObjectTaskDeleteLocalContentEngine();
+			case ObjectTaskType::STORAGE_EXPORT:
+				return new KObjectTaskStorageExportEngine();
 			default:
 				return KalturaPluginManager::loadObject('KObjectTaskEntryEngineBase', $type);
 		}

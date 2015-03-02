@@ -38,7 +38,7 @@ if(!file_exists($configFile))
 }
 $config = parse_ini_file($configFile);
 $sphinxServer = $config['sphinxServer'];
-
+$sphinxPort = (isset($config['sphinxPort']) ? $config['sphinxPort'] : 9312);
 $systemSettings = kConf::getMap('system');
 if(!$systemSettings || !$systemSettings['LOG_DIR'])
 {
@@ -83,7 +83,7 @@ while(true)
 	$sphinxCon = null;
 	try
 	{
-		$sphinxCon = DbManager::createSphinxConnection($sphinxServer);
+		$sphinxCon = DbManager::createSphinxConnection($sphinxServer,$sphinxPort);
 	}
 	catch(Exception $e)
 	{

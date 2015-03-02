@@ -184,6 +184,10 @@ class KalturaErrors extends APIErrors
 	const MAX_NUMBER_OF_ACCESS_CONTROLS_REACHED = "MAX_NUMBER_OF_ACCESS_CONTROLS_REACHED;MAX_NUM;Max number of \"@MAX_NUM@\" access controls was reached";
 
 	const CANNOT_DELETE_DEFAULT_ACCESS_CONTROL = "CANNOT_DELETE_DEFAULT_ACCESS_CONTROL;;Default access control cannot be deleted";
+	
+	const EXCEEDED_ENTRIES_PER_ACCESS_CONTROL_FOR_UPDATE = "EXCEEDED_ENTRIES_PER_ACCESS_CONTROL_FOR_UPDATE;id;exceeded entries per access control id @id@ for update";
+	
+	const CANNOT_TRANSFER_ENTRIES_TO_ANOTHER_ACCESS_CONTROL_OBJECT = "CANNOT_TRANSFER_ENTRIES_TO_ANOTHER_ACCESS_CONTROL_OBJECT;;no default access control for current partner";
 
 	/**
 	 * ConversionProfile Service
@@ -367,6 +371,14 @@ class KalturaErrors extends APIErrors
 	const INVALID_OBJECT_ID = "INVALID_OBJECT_ID;ID;Invalid object id [@ID@]";
 
 	const USER_NOT_FOUND = "USER_NOT_FOUND;;User was not found";
+
+	const GROUP_NOT_FOUND = "GROUP_NOT_FOUND;;Group was not found";
+
+	const GROUP_USER_ALREADY_EXISTS = "GROUP_USER_ALREADY_EXISTS;;GroupUser already exists";
+
+	const USER_EXCEEDED_MAX_GROUPS = "USER_EXCEEDED_MAX_GROUPS;;User exceeded max number of groups";
+
+	const GROUP_USER_DOES_NOT_EXIST = "GROUP_USER_DOES_NOT_EXISTS;USER,GROUP;Invalid GroupUser for group [\"@GROUP@\"] and for user [\"@USER@\"]";
 
 	const USER_LOGIN_ALREADY_ENABLED = "USER_LOGIN_ALREADY_ENABLED;;User is already allowed to login";
 

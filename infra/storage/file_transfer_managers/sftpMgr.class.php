@@ -327,7 +327,7 @@ class sftpMgr extends kFileTransferMgr
 	 */
 	protected function doChmod($remoteFile, $mode)
 	{
-		if($this->useCmdChmod && !$this->passphrase)
+		if($this->useCmdChmod)
 			return $this->execSftpCommand("chmod $mode \"$remoteFile\"");
 			
 		$chmod_cmd = "chmod $mode $remoteFile";

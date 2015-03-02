@@ -9,6 +9,8 @@ abstract class KalturaUserBaseFilter extends KalturaFilter
 	static private $map_between_objects = array
 	(
 		"partnerIdEqual" => "_eq_partner_id",
+		"typeEqual" => "_eq_type",
+		"typeIn" => "_in_type",
 		"screenNameLike" => "_like_screen_name",
 		"screenNameStartsWith" => "_likex_screen_name",
 		"emailLike" => "_like_email",
@@ -46,6 +48,16 @@ abstract class KalturaUserBaseFilter extends KalturaFilter
 	 * @var int
 	 */
 	public $partnerIdEqual;
+
+	/**
+	 * @var KalturaUserType
+	 */
+	public $typeEqual;
+
+	/**
+	 * @var string
+	 */
+	public $typeIn;
 
 	/**
 	 * @var string

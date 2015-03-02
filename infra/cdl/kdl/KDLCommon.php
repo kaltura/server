@@ -78,7 +78,8 @@
 				 */
 		const FlavorBitrateRedundencyFactor = 0.75;
 
-		const FlavorBitrateCompliantFactor = 0.80;
+		const FlavorBitrateComplianceFactor = 0.80;
+		const FlavorFrameSizeComplianceFactor = 0.80;
 
 		const ProductDurationFactor = 0.95;
 		const ProductBitrateFactor = 0.7;
@@ -389,6 +390,17 @@
 		}
 	}
 	
+		/*
+		 * Defines the heuristics to be used to define whether the resultant flavor-outut 
+		 * 'comply' or 'not comply' with the requirements
+		 * - Bitrate (default) - assets with bitrates higher than the source (+factor/threshold), will not be generated
+		 * - FrameSize - assets with frame size that are larger than the source, will not be generated 
+		 */
+	class KDLOptimizationPolicy {
+		const BitrateFlagBit = 1;
+		const FrameSizeFlagBit = 2;
+	}
+	
 	class KDLErrors {
 		const SanityInvalidFileSize = 1000;
 		const SanityInvalidFrameDim = 1001;
@@ -471,6 +483,7 @@
 		const RemovingMultilineTranscoding=2117;
 		const MissingTranscoderEngine=2118;
 		const RealMediaMissingContent=2119;
+		const TargetFrameSizeNotComply = 2120;
 		const Other = 2500;
 		
 		public static function ToString($err, $param1=null, $param2=null){
@@ -551,6 +564,9 @@
 					break;
 				case self::RealMediaMissingContent:
 					$str = $err."#The source file is an outdated RM file.No valid media info.";
+					break;
+				case self::TargetFrameSizeNotComply:
+					$str = "$err,$param1,$param2#The requested frame-size ($param1) does not comply with the target frame-size (".$param2.").";
 					break;
 				case self::Other:
 				default:

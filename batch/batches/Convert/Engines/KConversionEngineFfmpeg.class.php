@@ -48,7 +48,8 @@ class KConversionEngineFfmpeg  extends KJobConversionEngine
 			 */
 		foreach($cmdLines as $k=>$cmdLine){
 			$wmCmdLine = null;
-			$exec_cmd = self::expandForcedKeyframesParams($cmdLine->exec_cmd);
+			$exec_cmd = self::experimentalFixing($cmdLine->exec_cmd, $data->flavorParamsOutput, $this->getCmd(), $this->inFilePath, $this->outFilePath);
+			$exec_cmd = self::expandForcedKeyframesParams($exec_cmd);
 			
 			if(isset($wmData) && strstr($exec_cmd, "ffmpeg")!=false){
 			
@@ -98,6 +99,179 @@ class KConversionEngineFfmpeg  extends KJobConversionEngine
 				array($forcedKF),
 				$execCmd);
 		return $execCmd;
+	}
+	
+	/**
+	 * 
+	 * @param unknown_type $cmdStr
+	 * @param unknown_type $flavorParamsOutput
+	 * @param unknown_type $binCmd
+	 * @param unknown_type $srcFilePath
+	 * @param unknown_type $outFilePath
+	 * @return unknown|string
+	 */
+	public static function experimentalFixing($cmdStr, $flavorParamsOutput, $binCmd, $srcFilePath, $outFilePath)
+	{
+/*
+ * Samples - 
+ * Original 
+ * ffmpeg -i SOURCE 
+ * 	   -c:v libx265 
+ * 		-pix_fmt yuv420p -aspect 640:360 -b:v 8000k -s 640x360 -r 30 -g 60 
+ * 		-c:a libfdk_aac -b:a 128k -ar 44100 -f mp4 -y OUTPUT
+ * 
+ * Switched - 
+ * ffmpeg -i SOURCE 
+ * 		-pix_fmt yuv420p -aspect 640:360 -b:v 8000k -s 640x360 -r 30 -g 60 -f yuv4mpegpipe -an - 
+ * 		-vn 
+ * 		-c:a libfdk_aac -b:a 128k -ar 44100 -f mp4 -y OUTPUT.aac 
+ * 		| /home/dev/x265 - --y4m --scenecut 40 --keyint 60 --min-keyint 1 --bitrate 2000 --qpfile OUTPUT.qp OUTPUT.h265 
+ * 		&& ~/ffmpeg-2.4.3 -i OUTPUT.aac -r 30 -i OUTPUT.h265 -c copy -f mp4 -y OUTPUT
+ * 
+ */
+
+		/*
+		 * New binaries/aliases on transcoding servers
+		 */
+$x265bin = "x265";
+$ffmpegExperimBin = "ffmpeg-experim";
+
+		if($flavorParamsOutput->videoCodec==KDLVideoTarget::H265){ //video_codec	!!!flavorParamsOutput->videoCodec
+			KalturaLog::log("trying to fix H265 conversion");
+			$gop = $flavorParamsOutput->gopSize; 					//gop_size	!!!$flavorParamsOutput->gopSize;
+			$vBr = $flavorParamsOutput->videoBitrate; 				//video_bitrate	!!!$flavorParamsOutput->videoBitrate;
+			$frameRate = $flavorParamsOutput->frameRate; 			//frame_rate	!!!$flavorParamsOutput->frameRate;
+				
+$threads = 4;
+$pixFmt = "yuv420p";
+			$cmdValsArr = explode(' ', $cmdStr);
+			
+			/*
+			 * Rearrange the ffmpeg cmd-line into a complex pipe and multiple command
+			 * - ffmpeg transcodes audio into an output.AAC file and decodes video into a raw resized video to be piped
+			 * - into x265 that encodes raw output.h265
+			 * - upon completion- mux into an out.mp4
+			 * 
+			 * To Do's
+			 * - support other audio
+			 * - support other formats
+			 * 
+			 */
+			
+				/*
+				 * remove video codec
+				 */
+			if(in_array('-c:v', $cmdValsArr)) {
+				$key = array_search('-c:v', $cmdValsArr);
+				unset($cmdValsArr[$key+1]);
+				unset($cmdValsArr[$key]);
+			}
+			if(in_array('-threads', $cmdValsArr)) {
+				$key = array_search('-threads', $cmdValsArr);
+				$threads = $cmdValsArr[$key+1];
+			}
+				/*
+				 * add dual stream generation
+				 */
+			if(in_array('-c:a', $cmdValsArr)) {
+				$key = array_search('-c:a', $cmdValsArr);
+				$cmdValsArr[$key] = "-f yuv4mpegpipe -an - -vn -c:a";
+			}
+				/*
+				 * handle pix-format (main vs main10)
+				 */
+			if(in_array('-pix_fmt', $cmdValsArr)) {
+				$key = array_search('-pix_fmt', $cmdValsArr);
+				$pixFmt = $cmdValsArr[$key+1];
+			}
+			switch($pixFmt){
+				case "yuv420p10":
+				case "yuv422p":
+					$profile = "main10";
+					break;
+				case "yuv420p":
+				default:
+					$profile = "main";
+					break;
+			}
+
+				/*
+				 * Get source duration
+				 */
+			$ffParser = new KFFMpegMediaParser($srcFilePath);
+			$ffMi = null;
+			try {
+				$ffMi = $ffParser->getMediaInfo();
+			}
+			catch(Exception $ex)
+			{
+				KalturaLog::log(print_r($ex,1));
+			}
+			if(isset($ffMi->containerDuration) && $ffMi->containerDuration>0)
+				$duration = $ffMi->containerDuration/1000;
+			else if(isset($ffMi->videoDuration) && $ffMi->videoDuration>0)
+				$duration = $ffMi->videoDuration/1000;
+			else if(isset($ffMi->audioDuration) && $ffMi->audioDuration>0)
+				$duration = $ffMi->audioDuration/1000;
+			else
+				$duration = 0;
+			
+			$keyFramesArr = array();
+			/*
+			 * Generate x265 qpfile with forced key-frames
+			 */
+			if(isset($gop) && $gop>0 && isset($frameRate) && $frameRate>0 && isset($duration) && $duration>0){
+				$gopInSec 	= $gop/round($frameRate);
+				$frameDur 	= 1/$frameRate;
+				for($kfTime=0,$kfId=0,$kfTimeGop=0;$kfTime<$duration; ){
+					$keyFramesArr[] = $kfId;
+					$kfId+=$gop;
+					$kfTime=$kfId*$frameDur;
+					$kfTimeGop+=$gopInSec;
+					$kfTimeDelta = $kfTime-$kfTimeGop;
+						/*
+						 * Check for time derift conditions (for float fps, 29.97/23.947/etc) and fix when required
+						 */
+					if(abs($kfTimeDelta)>$frameDur){
+						$aaa = $kfId;
+						if($kfTimeDelta>0)
+							$kfId--;
+						else
+							$kfId++;
+					}
+				}
+				$keyFramesStr = implode(" I\n",$keyFramesArr)." I\n";
+				file_put_contents("$outFilePath.qp", $keyFramesStr);
+			}
+			else {
+				KalturaLog::log("Missing gop($gop) or frameRate($frameRate) or duration($duration) - will be generated without fixed keyframes!");
+			}
+
+			if(!in_array($outFilePath, $cmdValsArr)) {
+				return $cmdStr;
+			}
+			
+			$key = array_search($outFilePath, $cmdValsArr);
+			$cmdValsArr[$key] = "$outFilePath.aac |"; 
+			$cmdValsArr[$key].= " $x265bin - --profile $profile --y4m --scenecut 40 --min-keyint 1";
+			if(isset($gop)) $cmdValsArr[$key].= " --keyint $gop";
+			if(isset($vBr)) $cmdValsArr[$key].= " --bitrate $vBr";
+			if(count($keyFramesArr)>0) $cmdValsArr[$key].= " --qpfile $outFilePath.qp";
+			$cmdValsArr[$key].= " --threads $threads $outFilePath.h265";
+			$cmdValsArr[$key].= " && $ffmpegExperimBin -i $outFilePath.aac -r $frameRate -i $outFilePath.h265 -c copy -f mp4 -y $outFilePath";
+	
+			$cmdStr = implode(" ", $cmdValsArr);
+		}
+		
+			/*
+			 * VP9 - switch to 'experimental ffmpeg'
+			 */
+		else if($flavorParamsOutput->videoCodec==KDLVideoTarget::VP9){ //video_codec ||!flavorParamsOutput->videoCodec
+			$cmdValsArr = explode(' ', $cmdStr);
+			$cmdValsArr[0] = $ffmpegExperimBin;
+			$cmdStr = implode(" ", $cmdValsArr);
+		}
+		return $cmdStr;
 	}
 	
 	/**

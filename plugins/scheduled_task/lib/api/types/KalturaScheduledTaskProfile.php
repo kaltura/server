@@ -135,7 +135,11 @@ class KalturaScheduledTaskProfile extends KalturaObject implements IFilterable
 		$this->validatePropertyNotNull('objectFilter');
 		$this->validatePropertyNotNull('objectTasks');
 		$this->validatePropertyNotNull('maxTotalCountAllowed');
-
+		foreach($this->objectTasks as $objectTask)
+		{
+			/* @var KalturaObjectTask $objectTask */
+			$objectTask->validateForInsert(array('type'));
+		}
 		parent::validateForInsert($propertiesToSkip);
 	}
 	

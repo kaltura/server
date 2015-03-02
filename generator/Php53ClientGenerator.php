@@ -9,12 +9,9 @@ class Php53ClientGenerator extends ClientGeneratorFromXml
 	 */
 	protected $_doc = null;
 	
-	function Php53ClientGenerator($xmlPath, $sourcePath = null)
+	function __construct($xmlPath, Zend_Config $config, $sourcePath = "sources/php53")
 	{
-		if(!$sourcePath)
-			$sourcePath = realpath("sources/php53");
-			
-		parent::ClientGeneratorFromXml($xmlPath, $sourcePath);
+		parent::__construct($xmlPath, $sourcePath, $config);
 		$this->_doc = new KDOMDocument();
 		$this->_doc->load($this->_xmlFile);
 	}

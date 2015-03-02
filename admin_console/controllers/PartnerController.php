@@ -30,6 +30,7 @@ class PartnerController extends Zend_Controller_Action
 		$partnerFilter = new Kaltura_Client_SystemPartner_Type_SystemPartnerFilter();
 		$partnerFilter->partnerGroupTypeEqual = Kaltura_Client_Enum_PartnerGroupType::TEMPLATE;
 		$partnerFilter->partnerParentIdEqual = 0;
+		$partnerFilter->statusEqual = Kaltura_Client_Enum_PartnerStatus::ACTIVE;
 		$systemPartnerPlugin->systemPartner->listAction($partnerFilter);
 		list($packages, $packagesVertical, $packagesClassOfService, $templatePartners) = $client->doMultiRequest();
 		

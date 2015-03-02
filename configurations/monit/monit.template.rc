@@ -2,7 +2,7 @@
         # Monit control file
         #
 
-        set daemon 1 # Poll every second
+        set daemon 120 # Poll every 120 seconds
         set logfile syslog facility log_daemon
         set alert @ADMIN_CONSOLE_ADMIN_MAIL@ 
         set httpd port 2812 and use address localhost

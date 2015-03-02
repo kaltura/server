@@ -163,6 +163,17 @@ class KDLMediaDataSet  {
 						}
 					}
 					break;
+				case "ipad":
+				case "ipadnew":
+					if($this->_container->IsFormatOf($mp4ContainerFormats)) {
+						if($this->_video || $this->_audio) {
+							if((!$this->_video || ($this->_video && $this->_video->IsFormatOf($mp4VideoFormats)))
+							&& (!$this->_audio || ($this->_audio && $this->_audio->IsFormatOf($mp4AudioFormats)))){
+								$tagsOut[] = $tag;
+							}
+						}
+					}
+					break;
 				case "slweb":
 					if($this->_container->IsFormatOf($wmvContainerFormats))
 						$tagsOut[] = $tag;

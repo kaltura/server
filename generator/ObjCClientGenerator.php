@@ -13,12 +13,9 @@ class ObjCClientGenerator extends ClientGeneratorFromXml
 	
 	protected $_projectSections = array();
 	
-	function __construct($xmlPath, $sourcePath = null)
+	function __construct($xmlPath, Zend_Config $config, $sourcePath = "sources/objc")
 	{
-		if(!$sourcePath)
-			$sourcePath = realpath("sources/objc");
-			
-		parent::ClientGeneratorFromXml($xmlPath, $sourcePath);
+		parent::__construct($xmlPath, $sourcePath, $config);
 		$this->_doc = new KDOMDocument();
 		$this->_doc->load($this->_xmlFile);
 	}
@@ -36,7 +33,7 @@ class ObjCClientGenerator extends ClientGeneratorFromXml
 		case "" :
 			return "void";
 		case "bool" :
-			return "BOOL";
+			return "KALTURA_BOOL";
 		case "bigint" :
 		case "int" :
 			return "int";
@@ -131,6 +128,14 @@ class ObjCClientGenerator extends ClientGeneratorFromXml
 			default:
 				return $propertyName;
 		}
+	}
+
+	function renameReservedProperties($propertyName)
+	{
+		if (kString::beginsWith($propertyName, 'new') ||
+			kString::beginsWith($propertyName, 'copy'))
+			return "a$propertyName";		// prefixing with _ still produces the warning, need to use a real letter
+		return $propertyName;
 	}
 	
 	static function buildMultilineComment($description, $indent = "")
@@ -322,6 +327,7 @@ class ObjCClientGenerator extends ClientGeneratorFromXml
 				continue;
 				
 			$propName = $propertyNode->getAttribute("name");
+			$propName = $this->renameReservedProperties($propName);
 			$propType = $propertyNode->getAttribute("type");
 			$objcPropType = $this->getObjCType($propType);
 			
@@ -351,6 +357,7 @@ class ObjCClientGenerator extends ClientGeneratorFromXml
 				continue;
 			
 			$propName = $propertyNode->getAttribute("name");
+			$propName = $this->renameReservedProperties($propName);
 			$propType = $propertyNode->getAttribute("type");
 			$propValue = $this->getPropDefaultValue($propType);
 			if (!$propValue)
@@ -376,6 +383,7 @@ class ObjCClientGenerator extends ClientGeneratorFromXml
 				continue;
 			
 			$propName = $propertyNode->getAttribute("name");
+			$propName = $this->renameReservedProperties($propName);
 			$propType = $propertyNode->getAttribute("type");
 			if ($this->isSimpleType($propType))
 				continue;
@@ -396,6 +404,7 @@ class ObjCClientGenerator extends ClientGeneratorFromXml
 				continue;
 			
 			$propName = $propertyNode->getAttribute("name");
+			$propName = $this->renameReservedProperties($propName);
 			$isReadOnly = $propertyNode->getAttribute("readOnly") == 1;
 			$propType = $propertyNode->getAttribute("type");
 			
@@ -485,6 +494,7 @@ class ObjCClientGenerator extends ClientGeneratorFromXml
 			$propType = $this->getTypeName($propType);
 			$propName = $propertyNode->getAttribute ( "name" );
 			$ucPropName = $this->upperCaseFirstLetter($propName);
+			$propName = $this->renameReservedProperties($propName);
 			$propValue = "[KalturaSimpleTypeParser parse$propType:aPropVal]";
 			
 			$this->appendHLine("- (void)set{$ucPropName}FromString:(NSString*)aPropVal;");
@@ -517,6 +527,7 @@ class ObjCClientGenerator extends ClientGeneratorFromXml
 			$propType = $propertyNode->getAttribute ( "type" );
 			$propType = $this->getTypeName($propType);
 			$propName = $propertyNode->getAttribute ( "name" );
+			$propName = $this->renameReservedProperties($propName);
 			$this->appendMLine( "    [aParams addIfDefinedKey:@\"$propName\" with$propType:self.$propName];" );
 		}
 		$this->appendMLine( "}\n" );

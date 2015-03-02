@@ -69,7 +69,7 @@
             videoRecorder.videoQuality = UIImagePickerControllerQualityTypeMedium;
             videoRecorder.videoMaximumDuration = 180;			//Specify in seconds (600 is default)
             
-            [self presentModalViewController:videoRecorder animated:YES];
+            [self presentViewController:videoRecorder animated:YES completion:nil];
         }
         [videoRecorder release];
     } else {
@@ -87,14 +87,13 @@
     imagePicker.videoQuality = UIImagePickerControllerQualityTypeHigh;
     imagePicker.delegate = self;
     
-    [self presentModalViewController:imagePicker animated:YES];
-      
+    [self presentViewController:imagePicker animated:YES completion:nil];
     [imagePicker release];
 }
 
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info
 {
-    [self dismissModalViewControllerAnimated:YES];
+    [self dismissViewControllerAnimated:YES completion:nil];
     
     NSURL *url =  [info objectForKey:UIImagePickerControllerMediaURL];
     
@@ -113,7 +112,7 @@
 
 - (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker {
     
-    [self dismissModalViewControllerAnimated:YES];
+    [self dismissViewControllerAnimated:YES completion:nil];
     
 }
 
@@ -127,10 +126,10 @@
     labelTitle.font = [UIFont fontWithName:@"Maven Pro" size:19];
     viewMain.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"bg_table.png"]];
     
-    buttonRecord.titleLabel.lineBreakMode = UILineBreakModeWordWrap;
+    buttonRecord.titleLabel.lineBreakMode = NSLineBreakByWordWrapping;
 	buttonRecord.titleLabel.numberOfLines = 0;
     
-    buttonPick.titleLabel.lineBreakMode = UILineBreakModeWordWrap;
+    buttonPick.titleLabel.lineBreakMode = NSLineBreakByWordWrapping;
 	buttonPick.titleLabel.numberOfLines = 0;
     
     [buttonRecord.titleLabel setFont:[UIFont fontWithName:@"Maven Pro" size:20]];

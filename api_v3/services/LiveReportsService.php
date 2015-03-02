@@ -111,29 +111,36 @@ class LiveReportsService extends KalturaBaseService
 	/**
 	 * @action exportToCsv
 	 * @param KalturaLiveReportExportType $reportType 
-	 * @param string $entryIds
-	 * @param string $recpientEmail
+	 * @param KalturaLiveReportExportParams $params
 	 * @return KalturaLiveReportExportResponse
 	 */
-	public function exportToCsvAction($reportType, $entryIds = null, $recpientEmail = null)
+	public function exportToCsvAction($reportType, KalturaLiveReportExportParams $params)
 	{
-		if(!$recpientEmail) {
+		if(!$params->recpientEmail) {
 			$kuser = kCurrentContext::getCurrentKsKuser();
 			if($kuser) {
-				$recpientEmail = $kuser->getEmail();
+				$params->recpientEmail = $kuser->getEmail();
 			} else {
 				$partnerId = kCurrentContext::getCurrentPartnerId();
 				$partner = PartnerPeer::retrieveByPK($partnerId);
-				$recpientEmail = $partner->getAdminEmail();
+				$params->recpientEmail = $partner->getAdminEmail();
 			}
 		}
 		
+		// Validate input
+		if($params->entryIds) {
+			$entryIds = explode(",", $params->entryIds);
+			$entries = entryPeer::retrieveByPKs($entryIds);
+			if(count($entryIds) != count($entries))
+				throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $params->entryIds);
+		}
 		
-		$dbBatchJob = kJobsManager::addExportLiveReportJob($reportType, $entryIds, $recpientEmail);
+		
+		$dbBatchJob = kJobsManager::addExportLiveReportJob($reportType, $params);
 		
 		$res = new KalturaLiveReportExportResponse();
 		$res->referenceJobId = $dbBatchJob->getId();
-		$res->reportEmail = $recpientEmail;
+		$res->reportEmail = $params->recpientEmail;
 		
 		return $res;
 	}

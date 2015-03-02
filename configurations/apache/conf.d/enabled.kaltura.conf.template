@@ -7,11 +7,24 @@ DirectoryIndex index.html
 DeflateFilterNote Ratio ratio
 DeflateCompressionLevel 9
 FilterDeclare COMPRESS
+
+<IfVersion >= 2.4>
+FilterProvider COMPRESS DEFLATE "%{CONTENT_TYPE} = 'text/html'"
+FilterProvider COMPRESS DEFLATE "%{CONTENT_TYPE} = 'application/x-javascript'"
+FilterProvider COMPRESS DEFLATE "%{CONTENT_TYPE} = 'application/.*xml.*'"
+FilterProvider COMPRESS DEFLATE "%{CONTENT_TYPE} = 'image/svg+xml'"
+</IfVersion>
+
+<IfVersion < 2.4>
 FilterProvider COMPRESS DEFLATE resp=Content-Type $text
 FilterProvider COMPRESS DEFLATE resp=Content-Type $application/x-javascript
 FilterProvider COMPRESS DEFLATE resp=Content-Type $application/.*xml.*
 FilterProvider COMPRESS DEFLATE resp=Content-Type $image/svg+xml
+</IfVersion>
+
 FilterChain COMPRESS
+
+
 
 <IfModule !filter_module>
     LoadModule filter_module modules/mod_filter.so
@@ -80,31 +93,29 @@ Alias /sf "/usr/share/pear/data/symfony/web/sf/"
 	
 	RewriteRule ^p/[-0-9]+/sp/[-0-9]+/flv/(.*)$ /index.php/flv/$1 [L]
 	RewriteRule ^p/[-0-9]+/flv/(.*)$ /index.php/flv/$1 [L]
-	
+		
 	RewriteRule ^p/[-0-9]+/sp/[-0-9]+/playManifest/(.*)$ /index.php/extwidget/playManifest/$1 [L]
-	RewriteRule ^p/[-0-9]+/sp/[-0-9]+/serveFlavor/(.*)$ /index.php/extwidget/serveFlavor/$1 [L]
 	RewriteRule ^p/[-0-9]+/sp/[-0-9]+/serveIsm/(.*)$ /index.php/extwidget/serveIsm/$1 [L]
 	RewriteRule ^p/[-0-9]+/sp/[-0-9]+/serveManifest/(.*)$ /index.php/extwidget/serveManifest/$1 [L]
 	RewriteRule ^p/[-0-9]+/sp/[-0-9]+/embedIframe/(.*)$ /index.php/extwidget/embedIframe/$1 [L]
 	RewriteRule ^p/[-0-9]+/sp/[-0-9]+/embedIframeJs/(.*)$ /index.php/extwidget/embedIframeJs/$1 [L]
 	
 	RewriteRule ^s/p/[-0-9]+/sp/[-0-9]+/playManifest/(.*)$ /index.php/extwidget/playManifest/$1 [L]
-	RewriteRule ^s/p/[-0-9]+/sp/[-0-9]+/serveFlavor/(.*)$ /index.php/extwidget/serveFlavor/$1 [L]
 	RewriteRule ^s/p/[-0-9]+/sp/[-0-9]+/serveManifest/(.*)$ /index.php/extwidget/serveManifest/$1 [L]
 	RewriteRule ^s/p/[-0-9]+/sp/[-0-9]+/embedIframe/(.*)$ /index.php/extwidget/embedIframe/$1 [L]
 	RewriteRule ^s/p/[-0-9]+/sp/[-0-9]+/embedIframeJs/(.*)$ /index.php/extwidget/embedIframeJs/$1 [L]
 	
 	RewriteRule ^p/[-0-9]+/playManifest/(.*)$ /index.php/extwidget/playManifest/$1 [L]
-	RewriteRule ^p/[-0-9]+/serveFlavor/(.*)$ /index.php/extwidget/serveFlavor/$1 [L]
 	RewriteRule ^p/[-0-9]+/serveManifest/(.*)$ /index.php/extwidget/serveManifest/$1 [L]
 	RewriteRule ^p/[-0-9]+/embedIframe/(.*)$ /index.php/extwidget/embedIframe/$1 [L]
 	RewriteRule ^p/[-0-9]+/embedIframeJs/(.*)$ /index.php/extwidget/embedIframeJs/$1 [L]
 	
 	RewriteRule ^s/p/[-0-9]+/playManifest/(.*)$ /index.php/extwidget/playManifest/$1 [L]
-	RewriteRule ^s/p/[-0-9]+/serveFlavor/(.*)$ /index.php/extwidget/serveFlavor/$1 [L]
 	RewriteRule ^s/p/[-0-9]+/serveManifest/(.*)$ /index.php/extwidget/serveManifest/$1 [L]
 	RewriteRule ^s/p/[-0-9]+/embedIframe/(.*)$ /index.php/extwidget/embedIframe/$1 [L]
 	RewriteRule ^s/p/[-0-9]+/embedIframeJs/(.*)$ /index.php/extwidget/embedIframeJs/$1 [L]
+	
+	RewriteRule (?<!extwidget)/serveFlavor/(.*)$ /index.php/extwidget/serveFlavor/$1 [L]
 	
 	RewriteRule ^p/[-0-9]+/sp/[-0-9]+/kpreloader/(.*)$ /index.php/extwidget/kpreloader/$1 [L]
 	RewriteRule ^p/[-0-9]+/kpreloader/(.*)$ /index.php/extwidget/kpreloader/$1 [L]
@@ -151,6 +162,9 @@ Alias /sf "/usr/share/pear/data/symfony/web/sf/"
     Options FollowSymLinks ExecCGI Includes
     AllowOverride None
     Allow from all
+    <IfVersion >= 2.4>
+	Require all granted
+    </IfVersion>
 </Directory>
 
 Alias /start "@APP_DIR@/start"
@@ -160,6 +174,9 @@ Alias /start "@APP_DIR@/start"
 	AllowOverride All
 	Order allow,deny
 	Allow from all
+    <IfVersion >= 2.4>
+	Require all granted
+    </IfVersion>
 </Directory>
 
 Alias /content/uiconf "@WEB_DIR@/content/uiconf"
@@ -173,6 +190,9 @@ Alias /content/uiconf "@WEB_DIR@/content/uiconf"
         Header unset ETag
         AllowOverride None
         Allow from all
+	<IfVersion >= 2.4>
+	    Require all granted
+	</IfVersion>
 </Directory>
 
 Alias /content "@WEB_DIR@/content"
@@ -189,6 +209,9 @@ Alias /content "@WEB_DIR@/content"
 	RewriteRule ^(.*)entry/widget/(.*) /images/blank_one_pixel.gif [L]
         AllowOverride None
         Allow from all
+	<IfVersion >= 2.4>
+	    Require all granted
+	</IfVersion>
 </Directory>
 
 Alias /flash "@WEB_DIR@/flash"
@@ -203,6 +226,9 @@ Alias /flash "@WEB_DIR@/flash"
 	FileETag None
         AllowOverride None
         Allow from all
+	<IfVersion >= 2.4>
+	    Require all granted
+	</IfVersion>
 </Directory>
 
 # ------------------------------------------------------------------------------

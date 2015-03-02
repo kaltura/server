@@ -20,7 +20,7 @@ class LiveReportEntryBasedChunkerEngine extends LiveReportEngine {
 		$entryIds = explode(",", $entryIdStr);
 		$entryChunks = array_chunk($entryIds, self::ENTRY_CHUNK_SIZE);
 
-		$headers = $this->printHeaders($fp, "ENTRY ID");
+		$headers = $this->printHeaders($fp, "Entry Id");
 		$values = array();
 		// Execute all engines
 		foreach ( $entryChunks as $entryChunk ) {

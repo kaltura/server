@@ -1,4 +1,4 @@
-/*! KMC - v6.0.11 - 2014-11-23
+/*! KMC - v6.0.11 - 2014-12-30
 * https://github.com/kaltura/KMC_V2
 * Copyright (c) 2014 Amir Chervinsky; Licensed GNU */
 /**
@@ -3400,6 +3400,12 @@ if ( window.XDomainRequest ) {
             if (previewService.get('live') == true){
                 flashVars.disableEntryRedirect = true;
             }
+			flashVars['liveAnalytics'] = {
+				"plugin": "false",                // prevent loading the liveAnalytics plugin in v2 players
+				"relativeTo": "PlayerHolder",     // required to prevent v1 players from getting stuck
+				"position": "after",              // required to prevent v1 players from getting stuck
+				"loadingPolicy": "onDemand"       // prevent v1 players from trying to load this plugin
+			};
 		}
 
 		var playlistId = previewService.get('playlistId');

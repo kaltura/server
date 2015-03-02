@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="Kaltura Java Client Library Build" default="jar">
+
+	<property name="jar.filename" value="${basedir}/KalturaClientLib.jar" />
+	
+	<target name="jar">
+		<tempfile property="temp.classes" prefix="classes_" />
+		<mkdir dir="${temp.classes}" />
+		<javac srcdir="src" encoding="UTF-8" destdir="${temp.classes}">
+			<classpath>
+				<fileset dir="${basedir}/lib">
+					<include name="*.jar" />
+				</fileset>
+			</classpath>
+		</javac>
+		<copy todir="${temp.classes}">
+			<fileset dir="src" excludes="**/*.java" />
+		</copy>
+		<jar jarfile="${jar.filename}">
+			<fileset dir="${temp.classes}" />
+		</jar>
+		<delete dir="${temp.classes}" />
+	</target>
+
+</project>

@@ -38,7 +38,7 @@
 
 - (IBAction)selectCellView:(UIButton *)button {
     
-    [parentController openMediaInfoByIndex:index + button.tag];
+    [parentController openMediaInfoByIndex:index + (int)button.tag];
     
 }
 

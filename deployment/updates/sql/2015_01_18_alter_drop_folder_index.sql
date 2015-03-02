@@ -1,0 +1,1 @@
+alter table drop_folder_file add index entry_id_status (entry_id,status);

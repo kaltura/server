@@ -3,9 +3,9 @@ class RubyClientGenerator extends ClientGeneratorFromXml
 {
 	private $_doc = null;
 	
-	function RubyClientGenerator($xmlPath)
+	function __construct($xmlPath, Zend_Config $config, $sourcePath = "sources/ruby")
 	{
-		parent::ClientGeneratorFromXml($xmlPath, realpath("sources/ruby"));
+		parent::__construct($xmlPath, $sourcePath, $config);
 		$this->_doc = new KDOMDocument();
 		$this->_doc->load($this->_xmlFile);
 	}

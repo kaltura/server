@@ -10,6 +10,7 @@
  postrotate
  service kaltura_sphinx restart
  endscript
+ su root kaltura
 }
 
 @LOG_DIR@/sphinx/kaltura_sphinx_searchd.log{
@@ -23,4 +24,5 @@
  postrotate
  service kaltura_sphinx restart
  endscript
+ su root kaltura
 }

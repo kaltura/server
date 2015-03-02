@@ -174,6 +174,18 @@ class KalturaFlavorParams extends KalturaAssetParams
 	
 	/**
 	 * @var int
+	 * 	IMX files (MXF/Mpeg2) have a 32pix black strip at top of the frame.
+	 * 	When set - this strip will be removed automatically (just for those files)
+	 */
+	public $isCropIMX;
+	
+	/**
+	 * @var int
+	 */
+	public $optimizationPolicy;
+	
+	/**
+	 * @var int
 	 * 	Sets max bitrate that is different from the system wide 30fps.
 	 *  Required to support mezzanine formats
 	 */
@@ -233,6 +245,8 @@ class KalturaFlavorParams extends KalturaAssetParams
 		"multiStream",
 		"anamorphicPixels",
 		"isAvoidForcedKeyFrames",
+		"isCropIMX",
+		"optimizationPolicy",
 		"maxFrameRate",
 		"videoConstantBitrate",
 		"videoBitrateTolerance",

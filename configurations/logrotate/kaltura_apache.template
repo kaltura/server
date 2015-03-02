@@ -9,6 +9,7 @@
  postrotate
  service @APACHE_SERVICE@ reload
  endscript
+ su root kaltura
 }
 
 @LOG_DIR@/kaltura_apache_access.log {
@@ -22,6 +23,7 @@
  mv @LOG_DIR@/kaltura_apache_access.log-`/bin/date +%Y%m%d`.gz @EVENTS_LOGS_DIR@/`hostname`-kaltura_apache_access.log-`/bin/date +%Y%m%d-%H`.gz
  service @APACHE_SERVICE@ reload
  endscript
+ su root kaltura
 }
 
 @LOG_DIR@/kaltura_apache_errors_ssl.log {
@@ -35,6 +37,7 @@
  postrotate
  service @APACHE_SERVICE@ reload
  endscript
+ su root kaltura
 }
 
 @LOG_DIR@/kaltura_apache_access_ssl.log {
@@ -48,4 +51,5 @@
  mv @LOG_DIR@/kaltura_apache_access_ssl.log-`/bin/date +%Y%m%d`.gz @EVENTS_LOGS_DIR@/`hostname`-kaltura_apache_access_ssl.log-`/bin/date +%Y%m%d-%H`.gz
  service @APACHE_SERVICE@ reload
  endscript
+ su root kaltura
 }

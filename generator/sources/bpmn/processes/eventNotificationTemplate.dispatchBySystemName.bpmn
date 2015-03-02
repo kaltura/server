@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.kaltura.com/bpm">
+  <process id="kaltura-eventNotificationTemplate-dispatchBySystemName" name="kaltura-eventNotificationTemplate-dispatchBySystemName" isExecutable="true">
+    <startEvent id="theStart" name="Start"></startEvent>
+    <endEvent id="theEnd" name="End"></endEvent>
+    <callActivity id="eventNotificationTemplate.list" name="eventNotificationTemplate.list" calledElement="kaltura-eventNotificationTemplate-list">
+      <extensionElements>
+        <activiti:in source="client" target="client"></activiti:in>
+        <activiti:in source="filter" target="filter"></activiti:in>
+        <activiti:in source="pager" target="pager"></activiti:in>
+        <activiti:out source="response" target="eventNotificationTemplateList"></activiti:out>
+      </extensionElements>
+    </callActivity>
+    <sequenceFlow id="flow10" sourceRef="theStart" targetRef="setVars"></sequenceFlow>
+    <scriptTask id="setVars" name="Set Variables" scriptFormat="javascript" activiti:autoStoreVariables="false">
+      <script>importPackage(com.kaltura.client.enums);
+importPackage(com.kaltura.client.types);
+	
+println("Setting scope for template [" + systemName + "]");
+var scope = new KalturaEventNotificationScope();
+scope.objectId = objectId;
+scope.scopeObjectType = objectType;
+execution.setVariable("scope", scope);
+
+var filter = new KalturaEventNotificationTemplateFilter();
+filter.systemNameEqual = systemName;
+filter.orderBy = KalturaEventNotificationTemplateOrderBy.ID_DESC;
+execution.setVariable("filter", filter);
+
+var pager = new KalturaFilterPager();
+pager.pageSize = 1;
+execution.setVariable("pager", pager);
+
+var jobId = null;
+execution.setVariable("jobId", jobId);
+
+println("Scope defined");
+</script>
+    </scriptTask>
+    <sequenceFlow id="flow12" sourceRef="setVars" targetRef="eventNotificationTemplate.list"></sequenceFlow>
+    <scriptTask id="printJob" name="Print Job ID" scriptFormat="javascript" activiti:autoStoreVariables="false">
+      <script>println("Event notification dispatched, job id [" + jobId + "]");</script>
+    </scriptTask>
+    <sequenceFlow id="flow14" sourceRef="printJob" targetRef="theEnd"></sequenceFlow>
+    <dataObject id="client" name="client" itemSubjectRef="xsd:string"></dataObject>
+    <dataObject id="systemName" name="systemName" itemSubjectRef="xsd:string"></dataObject>
+    <dataObject id="objectType" name="objectType" itemSubjectRef="xsd:string"></dataObject>
+    <dataObject id="objectId" name="objectId" itemSubjectRef="xsd:string"></dataObject>
+    <scriptTask id="getTemplateId" name="Get Template Id" activiti:autoStoreVariables="false">
+      <script>
+var eventNotificationTemplate = eventNotificationTemplateList.objects.get(0);
+var eventNotificationTemplateId = eventNotificationTemplate.id;
+execution.setVariable("eventNotificationTemplateId", eventNotificationTemplateId);
+
+println("Event notification template id [" + eventNotificationTemplateId + "]");
+	</script>
+    </scriptTask>
+    <callActivity id="eventNotificationTemplate.dispatch" name="eventNotificationTemplate.dispatch" calledElement="kaltura-eventNotificationTemplate-dispatch">
+      <extensionElements>
+        <activiti:in source="client" target="client"></activiti:in>
+        <activiti:in source="eventNotificationTemplateId" target="id"></activiti:in>
+        <activiti:in source="scope" target="scope"></activiti:in>
+        <activiti:out source="response" target="jobId"></activiti:out>
+      </extensionElements>
+    </callActivity>
+    <sequenceFlow id="flow15" sourceRef="eventNotificationTemplate.list" targetRef="getTemplateId"></sequenceFlow>
+    <sequenceFlow id="flow16" sourceRef="getTemplateId" targetRef="eventNotificationTemplate.dispatch"></sequenceFlow>
+    <sequenceFlow id="flow17" sourceRef="eventNotificationTemplate.dispatch" targetRef="printJob"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_kaltura-eventNotificationTemplate-dispatchBySystemName">
+    <bpmndi:BPMNPlane bpmnElement="kaltura-eventNotificationTemplate-dispatchBySystemName" id="BPMNPlane_kaltura-eventNotificationTemplate-dispatchBySystemName">
+      <bpmndi:BPMNShape bpmnElement="theStart" id="BPMNShape_theStart">
+        <omgdc:Bounds height="35.0" width="35.0" x="190.0" y="10.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="theEnd" id="BPMNShape_theEnd">
+        <omgdc:Bounds height="35.0" width="35.0" x="190.0" y="520.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="eventNotificationTemplate.list" id="BPMNShape_eventNotificationTemplate.list">
+        <omgdc:Bounds height="55.0" width="276.0" x="70.0" y="170.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="setVars" id="BPMNShape_setVars">
+        <omgdc:Bounds height="55.0" width="105.0" x="155.0" y="80.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="printJob" id="BPMNShape_printJob">
+        <omgdc:Bounds height="55.0" width="105.0" x="155.0" y="440.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="getTemplateId" id="BPMNShape_getTemplateId">
+        <omgdc:Bounds height="55.0" width="105.0" x="155.0" y="260.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="eventNotificationTemplate.dispatch" id="BPMNShape_eventNotificationTemplate.dispatch">
+        <omgdc:Bounds height="55.0" width="261.0" x="77.0" y="350.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow10" id="BPMNEdge_flow10">
+        <omgdi:waypoint x="207.0" y="45.0"></omgdi:waypoint>
+        <omgdi:waypoint x="207.0" y="80.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow12" id="BPMNEdge_flow12">
+        <omgdi:waypoint x="207.0" y="135.0"></omgdi:waypoint>
+        <omgdi:waypoint x="208.0" y="170.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow14" id="BPMNEdge_flow14">
+        <omgdi:waypoint x="207.0" y="495.0"></omgdi:waypoint>
+        <omgdi:waypoint x="207.0" y="520.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow15" id="BPMNEdge_flow15">
+        <omgdi:waypoint x="208.0" y="225.0"></omgdi:waypoint>
+        <omgdi:waypoint x="207.0" y="260.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow16" id="BPMNEdge_flow16">
+        <omgdi:waypoint x="207.0" y="315.0"></omgdi:waypoint>
+        <omgdi:waypoint x="207.0" y="350.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow17" id="BPMNEdge_flow17">
+        <omgdi:waypoint x="207.0" y="405.0"></omgdi:waypoint>
+        <omgdi:waypoint x="207.0" y="440.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

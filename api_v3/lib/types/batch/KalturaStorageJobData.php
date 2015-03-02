@@ -20,6 +20,21 @@ class KalturaStorageJobData extends KalturaJobData
 	 */   	
     public $serverPassword;
 
+    /**
+    * @var string
+    */
+    public $serverPrivateKey;
+    
+    /**
+     * @var string
+     */
+    public $serverPublicKey;
+    
+    /**
+     * @var string
+     */
+    public $serverPassPhrase;
+
 	/**
 	 * @var bool
 	 */   	
@@ -51,6 +66,9 @@ class KalturaStorageJobData extends KalturaJobData
 	    "srcFileSyncLocalPath" ,
 		"srcFileSyncId" ,
 		"destFileSyncStoredPath",
+		"serverPrivateKey",
+		"serverPublicKey",
+		"serverPassPhrase",			
 	);
 
 	public function getMapBetweenObjects ( )

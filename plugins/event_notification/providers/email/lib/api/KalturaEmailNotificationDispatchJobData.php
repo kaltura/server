@@ -112,6 +112,5 @@ class KalturaEmailNotificationDispatchJobData extends KalturaEventNotificationDi
 		$this->bcc = KalturaEmailNotificationRecipientJobData::getDataInstance($dbObject->getBcc());
 		$this->replyTo = KalturaEmailNotificationRecipientJobData::getDataInstance($dbObject->getReplyTo());
 		$this->customHeaders = KalturaKeyValueArray::fromKeyValueArray($dbObject->getCustomHeaders());
-		$this->contentParameters = KalturaKeyValueArray::fromKeyValueArray($dbObject->getContentParameters());
 	}
 }

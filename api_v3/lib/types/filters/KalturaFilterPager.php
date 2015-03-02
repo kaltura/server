@@ -32,4 +32,10 @@ class KalturaFilterPager extends KalturaObject
 		$offset = ($this->pageIndex - 1) * $this->pageSize;
 		$c->setOffset( $offset );
 	}
+	
+	public static function detachFromCriteria(Criteria $c)
+	{
+		$c->setOffset(0);
+		$c->setLimit(-1);
+	}
 }

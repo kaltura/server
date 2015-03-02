@@ -129,7 +129,7 @@ try
   sfLoader::loadPluginConfig();
 
   // compress output
-  ob_start(sfConfig::get('sf_compressed') ? 'ob_gzhandler' : '');
+  ob_start(sfConfig::get('sf_compressed') ? 'ob_gzhandler' : null);
 }
 catch (sfException $e)
 {

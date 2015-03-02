@@ -35,6 +35,9 @@ class ITunesFeedRenderer extends SyndicationFeedRenderer {
 				case 'mp4':
 					$this->mimeType = 'video/mp4';
 					break;
+				case 'mp3':
+					$this->mimeType = 'audio/mp3';
+					break;
 				case 'm4v':
 					$this->mimeType = 'video/x-m4v';
 					break;

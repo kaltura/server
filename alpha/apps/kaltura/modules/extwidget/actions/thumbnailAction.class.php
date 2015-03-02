@@ -453,11 +453,8 @@ class thumbnailAction extends sfAction
 		else if (strpos($tempThumbPath, "_NOCACHE_") !== false)
 			$cacheAge = 60;
 		else
-			$cacheAge = 8640000;
-		
-		// cache result
-		if (!$nocache)
 		{
+			$cacheAge = 8640000;
 			$requestKey = $_SERVER["REQUEST_URI"];
 			$cache = new myCache("thumb", $cacheAge); // 30 days
 			$cache->put($requestKey, $tempThumbPath);

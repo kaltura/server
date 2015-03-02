@@ -28,6 +28,9 @@ class kStorageDeleteJobData extends kStorageJobData
         $this->setServerUrl($storage->getStorageUrl()); 
         $this->setServerUsername($storage->getStorageUsername()); 
         $this->setServerPassword($storage->getStoragePassword());
+        $this->setServerPrivateKey($storage->getPrivateKey());
+        $this->setServerPublicKey($storage->getPublicKey());
+        $this->setServerPassPhrase($storage->getPassPhrase());
         $this->setFtpPassiveMode($storage->getStorageFtpPassiveMode());
 
         $this->setSrcFileSyncId($filesync->getId());

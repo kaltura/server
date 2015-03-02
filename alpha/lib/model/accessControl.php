@@ -36,11 +36,11 @@ class accessControl extends BaseaccessControl
 			if ($this->isDefault === true)
 				throw new kCoreException("Default access control profile [" . $this->getId(). "] can't be deleted", kCoreException::ACCESS_CONTROL_CANNOT_DELETE_PARTNER_DEFAULT);
 				
-			$c = new Criteria();
-			$c->add(entryPeer::ACCESS_CONTROL_ID, $this->getId());
-			$entryCount = entryPeer::doCount($c);
-			if ($entryCount > 0)
-				throw new kCoreException("Default access control profile [" . $this->getId(). "] is linked with [$entryCount] entries and can't be deleted", kCoreException::ACCESS_CONTROL_CANNOT_DELETE_USED_PROFILE);
+			$defaultAccessControl = $this->getPartner()->getDefaultAccessControlId();
+			if (!$defaultAccessControl)
+				throw new kCoreException("no default access control on partner",kCoreException::NO_DEFAULT_ACCESS_CONTROL);
+			
+			entryPeer::updateAccessControl($this->getPartnerId(), $this->id, $defaultAccessControl);
 		}
 		
 		return parent::preSave($con);
@@ -269,6 +269,8 @@ class accessControl extends BaseaccessControl
 		
 		return $this->isDefault;
 	}
+
+	public function getPartner()    { return PartnerPeer::retrieveByPK( $this->getPartnerId() ); }
 	
 	public function getCacheInvalidationKeys()
 	{

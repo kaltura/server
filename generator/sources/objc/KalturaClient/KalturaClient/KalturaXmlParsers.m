@@ -121,7 +121,7 @@ static void XMLCDECL saxCallbackError (void *ctx,
 - (void)processData:(NSData*)aData
 {
     [self retain];      // make sure we don't release _xmlCtx from within xmlParseChunk
-    xmlParseChunk(self->_xmlCtx, aData.bytes, aData.length, 0);
+    xmlParseChunk(self->_xmlCtx, aData.bytes, (int)aData.length, 0);
     [self release];
 }
 
@@ -467,7 +467,7 @@ static void XMLCDECL saxCallbackError (void *ctx,
     NSString* postfix = @"";
     if (aIsSimple)
         postfix = @"FromString";
-    NSMutableString* selName = [[NSString alloc] initWithFormat:@"set%@%@:", self->_lastTagCapitalized, postfix];
+    NSMutableString* selName = [[NSMutableString alloc] initWithFormat:@"set%@%@:", self->_lastTagCapitalized, postfix];
     SEL sel = NSSelectorFromString(selName);
     [selName release];
     
@@ -710,7 +710,7 @@ static void XMLCDECL saxCallbackError (void *ctx,
 
 - (int)reqCount
 {
-    return self->_subParsers.count;
+    return (int)self->_subParsers.count;
 }
 
 - (void)parser:(KalturaLibXmlWrapper *)aParser didStartElement:(NSString *)aElementName
@@ -731,8 +731,8 @@ static void XMLCDECL saxCallbackError (void *ctx,
 {
     if (self->_reqIndex < self->_subParsers.count)
     {
-        NSNumber* receivedNum = [NSNumber numberWithInt:self->_reqIndex];
-        NSNumber* expectedNum = [NSNumber numberWithInt:self->_subParsers.count];
+        NSNumber* receivedNum = [NSNumber numberWithInt:(int)self->_reqIndex];
+        NSNumber* expectedNum = [NSNumber numberWithInt:(int)self->_subParsers.count];
         self.error = [NSError errorWithDomain:KalturaClientErrorDomain code:KalturaClientErrorMissingMultiReqItems userInfo:[NSDictionary dictionaryWithObjectsAndKeys:@"Didn't get enough multi request items in the response", NSLocalizedDescriptionKey, receivedNum, @"ReceivedNum", expectedNum, @"ExpectedNum", nil]];         
         [self.delegate parsingFailed:self];
         return;

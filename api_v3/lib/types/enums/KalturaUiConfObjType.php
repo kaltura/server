@@ -25,4 +25,5 @@ class KalturaUiConfObjType extends KalturaEnum
 	const CLIPPER = 18;
 	const KSR = 19;
 	const KUPLOAD = 20;
+	const WEBCASTING = 21;
 }

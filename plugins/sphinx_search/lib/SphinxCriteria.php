@@ -375,7 +375,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 		// attach all default criteria from peer
 		$objectClass::getDefaultCriteriaFilter()->applyFilter($this);
 		
-		if(!$this->hasAdvancedSearchFilter && !count($this->matchClause) && $this->shouldSkipSphinx())
+		if(!$this->hasAdvancedSearchFilter && !count($this->matchClause) && $this->shouldSkipSphinx() && !isset($this->groupByColumn) && !isset($this->selectColumn))
 		{
 			KalturaLog::debug('Skip Sphinx');
 			$this->sphinxSkipped = true;
@@ -1022,5 +1022,73 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 		$objectClass = $this->getIndexObjectName();
 		$sphinxColumnName = $objectClass::getIndexFieldName($name);
 		$this->groupByColumn = $sphinxColumnName;
+	}
+	
+	public function addFreeTextToMatchClauseByMatchFields($freeTexts, $matchFields, $additionalConditions = null, $isLikeExpr = false)
+	{
+		if(!$additionalConditions)
+			$additionalConditions = array();
+		
+		if(preg_match('/^"[^"]+"$/', $freeTexts))
+		{
+			$freeText = str_replace('"', '', $freeTexts);
+			$freeText = SphinxUtils::escapeString($freeText);
+			$freeText = "^$freeText$";
+			$condition = "@(" . $matchFields . ") $freeText";
+			if($isLikeExpr)
+				$condition .= "\\\*";
+			$additionalConditions[] = $condition;
+		}
+		else
+		{
+			$useInSeperator = true;
+			if(strpos($freeTexts, baseObjectFilter::IN_SEPARATOR) > 0)
+			{
+				str_replace(baseObjectFilter::AND_SEPARATOR, baseObjectFilter::IN_SEPARATOR, $freeTexts);
+				$freeTextsArr = explode(baseObjectFilter::IN_SEPARATOR, $freeTexts);
+			}
+			else{
+				$useInSeperator = false;
+				$freeTextsArr = explode(baseObjectFilter::AND_SEPARATOR, $freeTexts);	
+			}
+				
+			foreach($freeTextsArr as $valIndex => $valValue)
+			{
+				if(!is_numeric($valValue) && strlen($valValue) <= 0)
+					unset($freeTextsArr[$valIndex]);
+				else
+					$freeTextsArr[$valIndex] = SphinxUtils::escapeString($valValue);
+			}
+			
+			if($useInSeperator)
+			{
+				foreach($freeTextsArr as $freeText)
+				{
+					$condition = "@(" . $matchFields . ") $freeText";
+					if($isLikeExpr)
+						$condition .= "\\\*";
+					$additionalConditions[] = $condition;
+				}
+			}
+			else
+			{
+				$freeTextsArr = array_unique($freeTextsArr);
+				$freeTextExpr = implode(baseObjectFilter::AND_SEPARATOR, $freeTextsArr);
+				$condition = "@(" . $matchFields . ") $freeTextExpr";
+				if($isLikeExpr)
+					$condition .= "\\\*";
+				$additionalConditions[] = $condition;
+			}
+		}
+			
+		if(count($additionalConditions))
+		{	
+			$additionalConditions = array_unique($additionalConditions);
+			$matches = reset($additionalConditions);
+			if(count($additionalConditions) > 1)
+				$matches = '( ' . implode(' ) | ( ', $additionalConditions) . ' )';
+				
+			$this->matchClause[] = $matches;
+		}
 	}
 }

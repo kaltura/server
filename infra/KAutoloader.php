@@ -52,10 +52,14 @@ class KAutoloader
 			if (function_exists('apc_fetch'))
 			{
 				$classPath = apc_fetch(self::$_classMapCacheKey . $class);
-				if ($classPath !== false)
+				if (is_string($classPath))
 				{
-					if ($classPath)
-						require_once($classPath);
+					require_once($classPath);
+					return;
+				}
+
+				if (is_null($classPath))
+				{
 					return;
 				}
 				

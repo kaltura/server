@@ -91,13 +91,13 @@ public class KalturaParams extends HashMap<String, String> {
 			this.put(key, Long.toString(value));
 	}
 
-	public void add(String key, float value) {
-		if (value == KalturaParamsValueDefaults.KALTURA_UNDEF_FLOAT)
+	public void add(String key, double value) {
+		if (value == KalturaParamsValueDefaults.KALTURA_UNDEF_DOUBLE)
 			return;
-		if (value == KalturaParamsValueDefaults.KALTURA_NULL_FLOAT)
+		if (value == KalturaParamsValueDefaults.KALTURA_NULL_DOUBLE)
 			putNull(key);
 		else
-			this.put(key, Float.toString(value));
+			this.put(key, Double.toString(value));
 	}
 
 	public void add(String key, String value) {

@@ -287,16 +287,19 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 			 	foreach (\$this->oldCustomDataValues as \$namespace => \$namespaceValues){
                 	foreach(\$namespaceValues as \$name => \$oldValue)
 					{
+						\$newValue = null;
 						if (\$namespace)
 						{
-							\$newValue = \$valuesToChangeTo[\$namespace][\$name];
+							if (isset (\$valuesToChangeTo[\$namespace][\$name]))
+								\$newValue = \$valuesToChangeTo[\$namespace][\$name];
 						}
 						else
 						{ 
 							\$newValue = \$valuesToChangeTo[\$name];
 						}
 					 
-						\$this->putInCustomData(\$name, \$newValue, \$namespace);
+						if (!is_null(\$newValue))
+							\$this->putInCustomData(\$name, \$newValue, \$namespace);
 					}
                    }
                    
@@ -582,7 +585,7 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 	/**
 	 * Code to be run before persisting the object
 	 * @param PropelPDO \$con
-	 * @return bloolean
+	 * @return boolean
 	 */
 	public function preSave(PropelPDO \$con = null)
 	{";

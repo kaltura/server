@@ -38,9 +38,9 @@ class kKontikiStorageDeleteJobData extends kStorageDeleteJobData
         return $this->serviceToken;
     }
     
-    public function setJobData(StorageProfile $storage, FileSync $filesync)
+    public function setJobData(StorageProfile $storage, FileSync $fileSync)
     {
-        /* @var $externalStorage KontikiStorageProfile */
+        /* @var $storage KontikiStorageProfile */
         $this->setServerUrl($storage->getStorageUrl()); 
         $this->setServiceToken($storage->getServiceToken()); 
         if ($fileSync->getObjectType() != FileSyncObjectType::ASSET)

@@ -80,6 +80,11 @@ function handleFile($filePath)
 	list($order, $objectType, $fileExtension) = explode('.', $fileName, 3);
 	$objectConfigurations = parse_ini_file($filePath, true);
 
+	$object = new $objectType();
+	/* @var $object BaseObject */
+	$peer = $object->getPeer();
+	$peerClass = get_class($peer);
+	
 	$newObjectType = "Insert{$objectType}";
 	if(!class_exists($newObjectType))
 	{
@@ -109,7 +114,7 @@ function handleFile($filePath)
 								$this->setNew(false);
 								$this->objectSaved = true;
 							} else {
-								$affectedObjects = ' . $objectType . 'Peer::doUpdate($this, $con);
+								$affectedObjects = ' . $peerClass . '::doUpdate($this, $con);
 								if($affectedObjects)
 									$this->objectSaved = true;
 									
@@ -126,10 +131,7 @@ function handleFile($filePath)
 			}
 		');
 	}
-	$object = new $newObjectType();
-	/* @var $object BaseObject */
 
-	$peer = $object->getPeer();
 	$map = $peer->getTableMap();
 	$primaryKeys = $map->getPrimaryKeys();
 

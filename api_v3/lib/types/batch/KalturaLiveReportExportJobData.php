@@ -11,6 +11,11 @@ class KalturaLiveReportExportJobData extends KalturaJobData
 	public $timeReference; 
 	
 	/**
+	 * @var int
+	 */
+	public $timeZoneOffset;
+	
+	/**
 	 * @var string
 	 */
 	public $entryIds;
@@ -28,6 +33,7 @@ class KalturaLiveReportExportJobData extends KalturaJobData
 	private static $map_between_objects = array
 	(
 			"timeReference" ,
+			"timeZoneOffset",
 			"entryIds" ,
 			'outputPath',
 			"recipientEmail",

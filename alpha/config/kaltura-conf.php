@@ -230,5 +230,8 @@ return array (
     'FileAssetTableMap' => 'lib/model/map/FileAssetTableMap.php',
     'FileAssetPeer' => 'lib/model/FileAssetPeer.php',
     'FileAsset' => 'lib/model/FileAsset.php',
+    'KuserKgroupTableMap' => 'lib/model/map/KuserKgroupTableMap.php',
+    'KuserKgroupPeer' => 'lib/model/KuserKgroupPeer.php',
+    'KuserKgroup' => 'lib/model/KuserKgroup.php',
   ),
 );

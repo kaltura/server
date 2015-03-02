@@ -107,6 +107,7 @@
 	<field name="dynamic_attributes" indexName="dynamic_attributes" type="json" matchable="yes" />
 	<field name="first_broadcast" indexName="dynamic_attributes.first_broadcast" type="null" searchableonly="yes" orderable="yes" />
 	<field name="user_names" indexName="user_names" type="string"/>
+	<field name="source" indexName="source" type="int"/>
 	<field name="plugins_data" indexName="plugins_data" type="string" searchableonly="yes" matchable="yes" />
 	<field name="search_text" indexName="(name,tags,description,entry_id,reference_id,roots,puser_id)" type="null" searchableonly="yes" matchable="yes" />
 	<index format="P%sST%s">
@@ -147,5 +148,6 @@
 	<field name="first_name_or_last_name" indexName="(full_name,last_name)" type="null" searchableonly="yes" />
 	<field name="puser_id_or_screen_name" indexName="(puser_id,screen_name)" type="null" searchableonly="yes" />
 	<field name="plugins_data" indexName="plugins_data" type="string" searchableonly="yes" />
+	<field name="type" indexName="type" getter="type" type="int" />
 </object>
 </schema>

@@ -85,6 +85,17 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 	 */
 	public $lastBroadcast;
 	
+	/**
+	 * The time (unix timestamp in milliseconds) in which the entry broadcast started or 0 when the entry is off the air
+	 * @var float
+	 */
+	public $currentBroadcastStartTime;
+	
+	/**
+	 * @var KalturaLiveEntryRecordingOptions
+	 * @insertonly
+	 */
+	public $recordingOptions;
 	
 	private static $map_between_objects = array
 	(
@@ -99,6 +110,8 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 		"firstBroadcast",
 		"lastBroadcast",
 		"publishConfigurations",
+		"currentBroadcastStartTime",
+		"recordingOptions",
 	);
 	
 	/* (non-PHPdoc)
@@ -116,8 +129,24 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 			
 		return parent::toInsertableObject($sourceObject, $propsToSkip);
 	}
-
 	
+	/* (non-PHPdoc)
+	 * @see KalturaMediaEntry::fromObject()
+	 */
+	public function fromObject ( $dbObject )
+	{
+		if(!($dbObject instanceof LiveEntry))
+			return;
+			
+		parent::fromObject($dbObject);
+
+		if(!is_null($dbObject->getRecordingOptions()))
+		{
+			$this->recordingOptions = new KalturaLiveEntryRecordingOptions();
+			$this->recordingOptions->fromObject($dbObject->getRecordingOptions());
+		}
+	}
+
 	public function validateConversionProfile(entry $sourceObject = null)
 	{
 		if(!is_null($this->conversionProfileId) && $this->conversionProfileId != conversionProfile2::CONVERSION_PROFILE_NONE)

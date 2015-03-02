@@ -1,4 +1,363 @@
+
+----------
+# Jupiter-10.5.0 #
+
+##Flavor-asset status HTTP Notifications##
+- Issue Type: new feature
+- Issue ID: PS-2065
+
+### Configuration ###
+None
+
+###Installation  
+- Run:  
+php /opt/kaltura/app/tests/standAloneClient/exec.php /opt/kaltura/app/tests/standAloneClient/flavorAssetHttpNotifications.xml  
+
+#### Known Issues & Limitations ####
+
+None.
+
+##Support MPEG-DASH Delivery Profile##
+- Issue Type: New Feature
+- Issue ID: PLAT-2064
+
+#### Configuration ####
+
+None.
+
+#### Deployment Scripts ####
+
+		php deployment/updates/scripts/2014_12_08_create_dash_delivery_profile.php
+
+#### Known Issues & Limitations ####
+
+No client side (player) failover support.  
+
+##Live Audio/Video async fix##
+- Issue ID: SUP-2942
+
+### Configuration ###
+- Add "params.ffprobeCmd = ffprobe" to 
+- - configurations/batch/workers.ini - KAsyncExtractMedia
+- - configurations/batch/live.workers.ini - KAsyncConcat
+
+
+## Business Process Management Integration ##
+Integration with Activiti BPM engine
+
+- Issue Type: New Feature
+
+#### Configuration ####
+
+*plugins.ini*
+
+Add the following line:
+
+		Integration		
+		IntegrationEventNotifications
+		BpmEventNotificationIntegration
+		BusinessProcessNotification
+		ActivitiBusinessProcessNotification
+
+*batch.ini*
+
+Add the following lines under `[template]` section:
+
+		enabledWorkers.KAsyncIntegrate						= 1
+		enabledWorkers.KAsyncIntegrateCloser				= 1
+
+Add the following lines as new sections:
+
+		[KAsyncIntegrate : JobHandlerWorker]
+		id													= 570
+		friendlyName										= Integrate
+		type												= KAsyncIntegrate
+		maximumExecutionTime								= 12000
+		scriptPath											= ../plugins/integration/batch/Integrate/KAsyncIntegrateExe.php
+		
+		[KAsyncIntegrateCloser : JobHandlerWorker]
+		id													= 580
+		friendlyName										= Integrate Closer
+		type												= KAsyncIntegrateCloser
+		maximumExecutionTime								= 12000
+		scriptPath											= ../plugins/integration/batch/Integrate/KAsyncIntegrateCloserExe.php
+		params.maxTimeBeforeFail							= 1000000
+
+
+#### Deployment Preparations ####
+
+ - Reload configuration: `touch cache/base.reload`.
+ - Clear cache: `rm -rf cache/*`.
+ - Install plugins: `php deployment/base/scripts/installPlugins.php`.
+ - Generate clients: `php generator/generate.php`.
+ - Restart batch: `/etc/init.d/kaltura-batch restart`.
+
+#### Deployment Scripts ####
+
+		mysql -uroot -p kaltura < deployment/updates/sql/2014_11_20_business_process_server.sql
+		php deployment/updates/scripts/add_permissions/2014_11_20_business_process_server_permissions.php
+		php deployment/updates/scripts/add_permissions/2015_01_20_dispatch_integration_job.php
+		php tests/standAloneClient/exec.php tests/standAloneClient/bpmNotificationsTemplates.xml
+
+#### Activiti Deployment Instructions ####
+
+ - Install [Apache Tomcat 7](http://tomcat.apache.org/tomcat-7.0-doc/setup.html#Unix_daemon "Apache Tomcat 7")
+ - Make sure $CATALINA_HOME is defined.
+ - Install [Apache Ant](http://ant.apache.org/manual/installlist.html "Apache Ant")
+ - Download [Activiti 5.17.0](https://github.com/Activiti/Activiti/releases/download/activiti-5.17.0/activiti-5.17.0.zip "Activiti 5.17.0")
+ - Open zip: `unzip activiti-5.17.0.zip`
+ - Copy WAR files: `cp activiti-5.17.0/wars/* $CATALINA_HOME/webapps/`
+ - Restart Apache Tomcat.
+ - Create DB **(replace tokens)**: `mysql -uroot -p`
+
+		CREATE DATABASE activiti;
+		GRANT INSERT,UPDATE,DELETE,SELECT,ALTER,CREATE ON activiti.* TO '@DB1_USER@'@'%';
+		FLUSH PRIVILEGES;
+
+ - Edit **(replace tokens)** $CATALINA_HOME/webapps/**activiti-explorer**/WEB-INF/classes/db.properties
+
+		jdbc.driver=com.mysql.jdbc.Driver
+		jdbc.url=jdbc:mysql://@DB1_HOST@:@DB1_PORT@/activiti
+		jdbc.username=@DB1_USER@
+		jdbc.password=@DB1_PASS@
+
+ - Edit **(replace tokens)** $CATALINA_HOME/webapps/**activiti-rest**/WEB-INF/classes/db.properties
+
+		jdbc.driver=com.mysql.jdbc.Driver
+		jdbc.url=jdbc:mysql://@DB1_HOST@:@DB1_PORT@/activiti
+		jdbc.username=@DB1_USER@
+		jdbc.password=@DB1_PASS@
+
+ - Download [mysql jdbc connector 5.0.8](http://cdn.mysql.com/Downloads/Connector-J/mysql-connector-java-5.0.8.zip "mysql jdbc connector 5.0.8")
+ - Open zip: `unzip mysql-connector-java-5.0.8.zip`
+ - Copy the mysql jdbc connector: `cp mysql-connector-java-5.0.8/mysql-connector-java-5.0.8-bin.jar $CATALINA_HOME/lib/`
+ - Restart Apache Tomcat.
+ - Open your browser to validate installation **(replace tokens)**: http://@WWW_HOST@:8080/activiti-explorer/
+	 - Username: kermit
+	 - Password: kermit
+ - Generate java pojo and bpmn clients **(replace tokens)**: `php @APP_DIR@/generator/generate.php pojo,bpmn`
+ - Edit deployment configuration file **(replace tokens)**: `cp @WEB_DIR@/content/clientlibs/bpmn/deploy/src/activiti.cfg.template.xml @WEB_DIR@/content/clientlibs/bpmn/deploy/src/activiti.cfg.xml`
+ - Deploy processes **(replace tokens)**:
+	 - `cd @WEB_DIR@/content/clientlibs/bpmn`
+	 - `ant`
+ - Add Activiti server to Kaltura server using the API **(replace tokens)**: `php @APP_DIR@/tests/standAloneClient/exec.php @APP_DIR@/tests/standAloneClient/activitiServer.xml`
+
+##Caption added HTTP Notifications##
+- Issue Type: new feature
+- Issue ID: PLAT-2412
+
+### Configuration ###
+None
+
+###Installation  
+- Run:  
+php /opt/kaltura/app/tests/standAloneClient/exec.php /opt/kaltura/app/tests/standAloneClient/captionAssetHttpNotifications.xml  
+
+#### Known Issues & Limitations ####
+
+None.  
+
+----------
+# Jupiter-10.4.0 #
+
+##Drop Folder Email Notifications##
+- Issue Type - new feature 
+
+### Configuration ###
+*plugins.ini*  
+Add new line:  
+DropFolderEventNotifications
+
+###Installation  
+
+- Run:  
+php /opt/kaltura/app/deployment/base/scripts/installPlugins.php  
+- Run:  
+php /opt/kaltura/app/tests/standAloneClient/exec.php /opt/kaltura/app/tests/standAloneClient/emailDropFolderFileFailedStatus.xml  
+
+
+----------
+# Jupiter-10.2.0 #
+
+## Webex Fix ## 
+- Issue Type: bug fix
+
+#### Configuration ####
+
+*batch.ini* 
+
+Add the following to the KAsyncImport worker configuartion:
+
+params.webex.iterations                                                                 = 30  
+params.webex.sleep 
+
+## Unicorn Connector ##
+- Issue Type: New Feature
+
+#### Configuration ####
+
+*plugins.ini*
+
+Add the following line:
+
+		UnicornDistribution
+
+#### Deployment Scripts ####
+
+		php deployment/updates/scripts/add_permissions/2014_12_30_unicorn_callback_service.php
+
+##link externalmedia->add permission to basic permission objects##
+- Issue Type: Back-End Request
+- Issue ID: SUP-2708
+
+#### Configuration ####
+
+None.
+
+#### Deployment Scripts ####
+
+		php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2015_01_11_add_externalmedia_add_permissions.php
+
+#### Known Issues & Limitations ####
+
+None.
+
+##add flavorasset->getwebplayablebyentryid permission to basic playback role##
+- Issue Type: Back-End Request
+- Issue ID: KMS-5334
+
+#### Configuration ####
+
+None.
+
+#### Deployment Scripts ####
+
+		php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2015_01_11_add_base_playback_role_flavorasset_getwebplayablebyentryid_permission.php
+
+#### Known Issues & Limitations ####
+
+None.
+
+## Copy entitlement info from live entry to vod entry ##
+- Issue Type: New Feature
+- Issue ID: PLAT-2313
+
+#### Configuration ####
+
+*base.ini*
+
+Add the following line to the the event_consumers[] list
+
+		event_consumers[] = kObjectCreatedHandler
+
+#### Deployment Scripts ####
+
+None.
+
+#### Known Issues & Limitations ####
+
+None.
+
+## Scheduled Tasks Enhancements 2 ##
+- Issue Type: New Feature
+- Issue ID: PLAT-1631
+
+#### Configuration ####
+
+*plugins.ini*
+
+Add the following plugin to the list of plugins
+
+		ScheduledTaskContentDistribution
+
+#### Deployment Scripts ####
+
+		php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2014_11_25_scheduled_task_update.php
+
+#### Known Issues & Limitations ####
+
+None.
+
+# Jupiter-10.1.0 #
+
+## New UI Conf Type ##
+- Issue Type: New Feature
+- Issue ID: PLAT-2245
+
+#### Configuration ####
+
+*admin.ini*
+
+Add the following line to the end of the settings.uiConfTypes[] list
+
+		settings.uiConfTypes[] = Kaltura_Client_Enum_UiConfObjType::WEBCASTING
+
+#### Deployment Scripts ####
+
+None.
+
+#### Known Issues & Limitations ####
+
+None.
+
+## Allow cue point search combined with entry filter ##
+- Issue Type: New Feature
+- Issue ID: PLAT-2208
+
+#### Configuration ####
+
+None.
+
+#### Deployment Scripts ####
+
+Need to re-index the entry in order for the cue points to get indexed on it.
+
+#### Known Issues & Limitations ####
+
+None.
+
 # Jupiter-10.0.0 #
+
+## Change emails_en to templace ##
+- Issue Type: Back-End Request
+- Issue ID: PLAT-2244
+
+#### Configuration ####
+
+** emails_en **
+
+Requires cloning batch/batches/Mailer/emails_en.template.ini to batch/batches/Mailer/emails_en.ini and replace all place holders in it.
+
+
+#### Deployment Scripts ####
+
+None.
+
+#### Known Issues & Limitations ####
+
+None.
+
+
+## sourceType filter ##
+- Issue Type: Change Request
+- Issue ID: PLAT-2148
+
+#### Configuration ####
+
+** sphinx/kaltura.conf **
+
+Add the following line to the kaltura_entry class in configurations/sphinx/kaltura.conf (or merged from configurations/sphinx/kaltura.conf.template)
+
+	rt_attr_uint = source
+
+
+#### Deployment Scripts ####
+
+None.
+
+#### Known Issues & Limitations ####
+
+None.
 
 ##add user->get permission to basic user role##
 - Issue Type: Customer request
@@ -10,7 +369,7 @@ None.
 
 #### Deployment Scripts ####
 
-		php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2014_11_30_BASE_USER_SESSION_PERMISSION_add_USER_GET_permissions.php
+		php deployment/updates/scripts/add_permissions/2014_11_30_BASE_USER_SESSION_PERMISSION_add_USER_GET_permissions.php
 
 #### Known Issues & Limitations ####
 
@@ -150,6 +509,45 @@ Need to run an update SQL statment:
 None.
 
 # IX-9.19.6 #
+
+##Added PPT to image conversion##
+- Issue Type: Back-End Request
+- Issue ID: PLAT-1750
+
+#### Configuration ####
+In order to use, requires adding a new flavor_params such as: [Assuming 10025 == document / assetType / Image]
+
+	INSERT INTO flavor_params VALUES (581230,0,0,'PPT 2 Image','',NULL,'PPT 2 Image',0,'0000-00-00 00:00:00','0000-00-00 00:00:00',NULL,0,'jpg','',1,'',0,0,0,0,0,0,0,0,0,NULL,NULL,'a:3:{s:18:\"FlavorVideoBitrate\";i:1;s:19:\"requiredPermissions\";a:0:{}s:9:"sizeWidth";i:940;}',0,NULL,1,0,0,'[[{\"id\":\"document.ppt2Img\",\"extra\":null,\"command\":null}]]',NULL,10025);
+
+Place PowerPointConvertor.exe and PowerPointConvertor.exe.config in the same directory on your windows machine.
+f.i. /opt/kaltura/exe
+
+Requires adding a new windows worker. Sample configuration - 
+
+	[KAsyncConvertPpt : KAsyncConvert]
+	id = XXXXX
+	friendlyName = Convert ppt
+	params.isRemoteInput = 1
+	params.isRemoteOutput = 0
+	maximumExecutionTime = 36000
+	maxJobsEachRun = 1
+	filter.jobSubTypeIn = document.ppt2Img
+	params.ppt2ImgCmd = C:\opt\kaltura\exe\PowerPointConvertor.exe
+	baseLocalPath = C:\web\
+	baseTempSharedPath = /opt/kaltura/web/tmp/convert/
+	baseTempLocalPath = W:\tmp\convert\
+	params.localFileRoot = C:/output
+	params.remoteUrlDirectory = /output
+	params.fileCacheExpire = 36000
+	params.localTempPath = C:\opt\kaltura\tmp\convert
+	params.sharedTempPath = W:\tmp\convert\ 
+
+#### Deployment Scripts ####
+
+	php deployment/base/scripts/installPlugins.php
+
+#### Known Issues & Limitations ####
+None.
 
 ##add partner to 'exclude' list##
 - Issue Type: Customer request
@@ -494,7 +892,13 @@ Integration in process.
 ## Thumbnail encoder ##
 reverting the current encoder to the old one
 
-- Issue Type: Bug fix
+- Issue Type: 
+- 
+- 
+- 
+- 
+- 
+- Bug fix
 - Issue ID: SUP-2581
 
 #### Configuration ####

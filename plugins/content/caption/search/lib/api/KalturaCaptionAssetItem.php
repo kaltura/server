@@ -56,8 +56,12 @@ class KalturaCaptionAssetItem extends KalturaObject
 		$this->asset->fromObject($source_object->getAsset());
 		
 		$entry = $source_object->getEntry();
-		$this->entry = KalturaEntryFactory::getInstanceByType($entry->getType());
-		$this->entry->fromObject($entry);
+		
+		if ($entry)
+		{
+			$this->entry = KalturaEntryFactory::getInstanceByType($entry->getType());
+			$this->entry->fromObject($entry);
+		}
 			
 		return $ret;
 	}

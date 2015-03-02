@@ -29,14 +29,19 @@ To build the API:
 == TESTING THE API CLIENT LIBRARY ==
 
 To run the main class (Kaltura.java):
- - Edit the /src/KalturaTestConfig.java file, enter valid data to PARTNER_ID, SECRET and ADMIN_SECRET variables.
+ - Edit the src/com/kaltura/client/test/KalturaTestConfig.java file, enter valid data to ENDPOINT, PARTNER_ID, SECRET and ADMIN_SECRET variables.
  - Compile the client library.
  - Right click the Kaltura.java file and choose Debug As > Java Application.
 
 To run the JUnit test suite that accompanies this source:
- - Edit the /src/KalturaTestConfig.java file, enter valid data to PARTNER_ID, SECRET and ADMIN_SECRET variables.
+ - Edit the src/com/kaltura/client/test/KalturaTestConfig.java file, enter valid data to ENDPOINT,PARTNER_ID, SECRET and ADMIN_SECRET variables.
  - Compile the client library.
  - Right click the KalturaTestSuite.java file and choose Debug As > JUnit Test.
+
+To auto compile run the tests on a Linux ENV:
+ - Edit the src/com/kaltura/client/test/KalturaTestConfig.java file, enter valid data to ENDPOINT, PARTNER_ID, SECRET and ADMIN_SECRET variables.
+ - run ./testAPI/test.sh
+
   
 == SETUP log4j LOGGING IN ECLIPSE ==
 

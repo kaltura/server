@@ -134,6 +134,13 @@ class DocumentPlugin extends KalturaPlugin implements IKalturaPlugin, IKalturaSe
 			return new KOperationEngineImageMagick($constructorArgs['params']->imageMagickCmd, $constructorArgs['outFilePath']);
 		}
 		
+		if($baseClass == 'KOperationEngine' && $enumValue == KalturaConversionEngineType::PPT2IMG)
+		{
+			if(!isset($constructorArgs['params']) || !isset($constructorArgs['outFilePath']))
+				return null;
+			return new KOperationEnginePpt2Image($constructorArgs['params']->ppt2ImgCmd, $constructorArgs['outFilePath']);
+		}
+		
 		
 		// KDL ENGINES
 		
@@ -150,6 +157,11 @@ class DocumentPlugin extends KalturaPlugin implements IKalturaPlugin, IKalturaSe
 		if($baseClass == 'KDLOperatorBase' && $enumValue == self::getApiValue(DocumentConversionEngineType::IMAGEMAGICK_ENGINE))
 		{
 			return new KDLTranscoderImageMagick($enumValue);
+		}
+		
+		if($baseClass == 'KDLOperatorBase' && $enumValue == self::getApiValue(DocumentConversionEngineType::PPT2IMG_ENGINE))
+		{
+			return new KDLTranscoderPpt2Img($enumValue);
 		}
 		
 		return null;
