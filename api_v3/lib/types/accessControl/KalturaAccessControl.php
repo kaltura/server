@@ -174,9 +174,9 @@ class KalturaAccessControl extends KalturaObject implements IFilterable
 	/* (non-PHPdoc)
 	 * @see KalturaObject::fromObject()
 	 */
-	public function fromObject($dbObject, KalturaResponseProfileBase $responseProfile = null)
+	public function doFromObject($dbObject, KalturaResponseProfileBase $responseProfile = null)
 	{
-		parent::fromObject($dbObject, $responseProfile);
+		parent::doFromObject($dbObject, $responseProfile);
 		
 		if (!($dbObject instanceof accessControl))
 			return;

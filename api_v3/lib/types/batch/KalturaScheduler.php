@@ -127,9 +127,9 @@ class KalturaScheduler extends KalturaObject
 	 * @param Scheduler $dbData
 	 * @return KalturaScheduler
 	 */
-	public function fromObject($dbData, KalturaResponseProfileBase $responseProfile = null)
+	public function doFromObject($dbData, KalturaResponseProfileBase $responseProfile = null)
 	{
-		parent::fromObject($dbData, $responseProfile);
+		parent::doFromObject($dbData, $responseProfile);
 		
 		$statusesArray = $dbData->getStatuses();
 		if(is_array($statusesArray))

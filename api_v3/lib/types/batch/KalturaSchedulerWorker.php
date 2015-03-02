@@ -155,9 +155,9 @@ class KalturaSchedulerWorker extends KalturaObject
 	 * @param SchedulerWorker $dbData
 	 * @return KalturaScheduler
 	 */
-	public function fromObject($dbData, KalturaResponseProfileBase $responseProfile = null)
+	public function doFromObject($dbData, KalturaResponseProfileBase $responseProfile = null)
 	{
-		parent::fromObject($dbData, $responseProfile);
+		parent::doFromObject($dbData, $responseProfile);
 		
 		$this->typeName = BatchJob::getTypeName($this->type);
 		

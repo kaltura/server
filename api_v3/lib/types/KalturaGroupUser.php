@@ -76,12 +76,12 @@ class KalturaGroupUser extends KalturaObject implements IFilterable
 		return $dbObject;
 	}
 
-	public function fromObject($sourceObject)
+	public function doFromObject($sourceObject)
 	{
 		if(!$sourceObject)
 			return;
 			
-		parent::fromObject($sourceObject);
+		parent::doFromObject($sourceObject);
 	}
 	
 	public function getExtraFilters()

@@ -35,10 +35,10 @@ class KalturaEventFieldCondition extends KalturaCondition
 	/* (non-PHPdoc)
 	 * @see KalturaObject::fromObject()
 	 */
-	public function fromObject($dbObject, KalturaResponseProfileBase $responseProfile = null)
+	public function doFromObject($dbObject, KalturaResponseProfileBase $responseProfile = null)
 	{
 		/* @var $dbObject kEventFieldCondition */
-		parent::fromObject($dbObject, $responseProfile);
+		parent::doFromObject($dbObject, $responseProfile);
 		
 		$fieldType = get_class($dbObject->getField());
 		KalturaLog::debug("Loading KalturaBooleanField from type [$fieldType]");

@@ -38,9 +38,9 @@ class KalturaEmailNotificationUserRecipientProvider extends KalturaEmailNotifica
 	/* (non-PHPdoc)
 	 * @see KalturaObject::fromObject($source_object)
 	 */
-	public function fromObject($dbObject, KalturaResponseProfileBase $responseProfile = null)
+	public function doFromObject($dbObject, KalturaResponseProfileBase $responseProfile = null)
 	{
-		parent::fromObject($dbObject, $responseProfile);
+		parent::doFromObject($dbObject, $responseProfile);
 		if ($dbObject->getFilter())
 		{
 			$this->filter = new KalturaUserFilter();

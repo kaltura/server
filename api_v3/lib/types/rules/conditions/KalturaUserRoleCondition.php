@@ -41,9 +41,9 @@ class KalturaUserRoleCondition extends KalturaCondition
 		return parent::toObject($dbObject, $skip);
 	}
 
-	public function fromObject($srcObj, KalturaResponseProfileBase $responseProfile = null)
+	public function doFromObject($srcObj, KalturaResponseProfileBase $responseProfile = null)
 	{
 		/** @var $srcObj kUserRoleCondition */
-		parent::fromObject($srcObj, $responseProfile);
+		parent::doFromObject($srcObj, $responseProfile);
 	}
 }

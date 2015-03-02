@@ -46,11 +46,11 @@ class KalturaCaptionAssetItem extends KalturaObject
 		return array_merge ( parent::getMapBetweenObjects() , self::$map_between_objects );
 	}
 	
-	public function fromObject($source_object, KalturaResponseProfileBase $responseProfile = null)
+	public function doFromObject($source_object, KalturaResponseProfileBase $responseProfile = null)
 	{
 		/* @var $source_object CaptionAssetItem */
 		
-		$ret = parent::fromObject($source_object, $responseProfile);
+		$ret = parent::doFromObject($source_object, $responseProfile);
 		
 		if($this->shouldGet('asset', $responseProfile))
 		{

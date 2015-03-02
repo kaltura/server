@@ -153,9 +153,9 @@ class KalturaCrossKalturaDistributionProfile extends KalturaConfigurableDistribu
 		return $object_to_fill;
 	}
 	
-	public function fromObject($source_object, KalturaResponseProfileBase $responseProfile = null)
+	public function doFromObject($source_object, KalturaResponseProfileBase $responseProfile = null)
 	{
-	    parent::fromObject($source_object, $responseProfile);
+	    parent::doFromObject($source_object, $responseProfile);
 	    
 	    /* @var $source_object CrossKalturaDistributionProfile */
 	    $this->mapAccessControlProfileIds = KalturaKeyValueArray::fromKeyValueArray($source_object->getMapAccessControlProfileIds());

@@ -72,10 +72,10 @@ class KalturaComcastMrssDistributionProfile extends KalturaConfigurableDistribut
 		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
 	}
 	
-	public function fromObject($sourceObject, KalturaResponseProfileBase $responseProfile = null)
+	public function doFromObject($sourceObject, KalturaResponseProfileBase $responseProfile = null)
 	{
 		/* @var $sourceObject ComcastMrssDistributionProfile */
-		parent::fromObject($sourceObject, $responseProfile);
+		parent::doFromObject($sourceObject, $responseProfile);
 		
 		$keyValArray = new KalturaKeyValueArray();
 		$array = $sourceObject->getcPlatformTvSeries();

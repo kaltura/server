@@ -133,9 +133,9 @@ class KalturaGenericDistributionProvider extends KalturaDistributionProvider
 		return $object;		
 	}
 
-	public function fromObject($sourceObject, KalturaResponseProfileBase $responseProfile = null)
+	public function doFromObject($sourceObject, KalturaResponseProfileBase $responseProfile = null)
 	{
-		parent::fromObject($sourceObject, $responseProfile);
+		parent::doFromObject($sourceObject, $responseProfile);
 		
 		if($this->shouldGet('optionalThumbDimensions', $responseProfile))
 			$this->optionalThumbDimensions = KalturaDistributionThumbDimensionsArray::fromDbArray($sourceObject->getOptionalThumbDimensionsObjects());

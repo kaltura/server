@@ -200,9 +200,9 @@ abstract class KalturaBaseSyndicationFeed extends KalturaObject implements IFilt
 			throw new KalturaAPIException(KalturaErrors::SYNDICATION_FEED_KALTURA_DC_ONLY);
 	}
 	
-	public function fromObject($source_object, KalturaResponseProfileBase $responseProfile = null)
+	public function doFromObject($source_object, KalturaResponseProfileBase $responseProfile = null)
 	{
-		parent::fromObject($source_object, $responseProfile);
+		parent::doFromObject($source_object, $responseProfile);
 		if($this->shouldGet('feedUrl', $responseProfile) && isset($this->id) && $this->id)
 		{
 			$this->feedUrl = kConf::get('apphome_url') . '/api_v3/getFeed.php';

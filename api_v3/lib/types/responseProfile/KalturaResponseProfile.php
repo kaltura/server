@@ -173,10 +173,10 @@ class KalturaResponseProfile extends KalturaResponseProfileBase implements IFilt
 	/* (non-PHPdoc)
 	 * @see KalturaObject::fromObject($srcObj, $responseProfile)
 	 */
-	public function fromObject($srcObj, KalturaResponseProfileBase $responseProfile = null)
+	public function doFromObject($srcObj, KalturaResponseProfileBase $responseProfile = null)
 	{
 		/* @var $srcObj ResponseProfile */
-		parent::fromObject($srcObj, $responseProfile);
+		parent::doFromObject($srcObj, $responseProfile);
 		
 		if($srcObj->getFilter() && $this->shouldGet('filter', $responseProfile))
 		{

@@ -76,9 +76,9 @@ class KalturaCaptionAsset extends KalturaAsset
 		return array_merge ( parent::getMapBetweenObjects() , self::$map_between_objects );
 	}
 	
-	public function fromObject($source_object, KalturaResponseProfileBase $responseProfile = null)
+	public function doFromObject($source_object, KalturaResponseProfileBase $responseProfile = null)
 	{
-		$ret = parent::fromObject($source_object, $responseProfile);
+		$ret = parent::doFromObject($source_object, $responseProfile);
 				
 		if($this->shouldGet('languageCode', $responseProfile))
 		{

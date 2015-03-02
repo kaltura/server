@@ -119,7 +119,7 @@ abstract class KalturaObject
 		$thisProps = $thisRef->getProperties();
 	
 		// generate file header
-		$result = "<?php\nclass {$fromObjectClass} extends {$srcObjClass}\n{\n\tstatic function fromObject(\$apiObj, \$srcObj, KalturaResponseProfileBase \$responseProfile = null)\n\t{\n";
+		$result = "<?php\nclass {$fromObjectClass} extends {$srcObjClass}\n{\n\tstatic function doFromObject(\$apiObj, \$srcObj, KalturaResponseProfileBase \$responseProfile = null)\n\t{\n";
 	
 		if ($thisRef->requiresReadPermission())
 		{
@@ -345,7 +345,12 @@ abstract class KalturaObject
 		return true;
 	}
 	
-	public function fromObject($srcObj, KalturaResponseProfileBase $responseProfile = null)
+	protected function doFromObject($srcObj, KalturaResponseProfileBase $responseProfile = null)
+	{
+		
+	}
+	
+	final public function fromObject($srcObj, KalturaResponseProfileBase $responseProfile = null)
 	{
 		$thisClass = get_class($this);
 		$srcObjClass = get_class($srcObj);
@@ -372,6 +377,7 @@ abstract class KalturaObject
 		}
 	
 		$fromObjectClass::fromObject($this, $srcObj, $responseProfile);
+		$this->doFromObject($srcObj, $responseProfile);
 		
 		if($responseProfile)
 		{

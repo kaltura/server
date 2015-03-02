@@ -41,9 +41,9 @@ class KalturaDispatchEventNotificationObjectTask extends KalturaObjectTask
 		return $dbObject;
 	}
 
-	public function fromObject($srcObj, KalturaResponseProfileBase $responseProfile = null)
+	public function doFromObject($srcObj, KalturaResponseProfileBase $responseProfile = null)
 	{
-		parent::fromObject($srcObj, $responseProfile);
+		parent::doFromObject($srcObj, $responseProfile);
 
 		/** @var kObjectTask $srcObj */
 		$this->eventNotificationTemplateId = $srcObj->getDataValue('eventNotificationTemplateId');

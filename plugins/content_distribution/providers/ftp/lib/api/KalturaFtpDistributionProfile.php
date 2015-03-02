@@ -138,8 +138,8 @@ class KalturaFtpDistributionProfile extends KalturaConfigurableDistributionProfi
 		return $dbObject;
 	}
 	
-	public function fromObject($source_object, KalturaResponseProfileBase $responseProfile = null)
+	public function doFromObject($source_object, KalturaResponseProfileBase $responseProfile = null)
 	{
-		parent::fromObject($source_object, $responseProfile);
+		parent::doFromObject($source_object, $responseProfile);
 	}
 }

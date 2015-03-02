@@ -115,9 +115,9 @@ class KalturaGenericDistributionProfile extends KalturaDistributionProfile
 		return $object;		
 	}
 
-	public function fromObject($object, KalturaResponseProfileBase $responseProfile = null)
+	public function doFromObject($object, KalturaResponseProfileBase $responseProfile = null)
 	{
-		parent::fromObject($object, $responseProfile);
+		parent::doFromObject($object, $responseProfile);
 		
 		foreach(self::$actions as $action)
 		{

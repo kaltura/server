@@ -327,6 +327,12 @@ class KalturaPartner extends KalturaObject implements IFilterable
 	public function fromPartner(Partner $partner)
 	{
 		parent::fromObject($partner);
+		return $this;
+	}
+	
+	public function doFromObject($partner, KalturaResponseProfileBase $responseProfile = null)
+	{
+		self::doFromObject($partner);
 		
 		$this->name = kString::stripUtf8InvalidChars($this->name);
 		$this->description = kString::stripUtf8InvalidChars($this->description);
@@ -338,13 +344,6 @@ class KalturaPartner extends KalturaObject implements IFilterable
 		if (!$this->cdnHost){
 			$this->cdnHost = null;
 		}
-		
-		return $this;
-	}
-	
-	public function fromObject($source_object, KalturaResponseProfileBase $responseProfile = null)
-	{
-		return self::fromPartner($source_object);
 	}
 	
 	

@@ -26,12 +26,12 @@ class KalturaDistributionValidationErrorMissingThumbnail extends KalturaDistribu
 		return $dbObject;
 	}
 	
-	public function fromObject($sourceObject, KalturaResponseProfileBase $responseProfile = null)
+	public function doFromObject($sourceObject, KalturaResponseProfileBase $responseProfile = null)
 	{
 		if(!$sourceObject)
 			return;
 			
-		parent::fromObject($sourceObject, $responseProfile);
+		parent::doFromObject($sourceObject, $responseProfile);
 		
 		if($this->shouldGet('dimensions', $responseProfile))
 		{
