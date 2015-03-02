@@ -18,7 +18,7 @@ class KalturaConversionProfileFilter extends KalturaConversionProfileBaseFilter
 	 */
 	public function getListResponse(KalturaFilterPager $pager, KalturaResponseProfileBase $responseProfile = null)
 	{
-		$conversionProfile2Filter = $this->toObject($conversionProfile2Filter);
+		$conversionProfile2Filter = $this->toObject();
 
 		$c = new Criteria();
 		$conversionProfile2Filter->attachToCriteria($c);
