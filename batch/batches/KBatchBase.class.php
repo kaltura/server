@@ -6,6 +6,8 @@
  */
 abstract class KBatchBase implements IKalturaLogger
 {
+	const PRIVILEGE_BATCH_JOB_TYPE = "jobtype";
+	
 	/**
 	 * @var KSchedularTaskConfig
 	 */
@@ -281,6 +283,14 @@ abstract class KBatchBase implements IKalturaLogger
 	}
 
 	/**
+	 * @return array
+	 */
+	protected function getPrivileges()
+	{
+		return array('disableentitlement');
+	}
+
+	/**
 	 * @return string
 	 */
 	private function createKS()
@@ -288,7 +298,7 @@ abstract class KBatchBase implements IKalturaLogger
 		$partnerId = self::$taskConfig->getPartnerId();
 		$sessionType = KalturaSessionType::ADMIN;
 		$puserId = 'batchUser';
-		$privileges = 'disableentitlement';
+		$privileges = implode(',', $this->getPrivileges());
 		$adminSecret = self::$taskConfig->getSecret();
 		$expiry = 60 * 60 * 24 * 30; // 30 days
 

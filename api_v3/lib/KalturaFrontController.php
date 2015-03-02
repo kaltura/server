@@ -343,7 +343,7 @@ class KalturaFrontController
 					break;
 					
 				case kCoreException::MAX_CATEGORIES_PER_ENTRY:
-					$object = new KalturaAPIException(KalturaErrors::MAX_CATEGORIES_FOR_ENTRY_REACHED, entry::MAX_CATEGORIES_PER_ENTRY);
+					$object = new KalturaAPIException(KalturaErrors::MAX_CATEGORIES_FOR_ENTRY_REACHED, $ex->getData());
 					break;
 					
 				case kCoreException::MAX_ASSETS_PER_ENTRY:

@@ -1235,6 +1235,25 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		return $dynamicAttributes;
 	}
 	
+	public function getMaxCategoriesPerEntry()
+	{
+		$maxCategoriesPerEntry = entry::MAX_CATEGORIES_PER_ENTRY;
+		if(PermissionPeer::isValidForPartner(PermissionName::FEATURE_DISABLE_CATEGORY_LIMIT, $this->getPartnerId()))
+			$maxCategoriesPerEntry = entry::MAX_CATEGORIES_PER_ENTRY_DISABLE_LIMIT_FEATURE;
+			
+		// When batch move entry between categories it's adding the new category before deleting the old one
+		if(kCurrentContext::$ks_partner_id = Partner::BATCH_PARTNER_ID && kCurrentContext::$ks_object)
+		{
+			$batchJobType = kCurrentContext::$ks_object->getPrivilegeValue(ks::PRIVILEGE_BATCH_JOB_TYPE);
+			if(intval($batchJobType) == BatchJobType::MOVE_CATEGORY_ENTRIES)
+			{
+				$maxCategoriesPerEntry *= 2;
+			}
+		}
+		
+		return $maxCategoriesPerEntry;
+	}
+	
 	/**
 	 * Set the categories (use only the most child categories)
 	 *
@@ -1249,8 +1268,9 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		
 		$this->trimCategories($newCats);
 		
-		if (count($newCats) > self::MAX_CATEGORIES_PER_ENTRY)
-			throw new kCoreException("Max number of allowed entries per category was reached", kCoreException::MAX_CATEGORIES_PER_ENTRY);
+		$maxCategoriesPerEntry = $this->getMaxCategoriesPerEntry();
+		if (count($newCats) > $maxCategoriesPerEntry)
+			throw new kCoreException("Max number of allowed entries per category was reached", kCoreException::MAX_CATEGORIES_PER_ENTRY, $maxCategoriesPerEntry);
 
 		// remove duplicates
 		$newCats = array_unique($newCats);
@@ -1270,8 +1290,9 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		
 		$this->trimCategories($newCats);
 		
-		if (count($newCats) > self::MAX_CATEGORIES_PER_ENTRY)
-			throw new kCoreException("Max number of allowed entries per category was reached", kCoreException::MAX_CATEGORIES_PER_ENTRY);
+		$maxCategoriesPerEntry = $this->getMaxCategoriesPerEntry();
+		if (count($newCats) > $maxCategoriesPerEntry)
+			throw new kCoreException("Max number of allowed entries per category was reached", kCoreException::MAX_CATEGORIES_PER_ENTRY, $maxCategoriesPerEntry);
 
 		// remove duplicates
 		$newCats = array_unique($newCats);

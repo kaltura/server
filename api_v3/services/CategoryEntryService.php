@@ -39,9 +39,8 @@ class CategoryEntryService extends KalturaBaseService
 			
 		$categoryEntries = categoryEntryPeer::retrieveActiveAndPendingByEntryId($categoryEntry->entryId);
 		
-		$maxCategoriesPerEntry = entry::MAX_CATEGORIES_PER_ENTRY;
-		if(PermissionPeer::isValidForPartner(PermissionName::FEATURE_DISABLE_CATEGORY_LIMIT, $entry->getPartnerId()))
-			$maxCategoriesPerEntry = entry::MAX_CATEGORIES_PER_ENTRY_DISABLE_LIMIT_FEATURE;
+		$maxCategoriesPerEntry = $entry->getMaxCategoriesPerEntry();
+			
 		if (count($categoryEntries) >= $maxCategoriesPerEntry)
 			throw new KalturaAPIException(KalturaErrors::MAX_CATEGORIES_FOR_ENTRY_REACHED, $maxCategoriesPerEntry);
 			
