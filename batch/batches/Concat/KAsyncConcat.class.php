@@ -224,20 +224,24 @@ class KAsyncConcat extends KJobHandlerWorker
 			$videoParamStr = "-c:v copy";
 	
 			/*
+			 * If no audio - skip.
 			 * For AAC source - copy audio,
 			 * otherwise - convert to AAC
 			 */
-		if(isset($mi) && isset($mi->audioFormat) && $mi->audioFormat=="aac")
-			$audioParamStr = "-c:a copy";
-		else
-			$audioParamStr = "-c:a libfdk_aac";
-		$audioParamStr.= " -bsf:a aac_adtstoasc";
+		$audioParamStr = null;
+		if(isset($mi->audioFormat) || isset($mi->audioCodecId) || isset($mi->audioDuration)) {
+			if(isset($mi->audioFormat) && $mi->audioFormat=="aac")
+				$audioParamStr = "-c:a copy";
+			else
+				$audioParamStr = "-c:a libfdk_aac";
+			$audioParamStr.= " -bsf:a aac_adtstoasc";
+		}
 	
 			/*
 			 * For fix-durtion-delta flow - split the input concat to separate video and audio streams,
 			 * otherwise - normal single input
 			 */
-		if($fixLargeDeltaFlag) {
+		if($fixLargeDeltaFlag && $audioParamStr) {
 			KalturaLog::log("Will attempt to fix the audio-video drift ");
 			$cmdStr = "$ffmpegBin -probesize 15M -analyzeduration 25M -i $concateStr -probesize 15M -analyzeduration 25M -i $concateStr";
 			$cmdStr.= " -map 0:v -map 1:a $videoParamStr $audioParamStr";
