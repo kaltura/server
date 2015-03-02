@@ -547,6 +547,22 @@ class asset extends Baseasset implements ISyncableFile
 
 		return $this->getDownloadUrlWithExpiry(86400, $useCdn, $forceProxy, $preview);
 	}
+
+	public function getServeFlavorUrl($entry)
+	{
+		if ($entry->getType() != entryType::MEDIA_CLIP)
+			KExternalErrors::dieError(KExternalErrors::INVALID_ENTRY_TYPE);
+
+		$url = myAssetUtils::getAssetUrl($this);
+		$name = $entry->getName();
+		$extension = $this->getFileExt();
+	
+		//adding a serveFlavor download parameter
+		$downloadAddition = "/fileName/$name.$extension";
+
+		return $url . $downloadAddition;
+	
+	}
 	
 	public function isKsNeededForDownload()
 	{
