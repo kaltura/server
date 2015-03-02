@@ -31,6 +31,8 @@ class serveFlavorAction extends kalturaAction
 		$flavorId = $this->getRequestParameter("flavorId");
 		$shouldProxy = $this->getRequestParameter("forceproxy", false);
 		$ks = $this->getRequestParameter( "ks" );
+		$fileName = $this->getRequestParameter( "fileName" );
+		$fileSize = $this->getRequestParameter("fileSize");
 		$fileParam = $this->getRequestParameter( "file" );
 		$fileParam = basename($fileParam);
 		$pathOnly = $this->getRequestParameter( "pathOnly", false );
@@ -45,7 +47,14 @@ class serveFlavorAction extends kalturaAction
 		$entryId = $this->getRequestParameter("entryId");
 		if (!is_null($entryId) && $flavorAsset->getEntryId() != $entryId)
 			KExternalErrors::dieError(KExternalErrors::FLAVOR_NOT_FOUND);
-		
+
+		if ($fileName)
+		{
+			header("Content-Disposition: attachment; filename=\"$fileName\"");
+			header("Content-Type: $fileName");
+			header( "Content-Description: File Transfer" );
+		}
+
 		$clipTo = null;
 //		$securyEntryHelper = new KSecureEntryHelper($entry, $ks, $referrer, ContextType::PLAY);
 //		if ($securyEntryHelper->shouldPreview())
@@ -222,8 +231,9 @@ class serveFlavorAction extends kalturaAction
 			requestUtils::sendCdnHeaders("flv", $rangeLength, 0);
 		else
 			requestUtils::sendCdnHeaders("flv", $rangeLength);
-			
-		header('Content-Disposition: attachment; filename="video.flv"');
+
+		if(!$fileName)
+			header('Content-Disposition: attachment; filename="video.flv"');
 				
 		// dont inject cuepoint into the stream
 		$cuepointTime = 0;
@@ -237,9 +247,15 @@ class serveFlavorAction extends kalturaAction
 		{
 			$this->logMessage( "serveFlavor: error closing db $e");
 		}
-		
-		header("Content-Type: video/x-flv");
-		$flvWrapper->dump(self::CHUNK_SIZE, $fromByte, $toByte, $audioOnly, $seekFromBytes, $rangeFrom, $rangeTo, $cuepointTime, $cuepointPos);
+		if(!$fileName)
+			header("Content-Type: video/x-flv");
+
+		if($fileSize)
+			$chunkSize = $fileSize;
+		else
+			$chunkSize = self::CHUNK_SIZE;
+	
+		$flvWrapper->dump($chunkSize, $fromByte, $toByte, $audioOnly, $seekFromBytes, $rangeFrom, $rangeTo, $cuepointTime, $cuepointPos);
 		KExternalErrors::dieGracefully();
 	}
 }

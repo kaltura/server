@@ -122,7 +122,7 @@ class downloadAction extends sfAction
 
 		$filePath = kFileSyncUtils::getReadyLocalFilePathForKey($syncKey);
 		
-		list($fileBaseName, $fileExt) = $this->getFileName($entry, $flavorAsset);
+		list($fileBaseName, $fileExt) = myAssetUtils::getFileName($entry, $flavorAsset);
 
 		if (!$fileName)
 			$fileName = $fileBaseName;
@@ -143,29 +143,6 @@ class downloadAction extends sfAction
 		$this->dumpFile($filePath, $fileName, $preview);
 		
 		KExternalErrors::dieGracefully(); // no view
-	}
-	
-	private function getFileName(entry $entry, flavorAsset $flavorAsset = null)
-	{
-		$fileExt = "";
-		$fileBaseName = $entry->getName();
-		if ($flavorAsset)
-		{
-			$flavorParams = $flavorAsset->getFlavorParams();
-			if ($flavorParams)
-				$fileBaseName = ($fileBaseName . " (" . $flavorParams->getName() . ")");
-					
-			$fileExt = $flavorAsset->getFileExt();
-		}
-		else
-		{
-			$syncKey = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA);
-			list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($syncKey, true, false);
-			if ($fileSync)
-				$fileExt = $fileSync->getFileExt();
-		}
-		
-		return array($fileBaseName, $fileExt);
 	}
 	
 	private function getSyncKeyAndForFlavorAsset(entry $entry, flavorAsset $flavorAsset)
@@ -193,12 +170,7 @@ class downloadAction extends sfAction
 		
 		return $syncKey;
 	}
-	
-	private static function encodeUrl($url)
-	{
-		return str_replace(array('?', '|', '*', '\\', '/' , '>' , '<', '&', '[', ']'), '_', $url);
-	}
-	
+
 	private function dumpFile($file_path, $file_name, $limit_file_size = 0)
 	{
 		$file_name = str_replace("\n", ' ', $file_name);
@@ -217,7 +189,7 @@ class downloadAction extends sfAction
 				$url .= "/relocate/";
 			}
 				
-			$url .= $this->encodeUrl($file_name);
+			$url .= myUrlUtils::encodeUrl($file_name);
 
 			kFile::cacheRedirect($url);
 
