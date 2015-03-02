@@ -353,6 +353,7 @@ index kaltura_kuser:kaltura_kuser_base
 	rt_field = role_ids
 	rt_attr_json = dynamic_attributes
 	rt_field = plugins_data
+	rt_attr_uint = type
 }
 
 index kaltura_category_kuser:kaltura_kuser_base
