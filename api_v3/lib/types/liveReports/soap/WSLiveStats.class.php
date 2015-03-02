@@ -11,7 +11,12 @@ class WSLiveStats extends WSBaseObject
 	 * @var long
 	 **/
 	public $audience;
-	
+
+    /**
+     * @var long
+     **/
+    public $dvrAudience;
+
 	/**
 	 * @var float
 	 **/
