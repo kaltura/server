@@ -37,8 +37,11 @@ class LiveReportsService extends KalturaBaseService
 			if(empty($object))
 				continue;
 			
-			$parts = explode(",", $object);
-			$resultsArray[$parts[0]] = $parts[1];
+            $parts = explode(",", $object);
+            $additionalValue = "";
+            if(count($parts) > 2)
+                $additionalValue = "," . $parts[2];
+            $resultsArray[$parts[0]] = $parts[1] . $additionalValue;
 		}
 		
 		$kResult = KalturaReportGraphArray::fromReportDataArray(array("audience" => $resultsArray));
