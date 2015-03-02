@@ -267,7 +267,7 @@ class flavorAsset extends asset
 		return $this->getBitrate();
 	}
 	
-	public function getServeFlavorUrl($fileSize = null)
+	public function getServeFlavorUrl($previewLength = null)
 	{
 		$entry = $this->getentry();
 
@@ -285,8 +285,8 @@ class flavorAsset extends asset
 		//adding a serveFlavor download parameter
 		$downloadAddition = "/fileName/$name";
 
-		if ($fileSize)
-			$downloadAddition .= "/fileSize/$fileSize";
+		if ($previewLength)
+			$downloadAddition .= "/clipTo/$previewLength";
 
 		return $url . $downloadAddition;
 	}

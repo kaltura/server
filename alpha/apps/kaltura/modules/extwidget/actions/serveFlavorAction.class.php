@@ -32,7 +32,6 @@ class serveFlavorAction extends kalturaAction
 		$shouldProxy = $this->getRequestParameter("forceproxy", false);
 		$ks = $this->getRequestParameter( "ks" );
 		$fileName = $this->getRequestParameter( "fileName" );
-		$fileSize = $this->getRequestParameter("fileSize");
 		$fileParam = $this->getRequestParameter( "file" );
 		$fileParam = basename($fileParam);
 		$pathOnly = $this->getRequestParameter( "pathOnly", false );
@@ -51,7 +50,7 @@ class serveFlavorAction extends kalturaAction
 		if ($fileName)
 		{
 			header("Content-Disposition: attachment; filename=\"$fileName\"");
-			header("Content-Type: $fileName");
+			header("Content-Type: application/force-download");
 			header( "Content-Description: File Transfer" );
 		}
 
@@ -232,9 +231,6 @@ class serveFlavorAction extends kalturaAction
 		else
 			requestUtils::sendCdnHeaders("flv", $rangeLength);
 
-		if(!$fileName)
-			header('Content-Disposition: attachment; filename="video.flv"');
-				
 		// dont inject cuepoint into the stream
 		$cuepointTime = 0;
 		$cuepointPos = 0;
@@ -247,15 +243,9 @@ class serveFlavorAction extends kalturaAction
 		{
 			$this->logMessage( "serveFlavor: error closing db $e");
 		}
-		if(!$fileName)
-			header("Content-Type: video/x-flv");
+		header("Content-Type: video/x-flv");
 
-		if($fileSize)
-			$chunkSize = $fileSize;
-		else
-			$chunkSize = self::CHUNK_SIZE;
-	
-		$flvWrapper->dump($chunkSize, $fromByte, $toByte, $audioOnly, $seekFromBytes, $rangeFrom, $rangeTo, $cuepointTime, $cuepointPos);
+		$flvWrapper->dump(self::CHUNK_SIZE, $fromByte, $toByte, $audioOnly, $seekFromBytes, $rangeFrom, $rangeTo, $cuepointTime, $cuepointPos);
 		KExternalErrors::dieGracefully();
 	}
 }

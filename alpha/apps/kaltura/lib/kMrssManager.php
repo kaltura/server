@@ -249,7 +249,7 @@ class kMrssManager
 			$mrss = new SimpleXMLElement('<item/>');
 			
 		$thumbnail = $mrss->addChild('thumbnail');
-		$thumbnail->addAttribute('url', myAssetUtils::getAssetUrl($thumbAsset));
+		$thumbnail->addAttribute('url', kString::getAssetUrl($thumbAsset));
 		$thumbnail->addAttribute('thumbAssetId', $thumbAsset->getId());
 		$thumbnail->addAttribute('isDefault', $thumbAsset->hasTag(thumbParams::TAG_DEFAULT_THUMB) ? 'true' : 'false');
 		$thumbnail->addAttribute('format', $thumbAsset->getContainerFormat());
@@ -273,21 +273,22 @@ class kMrssManager
 	 */
 	protected static function appendFlavorAssetMrss(flavorAsset $flavorAsset, SimpleXMLElement $mrss = null, kMrssParameters $mrssParams = null)
 	{
+		if(!$mrss)
+			$mrss = new SimpleXMLElement('<item/>');
+
 		$servePlayManifest = false;
 		$playManifestClientTag = null;
 		$storageId = null;
 
-		if(!$mrss)
-			$mrss = new SimpleXMLElement('<item/>');
-		else
+		if ($mrssParams)
 		{
-			$servePlayManifest = $mrss->getServePlayManifest();
-			$playManifestClientTag = $mrss->getPlayManifestClientTag();
-			$storageId = $mrss->getStorageId();
+			$servePlayManifest = $mrssParams->getServePlayManifest();
+			$playManifestClientTag = $mrssParams->getPlayManifestClientTag();
+			$storageId = $mrssParams->getStorageId();
 		}
 
 		$content = $mrss->addChild('content');
-		$content->addAttribute('url', myAssetUtils::getAssetUrl($flavorAsset, $servePlayManifest, $playManifestClientTag, $storageId));
+		$content->addAttribute('url', kString::getAssetUrl($flavorAsset, $servePlayManifest, $playManifestClientTag, $storageId));
 		$content->addAttribute('flavorAssetId', $flavorAsset->getId());
 		$content->addAttribute('isSource', $flavorAsset->getIsOriginal() ? 'true' : 'false');
 		$content->addAttribute('containerFormat', $flavorAsset->getContainerFormat());

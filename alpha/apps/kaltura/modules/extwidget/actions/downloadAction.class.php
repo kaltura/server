@@ -189,7 +189,7 @@ class downloadAction extends sfAction
 				$url .= "/relocate/";
 			}
 				
-			$url .= myUrlUtils::encodeUrl($file_name);
+			$url .= kString::stripInvalidUrlChars($file_name);
 
 			kFile::cacheRedirect($url);
 
