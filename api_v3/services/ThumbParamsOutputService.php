@@ -50,6 +50,11 @@ class ThumbParamsOutputService extends KalturaBaseService
 		if (!$filter)
 			$filter = new KalturaThumbParamsOutputFilter();
 			
+		if(!$pager)
+		{
+			$pager = new KalturaFilterPager();
+		}
+			
 		$types = KalturaPluginManager::getExtendedTypes(assetParamsOutputPeer::OM_CLASS, assetType::THUMBNAIL);
 		return $filter->getTypeListResponse($pager, $this->getResponseProfile(), $types);
 	}

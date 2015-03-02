@@ -790,6 +790,11 @@ class ThumbAssetService extends KalturaAssetService
 		if (!$filter)
 			$filter = new KalturaAssetFilter();
 			
+		if(!$pager)
+		{
+			$pager = new KalturaFilterPager();
+		}
+			
 		$types = KalturaPluginManager::getExtendedTypes(assetPeer::OM_CLASS, assetType::THUMBNAIL);
 		return $filter->getTypeListResponse($pager, $this->getResponseProfile(), $types);
 	}

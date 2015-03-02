@@ -143,6 +143,11 @@ class FlavorParamsService extends KalturaBaseService
 		if (!$filter)
 			$filter = new KalturaFlavorParamsFilter();
 			
+		if(!$pager)
+		{
+			$pager = new KalturaFilterPager();
+		}
+			
 		$types = assetParamsPeer::retrieveAllFlavorParamsTypes();			
 		return $filter->getTypeListResponse($pager, $this->getResponseProfile(), $types);
 	}

@@ -447,6 +447,11 @@ class FlavorAssetService extends KalturaAssetService
 		if (!$filter)
 			$filter = new KalturaAssetFilter();
 			
+		if(!$pager)
+		{
+			$pager = new KalturaFilterPager();
+		}
+		
 		$types = assetPeer::retrieveAllFlavorsTypes();
 		return $filter->getTypeListResponse($pager, $this->getResponseProfile(), $types);
 	}

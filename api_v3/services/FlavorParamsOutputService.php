@@ -50,6 +50,11 @@ class FlavorParamsOutputService extends KalturaBaseService
 		if (!$filter)
 			$filter = new KalturaFlavorParamsOutputFilter();
 			
+		if(!$pager)
+		{
+			$pager = new KalturaFilterPager();
+		}
+			
 		$types = KalturaPluginManager::getExtendedTypes(assetParamsOutputPeer::OM_CLASS, assetType::FLAVOR);
 		return $filter->getTypeListResponse($pager, $this->getResponseProfile(), $types);
 	}

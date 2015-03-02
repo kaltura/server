@@ -137,6 +137,11 @@ class CaptionParamsService extends KalturaBaseService
 	{
 		if (!$filter)
 			$filter = new KalturaCaptionParamsFilter();
+			
+		if(!$pager)
+		{
+			$pager = new KalturaFilterPager();
+		}
 
 		$types = KalturaPluginManager::getExtendedTypes(assetParamsPeer::OM_CLASS, CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION));			
 		return $filter->getTypeListResponse($pager, $this->getResponseProfile(), $types);
