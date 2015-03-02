@@ -369,7 +369,7 @@
 				<xs:documentation>Flavor asset audio codec</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
-		<xs:attribute name="frameRate" type="xs:int" use="optional">
+		<xs:attribute name="frameRate" type="xs:float" use="optional">
 			<xs:annotation>
 				<xs:documentation>Flavor asset frame rate</xs:documentation>
 			</xs:annotation>
