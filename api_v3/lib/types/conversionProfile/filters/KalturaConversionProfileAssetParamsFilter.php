@@ -87,7 +87,7 @@ class KalturaConversionProfileAssetParamsFilter extends KalturaConversionProfile
 		$pager->attachToCriteria($c);
 		$dbList = flavorParamsConversionProfilePeer::doSelect($c);
 		
-		$list = KalturaConversionProfileAssetParamsArray::fromDbArray($dbList, $this->getResponseProfile());
+		$list = KalturaConversionProfileAssetParamsArray::fromDbArray($dbList, $responseProfile);
 		$response = new KalturaConversionProfileAssetParamsListResponse();
 		$response->objects = $list;
 		$response->totalCount = $totalCount;
