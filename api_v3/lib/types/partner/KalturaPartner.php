@@ -332,7 +332,7 @@ class KalturaPartner extends KalturaObject implements IFilterable
 	
 	public function doFromObject($partner, KalturaDetachedResponseProfile $responseProfile = null)
 	{
-		self::doFromObject($partner);
+		parent::doFromObject($partner);
 		
 		$this->name = kString::stripUtf8InvalidChars($this->name);
 		$this->description = kString::stripUtf8InvalidChars($this->description);
