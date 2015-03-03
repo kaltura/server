@@ -122,7 +122,7 @@ class downloadAction extends sfAction
 
 		$filePath = kFileSyncUtils::getReadyLocalFilePathForKey($syncKey);
 		
-		list($fileBaseName, $fileExt) = myAssetUtils::getFileName($entry, $flavorAsset);
+		list($fileBaseName, $fileExt) = kAssetUtils::getFileName($entry, $flavorAsset);
 
 		if (!$fileName)
 			$fileName = $fileBaseName;
