@@ -114,6 +114,7 @@ class ThumbCuePointPlugin extends KalturaPlugin implements IKalturaCuePoint, IKa
 	 */
 	public static function contributeToSchema($type)
 	{
+
 		//TBD add thumb asset support to xsd
 		$coreType = kPluginableEnumsManager::apiToCore('SchemaType', $type);
 		if(
@@ -140,25 +141,10 @@ class ThumbCuePointPlugin extends KalturaPlugin implements IKalturaCuePoint, IKa
 							<xs:documentation>Indicates the thumb cue point sub type 1 = Slide 2 = Chapter</xs:documentation>
 						</xs:annotation>
 					</xs:element>
-					<xs:element maxOccurs="1" minOccurs="1" ref="slide" />
 					<xs:element ref="scene-extension" minOccurs="0" maxOccurs="unbounded" />
 				</xs:sequence>
 			</xs:extension>
 		</xs:complexContent>
-	</xs:complexType>
-	
-	<xs:complexType name="T_slide">
-		<xs:sequence>
-			<xs:choice maxOccurs="1" minOccurs="0">
-				<xs:element maxOccurs="1" minOccurs="0" ref="urlContentResource"></xs:element>
-				<xs:element maxOccurs="1" minOccurs="0" ref="remoteStorageContentResource"></xs:element>
-				<xs:element maxOccurs="1" minOccurs="0" ref="remoteStorageContentResources"></xs:element>
-				<xs:element maxOccurs="1" minOccurs="0" ref="assetContentResource"></xs:element>
-				<xs:element maxOccurs="1" minOccurs="0" ref="entryContentResource"></xs:element>
-				<xs:element maxOccurs="1" minOccurs="0" ref="contentResource-extension"></xs:element>
-			</xs:choice>
-		</xs:sequence>
-		<xs:attribute name="timedThumbAssetId" type="xs:string" use="optional"/>		
 	</xs:complexType>
 	
 	<xs:element name="scene-thumb-cue-point" type="T_scene_thumbCuePoint" substitutionGroup="scene">
@@ -171,24 +157,13 @@ class ThumbCuePointPlugin extends KalturaPlugin implements IKalturaCuePoint, IKa
 						<tags>
 							<tag>my_tag</tag>
 						</tags>
-						<slide>
-							<urlContentResource url="URL_TO_FILE"/>
-						</slide>
 					</scene-thumb-cue-point>
 				</example>
 			</xs:appinfo>
 		</xs:annotation>
 	</xs:element>
 	
-	<xs:element name="slide" type="T_slide">
-		<xs:annotation>
-			<xs:documentation>
-				The slide image to attahce to tht thumb cue point ellement
-			</xs:documentation>
-		</xs:annotation>
-	</xs:element>
-		';
-		
+		';	
 		return $xsd;
 	}
 	

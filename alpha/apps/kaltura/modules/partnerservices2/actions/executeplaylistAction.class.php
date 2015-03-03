@@ -121,7 +121,9 @@ class executeplaylistAction extends defPartnerservices2Action
 				"detailed" => $detailed,
 				"user" => kCurrentContext::$ks_uid,
 				"privileges" => $privileges,
-				"is_admin" => $this->isAdmin() );
+				"is_admin" => $this->isAdmin(),
+				"protocol" => infraRequestUtils::getProtocol(),
+			);
 			$cahce_key = new executionCacheKey( );
 			$cahce_key->expiry =  600 ;
 			$cahce_key->key = md5( print_r($cache_key_arr,true ) );

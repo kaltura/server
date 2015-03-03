@@ -1356,6 +1356,34 @@ class KalturaEntryService extends KalturaBaseService
 		$dbEntry->setKuserId($kuser->getId());
 	}
 	
+   	/**
+   	 * Throws an error if the non-onwer session user is trying to update entitledPusersEdit or entitledPusersPublish 
+   	 *
+   	 * @param KalturaBaseEntry $entry
+   	 * @param entry $dbEntry
+   	 */
+	protected function validateEntitledUsersUpdate(KalturaBaseEntry $entry, entry $dbEntry)
+	{	
+		if ((!$this->getKs() || !$this->getKs()->isAdmin()))
+		{
+			//non owner cannot change entitledUsersEdit and entitledUsersPublish
+			if($this->getKuser()->getId() != $dbEntry->getKuserId())
+			{
+				if($entry->entitledUsersEdit !== null && strtolower($entry->entitledUsersEdit) != strtolower($dbEntry->getEntitledPusersEdit())){
+					KalturaLog::debug('Update to entitledUsersEdit allowed only with admin KS or entry owner');
+					throw new KalturaAPIException(KalturaErrors::INVALID_KS, "", ks::INVALID_TYPE, ks::getErrorStr(ks::INVALID_TYPE));					
+					
+				}
+				
+				if($entry->entitledUsersPublish !== null && strtolower($entry->entitledUsersPublish) != strtolower($dbEntry->getEntitledPusersPublish())){
+					KalturaLog::debug('Update to entitledUsersPublish allowed only with admin KS or entry owner');
+					throw new KalturaAPIException(KalturaErrors::INVALID_KS, "", ks::INVALID_TYPE, ks::getErrorStr(ks::INVALID_TYPE));					
+					
+				}
+			}
+		}
+	}
+	
 	/**
 	 * Throws an error if trying to update admin only properties with normal user session
 	 *
@@ -1501,6 +1529,7 @@ class KalturaEntryService extends KalturaBaseService
 		
 		$this->checkAndSetValidUserUpdate($entry, $dbEntry);
 		$this->checkAdminOnlyUpdateProperties($entry);
+		$this->validateEntitledUsersUpdate($entry, $dbEntry);
 		$this->validateAccessControlId($entry);
 		$this->validateEntryScheduleDates($entry, $dbEntry); 
 		
