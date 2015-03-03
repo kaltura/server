@@ -249,7 +249,7 @@ class kMrssManager
 			$mrss = new SimpleXMLElement('<item/>');
 			
 		$thumbnail = $mrss->addChild('thumbnail');
-		$thumbnail->addAttribute('url', kString::getAssetUrl($thumbAsset));
+		$thumbnail->addAttribute('url', kAssetUtils::getAssetUrl($thumbAsset));
 		$thumbnail->addAttribute('thumbAssetId', $thumbAsset->getId());
 		$thumbnail->addAttribute('isDefault', $thumbAsset->hasTag(thumbParams::TAG_DEFAULT_THUMB) ? 'true' : 'false');
 		$thumbnail->addAttribute('format', $thumbAsset->getContainerFormat());
@@ -288,7 +288,7 @@ class kMrssManager
 		}
 
 		$content = $mrss->addChild('content');
-		$content->addAttribute('url', kString::getAssetUrl($flavorAsset, $servePlayManifest, $playManifestClientTag, $storageId));
+		$content->addAttribute('url', kAssetUtils::getAssetUrl($flavorAsset, $servePlayManifest, $playManifestClientTag, $storageId));
 		$content->addAttribute('flavorAssetId', $flavorAsset->getId());
 		$content->addAttribute('isSource', $flavorAsset->getIsOriginal() ? 'true' : 'false');
 		$content->addAttribute('containerFormat', $flavorAsset->getContainerFormat());
