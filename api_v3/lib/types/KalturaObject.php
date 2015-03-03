@@ -300,18 +300,17 @@ abstract class KalturaObject
 			$result .= "\t\t\$customData = unserialize(\$srcObj->custom_data);\n";
 		}
 	
-		$result .= "\t\t\$get = array(\n\t\t\t'" . implode("',\n\t\t\t'", array_keys($mappingFuncCode)) . "'\n\t\t);";
+		$result .= "\t\t\$get = array(\n\t\t\t'" . implode("' => true,\n\t\t\t'", array_keys($mappingFuncCode)) . " => true'\n\t\t);";
 		$result .= '
 		if($responseProfile){
-			$fieldsArray = array_map("trim", explode(",", $responseProfile->fields));
+			$fieldsArray = array_flip(array_map("trim", explode(",", $responseProfile->fields)));
 			if($responseProfile->type == ResponseProfileType::INCLUDE_FIELDS){
-				$get = array_intersect($get, $fieldsArray);
+				$get = array_intersectt_key($get, $fieldsArray);
 			}
 			else{
-				$get = array_diff($get, $fieldsArray);
+				$get = array_difft_key($get, $fieldsArray);
 			}
 		}
-		$get = array_flip($get);
 		';
 		
 		$result .= implode("\n\t\t", $mappingFuncCode) . "\n\t}\n}";
