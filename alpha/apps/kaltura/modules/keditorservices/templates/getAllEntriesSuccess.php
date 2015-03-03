@@ -5,8 +5,8 @@ if ( $debug ) { echo "Result<br><textarea cols=100 rows=50>"; }
 
 <assets>
 <?php
-assetsUtils::createAssets ( $kshow_entry_list , "show" );
-assetsUtils::createAssets ( $kuser_entry_list , "user" );
+kAssetUtils::createAssets ( $kshow_entry_list , "show" );
+kAssetUtils::createAssets ( $kuser_entry_list , "user" );
 ?>
 </assets>
 
