@@ -3,7 +3,7 @@
  * @package api
  * @subpackage objects
  */
-abstract class KalturaDetachedResponseProfile extends KalturaBaseResponseProfile
+class KalturaDetachedResponseProfile extends KalturaBaseResponseProfile
 {
 	/**
 	 * Friendly name
