@@ -435,7 +435,7 @@ class kString
 		return $values;
 	}
 	
-	public function stripInvalidUrlChars($url)
+	public static function stripInvalidUrlChars($url)
 	{
 		return str_replace(array('?', '|', '*', '\\', '/' , '>' , '<', '&', '[', ']'), '_', $url);
 	}
