@@ -138,6 +138,11 @@ class KalturaDetachedResponseProfile extends KalturaBaseResponseProfile
 	 */
 	public function toObject($object = null, $propertiesToSkip = array())
 	{
+		if(!$object)
+		{
+			$object = new kResponseProfile();
+		}
+		
 		if($this->filter)
 		{
 			$object->setFilterApiClassName(get_class($this->filter));
