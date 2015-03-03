@@ -14,7 +14,7 @@ class KalturaListResponse extends KalturaObject
 	/* (non-PHPdoc)
 	 * @see KalturaObject::loadRelatedObjects($responseProfile)
 	 */
-	public function loadRelatedObjects(KalturaResponseProfileBase $responseProfile)
+	public function loadRelatedObjects(KalturaDetachedResponseProfile $responseProfile)
 	{
 		if($this->objects)
 		{

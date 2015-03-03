@@ -103,7 +103,7 @@ abstract class KalturaTypedArray extends KalturaObject implements ArrayAccess, I
 	/* (non-PHPdoc)
 	 * @see KalturaObject::loadRelatedObjects($responseProfile)
 	 */
-	public function loadRelatedObjects(KalturaResponseProfileBase $responseProfile)
+	public function loadRelatedObjects(KalturaDetachedResponseProfile $responseProfile)
 	{
 		foreach($this as &$item)
 		{

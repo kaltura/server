@@ -94,7 +94,7 @@ class KalturaFreewheelDistributionJobProviderData extends KalturaDistributionJob
 	/* (non-PHPdoc)
 	 * @see KalturaObject::fromObject()
 	 */
-	public function doFromObject($object, KalturaResponseProfileBase $responseProfile = null)
+	public function doFromObject($object, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		parent::doFromObject($object, $responseProfile);
 		$videoAssetFilePaths = $object->getVideoAssetFilePaths();

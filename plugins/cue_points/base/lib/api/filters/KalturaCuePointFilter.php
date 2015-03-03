@@ -100,7 +100,7 @@ class KalturaCuePointFilter extends KalturaCuePointBaseFilter
 		return array($list, $c->getRecordsCount());
 	}
 	
-	public function getTypeListResponse(KalturaFilterPager $pager, KalturaResponseProfileBase $responseProfile = null, $type = null)
+	public function getTypeListResponse(KalturaFilterPager $pager, KalturaDetachedResponseProfile $responseProfile = null, $type = null)
 	{
 		list($list, $totalCount) = $this->doGetListResponse($pager, $type);
 		$response = new KalturaCuePointListResponse();
@@ -113,7 +113,7 @@ class KalturaCuePointFilter extends KalturaCuePointBaseFilter
 	/* (non-PHPdoc)
 	 * @see KalturaRelatedFilter::getListResponse()
 	 */
-	public function getListResponse(KalturaFilterPager $pager, KalturaResponseProfileBase $responseProfile = null)
+	public function getListResponse(KalturaFilterPager $pager, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		return $this->getTypeListResponse($pager, $responseProfile);
 	}

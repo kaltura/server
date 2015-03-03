@@ -75,7 +75,7 @@ class KalturaConversionProfileAssetParamsFilter extends KalturaConversionProfile
 	/* (non-PHPdoc)
 	 * @see KalturaRelatedFilter::getListResponse()
 	 */
-	public function getListResponse(KalturaFilterPager $pager, KalturaResponseProfileBase $responseProfile = null)
+	public function getListResponse(KalturaFilterPager $pager, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		$assetParamsConversionProfileFilter = $this->toObject();
 

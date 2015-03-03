@@ -155,7 +155,7 @@ class KalturaSchedulerWorker extends KalturaObject
 	 * @param SchedulerWorker $dbData
 	 * @return KalturaScheduler
 	 */
-	public function doFromObject($dbData, KalturaResponseProfileBase $responseProfile = null)
+	public function doFromObject($dbData, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		parent::doFromObject($dbData, $responseProfile);
 		

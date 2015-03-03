@@ -396,7 +396,7 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
 	}
 	
-	public function doFromObject($source_object, KalturaResponseProfileBase $responseProfile = null)
+	public function doFromObject($source_object, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		parent::doFromObject($source_object, $responseProfile);
 		

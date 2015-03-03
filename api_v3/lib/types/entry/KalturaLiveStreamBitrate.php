@@ -26,7 +26,7 @@ class KalturaLiveStreamBitrate extends KalturaObject
 	public $tags;
 	
 
-	public function doFromObject($source_object, KalturaResponseProfileBase $responseProfile = null)
+	public function doFromObject($source_object, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		if($this->shouldGet('bitrate', $responseProfile))
 			$this->bitrate = $source_object['bitrate'];

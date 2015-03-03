@@ -5,7 +5,7 @@
  */
 class KalturaBatchHistoryDataArray extends KalturaTypedArray
 {
-	public static function fromDbArray($arr, KalturaResponseProfileBase $responseProfile = null)
+	public static function fromDbArray($arr, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		$newArr = new KalturaBatchHistoryDataArray();
 		if ($arr == null)

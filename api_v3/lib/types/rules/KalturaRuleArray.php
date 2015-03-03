@@ -5,7 +5,7 @@
  */
 class KalturaRuleArray extends KalturaTypedArray
 {
-	public static function fromDbArray($arr, KalturaResponseProfileBase $responseProfile = null)
+	public static function fromDbArray($arr, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		KalturaLog::debug(print_r($arr, true));
 		$newArr = new KalturaRuleArray();

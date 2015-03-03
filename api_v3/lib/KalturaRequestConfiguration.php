@@ -20,7 +20,7 @@ class KalturaRequestConfiguration
 	
 	/**
 	 * Response profile
-	 * @var KalturaNestedResponseProfileBase
+	 * @var KalturaBaseResponseProfile
 	 */
 	public $responseProfile;
 }

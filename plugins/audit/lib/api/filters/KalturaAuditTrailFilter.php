@@ -63,7 +63,7 @@ class KalturaAuditTrailFilter extends KalturaAuditTrailBaseFilter
 	/* (non-PHPdoc)
 	 * @see KalturaRelatedFilter::getListResponse()
 	 */
-	public function getListResponse(KalturaFilterPager $pager, KalturaResponseProfileBase $responseProfile = null)
+	public function getListResponse(KalturaFilterPager $pager, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		$auditTrailFilter = $this->toObject();
 		

@@ -87,7 +87,7 @@ class KalturaShortLink extends KalturaObject implements IFilterable
 		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
 	}
 	
-	public function doFromObject($object, KalturaResponseProfileBase $responseProfile = null)
+	public function doFromObject($object, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		parent::doFromObject($object, $responseProfile);
 		

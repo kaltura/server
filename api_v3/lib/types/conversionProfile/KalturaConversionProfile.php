@@ -173,7 +173,7 @@ class KalturaConversionProfile extends KalturaObject implements IFilterable
 		return array_merge ( parent::getMapBetweenObjects() , self::$map_between_objects );
 	}
 	
-	public function doFromObject($sourceObject, KalturaResponseProfileBase $responseProfile = null)
+	public function doFromObject($sourceObject, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		parent::doFromObject($sourceObject, $responseProfile);
 		

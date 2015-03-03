@@ -42,7 +42,7 @@ class KalturaEmailNotificationRecipient extends KalturaObject
 	/* (non-PHPdoc)
 	 * @see KalturaObject::fromObject()
 	 */
-	public function doFromObject($dbObject, KalturaResponseProfileBase $responseProfile = null)
+	public function doFromObject($dbObject, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		/* @var $dbObject kEmailNotificationRecipient */
 		parent::doFromObject($dbObject, $responseProfile);

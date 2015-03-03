@@ -49,7 +49,7 @@ class KalturaDataEntry extends KalturaBaseEntry
 		return parent::toObject($dbDataEntry, $propsToSkip);
 	}
 	
-	public function doFromObject($dbDataEntry, KalturaResponseProfileBase $responseProfile = null)
+	public function doFromObject($dbDataEntry, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		parent::doFromObject($dbDataEntry, $responseProfile);
 		//$retrieveDataContentByGet = $dbDataEntry->getFromCustomData('retrieveDataContentByGet');

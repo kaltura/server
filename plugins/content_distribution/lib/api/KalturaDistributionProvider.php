@@ -63,7 +63,7 @@ abstract class KalturaDistributionProvider extends KalturaObject implements IFil
 		'name',
 	);
 
-	public function doFromObject($sourceObject, KalturaResponseProfileBase $responseProfile = null)
+	public function doFromObject($sourceObject, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		parent::doFromObject($sourceObject, $responseProfile);
 		

@@ -5,7 +5,7 @@
  */
 class KalturaMediaEntryFilterForPlaylistArray extends KalturaTypedArray
 {
-	public static function fromDbArray(array $arr = null, KalturaResponseProfileBase $responseProfile = null)
+	public static function fromDbArray(array $arr = null, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		foreach ( $arr as $obj )
 		{

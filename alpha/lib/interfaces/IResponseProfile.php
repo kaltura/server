@@ -1,6 +1,6 @@
 <?php
 
-interface IResponseProfile extends IResponseProfileBase
+interface IResponseProfile
 {
 	/**
 	 * @return string
@@ -23,7 +23,7 @@ interface IResponseProfile extends IResponseProfileBase
 	public function getFieldsArray();
 	
 	/**
-	 * @return array<IResponseProfileBase>
+	 * @return array<IResponseProfile>
 	 */
 	public function getRelatedProfiles();
 	
@@ -58,7 +58,7 @@ interface IResponseProfile extends IResponseProfileBase
 	public function setFields($v);
 	
 	/**
-	 * @param array<IResponseProfileBase> $v
+	 * @param array<IResponseProfile> $v
 	 */
 	public function setRelatedProfiles(array $v);
 

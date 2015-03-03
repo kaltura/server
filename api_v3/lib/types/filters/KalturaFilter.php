@@ -130,7 +130,7 @@ abstract class KalturaFilter extends KalturaObject
 		return $object_to_fill;		
 	}	
 	
-	public function doFromObject($source_object, KalturaResponseProfileBase $responseProfile = null)
+	public function doFromObject($source_object, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		$reflector = KalturaTypeReflectorCacher::get(get_class($this));
 		

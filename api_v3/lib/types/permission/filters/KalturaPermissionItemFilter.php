@@ -16,7 +16,7 @@ class KalturaPermissionItemFilter extends KalturaPermissionItemBaseFilter
 	/* (non-PHPdoc)
 	 * @see KalturaRelatedFilter::getListResponse()
 	 */
-	public function getListResponse(KalturaFilterPager $pager, KalturaResponseProfileBase $responseProfile = null)
+	public function getListResponse(KalturaFilterPager $pager, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		$permissionItemFilter = $this->toObject();
 		

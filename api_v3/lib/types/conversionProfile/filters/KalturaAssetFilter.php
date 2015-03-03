@@ -90,7 +90,7 @@ class KalturaAssetFilter extends KalturaAssetBaseFilter
 		return array($list, $totalCount);
 	}
 
-	public function getTypeListResponse(KalturaFilterPager $pager, KalturaResponseProfileBase $responseProfile = null, array $types = null)
+	public function getTypeListResponse(KalturaFilterPager $pager, KalturaDetachedResponseProfile $responseProfile = null, array $types = null)
 	{
 		list($list, $totalCount) = $this->doGetListResponse($pager, $types);
 		
@@ -103,7 +103,7 @@ class KalturaAssetFilter extends KalturaAssetBaseFilter
 	/* (non-PHPdoc)
 	 * @see KalturaRelatedFilter::getListResponse()
 	 */
-	public function getListResponse(KalturaFilterPager $pager, KalturaResponseProfileBase $responseProfile = null)
+	public function getListResponse(KalturaFilterPager $pager, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		return $this->getTypeListResponse($pager, $responseProfile);  
 	}

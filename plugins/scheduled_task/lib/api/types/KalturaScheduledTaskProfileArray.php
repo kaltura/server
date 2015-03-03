@@ -5,7 +5,7 @@
  */
 class KalturaScheduledTaskProfileArray extends KalturaTypedArray
 {
-	public static function fromDbArray($arr, KalturaResponseProfileBase $responseProfile = null)
+	public static function fromDbArray($arr, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		$newArr = new KalturaScheduledTaskProfileArray();
 		if ($arr == null)

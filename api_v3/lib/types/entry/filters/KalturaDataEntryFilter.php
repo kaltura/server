@@ -8,7 +8,7 @@ class KalturaDataEntryFilter extends KalturaDataEntryBaseFilter
 	/* (non-PHPdoc)
 	 * @see KalturaBaseEntryFilter::getListResponse()
 	 */
-	public function getListResponse(KalturaFilterPager $pager, KalturaResponseProfileBase $responseProfile = null)
+	public function getListResponse(KalturaFilterPager $pager, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		list($list, $totalCount) = $this->doGetListResponse($pager);
 		

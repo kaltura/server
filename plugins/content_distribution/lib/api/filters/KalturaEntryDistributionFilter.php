@@ -16,7 +16,7 @@ class KalturaEntryDistributionFilter extends KalturaEntryDistributionBaseFilter
 	/* (non-PHPdoc)
 	 * @see KalturaRelatedFilter::getListResponse()
 	 */
-	public function getListResponse(KalturaFilterPager $pager, KalturaResponseProfileBase $responseProfile = null)
+	public function getListResponse(KalturaFilterPager $pager, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		$c = new Criteria();
 		$entryDistributionFilter = $this->toObject();

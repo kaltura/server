@@ -17,7 +17,7 @@ class KalturaAccessControlFilter extends KalturaAccessControlBaseFilter
 	/* (non-PHPdoc)
 	 * @see KalturaFilter::getListResponse()
 	 */
-	public function getListResponse(KalturaFilterPager $pager, KalturaResponseProfileBase $responseProfile = null)
+	public function getListResponse(KalturaFilterPager $pager, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		$accessControlFilter = $this->toObject();
 

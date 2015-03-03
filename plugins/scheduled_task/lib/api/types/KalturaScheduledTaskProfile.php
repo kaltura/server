@@ -171,7 +171,7 @@ class KalturaScheduledTaskProfile extends KalturaObject implements IFilterable
 	/**
 	 * @param ScheduledTaskProfile $srcObj
 	 */
-	public function doFromObject($srcObj, KalturaResponseProfileBase $responseProfile = null)
+	public function doFromObject($srcObj, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		parent::doFromObject($srcObj, $responseProfile);
 		$this->objectTasks = KalturaObjectTaskArray::fromDbArray($srcObj->getObjectTasks());

@@ -5,7 +5,7 @@
  */
 class KalturaRemotePathArray extends KalturaTypedArray
 {
-	public static function fromDbArray(array $arr = null, KalturaResponseProfileBase $responseProfile = null)
+	public static function fromDbArray(array $arr = null, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		$newArr = new KalturaRemotePathArray();
 		foreach($arr as $obj)

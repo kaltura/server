@@ -102,7 +102,7 @@ class KalturaEmailNotificationDispatchJobData extends KalturaEventNotificationDi
 	/* (non-PHPdoc)
 	 * @see KalturaObject::fromObject()
 	 */
-	public function doFromObject($dbObject, KalturaResponseProfileBase $responseProfile = null)
+	public function doFromObject($dbObject, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		/* @var $dbObject kEmailNotificationDispatchJobData */
 		parent::doFromObject($dbObject, $responseProfile);

@@ -60,7 +60,7 @@ class KalturaUserFilter extends KalturaUserBaseFilter
 		return $object_to_fill;		
 	}
 	
-	public function doFromObject($source_object, KalturaResponseProfileBase $responseProfile = null)
+	public function doFromObject($source_object, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		parent::doFromObject($source_object, $responseProfile);
 		
@@ -130,7 +130,7 @@ class KalturaUserFilter extends KalturaUserBaseFilter
 	/* (non-PHPdoc)
 	 * @see KalturaRelatedFilter::getListResponse()
 	 */
-	public function getListResponse(KalturaFilterPager $pager, KalturaResponseProfileBase $responseProfile = null)
+	public function getListResponse(KalturaFilterPager $pager, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		$userFilter = $this->toObject();
 		

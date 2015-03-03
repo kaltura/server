@@ -3,7 +3,7 @@
  * @package api
  * @subpackage objects
  */
-class KalturaResponseProfile extends KalturaResponseProfileBase implements IFilterable
+class KalturaResponseProfile extends KalturaDetachedResponseProfile implements IFilterable
 {
 	/**
 	 * Auto generated numeric identifier
@@ -13,13 +13,6 @@ class KalturaResponseProfile extends KalturaResponseProfileBase implements IFilt
 	 * @filter eq,in
 	 */
 	public $id;
-	
-	/**
-	 * Friendly name
-	 * 
-	 * @var string
-	 */
-	public $name;
 	
 	/**
 	 * Unique system name
@@ -60,37 +53,6 @@ class KalturaResponseProfile extends KalturaResponseProfileBase implements IFilt
 	 */
 	public $status;
 	
-	/**
-	 * @var KalturaResponseProfileType
-	 */
-	public $type;
-	
-	/**
-	 * Comma separated fields list to be included or excluded
-	 * 
-	 * @var string
-	 */
-	public $fields;
-	
-	/**
-	 * @var KalturaRelatedFilter
-	 */
-	public $filter;
-	
-	/**
-	 * @var KalturaFilterPager
-	 */
-	public $pager;
-	
-	/**
-	 * @var KalturaNestedResponseProfileBaseArray
-	 */
-	public $relatedProfiles;
-	
-	/**
-	 * @var KalturaResponseProfileMappingArray
-	 */
-	public $mappings;
 	
 	public function __construct(ResponseProfile $responseProfile = null)
 	{
@@ -102,17 +64,11 @@ class KalturaResponseProfile extends KalturaResponseProfileBase implements IFilt
 	
 	private static $map_between_objects = array(
 		'id', 
-		'name', 
 		'systemName', 
 		'partnerId',
 		'createdAt',
 		'updatedAt',
 		'status',
-		'type',
-		'fields',
-		'pager',
-		'relatedProfiles',
-		'mappings',
 	);
 	
 	/* (non-PHPdoc)
@@ -129,17 +85,13 @@ class KalturaResponseProfile extends KalturaResponseProfileBase implements IFilt
 	public function validateForUsage($sourceObject, $propertiesToSkip = array())
 	{
 		// Allow null in case of update
-		$allowNull = !is_null($sourceObject);
-		
-		$this->validatePropertyMinLength('name', 2, $allowNull);
-		$this->validatePropertyMinLength('systemName', 2, $allowNull);
-		
-		if(!$allowNull)
-			$this->validatePropertyNotNull('type');
+		$this->validatePropertyMinLength('systemName', 2, !is_null($sourceObject));
 		
 		$id = null;
 		if($sourceObject)
+		{
 			$id = $sourceObject->getId();
+		}
 			
 		if(trim($this->systemName) && !$this->isNull('systemName'))
 		{
@@ -173,7 +125,7 @@ class KalturaResponseProfile extends KalturaResponseProfileBase implements IFilt
 	/* (non-PHPdoc)
 	 * @see KalturaObject::fromObject($srcObj, $responseProfile)
 	 */
-	public function doFromObject($srcObj, KalturaResponseProfileBase $responseProfile = null)
+	public function doFromObject($srcObj, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		/* @var $srcObj ResponseProfile */
 		parent::doFromObject($srcObj, $responseProfile);
@@ -184,27 +136,6 @@ class KalturaResponseProfile extends KalturaResponseProfileBase implements IFilt
 			$this->filter = new $filterApiClassName();
 			$this->filter->fromObject($srcObj->getFilter());
 		}
-	}
-	
-	/* (non-PHPdoc)
-	 * @see KalturaResponseProfileBase::getRelatedProfiles()
-	 */
-	public function getRelatedProfiles()
-	{
-		if($this->relatedProfiles)
-		{
-			return $this->relatedProfiles;
-		}
-		
-		return array();
-	}
-	
-	/* (non-PHPdoc)
-	 * @see KalturaResponseProfileBase::getPager()
-	 */
-	public function getPager()
-	{
-		return $this->pager;
 	}
 	
 	/* (non-PHPdoc)

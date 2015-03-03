@@ -47,7 +47,7 @@ class KalturaPdfFlavorParamsOutput extends KalturaFlavorParamsOutput
 		return $map;
 	}
 	
-	public function doFromObject($dbPdfFlavorParamsOutput, KalturaResponseProfileBase $responseProfile = null)
+	public function doFromObject($dbPdfFlavorParamsOutput, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		parent::doFromObject($dbPdfFlavorParamsOutput, $responseProfile);
 		

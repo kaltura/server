@@ -7,8 +7,8 @@ abstract class KalturaRelatedFilter extends KalturaFilter
 {
 	/**
 	 * @param KalturaFilterPager $pager
-	 * @param KalturaResponseProfileBase $responseProfile
+	 * @param KalturaDetachedResponseProfile $responseProfile
 	 * @return KalturaListResponse
 	 */
-	abstract public function getListResponse(KalturaFilterPager $pager, KalturaResponseProfileBase $responseProfile = null);
+	abstract public function getListResponse(KalturaFilterPager $pager, KalturaDetachedResponseProfile $responseProfile = null);
 }

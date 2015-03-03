@@ -5,7 +5,7 @@
  */
 class KalturaWidgetArray extends KalturaTypedArray
 {
-	public static function fromDbArray(array $arr, KalturaResponseProfileBase $responseProfile = null)
+	public static function fromDbArray(array $arr, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		$newArr = new KalturaWidgetArray();
 		foreach ( $arr as $obj )

@@ -3,7 +3,7 @@
  * @package api
  * @subpackage objects
  */
-class KalturaNestedResponseProfileHolder extends KalturaNestedResponseProfileBase
+class KalturaResponseProfileHolder extends KalturaBaseResponseProfile
 {
 	/**
 	 * Auto generated numeric identifier
@@ -54,41 +54,5 @@ class KalturaNestedResponseProfileHolder extends KalturaNestedResponseProfileBas
 		}
 		
 		return parent::toObject($object, $propertiesToSkip);
-	}
-	
-	/* (non-PHPdoc)
-	 * @see KalturaResponseProfileBase::getRelatedProfiles()
-	 */
-	public function getRelatedProfiles()
-	{
-		$responseProfile = $this->get();
-		return $responseProfile->getRelatedProfiles();
-	}
-
-	/* (non-PHPdoc)
-	 * @see KalturaNestedResponseProfileBase::get()
-	 */
-	public function get()
-	{
-		$responseProfile = null;
-		if($this->id)
-		{
-			$responseProfile = ResponseProfilePeer::retrieveByPK($this->id);
-		}
-		elseif($this->systemName)
-		{
-			$responseProfile = ResponseProfilePeer::retrieveBySystemName($this->systemName);
-		}
-		
-		return new KalturaResponseProfile($responseProfile);
-	}
-	
-	/* (non-PHPdoc)
-	 * @see KalturaResponseProfileBase::getPager()
-	 */
-	public function getPager()
-	{
-		$responseProfile = $this->get();
-		return $responseProfile->getPager();
 	}
 }

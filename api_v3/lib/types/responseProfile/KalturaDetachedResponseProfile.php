@@ -3,7 +3,7 @@
  * @package api
  * @subpackage objects
  */
-class KalturaNestedResponseProfile extends KalturaNestedResponseProfileBase
+abstract class KalturaDetachedResponseProfile extends KalturaBaseResponseProfile
 {
 	/**
 	 * Friendly name
@@ -35,7 +35,7 @@ class KalturaNestedResponseProfile extends KalturaNestedResponseProfileBase
 	public $pager;
 	
 	/**
-	 * @var KalturaNestedResponseProfileBaseArray
+	 * @var KalturaDetachedResponseProfileArray
 	 */
 	public $relatedProfiles;
 	
@@ -54,28 +54,73 @@ class KalturaNestedResponseProfile extends KalturaNestedResponseProfileBase
 	);
 	
 	/* (non-PHPdoc)
-	 * @see KalturaObject::validateForUsage($sourceObject, $propertiesToSkip)
-	 */
-	public function validateForUsage($sourceObject, $propertiesToSkip = array())
-	{
-		$this->validatePropertyMinLength('name', 2);
-		$this->validatePropertyNotNull('type');
-		
-		parent::validateForUsage($sourceObject, $propertiesToSkip);
-	}
-	
-	/* (non-PHPdoc)
 	 * @see KalturaObject::getMapBetweenObjects()
 	 */
 	public function getMapBetweenObjects()
 	{
 		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
 	}
+	
+	/* (non-PHPdoc)
+	 * @see KalturaObject::validateForUsage($sourceObject, $propertiesToSkip)
+	 */
+	public function validateForUsage($sourceObject, $propertiesToSkip = array())
+	{
+		$this->validatePropertyMinLength('name', 2, !is_null($sourceObject));
+		
+		// Allow null in case of update
+		if(is_null($sourceObject))
+		{
+			$this->validatePropertyNotNull('type');
+		}
+		
+		$this->validateNestedObjects();
+	
+		parent::validateForUsage($sourceObject, $propertiesToSkip);
+	}
+	
+	protected function validateNestedObjects($maxPageSize = null, $maxNestingLevel = null)
+	{	
+		$relatedProfiles = $this->getRelatedProfiles();
+		if(!$relatedProfiles)
+		{
+			return;
+		}
+	
+		if(is_null($maxPageSize))
+		{
+			$maxPageSize = kConf::get('response_profile_max_page_size', 'local', 100);
+		}
+		
+		if(is_null($maxNestingLevel))
+		{
+			$maxNestingLevel = kConf::get('response_profile_max_nesting_level', 'local', 2);
+		}
+		
+		if($maxNestingLevel > 0)
+		{
+			foreach($relatedProfiles as $relatedProfile)
+			{
+				/* @var $relatedProfile KalturaDetachedResponseProfile */
+				$relatedProfile->validateNestedObjects($maxPageSize, $maxNestingLevel - 1);
+				
+				$pager = $relatedProfile->getPager();
+				if($pager)
+				{
+					$pager->validatePropertyMaxValue('pageSize', $maxPageSize, true);
+				}
+			}
+		}
+		elseif(count($relatedProfiles))
+		{
+			throw new KalturaAPIException(KalturaErrors::RESPONSE_PROFILE_MAX_NESTING_LEVEL);
+		}
+	}
 
 	/* (non-PHPdoc)
 	 * @see KalturaObject::fromObject($srcObj, $responseProfile)
 	 */
-	public function doFromObject($srcObj, KalturaResponseProfileBase $responseProfile = null)
+	public function doFromObject($srcObj, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		/* @var $srcObj kResponseProfile */
 		parent::doFromObject($srcObj, $responseProfile);
@@ -93,11 +138,6 @@ class KalturaNestedResponseProfile extends KalturaNestedResponseProfileBase
 	 */
 	public function toObject($object = null, $propertiesToSkip = array())
 	{
-		if(is_null($object))
-		{
-			$object = new kResponseProfile();
-		}
-		
 		if($this->filter)
 		{
 			$object->setFilterApiClassName(get_class($this->filter));
@@ -105,34 +145,5 @@ class KalturaNestedResponseProfile extends KalturaNestedResponseProfileBase
 		}
 		
 		return parent::toObject($object, $propertiesToSkip);
-	}
-	
-	/* (non-PHPdoc)
-	 * @see KalturaResponseProfileBase::getRelatedProfiles()
-	 */
-	public function getRelatedProfiles()
-	{
-		if($this->relatedProfiles)
-		{
-			return $this->relatedProfiles;
-		}
-		
-		return array();
-	}
-
-	/* (non-PHPdoc)
-	 * @see KalturaNestedResponseProfileBase::get()
-	 */
-	public function get()
-	{
-		return $this;
-	}
-	
-	/* (non-PHPdoc)
-	 * @see KalturaResponseProfileBase::getPager()
-	 */
-	public function getPager()
-	{
-		return $this->pager;
 	}
 }

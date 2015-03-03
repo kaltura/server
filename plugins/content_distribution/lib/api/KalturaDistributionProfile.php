@@ -237,7 +237,7 @@ abstract class KalturaDistributionProfile extends KalturaObject implements IFilt
 		return $dbObject;
 	}
 	
-	public function doFromObject($sourceObject, KalturaResponseProfileBase $responseProfile = null)
+	public function doFromObject($sourceObject, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		if(!$sourceObject)
 			return;

@@ -133,7 +133,7 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 	/* (non-PHPdoc)
 	 * @see KalturaMediaEntry::fromObject()
 	 */
-	public function doFromObject($dbObject, KalturaResponseProfileBase $responseProfile = null)
+	public function doFromObject($dbObject, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		if(!($dbObject instanceof LiveEntry))
 			return;

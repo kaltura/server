@@ -194,7 +194,7 @@ class KalturaRequestDeserializer
 	}
 	
 	/**
-	 * @return KalturaResponseProfileBase
+	 * @return KalturaDetachedResponseProfile
 	 */
 	public function getResponseProfile($paramName = 'responseProfile') {
 		if(!isset($this->paramsGrouped[$paramName])){
@@ -205,14 +205,14 @@ class KalturaRequestDeserializer
 		if(isset($this->paramsGrouped[$paramName]['id'])){
 			$responseProfile = ResponseProfilePeer::retrieveByPK($this->paramsGrouped[$paramName]['id']);
 		}
-		if(isset($this->paramsGrouped[$paramName]['name'])){
-			$responseProfile = ResponseProfilePeer::retrieveBySystemName($this->paramsGrouped[$paramName]['name']);
+		if(isset($this->paramsGrouped[$paramName]['systemName'])){
+			$responseProfile = ResponseProfilePeer::retrieveBySystemName($this->paramsGrouped[$paramName]['systemName']);
 		}
 		if($responseProfile){
 			return new KalturaResponseProfile($responseProfile);
 		}
 		
-		$typeReflector = KalturaTypeReflectorCacher::get('KalturaNestedResponseProfile');
+		$typeReflector = KalturaTypeReflectorCacher::get('KalturaDetachedResponseProfile');
 		return $this->buildObject($typeReflector, $this->paramsGrouped[$paramName], $paramName);
 	}
 	

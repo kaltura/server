@@ -142,7 +142,7 @@ abstract class KalturaCuePoint extends KalturaObject implements IFilterable
 		return array();
 	}
 	
-	public function doFromObject($dbCuePoint, KalturaResponseProfileBase $responseProfile = null)
+	public function doFromObject($dbCuePoint, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		parent::doFromObject($dbCuePoint, $responseProfile);
 		

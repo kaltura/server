@@ -13,7 +13,7 @@
  * @package Core
  * @subpackage model
  */
-class ResponseProfile extends BaseResponseProfile implements IResponseProfileHolder, IResponseProfile {
+class ResponseProfile extends BaseResponseProfile implements IResponseProfile {
 	
 	const CUSTOM_DATA_FIELD_FIELDS = 'fields';
 	const CUSTOM_DATA_FIELD_RELATED_PROFILES = 'relatedProfiles';
@@ -22,14 +22,6 @@ class ResponseProfile extends BaseResponseProfile implements IResponseProfileHol
 	const CUSTOM_DATA_FIELD_FILTER = 'filter';
 	const CUSTOM_DATA_FIELD_PAGER = 'pager';
 	
-	/* (non-PHPdoc)
-	 * @see IResponseProfileLoader::get()
-	 */
-	public function get()
-	{
-		return $this;
-	}
-
 	/* (non-PHPdoc)
 	 * @see IResponseProfile::getFieldsArray()
 	 */

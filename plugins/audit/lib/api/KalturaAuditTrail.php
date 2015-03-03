@@ -224,7 +224,7 @@ class KalturaAuditTrail extends KalturaObject implements IFilterable
 	/**
 	 * @param AuditTrail $dbAuditTrail
 	 */
-	public function doFromObject($dbAuditTrail, KalturaResponseProfileBase $responseProfile = null)
+	public function doFromObject($dbAuditTrail, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		parent::doFromObject($dbAuditTrail, $responseProfile);
 		

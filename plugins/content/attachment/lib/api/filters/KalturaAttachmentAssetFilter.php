@@ -8,7 +8,7 @@ class KalturaAttachmentAssetFilter extends KalturaAttachmentAssetBaseFilter
 	/* (non-PHPdoc)
 	 * @see KalturaAssetFilter::getTypeListResponse()
 	 */
-	public function getTypeListResponse(KalturaFilterPager $pager, KalturaResponseProfileBase $responseProfile = null, array $types = null)
+	public function getTypeListResponse(KalturaFilterPager $pager, KalturaDetachedResponseProfile $responseProfile = null, array $types = null)
 	{
 		list($list, $totalCount) = $this->doGetListResponse($pager, $types);
 		
@@ -21,7 +21,7 @@ class KalturaAttachmentAssetFilter extends KalturaAttachmentAssetBaseFilter
 	/* (non-PHPdoc)
 	 * @see KalturaAssetFilter::getListResponse()
 	 */
-	public function getListResponse(KalturaFilterPager $pager, KalturaResponseProfileBase $responseProfile = null)
+	public function getListResponse(KalturaFilterPager $pager, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		$types = KalturaPluginManager::getExtendedTypes(assetPeer::OM_CLASS, AttachmentPlugin::getAssetTypeCoreValue(AttachmentAssetType::ATTACHMENT));
 		return $this->getTypeListResponse($pager, $responseProfile, $types);

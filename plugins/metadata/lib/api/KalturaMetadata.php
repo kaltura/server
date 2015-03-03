@@ -146,7 +146,7 @@ class KalturaMetadata extends KalturaObject implements IFilterable
 		return parent::toObject($dbMetadata, $propsToSkip);
 	}
 	
-	public function doFromObject($source_object, KalturaResponseProfileBase $responseProfile = null)
+	public function doFromObject($source_object, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		parent::doFromObject($source_object, $responseProfile);
 		

@@ -5,7 +5,7 @@
  */
 class KalturaDropFolderArray extends KalturaTypedArray
 {
-	public static function fromDbArray($arr, KalturaResponseProfileBase $responseProfile = null)
+	public static function fromDbArray($arr, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		$newArr = new KalturaDropFolderArray();
 		foreach ( $arr as $obj )

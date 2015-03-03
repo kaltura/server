@@ -26,7 +26,7 @@ class KalturaDistributionValidationErrorMissingThumbnail extends KalturaDistribu
 		return $dbObject;
 	}
 	
-	public function doFromObject($sourceObject, KalturaResponseProfileBase $responseProfile = null)
+	public function doFromObject($sourceObject, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		if(!$sourceObject)
 			return;

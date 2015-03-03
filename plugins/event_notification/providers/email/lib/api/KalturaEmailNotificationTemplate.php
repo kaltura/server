@@ -166,7 +166,7 @@ class KalturaEmailNotificationTemplate extends KalturaEventNotificationTemplate
 	/* (non-PHPdoc)
 	 * @see KalturaObject::fromObject($source_object)
 	 */
-	public function doFromObject($dbObject, KalturaResponseProfileBase $responseProfile = null)
+	public function doFromObject($dbObject, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		/* @var $dbObject EmailNotificationTemplate */
 		parent::doFromObject($dbObject, $responseProfile);

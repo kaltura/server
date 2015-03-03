@@ -97,7 +97,7 @@ class KalturaVirusScanProfile extends KalturaObject implements IFilterable
 		return $dbObject;
 	}
 	
-	public function doFromObject($sourceObject, KalturaResponseProfileBase $responseProfile = null)
+	public function doFromObject($sourceObject, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		if(!$sourceObject)
 			return;

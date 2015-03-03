@@ -30,7 +30,7 @@ class KalturaGenericXsltSyndicationFeed extends KalturaGenericSyndicationFeed
 		$this->type = KalturaSyndicationFeedType::KALTURA_XSLT;
 	}
 	
-	public function doFromObject($source_object, KalturaResponseProfileBase $responseProfile = null)
+	public function doFromObject($source_object, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		parent::doFromObject($source_object, $responseProfile);
 

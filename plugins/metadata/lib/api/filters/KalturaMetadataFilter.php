@@ -67,7 +67,7 @@ class KalturaMetadataFilter extends KalturaMetadataBaseFilter
 	/* (non-PHPdoc)
 	 * @see KalturaRelatedFilter::getListResponse()
 	 */
-	public function getListResponse(KalturaFilterPager $pager, KalturaResponseProfileBase $responseProfile = null)
+	public function getListResponse(KalturaFilterPager $pager, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		if (kEntitlementUtils::getEntitlementEnforcement() && (is_null($this->objectIdIn) && is_null($this->objectIdEqual)))
 			throw new KalturaAPIException(MetadataErrors::MUST_FILTER_ON_OBJECT_ID);

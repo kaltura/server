@@ -8,7 +8,7 @@ class KalturaThumbParamsFilter extends KalturaThumbParamsBaseFilter
 	/* (non-PHPdoc)
 	 * @see KalturaAssetParamsFilter::getTypeListResponse()
 	 */
-	public function getTypeListResponse(KalturaFilterPager $pager, KalturaResponseProfileBase $responseProfile = null, array $types = null)
+	public function getTypeListResponse(KalturaFilterPager $pager, KalturaDetachedResponseProfile $responseProfile = null, array $types = null)
 	{
 		list($list, $totalCount) = $this->doGetListResponse($pager, $types);
 		

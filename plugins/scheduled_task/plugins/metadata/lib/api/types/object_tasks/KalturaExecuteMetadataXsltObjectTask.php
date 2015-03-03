@@ -59,7 +59,7 @@ class KalturaExecuteMetadataXsltObjectTask extends KalturaObjectTask
 		return $dbObject;
 	}
 
-	public function doFromObject($srcObj, KalturaResponseProfileBase $responseProfile = null)
+	public function doFromObject($srcObj, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		parent::doFromObject($srcObj, $responseProfile);
 

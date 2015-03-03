@@ -29,7 +29,7 @@ class KalturaAuditTrailChangeInfo extends KalturaAuditTrailInfo
 	/**
 	 * @param kAuditTrailChangeInfo $auditTrailInfo
 	 */
-	public function doFromObject($auditTrailInfo, KalturaResponseProfileBase $responseProfile = null)
+	public function doFromObject($auditTrailInfo, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		parent::doFromObject($auditTrailInfo, $responseProfile);
 		

@@ -283,7 +283,7 @@ class KalturaUser extends KalturaObject implements IFilterable
 	}
 	
 	
-	public function doFromObject($sourceObject, KalturaResponseProfileBase $responseProfile = null)
+	public function doFromObject($sourceObject, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		if(!$sourceObject)
 			return;

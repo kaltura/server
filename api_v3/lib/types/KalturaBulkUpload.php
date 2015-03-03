@@ -122,7 +122,7 @@ class KalturaBulkUpload extends KalturaObject implements IFilterable
 		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
 	}
 	
-	public function doFromObject($batchJobObject, KalturaResponseProfileBase $responseProfile = null)
+	public function doFromObject($batchJobObject, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 	    /* @var $batchJobObject BatchJobLog */
 	    if (is_null($batchJobObject))

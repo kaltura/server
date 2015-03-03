@@ -10,7 +10,7 @@ class KalturaUiConfAdmin extends KalturaUiConf
 	 */
 	public $isPublic;
 	
-	public function doFromObject($source_object, KalturaResponseProfileBase $responseProfile = null)
+	public function doFromObject($source_object, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		if ($source_object instanceof uiConf)
 		{

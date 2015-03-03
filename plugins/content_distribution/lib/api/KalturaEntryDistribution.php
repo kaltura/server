@@ -234,7 +234,7 @@ class KalturaEntryDistribution extends KalturaObject implements IFilterable
 		return parent::toObject($dbObject, $skip);
 	}
 	
-	public function doFromObject($sourceObject, KalturaResponseProfileBase $responseProfile = null)
+	public function doFromObject($sourceObject, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		if(!$sourceObject)
 			return;

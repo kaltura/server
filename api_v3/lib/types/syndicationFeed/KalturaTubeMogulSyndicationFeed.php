@@ -39,7 +39,7 @@ class KalturaTubeMogulSyndicationFeed extends KalturaBaseSyndicationFeed
             $this->categories = implode(',', $categories);
         }
         
-        public function doFromObject($source_object, KalturaResponseProfileBase $responseProfile = null)
+        public function doFromObject($source_object, KalturaDetachedResponseProfile $responseProfile = null)
         {
             parent::doFromObject($source_object, $responseProfile);
             $categories = explode(',', $this->categories);

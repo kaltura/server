@@ -99,7 +99,7 @@ class KalturaMediaEntry extends KalturaPlayableEntry {
 		return array_merge ( parent::getMapBetweenObjects (), self::$map_between_objects );
 	}
 	
-	public function doFromObject($entry, KalturaResponseProfileBase $responseProfile = null) {
+	public function doFromObject($entry, KalturaDetachedResponseProfile $responseProfile = null) {
 		parent::doFromObject($entry, $responseProfile);
 		
 		if($this->shouldGet('mediaDate', $responseProfile))

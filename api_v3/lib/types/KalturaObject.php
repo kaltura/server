@@ -119,7 +119,7 @@ abstract class KalturaObject
 		$thisProps = $thisRef->getProperties();
 	
 		// generate file header
-		$result = "<?php\nclass {$fromObjectClass} extends {$srcObjClass}\n{\n\tstatic function doFromObject(\$apiObj, \$srcObj, KalturaResponseProfileBase \$responseProfile = null)\n\t{\n";
+		$result = "<?php\nclass {$fromObjectClass} extends {$srcObjClass}\n{\n\tstatic function doFromObject(\$apiObj, \$srcObj, KalturaDetachedResponseProfile \$responseProfile = null)\n\t{\n";
 	
 		if ($thisRef->requiresReadPermission())
 		{
@@ -303,9 +303,6 @@ abstract class KalturaObject
 		$result .= "\t\t\$get = array(\n\t\t\t'" . implode("',\n\t\t\t'", array_keys($mappingFuncCode)) . "'\n\t\t);";
 		$result .= '
 		if($responseProfile){
-			if($responseProfile instanceof KalturaNestedResponseProfileHolder){	
-				$responseProfile = $responseProfile->get();
-			}
 			$fieldsArray = array_map("trim", explode(",", $responseProfile->fields));
 			if($responseProfile->type == ResponseProfileType::INCLUDE_FIELDS){
 				$get = array_intersect($get, $fieldsArray);
@@ -322,15 +319,10 @@ abstract class KalturaObject
 		return $result;
 	}
 	
-	public function shouldGet($propertyName, KalturaResponseProfileBase $responseProfile = null)
+	public function shouldGet($propertyName, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		if($responseProfile)
 		{
-			if($responseProfile instanceof KalturaNestedResponseProfileHolder)
-			{	
-				$responseProfile = $responseProfile->get();
-			}
-			
 			$fields = array_flip(array_map("trim", explode(",", $responseProfile->fields)));
 			if($responseProfile->type == ResponseProfileType::INCLUDE_FIELDS)
 			{
@@ -345,12 +337,12 @@ abstract class KalturaObject
 		return true;
 	}
 	
-	protected function doFromObject($srcObj, KalturaResponseProfileBase $responseProfile = null)
+	protected function doFromObject($srcObj, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		
 	}
 	
-	final public function fromObject($srcObj, KalturaResponseProfileBase $responseProfile = null)
+	final public function fromObject($srcObj, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		$thisClass = get_class($this);
 		$srcObjClass = get_class($srcObj);
@@ -385,14 +377,14 @@ abstract class KalturaObject
 		}
 	}
 	
-	public function loadRelatedObjects(KalturaResponseProfileBase $responseProfile)
+	public function loadRelatedObjects(KalturaDetachedResponseProfile $responseProfile)
 	{
 		// trigger validation
 		$responseProfile->toObject();
 		
 		foreach($responseProfile->getRelatedProfiles() as $relatedProfile)
 		{
-			/* @var $relatedProfile KalturaNestedResponseProfileBase */
+			/* @var $relatedProfile KalturaDetachedResponseProfile */
 			$relatedProfile = $relatedProfile->get();
 			
 			if(!$relatedProfile->filter)

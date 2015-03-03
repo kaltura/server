@@ -39,7 +39,7 @@ class kResponseProfile implements IResponseProfile
 	private $pager;
 	
 	/**
-	 * @var array<IResponseProfileBase>
+	 * @var array<IResponseProfile>
 	 */
 	private $relatedProfiles;
 	
@@ -64,14 +64,6 @@ class kResponseProfile implements IResponseProfile
 		$this->mappings = $mappings;
 	}
 
-	/* (non-PHPdoc)
-	 * @see IResponseProfileBase::get()
-	 */
-	public function get()
-	{
-		return $this;
-	}
-	
 	/* (non-PHPdoc)
 	 * @see IResponseProfile::getFilterApiClassName()
 	 */

@@ -52,7 +52,7 @@ class KalturaCopyJobData extends KalturaJobData
 	/* (non-PHPdoc)
 	 * @see KalturaObject::fromObject()
 	 */
-	public function doFromObject($dbData, KalturaResponseProfileBase $responseProfile = null) 
+	public function doFromObject($dbData, KalturaDetachedResponseProfile $responseProfile = null) 
 	{
 		/* @var $dbData kCopyJobData */
 		$filter = $dbData->getFilter();

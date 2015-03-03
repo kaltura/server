@@ -92,7 +92,7 @@ class KalturaDistributionFieldConfig extends KalturaObject
 		return $dbObject;
 	}
 	
-	public function doFromObject($source_object, KalturaResponseProfileBase $responseProfile = null)
+	public function doFromObject($source_object, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		parent::doFromObject($source_object, $responseProfile);
 		

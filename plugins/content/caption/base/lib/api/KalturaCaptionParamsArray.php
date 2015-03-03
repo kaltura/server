@@ -5,7 +5,7 @@
  */
 class KalturaCaptionParamsArray extends KalturaTypedArray
 {
-	public static function fromDbArray($arr, KalturaResponseProfileBase $responseProfile = null)
+	public static function fromDbArray($arr, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		$newArr = new KalturaCaptionParamsArray();
 		if ($arr == null)

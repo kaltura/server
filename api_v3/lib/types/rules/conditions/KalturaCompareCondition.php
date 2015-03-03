@@ -42,7 +42,7 @@ abstract class KalturaCompareCondition extends KalturaCondition
 	/* (non-PHPdoc)
 	 * @see KalturaObject::fromObject()
 	 */
-	public function doFromObject($dbObject, KalturaResponseProfileBase $responseProfile = null)
+	public function doFromObject($dbObject, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		/* @var $dbObject kFieldMatchCondition */
 		parent::doFromObject($dbObject, $responseProfile);
