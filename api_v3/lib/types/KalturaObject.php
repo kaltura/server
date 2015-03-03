@@ -382,11 +382,9 @@ abstract class KalturaObject
 		// trigger validation
 		$responseProfile->toObject();
 		
-		foreach($responseProfile->getRelatedProfiles() as $relatedProfile)
+		foreach($responseProfile->relatedProfiles as $relatedProfile)
 		{
 			/* @var $relatedProfile KalturaDetachedResponseProfile */
-			$relatedProfile = $relatedProfile->get();
-			
 			if(!$relatedProfile->filter)
 			{
 				KalturaLog::notice("Related response-profile [$relatedProfile->name] has no filter and should not be used as nested profile");

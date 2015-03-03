@@ -81,7 +81,7 @@ abstract class KalturaDetachedResponseProfile extends KalturaBaseResponseProfile
 	
 	protected function validateNestedObjects($maxPageSize = null, $maxNestingLevel = null)
 	{	
-		$relatedProfiles = $this->getRelatedProfiles();
+		$relatedProfiles = $this->relatedProfiles;
 		if(!$relatedProfiles)
 		{
 			return;
@@ -104,7 +104,7 @@ abstract class KalturaDetachedResponseProfile extends KalturaBaseResponseProfile
 				/* @var $relatedProfile KalturaDetachedResponseProfile */
 				$relatedProfile->validateNestedObjects($maxPageSize, $maxNestingLevel - 1);
 				
-				$pager = $relatedProfile->getPager();
+				$pager = $relatedProfile->pager;
 				if($pager)
 				{
 					$pager->validatePropertyMaxValue('pageSize', $maxPageSize, true);
