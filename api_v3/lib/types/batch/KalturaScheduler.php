@@ -106,6 +106,7 @@ class KalturaScheduler extends KalturaObject
 		"name",
 		"host",
 		"createdAt",
+		"lastStatus",
 	);
 	
 	public function getMapBetweenObjects()
@@ -135,7 +136,6 @@ class KalturaScheduler extends KalturaObject
 		if(is_array($statusesArray))
 			$this->statuses = KalturaSchedulerStatusArray::fromValuesArray($statusesArray, $this->id, $this->configuredId);
 		
-		$this->lastStatus = $dbData->getLastStatus(null);
 		$this->lastStatusStr = date('d-m-Y H:i:s', $this->lastStatus);
 		
 		return $this;

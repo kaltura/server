@@ -200,20 +200,6 @@ class KalturaDropFolderFile extends KalturaObject implements IFilterable
 		KalturaLog::debug("dbObject: " . print_r($dbObject, true));
 		return $dbObject;
 	}
-	
-	public function doFromObject($source_object, KalturaDetachedResponseProfile $responseProfile = null)
-	{
-		parent::doFromObject($source_object, $responseProfile);
-		
-		if($this->shouldGet('uploadStartDetectedAt', $responseProfile))
-			$this->uploadStartDetectedAt = $source_object->getUploadStartDetectedAt(null);
-		if($this->shouldGet('uploadEndDetectedAt', $responseProfile))
-			$this->uploadEndDetectedAt = $source_object->getUploadEndDetectedAt(null);
-		if($this->shouldGet('importStartedAt', $responseProfile))
-			$this->importStartedAt = $source_object->getImportStartedAt(null);
-		if($this->shouldGet('importEndedAt', $responseProfile))
-			$this->importEndedAt = $source_object->getImportEndedAt(null);		
-	}
 
 	public function getExtraFilters()
 	{

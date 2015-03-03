@@ -449,11 +449,6 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 			
 		parent::doFromObject($sourceObject, $responseProfile);
 		
-		if($this->shouldGet('startDate', $responseProfile))
-			$this->startDate = $sourceObject->getStartDate(null);
-		if($this->shouldGet('endDate', $responseProfile))
-			$this->endDate = $sourceObject->getEndDate(null);
-		
 		$partnerId = kCurrentContext::$ks_partner_id ? kCurrentContext::$ks_partner_id : kCurrentContext::$partner_id;
 		
 		if (implode(',', kEntitlementUtils::getKsPrivacyContext()) != kEntitlementUtils::DEFAULT_CONTEXT . $partnerId)

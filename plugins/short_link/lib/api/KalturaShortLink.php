@@ -80,19 +80,12 @@ class KalturaShortLink extends KalturaObject implements IFilterable
 		'systemName',
 		'fullUrl',
 		'status',
+		'expiresAt',
 	 );
 		 
 	public function getMapBetweenObjects()
 	{
 		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
-	}
-	
-	public function doFromObject($object, KalturaDetachedResponseProfile $responseProfile = null)
-	{
-		parent::doFromObject($object, $responseProfile);
-		
-		if($this->shouldGet('expiresAt', $responseProfile))
-			$this->expiresAt = $object->getExpiresAt(null);
 	}
 	
 	public function getExtraFilters()

@@ -48,17 +48,6 @@ class KalturaDocumentEntry extends KalturaBaseEntry
 		if (is_null($dbObject))
 			$dbObject = new DocumentEntry();
 			
-		parent::toObject($dbObject, $skip);
-
-		return $dbObject;		
-	}
-	
-	
-	public function doFromObject($sourceObject, KalturaDetachedResponseProfile $responseProfile = null)
-	{
-		if(!$sourceObject)
-			return;
-			
-		parent::doFromObject($sourceObject, $responseProfile);
+		return parent::toObject($dbObject, $skip);		
 	}
 }

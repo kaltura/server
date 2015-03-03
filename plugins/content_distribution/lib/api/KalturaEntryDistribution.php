@@ -211,8 +211,10 @@ class KalturaEntryDistribution extends KalturaObject implements IFilterable
 		'thumbAssetIds',
 		'flavorAssetIds',
 	 	'assetIds',
+		'sunStatus',
 		'sunrise',
 		'sunset',
+		'submittedAt',
 		'remoteId',
 		'plays',
 		'views',
@@ -241,15 +243,6 @@ class KalturaEntryDistribution extends KalturaObject implements IFilterable
 			
 		parent::doFromObject($sourceObject, $responseProfile);
 		
-		if($this->shouldGet('sunStatus', $responseProfile))
-			$this->sunStatus = $sourceObject->getSunStatus();
-		if($this->shouldGet('sunrise', $responseProfile))
-			$this->sunrise = $sourceObject->getSunrise(null);
-		if($this->shouldGet('sunset', $responseProfile))
-			$this->sunset = $sourceObject->getSunset(null);
-		if($this->shouldGet('submittedAt', $responseProfile))
-			$this->submittedAt = $sourceObject->getSubmittedAt(null);
-	            
 		if($this->shouldGet('validationErrors', $responseProfile))
 			$this->validationErrors = KalturaDistributionValidationErrorArray::fromDbArray($sourceObject->getValidationErrors());
 			
