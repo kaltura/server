@@ -300,7 +300,7 @@ abstract class KalturaObject
 			$result .= "\t\t\$customData = unserialize(\$srcObj->custom_data);\n";
 		}
 	
-		$result .= "\t\t\$get = array(\n\t\t\t'" . implode("' => true,\n\t\t\t'", array_keys($mappingFuncCode)) . " => true'\n\t\t);";
+		$result .= "\t\t\$get = array(\n\t\t\t'" . implode("' => true,\n\t\t\t'", array_keys($mappingFuncCode)) . "' => true\n\t\t);";
 		$result .= '
 		if($responseProfile){
 			$fieldsArray = array_flip(array_map("trim", explode(",", $responseProfile->fields)));
