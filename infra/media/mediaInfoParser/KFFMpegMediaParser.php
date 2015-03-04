@@ -537,11 +537,22 @@ class KFFMpegMediaParser extends KBaseMediaParser
 	 * @param unknown_type $srcFileName
 	 * @return array of keyframes
 	 */
-	public static function retrieveKeyFrames($ffprobeBin, $srcFileName)
+	public static function retrieveKeyFrames($ffprobeBin, $srcFileName,$start=null,$duration=null)
 	{
 		KalturaLog::log("srcFileName($srcFileName)");
-	
-		$cmdLine = "$ffprobeBin -show_frames -select_streams v -of default=nk=1:nw=1 -f lavfi \"movie='$srcFileName',select=eq(pict_type\,PICT_TYPE_I)\" -show_entries frame=pkt_pts_time";
+		
+		$trimStr=null;
+		if(isset($start) && $start>0){
+			$trimStr = ",trim=start=$start";
+		}
+		if(isset($duration) && $duration>0){
+			if(isset($trimStr))
+				$trimStr.= ":duration=$duration";
+			else
+				$trimStr = ",trim=duration=$duration";
+		}
+		
+		$cmdLine = "$ffprobeBin -show_frames -select_streams v -of default=nk=1:nw=1 -f lavfi \"movie='$srcFileName',select=eq(pict_type\,PICT_TYPE_I)$trimStr\" -show_entries frame=pkt_pts_time";
 		KalturaLog::log("$cmdLine");
 		$lastLine=exec($cmdLine , $outputArr, $rv);
 		if($rv!=0) {
