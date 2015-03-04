@@ -6,6 +6,7 @@
 class serveFlavorAction extends kalturaAction
 {
 	const CHUNK_SIZE = 1048576; // 1024 X 1024
+	const NO_CLIP_TO = 2147483647;
 	
 	protected function storeCache($renderer, $partnerId)
 	{
@@ -31,6 +32,7 @@ class serveFlavorAction extends kalturaAction
 		$flavorId = $this->getRequestParameter("flavorId");
 		$shouldProxy = $this->getRequestParameter("forceproxy", false);
 		$ks = $this->getRequestParameter( "ks" );
+		$fileName = $this->getRequestParameter( "fileName" );
 		$fileParam = $this->getRequestParameter( "file" );
 		$fileParam = basename($fileParam);
 		$pathOnly = $this->getRequestParameter( "pathOnly", false );
@@ -45,7 +47,14 @@ class serveFlavorAction extends kalturaAction
 		$entryId = $this->getRequestParameter("entryId");
 		if (!is_null($entryId) && $flavorAsset->getEntryId() != $entryId)
 			KExternalErrors::dieError(KExternalErrors::FLAVOR_NOT_FOUND);
-		
+
+		if ($fileName)
+		{
+			header("Content-Disposition: attachment; filename=\"$fileName\"");
+			header("Content-Type: application/force-download");
+			header( "Content-Description: File Transfer" );
+		}
+
 		$clipTo = null;
 //		$securyEntryHelper = new KSecureEntryHelper($entry, $ks, $referrer, ContextType::PLAY);
 //		if ($securyEntryHelper->shouldPreview())
@@ -119,22 +128,30 @@ class serveFlavorAction extends kalturaAction
 	
 		$clipFrom = $this->getRequestParameter ( "clipFrom" , 0); // milliseconds
 		if(is_null($clipTo))
-			$clipTo = $this->getRequestParameter ( "clipTo" , 2147483647 ); // milliseconds
+			$clipTo = $this->getRequestParameter ( "clipTo" , self::NO_CLIP_TO ); // milliseconds
 		if($clipTo == 0) 
-			$clipTo = 2147483647;
+			$clipTo = self::NO_CLIP_TO;
 		if(!is_numeric($clipTo) || $clipTo < 0)
 			KExternalErrors::dieError(KExternalErrors::BAD_QUERY, 'clipTo must be a positive number');
 		
-
+		$seekFrom = $this->getRequestParameter ( "seekFrom" , -1);
+		if ($seekFrom <= 0)
+			$seekFrom = -1;
+		
+		$seekFromBytes = $this->getRequestParameter ( "seekFromBytes" , -1);
+		if ($seekFromBytes <= 0)
+			$seekFromBytes = -1;
+		
+		
 		if($fileParam && is_dir($path)) {
 			$path .= "/$fileParam";
 			kFileUtils::dumpFile($path, null, null);
 			KExternalErrors::dieGracefully();
 		}
-		else if (!$isFlv) // dump as regular file if the forceproxy parameter was specified or the file isn't an flv
+		else if (!$isFlv || ($clipTo == self::NO_CLIP_TO && $seekFrom < 0 && $seekFromBytes < 0)) // dump as regular file if the forceproxy parameter was specified or the file isn't an flv
 		{
 			$limit_file_size = 0;
-			if ($clipTo != 2147483647)
+			if ($clipTo != self::NO_CLIP_TO)
 			{
 				if (strtolower($flavorAsset->getFileExt()) == 'mp4' && 
 					PermissionPeer::isValidForPartner(PermissionName::FEATURE_ACCURATE_SERVE_CLIPPING, $flavorAsset->getPartnerId()))
@@ -191,14 +208,6 @@ class serveFlavorAction extends kalturaAction
 			$audioOnly = true; 
 		}
 		
-		$seekFrom = $this->getRequestParameter ( "seekFrom" , -1);
-		if ($seekFrom <= 0)
-			$seekFrom = -1;
-		
-		$seekFromBytes = $this->getRequestParameter ( "seekFromBytes" , -1);
-		if ($seekFromBytes <= 0)
-			$seekFromBytes = -1;
-	
 		$bytes = 0;
 		if ($seekFrom !== -1 && $seekFrom !== 0)
 		{
@@ -222,9 +231,7 @@ class serveFlavorAction extends kalturaAction
 			requestUtils::sendCdnHeaders("flv", $rangeLength, 0);
 		else
 			requestUtils::sendCdnHeaders("flv", $rangeLength);
-			
-		header('Content-Disposition: attachment; filename="video.flv"');
-				
+
 		// dont inject cuepoint into the stream
 		$cuepointTime = 0;
 		$cuepointPos = 0;
@@ -237,8 +244,8 @@ class serveFlavorAction extends kalturaAction
 		{
 			$this->logMessage( "serveFlavor: error closing db $e");
 		}
-		
 		header("Content-Type: video/x-flv");
+
 		$flvWrapper->dump(self::CHUNK_SIZE, $fromByte, $toByte, $audioOnly, $seekFromBytes, $rangeFrom, $rangeTo, $cuepointTime, $cuepointPos);
 		KExternalErrors::dieGracefully();
 	}
