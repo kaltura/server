@@ -434,4 +434,10 @@ class kString
 			$values = array_filter($values, 'strlen');
 		return $values;
 	}
+	
+	public static function stripInvalidUrlChars($url)
+	{
+		return str_replace(array('?', '|', '*', '\\', '/' , '>' , '<', '&', '[', ']'), '_', $url);
+	}
+
 }

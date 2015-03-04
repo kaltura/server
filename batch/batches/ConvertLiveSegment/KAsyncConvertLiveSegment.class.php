@@ -71,11 +71,12 @@ class KAsyncConvertLiveSegment extends KJobHandlerWorker
 		$jobData = $job->data;
 		
 		$ffmpegBin = KBatchBase::$taskConfig->params->ffmpegCmd;
+		$ffprobeBin = isset(KBatchBase::$taskConfig->params->ffprobeCmd)? KBatchBase::$taskConfig->params->ffprobeCmd: "ffprobe";
 		$fileName = "{$job->entryId}_{$jobData->assetId}_{$data->mediaServerIndex}.{$job->id}.ts";
 		$localTempFilePath = $this->localTempPath . DIRECTORY_SEPARATOR . $fileName;
 		$sharedTempFilePath = $this->sharedTempPath . DIRECTORY_SEPARATOR . $fileName;
 		
-		$result = $this->convertRecordedToMPEGTS($ffmpegBin, $data->srcFilePath, $localTempFilePath);
+		$result = $this->convertRecordedToMPEGTS($ffmpegBin, $ffprobeBin, $data->srcFilePath, $localTempFilePath);
 		if(! $result)
 			return $this->closeJob($job, KalturaBatchJobErrorTypes::RUNTIME, null, "Failed to convert file", KalturaBatchJobStatus::FAILED);
 		
@@ -108,12 +109,33 @@ class KAsyncConvertLiveSegment extends KJobHandlerWorker
 		return $this->closeJob($job, null, null, 'Succesfully moved file', KalturaBatchJobStatus::FINISHED, $data);
 	}
 	
-	protected function convertRecordedToMPEGTS($ffmpegBin, $inFilename, $outFilename)
+	protected function convertRecordedToMPEGTS($ffmpegBin, $ffprobeBin, $inFilename, $outFilename)
 	{
 		$cmdStr = "$ffmpegBin -i $inFilename -c copy -bsf:v h264_mp4toannexb -f mpegts -y $outFilename 2>&1";
 		
 		KalturaLog::debug("Executing [$cmdStr]");
 		$output = system($cmdStr, $rv);
+
+		/*
+		 * Anomaly detection -
+		*	Look for the time of the first KF in the source file.
+		*	Should be less than 200 msec
+		*	Currnetly - just logging
+		*/
+		$detectInterval = 10;		// sec
+		$maxKeyFrameTime = 0.200;	// sec
+		$kfArr=KFFMpegMediaParser::retrieveKeyFrames($ffprobeBin, $inFilename,0,$detectInterval);
+		KalturaLog::log("KeyFrames:".print_r($kfArr,1));
+		if(count($kfArr)==0){
+			KalturaLog::log("Anomaly detection: NO Keyframes in the detection interval ($detectInterval sec)");
+		}
+		else if($kfArr[0]>$maxKeyFrameTime){
+			KalturaLog::log("Anomaly detection: ERROR, first KF at ($kfArr[0] sec), max allowed ($maxKeyFrameTime sec)");
+		}
+		else {
+			KalturaLog::log("Anomaly detection: OK, first KF at ($kfArr[0] sec), max allowed ($maxKeyFrameTime sec)");
+		}
+		
 		return ($rv == 0) ? true : false;
 	}
 }
