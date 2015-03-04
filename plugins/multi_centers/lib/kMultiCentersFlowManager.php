@@ -100,12 +100,8 @@ class kMultiCentersFlowManager implements kBatchJobStatusEventConsumer
 			return $dbBatchJob;
 		}
 		
-		if ( $fileSync->getStatus() != FileSync::FILE_SYNC_STATUS_DELETED )
-		{
-			$fileSync->setStatus(FileSync::FILE_SYNC_STATUS_ERROR);
-			$fileSync->save();
-		}
-
+		$fileSync->setStatus(FileSync::FILE_SYNC_STATUS_ERROR);
+		$fileSync->save();
 		return $dbBatchJob;
 	}
 }
