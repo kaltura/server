@@ -152,7 +152,7 @@ function handleFile($filePath)
 			{
 				$pk = $value;
 			}
-			elseif ($attributeName == 'identifierParam' || $attributeName == 'identifierColumn')
+			elseif ($attributeName == 'identifierParam')
 			{
 				$$attributeName = $value;
 				continue;
@@ -192,11 +192,12 @@ function handleFile($filePath)
 			$existingObject = $peer->doSelectOne($pkCriteria, $con);
 			
 		}
-		elseif (!is_null($identifierParam) && !is_null($identifierColumn))
+		elseif (!is_null($identifierParam))
 		{
 			// If we have some other form of identifier on the object
+			$identifierColumn = $peer::translateFieldName($identifierParam, BasePeer::TYPE_STUDLYPHPNAME, BasePeer::TYPE_COLNAME);
 			$c = new Criteria();
-			$c->add (constant(get_class($peer) . "::$identifierColumn"), $objectConfiguration[$identifierParam]);
+			$c->add ($identifierColumn, $objectConfiguration[$identifierParam]);
 			$existingObject = $peer->doSelectOne($c, $con);
 		}
 		
