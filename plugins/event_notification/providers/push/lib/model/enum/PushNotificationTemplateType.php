@@ -1,6 +1,6 @@
 <?php
 /**
- * @package plugins.httpNotification
+ * @package plugins.pushNotification
  * @subpackage model.enum
  */
 class PushNotificationTemplateType implements IKalturaPluginEnum, EventNotificationTemplateType

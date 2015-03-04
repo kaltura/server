@@ -79,7 +79,10 @@ class PushNotificationPlugin extends KalturaPlugin implements IKalturaPermission
     
         if ($baseClass == 'KalturaEventNotificationTemplate' && $enumValue == self::getPushNotificationTemplateTypeCoreValue(PushNotificationTemplateType::PUSH))
             return 'KalturaPushNotificationTemplate';
-   
+                          
+        if($baseClass == 'Kaltura_Client_EventNotification_Type_EventNotificationTemplate' && $enumValue == Kaltura_Client_EventNotification_Enum_EventNotificationTemplateType::PUSH)
+            return 'Kaltura_Client_PushNotification_Type_PushNotificationTemplate';
+           
         return null;
     }  
     
