@@ -305,10 +305,10 @@ abstract class KalturaObject
 		if($responseProfile){
 			$fieldsArray = array_flip(array_map("trim", explode(",", $responseProfile->fields)));
 			if($responseProfile->type == ResponseProfileType::INCLUDE_FIELDS){
-				$get = array_intersectt_key($get, $fieldsArray);
+				$get = array_intersect_key($get, $fieldsArray);
 			}
 			else{
-				$get = array_difft_key($get, $fieldsArray);
+				$get = array_diff_key($get, $fieldsArray);
 			}
 		}
 		';
