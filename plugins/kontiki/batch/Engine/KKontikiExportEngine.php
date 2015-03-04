@@ -32,7 +32,7 @@ class KKontikiExportEngine extends KExportEngine
 		KBatchBase::impersonate($this->partnerId);
 		$url = KBatchBase::$kClient->flavorAsset->getUrl($this->data->flavorAssetId, null, true);
 		$kontikiResult = $this->kontikiAPIWrapper->addKontikiUploadResource(KontikiPlugin::SERVICE_TOKEN_PREFIX . base64_encode($this->data->serviceToken), $url);
-		KalturaLog::info("Upload result: $result");
+		KalturaLog::info("Upload result: " . print_r($kontikiResult, true));
         
         if (!$kontikiResult->moid)
             throw new kApplicativeException(KalturaBatchJobAppErrors::MISSING_PARAMETERS, "missing mandatory parameter moid");

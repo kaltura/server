@@ -6,8 +6,8 @@ class DeliveryProfileLocalPathRtmp extends DeliveryProfileRtmp {
 	{
 		$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 		$fileSync = kFileSyncUtils::getReadyInternalFileSyncForKey($syncKey);
-		$url = $this->doGetFileSyncUrl($fileSync);
-		$url = $this->formatByExtension($url);
+		$url = $this->getFileSyncUrl($fileSync);
+		$url = $this->formatByExtension($url, false);
 		return $url;
 	}
 	
@@ -16,5 +16,6 @@ class DeliveryProfileLocalPathRtmp extends DeliveryProfileRtmp {
 		$url = preg_replace('/\.[\w]+$/', '', $url);
 		return $url;
 	}
+	
 }
 
