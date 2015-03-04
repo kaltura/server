@@ -16,6 +16,11 @@ class WSEntryLiveStats extends WSLiveStats
 	 * @var long
 	 */
 	public $peakAudience;
+
+    /**
+     * @var long
+     */
+    public $peakDvrAudience;
 }
 
 
