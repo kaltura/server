@@ -13,9 +13,4 @@ class KalturaPartnerUsageListResponse extends KalturaListResponse
      * @var KalturaVarPartnerUsageArray
      */
     public $objects;
-    
-    /**
-     * @var int
-     */
-    public $totalCount;
 }

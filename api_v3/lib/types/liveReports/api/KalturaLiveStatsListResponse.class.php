@@ -12,12 +12,6 @@ class KalturaLiveStatsListResponse extends KalturaListResponse
 	 **/
 	public $objects;
 	
-	/**
-	 *
-	 * @var int
-	 **/
-	public $totalCount = 0;
-	
 	public function getWSObject() {
 		$obj = new WSLiveEntriesListResponse();
 		$obj->fromKalturaObject($this);
