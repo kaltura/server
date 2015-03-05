@@ -1,6 +1,15 @@
 #!/bin/bash - 
 
 #set -o nounset     # Treat unset variables as an error
+if [ ! -x "`which jar 2>/dev/null`" ];then
+    echo "Need to install jar."
+    exit 1
+fi
+if [ ! -x "`which javac 2>/dev/null`" ];then
+    echo "Need to install javac."
+    exit 2
+fi
+
 mkdir -p bin
 cd bin
 cp ../src/DemoImage.jpg ../src/DemoVideo.flv .
