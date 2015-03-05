@@ -192,7 +192,8 @@ class serveFlavorAction extends kalturaAction
 			}
 			
 			$renderer = kFileUtils::getDumpFileRenderer($path, null, null, $limit_file_size);
-			$this->storeCache($renderer, $flavorAsset->getPartnerId());
+			if(!$fileName)
+				$this->storeCache($renderer, $flavorAsset->getPartnerId());
 			$renderer->output();
 			
 			KExternalErrors::dieGracefully();
