@@ -668,6 +668,44 @@ class KalturaClientBase
 		}
 	}
 
+	public function setClientConfiguration(KalturaClientConfiguration $configuration)
+	{
+		$params = get_class_vars('KalturaClientConfiguration');
+		foreach($params as $param)
+		{
+			if(is_null($configuration->$param))
+			{
+				if(isset($this->clientConfiguration[$param]))
+				{
+					unset($this->clientConfiguration[$param]);
+				}
+			}
+			else
+			{
+				$this->clientConfiguration[$param] = $configuration->$param;
+			}
+		}
+	}
+	
+	public function setRequestConfiguration(KalturaRequestConfiguration $configuration)
+	{
+		$params = get_class_vars('KalturaRequestConfiguration');
+		foreach($params as $param)
+		{
+			if(is_null($configuration->$param))
+			{
+				if(isset($this->requestConfiguration[$param]))
+				{
+					unset($this->requestConfiguration[$param]);
+				}
+			}
+			else
+			{
+				$this->requestConfiguration[$param] = $configuration->$param;
+			}
+		}
+	}
+	
 	/**
 	 * Add parameter to array of parameters that is passed by reference
 	 *

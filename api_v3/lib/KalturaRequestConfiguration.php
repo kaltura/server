@@ -3,7 +3,7 @@
 /**
  * Define client request optional configurations
  */
-class KalturaRequestConfiguration
+class KalturaRequestConfiguration extends KalturaObject
 {
 	/**
 	 * Impersonated partner id

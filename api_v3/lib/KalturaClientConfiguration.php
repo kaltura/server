@@ -3,7 +3,7 @@
 /**
  * Define client optional configurations
  */
-class KalturaClientConfiguration
+class KalturaClientConfiguration extends KalturaObject
 {
 	/**
 	 * @var string

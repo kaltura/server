@@ -688,24 +688,6 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 			$configurationName = $configurationNode->nodeName;
 			$methodsName = ucfirst($configurationName) . "Configuration";
 		
-			$this->appendLine("	public function set{$methodsName}(\$param, \$value)");
-			$this->appendLine("	{");
-			$this->appendLine("		\$this->{$configurationName}Configuration[\$param] = \$value;");
-			$this->appendLine("	}");
-			$this->appendLine("	");
-		
-			
-			$this->appendLine("	public function get{$methodsName}(\$param)");
-			$this->appendLine("	{");
-			$this->appendLine("		if(isset(\$this->{$configurationName}Configuration[\$param]))");
-			$this->appendLine("		{");
-			$this->appendLine("			return \$this->{$configurationName}Configuration[\$param];");
-			$this->appendLine("		}");
-			$this->appendLine("		");
-			$this->appendLine("		return null;");
-			$this->appendLine("	}");
-			$this->appendLine("	");
-			
 			foreach($configurationNode->childNodes as $configurationPropertyNode)
 			{
 				/* @var $configurationPropertyNode DOMElement */

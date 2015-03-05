@@ -652,6 +652,10 @@ abstract class ClientGeneratorFromPhp
 					$includeList[] = $item;
 		}
 		
+		// Always add these two classes
+		$includeList[] = 'KalturaClientConfiguration';
+		$includeList[] = 'KalturaRequestConfiguration';
+		
 		foreach($includeList as $class)
 		{
 			$classTypeReflector = KalturaTypeReflectorCacher::get($class);
