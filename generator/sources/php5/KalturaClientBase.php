@@ -1182,7 +1182,7 @@ class KalturaException extends Exception
 	 */
 	public function getArgument($argument)
 	{
-		if(isset($this->arguments[$argument]))
+		if($this->arguments && isset($this->arguments[$argument]))
 		{
 			return $this->arguments[$argument];
 		}
