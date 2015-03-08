@@ -15,7 +15,6 @@ class BusinessProcessCaseService extends KalturaBaseService
 		if (!EventNotificationPlugin::isAllowedPartner($partnerId))
 			throw new KalturaAPIException(KalturaErrors::FEATURE_FORBIDDEN, EventNotificationPlugin::PLUGIN_NAME);
 			
-		$this->applyPartnerFilterForClass('BusinessProcessServer');
 		$this->applyPartnerFilterForClass('EventNotificationTemplate');
 	}
 	
