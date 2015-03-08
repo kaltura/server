@@ -49,9 +49,9 @@ class Kaltura_View_Helper_EntryBusinessProcess extends Kaltura_View_Helper_Parti
 		{
 			foreach($businessProcessCases as $businessProcessCase)
 			{
-				$businessProcessCasesUrls[$businessProcessCase->templateId] = $businessProcessNotificationPlugin->businessProcessCase->serveDiagram($objectType, $this->entryId, $businessProcessCase->templateId);
-				$businessProcesses[$businessProcessCase->templateId] = $businessProcessCase;
-				$templateIds[] = $businessProcessCase->templateId;
+				$businessProcessCasesUrls[$businessProcessCase->businessProcessStartNotificationTemplateId] = $businessProcessNotificationPlugin->businessProcessCase->serveDiagram($objectType, $this->entryId, $businessProcessCase->businessProcessStartNotificationTemplateId);
+				$businessProcesses[$businessProcessCase->businessProcessStartNotificationTemplateId] = $businessProcessCase;
+				$templateIds[] = $businessProcessCase->businessProcessStartNotificationTemplateId;
 			}
 		}
 
