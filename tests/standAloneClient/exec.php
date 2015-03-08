@@ -202,6 +202,11 @@ function executeRequest(KalturaClient $client, SimpleXMLElement $request)
 		require_once realpath(__DIR__ . '/../') . "/lib/KalturaPlugins/$pluginClass.php";
 
 		$plugin = call_user_func(array($pluginClass, 'get'), $client);
+		if(!property_exists($plugin, $serviceName))
+		{
+			echo "Service [$serviceName] not found on plugin [$pluginName]\n";
+			exit(-1);
+		}
 		$service = $plugin->$serviceName;
 	}
 	else //get core service
