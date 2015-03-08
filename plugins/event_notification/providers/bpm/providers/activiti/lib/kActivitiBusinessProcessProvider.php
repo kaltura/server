@@ -153,8 +153,8 @@ class kActivitiBusinessProcessProvider extends kBusinessProcessProvider
 	/* (non-PHPdoc)
 	 * @see kBusinessProcessProvider::getCaseDiagramUrl()
 	 */
-	public function getCaseDiagramUrl($caseId)
+	public function getCaseDiagram($caseId, $filename)
 	{
-		return $this->client->processInstances->getDiagramForProcessInstance($caseId);
+		file_put_contents($filename, $activiti->processInstances->getDiagramForProcessInstance($caseId));
 	}
 }

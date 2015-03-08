@@ -116,14 +116,14 @@ class ActivitiProcessInstancesService extends ActivitiService
 	/**
 	 * Get diagram for a process instance
 	 * 
-	 * @return ActivitiGetDiagramForProcessInstanceResponse
+	 * @return string
 	 * @see {@link http://www.activiti.org/userguide/#N13F76 Get diagram for a process instance}
 	 */
-	public function getDiagramForProcessInstance($processInstanceId)
+	public function getDiagramForProcessInstance($processInstanceId, $filePath)
 	{
 		$data = array();
 		
-		return $this->client->request("runtime/process-instances/$processInstanceId/diagram", 'GET', $data, array(200), array(400 => "Indicates the requested process instance was not found but the process doesn't contain any graphical information (BPMN:DI) and no diagram can be created.",404 => "Indicates the requested process instance was not found."), 'ActivitiGetDiagramForProcessInstanceResponse');
+		return $this->client->request("runtime/process-instances/$processInstanceId/diagram", 'GET', $data, array(200), array(400 => "Indicates the requested process instance was not found but the process doesn't contain any graphical information (BPMN:DI) and no diagram can be created.",404 => "Indicates the requested process instance was not found."), 'string');
 	}
 	
 	/**

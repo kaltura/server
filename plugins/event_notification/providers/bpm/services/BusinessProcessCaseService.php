@@ -111,12 +111,13 @@ class BusinessProcessCaseService extends KalturaBaseService
 		
 		$caseId = end($caseIds);
 		$provider->abortCase($caseId);
-		$url = $provider->getCaseDiagramUrl($caseId);
 		
 		$filename = myContentStorage::getFSCacheRootPath() . 'bpm_diagram/bpm_';
 		$filename .= $objectId . '_';
 		$filename .= $businessProcessStartNotificationTemplateId . '_';
 		$filename .= $caseId . '.jpg';
+		
+		$url = $provider->getCaseDiagram($caseId, $filename);
 		
 		KCurlWrapper::getDataFromFile($url, $filename);
 		$mimeType = kFile::mimeType($filename);			
