@@ -45,7 +45,7 @@ class BusinessProcessCaseService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaEventNotificationErrors::EVENT_NOTIFICATION_TEMPLATE_NOT_FOUND, $businessProcessStartNotificationTemplateId);
 		}
 		
-		$caseIds = $dbTemplate->getCaseIds($dbObject);
+		$caseIds = $dbTemplate->getCaseIds($dbObject, false);
 		if(!count($caseIds))
 		{
 			throw new KalturaAPIException(KalturaBusinessProcessNotificationErrors::BUSINESS_PROCESS_CASE_NOT_FOUND);
@@ -93,7 +93,7 @@ class BusinessProcessCaseService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaEventNotificationErrors::EVENT_NOTIFICATION_TEMPLATE_NOT_FOUND, $businessProcessStartNotificationTemplateId);
 		}
 		
-		$caseIds = $dbTemplate->getCaseIds($dbObject);
+		$caseIds = $dbTemplate->getCaseIds($dbObject, false);
 		if(!count($caseIds))
 		{
 			throw new KalturaAPIException(KalturaBusinessProcessNotificationErrors::BUSINESS_PROCESS_CASE_NOT_FOUND);
@@ -157,7 +157,7 @@ class BusinessProcessCaseService extends KalturaBaseService
 				continue;
 			}
 			
-			$caseIds = $dbTemplate->getCaseIds($dbObject);
+			$caseIds = $dbTemplate->getCaseIds($dbObject, false);
 			if(!count($caseIds))
 			{
 				continue;
