@@ -67,9 +67,9 @@ class BusinessProcessCaseService extends KalturaBaseService
 	}
 
 	/**
-	 * Abort business-process case
+	 * Server business-process case diagram
 	 * 
-	 * @action abort
+	 * @action serveDiagram
 	 * @param KalturaEventNotificationEventObjectType $objectType
 	 * @param string $objectId
 	 * @param int $businessProcessStartNotificationTemplateId
