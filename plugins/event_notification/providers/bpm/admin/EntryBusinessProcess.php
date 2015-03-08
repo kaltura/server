@@ -42,9 +42,9 @@ class Kaltura_View_Helper_EntryBusinessProcess extends Kaltura_View_Helper_Parti
 		}
 	
 		$businessProcesses = array();
+		$businessProcessCasesUrls = array();
 		if(count($businessProcessCases))
 		{
-			$businessProcessCasesUrls = array();
 			$templateIds = array();
 			foreach($businessProcessCases as $businessProcessCase)
 			{
