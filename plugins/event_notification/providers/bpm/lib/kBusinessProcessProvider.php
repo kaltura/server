@@ -43,7 +43,7 @@ abstract class kBusinessProcessProvider
 	 * @param string $caseId
 	 * @param string $filename
 	 */
-	public function getCaseDiagram($caseId, $filename);
+	abstract public function getCaseDiagram($caseId, $filename);
 	
 	/**
 	 * @param string $caseId
