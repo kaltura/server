@@ -41,11 +41,11 @@ class Kaltura_View_Helper_EntryBusinessProcess extends Kaltura_View_Helper_Parti
 			$errDescriptions[] = $e->getMessage();
 		}
 	
+		$templateIds = array();
 		$businessProcesses = array();
 		$businessProcessCasesUrls = array();
 		if(count($businessProcessCases))
 		{
-			$templateIds = array();
 			foreach($businessProcessCases as $businessProcessCase)
 			{
 				$businessProcessCasesUrls[$businessProcessCase->templateId] = $businessProcessNotificationPlugin->businessProcessCase->serveDiagram($objectType, $this->entryId, $businessProcessCase->templateId);
@@ -55,7 +55,7 @@ class Kaltura_View_Helper_EntryBusinessProcess extends Kaltura_View_Helper_Parti
 		}
 
 		$eventNotificationTemplates = array();
-		if($templateIds)
+		if(count($templateIds))
 		{
 			$filter = new Kaltura_Client_EventNotification_Type_EventNotificationTemplateFilter();
 			$filter->idIn = implode(',', $templateIds);
