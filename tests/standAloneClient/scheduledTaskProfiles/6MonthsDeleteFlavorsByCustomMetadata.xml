@@ -14,7 +14,7 @@
 		<userAgent>Stand alone php 1.0.0</userAgent>
 	</config>
 	<session />
-	<!-- 30 Days Delete Flavors -->
+	<!-- 6 Months Delete Flavors -->
 	<request service="scheduledTaskProfile" action="add" plugin="scheduledTask" partnerId="{variable:partnerId}">
 		<scheduledTaskProfile objectType="KalturaScheduledTaskProfile">
 			<name>6 months delete flavors if metadata conditions met</name>

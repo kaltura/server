@@ -678,6 +678,7 @@ scriptPath											= ../plugins/scheduled_task/batch/ScheduledTaskDryRunner/KS
 params.sharedTempPath 								= @TMP_DIR@/scheduledtasks
 
 [KScheduledTaskRunner : PeriodicWorker]
+id													= 610
 type												= KScheduledTaskRunner
 maximumExecutionTime								= 600
 scriptPath											= ../plugins/scheduled_task/batch/ScheduledTaskRunner/KScheduledTaskRunnerExe.php
