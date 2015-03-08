@@ -29,6 +29,7 @@ class Kaltura_View_Helper_EntryBusinessProcess extends Kaltura_View_Helper_Parti
 		$businessProcessNotificationPlugin = Kaltura_Client_BusinessProcessNotification_Plugin::get($client);
 		
 		$errDescriptions = array();
+		$businessProcessCases = array();
 		try
 		{
 			Infra_ClientHelper::impersonate($this->partnerId);
