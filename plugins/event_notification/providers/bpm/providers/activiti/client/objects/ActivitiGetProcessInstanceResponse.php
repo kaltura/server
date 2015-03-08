@@ -4,7 +4,7 @@ require_once(__DIR__ . '/../ActivitiResponseObject.php');
 
 	
 
-class ActivitiGetProcessInstanceResponse extends ActivitiResponseObject
+class ActivitiGetProcessInstanceResponse extends ActivitiResponseObject implements IBusinessProcessCase
 {
 	/* (non-PHPdoc)
 	 * @see ActivitiResponseObject::getAttributes()

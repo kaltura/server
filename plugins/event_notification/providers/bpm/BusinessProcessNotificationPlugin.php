@@ -178,6 +178,13 @@ class BusinessProcessNotificationPlugin extends KalturaPlugin implements IKaltur
 				new Kaltura_View_Helper_BusinessProcessNotificationTemplateConfigure(),
 			);
 		}
+	
+		if($controller == 'batch' && $action == 'entryInvestigation')
+		{
+			return array(
+				new Kaltura_View_Helper_EntryBusinessProcess(),
+			);
+		}
 		
 		return array();
 	}
@@ -230,6 +237,7 @@ class BusinessProcessNotificationPlugin extends KalturaPlugin implements IKaltur
 	{
 		return array(
 			'businessProcessServer' => 'BusinessProcessServerService',
+			'businessProcessCase' => 'BusinessProcessCaseService',
 		);
 	}
 }
