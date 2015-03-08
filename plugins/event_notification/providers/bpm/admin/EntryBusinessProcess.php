@@ -54,23 +54,28 @@ class Kaltura_View_Helper_EntryBusinessProcess extends Kaltura_View_Helper_Parti
 			}
 		}
 
-		$filter = new Kaltura_Client_EventNotification_Type_EventNotificationTemplateFilter();
-		$filter->idIn = implode(',', $templateIds);
-		try
+		$eventNotificationTemplates = array();
+		if($templateIds)
 		{
-			Infra_ClientHelper::impersonate($this->partnerId);
-			$eventNotificationTemplateList = $eventNotificationPlugin->eventNotificationTemplate->listAction($filter);
-			Infra_ClientHelper::unimpersonate();
-		}
-		catch (Exception $e)
-		{
-			$errDescriptions[] = $e->getMessage();
+			$filter = new Kaltura_Client_EventNotification_Type_EventNotificationTemplateFilter();
+			$filter->idIn = implode(',', $templateIds);
+			try
+			{
+				Infra_ClientHelper::impersonate($this->partnerId);
+				$eventNotificationTemplateList = $eventNotificationPlugin->eventNotificationTemplate->listAction($filter);
+				Infra_ClientHelper::unimpersonate();
+				$eventNotificationTemplates = $eventNotificationTemplateList->objects;
+			}
+			catch (Exception $e)
+			{
+				$errDescriptions[] = $e->getMessage();
+			}
 		}
 		
 		return array(
 			'businessProcessCases' => $businessProcesses,
 			'businessProcessCasesUrls' => $businessProcessCasesUrls,
-			'eventNotificationTemplates' => $eventNotificationTemplateList->objects,
+			'eventNotificationTemplates' => $eventNotificationTemplates,
 			'errDescriptions' => $errDescriptions,
 		);
 	}
