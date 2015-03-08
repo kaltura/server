@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xml>
+	<variables>
+		<variable name="partnerId">{prompt:Partner ID:}</variable>
+		<variable name="flavorParamsIds">{prompt:Flavor Params IDs:}</variable>
+		<variable name="metadataProfileId">{prompt:Metadata Profile ID:}</variable>
+		<variable name="maxTotalCountAllowed">{prompt:Max total count enabled:}</variable>
+	</variables>
+	<config>
+		<serviceUrl>http://{prompt:Host name:}/</serviceUrl>
+		<partnerId>-2</partnerId>
+		<clientTag>Stand alone php 1.0.0</clientTag>
+		<curlTimeout>30</curlTimeout>
+		<userAgent>Stand alone php 1.0.0</userAgent>
+	</config>
+	<session />
+	<!-- 30 Days Delete Flavors -->
+	<request service="scheduledTaskProfile" action="add" plugin="scheduledTask" partnerId="{variable:partnerId}">
+		<scheduledTaskProfile objectType="KalturaScheduledTaskProfile">
+			<name>6 months delete flavors if metadata conditions met</name>
+			<objectFilterEngineType>1</objectFilterEngineType>
+			<maxTotalCountAllowed>{variable:maxTotalCountAllowed}</maxTotalCountAllowed>
+			<objectFilter objectType="KalturaMediaEntryFilter">
+				<lastPlayedAtLessThanOrEqual>{php:return -6*30*24*60*60;}</lastPlayedAtLessThanOrEqual>
+				<advancedSearch objectType="KalturaSearchOperator">
+					<type>1</type>
+					<items objectType="array">
+						<item objectType="KalturaMetadataSearchItem">
+							<metadataProfileId>{variable:metadataProfileId}</metadataProfileId>
+							<type>1</type>
+							<items objectType="array">
+								<item objectType="KalturaSearchCondition">
+									<field>/*[local-name()='metadata']/*[local-name()='RetirementPolicy']</field>
+									<value>Prune</value>
+								</item>
+								<item objectType="KalturaSearchCondition">
+									<field>/*[local-name()='metadata']/*[local-name()='Pruned']</field>
+									<value>-1</value>
+								</item>
+							</items>
+						</item>
+					</items>
+				</advancedSearch>
+			</objectFilter>
+			<objectTasks objectType="array">
+				<item objectType="KalturaDeleteEntryFlavorsObjectTask">
+					<flavorParamsIds>{variable:flavorParamsIds}</flavorParamsIds>
+					<deleteType>2</deleteType><!-- DELETE_LIST -->
+					<stopProcessingOnError>true</stopProcessingOnError>
+				</item>
+			</objectTasks>
+		</scheduledTaskProfile>
+	</request>
+</xml>
