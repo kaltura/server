@@ -145,7 +145,7 @@ class LiveReportLocation1MinEngine extends LiveReportEngine {
 			
 			$plays = $audience = $avgBitrate = $bufferTime = $secondsViewed = $maxAudience = $dvrAudience = $maxDvrAudience = 0;
 			$minAudience = PHP_INT_MAX;
-            $minDvrAudience = PHP_INT_MAX;
+			$minDvrAudience = PHP_INT_MAX;
 			
 			foreach ($records as $record) {
 				$plays += $record->plays;
