@@ -73,6 +73,7 @@ class BusinessProcessCaseService extends KalturaBaseService
 	 * @param KalturaEventNotificationEventObjectType $objectType
 	 * @param string $objectId
 	 * @param int $businessProcessStartNotificationTemplateId
+	 * @return file
 	 *
 	 * @throws KalturaEventNotificationErrors::EVENT_NOTIFICATION_TEMPLATE_NOT_FOUND
 	 * @throws KalturaBusinessProcessNotificationErrors::BUSINESS_PROCESS_CASE_NOT_FOUND
