@@ -109,7 +109,6 @@ class BusinessProcessCaseService extends KalturaBaseService
 		$provider = kBusinessProcessProvider::get($businessProcessServer);
 		
 		$caseId = end($caseIds);
-		$provider->abortCase($caseId);
 		
 		$filename = myContentStorage::getFSCacheRootPath() . 'bpm_diagram/bpm_';
 		$filename .= $objectId . '_';
