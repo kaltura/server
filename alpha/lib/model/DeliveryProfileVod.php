@@ -26,6 +26,10 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 		$versionString = $this->getFlavorVersionString($flavorAsset);
 		
 		$url = "$partnerPath/serveFlavor/entryId/".$flavorAsset->getEntryId()."{$versionString}/flavorId/$flavorAssetId";
+		if ($this->params->extraParams)
+		{
+			
+		}
 		return $url;
 	}
 	
@@ -77,7 +81,12 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 	
 		if($asset instanceof flavorAsset)
 		{
+			$urlParams = $this->params->getUrlParams();
+			
 			$url = $this->doGetFlavorAssetUrl($asset);
+			if ($urlParams)
+				$url .= $urlParams;
+
 			$url = str_replace('\\', '/', $url);
 			if ($tokenizeUrl)
 			{
@@ -106,6 +115,19 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 		}
 		
 		return $hostName . $assetUrl;
+	}
+	
+	public function addUrlParams($urlParamsToAdd)
+	{
+		$urlOldString = $this->params->getUrlParams();
+		if ($urlOldString)
+			$urlParamsToAdd = $urlOldString . $urlParamsToAdd;  
+		$this->params->setUrlParams($urlParamsToAdd);
+	}
+	
+	public function getUrlParmas()
+	{
+		return $this->params->getUrlParams();
 	}
 	
 	protected function addSeekFromBytes($flavorAsset, $url, $prefix) {
