@@ -12,11 +12,11 @@ class KalturaLiveStats extends KalturaObject
 	 **/
 	public $audience = 0;
 
-    /**
-     *
-     * @var int
-     **/
-    public $dvrAudience = 0;
+	/**
+	 *
+	 * @var int
+	 **/
+	public $dvrAudience = 0;
 
 	/**
 	 *

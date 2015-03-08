@@ -16,10 +16,10 @@ class KalturaEntryLiveStats extends KalturaLiveStats
 	 */
 	public $peakAudience;
 
-    /**
-     * @var int
-     */
-    public $peakDvrAudience;
+	/**
+	 * @var int
+	 */
+	public $peakDvrAudience;
 	
 	public function getWSObject() {
 		$obj = new WSEntryLiveStats();

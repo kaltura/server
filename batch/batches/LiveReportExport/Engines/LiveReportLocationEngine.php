@@ -21,7 +21,7 @@ class LiveReportLocation1MinEngine extends LiveReportEngine {
 		$this->checkParams($args, array(LiveReportConstants::TIME_REFERENCE_PARAM, LiveReportConstants::ENTRY_IDS));
 		$toTime = $args[LiveReportConstants::TIME_REFERENCE_PARAM];
 		$fromTime = $args[LiveReportConstants::TIME_REFERENCE_PARAM] - LiveReportConstants::SECONDS_36_HOURS;
-        $showDvr = $this->shouldShowDvrColumns($args[LiveReportConstants::ENTRY_IDS]);
+		$showDvr = $this->shouldShowDvrColumns($args[LiveReportConstants::ENTRY_IDS]);
 
 		$this->printHeaders($fp, $showDvr);
 		
@@ -88,23 +88,24 @@ class LiveReportLocation1MinEngine extends LiveReportEngine {
 		return KBatchBase::$kClient->liveReports->getReport($reportType, $filter, $pager);
 	}
 
-    protected function shouldShowDvrColumns($entryIds) {
-        $filter = new KalturaLiveStreamEntryFilter();
-        $filter->idIn = $entryIds;
+	protected function shouldShowDvrColumns($entryIds)
+	{
+		$filter = new KalturaLiveStreamEntryFilter();
+		$filter->idIn = $entryIds;
 
-        /** @var KalturaLiveStreamListResponse */
-        $response = KBatchBase::$kClient->liveStream->listAction($filter, null);
+		/** @var KalturaLiveStreamListResponse */
+		$response = KBatchBase::$kClient->liveStream->listAction($filter, null);
 
-        $combinedDvrStatus = false;
-        foreach($response->objects as $object) {
-            if($object->dvrStatus == true) {
-                $combinedDvrStatus = true;
-                KalturaLog::debug("Found entry with DVR status = true: " . $object->id);
-            }
-        }
-        /* $combinedDvrStatus is true if at least one of the entries has dvrStatus = true */
-        return $combinedDvrStatus;
-    }
+		$combinedDvrStatus = false;
+		foreach ($response->objects as $object) {
+			if ($object->dvrStatus == true) {
+				$combinedDvrStatus = true;
+				KalturaLog::debug("Found entry with DVR status = true: " . $object->id);
+			}
+		}
+		/* $combinedDvrStatus is true if at least one of the entries has dvrStatus = true */
+		return $combinedDvrStatus;
+	}
 	
 	protected function printHeaders($fp, $showDvr) {
 		$values = array();
@@ -117,11 +118,11 @@ class LiveReportLocation1MinEngine extends LiveReportEngine {
 		$values[] = "Average Audience";
 		$values[] = "Min Audience";
 		$values[] = "Max Audience";
-        if ($showDvr) {
-            $values[] = "Average DVR Audience";
-            $values[] = "Min DVR Audience";
-            $values[] = "Max DVR Audience";
-        }
+		if ($showDvr) {
+			$values[] = "Average DVR Audience";
+			$values[] = "Min DVR Audience";
+			$values[] = "Max DVR Audience";
+		}
 		$values[] = "Average bitrate";
 		$values[] = "Buffer time";
 		$values[] = "Seconds viewed";
@@ -149,12 +150,12 @@ class LiveReportLocation1MinEngine extends LiveReportEngine {
 			foreach ($records as $record) {
 				$plays += $record->plays;
 				$audience += $record->audience;
-                $maxAudience = max($maxAudience, $record->audience);
-                if ($showDvr) {
-                    $dvrAudience += $record->dvrAudience;
-                    $maxDvrAudience = max($maxDvrAudience, $record->dvrAudience);
-                    $minDvrAudience = min($minDvrAudience, $record->dvrAudience);
-                }
+				$maxAudience = max($maxAudience, $record->audience);
+				if ($showDvr) {
+					$dvrAudience += $record->dvrAudience;
+					$maxDvrAudience = max($maxDvrAudience, $record->dvrAudience);
+					$minDvrAudience = min($minDvrAudience, $record->dvrAudience);
+				}
 				$minAudience = min($minAudience, $record->audience);
 				$avgBitrate += $record->avgBitrate;
 				$bufferTime += $record->bufferTime;
@@ -166,11 +167,11 @@ class LiveReportLocation1MinEngine extends LiveReportEngine {
 			$values[] = round($audience / $nObj, 2);
 			$values[] = $minAudience;
 			$values[] = $maxAudience;
-            if ($showDvr) {
-                $values[] = round($dvrAudience / $nObj, 2);
-                $values[] = $minDvrAudience;
-                $values[] = $maxDvrAudience;
-            }
+			if ($showDvr) {
+				$values[] = round($dvrAudience / $nObj, 2);
+				$values[] = $minDvrAudience;
+				$values[] = $maxDvrAudience;
+			}
 			$values[] = round($avgBitrate / $nObj, 2);
 			$values[] = round($bufferTime / $nObj, 2);
 			$values[] = $secondsViewed;
