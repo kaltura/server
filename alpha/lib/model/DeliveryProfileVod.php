@@ -26,10 +26,6 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 		$versionString = $this->getFlavorVersionString($flavorAsset);
 		
 		$url = "$partnerPath/serveFlavor/entryId/".$flavorAsset->getEntryId()."{$versionString}/flavorId/$flavorAssetId";
-		if ($this->params->extraParams)
-		{
-			
-		}
 		return $url;
 	}
 	
