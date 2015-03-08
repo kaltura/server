@@ -119,7 +119,7 @@ class ActivitiProcessInstancesService extends ActivitiService
 	 * @return string
 	 * @see {@link http://www.activiti.org/userguide/#N13F76 Get diagram for a process instance}
 	 */
-	public function getDiagramForProcessInstance($processInstanceId, $filePath)
+	public function getDiagramForProcessInstance($processInstanceId)
 	{
 		$data = array();
 		
