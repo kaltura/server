@@ -13,7 +13,7 @@ class KalturaRequestConfiguration extends KalturaObject
 	
 	/**
 	 * Kaltura API session
-	 * @alias session
+	 * @alias sessionId
 	 * @var string
 	 */
 	public $ks;

@@ -51,8 +51,9 @@ import com.kaltura.client.IKalturaLogger;
 import com.kaltura.client.KalturaLogger;
 
 public class BaseTest extends TestCase {
-	public KalturaConfiguration kalturaConfig = new KalturaConfiguration();
-
+	protected static KalturaTestConfig testConfig;
+	
+	protected KalturaConfiguration kalturaConfig = new KalturaConfiguration();
 	protected KalturaClient client;
 	
 	// keeps track of test vids we upload so they can be cleaned up at the end
@@ -66,11 +67,14 @@ public class BaseTest extends TestCase {
 	protected void setUp() throws Exception {
 		super.setUp();
 		
+		if(testConfig == null){
+			testConfig = new KalturaTestConfig();
+		}
+		
 		// Create client
-		this.kalturaConfig.setPartnerId(KalturaTestConfig.PARTNER_ID);
-		this.kalturaConfig.setSecret(KalturaTestConfig.SECRET);
-		this.kalturaConfig.setAdminSecret(KalturaTestConfig.ADMIN_SECRET);
-		this.kalturaConfig.setEndpoint(KalturaTestConfig.ENDPOINT);
+		this.kalturaConfig.setSecret(testConfig.getUserSecret());
+		this.kalturaConfig.setAdminSecret(testConfig.getAdminSecret());
+		this.kalturaConfig.setEndpoint(testConfig.getServiceUrl());
 		this.client = new KalturaClient(this.kalturaConfig);
 	}
 	
@@ -99,21 +103,25 @@ public class BaseTest extends TestCase {
 	}
 	
 	
-	public static void startUserSession(KalturaClient client, KalturaConfiguration kalturaConfig) throws KalturaApiException{
+	public static void startUserSession(KalturaClient client, KalturaConfiguration kalturaConfig) throws KalturaApiException, IOException{
 		startSession(client, kalturaConfig, kalturaConfig.getSecret(), KalturaSessionType.USER);
 	}
 	
-	public static void startAdminSession(KalturaClient client, KalturaConfiguration kalturaConfig) throws KalturaApiException{
+	public static void startAdminSession(KalturaClient client, KalturaConfiguration kalturaConfig) throws KalturaApiException, IOException{
 		startSession(client, kalturaConfig, kalturaConfig.getAdminSecret(), KalturaSessionType.ADMIN);
 	}
 	
 	protected static void startSession(KalturaClient client, KalturaConfiguration kalturaConfig, String secret,
-			KalturaSessionType type) throws KalturaApiException {
+			KalturaSessionType type) throws KalturaApiException, IOException {
 		
 		KalturaSessionService sessionService = client.getSessionService();
 
+		if(testConfig == null){
+			testConfig = new KalturaTestConfig();
+		}
+		
 		String sessionId = sessionService.start(secret, "admin", type,
-				kalturaConfig.getPartnerId(), 86400, "");
+				testConfig.getPartnerId(), 86400, "");
 		if (logger.isEnabled())
 			logger.debug("Session id:" + sessionId);
 		client.setSessionId(sessionId);
@@ -137,7 +145,7 @@ public class BaseTest extends TestCase {
 		
 		// Upload token
 		KalturaUploadToken uploadToken = new KalturaUploadToken();
-		uploadToken.fileName = KalturaTestConfig.UPLOAD_IMAGE;
+		uploadToken.fileName = testConfig.getUploadImage();
 		uploadToken.fileSize = fileSize;
 		KalturaUploadToken token = client.getUploadTokenService().add(uploadToken);
 		assertNotNull(token);
@@ -149,7 +157,7 @@ public class BaseTest extends TestCase {
 		assertNotNull(entry);
 		
 		// upload
-		uploadToken = client.getUploadTokenService().upload(token.id, fileData, KalturaTestConfig.UPLOAD_IMAGE, fileSize, false);
+		uploadToken = client.getUploadTokenService().upload(token.id, fileData, testConfig.getUploadImage(), fileSize, false);
 		if(container != null)
 			container.testIds.add(entry.id);
 		return client.getMediaService().get(entry.id);
