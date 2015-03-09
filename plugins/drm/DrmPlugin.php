@@ -103,13 +103,13 @@ class DrmPlugin extends KalturaPlugin implements IKalturaServices, IKalturaAdmin
     {
         if($baseClass == 'KOperationEngine' && $enumValue == KalturaConversionEngineType::CENC)
             return new KCEncOperationEngine($constructorArgs['params'], $constructorArgs['outFilePath']);
-        if($baseClass == 'KDLOperatorBase' && $enumValue == self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . DrmConversionEngineType::CENC)
+        if($baseClass == 'KDLOperatorBase' && $enumValue == self::getApiValue(DrmConversionEngineType::CENC))
             return new KDLOperatorDRM($enumValue);
-        if($baseClass == 'KalturaDrmProfile' && $enumValue == KalturaDrmProviderType::CENC)
+/*        if($baseClass == 'KalturaDrmProfile' && $enumValue == KalturaDrmProviderType::CENC)
             return new KalturaDrmProfile();
         if($baseClass == 'DrmProfile' && $enumValue == KalturaDrmProviderType::CENC)
             return new DrmProfile();
-
+*/
         return null;
     }
 
@@ -120,14 +120,22 @@ class DrmPlugin extends KalturaPlugin implements IKalturaServices, IKalturaAdmin
     {
         if($baseClass == 'KOperationEngine' && $enumValue == KalturaConversionEngineType::CENC)
             return "KDRMOperationEngine";
-        if($baseClass == 'KDLOperatorBase' && $enumValue == KalturaConversionEngineType::CENC)
+        if($baseClass == 'KDLOperatorBase' && $enumValue == self::getApiValue(DrmConversionEngineType::CENC))
             return "KDLOperatorDRM";
-        if($baseClass == 'KalturaDrmProfile' && KalturaDrmProviderType::CENC)
+        if($baseClass == 'KalturaDrmProfile' && $enumValue == KalturaDrmProviderType::CENC)
             return "KalturaDrmProfile";
-        if($baseClass == 'DrmProfile' && KalturaDrmProviderType::CENC)
+        if($baseClass == 'DrmProfile' && $enumValue == KalturaDrmProviderType::CENC)
             return "DrmProfile";
 
         return null;
+    }
+
+    /**
+     * @return string
+     */
+    protected static function getApiValue($value)
+    {
+        return self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $value;
     }
 
 
