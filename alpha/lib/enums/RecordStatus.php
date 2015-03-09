@@ -5,7 +5,7 @@
  */ 
 interface RecordStatus extends BaseEnum
 {
-   const ENABLED = 1;
-   
    const DISABLED = 0;
+   const APPENDED = 1;
+   const PER_SESSION = 2;
 }
