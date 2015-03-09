@@ -93,9 +93,13 @@ abstract class BusinessProcessNotificationTemplate extends BatchEventNotificatio
 		return array();
 	}
 	
-	public function getCaseIds(BaseObject $object)
+	public function getCaseIds(BaseObject $object, $applyMainObject = true)
 	{
-		$object = $this->getMainObject($object);
+		if($applyMainObject)
+		{
+			$object = $this->getMainObject($object);
+		}
+		
 		if(method_exists($object, 'getFromCustomData'))
 		{
 			$values = $object->getFromCustomData($this->getServerId() . '_' . $this->getProcessId(), 'businessProcessCases', array());

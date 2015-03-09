@@ -2,7 +2,7 @@
 /**
  * @package plugins.businessProcessNotification
  */
-class BusinessProcessNotificationPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaPending, IKalturaObjectLoader, IKalturaEnumerator, IKalturaServices, IKalturaApplicationPartialView, IKalturaAdminConsolePages, IKalturaEventConsumers, IKalturaConfigurator
+class BusinessProcessNotificationPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaPending, IKalturaObjectLoader, IKalturaEnumerator, IKalturaServices, IKalturaApplicationPartialView, IKalturaAdminConsolePages, IKalturaEventConsumers, IKalturaConfigurator, IKalturaApplicationTranslations
 {
 	const PLUGIN_NAME = 'businessProcessNotification';
 	const PLUGIN_VERSION_MAJOR = 1;
@@ -178,6 +178,13 @@ class BusinessProcessNotificationPlugin extends KalturaPlugin implements IKaltur
 				new Kaltura_View_Helper_BusinessProcessNotificationTemplateConfigure(),
 			);
 		}
+	
+		if($controller == 'batch' && $action == 'entryInvestigation')
+		{
+			return array(
+				new Kaltura_View_Helper_EntryBusinessProcess(),
+			);
+		}
 		
 		return array();
 	}
@@ -230,6 +237,27 @@ class BusinessProcessNotificationPlugin extends KalturaPlugin implements IKaltur
 	{
 		return array(
 			'businessProcessServer' => 'BusinessProcessServerService',
+			'businessProcessCase' => 'BusinessProcessCaseService',
 		);
+	}
+
+	/* (non-PHPdoc)
+	 * @see IKalturaApplicationTranslations::getTranslations()
+	 */
+	public static function getTranslations($locale)
+	{
+		$array = array();
+		
+		$langFilePath = __DIR__ . "/config/lang/$locale.php";
+		if(!file_exists($langFilePath))
+		{
+			$default = 'en';
+			$langFilePath = __DIR__ . "/config/lang/$default.php";
+		}
+		
+		KalturaLog::debug("Loading file [$langFilePath]");
+		$array = include($langFilePath);
+	
+		return array($locale => $array);
 	}
 }

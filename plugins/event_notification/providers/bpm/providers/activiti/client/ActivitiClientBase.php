@@ -35,6 +35,11 @@ abstract class ActivitiClientBase
 		$this->buildUrl();
 	}
 	
+	public function getUrl()
+	{
+		return $this->url;
+	}
+	
 	public function setDebug($debug)
 	{
 		$this->debug = $debug;
@@ -204,11 +209,16 @@ abstract class ActivitiClientBase
 		}
 		
 		if(in_array($status, $expectedHttpCodes))
-		{
-			$response = implode("\n", $content);
+		{	
+			$response = implode("\r\n", $content);
 			if(!trim($response))
 				return;
-				
+		
+			if($returnType == 'string')
+			{
+				return $response;
+			}
+			
 			$response = json_decode($response);
 			if($returnType)
 			{

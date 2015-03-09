@@ -18,7 +18,7 @@ class ActivitiGetProcessInstanceResponse extends ActivitiResponseObject
 			'suspended' => 'boolean',
 			'processDefinitionUrl' => 'string',
 			'activityId' => 'string',
-			'tenantId' => '',
+			'tenantId' => 'string',
 		));
 	}
 	
@@ -53,7 +53,7 @@ class ActivitiGetProcessInstanceResponse extends ActivitiResponseObject
 	protected $activityId;
 
 	/**
-	 * @var 
+	 * @var string
 	 */
 	protected $tenantId;
 
@@ -106,7 +106,7 @@ class ActivitiGetProcessInstanceResponse extends ActivitiResponseObject
 	}
 
 	/**
-	 * @return 
+	 * @return string
 	 */
 	public function getTenantid()
 	{
