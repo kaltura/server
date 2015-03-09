@@ -28,7 +28,6 @@
 package com.kaltura.client;
 
 import java.io.Serializable;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -39,34 +38,14 @@ import java.util.Map;
  */
 @SuppressWarnings("serial")
 public class KalturaConfiguration implements Serializable {
-	protected int partnerId;
 	protected String secret;
 	protected String adminSecret;	
 	protected String endpoint;
 	protected int timeout = 120000;
-	protected String clientTag = "java:@DATE@";
     protected EKalturaServiceFormat serviceFormat = EKalturaServiceFormat.RESPONSE_TYPE_XML;
 	
 	private Map<String, String> params;
 	
-	public KalturaConfiguration() {		
-	}
-	
-	public Map<String, String> getMap ()	{
-		params = new HashMap<String, String>();
-		params.put ( "partner_id" , new Integer(partnerId).toString());
-		
-		return params;
-	}
-
-	public int getPartnerId() {
-		return partnerId;
-	}
-
-	public void setPartnerId(int partnerId) {
-		this.partnerId = partnerId;
-	}
-
 	public String getSecret() {
 		return secret;
 	}
@@ -97,14 +76,6 @@ public class KalturaConfiguration implements Serializable {
 
 	public void setParams(Map<String, String> params) {
 		this.params = params;
-	}
-
-	public String getClientTag() {
-		return clientTag;
-	}
-
-	public void setClientTag(String clientTag) {
-		this.clientTag = clientTag;
 	}
 
 	public EKalturaServiceFormat getServiceFormat() {

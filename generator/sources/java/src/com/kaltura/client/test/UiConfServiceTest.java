@@ -27,6 +27,7 @@
 // ===================================================================================================
 package com.kaltura.client.test;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -67,7 +68,7 @@ public class UiConfServiceTest extends BaseTest {
 		
 	}
 	
-	public void testAddUiConf() {
+	public void testAddUiConf() throws IOException {
 		if (logger.isEnabled())
 			logger.info("Starting ui conf add test");
 		
@@ -85,7 +86,7 @@ public class UiConfServiceTest extends BaseTest {
 		
 	}
 	
-	public void testGetUiConf() {
+	public void testGetUiConf() throws IOException {
 		if (logger.isEnabled())
 			logger.info("Starting ui get test");
 		
@@ -107,7 +108,7 @@ public class UiConfServiceTest extends BaseTest {
 		
 	}
 	
-	public void testDeleteUiConf() {
+	public void testDeleteUiConf() throws IOException {
 		if (logger.isEnabled())
 			logger.info("Starting ui conf delete test");
 		
@@ -139,7 +140,7 @@ public class UiConfServiceTest extends BaseTest {
 		}
 	}
 
-	public void testListUiConf() {
+	public void testListUiConf() throws IOException {
 		if (logger.isEnabled())
 			logger.info("Starting ui conf list test");
 		

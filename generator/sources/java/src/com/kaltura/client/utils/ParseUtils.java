@@ -28,6 +28,7 @@
 package com.kaltura.client.utils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -96,8 +97,22 @@ public final class ParseUtils {
 		return tmpList;
 	}
 
+	public static <T> HashMap<String, T> parseMap(Class<T> clz, Node aNode) throws KalturaApiException{
+		HashMap<String, T> tmpMap = new HashMap<String, T>();
+		NodeList subNodeList = aNode.getChildNodes();
+		for (int j = 0; j < subNodeList.getLength(); j++) {
+			Node itemNode = subNodeList.item(j);
+			if(itemNode instanceof Element){
+				NodeList nameNodes = ((Element)itemNode).getElementsByTagName("name");
+		        String name = nameNodes.item(0).getTextContent();
+		        
+				tmpMap.put(name, (T) KalturaObjectFactory.create((Element) itemNode, clz));
+			}
+		}
+		return tmpMap;
+	}
+
 	public static <T> T parseObject(Class<T> clz, Node aNode) throws KalturaApiException{
 		 return (T) KalturaObjectFactory.create((Element)aNode, clz);
 	}
-	
 }

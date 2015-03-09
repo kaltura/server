@@ -84,6 +84,9 @@ public class MediaServiceTest extends BaseTest {
 		} catch (KalturaApiException e) {
 			e.printStackTrace();
 			fail();
+		} catch (IOException e) {
+			e.printStackTrace();
+			fail();
 		}
 	}
 	
@@ -97,7 +100,7 @@ public class MediaServiceTest extends BaseTest {
 		entry.mediaType = KalturaMediaType.VIDEO;
 
 		KalturaMediaService mediaService = client.getMediaService();
-		KalturaMediaEntry addedEntry = mediaService.addFromUrl(entry, KalturaTestConfig.TEST_URL);
+		KalturaMediaEntry addedEntry = mediaService.addFromUrl(entry, testConfig.getTestUrl());
 
 		if(addedEntry != null)
 			testContainer.testIds.add(addedEntry.id);
@@ -142,7 +145,7 @@ public class MediaServiceTest extends BaseTest {
 			
 			// Create token
 			KalturaUploadToken uploadToken = new KalturaUploadToken();
-			uploadToken.fileName = KalturaTestConfig.UPLOAD_VIDEO;
+			uploadToken.fileName = testConfig.getUploadVideo();
 			uploadToken.fileSize = fileSize;
 			KalturaUploadToken token = client.getUploadTokenService().add(uploadToken);
 			assertNotNull(token);
@@ -154,7 +157,7 @@ public class MediaServiceTest extends BaseTest {
 			assertNotNull(entry);
 			
 			// upload
-			uploadToken = client.getUploadTokenService().upload(token.id, fileData, KalturaTestConfig.UPLOAD_VIDEO, fileSize, false);
+			uploadToken = client.getUploadTokenService().upload(token.id, fileData, testConfig.getUploadVideo(), fileSize, false);
 			assertNotNull(uploadToken);
 			
 			// Test Creation
@@ -176,7 +179,7 @@ public class MediaServiceTest extends BaseTest {
 		}
 	}
 	
-	public void testUploadUnexistingFile() throws KalturaApiException {
+	public void testUploadUnexistingFile() throws KalturaApiException, IOException {
 		
 		File file = new File("bin/nonExistingfile.flv");
 		
@@ -250,6 +253,9 @@ public class MediaServiceTest extends BaseTest {
 			fail();
 		} catch (KalturaApiException kae) {
 			// expected behavior
+		} catch (IOException e) {
+			e.printStackTrace();
+			fail();
 		}
 		
 		assertNull(badEntry);
@@ -395,8 +401,9 @@ public class MediaServiceTest extends BaseTest {
 	 * Tests the following : 
 	 * Media Service -
 	 *  - delete
+	 * @throws IOException 
 	 */
-	public void testDelete() throws KalturaApiException {
+	public void testDelete() throws KalturaApiException, IOException {
 		if (logger.isEnabled())
 			logger.info("Starting delete test");
 		
@@ -458,7 +465,7 @@ public class MediaServiceTest extends BaseTest {
 			InputStream fileData = TestUtils.getTestVideo();
 			int fileSize = fileData.available();
 
-			String result = mediaService.upload(fileData, KalturaTestConfig.UPLOAD_VIDEO, fileSize);
+			String result = mediaService.upload(fileData, testConfig.getUploadVideo(), fileSize);
 			if (logger.isEnabled())
 				logger.debug("After upload, result:" + result);			
 			entry.name = name;
@@ -514,7 +521,7 @@ public class MediaServiceTest extends BaseTest {
 		} 
 	}
 	
-	public void testServe() throws KalturaApiException {
+	public void testServe() throws KalturaApiException, IOException {
 		String test = "bla bla bla";
 		try {
 			startUserSession(client, kalturaConfig);
