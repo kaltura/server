@@ -316,7 +316,7 @@ class infraRequestUtils
 					continue;
 					
 	 			$tempAddr = trim($matches[0]);
-	 			if (self::isIpPrivate($tempAddr))	// verify that ip is not from a private range
+	 			if (!kConf::get('accept_private_ips') && self::isIpPrivate($tempAddr))	// verify that ip is not from a private range
 	 				continue;
 	 			
 	 			$remote_addr = $tempAddr;
