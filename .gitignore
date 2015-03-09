@@ -50,3 +50,10 @@ alpha/.settings/
 .idea
 .DS_Store
 admin_console/lib/Kaltura/Client/
+generator/
+deployment/
+*.pyc
+*.pyo
+*.pdf
+*.conf
+

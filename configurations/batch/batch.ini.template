@@ -18,6 +18,13 @@ dwhEnabled											= 0
 timezone											= @TIME_ZONE@
 statusInterval										= 300
 logWorkerInterval									= 60
+directoryChmod                                                                          = 775
+chmod                                                                                           = 664
+
+[@INSTALLED_HOSNAME@ : mainTemplate]
+id	= @BATCH_SCHEDULER_ID@
+name                                                                                            = Default Scheduler
+
 enabledWorkers.KScheduleHelper						= 1
 enabledWorkers.DirectoryCleanupLocal				= 1
 enabledWorkers.DirectoryCleanupBatchLogs			= 1
@@ -61,7 +68,7 @@ enabledWorkers.KAsyncSyncCategoryPrivacyContext		= 1
 enabledWorkers.KAsyncTagIndex						= 1
 enabledWorkers.KAsyncIntegrate						= 1
 enabledWorkers.KAsyncIntegrateCloser				= 1
-
+enabledWorkers.KAsyncConvertCEnc                    = 1
 
 [mainTemplate : template]
 enabledWorkers.DirectoryCleanupShared				= 1
@@ -78,7 +85,6 @@ enabledWorkers.KAsyncDistributeDeleteCloser			= 1
 enabledWorkers.KAsyncDistributeFetchReportCloser	= 1
 enabledWorkers.KAsyncValidateLiveMediaServers		= 1
 enabledWorkers.KAsyncCopyPartner					= 1
-
 
 [Worker]
 maximumExecutionTime			= 300
@@ -253,6 +259,12 @@ params.maxTimeBeforeFail 							= 10000
 params.localTempPath 								= /web/tmp/encrypt
 ;The path for finished products, acessable from the apache
 params.sharedTempPath 								= /web/tmp/encrypt
+
+[KAsyncConvertCEnc : KAsyncConvertWorker]
+id													= 570
+friendlyName                                        = Common Encryption
+filter.jobSubTypeIn                                 = drm.cEnc
+params.exePath  									= @EDASH_EXE@
 
 [KAsyncDistributedConvert : KAsyncConvertWorker]
 id													= 72

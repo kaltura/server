@@ -4,7 +4,6 @@ class KCEncOperationEngine extends KOperationEngine
 {
 	CONST SYSTEM_NAME = 'OVP';
     const URL_EXTENSION = "widevine/encryption?signature=";
-
     /**
 	 * @var array
 	 * batch job parameters
@@ -29,7 +28,6 @@ class KCEncOperationEngine extends KOperationEngine
 	protected function doOperation()
 	{
         KalturaLog::debug("starting");
-
 		KBatchBase::impersonate($this->job->partnerId);
         $drmPlugin = KalturaDrmClientPlugin::get(KBatchBase::$kClient);
         $profile = $drmPlugin->drmProfile->getByProvider(KalturaDrmProviderType::CENC);
@@ -65,7 +63,6 @@ class KCEncOperationEngine extends KOperationEngine
         }
 
         $mpdOutPath = $this->data->destFileSyncLocalPath.".mpd";
-//        $this->data->destFileSyncLocalPath = $this->data->destFileSyncLocalPath.".mp4";
         $fsDescArr = array();
         $fsDesc = new KalturaDestFileSyncDescriptor();
         $fsDesc->fileSyncLocalPath = $mpdOutPath;
@@ -94,18 +91,17 @@ class KCEncOperationEngine extends KOperationEngine
         $keyData->success = false;
         if ($output === false)
         {
-//            KalturaLog::err("Curl had an error '".curl_error($ch)."'");
             $keyData->errMsg = "Curl had an error '".curl_error($ch)."'";
             return $keyData;
         }
         $keyData->data = json_decode($output);
         if (!isset($keyData->data->key_id))
         {
-//            KalturaLog::err("did not get good result from udrm service, output is '".$output."'");
             $keyData->errMsg = "did not get good result from udrm service, output is '".$output."'";
             return $keyData;
         }
         $keyData->success = true;
+
         return $keyData;
     }
 
