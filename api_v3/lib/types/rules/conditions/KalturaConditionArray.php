@@ -50,8 +50,10 @@ class KalturaConditionArray extends KalturaTypedArray
 				return new KalturaUserRoleCondition();
 			case ConditionType::GEO_DISTANCE:
 				return new KalturaGeoDistanceCondition();
-				default:
-				return KalturaPluginManager::loadObject('KalturaCondition', $dbObject->getType());
+			case ConditionType::OR_OPERATOR:
+			    return new KalturaOrCondition();
+			default:
+			     return KalturaPluginManager::loadObject('KalturaCondition', $dbObject->getType());
 		}
 	}
 		

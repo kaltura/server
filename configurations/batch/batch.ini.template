@@ -636,7 +636,7 @@ scriptPath             								= ../plugins/drm/providers/widevine/batch/widevin
 id													= 490
 type												= KAsyncConvertLiveSegment
 scriptPath											= batches/ConvertLiveSegment/KAsyncConvertLiveSegmentExe.php
-
+params.ffprobeCmd									= @BIN_DIR@/ffprobe
 
 
 [KAsyncConcat : KAsyncConvertWorker]
