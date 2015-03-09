@@ -1,1 +1,0 @@
-ALTER TABLE batch_job_lock_suspend ADD batch_version INTEGER AFTER `custom_data`;

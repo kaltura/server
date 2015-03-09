@@ -38,4 +38,16 @@ abstract class kBusinessProcessProvider
 	 * @param array $variables
 	 */
 	abstract public function signalCase($caseId, $eventId, $message, array $variables = array());
+	
+	/**
+	 * @param string $caseId
+	 * @param string $filename
+	 */
+	abstract public function getCaseDiagram($caseId, $filename);
+	
+	/**
+	 * @param string $caseId
+	 * @return kBusinessProcessCase
+	 */
+	abstract public function getCase($caseId);
 }
