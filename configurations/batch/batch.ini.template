@@ -17,6 +17,13 @@ dwhPath												= @LOG_DIR@/dwh.log
 dwhEnabled											= 0
 timezone											= @TIME_ZONE@
 statusInterval										= 300
+directoryChmod                                                                          = 775
+chmod                                                                                           = 664
+
+[@INSTALLED_HOSNAME@ : mainTemplate]
+id	= @BATCH_SCHEDULER_ID@
+name                                                                                            = Default Scheduler
+
 enabledWorkers.KScheduleHelper						= 1
 enabledWorkers.DirectoryCleanupLocal				= 1
 enabledWorkers.DirectoryCleanupBatchLogs			= 1
@@ -56,9 +63,7 @@ enabledWorkers.KAsyncConcat							= 1
 enabledWorkers.KAsyncValidateLiveMediaServers		= 1
 enabledWorkers.KAsyncSyncCategoryPrivacyContext		= 1
 enabledWorkers.KAsyncTagIndex						= 1
-enabledWorkers.KAsyncIntegrate						= 1
-enabledWorkers.KAsyncIntegrateCloser				= 1
-
+enabledWorkers.KAsyncConvertCEnc                    = 1
 
 [mainTemplate : template]
 enabledWorkers.DirectoryCleanupShared				= 1
@@ -76,12 +81,12 @@ enabledWorkers.KAsyncDistributeFetchReportCloser	= 1
 enabledWorkers.KAsyncValidateLiveMediaServers		= 1
 enabledWorkers.KAsyncCopyPartner					= 1
 
-
 [Worker]
 maximumExecutionTime			= 300
 params.tempDirectoryPath		= @TMP_DIR@
 engineOptions.asperaTempFolder	= @TMP_DIR@/aspera_upload
-;clientConfig.verifySSL = false
+clientConfig.verifySSL 		= 0
+
 
 [JobHandlerWorker : Worker]
 fileExistReties			= 3
@@ -142,9 +147,8 @@ params.minutesOld 									= 2880
 id													= 16
 friendlyName										= Recorded Media Cleanup
 params.path											= @WOWZA_DIR@/content/
-params.pattern										= *.*
+params.pattern										= *
 params.minutesOld 									= 2880
-
 [KAsyncDbCleanup : PeriodicWorker]
 id													= 17
 friendlyName										= DB Cleanup
@@ -197,8 +201,7 @@ id													= 60
 friendlyName										= Extract Media
 type												= KAsyncExtractMedia
 scriptPath											= batches/ExtractMedia/KAsyncExtractMediaExe.php
-params.mediaInfoCmd									= @BIN_DIR@/mediainfo
-params.ffprobeCmd									= @BIN_DIR@/ffprobe
+params.mediaInfoCmd=/usr/bin/mediainfo
 
 [KAsyncConvertWorker : JobHandlerWorker]
 type												= KAsyncConvert
@@ -213,8 +216,7 @@ params.fastStartCmd									= @BIN_DIR@/qt-faststart
 params.avidemuxCmd									= @BIN_DIR@/avidemux2_cli
 params.segmenterCmd									= @BIN_DIR@/segmenter
 params.pdf2SwfCmd									= @BIN_DIR@/pdf2swf
-params.ImageMagickCmd								= convert
-params.ismIndexCmd									= @BIN_DIR@/ismIndex
+params.ImageMagickCmd=/usr/bin/convert
 
 params.EncodingComUserId							= should-fail
 params.EncodingComUserKey							= should-fail
@@ -233,7 +235,7 @@ params.sharedTempPath 								= @WEB_DIR@/tmp/convert
 [KAsyncConvert : KAsyncConvertWorker]
 id													= 70
 friendlyName										= Convert
-filter.jobSubTypeIn	= 1,2,99,3,fastStart.FastStart,segmenter.Segmenter,mp4box.Mp4box,vlc.Vlc,document.ImageMagick,201,202,quickTimeTools.QuickTimeTools,ismIndex.IsmIndex,ismIndex.IsmManifest
+filter.jobSubTypeIn	= 1,2,99,3,fastStart.FastStart,segmenter.Segmenter,mp4box.Mp4box,vlc.Vlc,document.ImageMagick,201,202,quickTimeTools.QuickTimeTools
 ;affinity											= 
 
 ;params.minFileSize									= 
@@ -250,6 +252,12 @@ params.maxTimeBeforeFail 							= 10000
 params.localTempPath 								= /web/tmp/encrypt
 ;The path for finished products, acessable from the apache
 params.sharedTempPath 								= /web/tmp/encrypt
+
+[KAsyncConvertCEnc : KAsyncConvertWorker]
+id													= 570
+friendlyName                                        = Common Encryption
+filter.jobSubTypeIn                                 = drm.cEnc
+params.exePath  									= @EDASH_EXE@
 
 [KAsyncDistributedConvert : KAsyncConvertWorker]
 id													= 72
@@ -325,7 +333,7 @@ id													= 100
 friendlyName										= Post Convert
 type												= KAsyncPostConvert
 scriptPath											= batches/PostConvert/KAsyncPostConvertExe.php
-params.mediaInfoCmd									= @BIN_DIR@/mediainfo
+params.mediaInfoCmd=/usr/bin/mediainfo
 params.FFMpegCmd									= @BIN_DIR@/ffmpeg
 params.localTempPath 								= @TMP_DIR@/thumb 
 params.sharedTempPath 								= @WEB_DIR@/tmp/thumb
@@ -375,7 +383,10 @@ params.emailId										= @PROVISION_PROVIDE_EMAIL_ID@
 params.primaryContact								= @PROVISION_PROVIDE_PRIMARY_CONTACT@
 params.secondaryContact								= @PROVISION_PROVIDE_SECONDARY_CONTACT@
 params.restapi.akamaiRestApiBaseServiceUrl			= "https://control.akamai.com/hdnetwork/api/live"
-params.restapi.systemUserName							= @AKAMAI_UNIVERSAL_STREAM_USER_NAME@
+params.restapi.velocixApiBaseServiceUrl				= "http://cmin.live.cdn.antel.net.uy:82"
+params.restapi.velocixPlaybackHost					= "live.cdn.antel.net.uy"
+params.restapi.velocixPublishHost					= "cmin.live.cdn.antel.net.uy"
+params.restapi.systemUser							= @AKAMAI_UNIVERSAL_STREAM_USER_NAME@
 params.restapi.systemPassword						= @AKAMAI_UNIVERSAL_STREAM_USER_PASSWORD@
 params.restapi.domainName							= @AKAMAI_UNIVERSAL_STREAM_DOMAIN_NAME@
 params.restapi.primaryContact						= @AKAMAI_UNIVERSAL_STREAM_PRIMARY_CONTACT@
@@ -392,7 +403,8 @@ minCreatedAtMinutes									= 10080
 params.wsdlUsername									= @PROVISION_PROVIDE_USER@
 params.wsdlPassword									= @PROVISION_PROVIDE_PASS@
 params.restapi.akamaiRestApiBaseServiceUrl			= "https://control.akamai.com/hdnetwork/api/live"
-params.restapi.systemUserName							= @AKAMAI_UNIVERSAL_STREAM_USER_NAME@
+params.restapi.velocixApiBaseServiceUrl				= "http://cmin.live.cdn.antel.net.uy:82"
+params.restapi.systemUser							= @AKAMAI_UNIVERSAL_STREAM_USER_NAME@
 params.restapi.systemPassword						= @AKAMAI_UNIVERSAL_STREAM_USER_PASSWORD@
 params.restapi.domainName							= @AKAMAI_UNIVERSAL_STREAM_DOMAIN_NAME@
 
@@ -464,7 +476,7 @@ scriptPath											= batches/CaptureThumb/KAsyncCaptureThumbExe.php
 params.localTempPath 								= @TMP_DIR@/thumb 
 params.sharedTempPath 								= @WEB_DIR@/tmp/thumb
 params.FFMpegCmd	 								= @BIN_DIR@/ffmpeg
-params.ImageMagickCmd								= convert
+params.ImageMagickCmd=/usr/bin/convert
 
 
 [KAsyncDistribute : JobHandlerWorker]
@@ -585,8 +597,6 @@ type												= KAsyncDelete
 maximumExecutionTime								= 1200
 scriptPath											= batches/Delete/KAsyncDeleteExe.php
 
-
-
 [KAsyncMoveCategoryEntries : JobHandlerWorker]
 id													= 440
 friendlyName										= Move Categories Entries
@@ -643,7 +653,7 @@ params.ffprobeCmd									= @BIN_DIR@/ffprobe
 id													= 500
 type												= KAsyncConcat
 scriptPath											= batches/Concat/KAsyncConcatExe.php
-params.ffprobeCmd									= @BIN_DIR@/ffprobe
+
 
 
 [KAsyncValidateLiveMediaServers : PeriodicWorker]
@@ -683,7 +693,6 @@ type												= KScheduledTaskRunner
 maximumExecutionTime								= 600
 scriptPath											= ../plugins/scheduled_task/batch/ScheduledTaskRunner/KScheduledTaskRunnerExe.php
 sleepBetweenStopStart								= 21600
-maxTotalCountAllowed								= 50
 
 [KAsyncSyncCategoryPrivacyContext : JobHandlerWorker]
 id													= 550
@@ -698,27 +707,3 @@ friendlyName										= Re-index tags
 type												= KAsyncTagIndex
 maximumExecutionTime								= 12000
 scriptPath											= ../plugins/tag_search/lib/batch/tag_index/KAsyncTagIndexExe.php
-
-[KAsyncLiveReportExport : JobHandlerWorker]
-id													= 600
-friendlyName										= Live reports export
-type												= KAsyncLiveReportExport
-maximumExecutionTime								= 12000
-scriptPath											= batches/LiveReportExport/KAsyncLiveReportExportExe.php
-params.localTempPath								= @TMP_DIR@/reports
-params.sharedPath									= @WEB_DIR@/tmp/reports
-
-[KAsyncIntegrate : JobHandlerWorker]
-id													= 570
-friendlyName										= Integrate
-type												= KAsyncIntegrate
-maximumExecutionTime								= 12000
-scriptPath											= ../plugins/integration/batch/Integrate/KAsyncIntegrateExe.php
-
-[KAsyncIntegrateCloser : JobHandlerWorker]
-id													= 580
-friendlyName										= Integrate Closer
-type												= KAsyncIntegrateCloser
-maximumExecutionTime								= 12000
-scriptPath											= ../plugins/integration/batch/Integrate/KAsyncIntegrateCloserExe.php
-params.maxTimeBeforeFail							= 1000000
