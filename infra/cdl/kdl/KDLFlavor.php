@@ -489,13 +489,13 @@ $plannedDur = 0;
 		&& isset($source->_container) && $source->_container->IsFormatOf(array("mxf")) 
 		&& isset($source->_video) && $source->_video->IsFormatOf(array("mpeg video","mpeg2video")) 
 		&& isset($source->_video->_width) && $source->_video->_width==720
-		&& isset($source->_video->_height) && $source->_video->_height==608){
-			$target->_video->_isCropIMX=true;
+		&& isset($source->_video->_height) && ($source->_video->_height==608 || $source->_video->_height==576)){
+			$this->_video->_isCropIMX=true;
 		}
 		else {
-			$target->_video->_isCropIMX=false;
+			$this->_video->_isCropIMX=false;
 		}
-		KalturaLog::log('IsCropImx('.$target->_video->_isCropIMX.')');
+		KalturaLog::log('IsCropImx('.$this->_video->_isCropIMX.')');
 		
 			/*
 			 * Analyse the source to determine whether it contains multi-stream audio.

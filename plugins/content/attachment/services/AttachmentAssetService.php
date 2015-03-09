@@ -378,6 +378,10 @@ class AttachmentAssetService extends KalturaAssetService
 		if ($assetDb->getStatus() != asset::ASSET_STATUS_READY)
 			throw new KalturaAPIException(KalturaAttachmentErrors::ATTACHMENT_ASSET_IS_NOT_READY);
 		
+		$entryDb = $assetDb->getentry();
+		if(is_null($entryDb))
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $assetDb->getEntryId());
+		
 		if($storageId)
 			return $assetDb->getExternalUrl($storageId);
 			

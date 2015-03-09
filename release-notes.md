@@ -1,5 +1,15 @@
 
 ----------
+# Jupiter-10.6.0 #
+
+##Live - A/V out of sync in second part of recorded entry after restart streaming (regression)##
+- Issue ID: PLAT-2540
+
+### Configuration ###
+- Add "params.ffprobeCmd = ffprobe" to 
+- - configurations/batch/live.workers.ini - KAsyncConvertLiveSegment
+
+----------
 # Jupiter-10.5.0 #
 
 ##Flavor-asset status HTTP Notifications##
