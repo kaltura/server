@@ -42,21 +42,11 @@ class Configuration
 	 * @var string
 	 */
 	private $serviceUrl    				= "http://www.kaltura.com/";
-
-	/**
-	 * @var int
-	 */
-	private $partnerId    				= null;
 	
 	/**
 	 * @var int
 	 */
 	private $format        				= Client::KALTURA_SERVICE_FORMAT_XML;
-	
-	/**
-	 * @var string
-	 */
-	private $clientTag 	  				= "php53:@DATE@";
 	
 	/**
 	 * @var int
@@ -114,15 +104,6 @@ class Configuration
 	private $logger;
 	
 	/**
-	 * Constructs new Kaltura configuration object
-	 *
-	 */
-	public function __construct($partnerId = -1)
-	{
-	    $this->setPartnerId($partnerId);
-	}
-	
-	/**
 	 * @return the $serviceUrl
 	 */
 	public function getServiceUrl ()
@@ -131,27 +112,11 @@ class Configuration
 	}
 
 	/**
-	 * @return the $partnerId
-	 */
-	public function getPartnerId ()
-	{
-		return $this->partnerId;
-	}
-
-	/**
 	 * @return the $format
 	 */
 	public function getFormat ()
 	{
 		return $this->format;
-	}
-
-	/**
-	 * @return the $clientTag
-	 */
-	public function getClientTag ()
-	{
-		return $this->clientTag;
 	}
 
 	/**
@@ -243,30 +208,11 @@ class Configuration
 	}
 
 	/**
-	 * @param int $partnerId
-	 */
-	public function setPartnerId ($partnerId)
-	{
-		if (!is_numeric($partnerId))
-	        throw new ClientException("Invalid partner id", ClientException::ERROR_INVALID_PARTNER_ID);
-	        
-		$this->partnerId = (int)$partnerId;
-	}
-
-	/**
 	 * @param int $format
 	 */
 	public function setFormat ($format)
 	{
 		$this->format = $format;
-	}
-
-	/**
-	 * @param string $clientTag
-	 */
-	public function setClientTag ($clientTag)
-	{
-		$this->clientTag = $clientTag;
 	}
 
 	/**
