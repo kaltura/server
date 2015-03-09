@@ -2,7 +2,7 @@
 /**
  * @package plugins.drm
  */
-class DrmPlugin extends KalturaPlugin implements IKalturaServices, IKalturaAdminConsolePages, IKalturaPermissions, IKalturaEnumerator, IKalturaConfigurator
+class DrmPlugin extends KalturaPlugin implements IKalturaServices, IKalturaAdminConsolePages, IKalturaPermissions, IKalturaEnumerator, IKalturaConfigurator, IKalturaObjectLoader
 {
 	const PLUGIN_NAME = 'drm';
 	
@@ -58,10 +58,12 @@ class DrmPlugin extends KalturaPlugin implements IKalturaServices, IKalturaAdmin
 	public static function getEnums($baseEnumName = null)
 	{	
 		if(is_null($baseEnumName))
-			return array('DrmPermissionName');		
+			return array('DrmPermissionName', 'DRMConversionEngineType');
 		if($baseEnumName == 'PermissionName')
 			return array('DrmPermissionName');
-			
+        if($baseEnumName == 'conversionEngineType')
+            return array('DRMConversionEngineType');
+
 		return array();
 	}
 
@@ -93,6 +95,42 @@ class DrmPlugin extends KalturaPlugin implements IKalturaServices, IKalturaAdmin
 
 		return $config[$key];
 	}
+
+    /* (non-PHPdoc)
+	 * @see IKalturaObjectLoader::loadObject()
+	 */
+    public static function loadObject($baseClass, $enumValue, array $constructorArgs = null)
+    {
+        if($baseClass == 'KOperationEngine' && $enumValue == KalturaConversionEngineType::CENC)
+            return new KCEncOperationEngine($constructorArgs['params'], $constructorArgs['outFilePath']);
+        if($baseClass == 'KDLOperatorBase' && $enumValue == self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . DrmConversionEngineType::CENC)
+            return new KDLOperatorDRM($enumValue);
+        if($baseClass == 'KalturaDrmProfile' && $enumValue == KalturaDrmProviderType::CENC)
+            return new KalturaDrmProfile();
+        if($baseClass == 'DrmProfile' && $enumValue == KalturaDrmProviderType::CENC)
+            return new DrmProfile();
+
+        return null;
+    }
+
+    /* (non-PHPdoc)
+    * @see IKalturaObjectLoader::getObjectClass()
+     */
+    public static function getObjectClass($baseClass, $enumValue)
+    {
+        if($baseClass == 'KOperationEngine' && $enumValue == KalturaConversionEngineType::CENC)
+            return "KDRMOperationEngine";
+        if($baseClass == 'KDLOperatorBase' && $enumValue == KalturaConversionEngineType::CENC)
+            return "KDLOperatorDRM";
+        if($baseClass == 'KalturaDrmProfile' && KalturaDrmProviderType::CENC)
+            return "KalturaDrmProfile";
+        if($baseClass == 'DrmProfile' && KalturaDrmProviderType::CENC)
+            return "DrmProfile";
+
+        return null;
+    }
+
+
 }
 
 
