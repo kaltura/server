@@ -77,6 +77,22 @@ class kActivitiBusinessProcessProvider extends kBusinessProcessProvider
 	}
 	
 	/* (non-PHPdoc)
+	 * @see kBusinessProcessProvider::getCase()
+	 */
+	public function getCase($caseId)
+	{
+		$processInstance = $this->client->processInstances->getProcessInstance($caseId);
+		
+		$case = new kBusinessProcessCase();
+		$case->setId($processInstance->getId());
+		$case->setBusinessProcessId($processInstance->getBusinesskey());
+		$case->setActivityId($processInstance->getActivityid());
+		$case->setSuspended($processInstance->getSuspended());
+		
+		return $case;
+	}
+	
+	/* (non-PHPdoc)
 	 * @see kBusinessProcessProvider::abortCase()
 	 */
 	public function abortCase($caseId)
@@ -132,5 +148,14 @@ class kActivitiBusinessProcessProvider extends kBusinessProcessProvider
 				$this->client->executions->executeAnActionOnAnExecution($processInstance->getId(), $action, null, $messageVariables, $message);
 			}
 		}
+	}
+
+	/* (non-PHPdoc)
+	 * @see kBusinessProcessProvider::getCaseDiagramUrl()
+	 */
+	public function getCaseDiagram($caseId, $filename)
+	{
+		kFileUtils::fullMkdir($filename);
+		file_put_contents($filename, $this->client->processInstances->getDiagramForProcessInstance($caseId));
 	}
 }
