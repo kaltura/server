@@ -27,7 +27,6 @@
 // ===================================================================================================
 package com.kaltura.client.test;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -68,12 +67,12 @@ public class UiConfServiceTest extends BaseTest {
 		
 	}
 	
-	public void testAddUiConf() throws IOException {
+	public void testAddUiConf() throws Exception {
 		if (logger.isEnabled())
 			logger.info("Starting ui conf add test");
 		
 		try {			
-			BaseTest.startAdminSession(client,kalturaConfig);
+			startAdminSession();
 			String name = "Test UI Conf (" + new Date() + ")";
 			KalturaUiConf addedConf = addUiConf(name);
 			assertNotNull(addedConf);
@@ -86,12 +85,12 @@ public class UiConfServiceTest extends BaseTest {
 		
 	}
 	
-	public void testGetUiConf() throws IOException {
+	public void testGetUiConf() throws Exception {
 		if (logger.isEnabled())
 			logger.info("Starting ui get test");
 		
 		try {			
-			BaseTest.startAdminSession(client,kalturaConfig);
+			startAdminSession();
 			String name = "Test UI Conf (" + new Date() + ")";
 			KalturaUiConf addedConf = addUiConf(name);
 			
@@ -108,12 +107,12 @@ public class UiConfServiceTest extends BaseTest {
 		
 	}
 	
-	public void testDeleteUiConf() throws IOException {
+	public void testDeleteUiConf() throws Exception {
 		if (logger.isEnabled())
 			logger.info("Starting ui conf delete test");
 		
 		try {			
-			BaseTest.startAdminSession(client,kalturaConfig);
+			startAdminSession();
 			String name = "Test UI Conf (" + new Date() + ")";
 			KalturaUiConf addedConf = addUiConf(name);
 			
@@ -140,12 +139,12 @@ public class UiConfServiceTest extends BaseTest {
 		}
 	}
 
-	public void testListUiConf() throws IOException {
+	public void testListUiConf() throws Exception {
 		if (logger.isEnabled())
 			logger.info("Starting ui conf list test");
 		
 		try {
-			BaseTest.startAdminSession(client,kalturaConfig);
+			startAdminSession();
 			KalturaUiConfService uiConfService = client.getUiConfService();
 			assertNotNull(uiConfService);
 			

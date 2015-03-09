@@ -48,7 +48,7 @@ public class MultiRequestTest extends BaseTest{
 	@SuppressWarnings("unchecked")
 	public void testMultiRequest() throws Exception {
 		
-		BaseTest.startAdminSession(client,kalturaConfig);
+		startAdminSession();
 		client.startMultiRequest();
 		
 		// 1. Ping (Bool : void)
@@ -64,7 +64,7 @@ public class MultiRequestTest extends BaseTest{
 		
 		// 3. Upload token (Object : Object)
 		KalturaUploadToken uploadToken = new KalturaUploadToken();
-		uploadToken.setFileName(KalturaTestConfig.UPLOAD_IMAGE);
+		uploadToken.setFileName(testConfig.getUploadImage());
 		uploadToken.setFileSize(fileData.available());
 		KalturaUploadToken token = client.getUploadTokenService().add(uploadToken);
 		assertNull(token);
@@ -76,7 +76,7 @@ public class MultiRequestTest extends BaseTest{
 		assertNull(entry);
 		
 		// 5. upload (Object : String, file, boolean)
-		uploadToken = client.getUploadTokenService().upload("{3:result:id}", fileData, KalturaTestConfig.UPLOAD_IMAGE, fileData.available(), false);
+		uploadToken = client.getUploadTokenService().upload("{3:result:id}", fileData, testConfig.getUploadImage(), fileData.available(), false);
 		
 		KalturaMultiResponse multi = client.doMultiRequest();
 		// 0
@@ -120,9 +120,9 @@ public class MultiRequestTest extends BaseTest{
 	 * and it doesn't affect the rest of the multi-request.
 	 * @throws KalturaApiException
 	 */
-	public void testMultiRequestWithError() throws KalturaApiException {
+	public void testMultiRequestWithError() throws Exception {
 		
-		BaseTest.startAdminSession(client,kalturaConfig);
+		startAdminSession();
 		client.startMultiRequest();
 		
 		client.getSystemService().ping();

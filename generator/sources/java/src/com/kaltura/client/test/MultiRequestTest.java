@@ -49,7 +49,7 @@ public class MultiRequestTest extends BaseTest{
 	@SuppressWarnings("unchecked")
 	public void testMultiRequest() throws Exception {
 		
-		BaseTest.startAdminSession(client,kalturaConfig);
+		startAdminSession();
 		client.startMultiRequest();
 		
 		// 1. Ping (Bool : void)
@@ -122,9 +122,9 @@ public class MultiRequestTest extends BaseTest{
 	 * @throws KalturaApiException
 	 * @throws IOException 
 	 */
-	public void testMultiRequestWithError() throws KalturaApiException, IOException {
+	public void testMultiRequestWithError() throws Exception {
 		
-		BaseTest.startAdminSession(client,kalturaConfig);
+		startAdminSession();
 		client.startMultiRequest();
 		
 		client.getSystemService().ping();

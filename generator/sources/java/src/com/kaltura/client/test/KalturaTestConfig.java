@@ -35,7 +35,6 @@ public class KalturaTestConfig {
 	private static Properties properties;
 	
 	private static final String PARTNER_ID = "partnerId";
-	private static final String SECRET = "userSecret";
 	private static final String ADMIN_SECRET = "adminSecret";
 	private static final String ENDPOINT = "serviceUrl";
 	private static final String TEST_URL = "testUrl";
@@ -45,7 +44,7 @@ public class KalturaTestConfig {
 	
 	public KalturaTestConfig() throws IOException{
 		if(properties == null){
-			InputStream inputStream = getClass().getClassLoader().getResourceAsStream("config.ini");
+			InputStream inputStream = getClass().getClassLoader().getResourceAsStream("test.properties");
 			properties = new Properties();
 			properties.load(inputStream);
 		}
@@ -53,10 +52,6 @@ public class KalturaTestConfig {
 	
 	public int getPartnerId(){
 		return Integer.parseInt(properties.getProperty(PARTNER_ID));
-	}
-	
-	public String getUserSecret(){
-		return properties.getProperty(SECRET);
 	}
 	
 	public String getAdminSecret(){

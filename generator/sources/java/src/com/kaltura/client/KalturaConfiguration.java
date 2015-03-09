@@ -38,30 +38,12 @@ import java.util.Map;
  */
 @SuppressWarnings("serial")
 public class KalturaConfiguration implements Serializable {
-	protected String secret;
-	protected String adminSecret;	
 	protected String endpoint;
 	protected int timeout = 120000;
     protected EKalturaServiceFormat serviceFormat = EKalturaServiceFormat.RESPONSE_TYPE_XML;
 	
 	private Map<String, String> params;
 	
-	public String getSecret() {
-		return secret;
-	}
-
-	public void setSecret(String secret) {
-		this.secret = secret;
-	}
-
-	public String getAdminSecret() {
-		return adminSecret;
-	}
-
-	public void setAdminSecret(String adminSecret) {
-		this.adminSecret = adminSecret;
-	}
-
 	public String getEndpoint() {
 		return endpoint;
 	}

@@ -302,6 +302,7 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 	public function generateParametersDeclaration(&$imports, $classNode) {
 
 		$needsArrayList = false;
+		$needsHashMap = false;
 		$arrImportsEnums = array();
 		$arrFunctions = array();
 

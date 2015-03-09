@@ -39,12 +39,12 @@ public class SessionServiceTest extends BaseTest {
 	 * Test Open / close Session
 	 * @throws IOException 
 	 */
-	public void testSession() throws IOException {
+	public void testSession() throws Exception {
 
 		try {
 			
 			// test open session
-			BaseTest.startUserSession(client, kalturaConfig);
+			startUserSession();
 			assertNotNull(client.getSessionId());
 			
 			KalturaMediaListResponse response = client.getMediaService().list();

@@ -75,22 +75,19 @@ public class MediaServiceTest extends BaseTest {
 		String name = "test (" + new Date() + ")";
 		
 		try {
-			startUserSession(client, kalturaConfig);
+			startUserSession();
 			KalturaMediaEntry addedEntry = addClipFromUrl(this, client, name);
 			assertNotNull(addedEntry);
 			assertNotNull(addedEntry.id);
 			assertEquals(name, addedEntry.name);
 			assertEquals(KalturaEntryStatus.IMPORT, addedEntry.status);
-		} catch (KalturaApiException e) {
-			e.printStackTrace();
-			fail();
-		} catch (IOException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 			fail();
 		}
 	}
 	
-	public static KalturaMediaEntry addClipFromUrl(BaseTest testContainer,
+	public KalturaMediaEntry addClipFromUrl(BaseTest testContainer,
 			KalturaClient client, String name) throws KalturaApiException {
 
 		KalturaMediaEntry entry = new KalturaMediaEntry();
@@ -129,7 +126,7 @@ public class MediaServiceTest extends BaseTest {
 			InputStream fileData = TestUtils.getTestVideo();
 			int fileSize = fileData.available();
 			
-			startUserSession(client, kalturaConfig);
+			startUserSession();
 			int sz = client.getMediaService().count();
 			
 			// Create entry
@@ -179,11 +176,11 @@ public class MediaServiceTest extends BaseTest {
 		}
 	}
 	
-	public void testUploadUnexistingFile() throws KalturaApiException, IOException {
+	public void testUploadUnexistingFile() throws Exception {
 		
 		File file = new File("bin/nonExistingfile.flv");
 		
-		startUserSession(client, kalturaConfig);
+		startUserSession();
 		
 		// Create token
 		KalturaUploadToken uploadToken = new KalturaUploadToken();
@@ -215,8 +212,8 @@ public class MediaServiceTest extends BaseTest {
 		String name = "test (" + new Date() + ")";
 		
 		try {
-			startUserSession(client, kalturaConfig);
-			KalturaMediaEntry addedEntry = BaseTest.addTestImage(this, client, name);
+			startUserSession();
+			KalturaMediaEntry addedEntry = addTestImage(this, name);
 			assertNotNull(addedEntry);
 			assertNotNull(addedEntry.id);
 			
@@ -247,13 +244,13 @@ public class MediaServiceTest extends BaseTest {
 		// look for one we know doesn't exist
 		KalturaMediaEntry badEntry = null;
 		try {
-			startUserSession(client, kalturaConfig);
+			startUserSession();
 			KalturaMediaService mediaService = this.client.getMediaService();
 			badEntry = mediaService.get("badid");
 			fail();
 		} catch (KalturaApiException kae) {
 			// expected behavior
-		} catch (IOException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 			fail();
 		}
@@ -273,8 +270,8 @@ public class MediaServiceTest extends BaseTest {
 		String name = "test (" + new Date() + ")";
 		
 		try {
-			startUserSession(client, kalturaConfig);
-			KalturaMediaEntry addedEntry = BaseTest.addTestImage(this, client, name);
+			startUserSession();
+			KalturaMediaEntry addedEntry = addTestImage(this, name);
 			KalturaMediaService mediaService = this.client.getMediaService();
 			KalturaMediaEntry retrievedEntry = mediaService.get(addedEntry.id);
 			
@@ -299,12 +296,12 @@ public class MediaServiceTest extends BaseTest {
 			logger.info("Test List");
 
 		try {
-			startUserSession(client, kalturaConfig);
+			startUserSession();
 			// add test clips
 			String name1 = "test one (" + new Date() + ")";
-			KalturaMediaEntry addedEntry1 = BaseTest.addTestImage(this, client, name1);
+			KalturaMediaEntry addedEntry1 = addTestImage(this, name1);
 			String name2 = "test two (" + new Date() + ")";
-			KalturaMediaEntry addedEntry2 = BaseTest.addTestImage(this, client, name2);
+			KalturaMediaEntry addedEntry2 = addTestImage(this, name2);
 
 			// Make sure were updated
 			getProcessedEntry(client, addedEntry1.id, true);
@@ -363,9 +360,9 @@ public class MediaServiceTest extends BaseTest {
 		
 		try {
 			
-			startAdminSession(client, kalturaConfig);
+			startAdminSession();
 
-			KalturaMediaEntry addedEntry = BaseTest.addTestImage(this, client, name);
+			KalturaMediaEntry addedEntry = addTestImage(this, name);
 			//wait for the newly-added clip to process
 			getProcessedEntry(client, addedEntry.id);
 						
@@ -403,20 +400,20 @@ public class MediaServiceTest extends BaseTest {
 	 *  - delete
 	 * @throws IOException 
 	 */
-	public void testDelete() throws KalturaApiException, IOException {
+	public void testDelete() throws Exception {
 		if (logger.isEnabled())
 			logger.info("Starting delete test");
 		
 		String name = "test (" + new Date() + ")";
 		String idToDelete = "";
 		
-		startUserSession(client, kalturaConfig);
+		startUserSession();
 		KalturaMediaService mediaService = this.client.getMediaService();
 		
 		// First delete - should succeed
 		try {
 			
-			KalturaMediaEntry addedEntry = BaseTest.addTestImage(this, client, name);
+			KalturaMediaEntry addedEntry = addTestImage(this, name);
 			assertNotNull(addedEntry);
 			idToDelete = addedEntry.id;
 			
@@ -459,7 +456,7 @@ public class MediaServiceTest extends BaseTest {
 		
 		KalturaMediaEntry entry = new KalturaMediaEntry();
 		try {
-			startUserSession(client, kalturaConfig);
+			startUserSession();
 			KalturaMediaService mediaService = this.client.getMediaService();
 
 			InputStream fileData = TestUtils.getTestVideo();
@@ -489,7 +486,7 @@ public class MediaServiceTest extends BaseTest {
 		if (logger.isEnabled())
 			logger.info("Starting test data serve");
 		try {
-			startUserSession(client, kalturaConfig);
+			startUserSession();
 			//client.getDataService().serve();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -501,10 +498,10 @@ public class MediaServiceTest extends BaseTest {
 		if (logger.isEnabled())	
 			logger.info("Starting test playlist execute from filters");
 		try {
-			startAdminSession(client, kalturaConfig);
+			startAdminSession();
 			
 			// Create entry
-			KalturaMediaEntry entry = BaseTest.addTestImage(this, client, "test (" + new Date() + ")");
+			KalturaMediaEntry entry = addTestImage(this, "test (" + new Date() + ")");
 			
 			// generate filter
 			KalturaMediaEntryFilterForPlaylist filter = new KalturaMediaEntryFilterForPlaylist();
@@ -521,10 +518,10 @@ public class MediaServiceTest extends BaseTest {
 		} 
 	}
 	
-	public void testServe() throws KalturaApiException, IOException {
+	public void testServe() throws Exception {
 		String test = "bla bla bla";
 		try {
-			startUserSession(client, kalturaConfig);
+			startUserSession();
 			
 			// Add Entry
 			KalturaDataEntry dataEntry = new KalturaDataEntry();
