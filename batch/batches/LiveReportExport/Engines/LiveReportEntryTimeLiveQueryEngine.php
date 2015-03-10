@@ -17,7 +17,7 @@ class LiveReportAudienceEngine extends LiveReportEngine {
 		
 		$this->checkParams($args, array(LiveReportConstants::TIME_REFERENCE_PARAM));
 		
-		fwrite($fp, "DateTime" . LiveReportConstants::CELLS_SEPARATOR . "Audience\n");
+		fwrite($fp, "DateTime" . LiveReportConstants::CELLS_SEPARATOR . "Audience" . LiveReportConstants::CELLS_SEPARATOR . "DVR\n");
 		
 		$endTime =  $args[LiveReportConstants::TIME_REFERENCE_PARAM];
 		$timeRange = LiveReportConstants::SECONDS_36_HOURS;
@@ -44,7 +44,7 @@ class LiveReportAudienceEngine extends LiveReportEngine {
 		
 		foreach($couples as $couple) {
 			$parts = explode(",", $couple);
-			if(count($parts) == 2) {
+			if(count($parts) >= 2) {
 				$parts[0] = $this->formatter->format($parts[0]);
 				$msg = implode(LiveReportConstants::CELLS_SEPARATOR, $parts) . "\n";
 				fwrite($fp, $msg);

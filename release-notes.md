@@ -1,5 +1,18 @@
 
 ----------
+# Jupiter-10.7.0 #
+
+##Live Analytics - Show DVR audience metrics on Live Analytics##
+- Issue ID: PLAT-2413
+
+### Configuration ###
+None
+
+### Installation ###
+- Run on the Cassandra cluster: **live_analytics**/KalturaLiveModel/conf/migrations/2015-03-01-000000-update_dvr_kaltura_live_keyspace.cql
+- Deploy KalturaLiveAnalyics.war
+
+----------
 # Jupiter-10.6.0 #
 
 ##Live - A/V out of sync in second part of recorded entry after restart streaming (regression)##
