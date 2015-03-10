@@ -57,7 +57,13 @@ class KalturaLiveStatsEvent extends KalturaObject
 	 * @var bool 
 	 */
 	public $isLive;
-		
+
+	/**
+	 * the event start time as string
+	 * @var string
+	 */
+	public $startTime;
+
 	/**
 	 * delivery type used for this stream
 	 * @var KalturaPlaybackProtocol 
