@@ -2667,7 +2667,7 @@ class kFlowHelper
 		$secret = $partner->getSecret ();
 		$privilege = ks::PRIVILEGE_DOWNLOAD . ":" . $file_name;
 	
-		$expiry = kConf::get("live_report_export_expiry", 'local', 3 * 24 * 60 * 60);
+		$expiry = kConf::get("live_report_export_expiry", 'local', 7 * 24 * 60 * 60);
 		$ksStr = kSessionBase::generateSession($partner->getKSVersion(), $partner->getAdminSecret(), null, ks::TYPE_KS, $partner_id, $expiry, $privilege);
 			
 		//url is built with DC url in order to be directed to the same DC of the saved file
