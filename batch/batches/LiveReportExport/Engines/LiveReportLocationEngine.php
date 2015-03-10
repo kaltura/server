@@ -96,15 +96,13 @@ class LiveReportLocation1MinEngine extends LiveReportEngine {
 		/** @var KalturaLiveStreamListResponse */
 		$response = KBatchBase::$kClient->liveStream->listAction($filter, null);
 
-		$combinedDvrStatus = false;
 		foreach ($response->objects as $object) {
 			if ($object->dvrStatus == true) {
-				$combinedDvrStatus = true;
 				KalturaLog::debug("Found entry with DVR status = true: " . $object->id);
+				return true;
 			}
 		}
-		/* $combinedDvrStatus is true if at least one of the entries has dvrStatus = true */
-		return $combinedDvrStatus;
+		return false;
 	}
 	
 	protected function printHeaders($fp, $showDvr) {
