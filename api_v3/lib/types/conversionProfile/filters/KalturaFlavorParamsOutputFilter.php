@@ -6,6 +6,14 @@
 class KalturaFlavorParamsOutputFilter extends KalturaFlavorParamsOutputBaseFilter
 {
 	/* (non-PHPdoc)
+	 * @see KalturaFilter::getCoreFilter()
+	 */
+	protected function getCoreFilter()
+	{
+		return new assetParamsOutputFilter();
+	}
+	
+	/* (non-PHPdoc)
 	 * @see KalturaAssetParamsFilter::getTypeListResponse()
 	 */
 	public function getTypeListResponse(KalturaFilterPager $pager, KalturaDetachedResponseProfile $responseProfile = null, array $types = null)
