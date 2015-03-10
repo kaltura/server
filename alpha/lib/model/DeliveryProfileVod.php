@@ -24,8 +24,9 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 		$partnerPath = myPartnerUtils::getUrlForPartner($partnerId, $subpId);
 		$flavorAssetId = $flavorAsset->getId();
 		$versionString = $this->getFlavorVersionString($flavorAsset);
+		$urlParams = $this->params->getUrlParams();
 		
-		$url = "$partnerPath/serveFlavor/entryId/".$flavorAsset->getEntryId()."{$versionString}/flavorId/$flavorAssetId";
+		$url = "$partnerPath/serveFlavor/entryId/".$flavorAsset->getEntryId()."{$versionString}/flavorId/$flavorAssetId" . $urlParams;
 		return $url;
 	}
 	
@@ -76,12 +77,8 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 			$url = $this->doGetThumbnailAssetUrl($asset);
 	
 		if($asset instanceof flavorAsset)
-		{
-			$urlParams = $this->params->getUrlParams();
-			
+		{	
 			$url = $this->doGetFlavorAssetUrl($asset);
-			if ($urlParams)
-				$url .= $urlParams;
 
 			$url = str_replace('\\', '/', $url);
 			if ($tokenizeUrl)
@@ -113,19 +110,16 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 		return $hostName . $assetUrl;
 	}
 	
-	public function addUrlParams($urlParamsToAdd)
+	public function setAttributesUrlParmas($urlParamsToSet)
 	{
-		$urlOldString = $this->params->getUrlParams();
-		if ($urlOldString)
-			$urlParamsToAdd = $urlOldString . $urlParamsToAdd;  
-		$this->params->setUrlParams($urlParamsToAdd);
+		$this->params->setUrlParams($urlParamsToSet);
 	}
-	
-	public function getUrlParmas()
+
+	public function getAttributesUrlParmas()
 	{
 		return $this->params->getUrlParams();
 	}
-	
+
 	protected function addSeekFromBytes($flavorAsset, $url, $prefix) {
 		$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 		$seekFromBytes = $this->getSeekFromBytes(kFileSyncUtils::getLocalFilePathForKey($syncKey));

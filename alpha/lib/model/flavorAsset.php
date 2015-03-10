@@ -271,9 +271,6 @@ class flavorAsset extends asset
 	{
 		$entry = $this->getentry();
 
-		if (!$entry || $entry->getType() != entryType::MEDIA_CLIP)
-			KExternalErrors::dieError(KExternalErrors::INVALID_ENTRY_TYPE);
-
 		list($name , $extension) = kAssetUtils::getFileName($entry , $this);
 		$name = str_replace("\n", ' ', $name);
 		$name = kString::stripInvalidUrlChars($name);
