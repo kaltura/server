@@ -86,6 +86,7 @@ enabledWorkers.KAsyncDistributeFetchReportCloser	= 1
 enabledWorkers.KAsyncValidateLiveMediaServers		= 1
 enabledWorkers.KAsyncCopyPartner					= 1
 
+
 [Worker]
 maximumExecutionTime			= 300
 params.tempDirectoryPath		= @TMP_DIR@
@@ -248,6 +249,12 @@ filter.jobSubTypeIn	= 1,2,99,3,fastStart.FastStart,segmenter.Segmenter,mp4box.Mp
 ;params.minFileSize									= 
 ;params.maxFileSize									= 
 
+[KAsyncConvertCEnc : KAsyncConvertWorker]
+id													= 590
+friendlyName                                        = Common Encryption
+filter.jobSubTypeIn                                 = drm.cEnc
+params.exePath  									= @EDASH_EXE@
+
 [KAsyncConvertWidevine : KAsyncConvertWorker]
 id													= 71
 friendlyName										= Convert Widevine
@@ -259,12 +266,6 @@ params.maxTimeBeforeFail 							= 10000
 params.localTempPath 								= /web/tmp/encrypt
 ;The path for finished products, acessable from the apache
 params.sharedTempPath 								= /web/tmp/encrypt
-
-[KAsyncConvertCEnc : KAsyncConvertWorker]
-id													= 570
-friendlyName                                        = Common Encryption
-filter.jobSubTypeIn                                 = drm.cEnc
-params.exePath  									= @EDASH_EXE@
 
 [KAsyncDistributedConvert : KAsyncConvertWorker]
 id													= 72
