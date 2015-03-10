@@ -104,7 +104,7 @@ class DrmPlugin extends KalturaPlugin implements IKalturaServices, IKalturaAdmin
         if($baseClass == 'KOperationEngine' && $enumValue == KalturaConversionEngineType::CENC)
             return new KCEncOperationEngine($constructorArgs['params'], $constructorArgs['outFilePath']);
         if($baseClass == 'KDLOperatorBase' && $enumValue == self::getApiValue(DrmConversionEngineType::CENC))
-            return new KDLOperatorDRM($enumValue);
+            return new KDLOperatorDrm($enumValue);
 /*        if($baseClass == 'KalturaDrmProfile' && $enumValue == KalturaDrmProviderType::CENC)
             return new KalturaDrmProfile();
         if($baseClass == 'DrmProfile' && $enumValue == KalturaDrmProviderType::CENC)
@@ -121,7 +121,7 @@ class DrmPlugin extends KalturaPlugin implements IKalturaServices, IKalturaAdmin
         if($baseClass == 'KOperationEngine' && $enumValue == KalturaConversionEngineType::CENC)
             return "KDRMOperationEngine";
         if($baseClass == 'KDLOperatorBase' && $enumValue == self::getApiValue(DrmConversionEngineType::CENC))
-            return "KDLOperatorDRM";
+            return "KDLOperatorrm";
         if($baseClass == 'KalturaDrmProfile' && $enumValue == KalturaDrmProviderType::CENC)
             return "KalturaDrmProfile";
         if($baseClass == 'DrmProfile' && $enumValue == KalturaDrmProviderType::CENC)
