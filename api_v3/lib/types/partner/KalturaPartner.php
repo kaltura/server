@@ -381,12 +381,18 @@ class KalturaPartner extends KalturaObject implements IFilterable
 
 		$partner = new Partner();
 		$partner = parent::toObject( $partner );
-		$additionalParamsArray = array();
-		foreach($this->additionalParams as $pairObject)
+		/* @var $partner Partner */
+		
+		if($this->additionalParams)
 		{
-			$additionalParamsArray[$pairObject->key] = $pairObject->value;
+			$additionalParamsArray = array();
+			foreach($this->additionalParams as $pairObject)
+			{
+				$additionalParamsArray[$pairObject->key] = $pairObject->value;
+			}
 			$partner->setAdditionalParams($additionalParamsArray);
 		}
+		
 		return $partner;
 	}
 	
