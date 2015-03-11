@@ -162,6 +162,7 @@ abstract class KalturaObject
 	
 			// calculate field value
 			$fieldValue = null;
+			$getterParameters = '';
 	
 			if (strrpos($getterBody, 'return ') === 0)
 			{
@@ -201,17 +202,24 @@ abstract class KalturaObject
 					$fieldValue = null;		// we have to use the getter since it uses a private property
 				}
 			}
-			else if (strpos($curGetter->class, 'Base') === 0)
+			else
 			{
 				$params = $curGetter->getParameters();
 				if (count($params) == 1 && $params[0]->getDefaultValue() == "Y-m-d H:i:s")
 				{
-					// date field getter
-					$matches = array();
-					if (preg_match('/^if \(\$this\->([\w_]+) === null\)/', $getterBody, $matches))
+					if (strpos($curGetter->class, 'Base') === 0)
 					{
-						$memberName = '$srcObj->' . $matches[1];
-						$fieldValue = "({$memberName} === null ? null : (int) date_create({$memberName})->format('U'))";
+						// date field getter
+						$matches = array();
+						if (preg_match('/^if \(\$this\->([\w_]+) === null\)/', $getterBody, $matches))
+						{
+							$memberName = '$srcObj->' . $matches[1];
+							$fieldValue = "({$memberName} === null ? null : (int) date_create({$memberName})->format('U'))";
+						}
+					}
+					else
+					{
+						$getterParameters = 'null';
 					}
 				}
 			}
@@ -219,7 +227,7 @@ abstract class KalturaObject
 			if (!$fieldValue)
 			{
 				// complex getter - call original function
-				$fieldValue = "\$srcObj->".$curGetter->name."()";
+				$fieldValue = "\$srcObj->".$curGetter->name."($getterParameters)";
 			}
 	
 			// add support for arrays and dynamic enums
