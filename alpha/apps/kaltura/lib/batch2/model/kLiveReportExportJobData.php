@@ -14,6 +14,8 @@ class kLiveReportExportJobData extends kJobData
 	public $outputPath;
 	
 	public $recipientEmail;
+
+	public $baseApplicationUrl;
 	
 	/**
 	 * @return the $recipientEmail
@@ -85,6 +87,18 @@ class kLiveReportExportJobData extends kJobData
 		$this->timeZoneOffset = $timeZoneOffset;
 	}
 
-	
+	/**
+	 * @return the $baseApplicationUrl
+	 */
+	public function getBaseApplicationUrl() {
+		return $this->baseApplicationUrl;
+	}
+
+	/**
+	 * @param field_type $baseApplicationUrl
+	 */
+	public function setBaseApplicationUrl($baseApplicationUrl) {
+		$this->baseApplicationUrl = $baseApplicationUrl;
+	}
 	
 }

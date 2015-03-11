@@ -2648,7 +2648,7 @@ class kFlowHelper
 		return $dbBatchJob;
 	}
 	
-	protected static function createLiveReportExportDownloadUrl ($partner_id, $file_name)
+	protected static function createLiveReportExportDownloadUrl ($partner_id, $file_name, $baseApplicationUrl)
 	{
 		// Extract simple download name
 		$regex = "/^{$partner_id}_Export_[a-zA-Z0-9]+_(?<fileName>[\w\-]+.csv)$/";
@@ -2669,9 +2669,14 @@ class kFlowHelper
 	
 		$expiry = kConf::get("live_report_export_expiry", 'local', 7 * 24 * 60 * 60);
 		$ksStr = kSessionBase::generateSession($partner->getKSVersion(), $partner->getAdminSecret(), null, ks::TYPE_KS, $partner_id, $expiry, $privilege);
-			
-		//url is built with DC url in order to be directed to the same DC of the saved file
-		$url = kDataCenterMgr::getCurrentDcUrl() . "/api_v3/index.php/service/liveReports/action/serveReport/ks/$ksStr/id/$file_name/$downloadName";
+
+		if ($baseApplicationUrl) {
+			$url = $baseApplicationUrl . "/export/$ksStr/$file_name/$downloadName";
+		}
+		else {
+			//url is built with DC url in order to be directed to the same DC of the saved file
+			$url = kDataCenterMgr::getCurrentDcUrl() . "/api_v3/index.php/service/liveReports/action/serveReport/ks/$ksStr/id/$file_name/$downloadName";
+		}
 		return $url;
 	}
 	
@@ -2693,7 +2698,7 @@ class kFlowHelper
 		$dbBatchJob->save();
 		
 		// Create download URL
-		$url = self::createLiveReportExportDownloadUrl($dbBatchJob->getPartnerId(), $fileName);
+		$url = self::createLiveReportExportDownloadUrl($dbBatchJob->getPartnerId(), $fileName, $data->baseApplicationUrl);
 		if(!$url) {
 			KalturaLog::err("Failed to create download URL");
 			return kFlowHelper::handleLiveReportExportFailed($dbBatchJob, $data);
