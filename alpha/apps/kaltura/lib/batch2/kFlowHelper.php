@@ -15,7 +15,7 @@ class kFlowHelper
 	
 	const BULK_DOWNLOAD_EMAIL_PARAMS_SEPARATOR = '|,|';
 
-	const LIVE_REPORT_EXPIRY_TIME_IN_DAYS = 7;
+	const LIVE_REPORT_EXPIRY_TIME = 604800; // 7 * 60 * 60 * 24
 	/**
 	 * @param int $partnerId
 	 * @param string $entryId
@@ -2697,7 +2697,7 @@ class kFlowHelper
 		$dbBatchJob->setData($data);
 		$dbBatchJob->save();
 
-		$expiry = kConf::get("live_report_export_expiry", 'local', self::LIVE_REPORT_EXPIRY_TIME_IN_DAYS * 60 * 60 * 24);
+		$expiry = kConf::get("live_report_export_expiry", 'local', self::LIVE_REPORT_EXPIRY_TIME);
 		// Create download URL
 		$url = self::createLiveReportExportDownloadUrl($dbBatchJob->getPartnerId(), $fileName, $expiry, $data->baseApplicationUrl);
 		if(!$url) {
@@ -2709,7 +2709,8 @@ class kFlowHelper
 		$time = date("m-d-y H:i", $data->timeReference + $data->timeZoneOffset); 
 		$email_id = MailType::MAIL_TYPE_LIVE_REPORT_EXPORT_SUCCESS;
 		$validUntil = date("m-d-y H:i", $data->timeReference + $expiry + $data->timeZoneOffset);
-		$params = array($dbBatchJob->getPartner()->getName(), $time, $dbBatchJob->getId(), $url, self::LIVE_REPORT_EXPIRY_TIME_IN_DAYS, $validUntil);
+		$expiryInDays = $expiry / 60 / 60 / 24;
+		$params = array($dbBatchJob->getPartner()->getName(), $time, $dbBatchJob->getId(), $url, $expiryInDays, $validUntil);
 		$titleParams = array($time);
 		
 		
