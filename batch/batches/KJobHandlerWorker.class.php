@@ -111,7 +111,7 @@ abstract class KJobHandlerWorker extends KBatchBase
 				if($ktex->getResetJobExecutionAttempts())
 					KBatchBase::$kClient->batch->resetJobExecutionAttempts($job->id, $this->getExclusiveLockKey(), $job->jobType);
 				
-				$this->closeJobOnError($job,KalturaBatchJobErrorTypes::RUNTIME, $ktex, KalturaBatchJobStatus::RETRY);
+				$this->closeJobOnError($job,KalturaBatchJobErrorTypes::RUNTIME, $ktex, KalturaBatchJobStatus::RETRY, $ktex->getData());
 			}
 			catch(KalturaClientException $kcex)
 			{
@@ -129,12 +129,12 @@ abstract class KJobHandlerWorker extends KBatchBase
 		return $jobs;
 	}
 	
-	protected function closeJobOnError($job, $error, $ex, $status) 
+	protected function closeJobOnError($job, $error, $ex, $status, $data = null)
 	{
 		try
 		{
 			self::unimpersonate();
-			$job = $this->closeJob($job, $error, $ex->getCode(), "Error: " . $ex->getMessage(), $status);
+			$job = $this->closeJob($job, $error, $ex->getCode(), "Error: " . $ex->getMessage(), $status, $data);
 		} 
 		catch(Exception $ex)
 		{
