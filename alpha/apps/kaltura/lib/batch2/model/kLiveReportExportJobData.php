@@ -95,7 +95,7 @@ class kLiveReportExportJobData extends kJobData
 	}
 
 	/**
-	 * @param field_type $baseApplicationUrl
+	 * @param string $baseApplicationUrl
 	 */
 	public function setBaseApplicationUrl($baseApplicationUrl) {
 		$this->baseApplicationUrl = $baseApplicationUrl;
