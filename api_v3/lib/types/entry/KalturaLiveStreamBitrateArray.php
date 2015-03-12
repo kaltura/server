@@ -14,7 +14,7 @@ class KalturaLiveStreamBitrateArray extends KalturaTypedArray
 		foreach ($arr as $obj)
 		{
 			$nObj = new KalturaLiveStreamBitrate();
-			$nObj->fromObject($obj, $responseProfile);
+			$nObj->fromArray($obj);
 			$newArr[] = $nObj;
 		}
 		

@@ -25,19 +25,6 @@ class KalturaLiveStreamBitrate extends KalturaObject
 	 */
 	public $tags;
 	
-
-	public function doFromObject($source_object, KalturaDetachedResponseProfile $responseProfile = null)
-	{
-		if($this->shouldGet('bitrate', $responseProfile))
-			$this->bitrate = $source_object['bitrate'];
-		if($this->shouldGet('width', $responseProfile))
-			$this->width = $source_object['width'];
-		if($this->shouldGet('height', $responseProfile))
-			$this->height = $source_object['height'];
-		if($this->shouldGet('recordingOptions', $responseProfile) && isset($source_object['tags']))
-			$this->tags = $source_object['tags'];
-	}
-	
 	public function toObject ( $object_to_fill = null , $props_to_skip = array() )
 	{
 		// enables extension with default empty object
