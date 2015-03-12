@@ -77,8 +77,8 @@ class KalturaCategoryFilter extends KalturaCategoryBaseFilter
 	 */
 	public function getListResponse(KalturaFilterPager $pager, KalturaDetachedResponseProfile $responseProfile = null)
 	{
-		if ($filter->orderBy === null)
-			$filter->orderBy = KalturaCategoryOrderBy::DEPTH_ASC;
+		if ($this->orderBy === null)
+			$this->orderBy = KalturaCategoryOrderBy::DEPTH_ASC;
 			
 		$categoryFilter = $this->toObject();
 		
