@@ -2671,7 +2671,8 @@ class kFlowHelper
 		$ksStr = kSessionBase::generateSession($partner->getKSVersion(), $partner->getAdminSecret(), null, ks::TYPE_KS, $partner_id, $expiry, $privilege);
 
 		if ($applicationUrlTemplate) {
-			$url = $applicationUrlTemplate . "/export/$ksStr/$file_name/$downloadName";
+			$url = str_replace("[ks]", $ksStr, $applicationUrlTemplate);
+			$url = str_replace("[id]", $file_name, $url);
 		}
 		else {
 			//url is built with DC url in order to be directed to the same DC of the saved file
