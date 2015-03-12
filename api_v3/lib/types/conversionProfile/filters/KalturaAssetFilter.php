@@ -49,7 +49,9 @@ class KalturaAssetFilter extends KalturaAssetBaseFilter
 		$dbEntries = entryPeer::doSelect($c);
 		
 		if (!$dbEntries)
-			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, implode(',', $entryIds));
+		{
+			return array(array(), 0);
+		}
 		
 		$entryIds = array();
 		foreach ($dbEntries as $dbEntry)
