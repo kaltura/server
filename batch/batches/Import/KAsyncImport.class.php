@@ -213,17 +213,18 @@ class KAsyncImport extends KJobHandlerWorker
 		}
 		catch(kTemporaryException $tex)
 		{
-			$importData->destFileLocalPath = null;
+			$data->destFileLocalPath = KalturaClient::getKalturaNullValue();
+			$tex->setData($data);
 			throw $tex;
 		}
 		catch(Exception $ex)
 		{
+			$data->destFileLocalPath = KalturaClient::getKalturaNullValue();
 			if($ex->getMessage() == KCurlWrapper::COULD_NOT_CONNECT_TO_HOST_ERROR)
 			{
-				$importData->destFileLocalPath = null;
-				throw new kTemporaryException($ex->getMessage(), $ex->getCode());
+				throw new kTemporaryException($ex->getMessage(), $ex->getCode(), $data);
 			}
-			$this->closeJob($job, KalturaBatchJobErrorTypes::RUNTIME, $ex->getCode(), "Error: " . $ex->getMessage(), KalturaBatchJobStatus::FAILED);
+			$this->closeJob($job, KalturaBatchJobErrorTypes::RUNTIME, $ex->getCode(), "Error: " . $ex->getMessage(), KalturaBatchJobStatus::FAILED, $data);
 		}
 		return $job;
 	}
@@ -451,4 +452,3 @@ class KAsyncImport extends KJobHandlerWorker
 		return $destFile;
 	}
 }
-?>
