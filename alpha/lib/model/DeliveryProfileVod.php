@@ -110,12 +110,12 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 		return $hostName . $assetUrl;
 	}
 	
-	public function setAttributesUrlParmas($urlParamsToSet)
+	public function setAttributesUrlParams($urlParamsToSet)
 	{
 		$this->params->setUrlParams($urlParamsToSet);
 	}
 
-	public function getAttributesUrlParmas()
+	public function getAttributesUrlParams()
 	{
 		return $this->params->getUrlParams();
 	}

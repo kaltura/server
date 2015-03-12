@@ -91,7 +91,7 @@ class kAssetUtils
 			if($asset instanceof flavorAsset)
 				$urlManager->initDeliveryDynamicAttributes(null, $asset);
 
-			$urlManager->setAttributesUrlParmas($urlParameters);
+			$urlManager->setAttributesUrlParams($urlParameters);
 
 			$url = $urlManager->getFullAssetUrl($asset);
 		}
