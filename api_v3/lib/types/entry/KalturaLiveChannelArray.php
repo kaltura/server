@@ -13,7 +13,7 @@ class KalturaLiveChannelArray extends KalturaTypedArray
 			
 		foreach ($arr as $obj)
 		{
-			$nObj = new KalturaLiveChannel();
+    		$nObj = KalturaEntryFactory::getInstanceByType($obj->getType());
 			$nObj->fromObject($obj, $responseProfile);
 			$newArr[] = $nObj;
 		}

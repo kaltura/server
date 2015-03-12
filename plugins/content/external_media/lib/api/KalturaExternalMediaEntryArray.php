@@ -13,7 +13,7 @@ class KalturaExternalMediaEntryArray extends KalturaTypedArray
 		
 		foreach($arr as $obj)
 		{
-			$nObj = new KalturaExternalMediaEntry();
+    		$nObj = KalturaEntryFactory::getInstanceByType($obj->getType());
 			$nObj->fromObject($obj, $responseProfile);
 			$newArr[] = $nObj;
 		}

@@ -12,7 +12,7 @@ class KalturaDocumentEntryArray extends KalturaTypedArray
 			return $newArr;		
 		foreach ($arr as $obj)
 		{
-			$nObj = new KalturaDocumentEntry();
+    		$nObj = KalturaEntryFactory::getInstanceByType($obj->getType());
 			$nObj->fromObject($obj, $responseProfile);
 			$newArr[] = $nObj;
 		}

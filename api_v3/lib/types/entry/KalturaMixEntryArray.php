@@ -12,7 +12,7 @@ class KalturaMixEntryArray extends KalturaTypedArray
 			return $newArr;		
 		foreach ($arr as $obj)
 		{
-			$nObj = new KalturaMixEntry();
+    		$nObj = KalturaEntryFactory::getInstanceByType($obj->getType());
 			$nObj->fromObject($obj, $responseProfile);
 			$newArr[] = $nObj;
 		}

@@ -11,7 +11,7 @@ class KalturaPlaylistArray extends KalturaTypedArray
 		if ( $arr == null ) return $newArr;
 		foreach ( $arr as $obj )
 		{
-			$nObj = new KalturaPlaylist();
+    		$nObj = KalturaEntryFactory::getInstanceByType($obj->getType());
 			$nObj->fromObject($obj, $responseProfile);
 			$newArr[] = $nObj;
 		}
