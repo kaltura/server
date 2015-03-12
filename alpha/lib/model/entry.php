@@ -3301,7 +3301,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	 */
 	public function isCustomDataModified($name = null, $namespace = '')
 	{
-		if(isset($this->oldCustomDataValues[$namespace]) && (is_null($name) || isset($this->oldCustomDataValues[$namespace][$name])))
+		if(isset($this->oldCustomDataValues[$namespace]) && (is_null($name) || array_key_exists($name, $this->oldCustomDataValues[$namespace])))
 		{
 			return true;
 		}

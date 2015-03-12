@@ -140,7 +140,8 @@ class KalturaEntryService extends KalturaBaseService
 		$tempDbEntry->setDisplayInSearch(mySearchUtils::DISPLAY_IN_SEARCH_SYSTEM);
 		$tempDbEntry->setPartnerId($dbEntry->getPartnerId());
 		$tempDbEntry->setReplacedEntryId($dbEntry->getId());
-		$tempDbEntry->save();
+        $tempDbEntry->putInCustomData( "isTemporary" , true );
+        $tempDbEntry->save();
 		
 		$dbEntry->setReplacingEntryId($tempDbEntry->getId());
 		$dbEntry->setReplacementStatus(entryReplacementStatus::NOT_READY_AND_NOT_APPROVED);
