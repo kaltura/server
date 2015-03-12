@@ -88,22 +88,7 @@ class LiveReportLocation1MinEngine extends LiveReportEngine {
 		return KBatchBase::$kClient->liveReports->getReport($reportType, $filter, $pager);
 	}
 
-	protected function shouldShowDvrColumns($entryIds)
-	{
-		$filter = new KalturaLiveStreamEntryFilter();
-		$filter->idIn = $entryIds;
 
-		/** @var KalturaLiveStreamListResponse */
-		$response = KBatchBase::$kClient->liveStream->listAction($filter, null);
-
-		foreach ($response->objects as $object) {
-			if ($object->dvrStatus) {
-				KalturaLog::debug("Found entry with DVR status = true: " . $object->id);
-				return true;
-			}
-		}
-		return false;
-	}
 	
 	protected function printHeaders($fp, $showDvr) {
 		$values = array();
