@@ -90,13 +90,15 @@ class kAssetUtils
 			$urlManager = DeliveryProfilePeer::getDeliveryProfile($asset->getEntryId());
 			if($asset instanceof flavorAsset)
 				$urlManager->initDeliveryDynamicAttributes(null, $asset);
-			
+			if ($urlParameters)
+				$urlManager->addUrlParams($urlParameters);
+
 			$url = $urlManager->getFullAssetUrl($asset);
 		}
 		
 		$url = preg_replace('/^https?:\/\//', '', $url);
 			
-		return 'http://' . $url . $urlParameters;
+		return 'http://' . $url;
 	}
 
 	private static function getExternalStorageUrl(Partner $partner, asset $asset, FileSyncKey $key, $servePlayManifest = false , $playManifestClientTag = null , $storageId = null)
