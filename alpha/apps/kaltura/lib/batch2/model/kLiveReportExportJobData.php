@@ -15,7 +15,7 @@ class kLiveReportExportJobData extends kJobData
 	
 	public $recipientEmail;
 
-	public $baseApplicationUrl;
+	public $applicationUrlTemplate;
 	
 	/**
 	 * @return the $recipientEmail
@@ -88,17 +88,17 @@ class kLiveReportExportJobData extends kJobData
 	}
 
 	/**
-	 * @return the $baseApplicationUrl
+	 * @return the $applicationUrlTemplate
 	 */
-	public function getBaseApplicationUrl() {
-		return $this->baseApplicationUrl;
+	public function getApplicationUrlTemplate() {
+		return $this->applicationUrlTemplate;
 	}
 
 	/**
-	 * @param string $baseApplicationUrl
+	 * @param string $applicationUrlTemplate
 	 */
-	public function setBaseApplicationUrl($baseApplicationUrl) {
-		$this->baseApplicationUrl = $baseApplicationUrl;
+	public function setApplicationUrlTemplate($applicationUrlTemplate) {
+		$this->applicationUrlTemplate = $applicationUrlTemplate;
 	}
 	
 }
