@@ -110,14 +110,14 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 		return $hostName . $assetUrl;
 	}
 	
-	public function setAttributesUrlParams($urlParamsToSet)
+	public function getDynamicAttribues()
 	{
-		$this->params->setUrlParams($urlParamsToSet);
+		return $this->params;
 	}
 
-	public function getAttributesUrlParams()
+	public function setDynamicAttribues(DeliveryProfileDynamicAttributes $attributes)
 	{
-		return $this->params->getUrlParams();
+		$this->params = $attributes;
 	}
 
 	protected function addSeekFromBytes($flavorAsset, $url, $prefix) {
