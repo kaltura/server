@@ -110,12 +110,12 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 		return $hostName . $assetUrl;
 	}
 	
-	public function getDynamicAttribues()
+	public function getDynamicAttributes()
 	{
 		return $this->params;
 	}
 
-	public function setDynamicAttribues(DeliveryProfileDynamicAttributes $attributes)
+	public function setDynamicAttributes(DeliveryProfileDynamicAttributes $attributes)
 	{
 		$this->params = $attributes;
 	}
