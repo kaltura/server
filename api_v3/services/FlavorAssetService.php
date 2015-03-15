@@ -696,18 +696,14 @@ class FlavorAssetService extends KalturaAssetService
 		$securyEntryHelper = new KSecureEntryHelper($entryDb, $ks, null, ContextType::DOWNLOAD);
 		if ($securyEntryHelper->shouldPreview()) 
 		{ 
-			if ($securyEntryHelper->shouldPreview()) 
-			{ 
 			if ($shouldServeFlavor)
 				$preview = $securyEntryHelper->getPreviewLength() * 1000;
 			else
 				$previewFileSize = $assetDb->estimateFileSize($entryDb, $securyEntryHelper->getPreviewLength());
-			}
-			else
-			{ 
-				$securyEntryHelper->validateForDownload();
-			}
 		}
+		else
+			$securyEntryHelper->validateForDownload();
+
 		if (!$securyEntryHelper->isAssetAllowed($assetDb))
 			throw new KalturaAPIException(KalturaErrors::ASSET_NOT_ALLOWED, $id);
  
