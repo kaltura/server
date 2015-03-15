@@ -684,9 +684,13 @@ class FlavorAssetService extends KalturaAssetService
 		
 		$shouldServeFlavor = false;
 		if($entryDb->getType() == entryType::MEDIA_CLIP)
+		{
 			$shouldServeFlavor = true;
-		
-		$preview = null;
+			$preview = null;
+		}
+		else
+			$previewFileSize = null;
+
 		$ksObj = $this->getKs();
 		$ks = ($ksObj) ? $ksObj->getOriginalString() : null;
 		$securyEntryHelper = new KSecureEntryHelper($entryDb, $ks, null, ContextType::DOWNLOAD);
@@ -697,7 +701,7 @@ class FlavorAssetService extends KalturaAssetService
 			if ($shouldServeFlavor)
 				$preview = $securyEntryHelper->getPreviewLength() * 1000;
 			else
-				$preview = $assetDb->estimateFileSize($entryDb, $securyEntryHelper->getPreviewLength());
+				$previewFileSize = $assetDb->estimateFileSize($entryDb, $securyEntryHelper->getPreviewLength());
 			}
 			else
 			{ 
@@ -706,16 +710,10 @@ class FlavorAssetService extends KalturaAssetService
 		}
 		if (!$securyEntryHelper->isAssetAllowed($assetDb))
 			throw new KalturaAPIException(KalturaErrors::ASSET_NOT_ALLOWED, $id);
-
-		//files grater then 1.8GB can't be downloaded from cdn.
-		$flavorSizeKB = $assetDb->getSize();
-		$useCdn = true;
-		if ($flavorSizeKB > kConf::get("max_file_size_downloadable_from_cdn_in_KB"))
-			$useCdn = false;
  
 		if ($shouldServeFlavor)
 			return $assetDb->getServeFlavorUrl($preview);
-		return $assetDb->getDownloadUrl($useCdn, $forceProxy,$preview);
+		return $assetDb->getDownloadUrl(true, $forceProxy,$previewFileSize);
 	}
 	
 	/**
