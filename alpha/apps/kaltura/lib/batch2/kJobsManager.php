@@ -1697,7 +1697,7 @@ class kJobsManager
 		$jobData->recipientEmail = $params->recpientEmail;
 		$jobData->timeZoneOffset = $timeOffsetSeconds - ($params->timeZoneOffset * 60); // Convert minutes to seconds
 		$jobData->timeReference = time();
-		$jobData->baseApplicationUrl = $params->baseApplicationUrl;
+		$jobData->applicationUrlTemplate = $params->applicationUrlTemplate;
 		
 		
 		$job = new BatchJob();

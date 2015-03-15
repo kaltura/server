@@ -27,6 +27,6 @@ class KalturaLiveReportExportParams extends KalturaObject
 	 * Optional argument that allows controlling the prefix of the exported csv url
 	 * @var string
 	 */
-	public $baseApplicationUrl;
+	public $applicationUrlTemplate;
 	
 }

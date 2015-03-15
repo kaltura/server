@@ -3,14 +3,21 @@
 # Jupiter-10.7.0 #
 
 ##Live Analytics - Show DVR audience metrics on Live Analytics##
+- Issue Type: new feature
 - Issue ID: PLAT-2413
 
-### Configuration ###
-None
+#### Configuration ####
 
-### Installation ###
-- Run on the Cassandra cluster: **live_analytics**/KalturaLiveModel/conf/migrations/2015-03-01-000000-update_dvr_kaltura_live_keyspace.cql
-- Deploy KalturaLiveAnalyics.war
+Deploy an up-to-date version of batch/batches/Mailer/emails_en.ini
+
+#### Deployment Scripts ####
+
+Run on the Cassandra cluster: **live_analytics**/KalturaLiveModel/conf/migrations/2015-03-01-000000-update_dvr_kaltura_live_keyspace.cql
+Deploy KalturaLiveAnalyics.war
+
+#### Known Issues & Limitations ####
+
+None.
 
 ----------
 # Jupiter-10.6.0 #
