@@ -103,7 +103,7 @@ class DeliveryProfileDynamicAttributes {
 	/**
 	 * @var string
 	 */
-	protected $urlParams = null;
+	protected $urlParams = '';
 
 	/**
 	 * @return the $format

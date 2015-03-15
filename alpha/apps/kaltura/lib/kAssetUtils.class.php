@@ -90,8 +90,7 @@ class kAssetUtils
 			$urlManager = DeliveryProfilePeer::getDeliveryProfile($asset->getEntryId());
 			if($asset instanceof flavorAsset)
 				$urlManager->initDeliveryDynamicAttributes(null, $asset);
-			if ($urlParameters)
-				$urlManager->addUrlParams($urlParameters);
+			$urlManager->setAttributesUrlParmas($urlParameters);
 
 			$url = $urlManager->getFullAssetUrl($asset);
 		}
