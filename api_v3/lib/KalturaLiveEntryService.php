@@ -116,7 +116,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 		{
 			if(!$dbEntry->getRecordedEntryId())
 			{
-				$this->createRecordedEntry($dbEntry);
+				$this->createRecordedEntry($dbEntry, $mediaServerIndex);
 			}
 			
 			$recordedEntry = entryPeer::retrieveByPK($dbEntry->getRecordedEntryId());
@@ -220,7 +220,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 				}
 				
 				if($createRecordedEntry)
-					$this->createRecordedEntry($dbEntry);
+					$this->createRecordedEntry($dbEntry, $mediaServerIndex);
 			}
 		}
 		
@@ -233,7 +233,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 	 * @param LiveEntry $dbEntry
 	 * @return entry
 	 */
-	private function createRecordedEntry(LiveEntry $dbEntry)
+	private function createRecordedEntry(LiveEntry $dbEntry, $mediaServerIndex)
 	{
 		$lock = kLock::create("live_record_" . $dbEntry->getId());
 		
@@ -242,6 +242,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 	    	return;
 	    }
 	    
+	    $recordedEntry = null;
      	try{		
 			$recordedEntryName = $dbEntry->getName();
 			if($dbEntry->getRecordStatus() == RecordStatus::PER_SESSION)
@@ -264,6 +265,14 @@ class KalturaLiveEntryService extends KalturaEntryService
 			
 			$dbEntry->setRecordedEntryId($recordedEntry->getId());
 			$dbEntry->save();
+			
+			$assets = assetPeer::retrieveByEntryId($dbEntry->getId(), array(assetType::LIVE));
+			foreach($assets as $asset)
+			{
+				/* @var $asset liveAsset */
+				$asset->incLiveSegmentVersion($mediaServerIndex);
+				$asset->save();
+			}
 		}
 		catch(Exception $e){
        		$lock->unlock();
