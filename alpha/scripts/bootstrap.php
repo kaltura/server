@@ -11,6 +11,7 @@ KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "vendor", "*
 KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "infra", "*"));
 KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "plugins", "*"));
 KAutoloader::setClassMapFilePath(kConf::get("cache_root_path") . '/scripts/classMap.cache');
+KAutoloader::addExcludePath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "vendor", "aws", "*")); // Do not load AWS files, rather use their autoloader (see below)
 KAutoloader::register();
 
 date_default_timezone_set(kConf::get("date_default_timezone"));
@@ -32,3 +33,6 @@ KalturaLog::info("Initializing database...");
 DbManager::setConfig(kConf::getDB());
 DbManager::initialize();
 KalturaLog::info("Database initialized successfully");
+
+// AWS SDK PHP Client Library
+require_once(KAutoloader::buildPath(KALTURA_ROOT_PATH, 'vendor', 'aws', 'aws-autoloader.php'));

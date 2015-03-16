@@ -10,6 +10,7 @@ class KAutoloader
 {
 	static private $_oldIncludePath = "";
 	static private $_classPath = null;
+	static private $_excludePath = null;
 	static private $_includePath = null;
 	static private $_classMap = array();
 	static private $_classMapFileLocation = false;
@@ -83,6 +84,11 @@ class KAutoloader
 	static function scanDirectory($directory, $recursive)
 	{
 		if (!is_dir($directory))
+		{
+			return;
+		}
+
+		if ( array_key_exists($directory, self::$_excludePath) )
 		{
 			return;
 		}
@@ -229,6 +235,40 @@ class KAutoloader
 			}
 		}
 		self::$_classPath[] = $path;
+	}
+
+	/**
+	 * Adds another class path to the list of excluded class paths
+	 * @param $path
+	 */
+	static function addExcludePath($path)
+	{
+		if (self::$_excludePath === null)
+			self::$_excludePath = array();
+
+		if(strpos($path, DIRECTORY_SEPARATOR . '*') > 0)
+		{
+			list($base, $rest) = explode(DIRECTORY_SEPARATOR . '*', $path, 2);
+			if(strpos($rest, DIRECTORY_SEPARATOR . '*') > 0)
+			{
+				foreach(scandir($base) as $sub_folder)
+				{
+					if ($sub_folder[0] == "." || $sub_folder[0] == "..") // ignore linux hidden files
+						continue;
+
+					$path = realpath($base . DIRECTORY_SEPARATOR . $sub_folder);
+					if (is_dir($path))
+						self::addExcludePath($path . $rest);
+				}
+				return;
+			}
+			else
+			{
+				$path = $base;
+			}
+		}
+
+		self::$_excludePath[$path] = 1;
 	}
 
 	/**
