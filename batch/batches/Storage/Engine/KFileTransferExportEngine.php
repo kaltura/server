@@ -33,7 +33,10 @@ class KFileTransferExportEngine extends KExportEngine
 		$engineOptions['passiveMode'] = $this->data->ftpPassiveMode;
 		$engineOptions['createLink'] = $this->data->createLink;
 		if($this->data instanceof KalturaAmazonS3StorageExportJobData)
+		{
 			$engineOptions['filesAcl'] = $this->data->filesPermissionInS3;
+			$engineOptions['s3Region'] = $this->data->s3Region;
+		}
 			
 		$engine = kFileTransferMgr::getInstance($this->protocol, $engineOptions);
 		
