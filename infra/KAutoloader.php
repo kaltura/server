@@ -10,7 +10,7 @@ class KAutoloader
 {
 	static private $_oldIncludePath = "";
 	static private $_classPath = null;
-	static private $_excludePath = null;
+	static private $_excludePath = array();
 	static private $_includePath = null;
 	static private $_classMap = array();
 	static private $_classMapFileLocation = false;
@@ -243,9 +243,6 @@ class KAutoloader
 	 */
 	static function addExcludePath($path)
 	{
-		if (self::$_excludePath === null)
-			self::$_excludePath = array();
-
 		if(strpos($path, DIRECTORY_SEPARATOR . '*') > 0)
 		{
 			list($base, $rest) = explode(DIRECTORY_SEPARATOR . '*', $path, 2);
