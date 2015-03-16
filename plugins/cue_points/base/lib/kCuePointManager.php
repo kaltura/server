@@ -5,19 +5,7 @@
 class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEventConsumer, kObjectAddedEventConsumer, kObjectCreatedEventConsumer, kObjectReplacedEventConsumer
 {
 	const MAX_CUE_POINTS_TO_COPY_TO_VOD = 100;
-    const MAX_CUE_POINTS_TO_COPY_TO_CLIP = 1000;
-
-    static $trimPermissionsArray = array( "ThumbCuePoint" => PermissionName::FEATURE_COPY_THUMB_CUE_POINTS_TO_TRIMMED_ENTRY,
-        "CodeCuePoint"=>PermissionName::FEATURE_COPY_CODE_CUE_POINTS_TO_TRIMMED_ENTRY,
-        "AdCuePoint"=>PermissionName::FEATURE_COPY_AD_CUE_POINTS_TO_TRIMMED_ENTRY,
-        "Annotation"=>PermissionName::FEATURE_COPY_ANNOTATIONS_TO_TRIMMED_ENTRY
-        );
-
-    static $clipPermissionsArray = array( "ThumbCuePoint" => PermissionName::FEATURE_COPY_THUMB_CUE_POINTS_TO_CLIP,
-        "CodeCuePoint"=>PermissionName::FEATURE_COPY_CODE_CUE_POINTS_TO_CLIP,
-        "AdCuePoint"=>PermissionName::FEATURE_COPY_AD_CUE_POINTS_TO_CLIP,
-        "Annotation"=>PermissionName::FEATURE_COPY_ANNOTATIONS_TO_CLIP
-        );
+	const MAX_CUE_POINTS_TO_COPY_TO_CLIP = 1000;
 
 	/* (non-PHPdoc)
 	 * @see kObjectAddedEventConsumer::shouldConsumeAddedEvent()
@@ -57,17 +45,17 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 		return false;
 	}
 
-    /* (non-PHPdoc)
+	/* (non-PHPdoc)
 	 * @see kObjectReplacedEventConsumer::shouldConsumeReplacedEvent()
 	 */
-    public function shouldConsumeReplacedEvent(BaseObject $object)
-    {
-        if($object instanceof entry) {
-            return true;
-        }
+	public function shouldConsumeReplacedEvent(BaseObject $object)
+	{
+		if($object instanceof entry) {
+			return true;
+		}
 
-        return false;
-    }
+		return false;
+	}
 
 	/**
 	 * Return a VOD entry (sourceType = RECORDED_LIVE) based on the flavorAsset that is
@@ -133,44 +121,37 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 		return true;
 	}
 
-    /* (non-PHPdoc)
+	/* (non-PHPdoc)
 	 * @see kObjectReplacedEventConsumer::objectReplaced()
 	*/
-    public function objectReplaced(BaseObject $object, BaseObject $replacingObject, BatchJob $raisedJob = null) {
+	public function objectReplaced(BaseObject $object, BaseObject $replacingObject, BatchJob $raisedJob = null) {
+		$c = new Criteria();
+		$c->add(CuePointPeer::ENTRY_ID, $object->getId());
 
-        $criteria = new KalturaCriteria();
-        $criteria->add( CuePointPeer::ENTRY_ID, $object->getId() );
-        $list = CuePointPeer::doSelect($criteria);
-        if ( count($list) > self::MAX_CUE_POINTS_TO_COPY_TO_CLIP ) {
-            KalturaLog::alert("Can't handle cuePoints after replacement for entry [{$object->getId()}] because cuePoints count exceeded max limit of [" . self::MAX_CUE_POINTS_TO_COPY_TO_CLIP . "]");
-            return;
-        }
+		if ( CuePointPeer::doCount($c) > self::MAX_CUE_POINTS_TO_COPY_TO_CLIP ) {
+			KalturaLog::alert("Can't handle cuePoints after replacement for entry [{$object->getId()}] because cuePoints count exceeded max limit of [" . self::MAX_CUE_POINTS_TO_COPY_TO_CLIP . "]");
+			return true;
+		}
 
-        //replacement as a result of trimming
-        if ( $replacingObject->getRootEntryId() === $object->getId() ) {
-            kEventsManager::forceDeferredEvents( true );
+		if ( $replacingObject->getIsTemporary() ) {
+			kEventsManager::setForceDeferredEvents( true );
 
-            //delete old cuePoints
-            $c = new Criteria();
-            $c->add(CuePointPeer::ENTRY_ID, $object->getId());
-            $this->deleteCuePoints($c);
+			//delete old cuePoints
+			$this->deleteCuePoints($c);
 
-            //copy cuepoints from replacement entry
-            $kc = new KalturaCriteria();
-            $kc->add( CuePointPeer::ENTRY_ID, $replacingObject->getId() );
-            $kc->add( CuePointPeer::TYPE, EventCuePointPlugin::getCuePointTypeCoreValue(EventCuePointType::EVENT), Criteria::NOT_EQUAL );
-            $replacementCuePoints = CuePointPeer::doSelect($kc);
-            foreach( $replacementCuePoints as $cuePoint ) {
-                $cuePoint->setEntryId( $object->getId() );
-                $cuePoint->save();
-            }
+			//copy cuepoints from replacement entry
+			$replacementCuePoints = CuePointPeer::retrieveByEntryId($replacingObject->getId());
+			foreach( $replacementCuePoints as $cuePoint ) {
+				$newCuePoint = $cuePoint->copyToEntry($object);
+				$newCuePoint->save();
+			}
 
-            kEventsManager::flushEvents();
-        }
-        //TODO add handling for "regular" replacement, per new permission TBD
+			kEventsManager::flushEvents();
+		}
+		//TODO add handling for "regular" replacement, per new permission TBD
 
-        return true;
-    }
+		return true;
+	}
 
 	/**
 	 * @param CuePoint $cuePoint
@@ -444,10 +425,10 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 			$this->reIndexCuePointEntry($object);
 		}
 
-        if ( self::wasClipCreated($object, $modifiedColumns) )
-        {
-            self::copyCuePointsToClipEntry( $object );
-        }
+		if ( self::wasEntryClipped($object, $modifiedColumns) )
+		{
+			self::copyCuePointsToClipEntry( $object );
+		}
 
 		return true;
 	}
@@ -467,25 +448,25 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 			return true;
 		}
 
-        if ( self::wasClipCreated($object, $modifiedColumns) ) {
-            return true;
-        }
+		if ( self::wasEntryClipped($object, $modifiedColumns) ) {
+			return true;
+		}
 
 		return false;
 	}
 
-    public static function wasClipCreated(BaseObject $object, array $modifiedColumns)
-    {
-        if ( ($object instanceof entry)
-            && in_array(entryPeer::CUSTOM_DATA, $modifiedColumns)
-            && $object->isCustomDataModified('operationAttributes')
-            && $object->isCustomDataModified('rootEntryId') )
-        {
-            return true;
-        }
+	public static function wasEntryClipped(BaseObject $object, array $modifiedColumns)
+	{
+		if ( ($object instanceof entry)
+			&& in_array(entryPeer::CUSTOM_DATA, $modifiedColumns)
+			&& $object->isCustomDataModified('operationAttributes')
+			&& $object->isCustomDataModified('rootEntryId') )
+		{
+			return true;
+		}
 
-        return false;
-    }
+		return false;
+	}
 
 	public static function isPostProcessCuePointsEvent(BaseObject $object, array $modifiedColumns)
 	{
@@ -645,101 +626,32 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 		}
 	}
 
-    /**
-     * check if at least one permission from the given array is allowed for partner
-     * @param array $permissions
-     * @param $partnerId
-     * @return bool
-     */
-    private static function checkForPermission( array $permissions, $partnerId ) {
-        foreach( $permissions as $permissionType => $permission) {
-            if ( PermissionPeer::isValidForPartner($permission, $partnerId) ) {
-                return true;
-            }
-        }
+	/**
+	 *
+	 * @param entry $clipEntry new entry to copy and adjust cue points from root entry to
+	 */
+	public static function copyCuePointsToClipEntry( entry $clipEntry ) {
+		$operationAtts = $clipEntry->getFromCustomData('operationAttributes');
+		if ( !is_null($operationAtts) && count($operationAtts) > 0 ) {
+			$clipAtts = reset($operationAtts);
+			$clipStartTime = $clipAtts->getOffset();
+			$clipDuration = $clipAtts->getDuration();
 
-        return false;
-    }
+			$c = new KalturaCriteria();
+			$c->add( CuePointPeer::ENTRY_ID, $clipEntry->getRootEntryId() );
+			$c->addAnd( CuePointPeer::START_TIME, $clipStartTime, KalturaCriteria::GREATER_EQUAL );
+			$c->addAnd( CuePointPeer::START_TIME, $clipStartTime + $clipDuration, KalturaCriteria::LESS_EQUAL );
+			$rootEntryCuePointsToCopy = CuePointPeer::doSelect($c);
 
-    /**
-     *
-     * @param entry $clipEntry new entry to copy and adjust cue points from root entry to
-     */
-    public static function copyCuePointsToClipEntry( entry $clipEntry ) {
-        $rootEntryId = $clipEntry->getRootEntryId();
-        if ( $clipEntry->getFromCustomData("isTemporary") ) {
-            $permissionsArray = self::$trimPermissionsArray;
-        } else {
-            $permissionsArray = self::$clipPermissionsArray;
-        }
-        //at least one relevant permission
-       /* TODO add when integrating permissions
-       if ( !self::checkForPermission( $permissionsArray, $clipEntry->getPartnerId() ) ) {
-            KalturaLog::log("Didn't copy cuePoints from root to clip, no relevant permissions");
-            return;
-        }*/
+			if ( count( $rootEntryCuePointsToCopy ) <= self::MAX_CUE_POINTS_TO_COPY_TO_CLIP )
+			{
+				foreach( $rootEntryCuePointsToCopy as $cuePoint ) {
+					$cuePoint->copyToClipEntry( $clipEntry, $clipStartTime, $clipDuration );
+				}
+			} else {
+				KalturaLog::alert("Can't copy cuePoints for entry [{$clipEntry->getId()}] because cuePoints count exceeded max limit of [" . self::MAX_CUE_POINTS_TO_COPY_TO_CLIP . "]");
+			}
+		}
+	}
 
-        $c = new KalturaCriteria();
-        $c->add( CuePointPeer::ENTRY_ID, $rootEntryId );
-        $c->add( CuePointPeer::TYPE, EventCuePointPlugin::getCuePointTypeCoreValue(EventCuePointType::EVENT), Criteria::NOT_EQUAL );
-        $rootEntryCuePointsToCopy = CuePointPeer::doSelect($c);
-
-        if ( count( $rootEntryCuePointsToCopy ) <= self::MAX_CUE_POINTS_TO_COPY_TO_CLIP )
-        {
-            $addCuePointToClipEntry = function ( CuePoint $newCuePoint, CuePoint $originalCuePoint ) use ( $clipEntry, $permissionsArray )
-            {
-                //check permission for cue point type
-                //TODO add when integrating permissions
-               /* $key = get_class($newCuePoint);
-                if ( isset($permissionsArray[$key]) && PermissionPeer::isValidForPartner($permissionsArray[$key], $newCuePoint->getPartnerId()) ) {
-                    $newCuePoint->setEntryId( $clipEntry->getId() );
-                    $newCuePoint->save();
-                }*/
-
-                $newCuePoint->setEntryId( $clipEntry->getId() );
-                $newCuePoint->save();
-            };
-            $operationAtts = $clipEntry->getFromCustomData('operationAttributes');
-            if ( !is_null($operationAtts) && count($operationAtts) > 0 ) {
-                self::translateAndCloneCuePoints( $rootEntryCuePointsToCopy, $operationAtts[0], $addCuePointToClipEntry );
-            }
-
-        } else {
-            KalturaLog::alert("Can't copy cuePoints for entry [{$clipEntry->getId()}] because cuePoints count exceeded max limit of [" . self::MAX_CUE_POINTS_TO_COPY_TO_CLIP . "]");
-        }
-    }
-
-    /**
-     * @param array $cuePointsArray
-     * @param KalturaClipAttributes $clipAttributes
-     * @param $cloneFunc callback to call after cuepoint new values were set, callback arguments are : newCuePoint, originalCuePoint
-     */
-    public static function translateAndCloneCuePoints( array $cuePointsArray, kClipAttributes $clipAttributes, $cloneFunc ) {
-        $clipStartTime = $clipAttributes->getOffset();
-        $clipEndTime = $clipStartTime + $clipAttributes->getDuration();
-
-        foreach( $cuePointsArray as $cuePoint ) {
-            //if cuepoint is in clip bounds
-            if ( $cuePoint->getStartTime() >= $clipStartTime && $cuePoint->getStartTime() <= $clipEndTime ) {
-                $newCuePoint = $cuePoint->copy();
-                $newCuePoint->setStartTime( $newCuePoint->getStartTime() - $clipStartTime );
-                $newCuePoint->setEndTime( $newCuePoint->getEndTime() - $clipStartTime );
-                $endTimeDiff = $newCuePoint->getEndTime() - $clipAttributes->getDuration();
-                //if cuePoint duration exceeds new clip duration
-                if ( $endTimeDiff > 0 ) {
-                    $newCuePoint->setEndTime( $newCuePoint->getEndTime() - $endTimeDiff );
-                }
-                if ( $newCuePoint->getEndTime() >= $newCuePoint->getStartTime() ) {
-                    $cloneFunc( $newCuePoint, $cuePoint );
-                }
-                else {
-                    KalturaLog::log("Didn't copy cuePoint [{$cuePoint->getId()}] to clip because its startTime is out of clip bounds]");
-                }
-            }
-            else {
-                KalturaLog::log("Didn't copy cuePoint [{$cuePoint->getId()}] to clip because its startTime is out of clip bounds]");
-            }
-
-        }
-    }
 }

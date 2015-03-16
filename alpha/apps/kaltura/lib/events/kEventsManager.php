@@ -131,18 +131,19 @@ class kEventsManager
      * Will work only if enableDeferredEvents = true
      * @param bool $force
      */
-    public static function forceDeferredEvents($force)
+    public static function setForceDeferredEvents($force)
     {
         self::$forceDeferredEvents = $force;
     }
 	
 	public static function flushEvents()
 	{
+        self::$forceDeferredEvents = false;
+
 		if (!self::$deferredEvents)
 			return;
 		
 		KalturaLog::debug("started flushing deferred events");
-        self::$forceDeferredEvents = false;
 
 		while (count(self::$deferredEvents))
 		{
