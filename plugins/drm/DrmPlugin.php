@@ -21,6 +21,7 @@ class DrmPlugin extends KalturaPlugin implements IKalturaServices, IKalturaAdmin
 		$map = array(
 			'drmPolicy' => 'DrmPolicyService',
 			'drmProfile' => 'DrmProfileService',
+            'drmLicenseAccess' => 'DrmLicenseAccessService'
 		);
 		return $map;	
 	}

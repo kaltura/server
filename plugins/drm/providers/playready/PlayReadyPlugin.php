@@ -35,9 +35,9 @@ class PlayReadyPlugin extends KalturaPlugin implements IKalturaEnumerator, IKalt
 	public static function getEnums($baseEnumName = null)
 	{	
 		if(is_null($baseEnumName))
-			return array('PlayReadyAccessControlActionType', 'PlayReadyLicenseScenario', 'PlayReadyLicenseType', 'PlayReadyProviderType');		
+			return array('DrmAccessControlActionType', 'PlayReadyLicenseScenario', 'PlayReadyLicenseType', 'PlayReadyProviderType');
 		if($baseEnumName == 'RuleActionType')
-			return array('PlayReadyAccessControlActionType');
+			return array('DrmAccessControlActionType');
 		if($baseEnumName == 'DrmLicenseScenario')
 			return array('PlayReadyLicenseScenario');
 		if($baseEnumName == 'DrmLicenseType')
@@ -61,7 +61,7 @@ class PlayReadyPlugin extends KalturaPlugin implements IKalturaEnumerator, IKalt
 		if($baseClass == 'KalturaDrmPolicy' && $enumValue == PlayReadyPlugin::getPlayReadyProviderCoreValue())
 			return new KalturaPlayReadyPolicy();
 		
-		if($baseClass == 'KalturaRuleAction' && $enumValue == PlayReadyAccessControlActionType::DRM_POLICY)
+		if($baseClass == 'KalturaRuleAction' && $enumValue == DrmAccessControlActionType::DRM_POLICY)
 			return new KalturaAccessControlPlayReadyPolicyAction();
 			
 		if($baseClass == 'DrmProfile' && $enumValue == PlayReadyPlugin::getPlayReadyProviderCoreValue())
@@ -70,8 +70,8 @@ class PlayReadyPlugin extends KalturaPlugin implements IKalturaEnumerator, IKalt
 		if($baseClass == 'DrmPolicy' && $enumValue == PlayReadyPlugin::getPlayReadyProviderCoreValue())
 			return new PlayReadyPolicy();
 			
-		if($baseClass == 'kRuleAction' && $enumValue == PlayReadyAccessControlActionType::DRM_POLICY)
-			return new kAccessControlPlayReadyPolicyAction();
+		if($baseClass == 'kRuleAction' && $enumValue == DrmAccessControlActionType::DRM_POLICY)
+			return new kAccessControlDrmPolicyAction();
 
 		if (class_exists('Kaltura_Client_Client'))
 		{
@@ -101,7 +101,7 @@ class PlayReadyPlugin extends KalturaPlugin implements IKalturaEnumerator, IKalt
 		if($baseClass == 'KalturaDrmPolicy' && $enumValue == PlayReadyPlugin::getPlayReadyProviderCoreValue())
 			return 'KalturaPlayReadyPolicy';
 		
-		if($baseClass == 'KalturaRuleAction' && $enumValue == PlayReadyAccessControlActionType::DRM_POLICY)
+		if($baseClass == 'KalturaRuleAction' && $enumValue == DrmAccessControlActionType::DRM_POLICY)
 			return 'KalturaAccessControlPlayReadyPolicyAction';
 			
 		if($baseClass == 'DrmProfile' && $enumValue == PlayReadyPlugin::getPlayReadyProviderCoreValue())
@@ -110,8 +110,8 @@ class PlayReadyPlugin extends KalturaPlugin implements IKalturaEnumerator, IKalt
 		if($baseClass == 'DrmPolicy' && $enumValue == PlayReadyPlugin::getPlayReadyProviderCoreValue())
 			return 'PlayReadyPolicy';
 			
-		if($baseClass == 'kRuleAction' && $enumValue == PlayReadyAccessControlActionType::DRM_POLICY)
-			return 'kAccessControlPlayReadyPolicyAction';
+		if($baseClass == 'kRuleAction' && $enumValue == DrmAccessControlActionType::DRM_POLICY)
+			return 'kAccessControlDrmPolicyAction';
 
 		if (class_exists('Kaltura_Client_Client'))
 		{
