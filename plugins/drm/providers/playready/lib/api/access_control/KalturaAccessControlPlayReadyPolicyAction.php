@@ -22,7 +22,7 @@ class KalturaAccessControlPlayReadyPolicyAction extends KalturaRuleAction
 	 */
 	public function __construct() 
 	{
-		$this->type = PlayReadyAccessControlActionType::DRM_POLICY;
+		$this->type = DrmAccessControlActionType::DRM_POLICY;
 	}
 	
 	public function getMapBetweenObjects()
@@ -36,7 +36,7 @@ class KalturaAccessControlPlayReadyPolicyAction extends KalturaRuleAction
 	public function toObject($dbObject = null, $skip = array())
 	{
 		if(!$dbObject)
-			$dbObject = new kAccessControlPlayReadyPolicyAction();
+			$dbObject = new kAccessControlDrmPolicyAction();
 			
 		return parent::toObject($dbObject, $skip);
 	}
