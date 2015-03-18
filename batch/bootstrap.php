@@ -40,6 +40,3 @@ try // we don't want to fail when logger is not configured right
 catch(Zend_Config_Exception $ex)
 {
 }
-
-// AWS SDK PHP Client Library
-require_once(KAutoloader::buildPath(KALTURA_ROOT_PATH, 'vendor', 'aws', 'aws-autoloader.php'));

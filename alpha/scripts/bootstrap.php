@@ -33,6 +33,3 @@ KalturaLog::info("Initializing database...");
 DbManager::setConfig(kConf::getDB());
 DbManager::initialize();
 KalturaLog::info("Database initialized successfully");
-
-// AWS SDK PHP Client Library
-require_once(KAutoloader::buildPath(KALTURA_ROOT_PATH, 'vendor', 'aws', 'aws-autoloader.php'));
