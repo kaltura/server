@@ -194,7 +194,7 @@ class CategoryEntryService extends KalturaBaseService
 	 */
 	function listAction(KalturaCategoryEntryFilter $filter = null, KalturaFilterPager $pager = null)
 	{
-		if ($filter === null)
+		if (!$filter)
 			$filter = new KalturaCategoryEntryFilter();
 			
 		if(!$pager)

@@ -1,1 +1,0 @@
-ALTER TABLE `drop_folder_file` ADD `type` INTEGER AFTER `file_name`;

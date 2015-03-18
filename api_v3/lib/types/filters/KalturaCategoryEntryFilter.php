@@ -124,7 +124,10 @@ class KalturaCategoryEntryFilter extends KalturaCategoryEntryBaseFilter
 			if ($resultCount && $resultCount < $pager->pageSize)
 				$totalCount = ($pager->pageIndex - 1) * $pager->pageSize + $resultCount;
 			else
+			{
+				KalturaFilterPager::detachFromCriteria($c);
 				$totalCount = categoryEntryPeer::doCount($c);
+			}
 		}
 			
 		$categoryEntrylist = KalturaCategoryEntryArray::fromDbArray($dbCategoriesEntry, $responseProfile);

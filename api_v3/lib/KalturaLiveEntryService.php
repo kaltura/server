@@ -9,6 +9,12 @@
  */
 class KalturaLiveEntryService extends KalturaEntryService
 {
+	//amount of time for attempting to grab kLock
+	const KLOCK_CREATE_RECORDED_ENTRY_GRAB_TIMEOUT = 0.1;
+	
+	//amount of time for holding kLock
+	const KLOCK_CREATE_RECORDED_ENTRY_HOLD_TIMEOUT = 3;
+  
 	public function initService($serviceId, $serviceName, $actionName)
 	{
 		parent::initService($serviceId, $serviceName, $actionName);
@@ -110,7 +116,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 		{
 			if(!$dbEntry->getRecordedEntryId())
 			{
-				$this->createRecordedEntry($dbEntry);
+				$this->createRecordedEntry($dbEntry, $mediaServerIndex);
 			}
 			
 			$recordedEntry = entryPeer::retrieveByPK($dbEntry->getRecordedEntryId());
@@ -199,15 +205,24 @@ class KalturaLiveEntryService extends KalturaEntryService
 		$dbEntry->setMediaServer($mediaServerIndex, $hostname, $applicationName);
 		$dbEntry->setRedirectEntryId(null);
 		
-		if(is_null($dbEntry->getFirstBroadcast())) 
-				$dbEntry->setFirstBroadcast(time());
-		
-		if($mediaServerIndex == MediaServerIndex::PRIMARY && $dbEntry->getRecordStatus() == RecordStatus::ENABLED && !$dbEntry->getRecordedEntryId())
+		if($dbEntry->save())
 		{
-			$this->createRecordedEntry($dbEntry);
+			if($mediaServerIndex == MediaServerIndex::PRIMARY && $dbEntry->getRecordStatus())
+			{
+				$createRecordedEntry = false;
+				if(!$dbEntry->getRecordedEntryId())
+				{
+					$createRecordedEntry = true;
+				}
+				elseif($dbEntry->getRecordStatus() == RecordStatus::PER_SESSION && ($dbEntry->getLastBroadcastEndTime() + kConf::get('live_session_reconnect_timeout', 'local', 180) < time()))
+				{
+					$createRecordedEntry = true;
+				}
+				
+				if($createRecordedEntry)
+					$this->createRecordedEntry($dbEntry, $mediaServerIndex);
+			}
 		}
-		
-		$dbEntry->save();
 		
 		$entry = KalturaEntryFactory::getInstanceByType($dbEntry->getType());
 		$entry->fromObject($dbEntry, $this->getResponseProfile());
@@ -218,25 +233,53 @@ class KalturaLiveEntryService extends KalturaEntryService
 	 * @param LiveEntry $dbEntry
 	 * @return entry
 	 */
-	private function createRecordedEntry(LiveEntry $dbEntry)
+	private function createRecordedEntry(LiveEntry $dbEntry, $mediaServerIndex)
 	{
-		$recordedEntry = new entry();
-		$recordedEntry->setType(entryType::MEDIA_CLIP);
-		$recordedEntry->setMediaType(entry::ENTRY_MEDIA_TYPE_VIDEO);
-		$recordedEntry->setRootEntryId($dbEntry->getId());
-		$recordedEntry->setName($dbEntry->getName());
-		$recordedEntry->setDescription($dbEntry->getDescription());
-		$recordedEntry->setSourceType(EntrySourceType::RECORDED_LIVE);
-		$recordedEntry->setAccessControlId($dbEntry->getAccessControlId());
-		$recordedEntry->setConversionProfileId($dbEntry->getConversionProfileId());
-		$recordedEntry->setKuserId($dbEntry->getKuserId());
-		$recordedEntry->setPartnerId($dbEntry->getPartnerId());
-		$recordedEntry->setModerationStatus($dbEntry->getModerationStatus());
-		$recordedEntry->setIsRecordedEntry(true);
-		$recordedEntry->save();
+		$lock = kLock::create("live_record_" . $dbEntry->getId());
 		
-		$dbEntry->setRecordedEntryId($recordedEntry->getId());
-		$dbEntry->save();
+	    if ($lock && !$lock->lock(self::KLOCK_CREATE_RECORDED_ENTRY_GRAB_TIMEOUT , self::KLOCK_CREATE_RECORDED_ENTRY_HOLD_TIMEOUT))
+	    {
+	    	return;
+	    }
+	    
+	    $recordedEntry = null;
+     	try{		
+			$recordedEntryName = $dbEntry->getName();
+			if($dbEntry->getRecordStatus() == RecordStatus::PER_SESSION)
+				$recordedEntryName .= ' ' . ($dbEntry->getRecordedEntryIndex() + 1);
+				
+			$recordedEntry = new entry();
+			$recordedEntry->setType(entryType::MEDIA_CLIP);
+			$recordedEntry->setMediaType(entry::ENTRY_MEDIA_TYPE_VIDEO);
+			$recordedEntry->setRootEntryId($dbEntry->getId());
+			$recordedEntry->setName($recordedEntryName);
+			$recordedEntry->setDescription($dbEntry->getDescription());
+			$recordedEntry->setSourceType(EntrySourceType::RECORDED_LIVE);
+			$recordedEntry->setAccessControlId($dbEntry->getAccessControlId());
+			$recordedEntry->setConversionProfileId($dbEntry->getConversionProfileId());
+			$recordedEntry->setKuserId($dbEntry->getKuserId());
+			$recordedEntry->setPartnerId($dbEntry->getPartnerId());
+			$recordedEntry->setModerationStatus($dbEntry->getModerationStatus());
+			$recordedEntry->setIsRecordedEntry(true);
+			$recordedEntry->save();
+			
+			$dbEntry->setRecordedEntryId($recordedEntry->getId());
+			$dbEntry->save();
+			
+			$assets = assetPeer::retrieveByEntryId($dbEntry->getId(), array(assetType::LIVE));
+			foreach($assets as $asset)
+			{
+				/* @var $asset liveAsset */
+				$asset->incLiveSegmentVersion($mediaServerIndex);
+				$asset->save();
+			}
+		}
+		catch(Exception $e){
+       		$lock->unlock();
+       		throw $e;
+		}
+		
+		$lock->unlock();
 		
 		return $recordedEntry;
 	}

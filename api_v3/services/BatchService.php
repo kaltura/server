@@ -122,7 +122,7 @@ class BatchService extends KalturaBatchService
 		
 		return $res;
 	}
-
+	
 	/**
 	 * batch updateBulkUploadResults action adds KalturaBulkUploadResult to the DB
 	 *
