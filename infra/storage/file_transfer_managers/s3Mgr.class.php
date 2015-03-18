@@ -55,7 +55,7 @@ class s3Mgr extends kFileTransferMgr
 	protected function doLogin($sftp_user, $sftp_pass)
 	{
 		if(!class_exists("Aws\S3\S3Client")) {
-			KalturaLog::debug("Class Aws\S3\S3Client was not found!!");
+			KalturaLog::err("Class Aws\S3\S3Client was not found!!");
 			return false;
 		}
 
@@ -77,7 +77,7 @@ class s3Mgr extends kFileTransferMgr
 		}
 		catch ( Exception $e )
 		{
-			KalturaLog::debug("Can't connect to S3: {$e->getMessage()}");
+			KalturaLog::err("Can't connect to S3: {$e->getMessage()}");
 		}
 
 		return $connectionSuccess;
@@ -111,7 +111,7 @@ class s3Mgr extends kFileTransferMgr
  		}
 		catch ( Exception $e )
 		{
-			KalturaLog::debug("error uploading file ".$local_file." s3 info ".print_r($info, true));
+			KalturaLog::err("error uploading file ".$local_file." s3 info ".print_r($info, true));
 			return false;
 		}
 	}
@@ -193,7 +193,7 @@ class s3Mgr extends kFileTransferMgr
 		}
 		catch ( Exception $e )
 		{
-			KalturaLog::debug("Couldn't delete file [$remote_file] from bucket [$bucket]: {$e->getMessage()}");
+			KalturaLog::err("Couldn't delete file [$remote_file] from bucket [$bucket]: {$e->getMessage()}");
 		}
 		
 		return $deleted;
