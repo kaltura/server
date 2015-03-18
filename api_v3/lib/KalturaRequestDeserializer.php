@@ -59,7 +59,7 @@ class KalturaRequestDeserializer
 		$serviceArguments = array();
 		foreach($actionParams as &$actionParam)
 		{
-			/** @var KalturaParamInfo $actionParam */
+			/* @var KalturaParamInfo $actionParam */
 			$type = $actionParam->getType();
 			$name = $actionParam->getName();
 
@@ -155,11 +155,21 @@ class KalturaRequestDeserializer
 			{
 				$arrayObj = new $type();
 				if (isset($this->paramsGrouped[$name]) && is_array($this->paramsGrouped[$name]))
-				{
-					ksort($this->paramsGrouped[$name]);
-					foreach($this->paramsGrouped[$name] as $arrayItemParams)
+				{	
+					if ($actionParam->isAssociativeArray())
 					{
-						$arrayObj[] = $this->buildObject($actionParam->getArrayTypeReflector(), $arrayItemParams, $name);
+						foreach($this->paramsGrouped[$name] as $arrayItemKey => $arrayItemParams)
+						{
+							$arrayObj[$arrayItemKey] = $this->buildObject($actionParam->getArrayTypeReflector(), $arrayItemParams, $name);
+						}
+					}
+					else
+					{
+						ksort($this->paramsGrouped[$name]);
+						foreach($this->paramsGrouped[$name] as $arrayItemParams)
+						{
+							$arrayObj[] = $this->buildObject($actionParam->getArrayTypeReflector(), $arrayItemParams, $name);
+						}
 					}
 				}
 				$serviceArguments[] = $arrayObj;
@@ -181,6 +191,29 @@ class KalturaRequestDeserializer
 			throw new KalturaAPIException(KalturaErrors::MISSING_MANDATORY_PARAMETER, $name);
 		}
 		return $serviceArguments;
+	}
+	
+	/**
+	 * @return KalturaDetachedResponseProfile
+	 */
+	public function getResponseProfile($paramName = 'responseProfile') {
+		if(!isset($this->paramsGrouped[$paramName])){
+			return null;
+		}
+		
+		$responseProfile = null;
+		if(isset($this->paramsGrouped[$paramName]['id'])){
+			$responseProfile = ResponseProfilePeer::retrieveByPK($this->paramsGrouped[$paramName]['id']);
+		}
+		if(isset($this->paramsGrouped[$paramName]['systemName'])){
+			$responseProfile = ResponseProfilePeer::retrieveBySystemName($this->paramsGrouped[$paramName]['systemName']);
+		}
+		if($responseProfile){
+			return new KalturaResponseProfile($responseProfile);
+		}
+		
+		$typeReflector = KalturaTypeReflectorCacher::get('KalturaDetachedResponseProfile');
+		return $this->buildObject($typeReflector, $this->paramsGrouped[$paramName], $paramName);
 	}
 	
 	protected function validateParameter($name, $value, $constraintsObj) {
@@ -313,11 +346,21 @@ class KalturaRequestDeserializer
 			
 			if ($property->isArray() && is_array($value))
 			{
-				ksort($value);
 				$arrayObj = new $type();
-				foreach($value as $arrayItemParams)
+				if($property->isAssociativeArray())
 				{
-					$arrayObj[] = $this->buildObject($property->getArrayTypeReflector(), $arrayItemParams, "{$objectName}:$name");
+					foreach($value as $arrayItemKey => $arrayItemParams)
+					{
+						$arrayObj[$arrayItemKey] = $this->buildObject($property->getArrayTypeReflector(), $arrayItemParams, "{$objectName}:$name");
+					}
+				}
+				else
+				{
+					ksort($value);
+					foreach($value as $arrayItemParams)
+					{
+						$arrayObj[] = $this->buildObject($property->getArrayTypeReflector(), $arrayItemParams, "{$objectName}:$name");
+					}
 				}
 				$obj->$name = $arrayObj;
 				continue;

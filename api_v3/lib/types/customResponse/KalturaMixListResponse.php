@@ -3,17 +3,11 @@
  * @package api
  * @subpackage objects
  */
-class KalturaMixListResponse extends KalturaObject
+class KalturaMixListResponse extends KalturaListResponse
 {
 	/**
 	 * @var KalturaMixEntryArray
 	 * @readonly
 	 */
 	public $objects;
-
-	/**
-	 * @var int
-	 * @readonly
-	 */
-	public $totalCount;
 }

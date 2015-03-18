@@ -21,6 +21,7 @@ class WebexPlugin extends KalturaPlugin implements IKalturaImportHandler
 	 * @see IKalturaImportHandler::handleImportData()
 	 */
 	public static function handleImportContent($curlInfo,  $importData, $params) {
+		KalturaLog::debug('content-length [' . $curlInfo->headers['content-length'] . '] content-type [' . $curlInfo->headers['content-type'] . ']');
 		if (!($curlInfo->headers['content-length'] < 16000 && $curlInfo->headers['content-type'] == 'text/html'))
 			return $importData;
 		
@@ -34,60 +35,45 @@ class WebexPlugin extends KalturaPlugin implements IKalturaImportHandler
 			if($cookieName == 'recordId')
 				$recordId = $cookieValue;
 		}
-		
 		if (!$recordId)
 		{
-			KalturaLog::info('recordId value not found - exiting.');
-			return null;
+			throw new Exception('recordId value not found');
 		}
 		
 		$data = file_get_contents($importData->destFileLocalPath);
+		KalturaLog::info("data:\n\n$data\n\n");
 		if(!preg_match("/href='([^']+)';/", $data, $matches))
 		{
-			KalturaLog::err("Starting URL not found");
-			return null;
+			throw new Exception('Starting URL not found');
 		}
 		$url2 = $matches[1];
 		$curlWrapper = new KCurlWrapper();
 		$curlWrapper->setOpt(CURLOPT_COOKIE, 'DetectionBrowserStatus=3|1|32|1|11|2;'.$curlInfo->headers["set-cookie"]);
 		$result = $curlWrapper->exec($url2);
+		KalturaLog::info("result:\n\n$result\n\n");
 		
 		if(!preg_match("/var prepareTicket = '([^']+)';/", $result, $matches))
 		{
-			KalturaLog::err("prepareTicket parameter not found");
-			return null;
+			throw new Exception('prepareTicket parameter not found');
 		}
 		$prepareTicket = $matches[1];
 		
 		if (!preg_match('/function (download\(\).+prepareTicket;)/s', $result, $matches))
 		{
-			KalturaLog::err("download function not found");
-			return null;
+			throw new Exception('download function not found');
 		}
-		
 		if (!preg_match('/http.+prepareTicket/', $matches[0], $matches))
 		{
-			KalturaLog::err("prepareTicket URL not found");
-			return null;
+			throw new Exception('prepareTicket URL not found');
 		}
-		
 		$url3 = $matches[0];
 		$url3 = str_replace(array('"',' ','+', 'recordId', 'prepareTicket=prepareTicket'), array('','','',$recordId, "prepareTicket=$prepareTicket"), $url3);
 		
-		if (!preg_match('/function (func\_prepare\(.+\).+ticket;)/s', $result, $matches))
+		if (!preg_match("/var downloadUrl = '(http[^']+)' \\+ ticket;/", $result, $matches))
 		{
-			KalturaLog::err("func_prepare function not found");
-			return null;
+			throw new Exception('Download URL not found');
 		}
-		
-		if (!preg_match('/http.+ticket/', $matches[0], $matches))
-		{
-			KalturaLog::err("download URL not found");
-			return null;
-		}
-		
-		$url4 = $matches[0];
-		$url4 = str_replace(array("'",' ','+'), '', $url4);
+		$url4 = $matches[1];
 		
 		$status = null;
 		$iterations = (isset($params->webex->iterations) && !is_null($params->webex->iterations)) ? intval($params->webex->iterations ) : 10;
@@ -95,11 +81,12 @@ class WebexPlugin extends KalturaPlugin implements IKalturaImportHandler
 		for($i = 0; $i < $iterations; $i++)
 		{
 			$result = $curlWrapper->exec($url3);
+			KalturaLog::info("result ($i):\n\n$result\n\n");
 			
-			if(!preg_match("/window\.parent\.func_prepare\('([^']+)','([^']*)','([^']*)'\);/", $result, $matches))
+			if(!preg_match("/window\\.parent\\.func_prepare\\('([^']+)','([^']*)','([^']*)'\\);/", $result, $matches))
 			{
 				KalturaLog::err("Invalid result returned for prepareTicket request - should contain call to the func_prepare method\n $result");
-				return null;
+				throw new Exception('Invalid result: func_prepare function not found');
 			}
 			$status = $matches[1];
 			if($status == 'OKOK')
@@ -110,13 +97,13 @@ class WebexPlugin extends KalturaPlugin implements IKalturaImportHandler
 		
 		if($status != 'OKOK')
 		{
-			KalturaLog::info("Invalid result returned for prepareTicket request. Last reult:\n " . $result);
-			return null;
+			KalturaLog::info("Invalid result returned for prepareTicket request. Last result:\n " . $result);
+			throw new kTemporaryException('Invalid result returned for prepareTicket request');
 		}
 			
 		$ticket = $matches[3];
 		
-		$url4 = str_replace("ticket=ticket", "ticket=$ticket", $url4);
+		$url4 .= $ticket;
 		
 		$curlWrapper->setOpt(CURLOPT_RETURNTRANSFER, false);
 		$fileName = pathinfo($importData->destFileLocalPath, PATHINFO_FILENAME);
@@ -127,8 +114,9 @@ class WebexPlugin extends KalturaPlugin implements IKalturaImportHandler
 		
 		if (!$result)
 		{	
-			KalturaLog::err("getError: " . $curlWrapper->getError());
-			return null;
+			$code = $curlWrapper->getErrorNumber();
+			$message = $curlWrapper->getError();
+			throw new Exception($message, $code);
 		}
 		
 		$curlWrapper->close();

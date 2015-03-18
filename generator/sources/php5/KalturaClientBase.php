@@ -117,19 +117,19 @@ class KalturaClientBase
 	const METHOD_GET 	= 'GET';
 
 	/**
-	 * @var string
-	 */
-	protected $apiVersion = null;
-
-	/**
 	 * @var KalturaConfiguration
 	 */
 	protected $config;
 
 	/**
-	 * @var string
+	 * @var array
 	 */
-	private $ks;
+	protected $clientConfiguration = array();
+
+	/**
+	 * @var array
+	 */
+	protected $requestConfiguration = array();
 
 	/**
 	 * @var boolean
@@ -248,9 +248,12 @@ class KalturaClientBase
 		$this->log("service url: [" . $this->config->serviceUrl . "]");
 
 		// append the basic params
-		$this->addParam($params, "apiVersion", $this->apiVersion);
 		$this->addParam($params, "format", $this->config->format);
-		$this->addParam($params, "clientTag", $this->config->clientTag);
+	
+		foreach($this->clientConfiguration as $param => $value)
+		{
+			$this->addParam($params, $param, $value);
+		}
 
 		$call = $this->callsQueue[0];
 		$this->resetRequest();
@@ -267,11 +270,10 @@ class KalturaClientBase
 
 	public function queueServiceActionCall($service, $action, $params = array(), $files = array())
 	{
-		// in start session partner id is optional (default -1). if partner id was not set, use the one in the config
-		if ((!isset($params["partnerId"]) || $params["partnerId"] === -1) && !is_null($this->config->partnerId))
-			$params["partnerId"] = $this->config->partnerId;
-
-		$this->addParam($params, "ks", $this->ks);
+		foreach($this->requestConfiguration as $param => $value)
+		{
+			$this->addParam($params, $param, $value);
+		}
 
 		$call = new KalturaServiceActionCall($service, $action, $params, $files);
 		$this->callsQueue[] = $call;
@@ -311,11 +313,14 @@ class KalturaClientBase
 		$this->log("service url: [" . $this->config->serviceUrl . "]");
 
 		// append the basic params
-		$this->addParam($params, "apiVersion", $this->apiVersion);
 		$this->addParam($params, "format", $this->config->format);
-		$this->addParam($params, "clientTag", $this->config->clientTag);
 		$this->addParam($params, "ignoreNull", true);
 
+		foreach($this->clientConfiguration as $param => $value)
+		{
+			$this->addParam($params, $param, $value);
+		}
+		
 		$url = $this->config->serviceUrl."/api_v3/index.php?service=";
 		if ($this->isMultiRequest)
 		{
@@ -610,22 +615,6 @@ class KalturaClientBase
 	}
 
 	/**
-	 * @return string
-	 */
-	public function getKs()
-	{
-		return $this->ks;
-	}
-
-	/**
-	 * @param string $ks
-	 */
-	public function setKs($ks)
-	{
-		$this->ks = $ks;
-	}
-
-	/**
 	 * @param boolean $returnServedResult
 	 */
 	public function setReturnServedResult($returnServedResult)
@@ -679,6 +668,44 @@ class KalturaClientBase
 		}
 	}
 
+	public function setClientConfiguration(KalturaClientConfiguration $configuration)
+	{
+		$params = get_class_vars('KalturaClientConfiguration');
+		foreach($params as $param)
+		{
+			if(is_null($configuration->$param))
+			{
+				if(isset($this->clientConfiguration[$param]))
+				{
+					unset($this->clientConfiguration[$param]);
+				}
+			}
+			else
+			{
+				$this->clientConfiguration[$param] = $configuration->$param;
+			}
+		}
+	}
+	
+	public function setRequestConfiguration(KalturaRequestConfiguration $configuration)
+	{
+		$params = get_class_vars('KalturaRequestConfiguration');
+		foreach($params as $param)
+		{
+			if(is_null($configuration->$param))
+			{
+				if(isset($this->requestConfiguration[$param]))
+				{
+					unset($this->requestConfiguration[$param]);
+				}
+			}
+			else
+			{
+				$this->requestConfiguration[$param] = $configuration->$param;
+			}
+		}
+	}
+	
 	/**
 	 * Add parameter to array of parameters that is passed by reference
 	 *
@@ -731,7 +758,7 @@ class KalturaClientBase
 	{
 		if ($this->isError($resultObject))
 		{
-			throw new KalturaException($resultObject["message"], $resultObject["code"]);
+			throw new KalturaException($resultObject["message"], $resultObject["code"], $resultObject["args"]);
 		}
 	}
 
@@ -1084,6 +1111,11 @@ abstract class KalturaServiceBase
  */
 abstract class KalturaObjectBase
 {
+	/**
+	 * @var array
+	 */
+	public $relatedObjects;
+	
 	public function __construct($params = array())
 	{
 		foreach ($params as $key => $value)
@@ -1127,11 +1159,36 @@ abstract class KalturaObjectBase
  */
 class KalturaException extends Exception
 {
-    public function __construct($message, $code)
+	private $arguments;
+	
+    public function __construct($message, $code, $arguments)
     {
     	$this->code = $code;
+    	$this->arguments = $arguments;
+    	
 		parent::__construct($message);
     }
+    
+	/**
+	 * @return array
+	 */
+	public function getArguments()
+	{
+		return $this->arguments;
+	}
+    
+	/**
+	 * @return string
+	 */
+	public function getArgument($argument)
+	{
+		if($this->arguments && isset($this->arguments[$argument]))
+		{
+			return $this->arguments[$argument];
+		}
+		
+		return null;
+	}
 }
 
 /**
@@ -1162,9 +1219,7 @@ class KalturaConfiguration
 	private $logger;
 
 	public $serviceUrl    				= "http://www.kaltura.com/";
-	public $partnerId    				= null;
 	public $format        				= 3;
-	public $clientTag 	  				= "php5:@DATE@";
 	public $curlTimeout   				= 120;
 	public $userAgent					= '';
 	public $startZendDebuggerSession 	= false;
@@ -1177,21 +1232,6 @@ class KalturaConfiguration
 	public $sslCertificatePath			= null;
 	public $requestHeaders				= array();
 	public $method						= KalturaClientBase::METHOD_POST;
-
-
-
-
-	/**
-	 * Constructs new Kaltura configuration object
-	 *
-	 */
-	public function __construct($partnerId = -1)
-	{
-	    if (!is_null($partnerId) && !is_numeric($partnerId))
-	        throw new KalturaClientException("Invalid partner id", KalturaClientException::ERROR_INVALID_PARTNER_ID);
-
-	    $this->partnerId = $partnerId;
-	}
 
 	/**
 	 * Set logger to get kaltura client debug logs

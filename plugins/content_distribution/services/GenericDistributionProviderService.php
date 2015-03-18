@@ -37,7 +37,7 @@ class GenericDistributionProviderService extends KalturaBaseService
 		$dbGenericDistributionProvider->save();
 		
 		$genericDistributionProvider = new KalturaGenericDistributionProvider();
-		$genericDistributionProvider->fromObject($dbGenericDistributionProvider);
+		$genericDistributionProvider->fromObject($dbGenericDistributionProvider, $this->getResponseProfile());
 		return $genericDistributionProvider;
 	}
 	
@@ -56,7 +56,7 @@ class GenericDistributionProviderService extends KalturaBaseService
 			throw new KalturaAPIException(ContentDistributionErrors::GENERIC_DISTRIBUTION_PROVIDER_NOT_FOUND, $id);
 			
 		$genericDistributionProvider = new KalturaGenericDistributionProvider();
-		$genericDistributionProvider->fromObject($dbGenericDistributionProvider);
+		$genericDistributionProvider->fromObject($dbGenericDistributionProvider, $this->getResponseProfile());
 		return $genericDistributionProvider;
 	}
 	
@@ -82,7 +82,7 @@ class GenericDistributionProviderService extends KalturaBaseService
 		$dbGenericDistributionProvider->save();
 		
 		$genericDistributionProvider = new KalturaGenericDistributionProvider();
-		$genericDistributionProvider->fromObject($dbGenericDistributionProvider);
+		$genericDistributionProvider->fromObject($dbGenericDistributionProvider, $this->getResponseProfile());
 		return $genericDistributionProvider;
 	}
 	
@@ -134,7 +134,7 @@ class GenericDistributionProviderService extends KalturaBaseService
 		$list = GenericDistributionProviderPeer::doSelect($c);
 		
 		$response = new KalturaGenericDistributionProviderListResponse();
-		$response->objects = KalturaGenericDistributionProviderArray::fromGenericDistributionProvidersArray($list);
+		$response->objects = KalturaGenericDistributionProviderArray::fromDbArray($list, $this->getResponseProfile());
 		$response->totalCount = $count;
 	
 		return $response;

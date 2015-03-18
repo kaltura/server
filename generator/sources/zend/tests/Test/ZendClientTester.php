@@ -11,9 +11,15 @@ class ZendClientTester
 	 */
 	protected $_client;
 	
-	public function __construct(Kaltura_Client_Client $client)
+	/**
+	 * @var int
+	 */
+	protected $_partnerId;
+	
+	public function __construct(Kaltura_Client_Client $client, $partnerId)
 	{
 		$this->_client = $client;
+		$this->_partnerId = $partnerId;
 	}
 	
 	public function run()
@@ -88,7 +94,7 @@ class ZendClientTester
 		$this->assertTrue(strlen($uploadToken->id) > 0);
     	$this->assertEqual($uploadToken->fileName, self::UPLOAD_VIDEO_FILENAME);
     	$this->assertEqual($uploadToken->status, Kaltura_Client_Enum_UploadTokenStatus::PENDING);
-    	$this->assertEqual($uploadToken->partnerId, $this->_client->getConfig()->partnerId);
+    	$this->assertEqual($uploadToken->partnerId, $this->_partnerId);
     	$this->assertEqual($uploadToken->fileSize, null);
     	
     	// add media entry
@@ -99,7 +105,7 @@ class ZendClientTester
     	$this->assertTrue(strlen($entry->id) > 0);
     	$this->assertTrue($entry->status === Kaltura_Client_Enum_EntryStatus::NO_CONTENT);
     	$this->assertTrue($entry->name === self::ENTRY_NAME);
-    	$this->assertTrue($entry->partnerId === $this->_client->getConfig()->partnerId);
+    	$this->assertTrue($entry->partnerId === $this->_partnerId);
     	
     	// add uploaded token as resource
     	$resource = new Kaltura_Client_Type_UploadedFileTokenResource();
@@ -160,27 +166,6 @@ class ZendClientTester
     	$this->assertEqual($firstPlaylistEntry->id, $imageEntry->id);
     	
     	$this->_client->media->delete($imageEntry->id);
-	}
-	
-	public function testServeUrl()
-	{
-		$serveUrl = $this->_client->data->serve("12345", 5, true);
-		$expectedArray = array(
-			'service' => 'data',
-			'action' => 'serve',
-			'apiVersion' => $this->_client->getApiVersion(),
-			'format' => 2,
-			'clientTag' => $this->_client->getConfig()->clientTag,
-			'entryId' => '12345',
-			'version' => 5,
-			'forceProxy' => 1,
-			'partnerId' => $this->_client->getConfig()->partnerId,
-			'ks' => $this->_client->getKs());
-		$expected = http_build_query($expectedArray);
-		
-	    	echo($serveUrl.PHP_EOL);
-	    	echo($expected.PHP_EOL);
-    	$this->assertTrue(strpos($serveUrl, $expected) !== false);
 	}
 	
 	public function addImageEntry()

@@ -5,7 +5,7 @@
  */
 class KalturaConditionArray extends KalturaTypedArray
 {
-	public static function fromDbArray($arr)
+	public static function fromDbArray($arr, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		$newArr = new KalturaConditionArray();
 		if ($arr == null)
@@ -19,7 +19,7 @@ class KalturaConditionArray extends KalturaTypedArray
 				KalturaLog::alert("Object [" . get_class($obj) . "] type [" . $obj->getType() . "] could not be translated to API object");
 				continue;
 			}
-			$nObj->fromObject($obj);
+			$nObj->fromObject($obj, $responseProfile);
 			$newArr[] = $nObj;
 		}
 		
@@ -50,8 +50,10 @@ class KalturaConditionArray extends KalturaTypedArray
 				return new KalturaUserRoleCondition();
 			case ConditionType::GEO_DISTANCE:
 				return new KalturaGeoDistanceCondition();
-				default:
-				return KalturaPluginManager::loadObject('KalturaCondition', $dbObject->getType());
+			case ConditionType::OR_OPERATOR:
+			    return new KalturaOrCondition();
+			default:
+			     return KalturaPluginManager::loadObject('KalturaCondition', $dbObject->getType());
 		}
 	}
 		

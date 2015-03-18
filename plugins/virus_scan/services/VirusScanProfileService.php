@@ -47,7 +47,7 @@ class VirusScanProfileService extends KalturaBaseService
 		$list = VirusScanProfilePeer::doSelect($c);
 		
 		$response = new KalturaVirusScanProfileListResponse();
-		$response->objects = KalturaVirusScanProfileArray::fromDbArray($list);
+		$response->objects = KalturaVirusScanProfileArray::fromDbArray($list, $this->getResponseProfile());
 		$response->totalCount = $count;
 		
 		return $response;
@@ -77,7 +77,7 @@ class VirusScanProfileService extends KalturaBaseService
 		$dbVirusScanProfile->save();
 		
 		$virusScanProfile = new KalturaVirusScanProfile();
-		$virusScanProfile->fromObject($dbVirusScanProfile);
+		$virusScanProfile->fromObject($dbVirusScanProfile, $this->getResponseProfile());
 		
 		return $virusScanProfile;
 	}
@@ -98,7 +98,7 @@ class VirusScanProfileService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $virusScanProfileId);
 			
 		$virusScanProfile = new KalturaVirusScanProfile();
-		$virusScanProfile->fromObject($dbVirusScanProfile);
+		$virusScanProfile->fromObject($dbVirusScanProfile, $this->getResponseProfile());
 		
 		return $virusScanProfile;
 	}
@@ -124,7 +124,7 @@ class VirusScanProfileService extends KalturaBaseService
 		$dbVirusScanProfile = $virusScanProfile->toUpdatableObject($dbVirusScanProfile);
 		$dbVirusScanProfile->save();
 	
-		$virusScanProfile->fromObject($dbVirusScanProfile);
+		$virusScanProfile->fromObject($dbVirusScanProfile, $this->getResponseProfile());
 		
 		return $virusScanProfile;
 	}
@@ -149,7 +149,7 @@ class VirusScanProfileService extends KalturaBaseService
 		$dbVirusScanProfile->save();
 			
 		$virusScanProfile = new KalturaVirusScanProfile();
-		$virusScanProfile->fromObject($dbVirusScanProfile);
+		$virusScanProfile->fromObject($dbVirusScanProfile, $this->getResponseProfile());
 		
 		return $virusScanProfile;
 	}

@@ -5,8 +5,9 @@
  */
 class KalturaBaseEntryArray extends KalturaTypedArray
 {
-	public static function fromEntryArray ( $arr, $isAdmin = false )
+	public static function fromDbArray($arr, KalturaDetachedResponseProfile $responseProfile = null)
 	{
+		$isAdmin = kCurrentContext::$is_admin_session;
 		$newArr = new KalturaBaseEntryArray();
 		if ($arr == null)
 			return $newArr;
@@ -14,7 +15,7 @@ class KalturaBaseEntryArray extends KalturaTypedArray
 		foreach ($arr as $obj)
 		{
     		$nObj = KalturaEntryFactory::getInstanceByType($obj->getType(), $isAdmin);
-			$nObj->fromObject($obj);
+			$nObj->fromObject($obj, $responseProfile);
 			$newArr[] = $nObj;
 		}
 		

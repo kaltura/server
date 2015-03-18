@@ -22,5 +22,11 @@ class KalturaLiveReportExportParams extends KalturaObject
 	 * @var int
 	 */
 	public $timeZoneOffset = 0;
+
+	/**
+	 * Optional argument that allows controlling the prefix of the exported csv url
+	 * @var string
+	 */
+	public $applicationUrlTemplate;
 	
 }

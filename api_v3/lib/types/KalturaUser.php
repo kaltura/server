@@ -254,6 +254,7 @@ class KalturaUser extends KalturaObject implements IFilterable
 		"isAccountOwner",
 		"allowedPartnerIds" => "allowedPartners",
 		"allowedPartnerPackages",
+		"statusUpdatedAt",
 	);
 
 	public function getMapBetweenObjects ( )
@@ -283,17 +284,19 @@ class KalturaUser extends KalturaObject implements IFilterable
 	}
 	
 	
-	public function fromObject($sourceObject)
+	public function doFromObject($sourceObject, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		if(!$sourceObject)
 			return;
 			
-		parent::fromObject($sourceObject);
+		parent::doFromObject($sourceObject, $responseProfile);
+		
 		// full name is deprecated and was split to firstName + lastName
 		// this is for backward compatibility
-		$this->fullName = $sourceObject->getFullName();
-		$this->loginEnabled = !is_null($sourceObject->getLoginDataId());
-		$this->statusUpdatedAt = $sourceObject->getStatusUpdatedAt(null);
+		if($this->shouldGet('fullName', $responseProfile))
+			$this->fullName = $sourceObject->getFullName();
+		if($this->shouldGet('loginEnabled', $responseProfile))
+			$this->loginEnabled = !is_null($sourceObject->getLoginDataId());
 	}
 	
 	public function getExtraFilters()

@@ -201,8 +201,16 @@ class KAsyncConcat extends KJobHandlerWorker
 				else
 					$duration = 0;
 
-				if($duration>0 && abs($duration-KAsyncConcat::LiveChunkDuration)>KAsyncConcat::MaxChunkDelta){
-					$fixLargeDeltaFlag = true;
+				if($duration>0){
+					/*
+					 * If the duration is too small - stop/start flow, don't fix 
+					 */
+					if(KAsyncConcat::LiveChunkDuration-$duration>30000){
+						$fixLargeDeltaFlag = false;
+					}
+					else if(abs($duration-KAsyncConcat::LiveChunkDuration)>KAsyncConcat::MaxChunkDelta){
+						$fixLargeDeltaFlag = true;
+					}
 				}
 				KalturaLog::log("Chunk duration($duration), Wowza chunk setting(".KAsyncConcat::LiveChunkDuration."),max-allowed-delta(".KAsyncConcat::MaxChunkDelta."),fixLargeDeltaFlag($fixLargeDeltaFlag) ");
 			}

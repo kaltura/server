@@ -81,7 +81,7 @@ class CaptionAssetService extends KalturaAssetService
 		$dbCaptionAsset->save();
 
 		$captionAsset = new KalturaCaptionAsset();
-		$captionAsset->fromObject($dbCaptionAsset);
+		$captionAsset->fromObject($dbCaptionAsset, $this->getResponseProfile());
 		return $captionAsset;
     }
     
@@ -131,7 +131,7 @@ class CaptionAssetService extends KalturaAssetService
    			kEventsManager::raiseEvent(new kObjectDataChangedEvent($dbCaptionAsset));
    		
 		$captionAsset = new KalturaCaptionAsset();
-		$captionAsset->fromObject($dbCaptionAsset);
+		$captionAsset->fromObject($dbCaptionAsset, $this->getResponseProfile());
 		return $captionAsset;
     }
 	
@@ -163,7 +163,7 @@ class CaptionAssetService extends KalturaAssetService
 			$this->setAsDefaultAction($dbCaptionAsset->getId());
 			
 		$captionAsset = new KalturaCaptionAsset();
-		$captionAsset->fromObject($dbCaptionAsset);
+		$captionAsset->fromObject($dbCaptionAsset, $this->getResponseProfile());
 		return $captionAsset;
     }
     
@@ -441,6 +441,10 @@ class CaptionAssetService extends KalturaAssetService
 		if ($assetDb->getStatus() != asset::ASSET_STATUS_READY)
 			throw new KalturaAPIException(KalturaCaptionErrors::CAPTION_ASSET_IS_NOT_READY);
 
+		$entryDb = $assetDb->getentry();
+		if(is_null($entryDb))
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $assetDb->getEntryId());
+		
 		if($storageId)
 			return $assetDb->getExternalUrl($storageId);
 			
@@ -476,7 +480,7 @@ class CaptionAssetService extends KalturaAssetService
 		$fileSyncs = FileSyncPeer::doSelect($c);
 			
 		$listResponse = new KalturaRemotePathListResponse();
-		$listResponse->objects = KalturaRemotePathArray::fromFileSyncArray($fileSyncs);
+		$listResponse->objects = KalturaRemotePathArray::fromDbArray($fileSyncs, $this->getResponseProfile());
 		$listResponse->totalCount = count($listResponse->objects);
 		return $listResponse;
 	}
@@ -642,7 +646,7 @@ class CaptionAssetService extends KalturaAssetService
 			throw new KalturaAPIException(KalturaCaptionErrors::CAPTION_ASSET_ID_NOT_FOUND, $captionAssetId);
 		
 		$captionAssets = new KalturaCaptionAsset();
-		$captionAssets->fromObject($captionAssetsDb);
+		$captionAssets->fromObject($captionAssetsDb, $this->getResponseProfile());
 		return $captionAssets;
 	}
 	
@@ -656,39 +660,22 @@ class CaptionAssetService extends KalturaAssetService
 	 */
 	function listAction(KalturaAssetFilter $filter = null, KalturaFilterPager $pager = null)
 	{
-		if (!$filter)
-			$filter = new KalturaAssetFilter();
-
-		if (!$pager)
-			$pager = new KalturaFilterPager();
-			
-		$captionAssetFilter = new AssetFilter();
-		
-		$filter->toObject($captionAssetFilter);
-
-		$c = new Criteria();
-		$captionAssetFilter->attachToCriteria($c);
-		
-		$types = KalturaPluginManager::getExtendedTypes(assetPeer::OM_CLASS, CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION));
-		$c->add(assetPeer::TYPE, $types, Criteria::IN);
-				
-		$pager->attachToCriteria($c);
-		$dbList = assetPeer::doSelect($c);
-
-		$resultCount = count($dbList);
-		if ($resultCount && $resultCount < $pager->pageSize)
-			$totalCount = ($pager->pageIndex - 1) * $pager->pageSize + $resultCount;
-		else
+		if(!$filter)
 		{
-			KalturaFilterPager::detachFromCriteria($c);
-			$totalCount = assetPeer::doCount($c);
+			$filter = new KalturaCaptionAssetFilter();
 		}
-		
-		$list = KalturaCaptionAssetArray::fromDbArray($dbList);
-		$response = new KalturaCaptionAssetListResponse();
-		$response->objects = $list;
-		$response->totalCount = $totalCount;
-		return $response;    
+		elseif(! $filter instanceof KalturaCaptionAssetFilter)
+		{
+			$filter = $filter->cast('KalturaCaptionAssetFilter');
+		}
+			
+		if(!$pager)
+		{
+			$pager = new KalturaFilterPager();
+		}
+
+		$types = KalturaPluginManager::getExtendedTypes(assetPeer::OM_CLASS, CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION));
+		return $filter->getTypeListResponse($pager, $this->getResponseProfile(), $types);
 	}
 	
 	/**

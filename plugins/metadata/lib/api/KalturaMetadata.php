@@ -146,20 +146,26 @@ class KalturaMetadata extends KalturaObject implements IFilterable
 		return parent::toObject($dbMetadata, $propsToSkip);
 	}
 	
-	public function fromObject($source_object)
+	public function doFromObject($source_object, KalturaDetachedResponseProfile $responseProfile = null)
 	{
-		parent::fromObject($source_object);
+		parent::doFromObject($source_object, $responseProfile);
 		
-		if($this->metadataObjectType == KalturaMetadataObjectType::USER)
+		if($this->shouldGet('objectId', $responseProfile))
 		{
-			$user = kuserPeer::retrieveByPK($this->objectId);
-			
-			$this->objectId = null;
-			if($user)
-				$this->objectId = $user->getPuserId();
+			if($this->metadataObjectType == KalturaMetadataObjectType::USER)
+			{
+				$user = kuserPeer::retrieveByPK($this->objectId);
+				
+				$this->objectId = null;
+				if($user)
+					$this->objectId = $user->getPuserId();
+			}
 		}
 
-		$key = $source_object->getSyncKey(Metadata::FILE_SYNC_METADATA_DATA);
-		$this->xml = kFileSyncUtils::file_get_contents($key, true, false);
+		if($this->shouldGet('xml', $responseProfile))
+		{
+			$key = $source_object->getSyncKey(Metadata::FILE_SYNC_METADATA_DATA);
+			$this->xml = kFileSyncUtils::file_get_contents($key, true, false);
+		}
 	}
 }

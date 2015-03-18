@@ -69,7 +69,7 @@ class UserRoleService extends KalturaBaseService
 		$dbUserRole->save();
 		
 		$userRole = new KalturaUserRole();
-		$userRole->fromObject($dbUserRole);
+		$userRole->fromObject($dbUserRole, $this->getResponseProfile());
 		
 		return $userRole;
 	}
@@ -92,7 +92,7 @@ class UserRoleService extends KalturaBaseService
 		}
 			
 		$userRole = new KalturaUserRole();
-		$userRole->fromObject($dbUserRole);
+		$userRole->fromObject($dbUserRole, $this->getResponseProfile());
 		
 		return $userRole;
 	}
@@ -145,7 +145,7 @@ class UserRoleService extends KalturaBaseService
 		$dbUserRole->save();
 	
 		$userRole = new KalturaUserRole();
-		$userRole->fromObject($dbUserRole);
+		$userRole->fromObject($dbUserRole, $this->getResponseProfile());
 		
 		return $userRole;
 	}
@@ -181,7 +181,7 @@ class UserRoleService extends KalturaBaseService
 		$dbUserRole->save();
 			
 		$userRole = new KalturaUserRole();
-		$userRole->fromObject($dbUserRole);
+		$userRole->fromObject($dbUserRole, $this->getResponseProfile());
 		
 		return $userRole;
 	}
@@ -201,22 +201,10 @@ class UserRoleService extends KalturaBaseService
 		if (!$filter)
 			$filter = new KalturaUserRoleFilter();
 			
-		$userRoleFilter = $filter->toObject();
-
-		$c = new Criteria();
-		$userRoleFilter->attachToCriteria($c);
-		$count = UserRolePeer::doCount($c);
-		
-		if (! $pager)
-			$pager = new KalturaFilterPager ();
-		$pager->attachToCriteria ( $c );
-		$list = UserRolePeer::doSelect($c);
-		
-		$response = new KalturaUserRoleListResponse();
-		$response->objects = KalturaUserRoleArray::fromDbArray($list);
-		$response->totalCount = $count;
-		
-		return $response;
+		if(!$pager)
+			$pager = new KalturaFilterPager();
+			
+		return $filter->getListResponse($pager, $this->getResponseProfile());
 	}
 	
 	/**
@@ -244,7 +232,7 @@ class UserRoleService extends KalturaBaseService
 		$newDbRole->save();
 		
 		$userRole = new KalturaUserRole();
-		$userRole->fromObject($newDbRole);
+		$userRole->fromObject($newDbRole, $this->getResponseProfile());
 		
 		return $userRole;
 	}

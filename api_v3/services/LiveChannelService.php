@@ -36,7 +36,7 @@ class LiveChannelService extends KalturaLiveEntryService
 		TrackEntry::addTrackEntry($te);
 		
 		$liveChannel = new KalturaLiveChannel();
-		$liveChannel->fromObject($dbEntry);
+		$liveChannel->fromObject($dbEntry, $this->getResponseProfile());
 		return $liveChannel;
 	}
 
@@ -102,7 +102,7 @@ class LiveChannelService extends KalturaLiveEntryService
 	    $filter->typeEqual = KalturaEntryType::LIVE_CHANNEL;
 	    list($list, $totalCount) = parent::listEntriesByFilter($filter, $pager);
 	    
-	    $newList = KalturaLiveChannelArray::fromEntryArray($list);
+	    $newList = KalturaLiveChannelArray::fromDbArray($list, $this->getResponseProfile());
 		$response = new KalturaLiveChannelListResponse();
 		$response->objects = $newList;
 		$response->totalCount = $totalCount;

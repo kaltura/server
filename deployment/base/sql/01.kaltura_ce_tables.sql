@@ -1772,8 +1772,30 @@ CREATE TABLE IF NOT EXISTS `roughcut_entry` (
   KEY `roughcut_id_index` (`roughcut_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
-/*Table structure for table `scheduler` */
+/*Table structure for table `scheduled_task_profile` */
+CREATE TABLE IF NOT EXISTS `scheduled_task_profile`
+(
+	`id` INTEGER  NOT NULL AUTO_INCREMENT,
+	`partner_id` INTEGER  NOT NULL,
+	`name` VARCHAR(127)  NOT NULL,
+	`system_name` VARCHAR(127),
+	`description` VARCHAR(255),
+	`status` INTEGER  NOT NULL,
+	`object_filter_engine_type` INTEGER  NOT NULL,
+	`object_filter` TEXT  NOT NULL,
+	`object_filter_api_type` VARCHAR(255)  NOT NULL,
+	`object_tasks` TEXT  NOT NULL,
+	`created_at` DATETIME,
+	`updated_at` DATETIME,
+	`last_execution_started_at` DATETIME,
+	`max_total_count_allowed` INTEGER  NOT NULL,
+	PRIMARY KEY (`id`),
+	KEY `partner_id_status_index`(`partner_id`, `status`),
+	KEY `system_name_partner_id`(`system_name`, `partner_id`),
+	KEY `status_last_execution_started_at`(`status`, `last_execution_started_at`)
+)ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
+/*Table structure for table `scheduler` */
 CREATE TABLE IF NOT EXISTS `scheduler` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `created_at` datetime DEFAULT NULL,
@@ -2356,4 +2378,20 @@ CREATE TABLE `kuser_kgroup`
 	CONSTRAINT `kuser_kgroup_FK_2`
 	FOREIGN KEY (`kuser_id`)
 	REFERENCES `kuser` (`id`)
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+CREATE TABLE response_profile
+(
+	id BIGINT  NOT NULL AUTO_INCREMENT,
+	created_at DATETIME,
+	updated_at DATETIME,
+	partner_id INTEGER,
+	status INTEGER,
+	name VARCHAR(255),
+	system_name VARCHAR(255),
+	type INTEGER,
+	custom_data TEXT,
+	PRIMARY KEY (id),
+	KEY partner_status(partner_id, status)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;

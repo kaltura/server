@@ -50,19 +50,19 @@ class Base
 	const KALTURA_SERVICE_FORMAT_PHP  = 3;
 
 	/**
-	 * @var string
-	 */
-	protected $apiVersion = null;
-
-	/**
 	 * @var \Kaltura\Client\Configuration
 	 */
 	protected $config;
-	
+
 	/**
-	 * @var string
+	 * @var array
 	 */
-	private $ks;
+	protected $clientConfiguration = array();
+
+	/**
+	 * @var array
+	 */
+	protected $requestConfiguration = array();
 	
 	/**
 	 * @var boolean
@@ -121,9 +121,12 @@ class Base
 		$this->log("service url: [" . $this->config->getServiceUrl() . "]");
 		
 		// append the basic params
-		$this->addParam($params, "apiVersion", $this->apiVersion);
 		$this->addParam($params, "format", $this->config->getFormat());
-		$this->addParam($params, "clientTag", $this->config->getClientTag());
+	
+		foreach($this->clientConfiguration as $param => $value)
+		{
+			$this->addParam($params, $param, $value);
+		}
 		
 		$call = $this->callsQueue[0];
 		$this->callsQueue = array();
@@ -140,11 +143,10 @@ class Base
 
 	public function queueServiceActionCall($service, $action, $returnType, $params = array(), $files = array())
 	{
-		// in start session partner id is optional (default -1). if partner id was not set, use the one in the config
-		if (!isset($params["partnerId"]) || $params["partnerId"] === -1)
-			$params["partnerId"] = $this->config->getPartnerId();
-			
-		$this->addParam($params, "ks", $this->ks);
+		foreach($this->requestConfiguration as $param => $value)
+		{
+			$this->addParam($params, $param, $value);
+		}
 		
 		$call = new ServiceActionCall($service, $action, $params, $files);
 		if(!is_null($this->multiRequestReturnType))
@@ -172,10 +174,13 @@ class Base
 		$this->log("service url: [" . $this->config->getServiceUrl() . "]");
 		
 		// append the basic params
-		$this->addParam($params, "apiVersion", $this->apiVersion);
 		$this->addParam($params, "format", $this->config->getFormat());
-		$this->addParam($params, "clientTag", $this->config->getClientTag());
 		$this->addParam($params, "ignoreNull", true);
+
+		foreach($this->clientConfiguration as $param => $value)
+		{
+			$this->addParam($params, $param, $value);
+		}
 		
 		$url = $this->config->getServiceUrl()."/api_v3/index.php?service=";
 		if (!is_null($this->multiRequestReturnType))
@@ -356,22 +361,6 @@ class Base
 	}
 
 	/**
-	 * @return string
-	 */
-	public function getKs()
-	{
-		return $this->ks;
-	}
-	
-	/**
-	 * @param string $ks
-	 */
-	public function setKs($ks)
-	{
-		$this->ks = $ks;
-	}
-	
-	/**
 	 * @return Configuration
 	 */
 	public function getConfig()
@@ -392,21 +381,43 @@ class Base
 			$this->shouldLog = true;	
 		}
 	}
-	
-	/**
-	 * @return string
-	 */
-	public function getApiVersion()
-	{
-		return $this->apiVersion;
-	}
 
-	/**
-	 * @param string $apiVersion
-	 */
-	public function setApiVersion($apiVersion)
+	public function setClientConfiguration(\Kaltura\Client\Type\ClientConfiguration $configuration)
 	{
-		$this->apiVersion = $apiVersion;
+		$params = get_class_vars('\Kaltura\Client\Type\ClientConfiguration');
+		foreach($params as $param)
+		{
+			if(is_null($configuration->$param))
+			{
+				if(isset($this->clientConfiguration[$param]))
+				{
+					unset($this->clientConfiguration[$param]);
+				}
+			}
+			else
+			{
+				$this->clientConfiguration[$param] = $configuration->$param;
+			}
+		}
+	}
+	
+	public function setRequestConfiguration(\Kaltura\Client\Type\RequestConfiguration $configuration)
+	{
+		$params = get_class_vars('\Kaltura\Client\Type\RequestConfiguration');
+		foreach($params as $param)
+		{
+			if(is_null($configuration->$param))
+			{
+				if(isset($this->requestConfiguration[$param]))
+				{
+					unset($this->requestConfiguration[$param]);
+				}
+			}
+			else
+			{
+				$this->requestConfiguration[$param] = $configuration->$param;
+			}
+		}
 	}
 	
 	/**

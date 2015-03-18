@@ -5,6 +5,17 @@
  */
 class KalturaMediaInfoFilter extends KalturaMediaInfoBaseFilter
 {
+	/* (non-PHPdoc)
+	 * @see KalturaFilter::getCoreFilter()
+	 */
+	protected function getCoreFilter()
+	{
+		return new MediaInfoFilter();
+	}
+	
+	/* (non-PHPdoc)
+	 * @see KalturaFilter::toObject()
+	 */
 	public function toObject ( $object_to_fill = null, $props_to_skip = array() )
 	{
 		if(!$this->flavorAssetIdEqual)

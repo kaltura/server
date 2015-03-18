@@ -27,9 +27,9 @@
 // ===================================================================================================
 package com.kaltura.client.test;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
-import com.kaltura.client.KalturaApiException;
 import com.kaltura.client.enums.KalturaContainerFormat;
 import com.kaltura.client.enums.KalturaNullableBoolean;
 import com.kaltura.client.enums.KalturaSiteRestrictionType;
@@ -46,10 +46,11 @@ public class MediaServiceFieldsTest extends BaseTest {
 	 * Tests that when we set values to their matching "NULL" their value isn't passed to the server.
 	 * The parameter types that are tested : 
 	 * String, int, EnumAsInt, EnumAsString.
+	 * @throws IOException 
 	 */
-	public void testSetFieldValueShouldNotPass() throws KalturaApiException {
+	public void testSetFieldValueShouldNotPass() throws Exception {
 
-		BaseTest.startAdminSession(client, kalturaConfig);
+		startAdminSession();
 
 		final String testString = "Kaltura test string";
 		final int testInt = 42;
@@ -91,10 +92,11 @@ public class MediaServiceFieldsTest extends BaseTest {
 	/**
 	 * Tests that when we ask to set parameters to null, we indeed set them to null
 	 * The parameter types that are tested : String
+	 * @throws IOException 
 	 */
-	public void testSetFieldsToNullString() throws KalturaApiException {
+	public void testSetFieldsToNullString() throws Exception {
 
-		BaseTest.startAdminSession(client, kalturaConfig);
+		startAdminSession();
 
 		final String testString = "Kaltura test string";
 
@@ -121,10 +123,11 @@ public class MediaServiceFieldsTest extends BaseTest {
 	/**
 	 * Tests that when we ask to set parameters to null, we indeed set them to null
 	 * The parameter types that are tested : int
+	 * @throws IOException 
 	 */
-	public void testSetFieldsToNullInt() throws KalturaApiException {
+	public void testSetFieldsToNullInt() throws Exception {
 
-		BaseTest.startAdminSession(client, kalturaConfig);
+		startAdminSession();
 		final int testInt = 42;
 
 		KalturaConversionProfile profile = new KalturaConversionProfile();
@@ -153,7 +156,7 @@ public class MediaServiceFieldsTest extends BaseTest {
 	 * Tests that array update is working - 
 	 * tests empty array, Null array & full array.
 	 */
-	public void testArrayConversion() throws KalturaApiException {
+	public void testArrayConversion() throws Exception {
 		
 		KalturaSiteRestriction resA = new KalturaSiteRestriction();
 		resA.siteRestrictionType = KalturaSiteRestrictionType.RESTRICT_SITE_LIST;
@@ -169,7 +172,7 @@ public class MediaServiceFieldsTest extends BaseTest {
 		accessControl.name = "test access control";
 		accessControl.restrictions = restrictions;
 		
-		BaseTest.startAdminSession(client, kalturaConfig);
+		startAdminSession();
 		accessControl = client.getAccessControlService().add(accessControl);
 		
 		assertNotNull(accessControl.restrictions);

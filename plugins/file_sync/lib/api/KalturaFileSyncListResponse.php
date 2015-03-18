@@ -3,17 +3,11 @@
  * @package plugins.fileSync
  * @subpackage api.objects
  */
-class KalturaFileSyncListResponse extends KalturaObject
+class KalturaFileSyncListResponse extends KalturaListResponse
 {
 	/**
 	 * @var KalturaFileSyncArray
 	 * @readonly
 	 */
 	public $objects;
-
-	/**
-	 * @var int
-	 * @readonly
-	 */
-	public $totalCount;
 }

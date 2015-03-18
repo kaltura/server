@@ -14,16 +14,12 @@ class Infra_ClientHelper
 
 	public static function unimpersonate()
 	{
-		$config = self::getClient()->getConfig();
-		$config->partnerId = null;
-		self::getClient()->setConfig($config);
+		self::getClient()->setPartnerId(null);
 	}
 
 	public static function impersonate($partnerId)
 	{
-		$config = self::getClient()->getConfig();
-		$config->partnerId = $partnerId;
-		self::getClient()->setConfig($config);
+		self::getClient()->setPartnerId($partnerId);
 	}
 
 	public static function getPartnerId()
@@ -74,13 +70,12 @@ class Infra_ClientHelper
 
 		$ks = self::getKs();
 
-		$config = new Kaltura_Client_Configuration(null);
+		$config = new Kaltura_Client_Configuration();
 		$config->serviceUrl = self::getServiceUrl();
 		$config->curlTimeout = self::getCurlTimeout();
 		$config->setLogger(new Infra_ClientLoggingProxy());
 
 		$settings = Zend_Registry::get('config')->settings;
-		$config->clientTag = 'Kaltura-' . $settings->applicationName;
 		if(isset($settings->clientConfig))
 		{
 			foreach($settings->clientConfig as $attr => $value)
@@ -97,6 +92,7 @@ class Infra_ClientHelper
 		}
 
 		$client = new Kaltura_Client_Client($config);
+		$client->setClientTag('Kaltura-' . $settings->applicationName);
 		$client->setKs($ks);
 		self::$client = $client;
 

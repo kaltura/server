@@ -34,6 +34,11 @@
  */
 abstract class Kaltura_Client_ObjectBase
 {
+	/**
+	 * @var array
+	 */
+	public $relatedObjects;
+	
 	abstract public function getKalturaObjectType();
 	
 	public function __construct(SimpleXMLElement $xml = null)

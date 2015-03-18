@@ -58,7 +58,7 @@ class DrmPolicyService extends KalturaBaseService
 		
 		// return the saved object
 		$drmPolicy = KalturaDrmPolicy::getInstanceByType($dbDrmPolicy->getProvider());
-		$drmPolicy->fromObject($dbDrmPolicy);
+		$drmPolicy->fromObject($dbDrmPolicy, $this->getResponseProfile());
 		return $drmPolicy;
 		
 	}
@@ -81,7 +81,7 @@ class DrmPolicyService extends KalturaBaseService
 		}
 			
 		$drmPolicy = KalturaDrmPolicy::getInstanceByType($dbDrmPolicy->getProvider());
-		$drmPolicy->fromObject($dbDrmPolicy);
+		$drmPolicy->fromObject($dbDrmPolicy, $this->getResponseProfile());
 		
 		return $drmPolicy;
 	}
@@ -111,7 +111,7 @@ class DrmPolicyService extends KalturaBaseService
 		$dbDrmPolicy->save();
 	
 		$drmPolicy = KalturaDrmPolicy::getInstanceByType($dbDrmPolicy->getProvider());
-		$drmPolicy->fromObject($dbDrmPolicy);
+		$drmPolicy->fromObject($dbDrmPolicy, $this->getResponseProfile());
 		
 		return $drmPolicy;
 	}
@@ -137,7 +137,7 @@ class DrmPolicyService extends KalturaBaseService
 		$dbDrmPolicy->save();
 			
 		$drmPolicy = KalturaDrmPolicy::getInstanceByType($dbDrmPolicy->getProvider());
-		$drmPolicy->fromObject($dbDrmPolicy);
+		$drmPolicy->fromObject($dbDrmPolicy, $this->getResponseProfile());
 		
 		return $drmPolicy;
 	}
@@ -166,7 +166,7 @@ class DrmPolicyService extends KalturaBaseService
 		$list = DrmPolicyPeer::doSelect($c);
 		
 		$response = new KalturaDrmPolicyListResponse();
-		$response->objects = KalturaDrmPolicyArray::fromDbArray($list);
+		$response->objects = KalturaDrmPolicyArray::fromDbArray($list, $this->getResponseProfile());
 		$response->totalCount = $count;
 		
 		return $response;

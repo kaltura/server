@@ -115,11 +115,6 @@ class KalturaWidget extends KalturaObject implements IFilterable
 		return array_merge ( parent::getMapBetweenObjects() , self::$map_between_objects );
 	}
 
-	public function fromWidget ( widget $entry )
-	{
-		parent::fromObject( $entry );
-	}
-	
 	public function toWidget () 
 	{
 		$user = new widget();

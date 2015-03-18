@@ -41,7 +41,7 @@ class UploadTokenService extends KalturaBaseService
 		$uploadTokenMgr->saveAsNewUploadToken();
 		$uploadTokenDb = $uploadTokenMgr->getUploadToken();
 		
-		$uploadToken->fromObject($uploadTokenDb);
+		$uploadToken->fromObject($uploadTokenDb, $this->getResponseProfile());
 		
 		return $uploadToken;
 	}
@@ -61,7 +61,7 @@ class UploadTokenService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::UPLOAD_TOKEN_NOT_FOUND);
 			
 		$uploadToken = new KalturaUploadToken();
-		$uploadToken->fromObject($uploadTokenDb);
+		$uploadToken->fromObject($uploadTokenDb, $this->getResponseProfile());
 		return $uploadToken;
 	}
 	
@@ -116,7 +116,7 @@ class UploadTokenService extends KalturaBaseService
 			}
 		}
 		$uploadToken = new KalturaUploadToken();
-		$uploadToken->fromObject($uploadTokenDb);
+		$uploadToken->fromObject($uploadTokenDb, $this->getResponseProfile());
 		return $uploadToken;
 	}
 
@@ -184,7 +184,7 @@ class UploadTokenService extends KalturaBaseService
 		$list = UploadTokenPeer::doSelect($c);
 		
 		// create the response object
-		$newList = KalturaUploadTokenArray::fromUploadTokenArray($list);
+		$newList = KalturaUploadTokenArray::fromDbArray($list, $this->getResponseProfile());
 		$response = new KalturaUploadTokenListResponse();
 		$response->objects = $newList;
 		$response->totalCount = $totalCount;

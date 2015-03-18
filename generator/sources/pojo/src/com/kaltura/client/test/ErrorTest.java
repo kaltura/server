@@ -44,9 +44,6 @@ import com.kaltura.client.types.KalturaMediaListResponse;
 public class ErrorTest extends BaseTest {
 
 	public void testInvalidServiceId() {
-		this.kalturaConfig.setPartnerId(KalturaTestConfig.PARTNER_ID);
-		this.kalturaConfig.setSecret(KalturaTestConfig.SECRET);
-		this.kalturaConfig.setAdminSecret(KalturaTestConfig.ADMIN_SECRET);
 		this.kalturaConfig.setEndpoint("http://2.2.2.2");
 		this.kalturaConfig.setTimeout(2000);
 		
@@ -60,9 +57,6 @@ public class ErrorTest extends BaseTest {
 	}
 	
 	public void testInvalidServerDnsName() {
-		this.kalturaConfig.setPartnerId(KalturaTestConfig.PARTNER_ID);
-		this.kalturaConfig.setSecret(KalturaTestConfig.SECRET);
-		this.kalturaConfig.setAdminSecret(KalturaTestConfig.ADMIN_SECRET);
 		this.kalturaConfig.setEndpoint("http://www.nonexistingkaltura.com");
 		this.kalturaConfig.setTimeout(2000);
 		

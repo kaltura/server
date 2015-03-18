@@ -21,7 +21,7 @@ $loader->register();
 $testerConfig = parse_ini_file(dirname(__FILE__).'/'.CONFIG_FILE);
 
 // init kaltura configuration
-$config = new KalturaConfiguration($testerConfig['partnerId']);
+$config = new KalturaConfiguration();
 $config->setServiceUrl($testerConfig['serviceUrl']);
 $config->setCurlTimeout(120);
 $config->setLogger(new \Test\SampleLoggerImplementation());
@@ -30,7 +30,7 @@ $config->setLogger(new \Test\SampleLoggerImplementation());
 $client = new KalturaClient($config);
 
 // generate session
-$ks = $client->generateSession($testerConfig['adminSecret'], $testerConfig['userId'], KalturaSessionType::ADMIN, $config->getPartnerId());
+$ks = $client->generateSession($testerConfig['adminSecret'], $testerConfig['userId'], KalturaSessionType::ADMIN, $testerConfig['partnerId']);
 $config->getLogger()->log('Kaltura session (ks) was generated successfully: ' . $ks);
 $client->setKs($ks);
 
@@ -51,5 +51,5 @@ catch (ClientException $ex)
 }
 
 // run the tester
-$tester = new \Test\Zend2ClientTester($client);
+$tester = new \Test\Zend2ClientTester($client, intval($testerConfig['partnerId']));
 $tester->run();

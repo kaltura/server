@@ -72,11 +72,20 @@ class ActivitiBusinessProcessNotificationPlugin extends KalturaPlugin implements
 	{
 		if($baseClass == 'kBusinessProcessProvider')
 		{
-			if(class_exists('Kaltura_Client_BusinessProcessNotification_Enum_BusinessProcessProvider') && $enumValue == Kaltura_Client_BusinessProcessNotification_Enum_BusinessProcessProvider::ACTIVITI)
+			if(defined('KalturaBusinessProcessProvider::ACTIVITI'))
+			{
+				if($enumValue == KalturaBusinessProcessProvider::ACTIVITI)
+					return 'kActivitiBusinessProcessProvider';
+			}
+			elseif(defined('Kaltura_Client_BusinessProcessNotification_Enum_BusinessProcessProvider::ACTIVITI'))
+			{
+				if($enumValue == Kaltura_Client_BusinessProcessNotification_Enum_BusinessProcessProvider::ACTIVITI)
+					return 'kActivitiBusinessProcessProvider';
+			}
+			elseif($enumValue == self::getApiValue(ActivitiBusinessProcessProvider::ACTIVITI))
+			{
 				return 'kActivitiBusinessProcessProvider';
-				
-			if(class_exists('KalturaBusinessProcessProvider') && $enumValue == KalturaBusinessProcessProvider::ACTIVITI)
-				return 'kActivitiBusinessProcessProvider';
+			}
 		}
 			
 		if($baseClass == 'BusinessProcessServer' && $enumValue == self::getActivitiBusinessProcessProviderCoreValue(ActivitiBusinessProcessProvider::ACTIVITI))
