@@ -8,7 +8,8 @@
 
 class DrmLicenseUtils {
 
-
+    const SYSTEM_NAME = 'OVP';
+    
     private $secureEntryHelper;
 
     public function __construct($entry, $referrer)
@@ -55,4 +56,32 @@ class DrmLicenseUtils {
     {
         return $this->secureEntryHelper;
     }
+
+    public static function signDataWithKey($dataToSign, $signingKey)
+    {
+        return urlencode(base64_encode(sha1($signingKey.$dataToSign,TRUE)));
+    }
+
+    public static function createCustomData($entryId, $flavorAssets)
+    {
+        $customData = new stdClass();
+        $customData->ca_system = self::SYSTEM_NAME;
+        $customData->user_token = kCurrentContext::$ks;
+        $customData->acount_id = kCurrentContext::$partner_id;
+        $customData->content_id = $entryId;
+        $customData->file_ids = "";
+        if (isset($flavorAssets))
+        {
+            $flavorIds = array();
+            $flavorAssets = $flavorAssets->toArray();
+            foreach ($flavorAssets as $flavor)
+            {
+                $flavorIds[] = $flavor->id;
+            }
+            $customData->file_ids = $flavorIds;
+        }
+        $customDataJson = json_encode($customData);
+        return $customDataJson;
+    }
+
 }

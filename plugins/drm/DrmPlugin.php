@@ -5,7 +5,6 @@
 class DrmPlugin extends KalturaPlugin implements IKalturaServices, IKalturaAdminConsolePages, IKalturaPermissions, IKalturaEnumerator, IKalturaConfigurator, IKalturaObjectLoader, IKalturaEntryContextDataContributor
 {
 	const PLUGIN_NAME = 'drm';
-    const SYSTEM_NAME = 'OVP';
 
     /* (non-PHPdoc)
      * @see IKalturaPlugin::getPluginName()
@@ -111,6 +110,8 @@ class DrmPlugin extends KalturaPlugin implements IKalturaServices, IKalturaAdmin
             return new KDLOperatorDrm($enumValue);
         if ($baseClass == 'Kaltura_Client_Drm_Type_DrmProfile' && $enumValue == Kaltura_Client_Drm_Enum_DrmProviderType::CENC)
             return new Kaltura_Client_Drm_Type_DrmProfile();
+        if($baseClass == 'kRuleAction' && $enumValue == DrmAccessControlActionType::DRM_POLICY)
+            return new kAccessControlDrmPolicyAction();
         if($baseClass == 'KalturaRuleAction' && $enumValue == DrmAccessControlActionType::DRM_POLICY)
             return new KalturaAccessControlDrmPolicyAction();
         return null;
@@ -131,6 +132,8 @@ class DrmPlugin extends KalturaPlugin implements IKalturaServices, IKalturaAdmin
             return "DrmProfile";
         if ($baseClass == 'Kaltura_Client_Drm_Type_DrmProfile' && $enumValue == Kaltura_Client_Drm_Enum_DrmProviderType::CENC)
             return 'Kaltura_Client_Drm_Type_DrmProfile';
+        if($baseClass == 'kRuleAction' && $enumValue == DrmAccessControlActionType::DRM_POLICY)
+            return 'kAccessControlDrmPolicyAction';
         if($baseClass == 'KalturaRuleAction' && $enumValue == DrmAccessControlActionType::DRM_POLICY)
             return 'KalturaAccessControlDrmPolicyAction';
         return null;
@@ -151,24 +154,8 @@ class DrmPlugin extends KalturaPlugin implements IKalturaServices, IKalturaAdmin
         $signingKey = $this->getSigningKey();
         KalturaLog::debug("Signing key is '$signingKey'");
 
-        $customData = new stdClass();
-        $customData->ca_system = self::SYSTEM_NAME;
-        $customData->user_token = kCurrentContext::$ks;
-        $customData->acount_id = kCurrentContext::$partner_id;
-        $customData->content_id = $entryId;
-        $customData->file_ids = "";
-        if (isset($result->flavorAssets))
-        {
-            $flavorIds = array();
-            $flavorAssets = $result->flavorAssets->toArray();
-            foreach ($flavorAssets as $flavor)
-            {
-                $flavorIds[] = $flavor->id;
-            }
-            $customData->file_ids = $flavorIds;
-        }
-        $customDataJson = json_encode($customData);
-        $signature = self::signDataWithKey($signingKey, $customDataJson);
+        $customDataJson = DrmLicenseUtils::createCustomData($entryId, $result->flavorAssets);
+        $signature = DrmLicenseUtils::signDataWithKey($signingKey, $customDataJson);
 
         $drmContextData = new KalturaDrmEntryContextPluginData();
         $drmContextData->jsonData = $customDataJson;
@@ -183,11 +170,6 @@ class DrmPlugin extends KalturaPlugin implements IKalturaServices, IKalturaAdmin
         $drmProfile->fromObject($dbProfile);
         $signingKey = $drmProfile->signingKey;
         return $signingKey;
-    }
-
-    public static function signDataWithKey($dataToSign, $signingKey)
-    {
-        return urlencode(base64_encode(sha1($signingKey.$dataToSign,TRUE)));
     }
 }
 

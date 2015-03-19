@@ -7,12 +7,12 @@
 interface IKalturaEntryContextDataContributor {
 
     /**
-     * Returns an object that is known only to the plugin, and extends the baseClass.
+     * Receives the context-data result and adds an instance of KalturaPluginData to the pluginData containing
+     * the specific plugins context-data.
      *
      * @param string $entryId
      * @param KalturaEntryContextDataParams $contextDataParams
      * @param KalturaEntryContextDataResult $result
-     * @return bool
      */
     public function contributeToEntryContextDataResult($entryId, KalturaEntryContextDataParams $contextDataParams, KalturaEntryContextDataResult $result);
 }
