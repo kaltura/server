@@ -3,6 +3,7 @@
 class KCEncOperationEngine extends KOperationEngine
 {
     const URL_EXTENSION = "widevine/encryption?signature=";
+    const SYSTEM_NAME = 'OVP';
 
     /**
 	 * @var array
@@ -78,8 +79,8 @@ class KCEncOperationEngine extends KOperationEngine
     private function getUDRMdata($licenseServerUrl, $signingKey)
     {
 
-        $jsonPostData = '{"ca_system":"'. DrmPlugin::SYSTEM_NAME .'", "account_id":"'.$this->job->partnerId.'", "content_id":"'. $this->job->entryId.'", "file_id":"'.$this->data->flavorParamsOutput->flavorParamsId.'"}';
-        $signature = DrmPlugin::signDataWithKey($jsonPostData, $signingKey);
+        $jsonPostData = '{"ca_system":"'. self::SYSTEM_NAME .'", "account_id":"'.$this->job->partnerId.'", "content_id":"'. $this->job->entryId.'", "file_id":"'.$this->data->flavorParamsOutput->flavorParamsId.'"}';
+        $signature = self::signDataWithKey($jsonPostData, $signingKey);
 
         $serviceURL = $licenseServerUrl. "" . self::URL_EXTENSION . "" .$signature;
         $ch = curl_init($serviceURL);
@@ -155,5 +156,9 @@ class KCEncOperationEngine extends KOperationEngine
         return strtoupper($hex);
     }
 
+    public static function signDataWithKey($dataToSign, $signingKey)
+    {
+        return urlencode(base64_encode(sha1($signingKey.$dataToSign,TRUE)));
+    }
 
 }
