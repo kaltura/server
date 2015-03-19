@@ -390,18 +390,42 @@ abstract class CuePoint extends BaseCuePoint implements IIndexable
 
 	public function copyToClipEntry( entry $clipEntry, $clipStartTime, $clipDuration )
 	{
-		$newCuePoint = $this->copyToEntry($clipEntry);
-		$newCuePoint->setStartTime( $newCuePoint->getStartTime() - $clipStartTime );
-		$newCuePoint->setEndTime( $newCuePoint->getEndTime() - $clipStartTime );
-		if ( $newCuePoint->getEndTime() > $clipDuration ) {
-			$newCuePoint->setEndTime( $clipDuration );
+		if ( $this->hasPermissionToCopyToEntry($clipEntry) ) {
+			$newCuePoint = $this->copyToEntry($clipEntry);
+			$newCuePoint->setStartTime( $newCuePoint->getStartTime() - $clipStartTime );
+			$newCuePoint->setEndTime( $newCuePoint->getEndTime() - $clipStartTime );
+			if ( $newCuePoint->getEndTime() > $clipDuration ) {
+				$newCuePoint->setEndTime( $clipDuration );
+			}
+			if ( $newCuePoint->getEndTime() >= $newCuePoint->getStartTime() ) {
+				$newCuePoint->save();
+			}
+			else {
+				KalturaLog::debug("Didn't copy cuePoint [{$this->getId()}] to clip because its startTime is out of clip bounds]");
+			}
+		} else {
+			KalturaLog::debug("Didn't copy cuePoint [{$this->getId()}] to clip because partner permissions are missing]");
 		}
-		if ( $newCuePoint->getEndTime() >= $newCuePoint->getStartTime() ) {
-			$newCuePoint->save();
-		}
-		else {
-			KalturaLog::log("Didn't copy cuePoint [{$this->getId()}] to clip because its startTime is out of clip bounds]");
+	}
+
+	/**
+	 * @param entry $entry
+	 * @return bool true if cuepoints should be copied to given entry
+	 */
+	public function hasPermissionToCopyToEntry( entry $entry )
+	{
+		if (!$entry->getIsTemporary()
+			&& PermissionPeer::isValidForPartner(CuePointPermissionName::COPY_CUE_POINTS_TO_CLIP, $entry->getPartnerId()))
+		{
+			return true;
 		}
 
+		if ($entry->getIsTemporary()
+			&& PermissionPeer::isValidForPartner(CuePointPermissionName::COPY_CUE_POINTS_TO_TRIMMED_ENTRY, $entry->getPartnerId()))
+		{
+			return true;
+		}
+
+		return false;
 	}
 } // CuePoint

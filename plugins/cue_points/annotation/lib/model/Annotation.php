@@ -41,4 +41,23 @@ class Annotation extends CuePoint implements IMetadataObject
 			
 		return $data;
 	}
+
+	/**
+	 * @param entry $entry
+	 * @return bool true if cuepoints should be copied to given entry
+	 */
+	public function hasPermissionToCopyToEntry( entry $entry )
+	{
+		if (!$entry->getIsTemporary()
+			&& PermissionPeer::isValidForPartner(AnnotationCuePointPermissionName::COPY_ANNOTATIONS_TO_CLIP, $entry->getPartnerId())) {
+			return true;
+		}
+
+		if ($entry->getIsTemporary()
+			&& PermissionPeer::isValidForPartner(AnnotationCuePointPermissionName::COPY_ANNOTATIONS_TO_TRIMMED_ENTRY, $entry->getPartnerId())) {
+			return true;
+		}
+
+		return false;
+	}
 }
