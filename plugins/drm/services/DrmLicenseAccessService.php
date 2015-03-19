@@ -25,7 +25,7 @@ class DrmLicenseAccessService extends KalturaBaseService
     {
         KalturaLog::debug("Starting");
         $response = new KalturaDrmLicenseAccessDetails();
-        $response->policy = "";
+        $response->policyName = "";
         $response->duration = 0;
         $response->absoluteExpiration = 0;
         $flavorIdsArr = explode(",",$flavorIds);
@@ -34,17 +34,17 @@ class DrmLicenseAccessService extends KalturaBaseService
         if (isset($entry))
         {
             $drmLU = new DrmLicenseUtils($entry, $referrer);
-            $policyId = $this->validateAccessControl($drmLU, $flavorIdsArr);
+            $policyId = $this->validateFlavorAssetssAllowed($drmLU, $flavorIdsArr);
             if (isset($policyId)) {
                 KalturaLog::debug("policy_id is '$policyId'");
 
                 $dbPolicy = DrmPolicyPeer::retrieveByPK($policyId);
                 if (isset($dbPolicy)) {
 
-                    $expirationDate = $drmLU->calculateExpirationDate($dbPolicy, $entry);
+                    $expirationDate = DrmLicenseUtils::calculateExpirationDate($dbPolicy, $entry);
 
-                    $response->policy = $dbPolicy->getName();
-                    $response->duration = $dbPolicy->getDuration();
+                    $response->policyName = $dbPolicy->getName();
+                    $response->duration = $expirationDate;
                     $response->absoluteExpiration = $expirationDate;
                     KalturaLog::debug("response is  '" . print_r($response, true) . "' ");
                 } else {
@@ -60,7 +60,7 @@ class DrmLicenseAccessService extends KalturaBaseService
 
     }
 
-    protected function validateAccessControl(DrmLicenseUtils $drmLU, $flavorIdsArr)
+    protected function validateFlavorAssetssAllowed(DrmLicenseUtils $drmLU, $flavorIdsArr)
     {
         try {
             $policyId = $drmLU->getPolicyId();

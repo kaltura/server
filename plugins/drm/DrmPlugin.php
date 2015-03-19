@@ -60,11 +60,14 @@ class DrmPlugin extends KalturaPlugin implements IKalturaServices, IKalturaAdmin
 	public static function getEnums($baseEnumName = null)
 	{	
 		if(is_null($baseEnumName))
-			return array('DrmPermissionName', 'DrmConversionEngineType');
+			return array('DrmPermissionName', 'DrmConversionEngineType', 'DrmAccessControlActionType');
 		if($baseEnumName == 'PermissionName')
 			return array('DrmPermissionName');
         if($baseEnumName == 'conversionEngineType')
             return array('DrmConversionEngineType');
+        if($baseEnumName == 'RuleActionType')
+            return array('DrmAccessControlActionType');
+
 
 		return array();
 	}
@@ -109,7 +112,8 @@ class DrmPlugin extends KalturaPlugin implements IKalturaServices, IKalturaAdmin
             return new KDLOperatorDrm($enumValue);
         if ($baseClass == 'Kaltura_Client_Drm_Type_DrmProfile' && $enumValue == Kaltura_Client_Drm_Enum_DrmProviderType::CENC)
             return new Kaltura_Client_Drm_Type_DrmProfile();
-
+        if($baseClass == 'KalturaRuleAction' && $enumValue == DrmAccessControlActionType::DRM_POLICY)
+            return new KalturaAccessControlDrmPolicyAction();
         return null;
     }
 
@@ -126,7 +130,10 @@ class DrmPlugin extends KalturaPlugin implements IKalturaServices, IKalturaAdmin
             return "KalturaDrmProfile";
         if($baseClass == 'DrmProfile' && $enumValue == KalturaDrmProviderType::CENC)
             return "DrmProfile";
-
+        if ($baseClass == 'Kaltura_Client_Drm_Type_DrmProfile' && $enumValue == Kaltura_Client_Drm_Enum_DrmProviderType::CENC)
+            return 'Kaltura_Client_Drm_Type_DrmProfile';
+        if($baseClass == 'KalturaRuleAction' && $enumValue == DrmAccessControlActionType::DRM_POLICY)
+            return 'KalturaAccessControlDrmPolicyAction';
         return null;
     }
 

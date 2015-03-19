@@ -58,7 +58,6 @@ enabledWorkers.KAsyncSyncCategoryPrivacyContext		= 1
 enabledWorkers.KAsyncTagIndex						= 1
 enabledWorkers.KAsyncIntegrate						= 1
 enabledWorkers.KAsyncIntegrateCloser				= 1
-enabledWorkers.KAsyncConvertCEnc                    = 1
 
 [mainTemplate : template]
 enabledWorkers.DirectoryCleanupShared				= 1

@@ -151,7 +151,7 @@ class PlayReadyDrmService extends KalturaBaseService
 		if(!$dbPolicy)
 			throw new KalturaAPIException(KalturaPlayReadyErrors::PLAYREADY_POLICY_OBJECT_NOT_FOUND, $policyId);
 			
-		list($beginDate, $expirationDate, $removalDate) = $drmLU->calculateLicenseDates($dbPolicy, $entry);
+		list($beginDate, $expirationDate, $removalDate) = $this->calculateLicenseDates($dbPolicy, $entry);
 
 		$policy = new KalturaPlayReadyPolicy();
 		$policy->fromObject($dbPolicy);
@@ -194,10 +194,6 @@ class PlayReadyDrmService extends KalturaBaseService
 			}
 		}
 	}
-
-    private function validateAccessControl(entry $entry, $referrer64base = null)
-    {
-    }
 
 	private function getLicenseRequestEntry($keyId, $entryId = null)
 	{
@@ -259,7 +255,42 @@ class PlayReadyDrmService extends KalturaBaseService
 		return $contentKey;
 	}
 
-	private function getEntryKeyId($entryId)
+    public function calculateLicenseDates(PlayReadyPolicy $policy, entry $entry)
+    {
+        $expirationDate = null;
+        $removalDate = null;
+
+        $expirationDate = DrmLicenseUtils::calculateExpirationDate($policy, $entry);
+
+        switch($policy->getLicenseRemovalPolicy())
+        {
+            case PlayReadyLicenseRemovalPolicy::FIXED_FROM_EXPIRATION:
+                $removalDate = $expirationDate + dateUtils::DAY*$policy->getLicenseRemovalDuration();
+                break;
+            case PlayReadyLicenseRemovalPolicy::ENTRY_SCHEDULING_END:
+                $removalDate = $entry->getEndDate();
+                break;
+        }
+
+        //override begin and expiration dates from ks if passed
+        if(kCurrentContext::$ks_object)
+        {
+            $privileges = kCurrentContext::$ks_object->getPrivileges();
+            $allParams = explode(',', $privileges);
+            foreach($allParams as $param)
+            {
+                $exParam = explode(':', $param);
+                if ($exParam[0] == self::PLAY_READY_BEGIN_DATE_PARAM)
+                    $beginDate = $exParam[1];
+                if ($exParam[0] == self::PLAY_READY_EXPIRATION_DATE_PARAM)
+                    $expirationDate = $exParam[1];
+            }
+        }
+
+        return array($beginDate, $expirationDate, $removalDate);
+    }
+
+    private function getEntryKeyId($entryId)
 	{
 		$drmKey = DrmKeyPeer::retrieveByUniqueKey($entryId, DrmKeyObjectType::ENTRY, PlayReadyPlugin::getPlayReadyProviderCoreValue());
 		if($drmKey)
