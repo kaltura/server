@@ -1,12 +1,12 @@
 <?php
 /**
- * @package plugins.playReady
+ * @package plugins.drm
  * @subpackage api.objects
  */
-class KalturaAccessControlPlayReadyPolicyAction extends KalturaRuleAction
+class KalturaAccessControlDrmPolicyAction extends KalturaRuleAction
 {
 	/**
-	 * Play ready policy id 
+	 * Drm policy id
 	 * 
 	 * @var int
 	 */
