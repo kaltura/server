@@ -2,13 +2,14 @@
 /**
  * @package plugins.drm
  */
-class DrmPlugin extends KalturaPlugin implements IKalturaServices, IKalturaAdminConsolePages, IKalturaPermissions, IKalturaEnumerator, IKalturaConfigurator, IKalturaObjectLoader
+class DrmPlugin extends KalturaPlugin implements IKalturaServices, IKalturaAdminConsolePages, IKalturaPermissions, IKalturaEnumerator, IKalturaConfigurator, IKalturaObjectLoader, IKalturaEntryContextDataContributor
 {
 	const PLUGIN_NAME = 'drm';
-	
-	/* (non-PHPdoc)
-	 * @see IKalturaPlugin::getPluginName()
-	 */
+    const SYSTEM_NAME = 'OVP';
+
+    /* (non-PHPdoc)
+     * @see IKalturaPlugin::getPluginName()
+     */
 	public static function getPluginName()
 	{
 		return self::PLUGIN_NAME;
@@ -106,11 +107,9 @@ class DrmPlugin extends KalturaPlugin implements IKalturaServices, IKalturaAdmin
             return new KCEncOperationEngine($constructorArgs['params'], $constructorArgs['outFilePath']);
         if($baseClass == 'KDLOperatorBase' && $enumValue == self::getApiValue(DrmConversionEngineType::CENC))
             return new KDLOperatorDrm($enumValue);
-/*        if($baseClass == 'KalturaDrmProfile' && $enumValue == KalturaDrmProviderType::CENC)
-            return new KalturaDrmProfile();
-        if($baseClass == 'DrmProfile' && $enumValue == KalturaDrmProviderType::CENC)
-            return new DrmProfile();
-*/
+        if ($baseClass == 'Kaltura_Client_Drm_Type_DrmProfile' && $enumValue == Kaltura_Client_Drm_Enum_DrmProviderType::CENC)
+            return new Kaltura_Client_Drm_Type_DrmProfile();
+
         return null;
     }
 
@@ -139,7 +138,51 @@ class DrmPlugin extends KalturaPlugin implements IKalturaServices, IKalturaAdmin
         return self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $value;
     }
 
+    public function contributeToEntryContextDataResult($entryId, KalturaEntryContextDataParams $contextDataParams, KalturaEntryContextDataResult $result)
+    {
+        KalturaLog::debug("Drm contributing to context data");
 
+        $signingKey = $this->getSigningKey();
+        KalturaLog::debug("Signing key is '$signingKey'");
+
+        $customData = new stdClass();
+        $customData->ca_system = self::SYSTEM_NAME;
+        $customData->user_token = kCurrentContext::$ks;
+        $customData->acount_id = kCurrentContext::$partner_id;
+        $customData->content_id = $entryId;
+        $customData->file_ids = "";
+        if (isset($result->flavorAssets))
+        {
+            $flavorIds = array();
+            $flavorAssets = $result->flavorAssets->toArray();
+            foreach ($flavorAssets as $flavor)
+            {
+                $flavorIds[] = $flavor->id;
+            }
+            $customData->file_ids = $flavorIds;
+        }
+        $customDataJson = json_encode($customData);
+        $signature = self::signDataWithKey($signingKey, $customDataJson);
+
+        $drmContextData = new KalturaDrmEntryContextPluginData();
+        $drmContextData->jsonData = $customDataJson;
+        $drmContextData->signature = $signature;
+        $result->pluginData[] = $drmContextData;
+    }
+
+    private function getSigningKey()
+    {
+        $drmProfile = KalturaDrmProfile::getInstanceByType(KalturaDrmProviderType::CENC);
+        $dbProfile = DrmProfilePeer::retrieveByProvider(KalturaDrmProviderType::CENC);
+        $drmProfile->fromObject($dbProfile);
+        $signingKey = $drmProfile->signingKey;
+        return $signingKey;
+    }
+
+    public static function signDataWithKey($dataToSign, $signingKey)
+    {
+        return urlencode(base64_encode(sha1($signingKey.$dataToSign,TRUE)));
+    }
 }
 
 
