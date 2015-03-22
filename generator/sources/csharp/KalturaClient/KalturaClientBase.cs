@@ -405,11 +405,46 @@ namespace Kaltura
             string boundary = "---------------------------" + DateTime.Now.Ticks.ToString("x");
             request.ContentType = "multipart/form-data; boundary=" + boundary;
 
-            // use a memory stream because we don't know the content length of the request when we have multiple files
-            MemoryStream memStream = new MemoryStream();
-            byte[] buffer;
-            int bytesRead = 0;
+            byte[] paramsBuffer = BuildMultiPartParamsBuffer(kparams, boundary);
 
+            SortedList<string, MultiPartFileDescriptor> filesDescriptions = new SortedList<string, MultiPartFileDescriptor>();
+            foreach (KeyValuePair<string, FileStream> file in kfiles)
+                filesDescriptions.Add(file.Key, BuildMultiPartFileDescriptor(file, boundary));
+
+            // Set content's length
+            request.ContentLength = paramsBuffer.LongLength;
+            foreach (KeyValuePair<string, MultiPartFileDescriptor> fileDesc in filesDescriptions)
+                request.ContentLength += fileDesc.Value.GetTotalLength();
+
+            // And let's upload
+            request.AllowWriteStreamBuffering = false; // A more sensible approach may be relevant
+            Stream requestStream = request.GetRequestStream();
+            requestStream.Write(paramsBuffer, 0, paramsBuffer.Length);
+            foreach (KeyValuePair<string, MultiPartFileDescriptor> fileDesc in filesDescriptions)
+            {
+                requestStream.Write(fileDesc.Value._Header, 0, fileDesc.Value._Header.Length);
+
+                byte[] buffer = new Byte[checked(Math.Min((uint)4096, fileDesc.Value._Stream.Length))];
+                int bytesRead = 0;
+                while ((bytesRead = fileDesc.Value._Stream.Read(buffer, 0, buffer.Length)) != 0)
+                    requestStream.Write(buffer, 0, bytesRead);
+
+                requestStream.Write(fileDesc.Value._Footer, 0, fileDesc.Value._Footer.Length);
+            }
+
+            requestStream.Close();
+        }
+
+        /// <summary>
+        /// Compiles the parameters required for PostMultiPartWithFiles(...) into a byte buffer ready to be streamed.
+        /// </summary>
+        /// <param name="kparams">The request's parameters.</param>
+        /// <param name="boundary">The multipart's boundary.</param>
+        /// <returns>
+        /// The parameters' byte array ready to be streamed.
+        /// </returns>
+        private byte[] BuildMultiPartParamsBuffer(KalturaParams kparams, string boundary)
+        {
             StringBuilder sb = new StringBuilder();
             sb.Append("--" + boundary + "\r\n");
             foreach (KeyValuePair<string, string> param in kparams)
@@ -420,43 +455,33 @@ namespace Kaltura
                 sb.Append("\r\n--" + boundary + "\r\n");
             }
 
-            buffer = Encoding.UTF8.GetBytes(sb.ToString());
-            memStream.Write(buffer, 0, buffer.Length);
+            return Encoding.UTF8.GetBytes(sb.ToString()); 
+        }
 
-            foreach (KeyValuePair<string, FileStream> file in kfiles)
-            {
-                sb = new StringBuilder();
-                FileStream fileStream = file.Value;
-                sb.Append("Content-Disposition: form-data; name=\"" + file.Key + "\"; filename=\"" + Path.GetFileName(fileStream.Name) + "\"" + "\r\n");
-                sb.Append("Content-Type: application/octet-stream" + "\r\n");
-                sb.Append("\r\n");
+        /// <summary>
+        /// Pre-compiles the multipart data required for a given file.
+        /// </summary>
+        /// <param name="fileEntry">The provided file infos.</param>
+        /// <param name="boundary">The multipart's boundary.</param>
+        /// <returns>
+        /// A description containing the file's stream and the part's header and footer.
+        /// </returns>
+        private MultiPartFileDescriptor BuildMultiPartFileDescriptor(KeyValuePair<string, FileStream> fileEntry, string boundary)
+        {
+            MultiPartFileDescriptor result = new MultiPartFileDescriptor();
+            result._Stream = fileEntry.Value;
 
-                // write the current string builder content
-                buffer = Encoding.UTF8.GetBytes(sb.ToString());
-                memStream.Write(buffer, 0, buffer.Length);
+            // Build header
+            StringBuilder sb = new StringBuilder();
+            FileStream fileStream = fileEntry.Value;
+            sb.Append("Content-Disposition: form-data; name=\"" + fileEntry.Key + "\"; filename=\"" + Path.GetFileName(fileStream.Name) + "\"" + "\r\n");
+            sb.Append("Content-Type: application/octet-stream" + "\r\n");
+            sb.Append("\r\n");
+            result._Header = Encoding.UTF8.GetBytes(sb.ToString());
 
-                // write the file content
-                buffer = new Byte[checked((uint)Math.Min(4096, (int)fileStream.Length))];
-                bytesRead = 0;
-                while ((bytesRead = fileStream.Read(buffer, 0, buffer.Length)) != 0)
-                    memStream.Write(buffer, 0, bytesRead);
+            result._Footer = Encoding.UTF8.GetBytes("\r\n--" + boundary + "\r\n");
 
-                buffer = Encoding.UTF8.GetBytes("\r\n--" + boundary + "\r\n");
-                memStream.Write(buffer, 0, buffer.Length);
-            }
-
-            request.ContentLength = memStream.Length;
-
-            Stream requestStream = request.GetRequestStream();
-            // write the memorty stream to the request stream
-            memStream.Seek(0, SeekOrigin.Begin);
-            buffer = new Byte[checked((uint)Math.Min(4096, (int)memStream.Length))];
-            bytesRead = 0;
-            while ((bytesRead = memStream.Read(buffer, 0, buffer.Length)) != 0)
-                requestStream.Write(buffer, 0, bytesRead);
-
-            requestStream.Close();
-            memStream.Close();
+            return result;
         }
 
         private void PostUrlEncodedParams(HttpWebRequest request, KalturaParams kparams)
@@ -482,6 +507,22 @@ namespace Kaltura
             byte[] toEncodeAsBytes = System.Text.ASCIIEncoding.ASCII.GetBytes(toEncode);
             string returnValue = System.Convert.ToBase64String(toEncodeAsBytes);
             return returnValue;
+        }
+
+        #endregion
+
+        #region Support Types
+
+        private struct MultiPartFileDescriptor
+        {
+            public FileStream _Stream;
+            public byte[] _Header;
+            public byte[] _Footer;
+
+            public long GetTotalLength()
+            {
+                return _Stream.Length + _Header.LongLength + _Footer.LongLength;
+            }
         }
 
         #endregion
