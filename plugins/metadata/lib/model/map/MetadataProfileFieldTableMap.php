@@ -48,6 +48,8 @@ class MetadataProfileFieldTableMap extends TableMap {
 		$this->addColumn('TYPE', 'Type', 'VARCHAR', false, 127, null);
 		$this->addColumn('XPATH', 'Xpath', 'VARCHAR', false, 255, null);
 		$this->addColumn('STATUS', 'Status', 'TINYINT', false, null, null);
+		$this->addColumn('RELATED_METADATA_PROFILE_ID', 'RelatedMetadataProfileId', 'INTEGER', false, null, null);
+		$this->addColumn('CUSTOM_DATA', 'CustomData', 'LONGVARCHAR', false, null, null);
 		// validators
 	} // initialize()
 

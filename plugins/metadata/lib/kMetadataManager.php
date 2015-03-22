@@ -149,6 +149,7 @@ class kMetadataManager
 		// check all existing fields
 		foreach($profileFields as $profileField)
 		{
+			/** @var MetadataProfileField $profileField*/
 			$xPath = $profileField->getXpath();
 			
 			// field removed
@@ -169,9 +170,9 @@ class kMetadataManager
 				$profileField->setLabel($xPathData['label']);
 			if(isset($xPathData['type']))
 				$profileField->setType($xPathData['type']);
-			
-			
-				
+
+			self::setAdditionalProfileFieldData($metadataProfile, $profileField, $xPathData);
+
 			$profileField->save();
 			
 			unset($xPaths[$xPath]);
@@ -195,6 +196,7 @@ class kMetadataManager
 			if(isset($xPathData['type']))
 			{
 				$profileField->setType($xPathData['type']);
+				self::setAdditionalProfileFieldData($metadataProfile, $profileField, $xPathData);
 				$profileField->save();
 			}
 		}
@@ -242,6 +244,17 @@ class kMetadataManager
 			$profileField->save();
 		}
 	}
+
+	public static function setAdditionalProfileFieldData(MetadataProfile $metadataProfile, MetadataProfileField $profileField, $xPathData)
+	{
+		if($profileField->getType() === MetadataSearchFilter::KMC_FIELD_TYPE_METADATA_OBJECT &&
+			isset($xPathData['metadataProfileId']))
+		{
+			if ($xPathData['metadataProfileId'] == $metadataProfile->getId())
+				throw new kCoreException('Self metadata reference is not allowed');
+			$profileField->setRelatedMetadataProfileId($xPathData['metadataProfileId']);
+		}
+	}
 	
 	/**
 	 * Return search texts per object id
@@ -255,7 +268,7 @@ class kMetadataManager
 	{
 		$metadatas = MetadataPeer::retrieveAllByObject($objectType, $objectId);
 		KalturaLog::debug("Found " . count($metadatas) . " metadata object");
-		
+
 		return self::getMetadataValuesByMetadataObjects($metadatas);
 	}
 
@@ -335,7 +348,8 @@ class kMetadataManager
 			if(!count($searchItemValues))
 				continue;
 
-			if($profileField->getType() == MetadataSearchFilter::KMC_FIELD_TYPE_TEXT)
+			if($profileField->getType() == MetadataSearchFilter::KMC_FIELD_TYPE_TEXT ||
+				$profileField->getType() == MetadataSearchFilter::KMC_FIELD_TYPE_METADATA_OBJECT)
 			{
 				$textItems[] = implode(' ', $searchItemValues);
 
@@ -347,7 +361,30 @@ class kMetadataManager
 						
 					$searchItems[$profileField->getId()][] = $searchItemValue;
 				}
-				
+
+				if ($profileField->getType() == MetadataSearchFilter::KMC_FIELD_TYPE_METADATA_OBJECT &&
+					$profileField->getRelatedMetadataProfileId())
+				{
+					$subMetadataProfileId = $profileField->getRelatedMetadataProfileId();
+					$subMetadataProfile = MetadataProfilePeer::retrieveByPK($subMetadataProfileId );
+					if (!$subMetadataProfile)
+					{
+						KalturaLog::err('Sub metadata profile '.$subMetadataProfileId .' was not found');
+						continue;
+					}
+					foreach($searchItemValues as $subObjectId)
+					{
+						$metadata = MetadataPeer::retrieveByObject($subMetadataProfileId, $subMetadataProfile->getObjectType(), $subObjectId);
+						if ($metadata)
+						{
+							KalturaLog::debug("Found metadata object for profile $subMetadataProfileId, extracting search data");
+							$subSearchTextsResult = self::getDataSearchValues($metadata);
+							$subSearchTexts = $subSearchTextsResult[MetadataPlugin::getSphinxFieldName(MetadataPlugin::SPHINX_EXPANDER_FIELD_DATA)];
+							foreach($subSearchTexts as $subSearchText)
+								$searchTexts[] = $subSearchText;
+						}
+					}
+				}
 			}
 			else
 			{
@@ -469,6 +506,12 @@ class kMetadataManager
 		$xml->loadXML($metadata);
 		if($xml->schemaValidateSource($xsdData))
 		{
+			if (!self::validateSubMetadataObjects($metadataProfileId, $xml))
+			{
+				$errorMessage = "Metadata has invalid sub metadata object";
+				KalturaLog::err($errorMessage);
+				return false;
+			}
 			KalturaLog::debug("Metadata is valid");
 			return true;
 		}
@@ -476,6 +519,38 @@ class kMetadataManager
 		$errorMessage = kXml::getLibXmlErrorDescription($metadata);
 		KalturaLog::err("Metadata is invalid:\n$errorMessage");
 		return false;
+	}
+
+	protected static function validateSubMetadataObjects($metadataProfileId, KDOMDocument $xml)
+	{
+		$profileFields = MetadataProfileFieldPeer::retrieveByMetadataProfileId($metadataProfileId);
+		$xPath = new DOMXPath($xml);
+		foreach ($profileFields as $profileField)
+		{
+			/** @var MetadataProfileField $profileField */
+			if ($profileField->getType() == MetadataSearchFilter::KMC_FIELD_TYPE_METADATA_OBJECT)
+			{
+				$nodes = $xPath->query($profileField->getXpath());
+				foreach ($nodes as $node)
+				{
+					$objectId = $node->nodeValue;
+					$subMetadataProfileId = $profileField->getRelatedMetadataProfileId();
+					$subMetadataProfile = MetadataProfilePeer::retrieveByPK($subMetadataProfileId);
+					if (!$subMetadataProfile)
+					{
+						KalturaLog::err('Sub metadata profile '.$subMetadataProfileId.' was not found');
+						return false;
+					}
+					$metadata = MetadataPeer::retrieveByObject($subMetadataProfileId, $subMetadataProfile->getObjectType(), $objectId);
+					if (!$metadata)
+					{
+						KalturaLog::err('Sub metadata object id '.$objectId.' for profile '.$subMetadataProfileId.' was not found');
+						return false;
+					}
+				}
+			}
+		}
+		return true;
 	}
 	
 	/**

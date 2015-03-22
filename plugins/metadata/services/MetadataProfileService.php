@@ -289,7 +289,21 @@ class MetadataProfileService extends KalturaBaseService
 		
 		if(!$dbMetadataProfile)
 			throw new KalturaAPIException(MetadataErrors::METADATA_PROFILE_NOT_FOUND, $id);
-		
+
+		// if this profile is a dynamic object, check for references in other profiles
+		if ($dbMetadataProfile->getObjectType() == MetadataObjectType::DYNAMIC_OBJECT)
+		{
+			$referencedFields = MetadataProfileFieldPeer::retrieveByPartnerAndRelatedMetadataProfileId(
+				kCurrentContext::getCurrentPartnerId(),
+				$dbMetadataProfile->getId());
+			if (count($referencedFields))
+			{
+				/** @var MetadataProfileField $referencedField */
+				$referencedField = $referencedFields[0];
+				throw new KalturaAPIException(MetadataErrors::METADATA_PROFILE_REFERENCE_EXISTS, $referencedField->getMetadataProfileId(), $referencedField->getKey());
+			}
+		}
+
 		$dbMetadataProfile->setStatus(KalturaMetadataProfileStatus::DEPRECATED);
 		$dbMetadataProfile->save();
 		

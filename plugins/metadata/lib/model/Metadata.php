@@ -41,7 +41,8 @@ class Metadata extends BaseMetadata implements IIndexable, ISyncableFile
 	{
 		if ($this->alreadyInSave)
 			return parent::postUpdate($con);
-		
+
+		$objectUpdated = $this->isModified();
 		$objectDeleted = false;
 		if($this->isColumnModified(MetadataPeer::STATUS) && $this->getStatus() == self::STATUS_DELETED)
 			$objectDeleted = true;
@@ -50,6 +51,9 @@ class Metadata extends BaseMetadata implements IIndexable, ISyncableFile
 		
 		if($objectDeleted)
 			kEventsManager::raiseEvent(new kObjectDeletedEvent($this));
+
+		if($objectUpdated)
+			kEventsManager::raiseEvent(new kObjectUpdatedEvent($this));
 			
 		return $ret;
 	}

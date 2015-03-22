@@ -459,7 +459,31 @@ class MetadataService extends KalturaBaseService
 		$dbMetadata->save();
 	}
 
-	
+	/**
+	 * Index metadata by id, will also index the related object
+	 *
+	 * @action index
+	 * @param string $id
+	 * @param bool $shouldUpdate
+	 * @return int
+	 */
+	function indexAction($id, $shouldUpdate)
+	{
+		if(kEntitlementUtils::getEntitlementEnforcement())
+			throw new KalturaAPIException(KalturaErrors::CANNOT_INDEX_OBJECT_WHEN_ENTITLEMENT_IS_ENABLE);
+
+		$dbMetadata = MetadataPeer::retrieveByPK($id);
+		if(!$dbMetadata)
+			throw new KalturaAPIException(MetadataErrors::METADATA_NOT_FOUND, $id);
+
+		$dbMetadata->indexToSearchIndex();
+		$relatedObject = kMetadataManager::getObjectFromPeer($dbMetadata);
+		if($relatedObject && $relatedObject instanceof IIndexable)
+			$relatedObject->indexToSearchIndex();
+
+		return $dbMetadata->getId();
+
+	}
 
 	/**
 	 * Serves metadata XML file

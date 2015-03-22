@@ -78,7 +78,7 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 		$partner = PartnerPeer::retrieveByPK($partnerId);
 		if(!$partner)
 			return false;
-			
+
 		return $partner->getPluginEnabled(self::PLUGIN_NAME);
 	}
 	
@@ -88,7 +88,7 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 	public static function getEnums($baseEnumName = null)
 	{
 		if(is_null($baseEnumName))
-			return array('MetadataConditionType', 'MetadataBatchJobObjectType', 'MetadataObjectFeatureType');
+			return array('MetadataConditionType', 'MetadataBatchJobObjectType', 'MetadataObjectFeatureType', 'MetadataIndexObjectType');
 	
 		if($baseEnumName == 'ConditionType')
 			return array('MetadataConditionType');
@@ -98,6 +98,9 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 		
 		if ($baseEnumName == 'ObjectFeatureType')
 			return array ('MetadataObjectFeatureType');
+
+		if ($baseEnumName == 'IndexObjectType')
+			return array('MetadataIndexObjectType');
 		
 		return array();
 	}
@@ -216,6 +219,18 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 				
 			if($enumValue == MetadataPlugin::getConditionTypeCoreValue(MetadataConditionType::METADATA_FIELD_CHANGED))
 				return new KalturaMetadataFieldChangedCondition();
+		}
+
+		if ($baseClass == 'KalturaFilter')
+		{
+			if ($enumValue == 'MetadataFilter')
+				return new KalturaMetadataFilter();
+		}
+
+		if($baseClass == 'KIndexingEngine')
+		{
+			if ($enumValue == KalturaIndexObjectType::METADATA)
+				return new KIndexingMetadataEngine();
 		}
 		
 		return null;

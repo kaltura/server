@@ -33,6 +33,24 @@ class KalturaIndexJobData extends KalturaJobData
 	{
 		return array_merge ( parent::getMapBetweenObjects() , self::$map_between_objects );
 	}
+
+	/**
+	 * @param string $subType is the provider type
+	 * @return int
+	 */
+	public function toSubType($subType)
+	{
+		return kPluginableEnumsManager::apiToCore('IndexObjectType', $subType);
+	}
+
+	/**
+	 * @param int $subType
+	 * @return string
+	 */
+	public function fromSubType($subType)
+	{
+		return kPluginableEnumsManager::coreToApi('IndexObjectType', $subType);
+	}
 	
 	public function toObject($dbData = null, $props_to_skip = array()) 
 	{
