@@ -25,7 +25,6 @@ function toArrayRecursive(KalturaPropertyInfo $propInfo)
 	return $propInfo->toArray(true);
 }
 
-$subClasses = array();
 try
 {
 	KalturaTypeReflector::setClassInheritMapPath(KAutoloader::buildPath(kConf::get("cache_root_path"), "api_v3", "KalturaClassInheritMap.cache"));
@@ -52,20 +51,26 @@ try
 	$subClassesNames = KalturaTypeReflector::getSubClasses($type);
 	KalturaLog::info( "subClassesNames [" . print_r($subClassesNames, true) . "]");
 
+	echo '[';
+	$first = true;
 	foreach($subClassesNames as $subClassName)
 	{
 		$subClass = new KalturaPropertyInfo($subClassName);
-		$subClasses[] = $subClass->toArray();
+		if (!$first)
+		{
+			echo ',';
+		}
+		$first = false;
+
+		echo json_encode($subClass->toArray());
 	}
+	echo ']';
 }
 catch ( Exception $ex )
 {
 	KalturaLog::err ( "<------- api_v3 testme [$type]\n" . 
 		 $ex->__toString() .  " " ." -------");
 }
-//echo "<pre>";
-//echo print_r($actionInfo);
-echo json_encode($subClasses);
 $bench_end = microtime(true);
 KalturaLog::info ( "<------- api_v3 testme type [$type][" . ($bench_end - $bench_start) . "] -------");
 
