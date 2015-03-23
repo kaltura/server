@@ -14,12 +14,20 @@ class KalturaConversionProfileAssetParamsFilter extends KalturaConversionProfile
 	 * @var KalturaAssetParamsFilter
 	 */
 	public $assetParamsIdFilter;
+
+	/* (non-PHPdoc)
+	 * @see KalturaFilter::getCoreFilter()
+	 */
+	protected function getCoreFilter()
+	{
+		return new assetParamsConversionProfileFilter();
+	}
 	
+	/* (non-PHPdoc)
+	 * @see KalturaFilter::toObject()
+	 */
 	public function toObject($object_to_fill = null, $props_to_skip = array())
 	{
-		if(!$object_to_fill)
-			$object_to_fill = new assetParamsConversionProfileFilter();
-			
 		$conversionProfileCriteria = new Criteria();
 		
 		if($this->conversionProfileIdEqual)
@@ -62,5 +70,27 @@ class KalturaConversionProfileAssetParamsFilter extends KalturaConversionProfile
 			$this->assetParamsIdIn = -1; // none existing flavor
 		
 		return parent::toObject($object_to_fill, $props_to_skip);
+	}
+
+	/* (non-PHPdoc)
+	 * @see KalturaRelatedFilter::getListResponse()
+	 */
+	public function getListResponse(KalturaFilterPager $pager, KalturaDetachedResponseProfile $responseProfile = null)
+	{
+		$assetParamsConversionProfileFilter = $this->toObject();
+
+		$c = new Criteria();
+		$assetParamsConversionProfileFilter->attachToCriteria($c);
+		
+		$totalCount = flavorParamsConversionProfilePeer::doCount($c);
+		
+		$pager->attachToCriteria($c);
+		$dbList = flavorParamsConversionProfilePeer::doSelect($c);
+		
+		$list = KalturaConversionProfileAssetParamsArray::fromDbArray($dbList, $responseProfile);
+		$response = new KalturaConversionProfileAssetParamsListResponse();
+		$response->objects = $list;
+		$response->totalCount = $totalCount;
+		return $response; 
 	}
 }

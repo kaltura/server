@@ -134,39 +134,42 @@ class KalturaBulkUploadJobData extends KalturaJobData
 	/* (non-PHPdoc)
 	 * @see KalturaObject::fromObject()
 	 */
-	public function fromObject($source_object)
+	public function doFromObject($source_object, KalturaDetachedResponseProfile $responseProfile = null)
 	{
-	    parent::fromObject($source_object);
-	    
+		parent::doFromObject($source_object, $responseProfile);
+		
 	    /* @var $source_object kBulkUploadJobData */
-	    $this->objectData = null;
-	    switch (get_class($source_object->getObjectData()))
-	    {
-	        case 'kBulkUploadEntryData':
-	            $this->objectData = new KalturaBulkUploadEntryData();
-	            break;
-	        case 'kBulkUploadCategoryData':
-	            $this->objectData = new KalturaBulkUploadCategoryData();
-	            break;
-	        case 'kBulkUploadCategoryUserData':
-	            $this->objectData = new KalturaBulkUploadCategoryUserData();
-	            break;
-	        case 'kBulkUploadUserData':
-	            $this->objectData = new KalturaBulkUploadUserData();
-	            break;
-	        case 'kBulkUploadCategoryEntryData':
-	            $this->objectData = new KalturaBulkUploadCategoryEntryData();
-	            break;
-	        default:
-	            break;
-	    }
 	    
-	    if ($this->objectData)
+	    if($this->shouldGet('objectData', $responseProfile))
 	    {
-	        KalturaLog::debug("Object data class was found: ". get_class($this->objectData));
-	        $this->objectData->fromObject($source_object->getObjectData());
+		    $this->objectData = null;
+		    switch (get_class($source_object->getObjectData()))
+		    {
+		        case 'kBulkUploadEntryData':
+		            $this->objectData = new KalturaBulkUploadEntryData();
+		            break;
+		        case 'kBulkUploadCategoryData':
+		            $this->objectData = new KalturaBulkUploadCategoryData();
+		            break;
+		        case 'kBulkUploadCategoryUserData':
+		            $this->objectData = new KalturaBulkUploadCategoryUserData();
+		            break;
+		        case 'kBulkUploadUserData':
+		            $this->objectData = new KalturaBulkUploadUserData();
+		            break;
+		        case 'kBulkUploadCategoryEntryData':
+		            $this->objectData = new KalturaBulkUploadCategoryEntryData();
+		            break;
+		        default:
+		            break;
+		    }
+		    
+		    if ($this->objectData)
+		    {
+		        KalturaLog::debug("Object data class was found: ". get_class($this->objectData));
+		        $this->objectData->fromObject($source_object->getObjectData());
+		    }
 	    }
-	        
 	        
 	}
 

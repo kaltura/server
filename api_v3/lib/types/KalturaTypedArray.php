@@ -5,7 +5,7 @@
  */
 abstract class KalturaTypedArray extends KalturaObject implements ArrayAccess, Iterator, Countable
 {
-	private $array = array();
+	protected $array = array();
 	private $class = "";
 	
 	/**
@@ -28,13 +28,20 @@ abstract class KalturaTypedArray extends KalturaObject implements ArrayAccess, I
 		return $this->array[$offset];
 	}
 
-	public function offsetSet($offset, $value) 
+	protected function validateType($value) 
 	{
 		if (!is_object($value) && is_subclass_of($value, $this->class))
 			throw new Exception("'".get_class($value)."' is not an instance of '".$this->class."'");
+	}
+
+	public function offsetSet($offset, $value) 
+	{
+		$this->validateType($value);
 		
 		if ($offset === null)
+		{
 			$this->array[] = $value;
+		}
 			
 		$this->count = count ( $this->array );
 	}
@@ -42,7 +49,7 @@ abstract class KalturaTypedArray extends KalturaObject implements ArrayAccess, I
 	
 	public function offsetUnset($offset) 
 	{
-		
+		unset($this->array[$offset]);
 	}
 	
 	public function current() 
@@ -88,8 +95,20 @@ abstract class KalturaTypedArray extends KalturaObject implements ArrayAccess, I
 	public function toObjectsArray()
 	{
 		$array = array();
-		foreach($this->array as $obj)
-			$array[] = $obj->toObject();
+		foreach($this->array as $key => $obj)
+			$array[$key] = $obj->toObject();
 		return $array;
+	}
+	
+	/* (non-PHPdoc)
+	 * @see KalturaObject::loadRelatedObjects($responseProfile)
+	 */
+	public function loadRelatedObjects(KalturaDetachedResponseProfile $responseProfile)
+	{
+		foreach($this as &$item)
+		{
+			/* @var $item KalturaObject */
+			$item->loadRelatedObjects($responseProfile);
+		}
 	}
 }

@@ -76,17 +76,20 @@ class KalturaCaptionAsset extends KalturaAsset
 		return array_merge ( parent::getMapBetweenObjects() , self::$map_between_objects );
 	}
 	
-	public function fromObject($source_object)
+	public function doFromObject($source_object, KalturaDetachedResponseProfile $responseProfile = null)
 	{
-		$ret = parent::fromObject($source_object);
+		$ret = parent::doFromObject($source_object, $responseProfile);
 				
-		$languageReflector = KalturaTypeReflectorCacher::get('KalturaLanguage');
-		$languageCodeReflector = KalturaTypeReflectorCacher::get('KalturaLanguageCode');
-		if($languageReflector && $languageCodeReflector)
+		if($this->shouldGet('languageCode', $responseProfile))
 		{
-			$languageCode = $languageReflector->getConstantName($this->language);
-			if($languageCode)
-				$this->languageCode = $languageCodeReflector->getConstantValue($languageCode);
+			$languageReflector = KalturaTypeReflectorCacher::get('KalturaLanguage');
+			$languageCodeReflector = KalturaTypeReflectorCacher::get('KalturaLanguageCode');
+			if($languageReflector && $languageCodeReflector)
+			{
+				$languageCode = $languageReflector->getConstantName($this->language);
+				if($languageCode)
+					$this->languageCode = $languageCodeReflector->getConstantValue($languageCode);
+			}
 		}
 			
 		return $ret;

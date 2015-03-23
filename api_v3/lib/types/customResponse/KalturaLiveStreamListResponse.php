@@ -3,17 +3,11 @@
  * @package api
  * @subpackage objects
  */
-class KalturaLiveStreamListResponse extends KalturaObject
+class KalturaLiveStreamListResponse extends KalturaListResponse
 {
 	/**
 	 * @var KalturaLiveStreamEntryArray
 	 * @readonly
 	 */
 	public $objects;
-
-	/**
-	 * @var int
-	 * @readonly
-	 */
-	public $totalCount;
 }

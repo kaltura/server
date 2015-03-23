@@ -3,17 +3,11 @@
  * @package plugins.attachment
  * @subpackage api.objects
  */
-class KalturaAttachmentAssetListResponse extends KalturaObject
+class KalturaAttachmentAssetListResponse extends KalturaListResponse
 {
 	/**
 	 * @var KalturaAttachmentAssetArray
 	 * @readonly
 	 */
 	public $objects;
-
-	/**
-	 * @var int
-	 * @readonly
-	 */
-	public $totalCount;
 }

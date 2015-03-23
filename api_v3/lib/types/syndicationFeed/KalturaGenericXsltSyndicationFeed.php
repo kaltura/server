@@ -30,18 +30,24 @@ class KalturaGenericXsltSyndicationFeed extends KalturaGenericSyndicationFeed
 		$this->type = KalturaSyndicationFeedType::KALTURA_XSLT;
 	}
 	
-	public function fromObject($source_object)
+	public function doFromObject($source_object, KalturaDetachedResponseProfile $responseProfile = null)
 	{
-		parent::fromObject($source_object);
+		parent::doFromObject($source_object, $responseProfile);
 
-		$key = $source_object->getSyncKey(genericSyndicationFeed::FILE_SYNC_SYNDICATION_FEED_XSLT);
-		$this->xslt = kFileSyncUtils::file_get_contents($key, true, false);
-
-		$mrssParams = $source_object->getMrssParameters();
-		$this->itemXpathsToExtend = new KalturaExtendingItemMrssParameterArray();
-		if ($mrssParams && $mrssParams->getItemXpathsToExtend())
+		if($this->shouldGet('xslt', $responseProfile))
 		{
-			$this->itemXpathsToExtend = KalturaExtendingItemMrssParameterArray::fromDbArray($mrssParams->getItemXpathsToExtend());
+			$key = $source_object->getSyncKey(genericSyndicationFeed::FILE_SYNC_SYNDICATION_FEED_XSLT);
+			$this->xslt = kFileSyncUtils::file_get_contents($key, true, false);
+		}
+
+		if($this->shouldGet('itemXpathsToExtend', $responseProfile))
+		{
+			$mrssParams = $source_object->getMrssParameters();
+			$this->itemXpathsToExtend = new KalturaExtendingItemMrssParameterArray();
+			if ($mrssParams && $mrssParams->getItemXpathsToExtend())
+			{
+				$this->itemXpathsToExtend = KalturaExtendingItemMrssParameterArray::fromDbArray($mrssParams->getItemXpathsToExtend());
+			}
 		}
 	}
 	

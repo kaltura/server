@@ -27,7 +27,7 @@ class AccessControlProfileService extends KalturaBaseService
 		$dbAccessControl->save();
 		
 		$accessControlProfile = new KalturaAccessControlProfile();
-		$accessControlProfile->fromObject($dbAccessControl);
+		$accessControlProfile->fromObject($dbAccessControl, $this->getResponseProfile());
 		return $accessControlProfile;
 	}
 	
@@ -47,7 +47,7 @@ class AccessControlProfileService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::ACCESS_CONTROL_ID_NOT_FOUND, $id);
 			
 		$accessControlProfile = new KalturaAccessControlProfile();
-		$accessControlProfile->fromObject($dbAccessControl);
+		$accessControlProfile->fromObject($dbAccessControl, $this->getResponseProfile());
 		return $accessControlProfile;
 	}
 	
@@ -71,7 +71,7 @@ class AccessControlProfileService extends KalturaBaseService
 		$dbAccessControl->save();
 		
 		$accessControlProfile = new KalturaAccessControlProfile();
-		$accessControlProfile->fromObject($dbAccessControl);
+		$accessControlProfile->fromObject($dbAccessControl, $this->getResponseProfile());
 		return $accessControlProfile;
 	}
 	
@@ -125,25 +125,10 @@ class AccessControlProfileService extends KalturaBaseService
 	{
 		if (!$filter)
 			$filter = new KalturaAccessControlProfileFilter();
-
-		if (!$pager)
+			
+		if(!$pager)
 			$pager = new KalturaFilterPager();
 			
-		$accessControlFilter = new accessControlFilter();
-		$filter->toObject($accessControlFilter);
-
-		$c = new Criteria();
-		$accessControlFilter->attachToCriteria($c);
-		
-		$totalCount = accessControlPeer::doCount($c);
-		
-		$pager->attachToCriteria($c);
-		$dbList = accessControlPeer::doSelect($c);
-		
-		$list = KalturaAccessControlProfileArray::fromDbArray($dbList);
-		$response = new KalturaAccessControlProfileListResponse();
-		$response->objects = $list;
-		$response->totalCount = $totalCount;
-		return $response;    
+		return $filter->getListResponse($pager, $this->getResponseProfile());
 	}
 }

@@ -24,15 +24,21 @@ class KalturaLiveStreamBitrate extends KalturaObject
 	 * @var string
 	 */
 	public $tags;
-	
 
-	public function fromObject ( $source_object )
+	private static $map_between_objects = array
+	(
+		'bitrate',
+		'width',
+		'height',
+		'tags',
+	);
+	
+	/* (non-PHPdoc)
+	 * @see KalturaMediaEntry::getMapBetweenObjects()
+	 */
+	public function getMapBetweenObjects()
 	{
-		$this->bitrate = $source_object['bitrate'];
-		$this->width = $source_object['width'];
-		$this->height = $source_object['height'];
-		if(isset($source_object['tags']))
-			$this->tags = $source_object['tags'];
+		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
 	}
 	
 	public function toObject ( $object_to_fill = null , $props_to_skip = array() )

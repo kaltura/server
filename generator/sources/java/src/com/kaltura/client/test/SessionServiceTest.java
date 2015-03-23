@@ -27,6 +27,8 @@
 // ===================================================================================================
 package com.kaltura.client.test;
 
+import java.io.IOException;
+
 import com.kaltura.client.KalturaApiException;
 import com.kaltura.client.enums.KalturaSessionType;
 import com.kaltura.client.types.KalturaMediaListResponse;
@@ -35,13 +37,14 @@ public class SessionServiceTest extends BaseTest {
 
 	/**
 	 * Test Open / close Session
+	 * @throws IOException 
 	 */
-	public void testSession() {
+	public void testSession() throws Exception {
 
 		try {
 			
 			// test open session
-			BaseTest.startUserSession(client, kalturaConfig);
+			startUserSession();
 			assertNotNull(client.getSessionId());
 			
 			KalturaMediaListResponse response = client.getMediaService().list();
@@ -67,9 +70,9 @@ public class SessionServiceTest extends BaseTest {
 	
 	public void testExpiredSession() {
 		try {
-			String KS = client.generateSession(KalturaTestConfig.ADMIN_SECRET,
+			String KS = client.generateSession(testConfig.getAdminSecret(),
 					"asdasd", KalturaSessionType.USER,
-					KalturaTestConfig.PARTNER_ID, 60 * 60 * 24);
+					testConfig.getPartnerId(), 60 * 60 * 24);
 			client.setSessionId(KS);
 
 			KalturaMediaListResponse response = client.getMediaService().list();
@@ -80,9 +83,9 @@ public class SessionServiceTest extends BaseTest {
 		}
 
 		try {
-			String KS = client.generateSession(KalturaTestConfig.ADMIN_SECRET,
+			String KS = client.generateSession(testConfig.getAdminSecret(),
 					"asdasd", KalturaSessionType.USER,
-					KalturaTestConfig.PARTNER_ID, -60 * 60 * 24);
+					testConfig.getPartnerId(), -60 * 60 * 24);
 			client.setSessionId(KS);
 
 			client.getMediaService().list();

@@ -3,17 +3,11 @@
  * @package plugins.document
  * @subpackage api.objects
  */
-class KalturaDocumentListResponse extends KalturaObject
+class KalturaDocumentListResponse extends KalturaListResponse
 {
 	/**
 	 * @var KalturaDocumentEntryArray
 	 * @readonly
 	 */
 	public $objects;
-
-	/**
-	 * @var int
-	 * @readonly
-	 */
-	public $totalCount;
 }

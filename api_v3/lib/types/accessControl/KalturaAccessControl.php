@@ -174,24 +174,27 @@ class KalturaAccessControl extends KalturaObject implements IFilterable
 	/* (non-PHPdoc)
 	 * @see KalturaObject::fromObject()
 	 */
-	public function fromObject($dbObject)
+	public function doFromObject($dbObject, KalturaDetachedResponseProfile $responseProfile = null)
 	{
-		parent::fromObject($dbObject);
+		parent::doFromObject($dbObject, $responseProfile);
 		
 		if (!($dbObject instanceof accessControl))
 			return;
 			
-		$rules = $dbObject->getRulesArray();
-		foreach($rules as $rule)
+		if($this->shouldGet('restrictions', $responseProfile))
 		{
-			if(!($rule instanceof kAccessControlRestriction))
+			$rules = $dbObject->getRulesArray();
+			foreach($rules as $rule)
 			{
-				KalturaLog::info("Access control [" . $dbObject->getId() . "] rules are new and cannot be loaded using old object");
-				$this->containsUnsuportedRestrictions = true;
-				return;
+				if(!($rule instanceof kAccessControlRestriction))
+				{
+					KalturaLog::info("Access control [" . $dbObject->getId() . "] rules are new and cannot be loaded using old object");
+					$this->containsUnsuportedRestrictions = true;
+					return;
+				}
 			}
+			$this->restrictions = KalturaRestrictionArray::fromDbArray($rules);
 		}
-		$this->restrictions = KalturaRestrictionArray::fromDbArray($rules);
 	}
 	
 	/* (non-PHPdoc)

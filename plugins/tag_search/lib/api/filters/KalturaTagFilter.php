@@ -66,13 +66,19 @@ class KalturaTagFilter extends KalturaFilter
 		$this->validatePropertyMinLength('tagEqual', TagSearchPlugin::MIN_TAG_SEARCH_LENGTH, true, true);
 	}
 	
+	/* (non-PHPdoc)
+	 * @see KalturaFilter::getCoreFilter()
+	 */
+	protected function getCoreFilter()
+	{
+		return new TagFilter();
+	}
+	
+	/* (non-PHPdoc)
+	 * @see KalturaFilter::toObject()
+	 */
 	public function toObject ($object = null, $props_to_skip = array())
 	{
-		if (!$object)
-		{
-			$object = new TagFilter();
-		}
-		
 		/* @var $object TagFilter */
 		$object->set ('_eq_tag', str_replace(kTagFlowManager::$specialCharacters, kTagFlowManager::$specialCharactersReplacement, $this->tagEqual));
 		$object->set ('_likex_tag', str_replace(kTagFlowManager::$specialCharacters, kTagFlowManager::$specialCharactersReplacement, $this->tagStartsWith));

@@ -38,7 +38,7 @@ class ScheduledTaskProfileService extends KalturaBaseService
 
 		// return the saved object
 		$scheduledTaskProfile = new KalturaScheduledTaskProfile();
-		$scheduledTaskProfile->fromObject($dbScheduledTaskProfile);
+		$scheduledTaskProfile->fromObject($dbScheduledTaskProfile, $this->getResponseProfile());
 		return $scheduledTaskProfile;
 	}
 
@@ -60,7 +60,7 @@ class ScheduledTaskProfileService extends KalturaBaseService
 
 		// return the found object
 		$scheduledTaskProfile = new KalturaScheduledTaskProfile();
-		$scheduledTaskProfile->fromObject($dbScheduledTaskProfile);
+		$scheduledTaskProfile->fromObject($dbScheduledTaskProfile, $this->getResponseProfile());
 		return $scheduledTaskProfile;
 	}
 
@@ -89,7 +89,7 @@ class ScheduledTaskProfileService extends KalturaBaseService
 
 		// return the saved object
 		$scheduledTaskProfile = new KalturaScheduledTaskProfile();
-		$scheduledTaskProfile->fromObject($dbScheduledTaskProfile);
+		$scheduledTaskProfile->fromObject($dbScheduledTaskProfile, $this->getResponseProfile());
 		return $scheduledTaskProfile;
 	}
 
@@ -140,7 +140,7 @@ class ScheduledTaskProfileService extends KalturaBaseService
 		$list = ScheduledTaskProfilePeer::doSelect($c);
 
 		$response = new KalturaScheduledTaskProfileListResponse();
-		$response->objects = KalturaScheduledTaskProfileArray::fromDbArray($list);
+		$response->objects = KalturaScheduledTaskProfileArray::fromDbArray($list, $this->getResponseProfile());
 		$response->totalCount = $count;
 
 		return $response;

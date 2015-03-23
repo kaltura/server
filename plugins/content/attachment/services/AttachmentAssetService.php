@@ -90,7 +90,7 @@ class AttachmentAssetService extends KalturaAssetService
 		$dbAttachmentAsset->save();
 
 		$attachmentAsset = new KalturaAttachmentAsset();
-		$attachmentAsset->fromObject($dbAttachmentAsset);
+		$attachmentAsset->fromObject($dbAttachmentAsset, $this->getResponseProfile());
 		return $attachmentAsset;
     }
     
@@ -139,7 +139,7 @@ class AttachmentAssetService extends KalturaAssetService
    			kEventsManager::raiseEvent(new kObjectAddedEvent($dbAttachmentAsset));
    		
 		$attachmentAsset = new KalturaAttachmentAsset();
-		$attachmentAsset->fromObject($dbAttachmentAsset);
+		$attachmentAsset->fromObject($dbAttachmentAsset, $this->getResponseProfile());
 		return $attachmentAsset;
     }
 	
@@ -168,7 +168,7 @@ class AttachmentAssetService extends KalturaAssetService
     	$dbAttachmentAsset->save();
 		
 		$attachmentAsset = new KalturaAttachmentAsset();
-		$attachmentAsset->fromObject($dbAttachmentAsset);
+		$attachmentAsset->fromObject($dbAttachmentAsset, $this->getResponseProfile());
 		return $attachmentAsset;
     }
     
@@ -417,7 +417,7 @@ class AttachmentAssetService extends KalturaAssetService
 		$fileSyncs = FileSyncPeer::doSelect($c);
 			
 		$listResponse = new KalturaRemotePathListResponse();
-		$listResponse->objects = KalturaRemotePathArray::fromFileSyncArray($fileSyncs);
+		$listResponse->objects = KalturaRemotePathArray::fromDbArray($fileSyncs, $this->getResponseProfile());
 		$listResponse->totalCount = count($listResponse->objects);
 		return $listResponse;
 	}
@@ -489,7 +489,7 @@ class AttachmentAssetService extends KalturaAssetService
 			throw new KalturaAPIException(KalturaAttachmentErrors::ATTACHMENT_ASSET_ID_NOT_FOUND, $attachmentAssetId);
 		
 		$attachmentAssets = new KalturaAttachmentAsset();
-		$attachmentAssets->fromObject($attachmentAssetsDb);
+		$attachmentAssets->fromObject($attachmentAssetsDb, $this->getResponseProfile());
 		return $attachmentAssets;
 	}
 	
@@ -503,39 +503,22 @@ class AttachmentAssetService extends KalturaAssetService
 	 */
 	function listAction(KalturaAssetFilter $filter = null, KalturaFilterPager $pager = null)
 	{
-		if (!$filter)
-			$filter = new KalturaAssetFilter();
-
-		if (!$pager)
-			$pager = new KalturaFilterPager();
-			
-		$attachmentAssetFilter = new AssetFilter();
-		
-		$filter->toObject($attachmentAssetFilter);
-
-		$c = new Criteria();
-		$attachmentAssetFilter->attachToCriteria($c);
-		
-		$types = KalturaPluginManager::getExtendedTypes(assetPeer::OM_CLASS, AttachmentPlugin::getAssetTypeCoreValue(AttachmentAssetType::ATTACHMENT));
-		$c->add(assetPeer::TYPE, $types, Criteria::IN);
-		
-		$pager->attachToCriteria($c);
-		$dbList = assetPeer::doSelect($c);
-
-		$resultCount = count($dbList);
-		if ($resultCount && $resultCount < $pager->pageSize)
-			$totalCount = ($pager->pageIndex - 1) * $pager->pageSize + $resultCount;
-		else
+		if(!$filter)
 		{
-			KalturaFilterPager::detachFromCriteria($c);
-			$totalCount = assetPeer::doCount($c);
+			$filter = new KalturaAttachmentAssetFilter();
 		}
-				
-		$list = KalturaAttachmentAssetArray::fromDbArray($dbList);
-		$response = new KalturaAttachmentAssetListResponse();
-		$response->objects = $list;
-		$response->totalCount = $totalCount;
-		return $response;    
+		elseif(! $filter instanceof KalturaAttachmentAssetFilter)
+		{
+			$filter = $filter->cast('KalturaAttachmentAssetFilter');
+		}
+			
+		if(!$pager)
+		{
+			$pager = new KalturaFilterPager();
+		}
+
+		$types = KalturaPluginManager::getExtendedTypes(assetPeer::OM_CLASS, AttachmentPlugin::getAssetTypeCoreValue(AttachmentAssetType::ATTACHMENT));
+		return $filter->getTypeListResponse($pager, $this->getResponseProfile(), $types);
 	}
 	
 	/**
