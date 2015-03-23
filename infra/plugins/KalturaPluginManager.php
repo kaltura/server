@@ -206,6 +206,17 @@ class KalturaPluginManager
 		return null;
 	}
 	
+	private static function hasInstanceOf($pluginInterface)
+	{
+	    $listOfPlugins = self::getPlugins();
+	    foreach ($listOfPlugins as $currentPlugin)
+	    {
+	        if (is_subclass_of($currentPlugin, $pluginInterface))
+	            return true;
+	    }
+	    return false;
+	}
+	
 	/**
 	 * Validates plugin according to its dependencies
 	 * @param string $pluginClass 
@@ -214,8 +225,21 @@ class KalturaPluginManager
 	 */
 	protected static function isValid($pluginClass, array $validatedPlugins = null)
 	{
-		$pluginClassReplection = new ReflectionClass($pluginClass);
-		if(!$pluginClassReplection->implementsInterface('IKalturaPending'))
+		// check if object has requirements
+		if (is_subclass_of($pluginClass, 'IKalturaRequire'))
+		{
+		    $requiredPlugins = $pluginClass::requires(); // returns the requiredPluginsName(s)
+		    foreach($requiredPlugins as $requiredPlugin)
+		    {
+		        if (!self::hasInstanceOf($requiredPlugin))
+		        {
+		            KalturaLog::err("Required plugin name [$requiredPlugin] is not available, plugin [$pluginClass] could not be loaded.");
+		            return false;
+		        }
+		    }
+		}
+		
+		if(!is_subclass_of($pluginClass, 'IKalturaPending'))
 			return true;
 			
 		$pendingPlugins = $pluginClass::dependsOn();

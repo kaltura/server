@@ -5,12 +5,42 @@
 */
 class KalturaPushNotificationTemplate extends KalturaEventNotificationTemplate
 {
+    /**
+     * Kaltura API object type
+     * @var string
+     */
+    public $apiObjectType;
+    
+    /**
+     * Kaltura Object format
+     * @var KalturaResponseType
+     */    
+    public $objectFormat;
+
+    private static $map_between_objects = array('apiObjectType', 'objectFormat');
+    
     public function __construct()
     {
         $this->type = PushNotificationPlugin::getApiValue(PushNotificationTemplateType::PUSH);
     }
+    
+    /* (non-PHPdoc)
+     * @see KalturaObject::getMapBetweenObjects()
+     */
+    public function getMapBetweenObjects()
+    {
+        return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
+    }    
 
-
+    /* (non-PHPdoc)
+     * @see KalturaObject::validateForUpdate()
+     */
+    public function validateForUpdate($sourceObject, $propertiesToSkip = array())
+    {
+        $propertiesToSkip[] = 'type';
+        return parent::validateForUpdate($sourceObject, $propertiesToSkip);
+    }
+    
     /* (non-PHPdoc)
      * @see KalturaObject::toObject()
      */

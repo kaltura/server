@@ -5,14 +5,107 @@
 */
 class PushNotificationTemplate extends EventNotificationTemplate
 {
+    const CUSTOM_DATA_API_OBJECT_TYPE = 'apiObjectType';
+    const CUSTOM_DATA_OBJECT_FORMAT = 'objectFormat';
+    
     public function __construct()
     {
         $this->setType(PushNotificationPlugin::getPushNotificationTemplateTypeCoreValue(PushNotificationTemplateType::PUSH));
         parent::__construct();
     }
+
+    public function fulfilled(kEventScope $scope)
+    {
+        if(!kCurrentContext::$serializeCallback)
+            return false;
         
+        if(!parent::fulfilled($scope))
+            return false;
+        
+        // check if queue exists
+        $queueKey = $this->getQueueKey($scope);
+        $queueProvider = QueueProvider::getInstance();
+        if (!$queueProvider->exists($queueKey))
+        {
+            KalturaLog::debug("Queue [$queueKey] doesn't exist.");
+            return false;
+        }
+        KalturaLog::debug("Fullfiled!! Queue is: [$queueKey]");
+        return true;
+    }
+    
+    public function setApiObjectType($value)
+    {
+        return $this->putInCustomData(self::CUSTOM_DATA_API_OBJECT_TYPE, $value);
+    }
+    
+    public function getApiObjectType()
+    {
+        return $this->getFromCustomData(self::CUSTOM_DATA_API_OBJECT_TYPE);
+    }
+    
+    public function setObjectFormat($value)
+    {
+        return $this->putInCustomData(self::CUSTOM_DATA_OBJECT_FORMAT, $value);
+    }
+    
+    public function getObjectFormat()
+    {
+        return $this->getFromCustomData(self::CUSTOM_DATA_OBJECT_FORMAT);
+    }    
+    
+    protected function getQueueKey(kScope $scope)
+    {
+        $templateId = $this->getId();
+        $partnerId = $scope->getPartnerId();
+        
+        $contentParameters = $this->getContentParameters();
+        
+        // currently contentParams contains only one param (entryId), but for further support
+        foreach ($contentParameters as $contentParameter)
+        {
+            /* @var $contentParameter kEventNotificationParameter */
+            $value = $contentParameter->getValue();
+            if ($value instanceof kStringField)
+                $value->setScope($scope);
+        
+            $key = $contentParameter->getKey();
+            $contentParametersValues[$key] = $value->getValue();
+        }
+        // sort array according to created keys
+        ksort($contentParametersValues);
+        
+        $contentParamsHash = md5($partnerId . '_' . implode( '_' , array_values($contentParametersValues) ) );
+        // prepare queue key to return
+        return 'pn_' . $templateId . '_' . $contentParamsHash;
+    }
+    
+    protected function getMessage(kScope $scope)
+    {
+        if ($scope instanceof kEventScope)
+        {
+            $object = $scope->getObject();
+        }
+
+        // prepare vars as configured by user in admin console
+        $objectType = $this->getApiObjectType();
+        $format = $this->getObjectFormat();
+        
+        return call_user_func(kCurrentContext::$serializeCallback, $object, $objectType, $format);
+    }
+    
     public function dispatch(kScope $scope) 
     {
-        //TODO send message to queue (rabbitmq)
+        if (!$scope || !($scope instanceof kEventScope))
+        {
+            KalturaLog::err('Failed to dispatch due to incorrect scope [' .$scope . ']');
+            return;
+        }
+        
+        $queueKey = $this->getQueueKey($scope);
+        
+        // get instance of activated queue proivder and send message
+        $queueProvider = QueueProvider::getInstance();
+        $queueProvider->send($queueKey, $this->getMessage($scope));
     }
 }

@@ -4,7 +4,7 @@
  * @subpackage api.objects
  * @abstract
  */
-abstract class KalturaCuePoint extends KalturaObject implements IFilterable 
+abstract class KalturaCuePoint extends KalturaObject implements IFilterable, IApiObjectFactory
 {
 	/**
 	 * @var string
@@ -329,8 +329,13 @@ abstract class KalturaCuePoint extends KalturaObject implements IFilterable
 	 * @param int $type
 	 * @return KalturaCuePoint
 	 */
-	public static function getInstance($type)
+	public static function getInstance($sourceObject)
 	{
-		return KalturaPluginManager::loadObject('KalturaCuePoint', $type);
+		$object = KalturaPluginManager::loadObject('KalturaCuePoint', $sourceObject->getType());
+		if (!$object)
+		    return null;
+		
+		$object->fromObject($sourceObject);		 
+		return $object;
 	}
 }

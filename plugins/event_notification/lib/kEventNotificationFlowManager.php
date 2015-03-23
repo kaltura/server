@@ -67,27 +67,6 @@ class kEventNotificationFlowManager implements kGenericEventConsumer
 	}
 
 	/**
-	 * @param EventNotificationTemplate $notificationTemplate
-	 * @param kEventScope $scope
-	 * @return boolean
-	 */
-	protected function notificationTemplatesConditionsFulfilled(EventNotificationTemplate $notificationTemplate, kEventScope $scope) 
-	{
-		$eventConditions = $notificationTemplate->getEventConditions();
-		if(!$eventConditions || !count($eventConditions))
-			return true;
-		
-		foreach($eventConditions as $eventCondition)
-		{
-			/* @var $eventCondition kCondition */
-			if(!$eventCondition->fulfilled($scope))
-				return false;
-		}
-		
-		return true;
-	}
-
-	/**
 	 * @param int $eventType
 	 * @param string $eventObjectClassName core class name
 	 * @param int $partnerId
@@ -160,7 +139,7 @@ class kEventNotificationFlowManager implements kGenericEventConsumer
 					$scope->addDynamicValue($notificationParameter->getKey(), $notificationParameter->getValue());
 			}
 			
-			if($this->notificationTemplatesConditionsFulfilled($notificationTemplate, $scope))
+			if ($notificationTemplate->fulfilled($scope))
 				$this->notificationTemplates[] = $notificationTemplate;
 		}
 		
