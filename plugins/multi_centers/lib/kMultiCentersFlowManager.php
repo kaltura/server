@@ -99,9 +99,14 @@ class kMultiCentersFlowManager implements kBatchJobStatusEventConsumer
 			KalturaLog::err("Invalid filesync record with id [$fileSyncId]");
 			return $dbBatchJob;
 		}
-		
-		$fileSync->setStatus(FileSync::FILE_SYNC_STATUS_ERROR);
-		$fileSync->save();
+
+		if ( $fileSync->getStatus() != FileSync::FILE_SYNC_STATUS_DELETED
+				&& $fileSync->getStatus() != FileSync::FILE_SYNC_STATUS_PURGED )
+		{
+			$fileSync->setStatus(FileSync::FILE_SYNC_STATUS_ERROR);
+			$fileSync->save();
+		}
+
 		return $dbBatchJob;
 	}
 }

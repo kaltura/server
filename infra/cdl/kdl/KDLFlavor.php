@@ -485,17 +485,19 @@ $plannedDur = 0;
 			 * For IMX sources, apply cropping of the top 32 pixs, if the flavor has the ImxCrop flag
 			 * 'IMX' ==> mxf/mpeg2 video/ 720x608
 			 */
-		if(isset($this->_video) && $this->_video->_isCropIMX==true
-		&& isset($source->_container) && $source->_container->IsFormatOf(array("mxf")) 
-		&& isset($source->_video) && $source->_video->IsFormatOf(array("mpeg video","mpeg2video")) 
-		&& isset($source->_video->_width) && $source->_video->_width==720
-		&& isset($source->_video->_height) && ($source->_video->_height==608 || $source->_video->_height==576)){
-			$this->_video->_isCropIMX=true;
+		if(isset($this->_video)){
+			if($this->_video->_isCropIMX==true
+			&& isset($source->_container) && $source->_container->IsFormatOf(array("mxf")) 
+			&& isset($source->_video) && $source->_video->IsFormatOf(array("mpeg video","mpeg2video")) 
+			&& isset($source->_video->_width) && $source->_video->_width==720
+			&& isset($source->_video->_height) && ($source->_video->_height==608 || $source->_video->_height==576)){
+				$this->_video->_isCropIMX=true;
+			}
+			else {
+				$this->_video->_isCropIMX=false;
+			}
+			KalturaLog::log('IsCropImx('.$this->_video->_isCropIMX.')');
 		}
-		else {
-			$this->_video->_isCropIMX=false;
-		}
-		KalturaLog::log('IsCropImx('.$this->_video->_isCropIMX.')');
 		
 			/*
 			 * Analyse the source to determine whether it contains multi-stream audio.

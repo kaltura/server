@@ -21,8 +21,9 @@ class LiveReportLocation1MinEngine extends LiveReportEngine {
 		$this->checkParams($args, array(LiveReportConstants::TIME_REFERENCE_PARAM, LiveReportConstants::ENTRY_IDS));
 		$toTime = $args[LiveReportConstants::TIME_REFERENCE_PARAM];
 		$fromTime = $args[LiveReportConstants::TIME_REFERENCE_PARAM] - LiveReportConstants::SECONDS_36_HOURS;
-		
-		$this->printHeaders($fp);
+		$showDvr = $this->shouldShowDvrColumns($args[LiveReportConstants::ENTRY_IDS]);
+
+		$this->printHeaders($fp, $showDvr);
 		
 		$objs = array();
 		$lastTimeGroup = null;
@@ -49,7 +50,7 @@ class LiveReportLocation1MinEngine extends LiveReportEngine {
 						$lastTimeGroup = $groupTime;
 					
 					if($lastTimeGroup < $groupTime) {
-						$this->printRows($fp, $objs, $lastTimeGroup);
+						$this->printRows($fp, $objs, $lastTimeGroup, $showDvr);
 						$lastTimeGroup = $groupTime;
 					}
 					
@@ -67,7 +68,7 @@ class LiveReportLocation1MinEngine extends LiveReportEngine {
 			$fix = LiveReportConstants::SECONDS_10;
 		}
 		
-		$this->printRows($fp, $objs, $lastTimeGroup);
+		$this->printRows($fp, $objs, $lastTimeGroup, $showDvr);
 	}
 	
 	// ASUMPTION - we have a single entry ID (that's a constraint of the cassandra)
@@ -86,8 +87,10 @@ class LiveReportLocation1MinEngine extends LiveReportEngine {
 		
 		return KBatchBase::$kClient->liveReports->getReport($reportType, $filter, $pager);
 	}
+
+
 	
-	protected function printHeaders($fp) {
+	protected function printHeaders($fp, $showDvr) {
 		$values = array();
 		$values[] = "Date";
 		$values[] = "Country";
@@ -98,6 +101,11 @@ class LiveReportLocation1MinEngine extends LiveReportEngine {
 		$values[] = "Average Audience";
 		$values[] = "Min Audience";
 		$values[] = "Max Audience";
+		if ($showDvr) {
+			$values[] = "Average DVR Audience";
+			$values[] = "Min DVR Audience";
+			$values[] = "Max DVR Audience";
+		}
 		$values[] = "Average bitrate";
 		$values[] = "Buffer time";
 		$values[] = "Seconds viewed";
@@ -105,7 +113,7 @@ class LiveReportLocation1MinEngine extends LiveReportEngine {
 		fwrite($fp, implode(LiveReportConstants::CELLS_SEPARATOR, $values) . "\n");
 	}
 	
-	protected function printRows($fp, &$objects, $lastTimeGroup) {
+	protected function printRows($fp, &$objects, $lastTimeGroup, $showDvr) {
 		
 		foreach ($objects as $records) {
 
@@ -118,13 +126,19 @@ class LiveReportLocation1MinEngine extends LiveReportEngine {
 			$values[] = $firstRecord->city->latitude;
 			$values[] = $firstRecord->city->longitude;
 			
-			$plays = $audience = $avgBitrate = $bufferTime = $secondsViewed = $maxAudience = 0;
+			$plays = $audience = $avgBitrate = $bufferTime = $secondsViewed = $maxAudience = $dvrAudience = $maxDvrAudience = 0;
 			$minAudience = PHP_INT_MAX;
+			$minDvrAudience = PHP_INT_MAX;
 			
 			foreach ($records as $record) {
 				$plays += $record->plays;
 				$audience += $record->audience;
 				$maxAudience = max($maxAudience, $record->audience);
+				if ($showDvr) {
+					$dvrAudience += $record->dvrAudience;
+					$maxDvrAudience = max($maxDvrAudience, $record->dvrAudience);
+					$minDvrAudience = min($minDvrAudience, $record->dvrAudience);
+				}
 				$minAudience = min($minAudience, $record->audience);
 				$avgBitrate += $record->avgBitrate;
 				$bufferTime += $record->bufferTime;
@@ -136,6 +150,11 @@ class LiveReportLocation1MinEngine extends LiveReportEngine {
 			$values[] = round($audience / $nObj, 2);
 			$values[] = $minAudience;
 			$values[] = $maxAudience;
+			if ($showDvr) {
+				$values[] = round($dvrAudience / $nObj, 2);
+				$values[] = $minDvrAudience;
+				$values[] = $maxDvrAudience;
+			}
 			$values[] = round($avgBitrate / $nObj, 2);
 			$values[] = round($bufferTime / $nObj, 2);
 			$values[] = $secondsViewed;

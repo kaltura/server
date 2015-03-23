@@ -11,7 +11,24 @@ abstract class LiveReportEngine
 				throw new KOperationEngineException("Missing mandatory argument : " . $param);
 		}
 	}
-	
+
+	protected function shouldShowDvrColumns($entryIds)
+	{
+		$filter = new KalturaLiveStreamEntryFilter();
+		$filter->idIn = $entryIds;
+
+		/** @var KalturaLiveStreamListResponse */
+		$response = KBatchBase::$kClient->liveStream->listAction($filter, null);
+
+		foreach ($response->objects as $object) {
+			if ($object->dvrStatus) {
+				KalturaLog::debug("Found entry with DVR status = true: " . $object->id);
+				return true;
+			}
+		}
+		return false;
+	}
+
 	/**
 	 * Executes the given engine
 	 * @param pointer resource $fp - A file system pointer resource.

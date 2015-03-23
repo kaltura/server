@@ -1,0 +1,6 @@
+@DWH_DIR@/logs/*.log {
+ rotate 30
+ daily
+ missingok
+ compress
+}

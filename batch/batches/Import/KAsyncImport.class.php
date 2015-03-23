@@ -205,23 +205,26 @@ class KAsyncImport extends KJobHandlerWorker
 				{
 					/* @var $pluginInstance IKalturaImportHandler */
 					$data = $pluginInstance->handleImportContent($curlHeaderResponse, $data, KBatchBase::$taskConfig->params);
-					if (is_null($data))
-					{
-						KalturaLog::err("An error occurred while handling the content");
-						//TODO: check why webex retries do not work
-						throw new KalturaException('An error occurred while handling the content' );
-					}
 				}
 			}
 
 			$this->updateJob($job, 'File imported, copy to shared folder', KalturaBatchJobStatus::PROCESSED);
 			$job = $this->moveFile($job, $data->destFileLocalPath);
 		}
+		catch(kTemporaryException $tex)
+		{
+			$data->destFileLocalPath = KalturaClient::getKalturaNullValue();
+			$tex->setData($data);
+			throw $tex;
+		}
 		catch(Exception $ex)
 		{
+			$data->destFileLocalPath = KalturaClient::getKalturaNullValue();
 			if($ex->getMessage() == KCurlWrapper::COULD_NOT_CONNECT_TO_HOST_ERROR)
-				throw new kTemporaryException($ex->getMessage(), $ex->getCode());
-			$this->closeJob($job, KalturaBatchJobErrorTypes::RUNTIME, $ex->getCode(), "Error: " . $ex->getMessage(), KalturaBatchJobStatus::FAILED);
+			{
+				throw new kTemporaryException($ex->getMessage(), $ex->getCode(), $data);
+			}
+			$this->closeJob($job, KalturaBatchJobErrorTypes::RUNTIME, $ex->getCode(), "Error: " . $ex->getMessage(), KalturaBatchJobStatus::FAILED, $data);
 		}
 		return $job;
 	}
@@ -449,4 +452,3 @@ class KAsyncImport extends KJobHandlerWorker
 		return $destFile;
 	}
 }
-?>
