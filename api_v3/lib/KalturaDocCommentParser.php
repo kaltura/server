@@ -12,6 +12,8 @@ class KalturaDocCommentParser
     const DOCCOMMENT_PARAM = '/\@param (\w*) \$__NAME__ ?(.*)/';
     const DOCCOMMENT_REPLACENET_PARAM_NAME = '__NAME__';
     
+    const DOCCOMMENT_ALIAS = '/\@alias (\w*)/';
+    
     const DOCCOMMENT_VAR_TYPE = "/\\@var (\\w*)/";
     const DOCCOMMENT_LINK = "/\\@link (.*)/";
     const DOCCOMMENT_DESCRIPTION = " /\\*\\s*?[^@]+/";
@@ -85,6 +87,11 @@ class KalturaDocCommentParser
      * @var string
      */
     public $varType;
+    
+    /**
+     * @var string
+     */
+    public $alias;
     
     /**
      * @var string
@@ -223,6 +230,10 @@ class KalturaDocCommentParser
                 $this->paramDescription = $result[2];
             }
         }
+        
+        $result = null;
+        if (preg_match( self::DOCCOMMENT_ALIAS, $comment, $result ))
+            $this->alias = $result[1];
         
         $result = null;
         if (preg_match( self::DOCCOMMENT_VAR_TYPE, $comment, $result ))

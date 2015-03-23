@@ -39,9 +39,9 @@ class KalturaTubeMogulSyndicationFeed extends KalturaBaseSyndicationFeed
             $this->categories = implode(',', $categories);
         }
         
-        public function fromObject($source_object)
+        public function doFromObject($source_object, KalturaDetachedResponseProfile $responseProfile = null)
         {
-            parent::fromObject($source_object);
+            parent::doFromObject($source_object, $responseProfile);
             $categories = explode(',', $this->categories);
             $strCategories = array();
             foreach($categories as $category)

@@ -27,9 +27,9 @@ class KalturaDistributeObjectTask extends KalturaObjectTask
 		return $dbObject;
 	}
 
-	public function fromObject($srcObj)
+	public function doFromObject($srcObj, KalturaDetachedResponseProfile $responseProfile = null)
 	{
-		parent::fromObject($srcObj);
+		parent::doFromObject($srcObj, $responseProfile);
 
 		/** @var kObjectTask $srcObj */
 		$this->distributionProfileId = $srcObj->getDataValue('distributionProfileId');

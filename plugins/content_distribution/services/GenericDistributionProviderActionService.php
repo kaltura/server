@@ -40,7 +40,7 @@ class GenericDistributionProviderActionService extends KalturaBaseService
 		$dbGenericDistributionProviderAction->save();
 		
 		$genericDistributionProviderAction = new KalturaGenericDistributionProviderAction();
-		$genericDistributionProviderAction->fromObject($dbGenericDistributionProviderAction);
+		$genericDistributionProviderAction->fromObject($dbGenericDistributionProviderAction, $this->getResponseProfile());
 		return $genericDistributionProviderAction;
 	}
 
@@ -67,7 +67,7 @@ class GenericDistributionProviderActionService extends KalturaBaseService
 		kFileSyncUtils::file_put_contents($key, $xslData);
 		
 		$genericDistributionProviderAction = new KalturaGenericDistributionProviderAction();
-		$genericDistributionProviderAction->fromObject($dbGenericDistributionProviderAction);
+		$genericDistributionProviderAction->fromObject($dbGenericDistributionProviderAction, $this->getResponseProfile());
 		return $genericDistributionProviderAction;
 	}
 
@@ -99,7 +99,7 @@ class GenericDistributionProviderActionService extends KalturaBaseService
 		kFileSyncUtils::moveFromFile($filePath, $key);
 		
 		$genericDistributionProviderAction = new KalturaGenericDistributionProviderAction();
-		$genericDistributionProviderAction->fromObject($dbGenericDistributionProviderAction);
+		$genericDistributionProviderAction->fromObject($dbGenericDistributionProviderAction, $this->getResponseProfile());
 		return $genericDistributionProviderAction;
 	}
 
@@ -126,7 +126,7 @@ class GenericDistributionProviderActionService extends KalturaBaseService
 		kFileSyncUtils::file_put_contents($key, $xsdData);
 		
 		$genericDistributionProviderAction = new KalturaGenericDistributionProviderAction();
-		$genericDistributionProviderAction->fromObject($dbGenericDistributionProviderAction);
+		$genericDistributionProviderAction->fromObject($dbGenericDistributionProviderAction, $this->getResponseProfile());
 		return $genericDistributionProviderAction;
 	}
 
@@ -158,7 +158,7 @@ class GenericDistributionProviderActionService extends KalturaBaseService
 		kFileSyncUtils::moveFromFile($filePath, $key);
 		
 		$genericDistributionProviderAction = new KalturaGenericDistributionProviderAction();
-		$genericDistributionProviderAction->fromObject($dbGenericDistributionProviderAction);
+		$genericDistributionProviderAction->fromObject($dbGenericDistributionProviderAction, $this->getResponseProfile());
 		return $genericDistributionProviderAction;
 	}
 
@@ -185,7 +185,7 @@ class GenericDistributionProviderActionService extends KalturaBaseService
 		kFileSyncUtils::file_put_contents($key, $transformData);
 		
 		$genericDistributionProviderAction = new KalturaGenericDistributionProviderAction();
-		$genericDistributionProviderAction->fromObject($dbGenericDistributionProviderAction);
+		$genericDistributionProviderAction->fromObject($dbGenericDistributionProviderAction, $this->getResponseProfile());
 		return $genericDistributionProviderAction;
 	}
 
@@ -217,7 +217,7 @@ class GenericDistributionProviderActionService extends KalturaBaseService
 		kFileSyncUtils::moveFromFile($filePath, $key);
 		
 		$genericDistributionProviderAction = new KalturaGenericDistributionProviderAction();
-		$genericDistributionProviderAction->fromObject($dbGenericDistributionProviderAction);
+		$genericDistributionProviderAction->fromObject($dbGenericDistributionProviderAction, $this->getResponseProfile());
 		return $genericDistributionProviderAction;
 	}
 	
@@ -237,7 +237,7 @@ class GenericDistributionProviderActionService extends KalturaBaseService
 			throw new KalturaAPIException(ContentDistributionErrors::GENERIC_DISTRIBUTION_PROVIDER_ACTION_NOT_FOUND, $id);
 			
 		$genericDistributionProviderAction = new KalturaGenericDistributionProviderAction();
-		$genericDistributionProviderAction->fromObject($dbGenericDistributionProviderAction);
+		$genericDistributionProviderAction->fromObject($dbGenericDistributionProviderAction, $this->getResponseProfile());
 		return $genericDistributionProviderAction;
 	}
 	
@@ -258,7 +258,7 @@ class GenericDistributionProviderActionService extends KalturaBaseService
 			throw new KalturaAPIException(ContentDistributionErrors::GENERIC_DISTRIBUTION_PROVIDER_ACTION_NOT_FOUND, $genericDistributionProviderId);
 	
 		$genericDistributionProviderAction = new KalturaGenericDistributionProviderAction();
-		$genericDistributionProviderAction->fromObject($dbGenericDistributionProviderAction);
+		$genericDistributionProviderAction->fromObject($dbGenericDistributionProviderAction, $this->getResponseProfile());
 		return $genericDistributionProviderAction;
 	}
 	
@@ -282,7 +282,7 @@ class GenericDistributionProviderActionService extends KalturaBaseService
 		$dbGenericDistributionProviderAction->save();
 		
 		$genericDistributionProviderAction = new KalturaGenericDistributionProviderAction();
-		$genericDistributionProviderAction->fromObject($dbGenericDistributionProviderAction);
+		$genericDistributionProviderAction->fromObject($dbGenericDistributionProviderAction, $this->getResponseProfile());
 		return $genericDistributionProviderAction;
 	}
 	
@@ -305,7 +305,7 @@ class GenericDistributionProviderActionService extends KalturaBaseService
 		$dbGenericDistributionProviderAction->save();
 		
 		$genericDistributionProviderAction = new KalturaGenericDistributionProviderAction();
-		$genericDistributionProviderAction->fromObject($dbGenericDistributionProviderAction);
+		$genericDistributionProviderAction->fromObject($dbGenericDistributionProviderAction, $this->getResponseProfile());
 		return $genericDistributionProviderAction;
 	}
 	
@@ -371,7 +371,7 @@ class GenericDistributionProviderActionService extends KalturaBaseService
 		$list = GenericDistributionProviderActionPeer::doSelect($c);
 		
 		$response = new KalturaGenericDistributionProviderActionListResponse();
-		$response->objects = KalturaGenericDistributionProviderActionArray::fromDbArray($list);
+		$response->objects = KalturaGenericDistributionProviderActionArray::fromDbArray($list, $this->getResponseProfile());
 		$response->totalCount = $count;
 	
 		return $response;

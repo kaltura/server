@@ -47,7 +47,7 @@ class DistributionProviderService extends KalturaBaseService
 		$list = GenericDistributionProviderPeer::doSelect($c);
 		
 		$response = new KalturaDistributionProviderListResponse();
-		$response->objects = KalturaDistributionProviderArray::fromGenericDistributionProvidersArray($list);
+		$response->objects = KalturaDistributionProviderArray::fromDbArray($list, $this->getResponseProfile());
 		$response->totalCount = $count;
 	
 		$syndicationProvider = new KalturaSyndicationDistributionProvider();

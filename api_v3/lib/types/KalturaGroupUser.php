@@ -71,17 +71,7 @@ class KalturaGroupUser extends KalturaObject implements IFilterable
 		if (is_null($dbObject))
 			$dbObject = new KuserKgroup();
 			
-		parent::toObject($dbObject, $skip);
-		
-		return $dbObject;
-	}
-
-	public function fromObject($sourceObject)
-	{
-		if(!$sourceObject)
-			return;
-			
-		parent::fromObject($sourceObject);
+		return parent::toObject($dbObject, $skip);
 	}
 	
 	public function getExtraFilters()

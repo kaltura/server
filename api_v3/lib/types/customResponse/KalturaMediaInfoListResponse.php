@@ -3,17 +3,11 @@
  * @package api
  * @subpackage objects
  */
-class KalturaMediaInfoListResponse extends KalturaObject
+class KalturaMediaInfoListResponse extends KalturaListResponse
 {
 	/**
 	 * @var KalturaMediaInfoArray
 	 * @readonly
 	 */
 	public $objects;
-
-	/**
-	 * @var int
-	 * @readonly
-	 */
-	public $totalCount;
 }

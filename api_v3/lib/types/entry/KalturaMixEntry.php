@@ -44,14 +44,17 @@ class KalturaMixEntry extends KalturaPlayableEntry
 		return array_merge ( parent::getMapBetweenObjects() , self::$map_between_objects );
 	}
 	
-    public function fromObject($entry)
+    public function doFromObject($entry, KalturaDetachedResponseProfile $responseProfile = null)
 	{
-		parent::fromObject($entry);
+		parent::doFromObject($entry, $responseProfile);
 
-		if ($entry->getEditorType() == "kalturaAdvancedEditor" || $entry->getEditorType() == "Keditor")
-		    $this->editorType = KalturaEditorType::ADVANCED;
-		else
-		    $this->editorType = KalturaEditorType::SIMPLE;
+		if($this->shouldGet('editorType', $responseProfile))
+		{
+			if ($entry->getEditorType() == "kalturaAdvancedEditor" || $entry->getEditorType() == "Keditor")
+			    $this->editorType = KalturaEditorType::ADVANCED;
+			else
+			    $this->editorType = KalturaEditorType::SIMPLE;
+		}
 	}
 	
 	public function toObject($entry = null, $skip = array())

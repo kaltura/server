@@ -3,17 +3,11 @@
  * @package api
  * @subpackage objects
  */
-class KalturaPermissionListResponse extends KalturaObject
+class KalturaPermissionListResponse extends KalturaListResponse
 {
 	/**
 	 * @var KalturaPermissionArray
 	 * @readonly
 	 */
 	public $objects;
-
-	/**
-	 * @var int
-	 * @readonly
-	 */
-	public $totalCount;
 }

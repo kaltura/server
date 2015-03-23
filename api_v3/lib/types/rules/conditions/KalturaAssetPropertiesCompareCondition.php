@@ -54,10 +54,12 @@ class KalturaAssetPropertiesCompareCondition extends KalturaCondition
 	/* (non-PHPdoc)
 	 * @see KalturaObject::fromObject()
 	 */
-	public function fromObject($dbObject)
+	public function doFromObject($dbObject, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		/** @var $dbObject kAssetPropertiesCompareCondition */
-		parent::fromObject($dbObject);
-		$this->properties = KalturaKeyValueArray::fromKeyValueArray($dbObject->getProperties());
+		parent::doFromObject($dbObject, $responseProfile);
+		
+		if($this->shouldGet('properties', $responseProfile))
+			$this->properties = KalturaKeyValueArray::fromKeyValueArray($dbObject->getProperties());
 	}
 }

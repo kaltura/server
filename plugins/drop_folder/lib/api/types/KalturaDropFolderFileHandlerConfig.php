@@ -34,11 +34,4 @@ abstract class KalturaDropFolderFileHandlerConfig extends KalturaObject
 		
 		return $dbObject;
 	}
-	
-	public function fromObject ($source_object)
-	{
-		parent::fromObject($source_object);
-	}
-		
-	
 }

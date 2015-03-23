@@ -237,18 +237,22 @@ abstract class KalturaDistributionProfile extends KalturaObject implements IFilt
 		return $dbObject;
 	}
 	
-	public function fromObject($sourceObject)
+	public function doFromObject($sourceObject, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		if(!$sourceObject)
 			return;
 			
-		parent::fromObject($sourceObject);
+		parent::doFromObject($sourceObject, $responseProfile);
 		
-		$this->optionalThumbDimensions = KalturaDistributionThumbDimensionsArray::fromDbArray($sourceObject->getOptionalThumbDimensionsObjects());
-		$this->requiredThumbDimensions = KalturaDistributionThumbDimensionsArray::fromDbArray($sourceObject->getRequiredThumbDimensionsObjects());
-		
-		$this->optionalAssetDistributionRules = KalturaAssetDistributionRulesArray::fromDbArray($sourceObject->getOptionalAssetDistributionRules());
-		$this->requiredAssetDistributionRules = KalturaAssetDistributionRulesArray::fromDbArray($sourceObject->getRequiredAssetDistributionRules());
+		if($this->shouldGet('optionalThumbDimensions', $responseProfile))
+			$this->optionalThumbDimensions = KalturaDistributionThumbDimensionsArray::fromDbArray($sourceObject->getOptionalThumbDimensionsObjects());
+		if($this->shouldGet('requiredThumbDimensions', $responseProfile))
+			$this->requiredThumbDimensions = KalturaDistributionThumbDimensionsArray::fromDbArray($sourceObject->getRequiredThumbDimensionsObjects());
+			
+		if($this->shouldGet('optionalAssetDistributionRules', $responseProfile))
+			$this->optionalAssetDistributionRules = KalturaAssetDistributionRulesArray::fromDbArray($sourceObject->getOptionalAssetDistributionRules());
+		if($this->shouldGet('requiredAssetDistributionRules', $responseProfile))
+			$this->requiredAssetDistributionRules = KalturaAssetDistributionRulesArray::fromDbArray($sourceObject->getRequiredAssetDistributionRules());
 	}
 	
 	public function getExtraFilters()

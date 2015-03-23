@@ -3,17 +3,11 @@
  * @package plugins.captionSearch
  * @subpackage api.objects
  */
-class KalturaCaptionAssetItemListResponse extends KalturaObject
+class KalturaCaptionAssetItemListResponse extends KalturaListResponse
 {
 	/**
 	 * @var KalturaCaptionAssetItemArray
 	 * @readonly
 	 */
 	public $objects;
-
-	/**
-	 * @var int
-	 * @readonly
-	 */
-	public $totalCount;
 }

@@ -106,6 +106,7 @@ class KalturaScheduler extends KalturaObject
 		"name",
 		"host",
 		"createdAt",
+		"lastStatus",
 	);
 	
 	public function getMapBetweenObjects()
@@ -127,15 +128,14 @@ class KalturaScheduler extends KalturaObject
 	 * @param Scheduler $dbData
 	 * @return KalturaScheduler
 	 */
-	public function fromObject($dbData)
+	public function doFromObject($dbData, KalturaDetachedResponseProfile $responseProfile = null)
 	{
-		parent::fromObject($dbData);
+		parent::doFromObject($dbData, $responseProfile);
 		
 		$statusesArray = $dbData->getStatuses();
 		if(is_array($statusesArray))
 			$this->statuses = KalturaSchedulerStatusArray::fromValuesArray($statusesArray, $this->id, $this->configuredId);
 		
-		$this->lastStatus = $dbData->getLastStatus(null);
 		$this->lastStatusStr = date('d-m-Y H:i:s', $this->lastStatus);
 		
 		return $this;
@@ -150,7 +150,7 @@ class KalturaScheduler extends KalturaObject
 		$this->fromObject($dbData);
 		
 		$this->workers = KalturaSchedulerWorkerArray::statusFromSchedulerWorkerArray($dbData->getWorkers());
-		$this->configs = KalturaSchedulerConfigArray::fromSchedulerConfigArray($dbData->getConfigs());
+		$this->configs = KalturaSchedulerConfigArray::fromDbArray($dbData->getConfigs());
 		
 		return $this;
 	}

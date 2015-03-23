@@ -20,7 +20,18 @@ class KalturaFileSyncFilter extends KalturaFileSyncBaseFilter
 	{
 		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
 	}
+
+	/* (non-PHPdoc)
+	 * @see KalturaFilter::getCoreFilter()
+	 */
+	protected function getCoreFilter()
+	{
+		return new FileSyncFilter();
+	}
 	
+	/* (non-PHPdoc)
+	 * @see KalturaFilter::toObject()
+	 */
 	public function toObject ( $object_to_fill = null, $props_to_skip = array() )
 	{
 		if(!$this->isNull('currentDc'))

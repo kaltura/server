@@ -13,10 +13,10 @@ class KalturaDeleteFileJobData extends KalturaJobData
 	/* (non-PHPdoc)
 	 * @see KalturaObject::fromObject($source_object)
 	 */
-	public function fromObject($sourceObject)
+	public function doFromObject($sourceObject, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		$this->localFileSyncPath = $sourceObject->getLocalFileSyncPath();
-		return parent::fromObject($sourceObject);
+		parent::doFromObject($sourceObject, $responseProfile);
 	}
 	
 }

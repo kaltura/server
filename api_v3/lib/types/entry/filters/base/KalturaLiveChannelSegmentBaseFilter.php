@@ -4,7 +4,7 @@
  * @subpackage filters.base
  * @abstract
  */
-abstract class KalturaLiveChannelSegmentBaseFilter extends KalturaFilter
+abstract class KalturaLiveChannelSegmentBaseFilter extends KalturaRelatedFilter
 {
 	static private $map_between_objects = array
 	(

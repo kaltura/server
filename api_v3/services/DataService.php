@@ -47,7 +47,7 @@ class DataService extends KalturaEntryService
 		$trackEntry->setDescription(__METHOD__ . ":" . __LINE__ . "::ENTRY_DATA");
 		TrackEntry::addTrackEntry($trackEntry);
 		
-		$dataEntry->fromObject($dbEntry);
+		$dataEntry->fromObject($dbEntry, $this->getResponseProfile());
 		
 		myNotificationMgr::createNotification(kNotificationJobData::NOTIFICATION_TYPE_ENTRY_ADD, $dbEntry);
 		
@@ -75,7 +75,7 @@ class DataService extends KalturaEntryService
 			$dbEntry->setDesiredVersion($version);
 			
 		$dataEntry = new KalturaDataEntry();
-		$dataEntry->fromObject($dbEntry);
+		$dataEntry->fromObject($dbEntry, $this->getResponseProfile());
 
 		return $dataEntry;
 	}
@@ -126,7 +126,7 @@ class DataService extends KalturaEntryService
 	    $filter->typeEqual = KalturaEntryType::DATA;
 	    list($list, $totalCount) = parent::listEntriesByFilter($filter, $pager);
 	    
-	    $newList = KalturaDataEntryArray::fromEntryArray($list);
+	    $newList = KalturaDataEntryArray::fromDbArray($list, $this->getResponseProfile());
 		$response = new KalturaDataListResponse();
 		$response->objects = $newList;
 		$response->totalCount = $totalCount;

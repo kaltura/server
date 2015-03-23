@@ -72,7 +72,7 @@ class BatchService extends KalturaBatchService
 			}
 		}
 
-		$bulkUploadResult->fromObject($dbBulkUploadResult);
+		$bulkUploadResult->fromObject($dbBulkUploadResult, $this->getResponseProfile());
 		return $bulkUploadResult;
 	}
 
@@ -92,7 +92,7 @@ class BatchService extends KalturaBatchService
 			return null;
 
 		$bulkUploadResult = new KalturaBulkUploadResult();
-		$bulkUploadResult->fromObject($dbBulkUploadResult);
+		$bulkUploadResult->fromObject($dbBulkUploadResult, $this->getResponseProfile());
 		return $bulkUploadResult;
 	}
 
@@ -267,7 +267,7 @@ class BatchService extends KalturaBatchService
 
 		$mediaInfoDb = kBatchManager::addMediaInfo($mediaInfoDb);
 
-		$mediaInfo->fromObject($mediaInfoDb);
+		$mediaInfo->fromObject($mediaInfoDb, $this->getResponseProfile());
 		return $mediaInfo;
 	}
 

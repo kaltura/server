@@ -42,7 +42,9 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
 import java.util.zip.GZIPInputStream;
@@ -90,8 +92,6 @@ abstract public class KalturaClientBase implements Serializable {
 	
 	private static final String UTF8_CHARSET = "UTF-8";
 
-    private static final String PARTNER_ID_PARAM_NAME = "partnerId";
-    
     // KS v2 constants
     private static final int BLOCK_SIZE = 16;
     private static final String FIELD_EXPIRY = "_e";
@@ -101,10 +101,11 @@ abstract public class KalturaClientBase implements Serializable {
 
 	private static final int MAX_DEBUG_RESPONSE_STRING_LENGTH = 1024;
 	protected KalturaConfiguration kalturaConfiguration;
-    protected String sessionId;
     protected List<KalturaServiceActionCall> callsQueue;
     protected List<Class<?>> requestReturnType;
     protected KalturaParams multiRequestParamsMap;
+	protected Map<String, Object> clientConfiguration = new HashMap<String, Object>();
+	protected Map<String, Object> requestConfiguration = new HashMap<String, Object>();
 
 	private static IKalturaLogger logger = KalturaLogger.getLogger(KalturaClientBase.class);
     
@@ -188,16 +189,6 @@ abstract public class KalturaClientBase implements Serializable {
         this.multiRequestParamsMap = new KalturaParams();
     }
 
-    abstract String getApiVersion();
-
-    public String getSessionId() {
-        return this.sessionId;
-    }
-
-	public void setSessionId(String sessionId) {
-		this.sessionId = sessionId;
-	}
-					
 	public boolean isMultiRequest() {
 		return (requestReturnType != null);
 	}
@@ -223,14 +214,9 @@ abstract public class KalturaClientBase implements Serializable {
 	}
 
 	public void queueServiceCall(String service, String action, KalturaParams kparams, KalturaFiles kfiles, Class<?> expectedClass) {
-		// in start session partner id is optional (default -1). if partner id was not set, use the one in the config
-		if (!kparams.containsKey(PARTNER_ID_PARAM_NAME))
-			kparams.add(PARTNER_ID_PARAM_NAME, this.kalturaConfiguration.getPartnerId());
-
-		if (kparams.get(PARTNER_ID_PARAM_NAME).equals("-1"))
-			kparams.add(PARTNER_ID_PARAM_NAME, this.kalturaConfiguration.getPartnerId());
-
-		kparams.add("ks", this.sessionId);
+		for(Entry<String, Object> itr : this.requestConfiguration.entrySet()) {
+			kparams.add(itr.getKey(), (String) itr.getValue());	   
+		}
 
 		KalturaServiceActionCall call = new KalturaServiceActionCall(service, action, kparams, kfiles);
 		if(requestReturnType != null)
@@ -462,10 +448,12 @@ abstract public class KalturaClientBase implements Serializable {
 		String url = this.kalturaConfiguration.getEndpoint() + "/api_v3/index.php?service=";
 		
 		// append the basic params
-		kparams.put("apiVersion", this.getApiVersion());
-		kparams.put("clientTag", this.kalturaConfiguration.getClientTag());
 		kparams.add("format", this.kalturaConfiguration.getServiceFormat());
 		kparams.add("ignoreNull", true);
+	
+		for(Entry<String, Object> itr : this.clientConfiguration.entrySet()) {
+			kparams.add(itr.getKey(), (String) itr.getValue());	   
+		}
 		
 		if (requestReturnType != null) {
 			url += "multirequest";

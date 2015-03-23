@@ -190,11 +190,6 @@ class KalturaUiConf extends KalturaObject implements IFilterable
 		return array_merge ( parent::getMapBetweenObjects() , self::$map_between_objects );
 	}
 
-	public function fromUiConf ( uiConf  $uiConf )
-	{
-		parent::fromObject( $uiConf );
-	}
-	
 	public function toUiConf () 
 	{
 		$uiConf = new uiConf();

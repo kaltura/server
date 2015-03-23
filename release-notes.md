@@ -1,6 +1,20 @@
-
 ----------
 # Jupiter-10.7.0 #
+
+##API Response Profiles##
+- Issue Type: new feature
+
+#### Configuration ####
+None
+
+#### Deployment Scripts ####
+
+	mysql -uroot -p kaltura < deployment/updates/sql/2015_02_23_response_profile_table.sql
+	php deployment/updates/scripts/add_permissions/2015_02_23_response_profile.php  
+
+#### Known Issues & Limitations ####
+
+None.
 
 ##Live Analytics - Show DVR audience metrics on Live Analytics##
 - Issue Type: new feature
@@ -26,8 +40,7 @@ None.
 - Issue ID: PLAT-2540
 
 ### Configuration ###
-- Add "params.ffprobeCmd = ffprobe" to 
-- - configurations/batch/live.workers.ini - KAsyncConvertLiveSegment
+- Add "params.ffprobeCmd = ffprobe" to configurations/batch/live.workers.ini - KAsyncConvertLiveSegment
 
 ----------
 # Jupiter-10.5.0 #

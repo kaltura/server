@@ -44,7 +44,7 @@ class TagService extends KalturaBaseService
         $tags = TagPeer::doSelect($c);
         
         $searchResponse = new KalturaTagListResponse();
-        $searchResponse->objects = KalturaTagArray::fromDbArray($tags);
+        $searchResponse->objects = KalturaTagArray::fromDbArray($tags, $this->getResponseProfile());
         $searchResponse->totalCount = $c->getRecordsCount();
         
         return $searchResponse;

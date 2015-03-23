@@ -63,15 +63,36 @@ class KalturaCategoryFilter extends KalturaCategoryBaseFilter
 	 * @var string
 	 */
 	public $idOrInheritedParentIdIn;
-	
+
 	/* (non-PHPdoc)
-	 * @see KalturaObject::toObject()
+	 * @see KalturaFilter::getCoreFilter()
 	 */
-	public function toObject($coreFilter = null, $props_to_skip = array()) 
+	protected function getCoreFilter()
 	{
-		if(is_null($coreFilter))
-			$coreFilter = new categoryFilter();
+		return new categoryFilter();
+	}
+
+	/* (non-PHPdoc)
+	 * @see KalturaRelatedFilter::getListResponse()
+	 */
+	public function getListResponse(KalturaFilterPager $pager, KalturaDetachedResponseProfile $responseProfile = null)
+	{
+		if ($this->orderBy === null)
+			$this->orderBy = KalturaCategoryOrderBy::DEPTH_ASC;
 			
-		return parent::toObject($coreFilter, $props_to_skip);
+		$categoryFilter = $this->toObject();
+		
+		$c = KalturaCriteria::create(categoryPeer::OM_CLASS);
+		$categoryFilter->attachToCriteria($c);
+		$pager->attachToCriteria($c);
+		$dbList = categoryPeer::doSelect($c);
+		$totalCount = $c->getRecordsCount();
+		
+		$list = KalturaCategoryArray::fromDbArray($dbList, $responseProfile);
+		
+		$response = new KalturaCategoryListResponse();
+		$response->objects = $list;
+		$response->totalCount = $totalCount;
+		return $response;
 	}
 }

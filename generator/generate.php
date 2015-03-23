@@ -89,7 +89,7 @@ elseif(!$generateSingle)
 //if we got specific generator request, tes if this requested generator does exist
 if ($generateSingle != null)
 {
-	$libsToGenerate = array_intersect(explode(',', $generateSingle), array_keys($config->toArray()));
+	$libsToGenerate = array_map('strtolower', array_intersect(explode(',', $generateSingle), array_keys($config->toArray())));
 }
 
 //get the API version

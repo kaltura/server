@@ -86,7 +86,7 @@ class CuePointService extends KalturaBaseService
 			return null;
 		}
 			
-		$cuePoint->fromObject($dbCuePoint);
+		$cuePoint->fromObject($dbCuePoint, $this->getResponseProfile());
 		return $cuePoint;
 	}
 	
@@ -111,7 +111,7 @@ class CuePointService extends KalturaBaseService
 		}
 		
 		$response = new KalturaCuePointListResponse();
-		$response->objects = KalturaCuePointArray::fromDbArray($list);
+		$response->objects = KalturaCuePointArray::fromDbArray($list, $this->getResponseProfile());
 		$response->totalCount = count($list);
 	
 		return $response;
@@ -171,7 +171,7 @@ class CuePointService extends KalturaBaseService
 		if(!$cuePoint)
 			return null;
 			
-		$cuePoint->fromObject($dbCuePoint);
+		$cuePoint->fromObject($dbCuePoint, $this->getResponseProfile());
 		return $cuePoint;
 	}
 	
@@ -193,43 +193,8 @@ class CuePointService extends KalturaBaseService
 
 		if (!$filter)
 			$filter = new KalturaCuePointFilter();
-		
-		$c = KalturaCriteria::create(CuePointPeer::OM_CLASS);
-		if($this->getCuePointType())
-			$c->add(CuePointPeer::TYPE, $this->getCuePointType());
-
-		$entryIds = null;
-		if ($filter->entryIdEqual) {
-			$entryIds = array($filter->entryIdEqual);
-		} else if ($filter->entryIdIn) {
-			$entryIds = explode(',', $filter->entryIdIn);
-		}
-		
-		if (! is_null ( $entryIds )) {
-			$entryIds = entryPeer::filterEntriesByPartnerOrKalturaNetwork ( $entryIds, $this->getPartnerId () );
-			if (! $entryIds) {
-				$response = new KalturaCuePointListResponse ();
-				$response->objects = array ();
-				$response->totalCount = 0;
-				return $response;
-			}
 			
-			$filter->entryIdEqual = null;
-			$filter->entryIdIn = implode ( ',', $entryIds );
-		}
-
-		$cuePointFilter = $filter->toObject();
-		$cuePointFilter->attachToCriteria($c);
-
-		$pager->attachToCriteria($c);
-			
-		$list = CuePointPeer::doSelect($c);
-		
-		$response = new KalturaCuePointListResponse();
-		$response->objects = KalturaCuePointArray::fromDbArray($list);
-		$response->totalCount = $c->getRecordsCount();
-	
-		return $response;
+		return $filter->getTypeListResponse($pager, $this->getResponseProfile(), $this->getCuePointType());
 	}
 	
 	/**
@@ -287,7 +252,7 @@ class CuePointService extends KalturaBaseService
 		$dbCuePoint->setKuserId($this->getKuser()->getId()); 
 		$dbCuePoint->save();
 		
-		$cuePoint->fromObject($dbCuePoint);
+		$cuePoint->fromObject($dbCuePoint, $this->getResponseProfile());
 		return $cuePoint;
 	}
 	
