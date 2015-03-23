@@ -9,5 +9,5 @@ interface IApiObjectFactory
 	 * Should return the API object
 	 *
 	 */
-	public static function getInstance($sourceObject);
+	public static function getInstance($sourceObject, KalturaDetachedResponseProfile $responseProfile = null);
 }

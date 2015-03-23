@@ -149,7 +149,7 @@ class KalturaAsset extends KalturaObject implements IFilterable, IApiObjectFacto
 		return array();
 	}
 	
-	public static function getInstance($sourceObject, KalturaDetachedResponseProfile $responseProfile)
+	public static function getInstance($sourceObject, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 	     $type = $sourceObject->getType();
 	     $object = null;

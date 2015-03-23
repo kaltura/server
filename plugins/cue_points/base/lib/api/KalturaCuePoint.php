@@ -332,13 +332,13 @@ abstract class KalturaCuePoint extends KalturaObject implements IFilterable, IAp
 	 * @param int $type
 	 * @return KalturaCuePoint
 	 */
-	public static function getInstance($sourceObject, KalturaDetachedResponseProfile $responseProfile)
+	public static function getInstance($sourceObject, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		$object = KalturaPluginManager::loadObject('KalturaCuePoint', $sourceObject->getType());
 		if (!$object)
 		    return null;
 		
-		$object->fromObject($sourceObject);		 
+		$object->fromObject($sourceObject, $responseProfile);		 
 		return $object;
 	}
 }

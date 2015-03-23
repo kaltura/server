@@ -717,13 +717,13 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable, IApiObjectF
 		);
 	}
 	
-	public static function getInstance($sourceObject)
+	public static function getInstance($sourceObject, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 	    $object = KalturaEntryFactory::getInstanceByType($this->type);
 	    if (!$object)
 	        return null;
 	    
-	    $object->fromObject($sourceObject);
+	    $object->fromObject($sourceObject, $responseProfile);
 	    return $object;
 	}
 }
