@@ -127,15 +127,14 @@ class kMetadataFlowManager implements kBatchJobStatusEventConsumer, kObjectDataC
 			foreach ($profileFields as $profileField)
 			{
 				/** @var MetadataProfileField $profileField */
-				$relatedMetadataProfiles[$profileField->getMetadataProfileId()] = null;
-			}
-			$relatedMetadataProfiles = array_keys($relatedMetadataProfiles);
-			foreach($relatedMetadataProfiles as $relatedMetadataProfileId)
-			{
+				if (in_array($profileField->getMetadataProfileId(), $relatedMetadataProfiles))
+					continue;
+
 				$filter = new MetadataFilter();
-				$filter->set('_eq_metadata_profile_id', $relatedMetadataProfileId);
+				$filter->set('_eq_metadata_profile_id', $profileField->getMetadataProfileId());
 				$indexObjectType = kPluginableEnumsManager::apiToCore('IndexObjectType', MetadataPlugin::getApiValue(MetadataIndexObjectType::METADATA));
 				kJobsManager::addIndexJob($object->getPartnerId(), $indexObjectType, $filter, true);
+				$relatedMetadataProfiles[] = $profileField->getMetadataProfileId();
 			}
 		}
 
