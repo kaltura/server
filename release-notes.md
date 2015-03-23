@@ -1,4 +1,34 @@
 ----------
+# Jupiter-10.8.0 #
+
+## Dynamic Objects ##
+
+- Issue Type: New Feature
+- Issue ID: PLAT-2466
+
+#### Configuration ####
+
+*plugins.ini*
+
+Add `MetadataSphinx` to the end of `Mandatory plugins` section (after `SphinxSearch`)
+
+*sphinx*
+
+Update `configurations/sphinx/kaltura.conf` according to template (a new index `kaltura_metadata` was added).
+
+
+#### Deployment Scripts ####
+
+		mysql -uroot -p kaltura < deployment/updates/sql/2015_03_18_alter_metadata_profile_field_with_custom_data_field.sql
+		php deployment/updates/scripts/add_permissions/2015_03_18_update_metadata_permissions.php
+		php deployment/base/scripts/installPlugins.php
+		php deployment/base/scripts/populateSphinxMetadata.php
+
+#### Known Issues & Limitations ####
+
+None.
+
+----------
 # Jupiter-10.7.0 #
 
 ##API Response Profiles##
