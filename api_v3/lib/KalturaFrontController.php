@@ -23,6 +23,8 @@ class KalturaFrontController
         
         $this->service = isset($this->params["service"]) ? (string)$this->params["service"] : null;
 		$this->action = isset($this->params["action"]) ? (string)$this->params["action"] : null;
+		
+		kCurrentContext::$serializeCallback = array($this, 'serialize');
     }
         
 	/**
@@ -418,6 +420,28 @@ class KalturaFrontController
 	}
 	
 	
+	protected function setSerializer($format, $ignoreNull = true)
+	{
+	    // Return a serializer according to the given format
+	    switch ($format)
+	    {
+	        case KalturaResponseType::RESPONSE_TYPE_XML:
+	            return new KalturaXmlSerializer($ignoreNull);
+	    
+	        case KalturaResponseType::RESPONSE_TYPE_PHP:
+	            return new KalturaPhpSerializer();
+	    
+	        case KalturaResponseType::RESPONSE_TYPE_JSON:
+	            return new KalturaJsonSerializer();
+	            	
+	        case KalturaResponseType::RESPONSE_TYPE_JSONP:
+	            return new KalturaJsonProcSerializer();
+	             
+	        default:
+	            return KalturaPluginManager::loadObject('KalturaSerializer', $format);
+	    }	    
+	}
+	
 	public function setSerializerByFormat()
 	{
 		if (isset($this->params["ignoreNull"]))
@@ -429,29 +453,7 @@ class KalturaFrontController
 		$format = isset($this->params["format"]) ? $this->params["format"] : KalturaResponseType::RESPONSE_TYPE_XML;
 		
 		// Create a serializer according to the given format
-		switch($format)
-		{
-			case KalturaResponseType::RESPONSE_TYPE_XML:
-				$serializer = new KalturaXmlSerializer($ignoreNull);
-				break;
-				
-			case KalturaResponseType::RESPONSE_TYPE_PHP:
-				$serializer = new KalturaPhpSerializer();
-				break;
-				
-			case KalturaResponseType::RESPONSE_TYPE_JSON:
-				$serializer = new KalturaJsonSerializer();
-				break;
-			
-			case KalturaResponseType::RESPONSE_TYPE_JSONP:
-				$serializer = new KalturaJsonProcSerializer();
-				break;
-			    
-			default:
-				$serializer = KalturaPluginManager::loadObject('KalturaSerializer', $format);
-				break;
-		}
-		
+		$serializer = $this->setSerializer($format, $ignoreNull);
 		if(empty($serializer))
 			throw new KalturaAPIException(APIErrors::UNKNOWN_RESPONSE_FORMAT, $format);
 		
@@ -555,4 +557,30 @@ class KalturaFrontController
 			return $replacedException;
 		}
 	}
+
+    public function serialize($object, $className, $serializerType)
+    {
+        if (!class_exists($className)) {
+            KalturaLog::err("Class [$className] was not found!");
+            return null;
+        }
+        
+        $apiObject = null;
+        // if KalturaBaseEntry, KalturaCuePoint, KalturaAsset
+        if (is_subclass_of($className, 'IApiObjectFactory')) 
+        {
+            $apiObject = $className::getInstance($object);
+        }        
+
+        // if KalturaObject
+        elseif (is_subclass_of($className, 'IApiObject')) 
+        {
+            $apiObject = new $className();
+            $apiObject->fromObject($object);
+        }
+        
+        // return serialized object according to required type
+        $serializer = $this->setSerializer($serializerType);
+        return $serializer->serialize($apiObject);
+    }
 }

@@ -3,7 +3,7 @@
  * @package api
  * @subpackage objects
  */
-class KalturaAsset extends KalturaObject implements IFilterable
+class KalturaAsset extends KalturaObject implements IFilterable, IApiObjectFactory
 {
 	/**
 	 * The ID of the Flavor Asset
@@ -148,4 +148,42 @@ class KalturaAsset extends KalturaObject implements IFilterable
 	{
 		return array();
 	}
+	
+	public static function getInstance($sourceObject)
+	{
+	     $type = $sourceObject->getType();
+	     $object = null;
+	     switch ($type)
+	     {
+	         case KalturaAssetType::FLAVOR:
+	             $object = new KalturaFlavorAsset();
+	             break;
+	         case KalturaAssetType::LIVE:
+	             $object = new KalturaLiveAsset();
+	             break;
+	         case KalturaAssetType::THUMBNAIL:
+	             $object = new KalturaThumbAsset();
+	             break;
+	         default:
+	             if(in_array($type, KalturaPluginManager::getExtendedTypes(assetParamsPeer::OM_CLASS, assetType::THUMBNAIL)))
+	             {
+	                 $obj = KalturaPluginManager::loadObject('KalturaThumbAsset', $type);
+	             }
+	             elseif(in_array($type, KalturaPluginManager::getExtendedTypes(assetParamsPeer::OM_CLASS, assetType::FLAVOR)))
+	             {
+	                 $obj = KalturaPluginManager::loadObject('KalturaFlavorAsset', $type);
+	             }
+	             else
+	             {
+	                 $obj = KalturaPluginManager::loadObject('KalturaAsset', $type);
+	             }
+	     }
+	     
+	     // verify object was really generated
+	     if (!$object)
+	         return null;
+	     // otherwise, create from given object
+	     $object->fromObject($sourceObject);
+	     return $object;
+	}	
 }

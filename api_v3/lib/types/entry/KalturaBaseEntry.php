@@ -3,7 +3,7 @@
  * @package api
  * @subpackage objects
  */
-class KalturaBaseEntry extends KalturaObject implements IFilterable 
+class KalturaBaseEntry extends KalturaObject implements IFilterable, IApiObjectFactory
 {
 	/**
 	 * Auto generated 10 characters alphanumeric string
@@ -716,5 +716,15 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 			"categoriesMatchOr" => "All entries within these categories or their child categories.",
 			"categoriesIdsMatchOr" => "All entries of the categories, excluding their child categories.\nTo include entries of the child categories, use categoryAncestorIdIn, or categoriesMatchOr.",
 		);
+	}
+	
+	public static function getInstance($sourceObject)
+	{
+	    $object = KalturaEntryFactory::getInstanceByType($this->type);
+	    if (!$object)
+	        return null;
+	    
+	    $object->fromObject($sourceObject);
+	    return $object;
 	}
 }

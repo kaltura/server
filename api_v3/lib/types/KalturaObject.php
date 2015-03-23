@@ -3,7 +3,7 @@
  * @package api
  * @subpackage objects
  */
-abstract class KalturaObject 
+abstract class KalturaObject implements IApiObject
 {
 	static protected $sourceFilesCache = array();
 	static protected $classPrivatesCache = array();
