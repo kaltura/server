@@ -252,7 +252,12 @@ class kMetadataManager
 		{
 			if ($xPathData['metadataProfileId'] == $metadataProfile->getId())
 				throw new kCoreException('Self metadata reference is not allowed');
-			$profileField->setRelatedMetadataProfileId($xPathData['metadataProfileId']);
+			$relatedMetadataProfileId = $xPathData['metadataProfileId'];
+			$relatedMetadataProfile = MetadataProfilePeer::retrieveByPK($relatedMetadataProfileId);
+			if (!$relatedMetadataProfile)
+				throw new kCoreException('Metadata profile id ['.$relatedMetadataProfileId.' was not found', kCoreException::ID_NOT_FOUND);
+
+			$profileField->setRelatedMetadataProfileId($relatedMetadataProfileId);
 		}
 	}
 	
