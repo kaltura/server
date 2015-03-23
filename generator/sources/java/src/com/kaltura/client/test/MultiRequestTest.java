@@ -27,6 +27,7 @@
 // ===================================================================================================
 package com.kaltura.client.test;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Date;
@@ -48,7 +49,7 @@ public class MultiRequestTest extends BaseTest{
 	@SuppressWarnings("unchecked")
 	public void testMultiRequest() throws Exception {
 		
-		BaseTest.startAdminSession(client,kalturaConfig);
+		startAdminSession();
 		client.startMultiRequest();
 		
 		// 1. Ping (Bool : void)
@@ -64,7 +65,7 @@ public class MultiRequestTest extends BaseTest{
 		
 		// 3. Upload token (Object : Object)
 		KalturaUploadToken uploadToken = new KalturaUploadToken();
-		uploadToken.fileName = KalturaTestConfig.UPLOAD_IMAGE;
+		uploadToken.fileName = testConfig.getUploadImage();
 		uploadToken.fileSize = fileData.available();
 		KalturaUploadToken token = client.getUploadTokenService().add(uploadToken);
 		assertNull(token);
@@ -76,7 +77,7 @@ public class MultiRequestTest extends BaseTest{
 		assertNull(entry);
 		
 		// 5. upload (Object : String, file, boolean)
-		uploadToken = client.getUploadTokenService().upload("{3:result:id}", fileData, KalturaTestConfig.UPLOAD_IMAGE, fileData.available(), false);
+		uploadToken = client.getUploadTokenService().upload("{3:result:id}", fileData, testConfig.getUploadImage(), fileData.available(), false);
 		
 		KalturaMultiResponse multi = client.doMultiRequest();
 		// 0
@@ -119,10 +120,11 @@ public class MultiRequestTest extends BaseTest{
 	 * This function tests that in a case of error in a multi request, the error is parsed correctly
 	 * and it doesn't affect the rest of the multi-request.
 	 * @throws KalturaApiException
+	 * @throws IOException 
 	 */
-	public void testMultiRequestWithError() throws KalturaApiException {
+	public void testMultiRequestWithError() throws Exception {
 		
-		BaseTest.startAdminSession(client,kalturaConfig);
+		startAdminSession();
 		client.startMultiRequest();
 		
 		client.getSystemService().ping();

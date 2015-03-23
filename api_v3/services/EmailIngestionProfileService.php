@@ -37,7 +37,7 @@ class EmailIngestionProfileService extends KalturaEntryService
 		$dbEIP->save();
 
 		$savedEIP = new KalturaEmailIngestionProfile(); // start from blank
-		$savedEIP->fromObject( $dbEIP );
+		$savedEIP->fromObject($dbEIP, $this->getResponseProfile());
 
 		return $savedEIP;
 	}
@@ -58,7 +58,7 @@ class EmailIngestionProfileService extends KalturaEntryService
 		throw new KalturaAPIException(KalturaErrors::EMAIL_INGESTION_PROFILE_NOT_FOUND, $emailAddress);
 
 		$emailIP = new KalturaEmailIngestionProfile();
-		$emailIP->fromObject($existingEIP);
+		$emailIP->fromObject($existingEIP, $this->getResponseProfile());
 
 		return $emailIP;
 	}
@@ -79,7 +79,7 @@ class EmailIngestionProfileService extends KalturaEntryService
 		throw new KalturaAPIException(KalturaErrors::EMAIL_INGESTION_PROFILE_NOT_FOUND, $id);
 			
 		$emailIP = new KalturaEmailIngestionProfile();
-		$emailIP->fromObject($existingEIP);
+		$emailIP->fromObject($existingEIP, $this->getResponseProfile());
 
 		return $emailIP;
 	}
@@ -105,7 +105,7 @@ class EmailIngestionProfileService extends KalturaEntryService
 		$updateEIP = $EmailIP->toUpdatableObject($dbEIP);
 
 		$dbEIP->save();
-		$updateEIP->fromObject( $dbEIP );
+		$updateEIP->fromObject($dbEIP, $this->getResponseProfile());
 
 		return $updateEIP;
 	}
@@ -162,7 +162,7 @@ class EmailIngestionProfileService extends KalturaEntryService
 			    throw new KalturaAPIException(KalturaErrors::EMAIL_INGESTION_PROFILE_NOT_FOUND, $emailProfId);
 	
 			$emailIP = new KalturaEmailIngestionProfile();
-			$emailIP->fromObject($existingEIP);
+			$emailIP->fromObject($existingEIP, $this->getResponseProfile());
 	
 	
 			// handle defaults for media entry metadata
@@ -239,7 +239,7 @@ class EmailIngestionProfileService extends KalturaEntryService
 			
 			myNotificationMgr::createNotification( kNotificationJobData::NOTIFICATION_TYPE_ENTRY_ADD, $dbEntry);
 	
-			$mediaEntry->fromObject($dbEntry);
+			$mediaEntry->fromObject($dbEntry, $this->getResponseProfile());
 			return $mediaEntry;
 	    }
 	    catch(kCoreException $ex)

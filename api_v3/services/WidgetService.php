@@ -79,7 +79,7 @@ class WidgetService extends KalturaBaseService
 		$savedWidget = widgetPeer::retrieveByPK($widgetId);
 		
 		$widget = new KalturaWidget(); // start from blank
-		$widget->fromWidget($savedWidget);
+		$widget->fromObject($savedWidget, $this->getResponseProfile());
 		
 		return $widget;
 	}
@@ -130,7 +130,7 @@ class WidgetService extends KalturaBaseService
 		$dbWidget->save();
 		// TODO: widget in cache, should drop from cache
 
-		$widget->fromWidget( $dbWidget );
+		$widget->fromObject($dbWidget, $this->getResponseProfile());
 		
 		return $widget;
 	}
@@ -149,7 +149,7 @@ class WidgetService extends KalturaBaseService
 		if ( ! $dbWidget )
 			throw new KalturaAPIException ( APIErrors::INVALID_WIDGET_ID , $id );
 		$widget = new KalturaWidget();
-		$widget->fromWidget( $dbWidget );
+		$widget->fromObject($dbWidget, $this->getResponseProfile());
 		
 		return $widget;
 	}
@@ -175,7 +175,7 @@ class WidgetService extends KalturaBaseService
 			throw new KalturaAPIException ( APIErrors::INVALID_KSHOW_AND_ENTRY_PAIR , $widget->kshowId, $widget->entryId );
 
 		$widget = new KalturaWidget;
-		$widget->fromWidget( $newWidget );
+		$widget->fromObject($newWidget, $this->getResponseProfile());
 		return $widget;
 	}
 	
@@ -204,7 +204,7 @@ class WidgetService extends KalturaBaseService
 		$pager->attachToCriteria ( $c );
 		$list = widgetPeer::doSelect( $c );
 		
-		$newList = KalturaWidgetArray::fromWidgetArray( $list );
+		$newList = KalturaWidgetArray::fromDbArray($list, $this->getResponseProfile());
 		
 		$response = new KalturaWidgetListResponse();
 		$response->objects = $newList;

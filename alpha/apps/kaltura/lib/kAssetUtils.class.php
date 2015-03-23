@@ -67,7 +67,7 @@ class kAssetUtils
 		return array($fileBaseName, $fileExt);
 	}
 
-	public static function getAssetUrl(asset $asset, $servePlayManifest = false , $playManifestClientTag = null , $storageId = null)
+	public static function getAssetUrl(asset $asset, $servePlayManifest = false , $playManifestClientTag = null , $storageId = null, $urlParameters = '')
 	{
 		$partner = PartnerPeer::retrieveByPK($asset->getPartnerId());
 		if(!$partner)
@@ -96,7 +96,7 @@ class kAssetUtils
 		
 		$url = preg_replace('/^https?:\/\//', '', $url);
 			
-		return 'http://' . $url;
+		return 'http://' . $url . $urlParameters;
 	}
 
 	private static function getExternalStorageUrl(Partner $partner, asset $asset, FileSyncKey $key, $servePlayManifest = false , $playManifestClientTag = null , $storageId = null)

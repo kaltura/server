@@ -166,18 +166,18 @@ class KalturaEmailNotificationTemplate extends KalturaEventNotificationTemplate
 	/* (non-PHPdoc)
 	 * @see KalturaObject::fromObject($source_object)
 	 */
-	public function fromObject($dbObject)
+	public function doFromObject($dbObject, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		/* @var $dbObject EmailNotificationTemplate */
-		parent::fromObject($dbObject);
+		parent::doFromObject($dbObject, $responseProfile);
 		
-		if($dbObject->getTo())
+		if($this->shouldGet('to', $responseProfile) && $dbObject->getTo())
 			$this->to = KalturaEmailNotificationRecipientProvider::getProviderInstance($dbObject->getTo());
-		if($dbObject->getCc())
+		if($this->shouldGet('cc', $responseProfile) && $dbObject->getCc())
 			$this->cc = KalturaEmailNotificationRecipientProvider::getProviderInstance($dbObject->getCc());
-		if($dbObject->getBcc())
+		if($this->shouldGet('bcc', $responseProfile) && $dbObject->getBcc())
 			$this->bcc = KalturaEmailNotificationRecipientProvider::getProviderInstance($dbObject->getBcc());
-		if($dbObject->getReplyTo())
+		if($this->shouldGet('replyTo', $responseProfile) && $dbObject->getReplyTo())
 			$this->replyTo = KalturaEmailNotificationRecipientProvider::getProviderInstance($dbObject->getReplyTo());
 	}
 }

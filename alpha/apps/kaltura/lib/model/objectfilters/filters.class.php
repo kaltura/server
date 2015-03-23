@@ -195,6 +195,20 @@ abstract class baseObjectFilter extends myBaseObject
 		return $res;
 	}
 
+	function __sleep()
+	{
+	    $allVars = get_object_vars($this);
+	    $return = array();
+	    foreach(array_keys($allVars) as $name)
+	    {
+	        if (isset($this->$name))
+	        {
+	            $return[] = $name;
+	        }
+	    }
+	    return $return;
+	}
+
 /*	public function baseObjectFilter ( $field_name_translation_type = BasePeer::TYPE_FIELDNAME )
 	{
 		echo "baseObjectFilter: $field_name_translation_type<br>";

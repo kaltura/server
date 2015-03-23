@@ -61,7 +61,7 @@ class CaptionParamsService extends KalturaBaseService
 		$captionParamsDb->setPartnerId($this->getPartnerId());
 		$captionParamsDb->save();
 		
-		$captionParams->fromObject($captionParamsDb);
+		$captionParams->fromObject($captionParamsDb, $this->getResponseProfile());
 		return $captionParams;
 	}
 	
@@ -80,7 +80,7 @@ class CaptionParamsService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::FLAVOR_PARAMS_ID_NOT_FOUND, $id);
 			
 		$captionParams = KalturaFlavorParamsFactory::getFlavorParamsInstance($captionParamsDb->getType());
-		$captionParams->fromObject($captionParamsDb);
+		$captionParams->fromObject($captionParamsDb, $this->getResponseProfile());
 		
 		return $captionParams;
 	}
@@ -105,7 +105,7 @@ class CaptionParamsService extends KalturaBaseService
 		$captionParams->toUpdatableObject($captionParamsDb);
 		$captionParamsDb->save();
 			
-		$captionParams->fromObject($captionParamsDb);
+		$captionParams->fromObject($captionParamsDb, $this->getResponseProfile());
 		return $captionParams;
 	}
 	
@@ -137,30 +137,13 @@ class CaptionParamsService extends KalturaBaseService
 	{
 		if (!$filter)
 			$filter = new KalturaCaptionParamsFilter();
-
-		if (!$pager)
-			$pager = new KalturaFilterPager();
 			
-		$captionParamsFilter = new assetParamsFilter();
-		
-		$filter->toObject($captionParamsFilter);
-		
-		$c = new Criteria();
-		$captionParamsFilter->attachToCriteria($c);
-		$pager->attachToCriteria($c);
-		
-		$captionTypes = KalturaPluginManager::getExtendedTypes(assetParamsPeer::OM_CLASS, CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION));
-		$c->add(assetParamsPeer::TYPE, $captionTypes, Criteria::IN);
-		
-		$dbList = assetParamsPeer::doSelect($c);
-		
-		$c->setLimit(null);
-		$totalCount = assetParamsPeer::doCount($c);
+		if(!$pager)
+		{
+			$pager = new KalturaFilterPager();
+		}
 
-		$list = KalturaCaptionParamsArray::fromDbArray($dbList);
-		$response = new KalturaCaptionParamsListResponse();
-		$response->objects = $list;
-		$response->totalCount = $totalCount;
-		return $response;    
+		$types = KalturaPluginManager::getExtendedTypes(assetParamsPeer::OM_CLASS, CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION));			
+		return $filter->getTypeListResponse($pager, $this->getResponseProfile(), $types);
 	}
 }

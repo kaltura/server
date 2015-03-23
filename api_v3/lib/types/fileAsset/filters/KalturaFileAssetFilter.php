@@ -17,6 +17,14 @@ class KalturaFileAssetFilter extends KalturaFileAssetBaseFilter
 	{
 		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
 	}
+
+	/* (non-PHPdoc)
+	 * @see KalturaFilter::getCoreFilter()
+	 */
+	protected function getCoreFilter()
+	{
+		return new fileAssetFilter();
+	}
 	
 	/* (non-PHPdoc)
 	 * @see KalturaFilter::toObject()
@@ -26,5 +34,26 @@ class KalturaFileAssetFilter extends KalturaFileAssetBaseFilter
 		$this->validatePropertyNotNull('fileAssetObjectTypeEqual');
 		$this->validatePropertyNotNull(array('objectIdEqual', 'objectIdIn', 'idIn', 'idEqual'));
 		return parent::toObject($object_to_fill, $props_to_skip);
+	}
+
+	/* (non-PHPdoc)
+	 * @see KalturaRelatedFilter::getListResponse()
+	 */
+	public function getListResponse(KalturaFilterPager $pager, KalturaDetachedResponseProfile $responseProfile = null)
+	{
+		$fileAssetFilter = $this->toObject();
+
+		$c = new Criteria();
+		$fileAssetFilter->attachToCriteria($c);
+		
+		$totalCount = FileAssetPeer::doCount($c);
+		
+		$pager->attachToCriteria($c);
+		$dbList = FileAssetPeer::doSelect($c);
+		
+		$response = new KalturaFileAssetListResponse();
+		$response->objects = KalturaFileAssetArray::fromDbArray($dbList, $responseProfile);
+		$response->totalCount = $totalCount;
+		return $response; 
 	}
 }

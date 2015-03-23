@@ -5,7 +5,7 @@
  */
 class KalturaThumbAssetArray extends KalturaTypedArray
 {
-	public static function fromDbArray($arr)
+	public static function fromDbArray($arr, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		$newArr = new KalturaThumbAssetArray();
 		if ($arr == null)
@@ -13,7 +13,7 @@ class KalturaThumbAssetArray extends KalturaTypedArray
 
 		foreach ($arr as $obj)
 		{
-    		$nObj = KalturaThumbAsset::getInstance($obj);
+    		$nObj = KalturaThumbAsset::getInstance($obj, $responseProfile);
 			$newArr[] = $nObj;
 		}
 		

@@ -46,21 +46,26 @@ class KalturaCaptionAssetItem extends KalturaObject
 		return array_merge ( parent::getMapBetweenObjects() , self::$map_between_objects );
 	}
 	
-	public function fromObject($source_object)
+	public function doFromObject($source_object, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		/* @var $source_object CaptionAssetItem */
 		
-		$ret = parent::fromObject($source_object);
+		$ret = parent::doFromObject($source_object, $responseProfile);
 		
-		$this->asset = new KalturaCaptionAsset();
-		$this->asset->fromObject($source_object->getAsset());
-		
-		$entry = $source_object->getEntry();
-		
-		if ($entry)
+		if($this->shouldGet('asset', $responseProfile))
 		{
-			$this->entry = KalturaEntryFactory::getInstanceByType($entry->getType());
-			$this->entry->fromObject($entry);
+			$this->asset = new KalturaCaptionAsset();
+			$this->asset->fromObject($source_object->getAsset());
+		}
+		
+		if($this->shouldGet('entry', $responseProfile))
+		{
+			$entry = $source_object->getEntry();
+			if ($entry)
+			{
+				$this->entry = KalturaEntryFactory::getInstanceByType($entry->getType());
+				$this->entry->fromObject($entry);
+			}
 		}
 			
 		return $ret;

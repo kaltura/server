@@ -65,7 +65,7 @@ class FlavorParamsService extends KalturaBaseService
 		$flavorParamsDb->save();
 		
 		$flavorParams = KalturaFlavorParamsFactory::getFlavorParamsInstance($flavorParamsDb->getType());
-		$flavorParams->fromObject($flavorParamsDb);
+		$flavorParams->fromObject($flavorParamsDb, $this->getResponseProfile());
 		return $flavorParams;
 	}
 	
@@ -84,7 +84,7 @@ class FlavorParamsService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::FLAVOR_PARAMS_ID_NOT_FOUND, $id);
 			
 		$flavorParams = KalturaFlavorParamsFactory::getFlavorParamsInstance($flavorParamsDb->getType());
-		$flavorParams->fromObject($flavorParamsDb);
+		$flavorParams->fromObject($flavorParamsDb, $this->getResponseProfile());
 		
 		return $flavorParams;
 	}
@@ -110,7 +110,7 @@ class FlavorParamsService extends KalturaBaseService
 		$flavorParamsDb->save();
 			
 		$flavorParams = KalturaFlavorParamsFactory::getFlavorParamsInstance($flavorParamsDb->getType());
-		$flavorParams->fromObject($flavorParamsDb);
+		$flavorParams->fromObject($flavorParamsDb, $this->getResponseProfile());
 		return $flavorParams;
 	}
 	
@@ -142,32 +142,14 @@ class FlavorParamsService extends KalturaBaseService
 	{
 		if (!$filter)
 			$filter = new KalturaFlavorParamsFilter();
-
-		if (!$pager)
-			$pager = new KalturaFilterPager();
 			
-		$flavorParamsFilter = new assetParamsFilter();
-		
-		$filter->toObject($flavorParamsFilter);
-		
-		$c = new Criteria();
-		$flavorParamsFilter->attachToCriteria($c);
-		
-		$pager->attachToCriteria($c);
-		
-		$flavorTypes = assetParamsPeer::retrieveAllFlavorParamsTypes();
-		$c->add(assetParamsPeer::TYPE, $flavorTypes, Criteria::IN);
-		
-		$dbList = assetParamsPeer::doSelect($c);
-		
-		$c->setLimit(null);
-		$totalCount = assetParamsPeer::doCount($c);
-
-		$list = KalturaFlavorParamsArray::fromDbArray($dbList);
-		$response = new KalturaFlavorParamsListResponse();
-		$response->objects = $list;
-		$response->totalCount = $totalCount;
-		return $response;    
+		if(!$pager)
+		{
+			$pager = new KalturaFilterPager();
+		}
+			
+		$types = assetParamsPeer::retrieveAllFlavorParamsTypes();			
+		return $filter->getTypeListResponse($pager, $this->getResponseProfile(), $types);
 	}
 	
 	/**
@@ -191,7 +173,7 @@ class FlavorParamsService extends KalturaBaseService
 			$flavorParamsDb[] = $item->getassetParams();
 		}
 		
-		$flavorParams = KalturaFlavorParamsArray::fromDbArray($flavorParamsDb);
+		$flavorParams = KalturaFlavorParamsArray::fromDbArray($flavorParamsDb, $this->getResponseProfile());
 		
 		return $flavorParams; 
 	}

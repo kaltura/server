@@ -59,7 +59,7 @@ class DrmProfileService extends KalturaBaseService
 		
 		// return the saved object
 		$drmProfile = KalturaDrmProfile::getInstanceByType($dbDrmProfile->getProvider());
-		$drmProfile->fromObject($dbDrmProfile);
+		$drmProfile->fromObject($dbDrmProfile, $this->getResponseProfile());
 		return $drmProfile;		
 	}
 	
@@ -80,7 +80,7 @@ class DrmProfileService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $drmProfileId);
 		}
 		$drmProfile = KalturaDrmProfile::getInstanceByType($dbDrmProfile->getProvider());
-		$drmProfile->fromObject($dbDrmProfile);
+		$drmProfile->fromObject($dbDrmProfile, $this->getResponseProfile());
 		
 		return $drmProfile;
 	}
@@ -108,7 +108,7 @@ class DrmProfileService extends KalturaBaseService
 		$dbDrmProfile->save();
 			
 		$drmProfile = KalturaDrmProfile::getInstanceByType($dbDrmProfile->getProvider());
-		$drmProfile->fromObject($dbDrmProfile);
+		$drmProfile->fromObject($dbDrmProfile, $this->getResponseProfile());
 		
 		return $drmProfile;
 	}
@@ -134,7 +134,7 @@ class DrmProfileService extends KalturaBaseService
 		$dbDrmProfile->save();
 			
 		$drmProfile = KalturaDrmProfile::getInstanceByType($dbDrmProfile->getProvider());
-		$drmProfile->fromObject($dbDrmProfile);
+		$drmProfile->fromObject($dbDrmProfile, $this->getResponseProfile());
 		
 		return $drmProfile;
 	}
@@ -162,7 +162,7 @@ class DrmProfileService extends KalturaBaseService
 		$list = DrmProfilePeer::doSelect($c);
 		
 		$response = new KalturaDrmProfileListResponse();
-		$response->objects = KalturaDrmProfileArray::fromDbArray($list);
+		$response->objects = KalturaDrmProfileArray::fromDbArray($list, $this->getResponseProfile());
 		$response->totalCount = $count;
 		
 		return $response;
@@ -188,7 +188,7 @@ class DrmProfileService extends KalturaBaseService
 			$dbDrmProfile->setName('default');
 			$dbDrmProfile->setProvider($tmpDbProfile->getProvider());
 		}		
-		$drmProfile->fromObject($dbDrmProfile);
+		$drmProfile->fromObject($dbDrmProfile, $this->getResponseProfile());
 
 		return $drmProfile;
 	}

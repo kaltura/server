@@ -39,7 +39,7 @@ class PartnerAggregationService extends KalturaBaseService
 		$list = DwhHourlyPartnerPeer::doSelect($c);
 		
 		$response = new KalturaDwhHourlyPartnerListResponse();
-		$response->objects = KalturaDwhHourlyPartnerArray::fromDbArray($list);
+		$response->objects = KalturaDwhHourlyPartnerArray::fromDbArray($list, $this->getResponseProfile());
 		$response->totalCount = $count;
 	
 		return $response;

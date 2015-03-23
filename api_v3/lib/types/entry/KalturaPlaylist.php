@@ -113,16 +113,17 @@ class KalturaPlaylist extends KalturaBaseEntry
 		return $dbObject;
 	}
 	
-	public function fromObject($sourceObject)
+	public function doFromObject($sourceObject, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		if(!$sourceObject)
 			return;
 
-		parent::fromObject( $sourceObject );
-		$host = requestUtils::getHost();
-		$this->executeUrl = myPlaylistUtils::toPlaylistUrl( $sourceObject , $host );
+		parent::doFromObject($sourceObject, $responseProfile);
 		
-		if ($this->playlistType == KalturaPlaylistType::DYNAMIC)
+		if($this->shouldGet('executeUrl', $responseProfile))
+			$this->executeUrl = myPlaylistUtils::toPlaylistUrl( $sourceObject , requestUtils::getHost() );
+		
+		if ($this->shouldGet('filters', $responseProfile) && $this->playlistType == KalturaPlaylistType::DYNAMIC)
 			$this->playlistContentXmlToFilters();
 	}
 	

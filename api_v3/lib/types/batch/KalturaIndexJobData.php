@@ -42,7 +42,7 @@ class KalturaIndexJobData extends KalturaJobData
 		return parent::toObject($dbData, $props_to_skip);
 	}
 	
-	public function fromObject($dbData) 
+	public function doFromObject($dbData, KalturaDetachedResponseProfile $responseProfile = null) 
 	{
 		/* @var $dbData kIndexJobData */
 		$filter = $dbData->getFilter();
@@ -74,7 +74,7 @@ class KalturaIndexJobData extends KalturaJobData
 		}
 		if($this->filter)
 			$this->filter->fromObject($filter);
-		
-		return parent::fromObject($dbData);
+			
+		parent::doFromObject($dbData, $responseProfile);
 	}
 }

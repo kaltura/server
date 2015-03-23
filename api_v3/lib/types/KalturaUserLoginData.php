@@ -37,15 +37,6 @@ class KalturaUserLoginData extends KalturaObject implements IFilterable
 		return parent::toObject($dbObject, $skip);	
 	}
 	
-	
-	public function fromObject($sourceObject)
-	{
-		if(!$sourceObject)
-			return;
-			
-		parent::fromObject($sourceObject);
-	}
-	
 	public function getExtraFilters()
 	{ 
 		return array();		

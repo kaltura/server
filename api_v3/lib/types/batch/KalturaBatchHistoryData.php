@@ -60,6 +60,7 @@ class KalturaBatchHistoryData extends KalturaObject
 			'errNumber',
 			'hostName',
 			'sessionId',
+			'timeStamp',
 	);
 	
 	public function getMapBetweenObjects()
@@ -72,11 +73,5 @@ class KalturaBatchHistoryData extends KalturaObject
 			$object_to_fill = new kBatchHistoryData();
 		
 		return parent::toObject($object_to_fill, $props_to_skip);
-	}
-	
-	public function fromObject($historyData)
-	{
-		parent::fromObject( $historyData );
-		$this->timeStamp = $historyData->getTimeStamp(null); // to return the timestamp and not string
 	}
 }

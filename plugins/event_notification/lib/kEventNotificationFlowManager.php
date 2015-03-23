@@ -50,6 +50,30 @@ class kEventNotificationFlowManager implements kGenericEventConsumer
 	}
 
 	/**
+	 * @param EventNotificationEventObjectType $objectType
+	 * @param string $objectId
+	 * @return BaseObject
+	 */
+	public static function getObject($objectType, $objectId) 
+	{
+		$objectClass = KalturaPluginManager::getObjectClass('EventNotificationEventObjectType', $objectType);
+		$peerClass = $objectClass . 'Peer';
+		$peer = null;
+
+		if(class_exists($peerClass))
+		{
+			$peer = new $peerClass();
+		}
+		else
+		{
+			$objectInstance = new $objectClass();
+			$peer = $objectInstance->getPeer();
+		}
+	
+		return $peer->retrieveByPK($objectId); 
+	}
+
+	/**
 	 * Return single integer value that represents the event object type
 	 * @param KalturaEvent $event
 	 * @return string class name

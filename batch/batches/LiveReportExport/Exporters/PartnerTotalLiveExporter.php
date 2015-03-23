@@ -33,6 +33,7 @@ class PartnerTotalLiveExporter extends LiveReportExporter {
 				new LiveReportEntryEngine("lastBroadcast", "Last broadcast", $this->dateFormatter),
 				new LiveReportEntryExactTimeEngine("audience", LiveReportConstants::SECONDS_60, "Total Audience", false), 
 				new LiveReportEntryQueryEngine("peakAudience", LiveReportConstants::SECONDS_36_HOURS, "Peak Audience", false),
+				new LiveReportEntryQueryEngine("peakDvrAudience", LiveReportConstants::SECONDS_36_HOURS, "Peak Dvr Audience", false),
 				new LiveReportEntryQueryEngine("secondsViewed", LiveReportConstants::SECONDS_36_HOURS, "Seconds Viewed", false),
 				new LiveReportEntryQueryEngine("bufferTime", LiveReportConstants::SECONDS_60, "Buffering Time", false),
 				new LiveReportEntryQueryEngine("avgBitrate", LiveReportConstants::SECONDS_60, "Average Bitrate", false),

@@ -32,7 +32,7 @@ class FlavorParamsOutputService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::FLAVOR_PARAMS_OUTPUT_ID_NOT_FOUND, $id);
 			
 		$flavorParamsOutput = KalturaFlavorParamsFactory::getFlavorParamsOutputInstance($flavorParamsOutputDb->getType());
-		$flavorParamsOutput->fromObject($flavorParamsOutputDb);
+		$flavorParamsOutput->fromObject($flavorParamsOutputDb, $this->getResponseProfile());
 		
 		return $flavorParamsOutput;
 	}
@@ -49,29 +49,13 @@ class FlavorParamsOutputService extends KalturaBaseService
 	{
 		if (!$filter)
 			$filter = new KalturaFlavorParamsOutputFilter();
-
-		if (!$pager)
-			$pager = new KalturaFilterPager();
 			
-		$flavorParamsOutputFilter = new assetParamsOutputFilter();
-		
-		$filter->toObject($flavorParamsOutputFilter);
-
-		$c = new Criteria();
-		$flavorParamsOutputFilter->attachToCriteria($c);
-		
-		$flavorTypes = KalturaPluginManager::getExtendedTypes(assetParamsOutputPeer::OM_CLASS, assetType::FLAVOR);
-		$c->add(assetParamsOutputPeer::TYPE, $flavorTypes, Criteria::IN);
-		
-		$totalCount = assetParamsOutputPeer::doCount($c);
-		
-		$pager->attachToCriteria($c);
-		$dbList = assetParamsOutputPeer::doSelect($c);
-		
-		$list = KalturaFlavorParamsOutputArray::fromDbArray($dbList);
-		$response = new KalturaFlavorParamsOutputListResponse();
-		$response->objects = $list;
-		$response->totalCount = $totalCount;
-		return $response;
+		if(!$pager)
+		{
+			$pager = new KalturaFilterPager();
+		}
+			
+		$types = KalturaPluginManager::getExtendedTypes(assetParamsOutputPeer::OM_CLASS, assetType::FLAVOR);
+		return $filter->getTypeListResponse($pager, $this->getResponseProfile(), $types);
 	}
 }

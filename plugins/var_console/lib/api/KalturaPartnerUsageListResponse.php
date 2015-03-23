@@ -3,7 +3,7 @@
  * @package plugins.varConsole
  * @subpackage api.types
  */
-class KalturaPartnerUsageListResponse extends KalturaObject
+class KalturaPartnerUsageListResponse extends KalturaListResponse
 {
     /**
      * @var KalturaVarPartnerUsageItem
@@ -13,9 +13,4 @@ class KalturaPartnerUsageListResponse extends KalturaObject
      * @var KalturaVarPartnerUsageArray
      */
     public $objects;
-    
-    /**
-     * @var int
-     */
-    public $totalCount;
 }

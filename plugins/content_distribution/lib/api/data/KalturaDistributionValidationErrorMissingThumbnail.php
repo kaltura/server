@@ -26,20 +26,23 @@ class KalturaDistributionValidationErrorMissingThumbnail extends KalturaDistribu
 		return $dbObject;
 	}
 	
-	public function fromObject($sourceObject)
+	public function doFromObject($sourceObject, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		if(!$sourceObject)
 			return;
 			
-		parent::fromObject($sourceObject);
+		parent::doFromObject($sourceObject, $responseProfile);
 		
-		$data = $sourceObject->getData();
-		$matches = null;
-		if(preg_match('/(\d+)x(\d+)/', $data, $matches))
+		if($this->shouldGet('dimensions', $responseProfile))
 		{
-			$this->dimensions = new KalturaDistributionThumbDimensions();
-			$this->dimensions->width = $matches[1];
-			$this->dimensions->height = $matches[2];
+			$data = $sourceObject->getData();
+			$matches = null;
+			if(preg_match('/(\d+)x(\d+)/', $data, $matches))
+			{
+				$this->dimensions = new KalturaDistributionThumbDimensions();
+				$this->dimensions->width = $matches[1];
+				$this->dimensions->height = $matches[2];
+			}
 		}
 	}
 }

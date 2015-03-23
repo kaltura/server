@@ -50,10 +50,14 @@ import com.kaltura.client.test.TestUtils;
 public class Kaltura {
 	
 	private static final int WAIT_BETWEEN_TESTS = 30000;
-	private static final String SERVICE_URL = "http://www.kaltura.com";
+	protected static KalturaTestConfig testConfig;
 	static public KalturaClient client;
 	
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
+
+		if(testConfig == null){
+			testConfig = new KalturaTestConfig();
+		}
 		
 		try {
 
@@ -84,14 +88,13 @@ public class Kaltura {
 		}
 		
 		// Set Constants
-		int partnerId = KalturaTestConfig.PARTNER_ID;
-		String adminSecret = KalturaTestConfig.ADMIN_SECRET;
-		String userId = KalturaTestConfig.USER_NAME;
+		int partnerId = testConfig.getPartnerId();
+		String adminSecret = testConfig.getAdminSecret();
+		String userId = testConfig.getUserId();
 		
 		// Generate configuration
 		KalturaConfiguration config = new KalturaConfiguration();
-		config.setPartnerId(partnerId);
-		config.setEndpoint(SERVICE_URL);
+		config.setEndpoint(testConfig.getServiceUrl());
 		
 		try {
 			// Create the client and open session
@@ -176,7 +179,7 @@ public class Kaltura {
 				InputStream fileData = TestUtils.getTestVideo();
 				int fileSize = fileData.available();
 
-				client.getUploadTokenService().upload(upToken.id, fileData, KalturaTestConfig.UPLOAD_VIDEO, fileSize);
+				client.getUploadTokenService().upload(upToken.id, fileData, testConfig.getUploadVideo(), fileSize);
 				
 				System.out.println("Uploaded a new Video file to entry: " + entry.id);
 			}

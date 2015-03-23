@@ -105,14 +105,12 @@ abstract class KBatchBase implements IKalturaLogger
 
 	static public function impersonate($partnerId)
 	{
-		self::$kClientConfig->partnerId = $partnerId;
-		self::$kClient->setConfig(self::$kClientConfig);
+		self::$kClient->setPartnerId($partnerId);
 	}
 
 	static public function unimpersonate()
 	{
-		self::$kClientConfig->partnerId = self::$taskConfig->getPartnerId();
-		self::$kClient->setConfig(self::$kClientConfig);
+		self::$kClient->setPartnerId(self::$taskConfig->getPartnerId());
 	}
 
 	protected function getSchedulerId()
@@ -245,11 +243,10 @@ abstract class KBatchBase implements IKalturaLogger
 		KalturaLog::debug('This batch index: ' . $this->getIndex());
 		KalturaLog::debug('This session key: ' . $this->sessionKey);
 
-		self::$kClientConfig = new KalturaConfiguration(self::$taskConfig->getPartnerId());
+		self::$kClientConfig = new KalturaConfiguration();
 		self::$kClientConfig->setLogger($this);
 		self::$kClientConfig->serviceUrl = self::$taskConfig->getServiceUrl();
 		self::$kClientConfig->curlTimeout = self::$taskConfig->getCurlTimeout();
-		self::$kClientConfig->clientTag = 'batch: ' . self::$taskConfig->getSchedulerName() . ' ' . get_class($this) . " index: {$this->getIndex()} sessionId: " . UniqueId::get();
 
 		if(isset(self::$taskConfig->clientConfig))
 		{
@@ -258,6 +255,9 @@ abstract class KBatchBase implements IKalturaLogger
 		}
 
 		self::$kClient = new KalturaClient(self::$kClientConfig);
+		self::$kClient->setPartnerId(self::$taskConfig->getPartnerId());
+		self::$kClient->setClientTag('batch: ' . self::$taskConfig->getSchedulerName() . ' ' . get_class($this) . " index: {$this->getIndex()} sessionId: " . UniqueId::get());
+		
 		//$ks = self::$kClient->session->start($secret, "user-2", KalturaSessionType::ADMIN);
 		$ks = $this->createKS();
 		self::$kClient->setKs($ks);

@@ -133,15 +133,19 @@ class KalturaGenericDistributionProvider extends KalturaDistributionProvider
 		return $object;		
 	}
 
-	public function fromObject($sourceObject)
+	public function doFromObject($sourceObject, KalturaDetachedResponseProfile $responseProfile = null)
 	{
-		parent::fromObject($sourceObject);
+		parent::doFromObject($sourceObject, $responseProfile);
 		
-		$this->optionalThumbDimensions = KalturaDistributionThumbDimensionsArray::fromDbArray($sourceObject->getOptionalThumbDimensionsObjects());
-		$this->requiredThumbDimensions = KalturaDistributionThumbDimensionsArray::fromDbArray($sourceObject->getRequiredThumbDimensionsObjects());
-		
-		$this->updateRequiredEntryFields = implode(',', $sourceObject->getUpdateRequiredEntryFields());
-		$this->updateRequiredMetadataXPaths = implode(',', $sourceObject->getUpdateRequiredMetadataXPaths());
+		if($this->shouldGet('optionalThumbDimensions', $responseProfile))
+			$this->optionalThumbDimensions = KalturaDistributionThumbDimensionsArray::fromDbArray($sourceObject->getOptionalThumbDimensionsObjects());
+		if($this->shouldGet('requiredThumbDimensions', $responseProfile))
+			$this->requiredThumbDimensions = KalturaDistributionThumbDimensionsArray::fromDbArray($sourceObject->getRequiredThumbDimensionsObjects());
+			
+		if($this->shouldGet('updateRequiredEntryFields', $responseProfile))
+			$this->updateRequiredEntryFields = implode(',', $sourceObject->getUpdateRequiredEntryFields());
+		if($this->shouldGet('updateRequiredMetadataXPaths', $responseProfile))
+			$this->updateRequiredMetadataXPaths = implode(',', $sourceObject->getUpdateRequiredMetadataXPaths());
 	}
 		 
 	public function getMapBetweenObjects()

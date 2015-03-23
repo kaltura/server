@@ -18,7 +18,8 @@ class KalturaLiveStatsEvent extends KalturaObject
 	public $entryId;
 	
 	/**
-	 * @var KalturaStatsEventType
+	 * an integer representing the type of event being sent from the player
+	 * @var KalturaLiveStatsEventType
 	 */
 	public $eventType;
 	
@@ -56,7 +57,13 @@ class KalturaLiveStatsEvent extends KalturaObject
 	 * @var bool 
 	 */
 	public $isLive;
-		
+
+	/**
+	 * the event start time as string
+	 * @var string
+	 */
+	public $startTime;
+
 	/**
 	 * delivery type used for this stream
 	 * @var KalturaPlaybackProtocol 

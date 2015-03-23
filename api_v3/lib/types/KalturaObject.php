@@ -5,8 +5,27 @@
  */
 abstract class KalturaObject implements IApiObject
 {
+	/**
+	 * @var KalturaListResponseArray
+	 */
+	public $relatedObjects;
+	
 	static protected $sourceFilesCache = array();
 	static protected $classPrivatesCache = array();
+	
+	function __sleep()
+	{
+	    $allVars = get_object_vars($this);
+	    $return = array();
+	    foreach(array_keys($allVars) as $name)
+	    {
+	        if (isset($this->$name))
+	        {
+	            $return[] = $name;
+	        }
+	    }
+	    return $return;
+	}
 	
 	protected function getReadOnly ()
 	{
@@ -100,7 +119,7 @@ abstract class KalturaObject implements IApiObject
 		$thisProps = $thisRef->getProperties();
 	
 		// generate file header
-		$result = "<?php\nclass {$fromObjectClass} extends {$srcObjClass}\n{\n\tstatic function fromObject(\$apiObj, \$srcObj)\n\t{\n";
+		$result = "<?php\nclass {$fromObjectClass} extends {$srcObjClass}\n{\n\tstatic function fromObject(\$apiObj, \$srcObj, KalturaDetachedResponseProfile \$responseProfile = null)\n\t{\n";
 	
 		if ($thisRef->requiresReadPermission())
 		{
@@ -143,6 +162,7 @@ abstract class KalturaObject implements IApiObject
 	
 			// calculate field value
 			$fieldValue = null;
+			$getterParameters = '';
 	
 			if (strrpos($getterBody, 'return ') === 0)
 			{
@@ -182,17 +202,24 @@ abstract class KalturaObject implements IApiObject
 					$fieldValue = null;		// we have to use the getter since it uses a private property
 				}
 			}
-			else if (strpos($curGetter->class, 'Base') === 0)
+			else
 			{
 				$params = $curGetter->getParameters();
 				if (count($params) == 1 && $params[0]->getDefaultValue() == "Y-m-d H:i:s")
 				{
-					// date field getter
-					$matches = array();
-					if (preg_match('/^if \(\$this\->([\w_]+) === null\)/', $getterBody, $matches))
+					if (strpos($curGetter->class, 'Base') === 0)
 					{
-						$memberName = '$srcObj->' . $matches[1];
-						$fieldValue = "({$memberName} === null ? null : (int) date_create({$memberName})->format('U'))";
+						// date field getter
+						$matches = array();
+						if (preg_match('/^if \(\$this\->([\w_]+) === null\)/', $getterBody, $matches))
+						{
+							$memberName = '$srcObj->' . $matches[1];
+							$fieldValue = "({$memberName} === null ? null : (int) date_create({$memberName})->format('U'))";
+						}
+					}
+					else
+					{
+						$getterParameters = 'null';
 					}
 				}
 			}
@@ -200,7 +227,7 @@ abstract class KalturaObject implements IApiObject
 			if (!$fieldValue)
 			{
 				// complex getter - call original function
-				$fieldValue = "\$srcObj->".$curGetter->name."()";
+				$fieldValue = "\$srcObj->".$curGetter->name."($getterParameters)";
 			}
 	
 			// add support for arrays and dynamic enums
@@ -248,6 +275,17 @@ abstract class KalturaObject implements IApiObject
 				}
 			}
 			
+			else if (	$thisProps[$apiPropName]->isComplexType() 
+						&& !$thisProps[$apiPropName]->isEnum() 
+						&& !$thisProps[$apiPropName]->isStringEnum() 
+						&& !$thisProps[$apiPropName]->isAbstract())
+			{
+				$propertyType = $thisProps[$apiPropName]->getType();
+				$getter = $curGetter->name;
+				$curCode = "\$value = null;\n\t\tif(\$srcObj->$getter()){\n\t\t\t\$value = new $propertyType();\n\t\t\t\$value->fromObject(\$srcObj->$getter());\n\t\t}\n\t\t"; 
+				$fieldValue = '$value';
+			}
+			
 	
 			// add field copy code
 			$curCode .= "\$apiObj->{$apiPropName} = {$fieldValue};";
@@ -255,9 +293,10 @@ abstract class KalturaObject implements IApiObject
 			if ($thisProps[$apiPropName]->requiresReadPermission())
 			{
 				$declaringClass = $this->getDeclaringClassName($apiPropName);
-				$curCode = "if (kPermissionManager::getReadPermitted('{$declaringClass}', '{$apiPropName}'))\n\t\t{\n\t\t\t{$curCode}\n\t\t}";
+				$curCode = "if (kPermissionManager::getReadPermitted('{$declaringClass}', '{$apiPropName}'))\n\t\t{\n\t\t\t" . implode("\n\t\t\t", explode("\n", $curCode)) . "\n\t\t}";
 			}
 	
+			$curCode = "if (isset(\$get['{$apiPropName}']))\n\t\t{\n\t\t\t" . implode("\n\t\t\t", explode("\n", $curCode)) . "\n\t\t}";
 			$mappingFuncCode[$apiPropName] = $curCode;
 		}
 	
@@ -266,13 +305,51 @@ abstract class KalturaObject implements IApiObject
 		// generate final code
 		if ($usesCustomData)
 		{
-			array_unshift($mappingFuncCode, '$customData = unserialize($srcObj->custom_data);');
+			$result .= "\t\t\$customData = unserialize(\$srcObj->custom_data);\n";
 		}
 	
-		return $result . "\t\t" . implode("\n\t\t", $mappingFuncCode) . "\n\t}\n}";
+		$result .= "\t\t\$get = array(\n\t\t\t'" . implode("' => true,\n\t\t\t'", array_keys($mappingFuncCode)) . "' => true\n\t\t);";
+		$result .= '
+		if($responseProfile){
+			$fieldsArray = array_flip(array_map("trim", explode(",", $responseProfile->fields)));
+			if($responseProfile->type == ResponseProfileType::INCLUDE_FIELDS){
+				$get = array_intersect_key($get, $fieldsArray);
+			}
+			else{
+				$get = array_diff_key($get, $fieldsArray);
+			}
+		}
+		';
+		
+		$result .= implode("\n\t\t", $mappingFuncCode) . "\n\t}\n}";
+		
+		return $result;
 	}
 	
-	public function fromObject($srcObj)
+	public function shouldGet($propertyName, KalturaDetachedResponseProfile $responseProfile = null)
+	{
+		if($responseProfile)
+		{
+			$fields = array_flip(array_map("trim", explode(",", $responseProfile->fields)));
+			if($responseProfile->type == ResponseProfileType::INCLUDE_FIELDS)
+			{
+				return isset($fields[$propertyName]);
+			}
+			else
+			{
+				return !isset($fields[$propertyName]);
+			}
+		}
+		
+		return true;
+	}
+	
+	protected function doFromObject($srcObj, KalturaDetachedResponseProfile $responseProfile = null)
+	{
+		
+	}
+	
+	final public function fromObject($srcObj, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		$thisClass = get_class($this);
 		$srcObjClass = get_class($srcObj);
@@ -298,7 +375,53 @@ abstract class KalturaObject implements IApiObject
 			require_once($cacheFileName);
 		}
 	
-		$fromObjectClass::fromObject($this, $srcObj);
+		$fromObjectClass::fromObject($this, $srcObj, $responseProfile);
+		$this->doFromObject($srcObj, $responseProfile);
+		
+		if($responseProfile)
+		{
+			$this->loadRelatedObjects($responseProfile);
+		}
+	}
+	
+	public function loadRelatedObjects(KalturaDetachedResponseProfile $responseProfile)
+	{
+		// trigger validation
+		$responseProfile->toObject();
+		
+		foreach($responseProfile->relatedProfiles as $relatedProfile)
+		{
+			/* @var $relatedProfile KalturaDetachedResponseProfile */
+			if(!$relatedProfile->filter)
+			{
+				KalturaLog::notice("Related response-profile [$relatedProfile->name] has no filter and should not be used as nested profile");
+				continue;
+			}
+			KalturaLog::debug("Loading related response-profile [$relatedProfile->name] with filter [" . get_class($relatedProfile->filter) . "]");
+
+			$filter = clone $relatedProfile->filter;
+			
+			if($relatedProfile->mappings)
+			{
+				foreach($relatedProfile->mappings as $mapping)
+				{
+					/* @var $mapping KalturaResponseProfileMapping */
+					$mapping->apply($filter, $this);
+				}
+			}
+			else 
+			{
+				KalturaLog::debug("No mappings defined in response-profile [$relatedProfile->name]");
+			}
+			
+			$pager = $relatedProfile->pager;
+			if(!$pager)
+			{
+				$pager = new KalturaFilterPager();
+			}
+			
+			$this->relatedObjects[$relatedProfile->name] = $filter->getListResponse($pager, $relatedProfile);
+		}
 	}
 	
 	public function fromArray ( $source_array )
@@ -726,5 +849,17 @@ abstract class KalturaObject implements IApiObject
 	            $this->$propertyName = trim($this->$propertyName);
 	        }
 	    }
+	}
+
+	public function cast($className) {
+		if(!is_subclass_of($className, get_class($this)))
+			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_TYPE, get_class($this));
+			
+	    return unserialize(sprintf(
+	        'O:%d:"%s"%s',
+	        strlen($className),
+	        $className,
+	        strstr(strstr(serialize($this), '"'), ':')
+	    ));
 	}
 }

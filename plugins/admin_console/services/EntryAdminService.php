@@ -39,7 +39,7 @@ class EntryAdminService extends KalturaBaseService
 			
 	    $entry = KalturaEntryFactory::getInstanceByType($dbEntry->getType(), true);
 	    
-		$entry->fromObject($dbEntry);
+		$entry->fromObject($dbEntry, $this->getResponseProfile());
 
 		return $entry;
 	}
@@ -75,7 +75,7 @@ class EntryAdminService extends KalturaBaseService
 		
 		$dbList = TrackEntryPeer::doSelect($c);
 		
-		$list = KalturaTrackEntryArray::fromDbArray($dbList);
+		$list = KalturaTrackEntryArray::fromDbArray($dbList, $this->getResponseProfile());
 		$response = new KalturaTrackEntryListResponse();
 		$response->objects = $list;
 		$response->totalCount = count($dbList);

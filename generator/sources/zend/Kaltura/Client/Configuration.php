@@ -35,9 +35,7 @@ class Kaltura_Client_Configuration
 	private $logger;
 
 	public $serviceUrl    				= "http://www.kaltura.com/";
-	public $partnerId    				= null;
 	public $format        				= Kaltura_Client_ClientBase::KALTURA_SERVICE_FORMAT_XML;
-	public $clientTag 	  				= "php5zend:@DATE@";
 	public $curlTimeout   				= 120;
 	public $startZendDebuggerSession 	= false;
 	public $userAgent					= '';
@@ -50,18 +48,6 @@ class Kaltura_Client_Configuration
 	public $sslCertificatePath			= null;
 	public $requestHeaders				= array();
 	
-	/**
-	 * Constructs new Kaltura configuration object
-	 *
-	 */
-	public function __construct($partnerId = -1)
-	{
-	    if ($partnerId && !is_numeric($partnerId))
-	        throw new Kaltura_Client_ClientException("Invalid partner id", Kaltura_Client_ClientException::ERROR_INVALID_PARTNER_ID);
-
-	    $this->partnerId = $partnerId;
-	}
-
 	/**
 	 * Set logger to get kaltura client debug logs
 	 *

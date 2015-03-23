@@ -273,8 +273,6 @@ class flavorAsset extends asset
 
 		if (!$entry || $entry->getType() != entryType::MEDIA_CLIP)
 			KExternalErrors::dieError(KExternalErrors::INVALID_ENTRY_TYPE);
-	
-		$url = kAssetUtils::getAssetUrl($this);
 
 		list($name , $extension) = kAssetUtils::getFileName($entry , $this);
 		$name = str_replace("\n", ' ', $name);
@@ -283,12 +281,14 @@ class flavorAsset extends asset
 		if ($extension)
 			$name .= ".$extension";
 		//adding a serveFlavor download parameter
-		$downloadAddition = "/fileName/$name";
+		$urlParameters = "/fileName/$name";
 
 		if ($previewLength)
-			$downloadAddition .= "/clipTo/$previewLength";
+			$urlParameters .= "/clipTo/$previewLength";
 
-		return $url . $downloadAddition;
+		$url = kAssetUtils::getAssetUrl($this, false, null, null , $urlParameters);
+		
+		return $url;
 	}
 	
 	

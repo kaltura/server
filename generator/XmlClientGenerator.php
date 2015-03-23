@@ -110,10 +110,14 @@ class XmlClientGenerator extends ClientGeneratorFromPhp
 	    $pluginsElement = $this->_doc->createElement("plugins");
 	    $this->appendPlugins($pluginsElement);
 		
+	    $configurationsElement = $this->_doc->createElement("configurations");
+	    $this->appendConfigurations($configurationsElement);
+	    
 		$this->_xmlElement->appendChild($enumsElement);
 		$this->_xmlElement->appendChild($classesElement);
 		$this->_xmlElement->appendChild($servicesElement);
 		$this->_xmlElement->appendChild($pluginsElement);
+		$this->_xmlElement->appendChild($configurationsElement);
 	    
 		$this->addFile("KalturaClient.xml", $this->_doc->saveXML());
 	}
@@ -157,6 +161,43 @@ class XmlClientGenerator extends ClientGeneratorFromPhp
 			
 	    	$this->appendPlugin($pluginsElement, $pluginInstance);
 		}
+	}
+	
+	private function appendConfiguration(DOMElement $configurationsElement, $name, $class)
+	{
+	    $configurationElement = $this->_doc->createElement($name);
+	    
+	    $reflectClass = new ReflectionClass($class);
+		$properties = $reflectClass->getProperties(ReflectionProperty::IS_PUBLIC);
+		foreach($properties as $property)
+		{
+			if ($property->getDeclaringClass() == $reflectClass) // only properties defined in the current class, ignore the inherited
+			{
+				$parsedDocComment = new KalturaDocCommentParser($property->getDocComment());
+				$paramElement = $this->_doc->createElement($property->name);
+				$paramElement->setAttribute('type', $parsedDocComment->varType);
+			
+				if($parsedDocComment->alias)
+				{
+					$paramElement->setAttribute('alias', $parsedDocComment->alias);
+				}
+				
+				if($parsedDocComment->description)
+				{
+					$paramElement->setAttribute('description', trim($parsedDocComment->description));
+				}
+				
+				$configurationElement->appendChild($paramElement);
+			}
+		}
+						
+		$configurationsElement->appendChild($configurationElement);
+	}
+	
+	private function appendConfigurations(DOMElement $configurationsElement)
+	{
+		$this->appendConfiguration($configurationsElement, 'client', 'KalturaClientConfiguration');
+		$this->appendConfiguration($configurationsElement, 'request', 'KalturaRequestConfiguration');
 	}
 	
 	private function appendPlugin(DOMElement $pluginsElement, IKalturaPlugin $pluginInstance)
@@ -290,6 +331,7 @@ class XmlClientGenerator extends ClientGeneratorFromPhp
 	    $properties = $typeReflector->getCurrentProperties();
 		foreach($properties as $property)
 		{
+			/* @var $property KalturaPropertyInfo */
 			if ($property->isServerOnly())
 			{
 				continue;
@@ -301,7 +343,12 @@ class XmlClientGenerator extends ClientGeneratorFromPhp
 			$propertyElement = $this->_doc->createElement("property");
 			$propertyElement->setAttribute("name", $propName);
 			
-			if ($property->isArray())
+			if ($property->isAssociativeArray())
+			{
+			    $propertyElement->setAttribute("type", "map");
+			    $propertyElement->setAttribute("arrayType", $property->getArrayType());
+			}
+			else if ($property->isArray())
 			{
 			    $propertyElement->setAttribute("type", "array");
 			    $propertyElement->setAttribute("arrayType", $property->getArrayType());
@@ -353,9 +400,16 @@ class XmlClientGenerator extends ClientGeneratorFromPhp
 		
 		foreach($actionParams as $actionParam)
 		{
+			/* @var $actionParam KalturaParamInfo */
 			$actionParamElement = $this->_doc->createElement("param");
 			$actionParamElement->setAttribute("name", $actionParam->getName());
-			if ($actionParam->isArray())
+			
+			if ($actionParam->isAssociativeArray())
+			{
+			    $actionParamElement->setAttribute("type", "map");
+			    $actionParamElement->setAttribute("arrayType", $actionParam->getArrayType());
+			}
+			elseif ($actionParam->isArray())
 			{
 			    $actionParamElement->setAttribute("type", "array");
 			    $actionParamElement->setAttribute("arrayType", $actionParam->getArrayType());
@@ -415,7 +469,13 @@ class XmlClientGenerator extends ClientGeneratorFromPhp
 		$arrayType = null;
 		if ($outputTypeReflector)
 		{
-		    if($outputTypeReflector->isArray())
+		    if($outputTypeReflector->isAssociativeArray())
+		    {
+		        $resultElement->setAttribute("type", "map");
+			    $arrayType = $outputTypeReflector->getArrayType();
+		        $resultElement->setAttribute("arrayType", $arrayType);
+		    }
+		    else if($outputTypeReflector->isArray())
 		    {
 		        $resultElement->setAttribute("type", "array");
 			    $arrayType = $outputTypeReflector->getArrayType();

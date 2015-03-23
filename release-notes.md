@@ -1,3 +1,37 @@
+----------
+# Jupiter-10.7.0 #
+
+##API Response Profiles##
+- Issue Type: new feature
+
+#### Configuration ####
+None
+
+#### Deployment Scripts ####
+
+	mysql -uroot -p kaltura < deployment/updates/sql/2015_02_23_response_profile_table.sql
+	php deployment/updates/scripts/add_permissions/2015_02_23_response_profile.php  
+
+#### Known Issues & Limitations ####
+
+None.
+
+##Live Analytics - Show DVR audience metrics on Live Analytics##
+- Issue Type: new feature
+- Issue ID: PLAT-2413
+
+#### Configuration ####
+
+Deploy an up-to-date version of batch/batches/Mailer/emails_en.ini
+
+#### Deployment Scripts ####
+
+Run on the Cassandra cluster: **live_analytics**/KalturaLiveModel/conf/migrations/2015-03-01-000000-update_dvr_kaltura_live_keyspace.cql
+Deploy KalturaLiveAnalyics.war
+
+#### Known Issues & Limitations ####
+
+None.
 
 ----------
 # Jupiter-10.6.0 #
@@ -6,8 +40,7 @@
 - Issue ID: PLAT-2540
 
 ### Configuration ###
-- Add "params.ffprobeCmd = ffprobe" to 
-- - configurations/batch/live.workers.ini - KAsyncConvertLiveSegment
+- Add "params.ffprobeCmd = ffprobe" to configurations/batch/live.workers.ini - KAsyncConvertLiveSegment
 
 ----------
 # Jupiter-10.5.0 #
@@ -1084,6 +1117,23 @@ None
 
 # IX-9.18.0 #
 
++## Add base-playback user role ##
++- Issue Type: Customer Request
++- Issue ID: PLAT-1565
++
++Adding a user-role with playback capabilities only
++
++#### Configuration ####
++None
++
++#### Deployment Scripts ####
++
++		php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2014_08_03_add_base_playback_role_permissions.php
++
++#### Known Issues & Limitations ####
++None
++
+
 ## Event Cue point support ##
 - Issue ID: PLAT-1136
 
@@ -1885,4 +1935,3 @@ Internal indication for api time properties and support for times that are relat
 0 = PID1
 1 = PID2
 `
-

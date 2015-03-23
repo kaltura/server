@@ -5,7 +5,7 @@
  */
 class KalturaCuePointArray extends KalturaTypedArray
 {
-	public static function fromDbArray($arr)
+	public static function fromDbArray($arr, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		$newArr = new KalturaCuePointArray();
 		if ($arr == null)
@@ -13,7 +13,7 @@ class KalturaCuePointArray extends KalturaTypedArray
 		
 		foreach ($arr as $obj)
 		{
-    		$nObj = KalturaCuePoint::getInstance($obj);
+    		$nObj = KalturaCuePoint::getInstance($obj, $responseProfile);
 			$newArr[] = $nObj;
 		}
 		
