@@ -277,6 +277,12 @@ index kaltura_tag:kaltura_kuser_base
 	@FIELDS_PLACEHOLDER-kaltura_tag@
 }
 
+index kaltura_metadata:kaltura_base
+{
+	path	 = @BASE_DIR@/sphinx/kaltura_metadata_rt
+	@FIELDS_PLACEHOLDER-kaltura_metadata@
+}
+
 
 searchd
 {
