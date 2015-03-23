@@ -5,5 +5,5 @@
  */ 
 interface IApiObject
 {
-    public function fromObject($srcObj);
+    public function fromObject($srcObj, KalturaDetachedResponseProfile $responseProfile = null);
 }
