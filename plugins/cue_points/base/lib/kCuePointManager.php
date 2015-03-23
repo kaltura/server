@@ -137,13 +137,12 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 
 		if (!PermissionPeer::isValidForPartner(CuePointPermissionName::KEEP_CUE_POINTS_WHEN_REPLACING_MEDIA, $object->getPartnerId())) {
 			$this->deleteCuePoints($c);
-		} else if ( $replacingObject->getIsTemporary() ) {
-			//copy cuepoints from replacement entry
-			$replacementCuePoints = CuePointPeer::retrieveByEntryId($replacingObject->getId());
-			foreach( $replacementCuePoints as $cuePoint ) {
-				$newCuePoint = $cuePoint->copyToEntry($object);
-				$newCuePoint->save();
-			}
+		}
+		//copy cuepoints from replacement entry
+		$replacementCuePoints = CuePointPeer::retrieveByEntryId($replacingObject->getId());
+		foreach( $replacementCuePoints as $cuePoint ) {
+			$newCuePoint = $cuePoint->copyToEntry($object);
+			$newCuePoint->save();
 		}
 
 		kEventsManager::flushEvents();
