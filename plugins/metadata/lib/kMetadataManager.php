@@ -253,10 +253,6 @@ class kMetadataManager
 			if ($xPathData['metadataProfileId'] == $metadataProfile->getId())
 				throw new kCoreException('Self metadata reference is not allowed');
 			$relatedMetadataProfileId = $xPathData['metadataProfileId'];
-			$relatedMetadataProfile = MetadataProfilePeer::retrieveByPK($relatedMetadataProfileId);
-			if (!$relatedMetadataProfile)
-				throw new kCoreException('Metadata profile id ['.$relatedMetadataProfileId.' was not found', kCoreException::ID_NOT_FOUND);
-
 			$profileField->setRelatedMetadataProfileId($relatedMetadataProfileId);
 		}
 	}
@@ -556,6 +552,25 @@ class kMetadataManager
 			}
 		}
 		return true;
+	}
+
+	public static function validateProfileFields($partnerId, $xsd)
+	{
+		$xPaths = array_merge(
+			kXsd::findXpathsByAppInfo($xsd, self::APP_INFO_SEARCH, 'true', false),
+			kXsd::findXpathsByAppInfo($xsd, self::APP_INFO_SEARCH, 'false', false)
+		);
+		foreach($xPaths as $xPath => $xPathData)
+		{
+			if($xPathData['type'] === MetadataSearchFilter::KMC_FIELD_TYPE_METADATA_OBJECT &&
+				isset($xPathData['metadataProfileId']))
+			{
+				$relatedMetadataProfileId = $xPathData['metadataProfileId'];
+				$relatedMetadataProfile = MetadataProfilePeer::retrieveByPK($relatedMetadataProfileId);
+				if (!$relatedMetadataProfile)
+					throw new kCoreException('Metadata profile id ['.$relatedMetadataProfileId.' was not found', kCoreException::ID_NOT_FOUND, $relatedMetadataProfileId);
+			}
+		}
 	}
 	
 	/**
