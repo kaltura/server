@@ -476,7 +476,6 @@ index kaltura_tag:kaltura_kuser_base
 index kaltura_metadata:kaltura_base
 {
 	path	 = @BASE_DIR@/sphinx/kaltura_metadata_rt
-	rt_attr_uint = metadata_id
 	rt_attr_timestamp = created_at
 	rt_attr_timestamp = updated_at
 	rt_attr_uint = version

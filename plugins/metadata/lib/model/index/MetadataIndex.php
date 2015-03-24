@@ -19,7 +19,7 @@ class MetadataIndex extends BaseIndexObject
 
 	public static function getSphinxIdField()
 	{
-		return 'metadata_id';
+		return 'id';
 	}
 
 	public static function getPropelIdField()
@@ -44,7 +44,6 @@ class MetadataIndex extends BaseIndexObject
 		if (!self::$fieldsMap)
 		{
 			self::$fieldsMap = array(
-				'metadata_id' => 'id',
 				'created_at' => 'createdAt',
 				'updated_at' => 'updatedAt',
 				'version' => 'version',
@@ -66,7 +65,6 @@ class MetadataIndex extends BaseIndexObject
 		if (!self::$typesMap)
 		{
 			self::$typesMap = array(
-				'metadata_id' => IIndexable::FIELD_TYPE_INTEGER,
 				'created_at' => IIndexable::FIELD_TYPE_DATETIME,
 				'updated_at' => IIndexable::FIELD_TYPE_DATETIME,
 				'version' => IIndexable::FIELD_TYPE_INTEGER,
@@ -101,7 +99,6 @@ class MetadataIndex extends BaseIndexObject
 		if (!self::$searchableFieldsMap)
 		{
 			self::$searchableFieldsMap = array(
-				'metadata.ID' => 'metadata_id',
 				'metadata.CREATED_AT' => 'created_at',
 				'metadata.UPDATED_AT' => 'updated_at',
 				'metadata.VERSION' => 'version',
@@ -178,8 +175,15 @@ class MetadataIndex extends BaseIndexObject
 		if (!self::$skipFields)
 		{
 			self::$skipFields = array(
-				'metadata.ID',
+				'metadata.CREATED_AT',
+				'metadata.UPDATED_AT',
+				'metadata.VERSION',
+				'metadata.METADATA_PROFILE_ID',
+				'metadata.METADATA_PROFILE_VERSION',
+				'metadata.PARTNER_ID',
 				'metadata.OBJECT_ID',
+				'metadata.OBJECT_TYPE',
+				'metadata.STATUS',
 			);
 		}
 		return self::$skipFields;

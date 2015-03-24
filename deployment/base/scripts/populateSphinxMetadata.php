@@ -15,6 +15,9 @@ if($argc > 3 && is_numeric($argv[3]))
 if($argc > 4)
 	MetadataPeer::setUseCriteriaFilter((bool)$argv[4]);
 
+// only dynamic objects are saved to sphinx for now
+$c->addAnd(MetadataPeer::OBJECT_TYPE, MetadataObjectType::DYNAMIC_OBJECT);
+
 $c->addAscendingOrderByColumn(MetadataPeer::UPDATED_AT);
 $c->addAscendingOrderByColumn(MetadataPeer::ID);
 $c->setLimit(10000);
