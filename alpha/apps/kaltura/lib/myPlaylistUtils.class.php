@@ -430,6 +430,17 @@ class myPlaylistUtils
 		if ( ! $list_of_filters ) return null;
 		// TODO - for now we assume that there are more or equal filters in the XML than the ones from the request
 		$i = 1; // the extra_filter is 1-based
+
+		if ( $extra_filters )
+		{
+			// Get the max results from the limit of the first filter
+			$total_results = min( $total_results, $extra_filters[1]->getLimit() );
+
+			// Clear this limit so it won't overcloud the limits of $entry_filter_xml rules
+			$extra_filters[1]->setLimit( null );
+		}
+
+		$lastFilter = null;
 		foreach ( $list_of_filters as $entry_filter_xml )
 		{
 		    /* @var $entry_filter_xml SimpleXMLElement */
@@ -450,7 +461,12 @@ class myPlaylistUtils
 				$entry_filter->setLimit( self::TOTAL_RESULTS );
 			}
 			
-			$extra_filter = @$extra_filters[$i];
+			$extra_filter = ($extra_filters && isset($extra_filters[$i])) ? $extra_filters[$i] : null;
+			if ( ! $extra_filter )
+			{
+				// Apply the last filter if no more filters exist
+				$extra_filter = $lastFilter;
+			}
 			// merge the current_filter with the correcponding extra_filter
 			// allow the extra_filter to override properties of the current filter
 
@@ -461,6 +477,8 @@ class myPlaylistUtils
 					myBaseObject::CLONE_POLICY_PREFER_NEW , null , null , false );
 					
 				$entry_filter->setPartnerSearchScope ( baseObjectFilter::MATCH_KALTURA_NETWORK_AND_PRIVATE );
+
+				$lastFilter = $extra_filter;
 			}
 			
 			self::updateEntryFilter( $entry_filter ,  $partner_id , true );
@@ -476,15 +494,16 @@ class myPlaylistUtils
 		foreach ( $entry_filters as $entry_filter )
 		{
 			$current_limit = max ( 0 , $total_results - $number_of_entries ); // if the current_limit is < 0 - set it to be 0
+
+			// no need to fetch any more results
+			if ( $current_limit <= 0 ) break;
+
 			$exclude_id_list = self::getIds( $entry_list );
 			$c = KalturaCriteria::create(entryPeer::OM_CLASS);
 			
 			
 			// don't fetch the same entries twice - filter out all the entries that were already fetched
 			if( $exclude_id_list ) $c->add ( entryPeer::ID , $exclude_id_list , Criteria::NOT_IN );  
-			
-			// no need to fetch any more results
-			if ( $current_limit <= 0  )break;
 			
 			$filter_limit = $entry_filter->getLimit ();
 			
