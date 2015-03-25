@@ -133,20 +133,39 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 			return true;
 		}
 
-		kEventsManager::setForceDeferredEvents( true );
-
-		if (!PermissionPeer::isValidForPartner(CuePointPermissionName::KEEP_CUE_POINTS_WHEN_REPLACING_MEDIA, $object->getPartnerId())) {
+		$clipAttributes = self::getClipAttributesFromEntry( $replacingObject );
+		//replacement as a result of trimming
+		if ( !is_null($clipAttributes) ) {
+			kEventsManager::setForceDeferredEvents( true );
+			$this->deleteCuePoints($c);
+			//copy cuepoints from replacement entry
+			$replacementCuePoints = CuePointPeer::retrieveByEntryId($replacingObject->getId());
+			foreach( $replacementCuePoints as $cuePoint ) {
+				$newCuePoint = $cuePoint->copyToEntry($object);
+				$newCuePoint->save();
+			}
+			kEventsManager::flushEvents();
+		} else if (!PermissionPeer::isValidForPartner(CuePointPermissionName::KEEP_CUE_POINTS_WHEN_REPLACING_MEDIA, $object->getPartnerId())) {
 			$this->deleteCuePoints($c);
 		}
-		//copy cuepoints from replacement entry
-		$replacementCuePoints = CuePointPeer::retrieveByEntryId($replacingObject->getId());
-		foreach( $replacementCuePoints as $cuePoint ) {
-			$newCuePoint = $cuePoint->copyToEntry($object);
-			$newCuePoint->save();
+	}
+
+	/**
+	 * @param BaseObject $entry entry to check
+	 * @return kClipAttributes|null
+	 */
+	protected static function getClipAttributesFromEntry( BaseObject $entry ) {
+		if ( $entry instanceof entry ) {
+			$operationAtts = $entry->getOperationAttributes();
+			if ( !is_null($operationAtts) && count($operationAtts) > 0 ) {
+				$clipAtts = reset($operationAtts);
+				if ($clipAtts instanceof kClipAttributes) {
+					return $clipAtts;
+				}
+			}
 		}
 
-		kEventsManager::flushEvents();
-		return true;
+		return null;
 	}
 
 	/**
@@ -593,7 +612,7 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 				{
 					$adjustedStartTime = $startTime - $totalVodOffsetTime;
 					KalturaLog::debug("Copying $copyMsg and adjustedStartTime [$adjustedStartTime] (totalVodOffsetTime [$totalVodOffsetTime])" );
-					$liveCuePoint->copyFromLiveToVodEntry( $liveEntry, $vodEntry, $adjustedStartTime );
+					$liveCuePoint->copyFromLiveToVodEntry( $vodEntry, $adjustedStartTime );
 				}
 				else
 				{
@@ -627,9 +646,8 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 	 * @param entry $clipEntry new entry to copy and adjust cue points from root entry to
 	 */
 	public static function copyCuePointsToClipEntry( entry $clipEntry ) {
-		$operationAtts = $clipEntry->getFromCustomData('operationAttributes');
-		if ( !is_null($operationAtts) && count($operationAtts) > 0 ) {
-			$clipAtts = reset($operationAtts);
+		$clipAtts =  self::getClipAttributesFromEntry( $clipEntry );
+		if ( !is_null($clipAtts) ) {
 			$clipStartTime = $clipAtts->getOffset();
 			$clipDuration = $clipAtts->getDuration();
 

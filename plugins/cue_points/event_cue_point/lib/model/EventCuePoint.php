@@ -25,7 +25,7 @@ class EventCuePoint extends CuePoint
 
 	public function copyToClipEntry( entry $clipEntry, $clipStartTime, $clipDuration )
 	{
-		return;
+		return false;
 	}
 	
 }
