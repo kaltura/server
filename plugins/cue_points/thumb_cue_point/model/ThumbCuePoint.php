@@ -69,8 +69,8 @@ class ThumbCuePoint extends CuePoint implements IMetadataObject
 
 		// Make a copy of the current thumb asset
 		// copyToEntry will create a filesync softlink to the original filesync
-		$vodTimedThumbAsset = $timedThumbAsset->copyToEntry( $toEntry->getId(), $toEntry->getPartnerId() );
-		$toCuePoint->setAssetId( $vodTimedThumbAsset->getId() );
+		$toTimedThumbAsset = $timedThumbAsset->copyToEntry( $toEntry->getId(), $toEntry->getPartnerId() );
+		$toCuePoint->setAssetId( $toTimedThumbAsset->getId() );
 		$toCuePoint->save();
 
 		// Restore the thumb asset's prev. cue point id (for good measures)
@@ -78,10 +78,10 @@ class ThumbCuePoint extends CuePoint implements IMetadataObject
 		$timedThumbAsset->setCustomDataObj();
 
 		// Save the destination entry's thumb asset
-		$vodTimedThumbAsset->setCuePointID( $toCuePoint->getId() );
-		$vodTimedThumbAsset->save();
+		$toTimedThumbAsset->setCuePointID( $toCuePoint->getId() );
+		$toTimedThumbAsset->save();
 
-		KalturaLog::log("Saved cue point [{$toCuePoint->getId()}] and timed thumb asset [{$vodTimedThumbAsset->getId()}]");
+		KalturaLog::log("Saved cue point [{$toCuePoint->getId()}] and timed thumb asset [{$toTimedThumbAsset->getId()}]");
 	}
 	
 	/* (non-PHPdoc)
