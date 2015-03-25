@@ -60,9 +60,9 @@ class KalturaIntegrationJobData extends KalturaJobData
 	/* (non-PHPdoc)
 	 * @see KalturaObject::fromObject($srcObj)
 	 */
-	public function doFromObject($sourceObject)
+	public function doFromObject($sourceObject, KalturaDetachedResponseProfile $responseProfile = null)
 	{
-		parent::doFromObject($sourceObject);
+		parent::doFromObject($sourceObject, $responseProfile);
 		
 		$providerType = $sourceObject->getProviderType();
 		$this->providerData = KalturaPluginManager::loadObject('KalturaIntegrationJobProviderData', $providerType);
