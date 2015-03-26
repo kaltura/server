@@ -1,7 +1,7 @@
 <?php
 // this chdir can be changed according to environment
-chdir(__DIR__ . '/../');
-require_once(__DIR__ . '/../bootstrap.php');
+chdir(__DIR__ . '/../../');
+require_once(__DIR__ . '/../../bootstrap.php');
 
 myDbHelper::$use_alternative_con = myDbHelper::DB_HELPER_CONN_PROPEL3;
 
