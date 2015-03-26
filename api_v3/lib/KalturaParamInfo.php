@@ -23,7 +23,7 @@ class KalturaParamInfo extends KalturaPropertyInfo
 		return $this->_optional;
 	}
 	
-	public function toArray($withSubTypes = false)
+	public function toArray($withSubTypes = false, $returnedTypes = array())
 	{
 		$array = parent::toArray($withSubTypes);
 		$array["isFile"] = $this->isFile();
