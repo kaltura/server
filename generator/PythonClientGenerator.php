@@ -442,9 +442,17 @@ class PythonClientGenerator extends ClientGeneratorFromXml
 					break;
 				case "array" :
 					$arrayType = $propertyNode->getAttribute ( "arrayType" );
+					if($arrayType == $type)
+					{
+						$arrayType = 'KalturaObjectBase';
+					}
 					$curLine .= "(KalturaObjectFactory.createArray, $arrayType)";
 					break;
 				default : // sub object
+					if($propType == $type)
+					{
+						$propType = 'KalturaObjectBase';
+					}
 					$curLine .= "(KalturaObjectFactory.create, $propType)";
 					break;
 			}
