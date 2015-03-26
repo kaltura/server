@@ -3,7 +3,7 @@
  * @package plugins.pushNotification
  */
 
-class PushNotificationPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaPending, IKalturaObjectLoader, IKalturaEnumerator
+class PushNotificationPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaPending, IKalturaObjectLoader, IKalturaEnumerator, IKalturaApplicationTranslations
 {
     const PLUGIN_NAME = 'pushNotification';
 
@@ -122,5 +122,23 @@ class PushNotificationPlugin extends KalturaPlugin implements IKalturaPermission
         return self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
     }    
     
-    //TODO need to add  IKalturaApplicationTranslations::getTranslations() 
+    /* (non-PHPdoc)
+     * @see IKalturaApplicationTranslations::getTranslations()
+     */
+    public static function getTranslations($locale)
+    {
+        $array = array();
+    
+        $langFilePath = __DIR__ . "/config/lang/$locale.php";
+        if(!file_exists($langFilePath))
+        {
+            $default = 'en';
+            $langFilePath = __DIR__ . "/config/lang/$default.php";
+        }
+    
+        KalturaLog::debug("Loading file [$langFilePath]");
+        $array = include($langFilePath);
+    
+        return array($locale => $array);
+    }
 }
