@@ -32,11 +32,14 @@ abstract class KJobHandlerWorker extends KBatchBase
 	 */
 	protected static function setCurrentJob(KalturaBatchJob $currentJob)
 	{
+		KalturaLog::debug("Start job[$currentJob->id] type[$currentJob->jobType] sub-type[$currentJob->jobSubType] object[$currentJob->jobObjectType] object-id[$currentJob->jobObjectId] partner-id[$currentJob->partnerId] dc[$currentJob->dc] parent-id[$currentJob->parentJobId] root-id[$currentJob->rootJobId]");
 		self::$currentJob = $currentJob;
 	}
 
 	protected static function unsetCurrentJob()
 	{
+		$currentJob = self::getCurrentJob();
+		KalturaLog::debug("End job[$currentJob->id]");
 		self::$currentJob = null;
 	}
 	
