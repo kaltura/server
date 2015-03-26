@@ -1,7 +1,7 @@
 <?php
 // this chdir can be changed according to environment
-chdir(__DIR__ . '/../');
-require_once(__DIR__ . '/../bootstrap.php');
+chdir(__DIR__ . '/../../');
+require_once(__DIR__ . '/../../bootstrap.php');
 
 $subTypes = array(entry::FILE_SYNC_ENTRY_SUB_TYPE_LIVE_PRIMARY, entry::FILE_SYNC_ENTRY_SUB_TYPE_LIVE_SECONDARY);
 
