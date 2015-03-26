@@ -78,7 +78,7 @@ abstract class BusinessProcessNotificationTemplate extends BatchEventNotificatio
 			$values = $object->getFromCustomData(null, 'businessProcessCases', array());
 			if(!$values || !count($values))
 			{
-				KalturaLog::err('Object [' . get_class($object) . '][' . $object->getPrimaryKey() . '] case id not found in custom-data');
+				return array();
 			}
 			$templatesIds = array();
 			foreach($values as $cases)
