@@ -19,6 +19,8 @@ jQuery(document).ready(function() {
 		case "<?php echo Kaltura_Client_Enum_StorageProfileProtocol::S3?>":				
 			jQuery('#filesPermissionInS3-label').css('visibility', 'visible');
 			jQuery('#filesPermissionInS3').css('visibility', 'visible');
+			jQuery('#s3Region-label').css('visibility', 'visible');
+			jQuery('#s3Region').css('visibility', 'visible');
 			jQuery('#storageFtpPassiveMode').css('visibility', 'hidden');
 			jQuery('#storageFtpPassiveMode-label').css('visibility', 'hidden');
 			break;
@@ -27,6 +29,8 @@ jQuery(document).ready(function() {
 			jQuery('#storageFtpPassiveMode-label').css('visibility', 'visible');
 			jQuery('#filesPermissionInS3-label').css('visibility', 'hidden');
 			jQuery('#filesPermissionInS3').css('visibility', 'hidden');			
+			jQuery('#s3Region-label').css('visibility', 'hidden');
+			jQuery('#s3Region').css('visibility', 'hidden');
 			break;
 		case "<?php echo Kaltura_Client_Enum_StorageProfileProtocol::SFTP?>":
 			setKeyPairSettings(true);
@@ -34,6 +38,8 @@ jQuery(document).ready(function() {
 		default:
 			jQuery('#filesPermissionInS3').css('visibility', 'hidden');
 			jQuery('#filesPermissionInS3-label').css('visibility', 'hidden');
+			jQuery('#s3Region-label').css('visibility', 'hidden');
+			jQuery('#s3Region').css('visibility', 'hidden');
 			jQuery('#storageFtpPassiveMode').css('visibility', 'hidden');
 			jQuery('#storageFtpPassiveMode-label').css('visibility', 'hidden');
 			break;

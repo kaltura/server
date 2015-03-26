@@ -40,7 +40,13 @@ class Form_Partner_StorageConfiguration extends Form_Partner_BaseStorageConfigur
 		));
 		$this->addElementToDisplayGroup('storage_info', 'storagePassword');
 		 
-		 
+		$this->addElement('text', 's3Region', array(
+				'label'			=> 'S3 Region:',
+				'filters'		=> array('StringTrim'),
+		));
+		$this->addElementToDisplayGroup('storage_info', 's3Region');
+
+
 		$this->addElement('checkbox', 'storageFtpPassiveMode', array(
 			'label'			=> 'Storage FTP Passive Mode:',
 			'filters'		=> array('StringTrim'),
