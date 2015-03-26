@@ -107,17 +107,7 @@ class LiveReportsService extends KalturaBaseService
 					$result->totalCount = $totalCount;
 
 				if ($entryIds) {
-					$resultHash = array();
-					foreach ($result->objects as $object) {
-						$resultHash[$object->entryId] = $object;
-					}
-
-					$result->objects = array();
-					foreach ($entryIds as $entryId) {
-						if ($resultHash[$entryId]) {
-							$result->objects[] = $resultHash[$entryId];
-						}
-					}
+					$this->sortResultByEntryIds($result, $entryIds);
 				}
 				return $result;
 		}
@@ -264,6 +254,26 @@ class LiveReportsService extends KalturaBaseService
 		$result = $client->getReport($reportType, $wsFilter, $wsPager);
 		$kResult = $result->toKalturaObject();
 		return $kResult;
+	}
+
+	/**
+	 * Sorts the objects array in the result object according to the order of entryIds provided
+	 * @param $result
+	 * @param $entryIds
+	 */
+	protected function sortResultByEntryIds($result, $entryIds)
+	{
+		$resultHash = array();
+		foreach ($result->objects as $object) {
+			$resultHash[$object->entryId] = $object;
+		}
+
+		$result->objects = array();
+		foreach ($entryIds as $entryId) {
+			if ($resultHash[$entryId]) {
+				$result->objects[] = $resultHash[$entryId];
+			}
+		}
 	}
 }
 
