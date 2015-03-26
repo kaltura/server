@@ -104,7 +104,7 @@ class KalturaBaseEntryFilter extends KalturaBaseEntryBaseFilter
 	{
 		if ($this->userIdEqual !== null)
 		{
-			$kuser = kuserPeer::getKuserByPartnerAndUid($this->getPartnerId(), $this->userIdEqual);
+			$kuser = kuserPeer::getKuserByPartnerAndUid(kCurrentContext::getCurrentPartnerId(), $this->userIdEqual);
 			if ($kuser)
 				$this->userIdEqual = $kuser->getId();
 			else 
