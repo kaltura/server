@@ -176,6 +176,11 @@ class Metadata extends BaseMetadata implements IIndexable, ISyncableFile
 		return array("metadata:objectId=".strtolower($this->getObjectId()));
 	}
 
+	public function getSphinxMatchOptimizations() {
+		$objectName = $this->getIndexObjectName();
+		return $objectName::getSphinxMatchOptimizations($this);
+	}
+
 	/**
 	 * @return int
 	 */

@@ -53,6 +53,7 @@ class MetadataIndex extends BaseIndexObject
 				'object_id' => 'objectId',
 				'object_type' => 'objectType',
 				'metadata_status' => 'status',
+				'sphinx_match_optimizations' => 'sphinxMatchOptimizations',
 			);
 		}
 		return self::$fieldsMap;
@@ -75,6 +76,7 @@ class MetadataIndex extends BaseIndexObject
 				'object_type' => IIndexable::FIELD_TYPE_INTEGER,
 				'metadata_status' => IIndexable::FIELD_TYPE_INTEGER,
 				'plugins_data' => IIndexable::FIELD_TYPE_STRING,
+				'sphinx_match_optimizations' => IIndexable::FIELD_TYPE_STRING,
 			);
 		}
 		return self::$typesMap;
@@ -109,6 +111,7 @@ class MetadataIndex extends BaseIndexObject
 				'metadata.OBJECT_TYPE' => 'object_type',
 				'metadata.STATUS' => 'metadata_status',
 				'metadata.PLUGINS_DATA' => 'plugins_data',
+				'metadata.SPHINX_MATCH_OPTIMIZATIONS' => 'sphinx_match_optimizations',
 			);
 		}
 		return self::$searchableFieldsMap;
@@ -204,12 +207,14 @@ class MetadataIndex extends BaseIndexObject
 	public static function getSphinxOptimizationMap()
 	{
 		return array(
+			array("P%s","metadata.PARTNER_ID"),
 		);
 	}
 
 	public static function getSphinxOptimizationValues()
 	{
 		return array(
+			array("P%s","getPartnerId"),
 		);
 	}
 
