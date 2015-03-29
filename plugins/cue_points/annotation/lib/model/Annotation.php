@@ -82,7 +82,6 @@ class Annotation extends CuePoint implements IMetadataObject
 		$annotation = parent::copyToEntry( $entry );
 		if ( $annotation->getParentId() ) {
 			$mappedId = kObjectCopyHandler::getMappedId('Annotation', $annotation->getParentId());
-			//if parent was copied we should also copy child annotation
 			if ( $mappedId ) {
 				$annotation->setParentId( $mappedId );
 			}
