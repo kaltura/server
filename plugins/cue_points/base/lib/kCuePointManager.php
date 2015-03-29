@@ -655,6 +655,9 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 			$c->add( CuePointPeer::ENTRY_ID, $clipEntry->getRootEntryId() );
 			$c->addAnd( CuePointPeer::START_TIME, $clipStartTime, KalturaCriteria::GREATER_EQUAL );
 			$c->addAnd( CuePointPeer::START_TIME, $clipStartTime + $clipDuration, KalturaCriteria::LESS_EQUAL );
+			$c->addOr( CuePointPeer::START_TIME, 0, KalturaCriteria::EQUAL );
+
+			$c->addAscendingOrderByColumn(CuePointPeer::CREATED_AT);
 			$rootEntryCuePointsToCopy = CuePointPeer::doSelect($c);
 
 			if ( count( $rootEntryCuePointsToCopy ) <= self::MAX_CUE_POINTS_TO_COPY_TO_CLIP )

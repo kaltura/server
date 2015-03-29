@@ -391,9 +391,11 @@ abstract class CuePoint extends BaseCuePoint implements IIndexable
 
 	public function copyToClipEntry( entry $clipEntry, $clipStartTime, $clipDuration )
 	{
-		if ( $this->hasPermissionToCopyToEntry($clipEntry) ) {
+		if ( $this->shouldCopyToClip($clipStartTime, $clipDuration) && $this->hasPermissionToCopyToEntry($clipEntry) ) {
 			$newCuePoint = $this->copyToEntry($clipEntry);
-			$newCuePoint->setStartTime( $newCuePoint->getStartTime() - $clipStartTime );
+			if ( $newCuePoint->getStartTime() ) {
+				$newCuePoint->setStartTime( $newCuePoint->getStartTime() - $clipStartTime );
+			}
 			if ( !is_null($newCuePoint->getEndTime()) ) {
 				$newCuePoint->setEndTime( $newCuePoint->getEndTime() - $clipStartTime );
 				if ( $newCuePoint->getEndTime() > $clipDuration ) {
@@ -402,6 +404,14 @@ abstract class CuePoint extends BaseCuePoint implements IIndexable
 			}
 			$newCuePoint->save();
 		}
+	}
+
+	public function shouldCopyToClip( $clipStartTime, $clipDuration ) {
+		if ( $this->getStartTime() < $clipStartTime ) {
+			return false;
+		}
+
+		return true;
 	}
 
 	/**

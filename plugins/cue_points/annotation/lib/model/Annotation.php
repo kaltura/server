@@ -60,4 +60,34 @@ class Annotation extends CuePoint implements IMetadataObject
 
 		return false;
 	}
+
+	public function shouldCopyToClip( $clipStartTime, $clipDuration ) {
+		//child annotations have starttime 0, check parent starttime
+		if ( !$this->getStartTime() ) {
+			if ( $this->getParentId() ) {
+				$parentAnnotation = CuePointPeer::retrieveByPK($this->getParentId());
+				if ( !is_null($parentAnnotation) ) {
+					return $parentAnnotation->shouldCopyToClip($clipStartTime, $clipDuration);
+				}
+			}
+		} else if ( $this->getStartTime() >= $clipStartTime && $this->getStartTime() <= ($clipStartTime + $clipDuration) ) {
+			return true;
+		}
+
+		return false;
+	}
+
+	public function copyToEntry( $entry, PropelPDO $con = null)
+	{
+		$annotation = parent::copyToEntry( $entry );
+		if ( $annotation->getParentId() ) {
+			$mappedId = kObjectCopyHandler::getMappedId('Annotation', $annotation->getParentId());
+			//if parent was copied we should also copy child annotation
+			if ( $mappedId ) {
+				$annotation->setParentId( $mappedId );
+			}
+		}
+		$annotation->save();
+		return $annotation;
+	}
 }
