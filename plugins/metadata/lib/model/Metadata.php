@@ -213,6 +213,7 @@ class Metadata extends BaseMetadata implements IIndexable, ISyncableFile
 	 */
 	public function indexToSearchIndex()
 	{
-		kEventsManager::raiseEventDeferred(new kObjectReadyForIndexEvent($this));
+		if ($this->getObjectType() == MetadataObjectType::DYNAMIC_OBJECT)
+			kEventsManager::raiseEventDeferred(new kObjectReadyForIndexEvent($this));
 	}
 } // Metadata
