@@ -426,19 +426,24 @@ class myPlaylistUtils
 
 		if ( ! $list_of_filters ) return null;
 		// TODO - for now we assume that there are more or equal filters in the XML than the ones from the request
-		$i = 1; // the extra_filter is 1-based
 
+		$filterLimit = null;
 		if ( $filter && $filter->getLimit() > 0 )
 		{
+			$filterLimit = $filter->getLimit();
+
 			// Get the max results from the limit of the first filter
-			$total_results = min( $total_results, $filter->getLimit() );
+			$total_results = min( $total_results, $filterLimit );
 
 			// Clear this limit so it won't overcloud the limits of $entry_filter_xml rules
 			$filter->setLimit( null );
 		}
 
-		foreach ( $list_of_filters as $entry_filter_xml )
+		$numFiltersInList = count($list_of_filters);
+		for ( $i = 0; $i < $numFiltersInList; $i++ )
 		{
+			$entry_filter_xml = $list_of_filters[$i];
+
 		    /* @var $entry_filter_xml SimpleXMLElement */
 			// 	in general this service can fetch entries from kaltura networks.
 			// for each filter we should decide if thie assumption is true...
@@ -462,6 +467,15 @@ class myPlaylistUtils
 
 			if ( $filter )
 			{
+				if ( $filterLimit && $i == ($numFiltersInList - 1) )
+				{
+					// Hack (in order to preserve old behavior):
+					// If the filter contained a limit, we'll add it to the last XML filter on the list
+					// in order to make sure the number of requested ($limit) entries will be supplied.
+					// This handles requests of a $limit which is higher than the total sum of inner XML filter limits.
+					$filter->setLimit( $filterLimit );
+				}
+
 				$entry_filter->fillObjectFromObject( $filter , 
 					myBaseObject::CLONE_FIELD_POLICY_THIS , 
 					myBaseObject::CLONE_POLICY_PREFER_NEW , null , null , false );
@@ -472,13 +486,10 @@ class myPlaylistUtils
 			self::updateEntryFilter( $entry_filter ,  $partner_id , true );
 			
 			$entry_filters[] = $entry_filter;
-
-			$i++;	
 		}
 		
 		$number_of_entries = 0;
 		$entry_list = array();
-		$i = 1;		
 		foreach ( $entry_filters as $entry_filter )
 		{
 			$current_limit = max ( 0 , $total_results - $number_of_entries ); // if the current_limit is < 0 - set it to be 0
