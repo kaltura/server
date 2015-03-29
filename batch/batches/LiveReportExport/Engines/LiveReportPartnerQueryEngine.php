@@ -9,11 +9,13 @@ class LiveReportPartnerEngine extends LiveReportEngine {
 	protected $title;
 	protected $timeFrame;
 	protected $fieldName;
+	protected $printResult;
 	
-	public function LiveReportPartnerEngine($field, $timeFrame, $title) {
+	public function LiveReportPartnerEngine($field, $timeFrame, $title, $printResult = true) {
 		$this->fieldName = $field;
 		$this->timeFrame = $timeFrame;
 		$this->title = $title;
+		$this->printResult = $printResult;
 	}
 	
 	public function run($fp, array $args = array()) {
@@ -26,12 +28,20 @@ class LiveReportPartnerEngine extends LiveReportEngine {
 		$filter->fromTime = $args[LiveReportConstants::TIME_REFERENCE_PARAM] - $this->timeFrame;
 		if(isset($args[LiveReportConstants::ENTRY_IDS])) 
 			$filter->entryIds = $args[LiveReportConstants::ENTRY_IDS];
-		
-		$res = LiveReportQueryHelper::retrieveFromReport($reportType, $filter, null, null, $this->fieldName);
+
+		if (is_array($this->fieldName)) {
+			$res = LiveReportQueryHelper::retrieveMultipleValuesFromReport($reportType, $filter, null, null, $this->fieldName);
+		}
+		else {
+			$res = LiveReportQueryHelper::retrieveFromReport($reportType, $filter, null, null, $this->fieldName);
+		}
 		if(empty($res))
 			$res = array(0);
-		
-		fwrite($fp, $this->title . LiveReportConstants::CELLS_SEPARATOR . implode(LiveReportConstants::CELLS_SEPARATOR, $res));
+
+		if($this->printResult){
+			fwrite($fp, $this->title . LiveReportConstants::CELLS_SEPARATOR . implode(LiveReportConstants::CELLS_SEPARATOR, $res));
+		}
+		return $res;
 	}
 
 }
@@ -43,7 +53,7 @@ class LiveReportLivePartnerEngine extends LiveReportPartnerEngine {
 	
 	public function run($fp, array $args = array()) {
 		$this->checkParams($args, array(LiveReportConstants::ENTRY_IDS));
-		parent::run($fp, $args);
+		return parent::run($fp, $args);
 	}
 }
 

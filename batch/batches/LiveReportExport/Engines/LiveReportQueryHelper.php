@@ -22,24 +22,48 @@ abstract class LiveReportQueryHelper {
 		
 		$res = array();
 		foreach($result->objects as $object) {
-			$res = self::setResultValue($object, $keyField, $valueField, $res);
+			if($keyField)
+				$res[$object->$keyField] = $object->$valueField;
+			else
+				$res[] = $object->$valueField;
 		}
 		return $res;
 	}
 
-	private static function setResultValue($object, $keyField, $valueField, $res) {
-		$resValue = $object->$valueField;
-		if (is_array($valueField)) {
-			$resValue = 0;
-			foreach($valueField as $singleValueField) {
-				$resValue += $object->$singleValueField;
+	/**
+	 * Executes a simple report query and returns the result as array of <key, value> according to the specified fields.
+	 * @param KalturaLiveReportType $reportType The type of the report
+	 * @param KalturaLiveReportInputFilter $filter The input filter for the report
+	 * @param KalturaFilterPager $pager The pager of the report
+	 * @param string $keyField The name of the field that will be used as key
+	 * @param string $valueFields The name of the field that will be used as value
+	 */
+	public static function retrieveMultipleValuesFromReport($reportType,
+	                                          KalturaLiveReportInputFilter $filter = null,
+	                                          KalturaFilterPager $pager = null,
+	                                          $keyField = null,
+	                                          $valueFields) {
+
+		$result = KBatchBase::$kClient->liveReports->getReport($reportType, $filter, $pager);
+		if($result->totalCount == 0)
+			return array();
+
+		$res = array();
+		foreach($result->objects as $object) {
+			foreach($valueFields as $valueField) {
+				if($keyField) {
+					if (empty($res[$object->$keyField])) {
+						$res[$object->$keyField] = array();
+					}
+					$res[$object->$keyField][$valueField] = $object->$valueField;
+				}
+				else {
+					if (empty($res[$valueField])) {
+						$res[$valueField] = array();
+					}
+					$res[$valueField][] = $object->$valueField;
+				}
 			}
-		}
-		if($keyField) {
-			$res[$object->$keyField] = $resValue;
-		}
-		else {
-			$res[] = $resValue;
 		}
 		return $res;
 	}
