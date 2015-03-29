@@ -125,6 +125,11 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 	 * @see kObjectReplacedEventConsumer::objectReplaced()
 	*/
 	public function objectReplaced(BaseObject $object, BaseObject $replacingObject, BatchJob $raisedJob = null) {
+		//replacement as a result of convertLiveSegmentFinished
+		if ( !$replacingObject->getIsTemporary() ) {
+			return true;
+		}
+
 		$c = new Criteria();
 		$c->add(CuePointPeer::ENTRY_ID, $object->getId());
 
