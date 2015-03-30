@@ -99,7 +99,7 @@ abstract class LiveReportEntryExporter extends LiveReportExporter {
 		
 		$this->liveEntriesEngines = array(
 				new LiveReportConstantStringEngine(LiveReportConstants::ROWS_SEPARATOR),
-				new LiveReportEntryExactTimeEngine("audience", LiveReportConstants::SECONDS_60, "Total Audience:"),
+				new LiveReportEntryExactTimeEngine(array("audience","dvrAudience"), LiveReportConstants::SECONDS_60, "Current Audience & DVR:"),
 				new LiveReportEntryQueryEngine("secondsViewed", LiveReportConstants::SECONDS_36_HOURS, "Seconds Viewed:"),
 				new LiveReportEntryQueryEngine("bufferTime", LiveReportConstants::SECONDS_60, "Average Buffering Time per Minute (seconds):"),
 				new LiveReportEntryQueryEngine("avgBitrate", LiveReportConstants::SECONDS_60, "Average Bitrate (kbps):"),
