@@ -1,7 +1,7 @@
 ----------
 # Jupiter-10.8.0 #
 
-## Dynamic Objects ##
+## Tags-search - return all objects when no entitlement ##
 
 - Issue Type: bug fix
 - Issue ID: PLAT-2646
