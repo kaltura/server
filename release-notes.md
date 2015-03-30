@@ -1,25 +1,6 @@
 ----------
 # Jupiter-10.8.0 #
 
-## Disable notices regarding not available translations in Zend Framework  ##
-
-- Issue Type: Customer request
-- Issue ID: SUP-3451
-
-#### Configuration ####
-
-*admin.ini*
-
-Add the following line to the end of the resources.translate.options[] list
-
-		resources.translate.options.disableNotices = "true"
-
-*var.ini*
-
-Add the following line to the end of the resources.translate.options[] list
-
-		resources.translate.options.disableNotices = "true"
-
 ## Dynamic Objects ##
 
 - Issue Type: New Feature
