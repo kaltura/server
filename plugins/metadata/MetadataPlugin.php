@@ -232,6 +232,12 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 			if ($enumValue == KalturaIndexObjectType::METADATA)
 				return new KIndexingMetadataEngine();
 		}
+
+		if($baseClass == 'KalturaResponseProfileMapping')
+		{
+			if ($enumValue == 'kMetadataResponseProfileMapping')
+				return new KalturaMetadataResponseProfileMapping();
+		}
 		
 		return null;
 	}
