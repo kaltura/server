@@ -106,7 +106,7 @@ var kmc = {
 				<div class="hr"></div>
 				<div class="control-group">
 					<label class="checkbox"><input type="checkbox" ng-model="includeSeo"> {{ 'INCLUDE_SEO_LABEL' | translate }}</label>
-					<label class="checkbox"><input type="checkbox" ng-model="secureEmbed"> {{ 'HTTPS_SUPPORT_LABEL' | translate }}</label>
+					<label ng-class="{checkboxdisabled: deliveryType=='hds', checkbox:deliveryType!='hds'}"><input type="checkbox" ng-model="secureEmbed" ng-disabled="deliveryType=='hds'"> {{ 'HTTPS_SUPPORT_LABEL' | translate }}</label>
 				</div>
 				<div class="hr"></div>
 			</div>
