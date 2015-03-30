@@ -20,6 +20,14 @@ Add the following line to the end of the resources.translate.options[] list
 
 		resources.translate.options.disableNotices = "true"
 
+#### Deployment Scripts ####
+
+None.
+
+#### Known Issues & Limitations ####
+
+None.
+
 ## Dynamic Objects ##
 
 - Issue Type: New Feature
