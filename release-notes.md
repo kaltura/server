@@ -1,6 +1,27 @@
 ----------
 # Jupiter-10.8.0 #
 
+## Tags-search - return all objects when no entitlement ##
+
+- Issue Type: bug fix
+- Issue ID: PLAT-2646
+
+#### Configuration ####
+
+** sphinx/kaltura.conf **
+
+Add the following line to the kaltura_tag class in configurations/sphinx/kaltura.conf (or merged from configurations/sphinx/kaltura.conf.template)
+
+	rt_attr_string = tag
+
+#### Deployment Scripts ####
+
+None.
+
+#### Known Issues & Limitations ####
+
+None.
+
 ## Dynamic Objects ##
 
 - Issue Type: New Feature
