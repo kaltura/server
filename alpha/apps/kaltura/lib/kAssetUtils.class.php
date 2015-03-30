@@ -90,13 +90,22 @@ class kAssetUtils
 			$urlManager = DeliveryProfilePeer::getDeliveryProfile($asset->getEntryId());
 			if($asset instanceof flavorAsset)
 				$urlManager->initDeliveryDynamicAttributes(null, $asset);
-			
+			$profileAttributes = $urlManager->getDynamicAttributes();
+			$profileAttributes->setUrlParams($urlParameters);
+			$urlManager->setDynamicAttributes($profileAttributes);
+
 			$url = $urlManager->getFullAssetUrl($asset);
+
+			$url = preg_replace('/^https?:\/\//', '', $url);
+
+			$protocol = infraRequestUtils::getProtocol();
+			$deliveryProfileProtocols = $urlManager->getMediaProtocols();
+			if (!is_null($deliveryProfileProtocols) && !in_array($protocol, explode(',',$deliveryProfileProtocols)))
+				$protocol = infraRequestUtils::PROTOCOL_HTTP;
+			$url = $protocol . "://" . $url;
 		}
 		
-		$url = preg_replace('/^https?:\/\//', '', $url);
-			
-		return 'http://' . $url . $urlParameters;
+		return $url;
 	}
 
 	private static function getExternalStorageUrl(Partner $partner, asset $asset, FileSyncKey $key, $servePlayManifest = false , $playManifestClientTag = null , $storageId = null)
