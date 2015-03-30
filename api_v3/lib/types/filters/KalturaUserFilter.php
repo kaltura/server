@@ -137,10 +137,10 @@ class KalturaUserFilter extends KalturaUserBaseFilter
 		$c = KalturaCriteria::create(kuserPeer::OM_CLASS);
 		$userFilter->attachToCriteria($c);
 		
-		if (!is_null($filter->roleIdEqual))
+		if (!is_null($this->roleIdEqual))
 		{
 			$roleCriteria = new Criteria();
-			$roleCriteria->add ( KuserToUserRolePeer::USER_ROLE_ID , $filter->roleIdEqual );
+			$roleCriteria->add ( KuserToUserRolePeer::USER_ROLE_ID , $this->roleIdEqual );
 			$roleCriteria->addSelectColumn(KuserToUserRolePeer::KUSER_ID);
 			$rs = KuserToUserRolePeer::doSelectStmt($roleCriteria);
 			$kuserIds = $rs->fetchAll(PDO::FETCH_COLUMN);
@@ -148,7 +148,7 @@ class KalturaUserFilter extends KalturaUserBaseFilter
 			$c->add(kuserPeer::ID, $kuserIds, KalturaCriteria::IN);
 		}
 
-		if (is_null($filter->typeEqual) && is_null($filter->typeIn)){
+		if (is_null($this->typeEqual) && is_null($this->typeIn)){
 			$c->add(kuserPeer::TYPE, KuserType::USER, KalturaCriteria::EQUAL);
 		}
 		
