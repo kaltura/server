@@ -30,13 +30,8 @@ class LiveReportEntryQueryEngine extends LiveReportEngine {
 		$filter->fromTime = $args[LiveReportConstants::TIME_REFERENCE_PARAM] - $this->timeFrame;
 		$filter->entryIds = $args[LiveReportConstants::ENTRY_IDS];
 
-		if (is_array($this->fieldName)) {
-			$res = LiveReportQueryHelper::retrieveMultipleValuesFromReport($reportType, $filter, null, "entryId", $this->fieldName);
-		} else {
-			$res = LiveReportQueryHelper::retrieveFromReport($reportType, $filter, null, "entryId", $this->fieldName);
-		}
+		$res = LiveReportQueryHelper::retrieveFromReport($reportType, $filter, null, "entryId", $this->fieldName);
 
-		
 		if($this->printResult) {
 			if(empty($res))
 				$res = $this->defaultVal;

@@ -29,12 +29,8 @@ class LiveReportPartnerEngine extends LiveReportEngine {
 		if(isset($args[LiveReportConstants::ENTRY_IDS])) 
 			$filter->entryIds = $args[LiveReportConstants::ENTRY_IDS];
 
-		if (is_array($this->fieldName)) {
-			$res = LiveReportQueryHelper::retrieveMultipleValuesFromReport($reportType, $filter, null, null, $this->fieldName);
-		}
-		else {
-			$res = LiveReportQueryHelper::retrieveFromReport($reportType, $filter, null, null, $this->fieldName);
-		}
+		$res = LiveReportQueryHelper::retrieveFromReport($reportType, $filter, null, null, $this->fieldName);
+
 		if(empty($res))
 			$res = array(0);
 
