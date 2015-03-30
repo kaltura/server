@@ -116,7 +116,7 @@ class KalturaGroupUserFilter extends KalturaGroupUserBaseFilter
 			$this->userIdIn = implode(',', $usersIds);
 		}
 
-		if($filter->groupIdIn)
+		if($this->groupIdIn)
 		{
 			$groupIdIn = explode(',', $this->groupIdIn);
 			$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
