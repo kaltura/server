@@ -124,7 +124,10 @@ class Form_PartnerConfigurationLimitSubForm extends Zend_Form_SubForm
 			if(!$isPermitted)
 			{
 				$element = $form->getElement($elementName);
-				$element->setOptions(array('disabled' => true));
+				if ( $element )
+				{
+					$element->setOptions(array('disabled' => true));
+				}
 			}
 		}
 	}
