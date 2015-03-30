@@ -176,6 +176,11 @@ class Metadata extends BaseMetadata implements IIndexable, ISyncableFile
 		return array("metadata:objectId=".strtolower($this->getObjectId()));
 	}
 
+	public function getSphinxMatchOptimizations() {
+		$objectName = $this->getIndexObjectName();
+		return $objectName::getSphinxMatchOptimizations($this);
+	}
+
 	/**
 	 * @return int
 	 */
@@ -208,6 +213,7 @@ class Metadata extends BaseMetadata implements IIndexable, ISyncableFile
 	 */
 	public function indexToSearchIndex()
 	{
-		kEventsManager::raiseEventDeferred(new kObjectReadyForIndexEvent($this));
+		if ($this->getObjectType() == MetadataObjectType::DYNAMIC_OBJECT)
+			kEventsManager::raiseEventDeferred(new kObjectReadyForIndexEvent($this));
 	}
 } // Metadata
