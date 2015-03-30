@@ -11,5 +11,9 @@
 		<field name="object_type" indexName="object_type" type="int" orderable="yes" skipField="yes" />
 		<field name="status" indexName="metadata_status" getter="status" type="int" skipField="yes" />
 		<field name="plugins_data" indexName="plugins_data" type="string" searchableonly="yes" matchable="yes" />
+		<field name="sphinx_match_optimizations" indexName="sphinx_match_optimizations" type="string" />
+		<index format="P%s">
+			<value field="partner_id" />
+		</index>
 	</object>
 </schema>
