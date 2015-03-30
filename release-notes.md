@@ -28,6 +28,12 @@ Update `configurations/sphinx/kaltura.conf` according to template (a new index `
 
 None.
 
+##New file formats MXF and M2TS##
+- Issue Type: new feature
+- Issue ID: PLAT-2742 and SUP-4124
+
+
+
 ----------
 # Jupiter-10.7.0 #
 
