@@ -92,7 +92,6 @@ class kAssetUtils
 				$urlManager->initDeliveryDynamicAttributes(null, $asset);
 			$profileAttributes = $urlManager->getDynamicAttributes();
 			$profileAttributes->setUrlParams($urlParameters);
-			$urlManager->setDynamicAttributes($profileAttributes);
 
 			$url = $urlManager->getFullAssetUrl($asset);
 
@@ -142,6 +141,7 @@ class kAssetUtils
 			if($urlManager) {
 				$dynamicAttrs = new DeliveryProfileDynamicAttributes();
 				$dynamicAttrs->setFileExtension($asset->getFileExt());
+				$urlManager->setDynamicAttributes($dynamicAttrs);
 				
 				$url = rtrim($urlManager->getUrl(),'/') . '/' . ltrim($urlManager->getFileSyncUrl($fileSync),'/');
 			} else {
