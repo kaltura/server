@@ -13,7 +13,15 @@ class KalturaResponseProfileMappingArray extends KalturaTypedArray
 
 		foreach ($arr as $obj)
 		{
-			$nObj = new KalturaResponseProfileMapping();
+			$dbClass = get_class($obj);
+			if ($dbClass == 'kResponseProfileMapping')
+				$nObj = new KalturaResponseProfileMapping();
+			else
+				$nObj = KalturaPluginManager::loadObject('KalturaResponseProfileMapping', $dbClass);
+
+			if (is_null($nObj))
+				KalturaLog::err('Failed to load api object for '.$dbClass);
+
 			$nObj->fromObject($obj, $responseProfile);
 			$newArr[] = $nObj;
 		}
