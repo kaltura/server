@@ -111,16 +111,6 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 		return $hostName . $assetUrl;
 	}
 	
-	public function getDynamicAttributes()
-	{
-		return $this->params;
-	}
-	
-	public function setDynamicAttributes(DeliveryProfileDynamicAttributes $attributes)
-	{
-		$this->params = $attributes;
-	}
-	
 	protected function addSeekFromBytes($flavorAsset, $url, $prefix) {
 		$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 		$seekFromBytes = $this->getSeekFromBytes(kFileSyncUtils::getLocalFilePathForKey($syncKey));
