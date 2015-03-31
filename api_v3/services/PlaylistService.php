@@ -298,7 +298,7 @@ class PlaylistService extends KalturaEntryService
 		if ($playlist->getType() != entryType::PLAYLIST)
 			throw new KalturaAPIException ( APIErrors::INVALID_PLAYLIST_TYPE );
 
-		$extraFilters = array();
+		$entryFilter = null;
 		if ($filter)
 		{
 			if ($playlist->getMediaType() == entry::ENTRY_MEDIA_TYPE_TEXT)
@@ -309,7 +309,7 @@ class PlaylistService extends KalturaEntryService
 
 			$coreFilter = new entryFilter();
 			$filter->toObject($coreFilter);
-			$extraFilters[1] = $coreFilter;
+			$entryFilter = $coreFilter;
 		}
 			
 		if ($this->getKs() && is_object($this->getKs()) && $this->getKs()->isAdmin())
@@ -328,7 +328,7 @@ class PlaylistService extends KalturaEntryService
 
 		try
 		{
-			$entryList = myPlaylistUtils::executePlaylist( $this->getPartnerId() , $playlist , $extraFilters , $detailed);
+			$entryList = myPlaylistUtils::executePlaylist( $this->getPartnerId() , $playlist , $entryFilter , $detailed);
 		}
 		catch (kCoreException $ex)
 		{   		
