@@ -403,10 +403,20 @@ abstract class KalturaObject
 			
 			if($relatedProfile->mappings)
 			{
+				$applied = true;
 				foreach($relatedProfile->mappings as $mapping)
 				{
 					/* @var $mapping KalturaResponseProfileMapping */
-					$mapping->apply($filter, $this);
+					if(!$mapping->apply($filter, $this))
+					{
+						$applied = false;
+						break;
+					}
+				}
+				if(!$applied)
+				{
+					KalturaLog::warning("Mappings could not be applied for response-profile [$relatedProfile->name]");
+					continue;
 				}
 			}
 			else 

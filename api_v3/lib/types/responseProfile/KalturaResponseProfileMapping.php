@@ -15,9 +15,15 @@ class KalturaResponseProfileMapping extends KalturaObject
 	 */
 	public $filterProperty;
 	
+	/**
+	 * @var bool
+	 */
+	public $allowNull;
+	
 	private static $map_between_objects = array(
 		'parentProperty', 
 		'filterProperty', 
+		'allowNull', 
 	);
 	
 	/* (non-PHPdoc)
@@ -52,6 +58,12 @@ class KalturaResponseProfileMapping extends KalturaObject
 		return parent::toObject($object, $propertiesToSkip);
 	}
 	
+	/**
+	 * @param KalturaRelatedFilter $filter
+	 * @param KalturaObject $parentObject
+	 * @return boolean
+	 * @throws KalturaAPIException
+	 */
 	public function apply(KalturaRelatedFilter $filter, KalturaObject $parentObject)
 	{
 		$filterProperty = $this->filterProperty;
@@ -64,16 +76,18 @@ class KalturaResponseProfileMapping extends KalturaObject
 			throw new KalturaAPIException(KalturaErrors::PROPERTY_IS_NOT_DEFINED, $parentProperty, get_class($parentObject));
 		}
 		
-		if(is_null($parentObject->$parentProperty))
-		{
-			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_CANNOT_BE_NULL, get_class($parentObject) . "::$parentProperty");
-		}
-		
 		if(!property_exists($filter, $filterProperty))
 		{
 			throw new KalturaAPIException(KalturaErrors::PROPERTY_IS_NOT_DEFINED, $filterProperty, get_class($filter));
 		}
 		
+		if(is_null($parentObject->$parentProperty) && !$this->allowNull)
+		{
+			KalturaLog::warning("Parent property [" . get_class($parentObject) . "::{$parentProperty}] is null");
+			return false;
+		}
+		
 		$filter->$filterProperty = $parentObject->$parentProperty;
+		return true;
 	}
 }
