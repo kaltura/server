@@ -1,6 +1,24 @@
 ----------
 # Jupiter-10.8.0 #
 
+## Real-time dashboard permission in now based on the general live-stream permission ##
+
+- Issue Type: Change Request
+- Issue ID: PLAT-2705
+
+#### Configuration ####
+
+Remove moduls.realTimeReports config from configurations/admin.ini
+
+#### Deployment Scripts ####
+
+None.
+
+#### Known Issues & Limitations ####
+
+None.
+
+
 ## Dynamic Objects ##
 
 - Issue Type: New Feature
