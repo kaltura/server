@@ -11,5 +11,6 @@ CREATE TABLE response_profile
 	type INTEGER,
 	custom_data TEXT,
 	PRIMARY KEY (id),
+	KEY partner_system_name(partner_id, system_name),
 	KEY partner_status(partner_id, status)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
