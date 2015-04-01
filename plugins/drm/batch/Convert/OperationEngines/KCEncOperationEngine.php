@@ -79,7 +79,7 @@ class KCEncOperationEngine extends KOperationEngine
     private function getUDRMdata($licenseServerUrl, $signingKey)
     {
 
-        $jsonPostData = '{"ca_system":"'. self::SYSTEM_NAME .'", "account_id":"'.$this->job->partnerId.'", "content_id":"'. $this->job->entryId.'", "file_id":"'.$this->data->flavorParamsOutput->flavorParamsId.'"}';
+        $jsonPostData = '{"ca_system":"'. self::SYSTEM_NAME .'", "account_id":"'.$this->job->partnerId.'", "content_id":"'. $this->job->entryId.'", "files":"'.$this->data->flavorParamsOutput->flavorParamsId.'"}';
         $signature = self::signDataWithKey($jsonPostData, $signingKey);
 
         $serviceURL = $licenseServerUrl. "" . self::URL_EXTENSION . "" .$signature;
