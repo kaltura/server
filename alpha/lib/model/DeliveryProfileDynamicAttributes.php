@@ -101,6 +101,11 @@ class DeliveryProfileDynamicAttributes {
 	protected $uiConfId = null;
 	
 	/**
+	 * @var string
+	 */
+	protected $urlParams = '';
+
+	/**
 	 * @return the $format
 	 */
 	public function getFormat() {
@@ -358,6 +363,22 @@ class DeliveryProfileDynamicAttributes {
 		$this->uiConfId = $uiConfId;
 	}
 
+	/**
+	 * @param string $urlParamsString
+	 */
+	public function setUrlParams($urlParamsString)
+	{
+		$this->urlParams = $urlParamsString;
+	}
+	
+	/**
+	 * @return the urlParams
+	 */
+	public function getUrlParams()
+	{
+		return $this->urlParams;
+	}
+	
 	/**
 	 * @param array<asset|assetParams> $flavors
 	 * @return array
