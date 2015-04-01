@@ -158,8 +158,8 @@ class DrmPlugin extends KalturaPlugin implements IKalturaServices, IKalturaAdmin
         $signature = DrmLicenseUtils::signDataWithKey($signingKey, $customDataJson);
 
         $drmContextData = new KalturaDrmEntryContextPluginData();
-        $drmContextData->jsonData = $customDataJson;
-        $drmContextData->signature = $signature;
+        $drmContextData->customData = rawurlencode(base64_encode($customDataJson));
+        $drmContextData->signature = rawurlencode(base64_encode($signature));
         $result->pluginData[] = $drmContextData;
     }
 

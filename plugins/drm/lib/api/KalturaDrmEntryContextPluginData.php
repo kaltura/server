@@ -8,7 +8,7 @@ class KalturaDrmEntryContextPluginData extends KalturaPluginData{
     /**
      * @var string
      */
-    public $jsonData;
+    public $customData;
 
     /**
      * @var string
