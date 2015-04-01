@@ -1,6 +1,27 @@
 ----------
 # Jupiter-10.8.0 #
 
+## Tag-search - return all objects when no entitlement ##
+
+- Issue Type: bug fix
+- Issue ID: PLAT-2646
+
+#### Configuration ####
+
+** sphinx/kaltura.conf **
+
+Added the following attribute to the kaltura_tag sphinx table. please re-index.
+
+	rt_attr_string = tag
+
+#### Deployment Scripts ####
+
+None.
+
+#### Known Issues & Limitations ####
+
+None.
+
 ## Real-time dashboard permission in now based on the general live-stream permission ##
 
 - Issue Type: Change Request
