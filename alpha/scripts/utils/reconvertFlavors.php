@@ -1,6 +1,7 @@
 <?php
-
-require_once('/opt/kaltura/app/alpha/scripts/bootstrap.php');
+// this chdir can be changed according to environment
+chdir(__DIR__ . '/../');
+require_once(__DIR__ . '/../bootstrap.php');
 
 function readFileLines($filename)
 {
@@ -48,9 +49,9 @@ function getRunningJobsCount($partnerId, $jobType, $jobSubType)
 	return $result;
 }
 
-if ($argc < 7)
+if ($argc < 8)
 {
-	die("Usage:\n\tphp ".basename(__file__)." <partner id> <job sub type> <flavor ids file> <processed flavors file> <max jobs per dc> <first host> [<second host>]\n");
+	die("Usage:\n\tphp ".basename(__file__)." <partner id> <job sub type> <flavor ids file> <processed flavors file> <max jobs per dc> <kalcli location> <first host> [<second host>]\n");
 }
 
 $partnerId = $argv[1];
@@ -58,14 +59,15 @@ $jobSubType = $argv[2];
 $flavorIdsFile = $argv[3];
 $processedFlavorIdsFile = $argv[4];
 $maxJobsPerDc = $argv[5];
-$firstHost = $argv[6];
+$kalcliLocation = $argv[6];
+$firstHost = $argv[7];
 
 $apiServers = array();
 $apiServers[] = $firstHost;
 
-if ($argc >= 8)
+if ($argc >= 9)
 {
-	$secondHost = $argv[7];
+	$secondHost = $argv[8];
 	$apiServers[] = $secondHost;
 }
 
@@ -93,7 +95,8 @@ for (;;)
 			}
 
 			$apiServer = $apiServers[$dc];
-			$commandLine = "/root/kalcli/cli/generateKs.php $partnerId | /root/kalcli/cli/kalcli.php -u $apiServer flavorasset reconvert id=$flavorId";
+			$commandLine = $kalcliLocation . "/generateKs.php $partnerId | " . $kalcliLocation . "kalcli.php -u $apiServer flavorasset reconvert id=$flavorId";
+			die;
 
 			KalturaLog::log($commandLine);
 			$output = array();
