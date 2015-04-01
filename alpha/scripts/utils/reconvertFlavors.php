@@ -96,7 +96,6 @@ for (;;)
 
 			$apiServer = $apiServers[$dc];
 			$commandLine = $kalcliLocation . "/generateKs.php $partnerId | " . $kalcliLocation . "kalcli.php -u $apiServer flavorasset reconvert id=$flavorId";
-			die;
 
 			KalturaLog::log($commandLine);
 			$output = array();
