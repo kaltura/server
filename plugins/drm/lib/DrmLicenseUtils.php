@@ -69,7 +69,7 @@ class DrmLicenseUtils {
         $customData->user_token = kCurrentContext::$ks;
         $customData->acount_id = kCurrentContext::$partner_id;
         $customData->content_id = $entryId;
-        $customData->file_ids = "";
+        $customData->files = "";
         if (isset($flavorAssets))
         {
             $flavorIds = array();
@@ -78,7 +78,7 @@ class DrmLicenseUtils {
             {
                 $flavorIds[] = $flavor->id;
             }
-            $customData->file_ids = $flavorIds;
+            $customData->files = $flavorIds;
         }
         $customDataJson = json_encode($customData);
         return $customDataJson;
