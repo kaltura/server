@@ -159,9 +159,9 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 	 * @param BaseObject $entry entry to check
 	 * @return kClipAttributes|null
 	 */
-	protected static function getClipAttributesFromEntry( BaseObject $entry ) {
-		if ( $entry instanceof entry ) {
-			$operationAtts = $entry->getOperationAttributes();
+	protected static function getClipAttributesFromEntry( BaseObject $object ) {
+		if ( $object instanceof entry ) {
+			$operationAtts = $object->getOperationAttributes();
 			if ( !is_null($operationAtts) && count($operationAtts) > 0 ) {
 				$clipAtts = reset($operationAtts);
 				if ($clipAtts instanceof kClipAttributes) {

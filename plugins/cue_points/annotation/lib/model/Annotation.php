@@ -64,11 +64,9 @@ class Annotation extends CuePoint implements IMetadataObject
 	public function shouldCopyToClip( $clipStartTime, $clipDuration ) {
 		//child annotations have starttime 0, check parent starttime
 		if ( !$this->getStartTime() ) {
-			if ( $this->getParentId() ) {
-				$parentAnnotation = CuePointPeer::retrieveByPK($this->getParentId());
-				if ( !is_null($parentAnnotation) ) {
-					return $parentAnnotation->shouldCopyToClip($clipStartTime, $clipDuration);
-				}
+			$parentAnnotation = $this->getParent();
+			if ( !is_null($parentAnnotation) ) {
+				return $parentAnnotation->shouldCopyToClip($clipStartTime, $clipDuration);
 			}
 		} else if ( $this->getStartTime() >= $clipStartTime && $this->getStartTime() <= ($clipStartTime + $clipDuration) ) {
 			return true;
