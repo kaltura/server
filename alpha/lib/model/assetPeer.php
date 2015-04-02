@@ -555,7 +555,40 @@ class assetPeer extends BaseassetPeer
 				
 		return $ret;
 	}
-	
+
+    /**
+     * @param string $entryId
+     * @param string $tag tag filter
+     * @return flavorAsset
+     */
+    public static function retrieveHighestBitrateByEntryIdWithValidFileSync($entryId, $tag = null)
+    {
+        $c = new Criteria();
+        $c->add(assetPeer::ENTRY_ID, $entryId);
+        $c->add(assetPeer::STATUS, flavorAsset::FLAVOR_ASSET_STATUS_READY);
+        $flavorTypes = self::retrieveAllFlavorsTypes();
+        $c->add(assetPeer::TYPE, $flavorTypes, Criteria::IN);
+        $flavorAssets = self::doSelect($c);
+        if(!count($flavorAssets))
+            return null;
+        if(!is_null($tag))
+            $flavorAssets = self::filterByTag($flavorAssets, $tag);
+        if(!count($flavorAssets))
+            return null;
+        $ret = null;
+        foreach($flavorAssets as $flavorAsset)
+        {
+            if (!$ret || $ret->getBitrate() < $flavorAsset->getBitrate()) {
+                $flavorSyncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+                list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($flavorSyncKey,false,false);
+                if ($fileSync){
+                    $ret = $flavorAsset;
+                }
+            }
+        }
+        return $ret;
+    }
+
 	/**
 	 * Leaves only the specified tag in the flavor assets array
 	 * 
