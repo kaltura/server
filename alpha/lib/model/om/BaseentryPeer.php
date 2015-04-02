@@ -2405,7 +2405,7 @@ abstract class BaseentryPeer {
 	}
 	
 	/**
-	 * Return array of columns that should change only if there is a real change.
+	 * Return array of custom-data fields that shouldn't be auto-updated.
 	 * @return array
 	 */
 	public static function getAtomicCustomDataFields()

@@ -3165,7 +3165,6 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 									$validUpdate = false;
 								}
 							}
-							
 							$this->putInCustomData($name, $newValue, $namespace);
 						}
 					}
