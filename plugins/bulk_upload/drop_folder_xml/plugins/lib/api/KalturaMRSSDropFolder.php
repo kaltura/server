@@ -7,7 +7,7 @@ class KalturaMRSSDropFolder extends KalturaDropFolder
 {
 	/**
 	 * URL of the MRSS indicating the entries to be uploaded
-	 * @var String
+	 * @var string
 	 */
 	public $mrssUrl;
 	
