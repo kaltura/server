@@ -1,6 +1,6 @@
 <?php
 /**
- * @package plugins.mrssDropFolder
+ * @package plugins.dropFolderMRSS
  * @subpackage api.objects
  */
 class KalturaMRSSDropFolderFile extends KalturaDropFolderFile
