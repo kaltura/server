@@ -3136,6 +3136,8 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 				$this->m_custom_data = myCustomData::fromString($newCustomData); 
 
 				//set custom data column values we wanted to change to
+				$validUpdate = true;
+				$atomicCustomDataFields = entryPeer::getAtomicCustomDataFields();
 			 	foreach ($this->oldCustomDataValues as $namespace => $namespaceValues){
                 	foreach($namespaceValues as $name => $oldValue)
 					{
@@ -3150,12 +3152,29 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 							$newValue = $valuesToChangeTo[$name];
 						}
 					 
-						if (!is_null($newValue))
+						if (!is_null($newValue)) {
+							$atomicField = false;
+							if($namespace) {
+								$atomicField = in_array($namespace, $atomicCustomDataFields) && in_array($name, $atomicCustomDataFields[$namespace]);
+							} else {
+								$atomicField = in_array($name, $atomicCustomDataFields);
+							}
+							if($atomicField) {
+								$dbValue = $this->m_custom_data->get($name, $namespace);
+								if($oldValue != $dbValue) {
+									$validUpdate = false;
+								}
+							}
+							
 							$this->putInCustomData($name, $newValue, $namespace);
+						}
 					}
                    }
                    
 				$this->setCustomData($this->m_custom_data->toString());
+				
+				if(!$validUpdate) 
+					break;
 			}
 
 			if ($isInsert) {

@@ -292,49 +292,17 @@ class kFlowHelper
 		if(count($files) > 1)
 		{
 			// find replacing entry id
-			$replacingEntryId = $recordedEntry->getReplacingEntryId();
-			$replacingEntry = null;
 			
-			// in replacement
-			if($replacingEntryId)
-			{
-				$replacingEntry = entryPeer::retrieveByPKNoFilter($replacingEntryId);
-				
-				// check if asset already ingested
-				$replacingAsset = assetPeer::retrieveByEntryIdAndParams($replacingEntryId, $asset->getFlavorParamsId());
-				if($replacingAsset)
-				{
-					KalturaLog::err('Asset with params [' . $asset->getFlavorParamsId() . '] already replaced');
-					return $dbBatchJob;
-				}
+			$replacingEntry = kFlowHelper::getReplacingEntry($recordedEntry, $asset);
+			if(is_null($replacingEntry)) {
+				KalturaLog::err('Failed to retrieve replacing entry');
+				return $dbBatchJob;
 			}
-			// not in replacement
-			else
-			{
-		    	$advancedOptions = new kEntryReplacementOptions();
-		    	$advancedOptions->setKeepManualThumbnails(true);
-		    	$recordedEntry->setReplacementOptions($advancedOptions);
-		
-				$replacingEntry = new entry();
-			 	$replacingEntry->setType(entryType::MEDIA_CLIP);
-				$replacingEntry->setMediaType(entry::ENTRY_MEDIA_TYPE_VIDEO);
-				$replacingEntry->setConversionProfileId($recordedEntry->getConversionProfileId());
-				$replacingEntry->setName($recordedEntry->getPartnerId().'_'.time());
-				$replacingEntry->setKuserId($recordedEntry->getKuserId());
-				$replacingEntry->setAccessControlId($recordedEntry->getAccessControlId());
-				$replacingEntry->setPartnerId($recordedEntry->getPartnerId());
-				$replacingEntry->setSubpId($recordedEntry->getPartnerId() * 100);
-				$replacingEntry->setDefaultModerationStatus();
-				$replacingEntry->setDisplayInSearch(mySearchUtils::DISPLAY_IN_SEARCH_SYSTEM);
-				$replacingEntry->setReplacedEntryId($recordedEntry->getId());
-				$replacingEntry->save();
-				
-				$recordedEntry->setReplacingEntryId($replacingEntry->getId());
-				$recordedEntry->setReplacementStatus(entryReplacementStatus::APPROVED_BUT_NOT_READY);
-				$recordedEntry->save();
-			}
-	
+			
 			$flavorParams = assetParamsPeer::retrieveByPKNoFilter($asset->getFlavorParamsId());
+			if(is_null($flavorParams)) { 
+				return $dbBatchJob;
+			}
 		
 			// create asset
 			$replacingAsset = assetPeer::getNewAsset(assetType::FLAVOR);
@@ -354,6 +322,61 @@ class kFlowHelper
 		}
 		
 		return $dbBatchJob;
+	}
+	
+	protected static function getReplacingEntry($recordedEntry, $asset, $retries = 1) {
+		$replacingEntryId = $recordedEntry->getReplacingEntryId();
+		$replacingEntry = null;
+		// in replacement
+		if($replacingEntryId)
+		{
+			$replacingEntry = entryPeer::retrieveByPKNoFilter($replacingEntryId);
+		
+			// check if asset already ingested
+			$replacingAsset = assetPeer::retrieveByEntryIdAndParams($replacingEntryId, $asset->getFlavorParamsId());
+			if($replacingAsset)
+			{
+				KalturaLog::err('Asset with params [' . $asset->getFlavorParamsId() . '] already replaced');
+				return null;
+			}
+		}
+		// not in replacement
+		else
+		{
+			$advancedOptions = new kEntryReplacementOptions();
+			$advancedOptions->setKeepManualThumbnails(true);
+			$recordedEntry->setReplacementOptions($advancedOptions);
+		
+			$replacingEntry = new entry();
+			$replacingEntry->setType(entryType::MEDIA_CLIP);
+			$replacingEntry->setMediaType(entry::ENTRY_MEDIA_TYPE_VIDEO);
+			$replacingEntry->setConversionProfileId($recordedEntry->getConversionProfileId());
+			$replacingEntry->setName($recordedEntry->getPartnerId().'_'.time());
+			$replacingEntry->setKuserId($recordedEntry->getKuserId());
+			$replacingEntry->setAccessControlId($recordedEntry->getAccessControlId());
+			$replacingEntry->setPartnerId($recordedEntry->getPartnerId());
+			$replacingEntry->setSubpId($recordedEntry->getPartnerId() * 100);
+			$replacingEntry->setDefaultModerationStatus();
+			$replacingEntry->setDisplayInSearch(mySearchUtils::DISPLAY_IN_SEARCH_SYSTEM);
+			$replacingEntry->setReplacedEntryId($recordedEntry->getId());
+			$replacingEntry->save();
+		
+			$recordedEntry->setReplacingEntryId($replacingEntry->getId());
+			$recordedEntry->setReplacementStatus(entryReplacementStatus::APPROVED_BUT_NOT_READY);
+			$affectedRows = $recordedEntry->save();
+			if(!$affectedRows) {
+				$replacingEntry->delete();
+				$replacingEntry = null;
+				$recordedEntry = entryPeer::retrieveByPKNoFilter($recordedEntry->getId());
+				if($retries) {
+					return kFlowHelper::getReplacingEntry($recordedEntry, $asset, 0);
+				} else {
+					KalturaLog::err("Failed to update replacing entry");
+					return null;
+				}
+			}
+		}
+		return $replacingEntry;
 	}
 
 	/**

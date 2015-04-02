@@ -2403,6 +2403,15 @@ abstract class BaseentryPeer {
 	{
 		return array();
 	}
+	
+	/**
+	 * Return array of columns that should change only if there is a real change.
+	 * @return array
+	 */
+	public static function getAtomicCustomDataFields()
+	{
+		return array();
+	}
 
 	/**
 	 * Method to DELETE all rows from the entry table.
