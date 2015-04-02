@@ -754,7 +754,7 @@ class myEntryUtils
 	    				if(is_null($flavorAsset) || !($flavorAsset->hasTag(flavorParams::TAG_MBR) || $flavorAsset->hasTag(flavorParams::TAG_WEB)))
 					    {
     						// try the best playable
-                            $flavorAsset = assetPeer::retrieveHighestBitrateByEntryIdWithValidFileSync($entry->getId());
+                            $flavorAsset = assetPeer::retrieveHighestBitrateByEntryId($entry->getId());
 					    }
 					    if (is_null($flavorAsset))
 					    {

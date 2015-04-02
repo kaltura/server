@@ -525,43 +525,12 @@ class assetPeer extends BaseassetPeer
 		return assetPeer::doSelectOne($c);
 	}
 	
-	/**
-	 * @param string $entryId
-	 * @param string $tag tag filter
-	 * @return flavorAsset
-	 */
-	public static function retrieveHighestBitrateByEntryId($entryId, $tag = null)
-	{
-		$c = new Criteria();
-		$c->add(assetPeer::ENTRY_ID, $entryId);
-		$c->add(assetPeer::STATUS, flavorAsset::FLAVOR_ASSET_STATUS_READY);
-		$flavorTypes = self::retrieveAllFlavorsTypes();
-		$c->add(assetPeer::TYPE, $flavorTypes, Criteria::IN);
-		
-		$flavorAssets = self::doSelect($c);
-		if(!count($flavorAssets))
-			return null;
-			
-		if(!is_null($tag))
-			$flavorAssets = self::filterByTag($flavorAssets, $tag);
-		
-		if(!count($flavorAssets))
-			return null;
-			
-		$ret = null;
-		foreach($flavorAssets as $flavorAsset)
-			if(!$ret || $ret->getBitrate() < $flavorAsset->getBitrate())
-				$ret = $flavorAsset;
-				
-		return $ret;
-	}
-
     /**
      * @param string $entryId
      * @param string $tag tag filter
-     * @return flavorAsset
+     * @return flavorAsset that has a file_sync in status ready
      */
-    public static function retrieveHighestBitrateByEntryIdWithValidFileSync($entryId, $tag = null)
+    public static function retrieveHighestBitrateByEntryId($entryId, $tag = null)
     {
         $c = new Criteria();
         $c->add(assetPeer::ENTRY_ID, $entryId);
