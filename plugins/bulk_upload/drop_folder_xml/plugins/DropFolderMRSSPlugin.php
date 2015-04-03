@@ -42,14 +42,6 @@ class DropFolderMRSSPlugin extends KalturaPlugin implements IKalturaPlugin, IKal
 					return new kMRSSDropFolderContentProcessorJobData();
 				}
 				break;
-			case 'KalturaJobData':
-				$jobSubType = $constructorArgs["coreJobSubType"];
-			    if ($enumValue == DropFolderPlugin::getApiValue(DropFolderBatchType::DROP_FOLDER_CONTENT_PROCESSOR) &&
-					$jobSubType == self::getDropFolderTypeCoreValue(MRSSDropFolderType::MRSS) )
-				{
-					return new KalturaMRSSDropFolderContentProcessorJobData();
-				}
-				break;
 			case 'Form_DropFolderConfigureExtend_SubForm':
 				if ($enumValue == Kaltura_Client_DropFolder_Enum_DropFolderType::MRSS)
 				{
@@ -62,8 +54,6 @@ class DropFolderMRSSPlugin extends KalturaPlugin implements IKalturaPlugin, IKal
 					return new Kaltura_Client_WebexDropFolder_Type_WebexDropFolder();
 				}
 				break;
-				break;
-				
 		}
 	}
 	

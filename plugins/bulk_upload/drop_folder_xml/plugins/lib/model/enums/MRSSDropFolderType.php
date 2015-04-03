@@ -1,7 +1,7 @@
 <?php
 /**
  * @package plugins.dropFolderMRSS
- *  @subpackage model.enum
+ * @subpackage model.enum
  */
 class MRSSDropFolderType implements IKalturaPluginEnum, DropFolderType
 {
