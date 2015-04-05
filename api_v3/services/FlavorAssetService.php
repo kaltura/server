@@ -604,11 +604,12 @@ class FlavorAssetService extends KalturaAssetService
 	 * @param string $id
 	 * @param int $storageId
 	 * @param bool $forceProxy
+	 * @param string $fileName
 	 * @return string
 	 * @throws KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND
 	 * @throws KalturaErrors::FLAVOR_ASSET_IS_NOT_READY
 	 */
-	public function getUrlAction($id, $storageId = null, $forceProxy = false)
+	public function getUrlAction($id, $storageId = null, $forceProxy = false, $fileName = "")
 	{
 		$assetDb = assetPeer::retrieveById($id);
 		if (!$assetDb || !($assetDb instanceof flavorAsset))
@@ -653,7 +654,7 @@ class FlavorAssetService extends KalturaAssetService
 			throw new KalturaAPIException(KalturaErrors::ASSET_NOT_ALLOWED, $id);
  
 		if ($shouldServeFlavor)
-			return $assetDb->getServeFlavorUrl($preview);
+			return $assetDb->getServeFlavorUrl($preview, $fileName);
 		return $assetDb->getDownloadUrl(true, $forceProxy,$previewFileSize);
 	}
 	

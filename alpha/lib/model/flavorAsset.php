@@ -267,7 +267,7 @@ class flavorAsset extends asset
 		return $this->getBitrate();
 	}
 	
-	public function getServeFlavorUrl($previewLength = null)
+	public function getServeFlavorUrl($previewLength = null, $fileName = null)
 	{
 		$entry = $this->getentry();
 
@@ -277,14 +277,18 @@ class flavorAsset extends asset
 			throw new kCoreException("asset $id belongs to an entry of a wrong type", kCoreException::INVALID_ENTRY_TYPE);
 		}
 
-		list($name , $extension) = kAssetUtils::getFileName($entry , $this);
-		$name = str_replace("\n", ' ', $name);
-		$name = kString::stripInvalidUrlChars($name);
-
-		if ($extension)
-			$name .= ".$extension";
+		if (!$fileName)
+		{
+			list($fileName , $extension) = kAssetUtils::getFileName($entry , $this);
+			$fileName = str_replace("\n", ' ', $fileName);
+			$fileName = kString::stripInvalidUrlChars($fileName);
+	
+			if ($extension)
+				$fileName .= ".$extension";
+		}
+		
 		//adding a serveFlavor download parameter
-		$urlParameters = "/fileName/$name";
+		$urlParameters = "/fileName/$fileName";
 
 		if ($previewLength)
 			$urlParameters .= "/clipTo/$previewLength";
