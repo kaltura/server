@@ -6,7 +6,7 @@
 
 require_once(__DIR__.'/../bootstrap.php');
 
-$distributionProvider = kPluginableEnumsManager::apiToCore('DistributionProviderType', YoutubeApiDistributionProviderType::YOUTUBE_API);
+$distributionProvider = YoutubeApiDistributionPlugin::getDistributionProviderTypeCoreValue(YoutubeApiDistributionProviderType::YOUTUBE_API);
 
 $criteria = new Criteria();
 $criteria->add(DistributionProfilePeer::STATUS, DistributionProfileStatus::DELETED, Criteria::NOT_EQUAL);
