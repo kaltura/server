@@ -8,7 +8,7 @@ require_once(__DIR__.'/../bootstrap.php');
 
 if (count($argv) < 2)
 {
-	die ('CSV file name is required input.\n');
+	die ("CSV file name is required input.\n");
 }
 
 $filename = $argv[1];
