@@ -6,6 +6,14 @@
 
 require_once(__DIR__.'/../bootstrap.php');
 
+if (count($argv) < 2)
+{
+	die ('CSV file name is required input.\n');
+}
+
+$filename = $argv[1];
+$csv = fopen($filename, 'w');
+
 $distributionProvider = YoutubeApiDistributionPlugin::getDistributionProviderTypeCoreValue(YoutubeApiDistributionProviderType::YOUTUBE_API);
 
 $criteria = new Criteria();
@@ -20,7 +28,7 @@ $fields = array(
 	'Username',
 	'Password',
 );
-fputcsv(STDOUT, $fields);
+fputcsv($csv, $fields);
 
 $ks = null;
 $distributionProfiles = DistributionProfilePeer::doSelect($criteria);
@@ -40,10 +48,11 @@ while($distributionProfiles){
 			$distributionProfile->getUsername(),
 			$distributionProfile->getPassword(),
 		);
-		fputcsv(STDOUT, $fields);
+		fputcsv($csv, $fields);
 	}
 	
 	$criteria->add(DistributionProfilePeer::ID, $lastId, Criteria::GREATER_THAN);
 	$distributionProfiles = DistributionProfilePeer::doSelect($criteria);
 }
 
+fclose($csv);
