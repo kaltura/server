@@ -195,7 +195,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 		if($entryDc != kDataCenterMgr::getCurrentDcId())
 		{
 			$remoteDCHost = kDataCenterMgr::getRemoteDcExternalUrlByDcId($entryDc);
-			kFileUtils::dumpApiRequest($remoteDCHost);
+			kFileUtils::dumpApiRequest($remoteDCHost, true);
 		}
 		
 		$dbEntry = entryPeer::retrieveByPK($entryId);
@@ -302,7 +302,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 		if($entryDc != kDataCenterMgr::getCurrentDcId())
 		{
 			$remoteDCHost = kDataCenterMgr::getRemoteDcExternalUrlByDcId($entryDc);
-			kFileUtils::dumpApiRequest($remoteDCHost);
+			kFileUtils::dumpApiRequest($remoteDCHost, true);
 		}
 		
 		$dbEntry = entryPeer::retrieveByPK($entryId);
@@ -348,7 +348,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 		if($entryDc != kDataCenterMgr::getCurrentDcId())
 		{
 			$remoteDCHost = kDataCenterMgr::getRemoteDcExternalUrlByDcId($entryDc);
-			kFileUtils::dumpApiRequest($remoteDCHost);
+			kFileUtils::dumpApiRequest($remoteDCHost, true);
 		}
 		
 		$dbEntry = entryPeer::retrieveByPK($entryId);
