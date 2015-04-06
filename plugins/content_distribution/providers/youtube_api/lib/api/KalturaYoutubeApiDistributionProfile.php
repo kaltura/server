@@ -44,6 +44,11 @@ class KalturaYoutubeApiDistributionProfile extends KalturaConfigurableDistributi
 	 * @var string
 	 */
 	public $allowResponses;
+	
+	/**
+	 * @var string
+	 */
+	public $apiAuthorizeUrl;
 
 	
 	/*
@@ -58,6 +63,7 @@ class KalturaYoutubeApiDistributionProfile extends KalturaConfigurableDistributi
 		'allowEmbedding',
 		'allowRatings',
 		'allowResponses',
+		'apiAuthorizeUrl',
 	 );
 		 
 	public function getMapBetweenObjects()

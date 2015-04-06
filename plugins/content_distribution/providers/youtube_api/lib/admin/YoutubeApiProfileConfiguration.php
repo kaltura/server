@@ -5,6 +5,16 @@
  */
 class Form_YoutubeApiProfileConfiguration extends Form_ConfigurableProfileConfiguration
 {
+	public function init()
+	{
+		parent::init();
+		$this->getView()->addBasePath(realpath(dirname(__FILE__)));
+		$this->addDecorator('ViewScript', array(
+			'viewScript' => 'youtube-distribution.phtml',
+			'placement' => 'APPEND'
+		));
+	}
+	
 	protected function addProviderElements()
 	{
 	    $this->setDescription(null);
@@ -13,6 +23,14 @@ class Form_YoutubeApiProfileConfiguration extends Form_ConfigurableProfileConfig
 		$element->setLabel('YouTube Specific Configuration');
 		$element->setDecorators(array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'b'))));
 		$this->addElements(array($element));
+
+		$this->addElement('text', 'api_authorize_url', array(
+			'label'			=> 'Authorize API Access:',
+			'decorators' => array(array('ViewScript', array(
+				'viewScript' => 'youtube-distribution-api-authorize-field.phtml',
+
+			)))
+		));
 		
 		// General
 		$this->addElement('text', 'username', array(
