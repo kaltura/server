@@ -282,7 +282,7 @@ class YoutubeApiDistributionProfile extends ConfigurableDistributionProfile
 	
 	public function getApiAuthorizeUrl()
 	{
-		$appId = 'youtubepartner';
+		$appId = 'youtubeapipartner';
 		$subId = md5(get_class($this) . $this->getUsername());
 		
 		$partner = PartnerPeer::retrieveByPK($this->getPartnerId());
