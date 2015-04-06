@@ -64,24 +64,28 @@ function addPrefix($arr, $prefix)
 	return $result;
 }
 
-function replaceInFile($path, $search, $replace)
+function replaceInFile($path, $search, $replace, $fileNameSearch, $fileNameReplace)
 {
 	$originalData = file_get_contents($path);
 	$newData = str_replace($search, $replace, $originalData);
 	if ($newData === $originalData)
 		return;
 	echo "updating {$path}...\n";
+	if ($fileNameSearch || $fileNameReplace)
+	{
+		$path = str_replace($fileNameSearch, $fileNameReplace, $path);
+	}
 	file_put_contents($path, $newData);
 }
 
-function replaceInFolder($path, $includeSuffixes, $excludeSuffixes, $search, $replace)
+function replaceInFolder($path, $includeSuffixes, $excludeSuffixes, $search, $replace, $fileNameSearch = null, $fileNameReplace = null)
 {
 	$fileList = listDir($path);
 	foreach ($fileList as $curFile)
 	{
 		$curPath = "{$path}/{$curFile}";
 		if (is_dir($curPath))
-			replaceInFolder($curPath, $includeSuffixes, $excludeSuffixes, $search, $replace);
+			replaceInFolder($curPath, $includeSuffixes, $excludeSuffixes, $search, $replace, $fileNameSearch, $fileNameReplace);
 		else
 		{
 			if ($includeSuffixes && !endsWith($curPath, $includeSuffixes))
@@ -90,7 +94,7 @@ function replaceInFolder($path, $includeSuffixes, $excludeSuffixes, $search, $re
 			if ($excludeSuffixes && endsWith($curPath, $excludeSuffixes))
 				continue;
 
-			replaceInFile($curPath, $search, $replace);
+			replaceInFile($curPath, $search, $replace, $fileNameSearch, $fileNameReplace);
 		}
 	}
 }

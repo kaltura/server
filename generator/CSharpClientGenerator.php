@@ -1,3 +1,4 @@
+
 <?php
 class CSharpClientGenerator extends ClientGeneratorFromXml
 {
@@ -164,6 +165,8 @@ class CSharpClientGenerator extends ClientGeneratorFromXml
 				$dotNetPropType = $propertyNode->getAttribute("enumType");
 			else if ($propType == "array")
 				$dotNetPropType = "IList<".$propertyNode->getAttribute("arrayType").">";
+			else if ($propType == "map")
+				$dotNetPropType = "Dictionary<string, ".$propertyNode->getAttribute("arrayType").">";
 			else if ($propType == "bool")
 				$dotNetPropType  = "bool?";
 			else if ($propType == "bigint")
@@ -313,6 +316,18 @@ class CSharpClientGenerator extends ClientGeneratorFromXml
 						$this->appendLine("							this.$dotNetPropName.Add(($arrayType)KalturaObjectFactory.Create(arrayNode, \"$arrayType\"));");
 						$this->appendLine("						}");
 						break;
+					case "map":
+						$arrayType = $propertyNode->getAttribute("arrayType");
+						$this->appendLine("						{");		// TODO: remove the index once the keys are added to the response
+						$this->appendLine("							int index = 0;");
+						$this->appendLine("							this.$dotNetPropName = new Dictionary<string, $arrayType>();");
+						$this->appendLine("							foreach(XmlElement arrayNode in propertyNode.ChildNodes)");
+						$this->appendLine("							{");
+						$this->appendLine("								this.$dotNetPropName\[index.ToString()\] = ($arrayType)KalturaObjectFactory.Create(arrayNode, \"$arrayType\");");
+						$this->appendLine("								index++;");
+						$this->appendLine("							}");
+						$this->appendLine("						}");
+						break;
 					default: // sub object
 						$this->appendLine("						this.$dotNetPropName = ($propType)KalturaObjectFactory.Create(propertyNode, \"$propType\");");
 						break;
@@ -383,6 +398,23 @@ class CSharpClientGenerator extends ClientGeneratorFromXml
 					$this->appendLine("					{");
 					$this->appendLine("						kparams.Add(\"".$propName.":\" + i, item.ToParams());");
 					$this->appendLine("						i++;");
+					$this->appendLine("					}");
+					$this->appendLine("				}");
+					$this->appendLine("			}");
+					break;
+				case "map":
+					$arrayType = $propertyNode->getAttribute("arrayType");
+					$this->appendLine("			if (this.$dotNetPropName != null)");
+					$this->appendLine("			{");
+					$this->appendLine("				if (this.$dotNetPropName.Count == 0)");
+					$this->appendLine("				{");
+					$this->appendLine("					kparams.Add(\"".$propName.":-\", \"\");");
+					$this->appendLine("				}");
+					$this->appendLine("				else");
+					$this->appendLine("				{");
+					$this->appendLine("					foreach (KeyValuePair<string, $arrayType> curEntry in this.$dotNetPropName)");
+					$this->appendLine("					{");
+					$this->appendLine("						kparams.Add(\"".$propName.":\" + curEntry.Key, curEntry.Value.ToParams());");
 					$this->appendLine("					}");
 					$this->appendLine("				}");
 					$this->appendLine("			}");
@@ -524,6 +556,10 @@ class CSharpClientGenerator extends ClientGeneratorFromXml
 			case "array":
 				$arrayType = $resultNode->getAttribute("arrayType"); 
 				$dotNetOutputType = "IList<".$arrayType.">";
+				break;
+			case "map":
+				$arrayType = $resultNode->getAttribute("arrayType");
+				$dotNetOutputType = "Dictionary<string, ".$arrayType.">";
 				break;
 			default:
 				$dotNetOutputType = $resultType;
@@ -736,6 +772,9 @@ class CSharpClientGenerator extends ClientGeneratorFromXml
 			{
 				case "array":
 					$dotNetType = "IList<".$paramNode->getAttribute("arrayType").">";
+					break;
+				case "map":
+					$dotNetType = "Dictionary<string, ".$paramNode->getAttribute("arrayType").">";
 					break;
 				case "file":
 					$dotNetType = "FileStream";

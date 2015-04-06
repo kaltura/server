@@ -10,13 +10,15 @@ $rootDir = fixSlashes($argv[1]);
 $config = parse_ini_file(dirname(__file__) . '/config.ini', true);
 
 $search = array(
-	'54321', 
-	'YOUR_USER_SECRET', 
-	'YOUR_ADMIN_SECRET');
+	'@YOUR_PARTNER_ID@', 
+	'@YOUR_USER_SECRET@', 
+	'@YOUR_ADMIN_SECRET@',
+	'@SERVICE_URL@');
 	
 $replace = array(
 	$config['general']['partner_id'],
 	$config['general']['user_secret'],
-	$config['general']['admin_secret']);
+	$config['general']['admin_secret'],
+	$config['general']['service_url']);
 
-replaceInFolder($rootDir, null, array('.tar.gz', 'configureTestPartner.php'), $search, $replace);
+replaceInFolder($rootDir, null, array('.tar.gz', 'configureTestPartner.php'), $search, $replace, '.template', '');
