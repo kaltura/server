@@ -114,7 +114,30 @@ class kMetadataFlowManager implements kBatchJobStatusEventConsumer, kObjectDataC
 			$relatedObject->save();
 			$relatedObject->indexToSearchIndex();
 		}
-		
+
+		/** @var Metadata $object */
+		if ($object->getObjectType() == MetadataObjectType::DYNAMIC_OBJECT)
+		{
+			/**
+			 * when dynamic object is modified, we need to reindex the metadata and the objects (users, entries)
+			 * that are referencing it
+			 */
+			$profileFields = MetadataProfileFieldPeer::retrieveByPartnerAndRelatedMetadataProfileId($object->getPartnerId(), $object->getMetadataProfileId());
+			$relatedMetadataProfiles = array();
+			foreach ($profileFields as $profileField)
+			{
+				/** @var MetadataProfileField $profileField */
+				if (in_array($profileField->getMetadataProfileId(), $relatedMetadataProfiles))
+					continue;
+
+				$filter = new MetadataFilter();
+				$filter->set('_eq_metadata_profile_id', $profileField->getMetadataProfileId());
+				$indexObjectType = kPluginableEnumsManager::apiToCore('IndexObjectType', MetadataPlugin::getApiValue(MetadataIndexObjectType::METADATA));
+				kJobsManager::addIndexJob($object->getPartnerId(), $indexObjectType, $filter, true);
+				$relatedMetadataProfiles[] = $profileField->getMetadataProfileId();
+			}
+		}
+
 		if($relatedObject instanceof entry)
 		{
 			kStorageExporter::reExportEntry($relatedObject);

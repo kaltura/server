@@ -84,7 +84,7 @@ class PlaylistService extends KalturaEntryService
 		TrackEntry::addTrackEntry($trackEntry);
 		
 		$playlist = new KalturaPlaylist(); // start from blank
-		$playlist->fromObject( $dbPlaylist );
+		$playlist->fromObject($dbPlaylist, $this->getResponseProfile());
 		
 		return $playlist;
 	}
@@ -114,7 +114,7 @@ class PlaylistService extends KalturaEntryService
 			$dbPlaylist->setDesiredVersion($version);
 			
 		$playlist = new KalturaPlaylist(); // start from blank
-		$playlist->fromObject( $dbPlaylist );
+		$playlist->fromObject($dbPlaylist, $this->getResponseProfile());
 		
 		return $playlist;
 	}
@@ -177,7 +177,7 @@ class PlaylistService extends KalturaEntryService
 			myPlaylistUtils::updatePlaylistStatistics ( $this->getPartnerId() , $dbPlaylist );//, $extra_filters , $detailed );
 		
 		$dbPlaylist->save();
-		$playlist->fromObject( $dbPlaylist );
+		$playlist->fromObject($dbPlaylist, $this->getResponseProfile());
 		
 		return $playlist;
 	}
@@ -224,7 +224,7 @@ class PlaylistService extends KalturaEntryService
 			throw new KalturaAPIException ( APIErrors::CANT_UPDATE_PARAMETER, 'playlistType' );
 		
 		$oldPlaylist = new KalturaPlaylist();
-		$oldPlaylist->fromObject($dbPlaylist);
+		$oldPlaylist->fromObject($dbPlaylist, $this->getResponseProfile());
 			
 		if (!$newPlaylist) {
 			$newPlaylist = new KalturaPlaylist();
@@ -269,7 +269,7 @@ class PlaylistService extends KalturaEntryService
 	    $filter->typeEqual = KalturaEntryType::PLAYLIST;
 	    list($list, $totalCount) = parent::listEntriesByFilter($filter, $pager);
 	    
-	    $newList = KalturaPlaylistArray::fromPlaylistArray($list);
+	    $newList = KalturaPlaylistArray::fromDbArray($list, $this->getResponseProfile());
 		$response = new KalturaPlaylistListResponse();
 		$response->objects = $newList;
 		$response->totalCount = $totalCount;
@@ -298,7 +298,7 @@ class PlaylistService extends KalturaEntryService
 		if ($playlist->getType() != entryType::PLAYLIST)
 			throw new KalturaAPIException ( APIErrors::INVALID_PLAYLIST_TYPE );
 
-		$extraFilters = array();
+		$entryFilter = null;
 		if ($filter)
 		{
 			if ($playlist->getMediaType() == entry::ENTRY_MEDIA_TYPE_TEXT)
@@ -309,7 +309,7 @@ class PlaylistService extends KalturaEntryService
 
 			$coreFilter = new entryFilter();
 			$filter->toObject($coreFilter);
-			$extraFilters[1] = $coreFilter;
+			$entryFilter = $coreFilter;
 		}
 			
 		if ($this->getKs() && is_object($this->getKs()) && $this->getKs()->isAdmin())
@@ -328,7 +328,7 @@ class PlaylistService extends KalturaEntryService
 
 		try
 		{
-			$entryList = myPlaylistUtils::executePlaylist( $this->getPartnerId() , $playlist , $extraFilters , $detailed);
+			$entryList = myPlaylistUtils::executePlaylist( $this->getPartnerId() , $playlist , $entryFilter , $detailed);
 		}
 		catch (kCoreException $ex)
 		{   		
@@ -340,7 +340,7 @@ class PlaylistService extends KalturaEntryService
 
 		myEntryUtils::updatePuserIdsForEntries ( $entryList );
 			
-		return KalturaBaseEntryArray::fromEntryArray( $entryList );
+		return KalturaBaseEntryArray::fromDbArray($entryList, $this->getResponseProfile());
 	}
 	
 
@@ -369,7 +369,7 @@ class PlaylistService extends KalturaEntryService
 			
 		myEntryUtils::updatePuserIdsForEntries($entryList);
 		
-		return KalturaBaseEntryArray::fromEntryArray($entryList);
+		return KalturaBaseEntryArray::fromDbArray($entryList, $this->getResponseProfile());
 	}
 	
 	/**
@@ -415,7 +415,7 @@ class PlaylistService extends KalturaEntryService
 		myPlaylistUtils::updatePlaylistStatistics ( $this->getPartnerId() , $dbPlaylist );//, $extra_filters , $detailed );
 		
 		$playlist = new KalturaPlaylist(); // start from blank
-		$playlist->fromObject( $dbPlaylist );
+		$playlist->fromObject($dbPlaylist, $this->getResponseProfile());
 		
 		return $playlist;
 	}

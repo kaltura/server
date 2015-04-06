@@ -3,7 +3,7 @@
  * @package plugins.externalMedia
  * @subpackage api.objects
  */
-class KalturaExternalMediaEntryListResponse extends KalturaObject
+class KalturaExternalMediaEntryListResponse extends KalturaListResponse
 {
 	/**
 	 * @var KalturaExternalMediaEntryArray
@@ -11,9 +11,4 @@ class KalturaExternalMediaEntryListResponse extends KalturaObject
 	 */
 	public $objects;
 	
-	/**
-	 * @var int
-	 * @readonly
-	 */
-	public $totalCount;
 }

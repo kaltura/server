@@ -455,6 +455,28 @@ NSString* const KalturaClientErrorDomain = @"KalturaClientErrorDomain";
     [self popKey:aKey]; 
 }
 
+- (void)addIfDefinedKey:(NSString*)aKey withDictionary:(NSDictionary*)aVal
+{
+    if (aVal == nil)
+        return;
+
+    [self pushKey:aKey]; 
+    
+    if (aVal.count == 0)
+    {
+        [self putKey:@"-" withString:@""];
+    }
+    else
+    {
+		for(id curKey in aVal)
+		{
+            [self addIfDefinedKey:curKey withObject:[aVal objectForKey:curKey]];
+		}
+    }
+    
+    [self popKey:aKey]; 
+}
+
 - (void)sign
 {
     [self->_params sortUsingSelector:@selector(compare:)];
@@ -563,9 +585,9 @@ NSString* const KalturaClientErrorDomain = @"KalturaClientErrorDomain";
 @end
 
 /*
- Class KalturaClientConfiguration
+ Class KalturaConfiguration
  */
-@implementation KalturaClientConfiguration
+@implementation KalturaConfiguration
 
 @synthesize serviceUrl = _serviceUrl;
 @synthesize clientTag = _clientTag;
@@ -624,7 +646,7 @@ NSString* const KalturaClientErrorDomain = @"KalturaClientErrorDomain";
 @synthesize params = _params;
 @synthesize responseHeaders = _responseHeaders;
 
-- (id)initWithConfig:(KalturaClientConfiguration*)aConfig
+- (id)initWithConfig:(KalturaConfiguration*)aConfig
 {
     self = [super init];
     if (self == nil)

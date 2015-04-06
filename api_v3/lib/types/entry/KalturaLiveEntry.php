@@ -133,14 +133,14 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 	/* (non-PHPdoc)
 	 * @see KalturaMediaEntry::fromObject()
 	 */
-	public function fromObject ( $dbObject )
+	public function doFromObject($dbObject, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		if(!($dbObject instanceof LiveEntry))
 			return;
 			
-		parent::fromObject($dbObject);
+		parent::doFromObject($dbObject, $responseProfile);
 
-		if(!is_null($dbObject->getRecordingOptions()))
+		if($this->shouldGet('recordingOptions', $responseProfile) && !is_null($dbObject->getRecordingOptions()))
 		{
 			$this->recordingOptions = new KalturaLiveEntryRecordingOptions();
 			$this->recordingOptions->fromObject($dbObject->getRecordingOptions());

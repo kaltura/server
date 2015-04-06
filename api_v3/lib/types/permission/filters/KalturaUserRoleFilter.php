@@ -5,11 +5,32 @@
  */
 class KalturaUserRoleFilter extends KalturaUserRoleBaseFilter
 {
-	public function toObject ( $object_to_fill = null, $props_to_skip = array() )
+	/* (non-PHPdoc)
+	 * @see KalturaFilter::getCoreFilter()
+	 */
+	protected function getCoreFilter()
 	{
-		if(is_null($object_to_fill))
-			$object_to_fill = new UserRoleFilter();
-			
-		return parent::toObject($object_to_fill, $props_to_skip);		
-	}	
+		return new UserRoleFilter();
+	}
+
+	/* (non-PHPdoc)
+	 * @see KalturaRelatedFilter::getListResponse()
+	 */
+	public function getListResponse(KalturaFilterPager $pager, KalturaDetachedResponseProfile $responseProfile = null)
+	{
+		$userRoleFilter = $this->toObject();
+
+		$c = new Criteria();
+		$userRoleFilter->attachToCriteria($c);
+		$count = UserRolePeer::doCount($c);
+		
+		$pager->attachToCriteria ( $c );
+		$list = UserRolePeer::doSelect($c);
+		
+		$response = new KalturaUserRoleListResponse();
+		$response->objects = KalturaUserRoleArray::fromDbArray($list, $responseProfile);
+		$response->totalCount = $count;
+		
+		return $response;
+	}
 }

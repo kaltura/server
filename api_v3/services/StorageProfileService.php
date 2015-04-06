@@ -38,7 +38,7 @@ class StorageProfileService extends KalturaBaseService
 		
 		$storageProfile = KalturaStorageProfile::getInstanceByType($dbStorageProfile->getProtocol());
 				
-		$storageProfile->fromObject($dbStorageProfile);
+		$storageProfile->fromObject($dbStorageProfile, $this->getResponseProfile());
 		return $storageProfile;
 	}
 		
@@ -73,7 +73,7 @@ class StorageProfileService extends KalturaBaseService
 		$protocol = $dbStorageProfile->getProtocol();
 		$storageProfile = KalturaStorageProfile::getInstanceByType($protocol);
 		
-		$storageProfile->fromObject($dbStorageProfile);
+		$storageProfile->fromObject($dbStorageProfile, $this->getResponseProfile());
 		return $storageProfile;
 	}
 	
@@ -97,7 +97,7 @@ class StorageProfileService extends KalturaBaseService
 		$protocol = $dbStorageProfile->getProtocol();
 		$storageProfile = KalturaStorageProfile::getInstanceByType($protocol);
 		
-		$storageProfile->fromObject($dbStorageProfile);
+		$storageProfile->fromObject($dbStorageProfile, $this->getResponseProfile());
 		return $storageProfile;
 	}
 	
@@ -126,7 +126,7 @@ class StorageProfileService extends KalturaBaseService
 		
 		$response = new KalturaStorageProfileListResponse();
 		$response->totalCount = StorageProfilePeer::doCount($c);
-		$response->objects = KalturaStorageProfileArray::fromStorageProfileArray($list);
+		$response->objects = KalturaStorageProfileArray::fromDbArray($list, $this->getResponseProfile());
 		return $response;
 	}
 	

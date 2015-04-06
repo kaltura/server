@@ -74,6 +74,7 @@ typedef enum
     KFT_String,
     KFT_Object,
     KFT_Array,
+	KFT_Dictionary,
 } KalturaFieldType;
 
 /*
@@ -164,6 +165,7 @@ typedef enum
 - (void)addIfDefinedKey:(NSString*)aKey withString:(NSString*)aVal;
 - (void)addIfDefinedKey:(NSString*)aKey withObject:(KalturaObjectBase*)aVal;
 - (void)addIfDefinedKey:(NSString*)aKey withArray:(NSArray*)aVal;
+- (void)addIfDefinedKey:(NSString*)aKey withDictionary:(NSDictionary*)aVal;
 - (void)sign;
 - (void)addToRequest:(ASIFormDataRequest*)aRequest;
 - (void)appendQueryString:(NSMutableString*)output;
@@ -204,9 +206,9 @@ typedef enum
 @end
 
 /*
- Class KalturaClientConfiguration
+ Class KalturaConfiguration
  */
-@interface KalturaClientConfiguration : NSObject
+@interface KalturaConfiguration : NSObject
 
 @property (nonatomic, copy) NSString* serviceUrl;
 @property (nonatomic, copy) NSString* clientTag;
@@ -240,7 +242,7 @@ typedef enum
     NSDate* _apiStartTime;
 }
 
-@property (nonatomic, retain) KalturaClientConfiguration* config;
+@property (nonatomic, retain) KalturaConfiguration* config;
 @property (nonatomic, retain) NSError* error;
 @property (nonatomic, assign) id<KalturaClientDelegate> delegate;
 @property (nonatomic, assign) id<ASIProgressDelegate> uploadProgressDelegate;
@@ -251,7 +253,7 @@ typedef enum
 @property (nonatomic, readonly) NSDictionary* responseHeaders;
 
     // public messages
-- (id)initWithConfig:(KalturaClientConfiguration*)aConfig;
+- (id)initWithConfig:(KalturaConfiguration*)aConfig;
 - (void)startMultiRequest;
 - (NSArray*)doMultiRequest;
 - (void)cancelRequest;

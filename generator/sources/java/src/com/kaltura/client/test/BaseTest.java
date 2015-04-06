@@ -43,7 +43,6 @@ import com.kaltura.client.enums.KalturaEntryStatus;
 import com.kaltura.client.enums.KalturaMediaType;
 import com.kaltura.client.enums.KalturaSessionType;
 import com.kaltura.client.services.KalturaMediaService;
-import com.kaltura.client.services.KalturaSessionService;
 import com.kaltura.client.types.KalturaMediaEntry;
 import com.kaltura.client.types.KalturaUploadToken;
 import com.kaltura.client.types.KalturaUploadedFileTokenResource;
@@ -51,8 +50,9 @@ import com.kaltura.client.IKalturaLogger;
 import com.kaltura.client.KalturaLogger;
 
 public class BaseTest extends TestCase {
-	public KalturaConfiguration kalturaConfig = new KalturaConfiguration();
-
+	protected KalturaTestConfig testConfig;
+	
+	protected KalturaConfiguration kalturaConfig = new KalturaConfiguration();
 	protected KalturaClient client;
 	
 	// keeps track of test vids we upload so they can be cleaned up at the end
@@ -66,11 +66,10 @@ public class BaseTest extends TestCase {
 	protected void setUp() throws Exception {
 		super.setUp();
 		
+		testConfig = new KalturaTestConfig();
+		
 		// Create client
-		this.kalturaConfig.setPartnerId(KalturaTestConfig.PARTNER_ID);
-		this.kalturaConfig.setSecret(KalturaTestConfig.SECRET);
-		this.kalturaConfig.setAdminSecret(KalturaTestConfig.ADMIN_SECRET);
-		this.kalturaConfig.setEndpoint(KalturaTestConfig.ENDPOINT);
+		this.kalturaConfig.setEndpoint(testConfig.getServiceUrl());
 		this.client = new KalturaClient(this.kalturaConfig);
 	}
 	
@@ -99,23 +98,21 @@ public class BaseTest extends TestCase {
 	}
 	
 	
-	public static void startUserSession(KalturaClient client, KalturaConfiguration kalturaConfig) throws KalturaApiException{
-		startSession(client, kalturaConfig, kalturaConfig.getSecret(), KalturaSessionType.USER);
+	public void startUserSession() throws Exception{
+		startSession(KalturaSessionType.USER);
 	}
 	
-	public static void startAdminSession(KalturaClient client, KalturaConfiguration kalturaConfig) throws KalturaApiException{
-		startSession(client, kalturaConfig, kalturaConfig.getAdminSecret(), KalturaSessionType.ADMIN);
+	public void startAdminSession() throws Exception{
+		startSession(KalturaSessionType.ADMIN);
 	}
 	
-	protected static void startSession(KalturaClient client, KalturaConfiguration kalturaConfig, String secret,
-			KalturaSessionType type) throws KalturaApiException {
+	protected void startSession(KalturaSessionType type) throws Exception {
 		
-		KalturaSessionService sessionService = client.getSessionService();
-
-		String sessionId = sessionService.start(secret, "admin", type,
-				kalturaConfig.getPartnerId(), 86400, "");
-		if (logger.isEnabled())
+		String sessionId = client.generateSessionV2(testConfig.getAdminSecret(), testConfig.getUserId(), type, testConfig.getPartnerId(), 86400, "");
+		if (logger.isEnabled()){
 			logger.debug("Session id:" + sessionId);
+		}
+		
 		client.setSessionId(sessionId);
 	}
 	
@@ -125,7 +122,7 @@ public class BaseTest extends TestCase {
 	
 	// Entry utils
 	
-	public static KalturaMediaEntry addTestImage(BaseTest container, KalturaClient client, String name) throws KalturaApiException, IOException, FileNotFoundException
+	public KalturaMediaEntry addTestImage(BaseTest container, String name) throws KalturaApiException, IOException, FileNotFoundException
 	{
 		KalturaMediaEntry entry = new KalturaMediaEntry();
 		entry.name = name;
@@ -137,7 +134,7 @@ public class BaseTest extends TestCase {
 		
 		// Upload token
 		KalturaUploadToken uploadToken = new KalturaUploadToken();
-		uploadToken.fileName = KalturaTestConfig.UPLOAD_IMAGE;
+		uploadToken.fileName = testConfig.getUploadImage();
 		uploadToken.fileSize = fileSize;
 		KalturaUploadToken token = client.getUploadTokenService().add(uploadToken);
 		assertNotNull(token);
@@ -149,7 +146,7 @@ public class BaseTest extends TestCase {
 		assertNotNull(entry);
 		
 		// upload
-		uploadToken = client.getUploadTokenService().upload(token.id, fileData, KalturaTestConfig.UPLOAD_IMAGE, fileSize, false);
+		uploadToken = client.getUploadTokenService().upload(token.id, fileData, testConfig.getUploadImage(), fileSize, false);
 		if(container != null)
 			container.testIds.add(entry.id);
 		return client.getMediaService().get(entry.id);

@@ -466,11 +466,28 @@ index kaltura_tag:kaltura_kuser_base
 	path	 = @BASE_DIR@/sphinx/kaltura_tag_rt
 	rt_attr_uint = int_id
 	rt_field = tag
+	rt_attr_string = tag
 	rt_field = partner_id
 	rt_field = object_type
 	rt_attr_timestamp = created_at
 	rt_attr_uint = instance_count
 	rt_field = privacy_context
+}
+
+index kaltura_metadata:kaltura_base
+{
+	path	 = @BASE_DIR@/sphinx/kaltura_metadata_rt
+	rt_attr_timestamp = created_at
+	rt_attr_timestamp = updated_at
+	rt_attr_uint = version
+	rt_attr_uint = metadata_profile_id
+	rt_attr_uint = metadata_profile_version
+	rt_attr_bigint = partner_id
+	rt_field = object_id
+	rt_attr_uint = object_type
+	rt_attr_uint = metadata_status
+	rt_field = plugins_data
+	rt_field = sphinx_match_optimizations
 }
 
 

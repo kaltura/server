@@ -3,17 +3,11 @@
  * @package api
  * @subpackage objects
  */
-class KalturaBaseSyndicationFeedListResponse extends KalturaObject
+class KalturaBaseSyndicationFeedListResponse extends KalturaListResponse
 {
 	/**
 	 * @var KalturaBaseSyndicationFeedArray
 	 * @readonly
 	 */
 	public $objects;
-
-	/**
-	 * @var int
-	 * @readonly
-	 */
-	public $totalCount;
 }

@@ -244,7 +244,7 @@ class SystemPartnerService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::UNKNOWN_PARTNER_ID, $partnerId);
 			
 		$configuration = new KalturaSystemPartnerConfiguration();
-		$configuration->fromObject($dbPartner);
+		$configuration->fromObject($dbPartner, $this->getResponseProfile());
 		return $configuration;
 	}
 	
@@ -294,7 +294,7 @@ class SystemPartnerService extends KalturaBaseService
 	public function getPlayerEmbedCodeTypesAction()
 	{
 		$map = kConf::getMap('players');
-		return KalturaPlayerEmbedCodeTypesArray::fromDbArray($map['embed_code_types']);
+		return KalturaPlayerEmbedCodeTypesArray::fromDbArray($map['embed_code_types'], $this->getResponseProfile());
 	}
 	
 	/**
@@ -304,7 +304,7 @@ class SystemPartnerService extends KalturaBaseService
 	public function getPlayerDeliveryTypesAction()
 	{
 		$map = kConf::getMap('players');
-		return KalturaPlayerDeliveryTypesArray::fromDbArray($map['delivery_types']);
+		return KalturaPlayerDeliveryTypesArray::fromDbArray($map['delivery_types'], $this->getResponseProfile());
 	}
 
 	/**
@@ -372,22 +372,7 @@ class SystemPartnerService extends KalturaBaseService
 		if (is_null($pager))
 			$pager = new KalturaFilterPager();
 			
-			
-		$userLoginDataFilter = new UserLoginDataFilter();
-		$filter->toObject($userLoginDataFilter);
-		
-		$c = new Criteria();
-		$userLoginDataFilter->attachToCriteria($c);
-		
-		$totalCount = UserLoginDataPeer::doCount($c);
-		$pager->attachToCriteria($c);
-		$list = UserLoginDataPeer::doSelect($c);
-		$newList = KalturaUserLoginDataArray::fromUserLoginDataArray($list);
-		
-		$response = new KalturaUserLoginDataListResponse();
-		$response->totalCount = $totalCount;
-		$response->objects = $newList;
-		return $response;
+		return $filter->getListResponse($pager, $this->getResponseProfile());
 	}
 	
 	

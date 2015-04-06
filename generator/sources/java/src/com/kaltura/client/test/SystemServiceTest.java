@@ -44,7 +44,7 @@ public class SystemServiceTest extends BaseTest {
 			logger.info("Starting ping test");
 
 		try {
-			BaseTest.startUserSession(client,kalturaConfig);
+			startUserSession();
 			KalturaSystemService systemService = this.client.getSystemService();
 			boolean result = systemService.ping();
 			assertTrue(result);

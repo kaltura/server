@@ -33,6 +33,24 @@ class KalturaIndexJobData extends KalturaJobData
 	{
 		return array_merge ( parent::getMapBetweenObjects() , self::$map_between_objects );
 	}
+
+	/**
+	 * @param string $subType is the provider type
+	 * @return int
+	 */
+	public function toSubType($subType)
+	{
+		return kPluginableEnumsManager::apiToCore('IndexObjectType', $subType);
+	}
+
+	/**
+	 * @param int $subType
+	 * @return string
+	 */
+	public function fromSubType($subType)
+	{
+		return kPluginableEnumsManager::coreToApi('IndexObjectType', $subType);
+	}
 	
 	public function toObject($dbData = null, $props_to_skip = array()) 
 	{
@@ -42,7 +60,7 @@ class KalturaIndexJobData extends KalturaJobData
 		return parent::toObject($dbData, $props_to_skip);
 	}
 	
-	public function fromObject($dbData) 
+	public function doFromObject($dbData, KalturaDetachedResponseProfile $responseProfile = null) 
 	{
 		/* @var $dbData kIndexJobData */
 		$filter = $dbData->getFilter();
@@ -74,7 +92,7 @@ class KalturaIndexJobData extends KalturaJobData
 		}
 		if($this->filter)
 			$this->filter->fromObject($filter);
-		
-		return parent::fromObject($dbData);
+			
+		parent::doFromObject($dbData, $responseProfile);
 	}
 }

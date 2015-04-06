@@ -5,7 +5,7 @@
  */
 class KalturaExternalMediaEntryArray extends KalturaTypedArray
 {
-	public static function fromDbArray($arr)
+	public static function fromDbArray($arr, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		$newArr = new KalturaExternalMediaEntryArray();
 		if($arr == null)
@@ -13,8 +13,8 @@ class KalturaExternalMediaEntryArray extends KalturaTypedArray
 		
 		foreach($arr as $obj)
 		{
-			$nObj = new KalturaExternalMediaEntry();
-			$nObj->fromObject($obj);
+    		$nObj = KalturaEntryFactory::getInstanceByType($obj->getType());
+			$nObj->fromObject($obj, $responseProfile);
 			$newArr[] = $nObj;
 		}
 		

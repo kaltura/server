@@ -184,7 +184,7 @@ class PartnerService extends KalturaBaseService
 		}
 		
 		$partner = new KalturaPartner();
-		$partner->fromObject($dbPartner);
+		$partner->fromObject($dbPartner, $this->getResponseProfile());
 		
 		return $partner;
 	}
@@ -461,7 +461,7 @@ class PartnerService extends KalturaBaseService
 		
 		$dbFeaturesStatus = $dbPartner->getFeaturesStatus();
 		
-		$featuresStatus = KalturaFeatureStatusArray::fromDbArray($dbFeaturesStatus);
+		$featuresStatus = KalturaFeatureStatusArray::fromDbArray($dbFeaturesStatus, $this->getResponseProfile());
 		
 		$response = new KalturaFeatureStatusListResponse();
 		$response->objects = $featuresStatus;

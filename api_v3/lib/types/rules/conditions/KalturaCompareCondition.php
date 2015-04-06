@@ -42,10 +42,10 @@ abstract class KalturaCompareCondition extends KalturaCondition
 	/* (non-PHPdoc)
 	 * @see KalturaObject::fromObject()
 	 */
-	public function fromObject($dbObject)
+	public function doFromObject($dbObject, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		/* @var $dbObject kFieldMatchCondition */
-		parent::fromObject($dbObject);
+		parent::doFromObject($dbObject, $responseProfile);
 		
 		$valueType = get_class($dbObject->getValue());
 		KalturaLog::debug("Loading KalturaIntegerValue from type [$valueType]");

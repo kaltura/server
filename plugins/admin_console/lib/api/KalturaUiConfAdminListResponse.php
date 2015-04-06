@@ -3,17 +3,11 @@
  * @package plugins.adminConsole
  * @subpackage api.objects
  */
-class KalturaUiConfAdminListResponse extends KalturaObject
+class KalturaUiConfAdminListResponse extends KalturaListResponse
 {
 	/**
 	 * @var KalturaUiConfAdminArray
 	 * @readonly
 	 */
 	public $objects;
-
-	/**
-	 * @var int
-	 * @readonly
-	 */
-	public $totalCount;
 }

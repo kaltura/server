@@ -69,11 +69,15 @@ class KalturaContentDistributionSearchItem extends KalturaSearchItem
 		return $object;
 	}
 
-	public function fromObject ( $source_object  )
+	public function doFromObject($source_object, KalturaDetachedResponseProfile $responseProfile = null)
 	{
-		parent::fromObject($source_object);
-		$entryDistributionValidationErrors = $source_object->getEntryDistributionValidationErrors();
-		if(count($entryDistributionValidationErrors))
-			$this->entryDistributionValidationErrors = implode(',', $entryDistributionValidationErrors);
+		parent::doFromObject($source_object, $responseProfile);
+		
+		if($this->shouldGet('entryDistributionValidationErrors', $responseProfile))
+		{
+			$entryDistributionValidationErrors = $source_object->getEntryDistributionValidationErrors();
+			if(count($entryDistributionValidationErrors))
+				$this->entryDistributionValidationErrors = implode(',', $entryDistributionValidationErrors);
+		}
 	}
 }

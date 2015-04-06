@@ -33,12 +33,20 @@ class KalturaUserFilter extends KalturaUserBaseFilter
 	{
 		return array_merge(parent::getOrderByMap(), self::$order_by_map);
 	}
+
+	/* (non-PHPdoc)
+	 * @see KalturaFilter::getCoreFilter()
+	 */
+	protected function getCoreFilter()
+	{
+		return new kuserFilter();
+	}
 	
+	/* (non-PHPdoc)
+	 * @see KalturaFilter::toObject()
+	 */
 	public function toObject ( $object_to_fill = null, $props_to_skip = array() )
 	{
-		if (!$object_to_fill)
-			$object_to_fill = new kuserFilter();
-		
 		$object_to_fill =  parent::toObject($object_to_fill, $props_to_skip);
 		
 		if (!is_null($this->loginEnabledEqual)) {
@@ -52,9 +60,9 @@ class KalturaUserFilter extends KalturaUserBaseFilter
 		return $object_to_fill;		
 	}
 	
-	public function fromObject ( $source_object )
+	public function doFromObject($source_object, KalturaDetachedResponseProfile $responseProfile = null)
 	{
-		parent::fromObject($source_object);
+		parent::doFromObject($source_object, $responseProfile);
 		
 		$loginDataIdGreaterOrEqualValue =  $source_object->get('_gte_login_data_id');
 		$loginDataIdLessThanOrNullValue =  $source_object->get('_ltornull_login_data_id');
@@ -118,5 +126,44 @@ class KalturaUserFilter extends KalturaUserBaseFilter
 	 * @var string
 	 */
 	public $permissionNamesMultiLikeAnd;
-	
+
+	/* (non-PHPdoc)
+	 * @see KalturaRelatedFilter::getListResponse()
+	 */
+	public function getListResponse(KalturaFilterPager $pager, KalturaDetachedResponseProfile $responseProfile = null)
+	{
+		$userFilter = $this->toObject();
+		
+		$c = KalturaCriteria::create(kuserPeer::OM_CLASS);
+		$userFilter->attachToCriteria($c);
+		
+		if (!is_null($this->roleIdEqual))
+		{
+			$roleCriteria = new Criteria();
+			$roleCriteria->add ( KuserToUserRolePeer::USER_ROLE_ID , $this->roleIdEqual );
+			$roleCriteria->addSelectColumn(KuserToUserRolePeer::KUSER_ID);
+			$rs = KuserToUserRolePeer::doSelectStmt($roleCriteria);
+			$kuserIds = $rs->fetchAll(PDO::FETCH_COLUMN);
+						
+			$c->add(kuserPeer::ID, $kuserIds, KalturaCriteria::IN);
+		}
+
+		if (is_null($this->typeEqual) && is_null($this->typeIn)){
+			$c->add(kuserPeer::TYPE, KuserType::USER, KalturaCriteria::EQUAL);
+		}
+		
+		$c->addAnd(kuserPeer::PUSER_ID, NULL, KalturaCriteria::ISNOTNULL);
+		
+		$pager->attachToCriteria($c);
+		$list = kuserPeer::doSelect($c);
+		
+		$totalCount = $c->getRecordsCount();
+
+		$newList = KalturaUserArray::fromDbArray($list, $responseProfile);
+		$response = new KalturaUserListResponse();
+		$response->objects = $newList;
+		$response->totalCount = $totalCount;
+		
+		return $response;
+	}
 }

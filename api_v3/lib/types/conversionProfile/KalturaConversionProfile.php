@@ -173,14 +173,18 @@ class KalturaConversionProfile extends KalturaObject implements IFilterable
 		return array_merge ( parent::getMapBetweenObjects() , self::$map_between_objects );
 	}
 	
-	public function fromObject($sourceObject)
+	public function doFromObject($sourceObject, KalturaDetachedResponseProfile $responseProfile = null)
 	{
-		parent::fromObject($sourceObject);
+		parent::doFromObject($sourceObject, $responseProfile);
 		
-		$this->xslTransformation = $sourceObject->getXsl();
+		if($this->shouldGet('xslTransformation', $responseProfile))
+			$this->xslTransformation = $sourceObject->getXsl();
 		
-		$this->cropDimensions = new KalturaCropDimensions();
-		$this->cropDimensions->fromObject($sourceObject);
+		if($this->shouldGet('cropDimensions', $responseProfile))
+		{
+			$this->cropDimensions = new KalturaCropDimensions();
+			$this->cropDimensions->fromObject($sourceObject);
+		}
 	}
 	
 	public function toObject($objectToFill = null , $propsToSkip = array())

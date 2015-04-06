@@ -44,32 +44,36 @@ class KalturaHttpNotificationDataText extends KalturaHttpNotificationData
 	/* (non-PHPdoc)
 	 * @see KalturaObject::fromObject()
 	 */
-	public function fromObject($dbObject)
+	public function doFromObject($dbObject, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		/* @var $dbObject kHttpNotificationDataText */
-		parent::fromObject($dbObject);
+		parent::doFromObject($dbObject, $responseProfile);
 		
-		$contentType = get_class($dbObject->getContent());
-		KalturaLog::debug("Loading KalturaStringValue from type [$contentType]");
-		switch ($contentType)
+		if($this->shouldGet('content', $responseProfile))
 		{
-			case 'kStringValue':
-				$this->content = new KalturaStringValue();
-				break;
-				
-			case 'kEvalStringField':
-				$this->content = new KalturaEvalStringField();
-				break;
-				
-			default:
-				$this->content = KalturaPluginManager::loadObject('KalturaStringValue', $contentType);
-				break;
-		}
-		
-		if($this->content)
-			$this->content->fromObject($dbObject->getContent());
+			$contentType = get_class($dbObject->getContent());
+			KalturaLog::debug("Loading KalturaStringValue from type [$contentType]");
+			switch ($contentType)
+			{
+				case 'kStringValue':
+					$this->content = new KalturaStringValue();
+					break;
+					
+				case 'kEvalStringField':
+					$this->content = new KalturaEvalStringField();
+					break;
+					
+				default:
+					$this->content = KalturaPluginManager::loadObject('KalturaStringValue', $contentType);
+					break;
+			}
 			
-		$this->data = $dbObject->getData();
+			if($this->content)
+				$this->content->fromObject($dbObject->getContent());
+		}
+			
+		if($this->shouldGet('data', $responseProfile))
+			$this->data = $dbObject->getData();
 	}
 	
 	/* (non-PHPdoc)

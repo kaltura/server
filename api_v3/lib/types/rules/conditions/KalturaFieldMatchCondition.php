@@ -36,10 +36,10 @@ class KalturaFieldMatchCondition extends KalturaMatchCondition
 	/* (non-PHPdoc)
 	 * @see KalturaObject::fromObject()
 	 */
-	public function fromObject($dbObject)
+	public function doFromObject($dbObject, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		/* @var $dbObject kFieldMatchCondition */
-		parent::fromObject($dbObject);
+		parent::doFromObject($dbObject, $responseProfile);
 		
 		$fieldType = get_class($dbObject->getField());
 		KalturaLog::debug("Loading KalturaStringField from type [$fieldType]");

@@ -5,10 +5,16 @@
  */
 class KalturaShortLinkFilter extends KalturaShortLinkBaseFilter
 {
+	/* (non-PHPdoc)
+	 * @see KalturaFilter::getCoreFilter()
+	 */
+	protected function getCoreFilter()
+	{
+		return new ShortLinkFilter();
+	}
+	
 	public function toFilter($partnerId)
 	{
-		$object = new ShortLinkFilter();
-		
 		if(!is_null($this->userIdEqual))
 		{
 			$kuser = kuserPeer::getKuserByPartnerAndUid($partnerId, $this->userIdEqual);
@@ -36,6 +42,6 @@ class KalturaShortLinkFilter extends KalturaShortLinkBaseFilter
 			}
 		}
 
-		return parent::toObject($object);
+		return parent::toObject();
 	}	
 }

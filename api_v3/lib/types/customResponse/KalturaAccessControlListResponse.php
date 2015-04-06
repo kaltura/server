@@ -4,17 +4,11 @@
  * @subpackage objects
  * @deprecated use KalturaAccessControlProfileListResponse instead
  */
-class KalturaAccessControlListResponse extends KalturaObject
+class KalturaAccessControlListResponse extends KalturaListResponse
 {
 	/**
 	 * @var KalturaAccessControlArray
 	 * @readonly
 	 */
 	public $objects;
-
-	/**
-	 * @var int
-	 * @readonly
-	 */
-	public $totalCount;
 }

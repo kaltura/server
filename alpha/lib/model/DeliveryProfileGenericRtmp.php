@@ -42,7 +42,7 @@ class DeliveryProfileGenericRtmp extends DeliveryProfileRtmp {
 		return kDeliveryUtils::formatGenericUrl($url, $pattern, $this->params);
 	}
 	
-	protected function formatByExtension($url) {
+	protected function formatByExtension($url, $addPostfix = true) {
 		return $url;
 	}
 }

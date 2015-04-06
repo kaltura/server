@@ -40,4 +40,6 @@ class MetadataErrors extends KalturaErrors
 	const INCOMPATIBLE_METADATA_PROFILE_OBJECT_TYPE = "INCOMPATIBLE_METADATA_PROFILE_OBJECT_TYPE;OBJ_TYPE,META_OBJ_TYPE;Metadata Profile object type is @OBJ_TYPE@, metadata object type is @META_OBJ_TYPE@";
 	
 	const METADATA_PROFILE_FILE_NOT_FOUND = "METADATA_PROFILE_FILE_NOT_FOUND;FILE_NAME;Metadata profile file not found [@FILE_NAME@]";
+
+	const METADATA_PROFILE_REFERENCE_EXISTS = "METADATA_PROFILE_REFERENCE_EXISTS;ID,FIELD;Metadata profile reference exists in profile [@ID@] on field [@FIELD@]";
 }

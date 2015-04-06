@@ -296,8 +296,7 @@ class KAsyncEmailIngestion extends KPeriodicWorker
 		$problems_happened = false;
 		$entry_name = $mediaEntry->name;
 		
-		self::$kClientConfig->partnerId = $profile->partnerId;
-		self::$kClient->setConfig(self::$kClientConfig);
+		self::$kClient->setPartnerId($profile->partnerId);
 		// loop through all attachments
 		// ----------------------------
 		$num = 1;

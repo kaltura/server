@@ -115,12 +115,15 @@ class KalturaGenericDistributionProfile extends KalturaDistributionProfile
 		return $object;		
 	}
 
-	public function fromObject($object)
+	public function doFromObject($object, KalturaDetachedResponseProfile $responseProfile = null)
 	{
-		parent::fromObject($object);
+		parent::doFromObject($object, $responseProfile);
 		
 		foreach(self::$actions as $action)
 		{
+			if(!$this->shouldGet('$actionAttribute', $responseProfile))
+				continue;
+				
 			$actionAttribute = "{$action}Action";
 			
 			if(!$this->$actionAttribute)
@@ -157,8 +160,10 @@ class KalturaGenericDistributionProfile extends KalturaDistributionProfile
 			}
 		}
 		
-		$this->updateRequiredEntryFields = implode(',', $object->getUpdateRequiredEntryFields());
-		$this->updateRequiredMetadataXPaths = implode(',', $object->getUpdateRequiredMetadataXPaths());
+		if($this->shouldGet('updateRequiredEntryFields', $responseProfile))
+			$this->updateRequiredEntryFields = implode(',', $object->getUpdateRequiredEntryFields());
+		if($this->shouldGet('updateRequiredMetadataXPaths', $responseProfile))
+			$this->updateRequiredMetadataXPaths = implode(',', $object->getUpdateRequiredMetadataXPaths());
 	}
 
 	/* (non-PHPdoc)

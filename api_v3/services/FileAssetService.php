@@ -29,7 +29,7 @@ class FileAssetService extends KalturaBaseService
 		$dbFileAsset->save();
 		
 		$fileAsset = new KalturaFileAsset();
-		$fileAsset->fromObject($dbFileAsset);
+		$fileAsset->fromObject($dbFileAsset, $this->getResponseProfile());
 		return $fileAsset;
 	}
 	
@@ -49,7 +49,7 @@ class FileAssetService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::FILE_ASSET_ID_NOT_FOUND, $id);
 			
 		$fileAsset = new KalturaFileAsset();
-		$fileAsset->fromObject($dbFileAsset);
+		$fileAsset->fromObject($dbFileAsset, $this->getResponseProfile());
 		return $fileAsset;
 	}
 	
@@ -73,7 +73,7 @@ class FileAssetService extends KalturaBaseService
 		$dbFileAsset->save();
 		
 		$fileAsset = new KalturaFileAsset();
-		$fileAsset->fromObject($dbFileAsset);
+		$fileAsset->fromObject($dbFileAsset, $this->getResponseProfile());
 		return $fileAsset;
 	}
 	
@@ -136,7 +136,7 @@ class FileAssetService extends KalturaBaseService
     	$this->attachContentResource($dbFileAsset, $kContentResource);
 		
 		$fileAsset = new KalturaFileAsset();
-		$fileAsset->fromObject($dbFileAsset);
+		$fileAsset->fromObject($dbFileAsset, $this->getResponseProfile());
 		return $fileAsset;
     }
     
@@ -251,24 +251,10 @@ class FileAssetService extends KalturaBaseService
 	{
 		if (!$filter)
 			$filter = new KalturaFileAssetFilter();
-
-		if (!$pager)
+			
+		if(!$pager)
 			$pager = new KalturaFilterPager();
 			
-		$fileAssetFilter = new fileAssetFilter();
-		$filter->toObject($fileAssetFilter);
-
-		$c = new Criteria();
-		$fileAssetFilter->attachToCriteria($c);
-		
-		$totalCount = FileAssetPeer::doCount($c);
-		
-		$pager->attachToCriteria($c);
-		$dbList = FileAssetPeer::doSelect($c);
-		
-		$response = new KalturaFileAssetListResponse();
-		$response->objects = KalturaFileAssetArray::fromDbArray($dbList);
-		$response->totalCount = $totalCount;
-		return $response;    
+		return $filter->getListResponse($pager, $this->getResponseProfile());   
 	}
 }
