@@ -280,12 +280,7 @@ class LiveStreamService extends KalturaLiveEntryService
 	 */
 	function updateAction($entryId, KalturaLiveStreamEntry $liveStreamEntry)
 	{
-		$entryDc = substr($entryId, 0, 1);
-		if($entryDc != kDataCenterMgr::getCurrentDcId())
-		{
-			$remoteDCHost = kDataCenterMgr::getRemoteDcExternalUrlByDcId($entryDc);
-			kFileUtils::dumpApiRequest($remoteDCHost, true);
-		}
+		$this->dumpApiRequest($entryId);
 		return $this->updateEntry($entryId, $liveStreamEntry, KalturaEntryType::LIVE_STREAM);
 	}
 
@@ -451,12 +446,7 @@ class LiveStreamService extends KalturaLiveEntryService
 	 */
 	public function addLiveStreamPushPublishConfigurationAction ($entryId, $protocol, $url = null, KalturaLiveStreamConfiguration $liveStreamConfiguration = null)
 	{
-		$entryDc = substr($entryId, 0, 1);
-		if($entryDc != kDataCenterMgr::getCurrentDcId())
-		{
-			$remoteDCHost = kDataCenterMgr::getRemoteDcExternalUrlByDcId($entryDc);
-			kFileUtils::dumpApiRequest($remoteDCHost, true);
-		}
+		$this->dumpApiRequest($entryId);
 		
 		$entry = entryPeer::retrieveByPK($entryId);
 		if (!$entry || $entry->getType() != entryType::LIVE_STREAM)
@@ -505,12 +495,7 @@ class LiveStreamService extends KalturaLiveEntryService
 	 */
 	public function removeLiveStreamPushPublishConfigurationAction ($entryId, $protocol)
 	{
-		$entryDc = substr($entryId, 0, 1);
-		if($entryDc != kDataCenterMgr::getCurrentDcId())
-		{
-			$remoteDCHost = kDataCenterMgr::getRemoteDcExternalUrlByDcId($entryDc);
-			kFileUtils::dumpApiRequest($remoteDCHost, true);
-		}
+		$this->dumpApiRequest($entryId);
 		
 		$entry = entryPeer::retrieveByPK($entryId);
 		if (!$entry || $entry->getType() != entryType::LIVE_STREAM)
