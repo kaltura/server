@@ -367,8 +367,9 @@ class kFlowHelper
 			if(!$affectedRows) {
 				$replacingEntry->delete();
 				$replacingEntry = null;
-				$recordedEntry = entryPeer::retrieveByPKNoFilter($recordedEntry->getId());
 				if($retries) {
+					sleep(10);
+					$recordedEntry = entryPeer::retrieveByPKNoFilter($recordedEntry->getId());
 					return kFlowHelper::getReplacingEntry($recordedEntry, $asset, 0);
 				} else {
 					KalturaLog::err("Failed to update replacing entry");

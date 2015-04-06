@@ -3163,17 +3163,18 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 								$dbValue = $this->m_custom_data->get($name, $namespace);
 								if($oldValue != $dbValue) {
 									$validUpdate = false;
+									break;
 								}
 							}
 							$this->putInCustomData($name, $newValue, $namespace);
 						}
 					}
                    }
+				
+				if (!$validUpdate)
+					break;
                    
 				$this->setCustomData($this->m_custom_data->toString());
-				
-				if(!$validUpdate) 
-					break;
 			}
 
 			if ($isInsert) {

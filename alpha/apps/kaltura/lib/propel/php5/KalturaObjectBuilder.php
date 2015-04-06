@@ -311,6 +311,7 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 								\$dbValue = \$this->m_custom_data->get(\$name, \$namespace);
 								if(\$oldValue != \$dbValue) {
 									\$validUpdate = false;
+									break;
 								}
 							}
 							\$this->putInCustomData(\$name, \$newValue, \$namespace);
@@ -318,10 +319,10 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 					}
                    }
                    
-				\$this->setCustomData(\$this->m_custom_data->toString());
-				
 				if(!\$validUpdate) 
 					break;
+					                   
+				\$this->setCustomData(\$this->m_custom_data->toString());
 			}
 
 			if (\$isInsert) {
