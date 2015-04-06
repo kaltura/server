@@ -38,13 +38,17 @@ while($distributionProfiles){
 	{
 		/* @var $distributionProfile YoutubeApiDistributionProfile */
 		
+		$lastId = $distributionProfile->getId();
+		$url = $distributionProfile->getApiAuthorizeUrl();
+		if(is_null($url))
+			continue;
+			
 		$partnerId = $distributionProfile->getPartnerId();
 		kSessionUtils::createKSessionNoValidations($partnerId, null, $ks, 86400, true);
-		$lastId = $distributionProfile->getId();
 		
 		$fields = array(
 			$lastId,
-			$distributionProfile->getApiAuthorizeUrl() . "?ks=$ks",
+			"$url?ks=$ks",
 			$distributionProfile->getUsername(),
 			$distributionProfile->getPassword(),
 		);
