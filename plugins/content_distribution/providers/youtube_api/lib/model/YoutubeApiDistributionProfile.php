@@ -280,5 +280,20 @@ class YoutubeApiDistributionProfile extends ConfigurableDistributionProfile
 	    return $fieldConfigArray;
 	}
 	
-	
+	public function getApiAuthorizeUrl()
+	{
+		$appId = 'youtubepartner';
+		$subId = md5(get_class($this) . $this->getUsername());
+		
+		$partner = PartnerPeer::retrieveByPK($this->getPartnerId());
+		$tokenData = $partner->getGoogleOAuth2($appId, $subId);
+		if(!is_null($tokenData))
+		{
+			return null;
+		}
+				
+		$url = kConf::get('apphome_url');
+		$url .= "/index.php/extservices/googleoauth2/ytid/$appId/subid/$subId";
+		return $url;
+	}
 }
