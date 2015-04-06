@@ -43,6 +43,8 @@ class ObjCClientGenerator extends ClientGeneratorFromXml
 			return "NSString*";
 		case "array" :
 			return "NSMutableArray*";
+		case "map":
+			return "NSMutableDictionary*";
 		case "file" :
 			return 'NSString*';
 		default : // object
@@ -96,6 +98,8 @@ class ObjCClientGenerator extends ClientGeneratorFromXml
 			return "String";
 		case "array" :
 			return "Array";
+		case "map":
+			return "Dictionary";
 		default : // object
 			return "Object";
 		}	
@@ -421,7 +425,7 @@ class ObjCClientGenerator extends ClientGeneratorFromXml
 			$comments = array();
 			if ($propertyNode->hasAttribute("enumType"))
 				$comments[] = "enum {$propertyNode->getAttribute("enumType")}";
-			else if ($propType == "array")
+			else if ($propType == "array" || $propType == "map")
 				$comments[] = "of {$propertyNode->getAttribute("arrayType")} elements";
 			$isInsertOnly = $propertyNode->getAttribute("insertOnly") == 1;
 			if ($isInsertOnly)
@@ -465,6 +469,7 @@ class ObjCClientGenerator extends ClientGeneratorFromXml
 				$objectType = $propertyNode->getAttribute ( "type" );
 				break;
 			case "Array":
+			case "Dictionary":
 				$objectType = $propertyNode->getAttribute ( "arrayType" );
 				break;
 			}
@@ -620,6 +625,7 @@ class ObjCClientGenerator extends ClientGeneratorFromXml
 			$withExpectedType = " withExpectedType:@\"$resultType\"";
 			break;
 		case "Array":
+		case "Dictionary":
 			$resultArrayType = $resultNode->getAttribute("arrayType");
 			$withExpectedType = " withExpectedType:@\"$resultArrayType\"";
 			break;
@@ -702,6 +708,8 @@ class ObjCClientGenerator extends ClientGeneratorFromXml
 
 			if ($paramType == 'array')
 				$paramType = "NSArray*";
+			else if ($paramType == 'map')
+				$paramType = "NSDictionary*";
 			else
 				$paramType = $this->getObjCType($paramType);
 			
@@ -799,7 +807,7 @@ class ObjCClientGenerator extends ClientGeneratorFromXml
 		// init
 		if ($pluginClassName == "KalturaClient")
 		{
-			$initParams = "WithConfig:(KalturaClientConfiguration*)aConfig";
+			$initParams = "WithConfig:(KalturaConfiguration*)aConfig";
 			$initSuperParams = "WithConfig:aConfig";
 			$clientVar = "self";
 		}

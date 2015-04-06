@@ -44,7 +44,7 @@ static NSArray *sBitRates;
 
 - (id)initClient {
     
-    KalturaClientConfiguration* config = [[KalturaClientConfiguration alloc] init];
+    KalturaConfiguration* config = [[KalturaConfiguration alloc] init];
     KalturaNSLogger* logger = [[KalturaNSLogger alloc] init];
     config.logger = logger;
     config.serviceUrl = DEFAULT_SERVICE_URL;
@@ -83,7 +83,7 @@ static NSArray *sBitRates;
     
     [self.client release];
     
-    KalturaClientConfiguration* config = [[KalturaClientConfiguration alloc] init];
+    KalturaConfiguration* config = [[KalturaConfiguration alloc] init];
     KalturaNSLogger* logger = [[KalturaNSLogger alloc] init];
     config.logger = logger;
     config.serviceUrl = DEFAULT_SERVICE_URL;
