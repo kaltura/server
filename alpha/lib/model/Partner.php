@@ -1662,11 +1662,10 @@ class Partner extends BasePartner
 		if(is_null($tokenData))
 		{
 			$appConfig = kConf::get($appId, 'google_auth', null);
-			if($appConfig && isset($appConfig[$customDataKey]))
+			if($appConfig && isset($appConfig[$objectIdentifier]))
 			{
-				$tokenJsonStr = $appConfig[$customDataKey];
-				$tokenObject = json_decode($tokenJsonStr);
-				$tokenData = get_object_vars($tokenObject);
+				$tokenJsonStr = $appConfig[$objectIdentifier];
+				$tokenData = json_decode($tokenJsonStr, true);
 			}
 		}
 		
@@ -1675,8 +1674,7 @@ class Partner extends BasePartner
 	
 	public function setGoogleOAuth2($appId, $tokenJsonStr, $objectIdentifier = null)
 	{
-		$tokenObject = json_decode($tokenJsonStr);
-		$tokenArray = get_object_vars($tokenObject);
+		$tokenData = json_decode($tokenJsonStr, true);
 		
 		$customDataKey = $appId;
 		if ($objectIdentifier)
@@ -1684,6 +1682,6 @@ class Partner extends BasePartner
 			$customDataKey .= '_' . $objectIdentifier;
 		}
 			
-		$this->putInCustomData($customDataKey, $tokenArray, 'googleAuth');
+		$this->putInCustomData($customDataKey, $tokenData, 'googleAuth');
 	}
 }
