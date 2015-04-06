@@ -44,7 +44,7 @@ while($distributionProfiles){
 			continue;
 			
 		$partnerId = $distributionProfile->getPartnerId();
-		kSessionUtils::createKSessionNoValidations($partnerId, null, $ks, 86400, true);
+		kSessionUtils::createKSessionNoValidations($partnerId, null, $ks, 86400, SessionType::ADMIN);
 		
 		$fields = array(
 			$lastId,
