@@ -5,6 +5,16 @@
  */
 class Form_YoutubeApiProfileConfiguration extends Form_ConfigurableProfileConfiguration
 {
+	public function init()
+	{
+		parent::init();
+		$this->getView()->addBasePath(realpath(dirname(__FILE__)));
+		$this->addDecorator('ViewScript', array(
+			'viewScript' => 'youtube-distribution.phtml',
+			'placement' => 'APPEND'
+		));
+	}
+	
 	protected function addProviderElements()
 	{
 	    $this->setDescription(null);
