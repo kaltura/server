@@ -1659,10 +1659,15 @@ class Partner extends BasePartner
 		}
 			
 		$tokenData = $this->getFromCustomData($customDataKey, 'googleAuth');
-		if($this->getId() && is_null($tokenData))
+		if(is_null($tokenData))
 		{
-			$partner = PartnerPeer::retrieveByPK(PartnerPeer::GLOBAL_PARTNER);
-			return $partner->getGoogleOAuth2($appId, $objectIdentifier);
+			$appConfig = kConf::get($appId, 'google_auth', null);
+			if($appConfig && isset($appConfig[$customDataKey]))
+			{
+				$tokenJsonStr = $appConfig[$customDataKey];
+				$tokenObject = json_decode($tokenJsonStr);
+				$tokenData = get_object_vars($tokenObject);
+			}
 		}
 		
 		return $tokenData;
