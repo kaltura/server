@@ -3119,6 +3119,7 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 			
 			for ($retries = 1; $retries < KalturaPDO::SAVE_MAX_RETRIES; $retries++)
 			{
+				
                $affectedRows = $this->doSave($con);
                 if ($affectedRows || !$this->isColumnModified(entryPeer::CUSTOM_DATA)) //ask if custom_data wasn't modified to avoid retry with atomic column 
                 	break;
@@ -3155,7 +3156,7 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 						if (!is_null($newValue)) {
 							$atomicField = false;
 							if($namespace) {
-								$atomicField = in_array($namespace, $atomicCustomDataFields) && in_array($name, $atomicCustomDataFields[$namespace]);
+								$atomicField = array_key_exists($namespace, $atomicCustomDataFields) && in_array($name, $atomicCustomDataFields[$namespace]);
 							} else {
 								$atomicField = in_array($name, $atomicCustomDataFields);
 							}

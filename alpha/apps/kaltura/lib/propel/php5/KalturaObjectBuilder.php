@@ -303,7 +303,7 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 						if (!is_null(\$newValue)) {
 							\$atomicField = false;
 							if(\$namespace) {
-								\$atomicField = in_array(\$namespace, \$atomicCustomDataFields) && in_array(\$name, \$atomicCustomDataFields[\$namespace]);
+								\$atomicField = array_key_exists(\$namespace, \$atomicCustomDataFields) && in_array(\$name, \$atomicCustomDataFields[\$namespace]);
 							} else {
 								\$atomicField = in_array(\$name, \$atomicCustomDataFields);
 							}
