@@ -1,8 +1,8 @@
 <?php
 /**
- * 
+ * @package plugins.DropFolderMrss
  */
-class KMRSSDropFolderEngine extends KDropFolderEngine 
+class KMrssDropFolderEngine extends KDropFolderEngine 
 {
 	const MRSS_NS = 'http://search.yahoo.com/mrss/';
 	/* (non-PHPdoc)
@@ -14,7 +14,9 @@ class KMRSSDropFolderEngine extends KDropFolderEngine
 		
 		//Get Drop Folder feed and import it into a SimpleXMLElement
 		/* @var KalturaMRSSDropFolder $dropFolder */
-		$feed = new SimpleXMLElement (file_get_contents($dropFolder->mrssUrl));
+		
+		KalturaLog::debug($dropFolder->mrssUrl);
+		$feed = new SimpleXMLElement (file_get_contents($dropFolder->path));
 		
 		//get items
 		$feedItems = $feed->xpath ('/rss/channel/item');
@@ -32,7 +34,7 @@ class KMRSSDropFolderEngine extends KDropFolderEngine
 			{
 				if (isset ($this->dropFolder->fileHandlerConfig->contentMatchPolicy) )
 				{
-					if ($this->fileHandlerConfig->contentMatchPolicy != KalturaDropFolderContentFileHandlerMatchPolicy::ADD_AS_NEW)
+					if ($this->fileHandlerConfig->contentMatchPolicy == KalturaDropFolderContentFileHandlerMatchPolicy::ADD_AS_NEW)
 					{
 						KalturaLog::info('No need to process- content match policy for drop folder id [' . $this->dropFolder->id . '] does not include updates.');
 						continue;
@@ -56,14 +58,42 @@ class KMRSSDropFolderEngine extends KDropFolderEngine
 		KalturaLog::debug('Add drop folder file ['.$fileName.'] last modification time ['.$lastModificationTime.'] file size ['.$fileSize.']');
 		try 
 		{
-			$feedPath = $this->saveFeedItemToDisk ($feedItem, $contentUpdateRequired);
+			//Register MRSS media namespace on the separate <item>
+			$feedItem->addAttribute('xmlns:xmlns:media', self::MRSS_NS);
 			
-			$newDropFolderFile = new KalturaMRSSDropFolderFile();
+			$newDropFolderFile = new KalturaMrssDropFolderFile();
 	    	$newDropFolderFile->dropFolderId = $this->dropFolder->id;
 	    	$newDropFolderFile->fileName = strval($feedItem->guid);
 	    	$newDropFolderFile->lastModificationTime = strval($feedItem->pubDate); 
+	    	
+	    	if (isset ($feedItem->children('media', true)->content[0]->attributes()->fileSize ))
+	    	{
+	    		$newDropFolderFile->fileSize = intval($feedItem->children(self::MRSS_NS)->content[0]->attributes()->fileSize);
+	    	}
+	    	else 
+	    	{
+	    		if (!isset($feedItem->children(self::MRSS_NS)->content[0]->attributes()->url))
+	    		{
+	    			throw new Exception ("Cannot add drop folder file - content URL does not exist");
+	    		}
+	    		$contentUrl = strval($feedItem->children(self::MRSS_NS)->content[0]->attributes()->url);
+	
+				$curl = curl_init($contentUrl);
+				curl_setopt($curl, CURLOPT_HEADER, true);
+			    curl_setopt($curl, CURLOPT_FILETIME, true);
+			    curl_setopt($curl, CURLOPT_NOBODY, true);
+				$res = curl_exec($curl);
+				if ($res)
+				{
+					$curlInfo = curl_getinfo($curl);
+					$newDropFolderFile->fileSize = intval($curlInfo['download_content_length']);
+				}
+				
+				curl_close($curl);
+	    	}
+	    	
 	    	$newDropFolderFile->hash = strval($feedItem->children(self::MRSS_NS)->hash);
-	    	$newDropFolderFile->xmlLocalPath = $feedPath;
+	    	$newDropFolderFile->mrssContent = $feedItem->saveXML();
 			$dropFolderFile = $this->dropFolderFileService->add($newDropFolderFile);
 			return $dropFolderFile;
 		}
@@ -72,20 +102,6 @@ class KMRSSDropFolderEngine extends KDropFolderEngine
 			KalturaLog::err('Cannot add new drop folder file with name ['.$feedItem->guid.'] - '.$e->getMessage());
 			return null;
 		}
-	}
-	
-	protected function saveFeedItemToDisk (SimpleXMLElement $feedItem, $contentUpdateRequired)
-	{
-		if (!$contentUpdateRequired)
-		{
-			unset($feedItem->content[0][0]);
-			KalturaLog::debug();
-		}
-		
-		$feedItemPath = KBatchBase::$taskConfig->params->mrss->xmlPath . DIRECTORY_SEPARATOR. $feedItem->guid . '_' . date();
-		file_put_contents($feedItemPath, $feedItem);
-		
-		return $feedItemPath;
 	}
 	
 	/**

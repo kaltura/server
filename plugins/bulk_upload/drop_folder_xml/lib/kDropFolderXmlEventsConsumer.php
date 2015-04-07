@@ -232,7 +232,7 @@ class kDropFolderXmlEventsConsumer implements kBatchJobStatusEventConsumer, kObj
 					
 				if($this->setFileProcessing($xmlFile, $relatedFiles))
 				{
-					$job = $this->addDropFolderXmlBulkUploadJob($folder, $xmlFile);
+					$job = $this->addXMLBulkUploadJob($folder, $xmlFile);
 					KalturaLog::debug('BulkUpload added with job id ['.$job->getId().']');
 					$xmlFile->setBatchJobId($job->getId());
 					$xmlFile->save();
@@ -430,7 +430,7 @@ class kDropFolderXmlEventsConsumer implements kBatchJobStatusEventConsumer, kObj
 	 * @param DropFolderFile $leadDropFolderFile
 	 * @throws Exception
 	 */
-	private function addDropFolderXmlBulkUploadJob(DropFolder $folder, DropFolderFile $leadDropFolderFile)
+	private function addXMLBulkUploadJob(DropFolder $folder, DropFolderFile $leadDropFolderFile)
 	{	
 		KalturaLog::debug('Adding BulkUpload job');
 		try 
