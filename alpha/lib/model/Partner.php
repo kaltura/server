@@ -1649,4 +1649,39 @@ class Partner extends BasePartner
 
 	public function getReferenceId() { return $this->getFromCustomData("referenceId", null); }
 	public function setReferenceId( $v ) { $this->putInCustomData("referenceId", $v); }
+
+	public function getGoogleOAuth2($appId, $objectIdentifier = null)
+	{
+		$customDataKey = $appId;
+		if ($objectIdentifier)
+		{
+			$customDataKey .= '_' . $objectIdentifier;
+		}
+			
+		$tokenData = $this->getFromCustomData($customDataKey, 'googleAuth');
+		if(is_null($tokenData))
+		{
+			$appConfig = kConf::get($appId, 'google_auth', null);
+			if($appConfig && isset($appConfig[$objectIdentifier]))
+			{
+				$tokenJsonStr = $appConfig[$objectIdentifier];
+				$tokenData = json_decode($tokenJsonStr, true);
+			}
+		}
+		
+		return $tokenData;
+	}
+	
+	public function setGoogleOAuth2($appId, $tokenJsonStr, $objectIdentifier = null)
+	{
+		$tokenData = json_decode($tokenJsonStr, true);
+		
+		$customDataKey = $appId;
+		if ($objectIdentifier)
+		{
+			$customDataKey .= '_' . $objectIdentifier;
+		}
+			
+		$this->putInCustomData($customDataKey, $tokenData, 'googleAuth');
+	}
 }
