@@ -280,6 +280,7 @@ class LiveStreamService extends KalturaLiveEntryService
 	 */
 	function updateAction($entryId, KalturaLiveStreamEntry $liveStreamEntry)
 	{
+		$this->dumpApiRequest($entryId);
 		return $this->updateEntry($entryId, $liveStreamEntry, KalturaEntryType::LIVE_STREAM);
 	}
 
@@ -445,6 +446,8 @@ class LiveStreamService extends KalturaLiveEntryService
 	 */
 	public function addLiveStreamPushPublishConfigurationAction ($entryId, $protocol, $url = null, KalturaLiveStreamConfiguration $liveStreamConfiguration = null)
 	{
+		$this->dumpApiRequest($entryId);
+		
 		$entry = entryPeer::retrieveByPK($entryId);
 		if (!$entry || $entry->getType() != entryType::LIVE_STREAM)
 			throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_ID);
@@ -492,6 +495,8 @@ class LiveStreamService extends KalturaLiveEntryService
 	 */
 	public function removeLiveStreamPushPublishConfigurationAction ($entryId, $protocol)
 	{
+		$this->dumpApiRequest($entryId);
+		
 		$entry = entryPeer::retrieveByPK($entryId);
 		if (!$entry || $entry->getType() != entryType::LIVE_STREAM)
 			throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_ID);
