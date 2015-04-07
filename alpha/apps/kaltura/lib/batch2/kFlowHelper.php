@@ -301,6 +301,7 @@ class kFlowHelper
 			
 			$flavorParams = assetParamsPeer::retrieveByPKNoFilter($asset->getFlavorParamsId());
 			if(is_null($flavorParams)) { 
+				KalturaLog::err('Failed to retrieve asset params');
 				return $dbBatchJob;
 			}
 		
