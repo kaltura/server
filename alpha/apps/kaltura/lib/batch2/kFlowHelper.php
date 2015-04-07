@@ -2531,9 +2531,11 @@ class kFlowHelper
 				KalturaLog::err("Entry id [" . $uploadToken->getObjectId() . "] not found");
 				return;
 			}
-
+			
+			//Keep original extention
+			$ext = pathinfo($fullPath, PATHINFO_EXTENSION);
 			// increments version
-			$dbEntry->setData('100000.jpg');
+			$dbEntry->setData('100000.'.$ext);
 			$dbEntry->save();
 
 			$syncKey = $dbEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA);
