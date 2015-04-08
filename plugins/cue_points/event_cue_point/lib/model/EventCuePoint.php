@@ -22,5 +22,10 @@ class EventCuePoint extends CuePoint
 	{
 		$this->setType(EventCuePointPlugin::getCuePointTypeCoreValue(EventCuePointType::EVENT));
 	}
+
+	public function copyToClipEntry( entry $clipEntry, $clipStartTime, $clipDuration )
+	{
+		return false;
+	}
 	
 }

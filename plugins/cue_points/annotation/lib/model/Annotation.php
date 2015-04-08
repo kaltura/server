@@ -41,4 +41,52 @@ class Annotation extends CuePoint implements IMetadataObject
 			
 		return $data;
 	}
+
+	/**
+	 * @param entry $entry
+	 * @return bool true if cuepoints should be copied to given entry
+	 */
+	public function hasPermissionToCopyToEntry( entry $entry )
+	{
+		if (!$entry->getIsTemporary()
+			&& PermissionPeer::isValidForPartner(AnnotationCuePointPermissionName::COPY_ANNOTATIONS_TO_CLIP, $entry->getPartnerId())) {
+			return true;
+		}
+
+		if ($entry->getIsTemporary()
+			&& PermissionPeer::isValidForPartner(AnnotationCuePointPermissionName::COPY_ANNOTATIONS_TO_TRIMMED_ENTRY, $entry->getPartnerId())) {
+			return true;
+		}
+
+		return false;
+	}
+
+	public function shouldCopyToClip( $clipStartTime, $clipDuration ) {
+		//child annotations have starttime 0, check parent starttime
+		if ( !$this->getStartTime() ) {
+			if ( $this->getParentId() ) {
+				$parentAnnotation = CuePointPeer::retrieveByPK($this->getParentId());
+				if ( !is_null($parentAnnotation) ) {
+					return $parentAnnotation->shouldCopyToClip($clipStartTime, $clipDuration);
+				}
+			}
+		} else if ( $this->getStartTime() >= $clipStartTime && $this->getStartTime() <= ($clipStartTime + $clipDuration) ) {
+			return true;
+		}
+
+		return false;
+	}
+
+	public function copyToEntry( $entry, PropelPDO $con = null)
+	{
+		$annotation = parent::copyToEntry( $entry );
+		if ( $annotation->getParentId() ) {
+			$mappedId = kObjectCopyHandler::getMappedId('Annotation', $annotation->getParentId());
+			if ( $mappedId ) {
+				$annotation->setParentId( $mappedId );
+			}
+		}
+		$annotation->save();
+		return $annotation;
+	}
 }
