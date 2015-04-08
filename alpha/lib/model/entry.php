@@ -1763,6 +1763,9 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	public function setReplacedEntryId ( $v )	{	$this->putInCustomData ( "replacedEntryId" , $v );	}
 	public function getReplacedEntryId (  )		{	return $this->getFromCustomData( "replacedEntryId" );	}
 
+	public function setIsTemporary ( $v )	{	$this->putInCustomData ( "isTemporary" , $v );	}
+	public function getIsTemporary (  )		{	return $this->getFromCustomData( "isTemporary", null, false );	}
+
 	public function setReplacementOptions ($v)  {	$this->putInCustomData ( "replacementOptions" , $v );	}
 	public function getReplacementOptions (  )	{	return $this->getFromCustomData( "replacementOptions", null, new kEntryReplacementOptions() );	}
 
@@ -3301,7 +3304,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	 */
 	public function isCustomDataModified($name = null, $namespace = '')
 	{
-		if(isset($this->oldCustomDataValues[$namespace]) && (is_null($name) || isset($this->oldCustomDataValues[$namespace][$name])))
+		if(isset($this->oldCustomDataValues[$namespace]) && (is_null($name) || array_key_exists($name, $this->oldCustomDataValues[$namespace])))
 		{
 			return true;
 		}
