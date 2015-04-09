@@ -980,7 +980,7 @@ class KalturaEntryService extends KalturaBaseService
 	 * @param string $entryId Media entry id
 	 * @param int $conversionProfileId
 	 * @param KalturaConversionAttributeArray $dynamicConversionAttributes
-	 * @return int job id
+	 * @return bigint job id
 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
 	 * @throws KalturaErrors::CONVERSION_PROFILE_ID_NOT_FOUND
 	 * @throws KalturaErrors::FLAVOR_PARAMS_NOT_FOUND
