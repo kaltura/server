@@ -13,7 +13,7 @@ class KalturaMrssDropFolderFile extends KalturaDropFolderFile
 	
 	/**
 	 * MRSS content of the
-	 * @var unknown_type
+	 * @var string
 	 */
 	public $mrssContent;
 	
@@ -22,7 +22,7 @@ class KalturaMrssDropFolderFile extends KalturaDropFolderFile
 	 */
 	private static $map_between_objects = array(
 		'hash',
-		'mrssContent',
+		'mrssContent'
 	 );
 		 
 	public function getMapBetweenObjects()
@@ -34,7 +34,7 @@ class KalturaMrssDropFolderFile extends KalturaDropFolderFile
 	{
 		if (!$dbObject)
 			$dbObject = new MrssDropFolderFile();
-		
+			
 		return parent::toObject($dbObject, $skip);
 	}
 }

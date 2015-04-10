@@ -39,13 +39,14 @@ class MrssDropFolderFile extends DropFolderFile implements ISyncableFile
 	 * @param string $mrssContent
 	 */
 	public function setMrssContent($mrssContent) {
-		$this->getBody();
+		$this->getMrssContent();
 		if($mrssContent != $this->mrssContent)
 			$this->setMrssContent = $mrssContent;
 	}
 	
 	public function incrementMrssContentVersion()
 	{
+		$this->mrssContentPreviousVersion = $this->getMrssContentVersion();
 		$version = kDataCenterMgr::incrementVersion($this->getMrssContentVersion());
 		return $this->putInCustomData(self::CUSTOM_DATA_MRSS_CONTENT_VERSION, $version);
 	}
@@ -68,6 +69,11 @@ class MrssDropFolderFile extends DropFolderFile implements ISyncableFile
 	public function setHash($hash) {
 		$this->putInCustomData('hash', $hash);
 	}
+	
+	/**
+	 * @var int
+	 */
+	protected $mrssContentPreviousVersion = null;
 	
 	/* (non-PHPdoc)
 	 * @see ISyncableFile::getSyncKey()
@@ -149,6 +155,48 @@ class MrssDropFolderFile extends DropFolderFile implements ISyncableFile
 	{
 		 $this->m_file_sync = $file_sync;
 	}
+	
+/**
+	 * @param int $sub_type
+	 * @throws string
+	 */
+	private function getFileSyncVersion($sub_type)
+	{
+		switch($sub_type)
+		{
+			case self::FILE_SYNC_SUB_TYPE_MRSS_XML:
+				return $this->getMrssContentVersion();
+		}
+		return null;
+	}
+	
+/* (non-PHPdoc)
+	 * @see BaseEventNotificationTemplate::preSave()
+	 */
+	public function preSave(PropelPDO $con = null)
+	{
+		if($this->setMrssContent)
+			$this->incrementMrssContentVersion();
+			
+		return parent::preSave($con);
+	}
 
+	/* (non-PHPdoc)
+	 * @see BaseEventNotificationTemplate::postSave()
+	 */
+	public function postSave(PropelPDO $con = null)
+	{
+		if($this->wasObjectSaved() && $this->setMrssContent)
+		{
+			$key = $this->getSyncKey(self::FILE_SYNC_SUB_TYPE_MRSS_XML);
+			kFileSyncUtils::file_put_contents($key, $this->setMrssContent);
+			$this->mrssContent = $this->setMrssContent;
+			$this->setMrssContent = null;
+			
+			kEventsManager::raiseEvent(new kObjectDataChangedEvent($this, $this->mrssContentPreviousVersion));	
+		}
+		
+		return parent::postSave($con);
+	}
 
 }

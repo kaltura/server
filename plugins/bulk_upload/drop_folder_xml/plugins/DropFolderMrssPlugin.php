@@ -30,18 +30,37 @@ class DropFolderMrssPlugin extends KalturaPlugin implements IKalturaPlugin, IKal
 					return new KalturaMrssDropFolderFile();
 				}
 				break;
-			case 'Form_DropFolderConfigureExtend_SubForm':
-				if ($enumValue == Kaltura_Client_DropFolder_Enum_DropFolderType::MRSS)
+			case ('KalturaDropFolder'):
+				if ($enumValue == self::getDropFolderTypeCoreValue(MrssDropFolderType::MRSS) )
 				{
-					return new Form_WebexDropFolderConfigureExtend_SubForm();
+					return new KalturaDropFolder();
 				}
 				break;
-//			case 'Kaltura_Client_DropFolder_Type_DropFolder':
+			case 'kDropFolderXmlFileHandler':
+				if ($enumValue == self::getDropFolderTypeCoreValue(MrssDropFolderType::MRSS))
+				{
+					return new kDropFolderMrssXmlFileHandler();
+				}
+				break;
+//			case 'Form_DropFolderConfigureExtend_SubForm':
 //				if ($enumValue == Kaltura_Client_DropFolder_Enum_DropFolderType::MRSS)
 //				{
-//					return new Kaltura_Client_WebexDropFolder_Type_WebexDropFolder();
+//					return new Form_WebexDropFolderConfigureExtend_SubForm();
 //				}
 //				break;
+			case 'Kaltura_Client_DropFolder_Type_DropFolder':
+				if ($enumValue == Kaltura_Client_DropFolder_Enum_DropFolderType::MRSS)
+				{
+					return new Kaltura_Client_DropFolder_Type_DropFolder();
+				}
+				break;
+				
+			case 'ISyncableFile':
+				if ($enumValue == self::getDropFolderFileFileSyncObjectTypeCoreValue(MrssDropFolderFileFileSyncObjectType::MRSS_DROP_FOLDER_FILE))
+				{
+					return DropFolderFilePeer::retrieveByPK($constructorArgs['objectId']);
+				}
+				break;
 		}
 	}
 	

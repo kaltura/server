@@ -25,14 +25,19 @@ class KMrssDropFolderEngine extends KDropFolderEngine
 		foreach ($feedItems as $feedItem)
 		{
 			// The unique feed item identifier is the GUID, so that is what we set as the drop folder file name.
-			if (!array_key_exists($feedItem->guid, $existingDropFolderFilesMap))
+			if (!array_key_exists(strval($feedItem->guid), $existingDropFolderFilesMap))
 			{
 				//In this case, we are required to add this item as a new drop folder file
 				$this->handleItemAdded ($feedItem);
 			}
 			else
 			{
-				if (isset ($this->dropFolder->fileHandlerConfig->contentMatchPolicy) )
+				if (!isset ($this->dropFolder->fileHandlerConfig->contentMatchPolicy) )
+				{
+					KalturaLog::info('Content match policy is not set for [' . $this->dropFolder->id . '] - assume ADD_AS_NEW.');
+					continue;
+				}
+				else
 				{
 					if ($this->fileHandlerConfig->contentMatchPolicy == KalturaDropFolderContentFileHandlerMatchPolicy::ADD_AS_NEW)
 					{
@@ -63,7 +68,7 @@ class KMrssDropFolderEngine extends KDropFolderEngine
 			
 			$newDropFolderFile = new KalturaMrssDropFolderFile();
 	    	$newDropFolderFile->dropFolderId = $this->dropFolder->id;
-	    	$newDropFolderFile->fileName = strval($feedItem->guid);
+	    	$newDropFolderFile->fileName = strval($feedItem->guid) . '.xml';
 	    	$newDropFolderFile->lastModificationTime = strval($feedItem->pubDate); 
 	    	
 	    	if (isset ($feedItem->children('media', true)->content[0]->attributes()->fileSize ))
@@ -94,7 +99,12 @@ class KMrssDropFolderEngine extends KDropFolderEngine
 	    	
 	    	$newDropFolderFile->hash = strval($feedItem->children(self::MRSS_NS)->hash);
 	    	$newDropFolderFile->mrssContent = $feedItem->saveXML();
+			//No such thing as an 'uploading' MRSS drop folder file - if the file is detected, it is ready for upload. Immediately update status to 'pending'
+			KBatchBase::$kClient->startMultiRequest();
 			$dropFolderFile = $this->dropFolderFileService->add($newDropFolderFile);
+			$this->dropFolderFileService->updateStatus($dropFolderFile->id, KalturaDropFolderFileStatus::PENDING);
+			$result = KBatchBase::$kClient->doMultiRequest();
+			
 			return $dropFolderFile;
 		}
 		catch(Exception $e)
