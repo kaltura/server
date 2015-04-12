@@ -6,12 +6,19 @@
 
 require_once(__DIR__.'/../bootstrap.php');
 
-if (count($argv) < 2)
+if(count($argv) < 2)
 {
 	die ("CSV file name is required input.\n");
 }
 
 $filename = $argv[1];
+
+$partnerId = null;
+if(isset($argv[2]) && is_numeric($argv[2]))
+{
+	$partnerId = intval($argv[2]);
+}
+
 $csv = fopen($filename, 'w');
 
 $distributionProvider = YoutubeApiDistributionPlugin::getDistributionProviderTypeCoreValue(YoutubeApiDistributionProviderType::YOUTUBE_API);
@@ -19,6 +26,12 @@ $distributionProvider = YoutubeApiDistributionPlugin::getDistributionProviderTyp
 $criteria = new Criteria();
 $criteria->add(DistributionProfilePeer::STATUS, DistributionProfileStatus::DELETED, Criteria::NOT_EQUAL);
 $criteria->add(DistributionProfilePeer::PROVIDER_TYPE, $distributionProvider);
+
+if($partnerId)
+{
+	$criteria->add(DistributionProfilePeer::PARTNER_ID, $partnerId);
+}
+
 $criteria->addAscendingOrderByColumn(DistributionProfilePeer::ID);
 $criteria->setLimit(100);
 

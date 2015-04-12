@@ -18,7 +18,7 @@ class KalturaYoutubeApiDistributionJobProviderData extends KalturaConfigurableDi
 	/**
 	 * @var KalturaYouTubeApiCaptionDistributionInfoArray
 	 */
-	public $captionsInfo;	
+	public $captionsInfo;
 
 	public function __construct(KalturaDistributionJobData $distributionJobData = null)
 	{
@@ -53,8 +53,6 @@ class KalturaYoutubeApiDistributionJobProviderData extends KalturaConfigurableDi
 		
 		$this->addCaptionsData($distributionJobData);
 	}
-
-
 	
 	private static $map_between_objects = array
 	(
@@ -110,6 +108,7 @@ class KalturaYoutubeApiDistributionJobProviderData extends KalturaConfigurableDi
 					if (kFileSyncUtils::fileSync_exists ( $syncKey )) {
 						$captionInfo = $this->getCaptionInfo($asset, $syncKey, $distributionJobData);
 						if ($captionInfo){
+							$captionInfo->label = $asset->getLabel();
 							$captionInfo->language = $this->getLanguageCode($asset->getLanguage());
 							if ($captionInfo->language)
 								$this->captionsInfo [] = $captionInfo;
@@ -119,11 +118,13 @@ class KalturaYoutubeApiDistributionJobProviderData extends KalturaConfigurableDi
 					}
 					break;
 				case AttachmentPlugin::getAssetTypeCoreValue ( AttachmentAssetType::ATTACHMENT ) :
+					/* @var $asset AttachmentAsset */
 					$syncKey = $asset->getSyncKey ( asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET );
 					if (kFileSyncUtils::fileSync_exists ( $syncKey )) {
 						$captionInfo = $this->getCaptionInfo($asset, $syncKey, $distributionJobData);
 						if ($captionInfo){
 							//language code should be set in the attachments title
+							$captionInfo->label = $asset->getTitle();
 							$captionInfo->language = $asset->getTitle();
 							
 							$languageCodeReflector = KalturaTypeReflectorCacher::get('KalturaLanguageCode');

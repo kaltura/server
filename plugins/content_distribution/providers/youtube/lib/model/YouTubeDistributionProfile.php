@@ -720,18 +720,26 @@ class YouTubeDistributionProfile extends ConfigurableDistributionProfile
 		}
 	}
 	
-	public function getApiAuthorizeUrl()
+	public function getGoogleOAuth2Data()
 	{
-		$appId = 'youtubepartner';
+		$appId = YouTubeDistributionPlugin::GOOGLE_APP_ID;
 		$subId = $this->getId();
 		
 		$partner = PartnerPeer::retrieveByPK($this->getPartnerId());
-		$tokenData = $partner->getGoogleOAuth2($appId, $subId);
+		return $partner->getGoogleOAuth2($appId, $subId);
+	}
+	
+	public function getApiAuthorizeUrl()
+	{
+		$tokenData = $this->getGoogleOAuth2Data();
 		if(!is_null($tokenData))
 		{
 			return null;
 		}
-				
+	
+		$appId = YouTubeDistributionPlugin::GOOGLE_APP_ID;
+		$subId = $this->getId();
+					
 		$url = kConf::get('apphome_url');
 		$url .= "/index.php/extservices/googleoauth2/ytid/$appId/subid/$subId";
 		return $url;
