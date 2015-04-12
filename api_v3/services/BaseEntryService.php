@@ -481,7 +481,9 @@ class BaseEntryService extends KalturaEntryService
 		{
 			$pager = new KalturaFilterPager();
 		}
-		
+
+		// NOTE: The following is a hack in order to make sure all responses are of type KalturaBaseEntryListResponse.
+		//       The reason is that baseentry::list() is not being extended by derived classes.
 		$result = $filter->getListResponse($pager, $this->getResponseProfile());
 		$response = new KalturaBaseEntryListResponse();
 		$response->objects = $result->objects;
