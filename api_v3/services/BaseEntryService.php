@@ -482,7 +482,11 @@ class BaseEntryService extends KalturaEntryService
 			$pager = new KalturaFilterPager();
 		}
 		
-		return $filter->getListResponse($pager, $this->getResponseProfile());
+		$result = $filter->getListResponse($pager, $this->getResponseProfile());
+		$response = new KalturaBaseEntryListResponse();
+		$response->objects = $result->objects;
+		$response->totalCount = $result->totalCount;
+		return $response;
 	}
 	
 	/**
