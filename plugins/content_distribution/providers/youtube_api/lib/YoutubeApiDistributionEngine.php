@@ -491,7 +491,7 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 	
 	protected function syncPlaylistIds(Google_Service_YouTube $youtube, $remoteId, array $playlistIds)
 	{
-		$playlistsResponseList = $youtube->playlists->listPlaylists('snippet', array('mine' => true));
+		$playlistsResponseList = $youtube->playlists->listPlaylists('id,snippet', array('mine' => true));
 		foreach($playlistsResponseList->getItems() as $playlist)
 		{
 			$playlistId = $playlist['id'];
@@ -510,6 +510,9 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 		
 		foreach($playlistIds as $playlistId)
 		{
+			if(!$playlistId)
+				continue;
+				
 			$playlistsItemsListResponse = $youtube->playlistItems->listPlaylistItems('snippet', array(
 				'playlistId' => $playlistId,
 				'videoId' => $remoteId
