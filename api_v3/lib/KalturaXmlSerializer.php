@@ -61,8 +61,16 @@ class KalturaXmlSerializer extends KalturaSerializer
 				$this->serializeArray($object);
 				break;
 				
+			case 'map':
+				$this->serializeMap($object);
+				break;
+				
 			case 'object':
-		        if ($object instanceof KalturaTypedArray)
+		        if ($object instanceof KalturaAssociativeArray)
+			    {
+    				$this->serializeMap($object);
+			    }
+			    elseif ($object instanceof KalturaTypedArray)
 			    {
     				$this->serializeArray($object);
 			    }
@@ -90,6 +98,16 @@ class KalturaXmlSerializer extends KalturaSerializer
 		foreach($object as $val)
 		{
 			echo '<item>';
+			$this->serializeByType($val);
+			echo '</item>';
+		}
+	}
+	
+	function serializeMap($object)
+	{
+		foreach($object as $key => $val)
+		{
+			echo '<item key="' . $key . '">';
 			$this->serializeByType($val);
 			echo '</item>';
 		}
