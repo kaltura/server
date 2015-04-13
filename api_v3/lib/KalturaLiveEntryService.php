@@ -38,13 +38,13 @@ class KalturaLiveEntryService extends KalturaEntryService
 		return parent::partnerRequired($actionName);
 	}
 
-	function dumpApiRequest($entryId)
+	function dumpApiRequest($entryId, $onlyIfAvailable = true)
 	{
 		$entryDc = substr($entryId, 0, 1);
 		if($entryDc != kDataCenterMgr::getCurrentDcId())
 		{
 			$remoteDCHost = kDataCenterMgr::getRemoteDcExternalUrlByDcId($entryDc);
-			kFileUtils::dumpApiRequest($remoteDCHost, true);
+			kFileUtils::dumpApiRequest($remoteDCHost, $onlyIfAvailable);
 		}		
 	}
 	
@@ -344,7 +344,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 	function validateRegisteredMediaServersAction($entryId)
 	{
 		KalturaResponseCacher::disableCache();
-		$this->dumpApiRequest($entryId);
+		$this->dumpApiRequest($entryId, false);
 		
 		$dbEntry = entryPeer::retrieveByPK($entryId);
 		if (!$dbEntry || !($dbEntry instanceof LiveEntry))
