@@ -634,7 +634,7 @@ class FlavorAssetService extends KalturaAssetService
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $assetDb->getEntryId());
 		
 		$shouldServeFlavor = false;
-		if($entryDb->getType() == entryType::MEDIA_CLIP)
+		if($entryDb->getType() == entryType::MEDIA_CLIP &&!in_array($assetDb->getPartnerId(),kConf::get('legacy_get_url_partners', 'local', array())))
 		{
 			$shouldServeFlavor = true;
 			$preview = null;
