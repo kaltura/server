@@ -127,11 +127,15 @@ class MetadataService extends KalturaBaseService
 		$dbMetadata->setObjectId($objectId);
 		$dbMetadata->setStatus(KalturaMetadataStatus::VALID);
 
-		// validate object exists
-		$object = kMetadataManager::getObjectFromPeer($dbMetadata);
-		if(!$object)
-			throw new KalturaAPIException(MetadataErrors::INVALID_METADATA_OBJECT, $objectId);
-		
+		// dynamic objects are metadata only, skip validating object id
+		if ($objectType != KalturaMetadataObjectType::DYNAMIC_OBJECT)
+		{
+			// validate object exists
+			$object = kMetadataManager::getObjectFromPeer($dbMetadata);
+			if (!$object)
+				throw new KalturaAPIException(MetadataErrors::INVALID_METADATA_OBJECT, $objectId);
+		}
+
 		$dbMetadata->save();
 		
 		$this->deleteOldVersions($dbMetadata);
@@ -343,6 +347,7 @@ class MetadataService extends KalturaBaseService
 		$applyPartnerFilter = true;
 		if ($filter->metadataObjectTypeEqual == MetadataObjectType::ENTRY)
 		{
+			$entryIds = null;
 			if ($filter->objectIdEqual)
 			{
 				$entryIds = array($filter->objectIdEqual);
@@ -454,7 +459,31 @@ class MetadataService extends KalturaBaseService
 		$dbMetadata->save();
 	}
 
-	
+	/**
+	 * Index metadata by id, will also index the related object
+	 *
+	 * @action index
+	 * @param string $id
+	 * @param bool $shouldUpdate
+	 * @return int
+	 */
+	function indexAction($id, $shouldUpdate)
+	{
+		if(kEntitlementUtils::getEntitlementEnforcement())
+			throw new KalturaAPIException(KalturaErrors::CANNOT_INDEX_OBJECT_WHEN_ENTITLEMENT_IS_ENABLE);
+
+		$dbMetadata = MetadataPeer::retrieveByPK($id);
+		if(!$dbMetadata)
+			throw new KalturaAPIException(MetadataErrors::METADATA_NOT_FOUND, $id);
+
+		$dbMetadata->indexToSearchIndex();
+		$relatedObject = kMetadataManager::getObjectFromPeer($dbMetadata);
+		if($relatedObject && $relatedObject instanceof IIndexable)
+			$relatedObject->indexToSearchIndex();
+
+		return $dbMetadata->getId();
+
+	}
 
 	/**
 	 * Serves metadata XML file

@@ -66,7 +66,7 @@ interface PermissionName extends BaseEnum
 	
 	const FEATURE_DISABLE_NEW_USER_EMAIL = 'FEATURE_DISABLE_NEW_USER_EMAIL';
 
-	// base system permissions
+    // base system permissions
 	
 	const USER_SESSION_PERMISSION = 'BASE_USER_SESSION_PERMISSION';
 	const ALWAYS_ALLOWED_ACTIONS = 'ALWAYS_ALLOWED_ACTIONS';

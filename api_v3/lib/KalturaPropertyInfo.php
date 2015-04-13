@@ -555,10 +555,18 @@ class KalturaPropertyInfo
 	 * @param bool $withSubTypes
 	 * @return array 
 	 */
-	public function toArray($withSubTypes = false)
+	public function toArray($withSubTypes = false, $returnedTypes = array())
 	{
 		$array = array();
 		$array["type"] 			= $this->getType();
+		
+		if(in_array($this->getType(), $returnedTypes))
+		{
+			return $array;
+		}
+		
+		$returnedTypes[] = $this->getType();
+		
 		$array["name"] 			= $this->getName();
 		$array["defaultValue"] 	= $this->getDefaultValue();
 		$array["isSimpleType"] 	= $this->isSimpleType();
@@ -572,7 +580,7 @@ class KalturaPropertyInfo
 		if ($this->isArray())
 		{
 			$propInfo = new KalturaPropertyInfo($this->getArrayType(), "1");
-			$array["arrayType"]	= $propInfo->toArray();
+			$array["arrayType"]	= $propInfo->toArray(false, $returnedTypes);
 		}
 		$array["isReadOnly"] 	= $this->isReadOnly();
 		$array["isInsertOnly"] 	= $this->isInsertOnly();
@@ -591,18 +599,18 @@ class KalturaPropertyInfo
 				foreach($subTypes as $subType)
 				{
 					$subTypeInfo = new KalturaPropertyInfo($subType, $this->_name);
-					$array["subTypes"][] = $subTypeInfo->toArray();
+					$array["subTypes"][] = $subTypeInfo->toArray(false, $returnedTypes);
 				}
 			}
 			
 			foreach($typeReflector->getProperties() as $prop)
 			{
-				$array["properties"][] = $prop->toArray($withSubTypes);
+				$array["properties"][] = $prop->toArray($withSubTypes, $returnedTypes);
 			}
 			
 			foreach($typeReflector->getConstants() as $prop)
 			{
-				$array["constants"][] = $prop->toArray();	
+				$array["constants"][] = $prop->toArray(false, $returnedTypes);	
 			}
 		}
 		return $array;

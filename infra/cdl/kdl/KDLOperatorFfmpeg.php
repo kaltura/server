@@ -248,6 +248,7 @@ $con = $target->_container;
 			case KDLContainerTarget::MP3:
 			case KDLContainerTarget::OGG:
 			case KDLContainerTarget::M4V:
+			case KDLContainerTarget::MXF:
 				$format = $con->_id;
 				break;
 			case KDLContainerTarget::OGV:
@@ -263,6 +264,7 @@ $con = $target->_container;
 				$format = "webm";
 				break;
 			case KDLContainerTarget::MPEGTS:
+			case KDLContainerTarget::M2TS:
 			case KDLContainerTarget::APPLEHTTP:
 				$format = "mpegts";
 				break;

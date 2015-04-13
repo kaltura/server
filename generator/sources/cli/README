@@ -81,13 +81,13 @@ Examples
 2. Diffing access control profiles:
 > (genks 1234 | kalcli accesscontrol get id=7003 > /tmp/a1) ; (genks 1234 | kalcli accesscontrol get id=8005 > /tmp/a2) ; diff /tmp/a1 /tmp/a2
 
-3. Getting the number of distinct entries in a playlist
+3. Getting the number of distinct entries in a playlist:
 > genks 1234 | kalcli playlist execute id=1_1a2b3c | grep -P 'id\t' | sort | uniq | wc -l
 
-4. Using a precreated session
+4. Using a precreated session:
 > kalcli -x media list ks=MDQ2ZThjOTI0MTJmZGIxYTVlMWVhNDJlZDZhNDAyMDkyMWJhNzE0OXw0Mzc0ODE7NDM3NDgxOzEzNjI0OTI3Njc7MDsxMzYyNDA2MzY3Ljc3NzM7MDt3aWRnZXQ6MSx2aWV3Oio7Ow==
 
-5. Using an expired session
+5. Using an expired session:
 > renewks MDQ2ZThjOTI0MTJmZGIxYTVlMWVhNDJlZDZhNDAyMDkyMWJhNzE0OXw0Mzc0ODE7NDM3NDgxOzEzNjI0OTI3Njc7MDsxMzYyNDA2MzY3Ljc3NzM7MDt3aWRnZXQ6MSx2aWV3Oio7Ow== | kalcli media list
 
 6. Parsing a KS:
@@ -99,8 +99,11 @@ Examples
 8. Using a serve action:
 > genks 1234 | kalcli -r document_documents serve entryId=0_abcdef > \temp\test.doc
 
-9. Nesting requests
+9. Nesting requests:
 > kalcli -x session start partnerId=1234 secret=abcdef type=2 | awk '{print "ks "$1}' | kalcli media list
 
-10. Uploading files
-> ks=`genks -b 1234` ; kalcli -x uploadtoken add ks=$ks | awk '$1 == "id" {print "uploadTokenId "$2}' | kalcli uploadtoken upload ks=$ks fileData=@/tmp/test.php
+10. Uploading files:
+> ks=`genks -b 1234` ; kalcli -x uploadtoken add ks=$ks | awk '$1 == "id" {print "uploadTokenId "$2}' | kalcli uploadtoken upload ks=$ks fileData=@/tmp/video.mp4
+
+11. Sending the contents of a file on a string parameter:
+> genks 1234 | kalcli caption_captionasset setContent id=0_abcd56 contentResource:objectType=KalturaStringResource contentResource:content=@@/tmp/caption.srt

@@ -87,6 +87,23 @@ class MetadataProfileFieldPeer extends BaseMetadataProfileFieldPeer {
 
 		return MetadataProfileFieldPeer::doSelect($criteria, $con);
 	}
+
+
+	/**
+	 * @param $partnerId
+	 * @param $relatedMetadataProfileId
+	 * @param PropelPDO $con
+	 * @return array<MetadataProfileField>
+	 */
+	public static function retrieveByPartnerAndRelatedMetadataProfileId($partnerId, $relatedMetadataProfileId, PropelPDO $con = null)
+	{
+		$criteria = new Criteria();
+		$criteria->add(MetadataProfileFieldPeer::PARTNER_ID, $partnerId);
+		$criteria->add(MetadataProfileFieldPeer::RELATED_METADATA_PROFILE_ID, $relatedMetadataProfileId);
+		$criteria->add(MetadataProfileFieldPeer::STATUS, array(MetadataProfileField::STATUS_ACTIVE, MetadataProfileField::STATUS_NONE_SEARCHABLE), Criteria::IN);
+
+		return MetadataProfileFieldPeer::doSelect($criteria, $con);
+	}
 	
 	/**
 	 * @param      int $partnerId

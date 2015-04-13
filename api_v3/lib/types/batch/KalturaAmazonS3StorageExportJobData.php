@@ -10,9 +10,15 @@ class KalturaAmazonS3StorageExportJobData extends KalturaStorageExportJobData
 	 */   	
     public $filesPermissionInS3;   
     
+	/**
+	 * @var string
+	 */   	
+    public $s3Region;   
+    
 	private static $map_between_objects = array
 	(
 		"filesPermissionInS3",	
+		"s3Region",	
 	);
 
 	public function getMapBetweenObjects ( )

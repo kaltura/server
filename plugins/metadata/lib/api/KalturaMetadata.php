@@ -135,7 +135,7 @@ class KalturaMetadata extends KalturaObject implements IFilterable
 	
 	public function getFilterDocs()
 	{
-		return array();
+		return array('metadataObjectTypeEqual' => 'When null, default is KalturaMetadataObjectType::ENTRY');
 	}
 	
 	public function toObject($dbMetadata = null, $propsToSkip = array())

@@ -45,6 +45,7 @@ class MetadataProfileService extends KalturaBaseService
 		
 		// must be validatebefore checking available searchable fields count
 		$metadataProfile->validatePropertyNotNull('metadataObjectType');
+		kMetadataManager::validateProfileFields($this->getPartnerId(), $xsdData);
 		
 		$dbMetadataProfile = $metadataProfile->toInsertableObject();
 		$dbMetadataProfile->setStatus(KalturaMetadataProfileStatus::ACTIVE);
@@ -170,6 +171,9 @@ class MetadataProfileService extends KalturaBaseService
 		if($dbMetadataProfile->getStatus() != MetadataProfile::STATUS_ACTIVE)
 			throw new KalturaAPIException(MetadataErrors::METADATA_TRANSFORMING);
 
+		if ($xsdData)
+			kMetadataManager::validateProfileFields($this->getPartnerId(), $xsdData);
+
 		$dbMetadataProfile = $metadataProfile->toUpdatableObject($dbMetadataProfile);
 		
 		$key = $dbMetadataProfile->getSyncKey(MetadataProfile::FILE_SYNC_METADATA_DEFINITION);
@@ -289,7 +293,21 @@ class MetadataProfileService extends KalturaBaseService
 		
 		if(!$dbMetadataProfile)
 			throw new KalturaAPIException(MetadataErrors::METADATA_PROFILE_NOT_FOUND, $id);
-		
+
+		// if this profile is a dynamic object, check for references in other profiles
+		if ($dbMetadataProfile->getObjectType() == MetadataObjectType::DYNAMIC_OBJECT)
+		{
+			$referencedFields = MetadataProfileFieldPeer::retrieveByPartnerAndRelatedMetadataProfileId(
+				kCurrentContext::getCurrentPartnerId(),
+				$dbMetadataProfile->getId());
+			if (count($referencedFields))
+			{
+				/** @var MetadataProfileField $referencedField */
+				$referencedField = $referencedFields[0];
+				throw new KalturaAPIException(MetadataErrors::METADATA_PROFILE_REFERENCE_EXISTS, $referencedField->getMetadataProfileId(), $referencedField->getKey());
+			}
+		}
+
 		$dbMetadataProfile->setStatus(KalturaMetadataProfileStatus::DEPRECATED);
 		$dbMetadataProfile->save();
 		

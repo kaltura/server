@@ -31,7 +31,7 @@ class LiveReportEntryQueryEngine extends LiveReportEngine {
 		$filter->entryIds = $args[LiveReportConstants::ENTRY_IDS];
 
 		$res = LiveReportQueryHelper::retrieveFromReport($reportType, $filter, null, "entryId", $this->fieldName);
-		
+
 		if($this->printResult) {
 			if(empty($res))
 				$res = $this->defaultVal;

@@ -689,6 +689,15 @@ class entryPeer extends BaseentryPeer
 	{
 		return array(entryPeer::STATUS);
 	}
+	
+	/* (non-PHPdoc)
+	 * @see BaseentryPeer::getAtomicCustomDataFields()
+	*/
+	public static function getAtomicCustomDataFields()
+	{
+		return array("replacingEntryId");
+	}
+	
 
 	private static function filterByAccessControl($entry) {
 

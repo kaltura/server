@@ -261,10 +261,12 @@
 		const WEBM = "webm";
 		const MPEG = "mpeg";
 		const MPEGTS = "mpegts";
+		const M2TS = "m2ts";
 		const APPLEHTTP = "applehttp";
 		const WAV = "wav";
 		const HLS = "hls";
 		const M4V = "m4v";
+		const MXF = "mxf";
 		const COPY = "copy";
 	};
 

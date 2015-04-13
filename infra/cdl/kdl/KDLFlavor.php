@@ -498,7 +498,6 @@ $plannedDur = 0;
 			}
 			KalturaLog::log('IsCropImx('.$this->_video->_isCropIMX.')');
 		}
-		
 			/*
 			 * Analyse the source to determine whether it contains multi-stream audio.
 			 * In case it does and the flavor has 'multiStream' set to 'auto-detect' (default action) -
@@ -664,6 +663,9 @@ $plannedDur = 0;
 			case 'windows media':
 				$format = KDLContainerTarget::WMV;
 				break;
+			case 'mxf':
+				$format = KDLContainerTarget::MXF;
+				break;
 			case 'avi':
 			case 'dv':
 			case 'realmedia':
@@ -717,6 +719,7 @@ $plannedDur = 0;
 					break;
 				case KDLContainerTarget::MPEG:
 				case KDLContainerTarget::MPEGTS:
+				case KDLContainerTarget::M2TS:
 				case KDLContainerTarget::APPLEHTTP:
 					$targetVid->_id = KDLVideoTarget::H264;
 					break;
@@ -1199,6 +1202,7 @@ $plannedDur = 0;
 						break;
 					case KDLContainerTarget::WEBM:
 					case KDLContainerTarget::MPEGTS:
+					case KDLContainerTarget::M2TS:
 					case KDLContainerTarget::APPLEHTTP:
 						$targetAud->_id=KDLAudioTarget::AAC;
 						break;

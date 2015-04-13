@@ -38,6 +38,16 @@ class KalturaLiveEntryService extends KalturaEntryService
 		return parent::partnerRequired($actionName);
 	}
 
+	function dumpApiRequest($entryId)
+	{
+		$entryDc = substr($entryId, 0, 1);
+		if($entryDc != kDataCenterMgr::getCurrentDcId())
+		{
+			$remoteDCHost = kDataCenterMgr::getRemoteDcExternalUrlByDcId($entryDc);
+			kFileUtils::dumpApiRequest($remoteDCHost, true);
+		}		
+	}
+	
 	/**
 	 * Append recorded video to live entry
 	 * 
@@ -191,12 +201,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 	 */
 	function registerMediaServerAction($entryId, $hostname, $mediaServerIndex, $applicationName = null)
 	{
-		$entryDc = substr($entryId, 0, 1);
-		if($entryDc != kDataCenterMgr::getCurrentDcId())
-		{
-			$remoteDCHost = kDataCenterMgr::getRemoteDcExternalUrlByDcId($entryDc);
-			kFileUtils::dumpApiRequest($remoteDCHost);
-		}
+		$this->dumpApiRequest($entryId);
 		
 		$dbEntry = entryPeer::retrieveByPK($entryId);
 		if (!$dbEntry || !($dbEntry instanceof LiveEntry))
@@ -298,12 +303,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 	 */
 	function unregisterMediaServerAction($entryId, $hostname, $mediaServerIndex)
 	{
-		$entryDc = substr($entryId, 0, 1);
-		if($entryDc != kDataCenterMgr::getCurrentDcId())
-		{
-			$remoteDCHost = kDataCenterMgr::getRemoteDcExternalUrlByDcId($entryDc);
-			kFileUtils::dumpApiRequest($remoteDCHost);
-		}
+		$this->dumpApiRequest($entryId);
 		
 		$dbEntry = entryPeer::retrieveByPK($entryId);
 		if (!$dbEntry || !($dbEntry instanceof LiveEntry))
@@ -344,12 +344,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 	function validateRegisteredMediaServersAction($entryId)
 	{
 		KalturaResponseCacher::disableCache();
-		$entryDc = substr($entryId, 0, 1);
-		if($entryDc != kDataCenterMgr::getCurrentDcId())
-		{
-			$remoteDCHost = kDataCenterMgr::getRemoteDcExternalUrlByDcId($entryDc);
-			kFileUtils::dumpApiRequest($remoteDCHost);
-		}
+		$this->dumpApiRequest($entryId);
 		
 		$dbEntry = entryPeer::retrieveByPK($entryId);
 		if (!$dbEntry || !($dbEntry instanceof LiveEntry))

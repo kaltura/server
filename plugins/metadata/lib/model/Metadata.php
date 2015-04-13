@@ -12,7 +12,7 @@
  * @package plugins.metadata
  * @subpackage model
  */
-class Metadata extends BaseMetadata implements ISyncableFile
+class Metadata extends BaseMetadata implements IIndexable, ISyncableFile
 {
 	const FILE_SYNC_METADATA_DATA = 1;
 	
@@ -41,7 +41,8 @@ class Metadata extends BaseMetadata implements ISyncableFile
 	{
 		if ($this->alreadyInSave)
 			return parent::postUpdate($con);
-		
+
+		$objectUpdated = $this->isModified();
 		$objectDeleted = false;
 		if($this->isColumnModified(MetadataPeer::STATUS) && $this->getStatus() == self::STATUS_DELETED)
 			$objectDeleted = true;
@@ -50,8 +51,21 @@ class Metadata extends BaseMetadata implements ISyncableFile
 		
 		if($objectDeleted)
 			kEventsManager::raiseEvent(new kObjectDeletedEvent($this));
+
+		if($objectUpdated)
+			kEventsManager::raiseEvent(new kObjectUpdatedEvent($this));
 			
 		return $ret;
+	}
+
+	/* (non-PHPdoc)
+	 * @see lib/model/om/BaseMetadata#postInsert()
+	 */
+	public function postInsert(PropelPDO $con = null)
+	{
+		parent::postInsert($con);
+
+		kEventsManager::raiseEvent(new kObjectAddedEvent($this));
 	}
 
 	public function incrementVersion()
@@ -160,5 +174,46 @@ class Metadata extends BaseMetadata implements ISyncableFile
 	public function getCacheInvalidationKeys()
 	{
 		return array("metadata:objectId=".strtolower($this->getObjectId()));
+	}
+
+	public function getSphinxMatchOptimizations() {
+		$objectName = $this->getIndexObjectName();
+		return $objectName::getSphinxMatchOptimizations($this);
+	}
+
+	/**
+	 * @return int
+	 */
+	public function getIntId()
+	{
+		return $this->getId();
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getEntryId()
+	{
+		if ($this->getObjectType() == MetadataObjectType::ENTRY)
+			return $this->getObjectId();
+		else
+			return null;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getIndexObjectName()
+	{
+		return "MetadataIndex";
+	}
+
+	/**
+	 * Index the object in the search engine
+	 */
+	public function indexToSearchIndex()
+	{
+		if ($this->getObjectType() == MetadataObjectType::DYNAMIC_OBJECT)
+			kEventsManager::raiseEventDeferred(new kObjectReadyForIndexEvent($this));
 	}
 } // Metadata

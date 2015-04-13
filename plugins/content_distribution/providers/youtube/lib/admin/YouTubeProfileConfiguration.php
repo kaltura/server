@@ -67,10 +67,6 @@ class Form_YouTubeProfileConfiguration extends Form_ConfigurableProfileConfigura
 			$this->setV1Mode($order++);
 
 		parent::populateFromObject($object, $add_underscore);
-
-		$serviceUrl = Infra_ClientHelper::getServiceUrl();
-		$url = $serviceUrl . '/index.php/extservices/googleoauth2/ytid/youtubepartner/subid/'.$object->id;
-		$this->setDefault('api_authorize_url', $url);
 	}
 
 	protected function addProviderElements()

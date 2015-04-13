@@ -399,6 +399,10 @@ class KalturaFrontController
 				case kCoreException::MAX_FILE_SYNCS_FOR_OBJECT_PER_DAY_REACHED:
 					$object = new KalturaAPIException(KalturaErrors::MAX_FILE_SYNCS_FOR_OBJECT_PER_DAY_REACHED, $ex->getData());
 					break;
+
+				case kCoreException::ID_NOT_FOUND:
+					$object = new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $ex->getData());
+					break;
 						
 				default:
 		    		KalturaLog::crit($ex);

@@ -1,4 +1,79 @@
 ----------
+# Jupiter-10.8.0 #
+
+## Tag-search - return all objects when no entitlement ##
+
+- Issue Type: bug fix
+- Issue ID: PLAT-2646
+
+#### Configuration ####
+
+** sphinx/kaltura.conf **
+
+Added the following attribute to the kaltura_tag sphinx table. please re-index.
+
+	rt_attr_string = tag
+
+#### Deployment Scripts ####
+
+None.
+
+#### Known Issues & Limitations ####
+
+None.
+
+## Real-time dashboard permission in now based on the general live-stream permission ##
+
+- Issue Type: Change Request
+- Issue ID: PLAT-2705
+
+#### Configuration ####
+
+Remove moduls.realTimeReports config from configurations/admin.ini
+
+#### Deployment Scripts ####
+
+None.
+
+#### Known Issues & Limitations ####
+
+None.
+
+
+## Dynamic Objects ##
+
+- Issue Type: New Feature
+- Issue ID: PLAT-2466
+
+#### Configuration ####
+
+*plugins.ini*
+
+Add `MetadataSphinx` to the end of `Mandatory plugins` section (after `SphinxSearch`)
+
+*sphinx*
+
+Update `configurations/sphinx/kaltura.conf` according to template (a new index `kaltura_metadata` was added).
+
+
+#### Deployment Scripts ####
+
+		mysql -uroot -p kaltura < deployment/updates/sql/2015_03_18_alter_metadata_profile_field_with_custom_data_field.sql
+		php deployment/updates/scripts/add_permissions/2015_03_18_update_metadata_permissions.php
+		php deployment/base/scripts/installPlugins.php
+		php deployment/base/scripts/populateSphinxMetadata.php
+
+#### Known Issues & Limitations ####
+
+None.
+
+##New file formats MXF and M2TS##
+- Issue Type: new feature
+- Issue ID: PLAT-2742 and SUP-4124
+
+
+
+----------
 # Jupiter-10.7.0 #
 
 ##API Response Profiles##

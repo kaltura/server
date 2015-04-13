@@ -75,6 +75,8 @@ abstract class KalturaMetadataBaseFilter extends KalturaRelatedFilter
 	public $metadataProfileVersionLessThanOrEqual;
 
 	/**
+	 * When null, default is KalturaMetadataObjectType::ENTRY
+	 * 
 	 * @var KalturaMetadataObjectType
 	 */
 	public $metadataObjectTypeEqual;

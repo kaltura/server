@@ -58,7 +58,13 @@ class KalturaCategoryUserAdvancedFilter extends KalturaSearchItem
 			{
 				throw new KalturaAPIException (KalturaErrors::USER_NOT_FOUND);
 			}
-			$obj->setMemberIdIn(array($kuser->getId()));
+
+			$kuserIds = array($kuser->getId());
+			// retrieve categories that the user is a member by a group.
+			$kgroupIds = KuserKgroupPeer::retrieveKgroupIdsByKuserId($kuser->getId());
+			if (!is_null($kgroupIds) && is_array($kgroupIds))
+				$kuserIds = array_merge($kgroupIds, $kuserIds);
+			$obj->setMemberIdIn($kuserIds);
 		}
 		
 		if ($this->memberIdIn)
@@ -72,7 +78,11 @@ class KalturaCategoryUserAdvancedFilter extends KalturaSearchItem
 			{
 				$kuserIds[] = $kuser->getId();
 			}
-			
+			// retrieve categories that the users are members by a group.
+			$kgroupIds = KuserKgroupPeer::retrieveKgroupIdsByKuserIds($kuserIds);
+			if (!is_null($kgroupIds) && is_array($kgroupIds))
+				$kuserIds = array_merge($kgroupIds, $kuserIds);
+
 			$obj->setMemberIdIn($kuserIds);
 		}
 			

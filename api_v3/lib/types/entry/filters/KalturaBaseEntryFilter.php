@@ -96,6 +96,25 @@ class KalturaBaseEntryFilter extends KalturaBaseEntryBaseFilter
 			$this->moderationStatusNotIn = implode(",", $moderationStatusesNotIn); 
 		}
 	}
+
+	private function preparePusersToKusersFilter( $puserIdsCsv )
+	{
+		$kuserIdsArr = array();
+		$puserIdsArr = explode(',',$puserIdsCsv);
+		$kuserArr = kuserPeer::getKuserByPartnerAndUids(kCurrentContext::getCurrentPartnerId(), $puserIdsArr);
+
+		foreach($kuserArr as $kuser)
+		{
+			$kuserIdsArr[] = $kuser->getId();
+		}
+
+		if(!empty($kuserIdsArr))
+		{
+			return implode(',',$kuserIdsArr);
+		}
+
+		return -1; // no result will be returned if no puser exists
+	}
 	
 	/**
 	 * The user_id is infact a puser_id and the kuser_id should be retrieved
@@ -104,7 +123,7 @@ class KalturaBaseEntryFilter extends KalturaBaseEntryBaseFilter
 	{
 		if ($this->userIdEqual !== null)
 		{
-			$kuser = kuserPeer::getKuserByPartnerAndUid($this->getPartnerId(), $this->userIdEqual);
+			$kuser = kuserPeer::getKuserByPartnerAndUid(kCurrentContext::getCurrentPartnerId(), $this->userIdEqual);
 			if ($kuser)
 				$this->userIdEqual = $kuser->getId();
 			else 
@@ -131,7 +150,7 @@ class KalturaBaseEntryFilter extends KalturaBaseEntryBaseFilter
 	 * @param KalturaFilterPager $pager
 	 * @return KalturaCriteria
 	 */
-	protected function prepareEntriesCriteriaFilter(KalturaFilterPager $pager)
+	public function prepareEntriesCriteriaFilter(KalturaFilterPager $pager = null)
 	{
 		// because by default we will display only READY entries, and when deleted status is requested, we don't want this to disturb
 		entryPeer::allowDeletedInCriteriaFilter(); 
@@ -140,7 +159,7 @@ class KalturaBaseEntryFilter extends KalturaBaseEntryBaseFilter
 	
 		if( $this->idEqual == null && $this->redirectFromEntryId == null )
         {
-        	$this->setDefaultStatus($this);
+        	$this->setDefaultStatus();
             $this->setDefaultModerationStatus($this);
             if($this->parentEntryIdEqual == null)
             	$c->add(entryPeer::DISPLAY_IN_SEARCH, mySearchUtils::DISPLAY_IN_SEARCH_SYSTEM, Criteria::NOT_EQUAL);
