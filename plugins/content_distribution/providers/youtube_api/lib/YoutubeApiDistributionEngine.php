@@ -109,14 +109,15 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 
 		$listResponse = $youtube->videos->listVideos('status', array('id' => $data->entryDistribution->remoteId));
 		$video = reset($listResponse->getItems());
+		KalturaLog::debug("Video: " . print_r($video, true));
 		
-		switch($video['status']['uploadStatus'])
+		switch($video['modelData']['status']['uploadStatus'])
 		{
 			case 'deleted':
 				throw new Exception("Video deleted on YouTube side");
 				
 			case 'failed':
-				switch($video['status']['failureReason'])
+				switch($video['modelData']['status']['failureReason'])
 				{
 					case 'codec':
 						throw new Exception("Video failed because of its codec");
@@ -131,11 +132,11 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 					case 'uploadAborted':
 						throw new Exception("Video failed because upload aborted");
 					default:
-						throw new Exception("Unknown failure reason [" . $video['status']['failureReason'] . "]");
+						throw new Exception("Unknown failure reason [" . $video['modelData']['status']['failureReason'] . "]");
 				}
 				
 			case 'rejected':
-				switch($video['status']['rejectionReason'])
+				switch($video['modelData']['status']['rejectionReason'])
 				{
 					case 'claim':
 						throw new Exception("Video rejected due to claim");
@@ -156,7 +157,7 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 					case 'uploaderAccountSuspended':
 						throw new Exception("Video rejected because uploader account suspended");
 					default:
-						throw new Exception("Unknown rejection reason [" . $video['status']['rejectionReason'] . "]");
+						throw new Exception("Unknown rejection reason [" . $video['modelData']['status']['rejectionReason'] . "]");
 				}
 				
 			case 'uploaded':
@@ -166,7 +167,7 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 				return true;
 				
 			default:
-				throw new Exception("Unknown video status [" . $video['status']['uploadStatus'] . "]");
+				throw new Exception("Unknown video status [" . $video['modelData']['status']['uploadStatus'] . "]");
 		}
 	}
 	
