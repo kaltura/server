@@ -205,7 +205,7 @@ class YoutubeApiDistributionProfile extends ConfigurableDistributionProfile
 	    
 	    $fieldConfig = new DistributionFieldConfig();
 	    $fieldConfig->setFieldName(YouTubeApiDistributionField::MEDIA_CATEGORY);
-	    $fieldConfig->setUserFriendlyFieldName(self::METADATA_FIELD_CATEGORY.' / Entry description');
+	    $fieldConfig->setUserFriendlyFieldName(self::METADATA_FIELD_CATEGORY);
 	    $fieldConfig->setEntryMrssXslt('
         			<xsl:choose>
                     	<xsl:when test="customData/metadata/'.self::METADATA_FIELD_CATEGORY.' != \'\'">
