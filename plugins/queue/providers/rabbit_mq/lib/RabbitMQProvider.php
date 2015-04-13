@@ -97,7 +97,7 @@ class RabbitMQProvider extends QueueProvider
         // exclusive=false to be accessed by other connections
         // auto-delete the queue after 12hours (43200000 ms)
         $channel->queue_declare($queueName, false, true, false, false, false,
-            new PhpAmqpLib\Wire\AMQPTable(array("x-expires"  => $this->timeout ))
+            new PhpAmqpLib\Wire\AMQPTable(array("x-expires"  => (int) $this->timeout ))
         );
         // close used resources 
         KalturaLog::debug("Queue [$queueName] created.");

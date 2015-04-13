@@ -23,7 +23,8 @@ class PushNotificationTemplate extends EventNotificationTemplate
             return false;
         
         // check if queue exists
-        $queueKey = $this->getQueueKey($scope);
+        $contentParameters = $this->getContentParameters();
+        $queueKey = $this->getQueueKey($contentParameters, null, $scope);
         $queueProvider = QueueProvider::getInstance();
         if (!$queueProvider->exists($queueKey))
         {
@@ -54,19 +55,18 @@ class PushNotificationTemplate extends EventNotificationTemplate
         return $this->getFromCustomData(self::CUSTOM_DATA_OBJECT_FORMAT);
     }    
     
-    protected function getQueueKey(kScope $scope)
+    public function getQueueKey($contentParameters, $partnerId = null, kScope $scope = null)
     {
         $templateId = $this->getId();
-        $partnerId = $scope->getPartnerId();
-        
-        $contentParameters = $this->getContentParameters();
+        if ($scope)
+            $partnerId = $scope->getPartnerId();
         
         // currently contentParams contains only one param (entryId), but for further support
         foreach ($contentParameters as $contentParameter)
         {
             /* @var $contentParameter kEventNotificationParameter */
             $value = $contentParameter->getValue();
-            if ($value instanceof kStringField)
+            if (($value instanceof kStringField) && ($scope) )
                 $value->setScope($scope);
         
             $key = $contentParameter->getKey();
@@ -102,10 +102,25 @@ class PushNotificationTemplate extends EventNotificationTemplate
             return;
         }
         
-        $queueKey = $this->getQueueKey($scope);
+        $contentParameters = $this->getContentParameters();
+        $queueKey = $this->getQueueKey($contentParameters, null, $scope);
         
         // get instance of activated queue proivder and send message
         $queueProvider = QueueProvider::getInstance();
         $queueProvider->send($queueKey, $this->getMessage($scope));
     }
+    
+    public function create($queueKey)
+    {
+        // get instance of activated queue proivder and create queue with given name
+        $queueProvider = QueueProvider::getInstance();
+        $queueProvider->create($queueKey);
+    }
+    
+    public function exists($queueKey)
+    {
+        // get instance of activated queue proivder and create queue with given name
+        $queueProvider = QueueProvider::getInstance();
+        return $queueProvider->exists($queueKey);
+    }    
 }

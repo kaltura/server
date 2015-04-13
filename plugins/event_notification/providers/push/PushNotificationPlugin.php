@@ -3,7 +3,7 @@
  * @package plugins.pushNotification
  */
 
-class PushNotificationPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaPending, IKalturaObjectLoader, IKalturaEnumerator, IKalturaApplicationTranslations
+class PushNotificationPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaPending, IKalturaObjectLoader, IKalturaEnumerator, IKalturaApplicationTranslations, IKalturaServices
 {
     const PLUGIN_NAME = 'pushNotification';
 
@@ -141,4 +141,14 @@ class PushNotificationPlugin extends KalturaPlugin implements IKalturaPermission
     
         return array($locale => $array);
     }
+    
+    /* (non-PHPdoc)
+     * @see IKalturaServices::getServicesMap()
+     */
+    public static function getServicesMap()
+    {
+        return array(
+            'pushNotificationTemplate' => 'PushNotificationTemplateService',
+        );
+    }    
 }

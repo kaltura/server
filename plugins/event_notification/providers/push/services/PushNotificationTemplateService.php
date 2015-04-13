@@ -1,0 +1,91 @@
+<?php
+/**
+ * Push Notification Template service that allows registration for a push queue 
+ *
+ * @service pushNotificationTemplate
+ * @package plugins.pushNotification
+ * @subpackage api.services
+ */
+class PushNotificationTemplateService extends KalturaBaseService
+{        
+    private function checkIfParamExists($templateParam, $userParamsArray)
+    {
+        foreach ($userParamsArray as $userParam)
+        {
+            if ($templateParam->getKey() == $userParam->toObject()->getKey())
+                return true;
+        }
+    }
+    
+    private function encode($msg)
+    {
+        // using a 128 Rijndael encyrption algorithm with Cipher-block chaining (CBC) as mode of AES encryption
+        $cipher = mcrypt_module_open(MCRYPT_RIJNDAEL_128, '', MCRYPT_MODE_CBC, '');
+        $secret = kConf::get("push_server_secret");
+        $iv = kConf::get("push_server_secret_iv");
+        
+        mcrypt_generic_init($cipher, $secret, $iv);
+        $cipherText256 = mcrypt_generic($cipher, $msg);
+        mcrypt_generic_deinit($cipher);
+        
+        return bin2hex($cipherText256);
+    }
+    
+	/**
+	 * Register to a queue from which event messages will be provided according to given template. Queue will be created if not already exists
+	 * 
+	 * @action register
+	 * @actionAlias eventNotification_eventNotificationTemplate.register
+	 * @param string $notificationTemplateSystemName Existing push notification template system name
+	 * @param KalturaEventNotificationParameterArray $userParamsArray User params
+	 * @return KalturaPushNotificationData
+	 */
+	function registerAction($notificationTemplateSystemName, $userParamsArray)
+	{
+	    // find the template, according to its system name, on both current partner and partner 0
+	    $partnerId = $this->getPartnerId();
+	    $partnersIds = array ( 
+	        PartnerPeer::GLOBAL_PARTNER,
+	        $partnerId,
+	     );
+	    $dbEventNotificationTemplate = EventNotificationTemplatePeer::retrieveBySystemName($notificationTemplateSystemName, null, $partnersIds);
+	    if (!$dbEventNotificationTemplate)
+	        throw new KalturaAPIException(KalturaEventNotificationErrors::EVENT_NOTIFICATION_TEMPLATE_SYSTEM_NAME_NOT_FOUND, $notificationTemplateSystemName);
+	    
+	    // verify template is push typed
+	    if (!$dbEventNotificationTemplate instanceof PushNotificationTemplate)
+	        throw new KalturaAPIException(KalturaEventNotificationErrors::EVENT_NOTIFICATION_WRONG_TYPE, $notificationTemplateSystemName, get_class($dbEventNotificationTemplate) );
+	    
+	    // Check all template needed params were actually given 
+	    $missingParams = array();
+	    $templateParams = $dbEventNotificationTemplate->getContentParameters();
+
+	    foreach ($templateParams as $templateParam)
+	    {
+	        if (!$this->checkIfParamExists($templateParam,$userParamsArray))
+	            array_push($missingParams, $templateParam->getKey());
+	    }
+	    
+	    if ( $missingParams != null )
+	        throw new KalturaAPIException(KalturaErrors::MISSING_MANDATORY_PARAMETER,  implode(",", $missingParams ));
+	    
+	    $queueKey = $dbEventNotificationTemplate->getQueueKey($userParamsArray->toObjectsArray(), $partnerId, null);
+	    
+	    // create queue if not exists 
+	    if (!$dbEventNotificationTemplate->exists($queueKey))
+	       $dbEventNotificationTemplate->create($queueKey);
+	    
+	    $result = new KalturaPushNotificationData();
+	    $result->key = $queueKey;
+
+	    // build the url to return
+	    $protocol = infraRequestUtils::getProtocol();
+	    $host = kConf::get("push_server_host");
+	    $templateId = $dbEventNotificationTemplate->getId();
+	    $secret = kConf::get("push_server_secret");
+	    $token = base64_encode($partnerId . ":" . $this->encode($secret . ":" . time() ) );
+	    $result->url = $protocol . "://" . $host ."/p/" . $partnerId ."/e/" . $templateId ."/t/" . $token;
+	    
+	    return $result;
+	}
+}
