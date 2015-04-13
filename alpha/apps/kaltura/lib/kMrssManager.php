@@ -297,7 +297,7 @@ class kMrssManager
 
 		// get the file size
 		$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-		list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($syncKey, false, false);
+		list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($syncKey, true, false);
 		$fileSize = ($fileSync && $fileSync->getFileSize() > 0) ? $fileSync->getFileSize() : ($flavorAsset->getSize() * 1024);
 		
 		$mediaParams = array(
