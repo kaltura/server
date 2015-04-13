@@ -107,9 +107,10 @@ class KalturaXmlSerializer extends KalturaSerializer
 	{
 		foreach($object as $key => $val)
 		{
-			echo '<item key="' . $key . '">';
+			echo "<item>";
+			echo "<itemKey>$key</itemKey>";
 			$this->serializeByType($val);
-			echo '</item>';
+			echo "</item>";
 		}
 	}
 	
