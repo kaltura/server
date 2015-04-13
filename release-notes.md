@@ -1,4 +1,32 @@
 ----------
+# Jupiter-10.9.0 #
+
+## YouTube API connector V3 ##
+
+- Issue Type: bug fix
+- Issue ID: PLAT-2776
+
+#### Configuration ####
+
+**google_auth.ini**
+
+Added `youtubeapi` section.
+
+#### Deployment Scripts ####
+
+None.
+
+#### Known Issues & Limitations ####
+
+The new API, currently, doesn't support existing features:
+
+- Disallow comments
+- Disallow ratings
+- Disallow responses
+- Set raw file name
+- Set start and end dates
+
+----------
 # Jupiter-10.8.0 #
 
 ## Tag-search - return all objects when no entitlement ##
@@ -8,7 +36,7 @@
 
 #### Configuration ####
 
-** sphinx/kaltura.conf **
+**sphinx/kaltura.conf**
 
 Added the following attribute to the kaltura_tag sphinx table. please re-index.
 
@@ -47,11 +75,11 @@ None.
 
 #### Configuration ####
 
-*plugins.ini*
+**plugins.ini**
 
 Add `MetadataSphinx` to the end of `Mandatory plugins` section (after `SphinxSearch`)
 
-*sphinx*
+**sphinx**
 
 Update `configurations/sphinx/kaltura.conf` according to template (a new index `kaltura_metadata` was added).
 
