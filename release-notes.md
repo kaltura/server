@@ -1,6 +1,33 @@
 ----------
 # Jupiter-10.9.0 #
 
+## YouTube API connector V3 ##
+
+***Note:*** Manual migration required to all existing accounts. 
+
+- Issue Type: bug fix
+- Issue ID: PLAT-2776
+
+#### Configuration ####
+
+**google_auth.ini**
+
+Added `youtubeapi` section.
+
+#### Deployment Scripts ####
+
+		deployment/updates/scripts/2015_04_12_migrate_youtube_api_category.php
+
+#### Known Issues & Limitations ####
+
+The new API, currently, doesn't support existing features:
+
+- Disallow comments
+- Disallow ratings
+- Disallow responses
+- Set raw file name
+- Set start and end dates
+
 ## Redirect live entry updates via its original DC ##
 
 - Issue Type: bug fix
@@ -33,7 +60,7 @@ None.
 
 #### Configuration ####
 
-** sphinx/kaltura.conf **
+**sphinx/kaltura.conf**
 
 Added the following attribute to the kaltura_tag sphinx table. please re-index.
 
@@ -72,11 +99,11 @@ None.
 
 #### Configuration ####
 
-*plugins.ini*
+**plugins.ini**
 
 Add `MetadataSphinx` to the end of `Mandatory plugins` section (after `SphinxSearch`)
 
-*sphinx*
+**sphinx**
 
 Update `configurations/sphinx/kaltura.conf` according to template (a new index `kaltura_metadata` was added).
 

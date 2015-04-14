@@ -1,4 +1,6 @@
-<?php 
+<?php
+require_once KALTURA_ROOT_PATH.'/vendor/google-api-php-client-1.1.2/src/Google/autoload.php';
+  
 /**
  * @package plugins.youtubeApiDistribution
  * @subpackage admin
@@ -52,41 +54,17 @@ class Form_YoutubeApiProfileConfiguration extends Form_ConfigurableProfileConfig
 			array('legend' => 'General', 'decorators' => array('FormElements', 'Fieldset'))
 		);
 				
-		// taken from http://gdata.youtube.com/schemas/2007/categories.cat
-		$youTubeCategories = array(
-			'Film' => 'Film & Animation',
-			'Autos' => 'Autos & Vehicles',
-			'Music' => 'Music',
-			'Animals' => 'Pets & Animals',
-			'Sports' => 'Sports',
-			'Travel' => 'Travel & Events',
-			'Games' => 'Gaming',
-			'Comedy' => 'Comedy',
-			'People' => 'People & Blogs',
-			'News' => 'News & Politics',
-			'Entertainment' => 'Entertainment',
-			'Education' => 'Education',
-			'Howto' => 'Howto & Style',
-			'Nonprofit' => 'Nonprofits & Activism',
-			'Tech' => 'Science & Technology',
-		);
-		
 		//  Metadata
-		$this->addElement('select', 'default_category', array(
-			'label' => 'Default Category:',
-			'multioptions' => $youTubeCategories,
-		));
+		$categories = $this->getCategories();
+		if($categories)
+		{
+			$this->addElement('select', 'default_category', array(
+				'label' => 'Default Category:',
+				'multioptions' => $this->getCategories()
+			));
+		}
 				
 		// Community
-		$this->addElement('select', 'allow_comments', array(
-			'label' => 'Allow Comments:',
-			'multioptions' => array(
-				'allowed' => 'allowed', 
-				'denied' => 'denied',
-				'moderated' => 'moderated',
-			)
-		));
-		
 		$this->addElement('select', 'allow_embedding', array(
 			'label' => 'Allow Embedding:',
 			'multioptions' => array(
@@ -95,12 +73,27 @@ class Form_YoutubeApiProfileConfiguration extends Form_ConfigurableProfileConfig
 			)
 		));
 		
+		$this->addElement('select', 'allow_comments', array(
+			'label' => 'Allow Comments:',
+			'multioptions' => array(
+				'allowed' => 'allowed', 
+				'denied' => 'denied',
+				'moderated' => 'moderated',
+			),
+			'default' => 'allowed',
+			'disabled' => true,
+			'title' => 'Currently not supported by you-tube API v3'
+		));
+		
 		$this->addElement('select', 'allow_ratings', array(
 			'label' => 'Allow Ratings:',
 			'multioptions' => array(
 				'allowed' => 'allowed', 
 				'denied' => 'denied',
-			)
+			),
+			'default' => 'allowed',
+			'disabled' => true,
+			'title' => 'Currently not supported by you-tube API v3'
 		));
 		
 		$this->addElement('select', 'allow_responses', array(
@@ -109,13 +102,39 @@ class Form_YoutubeApiProfileConfiguration extends Form_ConfigurableProfileConfig
 				'allowed' => 'allowed', 
 				'denied' => 'denied',
 				'moderated' => 'moderated',
-			)
+			),
+			'default' => 'allowed',
+			'disabled' => true,
+			'title' => 'Currently not supported by you-tube API v3'
 		));
 		
 		$this->addDisplayGroup(
-			array('allow_comments', 'allow_embedding', 'allow_ratings', 'allow_responses'), 
+			array('allow_embedding', 'allow_comments', 'allow_ratings', 'allow_responses'), 
 			'community', 
 			array('legend' => 'Community', 'decorators' => array('FormElements', 'Fieldset'))
 		);
+	}
+	
+	protected function getCategories()
+	{
+		if(!$this->distributionProfile || !$this->distributionProfile->googleTokenData)
+			return null;
+			
+		$distributionProfile = $this->distributionProfile;
+		/* @var $distributionProfile Kaltura_Client_YoutubeApiDistribution_Type_YoutubeApiDistributionProfile */
+		
+		$client = new Google_Client();
+		$client->setClientId($distributionProfile->googleClientId);
+		$client->setClientSecret($distributionProfile->googleClientSecret);
+		$client->setAccessToken(str_replace('\\', '', $distributionProfile->googleTokenData));
+		
+		$youtube = new Google_Service_YouTube($client);
+		$categoriesListResponse = $youtube->videoCategories->listVideoCategories('id,snippet', array('regionCode' => 'us'));
+		$categories = array();
+		foreach($categoriesListResponse->getItems() as $category)
+		{
+			$categories[$category['id']] = $category['snippet']['title'];
+		}
+		return $categories;
 	}
 }

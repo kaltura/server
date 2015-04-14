@@ -8,13 +8,11 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 	IDistributionEngineCloseSubmit, 
 	IDistributionEngineUpdate,
 	IDistributionEngineDelete,
-	IDistributionEngineReport,
 	IDistributionEngineEnable,
 	IDistributionEngineDisable
 {
 	protected $tempXmlPath;
-	
-	protected $timeout = 10;
+	protected $timeout = 90;
 	
 	/* (non-PHPdoc)
 	 * @see DistributionEngine::configure()
@@ -44,6 +42,29 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 		KalturaLog::info('Request timeout was set to ' . $this->timeout . ' seconds');
 	}
 
+	/**
+	 * @param KalturaYoutubeApiDistributionJobProviderData $providerData
+	 * @return Google_Client
+	 */
+	protected function initClient(KalturaYoutubeApiDistributionProfile $distributionProfile)
+	{
+		require_once KALTURA_ROOT_PATH.'/vendor/google-api-php-client-1.1.2/src/Google/autoload.php'; 
+		
+		$options = array(
+			CURLOPT_VERBOSE => true,
+			CURLOPT_STDERR => STDOUT,
+			CURLOPT_TIMEOUT => $this->timeout,
+		);
+		
+		$client = new Google_Client();
+		$client->getIo()->setOptions($options);
+		$client->setClientId($distributionProfile->googleClientId);
+		$client->setClientSecret($distributionProfile->googleClientSecret);
+		$client->setAccessToken(str_replace('\\', '', $distributionProfile->googleTokenData));
+		
+		return $client;
+	}
+
 	/* (non-PHPdoc)
 	 * @see IDistributionEngineSubmit::submit()
 	 */
@@ -56,109 +77,260 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 	}
 
 	/**
-	 * @param KalturaDistributionJobData $data
+	 * Tries to transalte the friendly name of the category to the api value, if not found the distribution progile default will be used
+	 * @param Google_Service_YouTube $youtube
 	 * @param KalturaYoutubeApiDistributionProfile $distributionProfile
-	 * @return array()
-	 */
-	protected function getYoutubeApiProps()
-	{			
-		$props = array();
-		$props['keywords'] = $this->getValueForField(KalturaYouTubeApiDistributionField::MEDIA_KEYWORDS);
-		$props['title'] = $this->getValueForField(KalturaYouTubeApiDistributionField::MEDIA_TITLE);
-		$props['category'] = $this->translateCategory($this->getValueForField(KalturaYouTubeApiDistributionField::MEDIA_CATEGORY));
-		$props['description'] = $this->getValueForField(KalturaYouTubeApiDistributionField::MEDIA_DESCRIPTION);
-		$props['playlistIds'] = $this->getValueForField(KalturaYouTubeApiDistributionField::MEDIA_PLAYLIST_IDS);
-		
-		$props['start_date'] = $this->getValueForField(KalturaYouTubeApiDistributionField::START_DATE);
-		$props['end_date'] = $this->getValueForField(KalturaYouTubeApiDistributionField::END_DATE);
-		
-		$props['comment'] = $this->getValueForField(KalturaYouTubeApiDistributionField::ALLOW_COMMENTS);
-		$props['rate'] = $this->getValueForField(KalturaYouTubeApiDistributionField::ALLOW_RATINGS);
-		$props['commentVote'] = $this->getValueForField(KalturaYouTubeApiDistributionField::ALLOW_RATINGS);
-		$props['videoRespond'] = $this->getValueForField(KalturaYouTubeApiDistributionField::ALLOW_RESPONSES);
-		$props['embed'] = $this->getValueForField(KalturaYouTubeApiDistributionField::ALLOW_EMBEDDING);		
-
-		$props['slugHeader'] = $this->getValueForField(KalturaYouTubeApiDistributionField::ALT_RAW_FILENAME);
-		
-		KalturaLog::debug("Props [" . print_r($props, true) . "]");
-
-		return $props;
-	}
-	
-	/**
-	 * Tries to transalte the friendly name of the category to the api value, if not found the input value will be returned (as a fallback)
 	 * @param string $category
+	 * @return int
 	 */
-	protected function translateCategory($category)
+	protected function translateCategory(Google_Service_YouTube $youtube, KalturaYoutubeApiDistributionProfile $distributionProfile, $categoryName)
 	{
-		foreach(YouTubeApiImpl::getCategoriesMap() as $id => $name)
+		if($categoryName)
 		{
-			if ($name == $category)
-				return $id;
+			$categoriesListResponse = $youtube->videoCategories->listVideoCategories('id,snippet', array('regionCode' => 'us'));
+			foreach($categoriesListResponse->getItems() as $category)
+			{
+				if($category['snippet']['title'] == $categoryName)
+					return $category['id'];
+			}
+			KalturaLog::warning("Partner [$distributionProfile->partnerId] Distribution-Profile [$distributionProfile->id] category [$categoryName] not found");
 		}
-		return $category;
+		
+		if($distributionProfile->defaultCategory)
+			return $distributionProfile->defaultCategory;
+		
+		return $categoryName;
+	}
+
+	protected function doCloseSubmit(KalturaDistributionSubmitJobData $data, KalturaYoutubeApiDistributionProfile $distributionProfile)
+	{
+		$client = $this->initClient($distributionProfile);
+		$youtube = new Google_Service_YouTube($client);
+
+		$listResponse = $youtube->videos->listVideos('status', array('id' => $data->entryDistribution->remoteId));
+		$video = reset($listResponse->getItems());
+		KalturaLog::debug("Video: " . print_r($video, true));
+		
+		switch($video['modelData']['status']['uploadStatus'])
+		{
+			case 'deleted':
+				throw new Exception("Video deleted on YouTube side");
+				
+			case 'failed':
+				switch($video['modelData']['status']['failureReason'])
+				{
+					case 'codec':
+						throw new Exception("Video failed because of its codec");
+					case 'conversion':
+						throw new Exception("Video failed on conversion");
+					case 'emptyFile':
+						throw new Exception("Video failed because the file is empty");
+					case 'invalidFile':
+						throw new Exception("Video failed - invalid file");
+					case 'tooSmall':
+						throw new Exception("Video failed because the file is too small");
+					case 'uploadAborted':
+						throw new Exception("Video failed because upload aborted");
+					default:
+						throw new Exception("Unknown failure reason [" . $video['modelData']['status']['failureReason'] . "]");
+				}
+				
+			case 'rejected':
+				switch($video['modelData']['status']['rejectionReason'])
+				{
+					case 'claim':
+						throw new Exception("Video rejected due to claim");
+					case 'copyright':
+						throw new Exception("Video rejected due to copyrights");
+					case 'duplicate':
+						throw new Exception("Video rejected due to duplication");
+					case 'inappropriate':
+						throw new Exception("Video rejected because it's inappropriate");
+					case 'length':
+						throw new Exception("Video rejected due its length");
+					case 'termsOfUse':
+						throw new Exception("Video rejected because it crossed the terms of use");
+					case 'trademark':
+						throw new Exception("Video rejected due to trademark");
+					case 'uploaderAccountClosed':
+						throw new Exception("Video rejected because uploader account closed");
+					case 'uploaderAccountSuspended':
+						throw new Exception("Video rejected because uploader account suspended");
+					default:
+						throw new Exception("Unknown rejection reason [" . $video['modelData']['status']['rejectionReason'] . "]");
+				}
+				
+			case 'uploaded':
+				return false;
+				
+			case 'processed':
+				return true;
+				
+			default:
+				throw new Exception("Unknown video status [" . $video['modelData']['status']['uploadStatus'] . "]");
+		}
 	}
 	
-	public function doSubmit(KalturaDistributionSubmitJobData $data, KalturaYoutubeApiDistributionProfile $distributionProfile)
-	{	
-	    $this->fieldValues = unserialize($data->providerData->fieldValues);
-	    
-		$private = true;
-		if($data->entryDistribution->sunStatus == KalturaEntryDistributionSunStatus::AFTER_SUNRISE)
-			$private = false;
-		
-		$needDel = false;
-		$entry = $this->getEntry($data->entryDistribution->partnerId, $data->entryDistribution->entryId);
-		$props = $this->getYoutubeApiProps();
+	protected function doSubmit(KalturaDistributionSubmitJobData $data, KalturaYoutubeApiDistributionProfile $distributionProfile)
+	{
+		$client = $this->initClient($distributionProfile);
+		$youtube = new Google_Service_YouTube($client);
+
 		if($data->entryDistribution->remoteId)
 		{
-			$youTubeApiImpl = new YouTubeApiImpl($distributionProfile->username, $distributionProfile->password, $this->getHttpClientConfig());
-			$youTubeApiImpl->updateEntry($data->entryDistribution->remoteId, $props, $private);
-		
 			$data->remoteId = $data->entryDistribution->remoteId;
-			return true;
 		}
-			
-		$videoFilePath = $data->providerData->videoAssetFilePath;
-		
-		if (!$videoFilePath)
-			throw new KalturaException('No video asset to distribute, the job will fail');
-			
-		if (!file_exists($videoFilePath))
-			throw new KalturaDistributionException('The file ['.$videoFilePath.'] was not found (probably not synced yet), the job will retry');
-		
-		if (FALSE === strstr($videoFilePath, "."))
+		else
 		{
-			$videoFilePathNew = $this->tempXmlPath . "/" . uniqid() . ".dme";
-
-			if (!file_exists($videoFilePathNew))
+			$videoPath = $data->providerData->videoAssetFilePath;
+			if (!$videoPath)
+				throw new KalturaException('No video asset to distribute, the job will fail');
+			if (!file_exists($videoPath))
+				throw new KalturaDistributionException("The file [$videoPath] was not found (probably not synced yet), the job will retry");
+			
+			$needDel = false;
+			if (strstr($videoPath, ".") === false)
 			{
-				copy($videoFilePath,$videoFilePathNew);
-				$needDel = true;
-			}
-			$videoFilePath = $videoFilePathNew;
-		}
-		
-		$youTubeApiImpl = new YouTubeApiImpl($distributionProfile->username, $distributionProfile->password, $this->getHttpClientConfig());
-		$remoteId = $youTubeApiImpl->uploadVideo($videoFilePath, $props, $private);
+				$videoPathNew = $this->tempXmlPath . "/" . uniqid() . ".dme";
 	
-		if ($needDel == true)
-		{
-			unlink($videoFilePath);
-		}
-		$data->remoteId = $remoteId;
+				if (!file_exists($videoPathNew))
+				{
+					copy($videoPath,$videoPathNew);
+					$needDel = true;
+				}
+				$videoPath = $videoPathNew;
+			}
+			
+			$this->fieldValues = unserialize($data->providerData->fieldValues);
+	
+	//		$props['start_date'] = $this->getValueForField(KalturaYouTubeApiDistributionField::START_DATE);
+	//		$props['end_date'] = $this->getValueForField(KalturaYouTubeApiDistributionField::END_DATE);
+			
+			$snippet = new Google_Service_YouTube_VideoSnippet();
+			$snippet->setTitle($this->getValueForField(KalturaYouTubeApiDistributionField::MEDIA_TITLE));
+			$snippet->setDescription($this->getValueForField(KalturaYouTubeApiDistributionField::MEDIA_DESCRIPTION));		
+			$snippet->setTags(explode(',', $this->getValueForField(KalturaYouTubeApiDistributionField::MEDIA_KEYWORDS)));
+			$snippet->setCategoryId($this->translateCategory($youtube, $distributionProfile, $this->getValueForField(KalturaYouTubeApiDistributionField::MEDIA_CATEGORY)));
+	
+			$status = new Google_Service_YouTube_VideoStatus();
+			$status->setPrivacyStatus('private');
+			$status->setEmbeddable(false);
+			
+			if($data->entryDistribution->sunStatus == KalturaEntryDistributionSunStatus::AFTER_SUNRISE)
+			{
+				$status->setPrivacyStatus('public');
+			}
+			if($this->getValueForField(KalturaYouTubeApiDistributionField::ALLOW_EMBEDDING) == 'allowed')
+			{
+				$status->setEmbeddable(true);
+			}
 		
-		$captionsInfo = $data->providerData->captionsInfo;
-		/* @var $captionInfo KalturaYouTubeApiCaptionDistributionInfo */
-		foreach ($captionsInfo as $captionInfo){
-			if ($captionInfo->action == KalturaYouTubeApiDistributionCaptionAction::SUBMIT_ACTION){
-				$data->mediaFiles[] = $this->submitCaption($youTubeApiImpl, $captionInfo, $data->remoteId);
+			$video = new Google_Service_YouTube_Video();
+			$video->setSnippet($snippet);
+			$video->setStatus($status);
+			
+			$client->setDefer(true);
+			$request = $youtube->videos->insert("status,snippet", $video);
+			
+			$chunkSizeBytes = 1 * 1024 * 1024;
+			$media = new Google_Http_MediaFileUpload($client, $request, 'video/*', null, true, $chunkSizeBytes);
+			$media->setFileSize(filesize($videoPath));
+	
+			$ingestedVideo = false;
+			$handle = fopen($videoPath, "rb");
+			while (!$ingestedVideo && !feof($handle)) 
+			{
+				$chunk = fread($handle, $chunkSizeBytes);
+				$ingestedVideo = $media->nextChunk($chunk);
+			}
+			/* @var $ingestedVideo Google_Service_YouTube_Video */
+	
+			fclose($handle);
+			$client->setDefer(false);
+	
+			$data->remoteId = $ingestedVideo->getId();
+	
+			if ($needDel == true)
+			{
+				unlink($videoPath);
 			}
 		}
 		
-		if ( $props['playlistIds'] ) {
-			$youTubeApiImpl->attachVideoEntryToPlaylistIds( $remoteId, $props['playlistIds'] );
-		} 
+		foreach ($data->providerData->captionsInfo as $captionInfo){
+			/* @var $captionInfo KalturaYouTubeApiCaptionDistributionInfo */
+			if ($captionInfo->action == KalturaYouTubeApiDistributionCaptionAction::SUBMIT_ACTION)
+			{
+				$data->mediaFiles[] = $this->submitCaption($youtube, $captionInfo, $data->remoteId);
+			}
+		}
+		
+		$playlistIds = explode(',', $this->getValueForField(KalturaYouTubeApiDistributionField::MEDIA_PLAYLIST_IDS));
+		$this->syncPlaylistIds($youtube, $data->remoteId, $playlistIds); 
+		
+		return false;
+	}
+	
+	protected function doUpdate(KalturaDistributionUpdateJobData $data, KalturaYoutubeApiDistributionProfile $distributionProfile, $enable = true)
+	{
+		$this->fieldValues = unserialize($data->providerData->fieldValues);
+
+		$client = $this->initClient($distributionProfile);
+		$youtube = new Google_Service_YouTube($client);
+
+		$listResponse = $youtube->videos->listVideos('snippet,status', array('id' => $data->entryDistribution->remoteId));
+		$video = reset($listResponse->getItems());
+		
+//		$props['start_date'] = $this->getValueForField(KalturaYouTubeApiDistributionField::START_DATE);
+//		$props['end_date'] = $this->getValueForField(KalturaYouTubeApiDistributionField::END_DATE);
+		
+		$snippet = $video['snippet'];
+		$snippet['title'] = $this->getValueForField(KalturaYouTubeApiDistributionField::MEDIA_TITLE);
+		$snippet['description'] = $this->getValueForField(KalturaYouTubeApiDistributionField::MEDIA_DESCRIPTION);
+		$snippet['tags'] = explode(',', $this->getValueForField(KalturaYouTubeApiDistributionField::MEDIA_KEYWORDS));
+ 		$snippet['category'] = $this->translateCategory($youtube, $distributionProfile, $this->getValueForField(KalturaYouTubeApiDistributionField::MEDIA_CATEGORY));
+		
+		$status = $video['status'];
+		$status['privacyStatus'] = 'private';
+		$status['embeddable'] = false;
+		
+		if($enable && $data->entryDistribution->sunStatus == KalturaEntryDistributionSunStatus::AFTER_SUNRISE)
+		{
+			$status['privacyStatus'] = 'public';
+		}
+		if($this->getValueForField(KalturaYouTubeApiDistributionField::ALLOW_EMBEDDING) == 'allowed')
+		{
+			$status['embeddable'] = true;
+		}
+	
+		$youtube->videos->update('snippet,status', $video);
+
+		foreach ($data->providerData->captionsInfo as $captionInfo)
+		{
+			/* @var $captionInfo KalturaYouTubeApiCaptionDistributionInfo */
+			switch ($captionInfo->action){
+				case KalturaYouTubeApiDistributionCaptionAction::SUBMIT_ACTION:
+					$data->mediaFiles[] = $this->submitCaption($youtube, $captionInfo, $data->entryDistribution->remoteId);
+					break;
+				case KalturaYouTubeApiDistributionCaptionAction::UPDATE_ACTION:
+					$this->updateCaption($youtube, $captionInfo, $data->mediaFiles);
+					break;
+				case KalturaYouTubeApiDistributionCaptionAction::DELETE_ACTION:
+					$this->deleteCaption($youtube, $captionInfo);
+					break;
+			}
+		}
+		
+		$playlistIds = explode(',', $this->getValueForField(KalturaYouTubeApiDistributionField::MEDIA_PLAYLIST_IDS));
+		$this->syncPlaylistIds($youtube, $data->entryDistribution->remoteId, $playlistIds); 
+		
+		return true;
+	}
+	
+	protected function doDelete(KalturaDistributionDeleteJobData $data, KalturaYoutubeApiDistributionProfile $distributionProfile)
+	{
+		$client = $this->initClient($distributionProfile);
+		$youtube = new Google_Service_YouTube($client);
+		$youtube->videos->delete($data->entryDistribution->remoteId);
 		
 		return true;
 	}
@@ -168,26 +340,10 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 	 */
 	public function closeSubmit(KalturaDistributionSubmitJobData $data)
 	{
-		$distributionProfile = $data->distributionProfile;
-		$youTubeApiImpl = new YouTubeApiImpl($distributionProfile->username, $distributionProfile->password, $this->getHttpClientConfig());
-		
-		$status = $youTubeApiImpl->getStatus($data->remoteId);
-				
-		switch($status)
-		{
-			case 'encoding_error':
-				throw new Exception("YoutubeApi error encoding");
-							
-			case 'waiting':
-			case 'processing':
-			case 'rejected':
-				return false;
-							
-			case 'deleted':
-			case 'ready':
-			case 'published':
-				return true;
-		}
+		if(!$data->distributionProfile || !($data->distributionProfile instanceof KalturaYoutubeApiDistributionProfile))
+			throw new Exception("Distribution profile must be of type KalturaYoutubeApiDistributionProfile");
+	
+		return $this->doCloseSubmit($data, $data->distributionProfile);
 	}
 	
 	/* (non-PHPdoc)
@@ -220,43 +376,7 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 		if(!$data->distributionProfile || !($data->distributionProfile instanceof KalturaYoutubeApiDistributionProfile))
 			throw new Exception("Distribution profile must be of type KalturaYoutubeApiDistributionProfile");
 	
-		return $this->doUpdate($data, $data->distributionProfile, true);
-	}
-	
-	public function doUpdate(KalturaDistributionUpdateJobData $data, KalturaYoutubeApiDistributionProfile $distributionProfile, $enabled = null)
-	{
-	    $this->fieldValues = unserialize($data->providerData->fieldValues);
-	    	    
-		$private = true;
-		if($enabled === true || (is_null($enabled) && $data->entryDistribution->sunStatus == KalturaEntryDistributionSunStatus::AFTER_SUNRISE))
-			$private = false;
-		
-		$entry = $this->getEntry($data->entryDistribution->partnerId, $data->entryDistribution->entryId);
-		$props = $this->getYoutubeApiProps();
-	
-		$youTubeApiImpl = new YouTubeApiImpl($distributionProfile->username, $distributionProfile->password, $this->getHttpClientConfig());
-		$youTubeApiImpl->updateEntry($data->remoteId, $props, $private);
-		
-		$captionsInfo = $data->providerData->captionsInfo;
-		/* @var $captionInfo KalturaYouTubeApiCaptionDistributionInfo */
-		foreach ($captionsInfo as $captionInfo){
-			switch ($captionInfo->action){
-				case KalturaYouTubeApiDistributionCaptionAction::SUBMIT_ACTION:
-					$data->mediaFiles[] = $this->submitCaption($youTubeApiImpl,$captionInfo, $data->remoteId);
-					break;
-				case KalturaYouTubeApiDistributionCaptionAction::UPDATE_ACTION:
-					if (!file_exists($captionInfo->filePath ))
-						throw new KalturaDistributionException('The caption file ['.$captionInfo->filePath.'] was not found (probably not synced yet), the job will retry');
-					$captionContent = $this->getFileBinaryContent($captionInfo->filePath);
-					$youTubeApiImpl->updateCaption ( $data->remoteId, $captionInfo->remoteId, $captionContent );
-					$this->updateRemoteMediaFileVersion($data,$captionInfo);
-					break;
-				case KalturaYouTubeApiDistributionCaptionAction::DELETE_ACTION:
-					$youTubeApiImpl->deleteCaption($data->remoteId, $captionInfo->remoteId);
-					break;
-			}
-		}
-		return true;
+		return $this->doUpdate($data, $data->distributionProfile);
 	}
 	
 	/* (non-PHPdoc)
@@ -264,59 +384,18 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 	 */
 	public function delete(KalturaDistributionDeleteJobData $data)
 	{
-		$distributionProfile = $data->distributionProfile;
-		$youTubeApiImpl = new YouTubeApiImpl($distributionProfile->username, $distributionProfile->password, $this->getHttpClientConfig());
-		
-		$youTubeApiImpl->deleteEntry($data->remoteId);
-		
-		$captionsInfo = $data->providerData->captionsInfo;
-		/* @var $captionInfo KalturaYouTubeApiCaptionDistributionInfo */
-		foreach ($captionsInfo as $captionInfo){
-			if ($captionInfo->action == KalturaYouTubeApiDistributionCaptionAction::DELETE_ACTION){
-				$youTubeApiImpl->deleteCaption ( $data->remoteId, $captionInfo->remoteId);
-			}
+		if(!$data->distributionProfile || !($data->distributionProfile instanceof KalturaYoutubeApiDistributionProfile))
+			throw new Exception("Distribution profile must be of type KalturaYoutubeApiDistributionProfile");
+	
+		return $this->doDelete($data, $data->distributionProfile);
+	}
+	
+	protected function getValueForField($fieldName)
+	{
+		if (isset($this->fieldValues[$fieldName])) {
+			return $this->fieldValues[$fieldName];
 		}
-		return true;
-	}
-	
-	/* (non-PHPdoc)
-	 * @see IDistributionEngineReport::fetchReport()
-	 */
-	public function fetchReport(KalturaDistributionFetchReportJobData $data)
-	{
-		// TODO
-	}
-	
-	/**
-	 * @return array
-	 */
-	protected function getHttpClientConfig()
-	{
-		return array('timeout' => $this->timeout);
-	}
-	
-	private function getValueForField($fieldName)
-	{
-	    if (isset($this->fieldValues[$fieldName])) {
-	        return $this->fieldValues[$fieldName];
-	    }
-	    return null;
-	}
-	
-	private function getFileBinaryContent($filePath){
-		if (! file_exists( $filePath )){
-			throw new KalturaDistributionException ( "Caption file [$filePath] was not found" );
-		}
-		$fh = fopen ( $filePath, 'r' );
-		return fread ( $fh, filesize ( $filePath ) );
-	}
-	
-	private function getNewRemoteMediaFile($captionRemoteId , $captionInfo) {
-		$remoteMediaFile = new KalturaDistributionRemoteMediaFile ();
-		$remoteMediaFile->remoteId = $captionRemoteId;
-		$remoteMediaFile->version = $captionInfo->version;
-		$remoteMediaFile->assetId = $captionInfo->assetId;
-		return $remoteMediaFile;
+		return null;
 	}
 	
 	private function updateRemoteMediaFileVersion(KalturaDistributionRemoteMediaFileArray &$remoteMediaFiles, KalturaYouTubeApiCaptionDistributionInfo $captionInfo){
@@ -329,12 +408,131 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 		}
 	}
 	
-	private function submitCaption($youTubeApiImpl, $captionInfo, $remoteId) {
+	protected function deleteCaption(Google_Service_YouTube $youtube, KalturaYouTubeApiCaptionDistributionInfo $captionInfo)
+	{
+		$youtube->captions->delete($captionInfo->remoteId);
+	}
+	
+	protected function updateCaption(Google_Service_YouTube $youtube, KalturaYouTubeApiCaptionDistributionInfo $captionInfo, KalturaDistributionRemoteMediaFileArray &$mediaFiles)
+	{
+		$captionSnippet = new Google_Service_YouTube_CaptionSnippet();
+		$captionSnippet->setName($captionInfo->label);
+	
+		$caption = new Google_Service_YouTube_Caption();
+		$caption->setId($captionInfo->remoteId);
+		$caption->setSnippet($captionSnippet);
+		
+		$chunkSizeBytes = 1 * 1024 * 1024;
+		$youtube->getClient()->setDefer(true);
+		$captionUpdateRequest = $youtube->captions->update('snippet', $caption);
+
+		$media = new Google_Http_MediaFileUpload($youtube->getClient(), $captionUpdateRequest, '*/*', null, true, $chunkSizeBytes);
+		$media->setFileSize(filesize($captionInfo->filePath));
+
+		$updatedCaption = false;
+		$handle = fopen($captionInfo->filePath, "rb");
+		while (!$updatedCaption && !feof($handle))
+		{
+			$chunk = fread($handle, $chunkSizeBytes);
+			$updatedCaption = $media->nextChunk($chunk);
+		}
+		fclose($handle);
+
+		$youtube->getClient()->setDefer(false);
+		
+		foreach ($mediaFiles as $remoteMediaFile)
+		{
+			if ($mediaFiles->assetId == $captionInfo->assetId)
+			{
+				$mediaFiles->version = $captionInfo->version;
+				break;
+			}			
+		}
+	}
+	
+	protected function submitCaption(Google_Service_YouTube $youtube, KalturaYouTubeApiCaptionDistributionInfo $captionInfo, $remoteId)
+	{
 		if (!file_exists($captionInfo->filePath ))
-			throw new KalturaDistributionException('The caption file ['.$captionInfo->filePath.'] was not found (probably not synced yet), the job will retry');
-		$captionContent = $this->getFileBinaryContent ( $captionInfo->filePath );
-		KalturaLog::debug ( 'Submitting caption [' . $captionInfo->assetId . ']' );
-		$captionRemoteId = $youTubeApiImpl->uploadCaption ( $remoteId, $captionContent, $captionInfo->language );
-		return $this->getNewRemoteMediaFile ( $captionRemoteId, $captionInfo );
+			throw new KalturaDistributionException("The caption file [$captionInfo->filePath] was not found (probably not synced yet), the job will retry");
+			
+		KalturaLog::debug("Submitting caption [$captionInfo->assetId]");
+		
+		$captionSnippet = new Google_Service_YouTube_CaptionSnippet();
+		$captionSnippet->setVideoId($remoteId);
+		$captionSnippet->setLanguage($captionInfo->language);
+		$captionSnippet->setName($captionInfo->label);
+	
+		$caption = new Google_Service_YouTube_Caption();
+		$caption->setSnippet($captionSnippet);
+	
+		$chunkSizeBytes = 1 * 1024 * 1024;
+		$youtube->getClient()->setDefer(true);
+		$insertRequest = $youtube->captions->insert('snippet', $caption);
+	
+		$media = new Google_Http_MediaFileUpload($youtube->getClient(), $insertRequest, '*/*', null, true, $chunkSizeBytes);
+		$media->setFileSize(filesize($captionInfo->filePath));
+	
+		$ingestedCaption = false;
+		$handle = fopen($captionInfo->filePath, "rb");
+		while (!$ingestedCaption && !feof($handle)) 
+		{
+			$chunk = fread($handle, $chunkSizeBytes);
+			$ingestedCaption = $media->nextChunk($chunk);
+		}
+	
+		fclose($handle);
+		$youtube->getClient()->setDefer(false);
+		
+		$remoteMediaFile = new KalturaDistributionRemoteMediaFile ();
+		$remoteMediaFile->remoteId = $ingestedCaption['id'];
+		$remoteMediaFile->version = $captionInfo->version;
+		$remoteMediaFile->assetId = $captionInfo->assetId;
+		return $remoteMediaFile;
+	}
+	
+	protected function syncPlaylistIds(Google_Service_YouTube $youtube, $remoteId, array $playlistIds)
+	{
+		$playlistsResponseList = $youtube->playlists->listPlaylists('id,snippet', array('mine' => true));
+		foreach($playlistsResponseList->getItems() as $playlist)
+		{
+			$playlistId = $playlist['id'];
+			if(!in_array($playlistId, $playlistIds))
+			{
+				$playlistsItemsListResponse = $youtube->playlistItems->listPlaylistItems('snippet', array(
+					'playlistId' => $playlistId,
+					'videoId' => $remoteId
+				));
+				foreach($playlistsItemsListResponse->getItems() as $playlistItem)
+				{
+					$youtube->playlistItems->delete($playlistItem['id']);
+				}
+			}
+		}
+		
+		foreach($playlistIds as $playlistId)
+		{
+			if(!$playlistId)
+				continue;
+				
+			$playlistsItemsListResponse = $youtube->playlistItems->listPlaylistItems('snippet', array(
+				'playlistId' => $playlistId,
+				'videoId' => $remoteId
+			));
+			
+			if(count($playlistsItemsListResponse->getItems()))
+				continue;
+				
+			$resourceId = new Google_Service_YouTube_ResourceId();
+			$resourceId->setKind('youtube#video');
+			$resourceId->setVideoId($remoteId);
+			
+			$snippet = new Google_Service_YouTube_PlaylistItemSnippet();
+			$snippet->setPlaylistId($playlistId);
+			$snippet->setResourceId($resourceId);
+			
+			$playlistItem = new Google_Service_YouTube_PlaylistItem();
+			$playlistItem->setSnippet($snippet);
+			$youtube->playlistItems->insert('snippet', $playlistItem);
+		}
 	}
 }
