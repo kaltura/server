@@ -55,10 +55,14 @@ class Form_YoutubeApiProfileConfiguration extends Form_ConfigurableProfileConfig
 		);
 				
 		//  Metadata
-		$this->addElement('select', 'default_category', array(
-			'label' => 'Default Category:',
-			'multioptions' => $this->getCategories()
-		));
+		$categories = $this->getCategories();
+		if($categories)
+		{
+			$this->addElement('select', 'default_category', array(
+				'label' => 'Default Category:',
+				'multioptions' => $this->getCategories()
+			));
+		}
 				
 		// Community
 		$this->addElement('select', 'allow_embedding', array(
@@ -113,6 +117,9 @@ class Form_YoutubeApiProfileConfiguration extends Form_ConfigurableProfileConfig
 	
 	protected function getCategories()
 	{
+		if(!$this->distributionProfile)
+			return null;
+			
 		$distributionProfile = $this->distributionProfile;
 		/* @var $distributionProfile Kaltura_Client_YoutubeApiDistribution_Type_YoutubeApiDistributionProfile */
 		
