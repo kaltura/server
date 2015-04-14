@@ -4,6 +4,7 @@
  */
 class KMrssDropFolderEngine extends KDropFolderEngine 
 {
+	const MRSS_NS = "http://search.yahoo.com/mrss/";
 	/**
 	 * @var array
 	 */
@@ -69,8 +70,13 @@ class KMrssDropFolderEngine extends KDropFolderEngine
 		KalturaLog::debug('Add drop folder file ['.$fileName.'] last modification time ['.$lastModificationTime.'] file size ['.$fileSize.']');
 		try 
 		{
-			//Register MRSS media namespace on the separate <item>
-			$feedItem->addAttribute('xmlns:xmlns:media', self::MRSS_NS);
+			//Register MRSS media namespaces on the separate <item>
+			foreach ($this->mrssNamespaces as $nameSpace => $url)
+			{
+				KalturaLog::debug("Add original namespace $nameSpace with URL $url to separate <item>");
+				//This is a PHP weakness- the only way to prettily add a namespace to an XML
+				$feedItem->addAttribute("xmlns:xmlns:$nameSpace", $url);
+			}
 			$feedPath = $this->saveFeedItemToDisk ($feedItem, $contentUpdateRequired);
 			
 			$newDropFolderFile = new KalturaMrssDropFolderFile();
@@ -78,7 +84,7 @@ class KMrssDropFolderEngine extends KDropFolderEngine
 	    	$newDropFolderFile->fileName = strval($feedItem->guid);
 	    	$newDropFolderFile->lastModificationTime = strval($feedItem->pubDate); 
 	    	
-	    	if (isset ($feedItem->children('media', true)->content[0]->attributes()->fileSize ))
+	    	if (isset ($feedItem->children(self::MRSS_NS)->content[0]->attributes()->fileSize ))
 	    	{
 	    		$newDropFolderFile->fileSize = intval($feedItem->children(self::MRSS_NS)->content[0]->attributes()->fileSize);
 	    	}
@@ -125,8 +131,8 @@ class KMrssDropFolderEngine extends KDropFolderEngine
 	{
 		if (!$contentUpdateRequired)
 		{
-			unset($feedItem->content[0][0]);
 			KalturaLog::debug("Removing content tags from MRSS");
+			//TODO remove media:content tags from feed item
 		}
 		
 		$updatedGuid = str_replace (self::$searchCharacters, self::$replaceCharacters, strval ($feedItem->guid));
