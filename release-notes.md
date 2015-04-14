@@ -14,7 +14,7 @@ Added `youtubeapi` section.
 
 #### Deployment Scripts ####
 
-None.
+		deployment/updates/scripts/2015_04_12_migrate_youtube_api_category.php
 
 #### Known Issues & Limitations ####
 
