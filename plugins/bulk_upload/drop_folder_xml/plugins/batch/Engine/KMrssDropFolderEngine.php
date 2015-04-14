@@ -5,6 +5,10 @@
 class KMrssDropFolderEngine extends KDropFolderEngine 
 {
 	const MRSS_NS = 'http://search.yahoo.com/mrss/';
+	
+	static $searchCharacters = array ('/');
+	static $replaceCharacters = array('_');
+	
 	/* (non-PHPdoc)
 	 * @see KDropFolderEngine::watchFolder()
 	 */
@@ -65,10 +69,12 @@ class KMrssDropFolderEngine extends KDropFolderEngine
 		{
 			//Register MRSS media namespace on the separate <item>
 			$feedItem->addAttribute('xmlns:xmlns:media', self::MRSS_NS);
+			$feedPath = $this->saveFeedItemToDisk ($feedItem, $contentUpdateRequired);
 			
+			KalturaLog::debug("file exists feedPath: " . file_exists($feedPath));
 			$newDropFolderFile = new KalturaMrssDropFolderFile();
 	    	$newDropFolderFile->dropFolderId = $this->dropFolder->id;
-	    	$newDropFolderFile->fileName = strval($feedItem->guid) . '.xml';
+	    	$newDropFolderFile->fileName = strval($feedItem->guid);
 	    	$newDropFolderFile->lastModificationTime = strval($feedItem->pubDate); 
 	    	
 	    	if (isset ($feedItem->children('media', true)->content[0]->attributes()->fileSize ))
@@ -98,7 +104,7 @@ class KMrssDropFolderEngine extends KDropFolderEngine
 	    	}
 	    	
 	    	$newDropFolderFile->hash = strval($feedItem->children(self::MRSS_NS)->hash);
-	    	$newDropFolderFile->mrssContent = $feedItem->saveXML();
+	    	$newDropFolderFile->mrssXmlPath = $feedPath;
 			//No such thing as an 'uploading' MRSS drop folder file - if the file is detected, it is ready for upload. Immediately update status to 'pending'
 			KBatchBase::$kClient->startMultiRequest();
 			$dropFolderFile = $this->dropFolderFileService->add($newDropFolderFile);
@@ -112,6 +118,23 @@ class KMrssDropFolderEngine extends KDropFolderEngine
 			KalturaLog::err('Cannot add new drop folder file with name ['.$feedItem->guid.'] - '.$e->getMessage());
 			return null;
 		}
+	}
+	
+	protected function saveFeedItemToDisk (SimpleXMLElement $feedItem, $contentUpdateRequired)
+	{
+		if (!$contentUpdateRequired)
+		{
+			unset($feedItem->content[0][0]);
+			KalturaLog::debug();
+		}
+		
+		$updatedGuid = str_replace (self::$searchCharacters, self::$replaceCharacters, strval ($feedItem->guid));
+		
+		$feedItemPath = KBatchBase::$taskConfig->params->mrss->xmlPath . DIRECTORY_SEPARATOR. $updatedGuid . '_' . time();
+		file_put_contents($feedItemPath, $feedItem->saveXML());
+		chmod($feedItemPath, 0660);
+		
+		return $feedItemPath;
 	}
 	
 	/**
@@ -139,6 +162,8 @@ class KMrssDropFolderEngine extends KDropFolderEngine
 		{
 			$this->handleItemAdded($feedItem, false);
 		}
+		
+		//If neither of the conditions above were true, neither the metadata nor the content were changed- do nothing.
 	}
 
 	/* (non-PHPdoc)

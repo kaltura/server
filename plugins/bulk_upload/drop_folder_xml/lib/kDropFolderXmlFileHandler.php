@@ -52,6 +52,23 @@ class kDropFolderXmlFileHandler
 			}
 	}
 	
+	public function handlePurgedDropFolderFile (DropFolder $folder, DropFolderFile $file)
+	{
+		if($this->isXmlFile($file->getFileName(), $folder))
+		{
+			$statuses = array(DropFolderFileStatus::PARSED);
+			$parsedDropFolderFiles = DropFolderFilePeer::retrieveByLeadIdAndStatuses($file->getLeadDropFolderFileId(), $statuses);
+			if($parsedDropFolderFiles)
+			{
+				foreach ($parsedDropFolderFiles as $parsedFile) 
+				{
+					$parsedFile->setStatus(DropFolderFileStatus::PURGED);
+					$parsedFile->save();
+				}
+			}
+		}
+	}
+	
 	/**
 	 * Parse XML file:
 	 * 1. add resources that are still not in the drop folder in status PARSED
@@ -145,7 +162,7 @@ class kDropFolderXmlFileHandler
 		}
 		catch(PropelException $e)
 		{
-			if($e->getCause() && $e->getCause()->getCode() == self::MYSQL_CODE_DUPLICATE_KEY) //unique constraint
+			if($e->getCause() && $e->getCause()->getCode() == kDropFolderXmlEventsConsumer::MYSQL_CODE_DUPLICATE_KEY) //unique constraint
 			{
 				$existingFile = DropFolderFilePeer::retrieveByDropFolderIdAndFileName($folder->getId(), $fileName);
 				if($existingFile)
@@ -195,7 +212,7 @@ class kDropFolderXmlFileHandler
 		$fileTransferManager = kFileTransferMgr::getInstance($folder->getFileTransferMgrType(), $engineOptions);
 		$loginStatus = $folder->loginByCredentialsType($fileTransferManager);
 		
-		if($fileTransferManager->fileSize($folder->getPath().'/'.$file->getFileName()) > self::MAX_XML_FILE_SIZE)
+		if($fileTransferManager->fileSize($folder->getPath().'/'.$file->getFileName()) > kDropFolderXmlEventsConsumer::MAX_XML_FILE_SIZE)
 			throw new Exception(DropFolderXmlBulkUploadPlugin::XML_FILE_SIZE_EXCEED_LIMIT_MESSAGE, DropFolderXmlBulkUploadPlugin::getErrorCodeCoreValue(DropFolderXmlBulkUploadErrorCode::XML_FILE_SIZE_EXCEED_LIMIT));
 			
 		$xmlPath = $folder->getLocalFilePath($file->getFileName(), $file->getId(), $fileTransferManager);
@@ -206,10 +223,10 @@ class kDropFolderXmlFileHandler
 		$xmlDoc = new KDOMDocument();
 		$res = $xmlDoc->loadXML($xmlContent);
 		
-		$localResourceNodes = $xmlDoc->getElementsByTagName(self::DROP_FOLDER_RESOURCE_NODE_NAME);						
+		$localResourceNodes = $xmlDoc->getElementsByTagName(kDropFolderXmlEventsConsumer::DROP_FOLDER_RESOURCE_NODE_NAME);						
 		foreach ($localResourceNodes as $localResourceNode) 
 		{
-			$contentResources[] = $localResourceNode->getAttribute(self::DROP_FOLDER_RESOURCE_PATH_ATTRIBUTE);
+			$contentResources[] = $localResourceNode->getAttribute(kDropFolderXmlEventsConsumer::DROP_FOLDER_RESOURCE_PATH_ATTRIBUTE);
 		}	
 										
 		return $contentResources;

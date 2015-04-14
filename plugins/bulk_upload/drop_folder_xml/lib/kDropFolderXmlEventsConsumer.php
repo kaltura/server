@@ -190,20 +190,9 @@ class kDropFolderXmlEventsConsumer implements kBatchJobStatusEventConsumer, kObj
 	 */
 	private function onXmlDropFolderFileStatusChangedToPurged(DropFolder $folder, DropFolderFile $file)
 	{
-		if($this->isXmlFile($file->getFileName(), $folder))
-		{
-			$statuses = array(DropFolderFileStatus::PARSED);
-			$parsedDropFolderFiles = DropFolderFilePeer::retrieveByLeadIdAndStatuses($file->getLeadDropFolderFileId(), $statuses);
-			if($parsedDropFolderFiles)
-			{
-				foreach ($parsedDropFolderFiles as $parsedFile) 
-				{
-					$parsedFile->setStatus(DropFolderFileStatus::PURGED);
-					$parsedFile->save();
-				}
-			}
-		}
 		
+		$xmlFileHandler = kDropFolderXmlFileHandler::getHandlerInstance($folder->getType());
+		$xmlFileHandler->handlePurgedDropFolderFile($folder, $file);
 	}
 	
 	/**

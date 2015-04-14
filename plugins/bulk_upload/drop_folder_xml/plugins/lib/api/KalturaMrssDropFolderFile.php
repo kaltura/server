@@ -12,17 +12,17 @@ class KalturaMrssDropFolderFile extends KalturaDropFolderFile
 	public $hash;
 	
 	/**
-	 * MRSS content of the
+	 * Path of the original MRSS content XML
 	 * @var string
 	 */
-	public $mrssContent;
+	public $mrssXmlPath;
 	
 /*
 	 * mapping between the field on this object (on the left) and the setter/getter on the entry object (on the right)  
 	 */
 	private static $map_between_objects = array(
 		'hash',
-		'mrssContent'
+		'mrssXmlPath'
 	 );
 		 
 	public function getMapBetweenObjects()
