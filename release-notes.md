@@ -1,6 +1,63 @@
 ----------
 # Jupiter-10.9.0 #
 
+## Copy cue points to clips and trimmed entries ##
+
+- Issue Type: bug fix
+- Issue ID: PLAT-1118
+
+#### Configuration ####
+
+Add the following lines from admin.template.ini to admin.ini:
+
+	moduls.annotationCopyToClip.enabled = true
+	moduls.annotationCopyToClip.permissionType = 2
+	moduls.annotationCopyToClip.label = Time Based - Copy annotation cue points when user clips entries
+	moduls.annotationCopyToClip.permissionName = COPY_ANNOTATIONS_TO_CLIP
+	moduls.annotationCopyToClip.basePermissionType = 3
+	moduls.annotationCopyToClip.basePermissionName = ANNOTATION_PLUGIN_PERMISSION
+	moduls.annotationCopyToClip.group = GROUP_ENABLE_DISABLE_FEATURES
+
+	moduls.annotationCopyToTrim.enabled = true
+	moduls.annotationCopyToTrim.permissionType = 2
+	moduls.annotationCopyToTrim.label = Time Based - Do not keep annotation cue points when user trims entries
+	moduls.annotationCopyToTrim.permissionName = DO_NOT_COPY_ANNOTATIONS_TO_TRIMMED_ENTRY
+	moduls.annotationCopyToTrim.basePermissionType = 3
+	moduls.annotationCopyToTrim.basePermissionName = ANNOTATION_PLUGIN_PERMISSION
+	moduls.annotationCopyToTrim.group = GROUP_ENABLE_DISABLE_FEATURES
+
+	moduls.cuePointCopyToClip.enabled = true
+	moduls.cuePointCopyToClip.permissionType = 2
+	moduls.cuePointCopyToClip.label = Time Based - Do not copy code, thumb and ad cue points when user clips entries
+	moduls.cuePointCopyToClip.permissionName = DO_NOT_COPY_CUE_POINTS_TO_CLIP
+	moduls.cuePointCopyToClip.basePermissionType = 3
+	moduls.cuePointCopyToClip.basePermissionName = CUEPOINT_PLUGIN_PERMISSION
+	moduls.cuePointCopyToClip.group = GROUP_ENABLE_DISABLE_FEATURES
+
+	moduls.cuePointCopyToTrim.enabled = true
+	moduls.cuePointCopyToTrim.permissionType = 2
+	moduls.cuePointCopyToTrim.label = Time Based - Do not keep code, thumb, and ad cue points when user trims entries
+	moduls.cuePointCopyToTrim.permissionName = DO_NOT_COPY_CUE_POINTS_TO_TRIMMED_ENTRY
+	moduls.cuePointCopyToTrim.basePermissionType = 3
+	moduls.cuePointCopyToTrim.basePermissionName = CUEPOINT_PLUGIN_PERMISSION
+	moduls.cuePointCopyToTrim.group = GROUP_ENABLE_DISABLE_FEATURES
+
+	moduls.keepCuePointsOnMediaReplacement.enabled = true
+	moduls.keepCuePointsOnMediaReplacement.permissionType = 2
+	moduls.keepCuePointsOnMediaReplacement.label = Time Based - Remove original cue points when user replaces media in existing entry
+	moduls.keepCuePointsOnMediaReplacement.permissionName = REMOVE_CUE_POINTS_WHEN_REPLACING_MEDIA
+	moduls.keepCuePointsOnMediaReplacement.basePermissionType = 3
+	moduls.keepCuePointsOnMediaReplacement.basePermissionName = CUEPOINT_PLUGIN_PERMISSION
+	moduls.keepCuePointsOnMediaReplacement.group = GROUP_ENABLE_DISABLE_FEATURES
+
+#### Deployment Scripts ####
+
+None.
+
+#### Known Issues & Limitations ####
+
+None.
+
 ## YouTube API connector V3 ##
 
 ***Note:*** Manual migration required to all existing accounts. 
