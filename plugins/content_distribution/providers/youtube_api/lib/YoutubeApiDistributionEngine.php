@@ -523,6 +523,7 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 				continue;
 				
 			$resourceId = new Google_Service_YouTube_ResourceId();
+			$resourceId->setKind('youtube#video');
 			$resourceId->setVideoId($remoteId);
 			
 			$snippet = new Google_Service_YouTube_PlaylistItemSnippet();
