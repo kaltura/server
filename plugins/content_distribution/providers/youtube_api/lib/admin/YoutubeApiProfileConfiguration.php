@@ -1,4 +1,6 @@
-<?php 
+<?php
+require_once KALTURA_ROOT_PATH.'/vendor/google-api-php-client-1.1.2/src/Google/autoload.php';
+  
 /**
  * @package plugins.youtubeApiDistribution
  * @subpackage admin
@@ -55,6 +57,7 @@ class Form_YoutubeApiProfileConfiguration extends Form_ConfigurableProfileConfig
 		//  Metadata
 		$this->addElement('select', 'default_category', array(
 			'label' => 'Default Category:',
+			'multioptions' => $this->getCategories()
 		));
 				
 		// Community
@@ -108,9 +111,10 @@ class Form_YoutubeApiProfileConfiguration extends Form_ConfigurableProfileConfig
 		);
 	}
 	
-	protected function getCategories(Kaltura_Client_YoutubeApiDistribution_Type_YoutubeApiDistributionProfile $distributionProfile)
+	protected function getCategories()
 	{
-		require_once KALTURA_ROOT_PATH.'/vendor/google-api-php-client-1.1.2/src/Google/autoload.php'; 
+		$distributionProfile = $this->distributionProfile;
+		/* @var $distributionProfile Kaltura_Client_YoutubeApiDistribution_Type_YoutubeApiDistributionProfile */
 		
 		$client = new Google_Client();
 		$client->setClientId($distributionProfile->googleClientId);
@@ -125,14 +129,5 @@ class Form_YoutubeApiProfileConfiguration extends Form_ConfigurableProfileConfig
 			$categories[$category['id']] = $category['snippet']['title'];
 		}
 		return $categories;
-	}
-	
-	public function populateFromObject($object, $add_underscore = true)
-	{
-		parent::populateFromObject($object, $add_underscore);
-		
-		$element = $this->getElement('default_category');
-		/* @var $element Zend_Form_Element_Select */
-		$element->setMultiOptions($this->getCategories($object));
 	}
 }
