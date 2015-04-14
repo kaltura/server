@@ -4,7 +4,10 @@
  */
 class KMrssDropFolderEngine extends KDropFolderEngine 
 {
-	const MRSS_NS = 'http://search.yahoo.com/mrss/';
+	/**
+	 * @var array
+	 */
+	protected $mrssNamespaces;
 	
 	static $searchCharacters = array ('/');
 	static $replaceCharacters = array('_');
@@ -17,10 +20,9 @@ class KMrssDropFolderEngine extends KDropFolderEngine
 		$this->dropFolder = $dropFolder;
 		
 		//Get Drop Folder feed and import it into a SimpleXMLElement
-		/* @var KalturaMRSSDropFolder $dropFolder */
 		
-		KalturaLog::debug($dropFolder->mrssUrl);
 		$feed = new SimpleXMLElement (file_get_contents($dropFolder->path));
+		$this->mrssNamespaces = $feed->getNamespaces(true);
 		
 		//get items
 		$feedItems = $feed->xpath ('/rss/channel/item');
@@ -71,7 +73,6 @@ class KMrssDropFolderEngine extends KDropFolderEngine
 			$feedItem->addAttribute('xmlns:xmlns:media', self::MRSS_NS);
 			$feedPath = $this->saveFeedItemToDisk ($feedItem, $contentUpdateRequired);
 			
-			KalturaLog::debug("file exists feedPath: " . file_exists($feedPath));
 			$newDropFolderFile = new KalturaMrssDropFolderFile();
 	    	$newDropFolderFile->dropFolderId = $this->dropFolder->id;
 	    	$newDropFolderFile->fileName = strval($feedItem->guid);
@@ -125,7 +126,7 @@ class KMrssDropFolderEngine extends KDropFolderEngine
 		if (!$contentUpdateRequired)
 		{
 			unset($feedItem->content[0][0]);
-			KalturaLog::debug();
+			KalturaLog::debug("Removing content tags from MRSS");
 		}
 		
 		$updatedGuid = str_replace (self::$searchCharacters, self::$replaceCharacters, strval ($feedItem->guid));

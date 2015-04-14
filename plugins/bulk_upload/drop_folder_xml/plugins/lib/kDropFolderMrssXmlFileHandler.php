@@ -35,7 +35,7 @@ class kDropFolderMrssXmlFileHandler extends kDropFolderXmlFileHandler
 	private function addXMLBulkUploadJob(DropFolder $folder, DropFolderFile $leadDropFolderFile)
 	{
 		/* @var $leadDropFolderFile MrssDropFolderFile */
-		KalturaLog::debug('Adding BulkUpload job');
+		KalturaLog::info('Adding BulkUpload job');
 		try 
 		{
 			$coreBulkUploadType = BulkUploadXmlPlugin::getBulkUploadTypeCoreValue(BulkUploadXmlType::XML);
@@ -48,13 +48,12 @@ class kDropFolderMrssXmlFileHandler extends kDropFolderXmlFileHandler
 			/* @var $data kBulkUploadJobData */
 			$data->setUploadedBy(kDropFolderXmlEventsConsumer::UPLOADED_BY);
 			
-			KalturaLog::debug("mrss xml path: " . $leadDropFolderFile->getMrssXmlPath());
-			KalturaLog::debug("file exists: " . file_exists($leadDropFolderFile->getMrssXmlPath()));
+			KalturaLog::info("MRSS xml path: " . $leadDropFolderFile->getMrssXmlPath());
 			$data->setFilePath($leadDropFolderFile->getMrssXmlPath());
 			$data->setFileName($leadDropFolderFile->getFileName());
 						
 			$objectData = new kBulkUploadEntryData();
-			KalturaLog::debug('conversion profile id: '.$folder->getConversionProfileId());
+			KalturaLog::info('Conversion profile id: '.$folder->getConversionProfileId());
 			$objectData->setConversionProfileId($folder->getConversionProfileId());
 			$data->setObjectData($objectData);
 	
