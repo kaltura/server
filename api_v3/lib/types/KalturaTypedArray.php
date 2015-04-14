@@ -96,7 +96,11 @@ abstract class KalturaTypedArray extends KalturaObject implements ArrayAccess, I
 	{
 		$array = array();
 		foreach($this->array as $key => $obj)
-			$array[$key] = $obj->toObject();
+		{
+			$coreObject = $obj->toObject();
+			if($coreObject)
+				$array[$key] = $coreObject;
+		}
 		return $array;
 	}
 	
