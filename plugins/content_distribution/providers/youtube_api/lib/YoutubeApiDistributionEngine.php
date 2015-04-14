@@ -529,12 +529,8 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 			$snippet->setPlaylistId($playlistId);
 			$snippet->setResourceId($resourceId);
 			
-			$status = new Google_Service_YouTube_PlaylistItemStatus();
-			$status->setPrivacyStatus('public');
-			
 			$playlistItem = new Google_Service_YouTube_PlaylistItem();
 			$playlistItem->setSnippet($snippet);
-			$playlistItem->setStatus($status);
 			$youtube->playlistItems->insert('snippet', $playlistItem);
 		}
 	}
