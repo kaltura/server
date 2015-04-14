@@ -3,6 +3,8 @@
 
 ## YouTube API connector V3 ##
 
+***Note:*** Manual migration required to all existing accounts. 
+
 - Issue Type: bug fix
 - Issue ID: PLAT-2776
 
