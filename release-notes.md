@@ -1,4 +1,29 @@
 ----------
+# Jupiter-10.9.0 #
+
+## Redirect live entry updates via its original DC ##
+
+- Issue Type: bug fix
+- Issue ID: PLAT-2762
+
+#### Configuration ####
+
+** local.ini **
+
+Added the following configuration.
+
+	;set to true when one of the DC's is down
+	disable_dump_api_request = false
+
+#### Deployment Scripts ####
+
+None.
+
+#### Known Issues & Limitations ####
+
+None.
+
+----------
 # Jupiter-10.8.0 #
 
 ## Tag-search - return all objects when no entitlement ##
