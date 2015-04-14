@@ -156,9 +156,12 @@ class MediaService extends KalturaEntryService
 			if ( !$conversionProfileId ) {
 				$originalConversionProfileId = $dbEntry->getConversionQuality();
 				$conversionProfile = conversionProfile2Peer::retrieveByPK($originalConversionProfileId);
-				if ( is_null($conversionProfile) || $conversionProfile->getType() == ConversionProfileType::LIVE_STREAM )
+				if ( is_null($conversionProfile) || $conversionProfile->getType() != ConversionProfileType::MEDIA )
 				{
-					$conversionProfileId = $this->getPartner()->getDefaultConversionProfileId();
+					$defaultConversionProfile = myPartnerUtils::getConversionProfile2ForPartner( $this->getPartnerId() );
+					if ( !is_null($defaultConversionProfile) ) {
+						$conversionProfileId = $defaultConversionProfile->getId();
+					}
 				} else {
 					$conversionProfileId = $originalConversionProfileId;
 				}
