@@ -12,7 +12,7 @@ Add the following lines from admin.template.ini to admin.ini:
 
 	moduls.annotationCopyToClip.enabled = true
 	moduls.annotationCopyToClip.permissionType = 2
-	moduls.annotationCopyToClip.label = Copy annotation cue points when user clips entries
+	moduls.annotationCopyToClip.label = Time Based - Copy annotation cue points when user clips entries
 	moduls.annotationCopyToClip.permissionName = COPY_ANNOTATIONS_TO_CLIP
 	moduls.annotationCopyToClip.basePermissionType = 3
 	moduls.annotationCopyToClip.basePermissionName = ANNOTATION_PLUGIN_PERMISSION
@@ -20,7 +20,7 @@ Add the following lines from admin.template.ini to admin.ini:
 
 	moduls.annotationCopyToTrim.enabled = true
 	moduls.annotationCopyToTrim.permissionType = 2
-	moduls.annotationCopyToTrim.label = Do not keep annotation cue points when user trims entries
+	moduls.annotationCopyToTrim.label = Time Based - Do not keep annotation cue points when user trims entries
 	moduls.annotationCopyToTrim.permissionName = DO_NOT_COPY_ANNOTATIONS_TO_TRIMMED_ENTRY
 	moduls.annotationCopyToTrim.basePermissionType = 3
 	moduls.annotationCopyToTrim.basePermissionName = ANNOTATION_PLUGIN_PERMISSION
@@ -28,7 +28,7 @@ Add the following lines from admin.template.ini to admin.ini:
 
 	moduls.cuePointCopyToClip.enabled = true
 	moduls.cuePointCopyToClip.permissionType = 2
-	moduls.cuePointCopyToClip.label = Do not copy code, thumb and ad cue points when user clips entries
+	moduls.cuePointCopyToClip.label = Time Based - Do not copy code, thumb and ad cue points when user clips entries
 	moduls.cuePointCopyToClip.permissionName = DO_NOT_COPY_CUE_POINTS_TO_CLIP
 	moduls.cuePointCopyToClip.basePermissionType = 3
 	moduls.cuePointCopyToClip.basePermissionName = CUEPOINT_PLUGIN_PERMISSION
@@ -36,7 +36,7 @@ Add the following lines from admin.template.ini to admin.ini:
 
 	moduls.cuePointCopyToTrim.enabled = true
 	moduls.cuePointCopyToTrim.permissionType = 2
-	moduls.cuePointCopyToTrim.label = Do not keep code, thumb, and ad cue points when user trims entries
+	moduls.cuePointCopyToTrim.label = Time Based - Do not keep code, thumb, and ad cue points when user trims entries
 	moduls.cuePointCopyToTrim.permissionName = DO_NOT_COPY_CUE_POINTS_TO_TRIMMED_ENTRY
 	moduls.cuePointCopyToTrim.basePermissionType = 3
 	moduls.cuePointCopyToTrim.basePermissionName = CUEPOINT_PLUGIN_PERMISSION
@@ -44,7 +44,7 @@ Add the following lines from admin.template.ini to admin.ini:
 
 	moduls.keepCuePointsOnMediaReplacement.enabled = true
 	moduls.keepCuePointsOnMediaReplacement.permissionType = 2
-	moduls.keepCuePointsOnMediaReplacement.label = Remove original cue points when user replaces media in existing entry
+	moduls.keepCuePointsOnMediaReplacement.label = Time Based - Remove original cue points when user replaces media in existing entry
 	moduls.keepCuePointsOnMediaReplacement.permissionName = REMOVE_CUE_POINTS_WHEN_REPLACING_MEDIA
 	moduls.keepCuePointsOnMediaReplacement.basePermissionType = 3
 	moduls.keepCuePointsOnMediaReplacement.basePermissionName = CUEPOINT_PLUGIN_PERMISSION
