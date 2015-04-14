@@ -62,7 +62,7 @@ class DrmLicenseUtils {
         return urlencode(base64_encode(sha1($signingKey.$dataToSign,TRUE)));
     }
 
-    public static function createCustomData($entryId, $flavorAssets)
+    public static function createCustomData($entryId, KalturaFlavorAssetArray $flavorAssets)
     {
         $customData = new stdClass();
         $customData->ca_system = self::SYSTEM_NAME;
@@ -76,7 +76,7 @@ class DrmLicenseUtils {
             $flavorAssets = $flavorAssets->toArray();
             foreach ($flavorAssets as $flavor)
             {
-                $flavorIds[] = $flavor->id;
+                $flavorIds[] = $flavor->flavorParamsId;
             }
             $customData->files = $flavorIds;
         }
