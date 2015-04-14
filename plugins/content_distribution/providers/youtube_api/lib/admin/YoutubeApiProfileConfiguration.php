@@ -117,7 +117,7 @@ class Form_YoutubeApiProfileConfiguration extends Form_ConfigurableProfileConfig
 	
 	protected function getCategories()
 	{
-		if(!$this->distributionProfile)
+		if(!$this->distributionProfile || !$this->distributionProfile->googleTokenData)
 			return null;
 			
 		$distributionProfile = $this->distributionProfile;
