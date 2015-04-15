@@ -291,7 +291,10 @@ class YoutubeApiDistributionProfile extends ConfigurableDistributionProfile
 		$subId = $this->getGoogleOAuth2ObjectIdentifier();
 		
 		$partner = PartnerPeer::retrieveByPK($this->getPartnerId());
-		return $partner->getGoogleOAuth2($appId, $subId);
+		if($partner)
+			return $partner->getGoogleOAuth2($appId, $subId);
+			
+		return null;
 	}
 	
 	public function getApiAuthorizeUrl()
