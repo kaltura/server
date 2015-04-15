@@ -297,6 +297,7 @@ class myPlaylistUtils
 		
 		$filter = new entryFilter();
 		$filter->setIdIn($entry_id_list);
+		$filter->setStatusEquel(entryStatus::READY);
 		$filter->setPartnerSearchScope(baseObjectFilter::MATCH_KALTURA_NETWORK_AND_PRIVATE);
 		$filter->attachToCriteria($c);
 		
@@ -364,9 +365,8 @@ class myPlaylistUtils
 		{
 			if ( $entry_id != "" )
 			{
-				// allow only ready entries
 				$current_entry = @$id_list[$entry_id];
-				if ( $current_entry && $current_entry->getStatus() == entryStatus::READY )
+				if ( $current_entry )
 				{
 					if ( isset($limit) && ($limit-- === 0) )
 					{
