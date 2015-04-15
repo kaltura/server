@@ -122,7 +122,7 @@ class myPlaylistUtils
 		return self::executePlaylist ( $partner_id , $playlist ,  $filter , $detailed);
 	}
 	
-	public static function executePlaylist ( $partner_id , $playlist ,  $filter = null , $detailed = true )
+	public static function executePlaylist ( $partner_id , $playlist ,  $filter = null , $detailed = true, $pager = null )
 	{
 		if ( ! $playlist )
 		{
@@ -144,7 +144,7 @@ class myPlaylistUtils
 				$filter_list_content = $playlist->getDataContent( true );
 			}
 			
-			$entryObjectsArray = self::executeDynamicPlaylist ( $partner_id ,  $filter_list_content , $filter , $detailed );
+			$entryObjectsArray = self::executeDynamicPlaylist ( $partner_id ,  $filter_list_content , $filter , $detailed, $pager );
 		}
 		elseif ( $playlist->getMediaType() == entry::ENTRY_MEDIA_TYPE_GENERIC_1 )
 		{
@@ -155,7 +155,7 @@ class myPlaylistUtils
 		{
 			// static playlist
 			// search the roughcut_entry for the playlist as a roughcut / group
-			$entryObjectsArray = self::executeStaticPlaylist ( $playlist , $filter , $detailed );
+			$entryObjectsArray = self::executeStaticPlaylist ( $playlist , $filter , $detailed, $pager );
 		}
 
 		// Perform entries redirection
@@ -271,13 +271,13 @@ class myPlaylistUtils
 		return array($filter);
 	}
 	
-	public static function executeStaticPlaylist ( entry $playlist , $filter  = null, $detailed = true )
+	public static function executeStaticPlaylist ( entry $playlist , $filter  = null, $detailed = true, $pager = null )
 	{
 		$entry_id_list_str = $playlist->getDataContent();
-		return self::executeStaticPlaylistFromEntryIdsString($entry_id_list_str, $filter, $detailed);
+		return self::executeStaticPlaylistFromEntryIdsString($entry_id_list_str, $filter, $detailed, $pager);
 	}
 	
-	public static function executeStaticPlaylistFromEntryIdsString($entry_id_list_str, $filter = null, $detailed = true)
+	public static function executeStaticPlaylistFromEntryIdsString($entry_id_list_str, $filter = null, $detailed = true, $pager = null)
 	{
 		if(! trim($entry_id_list_str))
 			return null;
@@ -287,10 +287,10 @@ class myPlaylistUtils
 		foreach ( $entry_id_list as &$entry_id ) 
 			$entry_id=trim($entry_id);
 		
-		return self::executeStaticPlaylistFromEntryIds($entry_id_list, $filter, $detailed);
+		return self::executeStaticPlaylistFromEntryIds($entry_id_list, $filter, $detailed, $pager);
 	}
 	
-	public static function executeStaticPlaylistFromEntryIds(array $entry_id_list, $entry_filter = null, $detailed = true)
+	public static function executeStaticPlaylistFromEntryIds(array $entry_id_list, $entry_filter = null, $detailed = true, $pager = null)
 	{
 		// if exists extra_filters - use the first one to filter the entry_id_list
 		$c= KalturaCriteria::create(entryPeer::OM_CLASS);
@@ -347,6 +347,12 @@ class myPlaylistUtils
 		// build a map where the key is the id of the entry
 		$id_list = self::buildIdMap( $unsorted_entry_list );
 
+		if ( $pager )
+		{
+			$pageSize = $pager->getPageSize();
+			$startOffset = $pager->getOffset();
+		}
+
 		// VERY STRANGE !! &$entry_id must be with a & or else the values of the array change !!!
 		foreach ( $entry_id_list as &$entry_id )
 		{
@@ -356,6 +362,26 @@ class myPlaylistUtils
 				$current_entry = @$id_list[$entry_id];
 				if ( $current_entry && $current_entry->getStatus() == entryStatus::READY )
 				{
+					if ( $pager )
+					{
+						if ( $startOffset > 0 )
+						{
+							$startOffset--;
+							continue;
+						}
+						else
+						{
+							if ( $pageSize > 0 )
+							{
+								$pageSize--;
+							}
+							else
+							{
+								break;
+							}
+						}
+					}
+
 					// add to the entry_list only when the entry_id is not empty 
 					$entry_list[] = $current_entry;
 				} 
@@ -418,7 +444,7 @@ class myPlaylistUtils
 		return $entry_filters;
 	}
 	
-	public static function executeDynamicPlaylist ( $partner_id , $xml , $filter = null ,$detailed = true)
+	public static function executeDynamicPlaylist ( $partner_id , $xml , $filter = null ,$detailed = true, $pager = null )
 	{
 		list ( $total_results , $list_of_filters ) = self::getPlaylistFilterListStruct ( $xml );
 	
@@ -488,6 +514,12 @@ class myPlaylistUtils
 			$entry_filters[] = $entry_filter;
 		}
 		
+		if ( $pager )
+		{
+			$startOffset = $pager->getOffset();
+			$pageSize = $pager->getPageSize();
+		}
+
 		$number_of_entries = 0;
 		$entry_list = array();
 		foreach ( $entry_filters as $entry_filter )
@@ -549,9 +581,37 @@ class myPlaylistUtils
 			else
 				$entry_list_for_filter = entryPeer::doSelect( $c ); // maybe join with kuser to add some data about the contributor
 			
+			if ( $pager )
+			{
+				$nEntries = count($entry_list_for_filter);
+				$nTrimFromStart = 0;
+				if ( $startOffset > 0 )
+				{
+					// Skip to the offset
+					$nTrimFromStart = min($startOffset, $nEntries);
+					$startOffset -= $nTrimFromStart;
+					if ( $nEntries <= $nTrimFromStart )
+					{
+						continue;
+					}
+				}
+
+				$nEntriesToKeep = min($nEntries - $nTrimFromStart, $pageSize);
+				if ( $nTrimFromStart > 0 || $nEntriesToKeep < $nEntries )
+				{
+					$entry_list_for_filter = array_slice($entry_list_for_filter, $nTrimFromStart, $nEntriesToKeep);
+				}
+			}
+
 			// update total count and merge current result with the global list
 			$number_of_entries += count ( $entry_list_for_filter );
 			$entry_list = array_merge ( $entry_list , $entry_list_for_filter );
+
+			if ( $pager )
+			{
+				$pageSize -= $nEntriesToKeep;
+				if ( $pageSize <= 0 ) break;
+			}
 		}
 		
 		return $entry_list;		 

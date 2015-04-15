@@ -32,15 +32,26 @@ class KalturaFilterPager extends KalturaObject
 		
 		return parent::toObject($object, $skipProperties);
 	}
+
+	public function getPageSize()
+	{
+		return max(min($this->pageSize, baseObjectFilter::getMaxInValues()), 0);
+	}
+
+	public function getPageIndex()
+	{
+		return max(self::MIN_PAGE_INDEX, $this->pageIndex);
+	}
+
+	public function getOffset()
+	{
+		return ($this->getPageIndex() - 1) * $this->getPageSize();
+	}
 	
 	public function attachToCriteria ( Criteria $c )
 	{
-		$this->pageSize = max(min($this->pageSize, baseObjectFilter::getMaxInValues()), 0);
-		$c->setLimit( $this->pageSize );
-		
-		$this->pageIndex = max(self::MIN_PAGE_INDEX, $this->pageIndex);		
-		$offset = ($this->pageIndex - 1) * $this->pageSize;
-		$c->setOffset( $offset );
+		$c->setLimit( $this->getPageSize() );
+		$c->setOffset( $this->getOffset() );
 	}
 	
 	public static function detachFromCriteria(Criteria $c)
