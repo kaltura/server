@@ -302,12 +302,6 @@ class PlaylistService extends KalturaEntryService
 		$entryFilter = null;
 		if ($filter)
 		{
-			if ($playlist->getMediaType() == entry::ENTRY_MEDIA_TYPE_TEXT)
-			{
-				$limit = $filter->limit;
-				$filter->limit = null;
-			}
-
 			$coreFilter = new entryFilter();
 			$filter->toObject($coreFilter);
 			$entryFilter = $coreFilter;
@@ -335,9 +329,6 @@ class PlaylistService extends KalturaEntryService
 		{   		
 			throw $ex;
 		}
-
-		if (isset($limit) && $limit)
-			$entryList = array_slice($entryList , 0 , $limit);
 
 		myEntryUtils::updatePuserIdsForEntries ( $entryList );
 			
