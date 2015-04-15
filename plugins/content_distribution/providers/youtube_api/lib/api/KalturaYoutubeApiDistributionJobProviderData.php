@@ -109,6 +109,8 @@ class KalturaYoutubeApiDistributionJobProviderData extends KalturaConfigurableDi
 						$captionInfo = $this->getCaptionInfo($asset, $syncKey, $distributionJobData);
 						if ($captionInfo){
 							$captionInfo->label = $asset->getLabel();
+							if(!$captionInfo->label)
+								$captionInfo->label = $asset->getLanguage();
 							$captionInfo->language = $this->getLanguageCode($asset->getLanguage());
 							if ($captionInfo->language)
 								$this->captionsInfo [] = $captionInfo;
