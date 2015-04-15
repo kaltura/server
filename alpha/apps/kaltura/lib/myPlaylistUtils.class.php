@@ -310,6 +310,12 @@ class myPlaylistUtils
 		
 		if ( $entry_filter )
 		{
+			if ( $entry_filter->getLimit() > 0 )
+			{
+				$limit = $entry_filter->getLimit();
+			}
+			$entry_filter->setLimit(null);
+
 			// read the _eq_display_in_search field but ignore it because it's part of a more complex criterion - see bellow
 			$display_in_search = $entry_filter->get( "_eq_display_in_search");
 			if ( $display_in_search >= 2 )
@@ -362,6 +368,11 @@ class myPlaylistUtils
 				$current_entry = @$id_list[$entry_id];
 				if ( $current_entry && $current_entry->getStatus() == entryStatus::READY )
 				{
+					if ( isset($limit) && ($limit-- === 0) )
+					{
+						break;
+					}
+
 					if ( $pager )
 					{
 						if ( $startOffset > 0 )
