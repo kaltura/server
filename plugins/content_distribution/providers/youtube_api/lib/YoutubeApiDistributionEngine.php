@@ -1,4 +1,21 @@
 <?php
+require_once KALTURA_ROOT_PATH.'/vendor/google-api-php-client-1.1.2/src/Google/autoload.php';
+
+/**
+ * @package plugins.youtubeApiDistribution
+ * @subpackage lib
+ */
+class YoutubeApiDistributionEngineLogger extends Google_Logger_Abstract
+{
+	/* (non-PHPdoc)
+	 * @see Google_Logger_Abstract::write()
+	 */
+	protected function write($message)
+	{
+		KalturaLog::debug($message);
+	}
+}
+
 /**
  * @package plugins.youtubeApiDistribution
  * @subpackage lib
@@ -48,8 +65,6 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 	 */
 	protected function initClient(KalturaYoutubeApiDistributionProfile $distributionProfile)
 	{
-		require_once KALTURA_ROOT_PATH.'/vendor/google-api-php-client-1.1.2/src/Google/autoload.php'; 
-		
 		$options = array(
 			CURLOPT_VERBOSE => true,
 			CURLOPT_STDERR => STDOUT,
@@ -58,6 +73,7 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 		
 		$client = new Google_Client();
 		$client->getIo()->setOptions($options);
+		$client->setLogger(new YoutubeApiDistributionEngineLogger($client));
 		$client->setClientId($distributionProfile->googleClientId);
 		$client->setClientSecret($distributionProfile->googleClientSecret);
 		$client->setAccessToken(str_replace('\\', '', $distributionProfile->googleTokenData));
