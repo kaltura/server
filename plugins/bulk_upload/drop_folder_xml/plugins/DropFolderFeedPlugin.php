@@ -1,11 +1,13 @@
 <?php
 /**
- * @package plugins.DropFolderMrss
+ * @package plugins.FeedDropFolder
  */
-class DropFolderMrssPlugin extends KalturaPlugin implements IKalturaPlugin, IKalturaPending, IKalturaObjectLoader, IKalturaEnumerator, IKalturaAdminConsolePages
+class FeedDropFolderPlugin extends KalturaPlugin implements IKalturaPlugin, IKalturaPending, IKalturaObjectLoader, IKalturaEnumerator, IKalturaAdminConsolePages
 {
-	const PLUGIN_NAME = 'DropFolderMrss';
+	const PLUGIN_NAME = 'FeedDropFolder';
 	const DROP_FOLDER_PLUGIN_NAME = 'dropFolder';
+	
+	const ERROR_MESSAGE_INCOMPLETE_HANDLING = "Feed is too long- because of handling limitation not all feed items will be handled. Feed Drop Folder ID ";
 	
 	/* (non-PHPdoc)
 	 * @see IKalturaPlugin::getPluginName()
@@ -19,31 +21,31 @@ class DropFolderMrssPlugin extends KalturaPlugin implements IKalturaPlugin, IKal
 		switch ($baseClass)
 		{
 			case 'KDropFolderEngine':
-				if ($enumValue == KalturaDropFolderType::MRSS)
+				if ($enumValue == KalturaDropFolderType::FEED)
 				{
-					return new KMrssDropFolderEngine();
+					return new KFeedDropFolderEngine();
 				}
 				break;
 			case ('KalturaDropFolderFile'):
-				if ($enumValue == self::getDropFolderTypeCoreValue(MrssDropFolderType::MRSS) )
+				if ($enumValue == self::getDropFolderTypeCoreValue(FeedDropFolderType::FEED) )
 				{
-					return new KalturaMrssDropFolderFile();
+					return new KalturaFeedDropFolderFile();
 				}
 				break;
 			case ('KalturaDropFolder'):
-				if ($enumValue == self::getDropFolderTypeCoreValue(MrssDropFolderType::MRSS) )
+				if ($enumValue == self::getDropFolderTypeCoreValue(FeedDropFolderType::FEED) )
 				{
-					return new KalturaDropFolder();
+					return new KalturaFeedDropFolder();
 				}
 				break;
 			case 'kDropFolderXmlFileHandler':
-				if ($enumValue == self::getDropFolderTypeCoreValue(MrssDropFolderType::MRSS))
+				if ($enumValue == self::getDropFolderTypeCoreValue(FeedDropFolderType::FEED))
 				{
-					return new kDropFolderMrssXmlFileHandler();
+					return new kDropFolderFeedXmlFileHandler();
 				}
 				break;
 			case 'Kaltura_Client_DropFolder_Type_DropFolder':
-				if ($enumValue == Kaltura_Client_DropFolder_Enum_DropFolderType::MRSS)
+				if ($enumValue == Kaltura_Client_DropFolder_Enum_DropFolderType::FEED)
 				{
 					return new Kaltura_Client_DropFolder_Type_DropFolder();
 				}
@@ -55,8 +57,13 @@ class DropFolderMrssPlugin extends KalturaPlugin implements IKalturaPlugin, IKal
 	{
 		switch ($baseClass) {
 			case 'DropFolderFile':
-				if ($enumValue == self::getDropFolderTypeCoreValue(MrssDropFolderType::MRSS))
-				return 'MrssDropFolderFile';				
+				if ($enumValue == self::getDropFolderTypeCoreValue(FeedDropFolderType::FEED))
+				return 'FeedDropFolderFile';				
+				break;
+				
+			case 'DropFolder':
+				if ($enumValue == self::getDropFolderTypeCoreValue(FeedDropFolderType::FEED))
+				return 'FeedDropFolder';				
 				break;
 
 		}
@@ -69,11 +76,11 @@ class DropFolderMrssPlugin extends KalturaPlugin implements IKalturaPlugin, IKal
 	{
 		if (!$baseEnumName)
 		{
-			return array('MrssDropFolderType');
+			return array('FeedDropFolderType');
 		}
 		if ($baseEnumName == 'DropFolderType')
 		{
-			return array('MrssDropFolderType');
+			return array('FeedDropFolderType');
 		}
 		
 		return array();

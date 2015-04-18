@@ -1,13 +1,13 @@
 <?php
 /**
- * @package plugins.DropFolderMrss
+ * @package plugins.FeedDropFolder
  * @subpackage model
  */
-class kDropFolderMrssXmlFileHandler extends kDropFolderXmlFileHandler
+class kDropFolderFeedXmlFileHandler extends kDropFolderXmlFileHandler
 {
 	public function handlePendingDropFolderFile (DropFolder $folder, DropFolderFile $file)
 	{
-		if (!($file instanceof MrssDropFolderFile))
+		if (!($file instanceof FeedDropFolderFile))
 		{
 			KalturaLog::err("Drop folder file does not match folder type");
 			return;
@@ -34,7 +34,7 @@ class kDropFolderMrssXmlFileHandler extends kDropFolderXmlFileHandler
 	 */
 	private function addXMLBulkUploadJob(DropFolder $folder, DropFolderFile $leadDropFolderFile)
 	{
-		/* @var $leadDropFolderFile MrssDropFolderFile */
+		/* @var $leadDropFolderFile FeedDropFolderFile */
 		KalturaLog::info('Adding BulkUpload job');
 		try 
 		{
@@ -48,8 +48,8 @@ class kDropFolderMrssXmlFileHandler extends kDropFolderXmlFileHandler
 			/* @var $data kBulkUploadJobData */
 			$data->setUploadedBy(kDropFolderXmlEventsConsumer::UPLOADED_BY);
 			
-			KalturaLog::info("MRSS xml path: " . $leadDropFolderFile->getMrssXmlPath());
-			$data->setFilePath($leadDropFolderFile->getMrssXmlPath());
+			KalturaLog::info("Feed XML path: " . $leadDropFolderFile->getFeedXmlPath());
+			$data->setFilePath($leadDropFolderFile->getFeedXmlPath());
 			$data->setFileName($leadDropFolderFile->getFileName());
 						
 			$objectData = new kBulkUploadEntryData();

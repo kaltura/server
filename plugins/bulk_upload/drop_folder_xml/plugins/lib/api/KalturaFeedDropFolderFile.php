@@ -1,9 +1,9 @@
 <?php
 /**
- * @package plugins.DropFolderMrss
+ * @package plugins.FeedDropFolder
  * @subpackage api.objects
  */
-class KalturaMrssDropFolderFile extends KalturaDropFolderFile
+class KalturaFeedDropFolderFile extends KalturaDropFolderFile
 {
 	/**
 	 * MD5 or Sha1 encrypted string
@@ -12,17 +12,17 @@ class KalturaMrssDropFolderFile extends KalturaDropFolderFile
 	public $hash;
 	
 	/**
-	 * Path of the original MRSS content XML
+	 * Path of the original Feed content XML
 	 * @var string
 	 */
-	public $mrssXmlPath;
+	public $feedXmlPath;
 	
 /*
 	 * mapping between the field on this object (on the left) and the setter/getter on the entry object (on the right)  
 	 */
 	private static $map_between_objects = array(
 		'hash',
-		'mrssXmlPath'
+		'feedXmlPath'
 	 );
 		 
 	public function getMapBetweenObjects()
@@ -33,7 +33,7 @@ class KalturaMrssDropFolderFile extends KalturaDropFolderFile
 	public function toObject($dbObject = null, $skip = array())
 	{
 		if (!$dbObject)
-			$dbObject = new MrssDropFolderFile();
+			$dbObject = new FeedDropFolderFile();
 			
 		return parent::toObject($dbObject, $skip);
 	}

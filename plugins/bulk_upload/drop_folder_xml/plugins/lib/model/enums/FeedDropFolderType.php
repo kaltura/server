@@ -1,17 +1,17 @@
 <?php
 /**
- * @package plugins.DropFolderMrss
+ * @package plugins.FeedDropFolder
  * @subpackage model.enum
  */
-class MrssDropFolderType implements IKalturaPluginEnum, DropFolderType
+class FeedDropFolderType implements IKalturaPluginEnum, DropFolderType
 {
-	const MRSS = 'MRSS';
+	const FEED = 'FEED';
 	
 	/* (non-PHPdoc)
 	 * @see IKalturaPluginEnum::getAdditionalValues()
 	 */
 	public static function getAdditionalValues() {
-		return array('MRSS' => self::MRSS);
+		return array('FEED' => self::FEED);
 		
 	}
 

@@ -1,14 +1,13 @@
-<?php
+ <?php
 /**
- * @package plugins.DropFolderMrss
+ * @package plugins.FeedDropFolder
  */
-class KMrssDropFolderEngine extends KDropFolderEngine 
+class KFeedDropFolderEngine extends KDropFolderEngine 
 {
-	const MRSS_NS = "http://search.yahoo.com/mrss/";
 	/**
 	 * @var array
 	 */
-	protected $mrssNamespaces;
+	protected $feedNamespaces;
 	
 	static $searchCharacters = array ('/');
 	static $replaceCharacters = array('_');
@@ -17,25 +16,40 @@ class KMrssDropFolderEngine extends KDropFolderEngine
 	 * @see KDropFolderEngine::watchFolder()
 	 */
 	public function watchFolder(KalturaDropFolder $dropFolder) {
+		/* @var $dropFolder KalturaFeedDropFolder */		
 		KalturaLog::info("Watching drop folder with ID [" . $dropFolder->id . "]");
 		$this->dropFolder = $dropFolder;
 		
 		//Get Drop Folder feed and import it into a SimpleXMLElement
 		
 		$feed = new SimpleXMLElement (file_get_contents($dropFolder->path));
-		$this->mrssNamespaces = $feed->getNamespaces(true);
+		$this->feedNamespaces = $feed->getNamespaces(true);
 		
 		//get items
-		$feedItems = $feed->xpath ('/rss/channel/item');
+		$feedItems = $feed->xpath ($this->dropFolder->feedItemInfo->itemXPath);
 		$existingDropFolderFilesMap = $this->loadDropFolderFiles();
 		
+		$counter = 0;
 		foreach ($feedItems as $feedItem)
 		{
+			/* @var $feedItem SimpleXMLElement */
+			if ($this->dropFolder->itemHandlingLimit > 0 && $counter > $this->dropFolder->itemHandlingLimit)
+			{
+				KalturaLog::err("Reached pulling limit for drop folder ID [" . $this->dropFolder->id . "].");
+				$dropFolderUpdate = new KalturaFeedDropFolder();
+				$dropFolderUpdate->errorDescription = FeedDropFolderPlugin::ERROR_MESSAGE_INCOMPLETE_HANDLING . $this->dropFolder->id;
+				$this->dropFolderPlugin->dropFolder->update($this->dropFolder->id, $dropFolderUpdate);
+				break;
+			}
+			
+			$counter++;
+			 
+			$uniqueId = strval($this->getSingleXPathResult($this->dropFolder->feedItemInfo->itemUniqueIdentifierXPath, $feedItem));
 			// The unique feed item identifier is the GUID, so that is what we set as the drop folder file name.
-			if (!array_key_exists(strval($feedItem->guid), $existingDropFolderFilesMap))
+			if (!array_key_exists($uniqueId, $existingDropFolderFilesMap))
 			{
 				//In this case, we are required to add this item as a new drop folder file
-				$this->handleItemAdded ($feedItem);
+				$this->handleItemAdded ($uniqueId, $feedItem);
 			}
 			else
 			{
@@ -53,7 +67,7 @@ class KMrssDropFolderEngine extends KDropFolderEngine
 					}	
 				}
 				
-				$this->handleExistingItem ($existingDropFolderFilesMap[$feedItem->guid], $feedItem);
+				$this->handleExistingItem ($uniqueId, $feedItem);
 			}
 		}
 	}
@@ -61,40 +75,43 @@ class KMrssDropFolderEngine extends KDropFolderEngine
 	
 	/**
 	 * Add a new item from the MRSS feed
+	 * @param string $uniqueId
 	 * @param SimpleXMLElement $feedItem
 	 * @param bool $contentUpdateRequired
 	 * @return Ambigous <KalturaDropFolderFile, MultiRequestSubResult, unknown, NULL, multitype:, multitype:string unknown , multitype:mixed string >|NULL
 	 */
-	protected function handleItemAdded (SimpleXMLElement $feedItem, $contentUpdateRequired = true)
+	protected function handleItemAdded ($uniqueId, SimpleXMLElement $feedItem, $contentUpdateRequired = true)
 	{
-		KalturaLog::debug('Add drop folder file ['.$fileName.'] last modification time ['.$lastModificationTime.'] file size ['.$fileSize.']');
+		KalturaLog::debug('Add drop folder file ['.$uniqueId.']');
 		try 
 		{
 			//Register MRSS media namespaces on the separate <item>
-			foreach ($this->mrssNamespaces as $nameSpace => $url)
+			foreach ($this->feedNamespaces as $nameSpace => $url)
 			{
 				KalturaLog::debug("Add original namespace $nameSpace with URL $url to separate <item>");
 				//This is a PHP weakness- the only way to prettily add a namespace to an XML
 				$feedItem->addAttribute("xmlns:xmlns:$nameSpace", $url);
 			}
+			
 			$feedPath = $this->saveFeedItemToDisk ($feedItem, $contentUpdateRequired);
 			
-			$newDropFolderFile = new KalturaMrssDropFolderFile();
+			$newDropFolderFile = new KalturaFeedDropFolderFile();
 	    	$newDropFolderFile->dropFolderId = $this->dropFolder->id;
-	    	$newDropFolderFile->fileName = strval($feedItem->guid);
-	    	$newDropFolderFile->lastModificationTime = strval($feedItem->pubDate); 
-	    	
-	    	if (isset ($feedItem->children(self::MRSS_NS)->content[0]->attributes()->fileSize ))
+	    	$newDropFolderFile->fileName = $uniqueId;
+	    	$newDropFolderFile->lastModificationTime = strval($this->getSingleXPathResult($this->dropFolder->feedItemInfo->itemPublishDateXPath, $feedItem)); 
+	    	$fileSize = $this->getSingleXPathResult($this->dropFolder->feedItemInfo->itemContentFileSizeXPath, $feedItem); 
+	    	if (!is_null ($fileSize))
 	    	{
-	    		$newDropFolderFile->fileSize = intval($feedItem->children(self::MRSS_NS)->content[0]->attributes()->fileSize);
+	    		$newDropFolderFile->fileSize = intval($fileSize);
 	    	}
 	    	else 
 	    	{
-	    		if (!isset($feedItem->children(self::MRSS_NS)->content[0]->attributes()->url))
+	    		$url = $this->getSingleXPathResult($this->dropFolder->feedItemInfo->itemContentUrlXPath, $feedItem);
+	    		if (is_null ($url))
 	    		{
 	    			throw new Exception ("Cannot add drop folder file - content URL does not exist");
 	    		}
-	    		$contentUrl = strval($feedItem->children(self::MRSS_NS)->content[0]->attributes()->url);
+	    		$contentUrl = strval($url);
 	
 				$curl = curl_init($contentUrl);
 				curl_setopt($curl, CURLOPT_HEADER, true);
@@ -110,8 +127,8 @@ class KMrssDropFolderEngine extends KDropFolderEngine
 				curl_close($curl);
 	    	}
 	    	
-	    	$newDropFolderFile->hash = strval($feedItem->children(self::MRSS_NS)->hash);
-	    	$newDropFolderFile->mrssXmlPath = $feedPath;
+	    	$newDropFolderFile->hash = strval($this->getSingleXPathResult($this->dropFolder->feedItemInfo->itemHashXPath, $feedItem));
+	    	$newDropFolderFile->feedXmlPath = $feedPath;
 			//No such thing as an 'uploading' MRSS drop folder file - if the file is detected, it is ready for upload. Immediately update status to 'pending'
 			KBatchBase::$kClient->startMultiRequest();
 			$dropFolderFile = $this->dropFolderFileService->add($newDropFolderFile);
@@ -131,16 +148,33 @@ class KMrssDropFolderEngine extends KDropFolderEngine
 	{
 		if (!$contentUpdateRequired)
 		{
-			KalturaLog::debug("Removing content tags from MRSS");
-			//TODO remove media:content tags from feed item
+			KalturaLog::debug("Removing content tags from feed");
+			$contentItems = $feedItem->xpath ($this->dropFolder->feedItemInfo->itemContentXpath);
+			foreach ($contentItems as $contentItem)
+			{
+				unset ($contentItem[0]);
+			}
+		}
+		elseif ($this->dropFolder->feedItemInfo->itemContentBitrateXPath && $this->dropFolder->feedItemInfo->contentBitrateAttributeName)
+		{
+			$maxBitrate = $this->getMaxFeedBitrate($feedItem);
+			if ($maxBitrate)
+			{
+				$contentItems = $feedItem->xpath ($this->dropFolder->feedItemInfo->itemContentXpath);
+				foreach ($contentItems as $contentItem)
+				{
+					$bitrateAttributeName = $this->dropFolder->feedItemInfo->contentBitrateAttributeName;
+					if (intval($contentItem->attributes()->$bitrateAttributeName) != $maxBitrate)
+						unset ($contentItem[0]);
+				}
+			}
 		}
 		
 		$updatedGuid = str_replace (self::$searchCharacters, self::$replaceCharacters, strval ($feedItem->guid));
 		
 		$feedItemPath = KBatchBase::$taskConfig->params->mrss->xmlPath . DIRECTORY_SEPARATOR. $updatedGuid . '_' . time();
-		file_put_contents($feedItemPath, $feedItem->saveXML());
-		chmod($feedItemPath, 0660);
-		
+		$res = file_put_contents($feedItemPath, $feedItem->saveXML());
+		//chmod($feedItemPath, 0660);
 		return $feedItemPath;
 	}
 	
@@ -152,7 +186,7 @@ class KMrssDropFolderEngine extends KDropFolderEngine
 	protected function handleExistingItem (KalturaMRSSDropFolderFile $existingDropFolderFile, SimpleXMLElement $feedItem)
 	{
 		//check whether the hash has changed - in this case the content needs to be updated.
-		$feedItemHash = strval($feedItem->children(self::MRSS_NS)->hash);
+		$feedItemHash = strval($this->getSingleXPathResult($this->dropFolder->feedItemInfo->itemHashXPath, $feedItem));
 		if ($feedItemHash)
 		{
 			KalturaLog::info('Hash found- checking whether content needs to be updated');
@@ -180,6 +214,39 @@ class KMrssDropFolderEngine extends KDropFolderEngine
 		// TODO Auto-generated method stub
 		
 	}
-
 	
+	/**
+	 * @param string $fieldName
+	 * @return SimpleXMLElement 
+	 */
+	protected function getSingleXPathResult ($fieldXpath, SimpleXMLElement $element)
+	{
+		if (!$fieldXpath)
+		{
+			KalturaLog::info("XPath not provided.");
+			return null;
+		}
+		$itemXPathRes = $element->xpath ($fieldXpath);
+		if (count ($itemXPathRes))
+			return $itemXPathRes[0];
+			
+		return null;
+	}
+
+	protected function getMaxFeedBitrate (SimpleXMLElement $feedItem)
+	{
+		$allBitrates = $feedItem->xpath ($this->dropFolder->feedItemInfo->itemContentBitrateXPath);
+		if (!count($allBitrates))
+		{
+			KalturaLog::info("No bitrate tags found ");
+		}
+		
+		$bitrates = array();
+		foreach ($allBitrates as $bitrate)
+		{
+			$bitrates[] = intval ($bitrate);
+		}
+		
+		return max ($bitrates);
+	}
 }
