@@ -129,7 +129,16 @@ class Form_YoutubeApiProfileConfiguration extends Form_ConfigurableProfileConfig
 		$client->setAccessToken(str_replace('\\', '', $distributionProfile->googleTokenData));
 		
 		$youtube = new Google_Service_YouTube($client);
-		$categoriesListResponse = $youtube->videoCategories->listVideoCategories('id,snippet', array('regionCode' => 'us'));
+		try
+		{
+			$categoriesListResponse = $youtube->videoCategories->listVideoCategories('id,snippet', array('regionCode' => 'us'));
+		}
+		catch(Google_Auth_Exception $e)
+		{
+			KalturaLog::err($e);
+			return array();
+		}
+		
 		$categories = array();
 		foreach($categoriesListResponse->getItems() as $category)
 		{
