@@ -48,21 +48,7 @@ class getplayliststatsfromcontentAction extends defPartnerservices2Action
 		// TODO -  verify permissions for viewing lists
 
 		$detailed = $this->getP ( "detailed" , false );
-		$limit = $this->getP ( "page_size" , 10 );
-		$limit = $this->maxPageSize ( $limit );
 
-		$page = $this->getP ( "page" , 1 );
-
-		$user_filter_prefix = $this->getP ( "fp" , "filter" );
-		
-		$offset = ($page-1)* $limit;
-
-		// TODO - should limit search to partner ??
-//		kuserPeer::setUseCriteriaFilter( false );
-//		entryPeer::setUseCriteriaFilter( false );
-
-		$input_params = $this->getInputParams();
-		
 		// fill the playlist (infact only the mediaType and contentData are important
 		$playlist = new entry();
 		$playlist->setType ( entryType::PLAYLIST ); // prepare the playlist type before filling from request
@@ -73,19 +59,7 @@ class getplayliststatsfromcontentAction extends defPartnerservices2Action
 		
 		$playlist->setDataContent( $data_content );
 		
-		// rest is similar to the executeplaylist service		
-		$extra_filters = array();
-		for ( $i=1 ; $i< self::MAX_FILTER_COUNT ; $i++ )
-		{
-			// filter
-			$extra_filter = new entryFilter(  );
-			
-			$fields_set = $extra_filter->fillObjectFromRequest( $input_params , "{$user_filter_prefix}{$i}_" , null );
-			$extra_filters[$i] = $extra_filter;
-		}
-	
-		//$entry_list = myPlaylistUtils::executePlaylist ( $partner_id , $playlist , $extra_filters , $detailed );
-		myPlaylistUtils::updatePlaylistStatistics ( $partner_id , $playlist );//, $extra_filters , $detailed );
+		myPlaylistUtils::updatePlaylistStatistics ( $partner_id , $playlist );
 		
 		$level = $detailed ? objectWrapperBase::DETAIL_LEVEL_DETAILED : objectWrapperBase::DETAIL_LEVEL_REGULAR ;
 		$wrapper =  objectWrapperBase::getWrapperClass( $playlist  , $level );

@@ -527,6 +527,7 @@ static void XMLCDECL saxCallbackError (void *ctx,
 	
     switch (self->_lastPropType)
     {
+		case KFT_Dictionary:		// TODO: implement support for dictionary parsing
         case KFT_Invalid:
             self->_subParser = [[KalturaXmlParserSkipTag alloc] init];
             break;

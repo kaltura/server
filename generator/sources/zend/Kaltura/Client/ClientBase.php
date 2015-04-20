@@ -107,7 +107,7 @@ class Kaltura_Client_ClientBase
 	 * @var array<string>
 	 */
 	private $responseHeaders = array();
-	
+
 	/**
 	 * Kaltura client constructor
 	 *
@@ -134,7 +134,7 @@ class Kaltura_Client_ClientBase
 	{
 		return $this->responseHeaders;
 	}
-	
+
 	public function getServeUrl()
 	{
 		if (count($this->callsQueue) != 1)
@@ -146,12 +146,12 @@ class Kaltura_Client_ClientBase
 
 		// append the basic params
 		$this->addParam($params, "format", $this->config->format);
-	
+
 		foreach($this->clientConfiguration as $param => $value)
 		{
 			$this->addParam($params, $param, $value);
 		}
-		
+
 		$call = $this->callsQueue[0];
 		$this->callsQueue = array();
 
@@ -187,7 +187,7 @@ class Kaltura_Client_ClientBase
 	{
 		if (count($this->callsQueue) == 0)
 		{
-			$this->multiRequestReturnType = null; 
+			$this->multiRequestReturnType = null;
 			return null;
 		}
 
@@ -256,7 +256,7 @@ class Kaltura_Client_ClientBase
 			}
 			if (!is_null($serverName) || !is_null($serverSession))
 				$this->log("server: [{$serverName}], session: [{$serverSession}]");
-			
+
 			$this->log("result (serialized): " . $postResult);
 
 			if ($this->config->format != self::KALTURA_SERVICE_FORMAT_XML)
@@ -320,9 +320,16 @@ class Kaltura_Client_ClientBase
 		curl_setopt($ch, CURLOPT_POST, 1);
 		if (count($files) > 0)
 		{
-			foreach($files as &$file)
-				$file = "@".$file; // let curl know its a file
-			curl_setopt($ch, CURLOPT_POSTFIELDS, array_merge($params, $files));
+            foreach ($files as &$file) {
+                // The usage of the @filename API for file uploading is
+                // deprecated since PHP 5.5. CURLFile must be used instead.
+                if (PHP_VERSION_ID >= 50500) {
+                    $file = new \CURLFile($file);
+                } else {
+                    $file = "@" . $file; // let curl know its a file
+                }
+            }
+            curl_setopt($ch, CURLOPT_POSTFIELDS, array_merge($params, $files));
 		}
 		else
 		{
@@ -349,7 +356,7 @@ class Kaltura_Client_ClientBase
 			$cookiesStr = http_build_query($cookies, null, '; ');
 			curl_setopt($ch, CURLOPT_COOKIE, $cookiesStr);
 		}
-        
+
 		if (isset($this->config->proxyHost)) {
 			curl_setopt($ch, CURLOPT_HTTPPROXYTUNNEL, true);
 			curl_setopt($ch, CURLOPT_PROXY, $this->config->proxyHost);
@@ -380,7 +387,7 @@ class Kaltura_Client_ClientBase
 
 		// Save response headers
 		curl_setopt($ch, CURLOPT_HEADERFUNCTION, array($this, 'readHeader') );
-		
+
 		$result = curl_exec($ch);
 		$curlError = curl_error($ch);
 		$curlErrorCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
@@ -478,7 +485,7 @@ class Kaltura_Client_ClientBase
 			}
 		}
 	}
-	
+
 	public function setRequestConfiguration(Kaltura_Client_Type_RequestConfiguration $configuration)
 	{
 		$params = get_class_vars('Kaltura_Client_Type_RequestConfiguration');
@@ -605,7 +612,7 @@ class Kaltura_Client_ClientBase
 		$xmlData = $this->doQueue();
 		if(is_null($xmlData))
 			return null;
-		
+
 		$xml = new SimpleXMLElement($xmlData);
 		$items = $xml->result->children();
 		$ret = array();
@@ -618,11 +625,11 @@ class Kaltura_Client_ClientBase
 				$ret[] = Kaltura_Client_ParseUtils::unmarshalObject($item, $this->multiRequestReturnType[$i]);
 			else if($item->item)
 				$ret[] = Kaltura_Client_ParseUtils::unmarshalArray($item, $this->multiRequestReturnType[$i]);
-			else			
+			else
 				$ret[] = Kaltura_Client_ParseUtils::unmarshalSimpleType($item);
 			$i++;
 		}
-	
+
 			$this->multiRequestReturnType = null;
 		return $ret;
 	}

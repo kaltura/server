@@ -102,7 +102,7 @@ class myPlaylistUtils
 	 * if after the entryFilter retrieved a list, still not enough entries (less than list's total number of results) - go to next list
 	 * 
 	 */
-	public static function executePlaylistById ( $partner_id , $playlist_id ,  $extra_filters = null , $detailed = true)
+	public static function executePlaylistById ( $partner_id , $playlist_id ,  $filter = null , $detailed = true)
 	{
 		$playlist = entryPeer::retrieveByPK( $playlist_id );
 
@@ -119,10 +119,10 @@ class myPlaylistUtils
 		// the default of detrailed should be true - most of the time the kuse is needed 
 		if ( is_null ( $detailed ) ) $detailed = true ; 
 		
-		return self::executePlaylist ( $partner_id , $playlist ,  $extra_filters , $detailed);
+		return self::executePlaylist ( $partner_id , $playlist ,  $filter , $detailed);
 	}
 	
-	public static function executePlaylist ( $partner_id , $playlist ,  $extra_filters = null , $detailed = true )
+	public static function executePlaylist ( $partner_id , $playlist ,  $filter = null , $detailed = true )
 	{
 		if ( ! $playlist )
 		{
@@ -144,7 +144,7 @@ class myPlaylistUtils
 				$filter_list_content = $playlist->getDataContent( true );
 			}
 			
-			$entryObjectsArray = self::executeDynamicPlaylist ( $partner_id ,  $filter_list_content , $extra_filters , $detailed );
+			$entryObjectsArray = self::executeDynamicPlaylist ( $partner_id ,  $filter_list_content , $filter , $detailed );
 		}
 		elseif ( $playlist->getMediaType() == entry::ENTRY_MEDIA_TYPE_GENERIC_1 )
 		{
@@ -155,7 +155,7 @@ class myPlaylistUtils
 		{
 			// static playlist
 			// search the roughcut_entry for the playlist as a roughcut / group
-			$entryObjectsArray = self::executeStaticPlaylist ( $playlist , $extra_filters , $detailed );
+			$entryObjectsArray = self::executeStaticPlaylist ( $playlist , $filter , $detailed );
 		}
 
 		// Perform entries redirection
@@ -271,13 +271,13 @@ class myPlaylistUtils
 		return array($filter);
 	}
 	
-	public static function executeStaticPlaylist ( entry $playlist , $extra_filters  = null, $detailed = true )
+	public static function executeStaticPlaylist ( entry $playlist , $filter  = null, $detailed = true )
 	{
 		$entry_id_list_str = $playlist->getDataContent();
-		return self::executeStaticPlaylistFromEntryIdsString($entry_id_list_str, $extra_filters, $detailed);
+		return self::executeStaticPlaylistFromEntryIdsString($entry_id_list_str, $filter, $detailed);
 	}
 	
-	public static function executeStaticPlaylistFromEntryIdsString($entry_id_list_str, $extra_filters = null, $detailed = true)
+	public static function executeStaticPlaylistFromEntryIdsString($entry_id_list_str, $filter = null, $detailed = true)
 	{
 		if(! trim($entry_id_list_str))
 			return null;
@@ -287,10 +287,10 @@ class myPlaylistUtils
 		foreach ( $entry_id_list as &$entry_id ) 
 			$entry_id=trim($entry_id);
 		
-		return self::executeStaticPlaylistFromEntryIds($entry_id_list, $extra_filters, $detailed);
+		return self::executeStaticPlaylistFromEntryIds($entry_id_list, $filter, $detailed);
 	}
 	
-	public static function executeStaticPlaylistFromEntryIds(array $entry_id_list, $extra_filters = null, $detailed = true)
+	public static function executeStaticPlaylistFromEntryIds(array $entry_id_list, $entry_filter = null, $detailed = true)
 	{
 		// if exists extra_filters - use the first one to filter the entry_id_list
 		$c= KalturaCriteria::create(entryPeer::OM_CLASS);
@@ -308,11 +308,8 @@ class myPlaylistUtils
 		
 		self::addModerationToCriteria($c);
 		
-		if ( $extra_filters && isset ( $extra_filters[1] )  )
+		if ( $entry_filter )
 		{
-			// use index 1 - will be used as the first filter
-			$entry_filter = $extra_filters[1];
-			
 			// read the _eq_display_in_search field but ignore it because it's part of a more complex criterion - see bellow
 			$display_in_search = $entry_filter->get( "_eq_display_in_search");
 			if ( $display_in_search >= 2 )
@@ -421,7 +418,7 @@ class myPlaylistUtils
 		return $entry_filters;
 	}
 	
-	public static function executeDynamicPlaylist ( $partner_id , $xml , $extra_filters = null ,$detailed = true)
+	public static function executeDynamicPlaylist ( $partner_id , $xml , $filter = null ,$detailed = true)
 	{
 		list ( $total_results , $list_of_filters ) = self::getPlaylistFilterListStruct ( $xml );
 	
@@ -429,9 +426,24 @@ class myPlaylistUtils
 
 		if ( ! $list_of_filters ) return null;
 		// TODO - for now we assume that there are more or equal filters in the XML than the ones from the request
-		$i = 1; // the extra_filter is 1-based
-		foreach ( $list_of_filters as $entry_filter_xml )
+
+		$filterLimit = null;
+		if ( $filter && $filter->getLimit() > 0 )
 		{
+			$filterLimit = $filter->getLimit();
+
+			// Get the max results from the limit of the first filter
+			$total_results = min( $total_results, $filterLimit );
+
+			// Clear this limit so it won't overcloud the limits of $entry_filter_xml rules
+			$filter->setLimit( null );
+		}
+
+		$numFiltersInList = count($list_of_filters);
+		for ( $i = 0; $i < $numFiltersInList; $i++ )
+		{
+			$entry_filter_xml = $list_of_filters[$i];
+
 		    /* @var $entry_filter_xml SimpleXMLElement */
 			// 	in general this service can fetch entries from kaltura networks.
 			// for each filter we should decide if thie assumption is true...
@@ -450,13 +462,21 @@ class myPlaylistUtils
 				$entry_filter->setLimit( self::TOTAL_RESULTS );
 			}
 			
-			$extra_filter = @$extra_filters[$i];
 			// merge the current_filter with the correcponding extra_filter
 			// allow the extra_filter to override properties of the current filter
 
-			if ( $extra_filter )
+			if ( $filter )
 			{
-				$entry_filter->fillObjectFromObject( $extra_filter , 
+				if ( $filterLimit && $i == ($numFiltersInList - 1) )
+				{
+					// Hack (in order to preserve old behavior):
+					// If the filter contained a limit, we'll add it to the last XML filter on the list
+					// in order to make sure the number of requested ($limit) entries will be supplied.
+					// This handles requests of a $limit which is higher than the total sum of inner XML filter limits.
+					$filter->setLimit( $filterLimit );
+				}
+
+				$entry_filter->fillObjectFromObject( $filter , 
 					myBaseObject::CLONE_FIELD_POLICY_THIS , 
 					myBaseObject::CLONE_POLICY_PREFER_NEW , null , null , false );
 					
@@ -466,25 +486,23 @@ class myPlaylistUtils
 			self::updateEntryFilter( $entry_filter ,  $partner_id , true );
 			
 			$entry_filters[] = $entry_filter;
-
-			$i++;	
 		}
 		
 		$number_of_entries = 0;
 		$entry_list = array();
-		$i = 1;		
 		foreach ( $entry_filters as $entry_filter )
 		{
 			$current_limit = max ( 0 , $total_results - $number_of_entries ); // if the current_limit is < 0 - set it to be 0
+
+			// no need to fetch any more results
+			if ( $current_limit <= 0 ) break;
+
 			$exclude_id_list = self::getIds( $entry_list );
 			$c = KalturaCriteria::create(entryPeer::OM_CLASS);
 			
 			
 			// don't fetch the same entries twice - filter out all the entries that were already fetched
 			if( $exclude_id_list ) $c->add ( entryPeer::ID , $exclude_id_list , Criteria::NOT_IN );  
-			
-			// no need to fetch any more results
-			if ( $current_limit <= 0  )break;
 			
 			$filter_limit = $entry_filter->getLimit ();
 			

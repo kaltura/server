@@ -10,7 +10,7 @@ class KalturaPlayableEntryFilter extends KalturaPlayableEntryBaseFilter
 	 * 
 	 * Convert duration in seconds to msecs (because the duration field is mapped to length_in_msec)
 	 */
-	protected function prepareEntriesCriteriaFilter(KalturaFilterPager $pager)
+	public function prepareEntriesCriteriaFilter(KalturaFilterPager $pager = null)
 	{
 		if ($this->durationGreaterThan !== null)
 			$this->durationGreaterThan = $this->durationGreaterThan * 1000;

@@ -17,6 +17,27 @@ class kResponseProfileMapping
 	private $filterProperty;
 	
 	/**
+	 * @var bool
+	 */
+	private $allowNull;
+	
+	/**
+	 * @return the $allowNull
+	 */
+	public function getAllowNull()
+	{
+		return $this->allowNull;
+	}
+
+	/**
+	 * @param bool $allowNull
+	 */
+	public function setAllowNull($allowNull)
+	{
+		$this->allowNull = $allowNull;
+	}
+
+	/**
 	 * @return the $parentProperty
 	 */
 	public function getParentProperty()

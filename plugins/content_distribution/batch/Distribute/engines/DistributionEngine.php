@@ -47,8 +47,7 @@ abstract class DistributionEngine implements IDistributionEngine
 	 */
 	public function setClient()
 	{
-		$config = KBatchBase::$kClient->getConfig();
-		$this->partnerId = $config->partnerId;
+		$this->partnerId = KBatchBase::$kClient->getPartnerId();
 	}
 	
 	/* (non-PHPdoc)

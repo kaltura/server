@@ -24,8 +24,9 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 		$partnerPath = myPartnerUtils::getUrlForPartner($partnerId, $subpId);
 		$flavorAssetId = $flavorAsset->getId();
 		$versionString = $this->getFlavorVersionString($flavorAsset);
+		$urlParams = $this->params->getUrlParams();
 		
-		$url = "$partnerPath/serveFlavor/entryId/".$flavorAsset->getEntryId()."{$versionString}/flavorId/$flavorAssetId";
+		$url = "$partnerPath/serveFlavor/entryId/".$flavorAsset->getEntryId()."{$versionString}/flavorId/$flavorAssetId" . $urlParams;
 		return $url;
 	}
 	
@@ -77,7 +78,9 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 	
 		if($asset instanceof flavorAsset)
 		{
+			
 			$url = $this->doGetFlavorAssetUrl($asset);
+
 			$url = str_replace('\\', '/', $url);
 			if ($tokenizeUrl)
 			{
