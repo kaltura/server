@@ -1,9 +1,9 @@
 <?php
 /**
- * @package plugins.annotation
+ * @package plugins.questionAnswer
  * @subpackage lib.enum
  */
-class QuestionsCuePointType implements IKalturaPluginEnum, CuePointType
+class QuestionAnswerCuePointType implements IKalturaPluginEnum, CuePointType
 {
 	const QUESTION = 'Question';
 	const ANSWER = 'Answer';

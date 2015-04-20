@@ -1,6 +1,6 @@
 <?php
 /**
- * @package plugins.questions
+ * @package plugins.questionAnswer
  * @subpackage model
  */
 
@@ -9,7 +9,7 @@ class QuestionCuePoint extends CuePoint //TODO: implements IMetadataObject
 	const CUSTOM_DATA_OPTIONAL_ANSWERS = 'optionalAnswers';
 	const CUSTOM_DATA_HINT = 'hint';
 	const CUSTOM_DATA_CORRECT_ANSWERS_KEYS = 'correctAnswersKeys';
-	const CUSTOM_DATA_CORRECT_ANSWER_EXPLANATION = 'correctAnswerExplanation';
+	const ANSWER_EXPLANATION = 'answerExplanation';
 
 	public function __construct()
 	{
@@ -24,7 +24,7 @@ class QuestionCuePoint extends CuePoint //TODO: implements IMetadataObject
 	 */
 	public function applyDefaultValues()
 	{
-		$this->setType(questionsPlugin::getCuePointTypeCoreValue(QuestionsCuePointType::QUESTION));
+		$this->setType(QuestionAnswerPlugin::getCuePointTypeCoreValue(QuestionAnswerCuePointType::QUESTION));
 	}
 
 	public function setOptionalAnswers($v) {return $this->putInCustomData(self::CUSTOM_DATA_OPTIONAL_ANSWERS, $v);}
@@ -35,9 +35,9 @@ class QuestionCuePoint extends CuePoint //TODO: implements IMetadataObject
 
 	public function getHint() {return $this->getFromCustomData(self::CUSTOM_DATA_OPTIONAL_ANSWERS);}
 
-	public function setCorrectAnswerExplanation($v) {return $this->putInCustomData(self::CUSTOM_DATA_CORRECT_ANSWER_EXPLANATION, $v);}
+	public function setAnswerExplanation($v) {return $this->putInCustomData(self::ANSWER_EXPLANATION, $v);}
 
-	public function getCorrectAnswerExplanation() {return $this->getFromCustomData(self::CUSTOM_DATA_CORRECT_ANSWER_EXPLANATION);}
+	public function getAnswerExplanation() {return $this->getFromCustomData(self::ANSWER_EXPLANATION);}
 
 	public function setCorrectAnswersKeys($v) {return $this->putInCustomData(self::CUSTOM_DATA_CORRECT_ANSWERS_KEYS, $v);}
 

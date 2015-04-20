@@ -1,11 +1,15 @@
 <?php
 /**
  * Enable question cue point objects and answer cue point objects management on entry objects
- * @package plugins.questions
+ * @package plugins.questionAnswer
  */
-class QuestionsPlugin extends KalturaPlugin implements IKalturaCuePoint
+class QuestionAnswerPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaVersion
 {
-	const PLUGIN_NAME = 'questions';
+	const PLUGIN_NAME = 'questionAnswer';
+	const PLUGIN_VERSION_MAJOR = 1;
+	const PLUGIN_VERSION_MINOR = 0;
+	const PLUGIN_VERSION_BUILD = 0;
+
 	const CUE_POINT_VERSION_MAJOR = 1;
 	const CUE_POINT_VERSION_MINOR = 0;
 	const CUE_POINT_VERSION_BUILD = 0;
@@ -28,15 +32,24 @@ class QuestionsPlugin extends KalturaPlugin implements IKalturaCuePoint
 	}
 
 	/* (non-PHPdoc)
+	 * @see IKalturaVersion::getVersion()
+	 */
+	public static function getVersion()
+	{
+		return new KalturaVersion(
+			self::PLUGIN_VERSION_MAJOR,
+			self::PLUGIN_VERSION_MINOR,
+			self::PLUGIN_VERSION_BUILD
+		);
+	}
+
+	/* (non-PHPdoc)
 	 * @see IKalturaEnumerator::getEnums()
 	 */
 	public static function getEnums($baseEnumName = null)
 	{
-		if (is_null($baseEnumName))
-			return array('QuestionsCuePointType');
-
-		if ($baseEnumName == 'CuePointType')
-			return array('QuestionsCuePointType');
+		if ( is_null($baseEnumName) || ($baseEnumName == 'CuePointType') )
+			return array('QuestionAnswerCuePointType');
 
 		return array();
 	}
@@ -61,11 +74,11 @@ class QuestionsPlugin extends KalturaPlugin implements IKalturaCuePoint
 	public static function loadObject($baseClass, $enumValue, array $constructorArgs = null)
 	{
 		if($baseClass == 'KalturaCuePoint') {
-			if ( $enumValue == self::getCuePointTypeCoreValue(QuestionsCuePointType::QUESTION))
-				return new KalturaAnnotation();//TODO
+			if ( $enumValue == self::getCuePointTypeCoreValue(QuestionAnswerCuePointType::QUESTION))
+				return new KalturaQuestionCuePoint();
 
-			if ( $enumValue == self::getCuePointTypeCoreValue(QuestionsCuePointType::ANSWER))
-				return new KalturaAnnotation();//TODO
+			if ( $enumValue == self::getCuePointTypeCoreValue(QuestionAnswerCuePointType::ANSWER))
+				return new KalturaAnswerCuePoint();
 		}
 
 	}
@@ -76,9 +89,9 @@ class QuestionsPlugin extends KalturaPlugin implements IKalturaCuePoint
 	public static function getObjectClass($baseClass, $enumValue)
 	{
 		if($baseClass == 'CuePoint') {
-			if ($enumValue == self::getCuePointTypeCoreValue(QuestionsCuePointType::QUESTION))
+			if ($enumValue == self::getCuePointTypeCoreValue(QuestionAnswerCuePointType::QUESTION))
 				return 'Question';
-			if ($enumValue == self::getCuePointTypeCoreValue(QuestionsCuePointType::ANSWER))
+			if ($enumValue == self::getCuePointTypeCoreValue(QuestionAnswerCuePointType::ANSWER))
 				return 'Answer';
 		}
 	}
@@ -156,6 +169,6 @@ class QuestionsPlugin extends KalturaPlugin implements IKalturaCuePoint
 	{
 		return array();
 		///TODO not sure
-		//return array(self::getCuePointTypeCoreValue(QuestionsCuePointType::QUESTION),self::getCuePointTypeCoreValue(QuestionsCuePointType::ANSWER));
+		//return array(self::getCuePointTypeCoreValue(QuestionAnswerCuePointType::QUESTION),self::getCuePointTypeCoreValue(QuestionAnswerCuePointType::ANSWER));
 	}
 }

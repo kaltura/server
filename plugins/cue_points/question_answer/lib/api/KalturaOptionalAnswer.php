@@ -1,6 +1,6 @@
 <?php
 /**
- * A representation of a live stream configuration
+ * A representation of an optional answer for question cue point
  *
  * @package api
  * @subpackage objects

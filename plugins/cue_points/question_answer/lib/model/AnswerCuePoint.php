@@ -1,6 +1,6 @@
 <?php
 /**
- * @package plugins.questions
+ * @package plugins.questionAnswer
  * @subpackage model
  */
 
@@ -22,7 +22,7 @@ class AnswerCuePoint extends CuePoint //TODO: implements IMetadataObject
 	 */
 	public function applyDefaultValues()
 	{
-		$this->setType(questionsPlugin::getCuePointTypeCoreValue(QuestionsCuePointType::ANSWER));
+		$this->setType(QuestionAnswerPlugin::getCuePointTypeCoreValue(QuestionAnswerCuePointType::ANSWER));
 	}
 
 	public function setAnswersUserEntryId($v) {return $this->putInCustomData(self::CUSTOM_DATA_ANSWERS_USER_ENTRY_ID, $v);}

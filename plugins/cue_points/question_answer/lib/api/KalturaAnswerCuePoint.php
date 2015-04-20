@@ -1,57 +1,34 @@
 <?php
 /**
- * @package plugins.questions
+ * @package plugins.questionAnswer
  * @subpackage api.objects
  */
-class KalturaQuestionCuePoint extends KalturaCuePoint
+class KalturaAnswerCuePoint extends KalturaCuePoint
 {
 
 	/**
-	 * Array of key value answerKey->optionAnswer objects
-	 * @var KalturaOptionalAnswersArray
+	 * @var string
+	 * @requiresPermission insert,update
 	 */
-	public $optionalAnswers;
-
-	/**
-	 * Array of int
-	 * @var KalturaTypedArray
-	 */
-	public $correctAnswerKeys;
-
+	public $answersUserEntryId;
 
 	/**
 	 * @var string
 	 * @requiresPermission insert,update
 	 */
-	public $hint;
+	public $answerKey;
 
-
-	/**
-	 * @var string
-	 * @filter like,mlikeor,mlikeand
-	 * @requiresPermission insert,update
-	 */
-	public $question;
-
-	/**
-	 * @var string
-	 * @requiresPermission insert,update
-	 */
-	public $correctAnswerExplanation;
 
 
 	public function __construct()
 	{
-		$this->cuePointType = questionsPlugin::getApiValue(QuestionsCuePointType::QUESTION);
+		$this->cuePointType = QuestionAnswerPlugin::getApiValue(QuestionAnswerCuePointType::QUESTION);
 	}
 
 	private static $map_between_objects = array
 	(
-		"optionalAnswers",
-		"correctAnswerKeys",
-		"hint",
-		"question" => "name",
-		"correctAnswerExplanation",
+		"answersUserEntryId",
+		"answerKey",
 	);
 
 	/* (non-PHPdoc)
