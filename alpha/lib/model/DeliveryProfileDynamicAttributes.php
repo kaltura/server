@@ -34,6 +34,11 @@ class DeliveryProfileDynamicAttributes {
 	protected $clipTo = null;
 	
 	/**
+	 * @var float
+	 */
+	protected $playbackRate = null;
+	
+	/**
 	 * @var int
 	 */
 	protected $storageProfileId = null;
@@ -139,6 +144,13 @@ class DeliveryProfileDynamicAttributes {
 	public function getClipTo() {
 		return $this->clipTo;
 	}
+	
+	/**
+	 * @return the $playbackRate
+	 */
+	public function getPlaybackRate() {
+		return $this->playbackRate;
+	}
 
 	/**
 	 * @return the $storageProfileId
@@ -224,6 +236,13 @@ class DeliveryProfileDynamicAttributes {
 		$this->clipTo = $clipTo;
 	}
 
+	/**
+	 * @param number $playbackRate
+	 */
+	public function setPlaybackRate($playbackRate) {
+		$this->playbackRate = $playbackRate;
+	}
+	
 	/**
 	 * @param number $storageProfileId
 	 */
@@ -412,6 +431,7 @@ class DeliveryProfileDynamicAttributes {
 		$this->containerFormat = $newObj->getContainerFormat();
 		$this->seekFromTime = $newObj->getSeekFromTime();
 		$this->clipTo = $newObj->getClipTo();
+		$this->playbackRate = $newObj->getPlaybackRate();
 		$this->storageId = $newObj->getStorageId();
 		$this->entryId = $newObj->getEntryId();
 		$this->tags = $newObj->getTags();
