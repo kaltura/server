@@ -31,7 +31,6 @@ class PushNotificationTemplate extends EventNotificationTemplate
             KalturaLog::debug("Queue [$queueKey] doesn't exist.");
             return false;
         }
-        KalturaLog::debug("Fullfiled!! Queue is: [$queueKey]");
         return true;
     }
     
@@ -119,7 +118,7 @@ class PushNotificationTemplate extends EventNotificationTemplate
     
     public function exists($queueKey)
     {
-        // get instance of activated queue proivder and create queue with given name
+        // get instance of activated queue proivder and check whether given queue exists
         $queueProvider = QueueProvider::getInstance();
         return $queueProvider->exists($queueKey);
     }    

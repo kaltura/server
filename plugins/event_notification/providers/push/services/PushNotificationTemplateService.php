@@ -8,7 +8,7 @@
  */
 class PushNotificationTemplateService extends KalturaBaseService
 {        
-    private function checkIfParamExists($templateParam, $userParamsArray)
+    private function doesParamExist($templateParam, $userParamsArray)
     {
         foreach ($userParamsArray as $userParam)
         {
@@ -25,10 +25,10 @@ class PushNotificationTemplateService extends KalturaBaseService
         $iv = kConf::get("push_server_secret_iv");
         
         mcrypt_generic_init($cipher, $secret, $iv);
-        $cipherText256 = mcrypt_generic($cipher, $msg);
+        $cipherData = mcrypt_generic($cipher, $msg);
         mcrypt_generic_deinit($cipher);
         
-        return bin2hex($cipherText256);
+        return bin2hex($cipherData);
     }
     
 	/**
@@ -62,7 +62,7 @@ class PushNotificationTemplateService extends KalturaBaseService
 
 	    foreach ($templateParams as $templateParam)
 	    {
-	        if (!$this->checkIfParamExists($templateParam,$userParamsArray))
+	        if (!$this->doesParamExist($templateParam,$userParamsArray))
 	            array_push($missingParams, $templateParam->getKey());
 	    }
 	    
