@@ -1167,7 +1167,7 @@ abstract class BaseFileSync extends BaseObject  implements Persistent {
 
 		FileSyncPeer::setUseCriteriaFilter(false);
 		$criteria = $this->buildPkeyCriteria();
-		entryPeer::addSelectColumns($criteria);
+		FileSyncPeer::addSelectColumns($criteria);
 		$stmt = BasePeer::doSelect($criteria, $con);
 		FileSyncPeer::setUseCriteriaFilter(true);
 		$row = $stmt->fetch(PDO::FETCH_NUM);
