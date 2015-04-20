@@ -4,6 +4,8 @@
  */
 class KFeedDropFolderEngine extends KDropFolderEngine 
 {
+	const DEFAULT_CONTENT_ITEM_SIZE = 1;
+	
 	/**
 	 * @var array
 	 */
@@ -27,29 +29,36 @@ class KFeedDropFolderEngine extends KDropFolderEngine
 		
 		//get items
 		$feedItems = $feed->xpath ($this->dropFolder->feedItemInfo->itemXPath);
+		if ($this->dropFolder->itemHandlingLimit > 0 && count ($feedItems) > $this->dropFolder->itemHandlingLimit)
+		{
+			KalturaLog::err("Reached pulling limit for drop folder ID [" . $this->dropFolder->id . "].");
+			
+			array_splice ($feedItems, $this->dropFolder->itemHandlingLimit);
+			
+			$dropFolderUpdate = new KalturaFeedDropFolder();
+			$dropFolderUpdate->errorDescription = FeedDropFolderPlugin::ERROR_MESSAGE_INCOMPLETE_HANDLING . $this->dropFolder->id;
+			$this->dropFolderPlugin->dropFolder->update($this->dropFolder->id, $dropFolderUpdate);
+		}
+		
 		$existingDropFolderFilesMap = $this->loadDropFolderFiles();
 		
 		$counter = 0;
 		foreach ($feedItems as $feedItem)
 		{
-			/* @var $feedItem SimpleXMLElement */
-			if ($this->dropFolder->itemHandlingLimit > 0 && $counter > $this->dropFolder->itemHandlingLimit)
+			if ($counter > intval ( KBatchBase::$taskConfig->params->mrss->limitProcessEachRun))
 			{
-				KalturaLog::err("Reached pulling limit for drop folder ID [" . $this->dropFolder->id . "].");
-				$dropFolderUpdate = new KalturaFeedDropFolder();
-				$dropFolderUpdate->errorDescription = FeedDropFolderPlugin::ERROR_MESSAGE_INCOMPLETE_HANDLING . $this->dropFolder->id;
-				$this->dropFolderPlugin->dropFolder->update($this->dropFolder->id, $dropFolderUpdate);
+				KalturaLog::info('Finished current run.');
 				break;
 			}
 			
-			$counter++;
-			 
+			/* @var $feedItem SimpleXMLElement */
 			$uniqueId = strval($this->getSingleXPathResult($this->dropFolder->feedItemInfo->itemUniqueIdentifierXPath, $feedItem));
 			// The unique feed item identifier is the GUID, so that is what we set as the drop folder file name.
 			if (!array_key_exists($uniqueId, $existingDropFolderFilesMap))
 			{
 				//In this case, we are required to add this item as a new drop folder file
 				$this->handleItemAdded ($uniqueId, $feedItem);
+				$counter++;
 			}
 			else
 			{
@@ -68,8 +77,10 @@ class KFeedDropFolderEngine extends KDropFolderEngine
 				}
 				
 				$this->handleExistingItem ($uniqueId, $feedItem);
+				$counter++;
 			}
 		}
+		
 	}
 	
 	
@@ -99,38 +110,41 @@ class KFeedDropFolderEngine extends KDropFolderEngine
 	    	$newDropFolderFile->dropFolderId = $this->dropFolder->id;
 	    	$newDropFolderFile->fileName = $uniqueId;
 	    	$newDropFolderFile->lastModificationTime = strval($this->getSingleXPathResult($this->dropFolder->feedItemInfo->itemPublishDateXPath, $feedItem)); 
-	    	$fileSize = $this->getSingleXPathResult($this->dropFolder->feedItemInfo->itemContentFileSizeXPath, $feedItem); 
-	    	if (!is_null ($fileSize))
-	    	{
-	    		$newDropFolderFile->fileSize = intval($fileSize);
-	    	}
-	    	else 
-	    	{
-	    		$url = $this->getSingleXPathResult($this->dropFolder->feedItemInfo->itemContentUrlXPath, $feedItem);
-	    		if (is_null ($url))
-	    		{
-	    			throw new Exception ("Cannot add drop folder file - content URL does not exist");
-	    		}
-	    		$contentUrl = strval($url);
-	
-				$curl = curl_init($contentUrl);
-				curl_setopt($curl, CURLOPT_HEADER, true);
-			    curl_setopt($curl, CURLOPT_FILETIME, true);
-			    curl_setopt($curl, CURLOPT_NOBODY, true);
-				$res = curl_exec($curl);
-				if ($res)
-				{
-					$curlInfo = curl_getinfo($curl);
-					$newDropFolderFile->fileSize = intval($curlInfo['download_content_length']);
-				}
-				
-				curl_close($curl);
-	    	}
-	    	
 	    	$newDropFolderFile->hash = strval($this->getSingleXPathResult($this->dropFolder->feedItemInfo->itemHashXPath, $feedItem));
+	    	$newDropFolderFile->fileSize = self::DEFAULT_CONTENT_ITEM_SIZE;
+	    	
+	    	// Disabled this code for the time being, until there is a requirement for MRSS feed updates. Drop folder file size will be set to 1. 
+//	    	$fileSize = $this->getSingleXPathResult($this->dropFolder->feedItemInfo->itemContentFileSizeXPath, $feedItem); 
+//	    	if (!is_null ($fileSize))
+//	    	{
+//	    		$newDropFolderFile->fileSize = intval($fileSize);
+//	    	}
+//	    	else 
+//	    	{
+//	    		$url = $this->getSingleXPathResult($this->dropFolder->feedItemInfo->itemContentUrlXPath, $feedItem);
+//	    		if (is_null ($url))
+//	    		{
+//	    			throw new Exception ("Cannot add drop folder file - content URL does not exist");
+//	    		}
+//	    		$contentUrl = strval($url);
+//	
+//				$curl = curl_init($contentUrl);
+//				curl_setopt($curl, CURLOPT_HEADER, true);
+//			    curl_setopt($curl, CURLOPT_FILETIME, true);
+//			    curl_setopt($curl, CURLOPT_NOBODY, true);
+//				$res = curl_exec($curl);
+//				if ($res)
+//				{
+//					$curlInfo = curl_getinfo($curl);
+//					$newDropFolderFile->fileSize = intval($curlInfo['download_content_length']);
+//				}
+//				
+//				curl_close($curl);
+//	    	}
+	    	
 	    	$newDropFolderFile->feedXmlPath = $feedPath;
 			//No such thing as an 'uploading' MRSS drop folder file - if the file is detected, it is ready for upload. Immediately update status to 'pending'
-			KBatchBase::$kClient->startMultiRequest();
+	    	KBatchBase::$kClient->startMultiRequest();
 			$dropFolderFile = $this->dropFolderFileService->add($newDropFolderFile);
 			$this->dropFolderFileService->updateStatus($dropFolderFile->id, KalturaDropFolderFileStatus::PENDING);
 			$result = KBatchBase::$kClient->doMultiRequest();
@@ -168,6 +182,7 @@ class KFeedDropFolderEngine extends KDropFolderEngine
 						unset ($contentItem[0]);
 				}
 			}
+			
 		}
 		
 		$updatedGuid = str_replace (self::$searchCharacters, self::$replaceCharacters, strval ($feedItem->guid));
@@ -194,7 +209,7 @@ class KFeedDropFolderEngine extends KDropFolderEngine
 			{
 				KalturaLog::info('Hash has changed- content will be updated.');
 				$this->handleItemAdded($feedItem);
-				return;
+				return true;
 			}
 		}
 		
@@ -202,9 +217,11 @@ class KFeedDropFolderEngine extends KDropFolderEngine
 		if ($feedItem->pubDate != $existingDropFolderFile->lastModificationTime)
 		{
 			$this->handleItemAdded($feedItem, false);
+			return true;
 		}
 		
 		//If neither of the conditions above were true, neither the metadata nor the content were changed- do nothing.
+		return false;
 	}
 
 	/* (non-PHPdoc)
