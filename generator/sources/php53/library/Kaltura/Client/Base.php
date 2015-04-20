@@ -36,11 +36,11 @@ namespace Kaltura\Client;
  * @package Kaltura
  * @subpackage Client
  */
-class Base 
+class Base
 {
 	// KS V2 constants
 	const RANDOM_SIZE = 16;
-	
+
 	const FIELD_EXPIRY =              '_e';
 	const FIELD_TYPE =                '_t';
 	const FIELD_USER =                '_u';
@@ -63,27 +63,27 @@ class Base
 	 * @var array
 	 */
 	protected $requestConfiguration = array();
-	
+
 	/**
 	 * @var boolean
 	 */
 	private $shouldLog = false;
-	
+
 	/**
 	 * @var Array of classes
 	 */
 	private $multiRequestReturnType = null;
-	
+
 	/**
 	 * @var array<\Kaltura\Client\ServiceActionCall>
 	 */
 	private $callsQueue = array();
-	
+
 	/**
 	* @var Array of response headers
 	*/
 	private $responseHeaders = array();
-	
+
 	/**
 	 * Kaltura client constructor
 	 *
@@ -92,51 +92,51 @@ class Base
 	public function __construct(Configuration $config)
 	{
 	    $this->config = $config;
-	    
+
 	    $logger = $this->config->getLogger();
 		if ($logger)
-			$this->shouldLog = true;	
+			$this->shouldLog = true;
 	}
 
 	/* Store response headers into array */
 	public function readHeader($ch, $string)
 	{
 		array_push($this->responseHeaders, $string);
-		return strlen($string);	
+		return strlen($string);
 	}
-	
+
 	/* Retrieve response headers */
 	public function getResponseHeaders()
 	{
 		return $this->responseHeaders;
 	}
-	
+
 	public function getServeUrl()
 	{
 		if (count($this->callsQueue) != 1)
 			return null;
-			 
+
 		$params = array();
 		$files = array();
 		$this->log("service url: [" . $this->config->getServiceUrl() . "]");
-		
+
 		// append the basic params
 		$this->addParam($params, "format", $this->config->getFormat());
-	
+
 		foreach($this->clientConfiguration as $param => $value)
 		{
 			$this->addParam($params, $param, $value);
 		}
-		
+
 		$call = $this->callsQueue[0];
 		$this->callsQueue = array();
-		
+
 		$params = array_merge($params, $call->params);
 		$signature = $this->signature($params);
 		$this->addParam($params, "kalsig", $signature);
-		
+
 		$url = $this->config->getServiceUrl() . "/api_v3/index.php?service={$call->service}&action={$call->action}";
-		$url .= '&' . http_build_query($params); 
+		$url .= '&' . http_build_query($params);
 		$this->log("Returned url [$url]");
 		return $url;
 	}
@@ -147,13 +147,13 @@ class Base
 		{
 			$this->addParam($params, $param, $value);
 		}
-		
+
 		$call = new ServiceActionCall($service, $action, $params, $files);
 		if(!is_null($this->multiRequestReturnType))
 			$this->multiRequestReturnType[] = $returnType;
 		$this->callsQueue[] = $call;
 	}
-	
+
 	/**
 	 * Call all API service that are in queue
 	 *
@@ -163,16 +163,16 @@ class Base
 	{
 		if (count($this->callsQueue) == 0)
 		{
-			$this->multiRequestReturnType = null; 
+			$this->multiRequestReturnType = null;
 			return null;
 		}
-			 
+
 		$startTime = microtime(true);
-				
+
 		$params = array();
 		$files = array();
 		$this->log("service url: [" . $this->config->getServiceUrl() . "]");
-		
+
 		// append the basic params
 		$this->addParam($params, "format", $this->config->getFormat());
 		$this->addParam($params, "ignoreNull", true);
@@ -181,7 +181,7 @@ class Base
 		{
 			$this->addParam($params, $param, $value);
 		}
-		
+
 		$url = $this->config->getServiceUrl()."/api_v3/index.php?service=";
 		if (!is_null($this->multiRequestReturnType))
 		{
@@ -203,21 +203,21 @@ class Base
 			$params = array_merge($params, $call->params);
 			$files = $call->files;
 		}
-		
+
 		// reset
 		$this->callsQueue = array();
-				
+
 		$signature = $this->signature($params);
 		$this->addParam($params, "kalsig", $signature);
-		
+
 		list($postResult, $errorCode, $error) = $this->doHttpRequest($url, $params, $files);
-						
+
 		if ($error || ($errorCode != 200 ))
 		{
 			$error .= ". RC : $errorCode";
 			throw new ClientException($error, ClientException::ERROR_GENERIC);
 		}
-		else 
+		else
 		{
 			// print server debug info to log
 			$serverName = null;
@@ -234,17 +234,17 @@ class Base
 				$this->log("server: [{$serverName}], session: [{$serverSession}]");
 
 			$this->log("result (serialized): " . $postResult);
-			
+
 			if ($this->config->getFormat() != self::KALTURA_SERVICE_FORMAT_XML)
 			{
 				throw new ClientException("unsupported format: $postResult", ClientException::ERROR_FORMAT_NOT_SUPPORTED);
 			}
 		}
-		
+
 		$endTime = microtime (true);
-		
+
 		$this->log("execution time for [".$url."]: [" . ($endTime - $startTime) . "]");
-		
+
 		return $postResult;
 	}
 
@@ -264,7 +264,7 @@ class Base
 		}
 		return md5($str);
 	}
-	
+
 	/**
 	 * Send http request by using curl (if available) or php stream_context
 	 *
@@ -276,7 +276,7 @@ class Base
 	{
 		if (!function_exists('curl_init'))
 			throw new ClientException("Curl extension must be enabled", ClientException::ERROR_CURL_MUST_BE_ENABLED);
-			
+
 		return $this->doCurl($url, $params, $files);
 	}
 
@@ -296,9 +296,16 @@ class Base
 		curl_setopt($ch, CURLOPT_POST, 1);
 		if (count($files) > 0)
 		{
-			foreach($files as &$file)
-				$file = "@".$file; // let curl know its a file
-			curl_setopt($ch, CURLOPT_POSTFIELDS, array_merge($params, $files));
+            foreach ($files as &$file) {
+                // The usage of the @filename API for file uploading is
+                // deprecated since PHP 5.5. CURLFile must be used instead.
+                if (PHP_VERSION_ID >= 50500) {
+                    $file = new \CURLFile($file);
+                } else {
+                    $file = "@" . $file; // let curl know its a file
+                }
+            }
+            curl_setopt($ch, CURLOPT_POSTFIELDS, array_merge($params, $files));
 		}
 		else
 		{
@@ -313,19 +320,19 @@ class Base
 			curl_setopt($ch, CURLOPT_TIMEOUT, 0);
 		else
 			curl_setopt($ch, CURLOPT_TIMEOUT, $this->config->getCurlTimeout());
-			
+
 		if ($this->config->getStartZendDebuggerSession() === true)
 		{
 			$zendDebuggerParams = $this->getZendDebuggerParams($url);
 			$cookies = array_merge($cookies, $zendDebuggerParams);
 		}
-		
-		if (count($cookies) > 0) 
+
+		if (count($cookies) > 0)
 		{
 			$cookiesStr = http_build_query($cookies, null, '; ');
 			curl_setopt($ch, CURLOPT_COOKIE, $cookiesStr);
 		}
-		
+
 		if ($this->config->getProxyHost()) {
 			curl_setopt($ch, CURLOPT_HTTPPROXYTUNNEL, true);
 			curl_setopt($ch, CURLOPT_PROXY, $this->config->getProxyHost());
@@ -337,22 +344,22 @@ class Base
 			}
 			if ($this->config->getProxyType() === 'SOCKS5') {
 				curl_setopt($ch, CURLOPT_PROXYTYPE, CURLPROXY_SOCKS5);
-			}	
+			}
 		}
-		
+
 		// Set SSL verification
 		if(!$this->config->getVerifySSL())
-		{		
+		{
 			curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 			curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
 		}
-		
+
 		// Set custom headers
 		curl_setopt($ch, CURLOPT_HTTPHEADER, $this->config->getRequestHeaders());
-		
+
 		// Save response headers
 		curl_setopt($ch, CURLOPT_HEADERFUNCTION, array($this, 'readHeader') );
-		
+
 		$result = curl_exec($ch);
 		$curlErrorCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 		$curlError = curl_error($ch);
@@ -367,18 +374,18 @@ class Base
 	{
 		return $this->config;
 	}
-	
+
 	/**
 	 * @param Configuration $config
 	 */
 	public function setConfig(Configuration $config)
 	{
 		$this->config = $config;
-		
+
 		$logger = $this->config->getLogger();
 		if ($logger instanceof ILogger)
 		{
-			$this->shouldLog = true;	
+			$this->shouldLog = true;
 		}
 	}
 
@@ -400,7 +407,7 @@ class Base
 			}
 		}
 	}
-	
+
 	public function setRequestConfiguration(\Kaltura\Client\Type\RequestConfiguration $configuration)
 	{
 		$params = get_class_vars('\Kaltura\Client\Type\RequestConfiguration');
@@ -419,7 +426,7 @@ class Base
 			}
 		}
 	}
-	
+
 	/**
 	 * Add parameter to array of parameters that is passed by reference
 	 *
@@ -431,27 +438,27 @@ class Base
 	{
 		if ($paramValue === null)
 			return;
-			
+
 		if ($paramValue instanceof NullValue) {
 			$params[$paramName . '__null'] = '';
 			return;
 		}
-			
+
 		if(is_object($paramValue) && $paramValue instanceof ObjectBase)
 		{
 			$this->addParam($params, "$paramName:objectType", $paramValue->getKalturaObjectType());
 		    foreach($paramValue as $prop => $val)
 				$this->addParam($params, "$paramName:$prop", $val);
-				
+
 			return;
-		}	
-		
+		}
+
 		if(!is_array($paramValue))
 		{
 			$params[$paramName] = (string)$paramValue;
 			return;
 		}
-		
+
 		if ($paramValue)
 		{
 			foreach($paramValue as $subParamName => $subParamValue)
@@ -462,7 +469,7 @@ class Base
 			$this->addParam($params, "$paramName:-", "");
 		}
 	}
-	
+
 	/**
 	 * Validate that the passed object type is of the expected type
 	 *
@@ -481,18 +488,18 @@ class Base
 			throw new ClientException("Invalid object type [" . gettype($resultObject) . "] expected [$objectType]", ClientException::ERROR_INVALID_OBJECT_TYPE);
 		}
 	}
-	
+
 	public function startMultiRequest()
 	{
 		$this->multiRequestReturnType = array();
 	}
-	
+
 	public function doMultiRequest()
 	{
 		$xmlData = $this->doQueue();
 		if(is_null($xmlData))
 			return null;
-		
+
 		$xml = new \SimpleXMLElement($xmlData);
 		$items = $xml->result->children();
 		$ret = array();
@@ -505,30 +512,30 @@ class Base
 				$ret[] = ParseUtils::unmarshalObject($item, $this->multiRequestReturnType[$i]);
 			else if($item->item)
 				$ret[] = ParseUtils::unmarshalArray($item, $this->multiRequestReturnType[$i]);
-			else			
+			else
 				$ret[] = ParseUtils::unmarshalSimpleType($item);
 			$i++;
 		}
-		
+
 		$this->multiRequestReturnType = null;
 		return $ret;
 	}
-	
+
 	public function isMultiRequest()
 	{
 		return !is_null($this->multiRequestReturnType);
 	}
-		
+
 	public function getMultiRequestQueueSize()
 	{
-		return count($this->callsQueue);	
+		return count($this->callsQueue);
 	}
-	
+
     public function getMultiRequestResult()
 	{
         return new MultiRequestSubResult($this->getMultiRequestQueueSize() . ':result');
 	}
-	
+
 	/**
 	 * @param string $msg
 	 */
@@ -537,7 +544,7 @@ class Base
 		if ($this->shouldLog)
 			$this->config->getLogger()->log($msg);
 	}
-	
+
 	/**
 	 * Return a list of parameters used to start a new debug session on the destination server api
 	 * @link http://kb.zend.com/index.php?View=entry&EntryID=434
@@ -555,41 +562,41 @@ class Base
 			'debug_jit',
 			'debug_stop',
 			'use_remote');
-		
+
 		foreach($passThruParams as $param)
 		{
 			if (isset($_COOKIE[$param]))
 				$params[$param] = $_COOKIE[$param];
 		}
-		
+
 		$params['original_url'] = $url;
 		$params['debug_session_id'] = microtime(true); // to create a new debug session
-		
+
 		return $params;
 	}
-	
+
 	public function generateSession($adminSecretForSigning, $userId, $type, $partnerId, $expiry = 86400, $privileges = '')
 	{
 		$rand = rand(0, 32000);
 		$expiry = time()+$expiry;
-		$fields = array ( 
-			$partnerId , 
-			$partnerId , 
-			$expiry , 
-			$type, 
-			$rand , 
-			$userId , 
-			$privileges 
+		$fields = array (
+			$partnerId ,
+			$partnerId ,
+			$expiry ,
+			$type,
+			$rand ,
+			$userId ,
+			$privileges
 		);
 		$info = implode ( ";" , $fields );
 
-		$signature = $this->hash ( $adminSecretForSigning , $info );	 
+		$signature = $this->hash ( $adminSecretForSigning , $info );
 		$strToHash =  $signature . "|" . $info ;
 		$encoded_str = base64_encode( $strToHash );
 
 		return $encoded_str;
 	}
-	
+
 	public static function generateSessionV2($adminSecretForSigning, $userId, $type, $partnerId, $expiry, $privileges)
 	{
 		// build fields array
@@ -618,7 +625,7 @@ class Base
 			$rand .= chr(rand(0, 0xff));
 		$fieldsStr = $rand . $fieldsStr;
 		$fieldsStr = sha1($fieldsStr, true) . $fieldsStr;
-		
+
 		// encrypt and encode
 		$encryptedFields = self::aesEncrypt($adminSecretForSigning, $fieldsStr);
 		$decodedKs = "v2|{$partnerId}|" . $encryptedFields;
@@ -635,7 +642,7 @@ class Base
 			str_repeat("\0", 16)	// no need for an IV since we add a random string to the message anyway
 		);
 	}
-	
+
 	private function hash ( $salt , $str )
 	{
 		return sha1($salt.$str);
@@ -648,7 +655,7 @@ class Base
 	{
         return NullValue::getInstance();
 	}
-	
+
 	public function __get($prop)
 	{
 		$getter = 'get'.ucfirst($prop).'Service';

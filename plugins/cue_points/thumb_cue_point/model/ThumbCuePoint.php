@@ -36,11 +36,21 @@ class ThumbCuePoint extends CuePoint implements IMetadataObject
 		return ThumbCuePointMetadataPlugin::getMetadataObjectTypeCoreValue(ThumbCuePointMetadataObjectType::THUMB_CUE_POINT);
 	}
 
-	public function copyFromLiveToVodEntry( $liveEntry, $vodEntry, $adjustedStartTime )
+	public function copyToEntry( $entry, PropelPDO $con = null)
+	{
+		return $this->copyFromLiveToVodEntry( $entry, null );
+	}
+
+	public function copyFromLiveToVodEntry( $vodEntry, $adjustedStartTime )
 	{
 		// Clone the cue point to the destination entry
 		$vodThumbCuePoint = parent::copyToEntry( $vodEntry );
+		$this->copyAssets( $vodEntry, $vodThumbCuePoint, $adjustedStartTime );
+		return $vodThumbCuePoint;
+	}
 
+	public function copyAssets( entry $toEntry, ThumbCuePoint $toCuePoint, $adjustedStartTime = null )
+	{
 		$timedThumbAsset = assetPeer::retrieveById($this->getAssetId());
 		if ( ! $timedThumbAsset )
 		{
@@ -49,27 +59,29 @@ class ThumbCuePoint extends CuePoint implements IMetadataObject
 		}
 
 		// Offset the startTime according to the duration gap between the live and VOD entries
-		$vodThumbCuePoint->setStartTime( $adjustedStartTime );
-		$vodThumbCuePoint->save(); // Must save in order to produce an id
+		if ( !is_null( $adjustedStartTime ) ) {
+			$toCuePoint->setStartTime( $adjustedStartTime );
+		}
+		$toCuePoint->save(); // Must save in order to produce an id
 
-		$timedThumbAsset->setCuePointID( $vodThumbCuePoint->getId() );	// Set the destination cue point's id
+		$timedThumbAsset->setCuePointID( $toCuePoint->getId() );	// Set the destination cue point's id
 		$timedThumbAsset->setCustomDataObj();							// Write the cached custom data object into the thumb asset
 
 		// Make a copy of the current thumb asset
 		// copyToEntry will create a filesync softlink to the original filesync
-		$vodTimedThumbAsset = $timedThumbAsset->copyToEntry( $vodEntry->getId(), $vodEntry->getPartnerId() );
-		$vodThumbCuePoint->setAssetId( $vodTimedThumbAsset->getId() );
-		$vodThumbCuePoint->save();
+		$toTimedThumbAsset = $timedThumbAsset->copyToEntry( $toEntry->getId(), $toEntry->getPartnerId() );
+		$toCuePoint->setAssetId( $toTimedThumbAsset->getId() );
+		$toCuePoint->save();
 
 		// Restore the thumb asset's prev. cue point id (for good measures)
 		$timedThumbAsset->setCuePointID( $this->getId() );
 		$timedThumbAsset->setCustomDataObj();
 
 		// Save the destination entry's thumb asset
-		$vodTimedThumbAsset->setCuePointID( $vodThumbCuePoint->getId() );
-		$vodTimedThumbAsset->save();
+		$toTimedThumbAsset->setCuePointID( $toCuePoint->getId() );
+		$toTimedThumbAsset->save();
 
-		KalturaLog::log("Saved cue point [{$vodThumbCuePoint->getId()}] and timed thumb asset [{$vodTimedThumbAsset->getId()}]");
+		KalturaLog::log("Saved cue point [{$toCuePoint->getId()}] and timed thumb asset [{$toTimedThumbAsset->getId()}]");
 	}
 	
 	/* (non-PHPdoc)

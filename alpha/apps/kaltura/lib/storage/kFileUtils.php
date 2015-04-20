@@ -67,8 +67,15 @@ class kFileUtils extends kFile
 		KExternalErrors::dieGracefully();
 	}
 	
-	public static function dumpApiRequest($host)
+	public static function dumpApiRequest($host, $onlyIfAvailable = false)
 	{
+		if($onlyIfAvailable){
+			//validate that the other DC is available before dumping the request
+			if(kConf::hasParam('disable_dump_api_request') && kConf::get('disable_dump_api_request')){
+				KalturaLog::debug('dumpApiRequest is disabled');
+				return;
+			}			
+		}
 		if (kCurrentContext::$multiRequest_index > 1)
             KExternalErrors::dieError(KExternalErrors::MULTIREQUEST_PROXY_FAILED);
 		self::closeDbConnections();
