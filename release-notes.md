@@ -14,7 +14,7 @@ Add the following parameters to the batch.ini DropFolderWatcher worker configura
         params.mrss.limitProcessEachRun						= 20
    
   
- ### Deployment ###
+### Deployment ###
  
  - clear the cache
  - run php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
