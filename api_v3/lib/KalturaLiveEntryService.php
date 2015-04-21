@@ -269,6 +269,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 			$recordedEntry->setIsRecordedEntry(true);
             if ($copyAdditionData)
             {
+                KalturaLog::debug("Adding addition data (tags and categories)");
                 $recordedEntry->setTags($dbEntry->getTags());
                 $recordedEntry->setCategories($dbEntry->getCategories());
             }
