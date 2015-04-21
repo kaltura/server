@@ -356,8 +356,8 @@ class myPlaylistUtils
 
 		if ( $pager )
 		{
-			$pageSize = $pager->getPageSize();
-			$startOffset = $pager->getOffset();
+			$pageSize = $pager->calcPageSize();
+			$startOffset = $pager->calcOffset();
 		}
 
 		// VERY STRANGE !! &$entry_id must be with a & or else the values of the array change !!!
@@ -527,8 +527,8 @@ class myPlaylistUtils
 		
 		if ( $pager )
 		{
-			$startOffset = $pager->getOffset();
-			$pageSize = $pager->getPageSize();
+			$startOffset = $pager->calcOffset();
+			$pageSize = $pager->calcPageSize();
 		}
 
 		$number_of_entries = 0;
