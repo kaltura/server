@@ -18,12 +18,6 @@ class QuizService extends KalturaBaseService
 		{
 			throw new KalturaAPIException(KalturaErrors::FEATURE_FORBIDDEN, QuizPlugin::PLUGIN_NAME);
 		}
-
-		 //TODO interesting
-		/*if (!kCurrentContext::$ks_uid || kCurrentContext::$ks_uid == "")
-		{
-			throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID);
-		}*/
 	}
 
 	/**
@@ -33,6 +27,9 @@ class QuizService extends KalturaBaseService
 	 * @param string $entryId
 	 * @param KalturaQuiz $quiz
 	 * @return KalturaQuiz
+	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
+	 * @throws KalturaErrors::INVALID_USER_ID
+	 * @throws KalturaQuizErrors::PROVIDED_ENTRY_IS_ALREADY_A_QUIZ
 	 */
 	public function addAction( $entryId, KalturaQuiz $quiz )
 	{
@@ -43,12 +40,7 @@ class QuizService extends KalturaBaseService
 		if ( !is_null( $this->getQuizData($dbEntry) ) )
 			throw new KalturaAPIException(KalturaQuizErrors::PROVIDED_ENTRY_IS_ALREADY_A_QUIZ, $entryId);
 
-		$quizData = $quiz->toObject();
-		$this->setQuizData( $dbEntry, $quizData );
-		$dbEntry->save();
-
-		return $quiz;
-		//TODO how to verify user can update this entry???
+		return $this->validateAndUpdateQuizData( $dbEntry, $quiz );
 	}
 
 	/**
@@ -58,6 +50,9 @@ class QuizService extends KalturaBaseService
 	 * @param string $entryId
 	 * @param KalturaQuiz $quiz
 	 * @return KalturaQuiz
+	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
+	 * @throws KalturaErrors::INVALID_USER_ID
+	 * @throws KalturaQuizErrors::PROVIDED_ENTRY_IS_NOT_A_QUIZ
 	 */
 	public function updateAction( $entryId, KalturaQuiz $quiz )
 	{
@@ -68,11 +63,16 @@ class QuizService extends KalturaBaseService
 		if ( is_null( $this->getQuizData($dbEntry) ) )
 			throw new KalturaAPIException(KalturaQuizErrors::PROVIDED_ENTRY_IS_NOT_A_QUIZ, $entryId);
 
+		return $this->validateAndUpdateQuizData( $dbEntry, $quiz );
+	}
+
+	private function validateAndUpdateQuizData( entry $dbEntry, KalturaQuiz $quiz )
+	{
+		$this->validateUserEntitledForUpdate( $dbEntry );
 		$quizData = $quiz->toObject();
 		$this->setQuizData( $dbEntry, $quizData );
 		$dbEntry->save();
 		return $quiz;
-		//TODO how to verify user can update this entry???
 	}
 
 	/**
@@ -81,6 +81,8 @@ class QuizService extends KalturaBaseService
 	 * @action get
 	 * @param string $entryId
 	 * @return KalturaQuiz
+	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
+	 * @throws KalturaQuizErrors::PROVIDED_ENTRY_IS_NOT_A_QUIZ
 	 */
 	public function getAction( $entryId )
 	{
@@ -110,6 +112,24 @@ class QuizService extends KalturaBaseService
 	private function setQuizData( entry $entry, kQuiz $kQuiz )
 	{
 		$entry->putInCustomData( QuizPlugin::QUIZ_DATA, serialize($kQuiz) );
+	}
+
+	/**
+	 * Throws an error if the user is not owner or co-editor
+	 *
+	 * @param entry $dbEntry
+	 */
+	private function validateUserEntitledForUpdate(entry $dbEntry)
+	{
+		if ( kCurrentContext::$is_admin_session || kCurrentContext::getCurrentKsKuserId() == $dbEntry->getKuserId())
+		return;
+
+		$entitledKusers = explode(',', $dbEntry->getEntitledKusersEdit());
+		if(!in_array(kCurrentContext::getCurrentKsKuserId(), $entitledKusers))
+		{
+			KalturaLog::debug('Update quiz allowed only with admin KS or entry owner or co-editor');
+			throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID);
+		}
 	}
 
 }
