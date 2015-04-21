@@ -232,8 +232,7 @@ function executeRequest(KalturaClient $client, SimpleXMLElement $request)
 	{
 		if (!is_null($impersonatePartner))
 		{
-		    $config = $client->getConfig();
-		    $configPartnerId = $config->partnerId;
+		    $configPartnerId = $client->getPartnerId();
 			$client->setPartnerId($impersonatePartner);
 		}
 		if ($client->isMultiRequest())
