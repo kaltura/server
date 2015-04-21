@@ -44,10 +44,16 @@ class FeedDropFolderPlugin extends KalturaPlugin implements IKalturaPlugin, IKal
 					return new kDropFolderFeedXmlFileHandler();
 				}
 				break;
+			case 'Form_DropFolderConfigureExtend_SubForm':
+				if ($enumValue == Kaltura_Client_DropFolder_Enum_DropFolderType::FEED)
+				{
+					return new Form_FeedDropFolderConfigureExtend_SubForm();
+				}
+				break;
 			case 'Kaltura_Client_DropFolder_Type_DropFolder':
 				if ($enumValue == Kaltura_Client_DropFolder_Enum_DropFolderType::FEED)
 				{
-					return new Kaltura_Client_DropFolder_Type_DropFolder();
+					return new Kaltura_Client_FeedDropFolder_Type_FeedDropFolder();
 				}
 				break;
 		}
