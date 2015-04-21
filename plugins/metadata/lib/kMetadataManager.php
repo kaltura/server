@@ -534,6 +534,13 @@ class kMetadataManager
 			/** @var MetadataProfileField $profileField */
 			if ($profileField->getType() == MetadataSearchFilter::KMC_FIELD_TYPE_METADATA_OBJECT)
 			{
+				$nodes = $xPath->query($profileField->getXpath());
+				$subObjectIds = array();
+				foreach ($nodes as $node)
+					$subObjectIds[] = $node->nodeValue;
+				$subObjectIds = array_unique($subObjectIds);
+				if (!count($subObjectIds))
+					continue;
 				$subMetadataProfileId = $profileField->getRelatedMetadataProfileId();
 				$subMetadataProfile = MetadataProfilePeer::retrieveByPK($subMetadataProfileId);
 				if (!$subMetadataProfile)
@@ -541,11 +548,6 @@ class kMetadataManager
 					KalturaLog::err('Sub metadata profile ' . $subMetadataProfileId . ' was not found');
 					return false;
 				}
-				$nodes = $xPath->query($profileField->getXpath());
-				$subObjectIds = array();
-				foreach ($nodes as $node)
-					$subObjectIds[] = $node->nodeValue;
-				$subObjectIds = array_unique($subObjectIds);
 				$subMetadataObjects = MetadataPeer::retrieveByObjects($subMetadataProfileId, $subMetadataProfile->getObjectType(), $subObjectIds);
 				if (count($subMetadataObjects) != count($subObjectIds))
 				{
