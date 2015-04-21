@@ -11,9 +11,9 @@ class DeliveryProfileVodPackagerMss extends DeliveryProfileSilverLight {
 	{
 		$url = parent::doGetFlavorAssetUrl($flavorAsset);
 		$url .= '/forceproxy/true';
-		$url .= VodPackagerDeliveryUtils::getExtraParams($this->params);
 		if($this->params->getFileExtension())
 			$url .= "/name/a." . $this->params->getFileExtension();
+		$url .= VodPackagerDeliveryUtils::getExtraParams($this->params);
 		return $url;
 	}
 	
