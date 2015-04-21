@@ -220,7 +220,9 @@ class kMetadataManager
 			$profileField->setStatus(MetadataProfileField::STATUS_NONE_SEARCHABLE);
 			$profileField->setMetadataProfileVersion($metadataProfile->getVersion());
 			$profileField->save();
-			
+
+			self::setAdditionalProfileFieldData($metadataProfile, $profileField, $xPathData);
+
 			unset($xPaths[$xPath]);
 		}
 		
@@ -239,7 +241,10 @@ class kMetadataManager
 			if(isset($xPathData['label']))
 				$profileField->setLabel($xPathData['label']);
 			if(isset($xPathData['type']))
+			{
 				$profileField->setType($xPathData['type']);
+				self::setAdditionalProfileFieldData($metadataProfile, $profileField, $xPathData);
+			}
 
 			$profileField->save();
 		}
