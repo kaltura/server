@@ -1067,7 +1067,10 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 			$serviceImports[] = "com.kaltura.client.types.*";
 				
 			return ("Map<String, " . $arrayType . ">");
-			
+
+		case "bigint" :
+			return "long";
+
 		case "bool" :
 			return "boolean";
 			
