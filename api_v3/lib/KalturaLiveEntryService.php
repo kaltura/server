@@ -58,11 +58,12 @@ class KalturaLiveEntryService extends KalturaEntryService
 	 * @param KalturaDataCenterContentResource $resource
 	 * @param float $duration in seconds
 	 * @param bool $isLastChunk Is this the last recorded chunk in the current session (i.e. following a stream stop event)
+     * @param bool $copyAdditionalParams There are some parameters that should only be copied to a new entry if this is true.
 	 * @return KalturaLiveEntry The updated live entry
 	 * 
 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
 	 */
-	function appendRecordingAction($entryId, $assetId, $mediaServerIndex, KalturaDataCenterContentResource $resource, $duration, $isLastChunk = false)
+	function appendRecordingAction($entryId, $assetId, $mediaServerIndex, KalturaDataCenterContentResource $resource, $duration, $isLastChunk = false, $copyAdditionalParams = true)
 	{
 		$dbEntry = entryPeer::retrieveByPK($entryId);
 		if (!$dbEntry || !($dbEntry instanceof LiveEntry))
@@ -126,7 +127,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 		{
 			if(!$dbEntry->getRecordedEntryId())
 			{
-				$this->createRecordedEntry($dbEntry, $mediaServerIndex);
+				$this->createRecordedEntry($dbEntry, $mediaServerIndex, $copyAdditionalParams);
 			}
 			
 			$recordedEntry = entryPeer::retrieveByPK($dbEntry->getRecordedEntryId());
@@ -238,7 +239,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 	 * @param LiveEntry $dbEntry
 	 * @return entry
 	 */
-	private function createRecordedEntry(LiveEntry $dbEntry, $mediaServerIndex)
+	private function createRecordedEntry(LiveEntry $dbEntry, $mediaServerIndex, $copyAdditionData = false)
 	{
 		$lock = kLock::create("live_record_" . $dbEntry->getId());
 		
@@ -266,6 +267,12 @@ class KalturaLiveEntryService extends KalturaEntryService
 			$recordedEntry->setPartnerId($dbEntry->getPartnerId());
 			$recordedEntry->setModerationStatus($dbEntry->getModerationStatus());
 			$recordedEntry->setIsRecordedEntry(true);
+            if ($copyAdditionData)
+            {
+                KalturaLog::debug("Adding addition data (tags and categories)");
+                $recordedEntry->setTags($dbEntry->getTags());
+                $recordedEntry->setCategories($dbEntry->getCategories());
+            }
 			$recordedEntry->save();
 			
 			$dbEntry->setRecordedEntryId($recordedEntry->getId());

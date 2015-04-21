@@ -178,7 +178,7 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 			substr($parentReload, 0, $doSelectPos) .
 			$this->getPeerClassname() . "::setUseCriteriaFilter(false);" . $newLine .
 			"\$criteria = \$this->buildPkeyCriteria();" . $newLine .
-			"entryPeer::addSelectColumns(\$criteria);" . $newLine .
+			$this->getPeerClassname() . "::addSelectColumns(\$criteria);" . $newLine .
 			"\$stmt = BasePeer::doSelect(\$criteria, \$con);" . $newLine . 
 			$this->getPeerClassname() . "::setUseCriteriaFilter(true);" .
 			substr($parentReload, $doSelectPos + strlen($doSelectStmt));
@@ -1070,6 +1070,16 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 	public function incInCustomData ( \$name , \$delta = 1, \$namespace = null)
 	{
 		\$customData = \$this->getCustomDataObj( );
+		
+		\$currentNamespace = '';
+		if(\$namespace)
+			\$currentNamespace = \$namespace;
+			
+		if(!isset(\$this->oldCustomDataValues[\$currentNamespace]))
+			\$this->oldCustomDataValues[\$currentNamespace] = array();
+		if(!isset(\$this->oldCustomDataValues[\$currentNamespace][\$name]))
+			\$this->oldCustomDataValues[\$currentNamespace][\$name] = \$customData->get(\$name, \$namespace);
+		
 		return \$customData->inc ( \$name , \$delta , \$namespace  );
 	}
 
