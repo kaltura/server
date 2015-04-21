@@ -527,7 +527,7 @@ class kMetadataManager
 
 	protected static function validateSubMetadataObjects($metadataProfileId, KDOMDocument $xml)
 	{
-		$profileFields = MetadataProfileFieldPeer::retrieveByMetadataProfileId($metadataProfileId);
+		$profileFields = MetadataProfileFieldPeer::retrieveAllActiveByMetadataProfileId($metadataProfileId);
 		$xPath = new DOMXPath($xml);
 		foreach ($profileFields as $profileField)
 		{
