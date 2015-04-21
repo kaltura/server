@@ -751,6 +751,12 @@ class myEntryUtils
 					if(is_null($flavorAsset))
 					{
     					$flavorAsset = assetPeer::retrieveOriginalReadyByEntryId($entry->getId());
+                        $flavorSyncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+                        list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($flavorSyncKey,false,false);
+                        if (!$fileSync)
+                        {
+                            $flavorAsset = null;
+                        }
 	    				if(is_null($flavorAsset) || !($flavorAsset->hasTag(flavorParams::TAG_MBR) || $flavorAsset->hasTag(flavorParams::TAG_WEB)))
 					    {
     						// try the best playable
