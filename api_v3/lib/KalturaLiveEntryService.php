@@ -58,12 +58,11 @@ class KalturaLiveEntryService extends KalturaEntryService
 	 * @param KalturaDataCenterContentResource $resource
 	 * @param float $duration in seconds
 	 * @param bool $isLastChunk Is this the last recorded chunk in the current session (i.e. following a stream stop event)
-     * @param bool $copyAdditionalParams There are some parameters that should only be copied to a new entry if this is true.
 	 * @return KalturaLiveEntry The updated live entry
 	 * 
 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
 	 */
-	function appendRecordingAction($entryId, $assetId, $mediaServerIndex, KalturaDataCenterContentResource $resource, $duration, $isLastChunk = false, $copyAdditionalParams = true)
+	function appendRecordingAction($entryId, $assetId, $mediaServerIndex, KalturaDataCenterContentResource $resource, $duration, $isLastChunk = false)
 	{
 		$dbEntry = entryPeer::retrieveByPK($entryId);
 		if (!$dbEntry || !($dbEntry instanceof LiveEntry))
@@ -127,7 +126,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 		{
 			if(!$dbEntry->getRecordedEntryId())
 			{
-				$this->createRecordedEntry($dbEntry, $mediaServerIndex, $copyAdditionalParams);
+				$this->createRecordedEntry($dbEntry, $mediaServerIndex);
 			}
 			
 			$recordedEntry = entryPeer::retrieveByPK($dbEntry->getRecordedEntryId());
@@ -239,7 +238,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 	 * @param LiveEntry $dbEntry
 	 * @return entry
 	 */
-	private function createRecordedEntry(LiveEntry $dbEntry, $mediaServerIndex, $copyAdditionData = false)
+	private function createRecordedEntry(LiveEntry $dbEntry, $mediaServerIndex)
 	{
 		$lock = kLock::create("live_record_" . $dbEntry->getId());
 		
@@ -267,14 +266,10 @@ class KalturaLiveEntryService extends KalturaEntryService
 			$recordedEntry->setPartnerId($dbEntry->getPartnerId());
 			$recordedEntry->setModerationStatus($dbEntry->getModerationStatus());
 			$recordedEntry->setIsRecordedEntry(true);
-            if ($copyAdditionData)
-            {
-                KalturaLog::debug("Adding addition data (tags and categories)");
-                $recordedEntry->setTags($dbEntry->getTags());
-                $recordedEntry->setCategories($dbEntry->getCategories());
-            }
+			$recordedEntry->setTags($dbEntry->getTags());
+
 			$recordedEntry->save();
-			
+
 			$dbEntry->setRecordedEntryId($recordedEntry->getId());
 			$dbEntry->save();
 			
