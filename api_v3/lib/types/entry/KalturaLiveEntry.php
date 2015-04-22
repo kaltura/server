@@ -129,14 +129,20 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 
 		if (is_null($this->recordingOptions))
 		{
-			$this->recordingOptions = new kLiveEntryRecordingOptions();
-		}
-
-		if (is_null($this->recordingOptions->getShouldCopyEntitlement()))
-		{
 			if (PermissionPeer::isValidForPartner(PermissionName::FEATURE_LIVE_STREAM_COPY_ENTITELMENTS, kCurrentContext::getCurrentPartnerId()))
 			{
+				$this->recordingOptions = new KalturaLiveEntryRecordingOptions();
 				$this->recordingOptions->setShouldCopyEntitlement(true);
+			}
+		}
+		else
+		{
+			if (is_null($this->recordingOptions->getShouldCopyEntitlement()))
+			{
+				if (PermissionPeer::isValidForPartner(PermissionName::FEATURE_LIVE_STREAM_COPY_ENTITELMENTS, kCurrentContext::getCurrentPartnerId()))
+				{
+					$this->recordingOptions->setShouldCopyEntitlement(true);
+				}
 			}
 		}
 
