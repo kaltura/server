@@ -126,7 +126,21 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 	{
 		if(is_null($this->recordStatus))
 			$this->recordStatus = (PermissionPeer::isValidForPartner(PermissionName::FEATURE_LIVE_STREAM_RECORD, kCurrentContext::getCurrentPartnerId()) ? KalturaRecordStatus::APPENDED : KalturaRecordStatus::DISABLED);
-			
+
+		if (is_null($this->recordingOptions))
+		{
+			$this->recordingOptions = new kLiveEntryRecordingOptions();
+		}
+
+		if (is_null($this->recordingOptions->getShouldCopyEntitlement()))
+		{
+			if (PermissionPeer::isValidForPartner(PermissionName::FEATURE_LIVE_STREAM_COPY_ENTITELMENTS, kCurrentContext::getCurrentPartnerId()))
+			{
+				$this->recordingOptions->setShouldCopyEntitlement(true);
+			}
+		}
+
+
 		return parent::toInsertableObject($sourceObject, $propsToSkip);
 	}
 	
