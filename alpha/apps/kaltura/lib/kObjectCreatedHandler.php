@@ -36,10 +36,12 @@ class kObjectCreatedHandler implements kObjectCreatedEventConsumer
 		/* @var $liveEntry LiveEntry */
 		$recordingOptions = $liveEntry->getRecordingOptions();
 		if(!$recordingOptions)
-			return true;
-		
+		{
+			$recordingOptions = new kLiveEntryRecordingOptions();
+		}
+
 		/* @var $recordingOptions kLiveEntryRecordingOptions */
-		if($recordingOptions->getShouldCopyEntitlement())
+		if($recordingOptions->getShouldCopyEntitlement($liveEntry->getPartnerId()))
 		{
 			$this->syncEntryEntitlementInfo($object, $liveEntry);
 			$this->syncCategoryEntries($object, $liveEntry);

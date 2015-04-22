@@ -23,10 +23,15 @@ class kLiveEntryRecordingOptions
 	}
 	
 	/**
+	 * @var int
 	 * @return boolean
 	 */
-	public function getShouldCopyEntitlement()
+	public function getShouldCopyEntitlement($partnerId)
 	{
+		if ( PermissionPeer::isValidForPartner(PermissionName::FEATURE_LIVE_STREAM_COPY_ENTITELMENTS, $partnerId) )
+		{
+			return true;
+		}
 		return $this->shouldCopyEntitlement;
 	}
 }
