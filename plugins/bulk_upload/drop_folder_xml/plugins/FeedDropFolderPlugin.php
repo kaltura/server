@@ -2,7 +2,7 @@
 /**
  * @package plugins.FeedDropFolder
  */
-class FeedDropFolderPlugin extends KalturaPlugin implements IKalturaPlugin, IKalturaPending, IKalturaObjectLoader, IKalturaEnumerator, IKalturaAdminConsolePages
+class FeedDropFolderPlugin extends KalturaPlugin implements IKalturaPlugin, IKalturaPending, IKalturaObjectLoader, IKalturaEnumerator
 {
 	const PLUGIN_NAME = 'FeedDropFolder';
 	const DROP_FOLDER_PLUGIN_NAME = 'dropFolder';
@@ -99,14 +99,6 @@ class FeedDropFolderPlugin extends KalturaPlugin implements IKalturaPlugin, IKal
 		$dropFolderDependency = new KalturaDependency(self::DROP_FOLDER_PLUGIN_NAME);
 		
 		return array($dropFolderDependency);
-	}
-
-	/* (non-PHPdoc)
-	 * @see IKalturaApplicationPages::getApplicationPages()
-	 */
-	public static function getApplicationPages() {
-		// TODO Auto-generated method stub
-		
 	}
 
 	/**
