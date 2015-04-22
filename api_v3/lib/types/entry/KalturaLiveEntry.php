@@ -132,16 +132,16 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 			if (PermissionPeer::isValidForPartner(PermissionName::FEATURE_LIVE_STREAM_COPY_ENTITELMENTS, kCurrentContext::getCurrentPartnerId()))
 			{
 				$this->recordingOptions = new KalturaLiveEntryRecordingOptions();
-				$this->recordingOptions->setShouldCopyEntitlement(true);
+				$this->recordingOptions->shouldCopyEntitlement = true;
 			}
 		}
 		else
 		{
-			if (is_null($this->recordingOptions->getShouldCopyEntitlement()))
+			if (is_null($this->recordingOptions->shouldCopyEntitlement))
 			{
 				if (PermissionPeer::isValidForPartner(PermissionName::FEATURE_LIVE_STREAM_COPY_ENTITELMENTS, kCurrentContext::getCurrentPartnerId()))
 				{
-					$this->recordingOptions->setShouldCopyEntitlement(true);
+					$this->recordingOptions->shouldCopyEntitlement = true;
 				}
 			}
 		}
