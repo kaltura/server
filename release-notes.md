@@ -88,6 +88,8 @@ deployment/updates/sql/2015_04_25_alter_delivery_profile_add_priority.sql
 
 #### Known Issues & Limitations ####
 
+None.
+
 ----------
 # Jupiter-10.9.0 #
 
