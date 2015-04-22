@@ -134,6 +134,9 @@ class FileSync extends BaseFileSync
 			
 		return parent::setStatus($v);
 	}
+	
+	public function getIsDir() { return $this->getFromCustomData("isDir"); }
+	public function setIsDir($v) { $this->putInCustomData("isDir", $v); }
 }
 
 
