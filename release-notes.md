@@ -65,8 +65,6 @@ None.
 
 None.
 
-##
-
 ## Delivery Profile selection logic for playback ##
 
 Added logic to the selection of deliveryProfiles for playback.
