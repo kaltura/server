@@ -49,13 +49,13 @@ None.
 
 Add the following lines from admin.template.ini to admin.ini:
 
-moduls.liveStreamRecordShouldCopyEntitelment.enabled = true
-moduls.liveStreamRecordShouldCopyEntitelment.permissionType = 2
-moduls.liveStreamRecordShouldCopyEntitelment.label = Kaltura Live Streams - Copy entitelment
-moduls.liveStreamRecordShouldCopyEntitelment.permissionName = FEATURE_LIVE_STREAM_COPY_ENTITELMENTS
-moduls.liveStreamRecordShouldCopyEntitelment.basePermissionType = 2
-moduls.liveStreamRecordShouldCopyEntitelment.basePermissionName = FEATURE_LIVE_STREAM
-moduls.liveStreamRecordShouldCopyEntitelment.group = GROUP_ENABLE_DISABLE_FEATURES
+    moduls.liveStreamRecordShouldCopyEntitelment.enabled = true
+    moduls.liveStreamRecordShouldCopyEntitelment.permissionType = 2
+    moduls.liveStreamRecordShouldCopyEntitelment.label = Kaltura Live Streams - Copy entitelment
+    moduls.liveStreamRecordShouldCopyEntitelment.permissionName = FEATURE_LIVE_STREAM_COPY_ENTITELMENTS
+    moduls.liveStreamRecordShouldCopyEntitelment.basePermissionType = 2
+    moduls.liveStreamRecordShouldCopyEntitelment.basePermissionName = FEATURE_LIVE_STREAM
+    moduls.liveStreamRecordShouldCopyEntitelment.group = GROUP_ENABLE_DISABLE_FEATURES
 
 #### Deployment Scripts ####
 
