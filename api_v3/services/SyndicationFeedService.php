@@ -104,7 +104,7 @@ class SyndicationFeedService extends KalturaBaseService
 			kFileSyncUtils::file_put_contents($key, $syndicationFeed->xslt);
 		}
 		
-		$syndicationFeed->fromObject($syndicationFeedDB);
+		$syndicationFeed->fromObject($syndicationFeedDB, $this->getResponseProfile());
 	
 		return $syndicationFeed;
 	}
@@ -125,7 +125,7 @@ class SyndicationFeedService extends KalturaBaseService
 			
 		$syndicationFeed = KalturaSyndicationFeedFactory::getInstanceByType($syndicationFeedDB->getType());
 		//echo $syndicationFeed->feedUrl; die;
-		$syndicationFeed->fromObject($syndicationFeedDB);
+		$syndicationFeed->fromObject($syndicationFeedDB, $this->getResponseProfile());
 		return $syndicationFeed;
 	}
         
@@ -164,7 +164,7 @@ class SyndicationFeedService extends KalturaBaseService
         $syndicationFeed->type = null;
         
 		$syndicationFeed = KalturaSyndicationFeedFactory::getInstanceByType($syndicationFeedDB->getType());
-		$syndicationFeed->fromObject($syndicationFeedDB);
+		$syndicationFeed->fromObject($syndicationFeedDB, $this->getResponseProfile());
 		return $syndicationFeed;
 	}
 	
@@ -218,7 +218,7 @@ class SyndicationFeedService extends KalturaBaseService
         $pager->attachToCriteria($c);
 		$dbList = syndicationFeedPeer::doSelect($c);
 		
-		$list = KalturaBaseSyndicationFeedArray::fromSyndicationFeedArray($dbList);
+		$list = KalturaBaseSyndicationFeedArray::fromDbArray($dbList, $this->getResponseProfile());
 		$response = new KalturaBaseSyndicationFeedListResponse();
 		$response->objects = $list;
 		$response->totalCount = $totalCount;

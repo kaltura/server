@@ -21,15 +21,35 @@ abstract class LiveReportQueryHelper {
 			return array();
 		
 		$res = array();
-		foreach($result->objects as $object) {
-			if($keyField)
-				$res[$object->$keyField] = $object->$valueField;
-			else
-				$res[] = $object->$valueField;
+		if (is_array($valueField)) {
+			foreach($result->objects as $object) {
+				foreach($valueField as $singleValueField) {
+					if($keyField) {
+						if (empty($res[$object->$keyField])) {
+							$res[$object->$keyField] = array();
+						}
+						$res[$object->$keyField][$singleValueField] = $object->$singleValueField;
+					}
+					else {
+						if (empty($res[$singleValueField])) {
+							$res[$singleValueField] = array();
+						}
+						$res[$singleValueField][] = $object->$singleValueField;
+					}
+				}
+			}
+		}
+		else {
+			foreach($result->objects as $object) {
+				if($keyField)
+					$res[$object->$keyField] = $object->$valueField;
+				else
+					$res[] = $object->$valueField;
+			}
 		}
 		return $res;
 	}
-	
+
 	/**
 	 * Executes a simple events query and returns the result as string according to the specified key.
 	 * @param KalturaLiveReportType $reportType The type of the report

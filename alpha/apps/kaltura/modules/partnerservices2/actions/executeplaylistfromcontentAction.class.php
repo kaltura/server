@@ -59,21 +59,7 @@ class executeplaylistfromcontentAction extends defPartnerservices2Action
 		$detailed = $this->getP ( "detailed" , false );
 		if (!$detailed)
 			$detailed = false;
-		$limit = $this->getP ( "page_size" , 10 );
-		$limit = $this->maxPageSize ( $limit );
 
-		$page = $this->getP ( "page" , 1 );
-
-		$user_filter_prefix = $this->getP ( "fp" , "filter" );
-		
-		$offset = ($page-1)* $limit;
-
-		// TODO - should limit search to partner ??
-//		kuserPeer::setUseCriteriaFilter( false );
-//		entryPeer::setUseCriteriaFilter( false );
-
-		$input_params = $this->getInputParams();
-		
 		// fill the playlist (infact only the mediaType and contentData are important
 		$playlist = new entry();
 		$playlist->setType ( entryType::PLAYLIST ); // prepare the playlist type before filling from request
@@ -84,23 +70,7 @@ class executeplaylistfromcontentAction extends defPartnerservices2Action
 		
 		$playlist->setDataContent( $data_content );
 		
-/*		
-		$updateable_fields = $obj_wrapper->getUpdateableFields() ;
-		$fields_modified = baseObjectUtils::fillObjectFromMapOrderedByFields( $input_params , $playlist , "playlist_" , 
-			$updateable_fields , BasePeer::TYPE_PHPNAME ,false );
-	*/	
-		// rest is similar to the executeplaylist service		
-		$extra_filters = array();
-		for ( $i=1 ; $i< self::MAX_FILTER_COUNT ; $i++ )
-		{
-			// filter
-			$extra_filter = new entryFilter(  );
-			
-			$fields_set = $extra_filter->fillObjectFromRequest( $input_params , "{$user_filter_prefix}{$i}_" , null );
-			$extra_filters[$i] = $extra_filter;
-		}
-	
-		$entry_list = myPlaylistUtils::executePlaylist ( $partner_id , $playlist , $extra_filters , $detailed );
+		$entry_list = myPlaylistUtils::executePlaylist ( $partner_id , $playlist , null , $detailed );
 
 		myEntryUtils::updatePuserIdsForEntries ( $entry_list );
 		

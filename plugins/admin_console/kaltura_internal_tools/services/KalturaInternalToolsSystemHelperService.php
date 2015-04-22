@@ -17,12 +17,12 @@ class KalturaInternalToolsSystemHelperService extends KalturaBaseService
 	 * @return KalturaInternalToolsSession
 	 * 
 	 */
-	static public function fromSecureStringAction($str)
+	public function fromSecureStringAction($str)
 	{
 		$ks =  ks::fromSecureString ( $str );
 		
 		$ksFromSecureString = new KalturaInternalToolsSession();
-		$ksFromSecureString->fromObject($ks);
+		$ksFromSecureString->fromObject($ks, $this->getResponseProfile());
 		
 		return $ksFromSecureString;
 	}
@@ -34,7 +34,7 @@ class KalturaInternalToolsSystemHelperService extends KalturaBaseService
 	 * @return string
 	 * 
 	 */
-	static public function iptocountryAction($remote_addr)
+	public function iptocountryAction($remote_addr)
 	{
 		$ip_geo = new myIPGeocoder();
 		$res = $ip_geo->iptocountry($remote_addr); 
@@ -46,7 +46,7 @@ class KalturaInternalToolsSystemHelperService extends KalturaBaseService
 	 * @return string
 	 * 
 	 */
-	static public function getRemoteAddressAction()
+	public function getRemoteAddressAction()
 	{
 		$remote_addr = requestUtils::getRemoteAddress();
 		return $remote_addr;	

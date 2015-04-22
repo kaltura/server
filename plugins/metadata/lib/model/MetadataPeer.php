@@ -25,9 +25,25 @@ class MetadataPeer extends BaseMetadataPeer {
 		$c->addAnd(MetadataPeer::STATUS, Metadata::STATUS_VALID);
 		self::$s_criteria_filter->setFilter($c);
 	}
-	
+
+	/* (non-PHPdoc)
+	 * @see BaseCuePointPeer::doSelect()
+	 */
+	public static function doSelect(Criteria $criteria, PropelPDO $con = null)
+	{
+		$c = clone $criteria;
+
+		if($c instanceof KalturaCriteria)
+		{
+			$c->applyFilters();
+			$criteria->setRecordsCount($c->getRecordsCount());
+		}
+
+		return parent::doSelect($c, $con);
+	}
+
 	/**
-	 * Retrieve a single metadta object by object id and type.
+	 * Retrieve a single metadata object by object id and type.
 	 *
 	 * @param      int $metadataProfileId
 	 * @param      int $objectType
@@ -47,6 +63,29 @@ class MetadataPeer extends BaseMetadataPeer {
 		$criteria->add(MetadataPeer::OBJECT_ID, $objectId);
 
 		return MetadataPeer::doSelectOne($criteria, $con);
+	}
+
+	/**
+	 * Retrieve metadata objects by object ids and type.
+	 *
+	 * @param      int $metadataProfileId
+	 * @param      int $objectType
+	 * @param      string $objectId
+	 * @param      PropelPDO $con the connection to use
+	 * @return     Metadata
+	 */
+	public static function retrieveByObjects($metadataProfileId, $objectType, array $objectIds, PropelPDO $con = null)
+	{
+		$metadataProfile = MetadataProfilePeer::retrieveByPK($metadataProfileId, $con);
+		if(!$metadataProfile)
+			return null;
+
+		$criteria = new Criteria();
+		$criteria->add(MetadataPeer::METADATA_PROFILE_ID, $metadataProfileId);
+		$criteria->add(MetadataPeer::OBJECT_TYPE, $objectType);
+		$criteria->add(MetadataPeer::OBJECT_ID, $objectIds, Criteria::IN);
+
+		return MetadataPeer::doSelect($criteria, $con);
 	}
 	
 	/**

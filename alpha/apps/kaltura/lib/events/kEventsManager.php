@@ -18,6 +18,12 @@ class kEventsManager
 	 * @var bool
 	 */
 	protected static $deferredEventsEnabled = true;
+
+	/**
+	 * When set to true all raised events will be sent as deferred until flushEvents is called
+	 * @var bool
+	 */
+	protected static $forceDeferredEvents = false;
 	
 	protected static function loadConsumers()
 	{
@@ -119,14 +125,26 @@ class kEventsManager
 	{
 		self::$deferredEventsEnabled = $enable;
 	}
+
+	/**
+	 * force / cancel enforcement of deferred events
+	 * Will work only if enableDeferredEvents = true
+	 * @param bool $force
+	 */
+	public static function setForceDeferredEvents($force)
+	{
+		self::$forceDeferredEvents = $force;
+	}
 	
 	public static function flushEvents()
 	{
+		self::$forceDeferredEvents = false;
+
 		if (!self::$deferredEvents)
 			return;
 		
 		KalturaLog::debug("started flushing deferred events");
-		
+
 		while (count(self::$deferredEvents))
 		{
 			$deferredEvent = self::popNextDeferredEvent();
@@ -169,6 +187,10 @@ class kEventsManager
 	
 	public static function raiseEvent(KalturaEvent $event)
 	{
+		if ( self::$deferredEventsEnabled && self::$forceDeferredEvents ) {
+			return self::raiseEventDeferred($event);
+		}
+
 		$consumerInterface = $event->getConsumerInterface();
 
 		$consumers = self::getConsumers($consumerInterface);

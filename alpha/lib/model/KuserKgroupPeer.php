@@ -50,7 +50,7 @@ class KuserKgroupPeer extends BaseKuserKgroupPeer {
 	 * @param int $kuserId
 	 */
 	public static function deleteByKuserId($kuserId){
-		$kuserKgroups = self::retrieveByKuserId($kuserId);
+		$kuserKgroups = self::retrieveByKuserIds(array($kuserId));
 		foreach($kuserKgroups as $kuserKgroup) {
 			/* @var $kuserKgroup KuserKgroup */
 			$kuserKgroup->setStatus(KuserKgroupStatus::DELETED);
@@ -59,32 +59,37 @@ class KuserKgroupPeer extends BaseKuserKgroupPeer {
 	}
 
 	/**
-	 * get kgroups by kuser
+	 * get kgroups by kusers
 	 *
-	 * @param int $kuserId
+	 * @param array $kuserIds
 	 * @return array
 	 */
-	public static function retrieveByKuserId($kuserId){
+	public static function retrieveByKuserIds($kuserIds){
 		$c = new Criteria();
-		$c->add(KuserKgroupPeer::KUSER_ID, $kuserId);
+		$c->add(KuserKgroupPeer::KUSER_ID, $kuserIds, Criteria::IN);
 		return KuserKgroupPeer::doSelect($c);
 	}
 
+	/**
+	 * @param array $kuserIds
+	 * @return array
+	 */
+	public static function retrieveKgroupIdsByKuserIds($kuserIds){
+		$kuserKgroups = self::retrieveByKuserIds($kuserIds);
+		$kgroupIds = array();
+		foreach ($kuserKgroups as $kuserKgroup){
+			/* @var $kuserKgroup KuserKgroup */
+			$kgroupIds[] = $kuserKgroup->getKgroupId();
+		}
+		return $kgroupIds;
+	}
 
 	/**
 	 * @param int $kuserId
 	 * @return array
 	 */
 	public static function retrieveKgroupIdsByKuserId($kuserId){
-		$kuserKgroups = self::retrieveByKuserId($kuserId);
-		$kgroupIds = array();
-		if ($kuserKgroups){
-			foreach ($kuserKgroups as $kuserKgroup){
-				/* @var $kuserKgroup KuserKgroup */
-				$kgroupIds[] = $kuserKgroup->getKgroupId();
-			}
-		}
-		return $kgroupIds;
+		return self::retrieveKgroupIdsByKuserIds(array($kuserId));
 	}
 
 } // KuserKgroupPeer

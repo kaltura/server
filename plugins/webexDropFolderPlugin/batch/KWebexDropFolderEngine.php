@@ -43,7 +43,7 @@ class KWebexDropFolderEngine extends KDropFolderEngine
 			/* @var $physicalFile WebexXmlEpRecordingType */
 			if ($physicalFile->getFormat() != self::ARF_FORMAT)
 			{
-				KalturaLog::info('Recording with id [' . $physicalFile.getRecordingID() . '] format [' . $physicalFile->getFormat() . '] is incompatible with the Kaltura conversion processes. Ignoring.');
+				KalturaLog::info('Recording with id [' . $physicalFile->getRecordingID() . '] format [' . $physicalFile->getFormat() . '] is incompatible with the Kaltura conversion processes. Ignoring.');
 				continue;
 			}
 			

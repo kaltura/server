@@ -3,7 +3,8 @@
  * @package api
  * @subpackage objects
  */
-class KalturaUserLoginData extends KalturaObject implements IFilterable 
+class KalturaUserLoginData extends KalturaObject implements IRelatedFilterable
+
 {
 	/**
 	 * @var string
@@ -35,15 +36,6 @@ class KalturaUserLoginData extends KalturaObject implements IFilterable
 			$dbObject = new UserLoginData();
 			
 		return parent::toObject($dbObject, $skip);	
-	}
-	
-	
-	public function fromObject($sourceObject)
-	{
-		if(!$sourceObject)
-			return;
-			
-		parent::fromObject($sourceObject);
 	}
 	
 	public function getExtraFilters()

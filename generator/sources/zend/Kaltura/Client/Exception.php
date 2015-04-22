@@ -41,9 +41,34 @@ class Kaltura_Client_Exception extends Exception
 	const ERROR_INVALID_PARTNER_ID = -7;
 	const ERROR_INVALID_OBJECT_TYPE = -8;
 	
-    public function __construct($message, $code) 
+	private $arguments;
+	
+    public function __construct($message, $code, $arguments = null) 
     {
     	$this->code = $code;
+    	$this->arguments = $arguments;
+    	
 		parent::__construct($message);
     }
+    
+	/**
+	 * @return array
+	 */
+	public function getArguments()
+	{
+		return $this->arguments;
+	}
+    
+	/**
+	 * @return string
+	 */
+	public function getArgument($argument)
+	{
+		if($this->arguments && isset($this->arguments[$argument]))
+		{
+			return $this->arguments[$argument];
+		}
+		
+		return null;
+	}
 }

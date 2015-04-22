@@ -160,6 +160,11 @@ abstract class ClientGeneratorFromXml
 		//return strtolower($filter->filter($value));
 	}
 	
+	protected function isArrayType($type)
+	{
+		return in_array($type, array("array","map"));
+	}
+	
 	protected function isSimpleType($type)
 	{
 		return in_array($type, array("int","string","bool","float","bigint"));
@@ -186,4 +191,8 @@ abstract class ClientGeneratorFromXml
 	 * @return string 
 	 */
 	protected abstract function getSingleLineCommentMarker();
+	
+	public function done($outputPath)
+	{
+	}
 }

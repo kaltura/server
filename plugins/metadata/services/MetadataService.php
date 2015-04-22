@@ -85,7 +85,7 @@ class MetadataService extends KalturaBaseService
 		kEventsManager::raiseEvent(new kObjectDataChangedEvent($dbMetadata));
 				
 		$metadata = new KalturaMetadata();
-		$metadata->fromObject($dbMetadata);
+		$metadata->fromObject($dbMetadata, $this->getResponseProfile());
 		
 		return $metadata;
 	}
@@ -127,11 +127,15 @@ class MetadataService extends KalturaBaseService
 		$dbMetadata->setObjectId($objectId);
 		$dbMetadata->setStatus(KalturaMetadataStatus::VALID);
 
-		// validate object exists
-		$object = kMetadataManager::getObjectFromPeer($dbMetadata);
-		if(!$object)
-			throw new KalturaAPIException(MetadataErrors::INVALID_METADATA_OBJECT, $objectId);
-		
+		// dynamic objects are metadata only, skip validating object id
+		if ($objectType != KalturaMetadataObjectType::DYNAMIC_OBJECT)
+		{
+			// validate object exists
+			$object = kMetadataManager::getObjectFromPeer($dbMetadata);
+			if (!$object)
+				throw new KalturaAPIException(MetadataErrors::INVALID_METADATA_OBJECT, $objectId);
+		}
+
 		$dbMetadata->save();
 		
 		$this->deleteOldVersions($dbMetadata);
@@ -216,7 +220,7 @@ class MetadataService extends KalturaBaseService
 			throw new KalturaAPIException(MetadataErrors::METADATA_NOT_FOUND, $id);
 			
 		$metadata = new KalturaMetadata();
-		$metadata->fromObject($dbMetadata);
+		$metadata->fromObject($dbMetadata, $this->getResponseProfile());
 		
 		return $metadata;
 	}
@@ -296,7 +300,7 @@ class MetadataService extends KalturaBaseService
 		}
 		
 		$metadata = new KalturaMetadata();
-		$metadata->fromObject($dbMetadata);
+		$metadata->fromObject($dbMetadata, $this->getResponseProfile());
 			
 		return $metadata;
 	}	
@@ -337,15 +341,13 @@ class MetadataService extends KalturaBaseService
 		if (!$filter)
 			$filter = new KalturaMetadataFilter;
 			
-		if (kEntitlementUtils::getEntitlementEnforcement() && (is_null($filter->objectIdIn) && is_null($filter->objectIdEqual)))
-			throw new KalturaAPIException(MetadataErrors::MUST_FILTER_ON_OBJECT_ID);
-
-		if (!$filter->metadataObjectTypeEqual)
-			throw new KalturaAPIException(MetadataErrors::MUST_FILTER_ON_OBJECT_TYPE);
-				
+		if (! $pager)
+			$pager = new KalturaFilterPager ();
+			
 		$applyPartnerFilter = true;
 		if ($filter->metadataObjectTypeEqual == MetadataObjectType::ENTRY)
 		{
+			$entryIds = null;
 			if ($filter->objectIdEqual)
 			{
 				$entryIds = array($filter->objectIdEqual);
@@ -356,12 +358,12 @@ class MetadataService extends KalturaBaseService
 			}
 			
 			if (!$entryIds && kConf::hasParam('metadata_list_without_object_filtering_partners') && 
-				!in_array($this->getPartnerId(), kConf::get('metadata_list_without_object_filtering_partners'))) 
+				!in_array(kCurrentContext::getCurrentPartnerId(), kConf::get('metadata_list_without_object_filtering_partners'))) 
 				throw new KalturaAPIException(MetadataErrors::MUST_FILTER_ON_OBJECT_ID);
 			
 			if($entryIds)
 			{
-				$entryIds = entryPeer::filterEntriesByPartnerOrKalturaNetwork($entryIds, $this->getPartnerId());
+				$entryIds = entryPeer::filterEntriesByPartnerOrKalturaNetwork($entryIds, kCurrentContext::getCurrentPartnerId());
 				if(!count($entryIds))
 				{
 					KalturaLog::debug("No entries found");
@@ -379,55 +381,7 @@ class MetadataService extends KalturaBaseService
 		if ($applyPartnerFilter)
 			$this->applyPartnerFilterForClass('Metadata');
 	
-		if ($filter->metadataObjectTypeEqual == MetadataObjectType::CATEGORY)
-		{
-			if ($filter->objectIdEqual)
-			{
-				$categoryIds = array($filter->objectIdEqual);
-			}
-			else if ($filter->objectIdIn)
-			{
-				$categoryIds = explode(',', $filter->objectIdIn);
-			}
-			
-			if($categoryIds)
-			{
-				$categories = categoryPeer::retrieveByPKs($categoryIds);
-				if(!count($categories))
-				{
-					KalturaLog::debug("No categories found");
-					$response = new KalturaMetadataListResponse();
-					$response->objects = new KalturaMetadataArray();
-					$response->totalCount = 0;
-					return $response;
-				}
-				
-				$categoryIds = array();
-				foreach($categories as $category)
-					$categoryIds[] = $category->getId();
-				
-				$filter->objectIdEqual = null;
-				$filter->objectIdIn = implode(',', $categoryIds);
-			}
-		}
-		
-		$metadataFilter = new MetadataFilter();
-		$filter->toObject($metadataFilter);
-		
-		$c = new Criteria();
-		$metadataFilter->attachToCriteria($c);
-		$count = MetadataPeer::doCount($c);
-		
-		if (! $pager)
-			$pager = new KalturaFilterPager ();
-		$pager->attachToCriteria($c);
-		$list = MetadataPeer::doSelect($c);
-		
-		$response = new KalturaMetadataListResponse();
-		$response->objects = KalturaMetadataArray::fromDbArray($list);
-		$response->totalCount = $count;
-		
-		return $response;
+		return $filter->getListResponse($pager, $this->getResponseProfile());
 	}
 	
 
@@ -505,7 +459,31 @@ class MetadataService extends KalturaBaseService
 		$dbMetadata->save();
 	}
 
-	
+	/**
+	 * Index metadata by id, will also index the related object
+	 *
+	 * @action index
+	 * @param string $id
+	 * @param bool $shouldUpdate
+	 * @return int
+	 */
+	function indexAction($id, $shouldUpdate)
+	{
+		if(kEntitlementUtils::getEntitlementEnforcement())
+			throw new KalturaAPIException(KalturaErrors::CANNOT_INDEX_OBJECT_WHEN_ENTITLEMENT_IS_ENABLE);
+
+		$dbMetadata = MetadataPeer::retrieveByPK($id);
+		if(!$dbMetadata)
+			throw new KalturaAPIException(MetadataErrors::METADATA_NOT_FOUND, $id);
+
+		$dbMetadata->indexToSearchIndex();
+		$relatedObject = kMetadataManager::getObjectFromPeer($dbMetadata);
+		if($relatedObject && $relatedObject instanceof IIndexable)
+			$relatedObject->indexToSearchIndex();
+
+		return $dbMetadata->getId();
+
+	}
 
 	/**
 	 * Serves metadata XML file

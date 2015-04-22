@@ -10,6 +10,7 @@ class MetadataSearchFilter extends AdvancedSearchFilterOperator
 	const KMC_FIELD_TYPE_DATE = 'dateType';
 	const KMC_FIELD_TYPE_INT = 'intType';
 	const KMC_FIELD_TYPE_OBJECT = 'objectType';
+	const KMC_FIELD_TYPE_METADATA_OBJECT = 'metadataObjectType';
 	 
 	/**
 	 * @var string

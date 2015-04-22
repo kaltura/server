@@ -445,13 +445,13 @@ class KDropFolderFileTransferEngine extends KDropFolderEngine
 				break;
 			
 			case KalturaDropFolderContentFileHandlerMatchPolicy::MATCH_EXISTING_OR_KEEP_IN_FOLDER:
-				$this->addAsExistingContent($job, $data);
+				$this->addAsExistingContent($job, $data, null, $dropFolder);
 				break;
 				
 			case KalturaDropFolderContentFileHandlerMatchPolicy::MATCH_EXISTING_OR_ADD_AS_NEW:
 				$matchedEntry = $this->isEntryMatch($data);
 				if($matchedEntry)
-					$this->addAsExistingContent($job, $data, $matchedEntry);
+					$this->addAsExistingContent($job, $data, $matchedEntry, $dropFolder);
 				else
 					 $this->addAsNewContent($job, $data, $dropFolder);	
 				break;			
@@ -518,7 +518,7 @@ class KDropFolderFileTransferEngine extends KDropFolderEngine
 	 * Update the matched entry with the new file and all other relevant files from the drop folder, according to the ingestion profile.
 	 *
 	 */
-	private function addAsExistingContent(KalturaBatchJob $job, KalturaDropFolderContentProcessorJobData $data, $matchedEntry = null)
+	private function addAsExistingContent(KalturaBatchJob $job, KalturaDropFolderContentProcessorJobData $data, $matchedEntry = null, KalturaDropFolder $dropFolder)
 	{	    
 		// check for matching entry and flavor
 		if(!$matchedEntry)

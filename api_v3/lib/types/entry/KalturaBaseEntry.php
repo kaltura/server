@@ -3,7 +3,7 @@
  * @package api
  * @subpackage objects
  */
-class KalturaBaseEntry extends KalturaObject implements IFilterable 
+class KalturaBaseEntry extends KalturaObject implements IRelatedFilterable 
 {
 	/**
 	 * Auto generated 10 characters alphanumeric string
@@ -389,7 +389,8 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 	 	"rootEntryId",
 	 	"parentEntryId",
 	 	"entitledUsersEdit" => "entitledPusersEdit",
-	 	"entitledUsersPublish" => "entitledPusersPublish"
+	 	"entitledUsersPublish" => "entitledPusersPublish",
+	 	"operationAttributes"
 	 );
 		 
 	public function getMapBetweenObjects()
@@ -441,16 +442,12 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 		return $dbObject;
 	}
 	
-	public function fromObject($sourceObject)
+	public function doFromObject($sourceObject, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		if(!$sourceObject)
 			return;
 			
-		parent::fromObject($sourceObject);
-		
-		$this->startDate = $sourceObject->getStartDate(null);
-		$this->endDate = $sourceObject->getEndDate(null);
-		$this->operationAttributes = KalturaOperationAttributesArray::fromOperationAttributesArray($sourceObject->getOperationAttributes());
+		parent::doFromObject($sourceObject, $responseProfile);
 		
 		$partnerId = kCurrentContext::$ks_partner_id ? kCurrentContext::$ks_partner_id : kCurrentContext::$partner_id;
 		
@@ -460,8 +457,10 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 			$this->categoriesIds = null;
 		}
 		if (!kConf::hasParam('protect_userid_in_api') || !in_array($sourceObject->getPartnerId(), kConf::get('protect_userid_in_api')) || !in_array(kCurrentContext::getCurrentSessionType(), array(kSessionBase::SESSION_TYPE_NONE,kSessionBase::SESSION_TYPE_WIDGET))){
-			$this->userId = $sourceObject->getPuserId();
-			$this->creatorId = $sourceObject->getCreatorPuserId();
+			if($this->shouldGet('userId', $responseProfile))
+				$this->userId = $sourceObject->getPuserId();
+			if($this->shouldGet('creatorId', $responseProfile))
+				$this->creatorId = $sourceObject->getCreatorPuserId();
 		}
 	}
 	

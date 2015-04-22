@@ -3,7 +3,7 @@
  * @package plugins.contentDistribution
  * @subpackage api.objects
  */
-class KalturaEntryDistribution extends KalturaObject implements IFilterable
+class KalturaEntryDistribution extends KalturaObject implements IRelatedFilterable
 {
 	/**
 	 * Auto generated unique id
@@ -211,8 +211,10 @@ class KalturaEntryDistribution extends KalturaObject implements IFilterable
 		'thumbAssetIds',
 		'flavorAssetIds',
 	 	'assetIds',
+		'sunStatus',
 		'sunrise',
 		'sunset',
+		'submittedAt',
 		'remoteId',
 		'plays',
 		'views',
@@ -234,26 +236,28 @@ class KalturaEntryDistribution extends KalturaObject implements IFilterable
 		return parent::toObject($dbObject, $skip);
 	}
 	
-	public function fromObject($sourceObject)
+	public function doFromObject($sourceObject, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		if(!$sourceObject)
 			return;
 			
-		parent::fromObject($sourceObject);
+		parent::doFromObject($sourceObject, $responseProfile);
 		
-		$this->sunStatus = $sourceObject->getSunStatus();
-		$this->sunrise = $sourceObject->getSunrise(null);
-		$this->sunset = $sourceObject->getSunset(null);
-		$this->submittedAt = $sourceObject->getSubmittedAt(null);
-            
-		$this->validationErrors = KalturaDistributionValidationErrorArray::fromDbArray($sourceObject->getValidationErrors());
-		
-		$this->hasSubmitResultsLog = (bool)$sourceObject->getSubmitResultsVersion();
-		$this->hasSubmitSentDataLog = (bool)$sourceObject->getSubmitDataVersion();
-		$this->hasUpdateResultsLog = (bool)$sourceObject->getUpdateResultsVersion();
-		$this->hasUpdateSentDataLog = (bool)$sourceObject->getUpdateDataVersion();
-		$this->hasDeleteResultsLog = (bool)$sourceObject->getDeleteResultsVersion();
-		$this->hasDeleteSentDataLog = (bool)$sourceObject->getDeleteDataVersion();
+		if($this->shouldGet('validationErrors', $responseProfile))
+			$this->validationErrors = KalturaDistributionValidationErrorArray::fromDbArray($sourceObject->getValidationErrors());
+			
+		if($this->shouldGet('hasSubmitResultsLog', $responseProfile))
+			$this->hasSubmitResultsLog = (bool)$sourceObject->getSubmitResultsVersion();
+		if($this->shouldGet('hasSubmitSentDataLog', $responseProfile))
+			$this->hasSubmitSentDataLog = (bool)$sourceObject->getSubmitDataVersion();
+		if($this->shouldGet('hasUpdateResultsLog', $responseProfile))
+			$this->hasUpdateResultsLog = (bool)$sourceObject->getUpdateResultsVersion();
+		if($this->shouldGet('hasUpdateSentDataLog', $responseProfile))
+			$this->hasUpdateSentDataLog = (bool)$sourceObject->getUpdateDataVersion();
+		if($this->shouldGet('hasDeleteResultsLog', $responseProfile))
+			$this->hasDeleteResultsLog = (bool)$sourceObject->getDeleteResultsVersion();
+		if($this->shouldGet('hasDeleteSentDataLog', $responseProfile))
+			$this->hasDeleteSentDataLog = (bool)$sourceObject->getDeleteDataVersion();
 	}
 
 	public function getExtraFilters()

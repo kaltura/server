@@ -28,16 +28,25 @@
 package com.kaltura.client.test;
 
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
-import java.io.FileNotFoundException;
 
 public class TestUtils {
+	protected static KalturaTestConfig testConfig;
 
-	static public InputStream getTestVideo() throws FileNotFoundException {
-		return new FileInputStream("bin/" + KalturaTestConfig.UPLOAD_VIDEO);
+	static public InputStream getTestVideo() throws IOException {
+		if(testConfig == null){
+			testConfig = new KalturaTestConfig();
+		}
+		
+		return new FileInputStream("bin/" + testConfig.getUploadVideo());
 	}
 	
-	static public InputStream getTestImage() throws FileNotFoundException {
-		return new FileInputStream("bin/" + KalturaTestConfig.UPLOAD_IMAGE);
+	static public InputStream getTestImage() throws IOException {
+		if(testConfig == null){
+			testConfig = new KalturaTestConfig();
+		}
+		
+		return new FileInputStream("bin/" + testConfig.getUploadImage());
 	}
 }

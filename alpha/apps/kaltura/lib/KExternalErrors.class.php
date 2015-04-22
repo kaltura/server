@@ -6,6 +6,8 @@
 class KExternalErrors
 {
 	private static $responseCode = null;
+
+	const CACHE_EXPIRY = 60;
 	
 	const ENTRY_NOT_FOUND = 1;
 	const NOT_SCHEDULED_NOW = 2;
@@ -116,17 +118,36 @@ class KExternalErrors
 			
 		KalturaLog::err("exiting on error $errorCode - $description");
 		
+		$headers = array();
 		if(self::$responseCode)
-			header(self::$errorCodeMap[self::$responseCode]);
+			$headers[] = self::$errorCodeMap[self::$responseCode];
+		
+		$headers[] = "X-Kaltura-App: exiting on error $errorCode - $description";
+		
+		foreach ($headers as $header)
+		{
+			header($header);
+		}
+		header("X-Kaltura:error-$errorCode");
+		
+		$headers[] = "X-Kaltura:cached-error-$errorCode";
 		
 		self::terminateDispatch();
 		
-		header("X-Kaltura:error-$errorCode");
-		header("X-Kaltura-App: exiting on error $errorCode - $description");
-
 		if ($errorCode != self::ACCESS_CONTROL_RESTRICTED && 
-			$errorCode != self::IP_COUNTRY_BLOCKED)
-			requestUtils::sendCachingHeaders(60);
+			$errorCode != self::IP_COUNTRY_BLOCKED && 
+			$_SERVER["REQUEST_METHOD"] == "GET")
+		{
+			requestUtils::sendCachingHeaders(self::CACHE_EXPIRY, true, time());
+			
+			if (function_exists('apc_store'))
+			{
+				$protocol = infraRequestUtils::getProtocol();
+				$host = isset($_SERVER['HTTP_X_FORWARDED_HOST']) ? $_SERVER['HTTP_X_FORWARDED_HOST'] : $_SERVER['HTTP_HOST'];
+				$uri = $_SERVER["REQUEST_URI"];
+				apc_store("exterror-$protocol://$host$uri", $headers, self::CACHE_EXPIRY);
+			}
+		}
 		
 		die();
 	}

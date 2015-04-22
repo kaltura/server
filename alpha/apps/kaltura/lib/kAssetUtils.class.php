@@ -90,13 +90,21 @@ class kAssetUtils
 			$urlManager = DeliveryProfilePeer::getDeliveryProfile($asset->getEntryId());
 			if($asset instanceof flavorAsset)
 				$urlManager->initDeliveryDynamicAttributes(null, $asset);
-			
+			$profileAttributes = $urlManager->getDynamicAttributes();
+			$profileAttributes->setUrlParams($urlParameters);
+
 			$url = $urlManager->getFullAssetUrl($asset);
+
+			$url = preg_replace('/^https?:\/\//', '', $url);
+
+			$protocol = infraRequestUtils::getProtocol();
+			$deliveryProfileProtocols = $urlManager->getMediaProtocols();
+			if (!is_null($deliveryProfileProtocols) && !in_array($protocol, explode(',',$deliveryProfileProtocols)))
+				$protocol = infraRequestUtils::PROTOCOL_HTTP;
+			$url = $protocol . "://" . $url;
 		}
 		
-		$url = preg_replace('/^https?:\/\//', '', $url);
-			
-		return 'http://' . $url . $urlParameters;
+		return $url;
 	}
 
 	private static function getExternalStorageUrl(Partner $partner, asset $asset, FileSyncKey $key, $servePlayManifest = false , $playManifestClientTag = null , $storageId = null)
@@ -134,8 +142,11 @@ class kAssetUtils
 				$dynamicAttrs = new DeliveryProfileDynamicAttributes();
 				$dynamicAttrs->setFileExtension($asset->getFileExt());
 				$urlManager->setDynamicAttributes($dynamicAttrs);
-				
-				$url = rtrim($urlManager->getUrl(),'/') . '/' . ltrim($urlManager->getFileSyncUrl($fileSync),'/');
+
+				$url = ltrim($urlManager->getFileSyncUrl($fileSync),'/');
+				if (strpos($url, "://") === false){
+					$url = rtrim($urlManager->getUrl(), "/") . "/".$url ;
+				}
 			} else {
 				KalturaLog::debug("Couldn't determine delivery profile for storage id");
 				$url = null;

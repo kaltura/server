@@ -3,17 +3,11 @@
  * @package plugins.contentDistribution
  * @subpackage api.objects
  */
-class KalturaDistributionProfileListResponse extends KalturaObject
+class KalturaDistributionProfileListResponse extends KalturaListResponse
 {
 	/**
 	 * @var KalturaDistributionProfileArray
 	 * @readonly
 	 */
 	public $objects;
-
-	/**
-	 * @var int
-	 * @readonly
-	 */
-	public $totalCount;
 }

@@ -178,10 +178,24 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 			substr($parentReload, 0, $doSelectPos) .
 			$this->getPeerClassname() . "::setUseCriteriaFilter(false);" . $newLine .
 			"\$criteria = \$this->buildPkeyCriteria();" . $newLine .
-			"entryPeer::addSelectColumns(\$criteria);" . $newLine .
+			$this->getPeerClassname() . "::addSelectColumns(\$criteria);" . $newLine .
 			"\$stmt = BasePeer::doSelect(\$criteria, \$con);" . $newLine . 
 			$this->getPeerClassname() . "::setUseCriteriaFilter(true);" .
 			substr($parentReload, $doSelectPos + strlen($doSelectStmt));
+		
+		
+	}
+	
+	protected function addHydrateOpen(&$script) {
+		parent::addHydrateOpen($script);
+		$newLine = "\n\t\t";
+		
+		$table = $this->getTable();
+		$customDataColumn = $table->getColumn(self::KALTURA_COLUMN_CUSTOM_DATA);
+		if($customDataColumn) {
+			$script .= $newLine . "// Nullify cached objects";
+			$script .= $newLine . "\$this->m_custom_data = null;" . $newLine;
+		}
 	}
 
 	/* (non-PHPdoc)
@@ -284,6 +298,8 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 				\$this->m_custom_data = myCustomData::fromString(\$newCustomData); 
 
 				//set custom data column values we wanted to change to
+				\$validUpdate = true;
+				\$atomicCustomDataFields = ".$this->getPeerClassname()."::getAtomicCustomDataFields();
 			 	foreach (\$this->oldCustomDataValues as \$namespace => \$namespaceValues){
                 	foreach(\$namespaceValues as \$name => \$oldValue)
 					{
@@ -298,11 +314,28 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 							\$newValue = \$valuesToChangeTo[\$name];
 						}
 					 
-						if (!is_null(\$newValue))
+						if (!is_null(\$newValue)) {
+							\$atomicField = false;
+							if(\$namespace) {
+								\$atomicField = array_key_exists(\$namespace, \$atomicCustomDataFields) && in_array(\$name, \$atomicCustomDataFields[\$namespace]);
+							} else {
+								\$atomicField = in_array(\$name, \$atomicCustomDataFields);
+							}
+							if(\$atomicField) {
+								\$dbValue = \$this->m_custom_data->get(\$name, \$namespace);
+								if(\$oldValue != \$dbValue) {
+									\$validUpdate = false;
+									break;
+								}
+							}
 							\$this->putInCustomData(\$name, \$newValue, \$namespace);
+						}
 					}
                    }
                    
+				if(!\$validUpdate) 
+					break;
+					                   
 				\$this->setCustomData(\$this->m_custom_data->toString());
 			}
 
@@ -1051,6 +1084,16 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 	public function incInCustomData ( \$name , \$delta = 1, \$namespace = null)
 	{
 		\$customData = \$this->getCustomDataObj( );
+		
+		\$currentNamespace = '';
+		if(\$namespace)
+			\$currentNamespace = \$namespace;
+			
+		if(!isset(\$this->oldCustomDataValues[\$currentNamespace]))
+			\$this->oldCustomDataValues[\$currentNamespace] = array();
+		if(!isset(\$this->oldCustomDataValues[\$currentNamespace][\$name]))
+			\$this->oldCustomDataValues[\$currentNamespace][\$name] = \$customData->get(\$name, \$namespace);
+		
 		return \$customData->inc ( \$name , \$delta , \$namespace  );
 	}
 

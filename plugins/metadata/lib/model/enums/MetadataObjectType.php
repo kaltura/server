@@ -9,4 +9,5 @@ interface MetadataObjectType extends BaseEnum
 	const CATEGORY = 2;
 	const USER = 3;
 	const PARTNER = 4;
+	const DYNAMIC_OBJECT = 5;
 }

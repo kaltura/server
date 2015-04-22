@@ -31,10 +31,10 @@ class KalturaBusinessProcessNotificationDispatchJobData extends KalturaEventNoti
 	/* (non-PHPdoc)
 	 * @see KalturaObject::fromObject()
 	 */
-	public function fromObject($dbObject)
+	protected function doFromObject($dbObject, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		/* @var $dbObject kBusinessProcessNotificationDispatchJobData */
-		parent::fromObject($dbObject);
+		parent::doFromObject($dbObject, $responseProfile);
 		
 		$server = $dbObject->getServer();
 		$this->server = KalturaBusinessProcessServer::getInstanceByType($server->getType());

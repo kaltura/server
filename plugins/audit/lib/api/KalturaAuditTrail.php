@@ -3,7 +3,7 @@
  * @package plugins.audit
  * @subpackage api.objects
  */
-class KalturaAuditTrail extends KalturaObject implements IFilterable
+class KalturaAuditTrail extends KalturaObject implements IRelatedFilterable
 {
 	/**
 	 * @var int
@@ -224,33 +224,36 @@ class KalturaAuditTrail extends KalturaObject implements IFilterable
 	/**
 	 * @param AuditTrail $dbAuditTrail
 	 */
-	public function fromObject($dbAuditTrail)
+	public function doFromObject($dbAuditTrail, KalturaDetachedResponseProfile $responseProfile = null)
 	{
-		parent::fromObject($dbAuditTrail);
+		parent::doFromObject($dbAuditTrail, $responseProfile);
 		
-		$dbData = $dbAuditTrail->getData();
-		switch(get_class($dbData))
+		if($this->shouldGet('data', $responseProfile))
 		{
-			case 'kAuditTrailChangeInfo':
-				$this->data = new KalturaAuditTrailChangeInfo();
-				break;
-				
-			case 'kAuditTrailFileSyncCreateInfo':
-				$this->data = new KalturaAuditTrailFileSyncCreateInfo();
-				break;
-				
-			case 'kAuditTrailTextInfo':
-				$this->data = new KalturaAuditTrailTextInfo();
-				break;
-				
-			default:
-//				$this->data = new KalturaAuditTrailInfo();
-				$this->data = null;
-				break;
+			$dbData = $dbAuditTrail->getData();
+			switch(get_class($dbData))
+			{
+				case 'kAuditTrailChangeInfo':
+					$this->data = new KalturaAuditTrailChangeInfo();
+					break;
+					
+				case 'kAuditTrailFileSyncCreateInfo':
+					$this->data = new KalturaAuditTrailFileSyncCreateInfo();
+					break;
+					
+				case 'kAuditTrailTextInfo':
+					$this->data = new KalturaAuditTrailTextInfo();
+					break;
+					
+				default:
+	//				$this->data = new KalturaAuditTrailInfo();
+					$this->data = null;
+					break;
+			}
+			
+			if($this->data && $dbData)
+				$this->data->fromObject($dbData);
 		}
-		
-		if($this->data && $dbData)
-			$this->data->fromObject($dbData);
 	}
 	
 	/**

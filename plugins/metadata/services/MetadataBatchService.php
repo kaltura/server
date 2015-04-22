@@ -77,7 +77,7 @@ class MetadataBatchService extends KalturaBatchService
 			$pager->attachToCriteria($c);
 
 		$list = MetadataPeer::doSelect($c);
-		$response->objects = KalturaMetadataArray::fromDbArray($list);
+		$response->objects = KalturaMetadataArray::fromDbArray($list, $this->getResponseProfile());
 
 		return $response;
 	}

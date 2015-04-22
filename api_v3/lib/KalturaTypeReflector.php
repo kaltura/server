@@ -138,7 +138,7 @@ class KalturaTypeReflector
 	/**
 	 * Return the type properties 
 	 *
-	 * @return array
+	 * @return array<KalturaPropertyInfo>
 	 */
 	public function getProperties()
 	{
@@ -505,6 +505,16 @@ class KalturaTypeReflector
 	}
 	
 	/**
+	 * Returns true when the type is (for what we know) an associative array
+	 *
+	 * @return boolean
+	 */
+	public function isAssociativeArray()
+	{
+		return is_subclass_of($this->_type, 'KalturaAssociativeArray');
+	}
+	
+	/**
 	 * When reflecting an array, returns the type of the array as string
 	 *
 	 * @return string
@@ -575,8 +585,12 @@ class KalturaTypeReflector
 	
 	public function isFilterable()
 	{
-		$reflectionClass = new ReflectionClass($this->_type);
-		return $reflectionClass->implementsInterface("IFilterable");
+		return is_subclass_of($this->_type, 'IFilterable');
+	}
+	
+	public function isRelatedFilterable()
+	{
+		return is_subclass_of($this->_type, 'IRelatedFilterable');
 	}
 	
 	/**

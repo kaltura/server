@@ -42,25 +42,11 @@ class ConversionProfileAssetParamsService extends KalturaBaseService
 	{
 		if (!$filter)
 			$filter = new KalturaConversionProfileAssetParamsFilter();
-
-		if (!$pager)
+			
+		if(!$pager)
 			$pager = new KalturaFilterPager();
 			
-		$assetParamsConversionProfileFilter = $filter->toObject();
-
-		$c = new Criteria();
-		$assetParamsConversionProfileFilter->attachToCriteria($c);
-		
-		$totalCount = flavorParamsConversionProfilePeer::doCount($c);
-		
-		$pager->attachToCriteria($c);
-		$dbList = flavorParamsConversionProfilePeer::doSelect($c);
-		
-		$list = KalturaConversionProfileAssetParamsArray::fromDbArray($dbList);
-		$response = new KalturaConversionProfileAssetParamsListResponse();
-		$response->objects = $list;
-		$response->totalCount = $totalCount;
-		return $response; 
+		return $filter->getListResponse($pager, $this->getResponseProfile());
 	}
 	
 	/**
@@ -85,7 +71,7 @@ class ConversionProfileAssetParamsService extends KalturaBaseService
 		$conversionProfileAssetParams->toUpdatableObject($flavorParamsConversionProfile);
 		$flavorParamsConversionProfile->save();
 			
-		$conversionProfileAssetParams->fromObject($flavorParamsConversionProfile);
+		$conversionProfileAssetParams->fromObject($flavorParamsConversionProfile, $this->getResponseProfile());
 		return $conversionProfileAssetParams;
 	}
 }

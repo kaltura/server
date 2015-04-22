@@ -205,7 +205,7 @@ class YoutubeApiDistributionProfile extends ConfigurableDistributionProfile
 	    
 	    $fieldConfig = new DistributionFieldConfig();
 	    $fieldConfig->setFieldName(YouTubeApiDistributionField::MEDIA_CATEGORY);
-	    $fieldConfig->setUserFriendlyFieldName(self::METADATA_FIELD_CATEGORY.' / Entry description');
+	    $fieldConfig->setUserFriendlyFieldName(self::METADATA_FIELD_CATEGORY);
 	    $fieldConfig->setEntryMrssXslt('
         			<xsl:choose>
                     	<xsl:when test="customData/metadata/'.self::METADATA_FIELD_CATEGORY.' != \'\'">
@@ -280,5 +280,37 @@ class YoutubeApiDistributionProfile extends ConfigurableDistributionProfile
 	    return $fieldConfigArray;
 	}
 	
+	protected function getGoogleOAuth2ObjectIdentifier()
+	{
+		return md5(get_class($this) . $this->getUsername());
+	}
 	
+	public function getGoogleOAuth2Data()
+	{
+		$appId = YoutubeApiDistributionPlugin::GOOGLE_APP_ID;
+		$subId = $this->getGoogleOAuth2ObjectIdentifier();
+		
+		$partner = PartnerPeer::retrieveByPK($this->getPartnerId());
+		if($partner)
+			return $partner->getGoogleOAuth2($appId, $subId);
+			
+		return null;
+	}
+	
+	public function getApiAuthorizeUrl()
+	{
+		$tokenData = $this->getGoogleOAuth2Data();
+		KalturaLog::debug(print_r($tokenData, true));
+		if(!is_null($tokenData))
+		{
+			return null;
+		}
+	
+		$appId = YoutubeApiDistributionPlugin::GOOGLE_APP_ID;
+		$subId = $this->getGoogleOAuth2ObjectIdentifier();
+					
+		$url = kConf::get('apphome_url');
+		$url .= "/index.php/extservices/googleoauth2/ytid/$appId/subid/$subId";
+		return $url;
+	}
 }

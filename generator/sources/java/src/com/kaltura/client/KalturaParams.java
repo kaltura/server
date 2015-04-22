@@ -135,6 +135,25 @@ public class KalturaParams extends HashMap<String, String> {
 			this.put(key + PARAMS_SEPERATOR + "-", "");
 		}
 	}
+
+	public <T extends KalturaObjectBase> void add(String key, HashMap<String, T> map) {
+		if (map == null)
+			return;
+
+		int index = 0;
+		for (String itemKey : map.keySet()) {
+			KalturaObjectBase baseObj = map.get(itemKey);
+			for (java.util.Map.Entry<String, String> itr : baseObj.toParams().entrySet()) {
+				this.put(key + PARAMS_SEPERATOR + index + PARAMS_SEPERATOR
+						+ itr.getKey(), itr.getValue());
+			}
+			index++;
+		}
+
+		if (map.isEmpty()) {
+			this.put(key + PARAMS_SEPERATOR + "-", "");
+		}
+	}
 	
 	public void add(KalturaParams objectProperties) {
 		this.putAll(objectProperties);

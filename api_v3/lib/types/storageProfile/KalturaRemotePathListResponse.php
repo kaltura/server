@@ -3,17 +3,11 @@
  * @package api
  * @subpackage objects
  */
-class KalturaRemotePathListResponse extends KalturaObject
+class KalturaRemotePathListResponse extends KalturaListResponse
 {
 	/**
 	 * @var KalturaRemotePathArray
 	 * @readonly
 	 */
 	public $objects;
-
-	/**
-	 * @var int
-	 * @readonly
-	 */
-	public $totalCount;
 }

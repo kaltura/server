@@ -84,7 +84,7 @@ class LiveStreamService extends KalturaLiveEntryService
 		
 		myNotificationMgr::createNotification( kNotificationJobData::NOTIFICATION_TYPE_ENTRY_ADD, $dbEntry, $this->getPartnerId(), null, null, null, $dbEntry->getId());
 
-		$liveStreamEntry->fromObject($dbEntry);
+		$liveStreamEntry->fromObject($dbEntry, $this->getResponseProfile());
 		return $liveStreamEntry;
 	}
 
@@ -263,7 +263,7 @@ class LiveStreamService extends KalturaLiveEntryService
 			throw new KalturaAPIException(KalturaErrors::LIVE_STREAM_EXCEEDED_MAX_PASSTHRU, $entryId);
 
 		$entry = KalturaEntryFactory::getInstanceByType($dbEntry->getType());
-		$entry->fromObject($dbEntry);
+		$entry->fromObject($dbEntry, $this->getResponseProfile());
 		return $entry;
 	}
 
@@ -280,6 +280,7 @@ class LiveStreamService extends KalturaLiveEntryService
 	 */
 	function updateAction($entryId, KalturaLiveStreamEntry $liveStreamEntry)
 	{
+		$this->dumpApiRequest($entryId);
 		return $this->updateEntry($entryId, $liveStreamEntry, KalturaEntryType::LIVE_STREAM);
 	}
 
@@ -313,7 +314,7 @@ class LiveStreamService extends KalturaLiveEntryService
 	    $filter->typeEqual = KalturaEntryType::LIVE_STREAM;
 	    list($list, $totalCount) = parent::listEntriesByFilter($filter, $pager);
 	    
-	    $newList = KalturaLiveStreamEntryArray::fromEntryArray($list);
+	    $newList = KalturaLiveStreamEntryArray::fromDbArray($list, $this->getResponseProfile());
 		$response = new KalturaLiveStreamListResponse();
 		$response->objects = $newList;
 		$response->totalCount = $totalCount;
@@ -445,6 +446,8 @@ class LiveStreamService extends KalturaLiveEntryService
 	 */
 	public function addLiveStreamPushPublishConfigurationAction ($entryId, $protocol, $url = null, KalturaLiveStreamConfiguration $liveStreamConfiguration = null)
 	{
+		$this->dumpApiRequest($entryId);
+		
 		$entry = entryPeer::retrieveByPK($entryId);
 		if (!$entry || $entry->getType() != entryType::LIVE_STREAM)
 			throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_ID);
@@ -477,7 +480,7 @@ class LiveStreamService extends KalturaLiveEntryService
 		}
 		
 		$apiEntry = KalturaEntryFactory::getInstanceByType($entry->getType());
-		$apiEntry->fromObject($entry);
+		$apiEntry->fromObject($entry, $this->getResponseProfile());
 		return $apiEntry;
 	}
 	
@@ -492,6 +495,8 @@ class LiveStreamService extends KalturaLiveEntryService
 	 */
 	public function removeLiveStreamPushPublishConfigurationAction ($entryId, $protocol)
 	{
+		$this->dumpApiRequest($entryId);
+		
 		$entry = entryPeer::retrieveByPK($entryId);
 		if (!$entry || $entry->getType() != entryType::LIVE_STREAM)
 			throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_ID);
@@ -511,7 +516,7 @@ class LiveStreamService extends KalturaLiveEntryService
 		$entry->save();
 		
 		$apiEntry = KalturaEntryFactory::getInstanceByType($entry->getType());
-		$apiEntry->fromObject($entry);
+		$apiEntry->fromObject($entry, $this->getResponseProfile());
 		return $apiEntry;
 	}
 }

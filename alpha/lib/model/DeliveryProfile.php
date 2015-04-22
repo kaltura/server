@@ -49,7 +49,16 @@ abstract class DeliveryProfile extends BaseDeliveryProfile {
 		else if ($fileSync) 
 			$this->params->setFileExtension(pathinfo($fileSync->getFilePath(), PATHINFO_EXTENSION));
 	}
-	
+
+	/**
+	 * This function returns the DeliveryProfileDynamicAttributes object
+	 * @return DeliveryProfileDynamicAttributes
+	 */
+	public function getDynamicAttributes()
+	{
+		return $this->params;
+	}
+
 	/**
 	 * Copies the parameters from a given DeliveryProfileDynamicAttributes object to the current object params 
 	 * @param DeliveryProfileDynamicAttributes $params 

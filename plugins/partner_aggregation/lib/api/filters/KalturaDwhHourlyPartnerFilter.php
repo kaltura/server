@@ -5,15 +5,20 @@
  */
 class KalturaDwhHourlyPartnerFilter extends KalturaDwhHourlyPartnerBaseFilter
 {
+	/* (non-PHPdoc)
+	 * @see KalturaFilter::getCoreFilter()
+	 */
+	protected function getCoreFilter()
+	{
+		return new DwhHourlyPartnerFilter();
+	}
+	
 	/**
 	 * @see KalturaFilter::toObject()
 	 * @return DwhHourlyPartnerFilter
 	 */
 	public function toObject($object_to_fill = null, $props_to_skip = array())
 	{
-		if(!$object_to_fill)
-			$object_to_fill = new DwhHourlyPartnerFilter();
-			
 		if(!is_null($this->aggregatedTimeLessThanOrEqual))
 		{
 			$object_to_fill->set('_lte_date_id', date('Ymd', $this->aggregatedTimeLessThanOrEqual));

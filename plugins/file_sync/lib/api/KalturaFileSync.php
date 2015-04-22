@@ -245,6 +245,7 @@ class KalturaFileSync extends KalturaObject implements IFilterable
 		"fileRoot",
 		"filePath",
 		"fileSize",
+		"readyAt",
 	);
 	
 	public function getMapBetweenObjects()
@@ -292,12 +293,11 @@ class KalturaFileSync extends KalturaObject implements IFilterable
 		return parent::toObject($dbFileSync, $propsToSkip);
 	}
 	
-	public function fromObject ( $source_object  )
+	public function doFromObject($source_object, KalturaDetachedResponseProfile $responseProfile = null)
 	{
-		parent::fromObject($source_object);
+		parent::doFromObject($source_object, $responseProfile);
 		
 		$this->fileUrl = $source_object->getExternalUrl($this->getEntryId($source_object));
-		$this->readyAt = $source_object->getReadyAt(null);
 		$this->isCurrentDc = ($source_object->getDc() == kDataCenterMgr::getCurrentDcId());
 		
 		if($this->fileType == KalturaFileSyncType::LINK)

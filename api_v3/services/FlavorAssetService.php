@@ -80,7 +80,7 @@ class FlavorAssetService extends KalturaAssetService
 		$dbFlavorAsset->save();
     	
 		$flavorAsset = KalturaFlavorAsset::getInstanceByType($type);
- 		$flavorAsset->fromObject($dbFlavorAsset);
+ 		$flavorAsset->fromObject($dbFlavorAsset, $this->getResponseProfile());
 		return $flavorAsset;
     }
     
@@ -110,7 +110,7 @@ class FlavorAssetService extends KalturaAssetService
    		$dbFlavorAsset->save();
 		
 		$flavorAsset = KalturaFlavorAsset::getInstanceByType($dbFlavorAsset->getType());
-		$flavorAsset->fromObject($dbFlavorAsset);
+		$flavorAsset->fromObject($dbFlavorAsset, $this->getResponseProfile());
 		return $flavorAsset;
     }
     
@@ -160,7 +160,7 @@ class FlavorAssetService extends KalturaAssetService
    			kEventsManager::raiseEvent(new kObjectAddedEvent($dbFlavorAsset));
    		
 		$flavorAsset = KalturaFlavorAsset::getInstanceByType($dbFlavorAsset->getType());
-		$flavorAsset->fromObject($dbFlavorAsset);
+		$flavorAsset->fromObject($dbFlavorAsset, $this->getResponseProfile());
 		return $flavorAsset;
     }
     
@@ -403,7 +403,7 @@ class FlavorAssetService extends KalturaAssetService
 			throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND, $id);
 			
 		$flavorAsset = KalturaFlavorAsset::getInstanceByType($flavorAssetDb->getType());
-		$flavorAsset->fromObject($flavorAssetDb);
+		$flavorAsset->fromObject($flavorAssetDb, $this->getResponseProfile());
 		return $flavorAsset;
 	}
 	
@@ -430,7 +430,7 @@ class FlavorAssetService extends KalturaAssetService
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 					
 		$flavorAssetsDb = assetPeer::retrieveFlavorsByEntryId($entryId);
-		$flavorAssets = KalturaFlavorAssetArray::fromDbArray($flavorAssetsDb);
+		$flavorAssets = KalturaFlavorAssetArray::fromDbArray($flavorAssetsDb, $this->getResponseProfile());
 		return $flavorAssets;
 	}
 	
@@ -444,77 +444,22 @@ class FlavorAssetService extends KalturaAssetService
 	 */
 	function listAction(KalturaAssetFilter $filter = null, KalturaFilterPager $pager = null)
 	{
-	    myDbHelper::$use_alternative_con = myDbHelper::DB_HELPER_CONN_PROPEL2;
-	    
-		if (!$filter)
-			$filter = new KalturaAssetFilter();
-
-		if (!$pager)
-			$pager = new KalturaFilterPager();
+		if(!$filter)
+		{
+			$filter = new KalturaFlavorAssetFilter();
+		}
+		elseif(! $filter instanceof KalturaFlavorAssetFilter)
+		{
+			$filter = $filter->cast('KalturaFlavorAssetFilter');
+		}
 			
-		// verify access to the relevant entries - either same partner as the KS or kaltura network
-		if ($filter->entryIdEqual)
+		if(!$pager)
 		{
-			$entryIds = array($filter->entryIdEqual);
-		}
-		else if ($filter->entryIdIn)
-		{
-			$entryIds = explode(',', $filter->entryIdIn);
-		}
-		else
-		{
-			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_CANNOT_BE_NULL, 'KalturaAssetFilter::entryIdEqual/KalturaAssetFilter::entryIdIn');
+			$pager = new KalturaFilterPager();
 		}
 		
-		$entryIds = array_slice($entryIds, 0, baseObjectFilter::getMaxInValues());
-
-		$c = KalturaCriteria::create(entryPeer::OM_CLASS);
-		$c->addAnd(entryPeer::ID, $entryIds, Criteria::IN);
-		$criterionPartnerOrKn = $c->getNewCriterion(entryPeer::PARTNER_ID, $this->getPartnerId());
-		$criterionPartnerOrKn->addOr($c->getNewCriterion(entryPeer::DISPLAY_IN_SEARCH, mySearchUtils::DISPLAY_IN_SEARCH_KALTURA_NETWORK));
-		$c->addAnd($criterionPartnerOrKn);
-		$dbEntries = entryPeer::doSelect($c);
-		
-		if (!$dbEntries)
-			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, implode(',', $entryIds));
-		
-		$entryIds = array();
-		foreach ($dbEntries as $dbEntry)
-		{
-			$entryIds[] = $dbEntry->getId();
-		}
-
-		$filter->entryIdEqual = null;
-		$filter->entryIdIn = implode(',', $entryIds);
-
-		// get the flavors
-		$flavorAssetFilter = new AssetFilter();
-		
-		$filter->toObject($flavorAssetFilter);
-
-		$c = new Criteria();
-		$flavorAssetFilter->attachToCriteria($c);
-		
-		$flavorTypes = assetPeer::retrieveAllFlavorsTypes();
-		$c->add(assetPeer::TYPE, $flavorTypes, Criteria::IN);
-
-		$pager->attachToCriteria($c);
-		$dbList = assetPeer::doSelect($c);
-
-		$resultCount = count($dbList);
-		if ($resultCount && $resultCount < $pager->pageSize)
-			$totalCount = ($pager->pageIndex - 1) * $pager->pageSize + $resultCount;
-		else
-		{
-			KalturaFilterPager::detachFromCriteria($c);
-			$totalCount = assetPeer::doCount($c);
-		}
-		
-		$list = KalturaFlavorAssetArray::fromDbArray($dbList);
-		$response = new KalturaFlavorAssetListResponse();
-		$response->objects = $list;
-		$response->totalCount = $totalCount;
-		return $response;    
+		$types = assetPeer::retrieveAllFlavorsTypes();
+		return $filter->getTypeListResponse($pager, $this->getResponseProfile(), $types);
 	}
 	
 	/**
@@ -544,7 +489,7 @@ class FlavorAssetService extends KalturaAssetService
 		if (count($flavorAssetsDb) == 0)
 			throw new KalturaAPIException(KalturaErrors::NO_FLAVORS_FOUND);
 			
-		$flavorAssets = KalturaFlavorAssetArray::fromDbArray($flavorAssetsDb);
+		$flavorAssets = KalturaFlavorAssetArray::fromDbArray($flavorAssetsDb, $this->getResponseProfile());
 		
 		return $flavorAssets;
 	}
@@ -659,12 +604,18 @@ class FlavorAssetService extends KalturaAssetService
 	 * @param string $id
 	 * @param int $storageId
 	 * @param bool $forceProxy
+	 * @param KalturaFlavorAssetUrlOptions $options
 	 * @return string
 	 * @throws KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND
 	 * @throws KalturaErrors::FLAVOR_ASSET_IS_NOT_READY
 	 */
-	public function getUrlAction($id, $storageId = null, $forceProxy = false)
+	public function getUrlAction($id, $storageId = null, $forceProxy = false, KalturaFlavorAssetUrlOptions $options = null)
 	{
+		if (!$options)
+		{
+			$options = new KalturaFlavorAssetUrlOptions();
+		}
+		
 		$assetDb = assetPeer::retrieveById($id);
 		if (!$assetDb || !($assetDb instanceof flavorAsset))
 			throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND, $id);
@@ -682,26 +633,34 @@ class FlavorAssetService extends KalturaAssetService
 		if(is_null($entryDb))
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $assetDb->getEntryId());
 		
-		$preview = null;
+		$shouldServeFlavor = false;
+		if($entryDb->getType() == entryType::MEDIA_CLIP &&!in_array($assetDb->getPartnerId(),kConf::get('legacy_get_url_partners', 'local', array())))
+		{
+			$shouldServeFlavor = true;
+			$preview = null;
+		}
+		else
+			$previewFileSize = null;
+
 		$ksObj = $this->getKs();
 		$ks = ($ksObj) ? $ksObj->getOriginalString() : null;
 		$securyEntryHelper = new KSecureEntryHelper($entryDb, $ks, null, ContextType::DOWNLOAD);
-		if ($securyEntryHelper->shouldPreview()) { 
-			$preview = $securyEntryHelper->getPreviewLength() * 1000;
-		} else { 
-			$securyEntryHelper->validateForDownload();
+		if ($securyEntryHelper->shouldPreview()) 
+		{ 
+			if ($shouldServeFlavor)
+				$preview = $securyEntryHelper->getPreviewLength() * 1000;
+			else
+				$previewFileSize = $assetDb->estimateFileSize($entryDb, $securyEntryHelper->getPreviewLength());
 		}
+		else
+			$securyEntryHelper->validateForDownload();
+
 		if (!$securyEntryHelper->isAssetAllowed($assetDb))
 			throw new KalturaAPIException(KalturaErrors::ASSET_NOT_ALLOWED, $id);
-
-		//files grater then 1.8GB can't be downloaded from cdn.
-		$flavorSizeKB = $assetDb->getSize();
-		$useCdn = true;
-		if ($flavorSizeKB > kConf::get("max_file_size_downloadable_from_cdn_in_KB"))
-			$useCdn = false;
-		
-		return $assetDb->getDownloadUrl($useCdn, $forceProxy,$preview);
-
+ 
+		if ($shouldServeFlavor)
+			return $assetDb->getServeFlavorUrl($preview, $options->fileName);
+		return $assetDb->getDownloadUrl(true, $forceProxy,$previewFileSize);
 	}
 	
 	/**
@@ -733,7 +692,7 @@ class FlavorAssetService extends KalturaAssetService
 		$fileSyncs = FileSyncPeer::doSelect($c);
 			
 		$listResponse = new KalturaRemotePathListResponse();
-		$listResponse->objects = KalturaRemotePathArray::fromFileSyncArray($fileSyncs);
+		$listResponse->objects = KalturaRemotePathArray::fromDbArray($fileSyncs, $this->getResponseProfile());
 		$listResponse->totalCount = count($listResponse->objects);
 		return $listResponse;
 	}
@@ -842,13 +801,13 @@ class FlavorAssetService extends KalturaAssetService
 			$flavorAssetWithParams = new KalturaFlavorAssetWithParams();
 			$flavorAssetWithParams->entryId = $entryId;
 			$flavorAsset = KalturaFlavorAsset::getInstanceByType($flavorAssetDb->getType());
-			$flavorAsset->fromObject($flavorAssetDb);
+			$flavorAsset->fromObject($flavorAssetDb, $this->getResponseProfile());
 			$flavorAssetWithParams->flavorAsset = $flavorAsset;
 			if (isset($flavorParamsArray[$flavorParamsId]))
 			{
 				$flavorParamsDb = $flavorParamsArray[$flavorParamsId];
 				$flavorParams = KalturaFlavorParamsFactory::getFlavorParamsInstance($flavorParamsDb->getType());
-				$flavorParams->fromObject($flavorParamsDb);
+				$flavorParams->fromObject($flavorParamsDb, $this->getResponseProfile());
 				$flavorAssetWithParams->flavorParams = $flavorParams;
 
 				// we want to log which flavor params are in use, there could be more
@@ -876,7 +835,7 @@ class FlavorAssetService extends KalturaAssetService
 				continue;
 			}
 			$flavorParams = KalturaFlavorParamsFactory::getFlavorParamsInstance($flavorParamsDb->getType());
-			$flavorParams->fromObject($flavorParamsDb);
+			$flavorParams->fromObject($flavorParamsDb, $this->getResponseProfile());
 			
 			$flavorAssetWithParams = new KalturaFlavorAssetWithParams();
 			$flavorAssetWithParams->entryId = $entryId;

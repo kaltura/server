@@ -1,16 +1,262 @@
+# Jupiter-10.10.0 #
+## Feed Drop Folder Feature ##
+
+- Issue type - new feature
+- Issue ID - PLAT-2042
+
+### Configuration ###
+
+Add the following line to the plugins.ini file:  
+        FeedDropFolder 
+   
+Add the following parameters to the batch.ini DropFolderWatcher worker configuration:  
+        params.mrss.xmlPath									= @WEB_DIR@/tmp/dropFolderFiles  
+        params.mrss.limitProcessEachRun						= 20
+   
+  
+### Deployment ###
+ 
+ - clear the cache
+ - run php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+ - Create new folder : @WEB_DIR@/tmp/dropFolderFiles
+
+## Time Based Playlist Filters ##
+
+Allows adding timebased filters to playlists that support expiry of a filter on a certain time.
+
+- Issue Type: New Feature
+- Issue ID: PLAT-2817
+
+#### Configuration ####
+
+None.
+
+#### Deployment Scripts ####
+
+None.
+
+#### Known Issues & Limitations ####
+
+None.
+
+----------
+# Jupiter-10.9.0 #
+
+## Copy cue points to clips and trimmed entries ##
+
+- Issue Type: bug fix
+- Issue ID: PLAT-1118
+
+#### Configuration ####
+
+Add the following lines from admin.template.ini to admin.ini:
+
+	moduls.annotationCopyToClip.enabled = true
+	moduls.annotationCopyToClip.permissionType = 2
+	moduls.annotationCopyToClip.label = Time Based - Copy annotation cue points when user clips entries
+	moduls.annotationCopyToClip.permissionName = COPY_ANNOTATIONS_TO_CLIP
+	moduls.annotationCopyToClip.basePermissionType = 3
+	moduls.annotationCopyToClip.basePermissionName = ANNOTATION_PLUGIN_PERMISSION
+	moduls.annotationCopyToClip.group = GROUP_ENABLE_DISABLE_FEATURES
+
+	moduls.annotationCopyToTrim.enabled = true
+	moduls.annotationCopyToTrim.permissionType = 2
+	moduls.annotationCopyToTrim.label = Time Based - Do not keep annotation cue points when user trims entries
+	moduls.annotationCopyToTrim.permissionName = DO_NOT_COPY_ANNOTATIONS_TO_TRIMMED_ENTRY
+	moduls.annotationCopyToTrim.basePermissionType = 3
+	moduls.annotationCopyToTrim.basePermissionName = ANNOTATION_PLUGIN_PERMISSION
+	moduls.annotationCopyToTrim.group = GROUP_ENABLE_DISABLE_FEATURES
+
+	moduls.cuePointCopyToClip.enabled = true
+	moduls.cuePointCopyToClip.permissionType = 2
+	moduls.cuePointCopyToClip.label = Time Based - Do not copy code, thumb and ad cue points when user clips entries
+	moduls.cuePointCopyToClip.permissionName = DO_NOT_COPY_CUE_POINTS_TO_CLIP
+	moduls.cuePointCopyToClip.basePermissionType = 3
+	moduls.cuePointCopyToClip.basePermissionName = CUEPOINT_PLUGIN_PERMISSION
+	moduls.cuePointCopyToClip.group = GROUP_ENABLE_DISABLE_FEATURES
+
+	moduls.cuePointCopyToTrim.enabled = true
+	moduls.cuePointCopyToTrim.permissionType = 2
+	moduls.cuePointCopyToTrim.label = Time Based - Do not keep code, thumb, and ad cue points when user trims entries
+	moduls.cuePointCopyToTrim.permissionName = DO_NOT_COPY_CUE_POINTS_TO_TRIMMED_ENTRY
+	moduls.cuePointCopyToTrim.basePermissionType = 3
+	moduls.cuePointCopyToTrim.basePermissionName = CUEPOINT_PLUGIN_PERMISSION
+	moduls.cuePointCopyToTrim.group = GROUP_ENABLE_DISABLE_FEATURES
+
+	moduls.keepCuePointsOnMediaReplacement.enabled = true
+	moduls.keepCuePointsOnMediaReplacement.permissionType = 2
+	moduls.keepCuePointsOnMediaReplacement.label = Time Based - Remove original cue points when user replaces media in existing entry
+	moduls.keepCuePointsOnMediaReplacement.permissionName = REMOVE_CUE_POINTS_WHEN_REPLACING_MEDIA
+	moduls.keepCuePointsOnMediaReplacement.basePermissionType = 3
+	moduls.keepCuePointsOnMediaReplacement.basePermissionName = CUEPOINT_PLUGIN_PERMISSION
+	moduls.keepCuePointsOnMediaReplacement.group = GROUP_ENABLE_DISABLE_FEATURES
+
+#### Deployment Scripts ####
+
+None.
+
+#### Known Issues & Limitations ####
+
+None.
+
+## YouTube API connector V3 ##
+
+***Note:*** Manual migration required to all existing accounts. 
+
+- Issue Type: bug fix
+- Issue ID: PLAT-2776
+
+#### Configuration ####
+
+**google_auth.ini**
+
+Added `youtubeapi` section.
+
+#### Deployment Scripts ####
+
+		deployment/updates/scripts/2015_04_12_migrate_youtube_api_category.php
+
+#### Known Issues & Limitations ####
+
+The new API, currently, doesn't support existing features:
+
+- Disallow comments
+- Disallow ratings
+- Disallow responses
+- Set raw file name
+- Set start and end dates
+
+## Redirect live entry updates via its original DC ##
+
+- Issue Type: bug fix
+- Issue ID: PLAT-2762
+
+#### Configuration ####
+
+** local.ini **
+
+Added the following configuration.
+
+	;set to true when one of the DC's is down
+	disable_dump_api_request = false
+
+#### Deployment Scripts ####
+
+None.
+
+#### Known Issues & Limitations ####
+
+None.
+
+----------
+# Jupiter-10.8.0 #
+
+## Tag-search - return all objects when no entitlement ##
+
+- Issue Type: bug fix
+- Issue ID: PLAT-2646
+
+#### Configuration ####
+
+**sphinx/kaltura.conf**
+
+Added the following attribute to the kaltura_tag sphinx table. please re-index.
+
+	rt_attr_string = tag
+
+#### Deployment Scripts ####
+
+None.
+
+#### Known Issues & Limitations ####
+
+None.
+
+## Real-time dashboard permission in now based on the general live-stream permission ##
+
+- Issue Type: Change Request
+- Issue ID: PLAT-2705
+
+#### Configuration ####
+
+Remove moduls.realTimeReports config from configurations/admin.ini
+
+#### Deployment Scripts ####
+
+None.
+
+#### Known Issues & Limitations ####
+
+None.
+
+
+## Dynamic Objects ##
+
+- Issue Type: New Feature
+- Issue ID: PLAT-2466
+
+#### Configuration ####
+
+**plugins.ini**
+
+Add `MetadataSphinx` to the end of `Mandatory plugins` section (after `SphinxSearch`)
+
+**sphinx**
+
+Update `configurations/sphinx/kaltura.conf` according to template (a new index `kaltura_metadata` was added).
+
+
+#### Deployment Scripts ####
+
+		mysql -uroot -p kaltura < deployment/updates/sql/2015_03_18_alter_metadata_profile_field_with_custom_data_field.sql
+		php deployment/updates/scripts/add_permissions/2015_03_18_update_metadata_permissions.php
+		php deployment/base/scripts/installPlugins.php
+		php deployment/base/scripts/populateSphinxMetadata.php
+
+#### Known Issues & Limitations ####
+
+None.
+
+##New file formats MXF and M2TS##
+- Issue Type: new feature
+- Issue ID: PLAT-2742 and SUP-4124
+
+
 
 ----------
 # Jupiter-10.7.0 #
 
-##Live Analytics - Show DVR audience metrics on Live Analytics##
-- Issue ID: PLAT-2413
+##API Response Profiles##
+- Issue Type: new feature
 
-### Configuration ###
+#### Configuration ####
 None
 
-### Installation ###
-- Run on the Cassandra cluster: **live_analytics**/KalturaLiveModel/conf/migrations/2015-03-01-000000-update_dvr_kaltura_live_keyspace.cql
-- Deploy KalturaLiveAnalyics.war
+#### Deployment Scripts ####
+
+	mysql -uroot -p kaltura < deployment/updates/sql/2015_02_23_response_profile_table.sql
+	php deployment/updates/scripts/add_permissions/2015_02_23_response_profile.php  
+
+#### Known Issues & Limitations ####
+
+None.
+
+##Live Analytics - Show DVR audience metrics on Live Analytics##
+- Issue Type: new feature
+- Issue ID: PLAT-2413
+
+#### Configuration ####
+
+Deploy an up-to-date version of batch/batches/Mailer/emails_en.ini
+
+#### Deployment Scripts ####
+
+Run on the Cassandra cluster: **live_analytics**/KalturaLiveModel/conf/migrations/2015-03-01-000000-update_dvr_kaltura_live_keyspace.cql
+Deploy KalturaLiveAnalyics.war
+
+#### Known Issues & Limitations ####
+
+None.
 
 ----------
 # Jupiter-10.6.0 #
@@ -19,8 +265,7 @@ None
 - Issue ID: PLAT-2540
 
 ### Configuration ###
-- Add "params.ffprobeCmd = ffprobe" to 
-- - configurations/batch/live.workers.ini - KAsyncConvertLiveSegment
+- Add "params.ffprobeCmd = ffprobe" to configurations/batch/live.workers.ini - KAsyncConvertLiveSegment
 
 ----------
 # Jupiter-10.5.0 #

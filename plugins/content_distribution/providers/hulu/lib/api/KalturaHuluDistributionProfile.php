@@ -150,9 +150,9 @@ class KalturaHuluDistributionProfile extends KalturaConfigurableDistributionProf
 		return $dbObject;
 	}
 	
-	public function fromObject ($source_object)
+	public function doFromObject($source_object, KalturaDetachedResponseProfile $responseProfile = null)
 	{
-		parent::fromObject($source_object);
+		parent::doFromObject($source_object, $responseProfile);
 		
 		$this->seriesAdditionalCategories = KalturaStringArray::fromStringArray($source_object->getSeriesAdditionalCategories());
 	}

@@ -47,14 +47,17 @@ class KalturaPdfFlavorParamsOutput extends KalturaFlavorParamsOutput
 		return $map;
 	}
 	
-	public function fromObject($dbPdfFlavorParamsOutput)
+	public function doFromObject($dbPdfFlavorParamsOutput, KalturaDetachedResponseProfile $responseProfile = null)
 	{
-		parent::fromObject($dbPdfFlavorParamsOutput);
+		parent::doFromObject($dbPdfFlavorParamsOutput, $responseProfile);
 		
-		if($dbPdfFlavorParamsOutput->getReadonly() == true){
-			$this->readonly = 1;
-		}else{
-			$this->readonly = 0;
+		if($this->shouldGet('readonly', $responseProfile))
+		{
+			if($dbPdfFlavorParamsOutput->getReadonly() == true){
+				$this->readonly = 1;
+			}else{
+				$this->readonly = 0;
+			}
 		}
 	}
 }

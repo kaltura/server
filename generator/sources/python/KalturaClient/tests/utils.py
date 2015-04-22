@@ -1,5 +1,6 @@
 import os, sys, inspect
 import unittest
+import ConfigParser
 
 from KalturaClient import KalturaClient, KalturaConfiguration
 from KalturaClient.Base import KalturaObjectFactory, KalturaEnumsFactory
@@ -8,7 +9,16 @@ from KalturaClient.Base import IKalturaLogger
 from KalturaClient.Plugins.Core import KalturaSessionType
 from KalturaClient.Plugins.Core import KalturaMediaType
 
-from secret_config import PARTNER_ID, SERVICE_URL, SECRET, ADMIN_SECRET, USER_NAME
+dir = os.path.dirname(__file__)
+filename = os.path.join(dir, 'config.ini')
+
+config = ConfigParser.ConfigParser()
+config.read(filename)
+PARTNER_ID = config.getint("Test", "partnerId")
+SERVICE_URL = config.get("Test", "serviceUrl")
+SECRET = config.get("Test", "secret")
+ADMIN_SECRET = config.get("Test", "adminSecret")
+USER_NAME = config.get("Test", "userName")
 
 import logging
 logging.basicConfig(level = logging.DEBUG,

@@ -5,7 +5,7 @@
  */
 class KalturaLiveChannelArray extends KalturaTypedArray
 {
-	public static function fromEntryArray ( $arr )
+	public static function fromDbArray($arr, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		$newArr = new KalturaLiveChannelArray();
 		if ($arr == null)
@@ -13,8 +13,8 @@ class KalturaLiveChannelArray extends KalturaTypedArray
 			
 		foreach ($arr as $obj)
 		{
-			$nObj = new KalturaLiveChannel();
-			$nObj->fromObject($obj);
+    		$nObj = KalturaEntryFactory::getInstanceByType($obj->getType());
+			$nObj->fromObject($obj, $responseProfile);
 			$newArr[] = $nObj;
 		}
 		

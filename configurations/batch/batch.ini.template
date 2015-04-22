@@ -533,7 +533,7 @@ id													= 330
 friendlyName										= Distribute Fetch Report Closer
 type												= KAsyncDistributeFetchReportCloser
 scriptPath											= ../plugins/content_distribution/batch/Distribute/KAsyncDistributeFetchReportCloserExe.php
-
+ 
 
 [KAsyncSynchronizeDistribution : PeriodicWorker]
 id													= 340
@@ -549,6 +549,8 @@ type												= KAsyncDropFolderWatcher
 maximumExecutionTime								= 3000
 scriptPath											= ../plugins/drop_folder/batch/DropFolderWatcher/KAsyncDropFolderWatcherExe.php
 params.tags											= *
+params.mrss.xmlPath									= @WEB_DIR@/tmp/dropFolderFiles
+params.mrss.limitProcessEachRun						= 20
 
 
 [KAsyncDropFolderContentProcessor : JobHandlerWorker]

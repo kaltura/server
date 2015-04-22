@@ -24,5 +24,12 @@ class KalturaSystemPartnerUsageFilter extends KalturaFilter
 	 * @var int
 	 */
 	public $timezoneOffset;
-	
+
+	/* (non-PHPdoc)
+	 * @see KalturaFilter::getCoreFilter()
+	 */
+	protected function getCoreFilter()
+	{
+		return new partnerFilter();
+	}
 }

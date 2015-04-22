@@ -62,7 +62,7 @@ class ConversionProfileService extends KalturaBaseService
 		PartnerPeer::removePartnerFromCache($partner->getId());
 		
 		$conversionProfile = new KalturaConversionProfile();
-		$conversionProfile->fromObject($conversionProfileDb);
+		$conversionProfile->fromObject($conversionProfileDb, $this->getResponseProfile());
 		$conversionProfile->loadFlavorParamsIds($conversionProfileDb);
 		
 		return $conversionProfile;
@@ -119,7 +119,7 @@ class ConversionProfileService extends KalturaBaseService
 			kFileSyncUtils::file_put_contents($key, $xsl);
 		}
 		
-		$conversionProfile->fromObject($conversionProfileDb);
+		$conversionProfile->fromObject($conversionProfileDb, $this->getResponseProfile());
 		
 		// load flavor params id with the same connection (master connection) that was used for insert
 		$con = myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_MASTER);
@@ -143,7 +143,7 @@ class ConversionProfileService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::CONVERSION_PROFILE_ID_NOT_FOUND, $id);
 			
 		$conversionProfile = new KalturaConversionProfile();
-		$conversionProfile->fromObject($conversionProfileDb);
+		$conversionProfile->fromObject($conversionProfileDb, $this->getResponseProfile());
 		$conversionProfile->loadFlavorParamsIds($conversionProfileDb);
 		
 		return $conversionProfile;
@@ -191,7 +191,7 @@ class ConversionProfileService extends KalturaBaseService
 			kFileSyncUtils::file_put_contents($key, $xsl);
 		}
 		
-		$conversionProfile->fromObject($conversionProfileDb);
+		$conversionProfile->fromObject($conversionProfileDb, $this->getResponseProfile());
 		// load flavor params id with the same connection (master connection) that was used for insert
 		$con = myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_MASTER);
 		$conversionProfile->loadFlavorParamsIds($conversionProfileDb, $con);
@@ -235,28 +235,11 @@ class ConversionProfileService extends KalturaBaseService
 	{
 		if (!$filter)
 			$filter = new KalturaConversionProfileFilter();
-
-		if (!$pager)
+			
+		if(!$pager)
 			$pager = new KalturaFilterPager();
 			
-		$conversionProfile2Filter = new conversionProfile2Filter();
-		
-		$filter->toObject($conversionProfile2Filter);
-
-		$c = new Criteria();
-		$conversionProfile2Filter->attachToCriteria($c);
-		
-		$totalCount = conversionProfile2Peer::doCount($c);
-		
-		$pager->attachToCriteria($c);
-		$dbList = conversionProfile2Peer::doSelect($c);
-		
-		$list = KalturaConversionProfileArray::fromDbArray($dbList);
-		$list->loadFlavorParamsIds();
-		$response = new KalturaConversionProfileListResponse();
-		$response->objects = $list;
-		$response->totalCount = $totalCount;
-		return $response;    
+		return $filter->getListResponse($pager, $this->getResponseProfile());  
 	}
 	
 	/**
