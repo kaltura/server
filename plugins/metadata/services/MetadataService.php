@@ -21,6 +21,21 @@ class MetadataService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::FEATURE_FORBIDDEN, MetadataPlugin::PLUGIN_NAME);
 	}
 	
+	/* (non-PHPdoc)
+	 * @see KalturaBaseService::partnerGroup()
+	 */
+	protected function partnerGroup($peer = null)
+	{
+	    if(in_array($this->actionName, array('get', 'list')) && $peer == 'Metadata'){
+	        return $this->partnerGroup . ',0';
+	    }
+	    elseif (in_array($this->actionName, array('add', 'get', 'list', 'update')) && $peer == 'MetadataProfile'){
+	        return $this->partnerGroup . ',0';
+	    }
+	
+	    return $this->partnerGroup;
+	}
+	
 	protected function kalturaNetworkAllowed($actionName)
 	{
 		if ($actionName == 'list')

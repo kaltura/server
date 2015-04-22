@@ -15,6 +15,9 @@
  */
 class MetadataProfile extends BaseMetadataProfile implements ISyncableFile
 {
+    private $xsdData = null;
+    private $viewsData = null;
+    
 	const FILE_SYNC_METADATA_DEFINITION = 1;
 	const FILE_SYNC_METADATA_VIEWS = 2;
 	const FILE_SYNC_METADATA_XSLT = 3;
@@ -211,4 +214,35 @@ class MetadataProfile extends BaseMetadataProfile implements ISyncableFile
 			
 		$this->putInCustomData('requiredCopyTemplatePermissions', $v);
 	}
+	
+	public function setXsdData($xsdData)
+	{
+	    $this->xsdData = $xsdData;
+	}
+	
+	public function setViewesData($viewsData)
+	{
+	    $this->viewsData = $viewsData;
+	}
+	
+	/* (non-PHPdoc)
+	 * @see BaseMetadataProfile::postSave()
+	 */
+	public function postSave(PropelPDO $con = null)
+	{
+	    if($this->wasObjectSaved())
+	    {
+	        $key = $this->getSyncKey(MetadataProfile::FILE_SYNC_METADATA_DEFINITION);
+	        kFileSyncUtils::file_put_contents($key, $this->xsdData);
+	        
+	        if($this->viewsData)
+	        {
+	            $key = $this->getSyncKey(MetadataProfile::FILE_SYNC_METADATA_VIEWS);
+	            kFileSyncUtils::file_put_contents($key, $this->viewsData);
+	        }
+	    }
+	
+	    return parent::postSave($con);
+	}
+
 } // MetadataProfile

@@ -173,4 +173,9 @@ class CuePointPeer extends BaseCuePointPeer implements IMetadataPeer
 		self::setUseCriteriaFilter ( true );
 		return $res;
 	}
+	
+	public static function validateMetadataObjects($profileField, $objectIds, &$errorMessage)
+	{
+	    return true;
+	}
 }
