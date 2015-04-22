@@ -1,4 +1,26 @@
 # Jupiter-10.10.0 #
+## Support marking file_sync's as directories ##
+
+- Issue type - new feature
+- Issue ID - WEBC-467
+
+### Configuration ###
+
+None.
+   
+  
+### Deployment ###
+ 
+ - Run mysql -h@db_host@ -u@db_user@ -p@db_pass@ -P3306 kaltura < deployment/updates/sql/2015_04_28_alter_file_sync_table_custom_data_field.sql
+	
+		Please verify this column does not exist propir to running.
+
+#### Known Issues & Limitations ####
+
+None.
+
+
+ 
 ## Feed Drop Folder Feature ##
 
 - Issue type - new feature

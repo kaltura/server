@@ -1377,6 +1377,7 @@ CREATE TABLE file_sync
 	file_path VARCHAR(128),
 	file_size BIGINT,
 	deleted_id BIGINT,
+	custom_data TEXT,
 	PRIMARY KEY (id),
 	UNIQUE KEY object_id-object_type-version-object_sub_type-dc-deleted_id (object_id, object_type, version, object_sub_type, dc, deleted_id),
 	KEY partner_id_object_id_object_type_index(partner_id, object_id, object_type),
