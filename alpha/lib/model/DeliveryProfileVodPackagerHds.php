@@ -6,9 +6,9 @@ class DeliveryProfileVodPackagerHds extends DeliveryProfileHds {
 	{
 		$url = parent::doGetFlavorAssetUrl($flavorAsset);
 		$url .= '/forceproxy/true';
-
 		if($this->params->getFileExtension())
 			$url .= "/name/a." . $this->params->getFileExtension();
+		$url .= VodPackagerDeliveryUtils::getExtraParams($this->params);
 		return $url;
 	}
 	
