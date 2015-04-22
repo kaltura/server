@@ -65,6 +65,29 @@ None.
 
 None.
 
+## Delivery Profile selection logic for playback ##
+
+Added logic to the selection of deliveryProfiles for playback.
+A priority attributes orders available deliveryProfile.
+Each deliveryProfile may override the base class implementation of supportsDeliveryDynamicAttributes which returns 
+whether the deliveryProfile supports the required playback constraints (progressive media seek, flv support etc), doesn't support or partially support it. 
+Partial support means the playback will work but a feature (e.g. seek within flash progressive download) won't.
+These enhancements allow for multiple deliveryProfiles to be configured as default and provide fall back in case of delivery constraints.
+Delivered by - Eran Itam.
+
+- Issue Type:Enhancement
+- Issue ID: No ID
+
+#### Configuration ####
+
+None.
+
+#### Deployment Scripts ####
+
+deployment/updates/sql/2015_04_25_alter_delivery_profile_add_priority.sql
+
+#### Known Issues & Limitations ####
+
 ----------
 # Jupiter-10.9.0 #
 
