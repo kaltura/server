@@ -189,7 +189,7 @@ class KFeedDropFolderEngine extends KDropFolderEngine
 		
 		$feedItemPath = KBatchBase::$taskConfig->params->mrss->xmlPath . DIRECTORY_SEPARATOR. $updatedGuid . '_' . time();
 		$res = file_put_contents($feedItemPath, $feedItem->saveXML());
-		//chmod($feedItemPath, 0660);
+		chmod($feedItemPath, 0660);
 		return $feedItemPath;
 	}
 	
