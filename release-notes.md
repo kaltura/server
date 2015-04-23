@@ -18,6 +18,7 @@ Add the following parameters to the batch.ini DropFolderWatcher worker configura
  
  - clear the cache
  - run php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+ - Create new folder : @WEB_DIR@/tmp/dropFolderFiles
 
 ----------
 # Jupiter-10.9.0 #
