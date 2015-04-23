@@ -62,23 +62,19 @@ class KFeedDropFolderEngine extends KDropFolderEngine
 			}
 			else
 			{
-				if (!isset ($this->dropFolder->fileHandlerConfig->contentMatchPolicy) )
-				{
-					KalturaLog::info('Content match policy is not set for [' . $this->dropFolder->id . '] - assume ADD_AS_NEW.');
-					continue;
-				}
-				else
-				{
-					if ($this->fileHandlerConfig->contentMatchPolicy == KalturaDropFolderContentFileHandlerMatchPolicy::ADD_AS_NEW)
-					{
-						KalturaLog::info('No need to process- content match policy for drop folder id [' . $this->dropFolder->id . '] does not include updates.');
-						continue;
-					}	
-				}
+				$dropFolderFile = $existingDropFolderFilesMap[$uniqueId];
+				//if file exist in the folder remove it from the map
+				//all the files that are left in a map will be marked as PURGED					
+				unset($existingDropFolderFilesMap[$uniqueId]);
+				$this->handleExistingItem($dropFolderFile, $feedItem);
 				
-				$this->handleExistingItem ($uniqueId, $feedItem);
 				$counter++;
 			}
+		}
+		
+		foreach ($existingDropFolderFilesMap as $existingDropFolderFile)
+		{
+			$this->handleFilePurged($existingDropFolderFile->id);
 		}
 		
 	}
@@ -198,7 +194,7 @@ class KFeedDropFolderEngine extends KDropFolderEngine
 	 * @param KalturaDropFolderFile $existingDropFolderFile
 	 * @param SimpleXMLElement $feedItem
 	 */
-	protected function handleExistingItem (KalturaMRSSDropFolderFile $existingDropFolderFile, SimpleXMLElement $feedItem)
+	protected function handleExistingItem (KalturaFeedDropFolderFile $existingDropFolderFile, SimpleXMLElement $feedItem)
 	{
 		//check whether the hash has changed - in this case the content needs to be updated.
 		$feedItemHash = strval($this->getSingleXPathResult($this->dropFolder->feedItemInfo->itemHashXPath, $feedItem));
@@ -216,6 +212,14 @@ class KFeedDropFolderEngine extends KDropFolderEngine
 		//check whether the publish date has changed - in this case the metadata needs to be updated
 		if ($feedItem->pubDate != $existingDropFolderFile->lastModificationTime)
 		{
+			$this->handleItemAdded($feedItem, false);
+			return true;
+		}
+		
+		$retryStatuses = array (KalturaDropFolderFileStatus::DELETED, KalturaDropFolderFileStatus::PURGED, KalturaDropFolderFileStatus::ERROR_HANDLING);
+		if (in_array ($existingDropFolderFile->status, $retryStatuses))
+		{
+			KalturaLog::info("File status condition met- retrying");
 			$this->handleItemAdded($feedItem, false);
 			return true;
 		}
