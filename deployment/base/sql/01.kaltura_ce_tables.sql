@@ -1435,6 +1435,7 @@ CREATE TABLE IF NOT EXISTS `metadata_profile` (
   `created_at` datetime DEFAULT NULL,
   `updated_at` datetime DEFAULT NULL,
   `version` int(11) DEFAULT NULL,
+  `file_sync_version` int(11) DEFAULT NULL,
   `views_version` int(11) DEFAULT NULL,
   `partner_id` int(11) DEFAULT NULL,
   `name` varchar(31) DEFAULT NULL,

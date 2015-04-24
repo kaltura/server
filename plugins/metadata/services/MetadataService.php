@@ -272,7 +272,7 @@ class MetadataService extends KalturaBaseService
 					
 				// validates against previous version
 				$errorMessagePrevVersion = '';
-				if(!kMetadataManager::validateMetadata($dbMetadata->getMetadataProfileId(), $xmlData, $errorMessagePrevVersion, $dbMetadata->getMetadataProfileVersion()))
+				if(!kMetadataManager::validateMetadata($dbMetadata->getMetadataProfileId(), $xmlData, $errorMessagePrevVersion, true))
 				{
 					KalturaLog::err("Failed to validate metadata object [$id] against metadata profile previous version [" . $dbMetadata->getMetadataProfileVersion() . "] error: $errorMessagePrevVersion");
 
