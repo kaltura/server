@@ -3,7 +3,7 @@
  * @package api
  * @subpackage objects
  */
-class KalturaPluginDataArray extends KalturaTypedArray
+class KalturaPluginDataArray extends KalturaAssociativeArray
 {
 
     public function __construct()

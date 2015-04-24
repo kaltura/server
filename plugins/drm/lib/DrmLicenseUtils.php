@@ -59,29 +59,34 @@ class DrmLicenseUtils {
 
     public static function signDataWithKey($dataToSign, $signingKey)
     {
-        return urlencode(base64_encode(sha1($signingKey.$dataToSign,TRUE)));
+        return rawurlencode(base64_encode(sha1($signingKey.$dataToSign,TRUE)));
     }
 
-    public static function createCustomData($entryId, KalturaFlavorAssetArray $flavorAssets)
-    {
-        $customData = new stdClass();
-        $customData->ca_system = self::SYSTEM_NAME;
-        $customData->user_token = kCurrentContext::$ks;
-        $customData->acount_id = kCurrentContext::$partner_id;
-        $customData->content_id = $entryId;
-        $customData->files = "";
-        if (isset($flavorAssets))
-        {
-            $flavorIds = array();
-            $flavorAssets = $flavorAssets->toArray();
-            foreach ($flavorAssets as $flavor)
-            {
-                $flavorIds[] = $flavor->flavorParamsId;
-            }
-            $customData->files = $flavorIds;
-        }
-        $customDataJson = json_encode($customData);
-        return $customDataJson;
-    }
+	public static function createCustomData($entryId, KalturaFlavorAssetArray $flavorAssets, $signingKey)
+	{
+		$flavorParamIds = "";
+		foreach ($flavorAssets as $flavor)
+		{
+			$flavorParamIds .= $flavor->flavorParamsId.",";
+		}
 
+		$innerData = new stdClass();
+		$innerData->ca_system = self::SYSTEM_NAME;
+		$innerData->user_token = kCurrentContext::$ks;
+		$innerData->acount_id = kCurrentContext::$partner_id;
+		$innerData->content_id = $entryId;
+		$innerData->files = $flavorParamIds;
+		$innerDataJson = json_encode($innerData);
+		$innerDataSignature = self::signDataWithKey($innerDataJson, $signingKey);
+		$innerDataJsonEncoded = rawurlencode(base64_encode($innerDataJson));
+
+		$customData = array();
+		foreach ($flavorAssets as $flavor)
+		{
+            $customData[$flavor->id] = new stdClass();
+			$customData[$flavor->id]->custom_data = $innerDataJsonEncoded;
+			$customData[$flavor->id]->signature = $innerDataSignature;
+		}
+		return $customData;
+	}
 }
