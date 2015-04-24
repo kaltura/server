@@ -388,7 +388,7 @@ class kMetadataManager
 		if($xsl === true)
 			return;
 
-		$prevVersion = $metadataProfile->getFileSyncVersion();
+		$prevVersion = $metadataProfile->getVersion();
 		$metadataProfile->incrementVersion();
 		$newVersion = $metadataProfile->getVersion();
 		
