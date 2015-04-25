@@ -235,7 +235,7 @@ class KFeedDropFolderEngine extends KDropFolderEngine
 			return true;
 		}
 		
-		$retryStatuses = array (KalturaDropFolderFileStatus::DELETED, KalturaDropFolderFileStatus::PURGED, KalturaDropFolderFileStatus::ERROR_HANDLING);
+		$retryStatuses = array (KalturaDropFolderFileStatus::ERROR_HANDLING);
 		if (in_array ($existingDropFolderFile->status, $retryStatuses))
 		{
 			KalturaLog::info("File status condition met- retrying [" . $existingDropFolderFile->fileName ."]");
