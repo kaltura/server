@@ -228,7 +228,6 @@ class KFeedDropFolderEngine extends KDropFolderEngine
 		
 		//check whether the publish date has changed - in this case the metadata needs to be updated
 		$pubDate = strval($this->getSingleXPathResult($this->dropFolder->feedItemInfo->itemPublishDateXPath, $feedItem));
-		KalturaLog::debug($pubDate);
 		if ($pubDate != $existingDropFolderFile->lastModificationTime)
 		{
 			KalturaLog::info('Publish date has changed for drop folder file named ['. $existingDropFolderFile->fileName .'] - content will be updated.');
