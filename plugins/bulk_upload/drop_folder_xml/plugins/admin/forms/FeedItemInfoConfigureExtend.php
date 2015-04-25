@@ -8,47 +8,47 @@ class Form_FeedItemInfoConfigureExtend extends Infra_Form
 	public function init()
 	{
 		$this->addElement('text', 'itemXPath', array(
-			'label' 		=> 'Item XPath:',
+			'label' 		=> 'item-xpath',
 			'filters'		=> array('StringTrim'),
 		));
 
 		$this->addElement('text', 'itemPublishDateXPath', array(
-			'label'			=> 'Item publish date xpath (relative to item):',
+			'label'			=> 'item-publish-date',
 			'filters'		=> array('StringTrim'),
 		));
 		
 		$this->addElement('text', 'itemUniqueIdentifierXPath', array(
-			'label'			=> 'Item unique identifier XPath (relative to item):',
+			'label'			=> 'item-unique-id',
 			'filters'		=> array('StringTrim'),
 		));
 		
 		$this->addElement('text', 'itemContentFileSizeXPath', array(
-			'label'			=> 'Item unique identifier XPath (relative to item):',
+			'label'			=> 'item-content-tag-file-size-xpath',
 			'filters'		=> array('StringTrim'),
 		));
 		
 		$this->addElement('text', 'itemContentUrlXPath', array(
-			'label'			=> 'Item content tag URL XPath (relative to item):',
+			'label'			=> 'item-content-tag-url-xpath',
 			'filters'		=> array('StringTrim'),
 		));
 		
 		$this->addElement('text', 'itemHashXPath', array(
-			'label'			=> 'Item hash XPath (relative to item):',
+			'label'			=> 'item-hash-xpath',
 			'filters'		=> array('StringTrim'),
 		));
 		
 		$this->addElement('text', 'itemContentXpath', array(
-			'label'			=> 'Item content tag XPath (relative to item):',
+			'label'			=> 'item-content-tag-xpath',
 			'filters'		=> array('StringTrim'),
 		));
 		
 		$this->addElement('text', 'contentBitrateAttributeName', array(
-			'label'			=> 'Item content tag bitrate attribute name:',
+			'label'			=> 'item-content-tag-bitrate-attribute-name',
 			'filters'		=> array('StringTrim'),
 		));
 		
 		$this->addElement('text', 'itemContentBitrateXPath', array(
-			'label'			=> 'Item content bitrate XPath (relative to item):',
+			'label'			=> 'item-content-tag-bitrate-xpath',
 			'filters'		=> array('StringTrim'),
 		));
 		

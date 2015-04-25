@@ -14,6 +14,8 @@ class KFeedDropFolderEngine extends KDropFolderEngine
 	static $searchCharacters = array ('/');
 	static $replaceCharacters = array('_');
 	
+	protected $handledUniqueIds = array();
+	
 	/* (non-PHPdoc)
 	 * @see KDropFolderEngine::watchFolder()
 	 */
@@ -53,32 +55,38 @@ class KFeedDropFolderEngine extends KDropFolderEngine
 			
 			/* @var $feedItem SimpleXMLElement */
 			$uniqueId = strval($this->getSingleXPathResult($this->dropFolder->feedItemInfo->itemUniqueIdentifierXPath, $feedItem));
+			//If we already encountered this uniqueId in this run- ignore subsequent iterations.
+			if (in_array ($uniqueId, $this->handledUniqueIds))
+			{
+				KalturaLog::err("The unique identifer value [$uniqueId] was encountered before during this scan of the feed. Ignoring.");
+				continue;
+			}
+			
 			// The unique feed item identifier is the GUID, so that is what we set as the drop folder file name.
 			if (!array_key_exists($uniqueId, $existingDropFolderFilesMap))
 			{
 				//In this case, we are required to add this item as a new drop folder file
+				KalturaLog::info("Item not found in drop folder file list- adding as new drop folder file.");
 				$this->handleItemAdded ($uniqueId, $feedItem);
 				$counter++;
 			}
 			else
 			{
-				if (!isset ($this->dropFolder->fileHandlerConfig->contentMatchPolicy) )
-				{
-					KalturaLog::info('Content match policy is not set for [' . $this->dropFolder->id . '] - assume ADD_AS_NEW.');
-					continue;
-				}
-				else
-				{
-					if ($this->fileHandlerConfig->contentMatchPolicy == KalturaDropFolderContentFileHandlerMatchPolicy::ADD_AS_NEW)
-					{
-						KalturaLog::info('No need to process- content match policy for drop folder id [' . $this->dropFolder->id . '] does not include updates.');
-						continue;
-					}	
-				}
-				
-				$this->handleExistingItem ($uniqueId, $feedItem);
-				$counter++;
+				KalturaLog::info("Item found in drop folder file list- adding as existing drop folder file.");
+				$dropFolderFile = $existingDropFolderFilesMap[$uniqueId];
+				unset ($existingDropFolderFilesMap[$uniqueId]);
+				//if file exist in the folder remove it from the map
+				//all the files that are left in a map will be marked as PURGED					
+				if ($this->handleExistingItem($dropFolderFile, $feedItem))
+					$counter++;
 			}
+			
+			$this->handledUniqueIds[] = $uniqueId;
+		}
+		
+		foreach ($existingDropFolderFilesMap as $existingDropFolderFile)
+		{
+			$this->handleFilePurged($existingDropFolderFile->id);
 		}
 		
 	}
@@ -93,9 +101,14 @@ class KFeedDropFolderEngine extends KDropFolderEngine
 	 */
 	protected function handleItemAdded ($uniqueId, SimpleXMLElement $feedItem, $contentUpdateRequired = true)
 	{
-		KalturaLog::debug('Add drop folder file ['.$uniqueId.']');
 		try 
 		{
+			$url = $this->getSingleXPathResult($this->dropFolder->feedItemInfo->itemContentUrlXPath, $feedItem);
+    		if (is_null ($url))
+    		{
+    			throw new Exception ("Cannot add drop folder file - content URL does not exist");
+    		}
+			
 			//Register MRSS media namespaces on the separate <item>
 			foreach ($this->feedNamespaces as $nameSpace => $url)
 			{
@@ -189,7 +202,7 @@ class KFeedDropFolderEngine extends KDropFolderEngine
 		
 		$feedItemPath = KBatchBase::$taskConfig->params->mrss->xmlPath . DIRECTORY_SEPARATOR. $updatedGuid . '_' . time();
 		$res = file_put_contents($feedItemPath, $feedItem->saveXML());
-		//chmod($feedItemPath, 0660);
+		chmod($feedItemPath, 0660);
 		return $feedItemPath;
 	}
 	
@@ -198,7 +211,7 @@ class KFeedDropFolderEngine extends KDropFolderEngine
 	 * @param KalturaDropFolderFile $existingDropFolderFile
 	 * @param SimpleXMLElement $feedItem
 	 */
-	protected function handleExistingItem (KalturaMRSSDropFolderFile $existingDropFolderFile, SimpleXMLElement $feedItem)
+	protected function handleExistingItem (KalturaFeedDropFolderFile $existingDropFolderFile, SimpleXMLElement $feedItem)
 	{
 		//check whether the hash has changed - in this case the content needs to be updated.
 		$feedItemHash = strval($this->getSingleXPathResult($this->dropFolder->feedItemInfo->itemHashXPath, $feedItem));
@@ -207,16 +220,26 @@ class KFeedDropFolderEngine extends KDropFolderEngine
 			KalturaLog::info('Hash found- checking whether content needs to be updated');
 			if ($feedItemHash != $existingDropFolderFile->hash)
 			{
-				KalturaLog::info('Hash has changed- content will be updated.');
-				$this->handleItemAdded($feedItem);
+				KalturaLog::info('Hash has changed for drop folder file named ['. $existingDropFolderFile->fileName .'] - content will be updated.');
+				$this->handleItemAdded($existingDropFolderFile->fileName, $feedItem);
 				return true;
 			}
 		}
 		
 		//check whether the publish date has changed - in this case the metadata needs to be updated
-		if ($feedItem->pubDate != $existingDropFolderFile->lastModificationTime)
+		$pubDate = strval($this->getSingleXPathResult($this->dropFolder->feedItemInfo->itemPublishDateXPath, $feedItem));
+		if ($pubDate != $existingDropFolderFile->lastModificationTime)
 		{
-			$this->handleItemAdded($feedItem, false);
+			KalturaLog::info('Publish date has changed for drop folder file named ['. $existingDropFolderFile->fileName .'] - content will be updated.');
+			$this->handleItemAdded($existingDropFolderFile->fileName, $feedItem, false);
+			return true;
+		}
+		
+		$retryStatuses = array (KalturaDropFolderFileStatus::ERROR_HANDLING);
+		if (in_array ($existingDropFolderFile->status, $retryStatuses))
+		{
+			KalturaLog::info("File status condition met- retrying [" . $existingDropFolderFile->fileName ."]");
+			$this->handleItemAdded($existingDropFolderFile->fileName, $feedItem);
 			return true;
 		}
 		

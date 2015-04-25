@@ -2,7 +2,7 @@
 /**
  * @package plugins.FeedDropFolder
  */
-class FeedDropFolderPlugin extends KalturaPlugin implements IKalturaPlugin, IKalturaPending, IKalturaObjectLoader, IKalturaEnumerator
+class FeedDropFolderPlugin extends KalturaPlugin implements IKalturaPlugin, IKalturaPending, IKalturaObjectLoader, IKalturaEnumerator, IKalturaApplicationTranslations
 {
 	const PLUGIN_NAME = 'FeedDropFolder';
 	const DROP_FOLDER_PLUGIN_NAME = 'dropFolder';
@@ -114,5 +114,24 @@ class FeedDropFolderPlugin extends KalturaPlugin implements IKalturaPlugin, IKal
 		$value = self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
 		return kPluginableEnumsManager::apiToCore('DropFolderType', $value);
 	}
+
+	/**
+	 * @return array
+	 */
+	public static function getTranslations($locale)
+	{
+		$array = array();
+		
+		$langFilePath = __DIR__ . "/config/lang/$locale.php";
+		if(!file_exists($langFilePath))
+		{
+			$default = 'en';
+			$langFilePath = __DIR__ . "/config/lang/$default.php";
+		}
+		
+		KalturaLog::info("Loading file [$langFilePath]");
+		$array = include($langFilePath);
 	
+		return array($locale => $array);
+	}
 }
