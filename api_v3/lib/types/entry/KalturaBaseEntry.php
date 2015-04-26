@@ -3,7 +3,7 @@
  * @package api
  * @subpackage objects
  */
-class KalturaBaseEntry extends KalturaObject implements IFilterable 
+class KalturaBaseEntry extends KalturaObject implements IRelatedFilterable 
 {
 	/**
 	 * Auto generated 10 characters alphanumeric string
