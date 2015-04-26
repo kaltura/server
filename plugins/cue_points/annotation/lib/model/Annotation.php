@@ -54,7 +54,7 @@ class Annotation extends CuePoint implements IMetadataObject
 		}
 
 		if ($entry->getIsTemporary()
-			&& PermissionPeer::isValidForPartner(AnnotationCuePointPermissionName::COPY_ANNOTATIONS_TO_TRIMMED_ENTRY, $entry->getPartnerId())) {
+			&& !PermissionPeer::isValidForPartner(AnnotationCuePointPermissionName::DO_NOT_COPY_ANNOTATIONS_TO_TRIMMED_ENTRY, $entry->getPartnerId())) {
 			return true;
 		}
 

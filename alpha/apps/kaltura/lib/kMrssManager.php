@@ -295,10 +295,15 @@ class kMrssManager
 		$content->addAttribute('extension', $flavorAsset->getFileExt());
 		$content->addAttribute('createdAt', $flavorAsset->getCreatedAt());
 
+		// get the file size
+		$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+		list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($syncKey, true, false);
+		$fileSize = ($fileSync && $fileSync->getFileSize() > 0) ? $fileSync->getFileSize() : ($flavorAsset->getSize() * 1024);
+		
 		$mediaParams = array(
 			'format' => $flavorAsset->getContainerFormat(),
 			'videoBitrate' => $flavorAsset->getBitrate(),
-			'fileSize' => $flavorAsset->getSize() * 1024, // mrss spec is in bytes
+			'fileSize' => $fileSize,
 			'videoCodec' => $flavorAsset->getVideoCodecId(),
 			'audioBitrate' => 0,
 			'audioCodec' => '',
@@ -355,7 +360,7 @@ class kMrssManager
 		$kalturaFileSync = kFileSyncUtils::getReadyInternalFileSyncForKey($syncKey);
 	
 		$urlManager = DeliveryProfilePeer::getDeliveryProfile($entry->getId(), PlaybackProtocol::SILVER_LIGHT);
-		if(is_null($urlManager))
+		if(!$urlManager)
 			return;
 		
 		$urlManager->initDeliveryDynamicAttributes($kalturaFileSync);

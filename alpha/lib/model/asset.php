@@ -493,7 +493,10 @@ class asset extends Baseasset implements ISyncableFile
 		if(is_null($urlManager)) 
 			return null;
 			
-		$url = rtrim($urlManager->getUrl(), "/") . "/". ltrim($urlManager->getFileSyncUrl($fileSync), "/");
+		$url = ltrim($urlManager->getFileSyncUrl($fileSync), "/");
+		if (strpos($url, "://") === false){
+			$url = rtrim($urlManager->getUrl(), "/") . "/".$url ;
+		}
 		return $url;
 	}
 	

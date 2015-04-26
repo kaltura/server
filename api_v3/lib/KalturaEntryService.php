@@ -1215,6 +1215,9 @@ class KalturaEntryService extends KalturaBaseService
 	{
 		myDbHelper::$use_alternative_con = myDbHelper::DB_HELPER_CONN_PROPEL3;
 
+		if(!$filter)
+			$filter = new KalturaBaseEntryFilter();
+			
 		$c = $filter->prepareEntriesCriteriaFilter();
 		$c->applyFilters();
 		$totalCount = $c->getRecordsCount();

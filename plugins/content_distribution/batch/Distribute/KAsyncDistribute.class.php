@@ -52,10 +52,12 @@ abstract class KAsyncDistribute extends KJobHandlerWorker
 		}
 		catch(KalturaDistributionException $ex)
 		{
+			KalturaLog::err($ex);
 			$job = $this->closeJob($job, KalturaBatchJobErrorTypes::APP, $ex->getCode(), "Error: " . $ex->getMessage(), KalturaBatchJobStatus::RETRY, $job->data);
 		}
 		catch(Exception $ex)
 		{
+			KalturaLog::err($ex);
 			$job = $this->closeJob($job, KalturaBatchJobErrorTypes::RUNTIME, $ex->getCode(), "Error: " . $ex->getMessage(), KalturaBatchJobStatus::FAILED, $job->data);
 		}
 		return $job;

@@ -149,12 +149,23 @@ class MediaService extends KalturaEntryService
 		}
 		else
 		{
-
 			$tempMediaEntry = new KalturaMediaEntry();
-		 	$tempMediaEntry->type = $dbEntry->getType();
+			$tempMediaEntry->type = $dbEntry->getType();
 			$tempMediaEntry->mediaType = $dbEntry->getMediaType();
-			$tempMediaEntry->conversionProfileId = $dbEntry->getConversionQuality();
 
+			if ( !$conversionProfileId ) {
+				$originalConversionProfileId = $dbEntry->getConversionQuality();
+				$conversionProfile = conversionProfile2Peer::retrieveByPK($originalConversionProfileId);
+				if ( is_null($conversionProfile) || $conversionProfile->getType() != ConversionProfileType::MEDIA )
+				{
+					$defaultConversionProfile = myPartnerUtils::getConversionProfile2ForPartner( $this->getPartnerId() );
+					if ( !is_null($defaultConversionProfile) ) {
+						$conversionProfileId = $defaultConversionProfile->getId();
+					}
+				} else {
+					$conversionProfileId = $originalConversionProfileId;
+				}
+			}
 			if($conversionProfileId)
 				$tempMediaEntry->conversionProfileId = $conversionProfileId;
 

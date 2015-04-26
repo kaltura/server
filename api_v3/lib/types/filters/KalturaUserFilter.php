@@ -51,7 +51,7 @@ class KalturaUserFilter extends KalturaUserBaseFilter
 		
 		if (!is_null($this->loginEnabledEqual)) {
 			if ($this->loginEnabledEqual === true)
-				$object_to_fill->set('_gte_login_data_id', 0);
+				$object_to_fill->set('_gt_login_data_id', 0);
 				
 			if ($this->loginEnabledEqual === false)
 				$object_to_fill->set('_ltornull_login_data_id', 0);
@@ -64,13 +64,13 @@ class KalturaUserFilter extends KalturaUserBaseFilter
 	{
 		parent::doFromObject($source_object, $responseProfile);
 		
-		$loginDataIdGreaterOrEqualValue =  $source_object->get('_gte_login_data_id');
+		$loginDataIdGreaterOrEqualValue =  $source_object->get('_gt_login_data_id');
 		$loginDataIdLessThanOrNullValue =  $source_object->get('_ltornull_login_data_id');
 		
-		if ($loginDataIdGreaterOrEqualValue == 0) {
+		if ($loginDataIdGreaterOrEqualValue === 0) {
 			$this->loginEnabledEqual = true;
 		}
-		else if ($loginDataIdLessThanOrNullValue == 0) {
+		else if ($loginDataIdLessThanOrNullValue === 0) {
 			$this->loginEnabledEqual = false;
 		}				
 	}
