@@ -460,7 +460,8 @@ class thumbnailAction extends sfAction
 		}
 		
 		$renderer = kFileUtils::getDumpFileRenderer($tempThumbPath, null, $cacheAge);
-
+		$renderer->partnerId = $entry->getPartnerId();
+		
 		if ($cache)
 		{
 			$cache->put($_SERVER["REQUEST_URI"], $renderer);
