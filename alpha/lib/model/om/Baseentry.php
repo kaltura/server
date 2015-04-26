@@ -2856,6 +2856,9 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 	 */
 	public function hydrate($row, $startcol = 0, $rehydrate = false)
 	{
+		// Nullify cached objects
+		$this->m_custom_data = null;
+		
 		try {
 
 			$this->id = ($row[$startcol + 0] !== null) ? (string) $row[$startcol + 0] : null;
