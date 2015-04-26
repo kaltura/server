@@ -20,6 +20,25 @@ Add the following parameters to the batch.ini DropFolderWatcher worker configura
  - run php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
  - Create new folder : @WEB_DIR@/tmp/dropFolderFiles
 
+## Time Based Playlist Filters ##
+
+Allows adding timebased filters to playlists that support expiry of a filter on a certain time.
+
+- Issue Type: New Feature
+- Issue ID: PLAT-2817
+
+#### Configuration ####
+
+None.
+
+#### Deployment Scripts ####
+
+None.
+
+#### Known Issues & Limitations ####
+
+None.
+
 ----------
 # Jupiter-10.9.0 #
 
