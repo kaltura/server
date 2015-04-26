@@ -57,7 +57,7 @@ class AdvancedSearchFilterComparableCondition extends AdvancedSearchFilterCondit
 				return;
 		}
 
-		$newCondition = $fieldValue . $comparison . $value;
+		$newCondition = $fieldValue . $comparison . SphinxUtils::escapeString($value);
 
 		$query->addCondition($newCondition);
 	}
