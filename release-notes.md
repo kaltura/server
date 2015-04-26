@@ -1,3 +1,134 @@
+# Jupiter-10.10.0 #
+## Feed Drop Folder Feature ##
+
+- Issue type - new feature
+- Issue ID - PLAT-2042
+
+### Configuration ###
+
+Add the following line to the plugins.ini file:  
+        FeedDropFolder 
+   
+Add the following parameters to the batch.ini DropFolderWatcher worker configuration:  
+        params.mrss.xmlPath									= @WEB_DIR@/tmp/dropFolderFiles  
+        params.mrss.limitProcessEachRun						= 20
+   
+  
+### Deployment ###
+ 
+ - clear the cache
+ - run php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+ - Create new folder : @WEB_DIR@/tmp/dropFolderFiles
+
+----------
+# Jupiter-10.9.0 #
+
+## Copy cue points to clips and trimmed entries ##
+
+- Issue Type: bug fix
+- Issue ID: PLAT-1118
+
+#### Configuration ####
+
+Add the following lines from admin.template.ini to admin.ini:
+
+	moduls.annotationCopyToClip.enabled = true
+	moduls.annotationCopyToClip.permissionType = 2
+	moduls.annotationCopyToClip.label = Time Based - Copy annotation cue points when user clips entries
+	moduls.annotationCopyToClip.permissionName = COPY_ANNOTATIONS_TO_CLIP
+	moduls.annotationCopyToClip.basePermissionType = 3
+	moduls.annotationCopyToClip.basePermissionName = ANNOTATION_PLUGIN_PERMISSION
+	moduls.annotationCopyToClip.group = GROUP_ENABLE_DISABLE_FEATURES
+
+	moduls.annotationCopyToTrim.enabled = true
+	moduls.annotationCopyToTrim.permissionType = 2
+	moduls.annotationCopyToTrim.label = Time Based - Do not keep annotation cue points when user trims entries
+	moduls.annotationCopyToTrim.permissionName = DO_NOT_COPY_ANNOTATIONS_TO_TRIMMED_ENTRY
+	moduls.annotationCopyToTrim.basePermissionType = 3
+	moduls.annotationCopyToTrim.basePermissionName = ANNOTATION_PLUGIN_PERMISSION
+	moduls.annotationCopyToTrim.group = GROUP_ENABLE_DISABLE_FEATURES
+
+	moduls.cuePointCopyToClip.enabled = true
+	moduls.cuePointCopyToClip.permissionType = 2
+	moduls.cuePointCopyToClip.label = Time Based - Do not copy code, thumb and ad cue points when user clips entries
+	moduls.cuePointCopyToClip.permissionName = DO_NOT_COPY_CUE_POINTS_TO_CLIP
+	moduls.cuePointCopyToClip.basePermissionType = 3
+	moduls.cuePointCopyToClip.basePermissionName = CUEPOINT_PLUGIN_PERMISSION
+	moduls.cuePointCopyToClip.group = GROUP_ENABLE_DISABLE_FEATURES
+
+	moduls.cuePointCopyToTrim.enabled = true
+	moduls.cuePointCopyToTrim.permissionType = 2
+	moduls.cuePointCopyToTrim.label = Time Based - Do not keep code, thumb, and ad cue points when user trims entries
+	moduls.cuePointCopyToTrim.permissionName = DO_NOT_COPY_CUE_POINTS_TO_TRIMMED_ENTRY
+	moduls.cuePointCopyToTrim.basePermissionType = 3
+	moduls.cuePointCopyToTrim.basePermissionName = CUEPOINT_PLUGIN_PERMISSION
+	moduls.cuePointCopyToTrim.group = GROUP_ENABLE_DISABLE_FEATURES
+
+	moduls.keepCuePointsOnMediaReplacement.enabled = true
+	moduls.keepCuePointsOnMediaReplacement.permissionType = 2
+	moduls.keepCuePointsOnMediaReplacement.label = Time Based - Remove original cue points when user replaces media in existing entry
+	moduls.keepCuePointsOnMediaReplacement.permissionName = REMOVE_CUE_POINTS_WHEN_REPLACING_MEDIA
+	moduls.keepCuePointsOnMediaReplacement.basePermissionType = 3
+	moduls.keepCuePointsOnMediaReplacement.basePermissionName = CUEPOINT_PLUGIN_PERMISSION
+	moduls.keepCuePointsOnMediaReplacement.group = GROUP_ENABLE_DISABLE_FEATURES
+
+#### Deployment Scripts ####
+
+None.
+
+#### Known Issues & Limitations ####
+
+None.
+
+## YouTube API connector V3 ##
+
+***Note:*** Manual migration required to all existing accounts. 
+
+- Issue Type: bug fix
+- Issue ID: PLAT-2776
+
+#### Configuration ####
+
+**google_auth.ini**
+
+Added `youtubeapi` section.
+
+#### Deployment Scripts ####
+
+		deployment/updates/scripts/2015_04_12_migrate_youtube_api_category.php
+
+#### Known Issues & Limitations ####
+
+The new API, currently, doesn't support existing features:
+
+- Disallow comments
+- Disallow ratings
+- Disallow responses
+- Set raw file name
+- Set start and end dates
+
+## Redirect live entry updates via its original DC ##
+
+- Issue Type: bug fix
+- Issue ID: PLAT-2762
+
+#### Configuration ####
+
+** local.ini **
+
+Added the following configuration.
+
+	;set to true when one of the DC's is down
+	disable_dump_api_request = false
+
+#### Deployment Scripts ####
+
+None.
+
+#### Known Issues & Limitations ####
+
+None.
+
 ----------
 # Jupiter-10.8.0 #
 
@@ -8,7 +139,7 @@
 
 #### Configuration ####
 
-** sphinx/kaltura.conf **
+**sphinx/kaltura.conf**
 
 Added the following attribute to the kaltura_tag sphinx table. please re-index.
 
@@ -47,11 +178,11 @@ None.
 
 #### Configuration ####
 
-*plugins.ini*
+**plugins.ini**
 
 Add `MetadataSphinx` to the end of `Mandatory plugins` section (after `SphinxSearch`)
 
-*sphinx*
+**sphinx**
 
 Update `configurations/sphinx/kaltura.conf` according to template (a new index `kaltura_metadata` was added).
 

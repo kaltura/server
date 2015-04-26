@@ -421,13 +421,13 @@ abstract class CuePoint extends BaseCuePoint implements IIndexable
 	public function hasPermissionToCopyToEntry( entry $entry )
 	{
 		if (!$entry->getIsTemporary()
-			&& PermissionPeer::isValidForPartner(CuePointPermissionName::COPY_CUE_POINTS_TO_CLIP, $entry->getPartnerId()))
+			&& !PermissionPeer::isValidForPartner(CuePointPermissionName::DO_NOT_COPY_CUE_POINTS_TO_CLIP, $entry->getPartnerId()))
 		{
 			return true;
 		}
 
 		if ($entry->getIsTemporary()
-			&& PermissionPeer::isValidForPartner(CuePointPermissionName::COPY_CUE_POINTS_TO_TRIMMED_ENTRY, $entry->getPartnerId()))
+			&& !PermissionPeer::isValidForPartner(CuePointPermissionName::DO_NOT_COPY_CUE_POINTS_TO_TRIMMED_ENTRY, $entry->getPartnerId()))
 		{
 			return true;
 		}
