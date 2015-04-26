@@ -698,8 +698,10 @@ class KalturaEntryService extends KalturaBaseService
 			if($srcEntryId)
 			{
 				$srcEntry = entryPeer::retrieveByPKNoFilter($srcEntryId);
-				if($srcEntry)
+				if($srcEntry) {
+					$dbEntry->setSourceEntryId($srcEntryId);
 					$dbEntry->setRootEntryId($srcEntry->getRootEntryId(true));
+				}
 			}
 			
 			$dbEntry->setOperationAttributes($operationAttributes);
