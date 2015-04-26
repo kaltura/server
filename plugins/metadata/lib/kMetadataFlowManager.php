@@ -3,16 +3,8 @@
  * @package plugins.metadata
  * @subpackage lib
  */
-class kMetadataFlowManager implements kBatchJobStatusEventConsumer, kObjectDataChangedEventConsumer, kObjectAddedEventConsumer
+class kMetadataFlowManager implements kBatchJobStatusEventConsumer, kObjectDataChangedEventConsumer
 {
-	/**
-	 * A flag to let kObjectDataChangedEvent know that metadata object was just added because we raise
-	 * kObjectDataChangedEvent on metadata.add and metadata.update
-	 *
-	 * @var bool
-	 */
-	private static $_metadataWasJustAdded = false;
-
 	/* (non-PHPdoc)
 	 * @see kBatchJobStatusEventConsumer::shouldConsumeJobStatusEvent()
 	 */
@@ -124,7 +116,7 @@ class kMetadataFlowManager implements kBatchJobStatusEventConsumer, kObjectDataC
 		}
 
 		/** @var Metadata $object */
-		if ($object->getObjectType() == MetadataObjectType::DYNAMIC_OBJECT && !self::$_metadataWasJustAdded)
+		if ($object->getObjectType() == MetadataObjectType::DYNAMIC_OBJECT)
 		{
 			/**
 			 * when dynamic object is modified, we need to reindex the metadata and the objects (users, entries)
@@ -151,28 +143,5 @@ class kMetadataFlowManager implements kBatchJobStatusEventConsumer, kObjectDataC
 			kStorageExporter::reExportEntry($relatedObject);
 		}
 		return true;
-	}
-
-	/**
-	 * @param BaseObject $object
-	 * @param BatchJob $raisedJob
-	 * @return bool true if the consumer should handle the event
-	 */
-	public function shouldConsumeAddedEvent(BaseObject $object)
-	{
-		if(class_exists('Metadata') && $object instanceof Metadata)
-			return true;
-
-		return false;
-	}
-
-	/**
-	 * @param BaseObject $object
-	 * @param BatchJob $raisedJob
-	 * @return bool true if should continue to the next consumer
-	 */
-	public function objectAdded(BaseObject $object, BatchJob $raisedJob = null)
-	{
-		self::$_metadataWasJustAdded = true;
 	}
 }
