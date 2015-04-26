@@ -222,6 +222,8 @@ class playManifestAction extends kalturaAction
 				KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_FOUND);
 		}
 		
+		myPartnerUtils::blockInactivePartner($this->entry->getPartnerId());
+		
 		// enforce access control
 		$base64Referrer = $this->getRequestParameter("referrer");
 		$hashes = $this->getRequestParameter("hashes");
