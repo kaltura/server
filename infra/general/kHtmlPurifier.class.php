@@ -10,6 +10,7 @@ class kHtmlPurifier
 {
 	private static $purifier = null;
 	private static $AllowedProperties = null;
+	private static $allowedTokenPatterns;
 
 	public static function purify( $className, $propertyName, $value )
 	{
@@ -20,7 +21,10 @@ class kHtmlPurifier
 			return $value;
 		}
 
-		$modifiedValue = self::$purifier->purify( $value );
+		$tokenMapper = new kRegExTokenMapper();
+		$tokenizedValue = $tokenMapper->tokenize($value, self::$allowedTokenPatterns);
+		$purifiedValue = self::$purifier->purify( $tokenizedValue );
+		$modifiedValue = $tokenMapper->unTokenize($purifiedValue);
 
 		if ( $modifiedValue != $value )
 		{
@@ -57,6 +61,7 @@ class kHtmlPurifier
 	{
 		self::initHTMLPurifier();
 		self::initAllowedProperties();
+		self::initAllowedTokenPatterns();
 	}
 	
 	public static function initHTMLPurifier()
@@ -91,35 +96,35 @@ class kHtmlPurifier
 		
 		if ( ! self::$AllowedProperties )
 		{
-			self::$AllowedProperties = array(
-					'entry' => array(
-							'categories' => 1,
-							'playlistContent' => 1
-					),
-					'uiConf' => array(
-							'config' => 1,
-							'confFile' => 1,
-							'confFileFeatures' => 1
-					),
-					'metadata' => array(
-							'xml' => 1
-					),
-					'metadataProfile' => array(
-							'xsd' => 1,
-							'xslt' => 1,
-							'views' => 1
-					),
-					'KalturaDataEntry' => array(
-							'dataContent' => 1
-					),
-					'KalturaGenericXsltSyndicationFeed' => array(
-							'xslt' => 1
-					),
-				);
+			self::$AllowedProperties = kConf::get("xss_allowed_object_properties");
+
+			// Convert values to keys (we don't care about the values) in order to test via array_key_exists.
+			self::$AllowedProperties = array_flip(self::$AllowedProperties);
 
 			if ( $cacheKey )
 			{
 				apc_store( $cacheKey, self::$AllowedProperties );
+			}
+		}
+	}
+
+	public static function initAllowedTokenPatterns()
+	{
+		$cacheKey = null;
+		if ( function_exists('apc_fetch') && function_exists('apc_store') )
+		{
+			$cacheKey = 'kHtmlPurifierAllowedTokenPatterns-' . kConf::getCachedVersionId();
+			self::$allowedTokenPatterns = apc_fetch($cacheKey);
+		}
+
+		if ( ! self::$allowedTokenPatterns )
+		{
+			self::$allowedTokenPatterns = kConf::get("xss_allowed_token_patterns");
+			self::$allowedTokenPatterns = preg_replace("/\\\\/", "\\", self::$allowedTokenPatterns);
+
+			if ( $cacheKey )
+			{
+				apc_store( $cacheKey, self::$allowedTokenPatterns );
 			}
 		}
 	}
