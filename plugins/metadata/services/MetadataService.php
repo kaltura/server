@@ -126,6 +126,7 @@ class MetadataService extends KalturaBaseService
 		$dbMetadata->setObjectType($objectType);
 		$dbMetadata->setObjectId($objectId);
 		$dbMetadata->setStatus(KalturaMetadataStatus::VALID);
+		$dbMetadata->setLikeNew(true);
 
 		// dynamic objects are metadata only, skip validating object id
 		if ($objectType != KalturaMetadataObjectType::DYNAMIC_OBJECT)
