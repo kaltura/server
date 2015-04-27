@@ -123,7 +123,7 @@ class KalturaXmlSerializer extends KalturaSerializer
 			foreach ( $object->getArgs() as $name => $value )
 			{
 				echo '<item>';
-				echo '<objectType>KalturaAPIExceptionArg</objectType>'; // Hardcoded imaginary type for the client code parsers.
+				echo '<objectType>KalturaApiExceptionArg</objectType>'; // Hardcoded imaginary type for the client code parsers.
 				echo '<name>' . kString::xmlEncode($name) . '</name>';
 				echo '<value>' . kString::xmlEncode($value) . '</value>';
 				echo '</item>';

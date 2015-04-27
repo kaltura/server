@@ -389,6 +389,10 @@ abstract class KalturaObject
 		// trigger validation
 		$responseProfile->toObject();
 		
+		if(!$responseProfile->relatedProfiles)
+			return;
+		
+		$this->relatedObjects = new KalturaListResponseArray();
 		foreach($responseProfile->relatedProfiles as $relatedProfile)
 		{
 			/* @var $relatedProfile KalturaDetachedResponseProfile */
