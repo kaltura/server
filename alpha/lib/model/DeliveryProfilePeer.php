@@ -210,6 +210,7 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 			
 			$orderBy = "(" . DeliveryProfilePeer::PARTNER_ID . "<>{$partnerId})";
 			$c->addAscendingOrderByColumn($orderBy);
+			$c->addAscendingOrderByColumn(DeliveryProfilePeer::PRIORITY);
 			
 			$deliveries = self::doSelect($c);
 		}
@@ -290,11 +291,6 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 			$deliveryAttributes->setMediaProtocol(null);
 		}
 	
-		$mediaProtocol = $deliveryAttributes->getMediaProtocol();
-		
-		if(!$mediaProtocol)
-			return reset($deliveries);
-		
 		foreach ($deliveries as $delivery) {
 			if ($delivery->supportsDeliveryDynamicAttributes($deliveryAttributes))
 				return $delivery;
