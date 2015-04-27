@@ -46,7 +46,16 @@ class Kaltura_Client_Exception extends Exception
     public function __construct($message, $code, $arguments = null) 
     {
     	$this->code = $code;
-    	$this->arguments = $arguments;
+    	
+    	if($arguments)
+    	{
+    		$this->arguments = array();
+	    	foreach($arguments as $argument)
+	    	{
+	    		/* @var $argument Kaltura_Client_Type_ApiExceptionArg */
+	    		$this->arguments[$argument->name] = $argument->value;
+	    	}
+    	}
     	
 		parent::__construct($message);
     }

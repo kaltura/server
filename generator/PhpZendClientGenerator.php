@@ -424,6 +424,14 @@ class PhpZendClientGenerator extends ClientGeneratorFromXml
 					$this->appendLine("			\$this->$propName = Kaltura_Client_ParseUtils::unmarshalArray(\$xml->$propName, \"$arrayType\");");
 					break;
 					
+				case "map" :
+					$arrayType = $propertyNode->getAttribute ( "arrayType" );
+					$this->appendLine("		if(empty(\$xml->{$propName}))");
+					$this->appendLine("			\$this->$propName = array();");
+					$this->appendLine("		else");
+					$this->appendLine("			\$this->$propName = Kaltura_Client_ParseUtils::unmarshalMap(\$xml->$propName, \"$arrayType\");");
+					break;
+					
 				default : // sub object
 					$fallback = $propertyNode->getAttribute("type");
 					$this->appendLine("		if(!empty(\$xml->{$propName}))");
@@ -787,7 +795,7 @@ class PhpZendClientGenerator extends ClientGeneratorFromXml
 					continue;
 			
 				$configurationProperty = $configurationPropertyNode->localName;
-				$type = $configurationPropertyNode->getAttribute('type');
+				$type = $this->getTypeClass($configurationPropertyNode->getAttribute('type'));
 				$description = null;
 				
 				if($configurationPropertyNode->hasAttribute('description'))
