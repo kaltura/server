@@ -561,6 +561,9 @@ class CSharpClientGenerator extends ClientGeneratorFromXml
 				$arrayType = $resultNode->getAttribute("arrayType");
 				$dotNetOutputType = "Dictionary<string, ".$arrayType.">";
 				break;
+			case "bigint":
+				$dotNetOutputType = "long";
+				break;
 			default:
 				$dotNetOutputType = $resultType;
 				break;
