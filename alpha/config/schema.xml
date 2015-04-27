@@ -1737,7 +1737,8 @@
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="status" type="integer" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="streamer_type" type="varchar" size="30"/>	
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="media_protocols" type="varchar" size="256"/>	
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="custom_data" type="longvarchar" />	
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="custom_data" type="longvarchar" />		
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="priority" type="integer" />	
 	</table>
 	<table skipSql="false" abstract="false" name="email_ingestion_profile">
 		<column lazyLoad="false" name="id" type="integer" required="true" primaryKey="true" autoIncrement="true" />
