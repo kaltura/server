@@ -62,6 +62,7 @@ if($partnerId)
 $criteria->addAscendingOrderByColumn(DistributionProfilePeer::ID);
 $criteria->setLimit(100);
 
+$demoCategories = null;
 $distributionProfiles = DistributionProfilePeer::doSelect($criteria);
 while($distributionProfiles){
 	$lastId = 0;
@@ -86,13 +87,32 @@ while($distributionProfiles){
 	
 		$client->setAccessToken(str_replace('\\', '', json_encode($distributionProfile->getGoogleOAuth2Data())));
 		
-		$youtube = new Google_Service_YouTube($client);
-		$categoriesListResponse = $youtube->videoCategories->listVideoCategories('id,snippet', array('regionCode' => 'us'));
-		$categories = array();
-		foreach($categoriesListResponse->getItems() as $category)
+		if($demoCategories && $distributionProfile->getUsername() == 'demodistro')
 		{
-			$categories[$category['snippet']['title']] = $category['id'];
+			$categories = $demoCategories;
 		}
+		else
+		{
+			try{
+				$youtube = new Google_Service_YouTube($client);
+				$categoriesListResponse = $youtube->videoCategories->listVideoCategories('id,snippet', array('regionCode' => 'us'));
+				$categories = array();
+				foreach($categoriesListResponse->getItems() as $category)
+				{
+					$categories[$category['snippet']['title']] = $category['id'];
+				}
+				if($distributionProfile->getUsername() == 'demodistro')
+				{
+					$demoCategories = $categories;
+				}
+			}
+			catch (Exception $e)
+			{
+				KalturaLog::err($e);
+				continue;
+			}
+		}
+	
 		if(!isset($categories[$oldCategory]))
 		{
 			KalturaLog::warning("Partner [" . $distributionProfile->getPartnerId() . "] Distribution-Profile [$lastId] old category [$oldCategory] not found");
