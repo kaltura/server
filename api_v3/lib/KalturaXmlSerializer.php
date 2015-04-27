@@ -61,10 +61,6 @@ class KalturaXmlSerializer extends KalturaSerializer
 				$this->serializeArray($object);
 				break;
 				
-			case 'map':
-				$this->serializeMap($object);
-				break;
-				
 			case 'object':
 		        if ($object instanceof KalturaAssociativeArray)
 			    {
