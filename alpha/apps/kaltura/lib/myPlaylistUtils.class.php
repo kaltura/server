@@ -529,10 +529,17 @@ class myPlaylistUtils
 		{
 			$startOffset = $pager->calcOffset();
 			$pageSize = $pager->calcPageSize();
+
+			if ( $startOffset > $total_results )
+			{
+				return array();
+			}
+
+			$total_results = min( $total_results, $startOffset + $pageSize);
 		}
 
 		$number_of_entries = 0;
-		$entry_list = array();
+		$entry_ids_list = array();
 		foreach ( $entry_filters as $entry_filter )
 		{
 			$current_limit = max ( 0 , $total_results - $number_of_entries ); // if the current_limit is < 0 - set it to be 0
@@ -540,12 +547,11 @@ class myPlaylistUtils
 			// no need to fetch any more results
 			if ( $current_limit <= 0 ) break;
 
-			$exclude_id_list = self::getIds( $entry_list );
 			$c = KalturaCriteria::create(entryPeer::OM_CLASS);
 			
 			
 			// don't fetch the same entries twice - filter out all the entries that were already fetched
-			if( $exclude_id_list ) $c->add ( entryPeer::ID , $exclude_id_list , Criteria::NOT_IN );  
+			if( $entry_ids_list ) $c->add ( entryPeer::ID , $entry_ids_list , Criteria::NOT_IN );
 			
 			$filter_limit = $entry_filter->getLimit ();
 			
@@ -587,44 +593,36 @@ class myPlaylistUtils
 			}
 			
 			self::addModerationToCriteria($c);
-			if ( $detailed )
-				$entry_list_for_filter = entryPeer::doSelectJoinkuser( $c ); // maybe join with kuser to add some data about the contributor
-			else
-				$entry_list_for_filter = entryPeer::doSelect( $c ); // maybe join with kuser to add some data about the contributor
+			$c = entryPeer::prepareEntitlementCriteriaAndFilters( $c );
+			$entry_ids_list_for_filter = $c->getFetchedIds();
 			
-			if ( $pager )
-			{
-				$nEntries = count($entry_list_for_filter);
-				$nTrimFromStart = 0;
-				if ( $startOffset > 0 )
-				{
-					// Skip to the offset
-					$nTrimFromStart = min($startOffset, $nEntries);
-					$startOffset -= $nTrimFromStart;
-					if ( $nEntries <= $nTrimFromStart )
-					{
-						continue;
-					}
-				}
-
-				$nEntriesToKeep = min($nEntries - $nTrimFromStart, $pageSize);
-				if ( $nTrimFromStart > 0 || $nEntriesToKeep < $nEntries )
-				{
-					$entry_list_for_filter = array_slice($entry_list_for_filter, $nTrimFromStart, $nEntriesToKeep);
-				}
-			}
-
 			// update total count and merge current result with the global list
-			$number_of_entries += count ( $entry_list_for_filter );
-			$entry_list = array_merge ( $entry_list , $entry_list_for_filter );
+			$number_of_entries += count ( $entry_ids_list_for_filter );
+			$entry_ids_list = array_merge ( $entry_ids_list , $entry_ids_list_for_filter );
+		}
 
-			if ( $pager )
-			{
-				$pageSize -= $nEntriesToKeep;
-				if ( $pageSize <= 0 ) break;
-			}
+		if ( $pager )
+		{
+			// Keep the paged entries only
+			$entry_ids_list = array_slice($entry_ids_list, $startOffset, $pageSize);
+		}
+
+		$db_entry_list = entryPeer::retrieveByPKs( $entry_ids_list );
+
+		// Map the entries to their IDs
+		$entry_map = array();
+		foreach ( $db_entry_list as $entry )
+		{
+			$entry_map[ $entry->getId() ] = $entry;
 		}
 		
+		// Build entry_list according to the playlist order
+		$entry_list = array();
+		foreach ( $entry_ids_list as $entryId )
+		{
+			$entry_list[] = $entry_map[$entryId];
+		}
+
 		return $entry_list;		 
 	}
 	
