@@ -3590,7 +3590,7 @@ kmcApp.controller('PreviewCtrl', ['$scope', '$translate', 'previewService', func
 			options = options || {};
 			var playerId = (options.uiConfId) ? options.uiConfId : undefined;
 			// Exit if player not loaded
-			if(!kmc.vars.playlists_list || !kmc.vars.players_list) {
+			if(!kmc.vars.playlists_list && !kmc.vars.players_list) {
 				return ;
 			}
 			// List of players
