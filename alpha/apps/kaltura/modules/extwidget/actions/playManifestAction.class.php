@@ -684,7 +684,7 @@ class playManifestAction extends kalturaAction
 			$cdnHostOnly = trim(preg_replace('#https?://#', '', $cdnHost), '/');
 			
 			return DeliveryProfilePeer::getLocalDeliveryByPartner($this->entryId, $this->deliveryAttributes->getFormat(), 
-					$this->deliveryAttributes->getMediaProtocol(), $cdnHostOnly);
+					$this->deliveryAttributes, $cdnHostOnly);
 		}
 	}
 

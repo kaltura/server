@@ -134,7 +134,10 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 	{
 		if ($streamerType == PlaybackProtocol::HTTP)
 		{
-			$delivery = self::getLocalDeliveryByPartner($entryId, $streamerType, infraRequestUtils::getProtocol(), null, null, false);
+			$deliveryAttributes = new DeliveryProfileDynamicAttributes();
+			$deliveryAttributes->setMediaProtocol(infraRequestUtils::getProtocol());
+		
+			$delivery = self::getLocalDeliveryByPartner($entryId, $streamerType, $deliveryAttributes, null, null, false);
 			if ($delivery)
 				return $delivery;
 		}
@@ -145,13 +148,13 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 	 * This function returns the matching delivery object for a given entry and delivery protocol. 
 	 * @param string $entryId - The entry ID
 	 * @param PlaybackProtocol $streamerType - The protocol
-	 * @param string $mediaProtocol - rtmp/rtmpe/https...
+	 * @param DeliveryProfileDynamicAttributes $deliveryAttributes - constraints on delivery such as media protocol, flv support, etc..
 	 * @param string $cdnHost - The requesting CdnHost if known / preffered.
 	 * @param boolean $checkSecured whether we should prefer secured delivery profiles.
 	 * @return DeliveryProfile
 	 */
-	public static function getLocalDeliveryByPartner($entryId, $streamerType = PlaybackProtocol::HTTP, $mediaProtocol = null, $cdnHost = null, $checkSecured = true) {
-		
+	public static function getLocalDeliveryByPartner($entryId, $streamerType = PlaybackProtocol::HTTP, DeliveryProfileDynamicAttributes $deliveryAttributes = null, $cdnHost = null, $checkSecured = true) {
+	
 		$deliveries = array();
 		$entry = entryPeer::retrieveByPK($entryId);
 		$partnerId = $entry->getPartnerId();
@@ -164,7 +167,7 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 		$isSecured = false;
 		if($checkSecured)
 			$isSecured = self::isSecured($partner, $entry);
-		$delivery = self::getDeliveryByPartner($partner, $streamerType, $mediaProtocol, $cdnHost, $isSecured);
+		$delivery = self::getDeliveryByPartner($partner, $streamerType, $deliveryAttributes, $cdnHost, $isSecured);
 		if($delivery)
 			$delivery->setEntryId($entryId);
 		return $delivery;
@@ -174,12 +177,12 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 	 * This function returns the matching delivery object for a given partner and delivery protocol
 	 * @param Partner $partner The partner
 	 * @param PlaybackProtocol $streamerType - The protocol
-	 * @param string $mediaProtocol - rtmp/rtmpe/https...
+	 * @param DeliveryProfileDynamicAttributes $deliveryAttributes - constraints on delivery such as media protocol, flv support, etc..
 	 * @param string $cdnHost - The requesting CdnHost if known / preffered.
 	 * @param boolean $isSecured whether we're interested in secured delivery profile
 	 */
-	public static function getDeliveryByPartner(Partner $partner, $streamerType = PlaybackProtocol::HTTP, $mediaProtocol = null, $cdnHost = null, $isSecured = false) {
-		
+	public static function getDeliveryByPartner(Partner $partner, $streamerType = PlaybackProtocol::HTTP, DeliveryProfileDynamicAttributes $deliveryAttributes = null, $cdnHost = null, $isSecured = false) {
+	
 		$partnerId = $partner->getId();
 		$deliveryIds = $partner->getDeliveryProfileIds();
 		
@@ -211,10 +214,11 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 			$deliveries = self::doSelect($c);
 		}
 		
-		$delivery = self::selectByMediaProtocol($deliveries, $mediaProtocol);
+		$delivery = self::selectByDeliveryAttributes($deliveries, $deliveryAttributes);
 		if($delivery) {
 			KalturaLog::debug("Delivery ID for partnerId [$partnerId] and streamer type [$streamerType] is " . $delivery->getId());
 		} else {
+			$mediaProtocol = $deliveryAttributes ? $deliveryAttributes->getMediaProtocol() : $mediaProtocol;
 			KalturaLog::err("Delivery ID can't be determined for partnerId [$partnerId] streamer type [$streamerType] and media protocol [$mediaProtocol]");
 		}
 		return $delivery;
@@ -255,8 +259,11 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 			return null;
 		}
 		
+		$deliveryAttributes = new DeliveryProfileDynamicAttributes();
+		$deliveryAttributes->setMediaProtocol($mediaProtocol);
+		
 		$deliveries = DeliveryProfilePeer::retrieveByPKs($deliveryIds[$streamerType]);
-		$delivery = self::selectByMediaProtocol($deliveries, $mediaProtocol);
+		$delivery = self::selectByDeliveryAttributes($deliveries, $deliveryAttributes);
 		if($delivery) {
 			KalturaLog::debug("Delivery ID for storageId [$storageProfileId] ( PartnerId [" . $storageProfile->getPartnerId() . "] ) and streamer type [$streamerType] is " . $delivery->getId());
 			$delivery->setEntryId($entryId);
@@ -273,21 +280,24 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 	/**
 	 * Selects between a list of deliveries by a requested media protocol
 	 * @param array $deliveries list of deliveries
-	 * @param string $mediaProtocol requested media protocol
+	 * @param DeliveryProfileDynamicAttributes $deliveryAttributes - constraints on delivery such as media protocol, flv support, etc..
 	 * @return The matching DeliveryProfile if exists, or null otherwise
 	 */
-	protected static function selectByMediaProtocol($deliveries, $mediaProtocol = null) {
+	protected static function selectByDeliveryAttributes($deliveries, DeliveryProfileDynamicAttributes $deliveryAttributes = null) {
+		if (!$deliveryAttributes)
+		{
+			$deliveryAttributes = new DeliveryProfileDynamicAttributes();
+			$deliveryAttributes->setMediaProtocol(null);
+		}
+	
+		$mediaProtocol = $deliveryAttributes->getMediaProtocol();
+		
 		if(!$mediaProtocol)
 			return reset($deliveries);
 		
 		foreach ($deliveries as $delivery) {
-			if(is_null($delivery->getMediaProtocols()))
+			if ($delivery->supportsDeliveryDynamicAttributes($deliveryAttributes))
 				return $delivery;
-
-			$supportedProtocols = explode(",", $delivery->getMediaProtocols());
-			if(in_array($mediaProtocol, $supportedProtocols)) 
-				return $delivery;
-			
 		}
 		return null;
 	}
@@ -323,7 +333,11 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 		$c->addAscendingOrderByColumn($orderBy);
 			
 		$deliveries = self::doSelect($c);
-		$delivery = self::selectByMediaProtocol($deliveries, $mediaProtocol);
+		
+		$deliveryAttributes = new DeliveryProfileDynamicAttributes();
+		$deliveryAttributes->setMediaProtocol($mediaProtocol);
+		
+		$delivery = self::selectByDeliveryAttributes($deliveries, $deliveryAttributes);
 		if($delivery) {
 			KalturaLog::debug("Delivery ID for Host Name: [$cdnHost] and streamer type: [$streamerType] is [" . $delivery->getId());
 			$delivery->setEntryId($entryId);
