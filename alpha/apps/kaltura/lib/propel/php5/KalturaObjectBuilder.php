@@ -182,6 +182,20 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 			"\$stmt = BasePeer::doSelect(\$criteria, \$con);" . $newLine . 
 			$this->getPeerClassname() . "::setUseCriteriaFilter(true);" .
 			substr($parentReload, $doSelectPos + strlen($doSelectStmt));
+		
+		
+	}
+	
+	protected function addHydrateOpen(&$script) {
+		parent::addHydrateOpen($script);
+		$newLine = "\n\t\t";
+		
+		$table = $this->getTable();
+		$customDataColumn = $table->getColumn(self::KALTURA_COLUMN_CUSTOM_DATA);
+		if($customDataColumn) {
+			$script .= $newLine . "// Nullify cached objects";
+			$script .= $newLine . "\$this->m_custom_data = null;" . $newLine;
+		}
 	}
 
 	/* (non-PHPdoc)
