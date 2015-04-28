@@ -480,7 +480,7 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 		if ( ($object instanceof entry)
 			&& in_array(entryPeer::CUSTOM_DATA, $modifiedColumns)
 			&& $object->isCustomDataModified('operationAttributes')
-			&& $object->isCustomDataModified('rootEntryId') )
+			&& $object->isCustomDataModified('sourceEntryId') )
 		{
 			return true;
 		}
@@ -657,7 +657,7 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 			$clipDuration = $clipAtts->getDuration();
 
 			$c = new KalturaCriteria();
-			$c->add( CuePointPeer::ENTRY_ID, $clipEntry->getRootEntryId() );
+			$c->add( CuePointPeer::ENTRY_ID, $clipEntry->getSourceEntryId() );
 			$c->addAnd( CuePointPeer::START_TIME, $clipStartTime, KalturaCriteria::GREATER_EQUAL );
 			$c->addAnd( CuePointPeer::START_TIME, $clipStartTime + $clipDuration, KalturaCriteria::LESS_EQUAL );
 			$c->addOr( CuePointPeer::START_TIME, 0, KalturaCriteria::EQUAL );

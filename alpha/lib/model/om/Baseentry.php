@@ -2856,6 +2856,9 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 	 */
 	public function hydrate($row, $startcol = 0, $rehydrate = false)
 	{
+		// Nullify cached objects
+		$this->m_custom_data = null;
+		
 		try {
 
 			$this->id = ($row[$startcol + 0] !== null) ? (string) $row[$startcol + 0] : null;
@@ -3119,7 +3122,6 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 			
 			for ($retries = 1; $retries < KalturaPDO::SAVE_MAX_RETRIES; $retries++)
 			{
-				
                $affectedRows = $this->doSave($con);
                 if ($affectedRows || !$this->isColumnModified(entryPeer::CUSTOM_DATA)) //ask if custom_data wasn't modified to avoid retry with atomic column 
                 	break;
@@ -3171,10 +3173,10 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 						}
 					}
                    }
-				
-				if (!$validUpdate)
-					break;
                    
+				if(!$validUpdate) 
+					break;
+					                   
 				$this->setCustomData($this->m_custom_data->toString());
 			}
 
@@ -7389,6 +7391,16 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 	public function incInCustomData ( $name , $delta = 1, $namespace = null)
 	{
 		$customData = $this->getCustomDataObj( );
+		
+		$currentNamespace = '';
+		if($namespace)
+			$currentNamespace = $namespace;
+			
+		if(!isset($this->oldCustomDataValues[$currentNamespace]))
+			$this->oldCustomDataValues[$currentNamespace] = array();
+		if(!isset($this->oldCustomDataValues[$currentNamespace][$name]))
+			$this->oldCustomDataValues[$currentNamespace][$name] = $customData->get($name, $namespace);
+		
 		return $customData->inc ( $name , $delta , $namespace  );
 	}
 

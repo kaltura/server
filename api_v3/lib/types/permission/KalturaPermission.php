@@ -3,7 +3,7 @@
  * @package api
  * @subpackage objects
  */
-class KalturaPermission extends KalturaObject implements IFilterable
+class KalturaPermission extends KalturaObject implements IRelatedFilterable
 {
 	/**
 	 * @var int

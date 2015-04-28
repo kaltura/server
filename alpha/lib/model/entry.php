@@ -1805,6 +1805,9 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	
 	public function setParentEntryId($v)	{ $this->putInCustomData("parentEntryId", $v); }
 	public function getParentEntryId() 		{ return $this->getFromCustomData( "parentEntryId", null, null ); }
+
+	public function setSourceEntryId($v)	{ $this->putInCustomData("sourceEntryId", $v); }
+	public function getSourceEntryId() 		{ return $this->getFromCustomData( "sourceEntryId", null, null ); }
 	
 	public function getParentEntry()
 	{

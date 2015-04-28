@@ -1,3 +1,70 @@
+# Jupiter-10.10.0 #
+## Feed Drop Folder Feature ##
+
+- Issue type - new feature
+- Issue ID - PLAT-2042
+
+### Configuration ###
+
+Add the following line to the plugins.ini file:  
+        FeedDropFolder 
+   
+Add the following parameters to the batch.ini DropFolderWatcher worker configuration:  
+        params.mrss.xmlPath									= @WEB_DIR@/tmp/dropFolderFiles  
+        params.mrss.limitProcessEachRun						= 20
+   
+  
+### Deployment ###
+ 
+ - clear the cache
+ - run php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+ - Create new folder : @WEB_DIR@/tmp/dropFolderFiles
+
+## Time Based Playlist Filters ##
+
+Allows adding timebased filters to playlists that support expiry of a filter on a certain time.
+
+- Issue Type: New Feature
+- Issue ID: PLAT-2817
+
+#### Configuration ####
+
+None.
+
+#### Deployment Scripts ####
+
+None.
+
+#### Known Issues & Limitations ####
+
+None.
+
+
+## Live to VOD entry should support copying all metadata ##
+
+- Issue Type: Story
+- Issue ID: PLAT-2744
+
+#### Configuration ####
+
+Add the following lines from admin.template.ini to admin.ini:
+
+    moduls.liveStreamRecordShouldCopyEntitelment.enabled = true
+    moduls.liveStreamRecordShouldCopyEntitelment.permissionType = 2
+    moduls.liveStreamRecordShouldCopyEntitelment.label = Kaltura Live Streams - Copy entitelment
+    moduls.liveStreamRecordShouldCopyEntitelment.permissionName = FEATURE_LIVE_STREAM_COPY_ENTITELMENTS
+    moduls.liveStreamRecordShouldCopyEntitelment.basePermissionType = 2
+    moduls.liveStreamRecordShouldCopyEntitelment.basePermissionName = FEATURE_LIVE_STREAM
+    moduls.liveStreamRecordShouldCopyEntitelment.group = GROUP_ENABLE_DISABLE_FEATURES
+
+#### Deployment Scripts ####
+
+None.
+
+#### Known Issues & Limitations ####
+
+None.
+
 ----------
 # Jupiter-10.9.0 #
 

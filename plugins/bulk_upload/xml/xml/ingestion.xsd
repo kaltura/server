@@ -839,15 +839,10 @@
 
 	<xs:complexType name="T_tags">
 		<xs:sequence>
-			<xs:element maxOccurs="unbounded" minOccurs="0" name="tag">
+			<xs:element maxOccurs="unbounded" minOccurs="0" name="tag" type="xs:string">
 				<xs:annotation>
 					<xs:documentation>Specifies a single tag to set for a related object</xs:documentation>
 				</xs:annotation>
-				<xs:simpleType>
-					<xs:restriction base="xs:string">
-						<xs:maxLength value="100"/>
-					</xs:restriction>
-				</xs:simpleType>
 			</xs:element>
 		</xs:sequence>
 	</xs:complexType>

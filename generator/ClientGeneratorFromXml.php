@@ -191,4 +191,8 @@ abstract class ClientGeneratorFromXml
 	 * @return string 
 	 */
 	protected abstract function getSingleLineCommentMarker();
+	
+	public function done($outputPath)
+	{
+	}
 }
