@@ -24,6 +24,7 @@ class CuePointPeer extends BaseCuePointPeer implements IMetadataPeer
 	const STR_CUE_POINT_ID = 'cue_point.STR_CUE_POINT_ID';
 	const FORCE_STOP = 'cue_point.FORCE_STOP';
 	const DURATION = 'cue_point.DURATION';
+	const IS_PUBLIC = 'cue_point.IS_PUBLIC';
 	
 	// cache classes by their type
 	protected static $class_types_cache = array();
@@ -46,7 +47,7 @@ class CuePointPeer extends BaseCuePointPeer implements IMetadataPeer
 		if(self::$s_criteria_filter == null)
 			self::$s_criteria_filter = new criteriaFilter();
 		
-		$c = new Criteria();
+		$c = KalturaCriteria::create(CuePointPeer::OM_CLASS);
 		$c->addAnd(CuePointPeer::STATUS, CuePointStatus::DELETED, Criteria::NOT_EQUAL);
 			
 		$puserId = kCurrentContext::$ks_uid;
@@ -72,6 +73,7 @@ class CuePointPeer extends BaseCuePointPeer implements IMetadataPeer
 											Criteria::IN
 										)
 									);
+			$criterionUserOrPublic->addOr($c->getNewCriterion (self::IS_PUBLIC, true, Criteria::EQUAL));
 
 			$c->addAnd($criterionUserOrPublic);
 		}
@@ -146,7 +148,7 @@ class CuePointPeer extends BaseCuePointPeer implements IMetadataPeer
 	 */
 	public static function retrieveByEntryId($entryId, $types = null, PropelPDO $con = null)
 	{
-		$criteria = new Criteria();
+		$criteria = KalturaCriteria::create(CuePointPeer::OM_CLASS);
 		$criteria->add(CuePointPeer::ENTRY_ID, $entryId);
 		if(!is_null($types))
 			$criteria->add(CuePointPeer::TYPE, $types, Criteria::IN);

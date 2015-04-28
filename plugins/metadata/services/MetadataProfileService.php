@@ -74,7 +74,6 @@ class MetadataProfileService extends KalturaBaseService
 		}
 		
 		$xsdData = file_get_contents($filePath);
-		
 		if(!kMetadataProfileManager::validateXsdData($xsdData, $errorMessage)) {
 		    throw new KalturaAPIException(MetadataErrors::INVALID_METADATA_PROFILE_SCHEMA, $errorMessage);
 		}
@@ -107,8 +106,6 @@ class MetadataProfileService extends KalturaBaseService
 	    $dbMetadataProfile->setStatus(KalturaMetadataProfileStatus::ACTIVE);
 	    $dbMetadataProfile->setPartnerId($this->getPartnerId());
 	    $dbMetadataProfile->save();
-	    
-	    kMetadataManager::parseProfileSearchFields($this->getPartnerId(), $dbMetadataProfile);
 	    
 	    $metadataProfile = new KalturaMetadataProfile();
 	    $metadataProfile->fromObject($dbMetadataProfile, $this->getResponseProfile());
@@ -162,7 +159,13 @@ class MetadataProfileService extends KalturaBaseService
 			throw new KalturaAPIException(MetadataErrors::METADATA_TRANSFORMING);
 
 		if ($xsdData)
+		{
+		    if(!kMetadataProfileManager::validateXsdData($xsdData, $errorMessage)) {
+		        throw new KalturaAPIException(MetadataErrors::INVALID_METADATA_PROFILE_SCHEMA, $errorMessage);
+		    }
+		    
 			kMetadataManager::validateProfileFields($this->getPartnerId(), $xsdData);
+		}
 
 		$dbMetadataProfile = $metadataProfile->toUpdatableObject($dbMetadataProfile);
 		
@@ -177,13 +180,13 @@ class MetadataProfileService extends KalturaBaseService
 		if($xsdData)
 		{
 			$xsdData = html_entity_decode($xsdData);
-			$dbMetadataProfile->incrementVersion();
+			$dbMetadataProfile->setXsdData($xsdData);
 		}
 			
 		if(!is_null($viewsData) && $viewsData != '')
 		{
 			$viewsData = html_entity_decode($viewsData);
-			$dbMetadataProfile->incrementViewsVersion();
+			$dbMetadataProfile->setViewesData($viewsData);
 		}
 			
 		if($xsdData)
@@ -198,22 +201,11 @@ class MetadataProfileService extends KalturaBaseService
 			}
 			
 			$dbMetadataProfile->save();
-			
-			$key = $dbMetadataProfile->getSyncKey(MetadataProfile::FILE_SYNC_METADATA_DEFINITION);
-			kFileSyncUtils::file_put_contents($key, $xsdData);
 		}
-		else
+		else if(!is_null($viewsData) && $viewsData != '')
 		{
 			$dbMetadataProfile->save();
 		}
-		
-		if(!is_null($viewsData) && $viewsData != '')
-		{
-			$key = $dbMetadataProfile->getSyncKey(MetadataProfile::FILE_SYNC_METADATA_VIEWS);
-			kFileSyncUtils::file_put_contents($key, $viewsData);
-		}
-	
-		kMetadataManager::parseProfileSearchFields($this->getPartnerId(), $dbMetadataProfile);
 		
 		$metadataProfile->fromObject($dbMetadataProfile, $this->getResponseProfile());
 		return $metadataProfile;
@@ -427,15 +419,18 @@ class MetadataProfileService extends KalturaBaseService
 		if(!$newXsd)
 			throw new KalturaAPIException(MetadataErrors::METADATA_FILE_NOT_FOUND, $xsdFile['name']);
 		
+		if(!kMetadataProfileManager::validateXsdData($newXsd, $errorMessage)) {
+		    throw new KalturaAPIException(MetadataErrors::INVALID_METADATA_PROFILE_SCHEMA, $errorMessage);
+		}
+		
 		$key = $dbMetadataProfile->getSyncKey(MetadataProfile::FILE_SYNC_METADATA_DEFINITION);
 		
 		$oldXsd = kFileSyncUtils::file_get_contents($key);
 		if(!$oldXsd)
 			throw new KalturaAPIException(MetadataErrors::METADATA_PROFILE_FILE_NOT_FOUND, $id);
 		
+		$dbMetadataProfile->setXsdData($newXsd);
 		$oldVersion = $dbMetadataProfile->getVersion();
-		
-		$dbMetadataProfile->incrementVersion();
 		
 		try
 		{
@@ -447,11 +442,6 @@ class MetadataProfileService extends KalturaBaseService
 		}
 		
 		$dbMetadataProfile->save();
-		
-		$key = $dbMetadataProfile->getSyncKey(MetadataProfile::FILE_SYNC_METADATA_DEFINITION);
-		kFileSyncUtils::moveFromFile($filePath, $key);
-		
-		kMetadataManager::parseProfileSearchFields($this->getPartnerId(), $dbMetadataProfile);
 		
 		$metadataProfile = new KalturaMetadataProfile();
 		$metadataProfile->fromObject($dbMetadataProfile, $this->getResponseProfile());
@@ -482,16 +472,15 @@ class MetadataProfileService extends KalturaBaseService
 			$filePath = $viewsFile['tmp_name'];
 			if(!file_exists($filePath))
 				throw new KalturaAPIException(MetadataErrors::METADATA_FILE_NOT_FOUND, $viewsFile['name']);
+			
+			$viewsDate = file_get_contents($filePath);
+			
+			if(trim($viewsDate) == '')
+			    throw new KalturaAPIException(MetadataErrors::EMPTY_VIEWS_DATA_PROVIDED, $viewsFile['name']);
 		}
 		
-		$dbMetadataProfile->incrementViewsVersion();
+		$dbMetadataProfile->setViewesData($viewsDate);
 		$dbMetadataProfile->save();
-		
-		if(trim(file_get_contents($filePath)) != '')
-		{
-			$key = $dbMetadataProfile->getSyncKey(MetadataProfile::FILE_SYNC_METADATA_VIEWS);
-			kFileSyncUtils::moveFromFile($filePath, $key);
-		}
 		
 		$metadataProfile = new KalturaMetadataProfile();
 		$metadataProfile->fromObject($dbMetadataProfile, $this->getResponseProfile());
@@ -522,16 +511,16 @@ class MetadataProfileService extends KalturaBaseService
 			$filePath = $xsltFile['tmp_name'];
 			if(!file_exists($filePath))
 				throw new KalturaAPIException(MetadataErrors::METADATA_FILE_NOT_FOUND, $xsltFile['name']);
+			
+			$xsltData = file_get_contents($filePath);
+			
+			if(trim($xsltData) == '')
+			    throw new KalturaAPIException(MetadataErrors::EMPTY_XSLT_DATA_PROVIDED, $xsltFile['name']);
+                
 		}
 		
-		$dbMetadataProfile->incrementXsltVersion();
+		$dbMetadataProfile->setXsltData($xsltData);
 		$dbMetadataProfile->save();
-		
-		if(trim(file_get_contents($filePath)) != '')
-		{
-			$key = $dbMetadataProfile->getSyncKey(MetadataProfile::FILE_SYNC_METADATA_XSLT);
-			kFileSyncUtils::moveFromFile($filePath, $key);
-		}
 		
 		$metadataProfile = new KalturaMetadataProfile();
 		$metadataProfile->fromObject($dbMetadataProfile, $this->getResponseProfile());

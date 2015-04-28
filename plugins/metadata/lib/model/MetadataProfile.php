@@ -14,10 +14,7 @@
  * @subpackage model
  */
 class MetadataProfile extends BaseMetadataProfile implements ISyncableFile
-{
-    private $xsdData = null;
-    private $viewsData = null;
-    
+{   
 	const FILE_SYNC_METADATA_DEFINITION = 1;
 	const FILE_SYNC_METADATA_VIEWS = 2;
 	const FILE_SYNC_METADATA_XSLT = 3;
@@ -28,16 +25,9 @@ class MetadataProfile extends BaseMetadataProfile implements ISyncableFile
 	
 	const CUSTOM_DATA_METADATA_XSLT_VERSION = 'metadata_xslt_version';
 	
-	/* (non-PHPdoc)
-	 * @see metadata/lib/model/om/BaseMetadata#preInsert()
-	 */
-	public function preInsert(PropelPDO $con = null)
-	{
-		$this->incrementVersion();
-		$this->incrementViewsVersion();
-		$this->incrementXsltVersion();
-		return parent::preInsert($con);
-	}
+	private $xsdData = null;
+	private $viewsData = null;
+	private $xsltData = null;
 
 	/* (non-PHPdoc)
 	 * @see lib/model/om/BaseMetadataProfile#postUpdate()
@@ -57,6 +47,39 @@ class MetadataProfile extends BaseMetadataProfile implements ISyncableFile
 			kEventsManager::raiseEvent(new kObjectDeletedEvent($this));
 			
 		return $ret;
+	}
+	
+	/* (non-PHPdoc)
+	 * @see BaseMetadataProfile::postSave()
+	 */
+	public function postSave(PropelPDO $con = null)
+	{
+	    if($this->wasObjectSaved()) {
+    	    if($this->xsdData)
+    	    {
+    	        $this->incrementVersion();
+                $key = $this->getSyncKey(MetadataProfile::FILE_SYNC_METADATA_DEFINITION);
+                kFileSyncUtils::file_put_contents($key, $this->xsdData);
+                
+                kMetadataManager::parseProfileSearchFields($this->getPartnerId(), $this);
+    	    }
+    	         
+            if($this->viewsData)
+    	    {
+    	        $this->incrementViewsVersion();
+                $key = $this->getSyncKey(MetadataProfile::FILE_SYNC_METADATA_VIEWS);
+                kFileSyncUtils::file_put_contents($key, $this->viewsData);
+            }
+            
+            if($this->xsltData)
+            {
+                $this->incrementXsltVersion();
+                $key = $this->getSyncKey(MetadataProfile::FILE_SYNC_METADATA_XSLT);
+                kFileSyncUtils::file_put_contents($key, $this->xsltData);
+            }
+	    }
+	
+	    return parent::postSave($con);
 	}
 
 	public function incrementVersion()
@@ -225,24 +248,9 @@ class MetadataProfile extends BaseMetadataProfile implements ISyncableFile
 	    $this->viewsData = $viewsData;
 	}
 	
-	/* (non-PHPdoc)
-	 * @see BaseMetadataProfile::postSave()
-	 */
-	public function postSave(PropelPDO $con = null)
+	public function setXsltData($xsltData)
 	{
-	    if($this->wasObjectSaved())
-	    {
-	        $key = $this->getSyncKey(MetadataProfile::FILE_SYNC_METADATA_DEFINITION);
-	        kFileSyncUtils::file_put_contents($key, $this->xsdData);
-	        
-	        if($this->viewsData)
-	        {
-	            $key = $this->getSyncKey(MetadataProfile::FILE_SYNC_METADATA_VIEWS);
-	            kFileSyncUtils::file_put_contents($key, $this->viewsData);
-	        }
-	    }
-	
-	    return parent::postSave($con);
+	    $this->xsltData = $xsltData;
 	}
 
 } // MetadataProfile
