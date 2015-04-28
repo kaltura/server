@@ -44,8 +44,16 @@ abstract class ObjectBase
 	
 	public function __construct(\SimpleXMLElement $xml = null)
 	{
-		if(!empty($xml->relatedObjects))
-			$this->relatedObjects = Kaltura_Client_ParseUtils::unmarshalMap($xml->relatedObjects, "KalturaObject");
+		if(is_null($xml))
+			return;
+	
+		if(count($xml->relatedObjects))
+		{
+			if(empty($xml->relatedObjects))
+				$this->relatedObjects = array();
+			else
+				$this->relatedObjects = \Kaltura\Client\ParseUtils::unmarshalMap($xml->relatedObjects, "KalturaListResponse");
+		}
 	}
 	
 	protected function addIfNotNull(&$params, $paramName, $paramValue)
