@@ -478,7 +478,7 @@ class asset extends Baseasset implements ISyncableFile
 			return null;
 	}
 	
-	public function getExternalUrl($storageId)
+	public function getExternalUrl($storageId, $fileName = null)
 	{
 		$key = $this->getSyncKey(self::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 		$fileSync = kFileSyncUtils::getReadyExternalFileSyncForKey($key, $storageId);
@@ -497,10 +497,13 @@ class asset extends Baseasset implements ISyncableFile
 		if (strpos($url, "://") === false){
 			$url = rtrim($urlManager->getUrl(), "/") . "/".$url ;
 		}
+		
+		$url = $this->finalizeDownloadUrl($fileSync, $url, $fileName, true);
+		
 		return $url;
 	}
 	
-	public function getDownloadUrl($useCdn = false, $forceProxy = false, $preview = null)
+	public function getDownloadUrl($useCdn = false, $forceProxy = false, $preview = null, $fileName = null)
 	{
 		$syncKey = $this->getSyncKey(self::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
 		
@@ -545,10 +548,29 @@ class asset extends Baseasset implements ISyncableFile
 				break;
 		}
 		
-		if($serveRemote && $fileSync)
-			return $fileSync->getExternalUrl($this->getEntryId());
-
-		return $this->getDownloadUrlWithExpiry(86400, $useCdn, $forceProxy, $preview);
+		if($serveRemote && $fileSync) {
+			$downloadUrl = $fileSync->getExternalUrl($this->getEntryId());
+		}
+		else {
+		    $downloadUrl = $this->getDownloadUrlWithExpiry(86400, $useCdn, $forceProxy, $preview);
+		}
+		
+		$downloadUrl = $this->finalizeDownloadUrl($fileSync, $downloadUrl, $fileName, $serveRemote);
+		
+		return $downloadUrl;
+	}
+	
+	public function finalizeDownloadUrl($fileSync, $url, $fileName = null, $serveRemote = false)
+	{
+	    if($fileSync->getIsDir() && $fileName)
+	    {
+	        if($serveRemote)
+	            $url .= "/" . $fileName;
+	        else
+	            $url .= "/file_name/" . $fileName;
+	    }
+	    
+	    return $url;
 	}
 	
 	public function isKsNeededForDownload()
