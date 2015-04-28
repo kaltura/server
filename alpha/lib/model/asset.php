@@ -498,9 +498,7 @@ class asset extends Baseasset implements ISyncableFile
 			$url = rtrim($urlManager->getUrl(), "/") . "/".$url ;
 		}
 		
-		if($fileSync->getIsDir() && $fileName){
-		    $url .= "/" . $fileName; 
-		}
+		$url = $this->finalizeDownloadUrl($fileSync, $url, $fileName, true);
 		
 		return $url;
 	}
