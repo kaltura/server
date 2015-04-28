@@ -34,6 +34,21 @@ abstract class DeliveryProfile extends BaseDeliveryProfile {
 		$newObject->save(null, true);
 		return $newObject;
 	}
+
+	/**
+	 * returns whether the delivery profile supports the passed deliveryAttributes such as mediaProtocol, flv support, etc..
+	 * @param DeliveryProfileDynamicAttributes $deliveryAttributes
+	 */
+	public function supportsDeliveryDynamicAttributes(DeliveryProfileDynamicAttributes $deliveryAttributes) {
+		if(!is_null($this->getMediaProtocols()))
+		{
+			$supportedProtocols = explode(",", $this->getMediaProtocols());
+			if(!in_array($deliveryAttributes->getMediaProtocol(), $supportedProtocols)) 
+				return false;
+		}
+		
+		return true;
+	}
 	
 	/**
 	 * Derives the delivery profile dynamic attributes from the file sync and the flavor asset.

@@ -55,6 +55,7 @@ class DeliveryProfileTableMap extends TableMap {
 		$this->addColumn('STREAMER_TYPE', 'StreamerType', 'VARCHAR', false, 30, null);
 		$this->addColumn('MEDIA_PROTOCOLS', 'MediaProtocols', 'VARCHAR', false, 256, null);
 		$this->addColumn('CUSTOM_DATA', 'CustomData', 'LONGVARCHAR', false, null, null);
+		$this->addColumn('PRIORITY', 'Priority', 'INTEGER', false, null, null);
 		// validators
 	} // initialize()
 

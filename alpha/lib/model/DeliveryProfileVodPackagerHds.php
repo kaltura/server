@@ -24,4 +24,20 @@ class DeliveryProfileVodPackagerHds extends DeliveryProfileHds {
 		
 		return $this->getRenderer(array($flavor));
 	}
+
+	/**
+	 * returns whether the delivery profile supports the passed deliveryAttributes such as mediaProtocol, flv support, etc..
+	 * @param DeliveryProfileDynamicAttributes $deliveryAttributes
+	 */
+	public function supportsDeliveryDynamicAttributes(DeliveryProfileDynamicAttributes $deliveryAttributes) {
+		if (!parent::supportsDeliveryDynamicAttributes($deliveryAttributes))
+			return false;
+	
+		foreach($deliveryAttributes->getFlavorAssets() as $flavorAsset) {
+			if (strtolower($flavorAsset->getFileExt()) == 'flv' || strtolower($flavorAsset->getContainerFormat()) == 'flash video')
+				return false;
+		}
+				
+		return true;
+	}
 }
