@@ -219,7 +219,7 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 		if($delivery) {
 			KalturaLog::debug("Delivery ID for partnerId [$partnerId] and streamer type [$streamerType] is " . $delivery->getId());
 		} else {
-			$mediaProtocol = $deliveryAttributes ? $deliveryAttributes->getMediaProtocol() : $mediaProtocol;
+			$mediaProtocol = $deliveryAttributes ? $deliveryAttributes->getMediaProtocol() : null;
 			KalturaLog::err("Delivery ID can't be determined for partnerId [$partnerId] streamer type [$streamerType] and media protocol [$mediaProtocol]");
 		}
 		return $delivery;

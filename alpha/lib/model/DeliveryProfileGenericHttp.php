@@ -25,5 +25,20 @@ class DeliveryProfileGenericHttp extends DeliveryProfileHttp {
 			$pattern = '{url}';
 		return kDeliveryUtils::formatGenericUrl($url, $pattern, $this->params);
 	}
+
+	/**
+	 * returns whether the delivery profile supports the passed deliveryAttributes in this case seekFrom
+	 * @param DeliveryProfileDynamicAttributes $deliveryAttributes
+	 */
+	public function supportsDeliveryDynamicAttributes(DeliveryProfileDynamicAttributes $deliveryAttributes) {
+		if (!parent::supportsDeliveryDynamicAttributes($deliveryAttributes))
+			return false;
+	
+		if ($deliveryAttributes->getSeekFromTime() > 0)
+			return false;
+				
+		return true;
+	}
+
 }
 
