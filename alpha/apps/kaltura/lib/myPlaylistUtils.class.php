@@ -538,11 +538,10 @@ class myPlaylistUtils
 			$total_results = min( $total_results, $startOffset + $pageSize);
 		}
 
-		$number_of_entries = 0;
 		$entry_ids_list = array();
 		foreach ( $entry_filters as $entry_filter )
 		{
-			$current_limit = max ( 0 , $total_results - $number_of_entries ); // if the current_limit is < 0 - set it to be 0
+			$current_limit = max ( 0 , $total_results - count($entry_ids_list) ); // if the current_limit is < 0 - set it to be 0
 
 			// no need to fetch any more results
 			if ( $current_limit <= 0 ) break;
@@ -597,7 +596,6 @@ class myPlaylistUtils
 			$entry_ids_list_for_filter = $c->getFetchedIds();
 			
 			// update total count and merge current result with the global list
-			$number_of_entries += count ( $entry_ids_list_for_filter );
 			$entry_ids_list = array_merge ( $entry_ids_list , $entry_ids_list_for_filter );
 		}
 
