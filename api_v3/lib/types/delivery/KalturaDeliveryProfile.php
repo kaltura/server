@@ -122,7 +122,14 @@ class KalturaDeliveryProfile extends KalturaObject implements IFilterable
 	 */
 	public $mediaProtocols;
 	
-	private static $map_between_objects = array
+	/**
+	 * priority used for ordering similar delivery profiles
+	 * @var int
+	 * @readonly
+	 */
+	public $priority;
+
+ 	private static $map_between_objects = array
 	(
 			"createdAt",
 			"description",
@@ -141,6 +148,7 @@ class KalturaDeliveryProfile extends KalturaObject implements IFilterable
 			"url",
 			"type",
 			"mediaProtocols",
+			"priority",
 	);
 	
 	public function getMapBetweenObjects ( )
