@@ -190,8 +190,8 @@ class KFeedDropFolderEngine extends KDropFolderEngine
 				$contentItems = $feedItem->xpath ($this->dropFolder->feedItemInfo->itemContentXpath);
 				foreach ($contentItems as $contentItem)
 				{
-					$bitrateAttributeName = $this->dropFolder->feedItemInfo->contentBitrateAttributeName;
-					if (intval($contentItem->attributes()->$bitrateAttributeName) != $maxBitrate)
+					$bitrateValue = intval($this->getSingleXPathResult($this->dropFolder->feedItemInfo->contentBitrateAttributeName, $contentItem));
+					if ($bitrateValue != $maxBitrate)
 						unset ($contentItem[0]);
 				}
 			}
