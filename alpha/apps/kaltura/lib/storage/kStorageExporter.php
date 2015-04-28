@@ -81,7 +81,7 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 		{
 			if($externalStorage->shoudlExportFileSync($key))
 			{		
-		$exporting = self::export($flavor->getentry(), $externalStorage, $key, !$flavor->getIsOriginal());
+                $exporting = self::export($flavor->getentry(), $externalStorage, $key, !$flavor->getIsOriginal());
 			}			
 		}
 				
@@ -101,7 +101,7 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 			return;
 		}
 		
-		$externalFileSync = kFileSyncUtils::createPendingExternalSyncFileForKey($key, $externalStorage);
+		$externalFileSync = kFileSyncUtils::createPendingExternalSyncFileForKey($key, $externalStorage, $fileSync->getIsDir());
 		
 		$parent_file_sync = kFileSyncUtils::resolve($fileSync);
 		$srcFileSyncPath = $parent_file_sync->getFileRoot() . $parent_file_sync->getFilePath();
