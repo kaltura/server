@@ -40,9 +40,43 @@ namespace Kaltura\Client;
  */
 class ApiException extends \RuntimeException 
 {
-    public function __construct($message, $code) 
+	private $arguments;
+	
+    public function __construct($message, $code, $arguments = null) 
     {
     	$this->code = $code; // force property set here because php expect code to be integer and it cannot pass in the constructor
+    	$this->arguments = array();
+    	
+    	if($arguments)
+    	{
+    		foreach($arguments as $argument)
+    		{
+    			/* @var $argument Kaltura_Client_Type_ApiExceptionArg */
+    			$this->arguments[$argument->name] = $argument->value;
+    		}
+    	}
+    	
 		parent::__construct($message);
     }
+    
+	/**
+	 * @return array
+	 */
+	public function getArguments()
+	{
+		return $this->arguments;
+	}
+    
+	/**
+	 * @return string
+	 */
+	public function getArgument($argument)
+	{
+		if($this->arguments && isset($this->arguments[$argument]))
+		{
+			return $this->arguments[$argument];
+		}
+		
+		return null;
+	}
 }

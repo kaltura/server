@@ -42,11 +42,20 @@ class Kaltura_Client_Exception extends Exception
 	const ERROR_INVALID_OBJECT_TYPE = -8;
 	
 	private $arguments;
-	
+
     public function __construct($message, $code, $arguments = null) 
     {
     	$this->code = $code;
-    	$this->arguments = $arguments;
+    	$this->arguments = array();
+    	
+    	if($arguments)
+    	{
+    		foreach($arguments as $argument)
+    		{
+    			/* @var $argument Kaltura_Client_Type_ApiExceptionArg */
+    			$this->arguments[$argument->name] = $argument->value;
+    		}
+    	}
     	
 		parent::__construct($message);
     }
