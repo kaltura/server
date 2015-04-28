@@ -37,11 +37,10 @@ class DeliveryProfileGenericHttp extends DeliveryProfileHttp {
 			return $result;
 	
 		// the profile supports seek if it has the {seekFromSec} placeholder in its pattern
-		if ($deliveryAttributes->getSeekFromTime() > 0 and strpos("{seekFromSec}", $this->getPattern()) === false)
+		if ($deliveryAttributes->getSeekFromTime() > 0 && strpos($this->getPattern(), "{seekFromSec}") === false)
 			return self::DYNAMIC_ATTRIBUTES_PARTIAL_SUPPORT;
 				
 		return $result;
 	}
-
 }
 

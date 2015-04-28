@@ -125,7 +125,6 @@ class KalturaDeliveryProfile extends KalturaObject implements IFilterable
 	/**
 	 * priority used for ordering similar delivery profiles
 	 * @var int
-	 * @readonly
 	 */
 	public $priority;
 
