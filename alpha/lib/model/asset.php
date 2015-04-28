@@ -550,21 +550,29 @@ class asset extends Baseasset implements ISyncableFile
 				break;
 		}
 		
-		if($serveRemote && $fileSync)
-		{
+		if($serveRemote && $fileSync) {
 			$downloadUrl = $fileSync->getExternalUrl($this->getEntryId());
-			if($fileSync->getIsDir() && $fileName)
-			    $downloadUrl .= "/" . $fileName;
 		}
-		else
-		{
+		else {
 		    $downloadUrl = $this->getDownloadUrlWithExpiry(86400, $useCdn, $forceProxy, $preview);
-		    if($fileSync->getIsDir() && $fileName)
-                $downloadUrl .= "/file_name/" . $fileName;
 		}
 		
+		$downloadUrl = $this->finalizeDownloadUrl($fileSync, $downloadUrl, $fileName, $serveRemote);
 		
 		return $downloadUrl;
+	}
+	
+	public function finalizeDownloadUrl($fileSync, $url, $fileName = null, $serveRemote = false)
+	{
+	    if($fileSync->getIsDir() && $fileName)
+	    {
+	        if($serveRemote)
+	            $url .= "/" . $fileName;
+	        else
+	            $url .= "/file_name/" . $fileName;
+	    }
+	    
+	    return $url;
 	}
 	
 	public function isKsNeededForDownload()
