@@ -747,26 +747,29 @@ class myEntryUtils
 						
 					$cache->put($orig_image_path, true);
 					
-				    $flavorAsset = assetPeer::retrieveHighestBitrateByEntryId($entry->getId(), flavorParams::TAG_THUMBSOURCE);
+					$flavorAsset = assetPeer::retrieveHighestBitrateByEntryId($entry->getId(), flavorParams::TAG_THUMBSOURCE);
 					if(is_null($flavorAsset))
 					{
-    					$flavorAsset = assetPeer::retrieveOriginalReadyByEntryId($entry->getId());
-                        $flavorSyncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-                        list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($flavorSyncKey,false,false);
-                        if (!$fileSync)
-                        {
-                            $flavorAsset = null;
-                        }
-	    				if(is_null($flavorAsset) || !($flavorAsset->hasTag(flavorParams::TAG_MBR) || $flavorAsset->hasTag(flavorParams::TAG_WEB)))
-					    {
-    						// try the best playable
-                            $flavorAsset = assetPeer::retrieveHighestBitrateByEntryId($entry->getId());
-					    }
-					    if (is_null($flavorAsset))
-					    {
-    						// if no READY ORIGINAL entry is available, try to retrieve a non-READY ORIGINAL entry
-						    $flavorAsset = assetPeer::retrieveOriginalByEntryId($entry->getId());
-					    }
+						$flavorAsset = assetPeer::retrieveOriginalReadyByEntryId($entry->getId());
+			                        if($flavorAsset)
+			                        {
+			                            $flavorSyncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+			                            list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($flavorSyncKey,false,false);
+			                            if (!$fileSync)
+			                            {
+			                                $flavorAsset = null;
+			                            }
+			                        }
+		    				if(is_null($flavorAsset) || !($flavorAsset->hasTag(flavorParams::TAG_MBR) || $flavorAsset->hasTag(flavorParams::TAG_WEB)))
+						{
+	    						// try the best playable
+							$flavorAsset = assetPeer::retrieveHighestBitrateByEntryId($entry->getId());
+						}
+						if (is_null($flavorAsset))
+						{
+	    						// if no READY ORIGINAL entry is available, try to retrieve a non-READY ORIGINAL entry
+							$flavorAsset = assetPeer::retrieveOriginalByEntryId($entry->getId());
+						}
 					}
 					if (is_null($flavorAsset))
 					{
