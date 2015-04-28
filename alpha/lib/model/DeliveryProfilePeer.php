@@ -291,11 +291,18 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 			$deliveryAttributes->setMediaProtocol(null);
 		}
 	
+		$partialSupport = null;
+		
+		// find either a fully supported deliveryProfile or the first partial supported one
 		foreach ($deliveries as $delivery) {
-			if ($delivery->supportsDeliveryDynamicAttributes($deliveryAttributes))
+			$result = $delivery->supportsDeliveryDynamicAttributes($deliveryAttributes);
+			if ($result == DeliveryProfile::DYNAMIC_ATTRIBUTES_FULL_SUPPORT)
 				return $delivery;
+			else if (!$partialSupport && $result == DeliveryProfile::DYNAMIC_ATTRIBUTES_PARTIAL_SUPPORT)
+				$partialSupport = $delivery;
 		}
-		return null;
+		
+		return $partialSupport;
 	}
 	
 	/**

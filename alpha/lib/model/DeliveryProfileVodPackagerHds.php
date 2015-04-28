@@ -30,14 +30,16 @@ class DeliveryProfileVodPackagerHds extends DeliveryProfileHds {
 	 * @param DeliveryProfileDynamicAttributes $deliveryAttributes
 	 */
 	public function supportsDeliveryDynamicAttributes(DeliveryProfileDynamicAttributes $deliveryAttributes) {
-		if (!parent::supportsDeliveryDynamicAttributes($deliveryAttributes))
-			return false;
+		$result = parent::supportsDeliveryDynamicAttributes($deliveryAttributes);
+		
+		if ($result == self::DYNAMIC_ATTRIBUTES_NO_SUPPORT)
+			return $result;
 	
 		foreach($deliveryAttributes->getFlavorAssets() as $flavorAsset) {
 			if (strtolower($flavorAsset->getFileExt()) == 'flv' || strtolower($flavorAsset->getContainerFormat()) == 'flash video')
-				return false;
+				return self::DYNAMIC_ATTRIBUTES_NO_SUPPORT;
 		}
 				
-		return true;
+		return $result;
 	}
 }

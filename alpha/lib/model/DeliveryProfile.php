@@ -9,6 +9,10 @@ abstract class DeliveryProfile extends BaseDeliveryProfile {
 	
 	protected $DEFAULT_RENDERER_CLASS = 'kF4MManifestRenderer';
 	
+	const DYNAMIC_ATTRIBUTES_FULL_SUPPORT = 0;		// the profile fully supports the required attirbutes
+	const DYNAMIC_ATTRIBUTES_PARTIAL_SUPPORT = 1;	// the profile may support the required attirbutes however its better to try and find a more suitable profile
+	const DYNAMIC_ATTRIBUTES_NO_SUPPORT = 2;		// the profile doesn't support the required attirbutes
+	
 	/**
 	 * @var DeliveryProfileDynamicAttributes
 	 */
@@ -44,10 +48,10 @@ abstract class DeliveryProfile extends BaseDeliveryProfile {
 		{
 			$supportedProtocols = explode(",", $this->getMediaProtocols());
 			if(!in_array($deliveryAttributes->getMediaProtocol(), $supportedProtocols)) 
-				return false;
+				return self::DYNAMIC_ATTRIBUTES_NO_SUPPORT;
 		}
 		
-		return true;
+		return self::DYNAMIC_ATTRIBUTES_FULL_SUPPORT;
 	}
 	
 	/**
