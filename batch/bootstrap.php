@@ -25,7 +25,8 @@ KAutoloader::setIncludePath(array(
 	KAutoloader::buildPath(KALTURA_ROOT_PATH, "vendor", "ZendFramework", "library"),
 ));
 KAutoloader::setClassMapFilePath(kEnvironment::get("cache_root_path") . '/batch/classMap.cache');
-KAutoloader::addExcludePath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "vendor", "aws", "*")); // Do not load AWS files, rather use their autoloader (see below)
+KAutoloader::addExcludePath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "vendor", "aws", "*")); // Do not load AWS files
+KAutoloader::addExcludePath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "vendor", "HTMLPurifier", "*")); // Do not load HTMLPurifier files
 KAutoloader::register();
 
 // Logger
