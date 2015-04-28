@@ -31,13 +31,16 @@ class DeliveryProfileGenericHttp extends DeliveryProfileHttp {
 	 * @param DeliveryProfileDynamicAttributes $deliveryAttributes
 	 */
 	public function supportsDeliveryDynamicAttributes(DeliveryProfileDynamicAttributes $deliveryAttributes) {
-		if (!parent::supportsDeliveryDynamicAttributes($deliveryAttributes))
-			return false;
+		$result = parent::supportsDeliveryDynamicAttributes($deliveryAttributes);
+		
+		if ($result == self::DYNAMIC_ATTRIBUTES_NO_SUPPORT)
+			return $result;
 	
-		if ($deliveryAttributes->getSeekFromTime() > 0)
-			return false;
+		// the profile supports seek if it has the {seekFromSec} placeholder in its pattern
+		if ($deliveryAttributes->getSeekFromTime() > 0 and strpos("{seekFromSec}", $this->getPattern()) === false)
+			return self::DYNAMIC_ATTRIBUTES_PARTIAL_SUPPORT;
 				
-		return true;
+		return $result;
 	}
 
 }
