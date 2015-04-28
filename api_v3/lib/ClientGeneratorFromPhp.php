@@ -657,6 +657,7 @@ abstract class ClientGeneratorFromPhp
 		}
 		
 		// Always add these two classes
+		$includeList[] = 'KalturaApiExceptionArg';
 		$includeList[] = 'KalturaClientConfiguration';
 		$includeList[] = 'KalturaRequestConfiguration';
 		

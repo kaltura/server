@@ -65,6 +65,16 @@ class ParseUtils
 			
 		return $ret;
 	}
+	
+	public static function unmarshalMap(\SimpleXMLElement $xml, $fallbackType = null)
+	{
+		$xmls = $xml->children();
+		$ret = array();
+		foreach($xmls as $xml)
+			$ret[strval($xml->itemKey)] = self::unmarshalObject($xml, $fallbackType);
+			
+		return $ret;
+	}
 
 	public static function checkIfError(\SimpleXMLElement $xml, $throwException = true) 
 	{
