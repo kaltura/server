@@ -750,12 +750,15 @@ class myEntryUtils
 				    $flavorAsset = assetPeer::retrieveHighestBitrateByEntryId($entry->getId(), flavorParams::TAG_THUMBSOURCE);
 					if(is_null($flavorAsset))
 					{
-    					$flavorAsset = assetPeer::retrieveOriginalReadyByEntryId($entry->getId());
-                        $flavorSyncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-                        list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($flavorSyncKey,false,false);
-                        if (!$fileSync)
+                        $flavorAsset = assetPeer::retrieveOriginalReadyByEntryId($entry->getId());
+                        if($flavorAsset)
                         {
-                            $flavorAsset = null;
+                            $flavorSyncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+                            list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($flavorSyncKey,false,false);
+                            if (!$fileSync)
+                            {
+                                $flavorAsset = null;
+                            }
                         }
 	    				if(is_null($flavorAsset) || !($flavorAsset->hasTag(flavorParams::TAG_MBR) || $flavorAsset->hasTag(flavorParams::TAG_WEB)))
 					    {
