@@ -9,7 +9,7 @@ return array (
 	'item-content-tag-url-xpath' => 'Item content tag URL XPath (relative to item):',
 	'item-hash-xpath' => 'Item hash XPath (relative to item):',
 	'item-content-tag-xpath' => 'Item content tag XPath (relative to item):',
-	'item-content-tag-bitrate-attribute-name' => 'Item content tag bitrate attribute name:',
+	'item-content-tag-bitrate-attribute-name' => 'Item content tag bitrate attribute value xpath (relative to content tag):',
 	'item-content-tag-bitrate-xpath' => 'Item content bitrate XPath (relative to item):',
 	
 );

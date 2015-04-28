@@ -190,8 +190,8 @@ class KFeedDropFolderEngine extends KDropFolderEngine
 				$contentItems = $feedItem->xpath ($this->dropFolder->feedItemInfo->itemContentXpath);
 				foreach ($contentItems as $contentItem)
 				{
-					$bitrateAttributeName = $this->dropFolder->feedItemInfo->contentBitrateAttributeName;
-					if (intval($contentItem->attributes()->$bitrateAttributeName) != $maxBitrate)
+					$bitrateValue = intval($this->getSingleXPathResult($this->dropFolder->feedItemInfo->contentBitrateAttributeName, $contentItem));
+					if ($bitrateValue != $maxBitrate)
 						unset ($contentItem[0]);
 				}
 			}
@@ -202,7 +202,7 @@ class KFeedDropFolderEngine extends KDropFolderEngine
 		
 		$feedItemPath = KBatchBase::$taskConfig->params->mrss->xmlPath . DIRECTORY_SEPARATOR. $updatedGuid . '_' . time();
 		$res = file_put_contents($feedItemPath, $feedItem->saveXML());
-		chmod($feedItemPath, 0660);
+		chmod($feedItemPath, KBatchBase::$taskConfig->chmod ? octdec(KBatchBase::$taskConfig->chmod) : 0660);
 		return $feedItemPath;
 	}
 	
