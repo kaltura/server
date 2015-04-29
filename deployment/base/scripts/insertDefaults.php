@@ -154,7 +154,7 @@ function handleFile($filePath)
 			}
 			elseif ($attributeName == 'identifierParam')
 			{
-				$$attributeName = $value;
+				$attributeName = $value;
 				continue;
 			} 
 			if (preg_match('/eval\((?P<evalString>.+)\)/', $value, $matches))
@@ -178,6 +178,12 @@ function handleFile($filePath)
 					throw new Exception("Attribute [$attributeName] file path [$value] not found");
 
 				$value = file_get_contents($valueFilePath);
+			}
+			
+			if(preg_match('/^#[^#]+$/', $value))
+			{
+			    list($dynamicObjectType, $objectValue) = explode('.', substr($value, 1), 2);
+                $value = kPluginableEnumsManager::apiToCore($dynamicObjectType, $objectValue);
 			}
 
 			$setters[$setter] = $value;

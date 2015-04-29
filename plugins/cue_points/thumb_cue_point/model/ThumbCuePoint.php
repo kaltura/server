@@ -114,4 +114,6 @@ class ThumbCuePoint extends CuePoint implements IMetadataObject
 		
 		return $data;
 	}
+	
+	public function getIsPublic()	              {return true;}
 }

@@ -139,10 +139,10 @@ class CuePointPeer extends BaseCuePointPeer implements IMetadataPeer
 	}
 
 	/**
-	 * Retrieve a single object by entry id.
+	 * Retrieve multiple objects by entry id.
 	 *
-	 * @param      string $systemName the entry id.
-	 * @param      int $type the cue point type from CuePointType enum
+	 * @param      string $entryId the entry id.
+	 * @param      array $types the cue point types from CuePointType enum
 	 * @param      PropelPDO $con the connection to use
 	 * @return     CuePoint
 	 */
@@ -150,11 +150,15 @@ class CuePointPeer extends BaseCuePointPeer implements IMetadataPeer
 	{
 		$criteria = KalturaCriteria::create(CuePointPeer::OM_CLASS);
 		$criteria->add(CuePointPeer::ENTRY_ID, $entryId);
+		$criteria->add(CuePointPeer::STATUS, CuePointStatus::DELETED, Criteria::NOT_EQUAL);
+		
 		if(!is_null($types))
 			$criteria->add(CuePointPeer::TYPE, $types, Criteria::IN);
 
 		return CuePointPeer::doSelect($criteria, $con);
 	}
+	
+	
 	
 	public static function getCacheInvalidationKeys()
 	{
