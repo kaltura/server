@@ -45,7 +45,9 @@ class getuiconfsAction extends kalturaAction
 		// default uiconf array
 		$this->kmc_swf_version = kConf::get('kmc_version');
 		$kmcGeneralUiConf = kmcUtils::getAllKMCUiconfs('kmc',   $this->kmc_swf_version, $this->templatePartnerId);
-		$kmcGeneralTemplateUiConf = kmcUtils::getAllKMCUiconfs('kmc',   $this->kmc_swf_version, $this->templatePartnerId);
+		if (!$this->partner->getHideDefaultContent())
+			$kmcGeneralTemplateUiConf = kmcUtils::getAllKMCUiconfs('kmc',   $this->kmc_swf_version, $this->templatePartnerId);
+			
 		if($type == 'player')
 		{
 			$content_uiconfs_previewembed = kmcUtils::find_confs_by_usage_tag($kmcGeneralTemplateUiConf, "kmc_previewembed", true, $kmcGeneralUiConf);

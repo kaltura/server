@@ -1684,4 +1684,7 @@ class Partner extends BasePartner
 			
 		$this->putInCustomData($customDataKey, $tokenData, 'googleAuth');
 	}
+	
+	public function getHideDefaultContent() { return $this->getFromCustomData("hideDefaultContent", false); }
+	public function setHideDefaultContent( $v ) { $this->putInCustomData("hideDefaultContent", $v); }
 }
