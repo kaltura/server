@@ -1,9 +1,9 @@
 <?php
 /**
- * @package plugins.questionAnswer
+ * @package plugins.quiz
  * @subpackage lib.enum
  */
-class QuestionAnswerCuePointType implements IKalturaPluginEnum, CuePointType
+class QuizCuePointType implements IKalturaPluginEnum, CuePointType
 {
 	const QUESTION = 'Question';
 	const ANSWER = 'Answer';

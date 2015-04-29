@@ -37,7 +37,7 @@ class QuizService extends KalturaBaseService
 		if (!$dbEntry)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 
-		if ( !is_null( $this->getQuizData($dbEntry) ) )
+		if ( !is_null( QuizPlugin::getQuizData($dbEntry) ) )
 			throw new KalturaAPIException(KalturaQuizErrors::PROVIDED_ENTRY_IS_ALREADY_A_QUIZ, $entryId);
 
 		return $this->validateAndUpdateQuizData( $dbEntry, $quiz );
@@ -60,7 +60,7 @@ class QuizService extends KalturaBaseService
 		if (!$dbEntry)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 
-		if ( is_null( $this->getQuizData($dbEntry) ) )
+		if ( is_null( QuizPlugin::getQuizData($dbEntry) ) )
 			throw new KalturaAPIException(KalturaQuizErrors::PROVIDED_ENTRY_IS_NOT_A_QUIZ, $entryId);
 
 		return $this->validateAndUpdateQuizData( $dbEntry, $quiz );
@@ -70,7 +70,7 @@ class QuizService extends KalturaBaseService
 	{
 		$this->validateUserEntitledForUpdate( $dbEntry );
 		$quizData = $quiz->toObject();
-		$this->setQuizData( $dbEntry, $quizData );
+		QuizPlugin::setQuizData( $dbEntry, $quizData );
 		$dbEntry->save();
 		return $quiz;
 	}
@@ -90,28 +90,13 @@ class QuizService extends KalturaBaseService
 		if (!$dbEntry)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 
-		$kQuiz = $this->getQuizData($dbEntry);
+		$kQuiz = QuizPlugin::getQuizData($dbEntry);
 		if ( is_null( $kQuiz ) )
 			throw new KalturaAPIException(KalturaQuizErrors::PROVIDED_ENTRY_IS_NOT_A_QUIZ, $entryId);
 
 		$quiz = new KalturaQuiz();
 		$quiz = $quiz->fromObject( $kQuiz );
 		return $quiz;
-	}
-
-	private function getQuizData( entry $entry )
-	{
-		$quizData = $entry->getFromCustomData( QuizPlugin::QUIZ_DATA );
-
-		if($quizData)
-			$quizData = unserialize($quizData);
-
-		return $quizData;
-	}
-
-	private function setQuizData( entry $entry, kQuiz $kQuiz )
-	{
-		$entry->putInCustomData( QuizPlugin::QUIZ_DATA, serialize($kQuiz) );
 	}
 
 	/**

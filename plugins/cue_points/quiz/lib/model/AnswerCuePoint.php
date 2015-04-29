@@ -1,12 +1,12 @@
 <?php
 /**
- * @package plugins.questionAnswer
+ * @package plugins.quiz
  * @subpackage model
  */
 
 class AnswerCuePoint extends CuePoint //TODO: implements IMetadataObject
 {
-	const CUSTOM_DATA_ANSWERS_USER_ENTRY_ID= 'answersUserEntryId';
+	const CUSTOM_DATA_QUIZ_USER_ENTRY_ID= 'quizUserEntryId';
 	const CUSTOM_DATA_ANSWER_KEY = 'answerKey';
 
 	public function __construct()
@@ -22,12 +22,12 @@ class AnswerCuePoint extends CuePoint //TODO: implements IMetadataObject
 	 */
 	public function applyDefaultValues()
 	{
-		$this->setType(QuestionAnswerPlugin::getCuePointTypeCoreValue(QuestionAnswerCuePointType::ANSWER));
+		$this->setType(QuizPlugin::getCuePointTypeCoreValue(QuizCuePointType::ANSWER));
 	}
 
-	public function setAnswersUserEntryId($v) {return $this->putInCustomData(self::CUSTOM_DATA_ANSWERS_USER_ENTRY_ID, $v);}
+	public function setQuizUserEntryId($v) {return $this->putInCustomData(self::CUSTOM_DATA_QUIZ_USER_ENTRY_ID, $v);}
 
-	public function getAnswersUserEntryId() {return $this->getFromCustomData(self::CUSTOM_DATA_ANSWERS_USER_ENTRY_ID);}
+	public function getQuizUserEntryId() {return $this->getFromCustomData(self::CUSTOM_DATA_QUIZ_USER_ENTRY_ID);}
 
 	public function setAnswerKey($v) {return $this->putInCustomData(self::CUSTOM_DATA_ANSWER_KEY, $v);}
 

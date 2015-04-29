@@ -1,6 +1,6 @@
 <?php
 /**
- * @package plugins.cuePoint
+ * @package plugins.quiz
  * @subpackage model.filters
  */
 class kQuizFilter extends AdvancedSearchFilterItem

@@ -1,7 +1,7 @@
 <?php
 /**
- * @package api
- * @subpackage filters
+ * @package plugins.quiz
+ * @subpackage api.filters
  */
 class KalturaQuizAdvancedFilter extends KalturaSearchItem
 {

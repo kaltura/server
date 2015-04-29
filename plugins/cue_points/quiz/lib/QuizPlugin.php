@@ -1,22 +1,26 @@
 <?php
 /**
  * Enable question cue point objects and answer cue point objects management on entry objects
- * @package plugins.questionAnswer
+ * @package plugins.quiz
  */
-class QuestionAnswerPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaVersion
+class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServices, IKalturaDynamicAttributeContributer
 {
-	const PLUGIN_NAME = 'questionAnswer';
-	const PLUGIN_VERSION_MAJOR = 1;
-	const PLUGIN_VERSION_MINOR = 0;
-	const PLUGIN_VERSION_BUILD = 0;
+	const PLUGIN_NAME = 'quiz';
 
 	const CUE_POINT_VERSION_MAJOR = 1;
 	const CUE_POINT_VERSION_MINOR = 0;
 	const CUE_POINT_VERSION_BUILD = 0;
 	const CUE_POINT_NAME = 'cuePoint';
+
+
+	const ANSWERS_OPTIONS = "answersOptions";
+
+	const IS_QUIZ = "isQuiz";
+	const QUIZ_DATA = "quizData";
+
 	/* (non-PHPdoc)
-		 * @see IKalturaPlugin::getPluginName()
-		 */
+	 * @see IKalturaPlugin::getPluginName()
+	 */
 	public static function getPluginName()
 	{
 		return self::PLUGIN_NAME;
@@ -32,16 +36,16 @@ class QuestionAnswerPlugin extends KalturaPlugin implements IKalturaCuePoint, IK
 	}
 
 	/* (non-PHPdoc)
-	 * @see IKalturaVersion::getVersion()
+	 * @see IKalturaServices::getServicesMap()
 	 */
-	public static function getVersion()
+	public static function getServicesMap ()
 	{
-		return new KalturaVersion(
-			self::PLUGIN_VERSION_MAJOR,
-			self::PLUGIN_VERSION_MINOR,
-			self::PLUGIN_VERSION_BUILD
+		$map = array(
+			'quiz' => 'QuizService',
 		);
+		return $map;
 	}
+
 
 	/* (non-PHPdoc)
 	 * @see IKalturaEnumerator::getEnums()
@@ -49,7 +53,7 @@ class QuestionAnswerPlugin extends KalturaPlugin implements IKalturaCuePoint, IK
 	public static function getEnums($baseEnumName = null)
 	{
 		if ( is_null($baseEnumName) || ($baseEnumName == 'CuePointType') )
-			return array('QuestionAnswerCuePointType');
+			return array('QuizCuePointType');
 
 		return array();
 	}
@@ -74,10 +78,10 @@ class QuestionAnswerPlugin extends KalturaPlugin implements IKalturaCuePoint, IK
 	public static function loadObject($baseClass, $enumValue, array $constructorArgs = null)
 	{
 		if($baseClass == 'KalturaCuePoint') {
-			if ( $enumValue == self::getCuePointTypeCoreValue(QuestionAnswerCuePointType::QUESTION))
+			if ( $enumValue == self::getCuePointTypeCoreValue(QuizCuePointType::QUESTION))
 				return new KalturaQuestionCuePoint();
 
-			if ( $enumValue == self::getCuePointTypeCoreValue(QuestionAnswerCuePointType::ANSWER))
+			if ( $enumValue == self::getCuePointTypeCoreValue(QuizCuePointType::ANSWER))
 				return new KalturaAnswerCuePoint();
 		}
 
@@ -89,10 +93,10 @@ class QuestionAnswerPlugin extends KalturaPlugin implements IKalturaCuePoint, IK
 	public static function getObjectClass($baseClass, $enumValue)
 	{
 		if($baseClass == 'CuePoint') {
-			if ($enumValue == self::getCuePointTypeCoreValue(QuestionAnswerCuePointType::QUESTION))
-				return 'Question';
-			if ($enumValue == self::getCuePointTypeCoreValue(QuestionAnswerCuePointType::ANSWER))
-				return 'Answer';
+			if ($enumValue == self::getCuePointTypeCoreValue(QuizCuePointType::QUESTION))
+				return 'QuestionCuePoint';
+			if ($enumValue == self::getCuePointTypeCoreValue(QuizCuePointType::ANSWER))
+				return 'AnswerCuePoint';
 		}
 	}
 
@@ -170,5 +174,47 @@ class QuestionAnswerPlugin extends KalturaPlugin implements IKalturaCuePoint, IK
 		return array();
 		///TODO not sure
 		//return array(self::getCuePointTypeCoreValue(QuestionAnswerCuePointType::QUESTION),self::getCuePointTypeCoreValue(QuestionAnswerCuePointType::ANSWER));
+	}
+
+	/* (non-PHPdoc)
+	 * @see IKalturaDynamicAttributeContributer::getDynamicAttribute()
+	 */
+	public static function getDynamicAttribute(entry $entry)
+	{
+		$isQuiz = 0;
+		if ( !is_null($entry->getFromCustomData(self::QUIZ_DATA)) )
+			$isQuiz = 1;
+
+		$dynamicAttribute = array(self::getDynamicAttributeName() => $isQuiz);
+		return $dynamicAttribute;
+	}
+
+	public static function getDynamicAttributeName()
+	{
+		return self::getPluginName() . '_' . self::IS_QUIZ;
+	}
+
+
+	/**
+	 * @param entry $entry
+	 * @return kQuiz
+	 */
+	public static function getQuizData( entry $entry )
+	{
+		$quizData = $entry->getFromCustomData( self::QUIZ_DATA );
+
+		if($quizData)
+			$quizData = unserialize($quizData);
+
+		return $quizData;
+	}
+
+	/**
+	 * @param entry $entry
+	 * @param kQuiz $kQuiz
+	 */
+	public static function setQuizData( entry $entry, kQuiz $kQuiz )
+	{
+		$entry->putInCustomData( self::QUIZ_DATA, serialize($kQuiz) );
 	}
 }

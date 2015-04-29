@@ -2,7 +2,7 @@
 /**
  * Quiz data on entry
  *
- * @package quiz
+ * @package plugins.quiz
  * @subpackage model
  *
  */
@@ -77,7 +77,7 @@ class kQuiz {
 	/**
 	 * @return boolean
 	 */
-	public function isShowResultOnAnswer()
+	public function getShowResultOnAnswer()
 	{
 		return $this->showResultOnAnswer;
 	}
@@ -93,7 +93,7 @@ class kQuiz {
 	/**
 	 * @return boolean
 	 */
-	public function isShowCorrectKeyOnAnswer()
+	public function getShowCorrectKeyOnAnswer()
 	{
 		return $this->showCorrectKeyOnAnswer;
 	}
@@ -109,7 +109,7 @@ class kQuiz {
 	/**
 	 * @return boolean
 	 */
-	public function isAllowAnswerUpdate()
+	public function getAllowAnswerUpdate()
 	{
 		return $this->allowAnswerUpdate;
 	}
@@ -125,7 +125,7 @@ class kQuiz {
 	/**
 	 * @return boolean
 	 */
-	public function isShowCorrectAfterSubmission()
+	public function getShowCorrectAfterSubmission()
 	{
 		return $this->showCorrectAfterSubmission;
 	}

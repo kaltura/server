@@ -1,0 +1,55 @@
+<?php
+/**
+ * Quiz optional answer
+ *
+ * @package plugins.quiz
+ * @subpackage model
+ *
+ */
+
+class kOptionalAnswer {
+
+
+	/**
+	 * @var string
+	 */
+	protected $text;
+
+	/**
+	 * @var float
+	 */
+	protected $weight = 1.0;
+
+	/**
+	 * @return string
+	 */
+	public function getText()
+	{
+		return $this->text;
+	}
+
+	/**
+	 * @param string $text
+	 */
+	public function setText($text)
+	{
+		$this->text = $text;
+	}
+
+	/**
+	 * @return float
+	 */
+	public function getWeight()
+	{
+		return $this->weight;
+	}
+
+	/**
+	 * @param float $weight
+	 */
+	public function setWeight($weight)
+	{
+		$this->weight = $weight;
+	}
+
+}
