@@ -563,7 +563,7 @@ class asset extends Baseasset implements ISyncableFile
 	
 	public function finalizeDownloadUrl($fileSync, $url, $fileName = null, $serveRemote = false)
 	{
-	    if($fileSync && $fileSync->getIsDir() && $fileName)
+	    if($fileSync->getIsDir() && $fileName)
 	    {
 	        if($serveRemote)
 	            $url .= "/" . $fileName;
