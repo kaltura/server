@@ -247,6 +247,14 @@ class KalturaLiveEntryService extends KalturaEntryService
 	    	return;
 	    }
 	    
+	    // If while we were waiting for the lock, someone has updated the recorded entry id - we should use it.
+	    $dbEntry->reload();
+	    if(($dbEntry->getRecordStatus() != RecordStatus::PER_SESSION) && ($dbEntry->getRecordedEntryId())) {
+	    	$lock->unlock();
+	    	$recordedEntry = entryPeer::retrieveByPK($dbEntry->getRecordedEntryId()); 
+	    	return $recordedEntry;
+	    }
+	    
 	    $recordedEntry = null;
      	try{		
 			$recordedEntryName = $dbEntry->getName();
@@ -266,8 +274,10 @@ class KalturaLiveEntryService extends KalturaEntryService
 			$recordedEntry->setPartnerId($dbEntry->getPartnerId());
 			$recordedEntry->setModerationStatus($dbEntry->getModerationStatus());
 			$recordedEntry->setIsRecordedEntry(true);
+			$recordedEntry->setTags($dbEntry->getTags());
+
 			$recordedEntry->save();
-			
+
 			$dbEntry->setRecordedEntryId($recordedEntry->getId());
 			$dbEntry->save();
 			

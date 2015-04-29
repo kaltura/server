@@ -323,7 +323,7 @@ class CSharpClientGenerator extends ClientGeneratorFromXml
 						$this->appendLine("							this.$dotNetPropName = new Dictionary<string, $arrayType>();");
 						$this->appendLine("							foreach(XmlElement arrayNode in propertyNode.ChildNodes)");
 						$this->appendLine("							{");
-						$this->appendLine("								this.$dotNetPropName\[index.ToString()\] = ($arrayType)KalturaObjectFactory.Create(arrayNode, \"$arrayType\");");
+						$this->appendLine("								this.{$dotNetPropName}[index.ToString()] = ($arrayType)KalturaObjectFactory.Create(arrayNode, \"$arrayType\");");
 						$this->appendLine("								index++;");
 						$this->appendLine("							}");
 						$this->appendLine("						}");
@@ -560,6 +560,9 @@ class CSharpClientGenerator extends ClientGeneratorFromXml
 			case "map":
 				$arrayType = $resultNode->getAttribute("arrayType");
 				$dotNetOutputType = "Dictionary<string, ".$arrayType.">";
+				break;
+			case "bigint":
+				$dotNetOutputType = "long";
 				break;
 			default:
 				$dotNetOutputType = $resultType;

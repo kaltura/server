@@ -141,6 +141,7 @@ class MetadataService extends KalturaBaseService
 		$dbMetadata->setObjectType($objectType);
 		$dbMetadata->setObjectId($objectId);
 		$dbMetadata->setStatus(KalturaMetadataStatus::VALID);
+		$dbMetadata->setLikeNew(true);
 
 		// dynamic objects are metadata only, skip validating object id
 		if ($objectType != KalturaMetadataObjectType::DYNAMIC_OBJECT)
@@ -373,7 +374,8 @@ class MetadataService extends KalturaBaseService
 			}
 			
 			if (!$entryIds && kConf::hasParam('metadata_list_without_object_filtering_partners') && 
-				!in_array(kCurrentContext::getCurrentPartnerId(), kConf::get('metadata_list_without_object_filtering_partners'))) 
+				!in_array(kCurrentContext::getCurrentPartnerId(), kConf::get('metadata_list_without_object_filtering_partners')) &&
+				kCurrentContext::$ks_partner_id != Partner::BATCH_PARTNER_ID)
 				throw new KalturaAPIException(MetadataErrors::MUST_FILTER_ON_OBJECT_ID);
 			
 			if($entryIds)
