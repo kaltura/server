@@ -44,7 +44,10 @@ abstract class DeliveryProfile extends BaseDeliveryProfile {
 	 * @param DeliveryProfileDynamicAttributes $deliveryAttributes
 	 */
 	public function supportsDeliveryDynamicAttributes(DeliveryProfileDynamicAttributes $deliveryAttributes) {
-		if(!is_null($this->getMediaProtocols()))
+		if(!$deliveryAttributes->getMediaProtocol())
+			return self::DYNAMIC_ATTRIBUTES_FULL_SUPPORT;
+
+ 		if(!is_null($this->getMediaProtocols()))
 		{
 			$supportedProtocols = explode(",", $this->getMediaProtocols());
 			if(!in_array($deliveryAttributes->getMediaProtocol(), $supportedProtocols)) 
