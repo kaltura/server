@@ -357,16 +357,16 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 	 * @return true if the request is should be blocked, flase otherwise
 	 */
 	public static function isRequestRestricted(Partner $partner) {
-		$enforceDelivery = $partner->getEnforceDelivery();
-		if(!$enforceDelivery)
+		// verify only secured entries
+		if (!self::isSecured())
 			return false;
-			
+
 		// Retrieve request origin
 		$requestOrigin = @$_SERVER['HTTP_X_FORWARDED_HOST'];
 		if(!$requestOrigin)
 			$requestOrigin = @$_SERVER['HTTP_HOST'];
 		
-		//  Otherwise, check the partner delivery profiles
+		// check the partner delivery profiles
 		$deliveryIds = array();
 		$deliveryIdsMap = $partner->getDeliveryProfileIds();
 		foreach($deliveryIdsMap as $deliveriesByFormat) {
@@ -377,6 +377,16 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 		}
 		$deliveries = self::retrieveByPKs($deliveryIds);
 		
+		// merge global delivery profiles with tokenizers
+		$c = new Criteria();
+		$c->add(DeliveryProfilePeer::PARTNER_ID, PartnerPeer::GLOBAL_PARTNER);
+		$c->add(DeliveryProfilePeer::IS_DEFAULT, true);
+		$c->add(DeliveryProfilePeer::TYPE, self::getAllLiveDeliveryProfileTypes(), Criteria::NOT_IN);
+		$c->addDescendingOrderByColumn('(' . DeliveryProfilePeer::TOKENIZER . ' is not null)');
+		$globalTokenizedDeliveries = self::doSelect($c);
+		
+		$deliveries = array_merge ( $deliveries, $globalTokenizedDeliveries);
+		
 		foreach($deliveries as $delivery) {
 			$recognizer = $delivery->getRecognizer();
 			if(!is_null($recognizer)) {
@@ -385,6 +395,12 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 				}
 			}
 		}
+		
+		KalturaLog::log("isRequestRestricted FAILED ".$_SERVER['REQUEST_URI']);
+		
+		$enforceDelivery = $partner->getEnforceDelivery();
+		if(!$enforceDelivery)
+			return false;
 		
 		return true;
 	}
