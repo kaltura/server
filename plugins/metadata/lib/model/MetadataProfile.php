@@ -50,34 +50,46 @@ class MetadataProfile extends BaseMetadataProfile implements ISyncableFile
 	}
 	
 	/* (non-PHPdoc)
+	 * @see BaseMetadataProfile::preSave()
+	 */
+	public function preSave(PropelPDO $con = null)
+	{
+	    if($this->xsdData)
+	        $this->incrementVersion();
+	    
+	    if($this->viewsData)
+	        $this->incrementViewsVersion();
+	    
+	    if($this->xsltData)
+	        $this->incrementXsltVersion();
+	    
+	    return parent::preSave($con);
+	}
+	
+	/* (non-PHPdoc)
 	 * @see BaseMetadataProfile::postSave()
 	 */
 	public function postSave(PropelPDO $con = null)
 	{
-	    if($this->wasObjectSaved()) {
-    	    if($this->xsdData)
-    	    {
-    	        $this->incrementVersion();
-                $key = $this->getSyncKey(MetadataProfile::FILE_SYNC_METADATA_DEFINITION);
-                kFileSyncUtils::file_put_contents($key, $this->xsdData);
+    	if($this->xsdData)
+    	{
+        	$key = $this->getSyncKey(MetadataProfile::FILE_SYNC_METADATA_DEFINITION);
+            kFileSyncUtils::file_put_contents($key, $this->xsdData);
                 
-                kMetadataManager::parseProfileSearchFields($this->getPartnerId(), $this);
-    	    }
+            kMetadataManager::parseProfileSearchFields($this->getPartnerId(), $this);
+    	}
     	         
-            if($this->viewsData)
-    	    {
-    	        $this->incrementViewsVersion();
-                $key = $this->getSyncKey(MetadataProfile::FILE_SYNC_METADATA_VIEWS);
-                kFileSyncUtils::file_put_contents($key, $this->viewsData);
-            }
+        if($this->viewsData)
+    	{
+			$key = $this->getSyncKey(MetadataProfile::FILE_SYNC_METADATA_VIEWS);
+			kFileSyncUtils::file_put_contents($key, $this->viewsData);
+		}
             
-            if($this->xsltData)
-            {
-                $this->incrementXsltVersion();
-                $key = $this->getSyncKey(MetadataProfile::FILE_SYNC_METADATA_XSLT);
-                kFileSyncUtils::file_put_contents($key, $this->xsltData);
-            }
-	    }
+		if($this->xsltData)
+		{
+			$key = $this->getSyncKey(MetadataProfile::FILE_SYNC_METADATA_XSLT);
+			kFileSyncUtils::file_put_contents($key, $this->xsltData);
+		}
 	
 	    return parent::postSave($con);
 	}
