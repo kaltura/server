@@ -605,7 +605,13 @@ class myPlaylistUtils
 			$entry_ids_list = array_slice($entry_ids_list, $startOffset, $pageSize);
 		}
 
+		// Disable entitlement, which was already applied in entryPeer::prepareEntitlementCriteriaAndFilters()
+		// otherwise we will hit the 150 entries limit from SphinxCriterion
+		KalturaCriterion::disableTag(KalturaCriterion::TAG_ENTITLEMENT_ENTRY);
+
 		$db_entry_list = entryPeer::retrieveByPKs( $entry_ids_list );
+
+		KalturaCriterion::restoreTag(KalturaCriterion::TAG_ENTITLEMENT_ENTRY);
 
 		// Map the entries to their IDs
 		$entry_map = array();
