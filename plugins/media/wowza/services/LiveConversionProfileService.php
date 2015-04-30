@@ -83,6 +83,11 @@ class LiveConversionProfileService extends KalturaBaseService
 			}
 		}
 		
+		if(!$liveParamsInput) {
+			KalturaLog::err("Failed to find matching input stream for stream name: " . $streamName);
+			throw new KalturaAPIException(WowzaErrors::INVALID_STREAM_NAME, $streamName);
+		}
+		
 		$ignoreLiveParamsIds = array();
 		if($disableIngested)
 		{
