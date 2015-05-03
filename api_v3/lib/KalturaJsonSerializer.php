@@ -14,7 +14,7 @@ class KalturaJsonSerializer extends KalturaSerializer
 	{
 		$object = parent::prepareSerializedObject($object);
 		$json = json_encode($object);
-		$json = preg_replace(array('/,?"[^"]+":null/', '/([\{\[]),/'), array('', '\1'), $json);
+		$json = preg_replace(array('/,?"[^\\"]+":null/', '/([\{\[]),/'), array('', '\1'), $json);
 		return $json;
 	}
 
