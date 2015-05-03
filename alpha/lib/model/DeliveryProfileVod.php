@@ -227,9 +227,8 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 		{
 			$flavorSizeKB = $flavorAsset->getSize();
 			if ($flavorSizeKB > kConf::get("max_file_size_downloadable_from_cdn_in_KB"))
-				$urlPrefix = requestUtils::getRequestHost();
-			else
-				$urlPrefix = $this->url;
+				KalturaLog::log("flavor size $flavorSizeKB > max_file_size_downloadable_from_cdn_in_KB, deliveryProfileId=".$this->getId()." url=".$this->getUrl()." flavorId=".$flavorAsset->getId()." flavorExt=".$flavorAsset->getFileExt());
+			$urlPrefix = $this->url;
 		}
 	
 		$urlPrefix = preg_replace('/^https?:\/\//', '', $urlPrefix);
