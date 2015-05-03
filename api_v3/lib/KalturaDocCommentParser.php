@@ -13,6 +13,7 @@ class KalturaDocCommentParser
     const DOCCOMMENT_REPLACENET_PARAM_NAME = '__NAME__';
     
     const DOCCOMMENT_ALIAS = '/\@alias (\w*)/';
+    const DOCCOMMENT_VOLATILE = "/\\@volatile/i";
     
     const DOCCOMMENT_VAR_TYPE = "/\\@var (\\w*)/";
     const DOCCOMMENT_LINK = "/\\@link (.*)/";
@@ -67,6 +68,11 @@ class KalturaDocCommentParser
      * @var bool
      */
     public $writeOnly;
+    
+    /**
+     * @var bool
+     */
+    public $volatile;
     
     /**
      * @var bool
@@ -216,6 +222,7 @@ class KalturaDocCommentParser
     	$this->readOnly = preg_match( self::DOCCOMMENT_READONLY, $comment);
         $this->insertOnly = preg_match( self::DOCCOMMENT_INSERTONLY, $comment);
         $this->writeOnly = preg_match( self::DOCCOMMENT_WRITEONLY, $comment);
+        $this->volatile = preg_match( self::DOCCOMMENT_VOLATILE, $comment);
         $this->abstract = preg_match( self::DOCCOMMENT_ABSTRACT, $comment);
         $this->deprecated = preg_match( self::DOCCOMMENT_DEPRECATED, $comment);
         $this->serverOnly = preg_match( self::DOCCOMMENT_SERVER_ONLY, $comment);

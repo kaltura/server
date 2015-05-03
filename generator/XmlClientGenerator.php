@@ -183,6 +183,11 @@ class XmlClientGenerator extends ClientGeneratorFromPhp
 					$paramElement->setAttribute('alias', $parsedDocComment->alias);
 				}
 				
+				if($parsedDocComment->volatile)
+				{
+					$paramElement->setAttribute('volatile', true);
+				}
+				
 				if($parsedDocComment->description)
 				{
 					$paramElement->setAttribute('description', trim($parsedDocComment->description));
