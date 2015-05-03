@@ -481,7 +481,7 @@ class NodeClientGenerator extends ClientGeneratorFromXml
 		$this->echoLine($this->mainClass, "/**");
 		$this->echoLine($this->mainClass, " * Clear all volatile configuration parameters");
 		$this->echoLine($this->mainClass, " */");
-		$this->echoLine($this->mainClass, "KalturaClient.prototype.clearRequest = function(){");
+		$this->echoLine($this->mainClass, "KalturaClient.prototype.resetRequest = function(){");
 		foreach($volatileProperties as $attributeName => $properties)
 		{
 			foreach($properties as $propertyName)

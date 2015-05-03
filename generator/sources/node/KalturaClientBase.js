@@ -334,15 +334,15 @@ KalturaClientBase.prototype.doQueue = function(callback){
 	var signature = this.signature(params);
 	this.addParam(params, "kalsig", signature);
 	this.doHttpRequest(callback, url, params, files);
-	this.clearRequest();
+	this.resetRequest();
 	return true;
 };
 
 /**
  * Clear all volatile configuration parameters
  */
-KalturaClientBase.prototype.clearRequest = function(){
-	throw new Error('KalturaClientBase.clearRequest should be overriden by KalturaClient.');
+KalturaClientBase.prototype.resetRequest = function(){
+	throw new Error('KalturaClientBase.resetRequest should be overriden by KalturaClient.');
 };
 
 /**

@@ -793,11 +793,13 @@ class PhpZendClientGenerator extends ClientGeneratorFromXml
 		$this->appendLine("	}");
 		$this->appendLine("	");
 	
+		$volatileProperties = array();
 		foreach($configurationNodes as $configurationNode)
 		{
 			/* @var $configurationNode DOMElement */
 			$configurationName = $configurationNode->nodeName;
-			$methodsName = ucfirst($configurationName) . "Configuration";
+			$attributeName = lcfirst($configurationName) . "Configuration";
+			$volatileProperties[$attributeName] = array();
 		
 			foreach($configurationNode->childNodes as $configurationPropertyNode)
 			{
@@ -807,6 +809,12 @@ class PhpZendClientGenerator extends ClientGeneratorFromXml
 					continue;
 			
 				$configurationProperty = $configurationPropertyNode->localName;
+				
+				if($configurationPropertyNode->hasAttribute('volatile') && $configurationPropertyNode->getAttribute('volatile'))
+				{
+					$volatileProperties[$attributeName][] = $configurationProperty;
+				}
+				
 				$type = $this->getTypeClass($configurationPropertyNode->getAttribute('type'));
 				$description = null;
 				
@@ -823,7 +831,21 @@ class PhpZendClientGenerator extends ClientGeneratorFromXml
 				}
 			}
 		}
-	
+		
+		$this->appendLine ( "	/**");
+		$this->appendLine ( "	 * Clear all volatile configuration parameters");
+		$this->appendLine ( "	 */");
+		$this->appendLine ( "	protected function resetRequest()");
+		$this->appendLine ( "	{");
+		foreach($volatileProperties as $attributeName => $properties)
+		{
+			foreach($properties as $propertyName)
+			{
+				$this->appendLine("		unset(\$this->{$attributeName}['{$propertyName}']);");
+			}
+		}
+		$this->appendLine ( "	}");
+		
 		$this->appendLine("}");
 	}
 	
