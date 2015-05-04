@@ -3,7 +3,7 @@
  * @package api
  * @subpackage objects
  */
-class KalturaLiveChannelSegment extends KalturaObject implements IFilterable
+class KalturaLiveChannelSegment extends KalturaObject implements IRelatedFilterable
 {
 	/**
 	 * Unique identifier

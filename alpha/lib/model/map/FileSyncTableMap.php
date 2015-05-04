@@ -57,6 +57,7 @@ class FileSyncTableMap extends TableMap {
 		$this->addColumn('FILE_PATH', 'FilePath', 'VARCHAR', false, 128, null);
 		$this->addColumn('FILE_SIZE', 'FileSize', 'BIGINT', false, null, null);
 		$this->addColumn('DELETED_ID', 'DeletedId', 'BIGINT', false, null, null);
+		$this->addColumn('CUSTOM_DATA', 'CustomData', 'LONGVARCHAR', false, null, null);
 		// validators
 	} // initialize()
 

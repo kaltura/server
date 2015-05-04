@@ -140,6 +140,7 @@ class KalturaEntryService extends KalturaBaseService
 		$tempDbEntry->setDisplayInSearch(mySearchUtils::DISPLAY_IN_SEARCH_SYSTEM);
 		$tempDbEntry->setPartnerId($dbEntry->getPartnerId());
 		$tempDbEntry->setReplacedEntryId($dbEntry->getId());
+		$tempDbEntry->setIsTemporary(true);
 		$tempDbEntry->save();
 		
 		$dbEntry->setReplacingEntryId($tempDbEntry->getId());
@@ -697,8 +698,10 @@ class KalturaEntryService extends KalturaBaseService
 			if($srcEntryId)
 			{
 				$srcEntry = entryPeer::retrieveByPKNoFilter($srcEntryId);
-				if($srcEntry)
+				if($srcEntry) {
+					$dbEntry->setSourceEntryId($srcEntryId);
 					$dbEntry->setRootEntryId($srcEntry->getRootEntryId(true));
+				}
 			}
 			
 			$dbEntry->setOperationAttributes($operationAttributes);
@@ -979,7 +982,7 @@ class KalturaEntryService extends KalturaBaseService
 	 * @param string $entryId Media entry id
 	 * @param int $conversionProfileId
 	 * @param KalturaConversionAttributeArray $dynamicConversionAttributes
-	 * @return int job id
+	 * @return bigint job id
 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
 	 * @throws KalturaErrors::CONVERSION_PROFILE_ID_NOT_FOUND
 	 * @throws KalturaErrors::FLAVOR_PARAMS_NOT_FOUND
@@ -1214,6 +1217,9 @@ class KalturaEntryService extends KalturaBaseService
 	{
 		myDbHelper::$use_alternative_con = myDbHelper::DB_HELPER_CONN_PROPEL3;
 
+		if(!$filter)
+			$filter = new KalturaBaseEntryFilter();
+			
 		$c = $filter->prepareEntriesCriteriaFilter();
 		$c->applyFilters();
 		$totalCount = $c->getRecordsCount();

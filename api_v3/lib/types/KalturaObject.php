@@ -389,6 +389,10 @@ abstract class KalturaObject
 		// trigger validation
 		$responseProfile->toObject();
 		
+		if(!$responseProfile->relatedProfiles)
+			return;
+			
+		$this->relatedObjects = new KalturaListResponseArray();
 		foreach($responseProfile->relatedProfiles as $relatedProfile)
 		{
 			/* @var $relatedProfile KalturaDetachedResponseProfile */
@@ -669,11 +673,12 @@ abstract class KalturaObject
 	
 	public function validateForInsert($propertiesToSkip = array())
 	{
-		$reflector = KalturaTypeReflectorCacher::get(get_class($this));
+		$className = get_class($this);
+		$reflector = KalturaTypeReflectorCacher::get($className);
 		$properties = $reflector->getProperties();
 		
-		if ($reflector->requiresInsertPermission()&& !kPermissionManager::getInsertPermitted(get_class($this), kApiParameterPermissionItem::ALL_VALUES_IDENTIFIER)) {
-			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_NO_INSERT_PERMISSION, get_class($this));
+		if ($reflector->requiresInsertPermission()&& !kPermissionManager::getInsertPermitted($className, kApiParameterPermissionItem::ALL_VALUES_IDENTIFIER)) {
+			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_NO_INSERT_PERMISSION, $className);
 		}
 		
 		foreach($properties as $property)
@@ -702,7 +707,7 @@ abstract class KalturaObject
 					}
 				}
 
-				$this->validateHtmlTags($property);
+				$this->validateHtmlTags($className, $property);
 			}
 		}
 	}
@@ -710,11 +715,12 @@ abstract class KalturaObject
 	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
 	{
 		$updatableProperties = array();
-		$reflector = KalturaTypeReflectorCacher::get(get_class($this));
+		$className = get_class($this);
+		$reflector = KalturaTypeReflectorCacher::get($className);
 		$properties = $reflector->getProperties();
 		
-		if ($reflector->requiresUpdatePermission()&& !kPermissionManager::getUpdatePermitted(get_class($this), kApiParameterPermissionItem::ALL_VALUES_IDENTIFIER)) {
-			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_NO_UPDATE_PERMISSION, get_class($this));
+		if ($reflector->requiresUpdatePermission()&& !kPermissionManager::getUpdatePermitted($className, kApiParameterPermissionItem::ALL_VALUES_IDENTIFIER)) {
+			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_NO_UPDATE_PERMISSION, $className);
 		}
 		
 		foreach($properties as $property)
@@ -757,7 +763,7 @@ abstract class KalturaObject
 					}
 				}
 
-				$this->validateHtmlTags($property);
+				$this->validateHtmlTags($className, $property);
 			}
 		}
 		
@@ -767,7 +773,7 @@ abstract class KalturaObject
 	/**
 	 * @param KalturaPropertyInfo $property
 	 */
-	public function validateHtmlTags( $property )
+	public function validateHtmlTags( $className, $property )
 	{
 		if ( $property->getType() != 'string' )
 		{
@@ -775,7 +781,8 @@ abstract class KalturaObject
 		}
 
 		$propName = $property->getName();
-		return requestUtils::stripUnsafeHtmlTags($this->$propName, $propName);
+		$value = $this->$propName;
+		return kHtmlPurifier::purify($className, $propName, $value);
 	}
 
 	public function validateForUsage($sourceObject, $propertiesToSkip = array())

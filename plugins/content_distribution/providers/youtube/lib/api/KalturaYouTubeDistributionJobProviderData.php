@@ -149,9 +149,8 @@ class KalturaYouTubeDistributionJobProviderData extends KalturaConfigurableDistr
 			$this->sftpMetadataFilename = $feed->getMetadataTempFileName();
 		}
 
-		$partnerId = $distributionJobData->distributionProfile->partnerId;
 		$distributionProfileId = $distributionJobData->distributionProfile->id;
-		$this->loadGoogleConfig($partnerId, $distributionProfileId);
+		$this->loadGoogleConfig($distributionProfileId);
 	}
 		
 	private static $map_between_objects = array
@@ -170,37 +169,23 @@ class KalturaYouTubeDistributionJobProviderData extends KalturaConfigurableDistr
 	}
 
 	/**
-	 * @param $partnerId
-	 * @param $distributionProfileId
-	 * @return void
+	 * @param int $distributionProfileId
 	 */
-	protected function loadGoogleConfig($partnerId, $distributionProfileId)
+	protected function loadGoogleConfig($distributionProfileId)
 	{
 		$appConfigId = 'youtubepartner'; // config section for configuration/google_auth.ini
-		$tokenSubId = $distributionProfileId;
 		$authConfig = kConf::get($appConfigId, 'google_auth', null);
 
 		$this->googleClientId = isset($authConfig['clientId']) ? $authConfig['clientId'] : null;
 		$this->googleClientSecret = isset($authConfig['clientSecret']) ? $authConfig['clientSecret'] : null;
+	
+		$distributionProfile = DistributionProfilePeer::retrieveByPK($distributionProfileId);
+		/* @var $distributionProfile YoutubeApiDistributionProfile */
 
-		/** @var Partner $partner */
-		$partner = PartnerPeer::retrieveByPK($partnerId);
-
-		// try to load based on the sub id,
-		// it means that we have a custom auth config for the distribution profile
-		$tokenData = $partner->getFromCustomData($appConfigId.'_'.$tokenSubId, 'googleAuth');
+		$tokenData = $distributionProfile->getGoogleOAuth2Data();
 		if ($tokenData)
 		{
 			$this->googleTokenData = json_encode($tokenData);
-			return;
-		}
-
-		// now try to load base on the app config id
-		$tokenData = $partner->getFromCustomData($appConfigId, 'googleAuth');
-		if ($tokenData)
-		{
-			$this->googleTokenData = serialize($tokenData);
-			return;
 		}
 	}
 }

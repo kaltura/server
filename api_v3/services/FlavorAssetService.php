@@ -626,7 +626,7 @@ class FlavorAssetService extends KalturaAssetService
 			throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_IS_NOT_READY);
 	
 		if($storageId)
-			return $assetDb->getExternalUrl($storageId);
+			return $assetDb->getExternalUrl($storageId, $options->fileName);
 		
 		// Validate for download
 		$entryDb = entryPeer::retrieveByPK($assetDb->getEntryId());
@@ -634,7 +634,7 @@ class FlavorAssetService extends KalturaAssetService
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $assetDb->getEntryId());
 		
 		$shouldServeFlavor = false;
-		if($entryDb->getType() == entryType::MEDIA_CLIP)
+		if($entryDb->getType() == entryType::MEDIA_CLIP &&!in_array($assetDb->getPartnerId(),kConf::get('legacy_get_url_partners', 'local', array())))
 		{
 			$shouldServeFlavor = true;
 			$preview = null;
@@ -660,7 +660,8 @@ class FlavorAssetService extends KalturaAssetService
  
 		if ($shouldServeFlavor)
 			return $assetDb->getServeFlavorUrl($preview, $options->fileName);
-		return $assetDb->getDownloadUrl(true, $forceProxy,$previewFileSize);
+		
+		return $assetDb->getDownloadUrl(true, $forceProxy,$previewFileSize, $options->fileName);
 	}
 	
 	/**

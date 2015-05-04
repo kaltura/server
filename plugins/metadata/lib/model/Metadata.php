@@ -24,6 +24,13 @@ class Metadata extends BaseMetadata implements IIndexable, ISyncableFile
 	 * @var MetadataProfile
 	 */
 	protected $aMetadataProfile;
+
+	/**
+	 * Metadata is counted as new during the metadata.add API
+	 *
+	 * @var bool
+	 */
+	protected $likeNew = false;
 	
 	/* (non-PHPdoc)
 	 * @see metadata/lib/model/om/BaseMetadata#preInsert()
@@ -215,5 +222,21 @@ class Metadata extends BaseMetadata implements IIndexable, ISyncableFile
 	{
 		if ($this->getObjectType() == MetadataObjectType::DYNAMIC_OBJECT)
 			kEventsManager::raiseEventDeferred(new kObjectReadyForIndexEvent($this));
+	}
+
+	/**
+	 * @return boolean
+	 */
+	public function isLikeNew()
+	{
+		return $this->likeNew;
+	}
+
+	/**
+	 * @param boolean $likeNew
+	 */
+	public function setLikeNew($likeNew)
+	{
+		$this->likeNew = $likeNew;
 	}
 } // Metadata

@@ -199,6 +199,7 @@ foreach($config as $name => $item)
 		}
 		
 		$instance = $reflectionClass->newInstance($tmpXmlFileName, $item);
+		/* @var $instance ClientGeneratorFromXml */
 		
 		if($item->get("generateDocs"))
 			$instance->setGenerateDocs($item->get("generateDocs"));
@@ -226,6 +227,7 @@ foreach($config as $name => $item)
 	else if ($fromPhp)
 	{
 		$instance = $reflectionClass->newInstance();
+		/* @var $instance ClientGeneratorFromPhp */
 		$instance->setIncludeOrExcludeList($include, $exclude, $excludePaths);
 		$instance->setIgnoreList($ignore);
 		$instance->setAdditionalList($additional);
@@ -314,6 +316,7 @@ foreach($config as $name => $item)
 			file_put_contents($filePath, $data);
 		}
 	}
+	$instance->done($outputPath);
 	umask($oldMask);
 	
 	//delete the api services xml schema file

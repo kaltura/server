@@ -1254,7 +1254,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 			$maxCategoriesPerEntry = entry::MAX_CATEGORIES_PER_ENTRY_DISABLE_LIMIT_FEATURE;
 			
 		// When batch move entry between categories it's adding the new category before deleting the old one
-		if(kCurrentContext::$ks_partner_id = Partner::BATCH_PARTNER_ID && kCurrentContext::$ks_object)
+		if(kCurrentContext::$ks_partner_id == Partner::BATCH_PARTNER_ID && kCurrentContext::$ks_object)
 		{
 			$batchJobType = kCurrentContext::$ks_object->getPrivilegeValue(ks::PRIVILEGE_BATCH_JOB_TYPE);
 			if(intval($batchJobType) == BatchJobType::MOVE_CATEGORY_ENTRIES)
@@ -1775,6 +1775,9 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	public function setReplacedEntryId ( $v )	{	$this->putInCustomData ( "replacedEntryId" , $v );	}
 	public function getReplacedEntryId (  )		{	return $this->getFromCustomData( "replacedEntryId" );	}
 
+	public function setIsTemporary ( $v )	{	$this->putInCustomData ( "isTemporary" , $v );	}
+	public function getIsTemporary (  )		{	return $this->getFromCustomData( "isTemporary", null, false );	}
+
 	public function setReplacementOptions ($v)  {	$this->putInCustomData ( "replacementOptions" , $v );	}
 	public function getReplacementOptions (  )	{	return $this->getFromCustomData( "replacementOptions", null, new kEntryReplacementOptions() );	}
 
@@ -1814,6 +1817,9 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	
 	public function setParentEntryId($v)	{ $this->putInCustomData("parentEntryId", $v); }
 	public function getParentEntryId() 		{ return $this->getFromCustomData( "parentEntryId", null, null ); }
+
+	public function setSourceEntryId($v)	{ $this->putInCustomData("sourceEntryId", $v); }
+	public function getSourceEntryId() 		{ return $this->getFromCustomData( "sourceEntryId", null, null ); }
 	
 	public function getParentEntry()
 	{
@@ -3313,7 +3319,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	 */
 	public function isCustomDataModified($name = null, $namespace = '')
 	{
-		if(isset($this->oldCustomDataValues[$namespace]) && (is_null($name) || isset($this->oldCustomDataValues[$namespace][$name])))
+		if(isset($this->oldCustomDataValues[$namespace]) && (is_null($name) || array_key_exists($name, $this->oldCustomDataValues[$namespace])))
 		{
 			return true;
 		}

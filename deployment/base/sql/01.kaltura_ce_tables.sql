@@ -902,6 +902,7 @@ CREATE TABLE IF NOT EXISTS `file_sync` (
   `file_size` bigint(20) DEFAULT NULL,
   `custom_data` text,
   `deleted_id` bigint(20) DEFAULT NULL,
+  `custom_data` text,
   PRIMARY KEY (`id`),
   UNIQUE KEY `unique_index` (`object_id`,`object_type`,`version`,`object_sub_type`,`dc`,`deleted_id`),
   KEY `linked_id_indx` (`linked_id`),

@@ -384,8 +384,55 @@ abstract class CuePoint extends BaseCuePoint implements IIndexable
 		return null;
 	}
 
-	public function copyFromLiveToVodEntry( $liveEntry, $vodEntry, $adjustedStartTime )
+	public function copyFromLiveToVodEntry( $vodEntry, $adjustedStartTime )
 	{
+		return null;
+	}
+
+	public function copyToClipEntry( entry $clipEntry, $clipStartTime, $clipDuration )
+	{
+		if ( $this->shouldCopyToClip($clipStartTime, $clipDuration) && $this->hasPermissionToCopyToEntry($clipEntry) ) {
+			$newCuePoint = $this->copyToEntry($clipEntry);
+			if ( $newCuePoint->getStartTime() ) {
+				$newCuePoint->setStartTime( $newCuePoint->getStartTime() - $clipStartTime );
+			}
+			if ( !is_null($newCuePoint->getEndTime()) ) {
+				$newCuePoint->setEndTime( $newCuePoint->getEndTime() - $clipStartTime );
+				if ( $newCuePoint->getEndTime() > $clipDuration ) {
+					$newCuePoint->setEndTime( $clipDuration );
+				}
+			}
+			$newCuePoint->save();
+		}
+	}
+
+	public function shouldCopyToClip( $clipStartTime, $clipDuration ) {
+		if ( $this->getStartTime() < $clipStartTime ) {
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * @param entry $entry
+	 * @return bool true if cuepoints should be copied to given entry
+	 */
+	public function hasPermissionToCopyToEntry( entry $entry )
+	{
+		if (!$entry->getIsTemporary()
+			&& !PermissionPeer::isValidForPartner(CuePointPermissionName::DO_NOT_COPY_CUE_POINTS_TO_CLIP, $entry->getPartnerId()))
+		{
+			return true;
+		}
+
+		if ($entry->getIsTemporary()
+			&& !PermissionPeer::isValidForPartner(CuePointPermissionName::DO_NOT_COPY_CUE_POINTS_TO_TRIMMED_ENTRY, $entry->getPartnerId()))
+		{
+			return true;
+		}
+
+		return false;
 	}
 
 	/**
