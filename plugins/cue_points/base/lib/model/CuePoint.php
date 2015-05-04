@@ -387,4 +387,26 @@ abstract class CuePoint extends BaseCuePoint implements IIndexable
 	public function copyFromLiveToVodEntry( $liveEntry, $vodEntry, $adjustedStartTime )
 	{
 	}
+
+	/**
+	 * Check if user is entry's owner or co-editor
+	 * @param $entryId
+	 */
+	public function isEntitledForEntry()
+	{
+		$dbEntry = entryPeer::retrieveByPK( $this->getEntryId() );
+		if ( !$dbEntry )
+			return false;
+
+		if ( kCurrentContext::$is_admin_session || kCurrentContext::getCurrentKsKuserId() == $dbEntry->getKuserId())
+			return true;
+
+		$entitledKusers = explode(',', $dbEntry->getEntitledKusersEdit());
+		if(in_array(kCurrentContext::getCurrentKsKuserId(), $entitledKusers))
+		{
+			return true;
+		}
+
+		return false;
+	}
 } // CuePoint

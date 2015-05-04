@@ -91,7 +91,7 @@ class KalturaQuestionCuePoint extends KalturaCuePoint
 		parent::doFromObject($dbObject, $responseProfile);
 		$this->optionalAnswers = KalturaOptionalAnswersArray::fromDbArray($dbObject->getOptionalAnswers(), $responseProfile);
 
-		if ( !$dbObject->isEntitledForCompleteInfo( $this->entryId ) ) {
+		if ( !$dbObject->isEntitledForEntry() ) {
 			$this->correctAnswerKeys = null;
 			$this->explanation = null; //?
 			//TODO hint?

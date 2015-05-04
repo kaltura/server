@@ -43,26 +43,4 @@ class QuestionCuePoint extends CuePoint //TODO: implements IMetadataObject
 
 	public function getCorrectAnswerKeys() {return $this->getFromCustomData(self::CUSTOM_DATA_CORRECT_ANSWER_KEYS, null, array() );}
 
-	/**
-	 * Check if user is entry's owner or co-editor
-	 * @param $entryId
-	 */
-	public function isEntitledForCompleteInfo( $entryId )
-	{
-		$dbEntry = entryPeer::retrieveByPK( $entryId );
-		if ( !$dbEntry )
-			return false;
-
-		if ( kCurrentContext::$is_admin_session || kCurrentContext::getCurrentKsKuserId() == $dbEntry->getKuserId())
-			return true;
-
-		$entitledKusers = explode(',', $dbEntry->getEntitledKusersEdit());
-		if(in_array(kCurrentContext::getCurrentKsKuserId(), $entitledKusers))
-		{
-			return true;
-		}
-
-		return false;
-	}
-
 }
