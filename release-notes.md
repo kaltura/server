@@ -1,3 +1,19 @@
+# Jupiter-10.11.0 #
+## Too many logs are written to file on batch ##
+
+### Configuration ###
+- update batch.ini
+Add the following parameters to the batch.ini [template] configuration
+logWorkerInterval										= 60
+#### Deployment Scripts ####
+
+None.
+
+#### Known Issues & Limitations ####
+
+None.
+
+
 # Jupiter-10.10.0 #
 ## Support marking file_sync's as directories ##
 

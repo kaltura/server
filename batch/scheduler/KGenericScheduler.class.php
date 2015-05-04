@@ -333,7 +333,7 @@ class KGenericScheduler
 				return false;
 		}
 
-		if (!isset($this->lastWorkerLog[$taskConfig->id]) || (time() >= ($this->lastWorkerLog[$taskConfig->id] + $this->logWorkerInterval)))
+		if ( !isset($this->lastWorkerLog[$taskConfig->id]) || (($this->logWorkerInterval >= 0) && (time() >= ($this->lastWorkerLog[$taskConfig->id] + $this->logWorkerInterval))) )
 		{
 			KalturaLog::debug("Worker [{$taskConfig->name}] id [{$taskConfig->id}] running batches [$runningBatches] max instances [{$taskConfig->maxInstances}]");
 			$this->lastWorkerLog[$taskConfig->id] = time();
