@@ -10,6 +10,11 @@ class KalturaOptionalAnswer extends KalturaObject {
 	/**
 	 * @var string
 	 */
+	public $key;
+
+	/**
+	 * @var string
+	 */
 	public $text;
 
 	/**
@@ -19,6 +24,7 @@ class KalturaOptionalAnswer extends KalturaObject {
 
 	private static $mapBetweenObjects = array
 	(
+		'key',
 		'text',
 		'weight',
 	);

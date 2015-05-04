@@ -9,6 +9,10 @@
 
 class kOptionalAnswer {
 
+	/**
+	 * @var string
+	 */
+	protected $key;
 
 	/**
 	 * @var string
@@ -19,6 +23,22 @@ class kOptionalAnswer {
 	 * @var float
 	 */
 	protected $weight = 1.0;
+
+	/**
+	 * @return string
+	 */
+	public function getKey()
+	{
+		return $this->key;
+	}
+
+	/**
+	 * @param string $key
+	 */
+	public function setKey($key)
+	{
+		$this->key = $key;
+	}
 
 	/**
 	 * @return string
