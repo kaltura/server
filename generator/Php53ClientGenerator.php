@@ -951,6 +951,7 @@ class Php53ClientGenerator extends ClientGeneratorFromXml
 		$this->appendLine ( "	 */");
 		$this->appendLine ( "	protected function resetRequest()");
 		$this->appendLine ( "	{");
+		$this->appendLine ( "		parent::resetRequest();");
 		foreach($volatileProperties as $attributeName => $properties)
 		{
 			foreach($properties as $propertyName)
