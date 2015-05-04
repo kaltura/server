@@ -33,19 +33,21 @@
 /*
  Constants
  */
-#define KALTURA_UNDEF_BOOL      ((BOOL)CHAR_MIN)
+#define KALTURA_UNDEF_BOOL      ([KalturaBool UNDEF_VALUE])
 #define KALTURA_UNDEF_INT       INT_MIN
 #define KALTURA_UNDEF_FLOAT     NAN
 #define KALTURA_UNDEF_STRING    (nil)
 #define KALTURA_UNDEF_OBJECT    (nil)
 
-#define KALTURA_NULL_BOOL   ((BOOL)CHAR_MAX)
+#define KALTURA_NULL_BOOL   ([KalturaBool NULL_VALUE])
 #define KALTURA_NULL_INT    INT_MAX
 #define KALTURA_NULL_FLOAT  INFINITY
 #define KALTURA_NULL_STRING (@"__null_string__")
 #define KALTURA_NULL_OBJECT ([[[KalturaObjectBase alloc] init] autorelease])
 
 extern NSString* const KalturaClientErrorDomain;
+
+typedef int KALTURA_BOOL;
 
 typedef enum {
     KalturaClientErrorAPIException = 1,
@@ -72,6 +74,7 @@ typedef enum
     KFT_String,
     KFT_Object,
     KFT_Array,
+	KFT_Dictionary,
 } KalturaFieldType;
 
 /*
@@ -85,6 +88,16 @@ typedef enum
 @class KalturaClientBase;
 
 /*
+ Class KalturaBool
+ */
+@interface KalturaBool : NSObject
++ (KALTURA_BOOL)NO_VALUE;
++ (KALTURA_BOOL)YES_VALUE;
++ (KALTURA_BOOL)NULL_VALUE;
++ (KALTURA_BOOL)UNDEF_VALUE;
+@end
+
+/*
  Class KalturaClientException
  */
 @interface KalturaClientException : NSException
@@ -95,7 +108,7 @@ typedef enum
  */
 @interface KalturaSimpleTypeParser : NSObject
 
-+ (BOOL)parseBool:(NSString*)aStr;
++ (KALTURA_BOOL)parseBool:(NSString*)aStr;
 + (int)parseInt:(NSString*)aStr;
 + (double)parseFloat:(NSString*)aStr;
 
@@ -146,12 +159,13 @@ typedef enum
 - (void)putKey:(NSString*)aKey withString:(NSString*)aVal;
 - (void)putNullKey:(NSString*)aKey;
 - (void)addIfDefinedKey:(NSString*)aKey withFileName:(NSString*)aFileName;
-- (void)addIfDefinedKey:(NSString*)aKey withBool:(BOOL)aVal;
+- (void)addIfDefinedKey:(NSString*)aKey withBool:(KALTURA_BOOL)aVal;
 - (void)addIfDefinedKey:(NSString*)aKey withInt:(int)aVal;
 - (void)addIfDefinedKey:(NSString*)aKey withFloat:(double)aVal;
 - (void)addIfDefinedKey:(NSString*)aKey withString:(NSString*)aVal;
 - (void)addIfDefinedKey:(NSString*)aKey withObject:(KalturaObjectBase*)aVal;
 - (void)addIfDefinedKey:(NSString*)aKey withArray:(NSArray*)aVal;
+- (void)addIfDefinedKey:(NSString*)aKey withDictionary:(NSDictionary*)aVal;
 - (void)sign;
 - (void)addToRequest:(ASIFormDataRequest*)aRequest;
 - (void)appendQueryString:(NSMutableString*)output;
@@ -192,9 +206,9 @@ typedef enum
 @end
 
 /*
- Class KalturaClientConfiguration
+ Class KalturaConfiguration
  */
-@interface KalturaClientConfiguration : NSObject
+@interface KalturaConfiguration : NSObject
 
 @property (nonatomic, copy) NSString* serviceUrl;
 @property (nonatomic, copy) NSString* clientTag;
@@ -228,7 +242,7 @@ typedef enum
     NSDate* _apiStartTime;
 }
 
-@property (nonatomic, retain) KalturaClientConfiguration* config;
+@property (nonatomic, retain) KalturaConfiguration* config;
 @property (nonatomic, retain) NSError* error;
 @property (nonatomic, assign) id<KalturaClientDelegate> delegate;
 @property (nonatomic, assign) id<ASIProgressDelegate> uploadProgressDelegate;
@@ -239,7 +253,7 @@ typedef enum
 @property (nonatomic, readonly) NSDictionary* responseHeaders;
 
     // public messages
-- (id)initWithConfig:(KalturaClientConfiguration*)aConfig;
+- (id)initWithConfig:(KalturaConfiguration*)aConfig;
 - (void)startMultiRequest;
 - (NSArray*)doMultiRequest;
 - (void)cancelRequest;
@@ -248,7 +262,7 @@ typedef enum
     // messages for use of auto-gen service code
 - (NSString*)queueServeService:(NSString*)aService withAction:(NSString*)aAction;
 - (void)queueVoidService:(NSString*)aService withAction:(NSString*)aAction;
-- (BOOL)queueBoolService:(NSString*)aService withAction:(NSString*)aAction;
+- (KALTURA_BOOL)queueBoolService:(NSString*)aService withAction:(NSString*)aAction;
 - (int)queueIntService:(NSString*)aService withAction:(NSString*)aAction;
 - (double)queueFloatService:(NSString*)aService withAction:(NSString*)aAction;
 - (NSString*)queueStringService:(NSString*)aService withAction:(NSString*)aAction;

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<database defaultPhpNamingMethod="underscore" heavyIndexing="false" name="propel" defaultIdMethod="native" package="plugins.businessProcessNotification">
+	<table skipSql="false" abstract="true" name="business_process_server">
+		<column lazyLoad="false" name="id" type="integer" required="true" primaryKey="true" autoIncrement="true" />
+		<column primaryKey="false" required="false" lazyLoad="false" name="created_at" type="timestamp" />
+		<column primaryKey="false" required="false" lazyLoad="false" name="updated_at" type="timestamp" />
+		<column primaryKey="false" required="false" lazyLoad="false" name="partner_id" type="integer" />
+		<column primaryKey="false" required="false" lazyLoad="false" name="name" type="varchar" size="31" />
+		<column primaryKey="false" required="false" lazyLoad="false" name="system_name" type="varchar" size="127" />
+		<column primaryKey="false" required="false" lazyLoad="false" name="description" type="varchar" size="255" />
+		<column primaryKey="false" required="false" lazyLoad="false" name="status" type="tinyint" />
+		<column primaryKey="false" required="false" lazyLoad="false" name="type" type="integer" inheritance="single" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="custom_data" type="longvarchar" />	
+	</table>
+</database>

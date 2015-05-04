@@ -51,7 +51,7 @@ class EntryDistributionService extends KalturaBaseService
 		$dbEntryDistribution->save();
 		
 		$entryDistribution = new KalturaEntryDistribution();
-		$entryDistribution->fromObject($dbEntryDistribution);
+		$entryDistribution->fromObject($dbEntryDistribution, $this->getResponseProfile());
 		return $entryDistribution;
 	}
 	
@@ -70,7 +70,7 @@ class EntryDistributionService extends KalturaBaseService
 			throw new KalturaAPIException(ContentDistributionErrors::ENTRY_DISTRIBUTION_NOT_FOUND, $id);
 			
 		$entryDistribution = new KalturaEntryDistribution();
-		$entryDistribution->fromObject($dbEntryDistribution);
+		$entryDistribution->fromObject($dbEntryDistribution, $this->getResponseProfile());
 		return $entryDistribution;
 	}
 	
@@ -110,7 +110,7 @@ class EntryDistributionService extends KalturaBaseService
 		$dbEntryDistribution->save();
 
 		$entryDistribution = new KalturaEntryDistribution();
-		$entryDistribution->fromObject($dbEntryDistribution);
+		$entryDistribution->fromObject($dbEntryDistribution, $this->getResponseProfile());
 		return $entryDistribution;
 	}
 	
@@ -133,7 +133,7 @@ class EntryDistributionService extends KalturaBaseService
 		$dbEntryDistribution->save();
 		
 		$entryDistribution = new KalturaEntryDistribution();
-		$entryDistribution->fromObject($dbEntryDistribution);
+		$entryDistribution->fromObject($dbEntryDistribution, $this->getResponseProfile());
 		return $entryDistribution;
 	}
 	
@@ -168,23 +168,10 @@ class EntryDistributionService extends KalturaBaseService
 		if (!$filter)
 			$filter = new KalturaEntryDistributionFilter();
 			
-		$c = new Criteria();
-		$entryDistributionFilter = new EntryDistributionFilter();
-		$filter->toObject($entryDistributionFilter);
-		
-		$entryDistributionFilter->attachToCriteria($c);
-		$count = EntryDistributionPeer::doCount($c);
-		
 		if (! $pager)
 			$pager = new KalturaFilterPager ();
-		$pager->attachToCriteria ( $c );
-		$list = EntryDistributionPeer::doSelect($c);
-		
-		$response = new KalturaEntryDistributionListResponse();
-		$response->objects = KalturaEntryDistributionArray::fromDbArray($list);
-		$response->totalCount = $count;
-	
-		return $response;
+			
+		return $filter->getListResponse($pager, $this->getResponseProfile());
 	}
 	
 	/**
@@ -229,7 +216,7 @@ class EntryDistributionService extends KalturaBaseService
 
 		$dbEntryDistribution->reload();
 		$entryDistribution = new KalturaEntryDistribution();
-		$entryDistribution->fromObject($dbEntryDistribution);
+		$entryDistribution->fromObject($dbEntryDistribution, $this->getResponseProfile());
 		return $entryDistribution;
 	}
 
@@ -271,7 +258,7 @@ class EntryDistributionService extends KalturaBaseService
 
 		$dbEntryDistribution->reload();
 		$entryDistribution = new KalturaEntryDistribution();
-		$entryDistribution->fromObject($dbEntryDistribution);
+		$entryDistribution->fromObject($dbEntryDistribution, $this->getResponseProfile());
 		return $entryDistribution;
 	}
 
@@ -311,7 +298,7 @@ class EntryDistributionService extends KalturaBaseService
 
 		$dbEntryDistribution->reload();
 		$entryDistribution = new KalturaEntryDistribution();
-		$entryDistribution->fromObject($dbEntryDistribution);
+		$entryDistribution->fromObject($dbEntryDistribution, $this->getResponseProfile());
 		return $entryDistribution;
 	}
 
@@ -353,7 +340,7 @@ class EntryDistributionService extends KalturaBaseService
 
 		$dbEntryDistribution->reload();
 		$entryDistribution = new KalturaEntryDistribution();
-		$entryDistribution->fromObject($dbEntryDistribution);
+		$entryDistribution->fromObject($dbEntryDistribution, $this->getResponseProfile());
 		return $entryDistribution;
 	}
 
@@ -409,7 +396,7 @@ class EntryDistributionService extends KalturaBaseService
 		}
 
 		$entryDistribution = new KalturaEntryDistribution();
-		$entryDistribution->fromObject($dbEntryDistribution);
+		$entryDistribution->fromObject($dbEntryDistribution, $this->getResponseProfile());
 		return $entryDistribution;
 	}
 

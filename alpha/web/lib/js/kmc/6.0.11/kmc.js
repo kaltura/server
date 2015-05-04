@@ -1,6 +1,6 @@
-/*! KMC - v6.0.11 - 2014-11-23
+/*! KMC - v6.0.11 - 2015-03-25
 * https://github.com/kaltura/KMC_V2
-* Copyright (c) 2014 Amir Chervinsky; Licensed GNU */
+* Copyright (c) 2015 Amir Chervinsky; Licensed GNU */
 /**
  * angular-translate - v1.1.1 - 2013-11-24
  * http://github.com/PascalPrecht/angular-translate
@@ -3400,6 +3400,12 @@ if ( window.XDomainRequest ) {
             if (previewService.get('live') == true){
                 flashVars.disableEntryRedirect = true;
             }
+			flashVars['liveAnalytics'] = {
+				"plugin": "false",                // prevent loading the liveAnalytics plugin in v2 players
+				"relativeTo": "PlayerHolder",     // required to prevent v1 players from getting stuck
+				"position": "after",              // required to prevent v1 players from getting stuck
+				"loadingPolicy": "onDemand"       // prevent v1 players from trying to load this plugin
+			};
 		}
 
 		var playlistId = previewService.get('playlistId');
@@ -3722,6 +3728,9 @@ kmcApp.controller('PreviewCtrl', ['$scope', '$translate', 'previewService', func
 	$scope.$watch('deliveryType', function() {
 		var deliveryType = Preview.getObjectById($scope.deliveryType, $scope.deliveryTypes);
 		previewService.set('deliveryType', deliveryType);
+		if ( deliveryType.id === "hds" ){
+			$scope.secureEmbed = false;
+		}
 	});
 	$scope.$watch('embedType', function() {
 		previewService.set('embedType', $scope.embedType);

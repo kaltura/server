@@ -10,7 +10,7 @@
             with path "/etc/my.cnf"
             # Reload mysql if the my.cnf file was changed
             if changed checksum
-               then exec "service mysqld reload"
+               then exec "/sbin/service mysqld reload"
 
         check file mysqld
             with path "/usr/bin/mysqld_safe"

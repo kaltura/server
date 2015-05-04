@@ -5,15 +5,15 @@
  */
 class KalturaDataEntryArray extends KalturaTypedArray
 {
-	public static function fromEntryArray ( $arr )
+	public static function fromDbArray(array $arr, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		$newArr = new KalturaDataEntryArray();
 		if ($arr == null)
 			return $newArr;		
 		foreach ($arr as $obj)
 		{
-			$nObj = new KalturaDataEntry();
-			$nObj->fromObject($obj);
+    		$nObj = KalturaEntryFactory::getInstanceByType($obj->getType());
+			$nObj->fromObject($obj, $responseProfile);
 			$newArr[] = $nObj;
 		}
 		

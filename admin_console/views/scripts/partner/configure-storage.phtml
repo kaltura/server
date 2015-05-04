@@ -11,12 +11,16 @@ jQuery('[class=commentForm]').toggle();
 jQuery(document).ready(function() {
 	// Get selected storage protocol
 	var protocolUpdateView = function( protocol ) {
+
+		setKeyPairSettings(false);
 		
 		switch ( protocol )
 		{
 		case "<?php echo Kaltura_Client_Enum_StorageProfileProtocol::S3?>":				
 			jQuery('#filesPermissionInS3-label').css('visibility', 'visible');
 			jQuery('#filesPermissionInS3').css('visibility', 'visible');
+			jQuery('#s3Region-label').css('visibility', 'visible');
+			jQuery('#s3Region').css('visibility', 'visible');
 			jQuery('#storageFtpPassiveMode').css('visibility', 'hidden');
 			jQuery('#storageFtpPassiveMode-label').css('visibility', 'hidden');
 			break;
@@ -25,10 +29,17 @@ jQuery(document).ready(function() {
 			jQuery('#storageFtpPassiveMode-label').css('visibility', 'visible');
 			jQuery('#filesPermissionInS3-label').css('visibility', 'hidden');
 			jQuery('#filesPermissionInS3').css('visibility', 'hidden');			
+			jQuery('#s3Region-label').css('visibility', 'hidden');
+			jQuery('#s3Region').css('visibility', 'hidden');
 			break;
+		case "<?php echo Kaltura_Client_Enum_StorageProfileProtocol::SFTP?>":
+			setKeyPairSettings(true);
+			// No break, the rest of the settings should be as default
 		default:
 			jQuery('#filesPermissionInS3').css('visibility', 'hidden');
 			jQuery('#filesPermissionInS3-label').css('visibility', 'hidden');
+			jQuery('#s3Region-label').css('visibility', 'hidden');
+			jQuery('#s3Region').css('visibility', 'hidden');
 			jQuery('#storageFtpPassiveMode').css('visibility', 'hidden');
 			jQuery('#storageFtpPassiveMode-label').css('visibility', 'hidden');
 			break;
@@ -44,6 +55,20 @@ jQuery(document).ready(function() {
 
 	updatedUI();
 });
+
+function setKeyPairSettings(enable) {
+	var val = enable ? 'visible' : 'hidden';
+	jQuery('#sshPublicKey').css('visibility', val);
+	jQuery('#sshPublicKey-label').css('visibility', val);
+	jQuery('#publicKey').css('visibility', val);
+	jQuery('#publicKey-label').css('visibility', val);
+	jQuery('#sshPrivateKey').css('visibility', val);
+	jQuery('#sshPrivateKey-label').css('visibility', val);
+	jQuery('#privateKey').css('visibility', val);
+	jQuery('#privateKey-label').css('visibility', val);
+	jQuery('#passPhrase').css('visibility', val);
+	jQuery('#passPhrase-label').css('visibility', val);
+}
 
 function assignDeliveryProfile(format, currentDps)
 {

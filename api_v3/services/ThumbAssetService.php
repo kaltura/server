@@ -90,7 +90,7 @@ class ThumbAssetService extends KalturaAssetService
 		$dbThumbAsset->save();
 
 		$thumbAsset = KalturaThumbAsset::getInstanceByType($dbThumbAsset->getType());
-		$thumbAsset->fromObject($dbThumbAsset);
+		$thumbAsset->fromObject($dbThumbAsset, $this->getResponseProfile());
 		return $thumbAsset;
     }
     
@@ -151,7 +151,7 @@ class ThumbAssetService extends KalturaAssetService
 		}
 		
 		$thumbAsset = KalturaThumbAsset::getInstanceByType($dbThumbAsset->getType());
-		$thumbAsset->fromObject($dbThumbAsset);
+		$thumbAsset->fromObject($dbThumbAsset, $this->getResponseProfile());
 		return $thumbAsset;
     }
 	
@@ -184,7 +184,7 @@ class ThumbAssetService extends KalturaAssetService
 			$this->setAsDefaultAction($dbThumbAsset->getId());
 			
 		$thumbAsset = KalturaThumbAsset::getInstanceByType($dbThumbAsset->getType());
-		$thumbAsset->fromObject($dbThumbAsset);
+		$thumbAsset->fromObject($dbThumbAsset, $this->getResponseProfile());
 		return $thumbAsset;
     }
     
@@ -592,7 +592,7 @@ class ThumbAssetService extends KalturaAssetService
 			return null;
 			
 		$thumbAsset = new KalturaThumbAsset();
-		$thumbAsset->fromObject($dbThumbAsset);
+		$thumbAsset->fromObject($dbThumbAsset, $this->getResponseProfile());
 		return $thumbAsset;
 	}
 
@@ -665,7 +665,7 @@ class ThumbAssetService extends KalturaAssetService
 			return null;
 			
 		$thumbAsset = new KalturaThumbAsset();
-		$thumbAsset->fromObject($dbThumbAsset);
+		$thumbAsset->fromObject($dbThumbAsset, $this->getResponseProfile());
 		return $thumbAsset;
 	}
 
@@ -716,7 +716,7 @@ class ThumbAssetService extends KalturaAssetService
 			return null;
 			
 		$thumbAsset = new KalturaThumbAsset();
-		$thumbAsset->fromObject($dbThumbAsset);
+		$thumbAsset->fromObject($dbThumbAsset, $this->getResponseProfile());
 		return $thumbAsset;
 	}
 	
@@ -744,7 +744,7 @@ class ThumbAssetService extends KalturaAssetService
 		}
 		
 		$thumbAssets = KalturaThumbAsset::getInstanceByType($thumbAssetsDb->getType());
-		$thumbAssets->fromObject($thumbAssetsDb);
+		$thumbAssets->fromObject($thumbAssetsDb, $this->getResponseProfile());
 		return $thumbAssets;
 	}
 	
@@ -773,7 +773,7 @@ class ThumbAssetService extends KalturaAssetService
 		$c->add(assetPeer::TYPE, assetType::THUMBNAIL, Criteria::EQUAL);
 		
 		$thumbAssetsDb = assetPeer::doSelect($c);
-		$thumbAssets = KalturaThumbAssetArray::fromDbArray($thumbAssetsDb);
+		$thumbAssets = KalturaThumbAssetArray::fromDbArray($thumbAssetsDb, $this->getResponseProfile());
 		return $thumbAssets;
 	}
 	
@@ -787,32 +787,22 @@ class ThumbAssetService extends KalturaAssetService
 	 */
 	function listAction(KalturaAssetFilter $filter = null, KalturaFilterPager $pager = null)
 	{
-		if (!$filter)
-			$filter = new KalturaAssetFilter();
-
-		if (!$pager)
-			$pager = new KalturaFilterPager();
+		if(!$filter)
+		{
+			$filter = new KalturaThumbAssetFilter();
+		}
+		elseif(! $filter instanceof KalturaThumbAssetFilter)
+		{
+			$filter = $filter->cast('KalturaThumbAssetFilter');
+		}
 			
-		$thumbAssetFilter = new AssetFilter();
-		
-		$filter->toObject($thumbAssetFilter);
-
-		$c = new Criteria();
-		$thumbAssetFilter->attachToCriteria($c);
-		
-		$thumbTypes = KalturaPluginManager::getExtendedTypes(assetPeer::OM_CLASS, assetType::THUMBNAIL);
-		$c->add(assetPeer::TYPE, $thumbTypes, Criteria::IN);
-		
-		$totalCount = assetPeer::doCount($c);
-		
-		$pager->attachToCriteria($c);
-		$dbList = assetPeer::doSelect($c);
-		
-		$list = KalturaThumbAssetArray::fromDbArray($dbList);
-		$response = new KalturaThumbAssetListResponse();
-		$response->objects = $list;
-		$response->totalCount = $totalCount;
-		return $response;    
+		if(!$pager)
+		{
+			$pager = new KalturaFilterPager();
+		}
+			
+		$types = KalturaPluginManager::getExtendedTypes(assetPeer::OM_CLASS, assetType::THUMBNAIL);
+		return $filter->getTypeListResponse($pager, $this->getResponseProfile(), $types);
 	}
 	
 	/**
@@ -854,7 +844,7 @@ class ThumbAssetService extends KalturaAssetService
 		$dbThumbAsset->save();
 		
 		$thumbAssets = new KalturaThumbAsset();
-		$thumbAssets->fromObject($dbThumbAsset);
+		$thumbAssets->fromObject($dbThumbAsset, $this->getResponseProfile());
 		return $thumbAssets;
 	}
 	
@@ -909,7 +899,7 @@ class ThumbAssetService extends KalturaAssetService
 				$this->setAsDefaultAction($dbThumbAsset->getId());
 			
 		$thumbAssets = new KalturaThumbAsset();
-		$thumbAssets->fromObject($dbThumbAsset);
+		$thumbAssets->fromObject($dbThumbAsset, $this->getResponseProfile());
 		return $thumbAssets;
 	}
 	
@@ -1032,7 +1022,7 @@ class ThumbAssetService extends KalturaAssetService
 		$fileSyncs = FileSyncPeer::doSelect($c);
 			
 		$listResponse = new KalturaRemotePathListResponse();
-		$listResponse->objects = KalturaRemotePathArray::fromFileSyncArray($fileSyncs);
+		$listResponse->objects = KalturaRemotePathArray::fromDbArray($fileSyncs, $this->getResponseProfile());
 		$listResponse->totalCount = count($listResponse->objects);
 		return $listResponse;
 	}

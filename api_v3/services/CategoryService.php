@@ -9,7 +9,12 @@ class CategoryService extends KalturaBaseService
 {
 	public function initService($serviceId, $serviceName, $actionName)
 	{
-		parent::initService($serviceId, $serviceName, $actionName); 	
+		parent::initService($serviceId, $serviceName, $actionName);
+
+		if($actionName == 'add')
+		{
+			categoryPeer::setIgnoreDeleted(true);
+		}
 	}
 	
 	/**
@@ -59,7 +64,7 @@ class CategoryService extends KalturaBaseService
 		}
 		
 		$category = new KalturaCategory();
-		$category->fromObject($categoryDb);
+		$category->fromObject($categoryDb, $this->getResponseProfile());
 		
 		return $category;
 	}
@@ -78,7 +83,7 @@ class CategoryService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::CATEGORY_NOT_FOUND, $id);
 		
 		$category = new KalturaCategory();
-		$category->fromObject($categoryDb);
+		$category->fromObject($categoryDb, $this->getResponseProfile());
 		return $category;
 	}
 	
@@ -122,7 +127,7 @@ class CategoryService extends KalturaBaseService
 
 		if (kEntitlementUtils::getEntitlementEnforcement())
 		{
-			$currentKuserCategoryKuser = categoryKuserPeer::retrieveByCategoryIdAndActiveKuserId($categoryDb->getId(), kCurrentContext::getCurrentKsKuserId());
+			$currentKuserCategoryKuser = categoryKuserPeer::retrievePermittedKuserInCategory($categoryDb->getId(), kCurrentContext::getCurrentKsKuserId());
 			if(!$currentKuserCategoryKuser || $currentKuserCategoryKuser->getPermissionLevel() != CategoryKuserPermissionLevel::MANAGER)
 				throw new KalturaAPIException(KalturaErrors::NOT_ENTITLED_TO_UPDATE_CATEGORY);
 		}
@@ -140,7 +145,7 @@ class CategoryService extends KalturaBaseService
 		}
 		
 		$category = new KalturaCategory();
-		$category->fromObject($categoryDb);
+		$category->fromObject($categoryDb, $this->getResponseProfile());
 		return $category;
 	}
 	
@@ -162,7 +167,7 @@ class CategoryService extends KalturaBaseService
 
 		if (kEntitlementUtils::getEntitlementEnforcement())
 		{
-			$currentKuserCategoryKuser = categoryKuserPeer::retrieveByCategoryIdAndActiveKuserId($categoryDb->getId(), kCurrentContext::getCurrentKsKuserId());
+			$currentKuserCategoryKuser = categoryKuserPeer::retrievePermittedKuserInCategory($categoryDb->getId(), kCurrentContext::getCurrentKsKuserId());
 			if(!$currentKuserCategoryKuser || $currentKuserCategoryKuser->getPermissionLevel() != CategoryKuserPermissionLevel::MANAGER)
 				throw new KalturaAPIException(KalturaErrors::NOT_ENTITLED_TO_UPDATE_CATEGORY);
 		}
@@ -198,38 +203,20 @@ class CategoryService extends KalturaBaseService
 	{
 		if ($filter === null)
 			$filter = new KalturaCategoryFilter();
-
+	
 		if ($pager == null)
 		{
 			$pager = new KalturaFilterPager();
-			//before falcon we didn’t have a pager for action category->list, 
-			//and since we added a pager – and remove the limit for partners categories, 
+			//before falcon we didn't have a pager for action category->list,
+			//and since we added a pager - and remove the limit for partners categories,
 			//for backward compatibility this will be the page size. 
 			$pager->pageIndex = 1;
 			$pager->pageSize = Partner::MAX_NUMBER_OF_CATEGORIES;
 			KalturaCriteria::setMaxRecords(Partner::MAX_NUMBER_OF_CATEGORIES);
 			baseObjectFilter::setMaxInValues(Partner::MAX_NUMBER_OF_CATEGORIES);
 		}
-
-		if ($filter->orderBy === null)
-			$filter->orderBy = KalturaCategoryOrderBy::DEPTH_ASC;
-			
-		$categoryFilter = new categoryFilter();
 		
-		$filter->toObject($categoryFilter);
-		
-		$c = KalturaCriteria::create(categoryPeer::OM_CLASS);
-		$categoryFilter->attachToCriteria($c);
-		$pager->attachToCriteria($c);
-		$dbList = categoryPeer::doSelect($c);
-		$totalCount = $c->getRecordsCount();
-		
-		$list = KalturaCategoryArray::fromCategoryArray($dbList);
-		
-		$response = new KalturaCategoryListResponse();
-		$response->objects = $list;
-		$response->totalCount = $totalCount;
-		return $response;
+		return $filter->getListResponse($pager, $this->getResponseProfile());
 	}
 	
 	/**

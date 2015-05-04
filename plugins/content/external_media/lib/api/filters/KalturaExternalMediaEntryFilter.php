@@ -40,4 +40,19 @@ class KalturaExternalMediaEntryFilter extends KalturaExternalMediaEntryBaseFilte
 		
 		return parent::toObject($coreFilter, $skip);
 	}
+	
+	/* (non-PHPdoc)
+	 * @see KalturaBaseEntryFilter::getListResponse()
+	 */
+	public function getListResponse(KalturaFilterPager $pager, KalturaDetachedResponseProfile $responseProfile = null)
+	{
+		list($list, $totalCount) = $this->doGetListResponse($pager);
+		
+	    $newList = KalturaExternalMediaEntryArray::fromDbArray($list, $responseProfile);
+		$response = new KalturaExternalMediaEntryListResponse();
+		$response->objects = $newList;
+		$response->totalCount = $totalCount;
+		
+		return $response;
+	}
 }

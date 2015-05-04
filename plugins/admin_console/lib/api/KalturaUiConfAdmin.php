@@ -10,7 +10,7 @@ class KalturaUiConfAdmin extends KalturaUiConf
 	 */
 	public $isPublic;
 	
-	public function fromObject($source_object)
+	public function doFromObject($source_object, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		if ($source_object instanceof uiConf)
 		{
@@ -20,7 +20,7 @@ class KalturaUiConfAdmin extends KalturaUiConf
 				$this->isPublic = false;
 		}
 		
-		return parent::fromObject($source_object);
+		return parent::doFromObject($source_object, $responseProfile);
 	}
 	
 	public function toObject($object_to_fill = null, $props_to_skip = array()) 

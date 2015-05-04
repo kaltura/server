@@ -49,7 +49,8 @@ class embedIframeJsAction extends sfAction
 		if ($autoEmbed)
 		{
 			$port = $_SERVER['SERVER_PORT'];
-			$host = "$protocol://" . kConf::get('html5lib_host') . ":$port/";
+			$host = "$protocol://". kConf::get('html5lib_host') ."/";
+
 		}
 
 		$iframeEmbed = $this->getRequestParameter('iframeembed');
@@ -104,7 +105,7 @@ class embedIframeJsAction extends sfAction
 			}
 		}
 
-		requestUtils::sendCachingHeaders(60);
+		requestUtils::sendCachingHeaders(60, true, time());
 		
 		kFile::cacheRedirect($url);
 		header("Location:$url");

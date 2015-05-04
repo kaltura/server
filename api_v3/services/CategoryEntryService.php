@@ -39,16 +39,15 @@ class CategoryEntryService extends KalturaBaseService
 			
 		$categoryEntries = categoryEntryPeer::retrieveActiveAndPendingByEntryId($categoryEntry->entryId);
 		
-		$maxCategoriesPerEntry = entry::MAX_CATEGORIES_PER_ENTRY;
-		if(PermissionPeer::isValidForPartner(PermissionName::FEATURE_DISABLE_CATEGORY_LIMIT, $entry->getPartnerId()))
-			$maxCategoriesPerEntry = entry::MAX_CATEGORIES_PER_ENTRY_DISABLE_LIMIT_FEATURE;
+		$maxCategoriesPerEntry = $entry->getMaxCategoriesPerEntry();
+			
 		if (count($categoryEntries) >= $maxCategoriesPerEntry)
 			throw new KalturaAPIException(KalturaErrors::MAX_CATEGORIES_FOR_ENTRY_REACHED, $maxCategoriesPerEntry);
 			
 		//validate user is entiteld to assign entry to this category 
 		if (kEntitlementUtils::getEntitlementEnforcement() && $category->getContributionPolicy() != ContributionPolicyType::ALL)
 		{
-			$categoryKuser = categoryKuserPeer::retrieveByCategoryIdAndActiveKuserId($categoryEntry->categoryId, kCurrentContext::getCurrentKsKuserId());
+			$categoryKuser = categoryKuserPeer::retrievePermittedKuserInCategory($categoryEntry->categoryId, kCurrentContext::getCurrentKsKuserId());
 			if(!$categoryKuser)
 			{
 				KalturaLog::err("User [" . kCurrentContext::getCurrentKsKuserId() . "] is not a member of the category [{$categoryEntry->categoryId}]");
@@ -85,7 +84,7 @@ class CategoryEntryService extends KalturaBaseService
 		
 		if (kEntitlementUtils::getEntitlementEnforcement() && $category->getModeration())
 		{
-			$categoryKuser = categoryKuserPeer::retrieveByCategoryIdAndActiveKuserId($categoryEntry->categoryId, kCurrentContext::getCurrentKsKuserId());
+			$categoryKuser = categoryKuserPeer::retrievePermittedKuserInCategory($categoryEntry->categoryId, kCurrentContext::getCurrentKsKuserId());
 			if(!$categoryKuser ||
 				($categoryKuser->getPermissionLevel() != CategoryKuserPermissionLevel::MANAGER && 
 				$categoryKuser->getPermissionLevel() != CategoryKuserPermissionLevel::MODERATOR))
@@ -105,7 +104,7 @@ class CategoryEntryService extends KalturaBaseService
 		myNotificationMgr::createNotification(kNotificationJobData::NOTIFICATION_TYPE_ENTRY_UPDATE, $entry);
 		
 		$categoryEntry = new KalturaCategoryEntry();
-		$categoryEntry->fromObject($dbCategoryEntry);
+		$categoryEntry->fromObject($dbCategoryEntry, $this->getResponseProfile());
 
 		return $categoryEntry;
 	}
@@ -141,9 +140,34 @@ class CategoryEntryService extends KalturaBaseService
 			$entry->getKuserId() != kCurrentContext::getCurrentKsKuserId() && 
 			$entry->getCreatorKuserId() != kCurrentContext::getCurrentKsKuserId())
 		{
-			$categoryKuser = categoryKuserPeer::retrieveByCategoryIdAndActiveKuserId($categoryId, kCurrentContext::getCurrentKsKuserId());
-			if(!$categoryKuser || $categoryKuser->getPermissionLevel() != CategoryKuserPermissionLevel::MANAGER)
-				throw new KalturaAPIException(KalturaErrors::CANNOT_REMOVE_ENTRY_FROM_CATEGORY);		
+			$kuserIsEntitled = false;
+			$kuser = categoryKuserPeer::retrievePermittedKuserInCategory($categoryId, kCurrentContext::getCurrentKsKuserId());
+
+			// First pass: check if kuser is a manager
+			if ( $kuser )
+			{
+				if ( $kuser->getPermissionLevel() == CategoryKuserPermissionLevel::MANAGER )
+				{
+					$kuserIsEntitled = true;
+				}
+			}
+			else
+			{
+				$kuser = kuserPeer::retrieveByPK( kCurrentContext::getCurrentKsKuserId() );
+			}
+
+			// Second pass: check if kuser is a co-publisher
+			if ( ! $kuserIsEntitled
+					&& $kuser
+					&& $entry->isEntitledKuserPublish( $kuser->getKuserId() ) )
+			{
+				$kuserIsEntitled = true;
+			}
+
+			if ( ! $kuserIsEntitled )
+			{
+				throw new KalturaAPIException(KalturaErrors::CANNOT_REMOVE_ENTRY_FROM_CATEGORY);
+			}
 		}
 			
 		$dbCategoryEntry = categoryEntryPeer::retrieveByCategoryIdAndEntryId($categoryId, $entryId);
@@ -170,127 +194,13 @@ class CategoryEntryService extends KalturaBaseService
 	 */
 	function listAction(KalturaCategoryEntryFilter $filter = null, KalturaFilterPager $pager = null)
 	{
-		if ($filter === null)
+		if (!$filter)
 			$filter = new KalturaCategoryEntryFilter();
-		
-		if ($pager == null)
+			
+		if(!$pager)
 			$pager = new KalturaFilterPager();
 			
-		if ($filter->entryIdEqual == null &&
-			$filter->categoryIdIn == null &&
-			$filter->categoryIdEqual == null && 
-			(kEntitlementUtils::getEntitlementEnforcement() || !kCurrentContext::$is_admin_session))
-			throw new KalturaAPIException(KalturaErrors::MUST_FILTER_ON_ENTRY_OR_CATEGORY);		
-			
-		if(kEntitlementUtils::getEntitlementEnforcement())
-		{
-			//validate entitl for entry
-			if($filter->entryIdEqual != null)
-			{
-				$entry = entryPeer::retrieveByPK($filter->entryIdEqual);
-				if(!$entry)
-					throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $filter->entryIdEqual);
-			}
-			
-			//validate entitl for entryIn
-			if($filter->entryIdIn != null)
-			{
-				$entry = entryPeer::retrieveByPKs($filter->entryIdIn);
-				if(!$entry)
-					throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $filter->entryIdIn);
-			}
-			
-			//validate entitl categories
-			if($filter->categoryIdIn != null)
-			{
-				$categoryIdInArr = explode(',', $filter->categoryIdIn);
-				if(!categoryKuserPeer::areCategoriesAllowed($categoryIdInArr))
-				$categoryIdInArr = array_unique($categoryIdInArr);
-				
-				$entitledCategories = categoryPeer::retrieveByPKs($categoryIdInArr);
-				
-				if(!count($entitledCategories) || count($entitledCategories) != count($categoryIdInArr))
-					throw new KalturaAPIException(KalturaErrors::CATEGORY_NOT_FOUND, $filter->categoryIdIn);
-					
-				$categoriesIdsUnlisted = array();
-				foreach($entitledCategories as $category)
-				{
-					if($category->getDisplayInSearch() == DisplayInSearchType::CATEGORY_MEMBERS_ONLY)
-						$categoriesIdsUnlisted[] = $category->getId();
-				}
-
-				if(count($categoriesIdsUnlisted))
-				{
-					if(!categoryKuserPeer::areCategoriesAllowed($categoriesIdsUnlisted))
-						throw new KalturaAPIException(KalturaErrors::CATEGORY_NOT_FOUND, $filter->categoryIdIn);
-				}
-			}
-			
-			//validate entitl category
-			if($filter->categoryIdEqual != null)
-			{
-				$category = categoryPeer::retrieveByPK($filter->categoryIdEqual);
-				if(!$category && kCurrentContext::$master_partner_id != Partner::BATCH_PARTNER_ID)
-					throw new KalturaAPIException(KalturaErrors::CATEGORY_NOT_FOUND, $filter->categoryIdEqual);
-
-				if(($category->getDisplayInSearch() == DisplayInSearchType::CATEGORY_MEMBERS_ONLY) && 
-					!categoryKuserPeer::retrieveByCategoryIdAndActiveKuserId($category->getId(), kCurrentContext::getCurrentKsKuserId()))
-				{
-					throw new KalturaAPIException(KalturaErrors::CATEGORY_NOT_FOUND, $filter->categoryIdEqual);
-				}
-			}
-		}
-			
-		$categoryEntryFilter = new categoryEntryFilter();
-		$filter->toObject($categoryEntryFilter);
-		 
-		$c = KalturaCriteria::create(categoryEntryPeer::OM_CLASS);
-		$categoryEntryFilter->attachToCriteria($c);
-		
-		if(!kEntitlementUtils::getEntitlementEnforcement() || $filter->entryIdEqual == null)
-			$pager->attachToCriteria($c);
-			
-		$dbCategoriesEntry = categoryEntryPeer::doSelect($c);
-		
-		if(kEntitlementUtils::getEntitlementEnforcement() && count($dbCategoriesEntry) && $filter->entryIdEqual != null)
-		{
-			//remove unlisted categories: display in search is set to members only
-			$categoriesIds = array();
-			foreach ($dbCategoriesEntry as $dbCategoryEntry)
-				$categoriesIds[] = $dbCategoryEntry->getCategoryId();
-				
-			$c = KalturaCriteria::create(categoryPeer::OM_CLASS);
-			$c->add(categoryPeer::ID, $categoriesIds, Criteria::IN);
-			$pager->attachToCriteria($c);
-			$c->applyFilters();
-			
-			$categoryIds = $c->getFetchedIds();
-			
-			foreach ($dbCategoriesEntry as $key => $dbCategoryEntry)
-			{
-				if(!in_array($dbCategoryEntry->getCategoryId(), $categoryIds))
-				{
-					KalturaLog::debug('Category [' . print_r($dbCategoryEntry->getCategoryId(),true) . '] is not listed to user');
-					unset($dbCategoriesEntry[$key]);
-				}
-			}
-			
-			$totalCount = $c->getRecordsCount();
-		}
-		else
-		{
-			$resultCount = count($dbCategoriesEntry);
-			if ($resultCount && $resultCount < $pager->pageSize)
-				$totalCount = ($pager->pageIndex - 1) * $pager->pageSize + $resultCount;
-			else
-				$totalCount = categoryEntryPeer::doCount($c);
-		}
-			
-		$categoryEntrylist = KalturaCategoryEntryArray::fromCategoryEntryArray($dbCategoriesEntry);
-		$response = new KalturaCategoryEntryListResponse();
-		$response->objects = $categoryEntrylist;
-		$response->totalCount = $totalCount; // no pager since category entry is limited to ENTRY::MAX_CATEGORIES_PER_ENTRY
-		return $response;
+		return $filter->getListResponse($pager, $this->getResponseProfile());
 	}
 	
 	/**
@@ -385,7 +295,7 @@ class CategoryEntryService extends KalturaBaseService
 		//validate user is entiteld to activate entry from category 
 		if(kEntitlementUtils::getEntitlementEnforcement())
 		{
-			$categoryKuser = categoryKuserPeer::retrieveByCategoryIdAndActiveKuserId($categoryId, kCurrentContext::getCurrentKsKuserId());
+			$categoryKuser = categoryKuserPeer::retrievePermittedKuserInCategory($categoryId, kCurrentContext::getCurrentKsKuserId());
 			if(!$categoryKuser || 
 				($categoryKuser->getPermissionLevel() != CategoryKuserPermissionLevel::MANAGER && 
 				 $categoryKuser->getPermissionLevel() != CategoryKuserPermissionLevel::MODERATOR))
@@ -427,7 +337,7 @@ class CategoryEntryService extends KalturaBaseService
 		//validate user is entiteld to reject entry from category 
 		if(kEntitlementUtils::getEntitlementEnforcement())
 		{
-			$categoryKuser = categoryKuserPeer::retrieveByCategoryIdAndActiveKuserId($categoryId, kCurrentContext::getCurrentKsKuserId());
+			$categoryKuser = categoryKuserPeer::retrievePermittedKuserInCategory($categoryId, kCurrentContext::getCurrentKsKuserId());
 			if(!$categoryKuser || 
 				($categoryKuser->getPermissionLevel() != CategoryKuserPermissionLevel::MANAGER && 
 				 $categoryKuser->getPermissionLevel() != CategoryKuserPermissionLevel::MODERATOR))

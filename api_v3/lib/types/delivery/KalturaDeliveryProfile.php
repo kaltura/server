@@ -122,7 +122,13 @@ class KalturaDeliveryProfile extends KalturaObject implements IFilterable
 	 */
 	public $mediaProtocols;
 	
-	private static $map_between_objects = array
+	/**
+	 * priority used for ordering similar delivery profiles
+	 * @var int
+	 */
+	public $priority;
+
+ 	private static $map_between_objects = array
 	(
 			"createdAt",
 			"description",
@@ -141,6 +147,7 @@ class KalturaDeliveryProfile extends KalturaObject implements IFilterable
 			"url",
 			"type",
 			"mediaProtocols",
+			"priority",
 	);
 	
 	public function getMapBetweenObjects ( )
@@ -158,15 +165,17 @@ class KalturaDeliveryProfile extends KalturaObject implements IFilterable
 		return $dbObject;
 	}
 	
-	public function fromObject($sourceObject)
+	public function doFromObject($sourceObject, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		if(!$sourceObject)
 			return;
 			
-		parent::fromObject($sourceObject);
+		parent::doFromObject($sourceObject, $responseProfile);
 		
-		$this->recognizer = $this->transformRecognizer($sourceObject);
-		$this->tokenizer = $this->transformTokenizer($sourceObject);
+		if($this->shouldGet('recognizer', $responseProfile))
+			$this->recognizer = $this->transformRecognizer($sourceObject);
+		if($this->shouldGet('tokenizer', $responseProfile))
+			$this->tokenizer = $this->transformTokenizer($sourceObject);
 	}
 	
 	protected function transformRecognizer($sourceObject) {

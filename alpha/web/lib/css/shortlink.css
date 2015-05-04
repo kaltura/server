@@ -1,0 +1,32 @@
+* { margin:0; padding:0;}
+body {
+	height:100%;
+	background:#F7F7F7;
+}
+#main{
+	background-color:#F7F7F7;
+	margin: 0px 0px 0;
+	position:relative;
+	overflow:hidden;
+	bottom:1px;
+}
+#main .content{
+	padding:10px 0 30px;
+	color:#333;
+}
+#main .content .title{
+	border-bottom:#a3bfcb solid 1px;
+	padding:20px 30px;
+}
+#main .content h1{
+	color:#3483a1;
+	font-size:3em;
+	font-weight:normal;
+	letter-spacing:-1px;
+}
+#main .content .contwrap{
+	border-top:#fff solid 1px;
+	padding:20px 30px;
+}
+
+

@@ -78,8 +78,8 @@
 - (void)uploadProcess:(NSDictionary *)data withDelegate:(UIViewController *)delegateController;
 - (NSArray *)getBitratesList:(KalturaMediaEntry *)mediaEntry withFilter:(NSString *)filter;
 - (NSString *)getVideoURL:(KalturaMediaEntry *)mediaEntry forMediaEntryDuration:(int)EntryDuration forFlavor:(NSString *)flavorId forFlavorType: (NSString*)flavorType;
--(void)HandleCurrentBitrate:(NSDictionary *)attributes;
--(void)HandleBitrates:(NSDictionary *)attributes;
+- (void)HandleCurrentBitrate:(NSDictionary *)attributes;
+- (void)HandleBitrates:(NSDictionary *)attributes;
 
 - (void)donePlayingMovieWithWV;
 - (void)playMovieFromUrl:(NSString *)path2;
@@ -87,7 +87,7 @@
 - (void) initializeWVDictionary: (NSString *)flavorId;
 - (void) terminateWV;
 - (void)selectBitrate:(int)ind;
-
+- (NSString *)getIframeURL:(KalturaMediaEntry *)mediaEntry;
 
 @property (nonatomic, retain) KalturaClient *client;
 @property (nonatomic, retain) NSMutableArray *categories;

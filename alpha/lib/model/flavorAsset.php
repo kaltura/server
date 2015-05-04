@@ -267,6 +267,38 @@ class flavorAsset extends asset
 		return $this->getBitrate();
 	}
 	
+	public function getServeFlavorUrl($previewLength = null, $fileName = null)
+	{
+		$entry = $this->getentry();
+
+		if (!$entry || $entry->getType() != entryType::MEDIA_CLIP)
+		{
+			$id = $this->getId();
+			throw new kCoreException("asset $id belongs to an entry of a wrong type", kCoreException::INVALID_ENTRY_TYPE);
+		}
+
+		if (!$fileName)
+		{
+			list($fileName , $extension) = kAssetUtils::getFileName($entry , $this);
+			$fileName = str_replace("\n", ' ', $fileName);
+			$fileName = kString::stripInvalidUrlChars($fileName);
+	
+			if ($extension)
+				$fileName .= ".$extension";
+		}
+		
+		//adding a serveFlavor download parameter
+		$urlParameters = "/fileName/$fileName";
+
+		if ($previewLength)
+			$urlParameters .= "/clipTo/$previewLength";
+
+		$url = kAssetUtils::getAssetUrl($this, false, null, null , $urlParameters);
+		
+		return $url;
+	}
+	
+	
 	public function getPlayManifestUrl($clientTag, $storageProfileId = null, $mediaProtocol = PlaybackProtocol::HTTP) {
 		$entryId = $this->getEntryId();
 		$partnerId = $this->getPartnerId();

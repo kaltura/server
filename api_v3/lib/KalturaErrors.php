@@ -184,6 +184,10 @@ class KalturaErrors extends APIErrors
 	const MAX_NUMBER_OF_ACCESS_CONTROLS_REACHED = "MAX_NUMBER_OF_ACCESS_CONTROLS_REACHED;MAX_NUM;Max number of \"@MAX_NUM@\" access controls was reached";
 
 	const CANNOT_DELETE_DEFAULT_ACCESS_CONTROL = "CANNOT_DELETE_DEFAULT_ACCESS_CONTROL;;Default access control cannot be deleted";
+	
+	const EXCEEDED_ENTRIES_PER_ACCESS_CONTROL_FOR_UPDATE = "EXCEEDED_ENTRIES_PER_ACCESS_CONTROL_FOR_UPDATE;id;exceeded entries per access control id @id@ for update";
+	
+	const CANNOT_TRANSFER_ENTRIES_TO_ANOTHER_ACCESS_CONTROL_OBJECT = "CANNOT_TRANSFER_ENTRIES_TO_ANOTHER_ACCESS_CONTROL_OBJECT;;no default access control for current partner";
 
 	/**
 	 * ConversionProfile Service
@@ -368,6 +372,14 @@ class KalturaErrors extends APIErrors
 
 	const USER_NOT_FOUND = "USER_NOT_FOUND;;User was not found";
 
+	const GROUP_NOT_FOUND = "GROUP_NOT_FOUND;;Group was not found";
+
+	const GROUP_USER_ALREADY_EXISTS = "GROUP_USER_ALREADY_EXISTS;;GroupUser already exists";
+
+	const USER_EXCEEDED_MAX_GROUPS = "USER_EXCEEDED_MAX_GROUPS;;User exceeded max number of groups";
+
+	const GROUP_USER_DOES_NOT_EXIST = "GROUP_USER_DOES_NOT_EXISTS;USER,GROUP;Invalid GroupUser for group [\"@GROUP@\"] and for user [\"@USER@\"]";
+
 	const USER_LOGIN_ALREADY_ENABLED = "USER_LOGIN_ALREADY_ENABLED;;User is already allowed to login";
 
 	const USER_LOGIN_ALREADY_DISABLED = "USER_LOGIN_ALREADY_DISABLED;;User is already not allowed to login";
@@ -385,7 +397,9 @@ class KalturaErrors extends APIErrors
 	const PERMISSION_ITEM_NOT_FOUND = "PERMISSION_ITEM_NOT_FOUND;;Permission item does not exists";
 
 	const PROPERTY_DEPRECATED = "PROPERTY_DEPRECTAED;PROP;The property \"@PROP@\" is deprecated and should not be used";
-
+	
+	const PROPERTY_IS_NOT_DEFINED = "PROPERTY_IS_NOT_DEFINED;PROP,TYPE;The property \"@PROP@\" is not defined on type \"@TYPE@\"";
+	
 	/*
 	 * syndication service
 	 */
@@ -546,4 +560,16 @@ class KalturaErrors extends APIErrors
 	 * Live reports Service
 	 */
 	const LIVE_REPORTS_WS_FAILURE = 'LIVE_REPORTS_WS_FAILURE;;failed to retrieve live analytics';
+		
+	
+	/*
+	 * Response Profiles
+	 */
+	const RESPONSE_PROFILE_NAME_NOT_FOUND = 'RESPONSE_PROFILE_NAME_NOT_FOUND;SYSTEM_NAME;Response profile name [@SYSTEM_NAME@] not found';
+	
+	const RESPONSE_PROFILE_ID_NOT_FOUND = 'RESPONSE_PROFILE_ID_NOT_FOUND;ID;Response profile id [@ID@] not found';
+	
+	const RESPONSE_PROFILE_DUPLICATE_SYSTEM_NAME = 'RESPONSE_PROFILE_DUPLICATE_SYSTEM_NAME;SYSTEM_NAME;Response profile system-name [@SYSTEM_NAME@] already exists';
+	
+	const RESPONSE_PROFILE_MAX_NESTING_LEVEL = 'RESPONSE_PROFILE_MAX_NESTING_LEVEL;;Response profile cross maximum nesting level';
 }

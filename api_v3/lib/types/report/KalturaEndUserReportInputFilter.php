@@ -24,6 +24,12 @@ class KalturaEndUserReportInputFilter extends KalturaReportInputFilter
 	 */
 	public $playbackContext;
 	
+	/**
+	 * 
+	 * @var string
+	 */
+	public $ancestorPlaybackContext;
+	
 	
 	
 	const APPLICATION_NAME_PLACE_HOLDER = "{APPLICATION_NAME}";
@@ -38,6 +44,7 @@ class KalturaEndUserReportInputFilter extends KalturaReportInputFilter
 		$endUserReportsInputFilter->application = $this->application;
 		$endUserReportsInputFilter->userIds = $this->userIds;
 		$endUserReportsInputFilter->playbackContext = $this->playbackContext;
+		$endUserReportsInputFilter->ancestorPlaybackContext = $this->ancestorPlaybackContext;
 		
 		
 		if ($this->application != null) {
@@ -59,6 +66,7 @@ class KalturaEndUserReportInputFilter extends KalturaReportInputFilter
 		$this->application = $endUserReportsInputFilter->application ;
 		$this->userIds = $endUserReportsInputFilter->userIds ;
 		$this->playbackContext = $endUserReportsInputFilter->playbackContext;	
+		$this->ancestorPlaybackContext = $endUserReportsInputFilter->ancestorPlaybackContext;	
 		return $this;
 	}	
 }

@@ -3,7 +3,10 @@ Alias /kmc "@APP_DIR@/kmc/web"
 <Directory "@APP_DIR@/kmc/web">
     DirectoryIndex index.php
     Options Indexes FollowSymLinks Includes
-    AllowOverride All
+    <IfVersion <= 2.2>
+        AllowOverride All
+    </IfVersion>
+
     Order allow,deny
     Allow from all
     <IfVersion >= 2.4>

@@ -448,22 +448,28 @@ class thumbnailAction extends sfAction
 			(!$securyEntryHelper->isKsWidget() && $securyEntryHelper->hasRules(ContextType::THUMBNAIL)))
 			$nocache = true;
 
+		$cache = null;
 		if ($nocache)
 			$cacheAge = 0;
 		else if (strpos($tempThumbPath, "_NOCACHE_") !== false)
 			$cacheAge = 60;
 		else
-			$cacheAge = 8640000;
-		
-		// cache result
-		if (!$nocache)
 		{
-			$requestKey = $_SERVER["REQUEST_URI"];
-			$cache = new myCache("thumb", $cacheAge); // 30 days
-			$cache->put($requestKey, $tempThumbPath);
+			$cacheAge = 8640000;
+			$cache = new myCache("thumb", 2592000); // 30 days, the max memcache allows
 		}
 		
-		kFileUtils::dumpFile($tempThumbPath, null, $cacheAge);
+		$renderer = kFileUtils::getDumpFileRenderer($tempThumbPath, null, $cacheAge);
+		$renderer->partnerId = $entry->getPartnerId();
+		
+		if ($cache)
+		{
+			$cache->put($_SERVER["REQUEST_URI"], $renderer);
+		}
+		
+		$renderer->output();
+	
+		KExternalErrors::dieGracefully();
 		
 		// TODO - can delete from disk assuming we caneasily recreate it and it will anyway be cached in the CDN
 		// however dumpfile dies at the end so we cant just write it here (maybe register a shutdown callback)

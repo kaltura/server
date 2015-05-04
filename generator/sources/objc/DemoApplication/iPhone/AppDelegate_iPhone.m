@@ -106,6 +106,13 @@
         
     //NSLog(@"categories count %d   %d", response.totalCount, [response.objects count]);
     
+    NSString* suffixUA = @"kalturaNativeCordovaPlayer";
+    UIWebView* webView = [[UIWebView alloc] initWithFrame:CGRectZero];
+    NSString* defaultUA = [webView stringByEvaluatingJavaScriptFromString:@"navigator.userAgent"];
+    NSString* finalUA = [defaultUA stringByAppendingString:suffixUA];
+    NSDictionary *dictionary = [NSDictionary dictionaryWithObjectsAndKeys:finalUA, @"UserAgent", nil];
+    [[NSUserDefaults standardUserDefaults] registerDefaults:dictionary];
+    
     return YES;
     
 }

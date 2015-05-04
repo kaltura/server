@@ -11,7 +11,7 @@ class KalturaObjectTaskArray extends KalturaTypedArray
 		parent::__construct('KalturaObjectTask');
 	}
 
-	public static function fromDbArray($dbArray)
+	public static function fromDbArray(array $dbArray, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		$apiArray = new KalturaObjectTaskArray();
 		foreach($dbArray as $dbObject)
@@ -20,10 +20,9 @@ class KalturaObjectTaskArray extends KalturaTypedArray
 			$apiObject = KalturaObjectTask::getInstanceByDbObject($dbObject);
 			if (is_null($apiObject))
 			{
-				KalturaLog::err('Couldn\'t load api object for db object '.$dbObject->getType());
-				continue;
+				throw new Exception('Couldn\'t load api object for db object '.$dbObject->getType());
 			}
-			$apiObject->fromObject($dbObject);
+			$apiObject->fromObject($dbObject, $responseProfile);;
 			$apiArray[] = $apiObject;
 		}
 

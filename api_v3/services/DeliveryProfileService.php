@@ -25,7 +25,7 @@ class DeliveryProfileService extends KalturaBaseService
 		$dbKalturaDelivery->save();
 		
 		$delivery = KalturaDeliveryProfileFactory::getDeliveryProfileInstanceByType($dbKalturaDelivery->getType());
-		$delivery->fromObject($dbKalturaDelivery);
+		$delivery->fromObject($dbKalturaDelivery, $this->getResponseProfile());
 		return $delivery;
 	}
 	
@@ -53,7 +53,7 @@ class DeliveryProfileService extends KalturaBaseService
 		$dbDelivery->save();
 		
 		$delivery = KalturaDeliveryProfileFactory::getDeliveryProfileInstanceByType($dbDelivery->getType());
-		$delivery->fromObject($dbDelivery);
+		$delivery->fromObject($dbDelivery, $this->getResponseProfile());
 		return $delivery;
 	}
 	
@@ -74,7 +74,7 @@ class DeliveryProfileService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::DELIVERY_ID_NOT_FOUND, $id);
 			
 		$delivery = KalturaDeliveryProfileFactory::getDeliveryProfileInstanceByType($dbDelivery->getType());
-		$delivery->fromObject($dbDelivery);
+		$delivery->fromObject($dbDelivery, $this->getResponseProfile());
 		return $delivery;
 	}
 	
@@ -99,7 +99,7 @@ class DeliveryProfileService extends KalturaBaseService
 		$dbKalturaDelivery = $dbDelivery->cloneToNew ( $dbKalturaDelivery );
 		
 		$delivery = KalturaDeliveryProfileFactory::getDeliveryProfileInstanceByType($dbKalturaDelivery->getType());
-		$delivery->fromObject($dbKalturaDelivery);
+		$delivery->fromObject($dbKalturaDelivery, $this->getResponseProfile());
 		return $delivery;
 	}
 	
@@ -135,7 +135,7 @@ class DeliveryProfileService extends KalturaBaseService
 		
 		DeliveryProfilePeer::setUseCriteriaFilter(true);
 		
-		$objects = KalturaDeliveryProfileArray::fromDbArray($dbList);
+		$objects = KalturaDeliveryProfileArray::fromDbArray($dbList, $this->getResponseProfile());
 		$response = new KalturaDeliveryProfileListResponse();
 		$response->objects = $objects;
 		$response->totalCount = $totalCount;

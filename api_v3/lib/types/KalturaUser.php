@@ -3,7 +3,7 @@
  * @package api
  * @subpackage objects
  */
-class KalturaUser extends KalturaObject implements IFilterable 
+class KalturaUser extends KalturaObject implements IRelatedFilterable 
 {
 	/**
 	 * @var string
@@ -17,6 +17,12 @@ class KalturaUser extends KalturaObject implements IFilterable
 	 * @filter eq
 	 */
 	public $partnerId;
+
+	/**
+	 * @var KalturaUserType
+	 * @filter eq,in
+	 */
+	public $type;
 	
 	/**
 	 * @var string
@@ -210,7 +216,6 @@ class KalturaUser extends KalturaObject implements IFilterable
 	 * @var string
 	 */
 	public $allowedPartnerIds;
-	
 
 	/**
 	 * @var string
@@ -221,6 +226,7 @@ class KalturaUser extends KalturaObject implements IFilterable
 	(
 		"id" => "puserId", 
 		"partnerId",
+		"type",
 		"screenName",
 		"email",
 		"dateOfBirth",
@@ -247,7 +253,8 @@ class KalturaUser extends KalturaObject implements IFilterable
 		"roleNames" => "userRoleNames",
 		"isAccountOwner",
 		"allowedPartnerIds" => "allowedPartners",
-		"allowedPartnerPackages"
+		"allowedPartnerPackages",
+		"statusUpdatedAt",
 	);
 
 	public function getMapBetweenObjects ( )
@@ -277,17 +284,19 @@ class KalturaUser extends KalturaObject implements IFilterable
 	}
 	
 	
-	public function fromObject($sourceObject)
+	public function doFromObject($sourceObject, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		if(!$sourceObject)
 			return;
 			
-		parent::fromObject($sourceObject);
+		parent::doFromObject($sourceObject, $responseProfile);
+		
 		// full name is deprecated and was split to firstName + lastName
 		// this is for backward compatibility
-		$this->fullName = $sourceObject->getFullName();
-		$this->loginEnabled = !is_null($sourceObject->getLoginDataId());
-		$this->statusUpdatedAt = $sourceObject->getStatusUpdatedAt(null);
+		if($this->shouldGet('fullName', $responseProfile))
+			$this->fullName = $sourceObject->getFullName();
+		if($this->shouldGet('loginEnabled', $responseProfile))
+			$this->loginEnabled = !is_null($sourceObject->getLoginDataId());
 	}
 	
 	public function getExtraFilters()

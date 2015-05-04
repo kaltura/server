@@ -9,6 +9,8 @@ class YoutubeApiDistributionPlugin extends KalturaPlugin implements IKalturaPerm
 	const CONTENT_DSTRIBUTION_VERSION_MINOR = 0;
 	const CONTENT_DSTRIBUTION_VERSION_BUILD = 0;
 	
+	const GOOGLE_APP_ID = 'youtubeapi';
+	
 	public static function getPluginName()
 	{
 		return self::PLUGIN_NAME;

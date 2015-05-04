@@ -131,11 +131,18 @@ class KScheduledTaskRunner extends KPeriodicWorker
 			}
 			catch(Exception $ex)
 			{
+				$this->unimpersonate();
 				$id = '';
 				if (property_exists($object, 'id'))
 					$id = $object->id;
 				KalturaLog::err(sprintf('An error occurred while executing %s on object %s (id %s)', get_class($objectTaskEngine), get_class($object), $id));
 				KalturaLog::err($ex);
+
+				if ($objectTask->stopProcessingOnError)
+				{
+					KalturaLog::info('Object task is configured to stop processing on error');
+					break;
+				}
 			}
 		}
 	}

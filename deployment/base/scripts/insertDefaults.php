@@ -80,6 +80,11 @@ function handleFile($filePath)
 	list($order, $objectType, $fileExtension) = explode('.', $fileName, 3);
 	$objectConfigurations = parse_ini_file($filePath, true);
 
+	$object = new $objectType();
+	/* @var $object BaseObject */
+	$peer = $object->getPeer();
+	$peerClass = get_class($peer);
+	
 	$newObjectType = "Insert{$objectType}";
 	if(!class_exists($newObjectType))
 	{
@@ -109,7 +114,7 @@ function handleFile($filePath)
 								$this->setNew(false);
 								$this->objectSaved = true;
 							} else {
-								$affectedObjects = ' . $objectType . 'Peer::doUpdate($this, $con);
+								$affectedObjects = ' . $peerClass . '::doUpdate($this, $con);
 								if($affectedObjects)
 									$this->objectSaved = true;
 									
@@ -126,10 +131,7 @@ function handleFile($filePath)
 			}
 		');
 	}
-	$object = new $newObjectType();
-	/* @var $object BaseObject */
 
-	$peer = $object->getPeer();
 	$map = $peer->getTableMap();
 	$primaryKeys = $map->getPrimaryKeys();
 
@@ -138,11 +140,32 @@ function handleFile($filePath)
 		$object = new $newObjectType();
 		/* @var $object BaseObject */
 		$pk = null;
+		$pkField = null;
+		// New logic allowing to use other parameters as uique identifers for updates
+		$identifierParam = null;
+		$identifierColumn = null;
+		
 		$setters = array();
 		foreach($objectConfiguration as $attributeName => $value)
 		{
 			if($attributeName == 'id')
+			{
 				$pk = $value;
+			}
+			elseif ($attributeName == 'identifierParam')
+			{
+				$$attributeName = $value;
+				continue;
+			} 
+			if (preg_match('/eval\((?P<evalString>.+)\)/', $value, $matches))
+			{
+				$evalString = $matches["evalString"];
+				$evaluator = new kEvalStringField();
+				$evaluator->setScope(new kScope());
+				$evaluator->setCode($evalString);
+				$value = $evaluator->getValue();
+				KalturaLog::info("Evaluated property value: $value");
+			}
 
 			$setter = "set{$attributeName}";
 			if(!is_callable(array($object, $setter)))
@@ -161,13 +184,27 @@ function handleFile($filePath)
 		}
 
 		$pkCriteria = null;
+		$existingObject = null;
 		if(!is_null($pk))
 		{
 			$pkCriteria = new Criteria();
 			$pkCriteria->add(constant(get_class($peer) . '::ID'), $pk);
 			$existingObject = $peer->doSelectOne($pkCriteria, $con);
-			if($existingObject)
-				$object = $existingObject;
+			
+		}
+		elseif (!is_null($identifierParam))
+		{
+			// If we have some other form of identifier on the object
+			$identifierColumn = $peer::translateFieldName($identifierParam, BasePeer::TYPE_STUDLYPHPNAME, BasePeer::TYPE_COLNAME);
+			$c = new Criteria();
+			$c->add ($identifierColumn, $objectConfiguration[$identifierParam]);
+			$existingObject = $peer->doSelectOne($c, $con);
+		}
+		
+		if($existingObject)
+		{
+			KalturaLog::info ('existing objects will not be re-written');
+			continue;
 		}
 
 		foreach($setters as $setter => $value)

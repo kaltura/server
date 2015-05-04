@@ -48,6 +48,7 @@ return array(
 	'Kaltura_Client_Enum_BatchJobType::EVENT_NOTIFICATION_HANDLER' => 'Event Notification',
 	'Kaltura_Client_Enum_BatchJobType::CONCAT' => 'Concat',
 	'Kaltura_Client_Enum_BatchJobType::CONVERT_LIVE_SEGMENT' => 'Convert Live Segment',
+	'Kaltura_Client_Enum_BatchJobType::INTEGRATION' => 'Integration',
 
 	'Kaltura_Client_Enum_ConversionEngineType::FFMPEG' => 'Convert - FFMpeg',
 	'Kaltura_Client_Enum_ConversionEngineType::FFMPEG_AUX' => 'Convert - FFMpeg Aux',
@@ -339,6 +340,7 @@ return array(
 	'KalturaUiConfObjType::PLAYER_SL' => 'Player Silverlight',
 	'KalturaUiConfObjType::CLIENTSIDE_ENCODER' => 'Client Side Encoder',
 	'Kaltura_Client_Enum_UiConfObjType::KSR' => 'Kaltura Screen Recorder',
+	'Kaltura_Client_Enum_UiConfObjType::WEBCASTING' => 'Kaltura Webcasting Studio',
 	 
     
 	//batch index
@@ -1130,6 +1132,7 @@ return array(
 	'Kaltura_Client_EventNotification_Enum_EventNotificationEventType::OBJECT_SAVED' => 'Object saved',
 	'Kaltura_Client_EventNotification_Enum_EventNotificationEventType::OBJECT_UPDATED' => 'Object updated',
 	'Kaltura_Client_EventNotification_Enum_EventNotificationEventType::OBJECT_REPLACED' => 'Object replaced',
+	'Kaltura_Client_EventNotification_Enum_EventNotificationEventType::INTEGRATION_JOB_CLOSED' => 'Integration job closed',
 
 	'Kaltura_Client_EventNotification_Enum_EventNotificationEventObjectType::AD_CUE_POINT' => 'Ad cue-point',
 	'Kaltura_Client_EventNotification_Enum_EventNotificationEventObjectType::ANNOTATION' => 'Annotation',
@@ -1225,6 +1228,7 @@ return array(
 		"Kaltura_Client_Enum_DeliveryProfileType::LOCAL_PATH_RTMP" => "LOCAL_PATH_RTMP",
 		"Kaltura_Client_Enum_DeliveryProfileType::LIVE_HLS" => "LIVE_HLS",
 		"Kaltura_Client_Enum_DeliveryProfileType::LIVE_HDS" => "LIVE_HDS",
+		"Kaltura_Client_Enum_DeliveryProfileType::LIVE_DASH" => "LIVE_DASH",
 		"Kaltura_Client_Enum_DeliveryProfileType::LIVE_RTMP" => "LIVE_RTMP",
 		"Kaltura_Client_Enum_DeliveryProfileType::LIVE_AKAMAI_HDS" => "LIVE_AKAMAI_HDS",
 		

@@ -130,7 +130,14 @@ $fltStr = null;
 			$filters[] = $str;
 			$filters[] = 'pad='.$vid->_width.':'.$vid->_height.':(ow-iw)/2:(oh-ih)/2';
 		}
-	
+
+			/*
+			 * For IMX - crop the source
+			 */
+		if(isset($vid->_isCropIMX) && $vid->_isCropIMX==true){
+			$aaa = 0;
+			$filters[] = "crop=in_w:in_h-32:in_w:32";
+		}
 		return $filters;
 	}
 	
@@ -245,12 +252,12 @@ $nullDev ="/dev/null";
 			return false;
 		
 			/*
-			 * HD codecs (prores & dnxhd) can be packaged only in MOV
+			 * HD codecs (prores & dnxhd) can be packaged only in MOV/MXF
 			 */
 $hdCodecsArr = array(KDLVideoTarget::APCO,KDLVideoTarget::APCS,KDLVideoTarget::APCN,KDLVideoTarget::APCH,KDLVideoTarget::DNXHD);
 		if(isset($target->_container))
 		{
-			if($target->_container->_id!=KDLContainerTarget::MOV && in_array($target->_video->_id, $hdCodecsArr)){
+			if(!$target->_container->IsFormatOf(array(KDLContainerTarget::MOV,KDLContainerTarget::MXF)) && in_array($target->_video->_id, $hdCodecsArr)){
 				$target->_errors[KDLConstants::ContainerIndex][] = 
 					KDLErrors::ToString(KDLErrors::PackageMovOnly, $target->_video->_id);
 				return true;

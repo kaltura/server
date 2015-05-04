@@ -9,6 +9,12 @@
  */
 class KalturaLiveEntryService extends KalturaEntryService
 {
+	//amount of time for attempting to grab kLock
+	const KLOCK_CREATE_RECORDED_ENTRY_GRAB_TIMEOUT = 0.1;
+	
+	//amount of time for holding kLock
+	const KLOCK_CREATE_RECORDED_ENTRY_HOLD_TIMEOUT = 3;
+  
 	public function initService($serviceId, $serviceName, $actionName)
 	{
 		parent::initService($serviceId, $serviceName, $actionName);
@@ -32,6 +38,16 @@ class KalturaLiveEntryService extends KalturaEntryService
 		return parent::partnerRequired($actionName);
 	}
 
+	function dumpApiRequest($entryId, $onlyIfAvailable = true)
+	{
+		$entryDc = substr($entryId, 0, 1);
+		if($entryDc != kDataCenterMgr::getCurrentDcId())
+		{
+			$remoteDCHost = kDataCenterMgr::getRemoteDcExternalUrlByDcId($entryDc);
+			kFileUtils::dumpApiRequest($remoteDCHost, $onlyIfAvailable);
+		}		
+	}
+	
 	/**
 	 * Append recorded video to live entry
 	 * 
@@ -56,24 +72,13 @@ class KalturaLiveEntryService extends KalturaEntryService
 		if (!$dbAsset || !($dbAsset instanceof liveAsset))
 			throw new KalturaAPIException(KalturaErrors::ASSET_ID_NOT_FOUND, $assetId);
 			
-		$currentDuration = $dbEntry->getLengthInMsecs();
-		if(!$currentDuration)
-			$currentDuration = 0;
-		$currentDuration += (int)($duration * 1000);
+		$lastDuration = $dbEntry->getLengthInMsecs();
+		if(!$lastDuration)
+			$lastDuration = 0;
+
+		$liveSegmentDurationInMsec = (int)($duration * 1000);
+		$currentDuration = $lastDuration + $liveSegmentDurationInMsec;
 		
-		if($dbAsset->hasTag(assetParams::TAG_RECORDING_ANCHOR) && $mediaServerIndex == KalturaMediaServerIndex::PRIMARY)
-		{
-			$dbEntry->setLengthInMsecs($currentDuration);
-
-			if ( $isLastChunk )
-			{
-				// Save last elapsed recording time
-				$dbEntry->setLastElapsedRecordingTime( $currentDuration );
-			}
-
-			$dbEntry->save();
-		}
-	
 		$maxRecordingDuration = (kConf::get('max_live_recording_duration_hours') + 1) * 60 * 60 * 1000;
 		if($currentDuration > $maxRecordingDuration)
 		{
@@ -90,29 +95,55 @@ class KalturaLiveEntryService extends KalturaEntryService
 			chgrp($filename, kConf::get('content_group'));
 			chmod($filename, 0640);
 		}
+
+		if($dbAsset->hasTag(assetParams::TAG_RECORDING_ANCHOR) && $mediaServerIndex == KalturaMediaServerIndex::PRIMARY)
+		{
+			KalturaLog::debug("Appending assetId $assetId to entryId $entryId");
+
+			$dbEntry->setLengthInMsecs($currentDuration);
+
+			// Extract the exact video segment duration from the recorded file
+			$mediaInfoParser = new KMediaInfoMediaParser($filename, kConf::get('bin_path_mediainfo'));
+			$recordedSegmentDurationInMsec = $mediaInfoParser->getMediaInfo()->videoDuration;
+
+			$currentSegmentVodToLiveDeltaTime = $liveSegmentDurationInMsec - $recordedSegmentDurationInMsec;
+			$recordedSegmentsInfo = $dbEntry->getRecordedSegmentsInfo();
+			$recordedSegmentsInfo->addSegment( $lastDuration, $recordedSegmentDurationInMsec, $currentSegmentVodToLiveDeltaTime );
+			$dbEntry->setRecordedSegmentsInfo( $recordedSegmentsInfo );
+
+			if ( $isLastChunk )
+			{
+				// Save last elapsed recording time
+				$dbEntry->setLastElapsedRecordingTime( $currentDuration );
+			}
+
+			$dbEntry->save();
+		}
+
 		kJobsManager::addConvertLiveSegmentJob(null, $dbAsset, $mediaServerIndex, $filename, $currentDuration);
 		
 		if($mediaServerIndex == KalturaMediaServerIndex::PRIMARY)
 		{
 			if(!$dbEntry->getRecordedEntryId())
 			{
-				$this->createRecordedEntry($dbEntry);
+				$this->createRecordedEntry($dbEntry, $mediaServerIndex);
 			}
 			
 			$recordedEntry = entryPeer::retrieveByPK($dbEntry->getRecordedEntryId());
 			if($recordedEntry)
 			{
-				$this->ingestAsset($recordedEntry, $dbAsset->getFlavorParamsId(), $filename);
+				$this->ingestAsset($recordedEntry, $dbAsset, $filename);
 			}
 		}
 		
 		$entry = KalturaEntryFactory::getInstanceByType($dbEntry->getType());
-		$entry->fromObject($dbEntry);
+		$entry->fromObject($dbEntry, $this->getResponseProfile());
 		return $entry;
 	}
 
-	private function ingestAsset(entry $entry, $flavorParamsId, $filename)
-	{	
+	private function ingestAsset(entry $entry, $dbAsset, $filename)
+	{
+		$flavorParamsId = $dbAsset->getFlavorParamsId();
 		$flavorParams = assetParamsPeer::retrieveByPKNoFilter($flavorParamsId);
 		
 		// is first chunk
@@ -130,6 +161,10 @@ class KalturaLiveEntryService extends KalturaEntryService
 		$recordedAsset->setStatus(asset::FLAVOR_ASSET_STATUS_QUEUED);
 		$recordedAsset->setFlavorParamsId($flavorParams->getId());
 		$recordedAsset->setFromAssetParams($flavorParams);
+		if ( $dbAsset->hasTag(assetParams::TAG_RECORDING_ANCHOR) )
+		{
+			$recordedAsset->addTags(array(assetParams::TAG_RECORDING_ANCHOR));
+		}
 		
 		if($flavorParams->hasTag(assetParams::TAG_SOURCE))
 		{
@@ -166,12 +201,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 	 */
 	function registerMediaServerAction($entryId, $hostname, $mediaServerIndex, $applicationName = null)
 	{
-		$entryDc = substr($entryId, 0, 1);
-		if($entryDc != kDataCenterMgr::getCurrentDcId())
-		{
-			$remoteDCHost = kDataCenterMgr::getRemoteDcExternalUrlByDcId($entryDc);
-			kFileUtils::dumpApiRequest($remoteDCHost);
-		}
+		$this->dumpApiRequest($entryId);
 		
 		$dbEntry = entryPeer::retrieveByPK($entryId);
 		if (!$dbEntry || !($dbEntry instanceof LiveEntry))
@@ -180,18 +210,27 @@ class KalturaLiveEntryService extends KalturaEntryService
 		$dbEntry->setMediaServer($mediaServerIndex, $hostname, $applicationName);
 		$dbEntry->setRedirectEntryId(null);
 		
-		if(is_null($dbEntry->getFirstBroadcast())) 
-				$dbEntry->setFirstBroadcast(time());
-		
-		if($mediaServerIndex == MediaServerIndex::PRIMARY && $dbEntry->getRecordStatus() == RecordStatus::ENABLED && !$dbEntry->getRecordedEntryId())
+		if($dbEntry->save())
 		{
-			$this->createRecordedEntry($dbEntry);
+			if($mediaServerIndex == MediaServerIndex::PRIMARY && $dbEntry->getRecordStatus())
+			{
+				$createRecordedEntry = false;
+				if(!$dbEntry->getRecordedEntryId())
+				{
+					$createRecordedEntry = true;
+				}
+				elseif($dbEntry->getRecordStatus() == RecordStatus::PER_SESSION && ($dbEntry->getLastBroadcastEndTime() + kConf::get('live_session_reconnect_timeout', 'local', 180) < time()))
+				{
+					$createRecordedEntry = true;
+				}
+				
+				if($createRecordedEntry)
+					$this->createRecordedEntry($dbEntry, $mediaServerIndex);
+			}
 		}
 		
-		$dbEntry->save();
-		
 		$entry = KalturaEntryFactory::getInstanceByType($dbEntry->getType());
-		$entry->fromObject($dbEntry);
+		$entry->fromObject($dbEntry, $this->getResponseProfile());
 		return $entry;
 	}
 
@@ -199,25 +238,63 @@ class KalturaLiveEntryService extends KalturaEntryService
 	 * @param LiveEntry $dbEntry
 	 * @return entry
 	 */
-	private function createRecordedEntry(LiveEntry $dbEntry)
+	private function createRecordedEntry(LiveEntry $dbEntry, $mediaServerIndex)
 	{
-		$recordedEntry = new entry();
-		$recordedEntry->setType(entryType::MEDIA_CLIP);
-		$recordedEntry->setMediaType(entry::ENTRY_MEDIA_TYPE_VIDEO);
-		$recordedEntry->setRootEntryId($dbEntry->getId());
-		$recordedEntry->setName($dbEntry->getName());
-		$recordedEntry->setDescription($dbEntry->getDescription());
-		$recordedEntry->setSourceType(EntrySourceType::RECORDED_LIVE);
-		$recordedEntry->setAccessControlId($dbEntry->getAccessControlId());
-		$recordedEntry->setConversionProfileId($dbEntry->getConversionProfileId());
-		$recordedEntry->setKuserId($dbEntry->getKuserId());
-		$recordedEntry->setPartnerId($dbEntry->getPartnerId());
-		$recordedEntry->setModerationStatus($dbEntry->getModerationStatus());
-		$recordedEntry->setIsRecordedEntry(true);
-		$recordedEntry->save();
+		$lock = kLock::create("live_record_" . $dbEntry->getId());
 		
-		$dbEntry->setRecordedEntryId($recordedEntry->getId());
-		$dbEntry->save();
+	    if ($lock && !$lock->lock(self::KLOCK_CREATE_RECORDED_ENTRY_GRAB_TIMEOUT , self::KLOCK_CREATE_RECORDED_ENTRY_HOLD_TIMEOUT))
+	    {
+	    	return;
+	    }
+	    
+	    // If while we were waiting for the lock, someone has updated the recorded entry id - we should use it.
+	    $dbEntry->reload();
+	    if(($dbEntry->getRecordStatus() != RecordStatus::PER_SESSION) && ($dbEntry->getRecordedEntryId())) {
+	    	$lock->unlock();
+	    	$recordedEntry = entryPeer::retrieveByPK($dbEntry->getRecordedEntryId()); 
+	    	return $recordedEntry;
+	    }
+	    
+	    $recordedEntry = null;
+     	try{		
+			$recordedEntryName = $dbEntry->getName();
+			if($dbEntry->getRecordStatus() == RecordStatus::PER_SESSION)
+				$recordedEntryName .= ' ' . ($dbEntry->getRecordedEntryIndex() + 1);
+				
+			$recordedEntry = new entry();
+			$recordedEntry->setType(entryType::MEDIA_CLIP);
+			$recordedEntry->setMediaType(entry::ENTRY_MEDIA_TYPE_VIDEO);
+			$recordedEntry->setRootEntryId($dbEntry->getId());
+			$recordedEntry->setName($recordedEntryName);
+			$recordedEntry->setDescription($dbEntry->getDescription());
+			$recordedEntry->setSourceType(EntrySourceType::RECORDED_LIVE);
+			$recordedEntry->setAccessControlId($dbEntry->getAccessControlId());
+			$recordedEntry->setConversionProfileId($dbEntry->getConversionProfileId());
+			$recordedEntry->setKuserId($dbEntry->getKuserId());
+			$recordedEntry->setPartnerId($dbEntry->getPartnerId());
+			$recordedEntry->setModerationStatus($dbEntry->getModerationStatus());
+			$recordedEntry->setIsRecordedEntry(true);
+			$recordedEntry->setTags($dbEntry->getTags());
+
+			$recordedEntry->save();
+
+			$dbEntry->setRecordedEntryId($recordedEntry->getId());
+			$dbEntry->save();
+			
+			$assets = assetPeer::retrieveByEntryId($dbEntry->getId(), array(assetType::LIVE));
+			foreach($assets as $asset)
+			{
+				/* @var $asset liveAsset */
+				$asset->incLiveSegmentVersion($mediaServerIndex);
+				$asset->save();
+			}
+		}
+		catch(Exception $e){
+       		$lock->unlock();
+       		throw $e;
+		}
+		
+		$lock->unlock();
 		
 		return $recordedEntry;
 	}
@@ -236,12 +313,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 	 */
 	function unregisterMediaServerAction($entryId, $hostname, $mediaServerIndex)
 	{
-		$entryDc = substr($entryId, 0, 1);
-		if($entryDc != kDataCenterMgr::getCurrentDcId())
-		{
-			$remoteDCHost = kDataCenterMgr::getRemoteDcExternalUrlByDcId($entryDc);
-			kFileUtils::dumpApiRequest($remoteDCHost);
-		}
+		$this->dumpApiRequest($entryId);
 		
 		$dbEntry = entryPeer::retrieveByPK($entryId);
 		if (!$dbEntry || !($dbEntry instanceof LiveEntry))
@@ -267,7 +339,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 		$dbEntry->save();
 		
 		$entry = KalturaEntryFactory::getInstanceByType($dbEntry->getType());
-		$entry->fromObject($dbEntry);
+		$entry->fromObject($dbEntry, $this->getResponseProfile());
 		return $entry;
 	}
 
@@ -282,12 +354,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 	function validateRegisteredMediaServersAction($entryId)
 	{
 		KalturaResponseCacher::disableCache();
-		$entryDc = substr($entryId, 0, 1);
-		if($entryDc != kDataCenterMgr::getCurrentDcId())
-		{
-			$remoteDCHost = kDataCenterMgr::getRemoteDcExternalUrlByDcId($entryDc);
-			kFileUtils::dumpApiRequest($remoteDCHost);
-		}
+		$this->dumpApiRequest($entryId, false);
 		
 		$dbEntry = entryPeer::retrieveByPK($entryId);
 		if (!$dbEntry || !($dbEntry instanceof LiveEntry))

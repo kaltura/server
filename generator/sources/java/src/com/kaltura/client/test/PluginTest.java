@@ -27,7 +27,6 @@
 // ===================================================================================================
 package com.kaltura.client.test;
 
-import com.kaltura.client.KalturaApiException;
 import com.kaltura.client.enums.KalturaMetadataObjectType;
 import com.kaltura.client.types.KalturaMetadataProfile;
 
@@ -35,9 +34,9 @@ import com.kaltura.client.types.KalturaMetadataProfile;
 
 public class PluginTest extends BaseTest {
 
-	public void testPlugin() throws KalturaApiException {
+	public void testPlugin() throws Exception {
 		final String testString = "TEST PROFILE";
-		BaseTest.startAdminSession(client, kalturaConfig);
+		startAdminSession();
 
 		KalturaMetadataProfile profile = new KalturaMetadataProfile();
 		profile.metadataObjectType = KalturaMetadataObjectType.ENTRY;

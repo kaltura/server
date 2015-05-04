@@ -78,7 +78,11 @@ class FileSync extends BaseFileSync
 		$url = $urlManager->getFileSyncUrl($this);
 		$baseUrl = $urlManager->getUrl();
 		
-		return rtrim($baseUrl, '/') . '/' . ltrim($url, '/');
+		$url = ltrim($url, "/");
+		if (strpos($url, "://") === false){
+			$url = rtrim($baseUrl, "/") . "/".$url ;
+		}
+		return $url;
 	}
 	
 	/* (non-PHPdoc)
@@ -130,6 +134,9 @@ class FileSync extends BaseFileSync
 			
 		return parent::setStatus($v);
 	}
+	
+	public function getIsDir() { return $this->getFromCustomData("isDir"); }
+	public function setIsDir($v) { $this->putInCustomData("isDir", $v); }
 }
 
 

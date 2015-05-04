@@ -67,8 +67,15 @@ class kFileUtils extends kFile
 		KExternalErrors::dieGracefully();
 	}
 	
-	public static function dumpApiRequest($host)
+	public static function dumpApiRequest($host, $onlyIfAvailable = false)
 	{
+		if($onlyIfAvailable){
+			//validate that the other DC is available before dumping the request
+			if(kConf::hasParam('disable_dump_api_request') && kConf::get('disable_dump_api_request')){
+				KalturaLog::debug('dumpApiRequest is disabled');
+				return;
+			}			
+		}
 		if (kCurrentContext::$multiRequest_index > 1)
             KExternalErrors::dieError(KExternalErrors::MULTIREQUEST_PROXY_FAILED);
 		self::closeDbConnections();
@@ -134,14 +141,19 @@ class kFileUtils extends kFile
 	{
 		KalturaLog::debug("URL [$url], $allowRange [$allowRange], $passHeaders [$passHeaders]");
 		self::closeDbConnections();
-		
+	
 		$ch = curl_init();
 		
 		// set URL and other appropriate options
 		curl_setopt($ch, CURLOPT_URL, $url);
 		curl_setopt($ch, CURLOPT_USERAGENT, "curl/7.11.1");
 		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
+		
+		// in case of private ips (internal to the datacenters) no need to check the certificate validity.
+		// otherwise curling for https://127.0.0.1/ will fail as the certificate is for *.domain.com
+		$urlHost = parse_url($url, PHP_URL_HOST);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, infraRequestUtils::isIpPrivate($urlHost) ? 0 : 2);
+
 
 		// prevent loop back of the proxied request by detecting the "X-Kaltura-Proxy header
 		if (isset($_SERVER["HTTP_X_KALTURA_PROXY"]))

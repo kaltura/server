@@ -1,1 +1,0 @@
-ALTER TABLE drop_folder_file MODIFY md5_file_name varchar(32) NOT NULL DEFAULT 0;

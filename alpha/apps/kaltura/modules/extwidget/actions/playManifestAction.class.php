@@ -91,6 +91,11 @@ class playManifestAction extends kalturaAction
 	private $flavorIds = null;
 	
 	/**
+	 * @var array
+	 */
+	private $flavorParamsIds = null;
+	
+	/**
 	 * @var DeliveryProfile
 	 */
 	private $deliveryProfile = null;
@@ -217,6 +222,8 @@ class playManifestAction extends kalturaAction
 				KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_FOUND);
 		}
 		
+		myPartnerUtils::blockInactivePartner($this->entry->getPartnerId());
+		
 		// enforce access control
 		$base64Referrer = $this->getRequestParameter("referrer");
 		$hashes = $this->getRequestParameter("hashes");
@@ -244,7 +251,10 @@ class playManifestAction extends kalturaAction
 		
 		if ($this->secureEntryHelper->shouldPreview())
 		{
-			$this->deliveryAttributes->setClipTo($this->secureEntryHelper->getPreviewLength() * 1000);
+			$previewLengthInMsecs = $this->secureEntryHelper->getPreviewLength() * 1000;
+			$entryLengthInMsecs = $this->entry->getLengthInMsecs();
+			if ($previewLengthInMsecs <  $entryLengthInMsecs)
+				$this->deliveryAttributes->setClipTo($previewLengthInMsecs);
 		}
 		else
 		{
@@ -271,23 +281,42 @@ class playManifestAction extends kalturaAction
 
 		$flavorParamIds = $this->getRequestParameter ( "flavorParamIds", null );
 		if (!is_null($flavorParamIds))
-			$flavorParamIds = explode(',', $flavorParamIds);
+			$this->flavorParamsIds = explode(',', $flavorParamIds);
 		
 		$flavorParamId = $this->getRequestParameter ( "flavorParamId", null );
 		if (!is_null($flavorParamId))
-			$flavorParamIds = array($flavorParamId);
+			$this->flavorParamsIds = array($flavorParamId);
 			
-		if (is_null($flavorParamIds))
+		if (is_null($this->flavorParamsIds))
 			return;
 			
-		$flavorParamIds = $this->secureEntryHelper->filterAllowedFlavorParams($flavorParamIds);
+		$this->flavorParamsIds = $this->secureEntryHelper->filterAllowedFlavorParams($this->flavorParamsIds);
 		
-		if(is_null($flavorParamIds))
+		if(is_null($this->flavorParamsIds))
 			return;
 			
-		$this->flavorIds = assetPeer::retrieveReadyFlavorsIdsByEntryId($this->entryId, $flavorParamIds);
+		$this->flavorIds = assetPeer::retrieveReadyFlavorsIdsByEntryId($this->entryId, $this->flavorParamsIds);
 	}
-
+	
+	protected function initFlavorParamsIds()
+	{
+		$this->initFlavorIds();
+		
+		if(is_null($this->flavorParamsIds) && !is_null($this->flavorIds))
+		{
+			$flavors = assetPeer::retrieveByIds($this->flavorIds);
+			$this->flavorParamsIds = array();
+			foreach($flavors as $flavor)
+			{
+				/* @var $flavor asset */
+				$this->flavorParamsIds[] = $flavor->getFlavorParamsId();
+			}
+		}
+		
+		if(is_null($this->flavorParamsIds))
+			$this->flavorParamsIds = array();
+	}
+	
 	protected function enforceEncryption()
 	{
 		$playbackParams = array();
@@ -657,7 +686,7 @@ class playManifestAction extends kalturaAction
 			$cdnHostOnly = trim(preg_replace('#https?://#', '', $cdnHost), '/');
 			
 			return DeliveryProfilePeer::getLocalDeliveryByPartner($this->entryId, $this->deliveryAttributes->getFormat(), 
-					$this->deliveryAttributes->getMediaProtocol(), $cdnHostOnly);
+					$this->deliveryAttributes, $cdnHostOnly);
 		}
 	}
 
@@ -733,6 +762,8 @@ class playManifestAction extends kalturaAction
 	 */
 	private function getLiveEntryBaseUrls()
 	{
+		$this->initFlavorParamsIds();
+		
 		$tag = null;
 		$tags = $this->deliveryAttributes->getTags();
 		if(count($tags) == 1) 
@@ -742,7 +773,7 @@ class playManifestAction extends kalturaAction
 		if(in_array($this->deliveryAttributes->getFormat(), self::$httpFormats) && !in_array($protocol, self::$httpProtocols))
 			$protocol = requestUtils::getProtocol();
 		
-		$liveStreamConfig = $this->entry->getLiveStreamConfigurationByProtocol($this->deliveryAttributes->getFormat(), $protocol, $tag);
+		$liveStreamConfig = $this->entry->getLiveStreamConfigurationByProtocol($this->deliveryAttributes->getFormat(), $protocol, $tag, false, $this->flavorParamsIds);
 		/* @var $liveStreamConfig kLiveStreamConfiguration */
 		if ($liveStreamConfig)
 			return array($liveStreamConfig->getUrl(), $liveStreamConfig->getBackupUrl());
@@ -771,7 +802,7 @@ class playManifestAction extends kalturaAction
  			
  			kApiCache::setExpiry(120);
  		}
-		
+ 		
 		list($baseUrl, $backupUrl) = $this->getLiveEntryBaseUrls();
 		$cdnHost = parse_url($baseUrl, PHP_URL_HOST);	
 		
@@ -849,6 +880,8 @@ class playManifestAction extends kalturaAction
 			$this->deliveryAttributes->setSeekFromTime(-1);
 
 		$this->deliveryAttributes->setClipTo($this->getRequestParameter ( "clipTo" , 0));
+
+		$this->deliveryAttributes->setPlaybackRate($this->getRequestParameter ( "playbackRate" , 0));
 		
 		$deliveryCode = $this->getRequestParameter( "deliveryCode", null );
 		$playbackContext = $this->getRequestParameter( "playbackContext", null );

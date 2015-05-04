@@ -559,7 +559,10 @@ class KalturaSyndicationFeedRenderer
 		{
 			$urlManager = DeliveryProfilePeer::getRemoteDeliveryByStorageId($fileSync->getDc(), $flavorAsset->getEntryId(),
 					PlaybackProtocol::HTTP, null, null, $flavorAsset);
-			$url = rtrim($urlManager->getUrl(),'/') . '/' . ltrim($urlManager->getFileSyncUrl($fileSync),'/');
+			$url = ltrim($urlManager->getFileSyncUrl($fileSync),'/');
+			if (strpos($url, "://") === false){
+				$url = rtrim($urlManager->getUrl(), "/") . "/".$url ;
+			}
 		}
 		
 		return $url;
@@ -618,4 +621,10 @@ class KalturaSyndicationFeedRenderer
 	public function getSyndicationFeedDb() {
 		return $this->syndicationFeedDb;
 	}
+
+	public function getReturnedEntriesCount()
+	{
+		return $this->returnedEntriesCount;
+	}
+
 }

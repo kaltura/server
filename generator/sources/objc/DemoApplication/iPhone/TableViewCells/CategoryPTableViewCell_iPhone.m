@@ -36,13 +36,14 @@
 
 - (IBAction)selectCellView:(UIButton *)button {
     
-    [parentController openMediaInfoByIndex:index + button.tag];
+    [parentController openMediaInfoByIndex:index + (int)button.tag];
     
 }
 
 - (IBAction)playButtonPressed:(UIButton *)button {
     
-    [parentController playButtonPressed];
+    [self selectCellView:button];
+//    [parentController playButtonPressed];
     
 }
 

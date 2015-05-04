@@ -319,5 +319,4 @@ class requestUtils extends infraRequestUtils
 		$current_country = self::getIpCountry() ;
 		return ( in_array ( $current_country , $ip_country_list ) );
 	}
-	
 }

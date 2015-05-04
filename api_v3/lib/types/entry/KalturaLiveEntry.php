@@ -91,6 +91,12 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 	 */
 	public $currentBroadcastStartTime;
 	
+	/**
+	 * @var KalturaLiveEntryRecordingOptions
+	 * @insertonly
+	 */
+	public $recordingOptions;
+	
 	private static $map_between_objects = array
 	(
 		"offlineMessage",
@@ -105,6 +111,7 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 		"lastBroadcast",
 		"publishConfigurations",
 		"currentBroadcastStartTime",
+		"recordingOptions",
 	);
 	
 	/* (non-PHPdoc)
@@ -118,12 +125,37 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 	public function toInsertableObject($sourceObject = null, $propsToSkip = array())
 	{
 		if(is_null($this->recordStatus))
-			$this->recordStatus = (PermissionPeer::isValidForPartner(PermissionName::FEATURE_LIVE_STREAM_RECORD, kCurrentContext::getCurrentPartnerId()) ? KalturaRecordStatus::ENABLED : KalturaRecordStatus::DISABLED);
-			
+			$this->recordStatus = (PermissionPeer::isValidForPartner(PermissionName::FEATURE_LIVE_STREAM_RECORD, kCurrentContext::getCurrentPartnerId()) ? KalturaRecordStatus::APPENDED : KalturaRecordStatus::DISABLED);
+
+
+		if ((is_null($this->recordingOptions) || is_null($this->recordingOptions->shouldCopyEntitlement)) && PermissionPeer::isValidForPartner(PermissionName::FEATURE_LIVE_STREAM_COPY_ENTITELMENTS, kCurrentContext::getCurrentPartnerId()))
+		{
+			if (is_null($this->recordingOptions))
+			{
+				$this->recordingOptions = new KalturaLiveEntryRecordingOptions();
+			}
+			$this->recordingOptions->shouldCopyEntitlement = true;
+		}
 		return parent::toInsertableObject($sourceObject, $propsToSkip);
 	}
-
 	
+	/* (non-PHPdoc)
+	 * @see KalturaMediaEntry::fromObject()
+	 */
+	public function doFromObject($dbObject, KalturaDetachedResponseProfile $responseProfile = null)
+	{
+		if(!($dbObject instanceof LiveEntry))
+			return;
+			
+		parent::doFromObject($dbObject, $responseProfile);
+
+		if($this->shouldGet('recordingOptions', $responseProfile) && !is_null($dbObject->getRecordingOptions()))
+		{
+			$this->recordingOptions = new KalturaLiveEntryRecordingOptions();
+			$this->recordingOptions->fromObject($dbObject->getRecordingOptions());
+		}
+	}
+
 	public function validateConversionProfile(entry $sourceObject = null)
 	{
 		if(!is_null($this->conversionProfileId) && $this->conversionProfileId != conversionProfile2::CONVERSION_PROFILE_NONE)

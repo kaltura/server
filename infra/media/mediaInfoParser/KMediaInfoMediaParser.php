@@ -58,7 +58,8 @@ class KMediaInfoMediaParser extends KBaseMediaParser
 			 * Interlaced mjpa sources - the height value is halved.
 			 */
 			if(isset($kMi->videoHeightTmp) 
-			&& isset($kMi->videoCodecId) && $kMi->videoCodecId=="mjpa"
+			// EBU case has the same issue with other codecs
+//			&& isset($kMi->videoCodecId) && $kMi->videoCodecId=="mjpa"
 			&& isset($kMi->scanType) && $kMi->scanType==1){
 				$kMi->videoHeight = $kMi->videoHeightTmp;
 			}

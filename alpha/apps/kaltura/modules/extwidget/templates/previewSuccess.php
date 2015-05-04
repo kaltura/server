@@ -42,7 +42,7 @@
 	<meta property="og:site_name" content="Kaltura" />
 	<?php } ?>
 	<title><?php echo htmlspecialchars($entry_name); ?></title>
-	<link type="text/css" rel="stylesheet" href="/lib/css/kmc.css" />
+	<link type="text/css" rel="stylesheet" href="/lib/css/shortlink.css" />
 	<?php if($framed)  { ?>
 	<style>
 	html, body {margin: 0; padding: 0; width: 100%; height: 100%; } 

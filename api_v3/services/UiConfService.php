@@ -64,7 +64,7 @@ class UiConfService extends KalturaBaseService
 		$dbUiConf->save();
 		
 		$uiConf = new KalturaUiConf(); // start from blank
-		$uiConf->fromUiConf( $dbUiConf );
+		$uiConf->fromObject($dbUiConf, $this->getResponseProfile());
 		
 		return $uiConf;
 	}
@@ -89,7 +89,7 @@ class UiConfService extends KalturaBaseService
 		$dbUiConf = $uiConf->toUpdatableObject($dbUiConf);
 		
 		$dbUiConf->save();
-		$uiConf->fromUiConf( $dbUiConf );
+		$uiConf->fromObject($dbUiConf, $this->getResponseProfile());
 		
 		return $uiConf;
 	}	
@@ -110,7 +110,7 @@ class UiConfService extends KalturaBaseService
 		if ( ! $dbUiConf )
 			throw new KalturaAPIException ( APIErrors::INVALID_UI_CONF_ID , $id );
 		$uiConf = new KalturaUiConf();
-		$uiConf->fromUiConf( $dbUiConf );
+		$uiConf->fromObject($dbUiConf, $this->getResponseProfile());
 		
 		return $uiConf;
 	}
@@ -158,7 +158,7 @@ class UiConfService extends KalturaBaseService
 		$uiConfClone = $dbUiConf->cloneToNew ( $ui_conf_verride_params );
 
 		$uiConf = new KalturaUiConf();
-		$uiConf->fromUiConf( $uiConfClone );
+		$uiConf->fromObject($uiConfClone, $this->getResponseProfile());
 		
 		return $uiConf;
 	}
@@ -195,7 +195,7 @@ class UiConfService extends KalturaBaseService
 		        $pager = new KalturaFilterPager ();
 		$pager->attachToCriteria( $templateCriteria );
 		$list = uiConfPeer::doSelect( $templateCriteria );
-		$newList = KalturaUiConfArray::fromUiConfArray( $list );
+		$newList = KalturaUiConfArray::fromDbArray($list, $this->getResponseProfile());
 		$response = new KalturaUiConfListResponse();
 		$response->objects = $newList;
 		$response->totalCount = $count;
@@ -227,7 +227,7 @@ class UiConfService extends KalturaBaseService
 		$pager->attachToCriteria( $c );
 		$list = uiConfPeer::doSelect( $c );
 		
-		$newList = KalturaUiConfArray::fromUiConfArray( $list );
+		$newList = KalturaUiConfArray::fromDbArray($list, $this->getResponseProfile());
 		
 		$response = new KalturaUiConfListResponse();
 		$response->objects = $newList;

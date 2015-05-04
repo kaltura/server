@@ -5,15 +5,15 @@
  */
 class KalturaLiveStreamEntryArray extends KalturaTypedArray
 {
-	public static function fromEntryArray ( $arr )
+	public static function fromDbArray($arr, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		$newArr = new KalturaLiveStreamEntryArray();
 		if ($arr == null)
 			return $newArr;		
 		foreach ($arr as $obj)
 		{
-			$nObj = new KalturaLiveStreamEntry();
-			$nObj->fromObject($obj);
+    		$nObj = KalturaEntryFactory::getInstanceByType($obj->getType());
+			$nObj->fromObject($obj, $responseProfile);
 			$newArr[] = $nObj;
 		}
 		

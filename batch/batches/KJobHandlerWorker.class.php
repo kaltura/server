@@ -7,10 +7,38 @@
 abstract class KJobHandlerWorker extends KBatchBase
 {
 	/**
+	 * The job object that currently handled
+	 * @var KalturaBatchJob
+	 */
+	private static $currentJob;
+	
+	/**
 	 * @param KalturaBatchJob $job
 	 * @return KalturaBatchJob
 	 */
 	abstract protected function exec(KalturaBatchJob $job);
+
+	/**
+	 * Returns the job object that currently handled
+	 * @return KalturaBatchJob
+	 */
+	public static function getCurrentJob()
+	{
+		return self::$currentJob;
+	}
+
+	/**
+	 * @param KalturaBatchJob $currentJob
+	 */
+	protected static function setCurrentJob(KalturaBatchJob $currentJob)
+	{
+		self::$currentJob = $currentJob;
+	}
+
+	protected static function unsetCurrentJob()
+	{
+		self::$currentJob = null;
+	}
 	
 	protected function init()
 	{
@@ -63,6 +91,7 @@ abstract class KJobHandlerWorker extends KBatchBase
 		{
 			try
 			{
+				self::setCurrentJob($job);
 				$job = $this->exec($job);
 				self::unimpersonate();
 			}
@@ -82,7 +111,7 @@ abstract class KJobHandlerWorker extends KBatchBase
 				if($ktex->getResetJobExecutionAttempts())
 					KBatchBase::$kClient->batch->resetJobExecutionAttempts($job->id, $this->getExclusiveLockKey(), $job->jobType);
 				
-				$this->closeJobOnError($job,KalturaBatchJobErrorTypes::RUNTIME, $ktex, KalturaBatchJobStatus::RETRY);
+				$this->closeJobOnError($job,KalturaBatchJobErrorTypes::RUNTIME, $ktex, KalturaBatchJobStatus::RETRY, $ktex->getData());
 			}
 			catch(KalturaClientException $kcex)
 			{
@@ -94,17 +123,18 @@ abstract class KJobHandlerWorker extends KBatchBase
 				self::unimpersonate();
 				$this->closeJobOnError($job,KalturaBatchJobErrorTypes::RUNTIME, $ex, KalturaBatchJobStatus::FAILED);
 			}
+			self::unsetCurrentJob();
 		}
 			
 		return $jobs;
 	}
 	
-	protected function closeJobOnError($job, $error, $ex, $status) 
+	protected function closeJobOnError($job, $error, $ex, $status, $data = null)
 	{
 		try
 		{
 			self::unimpersonate();
-			$job = $this->closeJob($job, $error, $ex->getCode(), "Error: " . $ex->getMessage(), $status);
+			$job = $this->closeJob($job, $error, $ex->getCode(), "Error: " . $ex->getMessage(), $status, $data);
 		} 
 		catch(Exception $ex)
 		{

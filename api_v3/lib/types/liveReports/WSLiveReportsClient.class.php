@@ -76,6 +76,7 @@ class WSLiveReportsClient extends nusoap_client
 	
 	protected function doCall($operation, array $params = array(), $type = null)
 	{
+		kApiCache::disableConditionalCache();
 		$namespace = 'http://tempuri.org';
 		$soapAction = '';
 		$headers = array();

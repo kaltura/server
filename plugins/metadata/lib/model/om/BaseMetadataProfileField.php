@@ -86,6 +86,18 @@ abstract class BaseMetadataProfileField extends BaseObject  implements Persisten
 	protected $status;
 
 	/**
+	 * The value for the related_metadata_profile_id field.
+	 * @var        int
+	 */
+	protected $related_metadata_profile_id;
+
+	/**
+	 * The value for the custom_data field.
+	 * @var        string
+	 */
+	protected $custom_data;
+
+	/**
 	 * Flag to prevent endless save loop, if this object is referenced
 	 * by another object which falls in this transaction.
 	 * @var        boolean
@@ -298,6 +310,26 @@ abstract class BaseMetadataProfileField extends BaseObject  implements Persisten
 	public function getStatus()
 	{
 		return $this->status;
+	}
+
+	/**
+	 * Get the [related_metadata_profile_id] column value.
+	 * 
+	 * @return     int
+	 */
+	public function getRelatedMetadataProfileId()
+	{
+		return $this->related_metadata_profile_id;
+	}
+
+	/**
+	 * Get the [custom_data] column value.
+	 * 
+	 * @return     string
+	 */
+	public function getCustomData()
+	{
+		return $this->custom_data;
 	}
 
 	/**
@@ -606,6 +638,49 @@ abstract class BaseMetadataProfileField extends BaseObject  implements Persisten
 	} // setStatus()
 
 	/**
+	 * Set the value of [related_metadata_profile_id] column.
+	 * 
+	 * @param      int $v new value
+	 * @return     MetadataProfileField The current object (for fluent API support)
+	 */
+	public function setRelatedMetadataProfileId($v)
+	{
+		if(!isset($this->oldColumnsValues[MetadataProfileFieldPeer::RELATED_METADATA_PROFILE_ID]))
+			$this->oldColumnsValues[MetadataProfileFieldPeer::RELATED_METADATA_PROFILE_ID] = $this->related_metadata_profile_id;
+
+		if ($v !== null) {
+			$v = (int) $v;
+		}
+
+		if ($this->related_metadata_profile_id !== $v) {
+			$this->related_metadata_profile_id = $v;
+			$this->modifiedColumns[] = MetadataProfileFieldPeer::RELATED_METADATA_PROFILE_ID;
+		}
+
+		return $this;
+	} // setRelatedMetadataProfileId()
+
+	/**
+	 * Set the value of [custom_data] column.
+	 * 
+	 * @param      string $v new value
+	 * @return     MetadataProfileField The current object (for fluent API support)
+	 */
+	public function setCustomData($v)
+	{
+		if ($v !== null) {
+			$v = (string) $v;
+		}
+
+		if ($this->custom_data !== $v) {
+			$this->custom_data = $v;
+			$this->modifiedColumns[] = MetadataProfileFieldPeer::CUSTOM_DATA;
+		}
+
+		return $this;
+	} // setCustomData()
+
+	/**
 	 * Indicates whether the columns in this object are only set to default values.
 	 *
 	 * This method can be used in conjunction with isModified() to indicate whether an object is both
@@ -648,6 +723,8 @@ abstract class BaseMetadataProfileField extends BaseObject  implements Persisten
 			$this->type = ($row[$startcol + 8] !== null) ? (string) $row[$startcol + 8] : null;
 			$this->xpath = ($row[$startcol + 9] !== null) ? (string) $row[$startcol + 9] : null;
 			$this->status = ($row[$startcol + 10] !== null) ? (int) $row[$startcol + 10] : null;
+			$this->related_metadata_profile_id = ($row[$startcol + 11] !== null) ? (int) $row[$startcol + 11] : null;
+			$this->custom_data = ($row[$startcol + 12] !== null) ? (string) $row[$startcol + 12] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -657,7 +734,7 @@ abstract class BaseMetadataProfileField extends BaseObject  implements Persisten
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 11; // 11 = MetadataProfileFieldPeer::NUM_COLUMNS - MetadataProfileFieldPeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 13; // 13 = MetadataProfileFieldPeer::NUM_COLUMNS - MetadataProfileFieldPeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating MetadataProfileField object", $e);
@@ -794,18 +871,61 @@ abstract class BaseMetadataProfileField extends BaseObject  implements Persisten
 			} else {
 				$ret = $ret && $this->preUpdate($con);
 			}
-			if ($ret) {
-				$affectedRows = $this->doSave($con);
-				if ($isInsert) {
-					$this->postInsert($con);
-				} else {
-					$this->postUpdate($con);
-				}
-				$this->postSave($con);
-				MetadataProfileFieldPeer::addInstanceToPool($this);
-			} else {
-				$affectedRows = 0;
+			
+			if (!$ret || !$this->isModified()) {
+				$con->commit();
+				return 0;
 			}
+			
+			for ($retries = 1; $retries < KalturaPDO::SAVE_MAX_RETRIES; $retries++)
+			{
+               $affectedRows = $this->doSave($con);
+                if ($affectedRows || !$this->isColumnModified(MetadataProfileFieldPeer::CUSTOM_DATA)) //ask if custom_data wasn't modified to avoid retry with atomic column 
+                	break;
+
+                KalturaLog::debug("was unable to save! retrying for the $retries time");
+                $criteria = $this->buildPkeyCriteria();
+				$criteria->addSelectColumn(MetadataProfileFieldPeer::CUSTOM_DATA);
+                $stmt = BasePeer::doSelect($criteria, $con);
+                $cutsomDataArr = $stmt->fetchAll(PDO::FETCH_COLUMN);
+                $newCustomData = $cutsomDataArr[0];
+                
+                $this->custom_data_md5 = md5($newCustomData);
+
+                $valuesToChangeTo = $this->m_custom_data->toArray();
+				$this->m_custom_data = myCustomData::fromString($newCustomData); 
+
+				//set custom data column values we wanted to change to
+			 	foreach ($this->oldCustomDataValues as $namespace => $namespaceValues){
+                	foreach($namespaceValues as $name => $oldValue)
+					{
+						$newValue = null;
+						if ($namespace)
+						{
+							if (isset ($valuesToChangeTo[$namespace][$name]))
+								$newValue = $valuesToChangeTo[$namespace][$name];
+						}
+						else
+						{ 
+							$newValue = $valuesToChangeTo[$name];
+						}
+					 
+						if (!is_null($newValue))
+							$this->putInCustomData($name, $newValue, $namespace);
+					}
+                   }
+                   
+				$this->setCustomData($this->m_custom_data->toString());
+			}
+
+			if ($isInsert) {
+				$this->postInsert($con);
+			} else {
+				$this->postUpdate($con);
+			}
+			$this->postSave($con);
+			MetadataProfileFieldPeer::addInstanceToPool($this);
+			
 			$con->commit();
 			return $affectedRows;
 		} catch (PropelException $e) {
@@ -887,10 +1007,12 @@ abstract class BaseMetadataProfileField extends BaseObject  implements Persisten
 	/**
 	 * Code to be run before persisting the object
 	 * @param PropelPDO $con
-	 * @return bloolean
+	 * @return boolean
 	 */
 	public function preSave(PropelPDO $con = null)
 	{
+		$this->setCustomDataObj();
+    	
 		return parent::preSave($con);
 	}
 
@@ -901,7 +1023,9 @@ abstract class BaseMetadataProfileField extends BaseObject  implements Persisten
 	public function postSave(PropelPDO $con = null) 
 	{
 		kEventsManager::raiseEvent(new kObjectSavedEvent($this));
-		$this->oldColumnsValues = array(); 
+		$this->oldColumnsValues = array();
+		$this->oldCustomDataValues = array();
+    	 
 		parent::postSave($con);
 	}
 	
@@ -1138,6 +1262,12 @@ abstract class BaseMetadataProfileField extends BaseObject  implements Persisten
 			case 10:
 				return $this->getStatus();
 				break;
+			case 11:
+				return $this->getRelatedMetadataProfileId();
+				break;
+			case 12:
+				return $this->getCustomData();
+				break;
 			default:
 				return null;
 				break;
@@ -1170,6 +1300,8 @@ abstract class BaseMetadataProfileField extends BaseObject  implements Persisten
 			$keys[8] => $this->getType(),
 			$keys[9] => $this->getXpath(),
 			$keys[10] => $this->getStatus(),
+			$keys[11] => $this->getRelatedMetadataProfileId(),
+			$keys[12] => $this->getCustomData(),
 		);
 		return $result;
 	}
@@ -1234,6 +1366,12 @@ abstract class BaseMetadataProfileField extends BaseObject  implements Persisten
 			case 10:
 				$this->setStatus($value);
 				break;
+			case 11:
+				$this->setRelatedMetadataProfileId($value);
+				break;
+			case 12:
+				$this->setCustomData($value);
+				break;
 		} // switch()
 	}
 
@@ -1269,6 +1407,8 @@ abstract class BaseMetadataProfileField extends BaseObject  implements Persisten
 		if (array_key_exists($keys[8], $arr)) $this->setType($arr[$keys[8]]);
 		if (array_key_exists($keys[9], $arr)) $this->setXpath($arr[$keys[9]]);
 		if (array_key_exists($keys[10], $arr)) $this->setStatus($arr[$keys[10]]);
+		if (array_key_exists($keys[11], $arr)) $this->setRelatedMetadataProfileId($arr[$keys[11]]);
+		if (array_key_exists($keys[12], $arr)) $this->setCustomData($arr[$keys[12]]);
 	}
 
 	/**
@@ -1291,6 +1431,8 @@ abstract class BaseMetadataProfileField extends BaseObject  implements Persisten
 		if ($this->isColumnModified(MetadataProfileFieldPeer::TYPE)) $criteria->add(MetadataProfileFieldPeer::TYPE, $this->type);
 		if ($this->isColumnModified(MetadataProfileFieldPeer::XPATH)) $criteria->add(MetadataProfileFieldPeer::XPATH, $this->xpath);
 		if ($this->isColumnModified(MetadataProfileFieldPeer::STATUS)) $criteria->add(MetadataProfileFieldPeer::STATUS, $this->status);
+		if ($this->isColumnModified(MetadataProfileFieldPeer::RELATED_METADATA_PROFILE_ID)) $criteria->add(MetadataProfileFieldPeer::RELATED_METADATA_PROFILE_ID, $this->related_metadata_profile_id);
+		if ($this->isColumnModified(MetadataProfileFieldPeer::CUSTOM_DATA)) $criteria->add(MetadataProfileFieldPeer::CUSTOM_DATA, $this->custom_data);
 
 		return $criteria;
 	}
@@ -1311,6 +1453,15 @@ abstract class BaseMetadataProfileField extends BaseObject  implements Persisten
 		
 		if($this->alreadyInSave)
 		{
+			if ($this->isColumnModified(MetadataProfileFieldPeer::CUSTOM_DATA))
+			{
+				if (!is_null($this->custom_data_md5))
+					$criteria->add(MetadataProfileFieldPeer::CUSTOM_DATA, "MD5(cast(" . MetadataProfileFieldPeer::CUSTOM_DATA . " as char character set latin1)) = '$this->custom_data_md5'", Criteria::CUSTOM);
+					//casting to latin char set to avoid mysql and php md5 difference
+				else 
+					$criteria->add(MetadataProfileFieldPeer::CUSTOM_DATA, NULL, Criteria::ISNULL);
+			}
+			
 			if (count($this->modifiedColumns) == 2 && $this->isColumnModified(MetadataProfileFieldPeer::UPDATED_AT))
 			{
 				$theModifiedColumn = null;
@@ -1379,6 +1530,10 @@ abstract class BaseMetadataProfileField extends BaseObject  implements Persisten
 		$copyObj->setXpath($this->xpath);
 
 		$copyObj->setStatus($this->status);
+
+		$copyObj->setRelatedMetadataProfileId($this->related_metadata_profile_id);
+
+		$copyObj->setCustomData($this->custom_data);
 
 
 		$copyObj->setNew(true);
@@ -1459,4 +1614,137 @@ abstract class BaseMetadataProfileField extends BaseObject  implements Persisten
 
 	}
 
+	/* ---------------------- CustomData functions ------------------------- */
+
+	/**
+	 * @var myCustomData
+	 */
+	protected $m_custom_data = null;
+	
+	/**
+	 * The md5 value for the custom_data field.
+	 * @var        string
+	 */
+	protected $custom_data_md5;
+
+	/**
+	 * Store custom data old values before the changes
+	 * @var        array
+	 */
+	protected $oldCustomDataValues = array();
+	
+	/**
+	 * @return array
+	 */
+	public function getCustomDataOldValues()
+	{
+		return $this->oldCustomDataValues;
+	}
+	
+	/**
+	 * @param string $name
+	 * @param string $value
+	 * @param string $namespace
+	 * @return string
+	 */
+	public function putInCustomData ( $name , $value , $namespace = null )
+	{
+		$customData = $this->getCustomDataObj( );
+		
+		$currentNamespace = '';
+		if($namespace)
+			$currentNamespace = $namespace;
+			
+		if(!isset($this->oldCustomDataValues[$currentNamespace]))
+			$this->oldCustomDataValues[$currentNamespace] = array();
+		if(!isset($this->oldCustomDataValues[$currentNamespace][$name]))
+			$this->oldCustomDataValues[$currentNamespace][$name] = $customData->get($name, $namespace);
+		
+		$customData->put ( $name , $value , $namespace );
+	}
+
+	/**
+	 * @param string $name
+	 * @param string $namespace
+	 * @param string $defaultValue
+	 * @return string
+	 */
+	public function getFromCustomData ( $name , $namespace = null , $defaultValue = null )
+	{
+		$customData = $this->getCustomDataObj( );
+		$res = $customData->get ( $name , $namespace );
+		if ( $res === null ) return $defaultValue;
+		return $res;
+	}
+
+	/**
+	 * @param string $name
+	 * @param string $namespace
+	 */
+	public function removeFromCustomData ( $name , $namespace = null)
+	{
+		$customData = $this->getCustomDataObj();
+		
+		$currentNamespace = '';
+		if($namespace)
+			$currentNamespace = $namespace;
+			
+		if(!isset($this->oldCustomDataValues[$currentNamespace]))
+			$this->oldCustomDataValues[$currentNamespace] = array();
+		if(!isset($this->oldCustomDataValues[$currentNamespace][$name]))
+			$this->oldCustomDataValues[$currentNamespace][$name] = $customData->get($name, $namespace);
+		
+		return $customData->remove ( $name , $namespace );
+	}
+
+	/**
+	 * @param string $name
+	 * @param int $delta
+	 * @param string $namespace
+	 * @return string
+	 */
+	public function incInCustomData ( $name , $delta = 1, $namespace = null)
+	{
+		$customData = $this->getCustomDataObj( );
+		return $customData->inc ( $name , $delta , $namespace  );
+	}
+
+	/**
+	 * @param string $name
+	 * @param int $delta
+	 * @param string $namespace
+	 * @return string
+	 */
+	public function decInCustomData ( $name , $delta = 1, $namespace = null)
+	{
+		$customData = $this->getCustomDataObj(  );
+		return $customData->dec ( $name , $delta , $namespace );
+	}
+
+	/**
+	 * @return myCustomData
+	 */
+	public function getCustomDataObj( )
+	{
+		if ( ! $this->m_custom_data )
+		{
+			$this->m_custom_data = myCustomData::fromString ( $this->getCustomData() );
+		}
+		return $this->m_custom_data;
+	}
+	
+	/**
+	 * Must be called before saving the object
+	 */
+	public function setCustomDataObj()
+	{
+		if ( $this->m_custom_data != null )
+		{
+			$this->custom_data_md5 = is_null($this->custom_data) ? null : md5($this->custom_data);
+			$this->setCustomData( $this->m_custom_data->toString() );
+		}
+	}
+	
+	/* ---------------------- CustomData functions ------------------------- */
+	
 } // BaseMetadataProfileField

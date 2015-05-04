@@ -3,7 +3,8 @@
  * @package api
  * @subpackage objects
  */
-class KalturaCategoryUser extends KalturaObject implements IFilterable {
+class KalturaCategoryUser extends KalturaObject implements IRelatedFilterable
+{
 	/**
 	 * 
 	 * @var int
@@ -167,7 +168,7 @@ class KalturaCategoryUser extends KalturaObject implements IFilterable {
 				throw new KalturaAPIException ( KalturaErrors::CATEGORY_USER_ALREADY_EXISTS );
 		}
 		
-		$currentKuserCategoryKuser = categoryKuserPeer::retrieveByCategoryIdAndActiveKuserId ( $this->categoryId, kCurrentContext::getCurrentKsKuserId() );
+		$currentKuserCategoryKuser = categoryKuserPeer::retrievePermittedKuserInCategory($this->categoryId, kCurrentContext::getCurrentKsKuserId());
 		if ((! $currentKuserCategoryKuser || 
 				$currentKuserCategoryKuser->getPermissionLevel () != CategoryKuserPermissionLevel::MANAGER) && 
 				$category->getUserJoinPolicy () == UserJoinPolicyType::NOT_ALLOWED && 
@@ -176,8 +177,6 @@ class KalturaCategoryUser extends KalturaObject implements IFilterable {
 		}
 		
 		//if user doesn't exists - create it
-		$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
-		$kuser = kuserPeer::getKuserByPartnerAndUid ($partnerId , $this->userId);
 		if(!$kuser)
 		{
 			if(!preg_match(kuser::PUSER_ID_REGEXP, $this->userId))
@@ -227,7 +226,7 @@ class KalturaCategoryUser extends KalturaObject implements IFilterable {
 			}
 		}
 		
-		$currentKuserCategoryKuser = categoryKuserPeer::retrieveByCategoryIdAndActiveKuserId($sourceObject->getCategoryId(), kCurrentContext::getCurrentKsKuserId());
+		$currentKuserCategoryKuser = categoryKuserPeer::retrievePermittedKuserInCategory($sourceObject->getCategoryId(), kCurrentContext::getCurrentKsKuserId());
 		if(kEntitlementUtils::getEntitlementEnforcement() && 
 		(!$currentKuserCategoryKuser || !$currentKuserCategoryKuser->hasPermission(PermissionName::CATEGORY_EDIT)))
 			throw new KalturaAPIException(KalturaErrors::CANNOT_UPDATE_CATEGORY_USER, $sourceObject->getCategoryId());

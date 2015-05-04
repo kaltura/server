@@ -10,6 +10,8 @@ class YouTubeDistributionPlugin extends KalturaPlugin implements IKalturaPermiss
 	const CONTENT_DSTRIBUTION_VERSION_BUILD = 0;
 	
 	const YOUTUBE_EVENT_CONSUMER = 'kYouTubeDistributionEventConsumer';
+	
+	const GOOGLE_APP_ID = 'youtubepartner';
 
 	public static function getPluginName()
 	{

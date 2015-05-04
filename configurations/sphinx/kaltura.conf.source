@@ -1,6 +1,9 @@
 index kaltura_base
 {
 	type	 = rt
+	dict	 = keywords
+	min_prefix_len  = 3
+	enable_star	 = 1
 	charset_type	 = utf-8
 	rt_mem_limit	 = 1024M
 	blend_chars	 = `, ~, !, @, U+23, $, %, ^, &, *, (, ), -, _, =, +, [, ], {, }, ;, :, ', \, |, /, ?, <, >
@@ -272,6 +275,12 @@ index kaltura_tag:kaltura_kuser_base
 {
 	path	 = @BASE_DIR@/sphinx/kaltura_tag_rt
 	@FIELDS_PLACEHOLDER-kaltura_tag@
+}
+
+index kaltura_metadata:kaltura_base
+{
+	path	 = @BASE_DIR@/sphinx/kaltura_metadata_rt
+	@FIELDS_PLACEHOLDER-kaltura_metadata@
 }
 
 

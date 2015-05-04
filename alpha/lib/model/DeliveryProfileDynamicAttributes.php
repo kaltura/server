@@ -34,6 +34,11 @@ class DeliveryProfileDynamicAttributes {
 	protected $clipTo = null;
 	
 	/**
+	 * @var float
+	 */
+	protected $playbackRate = null;
+	
+	/**
 	 * @var int
 	 */
 	protected $storageProfileId = null;
@@ -101,6 +106,11 @@ class DeliveryProfileDynamicAttributes {
 	protected $uiConfId = null;
 	
 	/**
+	 * @var string
+	 */
+	protected $urlParams = '';
+
+	/**
 	 * @return the $format
 	 */
 	public function getFormat() {
@@ -133,6 +143,13 @@ class DeliveryProfileDynamicAttributes {
 	 */
 	public function getClipTo() {
 		return $this->clipTo;
+	}
+	
+	/**
+	 * @return the $playbackRate
+	 */
+	public function getPlaybackRate() {
+		return $this->playbackRate;
 	}
 
 	/**
@@ -219,6 +236,13 @@ class DeliveryProfileDynamicAttributes {
 		$this->clipTo = $clipTo;
 	}
 
+	/**
+	 * @param number $playbackRate
+	 */
+	public function setPlaybackRate($playbackRate) {
+		$this->playbackRate = $playbackRate;
+	}
+	
 	/**
 	 * @param number $storageProfileId
 	 */
@@ -359,6 +383,22 @@ class DeliveryProfileDynamicAttributes {
 	}
 
 	/**
+	 * @param string $urlParamsString
+	 */
+	public function setUrlParams($urlParamsString)
+	{
+		$this->urlParams = $urlParamsString;
+	}
+	
+	/**
+	 * @return the urlParams
+	 */
+	public function getUrlParams()
+	{
+		return $this->urlParams;
+	}
+	
+	/**
 	 * @param array<asset|assetParams> $flavors
 	 * @return array
 	 */
@@ -391,6 +431,7 @@ class DeliveryProfileDynamicAttributes {
 		$this->containerFormat = $newObj->getContainerFormat();
 		$this->seekFromTime = $newObj->getSeekFromTime();
 		$this->clipTo = $newObj->getClipTo();
+		$this->playbackRate = $newObj->getPlaybackRate();
 		$this->storageId = $newObj->getStorageId();
 		$this->entryId = $newObj->getEntryId();
 		$this->tags = $newObj->getTags();

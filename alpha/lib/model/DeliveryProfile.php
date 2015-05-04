@@ -9,6 +9,10 @@ abstract class DeliveryProfile extends BaseDeliveryProfile {
 	
 	protected $DEFAULT_RENDERER_CLASS = 'kF4MManifestRenderer';
 	
+	const DYNAMIC_ATTRIBUTES_FULL_SUPPORT = 0;		// the profile fully supports the required attirbutes
+	const DYNAMIC_ATTRIBUTES_PARTIAL_SUPPORT = 1;	// the profile may support the required attirbutes however its better to try and find a more suitable profile
+	const DYNAMIC_ATTRIBUTES_NO_SUPPORT = 2;		// the profile doesn't support the required attirbutes
+	
 	/**
 	 * @var DeliveryProfileDynamicAttributes
 	 */
@@ -34,6 +38,24 @@ abstract class DeliveryProfile extends BaseDeliveryProfile {
 		$newObject->save(null, true);
 		return $newObject;
 	}
+
+	/**
+	 * returns whether the delivery profile supports the passed deliveryAttributes such as mediaProtocol, flv support, etc..
+	 * @param DeliveryProfileDynamicAttributes $deliveryAttributes
+	 */
+	public function supportsDeliveryDynamicAttributes(DeliveryProfileDynamicAttributes $deliveryAttributes) {
+		if(!$deliveryAttributes->getMediaProtocol())
+			return self::DYNAMIC_ATTRIBUTES_FULL_SUPPORT;
+
+ 		if(!is_null($this->getMediaProtocols()))
+		{
+			$supportedProtocols = explode(",", $this->getMediaProtocols());
+			if(!in_array($deliveryAttributes->getMediaProtocol(), $supportedProtocols)) 
+				return self::DYNAMIC_ATTRIBUTES_NO_SUPPORT;
+		}
+		
+		return self::DYNAMIC_ATTRIBUTES_FULL_SUPPORT;
+	}
 	
 	/**
 	 * Derives the delivery profile dynamic attributes from the file sync and the flavor asset.
@@ -49,7 +71,16 @@ abstract class DeliveryProfile extends BaseDeliveryProfile {
 		else if ($fileSync) 
 			$this->params->setFileExtension(pathinfo($fileSync->getFilePath(), PATHINFO_EXTENSION));
 	}
-	
+
+	/**
+	 * This function returns the DeliveryProfileDynamicAttributes object
+	 * @return DeliveryProfileDynamicAttributes
+	 */
+	public function getDynamicAttributes()
+	{
+		return $this->params;
+	}
+
 	/**
 	 * Copies the parameters from a given DeliveryProfileDynamicAttributes object to the current object params 
 	 * @param DeliveryProfileDynamicAttributes $params 

@@ -139,12 +139,6 @@ class kHttpNotificationDispatchJobData extends kEventNotificationDispatchJobData
 	protected $customHeaders;
 	
 	/**
-	 * Define the content dynamic parameters
-	 * @var array
-	 */
-	protected $contentParameters;
-	
-	/**
 	 * The secret to sign the notification with
 	 * @var string
 	 */
@@ -303,14 +297,6 @@ class kHttpNotificationDispatchJobData extends kEventNotificationDispatchJobData
 	}
 
 	/**
-	 * @return array $contentParameters
-	 */
-	public function getContentParameters()
-	{
-		return $this->contentParameters;
-	}
-
-	/**
 	 * @param string $url
 	 */
 	public function setUrl($url)
@@ -463,14 +449,6 @@ class kHttpNotificationDispatchJobData extends kEventNotificationDispatchJobData
 		$this->customHeaders = $customHeaders;
 	}
 
-	/**
-	 * @param array $contentParameters
-	 */
-	public function setContentParameters(array $contentParameters)
-	{
-		$this->contentParameters = $contentParameters;
-	}
-	
 	/**
 	 * @return the $signSecret
 	 */

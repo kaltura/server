@@ -16,6 +16,9 @@ class DeliveryProfileAkamaiHttp extends DeliveryProfileHttp {
 		$url = $this->getBaseUrl($flavorAsset);
 		if($this->params->getClipTo())
 			$url .= "/clipTo/" . $this->params->getClipTo();
+		else 
+			$url .= '/forceproxy/true';
+		
 		if($this->params->getFileExtension())
 			$url .= "/name/a." . $this->params->getFileExtension();
 		
@@ -38,6 +41,24 @@ class DeliveryProfileAkamaiHttp extends DeliveryProfileHttp {
 		return $url;
 	}
 	
-	// doGetFileSyncUrl - Inherit from parent
-}
+	protected function doGetFileSyncUrl(FileSync $fileSync)
+	{
+		$url = $fileSync->getFilePath();
+		
+		if($this->getUseIntelliseek() && ($this->params->getSeekFromTime() > 0))
+		{
+			$fromTime = floor($this->params->getSeekFromTime() / 1000);
 
+			/*
+			 * Akamai servers fail to return subset of the last second of the video.
+			 * The URL will return the two last seconds of the video in such cases. 
+			 **/
+			$entry = entryPeer::retrieveByPK($this->params->getEntryId()); 
+			if($entry)
+				$fromTime = min($fromTime, $entry->getDurationInt() - 1);
+
+			$url .= "?aktimeoffset=$fromTime";
+		}
+		return $url;
+	}
+}

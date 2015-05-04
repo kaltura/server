@@ -39,6 +39,7 @@ class kuserFilter extends baseObjectFilter
 				"_lte_id" ,
 				"_notin_id",
 				"_gte_login_data_id",
+				"_gt_login_data_id",
 				"_ltornull_login_data_id",
 				"_eq_is_admin",
 				"_likex_puser_id_or_screen_name",
@@ -47,6 +48,8 @@ class kuserFilter extends baseObjectFilter
 				'_mlikeor_permission_names',
 				'_eq_role_ids',		
 				'_in_role_ids',
+				'_eq_type',
+				'_in_type'
 			) ,
 			NULL
 		);

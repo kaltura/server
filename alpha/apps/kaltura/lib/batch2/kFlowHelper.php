@@ -14,7 +14,8 @@ class kFlowHelper
 	const MAX_INTER_FLOW_ITERATIONS_ALLOWED_ON_SOURCE = 2;
 	
 	const BULK_DOWNLOAD_EMAIL_PARAMS_SEPARATOR = '|,|';
-	
+
+	const LIVE_REPORT_EXPIRY_TIME = 604800; // 7 * 60 * 60 * 24
 	/**
 	 * @param int $partnerId
 	 * @param string $entryId
@@ -38,6 +39,7 @@ class kFlowHelper
 		$flavorAsset = flavorAsset::getInstance();
 		$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_QUEUED);
 		$flavorAsset->incrementVersion();
+		$flavorAsset->addTags(array(flavorParams::TAG_SOURCE));
 		$flavorAsset->setIsOriginal(true);
 		$flavorAsset->setFlavorParamsId(flavorParams::SOURCE_FLAVOR_ID);
 		$flavorAsset->setPartnerId($partnerId);
@@ -127,7 +129,12 @@ class kFlowHelper
 		// IMAGE media entries
 		if ($dbEntry->getType() == entryType::MEDIA_CLIP && $dbEntry->getMediaType() == entry::ENTRY_MEDIA_TYPE_IMAGE)
 		{
+			//setting the entry's data so it can be used for creating file-syncs' file-path version & extension - in kFileSyncUtils::moveFromFile
+			//without saving - the updated entry object exists in the instance pool
+			$dbEntry->setData(".jpg");
+			
 			$syncKey = $dbEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA);
+
 			try
 			{
 				kFileSyncUtils::moveFromFile($data->getDestFileLocalPath(), $syncKey, true, false, $data->getCacheOnly());
@@ -286,49 +293,18 @@ class kFlowHelper
 		if(count($files) > 1)
 		{
 			// find replacing entry id
-			$replacingEntryId = $recordedEntry->getReplacingEntryId();
-			$replacingEntry = null;
 			
-			// in replacement
-			if($replacingEntryId)
-			{
-				$replacingEntry = entryPeer::retrieveByPKNoFilter($replacingEntryId);
-				
-				// check if asset already ingested
-				$replacingAsset = assetPeer::retrieveByEntryIdAndParams($replacingEntryId, $asset->getFlavorParamsId());
-				if($replacingAsset)
-				{
-					KalturaLog::err('Asset with params [' . $asset->getFlavorParamsId() . '] already replaced');
-					return $dbBatchJob;
-				}
+			$replacingEntry = kFlowHelper::getReplacingEntry($recordedEntry, $asset);
+			if(is_null($replacingEntry)) {
+				KalturaLog::err('Failed to retrieve replacing entry');
+				return $dbBatchJob;
 			}
-			// not in replacement
-			else
-			{
-		    	$advancedOptions = new kEntryReplacementOptions();
-		    	$advancedOptions->setKeepManualThumbnails(true);
-		    	$recordedEntry->setReplacementOptions($advancedOptions);
-		
-				$replacingEntry = new entry();
-			 	$replacingEntry->setType(entryType::MEDIA_CLIP);
-				$replacingEntry->setMediaType(entry::ENTRY_MEDIA_TYPE_VIDEO);
-				$replacingEntry->setConversionProfileId($recordedEntry->getConversionProfileId());
-				$replacingEntry->setName($recordedEntry->getPartnerId().'_'.time());
-				$replacingEntry->setKuserId($recordedEntry->getKuserId());
-				$replacingEntry->setAccessControlId($recordedEntry->getAccessControlId());
-				$replacingEntry->setPartnerId($recordedEntry->getPartnerId());
-				$replacingEntry->setSubpId($recordedEntry->getPartnerId() * 100);
-				$replacingEntry->setDefaultModerationStatus();
-				$replacingEntry->setDisplayInSearch(mySearchUtils::DISPLAY_IN_SEARCH_SYSTEM);
-				$replacingEntry->setReplacedEntryId($recordedEntry->getId());
-				$replacingEntry->save();
-				
-				$recordedEntry->setReplacingEntryId($replacingEntry->getId());
-				$recordedEntry->setReplacementStatus(entryReplacementStatus::APPROVED_BUT_NOT_READY);
-				$recordedEntry->save();
-			}
-	
+			
 			$flavorParams = assetParamsPeer::retrieveByPKNoFilter($asset->getFlavorParamsId());
+			if(is_null($flavorParams)) { 
+				KalturaLog::err('Failed to retrieve asset params');
+				return $dbBatchJob;
+			}
 		
 			// create asset
 			$replacingAsset = assetPeer::getNewAsset(assetType::FLAVOR);
@@ -348,6 +324,62 @@ class kFlowHelper
 		}
 		
 		return $dbBatchJob;
+	}
+	
+	protected static function getReplacingEntry($recordedEntry, $asset, $retries = 1) {
+		$replacingEntryId = $recordedEntry->getReplacingEntryId();
+		$replacingEntry = null;
+		// in replacement
+		if($replacingEntryId)
+		{
+			$replacingEntry = entryPeer::retrieveByPKNoFilter($replacingEntryId);
+		
+			// check if asset already ingested
+			$replacingAsset = assetPeer::retrieveByEntryIdAndParams($replacingEntryId, $asset->getFlavorParamsId());
+			if($replacingAsset)
+			{
+				KalturaLog::err('Asset with params [' . $asset->getFlavorParamsId() . '] already replaced');
+				return null;
+			}
+		}
+		// not in replacement
+		else
+		{
+			$advancedOptions = new kEntryReplacementOptions();
+			$advancedOptions->setKeepManualThumbnails(true);
+			$recordedEntry->setReplacementOptions($advancedOptions);
+		
+			$replacingEntry = new entry();
+			$replacingEntry->setType(entryType::MEDIA_CLIP);
+			$replacingEntry->setMediaType(entry::ENTRY_MEDIA_TYPE_VIDEO);
+			$replacingEntry->setConversionProfileId($recordedEntry->getConversionProfileId());
+			$replacingEntry->setName($recordedEntry->getPartnerId().'_'.time());
+			$replacingEntry->setKuserId($recordedEntry->getKuserId());
+			$replacingEntry->setAccessControlId($recordedEntry->getAccessControlId());
+			$replacingEntry->setPartnerId($recordedEntry->getPartnerId());
+			$replacingEntry->setSubpId($recordedEntry->getPartnerId() * 100);
+			$replacingEntry->setDefaultModerationStatus();
+			$replacingEntry->setDisplayInSearch(mySearchUtils::DISPLAY_IN_SEARCH_SYSTEM);
+			$replacingEntry->setReplacedEntryId($recordedEntry->getId());
+			$replacingEntry->save();
+		
+			$recordedEntry->setReplacingEntryId($replacingEntry->getId());
+			$recordedEntry->setReplacementStatus(entryReplacementStatus::APPROVED_BUT_NOT_READY);
+			$affectedRows = $recordedEntry->save();
+			if(!$affectedRows) {
+				$replacingEntry->delete();
+				$replacingEntry = null;
+				if($retries) {
+					sleep(10);
+					$recordedEntry = entryPeer::retrieveByPKNoFilter($recordedEntry->getId());
+					return kFlowHelper::getReplacingEntry($recordedEntry, $asset, 0);
+				} else {
+					KalturaLog::err("Failed to update replacing entry");
+					return null;
+				}
+			}
+		}
+		return $replacingEntry;
 	}
 
 	/**
@@ -1805,7 +1837,7 @@ class kFlowHelper
 			{
 				if(self::isAssetExportFinished($fileSync, $asset))
 				{
-					if(!is_null($asset->getentry()->getReplacedEntryId()))
+					if(!is_null($asset->getentry()) && !is_null($asset->getentry()->getReplacedEntryId()))
 						self::handleEntryReplacementFileSyncDeletion($fileSync, array(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET, asset::FILE_SYNC_ASSET_SUB_TYPE_ISM, asset::FILE_SYNC_ASSET_SUB_TYPE_ISMC));
 					
 					self::conditionalAssetLocalFileSyncsDelete($fileSync, $asset);
@@ -2524,9 +2556,11 @@ class kFlowHelper
 				KalturaLog::err("Entry id [" . $uploadToken->getObjectId() . "] not found");
 				return;
 			}
-
+			
+			//Keep original extention
+			$ext = pathinfo($fullPath, PATHINFO_EXTENSION);
 			// increments version
-			$dbEntry->setData('100000.jpg');
+			$dbEntry->setData('100000.'.$ext);
 			$dbEntry->save();
 
 			$syncKey = $dbEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA);
@@ -2642,7 +2676,7 @@ class kFlowHelper
 		return $dbBatchJob;
 	}
 	
-	protected static function createLiveReportExportDownloadUrl ($partner_id, $file_name)
+	protected static function createLiveReportExportDownloadUrl ($partner_id, $file_name, $expiry, $applicationUrlTemplate)
 	{
 		// Extract simple download name
 		$regex = "/^{$partner_id}_Export_[a-zA-Z0-9]+_(?<fileName>[\w\-]+.csv)$/";
@@ -2660,21 +2694,17 @@ class kFlowHelper
 		$partner = PartnerPeer::retrieveByPK ( $partner_id );
 		$secret = $partner->getSecret ();
 		$privilege = ks::PRIVILEGE_DOWNLOAD . ":" . $file_name;
-	
-		$maxExpiry = 3 * 24 * 60 * 60;
-		$expiry = $partner->getKsMaxExpiryInSeconds();
-		if(!$expiry || ($expiry > $maxExpiry))
-			$expiry = $maxExpiry;
-	
-		$result = kSessionUtils::startKSession ( $partner_id, $secret, null, $ksStr, $expiry, false, "", $privilege );
-	
-		if ($result < 0) {
-			KalturaLog::err("Failed to create KS for Live report export download url");
-			return null;
+
+		$ksStr = kSessionBase::generateSession($partner->getKSVersion(), $partner->getAdminSecret(), null, ks::TYPE_KS, $partner_id, $expiry, $privilege);
+
+		if ($applicationUrlTemplate) {
+			$url = str_replace("[ks]", $ksStr, $applicationUrlTemplate);
+			$url = str_replace("[id]", $file_name, $url);
 		}
-			
-		//url is built with DC url in order to be directed to the same DC of the saved file
-		$url = kDataCenterMgr::getCurrentDcUrl() . "/api_v3/index.php/service/liveReports/action/serveReport/ks/$ksStr/id/$file_name/$downloadName";
+		else {
+			//url is built with DC url in order to be directed to the same DC of the saved file
+			$url = kDataCenterMgr::getCurrentDcUrl() . "/api_v3/index.php/service/liveReports/action/serveReport/ks/$ksStr/id/$file_name/$downloadName";
+		}
 		return $url;
 	}
 	
@@ -2694,9 +2724,10 @@ class kFlowHelper
 		$data->outputPath = $filePath;
 		$dbBatchJob->setData($data);
 		$dbBatchJob->save();
-		
+
+		$expiry = kConf::get("live_report_export_expiry", 'local', self::LIVE_REPORT_EXPIRY_TIME);
 		// Create download URL
-		$url = self::createLiveReportExportDownloadUrl($dbBatchJob->getPartnerId(), $fileName);
+		$url = self::createLiveReportExportDownloadUrl($dbBatchJob->getPartnerId(), $fileName, $expiry, $data->applicationUrlTemplate);
 		if(!$url) {
 			KalturaLog::err("Failed to create download URL");
 			return kFlowHelper::handleLiveReportExportFailed($dbBatchJob, $data);
@@ -2705,7 +2736,9 @@ class kFlowHelper
 		// Create email params
 		$time = date("m-d-y H:i", $data->timeReference + $data->timeZoneOffset); 
 		$email_id = MailType::MAIL_TYPE_LIVE_REPORT_EXPORT_SUCCESS;
-		$params = array($dbBatchJob->getPartner()->getName(), $time, $dbBatchJob->getId(), $url);
+		$validUntil = date("m-d-y H:i", $data->timeReference + $expiry + $data->timeZoneOffset);
+		$expiryInDays = $expiry / 60 / 60 / 24;
+		$params = array($dbBatchJob->getPartner()->getName(), $time, $dbBatchJob->getId(), $url, $expiryInDays, $validUntil);
 		$titleParams = array($time);
 		
 		
@@ -2730,7 +2763,7 @@ class kFlowHelper
 	
 		$time = date("m-d-y H:i", $data->timeReference + $data->timeZoneOffset);
 		$email_id = MailType::MAIL_TYPE_LIVE_REPORT_EXPORT_FAILURE;
-		$params = array($dbBatchJob->getPartner()->getName(), $time, $dbBatchJob->getId(), 
+		$params = array($dbBatchJob->getPartner()->getName(), $time, $dbBatchJob->getId(),
 				$dbBatchJob->getErrType(), $dbBatchJob->getErrNumber());
 		$titleParams = array($time);
 	

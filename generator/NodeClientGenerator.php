@@ -16,10 +16,9 @@ class NodeClientGenerator extends ClientGeneratorFromXml
 	 * @param string $xmlPath path to schema xml.
 	 * @link http://www.kaltura.com/api_v3/api_schema.php
 	 */
-	function NodeClientGenerator($xmlPath)
+	function __construct($xmlPath, Zend_Config $config, $sourcePath = "sources/node")
 	{
-		//set up the generator paths; path to schema xml and path to static source code files to copy.
-		parent::ClientGeneratorFromXml($xmlPath, 'sources/node');
+		parent::__construct($xmlPath, $sourcePath, $config);
 	}
 	
 	function getSingleLineCommentMarker()

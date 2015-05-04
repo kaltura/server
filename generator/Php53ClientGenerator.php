@@ -9,12 +9,9 @@ class Php53ClientGenerator extends ClientGeneratorFromXml
 	 */
 	protected $_doc = null;
 	
-	function Php53ClientGenerator($xmlPath, $sourcePath = null)
+	function __construct($xmlPath, Zend_Config $config, $sourcePath = "sources/php53")
 	{
-		if(!$sourcePath)
-			$sourcePath = realpath("sources/php53");
-			
-		parent::ClientGeneratorFromXml($xmlPath, $sourcePath);
+		parent::__construct($xmlPath, $sourcePath, $config);
 		$this->_doc = new KDOMDocument();
 		$this->_doc->load($this->_xmlFile);
 	}
@@ -149,7 +146,10 @@ class Php53ClientGenerator extends ClientGeneratorFromXml
 		
     	$this->startNewTextBlock();
 		$this->appendLine('<?php');
-	    $this->writeMainClient($serviceNodes);
+		
+		$configurationNodes = $xpath->query("/xml/configurations/*");
+	    $this->writeMainClient($serviceNodes, $configurationNodes);
+	    
     	$this->addFile($this->getMainPath(), $this->getTextBlock());
     	
     	
@@ -475,24 +475,44 @@ class Php53ClientGenerator extends ClientGeneratorFromXml
 					break;
 					
 				case "bool" :
-					$this->appendLine("		if(!empty(\$xml->{$propName}))");
-					$this->appendLine("			\$this->$propName = true;");
+					$this->appendLine("		if(count(\$xml->{$propName}))");
+					$this->appendLine("		{");
+					$this->appendLine("			if(!empty(\$xml->{$propName}))");
+					$this->appendLine("				\$this->$propName = true;");
+					$this->appendLine("			else");
+					$this->appendLine("				\$this->$propName = false;");
+					$this->appendLine("		}");
 					break;
 					
 				case "string" :
-					$this->appendLine("		\$this->$propName = ($propType)\$xml->$propName;");
+					$this->appendLine("		if(count(\$xml->{$propName}))");
+					$this->appendLine("			\$this->$propName = ($propType)\$xml->$propName;");
 					break;
 					
 				case "array" :
 					$arrayType = $propertyNode->getAttribute ( "arrayType" );
-					$this->appendLine("		if(empty(\$xml->{$propName}))");
-					$this->appendLine("			\$this->$propName = array();");
-					$this->appendLine("		else");
-					$this->appendLine("			\$this->$propName = \Kaltura\Client\ParseUtils::unmarshalArray(\$xml->$propName, \"$arrayType\");");
+					$this->appendLine("		if(count(\$xml->{$propName}))");
+					$this->appendLine("		{");
+					$this->appendLine("			if(empty(\$xml->{$propName}))");
+					$this->appendLine("				\$this->$propName = array();");
+					$this->appendLine("			else");
+					$this->appendLine("				\$this->$propName = \Kaltura\Client\ParseUtils::unmarshalArray(\$xml->$propName, \"$arrayType\");");
+					$this->appendLine("		}");
+					break;
+					
+				case "map" :
+					$arrayType = $propertyNode->getAttribute ( "arrayType" );
+					$this->appendLine("		if(count(\$xml->{$propName}))");
+					$this->appendLine("		{");
+					$this->appendLine("			if(empty(\$xml->{$propName}))");
+					$this->appendLine("				\$this->$propName = array();");
+					$this->appendLine("			else");
+					$this->appendLine("				\$this->$propName = \Kaltura\Client\ParseUtils::unmarshalMap(\$xml->$propName, \"$arrayType\");");
+					$this->appendLine("		}");
 					break;
 					
 				default : // sub object
-					$this->appendLine("		if(!empty(\$xml->{$propName}))");
+					$this->appendLine("		if(count(\$xml->{$propName}) && !empty(\$xml->{$propName}))");
 					$this->appendLine("			\$this->$propName = \Kaltura\Client\ParseUtils::unmarshalObject(\$xml->$propName, \"{$propType}\");");
 					break;
 			}
@@ -522,7 +542,9 @@ class Php53ClientGenerator extends ClientGeneratorFromXml
 			$this->appendLine("	/**");
 			$this->appendLine("	 * " . $this->formatMultiLineComment($description));
 			if ($propType == "array")
-				$this->appendLine("	 * @var $propType of {$propertyNode->getAttribute("arrayType")}");
+				$this->appendLine("	 * @var array<{$propertyNode->getAttribute("arrayType")}>");
+			elseif ($propType == "map")
+				$this->appendLine("	 * @var array<string, {$propertyNode->getAttribute("arrayType")}>");
 			elseif ($this->isSimpleType($propType))
 				$this->appendLine("	 * @var $propType");
 			elseif ($isEnum) 
@@ -671,7 +693,7 @@ class Php53ClientGenerator extends ClientGeneratorFromXml
 				{
 					$this->appendLine("		\$this->client->addParam(\$kfiles, \"$paramName\", \$$paramName);");
 				}
-				else if ($paramType == "array")
+				else if ($paramType == "array" || $paramType == "map")
 				{
 					$extraTab = "";
 					if ($isOptional)
@@ -769,7 +791,7 @@ class Php53ClientGenerator extends ClientGeneratorFromXml
 			{
 				$signature .= "$".$paramName;
 			}
-			else if ($paramType == "array")
+			else if ($paramType == "array" || $paramType == "map")
 			{
 				$signature .= "array $".$paramName;
 			}
@@ -813,9 +835,10 @@ class Php53ClientGenerator extends ClientGeneratorFromXml
 		return $signature;
 	}
 	
-	function writeMainClient(DOMNodeList $serviceNodes)
+	function writeMainClient(DOMNodeList $serviceNodes, DOMNodeList $configurationNodes)
 	{
 		$apiVersion = $this->_doc->documentElement->getAttribute('apiVersion');
+		$date = date('y-m-d');
 		
 		$this->appendLine('/**');
 		$this->appendLine(' * @namespace');
@@ -833,11 +856,6 @@ class Php53ClientGenerator extends ClientGeneratorFromXml
 		
 		$this->appendLine("class Client extends Base");
 		$this->appendLine("{");
-		$this->appendLine("	/**");
-		$this->appendLine("	 * @var string");
-		$this->appendLine("	 */");
-		$this->appendLine("	protected \$apiVersion = '$apiVersion';");
-		$this->appendLine("");
 	
 		foreach($serviceNodes as $serviceNode)
 		{
@@ -861,6 +879,9 @@ class Php53ClientGenerator extends ClientGeneratorFromXml
 		$this->appendLine("	public function __construct(Configuration \$config)");
 		$this->appendLine("	{");
 		$this->appendLine("		parent::__construct(\$config);");
+		$this->appendLine("		");
+		$this->appendLine("		\$this->setClientTag('php5:$date');");
+		$this->appendLine("		\$this->setApiVersion('$apiVersion');");
 		$this->appendLine("	}");
 		$this->appendLine("	");
 	
@@ -883,8 +904,82 @@ class Php53ClientGenerator extends ClientGeneratorFromXml
 			$this->appendLine("		return \$this->$serviceName;");
 			$this->appendLine("	}");
 		}
+	
+		foreach($configurationNodes as $configurationNode)
+		{
+			/* @var $configurationNode DOMElement */
+			$configurationName = $configurationNode->nodeName;
+			$methodsName = ucfirst($configurationName) . "Configuration";
+		
+			foreach($configurationNode->childNodes as $configurationPropertyNode)
+			{
+				/* @var $configurationPropertyNode DOMElement */
+				
+				if ($configurationPropertyNode->nodeType != XML_ELEMENT_NODE)
+					continue;
+			
+				$configurationProperty = $configurationPropertyNode->localName;
+				$type = $configurationPropertyNode->getAttribute('type');
+				if(!$this->isSimpleType($type))
+					$type = $this->getTypeClassInfo($type)->getFullyQualifiedName();
+				$description = null;
+				
+				if($configurationPropertyNode->hasAttribute('description'))
+				{
+					$description = $configurationPropertyNode->getAttribute('description');
+				}
+				
+				$this->writeConfigurationProperty($configurationName, $configurationProperty, $configurationProperty, $type, $description);
+				
+				if($configurationPropertyNode->hasAttribute('alias'))
+				{
+					$this->writeConfigurationProperty($configurationName, $configurationPropertyNode->getAttribute('alias'), $configurationProperty, $type, $description);					
+				}
+			}
+		}
 		
 		$this->appendLine("}");
+	}
+	
+	protected function writeConfigurationProperty($configurationName, $name, $paramName, $type, $description)
+	{
+		$methodsName = ucfirst($name);
+		$signitureType = $this->isSimpleType($type) ? '' : "$type ";
+	
+		
+		$this->appendLine("	/**");
+		if($description)
+		{
+			$this->appendLine("	 * $description");
+			$this->appendLine("	 * ");
+		}
+		$this->appendLine("	 * @param $type \${$name}");
+		$this->appendLine("	 */");
+		$this->appendLine("	public function set{$methodsName}({$signitureType}\${$name})");
+		$this->appendLine("	{");
+		$this->appendLine("		\$this->{$configurationName}Configuration['{$paramName}'] = \${$name};");
+		$this->appendLine("	}");
+		$this->appendLine("	");
+	
+		
+		$this->appendLine("	/**");
+		if($description)
+		{
+			$this->appendLine("	 * $description");
+			$this->appendLine("	 * ");
+		}
+		$this->appendLine("	 * @return $type");
+		$this->appendLine("	 */");
+		$this->appendLine("	public function get{$methodsName}()");
+		$this->appendLine("	{");
+		$this->appendLine("		if(isset(\$this->{$configurationName}Configuration['{$paramName}']))");
+		$this->appendLine("		{");
+		$this->appendLine("			return \$this->{$configurationName}Configuration['{$paramName}'];");
+		$this->appendLine("		}");
+		$this->appendLine("		");
+		$this->appendLine("		return null;");
+		$this->appendLine("	}");
+		$this->appendLine("	");
 	}
 	
 	protected function addFile($fileName, $fileContents, $addLicense = true)

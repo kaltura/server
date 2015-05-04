@@ -10,10 +10,13 @@
 #import <MediaPlayer/MediaPlayer.h>
 #import <MessageUI/MessageUI.h>
 #import <MessageUI/MFMailComposeViewController.h>
+#import <KALTURAPlayerSDK/KPViewController.h>
 
 @class AppDelegate_iPhone;
 
-@interface MediaInfoViewController_iPhone : UIViewController <MFMailComposeViewControllerDelegate> {
+extern const CGRect PlayerCGRect;
+
+@interface MediaInfoViewController_iPhone : UIViewController <MFMailComposeViewControllerDelegate, UINavigationControllerDelegate> {
     
     AppDelegate_iPhone *app;
     
@@ -38,6 +41,8 @@
     IBOutlet UIView *viewShare;
     
     NSString *categoryName;
+
+    KPViewController* playerViewController;
         
 }
 
@@ -45,6 +50,10 @@
 - (IBAction)categoryBarButtonPressed:(UIButton *)button;
 - (IBAction)playButtonPressed;
 - (IBAction)shareButtonPressed:(UIButton *)button;
+
+// Supporting PlayerSDK 
+- (void)stopAndRemovePlayer;
+- (void)toggleFullscreen:(NSNotification *)note;
 
 @property (nonatomic, retain) KalturaMediaEntry *mediaEntry;
 @property (nonatomic, retain) NSString *categoryName;

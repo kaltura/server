@@ -123,13 +123,15 @@ $config = parse_ini_file(__DIR__ . '/../config.ini', true);
 
 $serviceUrl = $config['client-config']['protocol'] . '://' . $options['service-url'] . ':' . $config['client-config']['port'];;
 $clientConfig = new KalturaConfiguration();
-$clientConfig->partnerId = null;
 $clientConfig->serviceUrl = $serviceUrl;
 
-foreach($config['client-config'] as $attribute => $value)
+foreach($config['config'] as $attribute => $value)
 	$clientConfig->$attribute = $value;
-
+	
 if(isset($options['debug']))
 	$clientConfig->setLogger(new KalturaMonitorClientLogger());
 
 $client = new KalturaMonitorClient($clientConfig);
+
+foreach($config['client-config'] as $attribute => $value)
+	$client->setClientConfiguration($attribute, $value);

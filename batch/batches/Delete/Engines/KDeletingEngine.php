@@ -40,7 +40,10 @@ abstract class KDeletingEngine
 				
 			case KalturaDeleteObjectType::CATEGORY_USER:
 				return new KDeletingCategoryUserEngine();
-				
+
+			case KalturaDeleteObjectType::GROUP_USER:
+				return new KDeletingGroupUserEngine();
+
 			default:
 				return KalturaPluginManager::loadObject('KDeletingEngine', $objectType);
 		}

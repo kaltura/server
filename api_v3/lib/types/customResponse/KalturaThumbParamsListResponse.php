@@ -3,17 +3,11 @@
  * @package api
  * @subpackage objects
  */
-class KalturaThumbParamsListResponse extends KalturaObject
+class KalturaThumbParamsListResponse extends KalturaListResponse
 {
 	/**
 	 * @var KalturaThumbParamsArray
 	 * @readonly
 	 */
 	public $objects;
-
-	/**
-	 * @var int
-	 * @readonly
-	 */
-	public $totalCount;
 }

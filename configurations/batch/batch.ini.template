@@ -49,13 +49,15 @@ enabledWorkers.KAsyncDeleteFile						= 1
 enabledWorkers.KAsyncMoveCategoryEntries			= 4
 enabledWorkers.KAsyncCopy							= 4
 enabledWorkers.KAsyncParseCaptionAsset				= 1
-enabledWorkers.KScheduledTaskRunner					= 0
-enabledWorkers.KScheduledTaskDryRunner				= 0
+enabledWorkers.KScheduledTaskRunner					= 1
+enabledWorkers.KScheduledTaskDryRunner				= 1
 enabledWorkers.KAsyncConvertLiveSegment				= 1
 enabledWorkers.KAsyncConcat							= 1
 enabledWorkers.KAsyncValidateLiveMediaServers		= 1
 enabledWorkers.KAsyncSyncCategoryPrivacyContext		= 1
 enabledWorkers.KAsyncTagIndex						= 1
+enabledWorkers.KAsyncIntegrate						= 1
+enabledWorkers.KAsyncIntegrateCloser				= 1
 
 
 [mainTemplate : template]
@@ -196,6 +198,7 @@ friendlyName										= Extract Media
 type												= KAsyncExtractMedia
 scriptPath											= batches/ExtractMedia/KAsyncExtractMediaExe.php
 params.mediaInfoCmd									= @BIN_DIR@/mediainfo
+params.ffprobeCmd									= @BIN_DIR@/ffprobe
 
 [KAsyncConvertWorker : JobHandlerWorker]
 type												= KAsyncConvert
@@ -525,7 +528,7 @@ id													= 330
 friendlyName										= Distribute Fetch Report Closer
 type												= KAsyncDistributeFetchReportCloser
 scriptPath											= ../plugins/content_distribution/batch/Distribute/KAsyncDistributeFetchReportCloserExe.php
-
+ 
 
 [KAsyncSynchronizeDistribution : PeriodicWorker]
 id													= 340
@@ -541,6 +544,8 @@ type												= KAsyncDropFolderWatcher
 maximumExecutionTime								= 3000
 scriptPath											= ../plugins/drop_folder/batch/DropFolderWatcher/KAsyncDropFolderWatcherExe.php
 params.tags											= *
+params.mrss.xmlPath									= @WEB_DIR@/tmp/dropFolderFiles
+params.mrss.limitProcessEachRun						= 20
 
 
 [KAsyncDropFolderContentProcessor : JobHandlerWorker]
@@ -633,14 +638,14 @@ scriptPath             								= ../plugins/drm/providers/widevine/batch/widevin
 id													= 490
 type												= KAsyncConvertLiveSegment
 scriptPath											= batches/ConvertLiveSegment/KAsyncConvertLiveSegmentExe.php
-
+params.ffprobeCmd									= @BIN_DIR@/ffprobe
 
 
 [KAsyncConcat : KAsyncConvertWorker]
 id													= 500
 type												= KAsyncConcat
 scriptPath											= batches/Concat/KAsyncConcatExe.php
-
+params.ffprobeCmd									= @BIN_DIR@/ffprobe
 
 
 [KAsyncValidateLiveMediaServers : PeriodicWorker]
@@ -675,6 +680,7 @@ scriptPath											= ../plugins/scheduled_task/batch/ScheduledTaskDryRunner/KS
 params.sharedTempPath 								= @TMP_DIR@/scheduledtasks
 
 [KScheduledTaskRunner : PeriodicWorker]
+id													= 610
 type												= KScheduledTaskRunner
 maximumExecutionTime								= 600
 scriptPath											= ../plugins/scheduled_task/batch/ScheduledTaskRunner/KScheduledTaskRunnerExe.php
@@ -703,3 +709,18 @@ maximumExecutionTime								= 12000
 scriptPath											= batches/LiveReportExport/KAsyncLiveReportExportExe.php
 params.localTempPath								= @TMP_DIR@/reports
 params.sharedPath									= @WEB_DIR@/tmp/reports
+
+[KAsyncIntegrate : JobHandlerWorker]
+id													= 570
+friendlyName										= Integrate
+type												= KAsyncIntegrate
+maximumExecutionTime								= 12000
+scriptPath											= ../plugins/integration/batch/Integrate/KAsyncIntegrateExe.php
+
+[KAsyncIntegrateCloser : JobHandlerWorker]
+id													= 580
+friendlyName										= Integrate Closer
+type												= KAsyncIntegrateCloser
+maximumExecutionTime								= 12000
+scriptPath											= ../plugins/integration/batch/Integrate/KAsyncIntegrateCloserExe.php
+params.maxTimeBeforeFail							= 1000000

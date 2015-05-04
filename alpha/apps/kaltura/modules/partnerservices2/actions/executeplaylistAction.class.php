@@ -69,35 +69,9 @@ class executeplaylistAction extends defPartnerservices2Action
 		$detailed = $this->getP ( "detailed" , false );
 		if (!$detailed)
 			$detailed = false;
-		$limit = $this->getP ( "page_size" , 10 );
-		$limit = $this->maxPageSize ( $limit );
-
-		$page = $this->getP ( "page" , 1 );
-
-		$user_filter_prefix = $this->getP ( "fp" , "filter" );
-		
-		$offset = ($page-1)* $limit;
-
-		// TODO - should limit search to partner ??
-//		kuserPeer::setUseCriteriaFilter( false );
-//		entryPeer::setUseCriteriaFilter( false );
 
 		$playlist_id= $this->getPM ( "playlist_id" );
-		$input_params = $this->getInputParams();
 		
-		$extra_filters = array();
-		for ( $i=1 ; $i< self::MAX_FILTER_COUNT ; $i++ )
-		{
-			// filter
-			$extra_filter = new entryFilter(  );
-			
-			$fields_set = $extra_filter->fillObjectFromRequest( $input_params , "{$user_filter_prefix}{$i}_" , null );
-			if ( $fields_set )		
-				$extra_filters[$i] = $extra_filter;
-		}
-		
-
-
 		if ( $create_cachekey ) 
 		{
 			if ( $this->isAdmin() )
@@ -115,13 +89,14 @@ class executeplaylistAction extends defPartnerservices2Action
 				
 			$cache_key_arr = array ( 
 				"playlist_id" => $playlist_id , 
-				"filters" => $extra_filters , 
 				"partner_id" => $partner_id ,
 				"ks_partner_id" => $ks_partner_id ,  
 				"detailed" => $detailed,
 				"user" => kCurrentContext::$ks_uid,
 				"privileges" => $privileges,
-				"is_admin" => $this->isAdmin() );
+				"is_admin" => $this->isAdmin(),
+				"protocol" => infraRequestUtils::getProtocol(),
+			);
 			$cahce_key = new executionCacheKey( );
 			$cahce_key->expiry =  600 ;
 			$cahce_key->key = md5( print_r($cache_key_arr,true ) );
@@ -143,7 +118,7 @@ class executeplaylistAction extends defPartnerservices2Action
 		if ($this->isAdmin())
 			myPlaylistUtils::setIsAdminKs(true);
 
-		$entry_list = myPlaylistUtils::executePlaylistById( $partner_id , $playlist_id , $extra_filters , $detailed );
+		$entry_list = myPlaylistUtils::executePlaylistById( $partner_id , $playlist_id , null , $detailed );
 
 		myEntryUtils::updatePuserIdsForEntries ( $entry_list );
 		

@@ -45,6 +45,7 @@ class MetadataProfileService extends KalturaBaseService
 		
 		// must be validatebefore checking available searchable fields count
 		$metadataProfile->validatePropertyNotNull('metadataObjectType');
+		kMetadataManager::validateProfileFields($this->getPartnerId(), $xsdData);
 		
 		$dbMetadataProfile = $metadataProfile->toInsertableObject();
 		$dbMetadataProfile->setStatus(KalturaMetadataProfileStatus::ACTIVE);
@@ -64,7 +65,7 @@ class MetadataProfileService extends KalturaBaseService
 		kMetadataManager::parseProfileSearchFields($this->getPartnerId(), $dbMetadataProfile);
 		
 		$metadataProfile = new KalturaMetadataProfile();
-		$metadataProfile->fromObject($dbMetadataProfile);
+		$metadataProfile->fromObject($dbMetadataProfile, $this->getResponseProfile());
 		
 		return $metadataProfile;
 	}
@@ -120,7 +121,7 @@ class MetadataProfileService extends KalturaBaseService
 		kMetadataManager::parseProfileSearchFields($this->getPartnerId(), $dbMetadataProfile);
 		
 		$metadataProfile = new KalturaMetadataProfile();
-		$metadataProfile->fromObject($dbMetadataProfile);
+		$metadataProfile->fromObject($dbMetadataProfile, $this->getResponseProfile());
 		
 		return $metadataProfile;
 	}
@@ -141,7 +142,7 @@ class MetadataProfileService extends KalturaBaseService
 			throw new KalturaAPIException(MetadataErrors::METADATA_PROFILE_NOT_FOUND, $id);
 			
 		$metadataProfile = new KalturaMetadataProfile();
-		$metadataProfile->fromObject($dbMetadataProfile);
+		$metadataProfile->fromObject($dbMetadataProfile, $this->getResponseProfile());
 		
 		return $metadataProfile;
 	}
@@ -169,6 +170,9 @@ class MetadataProfileService extends KalturaBaseService
 		
 		if($dbMetadataProfile->getStatus() != MetadataProfile::STATUS_ACTIVE)
 			throw new KalturaAPIException(MetadataErrors::METADATA_TRANSFORMING);
+
+		if ($xsdData)
+			kMetadataManager::validateProfileFields($this->getPartnerId(), $xsdData);
 
 		$dbMetadataProfile = $metadataProfile->toUpdatableObject($dbMetadataProfile);
 		
@@ -219,7 +223,7 @@ class MetadataProfileService extends KalturaBaseService
 	
 		kMetadataManager::parseProfileSearchFields($this->getPartnerId(), $dbMetadataProfile);
 		
-		$metadataProfile->fromObject($dbMetadataProfile);
+		$metadataProfile->fromObject($dbMetadataProfile, $this->getResponseProfile());
 		return $metadataProfile;
 	}
 	
@@ -250,7 +254,7 @@ class MetadataProfileService extends KalturaBaseService
 		$list = MetadataProfilePeer::doSelect($c);
 		
 		$response = new KalturaMetadataProfileListResponse();
-		$response->objects = KalturaMetadataProfileArray::fromMetadataProfileArray($list);
+		$response->objects = KalturaMetadataProfileArray::fromDbArray($list, $this->getResponseProfile());
 		$response->totalCount = $count;
 		
 		return $response;
@@ -268,7 +272,7 @@ class MetadataProfileService extends KalturaBaseService
 		$dbFields = MetadataProfileFieldPeer::retrieveActiveByMetadataProfileId($metadataProfileId);
 		
 		$response = new KalturaMetadataProfileFieldListResponse();
-		$response->objects = KalturaMetadataProfileFieldArray::fromMetadataProfileFieldArray($dbFields);
+		$response->objects = KalturaMetadataProfileFieldArray::fromDbArray($dbFields, $this->getResponseProfile());
 		$response->totalCount = count($dbFields);
 		
 		return $response;
@@ -287,7 +291,21 @@ class MetadataProfileService extends KalturaBaseService
 		
 		if(!$dbMetadataProfile)
 			throw new KalturaAPIException(MetadataErrors::METADATA_PROFILE_NOT_FOUND, $id);
-		
+
+		// if this profile is a dynamic object, check for references in other profiles
+		if ($dbMetadataProfile->getObjectType() == MetadataObjectType::DYNAMIC_OBJECT)
+		{
+			$referencedFields = MetadataProfileFieldPeer::retrieveByPartnerAndRelatedMetadataProfileId(
+				kCurrentContext::getCurrentPartnerId(),
+				$dbMetadataProfile->getId());
+			if (count($referencedFields))
+			{
+				/** @var MetadataProfileField $referencedField */
+				$referencedField = $referencedFields[0];
+				throw new KalturaAPIException(MetadataErrors::METADATA_PROFILE_REFERENCE_EXISTS, $referencedField->getMetadataProfileId(), $referencedField->getKey());
+			}
+		}
+
 		$dbMetadataProfile->setStatus(KalturaMetadataProfileStatus::DEPRECATED);
 		$dbMetadataProfile->save();
 		
@@ -382,7 +400,7 @@ class MetadataProfileService extends KalturaBaseService
 		}
 		
 		$metadataProfile = new KalturaMetadataProfile();
-		$metadataProfile->fromObject($dbMetadataProfile);
+		$metadataProfile->fromObject($dbMetadataProfile, $this->getResponseProfile());
 		
 		return $metadataProfile;
 	}
@@ -442,7 +460,7 @@ class MetadataProfileService extends KalturaBaseService
 		kMetadataManager::parseProfileSearchFields($this->getPartnerId(), $dbMetadataProfile);
 		
 		$metadataProfile = new KalturaMetadataProfile();
-		$metadataProfile->fromObject($dbMetadataProfile);
+		$metadataProfile->fromObject($dbMetadataProfile, $this->getResponseProfile());
 		
 		return $metadataProfile;
 	}
@@ -482,7 +500,7 @@ class MetadataProfileService extends KalturaBaseService
 		}
 		
 		$metadataProfile = new KalturaMetadataProfile();
-		$metadataProfile->fromObject($dbMetadataProfile);
+		$metadataProfile->fromObject($dbMetadataProfile, $this->getResponseProfile());
 		
 		return $metadataProfile;
 	}
@@ -522,7 +540,7 @@ class MetadataProfileService extends KalturaBaseService
 		}
 		
 		$metadataProfile = new KalturaMetadataProfile();
-		$metadataProfile->fromObject($dbMetadataProfile);
+		$metadataProfile->fromObject($dbMetadataProfile, $this->getResponseProfile());
 		
 		return $metadataProfile;
 	}

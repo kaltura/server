@@ -155,7 +155,7 @@ referrer
 		$_kalturaCEError->save();
 		
 		$kalturaCEError = new KalturaCEError(); // start from blank
-		$kalturaCEError->fromKceInstallationError( $_kalturaCEError );
+		$kalturaCEError->fromObject($_kalturaCEError, $this->getResponseProfile());
 		
 		return $kalturaCEError;
 	}

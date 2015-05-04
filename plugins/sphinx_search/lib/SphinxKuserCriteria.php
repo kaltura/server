@@ -63,7 +63,7 @@ class SphinxKuserCriteria extends SphinxCriteria
 			$names = $filter->get('_likex_first_name_or_last_name');
 			KalturaLog::debug("Attach free text [$names]");
 			
-			$this->addFreeTextToMatchClauseByMatchFields($names, kuserFilter::FIRST_NAME_OR_LAST_NAME, true);
+			$this->addFreeTextToMatchClauseByMatchFields($names, kuserFilter::FIRST_NAME_OR_LAST_NAME, null, true);
 		}
 		$filter->unsetByName('_likex_first_name_or_last_name');
 		

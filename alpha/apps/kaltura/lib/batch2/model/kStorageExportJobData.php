@@ -38,6 +38,9 @@ class kStorageExportJobData extends kStorageJobData
 		$this->setServerUrl($externalStorage->getStorageUrl()); 
 	    $this->setServerUsername($externalStorage->getStorageUsername()); 
 	    $this->setServerPassword($externalStorage->getStoragePassword());
+	    $this->setServerPrivateKey($externalStorage->getPrivateKey());
+	    $this->setServerPublicKey($externalStorage->getPublicKey());
+	    $this->setServerPassPhrase($externalStorage->getPassPhrase());
 	    $this->setFtpPassiveMode($externalStorage->getStorageFtpPassiveMode());
 	    $this->setSrcFileSyncLocalPath($srcFileSyncLocalPath);
 		$this->setSrcFileSyncId($fileSync->getId());

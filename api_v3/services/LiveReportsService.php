@@ -38,7 +38,10 @@ class LiveReportsService extends KalturaBaseService
 				continue;
 			
 			$parts = explode(",", $object);
-			$resultsArray[$parts[0]] = $parts[1];
+			$additionalValue = "";
+			if(count($parts) > 2)
+				$additionalValue = "," . $parts[2];
+			$resultsArray[$parts[0]] = $parts[1] . $additionalValue;
 		}
 		
 		$kResult = KalturaReportGraphArray::fromReportDataArray(array("audience" => $resultsArray));
@@ -94,7 +97,7 @@ class LiveReportsService extends KalturaBaseService
 					list($entryIds, $totalCount) = $this->getLiveEntries($client, kCurrentContext::getCurrentPartnerId(), $pager);
 					if(empty($entryIds))
 						return new KalturaLiveStatsListResponse();
-					
+
 					$wsFilter->entryIds = implode(",", $entryIds);
 				}
 				
@@ -102,7 +105,10 @@ class LiveReportsService extends KalturaBaseService
 				$result = $this->requestClient($client, $reportType, $wsFilter, $wsPager);
 				if($totalCount)
 					$result->totalCount = $totalCount;
-				
+
+				if ($entryIds) {
+					$this->sortResultByEntryIds($result, $entryIds);
+				}
 				return $result;
 		}
 		
@@ -231,7 +237,7 @@ class LiveReportsService extends KalturaBaseService
 		$filter->setIdIn($entryIds);
 		$filter->setPartnerSearchScope(baseObjectFilter::MATCH_KALTURA_NETWORK_AND_PRIVATE);
 		$filter->attachToCriteria($baseCriteria);
-		$baseCriteria->addDescendingOrderByColumn("entry.FIRST_BROADCAST");
+		$baseCriteria->addAscendingOrderByColumn("entry.name");
 		$pager->attachToCriteria($baseCriteria);
 		
 		$entries = entryPeer::doSelect($baseCriteria);
@@ -248,6 +254,26 @@ class LiveReportsService extends KalturaBaseService
 		$result = $client->getReport($reportType, $wsFilter, $wsPager);
 		$kResult = $result->toKalturaObject();
 		return $kResult;
+	}
+
+	/**
+	 * Sorts the objects array in the result object according to the order of entryIds provided
+	 * @param $result
+	 * @param $entryIds
+	 */
+	protected function sortResultByEntryIds($result, $entryIds)
+	{
+		$resultHash = array();
+		foreach ($result->objects as $object) {
+			$resultHash[$object->entryId] = $object;
+		}
+
+		$result->objects = array();
+		foreach ($entryIds as $entryId) {
+			if ($resultHash[$entryId]) {
+				$result->objects[] = $resultHash[$entryId];
+			}
+		}
 	}
 }
 

@@ -45,7 +45,7 @@ class PermissionItemService extends KalturaBaseService
 		$dbPermissionItem->save();
 		
 		$permissionItem = new KalturaPermissionItem();
-		$permissionItem->fromObject($dbPermissionItem);
+		$permissionItem->fromObject($dbPermissionItem, $this->getResponseProfile());
 		
 		return $permissionItem;
 	}
@@ -77,7 +77,7 @@ class PermissionItemService extends KalturaBaseService
 			$permissionItem = new KalturaPermissionItem();
 		}
 		
-		$permissionItem->fromObject($dbPermissionItem);
+		$permissionItem->fromObject($dbPermissionItem, $this->getResponseProfile());
 		
 		return $permissionItem;
 	}
@@ -106,7 +106,7 @@ class PermissionItemService extends KalturaBaseService
 		$dbPermissionItem->save();
 	
 		$permissionItem = new KalturaPermissionItem();
-		$permissionItem->fromObject($dbPermissionItem);
+		$permissionItem->fromObject($dbPermissionItem, $this->getResponseProfile());
 		
 		return $permissionItem;
 	}
@@ -132,7 +132,7 @@ class PermissionItemService extends KalturaBaseService
 		$dbPermissionItem->delete();
 			
 		$permissionItem = new KalturaPermissionItem();
-		$permissionItem->fromObject($dbPermissionItem);
+		$permissionItem->fromObject($dbPermissionItem, $this->getResponseProfile());
 		
 		return $permissionItem;
 	}
@@ -150,22 +150,6 @@ class PermissionItemService extends KalturaBaseService
 		if (!$filter)
 			$filter = new KalturaPermissionItemFilter();
 			
-		$permissionItemFilter = $filter->toObject();
-		
-		$c = new Criteria();
-		$permissionItemFilter->attachToCriteria($c);
-		$count = PermissionItemPeer::doCount($c);
-		
-		if (! $pager)
-			$pager = new KalturaFilterPager ();
-		
-		$pager->attachToCriteria ( $c );
-		$list = PermissionItemPeer::doSelect($c);
-		
-		$response = new KalturaPermissionItemListResponse();
-		$response->objects = KalturaPermissionItemArray::fromDbArray($list);
-		$response->totalCount = $count;
-		
-		return $response;
+		return $filter->getListResponse($pager, $this->getResponseProfile());
 	}	
 }

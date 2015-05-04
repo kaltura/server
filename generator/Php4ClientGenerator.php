@@ -6,9 +6,9 @@ class Php4ClientGenerator extends ClientGeneratorFromXml
 	 */
 	private $_doc = null;
 	
-	function Php4ClientGenerator($xmlPath)
+	function __construct($xmlPath, Zend_Config $config, $sourcePath = "sources/php4")
 	{
-		parent::ClientGeneratorFromXml($xmlPath, realpath("sources/php4"));
+		parent::__construct($xmlPath, $sourcePath, $config);
 		$this->_doc = new KDOMDocument();
 		$this->_doc->load($this->_xmlFile);
 	}

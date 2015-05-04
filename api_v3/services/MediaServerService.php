@@ -29,7 +29,7 @@ class MediaServerService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::MEDIA_SERVER_NOT_FOUND, $hostname);
 			
 		$mediaServer = new KalturaMediaServer();
-		$mediaServer->fromObject($dbMediaServer);
+		$mediaServer->fromObject($dbMediaServer, $this->getResponseProfile());
 		return $mediaServer;
 	}
 	
@@ -55,7 +55,7 @@ class MediaServerService extends KalturaBaseService
 		$dbMediaServer->save();
 		
 		$mediaServer = new KalturaMediaServer();
-		$mediaServer->fromObject($dbMediaServer);
+		$mediaServer->fromObject($dbMediaServer, $this->getResponseProfile());
 		return $mediaServer;
 	}
 }

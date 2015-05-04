@@ -971,6 +971,7 @@ class Partner extends BasePartner
     public function setMaxBulkSizeOverageUnit($v)		{$this->putInCustomData('bulk_size_overage_unit', $v);}
     public function setAutoModerateEntryFilter($v)		{$this->putInCustomData('auto_moderate_entry_filter', $v);}
     public function setCacheFlavorVersion($v)			{$this->putInCustomData('cache_flavor_version', $v);}
+    public function setCacheThumbnailVersion($v)		{$this->putInCustomData('cache_thumb_version', $v);}
     public function setBroadcastUrlManager($v)			{$this->putInCustomData('broadcast_url_manager', $v);}
     public function setPrimaryBroadcastUrl($v)			{$this->putInCustomData('primary_broadcast_url', $v);}
 	public function setSecondaryBroadcastUrl($v)		{$this->putInCustomData('secondary_broadcast_url', $v);}
@@ -1014,6 +1015,7 @@ class Partner extends BasePartner
     public function getMaxBulkSizeOverageUnit()			{return $this->getFromCustomData('bulk_size_overage_unit');}
 	public function getAutoModerateEntryFilter()		{return $this->getFromCustomData('auto_moderate_entry_filter');}
     public function getCacheFlavorVersion()				{return $this->getFromCustomData('cache_flavor_version');}
+    public function getCacheThumbnailVersion()			{return $this->getFromCustomData('cache_thumb_version');}
     public function getBroadcastUrlManager()			{return $this->getFromCustomData('broadcast_url_manager');}
 	public function getPrimaryBroadcastUrl()			{return $this->getFromCustomData('primary_broadcast_url');}
 	public function getSecondaryBroadcastUrl()			{return $this->getFromCustomData('secondary_broadcast_url');}
@@ -1647,4 +1649,39 @@ class Partner extends BasePartner
 
 	public function getReferenceId() { return $this->getFromCustomData("referenceId", null); }
 	public function setReferenceId( $v ) { $this->putInCustomData("referenceId", $v); }
+
+	public function getGoogleOAuth2($appId, $objectIdentifier = null)
+	{
+		$customDataKey = $appId;
+		if ($objectIdentifier)
+		{
+			$customDataKey .= '_' . $objectIdentifier;
+		}
+			
+		$tokenData = $this->getFromCustomData($customDataKey, 'googleAuth');
+		if(is_null($tokenData))
+		{
+			$appConfig = kConf::get($appId, 'google_auth', null);
+			if($appConfig && isset($appConfig[$objectIdentifier]))
+			{
+				$tokenJsonStr = $appConfig[$objectIdentifier];
+				$tokenData = json_decode($tokenJsonStr, true);
+			}
+		}
+		
+		return $tokenData;
+	}
+	
+	public function setGoogleOAuth2($appId, $tokenJsonStr, $objectIdentifier = null)
+	{
+		$tokenData = json_decode($tokenJsonStr, true);
+		
+		$customDataKey = $appId;
+		if ($objectIdentifier)
+		{
+			$customDataKey .= '_' . $objectIdentifier;
+		}
+			
+		$this->putInCustomData($customDataKey, $tokenData, 'googleAuth');
+	}
 }

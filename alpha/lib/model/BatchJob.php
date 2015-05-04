@@ -270,6 +270,45 @@ class BatchJob extends BaseBatchJob implements ISyncableFile
 		return $this->aRootJob;
 	}
 	
+	/**
+	 * @return BaseObject
+	 */
+	public function getObject()
+	{
+		switch ($this->getObjectType())
+		{
+			case BatchJobObjectType::ENTRY:
+				entryPeer::setUseCriteriaFilter(false);
+				$object = entryPeer::retrieveByPK($this->getObjectId());
+				entryPeer::setUseCriteriaFilter(true);
+				return $object;
+				
+			case BatchJobObjectType::ASSET:
+				assetPeer::setUseCriteriaFilter(false);
+				$object = assetPeer::retrieveById($this->getObjectId());
+				assetPeer::setUseCriteriaFilter(true);
+				return $object;
+				
+			case BatchJobObjectType::CATEGORY:
+				categoryPeer::setUseCriteriaFilter(false);
+				$object = categoryPeer::retrieveByPK($this->getObjectId());
+				categoryPeer::setUseCriteriaFilter(true);
+				return $object;
+				
+			case BatchJobObjectType::FILE_SYNC:
+				FileSyncPeer::setUseCriteriaFilter(false);
+				$object = FileSyncPeer::retrieveByPK($this->getObjectId());
+				FileSyncPeer::setUseCriteriaFilter(true);
+				return $object;
+		
+			default:
+				// TODO implement IBatchable in relevant plugins
+				return KalturaPluginManager::loadObject('IBatchable', $this->getObjectId());
+		}
+		
+		return $this->aRootJob;
+	}
+	
 	
 	public function getFormattedCreatedAt( $format = dateUtils::KALTURA_FORMAT )
 	{

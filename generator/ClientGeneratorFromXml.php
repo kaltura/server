@@ -32,7 +32,7 @@ abstract class ClientGeneratorFromXml
 		$this->excludeSourcePaths = explode(',', $excludeSourcePaths);
 	}
 
-	public function ClientGeneratorFromXml($xmlFile, $sourcePath = null)
+	public function __construct($xmlFile, $sourcePath, Zend_Config $config)
 	{
 		$this->_xmlFile = realpath($xmlFile);
 		$this->_sourcePath = realpath($sourcePath);
@@ -40,7 +40,7 @@ abstract class ClientGeneratorFromXml
 		if (!file_exists($this->_xmlFile))
 			throw new Exception("The file [" . $this->_xmlFile . "] was not found");
 			
-		if (($sourcePath !== null) && !(file_exists($sourcePath)))
+		if (!file_exists($sourcePath))
 			throw new Exception("Source path was not found [$sourcePath]");
 
 		$this->_licenseBuffer = file_get_contents(dirname(__FILE__).'/sources/license.txt');
@@ -160,6 +160,11 @@ abstract class ClientGeneratorFromXml
 		//return strtolower($filter->filter($value));
 	}
 	
+	protected function isArrayType($type)
+	{
+		return in_array($type, array("array","map"));
+	}
+	
 	protected function isSimpleType($type)
 	{
 		return in_array($type, array("int","string","bool","float","bigint"));
@@ -186,4 +191,8 @@ abstract class ClientGeneratorFromXml
 	 * @return string 
 	 */
 	protected abstract function getSingleLineCommentMarker();
+	
+	public function done($outputPath)
+	{
+	}
 }

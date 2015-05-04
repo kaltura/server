@@ -91,7 +91,7 @@ class BatchControlService extends KalturaBaseService
 				$command->setStatus(KalturaControlPanelCommandStatus::HANDLED);
 				$command->save();
 			}
-			$schedulerStatusResponse->controlPanelCommands = KalturaControlPanelCommandArray::fromControlPanelCommandArray($commandsList);
+			$schedulerStatusResponse->controlPanelCommands = KalturaControlPanelCommandArray::fromDbArray($commandsList, $this->getResponseProfile());
 			
 			// gets new configs
 			$c = new Criteria();
@@ -103,7 +103,7 @@ class BatchControlService extends KalturaBaseService
 				$config->setCommandStatus(KalturaControlPanelCommandStatus::HANDLED);
 				$config->save();
 			}
-			$schedulerStatusResponse->schedulerConfigs = KalturaSchedulerConfigArray::fromSchedulerConfigArray($configList);
+			$schedulerStatusResponse->schedulerConfigs = KalturaSchedulerConfigArray::fromDbArray($configList, $this->getResponseProfile());
 		}
 		else
 		{
@@ -271,7 +271,7 @@ class BatchControlService extends KalturaBaseService
 		$configDb->save();
 		
 		$config = new KalturaSchedulerConfig();
-		$config->fromObject($configDb);
+		$config->fromObject($configDb, $this->getResponseProfile());
 		return $config;
 	}
 	
@@ -327,7 +327,7 @@ class BatchControlService extends KalturaBaseService
 		$commandDb->save();
 		
 		$command = new KalturaControlPanelCommand();
-		$command->fromObject($commandDb);
+		$command->fromObject($commandDb, $this->getResponseProfile());
 		return $command;
 	}	
 	
@@ -389,7 +389,7 @@ class BatchControlService extends KalturaBaseService
 		$commandDb->save();
 		
 		$command = new KalturaControlPanelCommand();
-		$command->fromObject($commandDb);
+		$command->fromObject($commandDb, $this->getResponseProfile());
 		return $command;
 	}	
 	
@@ -457,7 +457,7 @@ class BatchControlService extends KalturaBaseService
 		$commandDb->save();
 		
 		$command = new KalturaControlPanelCommand();
-		$command->fromObject($commandDb);
+		$command->fromObject($commandDb, $this->getResponseProfile());
 		return $command;
 	}	
 	
@@ -519,7 +519,7 @@ class BatchControlService extends KalturaBaseService
 		$commandDb->save();
 		
 		$command = new KalturaControlPanelCommand();
-		$command->fromObject($commandDb);
+		$command->fromObject($commandDb, $this->getResponseProfile());
 		return $command;
 	}
 	
@@ -582,7 +582,7 @@ class BatchControlService extends KalturaBaseService
 		$configDb->save();
 		
 		$command = new KalturaControlPanelCommand();
-		$command->fromObject($commandDb);
+		$command->fromObject($commandDb, $this->getResponseProfile());
 		return $command;
 	}
 	
@@ -659,7 +659,7 @@ class BatchControlService extends KalturaBaseService
 		$configDb->save();
 		
 		$command = new KalturaControlPanelCommand();
-		$command->fromObject($commandDb);
+		$command->fromObject($commandDb, $this->getResponseProfile());
 		return $command;
 	}
 	
@@ -701,7 +701,7 @@ class BatchControlService extends KalturaBaseService
 		}
 		
 		$command = new KalturaControlPanelCommand();
-		$command->fromObject($commandDb);
+		$command->fromObject($commandDb, $this->getResponseProfile());
 		return $command;
 	}
 
@@ -733,7 +733,7 @@ class BatchControlService extends KalturaBaseService
 		$count = ControlPanelCommandPeer::doCount($c);
 		$list = ControlPanelCommandPeer::doSelect($c);
 
-		$newList = KalturaControlPanelCommandArray::fromControlPanelCommandArray($list);
+		$newList = KalturaControlPanelCommandArray::fromDbArray($list, $this->getResponseProfile());
 		
 		$response = new KalturaControlPanelCommandListResponse();
 		$response->objects = $newList;
@@ -758,7 +758,7 @@ class BatchControlService extends KalturaBaseService
 		
 		// returns the command
 		$command = new KalturaControlPanelCommand();
-		$command->fromObject($commandDb);
+		$command->fromObject($commandDb, $this->getResponseProfile());
 		return $command;
 	}
 
@@ -773,7 +773,7 @@ class BatchControlService extends KalturaBaseService
 		$c = new Criteria();
 		$count = SchedulerPeer::doCount($c, false, myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2));
 		$list = SchedulerPeer::doSelect($c, myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2));
-		$newList = KalturaSchedulerArray::fromSchedulerArray($list );
+		$newList = KalturaSchedulerArray::fromDbArray($list, $this->getResponseProfile());
 		
 		$response = new KalturaSchedulerListResponse();
 		$response->objects = $newList;
@@ -793,7 +793,7 @@ class BatchControlService extends KalturaBaseService
 		$c = new Criteria();
 		$count = SchedulerWorkerPeer::doCount($c, false, myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2));
 		$list = SchedulerWorkerPeer::doSelect($c, myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2));
-		$newList = KalturaSchedulerWorkerArray::fromSchedulerWorkerArray($list);
+		$newList = KalturaSchedulerWorkerArray::fromDbArray($list, $this->getResponseProfile());
 		
 		$response = new KalturaSchedulerWorkerListResponse();
 		$response->objects = $newList;

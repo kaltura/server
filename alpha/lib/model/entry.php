@@ -1235,6 +1235,25 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		return $dynamicAttributes;
 	}
 	
+	public function getMaxCategoriesPerEntry()
+	{
+		$maxCategoriesPerEntry = entry::MAX_CATEGORIES_PER_ENTRY;
+		if(PermissionPeer::isValidForPartner(PermissionName::FEATURE_DISABLE_CATEGORY_LIMIT, $this->getPartnerId()))
+			$maxCategoriesPerEntry = entry::MAX_CATEGORIES_PER_ENTRY_DISABLE_LIMIT_FEATURE;
+			
+		// When batch move entry between categories it's adding the new category before deleting the old one
+		if(kCurrentContext::$ks_partner_id == Partner::BATCH_PARTNER_ID && kCurrentContext::$ks_object)
+		{
+			$batchJobType = kCurrentContext::$ks_object->getPrivilegeValue(ks::PRIVILEGE_BATCH_JOB_TYPE);
+			if(intval($batchJobType) == BatchJobType::MOVE_CATEGORY_ENTRIES)
+			{
+				$maxCategoriesPerEntry *= 2;
+			}
+		}
+		
+		return $maxCategoriesPerEntry;
+	}
+	
 	/**
 	 * Set the categories (use only the most child categories)
 	 *
@@ -1249,8 +1268,9 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		
 		$this->trimCategories($newCats);
 		
-		if (count($newCats) > self::MAX_CATEGORIES_PER_ENTRY)
-			throw new kCoreException("Max number of allowed entries per category was reached", kCoreException::MAX_CATEGORIES_PER_ENTRY);
+		$maxCategoriesPerEntry = $this->getMaxCategoriesPerEntry();
+		if (count($newCats) > $maxCategoriesPerEntry)
+			throw new kCoreException("Max number of allowed entries per category was reached", kCoreException::MAX_CATEGORIES_PER_ENTRY, $maxCategoriesPerEntry);
 
 		// remove duplicates
 		$newCats = array_unique($newCats);
@@ -1270,8 +1290,9 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		
 		$this->trimCategories($newCats);
 		
-		if (count($newCats) > self::MAX_CATEGORIES_PER_ENTRY)
-			throw new kCoreException("Max number of allowed entries per category was reached", kCoreException::MAX_CATEGORIES_PER_ENTRY);
+		$maxCategoriesPerEntry = $this->getMaxCategoriesPerEntry();
+		if (count($newCats) > $maxCategoriesPerEntry)
+			throw new kCoreException("Max number of allowed entries per category was reached", kCoreException::MAX_CATEGORIES_PER_ENTRY, $maxCategoriesPerEntry);
 
 		// remove duplicates
 		$newCats = array_unique($newCats);
@@ -1742,6 +1763,9 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	public function setReplacedEntryId ( $v )	{	$this->putInCustomData ( "replacedEntryId" , $v );	}
 	public function getReplacedEntryId (  )		{	return $this->getFromCustomData( "replacedEntryId" );	}
 
+	public function setIsTemporary ( $v )	{	$this->putInCustomData ( "isTemporary" , $v );	}
+	public function getIsTemporary (  )		{	return $this->getFromCustomData( "isTemporary", null, false );	}
+
 	public function setReplacementOptions ($v)  {	$this->putInCustomData ( "replacementOptions" , $v );	}
 	public function getReplacementOptions (  )	{	return $this->getFromCustomData( "replacementOptions", null, new kEntryReplacementOptions() );	}
 
@@ -1781,6 +1805,9 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	
 	public function setParentEntryId($v)	{ $this->putInCustomData("parentEntryId", $v); }
 	public function getParentEntryId() 		{ return $this->getFromCustomData( "parentEntryId", null, null ); }
+
+	public function setSourceEntryId($v)	{ $this->putInCustomData("sourceEntryId", $v); }
+	public function getSourceEntryId() 		{ return $this->getFromCustomData( "sourceEntryId", null, null ); }
 	
 	public function getParentEntry()
 	{
@@ -1853,6 +1880,11 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		foreach ($entitledPusersEdit as $puserId)
 		{
 			$puserId = trim($puserId);
+			if ( $puserId === '' )
+			{
+				continue;
+			}
+
 			$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
 			$kuser = kuserPeer::getActiveKuserByPartnerAndUid($partnerId, $puserId);
 			if (!$kuser)
@@ -1882,6 +1914,11 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		return implode(',', unserialize($entitledUserPuserEdit));
 	}
 	
+	public function isEntitledKuserEdit( $kuserId )
+	{
+		return in_array( trim($kuserId), explode( ',', $this->getEntitledKusersEdit() ) );
+	}
+
 	public function setEntitledPusersPublish($v)
 	{
 		$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
@@ -1901,6 +1938,10 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		foreach ($entitledPusersPublish as $puserId)
 		{
 			$puserId = trim($puserId);
+			if ( $puserId === '' )
+			{
+				continue;
+			}
 			
 			$kuser = kuserPeer::getActiveKuserByPartnerAndUid($partnerId, $puserId);
 			if (!$kuser)
@@ -1929,6 +1970,11 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		return implode(',', unserialize($entitledUserPuserPublish));
 	}
 	
+	public function isEntitledKuserPublish( $kuserId )
+	{
+		return in_array( trim($kuserId), explode( ',', $this->getEntitledKusersPublish() ) );
+	}
+
 	public function getRoots()
 	{
 		// the prefix required becaue combined sphinx match is rrequired,
@@ -2177,7 +2223,10 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 
 	public function setCacheFlavorVersion($v)       {$this->putInCustomData("cache_flavor_version", $v);}
 	public function getCacheFlavorVersion()       {return $this->getFromCustomData("cache_flavor_version");}
-
+	
+	public function setCacheThumbnailVersion($v)       {$this->putInCustomData("cache_thumb_version", $v);}
+	public function getCacheThumbnailVersion()       {return $this->getFromCustomData("cache_thumb_version");}
+	
 	private $m_puser_id = null;
 	public function tempSetPuserId ( $puser_id )
 	{
@@ -3258,7 +3307,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	 */
 	public function isCustomDataModified($name = null, $namespace = '')
 	{
-		if(isset($this->oldCustomDataValues[$namespace]) && (is_null($name) || isset($this->oldCustomDataValues[$namespace][$name])))
+		if(isset($this->oldCustomDataValues[$namespace]) && (is_null($name) || array_key_exists($name, $this->oldCustomDataValues[$namespace])))
 		{
 			return true;
 		}

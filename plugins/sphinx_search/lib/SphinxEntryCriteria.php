@@ -255,10 +255,8 @@ class SphinxEntryCriteria extends SphinxCriteria
 			$additionalConditions = array();
 			$advancedSearch = $filter->getAdvancedSearch();
 			if($advancedSearch)
-			{
 				$additionalConditions = $advancedSearch->getFreeTextConditions($filter->getPartnerSearchScope(), $freeTexts);
-			}
-			
+
 			$this->addFreeTextToMatchClauseByMatchFields($freeTexts, entryFilter::FREE_TEXT_FIELDS, $additionalConditions);
 		}
 		$filter->unsetByName('_free_text');

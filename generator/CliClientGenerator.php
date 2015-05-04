@@ -6,12 +6,9 @@ class CliClientGenerator extends ClientGeneratorFromXml
 	 */
 	protected $_doc = null;
 	
-	function __construct($xmlPath, $sourcePath = null)
+	function __construct($xmlPath, Zend_Config $config, $sourcePath = "sources/cli")
 	{
-		if(!$sourcePath)
-			$sourcePath = realpath("sources/cli");
-			
-		parent::ClientGeneratorFromXml($xmlPath, $sourcePath);
+		parent::__construct($xmlPath, $sourcePath, $config);
 		$this->_doc = new KDOMDocument();
 		$this->_doc->load($this->_xmlFile);
 	}
@@ -128,6 +125,9 @@ class CliClientGenerator extends ClientGeneratorFromXml
 		$result = array();
 		foreach ($propertyNodes as $propertyNode)
 		{
+			if ($propertyNode->getAttribute("readOnly"))
+				continue;
+			
 			$curParam = $this->getNodeAttributes($propertyNode, array('name', 'type', 'enumType', 'arrayType'));
 			$result[$curParam['name']] = $curParam;
 		}

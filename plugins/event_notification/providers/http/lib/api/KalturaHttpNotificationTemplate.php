@@ -199,12 +199,12 @@ class KalturaHttpNotificationTemplate extends KalturaEventNotificationTemplate
 	/* (non-PHPdoc)
 	 * @see KalturaObject::fromObject()
 	 */
-	public function fromObject($dbObject)
+	public function doFromObject($dbObject, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		/* @var $dbObject HttpNotificationTemplate */
-		parent::fromObject($dbObject);
+		parent::doFromObject($dbObject, $responseProfile);
 		
-		if($dbObject->getData())
+		if($this->shouldGet('data', $responseProfile) && $dbObject->getData())
 			$this->data = KalturaHttpNotificationData::getInstance($dbObject->getData());
 	}
 }

@@ -109,7 +109,7 @@ class KAsyncPostConvert extends KJobHandlerWorker
 		$detectMsg = null;
 		if(isset($data->flavorParamsOutput) && isset($data->flavorParamsOutput->operators)
 		&& strstr($data->flavorParamsOutput->operators, "webexNbrplayer.WebexNbrplayer")!=false) {
-			$rv = $this->checkForValidityOfWebexProduct($data, realpath($mediaFile), $mediaInfo, &$detectMsg);
+			$rv = $this->checkForValidityOfWebexProduct($data, realpath($mediaFile), $mediaInfo, $detectMsg);
 			if($rv==false){
 				return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::BLACK_OR_SILENT_CONTENT, $detectMsg, KalturaBatchJobStatus::FAILED);
 			}
@@ -233,16 +233,17 @@ class KAsyncPostConvert extends KJobHandlerWorker
 	{
 		KalturaLog::debug("contDur:$mediaInfo->containerDuration,vidDur:$mediaInfo->videoDuration,audDur:$mediaInfo->audioDuration");
 
+		$rv = true;
+		$detectMsg = null;
 		/*
 		 * Get silent and black portions
-		 */
+		 *
 		list($silenceDetect, $blackDetect) = KFFMpegMediaParser::checkForSilentAudioAndBlackVideo(KBatchBase::$taskConfig->params->FFMpegCmd, $srcFileName, $mediaInfo);
 		
-		$rv = true;
 		$detectMsg = $silenceDetect;
 		if(isset($blackDetect))
 			$detectMsg = isset($detectMsg)?"$detectMsg,$blackDetect":$blackDetect;
-		
+		*/
 		/*
 		 * Silent/Black does not cause validation failure, just a job message 
 		 */

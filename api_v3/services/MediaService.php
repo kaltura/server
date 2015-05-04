@@ -84,7 +84,7 @@ class MediaService extends KalturaEntryService
 
     	myNotificationMgr::createNotification(kNotificationJobData::NOTIFICATION_TYPE_ENTRY_ADD, $dbEntry, $dbEntry->getPartnerId(), null, null, null, $dbEntry->getId());
 
-		$entry->fromObject($dbEntry);
+		$entry->fromObject($dbEntry, $this->getResponseProfile());
 		return $entry;
     }
 
@@ -149,12 +149,23 @@ class MediaService extends KalturaEntryService
 		}
 		else
 		{
-
 			$tempMediaEntry = new KalturaMediaEntry();
-		 	$tempMediaEntry->type = $dbEntry->getType();
+			$tempMediaEntry->type = $dbEntry->getType();
 			$tempMediaEntry->mediaType = $dbEntry->getMediaType();
-			$tempMediaEntry->conversionProfileId = $dbEntry->getConversionQuality();
 
+			if ( !$conversionProfileId ) {
+				$originalConversionProfileId = $dbEntry->getConversionQuality();
+				$conversionProfile = conversionProfile2Peer::retrieveByPK($originalConversionProfileId);
+				if ( is_null($conversionProfile) || $conversionProfile->getType() != ConversionProfileType::MEDIA )
+				{
+					$defaultConversionProfile = myPartnerUtils::getConversionProfile2ForPartner( $this->getPartnerId() );
+					if ( !is_null($defaultConversionProfile) ) {
+						$conversionProfileId = $defaultConversionProfile->getId();
+					}
+				} else {
+					$conversionProfileId = $originalConversionProfileId;
+				}
+			}
 			if($conversionProfileId)
 				$tempMediaEntry->conversionProfileId = $conversionProfileId;
 
@@ -289,7 +300,7 @@ class MediaService extends KalturaEntryService
 		myNotificationMgr::createNotification( kNotificationJobData::NOTIFICATION_TYPE_ENTRY_ADD, $dbEntry, $this->getPartnerId(), null, null, null, $dbEntry->getId());
 
 		// FIXME: need to remove something from cache? in the old code the kshow was removed
-		$mediaEntry->fromObject($dbEntry);
+		$mediaEntry->fromObject($dbEntry, $this->getResponseProfile());
 		return $mediaEntry;
 	}
 
@@ -388,7 +399,7 @@ class MediaService extends KalturaEntryService
 
 		myNotificationMgr::createNotification( kNotificationJobData::NOTIFICATION_TYPE_ENTRY_ADD, $dbEntry);
 
-		$mediaEntry->fromObject($dbEntry);
+		$mediaEntry->fromObject($dbEntry, $this->getResponseProfile());
 		return $mediaEntry;
 	}
 
@@ -477,7 +488,7 @@ class MediaService extends KalturaEntryService
 		if($dbEntry)
 		{
 			myNotificationMgr::createNotification( kNotificationJobData::NOTIFICATION_TYPE_ENTRY_ADD, $dbEntry, $dbEntry->getPartnerId(), null, null, null, $dbEntry->getId());
-			$ret->fromObject($dbEntry);
+			$ret->fromObject($dbEntry, $this->getResponseProfile());
 		}
 
 		return $ret;
@@ -546,7 +557,7 @@ class MediaService extends KalturaEntryService
 
 		myNotificationMgr::createNotification( kNotificationJobData::NOTIFICATION_TYPE_ENTRY_ADD, $dbEntry);
 
-		$mediaEntry->fromObject($dbEntry);
+		$mediaEntry->fromObject($dbEntry, $this->getResponseProfile());
 		return $mediaEntry;
 	}
 
@@ -647,7 +658,7 @@ class MediaService extends KalturaEntryService
 	 * @param string $entryId Media entry id
 	 * @param int $conversionProfileId
 	 * @param KalturaConversionAttributeArray $dynamicConversionAttributes
-	 * @return int job id
+	 * @return bigint job id
 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
 	 * @throws KalturaErrors::CONVERSION_PROFILE_ID_NOT_FOUND
 	 * @throws KalturaErrors::FLAVOR_PARAMS_NOT_FOUND
@@ -758,10 +769,14 @@ class MediaService extends KalturaEntryService
        		$this->replaceResource($resource, $dbEntry, $conversionProfileId, $advancedOptions);
 		}
 		catch(Exception $e){
-       		$lock->unlock();
+			if($lock){
+				$lock->unlock();
+			}
        		throw $e;
 		}
-		$lock->unlock();
+		if($lock){
+			$lock->unlock();
+		}
 
 		return $this->getEntry($entryId);
 	}
@@ -827,7 +842,7 @@ class MediaService extends KalturaEntryService
 	    $filter->typeEqual = KalturaEntryType::MEDIA_CLIP;
 	    list($list, $totalCount) = parent::listEntriesByFilter($filter, $pager);
 
-	    $newList = KalturaMediaEntryArray::fromEntryArray($list);
+	    $newList = KalturaMediaEntryArray::fromDbArray($list, $this->getResponseProfile());
 		$response = new KalturaMediaListResponse();
 		$response->objects = $newList;
 		$response->totalCount = $totalCount;

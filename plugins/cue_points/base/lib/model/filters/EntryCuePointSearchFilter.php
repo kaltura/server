@@ -25,14 +25,14 @@ class EntryCuePointSearchFilter extends AdvancedSearchFilterItem
 	 * @return the $freeText
 	 */
 	public function getCuePointsFreeText() {
-		return $this->$cuePointsFreeText;
+		return $this->cuePointsFreeText;
 	}
 
 	/**
 	 * @param string $freeText
 	 */
 	public function setCuePointsFreeText($freeText) {
-		$this->$cuePointsFreeText = $this->formatMatchPhrase($freeText);
+		$this->cuePointsFreeText = $this->formatMatchPhrase($freeText);
 	}
 	
 	/**
@@ -123,6 +123,9 @@ class EntryCuePointSearchFilter extends AdvancedSearchFilterItem
 	public function applyCondition(IKalturaDbQuery $query)
 	{
 		if ($query instanceof IKalturaIndexQuery){
+			if(!$this->getCuePointsFreeText())
+				return;
+			
 			$this->applyMatchCondition($this->getCuePointsFreeText(), $query);
 		}
 	}

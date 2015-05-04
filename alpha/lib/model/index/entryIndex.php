@@ -308,6 +308,8 @@ class entryIndex extends BaseIndexObject
 				"dynamic_attributes",
 				"plugins_data",
 				"search_text",
+				"entitled_kusers_edit",
+				"entitled_kusers_publish",
 			);
 		}
 		return self::$matchableFields;

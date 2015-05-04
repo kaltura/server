@@ -1,5 +1,34 @@
 <?php
 
+function setCacheExpiry($entriesCount , $feedId)
+{
+	$expiryArr = kConf::hasMap("v3cache_getfeed_expiry") ? kConf::getMap("v3cache_getfeed_expiry") : array();
+	foreach($expiryArr as $item)
+	{
+		if ($item["key"] == "partnerId" && $item["value"] == kCurrentContext::$partner_id ||
+			$item["key"] == "feedId" && $item["value"] == $feedId)
+		{
+			KalturaResponseCacher::setExpiry($item["expiry"]);
+			return;
+		}
+	}
+
+	$expiry = kConf::get("v3cache_getfeed_default_cache_time_frame" , 'local' , 86400);
+
+	if(kConf::hasParam("v3cache_getfeed_short_limits_array"))
+		$shortLimits = kConf::get("v3cache_getfeed_short_limits_array");
+	else
+		$shortLimits = array(50 => 900 , 100 => 1800 , 200 => 3600 , 400 => 7200);
+
+	foreach ($shortLimits as $numOfEntries => $cacheTimeFrame)
+	{
+		if ($entriesCount <= $numOfEntries)
+		$expiry = min($expiry , $cacheTimeFrame);
+	}
+
+	KalturaResponseCacher::setExpiry($expiry);
+}
+
 function getRequestParameter($paramName)
 {
 	if (isset($_GET[$paramName]))
@@ -79,26 +108,11 @@ catch(Exception $ex)
 	KExternalErrors::dieError(KExternalErrors::PROCESSING_FEED_REQUEST, $msg);
 }
 
-// small feeds will have a short 
-if ($limit)
-{
-	$short_limit = kConf::hasParam("v3cache_getfeed_short_limit") ? kConf::get("v3cache_getfeed_short_limit") : 50;
-	if ($limit < $short_limit)
-	{
-		KalturaResponseCacher::setExpiry(kConf::hasParam("v3cache_getfeed_short_expiry") ? kConf::get("v3cache_getfeed_short_expiry") : 900);
-	}
-}
+//in KalturaSyndicationFeedRenderer - if the limit does restrict the amount of entries - the entries counter passes the limit's value by one , so it must be decreased back
+$entriesCount = $syndicationFeedRenderer->getReturnedEntriesCount();
+$entriesCount--;
 
-$expiryArr = kConf::hasMap("v3cache_getfeed_expiry") ? kConf::getMap("v3cache_getfeed_expiry") : array();
-foreach($expiryArr as $item)
-{
-	if ($item["key"] == "partnerId" && $item["value"] == kCurrentContext::$partner_id ||
-		$item["key"] == "feedId" && $item["value"] == $feedId)
-	{
-		KalturaResponseCacher::setExpiry($item["expiry"]);
-		break;
-	}
-}
+setCacheExpiry($entriesCount , $feedId);
 
 $end = microtime(true);
 KalturaLog::info("syndicationFeedRenderer-end [".($end - $start)."] memory: ".memory_get_peak_usage(true));

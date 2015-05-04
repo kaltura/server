@@ -13,17 +13,6 @@
 	<script type="text/javascript" src="js/jquery.tweet.js" type="text/javascript"></script>
 	
 	<script type='text/javascript'>
-		$(document).ready(function(){
-			$(".tweet").tweet({
-				avatar_size: 8,
-				count: 10,
-				username: ["kaltura_api"],
-				loading_text: "Loading form twitter...",
-				refresh_interval: 60,
-				template: function(i){return i["text"] + "<br>" + i["time"]}
-			});
-		});
-
 		function gotoTestMe() {
 			var isInIFrame = (window.location != window.parent.location) ? true : false;
 			if (isInIFrame) {
@@ -121,9 +110,6 @@
 						<strong>Missing a language?</strong>
 						<p style="margin-top:4px;">Tweet - <a class="bluelink" target="_blank" href="http://twitter.com/?status=@Kaltura_API%20pls%20add%20sdk%20for%3A%20%5Bprogramming_language%5D" title="Tweet for a new client library">@Kaltura_API pls add sdk for: [lang]</a>.<br />
 						Or <a class="bluelink" target="_blank" href="http://www.kaltura.org/api-client-library-generator-guide" title="Creating a client library generator script">create your own Client Library Generator</a>.</p>
-					</div>
-					<div id="notifications-feed">
-						<div class="tweet tweetsdiv"></div>
 					</div>
 					<div class="twitter-icon-div">
 						<a href="http://twitter.com/Kaltura_API" target="_blank" title="Follow @Kaltura_API to get updates about changes and new additions to the API and Client Libraries (SDK)."><img class="twitter-icon" src="./images/twitter-icon.png" /></a>

@@ -849,7 +849,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 	 * @param boolean $strict  - will throw exception if not found
 	 * @return array
 	 */
-	public static function getReadyFileSyncForKey ( FileSyncKey $key , $fetch_from_remote_if_no_local = false , $strict = true )
+	public static function getReadyFileSyncForKey ( FileSyncKey $key , $fetch_from_remote_if_no_local = false , $strict = true , $resolve = true )
 	{
 		KalturaLog::debug("key [$key], fetch_from_remote_if_no_local [$fetch_from_remote_if_no_local], strict [$strict]");
 		$dc = kDataCenterMgr::getCurrentDc();
@@ -882,7 +882,9 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 			$tmp_file_sync = $file_sync;
 			// make sure not link and work on original
 			
-			$tmp_file_sync = self::resolve($file_sync);
+			if($resolve)
+				$tmp_file_sync = self::resolve($file_sync);
+				
 			if ($tmp_file_sync->getStatus() != FileSync::FILE_SYNC_STATUS_READY)
 				continue;
 			
@@ -1017,6 +1019,8 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		}
 
 		$fullPath = $currentDCFileSync->getFullPath();
+		$isDir = is_dir($fullPath);
+		
 		if ( file_exists( $fullPath ) )
 		{
 			$currentDCFileSync->setFileSizeFromPath ( $fullPath );
@@ -1035,7 +1039,8 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 			$currentDCFileSync->setFileType ( FileSync::FILE_SYNC_FILE_TYPE_CACHE );
 		else
 			$currentDCFileSync->setFileType ( FileSync::FILE_SYNC_FILE_TYPE_FILE );
-
+		
+		$currentDCFileSync->setIsDir($isDir);
 		$currentDCFileSync->save();
 
 		if($cacheOnly)
@@ -1052,6 +1057,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 			{
 				$remoteDCFileSync->setStatus( FileSync::FILE_SYNC_STATUS_PENDING );
 				$remoteDCFileSync->setPartnerID ( $key->partner_id );
+				$remoteDCFileSync->setIsDir($isDir);
 				$remoteDCFileSync->save();
 			}
 		}
@@ -1066,6 +1072,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 				$remoteDCFileSync->setFileType( FileSync::FILE_SYNC_FILE_TYPE_FILE );
 				$remoteDCFileSync->setOriginal ( 0 );
 				$remoteDCFileSync->setPartnerID ( $key->partner_id );
+				$remoteDCFileSync->setIsDir($isDir);
 				$remoteDCFileSync->save();
 
 				kEventsManager::raiseEvent(new kObjectAddedEvent($remoteDCFileSync));
@@ -1081,7 +1088,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 	 * @param StorageProfile $externalStorage
 	 * @return SyncFile
 	 */
-	public static function createPendingExternalSyncFileForKey(FileSyncKey $key, StorageProfile $externalStorage)
+	public static function createPendingExternalSyncFileForKey(FileSyncKey $key, StorageProfile $externalStorage, $isDir = false)
 	{
 		$externalStorageId = $externalStorage->getId();
 		KalturaLog::debug("key [$key], externalStorage [$externalStorageId]");
@@ -1101,6 +1108,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		$fileSync->setFileSize ( -1 );
 		$fileSync->setStatus( FileSync::FILE_SYNC_STATUS_PENDING );
 		$fileSync->setOriginal ( false );
+		$fileSync->setIsDir($isDir);
 
 		if($externalStorage->getProtocol() == StorageProfile::STORAGE_KALTURA_DC)
 		{

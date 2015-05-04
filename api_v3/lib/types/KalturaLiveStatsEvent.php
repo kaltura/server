@@ -18,7 +18,8 @@ class KalturaLiveStatsEvent extends KalturaObject
 	public $entryId;
 	
 	/**
-	 * @var KalturaStatsEventType
+	 * an integer representing the type of event being sent from the player
+	 * @var KalturaLiveStatsEventType
 	 */
 	public $eventType;
 	
@@ -29,32 +30,43 @@ class KalturaLiveStatsEvent extends KalturaObject
 	public $sessionId;	
 	
 	/**
-	 * @var int - incremental sequence of the event
+	 * incremental sequence of the event
+	 * @var int
 	 */
 	public $eventIndex;
 	
 	/**
-	 * @var int - buffer time in seconds from the last 10 seconds
+	 * buffer time in seconds from the last 10 seconds
+	 * @var int
 	 */
 	public $bufferTime;
 	
 	/**
-	 * @var int - bitrate used in the last 10 seconds 
+	 * bitrate used in the last 10 seconds
+	 * @var int
 	 */
 	public $bitrate;
 	
 	/**
-	 * @var string - the referrer of the client
+	 * the referrer of the client
+	 * @var string
 	 */
 	public $referrer;	
 	
 	/**
-	 * @var boolean 
+	 * @var bool 
 	 */
 	public $isLive;
-		
+
 	/**
-	 * @var KalturaPlaybackProtocol - delivery type used for this stream
+	 * the event start time as string
+	 * @var string
+	 */
+	public $startTime;
+
+	/**
+	 * delivery type used for this stream
+	 * @var KalturaPlaybackProtocol 
 	 */
 	public $deliveryType;
 		

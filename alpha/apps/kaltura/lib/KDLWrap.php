@@ -377,19 +377,22 @@ class KDLWrap
 		$kdlFlavor->_id = $cdlFlavor->getId();
 		$kdlFlavor->_type = $cdlFlavor->getType();
 		$kdlFlavor->_tags = $cdlFlavor->getTags();
-		if($cdlFlavor instanceof flavorParams || $cdlFlavor instanceof flavorParamsOutput)
+		if($cdlFlavor instanceof flavorParams)
 		{ 
 			$kdlFlavor->_clipStart = $cdlFlavor->getClipOffset();
 			$kdlFlavor->_clipDur = $cdlFlavor->getClipDuration();
 /**/
-			if($cdlFlavor instanceof flavorParams) {
-				$multiStream = $cdlFlavor->getMultiStream();
-				if(isset($multiStream)) {
-							//Sample json string: {"detect":"auto","audio":{"mapping":[1,2]}}
-					$fromJson = json_decode($multiStream);
-					$kdlFlavor->_multiStream = isset($fromJson)? $fromJson: null;
-				}
+			$multiStream = $cdlFlavor->getMultiStream();
+			if(isset($multiStream)) {
+						//Sample json string: {"detect":"auto","audio":{"mapping":[1,2]}}
+				$fromJson = json_decode($multiStream);
+				$kdlFlavor->_multiStream = isset($fromJson)? $fromJson: null;
 			}
+			$kdlFlavor->_optimizationPolicy = $cdlFlavor->getOptimizationPolicy();
+		}
+		else if($cdlFlavor instanceof flavorParamsOutput){
+			$kdlFlavor->_clipStart = $cdlFlavor->getClipOffset();
+			$kdlFlavor->_clipDur = $cdlFlavor->getClipDuration();		
 		}
 		
 		$kdlFlavor->_cdlObject = $cdlFlavor;
@@ -431,6 +434,7 @@ class KDLWrap
 				$kdlFlavor->_video->_anamorphic = $cdlFlavor->getAnamorphicPixels();
 				$kdlFlavor->_video->_maxFrameRate = $cdlFlavor->getMaxFrameRate();
 				$kdlFlavor->_video->_isForcedKeyFrames = !$cdlFlavor->getIsAvoidForcedKeyFrames();
+				$kdlFlavor->_video->_isCropIMX = $cdlFlavor->getIsCropIMX();
 				$watermarkData = $cdlFlavor->getWatermarkData();
 				if(isset($watermarkData)) {
 					$fromJson = json_decode($watermarkData);

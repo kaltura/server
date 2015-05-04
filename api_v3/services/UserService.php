@@ -89,7 +89,7 @@ class UserService extends KalturaBaseUserService
 		}	
 			
 		$newUser = new KalturaUser();
-		$newUser->fromObject($dbUser);
+		$newUser->fromObject($dbUser, $this->getResponseProfile());
 		
 		return $newUser;
 	}
@@ -168,7 +168,7 @@ class UserService extends KalturaBaseUserService
 		}
 				
 		$user = new KalturaUser();
-		$user->fromObject($dbUser);
+		$user->fromObject($dbUser, $this->getResponseProfile());
 		
 		return $user;
 	}
@@ -199,7 +199,7 @@ class UserService extends KalturaBaseUserService
 			throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID, $userId);
 
 		$user = new KalturaUser();
-		$user->fromObject($dbUser);
+		$user->fromObject($dbUser, $this->getResponseProfile());
 		
 		return $user;
 	}
@@ -232,7 +232,7 @@ class UserService extends KalturaBaseUserService
 			throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID, $loginId);
 		
 		$user = new KalturaUser();
-		$user->fromObject($kuser);
+		$user->fromObject($kuser, $this->getResponseProfile());
 		
 		return $user;
 	}
@@ -267,7 +267,7 @@ class UserService extends KalturaBaseUserService
 		$dbUser->save();
 		
 		$user = new KalturaUser();
-		$user->fromObject($dbUser);
+		$user->fromObject($dbUser, $this->getResponseProfile());
 		
 		return $user;
 	}
@@ -287,39 +287,10 @@ class UserService extends KalturaBaseUserService
 		if (!$filter)
 			$filter = new KalturaUserFilter();
 			
-		if (!$pager)
-			$pager = new KalturaFilterPager();	
-
-		$userFilter = new kuserFilter();
-		$filter->toObject($userFilter);
-		
-		$c = KalturaCriteria::create(kuserPeer::OM_CLASS);
-		$userFilter->attachToCriteria($c);
-		
-		if (!is_null($filter->roleIdEqual))
-		{
-			$roleCriteria = new Criteria();
-			$roleCriteria->add ( KuserToUserRolePeer::USER_ROLE_ID , $filter->roleIdEqual );
-			$roleCriteria->addSelectColumn(KuserToUserRolePeer::KUSER_ID);
-			$rs = KuserToUserRolePeer::doSelectStmt($roleCriteria);
-			$kuserIds = $rs->fetchAll(PDO::FETCH_COLUMN);
-						
-			$c->add(kuserPeer::ID, $kuserIds, KalturaCriteria::IN);
-		}
-		
-		$c->addAnd(kuserPeer::PUSER_ID, NULL, KalturaCriteria::ISNOTNULL);
-		
-		$pager->attachToCriteria($c);
-		$list = kuserPeer::doSelect($c);
-		
-		$totalCount = $c->getRecordsCount();
-
-		$newList = KalturaUserArray::fromUserArray($list);
-		$response = new KalturaUserListResponse();
-		$response->objects = $newList;
-		$response->totalCount = $totalCount;
-		
-		return $response;
+		if(!$pager)
+			$pager = new KalturaFilterPager();
+			
+		return $filter->getListResponse($pager, $this->getResponseProfile());
 	}
 	
 	/**
@@ -517,7 +488,7 @@ class UserService extends KalturaBaseUserService
 		}
 		
 		$apiUser = new KalturaUser();
-		$apiUser->fromObject($user);
+		$apiUser->fromObject($user, $this->getResponseProfile());
 		return $apiUser;
 	}
 	
@@ -583,7 +554,7 @@ class UserService extends KalturaBaseUserService
 		}
 		
 		$apiUser = new KalturaUser();
-		$apiUser->fromObject($user);
+		$apiUser->fromObject($user, $this->getResponseProfile());
 		return $apiUser;
 	}
 	

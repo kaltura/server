@@ -170,6 +170,7 @@ $con = $target->_container;
 				$format = "asf";
 				break;
 			case KDLContainerTarget::MPEGTS:
+			case KDLContainerTarget::M2TS:
 			case KDLContainerTarget::APPLEHTTP:
 				$format = "mpg";
 				break;

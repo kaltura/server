@@ -94,7 +94,17 @@ class rawAction extends sfAction
 				}
 				$name = kString::removeNewLine($name);
 				if(!$direct_serve)
+				{
+					$entry_data = $entry->getData();
+					if(strpos($name , ".") === false && !is_null($entry_data))
+					{
+						$file_ext = pathinfo($entry_data, PATHINFO_EXTENSION);
+						$image_extensions = kConf::get('image_file_ext');
+						if ($file_ext && in_array($file_ext, $image_extensions))
+							$name .= '.' . $file_ext;
+					}
 					header("Content-Disposition: attachment; filename=\"$name\"");
+				}
 			}
 		}
 		else

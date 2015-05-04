@@ -139,6 +139,20 @@ class flavorParams extends assetParams
 	public function setIsAvoidForcedKeyFrames($v){ $this->putInCustomData('IsAvoidForcedKeyFrames', $v);}
 	public function getIsAvoidForcedKeyFrames(){return $this->getFromCustomData('IsAvoidForcedKeyFrames', null, 0);}
 	
+		/*
+		 * Bitwise flags:
+		 * 1: bitrate oriented optimization
+		 * 2: frame size oriented optimization
+		 * Should be '3' to turn both on
+		 */
+	public function setOptimizationPolicy($v){ $this->putInCustomData('OptimizationPolicy', $v);}
+	public function getOptimizationPolicy(){return $this->getFromCustomData('OptimizationPolicy', null, 1);}
+		/*
+		 * When set, IMX sources (mxf/mpeg2/720x608) the top 32 lines will be cropped
+		 */
+	public function setIsCropIMX($v){ $this->putInCustomData('IsCropIMX', $v);}
+	public function getIsCropIMX(){return $this->getFromCustomData('IsCropIMX', null, 0);}
+	
 	public function setMaxFrameRate($v){ $this->putInCustomData('MaxFrameRate', $v);}
 	public function getMaxFrameRate(){return $this->getFromCustomData('MaxFrameRate', null, 0);}
 	

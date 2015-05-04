@@ -164,13 +164,7 @@ class googleoauth2Action extends sfAction
 		}
 
 		$tokenJsonStr = $client->getAccessToken();
-		$tokenObject = json_decode($tokenJsonStr);
-		$tokenArray = get_object_vars($tokenObject);
-		$customDataKey = $appId;
-		if ($subId)
-			$customDataKey .= '_' . intval($subId);
-
-		$partner->putInCustomData($customDataKey, $tokenArray, 'googleAuth');
+		$partner->setGoogleOAuth2($appId, $tokenJsonStr, $subId);
 		$partner->save();
 
 		$params = array(
@@ -209,11 +203,7 @@ class googleoauth2Action extends sfAction
 
 		$partnerId = $ks->partner_id;
 		$partner = $this->getPartner($partnerId);
-		$customDataKey = $appId;
-		if ($subId)
-			$customDataKey .= '_' . $subId;
-
-		$tokenData = $partner->getFromCustomData($customDataKey, 'googleAuth');
+		$tokenData = $partner->getGoogleOAuth2($appId, $subId);
 		$client = $this->getGoogleClient($appId);
 		try
 		{

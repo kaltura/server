@@ -32,6 +32,19 @@ class CaptionAsset extends asset
 	{
 		$finalPath = '/api_v3/index.php/service/caption_captionAsset/action/serve';
 		$finalPath .= '/captionAssetId/' . $this->getId();
+		if($this->getVersion() > 1)
+		{
+			$finalPath .= '/v/' . $this->getVersion();
+		}
+		
+		$partner = PartnerPeer::retrieveByPK($this->getPartnerId());
+		$entry = $this->getentry();
+		
+		$partnerVersion = $partner->getFromCustomData('cache_caption_version');
+		$entryVersion = $entry->getFromCustomData('cache_caption_version');
+		
+		$finalPath .= ($partnerVersion ? "/pv/$partnerVersion" : '');
+		$finalPath .= ($entryVersion ? "/ev/$entryVersion" : '');
 		
 		return $finalPath;
 	}

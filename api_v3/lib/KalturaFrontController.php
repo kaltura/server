@@ -343,7 +343,7 @@ class KalturaFrontController
 					break;
 					
 				case kCoreException::MAX_CATEGORIES_PER_ENTRY:
-					$object = new KalturaAPIException(KalturaErrors::MAX_CATEGORIES_FOR_ENTRY_REACHED, entry::MAX_CATEGORIES_PER_ENTRY);
+					$object = new KalturaAPIException(KalturaErrors::MAX_CATEGORIES_FOR_ENTRY_REACHED, $ex->getData());
 					break;
 					
 				case kCoreException::MAX_ASSETS_PER_ENTRY:
@@ -396,6 +396,10 @@ class KalturaFrontController
 					
 				case kCoreException::MAX_FILE_SYNCS_FOR_OBJECT_PER_DAY_REACHED:
 					$object = new KalturaAPIException(KalturaErrors::MAX_FILE_SYNCS_FOR_OBJECT_PER_DAY_REACHED, $ex->getData());
+					break;
+
+				case kCoreException::ID_NOT_FOUND:
+					$object = new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $ex->getData());
 					break;
 						
 				default:

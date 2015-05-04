@@ -19,6 +19,21 @@ class kStorageJobData extends kJobData
 	 * @var string
 	 */   	
     private $serverPassword;
+    
+    /**
+     * @var string
+     */
+    private $serverPrivateKey;
+    
+    /**
+     * @var string
+     */
+    private $serverPublicKey;
+    
+    /**
+     * @var string
+     */
+    private $serverPassPhrase;
 
 	/**
 	 * @var bool
@@ -39,7 +54,6 @@ class kStorageJobData extends kJobData
 	 * @var string
 	 */   	
     private $destFileSyncStoredPath;
-    
     
 	/**
 	 * @return the $serverUrl
@@ -152,4 +166,47 @@ class kStorageJobData extends kJobData
 	{
 		$this->destFileSyncStoredPath = $destFileSyncStoredPath;
 	}
+	
+	/**
+	 * @return the $serverPrivateKey
+	 */
+	public function getServerPrivateKey() {
+		return $this->serverPrivateKey;
+	}
+
+	/**
+	 * @return the $serverPublicKey
+	 */
+	public function getServerPublicKey() {
+		return $this->serverPublicKey;
+	}
+
+	/**
+	 * @return the $serverPassPhrase
+	 */
+	public function getServerPassPhrase() {
+		return $this->serverPassPhrase;
+	}
+
+	/**
+	 * @param string $serverPrivateKey
+	 */
+	public function setServerPrivateKey($serverPrivateKey) {
+		$this->serverPrivateKey = $serverPrivateKey;
+	}
+
+	/**
+	 * @param string $serverPublicKey
+	 */
+	public function setServerPublicKey($serverPublicKey) {
+		$this->serverPublicKey = $serverPublicKey;
+	}
+
+	/**
+	 * @param string $serverPassPhrase
+	 */
+	public function setServerPassPhrase($serverPassPhrase) {
+		$this->serverPassPhrase = $serverPassPhrase;
+	}
+	
 }

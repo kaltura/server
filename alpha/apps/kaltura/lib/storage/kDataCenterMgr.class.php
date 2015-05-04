@@ -156,7 +156,9 @@ class kDataCenterMgr
 		$file_sync_id = $file_sync->getId();
 		$file_hash = md5( $dc["secret" ] .  $file_sync_id );	// will be verified on the other side to make sure not some attack or external invalid request  
 		
-		$build_remote_url = $dc["url"] . "/index.php/extwidget/servefile/id/{$file_sync_id}/hash/{$file_hash}"; // or something similar 
+		$filename = 'f.' . $file_sync->getFileExt();
+		
+		$build_remote_url = $dc["url"] . "/index.php/extwidget/servefile/id/$file_sync_id/hash/$file_hash/f/$filename"; // or something similar 
 		
 		return $build_remote_url;
 	}

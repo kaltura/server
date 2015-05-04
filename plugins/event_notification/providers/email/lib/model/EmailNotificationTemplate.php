@@ -3,7 +3,7 @@
  * @package plugins.emailNotification
  * @subpackage model
  */
-class EmailNotificationTemplate extends EventNotificationTemplate implements ISyncableFile
+class EmailNotificationTemplate extends BatchEventNotificationTemplate implements ISyncableFile
 {
 	const CUSTOM_DATA_FORMAT = 'format';
 	const CUSTOM_DATA_SUBJECT = 'subject';
@@ -39,9 +39,9 @@ class EmailNotificationTemplate extends EventNotificationTemplate implements ISy
 	}
 
 	/* (non-PHPdoc)
-	 * @see EventNotificationTemplate::getJobData()
+	 * @see BatchEventNotificationTemplate::getJobData()
 	 */
-	public function getJobData(kScope $scope = null)
+	protected function getJobData(kScope $scope = null)
 	{
 		$jobData = new kEmailNotificationDispatchJobData();
 		$jobData->setTemplateId($this->getId());

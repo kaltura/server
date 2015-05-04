@@ -3,17 +3,11 @@
  * @package api
  * @subpackage objects
  */
-class KalturaModerationFlagListResponse extends KalturaObject
+class KalturaModerationFlagListResponse extends KalturaListResponse
 {
 	/**
 	 * @var KalturaModerationFlagArray
 	 * @readonly
 	 */
 	public $objects;
-
-	/**
-	 * @var int
-	 * @readonly
-	 */
-	public $totalCount;
 }

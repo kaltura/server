@@ -167,6 +167,21 @@ class KalturaStorageProfile extends KalturaObject implements IFilterable
 	 */
 	public $deliveryProfileIds;
 	
+	/**
+	 * @var string
+	 */
+	public $privateKey;
+	
+    /**
+	 * @var string
+	 */
+	public $publicKey;
+	
+	/**
+	 * @var string
+	 */
+	public $passPhrase;
+		
 	private static $map_between_objects = array
 	(
 		"id",
@@ -197,6 +212,9 @@ class KalturaStorageProfile extends KalturaObject implements IFilterable
 		"rules",
 		"pathManagerParams",	
 		"deliveryProfileIds",
+		"privateKey",
+		"publicKey",
+		"passPhrase",
 	);
 	
 	/* (non-PHPdoc)
@@ -305,12 +323,14 @@ class KalturaStorageProfile extends KalturaObject implements IFilterable
 	/* (non-PHPdoc)
 	 * @see KalturaObject::fromObject()
 	 */
-	public function fromObject ( $source_object  )
+	public function doFromObject($source_object, KalturaDetachedResponseProfile $responseProfile = null)
 	{
-	    parent::fromObject($source_object);
+	    parent::doFromObject($source_object, $responseProfile);
 	    
-	    $this->pathManagerParams = KalturaKeyValueArray::fromKeyValueArray($source_object->getPathManagerParams());
-	    $this->deliveryProfileIds = KalturaKeyValueArray::fromKeyValueArray($source_object->getDeliveryProfileIds());
+		if($this->shouldGet('pathManagerParams', $responseProfile))
+			$this->pathManagerParams = KalturaKeyValueArray::fromKeyValueArray($source_object->getPathManagerParams());
+		if($this->shouldGet('deliveryProfileIds', $responseProfile))
+			$this->deliveryProfileIds = KalturaKeyValueArray::fromKeyValueArray($source_object->getDeliveryProfileIds());
 	}
 	
 	/* (non-PHPdoc)

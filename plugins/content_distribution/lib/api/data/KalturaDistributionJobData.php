@@ -77,9 +77,9 @@ class KalturaDistributionJobData extends KalturaJobData
 		return array_merge ( parent::getMapBetweenObjects() , self::$map_between_objects );
 	}
 	
-	public function fromObject($sourceObject)
+	public function doFromObject($sourceObject, KalturaDetachedResponseProfile $responseProfile = null)
 	{
-		parent::fromObject($sourceObject);
+		parent::doFromObject($sourceObject, $responseProfile);
 		
 		$this->mediaFiles = KalturaDistributionRemoteMediaFileArray::fromDbArray($sourceObject->getMediaFiles());
 		

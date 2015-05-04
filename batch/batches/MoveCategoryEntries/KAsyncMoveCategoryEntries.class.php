@@ -37,6 +37,14 @@ class KAsyncMoveCategoryEntries extends KJobHandlerWorker
 	{
 		return KalturaBatchJobType::MOVE_CATEGORY_ENTRIES;
 	}
+
+	/* (non-PHPdoc)
+	 * @see KBatchBase::getPrivileges()
+	 */
+	protected function getPrivileges()
+	{
+		return array_merge(parent::getPrivileges(), array(self::PRIVILEGE_BATCH_JOB_TYPE . ':' . self::getType()));
+	}
 	
 	/* (non-PHPdoc)
 	 * @see KJobHandlerWorker::exec()
@@ -257,5 +265,7 @@ class KAsyncMoveCategoryEntries extends KJobHandlerWorker
 		}
 		
 		KBatchBase::$kClient->category->index($data->destCategoryId);
+		
+		return $movedEntries;
 	}
 }

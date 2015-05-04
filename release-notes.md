@@ -1,6 +1,647 @@
+# Jupiter-10.10.0 #
+## Support marking file_sync's as directories ##
+
+- Issue type - new feature
+- Issue ID - WEBC-467
+
+### Configuration ###
+
+None.
+   
+  
+### Deployment ###
+ 
+ - Run mysql -h@db_host@ -u@db_user@ -p@db_pass@ -P3306 kaltura < deployment/updates/sql/2015_04_28_alter_file_sync_table_custom_data_field.sql
+	
+		Please verify this column does not exist propir to running.
+
+#### Known Issues & Limitations ####
+
+None.
+
+
+ 
+## Feed Drop Folder Feature ##
+
+- Issue type - new feature
+- Issue ID - PLAT-2042
+
+### Configuration ###
+
+Add the following line to the plugins.ini file:  
+        FeedDropFolder 
+   
+Add the following parameters to the batch.ini DropFolderWatcher worker configuration:  
+        params.mrss.xmlPath									= @WEB_DIR@/tmp/dropFolderFiles  
+        params.mrss.limitProcessEachRun						= 20
+   
+  
+### Deployment ###
+ 
+ - clear the cache
+ - run php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+ - Create new folder : @WEB_DIR@/tmp/dropFolderFiles
+
+## Time Based Playlist Filters ##
+
+Allows adding timebased filters to playlists that support expiry of a filter on a certain time.
+
+- Issue Type: New Feature
+- Issue ID: PLAT-2817
+
+#### Configuration ####
+
+None.
+
+#### Deployment Scripts ####
+
+None.
+
+#### Known Issues & Limitations ####
+
+None.
+
+
+## Live to VOD entry should support copying all metadata ##
+
+- Issue Type: Story
+- Issue ID: PLAT-2744
+
+#### Configuration ####
+
+Add the following lines from admin.template.ini to admin.ini:
+
+    moduls.liveStreamRecordShouldCopyEntitelment.enabled = true
+    moduls.liveStreamRecordShouldCopyEntitelment.permissionType = 2
+    moduls.liveStreamRecordShouldCopyEntitelment.label = Kaltura Live Streams - Copy entitelment
+    moduls.liveStreamRecordShouldCopyEntitelment.permissionName = FEATURE_LIVE_STREAM_COPY_ENTITELMENTS
+    moduls.liveStreamRecordShouldCopyEntitelment.basePermissionType = 2
+    moduls.liveStreamRecordShouldCopyEntitelment.basePermissionName = FEATURE_LIVE_STREAM
+    moduls.liveStreamRecordShouldCopyEntitelment.group = GROUP_ENABLE_DISABLE_FEATURES
+
+#### Deployment Scripts ####
+
+None.
+
+#### Known Issues & Limitations ####
+
+None.
+
+## Delivery Profile selection logic for playback ##
+
+Added logic to the selection of deliveryProfiles for playback.
+A priority attributes orders available deliveryProfile.
+Each deliveryProfile may override the base class implementation of supportsDeliveryDynamicAttributes which returns 
+whether the deliveryProfile supports the required playback constraints (progressive media seek, flv support etc), doesn't support or partially support it. 
+Partial support means the playback will work but a feature (e.g. seek within flash progressive download) won't.
+These enhancements allow for multiple deliveryProfiles to be configured as default and provide fall back in case of delivery constraints.
+Delivered by - Eran Itam.
+
+- Issue Type:Enhancement
+- Issue ID: No ID
+
+#### Configuration ####
+
+None.
+
+#### Deployment Scripts ####
+
+deployment/updates/sql/2015_04_25_alter_delivery_profile_add_priority.sql
+
+#### Known Issues & Limitations ####
+
+None.
+
+----------
+# Jupiter-10.9.0 #
+
+## Copy cue points to clips and trimmed entries ##
+
+- Issue Type: bug fix
+- Issue ID: PLAT-1118
+
+#### Configuration ####
+
+Add the following lines from admin.template.ini to admin.ini:
+
+	moduls.annotationCopyToClip.enabled = true
+	moduls.annotationCopyToClip.permissionType = 2
+	moduls.annotationCopyToClip.label = Time Based - Copy annotation cue points when user clips entries
+	moduls.annotationCopyToClip.permissionName = COPY_ANNOTATIONS_TO_CLIP
+	moduls.annotationCopyToClip.basePermissionType = 3
+	moduls.annotationCopyToClip.basePermissionName = ANNOTATION_PLUGIN_PERMISSION
+	moduls.annotationCopyToClip.group = GROUP_ENABLE_DISABLE_FEATURES
+
+	moduls.annotationCopyToTrim.enabled = true
+	moduls.annotationCopyToTrim.permissionType = 2
+	moduls.annotationCopyToTrim.label = Time Based - Do not keep annotation cue points when user trims entries
+	moduls.annotationCopyToTrim.permissionName = DO_NOT_COPY_ANNOTATIONS_TO_TRIMMED_ENTRY
+	moduls.annotationCopyToTrim.basePermissionType = 3
+	moduls.annotationCopyToTrim.basePermissionName = ANNOTATION_PLUGIN_PERMISSION
+	moduls.annotationCopyToTrim.group = GROUP_ENABLE_DISABLE_FEATURES
+
+	moduls.cuePointCopyToClip.enabled = true
+	moduls.cuePointCopyToClip.permissionType = 2
+	moduls.cuePointCopyToClip.label = Time Based - Do not copy code, thumb and ad cue points when user clips entries
+	moduls.cuePointCopyToClip.permissionName = DO_NOT_COPY_CUE_POINTS_TO_CLIP
+	moduls.cuePointCopyToClip.basePermissionType = 3
+	moduls.cuePointCopyToClip.basePermissionName = CUEPOINT_PLUGIN_PERMISSION
+	moduls.cuePointCopyToClip.group = GROUP_ENABLE_DISABLE_FEATURES
+
+	moduls.cuePointCopyToTrim.enabled = true
+	moduls.cuePointCopyToTrim.permissionType = 2
+	moduls.cuePointCopyToTrim.label = Time Based - Do not keep code, thumb, and ad cue points when user trims entries
+	moduls.cuePointCopyToTrim.permissionName = DO_NOT_COPY_CUE_POINTS_TO_TRIMMED_ENTRY
+	moduls.cuePointCopyToTrim.basePermissionType = 3
+	moduls.cuePointCopyToTrim.basePermissionName = CUEPOINT_PLUGIN_PERMISSION
+	moduls.cuePointCopyToTrim.group = GROUP_ENABLE_DISABLE_FEATURES
+
+	moduls.keepCuePointsOnMediaReplacement.enabled = true
+	moduls.keepCuePointsOnMediaReplacement.permissionType = 2
+	moduls.keepCuePointsOnMediaReplacement.label = Time Based - Remove original cue points when user replaces media in existing entry
+	moduls.keepCuePointsOnMediaReplacement.permissionName = REMOVE_CUE_POINTS_WHEN_REPLACING_MEDIA
+	moduls.keepCuePointsOnMediaReplacement.basePermissionType = 3
+	moduls.keepCuePointsOnMediaReplacement.basePermissionName = CUEPOINT_PLUGIN_PERMISSION
+	moduls.keepCuePointsOnMediaReplacement.group = GROUP_ENABLE_DISABLE_FEATURES
+
+#### Deployment Scripts ####
+
+None.
+
+#### Known Issues & Limitations ####
+
+None.
+
+## YouTube API connector V3 ##
+
+***Note:*** Manual migration required to all existing accounts. 
+
+- Issue Type: bug fix
+- Issue ID: PLAT-2776
+
+#### Configuration ####
+
+**google_auth.ini**
+
+Added `youtubeapi` section.
+
+#### Deployment Scripts ####
+
+		deployment/updates/scripts/2015_04_12_migrate_youtube_api_category.php
+
+#### Known Issues & Limitations ####
+
+The new API, currently, doesn't support existing features:
+
+- Disallow comments
+- Disallow ratings
+- Disallow responses
+- Set raw file name
+- Set start and end dates
+
+## Redirect live entry updates via its original DC ##
+
+- Issue Type: bug fix
+- Issue ID: PLAT-2762
+
+#### Configuration ####
+
+** local.ini **
+
+Added the following configuration.
+
+	;set to true when one of the DC's is down
+	disable_dump_api_request = false
+
+#### Deployment Scripts ####
+
+None.
+
+#### Known Issues & Limitations ####
+
+None.
+
+----------
+# Jupiter-10.8.0 #
+
+## Tag-search - return all objects when no entitlement ##
+
+- Issue Type: bug fix
+- Issue ID: PLAT-2646
+
+#### Configuration ####
+
+**sphinx/kaltura.conf**
+
+Added the following attribute to the kaltura_tag sphinx table. please re-index.
+
+	rt_attr_string = tag
+
+#### Deployment Scripts ####
+
+None.
+
+#### Known Issues & Limitations ####
+
+None.
+
+## Real-time dashboard permission in now based on the general live-stream permission ##
+
+- Issue Type: Change Request
+- Issue ID: PLAT-2705
+
+#### Configuration ####
+
+Remove moduls.realTimeReports config from configurations/admin.ini
+
+#### Deployment Scripts ####
+
+None.
+
+#### Known Issues & Limitations ####
+
+None.
+
+
+## Dynamic Objects ##
+
+- Issue Type: New Feature
+- Issue ID: PLAT-2466
+
+#### Configuration ####
+
+**plugins.ini**
+
+Add `MetadataSphinx` to the end of `Mandatory plugins` section (after `SphinxSearch`)
+
+**sphinx**
+
+Update `configurations/sphinx/kaltura.conf` according to template (a new index `kaltura_metadata` was added).
+
+
+#### Deployment Scripts ####
+
+		mysql -uroot -p kaltura < deployment/updates/sql/2015_03_18_alter_metadata_profile_field_with_custom_data_field.sql
+		php deployment/updates/scripts/add_permissions/2015_03_18_update_metadata_permissions.php
+		php deployment/base/scripts/installPlugins.php
+		php deployment/base/scripts/populateSphinxMetadata.php
+
+#### Known Issues & Limitations ####
+
+None.
+
+##New file formats MXF and M2TS##
+- Issue Type: new feature
+- Issue ID: PLAT-2742 and SUP-4124
+
+
+
+----------
+# Jupiter-10.7.0 #
+
+##API Response Profiles##
+- Issue Type: new feature
+
+#### Configuration ####
+None
+
+#### Deployment Scripts ####
+
+	mysql -uroot -p kaltura < deployment/updates/sql/2015_02_23_response_profile_table.sql
+	php deployment/updates/scripts/add_permissions/2015_02_23_response_profile.php  
+
+#### Known Issues & Limitations ####
+
+None.
+
+##Live Analytics - Show DVR audience metrics on Live Analytics##
+- Issue Type: new feature
+- Issue ID: PLAT-2413
+
+#### Configuration ####
+
+Deploy an up-to-date version of batch/batches/Mailer/emails_en.ini
+
+#### Deployment Scripts ####
+
+Run on the Cassandra cluster: **live_analytics**/KalturaLiveModel/conf/migrations/2015-03-01-000000-update_dvr_kaltura_live_keyspace.cql
+Deploy KalturaLiveAnalyics.war
+
+#### Known Issues & Limitations ####
+
+None.
+
+----------
+# Jupiter-10.6.0 #
+
+##Live - A/V out of sync in second part of recorded entry after restart streaming (regression)##
+- Issue ID: PLAT-2540
+
+### Configuration ###
+- Add "params.ffprobeCmd = ffprobe" to configurations/batch/live.workers.ini - KAsyncConvertLiveSegment
+
+----------
+# Jupiter-10.5.0 #
+
+##Flavor-asset status HTTP Notifications##
+- Issue Type: new feature
+- Issue ID: PS-2065
+
+### Configuration ###
+None
+
+###Installation  
+- Run:  
+php /opt/kaltura/app/tests/standAloneClient/exec.php /opt/kaltura/app/tests/standAloneClient/flavorAssetHttpNotifications.xml  
+
+#### Known Issues & Limitations ####
+
+None.
+
+##Support MPEG-DASH Delivery Profile##
+- Issue Type: New Feature
+- Issue ID: PLAT-2064
+
+#### Configuration ####
+
+None.
+
+#### Deployment Scripts ####
+
+		php deployment/updates/scripts/2014_12_08_create_dash_delivery_profile.php
+
+#### Known Issues & Limitations ####
+
+No client side (player) failover support.  
+
+##Live Audio/Video async fix##
+- Issue ID: SUP-2942
+
+### Configuration ###
+- Add "params.ffprobeCmd = ffprobe" to 
+- - configurations/batch/workers.ini - KAsyncExtractMedia
+- - configurations/batch/live.workers.ini - KAsyncConcat
+
+
+## Business Process Management Integration ##
+Integration with Activiti BPM engine
+
+- Issue Type: New Feature
+
+#### Configuration ####
+
+*plugins.ini*
+
+Add the following line:
+
+		Integration		
+		IntegrationEventNotifications
+		BpmEventNotificationIntegration
+		BusinessProcessNotification
+		ActivitiBusinessProcessNotification
+
+*batch.ini*
+
+Add the following lines under `[template]` section:
+
+		enabledWorkers.KAsyncIntegrate						= 1
+		enabledWorkers.KAsyncIntegrateCloser				= 1
+
+Add the following lines as new sections:
+
+		[KAsyncIntegrate : JobHandlerWorker]
+		id													= 570
+		friendlyName										= Integrate
+		type												= KAsyncIntegrate
+		maximumExecutionTime								= 12000
+		scriptPath											= ../plugins/integration/batch/Integrate/KAsyncIntegrateExe.php
+		
+		[KAsyncIntegrateCloser : JobHandlerWorker]
+		id													= 580
+		friendlyName										= Integrate Closer
+		type												= KAsyncIntegrateCloser
+		maximumExecutionTime								= 12000
+		scriptPath											= ../plugins/integration/batch/Integrate/KAsyncIntegrateCloserExe.php
+		params.maxTimeBeforeFail							= 1000000
+
+
+#### Deployment Preparations ####
+
+ - Reload configuration: `touch cache/base.reload`.
+ - Clear cache: `rm -rf cache/*`.
+ - Install plugins: `php deployment/base/scripts/installPlugins.php`.
+ - Generate clients: `php generator/generate.php`.
+ - Restart batch: `/etc/init.d/kaltura-batch restart`.
+
+#### Deployment Scripts ####
+
+		mysql -uroot -p kaltura < deployment/updates/sql/2014_11_20_business_process_server.sql
+		php deployment/updates/scripts/add_permissions/2014_11_20_business_process_server_permissions.php
+		php deployment/updates/scripts/add_permissions/2015_01_20_dispatch_integration_job.php
+		php tests/standAloneClient/exec.php tests/standAloneClient/bpmNotificationsTemplates.xml
+
+#### Activiti Deployment Instructions ####
+
+ - Install [Apache Tomcat 7](http://tomcat.apache.org/tomcat-7.0-doc/setup.html#Unix_daemon "Apache Tomcat 7")
+ - Make sure $CATALINA_HOME is defined.
+ - Install [Apache Ant](http://ant.apache.org/manual/installlist.html "Apache Ant")
+ - Download [Activiti 5.17.0](https://github.com/Activiti/Activiti/releases/download/activiti-5.17.0/activiti-5.17.0.zip "Activiti 5.17.0")
+ - Open zip: `unzip activiti-5.17.0.zip`
+ - Copy WAR files: `cp activiti-5.17.0/wars/* $CATALINA_HOME/webapps/`
+ - Restart Apache Tomcat.
+ - Create DB **(replace tokens)**: `mysql -uroot -p`
+
+		CREATE DATABASE activiti;
+		GRANT INSERT,UPDATE,DELETE,SELECT,ALTER,CREATE ON activiti.* TO '@DB1_USER@'@'%';
+		FLUSH PRIVILEGES;
+
+ - Edit **(replace tokens)** $CATALINA_HOME/webapps/**activiti-explorer**/WEB-INF/classes/db.properties
+
+		jdbc.driver=com.mysql.jdbc.Driver
+		jdbc.url=jdbc:mysql://@DB1_HOST@:@DB1_PORT@/activiti
+		jdbc.username=@DB1_USER@
+		jdbc.password=@DB1_PASS@
+
+ - Edit **(replace tokens)** $CATALINA_HOME/webapps/**activiti-rest**/WEB-INF/classes/db.properties
+
+		jdbc.driver=com.mysql.jdbc.Driver
+		jdbc.url=jdbc:mysql://@DB1_HOST@:@DB1_PORT@/activiti
+		jdbc.username=@DB1_USER@
+		jdbc.password=@DB1_PASS@
+
+ - Download [mysql jdbc connector 5.0.8](http://cdn.mysql.com/Downloads/Connector-J/mysql-connector-java-5.0.8.zip "mysql jdbc connector 5.0.8")
+ - Open zip: `unzip mysql-connector-java-5.0.8.zip`
+ - Copy the mysql jdbc connector: `cp mysql-connector-java-5.0.8/mysql-connector-java-5.0.8-bin.jar $CATALINA_HOME/lib/`
+ - Restart Apache Tomcat.
+ - Open your browser to validate installation **(replace tokens)**: http://@WWW_HOST@:8080/activiti-explorer/
+	 - Username: kermit
+	 - Password: kermit
+ - Generate java pojo and bpmn clients **(replace tokens)**: `php @APP_DIR@/generator/generate.php pojo,bpmn`
+ - Edit deployment configuration file **(replace tokens)**: `cp @WEB_DIR@/content/clientlibs/bpmn/deploy/src/activiti.cfg.template.xml @WEB_DIR@/content/clientlibs/bpmn/deploy/src/activiti.cfg.xml`
+ - Deploy processes **(replace tokens)**:
+	 - `cd @WEB_DIR@/content/clientlibs/bpmn`
+	 - `ant`
+ - Add Activiti server to Kaltura server using the API **(replace tokens)**: `php @APP_DIR@/tests/standAloneClient/exec.php @APP_DIR@/tests/standAloneClient/activitiServer.xml`
+
+##Caption added HTTP Notifications##
+- Issue Type: new feature
+- Issue ID: PLAT-2412
+
+### Configuration ###
+None
+
+###Installation  
+- Run:  
+php /opt/kaltura/app/tests/standAloneClient/exec.php /opt/kaltura/app/tests/standAloneClient/captionAssetHttpNotifications.xml  
+
+#### Known Issues & Limitations ####
+
+None.  
+
+----------
+# Jupiter-10.4.0 #
+
+##Drop Folder Email Notifications##
+- Issue Type - new feature 
+
+### Configuration ###
+*plugins.ini*  
+Add new line:  
+DropFolderEventNotifications
+
+###Installation  
+
+- Run:  
+php /opt/kaltura/app/deployment/base/scripts/installPlugins.php  
+- Run:  
+php /opt/kaltura/app/tests/standAloneClient/exec.php /opt/kaltura/app/tests/standAloneClient/emailDropFolderFileFailedStatus.xml  
+
+
+----------
+# Jupiter-10.2.0 #
+
+## Webex Fix ## 
+- Issue Type: bug fix
+
+#### Configuration ####
+
+*batch.ini* 
+
+Add the following to the KAsyncImport worker configuartion:
+
+params.webex.iterations                                                                 = 30  
+params.webex.sleep 
+
+## Unicorn Connector ##
+- Issue Type: New Feature
+
+#### Configuration ####
+
+*plugins.ini*
+
+Add the following line:
+
+		UnicornDistribution
+
+#### Deployment Scripts ####
+
+		php deployment/updates/scripts/add_permissions/2014_12_30_unicorn_callback_service.php
+
+##link externalmedia->add permission to basic permission objects##
+- Issue Type: Back-End Request
+- Issue ID: SUP-2708
+
+#### Configuration ####
+
+None.
+
+#### Deployment Scripts ####
+
+		php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2015_01_11_add_externalmedia_add_permissions.php
+
+#### Known Issues & Limitations ####
+
+None.
+
+##add flavorasset->getwebplayablebyentryid permission to basic playback role##
+- Issue Type: Back-End Request
+- Issue ID: KMS-5334
+
+#### Configuration ####
+
+None.
+
+#### Deployment Scripts ####
+
+		php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2015_01_11_add_base_playback_role_flavorasset_getwebplayablebyentryid_permission.php
+
+#### Known Issues & Limitations ####
+
+None.
+
+## Copy entitlement info from live entry to vod entry ##
+- Issue Type: New Feature
+- Issue ID: PLAT-2313
+
+#### Configuration ####
+
+*base.ini*
+
+Add the following line to the the event_consumers[] list
+
+		event_consumers[] = kObjectCreatedHandler
+
+#### Deployment Scripts ####
+
+None.
+
+#### Known Issues & Limitations ####
+
+None.
+
+## Scheduled Tasks Enhancements 2 ##
+- Issue Type: New Feature
+- Issue ID: PLAT-1631
+
+#### Configuration ####
+
+*plugins.ini*
+
+Add the following plugin to the list of plugins
+
+		ScheduledTaskContentDistribution
+
+#### Deployment Scripts ####
+
+		php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2014_11_25_scheduled_task_update.php
+
+#### Known Issues & Limitations ####
+
+None.
+
 # Jupiter-10.1.0 #
 
-## sourceType filter ##
+## New UI Conf Type ##
+- Issue Type: New Feature
+- Issue ID: PLAT-2245
+
+#### Configuration ####
+
+*admin.ini*
+
+Add the following line to the end of the settings.uiConfTypes[] list
+
+		settings.uiConfTypes[] = Kaltura_Client_Enum_UiConfObjType::WEBCASTING
+
+#### Deployment Scripts ####
+
+None.
+
+#### Known Issues & Limitations ####
+
+None.
+
+## Allow cue point search combined with entry filter ##
 - Issue Type: New Feature
 - Issue ID: PLAT-2208
 
@@ -59,7 +700,6 @@ None.
 
 None.
 
-
 ##add user->get permission to basic user role##
 - Issue Type: Customer request
 - Issue ID: SUP-2899
@@ -70,7 +710,7 @@ None.
 
 #### Deployment Scripts ####
 
-		php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2014_11_30_BASE_USER_SESSION_PERMISSION_add_USER_GET_permissions.php
+		php deployment/updates/scripts/add_permissions/2014_11_30_BASE_USER_SESSION_PERMISSION_add_USER_GET_permissions.php
 
 #### Known Issues & Limitations ####
 
@@ -593,7 +1233,13 @@ Integration in process.
 ## Thumbnail encoder ##
 reverting the current encoder to the old one
 
-- Issue Type: Bug fix
+- Issue Type: 
+- 
+- 
+- 
+- 
+- 
+- Bug fix
 - Issue ID: SUP-2581
 
 #### Configuration ####
@@ -768,6 +1414,23 @@ None
 - The recording duration is limited to 24 hours.
 
 # IX-9.18.0 #
+
++## Add base-playback user role ##
++- Issue Type: Customer Request
++- Issue ID: PLAT-1565
++
++Adding a user-role with playback capabilities only
++
++#### Configuration ####
++None
++
++#### Deployment Scripts ####
++
++		php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2014_08_03_add_base_playback_role_permissions.php
++
++#### Known Issues & Limitations ####
++None
++
 
 ## Event Cue point support ##
 - Issue ID: PLAT-1136
@@ -1570,4 +2233,3 @@ Internal indication for api time properties and support for times that are relat
 0 = PID1
 1 = PID2
 `
-

@@ -63,7 +63,7 @@
 - (IBAction)menuButtonPressed:(UIButton *)button {
 
     
-    selectedMenu = button.tag;
+    selectedMenu = (int)button.tag;
     
     if (button.tag < 3) {
         
@@ -109,24 +109,24 @@
 {
     [super viewDidLoad];
 
-    menuButton0.titleLabel.lineBreakMode = UILineBreakModeWordWrap;
+    menuButton0.titleLabel.lineBreakMode = NSLineBreakByWordWrapping;
 	menuButton0.titleLabel.numberOfLines = 0;
-	menuButton0.titleLabel.textAlignment = UITextAlignmentCenter;
+	menuButton0.titleLabel.textAlignment = NSTextAlignmentCenter;
 	[menuButton0.titleLabel setFont:[UIFont fontWithName:@"Maven Pro" size:16]];
 	
-    menuButton1.titleLabel.lineBreakMode = UILineBreakModeWordWrap;
+    menuButton1.titleLabel.lineBreakMode = NSLineBreakByWordWrapping;
 	menuButton1.titleLabel.numberOfLines = 0;
-	menuButton1.titleLabel.textAlignment = UITextAlignmentCenter;
+	menuButton1.titleLabel.textAlignment = NSTextAlignmentCenter;
 	[menuButton1.titleLabel setFont:[UIFont fontWithName:@"Maven Pro" size:16]];
 
-    menuButton2.titleLabel.lineBreakMode = UILineBreakModeWordWrap;
+    menuButton2.titleLabel.lineBreakMode = NSLineBreakByWordWrapping;
 	menuButton2.titleLabel.numberOfLines = 0;
-	menuButton2.titleLabel.textAlignment = UITextAlignmentCenter;
+	menuButton2.titleLabel.textAlignment = NSTextAlignmentCenter;
 	[menuButton2.titleLabel setFont:[UIFont fontWithName:@"Maven Pro" size:16]];
 	
-    menuButton3.titleLabel.lineBreakMode = UILineBreakModeWordWrap;
+    menuButton3.titleLabel.lineBreakMode = NSLineBreakByWordWrapping;
 	menuButton3.titleLabel.numberOfLines = 0;
-	menuButton3.titleLabel.textAlignment = UITextAlignmentCenter;
+	menuButton3.titleLabel.textAlignment = NSTextAlignmentCenter;
 	[menuButton3.titleLabel setFont:[UIFont fontWithName:@"Maven Pro" size:16]];
     
      

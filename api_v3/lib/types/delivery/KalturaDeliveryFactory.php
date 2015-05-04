@@ -56,6 +56,8 @@ class KalturaDeliveryProfileFactory {
 				return new KalturaUrlTokenizerAkamaiRtsp();
 			case 'kAkamaiSecureHDUrlTokenizer':
 				return new KalturaUrlTokenizerAkamaiSecureHd();
+			case 'kCloudFrontUrlTokenizer':
+				return new KalturaUrlTokenizerCloudFront();
 			case 'kBitGravityUrlTokenizer':
 				return new KalturaUrlTokenizerBitGravity();
 			// Add other tokenizers here

@@ -839,9 +839,19 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 		$thumbParamsOutput->setConversionEnginesExtraParams($thumbParams->getConversionEnginesExtraParams());
 		$thumbParamsOutput->setOperators($thumbParams->getOperators());
 		$thumbParamsOutput->setEngineVersion($thumbParams->getEngineVersion());
-		$thumbParamsOutput->setFileExt('jpg');
+		$extensionTypes = kConf::hasParam('image_file_ext') ? kConf::get('image_file_ext') : array();
+
+		$ext = null;
+		if ($srcAsset)
+			$ext = $srcAsset->getFileExt();
+
+		if (!is_null($ext) && in_array($ext ,$extensionTypes))
+			$thumbParamsOutput->setFileExt($ext);
+		else
+			$thumbParamsOutput->setFileExt('jpg');
+
 		$thumbParamsOutput->setRotate($mediaInfo? $mediaInfo->getVideoRotation() : null);
-		
+
 		$thumbParamsOutput->setCropType($thumbParams->getCropType());
 		$thumbParamsOutput->setQuality($thumbParams->getQuality());
 		$thumbParamsOutput->setCropX($thumbParams->getCropX());

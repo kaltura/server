@@ -94,11 +94,11 @@ class MysqlPlatform extends DefaultPlatform {
 	 */
 	public function disconnectedEscapeText($text)
 	{
-		if (function_exists('mysql_escape_string')) {
-			return mysql_escape_string($text);
-		} else {
-			return addslashes($text);
-		}
+	    if (function_exists('mysqli_real_escape_string')) {
+		return mysqli_real_escape_string($text);
+	    } else {
+		return addslashes($text);
+	    }
 	}
 
 	/**

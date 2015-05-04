@@ -10,7 +10,7 @@
 
 #ifdef widevine
 #import "WViPhoneAPI.h"
-#import "WVSettings.h"
+#import "KWVSettings.h"
 
 static NSArray *sBitRates;
 #endif
@@ -44,7 +44,7 @@ static NSArray *sBitRates;
 
 - (id)initClient {
     
-    KalturaClientConfiguration* config = [[KalturaClientConfiguration alloc] init];
+    KalturaConfiguration* config = [[KalturaConfiguration alloc] init];
     KalturaNSLogger* logger = [[KalturaNSLogger alloc] init];
     config.logger = logger;
     config.serviceUrl = DEFAULT_SERVICE_URL;
@@ -74,7 +74,7 @@ static NSArray *sBitRates;
     self.media = [[NSMutableArray alloc] init];
     
 #ifdef widevine
-    wvSettings = [[WVSettings alloc] init];
+    wvSettings = [[KWVSettings alloc] init];
 #endif
     return self;
 }
@@ -83,7 +83,7 @@ static NSArray *sBitRates;
     
     [self.client release];
     
-    KalturaClientConfiguration* config = [[KalturaClientConfiguration alloc] init];
+    KalturaConfiguration* config = [[KalturaConfiguration alloc] init];
     KalturaNSLogger* logger = [[KalturaNSLogger alloc] init];
     config.logger = logger;
     config.serviceUrl = DEFAULT_SERVICE_URL;
@@ -310,7 +310,7 @@ static NSArray *sBitRates;
     {
         [Utils createBuffer:uploadFilePath offset:uploadedSize];
         
-        token = [client.uploadToken uploadWithUploadTokenId:self.uploadFileTokenId withFileData:[Utils getDocPath:@"buffer.tmp"] withResume:YES withFinalChunk:(fileSize - uploadedSize <= CHUNK_SIZE) withResumeAt: uploadedSize];
+        token = [client.uploadToken uploadWithUploadTokenId:self.uploadFileTokenId withFileData:[Utils getDocPath:@"buffer.tmp"] withResume:YES withFinalChunk:(fileSize - uploadedSize <= CHUNK_SIZE) withResumeAt: uploadedSize ];
         
         return;
     }
@@ -470,6 +470,10 @@ NSInteger bitratesSort(id media1, id media2, void *reverse)
     }
     
     return urlString;
+}
+
+- (NSString *)getIframeURL:(KalturaMediaEntry *)mediaEntry{
+    return [NSString stringWithFormat:@"http://kgit.html5video.org/tags/v2.0.0.rc12/mwEmbedFrame.php?wid=_%d&uiconf_id=%@&entry_id=%@", partnerId, [self getConfig: @"uiconfID"], mediaEntry.id];
 }
 
 #pragma widevine support methods

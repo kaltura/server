@@ -44,4 +44,15 @@ class KalturaEventNotificationDispatchJobData extends KalturaJobData
 	{
 		return kPluginableEnumsManager::coreToApi('EventNotificationTemplateType', $subType);
 	}
+	
+	/* (non-PHPdoc)
+	 * @see KalturaObject::fromObject()
+	 */
+	protected function doFromObject($dbObject, KalturaDetachedResponseProfile $responseProfile = null)
+	{
+		/* @var $dbObject kEventNotificationDispatchJobData */
+		parent::doFromObject($dbObject, $responseProfile);
+		
+		$this->contentParameters = KalturaKeyValueArray::fromKeyValueArray($dbObject->getContentParameters());
+	}
 }

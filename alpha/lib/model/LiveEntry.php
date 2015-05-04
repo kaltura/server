@@ -196,7 +196,13 @@ abstract class LiveEntry extends entry
 	
 	public function setRecordedEntryId($v)
 	{
+		$this->incInCustomData("recorded_entry_index");
 		$this->putInCustomData("recorded_entry_id", $v);
+	}
+	
+	public function getRecordedEntryIndex()
+	{
+		return $this->getFromCustomData("recorded_entry_index", null, 0);
 	}
 	
 	public function getRecordStatus()
@@ -232,10 +238,13 @@ abstract class LiveEntry extends entry
 	public function getLastElapsedRecordingTime()		{ return $this->getFromCustomData( "lastElapsedRecordingTime", null, 0 ); }
 	public function setLastElapsedRecordingTime( $v )	{ $this->putInCustomData( "lastElapsedRecordingTime" , $v ); }
 
+	public function setRecordedSegmentsInfo( $v )	{ $this->putInCustomData('recordedSegmentsInfo', $v); }
+	public function getRecordedSegmentsInfo()		{ return $this->getFromCustomData('recordedSegmentsInfo', null, new kRecordedSegmentsInfo()); }
+
 	public function setStreamName ( $v )	{	$this->putInCustomData ( "streamName" , $v );	}
 	public function getStreamName (  )	{	return $this->getFromCustomData( "streamName", null, $this->getId() . '_%i' );	}
 	
-	public function setFirstBroadcast ( $v )	{	$this->putInCustomData ( "first_broadcast" , $v );	}
+	protected function setFirstBroadcast ( $v )	{	$this->putInCustomData ( "first_broadcast" , $v );	}
 	public function getFirstBroadcast (  )	{	return $this->getFromCustomData( "first_broadcast");	}
 	
 	public function setCurrentBroadcastStartTime( $v )	{ $this->putInCustomData ( "currentBroadcastStartTime" , $v ); }
@@ -243,6 +252,9 @@ abstract class LiveEntry extends entry
 
 	public function setLastBroadcast ( $v )	{	$this->putInCustomData ( "last_broadcast" , $v );	}
 	public function getLastBroadcast (  )	{	return $this->getFromCustomData( "last_broadcast");	}
+	
+	protected function setLastBroadcastEndTime ( $v )	{	$this->putInCustomData ( "last_broadcast_end_time" , $v );	}
+	public function getLastBroadcastEndTime (  )	{	return (int) $this->getFromCustomData( "last_broadcast_end_time", null, 0);	}
 	
 	public function getPushPublishEnabled()
 	{
@@ -270,9 +282,9 @@ abstract class LiveEntry extends entry
 			$this->putInCustomData('live_stream_configurations', $v);
 	}
 	
-	public function getLiveStreamConfigurationByProtocol($format, $protocol, $tag = null, $currentDcOnly = false)
+	public function getLiveStreamConfigurationByProtocol($format, $protocol, $tag = null, $currentDcOnly = false, array $flavorParamsIds = array())
 	{
-		$configurations = $this->getLiveStreamConfigurations($protocol, $tag, $currentDcOnly);
+		$configurations = $this->getLiveStreamConfigurations($protocol, $tag, $currentDcOnly, $flavorParamsIds);
 		foreach($configurations as $configuration)
 		{
 			/* @var $configuration kLiveStreamConfiguration */
@@ -283,7 +295,7 @@ abstract class LiveEntry extends entry
 		return null;
 	}
 	
-	public function getLiveStreamConfigurations($protocol = 'http', $tag = null, $currentDcOnly = false)
+	public function getLiveStreamConfigurations($protocol = 'http', $tag = null, $currentDcOnly = false, array $flavorParamsIds = array())
 	{
 		$configurations = array();
 		if (!in_array($this->getSource(), self::$kalturaLiveSourceTypes))
@@ -378,37 +390,53 @@ abstract class LiveEntry extends entry
 			$streamName = $this->getId();
 			if(is_null($tag) && ($this->getConversionProfileId() || $this->getType() == entryType::LIVE_CHANNEL))
 				$tag = 'all';
+		
+			$queryString = array();
+			if($this->getDvrStatus() == DVRStatus::ENABLED)
+			{
+				$queryString[] = 'DVR';
+			}
 			
-			if($tag)
+			if(count($flavorParamsIds) === 1)
+			{
+				$streamName .= '_' . reset($flavorParamsIds);
+			}
+			elseif(count($flavorParamsIds) > 1)
+			{
+				sort($flavorParamsIds);
+				$tag = implode('_', $flavorParamsIds);
+				$queryString[] = 'flavorIds=' . implode(',', $flavorParamsIds);
+				
 				$streamName = "smil:{$streamName}_{$tag}.smil";
+			}
+			elseif($tag)
+			{
+				$streamName = "smil:{$streamName}_{$tag}.smil";
+			}
+			
+			if(count($queryString))
+			{
+				$queryString = '?' . implode('&', $queryString);
+			}
+			else
+			{
+				$queryString = '';
+			}
 			
 			$rtmpStreamUrl = $manifestUrl;
 			
 			$manifestUrl .= $streamName;
-			$hlsStreamUrl = "$manifestUrl/playlist.m3u8";
-			$hdsStreamUrl = "$manifestUrl/manifest.f4m";
-			$slStreamUrl = "$manifestUrl/Manifest";
-			$mpdStreamUrl = "$manifestUrl/manifest.mpd";
+			$hlsStreamUrl = "$manifestUrl/playlist.m3u8" . $queryString;
+			$hdsStreamUrl = "$manifestUrl/manifest.f4m" . $queryString;
+			$slStreamUrl = "$manifestUrl/Manifest" . $queryString;
+			$mpdStreamUrl = "$manifestUrl/manifest.mpd" . $queryString;
 			
 			if($backupManifestUrl)
 			{
 				$backupManifestUrl .= "$backupApplicationName/";
 				$backupManifestUrl .= $streamName;
-				$hlsBackupStreamUrl = "$backupManifestUrl/playlist.m3u8";
-				$hdsBackupStreamUrl = "$backupManifestUrl/manifest.f4m";
-			}
-			
-			if($this->getDvrStatus() == DVRStatus::ENABLED)
-			{
-				$hlsStreamUrl .= "?DVR";
-				$hdsStreamUrl .= "?DVR";
-				$slStreamUrl .= "?dvr";
-				
-				if($backupManifestUrl)
-				{
-					$hlsBackupStreamUrl .= "?DVR";
-					$hdsBackupStreamUrl .= "?DVR";
-				}
+				$hlsBackupStreamUrl = "$backupManifestUrl/playlist.m3u8" . $queryString;
+				$hdsBackupStreamUrl = "$backupManifestUrl/manifest.f4m" . $queryString;
 			}
 		}
 			
@@ -546,6 +574,9 @@ abstract class LiveEntry extends entry
 	
 	public function setMediaServer($index, $hostname, $applicationName = null)
 	{
+		if(is_null($this->getFirstBroadcast())) 
+			$this->setFirstBroadcast(kApiCache::getTime());
+				
 		$mediaServer = MediaServerPeer::retrieveByHostname($hostname);
 		if (!$mediaServer)
 		{
@@ -556,7 +587,7 @@ abstract class LiveEntry extends entry
 		if($this->storeInCache($key) && $this->isMediaServerRegistered($index, $hostname))
 			return;
 		
-		$this->setLastBroadcast(time());
+		$this->setLastBroadcast(kApiCache::getTime());
 		$server = new kLiveMediaServer($index, $hostname, $mediaServer ? $mediaServer->getDc() : null, $mediaServer ? $mediaServer->getId() : null, 
 			$applicationName ? $applicationName : MediaServer::DEFAULT_APPLICATION);
 		$this->putInCustomData("server-$index", $server, LiveEntry::CUSTOM_DATA_NAMESPACE_MEDIA_SERVERS);
@@ -576,7 +607,10 @@ abstract class LiveEntry extends entry
 	{	
 		$server = $this->getFromCustomData("server-$index", LiveEntry::CUSTOM_DATA_NAMESPACE_MEDIA_SERVERS);
 		if($server && $server->getHostname() == $hostname)
+		{
 			$server = $this->removeFromCustomData("server-$index", LiveEntry::CUSTOM_DATA_NAMESPACE_MEDIA_SERVERS);
+			$this->setLastBroadcastEndTime(kApiCache::getTime());
+		}
 	}
 	
 	/**
@@ -716,5 +750,18 @@ abstract class LiveEntry extends entry
 		}
 	}
 	
+	public function setRecordingOptions(kLiveEntryRecordingOptions $recordingOptions)
+	{
+		$this->putInCustomData("recording_options", serialize($recordingOptions));
+	}
 	
+	public function getRecordingOptions()
+	{
+		$recordingOptions = $this->getFromCustomData("recording_options");
+		
+		if($recordingOptions)
+			$recordingOptions = unserialize($recordingOptions);
+		
+		return $recordingOptions; 
+	}
 }
