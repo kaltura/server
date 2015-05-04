@@ -154,6 +154,12 @@ class Base
 		$this->callsQueue[] = $call;
 	}
 
+	protected function resetRequest()
+	{
+		$this->multiRequestReturnType = null;
+		$this->callsQueue = array();
+	}
+
 	/**
 	 * Call all API service that are in queue
 	 *
@@ -163,7 +169,7 @@ class Base
 	{
 		if (count($this->callsQueue) == 0)
 		{
-			$this->multiRequestReturnType = null;
+			$this->resetRequest();
 			return null;
 		}
 
@@ -215,6 +221,7 @@ class Base
 		if ($error || ($errorCode != 200 ))
 		{
 			$error .= ". RC : $errorCode";
+			$this->resetRequest();
 			throw new ClientException($error, ClientException::ERROR_GENERIC);
 		}
 		else
@@ -237,9 +244,12 @@ class Base
 
 			if ($this->config->getFormat() != self::KALTURA_SERVICE_FORMAT_XML)
 			{
+				$this->resetRequest();
 				throw new ClientException("unsupported format: $postResult", ClientException::ERROR_FORMAT_NOT_SUPPORTED);
 			}
 		}
+		
+		$this->resetRequest();
 
 		$endTime = microtime (true);
 
@@ -517,7 +527,7 @@ class Base
 			$i++;
 		}
 
-		$this->multiRequestReturnType = null;
+		$this->resetRequest();
 		return $ret;
 	}
 

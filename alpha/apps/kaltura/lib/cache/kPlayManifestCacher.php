@@ -25,8 +25,15 @@ class kPlayManifestCacher extends kApiCache
 		if (!parent::init())
 			return false;
 
-		unset($this->_params['callback']);
-		unset($this->_params['playSessionId']);
+		// ignore params which may hurt caching such as callback, playSessionId
+		if (kConf::hasParam('playmanifest_ignore_params'))
+		{
+			$ignoreParams = kConf::get('playmanifest_ignore_params');
+			foreach($ignoreParams as $paramName)
+			{
+				unset($this->_params[$paramName]);
+			}
+		}
 		
 		$this->_playbackContext = isset($this->_params['playbackContext']) ? $this->_params['playbackContext'] : null;
 		unset($this->_params['playbackContext']);
