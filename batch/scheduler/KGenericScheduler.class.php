@@ -122,9 +122,7 @@ class KGenericScheduler
 		$this->schedulerStatusInterval = $this->schedulerConfig->getSchedulerStatusInterval();
 		KDwhClient::setEnabled($this->schedulerConfig->getDwhEnabled());
 		KDwhClient::setFileName($this->schedulerConfig->getDwhPath());
-		KalturaLog::err("@@NA getting the log worker interval '".$this->schedulerConfig->getLogWorkerInterval()."'");
 		$this->logWorkerInterval = $this->schedulerConfig->getLogWorkerInterval();
-
 
 		$taskConfigsValidations = array();
 		foreach($taskConfigs as $taskConfig)
