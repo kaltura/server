@@ -23,7 +23,8 @@ class DeliveryProfileAkamaiAppleHttpDirect extends DeliveryProfileAkamaiAppleHtt
 	
 	protected function getUrlPrefix()
 	{
-		return parse_url($this->getUrl(), PHP_URL_HOST);
+		$parsedUrl = parse_url($this->getUrl());
+		return $parsedUrl["scheme"] . "://" . $parsedUrl["host"];
 	}
 	
 	protected function formatHdIos($path) {

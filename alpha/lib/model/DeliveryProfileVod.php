@@ -270,7 +270,7 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 	
 		$urlPrefix = '';
 		if (strpos($url, "://") === false) {
-			$urlPrefix = $this->getUrl();
+			$urlPrefix = $this->getUrlPrefix();
 			$url = "/".$url;
 		}
 	
