@@ -154,7 +154,7 @@ function handleFile($filePath)
 			}
 			elseif ($attributeName == 'identifierParam')
 			{
-				$attributeName = $value;
+				$$attributeName = $value;
 				continue;
 			} 
 			if (preg_match('/eval\((?P<evalString>.+)\)/', $value, $matches))
@@ -182,8 +182,7 @@ function handleFile($filePath)
 			
 			if(preg_match('/^#[^#]+$/', $value))
 			{
-			    list($dynamicObjectType, $objectValue) = explode('.', substr($value, 1), 2);
-                $value = kPluginableEnumsManager::apiToCore($dynamicObjectType, $objectValue);
+			    $value = kPluginableEnumsManager::genericApiToCore(substr($value, 1));
 			}
 
 			$setters[$setter] = $value;

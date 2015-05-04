@@ -5,7 +5,7 @@
  */
 class Annotation extends CuePoint implements IMetadataObject
 {
-    const CUSTOM_DATA_FIELD_SHOULD_INDEX_ON_ENTRY = 'shouldIndexOnEntry';
+    const CUSTOM_DATA_FIELD_SEARCHABLE_ON_ENTRY = 'searchableOnEntry';
     
 	public function __construct() 
 	{
@@ -93,7 +93,7 @@ class Annotation extends CuePoint implements IMetadataObject
 		return $annotation;
 	}
 	
-	public function getShouldIndexOnEntry()	      {return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_SHOULD_INDEX_ON_ENTRY);}
-	public function setShouldIndexOnEntry($v)        {return $this->putInCustomData(self::CUSTOM_DATA_FIELD_SHOULD_INDEX_ON_ENTRY, (bool)$v);}
+	public function getSearchableOnEntry()	      		{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_SEARCHABLE_ON_ENTRY);}
+	public function setSearchableOnEntry($v)        	{return $this->putInCustomData(self::CUSTOM_DATA_FIELD_SEARCHABLE_ON_ENTRY, (bool)$v);}
 	
 }

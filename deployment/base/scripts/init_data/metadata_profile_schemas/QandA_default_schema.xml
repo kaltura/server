@@ -47,6 +47,25 @@
 						</xsd:appinfo>
 					</xsd:annotation>
 				</xsd:element>
+				<xsd:element id="md_84d309ab-51de-45ca-8ccb-049f6a8d6068" name="Type" minOccurs="1" maxOccurs="1">
+					<xsd:annotation>
+						<xsd:documentation/>
+						<xsd:appinfo>
+							<label>Type</label>
+							<key>Type</key>
+							<searchable>true</searchable>
+							<timeControl>false</timeControl>
+							<description>Hold the type of the item</description>
+						</xsd:appinfo>
+					</xsd:annotation>
+					<xsd:simpleType>
+						<xsd:restriction base="listType">
+							<xsd:enumeration value="Question"/>
+							<xsd:enumeration value="Answer"/>
+							<xsd:enumeration value="Announcement"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
 			</xsd:sequence>
 		</xsd:complexType>
 	</xsd:element>

@@ -845,15 +845,6 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 			if(self::isAllowedPartner($object->getPartnerId()))
 				return kMetadataManager::getSearchValuesByObject(MetadataObjectType::USER, $object->getId());
 		}
-		
-		if($object instanceof CuePoint)
-		{
-		    $pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaCuePoint');
-		    $cuePointCalssName = lcfirst(get_class($object));
-		    
-		    if(self::isAllowedPartner($object->getPartnerId()) && isset($pluginInstances[$cuePointCalssName]) && $pluginInstances[$cuePointCalssName]::isAllowedPartner($object->getPartnerId()))
-		        return kMetadataManager::getSearchValuesByObject($object->getMetadataObjectType(), $object->getId());
-		}
 
 		if($object instanceof Metadata)
 		{

@@ -68,7 +68,7 @@ class KalturaAnnotation extends KalturaCuePoint
 	 * Should the cue point get indexed on the entry.
 	 * @var KalturaNullableBoolean
 	 */
-	public $shouldIndexOnEntry;
+	public $searchableOnEntry;
 	
 	
 
@@ -87,7 +87,7 @@ class KalturaAnnotation extends KalturaCuePoint
 		"childrenCount",
 		"directChildrenCount",
 	    "isPublic",
-	    "shouldIndexOnEntry",
+	    "searchableOnEntry",
 	);
 	
 	/* (non-PHPdoc)
