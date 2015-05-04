@@ -158,6 +158,10 @@ abstract class ClientGeneratorFromPhp
 	{
 		$this->loadServicesInfo();
 		
+		
+		$this->addType(KalturaTypeReflectorCacher::get('KalturaClientConfiguration'));
+		$this->addType(KalturaTypeReflectorCacher::get('KalturaRequestConfiguration'));
+		
 		// load the filter order by string enums
 		foreach($this->_types as $typeReflector)
 		{
@@ -653,6 +657,7 @@ abstract class ClientGeneratorFromPhp
 		}
 		
 		// Always add these two classes
+		$includeList[] = 'KalturaApiExceptionArg';
 		$includeList[] = 'KalturaClientConfiguration';
 		$includeList[] = 'KalturaRequestConfiguration';
 		
@@ -686,5 +691,9 @@ abstract class ClientGeneratorFromPhp
 	protected function beginsWith($str, $end)
 	{
 		return (substr($str, 0, strlen($end)) === $end);
+	}
+	
+	public function done($outputPath)
+	{
 	}
 }

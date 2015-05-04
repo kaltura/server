@@ -21,12 +21,16 @@ class DeliveryProfileAkamaiAppleHttpDirect extends DeliveryProfileAkamaiAppleHtt
 		}
 	}
 	
-	protected function formatHdIos($path) {
-		$url = $this->getUrl();
-		$host = parse_url($url, PHP_URL_HOST);
-		$urlpath = ltrim(parse_url($url, PHP_URL_PATH),"/");
+	protected function getUrlPrefix()
+	{
+		$parsedUrl = parse_url($this->getUrl());
+		return $parsedUrl["scheme"] . "://" . $parsedUrl["host"];
+	}
 	
-		$urlPrefix = "http://" . $host . '/i/' . $urlpath;
+	protected function formatHdIos($path) {
+		$urlpath = ltrim(parse_url($this->getUrl(), PHP_URL_PATH),"/");
+	
+		$urlPrefix = '/i/' . $urlpath;
 		$urlSuffix = str_replace('\\', '/', $path)."/index_0_av.m3u8";
 	
 		return $urlPrefix.ltrim($urlSuffix, '/');

@@ -585,8 +585,12 @@ class KalturaTypeReflector
 	
 	public function isFilterable()
 	{
-		$reflectionClass = new ReflectionClass($this->_type);
-		return $reflectionClass->implementsInterface("IFilterable");
+		return is_subclass_of($this->_type, 'IFilterable');
+	}
+	
+	public function isRelatedFilterable()
+	{
+		return is_subclass_of($this->_type, 'IRelatedFilterable');
 	}
 	
 	/**

@@ -475,25 +475,44 @@ class Php53ClientGenerator extends ClientGeneratorFromXml
 					break;
 					
 				case "bool" :
-					$this->appendLine("		if(!empty(\$xml->{$propName}))");
-					$this->appendLine("			\$this->$propName = true;");
+					$this->appendLine("		if(count(\$xml->{$propName}))");
+					$this->appendLine("		{");
+					$this->appendLine("			if(!empty(\$xml->{$propName}))");
+					$this->appendLine("				\$this->$propName = true;");
+					$this->appendLine("			else");
+					$this->appendLine("				\$this->$propName = false;");
+					$this->appendLine("		}");
 					break;
 					
 				case "string" :
-					$this->appendLine("		\$this->$propName = ($propType)\$xml->$propName;");
+					$this->appendLine("		if(count(\$xml->{$propName}))");
+					$this->appendLine("			\$this->$propName = ($propType)\$xml->$propName;");
 					break;
 					
 				case "array" :
+					$arrayType = $propertyNode->getAttribute ( "arrayType" );
+					$this->appendLine("		if(count(\$xml->{$propName}))");
+					$this->appendLine("		{");
+					$this->appendLine("			if(empty(\$xml->{$propName}))");
+					$this->appendLine("				\$this->$propName = array();");
+					$this->appendLine("			else");
+					$this->appendLine("				\$this->$propName = \Kaltura\Client\ParseUtils::unmarshalArray(\$xml->$propName, \"$arrayType\");");
+					$this->appendLine("		}");
+					break;
+					
 				case "map" :
 					$arrayType = $propertyNode->getAttribute ( "arrayType" );
-					$this->appendLine("		if(empty(\$xml->{$propName}))");
-					$this->appendLine("			\$this->$propName = array();");
-					$this->appendLine("		else");
-					$this->appendLine("			\$this->$propName = \Kaltura\Client\ParseUtils::unmarshalArray(\$xml->$propName, \"$arrayType\");");
+					$this->appendLine("		if(count(\$xml->{$propName}))");
+					$this->appendLine("		{");
+					$this->appendLine("			if(empty(\$xml->{$propName}))");
+					$this->appendLine("				\$this->$propName = array();");
+					$this->appendLine("			else");
+					$this->appendLine("				\$this->$propName = \Kaltura\Client\ParseUtils::unmarshalMap(\$xml->$propName, \"$arrayType\");");
+					$this->appendLine("		}");
 					break;
 					
 				default : // sub object
-					$this->appendLine("		if(!empty(\$xml->{$propName}))");
+					$this->appendLine("		if(count(\$xml->{$propName}) && !empty(\$xml->{$propName}))");
 					$this->appendLine("			\$this->$propName = \Kaltura\Client\ParseUtils::unmarshalObject(\$xml->$propName, \"{$propType}\");");
 					break;
 			}
@@ -901,6 +920,8 @@ class Php53ClientGenerator extends ClientGeneratorFromXml
 			
 				$configurationProperty = $configurationPropertyNode->localName;
 				$type = $configurationPropertyNode->getAttribute('type');
+				if(!$this->isSimpleType($type))
+					$type = $this->getTypeClassInfo($type)->getFullyQualifiedName();
 				$description = null;
 				
 				if($configurationPropertyNode->hasAttribute('description'))

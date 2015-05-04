@@ -222,6 +222,8 @@ class playManifestAction extends kalturaAction
 				KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_FOUND);
 		}
 		
+		myPartnerUtils::blockInactivePartner($this->entry->getPartnerId());
+		
 		// enforce access control
 		$base64Referrer = $this->getRequestParameter("referrer");
 		$hashes = $this->getRequestParameter("hashes");
@@ -684,7 +686,7 @@ class playManifestAction extends kalturaAction
 			$cdnHostOnly = trim(preg_replace('#https?://#', '', $cdnHost), '/');
 			
 			return DeliveryProfilePeer::getLocalDeliveryByPartner($this->entryId, $this->deliveryAttributes->getFormat(), 
-					$this->deliveryAttributes->getMediaProtocol(), $cdnHostOnly);
+					$this->deliveryAttributes, $cdnHostOnly);
 		}
 	}
 
@@ -878,6 +880,8 @@ class playManifestAction extends kalturaAction
 			$this->deliveryAttributes->setSeekFromTime(-1);
 
 		$this->deliveryAttributes->setClipTo($this->getRequestParameter ( "clipTo" , 0));
+
+		$this->deliveryAttributes->setPlaybackRate($this->getRequestParameter ( "playbackRate" , 0));
 		
 		$deliveryCode = $this->getRequestParameter( "deliveryCode", null );
 		$playbackContext = $this->getRequestParameter( "playbackContext", null );

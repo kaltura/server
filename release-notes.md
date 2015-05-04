@@ -1,3 +1,117 @@
+# Jupiter-10.10.0 #
+## Support marking file_sync's as directories ##
+
+- Issue type - new feature
+- Issue ID - WEBC-467
+
+### Configuration ###
+
+None.
+   
+  
+### Deployment ###
+ 
+ - Run mysql -h@db_host@ -u@db_user@ -p@db_pass@ -P3306 kaltura < deployment/updates/sql/2015_04_28_alter_file_sync_table_custom_data_field.sql
+	
+		Please verify this column does not exist propir to running.
+
+#### Known Issues & Limitations ####
+
+None.
+
+
+ 
+## Feed Drop Folder Feature ##
+
+- Issue type - new feature
+- Issue ID - PLAT-2042
+
+### Configuration ###
+
+Add the following line to the plugins.ini file:  
+        FeedDropFolder 
+   
+Add the following parameters to the batch.ini DropFolderWatcher worker configuration:  
+        params.mrss.xmlPath									= @WEB_DIR@/tmp/dropFolderFiles  
+        params.mrss.limitProcessEachRun						= 20
+   
+  
+### Deployment ###
+ 
+ - clear the cache
+ - run php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+ - Create new folder : @WEB_DIR@/tmp/dropFolderFiles
+
+## Time Based Playlist Filters ##
+
+Allows adding timebased filters to playlists that support expiry of a filter on a certain time.
+
+- Issue Type: New Feature
+- Issue ID: PLAT-2817
+
+#### Configuration ####
+
+None.
+
+#### Deployment Scripts ####
+
+None.
+
+#### Known Issues & Limitations ####
+
+None.
+
+
+## Live to VOD entry should support copying all metadata ##
+
+- Issue Type: Story
+- Issue ID: PLAT-2744
+
+#### Configuration ####
+
+Add the following lines from admin.template.ini to admin.ini:
+
+    moduls.liveStreamRecordShouldCopyEntitelment.enabled = true
+    moduls.liveStreamRecordShouldCopyEntitelment.permissionType = 2
+    moduls.liveStreamRecordShouldCopyEntitelment.label = Kaltura Live Streams - Copy entitelment
+    moduls.liveStreamRecordShouldCopyEntitelment.permissionName = FEATURE_LIVE_STREAM_COPY_ENTITELMENTS
+    moduls.liveStreamRecordShouldCopyEntitelment.basePermissionType = 2
+    moduls.liveStreamRecordShouldCopyEntitelment.basePermissionName = FEATURE_LIVE_STREAM
+    moduls.liveStreamRecordShouldCopyEntitelment.group = GROUP_ENABLE_DISABLE_FEATURES
+
+#### Deployment Scripts ####
+
+None.
+
+#### Known Issues & Limitations ####
+
+None.
+
+## Delivery Profile selection logic for playback ##
+
+Added logic to the selection of deliveryProfiles for playback.
+A priority attributes orders available deliveryProfile.
+Each deliveryProfile may override the base class implementation of supportsDeliveryDynamicAttributes which returns 
+whether the deliveryProfile supports the required playback constraints (progressive media seek, flv support etc), doesn't support or partially support it. 
+Partial support means the playback will work but a feature (e.g. seek within flash progressive download) won't.
+These enhancements allow for multiple deliveryProfiles to be configured as default and provide fall back in case of delivery constraints.
+Delivered by - Eran Itam.
+
+- Issue Type:Enhancement
+- Issue ID: No ID
+
+#### Configuration ####
+
+None.
+
+#### Deployment Scripts ####
+
+deployment/updates/sql/2015_04_25_alter_delivery_profile_add_priority.sql
+
+#### Known Issues & Limitations ####
+
+None.
+
 ----------
 # Jupiter-10.9.0 #
 

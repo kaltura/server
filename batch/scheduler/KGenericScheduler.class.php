@@ -325,6 +325,7 @@ class KGenericScheduler
 				return false;
 		}
 
+		KalturaLog::debug("Worker [{$taskConfig->name}] id [{$taskConfig->id}] running batches [$runningBatches] max instances [{$taskConfig->maxInstances}]");
 		if($runningBatches >= $taskConfig->maxInstances)
 			return false;
 

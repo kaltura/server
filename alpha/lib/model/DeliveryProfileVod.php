@@ -204,6 +204,11 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 		return $flavors;
 	}
 	
+	protected function getUrlPrefix()
+	{
+		return $this->url;
+	}
+	
 	/**
 	 * @param flavorAsset $flavorAsset
 	 * @return array
@@ -227,9 +232,8 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 		{
 			$flavorSizeKB = $flavorAsset->getSize();
 			if ($flavorSizeKB > kConf::get("max_file_size_downloadable_from_cdn_in_KB"))
-				$urlPrefix = requestUtils::getRequestHost();
-			else
-				$urlPrefix = $this->url;
+				KalturaLog::log("flavor size $flavorSizeKB > max_file_size_downloadable_from_cdn_in_KB, deliveryProfileId=".$this->getId()." url=".$this->getUrl()." flavorId=".$flavorAsset->getId()." flavorExt=".$flavorAsset->getFileExt());
+			$urlPrefix = $this->getUrlPrefix();
 		}
 	
 		$urlPrefix = preg_replace('/^https?:\/\//', '', $urlPrefix);
@@ -249,7 +253,7 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 	
 		return $this->getFlavorAssetInfo($url, $urlPrefix, $flavorAsset);
 	}
-	
+		
 	/**
 	 * @param flavorAsset $flavorAsset
 	 * @param FileSyncKey $key
@@ -266,7 +270,8 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 	
 		$urlPrefix = '';
 		if (strpos($url, "://") === false) {
-			$urlPrefix = $this->getUrl();
+			$urlPrefix = $this->getUrlPrefix();
+			$url = "/".$url;
 		}
 	
 		return $this->getFlavorAssetInfo($url, $urlPrefix, $flavorAsset);

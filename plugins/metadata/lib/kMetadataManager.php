@@ -220,7 +220,9 @@ class kMetadataManager
 			$profileField->setStatus(MetadataProfileField::STATUS_NONE_SEARCHABLE);
 			$profileField->setMetadataProfileVersion($metadataProfile->getVersion());
 			$profileField->save();
-			
+
+			self::setAdditionalProfileFieldData($metadataProfile, $profileField, $xPathData);
+
 			unset($xPaths[$xPath]);
 		}
 		
@@ -239,7 +241,10 @@ class kMetadataManager
 			if(isset($xPathData['label']))
 				$profileField->setLabel($xPathData['label']);
 			if(isset($xPathData['type']))
+			{
 				$profileField->setType($xPathData['type']);
+				self::setAdditionalProfileFieldData($metadataProfile, $profileField, $xPathData);
+			}
 
 			$profileField->save();
 		}
@@ -522,13 +527,20 @@ class kMetadataManager
 
 	protected static function validateSubMetadataObjects($metadataProfileId, KDOMDocument $xml)
 	{
-		$profileFields = MetadataProfileFieldPeer::retrieveByMetadataProfileId($metadataProfileId);
+		$profileFields = MetadataProfileFieldPeer::retrieveAllActiveByMetadataProfileId($metadataProfileId);
 		$xPath = new DOMXPath($xml);
 		foreach ($profileFields as $profileField)
 		{
 			/** @var MetadataProfileField $profileField */
 			if ($profileField->getType() == MetadataSearchFilter::KMC_FIELD_TYPE_METADATA_OBJECT)
 			{
+				$nodes = $xPath->query($profileField->getXpath());
+				$subObjectIds = array();
+				foreach ($nodes as $node)
+					$subObjectIds[] = $node->nodeValue;
+				$subObjectIds = array_unique($subObjectIds);
+				if (!count($subObjectIds))
+					continue;
 				$subMetadataProfileId = $profileField->getRelatedMetadataProfileId();
 				$subMetadataProfile = MetadataProfilePeer::retrieveByPK($subMetadataProfileId);
 				if (!$subMetadataProfile)
@@ -536,11 +548,6 @@ class kMetadataManager
 					KalturaLog::err('Sub metadata profile ' . $subMetadataProfileId . ' was not found');
 					return false;
 				}
-				$nodes = $xPath->query($profileField->getXpath());
-				$subObjectIds = array();
-				foreach ($nodes as $node)
-					$subObjectIds[] = $node->nodeValue;
-				$subObjectIds = array_unique($subObjectIds);
 				$subMetadataObjects = MetadataPeer::retrieveByObjects($subMetadataProfileId, $subMetadataProfile->getObjectType(), $subObjectIds);
 				if (count($subMetadataObjects) != count($subObjectIds))
 				{
