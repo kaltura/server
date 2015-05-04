@@ -28,6 +28,7 @@ class KGenericScheduler
 	private $schedulerStatusInterval;
 	private $nextStatusTime = 0;
 	private $nextSchedulerStatusTime = 0;
+	private $logWorkerInterval;
 
 	/**
 	 * Stores all groups of tasks, the index is the task type
@@ -121,6 +122,9 @@ class KGenericScheduler
 		$this->schedulerStatusInterval = $this->schedulerConfig->getSchedulerStatusInterval();
 		KDwhClient::setEnabled($this->schedulerConfig->getDwhEnabled());
 		KDwhClient::setFileName($this->schedulerConfig->getDwhPath());
+		KalturaLog::err("@@NA getting the log worker interval '".$this->schedulerConfig->getLogWorkerInterval()."'");
+		$this->logWorkerInterval = $this->schedulerConfig->getLogWorkerInterval();
+
 
 		$taskConfigsValidations = array();
 		foreach($taskConfigs as $taskConfig)
@@ -331,7 +335,7 @@ class KGenericScheduler
 				return false;
 		}
 
-		if (!isset($this->lastWorkerLog[$taskConfig->id]) || (time() >= ($this->lastWorkerLog[$taskConfig->id] + 60)))
+		if (!isset($this->lastWorkerLog[$taskConfig->id]) || (time() >= ($this->lastWorkerLog[$taskConfig->id] + $this->logWorkerInterval)))
 		{
 			KalturaLog::debug("Worker [{$taskConfig->name}] id [{$taskConfig->id}] running batches [$runningBatches] max instances [{$taskConfig->maxInstances}]");
 			$this->lastWorkerLog[$taskConfig->id] = time();
