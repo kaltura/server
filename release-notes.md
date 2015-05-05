@@ -1,10 +1,15 @@
 # Jupiter-10.11.0 #
 ## Too many logs are written to file on batch ##
 
+- Issue Type: bug fix
+- Issue ID: PLAT-2914
+
 ### Configuration ###
 - update batch.ini
 Add the following parameters to the batch.ini [template] configuration
 logWorkerInterval										= 60
+
+
 #### Deployment Scripts ####
 
 None.
