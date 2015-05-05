@@ -18,6 +18,23 @@ None.
 
 None.
 
+## Avoid the need to update many metadata objects ##
+
+- Issue Type: new feature
+- Issue ID: PLAT-1998
+
+### Configuration ###
+
+None.
+
+#### Deployment Scripts ####
+
+- Run mysql -h@db_host@ -u@db_user@ -p@db_pass@ -P3306 kaltura < deployment/updates/sql/2014_11_06_metadata_profile_file_sync_version.sql
+
+#### Known Issues & Limitations ####
+
+None.
+
 
 # Jupiter-10.10.0 #
 ## Support marking file_sync's as directories ##
