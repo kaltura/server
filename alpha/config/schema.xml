@@ -2096,22 +2096,16 @@
 		<column name="entry_id" type="varchar" size="20" required="true"/>
 		<column name="kuser_id" type="integer" required="true"/>
 		<column name="partner_id" type="integer"/>
-		<column name="createdAt" type="Timestamp"/>
-		<column name="updatedAt" type="Timestamp"/>
+		<column name="created_at" type="Timestamp"/>
+		<column name="updated_at" type="Timestamp"/>
 		<column name="status" type="Integer"/>
 		<column name="type" type="Integer"/>
-		<column name="custom_data" type="Varchar"/>
-		<unique name="IX_UQ_user_entry_id">
-			<unique-column name="id"/>
-		</unique>
-		<foreign-key foreignTable="entry">
-			<reference foreign="id" local="entry_id"/>
+		<column name="custom_data" type="longvarchar"/>
+		<foreign-key onDelete="none" onUpdate="none" foreignTable="entry">
+			<reference local="entry_id" foreign="id" />
 		</foreign-key>
-		<foreign-key foreignTable="kuser">
+		<foreign-key onDelete="none" foreignTable="kuser">
 			<reference foreign="id" local="kuser_id"/>
-		</foreign-key>
-		<foreign-key foreignTable="partner">
-			<reference foreign="id" local="partner_id"/>
 		</foreign-key>
 	</table>
 </database>

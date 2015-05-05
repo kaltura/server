@@ -44,16 +44,16 @@ abstract class BaseUserEntry extends BaseObject  implements Persistent {
 	protected $partner_id;
 
 	/**
-	 * The value for the createdat field.
+	 * The value for the created_at field.
 	 * @var        string
 	 */
-	protected $createdat;
+	protected $created_at;
 
 	/**
-	 * The value for the updatedat field.
+	 * The value for the updated_at field.
 	 * @var        string
 	 */
-	protected $updatedat;
+	protected $updated_at;
 
 	/**
 	 * The value for the status field.
@@ -82,11 +82,6 @@ abstract class BaseUserEntry extends BaseObject  implements Persistent {
 	 * @var        kuser
 	 */
 	protected $akuser;
-
-	/**
-	 * @var        Partner
-	 */
-	protected $aPartner;
 
 	/**
 	 * Flag to prevent endless save loop, if this object is referenced
@@ -174,7 +169,7 @@ abstract class BaseUserEntry extends BaseObject  implements Persistent {
 	}
 
 	/**
-	 * Get the [optionally formatted] temporal [createdat] column value.
+	 * Get the [optionally formatted] temporal [created_at] column value.
 	 * 
 	 * This accessor only only work with unix epoch dates.  Consider enabling the propel.useDateTimeClass
 	 * option in order to avoid converstions to integers (which are limited in the dates they can express).
@@ -184,22 +179,22 @@ abstract class BaseUserEntry extends BaseObject  implements Persistent {
 	 * @return     mixed Formatted date/time value as string or (integer) unix timestamp (if format is NULL), NULL if column is NULL, and 0 if column value is 0000-00-00 00:00:00
 	 * @throws     PropelException - if unable to parse/validate the date/time value.
 	 */
-	public function getCreatedat($format = 'Y-m-d H:i:s')
+	public function getCreatedAt($format = 'Y-m-d H:i:s')
 	{
-		if ($this->createdat === null) {
+		if ($this->created_at === null) {
 			return null;
 		}
 
 
-		if ($this->createdat === '0000-00-00 00:00:00') {
+		if ($this->created_at === '0000-00-00 00:00:00') {
 			// while technically this is not a default value of NULL,
 			// this seems to be closest in meaning.
 			return null;
 		} else {
 			try {
-				$dt = new DateTime($this->createdat);
+				$dt = new DateTime($this->created_at);
 			} catch (Exception $x) {
-				throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->createdat, true), $x);
+				throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->created_at, true), $x);
 			}
 		}
 
@@ -214,7 +209,7 @@ abstract class BaseUserEntry extends BaseObject  implements Persistent {
 	}
 
 	/**
-	 * Get the [optionally formatted] temporal [updatedat] column value.
+	 * Get the [optionally formatted] temporal [updated_at] column value.
 	 * 
 	 * This accessor only only work with unix epoch dates.  Consider enabling the propel.useDateTimeClass
 	 * option in order to avoid converstions to integers (which are limited in the dates they can express).
@@ -224,22 +219,22 @@ abstract class BaseUserEntry extends BaseObject  implements Persistent {
 	 * @return     mixed Formatted date/time value as string or (integer) unix timestamp (if format is NULL), NULL if column is NULL, and 0 if column value is 0000-00-00 00:00:00
 	 * @throws     PropelException - if unable to parse/validate the date/time value.
 	 */
-	public function getUpdatedat($format = 'Y-m-d H:i:s')
+	public function getUpdatedAt($format = 'Y-m-d H:i:s')
 	{
-		if ($this->updatedat === null) {
+		if ($this->updated_at === null) {
 			return null;
 		}
 
 
-		if ($this->updatedat === '0000-00-00 00:00:00') {
+		if ($this->updated_at === '0000-00-00 00:00:00') {
 			// while technically this is not a default value of NULL,
 			// this seems to be closest in meaning.
 			return null;
 		} else {
 			try {
-				$dt = new DateTime($this->updatedat);
+				$dt = new DateTime($this->updated_at);
 			} catch (Exception $x) {
-				throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->updatedat, true), $x);
+				throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->updated_at, true), $x);
 			}
 		}
 
@@ -380,25 +375,18 @@ abstract class BaseUserEntry extends BaseObject  implements Persistent {
 			$this->modifiedColumns[] = UserEntryPeer::PARTNER_ID;
 		}
 
-		if ($this->aPartner !== null && $this->aPartner->getId() !== $v) {
-			$this->aPartner = null;
-		}
-
 		return $this;
 	} // setPartnerId()
 
 	/**
-	 * Sets the value of [createdat] column to a normalized version of the date/time value specified.
+	 * Sets the value of [created_at] column to a normalized version of the date/time value specified.
 	 * 
 	 * @param      mixed $v string, integer (timestamp), or DateTime value.  Empty string will
 	 *						be treated as NULL for temporal objects.
 	 * @return     UserEntry The current object (for fluent API support)
 	 */
-	public function setCreatedat($v)
+	public function setCreatedAt($v)
 	{
-		if(!isset($this->oldColumnsValues[UserEntryPeer::CREATEDAT]))
-			$this->oldColumnsValues[UserEntryPeer::CREATEDAT] = $this->createdat;
-
 		// we treat '' as NULL for temporal objects because DateTime('') == DateTime('now')
 		// -- which is unexpected, to say the least.
 		if ($v === null || $v === '') {
@@ -422,35 +410,32 @@ abstract class BaseUserEntry extends BaseObject  implements Persistent {
 			}
 		}
 
-		if ( $this->createdat !== null || $dt !== null ) {
+		if ( $this->created_at !== null || $dt !== null ) {
 			// (nested ifs are a little easier to read in this case)
 
-			$currNorm = ($this->createdat !== null && $tmpDt = new DateTime($this->createdat)) ? $tmpDt->format('Y-m-d H:i:s') : null;
+			$currNorm = ($this->created_at !== null && $tmpDt = new DateTime($this->created_at)) ? $tmpDt->format('Y-m-d H:i:s') : null;
 			$newNorm = ($dt !== null) ? $dt->format('Y-m-d H:i:s') : null;
 
 			if ( ($currNorm !== $newNorm) // normalized values don't match 
 					)
 			{
-				$this->createdat = ($dt ? $dt->format('Y-m-d H:i:s') : null);
-				$this->modifiedColumns[] = UserEntryPeer::CREATEDAT;
+				$this->created_at = ($dt ? $dt->format('Y-m-d H:i:s') : null);
+				$this->modifiedColumns[] = UserEntryPeer::CREATED_AT;
 			}
 		} // if either are not null
 
 		return $this;
-	} // setCreatedat()
+	} // setCreatedAt()
 
 	/**
-	 * Sets the value of [updatedat] column to a normalized version of the date/time value specified.
+	 * Sets the value of [updated_at] column to a normalized version of the date/time value specified.
 	 * 
 	 * @param      mixed $v string, integer (timestamp), or DateTime value.  Empty string will
 	 *						be treated as NULL for temporal objects.
 	 * @return     UserEntry The current object (for fluent API support)
 	 */
-	public function setUpdatedat($v)
+	public function setUpdatedAt($v)
 	{
-		if(!isset($this->oldColumnsValues[UserEntryPeer::UPDATEDAT]))
-			$this->oldColumnsValues[UserEntryPeer::UPDATEDAT] = $this->updatedat;
-
 		// we treat '' as NULL for temporal objects because DateTime('') == DateTime('now')
 		// -- which is unexpected, to say the least.
 		if ($v === null || $v === '') {
@@ -474,22 +459,22 @@ abstract class BaseUserEntry extends BaseObject  implements Persistent {
 			}
 		}
 
-		if ( $this->updatedat !== null || $dt !== null ) {
+		if ( $this->updated_at !== null || $dt !== null ) {
 			// (nested ifs are a little easier to read in this case)
 
-			$currNorm = ($this->updatedat !== null && $tmpDt = new DateTime($this->updatedat)) ? $tmpDt->format('Y-m-d H:i:s') : null;
+			$currNorm = ($this->updated_at !== null && $tmpDt = new DateTime($this->updated_at)) ? $tmpDt->format('Y-m-d H:i:s') : null;
 			$newNorm = ($dt !== null) ? $dt->format('Y-m-d H:i:s') : null;
 
 			if ( ($currNorm !== $newNorm) // normalized values don't match 
 					)
 			{
-				$this->updatedat = ($dt ? $dt->format('Y-m-d H:i:s') : null);
-				$this->modifiedColumns[] = UserEntryPeer::UPDATEDAT;
+				$this->updated_at = ($dt ? $dt->format('Y-m-d H:i:s') : null);
+				$this->modifiedColumns[] = UserEntryPeer::UPDATED_AT;
 			}
 		} // if either are not null
 
 		return $this;
-	} // setUpdatedat()
+	} // setUpdatedAt()
 
 	/**
 	 * Set the value of [status] column.
@@ -596,8 +581,8 @@ abstract class BaseUserEntry extends BaseObject  implements Persistent {
 			$this->entry_id = ($row[$startcol + 1] !== null) ? (string) $row[$startcol + 1] : null;
 			$this->kuser_id = ($row[$startcol + 2] !== null) ? (int) $row[$startcol + 2] : null;
 			$this->partner_id = ($row[$startcol + 3] !== null) ? (int) $row[$startcol + 3] : null;
-			$this->createdat = ($row[$startcol + 4] !== null) ? (string) $row[$startcol + 4] : null;
-			$this->updatedat = ($row[$startcol + 5] !== null) ? (string) $row[$startcol + 5] : null;
+			$this->created_at = ($row[$startcol + 4] !== null) ? (string) $row[$startcol + 4] : null;
+			$this->updated_at = ($row[$startcol + 5] !== null) ? (string) $row[$startcol + 5] : null;
 			$this->status = ($row[$startcol + 6] !== null) ? (int) $row[$startcol + 6] : null;
 			$this->type = ($row[$startcol + 7] !== null) ? (int) $row[$startcol + 7] : null;
 			$this->custom_data = ($row[$startcol + 8] !== null) ? (string) $row[$startcol + 8] : null;
@@ -638,9 +623,6 @@ abstract class BaseUserEntry extends BaseObject  implements Persistent {
 		}
 		if ($this->akuser !== null && $this->kuser_id !== $this->akuser->getId()) {
 			$this->akuser = null;
-		}
-		if ($this->aPartner !== null && $this->partner_id !== $this->aPartner->getId()) {
-			$this->aPartner = null;
 		}
 	} // ensureConsistency
 
@@ -687,7 +669,6 @@ abstract class BaseUserEntry extends BaseObject  implements Persistent {
 
 			$this->aentry = null;
 			$this->akuser = null;
-			$this->aPartner = null;
 		} // if (deep)
 	}
 
@@ -882,13 +863,6 @@ abstract class BaseUserEntry extends BaseObject  implements Persistent {
 				$this->setkuser($this->akuser);
 			}
 
-			if ($this->aPartner !== null) {
-				if ($this->aPartner->isModified() || $this->aPartner->isNew()) {
-					$affectedRows += $this->aPartner->save($con);
-				}
-				$this->setPartner($this->aPartner);
-			}
-
 			if ($this->isNew() ) {
 				$this->modifiedColumns[] = UserEntryPeer::ID;
 			}
@@ -969,6 +943,8 @@ abstract class BaseUserEntry extends BaseObject  implements Persistent {
 	 */
 	public function preInsert(PropelPDO $con = null)
 	{
+		$this->setCreatedAt(time());
+		$this->setUpdatedAt(time());
 		return parent::preInsert($con);
 	}
 	
@@ -1055,6 +1031,9 @@ abstract class BaseUserEntry extends BaseObject  implements Persistent {
 		}	
 		
 		
+		if($this->isModified())
+			$this->setUpdatedAt(time());
+		
 		$this->tempModifiedColumns = $this->modifiedColumns;
 		return parent::preUpdate($con);
 	}
@@ -1136,12 +1115,6 @@ abstract class BaseUserEntry extends BaseObject  implements Persistent {
 				}
 			}
 
-			if ($this->aPartner !== null) {
-				if (!$this->aPartner->validate($columns)) {
-					$failureMap = array_merge($failureMap, $this->aPartner->getValidationFailures());
-				}
-			}
-
 
 			if (($retval = UserEntryPeer::doValidate($this, $columns)) !== true) {
 				$failureMap = array_merge($failureMap, $retval);
@@ -1194,10 +1167,10 @@ abstract class BaseUserEntry extends BaseObject  implements Persistent {
 				return $this->getPartnerId();
 				break;
 			case 4:
-				return $this->getCreatedat();
+				return $this->getCreatedAt();
 				break;
 			case 5:
-				return $this->getUpdatedat();
+				return $this->getUpdatedAt();
 				break;
 			case 6:
 				return $this->getStatus();
@@ -1233,8 +1206,8 @@ abstract class BaseUserEntry extends BaseObject  implements Persistent {
 			$keys[1] => $this->getEntryId(),
 			$keys[2] => $this->getKuserId(),
 			$keys[3] => $this->getPartnerId(),
-			$keys[4] => $this->getCreatedat(),
-			$keys[5] => $this->getUpdatedat(),
+			$keys[4] => $this->getCreatedAt(),
+			$keys[5] => $this->getUpdatedAt(),
 			$keys[6] => $this->getStatus(),
 			$keys[7] => $this->getType(),
 			$keys[8] => $this->getCustomData(),
@@ -1282,10 +1255,10 @@ abstract class BaseUserEntry extends BaseObject  implements Persistent {
 				$this->setPartnerId($value);
 				break;
 			case 4:
-				$this->setCreatedat($value);
+				$this->setCreatedAt($value);
 				break;
 			case 5:
-				$this->setUpdatedat($value);
+				$this->setUpdatedAt($value);
 				break;
 			case 6:
 				$this->setStatus($value);
@@ -1324,8 +1297,8 @@ abstract class BaseUserEntry extends BaseObject  implements Persistent {
 		if (array_key_exists($keys[1], $arr)) $this->setEntryId($arr[$keys[1]]);
 		if (array_key_exists($keys[2], $arr)) $this->setKuserId($arr[$keys[2]]);
 		if (array_key_exists($keys[3], $arr)) $this->setPartnerId($arr[$keys[3]]);
-		if (array_key_exists($keys[4], $arr)) $this->setCreatedat($arr[$keys[4]]);
-		if (array_key_exists($keys[5], $arr)) $this->setUpdatedat($arr[$keys[5]]);
+		if (array_key_exists($keys[4], $arr)) $this->setCreatedAt($arr[$keys[4]]);
+		if (array_key_exists($keys[5], $arr)) $this->setUpdatedAt($arr[$keys[5]]);
 		if (array_key_exists($keys[6], $arr)) $this->setStatus($arr[$keys[6]]);
 		if (array_key_exists($keys[7], $arr)) $this->setType($arr[$keys[7]]);
 		if (array_key_exists($keys[8], $arr)) $this->setCustomData($arr[$keys[8]]);
@@ -1344,8 +1317,8 @@ abstract class BaseUserEntry extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(UserEntryPeer::ENTRY_ID)) $criteria->add(UserEntryPeer::ENTRY_ID, $this->entry_id);
 		if ($this->isColumnModified(UserEntryPeer::KUSER_ID)) $criteria->add(UserEntryPeer::KUSER_ID, $this->kuser_id);
 		if ($this->isColumnModified(UserEntryPeer::PARTNER_ID)) $criteria->add(UserEntryPeer::PARTNER_ID, $this->partner_id);
-		if ($this->isColumnModified(UserEntryPeer::CREATEDAT)) $criteria->add(UserEntryPeer::CREATEDAT, $this->createdat);
-		if ($this->isColumnModified(UserEntryPeer::UPDATEDAT)) $criteria->add(UserEntryPeer::UPDATEDAT, $this->updatedat);
+		if ($this->isColumnModified(UserEntryPeer::CREATED_AT)) $criteria->add(UserEntryPeer::CREATED_AT, $this->created_at);
+		if ($this->isColumnModified(UserEntryPeer::UPDATED_AT)) $criteria->add(UserEntryPeer::UPDATED_AT, $this->updated_at);
 		if ($this->isColumnModified(UserEntryPeer::STATUS)) $criteria->add(UserEntryPeer::STATUS, $this->status);
 		if ($this->isColumnModified(UserEntryPeer::TYPE)) $criteria->add(UserEntryPeer::TYPE, $this->type);
 		if ($this->isColumnModified(UserEntryPeer::CUSTOM_DATA)) $criteria->add(UserEntryPeer::CUSTOM_DATA, $this->custom_data);
@@ -1366,6 +1339,30 @@ abstract class BaseUserEntry extends BaseObject  implements Persistent {
 		$criteria = new Criteria(UserEntryPeer::DATABASE_NAME);
 
 		$criteria->add(UserEntryPeer::ID, $this->id);
+		
+		if($this->alreadyInSave)
+		{
+			if ($this->isColumnModified(UserEntryPeer::CUSTOM_DATA))
+			{
+				if (!is_null($this->custom_data_md5))
+					$criteria->add(UserEntryPeer::CUSTOM_DATA, "MD5(cast(" . UserEntryPeer::CUSTOM_DATA . " as char character set latin1)) = '$this->custom_data_md5'", Criteria::CUSTOM);
+					//casting to latin char set to avoid mysql and php md5 difference
+				else 
+					$criteria->add(UserEntryPeer::CUSTOM_DATA, NULL, Criteria::ISNULL);
+			}
+			
+			if (count($this->modifiedColumns) == 2 && $this->isColumnModified(UserEntryPeer::UPDATED_AT))
+			{
+				$theModifiedColumn = null;
+				foreach($this->modifiedColumns as $modifiedColumn)
+					if($modifiedColumn != UserEntryPeer::UPDATED_AT)
+						$theModifiedColumn = $modifiedColumn;
+						
+				$atomicColumns = UserEntryPeer::getAtomicColumns();
+				if(in_array($theModifiedColumn, $atomicColumns))
+					$criteria->add($theModifiedColumn, $this->getByName($theModifiedColumn, BasePeer::TYPE_COLNAME), Criteria::NOT_EQUAL);
+			}
+		}		
 
 		return $criteria;
 	}
@@ -1409,9 +1406,9 @@ abstract class BaseUserEntry extends BaseObject  implements Persistent {
 
 		$copyObj->setPartnerId($this->partner_id);
 
-		$copyObj->setCreatedat($this->createdat);
+		$copyObj->setCreatedAt($this->created_at);
 
-		$copyObj->setUpdatedat($this->updatedat);
+		$copyObj->setUpdatedAt($this->updated_at);
 
 		$copyObj->setStatus($this->status);
 
@@ -1581,55 +1578,6 @@ abstract class BaseUserEntry extends BaseObject  implements Persistent {
 	}
 
 	/**
-	 * Declares an association between this object and a Partner object.
-	 *
-	 * @param      Partner $v
-	 * @return     UserEntry The current object (for fluent API support)
-	 * @throws     PropelException
-	 */
-	public function setPartner(Partner $v = null)
-	{
-		if ($v === null) {
-			$this->setPartnerId(NULL);
-		} else {
-			$this->setPartnerId($v->getId());
-		}
-
-		$this->aPartner = $v;
-
-		// Add binding for other direction of this n:n relationship.
-		// If this object has already been added to the Partner object, it will not be re-added.
-		if ($v !== null) {
-			$v->addUserEntry($this);
-		}
-
-		return $this;
-	}
-
-
-	/**
-	 * Get the associated Partner object
-	 *
-	 * @param      PropelPDO Optional Connection object.
-	 * @return     Partner The associated Partner object.
-	 * @throws     PropelException
-	 */
-	public function getPartner(PropelPDO $con = null)
-	{
-		if ($this->aPartner === null && ($this->partner_id !== null)) {
-			$this->aPartner = PartnerPeer::retrieveByPk($this->partner_id);
-			/* The following can be used additionally to
-			   guarantee the related object contains a reference
-			   to this object.  This level of coupling may, however, be
-			   undesirable since it could result in an only partially populated collection
-			   in the referenced object.
-			   $this->aPartner->addUserEntrys($this);
-			 */
-		}
-		return $this->aPartner;
-	}
-
-	/**
 	 * Resets all collections of referencing foreign keys.
 	 *
 	 * This method is a user-space workaround for PHP's inability to garbage collect objects
@@ -1645,7 +1593,6 @@ abstract class BaseUserEntry extends BaseObject  implements Persistent {
 
 			$this->aentry = null;
 			$this->akuser = null;
-			$this->aPartner = null;
 	}
 
 	/* ---------------------- CustomData functions ------------------------- */

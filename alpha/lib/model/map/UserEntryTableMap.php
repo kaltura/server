@@ -40,12 +40,12 @@ class UserEntryTableMap extends TableMap {
 		$this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
 		$this->addForeignKey('ENTRY_ID', 'EntryId', 'VARCHAR', 'entry', 'ID', true, 20, null);
 		$this->addForeignKey('KUSER_ID', 'KuserId', 'INTEGER', 'kuser', 'ID', true, null, null);
-		$this->addForeignKey('PARTNER_ID', 'PartnerId', 'INTEGER', 'partner', 'ID', false, null, null);
-		$this->addColumn('CREATEDAT', 'Createdat', 'TIMESTAMP', false, null, null);
-		$this->addColumn('UPDATEDAT', 'Updatedat', 'TIMESTAMP', false, null, null);
+		$this->addColumn('PARTNER_ID', 'PartnerId', 'INTEGER', false, null, null);
+		$this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
+		$this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
 		$this->addColumn('STATUS', 'Status', 'INTEGER', false, null, null);
 		$this->addColumn('TYPE', 'Type', 'INTEGER', false, null, null);
-		$this->addColumn('CUSTOM_DATA', 'CustomData', 'VARCHAR', false, 255, null);
+		$this->addColumn('CUSTOM_DATA', 'CustomData', 'LONGVARCHAR', false, null, null);
 		// validators
 	} // initialize()
 
@@ -56,7 +56,6 @@ class UserEntryTableMap extends TableMap {
 	{
     $this->addRelation('entry', 'entry', RelationMap::MANY_TO_ONE, array('entry_id' => 'id', ), null, null);
     $this->addRelation('kuser', 'kuser', RelationMap::MANY_TO_ONE, array('kuser_id' => 'id', ), null, null);
-    $this->addRelation('Partner', 'Partner', RelationMap::MANY_TO_ONE, array('partner_id' => 'id', ), null, null);
 	} // buildRelations()
 
 } // UserEntryTableMap

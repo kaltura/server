@@ -43,11 +43,11 @@ abstract class BaseUserEntryPeer {
 	/** the column name for the PARTNER_ID field */
 	const PARTNER_ID = 'user_entry.PARTNER_ID';
 
-	/** the column name for the CREATEDAT field */
-	const CREATEDAT = 'user_entry.CREATEDAT';
+	/** the column name for the CREATED_AT field */
+	const CREATED_AT = 'user_entry.CREATED_AT';
 
-	/** the column name for the UPDATEDAT field */
-	const UPDATEDAT = 'user_entry.UPDATEDAT';
+	/** the column name for the UPDATED_AT field */
+	const UPDATED_AT = 'user_entry.UPDATED_AT';
 
 	/** the column name for the STATUS field */
 	const STATUS = 'user_entry.STATUS';
@@ -74,10 +74,10 @@ abstract class BaseUserEntryPeer {
 	 * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
 	 */
 	private static $fieldNames = array (
-		BasePeer::TYPE_PHPNAME => array ('Id', 'EntryId', 'KuserId', 'PartnerId', 'Createdat', 'Updatedat', 'Status', 'Type', 'CustomData', ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'entryId', 'kuserId', 'partnerId', 'createdat', 'updatedat', 'status', 'type', 'customData', ),
-		BasePeer::TYPE_COLNAME => array (self::ID, self::ENTRY_ID, self::KUSER_ID, self::PARTNER_ID, self::CREATEDAT, self::UPDATEDAT, self::STATUS, self::TYPE, self::CUSTOM_DATA, ),
-		BasePeer::TYPE_FIELDNAME => array ('id', 'entry_id', 'kuser_id', 'partner_id', 'createdAt', 'updatedAt', 'status', 'type', 'custom_data', ),
+		BasePeer::TYPE_PHPNAME => array ('Id', 'EntryId', 'KuserId', 'PartnerId', 'CreatedAt', 'UpdatedAt', 'Status', 'Type', 'CustomData', ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'entryId', 'kuserId', 'partnerId', 'createdAt', 'updatedAt', 'status', 'type', 'customData', ),
+		BasePeer::TYPE_COLNAME => array (self::ID, self::ENTRY_ID, self::KUSER_ID, self::PARTNER_ID, self::CREATED_AT, self::UPDATED_AT, self::STATUS, self::TYPE, self::CUSTOM_DATA, ),
+		BasePeer::TYPE_FIELDNAME => array ('id', 'entry_id', 'kuser_id', 'partner_id', 'created_at', 'updated_at', 'status', 'type', 'custom_data', ),
 		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, )
 	);
 
@@ -88,10 +88,10 @@ abstract class BaseUserEntryPeer {
 	 * e.g. self::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
 	 */
 	private static $fieldKeys = array (
-		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'EntryId' => 1, 'KuserId' => 2, 'PartnerId' => 3, 'Createdat' => 4, 'Updatedat' => 5, 'Status' => 6, 'Type' => 7, 'CustomData' => 8, ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'entryId' => 1, 'kuserId' => 2, 'partnerId' => 3, 'createdat' => 4, 'updatedat' => 5, 'status' => 6, 'type' => 7, 'customData' => 8, ),
-		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::ENTRY_ID => 1, self::KUSER_ID => 2, self::PARTNER_ID => 3, self::CREATEDAT => 4, self::UPDATEDAT => 5, self::STATUS => 6, self::TYPE => 7, self::CUSTOM_DATA => 8, ),
-		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'entry_id' => 1, 'kuser_id' => 2, 'partner_id' => 3, 'createdAt' => 4, 'updatedAt' => 5, 'status' => 6, 'type' => 7, 'custom_data' => 8, ),
+		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'EntryId' => 1, 'KuserId' => 2, 'PartnerId' => 3, 'CreatedAt' => 4, 'UpdatedAt' => 5, 'Status' => 6, 'Type' => 7, 'CustomData' => 8, ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'entryId' => 1, 'kuserId' => 2, 'partnerId' => 3, 'createdAt' => 4, 'updatedAt' => 5, 'status' => 6, 'type' => 7, 'customData' => 8, ),
+		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::ENTRY_ID => 1, self::KUSER_ID => 2, self::PARTNER_ID => 3, self::CREATED_AT => 4, self::UPDATED_AT => 5, self::STATUS => 6, self::TYPE => 7, self::CUSTOM_DATA => 8, ),
+		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'entry_id' => 1, 'kuser_id' => 2, 'partner_id' => 3, 'created_at' => 4, 'updated_at' => 5, 'status' => 6, 'type' => 7, 'custom_data' => 8, ),
 		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, )
 	);
 
@@ -166,8 +166,8 @@ abstract class BaseUserEntryPeer {
 		$criteria->addSelectColumn(UserEntryPeer::ENTRY_ID);
 		$criteria->addSelectColumn(UserEntryPeer::KUSER_ID);
 		$criteria->addSelectColumn(UserEntryPeer::PARTNER_ID);
-		$criteria->addSelectColumn(UserEntryPeer::CREATEDAT);
-		$criteria->addSelectColumn(UserEntryPeer::UPDATEDAT);
+		$criteria->addSelectColumn(UserEntryPeer::CREATED_AT);
+		$criteria->addSelectColumn(UserEntryPeer::UPDATED_AT);
 		$criteria->addSelectColumn(UserEntryPeer::STATUS);
 		$criteria->addSelectColumn(UserEntryPeer::TYPE);
 		$criteria->addSelectColumn(UserEntryPeer::CUSTOM_DATA);
@@ -833,53 +833,6 @@ abstract class BaseUserEntryPeer {
 
 
 	/**
-	 * Returns the number of rows matching criteria, joining the related Partner table
-	 *
-	 * @param      Criteria $criteria
-	 * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
-	 * @param      PropelPDO $con
-	 * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
-	 * @return     int Number of matching rows.
-	 */
-	public static function doCountJoinPartner(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
-	{
-		// we're going to modify criteria, so copy it first
-		$criteria = clone $criteria;
-
-		// We need to set the primary table name, since in the case that there are no WHERE columns
-		// it will be impossible for the BasePeer::createSelectSql() method to determine which
-		// tables go into the FROM clause.
-		$criteria->setPrimaryTableName(UserEntryPeer::TABLE_NAME);
-
-		if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
-			$criteria->setDistinct();
-		}
-
-		if (!$criteria->hasSelectClause()) {
-			UserEntryPeer::addSelectColumns($criteria);
-		}
-		
-		$criteria->clearOrderByColumns(); // ORDER BY won't ever affect the count
-		
-		// Set the correct dbName
-		$criteria->setDbName(self::DATABASE_NAME);
-		
-		
-		$criteria->addJoin(UserEntryPeer::PARTNER_ID, PartnerPeer::ID, $join_behavior);
-
-		$stmt = UserEntryPeer::doCountStmt($criteria, $con);
-
-		if ($row = $stmt->fetch(PDO::FETCH_NUM)) {
-			$count = (int) $row[0];
-		} else {
-			$count = 0; // no rows returned; we infer that means 0 matches.
-		}
-		$stmt->closeCursor();
-		return $count;
-	}
-
-
-	/**
 	 * Selects a collection of UserEntry objects pre-filled with their entry objects.
 	 * @param      Criteria  $criteria
 	 * @param      PropelPDO $con
@@ -1021,76 +974,6 @@ abstract class BaseUserEntryPeer {
 
 
 	/**
-	 * Selects a collection of UserEntry objects pre-filled with their Partner objects.
-	 * @param      Criteria  $criteria
-	 * @param      PropelPDO $con
-	 * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
-	 * @return     array Array of UserEntry objects.
-	 * @throws     PropelException Any exceptions caught during processing will be
-	 *		 rethrown wrapped into a PropelException.
-	 */
-	public static function doSelectJoinPartner(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
-	{
-		$criteria = clone $criteria;
-
-		// Set the correct dbName if it has not been overridden
-		if ($criteria->getDbName() == Propel::getDefaultDB()) {
-			$criteria->setDbName(self::DATABASE_NAME);
-		}
-
-		UserEntryPeer::addSelectColumns($criteria);
-		$startcol = (UserEntryPeer::NUM_COLUMNS - UserEntryPeer::NUM_LAZY_LOAD_COLUMNS);
-		PartnerPeer::addSelectColumns($criteria);
-
-		$criteria->addJoin(UserEntryPeer::PARTNER_ID, PartnerPeer::ID, $join_behavior);
-
-		$stmt = UserEntryPeer::doSelectStmt($criteria, $con);
-		$results = array();
-
-		while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
-			$key1 = UserEntryPeer::getPrimaryKeyHashFromRow($row, 0);
-			if (null !== ($obj1 = UserEntryPeer::getInstanceFromPool($key1))) {
-				// We no longer rehydrate the object, since this can cause data loss.
-				// See http://propel.phpdb.org/trac/ticket/509
-				// $obj1->hydrate($row, 0, true); // rehydrate
-			} else {
-
-				$cls = UserEntryPeer::getOMClass(false);
-
-				$obj1 = new $cls();
-				$obj1->hydrate($row);
-				UserEntryPeer::addInstanceToPool($obj1, $key1);
-			} // if $obj1 already loaded
-
-			$key2 = PartnerPeer::getPrimaryKeyHashFromRow($row, $startcol);
-			if ($key2 !== null) {
-				$obj2 = PartnerPeer::getInstanceFromPool($key2);
-				if (!$obj2) {
-
-					$cls = PartnerPeer::getOMClass(false);
-
-					$obj2 = new $cls();
-					$obj2->hydrate($row, $startcol);
-					PartnerPeer::addInstanceToPool($obj2, $key2);
-				} // if obj2 already loaded
-				
-				// Add the $obj1 (UserEntry) to $obj2 (Partner)
-				$obj2->addUserEntry($obj1);
-
-			} // if joined row was not null
-
-			$results[] = $obj1;
-		}
-		$stmt->closeCursor();
-		
-		if($criteria instanceof KalturaCriteria)
-			$criteria->applyResultsSort($results);
-		
-		return $results;
-	}
-
-
-	/**
 	 * Returns the number of rows matching criteria, joining all related tables
 	 *
 	 * @param      Criteria $criteria
@@ -1126,8 +1009,6 @@ abstract class BaseUserEntryPeer {
 		$criteria->addJoin(UserEntryPeer::ENTRY_ID, entryPeer::ID, $join_behavior);
 
 		$criteria->addJoin(UserEntryPeer::KUSER_ID, kuserPeer::ID, $join_behavior);
-
-		$criteria->addJoin(UserEntryPeer::PARTNER_ID, PartnerPeer::ID, $join_behavior);
 
 		$stmt = UserEntryPeer::doCountStmt($criteria, $con);
 
@@ -1168,14 +1049,9 @@ abstract class BaseUserEntryPeer {
 		kuserPeer::addSelectColumns($criteria);
 		$startcol4 = $startcol3 + (kuserPeer::NUM_COLUMNS - kuserPeer::NUM_LAZY_LOAD_COLUMNS);
 
-		PartnerPeer::addSelectColumns($criteria);
-		$startcol5 = $startcol4 + (PartnerPeer::NUM_COLUMNS - PartnerPeer::NUM_LAZY_LOAD_COLUMNS);
-
 		$criteria->addJoin(UserEntryPeer::ENTRY_ID, entryPeer::ID, $join_behavior);
 
 		$criteria->addJoin(UserEntryPeer::KUSER_ID, kuserPeer::ID, $join_behavior);
-
-		$criteria->addJoin(UserEntryPeer::PARTNER_ID, PartnerPeer::ID, $join_behavior);
 
 		$stmt = UserEntryPeer::doSelectStmt($criteria, $con);
 		$results = array();
@@ -1231,24 +1107,6 @@ abstract class BaseUserEntryPeer {
 				$obj3->addUserEntry($obj1);
 			} // if joined row not null
 
-			// Add objects for joined Partner rows
-
-			$key4 = PartnerPeer::getPrimaryKeyHashFromRow($row, $startcol4);
-			if ($key4 !== null) {
-				$obj4 = PartnerPeer::getInstanceFromPool($key4);
-				if (!$obj4) {
-
-					$cls = PartnerPeer::getOMClass(false);
-
-					$obj4 = new $cls();
-					$obj4->hydrate($row, $startcol4);
-					PartnerPeer::addInstanceToPool($obj4, $key4);
-				} // if obj4 loaded
-
-				// Add the $obj1 (UserEntry) to the collection in $obj4 (Partner)
-				$obj4->addUserEntry($obj1);
-			} // if joined row not null
-
 			$results[] = $obj1;
 		}
 		$stmt->closeCursor();
@@ -1290,8 +1148,6 @@ abstract class BaseUserEntryPeer {
 		
 		
 		$criteria->addJoin(UserEntryPeer::KUSER_ID, kuserPeer::ID, $join_behavior);
-
-		$criteria->addJoin(UserEntryPeer::PARTNER_ID, PartnerPeer::ID, $join_behavior);
 
 		$stmt = UserEntryPeer::doCountStmt($criteria, $con);
 
@@ -1340,57 +1196,6 @@ abstract class BaseUserEntryPeer {
 		
 		$criteria->addJoin(UserEntryPeer::ENTRY_ID, entryPeer::ID, $join_behavior);
 
-		$criteria->addJoin(UserEntryPeer::PARTNER_ID, PartnerPeer::ID, $join_behavior);
-
-		$stmt = UserEntryPeer::doCountStmt($criteria, $con);
-
-		if ($row = $stmt->fetch(PDO::FETCH_NUM)) {
-			$count = (int) $row[0];
-		} else {
-			$count = 0; // no rows returned; we infer that means 0 matches.
-		}
-		$stmt->closeCursor();
-		return $count;
-	}
-
-
-	/**
-	 * Returns the number of rows matching criteria, joining the related Partner table
-	 *
-	 * @param      Criteria $criteria
-	 * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
-	 * @param      PropelPDO $con
-	 * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
-	 * @return     int Number of matching rows.
-	 */
-	public static function doCountJoinAllExceptPartner(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
-	{
-		// we're going to modify criteria, so copy it first
-		$criteria = clone $criteria;
-
-		// We need to set the primary table name, since in the case that there are no WHERE columns
-		// it will be impossible for the BasePeer::createSelectSql() method to determine which
-		// tables go into the FROM clause.
-		$criteria->setPrimaryTableName(UserEntryPeer::TABLE_NAME);
-		
-		if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
-			$criteria->setDistinct();
-		}
-
-		if (!$criteria->hasSelectClause()) {
-			UserEntryPeer::addSelectColumns($criteria);
-		}
-		
-		$criteria->clearOrderByColumns(); // ORDER BY should not affect count
-		
-		// Set the correct dbName
-		$criteria->setDbName(self::DATABASE_NAME);
-		
-		
-		$criteria->addJoin(UserEntryPeer::ENTRY_ID, entryPeer::ID, $join_behavior);
-
-		$criteria->addJoin(UserEntryPeer::KUSER_ID, kuserPeer::ID, $join_behavior);
-
 		$stmt = UserEntryPeer::doCountStmt($criteria, $con);
 
 		if ($row = $stmt->fetch(PDO::FETCH_NUM)) {
@@ -1430,12 +1235,7 @@ abstract class BaseUserEntryPeer {
 		kuserPeer::addSelectColumns($criteria);
 		$startcol3 = $startcol2 + (kuserPeer::NUM_COLUMNS - kuserPeer::NUM_LAZY_LOAD_COLUMNS);
 
-		PartnerPeer::addSelectColumns($criteria);
-		$startcol4 = $startcol3 + (PartnerPeer::NUM_COLUMNS - PartnerPeer::NUM_LAZY_LOAD_COLUMNS);
-
 		$criteria->addJoin(UserEntryPeer::KUSER_ID, kuserPeer::ID, $join_behavior);
-
-		$criteria->addJoin(UserEntryPeer::PARTNER_ID, PartnerPeer::ID, $join_behavior);
 
 
 		$stmt = BasePeer::doSelect($criteria, $con);
@@ -1474,25 +1274,6 @@ abstract class BaseUserEntryPeer {
 
 			} // if joined row is not null
 
-				// Add objects for joined Partner rows
-
-				$key3 = PartnerPeer::getPrimaryKeyHashFromRow($row, $startcol3);
-				if ($key3 !== null) {
-					$obj3 = PartnerPeer::getInstanceFromPool($key3);
-					if (!$obj3) {
-	
-						$cls = PartnerPeer::getOMClass(false);
-
-					$obj3 = new $cls();
-					$obj3->hydrate($row, $startcol3);
-					PartnerPeer::addInstanceToPool($obj3, $key3);
-				} // if $obj3 already loaded
-
-				// Add the $obj1 (UserEntry) to the collection in $obj3 (Partner)
-				$obj3->addUserEntry($obj1);
-
-			} // if joined row is not null
-
 			$results[] = $obj1;
 		}
 		$stmt->closeCursor();
@@ -1527,12 +1308,7 @@ abstract class BaseUserEntryPeer {
 		entryPeer::addSelectColumns($criteria);
 		$startcol3 = $startcol2 + (entryPeer::NUM_COLUMNS - entryPeer::NUM_LAZY_LOAD_COLUMNS);
 
-		PartnerPeer::addSelectColumns($criteria);
-		$startcol4 = $startcol3 + (PartnerPeer::NUM_COLUMNS - PartnerPeer::NUM_LAZY_LOAD_COLUMNS);
-
 		$criteria->addJoin(UserEntryPeer::ENTRY_ID, entryPeer::ID, $join_behavior);
-
-		$criteria->addJoin(UserEntryPeer::PARTNER_ID, PartnerPeer::ID, $join_behavior);
 
 
 		$stmt = BasePeer::doSelect($criteria, $con);
@@ -1569,123 +1345,6 @@ abstract class BaseUserEntryPeer {
 
 				// Add the $obj1 (UserEntry) to the collection in $obj2 (entry)
 				$obj2->addUserEntry($obj1);
-
-			} // if joined row is not null
-
-				// Add objects for joined Partner rows
-
-				$key3 = PartnerPeer::getPrimaryKeyHashFromRow($row, $startcol3);
-				if ($key3 !== null) {
-					$obj3 = PartnerPeer::getInstanceFromPool($key3);
-					if (!$obj3) {
-	
-						$cls = PartnerPeer::getOMClass(false);
-
-					$obj3 = new $cls();
-					$obj3->hydrate($row, $startcol3);
-					PartnerPeer::addInstanceToPool($obj3, $key3);
-				} // if $obj3 already loaded
-
-				// Add the $obj1 (UserEntry) to the collection in $obj3 (Partner)
-				$obj3->addUserEntry($obj1);
-
-			} // if joined row is not null
-
-			$results[] = $obj1;
-		}
-		$stmt->closeCursor();
-		return $results;
-	}
-
-
-	/**
-	 * Selects a collection of UserEntry objects pre-filled with all related objects except Partner.
-	 *
-	 * @param      Criteria  $criteria
-	 * @param      PropelPDO $con
-	 * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
-	 * @return     array Array of UserEntry objects.
-	 * @throws     PropelException Any exceptions caught during processing will be
-	 *		 rethrown wrapped into a PropelException.
-	 */
-	public static function doSelectJoinAllExceptPartner(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
-	{
-		$criteria = clone $criteria;
-
-		// Set the correct dbName if it has not been overridden
-		// $criteria->getDbName() will return the same object if not set to another value
-		// so == check is okay and faster
-		if ($criteria->getDbName() == Propel::getDefaultDB()) {
-			$criteria->setDbName(self::DATABASE_NAME);
-		}
-
-		UserEntryPeer::addSelectColumns($criteria);
-		$startcol2 = (UserEntryPeer::NUM_COLUMNS - UserEntryPeer::NUM_LAZY_LOAD_COLUMNS);
-
-		entryPeer::addSelectColumns($criteria);
-		$startcol3 = $startcol2 + (entryPeer::NUM_COLUMNS - entryPeer::NUM_LAZY_LOAD_COLUMNS);
-
-		kuserPeer::addSelectColumns($criteria);
-		$startcol4 = $startcol3 + (kuserPeer::NUM_COLUMNS - kuserPeer::NUM_LAZY_LOAD_COLUMNS);
-
-		$criteria->addJoin(UserEntryPeer::ENTRY_ID, entryPeer::ID, $join_behavior);
-
-		$criteria->addJoin(UserEntryPeer::KUSER_ID, kuserPeer::ID, $join_behavior);
-
-
-		$stmt = BasePeer::doSelect($criteria, $con);
-		$results = array();
-
-		while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
-			$key1 = UserEntryPeer::getPrimaryKeyHashFromRow($row, 0);
-			if (null !== ($obj1 = UserEntryPeer::getInstanceFromPool($key1))) {
-				// We no longer rehydrate the object, since this can cause data loss.
-				// See http://propel.phpdb.org/trac/ticket/509
-				// $obj1->hydrate($row, 0, true); // rehydrate
-			} else {
-				$cls = UserEntryPeer::getOMClass(false);
-
-				$obj1 = new $cls();
-				$obj1->hydrate($row);
-				UserEntryPeer::addInstanceToPool($obj1, $key1);
-			} // if obj1 already loaded
-
-				// Add objects for joined entry rows
-
-				$key2 = entryPeer::getPrimaryKeyHashFromRow($row, $startcol2);
-				if ($key2 !== null) {
-					$obj2 = entryPeer::getInstanceFromPool($key2);
-					if (!$obj2) {
-	
-						$omClass = entryPeer::getOMClass($row, $startcol2);
-            $cls = substr('.'.$omClass, strrpos('.'.$omClass, '.') + 1);
-
-					$obj2 = new $cls();
-					$obj2->hydrate($row, $startcol2);
-					entryPeer::addInstanceToPool($obj2, $key2);
-				} // if $obj2 already loaded
-
-				// Add the $obj1 (UserEntry) to the collection in $obj2 (entry)
-				$obj2->addUserEntry($obj1);
-
-			} // if joined row is not null
-
-				// Add objects for joined kuser rows
-
-				$key3 = kuserPeer::getPrimaryKeyHashFromRow($row, $startcol3);
-				if ($key3 !== null) {
-					$obj3 = kuserPeer::getInstanceFromPool($key3);
-					if (!$obj3) {
-	
-						$cls = kuserPeer::getOMClass(false);
-
-					$obj3 = new $cls();
-					$obj3->hydrate($row, $startcol3);
-					kuserPeer::addInstanceToPool($obj3, $key3);
-				} // if $obj3 already loaded
-
-				// Add the $obj1 (UserEntry) to the collection in $obj3 (kuser)
-				$obj3->addUserEntry($obj1);
 
 			} // if joined row is not null
 

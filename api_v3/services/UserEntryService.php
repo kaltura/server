@@ -21,7 +21,7 @@ class UserEntryService extends KalturaBaseService {
 	 * @param KalturaUserEntryType $type
 	 * @return KalturaUserEntry
 	 */
-	public function addAction($entryId, $userId, $type)
+	public function addAction($entryId, $userId = 0, $type)
 	{
 		$userEntry = KalturaUserEntry::getInstanceByType($type);
 		if (!$userEntry)
@@ -29,8 +29,6 @@ class UserEntryService extends KalturaBaseService {
 			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_TYPE, $type);
 		}
 		$dbUserEntry = $userEntry->toInsertableObject();
-		/*@var $dbUserEntry UserEntry */
-		$dbUserEntry = new UserEntry();
 		$dbUserEntry->setEntryId($entryId);
 		if ($userId == 0)
 		{
@@ -40,7 +38,7 @@ class UserEntryService extends KalturaBaseService {
 		$dbUserEntry->setPartnerId(kCurrentContext::$ks_partner_id);
 		$dbUserEntry->setCreatedat(time());
 		$dbUserEntry->setType($type);
-		$dbUserEntry->setStatus(1);
+		$dbUserEntry->setStatus(KalturaUserEntryStatus::ACTIVE);
 		$dbUserEntry->save();
 
 		$userEntry->fromObject($dbUserEntry, $this->getResponseProfile());
@@ -70,6 +68,7 @@ class UserEntryService extends KalturaBaseService {
 	/**
 	 * @action delete
 	 * @param int $id
+	 * @return KalturaUserEntry The deleted UserEntry object
  	 * @throws KalturaAPIException
 	 */
 	public function deleteAction($id)
@@ -77,7 +76,14 @@ class UserEntryService extends KalturaBaseService {
 		$dbUserEntry = UserEntryPeer::retrieveByPK($id);
 		if (!$dbUserEntry)
 			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $id);
-		$dbUserEntry->delete();
+		$dbUserEntry->setStatus(KalturaUserEntryStatus::DELETED);
+		$dbUserEntry->save();
+
+		$userEntry = new KalturaUserEntry();
+		$userEntry->fromObject($dbUserEntry, $this->getResponseProfile());
+
+		return $userEntry;
+
 	}
 
 	/**
@@ -98,11 +104,6 @@ class UserEntryService extends KalturaBaseService {
 		$userEntryFilter->attachToCriteria($c);
 		$list = UserEntryPeer::doSelect($c);
 
-		/*
-		 if (!$pager)
-			$pager = new KalturaFilterPager();
-		$pager->attachToCriteria($c);
-*/
 		$response = new KalturaUserEntryListResponse();
 		$response->totalCount = UserEntryPeer::doCount($c);
 		$response->objects = KalturaUserEntryArray::fromDbArray($list, $this->getResponseProfile());
