@@ -333,7 +333,7 @@ class KGenericScheduler
 				return false;
 		}
 
-		if ( !isset($this->lastWorkerLog[$taskConfig->id]) || (($this->logWorkerInterval > 0) && (time() >= ($this->lastWorkerLog[$taskConfig->id] + $this->logWorkerInterval))) )
+		if ($this->shouldPrintWorkerLog($taskConfig->id))
 		{
 			KalturaLog::debug("Worker [{$taskConfig->name}] id [{$taskConfig->id}] running batches [$runningBatches] max instances [{$taskConfig->maxInstances}]");
 			$this->lastWorkerLog[$taskConfig->id] = time();
@@ -741,5 +741,21 @@ class KGenericScheduler
 		$event->host_name = $this->schedulerConfig->getName();
 
 		KDwhClient::send($event);
+	}
+
+	private function shouldPrintWorkerLog(int $taskConfigId)
+	{
+		if (!isset($this->lastWorkerLog[$taskConfigId]))
+		{
+			return true;
+		}
+		if ($this->logWorkerInterval <= 0)
+		{
+			return false;
+		}
+		if (time() >= ($this->lastWorkerLog[$taskConfigId] + $this->logWorkerInterval) )
+		{
+			return true;
+		}
 	}
 }
