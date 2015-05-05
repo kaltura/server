@@ -257,7 +257,7 @@ abstract class CuePoint extends BaseCuePoint implements IIndexable
 		if(!is_null($ret))
 			return $ret;
 			
-		if(!$this->getParentId())
+		if( !$this->getParentId() || is_null($this->getParent()) )
 			return $this->getId();
 			
 		return $this->getParent()->getRootParentId();
