@@ -656,6 +656,9 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 			$clipStartTime = $clipAtts->getOffset();
 			$clipDuration = $clipAtts->getDuration();
 
+			if ( is_null($clipStartTime) || is_null($clipDuration) )
+				return;
+
 			$c = new KalturaCriteria();
 			$c->add( CuePointPeer::ENTRY_ID, $clipEntry->getSourceEntryId() );
 			$c->addAnd( CuePointPeer::START_TIME, $clipStartTime, KalturaCriteria::GREATER_EQUAL );
