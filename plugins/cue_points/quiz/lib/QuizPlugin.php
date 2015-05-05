@@ -3,7 +3,7 @@
  * Enable question cue point objects and answer cue point objects management on entry objects
  * @package plugins.quiz
  */
-class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServices, IKalturaDynamicAttributeContributer
+class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServices, IKalturaDynamicAttributeContributer, IKalturaEventConsumers
 {
 	const PLUGIN_NAME = 'quiz';
 
@@ -14,6 +14,8 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 
 
 	const ANSWERS_OPTIONS = "answersOptions";
+
+	const QUIZ_MANAGER = "kQuizManager";
 
 	const IS_QUIZ = "isQuiz";
 	const QUIZ_DATA = "quizData";
@@ -98,6 +100,16 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 			if ($enumValue == self::getCuePointTypeCoreValue(QuizCuePointType::ANSWER))
 				return 'AnswerCuePoint';
 		}
+	}
+
+	/* (non-PHPdoc)
+	 * @see IKalturaEventConsumers::getEventConsumers()
+	 */
+	public static function getEventConsumers()
+	{
+		return array(
+			self::QUIZ_MANAGER,
+		);
 	}
 
 	/* (non-PHPdoc)
@@ -216,5 +228,22 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 	public static function setQuizData( entry $entry, kQuiz $kQuiz )
 	{
 		$entry->putInCustomData( self::QUIZ_DATA, serialize($kQuiz) );
+	}
+
+	/**
+	 * @param $entryId string
+	 * @return mixed|string
+	 * @throws KalturaAPIException
+	 */
+	public static function validateAndGetQuiz( $entryId ) {
+		$dbEntry = entryPeer::retrieveByPK( $entryId );
+		if ( !$dbEntry )
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
+
+		$kQuiz = self::getQuizData($dbEntry);
+		if ( !$kQuiz )
+			throw new KalturaAPIException(KalturaQuizErrors::PROVIDED_ENTRY_IS_NOT_A_QUIZ, $entryId);
+
+		return $kQuiz;
 	}
 }

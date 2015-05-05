@@ -101,12 +101,11 @@ class KalturaQuestionCuePoint extends KalturaCuePoint
 	/* (non-PHPdoc)
 	 * @see KalturaCuePoint::validateForInsert()
 	 */
-//	public function validateForInsert($propertiesToSkip = array())
-//	{
-//		parent::validateForInsert($propertiesToSkip);
-//
-//		$this->validateEndTime();
-//	}
+	public function validateForInsert($propertiesToSkip = array())
+	{
+		parent::validateForInsert($propertiesToSkip);
+		QuizPlugin::validateAndGetQuiz($this->entryId);
+	}
 //
 //	/* (non-PHPdoc)
 //	 * @see KalturaCuePoint::validateForUpdate()

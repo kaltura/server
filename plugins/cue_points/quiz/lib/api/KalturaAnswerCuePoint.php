@@ -52,9 +52,9 @@ class KalturaAnswerCuePoint extends KalturaCuePoint
 		"quizUserEntryId",
 		"answerKey",
 		"parentId",
-//		"correctAnswerKeys",
-//		"isCorrect",
-//		"explanation"
+		"correctAnswerKeys",
+		"isCorrect",
+		"explanation"
 	);
 
 	/* (non-PHPdoc)
@@ -73,14 +73,7 @@ class KalturaAnswerCuePoint extends KalturaCuePoint
 		if (!$dbObject)
 		{
 			$dbObject = new AnswerCuePoint();
-			$dbParentCuePoint = CuePointPeer::retrieveByPK($this->parentId);
-			$correctAnswers =  $dbParentCuePoint->getCorrectAnswerKeys() ;
-			$dbObject->setCorrectAnswerKeys( $correctAnswers );
-			$dbObject->setExplanation( $dbParentCuePoint->getExplanation() );
-			$isCorrect = in_array( $this->answerKey, $correctAnswers );
-			$dbObject->setIsCorrect( $isCorrect );
 		}
-		//TODO map values from question to answer
 
 		return parent::toObject($dbObject, $propsToSkip);
 	}
@@ -93,7 +86,7 @@ class KalturaAnswerCuePoint extends KalturaCuePoint
 		parent::doFromObject($dbObject, $responseProfile);
 
 		if ( !$dbObject->isEntitledForEntry() ) {
-			$kQuiz = $this->validateAndGetQuiz( $this->entryId );
+			$kQuiz = QuizPlugin::validateAndGetQuiz( $this->entryId );
 			//TODO if quiz status is submitted return
 			if ( !$kQuiz->getShowResultOnAnswer() )
 				$this->isCorrect = KalturaNullableBoolean::NULL_VALUE;
@@ -103,23 +96,6 @@ class KalturaAnswerCuePoint extends KalturaCuePoint
 				$this->explanation = null;
 			}
 		}
-	}
-
-	/**
-	 * @param $entryId string
-	 * @return mixed|string
-	 * @throws KalturaAPIException
-	 */
-	private function validateAndGetQuiz( $entryId ) {
-		$dbEntry = entryPeer::retrieveByPK($entryId);
-		if ( !$dbEntry )
-			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
-
-		$kQuiz = QuizPlugin::getQuizData($dbEntry);
-		if ( !$kQuiz )
-			throw new KalturaAPIException(KalturaQuizErrors::PROVIDED_ENTRY_IS_NOT_A_QUIZ, $entryId);
-
-		return $kQuiz;
 	}
 
 	/*
@@ -159,7 +135,7 @@ class KalturaAnswerCuePoint extends KalturaCuePoint
 	public function validateForInsert($propertiesToSkip = array())
 	{
 		parent::validateForInsert($propertiesToSkip);
-		$kQuiz = $this->validateAndGetQuiz($this->entryId);
+		QuizPlugin::validateAndGetQuiz($this->entryId);
 		$this->validateParentId();
 
 		//TODO do not allow answer with duplicate answersUserEntryId
@@ -172,7 +148,7 @@ class KalturaAnswerCuePoint extends KalturaCuePoint
 	{
 		parent::validateForUpdate($sourceObject, $propertiesToSkip);
 
-		$kQuiz = $this->validateAndGetQuiz($this->entryId);
+		$kQuiz = QuizPlugin::validateAndGetQuiz($this->entryId);
 		if ( !$kQuiz->getAllowAnswerUpdate() ) {
 			throw new KalturaAPIException(KalturaQuizErrors::ANSWER_UPDATE_IS_NOT_ALLOWED, $sourceObject->getEntryId());
 		}
