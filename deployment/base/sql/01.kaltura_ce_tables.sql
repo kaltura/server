@@ -601,7 +601,7 @@ CREATE TABLE delivery_profile
 	is_default tinyint(4) DEFAULT 0,
 	parent_id bigint(20),
 	custom_data text,
-	PRIORITY tinyint(4),
+	priority INTEGER DEFAULT 0,
         PRIMARY KEY (id),
         KEY partner_index(partner_id)
 )Engine=InnoDB DEFAULT CHARSET=utf8;
