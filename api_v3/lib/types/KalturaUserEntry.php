@@ -10,6 +10,7 @@ abstract class KalturaUserEntry extends KalturaObject
 	/**
 	 * unique auto-generated identifier
 	 * @var int
+	 * @readonly
 	 */
 	public $id;
 
@@ -35,6 +36,7 @@ abstract class KalturaUserEntry extends KalturaObject
 
 	/*
 	 * @var int
+	 * @readonly
 	 */
 	public $status;
 
