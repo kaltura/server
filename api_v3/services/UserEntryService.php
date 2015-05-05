@@ -79,7 +79,7 @@ class UserEntryService extends KalturaBaseService {
 		$dbUserEntry->setStatus(KalturaUserEntryStatus::DELETED);
 		$dbUserEntry->save();
 
-		$userEntry = new KalturaUserEntry();
+		$userEntry = KalturaUserEntry::getInstanceByType($dbUserEntry->getType());
 		$userEntry->fromObject($dbUserEntry, $this->getResponseProfile());
 
 		return $userEntry;
