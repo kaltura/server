@@ -2091,4 +2091,27 @@
             <index-column name="status" />
         </index>
     </table>
+	<table skipSql="false" abstract="false" name="user_entry" description="Describes the relationship between a specific user and a specific entry">
+		<column name="id" type="Integer" required="true" autoIncrement="true" primaryKey="true"/>
+		<column name="entry_id" type="varchar" size="20" required="true"/>
+		<column name="kuser_id" type="integer" required="true"/>
+		<column name="partner_id" type="integer"/>
+		<column name="createdAt" type="Timestamp"/>
+		<column name="updatedAt" type="Timestamp"/>
+		<column name="status" type="Integer"/>
+		<column name="type" type="Integer"/>
+		<column name="custom_data" type="Varchar"/>
+		<unique name="IX_UQ_user_entry_id">
+			<unique-column name="id"/>
+		</unique>
+		<foreign-key foreignTable="entry">
+			<reference foreign="id" local="entry_id"/>
+		</foreign-key>
+		<foreign-key foreignTable="kuser">
+			<reference foreign="id" local="kuser_id"/>
+		</foreign-key>
+		<foreign-key foreignTable="partner">
+			<reference foreign="id" local="partner_id"/>
+		</foreign-key>
+	</table>
 </database>
