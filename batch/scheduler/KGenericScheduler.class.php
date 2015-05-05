@@ -743,7 +743,7 @@ class KGenericScheduler
 		KDwhClient::send($event);
 	}
 
-	private function shouldPrintWorkerLog(int $taskConfigId)
+	private function shouldPrintWorkerLog($taskConfigId)
 	{
 		if (!isset($this->lastWorkerLog[$taskConfigId]))
 		{
