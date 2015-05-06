@@ -6,14 +6,14 @@
 
 ### Configuration ###
 - Add the following permission block to @APP_DIR@/configurations/admin.ini:
-		moduls.hideTemplatePartnerUiConfs.enabled = true
-        moduls.hideTemplatePartnerUiConfs.permissionType = 2
-        moduls.hideTemplatePartnerUiConfs.label = Hide template partner ui-confs from preview&embed menu
-        moduls.hideTemplatePartnerUiConfs.permissionName = FEATURE_HIDE_TEMPLATE_PARTNER_UICONFS
-        moduls.hideTemplatePartnerUiConfs.basePermissionType = 2
-        moduls.hideTemplatePartnerUiConfs.basePermissionType =
-        moduls.hideTemplatePartnerUiConfs.basePermissionName =
-        moduls.hideTemplatePartnerUiConfs.group = GROUP_ENABLE_DISABLE_FEATURES
+		moduls.hideTemplatePartnerUiConfs.enabled = true  
+        moduls.hideTemplatePartnerUiConfs.permissionType = 2  
+        moduls.hideTemplatePartnerUiConfs.label = "Hide template partner ui-confs from preview&embed menu"  
+        moduls.hideTemplatePartnerUiConfs.permissionName = FEATURE_HIDE_TEMPLATE_PARTNER_UICONFS  
+        moduls.hideTemplatePartnerUiConfs.basePermissionType = 2  
+        moduls.hideTemplatePartnerUiConfs.basePermissionType =  
+        moduls.hideTemplatePartnerUiConfs.basePermissionName =  
+        moduls.hideTemplatePartnerUiConfs.group = GROUP_ENABLE_DISABLE_FEATURES  
 
 
 ## Too many logs are written to file on batch ##
