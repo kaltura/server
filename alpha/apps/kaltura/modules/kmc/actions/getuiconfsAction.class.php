@@ -46,7 +46,7 @@ class getuiconfsAction extends kalturaAction
 		$this->kmc_swf_version = kConf::get('kmc_version');
 		$kmcGeneralUiConf = array();
 		$kmcGeneralTemplateUiConf = array();
-		if (!$this->partner->getHideDefaultContent())
+		if (!PermissionPeer::isValidForPartner(PermissionName::FEATURE_HIDE_TEMPLATE_PARTNER_UICONFS, $this->partner->getId()));
 		{
 			$kmcGeneralUiConf = kmcUtils::getAllKMCUiconfs('kmc',   $this->kmc_swf_version, $this->templatePartnerId);
 			$kmcGeneralTemplateUiConf = kmcUtils::getAllKMCUiconfs('kmc',   $this->kmc_swf_version, $this->templatePartnerId);
