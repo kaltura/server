@@ -76,14 +76,18 @@ class DrmLicenseUtils {
 		$innerData->acount_id = kCurrentContext::$partner_id;
 		$innerData->content_id = $entryId;
 		$innerData->files = $flavorParamIds;
-		$innerDataJson = json_encode($innerData);
-		$innerDataSignature = self::signDataWithKey($innerDataJson, $signingKey);
-		$innerDataJsonEncoded = rawurlencode(base64_encode($innerDataJson));
 
 		$customData = array();
 		foreach ($flavorAssets as $flavor)
 		{
-            $customData[$flavor->id] = new stdClass();
+			/*
+			* we sign for each flavor asset in case that in the future someone will want to add data per flavor asset
+			*/
+			$innerDataJson = json_encode($innerData);
+			$innerDataSignature = self::signDataWithKey($innerDataJson, $signingKey);
+			$innerDataJsonEncoded = rawurlencode(base64_encode($innerDataJson));
+
+			$customData[$flavor->id] = new stdClass();
 			$customData[$flavor->id]->custom_data = $innerDataJsonEncoded;
 			$customData[$flavor->id]->signature = $innerDataSignature;
 		}
