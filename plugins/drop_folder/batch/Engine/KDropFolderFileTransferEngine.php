@@ -432,7 +432,7 @@ class KDropFolderFileTransferEngine extends KDropFolderEngine
 		{
 			KalturaLog::debug(print_r($currlFile, true));
 		}
-
+		
 		return $physicalFiles;
 	}
 	
