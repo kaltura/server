@@ -191,14 +191,13 @@ class MetadataProfileService extends KalturaBaseService
 		{		    
 			try
 			{
+				//Save is done in this function, no need to save again.
 				kMetadataManager::diffMetadataProfile($dbMetadataProfile, $oldXsd, $xsdData);
 			}
 			catch(kXsdException $e)
 			{
 				throw new KalturaAPIException(MetadataErrors::METADATA_UNABLE_TO_TRANSFORM, $e->getMessage());
 			}
-			
-			$dbMetadataProfile->save();
 		}
 		else if(!is_null($viewsData) && $viewsData != '')
 		{
@@ -432,14 +431,13 @@ class MetadataProfileService extends KalturaBaseService
 		
 		try
 		{
+			//Save is done in this function, no need to save again.
 			kMetadataManager::diffMetadataProfile($dbMetadataProfile, $oldXsd, $newXsd);
 		}
 		catch(kXsdException $e)
 		{
 			throw new KalturaAPIException(MetadataErrors::METADATA_UNABLE_TO_TRANSFORM, $e->getMessage());
 		}
-		
-		$dbMetadataProfile->save();
 		
 		$metadataProfile = new KalturaMetadataProfile();
 		$metadataProfile->fromObject($dbMetadataProfile, $this->getResponseProfile());
