@@ -14,41 +14,63 @@ abstract class KalturaUserEntry extends KalturaObject
 	 */
 	public $id;
 
-	/*
+	/**
 	 * @var string
 	 */
 	public $entryId;
 
-	/*
+	/**
 	 * @var int
 	 */
 	public $userId;
 
-	/*
+	/**
 	 * @var int
 	 */
 	public $partnerId;
 
-	/*
+	/**
 	 * @var KalturaUserEntryType
+	 * @readonly
 	 */
 	public $type;
 
-	/*
+	/**
 	 * @var KalturaUserEntryStatus
 	 * @readonly
 	 */
 	public $status;
 
-	/*
+	/**
 	 * @var time
+	 * @readonly
 	 */
 	public $createdAt;
 
-	/*
+	/**
 	 * @var time
+	 * @readonly
 	 */
 	public $updatedAt;
+
+
+	private static $map_between_objects = array
+	(
+		"id",
+		"entryId",
+		"userId" => "KuserId",
+		"partnerId",
+		"type",
+		"status",
+		"createdAt",
+		"updatedAt"
+	);
+
+	public function getMapBetweenObjects ( )
+	{
+		return array_merge ( parent::getMapBetweenObjects() , self::$map_between_objects );
+	}
+
 
 	/**
 	 * Function returns KalturaUserEntry sub-type according to protocol
@@ -74,11 +96,11 @@ abstract class KalturaUserEntry extends KalturaObject
 	/* (non-PHPdoc)
 	 * @see KalturaObject::toInsertableObject()
 	 */
-	public function toInsertableObject ( $object_to_fill = null , $props_to_skip = array() )
-	{
-		if(is_null($object_to_fill))
-			$object_to_fill = new UserEntry();
-		return parent::toInsertableObject($object_to_fill, $props_to_skip);
-	}
+//	public function toInsertableObject ( $object_to_fill = null , $props_to_skip = array() )
+//	{
+//		if(is_null($object_to_fill))
+//			$object_to_fill = self::getInstanceByType($this->type);
+//		return parent::toInsertableObject($object_to_fill, $props_to_skip);
+//	}
 
 }

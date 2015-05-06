@@ -19,23 +19,15 @@ class UserEntryService extends KalturaBaseService {
 	 * @param KalturaUserEntry $userEntry
 	 * @return KalturaUserEntry
 	 */
-//	public function addAction($entryId, $userId = 0, $type)
-	public function addAction($userEntry)
+	public function addAction(KalturaUserEntry $userEntry)
 	{
-//		$userEntry = KalturaUserEntry::getInstanceByType($userEntry->type);
-		if (!$userEntry)
-		{
-			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_TYPE, $userEntry->type);
-		}
-		$dbUserEntry = $userEntry->toInsertableObject();
-		$dbUserEntry->setEntryId($userEntry->entryId);
-		if ($userEntry->userId == 0)
+		$dbUserEntry = $userEntry->toInsertableObject(null, array('type'));
+		$userId = $userEntry->userId;
+		if ($userId == 0)
 		{
 			$userId = kCurrentContext::$ks_kuser;
 		}
 		$dbUserEntry->setKuserId($userId);
-		$dbUserEntry->setPartnerId(kCurrentContext::$ks_partner_id);
-		$dbUserEntry->setCreatedat(time());
 		$dbUserEntry->setType($userEntry->type);
 		$dbUserEntry->setStatus(KalturaUserEntryStatus::ACTIVE);
 		$dbUserEntry->save();
