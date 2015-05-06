@@ -426,15 +426,13 @@ class KDropFolderFileTransferEngine extends KDropFolderEngine
 		{
 			throw new kFileTransferMgrException('Drop folder path not valid ['.$this->dropFolder->path.']', kFileTransferMgrException::remotePathNotValid);
 		}
-			
-		if (count($physicalFiles) > 100)
+
+		KalturaLog::debug("physical files: ");
+		foreach ($physicalFiles as &$currlFile)
 		{
-			KalturaLog::notice("physical files: too many files to print to log");
+			KalturaLog::debug(print_r($currlFile, true));
 		}
-		else
-		{
-			KalturaLog::debug("physical files: ".print_r($physicalFiles, true));
-		}
+
 		return $physicalFiles;
 	}
 	
