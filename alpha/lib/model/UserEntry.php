@@ -13,6 +13,6 @@
  * @package Core
  * @subpackage model
  */
-class UserEntry extends BaseUserEntry {
+abstract class UserEntry extends BaseUserEntry {
 
 } // UserEntry

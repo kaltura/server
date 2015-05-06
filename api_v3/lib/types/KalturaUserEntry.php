@@ -30,12 +30,12 @@ abstract class KalturaUserEntry extends KalturaObject
 	public $partnerId;
 
 	/*
-	 * @var int
+	 * @var KalturaUserEntryType
 	 */
 	public $type;
 
 	/*
-	 * @var int
+	 * @var KalturaUserEntryStatus
 	 * @readonly
 	 */
 	public $status;
@@ -51,14 +51,11 @@ abstract class KalturaUserEntry extends KalturaObject
 	public $updatedAt;
 
 	/**
-	 * @var myCustomData
-	 */
-	protected $m_custom_data = null;
-
-	/**
 	 * Function returns KalturaUserEntry sub-type according to protocol
 	 * @var string $type
 	 * @return KalturaUserEntry
+	 *
+	 * MOVE FUNCTION to quiz plugin
 	 */
 	public static function getInstanceByType ($type)
 	{

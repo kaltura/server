@@ -15,4 +15,9 @@
  */
 class UserEntryPeer extends BaseUserEntryPeer {
 
+	public static function getOMClass($withPrefix = true)
+	{
+		return parent::getOMClass($withPrefix);
+	}
+
 } // UserEntryPeer

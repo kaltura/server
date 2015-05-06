@@ -3,8 +3,11 @@
  * @package api
  * @subpackage enum
  */
-class KalturaUserEntryStatus extends KalturaEnum
+class KalturaUserEntryStatus extends KalturaDynamicEnum implements UserEntryStatus
 {
-	const ACTIVE = 1;
-	const DELETED = 2;
+	public static function getEnumClass()
+	{
+		return 'UserEntryStatus';
+	}
 }
+

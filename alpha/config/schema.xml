@@ -2099,7 +2099,7 @@
 		<column name="created_at" type="Timestamp"/>
 		<column name="updated_at" type="Timestamp"/>
 		<column name="status" type="Integer"/>
-		<column name="type" type="Integer"/>
+		<column name="type" type="Integer" inheritance="single"/>
 		<column name="custom_data" type="longvarchar"/>
 		<foreign-key onDelete="none" onUpdate="none" foreignTable="entry">
 			<reference local="entry_id" foreign="id" />

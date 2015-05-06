@@ -4,6 +4,6 @@
  * @package api
  * @subpackage objects
   */
-class KalturaQuizUserEntry extends UserEntry{
+class KalturaQuizUserEntry extends KalturaUserEntry{
 
 }
