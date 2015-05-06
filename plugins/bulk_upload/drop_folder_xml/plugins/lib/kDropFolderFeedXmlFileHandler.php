@@ -50,7 +50,7 @@ class kDropFolderFeedXmlFileHandler extends kDropFolderXmlFileHandler
 			
 			KalturaLog::info("Feed XML path: " . $leadDropFolderFile->getFeedXmlPath());
 			$data->setFilePath($leadDropFolderFile->getFeedXmlPath());
-			$data->setFileName(basename($data->getFilePath()));
+			$data->setFileName(basename($data->getFilePath()) . '.xml');
 						
 			$objectData = new kBulkUploadEntryData();
 			KalturaLog::info('Conversion profile id: '.$folder->getConversionProfileId());
