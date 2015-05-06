@@ -1684,5 +1684,4 @@ class Partner extends BasePartner
 			
 		$this->putInCustomData($customDataKey, $tokenData, 'googleAuth');
 	}
-	
 }
