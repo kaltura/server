@@ -653,17 +653,25 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 	public static function copyCuePointsToClipEntry( entry $clipEntry ) {
 		$clipAtts =  self::getClipAttributesFromEntry( $clipEntry );
 		if ( !is_null($clipAtts) ) {
-			$clipStartTime = $clipAtts->getOffset();
-			$clipDuration = $clipAtts->getDuration();
+			$sourceEntryDuration = entryPeer::retrieveByPK( $clipEntry->getSourceEntryId() )->getLengthInMsecs();
 
-			if ( is_null($clipStartTime) || is_null($clipDuration) )
-				return;
+			$clipStartTime = $clipAtts->getOffset();
+			if ( is_null($clipStartTime) )
+				$clipStartTime = 0;
+			$clipDuration = $clipAtts->getDuration();
+			if ( is_null($clipDuration) )
+				$clipDuration = $sourceEntryDuration;
+
 
 			$c = new KalturaCriteria();
 			$c->add( CuePointPeer::ENTRY_ID, $clipEntry->getSourceEntryId() );
-			$c->addAnd( CuePointPeer::START_TIME, $clipStartTime, KalturaCriteria::GREATER_EQUAL );
-			$c->addAnd( CuePointPeer::START_TIME, $clipStartTime + $clipDuration, KalturaCriteria::LESS_EQUAL );
-			$c->addOr( CuePointPeer::START_TIME, 0, KalturaCriteria::EQUAL );
+			if ( $clipDuration < $sourceEntryDuration ) {
+				$c->addAnd( CuePointPeer::START_TIME, $clipStartTime + $clipDuration, KalturaCriteria::LESS_EQUAL );
+			}
+			if ( $clipStartTime > 0 ) {
+				$c->addAnd( CuePointPeer::START_TIME, $clipStartTime, KalturaCriteria::GREATER_EQUAL );
+				$c->addOr( CuePointPeer::START_TIME, 0, KalturaCriteria::EQUAL );
+			}
 
 			$c->addAscendingOrderByColumn(CuePointPeer::CREATED_AT);
 			$rootEntryCuePointsToCopy = CuePointPeer::doSelect($c);
