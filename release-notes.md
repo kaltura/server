@@ -6,7 +6,7 @@
 - Issue ID: PLAT-2387
 ### Deployment ###
 
-- Run the following script:
+- Run the following script:  
 			cd /opt/kaltura/app/tests/standAloneClient  
 			php exec.php commentAddedEnabledForManualDispatch.xml    
 - Delete older email notification from partner 0.
