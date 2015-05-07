@@ -130,7 +130,6 @@ class KCEncOperationEngine extends KOperationEngine
 
     private function createMPD()
     {
-        $inputFile = $this->data->srcFileSyncs[0]->actualFileSyncLocalPath;
         $cmdLine = $this->params->exePath."mpd_generator --input=".$this->data->destFileSyncLocalPath.
         ".media_info --output=".$this->data->destFileSyncLocalPath.".mpd ";
         KalturaLog::debug("Going to run command '".$cmdLine."' ");

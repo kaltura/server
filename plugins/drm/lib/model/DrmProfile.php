@@ -32,7 +32,7 @@ class DrmProfile extends BaseDrmProfile {
     {
         $key = $this->getFromCustomData(self::CUSTOM_DATA_SIGNING_KEY);
         if(!$key)
-            $key = DrmPlugin::getConfigParam("drm", "signingKey");
+            $key = DrmPlugin::getConfigParam("drm", "signing_key");
         return $key;
     }
 
