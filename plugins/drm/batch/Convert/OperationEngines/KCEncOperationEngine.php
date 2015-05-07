@@ -34,35 +34,14 @@ class KCEncOperationEngine extends KOperationEngine
         $profile = $drmPlugin->drmProfile->getByProvider(KalturaDrmProviderType::CENC);
         KBatchBase::unimpersonate();
         $udrmData = $this->getUDRMdata($profile->licenseServerUrl, $profile->signingKey);
-        if ($udrmData->success === false)
-        {
-            $logMsg = "Could not get UDRM Data error message '".$udrmData->errMsg."' ";
-            KalturaLog::err($logMsg);
-            throw new KOperationEngineException($logMsg);
-        }
-
         if (!isset($this->data->srcFileSyncs) || !isset($this->data->srcFileSyncs[0]))
         {
             $logMsg = "Did not get input file";
             KalturaLog::err($logMsg);
             throw new KOperationEngineException($logMsg);
         }
-        $encryptResult = $this->encryptWithEdash($udrmData->data);
-        if ($encryptResult->system_ret_val != 0)
-        {
-            $logMsg = "There was a problem running the packager, got return value '" . $encryptResult->system_ret_val . "' got result '" . $encryptResult->result . "' ";
-            KalturaLog::err($logMsg);
-            throw new KOperationEngineException($logMsg);
-        }
-
+        $encryptResult = $this->encryptWithEdash($udrmData);
         $mpdResult = $this->createMPD();
-        if ($mpdResult->system_ret_val != 0)
-        {
-            $logMsg = "There was a problem running the mpd generator, got return value '" . $mpdResult->system_ret_val . "' got result '" . $mpdResult->result . "' ";
-            KalturaLog::err($logMsg);
-            throw new KOperationEngineException($logMsg);
-        }
-
         $mpdOutPath = $this->data->destFileSyncLocalPath.".mpd";
         $fsDescArr = array();
         $fsDesc = new KalturaDestFileSyncDescriptor();
@@ -88,22 +67,21 @@ class KCEncOperationEngine extends KOperationEngine
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         KalturaLog::debug("calling udrm service '".$serviceURL."' with data '".$jsonPostData."' ");
         $output = curl_exec($ch);
-        $keyData = new stdClass();
-        $keyData->success = false;
         if ($output === false)
         {
-            $keyData->errMsg = "Curl had an error '".curl_error($ch)."'";
-            return $keyData;
-        }
-        $keyData->data = json_decode($output);
-        if (!isset($keyData->data->key_id))
-        {
-            $keyData->errMsg = "did not get good result from udrm service, output is '".$output."'";
-            return $keyData;
-        }
-        $keyData->success = true;
+            $logMsg = "Could not get UDRM Data error message 'Curl had an error '".curl_error($ch)."' ";
+            KalturaLog::err($logMsg);
+            throw new KOperationEngineException($logMsg);
 
-        return $keyData;
+        }
+        $ret_val = json_decode($output);
+        if (!isset($ret_val->key_id))
+        {
+            $logMsg = "did not get good result from udrm service, output is '".$output."'";
+            KalturaLog::err($logMsg);
+            throw new KOperationEngineException($logMsg);
+        }
+        return $ret_val;
     }
 
 
@@ -122,10 +100,14 @@ class KCEncOperationEngine extends KOperationEngine
         KalturaLog::debug("Going to run command '".$cmdLine."' ");
 
         $result = system($cmdLine, $system_ret_val);
-        $ret_val = new stdClass();
-        $ret_val->result = $result;
-        $ret_val->system_ret_val = $system_ret_val;
-        return $ret_val;
+	    if ($system_ret_val != 0)
+	    {
+		    $logMsg = "There was a problem running the packager, got return value '$system_ret_val' got result '$result' ";
+		    KalturaLog::err($logMsg);
+		    throw new KOperationEngineException($logMsg);
+	    }
+
+        return $result;
     }
 
     private function createMPD()
@@ -135,10 +117,14 @@ class KCEncOperationEngine extends KOperationEngine
         KalturaLog::debug("Going to run command '".$cmdLine."' ");
 
         $result = system($cmdLine, $system_ret_val);
-        $ret_val = new stdClass();
-        $ret_val->result = $result;
-        $ret_val->system_ret_val = $system_ret_val;
-        return $ret_val;
+	    if ($system_ret_val != 0)
+	    {
+		    $logMsg = "There was a problem running the mpd generator, got return value '$system_ret_val' got result '$result' ";
+		    KalturaLog::err($logMsg);
+		    throw new KOperationEngineException($logMsg);
+	    }
+
+        return $result;
     }
 
     public static function strToHex($string)

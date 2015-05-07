@@ -70,12 +70,12 @@ class DrmLicenseUtils {
 			$flavorParamIds .= $flavor->flavorParamsId.",";
 		}
 
-		$innerData = new stdClass();
-		$innerData->ca_system = self::SYSTEM_NAME;
-		$innerData->user_token = kCurrentContext::$ks;
-		$innerData->acount_id = kCurrentContext::$partner_id;
-		$innerData->content_id = $entryId;
-		$innerData->files = $flavorParamIds;
+        $innerData = array();
+        $innerData["ca_system"] = self::SYSTEM_NAME;
+        $innerData["user_token"] = kCurrentContext::$ks;
+        $innerData["acount_id"] = kCurrentContext::$partner_id;
+        $innerData["content_id"] = $entryId;
+        $innerData["files"] = $flavorParamIds;
 
 		$customData = array();
 		foreach ($flavorAssets as $flavor)

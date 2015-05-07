@@ -687,14 +687,6 @@ type												= KScheduledTaskDryRunner
 scriptPath											= ../plugins/scheduled_task/batch/ScheduledTaskDryRunner/KScheduledTaskDryRunnerExe.php
 params.sharedTempPath 								= @TMP_DIR@/scheduledtasks
 
-[KScheduledTaskRunner : PeriodicWorker]
-id													= 610
-type												= KScheduledTaskRunner
-maximumExecutionTime								= 600
-scriptPath											= ../plugins/scheduled_task/batch/ScheduledTaskRunner/KScheduledTaskRunnerExe.php
-sleepBetweenStopStart								= 21600
-maxTotalCountAllowed								= 50
-
 [KAsyncSyncCategoryPrivacyContext : JobHandlerWorker]
 id													= 550
 friendlyName										= Sync Category Privacy Context

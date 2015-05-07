@@ -83,7 +83,7 @@ class KalturaDrmProfile extends KalturaObject implements IFilterable
 		'defaultPolicy',
 		'createdAt',
 		'updatedAt',
-        'signingKey',
+		'signingKey',
 	 );
 		 
 	public function getMapBetweenObjects()
