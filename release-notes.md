@@ -1,3 +1,43 @@
+# Jupiter-10.12.0 #
+
+## uDRM on the fly encryption ##
+
+- Issue Type: new feature
+- Issue ID: PLAT-2675
+
+### Configuration ###
+
+- Clone @APP_DIR/configurations/drm.template.ini to @APP_DIR/configurations/drm.ini
+- In @APP_DIR/configurations/drm.ini replace @UDRM_SIGNING_KEY@ with OldHfWIk0fBNAQ8YKcQHE/IVrO9oArtqumZoLXtTVHs=
+- Add the following permission block to @APP_DIR@/configurations/admin.ini:
+
+		moduls.drmBase.enabled = true
+		moduls.drmBase.permissionType = 3
+		moduls.drmBase.label = DRM - Base
+		moduls.drmBase.permissionName = DRM_PLUGIN_PERMISSION
+		moduls.drmBase.basePermissionType =
+		moduls.drmBase.basePermissionName =
+		moduls.drmBase.group = GROUP_ENABLE_DISABLE_FEATURES
+		
+		moduls.drmCencFlavors.enabled = true
+		moduls.drmCencFlavors.permissionType = 2
+		moduls.drmCencFlavors.label = DRM – Enable CENC Flavors
+		moduls.drmCencFlavors.permissionName = DRM_CENC_FLAVORS
+		moduls.drmCencFlavors.basePermissionType = 3
+		moduls.drmCencFlavors.basePermissionName = DRM_PLUGIN_PERMISSION
+		moduls.drmCencFlavors.group = GROUP_ENABLE_DISABLE_FEATURES
+
+
+#### Deployment Scripts ####
+
+		- run php /opt/kaltura/app/deployment/updates/scripts/2015_05_17_update_DRM_access_control.php
+		- run php deployment/updates/scripts/add_permissions/2015_05_17_update_drm_license_access_permissions.php
+
+#### Known Issues & Limitations ####
+
+None.
+
+
 # Jupiter-10.11.0 #
 
 ## Server support for Q&A feature ##

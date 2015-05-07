@@ -249,7 +249,7 @@ filter.jobSubTypeIn	= 1,2,99,3,fastStart.FastStart,segmenter.Segmenter,mp4box.Mp
 ;params.maxFileSize									= 
 
 [KAsyncConvertCEnc : KAsyncConvertWorker]
-id													= 590
+id													= 610
 friendlyName                                        = Common Encryption
 filter.jobSubTypeIn                                 = drm.cEnc
 params.exePath  									= @EDASH_EXE@

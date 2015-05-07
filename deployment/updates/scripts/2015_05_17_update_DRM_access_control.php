@@ -1,8 +1,8 @@
 <?php
 ini_set("memory_limit","1024M");
 
-chdir(__DIR__.'/../');
-require_once(__DIR__ . '/../bootstrap.php');
+chdir(__DIR__);
+require_once (__DIR__ . '/../../bootstrap.php');
 
 class kAccessControlPlayReadyPolicyAction extends kRuleAction
 {
@@ -36,7 +36,7 @@ KalturaLog::debug("Partners are '".print_r($partners,true)."'");
 
 $c = new Criteria();
 $c->add(accessControlPeer::PARTNER_ID, $partners, Criteria::IN);
-$c->addAnd(accessControlPeer::RULES, '%kAccessControlPlayReadyPolicyAction%', Criteria::LIKE);//This is the correct line
+$c->addAnd(accessControlPeer::RULES, '%kAccessControlPlayReadyPolicyAction%', Criteria::LIKE);
 $acs = accessControlPeer::doSelect($c);
 foreach ($acs as $ac)
 {
@@ -49,10 +49,10 @@ foreach ($acs as $ac)
         foreach ($actions as $action)
         {
             KalturaLog::debug("checking action '".print_r($action,true)."'");
-            if (get_class($action) == 'kAccessControlPlayReadyPolicyAction')//This is the correct line
+            if (get_class($action) == 'kAccessControlPlayReadyPolicyAction')
             {
                 KalturaLog::debug("replacing kAccessControlPlayReadyPolicyAction with kAccessControlDrmPolicyAction");
-                $newAction = new kAccessControlDrmPolicyAction();//This is the correct line
+                $newAction = new kAccessControlDrmPolicyAction();
                 $newAction->setPolicyId($action->getPolicyId());
                 $actions[$j] = $newAction;
                 $rule->setActions($actions);
