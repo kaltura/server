@@ -48,4 +48,9 @@ class AnswerCuePoint extends CuePoint //TODO: implements IMetadataObject
 
 	public function getExplanation() {return $this->getFromCustomData(self::CUSTOM_DATA_EXPLANATION);}
 
+	public function copyToClipEntry( entry $clipEntry, $clipStartTime, $clipDuration )
+	{
+		return false;
+	}
+
 }
