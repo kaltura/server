@@ -18,13 +18,6 @@ dwhEnabled											= 0
 timezone											= @TIME_ZONE@
 statusInterval										= 300
 logWorkerInterval									= 60
-directoryChmod                                                                          = 775
-chmod                                                                                           = 664
-
-[@INSTALLED_HOSNAME@ : mainTemplate]
-id	= @BATCH_SCHEDULER_ID@
-name                                                                                            = Default Scheduler
-
 enabledWorkers.KScheduleHelper						= 1
 enabledWorkers.DirectoryCleanupLocal				= 1
 enabledWorkers.DirectoryCleanupBatchLogs			= 1

@@ -40,6 +40,7 @@ configurations/optimized_playback.ini
 configurations/playReady.ini
 configurations/v3cache_getfeed_expiry.ini
 configurations/whitelabel.ini
+configurations/drm.ini
 tests/lib/*
 tests/sanity/lib/config.ini
 tests/sanity/lib/logrotate.ini
@@ -49,3 +50,10 @@ alpha/.settings/
 .idea
 .DS_Store
 admin_console/lib/Kaltura/Client/
+generator/
+deployment/
+*.pyc
+*.pyo
+*.pdf
+*.conf
+
