@@ -5,7 +5,6 @@
  */
 class KalturaAnswerCuePoint extends KalturaCuePoint
 {
-
 	/**
 	 * @var string
 	 * @insertonly
@@ -87,7 +86,8 @@ class KalturaAnswerCuePoint extends KalturaCuePoint
 
 		if ( !$dbObject->isEntitledForEntry() ) {
 			$kQuiz = QuizPlugin::validateAndGetQuiz( $this->entryId );
-			//TODO if quiz status is submitted return
+			//TODO if quiz status is submitted go according to showResultsOnSubmit flag
+
 			if ( !$kQuiz->getShowResultOnAnswer() )
 				$this->isCorrect = KalturaNullableBoolean::NULL_VALUE;
 
@@ -114,19 +114,20 @@ class KalturaAnswerCuePoint extends KalturaCuePoint
 		if (!($dbParentCuePoint instanceof QuestionCuePoint))
 			throw new KalturaAPIException(KalturaQuizErrors::WRONG_PARENT_TYPE, $this->parentId);
 
-		if($cuePointId !== null){ // update
-			$dbCuePoint = CuePointPeer::retrieveByPK($cuePointId);
-			if(!$dbCuePoint)
-				throw new KalturaAPIException(KalturaCuePointErrors::INVALID_OBJECT_ID, $cuePointId);
-
-			if ($dbParentCuePoint->getEntryId() != $dbCuePoint->getEntryId())
-				throw new KalturaAPIException(KalturaCuePointErrors::PARENT_CUE_POINT_DO_NOT_BELONG_TO_THE_SAME_ENTRY);
-		}
-		else
-		{
+		//not needed? insert only
+//		if($cuePointId !== null){ // update
+//			$dbCuePoint = CuePointPeer::retrieveByPK($cuePointId);
+//			if(!$dbCuePoint)
+//				throw new KalturaAPIException(KalturaCuePointErrors::INVALID_OBJECT_ID, $cuePointId);
+//
+//			if ($dbParentCuePoint->getEntryId() != $dbCuePoint->getEntryId())
+//				throw new KalturaAPIException(KalturaCuePointErrors::PARENT_CUE_POINT_DO_NOT_BELONG_TO_THE_SAME_ENTRY);
+//		}
+//		else
+//		{
 			if ($dbParentCuePoint->getEntryId() != $this->entryId)
 				throw new KalturaAPIException(KalturaCuePointErrors::PARENT_CUE_POINT_DO_NOT_BELONG_TO_THE_SAME_ENTRY);
-		}
+//		}
 	}
 
 	/* (non-PHPdoc)
@@ -153,6 +154,7 @@ class KalturaAnswerCuePoint extends KalturaCuePoint
 			throw new KalturaAPIException(KalturaQuizErrors::ANSWER_UPDATE_IS_NOT_ALLOWED, $sourceObject->getEntryId());
 		}
 
-		$this->validateParentId($sourceObject->getId());
+		// insertOnly, not required?
+		// $this->validateParentId($sourceObject->getId());
 	}
 }

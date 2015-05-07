@@ -60,17 +60,6 @@ class KalturaQuestionCuePoint extends KalturaCuePoint
 	}
 
 	/* (non-PHPdoc)
-	 * @see KalturaObject::toInsertableObject()
-	 */
-//	public function toInsertableObject($object_to_fill = null, $props_to_skip = array())
-//	{
-//		if(is_null($object_to_fill))
-//			$object_to_fill = new QuestionCuePoint();
-//
-//		return parent::toInsertableObject($object_to_fill, $props_to_skip);
-//	}
-
-	/* (non-PHPdoc)
  * 	* @see KalturaObject::toObject($object_to_fill, $props_to_skip)
  *	*/
 	public function toObject($dbObject = null, $propsToSkip = array())
@@ -93,8 +82,7 @@ class KalturaQuestionCuePoint extends KalturaCuePoint
 
 		if ( !$dbObject->isEntitledForEntry() ) {
 			$this->correctAnswerKeys = null;
-			$this->explanation = null; //?
-			//TODO hint?
+			$this->explanation = null;
 		}
 	}
 
@@ -106,13 +94,5 @@ class KalturaQuestionCuePoint extends KalturaCuePoint
 		parent::validateForInsert($propertiesToSkip);
 		QuizPlugin::validateAndGetQuiz($this->entryId);
 	}
-//
-//	/* (non-PHPdoc)
-//	 * @see KalturaCuePoint::validateForUpdate()
-//	 */
-//	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
-//	{
-//		return parent::validateForUpdate($sourceObject, $propertiesToSkip);
-//	}
 
 }

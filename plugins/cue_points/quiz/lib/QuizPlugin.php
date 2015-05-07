@@ -12,11 +12,8 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 	const CUE_POINT_VERSION_BUILD = 0;
 	const CUE_POINT_NAME = 'cuePoint';
 
-
 	const ANSWERS_OPTIONS = "answersOptions";
-
 	const QUIZ_MANAGER = "kQuizManager";
-
 	const IS_QUIZ = "isQuiz";
 	const QUIZ_DATA = "quizData";
 
@@ -117,7 +114,6 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 	 */
 	public static function contributeToSchema($type)
 	{
-		//TODO
 		$coreType = kPluginableEnumsManager::apiToCore('SchemaType', $type);
 		if(
 			$coreType != SchemaType::SYNDICATION
@@ -135,10 +131,13 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 		<xs:complexType name="T_scene_questionCuePoint">
 			<xs:complexContent>
 				<xs:extension base="T_scene">
-					<xs:sequence>
-						<xs:element name="title" minOccurs="1" maxOccurs="1" type="xs:string"> </xs:element>
-						<xs:element name="description" minOccurs="1" maxOccurs="1" type="xs:string"> </xs:element>
-					</xs:sequence>
+				<xs:sequence>
+					<xs:element name="question" minOccurs="1" maxOccurs="1" type="xs:string"> </xs:element>
+					<xs:element name="hint" minOccurs="0" maxOccurs="1" type="xs:string"> </xs:element>
+					<xs:element name="explanation" minOccurs="0" maxOccurs="1" type="xs:string"> </xs:element>
+					<xs:element name="optionalAnswers" minOccurs="0" maxOccurs="1" type="KalturaOptionalAnswersArray"></xs:element>
+					<xs:element name="correctAnswerKeys" minOccurs="0" maxOccurs="1" type="KalturaStringArray"></xs:element>
+				</xs:sequence>
 				</xs:extension>
 			</xs:complexContent>
 		</xs:complexType>
@@ -159,6 +158,38 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 			</xs:annotation>
 		</xs:element>
 
+		<xs:complexType name="T_scene_answerCuePoint">
+			<xs:complexContent>
+				<xs:extension base="T_scene">
+				<xs:sequence>
+					<xs:element name="answerKey" minOccurs="1" maxOccurs="1" type="xs:string"> </xs:element>
+					<xs:element name="quizUserEntryId" minOccurs="1" maxOccurs="1" type="xs:string"> </xs:element>
+					<xs:element name="parentId" minOccurs="1" maxOccurs="1" type="xs:string">
+						<xs:annotation>
+							<xs:documentation>ID of the parent questionCuePoint</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+
+		<xs:element name="scene-answer-cue-point" type="T_scene_answerCuePoint" substitutionGroup="scene">
+			<xs:annotation>
+				<xs:documentation>Single answer cue point element</xs:documentation>
+				<xs:appinfo>
+					<example>
+						<scene-answer-cue-point sceneId="{scene id}" entryId="{entry id}">
+							<sceneStartTime>00:00:05.3</sceneStartTime>
+							<tags>
+								<tag>my_tag</tag>
+							</tags>
+						</scene-answer-cue-point>
+					</example>
+				</xs:appinfo>
+			</xs:annotation>
+		</xs:element>
+
 		';
 		return $xsd;
 	}
@@ -168,7 +199,6 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
  	*/
 	public static function getCuePointTypeCoreValue($valueName)
 	{
-		//TODO not sure
 		$value = self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
 		return kPluginableEnumsManager::apiToCore('CuePointType', $value);
 	}
@@ -177,7 +207,7 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 	 * @see IKalturaCuePoint::getApiValue()
 	 */
 	public static function getApiValue($valueName)
-	{	//TODO not sure
+	{
 		return self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
 	}
 
@@ -205,7 +235,6 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 	{
 		return self::getPluginName() . '_' . self::IS_QUIZ;
 	}
-
 
 	/**
 	 * @param entry $entry
