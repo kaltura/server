@@ -283,7 +283,7 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 		$playlistIds = explode(',', $this->getValueForField(KalturaYouTubeApiDistributionField::MEDIA_PLAYLIST_IDS));
 		$this->syncPlaylistIds($youtube, $data->remoteId, $playlistIds); 
 		
-		return false;
+		return $distributionProfile->assumeSuccess;
 	}
 	
 	protected function doUpdate(KalturaDistributionUpdateJobData $data, KalturaYoutubeApiDistributionProfile $distributionProfile, $enable = true)
