@@ -145,6 +145,8 @@ class KalturaErrors extends APIErrors
 
 	const ENTRY_CANNOT_BE_FLAGGED = "ENTRY_CANNOT_BE_FLAGGED;;Entry cannot be flagged";
 
+	const ENTRY_CANNOT_BE_TRIMMED = "ENTRY_CANNOT_BE_TRIMMED;;Entry cannot be trimmed";
+
 	/**
 	 * Notification Service
 	 */

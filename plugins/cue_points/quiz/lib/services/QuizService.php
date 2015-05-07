@@ -71,6 +71,7 @@ class QuizService extends KalturaBaseService
 		$this->validateUserEntitledForUpdate( $dbEntry );
 		$quizData = $quiz->toObject();
 		QuizPlugin::setQuizData( $dbEntry, $quizData );
+		$dbEntry->setIsTrimDisabled( true );
 		$dbEntry->save();
 		return $quiz;
 	}
