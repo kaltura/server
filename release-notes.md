@@ -1,4 +1,16 @@
 # Jupiter-10.11.0 #
+
+## Error when manually dispatching notification template ##  
+
+- Issue Type: bug fix
+- Issue ID: PLAT-2387
+### Deployment ###  
+
+- Run the following script:
+			cd /opt/kaltura/app/tests/standAloneClient
+			php exec.php commentAddedEnabledForManualDispatch.xml  
+- Delete older email notification from partner 0.
+
 ## New feature- hide template partner uiconfs ##  
 
 - Issue Type: bug fix  
