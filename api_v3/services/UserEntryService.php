@@ -84,6 +84,12 @@ class UserEntryService extends KalturaBaseService {
 	 */
 	public function listAction(KalturaUserEntryFilter $filter)
 	{
+		$response = new KalturaUserEntryListResponse();
+		if ( in_array(kCurrentContext::getCurrentSessionType(), array(kSessionBase::SESSION_TYPE_NONE,kSessionBase::SESSION_TYPE_WIDGET)) )
+		{
+			$response->totalCount = 0;
+			return $response;
+		}
 		if (!$filter)
 		{
 			$filter = new KalturaUserEntryFilter();
@@ -95,7 +101,6 @@ class UserEntryService extends KalturaBaseService {
 		$userEntryFilter->attachToCriteria($c);
 		$list = UserEntryPeer::doSelect($c);
 
-		$response = new KalturaUserEntryListResponse();
 		$response->totalCount = UserEntryPeer::doCount($c);
 		$response->objects = KalturaUserEntryArray::fromDbArray($list, $this->getResponseProfile());
 		return $response;
