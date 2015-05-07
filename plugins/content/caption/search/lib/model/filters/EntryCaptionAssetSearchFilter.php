@@ -104,10 +104,7 @@ class EntryCaptionAssetSearchFilter extends AdvancedSearchFilterItem
 	{		
 		if(!is_null($conditionStr))
 		{
-			$condition = "ca_prefix<<$conditionStr<<ca_sufix";
-			KalturaLog::debug("condition [" . print_r($condition, true) . "]");
-			$key = '@' . CaptionSearchPlugin::getSearchFieldName(CaptionSearchPlugin::SEARCH_FIELD_DATA);
-			$query->addMatch("($key $condition)");			
+			$query->addMatch("(".$this->createSphinxMatchPhrase($conditionStr).")");
 		}
 	}
 	
@@ -123,10 +120,12 @@ class EntryCaptionAssetSearchFilter extends AdvancedSearchFilterItem
 		}
 	}
 
-	protected function createSphinxSearchPhrase($text)
+	protected function createSphinxMatchPhrase($text)
 	{
-		$prefix = '@' . CaptionSearchPlugin::getSearchFieldName(CaptionSearchPlugin::SEARCH_FIELD_DATA) . ' ';
-		return $prefix . "ca_prefix<<$text<<ca_sufix";
+		$condition = "ca_prefix<<$text<<ca_sufix";
+		KalturaLog::debug("condition [$condition]");
+		$prefix = '@' . CaptionSearchPlugin::getSearchFieldName(CaptionSearchPlugin::SEARCH_FIELD_DATA);
+		return $prefix . ' ' . $condition;
 	}
 
 	public function getFreeTextConditions($partnerScope, $freeTexts)
@@ -146,7 +145,7 @@ class EntryCaptionAssetSearchFilter extends AdvancedSearchFilterItem
 			foreach($freeTextsArr as $freeText)
 			{
 				$freeText = SphinxUtils::escapeString($freeText);
-				$additionalConditions[] = $this->createSphinxSearchPhrase($freeText);
+				$additionalConditions[] = $this->createSphinxMatchPhrase($freeText);
 			}
 
 			return $additionalConditions;
@@ -160,7 +159,7 @@ class EntryCaptionAssetSearchFilter extends AdvancedSearchFilterItem
 		$freeTextsArr = array_unique($freeTextsArr);
 		$freeTextExpr = implode(baseObjectFilter::AND_SEPARATOR, $freeTextsArr);
 		$freeTextExpr = SphinxUtils::escapeString($freeTextExpr);
-		$additionalConditions[] =  $this->createSphinxSearchPhrase($freeTextExpr);
+		$additionalConditions[] =  $this->createSphinxMatchPhrase($freeTextExpr);
 
 		return $additionalConditions;
 	}
