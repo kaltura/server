@@ -7,8 +7,8 @@
 ### Deployment ###
 
 - Run the following script:
-			cd /opt/kaltura/app/tests/standAloneClient
-			php exec.php commentAddedEnabledForManualDispatch.xml  
+			cd /opt/kaltura/app/tests/standAloneClient  
+			php exec.php commentAddedEnabledForManualDispatch.xml    
 - Delete older email notification from partner 0.
 
 ## New feature- hide template partner uiconfs ##
