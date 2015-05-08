@@ -55,12 +55,16 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 	public static function getEnums($baseEnumName = null)
 	{
 		if (is_null($baseEnumName))
-			return array('QuizCuePointType','QuizUserEntryType');
+			return array('QuizCuePointType','QuizUserEntryType',"QuizUserEntryStatus");
 		if ($baseEnumName == 'CuePointType')
 			return array('QuizCuePointType');
 		if ($baseEnumName == "UserEntryType")
 		{
 			return array("QuizUserEntryType");
+		}
+		if ($baseEnumName == "UserEntryStatus")
+		{
+			return array("QuizUserEntryStatus");
 		}
 
 
@@ -95,9 +99,12 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 		}
 		if ( ($baseClass=="KalturaUserEntry") && ($enumValue == QuizUserEntryType::KALTURA_QUIZ_USER_ENTRY))
 		{
+			return new KalturaQuizUserEntry();
+		}
+		if ( ($baseClass=="UserEntry") && ($enumValue == QuizUserEntryType::KALTURA_QUIZ_USER_ENTRY))
+		{
 			return new QuizUserEntry();
 		}
-
 	}
 
 	/* (non-PHPdoc)

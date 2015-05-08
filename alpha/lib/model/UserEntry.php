@@ -30,4 +30,19 @@ abstract class UserEntry extends BaseUserEntry {
 		$this->setStatus(UserEntryStatus::ACTIVE);
 	}
 
+	/**
+	 * @param int $type
+	 * @return UserEntry
+	 */
+	public static function getInstanceByType ($type)
+	{
+		$obj = KalturaPluginManager::loadObject("UserEntry",$type);
+		if (is_null($obj))
+		{
+			KalturaLog::warning("The type '$type' is unknown");
+		}
+		return $obj;
+	}
+
+
 } // UserEntry

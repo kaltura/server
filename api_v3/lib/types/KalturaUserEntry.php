@@ -97,7 +97,7 @@ abstract class KalturaUserEntry extends KalturaObject
 	public function toInsertableObject ( $object_to_fill = null , $props_to_skip = array() )
 	{
 		if(is_null($object_to_fill))
-			$object_to_fill = self::getInstanceByType($this->type);
+			$object_to_fill = UserEntry::getInstanceByType($this->type);
 		$object_to_fill->setPartnerId(kCurrentContext::getCurrentPartnerId());
 		return parent::toInsertableObject($object_to_fill, $props_to_skip);
 	}
