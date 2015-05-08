@@ -653,7 +653,7 @@ class PhpZendClientGenerator extends ClientGeneratorFromXml
 				case 'bool':
 					$this->appendLine("		\$resultObject = (bool)Kaltura_Client_ParseUtils::unmarshalSimpleType(\$resultXmlObject->result);");
 					break;
-				
+				case 'bigint':
 				case 'string':
 					$this->appendLine("		\$resultObject = (string)Kaltura_Client_ParseUtils::unmarshalSimpleType(\$resultXmlObject->result);");
 					break;

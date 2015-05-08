@@ -15,6 +15,8 @@ class KalturaConcatAttributes extends KalturaOperationAttributes
 
 	public function toObject ( $object_to_fill = null , $props_to_skip = array() )
 	{
+		throw new KalturaAPIException(KalturaErrors::RESOURCE_TYPE_NOT_SUPPORTED, get_class($this));
+		
 		if(is_null($object_to_fill))
 			$object_to_fill = new kConcatAttributes();
 			
