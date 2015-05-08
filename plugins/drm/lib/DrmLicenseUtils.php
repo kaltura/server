@@ -87,9 +87,9 @@ class DrmLicenseUtils {
 			$innerDataSignature = self::signDataWithKey($innerDataJson, $signingKey);
 			$innerDataJsonEncoded = rawurlencode(base64_encode($innerDataJson));
 
-			$customData[$flavor->id] = new stdClass();
-			$customData[$flavor->id]->custom_data = $innerDataJsonEncoded;
-			$customData[$flavor->id]->signature = $innerDataSignature;
+			$customData[$flavor->id] = array();
+			$customData[$flavor->id]["custom_data"] = $innerDataJsonEncoded;
+			$customData[$flavor->id]["signature"] = $innerDataSignature;
 		}
 		return $customData;
 	}
