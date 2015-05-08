@@ -62,6 +62,7 @@ enabledWorkers.KAsyncTagIndex						= 1
 enabledWorkers.KAsyncIntegrate						= 1
 enabledWorkers.KAsyncIntegrateCloser				= 1
 
+
 [mainTemplate : template]
 enabledWorkers.DirectoryCleanupShared				= 1
 enabledWorkers.KAsyncDbCleanup						= 1
@@ -681,13 +682,13 @@ type												= KScheduledTaskDryRunner
 scriptPath											= ../plugins/scheduled_task/batch/ScheduledTaskDryRunner/KScheduledTaskDryRunnerExe.php
 params.sharedTempPath 								= @TMP_DIR@/scheduledtasks
 
-[KScheduledTaskRunner : PeriodicWorker]		
-id													= 610		
-type												= KScheduledTaskRunner		
-maximumExecutionTime								= 600		
-scriptPath											= ../plugins/scheduled_task/batch/ScheduledTaskRunner/KScheduledTaskRunnerExe.php		
-sleepBetweenStopStart								= 21600		
-maxTotalCountAllowed								= 50		
+[KScheduledTaskRunner : PeriodicWorker]
+id													= 610
+type												= KScheduledTaskRunner
+maximumExecutionTime								= 600
+scriptPath											= ../plugins/scheduled_task/batch/ScheduledTaskRunner/KScheduledTaskRunnerExe.php
+sleepBetweenStopStart								= 21600
+maxTotalCountAllowed								= 50
 
 [KAsyncSyncCategoryPrivacyContext : JobHandlerWorker]
 id													= 550
