@@ -30,7 +30,7 @@ class QuizUserEntryService extends KalturaBaseService{
 		/**
 		 * @var QuizUserEntry $dbUserEntry
 		 */
-		$score = $this->calculateScore();
+		$score = $this->calculateScore($dbUserEntry->getEntryId());
 		$dbUserEntry->setScore($score);
 		$dbUserEntry->save();
 
@@ -40,11 +40,43 @@ class QuizUserEntryService extends KalturaBaseService{
 	}
 
 	/**
+	 * @param $entryId
 	 * @return int
 	 */
-	protected function calculateScore()
+	protected function calculateScore($entryId)
 	{
 
-		return 95;
+		$finalScore = 0;
+		$answerType = QuizPlugin::getCuePointTypeCoreValue(QuizCuePointType::ANSWER);
+		$answers = CuePointPeer::retrieveByEntryId($entryId, array($answerType));
+		foreach ($answers as $answer)
+		{
+			/**
+			 * @var AnswerCuePoint $answer
+			 */
+			$question = CuePointPeer::retrieveByPK($answer->getParentId());
+			/**
+			 * @var QuestionCuePoint $question
+			 */
+			$optionalAnswers = $question->getOptionalAnswers();
+			/**
+			 * @var kOptionalAnswer $chosenAnswer
+			 */
+			foreach ($optionalAnswers as $optionalAnswer)
+			{
+				/**
+				 * @var kOptionalAnswer $optionalAnswer
+				 */
+				if ($optionalAnswer->getKey() === $answer->getAnswerKey())
+				{
+					if ($optionalAnswer->getCorrect())
+					{
+						$finalScore += $optionalAnswer->getWeight();
+					}
+				}
+			}
+		}
+
+		return $finalScore;
 	}
 }
