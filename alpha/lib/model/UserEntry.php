@@ -15,4 +15,19 @@
  */
 abstract class UserEntry extends BaseUserEntry {
 
+
+	/**
+	 * UserEntry constructor.
+	 */
+	public function __construct()
+	{
+		parent::__construct();
+		$this->applyDefaultValues();
+	}
+
+	public function applyDefaultValues()
+	{
+		$this->setStatus(UserEntryStatus::ACTIVE);
+	}
+
 } // UserEntry

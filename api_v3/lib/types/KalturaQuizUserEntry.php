@@ -27,7 +27,7 @@ class KalturaQuizUserEntry extends KalturaUserEntry{
 	 */
 	public function __construct()
 	{
-		$this->type = KalturaUserEntryType::KALTURA_QUIZ_USER_ENTRY;
+		$this->type = QuizUserEntryType::KALTURA_QUIZ_USER_ENTRY;
 	}
 
 	public function toObject($object_to_fill = null, $props_to_skip = array())

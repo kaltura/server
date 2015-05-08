@@ -17,6 +17,8 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 	const IS_QUIZ = "isQuiz";
 	const QUIZ_DATA = "quizData";
 
+	const QUIZ_OM_CLASS = 'QuizUserEntry';
+
 	/* (non-PHPdoc)
 	 * @see IKalturaPlugin::getPluginName()
 	 */
@@ -52,8 +54,15 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 	 */
 	public static function getEnums($baseEnumName = null)
 	{
-		if ( is_null($baseEnumName) || ($baseEnumName == 'CuePointType') )
+		if (is_null($baseEnumName))
+			return array('QuizCuePointType','QuizUserEntryType');
+		if ($baseEnumName == 'CuePointType')
 			return array('QuizCuePointType');
+		if ($baseEnumName == "UserEntryType")
+		{
+			return array("QuizUserEntryType");
+		}
+
 
 		return array();
 	}
@@ -84,6 +93,10 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 			if ( $enumValue == self::getCuePointTypeCoreValue(QuizCuePointType::ANSWER))
 				return new KalturaAnswerCuePoint();
 		}
+		if ( ($baseClass=="KalturaUserEntry") && ($enumValue == QuizUserEntryType::KALTURA_QUIZ_USER_ENTRY))
+		{
+			return new QuizUserEntry();
+		}
 
 	}
 
@@ -98,6 +111,11 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 			if ($enumValue == self::getCuePointTypeCoreValue(QuizCuePointType::ANSWER))
 				return 'AnswerCuePoint';
 		}
+		if ( ($baseClass == UserEntryPeer::OM_CLASS) && ($enumValue == QuizUserEntryType::KALTURA_QUIZ_USER_ENTRY) )
+		{
+			return self::QUIZ_OM_CLASS;
+		}
+
 	}
 
 	/* (non-PHPdoc)

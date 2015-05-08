@@ -16,16 +16,19 @@ abstract class KalturaUserEntry extends KalturaObject
 
 	/**
 	 * @var string
+	 * @insertonly
 	 */
 	public $entryId;
 
 	/**
 	 * @var int
+	 * @insertonly
 	 */
 	public $userId;
 
 	/**
 	 * @var int
+	 * @readonly
 	 */
 	public $partnerId;
 
@@ -77,18 +80,13 @@ abstract class KalturaUserEntry extends KalturaObject
 	 * @var string $type
 	 * @return KalturaUserEntry
 	 *
-	 * MOVE FUNCTION to quiz plugin
 	 */
 	public static function getInstanceByType ($type)
 	{
-		$obj = null;
-		switch ($type) {
-			case KalturaUserEntryType::KALTURA_QUIZ_USER_ENTRY:
-				$obj = new KalturaQuizUserEntry();
-				break;
-			default:
-				KalturaLog::warning("The type '$type' is unknown");
-				break;
+		$obj = KalturaPluginManager::loadObject("KalturaUserEntry",$type);
+		if (is_null($obj))
+		{
+			KalturaLog::warning("The type '$type' is unknown");
 		}
 		return $obj;
 	}
@@ -96,11 +94,12 @@ abstract class KalturaUserEntry extends KalturaObject
 	/* (non-PHPdoc)
 	 * @see KalturaObject::toInsertableObject()
 	 */
-//	public function toInsertableObject ( $object_to_fill = null , $props_to_skip = array() )
-//	{
-//		if(is_null($object_to_fill))
-//			$object_to_fill = self::getInstanceByType($this->type);
-//		return parent::toInsertableObject($object_to_fill, $props_to_skip);
-//	}
+	public function toInsertableObject ( $object_to_fill = null , $props_to_skip = array() )
+	{
+		if(is_null($object_to_fill))
+			$object_to_fill = self::getInstanceByType($this->type);
+		$object_to_fill->setPartnerId(kCurrentContext::getCurrentPartnerId());
+		return parent::toInsertableObject($object_to_fill, $props_to_skip);
+	}
 
 }

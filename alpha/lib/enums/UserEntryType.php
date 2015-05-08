@@ -3,7 +3,7 @@
  * @package Core
  * @subpackage model.enum
  */
-interface userEntryType extends BaseEnum
+interface UserEntryType extends BaseEnum
 {
-	const KALTURA_QUIZ_USER_ENTRY =1;
+
 }

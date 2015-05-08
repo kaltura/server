@@ -22,11 +22,17 @@ class KalturaOptionalAnswer extends KalturaObject {
 	 */
 	public $weight = 1.0;
 
+	/**
+	 * @var bool
+	 */
+	public $correct = false;
+
 	private static $mapBetweenObjects = array
 	(
 		'key',
 		'text',
 		'weight',
+		'correct'
 	);
 
 	public function getMapBetweenObjects()

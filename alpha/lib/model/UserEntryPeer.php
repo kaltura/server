@@ -15,29 +15,17 @@
  */
 class UserEntryPeer extends BaseUserEntryPeer {
 
-	const QUIZ_OM_CLASS = 'QuizUserEntry';
-
-	// cache classes by their type
-	protected static $class_types_cache = array(
-		userEntryType::KALTURA_QUIZ_USER_ENTRY => self::QUIZ_OM_CLASS
-	);
-
 	public static function getOMClass($row, $colnum)
 	{
 		if($row)
 		{
 			$typeField = self::translateFieldName(UserEntryPeer::TYPE, BasePeer::TYPE_COLNAME, BasePeer::TYPE_NUM);
 			$userEntryType = $row[$typeField];
-			if(isset(self::$class_types_cache[$userEntryType]))
-				return self::$class_types_cache[$userEntryType];
-
 			$extendedCls = KalturaPluginManager::getObjectClass(parent::OM_CLASS, $userEntryType);
 			if($extendedCls)
 			{
-				self::$class_types_cache[$userEntryType] = $extendedCls;
 				return $extendedCls;
 			}
-			self::$class_types_cache[$userEntryType] = parent::OM_CLASS;
 		}
 		return parent::OM_CLASS;
 	}

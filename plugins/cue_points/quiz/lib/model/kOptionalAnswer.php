@@ -25,6 +25,11 @@ class kOptionalAnswer {
 	protected $weight = 1.0;
 
 	/**
+	 * @var bool
+	 */
+	protected $correct = false;
+
+	/**
 	 * @return string
 	 */
 	public function getKey()
@@ -70,6 +75,22 @@ class kOptionalAnswer {
 	public function setWeight($weight)
 	{
 		$this->weight = $weight;
+	}
+
+	/**
+	 * @param $correct
+	 */
+	public function setCorrect($correct)
+	{
+		$this->correct = $correct;
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function getCorrect()
+	{
+		return $this->correct;
 	}
 
 }

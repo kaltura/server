@@ -27,9 +27,9 @@ class UserEntryService extends KalturaBaseService {
 		{
 			$userId = kCurrentContext::$ks_kuser;
 		}
-		$dbUserEntry->setKuserId($userId);
+		/*$dbUserEntry->setKuserId($userId);
 		$dbUserEntry->setType($userEntry->type);
-		$dbUserEntry->setStatus(KalturaUserEntryStatus::ACTIVE);
+		$dbUserEntry->setStatus(KalturaUserEntryStatus::ACTIVE);*/
 		$dbUserEntry->save();
 
 		$userEntry->fromObject($dbUserEntry, $this->getResponseProfile());
@@ -51,8 +51,6 @@ class UserEntryService extends KalturaBaseService {
 			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $id);
 
 		$dbUserEntry = $userEntry->toUpdatableObject($dbUserEntry);
-		$dbUserEntry->setUpdatedat(time());
-
 		$dbUserEntry->save();
 	}
 
