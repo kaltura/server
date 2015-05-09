@@ -78,30 +78,17 @@ class UserEntryService extends KalturaBaseService {
 	/**
 	 * @action list
 	 * @param KalturaUserEntryFilter $filter
+	 * @param KalturaFilterPager $pager
 	 * @return KalturaUserEntryListResponse
 	 */
-	public function listAction(KalturaUserEntryFilter $filter)
+	public function listAction(KalturaUserEntryFilter $filter, KalturaFilterPager $pager = null)
 	{
-		$response = new KalturaUserEntryListResponse();
-		if ( in_array(kCurrentContext::getCurrentSessionType(), array(kSessionBase::SESSION_TYPE_NONE,kSessionBase::SESSION_TYPE_WIDGET)) )
-		{
-			$response->totalCount = 0;
-			return $response;
-		}
 		if (!$filter)
 		{
 			$filter = new KalturaUserEntryFilter();
 		}
-		$c = new Criteria();
 
-		$userEntryFilter = new UserEntryFilter();
-		$filter->toObject($userEntryFilter);
-		$userEntryFilter->attachToCriteria($c);
-		$list = UserEntryPeer::doSelect($c);
-
-		$response->totalCount = UserEntryPeer::doCount($c);
-		$response->objects = KalturaUserEntryArray::fromDbArray($list, $this->getResponseProfile());
-		return $response;
+		return $filter->getListResponse(new KalturaFilterPager(), $this->getResponseProfile());
 	}
 
 }

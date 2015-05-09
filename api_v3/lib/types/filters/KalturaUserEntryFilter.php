@@ -20,7 +20,29 @@ class KalturaUserEntryFilter extends KalturaUserEntryBaseFilter
 	 */
 	public function getListResponse(KalturaFilterPager $pager, KalturaDetachedResponseProfile $responseProfile = null)
 	{
-		// TODO: Implement getListResponse() method.
+
+		$response = new KalturaUserEntryListResponse();
+		if ( in_array(kCurrentContext::getCurrentSessionType(), array(kSessionBase::SESSION_TYPE_NONE,kSessionBase::SESSION_TYPE_WIDGET)) )
+		{
+			$response->totalCount = 0;
+			return $response;
+		}
+
+		$c = new Criteria();
+		$userEntryFilter = new UserEntryFilter();
+		$this->toObject($userEntryFilter);
+		$userEntryFilter->attachToCriteria($c);
+
+		if (!is_null($pager))
+		{
+			$pager->attachToCriteria($c);
+		}
+
+		$list = UserEntryPeer::doSelect($c);
+
+		$response->totalCount = UserEntryPeer::doCount($c);
+		$response->objects = KalturaUserEntryArray::fromDbArray($list, $responseProfile);
+		return $response;
 	}
 
 }
