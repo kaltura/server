@@ -26,7 +26,7 @@
 #### Configuration ####
 
 - Clone @APP_DIR/configurations/drm.template.ini to @APP_DIR/configurations/drm.ini
-- In @APP_DIR/configurations/drm.ini replace @UDRM_SIGNING_KEY@ with OldHfWIk0fBNAQ8YKcQHE/IVrO9oArtqumZoLXtTVHs=
+- In @APP_DIR/configurations/drm.ini replace @UDRM_SIGNING_KEY@ with key given from me.
 - Add the following permission block to @APP_DIR@/configurations/admin.ini:
 
 		moduls.drmBase.enabled = true
