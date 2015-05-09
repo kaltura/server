@@ -1,10 +1,9 @@
 <?php
-
 /**
  * @package api
  * @subpackage filters
  */
-class KalturaUserEntryFilter extends KalturaRelatedFilter
+class KalturaQuizUserEntryFilter extends KalturaQuizUserEntryBaseFilter
 {
 	/**
 	 * @return baseObjectFilter
@@ -12,7 +11,6 @@ class KalturaUserEntryFilter extends KalturaRelatedFilter
 	protected function getCoreFilter()
 	{
 		// TODO: Implement getCoreFilter() method.
-		return new UserEntryFilter();
 	}
 
 	/**
@@ -22,8 +20,7 @@ class KalturaUserEntryFilter extends KalturaRelatedFilter
 	 */
 	public function getListResponse(KalturaFilterPager $pager, KalturaDetachedResponseProfile $responseProfile = null)
 	{
-		return new KalturaUserEntryListResponse();
+		// TODO: Implement getListResponse() method.
 	}
-
 
 }

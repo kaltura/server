@@ -56,6 +56,7 @@ class QuizService extends KalturaBaseService
 	 */
 	public function updateAction( $entryId, KalturaQuiz $quiz )
 	{
+		//TODO Verify that a new answer isn't entered afte quiz is submitted
 		$dbEntry = entryPeer::retrieveByPK($entryId);
 		if (!$dbEntry)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);

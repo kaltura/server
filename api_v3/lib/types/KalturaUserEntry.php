@@ -4,25 +4,28 @@
  * @subpackage objects
  * @abstract
  */
-abstract class KalturaUserEntry extends KalturaObject
+abstract class KalturaUserEntry extends KalturaObject implements IRelatedFilterable
 {
 
 	/**
 	 * unique auto-generated identifier
 	 * @var int
 	 * @readonly
+	 * @filter eq,in,notin
 	 */
 	public $id;
 
 	/**
 	 * @var string
 	 * @insertonly
+	 * @filter eq,in,notin
 	 */
 	public $entryId;
 
 	/**
 	 * @var int
 	 * @insertonly
+	 * @filter eq,in,notin
 	 */
 	public $userId;
 
@@ -35,6 +38,7 @@ abstract class KalturaUserEntry extends KalturaObject
 	/**
 	 * @var KalturaUserEntryType
 	 * @readonly
+	 * @filter eq,in,notin
 	 */
 	public $type;
 
@@ -101,5 +105,26 @@ abstract class KalturaUserEntry extends KalturaObject
 		$object_to_fill->setPartnerId(kCurrentContext::getCurrentPartnerId());
 		return parent::toInsertableObject($object_to_fill, $props_to_skip);
 	}
+
+	/**
+	 * Should return the extra filters that are using more than one field
+	 * On inherited classes, do not merge the array with the parent class
+	 *
+	 * @return array
+	 */
+	function getExtraFilters()
+	{
+		return array(array("order" => "recent"));
+	}
+
+	/**
+	 * Should return the filter documentation texts
+	 *
+	 */
+	function getFilterDocs()
+	{
+		return array();
+	}
+
 
 }
