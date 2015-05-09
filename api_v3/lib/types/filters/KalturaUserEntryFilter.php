@@ -3,7 +3,7 @@
  * @package api
  * @subpackage filters
  */
-class KalturaQuizUserEntryFilter extends KalturaQuizUserEntryBaseFilter
+class KalturaUserEntryFilter extends KalturaUserEntryBaseFilter
 {
 	/**
 	 * @return baseObjectFilter

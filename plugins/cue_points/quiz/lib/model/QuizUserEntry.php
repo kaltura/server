@@ -50,7 +50,7 @@ class QuizUserEntry extends UserEntry{
 				 */
 				if ($optionalAnswer->getKey() === $answer->getAnswerKey())
 				{
-					if ($optionalAnswer->getCorrect())
+					if ($optionalAnswer->getIsCorrect())
 					{
 						$finalScore += $optionalAnswer->getWeight();
 					}
