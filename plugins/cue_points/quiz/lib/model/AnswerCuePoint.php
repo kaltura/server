@@ -4,7 +4,7 @@
  * @subpackage model
  */
 
-class AnswerCuePoint extends CuePoint //TODO: implements IMetadataObject
+class AnswerCuePoint extends CuePoint
 {
 	const CUSTOM_DATA_QUIZ_USER_ENTRY_ID= 'quizUserEntryId';
 	const CUSTOM_DATA_ANSWER_KEY = 'answerKey';
@@ -25,7 +25,7 @@ class AnswerCuePoint extends CuePoint //TODO: implements IMetadataObject
 	 */
 	public function applyDefaultValues()
 	{
-		$this->setType(QuizPlugin::getCuePointTypeCoreValue(QuizCuePointType::ANSWER));
+		$this->setType(QuizPlugin::getCuePointTypeCoreValue(QuizCuePointType::QUIZ_ANSWER));
 	}
 
 	public function setQuizUserEntryId($v) {return $this->putInCustomData(self::CUSTOM_DATA_QUIZ_USER_ENTRY_ID, $v);}

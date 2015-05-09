@@ -3,7 +3,7 @@
  * Enable question cue point objects and answer cue point objects management on entry objects
  * @package plugins.quiz
  */
-class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServices, IKalturaDynamicAttributeContributer, IKalturaEventConsumers
+class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServices, IKalturaDynamicAttributesContributer, IKalturaEventConsumers
 {
 	const PLUGIN_NAME = 'quiz';
 
@@ -91,10 +91,10 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 	public static function loadObject($baseClass, $enumValue, array $constructorArgs = null)
 	{
 		if($baseClass == 'KalturaCuePoint') {
-			if ( $enumValue == self::getCuePointTypeCoreValue(QuizCuePointType::QUESTION))
+			if ( $enumValue == self::getCuePointTypeCoreValue(QuizCuePointType::QUIZ_QUESTION))
 				return new KalturaQuestionCuePoint();
 
-			if ( $enumValue == self::getCuePointTypeCoreValue(QuizCuePointType::ANSWER))
+			if ( $enumValue == self::getCuePointTypeCoreValue(QuizCuePointType::QUIZ_ANSWER))
 				return new KalturaAnswerCuePoint();
 		}
 		if ( ($baseClass=="KalturaUserEntry") && ($enumValue == QuizUserEntryType::KALTURA_QUIZ_USER_ENTRY))
@@ -113,9 +113,9 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 	public static function getObjectClass($baseClass, $enumValue)
 	{
 		if($baseClass == 'CuePoint') {
-			if ($enumValue == self::getCuePointTypeCoreValue(QuizCuePointType::QUESTION))
+			if ($enumValue == self::getCuePointTypeCoreValue(QuizCuePointType::QUIZ_QUESTION))
 				return 'QuestionCuePoint';
-			if ($enumValue == self::getCuePointTypeCoreValue(QuizCuePointType::ANSWER))
+			if ($enumValue == self::getCuePointTypeCoreValue(QuizCuePointType::QUIZ_ANSWER))
 				return 'AnswerCuePoint';
 		}
 		if ( ($baseClass == UserEntryPeer::OM_CLASS) && ($enumValue == QuizUserEntryType::KALTURA_QUIZ_USER_ENTRY) )
@@ -237,24 +237,29 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 		return self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
 	}
 
+	/* (non-PHPdoc)
+	 * @see IKalturaCuePoint::getTypesToIndexOnEntry()
+	*/
 	public static function getTypesToIndexOnEntry()
 	{
 		return array();
-		///TODO not sure
-		//return array(self::getCuePointTypeCoreValue(QuestionAnswerCuePointType::QUESTION),self::getCuePointTypeCoreValue(QuestionAnswerCuePointType::ANSWER));
 	}
 
 	/* (non-PHPdoc)
-	 * @see IKalturaDynamicAttributeContributer::getDynamicAttribute()
+	 * @see IKalturaDynamicAttributesContributer::getDynamicAttribute()
 	 */
-	public static function getDynamicAttribute(entry $entry)
+	public static function getDynamicAttributes(IIndexable $object)
 	{
-		$isQuiz = 0;
-		if ( !is_null($entry->getFromCustomData(self::QUIZ_DATA)) )
-			$isQuiz = 1;
+		if ( $object instanceof entry ) {
+			$isQuiz = 0;
+			if ( !is_null($object->getFromCustomData(self::QUIZ_DATA)) )
+				$isQuiz = 1;
 
-		$dynamicAttribute = array(self::getDynamicAttributeName() => $isQuiz);
-		return $dynamicAttribute;
+			$dynamicAttribute = array(self::getDynamicAttributeName() => $isQuiz);
+			return $dynamicAttribute;
+		}
+
+		return array();
 	}
 
 	public static function getDynamicAttributeName()
@@ -269,10 +274,8 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 	public static function getQuizData( entry $entry )
 	{
 		$quizData = $entry->getFromCustomData( self::QUIZ_DATA );
-
 		if( !is_null($quizData) )
 			$quizData = unserialize($quizData);
-
 		return $quizData;
 	}
 
@@ -286,19 +289,34 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 	}
 
 	/**
-	 * @param $entryId string
+	 * @param entry $dbEntry
 	 * @return mixed|string
 	 * @throws KalturaAPIException
 	 */
-	public static function validateAndGetQuiz( $entryId ) {
-		$dbEntry = entryPeer::retrieveByPK( $entryId );
-		if ( !$dbEntry )
-			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
-
+	public static function validateAndGetQuiz( entry $dbEntry ) {
 		$kQuiz = self::getQuizData($dbEntry);
 		if ( !$kQuiz )
 			throw new KalturaAPIException(KalturaQuizErrors::PROVIDED_ENTRY_IS_NOT_A_QUIZ, $entryId);
 
 		return $kQuiz;
+	}
+
+
+	/**
+	 * @param entry $dbEntry
+	 * @return bool if current user is admin / entyr owner / co-editor
+	 */
+	public static function validateUserEntitledForQuizEdit( entry $dbEntry )
+	{
+		if ( kCurrentContext::$is_admin_session || kCurrentContext::getCurrentKsKuserId() == $dbEntry->getKuserId())
+			return true;
+
+		$entitledKusers = explode(',', $dbEntry->getEntitledKusersEdit());
+		if(in_array(kCurrentContext::getCurrentKsKuserId(), $entitledKusers))
+		{
+			return true;
+		}
+
+		return false;
 	}
 }

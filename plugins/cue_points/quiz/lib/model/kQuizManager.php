@@ -21,8 +21,12 @@ class kQuizManager implements kObjectAddedEventConsumer, kObjectChangedEventCons
 	 */
 	public function shouldConsumeChangedEvent(BaseObject $object, array $modifiedColumns)
 	{
-		if($object instanceof AnswerCuePoint)
+		if( $object instanceof AnswerCuePoint
+			&& in_array(CuePointPeer::CUSTOM_DATA, $modifiedColumns)
+			&& $object->isCustomDataModified(AnswerCuePoint::CUSTOM_DATA_ANSWER_KEY) )
+		{
 			return true;
+		}
 
 		return false;
 	}
@@ -32,13 +36,8 @@ class kQuizManager implements kObjectAddedEventConsumer, kObjectChangedEventCons
 	 */
 	public function objectChanged(BaseObject $object, array $modifiedColumns)
 	{
-		if( $object instanceof AnswerCuePoint
-			&& in_array(CuePointPeer::CUSTOM_DATA, $modifiedColumns)
-			&& $object->isCustomDataModified(AnswerCuePoint::CUSTOM_DATA_ANSWER_KEY) )
-		{
-			$object->setIsCorrect( in_array( $object->getAnswerKey(), $object->getCorrectAnswerKeys() ) );
-			$object->save();
-		}
+		$object->setIsCorrect( in_array( $object->getAnswerKey(), $object->getCorrectAnswerKeys() ) );
+		$object->save();
 		return true;
 	}
 
@@ -59,6 +58,7 @@ class kQuizManager implements kObjectAddedEventConsumer, kObjectChangedEventCons
 		$object->setExplanation( $dbParentCuePoint->getExplanation() );
 		$object->setIsCorrect( in_array( $object->getAnswerKey(), $correctKeys ) );
 		$object->save();
+
 		return true;
 	}
 

@@ -23,7 +23,7 @@ class KalturaQuizAdvancedFilter extends KalturaSearchItem
 	public function toObject ( $object_to_fill = null , $props_to_skip = array() )
 	{
 		if(!$object_to_fill)
-			$object_to_fill = new kQuizFilter();
+			$object_to_fill = new kQuizAdvancedFilter();
 
 		return parent::toObject($object_to_fill, $props_to_skip);
 	}
