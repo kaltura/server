@@ -285,19 +285,25 @@ class KalturaClientBase
 			$this->setError(array("code" => $resultObject["code"], "message" => $resultObject["message"]));
 		}
 	}
-	
+
 	function validateObjectType($resultObject, $objectType)
 	{
-		if (is_object($resultObject))
+		if (in_array(gettype($resultObject) ,array("NULL", "boolean", "integer", "double", "string")) )
 		{
-			if (!(is_a($resultObject, $objectType)))
-				$this->setError(array("code" => 0, "message" => "Invalid object type"));
+			return;// we do not check native simple types
 		}
-		else if (gettype($resultObject) !== "NULL" && gettype($resultObject) !== $objectType)
+		else if ( is_object($resultObject) )
+		{
+			if (!(is_a($resultObject ,$objectType))){
+				$this->setError(array("code" => 0, "message" => "Invalid object type"));
+			}
+		}
+		else if(gettype($resultObject) !== $objectType)
 		{
 			$this->setError(array("code" => 0, "message" => "Invalid object type"));
 		}
 	}
+
 	
 	function log($msg)
 	{
