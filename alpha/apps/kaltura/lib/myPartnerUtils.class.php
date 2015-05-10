@@ -330,8 +330,7 @@ class myPartnerUtils
 		$cdnHost = $partner->getCdnHost();
 
 		// if a protocol was set manually (or by the temporary http default above) use it instead of the partner setting
-		if ($protocol !== null)
-			$cdnHost = preg_replace('/^https?/', $protocol, $cdnHost);
+		$cdnHost = preg_replace('/^https?/', $protocol, $cdnHost);
 			
 		return $cdnHost;
 	}
@@ -369,8 +368,7 @@ class myPartnerUtils
 			$protocol='http';
 
 		// if a protocol was set manually (or by the temporary http default above) use it instead of the partner setting
-		if ($protocol !== null)
-			$thumbHost = preg_replace('/^https?/', $protocol, $thumbHost);
+		$thumbHost = preg_replace('/^https?/', $protocol, $thumbHost);
 			
 		return $thumbHost;
 	}
