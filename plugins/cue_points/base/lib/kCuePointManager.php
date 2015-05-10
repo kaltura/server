@@ -653,7 +653,12 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 	public static function copyCuePointsToClipEntry( entry $clipEntry ) {
 		$clipAtts =  self::getClipAttributesFromEntry( $clipEntry );
 		if ( !is_null($clipAtts) ) {
-			$sourceEntryDuration = entryPeer::retrieveByPK( $clipEntry->getSourceEntryId() )->getLengthInMsecs();
+			$sourceEntry = entryPeer::retrieveByPK( $clipEntry->getSourceEntryId() );
+			if ( is_null($sourceEntry) ) {
+				KalturaLog::debug("Didn't copy cuePoints for entry [{$clipEntry->getId()}] because source entry [" . $clipEntry->getSourceEntryId() . "] wasn't found");
+				return;
+			}
+			$sourceEntryDuration = $sourceEntry->getLengthInMsecs();
 
 			$clipStartTime = $clipAtts->getOffset();
 			if ( is_null($clipStartTime) )
