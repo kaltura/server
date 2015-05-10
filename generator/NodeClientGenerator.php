@@ -36,6 +36,9 @@ class NodeClientGenerator extends ClientGeneratorFromXml
 		
 		$this->schemaXml = new SimpleXMLElement(file_get_contents($this->_xmlFile));
 		
+		$services = null;
+		$configurations = null;
+		
 		//parse object types
 		foreach($this->schemaXml->children() as $reflectionType)
 		{
@@ -48,8 +51,8 @@ class NodeClientGenerator extends ClientGeneratorFromXml
 						$this->writeEnum($enums_node);
 					}
 					break;
-				case 'classes':
 					
+				case 'classes':
 					$this->echoLine($this->voClasses, "var util = require('util');");
 					$this->echoLine($this->voClasses, "var kaltura = require('./KalturaClientBase');");
 					$this->echoLine($this->voClasses, "");
@@ -60,8 +63,8 @@ class NodeClientGenerator extends ClientGeneratorFromXml
 						$this->writeObjectClass($classes_node);
 					}
 					break;
-				case 'services':
 					
+				case 'services':
 					$this->echoLine($this->serviceClasses, "var util = require('util');");
 					$this->echoLine($this->serviceClasses, "var kaltura = require('./KalturaClientBase');");
 					$this->echoLine($this->serviceClasses, "");
@@ -71,11 +74,19 @@ class NodeClientGenerator extends ClientGeneratorFromXml
 					{
 						$this->writeService($services_node);
 					}
-					//write main class (if needed, this can also be included in the static sources folder if not dynamic)
-					$this->writeMainClass($reflectionType->children());
+					
+					$services = $reflectionType->children();
+					break;
+					
+				case 'configurations':
+					$configurations = $reflectionType->children();
 					break;
 			}
 		}
+		
+		//write main class (if needed, this can also be included in the static sources folder if not dynamic)
+		$this->writeMainClass($services, $configurations);
+		
 		$this->addFile('KalturaTypes.js', $this->enumTypes);
 		$this->addFile('KalturaVO.js', $this->voClasses);
 		$this->addFile('KalturaServices.js', $this->serviceClasses);
@@ -376,9 +387,10 @@ class NodeClientGenerator extends ClientGeneratorFromXml
 	 * Create the main class of the client library, may parse Services and actions.
 	 * initialize the service and assign to client to provide access to servcies and actions through the Kaltura client object.
 	 */
-	protected function writeMainClass(SimpleXMLElement $servicesNodes)
+	protected function writeMainClass(SimpleXMLElement $servicesNodes, SimpleXMLElement $configurationNodes)
 	{
 		$apiVersion = $this->schemaXml->attributes()->apiVersion;
+		$date = date('y-m-d');
 		
 		$this->echoLine($this->mainClass, "/**");
 		$this->echoLine($this->mainClass, " * The Kaltura Client - this is the facade through which all service actions should be called.");
@@ -391,6 +403,8 @@ class NodeClientGenerator extends ClientGeneratorFromXml
 		$this->echoLine($this->mainClass, "kaltura.enums = require('./KalturaTypes');");
 		$this->echoLine($this->mainClass, "");
 		$this->echoLine($this->mainClass, "function KalturaClient(config) {");
+		$this->echoLine($this->mainClass, "	this.setApiVersion('$apiVersion');");
+		$this->echoLine($this->mainClass, "	this.setClientTag('node:$date');");
 		$this->echoLine($this->mainClass, "	this.init(config);");
 		$this->echoLine($this->mainClass, "}");
 		$this->echoLine($this->mainClass, "");
@@ -398,7 +412,6 @@ class NodeClientGenerator extends ClientGeneratorFromXml
 		$this->echoLine($this->mainClass, "module.exports.KalturaClient = KalturaClient;");
 		$this->echoLine($this->mainClass, "");
 		$this->echoLine($this->mainClass, "util.inherits(KalturaClient, kaltura.KalturaClientBase);");
-		$this->echoLine($this->mainClass, "KalturaClient.prototype.apiVersion = '$apiVersion';");
 		$this->echoLine($this->mainClass, "");
 		
 		foreach($servicesNodes as $serviceNode)
@@ -431,6 +444,84 @@ class NodeClientGenerator extends ClientGeneratorFromXml
 			$this->echoLine($this->mainClass, "	this.$serviceName = new $serviceClassName(this);");
 		}
 		$this->echoLine($this->mainClass, "};");
+		
+		$volatileProperties = array();
+		foreach($configurationNodes as $configurationName => $configurationNode)
+		{
+			/* @var $configurationNode SimpleXMLElement */
+			$attributeName = lcfirst($configurationName) . "Configuration";
+			$volatileProperties[$attributeName] = array();
+		
+			foreach($configurationNode->children() as $configurationProperty => $configurationPropertyNode)
+			{
+				/* @var $configurationPropertyNode SimpleXMLElement */
+				
+				if($configurationPropertyNode->attributes()->volatile)
+				{
+					$volatileProperties[$attributeName][] = $configurationProperty;
+				}
+				
+				$type = $configurationPropertyNode->attributes()->type;
+				$description = null;
+				
+				if($configurationPropertyNode->attributes()->description)
+				{
+					$description = $configurationPropertyNode->attributes()->description;
+				}
+				
+				$this->writeConfigurationProperty($configurationName, $configurationProperty, $configurationProperty, $type, $description);
+				
+				if($configurationPropertyNode->attributes()->alias)
+				{
+					$this->writeConfigurationProperty($configurationName, $configurationPropertyNode->attributes()->alias, $configurationProperty, $type, $description);					
+				}
+			}
+		}
+		
+		$this->echoLine($this->mainClass, "/**");
+		$this->echoLine($this->mainClass, " * Clear all volatile configuration parameters");
+		$this->echoLine($this->mainClass, " */");
+		$this->echoLine($this->mainClass, "KalturaClient.prototype.resetRequest = function(){");
+		foreach($volatileProperties as $attributeName => $properties)
+		{
+			foreach($properties as $propertyName)
+				$this->echoLine($this->mainClass, "	delete this.{$attributeName}['{$propertyName}'];");
+		}
+		$this->echoLine($this->mainClass, "};");
+		$this->echoLine($this->mainClass, "");
+	
+	}
+	
+	protected function writeConfigurationProperty($configurationName, $name, $paramName, $type, $description)
+	{
+		$methodsName = ucfirst($name);
+		
+		$this->echoLine($this->mainClass, "/**");
+		if($description)
+		{
+			$this->echoLine($this->mainClass, " * $description");
+			$this->echoLine($this->mainClass, " * ");
+		}
+		$this->echoLine($this->mainClass, " * @param $type $name");
+		$this->echoLine($this->mainClass, " */");
+		$this->echoLine($this->mainClass, "KalturaClient.prototype.set{$methodsName} = function($name){");
+		$this->echoLine($this->mainClass, "	this.{$configurationName}Configuration['{$paramName}'] = {$name};");
+		$this->echoLine($this->mainClass, "};");
+		$this->echoLine($this->mainClass, "");
+	
+		
+		$this->echoLine($this->mainClass, "/**");
+		if($description)
+		{
+			$this->echoLine($this->mainClass, " * $description");
+			$this->echoLine($this->mainClass, " * ");
+		}
+		$this->echoLine($this->mainClass, " * @return $type");
+		$this->echoLine($this->mainClass, " */");
+		$this->echoLine($this->mainClass, "KalturaClient.prototype.get{$methodsName} = function(){");
+		$this->echoLine($this->mainClass, "	return this.{$configurationName}Configuration['{$paramName}'];");
+		$this->echoLine($this->mainClass, "};");
+		$this->echoLine($this->mainClass, "");
 	}
 	
 	/**

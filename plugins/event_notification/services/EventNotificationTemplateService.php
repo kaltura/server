@@ -30,6 +30,7 @@ class EventNotificationTemplateService extends KalturaBaseService
 		$dbEventNotificationTemplate = $eventNotificationTemplate->toInsertableObject();
 		/* @var $dbEventNotificationTemplate EventNotificationTemplate */
 		$dbEventNotificationTemplate->setStatus(EventNotificationTemplateStatus::ACTIVE);
+		//Partner 0 cannot be impersonated, the reasong this work is because null equals to 0.
 		$dbEventNotificationTemplate->setPartnerId($this->impersonatedPartnerId);
 		$dbEventNotificationTemplate->save();
 		
