@@ -566,7 +566,10 @@ class Kaltura_Client_ClientBase
 	 */
 	public function validateObjectType($resultObject, $objectType)
 	{
-		if (in_array(gettype($resultObject) ,array("NULL", "boolean", "integer", "double", "string")) )
+		$knownNativeTypes = array("boolean", "integer", "double", "string");
+		if (is_null($resultObject) ||
+			( in_array(gettype($resultObject) ,$knownNativeTypes) &&
+			  in_array($objectType, $knownNativeTypes) ) )
 		{
 			return;// we do not check native simple types
 		}
