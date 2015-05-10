@@ -18,6 +18,12 @@ class kMetadataManager
 		MetadataObjectType::PARTNER => 'Partner',
 	);
 	
+	protected static $metadataFieldTypesToValidate = array(
+	    MetadataSearchFilter::KMC_FIELD_TYPE_OBJECT,
+	    MetadataSearchFilter::KMC_FIELD_TYPE_USER,
+	    MetadataSearchFilter::KMC_FIELD_TYPE_METADATA_OBJECT,
+	);
+	
 	/**
 	 * @param KalturaMetadataObjectType $objectType
 	 *
@@ -42,6 +48,24 @@ class kMetadataManager
 			default:
 				return KalturaPluginManager::loadObject('IMetadataPeer', $objectType);
 		}
+	}
+	
+	protected static function getObjectPeerByFieldType($fieldType)
+	{
+	    switch ($fieldType)
+	    {
+	        case MetadataSearchFilter::KMC_FIELD_TYPE_OBJECT:
+	            return new MetadataEntryPeer();
+	             
+	        case MetadataSearchFilter::KMC_FIELD_TYPE_USER:
+	            return new MetadataKuserPeer();
+
+	        case MetadataSearchFilter::KMC_FIELD_TYPE_METADATA_OBJECT:
+	            return new MetadataDynamicObjectPeer();
+	             
+	        default:
+	            return null; 
+	    }
 	}
 	
 	/**
@@ -485,12 +509,12 @@ class kMetadataManager
 		$xml->loadXML($metadata);
 		if($xml->schemaValidateSource($xsdData))
 		{
-			if (!self::validateSubMetadataObjects($metadataProfileId, $xml))
-			{
-				$errorMessage = "Metadata has invalid sub metadata object";
+		    if(!self::validateMetadataObjects($metadataProfileId, $xml, $errorMessage))
+		    {
 				KalturaLog::err($errorMessage);
 				return false;
 			}
+			
 			KalturaLog::debug("Metadata is valid");
 			return true;
 		}
@@ -499,39 +523,39 @@ class kMetadataManager
 		KalturaLog::err("Metadata is invalid:\n$errorMessage");
 		return false;
 	}
-
-	protected static function validateSubMetadataObjects($metadataProfileId, KDOMDocument $xml)
+	
+	protected static function validateMetadataObjects($metadataProfileId, KDOMDocument $xml, &$errorMessage)
 	{
-		$profileFields = MetadataProfileFieldPeer::retrieveAllActiveByMetadataProfileId($metadataProfileId);
-		$xPath = new DOMXPath($xml);
-		foreach ($profileFields as $profileField)
-		{
-			/** @var MetadataProfileField $profileField */
-			if ($profileField->getType() == MetadataSearchFilter::KMC_FIELD_TYPE_METADATA_OBJECT)
-			{
-				$nodes = $xPath->query($profileField->getXpath());
-				$subObjectIds = array();
-				foreach ($nodes as $node)
-					$subObjectIds[] = $node->nodeValue;
-				$subObjectIds = array_unique($subObjectIds);
-				if (!count($subObjectIds))
-					continue;
-				$subMetadataProfileId = $profileField->getRelatedMetadataProfileId();
-				$subMetadataProfile = MetadataProfilePeer::retrieveByPK($subMetadataProfileId);
-				if (!$subMetadataProfile)
-				{
-					KalturaLog::err('Sub metadata profile ' . $subMetadataProfileId . ' was not found');
-					return false;
-				}
-				$subMetadataObjects = MetadataPeer::retrieveByObjects($subMetadataProfileId, $subMetadataProfile->getObjectType(), $subObjectIds);
-				if (count($subMetadataObjects) != count($subObjectIds))
-				{
-					KalturaLog::err('One of the following objects: '.implode(', ', $subObjectIds).' was not found for profile '.$subMetadataProfileId);
-					return false;
-				}
-			}
-		}
-		return true;
+	    $profileFields = MetadataProfileFieldPeer::retrieveByMetadataProfileId($metadataProfileId);
+	    $xPath = new DOMXPath($xml);
+	    
+	    foreach ($profileFields as $profileField)
+	    {
+	        /** @var MetadataProfileField $profileField */
+	        if(!in_array($profileField->getType(), self::$metadataFieldTypesToValidate))
+	            continue;
+	        
+	        $objectPeer = self::getObjectPeerByFieldType($profileField->getType());
+	        
+	        if(!$objectPeer)
+	        {
+	            $errorMessage = "Peer not found for field of type " . $profileField->getType();
+	            return false;
+	        }
+	        
+	        $objectIds = array();
+	        $nodes = $xPath->query($profileField->getXpath());
+	         
+	        foreach ($nodes as $node)
+	            $objectIds[] = $node->nodeValue;
+	         
+	        $objectIds = array_unique($objectIds);
+	        
+	        if(!$objectPeer->validateMetadataObjects($profileField, $objectIds, &$errorMessage))
+	            return false;
+	    }
+	    
+	    return true;
 	}
 
 	public static function validateProfileFields($partnerId, $xsd)
