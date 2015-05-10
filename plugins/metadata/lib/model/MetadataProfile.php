@@ -49,13 +49,13 @@ class MetadataProfile extends BaseMetadataProfile implements ISyncableFile
 		return $ret;
 	}
 	
-	/* (non-PHPdoc)
+		/* (non-PHPdoc)
 	 * @see BaseMetadataProfile::preSave()
 	 */
 	public function preSave(PropelPDO $con = null)
 	{
 	    if($this->xsdData)
-	        $this->incrementVersion();
+	        $this->incrementFileSyncVersion();
 	    
 	    if($this->viewsData)
 	        $this->incrementViewsVersion();
@@ -66,7 +66,7 @@ class MetadataProfile extends BaseMetadataProfile implements ISyncableFile
 	    return parent::preSave($con);
 	}
 	
-	/* (non-PHPdoc)
+		/* (non-PHPdoc)
 	 * @see BaseMetadataProfile::postSave()
 	 */
 	public function postSave(PropelPDO $con = null)
@@ -93,12 +93,15 @@ class MetadataProfile extends BaseMetadataProfile implements ISyncableFile
 	
 	    return parent::postSave($con);
 	}
-
+	
 	public function incrementVersion()
 	{
-		$newVersion = kFileSyncUtils::calcObjectNewVersion($this->getId(), $this->getVersion(), FileSyncObjectType::METADATA_PROFILE, self::FILE_SYNC_METADATA_DEFINITION);
-		
-		$this->setVersion($newVersion);
+		$this->setVersion($this->getFileSyncVersion());
+	}
+	
+	public function incrementFileSyncVersion() {
+		$newVersion = kFileSyncUtils::calcObjectNewVersion($this->getId(), $this->getFileSyncVersion(), FileSyncObjectType::METADATA_PROFILE, self::FILE_SYNC_METADATA_DEFINITION);
+		$this->setFileSyncVersion($newVersion);
 	}
 
 	public function incrementViewsVersion()
@@ -158,7 +161,7 @@ class MetadataProfile extends BaseMetadataProfile implements ISyncableFile
 		switch($sub_type)
 		{
 			case self::FILE_SYNC_METADATA_DEFINITION:
-				return $this->getVersion();
+				return $this->getFileSyncVersion();
 				
 			case self::FILE_SYNC_METADATA_VIEWS:
 				return $this->getViewsVersion();
@@ -248,6 +251,19 @@ class MetadataProfile extends BaseMetadataProfile implements ISyncableFile
 			$v = array_map('trim', explode(',', $v));
 			
 		$this->putInCustomData('requiredCopyTemplatePermissions', $v);
+	}
+	
+	public function getPreviousFileSyncVersion() {
+		$this->getFromCustomData('previousFileSyncVersion');
+	}
+	
+	public function setPreviousFileSyncVersion($v) {
+		$this->putInCustomData('previousFileSyncVersion', $v);
+	}
+	
+	public function setFileSyncVersion($v) {
+		$this->setPreviousFileSyncVersion($this->getFileSyncVersion());
+		parent::setFileSyncVersion($v);
 	}
 	
 	public function setXsdData($xsdData)

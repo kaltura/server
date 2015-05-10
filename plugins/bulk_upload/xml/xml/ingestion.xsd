@@ -4,15 +4,10 @@
 	<xs:complexType name="T_mrss">
 		<xs:sequence>
 		
-			<xs:element maxOccurs="1" minOccurs="0" name="ks">
+			<xs:element maxOccurs="1" minOccurs="0" name="ks" type="xs:string">
 				<xs:annotation>
 					<xs:documentation>KS of the user ingesting the content</xs:documentation>
 				</xs:annotation>
-				<xs:simpleType>
-					<xs:restriction base="xs:string">
-						<xs:maxLength value="256"/>
-					</xs:restriction>
-				</xs:simpleType>
 			</xs:element>
 			
 			<xs:element maxOccurs="unbounded" minOccurs="1" ref="channel">

@@ -48,8 +48,8 @@ class VodPackagerDeliveryUtils
 			$url = rtrim($urlPrefixPath, '/') . '/' . ltrim($url, '/');
 		}
 	
-		if (strpos($urlPrefix, '://') === false)
-			$urlPrefix = $params->getMediaProtocol() . '://' . $urlPrefix;
+		$urlPrefix = trim(preg_replace('#https?://#', '', $urlPrefix), '/');
+		$urlPrefix = $params->getMediaProtocol() . '://' . $urlPrefix;
 	
 		return array('url' => $url, 'urlPrefix' => $urlPrefix);
 	}
