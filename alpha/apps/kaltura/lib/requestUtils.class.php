@@ -98,6 +98,13 @@ class requestUtils extends infraRequestUtils
 		return "$protocol://".kConf::get("cdn_host");
 	}
 	
+	public static function getThumbnailCdnHost ($protocol = 'http')
+	{
+		if ($protocol == "https")
+			return "$protocol://".kConf::get("cdn_thumbnail_host_https", 'local', kConf::get("cdn_host_https"));
+		return "$protocol://".kConf::get("cdn_thumbnail_host", 'local', kConf::get("cdn_host"));
+	}
+	
 	public static function getApiCdnHost()
 	{
 		$protocol = self::getProtocol();

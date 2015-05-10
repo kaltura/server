@@ -312,21 +312,22 @@ class myPartnerUtils
 	}
 	
 	
-	public static function getCdnHost ( $partner_id, $protocol = null )
+	public static function getCdnHost ( $partner_id, $protocol = null, $hostType = null )
 	{
 		// in case the request came through https, force https url
 		if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on')
 			$protocol = 'https';
 
-		$partner = PartnerPeer::retrieveByPK( $partner_id );
-		if ( !$partner || (! $partner->getCdnHost() ) ) return requestUtils::getCdnHost($protocol === null ? 'http' : $protocol);
-
-		$cdnHost = $partner->getCdnHost();
-
 		// temporary default is http since the system is not aligned to use https in all of its components (e.g. kmc)
 		// right now, if a partner cdnHost is set to https:// the kmc wont work well if we reply with https prefix to its requests
 		if ($protocol === null)
 			$protocol='http';
+
+		$partner = PartnerPeer::retrieveByPK( $partner_id );
+		if ( !$partner || (! $partner->getCdnHost() ) )
+			return $hostType == "thumbnail" ? requestUtils::getThumbnailCdnHost($protocol) : requestUtils::getCdnHost($protocol);
+
+		$cdnHost = $partner->getCdnHost();
 
 		// if a protocol was set manually (or by the temporary http default above) use it instead of the partner setting
 		if ($protocol !== null)
@@ -354,7 +355,7 @@ class myPartnerUtils
 	public static function getThumbnailHost ($partner_id, $protocol = null)
 	{
 	    $partner = PartnerPeer::retrieveByPK( $partner_id );
-	    if ( !$partner || (! $partner->getThumbnailHost() ) ) return self::getCdnHost($partner_id, $protocol);
+	    if ( !$partner || (! $partner->getThumbnailHost() ) ) return self::getCdnHost($partner_id, $protocol, "thumbnail");
 	    
 	    // in case the request came through https, force https url
 		if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on')
