@@ -1,5 +1,42 @@
 # Jupiter-10.11.0 #
 
+## Server support for Q&A feature ##
+
+- Issue Type: new feature
+- Issue ID: PLAT-2850
+
+### Configuration ###
+- update sphinx kaltura.conf:
+	
+		Add the following to kaltura_cue_point index:
+		- rt_attr_uint = is_public
+		- rt_field = plugins_data
+
+#### Deployment Scripts ####
+
+		Need to re-build & re-index the cue point sphinx table.
+
+#### Known Issues & Limitations ####
+
+None.
+
+
+## New feature- hide template partner uiconfs ##
+
+- Issue Type: bug fix  
+- Issue ID: https://app2.clarizen.com/Clarizen/6.299216357.130510/
+
+### Configuration ###
+- Add the following permission block to @APP_DIR@/configurations/admin.ini:
+		moduls.hideTemplatePartnerUiConfs.enabled = true  
+        moduls.hideTemplatePartnerUiConfs.permissionType = 2  
+        moduls.hideTemplatePartnerUiConfs.label = "Hide template partner ui-confs from preview&embed menu"  
+        moduls.hideTemplatePartnerUiConfs.permissionName = FEATURE_HIDE_TEMPLATE_PARTNER_UICONFS  
+        moduls.hideTemplatePartnerUiConfs.basePermissionType = 2  
+        moduls.hideTemplatePartnerUiConfs.basePermissionType =  
+        moduls.hideTemplatePartnerUiConfs.basePermissionName =  
+        moduls.hideTemplatePartnerUiConfs.group = GROUP_ENABLE_DISABLE_FEATURES  
+
 ## Error when manually dispatching notification template ##
 
 - Issue Type: bug fix
