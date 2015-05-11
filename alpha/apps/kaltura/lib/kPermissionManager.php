@@ -908,6 +908,13 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 		return $partnerGroup;
 	}
 	
+	/**
+	 * @return string comma seperated current role ids
+	 */
+	public static function getCurrentRoleIds()
+	{
+		return self::$roleIds;
+	}
 	
 	/**
 	 * @return return current permission names

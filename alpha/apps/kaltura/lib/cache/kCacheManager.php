@@ -24,6 +24,7 @@ class kCacheManager
 	const CACHE_TYPE_LIVE_MEDIA_SERVER = 'liveMediaServer';
 	const CACHE_TYPE_PARTNER_SECRETS = 'partnerSecrets';
 	const CACHE_TYPE_SPHINX_EXECUTED_SERVER = 'sphinxExecutedServer';
+	const CACHE_TYPE_RESPONSE_PROFILE = 'responseProfile';
 	
 	protected static $caches = array();
 	
