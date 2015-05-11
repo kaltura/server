@@ -124,10 +124,10 @@ class KalturaAnnotation extends KalturaCuePoint
 			$this->validateEndTime();
 		
 		if(!isset($this->isPublic) || is_null($this->isPublic))
-		    $this->isPublic = true;
+		    $this->isPublic = false;
 		
-		if(!isset($this->shouldIndexOnEntry) || is_null($this->shouldIndexOnEntry))
-		    $this->shouldIndexOnEntry=true;
+		if(!isset($this->searchableOnEntry) || is_null($this->searchableOnEntry))
+		    $this->searchableOnEntry=true;
 	}
 	
 	/* (non-PHPdoc)

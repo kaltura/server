@@ -14,7 +14,8 @@
 
 #### Deployment Scripts ####
 
-		Need to re-build & re-index the cue point sphinx table.
+		- Need to re-build & re-index the cue point sphinx table.
+		- run php /op/kaltura/app/deployment/updates/scripts/2015_05_11_create_qAndA_default_schema.php
 
 #### Known Issues & Limitations ####
 
