@@ -151,4 +151,13 @@ class KalturaDetachedResponseProfile extends KalturaBaseResponseProfile
 		
 		return parent::toObject($object, $propertiesToSkip);
 	}
+	
+	/**
+	 * Return unique identifier to be used in cache
+	 * @return string
+	 */
+	public function getKey()
+	{
+		return md5(serialize($this));
+	}
 }

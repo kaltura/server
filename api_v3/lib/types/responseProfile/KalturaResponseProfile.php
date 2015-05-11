@@ -53,6 +53,12 @@ class KalturaResponseProfile extends KalturaDetachedResponseProfile implements I
 	 */
 	public $status;
 	
+	/**
+	 * @var int
+	 * @readonly
+	 */
+	public $version;
+	
 	
 	public function __construct(ResponseProfile $responseProfile = null)
 	{
@@ -69,6 +75,7 @@ class KalturaResponseProfile extends KalturaDetachedResponseProfile implements I
 		'createdAt',
 		'updatedAt',
 		'status',
+		'version',
 	);
 	
 	/* (non-PHPdoc)
@@ -152,5 +159,13 @@ class KalturaResponseProfile extends KalturaDetachedResponseProfile implements I
 	public function getFilterDocs()
 	{
 		return array();
+	}
+	
+	/* (non-PHPdoc)
+	 * @see KalturaDetachedResponseProfile::getKey()
+	 */
+	public function getKey()
+	{
+		return "{$this->id}_{$this->version}";
 	}
 }

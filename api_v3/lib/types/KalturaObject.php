@@ -378,9 +378,18 @@ abstract class KalturaObject
 		$fromObjectClass::fromObject($this, $srcObj, $responseProfile);
 		$this->doFromObject($srcObj, $responseProfile);
 		
-		if($responseProfile)
+		if($srcObj instanceof IBaseObject)
 		{
-			$this->loadRelatedObjects($responseProfile);
+			KalturaResponseProfileCacher::onPersistentObjectLoaded($srcObj);
+			if($responseProfile)
+			{
+				$this->relatedObjects = KalturaResponseProfileCacher::start($srcObj, $responseProfile);
+				if(!$this->relatedObjects)
+				{
+					$this->loadRelatedObjects($responseProfile);
+					KalturaResponseProfileCacher::stop($this);
+				}
+			}
 		}
 	}
 	
