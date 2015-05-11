@@ -13,7 +13,7 @@
  * @package plugins.audit
  * @subpackage model
  */
-class AuditTrailConfig extends BaseAuditTrailConfig {
+class AuditTrailConfig extends BaseAuditTrailConfig implements IBaseObject {
 
 	public function actionEnabled($action)
 	{

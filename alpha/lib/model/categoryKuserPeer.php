@@ -13,8 +13,8 @@
  * @package Core
  * @subpackage model
  */
-class categoryKuserPeer extends BasecategoryKuserPeer {
-	
+class categoryKuserPeer extends BasecategoryKuserPeer implements IRelatedObjectPeer
+{
 	/**
 	 * 
 	 * @param int $categoryId
@@ -214,4 +214,35 @@ class categoryKuserPeer extends BasecategoryKuserPeer {
 		self::$s_criteria_filter->setFilter($c);
 	}
 	
+	public function getCategoryKuserParentObjects(categoryKuser $object)
+	{
+		return array(
+			kuserPeer::retrieveByPK($object->getKuserId()),
+			categoryPeer::retrieveByPK($object->getCategoryId()),
+		);
+	}
+	
+	/* (non-PHPdoc)
+	 * @see IRelatedObjectPeer::getParentObjects()
+	 */
+	public function getParentObjects(IBaseObject $object)
+	{
+		return $this->getCategoryKuserParentObjects($object);
+	}
+
+	/* (non-PHPdoc)
+	 * @see IRelatedObjectPeer::getRootObjects()
+	 */
+	public function getRootObjects(IBaseObject $object)
+	{
+		return $this->getParentObjects($object);
+	}
+
+	/* (non-PHPdoc)
+	 * @see IRelatedObjectPeer::isReferenced()
+	 */
+	public function isReferenced(IBaseObject $object)
+	{
+		return false;
+	}
 } // categoryKuserPeer

@@ -13,7 +13,7 @@
  * @package plugins.cuePoint
  * @subpackage model
  */
-class CuePointPeer extends BaseCuePointPeer implements IMetadataPeer 
+class CuePointPeer extends BaseCuePointPeer implements IMetadataPeer, IRelatedObjectPeer
 {
 	const MAX_TEXT_LENGTH = 32700;
 	const MAX_TAGS_LENGTH = 255;
@@ -172,5 +172,34 @@ class CuePointPeer extends BaseCuePointPeer implements IMetadataPeer
 		$res = self::retrieveByPK($pk, $con);
 		self::setUseCriteriaFilter ( true );
 		return $res;
+	}
+	
+	public function getCuePointParentObjects(CuePoint $object)
+	{
+		return array(entryPeer::retrieveByPK($object->getEntryId()));
+	}
+	
+	/* (non-PHPdoc)
+	 * @see IRelatedObjectPeer::getParentObjects()
+	 */
+	public function getParentObjects(IBaseObject $object)
+	{
+		return $this->getCuePointParentObjects($object);
+	}
+
+	/* (non-PHPdoc)
+	 * @see IRelatedObjectPeer::getRootObjects()
+	 */
+	public function getRootObjects(IBaseObject $object)
+	{
+		return $this->getParentObjects($object);
+	}
+
+	/* (non-PHPdoc)
+	 * @see IRelatedObjectPeer::isReferenced()
+	 */
+	public function isReferenced(IBaseObject $object)
+	{
+		return false;
 	}
 }

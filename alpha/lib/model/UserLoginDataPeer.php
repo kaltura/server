@@ -13,8 +13,8 @@
  * @package Core
  * @subpackage model
  */
-class UserLoginDataPeer extends BaseUserLoginDataPeer {
-
+class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectPeer
+{
 	const KALTURAS_CMS_PASSWORD_RESET = 51;
 	
 	public static function generateNewPassword()
@@ -633,5 +633,32 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer {
 		
 	}
 	
+	public function getUserLoginDataParentObjects(UserLoginData $object)
+	{
+		return array();
+	}
 	
+	/* (non-PHPdoc)
+	 * @see IRelatedObjectPeer::getParentObjects()
+	 */
+	public function getParentObjects(IBaseObject $object)
+	{
+		return $this->getUserLoginDataParentObjects($object);
+	}
+
+	/* (non-PHPdoc)
+	 * @see IRelatedObjectPeer::getRootObjects()
+	 */
+	public function getRootObjects(IBaseObject $object)
+	{
+		return $this->getParentObjects($object);
+	}
+
+	/* (non-PHPdoc)
+	 * @see IRelatedObjectPeer::isReferenced()
+	 */
+	public function isReferenced(IBaseObject $object)
+	{
+		return true;
+	}
 } // UserLoginDataPeer

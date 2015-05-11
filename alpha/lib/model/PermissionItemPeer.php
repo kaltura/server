@@ -13,7 +13,8 @@
  * @package Core
  * @subpackage model
  */
-class PermissionItemPeer extends BasePermissionItemPeer
+use Aws\S3\Enum\Permission;
+class PermissionItemPeer extends BasePermissionItemPeer implements IRelatedObjectPeer
 {
 
 	public static function checkValidForParther($permissionIdsStr, $partnerId)
@@ -38,5 +39,32 @@ class PermissionItemPeer extends BasePermissionItemPeer
 		}
 	}
 	
+	public function getPermissionItemParentObjects(PermissionItem $object)
+	{
+		return array();
+	}
 	
+	/* (non-PHPdoc)
+	 * @see IRelatedObjectPeer::getParentObjects()
+	 */
+	public function getParentObjects(IBaseObject $object)
+	{
+		return $this->getPermissionItemParentObjects($object);
+	}
+
+	/* (non-PHPdoc)
+	 * @see IRelatedObjectPeer::getRootObjects()
+	 */
+	public function getRootObjects(IBaseObject $object)
+	{
+		return $this->getParentObjects($object);
+	}
+
+	/* (non-PHPdoc)
+	 * @see IRelatedObjectPeer::isReferenced()
+	 */
+	public function isReferenced(IBaseObject $object)
+	{
+		return true;
+	}
 } // PermissionItemPeer

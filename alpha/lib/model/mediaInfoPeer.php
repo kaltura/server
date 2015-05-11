@@ -8,7 +8,7 @@
  * @package Core
  * @subpackage model
  */ 
-class mediaInfoPeer extends BasemediaInfoPeer
+class mediaInfoPeer extends BasemediaInfoPeer implements IRelatedObjectPeer
 {
 	/**
 	 * @param string $flavorAssetId
@@ -60,5 +60,40 @@ class mediaInfoPeer extends BasemediaInfoPeer
 		return mediaInfoPeer::doSelectOne($criteria);
 	}
 	
+	public function getMediaInfoParentObjects(mediaInfo $object)
+	{
+		return array($object->getasset());
+	}
+	
+	/* (non-PHPdoc)
+	 * @see IRelatedObjectPeer::getParentObjects()
+	 */
+	public function getParentObjects(IBaseObject $object)
+	{
+		return $this->getMediaInfoParentObjects($object);
+	}
 
+	/* (non-PHPdoc)
+	 * @see IRelatedObjectPeer::getRootObjects()
+	 */
+	public function getRootObjects(IBaseObject $object)
+	{
+		$assets = $this->getParentObjects($object);
+		$roots = array();
+		foreach($assets as $asset)
+		{
+			/* @var $asset asset */
+			$roots[] = $asset->getentry();
+		}
+		
+		return $roots;
+	}
+
+	/* (non-PHPdoc)
+	 * @see IRelatedObjectPeer::isReferenced()
+	 */
+	public function isReferenced(IBaseObject $object)
+	{
+		return false;
+	}
 }

@@ -13,6 +13,6 @@
  * @package plugins.drm
  * @subpackage model
  */
-class DrmProfile extends BaseDrmProfile {
+class DrmProfile extends BaseDrmProfile implements IBaseObject {
 
 } // DrmProfile

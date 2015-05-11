@@ -8,7 +8,7 @@
  * @package Core
  * @subpackage model
  */ 
-class assetParamsOutputPeer extends BaseassetParamsOutputPeer
+class assetParamsOutputPeer extends BaseassetParamsOutputPeer implements IRelatedObjectPeer
 {
 	const FLAVOR_OM_CLASS = 'flavorParamsOutput';
 	const THUMBNAIL_OM_CLASS = 'thumbParamsOutput';
@@ -122,5 +122,42 @@ class assetParamsOutputPeer extends BaseassetParamsOutputPeer
 	public static function getCacheInvalidationKeys()
 	{
 		return array(array("flavorParamsOutput:id=%s", self::ID), array("flavorParamsOutput:flavorAssetId=%s", self::FLAVOR_ASSET_ID));		
+	}
+	
+	public function getAssetParamsOutputParentObjects(assetParamsOutput $object)
+	{
+		return array($object->getasset());
+	}
+	
+	/* (non-PHPdoc)
+	 * @see IRelatedObjectPeer::getParentObjects()
+	 */
+	public function getParentObjects(IBaseObject $object)
+	{
+		return $this->getAssetParamsOutputParentObjects($object);
+	}
+
+	/* (non-PHPdoc)
+	 * @see IRelatedObjectPeer::getRootObjects()
+	 */
+	public function getRootObjects(IBaseObject $object)
+	{
+		$assets = $this->getParentObjects($object);
+		$roots = array();
+		foreach($assets as $asset)
+		{
+			/* @var $asset asset */
+			$roots[] = $asset->getentry();
+		}
+		
+		return $roots;
+	}
+
+	/* (non-PHPdoc)
+	 * @see IRelatedObjectPeer::isReferenced()
+	 */
+	public function isReferenced(IBaseObject $object)
+	{
+		return false;
 	}
 }

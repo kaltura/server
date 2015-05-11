@@ -13,9 +13,9 @@
  * @package plugins.metadata
  * @subpackage model
  */
-class MetadataPeer extends BaseMetadataPeer {
-
-
+use Kaltura\Client\Plugin\Metadata\Enum\MetadataObjectType;
+class MetadataPeer extends BaseMetadataPeer implements IRelatedObjectPeer
+{
 	public static function setDefaultCriteriaFilter()
 	{
 		if(self::$s_criteria_filter == null)
@@ -151,5 +151,68 @@ class MetadataPeer extends BaseMetadataPeer {
 	public static function getCacheInvalidationKeys()
 	{
 		return array(array("metadata:objectId=%s", self::OBJECT_ID));		
+	}
+
+	public function getMetadataParentObjects(Metadata $object)
+	{
+		if($object->getObjectType() != MetadataObjectType::DYNAMIC_OBJECT)
+		{
+			$parent = kMetadataManager::getObjectFromPeer($object);
+			if($parent)
+				return array($parent);
+		}
+		return array();	
+	}
+	
+	/* (non-PHPdoc)
+	 * @see IRelatedObjectPeer::getParentObjects()
+	 */
+	public function getParentObjects(IBaseObject $object)
+	{
+		return $this->getMetadataParentObjects($object);
+	}
+
+	/* (non-PHPdoc)
+	 * @see IRelatedObjectPeer::getRootObjects()
+	 */
+	public function getRootObjects(IBaseObject $object)
+	{
+		$parentObjects = $this->getParentObjects($object);
+		$rootObjects = array();
+		foreach($parentObjects as $parentObject)
+		{
+			/* @var $parentObject IBaseObject */
+			$peer = $parentObject->getPeer();
+			$rootAdded = false;
+			if($peer instanceof IRelatedObjectPeer)
+			{
+				$parentRoots = $peer->getRootObjects($parentObject);
+				if(count($parentRoots))
+				{
+					$rootObjects = array_merge($rootObjects, $parentRoots);
+					$rootAdded = true;
+				}
+			}
+			if($rootAdded)
+				$rootObjects[] = $parentObject;
+		}
+		
+		return $rootObjects;
+	}
+
+	/* (non-PHPdoc)
+	 * @see IRelatedObjectPeer::isReferenced()
+	 */
+	public function isReferenced(IBaseObject $object)
+	{
+		/* @var $object Metadata */
+		if($object->getObjectType() == MetadataObjectType::DYNAMIC_OBJECT)
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
 	}
 } // MetadataPeer

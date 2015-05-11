@@ -13,7 +13,7 @@
  * @package plugins.dropFolder
  * @subpackage model
  */
-class DropFolderFilePeer extends BaseDropFolderFilePeer
+class DropFolderFilePeer extends BaseDropFolderFilePeer implements IRelatedObjectPeer
 {
 
 	// cache classes by their type
@@ -87,7 +87,7 @@ class DropFolderFilePeer extends BaseDropFolderFilePeer
 	}
 
 	/* (non-PHPdoc)
-	 * @see BaseCuePointPeer::getOMClass()
+	 * @see BaseDropFolderFilePeer::getOMClass()
 	 */
 	public static function getOMClass($row, $colnum)
 	{
@@ -118,5 +118,34 @@ class DropFolderFilePeer extends BaseDropFolderFilePeer
 	public static function getAtomicColumns()
 	{
 		return array(DropFolderFilePeer::STATUS);
+	}
+	
+	public function getDropFolderFileParentObjects(DropFolderFile $object)
+	{
+		return array(DropFolderPeer::retrieveByPK($object->getDropFolderId()));
+	}
+	
+	/* (non-PHPdoc)
+	 * @see IRelatedObjectPeer::getParentObjects()
+	 */
+	public function getParentObjects(IBaseObject $object)
+	{
+		return $this->getDropFolderFileParentObjects($object);
+	}
+
+	/* (non-PHPdoc)
+	 * @see IRelatedObjectPeer::getRootObjects()
+	 */
+	public function getRootObjects(IBaseObject $object)
+	{
+		return $this->getParentObjects($object);
+	}
+
+	/* (non-PHPdoc)
+	 * @see IRelatedObjectPeer::isReferenced()
+	 */
+	public function isReferenced(IBaseObject $object)
+	{
+		return false;
 	}
 } // DropFolderFilePeer

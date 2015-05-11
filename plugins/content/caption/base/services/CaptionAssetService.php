@@ -412,7 +412,7 @@ class CaptionAssetService extends KalturaAssetService
 			$captionAsset = assetPeer::retrieveByEntryIdAndParams($entryId, $captionParamId);
 		}
 		
-		if(!$captionAsset)
+		if(!$captionAsset || !($captionAsset instanceof CaptionAsset))
 			throw new KalturaAPIException(KalturaCaptionErrors::CAPTION_ASSET_PARAMS_ID_NOT_FOUND, $captionParamId);
 		
 		$fileName = $captionAsset->getId() . '.' . $captionAsset->getFileExt();

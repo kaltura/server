@@ -10,6 +10,11 @@ class KalturaCuePointFilter extends KalturaCuePointBaseFilter
 	 */
 	public $freeText;
 	
+	/**
+	 * @var KalturaNullableBoolean
+	 */
+	public $userIdCurrent;
+	
 	static private $map_between_objects = array
 	(
 		"cuePointTypeEqual" => "_eq_type",
@@ -40,6 +45,19 @@ class KalturaCuePointFilter extends KalturaCuePointBaseFilter
 	
 	protected function translateUserIds()
 	{		
+		if($this->userIdCurrent == KalturaNullableBoolean::TRUE_VALUE)
+		{
+			if(kCurrentContext::$ks_kuser_id)
+			{
+				$this->userIdEqual = kCurrentContext::$ks_kuser_id;
+			}
+			else
+			{
+				$this->isPublicEqual = KalturaNullableBoolean::TRUE_VALUE;
+			}
+			$this->userIdCurrent = null;
+		}
+		
 		if(isset($this->userIdEqual)){
 			$dbKuser = kuserPeer::getKuserByPartnerAndUid(kCurrentContext::$ks_partner_id, $this->userIdEqual);
 			if (! $dbKuser) {

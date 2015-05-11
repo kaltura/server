@@ -13,7 +13,7 @@
  * @package Core
  * @subpackage model
  */
-class KuserToUserRolePeer extends BaseKuserToUserRolePeer
+class KuserToUserRolePeer extends BaseKuserToUserRolePeer implements IRelatedObjectPeer
 {
 	
 	/**
@@ -33,5 +33,37 @@ class KuserToUserRolePeer extends BaseKuserToUserRolePeer
 	public static function getCacheInvalidationKeys()
 	{
 		return array(array("kuserToUserRole:kuserId=%s", self::KUSER_ID));		
+	}
+	
+	public function getKuserToUserRoleParentObjects(KuserToUserRole $object)
+	{
+		return array(
+			$object->getkuser(),
+			$object->getUserRole(),
+		);
+	}
+	
+	/* (non-PHPdoc)
+	 * @see IRelatedObjectPeer::getParentObjects()
+	 */
+	public function getParentObjects(IBaseObject $object)
+	{
+		return $this->getKuserToUserRoleParentObjects($object);
+	}
+
+	/* (non-PHPdoc)
+	 * @see IRelatedObjectPeer::getRootObjects()
+	 */
+	public function getRootObjects(IBaseObject $object)
+	{
+		return $this->getParentObjects($object);
+	}
+
+	/* (non-PHPdoc)
+	 * @see IRelatedObjectPeer::isReferenced()
+	 */
+	public function isReferenced(IBaseObject $object)
+	{
+		return false;
 	}
 } // KuserToUserRolePeer

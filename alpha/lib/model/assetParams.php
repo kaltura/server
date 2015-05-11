@@ -8,7 +8,7 @@
  * @package Core
  * @subpackage model
  */ 
-class assetParams extends BaseassetParams
+class assetParams extends BaseassetParams implements IBaseObject
 {
 	const CONTAINER_FORMAT_FLV = "flv";
 	const CONTAINER_FORMAT_MP4 = "mp4";

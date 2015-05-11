@@ -8,7 +8,7 @@
  * @package Core
  * @subpackage model
  */ 
-class FileSync extends BaseFileSync
+class FileSync extends BaseFileSync implements IBaseObject
 {
 	const FILE_SYNC_FILE_TYPE_FILE = 1;
 	const FILE_SYNC_FILE_TYPE_LINK = 2;

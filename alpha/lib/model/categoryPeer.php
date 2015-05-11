@@ -7,7 +7,7 @@
  * @package Core
  * @subpackage model
  */ 
-class categoryPeer extends BasecategoryPeer
+class categoryPeer extends BasecategoryPeer implements IRelatedObjectPeer
 {
 	const CATEGORY_SEPARATOR = ">";
 	
@@ -474,5 +474,41 @@ class categoryPeer extends BasecategoryPeer
 		
 	}
 	
+	public function getCategoryParentObjects(category $object)
+	{
+		$parentCategory = $object->getParentCategory();
+		if($parentCategory)
+			return array($parentCategory);
+	}
 	
+	public function getCategoryRootObjects(category $object)
+	{
+		$rootCategory = $object->getRootCategoryFromFullIds($object);
+		if($rootCategory)
+			return array($rootCategory);
+	}
+	
+	/* (non-PHPdoc)
+	 * @see IRelatedObjectPeer::getParentObjects()
+	 */
+	public function getParentObjects(IBaseObject $object)
+	{
+		return $this->getCategoryParentObjects($object);
+	}
+
+	/* (non-PHPdoc)
+	 * @see IRelatedObjectPeer::getRootObjects()
+	 */
+	public function getRootObjects(IBaseObject $object)
+	{
+		return $this->getCategoryRootObjects($object);
+	}
+
+	/* (non-PHPdoc)
+	 * @see IRelatedObjectPeer::isReferenced()
+	 */
+	public function isReferenced(IBaseObject $object)
+	{
+		return false;
+	}
 }

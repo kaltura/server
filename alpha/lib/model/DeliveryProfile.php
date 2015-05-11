@@ -5,8 +5,8 @@
  * @package Core
  * @subpackage model
  */
-abstract class DeliveryProfile extends BaseDeliveryProfile {
-	
+abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObject
+{
 	protected $DEFAULT_RENDERER_CLASS = 'kF4MManifestRenderer';
 	
 	const DYNAMIC_ATTRIBUTES_FULL_SUPPORT = 0;		// the profile fully supports the required attirbutes

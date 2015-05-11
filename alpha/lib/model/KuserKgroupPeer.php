@@ -13,8 +13,8 @@
  * @package Core
  * @subpackage model
  */
-class KuserKgroupPeer extends BaseKuserKgroupPeer {
-
+class KuserKgroupPeer extends BaseKuserKgroupPeer implements IRelatedObjectPeer
+{
 	/**
 	 * Creates default criteria filter
 	 */
@@ -90,6 +90,38 @@ class KuserKgroupPeer extends BaseKuserKgroupPeer {
 	 */
 	public static function retrieveKgroupIdsByKuserId($kuserId){
 		return self::retrieveKgroupIdsByKuserIds(array($kuserId));
+	}
+	
+	public function getKuserKgroupParentObjects(KuserKgroup $object)
+	{
+		return array(
+			kuserPeer::retrieveByPK($object->getKuserId()),
+			kuserPeer::retrieveByPK($object->getKgroupId()),
+		);
+	}
+	
+	/* (non-PHPdoc)
+	 * @see IRelatedObjectPeer::getParentObjects()
+	 */
+	public function getParentObjects(IBaseObject $object)
+	{
+		return $this->getKuserKgroupParentObjects($object);
+	}
+
+	/* (non-PHPdoc)
+	 * @see IRelatedObjectPeer::getRootObjects()
+	 */
+	public function getRootObjects(IBaseObject $object)
+	{
+		return $this->getParentObjects($object);
+	}
+
+	/* (non-PHPdoc)
+	 * @see IRelatedObjectPeer::isReferenced()
+	 */
+	public function isReferenced(IBaseObject $object)
+	{
+		return false;
 	}
 
 } // KuserKgroupPeer
