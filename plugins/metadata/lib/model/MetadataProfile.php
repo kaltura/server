@@ -28,6 +28,15 @@ class MetadataProfile extends BaseMetadataProfile implements ISyncableFile
 	private $xsdData = null;
 	private $viewsData = null;
 	private $xsltData = null;
+	
+	/* (non-PHPdoc)
+	 * @see metadata/lib/model/om/BaseMetadata#preInsert()
+	 */
+	public function preInsert(PropelPDO $con = null)
+	{
+		$this->incrementVersion();
+		return parent::preInsert($con);
+	}
 
 	/* (non-PHPdoc)
 	 * @see lib/model/om/BaseMetadataProfile#postUpdate()

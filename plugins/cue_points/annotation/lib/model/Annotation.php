@@ -35,7 +35,7 @@ class Annotation extends CuePoint implements IMetadataObject
 	{
 	   $data = null;
 
-	   if($this->getShouldIndexOnEntry())
+	   if($this->getSearchableOnEntry())
 	   {
 	       if($this->getText())
     			$data = $data . $this->getText() . ' ';

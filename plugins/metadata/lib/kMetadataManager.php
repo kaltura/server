@@ -187,7 +187,7 @@ class kMetadataManager
 			$xPathData = $xPaths[$xPath];
 			
 			$profileField->setStatus(MetadataProfileField::STATUS_ACTIVE);
-			$profileField->setMetadataProfileVersion($metadataProfile->getVersion());
+			$profileField->setMetadataProfileVersion($metadataProfile->getFileSyncVersion());
 			if(isset($xPathData['name']))
 				$profileField->setKey($xPathData['name']);
 			if(isset($xPathData['label']))
