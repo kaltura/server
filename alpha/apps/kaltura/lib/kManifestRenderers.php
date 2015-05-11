@@ -235,7 +235,7 @@ class kSingleUrlManifestRenderer extends kManifestRenderer
 		if($urlPrefix !== null)
 		{
 			$url = self::urlJoin($urlPrefix, $url);
-			unset($urlPrefix);	// no longer need the prefix
+			unset($this->flavor['urlPrefix']);	// no longer need the prefix
 		}
 		
 		$this->flavor['url'] = $url;
