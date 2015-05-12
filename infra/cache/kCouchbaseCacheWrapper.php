@@ -415,18 +415,18 @@ class kCouchbaseCacheWrapper extends kBaseCacheWrapper
 	 */
 	protected function doInit($config)
 	{
-		$cluster = new CouchbaseCluster($config->dsn, $config->username, $config->password);
-		$this->bucket = $cluster->openBucket($config->name);
+		$cluster = new CouchbaseCluster($config['dsn'], $config['username'], $config['password']);
+		$this->bucket = $cluster->openBucket($config['name']);
 		
-		if($config->properties)
+		if(isset($config['properties']))
 		{
-			foreach($config->properties as $propertyName => $propertyValue)
+			foreach($config['properties'] as $propertyName => $propertyValue)
 				$this->bucket->$propertyName = $propertyValue;
 		}
 	
-		if($config->views)
+		if(isset($config['views']))
 		{
-			foreach($config->views as $view => $viewConfig)
+			foreach($config['views'] as $view => $viewConfig)
 			{
 				list($designDocumentName, $viewName) = explode(',', $viewConfig, 2);
 				$this->views[$view] = array(
@@ -442,8 +442,15 @@ class kCouchbaseCacheWrapper extends kBaseCacheWrapper
 	 */
 	protected function doGet($key)
 	{
-		$meta = $this->bucket->get($key);
-		return $meta->value;
+		try
+		{
+			$meta = $this->bucket->get($key);
+			return $meta->value;
+		}
+		catch(CouchbaseException $e)
+		{
+		}
+		return false;
 	}
 	
 	/* (non-PHPdoc)
@@ -451,12 +458,19 @@ class kCouchbaseCacheWrapper extends kBaseCacheWrapper
 	 */
 	protected function doMultiGet($keys)
 	{
-		$metas = $this->bucket->get($keys);
-		$values = array();
-		foreach($metas as $meta)
-			$values[] = $meta->value;
-			
-		return $values;
+		try
+		{
+			$metas = $this->bucket->get($keys);
+			$values = array();
+			foreach($metas as $meta)
+				$values[] = $meta->value;
+				
+			return $values;
+		}
+		catch(CouchbaseException $e)
+		{
+		}
+		return false;
 	}
 	
 	/* (non-PHPdoc)
@@ -497,9 +511,15 @@ class kCouchbaseCacheWrapper extends kBaseCacheWrapper
 	 */
 	protected function doDelete($key)
 	{
-		$meta = $this->bucket->remove($key);
-		
-		return is_null($meta->error);
+		try
+		{
+			$meta = $this->bucket->remove($key);
+			return is_null($meta->error);
+		}
+		catch(CouchbaseException $e)
+		{
+		}
+		return false;
 	}
 
 	/**
@@ -509,11 +529,18 @@ class kCouchbaseCacheWrapper extends kBaseCacheWrapper
 	 */
 	public function replace($key, $var, $expiry = 0)
 	{
-		$meta = $this->bucket->replace($key, $var, array(
-			'expiry' => $expiry
-		));
-		
-		return is_null($meta->error);
+		try
+		{
+			$meta = $this->bucket->replace($key, $var, array(
+				'expiry' => $expiry
+			));
+			
+			return is_null($meta->error);
+		}
+		catch(CouchbaseException $e)
+		{
+		}
+		return false;
 	}
 
 	/**
@@ -522,8 +549,15 @@ class kCouchbaseCacheWrapper extends kBaseCacheWrapper
 	 */
 	public function append($key, $var)
 	{
-		$meta = $this->bucket->append($key, $var);
-		$meta->value;
+		try
+		{
+			$meta = $this->bucket->append($key, $var);
+			return $meta->value;
+		}
+		catch(CouchbaseException $e)
+		{
+		}
+		return false;
 	}
 
 	/**
@@ -532,8 +566,15 @@ class kCouchbaseCacheWrapper extends kBaseCacheWrapper
 	 */
 	public function prepend($key, $var)
 	{
-		$meta = $this->bucket->prepend($key, $var);
-		$meta->value;
+		try
+		{
+			$meta = $this->bucket->prepend($key, $var);
+			return $meta->value;
+		}
+		catch(CouchbaseException $e)
+		{
+		}
+		return false;
 	}
 
 	/**
@@ -542,8 +583,15 @@ class kCouchbaseCacheWrapper extends kBaseCacheWrapper
 	 */
 	public function getAndTouch($key)
 	{
-		$meta = $this->bucket->get($key);
-		return $meta->value;
+		try
+		{
+			$meta = $this->bucket->get($key);
+			return $meta->value;
+		}
+		catch(CouchbaseException $e)
+		{
+		}
+		return false;
 	}
 
 	/**
@@ -552,9 +600,15 @@ class kCouchbaseCacheWrapper extends kBaseCacheWrapper
 	 */
 	public function multiDelete(array $keys)
 	{
-		$meta = $this->bucket->remove($keys);
-		
-		return is_null($meta->error);
+		try
+		{
+			$meta = $this->bucket->remove($keys);
+			return is_null($meta->error);
+		}
+		catch(CouchbaseException $e)
+		{
+		}
+		return false;
 	}
 
 	/**
@@ -563,12 +617,19 @@ class kCouchbaseCacheWrapper extends kBaseCacheWrapper
 	 */
 	public function multiGetAndTouch(array $keys)
 	{
-		$metas = $this->bucket->get($keys);
-		$values = array();
-		foreach($metas as $meta)
-			$values[] = $meta->value;
-			
-		return $values;
+		try
+		{
+			$metas = $this->bucket->get($keys);
+			$values = array();
+			foreach($metas as $meta)
+				$values[] = $meta->value;
+				
+			return $values;
+		}
+		catch(CouchbaseException $e)
+		{
+		}
+		return false;
 	}
 
 	/**
