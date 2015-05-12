@@ -13,7 +13,6 @@
  * @package plugins.metadata
  * @subpackage model
  */
-use Kaltura\Client\Plugin\Metadata\Enum\MetadataObjectType;
 class MetadataPeer extends BaseMetadataPeer implements IRelatedObjectPeer
 {
 	public static function setDefaultCriteriaFilter()
