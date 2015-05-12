@@ -566,28 +566,25 @@ class Kaltura_Client_ClientBase
 	 */
 	public function validateObjectType($resultObject, $objectType)
 	{
-		if (is_object($resultObject))
+		$knownNativeTypes = array("boolean", "integer", "double", "string");
+		if (is_null($resultObject) ||
+			( in_array(gettype($resultObject) ,$knownNativeTypes) &&
+			  in_array($objectType, $knownNativeTypes) ) )
 		{
-			if (!($resultObject instanceof $objectType))
-				throw new Kaltura_Client_ClientException("Invalid object type", Kaltura_Client_ClientException::ERROR_INVALID_OBJECT_TYPE);
+			return;// we do not check native simple types
 		}
-		else if( $objectType != 'string')
+		else if ( is_object($resultObject) )
 		{
-			switch ($objectType)
-			{
-				case "integer":
-					$resStringVal = strval(intval($resultObject));
-					break;
-				case "float":
-					$resStringVal = strval(floatval($resultObject));
-					break;
-				default:
-					$resStringVal = $resultObject;
+			if (!($resultObject instanceof $objectType)){
+				throw new Kaltura_Client_ClientException("Invalid object type - not instance of $objectType", Kaltura_Client_ClientException::ERROR_INVALID_OBJECT_TYPE);
 			}
-			if ($resStringVal != $resultObject)
-				throw new Kaltura_Client_ClientException("Invalid object type [" . gettype($resultObject) . "] expected [$objectType]", Kaltura_Client_ClientException::ERROR_INVALID_OBJECT_TYPE);
+		}
+		else if(gettype($resultObject) !== $objectType)
+		{
+			throw new Kaltura_Client_ClientException("Invalid object type", Kaltura_Client_ClientException::ERROR_INVALID_OBJECT_TYPE);
 		}
 	}
+
 
 	public function startMultiRequest()
 	{

@@ -512,7 +512,10 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 			
 			if ($resultType == 'int')
 				$resultType = "integer";
-				
+
+			if ($resultType == 'bigint')
+				$resultType = "double";
+
 			if ($resultType == 'bool')
 				$this->appendLine("		\$resultObject = (bool) \$resultObject;");
 			else
