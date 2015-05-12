@@ -220,7 +220,7 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 
 		foreach($cuePoints as $cuePoint)
 		{
-			$cuePoint->reload();
+			$cuePoint->setStatus(CuePointStatus::DELETED);
 			$cuePoint->indexToSearchIndex();
 			kEventsManager::raiseEvent(new kObjectDeletedEvent($cuePoint));
 		}
