@@ -2,7 +2,7 @@
 
 
 /**
- * This class defines the structure of the 'metadata_profile' table.
+ * This class defines the structure of the 'user_entry' table.
  *
  *
  *
@@ -11,15 +11,15 @@
  * ORDER BY clause to know whether it needs to apply SQL to make the ORDER BY case-insensitive
  * (i.e. if it's a text column type).
  *
- * @package plugins.metadata
+ * @package Core
  * @subpackage model.map
  */
-class MetadataProfileTableMap extends TableMap {
+class UserEntryTableMap extends TableMap {
 
 	/**
 	 * The (dot-path) name of this class
 	 */
-	const CLASS_NAME = 'plugins.metadata.MetadataProfileTableMap';
+	const CLASS_NAME = 'Core.UserEntryTableMap';
 
 	/**
 	 * Initialize the table attributes, columns and validators
@@ -31,25 +31,20 @@ class MetadataProfileTableMap extends TableMap {
 	public function initialize()
 	{
 	  // attributes
-		$this->setName('metadata_profile');
-		$this->setPhpName('MetadataProfile');
-		$this->setClassname('MetadataProfile');
-		$this->setPackage('plugins.metadata');
+		$this->setName('user_entry');
+		$this->setPhpName('UserEntry');
+		$this->setClassname('UserEntry');
+		$this->setPackage('Core');
 		$this->setUseIdGenerator(true);
 		// columns
 		$this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
+		$this->addForeignKey('ENTRY_ID', 'EntryId', 'VARCHAR', 'entry', 'ID', true, 20, null);
+		$this->addForeignKey('KUSER_ID', 'KuserId', 'INTEGER', 'kuser', 'ID', true, null, null);
+		$this->addColumn('PARTNER_ID', 'PartnerId', 'INTEGER', false, null, null);
 		$this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
 		$this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
-		$this->addColumn('VERSION', 'Version', 'INTEGER', false, null, null);
-		$this->addColumn('FILE_SYNC_VERSION', 'FileSyncVersion', 'INTEGER', false, null, null);
-		$this->addColumn('VIEWS_VERSION', 'ViewsVersion', 'INTEGER', false, null, null);
-		$this->addColumn('PARTNER_ID', 'PartnerId', 'INTEGER', false, null, null);
-		$this->addColumn('NAME', 'Name', 'VARCHAR', false, 31, null);
-		$this->addColumn('SYSTEM_NAME', 'SystemName', 'VARCHAR', false, 127, null);
-		$this->addColumn('DESCRIPTION', 'Description', 'VARCHAR', false, 255, null);
-		$this->addColumn('STATUS', 'Status', 'TINYINT', false, null, null);
-		$this->addColumn('OBJECT_TYPE', 'ObjectType', 'INTEGER', false, null, null);
-		$this->addColumn('CREATE_MODE', 'CreateMode', 'INTEGER', false, null, null);
+		$this->addColumn('STATUS', 'Status', 'INTEGER', false, null, null);
+		$this->addColumn('TYPE', 'Type', 'INTEGER', false, null, null);
 		$this->addColumn('CUSTOM_DATA', 'CustomData', 'LONGVARCHAR', false, null, null);
 		// validators
 	} // initialize()
@@ -59,6 +54,8 @@ class MetadataProfileTableMap extends TableMap {
 	 */
 	public function buildRelations()
 	{
+    $this->addRelation('entry', 'entry', RelationMap::MANY_TO_ONE, array('entry_id' => 'id', ), null, null);
+    $this->addRelation('kuser', 'kuser', RelationMap::MANY_TO_ONE, array('kuser_id' => 'id', ), null, null);
 	} // buildRelations()
 
-} // MetadataProfileTableMap
+} // UserEntryTableMap

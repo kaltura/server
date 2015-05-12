@@ -1,21 +1,21 @@
 <?php
 
 /**
- * Base class that represents a row from the 'metadata_profile' table.
+ * Base class that represents a row from the 'user_entry' table.
  *
- * 
+ * Describes the relationship between a specific user and a specific entry
  *
- * @package plugins.metadata
+ * @package Core
  * @subpackage model.om
  */
-abstract class BaseMetadataProfile extends BaseObject  implements Persistent {
+abstract class BaseUserEntry extends BaseObject  implements Persistent {
 
 
 	/**
 	 * The Peer class.
 	 * Instance provides a convenient way of calling static methods on a class
 	 * that calling code may not be able to identify.
-	 * @var        MetadataProfilePeer
+	 * @var        UserEntryPeer
 	 */
 	protected static $peer;
 
@@ -24,6 +24,24 @@ abstract class BaseMetadataProfile extends BaseObject  implements Persistent {
 	 * @var        int
 	 */
 	protected $id;
+
+	/**
+	 * The value for the entry_id field.
+	 * @var        string
+	 */
+	protected $entry_id;
+
+	/**
+	 * The value for the kuser_id field.
+	 * @var        int
+	 */
+	protected $kuser_id;
+
+	/**
+	 * The value for the partner_id field.
+	 * @var        int
+	 */
+	protected $partner_id;
 
 	/**
 	 * The value for the created_at field.
@@ -38,70 +56,32 @@ abstract class BaseMetadataProfile extends BaseObject  implements Persistent {
 	protected $updated_at;
 
 	/**
-	 * The value for the version field.
-	 * @var        int
-	 */
-	protected $version;
-
-	/**
-	 * The value for the file_sync_version field.
-	 * @var        int
-	 */
-	protected $file_sync_version;
-
-	/**
-	 * The value for the views_version field.
-	 * @var        int
-	 */
-	protected $views_version;
-
-	/**
-	 * The value for the partner_id field.
-	 * @var        int
-	 */
-	protected $partner_id;
-
-	/**
-	 * The value for the name field.
-	 * @var        string
-	 */
-	protected $name;
-
-	/**
-	 * The value for the system_name field.
-	 * @var        string
-	 */
-	protected $system_name;
-
-	/**
-	 * The value for the description field.
-	 * @var        string
-	 */
-	protected $description;
-
-	/**
 	 * The value for the status field.
 	 * @var        int
 	 */
 	protected $status;
 
 	/**
-	 * The value for the object_type field.
+	 * The value for the type field.
 	 * @var        int
 	 */
-	protected $object_type;
-
-	/**
-	 * The value for the create_mode field.
-	 * @var        int
-	 */
-	protected $create_mode;
+	protected $type;
 
 	/**
 	 * The value for the custom_data field.
 	 * @var        string
 	 */
 	protected $custom_data;
+
+	/**
+	 * @var        entry
+	 */
+	protected $aentry;
+
+	/**
+	 * @var        kuser
+	 */
+	protected $akuser;
 
 	/**
 	 * Flag to prevent endless save loop, if this object is referenced
@@ -156,6 +136,36 @@ abstract class BaseMetadataProfile extends BaseObject  implements Persistent {
 	public function getId()
 	{
 		return $this->id;
+	}
+
+	/**
+	 * Get the [entry_id] column value.
+	 * 
+	 * @return     string
+	 */
+	public function getEntryId()
+	{
+		return $this->entry_id;
+	}
+
+	/**
+	 * Get the [kuser_id] column value.
+	 * 
+	 * @return     int
+	 */
+	public function getKuserId()
+	{
+		return $this->kuser_id;
+	}
+
+	/**
+	 * Get the [partner_id] column value.
+	 * 
+	 * @return     int
+	 */
+	public function getPartnerId()
+	{
+		return $this->partner_id;
 	}
 
 	/**
@@ -239,76 +249,6 @@ abstract class BaseMetadataProfile extends BaseObject  implements Persistent {
 	}
 
 	/**
-	 * Get the [version] column value.
-	 * 
-	 * @return     int
-	 */
-	public function getVersion()
-	{
-		return $this->version;
-	}
-
-	/**
-	 * Get the [file_sync_version] column value.
-	 * 
-	 * @return     int
-	 */
-	public function getFileSyncVersion()
-	{
-		return $this->file_sync_version;
-	}
-
-	/**
-	 * Get the [views_version] column value.
-	 * 
-	 * @return     int
-	 */
-	public function getViewsVersion()
-	{
-		return $this->views_version;
-	}
-
-	/**
-	 * Get the [partner_id] column value.
-	 * 
-	 * @return     int
-	 */
-	public function getPartnerId()
-	{
-		return $this->partner_id;
-	}
-
-	/**
-	 * Get the [name] column value.
-	 * 
-	 * @return     string
-	 */
-	public function getName()
-	{
-		return $this->name;
-	}
-
-	/**
-	 * Get the [system_name] column value.
-	 * 
-	 * @return     string
-	 */
-	public function getSystemName()
-	{
-		return $this->system_name;
-	}
-
-	/**
-	 * Get the [description] column value.
-	 * 
-	 * @return     string
-	 */
-	public function getDescription()
-	{
-		return $this->description;
-	}
-
-	/**
 	 * Get the [status] column value.
 	 * 
 	 * @return     int
@@ -319,23 +259,13 @@ abstract class BaseMetadataProfile extends BaseObject  implements Persistent {
 	}
 
 	/**
-	 * Get the [object_type] column value.
+	 * Get the [type] column value.
 	 * 
 	 * @return     int
 	 */
-	public function getObjectType()
+	public function getType()
 	{
-		return $this->object_type;
-	}
-
-	/**
-	 * Get the [create_mode] column value.
-	 * 
-	 * @return     int
-	 */
-	public function getCreateMode()
-	{
-		return $this->create_mode;
+		return $this->type;
 	}
 
 	/**
@@ -352,12 +282,12 @@ abstract class BaseMetadataProfile extends BaseObject  implements Persistent {
 	 * Set the value of [id] column.
 	 * 
 	 * @param      int $v new value
-	 * @return     MetadataProfile The current object (for fluent API support)
+	 * @return     UserEntry The current object (for fluent API support)
 	 */
 	public function setId($v)
 	{
-		if(!isset($this->oldColumnsValues[MetadataProfilePeer::ID]))
-			$this->oldColumnsValues[MetadataProfilePeer::ID] = $this->id;
+		if(!isset($this->oldColumnsValues[UserEntryPeer::ID]))
+			$this->oldColumnsValues[UserEntryPeer::ID] = $this->id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -365,18 +295,95 @@ abstract class BaseMetadataProfile extends BaseObject  implements Persistent {
 
 		if ($this->id !== $v) {
 			$this->id = $v;
-			$this->modifiedColumns[] = MetadataProfilePeer::ID;
+			$this->modifiedColumns[] = UserEntryPeer::ID;
 		}
 
 		return $this;
 	} // setId()
 
 	/**
+	 * Set the value of [entry_id] column.
+	 * 
+	 * @param      string $v new value
+	 * @return     UserEntry The current object (for fluent API support)
+	 */
+	public function setEntryId($v)
+	{
+		if(!isset($this->oldColumnsValues[UserEntryPeer::ENTRY_ID]))
+			$this->oldColumnsValues[UserEntryPeer::ENTRY_ID] = $this->entry_id;
+
+		if ($v !== null) {
+			$v = (string) $v;
+		}
+
+		if ($this->entry_id !== $v) {
+			$this->entry_id = $v;
+			$this->modifiedColumns[] = UserEntryPeer::ENTRY_ID;
+		}
+
+		if ($this->aentry !== null && $this->aentry->getId() !== $v) {
+			$this->aentry = null;
+		}
+
+		return $this;
+	} // setEntryId()
+
+	/**
+	 * Set the value of [kuser_id] column.
+	 * 
+	 * @param      int $v new value
+	 * @return     UserEntry The current object (for fluent API support)
+	 */
+	public function setKuserId($v)
+	{
+		if(!isset($this->oldColumnsValues[UserEntryPeer::KUSER_ID]))
+			$this->oldColumnsValues[UserEntryPeer::KUSER_ID] = $this->kuser_id;
+
+		if ($v !== null) {
+			$v = (int) $v;
+		}
+
+		if ($this->kuser_id !== $v) {
+			$this->kuser_id = $v;
+			$this->modifiedColumns[] = UserEntryPeer::KUSER_ID;
+		}
+
+		if ($this->akuser !== null && $this->akuser->getId() !== $v) {
+			$this->akuser = null;
+		}
+
+		return $this;
+	} // setKuserId()
+
+	/**
+	 * Set the value of [partner_id] column.
+	 * 
+	 * @param      int $v new value
+	 * @return     UserEntry The current object (for fluent API support)
+	 */
+	public function setPartnerId($v)
+	{
+		if(!isset($this->oldColumnsValues[UserEntryPeer::PARTNER_ID]))
+			$this->oldColumnsValues[UserEntryPeer::PARTNER_ID] = $this->partner_id;
+
+		if ($v !== null) {
+			$v = (int) $v;
+		}
+
+		if ($this->partner_id !== $v) {
+			$this->partner_id = $v;
+			$this->modifiedColumns[] = UserEntryPeer::PARTNER_ID;
+		}
+
+		return $this;
+	} // setPartnerId()
+
+	/**
 	 * Sets the value of [created_at] column to a normalized version of the date/time value specified.
 	 * 
 	 * @param      mixed $v string, integer (timestamp), or DateTime value.  Empty string will
 	 *						be treated as NULL for temporal objects.
-	 * @return     MetadataProfile The current object (for fluent API support)
+	 * @return     UserEntry The current object (for fluent API support)
 	 */
 	public function setCreatedAt($v)
 	{
@@ -413,7 +420,7 @@ abstract class BaseMetadataProfile extends BaseObject  implements Persistent {
 					)
 			{
 				$this->created_at = ($dt ? $dt->format('Y-m-d H:i:s') : null);
-				$this->modifiedColumns[] = MetadataProfilePeer::CREATED_AT;
+				$this->modifiedColumns[] = UserEntryPeer::CREATED_AT;
 			}
 		} // if either are not null
 
@@ -425,7 +432,7 @@ abstract class BaseMetadataProfile extends BaseObject  implements Persistent {
 	 * 
 	 * @param      mixed $v string, integer (timestamp), or DateTime value.  Empty string will
 	 *						be treated as NULL for temporal objects.
-	 * @return     MetadataProfile The current object (for fluent API support)
+	 * @return     UserEntry The current object (for fluent API support)
 	 */
 	public function setUpdatedAt($v)
 	{
@@ -462,7 +469,7 @@ abstract class BaseMetadataProfile extends BaseObject  implements Persistent {
 					)
 			{
 				$this->updated_at = ($dt ? $dt->format('Y-m-d H:i:s') : null);
-				$this->modifiedColumns[] = MetadataProfilePeer::UPDATED_AT;
+				$this->modifiedColumns[] = UserEntryPeer::UPDATED_AT;
 			}
 		} // if either are not null
 
@@ -470,176 +477,15 @@ abstract class BaseMetadataProfile extends BaseObject  implements Persistent {
 	} // setUpdatedAt()
 
 	/**
-	 * Set the value of [version] column.
-	 * 
-	 * @param      int $v new value
-	 * @return     MetadataProfile The current object (for fluent API support)
-	 */
-	public function setVersion($v)
-	{
-		if(!isset($this->oldColumnsValues[MetadataProfilePeer::VERSION]))
-			$this->oldColumnsValues[MetadataProfilePeer::VERSION] = $this->version;
-
-		if ($v !== null) {
-			$v = (int) $v;
-		}
-
-		if ($this->version !== $v) {
-			$this->version = $v;
-			$this->modifiedColumns[] = MetadataProfilePeer::VERSION;
-		}
-
-		return $this;
-	} // setVersion()
-
-	/**
-	 * Set the value of [file_sync_version] column.
-	 * 
-	 * @param      int $v new value
-	 * @return     MetadataProfile The current object (for fluent API support)
-	 */
-	public function setFileSyncVersion($v)
-	{
-		if(!isset($this->oldColumnsValues[MetadataProfilePeer::FILE_SYNC_VERSION]))
-			$this->oldColumnsValues[MetadataProfilePeer::FILE_SYNC_VERSION] = $this->file_sync_version;
-
-		if ($v !== null) {
-			$v = (int) $v;
-		}
-
-		if ($this->file_sync_version !== $v) {
-			$this->file_sync_version = $v;
-			$this->modifiedColumns[] = MetadataProfilePeer::FILE_SYNC_VERSION;
-		}
-
-		return $this;
-	} // setFileSyncVersion()
-
-	/**
-	 * Set the value of [views_version] column.
-	 * 
-	 * @param      int $v new value
-	 * @return     MetadataProfile The current object (for fluent API support)
-	 */
-	public function setViewsVersion($v)
-	{
-		if(!isset($this->oldColumnsValues[MetadataProfilePeer::VIEWS_VERSION]))
-			$this->oldColumnsValues[MetadataProfilePeer::VIEWS_VERSION] = $this->views_version;
-
-		if ($v !== null) {
-			$v = (int) $v;
-		}
-
-		if ($this->views_version !== $v) {
-			$this->views_version = $v;
-			$this->modifiedColumns[] = MetadataProfilePeer::VIEWS_VERSION;
-		}
-
-		return $this;
-	} // setViewsVersion()
-
-	/**
-	 * Set the value of [partner_id] column.
-	 * 
-	 * @param      int $v new value
-	 * @return     MetadataProfile The current object (for fluent API support)
-	 */
-	public function setPartnerId($v)
-	{
-		if(!isset($this->oldColumnsValues[MetadataProfilePeer::PARTNER_ID]))
-			$this->oldColumnsValues[MetadataProfilePeer::PARTNER_ID] = $this->partner_id;
-
-		if ($v !== null) {
-			$v = (int) $v;
-		}
-
-		if ($this->partner_id !== $v) {
-			$this->partner_id = $v;
-			$this->modifiedColumns[] = MetadataProfilePeer::PARTNER_ID;
-		}
-
-		return $this;
-	} // setPartnerId()
-
-	/**
-	 * Set the value of [name] column.
-	 * 
-	 * @param      string $v new value
-	 * @return     MetadataProfile The current object (for fluent API support)
-	 */
-	public function setName($v)
-	{
-		if(!isset($this->oldColumnsValues[MetadataProfilePeer::NAME]))
-			$this->oldColumnsValues[MetadataProfilePeer::NAME] = $this->name;
-
-		if ($v !== null) {
-			$v = (string) $v;
-		}
-
-		if ($this->name !== $v) {
-			$this->name = $v;
-			$this->modifiedColumns[] = MetadataProfilePeer::NAME;
-		}
-
-		return $this;
-	} // setName()
-
-	/**
-	 * Set the value of [system_name] column.
-	 * 
-	 * @param      string $v new value
-	 * @return     MetadataProfile The current object (for fluent API support)
-	 */
-	public function setSystemName($v)
-	{
-		if(!isset($this->oldColumnsValues[MetadataProfilePeer::SYSTEM_NAME]))
-			$this->oldColumnsValues[MetadataProfilePeer::SYSTEM_NAME] = $this->system_name;
-
-		if ($v !== null) {
-			$v = (string) $v;
-		}
-
-		if ($this->system_name !== $v) {
-			$this->system_name = $v;
-			$this->modifiedColumns[] = MetadataProfilePeer::SYSTEM_NAME;
-		}
-
-		return $this;
-	} // setSystemName()
-
-	/**
-	 * Set the value of [description] column.
-	 * 
-	 * @param      string $v new value
-	 * @return     MetadataProfile The current object (for fluent API support)
-	 */
-	public function setDescription($v)
-	{
-		if(!isset($this->oldColumnsValues[MetadataProfilePeer::DESCRIPTION]))
-			$this->oldColumnsValues[MetadataProfilePeer::DESCRIPTION] = $this->description;
-
-		if ($v !== null) {
-			$v = (string) $v;
-		}
-
-		if ($this->description !== $v) {
-			$this->description = $v;
-			$this->modifiedColumns[] = MetadataProfilePeer::DESCRIPTION;
-		}
-
-		return $this;
-	} // setDescription()
-
-	/**
 	 * Set the value of [status] column.
 	 * 
 	 * @param      int $v new value
-	 * @return     MetadataProfile The current object (for fluent API support)
+	 * @return     UserEntry The current object (for fluent API support)
 	 */
 	public function setStatus($v)
 	{
-		if(!isset($this->oldColumnsValues[MetadataProfilePeer::STATUS]))
-			$this->oldColumnsValues[MetadataProfilePeer::STATUS] = $this->status;
+		if(!isset($this->oldColumnsValues[UserEntryPeer::STATUS]))
+			$this->oldColumnsValues[UserEntryPeer::STATUS] = $this->status;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -647,63 +493,40 @@ abstract class BaseMetadataProfile extends BaseObject  implements Persistent {
 
 		if ($this->status !== $v) {
 			$this->status = $v;
-			$this->modifiedColumns[] = MetadataProfilePeer::STATUS;
+			$this->modifiedColumns[] = UserEntryPeer::STATUS;
 		}
 
 		return $this;
 	} // setStatus()
 
 	/**
-	 * Set the value of [object_type] column.
+	 * Set the value of [type] column.
 	 * 
 	 * @param      int $v new value
-	 * @return     MetadataProfile The current object (for fluent API support)
+	 * @return     UserEntry The current object (for fluent API support)
 	 */
-	public function setObjectType($v)
+	public function setType($v)
 	{
-		if(!isset($this->oldColumnsValues[MetadataProfilePeer::OBJECT_TYPE]))
-			$this->oldColumnsValues[MetadataProfilePeer::OBJECT_TYPE] = $this->object_type;
+		if(!isset($this->oldColumnsValues[UserEntryPeer::TYPE]))
+			$this->oldColumnsValues[UserEntryPeer::TYPE] = $this->type;
 
 		if ($v !== null) {
 			$v = (int) $v;
 		}
 
-		if ($this->object_type !== $v) {
-			$this->object_type = $v;
-			$this->modifiedColumns[] = MetadataProfilePeer::OBJECT_TYPE;
+		if ($this->type !== $v) {
+			$this->type = $v;
+			$this->modifiedColumns[] = UserEntryPeer::TYPE;
 		}
 
 		return $this;
-	} // setObjectType()
-
-	/**
-	 * Set the value of [create_mode] column.
-	 * 
-	 * @param      int $v new value
-	 * @return     MetadataProfile The current object (for fluent API support)
-	 */
-	public function setCreateMode($v)
-	{
-		if(!isset($this->oldColumnsValues[MetadataProfilePeer::CREATE_MODE]))
-			$this->oldColumnsValues[MetadataProfilePeer::CREATE_MODE] = $this->create_mode;
-
-		if ($v !== null) {
-			$v = (int) $v;
-		}
-
-		if ($this->create_mode !== $v) {
-			$this->create_mode = $v;
-			$this->modifiedColumns[] = MetadataProfilePeer::CREATE_MODE;
-		}
-
-		return $this;
-	} // setCreateMode()
+	} // setType()
 
 	/**
 	 * Set the value of [custom_data] column.
 	 * 
 	 * @param      string $v new value
-	 * @return     MetadataProfile The current object (for fluent API support)
+	 * @return     UserEntry The current object (for fluent API support)
 	 */
 	public function setCustomData($v)
 	{
@@ -713,7 +536,7 @@ abstract class BaseMetadataProfile extends BaseObject  implements Persistent {
 
 		if ($this->custom_data !== $v) {
 			$this->custom_data = $v;
-			$this->modifiedColumns[] = MetadataProfilePeer::CUSTOM_DATA;
+			$this->modifiedColumns[] = UserEntryPeer::CUSTOM_DATA;
 		}
 
 		return $this;
@@ -749,22 +572,20 @@ abstract class BaseMetadataProfile extends BaseObject  implements Persistent {
 	 */
 	public function hydrate($row, $startcol = 0, $rehydrate = false)
 	{
+		// Nullify cached objects
+		$this->m_custom_data = null;
+		
 		try {
 
 			$this->id = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
-			$this->created_at = ($row[$startcol + 1] !== null) ? (string) $row[$startcol + 1] : null;
-			$this->updated_at = ($row[$startcol + 2] !== null) ? (string) $row[$startcol + 2] : null;
-			$this->version = ($row[$startcol + 3] !== null) ? (int) $row[$startcol + 3] : null;
-			$this->file_sync_version = ($row[$startcol + 4] !== null) ? (int) $row[$startcol + 4] : null;
-			$this->views_version = ($row[$startcol + 5] !== null) ? (int) $row[$startcol + 5] : null;
-			$this->partner_id = ($row[$startcol + 6] !== null) ? (int) $row[$startcol + 6] : null;
-			$this->name = ($row[$startcol + 7] !== null) ? (string) $row[$startcol + 7] : null;
-			$this->system_name = ($row[$startcol + 8] !== null) ? (string) $row[$startcol + 8] : null;
-			$this->description = ($row[$startcol + 9] !== null) ? (string) $row[$startcol + 9] : null;
-			$this->status = ($row[$startcol + 10] !== null) ? (int) $row[$startcol + 10] : null;
-			$this->object_type = ($row[$startcol + 11] !== null) ? (int) $row[$startcol + 11] : null;
-			$this->create_mode = ($row[$startcol + 12] !== null) ? (int) $row[$startcol + 12] : null;
-			$this->custom_data = ($row[$startcol + 13] !== null) ? (string) $row[$startcol + 13] : null;
+			$this->entry_id = ($row[$startcol + 1] !== null) ? (string) $row[$startcol + 1] : null;
+			$this->kuser_id = ($row[$startcol + 2] !== null) ? (int) $row[$startcol + 2] : null;
+			$this->partner_id = ($row[$startcol + 3] !== null) ? (int) $row[$startcol + 3] : null;
+			$this->created_at = ($row[$startcol + 4] !== null) ? (string) $row[$startcol + 4] : null;
+			$this->updated_at = ($row[$startcol + 5] !== null) ? (string) $row[$startcol + 5] : null;
+			$this->status = ($row[$startcol + 6] !== null) ? (int) $row[$startcol + 6] : null;
+			$this->type = ($row[$startcol + 7] !== null) ? (int) $row[$startcol + 7] : null;
+			$this->custom_data = ($row[$startcol + 8] !== null) ? (string) $row[$startcol + 8] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -774,10 +595,10 @@ abstract class BaseMetadataProfile extends BaseObject  implements Persistent {
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 14; // 14 = MetadataProfilePeer::NUM_COLUMNS - MetadataProfilePeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 9; // 9 = UserEntryPeer::NUM_COLUMNS - UserEntryPeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
-			throw new PropelException("Error populating MetadataProfile object", $e);
+			throw new PropelException("Error populating UserEntry object", $e);
 		}
 	}
 
@@ -797,6 +618,12 @@ abstract class BaseMetadataProfile extends BaseObject  implements Persistent {
 	public function ensureConsistency()
 	{
 
+		if ($this->aentry !== null && $this->entry_id !== $this->aentry->getId()) {
+			$this->aentry = null;
+		}
+		if ($this->akuser !== null && $this->kuser_id !== $this->akuser->getId()) {
+			$this->akuser = null;
+		}
 	} // ensureConsistency
 
 	/**
@@ -820,17 +647,17 @@ abstract class BaseMetadataProfile extends BaseObject  implements Persistent {
 		}
 
 		if ($con === null) {
-			$con = Propel::getConnection(MetadataProfilePeer::DATABASE_NAME, Propel::CONNECTION_READ);
+			$con = Propel::getConnection(UserEntryPeer::DATABASE_NAME, Propel::CONNECTION_READ);
 		}
 
 		// We don't need to alter the object instance pool; we're just modifying this instance
 		// already in the pool.
 
-		MetadataProfilePeer::setUseCriteriaFilter(false);
+		UserEntryPeer::setUseCriteriaFilter(false);
 		$criteria = $this->buildPkeyCriteria();
-		entryPeer::addSelectColumns($criteria);
+		UserEntryPeer::addSelectColumns($criteria);
 		$stmt = BasePeer::doSelect($criteria, $con);
-		MetadataProfilePeer::setUseCriteriaFilter(true);
+		UserEntryPeer::setUseCriteriaFilter(true);
 		$row = $stmt->fetch(PDO::FETCH_NUM);
 		$stmt->closeCursor();
 		if (!$row) {
@@ -840,6 +667,8 @@ abstract class BaseMetadataProfile extends BaseObject  implements Persistent {
 
 		if ($deep) {  // also de-associate any related objects?
 
+			$this->aentry = null;
+			$this->akuser = null;
 		} // if (deep)
 	}
 
@@ -859,14 +688,14 @@ abstract class BaseMetadataProfile extends BaseObject  implements Persistent {
 		}
 
 		if ($con === null) {
-			$con = Propel::getConnection(MetadataProfilePeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
+			$con = Propel::getConnection(UserEntryPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
 		}
 		
 		$con->beginTransaction();
 		try {
 			$ret = $this->preDelete($con);
 			if ($ret) {
-				MetadataProfilePeer::doDelete($this, $con);
+				UserEntryPeer::doDelete($this, $con);
 				$this->postDelete($con);
 				$this->setDeleted(true);
 				$con->commit();
@@ -899,7 +728,7 @@ abstract class BaseMetadataProfile extends BaseObject  implements Persistent {
 		}
 
 		if ($con === null) {
-			$con = Propel::getConnection(MetadataProfilePeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
+			$con = Propel::getConnection(UserEntryPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
 		}
 		
 		$con->beginTransaction();
@@ -920,12 +749,12 @@ abstract class BaseMetadataProfile extends BaseObject  implements Persistent {
 			for ($retries = 1; $retries < KalturaPDO::SAVE_MAX_RETRIES; $retries++)
 			{
                $affectedRows = $this->doSave($con);
-                if ($affectedRows || !$this->isColumnModified(MetadataProfilePeer::CUSTOM_DATA)) //ask if custom_data wasn't modified to avoid retry with atomic column 
+                if ($affectedRows || !$this->isColumnModified(UserEntryPeer::CUSTOM_DATA)) //ask if custom_data wasn't modified to avoid retry with atomic column 
                 	break;
 
                 KalturaLog::debug("was unable to save! retrying for the $retries time");
                 $criteria = $this->buildPkeyCriteria();
-				$criteria->addSelectColumn(MetadataProfilePeer::CUSTOM_DATA);
+				$criteria->addSelectColumn(UserEntryPeer::CUSTOM_DATA);
                 $stmt = BasePeer::doSelect($criteria, $con);
                 $cutsomDataArr = $stmt->fetchAll(PDO::FETCH_COLUMN);
                 $newCustomData = $cutsomDataArr[0];
@@ -936,6 +765,8 @@ abstract class BaseMetadataProfile extends BaseObject  implements Persistent {
 				$this->m_custom_data = myCustomData::fromString($newCustomData); 
 
 				//set custom data column values we wanted to change to
+				$validUpdate = true;
+				$atomicCustomDataFields = UserEntryPeer::getAtomicCustomDataFields();
 			 	foreach ($this->oldCustomDataValues as $namespace => $namespaceValues){
                 	foreach($namespaceValues as $name => $oldValue)
 					{
@@ -950,11 +781,28 @@ abstract class BaseMetadataProfile extends BaseObject  implements Persistent {
 							$newValue = $valuesToChangeTo[$name];
 						}
 					 
-						if (!is_null($newValue))
+						if (!is_null($newValue)) {
+							$atomicField = false;
+							if($namespace) {
+								$atomicField = array_key_exists($namespace, $atomicCustomDataFields) && in_array($name, $atomicCustomDataFields[$namespace]);
+							} else {
+								$atomicField = in_array($name, $atomicCustomDataFields);
+							}
+							if($atomicField) {
+								$dbValue = $this->m_custom_data->get($name, $namespace);
+								if($oldValue != $dbValue) {
+									$validUpdate = false;
+									break;
+								}
+							}
 							$this->putInCustomData($name, $newValue, $namespace);
+						}
 					}
                    }
                    
+				if(!$validUpdate) 
+					break;
+					                   
 				$this->setCustomData($this->m_custom_data->toString());
 			}
 
@@ -964,7 +812,7 @@ abstract class BaseMetadataProfile extends BaseObject  implements Persistent {
 				$this->postUpdate($con);
 			}
 			$this->postSave($con);
-			MetadataProfilePeer::addInstanceToPool($this);
+			UserEntryPeer::addInstanceToPool($this);
 			
 			$con->commit();
 			return $affectedRows;
@@ -996,15 +844,34 @@ abstract class BaseMetadataProfile extends BaseObject  implements Persistent {
 		if (!$this->alreadyInSave) {
 			$this->alreadyInSave = true;
 
+			// We call the save method on the following object(s) if they
+			// were passed to this object by their coresponding set
+			// method.  This object relates to these object(s) by a
+			// foreign key reference.
+
+			if ($this->aentry !== null) {
+				if ($this->aentry->isModified() || $this->aentry->isNew()) {
+					$affectedRows += $this->aentry->save($con);
+				}
+				$this->setentry($this->aentry);
+			}
+
+			if ($this->akuser !== null) {
+				if ($this->akuser->isModified() || $this->akuser->isNew()) {
+					$affectedRows += $this->akuser->save($con);
+				}
+				$this->setkuser($this->akuser);
+			}
+
 			if ($this->isNew() ) {
-				$this->modifiedColumns[] = MetadataProfilePeer::ID;
+				$this->modifiedColumns[] = UserEntryPeer::ID;
 			}
 
 			// If this object has been modified, then save it to the database.
 			$this->objectSaved = false;
 			if ($this->isModified()) {
 				if ($this->isNew()) {
-					$pk = MetadataProfilePeer::doInsert($this, $con);
+					$pk = UserEntryPeer::doInsert($this, $con);
 					$affectedRows += 1; // we are assuming that there is only 1 row per doInsert() which
 										 // should always be true here (even though technically
 										 // BasePeer::doInsert() can insert multiple rows).
@@ -1014,7 +881,7 @@ abstract class BaseMetadataProfile extends BaseObject  implements Persistent {
 					$this->setNew(false);
 					$this->objectSaved = true;
 				} else {
-					$affectedObjects = MetadataProfilePeer::doUpdate($this, $con);
+					$affectedObjects = UserEntryPeer::doUpdate($this, $con);
 					if($affectedObjects)
 						$this->objectSaved = true;
 						
@@ -1231,7 +1098,25 @@ abstract class BaseMetadataProfile extends BaseObject  implements Persistent {
 			$failureMap = array();
 
 
-			if (($retval = MetadataProfilePeer::doValidate($this, $columns)) !== true) {
+			// We call the validate method on the following object(s) if they
+			// were passed to this object by their coresponding set
+			// method.  This object relates to these object(s) by a
+			// foreign key reference.
+
+			if ($this->aentry !== null) {
+				if (!$this->aentry->validate($columns)) {
+					$failureMap = array_merge($failureMap, $this->aentry->getValidationFailures());
+				}
+			}
+
+			if ($this->akuser !== null) {
+				if (!$this->akuser->validate($columns)) {
+					$failureMap = array_merge($failureMap, $this->akuser->getValidationFailures());
+				}
+			}
+
+
+			if (($retval = UserEntryPeer::doValidate($this, $columns)) !== true) {
 				$failureMap = array_merge($failureMap, $retval);
 			}
 
@@ -1254,7 +1139,7 @@ abstract class BaseMetadataProfile extends BaseObject  implements Persistent {
 	 */
 	public function getByName($name, $type = BasePeer::TYPE_PHPNAME)
 	{
-		$pos = MetadataProfilePeer::translateFieldName($name, $type, BasePeer::TYPE_NUM);
+		$pos = UserEntryPeer::translateFieldName($name, $type, BasePeer::TYPE_NUM);
 		$field = $this->getByPosition($pos);
 		return $field;
 	}
@@ -1273,42 +1158,27 @@ abstract class BaseMetadataProfile extends BaseObject  implements Persistent {
 				return $this->getId();
 				break;
 			case 1:
-				return $this->getCreatedAt();
+				return $this->getEntryId();
 				break;
 			case 2:
-				return $this->getUpdatedAt();
+				return $this->getKuserId();
 				break;
 			case 3:
-				return $this->getVersion();
-				break;
-			case 4:
-				return $this->getFileSyncVersion();
-				break;
-			case 5:
-				return $this->getViewsVersion();
-				break;
-			case 6:
 				return $this->getPartnerId();
 				break;
-			case 7:
-				return $this->getName();
+			case 4:
+				return $this->getCreatedAt();
 				break;
-			case 8:
-				return $this->getSystemName();
+			case 5:
+				return $this->getUpdatedAt();
 				break;
-			case 9:
-				return $this->getDescription();
-				break;
-			case 10:
+			case 6:
 				return $this->getStatus();
 				break;
-			case 11:
-				return $this->getObjectType();
+			case 7:
+				return $this->getType();
 				break;
-			case 12:
-				return $this->getCreateMode();
-				break;
-			case 13:
+			case 8:
 				return $this->getCustomData();
 				break;
 			default:
@@ -1330,22 +1200,17 @@ abstract class BaseMetadataProfile extends BaseObject  implements Persistent {
 	 */
 	public function toArray($keyType = BasePeer::TYPE_PHPNAME, $includeLazyLoadColumns = true)
 	{
-		$keys = MetadataProfilePeer::getFieldNames($keyType);
+		$keys = UserEntryPeer::getFieldNames($keyType);
 		$result = array(
 			$keys[0] => $this->getId(),
-			$keys[1] => $this->getCreatedAt(),
-			$keys[2] => $this->getUpdatedAt(),
-			$keys[3] => $this->getVersion(),
-			$keys[4] => $this->getFileSyncVersion(),
-			$keys[5] => $this->getViewsVersion(),
-			$keys[6] => $this->getPartnerId(),
-			$keys[7] => $this->getName(),
-			$keys[8] => $this->getSystemName(),
-			$keys[9] => $this->getDescription(),
-			$keys[10] => $this->getStatus(),
-			$keys[11] => $this->getObjectType(),
-			$keys[12] => $this->getCreateMode(),
-			$keys[13] => $this->getCustomData(),
+			$keys[1] => $this->getEntryId(),
+			$keys[2] => $this->getKuserId(),
+			$keys[3] => $this->getPartnerId(),
+			$keys[4] => $this->getCreatedAt(),
+			$keys[5] => $this->getUpdatedAt(),
+			$keys[6] => $this->getStatus(),
+			$keys[7] => $this->getType(),
+			$keys[8] => $this->getCustomData(),
 		);
 		return $result;
 	}
@@ -1362,7 +1227,7 @@ abstract class BaseMetadataProfile extends BaseObject  implements Persistent {
 	 */
 	public function setByName($name, $value, $type = BasePeer::TYPE_PHPNAME)
 	{
-		$pos = MetadataProfilePeer::translateFieldName($name, $type, BasePeer::TYPE_NUM);
+		$pos = UserEntryPeer::translateFieldName($name, $type, BasePeer::TYPE_NUM);
 		return $this->setByPosition($pos, $value);
 	}
 
@@ -1381,42 +1246,27 @@ abstract class BaseMetadataProfile extends BaseObject  implements Persistent {
 				$this->setId($value);
 				break;
 			case 1:
-				$this->setCreatedAt($value);
+				$this->setEntryId($value);
 				break;
 			case 2:
-				$this->setUpdatedAt($value);
+				$this->setKuserId($value);
 				break;
 			case 3:
-				$this->setVersion($value);
-				break;
-			case 4:
-				$this->setFileSyncVersion($value);
-				break;
-			case 5:
-				$this->setViewsVersion($value);
-				break;
-			case 6:
 				$this->setPartnerId($value);
 				break;
-			case 7:
-				$this->setName($value);
+			case 4:
+				$this->setCreatedAt($value);
 				break;
-			case 8:
-				$this->setSystemName($value);
+			case 5:
+				$this->setUpdatedAt($value);
 				break;
-			case 9:
-				$this->setDescription($value);
-				break;
-			case 10:
+			case 6:
 				$this->setStatus($value);
 				break;
-			case 11:
-				$this->setObjectType($value);
+			case 7:
+				$this->setType($value);
 				break;
-			case 12:
-				$this->setCreateMode($value);
-				break;
-			case 13:
+			case 8:
 				$this->setCustomData($value);
 				break;
 		} // switch()
@@ -1441,22 +1291,17 @@ abstract class BaseMetadataProfile extends BaseObject  implements Persistent {
 	 */
 	public function fromArray($arr, $keyType = BasePeer::TYPE_PHPNAME)
 	{
-		$keys = MetadataProfilePeer::getFieldNames($keyType);
+		$keys = UserEntryPeer::getFieldNames($keyType);
 
 		if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
-		if (array_key_exists($keys[1], $arr)) $this->setCreatedAt($arr[$keys[1]]);
-		if (array_key_exists($keys[2], $arr)) $this->setUpdatedAt($arr[$keys[2]]);
-		if (array_key_exists($keys[3], $arr)) $this->setVersion($arr[$keys[3]]);
-		if (array_key_exists($keys[4], $arr)) $this->setFileSyncVersion($arr[$keys[4]]);
-		if (array_key_exists($keys[5], $arr)) $this->setViewsVersion($arr[$keys[5]]);
-		if (array_key_exists($keys[6], $arr)) $this->setPartnerId($arr[$keys[6]]);
-		if (array_key_exists($keys[7], $arr)) $this->setName($arr[$keys[7]]);
-		if (array_key_exists($keys[8], $arr)) $this->setSystemName($arr[$keys[8]]);
-		if (array_key_exists($keys[9], $arr)) $this->setDescription($arr[$keys[9]]);
-		if (array_key_exists($keys[10], $arr)) $this->setStatus($arr[$keys[10]]);
-		if (array_key_exists($keys[11], $arr)) $this->setObjectType($arr[$keys[11]]);
-		if (array_key_exists($keys[12], $arr)) $this->setCreateMode($arr[$keys[12]]);
-		if (array_key_exists($keys[13], $arr)) $this->setCustomData($arr[$keys[13]]);
+		if (array_key_exists($keys[1], $arr)) $this->setEntryId($arr[$keys[1]]);
+		if (array_key_exists($keys[2], $arr)) $this->setKuserId($arr[$keys[2]]);
+		if (array_key_exists($keys[3], $arr)) $this->setPartnerId($arr[$keys[3]]);
+		if (array_key_exists($keys[4], $arr)) $this->setCreatedAt($arr[$keys[4]]);
+		if (array_key_exists($keys[5], $arr)) $this->setUpdatedAt($arr[$keys[5]]);
+		if (array_key_exists($keys[6], $arr)) $this->setStatus($arr[$keys[6]]);
+		if (array_key_exists($keys[7], $arr)) $this->setType($arr[$keys[7]]);
+		if (array_key_exists($keys[8], $arr)) $this->setCustomData($arr[$keys[8]]);
 	}
 
 	/**
@@ -1466,22 +1311,17 @@ abstract class BaseMetadataProfile extends BaseObject  implements Persistent {
 	 */
 	public function buildCriteria()
 	{
-		$criteria = new Criteria(MetadataProfilePeer::DATABASE_NAME);
+		$criteria = new Criteria(UserEntryPeer::DATABASE_NAME);
 
-		if ($this->isColumnModified(MetadataProfilePeer::ID)) $criteria->add(MetadataProfilePeer::ID, $this->id);
-		if ($this->isColumnModified(MetadataProfilePeer::CREATED_AT)) $criteria->add(MetadataProfilePeer::CREATED_AT, $this->created_at);
-		if ($this->isColumnModified(MetadataProfilePeer::UPDATED_AT)) $criteria->add(MetadataProfilePeer::UPDATED_AT, $this->updated_at);
-		if ($this->isColumnModified(MetadataProfilePeer::VERSION)) $criteria->add(MetadataProfilePeer::VERSION, $this->version);
-		if ($this->isColumnModified(MetadataProfilePeer::FILE_SYNC_VERSION)) $criteria->add(MetadataProfilePeer::FILE_SYNC_VERSION, $this->file_sync_version);
-		if ($this->isColumnModified(MetadataProfilePeer::VIEWS_VERSION)) $criteria->add(MetadataProfilePeer::VIEWS_VERSION, $this->views_version);
-		if ($this->isColumnModified(MetadataProfilePeer::PARTNER_ID)) $criteria->add(MetadataProfilePeer::PARTNER_ID, $this->partner_id);
-		if ($this->isColumnModified(MetadataProfilePeer::NAME)) $criteria->add(MetadataProfilePeer::NAME, $this->name);
-		if ($this->isColumnModified(MetadataProfilePeer::SYSTEM_NAME)) $criteria->add(MetadataProfilePeer::SYSTEM_NAME, $this->system_name);
-		if ($this->isColumnModified(MetadataProfilePeer::DESCRIPTION)) $criteria->add(MetadataProfilePeer::DESCRIPTION, $this->description);
-		if ($this->isColumnModified(MetadataProfilePeer::STATUS)) $criteria->add(MetadataProfilePeer::STATUS, $this->status);
-		if ($this->isColumnModified(MetadataProfilePeer::OBJECT_TYPE)) $criteria->add(MetadataProfilePeer::OBJECT_TYPE, $this->object_type);
-		if ($this->isColumnModified(MetadataProfilePeer::CREATE_MODE)) $criteria->add(MetadataProfilePeer::CREATE_MODE, $this->create_mode);
-		if ($this->isColumnModified(MetadataProfilePeer::CUSTOM_DATA)) $criteria->add(MetadataProfilePeer::CUSTOM_DATA, $this->custom_data);
+		if ($this->isColumnModified(UserEntryPeer::ID)) $criteria->add(UserEntryPeer::ID, $this->id);
+		if ($this->isColumnModified(UserEntryPeer::ENTRY_ID)) $criteria->add(UserEntryPeer::ENTRY_ID, $this->entry_id);
+		if ($this->isColumnModified(UserEntryPeer::KUSER_ID)) $criteria->add(UserEntryPeer::KUSER_ID, $this->kuser_id);
+		if ($this->isColumnModified(UserEntryPeer::PARTNER_ID)) $criteria->add(UserEntryPeer::PARTNER_ID, $this->partner_id);
+		if ($this->isColumnModified(UserEntryPeer::CREATED_AT)) $criteria->add(UserEntryPeer::CREATED_AT, $this->created_at);
+		if ($this->isColumnModified(UserEntryPeer::UPDATED_AT)) $criteria->add(UserEntryPeer::UPDATED_AT, $this->updated_at);
+		if ($this->isColumnModified(UserEntryPeer::STATUS)) $criteria->add(UserEntryPeer::STATUS, $this->status);
+		if ($this->isColumnModified(UserEntryPeer::TYPE)) $criteria->add(UserEntryPeer::TYPE, $this->type);
+		if ($this->isColumnModified(UserEntryPeer::CUSTOM_DATA)) $criteria->add(UserEntryPeer::CUSTOM_DATA, $this->custom_data);
 
 		return $criteria;
 	}
@@ -1496,29 +1336,29 @@ abstract class BaseMetadataProfile extends BaseObject  implements Persistent {
 	 */
 	public function buildPkeyCriteria()
 	{
-		$criteria = new Criteria(MetadataProfilePeer::DATABASE_NAME);
+		$criteria = new Criteria(UserEntryPeer::DATABASE_NAME);
 
-		$criteria->add(MetadataProfilePeer::ID, $this->id);
+		$criteria->add(UserEntryPeer::ID, $this->id);
 		
 		if($this->alreadyInSave)
 		{
-			if ($this->isColumnModified(MetadataProfilePeer::CUSTOM_DATA))
+			if ($this->isColumnModified(UserEntryPeer::CUSTOM_DATA))
 			{
 				if (!is_null($this->custom_data_md5))
-					$criteria->add(MetadataProfilePeer::CUSTOM_DATA, "MD5(cast(" . MetadataProfilePeer::CUSTOM_DATA . " as char character set latin1)) = '$this->custom_data_md5'", Criteria::CUSTOM);
+					$criteria->add(UserEntryPeer::CUSTOM_DATA, "MD5(cast(" . UserEntryPeer::CUSTOM_DATA . " as char character set latin1)) = '$this->custom_data_md5'", Criteria::CUSTOM);
 					//casting to latin char set to avoid mysql and php md5 difference
 				else 
-					$criteria->add(MetadataProfilePeer::CUSTOM_DATA, NULL, Criteria::ISNULL);
+					$criteria->add(UserEntryPeer::CUSTOM_DATA, NULL, Criteria::ISNULL);
 			}
 			
-			if (count($this->modifiedColumns) == 2 && $this->isColumnModified(MetadataProfilePeer::UPDATED_AT))
+			if (count($this->modifiedColumns) == 2 && $this->isColumnModified(UserEntryPeer::UPDATED_AT))
 			{
 				$theModifiedColumn = null;
 				foreach($this->modifiedColumns as $modifiedColumn)
-					if($modifiedColumn != MetadataProfilePeer::UPDATED_AT)
+					if($modifiedColumn != UserEntryPeer::UPDATED_AT)
 						$theModifiedColumn = $modifiedColumn;
 						
-				$atomicColumns = MetadataProfilePeer::getAtomicColumns();
+				$atomicColumns = UserEntryPeer::getAtomicColumns();
 				if(in_array($theModifiedColumn, $atomicColumns))
 					$criteria->add($theModifiedColumn, $this->getByName($theModifiedColumn, BasePeer::TYPE_COLNAME), Criteria::NOT_EQUAL);
 			}
@@ -1553,36 +1393,26 @@ abstract class BaseMetadataProfile extends BaseObject  implements Persistent {
 	 * If desired, this method can also make copies of all associated (fkey referrers)
 	 * objects.
 	 *
-	 * @param      object $copyObj An object of MetadataProfile (or compatible) type.
+	 * @param      object $copyObj An object of UserEntry (or compatible) type.
 	 * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
 	 * @throws     PropelException
 	 */
 	public function copyInto($copyObj, $deepCopy = false)
 	{
 
+		$copyObj->setEntryId($this->entry_id);
+
+		$copyObj->setKuserId($this->kuser_id);
+
+		$copyObj->setPartnerId($this->partner_id);
+
 		$copyObj->setCreatedAt($this->created_at);
 
 		$copyObj->setUpdatedAt($this->updated_at);
 
-		$copyObj->setVersion($this->version);
-
-		$copyObj->setFileSyncVersion($this->file_sync_version);
-
-		$copyObj->setViewsVersion($this->views_version);
-
-		$copyObj->setPartnerId($this->partner_id);
-
-		$copyObj->setName($this->name);
-
-		$copyObj->setSystemName($this->system_name);
-
-		$copyObj->setDescription($this->description);
-
 		$copyObj->setStatus($this->status);
 
-		$copyObj->setObjectType($this->object_type);
-
-		$copyObj->setCreateMode($this->create_mode);
+		$copyObj->setType($this->type);
 
 		$copyObj->setCustomData($this->custom_data);
 
@@ -1602,7 +1432,7 @@ abstract class BaseMetadataProfile extends BaseObject  implements Persistent {
 	 * objects.
 	 *
 	 * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
-	 * @return     MetadataProfile Clone of current object.
+	 * @return     UserEntry Clone of current object.
 	 * @throws     PropelException
 	 */
 	public function copy($deepCopy = false)
@@ -1618,16 +1448,16 @@ abstract class BaseMetadataProfile extends BaseObject  implements Persistent {
 	/**
 	 * Stores the source object that this object copied from 
 	 *
-	 * @var     MetadataProfile Clone of current object.
+	 * @var     UserEntry Clone of current object.
 	 */
 	protected $copiedFrom = null;
 	
 	/**
 	 * Stores the source object that this object copied from 
 	 *
-	 * @param      MetadataProfile $copiedFrom Clone of current object.
+	 * @param      UserEntry $copiedFrom Clone of current object.
 	 */
-	public function setCopiedFrom(MetadataProfile $copiedFrom)
+	public function setCopiedFrom(UserEntry $copiedFrom)
 	{
 		$this->copiedFrom = $copiedFrom;
 	}
@@ -1639,14 +1469,112 @@ abstract class BaseMetadataProfile extends BaseObject  implements Persistent {
 	 * same instance for all member of this class. The method could therefore
 	 * be static, but this would prevent one from overriding the behavior.
 	 *
-	 * @return     MetadataProfilePeer
+	 * @return     UserEntryPeer
 	 */
 	public function getPeer()
 	{
 		if (self::$peer === null) {
-			self::$peer = new MetadataProfilePeer();
+			self::$peer = new UserEntryPeer();
 		}
 		return self::$peer;
+	}
+
+	/**
+	 * Declares an association between this object and a entry object.
+	 *
+	 * @param      entry $v
+	 * @return     UserEntry The current object (for fluent API support)
+	 * @throws     PropelException
+	 */
+	public function setentry(entry $v = null)
+	{
+		if ($v === null) {
+			$this->setEntryId(NULL);
+		} else {
+			$this->setEntryId($v->getId());
+		}
+
+		$this->aentry = $v;
+
+		// Add binding for other direction of this n:n relationship.
+		// If this object has already been added to the entry object, it will not be re-added.
+		if ($v !== null) {
+			$v->addUserEntry($this);
+		}
+
+		return $this;
+	}
+
+
+	/**
+	 * Get the associated entry object
+	 *
+	 * @param      PropelPDO Optional Connection object.
+	 * @return     entry The associated entry object.
+	 * @throws     PropelException
+	 */
+	public function getentry(PropelPDO $con = null)
+	{
+		if ($this->aentry === null && (($this->entry_id !== "" && $this->entry_id !== null))) {
+			$this->aentry = entryPeer::retrieveByPk($this->entry_id);
+			/* The following can be used additionally to
+			   guarantee the related object contains a reference
+			   to this object.  This level of coupling may, however, be
+			   undesirable since it could result in an only partially populated collection
+			   in the referenced object.
+			   $this->aentry->addUserEntrys($this);
+			 */
+		}
+		return $this->aentry;
+	}
+
+	/**
+	 * Declares an association between this object and a kuser object.
+	 *
+	 * @param      kuser $v
+	 * @return     UserEntry The current object (for fluent API support)
+	 * @throws     PropelException
+	 */
+	public function setkuser(kuser $v = null)
+	{
+		if ($v === null) {
+			$this->setKuserId(NULL);
+		} else {
+			$this->setKuserId($v->getId());
+		}
+
+		$this->akuser = $v;
+
+		// Add binding for other direction of this n:n relationship.
+		// If this object has already been added to the kuser object, it will not be re-added.
+		if ($v !== null) {
+			$v->addUserEntry($this);
+		}
+
+		return $this;
+	}
+
+
+	/**
+	 * Get the associated kuser object
+	 *
+	 * @param      PropelPDO Optional Connection object.
+	 * @return     kuser The associated kuser object.
+	 * @throws     PropelException
+	 */
+	public function getkuser(PropelPDO $con = null)
+	{
+		if ($this->akuser === null && ($this->kuser_id !== null)) {
+			$this->akuser = kuserPeer::retrieveByPk($this->kuser_id);
+			/* The following can be used additionally to
+			   guarantee the related object contains a reference
+			   to this object.  This level of coupling may, however, be
+			   undesirable since it could result in an only partially populated collection
+			   in the referenced object.
+			   $this->akuser->addUserEntrys($this);
+			 */
+		}
+		return $this->akuser;
 	}
 
 	/**
@@ -1663,6 +1591,8 @@ abstract class BaseMetadataProfile extends BaseObject  implements Persistent {
 		if ($deep) {
 		} // if ($deep)
 
+			$this->aentry = null;
+			$this->akuser = null;
 	}
 
 	/* ---------------------- CustomData functions ------------------------- */
@@ -1757,6 +1687,16 @@ abstract class BaseMetadataProfile extends BaseObject  implements Persistent {
 	public function incInCustomData ( $name , $delta = 1, $namespace = null)
 	{
 		$customData = $this->getCustomDataObj( );
+		
+		$currentNamespace = '';
+		if($namespace)
+			$currentNamespace = $namespace;
+			
+		if(!isset($this->oldCustomDataValues[$currentNamespace]))
+			$this->oldCustomDataValues[$currentNamespace] = array();
+		if(!isset($this->oldCustomDataValues[$currentNamespace][$name]))
+			$this->oldCustomDataValues[$currentNamespace][$name] = $customData->get($name, $namespace);
+		
 		return $customData->inc ( $name , $delta , $namespace  );
 	}
 
@@ -1798,4 +1738,4 @@ abstract class BaseMetadataProfile extends BaseObject  implements Persistent {
 	
 	/* ---------------------- CustomData functions ------------------------- */
 	
-} // BaseMetadataProfile
+} // BaseUserEntry

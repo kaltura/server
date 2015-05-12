@@ -21,6 +21,7 @@ class KalturaRequestConfiguration extends KalturaObject
 	/**
 	 * Response profile
 	 * @var KalturaBaseResponseProfile
+	 * @volatile
 	 */
 	public $responseProfile;
 }

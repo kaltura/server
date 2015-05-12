@@ -178,6 +178,12 @@ class Kaltura_Client_ClientBase
 		$this->callsQueue[] = $call;
 	}
 
+	protected function resetRequest()
+	{
+		$this->multiRequestReturnType = null;
+		$this->callsQueue = array();
+	}
+	
 	/**
 	 * Call all API service that are in queue
 	 *
@@ -187,7 +193,7 @@ class Kaltura_Client_ClientBase
 	{
 		if (count($this->callsQueue) == 0)
 		{
-			$this->multiRequestReturnType = null;
+			$this->resetRequest();
 			return null;
 		}
 
@@ -239,6 +245,7 @@ class Kaltura_Client_ClientBase
 		if ($error || ($errorCode != 200 ))
 		{
 			$error .= ". RC : $errorCode";
+			$this->resetRequest();
 			throw new Kaltura_Client_ClientException($error, Kaltura_Client_ClientException::ERROR_GENERIC);
 		}
 		else
@@ -261,10 +268,13 @@ class Kaltura_Client_ClientBase
 
 			if ($this->config->format != self::KALTURA_SERVICE_FORMAT_XML)
 			{
+				$this->resetRequest();
 				throw new Kaltura_Client_ClientException("unsupported format: $postResult", Kaltura_Client_ClientException::ERROR_FORMAT_NOT_SUPPORTED);
 			}
 		}
 
+		$this->resetRequest();
+		
 		$endTime = microtime (true);
 
 		$this->log("execution time for [".$url."]: [" . ($endTime - $startTime) . "]");
@@ -607,7 +617,7 @@ class Kaltura_Client_ClientBase
 			$i++;
 		}
 
-			$this->multiRequestReturnType = null;
+		$this->resetRequest();
 		return $ret;
 	}
 

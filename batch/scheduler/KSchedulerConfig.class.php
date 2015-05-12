@@ -346,5 +346,10 @@ class KSchedulerConfig extends Zend_Config_Ini
 		$taskConfig = $this->taskConfigList[$name];
 		return $taskConfig;
 	}
+
+	public function getLogWorkerInterval()
+	{
+		return $this->logWorkerInterval;
+	}
 }
 

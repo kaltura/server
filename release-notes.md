@@ -1,3 +1,58 @@
+# Jupiter-10.11.0 #
+## New feature- hide template partner uiconfs ##  
+
+- Issue Type: bug fix  
+- Issue ID: https://app2.clarizen.com/Clarizen/6.299216357.130510/
+
+### Configuration ###
+- Add the following permission block to @APP_DIR@/configurations/admin.ini:
+		moduls.hideTemplatePartnerUiConfs.enabled = true  
+        moduls.hideTemplatePartnerUiConfs.permissionType = 2  
+        moduls.hideTemplatePartnerUiConfs.label = "Hide template partner ui-confs from preview&embed menu"  
+        moduls.hideTemplatePartnerUiConfs.permissionName = FEATURE_HIDE_TEMPLATE_PARTNER_UICONFS  
+        moduls.hideTemplatePartnerUiConfs.basePermissionType = 2  
+        moduls.hideTemplatePartnerUiConfs.basePermissionType =  
+        moduls.hideTemplatePartnerUiConfs.basePermissionName =  
+        moduls.hideTemplatePartnerUiConfs.group = GROUP_ENABLE_DISABLE_FEATURES  
+
+
+## Too many logs are written to file on batch ##
+
+- Issue Type: bug fix
+- Issue ID: PLAT-2914
+
+### Configuration ###
+- update batch.ini
+Add the following parameters to the batch.ini [template] configuration
+logWorkerInterval										= 60
+
+
+#### Deployment Scripts ####
+
+None.
+
+#### Known Issues & Limitations ####
+
+None.
+
+## Avoid the need to update many metadata objects ##
+
+- Issue Type: new feature
+- Issue ID: PLAT-1998
+
+### Configuration ###
+
+None.
+
+#### Deployment Scripts ####
+
+- Run mysql -h@db_host@ -u@db_user@ -p@db_pass@ -P3306 kaltura < deployment/updates/sql/2014_11_06_metadata_profile_file_sync_version.sql
+
+#### Known Issues & Limitations ####
+
+None.
+
+
 # Jupiter-10.10.0 #
 ## Support marking file_sync's as directories ##
 
