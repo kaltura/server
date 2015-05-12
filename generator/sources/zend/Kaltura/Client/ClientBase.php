@@ -557,6 +557,29 @@ class Kaltura_Client_ClientBase
 			$this->addParam($params, "$paramName:-", "");
 		}
 	}
+	
+	/**
+	 * Validate the result object and throw exception if its an error
+	 *
+	 * @param object $resultObject
+	 */
+	public function throwExceptionIfError($resultObject)
+	{
+		if ($this->isError($resultObject))
+		{
+			throw new Kaltura_Client_Exception($resultObject["message"], $resultObject["code"], $resultObject["args"]);
+		}
+	}
+	
+	/**
+	 * Checks whether the result object is an error
+	 *
+	 * @param object $resultObject
+	 */
+	public function isError($resultObject)
+	{
+		return (is_array($resultObject) && isset($resultObject["message"]) && isset($resultObject["code"]));
+	}
 
 	/**
 	 * Validate that the passed object type is of the expected type
