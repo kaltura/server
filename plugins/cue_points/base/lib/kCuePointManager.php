@@ -218,9 +218,15 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 		BasePeer::doUpdate($c, $update, $con);
 		CuePointPeer::setUseCriteriaFilter(true);
 
-		foreach($cuePoints as $cuePoint)
+		CuePointPeer::clearInstancePool();
+		$pks = array();
+		foreach( $cuePoints as $cuePoint ) {
+			$pks[] = $cuePoint->getId();
+		}
+		$upadtedCuePoints = CuePointPeer::retrieveByPKsNoFilter($pks);
+
+		foreach( $upadtedCuePoints as $cuePoint )
 		{
-			$cuePoint->reload();
 			$cuePoint->indexToSearchIndex();
 			kEventsManager::raiseEvent(new kObjectDeletedEvent($cuePoint));
 		}
