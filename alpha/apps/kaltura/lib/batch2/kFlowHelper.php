@@ -1910,7 +1910,7 @@ class kFlowHelper
 			asset::ASSET_STATUS_EXPORTING
 		);
 		
-		$unClosedAssets = assetPeer::retrieveReadyByEntryId($asset->getEntryId(), null, $unClosedStatuses);
+		$unClosedAssets = assetPeer::retrieveFlavorsByEntryIdAndStatus($asset->getEntryId(), null, $unClosedStatuses);
 		
 		if(count($unClosedAssets))
 		{
