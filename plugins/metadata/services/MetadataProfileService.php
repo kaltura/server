@@ -197,8 +197,9 @@ class MetadataProfileService extends KalturaBaseService
 			{
 				throw new KalturaAPIException(MetadataErrors::METADATA_UNABLE_TO_TRANSFORM, $e->getMessage());
 			}
-			
+
 			$dbMetadataProfile->save();
+
 		}
 		else if(!is_null($viewsData) && $viewsData != '')
 		{
@@ -438,9 +439,9 @@ class MetadataProfileService extends KalturaBaseService
 		{
 			throw new KalturaAPIException(MetadataErrors::METADATA_UNABLE_TO_TRANSFORM, $e->getMessage());
 		}
-		
+
 		$dbMetadataProfile->save();
-		
+
 		$metadataProfile = new KalturaMetadataProfile();
 		$metadataProfile->fromObject($dbMetadataProfile, $this->getResponseProfile());
 		

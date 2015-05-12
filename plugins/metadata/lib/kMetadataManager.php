@@ -458,13 +458,14 @@ class kMetadataManager
 		if($xsl === true)
 			return;
 
+		if(PermissionPeer::isValidForPartner(MetadataPermissionName::FEATURE_METADATA_NO_TRANSFORMATION, $metadataProfile->getPartnerId()))
+			throw new kXsdException(kXsdException::TRANSFORMATION_REQUIRED);
+
 		$prevVersion = $metadataProfile->getVersion();
 		$metadataProfile->incrementVersion();
 		$newVersion = $metadataProfile->getVersion();
-		
-		if(PermissionPeer::isValidForPartner(MetadataPermissionName::FEATURE_METADATA_NO_TRANSFORMATION, $metadataProfile->getPartnerId()))
-			throw new kXsdException(kXsdException::TRANSFORMATION_REQUIRED);
-			
+		$metadataProfile->save();//save has to be before we create a batch to make sure there is no race-condition where XSD is not updated before the batch runs.
+
 		return self::addTransformMetadataJob($metadataProfile->getPartnerId(), $metadataProfile->getId(), $prevVersion, $newVersion, $xsl);
 	}
 
