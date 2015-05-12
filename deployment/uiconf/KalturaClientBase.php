@@ -346,20 +346,12 @@ class KalturaClientBase
 	 */
 	public function validateObjectType($resultObject, $objectType)
 	{
-		$knownNativeTypes = array("boolean", "integer", "double", "string");
-		if (is_null($resultObject) ||
-			( in_array(gettype($resultObject) ,$knownNativeTypes) &&
-			  in_array($objectType, $knownNativeTypes) ) )
+		if (is_object($resultObject))
 		{
-			return;// we do not check native simple types
+			if (!($resultObject instanceof $objectType))
+				throw new KalturaClientException("Invalid object type", KalturaClientException::ERROR_INVALID_OBJECT_TYPE);
 		}
-		else if ( is_object($resultObject) )
-		{
-			if (!($resultObject instanceof $objectType)){
-				throw new KalturaClientException("Invalid object type - not instance of $objectType", KalturaClientException::ERROR_INVALID_OBJECT_TYPE);
-			}
-		}
-		else if(gettype($resultObject) !== $objectType)
+		else if (gettype($resultObject) !== "NULL" && gettype($resultObject) !== $objectType)
 		{
 			throw new KalturaClientException("Invalid object type", KalturaClientException::ERROR_INVALID_OBJECT_TYPE);
 		}
