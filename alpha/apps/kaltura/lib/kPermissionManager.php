@@ -909,7 +909,7 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 	}
 	
 	/**
-	 * @return string comma seperated current role ids
+	 * @return array current role ids
 	 */
 	public static function getCurrentRoleIds()
 	{

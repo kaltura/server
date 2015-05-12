@@ -118,7 +118,7 @@ class KalturaResponseProfileCacher implements kObjectChangedEventConsumer, kObje
 		$profileKey = self::$responseProfile->getKey();
 		$protocol = infraRequestUtils::getProtocol();
 		$ksType = kCurrentContext::getCurrentSessionType();
-		$userRole = kPermissionManager::getCurrentRoleIds();
+		$userRole = implode('_', kPermissionManager::getCurrentRoleIds());
 		
 		return "rp{$profileKey}_p{$partnerId}_o{$objectType}_i{$objectId}_h{$protocol}_k{$ksType}_u{$userRole}";
 	}
