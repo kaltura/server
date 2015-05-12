@@ -96,8 +96,27 @@ class QuizService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaQuizErrors::PROVIDED_ENTRY_IS_NOT_A_QUIZ, $entryId);
 
 		$quiz = new KalturaQuiz();
-		$quiz = $quiz->fromObject( $kQuiz );
+		$quiz->fromObject( $kQuiz );
 		return $quiz;
+	}
+
+	/**
+	 * List quiz objects by filter and pager
+	 *
+	 * @action list
+	 * @param KalturaQuizFilter $filter
+	 * @param KalturaFilterPager $pager
+	 * @return KalturaQuizListResponse
+	 */
+	function listAction(KalturaQuizFilter $filter = null, KalturaFilterPager $pager = null)
+	{
+		if (!$filter)
+			$filter = new KalturaQuizFilter;
+
+		if (! $pager)
+			$pager = new KalturaFilterPager ();
+
+		return $filter->getListResponse($pager, $this->getResponseProfile());
 	}
 
 	/**

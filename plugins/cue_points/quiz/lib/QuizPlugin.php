@@ -244,7 +244,7 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 	{
 		$quizData = $entry->getFromCustomData( self::QUIZ_DATA );
 
-		if($quizData)
+		if( !is_null($quizData) )
 			$quizData = unserialize($quizData);
 
 		return $quizData;
