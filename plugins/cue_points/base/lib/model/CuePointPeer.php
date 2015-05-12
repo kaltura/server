@@ -179,22 +179,6 @@ class CuePointPeer extends BaseCuePointPeer implements IMetadataPeer
 		self::setUseCriteriaFilter ( true );
 		return $res;
 	}
-
-	/**
-	 * Retrieve multiple objects by pkey.
-	 *
-	 * @param      array $pks List of primary keys
-	 * @param      PropelPDO $con the connection to use
-	 * @throws     PropelException Any exceptions caught during processing will be
-	 *		 rethrown wrapped into a PropelException.
-	 */
-	public static function retrieveByPKsNoFilter($pks, PropelPDO $con = null)
-	{
-		self::setUseCriteriaFilter ( false );
-		$res = self::retrieveByPKs($pks, $con);
-		self::setUseCriteriaFilter ( true );
-		return $res;
-	}
 	
 	public static function validateMetadataObjects($profileField, $objectIds, &$errorMessage)
 	{
