@@ -387,7 +387,7 @@ abstract class KalturaObject
 				if(!$this->relatedObjects)
 				{
 					$this->loadRelatedObjects($responseProfile);
-					KalturaResponseProfileCacher::stop($this);
+					KalturaResponseProfileCacher::stop($srcObj, $this);
 				}
 			}
 		}

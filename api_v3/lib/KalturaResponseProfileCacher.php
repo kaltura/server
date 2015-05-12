@@ -32,6 +32,8 @@ class KalturaResponseProfileCacher implements kObjectChangedEventConsumer, kObje
 			if ($cacheStore)
 				self::$cacheStores[] = $cacheStore;
 		}
+		
+		return self::$cacheStores;
 	}
 	
 	private static function set($key, $value)
@@ -39,6 +41,7 @@ class KalturaResponseProfileCacher implements kObjectChangedEventConsumer, kObje
 		$cacheStores = self::getStores();
 		foreach ($cacheStores as $cacheStore)
 		{
+			KalturaLog::debug("Save store [" . get_class($cacheStore) . "] key [$key] [" . json_encode($value) . "]");
 			$cacheStore->set($key, $value);
 		}
 	}
@@ -48,6 +51,7 @@ class KalturaResponseProfileCacher implements kObjectChangedEventConsumer, kObje
 		$cacheStores = self::getStores();
 		foreach ($cacheStores as $cacheStore)
 		{
+			KalturaLog::debug("Delete store [" . get_class($cacheStore) . "] key [$key]");
 			$cacheStore->delete($key);
 		}
 	}
@@ -58,6 +62,7 @@ class KalturaResponseProfileCacher implements kObjectChangedEventConsumer, kObje
 		$value = null;
 		foreach ($cacheStores as $cacheStore)
 		{
+			KalturaLog::debug("Get store [" . get_class($cacheStore) . "] key [$key]");
 			if($cacheStore instanceof kCouchbaseCacheWrapper)
 			{
 				$value = $cacheStore->getAndTouch($key);
@@ -68,7 +73,10 @@ class KalturaResponseProfileCacher implements kObjectChangedEventConsumer, kObje
 			}
 			
 			if($value)
+			{
+				KalturaLog::debug("Get value [" . json_encode($value) . "]");
 				return $value;
+			}
 		}
 		
 		return null;
@@ -148,6 +156,11 @@ class KalturaResponseProfileCacher implements kObjectChangedEventConsumer, kObje
 	
 	public static function onPersistentObjectLoaded(IBaseObject $object)
 	{
+		if(!self::$cachedObject)
+			return;
+			
+		KalturaLog::debug("Loaded " . get_class($object) . " [" . $object->getId() . "]");
+		
 		$peer = $object->getPeer();
 		if($peer instanceof IRelatedObjectPeer)
 		{
@@ -163,6 +176,10 @@ class KalturaResponseProfileCacher implements kObjectChangedEventConsumer, kObje
 	
 	public static function start(IBaseObject $object, KalturaDetachedResponseProfile $responseProfile)
 	{
+		if(self::$cachedObject)
+			return null;
+			
+		KalturaLog::debug("Start " . get_class($object) . " [" . $object->getId() . "]");
 		$setResponseProfile = (self::$responseProfile != $responseProfile);
 		
 		self::$cachedObject = $object;
@@ -185,10 +202,15 @@ class KalturaResponseProfileCacher implements kObjectChangedEventConsumer, kObje
 			self::set($responseProfileCacheKey, $responseProfile);
 	}
 	
-	public static function stop(KalturaObject $object)
+	public static function stop(IBaseObject $object, KalturaObject $apiObject)
 	{
+		if($object !== self::$cachedObject)
+			return;
+			
+		KalturaLog::debug("Stop " . get_class($apiObject) . " [" . json_encode($apiObject) . "]");
+		
 		$key = self::getObjectSpecificCacheKey();
-		$value = self::getObjectSpecificCacheValue($object);
+		$value = self::getObjectSpecificCacheValue($apiObject);
 		
 		self::set($key, $value);
 		
