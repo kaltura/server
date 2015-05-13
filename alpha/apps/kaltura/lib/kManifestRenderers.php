@@ -323,7 +323,7 @@ class kMultiFlavorManifestRenderer extends kManifestRenderer
 			
 			if($urlPrefix !== null)
 			{
-			    $url = self::urlJoin($urlPrefix, $url);
+				$url = self::urlJoin($urlPrefix, $url);
 				unset($flavor['urlPrefix']);		// no longer need the prefix
 			}
 			
