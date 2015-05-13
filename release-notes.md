@@ -1,9 +1,63 @@
 # Jupiter-10.11.0 #
 
+## Cache response-profile results ##
+
+- Issue Type: optimization
+
+### Couchbase Deployment Instructions ###
+Download Couchbase server and install according to [official instructions](http://www.couchbase.com/nosql-databases/downloads#Couchbase_Server "http://www.couchbase.com/").
+
+#### Server Setup ####
+
+ - Install Couchbase PHP extension: `pecl install couchbase`
+     - Required `php-devel` and `libcouchbase-devel`.
+ - Add couchbase extension in your php.ini file.
+ - Setup Couchbase server [http://@WWW_HOST@:8091](http://@WWW_HOST@:8091 "").
+ - Define username and password to be used later in cache.ini configuration.
+ - Create new data bucket named `ResponseProfile`.
+
+#### Views Setup ####
+
+ - Create design-document: `_design/dev_deploy1`.
+ - Create View: `objectSpecific`:
+```javascript
+	function (doc, meta) {
+	  if (meta.type == "json") {
+	    if(doc.type == "primaryObject"){
+		  emit([doc.partnerId, doc.objectType, doc.objectId], doc.data);
+	    }
+	  }
+	}
+```
+
+ - View Name: `relatedObject`:    
+```javascript
+	function (doc, meta) {
+	  if (meta.type == "json") {
+	    if(doc.type == "relatedObject"){
+		  emit([doc.partnerId, doc.objectType], doc.data);
+	    }
+	  }
+	}
+```
+
+ - Publish the design-document.
+
+### Configuration ###
+- Update configurations/cache.ini under couchbase section to use the username and password you configured for couchbase server.
+
+### Deployment Scripts ###
+None.
+
+### Known Issues & Limitations ###
+None.
+
+
 ## Error when manually dispatching notification template ##
 
 - Issue Type: bug fix
 - Issue ID: PLAT-2387
+
 ### Deployment ###
 
 - Run the following script:  
