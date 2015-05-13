@@ -98,10 +98,13 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 		}
 			
 		if($this->isCachedObject($object))
-			$this->deleteCachedObjects($object);
+			$this->invalidateCachedObject($object);
+			
+		if($this->hasCachedRootObjects($object))
+			$this->invalidateCachedRootObjects($object);
 			
 		if($this->hasCachedRelatedObjects($object))
-			$this->addRecalculateCacheJob($object);
+			$this->addRecalculateRelatedObjectsCacheJob($object);
 			
 		return true;
 	}
@@ -115,6 +118,9 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 			return true;
 			
 		if($this->hasCachedRelatedObjects($object))
+			return true;
+			
+		if($this->hasCachedRootObjects($object))
 			return true;
 			
 		if($this->isCachedObject($object))
@@ -135,10 +141,13 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 		}
 			
 		if($this->isCachedObject($object))
-			$this->deleteCachedObjects($object);
+			$this->invalidateCachedObject($object);
 			
 		if($this->hasCachedRelatedObjects($object))
-			$this->addRecalculateCacheJob($object);
+			$this->addRecalculateRelatedObjectsCacheJob($object);
+			
+		if($this->hasCachedRootObjects($object))
+			$this->invalidateCachedRootObjects($object);
 			
 		return true;
 	}
@@ -154,6 +163,9 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 		if($this->hasCachedRelatedObjects($object))
 			return true;
 			
+		if($this->hasCachedRootObjects($object))
+			return true;
+			
 		if($this->isCachedObject($object))
 			return true;
 			
@@ -166,7 +178,10 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 	public function objectAdded(BaseObject $object, BatchJob $raisedJob = null)
 	{
 		if($this->hasCachedRelatedObjects($object))
-			return $this->addRecalculateCacheJob($object);
+			return $this->addRecalculateRelatedObjectsCacheJob($object);
+			
+		if($this->hasCachedRootObjects($object))
+			$this->invalidateCachedRootObjects($object);
 			
 		return true;
 	}
@@ -177,6 +192,9 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 	public function shouldConsumeAddedEvent(BaseObject $object)
 	{
 		if($this->hasCachedRelatedObjects($object))
+			return true;
+			
+		if($this->hasCachedRootObjects($object))
 			return true;
 			
 		return false;
@@ -207,7 +225,7 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 			{
 				$query = $cacheStore->getNewQuery(kCouchbaseCacheQuery::VIEW_RELATED_OBJECT);
 				$query->addKey('partnerId', $object->getPartnerId());
-				$query->addKey('objectType', get_class($object));
+				$query->addKey('triggerObjectType', get_class($object));
 				$query->setLimit(1);
 				
 				$list = $cacheStore->query($query);
@@ -216,6 +234,27 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 			}
 		}
 		
+		return false;
+	}
+	
+	protected function hasCachedRootObjects(BaseObject $object)
+	{
+		/* @var $object IBaseObject */
+		$peer = $object->getPeer();
+		if(!($peer instanceof IRelatedObjectPeer))
+		{
+			return false;
+		}
+		
+		if($peer->isReferenced($object))
+		{
+			return false;
+		}
+		
+		$roots = $peer->getRootObjects($object);
+		if(count($roots))
+			return true;
+			
 		return false;
 	}
 	
@@ -242,11 +281,45 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 		return false;
 	}
 	
-	protected function addRecalculateCacheJob(BaseObject $object)
+	protected function addRecalculateRelatedObjectsCacheJob(BaseObject $object)
 	{
-		// TODO
+		// TODO list all ksType, roldIds, protocol that related to this object and create few jobs for each
 	}
 	
+	protected function addRecalculateObjectCacheJob(BaseObject $object)
+	{
+		// TODO just add a job
+	}
+	
+	protected function invalidateCachedRootObjects(BaseObject $object)
+	{
+		/* @var $object IBaseObject */
+		$peer = $object->getPeer();
+		if($peer instanceof IRelatedObjectPeer)
+		{
+			$roots = $peer->getRootObjects($object);
+			if(is_array($roots))
+			{
+				foreach($roots as $root)
+				{
+					$this->invalidateCachedObject($root);
+				}
+			}
+		}
+	}
+	
+	protected function invalidateCachedObject(BaseObject $object)
+	{
+		if(PermissionPeer::isValidForPartner(PermissionName::FEATURE_RECALCULATE_RESPONSE_PROFILE_CACHE, $object->getPartnerId()))
+		{
+			$this->addRecalculateObjectCacheJob($object);
+		}
+		else
+		{
+			$this->deleteCachedObjects($object);
+		}
+	}
+		
 	protected function deleteCachedObjects(BaseObject $object)
 	{
 		/* @var $object IBaseObject */

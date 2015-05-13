@@ -572,4 +572,6 @@ class KalturaErrors extends APIErrors
 	const RESPONSE_PROFILE_DUPLICATE_SYSTEM_NAME = 'RESPONSE_PROFILE_DUPLICATE_SYSTEM_NAME;SYSTEM_NAME;Response profile system-name [@SYSTEM_NAME@] already exists';
 	
 	const RESPONSE_PROFILE_MAX_NESTING_LEVEL = 'RESPONSE_PROFILE_MAX_NESTING_LEVEL;;Response profile cross maximum nesting level';
+	
+	const RESPONSE_PROFILE_CACHE_NOT_FOUND = 'RESPONSE_PROFILE_MAX_NESTING_LEVEL;KEY;Response-Profile key [@KEY@] not found in cache';
 }

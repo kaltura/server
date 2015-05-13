@@ -2,23 +2,41 @@
 
 class kCouchbaseCacheQuery
 {
-	const VIEW_OBJECT_SPECIFIC = 'objectSpecific';
-//	function (doc, meta) {
-//	  if (meta.type == "json") {
-//	    if(doc.type == "primaryObject"){
-//		  emit([doc.partnerId, doc.objectType, doc.objectId], doc.data);
-//	    }
-//	  }
+	const VIEW_RESPONSE_PROFILE_OBJECT_SPECIFIC = 'objectSpecific';
+//function (doc, meta) {
+//	if (meta.type == "json") {
+//		if(doc.type == "primaryObject"){
+//			emit([doc.partnerId, doc.objectType, doc.objectId], doc.data);
+//		}
 //	}
+//}
 
-	const VIEW_RELATED_OBJECT = 'relatedObject';
-//	function (doc, meta) {
-//	  if (meta.type == "json") {
-//	    if(doc.type == "relatedObject"){
-//		  emit([doc.partnerId, doc.objectType], doc.data);
-//	    }
-//	  }
+	const VIEW_RESPONSE_PROFILE_RELATED_OBJECT = 'relatedObject';
+//function (doc, meta) {
+//	if (meta.type == "json") {
+//		if(doc.type == "relatedObject"){
+//			emit([doc.partnerId, doc.triggerObjectType], {
+//				"responseProfileKey": doc.responseProfileKey, 
+//				"objectType": doc.objectType
+//			});
+//		}
 //	}
+//}
+//reduce _count
+
+	const VIEW_RESPONSE_PROFILE_SESSION_TYPE = 'sessionType';
+//function (doc, meta) {
+//	if (meta.type == "json") {
+//		if(doc.type == "primaryObject"){
+//			emit([doc.protocol, doc.ksType, doc.userRole], {
+//				"protocol": doc.protocol, 
+//				"ksType": doc.ksType, 
+//				"userRole": doc.userRole
+//			});
+//		}
+//	}
+//}
+//reduce _count
 	
 	/**
 	 * @var string
