@@ -659,8 +659,8 @@ class kCouchbaseCacheWrapper extends kBaseCacheWrapper
 		if(!isset($this->views[$view]))
 			return null;
 			
+		KalturaLog::debug("Loads query [" . print_r($this->views[$view], true) . "]");
 		list($designDocumentName, $viewName) = $this->views[$view];
-		KalturaLog::debug("Loads query $designDocumentName/$viewName");
 		return new kCouchbaseCacheQuery($designDocumentName, $viewName);
 	}
 
