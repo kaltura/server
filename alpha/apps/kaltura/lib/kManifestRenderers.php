@@ -226,14 +226,15 @@ class kSingleUrlManifestRenderer extends kManifestRenderer
 	{
 		self::normalizeUrlPrefix($this->flavor);
 		$url = $this->flavor['url'];
+		$urlPrefix = isset($this->flavor['urlPrefix']) ? $this->flavor['urlPrefix'] : null;
 		if ($this->tokenizer)
 		{
-			$url = $this->tokenizer->tokenizeSingleUrl($url);
+			$url = $this->tokenizer->tokenizeSingleUrl($url, $urlPrefix);
 		}
 		
-		if(isset($this->flavor['urlPrefix']))
+		if($urlPrefix !== null)
 		{
-			$url = self::urlJoin($this->flavor['urlPrefix'], $url);
+			$url = self::urlJoin($urlPrefix, $url);
 			unset($this->flavor['urlPrefix']);	// no longer need the prefix
 		}
 		
@@ -314,14 +315,15 @@ class kMultiFlavorManifestRenderer extends kManifestRenderer
 		foreach ($this->flavors as &$flavor)
 		{
 			$url = $flavor['url'];
+			$urlPrefix = isset($flavor['urlPrefix']) ? $flavor['urlPrefix'] : null;
 			if ($this->tokenizer)
 			{
-				$url = $this->tokenizer->tokenizeSingleUrl($url);
+				$url = $this->tokenizer->tokenizeSingleUrl($url, $urlPrefix);
 			}
 			
-			if(isset($flavor['urlPrefix']))
+			if($urlPrefix !== null)
 			{
-				$url = self::urlJoin($flavor['urlPrefix'], $url);
+			    $url = self::urlJoin($urlPrefix, $url);
 				unset($flavor['urlPrefix']);		// no longer need the prefix
 			}
 			
