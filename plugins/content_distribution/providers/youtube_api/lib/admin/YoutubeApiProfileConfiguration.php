@@ -39,17 +39,14 @@ class Form_YoutubeApiProfileConfiguration extends Form_ConfigurableProfileConfig
 			'label'			=> 'YouTube Account:',
 			'filters'		=> array('StringTrim'),
 		));
-
-		// General
-		$this->addElement('text', 'password', array(
-			'label'			=> 'YouTube Password:',
-			'filters'		=> array('StringTrim'),
-		));
-								
-//		$this->addMetadataProfile();
 		
+		$this->addElement('checkbox', 'assume_success', array(
+			'label'			=> 'Assume success (synchronous response)',
+			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt')))
+		));
+
 		$this->addDisplayGroup(
-			array('username', 'password'), 
+			array('username', 'assume_success'), 
 			'general', 
 			array('legend' => 'General', 'decorators' => array('FormElements', 'Fieldset'))
 		);

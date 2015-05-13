@@ -3,7 +3,7 @@
  * Enable custom metadata on ad cue point objects
  * @package plugins.cuePoint
  */
-class CuePointMetadataPlugin extends KalturaPlugin implements IKalturaPending, IKalturaSchemaContributor
+class CuePointMetadataPlugin extends KalturaPlugin implements IKalturaPending, IKalturaSchemaContributor, IKalturaSearchDataContributor
 {
 	const PLUGIN_NAME = 'cuePointMetadata';
 	const METADATA_PLUGIN_NAME = 'metadata';
@@ -332,4 +332,23 @@ class CuePointMetadataPlugin extends KalturaPlugin implements IKalturaPending, I
 		
 		return $scene;
 	}
+	
+	/* (non-PHPdoc)
+	 * @see IKalturaSearchDataContributor::getSearchData()
+	 */
+	public static function getSearchData(BaseObject $object)
+	{
+		if($object instanceof CuePoint)
+		{
+			$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaCuePoint');
+			$cuePointCalssName = lcfirst(get_class($object));
+		
+			if(MetadataPlugin::isAllowedPartner($object->getPartnerId() && isset($pluginInstances[$cuePointCalssName]) && $pluginInstances[$cuePointCalssName]::isAllowedPartner($object->getPartnerId())))
+			{
+			    return kMetadataManager::getSearchValuesByObject($object->getMetadataObjectType(), $object->getId());
+			}
+		}
+					
+		return null;
+	}	
 }

@@ -179,6 +179,11 @@ function handleFile($filePath)
 
 				$value = file_get_contents($valueFilePath);
 			}
+			
+			if(preg_match('/^#[^#]+$/', $value))
+			{
+			    $value = kPluginableEnumsManager::genericApiToCore(substr($value, 1));
+			}
 
 			$setters[$setter] = $value;
 		}

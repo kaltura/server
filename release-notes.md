@@ -1,3 +1,108 @@
+# Jupiter-10.11.0 #
+
+## Server support for Q&A feature ##
+
+- Issue Type: new feature
+- Issue ID: PLAT-2850
+
+### Configuration ###
+- update sphinx kaltura.conf:
+	
+		Add the following to kaltura_cue_point index:
+		- rt_attr_uint = is_public
+		- rt_field = plugins_data
+
+#### Deployment Scripts ####
+
+		- Need to re-build & re-index the cue point sphinx table.
+		- run php /op/kaltura/app/deployment/updates/scripts/2015_05_11_create_qAndA_default_schema.php
+
+#### Known Issues & Limitations ####
+
+None.
+
+
+## New feature- hide template partner uiconfs ##
+
+- Issue Type: bug fix  
+- Issue ID: https://app2.clarizen.com/Clarizen/6.299216357.130510/
+
+### Configuration ###
+- Add the following permission block to @APP_DIR@/configurations/admin.ini:
+		moduls.hideTemplatePartnerUiConfs.enabled = true  
+        moduls.hideTemplatePartnerUiConfs.permissionType = 2  
+        moduls.hideTemplatePartnerUiConfs.label = "Hide template partner ui-confs from preview&embed menu"  
+        moduls.hideTemplatePartnerUiConfs.permissionName = FEATURE_HIDE_TEMPLATE_PARTNER_UICONFS  
+        moduls.hideTemplatePartnerUiConfs.basePermissionType = 2  
+        moduls.hideTemplatePartnerUiConfs.basePermissionType =  
+        moduls.hideTemplatePartnerUiConfs.basePermissionName =  
+        moduls.hideTemplatePartnerUiConfs.group = GROUP_ENABLE_DISABLE_FEATURES  
+
+## Error when manually dispatching notification template ##
+
+- Issue Type: bug fix
+- Issue ID: PLAT-2387
+### Deployment ###
+
+- Run the following script:  
+			cd /opt/kaltura/app/tests/standAloneClient  
+			php exec.php commentAddedEnabledForManualDispatch.xml    
+- Delete older email notification from partner 0.
+
+## New feature- hide template partner uiconfs ##
+
+- Issue Type: bug fix  
+- Issue ID: https://app2.clarizen.com/Clarizen/6.299216357.130510/
+
+### Configuration ###
+- Add the following permission block to @APP_DIR@/configurations/admin.ini:
+		moduls.hideTemplatePartnerUiConfs.enabled = true  
+        moduls.hideTemplatePartnerUiConfs.permissionType = 2  
+        moduls.hideTemplatePartnerUiConfs.label = "Hide template partner ui-confs from preview&embed menu"  
+        moduls.hideTemplatePartnerUiConfs.permissionName = FEATURE_HIDE_TEMPLATE_PARTNER_UICONFS  
+        moduls.hideTemplatePartnerUiConfs.basePermissionType = 2  
+        moduls.hideTemplatePartnerUiConfs.basePermissionType =  
+        moduls.hideTemplatePartnerUiConfs.basePermissionName =  
+        moduls.hideTemplatePartnerUiConfs.group = GROUP_ENABLE_DISABLE_FEATURES  
+
+
+## Too many logs are written to file on batch ##
+
+- Issue Type: bug fix
+- Issue ID: PLAT-2914
+
+### Configuration ###
+- update batch.ini
+Add the following parameters to the batch.ini [template] configuration
+logWorkerInterval										= 60
+
+
+#### Deployment Scripts ####
+
+None.
+
+#### Known Issues & Limitations ####
+
+None.
+
+## Avoid the need to update many metadata objects ##
+
+- Issue Type: new feature
+- Issue ID: PLAT-1998
+
+### Configuration ###
+
+None.
+
+#### Deployment Scripts ####
+
+- Run mysql -h@db_host@ -u@db_user@ -p@db_pass@ -P3306 kaltura < deployment/updates/sql/2014_11_06_metadata_profile_file_sync_version.sql
+
+#### Known Issues & Limitations ####
+
+None.
+
+
 # Jupiter-10.10.0 #
 ## Support marking file_sync's as directories ##
 
