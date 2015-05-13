@@ -672,7 +672,7 @@ class kCouchbaseCacheWrapper extends kBaseCacheWrapper
 	 */
 	public function query(kCouchbaseCacheQuery $query)
 	{
-		$meta =  $this->bucket->query($query);
+		$meta =  $this->bucket->query($query->toQuery());
 		return new kCouchbaseCacheList($meta);
 	}
 }
