@@ -154,6 +154,12 @@ class Base
 		$this->callsQueue[] = $call;
 	}
 
+	protected function resetRequest()
+	{
+		$this->multiRequestReturnType = null;
+		$this->callsQueue = array();
+	}
+
 	/**
 	 * Call all API service that are in queue
 	 *
@@ -163,7 +169,7 @@ class Base
 	{
 		if (count($this->callsQueue) == 0)
 		{
-			$this->multiRequestReturnType = null;
+			$this->resetRequest();
 			return null;
 		}
 
@@ -215,6 +221,7 @@ class Base
 		if ($error || ($errorCode != 200 ))
 		{
 			$error .= ". RC : $errorCode";
+			$this->resetRequest();
 			throw new ClientException($error, ClientException::ERROR_GENERIC);
 		}
 		else
@@ -237,9 +244,12 @@ class Base
 
 			if ($this->config->getFormat() != self::KALTURA_SERVICE_FORMAT_XML)
 			{
+				$this->resetRequest();
 				throw new ClientException("unsupported format: $postResult", ClientException::ERROR_FORMAT_NOT_SUPPORTED);
 			}
 		}
+		
+		$this->resetRequest();
 
 		$endTime = microtime (true);
 
@@ -478,14 +488,22 @@ class Base
 	 */
 	public function validateObjectType($resultObject, $objectType)
 	{
-		if (is_object($resultObject))
+		$knownNativeTypes = array("boolean", "integer", "double", "string");
+		if (is_null($resultObject) ||
+			( in_array(gettype($resultObject) ,$knownNativeTypes) &&
+			  in_array($objectType, $knownNativeTypes) ) )
 		{
-			if (!($resultObject instanceof $objectType))
-				throw new ClientException("Invalid object type", ClientException::ERROR_INVALID_OBJECT_TYPE);
+			return;// we do not check native simple types
 		}
-		else if (gettype($resultObject) != "NULL" && gettype($resultObject) != $objectType)
+		else if ( is_object($resultObject) )
 		{
-			throw new ClientException("Invalid object type [" . gettype($resultObject) . "] expected [$objectType]", ClientException::ERROR_INVALID_OBJECT_TYPE);
+			if (!($resultObject instanceof $objectType)){
+				throw new ClientException("Invalid object type - not instance of $objectType", ClientException::ERROR_INVALID_OBJECT_TYPE);
+			}
+		}
+		else if(gettype($resultObject) !== $objectType)
+		{
+			throw new ClientException("Invalid object type", ClientException::ERROR_INVALID_OBJECT_TYPE);
 		}
 	}
 
@@ -517,7 +535,7 @@ class Base
 			$i++;
 		}
 
-		$this->multiRequestReturnType = null;
+		$this->resetRequest();
 		return $ret;
 	}
 

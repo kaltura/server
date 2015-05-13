@@ -59,6 +59,7 @@ class CuePointFilter extends baseObjectFilter
 				"_eq_cue_point_type", 
 				"_in_cue_point_type",
 				"_free_text",
+		        "_eq_is_public",
 			) , NULL );
 
 		$this->allowed_order_fields = array (

@@ -23,7 +23,7 @@ class KalturaEventNotificationScope extends KalturaScope
 		/** @var kEventNotificationScope $objectToFill */
 		$objectToFill = parent::toObject($objectToFill);
 
-		$objectClassName = KalturaPluginManager::getObjectClass('EventNotificationEventObjectType', $this->scopeObjectType);
+		$objectClassName = KalturaPluginManager::getObjectClass('EventNotificationEventObjectType', kPluginableEnumsManager::apiToCore('EventNotificationEventObjectType', $this->scopeObjectType));
 		$peerClass = $objectClassName.'Peer';
 		$objectId = $this->objectId;
 		if (class_exists($peerClass))

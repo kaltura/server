@@ -231,6 +231,9 @@ class Php4ClientGenerator extends ClientGeneratorFromXml
 		
 		if ($resultType == 'int')
 			$resultType = "integer";
+
+		if ($resultType == 'bigint')
+			$resultType = "double";
 			
 		$this->appendLine("		\$this->client->validateObjectType(\$resultObject, \"$resultType\");");
 		$this->appendLine("		return \$resultObject;");
