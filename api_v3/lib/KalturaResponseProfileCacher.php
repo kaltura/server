@@ -242,7 +242,7 @@ class KalturaResponseProfileCacher extends kResponseProfileCacher
 		self::set($key, $value);
 	}
 	
-	protected function recalculateCacheByResponseProfile($partnerId, $objectType, $responseProfileKey, $limit = 100)
+	protected function recalculateCacheBySessionType($partnerId, $objectType, $limit = 100)
 	{
 		/* @var $object IBaseObject */
 		$responseProfile = null;
@@ -251,18 +251,8 @@ class KalturaResponseProfileCacher extends kResponseProfileCacher
 		{
 			if($cacheStore instanceof kCouchbaseCacheWrapper)
 			{
-				if(!$responseProfile)
-				{
-					$responseProfileCacheKey = $this->getResponseProfileCacheKey($responseProfileKey, $partnerId);
-					$value = self::get($responseProfileCacheKey);
-					$responseProfile = self::toApiObject($value);
-					if(!$responseProfile)
-						throw new KalturaAPIException(KalturaErrors::RESPONSE_PROFILE_CACHE_NOT_FOUND, $responseProfileCacheKey);
-				}
-				
-				$query = $cacheStore->getNewQuery(kCouchbaseCacheQuery::VIEW_RESPONSE_PROFILE_OBJECT);
+				$query = $cacheStore->getNewQuery(kCouchbaseCacheQuery::VIEW_RESPONSE_PROFILE_SESSION_TYPE);
 				$query->addKey('partnerId', $partnerId);
-				$query->addKey('responseProfileKey', $responseProfileKey);
 				$query->addKey('objectType', $objectType);
 				$query->setLimit(min(100, $limit));
 
@@ -274,7 +264,7 @@ class KalturaResponseProfileCacher extends kResponseProfileCacher
 					{
 						/* @var $cache kCouchbaseCacheListItem */
 						KalturaLog::debug("Cache object [" . print_r($cache, true) . "]");
-						$this->recalculateCache($cache, $responseProfile);
+						$this->recalculateCache($cache);
 						$recalculated[] = $cache->getId();
 					}
 					
@@ -298,7 +288,7 @@ class KalturaResponseProfileCacher extends kResponseProfileCacher
 		{
 			if($cacheStore instanceof kCouchbaseCacheWrapper)
 			{
-				$query = $cacheStore->getNewQuery(kCouchbaseCacheQuery::VIEW_OBJECT_SPECIFIC);
+				$query = $cacheStore->getNewQuery(kCouchbaseCacheQuery::VIEW_RESPONSE_PROFILE_OBJECT_SPECIFIC);
 				$query->addKey('partnerId', $partnerId);
 				$query->addKey('objectType', $objectType);
 				$query->addKey('objectId', $objectId);

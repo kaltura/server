@@ -223,7 +223,7 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 		{
 			if($cacheStore instanceof kCouchbaseCacheWrapper)
 			{
-				$query = $cacheStore->getNewQuery(kCouchbaseCacheQuery::VIEW_RELATED_OBJECT);
+				$query = $cacheStore->getNewQuery(kCouchbaseCacheQuery::VIEW_RESPONSE_PROFILE_RELATED_OBJECT);
 				$query->addKey('partnerId', $object->getPartnerId());
 				$query->addKey('triggerObjectType', get_class($object));
 				$query->setLimit(1);
@@ -266,7 +266,7 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 		{
 			if($cacheStore instanceof kCouchbaseCacheWrapper)
 			{
-				$query = $cacheStore->getNewQuery(kCouchbaseCacheQuery::VIEW_OBJECT_SPECIFIC);
+				$query = $cacheStore->getNewQuery(kCouchbaseCacheQuery::VIEW_RESPONSE_PROFILE_OBJECT_SPECIFIC);
 				$query->addKey('partnerId', $object->getPartnerId());
 				$query->addKey('objectType', get_class($object));
 				$query->addKey('objectId', $object->getId());
@@ -328,7 +328,7 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 		{
 			if($cacheStore instanceof kCouchbaseCacheWrapper)
 			{
-				$query = $cacheStore->getNewQuery(kCouchbaseCacheQuery::VIEW_OBJECT_SPECIFIC);
+				$query = $cacheStore->getNewQuery(kCouchbaseCacheQuery::VIEW_RESPONSE_PROFILE_OBJECT_SPECIFIC);
 				$query->addKey('partnerId', $object->getPartnerId());
 				$query->addKey('objectType', get_class($object));
 				$query->addKey('objectId', $object->getId());
