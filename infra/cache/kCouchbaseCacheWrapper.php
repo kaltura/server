@@ -28,7 +28,7 @@ class kCouchbaseCacheQuery
 //function (doc, meta) {
 //	if (meta.type == "json") {
 //		if(doc.type == "primaryObject"){
-//			emit([doc.protocol, doc.ksType, doc.userRole], {
+//			emit([doc.partnerId, doc.objectType], {
 //				"protocol": doc.protocol, 
 //				"ksType": doc.ksType, 
 //				"userRole": doc.userRole
@@ -660,6 +660,7 @@ class kCouchbaseCacheWrapper extends kBaseCacheWrapper
 			return null;
 			
 		list($designDocumentName, $viewName) = $this->views[$view];
+		KalturaLog::debug("Loads query $designDocumentName/$viewName");
 		return new kCouchbaseCacheQuery($designDocumentName, $viewName);
 	}
 
