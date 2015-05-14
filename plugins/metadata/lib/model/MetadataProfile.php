@@ -290,4 +290,16 @@ class MetadataProfile extends BaseMetadataProfile implements ISyncableFile
 	    $this->xsltData = $xsltData;
 	}
 
+	public function getFileSyncVersion()
+	{
+		$fileSyncVersion = parent::getFileSyncVersion();
+		if (is_null($fileSyncVersion))
+		{
+			return $this->getVersion();
+		}
+		return $fileSyncVersion;
+
+	}
+
+
 } // MetadataProfile
