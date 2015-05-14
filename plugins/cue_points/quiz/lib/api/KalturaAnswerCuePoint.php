@@ -139,7 +139,7 @@ class KalturaAnswerCuePoint extends KalturaCuePoint
 		QuizPlugin::validateAndGetQuiz($this->entryId);
 		$this->validateParentId();
 
-		//TODO do not allow answer with duplicate answersUserEntryId
+		//TODO do not allow answer with duplicate quizUserEntryId
 	}
 
 	/* (non-PHPdoc)
