@@ -220,6 +220,11 @@ class MetadataProfileService extends KalturaBaseService
 	 */
 	function listAction(KalturaMetadataProfileFilter $filter = null, KalturaFilterPager $pager = null)
 	{
+		if(isset($filter->systemNameEqual) || isset($filter->systemNameIn) || isset($filter->idEqual)) {
+			$this->partnerGroup .= ",0";
+		}
+		$this->applyPartnerFilterForClass('MetadataProfile');
+		
 		if (!$filter)
 			$filter = new KalturaMetadataProfileFilter;
 			
@@ -227,12 +232,6 @@ class MetadataProfileService extends KalturaBaseService
 		$filter->toObject($metadataProfileFilter);
 		
 		$c = new Criteria();
-		
-		if(isset($filter->systemNameEqual) || isset($filter->systemNameIn) || isset($filter->idEqual)) {
-			$this->partnerGroup .= ",0";
-		}
-		$this->applyPartnerFilterForClass('MetadataProfile');
-		
 		$metadataProfileFilter->attachToCriteria($c);
 		$count = MetadataProfilePeer::doCount($c);
 		
