@@ -73,7 +73,7 @@ class CuePointPeer extends BaseCuePointPeer implements IMetadataPeer
 											Criteria::IN
 										)
 									);
-			$criterionUserOrPublic->addOr($c->getNewCriterion (self::IS_PUBLIC, true, Criteria::EQUAL));
+			//$criterionUserOrPublic->addOr($c->getNewCriterion (self::IS_PUBLIC, true, Criteria::EQUAL));
 
 			$c->addAnd($criterionUserOrPublic);
 		}
