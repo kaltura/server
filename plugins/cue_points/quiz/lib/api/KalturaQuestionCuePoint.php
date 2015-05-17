@@ -60,8 +60,8 @@ class KalturaQuestionCuePoint extends KalturaCuePoint
 	}
 
 	/* (non-PHPdoc)
- * 	* @see KalturaObject::toObject($object_to_fill, $props_to_skip)
- *	*/
+	* @see KalturaObject::toObject($object_to_fill, $props_to_skip)
+	*/
 	public function toObject($dbObject = null, $propsToSkip = array())
 	{
 		if (!$dbObject)

@@ -4,7 +4,7 @@
  * @subpackage model
  */
 
-class AnswerCuePoint extends CuePoint //TODO: implements IMetadataObject
+class AnswerCuePoint extends CuePoint
 {
 	const CUSTOM_DATA_QUIZ_USER_ENTRY_ID= 'quizUserEntryId';
 	const CUSTOM_DATA_ANSWER_KEY = 'answerKey';
