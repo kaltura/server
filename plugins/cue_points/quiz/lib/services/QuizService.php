@@ -56,23 +56,28 @@ class QuizService extends KalturaBaseService
 	 */
 	public function updateAction( $entryId, KalturaQuiz $quiz )
 	{
+		$kQuiz = QuizPlugin::validateAndGetQuiz( $entryId );
 		$dbEntry = entryPeer::retrieveByPK($entryId);
-		if (!$dbEntry)
-			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
-
-		if ( is_null( QuizPlugin::getQuizData($dbEntry) ) )
-			throw new KalturaAPIException(KalturaQuizErrors::PROVIDED_ENTRY_IS_NOT_A_QUIZ, $entryId);
-
-		return $this->validateAndUpdateQuizData( $dbEntry, $quiz );
+		return $this->validateAndUpdateQuizData( $dbEntry, $quiz, $kQuiz->getVersion() );
 	}
 
-	private function validateAndUpdateQuizData( entry $dbEntry, KalturaQuiz $quiz )
+	/**
+	 * if user is entitled for this action will update quizData on entry
+	 * @param entry $dbEntry
+	 * @param KalturaQuiz $quiz
+	 * @param int $currentVersion
+	 * @return KalturaQuiz
+	 * @throws KalturaAPIException
+	 */
+	private function validateAndUpdateQuizData( entry $dbEntry, KalturaQuiz $quiz, $currentVersion = 0 )
 	{
 		$this->validateUserEntitledForUpdate( $dbEntry );
 		$quizData = $quiz->toObject();
+		$quizData->setVersion( $currentVersion+1 );
 		QuizPlugin::setQuizData( $dbEntry, $quizData );
 		$dbEntry->setIsTrimDisabled( true );
 		$dbEntry->save();
+		$quiz->fromObject( $quizData );
 		return $quiz;
 	}
 

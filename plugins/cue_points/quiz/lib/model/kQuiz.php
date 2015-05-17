@@ -13,7 +13,7 @@ class kQuiz {
 	 *
 	 * @var int
 	 */
-	protected $version = 1;
+	protected $version = 0;
 
 
 	/**
