@@ -1,9 +1,9 @@
 <?php
 /**
- * @package plugins.playReady
+ * @package plugins.drm
  * @subpackage model.data
  */
-class kAccessControlPlayReadyPolicyAction extends kRuleAction 
+class kAccessControlDrmPolicyAction extends kRuleAction
 {
 	/**
 	 * @var int
@@ -12,7 +12,7 @@ class kAccessControlPlayReadyPolicyAction extends kRuleAction
 	
 	public function __construct() 
 	{
-		parent::__construct(PlayReadyAccessControlActionType::DRM_POLICY);
+		parent::__construct(DrmAccessControlActionType::DRM_POLICY);
 	}
 	
 	/**
