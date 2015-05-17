@@ -84,8 +84,9 @@ class KalturaAnswerCuePoint extends KalturaCuePoint
 	{
 		parent::doFromObject($dbObject, $responseProfile);
 
-		if ( !$dbObject->isEntitledForEntry() ) {
-			$kQuiz = QuizPlugin::validateAndGetQuiz( $this->entryId );
+		$dbEntry = entryPeer::retrieveByPK($dbObject->getEntryId());
+		if ( !QuizPlugin::validateUserEntitledForQuizEdit($dbEntry) ) {
+			$kQuiz = QuizPlugin::validateAndGetQuiz( $dbEntry );
 			//TODO if quiz status is submitted go according to showResultsOnSubmit flag
 
 			if ( !$kQuiz->getShowResultOnAnswer() )
@@ -136,7 +137,8 @@ class KalturaAnswerCuePoint extends KalturaCuePoint
 	public function validateForInsert($propertiesToSkip = array())
 	{
 		parent::validateForInsert($propertiesToSkip);
-		QuizPlugin::validateAndGetQuiz($this->entryId);
+		$dbEntry = entryPeer::retrieveByPK($this->entryId);
+		QuizPlugin::validateAndGetQuiz($dbEntry);
 		$this->validateParentId();
 
 		//TODO do not allow answer with duplicate quizUserEntryId
@@ -148,13 +150,10 @@ class KalturaAnswerCuePoint extends KalturaCuePoint
 	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
 	{
 		parent::validateForUpdate($sourceObject, $propertiesToSkip);
-
-		$kQuiz = QuizPlugin::validateAndGetQuiz($this->entryId);
+		$dbEntry = entryPeer::retrieveByPK($this->entryId);
+		$kQuiz = QuizPlugin::validateAndGetQuiz($dbEntry);
 		if ( !$kQuiz->getAllowAnswerUpdate() ) {
 			throw new KalturaAPIException(KalturaQuizErrors::ANSWER_UPDATE_IS_NOT_ALLOWED, $sourceObject->getEntryId());
 		}
-
-		// insertOnly, not required?
-		// $this->validateParentId($sourceObject->getId());
 	}
 }

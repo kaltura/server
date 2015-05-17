@@ -56,8 +56,8 @@ class QuizService extends KalturaBaseService
 	 */
 	public function updateAction( $entryId, KalturaQuiz $quiz )
 	{
-		$kQuiz = QuizPlugin::validateAndGetQuiz( $entryId );
 		$dbEntry = entryPeer::retrieveByPK($entryId);
+		$kQuiz = QuizPlugin::validateAndGetQuiz( $dbEntry );
 		return $this->validateAndUpdateQuizData( $dbEntry, $quiz, $kQuiz->getVersion() );
 	}
 
@@ -71,7 +71,10 @@ class QuizService extends KalturaBaseService
 	 */
 	private function validateAndUpdateQuizData( entry $dbEntry, KalturaQuiz $quiz, $currentVersion = 0 )
 	{
-		$this->validateUserEntitledForUpdate( $dbEntry );
+		if ( !QuizPlugin::validateUserEntitledForQuizEdit($dbEntry) ) {
+			KalturaLog::debug('Update quiz allowed only with admin KS or entry owner or co-editor');
+			throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID);
+		}
 		$quizData = $quiz->toObject();
 		$quizData->setVersion( $currentVersion+1 );
 		QuizPlugin::setQuizData( $dbEntry, $quizData );
@@ -122,24 +125,6 @@ class QuizService extends KalturaBaseService
 			$pager = new KalturaFilterPager ();
 
 		return $filter->getListResponse($pager, $this->getResponseProfile());
-	}
-
-	/**
-	 * Throws an error if the user is not owner or co-editor
-	 *
-	 * @param entry $dbEntry
-	 */
-	private function validateUserEntitledForUpdate(entry $dbEntry)
-	{
-		if ( kCurrentContext::$is_admin_session || kCurrentContext::getCurrentKsKuserId() == $dbEntry->getKuserId())
-		return;
-
-		$entitledKusers = explode(',', $dbEntry->getEntitledKusersEdit());
-		if(!in_array(kCurrentContext::getCurrentKsKuserId(), $entitledKusers))
-		{
-			KalturaLog::debug('Update quiz allowed only with admin KS or entry owner or co-editor');
-			throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID);
-		}
 	}
 
 }

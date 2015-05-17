@@ -79,8 +79,8 @@ class KalturaQuestionCuePoint extends KalturaCuePoint
 	{
 		parent::doFromObject($dbObject, $responseProfile);
 		$this->optionalAnswers = KalturaOptionalAnswersArray::fromDbArray($dbObject->getOptionalAnswers(), $responseProfile);
-
-		if ( !$dbObject->isEntitledForEntry() ) {
+		$dbEntry = entryPeer::retrieveByPK($dbObject->getEntryId());
+		if ( !QuizPlugin::validateUserEntitledForQuizEdit($dbEntry) ) {
 			$this->correctAnswerKeys = null;
 			$this->explanation = null;
 		}
@@ -92,7 +92,12 @@ class KalturaQuestionCuePoint extends KalturaCuePoint
 	public function validateForInsert($propertiesToSkip = array())
 	{
 		parent::validateForInsert($propertiesToSkip);
-		QuizPlugin::validateAndGetQuiz($this->entryId);
+		$dbEntry = entryPeer::retrieveByPK($this->entryId);
+		QuizPlugin::validateAndGetQuiz($dbEntry);
+		if ( !QuizPlugin::validateUserEntitledForQuizEdit($dbEntry) ) {
+			KalturaLog::debug('Update quiz questions is allowed only with admin KS or entry owner or co-editor');
+			throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID);
+		}
 	}
 
 }

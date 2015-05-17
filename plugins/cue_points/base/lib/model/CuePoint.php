@@ -439,28 +439,6 @@ abstract class CuePoint extends BaseCuePoint implements IIndexable
 	}
 
 	/**
-	 * Check if user is entry's owner or co-editor
-	 * @param $entryId
-	 */
-	public function isEntitledForEntry()
-	{
-		$dbEntry = entryPeer::retrieveByPK( $this->getEntryId() );
-		if ( !$dbEntry )
-			return false;
-
-		if ( kCurrentContext::$is_admin_session || kCurrentContext::getCurrentKsKuserId() == $dbEntry->getKuserId())
-			return true;
-
-		$entitledKusers = explode(',', $dbEntry->getEntitledKusersEdit());
-		if(in_array(kCurrentContext::getCurrentKsKuserId(), $entitledKusers))
-		{
-			return true;
-		}
-
-		return false;
-	}
-
-	/**
 	 * @param      string $name
 	 * @param      string $namespace
 	 * @return     boolean True if $name has been modified.

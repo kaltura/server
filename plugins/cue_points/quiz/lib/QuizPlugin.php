@@ -260,19 +260,34 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 	}
 
 	/**
-	 * @param $entryId string
+	 * @param entry $dbEntry
 	 * @return mixed|string
 	 * @throws KalturaAPIException
 	 */
-	public static function validateAndGetQuiz( $entryId ) {
-		$dbEntry = entryPeer::retrieveByPK( $entryId );
-		if ( !$dbEntry )
-			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
-
+	public static function validateAndGetQuiz( entry $dbEntry ) {
 		$kQuiz = self::getQuizData($dbEntry);
 		if ( !$kQuiz )
 			throw new KalturaAPIException(KalturaQuizErrors::PROVIDED_ENTRY_IS_NOT_A_QUIZ, $entryId);
 
 		return $kQuiz;
+	}
+
+
+	/**
+	 * @param entry $dbEntry
+	 * @return bool if current user is admin / entyr owner / co-editor
+	 */
+	public static function validateUserEntitledForQuizEdit( entry $dbEntry )
+	{
+		if ( kCurrentContext::$is_admin_session || kCurrentContext::getCurrentKsKuserId() == $dbEntry->getKuserId())
+			return true;
+
+		$entitledKusers = explode(',', $dbEntry->getEntitledKusersEdit());
+		if(in_array(kCurrentContext::getCurrentKsKuserId(), $entitledKusers))
+		{
+			return true;
+		}
+
+		return false;
 	}
 }
