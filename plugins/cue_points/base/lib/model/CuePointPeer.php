@@ -28,6 +28,7 @@ class CuePointPeer extends BaseCuePointPeer implements IMetadataPeer
 	
 	// cache classes by their type
 	protected static $class_types_cache = array();
+	private static $filerResults = false;
 	
 	/* (non-PHPdoc)
 	 * @see BaseCuePointPeer::setDefaultCriteriaFilter()
@@ -63,6 +64,7 @@ class CuePointPeer extends BaseCuePointPeer implements IMetadataPeer
 			// by adding a public property on the cuepoint object and checking (user==kuser OR is public)
 			//$c->addAnd(CuePointPeer::KUSER_ID, $kuser->getId());
 			$criterionUserOrPublic = $c->getNewCriterion(CuePointPeer::KUSER_ID, $kuser->getId());
+			$criterionUserOrPublic->addTag(KalturaCriterion::TAG_USER_SEESION);
 			$criterionUserOrPublic->addOr(
 										$c->getNewCriterion(
 											CuePointPeer::TYPE,
@@ -102,6 +104,52 @@ class CuePointPeer extends BaseCuePointPeer implements IMetadataPeer
 		}
 			
 		throw new Exception("Can't instantiate un-typed [$assetType] cue point [" . print_r($row, true) . "]");
+	}
+	
+	/**
+	 * Override in order to filter objects returned from doSelect.
+	 *
+	 * @param      array $selectResults The array of objects to filter.
+	 * @param	   Criteria $criteria
+	 */
+	public static function filterSelectResults(&$selectResults, Criteria $criteria)
+	{
+		if(empty($selectResults))
+			return;
+		
+		KalturaLog::debug('Filter User results');
+		
+		foreach ($selectResults as $key => $cuePoint)
+		{
+			/* @var $cuePoint CuePoint */
+			if($cuePoint->getPuserId() !== kCurrentContext::$ks_uid || !$cuePoint->getIsPublic())
+			{
+				unset($selectResults[$key]);
+				$removedRecordsCount++;
+			}
+		}
+	
+		if($criteria instanceof KalturaCriteria)
+		{
+			$recordsCount = $criteria->getRecordsCount();
+			$criteria->setRecordsCount($recordsCount - $removedRecordsCount);
+		}
+	
+		self::$filerResults = false;
+		parent::filterSelectResults($selectResults, $criteria);
+	
+		KalturaLog::debug('Filter Results - done');
+	}
+	
+	public static function retrieveByPK($pk, PropelPDO $con = null)
+	{
+		KalturaCriterion::disableTags(array(KalturaCriterion::TAG_USER_SEESION));
+		self::$filerResults = true;
+		$res = parent::retrieveByPK($pk, $con);
+		KalturaCriterion::restoreTags(array(KalturaCriterion::TAG_USER_SEESION));
+		self::$filerResults = false;
+	
+		return $res;
 	}
 	
 	/* (non-PHPdoc)
