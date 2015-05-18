@@ -24,7 +24,7 @@ class QuestionCuePoint extends CuePoint //TODO: implements IMetadataObject
 	 */
 	public function applyDefaultValues()
 	{
-		$this->setType(QuizPlugin::getCuePointTypeCoreValue(QuizCuePointType::QUESTION));
+		$this->setType(QuizPlugin::getCuePointTypeCoreValue(QuizCuePointType::QUIZ_QUESTION));
 	}
 
 	public function setOptionalAnswers($v) {return $this->putInCustomData(self::CUSTOM_DATA_OPTIONAL_ANSWERS, $v);}

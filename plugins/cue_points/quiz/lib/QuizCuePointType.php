@@ -5,14 +5,14 @@
  */
 class QuizCuePointType implements IKalturaPluginEnum, CuePointType
 {
-	const QUESTION = 'Question';
-	const ANSWER = 'Answer';
+	const QUIZ_QUESTION = 'QUIZ_QUESTION';
+	const QUIZ_ANSWER = 'QUIZ_ANSWER';
 
 	public static function getAdditionalValues()
 	{
 		return array(
-			'QUESTION' => self::QUESTION,
-			'ANSWER' => self::ANSWER,
+			'QUIZ_QUESTION' => self::QUIZ_QUESTION,
+			'QUIZ_ANSWER' => self::QUIZ_ANSWER,
 		);
 	}
 

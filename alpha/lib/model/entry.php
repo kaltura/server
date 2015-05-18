@@ -1232,11 +1232,11 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 			$dynamicAttributes[$dynAttribName] = $createdAt;
 		}
 
-		$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaDynamicAttributeContributer');
+		$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaDynamicAttributesContributer');
 		$pluginsDynamicAttributes = array();
 		foreach($pluginInstances as $pluginName => $pluginInstance) {
 			try {
-				$pluginsDynamicAttributes += $pluginInstance->getDynamicAttribute($this);
+				$pluginsDynamicAttributes += $pluginInstance->getDynamicAttributes($this);
 			} catch (Exception $e) {
 				KalturaLog::err($e->getMessage());
 				continue;

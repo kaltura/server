@@ -3,7 +3,7 @@
  * @package plugins.quiz
  * @subpackage model.filters
  */
-class kQuizFilter extends AdvancedSearchFilterItem
+class kQuizAdvancedFilter extends AdvancedSearchFilterItem
 {
 	/**
 	 * @var boolean

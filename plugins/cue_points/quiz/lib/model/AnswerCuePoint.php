@@ -25,7 +25,7 @@ class AnswerCuePoint extends CuePoint
 	 */
 	public function applyDefaultValues()
 	{
-		$this->setType(QuizPlugin::getCuePointTypeCoreValue(QuizCuePointType::ANSWER));
+		$this->setType(QuizPlugin::getCuePointTypeCoreValue(QuizCuePointType::QUIZ_ANSWER));
 	}
 
 	public function setQuizUserEntryId($v) {return $this->putInCustomData(self::CUSTOM_DATA_QUIZ_USER_ENTRY_ID, $v);}

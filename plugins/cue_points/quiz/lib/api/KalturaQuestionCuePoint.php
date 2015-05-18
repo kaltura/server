@@ -39,7 +39,7 @@ class KalturaQuestionCuePoint extends KalturaCuePoint
 
 	public function __construct()
 	{
-		$this->cuePointType = QuizPlugin::getApiValue(QuizCuePointType::QUESTION);
+		$this->cuePointType = QuizPlugin::getApiValue(QuizCuePointType::QUIZ_QUESTION);
 	}
 
 	private static $map_between_objects = array
