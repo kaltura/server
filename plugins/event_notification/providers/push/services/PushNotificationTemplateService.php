@@ -84,7 +84,7 @@ class PushNotificationTemplateService extends KalturaBaseService
 	    $templateId = $dbEventNotificationTemplate->getId();
 	    $secret = kConf::get("push_server_secret");
 	    $token = base64_encode($partnerId . ":" . $this->encode($secret . ":" . time() ) );
-	    $result->url = $protocol . "://" . $host ."/p/" . $partnerId ."/e/" . $templateId ."/t/" . $token;
+	    $result->url = $protocol . "://" . $host ."/?p=" . $partnerId ."&e=" . $templateId ."&x=" . $token;
 	    
 	    return $result;
 	}
