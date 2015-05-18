@@ -8,7 +8,7 @@
  * @package Core
  * @subpackage model
  */
-class BulkUploadResultPeer extends BaseBulkUploadResultPeer implements IRelatedObjectPeer
+class BulkUploadResultPeer extends BaseBulkUploadResultPeer
 {
     protected static $class_types_cache = array(
         BulkUploadResultObjectType::ENTRY => 'BulkUploadResultEntry',
@@ -154,34 +154,5 @@ class BulkUploadResultPeer extends BaseBulkUploadResultPeer implements IRelatedO
 		}
 			
 		return parent::OM_CLASS;
-	}
-	
-	public function getBulkUploadResultParentObjects(BulkUploadResult $object)
-	{
-		return array(BatchJobPeer::retrieveByPK($object->getBulkUploadJobId()));
-	}
-	
-	/* (non-PHPdoc)
-	 * @see IRelatedObjectPeer::getParentObjects()
-	 */
-	public function getParentObjects(IBaseObject $object)
-	{
-		return $this->getBulkUploadResultParentObjects($object);
-	}
-
-	/* (non-PHPdoc)
-	 * @see IRelatedObjectPeer::getRootObjects()
-	 */
-	public function getRootObjects(IBaseObject $object)
-	{
-		return $this->getParentObjects($object);
-	}
-
-	/* (non-PHPdoc)
-	 * @see IRelatedObjectPeer::isReferenced()
-	 */
-	public function isReferenced(IBaseObject $object)
-	{
-		return false;
 	}
 }

@@ -268,12 +268,12 @@ class kCouchbaseCacheQuery
 			$query = $query->limit($this->limit);
 			
 		if(!is_null($this->stale))
-			$query = $query->stale($this->stale);
+			$query = $query->stale($this->stale === false ? 'false' : $this->stale);
 			
 		$custom = array();
 		
 		if(!is_null($this->descending))
-			$custom['descending'] = $this->descending;
+			$custom['descending'] = $this->descending ? 'true' : 'false';
 			
 		if(!is_null($this->startKeyDocId))
 			$custom['startkey_docid'] = $this->startKeyDocId;
@@ -282,31 +282,31 @@ class kCouchbaseCacheQuery
 			$custom['endkey_docid'] = $this->endKeyDocId;
 			
 		if(!is_null($this->group))
-			$custom['group'] = $this->group;
+			$custom['group'] = $this->group ? 'true' : 'false';
 			
 		if(!is_null($this->groupLevel))
 			$custom['group_level'] = $this->groupLevel;
 			
 		if(!is_null($this->inclusiveEnd))
-			$custom['inclusive_end'] = $this->inclusiveEnd;
+			$custom['inclusive_end'] = $this->inclusiveEnd ? 'true' : 'false';
 			
 		if(!is_null($this->reduce))
-			$custom['reduce'] = $this->reduce;
+			$custom['reduce'] = $this->reduce ? 'true' : 'false';
 			
 		if(!is_null($this->connectionTimeout))
 			$custom['connection_timeout'] = $this->connectionTimeout;
 			
 		if(count($this->startKey))
-			$custom['startkey'] = array_values($this->startKey);
+			$custom['startkey'] = json_encode(array_values($this->startKey));
 			
 		if(count($this->endKey))
-			$custom['endkey'] = array_values($this->endKey);
+			$custom['endkey'] = json_encode(array_values($this->endKey));
 			
 		if(count($this->key))
-			$custom['key'] = array_values($this->key);
+			$custom['key'] = json_encode(array_values($this->key));
 			
 		if(count($this->keys))
-			$custom['keys'] = array_values($this->keys);
+			$custom['keys'] = json_encode(array_values($this->keys));
 
 		if(count($custom))
 			$query = $query->custom($custom);
@@ -338,9 +338,10 @@ class kCouchbaseCacheListItem
 	
 	public function __construct(array $meta)
 	{
+		KalturaLog::debug("meta [" . print_r($meta, true) . "]");
 		$this->id = $meta['id'];
 		$this->key = $meta['key'];
-		$this->data = $meta['data'];
+		$this->data = $meta['value'];
 	}
 	
 	/**
@@ -374,15 +375,21 @@ class kCouchbaseCacheList
 	/**
 	 * @var int
 	 */
-	private $totalCount;
+	private $totalCount = 0;
 	
 	/**
 	 * @var array<kCouchbaseCacheListItem>
 	 */
 	private $objects = array();
 	
-	public function __construct(array $meta)
+	public function __construct(array $meta = null)
 	{
+		if(is_null($meta))
+		{
+			return;
+		}
+		KalturaLog::debug("meta [" . print_r($meta, true) . "]");
+		
 		$this->totalCount = $meta['total_rows'];
 		
 		foreach($meta['rows'] as $row)
@@ -463,6 +470,7 @@ class kCouchbaseCacheWrapper extends kBaseCacheWrapper
 		try
 		{
 			$meta = $this->bucket->get($key);
+			KalturaLog::debug("key [$key], meta [" . print_r($meta, true) . "]");
 			return $meta->value;
 		}
 		catch(CouchbaseException $e)
@@ -479,6 +487,7 @@ class kCouchbaseCacheWrapper extends kBaseCacheWrapper
 		try
 		{
 			$metas = $this->bucket->get($keys);
+			KalturaLog::debug("key [" . print_r($keys, true) . "], metas [" . print_r($metas, true) . "]");
 			$values = array();
 			foreach($metas as $meta)
 				$values[] = $meta->value;
@@ -497,6 +506,7 @@ class kCouchbaseCacheWrapper extends kBaseCacheWrapper
 	protected function doIncrement($key, $delta = 1)
 	{
 		$meta = $this->bucket->counter($key, $delta);
+		KalturaLog::debug("key [$key], meta [" . print_r($meta, true) . "]");
 		return $meta->value;
 	}
 
@@ -505,6 +515,7 @@ class kCouchbaseCacheWrapper extends kBaseCacheWrapper
 	 */
 	protected function doSet($key, $var, $expiry = 0)
 	{
+		KalturaLog::debug("key [$key], var [" . print_r($var, true) . "]");
 		$meta = $this->bucket->upsert($key, $var, array(
 			'expiry' => $expiry
 		));
@@ -517,6 +528,7 @@ class kCouchbaseCacheWrapper extends kBaseCacheWrapper
 	 */
 	protected function doAdd($key, $var, $expiry = 0)
 	{
+		KalturaLog::debug("key [$key], var [" . print_r($var, true) . "]");
 		$meta = $this->bucket->insert($key, $var, array(
 			'expiry' => $expiry
 		));
@@ -529,6 +541,7 @@ class kCouchbaseCacheWrapper extends kBaseCacheWrapper
 	 */
 	protected function doDelete($key)
 	{
+		KalturaLog::debug("key [$key]");
 		try
 		{
 			$meta = $this->bucket->remove($key);
@@ -552,6 +565,7 @@ class kCouchbaseCacheWrapper extends kBaseCacheWrapper
 			$meta = $this->bucket->replace($key, $var, array(
 				'expiry' => $expiry
 			));
+			KalturaLog::debug("key [$key] var [" . print_r($var, true) . "] meta [" . print_r($meta, true) . "]");
 			
 			return is_null($meta->error);
 		}
@@ -570,6 +584,7 @@ class kCouchbaseCacheWrapper extends kBaseCacheWrapper
 		try
 		{
 			$meta = $this->bucket->append($key, $var);
+			KalturaLog::debug("key [$key] var [" . print_r($var, true) . "] meta [" . print_r($meta, true) . "]");
 			return $meta->value;
 		}
 		catch(CouchbaseException $e)
@@ -587,6 +602,7 @@ class kCouchbaseCacheWrapper extends kBaseCacheWrapper
 		try
 		{
 			$meta = $this->bucket->prepend($key, $var);
+			KalturaLog::debug("key [$key] var [" . print_r($var, true) . "] meta [" . print_r($meta, true) . "]");
 			return $meta->value;
 		}
 		catch(CouchbaseException $e)
@@ -604,6 +620,7 @@ class kCouchbaseCacheWrapper extends kBaseCacheWrapper
 		try
 		{
 			$meta = $this->bucket->get($key);
+			KalturaLog::debug("key [$key], meta [" . print_r($meta, true) . "]");
 			return $meta->value;
 		}
 		catch(CouchbaseException $e)
@@ -620,13 +637,14 @@ class kCouchbaseCacheWrapper extends kBaseCacheWrapper
 	{
 		try
 		{
-			$meta = $this->bucket->remove($keys);
-			return is_null($meta->error);
+			$metas = $this->bucket->remove($keys);
+			KalturaLog::debug("key [" . print_r($keys, true) . "] metas [" . print_r($metas, true) . "]");
+			return true;
 		}
 		catch(CouchbaseException $e)
 		{
+			return false;
 		}
-		return false;
 	}
 
 	/**
@@ -638,6 +656,7 @@ class kCouchbaseCacheWrapper extends kBaseCacheWrapper
 		try
 		{
 			$metas = $this->bucket->get($keys);
+			KalturaLog::debug("key [" . print_r($keys, true) . "] metas [" . print_r($metas, true) . "]");
 			$values = array();
 			foreach($metas as $meta)
 				$values[] = $meta->value;
@@ -672,7 +691,9 @@ class kCouchbaseCacheWrapper extends kBaseCacheWrapper
 	 */
 	public function query(kCouchbaseCacheQuery $query)
 	{
-		$meta =  $this->bucket->query($query->toQuery());
+		$couchBaseQuery = $query->toQuery();
+		$meta =  $this->bucket->query($couchBaseQuery);
+		KalturaLog::debug("query [" . print_r($couchBaseQuery, true) . "] meta [" . print_r($meta, true) . "]");
 		return new kCouchbaseCacheList($meta);
 	}
 }

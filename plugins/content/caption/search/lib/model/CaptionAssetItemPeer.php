@@ -13,7 +13,7 @@
  * @package plugins.captionSearch
  * @subpackage model
  */
-class CaptionAssetItemPeer extends BaseCaptionAssetItemPeer implements IRelatedObjectPeer {
+class CaptionAssetItemPeer extends BaseCaptionAssetItemPeer {
 
 	const TAGS = 'caption_asset_item.TAGS';
 	const PARTNER_DESCRIPTION = 'caption_asset_item.PARTNER_DESCRIPTION';
@@ -49,40 +49,4 @@ class CaptionAssetItemPeer extends BaseCaptionAssetItemPeer implements IRelatedO
 		return CaptionAssetItemPeer::doSelect($criteria, $con);
 	}
 	
-	public function getCaptionAssetItemParentObjects(CaptionAssetItem $object)
-	{
-		return array($object->getAsset());
-	}
-	
-	/* (non-PHPdoc)
-	 * @see IRelatedObjectPeer::getParentObjects()
-	 */
-	public function getParentObjects(IBaseObject $object)
-	{
-		return $this->getCaptionAssetItemParentObjects($object);
-	}
-
-	/* (non-PHPdoc)
-	 * @see IRelatedObjectPeer::getRootObjects()
-	 */
-	public function getRootObjects(IBaseObject $object)
-	{
-		$assets = $this->getParentObjects($object);
-		$roots = array();
-		foreach($assets as $asset)
-		{
-			/* @var $asset asset */
-			$roots[] = $asset->getentry();
-		}
-		
-		return $roots;
-	}
-
-	/* (non-PHPdoc)
-	 * @see IRelatedObjectPeer::isReferenced()
-	 */
-	public function isReferenced(IBaseObject $object)
-	{
-		return false;
-	}
 } // CaptionAssetItemPeer

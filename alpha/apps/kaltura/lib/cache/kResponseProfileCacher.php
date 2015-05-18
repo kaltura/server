@@ -92,10 +92,7 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 	public function objectChanged(BaseObject $object, array $modifiedColumns)
 	{
 		if($object instanceof ResponseProfile)
-		{
-			$this->deleteResponseProfileCache($object);
-			return true;
-		}
+			return $this->deleteResponseProfileCache($object);
 			
 		if($this->isCachedObject($object))
 			$this->invalidateCachedObject($object);
@@ -135,10 +132,7 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 	public function objectDeleted(BaseObject $object, BatchJob $raisedJob = null)
 	{
 		if($object instanceof ResponseProfile)
-		{
-			$this->deleteResponseProfileCache($object);
-			return true;
-		}
+			return $this->deleteResponseProfileCache($object);
 			
 		if($this->isCachedObject($object))
 			$this->invalidateCachedObject($object);
@@ -181,7 +175,7 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 			return $this->addRecalculateRelatedObjectsCacheJob($object);
 			
 		if($this->hasCachedRootObjects($object))
-			$this->invalidateCachedRootObjects($object);
+			return $this->invalidateCachedRootObjects($object);
 			
 		return true;
 	}
@@ -281,14 +275,24 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 		return false;
 	}
 	
+	protected function deleteResponseProfileCache(ResponseProfile $responseProfile)
+	{
+		$key = self::getResponseProfileCacheKey($responseProfile->getKey());
+		self::delete($key);
+		
+		return true;
+	}
+	
 	protected function addRecalculateRelatedObjectsCacheJob(BaseObject $object)
 	{
 		// TODO list all ksType, roldIds, protocol that related to this object and create few jobs for each
+		return true;
 	}
 	
 	protected function addRecalculateObjectCacheJob(BaseObject $object)
 	{
 		// TODO just add a job
+		return true;
 	}
 	
 	protected function invalidateCachedRootObjects(BaseObject $object)
@@ -306,6 +310,7 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 				}
 			}
 		}
+		return true;
 	}
 	
 	protected function invalidateCachedObject(BaseObject $object)
@@ -318,6 +323,8 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 		{
 			$this->deleteCachedObjects($object);
 		}
+		
+		return true;
 	}
 		
 	protected function deleteCachedObjects(BaseObject $object)
@@ -344,6 +351,7 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 						$keys[] = $cache->getId();
 					}
 					$cacheStore->multiDelete($keys);
+					$list = $cacheStore->query($query);
 				}
 			}
 		}

@@ -13,7 +13,7 @@
  * @package plugins.cuePoint
  * @subpackage model
  */
-class CuePointPeer extends BaseCuePointPeer implements IMetadataPeer, IRelatedObjectPeer
+class CuePointPeer extends BaseCuePointPeer implements IMetadataPeer 
 {
 	const MAX_TEXT_LENGTH = 32700;
 	const MAX_TAGS_LENGTH = 255;
@@ -24,6 +24,7 @@ class CuePointPeer extends BaseCuePointPeer implements IMetadataPeer, IRelatedOb
 	const STR_CUE_POINT_ID = 'cue_point.STR_CUE_POINT_ID';
 	const FORCE_STOP = 'cue_point.FORCE_STOP';
 	const DURATION = 'cue_point.DURATION';
+	const IS_PUBLIC = 'cue_point.IS_PUBLIC';
 	
 	// cache classes by their type
 	protected static $class_types_cache = array();
@@ -46,7 +47,7 @@ class CuePointPeer extends BaseCuePointPeer implements IMetadataPeer, IRelatedOb
 		if(self::$s_criteria_filter == null)
 			self::$s_criteria_filter = new criteriaFilter();
 		
-		$c = new Criteria();
+		$c = KalturaCriteria::create(CuePointPeer::OM_CLASS);
 		$c->addAnd(CuePointPeer::STATUS, CuePointStatus::DELETED, Criteria::NOT_EQUAL);
 			
 		$puserId = kCurrentContext::$ks_uid;
@@ -72,6 +73,7 @@ class CuePointPeer extends BaseCuePointPeer implements IMetadataPeer, IRelatedOb
 											Criteria::IN
 										)
 									);
+			$criterionUserOrPublic->addOr($c->getNewCriterion (self::IS_PUBLIC, true, Criteria::EQUAL));
 
 			$c->addAnd($criterionUserOrPublic);
 		}
@@ -137,22 +139,26 @@ class CuePointPeer extends BaseCuePointPeer implements IMetadataPeer, IRelatedOb
 	}
 
 	/**
-	 * Retrieve a single object by entry id.
+	 * Retrieve multiple objects by entry id.
 	 *
-	 * @param      string $systemName the entry id.
-	 * @param      int $type the cue point type from CuePointType enum
+	 * @param      string $entryId the entry id.
+	 * @param      array $types the cue point types from CuePointType enum
 	 * @param      PropelPDO $con the connection to use
 	 * @return     CuePoint
 	 */
 	public static function retrieveByEntryId($entryId, $types = null, PropelPDO $con = null)
 	{
-		$criteria = new Criteria();
+		$criteria = KalturaCriteria::create(CuePointPeer::OM_CLASS);
 		$criteria->add(CuePointPeer::ENTRY_ID, $entryId);
+		$criteria->add(CuePointPeer::STATUS, CuePointStatus::DELETED, Criteria::NOT_EQUAL);
+		
 		if(!is_null($types))
 			$criteria->add(CuePointPeer::TYPE, $types, Criteria::IN);
 
 		return CuePointPeer::doSelect($criteria, $con);
 	}
+	
+	
 	
 	public static function getCacheInvalidationKeys()
 	{
@@ -174,32 +180,8 @@ class CuePointPeer extends BaseCuePointPeer implements IMetadataPeer, IRelatedOb
 		return $res;
 	}
 	
-	public function getCuePointParentObjects(CuePoint $object)
+	public static function validateMetadataObjects($profileField, $objectIds, &$errorMessage)
 	{
-		return array(entryPeer::retrieveByPK($object->getEntryId()));
-	}
-	
-	/* (non-PHPdoc)
-	 * @see IRelatedObjectPeer::getParentObjects()
-	 */
-	public function getParentObjects(IBaseObject $object)
-	{
-		return $this->getCuePointParentObjects($object);
-	}
-
-	/* (non-PHPdoc)
-	 * @see IRelatedObjectPeer::getRootObjects()
-	 */
-	public function getRootObjects(IBaseObject $object)
-	{
-		return $this->getParentObjects($object);
-	}
-
-	/* (non-PHPdoc)
-	 * @see IRelatedObjectPeer::isReferenced()
-	 */
-	public function isReferenced(IBaseObject $object)
-	{
-		return false;
+	    return true;
 	}
 }

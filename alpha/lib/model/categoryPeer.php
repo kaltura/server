@@ -486,6 +486,8 @@ class categoryPeer extends BasecategoryPeer implements IRelatedObjectPeer
 		$rootCategory = $object->getRootCategoryFromFullIds($object);
 		if($rootCategory)
 			return array($rootCategory);
+			
+		return array();
 	}
 	
 	/* (non-PHPdoc)

@@ -121,20 +121,17 @@ class EntryDistributionPeer extends BaseEntryDistributionPeer implements IRelate
 		return array(array("entryDistribution:entryId=%s", self::ENTRY_ID));		
 	}
 	
-	public function getEntryDistributionParentObjects(EntryDistribution $object)
-	{
-		return array(
-			entryPeer::retrieveByPK($object->getEntryId()),
-			DeliveryProfilePeer::retrieveByPK($object->getDistributionProfileId()),
-		);
-	}
-	
 	/* (non-PHPdoc)
 	 * @see IRelatedObjectPeer::getParentObjects()
 	 */
 	public function getParentObjects(IBaseObject $object)
 	{
-		return $this->getEntryDistributionParentObjects($object);
+		/* @var $object EntryDistribution */
+		$distributionProfile = DistributionProfilePeer::retrieveByPK($object->getDistributionProfileId());
+		if($distributionProfile)
+			return array($distributionProfile);
+			
+		return array();
 	}
 
 	/* (non-PHPdoc)

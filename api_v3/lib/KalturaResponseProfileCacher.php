@@ -153,14 +153,6 @@ class KalturaResponseProfileCacher extends kResponseProfileCacher
 		self::$responseProfile = null;
 	}
 	
-	protected function deleteResponseProfileCache(ResponseProfile $responseProfile)
-	{
-		$key = self::getResponseProfileCacheKey($responseProfile->getKey());
-		self::delete($key);
-		
-		return true;
-	}
-	
 	/**
 	 * @param array $array
 	 * @return KalturaObject
@@ -198,9 +190,16 @@ class KalturaResponseProfileCacher extends kResponseProfileCacher
 		if(!is_array($object) && !is_object($object))
 			return $object;
 		
-		$array = (array) $object;
+		$array = null;
 		if(is_object($object) && $object instanceof KalturaObject)
+		{
+			if($object instanceof KalturaTypedArray)
+			{
+				return self::toArray($object->toArray());
+			}
+			$array = (array) $object;
 			$array['objectType'] = get_class($object);
+		}
 		
 		foreach($array as $key => $value)
 		{

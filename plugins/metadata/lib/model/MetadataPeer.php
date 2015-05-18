@@ -152,23 +152,12 @@ class MetadataPeer extends BaseMetadataPeer implements IRelatedObjectPeer
 		return array(array("metadata:objectId=%s", self::OBJECT_ID));		
 	}
 
-	public function getMetadataParentObjects(Metadata $object)
-	{
-		if($object->getObjectType() != MetadataObjectType::DYNAMIC_OBJECT)
-		{
-			$parent = kMetadataManager::getObjectFromPeer($object);
-			if($parent)
-				return array($parent);
-		}
-		return array();	
-	}
-	
 	/* (non-PHPdoc)
 	 * @see IRelatedObjectPeer::getParentObjects()
 	 */
 	public function getParentObjects(IBaseObject $object)
 	{
-		return $this->getMetadataParentObjects($object);
+		return array();
 	}
 
 	/* (non-PHPdoc)
@@ -176,27 +165,7 @@ class MetadataPeer extends BaseMetadataPeer implements IRelatedObjectPeer
 	 */
 	public function getRootObjects(IBaseObject $object)
 	{
-		$parentObjects = $this->getParentObjects($object);
-		$rootObjects = array();
-		foreach($parentObjects as $parentObject)
-		{
-			/* @var $parentObject IBaseObject */
-			$peer = $parentObject->getPeer();
-			$rootAdded = false;
-			if($peer instanceof IRelatedObjectPeer)
-			{
-				$parentRoots = $peer->getRootObjects($parentObject);
-				if(count($parentRoots))
-				{
-					$rootObjects = array_merge($rootObjects, $parentRoots);
-					$rootAdded = true;
-				}
-			}
-			if($rootAdded)
-				$rootObjects[] = $parentObject;
-		}
-		
-		return $rootObjects;
+		return array();
 	}
 
 	/* (non-PHPdoc)
