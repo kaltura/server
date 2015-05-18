@@ -35,7 +35,7 @@ Download Couchbase server and install according to [official instructions](http:
 	function (doc, meta) {
 	  if (meta.type == "json") {
 	    if(doc.type == "relatedObject"){
-		  emit([doc.partnerId, doc.objectType], doc.data);
+		  emit([doc.partnerId, doc.triggerObjectType], doc.data);
 	    }
 	  }
 	}
