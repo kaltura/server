@@ -91,6 +91,8 @@ class asset extends Baseasset implements ISyncableFile
 	const FILE_SYNC_ASSET_SUB_TYPE_LIVE_PRIMARY = 5; 
 	const FILE_SYNC_ASSET_SUB_TYPE_LIVE_SECONDARY = 6;
 
+	const FILE_SYNC_ASSET_SUB_TYPE_MPD = 7;
+
 	const CUSTOM_DATA_FIELD_PARTNER_DESCRIPTION = "partnerDescription";
 	const CUSTOM_DATA_FIELD_PARTNER_DATA = "partnerData";
 	const CUSTOM_DATA_FIELD_ACTUAL_SOURCE_ASSET_PARAMS_IDS = "actualSourceParamsIds";
@@ -309,6 +311,7 @@ class asset extends Baseasset implements ISyncableFile
 			self::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_CONVERT_LOG,
 			self::FILE_SYNC_ASSET_SUB_TYPE_ISM,
 			self::FILE_SYNC_ASSET_SUB_TYPE_ISMC,
+			self::FILE_SYNC_ASSET_SUB_TYPE_MPD,
 		);
 		if (!in_array($sub_type, $valid_sub_types))
 			throw new FileSyncException(FileSyncObjectType::FLAVOR_ASSET, $sub_type, $valid_sub_types);		
@@ -321,6 +324,7 @@ class asset extends Baseasset implements ISyncableFile
 			case asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET:
 			case asset::FILE_SYNC_ASSET_SUB_TYPE_ISM:
 			case asset::FILE_SYNC_ASSET_SUB_TYPE_ISMC:
+			case asset::FILE_SYNC_ASSET_SUB_TYPE_MPD:
 				return $this->getVersion();
 				
 			case asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_CONVERT_LOG:

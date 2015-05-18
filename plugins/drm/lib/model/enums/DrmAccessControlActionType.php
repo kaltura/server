@@ -1,9 +1,9 @@
 <?php
 /**
- * @package plugins.playReady
+ * @package plugins.drm
  * @subpackage model.enum
  */
-class PlayReadyAccessControlActionType implements IKalturaPluginEnum, RuleActionType
+class DrmAccessControlActionType implements IKalturaPluginEnum, RuleActionType
 {
 	const DRM_POLICY = 'DRM_POLICY';
 	
