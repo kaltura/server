@@ -39,10 +39,6 @@ class QuestionCuePoint extends CuePoint //TODO: implements IMetadataObject
 
 	public function getExplanation() {return $this->getFromCustomData(self::CUSTOM_DATA_EXPLANATION);}
 
-	public function setCorrectAnswerKeys($v) {return $this->putInCustomData(self::CUSTOM_DATA_CORRECT_ANSWER_KEYS, $v);}
-
-	public function getCorrectAnswerKeys() {return $this->getFromCustomData(self::CUSTOM_DATA_CORRECT_ANSWER_KEYS, null, array() );}
-
 	public function getIsPublic()	{return true;}
 
 }

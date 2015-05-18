@@ -25,6 +25,27 @@ class kOptionalAnswer {
 	protected $weight = 1.0;
 
 	/**
+	 * @var boolean
+	 */
+	protected $isCorrect;
+
+	/**
+	 * @return boolean
+	 */
+	public function getIsCorrect()
+	{
+		return $this->isCorrect;
+	}
+
+	/**
+	 * @param boolean $isCorrect
+	 */
+	public function setIsCorrect($isCorrect)
+	{
+		$this->isCorrect = $isCorrect;
+	}
+
+	/**
 	 * @return string
 	 */
 	public function getKey()
