@@ -6,7 +6,7 @@ class kCouchbaseCacheQuery
 //function (doc, meta) {
 //	if (meta.type == "json") {
 //		if(doc.type == "primaryObject"){
-//			emit([doc.partnerId, doc.objectType, doc.objectId], doc.data);
+//			emit(doc.objectKey, doc.data);
 //		}
 //	}
 //}
@@ -15,10 +15,7 @@ class kCouchbaseCacheQuery
 //function (doc, meta) {
 //	if (meta.type == "json") {
 //		if(doc.type == "relatedObject"){
-//			emit([doc.partnerId, doc.triggerObjectType], {
-//				"responseProfileKey": doc.responseProfileKey, 
-//				"objectType": doc.objectType
-//			});
+//			emit(doc.triggerKey, null);
 //		}
 //	}
 //}
@@ -28,11 +25,7 @@ class kCouchbaseCacheQuery
 //function (doc, meta) {
 //	if (meta.type == "json") {
 //		if(doc.type == "primaryObject"){
-//			emit([doc.partnerId, doc.objectType], {
-//				"protocol": doc.protocol, 
-//				"ksType": doc.ksType, 
-//				"userRole": doc.userRole
-//			});
+//			emit([doc.sessionKey, doc.objectKey], null);
 //		}
 //	}
 //}

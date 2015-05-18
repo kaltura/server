@@ -13,19 +13,16 @@ class KalturaResponseProfileCacher extends kResponseProfileCacher
 	
 	private static function getObjectSpecificCacheValue(KalturaObject $apiObject, IBaseObject $object, KalturaDetachedResponseProfile $responseProfile)
 	{
-		$userRoles = kPermissionManager::getCurrentRoleIds();
-		sort($userRoles);
 		return array(
 			'type' => 'primaryObject',
+			'objectKey' => self::getObjectKey($object),
+			'sessionKey' => self::getSessionKey(),
 			'objectType' => get_class($object),
 			'objectPeer' => get_class($object->getPeer()),
 			'objectId' => $object->getPrimaryKey(),
 			'partnerId' => $object->getPartnerId(),
 			'responseProfileKey' => $responseProfile->getKey(),
-			'apiObject' => self::toArray($apiObject),
-			'protocol' => infraRequestUtils::getProtocol(),
-			'ksType' => kCurrentContext::getCurrentSessionType(),
-			'userRole' => implode('_', $userRoles)
+			'apiObject' => self::toArray($apiObject)
 		);
 	}
 	
@@ -52,6 +49,7 @@ class KalturaResponseProfileCacher extends kResponseProfileCacher
 		
 		return array(
 			'type' => 'relatedObject',
+			'triggerKey' => self::getTriggerKey($object),
 			'objectType' => get_class(self::$cachedObject),
 			'objectPeer' => get_class(self::$cachedObject->getPeer()),
 			'triggerObjectType' => get_class($object),
@@ -244,7 +242,7 @@ class KalturaResponseProfileCacher extends kResponseProfileCacher
 		self::set($key, $value);
 	}
 	
-	protected function recalculateCacheBySessionType($partnerId, $objectType, $limit = 100)
+	protected function recalculateCacheBySessionType($sessionKey, $objectKey = null, $limit = 100)
 	{
 		/* @var $object IBaseObject */
 		$responseProfile = null;
@@ -254,46 +252,9 @@ class KalturaResponseProfileCacher extends kResponseProfileCacher
 			if($cacheStore instanceof kCouchbaseCacheWrapper)
 			{
 				$query = $cacheStore->getNewQuery(kCouchbaseCacheQuery::VIEW_RESPONSE_PROFILE_SESSION_TYPE);
-				$query->addKey('partnerId', $partnerId);
-				$query->addKey('objectType', $objectType);
-				$query->setLimit(min(100, $limit));
-
-				$recalculated = array();
-				$list = $cacheStore->query($query);
-				while($list->getCount())
-				{
-					foreach($list->getObjects() as $cache)
-					{
-						/* @var $cache kCouchbaseCacheListItem */
-						KalturaLog::debug("Cache object [" . print_r($cache, true) . "]");
-						$this->recalculateCache($cache);
-						$recalculated[] = $cache->getId();
-					}
-					
-					if(count($recalculated) >= $limit)
-						break;
-						
-					$list = $cacheStore->query($query);
-				}
-				if(count($recalculated))
-					return $recalculated;
-			}
-		}
-		return array();
-	}
-	
-	protected function recalculateCacheByObject($partnerId, $objectType, $objectId, $limit = 100)
-	{
-		/* @var $object IBaseObject */
-		$cacheStores = self::getStores();
-		foreach ($cacheStores as $cacheStore)
-		{
-			if($cacheStore instanceof kCouchbaseCacheWrapper)
-			{
-				$query = $cacheStore->getNewQuery(kCouchbaseCacheQuery::VIEW_RESPONSE_PROFILE_OBJECT_SPECIFIC);
-				$query->addKey('partnerId', $partnerId);
-				$query->addKey('objectType', $objectType);
-				$query->addKey('objectId', $objectId);
+				$query->addKey('sessionKey', $sessionKey);
+				if($objectKey)
+					$query->addKey('objectKey', $objectKey);
 				$query->setLimit(min(100, $limit));
 
 				$recalculated = array();
