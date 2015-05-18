@@ -196,35 +196,37 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 	
 	protected function hasCachedRelatedObjects(BaseObject $object)
 	{
-		/* @var $object IBaseObject */
-		$peer = $object->getPeer();
-		if(!($peer instanceof IRelatedObjectPeer))
+		if($object instanceof IBaseObject)
 		{
-			return false;
-		}
-		
-		if(!$peer->isReferenced($object))
-		{
-			$roots = $peer->getRootObjects($object);
-			if(count($roots))
-				return true;
-				
-			return false;
-		}
-		
-		$cacheStores = self::getStores();
-		foreach ($cacheStores as $cacheStore)
-		{
-			if($cacheStore instanceof kCouchbaseCacheWrapper)
+			$peer = $object->getPeer();
+			if(!($peer instanceof IRelatedObjectPeer))
 			{
-				$query = $cacheStore->getNewQuery(kCouchbaseCacheQuery::VIEW_RESPONSE_PROFILE_RELATED_OBJECT);
-				$query->addKey('partnerId', $object->getPartnerId());
-				$query->addKey('triggerObjectType', get_class($object));
-				$query->setLimit(1);
-				
-				$list = $cacheStore->query($query);
-				if($list->getCount())
+				return false;
+			}
+			
+			if(!$peer->isReferenced($object))
+			{
+				$roots = $peer->getRootObjects($object);
+				if(count($roots))
 					return true;
+					
+				return false;
+			}
+			
+			$cacheStores = self::getStores();
+			foreach ($cacheStores as $cacheStore)
+			{
+				if($cacheStore instanceof kCouchbaseCacheWrapper)
+				{
+					$query = $cacheStore->getNewQuery(kCouchbaseCacheQuery::VIEW_RESPONSE_PROFILE_RELATED_OBJECT);
+					$query->addKey('partnerId', $object->getPartnerId());
+					$query->addKey('triggerObjectType', get_class($object));
+					$query->setLimit(1);
+					
+					$list = $cacheStore->query($query);
+					if($list->getCount())
+						return true;
+				}
 			}
 		}
 		
@@ -233,42 +235,46 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 	
 	protected function hasCachedRootObjects(BaseObject $object)
 	{
-		/* @var $object IBaseObject */
-		$peer = $object->getPeer();
-		if(!($peer instanceof IRelatedObjectPeer))
+		if($object instanceof IBaseObject)
 		{
-			return false;
-		}
-		
-		if($peer->isReferenced($object))
-		{
-			return false;
-		}
-		
-		$roots = $peer->getRootObjects($object);
-		if(count($roots))
-			return true;
+			$peer = $object->getPeer();
+			if(!($peer instanceof IRelatedObjectPeer))
+			{
+				return false;
+			}
 			
+			if($peer->isReferenced($object))
+			{
+				return false;
+			}
+			
+			$roots = $peer->getRootObjects($object);
+			if(count($roots))
+				return true;
+		}
+				
 		return false;
 	}
 	
 	protected function isCachedObject(BaseObject $object)
 	{
-		/* @var $object IBaseObject */
-		$cacheStores = self::getStores();
-		foreach ($cacheStores as $cacheStore)
+		if($object instanceof IBaseObject)
 		{
-			if($cacheStore instanceof kCouchbaseCacheWrapper)
+			$cacheStores = self::getStores();
+			foreach ($cacheStores as $cacheStore)
 			{
-				$query = $cacheStore->getNewQuery(kCouchbaseCacheQuery::VIEW_RESPONSE_PROFILE_OBJECT_SPECIFIC);
-				$query->addKey('partnerId', $object->getPartnerId());
-				$query->addKey('objectType', get_class($object));
-				$query->addKey('objectId', $object->getId());
-				$query->setLimit(1);
-				
-				$list = $cacheStore->query($query);
-				if($list->getCount())
-					return true;
+				if($cacheStore instanceof kCouchbaseCacheWrapper)
+				{
+					$query = $cacheStore->getNewQuery(kCouchbaseCacheQuery::VIEW_RESPONSE_PROFILE_OBJECT_SPECIFIC);
+					$query->addKey('partnerId', $object->getPartnerId());
+					$query->addKey('objectType', get_class($object));
+					$query->addKey('objectId', $object->getId());
+					$query->setLimit(1);
+					
+					$list = $cacheStore->query($query);
+					if($list->getCount())
+						return true;
+				}
 			}
 		}
 		
@@ -283,21 +289,20 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 		return true;
 	}
 	
-	protected function addRecalculateRelatedObjectsCacheJob(BaseObject $object)
+	protected function addRecalculateRelatedObjectsCacheJob(IBaseObject $object)
 	{
 		// TODO list all ksType, roldIds, protocol that related to this object and create few jobs for each
 		return true;
 	}
 	
-	protected function addRecalculateObjectCacheJob(BaseObject $object)
+	protected function addRecalculateObjectCacheJob(IBaseObject $object)
 	{
 		// TODO just add a job
 		return true;
 	}
 	
-	protected function invalidateCachedRootObjects(BaseObject $object)
+	protected function invalidateCachedRootObjects(IBaseObject $object)
 	{
-		/* @var $object IBaseObject */
 		$peer = $object->getPeer();
 		if($peer instanceof IRelatedObjectPeer)
 		{
@@ -313,7 +318,7 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 		return true;
 	}
 	
-	protected function invalidateCachedObject(BaseObject $object)
+	protected function invalidateCachedObject(IBaseObject $object)
 	{
 		if(PermissionPeer::isValidForPartner(PermissionName::FEATURE_RECALCULATE_RESPONSE_PROFILE_CACHE, $object->getPartnerId()))
 		{
@@ -327,7 +332,7 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 		return true;
 	}
 		
-	protected function deleteCachedObjects(BaseObject $object)
+	protected function deleteCachedObjects(IBaseObject $object)
 	{
 		/* @var $object IBaseObject */
 		$cacheStores = self::getStores();

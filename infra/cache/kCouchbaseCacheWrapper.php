@@ -237,7 +237,7 @@ class kCouchbaseCacheQuery
 	 */
 	public function addEndKey($key, $value)
 	{
-		$this->startKey[$key] = $value;
+		$this->endKey[$key] = $value;
 	}
 
 	/**
@@ -246,7 +246,7 @@ class kCouchbaseCacheQuery
 	 */
 	public function addKey($key, $value)
 	{
-		$this->startKey[$key] = $value;
+		$this->key[$key] = $value;
 	}
 
 	/**
@@ -638,7 +638,7 @@ class kCouchbaseCacheWrapper extends kBaseCacheWrapper
 		try
 		{
 			$metas = $this->bucket->remove($keys);
-			KalturaLog::debug("key [" . print_r($keys, true) . "] metas [" . print_r($metas, true) . "]");
+			KalturaLog::debug("key [" . print_r($keys, true) . "]");
 			return true;
 		}
 		catch(CouchbaseException $e)

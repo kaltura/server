@@ -142,7 +142,7 @@ class KalturaResponseProfileCacher extends kResponseProfileCacher
 		if($object !== self::$cachedObject)
 			return;
 			
-		KalturaLog::debug("Stop " . get_class($apiObject) . " [" . self::toArray($apiObject) . "]");
+		KalturaLog::debug("Stop " . get_class($apiObject) . " [" . print_r($apiObject, true) . "]");
 		
 		$key = self::getObjectSpecificCacheKey(self::$cachedObject, self::$responseProfile);
 		$value = self::getObjectSpecificCacheValue($apiObject, self::$cachedObject, self::$responseProfile);
@@ -190,23 +190,26 @@ class KalturaResponseProfileCacher extends kResponseProfileCacher
 		if(!is_array($object) && !is_object($object))
 			return $object;
 		
-		$array = null;
+		$array = (array) $object;
 		if(is_object($object) && $object instanceof KalturaObject)
 		{
 			if($object instanceof KalturaTypedArray)
 			{
 				return self::toArray($object->toArray());
 			}
-			$array = (array) $object;
 			$array['objectType'] = get_class($object);
 		}
 		
 		foreach($array as $key => $value)
 		{
 			if(is_null($value))
+			{
 				unset($array[$key]);
-			
-			$array[$key] = self::toArray($value);
+			}
+			else 
+			{
+				$array[$key] = self::toArray($value);
+			}
 		}
 		
 		return $array;
