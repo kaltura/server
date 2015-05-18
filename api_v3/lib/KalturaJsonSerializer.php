@@ -26,9 +26,13 @@ class KalturaJsonSerializer extends KalturaSerializer
 		foreach($array as $key => $value)
 		{
 			if(is_null($value))
+			{
 				unset($array[$key]);
-			
-			$array[$key] = $this->unsetNull($value);
+			}
+			else
+			{
+				$array[$key] = $this->unsetNull($value);
+			}
 		}
 		
 		return $array;
