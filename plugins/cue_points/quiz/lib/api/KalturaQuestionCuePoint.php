@@ -12,12 +12,6 @@ class KalturaQuestionCuePoint extends KalturaCuePoint
 	 */
 	public $optionalAnswers;
 
-	/**
-	 * Array of string
-	 * @var KalturaStringArray
-	 */
-	public $correctAnswerKeys;
-
 
 	/**
 	 * @var string
@@ -45,7 +39,6 @@ class KalturaQuestionCuePoint extends KalturaCuePoint
 	private static $map_between_objects = array
 	(
 		"optionalAnswers",
-		"correctAnswerKeys",
 		"hint",
 		"question" => "name",
 		"explanation",
@@ -79,9 +72,11 @@ class KalturaQuestionCuePoint extends KalturaCuePoint
 	{
 		parent::doFromObject($dbObject, $responseProfile);
 		$this->optionalAnswers = KalturaOptionalAnswersArray::fromDbArray($dbObject->getOptionalAnswers(), $responseProfile);
-
-		if ( !$dbObject->isEntitledForEntry() ) {
-			$this->correctAnswerKeys = null;
+		$dbEntry = entryPeer::retrieveByPK($dbObject->getEntryId());
+		if ( !QuizPlugin::validateUserEntitledForQuizEdit($dbEntry) ) {
+			foreach ( $this->optionalAnswers as $answer ) {
+				$answer->isCorrect = null;
+			}
 			$this->explanation = null;
 		}
 	}

@@ -47,15 +47,18 @@ class kQuizManager implements kObjectAddedEventConsumer, kObjectChangedEventCons
 	 */
 	public function objectAdded(BaseObject $object, BatchJob $raisedJob = null)
 	{
-		if($object instanceof AnswerCuePoint) {
-			$dbParentCuePoint = CuePointPeer::retrieveByPK($object->getParentId());
-			$correctKeys =  $dbParentCuePoint->getCorrectAnswerKeys();
-			$object->setCorrectAnswerKeys( $correctKeys );
-			$object->setExplanation( $dbParentCuePoint->getExplanation() );
-			$object->setIsCorrect( in_array( $object->getAnswerKey(), $correctKeys ) );
-			$object->save();
+		$dbParentCuePoint = CuePointPeer::retrieveByPK($object->getParentId());
+		$optionalAnswers =  $dbParentCuePoint->getOptionalAnswers();
+		$correctKeys = array();
+		foreach ($optionalAnswers as $answer)
+		{
+			if ( $answer->getIsCorrect() )
+				$correctKeys[] = $answer->getKey();
 		}
-
+		$object->setCorrectAnswerKeys( $correctKeys );
+		$object->setExplanation( $dbParentCuePoint->getExplanation() );
+		$object->setIsCorrect( in_array( $object->getAnswerKey(), $correctKeys ) );
+		$object->save();
 		return true;
 	}
 
