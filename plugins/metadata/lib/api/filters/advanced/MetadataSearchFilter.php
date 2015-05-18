@@ -10,6 +10,7 @@ class MetadataSearchFilter extends AdvancedSearchFilterOperator
 	const KMC_FIELD_TYPE_DATE = 'dateType';
 	const KMC_FIELD_TYPE_INT = 'intType';
 	const KMC_FIELD_TYPE_OBJECT = 'objectType';
+	const KMC_FIELD_TYPE_USER = 'userType';
 	const KMC_FIELD_TYPE_METADATA_OBJECT = 'metadataObjectType';
 	 
 	/**
@@ -171,7 +172,7 @@ class MetadataSearchFilter extends AdvancedSearchFilterOperator
 						}
 						
 						// exact match
-						elseif ($xPaths[$field]->getType() == self::KMC_FIELD_TYPE_LIST)
+						elseif (in_array($xPaths[$field]->getType(), array(self::KMC_FIELD_TYPE_OBJECT, self::KMC_FIELD_TYPE_USER)))
 						{
 							$dataCondition = "\\\"{$pluginName}_{$fieldId} $value " . kMetadataManager::SEARCH_TEXT_SUFFIX . "_{$fieldId}" . "\\\"";
 						}

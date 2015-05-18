@@ -788,12 +788,19 @@ class myEntryUtils
 						$cache->remove($orig_image_path);
 						throw new kFileSyncException('no ready filesync on current DC', kFileSyncException::FILE_DOES_NOT_EXIST_ON_CURRENT_DC);
 					}
+					
+					// close db connections as we won't be requiring the database anymore and capturing a thumbnail may take a long time
+					kFile::closeDbConnections();
+					
 					myFileConverter::autoCaptureFrame($entry_data_path, $capturedThumbPath."temp_", $calc_vid_sec, -1, -1);
 					
 					$cache->remove($orig_image_path);
 				}
 			}
 
+			// close db connections as we won't be requiring the database anymore and image manipulation may take a long time
+			kFile::closeDbConnections();
+			
 			// resizing (and editing)) an image file that failes results in a long server waiting time
 			// prevent this waiting time (of future requests) in case the resizeing failes
 			$cache = new myCache("thumb-processing-resize", 5 * 60); // 5 minutes

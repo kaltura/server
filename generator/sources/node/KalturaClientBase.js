@@ -27,8 +27,11 @@
 // @ignore
 // ===================================================================================================
 
-var crypto = require("crypto");
-var http = require("http");
+var crypto = require('crypto');
+var http = require('http');
+var path = require('path');
+var url = require('url');
+var fs = require('fs');
 
 /**
  * Generates a URL-encoded query string from the associative (or indexed) array provided.
@@ -122,9 +125,9 @@ module.exports.toParams = toParams = function(obj)
 {
 	var params = {};
 	params["objectType"] = getClass(obj);
-		for(var prop in obj) {
-			var val = obj[prop];
-			addIfNotNull(obj, params, prop, val);
+	for(var prop in obj) {
+		var val = obj[prop];
+		addIfNotNull(obj, params, prop, val);
 	}
 	return params;
 };
@@ -240,8 +243,6 @@ var KalturaClientBase = module.exports.KalturaClientBase = function() {};
 KalturaClientBase.prototype.init = function(config){
 	this.config = config;
 
-	this.apiVersion = null;
-	this.ks = null;
 	this.logEnabled = false;
 	this.debugEnabled = false;
 	this.useMultiRequest = false;
@@ -257,6 +258,9 @@ KalturaClientBase.KALTURA_SERVICE_FORMAT_JSON = 1;
 KalturaClientBase.KALTURA_SERVICE_FORMAT_XML = 2;
 KalturaClientBase.KALTURA_SERVICE_FORMAT_PHP = 3;
 KalturaClientBase.KALTURA_SERVICE_FORMAT_JSONP = 9;
+
+KalturaClientBase.prototype.clientConfiguration = {};
+KalturaClientBase.prototype.requestConfiguration = {};
 
 /**
  * Set logger to get kaltura client debug logs.
@@ -275,10 +279,9 @@ KalturaClientBase.prototype.setLogger = function(logger){
  */
 KalturaClientBase.prototype.queueServiceActionCall = function (service, action, params, files){
 	// in start session partner id is optional (default -1). if partner id was not set, use the one in the config
-	if (!params.hasOwnProperty("partnerId") || params["partnerId"] == -1) {
-		params["partnerId"] = this.config.partnerId;
+	for(var paramName in this.requestConfiguration){
+		this.addParam(params, paramName, this.requestConfiguration[paramName]);
 	}
-	this.addParam(params, "ks", this.ks);
 	var call = new KalturaServiceActionCall(service, action, params, files);
 	this.callsQueue.push(call);
 };
@@ -294,9 +297,10 @@ KalturaClientBase.prototype.doQueue = function(callback){
 	var files = {};
 	this.log("Service url: [" + this.config.serviceUrl + "]");
 	// append the basic params
-	this.addParam(params, "apiVersion", this.apiVersion);
 	this.addParam(params, "format", this.config.format);
-	this.addParam(params, "clientTag", this.config.clientTag);
+	for(var paramName in this.clientConfiguration){
+		this.addParam(params, paramName, this.clientConfiguration[paramName]);
+	}
 	var url = this.config.serviceUrl + this.config.serviceBase;
 	var call = null;
 	if (this.useMultiRequest){
@@ -330,7 +334,15 @@ KalturaClientBase.prototype.doQueue = function(callback){
 	var signature = this.signature(params);
 	this.addParam(params, "kalsig", signature);
 	this.doHttpRequest(callback, url, params, files);
+	this.resetRequest();
 	return true;
+};
+
+/**
+ * Clear all volatile configuration parameters
+ */
+KalturaClientBase.prototype.resetRequest = function(){
+	throw new Error('KalturaClientBase.resetRequest should be overriden by KalturaClient.');
 };
 
 /**
@@ -351,20 +363,101 @@ KalturaClientBase.prototype.signature = function(params){
 };
 
 KalturaClientBase.requestIndex = 1;
+
+KalturaClientBase.prototype.encodeFile = function(boundary, type, name, filename) {
+	var returnPart = '--' + boundary + '\r\n';
+	returnPart += 'Content-Disposition: form-data name="' + name + '" filename="' + filename + '"\r\n';
+	returnPart += 'Content-Type: ' + type + '\r\n\r\n';
+	return returnPart;
+};
+
 /**
  * send the http request.
  * @param string url						the url to call.
  * @param parameters params					the parameters to pass.
  * @return array							 the results and errors inside an array.
  */
-KalturaClientBase.prototype.doHttpRequest = function (callCompletedCallback, url, params, files){
+KalturaClientBase.prototype.doHttpRequest = function (callCompletedCallback, requestUrl, params, files) {
 	var This = this;
 	var requestIndex = KalturaClientBase.requestIndex++;
-	url += "&" + http_build_query(params);
-	this.log("Request [" + requestIndex + "]: " + url);
-	http.get(url, function(response){
-			var data = "";
-			response.on("data", function(chunk) {
+	var data = http_build_query(params);
+	var debugUrl = requestUrl + '&' + data;
+	var urlInfo = url.parse(debugUrl);
+	this.log('Request [' + requestIndex + ']: ' + debugUrl);
+	
+	if(Object.keys(files).length > 0){	
+		var crlf = '\r\n';
+		var boundary = '---------------------------' + Math.random();
+		var delimiter = crlf + '--' + boundary;
+		var postData = [];
+
+		for ( var key in files) {
+			var filePath = files[key];
+			var fileName = path.basename(filePath);
+			var data = fs.readFileSync(filePath);
+			var headers = [ 'Content-Disposition: form-data; name="' + key + '"; filename="' + fileName + '"' + crlf, 'Content-Type: application/octet-stream' + crlf ];
+
+			postData.push(new Buffer(delimiter + crlf + headers.join('') + crlf));
+			postData.push(new Buffer(data));
+		}
+		postData.push(new Buffer(delimiter + '--'));
+		var multipartBody = Buffer.concat(postData);
+		
+		var options = {
+			host : urlInfo.host,
+			path : urlInfo.path,
+			method : 'POST',
+			headers : {
+				'Content-Type' : 'multipart/form-data; boundary=' + boundary,
+				'Content-Length' : multipartBody.length
+			}
+		};
+
+		var request = http.request(options);
+		request.write(multipartBody);
+		request.end();
+		request.on('error', function(err) {
+			console.log(err);
+		});
+		request.on('response', function(response) {
+			response.setEncoding('utf8');
+
+			var data = '';
+			response.on('data', function(chunk) {
+				data += chunk;
+			});
+			response.on('end', function() {
+				var headers = [];
+				for ( var header in response.headers) {
+					headers.push(header + ': ' + response.headers[header]);
+				}
+				This.debug('Headers [' + requestIndex + ']: \n\t' + headers.join('\n\t'));
+				This.debug('Response [' + requestIndex + ']: ' + data);
+				callCompletedCallback(JSON.parse(data));
+			});
+		});
+	} else {
+		var options = {
+			host : urlInfo.host,
+			path : urlInfo.path,
+			method : 'POST',
+			headers : {
+				'Content-Type' : 'application/x-www-form-urlencoded',
+				'Content-Length' : Buffer.byteLength(data)
+			}
+		};
+
+		var request = http.request(options);
+		request.write(data);
+		request.end();
+		
+		request.on('error', function(err) {
+			console.log(err);
+		});
+		request.on('response', function(response) {
+			response.setEncoding('utf8');
+			var data = '';
+			response.on('data', function(chunk) {
 				data += chunk;
 			});
 			response.on("end", function() {
@@ -376,25 +469,8 @@ KalturaClientBase.prototype.doHttpRequest = function (callCompletedCallback, url
 				This.debug("Response [" + requestIndex + "]: " + data);
 				callCompletedCallback(JSON.parse(data));
 			});
-	}).on('error', function(e){
-		This.error('Request failed  [' + requestIndex + ']: ' + e.message);
-		callCompletedCallback(null);
-	});
-};
-
-/**
- * getter for the Kaltura session.
- * @return string	KS
- */
-KalturaClientBase.prototype.getKs = function(){
-	return this.ks;
-};
-
-/**
- * @param string ks	setter for the Kaltura session.
- */
-KalturaClientBase.prototype.setKs = function(ks){
-	this.ks = ks;
+		});
+	}
 };
 
 /**
@@ -439,6 +515,9 @@ KalturaClientBase.prototype.addParam = function(params, paramName, paramValue){
 
 	// object
 	if(isNaN(paramValue.length)){
+		if(!paramValue.objectType){
+			paramValue = toParams(paramValue);
+		}
 		for(subParamName in paramValue) {
 			subParamValue = paramValue[subParamName];
 			this.addParam(params, paramName + ":" + subParamName, subParamValue);
@@ -528,21 +607,11 @@ KalturaServiceBase.prototype.client = null;
 
 /**
  * Constructs new Kaltura configuration object
- * @param partnerId		a valid Kaltura partner id.
  */
-var KalturaConfiguration = module.exports.KalturaConfiguration = function (partnerId){
-	if(!partnerId) {
-		partnerId = -1;
-	}
-	if (typeof(partnerId) != "number") {
-		throw "Invalid partner id - partnerId must be numeric!";
-	}
-	this.partnerId = partnerId;
-
+var KalturaConfiguration = module.exports.KalturaConfiguration = function (){
 	this.serviceUrl = "http://www.kaltura.com";
 	this.serviceBase = "/api_v3/index.php?service=";
 	this.format = KalturaClientBase.KALTURA_SERVICE_FORMAT_JSON;
-	this.clientTag = "node";
 	this.logger = null;
 };
 

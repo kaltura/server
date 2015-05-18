@@ -18,6 +18,12 @@ class kMetadataManager
 		MetadataObjectType::PARTNER => 'Partner',
 	);
 	
+	protected static $metadataFieldTypesToValidate = array(
+	    MetadataSearchFilter::KMC_FIELD_TYPE_OBJECT,
+	    MetadataSearchFilter::KMC_FIELD_TYPE_USER,
+	    MetadataSearchFilter::KMC_FIELD_TYPE_METADATA_OBJECT,
+	);
+	
 	/**
 	 * @param KalturaMetadataObjectType $objectType
 	 *
@@ -42,6 +48,24 @@ class kMetadataManager
 			default:
 				return KalturaPluginManager::loadObject('IMetadataPeer', $objectType);
 		}
+	}
+	
+	protected static function getObjectPeerByFieldType($fieldType)
+	{
+	    switch ($fieldType)
+	    {
+	        case MetadataSearchFilter::KMC_FIELD_TYPE_OBJECT:
+	            return new MetadataEntryPeer();
+	             
+	        case MetadataSearchFilter::KMC_FIELD_TYPE_USER:
+	            return new MetadataKuserPeer();
+
+	        case MetadataSearchFilter::KMC_FIELD_TYPE_METADATA_OBJECT:
+	            return new MetadataDynamicObjectPeer();
+	             
+	        default:
+	            return null; 
+	    }
 	}
 	
 	/**
@@ -163,7 +187,7 @@ class kMetadataManager
 			$xPathData = $xPaths[$xPath];
 			
 			$profileField->setStatus(MetadataProfileField::STATUS_ACTIVE);
-			$profileField->setMetadataProfileVersion($metadataProfile->getVersion());
+			$profileField->setMetadataProfileVersion($metadataProfile->getFileSyncVersion());
 			if(isset($xPathData['name']))
 				$profileField->setKey($xPathData['name']);
 			if(isset($xPathData['label']))
@@ -423,7 +447,7 @@ class kMetadataManager
 	 * @param int $prevVersion
 	 * @param string $prevXsd
 	 */
-	public static function diffMetadataProfile(MetadataProfile $metadataProfile, $prevVersion, $prevXsd, $newVersion, $newXsd)
+	public static function diffMetadataProfile(MetadataProfile $metadataProfile, $prevXsd, $newXsd)
 	{
 		$xsl = true;
 		if(!PermissionPeer::isValidForPartner(MetadataPermissionName::FEATURE_METADATA_NO_VALIDATION, $metadataProfile->getPartnerId()))
@@ -432,59 +456,30 @@ class kMetadataManager
 		}
 			
 		if($xsl === true)
-			return self::upgradeMetadataObjects($metadataProfile->getId(), $prevVersion, $newVersion);
+			return;
 
 		if(PermissionPeer::isValidForPartner(MetadataPermissionName::FEATURE_METADATA_NO_TRANSFORMATION, $metadataProfile->getPartnerId()))
 			throw new kXsdException(kXsdException::TRANSFORMATION_REQUIRED);
-			
+
+		$prevVersion = $metadataProfile->getVersion();
+		$metadataProfile->incrementVersion();
+		$newVersion = $metadataProfile->getVersion();
+		$metadataProfile->save();//save has to be before we create a batch to make sure there is no race-condition where XSD is not updated before the batch runs.
+
 		return self::addTransformMetadataJob($metadataProfile->getPartnerId(), $metadataProfile->getId(), $prevVersion, $newVersion, $xsl);
 	}
 
-	/**
-	 * batch getTransformMetadataObjects action retrieve all metadata objects that requires upgrade and the total count
-	 *
-	 * @param int $metadataProfileId The id of the metadata profile
-	 * @param int $srcVersion The old metadata profile version
-	 * @param int $destVersion The new metadata profile version
-	 */
-	private static function upgradeMetadataObjects($metadataProfileId, $srcVersion, $destVersion)
-	{
-		$affectedRows = null;
-		do
-		{
-			$table = MetadataPeer::TABLE_NAME;
-			$colId = MetadataPeer::ID;
-			$colMetadataProfileId = MetadataPeer::METADATA_PROFILE_ID;
-			$colMetadataProfileVersion = MetadataPeer::METADATA_PROFILE_VERSION;
-			$colStatus = MetadataPeer::STATUS;
-			$validStatus = Metadata::STATUS_VALID;
-			
-			$sql = "UPDATE $table ";
-			$sql .= "SET $colMetadataProfileVersion = $destVersion ";
-			$sql .= "WHERE $colMetadataProfileId = $metadataProfileId ";
-			$sql .= "AND $colMetadataProfileVersion = $srcVersion ";
-			$sql .= "AND $colStatus = $validStatus ";
-			$sql .= "ORDER BY $colId ";
-			$sql .= "LIMIT 10000";
-			
-			$con = myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_MASTER);
-			$affectedRows = $con->exec($sql);
-			KalturaLog::debug("Affected rows [$affectedRows]");
-		}
-		while($affectedRows);
-	}
-	
 	/**
 	 * Validate the XML against the profile XSD and set the metadata status
 	 *
 	 * @param int $metadataProfileId
 	 * @param string $metadata
 	 * @param string $errorMessage
-	 * @param int $metadataProfileVersion leave it null to use the latest
+	 * @param int $compareAgainstPreviousVersion leave it false to use the latest metadata profile version
 	 *
 	 * returns bool
 	 */
-	public static function validateMetadata($metadataProfileId, $metadata, &$errorMessage, $metadataProfileVersion = null)
+	public static function validateMetadata($metadataProfileId, $metadata, &$errorMessage, $compareAgainstPreviousVersion = false)
 	{
 		KalturaLog::debug("Validating metadata [$metadata]");
 		$metadataProfile = MetadataProfilePeer::retrieveByPK($metadataProfileId);
@@ -495,7 +490,12 @@ class kMetadataManager
 			return false;
 		}
 		
-		$metadataProfileKey = $metadataProfile->getSyncKey(MetadataProfile::FILE_SYNC_METADATA_DEFINITION, $metadataProfileVersion);
+		$metadataProfileFSVersion = null;
+		if($compareAgainstPreviousVersion) {
+			$metadataProfileFSVersion = $metadataProfile->getPreviousFileSyncVersion();
+		}
+		
+		$metadataProfileKey = $metadataProfile->getSyncKey(MetadataProfile::FILE_SYNC_METADATA_DEFINITION, $metadataProfileFSVersion);
 		$xsdData = kFileSyncUtils::file_get_contents($metadataProfileKey, true, false);
 		if(!$xsdData)
 		{
@@ -510,12 +510,12 @@ class kMetadataManager
 		$xml->loadXML($metadata);
 		if($xml->schemaValidateSource($xsdData))
 		{
-			if (!self::validateSubMetadataObjects($metadataProfileId, $xml))
-			{
-				$errorMessage = "Metadata has invalid sub metadata object";
+		    if(!self::validateMetadataObjects($metadataProfileId, $xml, $errorMessage))
+		    {
 				KalturaLog::err($errorMessage);
 				return false;
 			}
+			
 			KalturaLog::debug("Metadata is valid");
 			return true;
 		}
@@ -524,39 +524,39 @@ class kMetadataManager
 		KalturaLog::err("Metadata is invalid:\n$errorMessage");
 		return false;
 	}
-
-	protected static function validateSubMetadataObjects($metadataProfileId, KDOMDocument $xml)
+	
+	protected static function validateMetadataObjects($metadataProfileId, KDOMDocument $xml, &$errorMessage)
 	{
-		$profileFields = MetadataProfileFieldPeer::retrieveAllActiveByMetadataProfileId($metadataProfileId);
-		$xPath = new DOMXPath($xml);
-		foreach ($profileFields as $profileField)
-		{
-			/** @var MetadataProfileField $profileField */
-			if ($profileField->getType() == MetadataSearchFilter::KMC_FIELD_TYPE_METADATA_OBJECT)
-			{
-				$nodes = $xPath->query($profileField->getXpath());
-				$subObjectIds = array();
-				foreach ($nodes as $node)
-					$subObjectIds[] = $node->nodeValue;
-				$subObjectIds = array_unique($subObjectIds);
-				if (!count($subObjectIds))
-					continue;
-				$subMetadataProfileId = $profileField->getRelatedMetadataProfileId();
-				$subMetadataProfile = MetadataProfilePeer::retrieveByPK($subMetadataProfileId);
-				if (!$subMetadataProfile)
-				{
-					KalturaLog::err('Sub metadata profile ' . $subMetadataProfileId . ' was not found');
-					return false;
-				}
-				$subMetadataObjects = MetadataPeer::retrieveByObjects($subMetadataProfileId, $subMetadataProfile->getObjectType(), $subObjectIds);
-				if (count($subMetadataObjects) != count($subObjectIds))
-				{
-					KalturaLog::err('One of the following objects: '.implode(', ', $subObjectIds).' was not found for profile '.$subMetadataProfileId);
-					return false;
-				}
-			}
-		}
-		return true;
+	    $profileFields = MetadataProfileFieldPeer::retrieveByMetadataProfileId($metadataProfileId);
+	    $xPath = new DOMXPath($xml);
+	    
+	    foreach ($profileFields as $profileField)
+	    {
+	        /** @var MetadataProfileField $profileField */
+	        if(!in_array($profileField->getType(), self::$metadataFieldTypesToValidate))
+	            continue;
+	        
+	        $objectPeer = self::getObjectPeerByFieldType($profileField->getType());
+	        
+	        if(!$objectPeer)
+	        {
+	            $errorMessage = "Peer not found for field of type " . $profileField->getType();
+	            return false;
+	        }
+	        
+	        $objectIds = array();
+	        $nodes = $xPath->query($profileField->getXpath());
+	         
+	        foreach ($nodes as $node)
+	            $objectIds[] = $node->nodeValue;
+	         
+	        $objectIds = array_unique($objectIds);
+	        
+	        if(!$objectPeer->validateMetadataObjects($profileField, $objectIds, &$errorMessage))
+	            return false;
+	    }
+	    
+	    return true;
 	}
 
 	public static function validateProfileFields($partnerId, $xsd)

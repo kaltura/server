@@ -17,6 +17,7 @@ dwhPath												= @LOG_DIR@/dwh.log
 dwhEnabled											= 0
 timezone											= @TIME_ZONE@
 statusInterval										= 300
+logWorkerInterval									= 60
 enabledWorkers.KScheduleHelper						= 1
 enabledWorkers.DirectoryCleanupLocal				= 1
 enabledWorkers.DirectoryCleanupBatchLogs			= 1
@@ -38,6 +39,8 @@ enabledWorkers.KAsyncDistributeSubmit				= 1
 enabledWorkers.KAsyncDistributeUpdate				= 1
 enabledWorkers.KAsyncDistributeDelete				= 1
 enabledWorkers.KAsyncDistributeFetchReport			= 1
+enabledWorkers.KAsyncDistributeEnable				= 1
+enabledWorkers.KAsyncDistributeDisable				= 1 
 enabledWorkers.KAsyncSynchronizeDistribution		= 1
 enabledWorkers.KAsyncDropFolderWatcher				= 1
 enabledWorkers.KAsyncDropFolderContentProcessor		= 1
@@ -724,3 +727,15 @@ type												= KAsyncIntegrateCloser
 maximumExecutionTime								= 12000
 scriptPath											= ../plugins/integration/batch/Integrate/KAsyncIntegrateCloserExe.php
 params.maxTimeBeforeFail							= 1000000
+
+[KAsyncDistributeEnable : KAsyncDistribute]
+id													= 590
+friendlyName										= Distribute Enable
+type												= KAsyncDistributeEnable
+scriptPath											= ../plugins/content_distribution/batch/Distribute/KAsyncDistributeEnableExe.php
+
+[KAsyncDistributeDisable : KAsyncDistribute]
+id													= 600
+friendlyName										= Distribute Disable
+type												= KAsyncDistributeDisable
+scriptPath											= ../plugins/content_distribution/batch/Distribute/KAsyncDistributeDisableExe.php
