@@ -64,7 +64,7 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 			
 			if($value)
 			{
-				KalturaLog::debug("Get value [" . json_encode($value) . "]");
+				KalturaLog::debug("Get value [" . print_r($value, true) . "]");
 				return $value;
 			}
 		}
@@ -320,7 +320,22 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 	
 	protected function addRecalculateObjectCacheJob(IBaseObject $object)
 	{
-		// TODO just add a job
+		$objectKey = self::getObjectKey($object);
+		
+//		TODO
+//		$sessionTypes = self::listObjectSessionTypes($object);
+//		foreach($sessionTypes as $sessionType)
+//		{
+//			list($protocol, $ksType, $userRole, $count) = $sessionType;
+//			if($count < self::MAX_CACHE_KEYS_PER_JOB)
+//			{
+//				kJobsManager::addRecalculateCacheJob($partnerId, $protocol, $ksType, $userRoles, $objectKey);
+//			}
+//			else
+//			{
+//				kJobsManager::addRecalculateCacheJob($partnerId, $protocol, $ksType, $userRoles, $objectKey);
+//			}
+//		}
 		return true;
 	}
 	

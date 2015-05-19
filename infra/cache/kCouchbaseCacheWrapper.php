@@ -6,7 +6,7 @@ class kCouchbaseCacheQuery
 //function (doc, meta) {
 //	if (meta.type == "json") {
 //		if(doc.type == "primaryObject"){
-//			emit(doc.objectKey, doc.data);
+//			emit(doc.objectKey, doc.apiObject);
 //		}
 //	}
 //}
@@ -25,11 +25,10 @@ class kCouchbaseCacheQuery
 //function (doc, meta) {
 //	if (meta.type == "json") {
 //		if(doc.type == "primaryObject"){
-//			emit([doc.sessionKey, doc.objectKey], null);
+//			emit([doc.sessionKey, doc.objectKey], doc);
 //		}
 //	}
 //}
-//reduce _count
 	
 	/**
 	 * @var string

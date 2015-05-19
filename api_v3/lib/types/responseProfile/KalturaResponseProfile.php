@@ -120,29 +120,7 @@ class KalturaResponseProfile extends KalturaDetachedResponseProfile implements I
 			$object = new ResponseProfile();
 		}
 		
-		if($this->filter)
-		{
-			$object->setFilterApiClassName(get_class($this->filter));
-			$object->setFilter($this->filter->toObject());
-		}
-		
 		return parent::toObject($object, $propertiesToSkip);
-	}
-	
-	/* (non-PHPdoc)
-	 * @see KalturaObject::fromObject($srcObj, $responseProfile)
-	 */
-	public function doFromObject($srcObj, KalturaDetachedResponseProfile $responseProfile = null)
-	{
-		/* @var $srcObj ResponseProfile */
-		parent::doFromObject($srcObj, $responseProfile);
-		
-		if($srcObj->getFilter() && $this->shouldGet('filter', $responseProfile))
-		{
-			$filterApiClassName = $srcObj->getFilterApiClassName();
-			$this->filter = new $filterApiClassName();
-			$this->filter->fromObject($srcObj->getFilter());
-		}
 	}
 	
 	/* (non-PHPdoc)
