@@ -180,7 +180,7 @@ class kSessionBase
 			return null;
 		}
 
-		if (sha1($salt . $real_str) != $hash)
+		if (sha1($salt . $real_str) !== $hash)
 		{
 			$this->logError("Hash [$hash] doesn't match the sha1 on the salt on partner [$partnerId].");
 			return false;
