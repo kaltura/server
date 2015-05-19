@@ -479,7 +479,7 @@ class kMetadataManager
 	 *
 	 * returns bool
 	 */
-	public static function validateMetadata($metadataProfileId, $metadata, &$errorMessage, $compareAgainstPreviousVersion = false)
+	public static function validateMetadata($metadataProfileId, $metadata, $errorMessage, $compareAgainstPreviousVersion = false)
 	{
 		KalturaLog::debug("Validating metadata [$metadata]");
 		$metadataProfile = MetadataProfilePeer::retrieveByPK($metadataProfileId);
@@ -525,7 +525,7 @@ class kMetadataManager
 		return false;
 	}
 	
-	protected static function validateMetadataObjects($metadataProfileId, KDOMDocument $xml, &$errorMessage)
+	protected static function validateMetadataObjects($metadataProfileId, KDOMDocument $xml, $errorMessage)
 	{
 	    $profileFields = MetadataProfileFieldPeer::retrieveByMetadataProfileId($metadataProfileId);
 	    $xPath = new DOMXPath($xml);
@@ -552,7 +552,7 @@ class kMetadataManager
 	         
 	        $objectIds = array_unique($objectIds);
 	        
-	        if(!$objectPeer->validateMetadataObjects($profileField, $objectIds, &$errorMessage))
+	        if(!$objectPeer->validateMetadataObjects($profileField, $objectIds, $errorMessage))
 	            return false;
 	    }
 	    
