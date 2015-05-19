@@ -506,7 +506,7 @@ class kSessionBase
 		
 		$hash = substr($decKs, 0, self::SHA1_SIZE);
 		$fields = substr($decKs, self::SHA1_SIZE);
-		if ($hash != sha1($fields, true))
+		if ($hash !== sha1($fields, true))
 		{
 			$this->logError("Hash [$hash] doesn't match sha1 on partner [$partnerId].");
 			return false;						// invalid signature
