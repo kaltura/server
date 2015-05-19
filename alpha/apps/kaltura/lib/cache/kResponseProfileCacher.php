@@ -86,13 +86,16 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 		return array();
 	}
 
-	protected static function getSessionKey()
+	protected static function getSessionKey($protocol = null, $ksType = null, array $userRoles = null)
 	{
-		$userRoles = kPermissionManager::getCurrentRoleIds();
+		if(!$protocol)
+			$protocol = infraRequestUtils::getProtocol();
+		if(!$ksType)
+			$ksType = kCurrentContext::getCurrentSessionType();
+		if(!$userRoles)
+			$userRoles = kPermissionManager::getCurrentRoleIds();
+			
 		sort($userRoles);
-		
-		$protocol = infraRequestUtils::getProtocol();
-		$ksType = kCurrentContext::getCurrentSessionType();
 		$userRole = implode('_', $userRoles);
 		return "{$protocol}_{$ksType}_{$userRole}";
 	}
@@ -314,26 +317,49 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 	
 	protected function addRecalculateRelatedObjectsCacheJob(IBaseObject $object)
 	{
+		$triggerType = get_class($object);
+		$objectTypes = self::listObjectTypes($triggerType);
+		foreach($objectTypes as $objectType)
+		{
+//			TODO
+//			$sessionTypes = self::listObjectSessionTypes($object);
+//			foreach($sessionTypes as $sessionType)
+//			{
+//				list($protocol, $ksType, $userRole, $count) = $sessionType;
+//				if($count < self::MAX_CACHE_KEYS_PER_JOB)
+//				{
+//					kJobsManager::addRecalculateCacheJob($partnerId, $protocol, $ksType, $userRoles, $objectType);
+//				}
+//				else
+//				{
+//					kJobsManager::addRecalculateCacheJob($partnerId, $protocol, $ksType, $userRoles, $objectType);
+//				}
+//			}
+		}
 		// TODO list all ksType, roldIds, protocol that related to this object and create few jobs for each
 		return true;
 	}
 	
 	protected function addRecalculateObjectCacheJob(IBaseObject $object)
 	{
+		$objectType = get_class($object);
 		$objectKey = self::getObjectKey($object);
 		
 //		TODO
 //		$sessionTypes = self::listObjectSessionTypes($object);
 //		foreach($sessionTypes as $sessionType)
 //		{
-//			list($protocol, $ksType, $userRole, $count) = $sessionType;
+//			list($protocol, $ksType, $userRoles, $count) = $sessionType;
 //			if($count < self::MAX_CACHE_KEYS_PER_JOB)
 //			{
-//				kJobsManager::addRecalculateCacheJob($partnerId, $protocol, $ksType, $userRoles, $objectKey);
+//				$sessionKey = self::getSessionKey($protocol, $ksType, $userRoles);
+//				$startEndKeys = self::listStartEndKeys($object, $sessionKey);
+//				foreach($startEndKeys)
+//					kJobsManager::addRecalculateCacheJob($partnerId, $protocol, $ksType, $userRoles, $objectType, $objectKey);
 //			}
 //			else
 //			{
-//				kJobsManager::addRecalculateCacheJob($partnerId, $protocol, $ksType, $userRoles, $objectKey);
+//				kJobsManager::addRecalculateCacheJob($partnerId, $protocol, $ksType, $userRoles, $objectType, $objectKey);
 //			}
 //		}
 		return true;
