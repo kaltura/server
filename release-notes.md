@@ -1,5 +1,14 @@
 # Jupiter-10.12.0 #
 
+## "Entry flagged for review" Email Notification missing on production ##
+
+- Issue Type: bug  
+- Issue ID: PS-2252  
+
+#### Deployment Script ####
+
+- Run php /opt/kaltura/app/tests/standAloneClient/exec.php /opt/kaltura/app/tests/standAloneClient/kmcModerationNotificationsTemplates.xml  
+
 ## uDRM on the fly encryption ##
 
 - Issue Type: new feature
