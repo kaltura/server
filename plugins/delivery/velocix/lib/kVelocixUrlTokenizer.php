@@ -10,9 +10,10 @@ class kVelocixUrlTokenizer extends kUrlTokenizer
 	
 	/**
 	 * @param string $url
+	 * @param string $urlPrefix
 	 * @return string
 	 */
-	public function tokenizeSingleUrl($path)
+	public function tokenizeSingleUrl($url, $urlPrefix = null)
 	{
 		if (strstr($path, $this->authPrefix) === false)
 			return $path;
