@@ -9,6 +9,35 @@
 
 - Run php deployment/updates/scripts/add_permissions/2015_05_18_update_flavorasset_permissions.php
 
+## New event notification template- drop folder error description changed ##
+
+- Issue Type: new feature  
+- Issue ID: PS-2251  
+
+#### Deployment Script ####
+
+- Run php /opt/kaltura/app/tests/standAloneClient/exec.php /opt/kaltura/app/tests/standAloneClient/emailDropFolderFailedStatusMessage.xml  
+
+## Server ingestion of chapter cue points without slides ##
+
+- Issue Type: bug fix
+- Issue ID: PLAT-2204
+
+### Configuration ###
+- **workers.ini**
+
+under 'KAsyncBulkUpload'
+
+		params.xmlSchemaVersion		= 7
+
+#### Deployment Scripts ####
+
+None.
+
+#### Known Issues & Limitations ####
+
+None.
+
 ## New event notification template- entry custom data changed ##
 
 - Issue Type: new feature  
