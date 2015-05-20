@@ -1,5 +1,14 @@
 # Jupiter-10.12.0 #
 
+## New event notification template- entry custom data changed ##
+
+- Issue Type: new feature  
+- Issue ID: PS-2253  
+
+#### Deployment Script ####
+
+- Run php /opt/kaltura/app/tests/standAloneClient/exec.php /opt/kaltura/app/tests/standAloneClient/metadataObjectChanged.xml  
+
 ## "Entry flagged for review" Email Notification missing on production ##
 
 - Issue Type: bug  
