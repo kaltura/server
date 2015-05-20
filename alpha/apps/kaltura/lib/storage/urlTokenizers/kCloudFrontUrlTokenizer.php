@@ -82,7 +82,7 @@ class kCloudFrontUrlTokenizer extends kUrlTokenizer
 	public function tokenizeSingleUrl($url, $urlPrefix = null)
 	{
 		if ($this->rootDir)
-			$url = $this->rootDir.$url;
+		    $url = rtrim($this->rootDir, '/') . '/' . ltrim($url, '/');
 
 		$acl = $this->getAcl($urlPrefix,  array($url));
 		if (!$acl)
