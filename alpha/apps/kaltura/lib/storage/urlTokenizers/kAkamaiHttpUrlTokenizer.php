@@ -13,9 +13,10 @@ class kAkamaiHttpUrlTokenizer extends kUrlTokenizer
 	
 	/**
 	 * @param string $url
+	 * @param string $urlPrefix
 	 * @return string
 	 */
-	public function tokenizeSingleUrl($url)
+	public function tokenizeSingleUrl($url, $urlPrefix = null)
 	{
 		$url = '/' . ltrim($url, '/');
 		if ($this->root_dir)
