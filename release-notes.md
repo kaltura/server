@@ -1,5 +1,14 @@
 # Jupiter-10.12.0 #
 
+## Set new permission to flavorasset geturl ##
+
+- Issue Type: Permission change
+- Issue ID : SUP-4739
+
+### Deployment Script ####
+
+- Run php deployment/updates/scripts/add_permissions/2015_05_18_update_flavorasset_permissions.php
+
 ## New event notification template- entry custom data changed ##
 
 - Issue Type: new feature  
