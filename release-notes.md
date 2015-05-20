@@ -2,12 +2,12 @@
 
 ## Set new permission to flavorasset geturl ##
 
+- Issue Type: Permission change
+- Issue ID : SUP-4739
+
 ### Configuration ###
 
 None.
-
-- Issue Type: Permission change
-- Issue ID : SUP-4739
 
 #### Deployment Script ####
 
