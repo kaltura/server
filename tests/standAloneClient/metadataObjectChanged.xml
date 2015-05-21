@@ -23,7 +23,7 @@
 					<item objectType="KalturaFieldMatchCondition">
 						<description>Object type is entry</description>
 						<field objectType="KalturaEvalStringField">
-							<code>$scope->getEvent()->getObject()->getObjectType()</code>
+							<code>$scope->getObject()->getObjectType()</code>
 						</field>
 						<values objectType="array">
 							<item objectType="KalturaStringValue">
