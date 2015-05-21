@@ -28,6 +28,7 @@ class CuePointPeer extends BaseCuePointPeer implements IMetadataPeer
 	
 	// cache classes by their type
 	protected static $class_types_cache = array();
+	private static $filterResults = false;
 	
 	/* (non-PHPdoc)
 	 * @see BaseCuePointPeer::setDefaultCriteriaFilter()
@@ -42,7 +43,7 @@ class CuePointPeer extends BaseCuePointPeer implements IMetadataPeer
 		self::$s_criteria_filter->setFilter($c);
 	}
 	
-	public static function setDefaultCriteriaFilterByKuser()
+	public static function setDefaultCriteriaFilterByKuser($shouldAddUserSessionTag = false)
 	{
 		if(self::$s_criteria_filter == null)
 			self::$s_criteria_filter = new criteriaFilter();
@@ -63,6 +64,8 @@ class CuePointPeer extends BaseCuePointPeer implements IMetadataPeer
 			// by adding a public property on the cuepoint object and checking (user==kuser OR is public)
 			//$c->addAnd(CuePointPeer::KUSER_ID, $kuser->getId());
 			$criterionUserOrPublic = $c->getNewCriterion(CuePointPeer::KUSER_ID, $kuser->getId());
+			if($shouldAddUserSessionTag)
+				$criterionUserOrPublic->addTag(KalturaCriterion::TAG_USER_SESSION);
 			$criterionUserOrPublic->addOr(
 										$c->getNewCriterion(
 											CuePointPeer::TYPE,
@@ -73,7 +76,7 @@ class CuePointPeer extends BaseCuePointPeer implements IMetadataPeer
 											Criteria::IN
 										)
 									);
-			//$criterionUserOrPublic->addOr($c->getNewCriterion (self::IS_PUBLIC, true, Criteria::EQUAL));
+			$criterionUserOrPublic->addOr($c->getNewCriterion (self::IS_PUBLIC, true, Criteria::EQUAL));
 
 			$c->addAnd($criterionUserOrPublic);
 		}
@@ -102,6 +105,52 @@ class CuePointPeer extends BaseCuePointPeer implements IMetadataPeer
 		}
 			
 		throw new Exception("Can't instantiate un-typed [$assetType] cue point [" . print_r($row, true) . "]");
+	}
+	
+	/**
+	 * Override in order to filter objects returned from doSelect.
+	 *
+	 * @param      array $selectResults The array of objects to filter.
+	 * @param	   Criteria $criteria
+	 */
+	public static function filterSelectResults(&$selectResults, Criteria $criteria)
+	{
+		if(empty($selectResults) || !self::$filterResults)
+			return;
+		
+		KalturaLog::debug('Filter cuePoint User results');
+		
+		$removedRecordsCount = 0;
+		foreach ($selectResults as $key => $cuePoint)
+		{
+			/* @var $cuePoint CuePoint */
+			if($cuePoint->getPuserId() !== kCurrentContext::$ks_uid && !$cuePoint->getIsPublic())
+			{
+				unset($selectResults[$key]);
+				$removedRecordsCount++;
+			}
+		}
+	
+		if($criteria instanceof KalturaCriteria)
+		{
+			$recordsCount = $criteria->getRecordsCount();
+			$criteria->setRecordsCount($recordsCount - $removedRecordsCount);
+		}
+	
+		parent::filterSelectResults($selectResults, $criteria);
+	
+		KalturaLog::debug('Filter cuePoint Results - done');
+	}
+	
+	public static function retrieveByPK($pk, PropelPDO $con = null)
+	{
+		KalturaCriterion::disableTags(array(KalturaCriterion::TAG_USER_SESSION));
+		self::$filterResults = true;
+		$res = parent::retrieveByPK($pk, $con);
+		KalturaCriterion::restoreTags(array(KalturaCriterion::TAG_USER_SESSION));
+		self::$filterResults = false;
+	
+		return $res;
 	}
 	
 	/* (non-PHPdoc)
