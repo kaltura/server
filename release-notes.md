@@ -19,7 +19,7 @@
 		moduls.drmBase.basePermissionName =
 		moduls.drmBase.group = GROUP_ENABLE_DISABLE_FEATURES
 		
-		moduls.drmCencFlavors.enabled = true
+		moduls.drmCencFlavors.enabled = false
 		moduls.drmCencFlavors.permissionType = 2
 		moduls.drmCencFlavors.label = DRM – Enable CENC Flavors
 		moduls.drmCencFlavors.permissionName = DRM_CENC_FLAVORS
