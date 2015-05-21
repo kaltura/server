@@ -43,7 +43,7 @@ class CuePointPeer extends BaseCuePointPeer implements IMetadataPeer
 		self::$s_criteria_filter->setFilter($c);
 	}
 	
-	public static function setDefaultCriteriaFilterByKuser()
+	public static function setDefaultCriteriaFilterByKuser($shouldAddUserSessionTag = false)
 	{
 		if(self::$s_criteria_filter == null)
 			self::$s_criteria_filter = new criteriaFilter();
@@ -64,7 +64,8 @@ class CuePointPeer extends BaseCuePointPeer implements IMetadataPeer
 			// by adding a public property on the cuepoint object and checking (user==kuser OR is public)
 			//$c->addAnd(CuePointPeer::KUSER_ID, $kuser->getId());
 			$criterionUserOrPublic = $c->getNewCriterion(CuePointPeer::KUSER_ID, $kuser->getId());
-			$criterionUserOrPublic->addTag(KalturaCriterion::TAG_USER_SESSION);
+			if($shouldAddUserSessionTag)
+				$criterionUserOrPublic->addTag(KalturaCriterion::TAG_USER_SESSION);
 			$criterionUserOrPublic->addOr(
 										$c->getNewCriterion(
 											CuePointPeer::TYPE,
@@ -119,6 +120,7 @@ class CuePointPeer extends BaseCuePointPeer implements IMetadataPeer
 		
 		KalturaLog::debug('Filter cuePoint User results');
 		
+		$removedRecordsCount = 0;
 		foreach ($selectResults as $key => $cuePoint)
 		{
 			/* @var $cuePoint CuePoint */

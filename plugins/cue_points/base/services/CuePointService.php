@@ -39,8 +39,10 @@ class CuePointService extends KalturaBaseService
 		}
 
 		// when session is not admin, allow access to user entries only
-		if (!$this->getKs() || !$this->getKs()->isAdmin())
-			CuePointPeer::setDefaultCriteriaFilterByKuser();
+		if (!$this->getKs() || !$this->getKs()->isAdmin()) {
+			$shouldAddUserSessionTag = in_array($actionName, array('get', 'delete', 'update'));
+			CuePointPeer::setDefaultCriteriaFilterByKuser($shouldAddUserSessionTag);
+		}
 		
 		if(!CuePointPlugin::isAllowedPartner($this->getPartnerId()))
 			throw new KalturaAPIException(KalturaErrors::FEATURE_FORBIDDEN, CuePointPlugin::PLUGIN_NAME);
