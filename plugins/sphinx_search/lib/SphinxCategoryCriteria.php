@@ -143,8 +143,7 @@ class SphinxCategoryCriteria extends SphinxCriteria
 		{
 			$names = $filter->get('_likex_name_or_reference_id');
 			KalturaLog::debug("Attach free text [$names]");
-			$additional = array("(@(name,reference_id) $names)");
-			$this->addFreeTextToMatchClauseByMatchFields($names, categoryFilter::NAME_REFERNCE_ID, $additional, true);
+			$this->addFreeTextToMatchClauseByMatchFields($names, categoryFilter::NAME_REFERNCE_ID, null, true);
 		}
 		$filter->unsetByName('_likex_name_or_reference_id');
 		
