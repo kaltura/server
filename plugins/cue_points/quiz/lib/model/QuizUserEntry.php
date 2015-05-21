@@ -28,7 +28,7 @@ class QuizUserEntry extends UserEntry{
 	public function calculateScore()
 	{
 		$finalScore = 0;
-		$answerType = QuizPlugin::getCuePointTypeCoreValue(QuizCuePointType::ANSWER);
+		$answerType = QuizPlugin::getCuePointTypeCoreValue(QuizCuePointType::QUIZ_ANSWER);
 		$answers = CuePointPeer::retrieveByEntryId($this->getEntryId(), array($answerType));
 		foreach ($answers as $answer)
 		{
