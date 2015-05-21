@@ -17,6 +17,8 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 	const IS_QUIZ = "isQuiz";
 	const QUIZ_DATA = "quizData";
 
+	const QUIZ_OM_CLASS = 'QuizUserEntry';
+
 	/* (non-PHPdoc)
 	 * @see IKalturaPlugin::getPluginName()
 	 */
@@ -41,6 +43,7 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 	{
 		$map = array(
 			'quiz' => 'QuizService',
+			'quizUserEntry' => 'QuizUserEntryService'
 		);
 		return $map;
 	}
@@ -51,8 +54,19 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 	 */
 	public static function getEnums($baseEnumName = null)
 	{
-		if ( is_null($baseEnumName) || ($baseEnumName == 'CuePointType') )
+		if (is_null($baseEnumName))
+			return array('QuizCuePointType','QuizUserEntryType',"QuizUserEntryStatus");
+		if ($baseEnumName == 'CuePointType')
 			return array('QuizCuePointType');
+		if ($baseEnumName == "UserEntryType")
+		{
+			return array("QuizUserEntryType");
+		}
+		if ($baseEnumName == "UserEntryStatus")
+		{
+			return array("QuizUserEntryStatus");
+		}
+
 
 		return array();
 	}
@@ -83,7 +97,14 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 			if ( $enumValue == self::getCuePointTypeCoreValue(QuizCuePointType::QUIZ_ANSWER))
 				return new KalturaAnswerCuePoint();
 		}
-
+		if ( ($baseClass=="KalturaUserEntry") && ($enumValue == QuizUserEntryType::KALTURA_QUIZ_USER_ENTRY))
+		{
+			return new KalturaQuizUserEntry();
+		}
+		if ( ($baseClass=="UserEntry") && ($enumValue == QuizUserEntryType::KALTURA_QUIZ_USER_ENTRY))
+		{
+			return new QuizUserEntry();
+		}
 	}
 
 	/* (non-PHPdoc)
@@ -97,6 +118,11 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 			if ($enumValue == self::getCuePointTypeCoreValue(QuizCuePointType::QUIZ_ANSWER))
 				return 'AnswerCuePoint';
 		}
+		if ( ($baseClass == UserEntryPeer::OM_CLASS) && ($enumValue == QuizUserEntryType::KALTURA_QUIZ_USER_ENTRY) )
+		{
+			return self::QUIZ_OM_CLASS;
+		}
+
 	}
 
 	/* (non-PHPdoc)
