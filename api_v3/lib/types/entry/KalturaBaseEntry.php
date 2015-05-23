@@ -345,7 +345,16 @@ class KalturaBaseEntry extends KalturaObject implements IRelatedFilterable
 	 * @var string
 	 * @filter matchand
 	 */
-	public $entitledUsersPublish;	
+	public $entitledUsersPublish;
+
+	/**
+	 * Comma seperated string of the capabilities of the entry, each plugin can add it's own capability
+	 *
+	 * @dynamicType KalturaCapabilityName
+	 * @var string
+	 * @readonly
+	 */
+	public $capabilities;
 	
 	/*
 	 * mapping between the field on this object (on the left) and the setter/getter on the entry object (on the right)  
@@ -462,6 +471,10 @@ class KalturaBaseEntry extends KalturaObject implements IRelatedFilterable
 			if($this->shouldGet('creatorId', $responseProfile))
 				$this->creatorId = $sourceObject->getCreatorPuserId();
 		}
+		/**
+		 * @var Entry $sourceObject
+		 */
+		$this->capabilities=$sourceObject->getCapabilitiess();
 	}
 	
 	public function validateObjectsExist(entry $sourceObject = null)

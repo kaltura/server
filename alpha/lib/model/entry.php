@@ -140,6 +140,8 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	const DEFAULT_IMAGE_HEIGHT = 480;
 	const DEFAULT_IMAGE_WIDTH = 640;
 
+	const CAPABILITIES = "capabilities";
+
 	private $appears_in = null;
 
 	private $m_added_moderation = false;
@@ -3356,5 +3358,58 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		$userNames[] = $kuser->getScreenName();
 		
 		return implode(" ", $userNames);
+	}
+
+	public function getCapabilitiess()
+	{
+
+		$capabilitiesUnserialized = $this->getFromCustomData(self::CAPABILITIES);
+		if (is_null($capabilitiesUnserialized))
+		{
+			$capabilitiesArr = array();
+		}
+		else
+		{
+			$capabilitiesArr = unserialize($capabilitiesUnserialized);
+		}
+		$capabilitiesStr = "";
+		$first = true;
+		foreach ($capabilitiesArr as $capability)
+		{
+			if ($first)
+			{
+				$first = false;
+			} else
+			{
+				$capabilitiesStr .= ",";
+			}
+			$capabilitiesStr .= $capability;
+		}
+		return $capabilitiesStr;
+	}
+
+	public function addCapability($capability)
+	{
+		$capabilitiesStr = $this->getFromCustomData(self::CAPABILITIES);
+		if (is_null($capabilitiesStr))
+		{
+			$capabilitiesArr = array();
+		}
+		else
+		{
+			$capabilitiesArr = unserialize($capabilitiesStr);
+		}
+		$capabilitiesArr[] = $capability;
+		$this->putInCustomData( self::CAPABILITIES, serialize($capabilitiesArr) );
+	}
+
+	public function removeCapability($capability)
+	{
+		$capabilitiesArr = $this->getFromCustomData(self::CAPABILITIES);
+		if (!is_null($capabilitiesArr))
+		{
+			unset($capabilitiesArr[$capability]);
+			$this->putInCustomData( self::CAPABILITIES, serialize($capabilitiesArr) );
+		}
 	}
 }
