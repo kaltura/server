@@ -84,10 +84,11 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 			$url = str_replace('\\', '/', $url);
 			if ($tokenizeUrl)
 			{
+				$url = rtrim(parse_url($this->getUrl(), PHP_URL_PATH),'/').'/'.ltrim($url,'/');
 				$tokenizer = $this->getTokenizer();
 				if ($tokenizer)
 				{
-					$url = $tokenizer->tokenizeSingleUrl($url);
+					$url = $tokenizer->tokenizeSingleUrl($url, $this->getHostName());
 					kApiCache::disableCache();
 				}
 			}
@@ -162,7 +163,7 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 			$tokenizer = $this->getTokenizer();
 			if ($tokenizer)
 			{
-				$url = $tokenizer->tokenizeSingleUrl($url);
+				$url = $tokenizer->tokenizeSingleUrl($url, $this->getUrlPrefix());
 				kApiCache::disableCache();
 			}
 		}

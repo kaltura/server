@@ -15,8 +15,10 @@ class LiveCuePointService extends KalturaBaseService
 		$this->applyPartnerFilterForClass('CuePoint');
 
 		// when session is not admin, allow access to user entries only
-		if (!$this->getKs() || !$this->getKs()->isAdmin())
-			CuePointPeer::setDefaultCriteriaFilterByKuser();
+		if (!$this->getKs() || !$this->getKs()->isAdmin()) {
+			KalturaCriterion::enableTag(KalturaCriterion::TAG_USER_SESSION);
+			CuePointPeer::setUserContentOnly(true);
+		}
 		
 		if(!CuePointPlugin::isAllowedPartner($this->getPartnerId()))
 			throw new KalturaAPIException(KalturaErrors::FEATURE_FORBIDDEN, CuePointPlugin::PLUGIN_NAME);

@@ -552,7 +552,7 @@ class kMetadataManager
 	         
 	        $objectIds = array_unique($objectIds);
 	        
-	        if(!$objectPeer->validateMetadataObjects($profileField, $objectIds, &$errorMessage))
+	        if(!$objectPeer->validateMetadataObjects($profileField, $objectIds, $errorMessage))
 	            return false;
 	    }
 	    

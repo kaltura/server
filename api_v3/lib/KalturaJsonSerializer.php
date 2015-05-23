@@ -19,13 +19,17 @@ class KalturaJsonSerializer extends KalturaSerializer
 
 	protected function unsetNull($object)
 	{
+		if(!is_array($object) && !is_object($object))
+			return $object;
+		
 		$array = (array) $object;
 		foreach($array as $key => $value)
 		{
 			if(is_null($value))
+			{
 				unset($array[$key]);
-			
-			if(is_array($value) || is_object($value))
+			}
+			else
 			{
 				$array[$key] = $this->unsetNull($value);
 			}

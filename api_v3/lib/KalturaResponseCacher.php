@@ -316,9 +316,9 @@ class KalturaResponseCacher extends kApiCache
 			return;			// can't find the secrets of the partner in the cache
 		}
 		list($adminSecret, $userSecret, $ksVersion) = $secrets;				
-		$secretToMatch = $type ? $adminSecret : $userSecret;
 		$paramSecret = $params['secret'];
-		if ($paramSecret != $secretToMatch)
+		if ($paramSecret !== $adminSecret &&
+			($type || $paramSecret !== $userSecret))
 		{
 			return;			// invalid secret
 		}

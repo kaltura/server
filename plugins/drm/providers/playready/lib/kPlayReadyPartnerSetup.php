@@ -114,7 +114,7 @@ class kPlayReadyPartnerSetup
 		$rule = new kRule();
 		$condition = new kAuthenticatedCondition();
 		$condition->setPrivileges(array($priviledge));
-		$action = new kAccessControlPlayReadyPolicyAction();
+		$action = new kAccessControlDrmPolicyAction();
 		$action->setPolicyId($policyId);
 		$rule->setConditions(array($condition));
 		$rule->setActions(array($action));

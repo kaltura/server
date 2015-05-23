@@ -1465,6 +1465,8 @@ CREATE TABLE IF NOT EXISTS `metadata_profile_field` (
   `type` varchar(127) DEFAULT NULL,
   `xpath` varchar(255) DEFAULT NULL,
   `status` tinyint(4) DEFAULT NULL,
+  `custom_data` TEXT, 
+  `related_metadata_profile_id` INTEGER,
   PRIMARY KEY (`id`),
   KEY `partner_id` (`partner_id`),
   KEY `profile_id_and_version` (`metadata_profile_id`,`metadata_profile_version`)
@@ -1927,7 +1929,7 @@ CREATE TABLE IF NOT EXISTS `storage_profile` (
   `max_concurrent_connections` int(11) DEFAULT NULL,
   `custom_data` text,
   `path_manager_class` varchar(127) DEFAULT NULL,
-  `url_manager_class` varchar(127) NOT NULL,
+  `url_manager_class` varchar(127) DEFAULT '' NOT NULL,
   `delivery_priority` int(11) DEFAULT '1',
   `delivery_status` int(11) DEFAULT '1',
   PRIMARY KEY (`id`)

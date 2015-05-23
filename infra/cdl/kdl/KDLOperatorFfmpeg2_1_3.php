@@ -377,31 +377,34 @@ $wmData->opacity
 				$wmData->margins[0]=$wmData->margins[1];
 				$wmData->margins[1]=$m;
 			}
-			$w = in_array($wmData->margins[0],array(null,0,-1))? 0: $wmData->margins[0];
-			$h = in_array($wmData->margins[1],array(null,0,-1))? 0: $wmData->margins[1];
-			if($w<0){
-				$marginsCrop = "iw-ow".$w.":";
-				$marginsOver = "main_w-overlay_w".$w.":";
+			$w = $wmData->margins[0];
+			if(($centerW=strstr($w,"center"))!=false) $w = (int)str_replace("center", "",$w);
+			$w = in_array($w, array(null,0,-1))? 0: $w;
+			
+			$h = $wmData->margins[1];
+			if(($centerH=strstr($h,"center"))!=false) $h = (int)str_replace("center", "",$h);
+			$h = in_array($h, array(null,0,-1))? 0: $h;
+			
+			if($centerW){
+				$marginsCrop = "(iw-ow)/2";
+				if($w!=0) $marginsCrop.= ($w<0)? "$w": "+$w";
 			}
-			else {
-				$marginsCrop = "$w:";
-				$marginsOver = "$w:";
+			else
+				$marginsCrop = ($w<0)? "iw-ow$w": "$w";
+			$marginsCrop.=":";
+			
+			if($centerH){
+				$marginsCrop.= "(ih-oh)/2";
+				if($h!=0) $marginsCrop.= ($h<0)? "$h": "+$h";
 			}
-			if($h<0) {
-				$marginsCrop.= "ih-oh".$h;
-				$marginsOver.= "main_h-overlay_h".$h;
-			}
-			else {
-				$marginsCrop.= "$h";
-				$marginsOver.= "$h";
-			}
-				//main_w-overlay_w-10:1
+			else
+				$marginsCrop.= ($h<0)? "ih-oh$h": "$h";
 		}
 		else {
 			$marginsCrop = "0:0";
-			$marginsOver = "0:0";
 		}
-		
+		$marginsOver = str_replace(array("iw","ow","ih","oh"), array("main_w","overlay_w","main_h","overlay_h"), $marginsCrop);
+
 		if(isset($wmData->opacity)){
 			$watermarkStr = "[0:v]crop=$wmWid:$wmHgt:".$marginsCrop.",setsar=$wmWid/".$wmHgt."[cropped];";
 			$watermarkStr.= "[cropped][1:v]blend=all_mode='overlay':all_opacity=".min(1,$wmData->opacity)."[blended];";

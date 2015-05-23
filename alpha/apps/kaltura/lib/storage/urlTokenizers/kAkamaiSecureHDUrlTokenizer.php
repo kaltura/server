@@ -300,9 +300,10 @@ class kAkamaiSecureHDUrlTokenizer extends kUrlTokenizer
 	
 	/**
 	 * @param string $url
+	 * @param string $urlPrefix
 	 * @return string
 	 */
-	public function tokenizeSingleUrl($url)
+	public function tokenizeSingleUrl($url, $urlPrefix = null)
 	{
 		if ($this->useCookieHosts && !in_array($_SERVER['HTTP_HOST'], explode(',', $this->useCookieHosts)))
 		{
