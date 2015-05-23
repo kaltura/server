@@ -294,8 +294,7 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 	public static function setQuizData( entry $entry, kQuiz $kQuiz )
 	{
 		$entry->putInCustomData( self::QUIZ_DATA, serialize($kQuiz) );
-//		$entry->addCapability(self::getCapatabilityCoreValue());
-		$entry->addCapability(self::PLUGIN_NAME);
+		$entry->addCapability(self::getCapatabilityCoreValue());
 	}
 
 	/**

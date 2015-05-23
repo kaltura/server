@@ -399,7 +399,8 @@ class KalturaBaseEntry extends KalturaObject implements IRelatedFilterable
 	 	"parentEntryId",
 	 	"entitledUsersEdit" => "entitledPusersEdit",
 	 	"entitledUsersPublish" => "entitledPusersPublish",
-	 	"operationAttributes"
+	 	"operationAttributes",
+		"capabilities",
 	 );
 		 
 	public function getMapBetweenObjects()
@@ -471,10 +472,6 @@ class KalturaBaseEntry extends KalturaObject implements IRelatedFilterable
 			if($this->shouldGet('creatorId', $responseProfile))
 				$this->creatorId = $sourceObject->getCreatorPuserId();
 		}
-		/**
-		 * @var Entry $sourceObject
-		 */
-		$this->capabilities=$sourceObject->getCapabilitiess();
 	}
 	
 	public function validateObjectsExist(entry $sourceObject = null)

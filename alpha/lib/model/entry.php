@@ -3360,7 +3360,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		return implode(" ", $userNames);
 	}
 
-	public function getCapabilitiess()
+	public function getcapabilities()
 	{
 
 		$capabilitiesUnserialized = $this->getFromCustomData(self::CAPABILITIES);
