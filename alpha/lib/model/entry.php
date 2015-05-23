@@ -3399,7 +3399,11 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		{
 			$capabilitiesArr = unserialize($capabilitiesStr);
 		}
-		$capabilitiesArr[] = $capability;
+		$arrSpot = array_search($capability, array_values($capabilitiesArr));
+		if ($arrSpot === false)
+		{
+			$capabilitiesArr[] = $capability;
+		}
 		$this->putInCustomData( self::CAPABILITIES, serialize($capabilitiesArr) );
 	}
 
