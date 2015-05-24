@@ -192,14 +192,13 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 			$deliveryIds = $deliveryIds[$streamerType];
 			
 			// allow whitelisted / blacklisted delivery profiles
-			
 			if ($aclIds)
-			{
+            {
                 if ($deliveryAttributes->getIsDeliveryProfilesBlockedList())
                     $deliveryIds = array_diff($deliveryIds, $aclIds);
                 else
                     $deliveryIds = array_intersect($deliveryIds, $aclIds);
-			}
+            }
 			
 			$deliveries = DeliveryProfilePeer::retrieveByPKs($deliveryIds);
 			
