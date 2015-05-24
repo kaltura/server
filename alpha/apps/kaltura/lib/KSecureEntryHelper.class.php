@@ -82,6 +82,18 @@ class KSecureEntryHelper
 	
 	/**
 	 * 
+	 * @var array
+	 */
+	private $deliveryProfileIds = null;
+	
+	/**
+	 * 
+	 * @var bool
+	 */
+	private $deliveryProfileIdsIsBlocked = null;
+	
+	/**
+	 * 
 	 * @param entry $entry
 	 */
 	public function __construct(entry $entry, $ksStr, $referrer, $contexts = array(), $hashes = array())
@@ -257,6 +269,16 @@ class KSecureEntryHelper
 		}
 		return true;
 	}
+
+	public function updateDeliveryAttributesDP(DeliveryProfileDynamicAttributes $deliveryAttributes)
+	{
+	    $deliveryAttributes->setDeliveryProfileIds($this->deliveryProfileIds, $this->deliveryProfileIdsIsBlocked);
+	}
+	
+	public function getDeliveryProfileIdsIsBlocked()
+	{
+	    return  $this->deliveryProfileIdsIsBlocked;
+	}
 	
 	protected function applyContext()
 	{
@@ -289,7 +311,10 @@ class KSecureEntryHelper
 						break;
 					case RuleActionType::PREVIEW:
 						$this->hasPreviewAction = true;
-						break;					
+						break;
+					case RuleActionType::LIMIT_DELIVERY_PROFILES:
+					    $this->deliveryProfileIds = $action->getDeliveryProfileIds();					
+					    $this->deliveryProfileIdsIsBlocked = $action->GetisBlockedList();					
 				}
 			}
 		}			

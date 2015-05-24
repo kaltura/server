@@ -939,6 +939,8 @@ class playManifestAction extends kalturaAction
 			$this->deliveryAttributes->setUiConfId($this->getRequestParameter("uiConfId"));
 		}
 		
+		$this->secureEntryHelper->updateDeliveryAttributesDP($this->deliveryAttributes);
+		
 		$this->enforceEncryption();
 		
 		$renderer = null;

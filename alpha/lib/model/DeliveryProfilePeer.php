@@ -189,6 +189,17 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 		// if the partner has an override for the required format on the partner object - use that
 		if(array_key_exists($streamerType, $deliveryIds)) {
 			$deliveryIds = $deliveryIds[$streamerType];
+			
+			// allow whitelisted / blacklisted delivery profiles
+			$aclIds = $deliveryAttributes->getDeliveryProfileIds();
+			if ($aclIds)
+			{
+                if ($deliveryAttributes->getIsDeliveryProfilesBlockedList())
+                    $deliveryIds = array_diff($deliveryIds,$aclIds);
+                else
+                    $deliveryIds = array_intersect($deliveryIds,$aclIds);
+			}
+			
 			$deliveries = DeliveryProfilePeer::retrieveByPKs($deliveryIds);
 			
 			$cmp = new DeliveryProfileComparator($isSecured, $cdnHost);
@@ -207,7 +218,13 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 				$c->addDescendingOrderByColumn('(' . DeliveryProfilePeer::TOKENIZER . ' is not null)');
 			else
 				$c->addDescendingOrderByColumn('(' . DeliveryProfilePeer::TOKENIZER . ' is null)');
-			
+
+			if ($deliveryAttributes->getDeliveryProfileIds())
+			{
+			    $c->add(DeliveryProfilePeer::ID, $deliveryAttributes->getDeliveryProfileIds(),
+			         $deliveryAttributes->getIsDeliveryProfilesBlockedList() ? Criteria::NOT_IN : Criteria::IN);
+			}
+					
 			$orderBy = "(" . DeliveryProfilePeer::PARTNER_ID . "<>{$partnerId})";
 			$c->addAscendingOrderByColumn($orderBy);
 			$c->addAscendingOrderByColumn(DeliveryProfilePeer::PRIORITY);

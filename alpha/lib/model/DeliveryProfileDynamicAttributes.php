@@ -9,6 +9,18 @@
 class DeliveryProfileDynamicAttributes {
 	
 	/**
+	 * List of delivery profiles ids which should be enfroced due to an access control action
+	 * @var array
+	 */
+	protected $deliveryProfileIds = null;
+	
+	/**
+	 * Defines whether the list of delivery profiles should be whitelist or blacklisted 
+	 * @var bool
+	 */
+	protected $isDeliveryProfilesBlockedList = null;
+	
+    /**
 	 * @var string
 	 */
 	protected $format;
@@ -111,6 +123,20 @@ class DeliveryProfileDynamicAttributes {
 	protected $urlParams = '';
 
 	/**
+	 * @return the $deliveryProfileIds
+	 */
+	public function getDeliveryProfileIds() {
+		return $this->deliveryProfileIds;
+	}
+
+	/**
+	 * @return the $isDeliveryProfilesBlockedList
+	 */
+	public function getIsDeliveryProfilesBlockedList() {
+		return $this->isDeliveryProfilesBlockedList;
+	}
+		
+	/**
 	 * @return the $format
 	 */
 	public function getFormat() {
@@ -199,6 +225,15 @@ class DeliveryProfileDynamicAttributes {
 	 */
 	public function getPreferredBitrate() {
 		return $this->preferredBitrate;
+	}
+
+	/**
+	 * @param string $deliveryProfileIds
+	 * @param bool $isBlockedList
+	 */
+	public function setDeliveryProfileIds($deliveryProfileIds, $isBlockedList) {
+		$this->deliveryProfileIds = $deliveryProfileIds;
+		$this->isDeliveryProfilesBlockedList = $isBlockedList;
 	}
 
 	/**
@@ -426,7 +461,8 @@ class DeliveryProfileDynamicAttributes {
 	}
 	
 	public function cloneAttributes(DeliveryProfileDynamicAttributes $newObj) {
-		$this->format = $newObj->getFormat();
+		$this->deliveryProfileIds = $newObj->getDeliveryProfileIds();
+	    $this->format = $newObj->getFormat();
 		$this->extension = $newObj->getFileExtension();
 		$this->containerFormat = $newObj->getContainerFormat();
 		$this->seekFromTime = $newObj->getSeekFromTime();
