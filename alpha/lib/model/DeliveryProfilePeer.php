@@ -185,20 +185,12 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 	
 		$partnerId = $partner->getId();
 		$deliveryIds = $partner->getDeliveryProfileIds();
-		$aclIds = $deliveryAttributes->getDeliveryProfileIds();
 		
 		// if the partner has an override for the required format on the partner object - use that
 		if(array_key_exists($streamerType, $deliveryIds)) {
 			$deliveryIds = $deliveryIds[$streamerType];
 			
-			// allow whitelisted / blacklisted delivery profiles
-			if ($aclIds)
-            {
-                if ($deliveryAttributes->getIsDeliveryProfilesBlockedList())
-                    $deliveryIds = array_diff($deliveryIds, $aclIds);
-                else
-                    $deliveryIds = array_intersect($deliveryIds, $aclIds);
-            }
+			self::filterDeliveryProfiles($deliveryIds, $deliveryAttributes);
 			
 			$deliveries = DeliveryProfilePeer::retrieveByPKs($deliveryIds);
 			
@@ -219,11 +211,7 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 			else
 				$c->addDescendingOrderByColumn('(' . DeliveryProfilePeer::TOKENIZER . ' is null)');
 
-			// allow whitelisted / blacklisted delivery profiles
-			if ($aclIds)
-			{
-			    $c->add(DeliveryProfilePeer::ID, $aclIds, $deliveryAttributes->getIsDeliveryProfilesBlockedList() ? Criteria::NOT_IN : Criteria::IN);
-			}
+			self::filterDeliveryProfiles($c, $deliveryAttributes);
 					
 			$orderBy = "(" . DeliveryProfilePeer::PARTNER_ID . "<>{$partnerId})";
 			$c->addAscendingOrderByColumn($orderBy);
@@ -322,6 +310,29 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 		return $partialSupport;
 	}
 	
+	/*
+	 * Filters a Criteria or array of deliveryProfiles according to the access control set in the $deliveryAttributes
+	 * @param mixed &$object - either a Criteria or an array
+	 * @param DeliveryProfileDynamicAttributes $deliveryAttributes
+	 */
+	protected static function filterDeliveryProfiles(&$object, DeliveryProfileDynamicAttributes $deliveryAttributes)
+	{
+    	$aclIds = $deliveryAttributes->getDeliveryProfileIds();
+    		
+    	if ($aclIds)
+    	{
+    	    if ($object instanceof Criteria)
+    		    $object->add(DeliveryProfilePeer::ID, $aclIds, $deliveryAttributes->getIsDeliveryProfilesBlockedList() ? Criteria::NOT_IN : Criteria::IN);
+    	    else
+    	    {
+    	        if ($deliveryAttributes->getIsDeliveryProfilesBlockedList())
+    	            $object = array_diff($object, $aclIds);
+    	        else
+    	            $object = array_intersect($object, $aclIds);
+    	    }
+	    }
+	}
+	
 	/**
 	 * Returns the delivery profile by host name (or returns one of the defaults)
 	 * @param string $cdnHost The host we're looking for
@@ -330,7 +341,8 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 	 * @param string $mediaProtocol - rtmp/rtmpe/https...
 	 * @return DeliveryProfile
 	 */
-	public static function getLiveDeliveryProfileByHostName($cdnHost, $entryId, $streamerType = PlaybackProtocol::HTTP, $mediaProtocol = null) {
+	public static function getLiveDeliveryProfileByHostName($cdnHost, DeliveryProfileDynamicAttributes $deliveryAttributes) {
+	    $entryId = $deliveryAttributes->getEntryId();
 		$entry = entryPeer::retrieveByPK($entryId);
 		if(!$entry) {
 			KalturaLog::err('Failed to retrieve entryId: '. $entryId);
@@ -346,16 +358,15 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 		$hostCond->addOr($c->getNewCriterion(DeliveryProfilePeer::HOST_NAME, null, Criteria::ISNULL));
 		
 		$c->addAnd($hostCond);
-		$c->add(DeliveryProfilePeer::STREAMER_TYPE, $streamerType);
+		$c->add(DeliveryProfilePeer::STREAMER_TYPE, $deliveryAttributes->getFormat());
+		
+		self::filterDeliveryProfiles($c, $deliveryAttributes);
 		
 		$c->addDescendingOrderByColumn('(' . DeliveryProfilePeer::HOST_NAME . ' is not null)');
 		$orderBy = "(" . DeliveryProfilePeer::PARTNER_ID . "<>{$partnerId})";
 		$c->addAscendingOrderByColumn($orderBy);
 			
 		$deliveries = self::doSelect($c);
-		
-		$deliveryAttributes = new DeliveryProfileDynamicAttributes();
-		$deliveryAttributes->setMediaProtocol($mediaProtocol);
 		
 		$delivery = self::selectByDeliveryAttributes($deliveries, $deliveryAttributes);
 		if($delivery) {

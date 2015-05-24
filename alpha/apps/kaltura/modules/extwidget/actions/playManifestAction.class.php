@@ -811,7 +811,8 @@ class playManifestAction extends kalturaAction
 			$this->deliveryAttributes->setFormat(PlaybackProtocol::HDS);
 		}
 		
-		$this->deliveryProfile = DeliveryProfilePeer::getLiveDeliveryProfileByHostName($cdnHost, $this->entryId, $this->deliveryAttributes->getFormat(), $this->deliveryAttributes->getMediaProtocol());
+		$this->deliveryProfile = DeliveryProfilePeer::getLiveDeliveryProfileByHostName($cdnHost, $this->deliveryAttributes);
+		
 		if(!$this->deliveryProfile)
 		{
 			return null;
