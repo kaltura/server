@@ -461,7 +461,8 @@ class DeliveryProfileDynamicAttributes {
 	}
 	
 	public function cloneAttributes(DeliveryProfileDynamicAttributes $newObj) {
-		$this->deliveryProfileIds = $newObj->getDeliveryProfileIds();
+		$this->deliveryProfileIds = $newObj-getDeliveryProfileIds();
+		$this->isDeliveryProfilesBlockedList = $newObj->getIsDeliveryProfilesBlockedList();
 	    $this->format = $newObj->getFormat();
 		$this->extension = $newObj->getFileExtension();
 		$this->containerFormat = $newObj->getContainerFormat();

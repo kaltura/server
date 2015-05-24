@@ -275,11 +275,6 @@ class KSecureEntryHelper
 	    $deliveryAttributes->setDeliveryProfileIds($this->deliveryProfileIds, $this->deliveryProfileIdsIsBlocked);
 	}
 	
-	public function getDeliveryProfileIdsIsBlocked()
-	{
-	    return  $this->deliveryProfileIdsIsBlocked;
-	}
-	
 	protected function applyContext()
 	{
 		$this->contextResult = null;
