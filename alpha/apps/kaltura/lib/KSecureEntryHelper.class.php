@@ -57,7 +57,7 @@ class KSecureEntryHelper
 	private $contextResult;
 	
 	/**
-	 * access control actions lists keyed by kAccessControlAction
+	 * access control actions lists keyed by RuleActionType
 	 * @var array
 	 */
 	private $actionLists = array();
