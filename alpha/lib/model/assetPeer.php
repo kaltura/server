@@ -540,8 +540,8 @@ class assetPeer extends BaseassetPeer
         $flavorAssets = self::doSelect($c);
         if(!count($flavorAssets))
             return null;
-        if(!is_null($tag))
-            $flavorAssets = self::filterByTag($flavorAssets, $tag);
+		if(!is_null($tag))
+			$flavorAssets = self::filterByTag($flavorAssets, $tag);
 		if (!is_null($excludeTag))
 			$flavorAssets = self::excludeByTag($flavorAssets, $excludeTag);
         if(!count($flavorAssets))
