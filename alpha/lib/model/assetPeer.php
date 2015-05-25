@@ -530,7 +530,7 @@ class assetPeer extends BaseassetPeer
      * @param string $tag tag filter
      * @return flavorAsset that has a file_sync in status ready
      */
-    public static function retrieveHighestBitrateByEntryId($entryId, $tag = null)
+	public static function retrieveHighestBitrateByEntryId($entryId, $tag = null, $excludeTag = null)
     {
         $c = new Criteria();
         $c->add(assetPeer::ENTRY_ID, $entryId);
@@ -542,6 +542,8 @@ class assetPeer extends BaseassetPeer
             return null;
         if(!is_null($tag))
             $flavorAssets = self::filterByTag($flavorAssets, $tag);
+		if (!is_null($excludeTag))
+			$flavorAssets = self::excludeByTag($flavorAssets, $excludeTag);
         if(!count($flavorAssets))
             return null;
         $ret = null;
@@ -578,6 +580,24 @@ class assetPeer extends BaseassetPeer
 		return $newAssets;
 	}
 	
+	/**
+	 * removes assets with specified tag from flavor assets array
+	 *
+	 * @param array $assets
+	 * @param string $tag
+	 * @return array<assets>
+	 */
+	public static function excludeByTag(array $assets, $excludeTag)
+	{
+		$newAssets = array();
+		foreach($assets as $asset)
+		{
+			if (!$asset->hasTag($excludeTag))
+				$newAssets[] = $asset;
+		}
+		
+		return $newAssets;
+	}
 
 	/**
 	 * @param string $entryId
