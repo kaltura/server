@@ -459,6 +459,25 @@ class DeliveryProfileDynamicAttributes {
 		}
 		return array();
 	}
+
+	/**
+	 * 
+	 * @param int $storageId
+	 * @param string $entryId
+	 * @param PlaybackProtocol $format
+	 * @param string $mediaProtocol
+	 * @return DeliveryProfileDynamicAttributes
+	 */
+	public static function init($storageId, $entryId, $format = PlaybackProtocol::HTTP, $mediaProtocol = null)
+	{
+		$instance = new DeliveryProfileDynamicAttributes();
+		$instance->setStorageId($storageId);
+		$instance->setEntryId($entryId);
+		$instance->setFormat($format);
+		$instance->setMediaProtocol($mediaProtocol);
+		
+		return $instance;
+	}
 	
 	public function cloneAttributes(DeliveryProfileDynamicAttributes $newObj) {
 		$this->deliveryProfileIds = $newObj->getDeliveryProfileIds();

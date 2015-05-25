@@ -250,23 +250,22 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 	 * @param string $mediaProtocol - rtmp/rtmpe/https...
 	 * @return DeliveryProfile
 	 */
-	public static function getRemoteDeliveryByStorageId($storageProfileId, $entryId, $streamerType = PlaybackProtocol::HTTP, $mediaProtocol = null, 
+	public static function getRemoteDeliveryByStorageId(DeliveryProfileDynamicAttributes $deliveryAttributes, 
 			FileSync $fileSync = null, asset $asset = null) {
-	
+
+		$storageProfileId = $deliveryAttributes->getStorageProfileId();
 		$storageProfile = StorageProfilePeer::retrieveByPK($storageProfileId);
 		if(!$storageProfile) {
 			KalturaLog::err('Couldn\'t retrieve storageId: '. $storageProfileId);
 			return null;
 		}
-			
+
+		$streamerType = $deliveryAttributes->getFormat();
 		$deliveryIds = $storageProfile->getDeliveryProfileIds();
 		if(!array_key_exists($streamerType, $deliveryIds)) {
 			KalturaLog::err("Delivery ID can't be determined for storageId [$storageProfileId] ( PartnerId [" .  $storageProfile->getPartnerId() . "] ) and streamer type [ $streamerType ]");
 			return null;
 		}
-		
-		$deliveryAttributes = new DeliveryProfileDynamicAttributes();
-		$deliveryAttributes->setMediaProtocol($mediaProtocol);
 		
 		$deliveries = DeliveryProfilePeer::retrieveByPKs($deliveryIds[$streamerType]);
 		$delivery = self::selectByDeliveryAttributes($deliveries, $deliveryAttributes);

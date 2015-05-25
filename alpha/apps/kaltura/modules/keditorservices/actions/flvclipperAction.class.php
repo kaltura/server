@@ -219,8 +219,8 @@ class flvclipperAction extends kalturaAction
 			
 			if ($fileSync->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL)
 			{
-				$urlManager = DeliveryProfilePeer::getRemoteDeliveryByStorageId($fileSync->getDc(), $flavorAsset->getEntryId(),
-						PlaybackProtocol::HTTP, null, null, $flavorAsset);
+				$urlManager = DeliveryProfilePeer::getRemoteDeliveryByStorageId(
+						DeliveryProfileDynamicAttributes::init($fileSync->getDc(), $flavorAsset->getEntryId(), PlaybackProtocol::HTTP), null, $flavorAsset);
 				if (!$urlManager)
 				{
 					KalturaLog::log("Error - failed to find an HTTP delivery for storage profile [".$fileSync->getDc()."]");
