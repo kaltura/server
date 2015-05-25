@@ -679,8 +679,6 @@ class playManifestAction extends kalturaAction
 	{
 		if ($this->deliveryAttributes->getStorageId())
 		{
-			//TODO fix storage profile id inconsistency
-			$this->deliveryAttributes->setStorageProfileId($this->deliveryAttributes->getStorageId());
 			return DeliveryProfilePeer::getRemoteDeliveryByStorageId($this->deliveryAttributes);
 		} else {		
 			$cdnHost = $this->cdnHost;

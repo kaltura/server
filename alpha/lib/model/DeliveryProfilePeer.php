@@ -244,39 +244,36 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 	/**
 	 * This function returns the delivery object that matches a given storage profile and format
 	 * If one not found - returns null
-	 * @param int $storageProfileId - The storage profile ID
-	 * @param string $entryId - The entry ID
-	 * @param PlaybackProtocol $streamerType - The protocol
-	 * @param string $mediaProtocol - rtmp/rtmpe/https...
+	 * @param DeliveryProfileDynamicAttributes $deliveryAttributes - containing requested storageId, entryId, format and media protocol
 	 * @return DeliveryProfile
 	 */
 	public static function getRemoteDeliveryByStorageId(DeliveryProfileDynamicAttributes $deliveryAttributes, 
 			FileSync $fileSync = null, asset $asset = null) {
 
-		$storageProfileId = $deliveryAttributes->getStorageProfileId();
-		$storageProfile = StorageProfilePeer::retrieveByPK($storageProfileId);
+		$storageId = $deliveryAttributes->getStorageId();
+		$storageProfile = StorageProfilePeer::retrieveByPK($storageId);
 		if(!$storageProfile) {
-			KalturaLog::err('Couldn\'t retrieve storageId: '. $storageProfileId);
+			KalturaLog::err('Couldn\'t retrieve storageId: '. $storageId);
 			return null;
 		}
 
 		$streamerType = $deliveryAttributes->getFormat();
 		$deliveryIds = $storageProfile->getDeliveryProfileIds();
 		if(!array_key_exists($streamerType, $deliveryIds)) {
-			KalturaLog::err("Delivery ID can't be determined for storageId [$storageProfileId] ( PartnerId [" .  $storageProfile->getPartnerId() . "] ) and streamer type [ $streamerType ]");
+			KalturaLog::err("Delivery ID can't be determined for storageId [$storageId] ( PartnerId [" .  $storageProfile->getPartnerId() . "] ) and streamer type [ $streamerType ]");
 			return null;
 		}
 		
 		$deliveries = DeliveryProfilePeer::retrieveByPKs($deliveryIds[$streamerType]);
 		$delivery = self::selectByDeliveryAttributes($deliveries, $deliveryAttributes);
 		if($delivery) {
-			KalturaLog::debug("Delivery ID for storageId [$storageProfileId] ( PartnerId [" . $storageProfile->getPartnerId() . "] ) and streamer type [$streamerType] is " . $delivery->getId());
-			$delivery->setEntryId($entryId);
-			$delivery->setStorageProfileId($storageProfileId);
+			KalturaLog::debug("Delivery ID for storageId [$storageId] ( PartnerId [" . $storageProfile->getPartnerId() . "] ) and streamer type [$streamerType] is " . $delivery->getId());
+			$delivery->setEntryId($deliveryAttributes->getEntryId());
+			$delivery->setStorageProfileId($storageId);
 			
 			$delivery->initDeliveryDynamicAttributes($fileSync, $asset);
 		} else {
-			KalturaLog::err("Delivery ID can't be determined for storageId [$storageProfileId] ( PartnerId [" .  $storageProfile->getPartnerId() . "] ) streamer type [$streamerType] and media protocol [$mediaProtocol]");
+			KalturaLog::err("Delivery ID can't be determined for storageId [$storageId] ( PartnerId [" .  $storageProfile->getPartnerId() . "] ) streamer type [$streamerType] and media protocol [".$deliveryAttributes->getMediaProtocol()."]");
 		}
 		
 		return $delivery;
