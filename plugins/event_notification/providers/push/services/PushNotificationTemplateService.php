@@ -81,10 +81,9 @@ class PushNotificationTemplateService extends KalturaBaseService
 	    // build the url to return
 	    $protocol = infraRequestUtils::getProtocol();
 	    $host = kConf::get("push_server_host");
-	    $templateId = $dbEventNotificationTemplate->getId();
 	    $secret = kConf::get("push_server_secret");
 	    $token = base64_encode($partnerId . ":" . $this->encode($secret . ":" . time() ) );
-	    $result->url = $protocol . "://" . $host ."/?p=" . $partnerId ."&e=" . $templateId ."&x=" . $token;
+	    $result->url = $protocol . "://" . $host ."/?p=" . $partnerId ."&x=" . $token;
 	    
 	    return $result;
 	}
