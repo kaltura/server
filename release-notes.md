@@ -50,6 +50,7 @@
 
 		- run php /opt/kaltura/app/deployment/updates/scripts/2015_05_17_update_DRM_access_control.php
 		- run php deployment/updates/scripts/add_permissions/2015_05_17_update_drm_license_access_permissions.php
+        - run php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
 
 #### Known Issues & Limitations ####
 
