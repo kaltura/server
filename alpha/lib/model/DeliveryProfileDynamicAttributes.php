@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This class centralizes all the delivery attributes that are specific for a given request  
+ * This class centralizes all the delivery attributes that are specific for a given request
  * and not general for the delivery definition.
  * For example- when a request is passed from the Playmanifest - all parameters should be passed through 
  * this data transfer object 
@@ -20,7 +20,7 @@ class DeliveryProfileDynamicAttributes {
 	 */
 	protected $isDeliveryProfilesBlockedList = null;
 	
-    /**
+	/**
 	 * @var string
 	 */
 	protected $format;
@@ -463,7 +463,7 @@ class DeliveryProfileDynamicAttributes {
 	public function cloneAttributes(DeliveryProfileDynamicAttributes $newObj) {
 		$this->deliveryProfileIds = $newObj->getDeliveryProfileIds();
 		$this->isDeliveryProfilesBlockedList = $newObj->getIsDeliveryProfilesBlockedList();
-	    $this->format = $newObj->getFormat();
+		$this->format = $newObj->getFormat();
 		$this->extension = $newObj->getFileExtension();
 		$this->containerFormat = $newObj->getContainerFormat();
 		$this->seekFromTime = $newObj->getSeekFromTime();

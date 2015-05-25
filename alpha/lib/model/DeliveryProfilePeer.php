@@ -190,7 +190,7 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 		if(array_key_exists($streamerType, $deliveryIds)) {
 			$deliveryIds = $deliveryIds[$streamerType];
 			
-			self::filterDeliveryProfiles($deliveryIds, $deliveryAttributes);
+			self::filterDeliveryProfilesArray($deliveryIds, $deliveryAttributes);
 			
 			$deliveries = DeliveryProfilePeer::retrieveByPKs($deliveryIds);
 			
@@ -211,7 +211,7 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 			else
 				$c->addDescendingOrderByColumn('(' . DeliveryProfilePeer::TOKENIZER . ' is null)');
 
-			self::filterDeliveryProfiles($c, $deliveryAttributes);
+			self::filterDeliveryProfilesCriteria($c, $deliveryAttributes);
 					
 			$orderBy = "(" . DeliveryProfilePeer::PARTNER_ID . "<>{$partnerId})";
 			$c->addAscendingOrderByColumn($orderBy);
@@ -310,27 +310,31 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 		return $partialSupport;
 	}
 	
-	/*
-	 * Filters a Criteria or array of deliveryProfiles according to the access control set in the $deliveryAttributes
-	 * @param mixed &$object - either a Criteria or an array
+	/**
+	 * Filters an array of delivery profile ids according to the access control set in the $deliveryAttributes
+	 * @param array $deliveryIds an array of delivery profile ids
+	 * @param DeliveryProfileDynamicAttributes $deliveryAttributes        	
+	 */
+	protected static function filterDeliveryProfilesArray(&$deliveryIds, DeliveryProfileDynamicAttributes $deliveryAttributes) {
+		$aclIds = $deliveryAttributes->getDeliveryProfileIds ();
+		if ($aclIds) {
+			if ($deliveryAttributes->getIsDeliveryProfilesBlockedList ())
+				$deliveryIds = array_diff ( $deliveryIds, $aclIds );
+			else
+				$deliveryIds = array_intersect ( $deliveryIds, $aclIds );
+		}
+	}
+
+	/**
+	 * Adds a filter to a Criteria according to the access control set in the $deliveryAttributes
+	 * @param Criteria $c - a Criteria
 	 * @param DeliveryProfileDynamicAttributes $deliveryAttributes
 	 */
-	protected static function filterDeliveryProfiles(&$object, DeliveryProfileDynamicAttributes $deliveryAttributes)
-	{
-    	$aclIds = $deliveryAttributes->getDeliveryProfileIds();
-    		
-    	if ($aclIds)
-    	{
-    	    if ($object instanceof Criteria)
-    		    $object->add(DeliveryProfilePeer::ID, $aclIds, $deliveryAttributes->getIsDeliveryProfilesBlockedList() ? Criteria::NOT_IN : Criteria::IN);
-    	    else
-    	    {
-    	        if ($deliveryAttributes->getIsDeliveryProfilesBlockedList())
-    	            $object = array_diff($object, $aclIds);
-    	        else
-    	            $object = array_intersect($object, $aclIds);
-    	    }
-	    }
+	protected static function filterDeliveryProfilesCriteria(&$c, DeliveryProfileDynamicAttributes $deliveryAttributes) {
+		$aclIds = $deliveryAttributes->getDeliveryProfileIds ();
+		if ($aclIds) {
+			$c->add ( DeliveryProfilePeer::ID, $aclIds, $deliveryAttributes->getIsDeliveryProfilesBlockedList () ? Criteria::NOT_IN : Criteria::IN );
+		}
 	}
 	
 	/**
@@ -342,13 +346,14 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 	 * @return DeliveryProfile
 	 */
 	public static function getLiveDeliveryProfileByHostName($cdnHost, DeliveryProfileDynamicAttributes $deliveryAttributes) {
-	    $entryId = $deliveryAttributes->getEntryId();
+		$entryId = $deliveryAttributes->getEntryId();
 		$entry = entryPeer::retrieveByPK($entryId);
 		if(!$entry) {
 			KalturaLog::err('Failed to retrieve entryId: '. $entryId);
 			return null;
 		}
 		$partnerId = $entry->getPartnerId();
+		$streamerType = $deliveryAttributes->getFormat();
 		
 		$c = new Criteria();
 		$c->add(DeliveryProfilePeer::PARTNER_ID, array(PartnerPeer::GLOBAL_PARTNER, $partnerId), Criteria::IN); 
@@ -358,9 +363,9 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 		$hostCond->addOr($c->getNewCriterion(DeliveryProfilePeer::HOST_NAME, null, Criteria::ISNULL));
 		
 		$c->addAnd($hostCond);
-		$c->add(DeliveryProfilePeer::STREAMER_TYPE, $deliveryAttributes->getFormat());
+		$c->add(DeliveryProfilePeer::STREAMER_TYPE, $streamerType);
 		
-		self::filterDeliveryProfiles($c, $deliveryAttributes);
+		self::filterDeliveryProfilesCriteria($c, $deliveryAttributes);
 		
 		$c->addDescendingOrderByColumn('(' . DeliveryProfilePeer::HOST_NAME . ' is not null)');
 		$orderBy = "(" . DeliveryProfilePeer::PARTNER_ID . "<>{$partnerId})";
@@ -370,7 +375,7 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 		
 		$delivery = self::selectByDeliveryAttributes($deliveries, $deliveryAttributes);
 		if($delivery) {
-			KalturaLog::debug("Delivery ID for Host Name: [$cdnHost] and streamer type: [$streamerType] is [" . $delivery->getId());
+			KalturaLog::debug("Delivery ID for Host Name: [$cdnHost] and streamer type: [$deliveryAttributes->getFormat()$streamerType] is [" . $delivery->getId());
 			$delivery->setEntryId($entryId);
 		} else {
 			KalturaLog::err("Delivery ID can't be determined for Host Name [$cdnHost] and streamer type [$streamerType]");

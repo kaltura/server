@@ -166,9 +166,9 @@ class LiveStreamService extends KalturaLiveEntryService
 			if($url)
 			{
 				KalturaLog::info('Determining status of live stream URL [' .$url. ']');
-			    $dpda= new DeliveryProfileDynamicAttributes();
-			    $dpda->setEntryId($entryId);
-			    $dpda->setFormat($protocol);
+				$dpda= new DeliveryProfileDynamicAttributes();
+				$dpda->setEntryId($entryId);
+				$dpda->setFormat($protocol);
 				$deliveryProfile = DeliveryProfilePeer::getLiveDeliveryProfileByHostName(parse_url($url, PHP_URL_HOST), $dpda);
 				if($deliveryProfile && $deliveryProfile->isLive($url))
 				{

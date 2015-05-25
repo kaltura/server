@@ -37,7 +37,7 @@ class KalturaRuleActionArray extends KalturaTypedArray
 			case RuleActionType::ADD_TO_STORAGE:
 				return new KalturaStorageAddAction();	
 			case RuleActionType::LIMIT_DELIVERY_PROFILES:
-			    return new KalturaAccessControlLimitDeliveryProfilesAction();
+				return new KalturaAccessControlLimitDeliveryProfilesAction();
 			default:
 				return KalturaPluginManager::loadObject('KalturaRuleAction', $dbObject->getType());
 		}		
