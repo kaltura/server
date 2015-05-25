@@ -53,11 +53,6 @@ class DeliveryProfileDynamicAttributes {
 	/**
 	 * @var int
 	 */
-	protected $storageProfileId = null;
-	
-	/**
-	 * @var int
-	 */
 	protected $storageId = null;
 	
 	/**
@@ -179,13 +174,6 @@ class DeliveryProfileDynamicAttributes {
 	}
 
 	/**
-	 * @return the $storageProfileId
-	 */
-	public function getStorageProfileId() {
-		return $this->storageProfileId;
-	}
-
-	/**
 	 * @return the $storageId
 	 */
 	public function getStorageId() {
@@ -278,13 +266,6 @@ class DeliveryProfileDynamicAttributes {
 		$this->playbackRate = $playbackRate;
 	}
 	
-	/**
-	 * @param number $storageProfileId
-	 */
-	public function setStorageProfileId($storageProfileId) {
-		$this->storageProfileId = $storageProfileId;
-	}
-
 	/**
 	 * @param number $storageId
 	 */

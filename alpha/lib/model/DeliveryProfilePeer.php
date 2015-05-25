@@ -269,7 +269,7 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 		if($delivery) {
 			KalturaLog::debug("Delivery ID for storageId [$storageId] ( PartnerId [" . $storageProfile->getPartnerId() . "] ) and streamer type [$streamerType] is " . $delivery->getId());
 			$delivery->setEntryId($deliveryAttributes->getEntryId());
-			$delivery->setStorageProfileId($storageId);
+			$delivery->setStorageId($storageId);
 			
 			$delivery->initDeliveryDynamicAttributes($fileSync, $asset);
 		} else {
