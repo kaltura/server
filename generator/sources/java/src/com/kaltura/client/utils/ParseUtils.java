@@ -50,7 +50,12 @@ public final class ParseUtils {
 	public static int parseInt(String txt) {
 		if (txt.length() != 0) {
 			try {
-				return Integer.parseInt(txt);
+				Double asDouble = Double.parseDouble(txt);
+				if (asDouble.doubleValue() != asDouble.intValue()){
+					throw new NumberFormatException("Expected int yet got a double , parsed value: " + asDouble);
+				} else {
+					return asDouble.intValue();
+				}
 			} catch (NumberFormatException nfe) {
 				if (logger.isEnabled())
 					logger.warn("Failed to parse [" + txt + "] as int", nfe);
