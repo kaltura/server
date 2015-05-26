@@ -1,5 +1,15 @@
 # Jupiter-10.12.0 #
 
+
+## New event notification template- drop folder error description changed ##
+
+- Issue Type: new feature  
+- Issue ID: PS-2251  
+
+#### Deployment Script ####
+
+- Run php /opt/kaltura/app/tests/standAloneClient/exec.php /opt/kaltura/app/tests/standAloneClient/emailDropFolderFailedStatusMessage.xml  
+
 ## Server ingestion of chapter cue points without slides ##
 
 - Issue Type: bug fix
@@ -19,6 +29,7 @@ None.
 #### Known Issues & Limitations ####
 
 None.
+
 
 ## New event notification template- entry custom data changed ##
 
