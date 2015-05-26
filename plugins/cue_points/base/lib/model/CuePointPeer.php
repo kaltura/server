@@ -116,31 +116,31 @@ class CuePointPeer extends BaseCuePointPeer implements IMetadataPeer
 	 */
 	public static function filterSelectResults(&$selectResults, Criteria $criteria)
 	{
-		if(empty($selectResults))
-			return;
-	
-		KalturaLog::debug('Filter cuePoint User results');
-	
-		$removedRecordsCount = 0;
-		foreach ($selectResults as $key => $cuePoint)
+		if(!empty($selectResults) && self::$userContentOnly)
 		{
-			/* @var $cuePoint CuePoint */
-			if($cuePoint->getPuserId() !== kCurrentContext::$ks_uid && !$cuePoint->getIsPublic())
+			KalturaLog::debug('Filter cuePoint User results');
+		
+			$removedRecordsCount = 0;
+			foreach ($selectResults as $key => $cuePoint)
 			{
-				unset($selectResults[$key]);
-				$removedRecordsCount++;
+				/* @var $cuePoint CuePoint */
+				if(kCurrentContext::$ks_uid && $cuePoint->getPuserId() !== kCurrentContext::$ks_uid && !$cuePoint->getIsPublic())
+				{
+					unset($selectResults[$key]);
+					$removedRecordsCount++;
+				}
 			}
-		}
-	
-		if($criteria instanceof KalturaCriteria)
-		{
-			$recordsCount = $criteria->getRecordsCount();
-			$criteria->setRecordsCount($recordsCount - $removedRecordsCount);
+		
+			if($criteria instanceof KalturaCriteria)
+			{
+				$recordsCount = $criteria->getRecordsCount();
+				$criteria->setRecordsCount($recordsCount - $removedRecordsCount);
+			}
+			
+			KalturaLog::debug('Filter cuePoint Results - done');
 		}
 	
 		parent::filterSelectResults($selectResults, $criteria);
-	
-		KalturaLog::debug('Filter cuePoint Results - done');
 	}
 	
 	public static function retrieveByPK($pk, PropelPDO $con = null)
