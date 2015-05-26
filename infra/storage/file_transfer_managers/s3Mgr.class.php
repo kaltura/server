@@ -57,8 +57,8 @@ class s3Mgr extends kFileTransferMgr
 	// login to an existing connection with given user/pass (ftp_passive_mode is irrelevant)
 	protected function doLogin($sftp_user, $sftp_pass)
 	{
-		if(!class_exists("Aws\S3\S3Client")) {
-			KalturaLog::err("Class Aws\S3\S3Client was not found!!");
+		if(!class_exists('Aws\S3\S3Client')) {
+			KalturaLog::err('Class Aws\S3\S3Client was not found!!');
 			return false;
 		}
 
