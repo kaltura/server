@@ -1,5 +1,6 @@
 # Jupiter-10.12.0 #
 
+
 ## New event notification template- drop folder error description changed ##
 
 - Issue Type: new feature  
@@ -8,6 +9,27 @@
 #### Deployment Script ####
 
 - Run php /opt/kaltura/app/tests/standAloneClient/exec.php /opt/kaltura/app/tests/standAloneClient/emailDropFolderFailedStatusMessage.xml  
+
+## Server ingestion of chapter cue points without slides ##
+
+- Issue Type: bug fix
+- Issue ID: PLAT-2204
+
+### Configuration ###
+- **workers.ini**
+
+under 'KAsyncBulkUpload'
+
+		params.xmlSchemaVersion		= 7
+
+#### Deployment Scripts ####
+
+None.
+
+#### Known Issues & Limitations ####
+
+None.
+
 
 ## New event notification template- entry custom data changed ##
 
@@ -46,7 +68,7 @@
 		moduls.drmBase.basePermissionName =
 		moduls.drmBase.group = GROUP_ENABLE_DISABLE_FEATURES
 		
-		moduls.drmCencFlavors.enabled = true
+		moduls.drmCencFlavors.enabled = false
 		moduls.drmCencFlavors.permissionType = 2
 		moduls.drmCencFlavors.label = DRM – Enable CENC Flavors
 		moduls.drmCencFlavors.permissionName = DRM_CENC_FLAVORS
@@ -59,6 +81,7 @@
 
 		- run php /opt/kaltura/app/deployment/updates/scripts/2015_05_17_update_DRM_access_control.php
 		- run php deployment/updates/scripts/add_permissions/2015_05_17_update_drm_license_access_permissions.php
+        - run php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
 
 #### Known Issues & Limitations ####
 

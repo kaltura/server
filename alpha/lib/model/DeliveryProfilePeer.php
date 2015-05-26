@@ -189,6 +189,9 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 		// if the partner has an override for the required format on the partner object - use that
 		if(array_key_exists($streamerType, $deliveryIds)) {
 			$deliveryIds = $deliveryIds[$streamerType];
+			
+			self::filterDeliveryProfilesArray($deliveryIds, $deliveryAttributes);
+			
 			$deliveries = DeliveryProfilePeer::retrieveByPKs($deliveryIds);
 			
 			$cmp = new DeliveryProfileComparator($isSecured, $cdnHost);
@@ -207,7 +210,9 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 				$c->addDescendingOrderByColumn('(' . DeliveryProfilePeer::TOKENIZER . ' is not null)');
 			else
 				$c->addDescendingOrderByColumn('(' . DeliveryProfilePeer::TOKENIZER . ' is null)');
-			
+
+			self::filterDeliveryProfilesCriteria($c, $deliveryAttributes);
+					
 			$orderBy = "(" . DeliveryProfilePeer::PARTNER_ID . "<>{$partnerId})";
 			$c->addAscendingOrderByColumn($orderBy);
 			$c->addAscendingOrderByColumn(DeliveryProfilePeer::PRIORITY);
@@ -239,40 +244,38 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 	/**
 	 * This function returns the delivery object that matches a given storage profile and format
 	 * If one not found - returns null
-	 * @param int $storageProfileId - The storage profile ID
-	 * @param string $entryId - The entry ID
-	 * @param PlaybackProtocol $streamerType - The protocol
-	 * @param string $mediaProtocol - rtmp/rtmpe/https...
+	 * @param DeliveryProfileDynamicAttributes $deliveryAttributes - containing requested storageId, entryId, format and media protocol
 	 * @return DeliveryProfile
 	 */
-	public static function getRemoteDeliveryByStorageId($storageProfileId, $entryId, $streamerType = PlaybackProtocol::HTTP, $mediaProtocol = null, 
+	public static function getRemoteDeliveryByStorageId(DeliveryProfileDynamicAttributes $deliveryAttributes, 
 			FileSync $fileSync = null, asset $asset = null) {
-	
-		$storageProfile = StorageProfilePeer::retrieveByPK($storageProfileId);
+
+		$storageId = $deliveryAttributes->getStorageId();
+		$storageProfile = StorageProfilePeer::retrieveByPK($storageId);
 		if(!$storageProfile) {
-			KalturaLog::err('Couldn\'t retrieve storageId: '. $storageProfileId);
+			KalturaLog::err('Couldn\'t retrieve storageId: '. $storageId);
 			return null;
 		}
-			
+
+		$streamerType = $deliveryAttributes->getFormat();
 		$deliveryIds = $storageProfile->getDeliveryProfileIds();
 		if(!array_key_exists($streamerType, $deliveryIds)) {
-			KalturaLog::err("Delivery ID can't be determined for storageId [$storageProfileId] ( PartnerId [" .  $storageProfile->getPartnerId() . "] ) and streamer type [ $streamerType ]");
+			KalturaLog::err("Delivery ID can't be determined for storageId [$storageId] ( PartnerId [" .  $storageProfile->getPartnerId() . "] ) and streamer type [ $streamerType ]");
 			return null;
 		}
-		
-		$deliveryAttributes = new DeliveryProfileDynamicAttributes();
-		$deliveryAttributes->setMediaProtocol($mediaProtocol);
+
+		self::filterDeliveryProfilesArray($deliveryIds, $deliveryAttributes);
 		
 		$deliveries = DeliveryProfilePeer::retrieveByPKs($deliveryIds[$streamerType]);
 		$delivery = self::selectByDeliveryAttributes($deliveries, $deliveryAttributes);
 		if($delivery) {
-			KalturaLog::debug("Delivery ID for storageId [$storageProfileId] ( PartnerId [" . $storageProfile->getPartnerId() . "] ) and streamer type [$streamerType] is " . $delivery->getId());
-			$delivery->setEntryId($entryId);
-			$delivery->setStorageProfileId($storageProfileId);
+			KalturaLog::debug("Delivery ID for storageId [$storageId] ( PartnerId [" . $storageProfile->getPartnerId() . "] ) and streamer type [$streamerType] is " . $delivery->getId());
+			$delivery->setEntryId($deliveryAttributes->getEntryId());
+			$delivery->setStorageId($storageId);
 			
 			$delivery->initDeliveryDynamicAttributes($fileSync, $asset);
 		} else {
-			KalturaLog::err("Delivery ID can't be determined for storageId [$storageProfileId] ( PartnerId [" .  $storageProfile->getPartnerId() . "] ) streamer type [$streamerType] and media protocol [$mediaProtocol]");
+			KalturaLog::err("Delivery ID can't be determined for storageId [$storageId] ( PartnerId [" .  $storageProfile->getPartnerId() . "] ) streamer type [$streamerType] and media protocol [".$deliveryAttributes->getMediaProtocol()."]");
 		}
 		
 		return $delivery;
@@ -306,6 +309,33 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 	}
 	
 	/**
+	 * Filters an array of delivery profile ids according to the access control set in the $deliveryAttributes
+	 * @param array $deliveryIds an array of delivery profile ids
+	 * @param DeliveryProfileDynamicAttributes $deliveryAttributes        	
+	 */
+	protected static function filterDeliveryProfilesArray(&$deliveryIds, DeliveryProfileDynamicAttributes $deliveryAttributes) {
+		$aclIds = $deliveryAttributes->getDeliveryProfileIds ();
+		if ($aclIds) {
+			if ($deliveryAttributes->getIsDeliveryProfilesBlockedList ())
+				$deliveryIds = array_diff ( $deliveryIds, $aclIds );
+			else
+				$deliveryIds = array_intersect ( $deliveryIds, $aclIds );
+		}
+	}
+
+	/**
+	 * Adds a filter to a Criteria according to the access control set in the $deliveryAttributes
+	 * @param Criteria $c - a Criteria
+	 * @param DeliveryProfileDynamicAttributes $deliveryAttributes
+	 */
+	protected static function filterDeliveryProfilesCriteria(&$c, DeliveryProfileDynamicAttributes $deliveryAttributes) {
+		$aclIds = $deliveryAttributes->getDeliveryProfileIds ();
+		if ($aclIds) {
+			$c->add ( DeliveryProfilePeer::ID, $aclIds, $deliveryAttributes->getIsDeliveryProfilesBlockedList () ? Criteria::NOT_IN : Criteria::IN );
+		}
+	}
+	
+	/**
 	 * Returns the delivery profile by host name (or returns one of the defaults)
 	 * @param string $cdnHost The host we're looking for
 	 * @param string $entryId The entry for which we search for the delivery profile
@@ -313,13 +343,15 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 	 * @param string $mediaProtocol - rtmp/rtmpe/https...
 	 * @return DeliveryProfile
 	 */
-	public static function getLiveDeliveryProfileByHostName($cdnHost, $entryId, $streamerType = PlaybackProtocol::HTTP, $mediaProtocol = null) {
+	public static function getLiveDeliveryProfileByHostName($cdnHost, DeliveryProfileDynamicAttributes $deliveryAttributes) {
+		$entryId = $deliveryAttributes->getEntryId();
 		$entry = entryPeer::retrieveByPK($entryId);
 		if(!$entry) {
 			KalturaLog::err('Failed to retrieve entryId: '. $entryId);
 			return null;
 		}
 		$partnerId = $entry->getPartnerId();
+		$streamerType = $deliveryAttributes->getFormat();
 		
 		$c = new Criteria();
 		$c->add(DeliveryProfilePeer::PARTNER_ID, array(PartnerPeer::GLOBAL_PARTNER, $partnerId), Criteria::IN); 
@@ -331,14 +363,13 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 		$c->addAnd($hostCond);
 		$c->add(DeliveryProfilePeer::STREAMER_TYPE, $streamerType);
 		
+		self::filterDeliveryProfilesCriteria($c, $deliveryAttributes);
+		
 		$c->addDescendingOrderByColumn('(' . DeliveryProfilePeer::HOST_NAME . ' is not null)');
 		$orderBy = "(" . DeliveryProfilePeer::PARTNER_ID . "<>{$partnerId})";
 		$c->addAscendingOrderByColumn($orderBy);
 			
 		$deliveries = self::doSelect($c);
-		
-		$deliveryAttributes = new DeliveryProfileDynamicAttributes();
-		$deliveryAttributes->setMediaProtocol($mediaProtocol);
 		
 		$delivery = self::selectByDeliveryAttributes($deliveries, $deliveryAttributes);
 		if($delivery) {

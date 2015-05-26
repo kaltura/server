@@ -9,7 +9,7 @@ class DeliveryProfileKontikiHttp extends DeliveryProfileHttp
     
     protected function doGetFileSyncUrl(FileSync $fileSync)
     {
-        $storageProfile = StorageProfilePeer::retrieveByPK($this->params->getStorageProfileId());
+        $storageProfile = StorageProfilePeer::retrieveByPK($this->params->getStorageId());
 		/* @var $storageProfile KontikiStorageProfile */
 		$kontikiAPIWrapper = new KontikiAPIWrapper($storageProfile->getStorageUrl());
         $playbackResource = $kontikiAPIWrapper->getPlaybackResource(KontikiPlugin::SERVICE_TOKEN_PREFIX.base64_encode($storageProfile->getServiceToken()), $fileSync->getFilePath());
