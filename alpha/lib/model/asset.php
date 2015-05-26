@@ -493,7 +493,7 @@ class asset extends Baseasset implements ISyncableFile
 		if(!$storage)
 			return null;
 			
-		$urlManager = DeliveryProfilePeer::getRemoteDeliveryByStorageId($fileSync->getDc(), $this->getEntryId(), PlaybackProtocol::HTTP, null, $fileSync, $this);
+		$urlManager = DeliveryProfilePeer::getRemoteDeliveryByStorageId(DeliveryProfileDynamicAttributes::init($fileSync->getDc(), $this->getEntryId()), $fileSync, $this);
 		if(is_null($urlManager)) 
 			return null;
 			
