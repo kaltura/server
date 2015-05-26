@@ -22,7 +22,7 @@ class kLimeLightUrlTokenizer extends kUrlTokenizer
 			$url = substr($url, 0, $seekParamPos);
 		}
 	
-		$url .= '&e=' . (time() + 120);
+		$url .= '&e=' . (infraRequestUtils::getServerTime() + 120);
 		$fullUrl = $this->urlPrefix . $url;
 		$url .= '&h=' . md5($this->key . $fullUrl);
 		$url .= $seekParam;

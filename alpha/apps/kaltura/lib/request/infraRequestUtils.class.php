@@ -454,4 +454,34 @@ class infraRequestUtils
 			fclose($fh);
 		}
 	}
+	
+	public static function getServerTime()
+	{
+		if (isset ( $_SERVER['HTTP_X_KALTURA_REMOTE_TIME'] ) )
+		{
+			list($remote_time, $time, $uniqueId, $hash) = @explode(",", $_SERVER['HTTP_X_KALTURA_REMOTE_TIME']);
+			
+			if (kConf::hasParam('remote_time_header_salt') && kConf::hasParam("remote_time_header_timeout"))
+			{
+				$salt = kConf::get('remote_time_header_salt');
+				$timeout = kConf::get("remote_time_header_timeout");
+				
+				if ($timeout) {
+					// Compare the absolute value of the difference between the current time
+					// and the "token" time.
+					if (abs(time() - $time) > $timeout )
+						die("REMOTE_TIME header invalid time");
+				}
+				
+				if ($hash !== md5("$remote_time,$time,$uniqueId,$salt"))
+				{
+					die("REMOTE_TIME header invalid signature");
+				}
+			}
+			
+			return $remote_time;
+		}
+		
+		return time();
+	}
 }

@@ -25,7 +25,7 @@ class kVelocixUrlTokenizer extends kUrlTokenizer
 		$path_parts = pathinfo($path);
 		$path  = preg_replace('/'.$path_parts['basename'].'/', '*', $path);
 		// work out the expiry in Unix epoch seconds
-		$t_expiry = time() + $this->window;
+		$t_expiry = infraRequestUtils::getServerTime() + $this->window;
 		// URL encode the parameters
 		$message = "pathURI=" . rawurlencode($path);
 		$paths = explode(",", $this->hdsPaths);

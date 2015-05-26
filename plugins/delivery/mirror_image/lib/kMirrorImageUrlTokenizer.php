@@ -26,13 +26,13 @@ class kMirrorImageUrlTokenizer extends kUrlTokenizer
 	public function tokenizeSingleUrl($url, $urlPrefix = null)
 	{
 		// get parameters
-		$startTime = time();	
+		$startTime = infraRequestUtils::getServerTime();	
 				
 		// build the full file sync URL to decorate
 		$urlToDecorate = $this->baseUrl.'/'. ltrim($url, '/');
 		
 		// decorate URLs
-		$decoratedUrl = self::decorateUrl($urlToDecorate, $this->key, time(), $this->window, $this->useDummyHost);
+		$decoratedUrl = self::decorateUrl($urlToDecorate, $this->key, $startTime, $this->window, $this->useDummyHost);
 		
 		// remove the base URL from the decorated URL
 		return substr($decoratedUrl, strlen($this->baseUrl.'/'));
@@ -44,7 +44,7 @@ class kMirrorImageUrlTokenizer extends kUrlTokenizer
 	 */
 	public function tokenizeMultiUrls(&$baseUrl, &$flavors)
 	{
-		$startTime = time();
+		$startTime = infraRequestUtils::getServerTime();
 		foreach($flavors as &$flavor)
 		{			    
 			$bareUrl = $baseUrl.'/'.ltrim($flavor["url"],'/');

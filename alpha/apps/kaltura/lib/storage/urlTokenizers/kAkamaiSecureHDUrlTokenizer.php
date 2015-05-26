@@ -94,7 +94,7 @@ class Akamai_EdgeAuth_Config {
 		if ( $this->start_time > 0 ) {
 			return $this->start_time;
 		} else {
-			return time();
+			return infraRequestUtils::getServerTime();
 		}
 	}
 	public function get_start_time_field() {
@@ -291,7 +291,7 @@ class kAkamaiSecureHDUrlTokenizer extends kUrlTokenizer
 		$c = new Akamai_EdgeAuth_Config();
 		$c->set_acl($acl);
 		$c->set_window($this->window);
-		$c->set_start_time(time());		# The time from which the token will start
+		$c->set_start_time(infraRequestUtils::getServerTime());		# The time from which the token will start
 		$c->set_key($this->key);
 		
 		$g = new Akamai_EdgeAuth_Generate();
@@ -323,7 +323,7 @@ class kAkamaiSecureHDUrlTokenizer extends kUrlTokenizer
 		{
 			$slashPos = strrpos($acl, '/');
 			$path = $slashPos !== false ? substr($acl, 0, $slashPos + 1) : '/';
-			setrawcookie($this->paramName, $token, time() + $this->window, $path);
+			setrawcookie($this->paramName, $token, infraRequestUtils::getServerTime() + $this->window, $path);
 			return $url;
 		}
 		
@@ -359,7 +359,7 @@ class kAkamaiSecureHDUrlTokenizer extends kUrlTokenizer
 		{
 			$slashPos = strrpos($acl, '/');
 			$path = $slashPos !== false ? substr($acl, 0, $slashPos + 1) : '/';
-			setrawcookie($this->paramName, $token, time() + $this->window, $path);
+			setrawcookie($this->paramName, $token, infraRequestUtils::getServerTime() + $this->window, $path);
 			return;
 		}
 		

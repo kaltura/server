@@ -49,7 +49,7 @@ class kAkamaiHttpUrlTokenizer extends kUrlTokenizer
 		}
 	
 		if (($nTime <= 0) || (!is_numeric($nTime))) {
-			$nTime = time();
+			$nTime = infraRequestUtils::getServerTime();
 		}
 	
 		$nExpires = $nWindow + $nTime;
@@ -86,7 +86,7 @@ class kAkamaiHttpUrlTokenizer extends kUrlTokenizer
 		}
 	
 		if (($nTime <= 0) || (!is_numeric($nTime))) {
-			$nTime = time();
+			$nTime = infraRequestUtils::getServerTime();
 		}
 	
 		$nExpires = $nWindow + $nTime;
