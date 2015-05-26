@@ -1,7 +1,8 @@
 <?php
 
 abstract class SyndicationFeedRenderer {
-	
+
+	const KALTURA_TOKEN_MARKER = '{kt}';
 	const LEVEL_INDENTATION = '  ';
 	
 	protected $syndicationFeed;
@@ -119,6 +120,12 @@ abstract class SyndicationFeedRenderer {
 		$ret .= ($seconds >= 10)? "$seconds": "0$seconds";
 	
 		return $ret;
+	}
+
+	static protected function calculateKalturaToken($url)
+	{
+		$token = sha1(kConf::get('url_token_secret') . $url);
+		return str_replace(self::KALTURA_TOKEN_MARKER, $token, $url);
 	}
 }
 
