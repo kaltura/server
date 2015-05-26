@@ -1,5 +1,25 @@
 # Jupiter-10.12.0 #
 
+## Server ingestion of chapter cue points without slides ##
+
+- Issue Type: bug fix
+- Issue ID: PLAT-2204
+
+### Configuration ###
+- **workers.ini**
+
+under 'KAsyncBulkUpload'
+
+		params.xmlSchemaVersion		= 7
+
+#### Deployment Scripts ####
+
+None.
+
+#### Known Issues & Limitations ####
+
+None.
+
 ## New event notification template- entry custom data changed ##
 
 - Issue Type: new feature  
