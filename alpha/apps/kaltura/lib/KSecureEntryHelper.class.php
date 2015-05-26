@@ -208,16 +208,16 @@ class KSecureEntryHelper
 	public function filterAllowedFlavorParams(array $flavorParamsIds)
 	{
 		$actionList = $this->getActionList(RuleActionType::LIMIT_FLAVORS);
-		if (!$actionList)
-			return $flavorParamsIds;
-		
-		$filteredFlavorParamsIds = array();
-		foreach ($flavorParamsIds as $flavorParamsId) 
+		if ($actionList)
 		{
-			if($this->isFlavorParamsAllowed($flavorParamsId))
-				$filteredFlavorParamsIds[] = $flavorParamsId;
+			// take only the first LIMIT_FLAVORS action
+			$action = reset($actionList);
+		
+			$actionflavorParamsIds = explode(',', $action->getFlavorParamsIds());
+			$flavorParamsIds = $action->getIsBlockedList() ? array_diff($flavorParamsIds, $actionflavorParamsIds) :	array_intersect($flavorParamsIds, $actionflavorParamsIds);
 		}
-		return $filteredFlavorParamsIds;
+		
+		return $flavorParamsIds;
 	}
 	
 	public function isAssetAllowed(asset $asset)
