@@ -371,7 +371,7 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 		
 		$delivery = self::selectByDeliveryAttributes($deliveries, $deliveryAttributes);
 		if($delivery) {
-			KalturaLog::debug("Delivery ID for Host Name: [$cdnHost] and streamer type: [$deliveryAttributes->getFormat()$streamerType] is [" . $delivery->getId());
+			KalturaLog::debug("Delivery ID for Host Name: [$cdnHost] and streamer type: [$streamerType] is [" . $delivery->getId());
 			$delivery->setEntryId($entryId);
 		} else {
 			KalturaLog::err("Delivery ID can't be determined for Host Name [$cdnHost] and streamer type [$streamerType]");
