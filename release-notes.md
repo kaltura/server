@@ -1,5 +1,14 @@
 # Jupiter-10.12.0 #
 
+## New event notification template- drop folder error description changed ##
+
+- Issue Type: new feature  
+- Issue ID: PS-2251  
+
+#### Deployment Script ####
+
+- Run php /opt/kaltura/app/tests/standAloneClient/exec.php /opt/kaltura/app/tests/standAloneClient/emailDropFolderFailedStatusMessage.xml  
+
 ## New event notification template- entry custom data changed ##
 
 - Issue Type: new feature  
