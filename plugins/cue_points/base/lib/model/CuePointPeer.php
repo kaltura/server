@@ -124,7 +124,7 @@ class CuePointPeer extends BaseCuePointPeer implements IMetadataPeer
 		foreach ($selectResults as $key => $cuePoint)
 		{
 			/* @var $cuePoint CuePoint */
-			if($cuePoint->getPuserId() !== kCurrentContext::$ks_uid && !$cuePoint->getIsPublic())
+			if($cuePoint->getPuserId() !== kCurrentContext::$ks_uid && !$cuePoint->getIsPublic() && $cuePoint->getType() !== AdCuePointPlugin::getCuePointTypeCoreValue(AdCuePointType::AD))
 			{
 				unset($selectResults[$key]);
 				$removedRecordsCount++;
