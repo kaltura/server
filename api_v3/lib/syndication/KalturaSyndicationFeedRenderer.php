@@ -560,7 +560,7 @@ class KalturaSyndicationFeedRenderer
 		{
 			$dpda = new DeliveryProfileDynamicAttributes();
 			$urlManager = DeliveryProfilePeer::getRemoteDeliveryByStorageId(
-					DeliveryProfileDynamicAttributes::init($fileSync->getDc(), $flavorAsset->getEntryId(), PlaybackProtocol::HTTP), null, $flavorAsset);
+					DeliveryProfileDynamicAttributes::init($fileSync->getDc(), $flavorAsset->getEntryId()), null, $flavorAsset);
 			$url = ltrim($urlManager->getFileSyncUrl($fileSync),'/');
 			if (strpos($url, "://") === false){
 				$url = rtrim($urlManager->getUrl(), "/") . "/".$url ;
