@@ -263,6 +263,8 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 			KalturaLog::err("Delivery ID can't be determined for storageId [$storageId] ( PartnerId [" .  $storageProfile->getPartnerId() . "] ) and streamer type [ $streamerType ]");
 			return null;
 		}
+
+		self::filterDeliveryProfilesArray($deliveryIds, $deliveryAttributes);
 		
 		$deliveries = DeliveryProfilePeer::retrieveByPKs($deliveryIds[$streamerType]);
 		$delivery = self::selectByDeliveryAttributes($deliveries, $deliveryAttributes);
