@@ -257,7 +257,7 @@ class KSecureEntryHelper
 		{
 			// take only the first LIMIT_DELIVERY_PROFILES action
 			$action = reset($actionList);
-			$deliveryAttributes->setDeliveryProfileIds($action->getDeliveryProfileIds(), $action->GetisBlockedList());
+			$deliveryAttributes->setDeliveryProfileIds($action->getDeliveryProfileIds(), $action->getisBlockedList());
 		}
 	}
 	
