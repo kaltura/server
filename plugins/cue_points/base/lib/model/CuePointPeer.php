@@ -71,6 +71,7 @@ class CuePointPeer extends BaseCuePointPeer implements IMetadataPeer
 								array(
 										ThumbCuePointPlugin::getCuePointTypeCoreValue(ThumbCuePointType::THUMB),
 										CodeCuePointPlugin::getCuePointTypeCoreValue(CodeCuePointType::CODE),
+										AdCuePointPlugin::getCuePointTypeCoreValue(AdCuePointType::AD),
 								),
 								Criteria::IN
 						)
@@ -124,7 +125,7 @@ class CuePointPeer extends BaseCuePointPeer implements IMetadataPeer
 		foreach ($selectResults as $key => $cuePoint)
 		{
 			/* @var $cuePoint CuePoint */
-			if($cuePoint->getPuserId() !== kCurrentContext::$ks_uid && !$cuePoint->getIsPublic() && $cuePoint->getType() !== AdCuePointPlugin::getCuePointTypeCoreValue(AdCuePointType::AD))
+			if($cuePoint->getPuserId() !== kCurrentContext::$ks_uid && !$cuePoint->getIsPublic())
 			{
 				unset($selectResults[$key]);
 				$removedRecordsCount++;
