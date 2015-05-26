@@ -12,7 +12,8 @@ class MetadataProfileService extends KalturaBaseService
 	{
 		parent::initService($serviceId, $serviceName, $actionName);
 
-		$this->applyPartnerFilterForClass('MetadataProfile');
+		if($actionName !== "list")
+			$this->applyPartnerFilterForClass('MetadataProfile');
 		$this->applyPartnerFilterForClass('Metadata');
 		$this->applyPartnerFilterForClass('entry');
 		
@@ -26,8 +27,6 @@ class MetadataProfileService extends KalturaBaseService
 	protected function partnerGroup($peer = null)
 	{
 	    if( $this->actionName == 'get') {
-	        return $this->partnerGroup . ',0';
-	    } else if ($this->actionName == 'list') {
 	        return $this->partnerGroup . ',0';
 	    }
 	    	
@@ -226,6 +225,11 @@ class MetadataProfileService extends KalturaBaseService
 			
 		$metadataProfileFilter = new MetadataProfileFilter();
 		$filter->toObject($metadataProfileFilter);
+		
+		if(isset($filter->systemNameEqual) || isset($filter->systemNameIn) || isset($filter->idEqual)) {
+			$this->partnerGroup .= ",0";
+		}
+		$this->applyPartnerFilterForClass('MetadataProfile');
 		
 		$c = new Criteria();
 		$metadataProfileFilter->attachToCriteria($c);
