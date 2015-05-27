@@ -5,7 +5,11 @@
 - Issue Type: Permission change
 - Issue ID : SUP-4739
 
-### Deployment Script ####
+### Configuration ###
+ 
+None.
+
+#### Deployment Script ####
 
 - Run php deployment/updates/scripts/add_permissions/2015_05_18_update_flavorasset_permissions.php
 
