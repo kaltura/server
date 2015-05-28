@@ -1736,14 +1736,7 @@
 		<index name="partner_id_status">
 			<index-column name="partner_id" />
 			<index-column name="status" />
-		</index>
-		<index name="partner_id_created_at">
-			<index-column name="partner_id" />
-			<index-column name="created_at" />
-		</index>
-		<index name="status_created_at">
-			<index-column name="status" />
-			<index-column name="created_at" />
+			<index-column name="system_name" />
 		</index>
 	</table>
 	<table skipSql="false" abstract="false" name="delivery_profile">

@@ -1952,9 +1952,7 @@ CREATE TABLE `edge_server`
         `parent_id` INTEGER default 0,
         `custom_data` TEXT,
         PRIMARY KEY (`id`),
-        KEY `partner_id_status`(`partner_id`, `status`),
-        KEY `partner_id_created_at`(`partner_id`, `created_at`),
-        KEY `status_created_at`(`status`, `created_at`)
+        KEY `partner_id_status`(`partner_id`, `status`, `system_name`)
 )Type=InnoDB;
 
 #-----------------------------------------------------------------------------
