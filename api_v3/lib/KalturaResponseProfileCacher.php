@@ -11,6 +11,13 @@ class KalturaResponseProfileCacher extends kResponseProfileCacher
 	 */
 	private static $responseProfileKey = null;
 	
+	/**
+	 * @var boolean
+	 */
+	private static $disabled = false;
+	
+	
+	
 	private static function getObjectSpecificCacheValue(KalturaObject $apiObject, IBaseObject $object, $responseProfileKey)
 	{
 		return array(
@@ -38,15 +45,13 @@ class KalturaResponseProfileCacher extends kResponseProfileCacher
 		$protocol = infraRequestUtils::getProtocol();
 		$ksType = kCurrentContext::getCurrentSessionType();
 		$userRoles = implode('_', $userRoles);
+		$entitlement = (int) kEntitlementUtils::getEntitlementEnforcement();
 		
-		return "rp{$profileKey}_p{$partnerId}_o{$objectType}_i{$objectId}_h{$protocol}_k{$ksType}_u{$userRoles}";
+		return "rp{$profileKey}_p{$partnerId}_o{$objectType}_i{$objectId}_h{$protocol}_k{$ksType}_u{$userRoles}_e{$entitlement}";
 	}
 	
 	private static function getObjectTypeCacheValue(IBaseObject $object)
 	{
-		$userRoles = kPermissionManager::getCurrentRoleIds();
-		sort($userRoles);
-		
 		return array(
 			'type' => 'relatedObject',
 			'triggerKey' => self::getTriggerKey($object),
@@ -55,9 +60,7 @@ class KalturaResponseProfileCacher extends kResponseProfileCacher
 			'triggerObjectType' => get_class($object),
 			'partnerId' => self::$cachedObject->getPartnerId(),
 			'responseProfileKey' => self::$responseProfileKey,
-			'protocol' => infraRequestUtils::getProtocol(),
-			'ksType' => kCurrentContext::getCurrentSessionType(),
-			'userRole' => implode('_', $userRoles)
+			'sessionKey' => self::getSessionKey(),
 		);
 	}
 	
@@ -83,7 +86,7 @@ class KalturaResponseProfileCacher extends kResponseProfileCacher
 	
 	public static function onPersistentObjectLoaded(IBaseObject $object)
 	{
-		if(!self::$cachedObject)
+		if(!self::$cachedObject || self::$disabled)
 			return;
 			
 		KalturaLog::debug("Loaded " . get_class($object) . " [" . $object->getId() . "]");
@@ -138,6 +141,12 @@ class KalturaResponseProfileCacher extends kResponseProfileCacher
 			self::set($responseProfileCacheKey, serialize($responseProfile));
 	}
 	
+	public static function disable()
+	{
+		self::$cachedObject = null;
+		self::$disabled = true;
+	}
+	
 	public static function stop(IBaseObject $object, KalturaObject $apiObject)
 	{
 		if($object !== self::$cachedObject)
@@ -145,7 +154,13 @@ class KalturaResponseProfileCacher extends kResponseProfileCacher
 			KalturaLog::debug("Object [" . get_class(self::$cachedObject) . "][" . self::$cachedObject->getId() . "] still caching");
 			return;
 		}
-			
+
+		if(self::$disabled)
+		{
+			self::$disabled = false;
+			return;
+		}
+		
 		KalturaLog::debug("Stop " . get_class($apiObject) . " [" . print_r($apiObject, true) . "]");
 		
 		$key = self::getObjectSpecificCacheKey(self::$cachedObject, self::$responseProfileKey);
@@ -154,7 +169,6 @@ class KalturaResponseProfileCacher extends kResponseProfileCacher
 		self::set($key, $value);
 		
 		self::$cachedObject = null;
-		self::$responseProfileKey = null;
 	}
 	
 	protected static function recalculateCache(kCouchbaseCacheListItem $cache, KalturaDetachedResponseProfile $responseProfile = null)
