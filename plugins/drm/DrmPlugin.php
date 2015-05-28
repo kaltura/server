@@ -152,22 +152,27 @@ class DrmPlugin extends KalturaPlugin implements IKalturaServices, IKalturaAdmin
         KalturaLog::debug("Drm contributing to context data");
 
         $signingKey = $this->getSigningKey();
-        KalturaLog::debug("Signing key is '$signingKey'");
+	    if (!is_null($signingKey))
+	    {
+		    KalturaLog::debug("Signing key is '$signingKey'");
 
-        $customDataJson = DrmLicenseUtils::createCustomData($entryId, $result->flavorAssets, $signingKey);
+		    $customDataJson = DrmLicenseUtils::createCustomData($entryId, $result->flavorAssets, $signingKey);
 
-        $drmContextData = new KalturaDrmEntryContextPluginData();
-        $drmContextData->flavorData = $customDataJson;
-		$result->pluginData[get_class($drmContextData)] = $drmContextData;
+		    $drmContextData = new KalturaDrmEntryContextPluginData();
+		    $drmContextData->flavorData = $customDataJson;
+		    $result->pluginData[get_class($drmContextData)] = $drmContextData;
+	    }
     }
 
     private function getSigningKey()
     {
-        $drmProfile = KalturaDrmProfile::getInstanceByType(KalturaDrmProviderType::CENC);
-        $dbProfile = DrmProfilePeer::retrieveByProvider(KalturaDrmProviderType::CENC);
-        $drmProfile->fromObject($dbProfile);
-        $signingKey = $drmProfile->signingKey;
-        return $signingKey;
+	    $dbProfile = DrmProfilePeer::retrieveByProviderAndPartnerID(KalturaDrmProviderType::CENC, kCurrentContext::getCurrentPartnerId());
+	    if (!is_null($dbProfile))
+	    {
+		    $signingKey = $dbProfile->getSigningKey();
+		    return $signingKey;
+	    }
+	    return null;
     }
 }
 

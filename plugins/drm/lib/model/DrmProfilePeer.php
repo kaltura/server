@@ -59,4 +59,13 @@ class DrmProfilePeer extends BaseDrmProfilePeer
 		$c->addAnd(DrmProfilePeer::PROVIDER, $provider, Criteria::EQUAL);
 		return DrmProfilePeer::doSelectOne($c);		
 	}
+
+	public static function retrieveByProviderAndPartnerID($provider, $partnerId)
+	{
+		$c = new Criteria();
+		$c->addAnd(DrmProfilePeer::PROVIDER, $provider, Criteria::EQUAL);
+		$c->addAnd(DrmProfilePeer::PARTNER_ID, $partnerId, Criteria::EQUAL);
+		return DrmProfilePeer::doSelectOne($c);
+	}
+
 } // DrmProfilePeer
