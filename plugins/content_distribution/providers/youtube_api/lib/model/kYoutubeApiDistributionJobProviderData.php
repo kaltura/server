@@ -19,9 +19,29 @@ class kYoutubeApiDistributionJobProviderData extends kConfigurableDistributionJo
 	 * @var KalturaYouTubeApiCaptionDistributionInfoArray
 	 */
 	private $captionsInfo;
-		
+	
+	/**
+	 * @var int
+	 */
+	private $distributionProfileId;
 
-		/**
+	/**
+	 * @return the $distributionProfileId
+	 */
+	public function getDistributionProfileId()
+	{
+		return $this->distributionProfileId;
+	}
+
+	/**
+	 * @param int $distributionProfileId
+	 */
+	public function setDistributionProfileId($distributionProfileId)
+	{
+		$this->distributionProfileId = $distributionProfileId;
+	}
+
+	/**
 	 * @return string $videoAssetFilePath
 	 */
 	public function getVideoAssetFilePath()

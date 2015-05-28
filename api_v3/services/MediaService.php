@@ -149,12 +149,23 @@ class MediaService extends KalturaEntryService
 		}
 		else
 		{
-
 			$tempMediaEntry = new KalturaMediaEntry();
-		 	$tempMediaEntry->type = $dbEntry->getType();
+			$tempMediaEntry->type = $dbEntry->getType();
 			$tempMediaEntry->mediaType = $dbEntry->getMediaType();
-			$tempMediaEntry->conversionProfileId = $dbEntry->getConversionQuality();
 
+			if ( !$conversionProfileId ) {
+				$originalConversionProfileId = $dbEntry->getConversionQuality();
+				$conversionProfile = conversionProfile2Peer::retrieveByPK($originalConversionProfileId);
+				if ( is_null($conversionProfile) || $conversionProfile->getType() != ConversionProfileType::MEDIA )
+				{
+					$defaultConversionProfile = myPartnerUtils::getConversionProfile2ForPartner( $this->getPartnerId() );
+					if ( !is_null($defaultConversionProfile) ) {
+						$conversionProfileId = $defaultConversionProfile->getId();
+					}
+				} else {
+					$conversionProfileId = $originalConversionProfileId;
+				}
+			}
 			if($conversionProfileId)
 				$tempMediaEntry->conversionProfileId = $conversionProfileId;
 
@@ -647,7 +658,7 @@ class MediaService extends KalturaEntryService
 	 * @param string $entryId Media entry id
 	 * @param int $conversionProfileId
 	 * @param KalturaConversionAttributeArray $dynamicConversionAttributes
-	 * @return int job id
+	 * @return bigint job id
 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
 	 * @throws KalturaErrors::CONVERSION_PROFILE_ID_NOT_FOUND
 	 * @throws KalturaErrors::FLAVOR_PARAMS_NOT_FOUND

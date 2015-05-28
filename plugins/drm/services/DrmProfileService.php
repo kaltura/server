@@ -184,7 +184,14 @@ class DrmProfileService extends KalturaBaseService
 		$dbDrmProfile = DrmProfilePeer::retrieveByProvider($tmpDbProfile->getProvider());
 		if(!$dbDrmProfile)
 		{
-			$dbDrmProfile = KalturaPluginManager::loadObject('DrmProfile', $tmpDbProfile->getProvider());
+            if ($provider == KalturaDrmProviderType::CENC)
+            {
+                $dbDrmProfile = new DrmProfile();
+            }
+            else
+            {
+                $dbDrmProfile = KalturaPluginManager::loadObject('DrmProfile', $tmpDbProfile->getProvider());
+            }
 			$dbDrmProfile->setName('default');
 			$dbDrmProfile->setProvider($tmpDbProfile->getProvider());
 		}		

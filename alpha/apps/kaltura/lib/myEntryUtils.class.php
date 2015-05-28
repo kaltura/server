@@ -747,20 +747,29 @@ class myEntryUtils
 						
 					$cache->put($orig_image_path, true);
 					
-				    $flavorAsset = assetPeer::retrieveHighestBitrateByEntryId($entry->getId(), flavorParams::TAG_THUMBSOURCE);
+					$flavorAsset = assetPeer::retrieveHighestBitrateByEntryId($entry->getId(), flavorParams::TAG_THUMBSOURCE);
 					if(is_null($flavorAsset))
 					{
-    					$flavorAsset = assetPeer::retrieveOriginalReadyByEntryId($entry->getId());
-	    				if(is_null($flavorAsset) || !($flavorAsset->hasTag(flavorParams::TAG_MBR) || $flavorAsset->hasTag(flavorParams::TAG_WEB)))
-					    {
-    						// try the best playable
-						    $flavorAsset = assetPeer::retrieveHighestBitrateByEntryId($entry->getId());
-					    }
-					    if (is_null($flavorAsset))
-					    {
-    						// if no READY ORIGINAL entry is available, try to retrieve a non-READY ORIGINAL entry
-						    $flavorAsset = assetPeer::retrieveOriginalByEntryId($entry->getId());
-					    }
+						$flavorAsset = assetPeer::retrieveOriginalReadyByEntryId($entry->getId());
+			                        if($flavorAsset)
+			                        {
+			                            $flavorSyncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+			                            list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($flavorSyncKey,false,false);
+			                            if (!$fileSync)
+			                            {
+			                                $flavorAsset = null;
+			                            }
+			                        }
+		    				if(is_null($flavorAsset) || !($flavorAsset->hasTag(flavorParams::TAG_MBR) || $flavorAsset->hasTag(flavorParams::TAG_WEB)))
+						{
+	    						// try the best playable
+							$flavorAsset = assetPeer::retrieveHighestBitrateByEntryId($entry->getId());
+						}
+						if (is_null($flavorAsset))
+						{
+	    						// if no READY ORIGINAL entry is available, try to retrieve a non-READY ORIGINAL entry
+							$flavorAsset = assetPeer::retrieveOriginalByEntryId($entry->getId());
+						}
 					}
 					if (is_null($flavorAsset))
 					{
@@ -779,12 +788,19 @@ class myEntryUtils
 						$cache->remove($orig_image_path);
 						throw new kFileSyncException('no ready filesync on current DC', kFileSyncException::FILE_DOES_NOT_EXIST_ON_CURRENT_DC);
 					}
+					
+					// close db connections as we won't be requiring the database anymore and capturing a thumbnail may take a long time
+					kFile::closeDbConnections();
+					
 					myFileConverter::autoCaptureFrame($entry_data_path, $capturedThumbPath."temp_", $calc_vid_sec, -1, -1);
 					
 					$cache->remove($orig_image_path);
 				}
 			}
 
+			// close db connections as we won't be requiring the database anymore and image manipulation may take a long time
+			kFile::closeDbConnections();
+			
 			// resizing (and editing)) an image file that failes results in a long server waiting time
 			// prevent this waiting time (of future requests) in case the resizeing failes
 			$cache = new myCache("thumb-processing-resize", 5 * 60); // 5 minutes

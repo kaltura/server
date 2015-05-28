@@ -15,8 +15,7 @@ class KalturaJsonProcSerializer extends KalturaJsonSerializer
 		$callback = isset($_GET["callback"]) ? $_GET["callback"] : null;
 		if (is_null($callback))
 			die("Expecting \"callback\" parameter for jsonp format");
-		$response = array();
-		
+			
 		return $callback .  "(";
 	}
 	

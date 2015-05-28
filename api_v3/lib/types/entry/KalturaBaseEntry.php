@@ -3,7 +3,7 @@
  * @package api
  * @subpackage objects
  */
-class KalturaBaseEntry extends KalturaObject implements IFilterable, IApiObjectFactory
+class KalturaBaseEntry extends KalturaObject implements IRelatedFilterable 
 {
 	/**
 	 * Auto generated 10 characters alphanumeric string
@@ -219,7 +219,7 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable, IApiObjectF
 	 * Thumbnail URL
 	 * 
 	 * @var string
-	 * @insertonly
+	 * @readonly
 	 */
 	public $thumbnailUrl;
 	

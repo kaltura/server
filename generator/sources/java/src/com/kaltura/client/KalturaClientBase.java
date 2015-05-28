@@ -233,6 +233,8 @@ abstract public class KalturaClientBase implements Serializable {
 		
 		return url;
 	}
+	
+	abstract protected void resetRequest();
 
 	public Element doQueue() throws KalturaApiException {
 		if (this.callsQueue.isEmpty()) return null;
@@ -256,6 +258,7 @@ abstract public class KalturaClientBase implements Serializable {
 		} finally {
 			closeHttpClient(client);
 		}
+		resetRequest();
 		
 		Element responseXml = XmlUtils.parseXml(responseString);
 		Element resultXml = this.validateXmlResult(responseXml);

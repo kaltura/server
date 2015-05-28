@@ -222,6 +222,8 @@ class playManifestAction extends kalturaAction
 				KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_FOUND);
 		}
 		
+		myPartnerUtils::blockInactivePartner($this->entry->getPartnerId());
+		
 		// enforce access control
 		$base64Referrer = $this->getRequestParameter("referrer");
 		$hashes = $this->getRequestParameter("hashes");
@@ -677,14 +679,13 @@ class playManifestAction extends kalturaAction
 	{
 		if ($this->deliveryAttributes->getStorageId())
 		{
-			return DeliveryProfilePeer::getRemoteDeliveryByStorageId($this->deliveryAttributes->getStorageId(),$this->entryId, 
-					$this->deliveryAttributes->getFormat(), $this->deliveryAttributes->getMediaProtocol());
+			return DeliveryProfilePeer::getRemoteDeliveryByStorageId($this->deliveryAttributes);
 		} else {		
 			$cdnHost = $this->cdnHost;
 			$cdnHostOnly = trim(preg_replace('#https?://#', '', $cdnHost), '/');
 			
 			return DeliveryProfilePeer::getLocalDeliveryByPartner($this->entryId, $this->deliveryAttributes->getFormat(), 
-					$this->deliveryAttributes->getMediaProtocol(), $cdnHostOnly);
+					$this->deliveryAttributes, $cdnHostOnly);
 		}
 	}
 
@@ -809,7 +810,8 @@ class playManifestAction extends kalturaAction
 			$this->deliveryAttributes->setFormat(PlaybackProtocol::HDS);
 		}
 		
-		$this->deliveryProfile = DeliveryProfilePeer::getLiveDeliveryProfileByHostName($cdnHost, $this->entryId, $this->deliveryAttributes->getFormat(), $this->deliveryAttributes->getMediaProtocol());
+		$this->deliveryProfile = DeliveryProfilePeer::getLiveDeliveryProfileByHostName($cdnHost, $this->deliveryAttributes);
+		
 		if(!$this->deliveryProfile)
 		{
 			return null;
@@ -878,6 +880,8 @@ class playManifestAction extends kalturaAction
 			$this->deliveryAttributes->setSeekFromTime(-1);
 
 		$this->deliveryAttributes->setClipTo($this->getRequestParameter ( "clipTo" , 0));
+
+		$this->deliveryAttributes->setPlaybackRate($this->getRequestParameter ( "playbackRate" , 0));
 		
 		$deliveryCode = $this->getRequestParameter( "deliveryCode", null );
 		$playbackContext = $this->getRequestParameter( "playbackContext", null );
@@ -934,6 +938,8 @@ class playManifestAction extends kalturaAction
 			//In case request needs to be redirected to play-server we need to add the ui conf id to the manifest url as well
 			$this->deliveryAttributes->setUiConfId($this->getRequestParameter("uiConfId"));
 		}
+		
+		$this->secureEntryHelper->updateDeliveryAttributes($this->deliveryAttributes);
 		
 		$this->enforceEncryption();
 		

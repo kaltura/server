@@ -126,7 +126,7 @@ class kAssetUtils
 			
 		if($servePlayManifest)
 		{
-			$deliveryProfile = DeliveryProfilePeer::getRemoteDeliveryByStorageId($storageId, $asset->getEntryId(), PlaybackProtocol::HTTP, "https");
+			$deliveryProfile = DeliveryProfilePeer::getRemoteDeliveryByStorageId(DeliveryProfileDynamicAttributes::init($storageId, $asset->getEntryId(), PlaybackProtocol::HTTP, "https"));
 			
 			if (is_null($deliveryProfile))
 				$url = infraRequestUtils::PROTOCOL_HTTP . "://" . kConf::get("cdn_api_host");
@@ -137,13 +137,16 @@ class kAssetUtils
 		}
 		else
 		{
-			$urlManager = DeliveryProfilePeer::getRemoteDeliveryByStorageId($fileSync->getDc(), $asset->getEntryId());
+			$urlManager = DeliveryProfilePeer::getRemoteDeliveryByStorageId(DeliveryProfileDynamicAttributes::init($fileSync->getDc(), $asset->getEntryId()));
 			if($urlManager) {
 				$dynamicAttrs = new DeliveryProfileDynamicAttributes();
 				$dynamicAttrs->setFileExtension($asset->getFileExt());
 				$urlManager->setDynamicAttributes($dynamicAttrs);
-				
-				$url = rtrim($urlManager->getUrl(),'/') . '/' . ltrim($urlManager->getFileSyncUrl($fileSync),'/');
+
+				$url = ltrim($urlManager->getFileSyncUrl($fileSync),'/');
+				if (strpos($url, "://") === false){
+					$url = rtrim($urlManager->getUrl(), "/") . "/".$url ;
+				}
 			} else {
 				KalturaLog::debug("Couldn't determine delivery profile for storage id");
 				$url = null;

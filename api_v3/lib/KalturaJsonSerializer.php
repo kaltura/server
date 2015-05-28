@@ -13,7 +13,29 @@ class KalturaJsonSerializer extends KalturaSerializer
 	function serialize($object)
 	{
 		$object = parent::prepareSerializedObject($object);
-		return json_encode($object);
+		$json = json_encode($this->unsetNull($object));
+		return $json;
+	}
+
+	protected function unsetNull($object)
+	{
+		if(!is_array($object) && !is_object($object))
+			return $object;
+		
+		$array = (array) $object;
+		foreach($array as $key => $value)
+		{
+			if(is_null($value))
+			{
+				unset($array[$key]);
+			}
+			else
+			{
+				$array[$key] = $this->unsetNull($value);
+			}
+		}
+		
+		return $array;
 	}
 
 	public function getItemFooter($lastItem = false)

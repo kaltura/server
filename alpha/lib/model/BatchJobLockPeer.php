@@ -217,4 +217,21 @@ class BatchJobLockPeer extends BaseBatchJobLockPeer {
 		
 		return kConf::get('default_batch_version');
 	}
+	
+	/**
+	 * Retrieve all active jobs by entry id
+	 *
+	 * @param      int $entryId
+	 */
+	public static function retrieveByEntryId($entryId, array $jobTypes = null, array $jobSubTypes = null)
+	{
+	    $c = new Criteria();
+	    $c->add(self::ENTRY_ID, $entryId);
+	    if(count($jobTypes))
+	        $c->add(self::JOB_TYPE, $jobTypes, Criteria::IN);
+	    if(count($jobSubTypes))
+	        $c->add(self::JOB_SUB_TYPE, $jobSubTypes, Criteria::IN);
+	
+	    return self::doSelect($c);
+	}
 } // BatchJobLockPeer

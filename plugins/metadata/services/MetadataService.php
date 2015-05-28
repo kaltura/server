@@ -21,6 +21,21 @@ class MetadataService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::FEATURE_FORBIDDEN, MetadataPlugin::PLUGIN_NAME);
 	}
 	
+	/* (non-PHPdoc)
+	 * @see KalturaBaseService::partnerGroup()
+	 */
+	protected function partnerGroup($peer = null)
+	{
+	    if(in_array($this->actionName, array('get', 'list')) && $peer == 'Metadata'){
+	        return $this->partnerGroup . ',0';
+	    }
+	    elseif (in_array($this->actionName, array('add', 'get', 'list', 'update')) && $peer == 'MetadataProfile'){
+	        return $this->partnerGroup . ',0';
+	    }
+	
+	    return $this->partnerGroup;
+	}
+	
 	protected function kalturaNetworkAllowed($actionName)
 	{
 		if ($actionName == 'list')
@@ -126,6 +141,7 @@ class MetadataService extends KalturaBaseService
 		$dbMetadata->setObjectType($objectType);
 		$dbMetadata->setObjectId($objectId);
 		$dbMetadata->setStatus(KalturaMetadataStatus::VALID);
+		$dbMetadata->setLikeNew(true);
 
 		// dynamic objects are metadata only, skip validating object id
 		if ($objectType != KalturaMetadataObjectType::DYNAMIC_OBJECT)
@@ -276,7 +292,7 @@ class MetadataService extends KalturaBaseService
 					
 				// validates against previous version
 				$errorMessagePrevVersion = '';
-				if(!kMetadataManager::validateMetadata($dbMetadata->getMetadataProfileId(), $xmlData, $errorMessagePrevVersion, $dbMetadata->getMetadataProfileVersion()))
+				if(!kMetadataManager::validateMetadata($dbMetadata->getMetadataProfileId(), $xmlData, $errorMessagePrevVersion, true))
 				{
 					KalturaLog::err("Failed to validate metadata object [$id] against metadata profile previous version [" . $dbMetadata->getMetadataProfileVersion() . "] error: $errorMessagePrevVersion");
 
@@ -358,7 +374,8 @@ class MetadataService extends KalturaBaseService
 			}
 			
 			if (!$entryIds && kConf::hasParam('metadata_list_without_object_filtering_partners') && 
-				!in_array(kCurrentContext::getCurrentPartnerId(), kConf::get('metadata_list_without_object_filtering_partners'))) 
+				!in_array(kCurrentContext::getCurrentPartnerId(), kConf::get('metadata_list_without_object_filtering_partners')) &&
+				kCurrentContext::$ks_partner_id != Partner::BATCH_PARTNER_ID)
 				throw new KalturaAPIException(MetadataErrors::MUST_FILTER_ON_OBJECT_ID);
 			
 			if($entryIds)

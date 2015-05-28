@@ -1365,7 +1365,7 @@ function processGZipFile($apiLogPath, LogProcessor $logProcessor)
 	while (!gzeof($handle))
 	{
 		$buffer = gzgets($handle, 16384);
-		if ($logProcessor->processLine($buffer))
+		if ($buffer === false || $logProcessor->processLine($buffer))
 			break;
 	}
 

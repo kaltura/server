@@ -1053,6 +1053,8 @@ class kFlowHelper
 		if(!is_null($thumbAsset->getFlavorParamsId()))
 			kFlowHelper::generateThumbnailsFromFlavor($dbBatchJob->getEntryId(), $dbBatchJob, $thumbAsset->getFlavorParamsId());
 
+		self::handleLocalFileSyncDeletion($dbBatchJob->getEntryId(), $dbBatchJob->getPartner());
+		
 		return $dbBatchJob;
 	}
 
@@ -1229,6 +1231,8 @@ class kFlowHelper
 		$thumbAsset->setStatus(thumbAsset::FLAVOR_ASSET_STATUS_ERROR);
 		$thumbAsset->save();
 
+		self::handleLocalFileSyncDeletion($dbBatchJob->getEntryId(), $dbBatchJob->getPartner());
+		
 		return $dbBatchJob;
 	}
 

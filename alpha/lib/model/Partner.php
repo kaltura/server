@@ -65,8 +65,8 @@ class Partner extends BasePartner
 	
 	public function validateSecret ( $partner_secret , $partner_key , &$ks_max_expiry_in_seconds , $admin = false )
 	{
-		$secret_to_match = $admin ? $this->getAdminSecret() : $this->getSecret() ;
-		if ( $partner_secret == $secret_to_match )
+		if ($partner_secret === $this->getAdminSecret() || 
+			(!$admin && $partner_secret === $this->getSecret()))
 		{
 			$ks_max_expiry_in_seconds = $this->getKsMaxExpiryInSeconds();
 			return true;

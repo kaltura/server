@@ -8,9 +8,10 @@ class kLimeLightUrlTokenizer extends kUrlTokenizer
 	
 	/**
 	 * @param string $url
+	 * @param string $urlPrefix
 	 * @return string
 	 */
-	public function tokenizeSingleUrl($url)
+	public function tokenizeSingleUrl($url, $urlPrefix = null)
 	{
 		// seek parameter (fs) must be added after the token
 		$seekParam = '';

@@ -4,7 +4,7 @@
  * @subpackage api.objects
  * @abstract
  */
-abstract class KalturaCuePoint extends KalturaObject implements IFilterable, IApiObjectFactory
+abstract class KalturaCuePoint extends KalturaObject implements IRelatedFilterable 
 {
 	/**
 	 * @var string

@@ -5,6 +5,8 @@
  */
 class Annotation extends CuePoint implements IMetadataObject
 {
+    const CUSTOM_DATA_FIELD_SEARCHABLE_ON_ENTRY = 'searchableOnEntry';
+    
 	public function __construct() 
 	{
 		parent::__construct();
@@ -31,13 +33,16 @@ class Annotation extends CuePoint implements IMetadataObject
 	
 	public function contributeData()
 	{
-		$data = null;
-		
-		if($this->getText())
-			$data = $data . $this->getText() . ' ';
-		
-		if($this->getTags())
-			$data = $data . $this->getTags() . ' ';
+	   $data = null;
+
+	   if($this->getSearchableOnEntry())
+	   {
+	       if($this->getText())
+    			$data = $data . $this->getText() . ' ';
+    		
+    		if($this->getTags())
+    			$data = $data . $this->getTags() . ' ';
+	    }
 			
 		return $data;
 	}
@@ -54,7 +59,7 @@ class Annotation extends CuePoint implements IMetadataObject
 		}
 
 		if ($entry->getIsTemporary()
-			&& PermissionPeer::isValidForPartner(AnnotationCuePointPermissionName::COPY_ANNOTATIONS_TO_TRIMMED_ENTRY, $entry->getPartnerId())) {
+			&& !PermissionPeer::isValidForPartner(AnnotationCuePointPermissionName::DO_NOT_COPY_ANNOTATIONS_TO_TRIMMED_ENTRY, $entry->getPartnerId())) {
 			return true;
 		}
 
@@ -87,4 +92,8 @@ class Annotation extends CuePoint implements IMetadataObject
 		$annotation->save();
 		return $annotation;
 	}
+	
+	public function getSearchableOnEntry()	      		{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_SEARCHABLE_ON_ENTRY);}
+	public function setSearchableOnEntry($v)        	{return $this->putInCustomData(self::CUSTOM_DATA_FIELD_SEARCHABLE_ON_ENTRY, (bool)$v);}
+	
 }

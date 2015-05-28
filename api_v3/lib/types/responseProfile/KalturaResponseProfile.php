@@ -87,8 +87,8 @@ class KalturaResponseProfile extends KalturaDetachedResponseProfile implements I
 		// Allow null in case of update
 		$this->validatePropertyMinLength('systemName', 2, !is_null($sourceObject));
 		
-		$id = null;
-		if($sourceObject)
+		$id = $this->id;
+		if($sourceObject && $sourceObject->getId())
 		{
 			$id = $sourceObject->getId();
 		}

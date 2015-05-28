@@ -180,7 +180,7 @@ class kSessionBase
 			return null;
 		}
 
-		if (sha1($salt . $real_str) != $hash)
+		if (sha1($salt . $real_str) !== $hash)
 		{
 			$this->logError("Hash [$hash] doesn't match the sha1 on the salt on partner [$partnerId].");
 			return false;
@@ -506,7 +506,7 @@ class kSessionBase
 		
 		$hash = substr($decKs, 0, self::SHA1_SIZE);
 		$fields = substr($decKs, self::SHA1_SIZE);
-		if ($hash != sha1($fields, true))
+		if ($hash !== sha1($fields, true))
 		{
 			$this->logError("Hash [$hash] doesn't match sha1 on partner [$partnerId].");
 			return false;						// invalid signature

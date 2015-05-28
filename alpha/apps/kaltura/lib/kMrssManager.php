@@ -360,7 +360,7 @@ class kMrssManager
 		$kalturaFileSync = kFileSyncUtils::getReadyInternalFileSyncForKey($syncKey);
 	
 		$urlManager = DeliveryProfilePeer::getDeliveryProfile($entry->getId(), PlaybackProtocol::SILVER_LIGHT);
-		if(is_null($urlManager))
+		if(!$urlManager)
 			return;
 		
 		$urlManager->initDeliveryDynamicAttributes($kalturaFileSync);
@@ -388,7 +388,7 @@ class kMrssManager
 		$externalFileSync = kFileSyncUtils::getReadyExternalFileSyncForKey($syncKey);
 		if($externalFileSync)
 		{
-			$urlManager = DeliveryProfilePeer::getRemoteDeliveryByStorageId($externalFileSync->getDc(), $entry->getId(), PlaybackProtocol::SILVER_LIGHT);
+			$urlManager = DeliveryProfilePeer::getRemoteDeliveryByStorageId(DeliveryProfileDynamicAttributes::init($externalFileSync->getDc(), $entry->getId(), PlaybackProtocol::SILVER_LIGHT));
 			if(is_null($urlManager))
 				return;
 			
