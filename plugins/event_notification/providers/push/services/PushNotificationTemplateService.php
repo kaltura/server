@@ -17,15 +17,20 @@ class PushNotificationTemplateService extends KalturaBaseService
         }
     }
     
-    private function encode($msg)
+    private function encode($data)
     {
-        // using a 128 Rijndael encyrption algorithm with Cipher-block chaining (CBC) as mode of AES encryption
+        // use a 128 Rijndael encyrption algorithm with Cipher-block chaining (CBC) as mode of AES encryption
         $cipher = mcrypt_module_open(MCRYPT_RIJNDAEL_128, '', MCRYPT_MODE_CBC, '');
         $secret = kConf::get("push_server_secret");
         $iv = kConf::get("push_server_secret_iv");
         
+        // pad the rest of the block to suit Node crypto functions padding scheme (PKCS5)
+        $blocksize = 16; 
+        $pad = $blocksize - (strlen($data) % $blocksize);
+        $data = $data . str_repeat(chr($pad), $pad);
+        
         mcrypt_generic_init($cipher, $secret, $iv);
-        $cipherData = mcrypt_generic($cipher, $msg);
+        $cipherData = mcrypt_generic($cipher, $data);
         mcrypt_generic_deinit($cipher);
         
         return bin2hex($cipherData);
@@ -70,20 +75,21 @@ class PushNotificationTemplateService extends KalturaBaseService
 	        throw new KalturaAPIException(KalturaErrors::MISSING_MANDATORY_PARAMETER,  implode(",", $missingParams ));
 	    
 	    $queueKey = $dbEventNotificationTemplate->getQueueKey($userParamsArray->toObjectsArray(), $partnerId, null);
+	    $hash = kCurrentContext::$ks_object->getHash();
 	    
 	    // create queue if not exists 
 	    if (!$dbEventNotificationTemplate->exists($queueKey))
 	       $dbEventNotificationTemplate->create($queueKey);
 	    
 	    $result = new KalturaPushNotificationData();
-	    $result->key = $queueKey;
+	    $result->key = $this->encode($queueKey . ":" .$hash);
 
 	    // build the url to return
 	    $protocol = infraRequestUtils::getProtocol();
 	    $host = kConf::get("push_server_host");
 	    $secret = kConf::get("push_server_secret");
-	    $token = base64_encode($partnerId . ":" . $this->encode($secret . ":" . time() ) );
-	    $result->url = $protocol . "://" . $host ."/?p=" . $partnerId ."&x=" . $token;
+	    $token = base64_encode($partnerId . ":" . $this->encode($secret . ":" . time() . ":" . $hash) );
+	    $result->url = $protocol . "://" . $host ."/?p=" . $partnerId ."&x=" . urlencode($token);
 	    
 	    return $result;
 	}
