@@ -93,11 +93,6 @@ abstract class BaseEdgeServer extends BaseObject  implements Persistent {
 	protected $custom_data;
 
 	/**
-	 * @var        Partner
-	 */
-	protected $aPartner;
-
-	/**
 	 * Flag to prevent endless save loop, if this object is referenced
 	 * by another object which falls in this transaction.
 	 * @var        boolean
@@ -484,10 +479,6 @@ abstract class BaseEdgeServer extends BaseObject  implements Persistent {
 			$this->modifiedColumns[] = EdgeServerPeer::PARTNER_ID;
 		}
 
-		if ($this->aPartner !== null && $this->aPartner->getId() !== $v) {
-			$this->aPartner = null;
-		}
-
 		return $this;
 	} // setPartnerId()
 
@@ -755,9 +746,6 @@ abstract class BaseEdgeServer extends BaseObject  implements Persistent {
 	public function ensureConsistency()
 	{
 
-		if ($this->aPartner !== null && $this->partner_id !== $this->aPartner->getId()) {
-			$this->aPartner = null;
-		}
 	} // ensureConsistency
 
 	/**
@@ -801,7 +789,6 @@ abstract class BaseEdgeServer extends BaseObject  implements Persistent {
 
 		if ($deep) {  // also de-associate any related objects?
 
-			$this->aPartner = null;
 		} // if (deep)
 	}
 
@@ -976,18 +963,6 @@ abstract class BaseEdgeServer extends BaseObject  implements Persistent {
 		$affectedRows = 0; // initialize var to track total num of affected rows
 		if (!$this->alreadyInSave) {
 			$this->alreadyInSave = true;
-
-			// We call the save method on the following object(s) if they
-			// were passed to this object by their coresponding set
-			// method.  This object relates to these object(s) by a
-			// foreign key reference.
-
-			if ($this->aPartner !== null) {
-				if ($this->aPartner->isModified() || $this->aPartner->isNew()) {
-					$affectedRows += $this->aPartner->save($con);
-				}
-				$this->setPartner($this->aPartner);
-			}
 
 			if ($this->isNew() ) {
 				$this->modifiedColumns[] = EdgeServerPeer::ID;
@@ -1222,18 +1197,6 @@ abstract class BaseEdgeServer extends BaseObject  implements Persistent {
 			$retval = null;
 
 			$failureMap = array();
-
-
-			// We call the validate method on the following object(s) if they
-			// were passed to this object by their coresponding set
-			// method.  This object relates to these object(s) by a
-			// foreign key reference.
-
-			if ($this->aPartner !== null) {
-				if (!$this->aPartner->validate($columns)) {
-					$failureMap = array_merge($failureMap, $this->aPartner->getValidationFailures());
-				}
-			}
 
 
 			if (($retval = EdgeServerPeer::doValidate($this, $columns)) !== true) {
@@ -1633,55 +1596,6 @@ abstract class BaseEdgeServer extends BaseObject  implements Persistent {
 	}
 
 	/**
-	 * Declares an association between this object and a Partner object.
-	 *
-	 * @param      Partner $v
-	 * @return     EdgeServer The current object (for fluent API support)
-	 * @throws     PropelException
-	 */
-	public function setPartner(Partner $v = null)
-	{
-		if ($v === null) {
-			$this->setPartnerId(NULL);
-		} else {
-			$this->setPartnerId($v->getId());
-		}
-
-		$this->aPartner = $v;
-
-		// Add binding for other direction of this n:n relationship.
-		// If this object has already been added to the Partner object, it will not be re-added.
-		if ($v !== null) {
-			$v->addEdgeServer($this);
-		}
-
-		return $this;
-	}
-
-
-	/**
-	 * Get the associated Partner object
-	 *
-	 * @param      PropelPDO Optional Connection object.
-	 * @return     Partner The associated Partner object.
-	 * @throws     PropelException
-	 */
-	public function getPartner(PropelPDO $con = null)
-	{
-		if ($this->aPartner === null && ($this->partner_id !== null)) {
-			$this->aPartner = PartnerPeer::retrieveByPk($this->partner_id);
-			/* The following can be used additionally to
-			   guarantee the related object contains a reference
-			   to this object.  This level of coupling may, however, be
-			   undesirable since it could result in an only partially populated collection
-			   in the referenced object.
-			   $this->aPartner->addEdgeServers($this);
-			 */
-		}
-		return $this->aPartner;
-	}
-
-	/**
 	 * Resets all collections of referencing foreign keys.
 	 *
 	 * This method is a user-space workaround for PHP's inability to garbage collect objects
@@ -1695,7 +1609,6 @@ abstract class BaseEdgeServer extends BaseObject  implements Persistent {
 		if ($deep) {
 		} // if ($deep)
 
-			$this->aPartner = null;
 	}
 
 	/* ---------------------- CustomData functions ------------------------- */

@@ -40,7 +40,7 @@ class EdgeServerTableMap extends TableMap {
 		$this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
 		$this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
 		$this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
-		$this->addForeignKey('PARTNER_ID', 'PartnerId', 'INTEGER', 'partner', 'ID', false, null, null);
+		$this->addColumn('PARTNER_ID', 'PartnerId', 'INTEGER', false, null, null);
 		$this->addColumn('NAME', 'Name', 'VARCHAR', false, 31, null);
 		$this->addColumn('SYSTEM_NAME', 'SystemName', 'VARCHAR', false, 128, null);
 		$this->addColumn('DESCIPTION', 'Desciption', 'VARCHAR', false, 127, null);
@@ -57,7 +57,6 @@ class EdgeServerTableMap extends TableMap {
 	 */
 	public function buildRelations()
 	{
-    $this->addRelation('Partner', 'Partner', RelationMap::MANY_TO_ONE, array('partner_id' => 'id', ), null, null);
 	} // buildRelations()
 
 } // EdgeServerTableMap
