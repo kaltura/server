@@ -1123,6 +1123,20 @@ class kJobsManager
 	
 	/**
 	 * @param int $partnerId
+	 * @param string $protocol http or https
+	 * @param SessionType $ksType
+	 * @param array $userRoles
+	 * @param string $objectType class name
+	 * @param string $objectId
+	 * @param string $startDocId
+	 * @param string $endDocId
+	 */
+	public static function addRecalculateCacheJob($partnerId, $protocol, $ksType, array $userRoles, $objectType, $objectId = null, $startDocId = null, $endDocId = null)
+	{
+	}
+	
+	/**
+	 * @param int $partnerId
 	 * @param int $objectType of enum DeleteObjectType
 	 * @param baseObjectFilter $filter The filter should return the list of objects that need to be deleted
 	 * @return BatchJob

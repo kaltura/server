@@ -1,6 +1,8 @@
 <?php
 class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDeletedEventConsumer, kObjectAddedEventConsumer
 {
+	const MAX_CACHE_KEYS_PER_JOB = 1000;
+	
 	/**
 	 * @var array
 	 */
@@ -31,7 +33,6 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 		$cacheStores = self::getStores();
 		foreach ($cacheStores as $cacheStore)
 		{
-			KalturaLog::debug("Save store [" . get_class($cacheStore) . "] key [$key] [" . json_encode($value) . "]");
 			$cacheStore->set($key, $value);
 		}
 	}
@@ -41,7 +42,6 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 		$cacheStores = self::getStores();
 		foreach ($cacheStores as $cacheStore)
 		{
-			KalturaLog::debug("Delete store [" . get_class($cacheStore) . "] key [$key]");
 			$cacheStore->delete($key);
 		}
 	}
@@ -52,7 +52,6 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 		$value = null;
 		foreach ($cacheStores as $cacheStore)
 		{
-			KalturaLog::debug("Get store [" . get_class($cacheStore) . "] key [$key]");
 			if($cacheStore instanceof kCouchbaseCacheWrapper)
 			{
 				$value = $cacheStore->getAndTouch($key);
@@ -64,7 +63,6 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 			
 			if($value)
 			{
-				KalturaLog::debug("Get value [" . print_r($value, true) . "]");
 				return $value;
 			}
 		}
@@ -315,28 +313,171 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 		return true;
 	}
 	
+	protected function listDocIds($objectType, $sessionKey)
+	{
+		if($object instanceof IBaseObject)
+		{
+			$cacheStores = self::getStores();
+			foreach ($cacheStores as $cacheStore)
+			{
+				if($cacheStore instanceof kCouchbaseCacheWrapper)
+				{
+					// TODO optimize using elastic search query
+					$query = $cacheStore->getNewQuery(kCouchbaseCacheQuery::VIEW_RESPONSE_PROFILE_OBJECT_SESSIONS); // TODO create view
+					$query->addStartKey('objectType', $objectType);
+					$query->addStartKey('sessionKey', $sessionKey);
+					$query->addStartKey('objectId', '0');
+					$query->addEndKey('objectType', $objectType);
+					$query->addEndKey('sessionKey', $sessionKey);
+					$query->addEndKey('objectId', 'Z');
+					$query->setLimit(1);
+
+					$list = $cacheStore->query($query);
+					$query->setLimit(2);
+					$offset = -1;
+					$array = array();
+					$startId = null;
+					while(count($list->getObjects()))
+					{
+						$objects = $list->getObjects();
+						if(count($objects) == 1)
+						{
+							$startCacheObject = reset($objects);
+							/* @var $startCacheObject kCouchbaseCacheListItem */
+							$startId = $startCacheObject->getId();
+						}
+						elseif(count($objects) == 2)
+						{
+							list($endCacheObject, $startCacheObject) = $objects;
+							/* @var $endCacheObject kCouchbaseCacheListItem */
+							/* @var $startCacheObject kCouchbaseCacheListItem */
+							$array[] = array($startId, $endCacheObject->getId());
+							$startId = $startCacheObject->getId();
+						}
+						$offset += self::MAX_CACHE_KEYS_PER_JOB;
+						$query->setOffset($offset);
+						$list = $cacheStore->query($query);
+					}
+					return $array;
+				}
+			}
+		}
+	
+		return array();
+	}
+	
+	protected function listObjectRelatedTypes($triggerKey)
+	{
+		if($object instanceof IBaseObject)
+		{
+			$cacheStores = self::getStores();
+			foreach ($cacheStores as $cacheStore)
+			{
+				if($cacheStore instanceof kCouchbaseCacheWrapper)
+				{
+					// TODO optimize using elastic search query
+					$query = $cacheStore->getNewQuery(kCouchbaseCacheQuery::VIEW_RESPONSE_PROFILE_OBJECT_SESSIONS); // TODO create view
+					$query->addStartKey('triggerKey', $triggerKey);
+					$query->addStartKey('objectType', 'a');
+					$query->addStartKey('sessionKey', 'a');
+					$query->addEndKey('triggerKey', $triggerKey);
+					$query->addEndKey('objectType', 'Z');
+					$query->addEndKey('sessionKey', 'Z');
+					$query->setLimit(self::MAX_CACHE_KEYS_PER_JOB);
+
+					$offset = 0;
+					$array = array();
+					$list = $cacheStore->query($query);
+					while(count($list->getObjects()))
+					{
+						foreach ($list->getObjects() as $cacheObject)
+						{
+							/* @var $cacheObject kCouchbaseCacheListItem */
+							list($cacheTriggerKey, $cacheObjectType, $cacheSessionKey) = $cacheObject->getKey();
+							if(!isset($array[$cacheObjectType]))
+							{
+								$array[$cacheObjectType] = array();
+							}
+							if(isset($array[$cacheObjectType][$cacheSessionKey]))
+							{
+								$array[$cacheObjectType][$cacheSessionKey]++;
+							}
+							else
+							{
+								$array[$cacheObjectType][$cacheSessionKey] = 1;
+							}
+						}
+						
+						$offset += count($list->getObjects());
+						$query->setOffset($offset);
+						$list = $cacheStore->query($query);
+					}
+					return $array;
+				}
+			}
+		}
+	
+		return array();
+	}
+
+	protected function listObjectSessionTypes(BaseObject $object)
+	{
+		$objectKey = self::getObjectKey($object);
+		if($object instanceof IBaseObject)
+		{
+			$cacheStores = self::getStores();
+			foreach ($cacheStores as $cacheStore)
+			{
+				if($cacheStore instanceof kCouchbaseCacheWrapper)
+				{
+					// TODO optimize using elastic search query
+					$query = $cacheStore->getNewQuery(kCouchbaseCacheQuery::VIEW_RESPONSE_PROFILE_OBJECT_SESSIONS);
+					$query->addStartKey('objectKey', $objectKey);
+					$query->addStartKey('sessionKey', 'a');
+					$query->addEndKey('objectKey', $objectKey);
+					$query->addEndKey('sessionKey', 'Z');
+					$query->setLimit(self::MAX_CACHE_KEYS_PER_JOB);
+
+					$list = $cacheStore->query($query);
+					$array = array();
+					foreach ($list->getObjects() as $cacheObject)
+					{
+						/* @var $cacheObject kCouchbaseCacheListItem */
+						list($cacheObjectKey, $cacheSessionKey) = $cacheObject->getKey();
+						$array[$cacheSessionKey] = $cacheSessionKey;
+					}
+					return $array;
+				}
+			}
+		}
+	
+		return array();
+	}
+
 	protected function addRecalculateRelatedObjectsCacheJob(IBaseObject $object)
 	{
 		$triggerType = get_class($object);
-		$objectTypes = self::listObjectTypes($triggerType);
-		foreach($objectTypes as $objectType)
+		$objectTypes = self::listObjectRelatedTypes($triggerType);
+		foreach($objectTypes as $objectType => $sessionKeys)
 		{
-//			TODO
-//			$sessionTypes = self::listObjectSessionTypes($object);
-//			foreach($sessionTypes as $sessionType)
-//			{
-//				list($protocol, $ksType, $userRole, $count) = $sessionType;
-//				if($count < self::MAX_CACHE_KEYS_PER_JOB)
-//				{
-//					kJobsManager::addRecalculateCacheJob($partnerId, $protocol, $ksType, $userRoles, $objectType);
-//				}
-//				else
-//				{
-//					kJobsManager::addRecalculateCacheJob($partnerId, $protocol, $ksType, $userRoles, $objectType);
-//				}
-//			}
+			foreach($sessionKeys as $sessionKey => $count)
+			{
+				list($protocol, $ksType, $userRole) = explode('_', $sessionKey, 3);
+				if($count < self::MAX_CACHE_KEYS_PER_JOB)
+				{
+					$startEndDocIds = self::listDocIds($objectType, $sessionKey);
+					foreach($startEndDocIds as $startEndDocId)
+					{
+						list($startDocId, $endDocId) = $startEndDocId;
+						kJobsManager::addRecalculateCacheJob($partnerId, $protocol, $ksType, $userRoles, $objectType, null, $startDocId, $endDocId);
+					}
+				}
+				else
+				{
+					kJobsManager::addRecalculateCacheJob($partnerId, $protocol, $ksType, $userRoles, $objectType);
+				}
+			}
 		}
-		// TODO list all ksType, roldIds, protocol that related to this object and create few jobs for each
 		return true;
 	}
 	
@@ -345,23 +486,12 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 		$objectType = get_class($object);
 		$objectKey = self::getObjectKey($object);
 		
-//		TODO
-//		$sessionTypes = self::listObjectSessionTypes($object);
-//		foreach($sessionTypes as $sessionType)
-//		{
-//			list($protocol, $ksType, $userRoles, $count) = $sessionType;
-//			if($count < self::MAX_CACHE_KEYS_PER_JOB)
-//			{
-//				$sessionKey = self::getSessionKey($protocol, $ksType, $userRoles);
-//				$startEndKeys = self::listStartEndKeys($object, $sessionKey);
-//				foreach($startEndKeys)
-//					kJobsManager::addRecalculateCacheJob($partnerId, $protocol, $ksType, $userRoles, $objectType, $objectKey);
-//			}
-//			else
-//			{
-//				kJobsManager::addRecalculateCacheJob($partnerId, $protocol, $ksType, $userRoles, $objectType, $objectKey);
-//			}
-//		}
+		$sessionTypes = self::listObjectSessionTypes($object);
+		foreach($sessionTypes as $sessionKey)
+		{
+			list($protocol, $ksType, $userRoles) = explode('_', $sessionKey, 3);
+			kJobsManager::addRecalculateCacheJob($partnerId, $protocol, $ksType, $userRoles, $objectType, $object->getPrimaryKey());
+		}
 		return true;
 	}
 	

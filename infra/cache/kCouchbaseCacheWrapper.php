@@ -21,6 +21,15 @@ class kCouchbaseCacheQuery
 //}
 //reduce _count
 
+	const VIEW_RESPONSE_PROFILE_OBJECT_SESSIONS = 'objectSessions';
+// function (doc, meta) {
+// 	if (meta.type == "json") {
+// 		if(doc.type == "primaryObject"){
+// 			emit([doc.objectKey, doc.sessionKey], [doc.objectKey, doc.sessionKey]);
+// 		}
+// 	}
+// }
+
 	const VIEW_RESPONSE_PROFILE_SESSION_TYPE = 'sessionType';
 //function (doc, meta) {
 //	if (meta.type == "json") {
@@ -330,8 +339,9 @@ class kCouchbaseCacheListItem
 	
 	public function __construct(array $meta)
 	{
-		KalturaLog::debug("meta [" . print_r($meta, true) . "]");
-		$this->id = $meta['id'];
+		if(isset($meta['id']))
+			$this->id = $meta['id'];
+		
 		$this->key = $meta['key'];
 		$this->data = $meta['value'];
 	}
@@ -380,9 +390,9 @@ class kCouchbaseCacheList
 		{
 			return;
 		}
-		KalturaLog::debug("meta [" . print_r($meta, true) . "]");
 		
-		$this->totalCount = $meta['total_rows'];
+		if(isset($meta['total_rows']))
+			$this->totalCount = $meta['total_rows'];
 		
 		foreach($meta['rows'] as $row)
 		{
@@ -685,7 +695,6 @@ class kCouchbaseCacheWrapper extends kBaseCacheWrapper
 	{
 		$couchBaseQuery = $query->toQuery();
 		$meta =  $this->bucket->query($couchBaseQuery);
-		KalturaLog::debug("query [" . print_r($couchBaseQuery, true) . "] meta [" . print_r($meta, true) . "]");
 		return new kCouchbaseCacheList($meta);
 	}
 }
