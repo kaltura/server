@@ -227,7 +227,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		file_put_contents ( $fullPath , $content );
 		self::setPermissions($fullPath);
 
-		self::createSyncFileForKey($rootPath, $filePath,  $key , $strict , !is_null($res), md5($content));
+		self::createSyncFileForKey($rootPath, $filePath,  $key , $strict , !is_null($res), null, md5($content));
 	}
 
 	protected static function setPermissions($filePath)
