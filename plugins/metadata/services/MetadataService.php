@@ -310,6 +310,7 @@ class MetadataService extends KalturaBaseService
 			if (!$fileSync->compareContentMd5($xmlData, false))
 			{
 				$dbMetadata->incrementVersion();
+				$key = $dbMetadata->getSyncKey(Metadata::FILE_SYNC_METADATA_DATA);
 				kFileSyncUtils::file_put_contents($key, $xmlData);
 				$dbMetadata->save();
 				kEventsManager::raiseEvent(new kObjectDataChangedEvent($dbMetadata, $previousVersion));
