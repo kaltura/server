@@ -226,35 +226,38 @@ class KalturaResponseProfileCacher extends kResponseProfileCacher
 			if($cacheStore instanceof kCouchbaseCacheWrapper)
 			{
 				$query = $cacheStore->getNewQuery(kCouchbaseCacheQuery::VIEW_RESPONSE_PROFILE_SESSION_TYPE);
-				$query->setLimit($limit);
-				$query->addKey('sessionKey', $sessionKey);
-				if($options->objectKey)
-					$query->addKey('objectKey', $options->objectKey);
-				if($options->startKeyId)
-					$query->setStartKeyDocId($options->startKeyId);
-				if($options->endKeyId)
-					$query->setEndKeyDocId($options->endKeyId);
-
-				$results->recalculated = 0;
-				$list = $cacheStore->query($query);
-				while($list->getCount())
+				if($query)
 				{
-					foreach($list->getObjects() as $cache)
-					{
-						/* @var $cache kCouchbaseCacheListItem */
-						KalturaLog::debug("Cache object [" . print_r($cache, true) . "]");
-						self::recalculateCache($cache);
-						$results->lastKeyId = $cache->getId();
-						$results->recalculated++;
-					}
-					
-					if($options->limit && $results->recalculated >= $options->limit)
-						break;
-						
+					$query->setLimit($limit);
+					$query->addKey('sessionKey', $sessionKey);
+					if($options->objectKey)
+						$query->addKey('objectKey', $options->objectKey);
+					if($options->startKeyId)
+						$query->setStartKeyDocId($options->startKeyId);
+					if($options->endKeyId)
+						$query->setEndKeyDocId($options->endKeyId);
+	
+					$results->recalculated = 0;
 					$list = $cacheStore->query($query);
+					while($list->getCount())
+					{
+						foreach($list->getObjects() as $cache)
+						{
+							/* @var $cache kCouchbaseCacheListItem */
+							KalturaLog::debug("Cache object [" . print_r($cache, true) . "]");
+							self::recalculateCache($cache);
+							$results->lastKeyId = $cache->getId();
+							$results->recalculated++;
+						}
+						
+						if($options->limit && $results->recalculated >= $options->limit)
+							break;
+							
+						$list = $cacheStore->query($query);
+					}
+					if($results->recalculated)
+						break;
 				}
-				if($results->recalculated)
-					break;
 			}
 		}
 		return $results;

@@ -246,14 +246,17 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 				if($cacheStore instanceof kCouchbaseCacheWrapper)
 				{
 					$query = $cacheStore->getNewQuery(kCouchbaseCacheQuery::VIEW_RESPONSE_PROFILE_RELATED_OBJECT_SESSIONS);
-					$query->addStartKey('triggerKey', self::getTriggerKey($object));
-					$query->addStartKey('objectType', 'a');
-					$query->addStartKey('sessionKey', 'a');
-					$query->setLimit(1);
-					
-					$list = $cacheStore->query($query);
-					if($list->getCount())
-						return true;
+					if($query)
+					{
+						$query->addStartKey('triggerKey', self::getTriggerKey($object));
+						$query->addStartKey('objectType', 'a');
+						$query->addStartKey('sessionKey', 'a');
+						$query->setLimit(1);
+						
+						$list = $cacheStore->query($query);
+						if($list->getCount())
+							return true;
+					}
 				}
 			}
 		}
@@ -294,12 +297,15 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 				if($cacheStore instanceof kCouchbaseCacheWrapper)
 				{
 					$query = $cacheStore->getNewQuery(kCouchbaseCacheQuery::VIEW_RESPONSE_PROFILE_OBJECT_SPECIFIC);
-					$query->addKey('objectKey', self::getObjectKey($object));
-					$query->setLimit(1);
-					
-					$list = $cacheStore->query($query);
-					if($list->getCount())
-						return true;
+					if($query)
+					{
+						$query->addKey('objectKey', self::getObjectKey($object));
+						$query->setLimit(1);
+						
+						$list = $cacheStore->query($query);
+						if($list->getCount())
+							return true;
+					}
 				}
 			}
 		}
@@ -326,41 +332,44 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 				{
 					// TODO optimize using elastic search query
 					$query = $cacheStore->getNewQuery(kCouchbaseCacheQuery::VIEW_RESPONSE_PROFILE_OBJECT_TYPE_SESSIONS);
-					$query->addStartKey('objectType', $objectType);
-					$query->addStartKey('sessionKey', $sessionKey);
-					$query->addStartKey('objectId', '0');
-					$query->addEndKey('objectType', $objectType);
-					$query->addEndKey('sessionKey', $sessionKey);
-					$query->addEndKey('objectId', 'Z');
-					$query->setLimit(1);
-
-					$list = $cacheStore->query($query);
-					$query->setLimit(2);
-					$offset = -1;
-					$array = array();
-					$startId = null;
-					while(count($list->getObjects()))
+					if($query)
 					{
-						$objects = $list->getObjects();
-						if(count($objects) == 1)
-						{
-							$startCacheObject = reset($objects);
-							/* @var $startCacheObject kCouchbaseCacheListItem */
-							$startId = $startCacheObject->getId();
-						}
-						elseif(count($objects) == 2)
-						{
-							list($endCacheObject, $startCacheObject) = $objects;
-							/* @var $endCacheObject kCouchbaseCacheListItem */
-							/* @var $startCacheObject kCouchbaseCacheListItem */
-							$array[] = array($startId, $endCacheObject->getId());
-							$startId = $startCacheObject->getId();
-						}
-						$offset += self::MAX_CACHE_KEYS_PER_JOB;
-						$query->setOffset($offset);
+						$query->addStartKey('objectType', $objectType);
+						$query->addStartKey('sessionKey', $sessionKey);
+						$query->addStartKey('objectId', '0');
+						$query->addEndKey('objectType', $objectType);
+						$query->addEndKey('sessionKey', $sessionKey);
+						$query->addEndKey('objectId', 'Z');
+						$query->setLimit(1);
+	
 						$list = $cacheStore->query($query);
+						$query->setLimit(2);
+						$offset = -1;
+						$array = array();
+						$startId = null;
+						while(count($list->getObjects()))
+						{
+							$objects = $list->getObjects();
+							if(count($objects) == 1)
+							{
+								$startCacheObject = reset($objects);
+								/* @var $startCacheObject kCouchbaseCacheListItem */
+								$startId = $startCacheObject->getId();
+							}
+							elseif(count($objects) == 2)
+							{
+								list($endCacheObject, $startCacheObject) = $objects;
+								/* @var $endCacheObject kCouchbaseCacheListItem */
+								/* @var $startCacheObject kCouchbaseCacheListItem */
+								$array[] = array($startId, $endCacheObject->getId());
+								$startId = $startCacheObject->getId();
+							}
+							$offset += self::MAX_CACHE_KEYS_PER_JOB;
+							$query->setOffset($offset);
+							$list = $cacheStore->query($query);
+						}
+						return $array;
 					}
-					return $array;
 				}
 			}
 		}
@@ -379,42 +388,45 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 				{
 					// TODO optimize using elastic search query
 					$query = $cacheStore->getNewQuery(kCouchbaseCacheQuery::VIEW_RESPONSE_PROFILE_RELATED_OBJECT_SESSIONS);
-					$query->addStartKey('triggerKey', $triggerKey);
-					$query->addStartKey('objectType', 'a');
-					$query->addStartKey('sessionKey', 'a');
-					$query->addEndKey('triggerKey', $triggerKey);
-					$query->addEndKey('objectType', 'Z');
-					$query->addEndKey('sessionKey', 'Z');
-					$query->setLimit(self::MAX_CACHE_KEYS_PER_JOB);
-
-					$offset = 0;
-					$array = array();
-					$list = $cacheStore->query($query);
-					while(count($list->getObjects()))
+					if($query)
 					{
-						foreach ($list->getObjects() as $cacheObject)
-						{
-							/* @var $cacheObject kCouchbaseCacheListItem */
-							list($cacheTriggerKey, $cacheObjectType, $cacheSessionKey) = $cacheObject->getKey();
-							if(!isset($array[$cacheObjectType]))
-							{
-								$array[$cacheObjectType] = array();
-							}
-							if(isset($array[$cacheObjectType][$cacheSessionKey]))
-							{
-								$array[$cacheObjectType][$cacheSessionKey]++;
-							}
-							else
-							{
-								$array[$cacheObjectType][$cacheSessionKey] = 1;
-							}
-						}
-						
-						$offset += count($list->getObjects());
-						$query->setOffset($offset);
+						$query->addStartKey('triggerKey', $triggerKey);
+						$query->addStartKey('objectType', 'a');
+						$query->addStartKey('sessionKey', 'a');
+						$query->addEndKey('triggerKey', $triggerKey);
+						$query->addEndKey('objectType', 'Z');
+						$query->addEndKey('sessionKey', 'Z');
+						$query->setLimit(self::MAX_CACHE_KEYS_PER_JOB);
+	
+						$offset = 0;
+						$array = array();
 						$list = $cacheStore->query($query);
+						while(count($list->getObjects()))
+						{
+							foreach ($list->getObjects() as $cacheObject)
+							{
+								/* @var $cacheObject kCouchbaseCacheListItem */
+								list($cacheTriggerKey, $cacheObjectType, $cacheSessionKey) = $cacheObject->getKey();
+								if(!isset($array[$cacheObjectType]))
+								{
+									$array[$cacheObjectType] = array();
+								}
+								if(isset($array[$cacheObjectType][$cacheSessionKey]))
+								{
+									$array[$cacheObjectType][$cacheSessionKey]++;
+								}
+								else
+								{
+									$array[$cacheObjectType][$cacheSessionKey] = 1;
+								}
+							}
+							
+							$offset += count($list->getObjects());
+							$query->setOffset($offset);
+							$list = $cacheStore->query($query);
+						}
+						return $array;
 					}
-					return $array;
 				}
 			}
 		}
@@ -434,21 +446,24 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 				{
 					// TODO optimize using elastic search query
 					$query = $cacheStore->getNewQuery(kCouchbaseCacheQuery::VIEW_RESPONSE_PROFILE_OBJECT_SESSIONS);
-					$query->addStartKey('objectKey', $objectKey);
-					$query->addStartKey('sessionKey', 'a');
-					$query->addEndKey('objectKey', $objectKey);
-					$query->addEndKey('sessionKey', 'Z');
-					$query->setLimit(self::MAX_CACHE_KEYS_PER_JOB);
-
-					$list = $cacheStore->query($query);
-					$array = array();
-					foreach ($list->getObjects() as $cacheObject)
+					if($query)
 					{
-						/* @var $cacheObject kCouchbaseCacheListItem */
-						list($cacheObjectKey, $cacheSessionKey) = $cacheObject->getKey();
-						$array[$cacheSessionKey] = $cacheSessionKey;
+						$query->addStartKey('objectKey', $objectKey);
+						$query->addStartKey('sessionKey', 'a');
+						$query->addEndKey('objectKey', $objectKey);
+						$query->addEndKey('sessionKey', 'Z');
+						$query->setLimit(self::MAX_CACHE_KEYS_PER_JOB);
+	
+						$list = $cacheStore->query($query);
+						$array = array();
+						foreach ($list->getObjects() as $cacheObject)
+						{
+							/* @var $cacheObject kCouchbaseCacheListItem */
+							list($cacheObjectKey, $cacheSessionKey) = $cacheObject->getKey();
+							$array[$cacheSessionKey] = $cacheSessionKey;
+						}
+						return $array;
 					}
-					return $array;
 				}
 			}
 		}
@@ -537,20 +552,23 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 			if($cacheStore instanceof kCouchbaseCacheWrapper)
 			{
 				$query = $cacheStore->getNewQuery(kCouchbaseCacheQuery::VIEW_RESPONSE_PROFILE_OBJECT_SPECIFIC);
-				$query->addKey('objectKey', self::getObjectKey($object));
-				$query->setLimit(100);
-				
-				$list = $cacheStore->query($query);
-				while($list->getCount())
+				if($query)
 				{
-					$keys = array();
-					foreach($list->getObjects() as $cache)
-					{
-						/* @var $cache kCouchbaseCacheListItem */
-						$keys[] = $cache->getId();
-					}
-					$cacheStore->multiDelete($keys);
+					$query->addKey('objectKey', self::getObjectKey($object));
+					$query->setLimit(100);
+					
 					$list = $cacheStore->query($query);
+					while($list->getCount())
+					{
+						$keys = array();
+						foreach($list->getObjects() as $cache)
+						{
+							/* @var $cache kCouchbaseCacheListItem */
+							$keys[] = $cache->getId();
+						}
+						$cacheStore->multiDelete($keys);
+						$list = $cacheStore->query($query);
+					}
 				}
 			}
 		}
