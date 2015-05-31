@@ -14,8 +14,6 @@ abstract class KalturaEdgeServerBaseFilter extends KalturaFilter
 		"createdAtLessThanOrEqual" => "_lte_created_at",
 		"updatedAtGreaterThanOrEqual" => "_gte_updated_at",
 		"updatedAtLessThanOrEqual" => "_lte_updated_at",
-		"partnerIdEqual" => "_eq_partner_id",
-		"partnerIdIn" => "_in_partner_id",
 		"nameEqual" => "_eq_name",
 		"nameIn" => "_in_name",
 		"systemNameEqual" => "_eq_system_name",
@@ -28,8 +26,8 @@ abstract class KalturaEdgeServerBaseFilter extends KalturaFilter
 		"hostNameLike" => "_like_host_name",
 		"hostNameMultiLikeOr" => "_mlikeor_host_name",
 		"hostNameMultiLikeAnd" => "_mlikeand_host_name",
-		"parentEdgeServerIdEqual" => "_eq_parent_edge_server_id",
-		"parentEdgeServerIdIn" => "_in_parent_edge_server_id",
+		"parentIdEqual" => "_eq_parent_id",
+		"parentIdIn" => "_in_parent_id",
 	);
 
 	static private $order_by_map = array
@@ -79,16 +77,6 @@ abstract class KalturaEdgeServerBaseFilter extends KalturaFilter
 	 * @var time
 	 */
 	public $updatedAtLessThanOrEqual;
-
-	/**
-	 * @var int
-	 */
-	public $partnerIdEqual;
-
-	/**
-	 * @var string
-	 */
-	public $partnerIdIn;
 
 	/**
 	 * @var string
@@ -153,10 +141,10 @@ abstract class KalturaEdgeServerBaseFilter extends KalturaFilter
 	/**
 	 * @var int
 	 */
-	public $parentEdgeServerIdEqual;
+	public $parentIdEqual;
 
 	/**
 	 * @var string
 	 */
-	public $parentEdgeServerIdIn;
+	public $parentIdIn;
 }

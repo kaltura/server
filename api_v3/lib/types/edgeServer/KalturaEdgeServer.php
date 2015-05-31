@@ -91,7 +91,7 @@ class KalturaEdgeServer extends KalturaObject implements IFilterable
 	 * @var int
 	 * @filter eq,in
 	 */
-	public $parentEdgeServerId;
+	public $parentId;
 	
 	private static $map_between_objects = array
 	(
@@ -106,7 +106,7 @@ class KalturaEdgeServer extends KalturaObject implements IFilterable
 		"tags",
 		"hostName",
 		"deliveryProfileIds",
-		"parentEdgeServerId" => "parentId",
+		"parentId",
 	);
 	
 	/* (non-PHPdoc)
