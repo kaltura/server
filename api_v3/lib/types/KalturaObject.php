@@ -414,7 +414,7 @@ abstract class KalturaObject
 
 			$filter = clone $relatedProfile->filter;
 			
-			if(kEntitlementUtils::getEntitlementEnforcement() && is_a($filter, 'KalturaBaseEntryFilter') || is_a($filter, 'KalturaCategoryFilter'))
+			if(kEntitlementUtils::getEntitlementEnforcement() && (is_a($filter, 'KalturaBaseEntryFilter') || is_a($filter, 'KalturaCategoryFilter')))
 			{
 				KalturaResponseProfileCacher::disable();
 			}

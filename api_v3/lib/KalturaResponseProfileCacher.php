@@ -143,6 +143,11 @@ class KalturaResponseProfileCacher extends kResponseProfileCacher
 	
 	public static function disable()
 	{
+		if(self::$cachedObject)
+		{
+			KalturaLog::debug("Object [" . get_class(self::$cachedObject) . "][" . self::$cachedObject->getId() . "] caching disabled");
+		}
+		
 		self::$cachedObject = null;
 		self::$disabled = true;
 	}

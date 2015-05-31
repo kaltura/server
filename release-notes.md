@@ -22,25 +22,57 @@ Download Couchbase server and install according to [official instructions](http:
  - Create View: `objectSpecific`:
 ```javascript
 	function (doc, meta) {
-	  if (meta.type == "json") {
-	    if(doc.type == "primaryObject"){
-		  emit([doc.partnerId, doc.objectType, doc.objectId], doc.data);
-	    }
-	  }
-	}
+    	if (meta.type == "json") {
+    		if(doc.type == "primaryObject"){
+    			emit(doc.objectKey, null);
+    		}
+    	}
+}
 ```
 
- - View Name: `relatedObject`:    
+ - Create View: `relatedObjectSessions`:
 ```javascript
 	function (doc, meta) {
-	  if (meta.type == "json") {
-	    if(doc.type == "relatedObject"){
-		  emit([doc.partnerId, doc.triggerObjectType], doc.data);
-	    }
-	  }
-	}
+    	if (meta.type == "json") {
+    		if(doc.type == "relatedObject"){
+    	 			emit([doc.triggerKey, doc.objectType, doc.sessionKey], null);
+    		}
+    	}
+}
+```
+	
+ - Create View: `objectSessions`:
+```javascript
+	function (doc, meta) {
+	 	if (meta.type == "json") {
+	 		if(doc.type == "primaryObject"){
+	 			emit([doc.objectKey, doc.sessionKey], null);
+	 		}
+	 	}
+}
 ```
 
+ - Create View: `objectTypeSessions`:
+```javascript
+	function (doc, meta) {
+	 	if (meta.type == "json") {
+	 		if(doc.type == "primaryObject"){
+	 			emit([doc.objectType, doc.sessionKey], null);
+	 		}
+	 	}
+}
+```
+	
+ - Create View: `sessionType`:
+```javascript
+	function (doc, meta) {
+    	if (meta.type == "json") {
+    		if(doc.type == "primaryObject"){
+    			emit([doc.sessionKey, doc.objectKey], null);
+    		}
+    	}
+}
+```
  - Publish the design-document.
 
 ### Configuration ###

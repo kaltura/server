@@ -6,35 +6,43 @@ class kCouchbaseCacheQuery
 //function (doc, meta) {
 //	if (meta.type == "json") {
 //		if(doc.type == "primaryObject"){
-//			emit(doc.objectKey, doc.apiObject);
+//			emit(doc.objectKey, null);
 //		}
 //	}
 //}
 
-	const VIEW_RESPONSE_PROFILE_RELATED_OBJECT = 'relatedObject';
+	const VIEW_RESPONSE_PROFILE_RELATED_OBJECT_SESSIONS = 'relatedObjectSessions';
 //function (doc, meta) {
 //	if (meta.type == "json") {
 //		if(doc.type == "relatedObject"){
-//			emit(doc.triggerKey, null);
+// 			emit([doc.triggerKey, doc.objectType, doc.sessionKey], null);
 //		}
 //	}
 //}
-//reduce _count
-
+	
 	const VIEW_RESPONSE_PROFILE_OBJECT_SESSIONS = 'objectSessions';
 // function (doc, meta) {
 // 	if (meta.type == "json") {
 // 		if(doc.type == "primaryObject"){
-// 			emit([doc.objectKey, doc.sessionKey], [doc.objectKey, doc.sessionKey]);
+// 			emit([doc.objectKey, doc.sessionKey], null);
 // 		}
 // 	}
 // }
 
+	const VIEW_RESPONSE_PROFILE_OBJECT_TYPE_SESSIONS = 'objectTypeSessions';
+// function (doc, meta) {
+// 	if (meta.type == "json") {
+// 		if(doc.type == "primaryObject"){
+// 			emit([doc.objectType, doc.sessionKey], null);
+// 		}
+// 	}
+// }
+	
 	const VIEW_RESPONSE_PROFILE_SESSION_TYPE = 'sessionType';
 //function (doc, meta) {
 //	if (meta.type == "json") {
 //		if(doc.type == "primaryObject"){
-//			emit([doc.sessionKey, doc.objectKey], doc);
+//			emit([doc.sessionKey, doc.objectKey], null);
 //		}
 //	}
 //}
@@ -517,7 +525,6 @@ class kCouchbaseCacheWrapper extends kBaseCacheWrapper
 	 */
 	protected function doSet($key, $var, $expiry = 0)
 	{
-		KalturaLog::debug("key [$key], var [" . print_r($var, true) . "]");
 		$meta = $this->bucket->upsert($key, $var, array(
 			'expiry' => $expiry
 		));

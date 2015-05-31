@@ -1131,8 +1131,21 @@ class kJobsManager
 	 * @param string $startDocId
 	 * @param string $endDocId
 	 */
-	public static function addRecalculateCacheJob($partnerId, $protocol, $ksType, array $userRoles, $objectType, $objectId = null, $startDocId = null, $endDocId = null)
+	public static function addRecalculateResponseProfileCacheJob($partnerId, $protocol, $ksType, array $userRoles, $objectType, $objectId = null, $startDocId = null, $endDocId = null)
 	{
+	    $jobData = new kRecalculateCacheJobData();
+ 		$jobData->setProtocol($protocol);
+ 		$jobData->setKsType($ksType);
+ 		$jobData->setUserRoles($userRoles);
+ 		$jobData->setObjectType($objectType);
+ 		$jobData->setObjectId($objectId);
+ 		$jobData->setStartDocId($startDocId);
+ 		$jobData->setEndDocId($endDocId);
+ 		
+		$batchJob = new BatchJob();
+		$batchJob->setPartnerId($partnerId);
+		
+		return self::addJob($batchJob, $jobData, BatchJobType::RECALCULATE_CACHE, RecalculateCacheType::RESPONSE_PROFILE);
 	}
 	
 	/**

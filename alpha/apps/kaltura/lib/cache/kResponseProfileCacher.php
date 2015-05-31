@@ -245,8 +245,10 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 			{
 				if($cacheStore instanceof kCouchbaseCacheWrapper)
 				{
-					$query = $cacheStore->getNewQuery(kCouchbaseCacheQuery::VIEW_RESPONSE_PROFILE_RELATED_OBJECT);
-					$query->addKey('triggerKey', self::getTriggerKey($object));
+					$query = $cacheStore->getNewQuery(kCouchbaseCacheQuery::VIEW_RESPONSE_PROFILE_RELATED_OBJECT_SESSIONS);
+					$query->addStartKey('triggerKey', self::getTriggerKey($object));
+					$query->addStartKey('objectType', 'a');
+					$query->addStartKey('sessionKey', 'a');
 					$query->setLimit(1);
 					
 					$list = $cacheStore->query($query);
@@ -323,7 +325,7 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 				if($cacheStore instanceof kCouchbaseCacheWrapper)
 				{
 					// TODO optimize using elastic search query
-					$query = $cacheStore->getNewQuery(kCouchbaseCacheQuery::VIEW_RESPONSE_PROFILE_OBJECT_SESSIONS); // TODO create view
+					$query = $cacheStore->getNewQuery(kCouchbaseCacheQuery::VIEW_RESPONSE_PROFILE_OBJECT_TYPE_SESSIONS);
 					$query->addStartKey('objectType', $objectType);
 					$query->addStartKey('sessionKey', $sessionKey);
 					$query->addStartKey('objectId', '0');
@@ -376,7 +378,7 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 				if($cacheStore instanceof kCouchbaseCacheWrapper)
 				{
 					// TODO optimize using elastic search query
-					$query = $cacheStore->getNewQuery(kCouchbaseCacheQuery::VIEW_RESPONSE_PROFILE_OBJECT_SESSIONS); // TODO create view
+					$query = $cacheStore->getNewQuery(kCouchbaseCacheQuery::VIEW_RESPONSE_PROFILE_RELATED_OBJECT_SESSIONS);
 					$query->addStartKey('triggerKey', $triggerKey);
 					$query->addStartKey('objectType', 'a');
 					$query->addStartKey('sessionKey', 'a');
@@ -469,12 +471,12 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 					foreach($startEndDocIds as $startEndDocId)
 					{
 						list($startDocId, $endDocId) = $startEndDocId;
-						kJobsManager::addRecalculateCacheJob($partnerId, $protocol, $ksType, $userRoles, $objectType, null, $startDocId, $endDocId);
+						kJobsManager::addRecalculateResponseProfileCacheJob($partnerId, $protocol, $ksType, $userRoles, $objectType, null, $startDocId, $endDocId);
 					}
 				}
 				else
 				{
-					kJobsManager::addRecalculateCacheJob($partnerId, $protocol, $ksType, $userRoles, $objectType);
+					kJobsManager::addRecalculateResponseProfileCacheJob($partnerId, $protocol, $ksType, $userRoles, $objectType);
 				}
 			}
 		}
@@ -490,7 +492,7 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 		foreach($sessionTypes as $sessionKey)
 		{
 			list($protocol, $ksType, $userRoles) = explode('_', $sessionKey, 3);
-			kJobsManager::addRecalculateCacheJob($partnerId, $protocol, $ksType, $userRoles, $objectType, $object->getPrimaryKey());
+			kJobsManager::addRecalculateResponseProfileCacheJob($partnerId, $protocol, $ksType, $userRoles, $objectType, $object->getPrimaryKey());
 		}
 		return true;
 	}

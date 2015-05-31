@@ -10,6 +10,18 @@ class KRecalculateResponseProfileCacheEngine extends KRecalculateCacheEngine
 	 */
 	public function recalculate(KalturaRecalculateCacheJobData $data)
 	{
-		/* @var $data KalturaRecalculateResponseProfileCacheJobData */
+		return $this->doRecalculate($data);
+	}
+	
+	public function doRecalculate(KalturaRecalculateResponseProfileCacheJobData $data)
+	{
+// 		KBatchBase::$kClient->responseProfile->recalculate();
+		
+		$options = new KalturaResponseProfileCacheRecalculateOptions();
+		$options->limit;
+		$options->cachedObjectType;
+		$options->objectId;
+		$options->startDocId;
+		$options->endDocId;
 	}
 }
