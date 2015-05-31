@@ -5,8 +5,9 @@
  */
 class KalturaEdgeServerStatus extends KalturaEnum
 {
-	const ENABLED = 1;
+	const ACTIVE = 1;
 	const DISABLED = 2;
+	const DELETED = 3;
 }
 
 

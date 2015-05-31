@@ -14,6 +14,8 @@
  * @subpackage model
  */
 class EdgeServer extends BaseEdgeServer {
+	
+	const CUSTOM_DATA_DELIVERY_IDS = 'delivery_profile_ids';
 
 	/**
 	 * Initializes internal state of EdgeServer object.
@@ -24,6 +26,18 @@ class EdgeServer extends BaseEdgeServer {
 		// Make sure that parent constructor is always invoked, since that
 		// is where any default values for this object are set.
 		parent::__construct();
+	}
+	
+	/* Delivery Settings */
+	
+	public function setDeliveryProfileIds($params)
+	{
+		$this->putInCustomData(self::CUSTOM_DATA_DELIVERY_IDS, $params);
+	}
+	
+	public function getDeliveryProfileIds()
+	{
+		return $this->getFromCustomData(self::CUSTOM_DATA_DELIVERY_IDS, null, array());
 	}
 
 } // EdgeServer

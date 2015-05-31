@@ -29,7 +29,6 @@ class KalturaEdgeServer extends KalturaObject implements IFilterable
 	/**
 	 * @var int
 	 * @readonly
-	 * @filter eq,in
 	 */
 	public $partnerId;
 	
@@ -107,7 +106,7 @@ class KalturaEdgeServer extends KalturaObject implements IFilterable
 		"tags",
 		"hostName",
 		"deliveryProfileIds",
-		"parentEdgeServerId",
+		"parentEdgeServerId" => "parentId",
 	);
 	
 	/* (non-PHPdoc)
@@ -124,7 +123,7 @@ class KalturaEdgeServer extends KalturaObject implements IFilterable
 	public function toInsertableObject ( $object_to_fill = null , $props_to_skip = array() )
 	{
 		if(is_null($object_to_fill))
-			$object_to_fill = new edgeServer();
+			$object_to_fill = new EdgeServer();
 			
 		return parent::toInsertableObject($object_to_fill, $props_to_skip);
 	}
@@ -189,6 +188,18 @@ class KalturaEdgeServer extends KalturaObject implements IFilterable
 		$object_to_fill->setDeliveryProfileIds($deliveryProfiles);
 		
 		return $object_to_fill;
+	}
+	
+	protected function insertObject(&$res, $key, $value) {
+		if(strpos($key, ".") === FALSE) {
+			$res[$key] = intval($value);
+			return;
+		}
+	
+		list($key, $newKey) = explode(".", $key, 2);
+		if(!array_key_exists($key, $res))
+			$res[$key] = array();
+		$this->insertObject($res[$key], $newKey, $value);
 	}
 	
 	/* (non-PHPdoc)
