@@ -141,23 +141,6 @@ class FileSync extends BaseFileSync
 	public function getContentMd5 () { return $this->getFromCustomData("contentMd5"); }
 	public function setContentMd5 ($v) { $this->putInCustomData("contentMd5", $v);  }
 	
-	/**
-	 * @param string $contentToCompare
-	 * @param bool $isFile 
-	 * @return bool true if content md5 is equal to current content md5, false otherwise
-	 */
-	public function compareContentMd5 ($contentToCompare, $isFile = false)
-	{
-		if ($isFile)
-		{
-			return ($this->getContentMd5() == md5_file($contentToCompare));
-		}
-		else
-		{
-			return ($this->getContentMd5() == md5($contentToCompare));
-		}
-	} 
-	
 }
 
 

@@ -306,8 +306,7 @@ class MetadataService extends KalturaBaseService
 			}
 			
 			$key = $dbMetadata->getSyncKey(Metadata::FILE_SYNC_METADATA_DATA);
-			$fileSync = kFileSyncUtils::getLocalFileSyncForKey($key);
-			if (!$fileSync->compareContentMd5($xmlData, false))
+			if (!kFileSyncUtils::compareContent($key, $xmlData))
 			{
 				$dbMetadata->incrementVersion();
 				$key = $dbMetadata->getSyncKey(Metadata::FILE_SYNC_METADATA_DATA);

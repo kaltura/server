@@ -227,7 +227,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		file_put_contents ( $fullPath , $content );
 		self::setPermissions($fullPath);
 
-		self::createSyncFileForKey($rootPath, $filePath,  $key , $strict , !is_null($res), null, md5($content));
+		self::createSyncFileForKey($rootPath, $filePath,  $key , $strict , !is_null($res), false, md5($content));
 	}
 
 	protected static function setPermissions($filePath)
@@ -1016,7 +1016,8 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 			$currentDCFileSync->setFilePath ( $filePath );
 			$currentDCFileSync->setPartnerId ( $key->partner_id);
 			$currentDCFileSync->setOriginal ( 1 );
-			$currentDCFileSync->setContentMd5($md5);
+			if (!is_null($md5))
+				$currentDCFileSync->setContentMd5($md5);
 		}
 
 		$fullPath = $currentDCFileSync->getFullPath();
@@ -1564,6 +1565,29 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 					}
 				}
 			}
+		}
+	}
+	
+	/**
+	 * @param FileSyncKey $syncKey
+	 * @param string $contentMd5
+	 * @param bool $isFile
+	 * @return bool
+	 */
+	public static function compareContent ($syncKey, $contentMd5, $isFile = false)
+	{
+		$fileSync = kFileSyncUtils::getReadyFileSyncForKey($syncKey, false, false);
+		if (!$fileSync || !$fileSync->getContentMd5())
+		{
+			return false;
+		}
+		if ($isFile)
+		{
+			return ($fileSync->getContentMd5() == md5_file($contentMd5));
+		}
+		else
+		{
+			return ($fileSync->getContentMd5() == md5($contentMd5));
 		}
 	}
 }
