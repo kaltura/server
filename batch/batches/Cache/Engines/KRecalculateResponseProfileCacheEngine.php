@@ -5,6 +5,14 @@
  */
 class KRecalculateResponseProfileCacheEngine extends KRecalculateCacheEngine
 {
+	protected $maxCacheObjectsPerRequest = 10;
+	
+	public function __construct()
+	{
+		if(KBatchBase::$taskConfig->params->maxCacheObjectsPerRequest)
+			$this->maxCacheObjectsPerRequest = intval(KBatchBase::$taskConfig->params->maxCacheObjectsPerRequest);
+	}
+	
 	/* (non-PHPdoc)
 	 * @see KRecalculateCacheEngine::recalculate()
 	 */
@@ -15,13 +23,30 @@ class KRecalculateResponseProfileCacheEngine extends KRecalculateCacheEngine
 	
 	public function doRecalculate(KalturaRecalculateResponseProfileCacheJobData $data)
 	{
-// 		KBatchBase::$kClient->responseProfile->recalculate();
+		$job = KJobHandlerWorker::getCurrentJob();
+		$partner = KBatchBase::$kClient->partner->get($job->partnerId);
+		
+		$role = reset($data->userRoles);
+		/* @var $role KalturaIntegerValue */
+		$privileges = array(
+			'setrole:' . $role->value
+		);
+		$privileges = implode(',', $privileges);
+		
+		$client = new KalturaClient(KBatchBase::$kClientConfig);
+		$ks = $client->generateSession($partner->adminSecret, 'batchUser', $data->ksType, $job->partnerId, 86400, $privileges);
 		
 		$options = new KalturaResponseProfileCacheRecalculateOptions();
-		$options->limit;
-		$options->cachedObjectType;
-		$options->objectId;
-		$options->startDocId;
-		$options->endDocId;
+		$options->limit = $this->maxCacheObjectsPerRequest;
+		$options->cachedObjectType = $data->cachedObjectType;
+		$options->objectId = $data->objectId;
+		$options->startDocId = $data->startDocId;
+		$options->endDocId = $data->endDocId;
+		
+		do
+		{
+			$results = $client->responseProfile->recalculate($options);
+			$options->startDocId = $results->lastKeyId;
+		} while($results->recalculated);
 	}
 }
