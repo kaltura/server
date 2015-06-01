@@ -126,7 +126,7 @@ class kAssetUtils
 			
 		if($servePlayManifest)
 		{
-			// in case of an https request, if a delivery profile which supports https doesn't exist use an http api cdn host
+			// in case of an https request, if a delivery profile which supports https doesn't exist use an http cdn api host
 			if (infraRequestUtils::getProtocol() == infraRequestUtils::PROTOCOL_HTTPS &&
 				DeliveryProfilePeer::getRemoteDeliveryByStorageId(DeliveryProfileDynamicAttributes::init($fileSync->getDc(), $asset->getEntryId(), PlaybackProtocol::HTTP, "https")))
 				$url = requestUtils::getApiCdnHost();
