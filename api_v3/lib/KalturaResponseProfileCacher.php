@@ -241,14 +241,20 @@ class KalturaResponseProfileCacher extends kResponseProfileCacher
 					$list = $cacheStore->query($query);
 					while($list->getCount())
 					{
-						foreach($list->getObjects() as $cache)
+						$cachedObjects = $list->getObjects();
+						
+						do
 						{
+							$cache = array_shift($cachedObjects);
 							/* @var $cache kCouchbaseCacheListItem */
 							KalturaLog::debug("Cache object [" . print_r($cache, true) . "]");
 							self::recalculateCache($cache);
-							$results->lastKeyId = $cache->getId();
 							$results->recalculated++;
-						}
+						} while(count($cachedObjects) > 1);
+						
+						$cache = array_shift($cachedObjects);
+						/* @var $cache kCouchbaseCacheListItem */
+						$results->lastKeyId = $cache->getId();
 						
 						if($options->limit && $results->recalculated >= $options->limit)
 							break;
