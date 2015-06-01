@@ -679,8 +679,7 @@ class playManifestAction extends kalturaAction
 	{
 		if ($this->deliveryAttributes->getStorageId())
 		{
-			return DeliveryProfilePeer::getRemoteDeliveryByStorageId($this->deliveryAttributes->getStorageId(),$this->entryId, 
-					$this->deliveryAttributes->getFormat(), $this->deliveryAttributes->getMediaProtocol());
+			return DeliveryProfilePeer::getRemoteDeliveryByStorageId($this->deliveryAttributes);
 		} else {		
 			$cdnHost = $this->cdnHost;
 			$cdnHostOnly = trim(preg_replace('#https?://#', '', $cdnHost), '/');
@@ -811,7 +810,8 @@ class playManifestAction extends kalturaAction
 			$this->deliveryAttributes->setFormat(PlaybackProtocol::HDS);
 		}
 		
-		$this->deliveryProfile = DeliveryProfilePeer::getLiveDeliveryProfileByHostName($cdnHost, $this->entryId, $this->deliveryAttributes->getFormat(), $this->deliveryAttributes->getMediaProtocol());
+		$this->deliveryProfile = DeliveryProfilePeer::getLiveDeliveryProfileByHostName($cdnHost, $this->deliveryAttributes);
+		
 		if(!$this->deliveryProfile)
 		{
 			return null;
@@ -938,6 +938,8 @@ class playManifestAction extends kalturaAction
 			//In case request needs to be redirected to play-server we need to add the ui conf id to the manifest url as well
 			$this->deliveryAttributes->setUiConfId($this->getRequestParameter("uiConfId"));
 		}
+		
+		$this->secureEntryHelper->updateDeliveryAttributes($this->deliveryAttributes);
 		
 		$this->enforceEncryption();
 		

@@ -89,6 +89,13 @@ class KalturaEntryContextDataResult extends KalturaContextDataResult
 	 */
 	public $flavorAssets;
 
+    /**
+     * Array of allowed flavor assets according to access control limitations and requested tags
+     *
+     * @var KalturaPluginDataArray
+     */
+    public $pluginData;
+
 	private static $mapBetweenObjects = array
 	(
 		'isSiteRestricted',

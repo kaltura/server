@@ -1,20 +1,26 @@
 <?php
 /**
- * @package plugins.playReady
- * @subpackage api.objects
+ * @package api
+ * @subpackage objects
  */
-class KalturaAccessControlPlayReadyPolicyAction extends KalturaRuleAction
+class KalturaAccessControlLimitDeliveryProfilesAction extends KalturaRuleAction
 {
 	/**
-	 * Play ready policy id 
+	 * Comma separated list of delivery profile ids 
 	 * 
-	 * @var int
+	 * @var string
 	 */
-	public $policyId;
-
+	public $deliveryProfileIds;
+	
+	/**
+	 * @var bool
+	 */
+	public $isBlockedList;
+	
 	private static $mapBetweenObjects = array
 	(
-		'policyId',
+		'deliveryProfileIds',
+		'isBlockedList',
 	);
 
 	/**
@@ -22,7 +28,7 @@ class KalturaAccessControlPlayReadyPolicyAction extends KalturaRuleAction
 	 */
 	public function __construct() 
 	{
-		$this->type = PlayReadyAccessControlActionType::DRM_POLICY;
+		$this->type = RuleActionType::LIMIT_DELIVERY_PROFILES;
 	}
 	
 	public function getMapBetweenObjects()
@@ -36,7 +42,7 @@ class KalturaAccessControlPlayReadyPolicyAction extends KalturaRuleAction
 	public function toObject($dbObject = null, $skip = array())
 	{
 		if(!$dbObject)
-			$dbObject = new kAccessControlPlayReadyPolicyAction();
+			$dbObject = new kAccessControlLimitDeliveryProfilesAction();
 			
 		return parent::toObject($dbObject, $skip);
 	}

@@ -735,7 +735,14 @@ class BaseEntryService extends KalturaEntryService
 		}
 		
 		$result->isScheduledNow = $dbEntry->isScheduledNow($contextDataParams->time);
-		
+
+        $result->pluginData = new KalturaPluginDataArray();
+        $pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaEntryContextDataContributor');
+        foreach ($pluginInstances as $pluginInstance)
+        {
+            $pluginInstance->contributeToEntryContextDataResult($entryId, $contextDataParams, $result);
+        }
+
 		return $result;
 	}
 	
