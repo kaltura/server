@@ -629,7 +629,7 @@ class kCouchbaseCacheWrapper extends kBaseCacheWrapper
 		try
 		{
 			$meta = $this->bucket->get($key);
-			KalturaLog::debug("key [$key], meta [" . print_r($meta, true) . "]");
+			KalturaLog::debug("key [$key]");
 			return $meta->value;
 		}
 		catch(CouchbaseException $e)
@@ -685,7 +685,10 @@ class kCouchbaseCacheWrapper extends kBaseCacheWrapper
 	public function getNewQuery($view)
 	{
 		if(!isset($this->views[$view]))
+		{
+			KalturaLog::err("Couchbase view [$view] not found");
 			return null;
+		}
 			
 		KalturaLog::debug("Loads query [" . print_r($this->views[$view], true) . "]");
 		$designDocumentName = $this->views[$view]['designDocumentName'];
