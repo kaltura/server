@@ -1576,7 +1576,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 	 */
 	public static function compareContent ($syncKey, $contentMd5, $isFile = false)
 	{
-		$fileSync = kFileSyncUtils::getReadyFileSyncForKey($syncKey, false, false);
+		list ($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($syncKey, false, false);
 		if (!$fileSync || !$fileSync->getContentMd5())
 		{
 			return false;
