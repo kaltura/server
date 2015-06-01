@@ -106,6 +106,11 @@ class KalturaResponseProfileCacher extends kResponseProfileCacher
 	
 	public static function start(IBaseObject $object, KalturaDetachedResponseProfile $responseProfile)
 	{
+		if(self::$disabled)
+		{
+			return;
+		}
+		
 		if(self::$cachedObject)
 		{
 			KalturaLog::debug("Object [" . get_class(self::$cachedObject) . "][" . self::$cachedObject->getId() . "] still caching");
@@ -147,8 +152,6 @@ class KalturaResponseProfileCacher extends kResponseProfileCacher
 		{
 			KalturaLog::debug("Object [" . get_class(self::$cachedObject) . "][" . self::$cachedObject->getId() . "] caching disabled");
 		}
-		
-		self::$cachedObject = null;
 		self::$disabled = true;
 	}
 	
