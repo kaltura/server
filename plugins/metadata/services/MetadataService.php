@@ -314,6 +314,10 @@ class MetadataService extends KalturaBaseService
 				$dbMetadata->save();
 				kEventsManager::raiseEvent(new kObjectDataChangedEvent($dbMetadata, $previousVersion));
 			}
+			else 
+			{
+				KalturaLog::info("XML data MD5 matches current filesync content MD5. Update is not necessary.");
+			}
 		}
 		
 		$metadata = new KalturaMetadata();
