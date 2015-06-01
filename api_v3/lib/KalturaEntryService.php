@@ -494,6 +494,7 @@ class KalturaEntryService extends KalturaBaseService
 				}
 			}
 
+			$ext = pathinfo($entryFullPath, PATHINFO_EXTENSION);
 			$allowedImageTypes = kConf::get("image_file_ext");
 
 			if (in_array($ext, $allowedImageTypes))
