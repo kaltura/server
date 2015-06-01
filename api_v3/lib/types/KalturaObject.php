@@ -416,7 +416,7 @@ abstract class KalturaObject
 			
 			if(kEntitlementUtils::getEntitlementEnforcement() && (is_a($filter, 'KalturaBaseEntryFilter') || is_a($filter, 'KalturaCategoryFilter') || is_a($filter, 'KalturaCategoryEntryFilter')))
 			{
-				KalturaResponseProfileCacher::disable();
+				throw new KalturaAPIException(KalturaErrors::CANNOT_LIST_RELATED_ENTITLED_WHEN_ENTITLEMENT_IS_ENABLE, get_class($filter));
 			}
 			
 			if($relatedProfile->mappings)
