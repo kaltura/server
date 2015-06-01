@@ -76,7 +76,16 @@ Download Couchbase server and install according to [official instructions](http:
  - Publish the design-document.
 
 ### Configuration ###
-- Update configurations/cache.ini under couchbase section to use the username and password you configured for couchbase server.
+ - Update configurations/cache.ini under couchbase section to use the username and password you configured for couchbase server.
+ - Add new worker into configurations/batch/batch.ini:
+
+```ini
+[KAsyncRecalculateCache : JobHandlerWorker]
+id													= 590
+friendlyName										= Recalculate Cache
+type												= KAsyncRecalculateCache
+scriptPath											= batch/batches/Cache/KAsyncRecalculateCacheExe.php
+```
 
 ### Deployment Scripts ###
 None.
