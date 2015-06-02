@@ -357,7 +357,7 @@ class playManifestAction extends kalturaAction
 	{
 		switch ($this->entry->getPartner()->getStorageServePriority())
 		{
-		case 0:
+		case StorageProfile::STORAGE_SERVE_PRIORITY_DEFAULT:
 		case StorageProfile::STORAGE_SERVE_PRIORITY_KALTURA_ONLY:
 			return true;
 			
@@ -549,7 +549,7 @@ class playManifestAction extends kalturaAction
 			
 			switch ($servePriority)
 			{
-			case 0:
+			case StorageProfile::STORAGE_SERVE_PRIORITY_DEFAULT:
 			case StorageProfile::STORAGE_SERVE_PRIORITY_KALTURA_ONLY:
 				$c->addAnd ( FileSyncPeer::FILE_TYPE , FileSync::FILE_SYNC_FILE_TYPE_URL, Criteria::NOT_EQUAL);
 				break;
