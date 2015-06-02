@@ -964,6 +964,15 @@ class KalturaEntryService extends KalturaBaseService
 			$templateEntry = entryPeer::retrieveByPK($conversionProfile->getDefaultEntryId());
 			if($templateEntry)
 			{
+				$entryType = $entry->type ? $entry->type : "null";
+				$compareMsgString = "ENTRY_TEMPLATE_COPY - original entry:template entry. type - " . $entryType.':'.$templateEntry->getType();
+				if (property_exists(get_class($entry),'mediaType'))
+				{
+					$entryMediaType = $entry->mediaType ? $entry->mediaType : "null";
+					$compareMsgString .= " mediaType - " . $entry->mediaType.":".$templateEntry->getMediaType();
+				}
+				KalturaLog::debug($compareMsgString);
+
 				$dbEntry = $templateEntry->copyTemplate(true);
 				$dbEntry->save();
 			}
