@@ -1144,7 +1144,19 @@ class kJobsManager
  		
 		$batchJob = new BatchJob();
 		$batchJob->setPartnerId($partnerId);
-		
+
+		if(is_subclass_of($objectType, 'entry'))
+		{
+			$batchJob->setObjectId($objectId);
+			$batchJob->setEntryId($objectId);
+			$batchJob->setObjectType(BatchJobObjectType::ENTRY);
+		}
+		elseif(is_subclass_of($objectType, 'category'))
+		{
+			$batchJob->setObjectId($objectId);
+			$batchJob->setObjectType(BatchJobObjectType::CATEGORY);
+		}
+
 		return self::addJob($batchJob, $jobData, BatchJobType::RECALCULATE_CACHE, RecalculateCacheType::RESPONSE_PROFILE);
 	}
 	
