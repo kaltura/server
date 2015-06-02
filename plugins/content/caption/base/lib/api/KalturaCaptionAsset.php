@@ -61,6 +61,24 @@ class KalturaCaptionAsset extends KalturaAsset
 	 */
 	public $status;
 	
+	/**
+	 * The parent id of the asset
+	 *
+	 *@var string
+	 *@readonly
+	 *
+	 */
+	public $parentId;
+	
+	/**
+	 * Is multi-language caption asset
+	 *
+	 *@var bool
+	 *@readonly
+	 *
+	 */
+	public $isMulti;	
+
 	private static $map_between_objects = array
 	(
 		"captionParamsId" => "flavorParamsId",
@@ -69,6 +87,8 @@ class KalturaCaptionAsset extends KalturaAsset
 		"label",
 		"format" => "containerFormat",
 		"status",
+		"parentId",
+		"isMulti",		
 	);
 	
 	public function getMapBetweenObjects ( )
