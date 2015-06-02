@@ -868,6 +868,14 @@ abstract class KalturaObject
 	    }
 	}
 
+	public function replaceSpaceInStringProperty($propertyName, $originalValue)
+	{
+		if (!$this->isNull($propertyName))
+		{
+			$this->$propertyName = str_replace(" ", "\"", $originalValue);
+		}
+	}
+
 	public function cast($className) {
 		if(!is_subclass_of($className, get_class($this)))
 			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_TYPE, get_class($this));
