@@ -182,7 +182,7 @@ class ResponseProfileService extends KalturaBaseService
 	 * 
 	 * @action recalculate
 	 * @param KalturaResponseProfileCacheRecalculateOptions $options
-	 * @return recalculate
+	 * @return KalturaResponseProfileCacheRecalculateResults
 	 */
 	function recalculateAction(KalturaResponseProfileCacheRecalculateOptions $options)
 	{
