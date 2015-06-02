@@ -201,7 +201,13 @@ class CaptionAssetService extends KalturaAssetService
 
 		$finalPath = kFileSyncUtils::getLocalFilePathForKey($syncKey);
 		list($width, $height, $type, $attr) = getimagesize($finalPath);
-		
+
+		if ($this->detectMultiLanguageFile($captionAsset , $finalPath))
+		{
+			//        $captionAsset->setIsMulti(true);
+			//        TODO - create a CAPTION_EXPLODE_LANGUAGES job
+		}
+
 		$captionAsset->setWidth($width);
 		$captionAsset->setHeight($height);
 		$captionAsset->setSize(filesize($finalPath));
@@ -209,7 +215,29 @@ class CaptionAssetService extends KalturaAssetService
 		$captionAsset->setStatus(CaptionAsset::ASSET_STATUS_READY);
 		$captionAsset->save();
 	}
-    
+
+	/**
+	 * @param CaptionAsset $captionAsset
+	 * @param string $path
+	 */
+	protected function detectMultiLanguageFile(CaptionAsset $captionAsset, $path = null)
+	{
+		if (!$path)
+			return false;
+
+		$xmlString = file_get_contents($path);
+		$xmlObj = simplexml_load_string($xmlString);
+		if(!$xmlObj)
+		{
+			KalturaLog::debug("problems with xml");
+			return false;
+		}
+
+		$bodyNode = $xmlObj->body;
+		$divCount = count($bodyNode->div);
+		return $divCount > 1;
+	}
+
 	/**
 	 * @param CaptionAsset $captionAsset
 	 * @param string $url
