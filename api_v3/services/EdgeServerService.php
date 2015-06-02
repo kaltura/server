@@ -140,4 +140,20 @@ class EdgeServerService extends KalturaBaseService
 		return $response;
 	}
 	
+	/**
+	 * Report to Kaltura the edge server is still up
+	 * 
+	 * @action reportStatus
+	 * @param string $hostName
+	 * @throws KalturaErrors::INVALID_OBJECT_ID
+	 */
+	public function reportStatusAction($hostName)
+	{
+		$dbEdgeServer = EdgeServerPeer::retrieveByPartnerIdAndHostName($this->getPartnerId(), $hostName);
+		if (!$dbEdgeServer)
+			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $edgeServerId);
+
+		$dbEdgeServer->updateStatus();
+	}
+	
 }

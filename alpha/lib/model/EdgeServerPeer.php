@@ -25,5 +25,15 @@ class EdgeServerPeer extends BaseEdgeServerPeer {
 		
 		self::$s_criteria_filter->setFilter($c);
 	}
+	
+	public static function retrieveByPartnerIdAndHostName($partnerId, $hostName)
+	{
+		$c = new Criteria();
+		
+		$c->add(EdgeServerPeer::PARTNER_ID, $partnerId);
+		$c->add(EdgeServerPeer::HOST_NAME, $hostName);
+		
+		return EdgeServerPeer::doSelectOne($c);
+	}
 
 } // EdgeServerPeer
