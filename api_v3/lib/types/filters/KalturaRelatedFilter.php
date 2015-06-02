@@ -11,4 +11,9 @@ abstract class KalturaRelatedFilter extends KalturaFilter
 	 * @return KalturaListResponse
 	 */
 	abstract public function getListResponse(KalturaFilterPager $pager, KalturaDetachedResponseProfile $responseProfile = null);
+	
+	public function validateForResponseProfile()
+	{
+		
+	}
 }

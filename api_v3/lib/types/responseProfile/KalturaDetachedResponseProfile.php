@@ -79,7 +79,7 @@ class KalturaDetachedResponseProfile extends KalturaBaseResponseProfile
 		parent::validateForUsage($sourceObject, $propertiesToSkip);
 	}
 	
-	protected function validateNestedObjects($maxPageSize = null, $maxNestingLevel = null)
+	public function validateNestedObjects($maxPageSize = null, $maxNestingLevel = null)
 	{	
 		$relatedProfiles = $this->relatedProfiles;
 		if(!$relatedProfiles)

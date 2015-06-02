@@ -396,7 +396,7 @@ abstract class KalturaObject
 	public function loadRelatedObjects(KalturaDetachedResponseProfile $responseProfile)
 	{
 		// trigger validation
-		$responseProfile->toObject();
+		$responseProfile->validateNestedObjects();
 		
 		if(!$responseProfile->relatedProfiles)
 			return;
@@ -413,11 +413,7 @@ abstract class KalturaObject
 			KalturaLog::debug("Loading related response-profile [$relatedProfile->name] with filter [" . get_class($relatedProfile->filter) . "]");
 
 			$filter = clone $relatedProfile->filter;
-			
-			if(kEntitlementUtils::getEntitlementEnforcement() && (is_a($filter, 'KalturaBaseEntryFilter') || is_a($filter, 'KalturaCategoryFilter') || is_a($filter, 'KalturaCategoryEntryFilter')))
-			{
-				throw new KalturaAPIException(KalturaErrors::CANNOT_LIST_RELATED_ENTITLED_WHEN_ENTITLEMENT_IS_ENABLE, get_class($filter));
-			}
+			/* @var $filter KalturaRelatedFilter */
 			
 			if($relatedProfile->mappings)
 			{
@@ -441,6 +437,7 @@ abstract class KalturaObject
 			{
 				KalturaLog::debug("No mappings defined in response-profile [$relatedProfile->name]");
 			}
+			$filter->validateForResponseProfile();
 			
 			$pager = $relatedProfile->pager;
 			if(!$pager)

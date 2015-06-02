@@ -503,6 +503,8 @@ class KalturaErrors extends APIErrors
 	const CANNOT_INDEX_OBJECT_WHEN_ENTITLEMENT_IS_ENABLE = "CANNOT_INDEX_OBJECT_WHEN_ENTITLEMENT_IS_ENABLE;;Cannot index object when enetitlment is enabled";
 
 	const CANNOT_LIST_RELATED_ENTITLED_WHEN_ENTITLEMENT_IS_ENABLE = "CANNOT_LIST_RELATED_ENTITLED_WHEN_ENTITLEMENT_IS_ENABLE;FILTER;Objects that require entitlement should not be listed [@FILTER@] as related-objects when enetitlment is enabled";
+
+	const USER_KS_CANNOT_LIST_RELATED_ENTRIES = "USER_KS_CANNOT_LIST_RELATED_ENTRIES;FILTER;Entries should not be listed [@FILTER@] as related-objects with unprivileged user ks";
 	
 	// live stream
 	const LIVE_STREAM_STATUS_CANNOT_BE_DETERMINED = "LIVE_STREAM_STATUS_CANNOT_BE_DETERMINED;PROT;Status cannot be determined for live stream protocol [@PROT@]";
