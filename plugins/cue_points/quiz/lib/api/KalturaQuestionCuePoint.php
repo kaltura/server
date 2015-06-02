@@ -75,7 +75,7 @@ class KalturaQuestionCuePoint extends KalturaCuePoint
 		$dbEntry = entryPeer::retrieveByPK($dbObject->getEntryId());
 		if ( !QuizPlugin::validateUserEntitledForQuizEdit($dbEntry) ) {
 			foreach ( $this->optionalAnswers as $answer ) {
-				$answer->isCorrect = null;
+				$answer->isCorrect = KalturaNullableBoolean::NULL_VALUE;
 			}
 			$this->explanation = null;
 		}
