@@ -69,7 +69,7 @@ class KalturaTagFilter extends KalturaFilter
 		}
 		catch (Exception $e)
 		{
-			$this->replaceSpaceInStringProperty('tagStartsWith',$originalTagStartsWith);
+			$this->replaceLastSpaceWithQuotesInStringProperty('tagStartsWith',$originalTagStartsWith);
 			$this->validatePropertyMinLength('tagStartsWith', TagSearchPlugin::MIN_TAG_SEARCH_LENGTH, true, true);
 		}
 		$this->validatePropertyMinLength('tagEqual', TagSearchPlugin::MIN_TAG_SEARCH_LENGTH, true, true);
@@ -93,5 +93,13 @@ class KalturaTagFilter extends KalturaFilter
 		$object->set ('_likex_tag', str_replace(kTagFlowManager::$specialCharacters, kTagFlowManager::$specialCharactersReplacement, $this->tagStartsWith));
 		
 		return parent::toObject($object, $props_to_skip);
+	}
+
+	public function replaceLastSpaceWithQuotesInStringProperty($propertyName, $originalValue)
+	{
+		if (!$this->isNull($propertyName))
+		{
+			$this->$propertyName = preg_replace("/^(.*) $/","$1\"",$originalValue);
+		}
 	}
 }
