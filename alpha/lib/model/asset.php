@@ -533,7 +533,6 @@ class asset extends Baseasset implements ISyncableFile
 					break;
 				}
 
-			case StorageProfile::STORAGE_SERVE_PRIORITY_DEFAULT:
 			case StorageProfile::STORAGE_SERVE_PRIORITY_KALTURA_ONLY:
 				$fileSync = kFileSyncUtils::getReadyInternalFileSyncForKey($syncKey);
 				if(!$fileSync)

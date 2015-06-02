@@ -1089,7 +1089,6 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 					$serveRemote = true;
 					break;
 				
-				case StorageProfile::STORAGE_SERVE_PRIORITY_DEFAULT:
 				case StorageProfile::STORAGE_SERVE_PRIORITY_KALTURA_ONLY:
 					$fileSync = kFileSyncUtils::getReadyInternalFileSyncForKey($syncKey);
 					if(!$fileSync)
