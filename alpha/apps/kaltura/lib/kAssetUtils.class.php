@@ -141,6 +141,7 @@ class kAssetUtils
 			if($urlManager) {
 				$dynamicAttrs = new DeliveryProfileDynamicAttributes();
 				$dynamicAttrs->setFileExtension($asset->getFileExt());
+				$dynamicAttrs->setStorageId($fileSync->getDc());
 				$urlManager->setDynamicAttributes($dynamicAttrs);
 
 				$url = ltrim($urlManager->getFileSyncUrl($fileSync),'/');
