@@ -163,7 +163,7 @@ class SphinxCategoryCriteria extends SphinxCriteria
 		}
 		
 		if($filter->get('_eq_display_in_search')) {
-			$filter->set('_eq_display_in_search', $filter->get('_eq_display_in_search') . "P" . $partnerId);
+			$filter->set('_eq_display_in_search', $filter->get('_eq_display_in_search'));
 		}
 		
 		return parent::applyFilterFields($filter);
