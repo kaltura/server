@@ -585,6 +585,7 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 					$query->setKey($objectKey);
 					$query->setLimit(100);
 					
+					$deletedKeys = array();
 					$list = $cacheStore->query($query);
 					while($list->getCount())
 					{
@@ -593,7 +594,11 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 						foreach($list->getObjects() as $cache)
 						{
 							/* @var $cache kCouchbaseCacheListItem */
-							$keys[] = $cache->getId();
+							if(!isset($deletedKeys[$cache->getId()]))
+							{
+								$keys[] = $cache->getId();
+								$deletedKeys[$cache->getId()] = true;
+							}
 						}
 						$cacheStore->multiDelete($keys);
 						$list = $cacheStore->query($query);
