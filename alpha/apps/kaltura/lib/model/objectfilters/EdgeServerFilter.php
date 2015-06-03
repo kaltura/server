@@ -25,6 +25,12 @@ class EdgeServerFilter extends baseObjectFilter
 			"_like_tags" ,
 			"_mlikeor_tags" ,
 			"_mlikeand_tags",
+			"_like_host_name",
+			"_mlikeor_host_name",
+			"_mlikeand_host_name",
+			"_like_playback_host_name",
+			"_mlikeor_playback_host_name",
+			"_mlikeand_playback_host_name",
 			"_eq_parent_edge_server_id",
 			"_in_parent_edge_server_id",
 			) , NULL );

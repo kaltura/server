@@ -26,8 +26,9 @@ abstract class KalturaEdgeServerBaseFilter extends KalturaFilter
 		"hostNameLike" => "_like_host_name",
 		"hostNameMultiLikeOr" => "_mlikeor_host_name",
 		"hostNameMultiLikeAnd" => "_mlikeand_host_name",
-		"playbackHostNameEqual" => "_eq_playback_host_name",
-		"playbackHostNameIn" => "_in_playback_host_name",
+		"playbackHostNameLike" => "_like_playback_host_name",
+		"playbackHostNameMultiLikeOr" => "_mlikeor_playback_host_name",
+		"playbackHostNameMultiLikeAnd" => "_mlikeand_playback_host_name",
 		"parentIdEqual" => "_eq_parent_id",
 		"parentIdIn" => "_in_parent_id",
 	);
@@ -143,12 +144,17 @@ abstract class KalturaEdgeServerBaseFilter extends KalturaFilter
 	/**
 	 * @var string
 	 */
-	public $playbackHostNameEqual;
+	public $playbackHostNameLike;
 
 	/**
 	 * @var string
 	 */
-	public $playbackHostNameIn;
+	public $playbackHostNameMultiLikeOr;
+	
+	/**
+	 * @var string
+	 */
+	public $playbackHostNameMultiLikeAnd;
 
 	/**
 	 * @var int

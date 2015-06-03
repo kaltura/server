@@ -39,5 +39,15 @@ class EdgeServer extends BaseEdgeServer {
 	{
 		return $this->getFromCustomData(self::CUSTOM_DATA_DELIVERY_IDS, null, array());
 	}
+	
+	public function getPlaybackHostName()
+	{
+		$playbackHostName = $this->playback_host_name;
+		
+		if(!$playbackHostName)
+			$playbackHostName = $this->host_name;
+		
+		return $playbackHostName;
+	}
 
 } // EdgeServer

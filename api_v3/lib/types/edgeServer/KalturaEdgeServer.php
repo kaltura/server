@@ -83,6 +83,7 @@ class KalturaEdgeServer extends KalturaObject implements IFilterable
 	 * edgeServer playback hostName
 	 *
 	 * @var string
+	 * @filter like,mlikeor,mlikeand
 	 * @requiresPermission update
 	 */
 	public $playbackHostName;
