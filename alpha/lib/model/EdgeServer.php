@@ -16,7 +16,6 @@
 class EdgeServer extends BaseEdgeServer {
 	
 	const CUSTOM_DATA_DELIVERY_IDS = 'delivery_profile_ids';
-	const CUSTOM_DATA_PLAYBACK_HOST_NAME = 'playback_host_name';
 
 	/**
 	 * Initializes internal state of EdgeServer object.
@@ -39,16 +38,6 @@ class EdgeServer extends BaseEdgeServer {
 	public function getDeliveryProfileIds()
 	{
 		return $this->getFromCustomData(self::CUSTOM_DATA_DELIVERY_IDS, null, array());
-	}
-	
-	public function setPlaybackHostName($playbackUrl)
-	{
-		$this->putInCustomData(self::CUSTOM_DATA_PLAYBACK_HOST_NAME, $playbackUrl);
-	}
-	
-	public function getPlaybackHostName($playbackUrl)
-	{
-		return $this->getFromCustomData(self::CUSTOM_DATA_PLAYBACK_HOST_NAME, null, $this->getHostName());
 	}
 
 } // EdgeServer
