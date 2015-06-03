@@ -80,6 +80,14 @@ class KalturaEdgeServer extends KalturaObject implements IFilterable
 	public $hostName;
 	
 	/**
+	 * edgeServer playback hostName
+	 *
+	 * @var string
+	 * @requiresPermission update
+	 */
+	public $playbackHostName;
+	
+	/**
 	 * Delivery profile ids
 	 * @var KalturaKeyValueArray
 	 */
@@ -105,6 +113,7 @@ class KalturaEdgeServer extends KalturaObject implements IFilterable
 		"status",
 		"tags",
 		"hostName",
+		"playbackHostName",
 		"deliveryProfileIds",
 		"parentId",
 	);
@@ -134,12 +143,12 @@ class KalturaEdgeServer extends KalturaObject implements IFilterable
 	 */
 	public function validateForInsert($propertiesToSkip = array())
 	{
-		$this->validatePropertyMinLength("name", 1);
-		
+		$this->validateMandatoryAttributes();
+			
 		if($this->systemName)
 		{
-			$c = KalturaCriteria::create(StorageProfilePeer::OM_CLASS);
-			$c->add(StorageProfilePeer::SYSTEM_NAME, $this->systemName);
+			$c = KalturaCriteria::create(EdgeServerPeer::OM_CLASS);
+			$c->add(EdgeServerPeer::SYSTEM_NAME, $this->systemName);
 			if(StorageProfilePeer::doCount($c))
 				throw new KalturaAPIException(KalturaErrors::SYSTEM_NAME_ALREADY_EXISTS, $this->systemName);
 		}
@@ -152,18 +161,24 @@ class KalturaEdgeServer extends KalturaObject implements IFilterable
 	 */
 	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
 	{
-		$this->validatePropertyMinLength("name", 1, true);
+		$this->validateMandatoryAttributes();
 		
 		if($this->systemName)
 		{
 			$c = KalturaCriteria::create(EdgeServerPeer::OM_CLASS);
 			$c->add(EdgeServerPeer::ID, $sourceObject->getId(), Criteria::NOT_EQUAL);
-			$c->add(StorageProfilePeer::SYSTEM_NAME, $this->systemName);
+			$c->add(EdgeServerPeer::SYSTEM_NAME, $this->systemName);
 			if(EdgeServerPeer::doCount($c))
 				throw new KalturaAPIException(KalturaErrors::SYSTEM_NAME_ALREADY_EXISTS, $this->systemName);
 		}
 		
 		return parent::validateForUpdate($sourceObject, $propertiesToSkip);
+	}
+	
+	public function validateMandatoryAttributes()
+	{
+		$this->validatePropertyMinLength("name", 1, true);
+		$this->validatePropertyNotNull("hostName");
 	}
 	
 	/* (non-PHPdoc)
