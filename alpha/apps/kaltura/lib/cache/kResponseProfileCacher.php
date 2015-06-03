@@ -567,7 +567,8 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 		
 	protected function deleteCachedObjects(IBaseObject $object)
 	{
-		KalturaLog::debug('Invalidating object [' . get_class($object) . '] id [' . $object->getPrimaryKey() . '] cache');
+		$objectKey = self::getObjectKey($object);
+		KalturaLog::debug("Invalidating object [" . get_class($object) . "] id [" . $object->getPrimaryKey() . "] key [$objectKey]");
 		
 		/* @var $object IBaseObject */
 		$cacheStores = self::getStores();
@@ -578,7 +579,7 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 				$query = $cacheStore->getNewQuery(kCouchbaseCacheQuery::VIEW_RESPONSE_PROFILE_OBJECT_SPECIFIC);
 				if($query)
 				{
-					$query->addKey('objectKey', self::getObjectKey($object));
+					$query->addKey('objectKey', $objectKey);
 					$query->setLimit(100);
 					
 					$list = $cacheStore->query($query);
