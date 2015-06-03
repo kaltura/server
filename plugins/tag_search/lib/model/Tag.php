@@ -50,9 +50,7 @@ class Tag extends BaseTag implements IIndexable
 		parent::postInsert($con);
 	
 		if (!$this->alreadyInSave)
-		{
 			kEventsManager::raiseEvent(new kObjectReadyForIndexEvent($this));
-		}
 	}
 	
 	/* (non-PHPdoc)
@@ -63,9 +61,7 @@ class Tag extends BaseTag implements IIndexable
 		parent::postUpdate($con);
 		
 		if (!$this->alreadyInSave)
-		{
 			kEventsManager::raiseEvent(new kObjectUpdatedEvent($this));
-		}
 	}
 	
 	/**
