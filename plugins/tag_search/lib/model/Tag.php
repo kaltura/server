@@ -51,10 +51,6 @@ class Tag extends BaseTag implements IIndexable
 	
 		if (!$this->alreadyInSave)
 		{
-			/*
-			 * We replace space with '=' in order to be able to search for tags that have space in them and the first word has less than 3 letters
-			 */
-			$this->tag = str_replace(" ", "=", $this->tag);
 			kEventsManager::raiseEvent(new kObjectReadyForIndexEvent($this));
 		}
 	}
@@ -68,7 +64,6 @@ class Tag extends BaseTag implements IIndexable
 		
 		if (!$this->alreadyInSave)
 		{
-			$this->tag = str_replace(" ", "=", $this->tag);
 			kEventsManager::raiseEvent(new kObjectUpdatedEvent($this));
 		}
 	}
@@ -137,5 +132,13 @@ class Tag extends BaseTag implements IIndexable
 			return $indexedFieldValue;
 		}
 	}
-	
+
+	public function gettagWithEqual()
+	{
+		/*
+		 * We replace space with '=' in order to be able to search for tags that have space in them and the first word has less than 3 letters
+		 */
+		return str_replace(" ", "=", $this->tag);
+	}
+
 } // Tag
