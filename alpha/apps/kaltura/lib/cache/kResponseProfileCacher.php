@@ -420,6 +420,7 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 					$list = $cacheStore->query($query);
 					while(count($list->getObjects()))
 					{
+						KalturaLog::debug('Found [' . $list->getCount() . '] items');
 						foreach ($list->getObjects() as $cacheObject)
 						{
 							/* @var $cacheObject kCouchbaseCacheListItem */
@@ -471,6 +472,7 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 						$query->setLimit(self::MAX_CACHE_KEYS_PER_JOB);
 	
 						$list = $cacheStore->query($query);
+						KalturaLog::debug('Found [' . $list->getCount() . '] items');
 						$array = array();
 						foreach ($list->getObjects() as $cacheObject)
 						{
@@ -582,6 +584,7 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 					$list = $cacheStore->query($query);
 					while($list->getCount())
 					{
+						KalturaLog::debug('Found [' . $list->getCount() . '] items');
 						$keys = array();
 						foreach($list->getObjects() as $cache)
 						{
