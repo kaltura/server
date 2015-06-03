@@ -26,7 +26,7 @@ abstract class BaseEdgeServerPeer {
 	const TM_CLASS = 'EdgeServerTableMap';
 	
 	/** The total number of columns. */
-	const NUM_COLUMNS = 12;
+	const NUM_COLUMNS = 13;
 
 	/** The number of lazy-loaded columns. */
 	const NUM_LAZY_LOAD_COLUMNS = 0;
@@ -61,6 +61,9 @@ abstract class BaseEdgeServerPeer {
 	/** the column name for the HOST_NAME field */
 	const HOST_NAME = 'edge_server.HOST_NAME';
 
+	/** the column name for the PLAYBACK_HOST_NAME field */
+	const PLAYBACK_HOST_NAME = 'edge_server.PLAYBACK_HOST_NAME';
+
 	/** the column name for the PARENT_ID field */
 	const PARENT_ID = 'edge_server.PARENT_ID';
 
@@ -83,11 +86,11 @@ abstract class BaseEdgeServerPeer {
 	 * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
 	 */
 	private static $fieldNames = array (
-		BasePeer::TYPE_PHPNAME => array ('Id', 'CreatedAt', 'UpdatedAt', 'PartnerId', 'Name', 'SystemName', 'Desciption', 'Status', 'Tags', 'HostName', 'ParentId', 'CustomData', ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'createdAt', 'updatedAt', 'partnerId', 'name', 'systemName', 'desciption', 'status', 'tags', 'hostName', 'parentId', 'customData', ),
-		BasePeer::TYPE_COLNAME => array (self::ID, self::CREATED_AT, self::UPDATED_AT, self::PARTNER_ID, self::NAME, self::SYSTEM_NAME, self::DESCIPTION, self::STATUS, self::TAGS, self::HOST_NAME, self::PARENT_ID, self::CUSTOM_DATA, ),
-		BasePeer::TYPE_FIELDNAME => array ('id', 'created_at', 'updated_at', 'partner_id', 'name', 'system_name', 'desciption', 'status', 'tags', 'host_name', 'parent_id', 'custom_data', ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, )
+		BasePeer::TYPE_PHPNAME => array ('Id', 'CreatedAt', 'UpdatedAt', 'PartnerId', 'Name', 'SystemName', 'Desciption', 'Status', 'Tags', 'HostName', 'PlaybackHostName', 'ParentId', 'CustomData', ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'createdAt', 'updatedAt', 'partnerId', 'name', 'systemName', 'desciption', 'status', 'tags', 'hostName', 'playbackHostName', 'parentId', 'customData', ),
+		BasePeer::TYPE_COLNAME => array (self::ID, self::CREATED_AT, self::UPDATED_AT, self::PARTNER_ID, self::NAME, self::SYSTEM_NAME, self::DESCIPTION, self::STATUS, self::TAGS, self::HOST_NAME, self::PLAYBACK_HOST_NAME, self::PARENT_ID, self::CUSTOM_DATA, ),
+		BasePeer::TYPE_FIELDNAME => array ('id', 'created_at', 'updated_at', 'partner_id', 'name', 'system_name', 'desciption', 'status', 'tags', 'host_name', 'playback_host_name', 'parent_id', 'custom_data', ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, )
 	);
 
 	/**
@@ -97,11 +100,11 @@ abstract class BaseEdgeServerPeer {
 	 * e.g. self::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
 	 */
 	private static $fieldKeys = array (
-		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'CreatedAt' => 1, 'UpdatedAt' => 2, 'PartnerId' => 3, 'Name' => 4, 'SystemName' => 5, 'Desciption' => 6, 'Status' => 7, 'Tags' => 8, 'HostName' => 9, 'ParentId' => 10, 'CustomData' => 11, ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'createdAt' => 1, 'updatedAt' => 2, 'partnerId' => 3, 'name' => 4, 'systemName' => 5, 'desciption' => 6, 'status' => 7, 'tags' => 8, 'hostName' => 9, 'parentId' => 10, 'customData' => 11, ),
-		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::CREATED_AT => 1, self::UPDATED_AT => 2, self::PARTNER_ID => 3, self::NAME => 4, self::SYSTEM_NAME => 5, self::DESCIPTION => 6, self::STATUS => 7, self::TAGS => 8, self::HOST_NAME => 9, self::PARENT_ID => 10, self::CUSTOM_DATA => 11, ),
-		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'created_at' => 1, 'updated_at' => 2, 'partner_id' => 3, 'name' => 4, 'system_name' => 5, 'desciption' => 6, 'status' => 7, 'tags' => 8, 'host_name' => 9, 'parent_id' => 10, 'custom_data' => 11, ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, )
+		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'CreatedAt' => 1, 'UpdatedAt' => 2, 'PartnerId' => 3, 'Name' => 4, 'SystemName' => 5, 'Desciption' => 6, 'Status' => 7, 'Tags' => 8, 'HostName' => 9, 'PlaybackHostName' => 10, 'ParentId' => 11, 'CustomData' => 12, ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'createdAt' => 1, 'updatedAt' => 2, 'partnerId' => 3, 'name' => 4, 'systemName' => 5, 'desciption' => 6, 'status' => 7, 'tags' => 8, 'hostName' => 9, 'playbackHostName' => 10, 'parentId' => 11, 'customData' => 12, ),
+		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::CREATED_AT => 1, self::UPDATED_AT => 2, self::PARTNER_ID => 3, self::NAME => 4, self::SYSTEM_NAME => 5, self::DESCIPTION => 6, self::STATUS => 7, self::TAGS => 8, self::HOST_NAME => 9, self::PLAYBACK_HOST_NAME => 10, self::PARENT_ID => 11, self::CUSTOM_DATA => 12, ),
+		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'created_at' => 1, 'updated_at' => 2, 'partner_id' => 3, 'name' => 4, 'system_name' => 5, 'desciption' => 6, 'status' => 7, 'tags' => 8, 'host_name' => 9, 'playback_host_name' => 10, 'parent_id' => 11, 'custom_data' => 12, ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, )
 	);
 
 	/**
@@ -181,6 +184,7 @@ abstract class BaseEdgeServerPeer {
 		$criteria->addSelectColumn(EdgeServerPeer::STATUS);
 		$criteria->addSelectColumn(EdgeServerPeer::TAGS);
 		$criteria->addSelectColumn(EdgeServerPeer::HOST_NAME);
+		$criteria->addSelectColumn(EdgeServerPeer::PLAYBACK_HOST_NAME);
 		$criteria->addSelectColumn(EdgeServerPeer::PARENT_ID);
 		$criteria->addSelectColumn(EdgeServerPeer::CUSTOM_DATA);
 	}

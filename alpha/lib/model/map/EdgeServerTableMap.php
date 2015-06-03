@@ -47,6 +47,7 @@ class EdgeServerTableMap extends TableMap {
 		$this->addColumn('STATUS', 'Status', 'INTEGER', false, null, null);
 		$this->addColumn('TAGS', 'Tags', 'LONGVARCHAR', false, null, null);
 		$this->addColumn('HOST_NAME', 'HostName', 'VARCHAR', false, 127, null);
+		$this->addColumn('PLAYBACK_HOST_NAME', 'PlaybackHostName', 'VARCHAR', false, 127, null);
 		$this->addColumn('PARENT_ID', 'ParentId', 'INTEGER', false, null, 0);
 		$this->addColumn('CUSTOM_DATA', 'CustomData', 'LONGVARCHAR', false, null, null);
 		// validators

@@ -80,6 +80,12 @@ abstract class BaseEdgeServer extends BaseObject  implements Persistent {
 	protected $host_name;
 
 	/**
+	 * The value for the playback_host_name field.
+	 * @var        string
+	 */
+	protected $playback_host_name;
+
+	/**
 	 * The value for the parent_id field.
 	 * Note: this column has a database default value of: 0
 	 * @var        int
@@ -316,6 +322,16 @@ abstract class BaseEdgeServer extends BaseObject  implements Persistent {
 	public function getHostName()
 	{
 		return $this->host_name;
+	}
+
+	/**
+	 * Get the [playback_host_name] column value.
+	 * 
+	 * @return     string
+	 */
+	public function getPlaybackHostName()
+	{
+		return $this->playback_host_name;
 	}
 
 	/**
@@ -621,6 +637,29 @@ abstract class BaseEdgeServer extends BaseObject  implements Persistent {
 	} // setHostName()
 
 	/**
+	 * Set the value of [playback_host_name] column.
+	 * 
+	 * @param      string $v new value
+	 * @return     EdgeServer The current object (for fluent API support)
+	 */
+	public function setPlaybackHostName($v)
+	{
+		if(!isset($this->oldColumnsValues[EdgeServerPeer::PLAYBACK_HOST_NAME]))
+			$this->oldColumnsValues[EdgeServerPeer::PLAYBACK_HOST_NAME] = $this->playback_host_name;
+
+		if ($v !== null) {
+			$v = (string) $v;
+		}
+
+		if ($this->playback_host_name !== $v) {
+			$this->playback_host_name = $v;
+			$this->modifiedColumns[] = EdgeServerPeer::PLAYBACK_HOST_NAME;
+		}
+
+		return $this;
+	} // setPlaybackHostName()
+
+	/**
 	 * Set the value of [parent_id] column.
 	 * 
 	 * @param      int $v new value
@@ -712,8 +751,9 @@ abstract class BaseEdgeServer extends BaseObject  implements Persistent {
 			$this->status = ($row[$startcol + 7] !== null) ? (int) $row[$startcol + 7] : null;
 			$this->tags = ($row[$startcol + 8] !== null) ? (string) $row[$startcol + 8] : null;
 			$this->host_name = ($row[$startcol + 9] !== null) ? (string) $row[$startcol + 9] : null;
-			$this->parent_id = ($row[$startcol + 10] !== null) ? (int) $row[$startcol + 10] : null;
-			$this->custom_data = ($row[$startcol + 11] !== null) ? (string) $row[$startcol + 11] : null;
+			$this->playback_host_name = ($row[$startcol + 10] !== null) ? (string) $row[$startcol + 10] : null;
+			$this->parent_id = ($row[$startcol + 11] !== null) ? (int) $row[$startcol + 11] : null;
+			$this->custom_data = ($row[$startcol + 12] !== null) ? (string) $row[$startcol + 12] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -723,7 +763,7 @@ abstract class BaseEdgeServer extends BaseObject  implements Persistent {
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 12; // 12 = EdgeServerPeer::NUM_COLUMNS - EdgeServerPeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 13; // 13 = EdgeServerPeer::NUM_COLUMNS - EdgeServerPeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating EdgeServer object", $e);
@@ -1268,9 +1308,12 @@ abstract class BaseEdgeServer extends BaseObject  implements Persistent {
 				return $this->getHostName();
 				break;
 			case 10:
-				return $this->getParentId();
+				return $this->getPlaybackHostName();
 				break;
 			case 11:
+				return $this->getParentId();
+				break;
+			case 12:
 				return $this->getCustomData();
 				break;
 			default:
@@ -1304,8 +1347,9 @@ abstract class BaseEdgeServer extends BaseObject  implements Persistent {
 			$keys[7] => $this->getStatus(),
 			$keys[8] => $this->getTags(),
 			$keys[9] => $this->getHostName(),
-			$keys[10] => $this->getParentId(),
-			$keys[11] => $this->getCustomData(),
+			$keys[10] => $this->getPlaybackHostName(),
+			$keys[11] => $this->getParentId(),
+			$keys[12] => $this->getCustomData(),
 		);
 		return $result;
 	}
@@ -1368,9 +1412,12 @@ abstract class BaseEdgeServer extends BaseObject  implements Persistent {
 				$this->setHostName($value);
 				break;
 			case 10:
-				$this->setParentId($value);
+				$this->setPlaybackHostName($value);
 				break;
 			case 11:
+				$this->setParentId($value);
+				break;
+			case 12:
 				$this->setCustomData($value);
 				break;
 		} // switch()
@@ -1407,8 +1454,9 @@ abstract class BaseEdgeServer extends BaseObject  implements Persistent {
 		if (array_key_exists($keys[7], $arr)) $this->setStatus($arr[$keys[7]]);
 		if (array_key_exists($keys[8], $arr)) $this->setTags($arr[$keys[8]]);
 		if (array_key_exists($keys[9], $arr)) $this->setHostName($arr[$keys[9]]);
-		if (array_key_exists($keys[10], $arr)) $this->setParentId($arr[$keys[10]]);
-		if (array_key_exists($keys[11], $arr)) $this->setCustomData($arr[$keys[11]]);
+		if (array_key_exists($keys[10], $arr)) $this->setPlaybackHostName($arr[$keys[10]]);
+		if (array_key_exists($keys[11], $arr)) $this->setParentId($arr[$keys[11]]);
+		if (array_key_exists($keys[12], $arr)) $this->setCustomData($arr[$keys[12]]);
 	}
 
 	/**
@@ -1430,6 +1478,7 @@ abstract class BaseEdgeServer extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(EdgeServerPeer::STATUS)) $criteria->add(EdgeServerPeer::STATUS, $this->status);
 		if ($this->isColumnModified(EdgeServerPeer::TAGS)) $criteria->add(EdgeServerPeer::TAGS, $this->tags);
 		if ($this->isColumnModified(EdgeServerPeer::HOST_NAME)) $criteria->add(EdgeServerPeer::HOST_NAME, $this->host_name);
+		if ($this->isColumnModified(EdgeServerPeer::PLAYBACK_HOST_NAME)) $criteria->add(EdgeServerPeer::PLAYBACK_HOST_NAME, $this->playback_host_name);
 		if ($this->isColumnModified(EdgeServerPeer::PARENT_ID)) $criteria->add(EdgeServerPeer::PARENT_ID, $this->parent_id);
 		if ($this->isColumnModified(EdgeServerPeer::CUSTOM_DATA)) $criteria->add(EdgeServerPeer::CUSTOM_DATA, $this->custom_data);
 
@@ -1527,6 +1576,8 @@ abstract class BaseEdgeServer extends BaseObject  implements Persistent {
 		$copyObj->setTags($this->tags);
 
 		$copyObj->setHostName($this->host_name);
+
+		$copyObj->setPlaybackHostName($this->playback_host_name);
 
 		$copyObj->setParentId($this->parent_id);
 
