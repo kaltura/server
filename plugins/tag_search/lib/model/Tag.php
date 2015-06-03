@@ -50,7 +50,13 @@ class Tag extends BaseTag implements IIndexable
 		parent::postInsert($con);
 	
 		if (!$this->alreadyInSave)
+		{
+			/*
+			 * We replace space with '=' in order to be able to search for tags that have space in them and the first word has less than 3 letters
+			 */
+			$this->tag = str_replace(" ", "=", $this->tag);
 			kEventsManager::raiseEvent(new kObjectReadyForIndexEvent($this));
+		}
 	}
 	
 	/* (non-PHPdoc)
@@ -61,7 +67,10 @@ class Tag extends BaseTag implements IIndexable
 		parent::postUpdate($con);
 		
 		if (!$this->alreadyInSave)
+		{
+			$this->tag = str_replace(" ", "=", $this->tag);
 			kEventsManager::raiseEvent(new kObjectUpdatedEvent($this));
+		}
 	}
 	
 	/**

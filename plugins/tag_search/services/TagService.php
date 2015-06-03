@@ -35,7 +35,12 @@ class TagService extends KalturaBaseService
         }
         
         $tagFilter->validate();
-        
+/*
+ * We replace the spaces with '=' because when we index the tags we also replace them this way. This way when we search the sphinx for expressions using spaces that the first word in them is less than 3 letters
+ * we can still find them.
+ */
+	    $tagFilter->tagStartsWith = str_replace(" ","=",$tagFilter->tagStartsWith);
+
         $c = KalturaCriteria::create(TagPeer::OM_CLASS);
         $tagCoreFilter = new TagFilter();
         $tagFilter->toObject($tagCoreFilter);
