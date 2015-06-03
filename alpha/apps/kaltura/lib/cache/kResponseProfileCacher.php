@@ -261,17 +261,8 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 	protected function hasCachedRelatedObjects(IBaseObject $object)
 	{
 		$peer = $object->getPeer();
-		if(!($peer instanceof IRelatedObjectPeer))
+		if(!($peer instanceof IRelatedObjectPeer) || !$peer->isReferenced($object))
 		{
-			return false;
-		}
-		
-		if(!$peer->isReferenced($object))
-		{
-			$roots = $peer->getRootObjects($object);
-			if(count($roots))
-				return true;
-				
 			return false;
 		}
 		
