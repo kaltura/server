@@ -557,6 +557,21 @@ abstract class LiveEntry extends entry
 		return $cacheStore->get($key);
 	}
 	
+	/**
+	 *
+	 * Store given value in cache for with the given key as an identifier
+	 * @param string $key
+	 */
+	private function storeInCache($key)
+	{
+		$cacheType = self::getCacheType();
+		$cacheStore = kCacheManager::getSingleLayerCache($cacheType);
+		if(! $cacheStore)
+			return false;
+		
+		return $cacheStore->set($key, true, kConf::get('media_server_cache_expiry', 'local', self::DEFAULT_CACHE_EXPIRY));
+	}
+	
 	public function setMediaServer($index, $hostname, $applicationName = null)
 	{
 		if(is_null($this->getFirstBroadcast())) 
@@ -569,8 +584,7 @@ abstract class LiveEntry extends entry
 		}
 		
 		$key = $this->getId() . "_{$hostname}_{$index}";
-		if(kCacheManager::storeInCache(self::getCacheType(), $key, kConf::get('media_server_cache_expiry', 'local', self::DEFAULT_CACHE_EXPIRY)) 
-				&& $this->isMediaServerRegistered($index, $hostname))
+		if($this->storeInCache($key) && $this->isMediaServerRegistered($index, $hostname))
 			return;
 		
 		$this->setLastBroadcast(kApiCache::getTime());

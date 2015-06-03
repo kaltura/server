@@ -16,7 +16,6 @@
 class EdgeServer extends BaseEdgeServer {
 	
 	const CUSTOM_DATA_DELIVERY_IDS = 'delivery_profile_ids';
-	const DEFAULT_CACHE_EXPIRY = 300;
 
 	/**
 	 * Initializes internal state of EdgeServer object.
@@ -39,18 +38,6 @@ class EdgeServer extends BaseEdgeServer {
 	public function getDeliveryProfileIds()
 	{
 		return $this->getFromCustomData(self::CUSTOM_DATA_DELIVERY_IDS, null, array());
-	}
-	
-	private static function getCacheType()
-	{
-		return kCacheManager::CACHE_TYPE_EDGE_SERVER . '_' . kDataCenterMgr::getCurrentDcId();
-	}
-	
-	public function updateStatus()
-	{
-		$key = $this->getId() . "_" . $this->getHostName();
-		if(!kCacheManager::storeInCache(self::getCacheType(), $key, kConf::get('edge_server_cache_expiry', 'local', self::DEFAULT_CACHE_EXPIRY)))
-			KalturaLog::debug("Failed to store edgse server [{$this->getHostName()}] in cache");
 	}
 
 } // EdgeServer
