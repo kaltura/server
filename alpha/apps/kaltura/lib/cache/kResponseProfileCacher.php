@@ -28,12 +28,24 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 		return self::$cacheStores;
 	}
 	
-	protected static function set($key, $value)
+	protected static function invalidate($invalidationKey)
+	{
+		self::set($invalidationKey, time());
+	}
+	
+	protected static function set($key, $value, $invalidationKey = null)
 	{
 		KalturaLog::debug("Key [$key]");
+		
 		$cacheStores = self::getStores();
 		foreach ($cacheStores as $cacheStore)
 		{
+			/* @var $cacheStore kBaseCacheWrapper */
+			if($invalidationKey)
+			{
+				$cacheStore->add($invalidationKey, time());
+			}
+			
 			$cacheStore->set($key, $value);
 		}
 	}
@@ -48,7 +60,7 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 		}
 	}
 	
-	protected static function get($key)
+	protected static function get($key, $invalidationKey = null)
 	{
 		KalturaLog::debug("Key [$key]");
 		$cacheStores = self::getStores();
@@ -66,6 +78,13 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 			
 			if($value)
 			{
+				if($invalidationKey && $value->time)
+				{
+					$invalidationTime = self::get($invalidationKey);
+					if(intval($invalidationTime) > intval($value->time))
+						return null;
+				}
+				
 				return $value;
 			}
 		}
@@ -556,6 +575,8 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 	
 	protected function invalidateCachedObject(IBaseObject $object)
 	{
+		self::invalidate(self::getObjectKey($object));
+		
 		if(PermissionPeer::isValidForPartner(PermissionName::FEATURE_RECALCULATE_RESPONSE_PROFILE_CACHE, $object->getPartnerId()))
 		{
 			$this->addRecalculateObjectCacheJob($object);

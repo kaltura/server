@@ -22,6 +22,7 @@ class KalturaResponseProfileCacher extends kResponseProfileCacher
 	{
 		return array(
 			'type' => 'primaryObject',
+			'time' => time(),
 			'objectKey' => self::getObjectKey($object),
 			'sessionKey' => self::getSessionKey(),
 			'objectType' => get_class($object),
@@ -125,7 +126,7 @@ class KalturaResponseProfileCacher extends kResponseProfileCacher
 		if(self::get($responseProfileCacheKey))
 		{
 			$key = self::getObjectSpecificCacheKey($object, $responseProfileKey);
-			$value = self::get($key);
+			$value = self::get($key, self::getObjectKey($object));
 			if($value)
 			{
 				$apiObject = unserialize($value->apiObject);
@@ -174,7 +175,7 @@ class KalturaResponseProfileCacher extends kResponseProfileCacher
 		$key = self::getObjectSpecificCacheKey(self::$cachedObject, self::$responseProfileKey);
 		$value = self::getObjectSpecificCacheValue($apiObject, self::$cachedObject, self::$responseProfileKey);
 		
-		self::set($key, $value);
+		self::set($key, $value, self::getObjectKey(self::$cachedObject));
 		
 		self::$cachedObject = null;
 	}
@@ -205,7 +206,7 @@ class KalturaResponseProfileCacher extends kResponseProfileCacher
 		$key = self::getObjectSpecificCacheKey($object, $responseProfile->getKey());
 		$value = self::getObjectSpecificCacheValue($apiObject, $object, $responseProfile->getKey());
 		
-		self::set($key, $value);
+		self::set($key, $value, self::getObjectKey($object));
 	}
 	
 	/**
