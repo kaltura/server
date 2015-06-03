@@ -32,7 +32,7 @@ class CaptionAsset extends asset
 	public function setDefault($v)		{$this->putInCustomData(self::CUSTOM_DATA_FIELD_DEFAULT, (bool)$v);}
 	public function setLabel($v)		{$this->putInCustomData(self::CUSTOM_DATA_FIELD_LABEL, $v);}
 	public function setParentId($v)     {$this->putInCustomData(self::CUSTOM_DATA_PARENT_ID, $v);}
-	public function setIsMulti($v)      {$this->putInCustomData(self::IS_MULTI, (bool)$v);}
+	public function setIsMulti($v)      {$this->putInCustomData(self::CUSTOM_DATA_IS_MULTI, (bool)$v);}
 
 	public function getFinalDownloadUrlPathWithoutKs()
 	{

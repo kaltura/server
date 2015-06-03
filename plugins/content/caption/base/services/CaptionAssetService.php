@@ -202,7 +202,7 @@ class CaptionAssetService extends KalturaAssetService
 		$finalPath = kFileSyncUtils::getLocalFilePathForKey($syncKey);
 		list($width, $height, $type, $attr) = getimagesize($finalPath);
 
-		if ($this->detectMultiLanguageFile($captionAsset , $finalPath))
+		if ($this->isMultiLanguageFile($captionAsset , $finalPath))
 		{
 			//        $captionAsset->setIsMulti(true);
 			//        TODO - create a CAPTION_EXPLODE_LANGUAGES job
@@ -220,7 +220,7 @@ class CaptionAssetService extends KalturaAssetService
 	 * @param CaptionAsset $captionAsset
 	 * @param string $path
 	 */
-	protected function detectMultiLanguageFile(CaptionAsset $captionAsset, $path = null)
+	protected function isMultiLanguageFile(CaptionAsset $captionAsset, $path = null)
 	{
 		if (!$path)
 			return false;

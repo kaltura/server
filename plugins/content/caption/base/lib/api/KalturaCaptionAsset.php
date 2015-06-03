@@ -65,7 +65,7 @@ class KalturaCaptionAsset extends KalturaAsset
 	 * The parent id of the asset
 	 *
 	 *@var string
-	 *@readonly
+	 *@insertonly
 	 *
 	 */
 	public $parentId;
