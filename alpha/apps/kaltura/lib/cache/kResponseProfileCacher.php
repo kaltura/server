@@ -120,15 +120,25 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 	{
 		if($object instanceof ResponseProfile)
 			return $this->deleteResponseProfileCache($object);
-			
+
+		/* @var $object IBaseObject */
 		if($this->isCachedObject($object))
+		{
+			KalturaLog::debug('Object [' . get_class($object) . '] id [' . $object->getPrimaryKey() . '] is cached object');
 			$this->invalidateCachedObject($object);
+		}
 			
 		if($this->hasCachedRootObjects($object))
+		{
+			KalturaLog::debug('Object [' . get_class($object) . '] id [' . $object->getPrimaryKey() . '] has cached root objects');
 			$this->invalidateCachedRootObjects($object);
+		}
 			
 		if($this->hasCachedRelatedObjects($object))
+		{
+			KalturaLog::debug('Object [' . get_class($object) . '] id [' . $object->getPrimaryKey() . '] has cached related objects');
 			$this->addRecalculateRelatedObjectsCacheJob($object);
+		}
 			
 		return true;
 	}
@@ -140,15 +150,18 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 	{
 		if($object instanceof ResponseProfile)
 			return true;
-			
-		if($this->hasCachedRelatedObjects($object))
-			return true;
-			
-		if($this->hasCachedRootObjects($object))
-			return true;
-			
-		if($this->isCachedObject($object))
-			return true;
+
+		if($object instanceof IBaseObject)
+		{
+			if($this->hasCachedRelatedObjects($object))
+				return true;
+				
+			if($this->hasCachedRootObjects($object))
+				return true;
+				
+			if($this->isCachedObject($object))
+				return true;
+		}
 			
 		return false;
 	}
@@ -160,15 +173,26 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 	{
 		if($object instanceof ResponseProfile)
 			return $this->deleteResponseProfileCache($object);
-			
+
+		/* @var $object IBaseObject */
+		
 		if($this->isCachedObject($object))
+		{
+			KalturaLog::debug('Object [' . get_class($object) . '] id [' . $object->getPrimaryKey() . '] is cached object');
 			$this->invalidateCachedObject($object);
-			
+		}
+					
 		if($this->hasCachedRelatedObjects($object))
+		{
+			KalturaLog::debug('Object [' . get_class($object) . '] id [' . $object->getPrimaryKey() . '] has cached related objects');
 			$this->addRecalculateRelatedObjectsCacheJob($object);
+		}
 			
 		if($this->hasCachedRootObjects($object))
+		{
+			KalturaLog::debug('Object [' . get_class($object) . '] id [' . $object->getPrimaryKey() . '] has cached root objects');
 			$this->invalidateCachedRootObjects($object);
+		}
 			
 		return true;
 	}
@@ -180,15 +204,18 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 	{
 		if($object instanceof ResponseProfile)
 			return true;
-			
-		if($this->hasCachedRelatedObjects($object))
-			return true;
-			
-		if($this->hasCachedRootObjects($object))
-			return true;
-			
-		if($this->isCachedObject($object))
-			return true;
+
+		if($object instanceof IBaseObject)
+		{
+			if($this->hasCachedRelatedObjects($object))
+				return true;
+				
+			if($this->hasCachedRootObjects($object))
+				return true;
+				
+			if($this->isCachedObject($object))
+				return true;
+		}
 			
 		return false;
 	}
@@ -198,11 +225,18 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 	 */
 	public function objectAdded(BaseObject $object, BatchJob $raisedJob = null)
 	{
+		/* @var $object IBaseObject */
 		if($this->hasCachedRelatedObjects($object))
+		{
+			KalturaLog::debug('Object [' . get_class($object) . '] id [' . $object->getPrimaryKey() . '] has cached related objects');
 			return $this->addRecalculateRelatedObjectsCacheJob($object);
+		}
 			
 		if($this->hasCachedRootObjects($object))
+		{
+			KalturaLog::debug('Object [' . get_class($object) . '] id [' . $object->getPrimaryKey() . '] has cached root objects');
 			return $this->invalidateCachedRootObjects($object);
+		}
 			
 		return true;
 	}
@@ -212,51 +246,51 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 	 */
 	public function shouldConsumeAddedEvent(BaseObject $object)
 	{
-		if($this->hasCachedRelatedObjects($object))
-			return true;
-			
-		if($this->hasCachedRootObjects($object))
-			return true;
+		if($object instanceof IBaseObject)
+		{
+			if($this->hasCachedRelatedObjects($object))
+				return true;
+				
+			if($this->hasCachedRootObjects($object))
+				return true;
+		}
 			
 		return false;
 	}
 	
-	protected function hasCachedRelatedObjects(BaseObject $object)
+	protected function hasCachedRelatedObjects(IBaseObject $object)
 	{
-		if($object instanceof IBaseObject)
+		$peer = $object->getPeer();
+		if(!($peer instanceof IRelatedObjectPeer))
 		{
-			$peer = $object->getPeer();
-			if(!($peer instanceof IRelatedObjectPeer))
+			return false;
+		}
+		
+		if(!$peer->isReferenced($object))
+		{
+			$roots = $peer->getRootObjects($object);
+			if(count($roots))
+				return true;
+				
+			return false;
+		}
+		
+		$cacheStores = self::getStores();
+		foreach ($cacheStores as $cacheStore)
+		{
+			if($cacheStore instanceof kCouchbaseCacheWrapper)
 			{
-				return false;
-			}
-			
-			if(!$peer->isReferenced($object))
-			{
-				$roots = $peer->getRootObjects($object);
-				if(count($roots))
-					return true;
-					
-				return false;
-			}
-			
-			$cacheStores = self::getStores();
-			foreach ($cacheStores as $cacheStore)
-			{
-				if($cacheStore instanceof kCouchbaseCacheWrapper)
+				$query = $cacheStore->getNewQuery(kCouchbaseCacheQuery::VIEW_RESPONSE_PROFILE_RELATED_OBJECT_SESSIONS);
+				if($query)
 				{
-					$query = $cacheStore->getNewQuery(kCouchbaseCacheQuery::VIEW_RESPONSE_PROFILE_RELATED_OBJECT_SESSIONS);
-					if($query)
-					{
-						$query->addStartKey('triggerKey', self::getTriggerKey($object));
-						$query->addStartKey('objectType', 'a');
-						$query->addStartKey('sessionKey', 'a');
-						$query->setLimit(1);
-						
-						$list = $cacheStore->query($query);
-						if($list->getCount())
-							return true;
-					}
+					$query->addStartKey('triggerKey', self::getTriggerKey($object));
+					$query->addStartKey('objectType', 'a');
+					$query->addStartKey('sessionKey', 'a');
+					$query->setLimit(1);
+					
+					$list = $cacheStore->query($query);
+					if($list->getCount())
+						return true;
 				}
 			}
 		}
@@ -264,48 +298,42 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 		return false;
 	}
 	
-	protected function hasCachedRootObjects(BaseObject $object)
+	protected function hasCachedRootObjects(IBaseObject $object)
 	{
-		if($object instanceof IBaseObject)
+		$peer = $object->getPeer();
+		if(!($peer instanceof IRelatedObjectPeer))
 		{
-			$peer = $object->getPeer();
-			if(!($peer instanceof IRelatedObjectPeer))
-			{
-				return false;
-			}
-			
-			if($peer->isReferenced($object))
-			{
-				return false;
-			}
-			
-			$roots = $peer->getRootObjects($object);
-			if(count($roots))
-				return true;
+			return false;
 		}
+		
+		if($peer->isReferenced($object))
+		{
+			return false;
+		}
+		
+		$roots = $peer->getRootObjects($object);
+		if(count($roots))
+			return true;
 				
 		return false;
 	}
 	
-	protected function isCachedObject(BaseObject $object)
+	protected function isCachedObject(IBaseObject $object)
 	{
-		if($object instanceof IBaseObject)
+		$cacheStores = self::getStores();
+		foreach ($cacheStores as $cacheStore)
 		{
-			$cacheStores = self::getStores();
-			foreach ($cacheStores as $cacheStore)
+			if($cacheStore instanceof kCouchbaseCacheWrapper)
 			{
-				if($cacheStore instanceof kCouchbaseCacheWrapper)
+				$query = $cacheStore->getNewQuery(kCouchbaseCacheQuery::VIEW_RESPONSE_PROFILE_OBJECT_SPECIFIC);
+				if($query)
 				{
-					$query = $cacheStore->getNewQuery(kCouchbaseCacheQuery::VIEW_RESPONSE_PROFILE_OBJECT_SPECIFIC);
-					if($query)
-					{
-						$query->addKey('objectKey', self::getObjectKey($object));
-						$query->setLimit(1);
-						
-						$list = $cacheStore->query($query);
-						if($list->getCount())
-							return true;
-					}
+					$query->addKey('objectKey', self::getObjectKey($object));
+					$query->setLimit(1);
+					
+					$list = $cacheStore->query($query);
+					if($list->getCount())
+						return true;
 				}
 			}
 		}
@@ -470,6 +498,8 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 
 	protected function addRecalculateRelatedObjectsCacheJob(IBaseObject $object)
 	{
+		KalturaLog::debug('Recalculating object [' . get_class($object) . '] id [' . $object->getPrimaryKey() . '] related objects');
+		
 		$triggerType = get_class($object);
 		$objectTypes = self::listObjectRelatedTypes($triggerType);
 		foreach($objectTypes as $objectType => $sessionKeys)
@@ -497,6 +527,7 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 	
 	protected function addRecalculateObjectCacheJob(IBaseObject $object)
 	{
+		KalturaLog::debug('Recalculating object [' . get_class($object) . '] id [' . $object->getPrimaryKey() . '] cache');
 		$objectType = get_class($object);
 		$objectKey = self::getObjectKey($object);
 		
@@ -511,6 +542,7 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 	
 	protected function invalidateCachedRootObjects(IBaseObject $object)
 	{
+		KalturaLog::debug('Invalidating object [' . get_class($object) . '] id [' . $object->getPrimaryKey() . '] roots');
 		$peer = $object->getPeer();
 		if($peer instanceof IRelatedObjectPeer)
 		{
@@ -542,6 +574,8 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 		
 	protected function deleteCachedObjects(IBaseObject $object)
 	{
+		KalturaLog::debug('Invalidating object [' . get_class($object) . '] id [' . $object->getPrimaryKey() . '] cache');
+		
 		/* @var $object IBaseObject */
 		$cacheStores = self::getStores();
 		foreach ($cacheStores as $cacheStore)

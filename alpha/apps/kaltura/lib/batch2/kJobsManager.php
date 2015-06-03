@@ -1133,6 +1133,8 @@ class kJobsManager
 	 */
 	public static function addRecalculateResponseProfileCacheJob($partnerId, $protocol, $ksType, array $userRoles, $objectType, $objectId = null, $startDocId = null, $endDocId = null)
 	{
+		KalturaLog::debug("Recalculating cache partner[$partnerId] protocol[$protocol] ks[$ksType] roles[" . implode(', ', $userRoles) . "] object[$objectType] id [$objectId] start[$startDocId] end[$endDocId]");
+		
 	    $jobData = new kRecalculateCacheJobData();
  		$jobData->setProtocol($protocol);
  		$jobData->setKsType($ksType);
