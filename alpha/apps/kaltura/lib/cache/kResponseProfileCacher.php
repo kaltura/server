@@ -30,6 +30,7 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 	
 	protected static function set($key, $value)
 	{
+		KalturaLog::debug("Key [$key]");
 		$cacheStores = self::getStores();
 		foreach ($cacheStores as $cacheStore)
 		{
@@ -39,6 +40,7 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 	
 	protected static function delete($key)
 	{
+		KalturaLog::debug("Key [$key]");
 		$cacheStores = self::getStores();
 		foreach ($cacheStores as $cacheStore)
 		{
@@ -48,6 +50,7 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 	
 	protected static function get($key)
 	{
+		KalturaLog::debug("Key [$key]");
 		$cacheStores = self::getStores();
 		$value = null;
 		foreach ($cacheStores as $cacheStore)
