@@ -108,9 +108,9 @@ class kCouchbaseCacheQuery
 	private $inclusiveEnd = true;
 	
 	/**
-	 * @var array
+	 * @var array|string
 	 */  
-	private $key = array();
+	private $key = null;
 	
 	/**
 	 * @var array
@@ -255,6 +255,9 @@ class kCouchbaseCacheQuery
 	 */
 	public function addKey($key, $value)
 	{
+		if(!is_array($this->key))
+			$this->key = array();
+		
 		$this->key[$key] = $value;
 	}
 
@@ -264,6 +267,14 @@ class kCouchbaseCacheQuery
 	public function setKeys(array $keys)
 	{
 		$this->keys = $keys;
+	}
+
+	/**
+	 * @param string $key
+	 */
+	public function setKey($key)
+	{
+		$this->key = $key;
 	}
 	
 	public function toQuery()
@@ -311,8 +322,10 @@ class kCouchbaseCacheQuery
 		if(count($this->endKey))
 			$custom['endkey'] = json_encode(array_values($this->endKey));
 			
-		if(count($this->key))
+		if(is_array($this->key) && count($this->key))
 			$custom['key'] = json_encode(array_values($this->key));
+		elseif($this->key)
+			$custom['key'] = json_encode($this->key);
 			
 		if(count($this->keys))
 			$custom['keys'] = json_encode(array_values($this->keys));

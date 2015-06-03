@@ -322,7 +322,7 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 				$query = $cacheStore->getNewQuery(kCouchbaseCacheQuery::VIEW_RESPONSE_PROFILE_OBJECT_SPECIFIC);
 				if($query)
 				{
-					$query->addKey('objectKey', self::getObjectKey($object));
+					$query->setKey(self::getObjectKey($object));
 					$query->setLimit(1);
 					
 					$list = $cacheStore->query($query);
@@ -582,7 +582,7 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 				$query = $cacheStore->getNewQuery(kCouchbaseCacheQuery::VIEW_RESPONSE_PROFILE_OBJECT_SPECIFIC);
 				if($query)
 				{
-					$query->addKey('objectKey', $objectKey);
+					$query->setKey($objectKey);
 					$query->setLimit(100);
 					
 					$list = $cacheStore->query($query);
