@@ -5,13 +5,17 @@
 - Issue Type: bug fix
 - Issue ID: SUP-4362
 
-### Configuration ###
+#### Configuration ####
 
 None.
 
 #### Deployment Scripts ####
 
-		- Need to re-build so that spaces in tags will be replaced by '=' & re-index the tag sphinx table.
+    - Need to re-build so that spaces in tags will be replaced by '=' & re-index the tag sphinx table.
+
+#### Known Issues & Limitations ####
+
+None.
 
 
 # Jupiter-10.12.0 #
