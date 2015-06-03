@@ -229,13 +229,13 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 		if($this->hasCachedRelatedObjects($object))
 		{
 			KalturaLog::debug('Object [' . get_class($object) . '] id [' . $object->getPrimaryKey() . '] has cached related objects');
-			return $this->addRecalculateRelatedObjectsCacheJob($object);
+			$this->addRecalculateRelatedObjectsCacheJob($object);
 		}
 			
 		if($this->hasCachedRootObjects($object))
 		{
 			KalturaLog::debug('Object [' . get_class($object) . '] id [' . $object->getPrimaryKey() . '] has cached root objects');
-			return $this->invalidateCachedRootObjects($object);
+			$this->invalidateCachedRootObjects($object);
 		}
 			
 		return true;
