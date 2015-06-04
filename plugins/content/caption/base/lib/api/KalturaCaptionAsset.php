@@ -69,15 +69,6 @@ class KalturaCaptionAsset extends KalturaAsset
 	 *
 	 */
 	public $parentId;
-	
-	/**
-	 * Is multi-language caption asset
-	 *
-	 *@var bool
-	 *@readonly
-	 *
-	 */
-	public $isMulti;	
 
 	private static $map_between_objects = array
 	(
@@ -87,8 +78,7 @@ class KalturaCaptionAsset extends KalturaAsset
 		"label",
 		"format" => "containerFormat",
 		"status",
-		"parentId",
-		"isMulti",		
+		"parentId",		
 	);
 	
 	public function getMapBetweenObjects ( )
