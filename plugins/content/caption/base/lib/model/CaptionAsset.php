@@ -11,7 +11,6 @@ class CaptionAsset extends asset
 	const CUSTOM_DATA_FIELD_DEFAULT = "default";
 	const CUSTOM_DATA_FIELD_LABEL = "label";
 	const CUSTOM_DATA_PARENT_ID = "parentId";
-	const CUSTOM_DATA_IS_MULTI = "isMulti";
 
 	/* (non-PHPdoc)
 	 * @see Baseasset::applyDefaultValues()
@@ -26,13 +25,11 @@ class CaptionAsset extends asset
 	public function getDefault()		{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_DEFAULT);}
 	public function getLabel()			{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_LABEL);}
 	public function getParentId()       {return $this->getFromCustomData(self::CUSTOM_DATA_PARENT_ID);}
-	public function getIsMulti()        {return $this->getFromCustomData(self::CUSTOM_DATA_IS_MULTI);}
 
 	public function setLanguage($v)		{$this->putInCustomData(self::CUSTOM_DATA_FIELD_LANGUAGE, $v);}
 	public function setDefault($v)		{$this->putInCustomData(self::CUSTOM_DATA_FIELD_DEFAULT, (bool)$v);}
 	public function setLabel($v)		{$this->putInCustomData(self::CUSTOM_DATA_FIELD_LABEL, $v);}
 	public function setParentId($v)     {$this->putInCustomData(self::CUSTOM_DATA_PARENT_ID, $v);}
-	public function setIsMulti($v)      {$this->putInCustomData(self::CUSTOM_DATA_IS_MULTI, (bool)$v);}
 
 	public function getFinalDownloadUrlPathWithoutKs()
 	{
