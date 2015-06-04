@@ -448,6 +448,8 @@ class kCouchbaseCacheList
 
 class kCouchbaseCacheWrapper extends kBaseCacheWrapper
 {
+	const ERROR_CODE_THE_KEY_ALREADY_EXISTS_IN_THE_SERVER = 12;
+	
 	/**
 	 * @var CouchbaseBucket
 	 */
@@ -551,9 +553,19 @@ class kCouchbaseCacheWrapper extends kBaseCacheWrapper
 	protected function doAdd($key, $var, $expiry = 0)
 	{
 		KalturaLog::debug("key [$key], var [" . print_r($var, true) . "]");
-		$meta = $this->bucket->insert($key, $var, array(
-			'expiry' => $expiry
-		));
+		try
+		{
+			$meta = $this->bucket->insert($key, $var, array(
+				'expiry' => $expiry
+			));
+		}
+		catch(CouchbaseException $e)
+		{
+			if($e->getCode() == self::ERROR_CODE_THE_KEY_ALREADY_EXISTS_IN_THE_SERVER)
+				return false;
+			
+			throw $e;
+		}
 		
 		return is_null($meta->error);
 	}
