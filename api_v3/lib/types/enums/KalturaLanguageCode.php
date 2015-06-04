@@ -148,5 +148,5 @@ class KalturaLanguageCode extends KalturaStringEnum
 	const JI = 'ji';
 	const YO = 'yo';
 	const ZU = 'zu';
-	const MU = 'Multi-language';
+	const MU = 'Multilingual';
 }
