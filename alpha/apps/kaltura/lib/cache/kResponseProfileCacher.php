@@ -78,11 +78,14 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 			
 			if($value)
 			{
-				if($invalidationKey && $value->time)
+				if($invalidationKey)
 				{
 					$invalidationTime = self::get($invalidationKey);
 					if(intval($invalidationTime) > intval($value->time))
+					{
+						KalturaLog::debug("Invalidation time [$invalidationTime] > value time [{$value->time}]");
 						return null;
+					}
 				}
 				
 				return $value;
