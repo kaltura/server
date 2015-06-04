@@ -3366,7 +3366,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		$capabilitiesUnserialized = $this->getFromCustomData(self::CAPABILITIES);
 		if (is_null($capabilitiesUnserialized))
 		{
-			$capabilitiesArr = array();
+			return "";
 		}
 		else
 		{
@@ -3409,9 +3409,10 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 
 	public function removeCapability($capability)
 	{
-		$capabilitiesArr = $this->getFromCustomData(self::CAPABILITIES);
-		if (!is_null($capabilitiesArr))
+		$capabilitiesStr = $this->getFromCustomData(self::CAPABILITIES);
+		if (!is_null($capabilitiesStr))
 		{
+			$capabilitiesArr = unserialize($capabilitiesStr);
 			unset($capabilitiesArr[$capability]);
 			$this->putInCustomData( self::CAPABILITIES, serialize($capabilitiesArr) );
 		}

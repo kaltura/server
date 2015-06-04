@@ -120,7 +120,7 @@ class KalturaAnswerCuePoint extends KalturaCuePoint
 	 * @param string $cuePointId
 	 * @throw KalturaAPIException - when parent cue points is missing or not a question cue point or doesn't belong to the same entry
 	 */
-	public function validateParentId()
+	public function validateParentId($cuePointId = null)
 	{
 		if ($this->isNull('parentId'))
 			throw new KalturaAPIException(KalturaQuizErrors::PARENT_ID_IS_MISSING);

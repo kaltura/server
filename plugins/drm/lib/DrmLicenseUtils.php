@@ -73,7 +73,7 @@ class DrmLicenseUtils {
         $innerData = array();
         $innerData["ca_system"] = self::SYSTEM_NAME;
         $innerData["user_token"] = kCurrentContext::$ks;
-        $innerData["acount_id"] = kCurrentContext::$partner_id;
+        $innerData["account_id"] = kCurrentContext::getCurrentPartnerId();
         $innerData["content_id"] = $entryId;
         $innerData["files"] = $flavorParamIds;
 

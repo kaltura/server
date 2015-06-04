@@ -9,9 +9,9 @@
 
 	<target name="set-home" depends="install-contrib">
 		<if>
-			<isset property="env.CATALINA_HOME" />
+			<isset property="env.CATALINA_BASE" />
 			<then>
-				<property name="catalina.home" value="${env.CATALINA_HOME}" />		
+				<property name="catalina.home" value="${env.CATALINA_BASE}" />		
 			</then>
 			<else>
 				<input message="Please entrer tomcat 7 home directory full path" addproperty="catalina.home" defaultvalue="/usr/share/tomcat7" />
