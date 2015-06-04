@@ -636,7 +636,9 @@ Add the following lines as new sections:
  - Install [Apache Ant](http://ant.apache.org/manual/installlist.html "Apache Ant")
  - Download [Activiti 5.17.0](https://github.com/Activiti/Activiti/releases/download/activiti-5.17.0/activiti-5.17.0.zip "Activiti 5.17.0")
  - Open zip: `unzip activiti-5.17.0.zip`
- - Copy WAR files: `cp activiti-5.17.0/wars/* $CATALINA_BASE/webapps/activiti-##5.17.0`
+ - Copy WAR files: 
+  - `cp activiti-5.17.0/wars/activiti-explorer.war $CATALINA_BASE/webapps/activiti-explorer##5.17.0.war`
+  - `cp activiti-5.17.0/wars/activiti-rest.war $CATALINA_BASE/webapps/activiti-rest##5.17.0.war`
  - Restart Apache Tomcat.
  - Create DB **(replace tokens)**: `mysql -uroot -p`
 
