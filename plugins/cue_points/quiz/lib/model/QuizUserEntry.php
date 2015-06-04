@@ -19,7 +19,7 @@ class QuizUserEntry extends UserEntry{
 
 
 	public function setScore($v){ $this->putInCustomData("score", $v);}
-	public function getScore($v){ return $this->getFromCustomData("score");}
+	public function getScore(){ return $this->getFromCustomData("score");}
 
 	/**
 	 * @param $entryId

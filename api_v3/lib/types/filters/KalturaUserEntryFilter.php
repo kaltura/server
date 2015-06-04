@@ -11,6 +11,7 @@ class KalturaUserEntryFilter extends KalturaUserEntryBaseFilter
 	protected function getCoreFilter()
 	{
 		// TODO: Implement getCoreFilter() method.
+		return new UserEntryFilter();
 	}
 
 	/**
