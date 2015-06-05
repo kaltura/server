@@ -65,8 +65,8 @@ class Partner extends BasePartner
 	
 	public function validateSecret ( $partner_secret , $partner_key , &$ks_max_expiry_in_seconds , $admin = false )
 	{
-		$secret_to_match = $admin ? $this->getAdminSecret() : $this->getSecret() ;
-		if ( $partner_secret == $secret_to_match )
+		if ($partner_secret === $this->getAdminSecret() || 
+			(!$admin && $partner_secret === $this->getSecret()))
 		{
 			$ks_max_expiry_in_seconds = $this->getKsMaxExpiryInSeconds();
 			return true;
@@ -598,7 +598,7 @@ class Partner extends BasePartner
 	public function getMaxBulkSize() { return $this->getFromCustomData("maxBulk", null, null); }
 	public function setMaxBulkSize( $v ) { $this->putInCustomData("maxBulk", (int)$v); } 
 
-	public function getStorageServePriority() { return $this->getFromCustomData("storageServePriority", null, 0); }
+	public function getStorageServePriority() { return $this->getFromCustomData("storageServePriority", null, StorageProfile::STORAGE_SERVE_PRIORITY_KALTURA_ONLY); }
 	public function setStorageServePriority( $v ) { $this->putInCustomData("storageServePriority", (int)$v); } 
 	
 	public function getStorageDeleteFromKaltura() { return $this->getFromCustomData("storageDeleteFromKaltura", null, 0); }

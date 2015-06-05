@@ -1,4 +1,6 @@
-# Jupiter-10.11.0 #
+---
+
+# Jupiter-10.13.0 #
 
 ## Cache response-profile results ##
 
@@ -93,23 +95,136 @@ None.
 ### Known Issues & Limitations ###
 None.
 
+---
+# Jupiter-10.12.0 #
 
-## Error when manually dispatching notification template ##
+## Set new permission to flavorasset geturl ##
+
+- Issue Type: Permission change
+- Issue ID : SUP-4739
+
+### Configuration ###
+ 
+None.
+
+#### Deployment Script ####
+
+- Run php deployment/updates/scripts/add_permissions/2015_05_18_update_flavorasset_permissions.php
+
+## New event notification template- drop folder error description changed ##
+
+- Issue Type: new feature  
+- Issue ID: PS-2251  
+
+#### Deployment Script ####
+
+- Run php /opt/kaltura/app/tests/standAloneClient/exec.php /opt/kaltura/app/tests/standAloneClient/emailDropFolderFailedStatusMessage.xml  
+
+## Server ingestion of chapter cue points without slides ##
 
 - Issue Type: bug fix
-- Issue ID: PLAT-2387
+- Issue ID: PLAT-2204
 
-### Deployment ###
+### Configuration ###
+- **workers.ini**
 
-- Run the following script:  
-			cd /opt/kaltura/app/tests/standAloneClient  
-			php exec.php commentAddedEnabledForManualDispatch.xml    
-- Delete older email notification from partner 0.
+under 'KAsyncBulkUpload'
+
+		params.xmlSchemaVersion		= 7
+
+#### Deployment Scripts ####
+
+None.
+
+#### Known Issues & Limitations ####
+
+None.
+
+## New event notification template- entry custom data changed ##
+
+- Issue Type: new feature  
+- Issue ID: PS-2253  
+
+#### Deployment Script ####
+
+- Run php /opt/kaltura/app/tests/standAloneClient/exec.php /opt/kaltura/app/tests/standAloneClient/metadataObjectChanged.xml  
+
+## "Entry flagged for review" Email Notification missing on production ##
+
+- Issue Type: bug  
+- Issue ID: PS-2252  
+
+#### Deployment Script ####
+
+- Run php /opt/kaltura/app/tests/standAloneClient/exec.php /opt/kaltura/app/tests/standAloneClient/kmcModerationNotificationsTemplates.xml  
+
+## uDRM on the fly encryption ##
+
+- Issue Type: new feature
+- Issue ID: PLAT-2675
+
+#### Configuration ####
+
+- Clone @APP_DIR/configurations/drm.template.ini to @APP_DIR/configurations/drm.ini
+- In @APP_DIR/configurations/drm.ini replace @UDRM_SIGNING_KEY@ with key given from me.
+- Add the following permission block to @APP_DIR@/configurations/admin.ini:
+
+		moduls.drmBase.enabled = true
+		moduls.drmBase.permissionType = 3
+		moduls.drmBase.label = DRM - Base
+		moduls.drmBase.permissionName = DRM_PLUGIN_PERMISSION
+		moduls.drmBase.basePermissionType =
+		moduls.drmBase.basePermissionName =
+		moduls.drmBase.group = GROUP_ENABLE_DISABLE_FEATURES
+		
+		moduls.drmCencFlavors.enabled = false
+		moduls.drmCencFlavors.permissionType = 2
+		moduls.drmCencFlavors.label = DRM – Enable CENC Flavors
+		moduls.drmCencFlavors.permissionName = DRM_CENC_FLAVORS
+		moduls.drmCencFlavors.basePermissionType = 3
+		moduls.drmCencFlavors.basePermissionName = DRM_PLUGIN_PERMISSION
+		moduls.drmCencFlavors.group = GROUP_ENABLE_DISABLE_FEATURES
+
+
+#### Deployment Scripts ####
+
+		- run php /opt/kaltura/app/deployment/updates/scripts/2015_05_17_update_DRM_access_control.php
+		- run php deployment/updates/scripts/add_permissions/2015_05_17_update_drm_license_access_permissions.php
+        - run php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+
+#### Known Issues & Limitations ####
+
+None.
+
+---
+# Jupiter-10.11.0 #
+
+## Server support for Q&A feature ##
+
+- Issue Type: new feature
+- Issue ID: PLAT-2850
+
+### Configuration ###
+- update sphinx kaltura.conf:
+	
+		Add the following to kaltura_cue_point index:
+		- rt_attr_uint = is_public
+		- rt_field = plugins_data
+
+#### Deployment Scripts ####
+
+		- Need to re-build & re-index the cue point sphinx table.
+		- run php /opt/kaltura/app/deployment/updates/scripts/2015_05_11_create_qAndA_default_schema.php
+
+#### Known Issues & Limitations ####
+
+None.
+
 
 ## New feature- hide template partner uiconfs ##
 
 - Issue Type: bug fix  
-- Issue ID: https://app2.clarizen.com/Clarizen/6.299216357.130510/
+- Issue ID: PLAT-2946
 
 ### Configuration ###
 - Add the following permission block to @APP_DIR@/configurations/admin.ini:
@@ -122,6 +237,16 @@ None.
         moduls.hideTemplatePartnerUiConfs.basePermissionName =  
         moduls.hideTemplatePartnerUiConfs.group = GROUP_ENABLE_DISABLE_FEATURES  
 
+## Error when manually dispatching notification template ##
+
+- Issue Type: bug fix
+- Issue ID: PLAT-2387
+### Deployment ###
+
+- Run the following script:  
+			cd /opt/kaltura/app/tests/standAloneClient  
+			php exec.php commentAddedEnabledForManualDispatch.xml    
+- Delete older email notification from partner 0.
 
 ## Too many logs are written to file on batch ##
 
@@ -159,7 +284,7 @@ None.
 
 None.
 
-
+---
 # Jupiter-10.10.0 #
 ## Support marking file_sync's as directories ##
 
@@ -605,26 +730,28 @@ Add the following lines as new sections:
 #### Activiti Deployment Instructions ####
 
  - Install [Apache Tomcat 7](http://tomcat.apache.org/tomcat-7.0-doc/setup.html#Unix_daemon "Apache Tomcat 7")
- - Make sure $CATALINA_HOME is defined.
+ - Make sure $CATALINA_BASE is defined.
  - Install [Apache Ant](http://ant.apache.org/manual/installlist.html "Apache Ant")
  - Download [Activiti 5.17.0](https://github.com/Activiti/Activiti/releases/download/activiti-5.17.0/activiti-5.17.0.zip "Activiti 5.17.0")
  - Open zip: `unzip activiti-5.17.0.zip`
- - Copy WAR files: `cp activiti-5.17.0/wars/* $CATALINA_HOME/webapps/`
+ - Copy WAR files: 
+  - `cp activiti-5.17.0/wars/activiti-explorer.war $CATALINA_BASE/webapps/activiti-explorer##5.17.0.war`
+  - `cp activiti-5.17.0/wars/activiti-rest.war $CATALINA_BASE/webapps/activiti-rest##5.17.0.war`
  - Restart Apache Tomcat.
  - Create DB **(replace tokens)**: `mysql -uroot -p`
 
 		CREATE DATABASE activiti;
-		GRANT INSERT,UPDATE,DELETE,SELECT,ALTER,CREATE ON activiti.* TO '@DB1_USER@'@'%';
+		GRANT INSERT,UPDATE,DELETE,SELECT,ALTER,CREATE,INDEX ON activiti.* TO '@DB1_USER@'@'%';
 		FLUSH PRIVILEGES;
 
- - Edit **(replace tokens)** $CATALINA_HOME/webapps/**activiti-explorer**/WEB-INF/classes/db.properties
+ - Edit **(replace tokens)** $CATALINA_BASE/webapps/**activiti-explorer**/WEB-INF/classes/db.properties
 
 		jdbc.driver=com.mysql.jdbc.Driver
 		jdbc.url=jdbc:mysql://@DB1_HOST@:@DB1_PORT@/activiti
 		jdbc.username=@DB1_USER@
 		jdbc.password=@DB1_PASS@
 
- - Edit **(replace tokens)** $CATALINA_HOME/webapps/**activiti-rest**/WEB-INF/classes/db.properties
+ - Edit **(replace tokens)** $CATALINA_BASE/webapps/**activiti-rest**/WEB-INF/classes/db.properties
 
 		jdbc.driver=com.mysql.jdbc.Driver
 		jdbc.url=jdbc:mysql://@DB1_HOST@:@DB1_PORT@/activiti
@@ -633,7 +760,7 @@ Add the following lines as new sections:
 
  - Download [mysql jdbc connector 5.0.8](http://cdn.mysql.com/Downloads/Connector-J/mysql-connector-java-5.0.8.zip "mysql jdbc connector 5.0.8")
  - Open zip: `unzip mysql-connector-java-5.0.8.zip`
- - Copy the mysql jdbc connector: `cp mysql-connector-java-5.0.8/mysql-connector-java-5.0.8-bin.jar $CATALINA_HOME/lib/`
+ - Copy the mysql jdbc connector: `cp mysql-connector-java-5.0.8/mysql-connector-java-5.0.8-bin.jar $CATALINA_BASE/lib/`
  - Restart Apache Tomcat.
  - Open your browser to validate installation **(replace tokens)**: http://@WWW_HOST@:8080/activiti-explorer/
 	 - Username: kermit
@@ -2395,3 +2522,4 @@ Internal indication for api time properties and support for times that are relat
 0 = PID1
 1 = PID2
 `
+

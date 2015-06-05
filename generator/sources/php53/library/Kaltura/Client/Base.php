@@ -488,14 +488,22 @@ class Base
 	 */
 	public function validateObjectType($resultObject, $objectType)
 	{
-		if (is_object($resultObject))
+		$knownNativeTypes = array("boolean", "integer", "double", "string");
+		if (is_null($resultObject) ||
+			( in_array(gettype($resultObject) ,$knownNativeTypes) &&
+			  in_array($objectType, $knownNativeTypes) ) )
 		{
-			if (!($resultObject instanceof $objectType))
-				throw new ClientException("Invalid object type", ClientException::ERROR_INVALID_OBJECT_TYPE);
+			return;// we do not check native simple types
 		}
-		else if (gettype($resultObject) != "NULL" && gettype($resultObject) != $objectType)
+		else if ( is_object($resultObject) )
 		{
-			throw new ClientException("Invalid object type [" . gettype($resultObject) . "] expected [$objectType]", ClientException::ERROR_INVALID_OBJECT_TYPE);
+			if (!($resultObject instanceof $objectType)){
+				throw new ClientException("Invalid object type - not instance of $objectType", ClientException::ERROR_INVALID_OBJECT_TYPE);
+			}
+		}
+		else if(gettype($resultObject) !== $objectType)
+		{
+			throw new ClientException("Invalid object type", ClientException::ERROR_INVALID_OBJECT_TYPE);
 		}
 	}
 

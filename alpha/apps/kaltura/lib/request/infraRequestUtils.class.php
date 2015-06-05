@@ -168,6 +168,9 @@ class infraRequestUtils
 						case "3gp":
 								$content_type ="video/3gpp";
 								break;
+				case "js":
+					$content_type ="application/javascript";
+					break;
 				default:
 					$content_type ="image/$ext";
 					break;

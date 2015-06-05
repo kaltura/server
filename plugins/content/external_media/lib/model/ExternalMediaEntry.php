@@ -46,4 +46,15 @@ class ExternalMediaEntry extends entry
 	{
 		return false;
 	}
+
+	/* (non-PHPdoc)
+	  * @see entry::Baseentry()
+	  */
+	public function copy($deepCopy = false)
+	{
+		$copyObj = parent::copy($deepCopy);
+		$copyObj->setExternalSourceType($this->getExternalSourceType());
+		return $copyObj;
+	}
+	
 }

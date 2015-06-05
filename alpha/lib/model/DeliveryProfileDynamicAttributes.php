@@ -1,12 +1,24 @@
 <?php
 
 /**
- * This class centralizes all the delivery attributes that are specific for a given request  
+ * This class centralizes all the delivery attributes that are specific for a given request
  * and not general for the delivery definition.
  * For example- when a request is passed from the Playmanifest - all parameters should be passed through 
  * this data transfer object 
  */
 class DeliveryProfileDynamicAttributes {
+	
+	/**
+	 * List of delivery profiles ids which should be enfroced due to an access control action
+	 * @var array
+	 */
+	protected $deliveryProfileIds = null;
+	
+	/**
+	 * Defines whether the list of delivery profiles should be whitelist or blacklisted 
+	 * @var bool
+	 */
+	protected $isDeliveryProfilesBlockedList = null;
 	
 	/**
 	 * @var string
@@ -37,11 +49,6 @@ class DeliveryProfileDynamicAttributes {
 	 * @var float
 	 */
 	protected $playbackRate = null;
-	
-	/**
-	 * @var int
-	 */
-	protected $storageProfileId = null;
 	
 	/**
 	 * @var int
@@ -111,6 +118,20 @@ class DeliveryProfileDynamicAttributes {
 	protected $urlParams = '';
 
 	/**
+	 * @return the $deliveryProfileIds
+	 */
+	public function getDeliveryProfileIds() {
+		return $this->deliveryProfileIds;
+	}
+
+	/**
+	 * @return the $isDeliveryProfilesBlockedList
+	 */
+	public function getIsDeliveryProfilesBlockedList() {
+		return $this->isDeliveryProfilesBlockedList;
+	}
+		
+	/**
 	 * @return the $format
 	 */
 	public function getFormat() {
@@ -150,13 +171,6 @@ class DeliveryProfileDynamicAttributes {
 	 */
 	public function getPlaybackRate() {
 		return $this->playbackRate;
-	}
-
-	/**
-	 * @return the $storageProfileId
-	 */
-	public function getStorageProfileId() {
-		return $this->storageProfileId;
 	}
 
 	/**
@@ -202,6 +216,15 @@ class DeliveryProfileDynamicAttributes {
 	}
 
 	/**
+	 * @param string $deliveryProfileIds
+	 * @param bool $isBlockedList
+	 */
+	public function setDeliveryProfileIds($deliveryProfileIds, $isBlockedList) {
+		$this->deliveryProfileIds = $deliveryProfileIds;
+		$this->isDeliveryProfilesBlockedList = $isBlockedList;
+	}
+
+	/**
 	 * @param string $format
 	 */
 	public function setFormat($format) {
@@ -243,13 +266,6 @@ class DeliveryProfileDynamicAttributes {
 		$this->playbackRate = $playbackRate;
 	}
 	
-	/**
-	 * @param number $storageProfileId
-	 */
-	public function setStorageProfileId($storageProfileId) {
-		$this->storageProfileId = $storageProfileId;
-	}
-
 	/**
 	 * @param number $storageId
 	 */
@@ -424,8 +440,29 @@ class DeliveryProfileDynamicAttributes {
 		}
 		return array();
 	}
+
+	/**
+	 * 
+	 * @param int $storageId
+	 * @param string $entryId
+	 * @param PlaybackProtocol $format
+	 * @param string $mediaProtocol
+	 * @return DeliveryProfileDynamicAttributes
+	 */
+	public static function init($storageId, $entryId, $format = PlaybackProtocol::HTTP, $mediaProtocol = null)
+	{
+		$instance = new DeliveryProfileDynamicAttributes();
+		$instance->setStorageId($storageId);
+		$instance->setEntryId($entryId);
+		$instance->setFormat($format);
+		$instance->setMediaProtocol($mediaProtocol);
+		
+		return $instance;
+	}
 	
 	public function cloneAttributes(DeliveryProfileDynamicAttributes $newObj) {
+		$this->deliveryProfileIds = $newObj->getDeliveryProfileIds();
+		$this->isDeliveryProfilesBlockedList = $newObj->getIsDeliveryProfilesBlockedList();
 		$this->format = $newObj->getFormat();
 		$this->extension = $newObj->getFileExtension();
 		$this->containerFormat = $newObj->getContainerFormat();

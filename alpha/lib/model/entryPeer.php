@@ -582,18 +582,7 @@ class entryPeer extends BaseentryPeer
 
 	public static function doSelectJoinkuser(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
 	{
-		$c = clone $criteria;
-
-		if($c instanceof KalturaCriteria)
-		{
-			$skipApplyFilters = entryPeer::applyEntitlementCriteria($c);
-
-			if(!$skipApplyFilters)
-			{
-				$c->applyFilters();
-				$criteria->setRecordsCount($c->getRecordsCount());
-			}
-		}
+		$c = self::prepareEntitlementCriteriaAndFilters( $criteria );
 
 		$results = parent::doSelectJoinkuser($c, $con, $join_behavior);
 		self::$filerResults = false;
@@ -607,18 +596,7 @@ class entryPeer extends BaseentryPeer
 	 */
 	public static function doSelect(Criteria $criteria, PropelPDO $con = null)
 	{
-		$c = clone $criteria;
-
-		if($c instanceof KalturaCriteria)
-		{
-			$skipApplyFilters = entryPeer::applyEntitlementCriteria($c);
-
-			if(!$skipApplyFilters)
-			{
-				$c->applyFilters();
-				$criteria->setRecordsCount($c->getRecordsCount());
-			}
-		}
+		$c = self::prepareEntitlementCriteriaAndFilters( $criteria );
 
 		$queryResult =  parent::doSelect($c, $con);
 
@@ -661,6 +639,24 @@ class entryPeer extends BaseentryPeer
 		}
 
 		return $skipApplyFilters;
+	}
+
+	public static function prepareEntitlementCriteriaAndFilters(Criteria $criteria)
+	{
+		$c = clone $criteria;
+
+		if($c instanceof KalturaCriteria)
+		{
+			$skipApplyFilters = entryPeer::applyEntitlementCriteria($c);
+
+			if(!$skipApplyFilters)
+			{
+				$c->applyFilters();
+				$criteria->setRecordsCount($c->getRecordsCount());
+			}
+		}
+
+		return $c;
 	}
 
 	public static function getDurationType($duration)

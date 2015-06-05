@@ -69,9 +69,9 @@ class FileSync extends BaseFileSync implements IBaseObject
 		if(!$storage || $storage->getProtocol() == StorageProfile::STORAGE_KALTURA_DC)
 			return kDataCenterMgr::getInternalRemoteUrl($this);
 
-		$urlManager = DeliveryProfilePeer::getRemoteDeliveryByStorageId($this->getDc(), $entryId, PlaybackProtocol::HTTP, infraRequestUtils::getProtocol());
+		$urlManager = DeliveryProfilePeer::getRemoteDeliveryByStorageId(DeliveryProfileDynamicAttributes::init($this->getDc(), $entryId, PlaybackProtocol::HTTP, infraRequestUtils::getProtocol()));
 		if(is_null($urlManager) && infraRequestUtils::getProtocol() != 'http')
-			$urlManager = DeliveryProfilePeer::getRemoteDeliveryByStorageId($this->getDc(), $entryId);
+			$urlManager = DeliveryProfilePeer::getRemoteDeliveryByStorageId(DeliveryProfileDynamicAttributes::init($this->getDc(), $entryId));
 		if(is_null($urlManager))
 			return null;
 		
@@ -137,6 +137,10 @@ class FileSync extends BaseFileSync implements IBaseObject
 	
 	public function getIsDir() { return $this->getFromCustomData("isDir"); }
 	public function setIsDir($v) { $this->putInCustomData("isDir", $v); }
+	
+	public function getContentMd5 () { return $this->getFromCustomData("contentMd5"); }
+	public function setContentMd5 ($v) { $this->putInCustomData("contentMd5", $v);  }
+	
 }
 
 

@@ -21,6 +21,21 @@ class MetadataService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::FEATURE_FORBIDDEN, MetadataPlugin::PLUGIN_NAME);
 	}
 	
+	/* (non-PHPdoc)
+	 * @see KalturaBaseService::partnerGroup()
+	 */
+	protected function partnerGroup($peer = null)
+	{
+	    if(in_array($this->actionName, array('get', 'list')) && $peer == 'Metadata'){
+	        return $this->partnerGroup . ',0';
+	    }
+	    elseif (in_array($this->actionName, array('add', 'get', 'list', 'update')) && $peer == 'MetadataProfile'){
+	        return $this->partnerGroup . ',0';
+	    }
+	
+	    return $this->partnerGroup;
+	}
+	
 	protected function kalturaNetworkAllowed($actionName)
 	{
 		if ($actionName == 'list')
@@ -290,14 +305,19 @@ class MetadataService extends KalturaBaseService
 				$dbMetadata->setMetadataProfileVersion($dbMetadataProfile->getVersion());
 			}
 			
-			$dbMetadata->incrementVersion();
-		
 			$key = $dbMetadata->getSyncKey(Metadata::FILE_SYNC_METADATA_DATA);
-			kFileSyncUtils::file_put_contents($key, $xmlData);
-			
-			$dbMetadata->save();
-			
-			kEventsManager::raiseEvent(new kObjectDataChangedEvent($dbMetadata, $previousVersion));
+			if (!kFileSyncUtils::compareContent($key, $xmlData))
+			{
+				$dbMetadata->incrementVersion();
+				$key = $dbMetadata->getSyncKey(Metadata::FILE_SYNC_METADATA_DATA);
+				kFileSyncUtils::file_put_contents($key, $xmlData);
+				$dbMetadata->save();
+				kEventsManager::raiseEvent(new kObjectDataChangedEvent($dbMetadata, $previousVersion));
+			}
+			else 
+			{
+				KalturaLog::info("XML data MD5 matches current filesync content MD5. Update is not necessary.");
+			}
 		}
 		
 		$metadata = new KalturaMetadata();

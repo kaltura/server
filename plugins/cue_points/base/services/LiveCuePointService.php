@@ -15,8 +15,10 @@ class LiveCuePointService extends KalturaBaseService
 		$this->applyPartnerFilterForClass('CuePoint');
 
 		// when session is not admin, allow access to user entries only
-		if (!$this->getKs() || !$this->getKs()->isAdmin())
-			CuePointPeer::setDefaultCriteriaFilterByKuser();
+		if (!$this->getKs() || !$this->getKs()->isAdmin()) {
+			KalturaCriterion::enableTag(KalturaCriterion::TAG_USER_SESSION);
+			CuePointPeer::setUserContentOnly(true);
+		}
 		
 		if(!CuePointPlugin::isAllowedPartner($this->getPartnerId()))
 			throw new KalturaAPIException(KalturaErrors::FEATURE_FORBIDDEN, CuePointPlugin::PLUGIN_NAME);
@@ -53,18 +55,27 @@ class LiveCuePointService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 			
 		/* @var $dbEntry LiveStreamEntry */
-		$mediaServer = $dbEntry->getMediaServer(true);
-		if(!$mediaServer)
+		$mediaServers = $dbEntry->getMediaServers();
+		if(!count($mediaServers))
 			throw new KalturaAPIException(KalturaErrors::NO_MEDIA_SERVER_FOUND, $entryId);
-			
-		$mediaServerCuePointsService = $mediaServer->getWebService(MediaServer::WEB_SERVICE_CUE_POINTS);
-		if($mediaServerCuePointsService && $mediaServerCuePointsService instanceof KalturaMediaServerCuePointsService)
+		
+		foreach($mediaServers as $key => $kMediaServer)
 		{
-			$mediaServerCuePointsService->createTimeCuePoints($entryId, $interval, $duration);
-		}
-		else 
-		{
-			throw new KalturaAPIException(KalturaErrors::MEDIA_SERVER_SERVICE_NOT_FOUND, $mediaServer->getId(), MediaServer::WEB_SERVICE_LIVE);
+			if($kMediaServer && $kMediaServer instanceof kLiveMediaServer)
+			{
+				$mediaServer = $kMediaServer->getMediaServer();
+				$mediaServerCuePointsService = $mediaServer->getWebService(MediaServer::WEB_SERVICE_CUE_POINTS);
+				KalturaLog::debug("Sending sync points for DC [" . $mediaServer->getDc() . "] ");
+				if($mediaServerCuePointsService && $mediaServerCuePointsService instanceof KalturaMediaServerCuePointsService)
+				{
+					KalturaLog::debug("Call createTimeCuePoints on DC [" . $mediaServer->getDc() . "] ");
+					$mediaServerCuePointsService->createTimeCuePoints($entryId, $interval, $duration);
+				}
+				else 
+				{
+					KalturaLog::debug("Media server service not found on DC: [" . $mediaServer->getDc() . "] ");
+				}
+			}
 		}
 	}
 }
