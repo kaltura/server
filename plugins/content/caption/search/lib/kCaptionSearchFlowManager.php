@@ -11,8 +11,8 @@ class kCaptionSearchFlowManager implements kObjectDataChangedEventConsumer, kObj
 	public function shouldConsumeAddedEvent(BaseObject $object)
 	{
 		if(class_exists('CaptionAsset') && $object instanceof CaptionAsset 
-				&& CaptionSearchPlugin::isAllowedPartner($object->getPartnerId()
-					&& $object->getStatus() == CaptionAsset::ASSET_STATUS_READY)){
+				&& CaptionSearchPlugin::isAllowedPartner($object->getPartnerId())
+					&& $object->getStatus() == CaptionAsset::ASSET_STATUS_READY && $object->getLanguage() != CaptionPlugin::MULTI_LANGUAGE){
 						return true;
 					}
 					
@@ -32,7 +32,7 @@ class kCaptionSearchFlowManager implements kObjectDataChangedEventConsumer, kObj
 	 */
 	public function shouldConsumeDataChangedEvent(BaseObject $object, $previousVersion = null)
 	{
-		if(class_exists('CaptionAsset') && $object instanceof CaptionAsset)
+		if(class_exists('CaptionAsset') && $object instanceof CaptionAsset && $object->getLanguage() != CaptionPlugin::MULTI_LANGUAGE)
 			return CaptionSearchPlugin::isAllowedPartner($object->getPartnerId());
 			
 		return false;
@@ -144,7 +144,7 @@ class kCaptionSearchFlowManager implements kObjectDataChangedEventConsumer, kObj
 	 */
 	public function shouldConsumeDeletedEvent(BaseObject $object)
 	{
-		if($object instanceof CaptionAsset)
+		if($object instanceof CaptionAsset && $object->getLanguage() != CaptionPlugin::MULTI_LANGUAGE)
 			return true;
 			
 		return false;
