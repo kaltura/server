@@ -81,7 +81,6 @@ class CaptionAssetService extends KalturaAssetService
 		$dbCaptionAsset->save();
 
 		$captionAsset = new KalturaCaptionAsset();
-		$captionAsset->fromObject($dbCaptionAsset, $this->getResponseProfile());
 		return $captionAsset;
     }
     
@@ -178,8 +177,8 @@ class CaptionAssetService extends KalturaAssetService
 		
 		$captionAsset->incrementVersion();
 		if($ext && $ext != kUploadTokenMgr::NO_EXTENSION_IDENTIFIER)
- +      	$captionAsset->setFileExt($ext);
-		
+			$captionAsset->setFileExt($ext);
+
 		$captionAsset->setSize(filesize($fullPath));
 		$captionAsset->save();
 		
@@ -202,10 +201,9 @@ class CaptionAssetService extends KalturaAssetService
 		$finalPath = kFileSyncUtils::getLocalFilePathForKey($syncKey);
 		list($width, $height, $type, $attr) = getimagesize($finalPath);
 
-		if ($this->isMultiLanguageFile($captionAsset , $finalPath))
+		if ($captionAsset->getLanguage() == KalturaLanguage::MU)
 		{
-			//        $captionAsset->setIsMulti(true);
-			//        TODO - create a CAPTION_EXPLODE_LANGUAGES job
+			kCaptionsContentManager::addParseMultiLanguageCaptionAssetJob($captionAsset, $finalPath);
 		}
 
 		$captionAsset->setWidth($width);
@@ -214,28 +212,6 @@ class CaptionAssetService extends KalturaAssetService
 		
 		$captionAsset->setStatus(CaptionAsset::ASSET_STATUS_READY);
 		$captionAsset->save();
-	}
-
-	/**
-	 * @param CaptionAsset $captionAsset
-	 * @param string $path
-	 */
-	protected function isMultiLanguageFile(CaptionAsset $captionAsset, $path = null)
-	{
-		if (!$path)
-			return false;
-
-		$xmlString = file_get_contents($path);
-		$xmlObj = simplexml_load_string($xmlString);
-		if(!$xmlObj)
-		{
-			KalturaLog::debug("problems with xml");
-			return false;
-		}
-
-		$bodyNode = $xmlObj->body;
-		$divCount = count($bodyNode->div);
-		return $divCount > 1;
 	}
 
 	/**
