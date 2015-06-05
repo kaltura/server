@@ -324,6 +324,12 @@ class myPartnerUtils
 			$protocol='http';
 
 		$partner = PartnerPeer::retrieveByPK( $partner_id );
+		if ($partner->isInCDNWhiteList($_SERVER['HTTP_HOST']))
+		{
+			$cdnHost = $_SERVER['HTTP_HOST'];
+			return $cdnHost;
+		}
+
 		if ( !$partner || (! $partner->getCdnHost() ) )
 			return $hostType == "thumbnail" ? requestUtils::getThumbnailCdnHost($protocol) : requestUtils::getCdnHost($protocol);
 
