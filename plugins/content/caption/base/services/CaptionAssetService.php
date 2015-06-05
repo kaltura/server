@@ -81,6 +81,7 @@ class CaptionAssetService extends KalturaAssetService
 		$dbCaptionAsset->save();
 
 		$captionAsset = new KalturaCaptionAsset();
+		$captionAsset->fromObject($dbCaptionAsset, $this->getResponseProfile());
 		return $captionAsset;
     }
     
@@ -201,7 +202,7 @@ class CaptionAssetService extends KalturaAssetService
 		$finalPath = kFileSyncUtils::getLocalFilePathForKey($syncKey);
 		list($width, $height, $type, $attr) = getimagesize($finalPath);
 
-		if ($captionAsset->getLanguage() == KalturaLanguage::MU)
+		if ($captionAsset->getLanguage() == CaptionPlugin::MULTI_LANGUAGE)
 		{
 			kCaptionsContentManager::addParseMultiLanguageCaptionAssetJob($captionAsset, $finalPath);
 		}
