@@ -246,6 +246,56 @@ class KFeedDropFolderEngine extends KDropFolderEngine
 		//If neither of the conditions above were true, neither the metadata nor the content were changed- do nothing.
 		return false;
 	}
+	
+	protected function shouldUpdateContent (KalturaFeedDropFolderFile $existingDropFolderFile, SimpleXMLElement $feedItem)
+	{
+		$feedItemHash = strval($this->getSingleXPathResult($this->dropFolder->feedItemInfo->itemHashXPath, $feedItem));
+		if ($feedItemHash)
+		{
+			KalturaLog::info('Hash found- checking whether content needs to be updated');
+			if ($feedItemHash != $existingDropFolderFile->hash)
+			{
+				KalturaLog::info('Hash has changed for drop folder file named ['. $existingDropFolderFile->fileName .'] - content will be updated.');
+				$this->handleItemAdded($existingDropFolderFile->fileName, $feedItem);
+				return true;
+			}
+		}
+		
+		$fileSize = $this->getSingleXPathResult($this->dropFolder->feedItemInfo->itemContentFileSizeXPath, $feedItem); 
+    	if (!is_null ($fileSize))
+    	{
+    		if ($fileSize != $existingDropFolderFile->fileSize)
+    		{
+    			return true;
+    		}
+    	}
+    	else 
+    	{
+    		$url = $this->getSingleXPathResult($this->dropFolder->feedItemInfo->itemContentUrlXPath, $feedItem);
+    		if (is_null ($url))
+    		{
+    			throw new Exception ("Cannot add drop folder file - content URL does not exist");
+    		}
+    		$contentUrl = strval($url);
+
+			$curl = curl_init($contentUrl);
+			curl_setopt($curl, CURLOPT_HEADER, true);
+		    curl_setopt($curl, CURLOPT_FILETIME, true);
+		    curl_setopt($curl, CURLOPT_NOBODY, true);
+			$res = curl_exec($curl);
+			if ($res)
+			{
+				$curlInfo = curl_getinfo($curl);
+				$fileSize = intval($curlInfo['download_content_length']);
+				if ($fileSize != $existingDropFolderFile->fileSize)
+				{
+					
+				}
+			}
+			
+			curl_close($curl);
+    	}
+	}
 
 	/* (non-PHPdoc)
 	 * @see KDropFolderEngine::processFolder()
