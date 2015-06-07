@@ -202,7 +202,7 @@ class CaptionAssetService extends KalturaAssetService
 		$finalPath = kFileSyncUtils::getLocalFilePathForKey($syncKey);
 		list($width, $height, $type, $attr) = getimagesize($finalPath);
 
-		if ($captionAsset->getLanguage() == CaptionPlugin::MULTI_LANGUAGE)
+		if ($captionAsset->getLanguage() == CaptionAsset::MULTI_LANGUAGE)
 		{
 			kCaptionsContentManager::addParseMultiLanguageCaptionAssetJob($captionAsset, $finalPath);
 		}

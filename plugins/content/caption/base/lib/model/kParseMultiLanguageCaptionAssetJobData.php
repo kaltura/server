@@ -3,51 +3,70 @@
  * @package plugins.caption
  * @subpackage model.data
  */
- class kParseMultiLanguageCaptionAssetJobData extends kJobData
- {
-      /**
-       * @var string
-       */
-      private $parentCaptionAssetId;
+class kParseMultiLanguageCaptionAssetJobData extends kJobData
+{
+	/**
+     * @var string
+	 */
+	private $multiLanaguageCaptionAssetId;
 
-      /**
-       * @var string
-       */
-      private $entryId;
+	/**
+     * @var string
+	 */
+	private $entryId;
 
-      /**
-       * @var string
-       */
-      private $fileLocation;
+    /**
+     * @var string
+     */
+	private $fileLocation;
 
-      public function getParentCaptionAssetId()
-      {
-          return $this->parentCaptionAssetId;
-      }
+	/**
+     * @return string $multiLanaguageCaptionAssetId
+     */
+	public function getMultiLanaguageCaptionAssetId()
+	{
+		return $this->multiLanaguageCaptionAssetId;
+	}
 
-      public function setParentCaptionAssetId($parentCaptionAssetId)
-      {
-          $this->parentCaptionAssetId = $parentCaptionAssetId;
-      }
+	/**
+	 * @param string $captionAssetId
+	 */
+	public function setMultiLanaguageCaptionAssetId($captionAssetId)
+	{
+		$this->multiLanaguageCaptionAssetId = $captionAssetId;
+	}
 
-      public function getEntryId()
-      {
-          return $this->entryId;
-      }
+	/**
+	 * @return string $entryId
+	 */
+	public function getEntryId()
+	{
+		return $this->entryId;
+	}
 
-      public function setEntryId($entryId)
-      {
-          $this->entryId = $entryId;
-      }
+	/**
+	 * @param string $entryId
+	 */
+	public function setEntryId($entryId)
+	{
+		$this->entryId = $entryId;
+	}
 
-      public function getFileLocation()
-      {
-          return $this->fileLocation;
-      }
+	/**
+	 * @return string $fileLocation
+	 */
+	public function getFileLocation()
+	{
+		return $this->fileLocation;
+	}
 
-      public function setFileLocation($fileLocation)
-      {
-          $this->fileLocation = $fileLocation;
-      }
+	/**
+	 * @param string $fileLocation
+	 */
+	public function setFileLocation($fileLocation)
+	{
+		$this->fileLocation = $fileLocation;
+	}
 }
 
+	

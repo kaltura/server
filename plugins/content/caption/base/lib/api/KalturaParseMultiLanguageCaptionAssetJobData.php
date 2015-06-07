@@ -8,7 +8,7 @@ class KalturaParseMultiLanguageCaptionAssetJobData extends KalturaJobData
     /**
      * @var string
      */
-    public $parentCaptionAssetId;
+    public $multiLanaguageCaptionAssetId;
 
     /**
      * @var string
@@ -22,7 +22,7 @@ class KalturaParseMultiLanguageCaptionAssetJobData extends KalturaJobData
 
     private static $map_between_objects = array
     (
-        "parentCaptionAssetId",
+        "multiLanaguageCaptionAssetId",
         "entryId",
         "fileLocation",
     );
