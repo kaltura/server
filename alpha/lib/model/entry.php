@@ -140,6 +140,8 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	const DEFAULT_IMAGE_HEIGHT = 480;
 	const DEFAULT_IMAGE_WIDTH = 640;
 
+	const CAPABILITIES = "capabilities";
+
 	private $appears_in = null;
 
 	private $m_added_moderation = false;
@@ -1232,6 +1234,18 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 			$dynamicAttributes[$dynAttribName] = $createdAt;
 		}
 
+		$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaDynamicAttributesContributer');
+		$pluginsDynamicAttributes = array();
+		foreach($pluginInstances as $pluginName => $pluginInstance) {
+			try {
+				$pluginsDynamicAttributes += $pluginInstance->getDynamicAttributes($this);
+			} catch (Exception $e) {
+				KalturaLog::err($e->getMessage());
+				continue;
+			}
+		}
+		$dynamicAttributes = array_merge($dynamicAttributes, $pluginsDynamicAttributes);
+
 		return $dynamicAttributes;
 	}
 	
@@ -1774,6 +1788,9 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 
 	public function setRedirectEntryId ( $v )	{	$this->putInCustomData ( "redirectEntryId" , $v );	}
 	public function getRedirectEntryId (  )		{	return $this->getFromCustomData( "redirectEntryId" );	}
+
+	public function setIsTrimDisabled ( $v )	{	$this->putInCustomData ( "isTrimDisabled" , $v );	}
+	public function getIsTrimDisabled (  )		{	return $this->getFromCustomData( "isTrimDisabled" );	}
 	
 	// indicates that thumbnail shouldn't be auto captured, because it already supplied by the user
 	public function setCreateThumb ( $v, thumbAsset $thumbAsset = null)		
@@ -3341,5 +3358,63 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		$userNames[] = $kuser->getScreenName();
 		
 		return implode(" ", $userNames);
+	}
+
+	public function getcapabilities()
+	{
+
+		$capabilitiesUnserialized = $this->getFromCustomData(self::CAPABILITIES);
+		if (is_null($capabilitiesUnserialized))
+		{
+			return "";
+		}
+		else
+		{
+			$capabilitiesArr = unserialize($capabilitiesUnserialized);
+		}
+		$capabilitiesStr = "";
+		$first = true;
+		foreach ($capabilitiesArr as $capability)
+		{
+			if ($first)
+			{
+				$first = false;
+			} else
+			{
+				$capabilitiesStr .= ",";
+			}
+			$capabilitiesStr .= $capability;
+		}
+		return $capabilitiesStr;
+	}
+
+	public function addCapability($capability)
+	{
+		$capabilitiesStr = $this->getFromCustomData(self::CAPABILITIES);
+		if (is_null($capabilitiesStr))
+		{
+			$capabilitiesArr = array();
+		}
+		else
+		{
+			$capabilitiesArr = unserialize($capabilitiesStr);
+		}
+		$arrSpot = array_search($capability, array_values($capabilitiesArr));
+		if ($arrSpot === false)
+		{
+			$capabilitiesArr[] = $capability;
+		}
+		$this->putInCustomData( self::CAPABILITIES, serialize($capabilitiesArr) );
+	}
+
+	public function removeCapability($capability)
+	{
+		$capabilitiesStr = $this->getFromCustomData(self::CAPABILITIES);
+		if (!is_null($capabilitiesStr))
+		{
+			$capabilitiesArr = unserialize($capabilitiesStr);
+			unset($capabilitiesArr[$capability]);
+			$this->putInCustomData( self::CAPABILITIES, serialize($capabilitiesArr) );
+		}
 	}
 }
