@@ -70,7 +70,7 @@ class KalturaResponseProfileCacher extends kResponseProfileCacher
 		$userRoles = kPermissionManager::getCurrentRoleIds();
 		sort($userRoles);
 		
-		$objectType = get_class(self::$cachedObject);
+		$objectType = get_class($object);
 		$partnerId = self::$cachedObject->getPartnerId();
 		$profileKey = self::$responseProfileKey;
 		$protocol = infraRequestUtils::getProtocol();
@@ -99,6 +99,7 @@ class KalturaResponseProfileCacher extends kResponseProfileCacher
 			{
 				$key = self::getObjectTypeCacheKey($object);
 				$value = self::getObjectTypeCacheValue($object);
+				KalturaLog::debug("Set [$key] value [" . print_r($value, true) . "]");
 				
 				self::set($key, $value);
 			}
