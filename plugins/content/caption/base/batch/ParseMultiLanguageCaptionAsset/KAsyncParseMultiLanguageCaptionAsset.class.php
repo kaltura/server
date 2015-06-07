@@ -156,7 +156,6 @@ class KAsyncParseMultiLanguageCaptionAsset extends KJobHandlerWorker
 			KalturaLog::debug("problem with caption creation - language $languageCode - " . $e->getMessage());
 			return;
 		}
-		$this->unimpersonate();
 		$id = $captionCreated->id;
 		$this->setCaptionContent($id, $contentResource);
 	}
