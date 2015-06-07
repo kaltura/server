@@ -68,7 +68,7 @@ abstract class kCaptionsContentManager
 		$entryId = $captionAsset->getEntryId();
 
 		$jobData = new kParseMultiLanguageCaptionAssetJobData();
-		$jobData->setParentCaptionAssetId($id);
+		$jobData->setMultiLanaguageCaptionAssetId($id);
 		$jobData->setEntryId($entryId);
 		$jobData->setFileLocation($fileLocation);
 
