@@ -518,8 +518,8 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 	{
 		KalturaLog::debug('Recalculating object [' . get_class($object) . '] id [' . $object->getPrimaryKey() . '] related objects');
 		
-		$triggerType = get_class($object);
-		$objectTypes = self::listObjectRelatedTypes($triggerType);
+		$triggerKey = self::getTriggerKey($object);
+		$objectTypes = self::listObjectRelatedTypes($triggerKey);
 		foreach($objectTypes as $objectType => $sessionKeys)
 		{
 			foreach($sessionKeys as $sessionKey => $count)
