@@ -518,13 +518,15 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 	{
 		KalturaLog::debug('Recalculating object [' . get_class($object) . '] id [' . $object->getPrimaryKey() . '] related objects');
 		
+		$partnerId = $object->getPartnerId();
 		$triggerKey = self::getTriggerKey($object);
 		$objectTypes = self::listObjectRelatedTypes($triggerKey);
 		foreach($objectTypes as $objectType => $sessionKeys)
 		{
 			foreach($sessionKeys as $sessionKey => $count)
 			{
-				list($protocol, $ksType, $userRole) = explode('_', $sessionKey, 3);
+				list($protocol, $ksType, $userRoles) = explode('_', $sessionKey, 3);
+				$userRoles = explode('_', $userRoles);
 				if($count < self::MAX_CACHE_KEYS_PER_JOB)
 				{
 					$startEndDocIds = self::listDocIds($objectType, $sessionKey);
@@ -548,11 +550,13 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 		KalturaLog::debug('Recalculating object [' . get_class($object) . '] id [' . $object->getPrimaryKey() . '] cache');
 		$objectType = get_class($object);
 		$objectKey = self::getObjectKey($object);
+		$partnerId = $object->getPartnerId();
 		
 		$sessionTypes = self::listObjectSessionTypes($object);
 		foreach($sessionTypes as $sessionKey)
 		{
 			list($protocol, $ksType, $userRoles) = explode('_', $sessionKey, 3);
+			$userRoles = explode('_', $userRoles);
 			kJobsManager::addRecalculateResponseProfileCacheJob($partnerId, $protocol, $ksType, $userRoles, $objectType, $object->getPrimaryKey());
 		}
 		return true;
