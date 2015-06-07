@@ -873,6 +873,9 @@ class playManifestAction extends kalturaAction
 	
 	public function execute()
 	{
+		
+		KExternalErrors::setResponseErrorCode(KExternalErrors::HTTP_STATUS_NOT_FOUND);
+		
 		$this->deliveryAttributes = new DeliveryProfileDynamicAttributes();
 		// Parse input parameters
 		$this->deliveryAttributes->setSeekFromTime($this->getRequestParameter ( "seekFrom" , -1));
