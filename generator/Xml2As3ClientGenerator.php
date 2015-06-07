@@ -134,7 +134,7 @@ class Xml2As3ClientGenerator extends ClientGeneratorFromXml
 					break;
 					
 				case "map" :
-					$type = "Object";
+					$type = "Object = null";
 					break;
 					
 				default :
