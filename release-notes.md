@@ -1,3 +1,23 @@
+# Jupiter-10.13.0 #
+
+##multi-language caption ingestion##
+- Issue Type: feature request
+- Issue ID: PLAT-2500
+
+#### Configuration ####
+
+- allocate worker/s for KAsyncParseMultiLanguageCaptionAsset.
+
+#### Deployment Scripts ####
+
+	php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+
+- generate batch client libs.
+
+#### Known Issues & Limitations ####
+
+None.
+
 # Jupiter-10.12.0 #
 
 ## Set new permission to flavorasset geturl ##
