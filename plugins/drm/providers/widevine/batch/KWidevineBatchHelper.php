@@ -169,7 +169,7 @@ class KWidevineBatchHelper
 	
 	public static function getFixAssetCmdLine($ffmpegCmd, $inputFile, $fixedInputFile)
 	{
-		$cmd =  "$ffmpegCmd -i $inputFile -i $inputFile -map 0:v -map 1:a -c copy -shortest -y -f mp4 $fixedInputFile 2>&1";
+		$cmd =  "$ffmpegCmd -i $inputFile -i $inputFile -map 0:v -map 1:a -c copy -shortest -y -f mp4 -threads 1 $fixedInputFile 2>&1";
 		
 		KalturaLog::debug("Executing command to fix asset : ".$cmd);
 		
