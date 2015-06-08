@@ -12,11 +12,6 @@ class KAsyncParseMultiLanguageCaptionAsset extends KJobHandlerWorker
 	 */
 	private $captionClientPlugin = null;
 
-	/*
-	 * @var string
-	 */
-	private $partnerId = null;
-
 	/* (non-PHPdoc)
 	 * @see KBatchBase::getType()
 	 */
@@ -37,20 +32,9 @@ class KAsyncParseMultiLanguageCaptionAsset extends KJobHandlerWorker
 	{
 		KalturaLog::debug("parse Multi Language job id - ($job->id)");
 
-		try
-		{
-			$this->updateJob($job, "Start parsing multi-language caption asset [$data->multiLanaguageCaptionAssetId]", KalturaBatchJobStatus::QUEUED);
-		}
-		catch(Exception $e)
-		{
-			$this->closeJob($job, KalturaBatchJobErrorTypes::RUNTIME, $e->getCode(), "Error: " . $e->getMessage(), KalturaBatchJobStatus::FAILED, $data);
-			return $job;
-		}
+		$this->updateJob($job, "Start parsing multi-language caption asset [$data->multiLanaguageCaptionAssetId]", KalturaBatchJobStatus::QUEUED);
 
-		$this->partnerId = $job->partnerId;
-		$this->impersonate($this->partnerId);
 		$this->captionClientPlugin = KalturaCaptionClientPlugin::get(self::$kClient);
-		$this->unimpersonate();
 
 		$parentId = $data->multiLanaguageCaptionAssetId;
 		$entryId = $data->entryId;
@@ -81,20 +65,11 @@ class KAsyncParseMultiLanguageCaptionAsset extends KJobHandlerWorker
 			return $job;
 		}
 
-		try
-		{
-			$this->impersonate($this->partnerId);
-			$result = $this->captionClientPlugin->captionAsset->listAction($filter, $pager);
-			$this->unimpersonate();
-		}
-		catch(Exception $e)
-		{   
-			$this->unimpersonate();
-			$this->closeJob($job, KalturaBatchJobErrorTypes::RUNTIME, $e->getCode(), "Error: " . $e->getMessage(), KalturaBatchJobStatus::FAILED, $data);
-			return $job;
-		}
+		self::impersonate($job->partnerId);
+		$result = $this->captionClientPlugin->captionAsset->listAction($filter, $pager);
 
 		$captionChildernIds = array();
+		
 		foreach($result->objects as $caption)
 		{
 			if($caption->parentId == $parentId)
@@ -143,6 +118,7 @@ class KAsyncParseMultiLanguageCaptionAsset extends KJobHandlerWorker
 
 		//deleting captions of languages that weren't in uploaded file
 		self::deleteCaptions($captionChildernIds);
+		self::unimpersonate();
 
 		$this->closeJob($job, null, null, "Finished parsing", KalturaBatchJobStatus::FINISHED);
 
@@ -153,32 +129,25 @@ class KAsyncParseMultiLanguageCaptionAsset extends KJobHandlerWorker
 	{
 		try
 		{
-			$this->impersonate($this->partnerId);
 			$captionCreated = $this->captionClientPlugin->captionAsset->add($entryId , $captionAsset);
-			$this->unimpersonate();
 		}
 		catch(Exception $e)
 		{
-			$this->unimpersonate();
 			$languageCode = $captionAsset->languageCode;
 			KalturaLog::debug("problem with caption creation - language $languageCode - " . $e->getMessage());
 			return;
 		}
-		$id = $captionCreated->id;
-		$this->setCaptionContent($id, $contentResource);
+		$this->setCaptionContent($captionCreated->id, $contentResource);
 	}
 
 	private function setCaptionContent($id, $contentResource)
 	{
 		try
 		{
-			$this->impersonate($this->partnerId);
-			$captionCreated = $this->captionClientPlugin->captionAsset->setContent($id , $contentResource);
-			$this->unimpersonate();
+			$this->captionClientPlugin->captionAsset->setContent($id , $contentResource);
 		}
 		catch(Exception $e)
 		{
-			$this->unimpersonate();
 			KalturaLog::debug("problem with caption content-setting id - $id - " . $e->getMessage());
 		}
 	}
@@ -191,13 +160,10 @@ class KAsyncParseMultiLanguageCaptionAsset extends KJobHandlerWorker
 			{
 				try
 				{
-					$this->impersonate($this->partnerId);
 					$this->captionClientPlugin->captionAsset->delete($captionId);
-					$this->unimpersonate();
 				}
 				catch(Exception $e)
 				{
-					$this->unimpersonate();
 					KalturaLog::debug("problem with deleting caption id - $captionId - language $language - " . $e->getMessage());
 				}
 			}
