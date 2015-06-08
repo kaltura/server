@@ -1,5 +1,23 @@
 # Jupiter-10.13.0 #
 
+##multi-language caption ingestion##
+- Issue Type: feature request
+- Issue ID: PLAT-2500
+
+#### Configuration ####
+
+- allocate worker/s for KAsyncParseMultiLanguageCaptionAsset.
+
+#### Deployment Scripts ####
+
+	php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+
+- generate batch client libs.
+
+#### Known Issues & Limitations ####
+
+None.
+
 ## Search for tags with spaces and words with less than 3 characters ##
 
 - Issue Type: bug fix
