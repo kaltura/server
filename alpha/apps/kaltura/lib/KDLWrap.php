@@ -98,6 +98,10 @@ class KDLWrap
 		KalturaLog::log( "...S-->".$mediaSet->ToString());
 		
 		$profile = new KDLProfile();
+			/*
+			 * TEMPORARY - Look for WV cases in order to disable duplicate GOP generation. After a while this will be the default behaviour  
+			 */
+		$isForWideVine = false;
 		foreach($cdlFlavorList as $cdlFlavor) {
 			$kdlFlavor = self::ConvertFlavorCdl2Kdl($cdlFlavor);
 			if ($kdlFlavor->_errors)
@@ -105,10 +109,20 @@ class KDLWrap
 				$this->_rv = false;
 				return $this;
 			}
+			
+			if(isset($kdlFlavor->_video) && preg_match('/widevine/', strtolower($kdlFlavor->_tags), $matches)){
+				$isForWideVine = true;
+			}
 			$profile->_flavors[] = $kdlFlavor;
 			KalturaLog::log( "...F-->".$kdlFlavor->ToString());
 		}
-				
+
+		if($isForWideVine==true) {
+			foreach($profile->_flavors as $k=>$kdlFlavor) {
+				$profile->_flavors[$k]->_video->_forWideVine = true;
+			}
+		}
+
 		$trgList = array();
 		{
 			$dlPrc = new KDLProcessor();

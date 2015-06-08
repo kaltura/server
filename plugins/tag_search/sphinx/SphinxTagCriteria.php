@@ -14,7 +14,15 @@ class SphinxTagCriteria extends SphinxCriteria
 		{
 			$filter->set('_eq_object_type', Tag::getIndexedFieldValue('TagPeer::OBJECT_TYPE', $filter->get('_eq_object_type'), kCurrentContext::getCurrentPartnerId()));
 		}
-		
+		if ($filter->get('_likex_tag'))
+		{
+			/*
+ * We replace the spaces with '=' because when we index the tags we also replace them this way. This way when we search the sphinx for expressions using spaces that the first word in them is less than 3 letters
+ * we can still find them.
+ */
+			$filter->set('_likex_tag', str_replace(" ","=",$filter->get('_likex_tag')));
+		}
+
 		parent::applyFilterFields($filter);
 	}
 	

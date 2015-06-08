@@ -331,6 +331,19 @@ $html5Version = $_GET['playerVersion'];
 		<tr>
 			<td colspan="2"><br/><br/></td>
 		</tr>
+		<tr>
+			<td>Sync-Point Interval (seconds):</td>
+			<td><input type="text" id="txtSyncPointInterval" value="30" />
+		</td>
+		<tr>
+			<td>Sync-Point Duration (seconds):</td>
+			<td><input type="text" id="txtSyncPointDuration" value="150" />
+		</td>
+		<tr>
+			<td colspan="2">
+				<input type="button" onclick="enableAds()" value="Enable Ads (Send Sync-Points)" />
+			</td>
+		</tr>
 	</table>
 </div><!-- end #main -->
 </body>

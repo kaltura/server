@@ -281,7 +281,7 @@ class flavorAsset extends asset
 		{
 			list($fileName , $extension) = kAssetUtils::getFileName($entry , $this);
 			$fileName = str_replace("\n", ' ', $fileName);
-			$fileName = kString::stripInvalidUrlChars($fileName);
+			$fileName = kString::keepOnlyValidUrlChars($fileName);
 	
 			if ($extension)
 				$fileName .= ".$extension";

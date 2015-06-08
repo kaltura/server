@@ -132,16 +132,20 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 	 */
 	public static function getDeliveryProfile($entryId, $streamerType = PlaybackProtocol::HTTP) 
 	{
+		$deliveryAttributes = DeliveryProfileDynamicAttributes::init(null, $entryId, $streamerType);
+		
 		if ($streamerType == PlaybackProtocol::HTTP)
 		{
-			$deliveryAttributes = new DeliveryProfileDynamicAttributes();
 			$deliveryAttributes->setMediaProtocol(infraRequestUtils::getProtocol());
 		
 			$delivery = self::getLocalDeliveryByPartner($entryId, $streamerType, $deliveryAttributes, null, null, false);
 			if ($delivery)
 				return $delivery;
+			
+			// if a delivery profile wasn't found try again without forcing the request protocol  
+			$deliveryAttributes->setMediaProtocol(null);
 		}
-		return self::getLocalDeliveryByPartner($entryId, $streamerType, null, null, null, false);	
+		return self::getLocalDeliveryByPartner($entryId, $streamerType, $deliveryAttributes, null, null, false);	
 	}
 	
 	/**
@@ -153,7 +157,7 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 	 * @param boolean $checkSecured whether we should prefer secured delivery profiles.
 	 * @return DeliveryProfile
 	 */
-	public static function getLocalDeliveryByPartner($entryId, $streamerType = PlaybackProtocol::HTTP, DeliveryProfileDynamicAttributes $deliveryAttributes = null, $cdnHost = null, $checkSecured = true) {
+	public static function getLocalDeliveryByPartner($entryId, $streamerType = PlaybackProtocol::HTTP, DeliveryProfileDynamicAttributes $deliveryAttributes, $cdnHost = null, $checkSecured = true) {
 	
 		$deliveries = array();
 		$entry = entryPeer::retrieveByPK($entryId);
@@ -181,7 +185,7 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 	 * @param string $cdnHost - The requesting CdnHost if known / preffered.
 	 * @param boolean $isSecured whether we're interested in secured delivery profile
 	 */
-	public static function getDeliveryByPartner(Partner $partner, $streamerType = PlaybackProtocol::HTTP, DeliveryProfileDynamicAttributes $deliveryAttributes = null, $cdnHost = null, $isSecured = false) {
+	public static function getDeliveryByPartner(Partner $partner, $streamerType, DeliveryProfileDynamicAttributes $deliveryAttributes, $cdnHost = null, $isSecured = false) {
 	
 		$partnerId = $partner->getId();
 		$deliveryIds = $partner->getDeliveryProfileIds();
@@ -287,13 +291,7 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 	 * @param DeliveryProfileDynamicAttributes $deliveryAttributes - constraints on delivery such as media protocol, flv support, etc..
 	 * @return The matching DeliveryProfile if exists, or null otherwise
 	 */
-	protected static function selectByDeliveryAttributes($deliveries, DeliveryProfileDynamicAttributes $deliveryAttributes = null) {
-		if (!$deliveryAttributes)
-		{
-			$deliveryAttributes = new DeliveryProfileDynamicAttributes();
-			$deliveryAttributes->setMediaProtocol(null);
-		}
-	
+	protected static function selectByDeliveryAttributes($deliveries, DeliveryProfileDynamicAttributes $deliveryAttributes) {
 		$partialSupport = null;
 		
 		// find either a fully supported deliveryProfile or the first partial supported one
