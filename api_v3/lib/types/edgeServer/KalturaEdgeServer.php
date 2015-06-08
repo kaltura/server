@@ -144,16 +144,7 @@ class KalturaEdgeServer extends KalturaObject implements IFilterable
 	public function validateForInsert($propertiesToSkip = array())
 	{
 		$this->validateMandatoryAttributes();
-			
-		if($this->systemName)
-		{
-			$c = KalturaCriteria::create(EdgeServerPeer::OM_CLASS);
-			$systemNameOrHostName = $c->getNewCriterion(EdgeServerPeer::SYSTEM_NAME, $this->systemName);
-			$systemNameOrHostName->addOr($c->getNewCriterion (EdgeServerPeer::HOST_NAME, $this->hostName)); 
-			$c->addAnd($systemNameOrHostName);
-			if(EdgeServerPeer::doCount($c))
-				throw new KalturaAPIException(KalturaErrors::SYSTEM_NAME_OR_HOST_NAME_ALREADY_EXISTS, $this->systemName . "|" . $this->hostName);
-		}
+		$this->validateDuplications();
 	
 		return parent::validateForInsert($propertiesToSkip);
 	}
@@ -164,18 +155,8 @@ class KalturaEdgeServer extends KalturaObject implements IFilterable
 	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
 	{
 		$this->validateMandatoryAttributes();
-		
-		if($this->systemName)
-		{
-			$c = KalturaCriteria::create(EdgeServerPeer::OM_CLASS);
-			$c->add(EdgeServerPeer::ID, $sourceObject->getId(), Criteria::NOT_EQUAL);
-			$systemNameOrHostName = $c->getNewCriterion(EdgeServerPeer::SYSTEM_NAME, $this->systemName);
-			$systemNameOrHostName->addOr($c->getNewCriterion (EdgeServerPeer::HOST_NAME, $this->hostName)); 
-			$c->addAnd($systemNameOrHostName);
-			if(EdgeServerPeer::doCount($c))
-				throw new KalturaAPIException(KalturaErrors::SYSTEM_NAME_OR_HOST_NAME_ALREADY_EXISTS, $this->systemName . "|" . $this->hostName);
-		}
-		
+		$this->validateDuplications($sourceObject->getId());
+				
 		return parent::validateForUpdate($sourceObject, $propertiesToSkip);
 	}
 	
@@ -183,6 +164,42 @@ class KalturaEdgeServer extends KalturaObject implements IFilterable
 	{
 		$this->validatePropertyMinLength("name", 1, true);
 		$this->validatePropertyNotNull("hostName");
+	}
+	
+	public function validateDuplications($edgeId = null)
+	{		
+		$this->validateHostNameDuplication($edgeId);
+		
+		if($this->systemName)
+			$this->validateDuplications($edgeId);
+	}
+	
+	public function validateHostNameDuplication($edgeId = null)
+	{
+		$c = KalturaCriteria::create(EdgeServerPeer::OM_CLASS);
+		
+		if($edgeId)
+			$c->add(EdgeServerPeer::ID, $sourceObject->getId(), Criteria::NOT_EQUAL);
+		
+		$c->add(EdgeServerPeer::HOST_NAME, $this->hostName);
+		$c->add(EdgeServerPeer::STATUS, EdgeServerStatus::ACTIVE);
+		
+		if(EdgeServerPeer::doCount($c))
+			throw new KalturaAPIException(KalturaErrors::HOST_NAME_ALREADY_EXISTS, $this->hostName);
+	}
+	
+	public function validateSystemNameDuplication($edgeId = null)
+	{
+		$c = KalturaCriteria::create(EdgeServerPeer::OM_CLASS);
+	
+		if($edgeId)
+			$c->add(EdgeServerPeer::ID, $sourceObject->getId(), Criteria::NOT_EQUAL);
+	
+		$c->add(EdgeServerPeer::SYSTEM_NAME, $this->systemName);
+		$c->add(EdgeServerPeer::STATUS, EdgeServerStatus::ACTIVE);
+	
+		if(EdgeServerPeer::doCount($c))
+			throw new KalturaAPIException(KalturaErrors::SYSTEM_NAME_ALREADY_EXISTS, $this->systemName);
 	}
 	
 	/* (non-PHPdoc)

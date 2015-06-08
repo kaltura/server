@@ -576,5 +576,5 @@ class KalturaErrors extends APIErrors
 	/*
 	 * Edge Server service
 	 */
-	const SYSTEM_NAME_OR_HOST_NAME_ALREADY_EXISTS = "SYSTEM_NAME_OR_HOST_NAME_ALREADY_EXISTS;SYS_OR_HOST_NAME;System name | Host Name [@SYS_OR_HOST_NAME@] or already exists";
+	const HOST_NAME_ALREADY_EXISTS = "HOST_NAME_ALREADY_EXISTS;HOST_NAME;Host Name [@HOST_NAME@] already exists";
 }
