@@ -13,7 +13,7 @@ class KAsyncParseMultiLanguageCaptionAsset extends KJobHandlerWorker
 	private $captionClientPlugin = null;
 
 	/*
-	 * @var partnerId
+	 * @var string
 	 */
 	private $partnerId = null;
 
