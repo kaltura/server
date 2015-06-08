@@ -710,7 +710,15 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 		if(\$this->isModified())
 		{
 			kQueryCache::invalidateQueryCache(\$this);
-			kEventsManager::raiseEvent(new kObjectChangedEvent(\$this, \$this->tempModifiedColumns));
+			\$modifiedColumns = \$this->tempModifiedColumns;";
+			
+			if($customDataColumn) {
+				$script .= "
+			\$modifiedColumns[kObjectChangedEvent::CUSTOM_DATA_OLD_VALUES] = \$this->oldCustomDataValues;";
+			}
+			
+			$script .= "
+			kEventsManager::raiseEvent(new kObjectChangedEvent(\$this, \$modifiedColumns));
 		}
 			
 		\$this->tempModifiedColumns = array();
