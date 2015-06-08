@@ -572,4 +572,9 @@ class KalturaErrors extends APIErrors
 	const RESPONSE_PROFILE_DUPLICATE_SYSTEM_NAME = 'RESPONSE_PROFILE_DUPLICATE_SYSTEM_NAME;SYSTEM_NAME;Response profile system-name [@SYSTEM_NAME@] already exists';
 	
 	const RESPONSE_PROFILE_MAX_NESTING_LEVEL = 'RESPONSE_PROFILE_MAX_NESTING_LEVEL;;Response profile cross maximum nesting level';
+	
+	/*
+	 * Edge Server service
+	 */
+	const SYSTEM_NAME_OR_HOST_NAME_ALREADY_EXISTS = "SYSTEM_NAME_OR_HOST_NAME_ALREADY_EXISTS;SYS_OR_HOST_NAME;System name | Host Name [@SYS_OR_HOST_NAME@] or already exists";
 }

@@ -39,22 +39,6 @@ class EdgeServerService extends KalturaBaseService
 		$edgeServer->fromObject($dbEdgeServer, $this->getResponseProfile());
 		return $edgeServer;
 	}
-		
-	/**
-	 * @action updateStatus
-	 * @param int $edgeServerId
-	 * @throws KalturaErrors::INVALID_OBJECT_ID
-	 * @param KalturaEdgeServerStatus $status
-	 */
-	public function updateStatusAction($edgeServerId, $status)
-	{
-		$dbEdgeServer = EdgeServerPeer::retrieveByPK($edgeServerId);
-		if (!$dbEdgeServer)
-			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $edgeServerId);
-			
-		$dbEdgeServer->setStatus($status);
-		$dbEdgeServer->save();
-	}	
 	
 	/**
 	 * Get edge server by id

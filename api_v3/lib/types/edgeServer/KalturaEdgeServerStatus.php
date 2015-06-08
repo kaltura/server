@@ -3,11 +3,9 @@
  * @package api
  * @subpackage enum
  */
-class KalturaEdgeServerStatus extends KalturaEnum
+class KalturaEdgeServerStatus extends KalturaEnum implements EdgeServerStatus
 {
-	const ACTIVE = 1;
-	const DISABLED = 2;
-	const DELETED = 3;
+	// see EdgeServerStatus interface
 }
 
 

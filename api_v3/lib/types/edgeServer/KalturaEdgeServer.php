@@ -66,7 +66,6 @@ class KalturaEdgeServer extends KalturaObject implements IFilterable
 	 *
 	 * @var string
 	 * @filter like,mlikeor,mlikeand
-	 * @requiresPermission update
 	 */
 	public $tags;
 	
@@ -89,8 +88,8 @@ class KalturaEdgeServer extends KalturaObject implements IFilterable
 	public $playbackHostName;
 	
 	/**
-	 * Delivery profile ids
-	 * @var KalturaKeyValueArray
+	 * Delivery profile ids comma seperated
+	 * @var string
 	 */
 	public $deliveryProfileIds;
 	
@@ -149,9 +148,11 @@ class KalturaEdgeServer extends KalturaObject implements IFilterable
 		if($this->systemName)
 		{
 			$c = KalturaCriteria::create(EdgeServerPeer::OM_CLASS);
-			$c->add(EdgeServerPeer::SYSTEM_NAME, $this->systemName);
-			if(StorageProfilePeer::doCount($c))
-				throw new KalturaAPIException(KalturaErrors::SYSTEM_NAME_ALREADY_EXISTS, $this->systemName);
+			$systemNameOrHostName = $c->getNewCriterion(EdgeServerPeer::SYSTEM_NAME, $this->systemName);
+			$systemNameOrHostName->addOr($c->getNewCriterion (EdgeServerPeer::HOST_NAME, $this->hostName)); 
+			$c->addAnd($systemNameOrHostName);
+			if(EdgeServerPeer::doCount($c))
+				throw new KalturaAPIException(KalturaErrors::SYSTEM_NAME_OR_HOST_NAME_ALREADY_EXISTS, $this->systemName . "|" . $this->hostName);
 		}
 	
 		return parent::validateForInsert($propertiesToSkip);
@@ -168,9 +169,11 @@ class KalturaEdgeServer extends KalturaObject implements IFilterable
 		{
 			$c = KalturaCriteria::create(EdgeServerPeer::OM_CLASS);
 			$c->add(EdgeServerPeer::ID, $sourceObject->getId(), Criteria::NOT_EQUAL);
-			$c->add(EdgeServerPeer::SYSTEM_NAME, $this->systemName);
+			$systemNameOrHostName = $c->getNewCriterion(EdgeServerPeer::SYSTEM_NAME, $this->systemName);
+			$systemNameOrHostName->addOr($c->getNewCriterion (EdgeServerPeer::HOST_NAME, $this->hostName)); 
+			$c->addAnd($systemNameOrHostName);
 			if(EdgeServerPeer::doCount($c))
-				throw new KalturaAPIException(KalturaErrors::SYSTEM_NAME_ALREADY_EXISTS, $this->systemName);
+				throw new KalturaAPIException(KalturaErrors::SYSTEM_NAME_OR_HOST_NAME_ALREADY_EXISTS, $this->systemName . "|" . $this->hostName);
 		}
 		
 		return parent::validateForUpdate($sourceObject, $propertiesToSkip);
@@ -193,40 +196,7 @@ class KalturaEdgeServer extends KalturaObject implements IFilterable
 		
 		$object_to_fill =  parent::toObject($object_to_fill, $props_to_skip);
 		
-		// Delivery Profile Ids
-		$deliveryProfileIds = $this->deliveryProfileIds;
-		
-		$deliveryProfiles = array();
-		if($deliveryProfileIds)
-			foreach($deliveryProfileIds->toArray() as $keyValue) 
-				$this->insertObject($deliveryProfiles, $keyValue->key, $keyValue->value);
-			
-		$object_to_fill->setDeliveryProfileIds($deliveryProfiles);
-		
 		return $object_to_fill;
-	}
-	
-	protected function insertObject(&$res, $key, $value) {
-		if(strpos($key, ".") === FALSE) {
-			$res[$key] = intval($value);
-			return;
-		}
-	
-		list($key, $newKey) = explode(".", $key, 2);
-		if(!array_key_exists($key, $res))
-			$res[$key] = array();
-		$this->insertObject($res[$key], $newKey, $value);
-	}
-	
-	/* (non-PHPdoc)
-	 * @see KalturaObject::fromObject()
-	 */
-	public function doFromObject($source_object, KalturaDetachedResponseProfile $responseProfile = null)
-	{
-	    parent::doFromObject($source_object, $responseProfile);
-	    
-		if($this->shouldGet('deliveryProfileIds', $responseProfile))
-			$this->deliveryProfileIds = KalturaKeyValueArray::fromKeyValueArray($source_object->getDeliveryProfileIds());
 	}
 	
 	/* (non-PHPdoc)

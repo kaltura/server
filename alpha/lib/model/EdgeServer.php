@@ -26,6 +26,17 @@ class EdgeServer extends BaseEdgeServer {
 		// Make sure that parent constructor is always invoked, since that
 		// is where any default values for this object are set.
 		parent::__construct();
+		$this->applyDefaultValues();
+	}
+	
+	/**
+	 * Applies default values to this object.
+	 * This method should be called from the object's constructor (or equivalent initialization method).
+	 * @see __construct()
+	 */
+	public function applyDefaultValues()
+	{
+		$this->setType(edgeServerType::NODE);
 	}
 	
 	/* Delivery Settings */
@@ -46,6 +57,28 @@ class EdgeServer extends BaseEdgeServer {
 		
 		if(!$playbackHostName)
 			$playbackHostName = $this->host_name;
+		
+		return $playbackHostName;
+	}
+	
+	public function getPlaybackHost()
+	{
+		$playbackHostName = '';
+		
+		if($this->parent_id)
+		{
+			$parentEdge = edgeserverpeer::retrieveByPK($this->parent_id);
+			if($parentEdge) {
+				$playbackHostName = $parentEdge->getPlaybackHost() . $this->getPlaybackHostName();
+			}
+			else {
+				$playbackHostName = $this->getPlaybackHostName();
+			}
+			
+		}
+		else {
+			$playbackHostName = $this->getPlaybackHostName();
+		}
 		
 		return $playbackHostName;
 	}

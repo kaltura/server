@@ -1729,15 +1729,21 @@
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="system_name" type="varchar" size="128" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="desciption" type="varchar" size="127" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="status" type="integer" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="type" type="integer" default="0" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="tags" type="longvarchar" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="host_name" type="varchar" size="127" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="playback_host_name" type="varchar" size="127" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="parent_id" default="0" type="integer" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="custom_data" type="longvarchar" />
-		<index name="partner_id_status">
+		<index name="partner_id_status_system_name">
 			<index-column name="partner_id" />
 			<index-column name="status" />
 			<index-column name="system_name" />
+		</index>
+		<index name="partner_id_status_host_name">
+			<index-column name="partner_id" />
+			<index-column name="status" />
+			<index-column name="host_name" />
 		</index>
 	</table>
 	<table skipSql="false" abstract="false" name="delivery_profile">
