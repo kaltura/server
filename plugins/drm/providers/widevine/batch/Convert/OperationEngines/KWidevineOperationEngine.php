@@ -110,7 +110,7 @@ class KWidevineOperationEngine extends KOperationEngine
 		//try to fix source assets sync and re-try encryption
 		if($returnValue == KWidevineBatchHelper::FIX_ASSET_ERROR_RETURN_CODE)
 		{
-			KalturaLogger::debug("Trying to fix input files due to mismatch error ...");
+			KalturaLog::debug("Trying to fix input files due to mismatch error ...");
 			$fixedInputFiles = $this->fixInputAssets($inputFiles);
 			$returnValue = $this->executeEncryptPackageCmd($profile, $fixedInputFiles);
 			if($returnValue != 0)
