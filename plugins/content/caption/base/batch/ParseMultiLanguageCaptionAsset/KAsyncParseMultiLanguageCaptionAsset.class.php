@@ -12,6 +12,11 @@ class KAsyncParseMultiLanguageCaptionAsset extends KJobHandlerWorker
 	 */
 	private $captionClientPlugin = null;
 
+	/*
+	 * @var partnerId
+	 */
+	private $partnerId = null;
+
 	/* (non-PHPdoc)
 	 * @see KBatchBase::getType()
 	 */
@@ -42,7 +47,8 @@ class KAsyncParseMultiLanguageCaptionAsset extends KJobHandlerWorker
 			return $job;
 		}
 
-		$this->impersonate($job->partnerId);
+		$this->partnerId = $job->partnerId;
+		$this->impersonate($this->partnerId);
 		$this->captionClientPlugin = KalturaCaptionClientPlugin::get(self::$kClient);
 		$this->unimpersonate();
 
@@ -77,7 +83,7 @@ class KAsyncParseMultiLanguageCaptionAsset extends KJobHandlerWorker
 
 		try
 		{
-			$this->impersonate($job->partnerId);
+			$this->impersonate($this->partnerId);
 			$result = $this->captionClientPlugin->captionAsset->listAction($filter, $pager);
 			$this->unimpersonate();
 		}
@@ -134,6 +140,8 @@ class KAsyncParseMultiLanguageCaptionAsset extends KJobHandlerWorker
 				$this->setCaptionContent($id, $contentResource);				
 	
 		}
+
+		//deleting captions of languages that weren't in uploaded file
 		self::deleteCaptions($captionChildernIds);
 
 		$this->closeJob($job, null, null, "Finished parsing", KalturaBatchJobStatus::FINISHED);
@@ -145,7 +153,7 @@ class KAsyncParseMultiLanguageCaptionAsset extends KJobHandlerWorker
 	{
 		try
 		{
-			$this->impersonate($job->partnerId);
+			$this->impersonate($this->partnerId);
 			$captionCreated = $this->captionClientPlugin->captionAsset->add($entryId , $captionAsset);
 			$this->unimpersonate();
 		}
@@ -164,14 +172,14 @@ class KAsyncParseMultiLanguageCaptionAsset extends KJobHandlerWorker
 	{
 		try
 		{
-			$this->impersonate($job->partnerId);
+			$this->impersonate($this->partnerId);
 			$captionCreated = $this->captionClientPlugin->captionAsset->setContent($id , $contentResource);
 			$this->unimpersonate();
 		}
 		catch(Exception $e)
 		{
 			$this->unimpersonate();
-			KalturaLog::debug("problem with caption content-setting id - $id - language $languageLong - " . $e->getMessage());
+			KalturaLog::debug("problem with caption content-setting id - $id - " . $e->getMessage());
 		}
 	}
 
@@ -183,7 +191,7 @@ class KAsyncParseMultiLanguageCaptionAsset extends KJobHandlerWorker
 			{
 				try
 				{
-					$this->impersonate($job->partnerId);
+					$this->impersonate($this->partnerId);
 					$this->captionClientPlugin->captionAsset->delete($captionId);
 					$this->unimpersonate();
 				}
