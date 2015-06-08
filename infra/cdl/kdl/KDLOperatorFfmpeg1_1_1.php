@@ -22,6 +22,7 @@ $con = $target->_container;
 			break;
 	 */
 		case KDLContainerTarget::ISMV:
+		case KDLContainerTarget::ISMA:
 				/*
 				 * ISMV/SmoothStreaming needs following in order to support adptive-bitrate management
 				 * - frag_keyframe - the media control meta data is written for each chunk/packet, 
