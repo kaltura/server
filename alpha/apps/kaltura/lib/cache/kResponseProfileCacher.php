@@ -524,7 +524,7 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 			{
 				list($protocol, $ksType, $userRoles) = explode('_', $sessionKey, 3);
 				$userRoles = explode('_', $userRoles);
-				if($count < self::MAX_CACHE_KEYS_PER_JOB)
+				if($count > self::MAX_CACHE_KEYS_PER_JOB)
 				{
 					$startEndDocIds = self::listDocIds($objectType, $sessionKey);
 					foreach($startEndDocIds as $startEndDocId)
