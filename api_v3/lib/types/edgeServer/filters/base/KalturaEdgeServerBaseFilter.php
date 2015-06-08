@@ -150,7 +150,7 @@ abstract class KalturaEdgeServerBaseFilter extends KalturaFilter
 	 * @var string
 	 */
 	public $playbackHostNameMultiLikeOr;
-	
+
 	/**
 	 * @var string
 	 */
