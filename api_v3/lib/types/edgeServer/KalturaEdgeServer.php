@@ -171,7 +171,7 @@ class KalturaEdgeServer extends KalturaObject implements IFilterable
 		$this->validateHostNameDuplication($edgeId);
 		
 		if($this->systemName)
-			$this->validateDuplications($edgeId);
+			$this->validateSystemNameDuplication($edgeId);
 	}
 	
 	public function validateHostNameDuplication($edgeId = null)
@@ -182,7 +182,7 @@ class KalturaEdgeServer extends KalturaObject implements IFilterable
 			$c->add(EdgeServerPeer::ID, $sourceObject->getId(), Criteria::NOT_EQUAL);
 		
 		$c->add(EdgeServerPeer::HOST_NAME, $this->hostName);
-		$c->add(EdgeServerPeer::STATUS, EdgeServerStatus::ACTIVE);
+		$c->add(EdgeServerPeer::STATUS, array(EdgeServerStatus::ACTIVE, EdgeServerStatus::DISABLED), Criteria::IN);
 		
 		if(EdgeServerPeer::doCount($c))
 			throw new KalturaAPIException(KalturaErrors::HOST_NAME_ALREADY_EXISTS, $this->hostName);
@@ -196,7 +196,7 @@ class KalturaEdgeServer extends KalturaObject implements IFilterable
 			$c->add(EdgeServerPeer::ID, $sourceObject->getId(), Criteria::NOT_EQUAL);
 	
 		$c->add(EdgeServerPeer::SYSTEM_NAME, $this->systemName);
-		$c->add(EdgeServerPeer::STATUS, EdgeServerStatus::ACTIVE);
+		$c->add(EdgeServerPeer::STATUS, array(EdgeServerStatus::ACTIVE, EdgeServerStatus::DISABLED), Criteria::IN);
 	
 		if(EdgeServerPeer::doCount($c))
 			throw new KalturaAPIException(KalturaErrors::SYSTEM_NAME_ALREADY_EXISTS, $this->systemName);
