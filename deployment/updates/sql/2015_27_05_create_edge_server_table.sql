@@ -10,7 +10,7 @@ CREATE TABLE edge_server
         status INTEGER,
         type INTEGER default 0 NOT NULL,
         tags TEXT,
-        host_name VARCHAR(127) NOT NULL,,
+        host_name VARCHAR(127) NOT NULL,
         playback_host_name VARCHAR(127),
         parent_id INTEGER default 0,
         custom_data TEXT,
