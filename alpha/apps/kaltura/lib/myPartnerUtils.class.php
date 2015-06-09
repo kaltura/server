@@ -324,14 +324,45 @@ class myPartnerUtils
 			$protocol='http';
 
 		$partner = PartnerPeer::retrieveByPK( $partner_id );
+		if ( !$partner )
+		{
+			KalturaLog::err("No partner found");
+			return "";
+		}
 		if ($partner->isInCDNWhiteList($_SERVER['HTTP_HOST']))
 		{
 			$cdnHost = $_SERVER['HTTP_HOST'];
 			return $cdnHost;
 		}
 
-		if ( !$partner || (! $partner->getCdnHost() ) )
-			return $hostType == "thumbnail" ? requestUtils::getThumbnailCdnHost($protocol) : requestUtils::getCdnHost($protocol);
+		switch ($hostType)
+		{
+			case 'thumbnail':
+				if ($partner && $partner->getThumbnailHost())
+				{
+					return preg_replace('/^https?/', $protocol, $partner->getThumbnailHost());
+				}
+				if ($partner && $partner->getCdnHost())
+				{
+					return preg_replace('/^https?/', $protocol, $partner->getCdnHost());
+				}
+				return requestUtils::getThumbnailCdnHost($protocol);
+			case 'api':
+				if ($protocol == 'https')
+				{
+					return 'https://' . (kConf::hasParam('cdn_api_host_https')) ? kConf::get('cdn_api_host_https') : kConf::get('www_host');
+				}
+				else
+				{
+					return 'http://' . (kConf::hasParam('cdn_api_host')) ? kConf::get('cdn_api_host') : kConf::get('www_host');
+				}
+			default:
+				if ($partner && $partner->getCdnHost())
+				{
+					return preg_replace('/^https?/', $protocol, $partner->getCdnHost());
+				}
+				return requestUtils::getCdnHost($protocol);
+		}
 
 		$cdnHost = $partner->getCdnHost();
 
