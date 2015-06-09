@@ -29,6 +29,44 @@
 
 * To enable this feature on your account you will need you will need to flip on the feature in the partner configuration section.
 
+##multi-language caption ingestion##
+- Issue Type: feature request
+- Issue ID: PLAT-2500
+
+#### Configuration ####
+
+- allocate worker/s for KAsyncParseMultiLanguageCaptionAsset.
+
+#### Deployment Scripts ####
+
+	php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+
+- generate batch client libs.
+
+#### Known Issues & Limitations ####
+
+None.
+
+
+## Search for tags with spaces and words with less than 3 characters ##
+
+- Issue Type: bug fix
+- Issue ID: SUP-4362
+
+#### Configuration ####
+
+None.
+
+#### Deployment Scripts ####
+
+    - Need to re-build so that spaces in tags will be replaced by '=' & re-index the tag sphinx table.
+
+#### Known Issues & Limitations ####
+
+None.
+
+
+
 
 # Jupiter-10.12.0 #
 
