@@ -744,6 +744,6 @@ scriptPath											= ../plugins/content_distribution/batch/Distribute/KAsyncDi
 id													= 610
 friendlyName										= Recalculate Cache
 type												= KAsyncRecalculateCache
-scriptPath											= batch/batches/Cache/KAsyncRecalculateCacheExe.php
+scriptPath											= batches/Cache/KAsyncRecalculateCacheExe.php
 
 
