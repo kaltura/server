@@ -33,7 +33,6 @@ class KAsyncRecalculateCache extends KJobHandlerWorker
 		KalturaLog::debug("Recalculate job id [$job->id]");
 		
 		$engine = KRecalculateCacheEngine::getInstance($job->jobSubType);
-		$engine->configure($job->partnerId);
 		$recalculatedObjects = $engine->recalculate($data);
 		return $this->closeJob($job, null, null, "Recalculated $recalculatedObjects cache objects", KalturaBatchJobStatus::FINISHED);
 	}
