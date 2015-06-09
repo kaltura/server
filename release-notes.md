@@ -41,11 +41,11 @@
 
 	php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
 
-- generate batch client libs.
+- deploy server-saas-config to update batch client.
 
 #### Known Issues & Limitations ####
 
-None.
+Players will allow choosing 'multi-language' captions ,by default.
 
 
 ## Search for tags with spaces and words with less than 3 characters ##
