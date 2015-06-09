@@ -1690,7 +1690,7 @@ class Partner extends BasePartner
 	public function isInCDNWhiteList($host)
 	{
 		KalturaLog::debug("Checking host [$host] is in partner CDN white list");
-		$whiteList = $this->getCdnHostWhiteList();
+		$whiteList = $this->getCdnHostWhiteListArray();
 		foreach ($whiteList as $regEx)
 		{
 			if (preg_match("/".$regEx."/", $host)===1)//Should $regEx be escaped?
