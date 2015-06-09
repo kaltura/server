@@ -90,7 +90,7 @@ scriptPath											= batch/batches/Cache/KAsyncRecalculateCacheExe.php
 ```
 
 ### Deployment Scripts ###
-None.
+ - php deployment/updates/scripts/add_permissions/2015_06_09_response_profile.php
 
 ### Known Issues & Limitations ###
 None.
