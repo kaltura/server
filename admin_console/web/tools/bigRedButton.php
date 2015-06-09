@@ -128,6 +128,8 @@ $html5Version = $_GET['playerVersion'];
 
 		function onSyncPoint(metadata){
 			if ( metadata && metadata.objectType == "KalturaSyncPoint") {
+				if(lastSyncPointOffset && lastSyncPointOffset == metadata.offset)
+					return;
 				var date = new Date();
 				lastSyncPointTime = date.getTime();
 				lastSyncPointOffset = metadata.offset;
@@ -207,7 +209,7 @@ $html5Version = $_GET['playerVersion'];
 			}
 			else{
 				var delay = $('#txtAdDelay').val();
-				var triggeredAt = date.getTime() + parseInt(delay) / 1000;
+				var triggeredAt = (date.getTime() + parseInt(delay)) / 1000;
 
 				$.ajax(
 					'/api_v3/index.php/service/cuePoint_cuePoint/action/add', {
@@ -232,7 +234,7 @@ $html5Version = $_GET['playerVersion'];
 							return;
 						}
 
-						log('Cue-Point created [' + data.id + '] triggeredAt [' + triggeredAt + '] timeSinceLastSyncPoint [' + timeSinceLastSyncPoint +']');
+						log('Cue-Point created [' + data.id + '] triggeredAt [' + triggeredAt + ']');
 					}
 				});
 			}
