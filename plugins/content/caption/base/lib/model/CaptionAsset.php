@@ -12,6 +12,7 @@ class CaptionAsset extends asset
 	const CUSTOM_DATA_FIELD_LABEL = "label";
 	const CUSTOM_DATA_PARENT_ID = "parentId";
 
+	const MULTI_LANGUAGE = 'Multilingual';
 	/* (non-PHPdoc)
 	 * @see Baseasset::applyDefaultValues()
 	 */
