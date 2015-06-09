@@ -16,18 +16,6 @@
 class EdgeServer extends BaseEdgeServer {
 	
 	const CUSTOM_DATA_DELIVERY_IDS = 'delivery_profile_ids';
-
-	/**
-	 * Initializes internal state of EdgeServer object.
-	 * @see        parent::__construct()
-	 */
-	public function __construct()
-	{
-		// Make sure that parent constructor is always invoked, since that
-		// is where any default values for this object are set.
-		parent::__construct();
-		$this->applyDefaultValues();
-	}
 	
 	/**
 	 * Applies default values to this object.

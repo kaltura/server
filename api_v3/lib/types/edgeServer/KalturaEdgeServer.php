@@ -143,7 +143,7 @@ class KalturaEdgeServer extends KalturaObject implements IFilterable
 	 */
 	public function validateForInsert($propertiesToSkip = array())
 	{
-		$this->validateMandatoryAttributes();
+		$this->validateMandatoryAttributes(true);
 		$this->validateDuplications();
 	
 		return parent::validateForInsert($propertiesToSkip);
@@ -160,15 +160,18 @@ class KalturaEdgeServer extends KalturaObject implements IFilterable
 		return parent::validateForUpdate($sourceObject, $propertiesToSkip);
 	}
 	
-	public function validateMandatoryAttributes()
+	public function validateMandatoryAttributes($isInsert = false)
 	{
+		if($isInsert)
+			$this->validatePropertyNotNull("hostName");
+		
 		$this->validatePropertyMinLength("name", 1, true);
-		$this->validatePropertyNotNull("hostName");
 	}
 	
 	public function validateDuplications($edgeId = null)
-	{		
-		$this->validateHostNameDuplication($edgeId);
+	{
+		if($this->hostName)		
+			$this->validateHostNameDuplication($edgeId);
 		
 		if($this->systemName)
 			$this->validateSystemNameDuplication($edgeId);
