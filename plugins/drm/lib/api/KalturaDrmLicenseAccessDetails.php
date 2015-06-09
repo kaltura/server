@@ -10,7 +10,7 @@ class KalturaDrmLicenseAccessDetails extends  KalturaObject {
      *
      * @var string
      */
-    public $policyName;
+    public $policy;
     /**
      * movie duration in seconds
      *
@@ -22,6 +22,6 @@ class KalturaDrmLicenseAccessDetails extends  KalturaObject {
      *
      * @var int
      */
-    public $absoluteExpiration;
+    public $absolute_duration;
 
 }

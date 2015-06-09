@@ -66,10 +66,20 @@ None.
 None.
 
 
-
-
 # Jupiter-10.12.0 #
 
+## Set new permission to flavorasset geturl ##
+
+- Issue Type: Permission change
+- Issue ID : SUP-4739
+
+### Configuration ###
+ 
+None.
+
+#### Deployment Script ####
+
+- Run php deployment/updates/scripts/add_permissions/2015_05_18_update_flavorasset_permissions.php
 
 ## New event notification template- drop folder error description changed ##
 
@@ -99,7 +109,6 @@ None.
 #### Known Issues & Limitations ####
 
 None.
-
 
 ## New event notification template- entry custom data changed ##
 
@@ -691,26 +700,28 @@ Add the following lines as new sections:
 #### Activiti Deployment Instructions ####
 
  - Install [Apache Tomcat 7](http://tomcat.apache.org/tomcat-7.0-doc/setup.html#Unix_daemon "Apache Tomcat 7")
- - Make sure $CATALINA_HOME is defined.
+ - Make sure $CATALINA_BASE is defined.
  - Install [Apache Ant](http://ant.apache.org/manual/installlist.html "Apache Ant")
  - Download [Activiti 5.17.0](https://github.com/Activiti/Activiti/releases/download/activiti-5.17.0/activiti-5.17.0.zip "Activiti 5.17.0")
  - Open zip: `unzip activiti-5.17.0.zip`
- - Copy WAR files: `cp activiti-5.17.0/wars/* $CATALINA_HOME/webapps/`
+ - Copy WAR files: 
+  - `cp activiti-5.17.0/wars/activiti-explorer.war $CATALINA_BASE/webapps/activiti-explorer##5.17.0.war`
+  - `cp activiti-5.17.0/wars/activiti-rest.war $CATALINA_BASE/webapps/activiti-rest##5.17.0.war`
  - Restart Apache Tomcat.
  - Create DB **(replace tokens)**: `mysql -uroot -p`
 
 		CREATE DATABASE activiti;
-		GRANT INSERT,UPDATE,DELETE,SELECT,ALTER,CREATE ON activiti.* TO '@DB1_USER@'@'%';
+		GRANT INSERT,UPDATE,DELETE,SELECT,ALTER,CREATE,INDEX ON activiti.* TO '@DB1_USER@'@'%';
 		FLUSH PRIVILEGES;
 
- - Edit **(replace tokens)** $CATALINA_HOME/webapps/**activiti-explorer**/WEB-INF/classes/db.properties
+ - Edit **(replace tokens)** $CATALINA_BASE/webapps/**activiti-explorer**/WEB-INF/classes/db.properties
 
 		jdbc.driver=com.mysql.jdbc.Driver
 		jdbc.url=jdbc:mysql://@DB1_HOST@:@DB1_PORT@/activiti
 		jdbc.username=@DB1_USER@
 		jdbc.password=@DB1_PASS@
 
- - Edit **(replace tokens)** $CATALINA_HOME/webapps/**activiti-rest**/WEB-INF/classes/db.properties
+ - Edit **(replace tokens)** $CATALINA_BASE/webapps/**activiti-rest**/WEB-INF/classes/db.properties
 
 		jdbc.driver=com.mysql.jdbc.Driver
 		jdbc.url=jdbc:mysql://@DB1_HOST@:@DB1_PORT@/activiti
@@ -719,7 +730,7 @@ Add the following lines as new sections:
 
  - Download [mysql jdbc connector 5.0.8](http://cdn.mysql.com/Downloads/Connector-J/mysql-connector-java-5.0.8.zip "mysql jdbc connector 5.0.8")
  - Open zip: `unzip mysql-connector-java-5.0.8.zip`
- - Copy the mysql jdbc connector: `cp mysql-connector-java-5.0.8/mysql-connector-java-5.0.8-bin.jar $CATALINA_HOME/lib/`
+ - Copy the mysql jdbc connector: `cp mysql-connector-java-5.0.8/mysql-connector-java-5.0.8-bin.jar $CATALINA_BASE/lib/`
  - Restart Apache Tomcat.
  - Open your browser to validate installation **(replace tokens)**: http://@WWW_HOST@:8080/activiti-explorer/
 	 - Username: kermit
