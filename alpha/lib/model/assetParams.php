@@ -44,6 +44,7 @@ class assetParams extends BaseassetParams
 	const CONTAINER_FORMAT_WIDEVINE = 'wvm';
 	
 	const TAG_SOURCE = "source";
+	const TAG_SAVE_SOURCE = "save_source";
 	const TAG_WEB = "web";
 	const TAG_MBR = "mbr";
 	const TAG_MOBILE = "mobile";
