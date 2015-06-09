@@ -24,7 +24,9 @@ class KRecalculateResponseProfileCacheEngine extends KRecalculateCacheEngine
 	public function doRecalculate(KalturaRecalculateResponseProfileCacheJobData $data)
 	{
 		$job = KJobHandlerWorker::getCurrentJob();
+		KBatchBase::impersonate($job->partnerId);
 		$partner = KBatchBase::$kClient->partner->get($job->partnerId);
+		KBatchBase::unimpersonate();
 		
 		$role = reset($data->userRoles);
 		/* @var $role KalturaIntegerValue */
