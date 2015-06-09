@@ -45,7 +45,7 @@
 
 #### Known Issues & Limitations ####
 
-Players by default will present 'multi-language' captions.
+Players will allow choosing 'multi-language' captions ,by default.
 
 
 ## Search for tags with spaces and words with less than 3 characters ##
