@@ -34,7 +34,6 @@ $html5Version = $_GET['playerVersion'];
 		var ks = null;
 		var lastSyncPointTime = null;
 		var lastSyncPointOffset = null;
-		var lastSyncPointTimestamp = null;
 
 		function loadPlayer(){
 			var entryId = $('#txtEntryId').val();
@@ -129,13 +128,14 @@ $html5Version = $_GET['playerVersion'];
 
 		function onSyncPoint(metadata){
 			if ( metadata && metadata.objectType == "KalturaSyncPoint") {
+				if(lastSyncPointOffset && lastSyncPointOffset == metadata.offset)
+					return;
 				var date = new Date();
 				lastSyncPointTime = date.getTime();
 				lastSyncPointOffset = metadata.offset;
-				lastSyncPointTimestamp = metadata.timestamp;
 
 				$('#btnSendAd').removeAttr('disabled');
-				log('Ads Enabled last offset:' + lastSyncPointOffset + ' last timestamp: ' + lastSyncPointTimestamp);
+				log('Ads Enabled last offset:' + lastSyncPointOffset);
 			}
 		}
 		
@@ -209,7 +209,7 @@ $html5Version = $_GET['playerVersion'];
 			}
 			else{
 				var delay = $('#txtAdDelay').val();
-				var triggeredAt = (lastSyncPointTimestamp + timeSinceLastSyncPoint + parseInt(delay)) / 1000;
+				var triggeredAt = (date.getTime() + parseInt(delay)) / 1000;
 
 				$.ajax(
 					'/api_v3/index.php/service/cuePoint_cuePoint/action/add', {
@@ -234,7 +234,7 @@ $html5Version = $_GET['playerVersion'];
 							return;
 						}
 
-						log('Cue-Point created [' + data.id + '] triggeredAt [' + triggeredAt + '] timeSinceLastSyncPoint [' + timeSinceLastSyncPoint +']');
+						log('Cue-Point created [' + data.id + '] triggeredAt [' + triggeredAt + ']');
 					}
 				});
 			}
@@ -305,11 +305,11 @@ $html5Version = $_GET['playerVersion'];
 		</tr>
 		<tr>
 			<td>Ad URL:</td>
-			<td><input type="text" id="txtAdUrl" value="http://search.spotxchange.com/vast/2.00/79391?content_page_url=[please_put_dynamic_page_url]&cb=[random_number]&VPI=MP4" />
+			<td><input type="text" id="txtAdUrl" value="http://projects.kaltura.com/vast/vast10.xml" />
 		</td>
 		<tr>
 			<td>Ad Duration (milliseconds):</td>
-			<td><input type="text" id="txtAdDuration" value="15000" />
+			<td><input type="text" id="txtAdDuration" value="5000" />
 		</td>
 		<tr>
 			<td>Cue point type:</td>
@@ -330,19 +330,6 @@ $html5Version = $_GET['playerVersion'];
 		</tr>
 		<tr>
 			<td colspan="2"><br/><br/></td>
-		</tr>
-		<tr>
-			<td>Sync-Point Interval (seconds):</td>
-			<td><input type="text" id="txtSyncPointInterval" value="30" />
-		</td>
-		<tr>
-			<td>Sync-Point Duration (seconds):</td>
-			<td><input type="text" id="txtSyncPointDuration" value="150" />
-		</td>
-		<tr>
-			<td colspan="2">
-				<input type="button" onclick="enableAds()" value="Enable Ads (Send Sync-Points)" />
-			</td>
 		</tr>
 	</table>
 </div><!-- end #main -->
