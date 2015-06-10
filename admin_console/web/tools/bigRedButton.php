@@ -129,7 +129,7 @@ $html5Version = $_GET['playerVersion'];
 
 		function onSyncPoint(metadata){
 			if ( metadata && metadata.objectType == "KalturaSyncPoint") {
-				if(lastSyncPointOffset && lastSyncPointOffset <= metadata.offset)
+				if(lastSyncPointOffset && lastSyncPointOffset >= metadata.offset)
 					return;
 				var date = new Date();
 				lastSyncPointTime = date.getTime();
