@@ -216,12 +216,14 @@ class KalturaResponseProfileCacher extends kResponseProfileCacher
 	 */
 	public static function recalculateCacheBySessionType(KalturaResponseProfileCacheRecalculateOptions $options)
 	{
+		$partnerId = kCurrentContext::getCurrentPartnerId();
 		$sessionKey = self::getSessionKey();
+		$objectKey = "{$partnerId}_{$options->cachedObjectType}_{$options->objectId}";
 		$results = new KalturaResponseProfileCacheRecalculateResults();
 		
 		$limit = 100;
 		if($options->limit)
-			$limit = min($limit, $options->limit);
+			$limit = min($limit, ($options->limit + 1));
 			
 		/* @var $object IBaseObject */
 		$responseProfile = null;
@@ -237,10 +239,10 @@ class KalturaResponseProfileCacher extends kResponseProfileCacher
 					$query->addKey('sessionKey', $sessionKey);
 					if($options->objectKey)
 						$query->addKey('objectKey', $options->objectKey);
-					if($options->startKeyId)
-						$query->setStartKeyDocId($options->startKeyId);
-					if($options->endKeyId)
-						$query->setEndKeyDocId($options->endKeyId);
+					if($options->startDocId)
+						$query->setStartKeyDocId($options->startDocId);
+					if($options->endDocId)
+						$query->setEndKeyDocId($options->endDocId);
 	
 					$results->recalculated = 0;
 					$list = $cacheStore->query($query);
