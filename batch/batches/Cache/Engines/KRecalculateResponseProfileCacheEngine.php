@@ -37,6 +37,7 @@ class KRecalculateResponseProfileCacheEngine extends KRecalculateCacheEngine
 		
 		$client = new KalturaClient(KBatchBase::$kClientConfig);
 		$ks = $client->generateSession($partner->adminSecret, 'batchUser', $data->ksType, $job->partnerId, 86400, $privileges);
+		$client->setKs($ks);
 		
 		$options = new KalturaResponseProfileCacheRecalculateOptions();
 		$options->limit = $this->maxCacheObjectsPerRequest;
