@@ -439,28 +439,46 @@ class LiveStreamService extends KalturaLiveEntryService
 	 * @param string $entryId
 	 * @param KalturaPlaybackProtocol $protocol
 	 * @param string $url
+	 * @param KalturaLiveStreamConfiguration $liveStreamConfiguration
 	 * @return KalturaLiveStreamEntry
 	 * @throws KalturaErrors::INVALID_ENTRY_ID
 	 */
-	public function addLiveStreamPushPublishConfigurationAction ($entryId, $protocol, $url)
+	public function addLiveStreamPushPublishConfigurationAction ($entryId, $protocol, $url = null, KalturaLiveStreamConfiguration $liveStreamConfiguration = null)
 	{
+		$this->dumpApiRequest($entryId);
+		
 		$entry = entryPeer::retrieveByPK($entryId);
 		if (!$entry || $entry->getType() != entryType::LIVE_STREAM)
 			throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_ID);
 		
+		//Should not allow usage of both $url and $liveStreamConfiguration
+		if ($url && !is_null($liveStreamConfiguration))
+			throw new KalturaAPIException(KalturaErrors::SERVICE_FORBIDDEN);
+			
 		/* @var $entry LiveEntry */
-		$pushPublishConfigurations = $entry->getPushPublishConfigurations();
+		$pushPublishConfigurations = $entry->getPushPublishPlaybackConfigurations();
+		$configuration = null;
+		if ($url)
+		{
+			$configuration = new kLiveStreamConfiguration();
+			$configuration->setProtocol($protocol);
+			$configuration->setUrl($url);
+		}
+		elseif (!is_null($liveStreamConfiguration))
+		{
+			$configuration = $liveStreamConfiguration->toInsertableObject();
+			$configuration->setProtocol($protocol);
+		}
 		
-		$configuration = new kLiveStreamConfiguration();
-		$configuration->setProtocol($protocol);
-		$configuration->setUrl($url);
-		
-		$pushPublishConfigurations[] = $configuration;
-		$entry->setPushPublishConfigurations($pushPublishConfigurations);
-		$entry->save();
+		if ($configuration)
+		{
+			$pushPublishConfigurations[] = $configuration;
+			$entry->setPushPublishPlaybackConfigurations($pushPublishConfigurations);
+			$entry->save();
+		}
 		
 		$apiEntry = KalturaEntryFactory::getInstanceByType($entry->getType());
-		$apiEntry->fromObject($entry);
+		$apiEntry->fromObject($entry, $this->getResponseProfile());
 		return $apiEntry;
 	}
 	
@@ -475,12 +493,14 @@ class LiveStreamService extends KalturaLiveEntryService
 	 */
 	public function removeLiveStreamPushPublishConfigurationAction ($entryId, $protocol)
 	{
+		$this->dumpApiRequest($entryId);
+		
 		$entry = entryPeer::retrieveByPK($entryId);
 		if (!$entry || $entry->getType() != entryType::LIVE_STREAM)
 			throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_ID);
 		
 		/* @var $entry LiveEntry */
-		$pushPublishConfigurations = $entry->getPushPublishConfigurations();
+		$pushPublishConfigurations = $entry->getPushPublishPlaybackConfigurations();
 		foreach ($pushPublishConfigurations as $index => $config)
 		{
 			/* @var $config kLiveStreamConfiguration */
@@ -489,12 +509,11 @@ class LiveStreamService extends KalturaLiveEntryService
 				unset ($pushPublishConfigurations[$index]);
 			}
 		}
-
-		$entry->setPushPublishConfigurations($pushPublishConfigurations);
+		$entry->setPushPublishPlaybackConfigurations($pushPublishConfigurations);
 		$entry->save();
 		
 		$apiEntry = KalturaEntryFactory::getInstanceByType($entry->getType());
-		$apiEntry->fromObject($entry);
+		$apiEntry->fromObject($entry, $this->getResponseProfile());
 		return $apiEntry;
 	}
 }

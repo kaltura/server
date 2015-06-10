@@ -306,7 +306,7 @@ class kF4MManifestRenderer extends kMultiFlavorManifestRenderer
 	public $streamType = self::PLAY_STREAM_TYPE_RECORDED;
 
 	/**
-	 * @var strimg
+	 * @var string
 	 */
 	public $mediaUrl = '';
 
@@ -324,6 +324,16 @@ class kF4MManifestRenderer extends kMultiFlavorManifestRenderer
 	 * @var int
 	 */
 	public $dvrWindow = null;
+	
+	/**
+	 * @var string
+	 */
+	public $groupspec = null;
+	
+	/**
+	 * @var string
+	 */
+	public $multicastStreamName = null;
 	
 	function __construct($flavor, $entryId = null, $baseUrl = '') {
 		parent::__construct($flavor, $entryId, $baseUrl);
@@ -403,7 +413,18 @@ class kF4MManifestRenderer extends kMultiFlavorManifestRenderer
 		$mediaUrl = '';
 		if ($this->mediaUrl)
 		{
-			$mediaUrl = "<media url=\"".htmlspecialchars($this->mediaUrl)."\"/>";
+			$mediaUrl = "<media url=\"".htmlspecialchars($this->mediaUrl)."\"";
+			if (!is_null($this->groupspec))
+			{
+				$mediaUrl .= " groupspec={$this->groupspec}";
+			}
+			if ($this->multicastStreamName)
+			{
+				$mediaUrl .= " multicastStreamName={$this->multicastStreamName}";
+			}
+			
+			$mediaUrl .= "/>";
+			
 		}
 		return "{$mediaUrl}
 			</manifest>";

@@ -56,6 +56,14 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 	public $pushPublishEnabled;
 	
 	/**
+	 * Array of publish configurations
+	 * 
+	 * @var KalturaLiveStreamPushPublishConfigurationArray
+	 * @requiresPermission all
+	 */
+	public $publishConfigurations;
+	
+	/**
 	 * The first time in which the entry was broadcast
 	 * @var int
 	 * @readonly
@@ -73,6 +81,7 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 		"recordedEntryId",
 		"pushPublishEnabled",
 		"firstBroadcast",
+		"publishConfigurations",
 	);
 	
 	/* (non-PHPdoc)
