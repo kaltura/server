@@ -51,6 +51,6 @@ class KRecalculateResponseProfileCacheEngine extends KRecalculateCacheEngine
 		{
 			$results = $client->responseProfile->recalculate($options);
 			$options->startDocId = $results->lastKeyId;
-		} while($results->recalculated);
+		} while($results->recalculated == $options->limit);
 	}
 }
