@@ -237,8 +237,7 @@ class KalturaResponseProfileCacher extends kResponseProfileCacher
 				{
 					$query->setLimit($limit);
 					$query->addKey('sessionKey', $sessionKey);
-					if($options->objectKey)
-						$query->addKey('objectKey', $options->objectKey);
+					$query->addKey('objectKey', $objectKey);
 					if($options->startDocId)
 						$query->setStartKeyDocId($options->startDocId);
 					if($options->endDocId)
