@@ -324,12 +324,7 @@ class myPartnerUtils
 			$protocol='http';
 
 		$partner = PartnerPeer::retrieveByPK( $partner_id );
-		if ( !$partner )
-		{
-			KalturaLog::err("No partner found");
-			return "";
-		}
-		if ($partner->isInCDNWhiteList($_SERVER['HTTP_HOST']))
+		if ($partner && $partner->isInCDNWhiteList($_SERVER['HTTP_HOST']))
 		{
 			$cdnHost = $_SERVER['HTTP_HOST'];
 			return $cdnHost;
