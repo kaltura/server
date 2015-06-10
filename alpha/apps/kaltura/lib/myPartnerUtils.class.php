@@ -356,6 +356,7 @@ class myPartnerUtils
 				{
 					return 'http://' . (kConf::hasParam('cdn_api_host')) ? kConf::get('cdn_api_host') : kConf::get('www_host');
 				}
+				break;
 			default:
 				if ($partner && $partner->getCdnHost())
 				{
@@ -363,13 +364,6 @@ class myPartnerUtils
 				}
 				return requestUtils::getCdnHost($protocol);
 		}
-
-		$cdnHost = $partner->getCdnHost();
-
-		// if a protocol was set manually (or by the temporary http default above) use it instead of the partner setting
-		$cdnHost = preg_replace('/^https?/', $protocol, $cdnHost);
-			
-		return $cdnHost;
 	}
 	
 	

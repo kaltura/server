@@ -1715,11 +1715,7 @@ class Partner extends BasePartner
 	public function getCdnHostWhiteList()
 	{
 		$whiteLiestArr = $this->getCdnHostWhiteListArray();
-		$whiteLiestStr = "";
-		foreach ($whiteLiestArr as $whiteListRegEx)
-		{
-			$whiteLiestStr .= $whiteListRegEx.",";
-		}
+		$whiteLiestStr = implode(",",$whiteLiestArr);
 		return $whiteLiestStr;
 	}
 
