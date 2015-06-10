@@ -182,7 +182,7 @@ class KalturaEdgeServer extends KalturaObject implements IFilterable
 		$c = KalturaCriteria::create(EdgeServerPeer::OM_CLASS);
 		
 		if($edgeId)
-			$c->add(EdgeServerPeer::ID, $sourceObject->getId(), Criteria::NOT_EQUAL);
+			$c->add(EdgeServerPeer::ID, $edgeId, Criteria::NOT_EQUAL);
 		
 		$c->add(EdgeServerPeer::HOST_NAME, $this->hostName);
 		$c->add(EdgeServerPeer::STATUS, array(EdgeServerStatus::ACTIVE, EdgeServerStatus::DISABLED), Criteria::IN);
