@@ -41,14 +41,14 @@ class EdgeServerTableMap extends TableMap {
 		$this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
 		$this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
 		$this->addColumn('PARTNER_ID', 'PartnerId', 'INTEGER', false, null, null);
-		$this->addColumn('NAME', 'Name', 'VARCHAR', false, 31, null);
-		$this->addColumn('SYSTEM_NAME', 'SystemName', 'VARCHAR', false, 128, null);
-		$this->addColumn('DESCIPTION', 'Desciption', 'VARCHAR', false, 127, null);
+		$this->addColumn('NAME', 'Name', 'VARCHAR', false, 256, null);
+		$this->addColumn('SYSTEM_NAME', 'SystemName', 'VARCHAR', false, 256, null);
+		$this->addColumn('DESCIPTION', 'Desciption', 'VARCHAR', false, 256, null);
 		$this->addColumn('STATUS', 'Status', 'INTEGER', false, null, null);
 		$this->addColumn('TYPE', 'Type', 'INTEGER', true, null, 0);
 		$this->addColumn('TAGS', 'Tags', 'LONGVARCHAR', false, null, null);
-		$this->addColumn('HOST_NAME', 'HostName', 'VARCHAR', true, 127, null);
-		$this->addColumn('PLAYBACK_HOST_NAME', 'PlaybackHostName', 'VARCHAR', false, 127, null);
+		$this->addColumn('HOST_NAME', 'HostName', 'VARCHAR', true, 256, null);
+		$this->addColumn('PLAYBACK_HOST_NAME', 'PlaybackHostName', 'VARCHAR', false, 256, null);
 		$this->addColumn('PARENT_ID', 'ParentId', 'INTEGER', false, null, 0);
 		$this->addColumn('CUSTOM_DATA', 'CustomData', 'LONGVARCHAR', false, null, null);
 		// validators
