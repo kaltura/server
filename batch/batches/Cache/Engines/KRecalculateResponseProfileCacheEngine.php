@@ -31,7 +31,8 @@ class KRecalculateResponseProfileCacheEngine extends KRecalculateCacheEngine
 		$role = reset($data->userRoles);
 		/* @var $role KalturaIntegerValue */
 		$privileges = array(
-			'setrole:' . $role->value
+			'setrole:' . $role->value,
+			'disableentitlement',
 		);
 		$privileges = implode(',', $privileges);
 		
