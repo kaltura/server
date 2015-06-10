@@ -34,6 +34,7 @@ $html5Version = $_GET['playerVersion'];
 		var ks = null;
 		var lastSyncPointTime = null;
 		var lastSyncPointOffset = null;
+		var lastSyncPointTimestamp = null;
 
 		function loadPlayer(){
 			var entryId = $('#txtEntryId').val();
@@ -128,14 +129,15 @@ $html5Version = $_GET['playerVersion'];
 
 		function onSyncPoint(metadata){
 			if ( metadata && metadata.objectType == "KalturaSyncPoint") {
-				if(lastSyncPointOffset && lastSyncPointOffset == metadata.offset)
+				if(lastSyncPointOffset && lastSyncPointOffset >= metadata.offset)
 					return;
 				var date = new Date();
 				lastSyncPointTime = date.getTime();
 				lastSyncPointOffset = metadata.offset;
+				lastSyncPointTimestamp = metadata.timestamp;
 
 				$('#btnSendAd').removeAttr('disabled');
-				log('Ads Enabled last offset:' + lastSyncPointOffset);
+				log('Ads Enabled last offset:' + lastSyncPointOffset + ' last timestamp: ' + lastSyncPointTimestamp);
 			}
 		}
 		
@@ -209,7 +211,7 @@ $html5Version = $_GET['playerVersion'];
 			}
 			else{
 				var delay = $('#txtAdDelay').val();
-				var triggeredAt = (date.getTime() + parseInt(delay)) / 1000;
+				var triggeredAt = (lastSyncPointTimestamp + timeSinceLastSyncPoint + parseInt(delay)) / 1000;
 
 				$.ajax(
 					'/api_v3/index.php/service/cuePoint_cuePoint/action/add', {
@@ -234,7 +236,7 @@ $html5Version = $_GET['playerVersion'];
 							return;
 						}
 
-						log('Cue-Point created [' + data.id + '] triggeredAt [' + triggeredAt + ']');
+						log('Cue-Point created [' + data.id + '] triggeredAt [' + triggeredAt + '] timeSinceLastSyncPoint [' + timeSinceLastSyncPoint +']');
 					}
 				});
 			}
