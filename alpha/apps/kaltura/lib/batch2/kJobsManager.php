@@ -838,6 +838,7 @@ class kJobsManager
 		}
 		
 		$flavorAsset = assetPeer::retrieveById($flavorAssetId);
+		$flavorParamsOutput = null;
 		if($createThumb)
 		{
 			$flavorParamsOutput = assetParamsOutputPeer::retrieveByPK($flavorParamsOutputId);
