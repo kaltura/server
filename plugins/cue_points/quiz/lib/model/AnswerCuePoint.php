@@ -54,27 +54,34 @@ class AnswerCuePoint extends CuePoint
 	}
 
 
-	/* (non-PHPdoc)
- * @see BaseCuePoint::postInsert()
- */
-	public function postInsert(PropelPDO $con = null)
+	/** (non-PHPdoc)
+    * @see BaseCuePoint::preInsert()
+    */
+	public function preInsert(PropelPDO $con = null)
 	{
-		parent::postInsert($con);
-
-
+		$dbParentCuePoint = CuePointPeer::retrieveByPK($this->getParentId());
+		$optionalAnswers =  $dbParentCuePoint->getOptionalAnswers();
+		$correctKeys = array();
+		foreach ($optionalAnswers as $answer)
+		{
+			if ( $answer->getIsCorrect() )
+				$correctKeys[] = $answer->getKey();
+		}
+		$this->setCorrectAnswerKeys( $correctKeys );
+		$this->setExplanation( $dbParentCuePoint->getExplanation() );
+		$this->setIsCorrect( in_array( $this->getAnswerKey(), $correctKeys ) );
+		parent::preInsert($con);
 	}
 
 	/**
-	 * Code to be run after persisting the object
+	 * Code to be run before persisting the object
 	 * @param PropelPDO $con
+	 * @return bloolean
 	 */
-	public function postSave(PropelPDO $con = null)
+	public function preSave(PropelPDO $con = null)
 	{
-		kEventsManager::raiseEvent(new kObjectSavedEvent($this));
-		$this->oldColumnsValues = array();
-		$this->oldCustomDataValues = array();
-
-		parent::postSave($con);
+		$this->setIsCorrect( in_array( $this->getAnswerKey(), $this->getCorrectAnswerKeys() ) );
+		parent::preSave($con);
 	}
 
 
