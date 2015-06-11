@@ -93,7 +93,6 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 	 */
 	public static function loadObject($baseClass, $enumValue, array $constructorArgs = null)
 	{
-		KalturaLog::debug("@@NA here2");
 		if($baseClass == 'KalturaCuePoint') {
 			if ( $enumValue == self::getCuePointTypeCoreValue(QuizCuePointType::QUIZ_QUESTION))
 				return new KalturaQuestionCuePoint();
