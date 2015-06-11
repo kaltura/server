@@ -62,11 +62,11 @@ class kHashCondition extends kCondition
 	protected function internalFulfilled(kScope $scope)
 	{
 		$hashes = $scope->getHashes();
-		if (is_array($hashes) && count($hashes) && isset($hashes[$this->hashName]))
+		if (is_array($hashes) && isset($hashes[$this->hashName]))
 		{
 			$sentHash = $hashes[$this->hashName];
 			$compareHash = md5($this->hashSecret. kCurrentContext::$ks);
-			if ($sentHash == $compareHash)
+			if ($sentHash === $compareHash)
 			{
 				KalturaLog::info("Correct hash sent");
 				return false;
