@@ -32,9 +32,9 @@ class DrmLicenseAccessService extends KalturaBaseService
     {
         KalturaLog::debug("Starting");
         $response = new KalturaDrmLicenseAccessDetails();
-        $response->policyName = "";
+        $response->policy = "";
         $response->duration = 0;
-        $response->absoluteExpiration = 0;
+        $response->absolute_duration = 0;
         $flavorIdsArr = explode(",",$flavorIds);
 
         $entry = entryPeer::retrieveByPK($entryId);
@@ -52,9 +52,9 @@ class DrmLicenseAccessService extends KalturaBaseService
 
                         $expirationDate = DrmLicenseUtils::calculateExpirationDate($dbPolicy, $entry);
 
-                        $response->policyName = $dbPolicy->getName();
+                        $response->policy = $dbPolicy->getName();
                         $response->duration = $expirationDate;
-                        $response->absoluteExpiration = $expirationDate;
+                        $response->absolute_duration = $expirationDate;
                         KalturaLog::debug("response is  '" . print_r($response, true) . "' ");
                     } else {
                         KalturaLog::err("Could not get DRM policy from DB");

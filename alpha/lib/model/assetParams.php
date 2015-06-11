@@ -21,6 +21,7 @@ class assetParams extends BaseassetParams
 	const CONTAINER_FORMAT_WMV = "wmv";
 	const CONTAINER_FORMAT_WMA = "wma";
 	const CONTAINER_FORMAT_ISMV = "ismv";
+	const CONTAINER_FORMAT_ISMA = "isma";
 	const CONTAINER_FORMAT_MKV = "mkv";
 	const CONTAINER_FORMAT_WEBM = "webm";
 	const CONTAINER_FORMAT_MPEG = "mpeg";
@@ -43,6 +44,7 @@ class assetParams extends BaseassetParams
 	const CONTAINER_FORMAT_WIDEVINE = 'wvm';
 	
 	const TAG_SOURCE = "source";
+	const TAG_SAVE_SOURCE = "save_source";
 	const TAG_WEB = "web";
 	const TAG_MBR = "mbr";
 	const TAG_MOBILE = "mobile";

@@ -22,6 +22,7 @@ $con = $target->_container;
 			break;
 	 */
 		case KDLContainerTarget::ISMV:
+		case KDLContainerTarget::ISMA:
 				/*
 				 * ISMV/SmoothStreaming needs following in order to support adptive-bitrate management
 				 * - frag_keyframe - the media control meta data is written for each chunk/packet, 
@@ -142,6 +143,17 @@ $con = $target->_container;
 			}
 			$cmdValsArr[] = '-metadata:s:v rotate="0"';
 		}
+		
+			/*
+			 * Disabling of GOP in order to avoid duplicate KF's running through the whole file
+			 * TEMPORARY - it will be done only for WV
+			 */
+		if(isset($vid->_forWideVine) &&  $vid->_forWideVine = true
+		&& in_array('-force_key_frames', $cmdValsArr) && in_array('-g', $cmdValsArr)) {
+			$key = array_search('-g', $cmdValsArr);
+			$cmdValsArr[$key+1] = 3600*24; // set GOP to 24 hrs
+		}
+		
 		$cmdStr = implode(" ", $cmdValsArr);
 
 		return $cmdStr;

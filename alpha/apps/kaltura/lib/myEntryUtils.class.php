@@ -762,8 +762,8 @@ class myEntryUtils
 			                        }
 		    				if(is_null($flavorAsset) || !($flavorAsset->hasTag(flavorParams::TAG_MBR) || $flavorAsset->hasTag(flavorParams::TAG_WEB)))
 						{
-	    						// try the best playable
-							$flavorAsset = assetPeer::retrieveHighestBitrateByEntryId($entry->getId());
+	    					// try the best playable
+							$flavorAsset = assetPeer::retrieveHighestBitrateByEntryId($entry->getId(), null, flavorParams::TAG_SAVE_SOURCE);
 						}
 						if (is_null($flavorAsset))
 						{
