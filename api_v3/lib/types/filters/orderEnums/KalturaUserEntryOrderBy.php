@@ -3,6 +3,6 @@
  * @package api
  * @subpackage filters.enum
  */
-class KalturaQuizUserEntryOrderBy extends KalturaStringEnum
+class KalturaUserEntryOrderBy extends KalturaStringEnum
 {
 }
