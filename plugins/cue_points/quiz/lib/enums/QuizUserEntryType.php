@@ -6,7 +6,7 @@
  */
 class QuizUserEntryType implements IKalturaPluginEnum, UserEntryType
 {
-	const QUIZ = 1;
+	const QUIZ = 'QUIZ';
 
 	public static function getAdditionalValues()
 	{

@@ -4,7 +4,7 @@
  * @subpackage model
  */
 
-class AnswerCuePoint extends CuePoint
+class AnswerCuePoint extends CuePoint implements IMetadataObject
 {
 	const CUSTOM_DATA_QUIZ_USER_ENTRY_ID= 'quizUserEntryId';
 	const CUSTOM_DATA_ANSWER_KEY = 'answerKey';
@@ -74,11 +74,11 @@ class AnswerCuePoint extends CuePoint
 	}
 
 	/**
-	 * Code to be run before persisting the object
+	 * Code to be run before updating the object in database
 	 * @param PropelPDO $con
 	 * @return bloolean
 	 */
-	public function preSave(PropelPDO $con = null)
+	public function preUpdate(PropelPDO $con = null)
 	{
 		if ($this->isCustomDataModified(AnswerCuePoint::CUSTOM_DATA_ANSWER_KEY))
 		{
@@ -87,5 +87,8 @@ class AnswerCuePoint extends CuePoint
 		parent::preSave($con);
 	}
 
-
+	public function getMetadataObjectType()
+	{
+		return QuizPlugin::getCoreValue('MetadataObjectType', AnswerCuePointMetadataObjectType::Answer_CUE_POINT);
+	}
 }

@@ -17,10 +17,18 @@ abstract class KalturaUserEntryBaseFilter extends KalturaFilter
 		"userIdEqual" => "_eq_user_id",
 		"userIdIn" => "_in_user_id",
 		"userIdNotIn" => "_notin_user_id",
+		"createdAtLessThanOrEqual" => "_lte_created_at",
+		"createdAtGreaterThanOrEqual" => "_gte_created_at",
+		"updatedAtLessThanOrEqual" => "_lte_updated_at",
+		"updatedAtGreaterThanOrEqual" => "_gte_updated_at",
 	);
 
 	static private $order_by_map = array
 	(
+		"+createdAt" => "+created_at",
+		"-createdAt" => "-created_at",
+		"+updatedAt" => "+updated_at",
+		"-updatedAt" => "-updated_at",
 	);
 
 	public function getMapBetweenObjects()
@@ -77,4 +85,24 @@ abstract class KalturaUserEntryBaseFilter extends KalturaFilter
 	 * @var string
 	 */
 	public $userIdNotIn;
+
+	/**
+	 * @var time
+	 */
+	public $createdAtLessThanOrEqual;
+
+	/**
+	 * @var time
+	 */
+	public $createdAtGreaterThanOrEqual;
+
+	/**
+	 * @var time
+	 */
+	public $updatedAtLessThanOrEqual;
+
+	/**
+	 * @var time
+	 */
+	public $updatedAtGreaterThanOrEqual;
 }

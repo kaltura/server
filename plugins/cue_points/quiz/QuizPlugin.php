@@ -92,6 +92,7 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 	 */
 	public static function loadObject($baseClass, $enumValue, array $constructorArgs = null)
 	{
+		KalturaLog::debug("@@NA here1");
 		if($baseClass == 'KalturaCuePoint') {
 			if ( $enumValue == self::getCuePointTypeCoreValue(QuizCuePointType::QUIZ_QUESTION))
 				return new KalturaQuestionCuePoint();
@@ -114,6 +115,7 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 	 */
 	public static function getObjectClass($baseClass, $enumValue)
 	{
+		KalturaLog::debug("@@NA here2");
 		if($baseClass == 'CuePoint') {
 			if ($enumValue == self::getCuePointTypeCoreValue(QuizCuePointType::QUIZ_QUESTION))
 				return 'QuestionCuePoint';
@@ -122,7 +124,7 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 		}
 		if ( ($baseClass == UserEntryPeer::OM_CLASS) && ($enumValue == self::getCoreValue('UserEntryType' , QuizUserEntryType::QUIZ)) )
 		{
-			return UserEntryPeer::QUIZ_OM_CLASS;
+			return QuizUserEntry::QUIZ_OM_CLASS;
 		}
 
 	}
@@ -302,7 +304,7 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 	public static function setQuizData( entry $entry, kQuiz $kQuiz )
 	{
 		$entry->putInCustomData( self::QUIZ_DATA, $kQuiz);
-		$entry->addCapability(self::getPluginName(), self::getCapatabilityCoreValue());
+		$entry->addCapability(self::getCapatabilityCoreValue());
 	}
 
 	/**

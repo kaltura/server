@@ -4,7 +4,7 @@
  * @subpackage model
  */
 
-class QuestionCuePoint extends CuePoint //TODO: implements IMetadataObject
+class QuestionCuePoint extends CuePoint implements IMetadataObject
 {
 	const CUSTOM_DATA_OPTIONAL_ANSWERS = 'optionalAnswers';
 	const CUSTOM_DATA_HINT = 'hint';
@@ -40,4 +40,11 @@ class QuestionCuePoint extends CuePoint //TODO: implements IMetadataObject
 	public function getExplanation() {return $this->getFromCustomData(self::CUSTOM_DATA_EXPLANATION);}
 
 	public function getIsPublic()	{return true;}
+
+	public function getMetadataObjectType()
+	{
+		return QuizPlugin::getCoreValue('MetadataObjectType', QuestionCuePointMetadataObjectType::QUESTION_CUE_POINT);
+	}
+
+
 }

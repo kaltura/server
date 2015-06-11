@@ -1,24 +1,19 @@
 <?php
-
 /**
  * @package plugins.quiz
  * @subpackage lib.enum
  */
-class QuizEntryCapability implements IKalturaPluginEnum, EntryCapability
+class AnswerCuePointMetadataObjectType implements IKalturaPluginEnum, MetadataObjectType
 {
-
-	const QUIZ = 'quiz';
-
-	/**
-	 * @return array
-	 */
+	const ANSWER_CUE_POINT = 'AnswerCuePoint';
+	
 	public static function getAdditionalValues()
 	{
 		return array(
-			'KALTURA_QUIZ_CAPABILITY_NAME' => self::QUIZ
+			'ANSWER_CUE_POINT' => self::ANSWER_CUE_POINT,
 		);
 	}
-
+	
 	/**
 	 * @return array
 	 */
@@ -26,5 +21,4 @@ class QuizEntryCapability implements IKalturaPluginEnum, EntryCapability
 	{
 		return array();
 	}
-
 }

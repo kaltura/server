@@ -44,12 +44,14 @@ abstract class KalturaUserEntry extends KalturaObject implements IRelatedFiltera
 	/**
 	 * @var time
 	 * @readonly
+	 * @filter lte,gte,order
 	 */
 	public $createdAt;
 
 	/**
 	 * @var time
 	 * @readonly
+	 * @filter lte,gte,order
 	 */
 	public $updatedAt;
 
@@ -83,7 +85,7 @@ abstract class KalturaUserEntry extends KalturaObject implements IRelatedFiltera
 		$obj = KalturaPluginManager::loadObject("KalturaUserEntry",$type);
 		if (is_null($obj))
 		{
-			KalturaLog::warning("The type '$type' is unknown");
+			KalturaLog::err("The type '$type' is unknown");
 		}
 		return $obj;
 	}
