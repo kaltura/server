@@ -80,7 +80,10 @@ class AnswerCuePoint extends CuePoint
 	 */
 	public function preSave(PropelPDO $con = null)
 	{
-		$this->setIsCorrect( in_array( $this->getAnswerKey(), $this->getCorrectAnswerKeys() ) );
+		if ($this->isCustomDataModified(AnswerCuePoint::CUSTOM_DATA_ANSWER_KEY))
+		{
+			$this->setIsCorrect(in_array($this->getAnswerKey(), $this->getCorrectAnswerKeys()));
+		}
 		parent::preSave($con);
 	}
 
