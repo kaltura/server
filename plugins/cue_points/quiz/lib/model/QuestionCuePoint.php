@@ -43,7 +43,7 @@ class QuestionCuePoint extends CuePoint implements IMetadataObject
 
 	public function getMetadataObjectType()
 	{
-		return QuizPlugin::getCoreValue('MetadataObjectType', QuestionCuePointMetadataObjectType::QUESTION_CUE_POINT);
+		return QuizPlugin::getCoreValue('MetadataObjectType', QuizCuePointMetadataObjectType::QUESTION_CUE_POINT);
 	}
 
 

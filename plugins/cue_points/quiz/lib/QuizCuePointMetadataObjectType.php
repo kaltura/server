@@ -3,14 +3,16 @@
  * @package plugins.quiz
  * @subpackage lib.enum
  */
-class QuestionCuePointMetadataObjectType implements IKalturaPluginEnum, MetadataObjectType
+class QuizCuePointMetadataObjectType implements IKalturaPluginEnum, MetadataObjectType
 {
+	const ANSWER_CUE_POINT = 'AnswerCuePoint';
 	const QUESTION_CUE_POINT = 'QuestionCuePoint';
 	
 	public static function getAdditionalValues()
 	{
 		return array(
-			'QUESTION_CUE_POINT' => self::QUESTION_CUE_POINT,
+			'ANSWER_CUE_POINT' => self::ANSWER_CUE_POINT,
+			'QUESTION_CUE_POINT' => self::QUESTION_CUE_POINT
 		);
 	}
 	
