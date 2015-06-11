@@ -438,7 +438,7 @@ class playManifestAction extends kalturaAction
 	{
 		if(!$this->secureEntryHelper)
 			return $flavorAssets;
-		
+
 		$returnedFlavors = array();
 
 		foreach ($flavorAssets as $flavorAsset)

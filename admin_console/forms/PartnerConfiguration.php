@@ -888,7 +888,7 @@ class Form_PartnerConfiguration extends Infra_Form
 		);
 		$this->addDisplayGroup(array('cdn_host_white_list'), 'cdnHostWhiteList');
 
-									
+
 	}
 	
 	protected function addLimitSubForm($subForm, $subFormName)

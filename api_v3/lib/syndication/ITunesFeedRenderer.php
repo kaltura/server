@@ -107,14 +107,14 @@ class ITunesFeedRenderer extends SyndicationFeedRenderer {
 		return $res;
 	}
 
-	public function handleBody($entry, $e = null, $flavorAssetUrl = null) 
+	public function handleBody($entry, $e = null, $flavorAssetUrl = null)
 	{
 		$accessControl = $entry->getaccessControl();
 		if ($accessControl && $accessControl->hasRules())
 		{
 			//building a token based on the given url suffix
 			//first a pattern will be inserted as the last route param and then it will be replaced by an actual token
-			
+
 			$ktParamString = self::KALTURA_TOKEN_PARAM_NAME . self::KALTURA_TOKEN_MARKER;
 			$patternInsertionIndex = strrpos($flavorAssetUrl , "/");
 			//inserting the token pattern as the last route param
