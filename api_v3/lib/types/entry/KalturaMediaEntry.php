@@ -94,7 +94,7 @@ class KalturaMediaEntry extends KalturaPlayableEntry {
 	 * @readonly
 	 */
 	public $isTrimDisabled;
-	
+
 	private static $map_between_objects = array ("mediaType", "conversionQuality", "sourceType" , "searchProviderType", // see special logic for this field below
 	//"searchProviderType", // see special logic for this field below
 	"searchProviderId" => "sourceId", "creditUserName" => "credit", "creditUrl" => "siteUrl", "partnerId", "mediaDate", "dataUrl", "flavorParamsIds", "isTrimDisabled" );

@@ -25,8 +25,6 @@ class embedIframeJsAction extends sfAction
 		$widget_id = $this->getRequestParameter("widget_id", '_' . $partner_id);
 		
 		$protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') ? "https" : "http";
-		$embed_host = (kConf::hasParam('cdn_api_host')) ? kConf::get('cdn_api_host') : kConf::get('www_host');
-		$embed_host_https = (kConf::hasParam('cdn_api_host_https')) ? kConf::get('cdn_api_host_https') : kConf::get('www_host');
 		$host = ($protocol == 'https') ? 'https://' . $embed_host_https : 'http://' . $embed_host;
 
 		$ui_conf_html5_url = $uiConf->getHtml5Url();
