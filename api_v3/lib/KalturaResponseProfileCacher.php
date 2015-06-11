@@ -218,7 +218,6 @@ class KalturaResponseProfileCacher extends kResponseProfileCacher
 	{
 		$partnerId = kCurrentContext::getCurrentPartnerId();
 		$sessionKey = self::getSessionKey();
-		$objectKey = "{$partnerId}_{$options->cachedObjectType}_{$options->objectId}";
 		$results = new KalturaResponseProfileCacheRecalculateResults();
 		
 		$limit = 100;
@@ -236,8 +235,20 @@ class KalturaResponseProfileCacher extends kResponseProfileCacher
 				if($query)
 				{
 					$query->setLimit($limit);
-					$query->addKey('sessionKey', $sessionKey);
-					$query->addKey('objectKey', $objectKey);
+					if($options->objectId)
+					{
+						$objectKey = "{$partnerId}_{$options->cachedObjectType}_{$options->objectId}";
+						KalturaLog::debug("Serach for key [$sessionKey, $objectKey]");
+						$query->addKey('sessionKey', $sessionKey);
+						$query->addKey('objectKey', $objectKey);
+					}
+					else 
+					{
+						$objectKey = "{$partnerId}_{$options->cachedObjectType}_";
+						KalturaLog::debug("Serach for start key [$sessionKey, $objectKey]");
+						$query->addStartKey('sessionKey', $sessionKey);
+						$query->addStartKey('objectKey', $objectKey);
+					}
 					if($options->startDocId)
 						$query->setStartKeyDocId($options->startDocId);
 					if($options->endDocId)
