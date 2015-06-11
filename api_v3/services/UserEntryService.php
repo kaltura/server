@@ -91,4 +91,23 @@ class UserEntryService extends KalturaBaseService {
 		return $filter->getListResponse($pager, $this->getResponseProfile());
 	}
 
+	/**
+	 * @action get
+	 * @param string $id
+	 * @return KalturaUserEntry
+	 * @throws KalturaAPIException
+	 */
+	public function getAction($id)
+	{
+		$dbUserEntry = UserEntryPeer::retrieveByPK( $id );
+		if(!$dbUserEntry)
+			throw new KalturaAPIException(KalturaErrors::USER_ENTRY_NOT_FOUND, $id);
+
+		$userEntry = KalturaUserEntry::getInstanceByType($dbUserEntry->getType());
+		if (!$userEntry)
+			return null;
+		$userEntry->fromObject($dbUserEntry);
+		return $userEntry;
+	}
+
 }

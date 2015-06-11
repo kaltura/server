@@ -37,10 +37,20 @@ class KalturaUserEntryFilter extends KalturaUserEntryBaseFilter
 		{
 			$pager->attachToCriteria($c);
 		}
-
 		$list = UserEntryPeer::doSelect($c);
 
-		$response->totalCount = UserEntryPeer::doCount($c);
+		$resultCount = count($list);
+		if ($resultCount && ($resultCount < $pager->pageSize))
+		{
+			$totalCount = ($pager->pageIndex - 1) * $pager->pageSize + $resultCount;
+		}
+		else
+		{
+			KalturaFilterPager::detachFromCriteria($c);
+			$totalCount = assetPeer::doCount($c);
+		}
+
+		$response->totalCount = $totalCount;
 		$response->objects = KalturaUserEntryArray::fromDbArray($list, $responseProfile);
 		return $response;
 	}
