@@ -37,7 +37,7 @@ class QuizService extends KalturaBaseService
 		if (!$dbEntry)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 
-		if ( is_null( QuizPlugin::getQuizData($dbEntry) ) )
+		if ( !is_null( QuizPlugin::getQuizData($dbEntry) ) )
 			throw new KalturaAPIException(KalturaQuizErrors::PROVIDED_ENTRY_IS_ALREADY_A_QUIZ, $entryId);
 
 		return $this->validateAndUpdateQuizData( $dbEntry, $quiz );
