@@ -68,6 +68,9 @@ class DrmLicenseUtils {
         $first = true;
 		foreach ($flavorAssets as $flavor)
 		{
+            /**
+             * @var asset $flavor
+             */
 			if ($first)
 			{
 				$first = false;
@@ -76,7 +79,7 @@ class DrmLicenseUtils {
 			{
 				$flavorIds .=",";
 			}
-			$flavorIds .= $flavor->flavorParamsId;
+			$flavorIds .= $flavor->id;
 		}
 
         $innerData = array();
