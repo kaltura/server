@@ -1235,16 +1235,14 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		}
 
 		$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaDynamicAttributesContributer');
-		$pluginsDynamicAttributes = array();
 		foreach($pluginInstances as $pluginName => $pluginInstance) {
 			try {
-				$pluginsDynamicAttributes += $pluginInstance->getDynamicAttributes($this);
+				$dynamicAttributes += $pluginInstance->getDynamicAttributes($this);
 			} catch (Exception $e) {
 				KalturaLog::err($e->getMessage());
 				continue;
 			}
 		}
-		$dynamicAttributes = array_merge($dynamicAttributes, $pluginsDynamicAttributes);
 
 		return $dynamicAttributes;
 	}
@@ -3360,61 +3358,26 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		return implode(" ", $userNames);
 	}
 
-	public function getcapabilities()
+	public function getCapabilities()
 	{
-
-		$capabilitiesUnserialized = $this->getFromCustomData(self::CAPABILITIES);
-		if (is_null($capabilitiesUnserialized))
+		$capabilitiesArr = $this->getFromCustomData(self::CAPABILITIES);
+		if (is_null($capabilitiesArr))
 		{
 			return "";
 		}
-		else
-		{
-			$capabilitiesArr = unserialize($capabilitiesUnserialized);
-		}
-		$capabilitiesStr = "";
-		$first = true;
-		foreach ($capabilitiesArr as $capability)
-		{
-			if ($first)
-			{
-				$first = false;
-			} else
-			{
-				$capabilitiesStr .= ",";
-			}
-			$capabilitiesStr .= $capability;
-		}
+		$capabilitiesStr = implode(",", $capabilitiesArr);
 		return $capabilitiesStr;
 	}
 
-	public function addCapability($capability)
+	public function addCapability($name, $capability)
 	{
-		$capabilitiesStr = $this->getFromCustomData(self::CAPABILITIES);
-		if (is_null($capabilitiesStr))
-		{
-			$capabilitiesArr = array();
-		}
-		else
-		{
-			$capabilitiesArr = unserialize($capabilitiesStr);
-		}
-		$arrSpot = array_search($capability, array_values($capabilitiesArr));
+		$capabilities = $this->getFromCustomData(self::CAPABILITIES, array());
+		$capabilities[$name] = $capability;
+/*		$arrSpot = array_search($capability, array_values($capabilities));
 		if ($arrSpot === false)
 		{
 			$capabilitiesArr[] = $capability;
-		}
-		$this->putInCustomData( self::CAPABILITIES, serialize($capabilitiesArr) );
-	}
-
-	public function removeCapability($capability)
-	{
-		$capabilitiesStr = $this->getFromCustomData(self::CAPABILITIES);
-		if (!is_null($capabilitiesStr))
-		{
-			$capabilitiesArr = unserialize($capabilitiesStr);
-			unset($capabilitiesArr[$capability]);
-			$this->putInCustomData( self::CAPABILITIES, serialize($capabilitiesArr) );
-		}
+		}*/
+		$this->putInCustomData( self::CAPABILITIES, $capabilities);
 	}
 }

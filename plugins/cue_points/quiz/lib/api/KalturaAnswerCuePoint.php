@@ -93,7 +93,7 @@ class KalturaAnswerCuePoint extends KalturaCuePoint
 			$kQuiz = QuizPlugin::validateAndGetQuiz( $dbEntry );
 
 			$dbUesrEntry = UserEntryPeer::retrieveByPK($this->quizUserEntryId);
-			if ($dbUesrEntry->getStatus() == QuizUserEntryStatus::USER_ENTRY_STATUS_SUBMITTED)
+			if ($dbUesrEntry->getStatus() == QuizPlugin::getCoreValue('UserEntryStatus', QuizUserEntryStatus::QUIZ_SUBMITTED))
 			{
 				if (!$kQuiz->getShowCorrectAfterSubmission())
 				{
@@ -146,9 +146,9 @@ class KalturaAnswerCuePoint extends KalturaCuePoint
 		{
 			throw new KalturaAPIException(KalturaCuePointErrors::USER_ENTRY_DOES_NOT_MATCH_ENTRY_ID, $this->quizUserEntryId);
 		}
-		if ($dbUserEtnry->getStatus() === QuizUserEntryStatus::USER_ENTRY_STATUS_SUBMITTED)
+		if ($dbUserEtnry->getStatus() === QuizPlugin::getCoreValue('UserEntryStatus', QuizUserEntryStatus::QUIZ_SUBMITTED))
 		{
-			throw new KalturaAPIException(KalturaCuePointErrors::USER_ENTRY_QUIZ_ALREADY_SUBMITTED);
+			throw new KalturaAPIException(KalturaQuizErrors::USER_ENTRY_QUIZ_ALREADY_SUBMITTED);
 		}
 	}
 

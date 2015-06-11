@@ -14,7 +14,7 @@ class QuizUserEntry extends UserEntry{
 	public function applyDefaultValues()
 	{
 		parent::applyDefaultValues();
-		$this->setType(QuizUserEntryType::KALTURA_QUIZ_USER_ENTRY);
+		$this->setType(QuizPlugin::getCoreValue('UserEntryType' , QuizUserEntryType::QUIZ));
 	}
 
 

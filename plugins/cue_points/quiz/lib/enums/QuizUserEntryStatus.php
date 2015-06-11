@@ -4,9 +4,9 @@
  * @package plugins.quiz
  * @subpackage lib.enum
  */
-class QuizUserEntryStatus implements IKalturaPluginEnum {
+class QuizUserEntryStatus implements IKalturaPluginEnum,UserEntryStatus {
 
-	const USER_ENTRY_STATUS_SUBMITTED = 3;
+	const QUIZ_SUBMITTED = 3;
 
 	/**
 	 * @return array
@@ -15,7 +15,7 @@ class QuizUserEntryStatus implements IKalturaPluginEnum {
 	{
 		return array
 		(
-			'USER_ENTRY_STATUS_SUBMITTED' => self::USER_ENTRY_STATUS_SUBMITTED,
+			'QUIZ_SUBMITTED' => self::QUIZ_SUBMITTED,
 		);
 	}
 

@@ -27,9 +27,6 @@ class UserEntryService extends KalturaBaseService {
 		{
 			$userId = kCurrentContext::$ks_kuser;
 		}
-		/*$dbUserEntry->setKuserId($userId);
-		$dbUserEntry->setType($userEntry->type);
-		$dbUserEntry->setStatus(KalturaUserEntryStatus::ACTIVE);*/
 		$dbUserEntry->save();
 
 		$userEntry->fromObject($dbUserEntry, $this->getResponseProfile());
@@ -87,8 +84,11 @@ class UserEntryService extends KalturaBaseService {
 		{
 			$filter = new KalturaUserEntryFilter();
 		}
-
-		return $filter->getListResponse(new KalturaFilterPager(), $this->getResponseProfile());
+		if (!$pager)
+		{
+			$pager = new KalturaFilterPager();
+		}
+		return $filter->getListResponse($pager, $this->getResponseProfile());
 	}
 
 }

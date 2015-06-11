@@ -14,7 +14,7 @@ class KalturaUserEntryArray extends KalturaTypedArray
 			$nObj = KalturaUserEntry::getInstanceByType($obj->getType());
 			if (!$nObj)
 			{
-				throw new KalturaAPIException("There is an error in the DB, object type '".$obj->getType()."' of UserEntry id '".$obj->getId()."' is unknown");
+				throw new KalturaAPIException(KalturaErrors::USER_ENTRY_OBJECT_TYPE_ERROR, $obj->getType(), $obj->getId());
 			}
 			$nObj->fromObject($obj, $responseProfile);
 			$newArr[] = $nObj;

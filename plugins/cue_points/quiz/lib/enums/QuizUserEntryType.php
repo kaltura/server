@@ -6,12 +6,12 @@
  */
 class QuizUserEntryType implements IKalturaPluginEnum, UserEntryType
 {
-	const KALTURA_QUIZ_USER_ENTRY = 1;
+	const QUIZ = 1;
 
 	public static function getAdditionalValues()
 	{
 		return array(
-			'KALTURA_QUIZ_USER_ENTRY' => self::KALTURA_QUIZ_USER_ENTRY
+			'QUIZ' => self::QUIZ
 		);
 	}
 

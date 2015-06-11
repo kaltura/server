@@ -53,4 +53,29 @@ class AnswerCuePoint extends CuePoint
 		return false;
 	}
 
+
+	/* (non-PHPdoc)
+ * @see BaseCuePoint::postInsert()
+ */
+	public function postInsert(PropelPDO $con = null)
+	{
+		parent::postInsert($con);
+
+
+	}
+
+	/**
+	 * Code to be run after persisting the object
+	 * @param PropelPDO $con
+	 */
+	public function postSave(PropelPDO $con = null)
+	{
+		kEventsManager::raiseEvent(new kObjectSavedEvent($this));
+		$this->oldColumnsValues = array();
+		$this->oldCustomDataValues = array();
+
+		parent::postSave($con);
+	}
+
+
 }

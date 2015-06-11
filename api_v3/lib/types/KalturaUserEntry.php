@@ -36,13 +36,6 @@ abstract class KalturaUserEntry extends KalturaObject implements IRelatedFiltera
 	public $partnerId;
 
 	/**
-	 * @var KalturaUserEntryType
-	 * @readonly
-	 * @filter eq,in,notin
-	 */
-	public $type;
-
-	/**
 	 * @var KalturaUserEntryStatus
 	 * @readonly
 	 */
@@ -100,8 +93,6 @@ abstract class KalturaUserEntry extends KalturaObject implements IRelatedFiltera
 	 */
 	public function toInsertableObject ( $object_to_fill = null , $props_to_skip = array() )
 	{
-		if(is_null($object_to_fill))
-			$object_to_fill = UserEntry::getInstanceByType($this->type);
 		$object_to_fill->setPartnerId(kCurrentContext::getCurrentPartnerId());
 		return parent::toInsertableObject($object_to_fill, $props_to_skip);
 	}
@@ -114,7 +105,7 @@ abstract class KalturaUserEntry extends KalturaObject implements IRelatedFiltera
 	 */
 	function getExtraFilters()
 	{
-		return array(array("order" => "recent"));
+		return array();
 	}
 
 	/**

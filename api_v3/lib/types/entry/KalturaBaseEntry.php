@@ -348,9 +348,9 @@ class KalturaBaseEntry extends KalturaObject implements IRelatedFilterable
 	public $entitledUsersPublish;
 
 	/**
-	 * Comma seperated string of the capabilities of the entry, each plugin can add it's own capability
+	 * Comma seperated string of the capabilities of the entry. Any capability needed can be added to this list.
 	 *
-	 * @dynamicType KalturaCapabilityName
+	 * @dynamicType KalturaEntryCapability
 	 * @var string
 	 * @readonly
 	 */

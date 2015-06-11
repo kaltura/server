@@ -27,7 +27,7 @@ class KalturaQuizUserEntry extends KalturaUserEntry{
 	 */
 	public function __construct()
 	{
-		$this->type = QuizUserEntryType::KALTURA_QUIZ_USER_ENTRY;
+		$this->type = QuizPlugin::getCoreValue('UserEntryType', QuizUserEntryType::QUIZ);
 	}
 
 	public function toObject($object_to_fill = null, $props_to_skip = array())
@@ -39,6 +39,15 @@ class KalturaQuizUserEntry extends KalturaUserEntry{
 		return parent::toObject($object_to_fill, $props_to_skip);
 	}
 
+	/* (non-PHPdoc)
+	 * @see KalturaObject::toInsertableObject()
+	 */
+	public function toInsertableObject ( $object_to_fill = null , $props_to_skip = array() )
+	{
+		if(is_null($object_to_fill))
+			$object_to_fill = UserEntry::getInstanceByType($this->type);
+		return parent::toInsertableObject($object_to_fill, $props_to_skip);
+	}
 
 
 }

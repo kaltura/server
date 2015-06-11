@@ -3,7 +3,7 @@
  * @package Core
  * @subpackage model.enum
  */
-interface CapabilityName extends BaseEnum
+interface EntryCapability extends BaseEnum
 {
 
 }

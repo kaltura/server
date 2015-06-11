@@ -23,7 +23,7 @@ class QuizUserEntryService extends KalturaBaseService{
 		if (!$dbUserEntry)
 			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $id);
 
-		if ($dbUserEntry->getType() != QuizUserEntryType::KALTURA_QUIZ_USER_ENTRY)
+		if ($dbUserEntry->getType() != QuizPlugin::getCoreValue('UserEntryType',QuizUserEntryType::QUIZ))
 		{
 			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_TYPE, $dbUserEntry->getType());
 		}
@@ -32,7 +32,8 @@ class QuizUserEntryService extends KalturaBaseService{
 		 */
 		$score = $dbUserEntry->calculateScore();
 		$dbUserEntry->setScore($score);
-		$dbUserEntry->setStatus(QuizUserEntryStatus::USER_ENTRY_STATUS_SUBMITTED);
+//		$dbUserEntry->setStatus(QuizUserEntryStatus::QUIZ_SUBMITTED);
+		$dbUserEntry->setStatus(QuizPlugin::getCoreValue('UserEntryStatus', QuizUserEntryStatus::QUIZ_SUBMITTED));
 		$dbUserEntry->save();
 
 		$userEntry = new KalturaQuizUserEntry();

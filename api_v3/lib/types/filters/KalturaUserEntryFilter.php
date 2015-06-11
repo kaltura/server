@@ -30,8 +30,7 @@ class KalturaUserEntryFilter extends KalturaUserEntryBaseFilter
 		}
 
 		$c = new Criteria();
-		$userEntryFilter = new UserEntryFilter();
-		$this->toObject($userEntryFilter);
+		$userEntryFilter = $this->toObject();
 		$userEntryFilter->attachToCriteria($c);
 
 		if (!is_null($pager))
