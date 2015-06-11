@@ -2,7 +2,7 @@
 /**
  * @package plugins.drm
  */
-class DrmPlugin extends KalturaPlugin implements IKalturaServices, IKalturaAdminConsolePages, IKalturaPermissions, IKalturaEnumerator, IKalturaConfigurator, IKalturaObjectLoader, IKalturaEntryContextDataContributor
+class DrmPlugin extends KalturaPlugin implements IKalturaServices, IKalturaAdminConsolePages, IKalturaPermissions, IKalturaEnumerator, IKalturaConfigurator, IKalturaObjectLoader, IKalturaEntryContextDataContributor,IKalturaPermissionsEnabler
 {
 	const PLUGIN_NAME = 'drm';
 
