@@ -280,7 +280,8 @@ class playManifestAction extends kalturaAction
 		if (is_null($this->flavorParamsIds))
 			return;
 			
-		$this->flavorParamsIds = $this->secureEntryHelper->filterAllowedFlavorParams($this->flavorParamsIds);
+		if($this->secureEntryHelper)
+			$this->flavorParamsIds = $this->secureEntryHelper->filterAllowedFlavorParams($this->flavorParamsIds);
 		
 		if(is_null($this->flavorParamsIds))
 			return;
