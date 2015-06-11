@@ -47,7 +47,7 @@ class KalturaUserEntryFilter extends KalturaUserEntryBaseFilter
 		else
 		{
 			KalturaFilterPager::detachFromCriteria($c);
-			$totalCount = assetPeer::doCount($c);
+			$totalCount = UserEntryPeer::doCount($c);
 		}
 
 		$response->totalCount = $totalCount;
