@@ -1,3 +1,39 @@
+# Jupiter-10.14.0 #
+
+## in video quiz ##
+
+- Issue Type: new feature  
+- Issue ID: PLAT-2795 
+
+#### Configuration ####
+
+- Add the following line to the plugins.ini file:  
+        Quiz 
+
+#### Deployment Scripts ####
+
+- run the Following deployemnt scripts:
+        
+		Create new user_entry table:
+        mysql -h@db_host@ -u@db_user@ -p@db_pass@ -P3306 kaltura < deployment/updates/sql/2015_15_06_create_user_entry_table.sql
+        
+
+		Update new services permissions:
+		php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2015_04_11_update_quiz_permissions.php
+		php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2015_05_07_update_userentry_permissions.php
+		php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2015_06_07_update_quiz_analytics_permissions.php
+
+		Install Plugins:
+		php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+
+		
+		
+
+#### Known Issues & Limitations ####
+
+None.
+
+
 # Jupiter-10.13.0 #
 
 ## New edgeServer service - drop one of the dynamic eCDN ##
