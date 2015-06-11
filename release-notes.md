@@ -10,6 +10,16 @@
 - Add the following line to the plugins.ini file:  
         Quiz 
 
+- Add the following lines from admin.template.ini to admin.ini:
+
+		moduls.quizCuePoint.enabled = true
+		moduls.quizCuePoint.permissionType = 3
+		moduls.quizCuePoint.label = Quiz - Cue Points
+		moduls.quizCuePoint.permissionName = QUIZ_PLUGIN_PERMISSION
+		moduls.quizCuePoint.basePermissionType = 3
+		moduls.quizCuePoint.basePermissionName = CUEPOINT_PLUGIN_PERMISSION
+		moduls.quizCuePoint.group = GROUP_ENABLE_DISABLE_FEATURES
+
 #### Deployment Scripts ####
 
 - run the Following deployemnt scripts:
