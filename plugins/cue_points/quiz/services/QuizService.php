@@ -58,7 +58,7 @@ class QuizService extends KalturaBaseService
 	{
 		$dbEntry = entryPeer::retrieveByPK($entryId);
 		$kQuiz = QuizPlugin::validateAndGetQuiz( $dbEntry );
-		return $this->validateAndUpdateQuizData( $dbEntry, $quiz, $kQuiz->getVersion() );
+		return $this->validateAndUpdateQuizData( $dbEntry, $quiz, $kQuiz->getVersion(), $kQuiz );
 	}
 
 	/**
@@ -66,16 +66,17 @@ class QuizService extends KalturaBaseService
 	 * @param entry $dbEntry
 	 * @param KalturaQuiz $quiz
 	 * @param int $currentVersion
+	 * @param kQuiz|null $newQuiz
 	 * @return KalturaQuiz
 	 * @throws KalturaAPIException
 	 */
-	private function validateAndUpdateQuizData( entry $dbEntry, KalturaQuiz $quiz, $currentVersion = 0 )
+	private function validateAndUpdateQuizData( entry $dbEntry, KalturaQuiz $quiz, $currentVersion = 0, kQuiz $newQuiz = null )
 	{
 		if ( !QuizPlugin::validateUserEntitledForQuizEdit($dbEntry) ) {
 			KalturaLog::debug('Update quiz allowed only with admin KS or entry owner or co-editor');
 			throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID);
 		}
-		$quizData = $quiz->toObject();
+		$quizData = $quiz->toObject($newQuiz);
 		$quizData->setVersion( $currentVersion+1 );
 		QuizPlugin::setQuizData( $dbEntry, $quizData );
 		$dbEntry->setIsTrimDisabled( true );
