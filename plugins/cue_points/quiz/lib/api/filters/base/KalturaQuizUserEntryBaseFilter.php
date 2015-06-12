@@ -12,6 +12,8 @@ abstract class KalturaQuizUserEntryBaseFilter extends KalturaUserEntryFilter
 
 	static private $order_by_map = array
 	(
+		"+score" => "+score",
+		"-score" => "-score",
 	);
 
 	public function getMapBetweenObjects()

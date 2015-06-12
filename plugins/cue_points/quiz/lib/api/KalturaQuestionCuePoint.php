@@ -9,6 +9,7 @@ class KalturaQuestionCuePoint extends KalturaCuePoint
 	/**
 	 * Array of key value answerKey->optionAnswer objects
 	 * @var KalturaOptionalAnswersArray
+	 * @filter order
 	 */
 	public $optionalAnswers;
 
