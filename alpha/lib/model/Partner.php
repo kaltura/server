@@ -56,6 +56,8 @@ class Partner extends BasePartner
 	
 	public static $s_content_root ;
 	
+	const CDN_HOST_WHITE_LIST = 'CDNHostWhiteList';
+
 	public function save(PropelPDO $con = null)
 	{
 		PartnerPeer::removePartnerFromCache( $this->getId() );
@@ -1684,4 +1686,43 @@ class Partner extends BasePartner
 			
 		$this->putInCustomData($customDataKey, $tokenData, 'googleAuth');
 	}
+
+	public function isInCDNWhiteList($host)
+	{
+		KalturaLog::debug("Checking host [$host] is in partner CDN white list");
+		$whiteList = $this->getCdnHostWhiteListArray();
+		foreach ($whiteList as $regEx)
+		{
+			if (preg_match("/".$regEx."/", $host)===1)//Should $regEx be escaped?
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public function getCdnHostWhiteListArray()
+	{
+		$whiteListStr = $this->getFromCustomData(self::CDN_HOST_WHITE_LIST);
+		$whiteListArr = array();
+		if (!is_null($whiteListStr))
+		{
+			$whiteListArr = unserialize($whiteListStr);
+		}
+		return $whiteListArr;
+	}
+
+	public function getCdnHostWhiteList()
+	{
+		$whiteLiestArr = $this->getCdnHostWhiteListArray();
+		$whiteLiestStr = implode(",",$whiteLiestArr);
+		return $whiteLiestStr;
+	}
+
+	public function setCdnHostWhiteList($whiteListRegEx)
+	{
+		$whiteListArr = explode(',', rtrim($whiteListRegEx, ','));
+		$this->putInCustomData(self::CDN_HOST_WHITE_LIST, serialize($whiteListArr));
+	}
+
 }

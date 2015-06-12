@@ -2117,4 +2117,21 @@
             <index-column name="status" />
         </index>
     </table>
+	<table skipSql="false" abstract="false" name="user_entry" description="Describes the relationship between a specific user and a specific entry">
+		<column name="id" type="Integer" required="true" autoIncrement="true" primaryKey="true"/>
+		<column name="entry_id" type="varchar" size="20" required="true"/>
+		<column name="kuser_id" type="integer" required="true"/>
+		<column name="partner_id" type="integer"/>
+		<column name="created_at" type="Timestamp"/>
+		<column name="updated_at" type="Timestamp"/>
+		<column name="status" type="Integer"/>
+		<column name="type" type="Integer" inheritance="single"/>
+		<column name="custom_data" type="longvarchar"/>
+		<foreign-key onDelete="none" onUpdate="none" foreignTable="entry">
+			<reference local="entry_id" foreign="id" />
+		</foreign-key>
+		<foreign-key onDelete="none" foreignTable="kuser">
+			<reference foreign="id" local="kuser_id"/>
+		</foreign-key>
+	</table>
 </database>

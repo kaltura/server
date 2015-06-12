@@ -135,6 +135,7 @@ $html5Version = $_GET['playerVersion'];
 				lastSyncPointTime = date.getTime();
 				lastSyncPointOffset = metadata.offset;
 				lastSyncPointTimestamp = metadata.timestamp;
+				$('#last_cue_point_time').html(new Date(lastSyncPointTimestamp).toUTCString());
 
 				$('#btnSendAd').removeAttr('disabled');
 				log('Ads Enabled last offset:' + lastSyncPointOffset + ' last timestamp: ' + lastSyncPointTimestamp);
@@ -254,10 +255,16 @@ $html5Version = $_GET['playerVersion'];
 		function log(log){
 			$('#eraLog').val(log + '\n' + $('#eraLog').val());
 		}
-		
+
+		function updateSystemTime()
+		{
+			var currentTime = new Date();
+			setTimeout("updateSystemTime()",500);
+			$('#current_system_time').html(currentTime.toUTCString());
+		}
 	</script>
 </head>
-<body>
+<body onload="updateSystemTime()">
 <div id="main" style="position: static;">
 	<div class="content">
 		<div class="title">
@@ -285,6 +292,14 @@ $html5Version = $_GET['playerVersion'];
 	<div id="lblUrl"></div>
 	<br/>
 	<table>
+		<tr>
+			<td>Current PC Time</td>
+			<td><div id="current_system_time">&nbsp;</div></td>
+		</tr>
+		<tr>
+			<td>Last CuePoint time</td>
+			<td><div id="last_cue_point_time">&nbsp;</div></td>
+		</tr>
 		<tr>
 			<td>Admin Secret:</td>
 			<td><input type="text" id="txtSecret" value="<?php echo isset($_GET['secret']) ? $_GET['secret'] : ''; ?>" />
