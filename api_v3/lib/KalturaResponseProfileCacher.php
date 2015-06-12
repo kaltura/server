@@ -280,6 +280,10 @@ class KalturaResponseProfileCacher extends kResponseProfileCacher
 							$results->recalculated++;
 						} while(count($cachedObjects) > 1);
 						
+						if(!count($cachedObjects)){
+							break;
+						}
+						
 						$cache = array_shift($cachedObjects);
 						/* @var $cache kCouchbaseCacheListItem */
 						$results->lastKeyId = $cache->getId();
