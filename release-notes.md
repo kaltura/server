@@ -19,6 +19,8 @@
 		moduls.quizCuePoint.basePermissionType = 3
 		moduls.quizCuePoint.basePermissionName = CUEPOINT_PLUGIN_PERMISSION
 		moduls.quizCuePoint.group = GROUP_ENABLE_DISABLE_FEATURES
+		
+- Add relevant value of "license_server_url" in "drm.ini", see saas-config
 
 #### Deployment Scripts ####
 
