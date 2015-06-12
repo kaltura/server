@@ -1,5 +1,23 @@
 # Jupiter-10.14.0 #
 
+## On the fly encryption ##
+
+-- Issue Type: Configuration for existing feature
+-- Issue ID: 
+
+#### Configuration ####
+ 
+- Add relevant value of "license_server_url" in "drm.ini", see saas-config
+
+#### Deployment Scripts ####
+
+None.
+
+#### Known Issues & Limitations ####
+
+None.
+
+
 ## in video quiz ##
 
 - Issue Type: new feature  
@@ -182,7 +200,6 @@ None.
 #### Configuration ####
 
 - Clone @APP_DIR/configurations/drm.template.ini to @APP_DIR/configurations/drm.ini
-- Add relevant value of "license_server_url" in "drm.ini", see saas-config
 - In @APP_DIR/configurations/drm.ini replace @UDRM_SIGNING_KEY@ with key given from me.
 - Add the following permission block to @APP_DIR@/configurations/admin.ini:
 
