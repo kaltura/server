@@ -28,6 +28,19 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 		return self::$cacheStores;
 	}
 	
+	protected static function invalidateRelated(IBaseObject $object)
+	{
+		KalturaLog::debug('Invalidating object [' . get_class($object) . '] id [' . $object->getPrimaryKey() . '] related objects');
+		
+		$partnerId = $object->getPartnerId();
+		$triggerKey = self::getRelatedObjectKey($object);
+		$objectTypes = self::listObjectRelatedTypes($triggerKey);
+		foreach($objectTypes as $objectType)
+		{
+			self::invalidate("{$partnerId}_{$objectType}");
+		}
+	}
+	
 	protected static function invalidate($invalidationKey)
 	{
 		self::set($invalidationKey, time());
@@ -60,7 +73,25 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 		}
 	}
 	
-	protected static function get($key, $invalidationKey = null)
+	protected static function getMulti(array $keys)
+	{
+		$cacheStores = self::getStores();
+		foreach ($cacheStores as $cacheStore)
+		{
+			if($cacheStore instanceof kCouchbaseCacheWrapper)
+			{
+				return $cacheStore->multiGetAndTouch($keys);
+			}
+			else
+			{
+				return $cacheStore->multiGet($keys);
+			}
+		}
+		
+		return false;
+	}
+	
+	protected static function get($key, array $invalidationKeys = null)
 	{
 		KalturaLog::debug("Key [$key]");
 		$cacheStores = self::getStores();
@@ -78,13 +109,19 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 			
 			if($value)
 			{
-				if($invalidationKey)
+				if($invalidationKeys)
 				{
-					$invalidationTime = self::get($invalidationKey);
-					if(intval($invalidationTime) > intval($value->time))
+					$invalidationTimes = self::getMulti($invalidationKeys);
+					if($invalidationTimes)
 					{
-						KalturaLog::debug("Invalidation time [$invalidationTime] > value time [{$value->time}]");
-						return null;
+						foreach($invalidationTimes as $invalidationTime)
+						{
+							if(intval($invalidationTime) > intval($value->time))
+							{
+								KalturaLog::debug("Invalidation time [$invalidationTime] > value time [{$value->time}]");
+								return null;
+							}
+						}
 					}
 				}
 				
@@ -131,7 +168,7 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 		return "{$partnerId}_{$objectType}_{$objectId}";
 	}
 	
-	protected static function getTriggerKey(IBaseObject $object)
+	protected static function getRelatedObjectKey(IBaseObject $object)
 	{
 		$partnerId = $object->getPartnerId();
 		$objectType = get_class($object);
@@ -299,7 +336,7 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 				$query = $cacheStore->getNewQuery(kCouchbaseCacheQuery::VIEW_RESPONSE_PROFILE_RELATED_OBJECT_SESSIONS);
 				if($query)
 				{
-					$query->addStartKey('triggerKey', self::getTriggerKey($object));
+					$query->addStartKey('triggerKey', self::getRelatedObjectKey($object));
 					$query->addStartKey('objectType', 'a');
 					$query->addStartKey('sessionKey', 'a');
 					$query->setLimit(1);
@@ -418,7 +455,7 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 		return array();
 	}
 	
-	protected function listObjectRelatedTypes($triggerKey)
+	protected function listObjectRelatedSessions($triggerKey)
 	{
 		$cacheStores = self::getStores();
 		foreach ($cacheStores as $cacheStore)
@@ -473,6 +510,48 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 		return array();
 	}
 
+	protected function listObjectRelatedTypes($triggerKey)
+	{
+		$cacheStores = self::getStores();
+		foreach ($cacheStores as $cacheStore)
+		{
+			if($cacheStore instanceof kCouchbaseCacheWrapper)
+			{
+				// TODO optimize using elastic search query
+				$query = $cacheStore->getNewQuery(kCouchbaseCacheQuery::VIEW_RESPONSE_PROFILE_RELATED_OBJECTS_TYPES);
+				if($query)
+				{
+					$query->addStartKey('triggerKey', $triggerKey);
+					$query->addStartKey('objectType', 'a');
+					$query->addEndKey('triggerKey', $triggerKey);
+					$query->addEndKey('objectType', 'Z');
+					$query->setLimit(self::MAX_CACHE_KEYS_PER_JOB);
+
+					$offset = 0;
+					$array = array();
+					$list = $cacheStore->query($query);
+					while(count($list->getObjects()))
+					{
+						KalturaLog::debug('Found [' . $list->getCount() . '] items');
+						foreach ($list->getObjects() as $cacheObject)
+						{
+							/* @var $cacheObject kCouchbaseCacheListItem */
+							list($cacheTriggerKey, $cacheObjectType) = $cacheObject->getKey();
+							$array[$cacheObjectType] = true;
+						}
+						
+						$offset += count($list->getObjects());
+						$query->setOffset($offset);
+						$list = $cacheStore->query($query);
+					}
+					return array_keys($array);
+				}
+			}
+		}
+	
+		return array();
+	}
+
 	protected function listObjectSessionTypes(BaseObject $object)
 	{
 		$objectKey = self::getObjectKey($object);
@@ -516,8 +595,8 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 		KalturaLog::debug('Recalculating object [' . get_class($object) . '] id [' . $object->getPrimaryKey() . '] related objects');
 		
 		$partnerId = $object->getPartnerId();
-		$triggerKey = self::getTriggerKey($object);
-		$objectTypes = self::listObjectRelatedTypes($triggerKey);
+		$triggerKey = self::getRelatedObjectKey($object);
+		$objectTypes = self::listObjectRelatedSessions($triggerKey);
 		foreach($objectTypes as $objectType => $sessionKeys)
 		{
 			foreach($sessionKeys as $sessionKey => $count)
@@ -588,6 +667,18 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 		else
 		{
 			$this->deleteCachedObjects($object);
+		}
+		
+		return true;
+	}
+		
+	protected function invalidateCachedRelatedObjects(IBaseObject $object)
+	{
+		self::invalidateRelated($object);
+		
+		if(PermissionPeer::isValidForPartner(PermissionName::FEATURE_RECALCULATE_RESPONSE_PROFILE_CACHE, $object->getPartnerId()))
+		{
+			$this->addRecalculateRelatedObjectsCacheJob($object);
 		}
 		
 		return true;

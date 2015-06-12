@@ -75,6 +75,17 @@ Download Couchbase server and install according to [official instructions](http:
     	}
 }
 ```
+	
+ - Create View: `relatedObjectsTypes`:
+```javascript
+	function (doc, meta) {
+		if (meta.type == "json") {
+			if(doc.type == "relatedObject"){
+	 			emit([doc.triggerKey, doc.objectType], null);
+			}
+		}
+}
+```
  - Publish the design-document.
 
 ### Configuration ###

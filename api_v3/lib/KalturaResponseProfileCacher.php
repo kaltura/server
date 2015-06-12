@@ -55,7 +55,7 @@ class KalturaResponseProfileCacher extends kResponseProfileCacher
 	{
 		return array(
 			'type' => 'relatedObject',
-			'triggerKey' => self::getTriggerKey($object),
+			'triggerKey' => self::getRelatedObjectKey($object),
 			'objectType' => get_class(self::$cachedObject),
 			'objectPeer' => get_class(self::$cachedObject->getPeer()),
 			'triggerObjectType' => get_class($object),
@@ -127,7 +127,12 @@ class KalturaResponseProfileCacher extends kResponseProfileCacher
 		if(self::get($responseProfileCacheKey))
 		{
 			$key = self::getObjectSpecificCacheKey($object, $responseProfileKey);
-			$value = self::get($key, self::getObjectKey($object));
+			$invalidationKeys = array(
+				self::getObjectKey($object),
+				self::getRelatedObjectKey($object),
+			);
+			
+			$value = self::get($key, $invalidationKeys);
 			if($value)
 			{
 				$apiObject = unserialize($value->apiObject);

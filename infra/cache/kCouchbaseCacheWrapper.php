@@ -20,6 +20,15 @@ class kCouchbaseCacheQuery
 //	}
 //}
 	
+	const VIEW_RESPONSE_PROFILE_RELATED_OBJECTS_TYPES = 'relatedObjectsTypes';
+//function (doc, meta) {
+//	if (meta.type == "json") {
+//		if(doc.type == "relatedObject"){
+// 			emit([doc.triggerKey, doc.objectType], null);
+//		}
+//	}
+//}
+	
 	const VIEW_RESPONSE_PROFILE_OBJECT_SESSIONS = 'objectSessions';
 // function (doc, meta) {
 // 	if (meta.type == "json") {
