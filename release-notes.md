@@ -99,6 +99,18 @@ friendlyName										= Recalculate Cache
 type												= KAsyncRecalculateCache
 scriptPath											= batch/batches/Cache/KAsyncRecalculateCacheExe.php
 ```
+ - Add new module to the admin-console in admin.ini:
+
+```ini
+moduls.recalculateResponseProfile.enabled = true
+moduls.recalculateResponseProfile.permissionType = 2
+moduls.recalculateResponseProfile.label = "Recalculate response-profile cache"
+moduls.recalculateResponseProfile.permissionName = FEATURE_RECALCULATE_RESPONSE_PROFILE_CACHE
+moduls.recalculateResponseProfile.basePermissionType = 2
+moduls.recalculateResponseProfile.basePermissionType =
+moduls.recalculateResponseProfile.basePermissionName =
+moduls.recalculateResponseProfile.group = GROUP_ENABLE_DISABLE_FEATURES
+```
 
 ### Deployment Scripts ###
  - php deployment/updates/scripts/add_permissions/2015_06_09_response_profile.php
