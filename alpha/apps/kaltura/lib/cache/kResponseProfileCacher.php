@@ -716,6 +716,10 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 								$deletedKeys[$cache->getId()] = true;
 							}
 						}
+						if(!count($keys))
+						{
+							break;
+						}
 						$cacheStore->multiDelete($keys);
 						$list = $cacheStore->query($query);
 					}
