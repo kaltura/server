@@ -8,32 +8,22 @@
 class KalturaLiveStreamRtmfpConfiguration extends KalturaLiveStreamConfiguration
 {
 	/**
-	 * Groupspec with authorizations for the RTMFP stream
+	 * Groupspec for the RTMFP stream
 	 * @var string
 	 */
-	public $groupspecWithAuth;
+	public $groupspec;
 	
 	/**
-	 * Groupspec without authorizations for the RTMFP stream
+	 * Multicast stream name
 	 * @var string
 	 */
-	public $groupspecWithoutAuth;
+	public $multicastStreamName;
 	
-	/**
-	 * Type of RTMFP used
-	 * @var int
-	 */
-	public $rtmfpType;
-	
-	/**
-	 * Multicast address
-	 * @var string
-	 */
-	public $multicastAddress;
+
 	
 	private static $mapBetweenObjects = array
 	(
-		"groupspecWithAuth", "groupspecWithoutAuth", "rtmfpType", "multicastAddress"
+		"groupspec", "multicastStreamName"
 	);
 	
 	/* (non-PHPdoc)
