@@ -21,7 +21,8 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 		array(	DeliveryProfileType::LIVE_AKAMAI_HDS, 
 				DeliveryProfileType::LIVE_HDS, 
 				DeliveryProfileType::LIVE_HLS, 
-				DeliveryProfileType::LIVE_RTMP);
+				DeliveryProfileType::LIVE_RTMP,
+				DeliveryProfileType::LIVE_RTMFP);
 	
 	/**
 	 * Static cache for mapping between delivery profile type to delivery profile type. 
@@ -71,6 +72,8 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 			DeliveryProfileType::LIVE_RTMP => 'DeliveryProfileLiveRtmp',
 					
 			DeliveryProfileType::LIVE_AKAMAI_HDS => 'DeliveryProfileLiveAkamaiHds',
+			
+			DeliveryProfileType::LIVE_RTMFP => 'DeliveryProfileLiveRtmfp',
 	);
 	
 	/**
