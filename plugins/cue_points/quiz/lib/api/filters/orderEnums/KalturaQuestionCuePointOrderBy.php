@@ -5,6 +5,6 @@
  */
 class KalturaQuestionCuePointOrderBy extends KalturaCuePointOrderBy
 {
-	const OPTIONAL_ANSWERS_ASC = "+optionalAnswers";
-	const OPTIONAL_ANSWERS_DESC = "-optionalAnswers";
+	const QUESTION_ASC = "+question";
+	const QUESTION_DESC = "-question";
 }
