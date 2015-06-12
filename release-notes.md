@@ -20,8 +20,6 @@
 		moduls.quizCuePoint.basePermissionName = CUEPOINT_PLUGIN_PERMISSION
 		moduls.quizCuePoint.group = GROUP_ENABLE_DISABLE_FEATURES
 		
-- Add relevant value of "license_server_url" in "drm.ini", see saas-config
-
 #### Deployment Scripts ####
 
 - run the Following deployemnt scripts:
@@ -184,6 +182,7 @@ None.
 #### Configuration ####
 
 - Clone @APP_DIR/configurations/drm.template.ini to @APP_DIR/configurations/drm.ini
+- Add relevant value of "license_server_url" in "drm.ini", see saas-config
 - In @APP_DIR/configurations/drm.ini replace @UDRM_SIGNING_KEY@ with key given from me.
 - Add the following permission block to @APP_DIR@/configurations/admin.ini:
 
