@@ -83,11 +83,11 @@ If you have root privileges on the machine in question, you can also do the foll
 	a. Secret repositories - required for the extractKs / generateKs / renewKs utilities.
 		Two types of repositories can be configured:
 		1. Preset repositories - contain a fixed list of (partner id, admin secret) pairs
-		2. Database repositories - contain the connection details for a Kaltura server database,
-			that can be used to pull the secrets of partner accounts.
+		2. Database repositories - contain the connection details for a Kaltura server database, that can be used to pull the secrets of partner accounts.
+		*NOTE: The second option is only possible if you are hosting your own Kaltura ENV. For SaaS, only the first one is viable.*
 	b. IP address salt - required for the genIpHeader utility.
-		The salt has to match the parameter 'remote_addr_header_salt' that is configured in
-		configuration/local.ini on the Kaltura server.
+		The salt has to match the parameter 'remote_addr_header_salt' that is configured in configuration/local.ini on the Kaltura server.
+		*NOTE: this is only relevant when hosting your own Kaltura ENV, otherwise, leave empty.*
 	c. API Host - The default is www.kaltura.com if not defined
 		May be uncommented and modified in order to globally point to a different api host
 		The -u parameter may be used to override the api host via command line
@@ -134,10 +134,101 @@ $ (genks $PARTNER_ID | kalcli accesscontrol get id=7003 > /tmp/a1) ; (genks $PAR
 ```
 $ genks $PARTNER_ID | kalcli playlist execute id=1_1a2b3c | grep -P 'id\t' | sort | uniq | wc -l
 ```
+Sample output:
+```
+2
+```
 
 4. Using a precreated session:
 ```
 $ kalcli -x media list ks=MDQ2ZThjOTI0MTJmZGIxYTVlMWVhNDJlZDZhNDAyMDkyMWJhNzE0OXw0Mzc0ODE7NDM3NDgxOzEzNjI0OTI3Njc7MDsxMzYyNDA2MzY3Ljc3NzM7MDt3aWRnZXQ6MSx2aWV3Oio7Ow==
+```
+Sample output:
+```
+KalturaMediaListResponse
+        objects array
+                0       KalturaMediaEntry
+                        mediaType       1
+                        conversionQuality       6
+                        sourceType      1
+                        dataUrl http://54.160.105.103:80/p/101/sp/10100/playManifest/entryId/0_9b791llw/format/url/protocol/http
+                        flavorParamsIds 0,2,3,4,5,6
+                        plays   0
+                        views   0
+                        duration        33
+                        msDuration      33097
+                        id      0_9b791llw
+                        name    Sample Big Buck Bunny Trailer (HD)
+                        description     Sample Big Buck Bunny Trailer (HD)
+                        partnerId       101
+                        userId  template
+                        creatorId       template
+                        tags    hd content, video, bunny
+                        categories      video,hd content
+                        categoriesIds   7,8
+                        status  2
+                        moderationStatus        6
+                        moderationCount 0
+                        type    1
+                        createdAt       1434218441      (2015-06-13 21:00:41)
+                        updatedAt       1434218444      (2015-06-13 21:00:44)
+                        rank    0
+                        totalRank       0
+                        votes   0
+                        downloadUrl     http://54.160.105.103/p/101/sp/10100/raw/entry_id/0_9b791llw/version/0
+                        searchText      _PAR_ONLY_ _101_ _MEDIA_TYPE_1|  Sample Big Buck Bunny Trailer (HD) hd content, video, bunny Sample Big Buck Bunny Trailer (HD) 
+                        licenseType     -1
+                        version 0
+                        thumbnailUrl    http://54.160.105.103/p/101/sp/10100/thumbnail/entry_id/0_9b791llw/version/100000/acv/92
+                        accessControlId 2
+                        replacementStatus       0
+                        partnerSortValue        0
+                        conversionProfileId     6
+                        rootEntryId     0_9b791llw
+                        operationAttributes     array
+                        entitledUsersEdit
+                        entitledUsersPublish
+                1       KalturaMediaEntry
+                        mediaType       1
+                        conversionQuality       6
+                        sourceType      1
+                        dataUrl http://54.160.105.103:80/p/101/sp/10100/playManifest/entryId/0_i2xs97r8/format/url/protocol/http
+                        flavorParamsIds 0,3,4
+                        plays   0
+                        views   0
+                        duration        30
+                        msDuration      29853
+                        id      0_i2xs97r8
+                        name    Normal web quality video (400kbps)
+                        description     Normal web quality video
+                        partnerId       101
+                        userId  template
+                        creatorId       template
+                        tags    fish
+                        categories      fish
+                        categoriesIds   5
+                        status  2
+                        moderationStatus        6
+                        moderationCount 0
+                        type    1
+                        createdAt       1434218437      (2015-06-13 21:00:37)
+                        updatedAt       1434218439      (2015-06-13 21:00:39)
+                        rank    0
+                        totalRank       0
+                        votes   0
+                        downloadUrl     http://54.160.105.103/p/101/sp/10100/raw/entry_id/0_i2xs97r8/version/0
+                        searchText      _PAR_ONLY_ _101_ _MEDIA_TYPE_1|  Normal web quality video (400kbps) fish Normal web quality video 
+                        licenseType     -1
+                        version 0
+                        thumbnailUrl    http://54.160.105.103/p/101/sp/10100/thumbnail/entry_id/0_i2xs97r8/version/100000/acv/62
+                        accessControlId 2
+                        replacementStatus       0
+                        partnerSortValue        0
+                        conversionProfileId     6
+                        rootEntryId     0_i2xs97r8
+                        operationAttributes     array
+                        entitledUsersEdit
+                        entitledUsersPublish
 ```
 
 5. Parsing an array of params from the API log:
@@ -173,10 +264,27 @@ Parsing a KS:
 ```
 $ extks MDQ2ZThjOTI0MTJmZGIxYTVlMWVhNDJlZDZhNDAyMDkyMWJhNzE0OXw0Mzc0ODE7NDM3NDgxOzEzNjI0OTI3Njc7MDsxMzYyNDA2MzY3Ljc3NzM7MDt3aWRnZXQ6MSx2aWV3Oio7Ow==
 ```
+Sample output:
+```
+extks ZTc4ZmUxN2I5N2I5OWVjOGUwYWEyNzVlMzRhNjVkZWJiM2I1MDgxM3wxMDE7MTAxOzE0MzQzMDUxMDk7MjsxNDM0MjE4NzA5LjQzODc7YWRtaW47ZGlzYWJsZWVudGl0bGVtZW50Ozs=
+Sig                 e78fe17b97b99ec8e0aa275e34a65debb3b50813
+Fields              101;101;1434305109;2;1434218709.4387;admin;disableentitlement;;
+---
+partner_id          101
+partner_pattern     101
+valid_until         1434305109
+type                2
+rand                1434218709.4387
+user                admin
+privileges          disableentitlement
+master_partner_id   
+additional_data 
+
+```
 
 7. Using a serve action:
 ```
-$ genks $PARTNER_ID | kalcli -R document_documents serve entryId=0_abcdef > \temp\test.doc
+$ genks $PARTNER_ID | kalcli -R document_documents serve entryId=0_abcdef > /path/to/output/doc
 ```
 
 8. Nesting requests:
@@ -187,6 +295,18 @@ $ kalcli -x session start partnerId=$PARTNER_ID secret=abcdef type=2 | awk '{pri
 9. Uploading files:
 ```
 $ ks=`genks -b $PARTNER_ID` ; kalcli -x uploadtoken add ks=$ks | awk '$1 == "id" {print "uploadTokenId "$2}' | kalcli uploadtoken upload ks=$ks fileData=@/tmp/video.mp4
+```
+Sample output:
+```
+KalturaUploadToken
+        id      0_55909e3ed8b7c32d4bfd622884c5ae49
+        partnerId       101
+        userId  admin
+        status  2
+        fileName        video.mp4
+        uploadedFileSize        5296812
+        createdAt       1434218959      (2015-06-13 21:09:19)
+        updatedAt       1434218962      (2015-06-13 21:09:22)
 ```
 
 10. Sending the contents of a file on a string parameter:
