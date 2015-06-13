@@ -80,18 +80,20 @@ If you have root privileges on the machine in question, you can also do the foll
 *NOTE: If you do not have root privileges, you can still source kalcliAliases.sh in your user's ~/bashrc*
 
 * Copy config/config.template.ini to config/config.ini and fill out the parameters:
-	a. Secret repositories - required for the extractKs / generateKs / renewKs utilities.
+	- Secret repositories - required for the extractKs / generateKs / renewKs utilities.
 		Two types of repositories can be configured:
-		1. Preset repositories - contain a fixed list of (partner id, admin secret) pairs
-		2. Database repositories - contain the connection details for a Kaltura server database, that can be used to pull the secrets of partner accounts.
+		- Preset repositories - contain a fixed list of (partner id, admin secret) pairs
+		- Database repositories - contain the connection details for a Kaltura server database, that can be used to pull the secrets of partner accounts.
 		*NOTE: The second option is only possible if you are hosting your own Kaltura ENV. For SaaS, only the first one is viable.*
-	b. IP address salt - required for the genIpHeader utility.
+	- IP address salt - required for the genIpHeader utility.
 		The salt has to match the parameter 'remote_addr_header_salt' that is configured in configuration/local.ini on the Kaltura server.
 		*NOTE: this is only relevant when hosting your own Kaltura ENV, otherwise, leave empty.*
-	c. API Host - The default is www.kaltura.com if not defined
+	- API Host - The default is www.kaltura.com if not defined
 		May be uncommented and modified in order to globally point to a different api host
 		The -u parameter may be used to override the api host via command line
-	d. Log Dir - The log directory that contains kaltura_api_v3.log (typically /var/log or /opt/kaltura/log)
+	- Log Dir - The log directory that contains kaltura_api_v3.log (typically /var/log or /opt/kaltura/log)
+		This is relevant to the --log flag, that makes kalcli print the API log instead of the API output. 
+		*Note: this works only when kalcli is executed against a Kaltura server running on the same machine*
 
 Windows
 --------
