@@ -30,6 +30,8 @@ Installation instructions
 ==========================
 Linux
 ------
+The CLI libs require PHP CLI from version 5.3.3 and above, with the CURL PHP extension.
+
 Extract the package contents and run the setup.sh script with:
 ```
 $ ./setup.sh $BASEDIR $SERVICE_URL $PARTNER_ID $ADMIN_SECRET
@@ -62,8 +64,9 @@ Alternatively, you can follow these manual steps:
 	kalcliAliases.sh
 	kalcliAutoComplete
 	logToCli
-	(e.g. if kalcliAutoComplete was copied to /a/b/kalcliAutoComplete @BASEDIR@ should be set to /a/b)
 ```
+e.g. if kalcliAutoComplete was copied to /a/b/kalcliAutoComplete @BASEDIR@ should be set to /a/b
+
 If you have root privileges on the machine in question, you can also do the following to enjoy BASH's auto completion features:
 * Create a link to kalcliAutoComplete in /etc/bash_completion.d/
 	ln -s @BASEDIR@/kalcliAutoComplete /etc/bash_completion.d/kalcliAutoComplete
@@ -93,17 +96,19 @@ If you have root privileges on the machine in question, you can also do the foll
 Windows
 --------
 To use kalcli on Windows you'll need to install:
-1. [Cygwin] (https://cygwin.com/install.html)- make sure to include the bash-completion package (not included by default)
-2. [Xampp] (https://www.apachefriends.org/index.html) or any other platform that provides PHP CLI 5.3 and above with the CURL extension.
+
+- [Cygwin] (https://cygwin.com/install.html)- make sure to include the bash-completion package (not included by default)
+- [Xampp] (https://www.apachefriends.org/index.html) or any other platform that provides PHP CLI 5.3 and above with the CURL extension.
 
 
 Installation is the same as for Linux, but note the following:
-1. Perform the steps from the Cygwin bash
-2. The meaning of BASEDIR in step 2 is different than steps 3 & 5 - in step 2 you need to use a
+
+- Perform the steps from the Cygwin bash
+- The meaning of BASEDIR in step 2 is different than steps 3 & 5 - in step 2 you need to use a
 	path relative to the drive root while in steps 3 & 5 you need to use a path relative to Cygwin root. 
 	For example:
-	a. If you install kalcli in C:\Cygwin\cli, you'll need to use /cygwin/cli in step 2, and use /cli in 3 & 5.
-	a. If you install kalcli in C:\cli, you'll need to use /cli in step 2, and use /cygdrive/c/cli in 3 & 5.
+	- If you install kalcli in C:\Cygwin\cli, you'll need to use /cygwin/cli in step 2, and use /cli in 3 & 5.
+	- If you install kalcli in C:\cli, you'll need to use /cli in step 2, and use /cygdrive/c/cli in 3 & 5.
 
 Examples
 =========
