@@ -189,7 +189,12 @@ class MetadataSearchFilter extends AdvancedSearchFilterOperator
 					elseif($item instanceof MetadataSearchFilter)
 					{
 						$item->applyCondition($this, $xPaths);
-					}					
+					}
+					elseif ($item instanceof DynamicObjectSearchFilter)
+					{
+						$item->applyCondition($this, $xPaths);
+						$dataConditions = $item->matchClause;
+					}
 				}
 			}	
 				
