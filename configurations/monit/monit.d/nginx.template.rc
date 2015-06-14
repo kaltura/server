@@ -1,0 +1,16 @@
+        check process nginx
+           with pidfile "/var/run/nginx.pid"
+           start program = "/sbin/service kaltura-nginx start" with timeout 60 seconds
+           stop program = "/sbin/service kaltura-nginx stop"
+           group kaltura
+           depends on nginx.conf, nginx
+
+        check file nginx.conf
+            with path "/etc/nginx/nginx.conf"
+            # Reload apache if the httpd.conf file was changed
+            if changed checksum
+               then exec "/sbin/service kaltura-nginx reload"
+
+        check file nginx
+            with path "/usr/sbin/nginx"
+
