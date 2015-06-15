@@ -88,14 +88,14 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 		return false;
 	}
 	
-	protected static function get($key, array $invalidationKeys = null)
+	protected static function get($key, array $invalidationKeys = null, $touch = true)
 	{
 		KalturaLog::debug("Key [$key]");
 		$cacheStores = self::getStores();
 		$value = null;
 		foreach ($cacheStores as $cacheStore)
 		{
-			if($cacheStore instanceof kCouchbaseCacheWrapper)
+			if($touch && $cacheStore instanceof kCouchbaseCacheWrapper)
 			{
 				$value = $cacheStore->getAndTouch($key);
 			}
@@ -116,9 +116,9 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 							if(!is_null($invalidationTime))
 							{
 								KalturaLog::debug("Invalidation key [$invalidationKey] time [$invalidationTime] compare to value time [{$value->time}]");
-								if(intval($invalidationTime) > intval($value->time))
+								if(intval($invalidationTime) >= intval($value->time))
 								{
-									KalturaLog::debug("Invalidation time [$invalidationTime] > value time [{$value->time}]");
+									KalturaLog::debug("Invalidation time [$invalidationTime] >= value time [{$value->time}]");
 									return null;
 								}
 							}

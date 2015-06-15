@@ -5,6 +5,9 @@
  */
 class KRecalculateResponseProfileCacheEngine extends KRecalculateCacheEngine
 {
+	const RESPONSE_PROFILE_CACHE_ALREADY_RECALCULATED = 'RESPONSE_PROFILE_CACHE_ALREADY_RECALCULATED';
+	const RESPONSE_PROFILE_CACHE_RECALCULATE_RESTARTED = 'RESPONSE_PROFILE_CACHE_RECALCULATE_RESTARTED';
+	
 	protected $maxCacheObjectsPerRequest = 10;
 	
 	public function __construct()
@@ -46,11 +49,22 @@ class KRecalculateResponseProfileCacheEngine extends KRecalculateCacheEngine
 		$options->objectId = $data->objectId;
 		$options->startDocId = $data->startDocId;
 		$options->endDocId = $data->endDocId;
+		$options->jobCreatedAt = $job->createdAt;
 		
-		do
+		try 
 		{
-			$results = $client->responseProfile->recalculate($options);
-			$options->startDocId = $results->lastKeyId;
-		} while($results->recalculated == $options->limit);
+			do
+			{
+				$results = $client->responseProfile->recalculate($options);
+				$options->startDocId = $results->lastKeyId;
+			} while($results->recalculated == $options->limit);
+		}
+		catch(KalturaException $e)
+		{
+			if($e->getCode() != self::RESPONSE_PROFILE_CACHE_ALREADY_RECALCULATED && $e->getCode() != self::RESPONSE_PROFILE_CACHE_RECALCULATE_RESTARTED)
+				throw $e;
+			
+			KalturaLog::err($e);
+		}
 	}
 }

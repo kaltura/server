@@ -227,8 +227,23 @@ class KalturaResponseProfileCacher extends kResponseProfileCacher
 	 */
 	public static function recalculateCacheBySessionType(KalturaResponseProfileCacheRecalculateOptions $options)
 	{
-		$partnerId = kCurrentContext::getCurrentPartnerId();
 		$sessionKey = self::getSessionKey();
+		
+		$uniqueKey = "{$sessionKey}_{$options->cachedObjectType}";
+		if($options->objectId)
+			$uniqueKey .= "_{$options->objectId}";
+			
+		$lastRecalculateTime = self::get($uniqueKey, null, false);
+		if(is_null($results->lastKeyId)) // first loop
+		{
+			if($lastRecalculateTime > $options->jobCreatedAt)
+				throw new KalturaAPIException(KalturaErrors::RESPONSE_PROFILE_CACHE_ALREADY_RECALCULATED);
+				
+			$lastRecalculateTime = time();
+			self::set($uniqueKey, $lastRecalculateTime);
+		}
+		
+		$partnerId = kCurrentContext::getCurrentPartnerId();
 		$results = new KalturaResponseProfileCacheRecalculateResults();
 		
 		$limit = 100;
@@ -290,6 +305,10 @@ class KalturaResponseProfileCacher extends kResponseProfileCacher
 						
 						if($options->limit && $results->recalculated >= $options->limit)
 							break;
+							
+						$newRecalculateTime = self::get($uniqueKey, null, false);
+						if($newRecalculateTime > $lastRecalculateTime)
+							throw new KalturaAPIException(KalturaErrors::RESPONSE_PROFILE_CACHE_ALREADY_RECALCULATED);
 							
 						$list = $cacheStore->query($query);
 					}

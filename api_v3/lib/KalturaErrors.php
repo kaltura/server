@@ -578,4 +578,8 @@ class KalturaErrors extends APIErrors
 	const RESPONSE_PROFILE_MAX_NESTING_LEVEL = 'RESPONSE_PROFILE_MAX_NESTING_LEVEL;;Response profile cross maximum nesting level';
 	
 	const RESPONSE_PROFILE_CACHE_NOT_FOUND = 'RESPONSE_PROFILE_MAX_NESTING_LEVEL;KEY;Response-Profile key [@KEY@] not found in cache';
+	
+	const RESPONSE_PROFILE_CACHE_ALREADY_RECALCULATED = 'RESPONSE_PROFILE_CACHE_ALREADY_RECALCULATED;;Response-Profile cache was recalculated already by a different process';
+	
+	const RESPONSE_PROFILE_CACHE_RECALCULATE_RESTARTED = 'RESPONSE_PROFILE_CACHE_RECALCULATE_RESTARTED;;Response-Profile cache recalculate was restarted by a different process';
 }

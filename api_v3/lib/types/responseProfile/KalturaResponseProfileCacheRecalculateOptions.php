@@ -32,4 +32,9 @@ class KalturaResponseProfileCacheRecalculateOptions extends KalturaObject
 	 * @var string
 	 */
 	public $endDocId;
+	
+	/**
+	 * @var time
+	 */
+	public $jobCreatedAt;
 }
