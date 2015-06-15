@@ -181,7 +181,7 @@ class KalturaResponseProfileCacher extends kResponseProfileCacher
 		$key = self::getObjectSpecificCacheKey(self::$cachedObject, self::$responseProfileKey);
 		$value = self::getObjectSpecificCacheValue($apiObject, self::$cachedObject, self::$responseProfileKey);
 		
-		self::set($key, $value, self::getObjectKey(self::$cachedObject));
+		self::set($key, $value);
 		
 		self::$cachedObject = null;
 	}
@@ -218,7 +218,7 @@ class KalturaResponseProfileCacher extends kResponseProfileCacher
 		$key = self::getObjectSpecificCacheKey($object, $responseProfile->getKey());
 		$value = self::getObjectSpecificCacheValue($apiObject, $object, $responseProfile->getKey());
 		
-		self::set($key, $value, self::getObjectKey($object));
+		self::set($key, $value);
 	}
 	
 	/**

@@ -699,10 +699,18 @@ class kCouchbaseCacheWrapper extends kBaseCacheWrapper
 		try
 		{
 			$metas = $this->bucket->get($keys);
-			KalturaLog::debug("key [" . print_r($keys, true) . "] metas [" . print_r($metas, true) . "]");
+			KalturaLog::debug("key [" . print_r($keys, true) . "]");
 			$values = array();
-			foreach($metas as $meta)
-				$values[] = $meta->value;
+			foreach($keys as $index => $key)
+			{
+				$meta = $metas[$index];
+				if($meta->error)
+				{
+					KalturaLog::err($meta->error);
+				}
+				
+				$values[$key] = $meta->value;
+			}
 				
 			return $values;
 		}

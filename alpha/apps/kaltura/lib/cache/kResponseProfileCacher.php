@@ -46,7 +46,7 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 		self::set($invalidationKey, time());
 	}
 	
-	protected static function set($key, $value, $invalidationKey = null)
+	protected static function set($key, $value)
 	{
 		KalturaLog::debug("Key [$key]");
 		
@@ -54,11 +54,6 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 		foreach ($cacheStores as $cacheStore)
 		{
 			/* @var $cacheStore kBaseCacheWrapper */
-			if($invalidationKey)
-			{
-				$cacheStore->add($invalidationKey, time());
-			}
-			
 			$cacheStore->set($key, $value);
 		}
 	}
@@ -116,7 +111,7 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 					{
 						foreach($invalidationTimes as $invalidationTime)
 						{
-							if(intval($invalidationTime) > intval($value->time))
+							if(!is_null($invalidationTime) && intval($invalidationTime) > intval($value->time))
 							{
 								KalturaLog::debug("Invalidation time [$invalidationTime] > value time [{$value->time}]");
 								return null;
