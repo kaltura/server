@@ -51,11 +51,13 @@ class KRecalculateResponseProfileCacheEngine extends KRecalculateCacheEngine
 		$options->endDocId = $data->endDocId;
 		$options->jobCreatedAt = $job->createdAt;
 		
+		$recalculated = 0;
 		try 
 		{
 			do
 			{
 				$results = $client->responseProfile->recalculate($options);
+				$recalculated += $results->recalculated;
 				$options->startDocId = $results->lastKeyId;
 			} while($results->recalculated == $options->limit);
 		}
@@ -66,5 +68,7 @@ class KRecalculateResponseProfileCacheEngine extends KRecalculateCacheEngine
 			
 			KalturaLog::err($e);
 		}
+		
+		return $recalculated;
 	}
 }
