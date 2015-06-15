@@ -137,6 +137,10 @@ class FileSync extends BaseFileSync
 	
 	public function getIsDir() { return $this->getFromCustomData("isDir"); }
 	public function setIsDir($v) { $this->putInCustomData("isDir", $v); }
+	
+	public function getContentMd5 () { return $this->getFromCustomData("contentMd5"); }
+	public function setContentMd5 ($v) { $this->putInCustomData("contentMd5", $v);  }
+	
 }
 
 

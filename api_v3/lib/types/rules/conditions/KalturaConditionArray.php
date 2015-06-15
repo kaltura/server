@@ -52,6 +52,8 @@ class KalturaConditionArray extends KalturaTypedArray
 				return new KalturaGeoDistanceCondition();
 			case ConditionType::OR_OPERATOR:
 			    return new KalturaOrCondition();
+			case ConditionType::HASH:
+			    return new KalturaHashCondition();
 			default:
 			     return KalturaPluginManager::loadObject('KalturaCondition', $dbObject->getType());
 		}
