@@ -450,7 +450,7 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 		return array();
 	}
 	
-	protected function listObjectRelatedSessions($triggerKey)
+	protected static function listObjectRelatedSessions($triggerKey)
 	{
 		$cacheStores = self::getStores();
 		foreach ($cacheStores as $cacheStore)
@@ -505,7 +505,7 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 		return array();
 	}
 
-	protected function listObjectRelatedTypes($triggerKey)
+	protected static function listObjectRelatedTypes($triggerKey)
 	{
 		$cacheStores = self::getStores();
 		foreach ($cacheStores as $cacheStore)
@@ -547,7 +547,7 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 		return array();
 	}
 
-	protected function listObjectSessionTypes(BaseObject $object)
+	protected static function listObjectSessionTypes(BaseObject $object)
 	{
 		$objectKey = self::getObjectKey($object);
 		if($object instanceof IBaseObject)
