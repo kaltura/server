@@ -416,11 +416,11 @@ class kF4MManifestRenderer extends kMultiFlavorManifestRenderer
 			$mediaUrl = "<media url=\"".htmlspecialchars($this->mediaUrl)."\"";
 			if (!is_null($this->groupspec))
 			{
-				$mediaUrl .= " groupspec={$this->groupspec}";
+				$mediaUrl .= " groupspec=\"{$this->groupspec}\"";
 			}
 			if ($this->multicastStreamName)
 			{
-				$mediaUrl .= " multicastStreamName={$this->multicastStreamName}";
+				$mediaUrl .= " multicastStreamName=\"{$this->multicastStreamName}\"";
 			}
 			
 			$mediaUrl .= "/>";
