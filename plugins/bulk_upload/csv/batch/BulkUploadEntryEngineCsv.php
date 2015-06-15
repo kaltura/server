@@ -143,9 +143,6 @@ class BulkUploadEntryEngineCsv extends BulkUploadEngineCsv
 		    if($bulkUploadResult->scheduleEndDate)
 		    	$mediaEntry->endDate = $bulkUploadResult->scheduleEndDate;
 
-		    if($bulkUploadResult->thumbnailUrl)
-		    	$mediaEntry->thumbnailUrl = $bulkUploadResult->thumbnailUrl;
-
 		    if($bulkUploadResult->partnerData)
 		    	$mediaEntry->partnerData = $bulkUploadResult->partnerData;
 

@@ -598,7 +598,7 @@ class Partner extends BasePartner
 	public function getMaxBulkSize() { return $this->getFromCustomData("maxBulk", null, null); }
 	public function setMaxBulkSize( $v ) { $this->putInCustomData("maxBulk", (int)$v); } 
 
-	public function getStorageServePriority() { return $this->getFromCustomData("storageServePriority", null, 0); }
+	public function getStorageServePriority() { return $this->getFromCustomData("storageServePriority", null, StorageProfile::STORAGE_SERVE_PRIORITY_KALTURA_ONLY); }
 	public function setStorageServePriority( $v ) { $this->putInCustomData("storageServePriority", (int)$v); } 
 	
 	public function getStorageDeleteFromKaltura() { return $this->getFromCustomData("storageDeleteFromKaltura", null, 0); }

@@ -128,5 +128,13 @@ class Tag extends BaseTag implements IIndexable
 			return $indexedFieldValue;
 		}
 	}
-	
+
+	public function getTagWithEqual()
+	{
+		/*
+		 * We replace space with '=' in order to be able to search for tags that have space in them and the first word has less than 3 letters
+		 */
+		return str_replace(" ", "=", $this->tag);
+	}
+
 } // Tag

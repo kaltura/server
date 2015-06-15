@@ -1,3 +1,71 @@
+# Jupiter-10.13.0 #
+
+## New edgeServer service - drop one of the dynamic eCDN ##
+
+- Issue Type: new feature  
+- Issue ID: PLAT-3007 
+
+### Configuration ###
+- Add the following to the admin.ini under "AVAILABLE MODULES (permissionType)":
+
+		moduls.EdgeServer.enabled = true
+		moduls.EdgeServer.permissionType = 2
+		moduls.EdgeServer.label = "Edge server usage"
+		moduls.EdgeServer.permissionName = FEATURE_EDGE_SERVER
+		moduls.EdgeServer.basePermissionType =
+		moduls.EdgeServer.basePermissionName =
+		moduls.EdgeServer.group = GROUP_ENABLE_DISABLE_FEATURES
+
+#### Deployment Scripts ####
+- run the Following deployemnt scripts:
+
+		Update new servcie permissions: 
+		php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2015_05_28_edge_server_service.php
+
+		create new edge_Server table:
+		mysql -h@db_host@ -u@db_user@ -p@db_pass@ -P3306 kaltura < deployment/updates/sql/2015_27_05_create_edge_server_table.sql
+
+#### Known Issues & Limitations ####
+
+* To enable this feature on your account you will need you will need to flip on the feature in the partner configuration section.
+
+##multi-language caption ingestion##
+- Issue Type: feature request
+- Issue ID: PLAT-2500
+
+#### Configuration ####
+
+- allocate worker/s for KAsyncParseMultiLanguageCaptionAsset.
+
+#### Deployment Scripts ####
+
+	php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+
+- deploy server-saas-config to update batch client.
+
+#### Known Issues & Limitations ####
+
+Players will allow choosing 'multi-language' captions ,by default.
+
+
+## Search for tags with spaces and words with less than 3 characters ##
+
+- Issue Type: bug fix
+- Issue ID: SUP-4362
+
+#### Configuration ####
+
+None.
+
+#### Deployment Scripts ####
+
+    - Need to re-build so that spaces in tags will be replaced by '=' & re-index the tag sphinx table.
+
+#### Known Issues & Limitations ####
+
+None.
+
+
 # Jupiter-10.12.0 #
 
 ## Set new permission to flavorasset geturl ##
@@ -632,26 +700,28 @@ Add the following lines as new sections:
 #### Activiti Deployment Instructions ####
 
  - Install [Apache Tomcat 7](http://tomcat.apache.org/tomcat-7.0-doc/setup.html#Unix_daemon "Apache Tomcat 7")
- - Make sure $CATALINA_HOME is defined.
+ - Make sure $CATALINA_BASE is defined.
  - Install [Apache Ant](http://ant.apache.org/manual/installlist.html "Apache Ant")
  - Download [Activiti 5.17.0](https://github.com/Activiti/Activiti/releases/download/activiti-5.17.0/activiti-5.17.0.zip "Activiti 5.17.0")
  - Open zip: `unzip activiti-5.17.0.zip`
- - Copy WAR files: `cp activiti-5.17.0/wars/* $CATALINA_HOME/webapps/`
+ - Copy WAR files: 
+  - `cp activiti-5.17.0/wars/activiti-explorer.war $CATALINA_BASE/webapps/activiti-explorer##5.17.0.war`
+  - `cp activiti-5.17.0/wars/activiti-rest.war $CATALINA_BASE/webapps/activiti-rest##5.17.0.war`
  - Restart Apache Tomcat.
  - Create DB **(replace tokens)**: `mysql -uroot -p`
 
 		CREATE DATABASE activiti;
-		GRANT INSERT,UPDATE,DELETE,SELECT,ALTER,CREATE ON activiti.* TO '@DB1_USER@'@'%';
+		GRANT INSERT,UPDATE,DELETE,SELECT,ALTER,CREATE,INDEX ON activiti.* TO '@DB1_USER@'@'%';
 		FLUSH PRIVILEGES;
 
- - Edit **(replace tokens)** $CATALINA_HOME/webapps/**activiti-explorer**/WEB-INF/classes/db.properties
+ - Edit **(replace tokens)** $CATALINA_BASE/webapps/**activiti-explorer**/WEB-INF/classes/db.properties
 
 		jdbc.driver=com.mysql.jdbc.Driver
 		jdbc.url=jdbc:mysql://@DB1_HOST@:@DB1_PORT@/activiti
 		jdbc.username=@DB1_USER@
 		jdbc.password=@DB1_PASS@
 
- - Edit **(replace tokens)** $CATALINA_HOME/webapps/**activiti-rest**/WEB-INF/classes/db.properties
+ - Edit **(replace tokens)** $CATALINA_BASE/webapps/**activiti-rest**/WEB-INF/classes/db.properties
 
 		jdbc.driver=com.mysql.jdbc.Driver
 		jdbc.url=jdbc:mysql://@DB1_HOST@:@DB1_PORT@/activiti
@@ -660,7 +730,7 @@ Add the following lines as new sections:
 
  - Download [mysql jdbc connector 5.0.8](http://cdn.mysql.com/Downloads/Connector-J/mysql-connector-java-5.0.8.zip "mysql jdbc connector 5.0.8")
  - Open zip: `unzip mysql-connector-java-5.0.8.zip`
- - Copy the mysql jdbc connector: `cp mysql-connector-java-5.0.8/mysql-connector-java-5.0.8-bin.jar $CATALINA_HOME/lib/`
+ - Copy the mysql jdbc connector: `cp mysql-connector-java-5.0.8/mysql-connector-java-5.0.8-bin.jar $CATALINA_BASE/lib/`
  - Restart Apache Tomcat.
  - Open your browser to validate installation **(replace tokens)**: http://@WWW_HOST@:8080/activiti-explorer/
 	 - Username: kermit
