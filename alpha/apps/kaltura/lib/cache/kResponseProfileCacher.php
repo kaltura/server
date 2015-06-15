@@ -472,9 +472,9 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 					$offset = 0;
 					$array = array();
 					$list = $cacheStore->query($query);
+					KalturaLog::debug('Found [' . count($list->getObjects()) . '/' . $list->getCount() . '] items');
 					while(count($list->getObjects()))
 					{
-						KalturaLog::debug('Found [' . $list->getCount() . '] items');
 						foreach ($list->getObjects() as $cacheObject)
 						{
 							/* @var $cacheObject kCouchbaseCacheListItem */
@@ -496,6 +496,7 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 						$offset += count($list->getObjects());
 						$query->setOffset($offset);
 						$list = $cacheStore->query($query);
+						KalturaLog::debug('Found [' . count($list->getObjects()) . '/' . $list->getCount() . '] items');
 					}
 					return $array;
 				}
@@ -525,9 +526,9 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 					$offset = 0;
 					$array = array();
 					$list = $cacheStore->query($query);
+					KalturaLog::debug('Found [' . count($list->getObjects()) . '/' . $list->getCount() . '] items');
 					while(count($list->getObjects()))
 					{
-						KalturaLog::debug('Found [' . $list->getCount() . '] items');
 						foreach ($list->getObjects() as $cacheObject)
 						{
 							/* @var $cacheObject kCouchbaseCacheListItem */
@@ -538,6 +539,7 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 						$offset += count($list->getObjects());
 						$query->setOffset($offset);
 						$list = $cacheStore->query($query);
+						KalturaLog::debug('Found [' . count($list->getObjects()) . '/' . $list->getCount() . '] items');
 					}
 					return array_keys($array);
 				}
@@ -568,7 +570,7 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 						$query->setLimit(self::MAX_CACHE_KEYS_PER_JOB);
 	
 						$list = $cacheStore->query($query);
-						KalturaLog::debug('Found [' . $list->getCount() . '] items');
+						KalturaLog::debug('Found [' . count($list->getObjects()) . '/' . $list->getCount() . '] items');
 						$array = array();
 						foreach ($list->getObjects() as $cacheObject)
 						{
@@ -698,9 +700,9 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 					
 					$deletedKeys = array();
 					$list = $cacheStore->query($query);
+					KalturaLog::debug('Found [' . count($list->getObjects()) . '/' . $list->getCount() . '] items');
 					while($list->getCount())
 					{
-						KalturaLog::debug('Found [' . $list->getCount() . '] items');
 						$keys = array();
 						foreach($list->getObjects() as $cache)
 						{
@@ -717,6 +719,7 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 						}
 						$cacheStore->multiDelete($keys);
 						$list = $cacheStore->query($query);
+						KalturaLog::debug('Found [' . count($list->getObjects()) . '/' . $list->getCount() . '] items');
 					}
 				}
 			}
