@@ -57,7 +57,7 @@ class playManifestAction extends kalturaAction
 		"tags" => 't',
 		"uiConfId" => 'ui',
 	);
-	
+
 	const KALTURA_TOKEN_MARKER = '{kt}';
 	
 	/**
@@ -129,17 +129,7 @@ class playManifestAction extends kalturaAction
 		$calcToken = sha1(kConf::get('url_token_secret') . $url);
 		return $calcToken == $urlToken;
 	}
-	
-	/**
-	 * @param string $url
-	 * @return string
-	 */
-	static protected function calculateKalturaToken($url)
-	{
-		$token = sha1(kConf::get('url_token_secret') . $url); 
-		return str_replace(self::KALTURA_TOKEN_MARKER, $token, $url);
-	}
-	
+
 	/**
 	 * @param array $params
 	 * @return array
@@ -447,7 +437,8 @@ class playManifestAction extends kalturaAction
 
 	private function removeNotAllowedFlavors($flavorAssets)
 	{
-		$returnedFlavors = array();		
+		$returnedFlavors = array();
+
 		foreach ($flavorAssets as $flavorAsset)
 		{
 			if ($this->secureEntryHelper->isAssetAllowed($flavorAsset))
