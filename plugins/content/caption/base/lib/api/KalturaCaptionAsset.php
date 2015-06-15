@@ -61,6 +61,15 @@ class KalturaCaptionAsset extends KalturaAsset
 	 */
 	public $status;
 	
+	/**
+	 * The parent id of the asset
+	 *
+	 *@var string
+	 *@insertonly
+	 *
+	 */
+	public $parentId;
+
 	private static $map_between_objects = array
 	(
 		"captionParamsId" => "flavorParamsId",
@@ -69,6 +78,7 @@ class KalturaCaptionAsset extends KalturaAsset
 		"label",
 		"format" => "containerFormat",
 		"status",
+		"parentId",		
 	);
 	
 	public function getMapBetweenObjects ( )

@@ -1,5 +1,53 @@
 # Jupiter-10.13.0 #
 
+## New edgeServer service - drop one of the dynamic eCDN ##
+
+- Issue Type: new feature  
+- Issue ID: PLAT-3007 
+
+### Configuration ###
+- Add the following to the admin.ini under "AVAILABLE MODULES (permissionType)":
+
+		moduls.EdgeServer.enabled = true
+		moduls.EdgeServer.permissionType = 2
+		moduls.EdgeServer.label = "Edge server usage"
+		moduls.EdgeServer.permissionName = FEATURE_EDGE_SERVER
+		moduls.EdgeServer.basePermissionType =
+		moduls.EdgeServer.basePermissionName =
+		moduls.EdgeServer.group = GROUP_ENABLE_DISABLE_FEATURES
+
+#### Deployment Scripts ####
+- run the Following deployemnt scripts:
+
+		Update new servcie permissions: 
+		php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2015_05_28_edge_server_service.php
+
+		create new edge_Server table:
+		mysql -h@db_host@ -u@db_user@ -p@db_pass@ -P3306 kaltura < deployment/updates/sql/2015_27_05_create_edge_server_table.sql
+
+#### Known Issues & Limitations ####
+
+* To enable this feature on your account you will need you will need to flip on the feature in the partner configuration section.
+
+##multi-language caption ingestion##
+- Issue Type: feature request
+- Issue ID: PLAT-2500
+
+#### Configuration ####
+
+- allocate worker/s for KAsyncParseMultiLanguageCaptionAsset.
+
+#### Deployment Scripts ####
+
+	php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+
+- deploy server-saas-config to update batch client.
+
+#### Known Issues & Limitations ####
+
+Players will allow choosing 'multi-language' captions ,by default.
+
+
 ## Search for tags with spaces and words with less than 3 characters ##
 
 - Issue Type: bug fix

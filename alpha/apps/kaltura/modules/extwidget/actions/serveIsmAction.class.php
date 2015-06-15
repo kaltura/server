@@ -95,6 +95,7 @@ class serveIsmAction extends sfAction
 					$subType = entry::FILE_SYNC_ENTRY_SUB_TYPE_ISMC;
 				break;
 			case 'ismv':
+			case 'isma':
 				$subType = flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET;
 				$isAsset = true;
 				break;
@@ -178,13 +179,13 @@ class serveIsmAction extends sfAction
 			{
 				if($asset->hasTag(assetParams::TAG_ISM_MANIFEST))
 				{
-					list($replacingFileName, $fileName) = $this->getReplacedAndReplacingFileNames($asset, flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ISMC, 'ismc');
+					list($replacingFileName, $fileName) = $this->getReplacedAndReplacingFileNames($asset, flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ISMC);
 					if($replacingFileName && $fileName)
 						$fileData = str_replace("content=\"$replacingFileName\"", "content=\"$fileName\"", $fileData);			
 				}
 				else
 				{
-					list($replacingFileName, $fileName) = $this->getReplacedAndReplacingFileNames($asset, flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET, 'ismv');
+					list($replacingFileName, $fileName) = $this->getReplacedAndReplacingFileNames($asset, flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
 					if($replacingFileName && $fileName)					
 						$fileData = str_replace("src=\"$replacingFileName\"", "src=\"$fileName\"", $fileData);
 				}
@@ -195,7 +196,7 @@ class serveIsmAction extends sfAction
 			return $fileData;	
 	}
 	
-	private function getReplacedAndReplacingFileNames($asset, $fileSyncObjectSubType, $fileExt)
+	private function getReplacedAndReplacingFileNames($asset, $fileSyncObjectSubType)
 	{
 		$replacingFileName = null;
 		$fileName = null;
@@ -204,6 +205,7 @@ class serveIsmAction extends sfAction
 		if($fileSync)			
 		{
 			$replacingFileName = basename($fileSync->getFilePath());
+			$fileExt = pathinfo($fileSync->getFilePath(), PATHINFO_EXTENSION);
 			$fileName = $asset->getEntryId().'_'.$asset->getId().'_'.$fileSync->getVersion().'.'.$fileExt;
 		}
 		return array($replacingFileName, $fileName);

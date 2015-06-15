@@ -129,6 +129,8 @@ $html5Version = $_GET['playerVersion'];
 
 		function onSyncPoint(metadata){
 			if ( metadata && metadata.objectType == "KalturaSyncPoint") {
+				if(lastSyncPointOffset && lastSyncPointOffset >= metadata.offset)
+					return;
 				var date = new Date();
 				lastSyncPointTime = date.getTime();
 				lastSyncPointOffset = metadata.offset;
@@ -305,11 +307,11 @@ $html5Version = $_GET['playerVersion'];
 		</tr>
 		<tr>
 			<td>Ad URL:</td>
-			<td><input type="text" id="txtAdUrl" value="http://search.spotxchange.com/vast/2.00/79391?content_page_url=[please_put_dynamic_page_url]&cb=[random_number]&VPI=MP4" />
+			<td><input type="text" id="txtAdUrl" value="http://projects.kaltura.com/vast/vast10.xml" />
 		</td>
 		<tr>
 			<td>Ad Duration (milliseconds):</td>
-			<td><input type="text" id="txtAdDuration" value="15000" />
+			<td><input type="text" id="txtAdDuration" value="5000" />
 		</td>
 		<tr>
 			<td>Cue point type:</td>
@@ -330,19 +332,6 @@ $html5Version = $_GET['playerVersion'];
 		</tr>
 		<tr>
 			<td colspan="2"><br/><br/></td>
-		</tr>
-		<tr>
-			<td>Sync-Point Interval (seconds):</td>
-			<td><input type="text" id="txtSyncPointInterval" value="30" />
-		</td>
-		<tr>
-			<td>Sync-Point Duration (seconds):</td>
-			<td><input type="text" id="txtSyncPointDuration" value="150" />
-		</td>
-		<tr>
-			<td colspan="2">
-				<input type="button" onclick="enableAds()" value="Enable Ads (Send Sync-Points)" />
-			</td>
 		</tr>
 	</table>
 </div><!-- end #main -->
