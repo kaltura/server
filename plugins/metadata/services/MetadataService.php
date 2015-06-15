@@ -305,14 +305,19 @@ class MetadataService extends KalturaBaseService
 				$dbMetadata->setMetadataProfileVersion($dbMetadataProfile->getVersion());
 			}
 			
-			$dbMetadata->incrementVersion();
-		
 			$key = $dbMetadata->getSyncKey(Metadata::FILE_SYNC_METADATA_DATA);
-			kFileSyncUtils::file_put_contents($key, $xmlData);
-			
-			$dbMetadata->save();
-			
-			kEventsManager::raiseEvent(new kObjectDataChangedEvent($dbMetadata, $previousVersion));
+			if (!kFileSyncUtils::compareContent($key, $xmlData))
+			{
+				$dbMetadata->incrementVersion();
+				$key = $dbMetadata->getSyncKey(Metadata::FILE_SYNC_METADATA_DATA);
+				kFileSyncUtils::file_put_contents($key, $xmlData);
+				$dbMetadata->save();
+				kEventsManager::raiseEvent(new kObjectDataChangedEvent($dbMetadata, $previousVersion));
+			}
+			else 
+			{
+				KalturaLog::info("XML data MD5 matches current filesync content MD5. Update is not necessary.");
+			}
 		}
 		
 		$metadata = new KalturaMetadata();
