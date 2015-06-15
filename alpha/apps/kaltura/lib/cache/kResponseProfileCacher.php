@@ -43,7 +43,9 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 	
 	protected static function invalidate($invalidationKey)
 	{
-		self::set($invalidationKey, time());
+		$now = time();
+		KalturaLog::debug("Invalidating key [$invalidationKey] now [$now]");
+		self::set($invalidationKey, $now);
 	}
 	
 	protected static function set($key, $value)
@@ -109,12 +111,16 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 					$invalidationTimes = self::getMulti($invalidationKeys);
 					if($invalidationTimes)
 					{
-						foreach($invalidationTimes as $invalidationTime)
+						foreach($invalidationTimes as $invalidationKey => $invalidationTime)
 						{
-							if(!is_null($invalidationTime) && intval($invalidationTime) > intval($value->time))
+							if(!is_null($invalidationTime))
 							{
-								KalturaLog::debug("Invalidation time [$invalidationTime] > value time [{$value->time}]");
-								return null;
+								KalturaLog::debug("Invalidation key [$invalidationKey] time [$invalidationTime] compare to value time [{$value->time}]");
+								if(intval($invalidationTime) > intval($value->time))
+								{
+									KalturaLog::debug("Invalidation time [$invalidationTime] > value time [{$value->time}]");
+									return null;
+								}
 							}
 						}
 					}
