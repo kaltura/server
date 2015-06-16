@@ -50,6 +50,7 @@ class KRecalculateResponseProfileCacheEngine extends KRecalculateCacheEngine
 		$options->startDocId = $data->startDocId;
 		$options->endDocId = $data->endDocId;
 		$options->jobCreatedAt = $job->createdAt;
+		$options->isFirstLoop = true;
 		
 		$recalculated = 0;
 		try 
@@ -59,6 +60,7 @@ class KRecalculateResponseProfileCacheEngine extends KRecalculateCacheEngine
 				$results = $client->responseProfile->recalculate($options);
 				$recalculated += $results->recalculated;
 				$options->startDocId = $results->lastKeyId;
+				$options->isFirstLoop = false;
 			} while($results->recalculated == $options->limit);
 		}
 		catch(KalturaException $e)

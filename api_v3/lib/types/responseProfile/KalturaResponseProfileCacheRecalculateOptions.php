@@ -37,4 +37,9 @@ class KalturaResponseProfileCacheRecalculateOptions extends KalturaObject
 	 * @var time
 	 */
 	public $jobCreatedAt;
+	
+	/**
+	 * @var bool
+	 */
+	public $isFirstLoop;
 }
