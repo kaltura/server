@@ -438,6 +438,8 @@ class playManifestAction extends kalturaAction
 	private function removeNotAllowedFlavors($flavorAssets)
 	{
 		$returnedFlavors = array();
+		if(!$this->secureEntryHelper)
+			return $returnedFlavors;
 
 		foreach ($flavorAssets as $flavorAsset)
 		{
@@ -929,9 +931,10 @@ class playManifestAction extends kalturaAction
 			//In case request needs to be redirected to play-server we need to add the ui conf id to the manifest url as well
 			$this->deliveryAttributes->setUiConfId($this->getRequestParameter("uiConfId"));
 		}
-		
-		$this->secureEntryHelper->updateDeliveryAttributes($this->deliveryAttributes);
-		
+
+		if($this->secureEntryHelper)
+			$this->secureEntryHelper->updateDeliveryAttributes($this->deliveryAttributes);
+
 		$this->enforceEncryption();
 		
 		$renderer = null;
