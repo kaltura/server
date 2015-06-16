@@ -228,27 +228,43 @@ class CrossKalturaDistributionEngine extends DistributionEngine implements
 	    
 	    // get entry
 	    KalturaLog::debug('Getting entry id ['.$entryId.']');
-	    $entry = $client->baseEntry->get($entryId);
-	    
+		try
+		{
+			if ($this->distributionProfile->partnerId)
+				$entry = $this->getEntry($this->distributionProfile->partnerId, $entryId);
+			else
+				$entry = $client->baseEntry->get($entryId);
+		}
+		catch(Exception $e)
+		{
+			KalturaLog::err("Cannot get entry id - $entryId - error message - " . $e->getMessage());
+		}
+
 	    // get entry's flavor assets chosen for distribution
 	    $flavorAssets = array();
 	    if (!empty($data->entryDistribution->flavorAssetIds))
 	    {
-    	    $flavorAssetFilter = new KalturaFlavorAssetFilter();
-    	    $flavorAssetFilter->idIn = $data->entryDistribution->flavorAssetIds;
-    	    $flavorAssetFilter->entryIdEqual = $entryId;
-    	    try {
-                KalturaLog::debug('Getting entry\'s flavor assets');
-                $flavorAssetsList = $client->flavorAsset->listAction($flavorAssetFilter);
-                foreach ($flavorAssetsList->objects as $asset)
-                {
-                    $flavorAssets[$asset->id] = $asset;
-                }
-            }
-            catch (Exception $e) {
-                KalturaLog::err('Cannot get list of flavor assets - '.$e->getMessage());
-                throw $e;
-            }
+			try {
+				KalturaLog::debug('Getting entry\'s flavor assets');
+				if($this->distributionProfile->partnerId)
+					$flavorAssetsList = $this->getFlavorAssets($this->distributionProfile->partnerId, $data->entryDistribution->flavorAssetIds, $entryId);
+				else
+				{
+					$flavorAssetFilter = new KalturaFlavorAssetFilter();
+					$flavorAssetFilter->idIn = $data->entryDistribution->flavorAssetIds;
+					$flavorAssetFilter->entryIdEqual = $entryId;
+					$flavorAssetsList = $client->flavorAsset->listAction($flavorAssetFilter);
+				}
+
+				foreach ($flavorAssetsList->objects as $asset)
+				{
+					$flavorAssets[$asset->id] = $asset;
+				}
+			}
+			catch (Exception $e) {
+				KalturaLog::err('Cannot get list of flavor assets - '.$e->getMessage());
+				throw $e;
+			}
 	    }
 	    else
 	    {

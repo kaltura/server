@@ -77,11 +77,13 @@ abstract class DistributionEngine implements IDistributionEngine
 	 * @param string $flavorAssetIds comma seperated
 	 * @return array<KalturaFlavorAsset>
 	 */
-	protected function getFlavorAssets($partnerId, $flavorAssetIds)
+	protected function getFlavorAssets($partnerId, $flavorAssetIds, $entryId = null)
 	{
 		KBatchBase::impersonate($partnerId);
 		$filter = new KalturaAssetFilter();
 		$filter->idIn = $flavorAssetIds;
+		if($entryId)
+			$filter->entryIdEqual = $entryId;
 		$flavorAssetsList = KBatchBase::$kClient->flavorAsset->listAction($filter);
 		KBatchBase::unimpersonate();
 		
