@@ -48,7 +48,7 @@ class KalturaResponseProfileCacher extends kResponseProfileCacher
 		$userRoles = implode('_', $userRoles);
 		$entitlement = (int) kEntitlementUtils::getEntitlementEnforcement();
 		
-		return "rp{$profileKey}_p{$partnerId}_o{$objectType}_i{$objectId}_h{$protocol}_k{$ksType}_u{$userRoles}_e{$entitlement}";
+		return "obj_rp{$profileKey}_p{$partnerId}_o{$objectType}_i{$objectId}_h{$protocol}_k{$ksType}_u{$userRoles}_e{$entitlement}";
 	}
 	
 	private static function getObjectTypeCacheValue(IBaseObject $object)
@@ -77,12 +77,12 @@ class KalturaResponseProfileCacher extends kResponseProfileCacher
 		$ksType = kCurrentContext::getCurrentSessionType();
 		$userRoles = implode('_', $userRoles);
 		
-		return "rp{$profileKey}_p{$partnerId}_o{$objectType}_h{$protocol}_k{$ksType}_u{$userRoles}";
+		return "relate_rp{$profileKey}_p{$partnerId}_o{$objectType}_h{$protocol}_k{$ksType}_u{$userRoles}";
 	}
 	
 	private static function getResponseProfileCacheKey($responseProfileKey, $partnerId)
 	{
-		return "rp{$responseProfileKey}_p{$partnerId}";
+		return "rp_rp{$responseProfileKey}_p{$partnerId}";
 	}
 	
 	public static function onPersistentObjectLoaded(IBaseObject $object)
@@ -229,14 +229,14 @@ class KalturaResponseProfileCacher extends kResponseProfileCacher
 	{
 		$sessionKey = self::getSessionKey();
 		
-		$uniqueKey = "{$sessionKey}_{$options->cachedObjectType}";
+		$uniqueKey = "recalc_{$sessionKey}_{$options->cachedObjectType}";
 		if($options->objectId)
 			$uniqueKey .= "_{$options->objectId}";
 			
 		$lastRecalculateTime = self::get($uniqueKey, null, false);
-		if(is_null($results->lastKeyId)) // first loop
+		if($options->isFirstLoop)
 		{
-			if($lastRecalculateTime > $options->jobCreatedAt)
+			if($lastRecalculateTime >= $options->jobCreatedAt)
 				throw new KalturaAPIException(KalturaErrors::RESPONSE_PROFILE_CACHE_ALREADY_RECALCULATED);
 				
 			$lastRecalculateTime = time();
