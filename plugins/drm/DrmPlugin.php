@@ -2,7 +2,7 @@
 /**
  * @package plugins.drm
  */
-class DrmPlugin extends KalturaPlugin implements IKalturaServices, IKalturaAdminConsolePages, IKalturaPermissions, IKalturaEnumerator, IKalturaConfigurator, IKalturaObjectLoader, IKalturaEntryContextDataContributor
+class DrmPlugin extends KalturaPlugin implements IKalturaServices, IKalturaAdminConsolePages, IKalturaPermissions, IKalturaEnumerator, IKalturaConfigurator, IKalturaObjectLoader, IKalturaEntryContextDataContributor,IKalturaPermissionsEnabler
 {
 	const PLUGIN_NAME = 'drm';
 
@@ -174,6 +174,19 @@ class DrmPlugin extends KalturaPlugin implements IKalturaServices, IKalturaAdmin
 	    }
 	    return null;
     }
+
+	/* (non-PHPdoc)
+	 * @see IKalturaPermissionsEnabler::permissionEnabled()
+	 */
+	public static function permissionEnabled($partnerId, $permissionName)
+	{
+		if ($permissionName == 'DRM_PLUGIN_PERMISSION')
+		{
+			kDrmPartnerSetup::setupPartner($partnerId);
+		}
+	}
+
+
 }
 
 
