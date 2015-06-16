@@ -437,9 +437,10 @@ class playManifestAction extends kalturaAction
 
 	private function removeNotAllowedFlavors($flavorAssets)
 	{
-		$returnedFlavors = array();
 		if(!$this->secureEntryHelper)
-			return $returnedFlavors;
+			return $flavorAssets;
+		
+		$returnedFlavors = array();
 
 		foreach ($flavorAssets as $flavorAsset)
 		{
