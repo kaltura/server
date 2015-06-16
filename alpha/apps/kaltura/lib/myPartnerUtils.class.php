@@ -345,11 +345,13 @@ class myPartnerUtils
 			case 'api':
 				if ($protocol == 'https')
 				{
-					return 'https://' . (kConf::hasParam('cdn_api_host_https')) ? kConf::get('cdn_api_host_https') : kConf::get('www_host');
+					$apiHost = (kConf::hasParam('cdn_api_host_https')) ? kConf::get('cdn_api_host_https') : kConf::get('www_host');
+					return 'https://' . $apiHost;
 				}
 				else
 				{
-					return 'http://' . (kConf::hasParam('cdn_api_host')) ? kConf::get('cdn_api_host') : kConf::get('www_host');
+					$apiHost = (kConf::hasParam('cdn_api_host')) ? kConf::get('cdn_api_host') : kConf::get('www_host');
+					return 'http://' . $apiHost;
 				}
 				break;
 			default:
