@@ -205,11 +205,18 @@ class KalturaResponseProfileCacher extends kResponseProfileCacher
 			{
 				KalturaLog::err("Response-Profile key [$responseProfileCacheKey] not found in cache");
 				self::delete($cache->getId());
+				return;
 			}
 		}
 		
 		$peer = $data['objectPeer'];
 		$object = $peer::retrieveByPK($data['objectId']);
+		if(!$object)
+		{
+			KalturaLog::err("Object $peer [" . $data['objectId'] . "] not found");
+			self::delete($cache->getId());
+			return;
+		}
 		/* @var $object IBaseObject */
 		
 		$apiObject = unserialize($data['apiObject']);
