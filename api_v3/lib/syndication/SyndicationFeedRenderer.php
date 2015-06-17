@@ -2,9 +2,10 @@
 
 abstract class SyndicationFeedRenderer {
 
-	const KALTURA_TOKEN_MARKER = '{kt}';
 	const LEVEL_INDENTATION = '  ';
-	
+	const KALTURA_TOKEN_MARKER = '{kt}';
+	const KALTURA_TOKEN_PARAM_NAME = '/kt/';
+
 	protected $syndicationFeed;
 	protected $syndicationFeedDB;
 	protected $mimeType;

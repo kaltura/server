@@ -114,14 +114,20 @@ class ITunesFeedRenderer extends SyndicationFeedRenderer {
 		{
 			//building a token based on the given url suffix
 			//first a pattern will be inserted as the last route param and then it will be replaced by an actual token
-			$ktParamString = "/kt/" . self::KALTURA_TOKEN_MARKER;
-			$firstPos = strpos($flavorAssetUrl , "/p");
-			$lastPos = strrpos($flavorAssetUrl , "/");
-			$stringLen = strlen($flavorAssetUrl);
+
+			$patternInsertionIndex = strrpos($flavorAssetUrl , "/");
 			//inserting the token pattern as the last route param
-			$tokenString = substr($flavorAssetUrl,$firstPos,$lastPos - $firstPos) . $ktParamString . substr($flavorAssetUrl,$lastPos,$stringLen);
-			$tokenString = self::calculateKalturaToken($tokenString);
-			$flavorAssetUrl = substr($flavorAssetUrl,0,$firstPos) . $tokenString;
+			$flavorAssetUrl = substr_replace($flavorAssetUrl, $ktParamString, $patternInsertionIndex, 0);
+
+			$endOfHostIndex = strpos($flavorAssetUrl , "/p");
+			$stringLen = strlen($flavorAssetUrl);
+
+			$hostString = substr($flavorAssetUrl, 0, $endOfHostIndex);
+			$urlParamsString = substr($flavorAssetUrl, $endOfHostIndex, $stringLen - $endOfHostIndex);
+
+			//calculating the new token and replacing it with the token pattern
+			$urlParamsString = self::calculateKalturaToken($urlParamsString);
+			$flavorAssetUrl = $hostString . $urlParamsString;
 		}
 
 		$res = '';
