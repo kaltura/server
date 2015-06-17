@@ -112,16 +112,7 @@ class DynamicObjectSearchFilter extends AdvancedSearchFilterOperator
 				$innerPrefix = $pluginName .'_'. $innerFieldId;
 				$innerSuffix = kMetadataManager::SEARCH_TEXT_SUFFIX . '_' . $innerFieldId;
 
-				// exact match
-				if (in_array($innerFieldType, array(MetadataSearchFilter::KMC_FIELD_TYPE_OBJECT, MetadataSearchFilter::KMC_FIELD_TYPE_USER)))
-				{
-					$dataCondition = "\\\"$innerPrefix $innerValue $innerSuffix\\\"";
-				}
-				// anywhere in the field
-				else
-				{
-					$dataCondition = "$innerPrefix << ( $innerValue ) << $innerSuffix";
-				}
+				$dataCondition = "\"$innerPrefix $innerValue $innerSuffix\"";
 
 				KalturaLog::debug("Inner condition: $dataCondition");
 				$dataConditions[] = $dataCondition;
