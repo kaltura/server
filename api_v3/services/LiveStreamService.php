@@ -478,7 +478,7 @@ class LiveStreamService extends KalturaLiveEntryService
 		}
 		
 		$apiEntry = KalturaEntryFactory::getInstanceByType($entry->getType());
-		$apiEntry->fromObject($entry, $this->getResponseProfile());
+		$apiEntry->fromObject($entry);
 		return $apiEntry;
 	}
 	
@@ -513,7 +513,7 @@ class LiveStreamService extends KalturaLiveEntryService
 		$entry->save();
 		
 		$apiEntry = KalturaEntryFactory::getInstanceByType($entry->getType());
-		$apiEntry->fromObject($entry, $this->getResponseProfile());
+		$apiEntry->fromObject($entry);
 		return $apiEntry;
 	}
 }
