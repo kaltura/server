@@ -706,7 +706,7 @@ class kCouchbaseCacheWrapper extends kBaseCacheWrapper
 				$meta = $metas[$key];
 				if($meta->error)
 				{
-					KalturaLog::err($meta->error);
+					KalturaLog::warning($meta->error->getMessage());
 				}
 				
 				$values[$key] = $meta->value;
