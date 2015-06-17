@@ -180,7 +180,7 @@ class MetadataSearchFilter extends AdvancedSearchFilterOperator
 						// anywhere in the field
 						else 
 						{
-							$dataCondition = "{$pluginName}_{$fieldId} << ( $value ) << " . kMetadataManager::SEARCH_TEXT_SUFFIX . "_{$fieldId}";
+							$dataCondition = "{$pluginName}_{$fieldId} << ( \"$value\" ) << " . kMetadataManager::SEARCH_TEXT_SUFFIX . "_{$fieldId}";
 						}
 						
 						KalturaLog::debug("add $dataCondition");
