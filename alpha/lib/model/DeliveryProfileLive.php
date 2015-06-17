@@ -101,5 +101,32 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 	protected function checkIsLive($url) {
 		throw new Exception('Status cannot be determined for live stream protocol. Delivery Profile ID: '.$this->getId());
 	}
+	
+	public function getEdgeServerUrl($url)
+	{
+		if(!$url)
+			return;
+
+		$resolvedUrl = null;
+		$edgeServerUrl = null;
+		$edgeServerIds = $this->params->getEdgeServerIds();
+		
+		while(!$edgeServerUrl && count($edgeServerIds))
+		{
+			$edgeServerId = array_shift($edgeServerIds);
+			$edgeServer = EdgeServerPeer::retrieveByPK($edgeServerId);
+			if($edgeServer) {
+				$edgeServerUrl = $edgeServer->getPlaybackHost($this->getUrl());
+				break;
+			}
+		}
+		
+		$this->params->setEdgeServerIds($edgeServerIds);
+		
+		if($edgeServerUrl)
+			$resolvedUrl = str_replace($this->getUrl(), $edgeServerUrl, $url);
+		
+		return $resolvedUrl;
+	}
 }
 

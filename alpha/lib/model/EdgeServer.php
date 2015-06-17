@@ -49,25 +49,22 @@ class EdgeServer extends BaseEdgeServer {
 		return $playbackHostName;
 	}
 	
-	public function getPlaybackHost()
+	public function getPlaybackHost($urlTemplate = "{playbackHost}/kCache/")
 	{
 		$playbackHostName = '';
+		$urlParts = explode("/", $urlTemplate);
+		$token = reset($urlParts);
+		
+		$playbackHostName = $this->getPlaybackHostName();
 		
 		if($this->parent_id)
 		{
-			$parentEdge = edgeserverpeer::retrieveByPK($this->parent_id);
-			if($parentEdge) {
-				$playbackHostName = $parentEdge->getPlaybackHost() . $this->getPlaybackHostName();
-			}
-			else {
-				$playbackHostName = $this->getPlaybackHostName();
-			}
-			
-		}
-		else {
-			$playbackHostName = $this->getPlaybackHostName();
+			$parentEdge = EdgeServerPeer::retrieveByPK($this->parent_id);
+			if($parentEdge)
+				$playbackHostName = $parentEdge->getPlaybackHost($urlTemplate) . "/" . $playbackHostName;
 		}
 		
+		$playbackHostName = str_replace($token, $playbackHostName, $urlTemplate);
 		return $playbackHostName;
 	}
 

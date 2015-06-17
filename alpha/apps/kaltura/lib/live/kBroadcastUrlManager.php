@@ -99,7 +99,7 @@ class kBroadcastUrlManager
 	{
 		$port = kBroadcastUrlManager::DEFAULT_PORT;
 	
-		$broadcastConfig = $this->getConfiguration();	
+		$broadcastConfig = $this->getConfiguration($dc);	
 		if(isset($broadcastConfig['port']))
 		{
 			$port = $broadcastConfig['port'];
