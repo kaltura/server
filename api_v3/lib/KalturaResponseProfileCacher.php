@@ -198,7 +198,7 @@ class KalturaResponseProfileCacher extends kResponseProfileCacher
 		
 		if(!$responseProfile)
 		{
-			$responseProfileCacheKey = self::getResponseProfileCacheKey($data->responseProfileKey, $data->partnerId);
+			$responseProfileCacheKey = self::getResponseProfileCacheKey($data['responseProfileKey'], $data['partnerId']);
 			$value = self::get($responseProfileCacheKey);
 			$responseProfile = unserialize($value);
 			if(!$responseProfile)
@@ -208,11 +208,11 @@ class KalturaResponseProfileCacher extends kResponseProfileCacher
 			}
 		}
 		
-		$peer = $data->objectPeer;
-		$object = $peer::retrieveByPK($data->objectId);
+		$peer = $data['objectPeer'];
+		$object = $peer::retrieveByPK($data['objectId']);
 		/* @var $object IBaseObject */
 		
-		$apiObject = unserialize($data->apiObject);
+		$apiObject = unserialize($data['apiObject']);
 		$apiObject->fromObject($object, $responseProfile);
 		
 		$key = self::getObjectSpecificCacheKey($object, $responseProfile->getKey());
