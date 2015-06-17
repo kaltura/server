@@ -387,22 +387,38 @@ class kFile
 		}
 		return true;
 	}
-	
+
+
+
+
 	private static function copySingleFile($src, $dest, $deleteSrc) {
-		if($deleteSrc) {
-			// In case of move, first try to move the file before copy & unlink.
-			if(rename($src, $dest)) 
-				return true;
-		}
-		
-		if (!copy($src,$dest)) {
+
+        //check if dest dir is writable
+        $can_write_dest=is_writable (dirname($dest));
+        //check if source if is writeable so can remove it or rename it
+        $can_remove_source=is_writable($src);
+
+        if($can_write_dest){
+            KalturaLog::err("Destination is not writable : [$dest]");
+            return false;
+        }
+
+        if ($deleteSrc && $can_remove_source) {
+                // In case of move, first try to move the file before copy & unlink.
+                if (rename($src, $dest))
+                    return true;
+        }
+
+        if (!copy($src,$dest)) {
 			KalturaLog::err("Failed to copy file : [$src]");
 			return false;
 		}
-		if ($deleteSrc && (!unlink($src))) {
+
+		if ($deleteSrc && !$can_remove_source) {
 			KalturaLog::err("Failed to delete source file : [$src]");
 			return false;
 		}
+
 		return true;
 	}
 	
