@@ -114,7 +114,8 @@ class ITunesFeedRenderer extends SyndicationFeedRenderer {
 		{
 			//building a token based on the given url suffix
 			//first a pattern will be inserted as the last route param and then it will be replaced by an actual token
-
+			
+			$ktParamString = self::KALTURA_TOKEN_PARAM_NAME . self::KALTURA_TOKEN_MARKER;
 			$patternInsertionIndex = strrpos($flavorAssetUrl , "/");
 			//inserting the token pattern as the last route param
 			$flavorAssetUrl = substr_replace($flavorAssetUrl, $ktParamString, $patternInsertionIndex, 0);
