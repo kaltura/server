@@ -455,7 +455,6 @@ class KalturaSyndicationFeedRenderer
 
 		$e = null;
 		$kalturaFeed = $this->syndicationFeed->type == KalturaSyndicationFeedType::KALTURA || $this->syndicationFeed->type == KalturaSyndicationFeedType::KALTURA_XSLT;
-
 		$nextEntry = $this->getNextEntry();
 		
 		while($nextEntry)
