@@ -315,15 +315,16 @@ class flavorAsset extends asset
 			$url .= "/storageId/" . $storageProfileId;
 
 		if($addEncryptionToken)
-		{
 			$url .= self::KALTURA_TOKEN_PARAM_NAME . self::KALTURA_TOKEN_MARKER;
-			$url = self::calculateKalturaToken($url);
-		}
 
 		if ($this->getFileExt())
 			$url .= "/a." . $this->getFileExt();
-	
+
 		$url .= "?clientTag=$clientTag";
+
+		if($addEncryptionToken)
+			$url = self::calculateKalturaToken($url);
+
 		return $url;
 	}
 	
