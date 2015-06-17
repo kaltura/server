@@ -457,7 +457,6 @@ class KalturaSyndicationFeedRenderer
 		$kalturaFeed = $this->syndicationFeed->type == KalturaSyndicationFeedType::KALTURA || $this->syndicationFeed->type == KalturaSyndicationFeedType::KALTURA_XSLT;
 
 		$nextEntry = $this->getNextEntry();
-		$bypassAccessControl = $renderer instanceof ITunesFeedRenderer ? true : false;
 		
 		while($nextEntry)
 		{
@@ -489,7 +488,7 @@ class KalturaSyndicationFeedRenderer
 					$e->fromObject($entry);
 				}
 				
-				$flavorAssetUrl = is_null($e) ? null : $this->getFlavorAssetUrl($e, $bypassAccessControl);
+				$flavorAssetUrl = is_null($e) ? null : $this->getFlavorAssetUrl($e);
 				
 				if(!$kalturaFeed && $entry->getType() !== entryType::MIX && is_null($flavorAssetUrl)) {
 					$xml = ""; // cache empty result to avoid checking getFlavorAssetUrl next time
@@ -572,7 +571,7 @@ class KalturaSyndicationFeedRenderer
 		return $url;
 	}
 	
-	private function getFlavorAssetUrl($kalturaEntry, $shouldBypass = false)
+	private function getFlavorAssetUrl($kalturaEntry)
 	{
 		$partner = PartnerPeer::retrieveByPK($this->syndicationFeed->partnerId);
 		if(!$partner)
@@ -592,18 +591,18 @@ class KalturaSyndicationFeedRenderer
 		
 		if($this->syndicationFeedDb->getServePlayManifest())
 		{
-			$shouldAddEncryptToken = false;
-			if($shouldBypass)
+			$shouldAddKtToken = false;
+			if($this->syndicationFeed->type == KalturaSyndicationFeedType::ITUNES)
 			{
 				$entry = $flavorAsset->getentry();
 				$accessControl = $entry->getaccessControl();
 				if ($accessControl && $accessControl->hasRules())
-					$shouldAddEncryptToken = true;
+					$shouldAddKtToken = true;
 			}
 
 			$cdnHost = requestUtils::getApiCdnHost();
 			$clientTag = 'feed:' . $this->syndicationFeedDb->getId();
-			$url = $cdnHost . $flavorAsset->getPlayManifestUrl($clientTag, null, PlaybackProtocol::HTTP , $shouldAddEncryptToken);
+			$url = $cdnHost . $flavorAsset->getPlayManifestUrl($clientTag, null, PlaybackProtocol::HTTP , $shouldAddKtToken);
 		}
 		else
 		{

@@ -303,7 +303,7 @@ class flavorAsset extends asset
 	}
 	
 	
-	public function getPlayManifestUrl($clientTag, $storageProfileId = null, $mediaProtocol = PlaybackProtocol::HTTP, $addEncryptionToken = false) {
+	public function getPlayManifestUrl($clientTag, $storageProfileId = null, $mediaProtocol = PlaybackProtocol::HTTP, $addKtToken = false) {
 		$entryId = $this->getEntryId();
 		$partnerId = $this->getPartnerId();
 		$subpId = $this->getentry()->getSubpId();
@@ -314,7 +314,7 @@ class flavorAsset extends asset
 		if($storageProfileId)
 			$url .= "/storageId/" . $storageProfileId;
 
-		if($addEncryptionToken)
+		if($addKtToken)
 			$url .= self::KALTURA_TOKEN_PARAM_NAME . self::KALTURA_TOKEN_MARKER;
 
 		if ($this->getFileExt())
@@ -322,7 +322,7 @@ class flavorAsset extends asset
 
 		$url .= "?clientTag=$clientTag";
 
-		if($addEncryptionToken)
+		if($addKtToken)
 			$url = self::calculateKalturaToken($url);
 
 		return $url;
