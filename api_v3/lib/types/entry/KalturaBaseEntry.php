@@ -345,16 +345,7 @@ class KalturaBaseEntry extends KalturaObject implements IRelatedFilterable
 	 * @var string
 	 * @filter matchand
 	 */
-	public $entitledUsersPublish;
-
-	/**
-	 * Comma seperated string of the capabilities of the entry. Any capability needed can be added to this list.
-	 *
-	 * @dynamicType KalturaEntryCapability
-	 * @var string
-	 * @readonly
-	 */
-	public $capabilities;
+	public $entitledUsersPublish;	
 	
 	/*
 	 * mapping between the field on this object (on the left) and the setter/getter on the entry object (on the right)  
@@ -399,8 +390,7 @@ class KalturaBaseEntry extends KalturaObject implements IRelatedFilterable
 	 	"parentEntryId",
 	 	"entitledUsersEdit" => "entitledPusersEdit",
 	 	"entitledUsersPublish" => "entitledPusersPublish",
-	 	"operationAttributes",
-		"capabilities",
+	 	"operationAttributes"
 	 );
 		 
 	public function getMapBetweenObjects()

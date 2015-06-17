@@ -148,8 +148,7 @@ class KalturaEntryResource extends KalturaContentResource
 		$object_to_fill->setFileSyncObjectType(FileSyncObjectType::FLAVOR_ASSET);
 		$object_to_fill->setObjectSubType(asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 		$object_to_fill->setObjectId($srcFlavorAsset->getId());
-		$object_to_fill->setOriginEntryId($this->entryId);
-
+		
 		return $object_to_fill;
 	}
 	

@@ -281,19 +281,6 @@ abstract class ClientGeneratorFromPhp
 	{
 		$this->initClassMap();
 		
-		$alwaysIncludeList = array(
-			'KalturaApiExceptionArg',
-			'KalturaClientConfiguration',
-			'KalturaRequestConfiguration',
-		);
-		
-		foreach($alwaysIncludeList as $class)
-		{
-			$classTypeReflector = KalturaTypeReflectorCacher::get($class);
-			if($classTypeReflector)
-				$this->loadTypesRecursive($classTypeReflector);
-		}
-		
 		$serviceMap = KalturaServicesMap::getMap();
 		foreach($serviceMap as $serviceId => $serviceActionItem)
 		{
@@ -668,6 +655,11 @@ abstract class ClientGeneratorFromPhp
 				if(class_exists($item))
 					$includeList[] = $item;
 		}
+		
+		// Always add these two classes
+		$includeList[] = 'KalturaApiExceptionArg';
+		$includeList[] = 'KalturaClientConfiguration';
+		$includeList[] = 'KalturaRequestConfiguration';
 		
 		foreach($includeList as $class)
 		{
