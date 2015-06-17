@@ -288,7 +288,7 @@ class KalturaResponseProfileCacher extends kResponseProfileCacher
 						
 						do
 						{
-							$cache = array_shift($cachedObjects);
+							$cache = array_pop($cachedObjects);
 							/* @var $cache kCouchbaseCacheListItem */
 							KalturaLog::debug("Cache object [" . print_r($cache, true) . "]");
 							self::recalculateCache($cache);
@@ -299,7 +299,7 @@ class KalturaResponseProfileCacher extends kResponseProfileCacher
 							break;
 						}
 						
-						$cache = array_shift($cachedObjects);
+						$cache = array_pop($cachedObjects);
 						/* @var $cache kCouchbaseCacheListItem */
 						$results->lastKeyId = $cache->getId();
 						
