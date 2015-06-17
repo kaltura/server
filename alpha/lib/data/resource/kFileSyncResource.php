@@ -30,6 +30,28 @@ class kFileSyncResource extends kContentResource
 	 * @var string
 	 */
 	private $version;
+
+	/**
+	 * The original entry ID, if exists
+	 * @var string
+	 */
+	private $originEntryId;
+
+	/**
+	 * @return string
+	 */
+	public function getOriginEntryId()
+	{
+		return $this->originEntryId;
+	}
+
+	/**
+	 * @param string $originEntryId
+	 */
+	public function setOriginEntryId($originEntryId)
+	{
+		$this->originEntryId = $originEntryId;
+	}
 	
 	/**
 	 * @return string

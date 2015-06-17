@@ -3,7 +3,7 @@
  * @package plugins.cuePoint
  * @subpackage api.errors
  */
-interface kQuePointErrors
+interface kCuePointErrors
 {
 	const END_TIME_CANNOT_BE_LESS_THAN_START_TIME = "END_TIME_CANNOT_BE_LESS_THAN_START_TIME,end time cannot be less than start time";
 	const START_TIME_CANNOT_BE_EMPTY = "START_TIME_CANNOT_BE_EMPTY,start time cannot be null";
