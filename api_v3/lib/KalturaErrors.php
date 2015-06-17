@@ -145,8 +145,6 @@ class KalturaErrors extends APIErrors
 
 	const ENTRY_CANNOT_BE_FLAGGED = "ENTRY_CANNOT_BE_FLAGGED;;Entry cannot be flagged";
 
-	const ENTRY_CANNOT_BE_TRIMMED = "ENTRY_CANNOT_BE_TRIMMED;;Entry cannot be trimmed";
-
 	/**
 	 * Notification Service
 	 */
@@ -574,14 +572,7 @@ class KalturaErrors extends APIErrors
 	const RESPONSE_PROFILE_DUPLICATE_SYSTEM_NAME = 'RESPONSE_PROFILE_DUPLICATE_SYSTEM_NAME;SYSTEM_NAME;Response profile system-name [@SYSTEM_NAME@] already exists';
 	
 	const RESPONSE_PROFILE_MAX_NESTING_LEVEL = 'RESPONSE_PROFILE_MAX_NESTING_LEVEL;;Response profile cross maximum nesting level';
-
-	/*
-	 * User-Entry Service
-	 */
-	const USER_ENTRY_NOT_FOUND = 'USER_ENTRY_NOT_FOUND;USER_ENTRY_ID; User-Entry id [@USER_ENTRY_ID@] not found';
-	const USER_ENTRY_DOES_NOT_MATCH_ENTRY_ID = 'USER_ENTRY_DOES_NOT_MATCH_ENTRY_ID;USER_ENTRY_ID;The entry id in the user-entry [@USER_ENTRY_ID@] does not match the entry-id given';
-	const USER_ENTRY_OBJECT_TYPE_ERROR = 'USER_ENTRY_OBJECT_TYPE_ERROR;OBJ_TYPE;USER_ENTRY_ID;There is an error in the DB, object type [@OBJ_TYPE@] of UserEntry id [@USER_ENTRY_ID@] is unknown';
-
+	
 	/*
 	 * Edge Server service
 	 */

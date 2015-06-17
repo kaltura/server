@@ -140,8 +140,6 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	const DEFAULT_IMAGE_HEIGHT = 480;
 	const DEFAULT_IMAGE_WIDTH = 640;
 
-	const CAPABILITIES = "capabilities";
-
 	private $appears_in = null;
 
 	private $m_added_moderation = false;
@@ -1234,16 +1232,6 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 			$dynamicAttributes[$dynAttribName] = $createdAt;
 		}
 
-		$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaDynamicAttributesContributer');
-		foreach($pluginInstances as $pluginName => $pluginInstance) {
-			try {
-				$dynamicAttributes += $pluginInstance->getDynamicAttributes($this);
-			} catch (Exception $e) {
-				KalturaLog::err($e->getMessage());
-				continue;
-			}
-		}
-
 		return $dynamicAttributes;
 	}
 	
@@ -1786,9 +1774,6 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 
 	public function setRedirectEntryId ( $v )	{	$this->putInCustomData ( "redirectEntryId" , $v );	}
 	public function getRedirectEntryId (  )		{	return $this->getFromCustomData( "redirectEntryId" );	}
-
-	public function setIsTrimDisabled ( $v )	{	$this->putInCustomData ( "isTrimDisabled" , $v );	}
-	public function getIsTrimDisabled (  )		{	return $this->getFromCustomData( "isTrimDisabled" );	}
 	
 	// indicates that thumbnail shouldn't be auto captured, because it already supplied by the user
 	public function setCreateThumb ( $v, thumbAsset $thumbAsset = null)		
@@ -3356,28 +3341,5 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		$userNames[] = $kuser->getScreenName();
 		
 		return implode(" ", $userNames);
-	}
-
-	public function getCapabilities()
-	{
-		$capabilitiesArr = $this->getFromCustomData(self::CAPABILITIES);
-		if (is_null($capabilitiesArr))
-		{
-			return "";
-		}
-		$capabilitiesStr = implode(",", $capabilitiesArr);
-		return $capabilitiesStr;
-	}
-
-	public function addCapability($name, $capability)
-	{
-		$capabilities = $this->getFromCustomData(self::CAPABILITIES, array());
-		$capabilities[$name] = $capability;
-/*		$arrSpot = array_search($capability, array_values($capabilities));
-		if ($arrSpot === false)
-		{
-			$capabilitiesArr[] = $capability;
-		}*/
-		$this->putInCustomData( self::CAPABILITIES, $capabilities);
 	}
 }
