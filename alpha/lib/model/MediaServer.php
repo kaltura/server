@@ -193,7 +193,7 @@ class MediaServer extends BaseMediaServer {
 		return new $serviceClass($url);
 	}
 	
-	public function setIseExternalMediaServer($v)
+	public function setIsExternalMediaServer($v)
 	{
 		$this->isExternalMediaServer = $v;
 	}

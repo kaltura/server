@@ -37,7 +37,7 @@ class EdgeServer extends BaseEdgeServer {
 	
 	public function getDeliveryProfileIds()
 	{
-		return $this->getFromCustomData(self::CUSTOM_DATA_DELIVERY_IDS, null, array());
+		return $this->getFromCustomData(self::CUSTOM_DATA_DELIVERY_IDS, null, null);
 	}
 	
 	public function getPlaybackHostName()
@@ -50,7 +50,7 @@ class EdgeServer extends BaseEdgeServer {
 		return $playbackHostName;
 	}
 	
-	public function getPlaybackHost($urlTemplate = "{playbackHost}/kCache/")
+	public function getPlaybackHost($urlTemplate)
 	{
 		$playbackHostName = '';
 		$urlParts = explode("/", $urlTemplate);

@@ -265,7 +265,24 @@ class KSecureEntryHelper
 		{
 			// take only the first SERVE_FROM_REMOTE_SERVER action
 			$action = reset($serveRemoteEdgeServerActionList);
-			$deliveryAttributes->setEdgeServerIds(explode(',', $action->getEdgeServerIds()));
+			$edgeServerIds = explode(',', $action->getEdgeServerIds());
+			$deliveryAttributes->setEdgeServerIds($edgeServerIds);
+			
+			//Check if there are any edge server that override the delivery profiles
+			$edgeServers = EdgeServerPeer::retrieveByPKs($edgeServerIds);
+			if(!count($edgeServers))
+				return;
+			
+			$edgeDeliveryProfilesIds = array();
+			foreach ($edgeServers as $edgeServer)
+			{
+				if(!$edgeServer->getDeliveryProfileIds())
+					continue;
+				
+				$edgeDeliveryProfilesIds = array_merge($edgeDeliveryProfilesIds, explode(",", $edgeServer->getDeliveryProfileIds()));
+			}
+			if(count($edgeDeliveryProfilesIds))
+				$deliveryAttributes->setDeliveryProfileIds($edgeDeliveryProfilesIds, false);
 		}
 	}
 	

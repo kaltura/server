@@ -345,7 +345,7 @@ abstract class LiveEntry extends entry
 					{
 						$primaryMediaServer = new MediaServer();
 						$primaryMediaServer->setHostname($kMediaServer->getHostname());
-						$primaryMediaServer->setIseExternalMediaServer(true);
+						$primaryMediaServer->setIsExternalMediaServer(true);
 					}
 					$primaryApplicationName = $kMediaServer->getApplicationName();
 				}
@@ -363,7 +363,7 @@ abstract class LiveEntry extends entry
 					{
 						$backupMediaServer = new MediaServer();
 						$backupMediaServer->setHostname($kMediaServer->getHostname());
-						$backupMediaServer->setIseExternalMediaServer(true);
+						$backupMediaServer->setIsExternalMediaServer(true);
 					}
 					$backupApplicationName = $kMediaServer->getApplicationName();
 				}
