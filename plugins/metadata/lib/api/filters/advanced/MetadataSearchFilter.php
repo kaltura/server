@@ -180,7 +180,7 @@ class MetadataSearchFilter extends AdvancedSearchFilterOperator
 						// anywhere in the field
 						else 
 						{
-							$dataCondition = "{$pluginName}_{$fieldId} << ( $value ) << " . kMetadataManager::SEARCH_TEXT_SUFFIX . "_{$fieldId}";
+							$dataCondition = "{$pluginName}_{$fieldId} << ( \"$value\" ) << " . kMetadataManager::SEARCH_TEXT_SUFFIX . "_{$fieldId}";
 						}
 						
 						KalturaLog::debug("add $dataCondition");
@@ -189,7 +189,12 @@ class MetadataSearchFilter extends AdvancedSearchFilterOperator
 					elseif($item instanceof MetadataSearchFilter)
 					{
 						$item->applyCondition($this, $xPaths);
-					}					
+					}
+					elseif ($item instanceof DynamicObjectSearchFilter)
+					{
+						$item->applyCondition($this, $xPaths);
+						$dataConditions = $item->matchClause;
+					}
 				}
 			}	
 				
