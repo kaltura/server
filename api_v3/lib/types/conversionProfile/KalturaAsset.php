@@ -3,7 +3,7 @@
  * @package api
  * @subpackage objects
  */
-class KalturaAsset extends KalturaObject implements IRelatedFilterable
+class KalturaAsset extends KalturaObject implements IRelatedFilterable, IApiObjectFactory
 {
 	/**
 	 * The ID of the Flavor Asset

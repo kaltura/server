@@ -3,7 +3,7 @@
  * @package api
  * @subpackage objects
  */
-class KalturaBaseEntry extends KalturaObject implements IRelatedFilterable 
+class KalturaBaseEntry extends KalturaObject implements IRelatedFilterable, IApiObjectFactory
 {
 	/**
 	 * Auto generated 10 characters alphanumeric string
@@ -719,7 +719,7 @@ class KalturaBaseEntry extends KalturaObject implements IRelatedFilterable
 	
 	public static function getInstance($sourceObject, KalturaDetachedResponseProfile $responseProfile = null)
 	{
-	    $object = KalturaEntryFactory::getInstanceByType($this->type);
+	    $object = KalturaEntryFactory::getInstanceByType($sourceObject->getType());
 	    if (!$object)
 	        return null;
 	    

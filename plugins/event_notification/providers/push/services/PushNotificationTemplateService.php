@@ -7,16 +7,7 @@
  * @subpackage api.services
  */
 class PushNotificationTemplateService extends KalturaBaseService
-{        
-    private function doesParamExist($templateParam, $userParamsArray)
-    {
-        foreach ($userParamsArray as $userParam)
-        {
-            if ($templateParam->getKey() == $userParam->toObject()->getKey())
-                return true;
-        }
-    }
-    
+{
     private function encode($data)
     {
         // use a 128 Rijndael encyrption algorithm with Cipher-block chaining (CBC) as mode of AES encryption
@@ -34,7 +25,7 @@ class PushNotificationTemplateService extends KalturaBaseService
         mcrypt_generic_deinit($cipher);
         
         return bin2hex($cipherData);
-    }
+    }  
     
 	/**
 	 * Register to a queue from which event messages will be provided according to given template. Queue will be created if not already exists
@@ -65,9 +56,15 @@ class PushNotificationTemplateService extends KalturaBaseService
 	    $missingParams = array();
 	    $templateParams = $dbEventNotificationTemplate->getContentParameters();
 
+	    // create array of all keys
+	    $userParamsArrayKeys = array();
+	    foreach ($userParamsArray as $userParam) {
+	        array_push($userParamsArrayKeys,$userParam->toObject()->getKey());
+	    }
+	    
 	    foreach ($templateParams as $templateParam)
 	    {
-	        if (!$this->doesParamExist($templateParam,$userParamsArray))
+	        if (!in_array($templateParam->getKey(), $userParamsArrayKeys))
 	            array_push($missingParams, $templateParam->getKey());
 	    }
 	    
