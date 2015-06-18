@@ -52,7 +52,7 @@ class KalturaLiveStreamConfiguration extends KalturaObject
 	{
 		switch ($className)
 		{
-			case 'KalturaLiveStreamRtmfpConfiguration':
+			case 'kLiveStreamRtmfpConfiguration':
 				return new KalturaLiveStreamRtmfpConfiguration();
 			default:
 				return new KalturaLiveStreamConfiguration();
