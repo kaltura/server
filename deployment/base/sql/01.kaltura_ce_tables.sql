@@ -2433,12 +2433,5 @@ CREATE TABLE `user_entry`
 	`type` INTEGER,
 	`custom_data` TEXT,
 	PRIMARY KEY (`id`),
-	INDEX `user_entry_FI_1` (`entry_id`),
-	CONSTRAINT `user_entry_FK_1`
-		FOREIGN KEY (`entry_id`)
-		REFERENCES `entry` (`id`),
-	INDEX `user_entry_FI_2` (`kuser_id`),
-	CONSTRAINT `user_entry_FK_2`
-		FOREIGN KEY (`kuser_id`)
-		REFERENCES `kuser` (`id`)
+	KEY (`entry_id`, `kuser_id`)
 )Type=InnoDB COMMENT='Describes the relationship between a specific user and a specific entry';

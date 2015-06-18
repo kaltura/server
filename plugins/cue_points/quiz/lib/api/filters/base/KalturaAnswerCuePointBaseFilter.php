@@ -12,6 +12,8 @@ abstract class KalturaAnswerCuePointBaseFilter extends KalturaCuePointFilter
 
 	static private $order_by_map = array
 	(
+		"+isCorrect" => "+is_correct",
+		"-isCorrect" => "-is_correct",
 	);
 
 	public function getMapBetweenObjects()
