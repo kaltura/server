@@ -48,5 +48,14 @@ class KalturaLiveStreamConfiguration extends KalturaObject
 		return parent::toObject($dbObject, $propsToSkip);
 	}
 
-	
+	public static function getInstance ($className)
+	{
+		switch ($className)
+		{
+			case 'KalturaLiveStreamRtmfpConfiguration':
+				return new KalturaLiveStreamRtmfpConfiguration();
+			default:
+				return new KalturaLiveStreamConfiguration();
+		}
+	}		
 }

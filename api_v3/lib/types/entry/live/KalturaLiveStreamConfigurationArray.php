@@ -19,7 +19,7 @@ class KalturaLiveStreamConfigurationArray extends KalturaTypedArray
 			foreach($dbArray as $object)
 			{
 				/* @var $object kLiveStreamConfiguration */
-				$configObject = new KalturaLiveStreamConfiguration();
+				$configObject = KalturaLiveStreamConfiguration::getInstance(get_class($object));
 				$configObject->fromObject($object);
 				$array[] = $configObject;
 			}
