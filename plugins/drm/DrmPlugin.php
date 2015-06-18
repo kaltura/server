@@ -147,20 +147,20 @@ class DrmPlugin extends KalturaPlugin implements IKalturaServices, IKalturaAdmin
         return self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $value;
     }
 
-    public function contributeToEntryContextDataResult($entryId, KalturaEntryContextDataParams $contextDataParams, KalturaEntryContextDataResult $result)
+    public function contributeToEntryContextDataResult(entry $entry, KalturaEntryContextDataParams $contextDataParams, KalturaEntryContextDataResult $result)
     {
-        KalturaLog::debug("Drm contributing to context data");
-
-        $signingKey = $this->getSigningKey();
-	    if (!is_null($signingKey))
+	    if ($this->shouldContribute($entry))
 	    {
-		    KalturaLog::debug("Signing key is '$signingKey'");
-
-		    $customDataJson = DrmLicenseUtils::createCustomData($entryId, $result->flavorAssets, $signingKey);
-
-		    $drmContextData = new KalturaDrmEntryContextPluginData();
-		    $drmContextData->flavorData = $customDataJson;
-		    $result->pluginData[get_class($drmContextData)] = $drmContextData;
+		    KalturaLog::debug("Drm contributing to context data");
+		    $signingKey = $this->getSigningKey();
+		    if (!is_null($signingKey))
+		    {
+			    KalturaLog::debug("Signing key is '$signingKey'");
+			    $customDataJson = DrmLicenseUtils::createCustomData($entry->getId(), $result->flavorAssets, $signingKey);
+			    $drmContextData = new KalturaDrmEntryContextPluginData();
+			    $drmContextData->flavorData = $customDataJson;
+			    $result->pluginData[get_class($drmContextData)] = $drmContextData;
+		    }
 	    }
     }
 
@@ -175,6 +175,31 @@ class DrmPlugin extends KalturaPlugin implements IKalturaServices, IKalturaAdmin
 	    return null;
     }
 
+	/**
+	 * @param entry $entry
+	 * @return bool
+	 */
+	protected function shouldContribute(entry $entry)
+	{
+		foreach ($entry->getAccessControl()->getRulesArray() as $rule)
+		{
+			/**
+			 * @var kRule $rule
+			 */
+			foreach ($rule->getActions() as $action)
+			{
+				/**
+				 * @var kRuleAction $action
+				 */
+				if ($action->getType() == DrmAccessControlActionType::DRM_POLICY)
+				{
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
 	/* (non-PHPdoc)
 	 * @see IKalturaPermissionsEnabler::permissionEnabled()
 	 */
@@ -185,7 +210,6 @@ class DrmPlugin extends KalturaPlugin implements IKalturaServices, IKalturaAdmin
 			kDrmPartnerSetup::setupPartner($partnerId);
 		}
 	}
-
 
 }
 
