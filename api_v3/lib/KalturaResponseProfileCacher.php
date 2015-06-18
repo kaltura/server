@@ -188,7 +188,7 @@ class KalturaResponseProfileCacher extends kResponseProfileCacher
 	
 	protected static function recalculateCache(kCouchbaseCacheListItem $cache, KalturaDetachedResponseProfile $responseProfile = null)
 	{
-		KalturaLog::err("Cache object id [" . $cache->getId() . "]");
+		KalturaLog::debug("Cache object id [" . $cache->getId() . "]");
 		$data = $cache->getData();
 		if(!$data)
 		{
