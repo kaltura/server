@@ -47,8 +47,8 @@ class KRecalculateResponseProfileCacheEngine extends KRecalculateCacheEngine
 		$options->limit = $this->maxCacheObjectsPerRequest;
 		$options->cachedObjectType = $data->cachedObjectType;
 		$options->objectId = $data->objectId;
-		$options->startDocId = $data->startDocId;
-		$options->endDocId = $data->endDocId;
+		$options->startObjectKey = $data->startObjectKey;
+		$options->endObjectKey = $data->endObjectKey;
 		$options->jobCreatedAt = $job->createdAt;
 		$options->isFirstLoop = true;
 		
@@ -59,7 +59,7 @@ class KRecalculateResponseProfileCacheEngine extends KRecalculateCacheEngine
 			{
 				$results = $client->responseProfile->recalculate($options);
 				$recalculated += $results->recalculated;
-				$options->startDocId = $results->lastKeyId;
+				$options->startObjectKey = $results->lastObjectKey;
 				$options->isFirstLoop = false;
 			} while($results->recalculated == $options->limit);
 		}

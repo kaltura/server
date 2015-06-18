@@ -35,13 +35,45 @@ class kRecalculateResponseProfileCacheJobData extends kRecalculateCacheJobData
 	/**
 	 * @var string
 	 */
-	private $startDocId;
+	private $startObjectKey;
 
 	/**
 	 * @var string
 	 */
-	private $endDocId;
+	private $endObjectKey;
 	
+	/**
+	 * @return the $startObjectKey
+	 */
+	public function getStartObjectKey()
+	{
+		return $this->startObjectKey;
+	}
+
+	/**
+	 * @return the $endObjectKey
+	 */
+	public function getEndObjectKey()
+	{
+		return $this->endObjectKey;
+	}
+
+	/**
+	 * @param string $startObjectKey
+	 */
+	public function setStartObjectKey($startObjectKey)
+	{
+		$this->startObjectKey = $startObjectKey;
+	}
+
+	/**
+	 * @param string $endObjectKey
+	 */
+	public function setEndObjectKey($endObjectKey)
+	{
+		$this->endObjectKey = $endObjectKey;
+	}
+
 	/**
 	 * @return string
 	 */
@@ -117,40 +149,8 @@ class kRecalculateResponseProfileCacheJobData extends kRecalculateCacheJobData
 	/**
 	 * @param string $objectId
 	 */
-	public function setObjectId($protocol)
+	public function setObjectId($objectId)
 	{
 		$this->objectId = $objectId;
-	}
-	
-	/**
-	 * @return string
-	 */
-	public function getStartDocId()
-	{
-		return $this->startDocId;
-	}
-	
-	/**
-	 * @param string $startDocId
-	 */
-	public function setStartDocId($startDocId)
-	{
-		$this->startDocId = $startDocId;
-	}
-	
-	/**
-	 * @return string
-	 */
-	public function getEndDocId()
-	{
-		return $this->endDocId;
-	}
-	
-	/**
-	 * @param string $endDocId
-	 */
-	public function setEndDocId($endDocId)
-	{
-		$this->endDocId = $endDocId;
 	}
 }

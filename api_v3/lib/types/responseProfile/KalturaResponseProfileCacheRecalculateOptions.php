@@ -26,12 +26,12 @@ class KalturaResponseProfileCacheRecalculateOptions extends KalturaObject
 	/**
 	 * @var string
 	 */
-	public $startDocId;
+	public $startObjectKey;
 	
 	/**
 	 * @var string
 	 */
-	public $endDocId;
+	public $endObjectKey;
 	
 	/**
 	 * @var time

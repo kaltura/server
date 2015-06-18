@@ -1129,12 +1129,12 @@ class kJobsManager
 	 * @param array $userRoles
 	 * @param string $objectType class name
 	 * @param string $objectId
-	 * @param string $startDocId
-	 * @param string $endDocId
+	 * @param string $startObjectKey
+	 * @param string $endObjectKey
 	 */
-	public static function addRecalculateResponseProfileCacheJob($partnerId, $protocol, $ksType, array $userRoles, $objectType, $objectId = null, $startDocId = null, $endDocId = null)
+	public static function addRecalculateResponseProfileCacheJob($partnerId, $protocol, $ksType, array $userRoles, $objectType, $objectId = null, $startObjectKey = null, $endObjectKey = null)
 	{
-		KalturaLog::debug("Recalculating cache partner[$partnerId] protocol[$protocol] ks[$ksType] roles[" . implode(', ', $userRoles) . "] object[$objectType] id [$objectId] start[$startDocId] end[$endDocId]");
+		KalturaLog::debug("Recalculating cache partner[$partnerId] protocol[$protocol] ks[$ksType] roles[" . implode(', ', $userRoles) . "] object[$objectType] id [$objectId] start[$startObjectKey] end[$endObjectKey]");
 		
 	    $jobData = new kRecalculateResponseProfileCacheJobData();
  		$jobData->setProtocol($protocol);
@@ -1142,8 +1142,8 @@ class kJobsManager
  		$jobData->setUserRoles($userRoles);
  		$jobData->setObjectType($objectType);
  		$jobData->setObjectId($objectId);
- 		$jobData->setStartDocId($startDocId);
- 		$jobData->setEndDocId($endDocId);
+ 		$jobData->setStartObjectKey($startObjectKey);
+ 		$jobData->setEndObjectKey($endObjectKey);
  		
 		$batchJob = new BatchJob();
 		$batchJob->setPartnerId($partnerId);

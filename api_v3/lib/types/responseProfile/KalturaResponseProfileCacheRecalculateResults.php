@@ -10,7 +10,7 @@ class KalturaResponseProfileCacheRecalculateResults extends KalturaObject
 	 * 
 	 * @var string
 	 */
-	public $lastKeyId;
+	public $lastObjectKey;
 	
 	/**
 	 * Number of recalculated keys

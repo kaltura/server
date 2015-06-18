@@ -35,12 +35,12 @@ class KalturaRecalculateResponseProfileCacheJobData extends KalturaRecalculateCa
 	/**
 	 * @var string
 	 */
-	public $startDocId;
+	public $startObjectKey;
 
 	/**
 	 * @var string
 	 */
-	public $endDocId;
+	public $endObjectKey;
     
 	private static $map_between_objects = array
 	(
@@ -49,8 +49,8 @@ class KalturaRecalculateResponseProfileCacheJobData extends KalturaRecalculateCa
 		'userRoles',
 		'cachedObjectType' => 'objectType',
 		'objectId',
-		'startDocId',
-		'endDocId',
+		'startObjectKey',
+		'endObjectKey',
 	);
 
 	public function getMapBetweenObjects ( )

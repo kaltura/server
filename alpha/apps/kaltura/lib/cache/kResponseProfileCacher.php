@@ -403,53 +403,54 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 		return true;
 	}
 	
-	protected function listDocIds($objectType, $sessionKey)
+	protected function listObjectKeys($objectType, $sessionKey)
 	{
+		$partnerId = kCurrentContext::getCurrentPartnerId();
+		$objectKey = "{$partnerId}_{$objectType}_";
 		$cacheStores = self::getStores();
 		foreach ($cacheStores as $cacheStore)
 		{
 			if($cacheStore instanceof kCouchbaseCacheWrapper)
 			{
 				// TODO optimize using elastic search query
-				$query = $cacheStore->getNewQuery(kCouchbaseCacheQuery::VIEW_RESPONSE_PROFILE_OBJECT_TYPE_SESSIONS);
-				if($query)
-				{
-					$query->addStartKey('objectType', $objectType);
-					$query->addStartKey('sessionKey', $sessionKey);
-					$query->addStartKey('objectId', '0');
-					$query->addEndKey('objectType', $objectType);
-					$query->addEndKey('sessionKey', $sessionKey);
-					$query->addEndKey('objectId', 'Z');
-					$query->setLimit(1);
+				$query = $cacheStore->getNewQuery(kCouchbaseCacheQuery::VIEW_RESPONSE_PROFILE_SESSION_TYPE);
+				if(!$query)
+					continue;
+					
+				$query->addStartKey('sessionKey', $sessionKey);
+				$query->addStartKey('objectKey', $objectKey);
+				$query->setLimit(1);
 
-					$list = $cacheStore->query($query);
-					$query->setLimit(2);
-					$offset = -1;
-					$array = array();
-					$startId = null;
-					while(count($list->getObjects()))
+				$list = $cacheStore->query($query);
+				$query->setLimit(2);
+				$offset = -1;
+				$array = array();
+				$startKey = null;
+				while(count($list->getObjects()))
+				{
+					$objects = $list->getObjects();
+					if(count($objects) == 1)
 					{
-						$objects = $list->getObjects();
-						if(count($objects) == 1)
-						{
-							$startCacheObject = reset($objects);
-							/* @var $startCacheObject kCouchbaseCacheListItem */
-							$startId = $startCacheObject->getId();
-						}
-						elseif(count($objects) == 2)
-						{
-							list($endCacheObject, $startCacheObject) = $objects;
-							/* @var $endCacheObject kCouchbaseCacheListItem */
-							/* @var $startCacheObject kCouchbaseCacheListItem */
-							$array[] = array($startId, $endCacheObject->getId());
-							$startId = $startCacheObject->getId();
-						}
-						$offset += self::MAX_CACHE_KEYS_PER_JOB;
-						$query->setOffset($offset);
-						$list = $cacheStore->query($query);
+						$startCacheObject = reset($objects);
+						/* @var $startCacheObject kCouchbaseCacheListItem */
+						list($cachedSessionKey, $cachedObjectKey) = $startCacheObject->getKey();
+						$startKey = $cachedObjectKey;
 					}
-					return $array;
+					else
+					{
+						list($endCacheObject, $startCacheObject) = $objects;
+						/* @var $endCacheObject kCouchbaseCacheListItem */
+						/* @var $startCacheObject kCouchbaseCacheListItem */
+						list($cachedSessionKey, $cachedEndObjectKey) = $endCacheObject->getKey();
+						list($cachedSessionKey, $cachedStartObjectKey) = $startCacheObject->getKey();
+						$array[] = array($startKey, $cachedEndObjectKey);
+						$startKey = $cachedStartObjectKey;
+					}
+					$offset += self::MAX_CACHE_KEYS_PER_JOB;
+					$query->setOffset($offset);
+					$list = $cacheStore->query($query);
 				}
+				return $array;
 			}
 		}
 	
@@ -608,11 +609,11 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 				$userRoles = explode('_', $userRoles);
 				if($count > self::MAX_CACHE_KEYS_PER_JOB)
 				{
-					$startEndDocIds = self::listDocIds($objectType, $sessionKey);
-					foreach($startEndDocIds as $startEndDocId)
+					$startEndObjectKeys = self::listObjectKeys($objectType, $sessionKey);
+					foreach($startEndObjectKeys as $startEndObjectKey)
 					{
-						list($startDocId, $endDocId) = $startEndDocId;
-						kJobsManager::addRecalculateResponseProfileCacheJob($partnerId, $protocol, $ksType, $userRoles, $objectType, null, $startDocId, $endDocId);
+						list($startObjectKey, $endObjectKey) = $startEndObjectKey;
+						kJobsManager::addRecalculateResponseProfileCacheJob($partnerId, $protocol, $ksType, $userRoles, $objectType, null, $startObjectKey, $endObjectKey);
 					}
 				}
 				else
