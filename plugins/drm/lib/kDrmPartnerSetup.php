@@ -37,7 +37,7 @@ class kDrmPartnerSetup
 		$accessControlProfile->setPartnerId($partnerId);
 		$accessControlProfile->setSystemName('drm_default_'.$partnerId);
 
-		$ruleDefault = self::addAccessControlRule('scenario_rental', $defaultPolicy->getId());
+		$ruleDefault = self::addAccessControlRule($defaultPolicy->getId());
 
 		$accessControlProfile->setRulesArray(array($ruleDefault));
 		$accessControlProfile->save();
