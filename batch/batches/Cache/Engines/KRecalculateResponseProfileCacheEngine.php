@@ -61,7 +61,7 @@ class KRecalculateResponseProfileCacheEngine extends KRecalculateCacheEngine
 				$recalculated += $results->recalculated;
 				$options->startObjectKey = $results->lastObjectKey;
 				$options->isFirstLoop = false;
-			} while($results->recalculated == $options->limit);
+			} while($results->lastObjectKey);
 		}
 		catch(KalturaException $e)
 		{
