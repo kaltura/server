@@ -16,6 +16,7 @@
 class EdgeServer extends BaseEdgeServer {
 	
 	const CUSTOM_DATA_DELIVERY_IDS = 'delivery_profile_ids';
+	const EDGE_SERVER_DEFAULT_HOST_NAME_TOKEN = "{playbackHost}/kCache/";
 	
 	/**
 	 * Applies default values to this object.

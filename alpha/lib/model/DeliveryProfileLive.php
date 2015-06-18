@@ -102,31 +102,33 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 		throw new Exception('Status cannot be determined for live stream protocol. Delivery Profile ID: '.$this->getId());
 	}
 	
-	public function getEdgeServerUrl($url)
+	public function getEdgeServerUrls($primaryUrl, $backupUrl)
 	{
-		if(!$url)
+		if(!$primaryUrl)
 			return;
 
-		$resolvedUrl = null;
-		$edgeServerUrl = null;
 		$edgeServerIds = $this->params->getEdgeServerIds();
+		$edgeServers = EdgeServerPeer::retrieveByPKs($edgeServerIds);
 		
-		while(!$edgeServerUrl && count($edgeServerIds))
+		if(!count($edgeServers))
+			return array(null, null);
+		
+		$token = EdgeServer::EDGE_SERVER_DEFAULT_HOST_NAME_TOKEN;
+		if(preg_match("/:\/\/(.*)/", $this->getUrl(), $matches))
+			$token = $matches[1];
+		
+		$primaryEdge = array_shift($edgeServers);
+		$primaryEdgeResolvedUrl = $primaryEdge->getPlaybackHost($token);
+		$primaryUrl = str_replace($token, $primaryEdgeResolvedUrl, $primaryUrl);
+		
+		if($backupUrl && count($edgeServers))
 		{
-			$edgeServerId = array_shift($edgeServerIds);
-			$edgeServer = EdgeServerPeer::retrieveByPK($edgeServerId);
-			if($edgeServer) {
-				$edgeServerUrl = $edgeServer->getPlaybackHost($this->getUrl());
-				break;
-			}
+			$backupEdge = array_shift($edgeServers);
+			$backupEdgeResolvedUrl = $backupEdge->getPlaybackHost($token);
+			$backupUrl = str_replace($token, $backupEdgeResolvedUrl, $backupUrl);
 		}
 		
-		$this->params->setEdgeServerIds($edgeServerIds);
-		
-		if($edgeServerUrl)
-			$resolvedUrl = str_replace($this->getUrl(), $edgeServerUrl, $url);
-		
-		return $resolvedUrl;
+		return array($primaryUrl, $backupUrl);
 	}
 }
 
