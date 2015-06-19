@@ -15,6 +15,7 @@ class DeliveryProfileLiveRtmfp extends DeliveryProfileLive
 			$renderer = $this->getRenderer(array());
 			
 			/* @var $renderer kF4MManifestRenderer */
+			$renderer->streamType = kF4MManifestRenderer::PLAY_STREAM_TYPE_LIVE;
 			$renderer->groupspec = $pushPublishRtmfpConfiguration->getGroupspec();
 			$renderer->mediaUrl = $pushPublishRtmfpConfiguration->getUrl();
 			$renderer->multicastStreamName = $pushPublishRtmfpConfiguration->getMulticastStreamName();
