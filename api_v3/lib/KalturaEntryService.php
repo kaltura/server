@@ -975,16 +975,13 @@ class KalturaEntryService extends KalturaBaseService
 				$tempalteEntryMediaType = $templateEntry->getMediaType() ? $templateEntry->getMediaType() : "null";
 				if ($entryMediaType != $tempalteEntryMediaType)
 					KalturaLog::debug("ENTRY_TEMPLATE_COPY_MEDIA_TYPE - original entry:template entry. mediaType - ".$entryMediaType.':'.$tempalteEntryMediaType);
-
 			}
-
-				$dbEntry = $templateEntry->copyTemplate(true);
-				$dbEntry->save();
-			}
-			else
-			{
-				KalturaLog::err("Template entry id [" . $conversionProfile->getDefaultEntryId() . "] not found");
-			}
+			$dbEntry = $templateEntry->copyTemplate(true);
+			$dbEntry->save();
+		}
+		else
+		{
+			KalturaLog::err("Template entry id [" . $conversionProfile->getDefaultEntryId() . "] not found");
 		}
 		
 		return $this->prepareEntryForInsert($entry, $dbEntry);
