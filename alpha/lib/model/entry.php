@@ -2974,8 +2974,6 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		
 		$copyObj->setKuserId($this->kuser_id);
 		$copyObj->setName($this->name);
-		$copyObj->setType($this->type);
-		$copyObj->setMediaType($this->media_type);
 		$copyObj->setTags($this->tags);
 		$copyObj->setAnonymous($this->anonymous);
 		$copyObj->setSource($this->source);
