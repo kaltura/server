@@ -1288,8 +1288,14 @@ class myReportsMgr
 		kApiCache::disableConditionalCache();
 	
 		$mysql_function = 'mysqli';
-		
 		$db_config = kConf::get( "reports_db_config" );
+		if (!isset($db_config["port"])) {
+		    if(ini_get("mysqli.default_port")!==null){
+			$db_config["port"]=ini_get("mysqli.default_port");
+		    }else{
+			$db_config["port"]=3306;
+		    }
+		}	    
 		$timeout = isset ( $db_config["timeout"] ) ? $db_config["timeout"] : 40;
 		
 		ini_set('mysql.connect_timeout', $timeout );
