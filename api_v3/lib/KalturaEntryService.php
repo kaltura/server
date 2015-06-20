@@ -967,16 +967,16 @@ class KalturaEntryService extends KalturaBaseService
 				$entryType = $entry->type ? $entry->type : "null";
 				$apiTransformedType = kPluginableEnumsManager::coreToApi('entryType', $templateEntry->getType());
 				if($entryType != $apiTransformedType)
-				{
-					$compareMsgString = "ENTRY_TEMPLATE_COPY - original entry:template entry. type - " . $entryType.':'.$apiTransformedType;
+					KalturaLog::debug("ENTRY_TEMPLATE_COPY_TYPE - original entry:template entry. type - ".$entryType.':'.$apiTransformedType);
 
-					if ($entry instanceof KalturaMediaEntry)
-					{
-						$entryMediaType = $entry->mediaType ? $entry->mediaType : "null";
-						$compareMsgString .= " mediaType - " . $entry->mediaType.":".$templateEntry->getMediaType();
-					}
-					KalturaLog::debug($compareMsgString);
-				}
+				$entryMediaType = "null";
+				if ($entry instanceof KalturaMediaEntry)
+					$entryMediaType = $entry->mediaType;
+				$tempalteEntryMediaType = $templateEntry->getMediaType() ? $templateEntry->getMediaType() : "null";
+				if ($entryMediaType != $tempalteEntryMediaType)
+					KalturaLog::debug("ENTRY_TEMPLATE_COPY_MEDIA_TYPE - original entry:template entry. mediaType - ".$entryMediaType.':'.$tempalteEntryMediaType);
+
+			}
 
 				$dbEntry = $templateEntry->copyTemplate(true);
 				$dbEntry->save();
