@@ -25,7 +25,6 @@ class KalturaAnswerCuePoint extends KalturaCuePoint
 	/**
 	 * @var KalturaNullableBoolean
 	 * @readonly
- 	 * @filter order
 	 */
 	public $isCorrect;
 
