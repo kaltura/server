@@ -230,10 +230,7 @@ class CrossKalturaDistributionEngine extends DistributionEngine implements
 	    KalturaLog::debug('Getting entry id ['.$entryId.']');
 		try
 		{
-			if ($this->distributionProfile->partnerId)
-				$entry = $this->getEntry($this->distributionProfile->partnerId, $entryId);
-			else
-				$entry = $client->baseEntry->get($entryId);
+			$entry = $this->getEntry($this->distributionProfile->partnerId, $entryId);
 		}
 		catch(Exception $e)
 		{
@@ -246,16 +243,8 @@ class CrossKalturaDistributionEngine extends DistributionEngine implements
 	    {
 			try {
 				KalturaLog::debug('Getting entry\'s flavor assets');
-				if($this->distributionProfile->partnerId)
-					$flavorAssetsList = $this->getFlavorAssets($this->distributionProfile->partnerId, $data->entryDistribution->flavorAssetIds, $entryId);
-				else
-				{
-					$flavorAssetFilter = new KalturaFlavorAssetFilter();
-					$flavorAssetFilter->idIn = $data->entryDistribution->flavorAssetIds;
-					$flavorAssetFilter->entryIdEqual = $entryId;
-					$flavorAssetsList = $client->flavorAsset->listAction($flavorAssetFilter);
-				}
-
+				
+				$flavorAssetsList = $this->getFlavorAssets($this->distributionProfile->partnerId, $data->entryDistribution->flavorAssetIds, $entryId);
 				foreach ($flavorAssetsList->objects as $asset)
 				{
 					$flavorAssets[$asset->id] = $asset;
