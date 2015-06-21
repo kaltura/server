@@ -74,7 +74,6 @@ class KalturaEdgeServer extends KalturaObject implements IFilterable
 	 * 
 	 * @var string
 	 * @filter like,mlikeor,mlikeand
-	 * @requiresPermission update
 	 */
 	public $hostName;
 	
@@ -83,7 +82,6 @@ class KalturaEdgeServer extends KalturaObject implements IFilterable
 	 *
 	 * @var string
 	 * @filter like,mlikeor,mlikeand
-	 * @requiresPermission update
 	 */
 	public $playbackHostName;
 	
