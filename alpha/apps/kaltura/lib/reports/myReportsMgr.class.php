@@ -1288,8 +1288,14 @@ class myReportsMgr
 		kApiCache::disableConditionalCache();
 	
 		$mysql_function = 'mysqli';
-		
 		$db_config = kConf::get( "reports_db_config" );
+		if (!isset($db_config["port"])) {
+		    if(ini_get("mysqli.default_port")!==null){
+			$db_config["port"]=ini_get("mysqli.default_port");
+		    }else{
+			$db_config["port"]=3306;
+		    }
+		}	    
 		$timeout = isset ( $db_config["timeout"] ) ? $db_config["timeout"] : 40;
 		
 		ini_set('mysql.connect_timeout', $timeout );
@@ -1297,7 +1303,7 @@ class myReportsMgr
 		if ( isset ( $db_config["port"] ) && $db_config["port"]  && $mysql_function != 'mysqli' ) $host .= ":" . $db_config["port"];
 		
 		$connect_function = $mysql_function.'_connect';
-		$link  = $connect_function( $host , $db_config["user"] , $db_config["password"] , null );
+		$link  = $connect_function( $host , $db_config["user"] , $db_config["password"] , null, $db_config["port"] );
 
 KalturaLog::log( "Reports query using database host: [$host] user [" . $db_config["user"] . "]" );
 		
