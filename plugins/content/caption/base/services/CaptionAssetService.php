@@ -178,8 +178,8 @@ class CaptionAssetService extends KalturaAssetService
 		
 		$captionAsset->incrementVersion();
 		if($ext && $ext != kUploadTokenMgr::NO_EXTENSION_IDENTIFIER)
- +      	$captionAsset->setFileExt($ext);
-		
+			$captionAsset->setFileExt($ext);
+
 		$captionAsset->setSize(filesize($fullPath));
 		$captionAsset->save();
 		
@@ -201,7 +201,12 @@ class CaptionAssetService extends KalturaAssetService
 
 		$finalPath = kFileSyncUtils::getLocalFilePathForKey($syncKey);
 		list($width, $height, $type, $attr) = getimagesize($finalPath);
-		
+
+		if ($captionAsset->getLanguage() == KalturaLanguage::MU)
+		{
+			kCaptionsContentManager::addParseMultiLanguageCaptionAssetJob($captionAsset, $finalPath);
+		}
+
 		$captionAsset->setWidth($width);
 		$captionAsset->setHeight($height);
 		$captionAsset->setSize(filesize($finalPath));
@@ -209,7 +214,7 @@ class CaptionAssetService extends KalturaAssetService
 		$captionAsset->setStatus(CaptionAsset::ASSET_STATUS_READY);
 		$captionAsset->save();
 	}
-    
+
 	/**
 	 * @param CaptionAsset $captionAsset
 	 * @param string $url

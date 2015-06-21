@@ -1,6 +1,4 @@
----
-
-# Jupiter-10.13.0 #
+# Jupiter-10.14.0 #
 
 ## Cache response-profile results ##
 
@@ -118,6 +116,118 @@ moduls.recalculateResponseProfile.group = GROUP_ENABLE_DISABLE_FEATURES
 ### Known Issues & Limitations ###
 None.
 
+## in video quiz ##
+
+- Issue Type: new feature  
+- Issue ID: PLAT-2795 
+
+#### Configuration ####
+
+- Add the following line to the plugins.ini file:  
+        Quiz 
+
+- Add the following lines from admin.template.ini to admin.ini:
+
+		moduls.quizCuePoint.enabled = true
+		moduls.quizCuePoint.permissionType = 3
+		moduls.quizCuePoint.label = Quiz - Cue Points
+		moduls.quizCuePoint.permissionName = QUIZ_PLUGIN_PERMISSION
+		moduls.quizCuePoint.basePermissionType = 3
+		moduls.quizCuePoint.basePermissionName = CUEPOINT_PLUGIN_PERMISSION
+		moduls.quizCuePoint.group = GROUP_ENABLE_DISABLE_FEATURES
+
+#### Deployment Scripts ####
+
+- run the Following deployemnt scripts:
+        
+		Create new user_entry table:
+        mysql -h@db_host@ -u@db_user@ -p@db_pass@ -P3306 kaltura < deployment/updates/sql/2015_15_06_create_user_entry_table.sql
+        
+
+		Update new services permissions:
+		php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2015_04_11_update_quiz_permissions.php
+		php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2015_05_07_update_userentry_permissions.php
+		php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2015_06_07_update_quiz_analytics_permissions.php
+
+		Install Plugins:
+		php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+
+		
+		
+
+#### Known Issues & Limitations ####
+
+None.
+
+---
+
+# Jupiter-10.13.0 #
+
+## New edgeServer service - drop one of the dynamic eCDN ##
+
+- Issue Type: new feature  
+- Issue ID: PLAT-3007 
+
+### Configuration ###
+- Add the following to the admin.ini under "AVAILABLE MODULES (permissionType)":
+
+		moduls.EdgeServer.enabled = true
+		moduls.EdgeServer.permissionType = 2
+		moduls.EdgeServer.label = "Edge server usage"
+		moduls.EdgeServer.permissionName = FEATURE_EDGE_SERVER
+		moduls.EdgeServer.basePermissionType =
+		moduls.EdgeServer.basePermissionName =
+		moduls.EdgeServer.group = GROUP_ENABLE_DISABLE_FEATURES
+
+#### Deployment Scripts ####
+- run the Following deployemnt scripts:
+
+		Update new servcie permissions: 
+		php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2015_05_28_edge_server_service.php
+
+		create new edge_Server table:
+		mysql -h@db_host@ -u@db_user@ -p@db_pass@ -P3306 kaltura < deployment/updates/sql/2015_27_05_create_edge_server_table.sql
+
+#### Known Issues & Limitations ####
+
+* To enable this feature on your account you will need you will need to flip on the feature in the partner configuration section.
+
+##multi-language caption ingestion##
+- Issue Type: feature request
+- Issue ID: PLAT-2500
+
+#### Configuration ####
+
+- allocate worker/s for KAsyncParseMultiLanguageCaptionAsset.
+
+#### Deployment Scripts ####
+
+	php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+
+- deploy server-saas-config to update batch client.
+
+#### Known Issues & Limitations ####
+
+Players will allow choosing 'multi-language' captions ,by default.
+
+
+## Search for tags with spaces and words with less than 3 characters ##
+
+- Issue Type: bug fix
+- Issue ID: SUP-4362
+
+#### Configuration ####
+
+None.
+
+#### Deployment Scripts ####
+
+    - Need to re-build so that spaces in tags will be replaced by '=' & re-index the tag sphinx table.
+
+#### Known Issues & Limitations ####
+
+None.
+
 ---
 # Jupiter-10.12.0 #
 
@@ -219,7 +329,7 @@ None.
 
 None.
 
----
+
 # Jupiter-10.11.0 #
 
 ## Server support for Q&A feature ##
@@ -307,7 +417,7 @@ None.
 
 None.
 
----
+
 # Jupiter-10.10.0 #
 ## Support marking file_sync's as directories ##
 
@@ -2545,4 +2655,4 @@ Internal indication for api time properties and support for times that are relat
 0 = PID1
 1 = PID2
 `
-
+>>>>>>> Jupiter-10.14.0

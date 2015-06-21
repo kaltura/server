@@ -132,7 +132,11 @@ class Xml2As3ClientGenerator extends ClientGeneratorFromXml
 				case "array" :
 					$type = "Array = null";
 					break;
-
+					
+				case "map" :
+					$type = "Object = null";
+					break;
+					
 				default :
 					$type = $child->attributes()->type;
 					$str = $this->addImport2String( "	import com.kaltura.vo." . $type , $str );

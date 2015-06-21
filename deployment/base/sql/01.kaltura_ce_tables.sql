@@ -2399,3 +2399,39 @@ CREATE TABLE response_profile
 	PRIMARY KEY (id),
 	KEY partner_status(partner_id, status)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE `edge_server`
+(
+	`id` INTEGER  NOT NULL AUTO_INCREMENT,
+	`created_at` DATETIME,
+	`updated_at` DATETIME,
+	`partner_id` INTEGER,
+	`name` VARCHAR(256),
+	`system_name` VARCHAR(256),
+	`desciption` VARCHAR(256),
+	`status` INTEGER,
+	`type` INTEGER default 0 NOT NULL,
+	`tags` TEXT,
+	`host_name` VARCHAR(256) NOT NULL,
+	`playback_host_name` VARCHAR(256),
+	`parent_id` INTEGER default 0,
+	`custom_data` TEXT,
+	PRIMARY KEY (`id`),
+	KEY partner_id_status_system_name(`partner_id`, `status`, `system_name`),
+	KEY host_name(`host_name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE `user_entry`
+(
+	`id` INTEGER  NOT NULL AUTO_INCREMENT,
+	`entry_id` VARCHAR(20)  NOT NULL,
+	`kuser_id` INTEGER  NOT NULL,
+	`partner_id` INTEGER,
+	`created_at` DATETIME,
+	`updated_at` DATETIME,
+	`status` INTEGER,
+	`type` INTEGER,
+	`custom_data` TEXT,
+	PRIMARY KEY (`id`),
+	KEY (`entry_id`, `kuser_id`)
+)Type=InnoDB COMMENT='Describes the relationship between a specific user and a specific entry';

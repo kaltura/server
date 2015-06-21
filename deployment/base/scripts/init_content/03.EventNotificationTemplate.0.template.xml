@@ -40,11 +40,11 @@
 				<body>A new item is pending your approval in the Kaltura Management Console</body>
 				<fromEmail>{from_email}</fromEmail>
 				<fromName>{from_name}</fromName>
-				<to objectType="KalturaEmailNotificationUserRecipientProvider">
+				<bcc objectType="KalturaEmailNotificationUserRecipientProvider">
 					<filter objectType="KalturaUserFilter">
 						<permissionNamesMultiLikeAnd>CONTENT_MODERATE_APPROVE_REJECT,CONTENT_MODERATE_BASE</permissionNamesMultiLikeAnd>
 					</filter>
-				</to>
+				</bcc>
 				<contentParameters objectType="array">
 					<item objectType="KalturaEventNotificationParameter">
 						<key>from_email</key>
@@ -103,11 +103,11 @@
 				<body>A new item is flagged for review in the Kaltura Management Console</body>
 				<fromEmail>{from_email}</fromEmail>
 				<fromName>{from_name}</fromName>
-				<to objectType="KalturaEmailNotificationUserRecipientProvider">
+				<bcc objectType="KalturaEmailNotificationUserRecipientProvider">
 					<filter objectType="KalturaUserFilter">
 						<permissionNamesMultiLikeAnd>CONTENT_MODERATE_APPROVE_REJECT,CONTENT_MODERATE_BASE</permissionNamesMultiLikeAnd>
 					</filter>
-				</to>
+				</bcc>
 				<contentParameters objectType="array">
 					<item objectType="KalturaEventNotificationParameter">
 						<key>from_email</key>
@@ -165,14 +165,14 @@
 				<body>A new item is pending your approval: [ChannelSettingsPendingURLPrefix]{category_name_encoded}/{category_id}[ChannelSettingsPendingURLSuffix]</body>
 				<fromEmail>{from_email}</fromEmail>
 				<fromName>{from_name}</fromName>
-				<to objectType="KalturaEmailNotificationCategoryRecipientProvider">
+				<bcc objectType="KalturaEmailNotificationCategoryRecipientProvider">
 					<categoryId objectType="KalturaEvalStringField">
 						<code>$scope->getEvent()->getObject()->getCategoryId()</code>
 					</categoryId>
 					<categoryUserFilter objectType="KalturaCategoryUserProviderFilter">
 						<permissionNamesMatchOr>CATEGORY_MODERATE</permissionNamesMatchOr>
 					</categoryUserFilter>
-				</to>
+				</bcc>
 				<contentParameters objectType="array">
 					<item objectType="KalturaEventNotificationParameter">
 						<key>from_email</key>
@@ -243,14 +243,14 @@
 				<body>A new item is pending your approval: [ChannelSettingsPendingURLPrefix]{category_name_encoded}/{category_id}[ChannelSettingsPendingURLSuffix]</body>
 				<fromEmail>{from_email}</fromEmail>
 				<fromName>{from_name}</fromName>
-				<to objectType="KalturaEmailNotificationCategoryRecipientProvider">
+				<bcc objectType="KalturaEmailNotificationCategoryRecipientProvider">
 					<categoryId objectType="KalturaEvalStringField">
 						<code>$scope->getEvent()->getObject()->getCategoryId()</code>
 					</categoryId>
 					<categoryUserFilter objectType="KalturaCategoryUserProviderFilter">
 						<permissionNamesMatchOr>CATEGORY_MODERATE</permissionNamesMatchOr>
 					</categoryUserFilter>
-				</to>
+				</bcc>
 				<contentParameters objectType="array">
 					<item objectType="KalturaEventNotificationParameter">
 						<key>from_email</key>
@@ -894,14 +894,14 @@
 				<body>Media {entry_name} was added to {category_name}. You can see the media here: [AppEntryUrl]{entry_id}</body>
 				<fromEmail>{from_email}</fromEmail>
 				<fromName>{from_name}</fromName>
-				<to objectType="KalturaEmailNotificationCategoryRecipientProvider">
+				<bcc objectType="KalturaEmailNotificationCategoryRecipientProvider">
 					<categoryId objectType="KalturaEvalStringField">
 						<code>$scope->getEvent()->getObject()->getCategoryId()</code>
 					</categoryId>
 					<categoryUserFilter objectType="KalturaCategoryUserProviderFilter">
 						<permissionNamesMatchOr>CATEGORY_SUBSCRIBE</permissionNamesMatchOr>
 					</categoryUserFilter>
-				</to>
+				</bcc>
 				<contentParameters objectType="array">
 					<item objectType="KalturaEventNotificationParameter">
 						<key>from_email</key>

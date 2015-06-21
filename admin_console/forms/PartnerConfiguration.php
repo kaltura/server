@@ -402,7 +402,14 @@ class Form_PartnerConfiguration extends Infra_Form
 			'filters'		=> array('StringTrim'),
 		));
 		
-		
+		//--------------- Host white list ----------------------------
+
+		$this->addElement('text', 'cdn_host_white_list', array(
+			'label'			=> 'CDN Host white list regex (comma seperated)',
+			'filters'		=> array('StringTrim'),
+		));
+
+
 //-----------------------------------------------------------------------
 		$this->addElement('hidden', 'crossLine', array(
 			'lable'			=> 'line',
@@ -879,7 +886,9 @@ class Form_PartnerConfiguration extends Infra_Form
 			'liveStreamConfig',
 			array('legend' => 'Live Stream Config')
 		);
-									
+		$this->addDisplayGroup(array('cdn_host_white_list'), 'cdnHostWhiteList');
+
+
 	}
 	
 	protected function addLimitSubForm($subForm, $subFormName)
