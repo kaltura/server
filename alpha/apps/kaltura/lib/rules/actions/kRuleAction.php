@@ -36,6 +36,6 @@ class kRuleAction
 	
 	public function applyDeliveryProfileDynamicAttributes(DeliveryProfileDynamicAttributes $deliveryAttributes)
 	{
-		return;
+		return true;
 	}
 }

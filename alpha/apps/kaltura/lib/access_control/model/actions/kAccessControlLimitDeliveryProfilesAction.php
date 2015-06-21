@@ -55,7 +55,8 @@ class kAccessControlLimitDeliveryProfilesAction extends kRuleAction
 
 	public function applyDeliveryProfileDynamicAttributes(DeliveryProfileDynamicAttributes $deliveryAttributes)
 	{
-		$deliveryAttributes->setDeliveryProfileIds($this->getDeliveryProfileIds(), $this->getIsBlockedList());	
+		$deliveryAttributes->setDeliveryProfileIds($this->getDeliveryProfileIds(), $this->getIsBlockedList());
+		return true;
 	}
 	
 }

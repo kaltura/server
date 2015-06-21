@@ -255,8 +255,11 @@ class KSecureEntryHelper
 		foreach ($this->actionLists as $actionList)
 		{
 			// take only the first action of each type
-			$action = reset($actionList);
-			$action->applyDeliveryProfileDynamicAttributes($deliveryAttributes);	
+			foreach ($actionList as $action)
+			{
+				if($action->applyDeliveryProfileDynamicAttributes($deliveryAttributes))
+					break;
+			}	
 		}
 	}
 	
