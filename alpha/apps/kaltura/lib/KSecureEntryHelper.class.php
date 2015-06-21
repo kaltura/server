@@ -252,37 +252,11 @@ class KSecureEntryHelper
 
 	public function updateDeliveryAttributes(DeliveryProfileDynamicAttributes $deliveryAttributes)
 	{
-		$limitDeliveryProfilesActionList = $this->getActionList(RuleActionType::LIMIT_DELIVERY_PROFILES);
-		if ($limitDeliveryProfilesActionList)
+		foreach ($this->actionLists as $actionList)
 		{
-			// take only the first LIMIT_DELIVERY_PROFILES action
-			$action = reset($limitDeliveryProfilesActionList);
-			$deliveryAttributes->setDeliveryProfileIds($action->getDeliveryProfileIds(), $action->getIsBlockedList());
-		}
-		
-		$serveRemoteEdgeServerActionList = $this->getActionList(RuleActionType::SERVE_FROM_REMOTE_SERVER);
-		if ($serveRemoteEdgeServerActionList)
-		{
-			// take only the first SERVE_FROM_REMOTE_SERVER action
-			$action = reset($serveRemoteEdgeServerActionList);
-			$edgeServerIds = explode(',', $action->getEdgeServerIds());
-			$deliveryAttributes->setEdgeServerIds($edgeServerIds);
-			
-			//Check if there are any edge server that override the delivery profiles
-			$edgeServers = EdgeServerPeer::retrieveByPKs($edgeServerIds);
-			if(!count($edgeServers))
-				return;
-			
-			$edgeDeliveryProfilesIds = array();
-			foreach ($edgeServers as $edgeServer)
-			{
-				if(!$edgeServer->getDeliveryProfileIds())
-					continue;
-				
-				$edgeDeliveryProfilesIds = array_merge($edgeDeliveryProfilesIds, explode(",", $edgeServer->getDeliveryProfileIds()));
-			}
-			if(count($edgeDeliveryProfilesIds))
-				$deliveryAttributes->setDeliveryProfileIds($edgeDeliveryProfilesIds, false);
+			// take only the first action of each type
+			$action = reset($actionList);
+			$action->applyDeliveryProfileDynamicAttributes($deliveryAttributes);	
 		}
 	}
 	

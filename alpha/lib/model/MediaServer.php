@@ -132,13 +132,7 @@ class MediaServer extends BaseMediaServer {
 		if(!$this->isExternalMediaServer)
 			$hostname = preg_replace('/\..*$/', '', $hostname);
 		
-		if(!$this->isExternalMediaServer) {
-			$url = "$protocol://$domain:$port/$appPrefix";
-		}
-		else{
-			$url = "$protocol://$domain/$appPrefix:$port/";
-		}
-		
+		$url = "$protocol://$domain:$port/$appPrefix";
 		$url = str_replace("{hostName}", $hostname, $url);
 		return $url;
 		

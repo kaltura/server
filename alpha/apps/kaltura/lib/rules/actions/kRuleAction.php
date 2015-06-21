@@ -33,4 +33,9 @@ class kRuleAction
 	{
 		$this->type = $type;
 	}
+	
+	public function applyDeliveryProfileDynamicAttributes(DeliveryProfileDynamicAttributes $deliveryAttributes)
+	{
+		return;
+	}
 }
