@@ -2965,8 +2965,44 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	/**
 	 * @return entry
 	 */
-	public function copyTemplate($coptPartnerId = false)
+	public function copyTemplate($coptPartnerId = false, $entry = null)
 	{
+		if ($entry)
+		{
+			$entryType = $entry->type ? $entry->type : "null";
+			$apiTransformedType = kPluginableEnumsManager::coreToApi('entryType', $this->type);
+			if($entryType != $apiTransformedType)
+				KalturaLog::debug("ENTRY_TEMPLATE_COPY_TYPE - original entry:template entry. type - ".$entryType.':'.$apiTransformedType);
+
+			$tempalteEntryMediaType = $this->media_type ? $this->media_type : "null";
+			if ($entry instanceof KalturaMediaEntry)
+			{
+				$entryMediaType = $entry->mediaType;
+				if ($entryMediaType != $tempalteEntryMediaType)
+					KalturaLog::debug("ENTRY_TEMPLATE_COPY_MEDIA_TYPE - original entry:template entry. mediaType - ".$entryMediaType.':'.$tempalteEntryMediaType);
+			}
+			elseif ($entry instanceof KalturaDocumentEntry)
+			{
+				$entryDocumentType = $entry->documentType;
+				if ($entryDocumentType != $tempalteEntryMediaType)
+					KalturaLog::debug("ENTRY_TEMPLATE_COPY_MEDIA_TYPE - original entry:template entry. documentType - ".$entryDocumentType.':'.$tempalteEntryMediaType);
+			}
+			elseif ($entry instanceof KalturaPlaylist)
+			{
+				$entryPlaylistType = $entry->playlistType;
+				if ($entryPlaylistType != $tempalteEntryMediaType);
+					KalturaLog::debug("ENTRY_TEMPLATE_COPY_MEDIA_TYPE - original entry:template entry. playlistType - ".$entryPlaylistType.':'.$tempalteEntryMediaType);
+			}
+
+			if ($entry instanceof KalturaExternalMediaEntry)
+			{
+				$entrySourceType = $entry->externalSourceType;
+				$tempalteEntrySourceType = $this instanceof ExternalMediaEntry && $this->getExternalSourceType() ? $this->getExternalSourceType() : "null";
+				if ($entrySourceType != $tempalteEntrySourceType)
+					KalturaLog::debug("ENTRY_TEMPLATE_COPY_MEDIA_TYPE - original entry:template entry. sourceType - ".$entrySourceType.':'.$tempalteEntrySourceType);
+			}
+		}
+
 		// we use get_class(), because this might be a subclass
 		$clazz = get_class($this);
 		$copyObj = new $clazz();
@@ -2974,6 +3010,8 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		
 		$copyObj->setKuserId($this->kuser_id);
 		$copyObj->setName($this->name);
+		$copyObj->setType($this->type);
+		$copyObj->setMediaType($this->media_type);
 		$copyObj->setTags($this->tags);
 		$copyObj->setAnonymous($this->anonymous);
 		$copyObj->setSource($this->source);
