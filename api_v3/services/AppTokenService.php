@@ -34,7 +34,7 @@ class AppTokenService extends KalturaBaseService
 	 * Get application authentication token by id
 	 * 
 	 * @action get
-	 * @param int $id
+	 * @param string $id
 	 * @return KalturaAppToken
 	 * 
 	 * @throws KalturaErrors::APP_TOKEN_ID_NOT_FOUND
@@ -54,7 +54,7 @@ class AppTokenService extends KalturaBaseService
 	 * Update application authentication token by id
 	 * 
 	 * @action update
-	 * @param int $id
+	 * @param string $id
 	 * @param KalturaAppToken $appToken
 	 * @return KalturaAppToken
 	 * 
@@ -78,7 +78,7 @@ class AppTokenService extends KalturaBaseService
 	 * Delete application authentication token by id
 	 * 
 	 * @action delete
-	 * @param int $id
+	 * @param string $id
 	 * 
 	 * @throws KalturaErrors::APP_TOKEN_ID_NOT_FOUND
 	 */
