@@ -579,6 +579,22 @@ class PartnerController extends Zend_Controller_Action
 			$filterType = 'byid';
 			
 		}
+		if($filterType == 'byUIConfId') {
+		    $client = Infra_ClientHelper::getClient();
+		    $adminConsolePlugin = Kaltura_Client_AdminConsole_Plugin::get($client);
+		
+		    try {
+		        $uiConf = $adminConsolePlugin->uiConfAdmin->get($filterInput);
+		        /* @var $uiConf Kaltura_Client_Type_UIConf  */
+		        $filterInput = $uiConf->partnerId;
+		    }
+		    catch(Exception $ex) {
+		        $filterInput = "-99";
+		    }
+		    $filterType = 'byid';
+		
+		}
+		
 		if ($filterType == 'byid')
 		{
 			$filter->idIn = $filterInput;
