@@ -15,4 +15,20 @@
  */
 class AppTokenPeer extends BaseAppTokenPeer {
 
+	
+	/**
+	 * Retrieve a single object by pkey with no filter
+	 * @param string $id
+	 * @param $con
+	 * @return AppToken
+	 */
+	public static function retrieveByPkNoFilter($id, $con = null)
+	{
+		self::setUseCriteriaFilter(false);
+		$appToken = self::retrieveByPK($id, $con);
+		self::setUseCriteriaFilter(true);
+		
+		return $appToken;
+	}
+	
 } // AppTokenPeer

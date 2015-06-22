@@ -20,7 +20,7 @@ class AppToken extends BaseAppToken
 		for ($i = 0; $i < 10; $i++)
 		{
 			$id = $dc["id"] . '_' . kString::generateStringId();
-			$existingObject = AppTokenPeer::retrieveByIdNoFilter($id);
+			$existingObject = AppTokenPeer::retrieveByPkNoFilter($id);
 			
 			if ($existingObject)
 				KalturaLog::log("ID [$id] already exists");
