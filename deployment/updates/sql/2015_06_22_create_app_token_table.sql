@@ -7,7 +7,7 @@ CREATE TABLE app_token
 	created_at DATETIME,
 	updated_at DATETIME,
 	deleted_at DATETIME,
-	status INTEGER,
+	STATUS INTEGER,
 	expiry INTEGER,
 	session_type INTEGER,
 	session_user_id VARCHAR(100),
@@ -15,5 +15,6 @@ CREATE TABLE app_token
 	session_privileges TEXT,
 	token TEXT,
 	custom_data TEXT,
-	PRIMARY KEY (id)
-)Type=InnoDB DEFAULT CHARSET=utf8;
+	PRIMARY KEY (id),
+	KEY int_id_index (int_id)
+)TYPE=INNODB DEFAULT CHARSET=utf8;
