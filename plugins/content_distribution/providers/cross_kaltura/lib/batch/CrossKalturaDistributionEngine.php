@@ -245,7 +245,7 @@ class CrossKalturaDistributionEngine extends DistributionEngine implements
 				KalturaLog::debug('Getting entry\'s flavor assets');
 				
 				$flavorAssetsList = $this->getFlavorAssets($this->distributionProfile->partnerId, $data->entryDistribution->flavorAssetIds, $entryId);
-				foreach ($flavorAssetsList->objects as $asset)
+				foreach ($flavorAssetsList as $asset)
 				{
 					$flavorAssets[$asset->id] = $asset;
 				}
