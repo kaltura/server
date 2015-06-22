@@ -1,5 +1,23 @@
 # Jupiter-10.14.0 #
 
+## On the fly encryption ##
+
+-- Issue Type: Configuration for existing feature
+-- Issue ID: PLAT-2675 
+
+#### Configuration ####
+ 
+- Add relevant value of "license_server_url" in "drm.ini", see saas-config
+
+#### Deployment Scripts ####
+
+None.
+
+#### Known Issues & Limitations ####
+
+None.
+
+
 ## in video quiz ##
 
 - Issue Type: new feature  
@@ -19,7 +37,7 @@
 		moduls.quizCuePoint.basePermissionType = 3
 		moduls.quizCuePoint.basePermissionName = CUEPOINT_PLUGIN_PERMISSION
 		moduls.quizCuePoint.group = GROUP_ENABLE_DISABLE_FEATURES
-
+		
 #### Deployment Scripts ####
 
 - run the Following deployemnt scripts:
