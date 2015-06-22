@@ -163,7 +163,7 @@ class KalturaEdgeServer extends KalturaObject implements IFilterable
 		if($isInsert)
 			$this->validatePropertyNotNull("hostName");
 		
-		$this->validatePropertyMinLength("name", 1, true);
+		$this->validatePropertyMinLength("name", 1);
 	}
 	
 	public function validateDuplications($edgeId = null)
