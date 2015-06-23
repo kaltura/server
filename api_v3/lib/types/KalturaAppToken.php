@@ -8,7 +8,7 @@ class KalturaAppToken extends KalturaObject implements IFilterable
 	/**
 	 * The id of the application token
 	 * 
-	 * @var int
+	 * @var string
 	 * @readonly
 	 * @filter eq,in
 	 */
