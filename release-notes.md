@@ -2,8 +2,8 @@
 
 ## On the fly encryption ##
 
--- Issue Type: Configuration for existing feature
--- Issue ID: PLAT-2675 
+- Issue Type: Configuration for existing feature
+- Issue ID: PLAT-2675 
 
 #### Configuration ####
  
@@ -21,7 +21,7 @@ None.
 ## in video quiz ##
 
 - Issue Type: new feature  
-- Issue ID: PLAT-2795 
+- Issue ID: PLAT-2795 and PLAT-2792 and PLAT-2791 and PLAT-2790 and PLAT-2786 and PLAT-2857
 
 #### Configuration ####
 
