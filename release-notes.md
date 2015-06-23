@@ -1,5 +1,24 @@
 # Jupiter-10.14.0 #
 
+## Application authentication token ##
+
+-- Issue Type: New feature
+-- Issue ID: PLAT-3095
+
+#### Configuration ####
+ 
+None.
+
+#### Deployment Scripts ####
+
+ - php deployment/updates/scripts/add_permissions/2015_06_22_app_token_service.php
+ - mysql -h@db_host@ -u@db_user@ -p@db_pass@ -P3306 kaltura < deployment/updates/sql/2015_06_22_create_app_token_table.sql
+
+#### Known Issues & Limitations ####
+
+None.
+
+
 ## On the fly encryption ##
 
 - Issue Type: Configuration for existing feature
