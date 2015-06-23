@@ -33,6 +33,11 @@ class KalturaIpAddressCondition extends KalturaMatchCondition
 		$this->type = ConditionType::IP_ADDRESS;
 	}
 	
+	public function getMapBetweenObjects()
+	{
+		return array_merge(parent::getMapBetweenObjects(), self::$mapBetweenObjects);
+	}
+	
 	/* (non-PHPdoc)
 	 * @see KalturaObject::toObject()
 	 */
