@@ -420,15 +420,6 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 		$value = self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
 		return kPluginableEnumsManager::apiToCore('BatchJobType', $value);
 	}
-
-	/**
-	 * @return int id of dynamic enum in the DB.
-	 */
-	public static function getCoreValue($type, $valueName)
-	{
-		$value = self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
-		return kPluginableEnumsManager::apiToCore($type, $value);
-	}
 	
 	/**
 	 * @return string external API value of dynamic enum.
