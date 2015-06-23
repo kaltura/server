@@ -3,12 +3,15 @@
  * Enable caption assets management for entry objects
  * @package plugins.caption
  */
-class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPermissions, IKalturaEnumerator, IKalturaObjectLoader, IKalturaApplicationPartialView, IKalturaConfigurator, IKalturaSchemaContributor, IKalturaMrssContributor, IKalturaPlayManifestContributor
+class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPermissions, IKalturaEnumerator, IKalturaObjectLoader, IKalturaApplicationPartialView, IKalturaConfigurator, IKalturaSchemaContributor, IKalturaMrssContributor, IKalturaPlayManifestContributor, IKalturaEventConsumers
 {
 	const PLUGIN_NAME = 'caption';
 	const KS_PRIVILEGE_CAPTION = 'caption';
 	const MULTI_LANGUAGE = 'Multilingual';
-	
+
+	const MULTI_CAPTION_FLOW_MANAGER_CLASS = 'kMultiCaptionFlowManager';
+	const NO_CAPTIONS_MESSAGE = "No Captions Created";
+		
 	/* (non-PHPdoc)
 	 * @see IKalturaPlugin::getPluginName()
 	 */
@@ -181,6 +184,16 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 			'captionParams' => 'CaptionParamsService',
 		);
 		return $map;
+	}
+
+	/* (non-PHPdoc)
+	 * @see IKalturaEventConsumers::getEventConsumers()
+	*/
+	public static function getEventConsumers()
+	{
+		return array(
+				self::MULTI_CAPTION_FLOW_MANAGER_CLASS,
+		);
 	}
 	
 	/* (non-PHPdoc)
@@ -408,6 +421,15 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 		return kPluginableEnumsManager::apiToCore('BatchJobType', $value);
 	}
 
+	/**
+	 * @return int id of dynamic enum in the DB.
+	 */
+	public static function getCoreValue($type, $valueName)
+	{
+		$value = self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
+		return kPluginableEnumsManager::apiToCore($type, $value);
+	}
+	
 	/**
 	 * @return string external API value of dynamic enum.
 	 */
