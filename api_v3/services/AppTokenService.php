@@ -88,7 +88,8 @@ class AppTokenService extends KalturaBaseService
 		if(!$dbAppToken)
 			throw new KalturaAPIException(KalturaErrors::APP_TOKEN_ID_NOT_FOUND, $id);
 		
-		invalidSessionPeer::invalidateByKey($id, invalidSession::INVALID_SESSION_TYPE_SESSION_ID, $dbAppToken->getExpiry());
+		$invalidSessionKey = ks::buildSessionIdHash($this->getPartnerId(), $id); 
+		invalidSessionPeer::invalidateByKey($invalidSessionKey, invalidSession::INVALID_SESSION_TYPE_SESSION_ID, $dbAppToken->getExpiry());
 		$dbAppToken->setStatus(AppTokenStatus::DELETED);
 		$dbAppToken->save();
 	}

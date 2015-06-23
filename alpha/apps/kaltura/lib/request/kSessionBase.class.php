@@ -577,10 +577,15 @@ class kSessionBase
 		return true;
 	}
 
+	public static function buildSessionIdHash($partnerId, $sessionId)
+	{
+		return sha1($partnerId . '_' . $sessionId);
+	}
+
 	public function getSessionIdHash()
 	{
 		if(isset($this->parsedPrivileges[self::PRIVILEGE_SESSION_ID][0])) {
-			return sha1( $this->partner_id . '_' . $this->parsedPrivileges[self::PRIVILEGE_SESSION_ID][0]);
+			return self::buildSessionIdHash($this->partner_id, $this->parsedPrivileges[self::PRIVILEGE_SESSION_ID][0]);
 		}
 		return null;
 	}
