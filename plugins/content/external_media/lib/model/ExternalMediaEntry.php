@@ -39,6 +39,19 @@ class ExternalMediaEntry extends entry
 		$this->putInCustomData(self::CUSTOM_DATA_FIELD_EXTERNAL_SOURCE, $v);
 	}
 
+	public function copyTemplate($coptPartnerId = false, $entry = null)
+	{
+		if ($entry)
+		{
+			$templateExternalSourceType = $this->getExternalSourceType();
+			$externalSourceType = $entry instanceof ExternalMediaEntry ? $entry->getExternalSourceType() : "null";
+	
+			if($templateExternalSourceType != $externalSourceType)
+				KalturaLog::debug('ENTRY_TEMPLATE_COPY_SOURCE_TYPE - original entry:template entry. externalSourceType - ' . $externalSourceType.':'.$templateExternalSourceType);
+		}
+		return parent::copyTemplate($coptPartnerId, $entry);
+	}
+	
 	/* (non-PHPdoc)
 	 * @see entry::getCreateThumb()
 	 */
