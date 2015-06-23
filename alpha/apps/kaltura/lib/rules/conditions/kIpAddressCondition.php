@@ -14,12 +14,54 @@ class kIpAddressCondition extends kMatchCondition
 		parent::__construct($not);
 	}
 	
+	/**
+	 * @var bool
+	 */
+	protected $acceptInternalIps;
+	
+	/**
+	 * @var string
+	 */
+	protected $httpHeader;
+	
+	/**
+	 * @param bool $acceptInternalIps
+	 */
+	public function setAcceptInternalIps($acceptInternalIps)
+	{
+	    $this->acceptInternalIps = $acceptInternalIps;
+	}
+	
+	/**
+	 * @return bool
+	 */
+	public function getAcceptInternalIps()
+	{
+	    return $this->acceptInternalIps;
+	}
+	
+	/**
+	 * @param string $httpHeader
+	 */
+	public function setHttpHeader($httpHeader)
+	{
+	    $this->httpHeader = $httpHeader;
+	}
+	
+	/**
+	 * @return string
+	 */
+	public function getHttpHeader()
+	{
+	    return $this->httpHeader;
+	}
+	
 	/* (non-PHPdoc)
 	 * @see kCondition::getFieldValue()
 	 */
 	public function getFieldValue(kScope $scope)
 	{
-		kApiCache::addExtraField(kApiCache::ECF_IP, kApiCache::COND_IP_RANGE, $this->getStringValues($scope));
+		kApiCache::addExtraField(kApiCache::ECF_IP, kApiCache::COND_IP_RANGE, $this->getStringValues($scope), array("httpHeader" => $this->getHttpHeader()));
 		return $scope->getIp();	
 	}
 

@@ -235,11 +235,11 @@ class kApiCacheBase
 		return self::$_hasExtraFields;
 	}
 
-	static public function addExtraField($extraField, $condition = self::COND_NONE, $refValue = null)
+	static public function addExtraField($extraField, $condition = self::COND_NONE, $refValue = null, $extraFieldData = null)
 	{
 		foreach (self::$_activeInstances as $curInstance)
 		{
-			$curInstance->addExtraFieldInternal($extraField, $condition, $refValue);
+			$curInstance->addExtraFieldInternal($extraField, $condition, $refValue, $extraFieldData);
 		}
 
 		// the following code is required since there are no active cache instances in thumbnail action
@@ -254,20 +254,20 @@ class kApiCacheBase
 		return isset($_SERVER["HTTP_REFERER"]) ? $_SERVER["HTTP_REFERER"] : '';
 	}
 
-	protected function addExtraFieldInternal($extraField, $condition, $refValue)
+	protected function addExtraFieldInternal($extraField, $condition, $refValue, $extraFieldData)
 	{
-		$extraFieldParams = array($extraField, $condition, $refValue);
+		$extraFieldParams = array($extraField, $condition, $refValue, $extraFieldData);
 		if (in_array($extraFieldParams, $this->_extraFields))
 			return;			// already added
 		$this->_extraFields[] = $extraFieldParams;
 		if ($extraField != self::ECF_REFERRER || self::$_usesHttpReferrer)
 			self::$_hasExtraFields = true;
 
-		$this->addExtraFieldsToCacheParams($extraField, $condition, $refValue);
+		$this->addExtraFieldsToCacheParams($extraField, $condition, $refValue, $extraFieldData);
 	}
 	
 	// overridable
-	protected function addExtraFieldsToCacheParams($extraField, $condition, $refValue)
+	protected function addExtraFieldsToCacheParams($extraField, $condition, $refValue, $extraFieldData)
 	{
 	}
 

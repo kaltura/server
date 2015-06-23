@@ -268,7 +268,7 @@ class kApiCache extends kApiCacheBase
 		return self::$_coordinates;
 	}
 
-	protected function getFieldValues($extraField)
+	protected function getFieldValues($extraField, $extraFieldData = null)
 	{
 		switch ($extraField)
 		{
@@ -293,6 +293,7 @@ class kApiCache extends kApiCacheBase
 			return array(self::getCoordinates());
 
 			case self::ECF_IP:
+			//TODO: check $extraFieldData before fetching remote address
 			return array(infraRequestUtils::getRemoteAddress());
 		}
 
@@ -369,9 +370,9 @@ class kApiCache extends kApiCacheBase
 		return '';
 	}
 
-	protected function addExtraFieldsToCacheParams($extraField, $condition, $refValue)
+	protected function addExtraFieldsToCacheParams($extraField, $condition, $refValue, $extraFieldData)
 	{
-		foreach ($this->getFieldValues($extraField) as $valueIndex => $fieldValue)
+		foreach ($this->getFieldValues($extraField, $extraFieldData) as $valueIndex => $fieldValue)
 		{
 			if ($extraField == self::ECF_REFERRER)
 				$strippedFieldValue = infraRequestUtils::parseUrlHost($fieldValue);
