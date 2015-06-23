@@ -248,8 +248,11 @@ class infraRequestUtils
 		return self::$hostname;
 	}
 
-	public static function getIpFromHttpHeader($httpHeader, $acceptInternalIps)
+	public static function getIpFromHttpHeader($httpHeader, $acceptInternalIps, $phpizeHeader = false)
 	{
+		if ($phpizeHeader)
+			$httpHeader = "HTTP_".strtoupper(str_replace("-", "_", $httpHeader));
+		
 		if (!isset($_SERVER[$httpHeader]))
 				return null;
 		

@@ -299,7 +299,7 @@ class kApiCache extends kApiCacheBase
 
 			case self::ECF_IP:
 			if (is_array($extraField))
-				return array(infraRequestUtils::getIpFromHttpHeader($extraField["httpHeader"], $extraField["acceptInternalIps"]));
+				return array(infraRequestUtils::getIpFromHttpHeader($extraField["httpHeader"], $extraField["acceptInternalIps"], true));
 
 			return array(infraRequestUtils::getRemoteAddress());
 		}
