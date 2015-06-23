@@ -144,15 +144,7 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 	 * @param String $content
 	 */
 	protected function isDvrContent($content) {
-		$lines = explode("\n", trim($content));
-		foreach ( $lines as $line )
-		{
-			$line = trim($line);
-			if($line === self::M3U8_PLAYLIST_END_LIST_IDENTIFIER) {
-				return true;
-			}
-		}
-		return false;
+		return in_array(self::M3U8_PLAYLIST_END_LIST_IDENTIFIER, array_map('trim', explode("\n", $content)));
 	}
 	
 	public function finalizeUrls(&$baseUrl, &$flavorsUrls)
