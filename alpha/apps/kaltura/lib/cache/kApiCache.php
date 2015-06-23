@@ -267,10 +267,15 @@ class kApiCache extends kApiCacheBase
 		}
 		return self::$_coordinates;
 	}
-
-	protected function getFieldValues($extraField, $extraFieldData = null)
+	
+	static protected function getExtraFieldType($extraField)
 	{
-		switch ($extraField)
+		return is_array($extraField) ? $extraField["type"] : $extraField;
+	}
+
+	protected function getFieldValues($extraField)
+	{
+		switch (self::getExtraFieldType($extraField))
 		{
 		case self::ECF_REFERRER:
 			$values = array();
@@ -293,6 +298,10 @@ class kApiCache extends kApiCacheBase
 			return array(self::getCoordinates());
 
 			case self::ECF_IP:
+			if (is_array($extraField))
+			{
+				return array(infraRequestUtils::getRemoteAddress($extraField["httpHeader"], $extraField["acceptInternalIps"]));
+			}
 			//TODO: check $extraFieldData before fetching remote address
 			return array(infraRequestUtils::getRemoteAddress());
 		}
@@ -370,16 +379,19 @@ class kApiCache extends kApiCacheBase
 		return '';
 	}
 
-	protected function addExtraFieldsToCacheParams($extraField, $condition, $refValue, $extraFieldData)
+	protected function addExtraFieldsToCacheParams($extraField, $condition, $refValue)
 	{
-		foreach ($this->getFieldValues($extraField, $extraFieldData) as $valueIndex => $fieldValue)
+		foreach ($this->getFieldValues($extraField) as $valueIndex => $fieldValue)
 		{
-			if ($extraField == self::ECF_REFERRER)
+			$extraFieldType = self::getExtraFieldType($extraField);
+			$extraFieldCacheKey = is_array($extraField) ? json_encode($extraField) : $extraField;
+			
+			if ($extraFieldType == self::ECF_REFERRER)
 				$strippedFieldValue = infraRequestUtils::parseUrlHost($fieldValue);
 			else
 				$strippedFieldValue = $fieldValue;
 			$conditionResult = $this->applyCondition($fieldValue, $condition, $refValue, $strippedFieldValue);
-			$key = "___cache___{$extraField}_{$valueIndex}" . $this->getConditionKey($condition, $refValue);
+			$key = "___cache___{$extraFieldCacheKey}_{$valueIndex}" . $this->getConditionKey($condition, $refValue);
 			$this->_params[$key] = $conditionResult;
 		}
 

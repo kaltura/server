@@ -13,7 +13,7 @@ class infraRequestUtils
 	const PROTOCOL_HTTPS = 'https';
 	
 	protected static $isInGetRemoteAddress = false;
-	protected static $remoteAddress = null;
+	protected static $remoteAddress = array();
 	protected static $requestParams = null;
 	protected static $hostname = null;
 
@@ -247,27 +247,29 @@ class infraRequestUtils
 
 		return self::$hostname;
 	}
-	
-	public static function getRemoteAddress()
+
+	public static function getRemoteAddress($httpHeader = null, $acceptInternalIps = null)
 	{
-		if(self::$remoteAddress)
-			return self::$remoteAddress;
+		$key = "$httpHeader:$acceptInternalIps";
+		if(array_key_exists($key, self::$remoteAddress))
+			return self::$remoteAddress[$key];
 			
 		// Prevent call cycles in case KalturaLog will be used in internalGetRemoteAddress
 		if (self::$isInGetRemoteAddress)
 			return null;
 		
 		self::$isInGetRemoteAddress = true;
-		self::$remoteAddress = self::internalGetRemoteAddress();
+		self::$remoteAddress[key] = self::internalGetRemoteAddress($httpHeader, $acceptInternalIps);
 		self::$isInGetRemoteAddress = false;
-		return self::$remoteAddress;
+		return self::$remoteAddress[$key];
 	}
 	
-	protected static function internalGetRemoteAddress()
+	protected static function internalGetRemoteAddress($httpHeader, $acceptInternalIps)
 	{
-		if(self::$remoteAddress)
-			return self::$remoteAddress;
-			
+		$key = "$httpHeader:$acceptInternalIps";
+		if(array_key_exists($key, self::$remoteAddress))
+			return self::$remoteAddress[$key];
+					
 		// enable access control debug
 		if(isset($_POST['debug_ip']) && kConf::hasParam('debug_ip_enabled') && kConf::get('debug_ip_enabled'))
 		{
@@ -302,29 +304,42 @@ class infraRequestUtils
 		
 		// support getting the original ip address of the client when using the cdn for API calls (cdnapi)
 		// validate either HTTP_HOST or HTTP_X_FORWARDED_HOST in case of a proxy
-		if (!$remote_addr &&
-			isset($_SERVER['HTTP_X_FORWARDED_FOR']) &&
-			(isset($_SERVER['HTTP_HOST']) && 
-			in_array($_SERVER['HTTP_HOST'], kConf::get('remote_addr_whitelisted_hosts') ) ||
-			isset($_SERVER['HTTP_X_FORWARDED_HOST']) &&
-			in_array($_SERVER['HTTP_X_FORWARDED_HOST'], kConf::get('remote_addr_whitelisted_hosts') ) ) )
+		if (!$remote_addr)
 		{
-			// pick the first non private ip
-			$headerIPs = trim($_SERVER['HTTP_X_FORWARDED_FOR'], ',');
-			$headerIPs = explode(',', $headerIPs);
-			foreach ($headerIPs as $ip)
+			$headerIPs  = null;
+			
+			if ($httpHeader) // was a specific header passed as part of an access control ip condition?
 			{
-				preg_match('/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/', trim($ip), $matches); // ignore any string after the ip address
-				if (!isset($matches[0]))
-					continue;
-					
-	 			$tempAddr = trim($matches[0]);
-	 			if (!kConf::get('accept_private_ips') && self::isIpPrivate($tempAddr))	// verify that ip is not from a private range
-	 				continue;
-	 			
-	 			$remote_addr = $tempAddr;
-	 			break;
-		 	}
+				if (isset($_SERVER[$httpHeader]))
+				{		
+					$headerIPs = $_SERVER[$httpHeader];
+				}
+			}
+			elseif (isset($_SERVER['HTTP_X_FORWARDED_FOR']) &&
+				(isset($_SERVER['HTTP_HOST']) && 
+					in_array($_SERVER['HTTP_HOST'], kConf::get('remote_addr_whitelisted_hosts') ) ||
+					isset($_SERVER['HTTP_X_FORWARDED_HOST']) &&
+					in_array($_SERVER['HTTP_X_FORWARDED_HOST'], kConf::get('remote_addr_whitelisted_hosts') ) ) )
+				$headerIPs = $_SERVER['HTTP_X_FORWARDED_FOR'];
+			
+			if ($headerIPs)
+			{
+				// pick the first non private ip
+				$headerIPs = explode(',', trim($headerIPs, ','));
+				foreach ($headerIPs as $ip)
+				{
+					preg_match('/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/', trim($ip), $matches); // ignore any string after the ip address
+					if (!isset($matches[0]))
+						continue;
+						
+		 			$tempAddr = trim($matches[0]);
+		 			if (!$acceptInternalIps && !kConf::get('accept_private_ips') && self::isIpPrivate($tempAddr))	// verify that ip is not from a private range
+		 				continue;
+		 			
+		 			$remote_addr = $tempAddr;
+		 			break;
+			 	}
+			}
 		}
 
 		// support passing ip when proxying through apache. check the proxying server is indeed an internal server
