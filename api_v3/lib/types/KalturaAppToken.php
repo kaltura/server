@@ -129,7 +129,7 @@ class KalturaAppToken extends KalturaObject implements IFilterable
 		
 		/* @var $dbAppToken AppToken */
 		$dbAppToken->setPartnerId($partnerId);
-		$dbAppToken->setToken(bin2hex(openssl_random_pseudo_bytes(128)));
+		$dbAppToken->setToken(bin2hex(openssl_random_pseudo_bytes(16)));
 		$dbAppToken->setStatus(AppTokenStatus::ACTIVE);
 		
 		return $dbAppToken;
