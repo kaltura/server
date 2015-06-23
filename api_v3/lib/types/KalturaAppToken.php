@@ -125,19 +125,11 @@ class KalturaAppToken extends KalturaObject implements IFilterable
 			$this->sessionDuration = $partner->getKsMaxExpiryInSeconds();
 		}
 		
-		$secret = $partner->getSecret();
-		$token = '';
-		$result = kSessionUtils::startKSession($partnerId, $secret, 'app', $token, 1);
-		
-		if($result < 0)
-			throw new KalturaAPIException(APIErrors::START_SESSION_ERROR, $partnerId);
-			
-		
 		$dbAppToken = parent::toInsertableObject($dbAppToken, $skip);
 		
 		/* @var $dbAppToken AppToken */
 		$dbAppToken->setPartnerId($partnerId);
-		$dbAppToken->setToken($token);
+		$dbAppToken->setToken(bin2hex(openssl_random_pseudo_bytes(128)));
 		$dbAppToken->setStatus(AppTokenStatus::ACTIVE);
 		
 		return $dbAppToken;
