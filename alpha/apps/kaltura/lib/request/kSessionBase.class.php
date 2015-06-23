@@ -160,7 +160,7 @@ class kSessionBase
 		$privileges = array();
 		foreach($array as $privilegeName => $privilegeValue)
 		{
-			if(!count($privilegeValue))
+			if(count($privilegeValue))
 			{
 				$privilegeValue = implode(self::PRIVILEGES_DELIMITER, $privilegeValue);
 				$privileges[] = "$privilegeName:$privilegeValue";
