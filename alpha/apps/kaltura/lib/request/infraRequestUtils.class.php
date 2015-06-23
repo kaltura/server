@@ -259,7 +259,7 @@ class infraRequestUtils
 			return null;
 		
 		self::$isInGetRemoteAddress = true;
-		self::$remoteAddress[key] = self::internalGetRemoteAddress($httpHeader, $acceptInternalIps);
+		self::$remoteAddress[$key] = self::internalGetRemoteAddress($httpHeader, $acceptInternalIps);
 		self::$isInGetRemoteAddress = false;
 		return self::$remoteAddress[$key];
 	}
