@@ -43,6 +43,7 @@ class kSessionBase
 	const PRIVILEGE_PREVIEW = "preview";
 	const PRIVILEGE_SESSION_ID = "sessionid";
 	const PRIVILEGE_BATCH_JOB_TYPE = "jobtype";
+	const PRIVILEGE_APP_TOKEN = "apptoken";
 	const PRIVILEGES_DELIMITER = "/";
 
 	const SECRETS_CACHE_PREFIX = 'partner_secrets_ksver_';
