@@ -88,6 +88,7 @@ class AppTokenService extends KalturaBaseService
 		if(!$dbAppToken)
 			throw new KalturaAPIException(KalturaErrors::APP_TOKEN_ID_NOT_FOUND, $id);
 		
+		invalidSessionPeer::invalidateByKey($id, invalidSession::INVALID_SESSION_TYPE_SESSION_ID);
 		$dbAppToken->setStatus(AppTokenStatus::DELETED);
 		$dbAppToken->save();
 	}
@@ -187,7 +188,8 @@ class AppTokenService extends KalturaBaseService
 		$secret = $type == SessionType::ADMIN ? $partner->getAdminSecret() : $partner->getSecret();
 		
 		$privilegesArray = array(
-			ks::PRIVILEGE_APP_TOKEN => array()
+			ks::PRIVILEGE_SESSION_ID => array($id),
+			ks::PRIVILEGE_APP_TOKEN => array($id)
 		);
 		if($privileges)
 		{
