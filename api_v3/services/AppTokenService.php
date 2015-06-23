@@ -168,8 +168,10 @@ class AppTokenService extends KalturaBaseService
 			if($tokenExpiry < 0)
 				throw new KalturaAPIException(KalturaErrors::APP_TOKEN_EXPIRED, $id);
 		}
-		if(is_null($expiry))
+		if(!$expiry)
+		{
 			$expiry = $tokenExpiry;
+		}
 		$expiry = min($expiry, $tokenExpiry);
 		
 		if(!is_null($dbAppToken->getSessionType()))
