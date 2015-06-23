@@ -13,7 +13,7 @@ class infraRequestUtils
 	const PROTOCOL_HTTPS = 'https';
 	
 	protected static $isInGetRemoteAddress = false;
-	protected static $remoteAddress = array();
+	protected static $remoteAddress = null;
 	protected static $requestParams = null;
 	protected static $hostname = null;
 
@@ -248,28 +248,52 @@ class infraRequestUtils
 		return self::$hostname;
 	}
 
-	public static function getRemoteAddress($httpHeader = null, $acceptInternalIps = null)
+	public static function getIpFromHttpHeader($httpHeader, $acceptInternalIps)
 	{
-		$key = "$httpHeader:$acceptInternalIps";
-		if(array_key_exists($key, self::$remoteAddress))
-			return self::$remoteAddress[$key];
+		if (!isset($_SERVER[$httpHeader]))
+				return null;
+		
+		$remote_addr = null;
+				
+		// pick the first non private ip
+		$headerIPs = explode(',', trim($_SERVER[$httpHeader], ','));
+		foreach ($headerIPs as $ip)
+		{
+			preg_match('/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/', trim($ip), $matches); // ignore any string after the ip address
+			if (!isset($matches[0]))
+				continue;
+	
+			$tempAddr = trim($matches[0]);
+			if (!$acceptInternalIps && self::isIpPrivate($tempAddr))	// verify that ip is not from a private range
+				continue;
+	
+			$remote_addr = $tempAddr;
+			break;
+		}
+		 
+		return $remote_addr;
+	}
+	
+	public static function getRemoteAddress()
+	{
+		if(self::$remoteAddress)
+			return self::$remoteAddress;
 			
 		// Prevent call cycles in case KalturaLog will be used in internalGetRemoteAddress
 		if (self::$isInGetRemoteAddress)
 			return null;
 		
 		self::$isInGetRemoteAddress = true;
-		self::$remoteAddress[$key] = self::internalGetRemoteAddress($httpHeader, $acceptInternalIps);
+		self::$remoteAddress = self::internalGetRemoteAddress();
 		self::$isInGetRemoteAddress = false;
-		return self::$remoteAddress[$key];
+		return self::$remoteAddress;
 	}
 	
-	protected static function internalGetRemoteAddress($httpHeader, $acceptInternalIps)
+	protected static function internalGetRemoteAddress()
 	{
-		$key = "$httpHeader:$acceptInternalIps";
-		if(array_key_exists($key, self::$remoteAddress))
-			return self::$remoteAddress[$key];
-					
+		if(self::$remoteAddress)
+			return self::$remoteAddress;
+			
 		// enable access control debug
 		if(isset($_POST['debug_ip']) && kConf::hasParam('debug_ip_enabled') && kConf::get('debug_ip_enabled'))
 		{
@@ -304,42 +328,14 @@ class infraRequestUtils
 		
 		// support getting the original ip address of the client when using the cdn for API calls (cdnapi)
 		// validate either HTTP_HOST or HTTP_X_FORWARDED_HOST in case of a proxy
-		if (!$remote_addr)
+		if (!$remote_addr &&
+			isset($_SERVER['HTTP_X_FORWARDED_FOR']) &&
+			(isset($_SERVER['HTTP_HOST']) && 
+			in_array($_SERVER['HTTP_HOST'], kConf::get('remote_addr_whitelisted_hosts') ) ||
+			isset($_SERVER['HTTP_X_FORWARDED_HOST']) &&
+			in_array($_SERVER['HTTP_X_FORWARDED_HOST'], kConf::get('remote_addr_whitelisted_hosts') ) ) )
 		{
-			$headerIPs  = null;
-			
-			if ($httpHeader) // was a specific header passed as part of an access control ip condition?
-			{
-				if (isset($_SERVER[$httpHeader]))
-				{		
-					$headerIPs = $_SERVER[$httpHeader];
-				}
-			}
-			elseif (isset($_SERVER['HTTP_X_FORWARDED_FOR']) &&
-				(isset($_SERVER['HTTP_HOST']) && 
-					in_array($_SERVER['HTTP_HOST'], kConf::get('remote_addr_whitelisted_hosts') ) ||
-					isset($_SERVER['HTTP_X_FORWARDED_HOST']) &&
-					in_array($_SERVER['HTTP_X_FORWARDED_HOST'], kConf::get('remote_addr_whitelisted_hosts') ) ) )
-				$headerIPs = $_SERVER['HTTP_X_FORWARDED_FOR'];
-			
-			if ($headerIPs)
-			{
-				// pick the first non private ip
-				$headerIPs = explode(',', trim($headerIPs, ','));
-				foreach ($headerIPs as $ip)
-				{
-					preg_match('/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/', trim($ip), $matches); // ignore any string after the ip address
-					if (!isset($matches[0]))
-						continue;
-						
-		 			$tempAddr = trim($matches[0]);
-		 			if (!$acceptInternalIps && !kConf::get('accept_private_ips') && self::isIpPrivate($tempAddr))	// verify that ip is not from a private range
-		 				continue;
-		 			
-		 			$remote_addr = $tempAddr;
-		 			break;
-			 	}
-			}
+			$remote_addr = self::getIpFromHttpHeader('HTTP_X_FORWARDED_FOR', kConf::get('accept_private_ips'));
 		}
 
 		// support passing ip when proxying through apache. check the proxying server is indeed an internal server

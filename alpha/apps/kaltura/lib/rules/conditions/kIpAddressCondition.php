@@ -61,12 +61,18 @@ class kIpAddressCondition extends kMatchCondition
 	 */
 	public function getFieldValue(kScope $scope)
 	{
-		kApiCache::addExtraField(array("type" => kApiCache::ECF_IP,
-				"acceptInternalIps" => $this->getAcceptInternalIps(),
-				"httpHeader" => $this->getHttpHeader()),
-				kApiCache::COND_IP_RANGE, $this->getStringValues($scope));
-	
-		return infraRequestUtils::getRemoteAddress($this->getHttpHeader(), $this->getAcceptInternalIps());
+		if ($this->getHttpHeader() || $this->getAcceptInternalIps())
+		{
+			kApiCache::addExtraField(array("type" => kApiCache::ECF_IP,
+					"httpHeader" => $this->getHttpHeader(),
+					"acceptInternalIps" => $this->getAcceptInternalIps()),
+					kApiCache::COND_IP_RANGE, $this->getStringValues($scope));
+		
+			return infraRequestUtils::getIpFromHttpHeader($this->getHttpHeader(), $this->getAcceptInternalIps());
+		}
+		
+		kApiCache::addExtraField(kApiCache::ECF_IP, kApiCache::COND_IP_RANGE, $this->getStringValues($scope));
+		return $scope->getIp();
 	}
 
 	/* (non-PHPdoc)
