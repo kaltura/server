@@ -234,7 +234,7 @@ class CrossKalturaDistributionEngine extends DistributionEngine implements
 	    $flavorAssets = array();
 	    if (!empty($data->entryDistribution->flavorAssetIds))
 	    {
-	    	$flavorAssetFilter = new KalturaFlavorAssetFilter();
+            $flavorAssetFilter = new KalturaFlavorAssetFilter();
 	    	$flavorAssetFilter->idIn = $data->entryDistribution->flavorAssetIds;
 	    	$flavorAssetFilter->entryIdEqual = $entryId;
 	    	try {
@@ -268,13 +268,13 @@ class CrossKalturaDistributionEngine extends DistributionEngine implements
 	    $thumbAssets = array();
 	    if (!empty($data->entryDistribution->thumbAssetIds))
 	    {
-    	    $thumbAssetFilter = new KalturaThumbAssetFilter();
-    	    $thumbAssetFilter->idIn = $data->entryDistribution->thumbAssetIds;
-    	    $thumbAssetFilter->entryIdEqual = $entryId;
-    	    try {
+            $thumbAssetFilter = new KalturaThumbAssetFilter();
+            $thumbAssetFilter->idIn = $data->entryDistribution->thumbAssetIds;
+            $thumbAssetFilter->entryIdEqual = $entryId;
+            try {
                 KalturaLog::debug('Getting entry\'s thumbnail assets');
                 $thumbAssetsList = $client->thumbAsset->listAction($thumbAssetFilter);
-    	        foreach ($thumbAssetsList->objects as $asset)
+                foreach ($thumbAssetsList->objects as $asset)
                 {
                     $thumbAssets[$asset->id] = $asset;
                 }
