@@ -228,27 +228,32 @@ class CrossKalturaDistributionEngine extends DistributionEngine implements
 	    
 	    // get entry
 	    KalturaLog::debug('Getting entry id ['.$entryId.']');
-	    $entry = $client->baseEntry->get($entryId);
+		try
+		{
+			$entry = $this->getEntry($this->distributionProfile->partnerId, $entryId);
+		}
+		catch(Exception $e)
+		{
+			KalturaLog::err("Cannot get entry id - $entryId - error message - " . $e->getMessage());
+		}
 
 	    // get entry's flavor assets chosen for distribution
 	    $flavorAssets = array();
 	    if (!empty($data->entryDistribution->flavorAssetIds))
 	    {
-            $flavorAssetFilter = new KalturaFlavorAssetFilter();
-            $flavorAssetFilter->idIn = $data->entryDistribution->flavorAssetIds;
-            $flavorAssetFilter->entryIdEqual = $entryId;
-            try {
-                KalturaLog::debug('Getting entry\'s flavor assets');
-                $flavorAssetsList = $client->flavorAsset->listAction($flavorAssetFilter);
-                foreach ($flavorAssetsList->objects as $asset)
-                {
-                    $flavorAssets[$asset->id] = $asset;
-                }
-            }
-            catch (Exception $e) {
-            KalturaLog::err('Cannot get list of flavor assets - '.$e->getMessage());
-            throw $e;
-            }
+			try {
+				KalturaLog::debug('Getting entry\'s flavor assets');
+				
+				$flavorAssetsList = $this->getFlavorAssets($this->distributionProfile->partnerId, $data->entryDistribution->flavorAssetIds, $entryId);
+				foreach ($flavorAssetsList as $asset)
+				{
+					$flavorAssets[$asset->id] = $asset;
+				}
+			}
+			catch (Exception $e) {
+				KalturaLog::err('Cannot get list of flavor assets - '.$e->getMessage());
+				throw $e;
+			}
 	    }
 	    else
 	    {
@@ -268,13 +273,13 @@ class CrossKalturaDistributionEngine extends DistributionEngine implements
 	    $thumbAssets = array();
 	    if (!empty($data->entryDistribution->thumbAssetIds))
 	    {
-            $thumbAssetFilter = new KalturaThumbAssetFilter();
-            $thumbAssetFilter->idIn = $data->entryDistribution->thumbAssetIds;
-            $thumbAssetFilter->entryIdEqual = $entryId;
-            try {
+    	    $thumbAssetFilter = new KalturaThumbAssetFilter();
+    	    $thumbAssetFilter->idIn = $data->entryDistribution->thumbAssetIds;
+    	    $thumbAssetFilter->entryIdEqual = $entryId;
+    	    try {
                 KalturaLog::debug('Getting entry\'s thumbnail assets');
                 $thumbAssetsList = $client->thumbAsset->listAction($thumbAssetFilter);
-                foreach ($thumbAssetsList->objects as $asset)
+    	        foreach ($thumbAssetsList->objects as $asset)
                 {
                     $thumbAssets[$asset->id] = $asset;
                 }
