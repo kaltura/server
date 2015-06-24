@@ -247,6 +247,35 @@ class infraRequestUtils
 
 		return self::$hostname;
 	}
+
+	public static function getIpFromHttpHeader($httpHeader, $acceptInternalIps, $phpizeHeader = false)
+	{
+		if ($phpizeHeader)
+			$httpHeader = "HTTP_".strtoupper(str_replace("-", "_", $httpHeader));
+		
+		if (!isset($_SERVER[$httpHeader]))
+				return null;
+		
+		$remote_addr = null;
+				
+		// pick the first non private ip
+		$headerIPs = explode(',', trim($_SERVER[$httpHeader], ','));
+		foreach ($headerIPs as $ip)
+		{
+			preg_match('/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/', trim($ip), $matches); // ignore any string after the ip address
+			if (!isset($matches[0]))
+				continue;
+	
+			$tempAddr = trim($matches[0]);
+			if (!$acceptInternalIps && self::isIpPrivate($tempAddr))	// verify that ip is not from a private range
+				continue;
+	
+			$remote_addr = $tempAddr;
+			break;
+		}
+		 
+		return $remote_addr;
+	}
 	
 	public static function getRemoteAddress()
 	{
@@ -309,22 +338,7 @@ class infraRequestUtils
 			isset($_SERVER['HTTP_X_FORWARDED_HOST']) &&
 			in_array($_SERVER['HTTP_X_FORWARDED_HOST'], kConf::get('remote_addr_whitelisted_hosts') ) ) )
 		{
-			// pick the first non private ip
-			$headerIPs = trim($_SERVER['HTTP_X_FORWARDED_FOR'], ',');
-			$headerIPs = explode(',', $headerIPs);
-			foreach ($headerIPs as $ip)
-			{
-				preg_match('/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/', trim($ip), $matches); // ignore any string after the ip address
-				if (!isset($matches[0]))
-					continue;
-					
-	 			$tempAddr = trim($matches[0]);
-	 			if (!kConf::get('accept_private_ips') && self::isIpPrivate($tempAddr))	// verify that ip is not from a private range
-	 				continue;
-	 			
-	 			$remote_addr = $tempAddr;
-	 			break;
-		 	}
+			$remote_addr = self::getIpFromHttpHeader('HTTP_X_FORWARDED_FOR', kConf::get('accept_private_ips'));
 		}
 
 		// support passing ip when proxying through apache. check the proxying server is indeed an internal server
