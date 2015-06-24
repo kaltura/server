@@ -7,11 +7,11 @@ interface IIntegrationProviderPlugin
 	/**
 	 * @return KalturaVersion
 	 */
-	protected static function getRequiredIntegrationPluginVersion();
+	public static function getRequiredIntegrationPluginVersion();
 	
 	/**
 	 * Return class name that expand IntegrationProviderType enum
 	 * @return string
 	 */
-	protected static function getIntegrationProviderClassName();
+	public static function getIntegrationProviderClassName();
 }
