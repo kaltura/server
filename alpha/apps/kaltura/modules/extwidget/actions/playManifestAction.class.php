@@ -747,7 +747,16 @@ class playManifestAction extends kalturaAction
 	private function serveHDNetwork()
 	{
 		kApiCache::setConditionalCacheExpiry(600);		// the result contains a KS so we shouldn't cache it for a long time
-		$mediaUrl = requestUtils::getHost().str_replace("f4m", "smil", str_replace("hdnetwork", "hdnetworksmil", $_SERVER["REQUEST_URI"])); 
+
+        	if ($this->deliveryAttributes->getMediaProtocol() == 'https' && kConf::hasParam('cdn_api_host_https'))
+        	{
+            		$mediaUrl = "https://" . kConf::get('cdn_api_host_https');
+        	}
+        	else
+        	{
+            		$mediaUrl = "http://" . kConf::get('cdn_api_host');
+        	}
+        	$mediaUrl .= str_replace("f4m", "smil", str_replace("hdnetwork", "hdnetworksmil", $_SERVER["REQUEST_URI"]));
 
 		$renderer = new kF4MManifestRenderer(array(), $this->entryId);
 		$renderer->mediaUrl = $mediaUrl;
@@ -893,13 +902,10 @@ class playManifestAction extends kalturaAction
 		$this->deliveryAttributes->setFormat($this->getRequestParameter ( "format" ));
 		if(!$this->deliveryAttributes->getFormat())
 			$this->deliveryAttributes->setFormat(PlaybackProtocol::HTTP);
-			
-		if ($this->deliveryAttributes->getFormat() == self::HDNETWORKSMIL) 
-			$this->deliveryAttributes->setMediaProtocol(PlaybackProtocol::HTTP); // Akamai HD doesn't support any other protocol
-		
-		if ($this->deliveryAttributes->getFormat() == PlaybackProtocol::AKAMAI_HDS)
+
+		if ($this->deliveryAttributes->getFormat() == PlaybackProtocol::AKAMAI_HDS || $this->deliveryAttributes->getFormat() == self::HDNETWORKSMIL)  
 			if(strpos($this->deliveryAttributes->getMediaProtocol(), "http") !== 0)
-			$this->deliveryAttributes->setMediaProtocol(PlaybackProtocol::HTTP);
+			    $this->deliveryAttributes->setMediaProtocol(PlaybackProtocol::HTTP);
 			
 		$tags = $this->getRequestParameter ( "tags", null );
 		if (!$tags)
