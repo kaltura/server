@@ -341,7 +341,7 @@ abstract class LiveEntry extends entry
 				if($kMediaServer && $kMediaServer instanceof kLiveMediaServer)
 				{
 					$primaryMediaServer = $kMediaServer->getMediaServer();
-					if(!$primaryMediaServer && $partnerMediaServerConfiguration && $partnerMediaServerConfiguration[$kMediaServer->getHostname()])
+					if(!$primaryMediaServer && $partnerMediaServerConfiguration && isset($partnerMediaServerConfiguration[$kMediaServer->getHostname()]))
 					{
 						$primaryMediaServer = new MediaServer();
 						$primaryMediaServer->setHostname($kMediaServer->getHostname());
@@ -359,7 +359,7 @@ abstract class LiveEntry extends entry
 				if($kMediaServer && $kMediaServer instanceof kLiveMediaServer)
 				{
 					$backupMediaServer = $kMediaServer->getMediaServer();
-					if(!$backupMediaServer && $partnerMediaServerConfiguration && $partnerMediaServerConfiguration[$kMediaServer->getHostname()])
+					if(!$backupMediaServer && $partnerMediaServerConfiguration && isset($partnerMediaServerConfiguration[$kMediaServer->getHostname()]))
 					{
 						$backupMediaServer = new MediaServer();
 						$backupMediaServer->setHostname($kMediaServer->getHostname());
