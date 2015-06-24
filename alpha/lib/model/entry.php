@@ -2989,7 +2989,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 			$templateMediaType = $this->getMediaType() ? $this->getMediaType() : "null";
 			$mediaType = $entry->getMediaType() ? $entry->getMediaType() : "null";
 	
-			if ($templateType != $type || $templateMediaType != $mediaType || $templateExternalSourceType != $externalSourceType)
+			if ($templateType != $type || $templateMediaType != $mediaType)
 			KalturaLog::debug("ENTRY_TEMPLATE_COPY - original entry:template entry. type - ".$type.':'.$templateType.' mediaType - '.$mediaType.':'.$templateMediaType);
 		}
 	
