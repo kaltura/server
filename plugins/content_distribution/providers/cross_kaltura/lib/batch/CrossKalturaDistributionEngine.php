@@ -235,20 +235,20 @@ class CrossKalturaDistributionEngine extends DistributionEngine implements
 	    if (!empty($data->entryDistribution->flavorAssetIds))
 	    {
             $flavorAssetFilter = new KalturaFlavorAssetFilter();
-	    	$flavorAssetFilter->idIn = $data->entryDistribution->flavorAssetIds;
-	    	$flavorAssetFilter->entryIdEqual = $entryId;
-	    	try {
-	    		KalturaLog::debug('Getting entry\'s flavor assets');
-	    		$flavorAssetsList = $client->flavorAsset->listAction($flavorAssetFilter);
-	    		foreach ($flavorAssetsList->objects as $asset)
-	    		{
-	    			$flavorAssets[$asset->id] = $asset;
-				}
-			}
-	    	catch (Exception $e) {
-	    	KalturaLog::err('Cannot get list of flavor assets - '.$e->getMessage());
-	    	throw $e;
- 	    	}
+            $flavorAssetFilter->idIn = $data->entryDistribution->flavorAssetIds;
+            $flavorAssetFilter->entryIdEqual = $entryId;
+            try {
+                KalturaLog::debug('Getting entry\'s flavor assets');
+                $flavorAssetsList = $client->flavorAsset->listAction($flavorAssetFilter);
+                foreach ($flavorAssetsList->objects as $asset)
+                {
+                    $flavorAssets[$asset->id] = $asset;
+                }
+            }
+            catch (Exception $e) {
+            KalturaLog::err('Cannot get list of flavor assets - '.$e->getMessage());
+            throw $e;
+            }
 	    }
 	    else
 	    {
