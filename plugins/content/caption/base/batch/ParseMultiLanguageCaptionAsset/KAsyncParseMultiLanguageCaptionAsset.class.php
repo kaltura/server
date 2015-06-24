@@ -132,7 +132,7 @@ class KAsyncParseMultiLanguageCaptionAsset extends KJobHandlerWorker
 			else
 				$currentCaptionCreated = $this->setCaptionContent($id, $contentResource);				
 
-			$captionsCreated = $captionsCreated | $currentCaptionCreated;
+			$captionsCreated = $captionsCreated || $currentCaptionCreated;
 	
 		}
 
