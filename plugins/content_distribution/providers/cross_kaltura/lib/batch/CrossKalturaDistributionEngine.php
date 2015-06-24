@@ -234,26 +234,26 @@ class CrossKalturaDistributionEngine extends DistributionEngine implements
 	    $flavorAssets = array();
 	    if (!empty($data->entryDistribution->flavorAssetIds))
 	    {
-    	    $flavorAssetFilter = new KalturaFlavorAssetFilter();
-    	    $flavorAssetFilter->idIn = $data->entryDistribution->flavorAssetIds;
-    	    $flavorAssetFilter->entryIdEqual = $entryId;
-    	    try {
-                KalturaLog::debug('Getting entry\'s flavor assets');
-                $flavorAssetsList = $client->flavorAsset->listAction($flavorAssetFilter);
-                foreach ($flavorAssetsList->objects as $asset)
-                {
-                    $flavorAssets[$asset->id] = $asset;
-                }
-            }
-            catch (Exception $e) {
-                KalturaLog::err('Cannot get list of flavor assets - '.$e->getMessage());
-                throw $e;
-            }
-	    }
-	    else
-	    {
-	        KalturaLog::debug('No flavor assets set for distribution!');    
-	    }
+			$flavorAssetFilter = new KalturaFlavorAssetFilter();
+			$flavorAssetFilter->idIn = $data->entryDistribution->flavorAssetIds;
+			$flavorAssetFilter->entryIdEqual = $entryId;
+			try {
+				KalturaLog::debug('Getting entry\'s flavor assets');
+				$flavorAssetsList = $client->flavorAsset->listAction($flavorAssetFilter);
+				foreach ($flavorAssetsList->objects as $asset)
+				{
+					$flavorAssets[$asset->id] = $asset;
+				}
+			}
+			catch (Exception $e) {
+				KalturaLog::err('Cannot get list of flavor assets - '.$e->getMessage());
+				throw $e;
+			}
+		}
+		else
+		{
+			KalturaLog::debug('No flavor assets set for distribution!');    
+		}
 	    
 	    // get flavor assets content
 	    KalturaLog::debug('Getting flavor asset content for ids ['.implode(',', array_keys($flavorAssets)).']');
