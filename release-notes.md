@@ -1,5 +1,22 @@
 # Jupiter-10.14.0 #
 
+## Email Notifications ##
+
+- Issue Type: Email notifications send all addresses in the "To" field
+- Issue ID: SUP-4339 
+
+#### Configuration ####
+ 
+- None.
+
+#### Deployment Scripts ####
+
+/deployment/updates/scripts/2015_06_18_update_mediaspace_email_notification_templates.php
+
+#### Known Issues & Limitations ####
+
+None.
+
 ## On the fly encryption ##
 
 - Issue Type: Configuration for existing feature
