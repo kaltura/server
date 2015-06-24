@@ -4,6 +4,7 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 	
 	const HLS_LIVE_STREAM_CONTENT_TYPE = "hls_live_stream_content_type";
 	const M3U8_MASTER_PLAYLIST_IDENTIFIER = "EXT-X-STREAM-INF";
+	const M3U8_PLAYLIST_END_LIST_IDENTIFIER = "#EXT-X-ENDLIST";
 	const MAX_IS_LIVE_ATTEMPTS = 3;
 
 	public function setDisableExtraAttributes($v)
@@ -118,6 +119,9 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 	 */
 	protected function checkIsLiveMediaPlaylist( $url, $urlContent )
 	{
+		if($this->isDvrContent($urlContent))
+			return false;
+		
 		$lines = $this->getM3U8Urls( $urlContent );
 
 		$lines = array_slice($lines, -self::MAX_IS_LIVE_ATTEMPTS, self::MAX_IS_LIVE_ATTEMPTS, true);
@@ -132,6 +136,15 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 		}
 	
 		return false;
+	}
+	
+	/**
+	 * Check the the manifest content is actually a DVR.
+	 * We identify the DVR content by having the END-LIST identifier within the playlist.
+	 * @param String $content
+	 */
+	protected function isDvrContent($content) {
+		return in_array(self::M3U8_PLAYLIST_END_LIST_IDENTIFIER, array_map('trim', explode("\n", $content)));
 	}
 	
 	public function finalizeUrls(&$baseUrl, &$flavorsUrls)
