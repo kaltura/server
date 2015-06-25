@@ -1,3 +1,28 @@
+# Jupiter-10.15.0 #
+
+## Quiz Reporting ##
+
+- Issue Type: Add reporting API to quiz
+- Issue ID: PLAT-3137
+
+#### Configuration ####
+ 
+- None.
+
+#### Deployment Scripts ####
+
+- run the Following deployemnt scripts:
+        
+		php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2015_06_07_update_quiz_reports_permissions.php
+
+		Install Plugins:
+		php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+
+#### Known Issues & Limitations ####
+
+None.
+
+
 # Jupiter-10.14.0 #
 
 ## Email Notifications ##
