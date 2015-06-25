@@ -64,8 +64,8 @@ class kIpAddressCondition extends kMatchCondition
 		if ($this->getHttpHeader() || $this->getAcceptInternalIps())
 		{
 			kApiCache::addExtraField(array("type" => kApiCache::ECF_IP,
-					"httpHeader" => $this->getHttpHeader(),
-					"acceptInternalIps" => $this->getAcceptInternalIps()),
+					kApiCache::ECFD_IP_HTTP_HEADER => $this->getHttpHeader(),
+					kApiCache::ECFD_IP_ACCEPT_INTERNAL_IPS => $this->getAcceptInternalIps()),
 					kApiCache::COND_IP_RANGE, $this->getStringValues($scope));
 		
 			return infraRequestUtils::getIpFromHttpHeader($this->getHttpHeader(), $this->getAcceptInternalIps(), true);
