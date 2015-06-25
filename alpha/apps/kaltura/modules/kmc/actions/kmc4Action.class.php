@@ -213,7 +213,7 @@ class kmc4Action extends kalturaAction
                 'version'				=> kConf::get("liveanalytics_version"),
                 'player_id'				=> isset($this->content_uiconf_livea) ? $this->content_uiconf_livea->getId() : '',
 					
-				'map_zoom_levels' => kConf::hasParam ("map_zoom_levels") ? kConf::get ("map_zoom_levels") : 12,
+				'map_zoom_levels' => kConf::hasParam ("map_zoom_levels") ? kConf::get ("map_zoom_levels") : '',
 			    'map_urls' => kConf::hasParam ("cdn_static_hosts") ? array_map(function($s) {return "$s/content/static/maps/v1";}, kConf::get ("cdn_static_hosts")) : '',
             ),
 			'disable_analytics'			=> (bool) kConf::get("kmc_disable_analytics"),
