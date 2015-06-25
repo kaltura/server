@@ -17,10 +17,12 @@ abstract class KalturaUserEntryBaseFilter extends KalturaFilter
 		"userIdEqual" => "_eq_user_id",
 		"userIdIn" => "_in_user_id",
 		"userIdNotIn" => "_notin_user_id",
+		"statusEqual" => "_eq_status",
 		"createdAtLessThanOrEqual" => "_lte_created_at",
 		"createdAtGreaterThanOrEqual" => "_gte_created_at",
 		"updatedAtLessThanOrEqual" => "_lte_updated_at",
 		"updatedAtGreaterThanOrEqual" => "_gte_updated_at",
+		"typeEqual" => "_eq_type",
 	);
 
 	static private $order_by_map = array
@@ -87,6 +89,11 @@ abstract class KalturaUserEntryBaseFilter extends KalturaFilter
 	public $userIdNotIn;
 
 	/**
+	 * @var KalturaUserEntryStatus
+	 */
+	public $statusEqual;
+
+	/**
 	 * @var time
 	 */
 	public $createdAtLessThanOrEqual;
@@ -105,4 +112,9 @@ abstract class KalturaUserEntryBaseFilter extends KalturaFilter
 	 * @var time
 	 */
 	public $updatedAtGreaterThanOrEqual;
+
+	/**
+	 * @var KalturaUserEntryType
+	 */
+	public $typeEqual;
 }
