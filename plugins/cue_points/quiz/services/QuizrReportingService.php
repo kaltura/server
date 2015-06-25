@@ -28,7 +28,7 @@ class QuizrReportingService extends KalturaBaseService
 	 * @return float
 	 * @throws KalturaAPIException
 	 */
-	public function getAverageQuizScore($entryId)
+	public function getAverageScore($entryId)
 	{
 		$ans = -1;
 		$dbEntry = entryPeer::retrieveByPK($entryId);
