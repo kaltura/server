@@ -41,7 +41,8 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 	{
 		$map = array(
 			'quiz' => 'QuizService',
-			'quizUserEntry' => 'QuizUserEntryService'
+			'quizUserEntry' => 'QuizUserEntryService',
+			'quizReports' => 'QuizrReportingService'
 		);
 		return $map;
 	}
