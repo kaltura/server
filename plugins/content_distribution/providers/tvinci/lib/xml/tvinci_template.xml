@@ -1,0 +1,41 @@
+<!-- this is an exemplary XML as before the XSLT transformation takes place -->
+<feed>
+    <export>
+        <media co_guid="" entry_id="0_yfclmwf7" action="insert" is_active="true" erase="false">
+            <basic>
+                <name>
+                    <value lang="eng">Sample Kaltura Animated Logo</value>
+                </name>
+                <description>
+                    <value lang="eng">Sample Kaltura Animated Logo kaltura</value>
+                </description>
+                <dates>
+                    <catalog_start>05/05/2015 11:54:55</catalog_start>
+                    <catalog_end>01/01/1970 02:00:00</catalog_end>
+                    <start>05/05/2015 11:54:55</start>
+                    <end>01/01/1970 02:00:00</end>
+                </dates>
+                <pic_ratios/>
+            </basic>
+            <structure>
+                <metas>
+                    <metadata>
+                        <BOOLOTTboolean>true</BOOLOTTboolean>
+                        <STRINGOTTstring>stringy</STRINGOTTstring>
+                        <MediaType>Movie</MediaType>
+                        <GEOBlockRule>Isreal</GEOBlockRule>
+                        <WatchPermissionRule>not allowed</WatchPermissionRule>
+                        <OTTTAGActors>Arik</OTTTAGActors>
+                        <OTTTAGActors>Bentz</OTTTAGActors>
+                        <OTTTAGActors>Kipi</OTTTAGActors>
+                    </metadata>
+                </metas>
+            </structure>
+            <files>
+                <file type="Mobile Devices Trailer" quality="HIGH" handling_type="CLIP" cdn_name="Default CDN" cdn_code="http://centos.kaltura/p/105/sp/10500/playManifest/entryId/0_yfclmwf7/format/applehttp/tags/ipad/protocol/http/f/a.m3u8" co_guid="Mobile Devices Trailer" assetDuration="0"/>
+                <file type="Mobile Devices Main SD" quality="HIGH" handling_type="CLIP" cdn_name="Default CDN" cdn_code="http://centos.kaltura/p/105/sp/10500/playManifest/entryId/0_yfclmwf7/format/applehttp/tags/ipad/protocol/http/f/a.m3u8" co_guid="Mobile Devices Main SD" assetDuration="0"/>
+                <file type="Mobile Devices Main HD" quality="HIGH" handling_type="CLIP" cdn_name="Default CDN" cdn_code="http://centos.kaltura/p/105/sp/10500/playManifest/entryId/0_yfclmwf7/format/applehttp/tags/ipad/protocol/http/f/a.m3u8" co_guid="Mobile Devices Main HD" assetDuration="0"/>
+            </files>
+        </media>
+    </export>
+</feed>

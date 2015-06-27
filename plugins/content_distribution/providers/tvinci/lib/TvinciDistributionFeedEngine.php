@@ -9,19 +9,14 @@ class TvinciDistributionFeedEngine extends DistributionEngine implements
 	IDistributionEngineReport,
 	IDistributionEngineDelete
 {
+
 	/* (non-PHPdoc)
 	 * @see IDistributionEngineSubmit::submit()
 	 */
 	public function submit(KalturaDistributionSubmitJobData $data)
 	{
-		if(!$data->distributionProfile || !($data->distributionProfile instanceof KalturaTvinciDistributionProfile))
-			throw new Exception("Distribution profile must be of type KalturaTvinciDistributionProfile");
-
-		if(!$data->providerData || !($data->providerData instanceof KalturaTvinciDistributionJobProviderData))
-			throw new Exception("Provider data must be of type KalturaTvinciDistributionJobProviderData");
-
+		$this->validateProviderDataAndDistributionProfile($data);
 		$this->handleSubmit($data, $data->distributionProfile, $data->providerData);
-
 		return true;
 	}
 
@@ -30,14 +25,8 @@ class TvinciDistributionFeedEngine extends DistributionEngine implements
 	 */
 	public function update(KalturaDistributionUpdateJobData $data)
 	{
-		if(!$data->distributionProfile || !($data->distributionProfile instanceof KalturaTvinciDistributionProfile))
-			throw new Exception("Distribution profile must be of type KalturaTvinciDistributionProfile");
-
-		if(!$data->providerData || !($data->providerData instanceof KalturaTvinciDistributionJobProviderData))
-			throw new Exception("Provider data must be of type KalturaTvinciDistributionJobProviderData");
-
+		$this->validateProviderDataAndDistributionProfile($data);
 		$this->handleUpdate($data, $data->distributionProfile, $data->providerData);
-
 		return true;
 	}
 
@@ -46,16 +35,18 @@ class TvinciDistributionFeedEngine extends DistributionEngine implements
 	*/
 	public function delete(KalturaDistributionDeleteJobData $data)
 	{
-		if(!$data->distributionProfile || !($data->distributionProfile instanceof KalturaTvinciDistributionProfile))
-			throw new Exception("Distribution profile must be of type KalturaTvinciDistributionProfile");
-
-		if(!$data->providerData || !($data->providerData instanceof KalturaTvinciDistributionJobProviderData))
-			throw new Exception("Provider data must be of type KalturaTvinciDistributionJobProviderData");
-
+		$this->validateProviderDataAndDistributionProfile($data);
 		$this->handleDelete($data, $data->distributionProfile, $data->providerData);
-
 		return true;
 	}
+
+	private function validateProviderDataAndDistributionProfile(KalturaDistributionJobData $data){
+		if (!$data->distributionProfile || !($data->distributionProfile instanceof KalturaTvinciDistributionProfile))
+			throw new Exception("Distribution profile must be of type KalturaTvinciDistributionProfile");
+		if (!$data->providerData || !($data->providerData instanceof KalturaTvinciDistributionJobProviderData))
+			throw new Exception("Provider data must be of type KalturaTvinciDistributionJobProviderData");
+	}
+
 
 	/* (non-PHPdoc)
 	 * @see IDistributionEngineReport::fetchReport()
@@ -69,18 +60,27 @@ class TvinciDistributionFeedEngine extends DistributionEngine implements
 	 * @param KalturaDistributionJobData $data
 	 * @param KalturaTvinciDistributionProfile $distributionProfile
 	 * @param KalturaTvinciDistributionJobProviderData $providerData
+	 * @param $actionType
+	 */
+	private function handleAction(KalturaDistributionJobData $data, KalturaTvinciDistributionProfile $distributionProfile, KalturaTvinciDistributionJobProviderData $providerData, $actionType){
+		$url = $distributionProfile->ingestUrl;
+		KalturaLog::info("Action {$actionType} entry {$data->entryDistribution->entryId}, url: $url\nXML data:\n{$providerData->xml}");
+
+		$result = $this->postXml($url, $providerData->xml);
+		$success = ($result->status == 'OK' || $result->tvmID != '');
+		if (!$success) {
+			throw new Exception("{$actionType} failed - reason {$result->description}");
+		}
+	}
+
+	/**
+	 * @param KalturaDistributionJobData $data
+	 * @param KalturaTvinciDistributionProfile $distributionProfile
+	 * @param KalturaTvinciDistributionJobProviderData $providerData
 	 */
 	protected function handleSubmit(KalturaDistributionJobData $data, KalturaTvinciDistributionProfile $distributionProfile, KalturaTvinciDistributionJobProviderData $providerData)
 	{
-		$url = $distributionProfile->ingestUrl;
-		KalturaLog::info("Submitting entry {$data->entryDistribution->entryId}, url: $url\nXML data:\n{$providerData->xml}");
-
-		$responseXml = $this->postXml($url, $providerData->xml);
-		$success = ($responseXml->status == 'OK' || $responseXml->tvmID != '');
-		if ( ! $success )
-		{
-			throw new Exception("Submit failed");
-		}
+		$this->handleAction($data, $distributionProfile, $providerData, "Submit");
 	}
 
 	/**
@@ -90,15 +90,7 @@ class TvinciDistributionFeedEngine extends DistributionEngine implements
 	 */
 	protected function handleUpdate(KalturaDistributionJobData $data, KalturaTvinciDistributionProfile $distributionProfile, KalturaTvinciDistributionJobProviderData $providerData)
 	{
-		$url = $distributionProfile->ingestUrl;
-		KalturaLog::info("Updating entry {$data->entryDistribution->entryId}, url: $url\nXML data:\n{$providerData->xml}");
-
-		$responseXml = $this->postXml($url, $providerData->xml);
-		$success = ($responseXml->status == 'OK' || $responseXml->tvmID != '');
-		if ( ! $success )
-		{
-			throw new Exception("Update failed");
-		}
+		$this->handleAction($data, $distributionProfile, $providerData, "Update");
 	}
 
 	/**
@@ -108,15 +100,7 @@ class TvinciDistributionFeedEngine extends DistributionEngine implements
 	 */
 	protected function handleDelete(KalturaDistributionJobData $data, KalturaTvinciDistributionProfile $distributionProfile, KalturaTvinciDistributionJobProviderData $providerData)
 	{
-		$url = $distributionProfile->ingestUrl;
-		KalturaLog::info("Deleting entry {$data->entryDistribution->entryId}, url: $url\nXML data:\n{$providerData->xml}");
-
-		$responseXml = $this->postXml($url, $providerData->xml);
-		$success = ($responseXml->status == 'OK' || $responseXml->tvmID != '');
-		if ( ! $success )
-		{
-			throw new Exception("Delete failed");
-		}
+		$this->handleAction($data, $distributionProfile, $providerData, "Delete");
 	}
 
 	/**
@@ -128,20 +112,30 @@ class TvinciDistributionFeedEngine extends DistributionEngine implements
 	protected function postXml($url, $xml)
 	{
 		$response = self::curlPost($url, $xml);
-		KalturaLog::info("Full response: " . print_r($response,true));
+		KalturaLog::info("Post XML url:{$url} , XML:{$xml}, Full response: " . print_r($response,true));
 
-		$responseXml = null;
+		$retrunObject = null;
 		if ( $response['http_code'] == 200 )
 		{
-			$responseXml = simplexml_load_string( $response['content'] );
+			try
+			{
+				/**
+				 * this is an exemplary response from the OTT servers per legal request
+				 * <s:Envelope xmlns:s="http://www.w3.org/2003/05/soap-envelope" xmlns:a="http://www.w3.org/2005/08/addressing"><s:Header><a:Action s:mustUnderstand="1">urn:Iservice/InjestTvinciDataResponse</a:Action></s:Header><s:Body><InjestTvinciDataResponse><InjestTvinciDataResult xmlns:i="http://www.w3.org/2001/XMLSchema-instance"><status>OK</status><description/><assetID>1234Wicked</assetID><tvmID>279473</tvmID></InjestTvinciDataResult></InjestTvinciDataResponse></s:Body></s:Envelope>
+				 */
+				$responseXml = simplexml_load_string($response['content']);
+				$childs = $responseXml->children('http://www.w3.org/2003/05/soap-envelope')->Body;
+				$bodyElement = $childs->xpath('//s:Body');
+				$retrunObject = $bodyElement[0]->InjestTvinciDataResponse->InjestTvinciDataResult;
+			}
+			catch (Exception $e)
+			{
+
+				throw new Exception("Failed parsing response due to {$e->getMessage()}"); // Throw an Exception in order to fail the job
+			}
 		}
 
-		if ( !$responseXml )
-		{
-			throw new Exception("Failed parsing response"); // Throw an Exception in order to fail the job
-		}
-
-		return $responseXml;
+		return $retrunObject;
 	}
 	
 
@@ -158,6 +152,7 @@ class TvinciDistributionFeedEngine extends DistributionEngine implements
 		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
 	
+		curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/soap+xml', 'charset: utf-8'));
 		curl_setopt($ch, CURLOPT_POST, true);
 		curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);
 

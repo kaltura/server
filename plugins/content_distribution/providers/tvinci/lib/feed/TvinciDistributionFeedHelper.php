@@ -31,12 +31,22 @@ class TvinciDistributionFeedHelper
 	/**
 	 * var string
 	 */
-	protected $createdAt;
+	protected $description;
 
 	/**
 	 * var string
 	 */
-	protected $broadcasterName;
+	protected $titleName;
+
+	/**
+	 * var string
+	 */
+	protected $referenceId;
+
+	/**
+	 * var string
+	 */
+	protected $createdAt;
 
 	/**
 	 * var array
@@ -65,6 +75,21 @@ class TvinciDistributionFeedHelper
 	protected $language;
 
 	/**
+	 * var string
+	 */
+	protected $metasXML;
+
+	/**
+	 * var date
+	 */
+	protected $sunrise;
+
+	/**
+	 * var date
+	 */
+	protected $sunset;
+
+	/**
 	 * @var DOMDocument
 	 */
 	protected $_doc;
@@ -73,9 +98,9 @@ class TvinciDistributionFeedHelper
 	{
 		$this->distributionProfile = $distributionProfile;
 		$this->fieldValues = $fieldValues;
-		$this->language = self::getSafeFieldValue( TvinciDistributionField::LANGUAGE, 'eng');
+		$this->language = strlen($distributionProfile->language) === 0 ? 'eng' : $distributionProfile->language;
 
-		$this->schemaId = self::getSafeFieldValue(TvinciDistributionField::METADATA_SCHEMA_ID, self::DEFAULT_SCHEMA_ID);
+		$this->schemaId = $distributionProfile->schemaId;
 		if ( $this->schemaId != 1 && $this->schemaId != 2 )
 		{
 			$this->schemaId = self::DEFAULT_SCHEMA_ID;
@@ -85,11 +110,17 @@ class TvinciDistributionFeedHelper
 	public function setEntryId( $entryId )						{ $this->entryId = $entryId; }
 	public function getEntryId()								{ return $this->entryId; }
 
+	public function setDescription( $description )				{ $this->description = $description; }
+	public function getDescription()							{ return $this->description; }
+
+	public function setTitleName( $name )						{ $this->titleName = $name; }
+	public function getTitleName()								{ return $this->titleName; }
+
+	public function setReferenceId( $referenceId )				{ $this->referenceId = $referenceId; }
+	public function getReferenceId()							{ return $this->referenceId; }
+
 	public function setCreatedAt( $createdAt )					{ $this->createdAt = $createdAt; }
 	public function getCreatedAt()								{ return $this->createdAt; }
-
-	public function setBroadcasterName( $broadcasterName )		{ $this->broadcasterName = $broadcasterName; }
-	public function getBroadcasterName()						{ return $this->broadcasterName; }
 
 	public function setPicRatiosArray( $picRatiosArray )		{ $this->picRatiosArray = $picRatiosArray; }
 	public function getPicRatiosArray()							{ return $this->picRatiosArray; }
@@ -98,22 +129,19 @@ class TvinciDistributionFeedHelper
 	public function getDefaultThumbnailUrl()					{ return $this->defaultThumbUrl; }
 
 	public function schemaId()									{ return $this->schemaId; }
-	
+
+	public function setMetasXML($metadataXml)					{$this->metasXML = $metadataXml; }
+	public function getMetasXML()								{return $this->metasXML;}
+
+	public function setSunrise($sunrise)						{$this->sunrise = $sunrise;}
+	public function getSunrise()								{return $this->sunrise;}
+
+	public function setSunset($sunset)							{$this->sunset = $sunset;}
+	public function getSunset()									{return $this->sunset;}
+
 	public function setVideoAssetUrl( $name, $url )
 	{
 		$this->videoAssetToUrlMap[$name] = $url;
-	}
-
-	public static function getSafeArrayValue($arr, $key, $defaultValue)
-	{
-		$value = array_key_exists($key, $arr) ? $arr[$key] : $defaultValue;
-		return $value;
-	}
-
-	public function getSafeFieldValue($fieldValue, $defaultValue)
-	{
-		$value = array_key_exists($fieldValue, $this->fieldValues) ? $this->fieldValues[$fieldValue] : $defaultValue;
-		return $value;
 	}
 
 	public function buildSubmitFeed()
@@ -137,24 +165,29 @@ class TvinciDistributionFeedHelper
 		$this->_doc = new DOMDocument();
 		$this->_doc->formatOutput = true;
 		$this->_doc->encoding = "UTF-8";
-
 		// Build the feed
 		$feed = $this->_doc->createElement('feed');
-		$feed->setAttribute('broadcasterName', $this->broadcasterName);
-
 		$export = $this->_doc->createElement('export');
 		$feed->appendChild($export);
 
 		$media = $this->_doc->createElement('media');
 		$export->appendChild($media);
 
-		$this->setAttribute($media, "co_guid", $this->entryId);
-		$this->setAttribute($media, "action", $action );
+		$this->setAttribute($media, "co_guid", $this->referenceId);
+		$this->setAttribute($media, "entry_id", $this->entryId);
 
- 		if ( $action != self::ACTION_DELETE ) // No need for the following content in case of a delete scenario
+		if ($action === self::ACTION_DELETE) {
+			$this->setAttribute($media, "action", self::ACTION_DELETE);
+		} else {
+			$this->setAttribute($media, "action", self::ACTION_SUBMIT);
+		}
+
+		if ( $action != self::ACTION_DELETE ) // No need for the following content in case of a delete scenario
 		{
-			$isActive = $this->fieldValues[TvinciDistributionField::ACTIVATE_PUBLISHING];
-			$this->setAttribute($media, "is_active", $isActive);
+			//$isActive = $this->fieldValues[TvinciDistributionField::ACTIVATE_PUBLISHING];
+			// agreed that the is_active and erase will be hard coded for first phase
+			$this->setAttribute($media, "is_active", "true");
+			$this->setAttribute($media, "erase", "false");
 
 			$media->appendChild( $this->createBasicElement() );
 			$media->appendChild( $this->createStructureElement() );
@@ -163,33 +196,45 @@ class TvinciDistributionFeedHelper
 
 		// Wrap as a CDATA section
 		$feedAsXml = $this->_doc->saveXML($feed);
+		// convert the xml using provided XSLT
+		chdir(__DIR__);
+		$xslt = file_get_contents("../xml/tvinci_default.xslt");
+		$feedAsXml = $this->transformXml($feedAsXml, $xslt);
 		$data = $this->_doc->createElement('data');
 		$data->appendChild($this->_doc->createCDATASection($feedAsXml));
 
 		// Create the document's root node
-		$feederRootNode = $this->_doc->createElement('Feeder');
-		$feederRootNode->appendChild($this->_doc->createElement('userName', $this->distributionProfile->username));
-		$feederRootNode->appendChild($this->_doc->createElement('passWord', $this->distributionProfile->password));
+		$envelopeRootNode = $this->_doc->createElement('s:Envelope');
+		$this->setAttribute($envelopeRootNode,"xmlns:s","http://www.w3.org/2003/05/soap-envelope");
+		$this->setAttribute($envelopeRootNode,"xmlns:a","http://www.w3.org/2005/08/addressing");
+
+		$envelopeHeaderNode = $this->_doc->createElement('s:Header');
+		$envelopeHeaderActionNode = $this->_doc->createElement('a:Action', 'urn:Iservice/InjestTvinciData');
+		$this->setAttribute($envelopeHeaderActionNode,"s:mustUnderstand","1");
+		$envelopeHeaderNode->appendChild($envelopeHeaderActionNode);
+
+		$envelopeBodyNode = $this->_doc->createElement('s:Body');
+		$injestTvinciDataNode = $this->_doc->createElement('InjestTvinciData');
+		$tvinciDataRequestNode = $this->_doc->createElement('request');
+		$this->setAttribute($tvinciDataRequestNode,"xmlns:i","http://www.w3.org/2001/XMLSchema-instance");
+
+		$tvinciDataRequestNode->appendChild($this->_doc->createElement('userName', $this->distributionProfile->username));
+		$tvinciDataRequestNode->appendChild($this->_doc->createElement('passWord', $this->distributionProfile->password));
+		$tvinciDataRequestNode->appendChild($this->_doc->createElement('schemaID', $this->distributionProfile->schemaId));
 
 		// Attach the CDATA section
-		$feederRootNode->appendChild($data);
+		$tvinciDataRequestNode->appendChild($data);
+		$injestTvinciDataNode->appendChild($tvinciDataRequestNode);
+		$envelopeBodyNode->appendChild($injestTvinciDataNode);
+		$envelopeRootNode->appendChild($envelopeHeaderNode);
+		$envelopeRootNode->appendChild($envelopeBodyNode);
 
 		// Attach the root node to the document
-		$this->_doc->appendChild($feederRootNode);
+		$this->_doc->appendChild($envelopeRootNode);
 
 		return $this->getXml();
 	}
 
-	/**
-	 * Result XML:
-	 * 	<$name>$value</$name>
-	 */
-	protected function createValueElement($name, $arr, $key)
-	{
-		$value = array_key_exists($key, $arr) ? $arr[$key] : "";
-		$node = $this->_doc->createElement($name, $value);
-		return $node;
-	}
 
 	/**
 	 * Result XML:
@@ -208,19 +253,6 @@ class TvinciDistributionFeedHelper
 		return $namedNode;
 	}
 
-	/**
-	 * Result XML:
-	 * 	<$name>
-	 * 		<value lang="$lang">$value</value>
-	 * 	</$name>
-	 */
-	protected function createValueWithLangElementFromAssocArray($name, $lang, array $arr, $key)
-	{
-		$value = array_key_exists($key, $arr) ? $arr[$key] : "";
-
-		return $this->createValueWithLangElement($name, $value, $lang);
-	}
-
 	private function createDateElement($fieldName, $timestamp)
 	{
 		$formattedDate = date(self::DATE_FORMAT, $timestamp);
@@ -228,61 +260,11 @@ class TvinciDistributionFeedHelper
 		return $dateNode;
 	}
 
-	private function createDateElementFromAssocArray($fieldName, array $arr, $key)
-	{
-		$timestamp = $arr[$key];
-		$dateNode = $this->createDateElement($fieldName, $timestamp);
-		return $dateNode;
-	}
-
-	private function createMetadataElement($name, array $arr, $key)
-	{
-		$metaNode = $this->createValueElement("meta", $arr, $key);
-
-		$this->setAttribute($metaNode, "name", $name);
-
-		return $metaNode;
-	}
-
-	private function createMetadataWithLangElement($name, $lang, array $arr, $key)
-	{
-		$metaNode = $this->createValueWithLangElementFromAssocArray("meta", $lang, $arr, $key);
-
-		$this->setAttribute($metaNode, "name", $name);
-		$this->setAttribute($metaNode, "ml_handling", "unique");
-
-		return $metaNode;
-	}
-
-	private function createMetadataContainerWithLangElement($parentNode, $name, $lang, array $arr, $key)
-	{
-		if ( ! array_key_exists($key, $arr) || ! $arr[$key] )
-		{
-			return;
-		}
-
-		$multivalField = $arr[$key];
-		$multivalArr = explode(',', $multivalField);
-
-		$metaNode = $this->_doc->createElement('meta');
-		$this->setAttribute($metaNode, "name", $name);
-		$this->setAttribute($metaNode, "ml_handling", "unique");
-
-		foreach ( $multivalArr as $val )
-		{
-			$metaNode->appendChild( $this->createValueWithLangElement('container', $val, $lang) );
-		}
-
-		$parentNode->appendChild( $metaNode );
-	}
-
 	private function createBasicElement()
 	{
 		$basicNode = $this->_doc->createElement("basic");
-
-		$basicNode->appendChild( $this->createValueWithLangElementFromAssocArray('name', $this->language, $this->fieldValues, TvinciDistributionField::MEDIA_TITLE) );
-		$basicNode->appendChild( $this->createValueWithLangElementFromAssocArray('description', $this->language, $this->fieldValues, TvinciDistributionField::MEDIA_DESCRIPTION) );
-		$basicNode->appendChild( $this->createValueElement('media_type', $this->fieldValues, TvinciDistributionField::MEDIA_TYPE) );
+		$basicNode->appendChild( $this->createValueWithLangElement('name', $this->getTitleName(), $this->language));
+		$basicNode->appendChild( $this->createValueWithLangElement('description', $this->getDescription(), $this->language));
 
 		// Add default thumbnail
 		if ( isset($this->defaultThumbUrl) )
@@ -291,35 +273,20 @@ class TvinciDistributionFeedHelper
 			$this->setAttribute($thumbnail, "url", $this->defaultThumbUrl);
 			$basicNode->appendChild( $thumbnail );
 		}
-
-		$basicNode->appendChild( $this->createRulesElement() );
-		$basicNode->appendChild( $this->createDatesElement() );
+		$basicNode->appendChild( $this->createDatesElement());
 		$basicNode->appendChild( $this->createPicRatiosElement() );
 
 		return $basicNode;
 	}
 
-	private function createRulesElement()
-	{
-		$rules = $this->_doc->createElement("rules");
-
-		$rules->appendChild( $this->createValueElement('geo_block_rule', $this->fieldValues, TvinciDistributionField::GEO_BLOCK_RULE) );
-		$rules->appendChild( $this->createValueElement('watch_per_rule', $this->fieldValues, TvinciDistributionField::WATCH_PERMISSIONS_RULE) );
-
-		return $rules;
-	}
-
 	private function createDatesElement()
 	{
-		$dates = $this->_doc->createElement("dates");
-
-		$dates->appendChild( $this->createDateElement('create', $this->createdAt) );
-		$dates->appendChild( $this->createDateElementFromAssocArray('start', $this->fieldValues, TvinciDistributionField::START_DATE) );
-		$dates->appendChild( $this->createDateElementFromAssocArray('catalog_start', $this->fieldValues, TvinciDistributionField::CATALOG_START_DATE) );
-		$dates->appendChild( $this->createDateElementFromAssocArray('catalog_end', $this->fieldValues, TvinciDistributionField::CATALOG_END_DATE) );
-		$dates->appendChild( $this->createDateElementFromAssocArray('final_end', $this->fieldValues, TvinciDistributionField::END_DATE) );
-
- 		return $dates;
+		$datesNode = $this->_doc->createElement("dates");
+		$datesNode->appendChild( $this->createDateElement('catalog_start', $this->getSunrise()) );
+		$datesNode->appendChild( $this->createDateElement('catalog_end', $this->getSunset()) );
+		$datesNode->appendChild( $this->createDateElement('start', $this->getCreatedAt()) );
+		$datesNode->appendChild( $this->createDateElement('end', $this->getSunset()) );
+		return $datesNode;
 	}
 
 	private function createPicRatiosElement()
@@ -341,77 +308,33 @@ class TvinciDistributionFeedHelper
 	private function createStructureElement()
 	{
 		$structure = $this->_doc->createElement("structure");
-
- 		$structure->appendChild( $this->createStringsElement() );
- 		$structure->appendChild( $this->createBooleansElement() );
- 		$structure->appendChild( $this->createDoublesElement() );
  		$structure->appendChild( $this->createMetasElement() );
-
  		return $structure;
 	}
 
-	private function createStringsElement()
-	{
-		$strings = $this->_doc->createElement("strings");
-
-		$strings->appendChild( $this->createMetadataWithLangElement('Release date', $this->language, $this->fieldValues, TvinciDistributionField::METADATA_RELEASE_DATE) );
-
-		return $strings;
-	}
-
-	private function createBooleansElement()
-	{
-		$booleans = $this->_doc->createElement("booleans");
-
-		return $booleans;
-	}
-
-	private function createDoublesElement()
-	{
-		$doubles = $this->_doc->createElement("doubles");
-
-		$doubles->appendChild( $this->createMetadataElement('Runtime', $this->fieldValues, TvinciDistributionField::METADATA_RUNTIME) );
-		$doubles->appendChild( $this->createMetadataElement('Release year', $this->fieldValues, TvinciDistributionField::METADATA_RELEASE_YEAR) );
-
-		return $doubles;
-	}
 
 	private function createMetasElement()
 	{
+		$kalturaMetaDom = new DOMDocument();
+		$kalturaMetaDom->formatOutput = true;
+		$kalturaMetaDom->encoding = "UTF-8";
+		$tmpMetaStructure = "<tmpMetaStructure>".$this->getMetasXML()."</tmpMetaStructure>";
+		$kalturaMetaDom->loadXML($tmpMetaStructure);
 		$metas = $this->_doc->createElement("metas");
-
-		$this->createMetadataContainerWithLangElement($metas, 'Rating', $this->language, $this->fieldValues, TvinciDistributionField::METADATA_RATING);
-		$this->createMetadataContainerWithLangElement($metas, 'Country', $this->language, $this->fieldValues, TvinciDistributionField::METADATA_COUNTRY);
-		$this->createMetadataContainerWithLangElement($metas, 'Director', $this->language, $this->fieldValues, TvinciDistributionField::METADATA_DIRECTOR);
-		$this->createMetadataContainerWithLangElement($metas, 'Audio language', $this->language, $this->fieldValues, TvinciDistributionField::METADATA_AUDIO_LANGUAGE);
-		$this->createMetadataContainerWithLangElement($metas, 'Genre', $this->language, $this->fieldValues, TvinciDistributionField::METADATA_GENRE);
-		$this->createMetadataContainerWithLangElement($metas, 'Sub genre', $this->language, $this->fieldValues, TvinciDistributionField::METADATA_SUB_GENRE);
-		$this->createMetadataContainerWithLangElement($metas, 'Studio', $this->language, $this->fieldValues, TvinciDistributionField::METADATA_STUDIO);
-
-		if ( $this->schemaId() == 1 )
-		{
-			$this->createMetadataContainerWithLangElement($metas, 'Cast', $this->language, $this->fieldValues, TvinciDistributionField::METADATA_CAST);
+		foreach ($kalturaMetaDom->firstChild->childNodes as $metaNode) {
+			$tmpNode = $this->_doc->importNode($metaNode, true);
+			$metas->appendChild($tmpNode);
 		}
-		elseif ( $this->schemaId() == 2 )
-		{
-			$this->createMetadataContainerWithLangElement($metas, 'Parental Rating', $this->language, $this->fieldValues, TvinciDistributionField::METADATA_PARENTAL_RATING);
-			$this->createMetadataContainerWithLangElement($metas, 'Main Cast', $this->language, $this->fieldValues, TvinciDistributionField::METADATA_MAIN_CAST);
-			$this->createMetadataContainerWithLangElement($metas, 'Short title', $this->language, $this->fieldValues, TvinciDistributionField::METADATA_SHORT_TITLE);
-			$this->createMetadataContainerWithLangElement($metas, 'Dimension', $this->language, $this->fieldValues, TvinciDistributionField::METADATA_DIMENSION);
-		}
-		
 		return $metas;
 	}
 
 	private function createFilesElement()
 	{
 		$files = $this->_doc->createElement("files");
-
 		foreach ( $this->videoAssetToUrlMap as $name => $url )
 		{
 			$files->appendChild( $this->createFileElement($name, $url) );
 		}
-
  		return $files;
 	}
 
@@ -425,18 +348,18 @@ class TvinciDistributionFeedHelper
 		$this->setAttribute($fileNode, "cdn_name", "Default CDN");
 		$this->setAttribute($fileNode, "cdn_code", $url);
 		$this->setAttribute($fileNode, "co_guid", $fileType);
-
-		if ( $this->schemaId() == 2 )
-		{
-			$billingType = self::getSafeFieldValue(TvinciDistributionField::METADATA_BILLING_TYPE, null);
-			if ( $billingType )
-			{
-				$this->setAttribute($fileNode, "billing_type", $billingType);
-			}
-
-			$runtime = self::getSafeArrayValue($this->fieldValues, TvinciDistributionField::METADATA_RUNTIME, 0);
-			$this->setAttribute($fileNode, "assetDuration", $runtime * 60);
-		}
+		$this->setAttribute($fileNode, "billing_type", 'Tvinci');
+//		if ( $this->schemaId() == 2 )
+//		{
+//			$billingType = self::getSafeFieldValue(TvinciDistributionField::METADATA_BILLING_TYPE, null);
+//			if ( $billingType )
+//			{
+//				$this->setAttribute($fileNode, "billing_type", $billingType);
+//			}
+//
+//			$runtime = self::getSafeArrayValue($this->fieldValues, TvinciDistributionField::METADATA_RUNTIME, 0);
+//			$this->setAttribute($fileNode, "assetDuration", $runtime * 60);
+//		}
 
 		return $fileNode;
 	}
@@ -454,5 +377,47 @@ class TvinciDistributionFeedHelper
 	public function getXml()
 	{
 		return $this->_doc->saveXML();
+	}
+
+
+	/**
+	 * Transform XML using XSLT
+	 * @param string $xmlStr
+	 * @param string $xslStr
+	 * @return string the result XML
+	 */
+	protected function transformXml($xmlStr, $xslStr)
+	{
+		$xmlObj = new DOMDocument();
+		if (!$xmlObj->loadXML($xmlStr))
+		{
+			throw new Exception('Error loading source XML');
+		}
+
+		$xslObj = new DOMDocument();
+		if(!$xslObj->loadXML($xslStr))
+		{
+			throw new Exception('Error loading XSLT');
+		}
+
+		$proc = new XSLTProcessor;
+		$proc->registerPHPFunctions(kXml::getXslEnabledPhpFunctions());
+		$proc->importStyleSheet($xslObj);
+
+		$resultXmlObj = $proc->transformToDoc($xmlObj);
+		if (!$resultXmlObj)
+		{
+			throw new Exception('Error transforming XML');
+			return null;
+		}
+
+		$resultXmlStr = $resultXmlObj->saveXML();
+
+		// DEBUG logs
+		// KalturaLog::debug('source xml = '.$xmlStr);
+		// KalturaLog::debug('xslt = '.$xslStr);
+		// KalturaLog::debug('result xml = '.$resultXmlStr);
+
+		return $resultXmlStr;
 	}
 }

@@ -83,8 +83,18 @@ class Form_TvinciProfileConfiguration extends Form_ConfigurableProfileConfigurat
 				'filters'		=> array('StringTrim'),
 		));
 
+		$this->addElement('text', 'schema_id', array(
+				'label'			=> 'Schema ID:',
+				'filters'		=> array('StringTrim'),
+		));
+
+		$this->addElement('text', 'language', array(
+				'label'			=> 'Language :',
+				'filters'		=> array('StringTrim'),
+		));
+
 		$this->addDisplayGroup(
-				array('ingest_url','username','password'),
+				array('ingest_url','username','password', 'schema_id', 'language'),
 				'ingest',
 				array(
 					'legend' => 'Ingest URL Configuration',
