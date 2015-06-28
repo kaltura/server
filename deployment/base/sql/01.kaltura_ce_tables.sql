@@ -2441,4 +2441,4 @@ CREATE TABLE `user_entry`
 	CONSTRAINT `user_entry_FK_2`
 		FOREIGN KEY (`kuser_id`)
 		REFERENCES `kuser` (`id`)
-)Type=InnoDB COMMENT='Describes the relationship between a specific user and a specific entry';
+)ENGINE=InnoDB COMMENT='Describes the relationship between a specific user and a specific entry';
