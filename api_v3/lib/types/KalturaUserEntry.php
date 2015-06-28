@@ -23,7 +23,7 @@ abstract class KalturaUserEntry extends KalturaObject implements IRelatedFiltera
 	public $entryId;
 
 	/**
-	 * @var int
+	 * @var string
 	 * @insertonly
 	 * @filter eq,in,notin
 	 */

@@ -21,6 +21,7 @@ class UserEntryService extends KalturaBaseService {
 	 */
 	public function addAction(KalturaUserEntry $userEntry)
 	{
+		$userEntry->userId = kuserPeer::getKuserByPartnerAndUid(kCurrentContext::$ks_partner_id, $userEntry->userId);
 		$dbUserEntry = $userEntry->toInsertableObject(null, array('type'));
 		$userId = $userEntry->userId;
 		if ($userId == 0)
