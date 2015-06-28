@@ -1,4 +1,7 @@
-<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+                xmlns:exsl="http://exslt.org/common"
+                extension-element-prefixes="exsl"
+                version="1.0">
 
     <xsl:output omit-xml-declaration="no" indent="yes" />
 
@@ -29,36 +32,71 @@
         </xsl:if>
     </xsl:template>
 
-    <!--<xsl:template name="group-ott-tags">-->
-        <!--<xsl:for-each-group select="metas/meta" group-by="@name">-->
-            <!--<xsl:element name="meta">-->
-                <!--<xsl:attribute name="name">-->
-                    <!--<xsl:value-of select="current-grouping-key()"/>-->
-                <!--</xsl:attribute>-->
-                <!--<xsl:attribute name="ml_handling">unique</xsl:attribute>-->
-                <!--<xsl:element name="container">-->
-                    <!--<xsl:for-each select="current-group()">-->
-                        <!--<xsl:element name="value">-->
-                            <!--<xsl:attribute name="lang">eng</xsl:attribute>-->
-                            <!--<xsl:value-of select="."/>-->
-                        <!--</xsl:element>-->
-                    <!--</xsl:for-each>-->
-                <!--</xsl:element>-->
-            <!--</xsl:element>-->
-        <!--</xsl:for-each-group>-->
-    <!--</xsl:template>-->
 
-
-    <!--<xsl:template name="convert-ott-tags">-->
-        <!--<xsl:param name="otttags"/>-->
-        <!--&lt;!&ndash;<xsl:value-of select="$otttags"/>&ndash;&gt;-->
-        <!--<xsl:for-each select="$otttags">-->
-            <!--<xsl:call-template name="group-ott-tags"/>-->
-        <!--</xsl:for-each>-->
-    <!--</xsl:template>-->
-
-
-
+    <xsl:template name="create-ott-tags">
+        <xsl:param name="metadatas"/>
+        <xsl:variable name="prefix" select="'OTTTAG'"/>
+        <!--list here should include a list like this -->
+        <!--<OTTTAGActor>A</OTTTAGActor>-->
+        <!--<OTTTAGActor>B</OTTTAGActor>-->
+        <xsl:variable name="OTTTagsWithAttributes">
+            <xsl:for-each select="$metadatas">
+                <xsl:variable name="prefix-length" select="string-length($prefix)+1"/>
+                <xsl:variable name="currNodeName" select="local-name(.)"/>
+                <xsl:variable name="suffix" select="substring($currNodeName,$prefix-length)"/>
+                <xsl:if test="starts-with($currNodeName, $prefix)">
+                    <xsl:element name="otttag">
+                        <xsl:attribute name="name">
+                            <xsl:value-of select="$suffix"/>
+                        </xsl:attribute>
+                        <xsl:value-of select="."/>
+                    </xsl:element>
+                </xsl:if>
+            </xsl:for-each>
+        </xsl:variable>
+        <xsl:variable name="tagsWithAttributes" select="exsl:node-set($OTTTagsWithAttributes)/*"/>
+        <!--at this point the OTTTagsWithAttributes should be as follow:-->
+        <!--<meta name="Actor" value="A"/>-->
+        <!--<meta name="Actor" value="B"/>-->
+        <xsl:variable name="OTTTagUniques">
+            <xsl:for-each select="exsl:node-set($tagsWithAttributes)">
+                <xsl:if test="not(./@name = preceding-sibling::otttag/@name)">
+                    <xsl:element name="OTTTagUnique">
+                        <xsl:value-of select="./@name" />
+                    </xsl:element>
+                </xsl:if>
+            </xsl:for-each>
+        </xsl:variable>
+        <xsl:variable name="uniqueTags" select="exsl:node-set($OTTTagUniques)/*"/>
+        <!--at this point the OTTTagUniques should be as follow:-->
+        <!--<meta name="Actor" value="A"/>-->
+        <!-- now construct the actual result -->
+        <xsl:element name="tags">
+            <xsl:for-each select="exsl:node-set($uniqueTags)">
+                <xsl:variable name="uniqueTagName" select="."/>
+                <xsl:element name="meta">
+                    <xsl:attribute name="name">
+                        <xsl:value-of select="$uniqueTagName"/>
+                    </xsl:attribute>
+                    <xsl:attribute name="ml_handling">unique</xsl:attribute>
+                    <xsl:element name="container">
+                        <xsl:for-each select="exsl:node-set($tagsWithAttributes)">
+                            <xsl:variable name="tagWithAttrName" >
+                                <xsl:value-of select="@name" />
+                            </xsl:variable>
+                            <xsl:if test="$tagWithAttrName=$uniqueTagName">
+                                <xsl:element name="value">
+                                    <xsl:attribute name="lang">eng</xsl:attribute>
+                                    <xsl:value-of select="."/>
+                                </xsl:element>
+                            </xsl:if>
+                        </xsl:for-each>
+                    </xsl:element>
+                </xsl:element>
+            </xsl:for-each>
+        </xsl:element>
+    </xsl:template>
+            
     <xsl:template match="feed/export/media/structure/metas" >
         <xsl:variable name="metadatas" select="metadata/*"/>
         <xsl:element name="strings">
@@ -82,20 +120,9 @@
                 </xsl:call-template>
             </xsl:for-each>
         </xsl:element>
-        <!--<xsl:variable name="tags">-->
-            <!--<xsl:element name="metas" >-->
-                <!--<xsl:for-each select="$metadatas">-->
-                    <!--<xsl:call-template name="convert-known-meta-element">-->
-                        <!--<xsl:with-param name="prefix" select="'OTTTAG'"/>-->
-                    <!--</xsl:call-template>-->
-                <!--</xsl:for-each>-->
-            <!--</xsl:element>-->
-        <!--</xsl:variable>-->
-        <!--<xsl:element name="metas" >-->
-            <!--<xsl:call-template name="convert-ott-tags">-->
-                <!--<xsl:with-param name="otttags" select="$tags"/>-->
-            <!--</xsl:call-template>-->
-        <!--</xsl:element>-->
+        <xsl:call-template name="create-ott-tags">
+            <xsl:with-param name="metadatas" select="$metadatas"/>
+        </xsl:call-template>
     </xsl:template>
 
 
