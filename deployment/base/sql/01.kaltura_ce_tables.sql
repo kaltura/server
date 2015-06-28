@@ -2434,4 +2434,4 @@ CREATE TABLE `user_entry`
 	`custom_data` TEXT,
 	PRIMARY KEY (`id`),
 	KEY (`entry_id`, `kuser_id`)
-)Type=InnoDB COMMENT='Describes the relationship between a specific user and a specific entry';
+)ENGINE=InnoDB COMMENT='Describes the relationship between a specific user and a specific entry';
