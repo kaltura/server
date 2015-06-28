@@ -70,7 +70,7 @@ class AnswerCuePoint extends CuePoint implements IMetadataObject
 		$this->setCorrectAnswerKeys( $correctKeys );
 		$this->setExplanation( $dbParentCuePoint->getExplanation() );
 		$this->setIsCorrect( in_array( $this->getAnswerKey(), $correctKeys ) );
-		parent::preInsert($con);
+		return parent::preInsert($con);
 	}
 
 	/**
@@ -84,7 +84,7 @@ class AnswerCuePoint extends CuePoint implements IMetadataObject
 		{
 			$this->setIsCorrect(in_array($this->getAnswerKey(), $this->getCorrectAnswerKeys()));
 		}
-		parent::preSave($con);
+		return parent::preSave($con);
 	}
 
 	public function getMetadataObjectType()

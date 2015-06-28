@@ -28,7 +28,7 @@ class QuizrReportingService extends KalturaBaseService
 	 * @return float
 	 * @throws KalturaAPIException
 	 */
-	public function getAverageScore($entryId)
+	public function getAverageScoreAction($entryId)
 	{
 		$ans = -1;
 		$dbEntry = entryPeer::retrieveByPK($entryId);
@@ -56,6 +56,76 @@ class QuizrReportingService extends KalturaBaseService
 				$sumOfScores += $quiz->getScore();
 			}
 			$ans = $sumOfScores / (count($quizzes));
+		}
+		return $ans;
+	}
+
+	/**
+	 * @action listQuestionsSummary
+	 * @param string $entryId
+	 * @return KalturaQuestionSummaryArray
+	 * @throws KalturaAPIException
+	 */
+	public function listQuestionsSummaryAction($entryId)
+	{
+		$ans = new KalturaQuestionSummaryArray();
+		$dbEntry = entryPeer::retrieveByPK($entryId);
+		if (!$dbEntry)
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
+		/**
+		 * @var kQuiz $kQuiz
+		 */
+		$kQuiz = QuizPlugin::validateAndGetQuiz( $dbEntry );
+		$c = new Criteria();
+		$c->add(CuePointPeer::ENTRY_ID, $entryId);
+		$c->add(CuePointPeer::TYPE, QuizPlugin::getCoreValue('CuePointType',QuizCuePointType::QUIZ_QUESTION));
+		$questions = CuePointPeer::doSelect($c);
+		foreach ($questions as $question)
+		{
+			$numOfCorrectAnswers = 0;
+			/**
+			 * @var QuestionCuePoint $question
+			 */
+			$c = new Criteria();
+			$c->add(CuePointPeer::ENTRY_ID, $entryId);
+			$c->add(CuePointPeer::TYPE, QuizPlugin::getCoreValue('CuePointType',QuizCuePointType::QUIZ_ANSWER));
+			$c->add(CuePointPeer::PARENT_ID, $question->getId());
+			$answers = CuePointPeer::doSelect($c);
+			$numOfAnswers = count($answers);
+			if ($numOfAnswers)
+			{
+				foreach ($answers as $answer)
+				{
+					/**
+					 * @var AnswerCuePoint $answer
+					 */
+					$optionalAnswers = $question->getOptionalAnswers();
+					$correct = false;
+					foreach ($optionalAnswers as $optionalAnswer)
+					{
+						/**
+						 * @var kOptionalAnswer $optionalAnswer
+						 */
+						if ($optionalAnswer->getKey() === $answer->getAnswerKey())
+						{
+							if ($optionalAnswer->getIsCorrect())
+							{
+								$correct = true;
+							}
+						}
+					}
+					if ($correct)
+					{
+						$numOfCorrectAnswers++;
+					}
+				}
+				$pctg = $numOfCorrectAnswers/$numOfAnswers;
+			}
+			else
+			{
+				$pctg = 0.0;
+			}
+			$ans[$question->getId()] = $pctg;
 		}
 		return $ans;
 	}
