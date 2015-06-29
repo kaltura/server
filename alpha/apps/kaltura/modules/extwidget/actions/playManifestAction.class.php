@@ -811,6 +811,12 @@ class playManifestAction extends kalturaAction
 		}
 		
 		$this->deliveryProfile->setDynamicAttributes($this->deliveryAttributes);	
+
+		if($this->deliveryAttributes->getEdgeServerIds())
+		{
+			list($baseUrl, $backupUrl) = $this->deliveryProfile->getEdgeServerUrls($baseUrl, $backupUrl);
+		}
+		
 		return $this->deliveryProfile->serve($baseUrl, $backupUrl);
 	}
 	

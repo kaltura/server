@@ -32,10 +32,7 @@ class KalturaUserEntryFilter extends KalturaUserEntryBaseFilter
 		$userEntryFilter = $this->toObject();
 		$userEntryFilter->attachToCriteria($c);
 
-		if (!is_null($pager))
-		{
-			$pager->attachToCriteria($c);
-		}
+		$pager->attachToCriteria($c);
 		$list = UserEntryPeer::doSelect($c);
 
 		$resultCount = count($list);

@@ -315,6 +315,7 @@ abstract class LiveEntry extends entry
 		$backupApplicationName = null;
 		
 		$kMediaServers = $this->getMediaServers();
+		$partnerMediaServerConfiguration = $this->getPartner()->getMediaServersConfiguration();
 		if(count($kMediaServers))
 		{
 			foreach($kMediaServers as $key => $kMediaServer)
@@ -340,6 +341,12 @@ abstract class LiveEntry extends entry
 				if($kMediaServer && $kMediaServer instanceof kLiveMediaServer)
 				{
 					$primaryMediaServer = $kMediaServer->getMediaServer();
+					if(!$primaryMediaServer && $partnerMediaServerConfiguration && isset($partnerMediaServerConfiguration[$kMediaServer->getHostname()]))
+					{
+						$primaryMediaServer = new MediaServer();
+						$primaryMediaServer->setHostname($kMediaServer->getHostname());
+						$primaryMediaServer->setIsExternalMediaServer(true);
+					}
 					$primaryApplicationName = $kMediaServer->getApplicationName();
 				}
 			}
@@ -352,6 +359,12 @@ abstract class LiveEntry extends entry
 				if($kMediaServer && $kMediaServer instanceof kLiveMediaServer)
 				{
 					$backupMediaServer = $kMediaServer->getMediaServer();
+					if(!$backupMediaServer && $partnerMediaServerConfiguration && isset($partnerMediaServerConfiguration[$kMediaServer->getHostname()]))
+					{
+						$backupMediaServer = new MediaServer();
+						$backupMediaServer->setHostname($kMediaServer->getHostname());
+						$backupMediaServer->setIsExternalMediaServer(true);
+					}
 					$backupApplicationName = $kMediaServer->getApplicationName();
 				}
 			}
@@ -369,10 +382,10 @@ abstract class LiveEntry extends entry
 		}
 		elseif($primaryMediaServer)
 		{
-			$manifestUrl = $primaryMediaServer->getManifestUrl($protocol, $this->getPartner()->getMediaServersConfiguration());
+			$manifestUrl = $primaryMediaServer->getManifestUrl($protocol, $partnerMediaServerConfiguration);
 			if($backupMediaServer)
 			{
-				$backupManifestUrl = $backupMediaServer->getManifestUrl($protocol, $this->getPartner()->getMediaServersConfiguration());
+				$backupManifestUrl = $backupMediaServer->getManifestUrl($protocol, $partnerMediaServerConfiguration);
 			}
 		}
 		

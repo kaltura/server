@@ -2980,8 +2980,19 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	/**
 	 * @return entry
 	 */
-	public function copyTemplate($coptPartnerId = false)
+	public function copyTemplate($coptPartnerId = false, $entry = null)
 	{
+		if ($entry)
+		{
+			$templateType = $this->getType();
+			$type = $entry->getType();
+			$templateMediaType = $this->getMediaType() ? $this->getMediaType() : "null";
+			$mediaType = $entry->getMediaType() ? $entry->getMediaType() : "null";
+	
+			if ($templateType != $type || $templateMediaType != $mediaType)
+			KalturaLog::debug("ENTRY_TEMPLATE_COPY - original entry:template entry. type - ".$type.':'.$templateType.' mediaType - '.$mediaType.':'.$templateMediaType);
+		}
+	
 		// we use get_class(), because this might be a subclass
 		$clazz = get_class($this);
 		$copyObj = new $clazz();

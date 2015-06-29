@@ -288,6 +288,14 @@ class KDLWrap
 		{
 			$toJson = json_encode($target->_multiStream);
 			$flavor->setMultiStream($toJson);
+			/*
+			 * Audio-only flavors w/multi-lingual setup, might get wiped out by bitrate-optimization logic.
+			 * To avoid this - turn such flavors into 'forced'.
+			 */
+			if(isset($target->_audio) && !isset($target->_video)
+			&& isset($target->_multiStream->audio) && isset($target->_multiStream->audio->languages) && count($target->_multiStream->audio->languages)>0){
+				$flavor->_force = true;
+			}
 		}
 
 		$flavor->_errors   = $flavor->_errors + $target->_errors;

@@ -217,7 +217,7 @@ function getSignedIpHeader($ipAddress)
 	$baseHeader = array($ipAddress, $curTime, $uniqId);
 	$headerHash = md5(implode(',', $baseHeader) . ',' . $salt);
 	$ipHeader = implode(',', $baseHeader) . ',' . $headerHash;
-	return array("X_KALTURA_REMOTE_ADDR: $ipHeader");
+	return array("X-KALTURA-REMOTE-ADDR: $ipHeader");
 }
 
 function doCurl($url, $params = array(), $files = array(), $range = null, $requestHeaders = array())
@@ -716,7 +716,24 @@ function testAction($ipAddress, $fullActionName, $parsedParams, $uri, $postParam
 
 	$range = null;
 	if ($compareMode == CM_BINARY)
+	{
 		$range = '0-262144';		// 256K
+		
+		// use GET
+		if ($postParams)
+		{
+			if (strpos($uri, '?') === false)
+			{
+				$uri .= '?';
+			}
+			else 
+			{
+				$uri .= '&';
+			}
+			$uri .= http_build_query($postParams, null, "&");
+			$postParams = array();
+		}
+	}
 
 	$requestHeaders = array();
 	for ($retries = 0; $retries < 3; $retries++)

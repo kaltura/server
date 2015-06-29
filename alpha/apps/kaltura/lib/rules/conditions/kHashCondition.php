@@ -35,7 +35,7 @@ class kHashCondition extends kCondition
 	/**
 	 * @return string
 	 */
-	public function gethashName()
+	public function getHashName()
 	{
 		return $this->hashName;
 	}

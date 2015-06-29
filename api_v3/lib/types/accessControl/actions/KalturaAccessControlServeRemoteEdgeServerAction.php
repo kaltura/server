@@ -3,34 +3,25 @@
  * @package api
  * @subpackage objects
  */
-class KalturaIpAddressCondition extends KalturaMatchCondition
+class KalturaAccessControlServeRemoteEdgeServerAction extends KalturaRuleAction
 {
 	/**
-	 * allow internal ips
-	 * 
-	 * @var bool
-	 */
-	public $acceptInternalIps;
-	
-	/**
-	 * http header name for extracting the ip
+	 * Comma separated list of edge servers playBack should be done from
 	 * 
 	 * @var string
 	 */
-	public $httpHeader;
+	public $edgeServerIds;
 	
 	private static $mapBetweenObjects = array
 	(
-		'acceptInternalIps',
-		'httpHeader',
+		'edgeServerIds',
 	);
-	
 	/**
 	 * Init object type
 	 */
 	public function __construct() 
 	{
-		$this->type = ConditionType::IP_ADDRESS;
+		$this->type = RuleActionType::SERVE_FROM_REMOTE_SERVER;
 	}
 	
 	public function getMapBetweenObjects()
@@ -44,7 +35,7 @@ class KalturaIpAddressCondition extends KalturaMatchCondition
 	public function toObject($dbObject = null, $skip = array())
 	{
 		if(!$dbObject)
-			$dbObject = new kIpAddressCondition();
+			$dbObject = new kAccessControlServeRemoteEdgeServerAction();
 			
 		return parent::toObject($dbObject, $skip);
 	}
