@@ -21,14 +21,7 @@ class kMultiCaptionFlowManager implements kBatchJobStatusEventConsumer
 	 */
 	public function updatedJob(BatchJob $dbBatchJob)
 	{	
-		try 
-		{
-			$dbBatchJob = $this->updatedParseMulti($dbBatchJob, $dbBatchJob->getData());
-		}
-		catch(Exception $e)
-		{
-			KalturaLog::err('Failed to process updatedJob - '.$e->getMessage());
-		}
+		$dbBatchJob = $this->updatedParseMulti($dbBatchJob, $dbBatchJob->getData());
 		return true;					
 	}
 
