@@ -2434,7 +2434,7 @@ CREATE TABLE `user_entry`
 	`custom_data` TEXT,
 	PRIMARY KEY (`id`),
 	KEY (`entry_id`, `kuser_id`)
-)Type=InnoDB COMMENT='Describes the relationship between a specific user and a specific entry';
+)ENGINE=InnoDB COMMENT='Describes the relationship between a specific user and a specific entry';
 
 
 CREATE TABLE app_token
@@ -2455,4 +2455,4 @@ CREATE TABLE app_token
 	custom_data TEXT,
 	PRIMARY KEY (id),
 	KEY int_id_index (int_id)
-)TYPE=INNODB DEFAULT CHARSET=utf8;
+)ENGINE=INNODB DEFAULT CHARSET=utf8;
