@@ -3,13 +3,6 @@
 interface IRelatedObjectPeer
 {
 	/**
-	 * Return all direct parents
-	 * @param IBaseObject $object
-	 * @return array<IBaseObject>
-	 */
-	public function getParentObjects(IBaseObject $object);
-	
-	/**
 	 * Return all root parents
 	 * @param IBaseObject $object
 	 * @return array<IBaseObject>
