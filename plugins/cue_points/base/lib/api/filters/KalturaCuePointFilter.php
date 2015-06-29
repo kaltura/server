@@ -135,4 +135,19 @@ class KalturaCuePointFilter extends KalturaCuePointBaseFilter
 	{
 		return $this->getTypeListResponse($pager, $responseProfile);
 	}
+
+	/* (non-PHPdoc)
+	 * @see KalturaRelatedFilter::validateForResponseProfile()
+	 */
+	public function validateForResponseProfile()
+	{
+		if(		!kCurrentContext::$is_admin_session
+			&&	!$this->idEqual
+			&&	!$this->idIn
+			&&	!$this->systemNameEqual
+			&&	!$this->systemNameIn)
+		{
+			throw new KalturaAPIException(KalturaCuePointErrors::USER_KS_CANNOT_LIST_RELATED_CUE_POINTS, get_class($this));
+		}
+	}
 }
