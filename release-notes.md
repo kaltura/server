@@ -3,7 +3,7 @@
 ## Quiz Reporting ##
 
 - Issue Type: Add reporting API to quiz
-- Issue ID: PLAT-3137
+- Issue ID: PLAT-3137 and PLAT-2793 and PLAT-2794
 
 #### Configuration ####
  
