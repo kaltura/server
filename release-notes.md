@@ -1,11 +1,11 @@
 # Jupiter-10.15.0 #
 
-## Metadata Change HTTP Notification ##  
+## Metadata Change HTTP Notification # 
 
 - Issue Type: bug  
 - Issue ID: PS-2287  
 
-### Configuration ###  
+### Configuration ###
 
  - None.
  
