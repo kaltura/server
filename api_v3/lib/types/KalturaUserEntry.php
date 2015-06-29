@@ -23,7 +23,7 @@ abstract class KalturaUserEntry extends KalturaObject implements IRelatedFiltera
 	public $entryId;
 
 	/**
-	 * @var int
+	 * @var string
 	 * @insertonly
 	 * @filter eq,in,notin
 	 */
@@ -128,5 +128,14 @@ abstract class KalturaUserEntry extends KalturaObject implements IRelatedFiltera
 		return array();
 	}
 
+	protected function doFromObject(UserEntry $srcObj, KalturaDetachedResponseProfile $responseProfile = null)
+	{
+		$kuser = $srcObj->getkuser();
+		if ($kuser)
+		{
+			$this->userId = $kuser->getPuserId();
+		}
+		parent::doFromObject($srcObj, $responseProfile);
+	}
 
 }
