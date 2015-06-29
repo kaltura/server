@@ -55,27 +55,15 @@ class LiveChannelSegmentPeer extends BaseLiveChannelSegmentPeer implements IRela
 		return LiveChannelSegmentPeer::doCount($criteria);
 	}
 	
-	public function getLiveChannelSegmentParentObjects(LiveChannelSegment $object)
-	{
-		return array(
-			$object->getChannel()
-		);
-	}
-	
-	/* (non-PHPdoc)
-	 * @see IRelatedObjectPeer::getParentObjects()
-	 */
-	public function getParentObjects(IBaseObject $object)
-	{
-		return $this->getLiveChannelSegmentParentObjects($object);
-	}
-
 	/* (non-PHPdoc)
 	 * @see IRelatedObjectPeer::getRootObjects()
 	 */
 	public function getRootObjects(IBaseObject $object)
 	{
-		return $this->getParentObjects($object);
+		/* @var $object LiveChannelSegment */
+		return array(
+			$object->getChannel()
+		);
 	}
 
 	/* (non-PHPdoc)

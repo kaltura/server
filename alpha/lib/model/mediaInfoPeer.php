@@ -60,27 +60,15 @@ class mediaInfoPeer extends BasemediaInfoPeer implements IRelatedObjectPeer
 		return mediaInfoPeer::doSelectOne($criteria);
 	}
 	
-	public function getMediaInfoParentObjects(mediaInfo $object)
-	{
-		return array($object->getasset());
-	}
-	
-	/* (non-PHPdoc)
-	 * @see IRelatedObjectPeer::getParentObjects()
-	 */
-	public function getParentObjects(IBaseObject $object)
-	{
-		return $this->getMediaInfoParentObjects($object);
-	}
-
 	/* (non-PHPdoc)
 	 * @see IRelatedObjectPeer::getRootObjects()
 	 */
 	public function getRootObjects(IBaseObject $object)
 	{
-		$assets = $this->getParentObjects($object);
+		/* @var $object mediaInfo */
+		$asset = $object->getasset();
 		$roots = array();
-		foreach($assets as $asset)
+		if($asset)
 		{
 			/* @var $asset asset */
 			$roots[] = $asset->getentry();

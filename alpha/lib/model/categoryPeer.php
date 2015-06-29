@@ -474,36 +474,18 @@ class categoryPeer extends BasecategoryPeer implements IRelatedObjectPeer
 		
 	}
 	
-	public function getCategoryParentObjects(category $object)
-	{
-		$parentCategory = $object->getParentCategory();
-		if($parentCategory)
-			return array($parentCategory);
-	}
-	
-	public function getCategoryRootObjects(category $object)
-	{
-		$rootCategory = $object->getRootCategoryFromFullIds($object);
-		if($rootCategory)
-			return array($rootCategory);
-			
-		return array();
-	}
-	
-	/* (non-PHPdoc)
-	 * @see IRelatedObjectPeer::getParentObjects()
-	 */
-	public function getParentObjects(IBaseObject $object)
-	{
-		return $this->getCategoryParentObjects($object);
-	}
-
 	/* (non-PHPdoc)
 	 * @see IRelatedObjectPeer::getRootObjects()
 	 */
 	public function getRootObjects(IBaseObject $object)
 	{
-		return $this->getCategoryRootObjects($object);
+		/* @var $object category */
+		
+		$rootCategory = $object->getRootCategoryFromFullIds($object);
+		if($rootCategory)
+			return array($rootCategory);
+			
+		return array();
 	}
 
 	/* (non-PHPdoc)

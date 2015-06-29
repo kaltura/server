@@ -234,9 +234,9 @@ class CuePointPeer extends BaseCuePointPeer implements IMetadataPeer, IRelatedOb
 	}
 
 	/* (non-PHPdoc)
-	 * @see IRelatedObjectPeer::getParentObjects()
+	 * @see IRelatedObjectPeer::getRootObjects()
 	 */
-	public function getParentObjects(IBaseObject $object)
+	public function getRootObjects(IBaseObject $object)
 	{
 		/* @var $object CuePoint */
 		$entry = entryPeer::retrieveByPK($object->getEntryId());
@@ -244,14 +244,6 @@ class CuePointPeer extends BaseCuePointPeer implements IMetadataPeer, IRelatedOb
 			return array($entry);
 		
 		return array();
-	}
-
-	/* (non-PHPdoc)
-	 * @see IRelatedObjectPeer::getRootObjects()
-	 */
-	public function getRootObjects(IBaseObject $object)
-	{
-		return $this->getParentObjects($object);
 	}
 
 	/* (non-PHPdoc)

@@ -35,28 +35,16 @@ class KuserToUserRolePeer extends BaseKuserToUserRolePeer implements IRelatedObj
 		return array(array("kuserToUserRole:kuserId=%s", self::KUSER_ID));		
 	}
 	
-	public function getKuserToUserRoleParentObjects(KuserToUserRole $object)
-	{
-		return array(
-			$object->getkuser(),
-			$object->getUserRole(),
-		);
-	}
-	
-	/* (non-PHPdoc)
-	 * @see IRelatedObjectPeer::getParentObjects()
-	 */
-	public function getParentObjects(IBaseObject $object)
-	{
-		return $this->getKuserToUserRoleParentObjects($object);
-	}
-
 	/* (non-PHPdoc)
 	 * @see IRelatedObjectPeer::getRootObjects()
 	 */
 	public function getRootObjects(IBaseObject $object)
 	{
-		return $this->getParentObjects($object);
+		/* @var $object KuserToUserRole */
+		return array(
+			$object->getkuser(),
+			$object->getUserRole(),
+		);
 	}
 
 	/* (non-PHPdoc)

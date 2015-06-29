@@ -100,28 +100,15 @@ class KuserKgroupPeer extends BaseKuserKgroupPeer implements IRelatedObjectPeer
 		return self::$kgroupIdsByKuserId[$kuserId];
 	}
 	
-	public function getKuserKgroupParentObjects(KuserKgroup $object)
-	{
-		return array(
-			kuserPeer::retrieveByPK($object->getKuserId()),
-			kuserPeer::retrieveByPK($object->getKgroupId()),
-		);
-	}
-	
-	/* (non-PHPdoc)
-	 * @see IRelatedObjectPeer::getParentObjects()
-	 */
-	public function getParentObjects(IBaseObject $object)
-	{
-		return $this->getKuserKgroupParentObjects($object);
-	}
-
 	/* (non-PHPdoc)
 	 * @see IRelatedObjectPeer::getRootObjects()
 	 */
 	public function getRootObjects(IBaseObject $object)
 	{
-		return $this->getParentObjects($object);
+		return array(
+			kuserPeer::retrieveByPK($object->getKuserId()),
+			kuserPeer::retrieveByPK($object->getKgroupId()),
+		);
 	}
 
 	/* (non-PHPdoc)

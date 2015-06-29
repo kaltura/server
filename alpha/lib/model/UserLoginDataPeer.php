@@ -633,25 +633,12 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		
 	}
 	
-	public function getUserLoginDataParentObjects(UserLoginData $object)
-	{
-		return array();
-	}
-	
-	/* (non-PHPdoc)
-	 * @see IRelatedObjectPeer::getParentObjects()
-	 */
-	public function getParentObjects(IBaseObject $object)
-	{
-		return $this->getUserLoginDataParentObjects($object);
-	}
-
 	/* (non-PHPdoc)
 	 * @see IRelatedObjectPeer::getRootObjects()
 	 */
 	public function getRootObjects(IBaseObject $object)
 	{
-		return $this->getParentObjects($object);
+		return array();
 	}
 
 	/* (non-PHPdoc)

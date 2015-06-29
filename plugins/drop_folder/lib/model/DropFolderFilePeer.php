@@ -120,25 +120,12 @@ class DropFolderFilePeer extends BaseDropFolderFilePeer implements IRelatedObjec
 		return array(DropFolderFilePeer::STATUS);
 	}
 	
-	public function getDropFolderFileParentObjects(DropFolderFile $object)
-	{
-		return array(DropFolderPeer::retrieveByPK($object->getDropFolderId()));
-	}
-	
-	/* (non-PHPdoc)
-	 * @see IRelatedObjectPeer::getParentObjects()
-	 */
-	public function getParentObjects(IBaseObject $object)
-	{
-		return $this->getDropFolderFileParentObjects($object);
-	}
-
 	/* (non-PHPdoc)
 	 * @see IRelatedObjectPeer::getRootObjects()
 	 */
 	public function getRootObjects(IBaseObject $object)
 	{
-		return $this->getParentObjects($object);
+		return array(DropFolderPeer::retrieveByPK($object->getDropFolderId()));
 	}
 
 	/* (non-PHPdoc)

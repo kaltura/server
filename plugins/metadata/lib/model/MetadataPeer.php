@@ -153,14 +153,6 @@ class MetadataPeer extends BaseMetadataPeer implements IRelatedObjectPeer
 	}
 
 	/* (non-PHPdoc)
-	 * @see IRelatedObjectPeer::getParentObjects()
-	 */
-	public function getParentObjects(IBaseObject $object)
-	{
-		return array();
-	}
-
-	/* (non-PHPdoc)
 	 * @see IRelatedObjectPeer::getRootObjects()
 	 */
 	public function getRootObjects(IBaseObject $object)
