@@ -39,6 +39,8 @@ class DeliveryProfileAkamaiHdNetworkSmil extends DeliveryProfileVod {
 		$host = preg_replace("(https?://)", "", $this->getUrl() );
 		
 		$url = "http://". $host . $url . '/forceproxy/true';
+		if($this->params->getFileExtension())
+			$url .= "/name/a." . $this->params->getFileExtension();
 		return $url;
 	}
 	
