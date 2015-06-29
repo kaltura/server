@@ -414,9 +414,9 @@ class TvinciDistributionFeedHelper
 		$resultXmlStr = $resultXmlObj->saveXML();
 
 		// DEBUG logs
-		// KalturaLog::debug('source xml = '.$xmlStr);
-		// KalturaLog::debug('xslt = '.$xslStr);
-		// KalturaLog::debug('result xml = '.$resultXmlStr);
+		KalturaLog::debug('source xml = '.$xmlStr);
+		KalturaLog::debug('xslt = '.$xslStr);
+		KalturaLog::debug('result xml = '.$resultXmlStr);
 
 		return $resultXmlStr;
 	}

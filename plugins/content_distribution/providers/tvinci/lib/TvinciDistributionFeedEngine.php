@@ -10,13 +10,15 @@ class TvinciDistributionFeedEngine extends DistributionEngine implements
 	IDistributionEngineDelete
 {
 
+	const SOAP_ENVELOPE_URL = 'http://www.w3.org/2003/05/soap-envelope';
+
 	/* (non-PHPdoc)
 	 * @see IDistributionEngineSubmit::submit()
 	 */
 	public function submit(KalturaDistributionSubmitJobData $data)
 	{
 		$this->validateProviderDataAndDistributionProfile($data);
-		$this->handleSubmit($data, $data->distributionProfile, $data->providerData);
+		$this->handleAction($data, $data->distributionProfile, $data->providerData, "Submit");
 		return true;
 	}
 
@@ -26,7 +28,7 @@ class TvinciDistributionFeedEngine extends DistributionEngine implements
 	public function update(KalturaDistributionUpdateJobData $data)
 	{
 		$this->validateProviderDataAndDistributionProfile($data);
-		$this->handleUpdate($data, $data->distributionProfile, $data->providerData);
+		$this->handleAction($data, $data->distributionProfile, $data->providerData, "Update");
 		return true;
 	}
 
@@ -36,7 +38,7 @@ class TvinciDistributionFeedEngine extends DistributionEngine implements
 	public function delete(KalturaDistributionDeleteJobData $data)
 	{
 		$this->validateProviderDataAndDistributionProfile($data);
-		$this->handleDelete($data, $data->distributionProfile, $data->providerData);
+		$this->handleAction($data, $data->distributionProfile, $data->providerData, "Delete");
 		return true;
 	}
 
@@ -62,52 +64,26 @@ class TvinciDistributionFeedEngine extends DistributionEngine implements
 	 * @param KalturaTvinciDistributionJobProviderData $providerData
 	 * @param $actionType
 	 */
-	private function handleAction(KalturaDistributionJobData $data, KalturaTvinciDistributionProfile $distributionProfile, KalturaTvinciDistributionJobProviderData $providerData, $actionType){
+	private function handleAction(KalturaDistributionJobData $data, KalturaTvinciDistributionProfile $distributionProfile,
+								  KalturaTvinciDistributionJobProviderData $providerData, $actionType){
 		$url = $distributionProfile->ingestUrl;
-		KalturaLog::info("Action {$actionType} entry {$data->entryDistribution->entryId}, url: $url\nXML data:\n{$providerData->xml}");
+		KalturaLog::info("Tvinci Distribution action {$actionType}".
+						 ",entry {$data->entryDistribution->entryId}, url: {$url}\nXML data:\n{$providerData->xml}");
 
 		$result = $this->postXml($url, $providerData->xml);
-		$success = ($result->status == 'OK' || $result->tvmID != '');
+		$success = ($result->status == 'OK' && $result->tvmID != '');
 		if (!$success) {
-			throw new Exception("{$actionType} failed - reason {$result->description}");
+			KalturaLog::err("Tvinci distribution action {$actionType} has failed with description: {$result->description} ".
+							"and status: {$result->status}");
+			throw new KalturaDistributionException("{$actionType} failed - reason {$result->description}");
 		}
-	}
-
-	/**
-	 * @param KalturaDistributionJobData $data
-	 * @param KalturaTvinciDistributionProfile $distributionProfile
-	 * @param KalturaTvinciDistributionJobProviderData $providerData
-	 */
-	protected function handleSubmit(KalturaDistributionJobData $data, KalturaTvinciDistributionProfile $distributionProfile, KalturaTvinciDistributionJobProviderData $providerData)
-	{
-		$this->handleAction($data, $distributionProfile, $providerData, "Submit");
-	}
-
-	/**
-	 * @param KalturaDistributionJobData $data
-	 * @param KalturaTvinciDistributionProfile $distributionProfile
-	 * @param KalturaTvinciDistributionJobProviderData $providerData
-	 */
-	protected function handleUpdate(KalturaDistributionJobData $data, KalturaTvinciDistributionProfile $distributionProfile, KalturaTvinciDistributionJobProviderData $providerData)
-	{
-		$this->handleAction($data, $distributionProfile, $providerData, "Update");
-	}
-
-	/**
-	 * @param KalturaDistributionJobData $data
-	 * @param KalturaTvinciDistributionProfile $distributionProfile
-	 * @param KalturaTvinciDistributionJobProviderData $providerData
-	 */
-	protected function handleDelete(KalturaDistributionJobData $data, KalturaTvinciDistributionProfile $distributionProfile, KalturaTvinciDistributionJobProviderData $providerData)
-	{
-		$this->handleAction($data, $distributionProfile, $providerData, "Delete");
 	}
 
 	/**
 	 * @param string $url
 	 * @param string $xml
 	 * @throws Exception in case of failure to receive a response
-	 * @return SimpleXMLElement Sample content: <Response><status>ERROR</status><description>Root element is missing.</description><assetID></assetID><tvmID></tvmID></Response>
+	 * @return SimpleXMLElement
 	 */
 	protected function postXml($url, $xml)
 	{
@@ -115,27 +91,41 @@ class TvinciDistributionFeedEngine extends DistributionEngine implements
 		KalturaLog::info("Post XML url:{$url} , XML:{$xml}, Full response: " . print_r($response,true));
 
 		$retrunObject = null;
-		if ( $response['http_code'] == 200 )
+		if ( $response['http_code'] == KCurlHeaderResponse::HTTP_STATUS_OK )
 		{
 			try
 			{
 				/**
 				 * this is an exemplary response from the OTT servers per legal request
-				 * <s:Envelope xmlns:s="http://www.w3.org/2003/05/soap-envelope" xmlns:a="http://www.w3.org/2005/08/addressing"><s:Header><a:Action s:mustUnderstand="1">urn:Iservice/InjestTvinciDataResponse</a:Action></s:Header><s:Body><InjestTvinciDataResponse><InjestTvinciDataResult xmlns:i="http://www.w3.org/2001/XMLSchema-instance"><status>OK</status><description/><assetID>1234Wicked</assetID><tvmID>279473</tvmID></InjestTvinciDataResult></InjestTvinciDataResponse></s:Body></s:Envelope>
+				 * <s:Envelope xmlns:s="http://www.w3.org/2003/05/soap-envelope" xmlns:a="http://www.w3.org/2005/08/addressing">
+				 * 	<s:Header>
+				 * 		<a:Action s:mustUnderstand="1">urn:Iservice/InjestTvinciDataResponse</a:Action>
+				 * </s:Header>
+				 * <s:Body>
+				 * 		<InjestTvinciDataResponse>
+				 * 			<InjestTvinciDataResult xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+				 * 				<status>OK</status>
+				 * 				<description/>
+				 * 				<assetID>1234Wicked</assetID>
+				 * 				<tvmID>279473</tvmID>
+				 * 			</InjestTvinciDataResult>
+				 * 		</InjestTvinciDataResponse>
+				 * 	</s:Body>
+				 * </s:Envelope>
 				 */
 				$responseXml = simplexml_load_string($response['content']);
-				$childs = $responseXml->children('http://www.w3.org/2003/05/soap-envelope')->Body;
+				$childs = $responseXml->children(SOAP_ENVELOPE_URL)->Body;
 				$bodyElement = $childs->xpath('//s:Body');
-				$retrunObject = $bodyElement[0]->InjestTvinciDataResponse->InjestTvinciDataResult;
+				$returnObject = $bodyElement[0]->InjestTvinciDataResponse->InjestTvinciDataResult;
 			}
 			catch (Exception $e)
 			{
 
-				throw new Exception("Failed parsing response due to {$e->getMessage()}"); // Throw an Exception in order to fail the job
+				throw new KalturaDistributionException("Failed parsing response due to {$e->getMessage()}"); // Throw an Exception in order to fail the job
 			}
 		}
 
-		return $retrunObject;
+		return $returnObject;
 	}
 	
 
