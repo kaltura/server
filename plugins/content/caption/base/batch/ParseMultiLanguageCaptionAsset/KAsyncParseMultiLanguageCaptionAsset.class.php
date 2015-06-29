@@ -36,6 +36,7 @@ class KAsyncParseMultiLanguageCaptionAsset extends KJobHandlerWorker
 
 		$this->captionClientPlugin = KalturaCaptionClientPlugin::get(self::$kClient);
 
+		$parentId = $data->multiLanaguageCaptionAssetId;
 		$entryId = $data->entryId;
 		$fileLoc = $data->fileLocation;
 

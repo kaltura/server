@@ -43,5 +43,5 @@ interface BatchJobAppErrors extends BaseEnum
 	
 	const EXTERNAL_ENGINE_ERROR = 93;
 
-    const MISSING_ASSETS = 101;
+	const MISSING_ASSETS = 101;
 }
