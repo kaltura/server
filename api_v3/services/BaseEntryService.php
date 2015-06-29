@@ -740,7 +740,7 @@ class BaseEntryService extends KalturaEntryService
         $pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaEntryContextDataContributor');
         foreach ($pluginInstances as $pluginInstance)
         {
-            $pluginInstance->contributeToEntryContextDataResult($entryId, $contextDataParams, $result);
+            $pluginInstance->contributeToEntryContextDataResult($dbEntry, $contextDataParams, $result);
         }
 
 		return $result;

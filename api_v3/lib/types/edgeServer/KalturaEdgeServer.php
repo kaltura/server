@@ -74,7 +74,6 @@ class KalturaEdgeServer extends KalturaObject implements IFilterable
 	 * 
 	 * @var string
 	 * @filter like,mlikeor,mlikeand
-	 * @requiresPermission update
 	 */
 	public $hostName;
 	
@@ -83,7 +82,6 @@ class KalturaEdgeServer extends KalturaObject implements IFilterable
 	 *
 	 * @var string
 	 * @filter like,mlikeor,mlikeand
-	 * @requiresPermission update
 	 */
 	public $playbackHostName;
 	
@@ -162,10 +160,9 @@ class KalturaEdgeServer extends KalturaObject implements IFilterable
 	
 	public function validateMandatoryAttributes($isInsert = false)
 	{
-		if($isInsert)
-			$this->validatePropertyNotNull("hostName");
+		$this->validatePropertyMinLength("hostName", 1, !$isInsert);
 		
-		$this->validatePropertyMinLength("name", 1, true);
+		$this->validatePropertyMinLength("name", 1, !$isInsert);
 	}
 	
 	public function validateDuplications($edgeId = null)

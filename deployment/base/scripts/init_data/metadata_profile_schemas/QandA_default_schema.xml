@@ -30,8 +30,9 @@
 							<xsd:enumeration value="Pending"/>
 							<xsd:enumeration value="Assigned"/>
 							<xsd:enumeration value="Answered"/>
-							<xsd:enumeration value="Follow Up"/>
+							<xsd:enumeration value="FollowUp"/>
 							<xsd:enumeration value="Done"/>
+                            <xsd:enumeration value="Cleared"/>
 						</xsd:restriction>
 					</xsd:simpleType>
 				</xsd:element>
@@ -65,6 +66,18 @@
 							<xsd:enumeration value="Announcement"/>
 						</xsd:restriction>
 					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element id="md_EB0C3496-0163-4950-B46D-F9DA204A33E3" name="ThreadCreatorId" minOccurs="0" maxOccurs="1" type="textType">
+					<xsd:annotation>
+						<xsd:documentation/>
+						<xsd:appinfo>
+							<label>Thread creator id</label>
+							<key>ThreadCreatorId</key>
+							<searchable>true</searchable>
+							<timeControl>false</timeControl>
+							<description>Holds the Thread creator id</description>
+						</xsd:appinfo>
+					</xsd:annotation>
 				</xsd:element>
 			</xsd:sequence>
 		</xsd:complexType>

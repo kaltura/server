@@ -2406,17 +2406,32 @@ CREATE TABLE `edge_server`
 	`created_at` DATETIME,
 	`updated_at` DATETIME,
 	`partner_id` INTEGER,
-	`name` VARCHAR(31),
-	`system_name` VARCHAR(128),
-	`desciption` VARCHAR(127),
+	`name` VARCHAR(256),
+	`system_name` VARCHAR(256),
+	`desciption` VARCHAR(256),
 	`status` INTEGER,
-	'type' INTEGER default 0,
+	`type` INTEGER default 0 NOT NULL,
 	`tags` TEXT,
-	`host_name` VARCHAR(127),
-	'playback_host_name' VARCHAR(127),
+	`host_name` VARCHAR(256) NOT NULL,
+	`playback_host_name` VARCHAR(256),
 	`parent_id` INTEGER default 0,
 	`custom_data` TEXT,
 	PRIMARY KEY (`id`),
-	KEY partner_id_status_system_name(partner_id, status, system_name),
-	KEY partner_id_status_host_name(partner_id, status, host_name)
+	KEY partner_id_status_system_name(`partner_id`, `status`, `system_name`),
+	KEY host_name(`host_name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE `user_entry`
+(
+	`id` INTEGER  NOT NULL AUTO_INCREMENT,
+	`entry_id` VARCHAR(20)  NOT NULL,
+	`kuser_id` INTEGER  NOT NULL,
+	`partner_id` INTEGER,
+	`created_at` DATETIME,
+	`updated_at` DATETIME,
+	`status` INTEGER,
+	`type` INTEGER,
+	`custom_data` TEXT,
+	PRIMARY KEY (`id`),
+	KEY (`entry_id`, `kuser_id`)
+)Type=InnoDB COMMENT='Describes the relationship between a specific user and a specific entry';

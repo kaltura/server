@@ -239,5 +239,8 @@ return array (
     'KuserKgroupTableMap' => 'lib/model/map/KuserKgroupTableMap.php',
     'KuserKgroupPeer' => 'lib/model/KuserKgroupPeer.php',
     'KuserKgroup' => 'lib/model/KuserKgroup.php',
+    'UserEntryTableMap' => 'lib/model/map/UserEntryTableMap.php',
+    'UserEntryPeer' => 'lib/model/UserEntryPeer.php',
+    'UserEntry' => 'lib/model/UserEntry.php',
   ),
 );

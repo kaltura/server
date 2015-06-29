@@ -319,6 +319,10 @@ class KalturaRequestDeserializer
 			
 			if ($property->isEnum())
 			{
+				if(strtolower($value) == 'true')
+					$value = 1;
+				if(strtolower($value) == 'false')
+					$value = 0;
 				if (!$property->getTypeReflector()->checkEnumValue($value))
 					throw new KalturaAPIException(KalturaErrors::INVALID_ENUM_VALUE, $value, $name, $property->getType());
 			

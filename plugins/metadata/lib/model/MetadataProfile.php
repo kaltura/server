@@ -24,6 +24,7 @@ class MetadataProfile extends BaseMetadataProfile implements ISyncableFile
 	const STATUS_TRANSFORMING = 3;
 	
 	const CUSTOM_DATA_METADATA_XSLT_VERSION = 'metadata_xslt_version';
+	const CUSTOM_DATA_DISABLE_REINDEXING = 'disable_reindexing';
 	
 	private $xsdData = null;
 	private $viewsData = null;
@@ -135,9 +136,18 @@ class MetadataProfile extends BaseMetadataProfile implements ISyncableFile
     public function getXsltVersion()
 	{
 	    return $this->getFromCustomData(self::CUSTOM_DATA_METADATA_XSLT_VERSION);
-	}	
-	
-	
+	}
+
+	public function setDisableReIndexing($value)
+	{
+		$this->putInCustomData(self::CUSTOM_DATA_DISABLE_REINDEXING, (bool)$value);
+	}
+
+	public function getDisableReIndexing()
+	{
+		return $this->getFromCustomData(self::CUSTOM_DATA_DISABLE_REINDEXING, null, false);
+	}
+
 	/**
 	 * @param int $sub_type
 	 * @throws FileSyncException

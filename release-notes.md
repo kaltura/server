@@ -1,3 +1,84 @@
+# Jupiter-10.14.0 #
+
+## Email Notifications ##
+
+- Issue Type: Email notifications send all addresses in the "To" field
+- Issue ID: SUP-4339 
+
+#### Configuration ####
+ 
+- None.
+
+#### Deployment Scripts ####
+
+/deployment/updates/scripts/2015_06_18_update_mediaspace_email_notification_templates.php
+
+#### Known Issues & Limitations ####
+
+None.
+
+## On the fly encryption ##
+
+- Issue Type: Configuration for existing feature
+- Issue ID: PLAT-2675 
+
+#### Configuration ####
+ 
+- Add relevant value of "license_server_url" in "drm.ini", see saas-config
+
+#### Deployment Scripts ####
+
+None.
+
+#### Known Issues & Limitations ####
+
+None.
+
+
+## in video quiz ##
+
+- Issue Type: new feature  
+- Issue ID: PLAT-2795 and PLAT-2792 and PLAT-2791 and PLAT-2790 and PLAT-2786 and PLAT-2857
+
+#### Configuration ####
+
+- Add the following line to the plugins.ini file:  
+        Quiz 
+
+- Add the following lines from admin.template.ini to admin.ini:
+
+		moduls.quizCuePoint.enabled = true
+		moduls.quizCuePoint.permissionType = 3
+		moduls.quizCuePoint.label = Quiz - Cue Points
+		moduls.quizCuePoint.permissionName = QUIZ_PLUGIN_PERMISSION
+		moduls.quizCuePoint.basePermissionType = 3
+		moduls.quizCuePoint.basePermissionName = CUEPOINT_PLUGIN_PERMISSION
+		moduls.quizCuePoint.group = GROUP_ENABLE_DISABLE_FEATURES
+		
+#### Deployment Scripts ####
+
+- run the Following deployemnt scripts:
+        
+		Create new user_entry table:
+        mysql -h@db_host@ -u@db_user@ -p@db_pass@ -P3306 kaltura < deployment/updates/sql/2015_15_06_create_user_entry_table.sql
+        
+
+		Update new services permissions:
+		php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2015_04_11_update_quiz_permissions.php
+		php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2015_05_07_update_userentry_permissions.php
+		php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2015_06_07_update_quiz_analytics_permissions.php
+
+		Install Plugins:
+		php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+
+		
+		
+
+#### Known Issues & Limitations ####
+
+None.
+
+
 # Jupiter-10.13.0 #
 
 ## New edgeServer service - drop one of the dynamic eCDN ##

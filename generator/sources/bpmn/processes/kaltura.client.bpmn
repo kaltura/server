@@ -9,9 +9,9 @@
 
 				var config = new com.kaltura.client.KalturaConfiguration();
 				config.setEndpoint(endPoint);
-				config.setClientTag("bpm-engine");
 
 				var client = new com.kaltura.client.KalturaClient(config);
+				client.setClientTag("bpm-engine");
 				execution.setVariable("client", client);
 			</script>
     </scriptTask>

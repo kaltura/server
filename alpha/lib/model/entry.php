@@ -140,6 +140,8 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	const DEFAULT_IMAGE_HEIGHT = 480;
 	const DEFAULT_IMAGE_WIDTH = 640;
 
+	const CAPABILITIES = "capabilities";
+
 	private $appears_in = null;
 
 	private $m_added_moderation = false;
@@ -1232,6 +1234,16 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 			$dynamicAttributes[$dynAttribName] = $createdAt;
 		}
 
+		$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaDynamicAttributesContributer');
+		foreach($pluginInstances as $pluginName => $pluginInstance) {
+			try {
+				$dynamicAttributes += $pluginInstance->getDynamicAttributes($this);
+			} catch (Exception $e) {
+				KalturaLog::err($e->getMessage());
+				continue;
+			}
+		}
+
 		return $dynamicAttributes;
 	}
 	
@@ -1774,6 +1786,9 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 
 	public function setRedirectEntryId ( $v )	{	$this->putInCustomData ( "redirectEntryId" , $v );	}
 	public function getRedirectEntryId (  )		{	return $this->getFromCustomData( "redirectEntryId" );	}
+
+	public function setIsTrimDisabled ( $v )	{	$this->putInCustomData ( "isTrimDisabled" , $v );	}
+	public function getIsTrimDisabled (  )		{	return $this->getFromCustomData( "isTrimDisabled" );	}
 	
 	// indicates that thumbnail shouldn't be auto captured, because it already supplied by the user
 	public function setCreateThumb ( $v, thumbAsset $thumbAsset = null)		
@@ -2965,8 +2980,19 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	/**
 	 * @return entry
 	 */
-	public function copyTemplate($coptPartnerId = false)
+	public function copyTemplate($coptPartnerId = false, $entry = null)
 	{
+		if ($entry)
+		{
+			$templateType = $this->getType();
+			$type = $entry->getType();
+			$templateMediaType = $this->getMediaType() ? $this->getMediaType() : "null";
+			$mediaType = $entry->getMediaType() ? $entry->getMediaType() : "null";
+	
+			if ($templateType != $type || $templateMediaType != $mediaType)
+			KalturaLog::debug("ENTRY_TEMPLATE_COPY - original entry:template entry. type - ".$type.':'.$templateType.' mediaType - '.$mediaType.':'.$templateMediaType);
+		}
+	
 		// we use get_class(), because this might be a subclass
 		$clazz = get_class($this);
 		$copyObj = new $clazz();
@@ -3341,5 +3367,19 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		$userNames[] = $kuser->getScreenName();
 		
 		return implode(" ", $userNames);
+	}
+
+	public function getCapabilities()
+	{
+		$capabilitiesArr = $this->getFromCustomData(self::CAPABILITIES, null, array());
+		$capabilitiesStr = implode(",", $capabilitiesArr);
+		return $capabilitiesStr;
+	}
+
+	public function addCapability( $capability)
+	{
+		$capabilities = $this->getFromCustomData(self::CAPABILITIES, null, array());
+		$capabilities[$capability] = $capability;
+		$this->putInCustomData( self::CAPABILITIES, $capabilities);
 	}
 }

@@ -218,6 +218,21 @@ class KDLOperatorFfmpeg2_1_3 extends KDLOperatorFfmpeg1_1_1 {
 		if(!isset($target->_container))
 			return $cmdStr;
 		
+		/*
+		 * On multi-lingual, add:
+		 * - explicit mapping for video (if required) 
+		 * - the required audio channels 
+		 */
+		if(isset($target->_audio) && isset($target->_multiStream) && isset($target->_multiStream->audio)
+		&& isset($target->_multiStream->audio->languages) && count($target->_multiStream->audio->languages)>0){
+			if(isset($target->_video)) {
+				$cmdStr.= " -map v";
+			}
+			foreach ($target->_multiStream->audio->languages as $lang){
+				$cmdStr.= " -map 0:".$lang->id;
+			}
+		}
+		
 		if(in_array($target->_container->_id, array(KDLContainerTarget::MKV,KDLContainerTarget::WEBM))){
 			$cmdStr.= " -sn";
 		}

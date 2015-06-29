@@ -15,6 +15,8 @@
  */
 class KuserKgroupPeer extends BaseKuserKgroupPeer {
 
+	private static $kgroupIdsByKuserId = array();
+
 	/**
 	 * Creates default criteria filter
 	 */
@@ -89,7 +91,13 @@ class KuserKgroupPeer extends BaseKuserKgroupPeer {
 	 * @return array
 	 */
 	public static function retrieveKgroupIdsByKuserId($kuserId){
-		return self::retrieveKgroupIdsByKuserIds(array($kuserId));
+		if (isset(self::$kgroupIdsByKuserId[$kuserId])){
+			return self::$kgroupIdsByKuserId[$kuserId];
+		}
+
+		self::$kgroupIdsByKuserId[$kuserId] = self::retrieveKgroupIdsByKuserIds(array($kuserId));
+
+		return self::$kgroupIdsByKuserId[$kuserId];
 	}
 
 } // KuserKgroupPeer
