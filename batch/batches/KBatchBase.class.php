@@ -32,11 +32,6 @@ abstract class KBatchBase implements IKalturaLogger
 	 * @var KalturaConfiguration
 	 */
 	public static $kClientConfig = null;
-	
-	/**
-	 * @var string
-	 */
-	public static $clientTag = null;
 
 	/**
 	 * @var boolean
@@ -261,9 +256,7 @@ abstract class KBatchBase implements IKalturaLogger
 
 		self::$kClient = new KalturaClient(self::$kClientConfig);
 		self::$kClient->setPartnerId(self::$taskConfig->getPartnerId());
-
-		self::$clientTag = 'batch: ' . self::$taskConfig->getSchedulerName() . ' ' . get_class($this) . " index: {$this->getIndex()} sessionId: " . UniqueId::get();
-		self::$kClient->setClientTag(self::$clientTag);
+		self::$kClient->setClientTag('batch: ' . self::$taskConfig->getSchedulerName() . ' ' . get_class($this) . " index: {$this->getIndex()} sessionId: " . UniqueId::get());
 		
 		//$ks = self::$kClient->session->start($secret, "user-2", KalturaSessionType::ADMIN);
 		$ks = $this->createKS();

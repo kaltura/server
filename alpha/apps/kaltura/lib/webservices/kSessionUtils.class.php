@@ -39,23 +39,6 @@ class kSessionUtils
 		}
 	}
 	
-	public static function createKSession($partner_id, $partner_secret, $puser_id, $expiry, $type, $privileges, $additional_data = null, $master_partner_id = null)
-	{
-		$ks = new ks();
-		$ks->valid_until = kApiCache::getTime() + $expiry; // store in milliseconds to make comparison easier at validation time
-		$ks->type = $type;
-		$ks->partner_id = $partner_id;
-		$ks->master_partner_id = $master_partner_id;
-		$ks->partner_pattern = $partner_id;
-		$ks->error = 0;
-		$ks->rand = microtime(true);
-		$ks->user = $puser_id;
-		$ks->privileges = $privileges;
-		$ks->additional_data = $additional_data;
-		
-		return $ks;
-	}
-		
 	/*
 	* will validate the partner_id, secret & key and return a kaltura-session string (KS)
 	* the ks will be a 2-way hashed string that expires after a given period of time and holds data about the partner
@@ -78,11 +61,22 @@ class kSessionUtils
 
 			//	echo "startKSession: from DB: $ks_max_expiry_in_seconds | desired: $desired_expiry_in_seconds " ;
 
-			$ks_type = ks::TYPE_KS;
-			if($admin)
-				$ks_type = $admin ; // if the admin > 1 - use it rather than automatially setting it to be 2
-				
-			$ks = self::createKSession($partner_id, $partner_secret, $puser_id, $desired_expiry_in_seconds, $ks_type, $privileges, $additional_data, $master_partner_id);
+			$ks = new ks();
+			$ks->valid_until = kApiCache::getTime() + $desired_expiry_in_seconds ; // store in milliseconds to make comparison easier at validation time
+//			$ks->type = $admin ? ks::TYPE_KAS : ks::TYPE_KS;
+			if ( $admin == false )
+				$ks->type = ks::TYPE_KS;
+			else
+				$ks->type = $admin ; // if the admin > 1 - use it rather than automatially setting it to be 2
+
+			$ks->partner_id = $partner_id;
+			$ks->master_partner_id = $master_partner_id;
+			$ks->partner_pattern = $partner_id;
+			$ks->error = 0;
+			$ks->rand = microtime(true);
+			$ks->user = $puser_id;
+			$ks->privileges = $privileges;
+			$ks->additional_data = $additional_data;
 			$ks_str = $ks->toSecureString();
 			return 0;
 		}

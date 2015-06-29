@@ -181,22 +181,19 @@ class DrmPlugin extends KalturaPlugin implements IKalturaServices, IKalturaAdmin
 	 */
 	protected function shouldContribute(entry $entry)
 	{
-		if ($entry->getAccessControl())
+		foreach ($entry->getAccessControl()->getRulesArray() as $rule)
 		{
-			foreach ($entry->getAccessControl()->getRulesArray() as $rule)
+			/**
+			 * @var kRule $rule
+			 */
+			foreach ($rule->getActions() as $action)
 			{
 				/**
-				 * @var kRule $rule
+				 * @var kRuleAction $action
 				 */
-				foreach ($rule->getActions() as $action)
+				if ($action->getType() == DrmAccessControlActionType::DRM_POLICY)
 				{
-					/**
-					 * @var kRuleAction $action
-					 */
-					if ($action->getType() == DrmAccessControlActionType::DRM_POLICY)
-					{
-						return true;
-					}
+					return true;
 				}
 			}
 		}

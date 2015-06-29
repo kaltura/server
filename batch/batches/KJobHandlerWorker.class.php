@@ -33,15 +33,11 @@ abstract class KJobHandlerWorker extends KBatchBase
 	protected static function setCurrentJob(KalturaBatchJob $currentJob)
 	{
 		self::$currentJob = $currentJob;
-		
-		self::$kClient->setClientTag(self::$clientTag . " partnerId: " . $currentJob->partnerId);
 	}
 
 	protected static function unsetCurrentJob()
 	{
 		self::$currentJob = null;
-
-		self::$kClient->setClientTag(self::$clientTag);
 	}
 	
 	protected function init()

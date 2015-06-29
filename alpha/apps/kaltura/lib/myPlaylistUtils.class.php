@@ -859,10 +859,10 @@ HTML;
 	
 	private static function addSchedulingToCriteria(Criteria $c)
 	{
-		$startDateCriterion = $c->getNewCriterion(entryPeer::START_DATE, kApiCache::getTime(), Criteria::LESS_EQUAL);
+		$startDateCriterion = $c->getNewCriterion(entryPeer::START_DATE, time(), Criteria::LESS_EQUAL);
 		$startDateCriterion->addOr($c->getNewCriterion(entryPeer::START_DATE, null));
 		
-		$endDateCriterion = $c->getNewCriterion(entryPeer::END_DATE, kApiCache::getTime(), Criteria::GREATER_EQUAL);
+		$endDateCriterion = $c->getNewCriterion(entryPeer::END_DATE, time(), Criteria::GREATER_EQUAL);
 		$endDateCriterion->addOr($c->getNewCriterion(entryPeer::END_DATE, null));
 		
 		$c->addAnd($startDateCriterion);

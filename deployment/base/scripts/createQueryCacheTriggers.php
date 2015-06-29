@@ -36,8 +36,6 @@ $INVALIDATION_KEYS = array(
 	array('table' => "permission_to_permission_item", 	'keys' => array(array("'permissionToPermissionItem:permissionId='", '@OBJ@.permission_id'))),
 	array('table' => "delivery_profile", 				'keys' => array(array("'deliveryProfile:id='", '@OBJ@.id'), array("'deliveryProfile:partnerId='", '@OBJ@.partner_id'))),
 	array('table' => "event_notification_template", 	'keys' => array(array("'eventNotificationTemplate:partnerId='", '@OBJ@.partner_id')),													'plugin' => 'event_notification'),
-	array('table' => "category_kuser", 					'keys' => array(array("'categoryKuser:categoryId='", '@OBJ@.category_id'))),
-	array('table' => "kuser_kgroup", 					'keys' => array(array("'kuserKgroup:kuserId='", '@OBJ@.kuser_id'))),
 	);
 
 $TRIGGER_TYPES = array('INSERT', 'UPDATE', 'DELETE');

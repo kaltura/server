@@ -410,8 +410,4 @@ class categoryKuser extends BasecategoryKuser implements IIndexable{
 	}
 
 
-	public function getCacheInvalidationKeys()
-	{
-		return array("categoryKuser:categoryId=".strtolower($this->getCategoryId()));
-	}
 } // categoryKuser
