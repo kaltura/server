@@ -55,7 +55,7 @@ class QuizrReportingService extends KalturaBaseService
 				 */
 				$sumOfScores += $quiz->getScore();
 			}
-			$ans = $sumOfScores / (count($quizzes));
+			$ans = $sumOfScores / $numOfQuizzesFound;
 		}
 		return $ans;
 	}
@@ -110,13 +110,10 @@ class QuizrReportingService extends KalturaBaseService
 						{
 							if ($optionalAnswer->getIsCorrect())
 							{
-								$correct = true;
+								$numOfCorrectAnswers++;
+								break;
 							}
 						}
-					}
-					if ($correct)
-					{
-						$numOfCorrectAnswers++;
 					}
 				}
 				$pctg = $numOfCorrectAnswers/$numOfAnswers;
@@ -125,7 +122,7 @@ class QuizrReportingService extends KalturaBaseService
 			{
 				$pctg = 0.0;
 			}
-			$ans[$question->getId()] = $pctg;
+			$ans[$question->getId()] = $pctg*100;
 		}
 		return $ans;
 	}
