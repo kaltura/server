@@ -67,8 +67,19 @@ class kCategoryEntryAdvancedFilter extends AdvancedSearchFilterItem
 
 		$categoryEntries = explode( ',', $categoryEntries );
 
-		$query->addColumnWhere(entryPeer::CATEGORIES_IDS, $categoryEntries, KalturaCriteria::IN_LIKE);
-
+		if($query instanceof IKalturaIndexQuery)
+		{
+			$categoriesStrs = array();
+			foreach($categoryEntries as $categoryId)
+			{
+				$categoriesStrs[] = '"'.$categoryId.'"';
+			}
+			$query->addMatch('@' . entryIndex::getIndexFieldName(entryPeer::CATEGORIES_IDS) . ' (' . implode(' | ', $categoriesStrs) . ')');
+		}
+		else
+		{
+			$query->addColumnWhere(entryPeer::CATEGORIES_IDS, $categoryEntries, KalturaCriteria::IN_LIKE);
+		}
 
 		if ( $this->orderBy )
 		{
