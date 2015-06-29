@@ -17,9 +17,7 @@ class TvinciDistributionFeedEngine extends DistributionEngine implements
 	 */
 	public function submit(KalturaDistributionSubmitJobData $data)
 	{
-		$this->validateProviderDataAndDistributionProfile($data);
-		$this->handleAction($data, $data->distributionProfile, $data->providerData, "Submit");
-		return true;
+		return $this->handleAction($data, $data->distributionProfile, $data->providerData, "Submit");
 	}
 
 	/* (non-PHPdoc)
@@ -27,9 +25,7 @@ class TvinciDistributionFeedEngine extends DistributionEngine implements
 	 */
 	public function update(KalturaDistributionUpdateJobData $data)
 	{
-		$this->validateProviderDataAndDistributionProfile($data);
-		$this->handleAction($data, $data->distributionProfile, $data->providerData, "Update");
-		return true;
+		return $this->handleAction($data, $data->distributionProfile, $data->providerData, "Update");
 	}
 
 	/* (non-PHPdoc)
@@ -37,9 +33,7 @@ class TvinciDistributionFeedEngine extends DistributionEngine implements
 	*/
 	public function delete(KalturaDistributionDeleteJobData $data)
 	{
-		$this->validateProviderDataAndDistributionProfile($data);
-		$this->handleAction($data, $data->distributionProfile, $data->providerData, "Delete");
-		return true;
+		return $this->handleAction($data, $data->distributionProfile, $data->providerData, "Delete");
 	}
 
 	private function validateProviderDataAndDistributionProfile(KalturaDistributionJobData $data){
@@ -66,6 +60,7 @@ class TvinciDistributionFeedEngine extends DistributionEngine implements
 	 */
 	private function handleAction(KalturaDistributionJobData $data, KalturaTvinciDistributionProfile $distributionProfile,
 								  KalturaTvinciDistributionJobProviderData $providerData, $actionType){
+		$this->validateProviderDataAndDistributionProfile($data);
 		$url = $distributionProfile->ingestUrl;
 		KalturaLog::info("Tvinci Distribution action {$actionType}".
 						 ",entry {$data->entryDistribution->entryId}, url: {$url}\nXML data:\n{$providerData->xml}");
@@ -77,6 +72,7 @@ class TvinciDistributionFeedEngine extends DistributionEngine implements
 							"and status: {$result->status}");
 			throw new KalturaDistributionException("{$actionType} failed - reason {$result->description}");
 		}
+		return true;
 	}
 
 	/**
@@ -88,7 +84,7 @@ class TvinciDistributionFeedEngine extends DistributionEngine implements
 	protected function postXml($url, $xml)
 	{
 		$response = self::curlPost($url, $xml);
-		KalturaLog::info("Post XML url:{$url} , XML:{$xml}, Full response: " . print_r($response,true));
+		KalturaLog::info("Post XML Full response: " . print_r($response,true));
 
 		$retrunObject = null;
 		if ( $response['http_code'] == KCurlHeaderResponse::HTTP_STATUS_OK )
