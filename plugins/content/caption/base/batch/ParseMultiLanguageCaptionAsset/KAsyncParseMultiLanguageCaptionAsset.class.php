@@ -82,29 +82,29 @@ class KAsyncParseMultiLanguageCaptionAsset extends KJobHandlerWorker
 		$subXMLStart = substr($xmlString, 0, $indexStart);
 		$subXMLEnd = substr($xmlString, $indexEnd + 6);
 
-		$headerLanguage = null;
-		if ($xml[0])
-			$headerLanguage = $xml[0]->attributes('xml',true);
+        $headerLanguage = null;
+        if ($xml[0])
+            $headerLanguage = $xml[0]->attributes('xml',true);
 
-		$captionsCreated = false;
-		$divCounter = 0;
+        $captionsCreated = false;
+        $divCounter = 0;
 		foreach ($bodyNode->div as $divNode)
 		{
-			$divCounter++;
+            $divCounter++;
 
 			$onlyUpdate = false;
 			$xmlDivNode = $divNode->asXml();
 			$languageShort = $divNode[0]->attributes('xml',true)->lang;
 
-			if(!$languageShort)
-			{
-				if(!$headerLanguage)
-				{
-					KalturaLog::debug("failed to find language in div number $divCounter");
-					continue;
-				}
-				$languageShort = $headerLanguage;
-			}
+            if(!$languageShort)
+            {
+                if(!$headerLanguage)
+                {
+                    KalturaLog::debug("failed to find language in div number $divCounter");
+                    continue;
+                }
+                $languageShort = $headerLanguage;
+            }
 
 			if(isset($captionChildernIds[$languageShort]))
 			{
@@ -132,7 +132,7 @@ class KAsyncParseMultiLanguageCaptionAsset extends KJobHandlerWorker
 			else
 				$currentCaptionCreated = $this->setCaptionContent($id, $contentResource);				
 
-			$captionsCreated = $captionsCreated || $currentCaptionCreated;
+            $captionsCreated = $captionsCreated || $currentCaptionCreated;
 	
 		}
 
@@ -140,9 +140,22 @@ class KAsyncParseMultiLanguageCaptionAsset extends KJobHandlerWorker
 		self::deleteCaptions($captionChildernIds);
 		self::unimpersonate();
 
-		$message = $captionsCreated ? "Finished parsing" : CaptionPlugin::NO_CAPTIONS_MESSAGE;
+        if ($captionsCreated)
+        {
+            $errType = null;
+            $errNumber = null;
+            $message = CaptionPlugin::FINISHED_PARSING_MESSAGE;
+            $status = KalturaBatchJobStatus::FINISHED;
+        }
+        else
+        {
+            $errType = KalturaBatchJobErrorTypes::KALTURA_API;
+            $errNumber = KalturaBatchJobAppErrors::MISSING_ASSETS;
+            $message = CaptionPlugin::NO_CAPTIONS_MESSAGE;
+            $status = KalturaBatchJobStatus::FAILED;
+        }
 
-		$this->closeJob($job, null, null, $message, KalturaBatchJobStatus::FINISHED);
+		$this->closeJob($job, $errType, $errNumber, $message, $status);
 
 		return $job;
 	}
@@ -167,12 +180,12 @@ class KAsyncParseMultiLanguageCaptionAsset extends KJobHandlerWorker
 		try
 		{
 			$this->captionClientPlugin->captionAsset->setContent($id , $contentResource);
-			return true;
+            return true;
 		}
 		catch(Exception $e)
 		{
 			KalturaLog::debug("problem with caption content-setting id - $id - " . $e->getMessage());
-			return false;
+            return false;
 		}
 	}
 

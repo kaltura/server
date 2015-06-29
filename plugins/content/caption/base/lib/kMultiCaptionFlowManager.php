@@ -7,14 +7,13 @@ class kMultiCaptionFlowManager implements kBatchJobStatusEventConsumer
 	 */
 	public function shouldConsumeJobStatusEvent(BatchJob $dbBatchJob)
 	{
-		$parseMultiBatchJobType = CaptionPlugin::getBatchJobTypeCoreValue(ParseMultiLanguageCaptionAssetBatchType::PARSE_MULTI_LANGUAGE_CAPTION_ASSET);
-		$message = $dbBatchJob->getMessage();
-			
-		if ($dbBatchJob->getJobType() == $parseMultiBatchJobType && $dbBatchJob->getStatus() == BatchJob::BATCHJOB_STATUS_FINISHED)
+        if($dbBatchJob->getStatus() == BatchJob::BATCHJOB_STATUS_FAILED)
 		{
-			if(strpos($message,CaptionPlugin::NO_CAPTIONS_MESSAGE) !== false)
-				return true;
-		}		
+            $parseMultiBatchJobType = CaptionPlugin::getBatchJobTypeCoreValue(ParseMultiLanguageCaptionAssetBatchType::PARSE_MULTI_LANGUAGE_CAPTION_ASSET);
+            if ($dbBatchJob->getJobType() == $parseMultiBatchJobType && $dbBatchJob->getErrNumber() == KalturaBatchJobAppErrors::MISSING_ASSETS)
+				    return true;
+		}
+        return false;
 	}
 	
 	/* (non-PHPdoc)
@@ -35,7 +34,7 @@ class kMultiCaptionFlowManager implements kBatchJobStatusEventConsumer
 
 	private function updatedParseMulti($dbBatchJob,$data)
 	{
-		$captionId = $data->getMultiLanaguageCaptionAssetId();
+		$captionId = $data->getParentCaptionAssetId();
 		$captionAsset = assetPeer::retrieveById($captionId);
 		$captionAsset->setStatus(asset::ASSET_STATUS_ERROR);
 		$captionAsset->save();
