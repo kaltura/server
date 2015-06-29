@@ -11,13 +11,6 @@ class KalturaResponseProfileCacher extends kResponseProfileCacher
 	 */
 	private static $responseProfileKey = null;
 	
-	/**
-	 * @var boolean
-	 */
-	private static $disabled = false;
-	
-	
-	
 	private static function getObjectSpecificCacheValue(KalturaObject $apiObject, IBaseObject $object, $responseProfileKey)
 	{
 		return array(
@@ -87,7 +80,7 @@ class KalturaResponseProfileCacher extends kResponseProfileCacher
 	
 	public static function onPersistentObjectLoaded(IBaseObject $object)
 	{
-		if(!self::$cachedObject || self::$disabled)
+		if(!self::$cachedObject)
 			return;
 			
 		KalturaLog::debug("Loaded " . get_class($object) . " [" . $object->getId() . "]");
@@ -108,11 +101,6 @@ class KalturaResponseProfileCacher extends kResponseProfileCacher
 	
 	public static function start(IBaseObject $object, KalturaDetachedResponseProfile $responseProfile)
 	{
-		if(self::$disabled)
-		{
-			return;
-		}
-		
 		if(self::$cachedObject)
 		{
 			KalturaLog::debug("Object [" . get_class(self::$cachedObject) . "][" . self::$cachedObject->getId() . "] still caching");
@@ -153,15 +141,6 @@ class KalturaResponseProfileCacher extends kResponseProfileCacher
 			self::set($responseProfileCacheKey, serialize($responseProfile));
 	}
 	
-	public static function disable()
-	{
-		if(self::$cachedObject)
-		{
-			KalturaLog::debug("Object [" . get_class(self::$cachedObject) . "][" . self::$cachedObject->getId() . "] caching disabled");
-		}
-		self::$disabled = true;
-	}
-	
 	public static function stop(IBaseObject $object, KalturaObject $apiObject)
 	{
 		if($object !== self::$cachedObject)
@@ -170,12 +149,6 @@ class KalturaResponseProfileCacher extends kResponseProfileCacher
 			return;
 		}
 
-		if(self::$disabled)
-		{
-			self::$disabled = false;
-			return;
-		}
-		
 		KalturaLog::debug("Stop " . get_class($apiObject) . " [" . print_r($apiObject, true) . "]");
 		
 		$key = self::getObjectSpecificCacheKey(self::$cachedObject, self::$responseProfileKey);
