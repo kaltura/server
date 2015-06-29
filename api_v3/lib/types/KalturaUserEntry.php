@@ -61,7 +61,6 @@ abstract class KalturaUserEntry extends KalturaObject implements IRelatedFiltera
 		"id",
 		"entryId",
 		"userId" => "KuserId",
-//		"userId",
 		"partnerId",
 		"type",
 		"status",

@@ -28,10 +28,6 @@ class UserEntryService extends KalturaBaseService {
 		}
 		$userEntry->userId = $kuser->getKuserId();
 		$dbUserEntry = $userEntry->toInsertableObject(null, array('type'));
-		/**
-		 * @var UserEntry $dbUserEntry
-		 */
-//		$dbUserEntry->setKuserId($userId);
 		$dbUserEntry->save();
 
 		$userEntry->fromObject($dbUserEntry, $this->getResponseProfile());
