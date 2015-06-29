@@ -61,6 +61,7 @@ abstract class KalturaUserEntry extends KalturaObject implements IRelatedFiltera
 		"id",
 		"entryId",
 		"userId" => "KuserId",
+//		"userId",
 		"partnerId",
 		"type",
 		"status",
@@ -120,5 +121,14 @@ abstract class KalturaUserEntry extends KalturaObject implements IRelatedFiltera
 		return array();
 	}
 
+	protected function doFromObject(UserEntry $srcObj, KalturaDetachedResponseProfile $responseProfile = null)
+	{
+		$kuser = $srcObj->getkuser();
+		if ($kuser)
+		{
+			$this->userId = $kuser->getPuserId();
+		}
+		parent::doFromObject($srcObj, $responseProfile);
+	}
 
 }
