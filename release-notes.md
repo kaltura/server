@@ -1,5 +1,20 @@
 # Jupiter-10.15.0 #
 
+## Metadata Change HTTP Notification ##  
+
+- Issue Type: bug  
+- Issue ID: PS-2287  
+
+### Configuration ###  
+
+ - None.
+ 
+### Deployment Scripts ###
+
+- run the following deployment script:  
+		php exec.php /opt/kaltura/app/tests/standAloneClient/entryCustomMetadataChangedHttpNotification.xml  
+
+
 ## Quiz Reporting ##
 
 - Issue Type: Add reporting API to quiz
