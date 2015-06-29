@@ -106,7 +106,7 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 			
 			if($value)
 			{
-				if($invalidationKeys)
+				if($invalidationKeys) // TODO use different store for invalidation keys
 				{
 					$invalidationTimes = self::getMulti($invalidationKeys);
 					if($invalidationTimes)
@@ -338,8 +338,8 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 				if($query)
 				{
 					$query->addStartKey('triggerKey', self::getRelatedObjectKey($object));
-					$query->addStartKey('objectType', 'a');
-					$query->addStartKey('sessionKey', 'a');
+					$query->addStartKey('objectType', 'A');
+					$query->addStartKey('sessionKey', 'A');
 					$query->setLimit(1);
 					
 					$list = $cacheStore->query($query);
@@ -469,11 +469,11 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 				if($query)
 				{
 					$query->addStartKey('triggerKey', $triggerKey);
-					$query->addStartKey('objectType', 'a');
-					$query->addStartKey('sessionKey', 'a');
+					$query->addStartKey('objectType', 'A');
+					$query->addStartKey('sessionKey', 'A');
 					$query->addEndKey('triggerKey', $triggerKey);
-					$query->addEndKey('objectType', 'Z');
-					$query->addEndKey('sessionKey', 'Z');
+					$query->addEndKey('objectType', 'z');
+					$query->addEndKey('sessionKey', 'z');
 					$query->setLimit(self::MAX_CACHE_KEYS_PER_JOB);
 
 					$offset = 0;
@@ -525,9 +525,9 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 				if($query)
 				{
 					$query->addStartKey('triggerKey', $triggerKey);
-					$query->addStartKey('objectType', 'a');
+					$query->addStartKey('objectType', 'A');
 					$query->addEndKey('triggerKey', $triggerKey);
-					$query->addEndKey('objectType', 'Z');
+					$query->addEndKey('objectType', 'z');
 					$query->setLimit(self::MAX_CACHE_KEYS_PER_JOB);
 
 					$offset = 0;
@@ -571,9 +571,9 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 					if($query)
 					{
 						$query->addStartKey('objectKey', $objectKey);
-						$query->addStartKey('sessionKey', 'a');
+						$query->addStartKey('sessionKey', 'A');
 						$query->addEndKey('objectKey', $objectKey);
-						$query->addEndKey('sessionKey', 'Z');
+						$query->addEndKey('sessionKey', 'z');
 						$query->setLimit(self::MAX_CACHE_KEYS_PER_JOB);
 	
 						$list = $cacheStore->query($query);
@@ -668,10 +668,6 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 		{
 			$this->addRecalculateObjectCacheJob($object);
 		}
-		else
-		{
-			$this->deleteCachedObjects($object);
-		}
 		
 		return true;
 	}
@@ -686,50 +682,5 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 		}
 		
 		return true;
-	}
-		
-	protected function deleteCachedObjects(IBaseObject $object)
-	{
-		$objectKey = self::getObjectKey($object);
-		KalturaLog::debug("Invalidating object [" . get_class($object) . "] id [" . $object->getPrimaryKey() . "] key [$objectKey]");
-		
-		/* @var $object IBaseObject */
-		$cacheStores = self::getStores();
-		foreach ($cacheStores as $cacheStore)
-		{
-			if($cacheStore instanceof kCouchbaseCacheWrapper)
-			{
-				$query = $cacheStore->getNewQuery(kCouchbaseCacheQuery::VIEW_RESPONSE_PROFILE_OBJECT_SPECIFIC);
-				if($query)
-				{
-					$query->setKey($objectKey);
-					$query->setLimit(100);
-					
-					$deletedKeys = array();
-					$list = $cacheStore->query($query);
-					KalturaLog::debug('Found [' . count($list->getObjects()) . '/' . $list->getCount() . '] items');
-					while($list->getCount())
-					{
-						$keys = array();
-						foreach($list->getObjects() as $cache)
-						{
-							/* @var $cache kCouchbaseCacheListItem */
-							if(!isset($deletedKeys[$cache->getId()]))
-							{
-								$keys[] = $cache->getId();
-								$deletedKeys[$cache->getId()] = true;
-							}
-						}
-						if(!count($keys))
-						{
-							break;
-						}
-						$cacheStore->multiDelete($keys);
-						$list = $cacheStore->query($query);
-						KalturaLog::debug('Found [' . count($list->getObjects()) . '/' . $list->getCount() . '] items');
-					}
-				}
-			}
-		}
 	}
 }
