@@ -158,12 +158,6 @@ class KalturaDetachedResponseProfile extends KalturaBaseResponseProfile
 	 */
 	public function getKey()
 	{
-		if(!isset($this->uniq))
-			$this->uniq = uniqid();
-			
-		$serial = serialize($this);
-		KalturaLog::debug("Serial [{$this->uniq}]: $serial");
-		
-		return md5($serial);
+		return md5(serialize($this));
 	}
 }
