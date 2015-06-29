@@ -235,25 +235,19 @@ class KalturaBaseEntryFilter extends KalturaBaseEntryBaseFilter
 			throw new KalturaAPIException(KalturaErrors::CANNOT_LIST_RELATED_ENTITLED_WHEN_ENTITLEMENT_IS_ENABLE, get_class($this));
 		}
 		
-		if(!kCurrentContext::$is_admin_session && !$this->idEqual && !$this->idIn)
+		if(		!kCurrentContext::$is_admin_session
+			&&	!$this->idEqual 
+			&&	!$this->idIn
+			&&	!$this->referenceIdEqual
+			&&	!$this->redirectFromEntryId
+			&&	!$this->referenceIdIn 
+			&&	!$this->parentEntryIdEqual)
 		{
 			if(kCurrentContext::$ks_object->privileges === ks::PATTERN_WILDCARD)
 				return;
 			
-			$privileges = array(
-				ks::PRIVILEGE_EDIT,
-				ks::PRIVILEGE_LIST,
-				ks::PRIVILEGE_VIEW,
-				ks::PRIVILEGE_EDIT_ENTRY_OF_PLAYLIST,
-				ks::PRIVILEGE_VIEW_ENTRY_OF_PLAYLIST,
-				ks::PRIVILEGE_DOWNLOAD,
-			);
-			
-			foreach($privileges as $privilege)
-			{
-				if(kCurrentContext::$ks_object->getPrivilegeValue($privilege) === ks::PATTERN_WILDCARD)
-					return;
-			}
+			if(kCurrentContext::$ks_object->getPrivilegeValue(ks::PRIVILEGE_LIST) === ks::PATTERN_WILDCARD)
+				return;
 				
 			throw new KalturaAPIException(KalturaErrors::USER_KS_CANNOT_LIST_RELATED_ENTRIES, get_class($this));
 		}
