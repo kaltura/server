@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- this is an exemplary XML structure of how the request is sent to OTT -->
+<s:Envelope xmlns:s="http://www.w3.org/2003/05/soap-envelope" xmlns:a="http://www.w3.org/2005/08/addressing">
+    <s:Header>
+        <a:Action s:mustUnderstand="1">urn:Iservice/InjestTvinciData</a:Action>
+    </s:Header>
+    <s:Body>
+        <InjestTvinciData>
+            <request xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+                <userName>Vodafone Virtual-main</userName>
+                <passWord>Vodafone Virtual-main</passWord>
+                <schemaID>1</schemaID>
+                <data><![CDATA[<?xml version="1.0"?>
+<feed><export><media co_guid="1234Wicked" entry_id="0_yfclmwf7" action="insert" is_active="true" erase="false"><basic><name><value lang="eng">Sample Kaltura Animated Logo</value></name><d
+escription><value lang="eng">Sample Kaltura Animated Logo kaltura</value></description><dates><catalog_start>05/05/2015 11:54:55</catalog_start><catalog_end>01/01/1970 02:00:00</catalog_e
+nd><start>05/05/2015 11:54:55</start><end>01/01/1970 02:00:00</end></dates><pic_ratios/><media_type>Movie</media_type><rules><geo_block_rule/><watch_per_rule/></rules></basic><structure><
+strings><meta name="Synopsis" ml_handling="unique"><value lang="eng">2</value></meta></strings><booleans/><doubles><meta name="EpisodeNumber" ml_handling="unique"><value lang="eng">1</val
+ue></meta></doubles></structure><files><file type="Main" quality="HIGH" handling_type="CLIP" cdn_name="Default CDN" cdn_code="http://centos.kaltura/p/105/sp/10500/playManifest/entryId/0_y
+fclmwf7/format/hdnetworkmanifest/tags/mbr/protocol/http/f/a.a4m" co_guid="Main" billing_type="Tvinci"/><file type="Tablet Main" quality="HIGH" handling_type="CLIP" cdn_name="Default CDN"
+cdn_code="http://centos.kaltura/p/105/sp/10500/playManifest/entryId/0_yfclmwf7/format/applehttp/tags/ipad/protocol/http/f/a.m3u8" co_guid="Tablet Main" billing_type="Tvinci"/><file type="
+Smartphone Main" quality="HIGH" handling_type="CLIP" cdn_name="Default CDN" cdn_code="http://centos.kaltura/p/105/sp/10500/playManifest/entryId/0_yfclmwf7/format/applehttp/tags/iphone/pro
+tocol/http/f/a.m3u8" co_guid="Smartphone Main" billing_type="Tvinci"/></files></media></export></feed>
+]]></data>
+            </request>
+        </InjestTvinciData>
+    </s:Body>
+</s:Envelope>
