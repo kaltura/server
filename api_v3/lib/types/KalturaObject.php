@@ -869,7 +869,7 @@ abstract class KalturaObject
 	}
 
 	public function cast($className) {
-		if(!is_subclass_of($className, get_class($this)))
+		if(!is_subclass_of($className, get_class($this)) && !is_subclass_of(get_class($this),$className))
 			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_TYPE, get_class($this));
 			
 	    return unserialize(sprintf(
