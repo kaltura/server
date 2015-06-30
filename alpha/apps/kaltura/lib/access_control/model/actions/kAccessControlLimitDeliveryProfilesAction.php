@@ -22,19 +22,19 @@ class kAccessControlLimitDeliveryProfilesAction extends kRuleAction
 	}
 	
 	/**
-	 * @return array
+	 * @return string
 	 */
 	public function getDeliveryProfileIds() 
 	{
-		return $this->deliveryProfileIds;
+		return implode(',', $this->deliveryProfileIds);
 	}
 
 	/**
-	 * @param array $deliveryProfileIds
+	 * @param string $deliveryProfileIds
 	 */
 	public function setDeliveryProfileIds($deliveryProfileIds) 
 	{
-		$this->deliveryProfileIds = $deliveryProfileIds;
+		$this->deliveryProfileIds = explode(',', $deliveryProfileIds);
 	}
 	
 	/**
@@ -55,7 +55,7 @@ class kAccessControlLimitDeliveryProfilesAction extends kRuleAction
 
 	public function applyDeliveryProfileDynamicAttributes(DeliveryProfileDynamicAttributes $deliveryAttributes)
 	{
-		$deliveryAttributes->setDeliveryProfileIds($this->getDeliveryProfileIds(), $this->getIsBlockedList());
+		$deliveryAttributes->setDeliveryProfileIds($this->deliveryProfileIds, $this->isBlockedList);
 		return true;
 	}
 	
