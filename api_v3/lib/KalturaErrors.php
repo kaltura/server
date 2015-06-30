@@ -192,6 +192,18 @@ class KalturaErrors extends APIErrors
 	const CANNOT_TRANSFER_ENTRIES_TO_ANOTHER_ACCESS_CONTROL_OBJECT = "CANNOT_TRANSFER_ENTRIES_TO_ANOTHER_ACCESS_CONTROL_OBJECT;;no default access control for current partner";
 
 	/**
+	 * App Token
+	 */
+	const APP_TOKEN_ID_NOT_FOUND = "APP_TOKEN_ID_NOT_FOUND;ID;Application token id \"@ID@\" not found";
+	
+	const APP_TOKEN_NOT_ACTIVE = "APP_TOKEN_NOT_ACTIVE;ID;Application token id \"@ID@\" not active";
+	
+	const APP_TOKEN_EXPIRED = "APP_TOKEN_EXPIRED;ID;Application token id \"@ID@\" expired";
+	
+	const INVALID_APP_TOKEN_HASH = "INVALID_APP_TOKEN_HASH;;Invalid application token hash";
+	
+	
+	/**
 	 * ConversionProfile Service
 	 */
 	const CONVERSION_PROFILE_ID_NOT_FOUND = "CONVERSION_PROFILE_ID_NOT_FOUND;ID;Conversion profile id \"@ID@\" not found";

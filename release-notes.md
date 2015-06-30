@@ -1,3 +1,61 @@
+# Jupiter-10.15.0 #
+
+## Metadata Change HTTP Notification ##
+
+- Issue Type: bug  
+- Issue ID: PS-2287  
+
+### Configuration ###
+
+ - None.
+ 
+### Deployment Scripts ###
+
+- run the following deployment script:  
+		php exec.php /opt/kaltura/app/tests/standAloneClient/entryCustomMetadataChangedHttpNotification.xml  
+
+
+## Quiz Reporting ##
+
+- Issue Type: Add reporting API to quiz
+- Issue ID: PLAT-3137 and PLAT-2793 and PLAT-2794
+
+#### Configuration ####
+ 
+- None.
+
+#### Deployment Scripts ####
+
+- run the Following deployemnt scripts:
+        
+		php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2015_06_07_update_quiz_reports_permissions.php
+
+		Install Plugins:
+		php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+
+#### Known Issues & Limitations ####
+
+None.
+
+## Application authentication token ##
+
+-- Issue Type: New feature
+-- Issue ID: PLAT-3095
+
+#### Configuration ####
+ 
+None.
+
+#### Deployment Scripts ####
+
+ - php deployment/updates/scripts/add_permissions/2015_06_22_app_token_service.php
+ - mysql -h@db_host@ -u@db_user@ -p@db_pass@ -P3306 kaltura < deployment/updates/sql/2015_06_22_create_app_token_table.sql
+
+#### Known Issues & Limitations ####
+
+None.
+
+---
 # Jupiter-10.14.0 #
 
 ## Email Notifications ##

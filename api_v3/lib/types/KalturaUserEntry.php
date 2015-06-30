@@ -23,7 +23,7 @@ abstract class KalturaUserEntry extends KalturaObject implements IRelatedFiltera
 	public $entryId;
 
 	/**
-	 * @var int
+	 * @var string
 	 * @insertonly
 	 * @filter eq,in,notin
 	 */
@@ -38,6 +38,7 @@ abstract class KalturaUserEntry extends KalturaObject implements IRelatedFiltera
 	/**
 	 * @var KalturaUserEntryStatus
 	 * @readonly
+	 * @filter eq
 	 */
 	public $status;
 
@@ -55,6 +56,12 @@ abstract class KalturaUserEntry extends KalturaObject implements IRelatedFiltera
 	 */
 	public $updatedAt;
 
+	/**
+	 * @var KalturaUserEntryType
+	 * @readonly
+	 * @filter eq
+	 */
+	public $type;
 
 	private static $map_between_objects = array
 	(
@@ -65,7 +72,8 @@ abstract class KalturaUserEntry extends KalturaObject implements IRelatedFiltera
 		"type",
 		"status",
 		"createdAt",
-		"updatedAt"
+		"updatedAt",
+		"type"
 	);
 
 	public function getMapBetweenObjects ( )
@@ -120,5 +128,14 @@ abstract class KalturaUserEntry extends KalturaObject implements IRelatedFiltera
 		return array();
 	}
 
+	protected function doFromObject(UserEntry $srcObj, KalturaDetachedResponseProfile $responseProfile = null)
+	{
+		$kuser = $srcObj->getkuser();
+		if ($kuser)
+		{
+			$this->userId = $kuser->getPuserId();
+		}
+		parent::doFromObject($srcObj, $responseProfile);
+	}
 
 }

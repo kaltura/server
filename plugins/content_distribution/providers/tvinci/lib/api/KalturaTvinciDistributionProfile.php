@@ -19,7 +19,17 @@ class KalturaTvinciDistributionProfile extends KalturaConfigurableDistributionPr
 	 * @var string
 	 */
 	public $password;
-	
+
+	/**
+	 * @var int
+	 */
+	public $schemaId;
+
+	/**
+	 * @var string
+	 */
+	public $language;
+
 	/*
 	 * mapping between the field on this object (on the left) and the setter/getter on the object (on the right)
 	 */
@@ -28,6 +38,8 @@ class KalturaTvinciDistributionProfile extends KalturaConfigurableDistributionPr
 		'ingestUrl',
 		'username',
 		'password',
+		'schemaId',
+		'language'
 	 );
 		 
 	public function getMapBetweenObjects()

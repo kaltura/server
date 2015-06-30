@@ -35,10 +35,11 @@ class KalturaTvinciDistributionJobProviderData extends KalturaConfigurableDistri
 
 		$feedHelper = new TvinciDistributionFeedHelper($distributionJobData->distributionProfile, $fieldValues);
 		$feedHelper->setEntryId( $entry->getId() );
+		$feedHelper->setReferenceId($entry->getReferenceID());
 		$feedHelper->setCreatedAt( $entry->getCreatedAtAsInt() );
-
-		$broadcasterName = 'Kaltura-' . $entry->getPartnerId();
-		$feedHelper->setBroadcasterName( $broadcasterName );
+		$feedHelper->setDescription( $entry->getDescription() );
+		$feedHelper->setTitleName( $entry->getName() );
+		$feedHelper->setSunrise($distributionJobData->entryDistribution->sunrise);
 
 		$thumbAssets = assetPeer::retrieveByIds(explode(',', $distributionJobData->entryDistribution->thumbAssetIds));
 		$picRatios = array();
@@ -67,9 +68,18 @@ class KalturaTvinciDistributionJobProviderData extends KalturaConfigurableDistri
 			$defaultThumbUrl = $picRatios[0]['url'];
 		}
 
-		$feedHelper->setDefaultThumbnailUrl( $defaultThumbUrl ); 
+		$feedHelper->setDefaultThumbnailUrl( $defaultThumbUrl );
 
 		$this->initPlayManifestUrls( $entry, $feedHelper );
+
+		$metadatas = MetadataPeer::retrieveAllByObject(MetadataObjectType::ENTRY, $distributionJobData->entryDistribution->entryId);
+		$fullMetadataXML='';
+		foreach($metadatas as $metadataField) {
+			$syncKey = $metadataField->getSyncKey(Metadata::FILE_SYNC_METADATA_DATA);
+			$currMetaXML = kFileSyncUtils::file_get_contents($syncKey, true, false);
+			$fullMetadataXML.=$currMetaXML;
+		}
+		$feedHelper->setMetasXML($fullMetadataXML);
 
 		if ($distributionJobData instanceof KalturaDistributionSubmitJobData)
 		{
@@ -83,26 +93,28 @@ class KalturaTvinciDistributionJobProviderData extends KalturaConfigurableDistri
 		{
 			$this->xml = $feedHelper->buildDeleteFeed();
 		}
+		KalturaLog::debug("XML Constructed by the Tvinci feed helper :{$this->xml}");
+
 	}
 
 	private function initPlayManifestUrls($entry, $feedHelper)
 	{
 		$videoAssetDataMap = array();
 
-		// If the following field is defined, it will override the below hardcoded defaults
-		$videoAssetConfigLines = $feedHelper->getSafeFieldValue(TvinciDistributionField::VIDEO_ASSETS_CONFIGURATION, null);
-		if ( $videoAssetConfigLines )
-		{
-			// The format is a comma separated array of these compounds: "name:protocol:tag:ext"
-			// E.g.: "name:protocol:tag:ext,name:protocol:tag:ext,name:protocol:tag:ext"
-			$configLines = explode(',', $videoAssetConfigLines);
-			foreach ( $configLines as $configLine )
-			{
-				$vad = explode(':', $configLine);
-				$videoAssetDataMap[] = array($vad[0], $vad[1], $vad[2], $vad[3]);
-			}
-		}
-		elseif ( $feedHelper->schemaId() == 1 )
+//		// If the following field is defined, it will override the below hardcoded defaults
+//		$videoAssetConfigLines = $feedHelper->getSafeFieldValue(TvinciDistributionField::VIDEO_ASSETS_CONFIGURATION, null);
+//		if ( $videoAssetConfigLines )
+//		{
+//			// The format is a comma separated array of these compounds: "name:protocol:tag:ext"
+//			// E.g.: "name:protocol:tag:ext,name:protocol:tag:ext,name:protocol:tag:ext"
+//			$configLines = explode(',', $videoAssetConfigLines);
+//			foreach ( $configLines as $configLine )
+//			{
+//				$vad = explode(':', $configLine);
+//				$videoAssetDataMap[] = array($vad[0], $vad[1], $vad[2], $vad[3]);
+//			}
+//		}
+		if ( $feedHelper->schemaId() == 1 )
 		{
 			$videoAssetDataMap = array(
 					array( 'Main',						PlaybackProtocol::AKAMAI_HDS,	'mbr',		'a4m' ),

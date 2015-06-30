@@ -327,6 +327,10 @@ class myPartnerUtils
 		if ($partner && $partner->isInCDNWhiteList($_SERVER['HTTP_HOST']))
 		{
 			$cdnHost = $protocol.'://'.$_SERVER['HTTP_HOST'];
+			if (isset($_SERVER['SERVER_PORT']))
+			{
+				$cdnHost .= ":".$_SERVER['SERVER_PORT'];
+			}
 			return $cdnHost;
 		}
 
