@@ -7,6 +7,6 @@ class KalturaQuestionSummaryArray extends KalturaAssociativeArray
 {
 	public function __construct()
 	{
-		parent::__construct("float");
+		parent::__construct("KalturaQuestionSummary");
 	}
 }

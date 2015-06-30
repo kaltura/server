@@ -122,7 +122,9 @@ class QuizrReportingService extends KalturaBaseService
 			{
 				$pctg = 0.0;
 			}
-			$ans[$question->getId()] = $pctg*100;
+			$questionSummary = new KalturaQuestionSummary();
+			$questionSummary->percentage = $pctg*100;
+			$ans[$question->getId()] = $questionSummary;
 		}
 		return $ans;
 	}
