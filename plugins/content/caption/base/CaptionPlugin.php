@@ -12,6 +12,7 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 
 	const NO_CAPTIONS_MESSAGE = "No Captions Created";
 	const FINISHED_PARSING_MESSAGE = "Finished parsing";
+	const NO_CAPTIONS_CREATED_ERROR_CODE = "NO_CAPTIONS_CREATED";
 
 	/* (non-PHPdoc)
 	 * @see IKalturaPlugin::getPluginName()
