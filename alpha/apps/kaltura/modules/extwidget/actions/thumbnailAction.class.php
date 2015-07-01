@@ -449,22 +449,36 @@ class thumbnailAction extends sfAction
 			$nocache = true;
 
 		$cache = null;
+		$lastModified = null;
+		$invalidationKey = null;
+		$cacheTime = null;
+		
 		if ($nocache)
+		{
 			$cacheAge = 0;
+		}
 		else if (strpos($tempThumbPath, "_NOCACHE_") !== false)
+		{
 			$cacheAge = 60;
+		}
 		else
 		{
-			$cacheAge = 8640000;
+			$cacheAge = 3600;
+			$lastModified = $entry->getAssetCacheTime();
+			$invalidationKey = $entry->getCacheInvalidationKeys();
+			$invalidationKey = kQueryCache::CACHE_PREFIX_INVALIDATION_KEY . $invalidationKey[0];
+			$cacheTime = time() - kQueryCache::CLOCK_SYNC_TIME_MARGIN_SEC;
+				
 			$cache = new myCache("thumb", 2592000); // 30 days, the max memcache allows
 		}
 		
-		$renderer = kFileUtils::getDumpFileRenderer($tempThumbPath, null, $cacheAge);
+		$renderer = kFileUtils::getDumpFileRenderer($tempThumbPath, null, $cacheAge, 0, $lastModified);
 		$renderer->partnerId = $entry->getPartnerId();
 		
 		if ($cache)
 		{
-			$cache->put($_SERVER["REQUEST_URI"], $renderer);
+			$cachedResponse = array($renderer, $invalidationKey, $cacheTime);
+			$cache->put($_SERVER["REQUEST_URI"], $cachedResponse);
 		}
 		
 		$renderer->output();
