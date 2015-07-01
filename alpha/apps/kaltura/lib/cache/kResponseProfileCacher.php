@@ -11,13 +11,13 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 	/**
 	 * @return array<kBaseCacheWrapper>
 	 */
-	protected static function getStores()
+	protected static function getStores($cacheType = kCacheManager::CACHE_TYPE_RESPONSE_PROFILE)
 	{
 		if(is_array(self::$cacheStores))
 			return self::$cacheStores;
 			
 		self::$cacheStores = array();
-		$cacheSections = kCacheManager::getCacheSectionNames(kCacheManager::CACHE_TYPE_RESPONSE_PROFILE);
+		$cacheSections = kCacheManager::getCacheSectionNames($cacheType);
 		foreach ($cacheSections as $cacheSection)
 		{
 			$cacheStore = kCacheManager::getCache($cacheSection);
@@ -26,6 +26,14 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 		}
 		
 		return self::$cacheStores;
+	}
+	
+	/**
+	 * @return array<kBaseCacheWrapper>
+	 */
+	protected static function getInvalidationStores()
+	{
+		return self::getStores(kCacheManager::CACHE_TYPE_RESPONSE_PROFILE_INVALIDATION);
 	}
 	
 	protected static function invalidateRelated(IBaseObject $object)
@@ -106,31 +114,46 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 			
 			if($value)
 			{
-				if($invalidationKeys) // TODO use different store for invalidation keys
+				break;
+			}
+		}
+	
+		if($value && $invalidationKeys)
+		{
+			$invalidationCacheStores = self::getInvalidationStores();
+			foreach ($invalidationCacheStores as $store)
+			{
+				/* @var $store kBaseCacheWrapper */
+			
+				if($store instanceof kCouchbaseCacheWrapper)
 				{
-					$invalidationTimes = self::getMulti($invalidationKeys);
-					if($invalidationTimes)
+					$invalidationTimes = $cacheStore->multiGetAndTouch($invalidationTimes);
+				}
+				else
+				{
+					$invalidationTimes = $store->multiGet($invalidationTimes);
+				}
+				
+				if($invalidationTimes)
+				{
+					foreach($invalidationTimes as $invalidationKey => $invalidationTime) 
 					{
-						foreach($invalidationTimes as $invalidationKey => $invalidationTime)
+						if(!is_null($invalidationTime))
 						{
-							if(!is_null($invalidationTime))
+							$invalidationTime += kConf::get('cache_invalidation_threshold', null, 0);
+							KalturaLog::debug("Invalidation key [$invalidationKey] time [$invalidationTime] compare to value time [{$value->time}]");
+							if(intval($invalidationTime) >= intval($value->time))
 							{
-								KalturaLog::debug("Invalidation key [$invalidationKey] time [$invalidationTime] compare to value time [{$value->time}]");
-								if(intval($invalidationTime) >= intval($value->time))
-								{
-									KalturaLog::debug("Invalidation time [$invalidationTime] >= value time [{$value->time}]");
-									return null;
-								}
+								KalturaLog::debug("Invalidation time [$invalidationTime] >= value time [{$value->time}]");
+								return null;
 							}
 						}
 					}
-				}
-				
-				return $value;
+				}	
 			}
 		}
-		
-		return null;
+			
+		return $value;
 	}
 	
 	protected static function query(kCouchbaseCacheQuery $query)
