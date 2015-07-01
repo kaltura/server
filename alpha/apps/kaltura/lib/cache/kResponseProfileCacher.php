@@ -665,7 +665,7 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 		return true;
 	}
 	
-	protected function invalidateCachedRootObjects(IBaseObject $object)
+	protected function invalidateCachedRootObjects(IBaseObject $object, $recursionLevel = 0)
 	{
 		KalturaLog::debug('Invalidating object [' . get_class($object) . '] id [' . $object->getPrimaryKey() . '] roots');
 		$peer = $object->getPeer();
@@ -676,20 +676,25 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 			{
 				foreach($roots as $root)
 				{
-					$this->invalidateCachedObject($root);
+					$this->invalidateCachedObject($root, $recursionLevel);
 				}
 			}
 		}
 		return true;
 	}
 	
-	protected function invalidateCachedObject(IBaseObject $object)
+	protected function invalidateCachedObject(IBaseObject $object, $recursionLevel = 0)
 	{
 		self::invalidate(self::getObjectKey($object));
 		
 		if(PermissionPeer::isValidForPartner(PermissionName::FEATURE_RECALCULATE_RESPONSE_PROFILE_CACHE, $object->getPartnerId()))
 		{
 			$this->addRecalculateObjectCacheJob($object);
+		}
+		
+		if($recursionLevel < 10)
+		{
+			$this->invalidateCachedRootObjects($object, $recursionLevel + 1);
 		}
 		
 		return true;
