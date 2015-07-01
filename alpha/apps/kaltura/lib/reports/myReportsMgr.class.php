@@ -7,7 +7,6 @@ class myReportsMgr
 	const REPORT_FLAVOR_COUNT = 4;
 	const REPORT_FLAVOR_BASE_TOTAL = 5;
 
-	//TODO: Replace all these with ReportType
 	const REPORT_TYPE_TOP_CONTENT = 1;
 	const REPORT_TYPE_CONTENT_DROPOFF = 2;
 	const REPORT_TYPE_CONTENT_INTERACTIONS = 3;
