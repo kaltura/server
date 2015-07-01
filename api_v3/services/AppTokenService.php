@@ -148,7 +148,7 @@ class AppTokenService extends KalturaBaseService
 	 * @throws KalturaErrors::APP_TOKEN_ID_NOT_FOUND
 	 * @return KalturaSessionInfo
 	 */
-	function startSessionAction($id, $tokenHash, $userId = null, $type = null, $expiry = null, $privileges = null)
+	function startSessionAction($id, $tokenHash, $userId = null, $type = null, $expiry = null)
 	{
 		$dbAppToken = AppTokenPeer::retrieveByPK($id);
 		if(!$dbAppToken)
@@ -192,10 +192,6 @@ class AppTokenService extends KalturaBaseService
 			ks::PRIVILEGE_SESSION_ID => array($id),
 			ks::PRIVILEGE_APP_TOKEN => array($id)
 		);
-		if($privileges)
-		{
-			$privilegesArray = array_merge_recursive($privilegesArray, ks::parsePrivileges($privileges));
-		}
 		if($dbAppToken->getSessionPrivileges())
 		{
 			$privilegesArray = array_merge_recursive($privilegesArray, ks::parsePrivileges($dbAppToken->getSessionPrivileges()));
