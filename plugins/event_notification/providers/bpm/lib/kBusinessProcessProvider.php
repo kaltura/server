@@ -15,6 +15,11 @@ abstract class kBusinessProcessProvider
 	}
 	
 	/**
+	 * @param boolean $enable 
+	 */
+	abstract public function enableDebug($enable);
+	
+	/**
 	 * @return array<string, string> key is id, value is process name 
 	 */
 	abstract public function listBusinessProcesses();
