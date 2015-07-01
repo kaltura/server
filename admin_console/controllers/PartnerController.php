@@ -563,22 +563,36 @@ class PartnerController extends Zend_Controller_Action
 		if (!in_array($filterType,array('','none'))) {
 			$_SESSION['partnerLastSearchValue'] = $filterInput;
 		}
-		
-		if($filterType == 'byEntryId') {
-			$client = Infra_ClientHelper::getClient();
-			$adminConsolePlugin = Kaltura_Client_AdminConsole_Plugin::get($client);
-			
-			try {
-				$entry = $adminConsolePlugin->entryAdmin->get($filterInput);
-				/* @var $entry Kaltura_Client_Type_MediaEntry */
-				$filterInput = $entry->partnerId;
-			}
-			catch(Exception $ex) {
-				$filterInput = "-99";
-			}
-			$filterType = 'byid';
-			
-		}
+		if($filterType == 'byEntryId') 
+		{
+                        $client = Infra_ClientHelper::getClient();
+                        $adminConsolePlugin = Kaltura_Client_AdminConsole_Plugin::get($client);
+
+                        try {
+                                $entry = $adminConsolePlugin->entryAdmin->get($filterInput);
+                                /* @var $entry Kaltura_Client_Type_MediaEntry */
+                                $filter->idIn = $entry->partnerId;
+                        }
+                        catch(Exception $ex) {
+                                $filter->idIn = "-99";
+                        }
+
+                }
+                if($filterType == 'byUIConfId')
+                {
+                        $client = Infra_ClientHelper::getClient();
+                        $adminConsolePlugin = Kaltura_Client_AdminConsole_Plugin::get($client);
+
+                        try {
+                                $uiConf = $adminConsolePlugin->uiConfAdmin->get($filterInput);
+                                /* @var $uiConf Kaltura_Client_Type_UIConf  */
+                                $filter->idIn = $uiConf->partnerId;
+                        }
+                        catch(Exception $ex) {
+                                $filter->idIn = "-99";
+                        }
+
+                }
 		if ($filterType == 'byid')
 		{
 			$filter->idIn = $filterInput;
