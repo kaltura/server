@@ -3,7 +3,7 @@
  * Enable question cue point objects and answer cue point objects management on entry objects
  * @package plugins.quiz
  */
-class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServices, IKalturaDynamicAttributesContributer, IKalturaEventConsumers
+class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServices, IKalturaDynamicAttributesContributer, IKalturaEventConsumers, IKalturaReportGenerator
 {
 	const PLUGIN_NAME = 'quiz';
 
@@ -53,7 +53,7 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 	public static function getEnums($baseEnumName = null)
 	{
 		if (is_null($baseEnumName))
-			return array('QuizCuePointType','QuizUserEntryType',"QuizUserEntryStatus","QuizEntryCapability");
+			return array('QuizCuePointType','QuizUserEntryType',"QuizUserEntryStatus","QuizEntryCapability","QuizReportType");
 		if ($baseEnumName == 'CuePointType')
 			return array('QuizCuePointType');
 		if ($baseEnumName == "UserEntryType")
@@ -67,6 +67,10 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 		if ($baseEnumName == 'EntryCapability')
 		{
 			return array("QuizEntryCapability");
+		}
+		if ($baseEnumName == 'ReportType')
+		{
+			return array("QuizReportType");
 		}
 
 
@@ -336,4 +340,53 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 
 		return false;
 	}
+
+	/**
+	 * Receives the data needed in order to generate the total report of said plugin
+	 *
+	 * @param string $partner_id
+	 * @param KalturaReportType $report_type
+	 * @param string $object_ids
+	 */
+	public function getTotal($partner_id, $report_type, $object_ids)
+	{
+		if ($report_type != self::getPluginName().".".QuizReportType::QUIZ)
+		{
+			return array(null,null);
+		}
+		if (!$object_ids)
+		{
+			throw new Exception();
+		}
+		$ans = -1;
+		$dbEntry = entryPeer::retrieveByPK($object_ids);
+		if (!$dbEntry)
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $object_ids);
+		/**
+		 * @var kQuiz $kQuiz
+		 */
+		$kQuiz = QuizPlugin::validateAndGetQuiz( $dbEntry );
+		$c = new Criteria();
+		$c->add(UserEntryPeer::ENTRY_ID, $object_ids);
+		$c->add(UserEntryPeer::TYPE, QuizPlugin::getCoreValue('UserEntryType',QuizUserEntryType::QUIZ));
+		$c->add(UserEntryPeer::STATUS, QuizPlugin::getCoreValue('UserEntryStatus', QuizUserEntryStatus::QUIZ_SUBMITTED));
+		$quizzes = UserEntryPeer::doSelect($c);
+		$numOfQuizzesFound = count($quizzes);
+		KalturaLog::debug("Found $numOfQuizzesFound quizzes that were submitted");
+		if ($numOfQuizzesFound)
+		{
+			$sumOfScores = 0;
+			foreach ($quizzes as $quiz)
+			{
+				/**
+				 * @var QuizUserEntry $quiz
+				 */
+				$sumOfScores += $quiz->getScore();
+			}
+			$ans = $sumOfScores / $numOfQuizzesFound;
+		}
+		return array('Average', $ans);
+	}
+
+
 }
