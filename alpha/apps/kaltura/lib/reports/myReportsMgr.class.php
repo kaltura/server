@@ -293,21 +293,22 @@ class myReportsMgr
 	public static function getTotal ( $partner_id , $report_type , reportsInputFilter $input_filter , $object_ids = null  )
 	{
 		$start = microtime ( true );
-		$result = self::executeQueryByType($partner_id, $report_type, self::REPORT_FLAVOR_TOTAL, $input_filter, null, null, null, $object_ids);
-		if (count($result) > 0)
+
+		$result  = self::executeQueryByType( $partner_id , $report_type , self::REPORT_FLAVOR_TOTAL , $input_filter , null , null , null , $object_ids );
+		if ( count($result) > 0 )
 		{
 			$row = $result[0];
 			$header = array();
 			$data = array();
-			foreach ($row as $name => $value)
+			foreach ( $row as $name => $value )
 			{
-				$header[] = $name;
+				$header[]= $name;
 				$data[] = $value;
 			}
-			$res = array($header, $data);
+			$res = array ( $header , $data );
 			if ($input_filter instanceof endUserReportsInputFilter && in_array($report_type, self::$unique_total_reports))
 			{
-				foreach ($row as $name => $value)
+				foreach ( $row as $name => $value )
 				{
 					if ($name == self::COUNT_PLAYS_HEADER)
 					{
@@ -315,40 +316,39 @@ class myReportsMgr
 						break;
 					}
 				}
-				if (count($res[0]) == 1)
-				{
+				if (count($res[0]) == 1) {
 					$header = array();
 					$data = array();
 				}
 				$count_plays_limit = kConf::get('plays_limit');
-				if ($count_plays > $count_plays_limit)
-				{
-					$unique_header[] = self::UNIQUE_USERS;
+				if ($count_plays > $count_plays_limit) {
+					$unique_header[]= self::UNIQUE_USERS;
 					$unique_data[] = "-";
-					$unique_header[] = self::UNIQUE_VIDEOS;
+					$unique_header[]= self::UNIQUE_VIDEOS;
 					$unique_data[] = "-";
 					$header = array_merge($unique_header, $header);
 					$data = array_merge($unique_data, $data);
-				} else
-				{
-					$result = self::executeQueryByType($partner_id, $report_type * 10, self::REPORT_FLAVOR_TOTAL, $input_filter, null, null, null, $object_ids);
+				} else {
+					$result  = self::executeQueryByType( $partner_id , $report_type * 10 , self::REPORT_FLAVOR_TOTAL , $input_filter , null , null , null , $object_ids );
 					$row = $result[0];
 
-					foreach ($row as $name => $value)
+					foreach ( $row as $name => $value )
 					{
-						$unique_header[] = $name;
+						$unique_header[]= $name;
 						$unique_data[] = $value;
 					}
 					$header = array_merge($unique_header, $header);
 					$data = array_merge($unique_data, $data);
 				}
 			}
-			$res = array($header, $data);
-		} else
+			$res = array ( $header , $data );
+		}
+		else
 		{
 //			return $result[0]; // for total - there is only a single record
 			$res = array ( null , null );
 		}
+
 		$end = microtime(true);
 		KalturaLog::log( "getTotal took [" . ( $end - $start ) . "]" );
 		
