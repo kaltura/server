@@ -157,6 +157,10 @@ class MetadataPeer extends BaseMetadataPeer implements IRelatedObjectPeer
 	 */
 	public function getRootObjects(IBaseObject $object)
 	{
+		$parentObject = kMetadataManager::getObjectFromPeer($object);
+		if($parentObject)
+			return array($parentObject);
+
 		return array();
 	}
 
