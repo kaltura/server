@@ -145,7 +145,7 @@ class KAsyncParseMultiLanguageCaptionAsset extends KJobHandlerWorker
 			return $job;
 		}
 		else
-			throw new kApplicativeException(null ,"no captions created");
+			throw new kApplicativeException(KalturaBatchJobAppErrors::MISSING_ASSETS ,"no captions created");
 	}
 
 	private function addCaption($entryId, $captionAsset, $contentResource)
