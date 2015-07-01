@@ -104,6 +104,12 @@ abstract class KalturaUserEntry extends KalturaObject implements IRelatedFiltera
 	public function toInsertableObject ( $object_to_fill = null , $props_to_skip = array() )
 	{
 		$object_to_fill = parent::toInsertableObject($object_to_fill, $props_to_skip);
+		$kuser= kuserPeer::getKuserByPartnerAndUid(kCurrentContext::$ks_partner_id, $this->userId);
+		if (!$kuser)
+		{
+			return null;
+		}
+		$object_to_fill->setKuserId($kuser->getKuserId());
 		$object_to_fill->setPartnerId(kCurrentContext::getCurrentPartnerId());
 		return $object_to_fill;
 	}
