@@ -293,7 +293,7 @@ class myReportsMgr
 	public static function getTotal ( $partner_id , $report_type , reportsInputFilter $input_filter , $object_ids = null  )
 	{
 		$start = microtime ( true );
-
+		
 		$result  = self::executeQueryByType( $partner_id , $report_type , self::REPORT_FLAVOR_TOTAL , $input_filter , null , null , null , $object_ids );
 		if ( count($result) > 0 )
 		{
@@ -306,7 +306,7 @@ class myReportsMgr
 				$data[] = $value;
 			}
 			$res = array ( $header , $data );
-			if ($input_filter instanceof endUserReportsInputFilter && in_array($report_type, self::$unique_total_reports))
+			if ($input_filter instanceof endUserReportsInputFilter && in_array($report_type, self::$unique_total_reports)) 
 			{
 				foreach ( $row as $name => $value )
 				{
@@ -327,16 +327,16 @@ class myReportsMgr
 					$unique_header[]= self::UNIQUE_VIDEOS;
 					$unique_data[] = "-";
 					$header = array_merge($unique_header, $header);
-					$data = array_merge($unique_data, $data);
+					$data = array_merge($unique_data, $data);						
 				} else {
 					$result  = self::executeQueryByType( $partner_id , $report_type * 10 , self::REPORT_FLAVOR_TOTAL , $input_filter , null , null , null , $object_ids );
 					$row = $result[0];
-
+			
 					foreach ( $row as $name => $value )
 					{
 						$unique_header[]= $name;
 						$unique_data[] = $value;
-					}
+					}			
 					$header = array_merge($unique_header, $header);
 					$data = array_merge($unique_data, $data);
 				}
@@ -348,7 +348,7 @@ class myReportsMgr
 //			return $result[0]; // for total - there is only a single record
 			$res = array ( null , null );
 		}
-
+			
 		$end = microtime(true);
 		KalturaLog::log( "getTotal took [" . ( $end - $start ) . "]" );
 		
@@ -723,6 +723,15 @@ class myReportsMgr
 			$sql_raw_content = file_get_contents( $file_path );
 			if ( ! $sql_raw_content )
 			{
+				$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaReportProvider');
+				foreach ($pluginInstances as $pluginInstance)
+				{
+					$res = $pluginInstance->getReportResult($partner_id, $report_type, $report_flavor, $object_ids);
+					if ($res)
+					{
+						return $res;
+					}
+				}
 				throw new kCoreException("Cannot find sql for [$report_type] [$report_flavor] at [$file_path]", kCoreException::QUERY_NOT_FOUND);
 			}
 			
@@ -874,19 +883,6 @@ class myReportsMgr
 		}
 		catch ( Exception $ex )
 		{
-			if ($ex->getCode() == kCoreException::QUERY_NOT_FOUND)
-			{
-				$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaReportGenerator');
-				foreach ($pluginInstances as $pluginInstance)
-				{
-					$res = $pluginInstance->getReportResult($partner_id, $report_type, $report_flavor, $object_ids);
-					if ($res)
-					{
-						return $res;
-					}
-				}
-			}
-
 			KalturaLog::log( $ex->getMessage() );
 			// TODO - write proeper error
 			if ($ex->getCode() == kCoreException::SEARCH_TOO_GENERAL);
