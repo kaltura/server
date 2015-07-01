@@ -17,13 +17,14 @@ class serveFlavorAction extends kalturaAction
 
 		$renderer->partnerId = $partnerId;
 		$host = isset($_SERVER['HTTP_X_FORWARDED_HOST']) ? $_SERVER['HTTP_X_FORWARDED_HOST'] : $_SERVER['HTTP_HOST'];
-		$cacheKey = 'dumpFile-'.kIpAddressUtils::isInternalIp($_SERVER['REMOTE_ADDR']).'-'.$host.$_SERVER["REQUEST_URI"];
+		$cacheKey = 'dumpFile-NOAM'.kIpAddressUtils::isInternalIp($_SERVER['REMOTE_ADDR']).'-'.$host.$_SERVER["REQUEST_URI"];
 		apc_store($cacheKey, $renderer, 86400);
 		header("X-Kaltura:cache-key");
 	}
 	
 	public function execute()
 	{
+		KalturaLog::debug("@@NA here1 serve flavor");
 		//entitlement should be disabled to serveFlavor action as we do not get ks on this action.
 		KalturaCriterion::disableTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
 		
@@ -56,6 +57,10 @@ class serveFlavorAction extends kalturaAction
 		}
 
 		$clipTo = null;
+		$secureEntryHelper = new KSecureEntryHelper($flavorAsset->getentry(), null, null, ContextType::SERVE);
+		$secureEntryHelper->getActionList();
+		$secureEntryHelper->validateAccessControl();
+
 //		$securyEntryHelper = new KSecureEntryHelper($entry, $ks, $referrer, ContextType::PLAY);
 //		if ($securyEntryHelper->shouldPreview())
 //		{
