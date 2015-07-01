@@ -449,7 +449,6 @@ class thumbnailAction extends sfAction
 			$nocache = true;
 
 		$cache = null;
-		$lastModified = null;
 		
 		if ($nocache)
 		{
@@ -462,10 +461,11 @@ class thumbnailAction extends sfAction
 		else
 		{
 			$cacheAge = 3600;
-			$lastModified = $entry->getAssetCacheTime();
 				
 			$cache = new myCache("thumb", 2592000); // 30 days, the max memcache allows
 		}
+
+		$lastModified = $entry->getAssetCacheTime();
 		
 		$renderer = kFileUtils::getDumpFileRenderer($tempThumbPath, null, $cacheAge, 0, $lastModified);
 		$renderer->partnerId = $entry->getPartnerId();
