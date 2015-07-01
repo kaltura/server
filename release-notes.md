@@ -33,6 +33,27 @@ None.
 
 None.
 
+
+## Update KMC docs  ##
+
+-- Issue Type: Doc change
+-- Issue ID: SUP-3117
+
+#### Configuration ####
+
+Need to update the following doc on the SAAS server under location /web/content/docs/kaltura_batch_upload_falcon.zip
+from repository kmc-docs.
+
+#### Deployment Scripts ####
+
+None.
+
+#### Known Issues & Limitations ####
+
+None.
+
+
+
 ---
 # Jupiter-10.14.0 #
 
