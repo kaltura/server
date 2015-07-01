@@ -450,8 +450,6 @@ class thumbnailAction extends sfAction
 
 		$cache = null;
 		$lastModified = null;
-		$invalidationKey = null;
-		$cacheTime = null;
 		
 		if ($nocache)
 		{
@@ -465,9 +463,6 @@ class thumbnailAction extends sfAction
 		{
 			$cacheAge = 3600;
 			$lastModified = $entry->getAssetCacheTime();
-			$invalidationKey = $entry->getCacheInvalidationKeys();
-			$invalidationKey = kQueryCache::CACHE_PREFIX_INVALIDATION_KEY . $invalidationKey[0];
-			$cacheTime = time() - kQueryCache::CLOCK_SYNC_TIME_MARGIN_SEC;
 				
 			$cache = new myCache("thumb", 2592000); // 30 days, the max memcache allows
 		}
@@ -477,6 +472,9 @@ class thumbnailAction extends sfAction
 		
 		if ($cache)
 		{
+			$invalidationKey = $entry->getCacheInvalidationKeys();
+			$invalidationKey = kQueryCache::CACHE_PREFIX_INVALIDATION_KEY . $invalidationKey[0];
+			$cacheTime = time() - kQueryCache::CLOCK_SYNC_TIME_MARGIN_SEC;
 			$cachedResponse = array($renderer, $invalidationKey, $cacheTime);
 			$cache->put($_SERVER["REQUEST_URI"], $cachedResponse);
 		}
