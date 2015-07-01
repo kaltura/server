@@ -139,24 +139,13 @@ class KAsyncParseMultiLanguageCaptionAsset extends KJobHandlerWorker
 		self::deleteCaptions($captionChildernIds);
 		self::unimpersonate();
 
-		$errNumber = null;
 		if ($captionsCreated)
 		{
-			$errType = null;
-			$message = CaptionPlugin::FINISHED_PARSING_MESSAGE;
-			$status = KalturaBatchJobStatus::FINISHED;
-			$data = null;
+			$this->closeJob($job, null, null, "Finished parsing", KalturaBatchJobStatus::FINISHED);
+			return $job;
 		}
 		else
-		{
-			$errType = KalturaBatchJobErrorTypes::KALTURA_API;
-			$message = CaptionPlugin::NO_CAPTIONS_MESSAGE;
-			$status = KalturaBatchJobStatus::FAILED;
-		}
-
-		$this->closeJob($job, $errType, $errNumber, $message, $status, $data);
-
-		return $job;
+			throw new kApplicativeException(null ,"no captions created");
 	}
 
 	private function addCaption($entryId, $captionAsset, $contentResource)

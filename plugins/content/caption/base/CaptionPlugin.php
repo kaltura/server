@@ -10,9 +10,6 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 
 	const MULTI_CAPTION_FLOW_MANAGER_CLASS = 'kMultiCaptionFlowManager'; 
 
-	const NO_CAPTIONS_MESSAGE = "No Captions Created";
-	const FINISHED_PARSING_MESSAGE = "Finished parsing";
-
 	/* (non-PHPdoc)
 	 * @see IKalturaPlugin::getPluginName()
 	 */
