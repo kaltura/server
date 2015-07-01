@@ -45,6 +45,15 @@ class KalturaAppToken extends KalturaObject implements IFilterable
 	 * @filter gte,lte,order
 	 */
 	public $updatedAt;
+	
+	/**
+	 * Application token status 
+	 * 
+	 * @var KalturaAppTokenStatus
+	 * @readonly
+	 * @filter eq,in
+	 */
+	public $status;
 
 	/**
 	 * Expiry time of current token (unix timestamp in seconds)
@@ -86,6 +95,7 @@ class KalturaAppToken extends KalturaObject implements IFilterable
 		"partnerId",
 		"createdAt",
 		"updatedAt",
+		"status",
 		"token",
 		"expiry",
 		"sessionUserId",
