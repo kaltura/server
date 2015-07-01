@@ -107,7 +107,7 @@ abstract class KalturaUserEntry extends KalturaObject implements IRelatedFiltera
 		$kuser= kuserPeer::getKuserByPartnerAndUid(kCurrentContext::$ks_partner_id, $this->userId);
 		if (!$kuser)
 		{
-			return null;
+			throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID, $this->userId);
 		}
 		$object_to_fill->setKuserId($kuser->getKuserId());
 		$object_to_fill->setPartnerId(kCurrentContext::getCurrentPartnerId());
