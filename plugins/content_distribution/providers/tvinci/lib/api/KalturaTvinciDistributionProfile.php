@@ -30,6 +30,13 @@ class KalturaTvinciDistributionProfile extends KalturaConfigurableDistributionPr
 	 */
 	public $language;
 
+	/**
+	 * @var string
+	 */
+	public $xsltFile;
+
+
+
 	/*
 	 * mapping between the field on this object (on the left) and the setter/getter on the object (on the right)
 	 */
@@ -39,7 +46,8 @@ class KalturaTvinciDistributionProfile extends KalturaConfigurableDistributionPr
 		'username',
 		'password',
 		'schemaId',
-		'language'
+		'language',
+		'xsltFile'
 	 );
 		 
 	public function getMapBetweenObjects()

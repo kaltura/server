@@ -10,6 +10,7 @@ class TvinciDistributionProfile extends ConfigurableDistributionProfile
  	const CUSTOM_DATA_PASSWORD = 'password';
  	const CUSTOM_DATA_SCHEMA_ID = 'schemaId';
  	const CUSTOM_DATA_LANGUAGE = 'language';
+ 	const CUSTOM_DATA_XSLT = 'xsltFile';
 
 	/* (non-PHPdoc)
 	 * @see DistributionProfile::getProvider()
@@ -50,6 +51,9 @@ class TvinciDistributionProfile extends ConfigurableDistributionProfile
 
 	public function getLanguage()				{return $this->getFromCustomData(self::CUSTOM_DATA_LANGUAGE);}
 	public function setLanguage($v)				{$this->putInCustomData(self::CUSTOM_DATA_LANGUAGE, $v);}
+
+	public function getXsltFile()				{return $this->getFromCustomData(self::CUSTOM_DATA_XSLT);}
+	public function setXsltFile($v)				{$this->putInCustomData(self::CUSTOM_DATA_XSLT, $v);}
 
 	protected function getDefaultFieldConfigArray()
 	{

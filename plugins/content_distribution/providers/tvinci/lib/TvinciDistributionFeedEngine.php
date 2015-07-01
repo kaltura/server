@@ -70,7 +70,7 @@ class TvinciDistributionFeedEngine extends DistributionEngine implements
 		if (!$success) {
 			KalturaLog::err("Tvinci distribution action {$actionType} has failed with description: {$result->description} ".
 							"and status: {$result->status}");
-			throw new KalturaDistributionException("{$actionType} failed - reason {$result->description}");
+			throw new Exception("{$actionType} failed - reason {$result->description}");
 		}
 		return true;
 	}
@@ -110,15 +110,18 @@ class TvinciDistributionFeedEngine extends DistributionEngine implements
 				 * </s:Envelope>
 				 */
 				$responseXml = simplexml_load_string($response['content']);
-				$childs = $responseXml->children(SOAP_ENVELOPE_URL)->Body;
+				$childs = $responseXml->children(self::SOAP_ENVELOPE_URL)->Body;
 				$bodyElement = $childs->xpath('//s:Body');
 				$returnObject = $bodyElement[0]->InjestTvinciDataResponse->InjestTvinciDataResult;
 			}
 			catch (Exception $e)
 			{
 
-				throw new KalturaDistributionException("Failed parsing response due to {$e->getMessage()}"); // Throw an Exception in order to fail the job
+				throw new Exception("Failed parsing response due to {$e->getMessage()}"); // Throw an Exception in order to fail the job
 			}
+		} else {
+			throw new Exception("Failed communication to host - response code is: {$response['http_code']}".
+													", error description is: {$response['error_text']}");
 		}
 
 		return $returnObject;

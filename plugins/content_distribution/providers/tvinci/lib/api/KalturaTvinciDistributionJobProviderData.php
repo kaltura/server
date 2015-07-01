@@ -100,20 +100,6 @@ class KalturaTvinciDistributionJobProviderData extends KalturaConfigurableDistri
 	private function initPlayManifestUrls($entry, $feedHelper)
 	{
 		$videoAssetDataMap = array();
-
-//		// If the following field is defined, it will override the below hardcoded defaults
-//		$videoAssetConfigLines = $feedHelper->getSafeFieldValue(TvinciDistributionField::VIDEO_ASSETS_CONFIGURATION, null);
-//		if ( $videoAssetConfigLines )
-//		{
-//			// The format is a comma separated array of these compounds: "name:protocol:tag:ext"
-//			// E.g.: "name:protocol:tag:ext,name:protocol:tag:ext,name:protocol:tag:ext"
-//			$configLines = explode(',', $videoAssetConfigLines);
-//			foreach ( $configLines as $configLine )
-//			{
-//				$vad = explode(':', $configLine);
-//				$videoAssetDataMap[] = array($vad[0], $vad[1], $vad[2], $vad[3]);
-//			}
-//		}
 		if ( $feedHelper->schemaId() == 1 )
 		{
 			$videoAssetDataMap = array(
@@ -137,9 +123,9 @@ class KalturaTvinciDistributionJobProviderData extends KalturaConfigurableDistri
 			$playbackProtocol = $videoAssetData[1];
 			$tag = $videoAssetData[2];
 			$fileExt = $videoAssetData[3];
-
+			$fileCoGuid = "{$entry->getIntId()}{$entry->getFlavorParamsIds}";
 			$url = $this->getPlayManifestUrl($entry, $playbackProtocol, $tag, $fileExt);
-			$feedHelper->setVideoAssetUrl( $tvinciAssetName, $url );
+			$feedHelper->setVideoAssetData( $tvinciAssetName, $url,$fileCoGuid );
 		}
 	}
 
