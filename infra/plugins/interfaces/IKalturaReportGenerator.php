@@ -12,7 +12,8 @@ interface IKalturaReportGenerator {
      * @param string $partner_id
      * @param KalturaReportType $report_type
      * @param string $object_ids
+     * @return array(array(<header> => <value>))
      */
-    public function getTotal($partner_id, $report_type, $object_ids);
+    public function getReportResult($partner_id, $report_type, $report_flavor, $object_ids);
 
 }

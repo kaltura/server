@@ -348,12 +348,33 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 	 * @param KalturaReportType $report_type
 	 * @param string $object_ids
 	 */
-	public function getTotal($partner_id, $report_type, $object_ids)
+	public function getReportResult($partner_id, $report_type, $report_flavor, $object_ids)
 	{
-		if ($report_type != self::getPluginName().".".QuizReportType::QUIZ)
+		if ($report_type != self::getPluginName() . "." . QuizReportType::QUIZ)
 		{
-			return array(null,null);
+			return array(null, null);
 		}
+		switch ($report_flavor)
+		{
+			case myReportsMgr::REPORT_FLAVOR_TOTAL:
+				return $this->getTotalReport($object_ids);
+			case myReportsMgr::REPORT_FLAVOR_TABLE:
+				return $this->getTableReport($object_ids);
+			case myReportsMgr::REPORT_FLAVOR_COUNT:
+				return $this->getReportCount($object_ids);
+			default:
+				return null;
+		}
+	}
+
+	/**
+	 * @param $object_ids
+	 * @return array
+	 * @throws Exception
+	 * @throws KalturaAPIException
+	 */
+	protected function getTotalReport($object_ids)
+	{
 		if (!$object_ids)
 		{
 			throw new Exception();
@@ -365,10 +386,10 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 		/**
 		 * @var kQuiz $kQuiz
 		 */
-		$kQuiz = QuizPlugin::validateAndGetQuiz( $dbEntry );
+		$kQuiz = QuizPlugin::validateAndGetQuiz($dbEntry);
 		$c = new Criteria();
 		$c->add(UserEntryPeer::ENTRY_ID, $object_ids);
-		$c->add(UserEntryPeer::TYPE, QuizPlugin::getCoreValue('UserEntryType',QuizUserEntryType::QUIZ));
+		$c->add(UserEntryPeer::TYPE, QuizPlugin::getCoreValue('UserEntryType', QuizUserEntryType::QUIZ));
 		$c->add(UserEntryPeer::STATUS, QuizPlugin::getCoreValue('UserEntryStatus', QuizUserEntryStatus::QUIZ_SUBMITTED));
 		$quizzes = UserEntryPeer::doSelect($c);
 		$numOfQuizzesFound = count($quizzes);
@@ -385,8 +406,98 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 			}
 			$ans = $sumOfScores / $numOfQuizzesFound;
 		}
-		return array('Average', $ans);
+		return array(array('Average', $ans));
 	}
 
+	/**
+	 * @param $object_ids
+	 * @return array
+	 * @throws Exception
+	 * @throws KalturaAPIException
+	 */
+	protected function getTableReport($object_ids)
+	{
+		$dbEntry = entryPeer::retrieveByPK($object_ids);
+		if (!$dbEntry)
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $object_ids);
+		/**
+		 * @var kQuiz $kQuiz
+		 */
+		$kQuiz = QuizPlugin::validateAndGetQuiz( $dbEntry );
+		$ans = array();
+		$c = new Criteria();
+		$c->add(CuePointPeer::ENTRY_ID, $object_ids);
+		$c->add(CuePointPeer::TYPE, QuizPlugin::getCoreValue('CuePointType',QuizCuePointType::QUIZ_QUESTION));
+		$questions = CuePointPeer::doSelect($c);
+		foreach ($questions as $question)
+		{
+			$numOfCorrectAnswers = 0;
+			/**
+			 * @var QuestionCuePoint $question
+			 */
+			$c = new Criteria();
+			$c->add(CuePointPeer::ENTRY_ID, $object_ids);
+			$c->add(CuePointPeer::TYPE, QuizPlugin::getCoreValue('CuePointType',QuizCuePointType::QUIZ_ANSWER));
+			$c->add(CuePointPeer::PARENT_ID, $question->getId());
+			$answers = CuePointPeer::doSelect($c);
+			$numOfAnswers = count($answers);
+			if ($numOfAnswers)
+			{
+				foreach ($answers as $answer)
+				{
+					/**
+					 * @var AnswerCuePoint $answer
+					 */
+					$optionalAnswers = $question->getOptionalAnswers();
+					$correct = false;
+					foreach ($optionalAnswers as $optionalAnswer)
+					{
+						/**
+						 * @var kOptionalAnswer $optionalAnswer
+						 */
+						if ($optionalAnswer->getKey() === $answer->getAnswerKey())
+						{
+							if ($optionalAnswer->getIsCorrect())
+							{
+								$numOfCorrectAnswers++;
+								break;
+							}
+						}
+					}
+				}
+				$pctg = $numOfCorrectAnswers/$numOfAnswers;
+			}
+			else
+			{
+				$pctg = 0.0;
+			}
+			$ans[$question->getId()] = $pctg*100;
+		}
+		return array($ans);
+	}
+
+	/**
+	 * @param $object_ids
+	 * @return array
+	 * @throws KalturaAPIException
+	 */
+	protected function getReportCount($object_ids)
+	{
+		$dbEntry = entryPeer::retrieveByPK($object_ids);
+		if (!$dbEntry)
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $object_ids);
+		/**
+		 * @var kQuiz $kQuiz
+		 */
+		$kQuiz = QuizPlugin::validateAndGetQuiz($dbEntry);
+		$ans = array();
+		$c = new Criteria();
+		$c->add(CuePointPeer::ENTRY_ID, $object_ids);
+		$c->add(CuePointPeer::TYPE, QuizPlugin::getCoreValue('CuePointType', QuizCuePointType::QUIZ_QUESTION));
+		$numOfquestions = CuePointPeer::doCount($c);
+		$res = array();
+		$res['count_all'] = $numOfquestions;
+		return array($res);
+	}
 
 }

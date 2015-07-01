@@ -880,12 +880,10 @@ class myReportsMgr
 				$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaReportGenerator');
 				foreach ($pluginInstances as $pluginInstance)
 				{
-					list ($header, $data) = $pluginInstance->getTotal($partner_id, $report_type, $object_ids);
-					if ($header)
+					$res = $pluginInstance->getReportResult($partner_id, $report_type, $report_flavor, $object_ids);
+					if ($res)
 					{
-						$res = array();
-						$res[$header] = $data;
-						return array($res);
+						return $res;
 					}
 				}
 			}
