@@ -67,8 +67,19 @@ class kCategoryEntryAdvancedFilter extends AdvancedSearchFilterItem
 
 		$categoryEntries = explode( ',', $categoryEntries );
 
-		$query->addColumnWhere(entryPeer::CATEGORIES_IDS, $categoryEntries, KalturaCriteria::IN_LIKE);
-
+		if($query instanceof IKalturaIndexQuery)
+		{
+			$categoriesStrs = array();
+			foreach($categoryEntries as $categoryId)
+			{
+				$categoriesStrs[] = '"'.$categoryId.'"';
+			}
+			$query->addMatch('@' . entryIndex::getIndexFieldName(entryPeer::CATEGORIES_IDS) . ' (' . implode(' | ', $categoriesStrs) . ')');
+		}
+		else
+		{
+			$query->addColumnWhere(entryPeer::CATEGORIES_IDS, $categoryEntries, KalturaCriteria::IN_LIKE);
+		}
 
 		if ( $this->orderBy )
 		{
@@ -147,5 +158,34 @@ class kCategoryEntryAdvancedFilter extends AdvancedSearchFilterItem
 	public function getCategoryIdEqual()
 	{
 		return $this->categoryIdEqual;
+	}
+
+	public function addToXml(SimpleXMLElement &$xmlElement)
+	{
+		parent::addToXml($xmlElement);
+
+		if (!is_null($this->categoriesMatchOr))
+			$xmlElement->addAttribute('categoriesMatchOr', $this->categoriesMatchOr);
+		if (!is_null($this->categoryEntryStatusIn))
+			$xmlElement->addAttribute('categoryEntryStatusIn', $this->categoryEntryStatusIn);
+		if (!is_null($this->orderBy))
+			$xmlElement->addAttribute('orderBy', $this->orderBy);
+		if (!is_null($this->categoryIdEqual))
+			$xmlElement->addAttribute('categoryIdEqual', $this->categoryIdEqual);
+	}
+
+	public function fillObjectFromXml(SimpleXMLElement $xmlElement)
+	{
+		parent::fillObjectFromXml($xmlElement);
+
+		$attr = $xmlElement->attributes();
+		if(isset($attr['categoriesMatchOr']))
+			$this->categoriesMatchOr = (string)$attr['categoriesMatchOr'];
+		if(isset($attr['categoryEntryStatusIn']))
+			$this->categoryEntryStatusIn = (string)$attr['categoryEntryStatusIn'];
+		if(isset($attr['orderBy']))
+			$this->orderBy = (string)$attr['orderBy'];
+		if(isset($attr['categoryIdEqual']))
+			$this->categoryIdEqual = (int)$attr['categoryIdEqual'];
 	}
 }
