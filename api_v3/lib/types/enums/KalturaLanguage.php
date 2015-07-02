@@ -34,8 +34,6 @@ class KalturaLanguage extends KalturaStringEnum
 	const DA = 'Danish';
 	const NL = 'Dutch';
 	const EN = 'English';
-	const EN_GB = 'English (British)';
-	const EN_US = 'English (American)';
 	const EO = 'Esperanto';
 	const ET = 'Estonian';
 	const FO = 'Faeroese';
