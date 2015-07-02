@@ -1248,7 +1248,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
             }
             catch (Exception $e)
             {
-                if ($e->getCode() == DUPLICATE_CATEGORY)
+                if ($e->getCode() == 'DUPLICATE_CATEGORY')
                 {
                 	KalturaLog::debug("Categroy [$fullNameEq] already exist");
                     $catFilter = new KalturaCategoryFilter();
