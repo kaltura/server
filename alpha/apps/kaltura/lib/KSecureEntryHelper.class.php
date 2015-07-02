@@ -416,4 +416,16 @@ class KSecureEntryHelper
 	{
 		return $this->contextResult;
 	}
+	
+	public function validateForServe($asset)
+	{
+		if (!$this->isAssetAllowed($asset))
+		{
+			KExternalErrors::dieError(KExternalErrors::ACCESS_CONTROL_RESTRICTED);
+		}
+		if ($this->shouldBlock())
+		{
+			KExternalErrors::dieError(KExternalErrors::ACCESS_CONTROL_RESTRICTED);
+		}
+	}
 }
