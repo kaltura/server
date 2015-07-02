@@ -139,9 +139,9 @@ class TvinciDistributionFeedHelper
 	public function setSunset($sunset)							{$this->sunset = $sunset;}
 	public function getSunset()									{return $this->sunset;}
 
-	public function setVideoAssetUrl( $name, $url )
+	public function setVideoAssetData( $name, $url , $co_guid)
 	{
-		$this->videoAssetToUrlMap[$name] = $url;
+		$this->videoAssetToUrlMap[$name] = array( $url, $co_guid);
 	}
 
 	public function buildSubmitFeed()
@@ -196,9 +196,13 @@ class TvinciDistributionFeedHelper
 
 		// Wrap as a CDATA section
 		$feedAsXml = $this->_doc->saveXML($feed);
-		// convert the xml using provided XSLT
-		chdir(__DIR__);
-		$xslt = file_get_contents("../xml/tvinci_default.xslt");
+		if ($this->distributionProfile->xsltFile) {
+			$xslt = $this->distributionProfile->xsltFile;
+		} else {
+			// convert the xml using provided XSLT
+			chdir(__DIR__);
+			$xslt = file_get_contents("../xml/tvinci_default.xslt");
+		}
 		$feedAsXml = $this->transformXml($feedAsXml, $xslt);
 		$data = $this->_doc->createElement('data');
 		$data->appendChild($this->_doc->createCDATASection($feedAsXml));
@@ -331,35 +335,27 @@ class TvinciDistributionFeedHelper
 	private function createFilesElement()
 	{
 		$files = $this->_doc->createElement("files");
-		foreach ( $this->videoAssetToUrlMap as $name => $url )
+		foreach ( $this->videoAssetToUrlMap as $name => $fileData )
 		{
-			$files->appendChild( $this->createFileElement($name, $url) );
+			$url = $fileData[0];
+			$co_guid = $fileData[1];
+			$files->appendChild( $this->createFileElement($name, $url, $co_guid) );
 		}
  		return $files;
 	}
 
-	private function createFileElement($fileType, $url)
+	private function createFileElement($fileType, $url, $co_guid)
 	{
 		$fileNode = $this->_doc->createElement("file");
 
 		$this->setAttribute($fileNode, "type", $fileType);
 		$this->setAttribute($fileNode, "quality", "HIGH");
 		$this->setAttribute($fileNode, "handling_type", "CLIP");
-		$this->setAttribute($fileNode, "cdn_name", "Default CDN");
+		$this->setAttribute($fileNode, "cdn_name", "Akamai");
 		$this->setAttribute($fileNode, "cdn_code", $url);
-		$this->setAttribute($fileNode, "co_guid", $fileType);
+		$this->setAttribute($fileNode, "co_guid", $co_guid);
 		$this->setAttribute($fileNode, "billing_type", 'Tvinci');
-//		if ( $this->schemaId() == 2 )
-//		{
-//			$billingType = self::getSafeFieldValue(TvinciDistributionField::METADATA_BILLING_TYPE, null);
-//			if ( $billingType )
-//			{
-//				$this->setAttribute($fileNode, "billing_type", $billingType);
-//			}
-//
-//			$runtime = self::getSafeArrayValue($this->fieldValues, TvinciDistributionField::METADATA_RUNTIME, 0);
-//			$this->setAttribute($fileNode, "assetDuration", $runtime * 60);
-//		}
+
 
 		return $fileNode;
 	}
