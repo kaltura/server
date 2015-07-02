@@ -34,6 +34,8 @@ class KalturaLanguageCode extends KalturaStringEnum
 	const DA = 'da';
 	const NL = 'nl';
 	const EN = 'en';
+	const EN_GB = 'en_gb';
+	const EN_US = 'en_us';
 	const EO = 'eo';
 	const ET = 'et';
 	const FO = 'fo';
