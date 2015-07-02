@@ -1018,6 +1018,10 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	public function getAssetCacheVersion()			{ return $this->getFromCustomData( "assetCacheVersion", null, entry::DEFAULT_ASSETCACHEVERSION ); }
 
 	protected function setAssetCacheVersion( $v )	{ $this->putInCustomData( "assetCacheVersion" , $v ); }
+
+	public function getAssetCacheTime()			{ return $this->getFromCustomData( "assetCacheTime", null, null ); }
+	
+	protected function setAssetCacheTime( $v )	{ $this->putInCustomData( "assetCacheTime" , $v ); }
 	
 	/**
 	 * Increment an internal version counter in order to invalidate cached thumbnails (see getThumbnailUrl())
@@ -1026,6 +1030,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	{
 		$assetCacheVersion = kDataCenterMgr::incrementVersion($this->getAssetCacheVersion());
 		$this->setAssetCacheVersion($assetCacheVersion);
+		$this->setAssetCacheTime(time());
 		return $assetCacheVersion;
 	}
 	
