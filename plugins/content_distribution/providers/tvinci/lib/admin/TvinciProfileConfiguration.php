@@ -25,6 +25,19 @@ class Form_TvinciProfileConfiguration extends Form_ConfigurableProfileConfigurat
 	{
 		$object = parent::getObject($objectType, $properties, $add_underscore, $include_empty_fields);
 
+		/*$upload = new Zend_File_Transfer_Adapter_Http();
+		$files = $upload->getFileInfo();
+
+		if(isset($files['xsltFile']))
+		{
+			$file = $files['xsltFile'];
+			if ($file['size'])
+			{
+				$content = file_get_contents($file['tmp_name']);
+				$object->xsltFile = $content;
+			}
+		}*/
+
 		return $object;
 	}
 
@@ -38,6 +51,9 @@ class Form_TvinciProfileConfiguration extends Form_ConfigurableProfileConfigurat
 		$this->layoutForm($order++);
 
 		parent::populateFromObject($object, $add_underscore);
+		/*if ($object->xsltFile) {
+			$this->getElement('xsltFileText')->setValue(json_encode($object->xsltFile));
+		}*/
 	}
 
 	protected function addProviderElements()
@@ -51,6 +67,8 @@ class Form_TvinciProfileConfiguration extends Form_ConfigurableProfileConfigurat
 
 		$this->addElement('hidden', self::FORM_PLACEHOLDER_ELEMENT_ID);
 	}
+
+
 
 	public function resetOrderOfLastElements()
 	{
@@ -83,18 +101,8 @@ class Form_TvinciProfileConfiguration extends Form_ConfigurableProfileConfigurat
 				'filters'		=> array('StringTrim'),
 		));
 
-		$this->addElement('text', 'schema_id', array(
-				'label'			=> 'Schema ID:',
-				'filters'		=> array('StringTrim'),
-		));
-
-		$this->addElement('text', 'language', array(
-				'label'			=> 'Language :',
-				'filters'		=> array('StringTrim'),
-		));
-
 		$this->addDisplayGroup(
-				array('ingest_url','username','password', 'schema_id', 'language'),
+				array('ingest_url','username','password'),
 				'ingest',
 				array(
 					'legend' => 'Ingest URL Configuration',
@@ -102,5 +110,52 @@ class Form_TvinciProfileConfiguration extends Form_ConfigurableProfileConfigurat
 					'order' => $order++,
 				)
 		);
+
+		$this->addElement('select', 'schema_id', array(
+			'label'			=> 'Schema ID:',
+			'multioptions' => array(
+				'' => '2',
+				'1' => '1',
+				'2' => '2',
+			)
+
+		));
+
+		$this->addElement('text', 'language', array(
+			'label'			=> 'Language :',
+			'filters'		=> array('StringTrim'),
+		));
+
+		$this->addDisplayGroup(
+			array('schema_id', 'language'),
+			'additional',
+			array(
+				'legend' => 'Additional Configuration',
+				'decorators' => array('FormElements', 'Fieldset'),
+				'order' => $order++,
+			)
+		);
+
+		/*$this->addElement('file', 'xsltFile', array(
+			'label' => 'XSLT:',
+		));
+
+		$this->addElement('textarea', 'xsltFileText', array(
+			'label' => 'XSLT Data:',
+			'rows' => '2',
+			'cols' => '50',
+			'readonly' => '1'
+		));
+
+		$this->addDisplayGroup(
+			array('schema_id', 'language','xsltFile' , 'xsltFileText'),
+			'additional',
+			array(
+				'legend' => 'Additional Configuration',
+				'decorators' => array('FormElements', 'Fieldset'),
+				'order' => $order++,
+			)
+		);*/
+
 	}
 }

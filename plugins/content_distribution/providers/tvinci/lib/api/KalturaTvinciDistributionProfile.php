@@ -33,7 +33,7 @@ class KalturaTvinciDistributionProfile extends KalturaConfigurableDistributionPr
 	/**
 	 * @var string
 	 */
-	public $xsltFile;
+	//public $xsltFile;
 
 
 
@@ -47,7 +47,7 @@ class KalturaTvinciDistributionProfile extends KalturaConfigurableDistributionPr
 		'password',
 		'schemaId',
 		'language',
-		'xsltFile'
+		//'xsltFile'
 	 );
 		 
 	public function getMapBetweenObjects()

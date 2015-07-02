@@ -18,7 +18,7 @@
         <xsl:variable name="prefix-length" select="string-length($prefix)+1"/>
         <xsl:variable name="currNodeName" select="local-name(.)"/>
         <xsl:variable name="suffix" select="substring($currNodeName,$prefix-length)"/>
-        <xsl:if test="starts-with($currNodeName, $prefix)">
+        <xsl:if test="starts-with($currNodeName, $prefix) and (string-length($suffix) >0)">
             <xsl:element name="meta">
                 <xsl:attribute name="name">
                     <xsl:value-of select="$suffix"/>
@@ -44,7 +44,7 @@
                 <xsl:variable name="prefix-length" select="string-length($prefix)+1"/>
                 <xsl:variable name="currNodeName" select="local-name(.)"/>
                 <xsl:variable name="suffix" select="substring($currNodeName,$prefix-length)"/>
-                <xsl:if test="starts-with($currNodeName, $prefix)">
+                <xsl:if test="starts-with($currNodeName, $prefix)  and (string-length($suffix) >0)">
                     <xsl:element name="otttag">
                         <xsl:attribute name="name">
                             <xsl:value-of select="$suffix"/>
