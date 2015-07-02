@@ -7,13 +7,13 @@ class kMultiCaptionFlowManager implements kBatchJobStatusEventConsumer
 	 */
 	public function shouldConsumeJobStatusEvent(BatchJob $dbBatchJob)
 	{
-        if($dbBatchJob->getStatus() == BatchJob::BATCHJOB_STATUS_FAILED)
+		if($dbBatchJob->getStatus() == BatchJob::BATCHJOB_STATUS_FAILED)
 		{
-            $parseMultiBatchJobType = CaptionPlugin::getBatchJobTypeCoreValue(ParseMultiLanguageCaptionAssetBatchType::PARSE_MULTI_LANGUAGE_CAPTION_ASSET);
-            if ($dbBatchJob->getJobType() == $parseMultiBatchJobType)
-				    return true;
+			$parseMultiBatchJobType = CaptionPlugin::getBatchJobTypeCoreValue(ParseMultiLanguageCaptionAssetBatchType::PARSE_MULTI_LANGUAGE_CAPTION_ASSET);
+			if ($dbBatchJob->getJobType() == $parseMultiBatchJobType)
+				return true;
 		}
-        return false;
+		return false;
 	}
 	
 	/* (non-PHPdoc)
