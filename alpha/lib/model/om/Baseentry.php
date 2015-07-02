@@ -4377,6 +4377,8 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 	public function copyInto($copyObj, $deepCopy = false)
 	{
 
+		$copyObj->setCustomData($this->custom_data);
+		
 		$copyObj->setId($this->id);
 
 		$copyObj->setKshowId($this->kshow_id);
@@ -4432,8 +4434,6 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 		$copyObj->setDisplayInSearch($this->display_in_search);
 
 		$copyObj->setSubpId($this->subp_id);
-
-		$copyObj->setCustomData($this->custom_data);
 
 		$copyObj->setScreenName($this->screen_name);
 
