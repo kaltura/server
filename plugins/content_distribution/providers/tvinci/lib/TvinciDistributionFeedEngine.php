@@ -33,8 +33,6 @@ class TvinciDistributionFeedEngine extends DistributionEngine implements
 	*/
 	public function delete(KalturaDistributionDeleteJobData $data)
 	{
-		//return $this->handleAction($data, $data->distributionProfile, $data->providerData, "Delete");
-
 		return true;
 	}
 

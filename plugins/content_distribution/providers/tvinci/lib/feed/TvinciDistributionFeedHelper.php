@@ -189,13 +189,6 @@ class TvinciDistributionFeedHelper
 
 		// Wrap as a CDATA section
 		$feedAsXml = $this->_doc->saveXML($feed);
-		/*if ($this->distributionProfile->xsltFile) {
-			$xslt = $this->distributionProfile->xsltFile;
-		} else {
-			// convert the xml using provided XSLT
-			chdir(__DIR__);
-			$xslt = file_get_contents("../xml/tvinci_default.xslt");
-		}*/
 		$xslt = file_get_contents(__DIR__."/../xml/tvinci_default.xslt");
 		$feedAsXml = $this->transformXml($feedAsXml, $xslt);
 		$data = $this->_doc->createElement('data');

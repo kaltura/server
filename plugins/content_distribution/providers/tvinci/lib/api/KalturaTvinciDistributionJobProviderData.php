@@ -101,9 +101,6 @@ class KalturaTvinciDistributionJobProviderData extends KalturaConfigurableDistri
 			array( 'Main',						PlaybackProtocol::AKAMAI_HDS,	'mbr',		'a4m' ),
 			array( 'Tablet Main',				PlaybackProtocol::APPLE_HTTP,	'ipad',		'm3u8' ),
 			array( 'Smartphone Main',			PlaybackProtocol::APPLE_HTTP,	'iphone',	'm3u8' ),
-			array( 'Mobile Devices Trailer',	PlaybackProtocol::APPLE_HTTP,	'ipad',		'm3u8' ),
-			array( 'Mobile Devices Main SD',	PlaybackProtocol::APPLE_HTTP,	'ipad',		'm3u8' ),
-			array( 'Mobile Devices Main HD',	PlaybackProtocol::APPLE_HTTP,	'ipad',		'm3u8' ),
 		);
 
 		// Loop and build the file nodes
