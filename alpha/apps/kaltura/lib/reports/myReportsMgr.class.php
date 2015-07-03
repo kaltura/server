@@ -1312,7 +1312,7 @@ KalturaLog::log( "Reports query using database host: [$host] user [" . $db_confi
 		
 		$error_function = $mysql_function.'_error';
 		if (!$db_selected) {
-			throw new kCoreException('Can\'t use foo : ' . $error_function($link), kCoreException::INVALID_QUERY);
+			throw new kCoreException("mysqli_select_db($link , ".$db_config["db_name"].") failed." . $error_function($link), kCoreException::INVALID_QUERY);
 		}
 
 		if($mysql_function == 'mysql') $result = mysql_query($query);
