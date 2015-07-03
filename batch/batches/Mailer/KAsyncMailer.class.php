@@ -143,7 +143,7 @@ class KAsyncMailer extends KJobHandlerWorker
 
 	protected function sendEmail( $recipientemail, $recipientname, $type, $subjectParams, $bodyParams, $fromemail , $fromname, $language = 'en', $isHtml = false  )
 	{
-		KalturaLog::debug(__METHOD__ . "($recipientemail, $recipientname, $type, $subjectParams, $bodyParams, $language, $fromemail , $fromname)");
+		KalturaLog::debug(__METHOD__ . "($recipientemail, $recipientname, $type, ".print_r($subjectParams,true)."\n".print_r( $bodyParams,true)." $language, $fromemail , $fromname)");
 		
 		$this->mail = new PHPMailer();
 		$this->mail->CharSet = 'utf-8';
@@ -201,7 +201,7 @@ class KAsyncMailer extends KJobHandlerWorker
 	
 	protected function getSubjectByType( $type, $language, $subjectParamsArray  )
 	{
-		KalturaLog::debug(__METHOD__ . "($type, $language, $subjectParamsArray)");
+		KalturaLog::debug(__METHOD__ . "($type, $language, ".print_r($subjectParamsArray,true));
 		
 		if ( $type > 0 )
 		{
@@ -220,7 +220,7 @@ class KAsyncMailer extends KJobHandlerWorker
 
 	protected function getBodyByType( $type, $language, $bodyParamsArray, $recipientemail, $isHtml = false  )
 	{
-		KalturaLog::debug(__METHOD__ . "($type, $language, $bodyParamsArray, $recipientemail)");
+		KalturaLog::debug(__METHOD__ . "($type, $language\n".print_r($bodyParamsArray,true).", $recipientemail)");
 
 		// if this does not need the common_header, under common_text should have $type_header =
 		// same with footer
