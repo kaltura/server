@@ -201,6 +201,9 @@ class KalturaRequestDeserializer
 			return null;
 		}
 		
+		$partnerId = kCurrentContext::getCurrentPartnerId();
+		myPartnerUtils::addPartnerToCriteria('ResponseProfile', $partnerId, true, "$partnerId,0");
+		
 		$responseProfile = null;
 		if(isset($this->paramsGrouped[$paramName]['id'])){
 			$responseProfile = ResponseProfilePeer::retrieveByPK($this->paramsGrouped[$paramName]['id']);
