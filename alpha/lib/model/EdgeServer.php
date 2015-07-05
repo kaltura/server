@@ -43,16 +43,6 @@ class EdgeServer extends BaseEdgeServer {
 		return $this->getFromCustomData(self::CUSTOM_DATA_DELIVERY_IDS, null, null);
 	}
 	
-	public function setPlaybackConfiguration(EdgeServerPlyabackConfiguration $playbackConfiguration)
-	{
-		$this->putInCustomData(self::CUSTOM_DATA_EDGE_PLAYBACK_CONFIGURATION, $playbackConfiguration);
-	}
-	
-	public function getPlaybackConfiguration()
-	{
-		return $this->getFromCustomData(self::CUSTOM_DATA_EDGE_PLAYBACK_CONFIGURATION, null, null);
-	}
-	
 	public function getPlaybackHostName()
 	{
 		$playbackHostName = $this->playback_host_name;

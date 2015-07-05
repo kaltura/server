@@ -99,12 +99,6 @@ class KalturaEdgeServer extends KalturaObject implements IFilterable
 	 */
 	public $parentId;
 	
-	/**
-	 * Define Edge server playback related configuration
-	 * @var KalturaEdgeServerPlaybackConfiguration
-	 */
-	public $playbackConfiguration;
-	
 	private static $map_between_objects = array
 	(
 		"id",
@@ -120,7 +114,6 @@ class KalturaEdgeServer extends KalturaObject implements IFilterable
 		"playbackHostName",
 		"deliveryProfileIds",
 		"parentId",
-		"playbackConfiguration",
 	);
 	
 	/* (non-PHPdoc)
@@ -220,17 +213,6 @@ class KalturaEdgeServer extends KalturaObject implements IFilterable
 		$object_to_fill =  parent::toObject($object_to_fill, $props_to_skip);
 		
 		return $object_to_fill;
-	}
-	
-	public function doFromObject($dbObject, KalturaDetachedResponseProfile $responseProfile = null)
-	{
-		parent::doFromObject($dbObject, $responseProfile);
-	
-		if($this->shouldGet('playbackConfiguration', $responseProfile) && !is_null($dbObject->getPlaybackConfiguration()))
-		{
-			$this->playbackConfiguration = new KalturaEdgeServerPlaybackConfiguration();
-			$this->playbackConfiguration->fromObject($dbObject->getPlaybackConfiguration());
-		}
 	}
 	
 	/* (non-PHPdoc)
