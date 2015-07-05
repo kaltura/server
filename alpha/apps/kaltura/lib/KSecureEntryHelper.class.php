@@ -419,7 +419,7 @@ class KSecureEntryHelper
 	
 	public function validateForServe($asset)
 	{
-		if (!$this->isAssetAllowed($asset))
+		if (!$this->isFlavorParamsAllowed($asset->getFlavorParamsId()))
 		{
 			KExternalErrors::dieError(KExternalErrors::ACCESS_CONTROL_RESTRICTED);
 		}
