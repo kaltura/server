@@ -3398,9 +3398,10 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	 * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
 	 * @throws     PropelException
 	 */
-	public function copyInto($copyObj, $deepCopy = false)
+	public function copyInto(entry $copyObj, $deepCopy = false)
 	{
-		$copyObj->setCustomData($this->custom_data);
 		parent::copyInto($copyObj,$deepCopy);
+		$copyObj->setEntitledPusersEdit($this->getEntitledPusersEdit());
+		$copyObj->setEntitledPusersPublish($this->getEntitledPusersPublish());
 	}
 }
