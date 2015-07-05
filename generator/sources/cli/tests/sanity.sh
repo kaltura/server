@@ -4,7 +4,7 @@ if [ -r `dirname $0`/colors.sh ];then
     . `dirname $0`/colors.sh
 fi
 if [ $# -lt 2 ];then
-    echo "Usage: $1 </path/cli/lib/prefix> <partner_id>"
+    echo -e "${BRIGHT_RED}Usage: $0 </path/cli/lib/prefix> <partner_id>${NORMAL}"
     exit 1
 fi
 PREFIX=$1
