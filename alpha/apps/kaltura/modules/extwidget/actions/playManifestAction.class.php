@@ -795,6 +795,8 @@ class playManifestAction extends kalturaAction
  			kApiCache::setExpiry(120);
  		}
  		
+ 		$this->decidePlaybackFormat();
+ 		
 		list($baseUrl, $backupUrl) = $this->getLiveEntryBaseUrls();
 		$cdnHost = parse_url($baseUrl, PHP_URL_HOST);	
 		
@@ -812,12 +814,34 @@ class playManifestAction extends kalturaAction
 		
 		$this->deliveryProfile->setDynamicAttributes($this->deliveryAttributes);	
 
-		if($this->deliveryAttributes->getEdgeServerIds())
-		{
+		if($this->deliveryAttributes->getEdgeServerIds()) {
 			list($baseUrl, $backupUrl) = $this->deliveryProfile->getEdgeServerUrls($baseUrl, $backupUrl);
 		}
 		
+		if(is_null($baseUrl) && is_null($backupUrl)) {
+			KExternalErrors::dieError(KExternalErrors::LIVE_ENTRY_PLAYBACK_URLS_NOT_FOUND, "Live playback url's not found for entry [$this->entryId] and playback protocol [{$this->deliveryAttributes->getFormat()}]");
+		}
+		
 		return $this->deliveryProfile->serve($baseUrl, $backupUrl);
+	}
+	
+	public function decidePlaybackFormat()
+	{
+		if($this->deliveryAttributes->getFormat() == PlaybackProtocol::MULTICAST_SL)
+		{
+			$edgeServerIds = $this->deliveryAttributes->getEdgeServerIds();
+			if($edgeServerIds) {
+				$edgeServers = EdgeServerPeer::retrieveByPKs($edgeServerIds);
+				foreach ($edgeServers as $edgeServer)
+				{
+					if($edgeServer->getPlaybackConfiguration() && $edgeServer->getPlaybackConfiguration()->getMulticastEnabled()) {
+						$this->deliveryAttributes->setFormat(PlaybackProtocol::APPLE_HTTP_TO_MC);
+						$this->deliveryAttributes->setEdgeServerIds($edgeServer->getId());
+						break;
+					}
+				}
+			}
+		}
 	}
 	
 	/* (non-PHPdoc)

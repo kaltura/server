@@ -99,6 +99,12 @@ class KalturaEdgeServer extends KalturaObject implements IFilterable
 	 */
 	public $parentId;
 	
+	/**
+	 * Define Edge server playback related configuration
+	 * @var KalturaEdgeServerPlaybackConfiguration
+	 */
+	public $playbackConfiguration;
+	
 	private static $map_between_objects = array
 	(
 		"id",
@@ -114,6 +120,7 @@ class KalturaEdgeServer extends KalturaObject implements IFilterable
 		"playbackHostName",
 		"deliveryProfileIds",
 		"parentId",
+		"playbackConfiguration",
 	);
 	
 	/* (non-PHPdoc)
@@ -134,7 +141,6 @@ class KalturaEdgeServer extends KalturaObject implements IFilterable
 			
 		return parent::toInsertableObject($object_to_fill, $props_to_skip);
 	}
-	
 
 	/* (non-PHPdoc)
 	 * @see KalturaObject::validateForInsert()
@@ -193,7 +199,7 @@ class KalturaEdgeServer extends KalturaObject implements IFilterable
 		$c = KalturaCriteria::create(EdgeServerPeer::OM_CLASS);
 	
 		if($edgeId)
-			$c->add(EdgeServerPeer::ID, $sourceObject->getId(), Criteria::NOT_EQUAL);
+			$c->add(EdgeServerPeer::ID, $edgeId, Criteria::NOT_EQUAL);
 	
 		$c->add(EdgeServerPeer::SYSTEM_NAME, $this->systemName);
 		$c->add(EdgeServerPeer::STATUS, array(EdgeServerStatus::ACTIVE, EdgeServerStatus::DISABLED), Criteria::IN);
@@ -214,6 +220,17 @@ class KalturaEdgeServer extends KalturaObject implements IFilterable
 		$object_to_fill =  parent::toObject($object_to_fill, $props_to_skip);
 		
 		return $object_to_fill;
+	}
+	
+	public function doFromObject($dbObject, KalturaDetachedResponseProfile $responseProfile = null)
+	{
+		parent::doFromObject($dbObject, $responseProfile);
+	
+		if($this->shouldGet('playbackConfiguration', $responseProfile) && !is_null($dbObject->getPlaybackConfiguration()))
+		{
+			$this->playbackConfiguration = new KalturaEdgeServerPlaybackConfiguration();
+			$this->playbackConfiguration->fromObject($dbObject->getPlaybackConfiguration());
+		}
 	}
 	
 	/* (non-PHPdoc)
