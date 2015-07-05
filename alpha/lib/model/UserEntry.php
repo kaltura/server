@@ -30,13 +30,4 @@ abstract class UserEntry extends BaseUserEntry {
 		$this->setStatus(UserEntryStatus::ACTIVE);
 	}
 
-	public function setKuserId($userId)
-	{
-		$kuser= kuserPeer::getKuserByPartnerAndUid(kCurrentContext::$ks_partner_id, $userId);
-		if (!$kuser)
-		{
-			throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID, $userId);
-		}
-		parent::setKuserId($kuser->getKuserId());
-	}
 } // UserEntry
