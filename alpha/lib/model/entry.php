@@ -3387,4 +3387,21 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		$capabilities[$capability] = $capability;
 		$this->putInCustomData( self::CAPABILITIES, $capabilities);
 	}
+
+	/**
+	 * Sets contents of passed object to values from current object.
+	 *
+	 * If desired, this method can also make copies of all associated (fkey referrers)
+	 * objects.
+	 *
+	 * @param      object $copyObj An object of entry (or compatible) type.
+	 * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
+	 * @throws     PropelException
+	 */
+	public function copyInto(entry $copyObj, $deepCopy = false)
+	{
+		parent::copyInto($copyObj,$deepCopy);
+		$copyObj->setEntitledPusersEdit($this->getEntitledPusersEdit());
+		$copyObj->setEntitledPusersPublish($this->getEntitledPusersPublish());
+	}
 }
