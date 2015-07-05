@@ -7,6 +7,7 @@ abstract class KalturaObject
 {
 	/**
 	 * @var KalturaListResponseArray
+	 * @readonly
 	 */
 	public $relatedObjects;
 	
