@@ -127,7 +127,7 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 		return array($primaryUrl, $backupUrl);
 	}
 	
-	public function finilizeEdgePlaybackUrl($originalPlaybackUrl, $edgeServerHostName)
+	protected function finilizeEdgePlaybackUrl($originalPlaybackUrl, $edgeServerHostName)
 	{
 		$urlParts = explode("://", $originalPlaybackUrl);
 	
