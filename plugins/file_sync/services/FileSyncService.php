@@ -52,42 +52,30 @@ class FileSyncService extends KalturaBaseService
 		$response->totalCount = $totalCount;
 		return $response;
 	}
-	
+
 	/**
-	 * @action sync
-	 * @param int $fileSyncId
-	 * @param file $fileData
+	 * Update file sync by id
+	 * 
+	 * @action update
+	 * @param int $id
+	 * @param KalturaFileSync $fileSync
 	 * @return KalturaFileSync
+	 * 
+	 * @throws FileSyncErrors::FILESYNC_ID_NOT_FOUND
 	 */
-	function syncAction($fileSyncId, $fileData)
+	function updateAction($id, KalturaFileSync $fileSync)
 	{
-		$dbFileSync = FileSyncPeer::retrieveByPK($fileSyncId);
-		if(!$dbFileSync)
-			throw new APIException(APIErrors::INVALID_FILE_SYNC_ID, $fileSyncId);
-			
-		$key = kFileSyncUtils::getKeyForFileSync($dbFileSync);
-		kFileSyncUtils::moveFromFile($fileData['tmp_name'], $key, false);
-		
-		list($file_root, $real_path) = kPathManager::getFilePathArr($key);
-		$full_path = $file_root . $real_path;
-		
-		if(file_exists($full_path))
+		$dbFileSync = FileSyncPeer::retrieveByPK($id);
+		if (!$dbFileSync)
 		{
-			$dbFileSync->setFileRoot($file_root);
-			$dbFileSync->setFilePath($real_path);
-			$dbFileSync->setFileSizeFromPath($full_path);
-			$dbFileSync->setStatus(FileSync::FILE_SYNC_STATUS_READY);
+			throw new KalturaAPIException(FileSyncErrors::FILESYNC_ID_NOT_FOUND, $id);
 		}
-		else
-		{
-			$dbFileSync->setFileSize(-1);
-			$dbFileSync->setStatus(FileSync::FILE_SYNC_STATUS_ERROR);
-		}
+
+		$fileSync->toUpdatableObject($dbFileSync);
 		$dbFileSync->save();
 		
 		$fileSync = new KalturaFileSync();
 		$fileSync->fromObject($dbFileSync, $this->getResponseProfile());
 		return $fileSync;
 	}
-	
 }
