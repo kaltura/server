@@ -300,9 +300,17 @@ $ kalcli -x session start partnerId=$PARTNER_ID secret=abcdef type=2 | awk '{pri
 
 9. Uploading files:
 ```
-$ ks=`genks -b $PARTNER_ID` ; kalcli -x uploadtoken add ks=$ks | awk '$1 == "id" {print "uploadTokenId "$2}'
-$ TOKEN=`kalcli -x uploadtoken upload ks=$ks fileData=@/tmp/video.mp4`
-$ kalcli baseentry addFromUploadedFile uploadTokenId=$TOKEN partnerId=$PARTNER_ID ks=$KS entry:objectType=KalturaBaseEntry
+$ KS=`genks -b $PARTNER_ID`
+
+# gen token
+$ TOKEN=`kalcli -x uploadtoken add uploadToken:objectType=KalturaUploadToken uploadToken:fileName=$TEST_FLV  ks=$KS|awk '$1 == "id" {print $2}'`
+
+# upload token
+$ kalcli -x uploadtoken upload fileData=@$TEST_FLV uploadTokenId=$TOKEN ks=$KS
+
+# upload entry using $TOKEN
+$ ENTRY_ID=`kalcli -x baseentry addFromUploadedFile uploadTokenId=$TOKEN partnerId=$PARTNER_ID ks=$KS entry:objectType=KalturaBaseEntry |awk '$1 == "id" {print $2}'`
+
 ```
 Sample output:
 ```
