@@ -102,9 +102,9 @@ class KAsyncParseMultiLanguageCaptionAsset extends KJobHandlerWorker
 			if($languageShort)
 				$languageLong = constant('KalturaLanguage::' . strtoupper($languageShort));
 
-			if(!$languageLong)
+			if(is_null($languageLong))
 			{
-				if(!$headerLanguageLong)
+				if(is_null($headerLanguageLong))
 				{
 					KalturaLog::debug("failed to find language in div number $divCounter");
 					continue;
