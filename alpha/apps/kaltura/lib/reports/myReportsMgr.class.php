@@ -1303,7 +1303,6 @@ class myReportsMgr
 		if ( isset ( $db_config["port"] ) && $db_config["port"]  && $mysql_function != 'mysqli' ) $host .= ":" . $db_config["port"];
 		
 		$connect_function = $mysql_function.'_connect';
-		//$link  = $connect_function( $host , $db_config["user"] , $db_config["password"] , null, $db_config["port"] );
 		$link  = $connect_function( $host , $db_config["user"] , $db_config["password"] , null, $db_config["port"] );
 
 KalturaLog::log( "Reports query using database host: [$host] user [" . $db_config["user"] . "]" );
