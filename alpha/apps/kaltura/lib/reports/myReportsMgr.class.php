@@ -1303,7 +1303,6 @@ class myReportsMgr
 		if ( isset ( $db_config["port"] ) && $db_config["port"]  && $mysql_function != 'mysqli' ) $host .= ":" . $db_config["port"];
 		
 		$connect_function = $mysql_function.'_connect';
-		//$link  = $connect_function( $host , $db_config["user"] , $db_config["password"] , null, $db_config["port"] );
 		$link  = $connect_function( $host , $db_config["user"] , $db_config["password"] , null, $db_config["port"] );
 
 KalturaLog::log( "Reports query using database host: [$host] user [" . $db_config["user"] . "]" );
@@ -1313,7 +1312,7 @@ KalturaLog::log( "Reports query using database host: [$host] user [" . $db_confi
 		
 		$error_function = $mysql_function.'_error';
 		if (!$db_selected) {
-			throw new kCoreException("mysqli_select_db() failed. " . $error_function($link). 'DB params were: '. print_r($db_config,true), kCoreException::INVALID_QUERY);
+			throw new kCoreException('Can\'t use foo : ' . $error_function($link), kCoreException::INVALID_QUERY);
 		}
 
 		if($mysql_function == 'mysql') $result = mysql_query($query);
