@@ -82,9 +82,13 @@ class KAsyncParseMultiLanguageCaptionAsset extends KJobHandlerWorker
 		$subXMLStart = substr($xmlString, 0, $indexStart);
 		$subXMLEnd = substr($xmlString, $indexEnd + 6);
 
-		$headerLanguage = null;
+		$headerLanguageLong = null;
 		if ($xml[0])
-			$headerLanguage = $xml[0]->attributes('xml',true);
+		{
+			$headerLanguageShort = $xml[0]->attributes('xml',true);
+			if($headerLanguageShort)
+				$headerLanguageLong = constant('KalturaLanguage::' . strtoupper($headerLanguageShort));
+		}	
 
 		$captionsCreated = false;
 		$divCounter = 0;
@@ -94,15 +98,19 @@ class KAsyncParseMultiLanguageCaptionAsset extends KJobHandlerWorker
 			$onlyUpdate = false;
 			$xmlDivNode = $divNode->asXml();
 			$languageShort = $divNode[0]->attributes('xml',true)->lang;
+			$languageLong = null;
+			if($languageShort)
+				$languageLong = constant('KalturaLanguage::' . strtoupper($languageShort));
 
-			if(!$languageShort)
+			if(is_null($languageLong))
 			{
-				if(!$headerLanguage)
+				if(is_null($headerLanguageLong))
 				{
 					KalturaLog::debug("failed to find language in div number $divCounter");
 					continue;
 				}
-				$languageShort = $headerLanguage;
+				$languageShort = $headerLanguageShort;
+				$languageLong = $headerLanguageLong;
 			}
 
 			if(isset($captionChildernIds[$languageShort]))
@@ -114,8 +122,6 @@ class KAsyncParseMultiLanguageCaptionAsset extends KJobHandlerWorker
 			}
 
 			$completeXML = $subXMLStart . $xmlDivNode . $subXMLEnd;
-			$languageShort = strtoupper($languageShort);
-			$languageLong = constant('KalturaLanguage::' . $languageShort);
 
 			$captionAsset = new KalturaCaptionAsset();
 			$captionAsset->fileExt = 'xml';
