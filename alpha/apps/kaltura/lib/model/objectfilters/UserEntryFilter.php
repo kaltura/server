@@ -27,6 +27,10 @@ class UserEntryFilter extends baseObjectFilter
 			"created_at",
 			"updated_at",
 		);
+
+		$this->aliases = array ( 
+			"user_id" => "kuser_id",
+			);
 	}
 
 	protected function getFieldNameFromPeer ( $field_name )
