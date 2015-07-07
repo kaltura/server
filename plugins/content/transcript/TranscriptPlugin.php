@@ -51,14 +51,14 @@ class TranscriptPlugin extends KalturaPlugin implements IKalturaEnumerator, IKal
 		return null;
 	}
 
-    /* (non-PHPdoc)
-     * @see IKalturaPending::dependsOn()
-     */
-    public static function dependsOn()
-    {
-        $dependency = new KalturaDependency(AttachmentPlugin::getPluginName());
-        return array($dependency);
-    }
+	/* (non-PHPdoc)
+	 * @see IKalturaPending::dependsOn()
+	 */
+	public static function dependsOn()
+	{
+		$dependency = new KalturaDependency(AttachmentPlugin::getPluginName());
+		return array($dependency);
+	}
 
 	/**
 	 * @return int id of dynamic enum in the DB.
