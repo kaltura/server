@@ -240,7 +240,10 @@ class CrossKalturaDistributionEngine extends DistributionEngine implements
     	    $flavorAssetFilter->entryIdEqual = $entryId;
     	    try {
                 KalturaLog::debug('Getting entry\'s flavor assets');
-                $flavorAssetsList = $client->flavorAsset->listAction($flavorAssetFilter);
+		        KBatchBase::impersonate($this->distributionProfile->partnerId);
+		        $flavorAssetsList = KBatchBase::$kClient->flavorAsset->listAction($flavorAssetFilter);
+		        KBatchBase::unimpersonate();
+//		        $flavorAssetsList = $client->flavorAsset->listAction($flavorAssetFilter);
                 foreach ($flavorAssetsList->objects as $asset)
                 {
                     $flavorAssets[$asset->id] = $asset;
@@ -319,7 +322,8 @@ class CrossKalturaDistributionEngine extends DistributionEngine implements
         }
         
         // get entry's caption assets
-        $captionAssetClient = KalturaCaptionClientPlugin::get($client);  
+		KBatchBase::impersonate($this->distributionProfile->partnerId);
+		$captionAssetClient = KalturaCaptionClientPlugin::get(KBatchBase::$kClient);
         $captionAssets = array();
         if ($this->distributeCaptions == true)
         {
@@ -328,18 +332,21 @@ class CrossKalturaDistributionEngine extends DistributionEngine implements
     	    try {
                 KalturaLog::debug('Getting entry\'s caption assets');
                 $captionAssetsList = $captionAssetClient->captionAsset->listAction($captionAssetFilter);
+		        KBatchBase::unimpersonate();
     	        foreach ($captionAssetsList->objects as $asset)
                 {
                     $captionAssets[$asset->id] = $asset;
                 }
             }
             catch (Exception $e) {
+	            KBatchBase::unimpersonate();
                 KalturaLog::err('Cannot get list of caption assets - '.$e->getMessage());
                 throw $e;
             }
         }
         else
         {
+	        KBatchBase::unimpersonate();
             KalturaLog::debug('Caption distribution is turned off');
         }
         
@@ -431,7 +438,10 @@ class CrossKalturaDistributionEngine extends DistributionEngine implements
 	    {
 	        // get local resource
 	        $contentResource = new KalturaUrlResource();
-	        $contentResource->url = $assetService->getUrl($assetId);
+		    KBatchBase::impersonate($this->distributionProfile->partnerId);
+		    $assetService->setClient(KBatchBase::$kClient);
+		    $contentResource->url = $assetService->getUrl($assetId);
+		    KBatchBase::unimpersonate();
 	    }
 	    return $contentResource;
 	}
