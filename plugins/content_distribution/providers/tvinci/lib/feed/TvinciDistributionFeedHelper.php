@@ -200,12 +200,12 @@ class TvinciDistributionFeedHelper
 		$this->setAttribute($envelopeRootNode,"xmlns:a","http://www.w3.org/2005/08/addressing");
 
 		$envelopeHeaderNode = $this->_doc->createElement('s:Header');
-		$envelopeHeaderActionNode = $this->_doc->createElement('a:Action', 'urn:Iservice/InjestTvinciData');
+		$envelopeHeaderActionNode = $this->_doc->createElement('a:Action', 'urn:Iservice/IngestTvinciData');
 		$this->setAttribute($envelopeHeaderActionNode,"s:mustUnderstand","1");
 		$envelopeHeaderNode->appendChild($envelopeHeaderActionNode);
 
 		$envelopeBodyNode = $this->_doc->createElement('s:Body');
-		$injestTvinciDataNode = $this->_doc->createElement('InjestTvinciData');
+		$ingestTvinciDataNode = $this->_doc->createElement('IngestTvinciData');
 		$tvinciDataRequestNode = $this->_doc->createElement('request');
 		$this->setAttribute($tvinciDataRequestNode,"xmlns:i","http://www.w3.org/2001/XMLSchema-instance");
 
@@ -215,8 +215,8 @@ class TvinciDistributionFeedHelper
 
 		// Attach the CDATA section
 		$tvinciDataRequestNode->appendChild($data);
-		$injestTvinciDataNode->appendChild($tvinciDataRequestNode);
-		$envelopeBodyNode->appendChild($injestTvinciDataNode);
+		$ingestTvinciDataNode->appendChild($tvinciDataRequestNode);
+		$envelopeBodyNode->appendChild($ingestTvinciDataNode);
 		$envelopeRootNode->appendChild($envelopeHeaderNode);
 		$envelopeRootNode->appendChild($envelopeBodyNode);
 
