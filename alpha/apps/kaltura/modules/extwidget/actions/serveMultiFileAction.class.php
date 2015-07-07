@@ -17,7 +17,7 @@ class serveMultiFileAction extends sfAction
 		$currentDc = kDataCenterMgr::getCurrentDc();
 		$currentDcId = $currentDc["id"];
 		$expectedHash = md5($currentDc["secret" ] . $fileSyncIds);
-		if ($hash != $expectedHash)  
+		if ($hash !== $expectedHash)  
 		{
 			$error = "Invalid hash - ids [$fileSyncIds] got [$hash] expected [$expectedHash]";
 			KalturaLog::err($error); 
@@ -58,7 +58,7 @@ class serveMultiFileAction extends sfAction
 			{
 				$error = "Path [$resolvedPath] for fileSync id [$file_sync_id] does not exist";
 				KalturaLog::err($error);
-				throw new Exception ( $error );
+				continue;
 			}
 			
 			$filePaths[$fileSync->getId()] = $resolvedPath;

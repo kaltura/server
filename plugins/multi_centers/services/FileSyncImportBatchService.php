@@ -86,8 +86,7 @@ class FileSyncImportBatchService extends KalturaBatchService
 		$keysCache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_QUERY_CACHE_KEYS);
 		if (!$keysCache)
 		{
-			//throw new KalturaAPIException(MultiCentersErrors::GET_MAX_FILESYNC_ID_FAILED, $sourceDc);
-			// XXX error
+			throw new KalturaAPIException(MultiCentersErrors::GET_KEYS_CACHE_FAILED);
 		}
 		
 		$maxId = $keysCache->get(self::MAX_FILESYNC_ID_PREFIX . $sourceDc);
@@ -112,6 +111,7 @@ class FileSyncImportBatchService extends KalturaBatchService
 		$createdAtLessThanOrEqual = $filter->createdAtLessThanOrEqual;
 		$filter->createdAtLessThanOrEqual = null;
 		
+		// build the criteria
 		$fileSyncFilter = new FileSyncFilter();
 		$filter->toObject($fileSyncFilter);
 		
@@ -144,7 +144,7 @@ class FileSyncImportBatchService extends KalturaBatchService
 			
 			// get a chunk of file syncs
 			$idCriterion = $c->getNewCriterion(FileSyncPeer::ID, $lastId - 100, Criteria::GREATER_THAN);
-			$idCriterion->addOr($c->getNewCriterion(FileSyncPeer::ID, $maxId, Criteria::LESS_THAN));
+			$idCriterion->addAnd($c->getNewCriterion(FileSyncPeer::ID, $maxId, Criteria::LESS_THAN));
 			$c->addAnd($idCriterion);
 
 			$fileSyncs = FileSyncPeer::doSelect($c);

@@ -283,7 +283,6 @@ class KAsyncFileSyncImport extends KPeriodicWorker
 		
 		for (;;)
 		{
-			// get http body
 			if($resumeOffset)
 			{
 				// will resume from the current offset
@@ -300,12 +299,13 @@ class KAsyncFileSyncImport extends KPeriodicWorker
 				}
 			}
 				
+			// download directly to the dest file
 			KalturaLog::debug("Executing curl for downloading file at [$sourceUrl]");
 			$res = $this->curlWrapper->exec($sourceUrl, $fileDestination); // download file
 			$curlError = $this->curlWrapper->getError();
 			$curlErrorNumber = $this->curlWrapper->getErrorNumber();
 			
-			//If we run mutiple file sync import using the same curl we need to reset the offset each time before fetching the file
+			// reset the resume offset, since the curl handle is reused
 			$this->curlWrapper->setResumeOffset(0);
 
 			KalturaLog::debug("Curl results: $res");
@@ -315,7 +315,7 @@ class KAsyncFileSyncImport extends KPeriodicWorker
 			{
 				if($curlErrorNumber != CURLE_OPERATION_TIMEOUTED)
 				{
-					// an error other than timeout occured  - cannot continue (timeout is handled with resuming)
+					// an error other than timeout occured  - cannot continue
 					KalturaLog::err("$curlError");
 					return false;
 				}
@@ -438,6 +438,8 @@ class KAsyncFileSyncImport extends KPeriodicWorker
 				$baseUrl,
 				$dcSecret);
 		
+		KalturaLog::debug('fetchMultiFiles - source url ['.$sourceUrl.']');
+		
 		$contents = $this->curlWrapper->exec($sourceUrl);
 		$curlError = $this->curlWrapper->getError();
 		
@@ -487,6 +489,8 @@ class KAsyncFileSyncImport extends KPeriodicWorker
 				$this->markFileSyncAsReady($fileSync);
 			}
 		}
+
+		KalturaLog::debug('fetchMultiFiles - done');
 		
 		return true;
 	}
@@ -607,12 +611,10 @@ class KAsyncFileSyncImport extends KPeriodicWorker
 	 */
 	private function isDirectoryHeader($curlHeaderResponse)
 	{
-		if (isset($curlHeaderResponse->headers['file-sync-type'])) 
+		if (isset($curlHeaderResponse->headers['file-sync-type']) &&  
+			trim($curlHeaderResponse->headers['file-sync-type']) === 'dir') 
 		{
-			if (trim($curlHeaderResponse->headers['file-sync-type']) === 'dir') 
-			{
-				return true;
-			}
+			return true;
 		}
 		return false;
 	}
