@@ -146,7 +146,7 @@ abstract class KalturaUserEntry extends KalturaObject implements IRelatedFiltera
 		return array();
 	}
 
-	protected function doFromObject(UserEntry $srcObj, KalturaDetachedResponseProfile $responseProfile = null)
+	protected function doFromObject($srcObj, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		$kuser = $srcObj->getkuser();
 		if ($kuser)
