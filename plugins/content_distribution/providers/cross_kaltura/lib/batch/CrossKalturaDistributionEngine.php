@@ -228,8 +228,9 @@ class CrossKalturaDistributionEngine extends DistributionEngine implements
 	    
 	    // get entry
 	    KalturaLog::debug('Getting entry id ['.$entryId.']');
-	    $entry = $client->baseEntry->get($entryId);
-	    
+		KBatchBase::impersonate($this->distributionProfile->partnerId);
+		$entry = KBatchBase::$kClient->baseEntry->get($entryId);
+		KBatchBase::unimpersonate();
 	    // get entry's flavor assets chosen for distribution
 	    $flavorAssets = array();
 	    if (!empty($data->entryDistribution->flavorAssetIds))
