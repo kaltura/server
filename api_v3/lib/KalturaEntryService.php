@@ -961,7 +961,7 @@ class KalturaEntryService extends KalturaBaseService
 		$conversionProfile = myPartnerUtils::getConversionProfile2ForPartner($this->getPartnerId(), $conversionProfileId);
 		if($conversionProfile && $conversionProfile->getDefaultEntryId())
 		{
-			$templateEntry = entryPeer::retrieveByPK($conversionProfile->getDefaultEntryId());
+			$templateEntry = entryPeer::retrieveByPKNoFilter($conversionProfile->getDefaultEntryId(), null, false);
 			if($templateEntry)
 			{
 				$dbEntry = $templateEntry->copyTemplate(true, $entry->toObject());
@@ -993,9 +993,7 @@ class KalturaEntryService extends KalturaBaseService
 
 		if (!$entry)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
-			
 		
-			
 		$srcFlavorAsset = assetPeer::retrieveOriginalByEntryId($entryId);
 		if(!$srcFlavorAsset)
 			throw new KalturaAPIException(KalturaErrors::ORIGINAL_FLAVOR_ASSET_IS_MISSING);
