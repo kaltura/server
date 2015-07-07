@@ -100,7 +100,7 @@ class KExternalErrors
 			self::INVALID_SETTING_TYPE => "Invalid setting type",
 			self::ACTION_BLOCKED => "The requested action is blocked for this partner",
 			self::INVALID_HASH => "Hash key contains invalid characters",
-			self::PARENT_ENTRY_ID_NOT_FOUND => "Parent entry id provided not found in system",
+			self::PARENT_ENTRY_ID_NOT_FOUND => "Parent entry id provided not found in system"
 	);
 	
 	public static function dieError($errorCode, $message = null)
