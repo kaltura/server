@@ -16,7 +16,10 @@
 class EdgeServer extends BaseEdgeServer {
 	
 	const CUSTOM_DATA_DELIVERY_IDS = 'delivery_profile_ids';
-	const EDGE_SERVER_DEFAULT_HOST_NAME_TOKEN = "{playbackHost}/kCache/";
+	const CUSTOM_DATA_EDGE_PLAYBACK_CONFIGURATION = 'edge_playback_configuration';
+	const EDGE_SERVER_DEFAULT_HOST_NAME_TOKEN = "{playbackHost}";
+	const EDGE_SERVER_DEFAULT_LIVE_CACHE_APPLICATION_NAME = "kCache";
+	const EDGE_SERVER_DEFAULT_LIVE_UNICAST_TO_MC_APPLICATION_NAME = "kMulticast";
 	
 	/**
 	 * Applies default values to this object.
@@ -50,23 +53,28 @@ class EdgeServer extends BaseEdgeServer {
 		return $playbackHostName;
 	}
 	
-	public function getPlaybackHost($urlTemplate)
-	{
-		$playbackHostName = '';
-		$urlParts = explode("/", $urlTemplate);
-		$token = reset($urlParts);
-		
+	public function getPlaybackHost()
+	{		
 		$playbackHostName = $this->getPlaybackHostName();
 		
 		if($this->parent_id)
 		{
 			$parentEdge = EdgeServerPeer::retrieveByPK($this->parent_id);
 			if($parentEdge)
-				$playbackHostName = $parentEdge->getPlaybackHost($urlTemplate) . "/" . $playbackHostName;
+				$playbackHostName = $parentEdge->getPlaybackHost() . "/" . $playbackHostName;
 		}
 		
-		$playbackHostName = str_replace($token, $playbackHostName, $urlTemplate);
+		$playbackHostName .= "/" . self::EDGE_SERVER_DEFAULT_LIVE_CACHE_APPLICATION_NAME . "/";
 		return $playbackHostName;
+	}
+	
+	public function buildEdgePlaybackUrl($originalPlaybackUrl)
+	{
+		$edgePlaybackHost = $this->getPlaybackHost();
+		
+		$urlParts = explode("://", $originalPlaybackUrl);
+		
+		return $urlParts[0] . "://" . $edgePlaybackHost . "/" . $urlParts[1];
 	}
 
 } // EdgeServer

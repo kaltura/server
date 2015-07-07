@@ -812,8 +812,7 @@ class playManifestAction extends kalturaAction
 		
 		$this->deliveryProfile->setDynamicAttributes($this->deliveryAttributes);	
 
-		if($this->deliveryAttributes->getEdgeServerIds())
-		{
+		if($this->deliveryAttributes->getEdgeServerIds()) {
 			list($baseUrl, $backupUrl) = $this->deliveryProfile->getEdgeServerUrls($baseUrl, $backupUrl);
 		}
 		
@@ -872,8 +871,8 @@ class playManifestAction extends kalturaAction
 	
 	public function execute()
 	{
-		
-		KExternalErrors::setResponseErrorCode(KExternalErrors::HTTP_STATUS_NOT_FOUND);
+		if($this->getRequestParameter("format", "Empty") !== PlaybackProtocol::APPLE_HTTP_TO_MC)
+			KExternalErrors::setResponseErrorCode(KExternalErrors::HTTP_STATUS_NOT_FOUND);
 		
 		$this->deliveryAttributes = new DeliveryProfileDynamicAttributes();
 		// Parse input parameters
