@@ -426,7 +426,16 @@ class Partner extends BasePartner
 		return $this->putInCustomData( "partnerSpecificServices", $v );
 	}
 
-	
+	public function getDefThumbQuality()
+	{
+		return $this->getFromCustomData( "defThumbQuality" , null , 0);
+	}
+
+	public function setDefThumbQuality( $v )
+	{
+		return $this->putInCustomData( "defThumbQuality", $v );
+	}
+
 	public function getAllowAnonymousRanking()	{		return $this->getFromCustomData( "allowAnonymousRanking" , null, false  );	}
 	public function setAllowAnonymousRanking( $v )	{		return $this->putInCustomData( "allowAnonymousRanking", $v );	}
 	
@@ -444,6 +453,9 @@ class Partner extends BasePartner
 
 	public function getCdnHost()	{		return $this->getFromCustomData( "cdnHost" , null, false  );	}
 	public function setCdnHost( $v )	{		return $this->putInCustomData( "cdnHost", $v );	}
+		
+	public function getPlayServerHost()	{		return $this->getFromCustomData( "playServerHost");	}
+	public function setPlayServerHost( $v )	{		return $this->putInCustomData( "playServerHost", $v );	}
 
 	public function getDefaultDeliveryCode()    {               return $this->getFromCustomData( "defaultDeliveryCode" , null, false  ); }
 	public function setDefaultDeliveryCode( $v )        {               return $this->putInCustomData( "defaultDeliveryCode", $v ); }
@@ -750,7 +762,14 @@ class Partner extends BasePartner
 	
 	/** monitor Usage Expiry **/
 	public function getExtendedFreeTrail() { return $this->getFromCustomData("extendedFreeTrail", null); }
-	public function setExtendedFreeTrail( $v ) { $this->putInCustomData("extendedFreeTrail", $v); }
+	public function setExtendedFreeTrail( $v )
+	{
+		$this->putInCustomData("extendedFreeTrail", $v);
+		if ( $v )
+		{
+			$this->setUsageLimitWarning(null);
+		}
+	}
 	
 	public function getExtendedFreeTrailExpiryReason() { return $this->getFromCustomData("extendedFreeTrailExpiryReason", null); }
 	public function setExtendedFreeTrailExpiryReason( $v ) { $this->putInCustomData("extendedFreeTrailExpiryReason", $v); }
@@ -952,6 +971,7 @@ class Partner extends BasePartner
     public function setMaxBulkSizeOverageUnit($v)		{$this->putInCustomData('bulk_size_overage_unit', $v);}
     public function setAutoModerateEntryFilter($v)		{$this->putInCustomData('auto_moderate_entry_filter', $v);}
     public function setCacheFlavorVersion($v)			{$this->putInCustomData('cache_flavor_version', $v);}
+    public function setCacheThumbnailVersion($v)		{$this->putInCustomData('cache_thumb_version', $v);}
     public function setBroadcastUrlManager($v)			{$this->putInCustomData('broadcast_url_manager', $v);}
     public function setPrimaryBroadcastUrl($v)			{$this->putInCustomData('primary_broadcast_url', $v);}
 	public function setSecondaryBroadcastUrl($v)		{$this->putInCustomData('secondary_broadcast_url', $v);}
@@ -995,11 +1015,30 @@ class Partner extends BasePartner
     public function getMaxBulkSizeOverageUnit()			{return $this->getFromCustomData('bulk_size_overage_unit');}
 	public function getAutoModerateEntryFilter()		{return $this->getFromCustomData('auto_moderate_entry_filter');}
     public function getCacheFlavorVersion()				{return $this->getFromCustomData('cache_flavor_version');}
+    public function getCacheThumbnailVersion()			{return $this->getFromCustomData('cache_thumb_version');}
     public function getBroadcastUrlManager()			{return $this->getFromCustomData('broadcast_url_manager');}
 	public function getPrimaryBroadcastUrl()			{return $this->getFromCustomData('primary_broadcast_url');}
 	public function getSecondaryBroadcastUrl()			{return $this->getFromCustomData('secondary_broadcast_url');}
 	public function getLiveStreamPlaybackUrlConfigurations()		 	{return $this->getFromCustomData('live_stream_playback_url_configurations', null, array());}
-	
+
+
+    public function setLiveStreamBroadcastUrlConfigurations($key, $value)
+    {
+    	$this->putInCustomData($key, $value, 'live_stream_broadcast_url_configurations');
+    }
+    
+	public function getLiveStreamBroadcastUrlConfigurations($dc = null)
+	{
+		$config = (!is_null($dc) ? kConf::get($dc, 'broadcast') : kConf::getMap('broadcast'));
+		
+		$partnerConfig = $this->getFromCustomData($dc, 'live_stream_broadcast_url_configurations');
+		if($partnerConfig)
+		{
+			$config = kConf::mergeConfigItem($config, $partnerConfig, true);
+		}
+		
+		return $config;
+	}
 	
 	/**
 	 * @return kAkamaiLiveParams
@@ -1155,8 +1194,9 @@ class Partner extends BasePartner
 	public function getAlwaysAllowedPermissionNames()
 	{
 		$names = $this->getFromCustomData('always_allowed_permission_names');
-		$namesArray = explode(',', $names);
-		if (!count($namesArray) || !in_array(PermissionName::ALWAYS_ALLOWED_ACTIONS, $namesArray)) {
+		// add ALWAYS_ALLOWED_ACTIONS only when always_allowed_permission_names was not specified explicitly
+		// it's required to support the scenario where ALWAYS_ALLOWED_ACTIONS should be disabled (by specifying a "dummy" permission in always_allowed_permission_names)
+		if (!trim($names)) {
 			$names = PermissionName::ALWAYS_ALLOWED_ACTIONS.','.$names;
 		}
 		$names = trim($names, ',');
@@ -1609,4 +1649,39 @@ class Partner extends BasePartner
 
 	public function getReferenceId() { return $this->getFromCustomData("referenceId", null); }
 	public function setReferenceId( $v ) { $this->putInCustomData("referenceId", $v); }
+
+	public function getGoogleOAuth2($appId, $objectIdentifier = null)
+	{
+		$customDataKey = $appId;
+		if ($objectIdentifier)
+		{
+			$customDataKey .= '_' . $objectIdentifier;
+		}
+			
+		$tokenData = $this->getFromCustomData($customDataKey, 'googleAuth');
+		if(is_null($tokenData))
+		{
+			$appConfig = kConf::get($appId, 'google_auth', null);
+			if($appConfig && isset($appConfig[$objectIdentifier]))
+			{
+				$tokenJsonStr = $appConfig[$objectIdentifier];
+				$tokenData = json_decode($tokenJsonStr, true);
+			}
+		}
+		
+		return $tokenData;
+	}
+	
+	public function setGoogleOAuth2($appId, $tokenJsonStr, $objectIdentifier = null)
+	{
+		$tokenData = json_decode($tokenJsonStr, true);
+		
+		$customDataKey = $appId;
+		if ($objectIdentifier)
+		{
+			$customDataKey .= '_' . $objectIdentifier;
+		}
+			
+		$this->putInCustomData($customDataKey, $tokenData, 'googleAuth');
+	}
 }
