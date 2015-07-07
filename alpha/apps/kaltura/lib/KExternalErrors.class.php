@@ -51,7 +51,6 @@ class KExternalErrors
 	const ACTION_BLOCKED = 40;
 	const INVALID_HASH = 41;
 	const PARENT_ENTRY_ID_NOT_FOUND = 42;
-	const LIVE_ENTRY_PLAYBACK_URLS_NOT_FOUND = 43;
 	
 	const HTTP_STATUS_NOT_FOUND = 404;
 	
@@ -102,7 +101,6 @@ class KExternalErrors
 			self::ACTION_BLOCKED => "The requested action is blocked for this partner",
 			self::INVALID_HASH => "Hash key contains invalid characters",
 			self::PARENT_ENTRY_ID_NOT_FOUND => "Parent entry id provided not found in system",
-			self::LIVE_ENTRY_PLAYBACK_URLS_NOT_FOUND => "Live entry playback url's not found for selected playback format"
 	);
 	
 	public static function dieError($errorCode, $message = null)

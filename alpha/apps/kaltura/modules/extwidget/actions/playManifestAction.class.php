@@ -816,10 +816,6 @@ class playManifestAction extends kalturaAction
 			list($baseUrl, $backupUrl) = $this->deliveryProfile->getEdgeServerUrls($baseUrl, $backupUrl);
 		}
 		
-		if(is_null($baseUrl) && is_null($backupUrl)) {
-			KExternalErrors::dieError(KExternalErrors::LIVE_ENTRY_PLAYBACK_URLS_NOT_FOUND, "Live playback url's not found for entry [$this->entryId] and playback protocol [{$this->deliveryAttributes->getFormat()}]");
-		}
-		
 		return $this->deliveryProfile->serve($baseUrl, $backupUrl);
 	}
 	
@@ -875,8 +871,8 @@ class playManifestAction extends kalturaAction
 	
 	public function execute()
 	{
-		
-		KExternalErrors::setResponseErrorCode(KExternalErrors::HTTP_STATUS_NOT_FOUND);
+		if($this->getRequestParameter("format", "Empty") !== PlaybackProtocol::APPLE_HTTP_TO_MC)
+			KExternalErrors::setResponseErrorCode(KExternalErrors::HTTP_STATUS_NOT_FOUND);
 		
 		$this->deliveryAttributes = new DeliveryProfileDynamicAttributes();
 		// Parse input parameters
