@@ -32,6 +32,7 @@ class LiveCuePointService extends KalturaBaseService
 	 * 
 	 * @action createPeriodicSyncPoints
 	 * @actionAlias liveStream.createPeriodicSyncPoints
+	 * @deprecated This actions is not required, sync points are sent automatically on the stream.
 	 * @param string $entryId Kaltura live-stream entry id
 	 * @param int $interval Events interval in seconds 
 	 * @param int $duration Duration in seconds
@@ -42,40 +43,5 @@ class LiveCuePointService extends KalturaBaseService
 	 */
 	function createPeriodicSyncPoints($entryId, $interval, $duration)
 	{
-		$entryDc = substr($entryId, 0, 1);
-		if($entryDc != kDataCenterMgr::getCurrentDcId())
-		{
-			$remoteDCHost = kDataCenterMgr::getRemoteDcExternalUrlByDcId($entryDc);
-			kFileUtils::dumpApiRequest($remoteDCHost, true);
-		}
-		
-		$dbEntry = entryPeer::retrieveByPK($entryId);
-
-		if (!$dbEntry || $dbEntry->getType() != KalturaEntryType::LIVE_STREAM || !in_array($dbEntry->getSource(), array(KalturaSourceType::LIVE_STREAM, KalturaSourceType::LIVE_STREAM_ONTEXTDATA_CAPTIONS)))
-			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
-			
-		/* @var $dbEntry LiveStreamEntry */
-		$mediaServers = $dbEntry->getMediaServers();
-		if(!count($mediaServers))
-			throw new KalturaAPIException(KalturaErrors::NO_MEDIA_SERVER_FOUND, $entryId);
-		
-		foreach($mediaServers as $key => $kMediaServer)
-		{
-			if($kMediaServer && $kMediaServer instanceof kLiveMediaServer)
-			{
-				$mediaServer = $kMediaServer->getMediaServer();
-				$mediaServerCuePointsService = $mediaServer->getWebService(MediaServer::WEB_SERVICE_CUE_POINTS);
-				KalturaLog::debug("Sending sync points for DC [" . $mediaServer->getDc() . "] ");
-				if($mediaServerCuePointsService && $mediaServerCuePointsService instanceof KalturaMediaServerCuePointsService)
-				{
-					KalturaLog::debug("Call createTimeCuePoints on DC [" . $mediaServer->getDc() . "] ");
-					$mediaServerCuePointsService->createTimeCuePoints($entryId, $interval, $duration);
-				}
-				else 
-				{
-					KalturaLog::debug("Media server service not found on DC: [" . $mediaServer->getDc() . "] ");
-				}
-			}
-		}
 	}
 }
