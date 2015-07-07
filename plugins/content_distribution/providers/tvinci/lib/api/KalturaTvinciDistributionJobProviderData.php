@@ -95,31 +95,13 @@ class KalturaTvinciDistributionJobProviderData extends KalturaConfigurableDistri
 
 	}
 
-	private static function getSupportedAssetsTags()
+	private function initPlayManifestUrls($entry, $feedHelper)
 	{
-		return array(
+		$videoAssetDataMap = array(
 			array( 'Main',						PlaybackProtocol::AKAMAI_HDS,	'mbr',		'a4m' ),
 			array( 'Tablet Main',				PlaybackProtocol::APPLE_HTTP,	'ipad',		'm3u8' ),
 			array( 'Smartphone Main',			PlaybackProtocol::APPLE_HTTP,	'iphone',	'm3u8' ),
 		);
-
-	}
-
-
-	private function getTagToFlavorsData(entry $entry, array $tags)
-	{
-		$videoAssetDataMap = getSupportedAssetsTags();
-		foreach ( $videoAssetDataMap as $videoAssetData )
-		{
-			$matchingFalvors
-		}
-	}
-
-
-
-	private function initPlayManifestUrls($entry, $feedHelper)
-	{
-
 
 		// Loop and build the file nodes
 		foreach ( $videoAssetDataMap as $videoAssetData )

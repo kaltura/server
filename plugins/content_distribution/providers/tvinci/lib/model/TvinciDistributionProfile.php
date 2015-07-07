@@ -30,25 +30,7 @@ class TvinciDistributionProfile extends ConfigurableDistributionProfile
 		    return $validationErrors;
 		}
 
-		$validationErrors = $this->validateReferenceId($entryDistribution, $action, $validationErrors);
-
 		return $validationErrors;
-	}
-
-	public function validateReferenceId(EntryDistribution $entryDistribution, $action, array $validationErrors)
-	{
-		$entry = null;
-		if ( $entryDistribution->getEntryId() )
-		{
-			$entry = entryPeer::retrieveByPK($entryDistribution->getEntryId());
-			if (!$entry->getReferenceID())
-			{
-				$validationError = $this->createValidationError($action, DistributionErrorType::MISSING_METADATA, "Reference ID" , "is a mandatory field");
-				$validationError->setValidationErrorType(DistributionValidationErrorType::STRING_EMPTY);
-				$validationError->setValidationErrorParam("Reference ID is a mandatory field");
-				$validationErrors[] = $validationError;
-			}
-		}
 	}
 
 	public function getIngestUrl()				{return $this->getFromCustomData(self::CUSTOM_DATA_INGEST_URL);}
