@@ -29,6 +29,7 @@ class KalturaUserEntryFilter extends KalturaUserEntryBaseFilter
 		}
 
 		$c = new Criteria();
+		$this->fixFilterUserId();
 		$userEntryFilter = $this->toObject();
 		$userEntryFilter->attachToCriteria($c);
 
