@@ -5,20 +5,82 @@
  * @package plugins.multiCenters
  * @subpackage Scheduler.FileSyncImport
  */
-class KAsyncFileSyncImport extends KJobHandlerWorker
+class KAsyncFileSyncImport extends KPeriodicWorker
 {
 	protected $curlWrapper;
 
 	public function run($jobs = null)
 	{
+		// get worker parameters
+		$filter = $this->getFilter();
+		$sourceDc = $this->getAdditionalParams("sourceDc");
+		$maxCount = $this->getAdditionalParams("maxCount");
+		$maxSize = $this->getAdditionalParams("maxSize");
+		
 		$this->curlWrapper = new KCurlWrapper(self::$taskConfig->params);
 		
-		$retJobs = parent::run($jobs);
+		$multiCentersPlugin = KalturaMultiCentersClientPlugin::get(self::$kClient);
+		
+		for (;;)
+		{
+			// lock file syncs to import
+			$lockResult = $multiCentersPlugin->filesyncImportBatch->lockPendingFileSyncs(
+					$filter, 
+					$this->getId(), 
+					$sourceDc,
+					$maxCount,
+					$maxSize);
+
+			// handle all dirs and empty files first
+			$fileSyncs = array();
+			foreach ($lockResult->fileSyncs as $fileSync)
+			{				
+				if ($fileSync->isDir)
+				{
+					$sourceUrl = self::getSourceUrl($fileSync->originalId, $lockResult->baseUrl, $lockResult->dcSecret);
+					if ($this->fetchDir($sourceUrl, self::getFullPath($fileSync)))
+					{
+						$this->markFileSyncAsReady($fileSync);
+					}
+				}
+				else if ($fileSync->fileSize == 0)
+				{
+					if ($this->fetchEmptyFile(self::getFullPath($fileSync)))
+					{
+						$this->markFileSyncAsReady($fileSync);
+					}
+				}
+				else 
+				{
+					$fileSyncs[] = $fileSync;
+				}
+			}
+
+			// handle regular files
+			if (count($fileSyncs) == 1)
+			{
+				$fileSync = reset($fileSyncs);
+				$sourceUrl = self::getSourceUrl($fileSync->originalId, $lockResult->baseUrl, $lockResult->dcSecret);
+				if ($this->fetchFile($sourceUrl, self::getFullPath($fileSync), $fileSync->fileSize))
+				{
+					$this->markFileSyncAsReady($fileSync);
+				}
+			}
+			else if (count($fileSyncs) > 1)
+			{
+				$this->fetchMultiFiles($fileSyncs, $lockResult->baseUrl, $lockResult->dcSecret);
+			}
+			
+			// if the limit was not reached, wait for more file syncs to become available
+			if (!$lockResult->limitReached)
+			{
+				sleep(1);
+			}
+		}
 		
 		$this->curlWrapper->close();
-		
-		return $retJobs;
 	}
+	
 	/* (non-PHPdoc)
 	 * @see KBatchBase::getType()
 	 */
@@ -26,122 +88,87 @@ class KAsyncFileSyncImport extends KJobHandlerWorker
 	{
 		return KalturaBatchJobType::FILESYNC_IMPORT;
 	}
-	
-	/* (non-PHPdoc)
-	 * @see KJobHandlerWorker::getJobs()
-	 * 
-	 * TODO remove the destFilePath from the job data and get it later using the api, then delete this method
-	 */
-	protected function getJobs()
+
+	protected function getFilter()
 	{
-		$maxOffset = min($this->getMaxOffset(), KBatchBase::$taskConfig->getQueueSize());
-		$multiCentersPlugin = KalturaMultiCentersClientPlugin::get(self::$kClient);
-		return $multiCentersPlugin->filesyncImportBatch->getExclusiveFileSyncImportJobs($this->getExclusiveLockKey(), self::$taskConfig->maximumExecutionTime, 
-				$this->getMaxJobsEachRun(), $this->getFilter(), $maxOffset);
+		if(KBatchBase::$taskConfig->filter)
+		{
+			return KBatchBase::$taskConfig->filter;
+		}
+		return new KalturaFileSyncFilter();
 	}
 	
-	/* (non-PHPdoc)
-	 * @see KJobHandlerWorker::exec()
-	 */
-	protected function exec(KalturaBatchJob $job)
+	static protected function getSourceUrl($fileSyncId, $baseUrl, $dcSecret)
 	{
-		$fileDestination = $job->data->destFilePath;
-		
-		if($job->data->fileSize == 0) 
-			return $this->fetchEmptyFile($job, $fileDestination);				
-		
-		// start downoading the file to its destination (temp or final)
-		return $this->fetchUrl($job, $job->data->sourceUrl, $fileDestination);	
+		$fileHash = md5($dcSecret . $fileSyncId);
+		return $baseUrl . "/index.php/extwidget/servefile/id/$fileSyncId/hash/$fileHash";
 	}
 	
-	private function fetchUrl(KalturaBatchJob &$job, $sourceUrl, $destination)
+	static protected function getMultiSourceUrl($fileSyncIds, $baseUrl, $dcSecret)
 	{
-		KalturaLog::debug('fetchUrl - job id ['.$job->id.'], source url ['.$sourceUrl.'], destination ['.$destination.']');
-		
+		$fileHash = md5($dcSecret . $fileSyncIds);
+		return $baseUrl . "/index.php/extwidget/serveMultiFile/ids/$fileSyncIds/hash/$fileHash";
+	}
+	
+	static protected function getFullPath(KalturaFileSync $fileSync)
+	{
+		return $fileSync->fileRoot . $fileSync->filePath;
+	}
+	
+	protected function markFileSyncAsReady(KalturaFileSync $fileSync)
+	{
+		$updateFileSync = new KalturaFileSync;
+		$updateFileSync->status = KalturaFileSyncStatus::READY;
+		$updateFileSync->fileRoot = $fileSync->fileRoot;
+		$updateFileSync->filePath = $fileSync->filePath;
+	
 		try
 		{
-			// get the url header and check close job on any errors
-			$curlHeaderResponse = $this->fetchHeader($job, $sourceUrl);
-			if (!$curlHeaderResponse) {
-				return false; // job already closed by fetchHeader function
-			}
-			
-			// check if url leads to a file or a directory
-			$isDir = $this->isDirectoryHeader($curlHeaderResponse);
-	
-			if ($isDir) {
-				// fetch all directory contents, one by one
-				$result = $this->fetchDir($job, $sourceUrl, $destination);
-			}
-			else {
-				// fetch the file
-				$result = $this->fetchFile($job, $sourceUrl, $destination, $curlHeaderResponse);
-			}
+			$fileSyncPlugin = KalturaFilesyncClientPlugin::get(self::$kClient);
+			$fileSyncPlugin->fileSync->update($fileSync->id, $updateFileSync);
 		}
-		catch(Exception $ex)
+		catch(KalturaException $e)
 		{
-			// run time error occured
-			$this->closeJob($job, KalturaBatchJobErrorTypes::RUNTIME, $ex->getCode(), "Error: " . $ex->getMessage(), KalturaBatchJobStatus::FAILED);
+			KalturaLog::err($e);
 		}
-		
-		if (!$result)
-			// job failed and closed inside
-			KalturaLog::debug('fetchUrl - job id ['.$job->id.'] failed!');
-		else  
-			$this->fetchUrlClose($job);
-		
-		return $job;
+		catch(KalturaClientException $e)
+		{
+			KalturaLog::err($e);
+		}
 	}
 	
-	private function fetchUrlClose(KalturaBatchJob &$job) {
+	private function fetchEmptyFile($destination) {
 		
-		// job completed successfuly
-		KalturaLog::debug ( 'fetchUrl - job id [' . $job->id . '] completed successfuly!' );
-		
-		// close and mark job as finished
-		$this->closeJob ( $job, null, null, "File is in final destination", KalturaBatchJobStatus::FINISHED, null, $job->data );
-	}
-	
-	private function fetchEmptyFile(KalturaBatchJob &$job, $destination) {
-		
-		$res = self::createDir(dirname($destination));
+		$res = self::createAndSetDir(dirname($destination));
 		if ( !$res )
 		{
-			$msg = 'Error: Cannot create destination directory ['.dirname($destination).']';
-			KalturaLog::err($msg);
-			$this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::CANNOT_CREATE_DIRECTORY, $msg, KalturaBatchJobStatus::RETRY);
-			return $job;
+			KalturaLog::err('Cannot create destination directory ['.dirname($destination).']');
+			return false;
 		}
 		
 		$res = touch($destination);
 		if ( !$res )
 		{
-			$msg = 'Error: Cannot create file [$destination]';
-			KalturaLog::err($msg);
-			$this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::OUTPUT_FILE_DOESNT_EXIST, $msg, KalturaBatchJobStatus::RETRY);
-			return $job;
+			KalturaLog::err("Cannot create file [$destination]");
+			return false;
 		}
-		
-		$this->fetchUrlClose($job);
-		return $job;
+		return true;
 	}
 
 	/**
 	 * Fetch all content of a $sourceUrl that leads to a directory and save it in the given $dirDestination.
-	 * @param KalturaBatchJob $job
 	 * @param string $sourceUrl
 	 * @param string $dirDestination
 	 */
-	private function fetchDir(KalturaBatchJob &$job, $sourceUrl, $dirDestination)
+	private function fetchDir($sourceUrl, $dirDestination)
 	{
-		KalturaLog::debug('fetchDir - job id ['.$job->id.'], source url ['.$sourceUrl.'], destination ['.$dirDestination.']');
+		KalturaLog::debug('fetchDir - source url ['.$sourceUrl.'], destination ['.$dirDestination.']');
 		
 		// create directory if does not exist
 		$res = $this->createAndSetDir($dirDestination);
-		if (!$res) {
-			$msg = "Error: Cannot create destination directory [$dirDestination]";
-			KalturaLog::err($msg);
-			$this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::CANNOT_CREATE_DIRECTORY, $msg, KalturaBatchJobStatus::RETRY);				
+		if (!$res) 
+		{
+			KalturaLog::err("Cannot create destination directory [$dirDestination]");
 			return false;
 		}
 		
@@ -151,10 +178,9 @@ class KAsyncFileSyncImport extends KJobHandlerWorker
 		$curlError = $this->curlWrapper->getError();
 		$curlErrorNumber = $this->curlWrapper->getErrorNumber();
 		
-		if ($contents === false || $curlError) {
-			$msg = "Error: $curlError";
-			KalturaLog::err($msg);
-			$this->closeJob($job, KalturaBatchJobErrorTypes::CURL, $curlErrorNumber, $msg, KalturaBatchJobStatus::RETRY);
+		if ($contents === false || $curlError) 
+		{
+			KalturaLog::err("$curlError");
 			return false;
 		}
 		$contents = unserialize($contents); // if an exception is thrown, it will be catched in fetchUrl
@@ -173,15 +199,17 @@ class KAsyncFileSyncImport extends KJobHandlerWorker
 			
 			if (!$type || !$filesize)
 			{
-				$curlHeaderResponse = $this->fetchHeader($job, $newUrl);
-				if (!$curlHeaderResponse) {
-					return false; // job already closed with an error
+				$curlHeaderResponse = $this->fetchHeader($newUrl);
+				if (!$curlHeaderResponse) 
+				{
+					return false;
 				}
 				// check if current is a file or directory
 				$isDir = $this->isDirectoryHeader($curlHeaderResponse);
 				$filesize = $this->getFilesizeFromHeader($curlHeaderResponse);
 			}
-			else {
+			else 
+			{
 				$isDir = $type === 'dir';
 			}
 			
@@ -191,66 +219,59 @@ class KAsyncFileSyncImport extends KJobHandlerWorker
 				$res = $this->createAndSetDir($dirDestination.'/'.$name);
 				if (!$res)
 				{
-					$msg = 'Error: Cannot create destination directory ['.$dirDestination.'/'.$name.']';
-					KalturaLog::err($msg);
-					$this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::CANNOT_CREATE_DIRECTORY, $msg, KalturaBatchJobStatus::RETRY);				
+					KalturaLog::err('Cannot create destination directory ['.$dirDestination.'/'.$name.']');
 					return false;
 				}
 			}
 			else
 			{
 				// is a file - fetch it from server
-				$res = $this->fetchFile($job, $newUrl, $dirDestination.'/'.$name, null, $filesize);
-				if (!$res) {
-					return false; // job already closed with an error
+				$res = $this->fetchFile($newUrl, $dirDestination.'/'.$name, $filesize);
+				if (!$res) 
+				{
+					return false;
 				}
 			}
 		}
 
-		KalturaLog::debug('fetchDir - done succesfuly');
+		KalturaLog::debug('fetchDir - completed successfully');
 		return true;
 	}
 	
-	
 	/**
 	 * Download a file from $sourceUrl to $fileDestination
-	 * @param KalturaBatchJob $job
 	 * @param string $sourceUrl
 	 * @param string $fileDestination
 	 * @param KCurlHeaderResponse $curlHeaderResponse header fetched for the $sourceUrl
 	 */
-	private function fetchFile(KalturaBatchJob &$job, $sourceUrl, $fileDestination, $curlHeaderResponse = null, $fileSize = null)
+	private function fetchFile($sourceUrl, $fileDestination, $fileSize = null)
 	{
-		KalturaLog::debug('fetchFile - job id ['.$job->id.'], source url ['.$sourceUrl.'], destination ['.$fileDestination.']');
+		KalturaLog::debug('fetchFile - source url ['.$sourceUrl.'], destination ['.$fileDestination.']');
 		
 		if (!$fileSize)
 		{
 			// fetch header if not given
-			if (!$curlHeaderResponse) {
-				$curlHeaderResponse = $this->fetchHeader($job, $sourceUrl);
-				if (!$curlHeaderResponse) {
-					return false; // job already closed with an error
-				}
+			$curlHeaderResponse = $this->fetchHeader($sourceUrl);
+			if (!$curlHeaderResponse) 
+			{
+				return false;
 			}
 			
 			// try to get file size from headers
-			$fileSize = null;
-			if (isset($curlHeaderResponse->headers['content-length'])) {
-				$fileSize = $curlHeaderResponse->headers['content-length'];
-			}
+			$fileSize = $this->getFilesizeFromHeader($curlHeaderResponse);
 		}		
 
 		// if file already exists - check if we can start from specific offset on exising partial content
 		$resumeOffset = 0;
-		if($fileSize && $fileDestination && file_exists($fileDestination))
+		if($fileSize && file_exists($fileDestination))
 		{
 			clearstatcache();
-			$actualFileSize = filesize($fileDestination);
+			$actualFileSize = kFile::fileSize($fileDestination);
 			if($actualFileSize >= $fileSize)
 			{
 				// file download finished ?
 				KalturaLog::debug('File exists with size ['.$actualFileSize.'] - checking if finished...');
-				return $this->checkFile($job, $fileDestination, $fileSize);
+				return $this->checkFile($fileDestination, $fileSize);
 			}
 			else
 			{
@@ -260,175 +281,284 @@ class KAsyncFileSyncImport extends KJobHandlerWorker
 			}
 		}
 		
-		// get http body
-		if($resumeOffset)
+		for (;;)
 		{
-			// will resume from the current offset
-			$this->curlWrapper->setResumeOffset($resumeOffset);
-		}
-		else
-		{
-			//If we run mutiple file sync import using the same curl we nned to reset the offset each time before fetching the file 
-			$this->curlWrapper->setResumeOffset(0);
-			
-			// create destination directory if doesn't already exist
-			$res = self::createDir(dirname($fileDestination));
-			if ( !$res )
+			if($resumeOffset)
 			{
-				$msg = 'Error: Cannot create destination directory ['.dirname($fileDestination).']';
-				KalturaLog::err($msg);
-				$this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::CANNOT_CREATE_DIRECTORY, $msg, KalturaBatchJobStatus::RETRY);				
-				return false;
-			}
-			
-			// about to start downloading
-			$this->updateJob($job, "Downloading file, size: $fileSize", KalturaBatchJobStatus::PROCESSING);
-		}
-			
-		KalturaLog::debug("Executing curl for downloading file at [$sourceUrl]");
-		$res = $this->curlWrapper->exec($sourceUrl, $fileDestination); // download file
-		$curlError = $this->curlWrapper->getError();
-		$curlErrorNumber = $this->curlWrapper->getErrorNumber();
-		
-		KalturaLog::debug("Curl results: $res");
-
-		// handle errors
-		if (!$res || $curlError)
-		{
-			if($curlErrorNumber != CURLE_OPERATION_TIMEOUTED)
-			{
-				// an error other than timeout occured  - cannot continue (timeout is handled with resuming)
-				$msg = "Error: $curlError";
-				KalturaLog::err($msg);
-				$this->closeJob($job, KalturaBatchJobErrorTypes::CURL, $curlErrorNumber, $msg, KalturaBatchJobStatus::RETRY);
-				return false;
+				// will resume from the current offset
+				$this->curlWrapper->setResumeOffset($resumeOffset);
 			}
 			else
-			{
-				// timeout error occured
-				KalturaLog::debug('Timeout occured');
-				clearstatcache();
-				$actualFileSize = kFile::fileSize($fileDestination);
-				if($actualFileSize == $resumeOffset)
+			{				
+				// create destination directory if doesn't already exist
+				$res = self::createAndSetDir(dirname($fileDestination));
+				if ( !$res )
 				{
-					// no downloading was done at all - error
-					$msg = "Error: $curlError";
-					KalturaLog::err($msg);
-					$this->closeJob($job, KalturaBatchJobErrorTypes::CURL, $curlErrorNumber, $msg, KalturaBatchJobStatus::RETRY);
+					KalturaLog::err('Cannot create destination directory ['.dirname($fileDestination).']');
 					return false;
 				}
 			}
-		}
-		
-		if(!file_exists($fileDestination))
-		{
-			// destination file does not exist for an unknown reason
-			$msg = "Error: output file doesn't exist";
-			KalturaLog::err($msg);
-			$this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::OUTPUT_FILE_DOESNT_EXIST, $msg, KalturaBatchJobStatus::RETRY);
-			return false;
-		}
+				
+			// download directly to the dest file
+			KalturaLog::debug("Executing curl for downloading file at [$sourceUrl]");
+			$res = $this->curlWrapper->exec($sourceUrl, $fileDestination); // download file
+			$curlError = $this->curlWrapper->getError();
+			$curlErrorNumber = $this->curlWrapper->getErrorNumber();
+			
+			// reset the resume offset, since the curl handle is reused
+			$this->curlWrapper->setResumeOffset(0);
 
-
-		if($fileSize)
-		{
-			$actualFileSize = kFile::fileSize($fileDestination);
-			if ($actualFileSize < $fileSize)
+			KalturaLog::debug("Curl results: $res");
+	
+			// handle errors
+			if (!$res || $curlError)
 			{
-				// part of file was downloaded - will resume in next run
-				KalturaLog::debug('File partialy downloaded - will resumt in next run');
-				self::$kClient->batch->resetJobExecutionAttempts($job->id, $this->getExclusiveLockKey(), $job->jobType);
-				$this->closeJob($job, null, null, "Downloaded size: $actualFileSize", KalturaBatchJobStatus::RETRY);
+				if($curlErrorNumber != CURLE_OPERATION_TIMEOUTED)
+				{
+					// an error other than timeout occured  - cannot continue
+					KalturaLog::err("$curlError");
+					return false;
+				}
+				else
+				{
+					// timeout error occured, ignore and try to resume
+					KalturaLog::debug('Curl timeout');
+				}
+			}
+			
+			if(!file_exists($fileDestination))
+			{
+				// destination file does not exist for an unknown reason
+				KalturaLog::err("output file doesn't exist");
 				return false;
 			}
+	
+			clearstatcache();
+			$actualFileSize = kFile::fileSize($fileDestination);
+			if($actualFileSize == $resumeOffset)
+			{
+				// no downloading was done at all - error
+				KalturaLog::err("$curlError");
+				return false;
+			}
+			
+			if($fileSize && $actualFileSize < $fileSize)
+			{
+				// part of file was downloaded - resume
+				$resumeOffset = $actualFileSize;
+				continue;
+			}
+			break;
 		}
 
 		KalturaLog::debug('File downloaded completely - will now check if done...');
-		$this->updateJob($job, 'File downloaded', KalturaBatchJobStatus::PROCESSING);
 		
 		// file downloaded completely - check it
-		return $this->checkFile($job, $fileDestination, $fileSize);
+		return $this->checkFile($fileDestination, $fileSize);
 	}
 
+	static protected function parseMultiPart($contentType, $contents)
+	{
+		if (!kString::beginsWith($contentType, 'multipart/form-data; boundary='))
+		{
+			KalturaLog::err("failed to parse multipart content type [$contentType]");
+			return false;
+		}
+	
+		$explodedContentType = explode('=', $contentType);
+		$boundary = trim($explodedContentType[1]);
+	
+		$result = array();
+		$curPos = 0;
+		for (;;)
+		{
+			if (substr($contents, $curPos, 2 + strlen($boundary)) != '--' . $boundary)
+			{
+				KalturaLog::err("expected [--$boundary] at pos [$curPos]");
+				return false;
+			}
+				
+			$headerEndPos = strpos($contents, "\n\n", $curPos);
+			if ($headerEndPos === false)
+			{
+				break;
+			}
+			$headerEndPos += 2;		// skip the 2 newlines
+				
+			$dataEndPos = strpos($contents, "\n--" . $boundary, $headerEndPos);
+			if ($dataEndPos === false)
+			{
+				KalturaLog::err("failed to find end boundary");
+				return false;
+			}
+				
+			$headers = explode("\n", substr($contents, $curPos, $headerEndPos - $curPos));
+				
+			$name = null;
+			foreach ($headers as $header)
+			{
+				if (!kString::beginsWith($header, 'Content-Disposition: form-data; name="'))
+				{
+					continue;
+				}
+	
+				$explodedHeader = explode('"', $header);
+				$name = $explodedHeader[1];
+			}
+				
+			if (is_null($name))
+			{
+				KalturaLog::err("failed to extract part name from " . print_r($headers, true));
+				return false;
+			}
+				
+			$result[$name] = substr($contents, $headerEndPos, $dataEndPos - $headerEndPos);
+				
+			$curPos = $dataEndPos + 1;
+		}
+	
+		if (substr($contents, $curPos + 2 + strlen($boundary), 2) != '--')
+		{
+			KalturaLog::err("last boundary must end with --");
+			return false;
+		}
+	
+		return $result;
+	}
+	
+	protected function fetchMultiFiles($fileSyncs, $baseUrl, $dcSecret)
+	{
+		$fileSyncIds = array();
+		foreach ($fileSyncs as $fileSync)
+		{
+			$fileSyncIds[] = $fileSync->originalId;
+		}
+		$sourceUrl = self::getMultiSourceUrl(
+				implode(',', $fileSyncIds),
+				$baseUrl,
+				$dcSecret);
+		
+		KalturaLog::debug('fetchMultiFiles - source url ['.$sourceUrl.']');
+		
+		$contents = $this->curlWrapper->exec($sourceUrl);
+		$curlError = $this->curlWrapper->getError();
+		
+		if ($contents === false || $curlError)
+		{
+			KalturaLog::err("failed to fetch $sourceUrl - $curlError");
+			return false;
+		}
+		
+		$contentType = curl_getinfo($this->curlWrapper->ch, CURLINFO_CONTENT_TYPE);
+		
+		$parsedContent = self::parseMultiPart($contentType, $contents);
+		if ($parsedContent === false)
+		{
+			KalturaLog::err("failed to parse multipart response $sourceUrl");
+			return false;
+		}
+		
+		foreach ($fileSyncs as $fileSync)
+		{
+			if (!isset($parsedContent[$fileSync->originalId]))
+			{
+				KalturaLog::err("missing content for file " . $fileSync->originalId);
+				continue;
+			}
+				
+			$data = $parsedContent[$fileSync->originalId];
+			$filePath = self::getFullPath($fileSync);
+				
+			$res = self::createAndSetDir(dirname($filePath));
+			if (!$res)
+			{
+				KalturaLog::err("failed to create dir for $filePath");
+				continue;
+			}
+				
+			if (!file_put_contents($filePath, $data))
+			{
+				KalturaLog::err("failed to write file $filePath");
+				continue;
+			}
+			
+			clearstatcache();
+				
+			if ($this->checkFile($filePath, $fileSync->fileSize))
+			{
+				$this->markFileSyncAsReady($fileSync);
+			}
+		}
+
+		KalturaLog::debug('fetchMultiFiles - done');
+		
+		return true;
+	}
 	
 	/**
 	 * Checks downloaded file.
 	 * Changes the file mode and owner if required.
 	 * 
-	 * @param KalturaBatchJob $job
 	 * @param string $destFile
 	 * @param int $fileSize
-	 * @return KalturaBatchJob
 	 */
-	private function checkFile(KalturaBatchJob &$job, $destFile, $fileSize = null)
+	private function checkFile($destFile, $fileSize = null)
 	{
-		KalturaLog::debug("checkFile($job->id, $destFile, $fileSize)");
+		KalturaLog::debug("checkFile($destFile, $fileSize)");
 
 		if(!file_exists($destFile))
 		{
 			// destination file does not exist
-			KalturaLog::err("Error: file [$destFile] doesn't exist");
-			$this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::OUTPUT_FILE_DOESNT_EXIST, "Error: file [$destFile] doesn't exist", KalturaBatchJobStatus::FAILED);
+			KalturaLog::err("file [$destFile] doesn't exist");
 			return false;
 		}
 
-		if($fileSize)
+		$actualSize = kFile::fileSize($destFile);
+		if(!$fileSize)
 		{
-			if(kFile::fileSize($destFile) != $fileSize)
-			{
-				// destination file size is wrong
-				KalturaLog::err("Error: file [$destFile] has a wrong size.  file size: [".kFile::fileSize($destFile)."] should be [$fileSize]");
-				$this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::OUTPUT_FILE_WRONG_SIZE, "Error: file [$destFile] has a wrong size", KalturaBatchJobStatus::FAILED);
-				return false;
-			}
+			$fileSize = $actualSize;
 		}
-		else
+		else if($actualSize != $fileSize)
 		{
-			$fileSize = kFile::fileSize($destFile);
+			// destination file size is wrong
+			KalturaLog::err("file [$destFile] has a wrong size. file size: [$actualSize] should be [$fileSize]");
+			return false;
 		}
 			
 		// set file owner
 		$chown_name = self::$taskConfig->params->fileOwner;
-		if ($chown_name) {
+		if ($chown_name) 
+		{
 			KalturaLog::debug("Changing owner of file [$destFile] to [$chown_name]");
 			@chown($destFile, $chown_name);
 		}
 		
 		// set file mode
 		$chmod_perm = octdec(self::$taskConfig->params->fileChmod);
-		if (!$chmod_perm) {
+		if (!$chmod_perm) 
+		{
 			$chmod_perm = 0644;
 		}
 		KalturaLog::debug("Changing mode of file [$destFile] to [$chmod_perm]");
 		@chmod($destFile, $chmod_perm);
-			
-			
+
 		// IMPORTANT - check's if file is seen by apache
 		if(!$this->checkFileExists($destFile, $fileSize))
 		{
-			$this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::NFS_FILE_DOESNT_EXIST, 'File not moved correctly', KalturaBatchJobStatus::RETRY);
 			return false;
 		}
 		
 		return true;
 	}
 
-	
-	// ----------------------
-	// -- Helper functions --
-	// ----------------------
-	
-	
 	/**
-	 * Fetches the header for the given $url and closes the job on any errors
-	 * @param KalturaBatchJob $job
+	 * Fetches the header for the given $url
 	 * @param string $url
 	 * @return false|KCurlHeaderResponse
 	 */
-	private function fetchHeader(KalturaBatchJob &$job, $url)
+	private function fetchHeader($url)
 	{
 		KalturaLog::debug('Fetching header for ['.$url.']');
-		$this->updateJob($job, 'Downloading header for ['.$url.']', KalturaBatchJobStatus::PROCESSING);
 		
 		// fetch the http headers
 		$curlHeaderResponse = $this->curlWrapper->getHeader($url);
@@ -438,9 +568,7 @@ class KAsyncFileSyncImport extends KJobHandlerWorker
 		if(!$curlHeaderResponse || !count($curlHeaderResponse->headers))
 		{
 			// error fetching headers
-			$msg = "Error: $curlError";
-			KalturaLog::err($msg);
-			$this->closeJob($job, KalturaBatchJobErrorTypes::CURL, $curlErrorNumber, $msg, KalturaBatchJobStatus::RETRY);
+			KalturaLog::err("$curlError");
 			return false;
 		}
 	
@@ -453,17 +581,13 @@ class KAsyncFileSyncImport extends KJobHandlerWorker
 		if(!$curlHeaderResponse->isGoodCode())
 		{
 			// some error exists in the response
-			$msg = 'HTTP Error: ' . $curlHeaderResponse->code . ' ' . $curlHeaderResponse->codeName;
-			KalturaLog::err($msg);
-			$this->closeJob($job, KalturaBatchJobErrorTypes::HTTP, $curlHeaderResponse->code, $msg, KalturaBatchJobStatus::RETRY);
+			KalturaLog::err('HTTP Error: ' . $curlHeaderResponse->code . ' ' . $curlHeaderResponse->codeName);
 			return false;
 		}
 		
 		// header fetched successfully - return it
 		return $curlHeaderResponse;
 	}
-	
-	
 	
 	/**
 	 * Try to get the filesize from the given header
@@ -473,14 +597,12 @@ class KAsyncFileSyncImport extends KJobHandlerWorker
 	private function getFilesizeFromHeader($curlHeaderResponse)
 	{
 		// try to get file size from headers
-		if (isset($curlHeaderResponse->headers['content-length'])) {
-			$fileSize = $curlHeaderResponse->headers['content-length'];
-			return $fileSize;
+		if (isset($curlHeaderResponse->headers['content-length']))
+		{
+			return $curlHeaderResponse->headers['content-length'];
 		}
-		return false;	
+		return false;
 	}
-	
-	
 	
 	/**
 	 * Check if the given curl header response contains a File-Sync-Type header == 'dir'
@@ -489,15 +611,13 @@ class KAsyncFileSyncImport extends KJobHandlerWorker
 	 */
 	private function isDirectoryHeader($curlHeaderResponse)
 	{
-		if (isset($curlHeaderResponse->headers['file-sync-type'])) {
-			if (trim($curlHeaderResponse->headers['file-sync-type']) === 'dir') {
-				return true;
-			}
+		if (isset($curlHeaderResponse->headers['file-sync-type']) &&  
+			trim($curlHeaderResponse->headers['file-sync-type']) === 'dir') 
+		{
+			return true;
 		}
 		return false;
 	}
-	
-	
 	
 	/**
 	 * Create a new directory with the given $dirPath and changing its owner and mode according to the batch worker parameters
@@ -517,14 +637,16 @@ class KAsyncFileSyncImport extends KJobHandlerWorker
 				
 		// set directory owner
 		$chown_name = self::$taskConfig->params->fileOwner;
-		if ($chown_name) {
+		if ($chown_name) 
+		{
 			KalturaLog::debug("Changing owner of directory [$dirPath] to [$chown_name]");
 			@chown($dirPath, $chown_name);
 		}
 		
 		// set directory mode
 		$chmod_perm = octdec(self::$taskConfig->params->fileChmod);
-		if (!$chmod_perm) {
+		if (!$chmod_perm) 
+		{
 			$chmod_perm = 0644;
 		}
 		KalturaLog::debug("Changing mode of directory [$dirPath] to [$chmod_perm]");
@@ -533,14 +655,13 @@ class KAsyncFileSyncImport extends KJobHandlerWorker
 		return true;
 	}
 	
-	
 	/**
 	 * Recursivly create directories for the given $dirPath
 	 * @param string $dirPath
 	 */
 	private function createDirRecursive($dirPath)
 	{
-		if (is_null($dirPath) || $dirPath == '')
+		if (!$dirPath)
 		{
 			return false;
 		}
@@ -561,38 +682,5 @@ class KAsyncFileSyncImport extends KJobHandlerWorker
 			$res = $this->createDirRecursive(dirname($dirPath));
 			return $res && $this->createDir($dirPath);
 		}
-	}
-	
-	
-	
-	/**
-	 * Create a temporary path for the given $sourceUrl
-	 * @param string $sourceUrl
-	 */
-	private function getTmpPath($sourceUrl)
-	{
-		// create a temporary file path 
-		$rootPath = self::$taskConfig->params->localTempPath;
-		
-		$res = self::createDir( $rootPath );
-		if ( !$res ) 
-		{
-			KalturaLog::err( "Cannot continue filesync import without a temp directory");
-			return false;
-		}
-		
-		// add a unique id to the temporary file path
-		$uniqid = uniqid('filesync_import_');
-		$destFile = realpath($rootPath) . DIRECTORY_SEPARATOR . $uniqid;
-		KalturaLog::debug("destFile [$destFile]");
-		
-		// add file extension if any
-		$ext = pathinfo($sourceUrl, PATHINFO_EXTENSION);
-		$extArr = explode('?', $ext); // remove query string
-		$ext = reset($extArr);
-		if(strlen($ext))
-			$destFile .= ".$ext";
-			
-		return $destFile;
 	}
 }
