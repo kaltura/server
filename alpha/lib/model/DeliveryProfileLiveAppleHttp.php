@@ -238,7 +238,7 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 	/* (non-PHPdoc)
 	 * @see DeliveryProfileLive::serve()
 	 */
-	public function serve($baseUrl, $backupUrl) 
+	public final function serve($baseUrl, $backupUrl) 
 	{
 		if($this->params->getUsePlayServer())
 		{

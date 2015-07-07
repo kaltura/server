@@ -67,5 +67,14 @@ class EdgeServer extends BaseEdgeServer {
 		$playbackHostName .= "/" . self::EDGE_SERVER_DEFAULT_LIVE_CACHE_APPLICATION_NAME . "/";
 		return $playbackHostName;
 	}
+	
+	public function buildEdgePlaybackUrl($originalPlaybackUrl)
+	{
+		$edgePlaybackHost = $this->getPlaybackHost();
+		
+		$urlParts = explode("://", $originalPlaybackUrl);
+		
+		return $urlParts[0] . "://" . $edgePlaybackHost . "/" . $urlParts[1];
+	}
 
 } // EdgeServer

@@ -10,7 +10,7 @@ class DeliveryProfileLiveAppleHttpToMulticast extends DeliveryProfileLiveAppleHt
 	/* (non-PHPdoc)
 	 * @see DeliveryProfileLive::serve()
 	 */
-	public final function serve($baseUrl, $backupUrl) 
+	public function doServe($baseUrl, $backupUrl) 
 	{
 		$flavor = $this->getFlavorAssetInfo('', $baseUrl);		// passing the url as urlPrefix so that only the path will be tokenized
 		$renderer = $this->getRenderer(array($flavor));

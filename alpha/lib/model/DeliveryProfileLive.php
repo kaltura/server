@@ -114,24 +114,15 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 			return array(null, null);
 	
 		$edgeServer = array_shift($edgeServers);
-		$primaryEdgeUrl = $edgeServer->getPlaybackHost();
-		$primaryUrl = $this->finilizeEdgePlaybackUrl($primaryUrl, $primaryEdgeUrl);
+		$primaryUrl = $edgeServer->buildEdgePlaybackUrl($primaryUrl);
 	
 		if($backupUrl && count($edgeServers))
 		{
 			$edgeServer = array_shift($edgeServers);
-			$backupEdgeUrl = $edgeServer->getPlaybackHost();
-			$backupUrl =  $this->finilizeEdgePlaybackUrl($backupUrl, $backupEdgeUrl);
+			$backupUrl =  $edgeServer->buildEdgePlaybackUrl($backupUrl);
 		}
 	
 		return array($primaryUrl, $backupUrl);
-	}
-	
-	protected function finilizeEdgePlaybackUrl($originalPlaybackUrl, $edgeServerHostName)
-	{
-		$urlParts = explode("://", $originalPlaybackUrl);
-	
-		return $urlParts[0] . "://" . $edgeServerHostName . "/" . $urlParts[1];
 	}
 }
 
