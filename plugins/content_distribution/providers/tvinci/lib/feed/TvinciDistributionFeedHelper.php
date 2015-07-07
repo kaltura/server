@@ -19,11 +19,6 @@ class TvinciDistributionFeedHelper
 	protected $distributionProfile;
 
 	/**
-	 * @var array
-	 */
-	protected $fieldValues;
-
-	/**
 	 * var string
 	 */
 	protected $entryId;
@@ -65,7 +60,6 @@ class TvinciDistributionFeedHelper
 
 	/**
 	 * @var int
-	 * @see TvinciDistributionField::METADATA_SCHEMA_ID
 	 */
 	protected $schemaId;
 	
@@ -94,10 +88,9 @@ class TvinciDistributionFeedHelper
 	 */
 	protected $_doc;
 
-	public function __construct(KalturaTvinciDistributionProfile $distributionProfile, $fieldValues)
+	public function __construct(KalturaTvinciDistributionProfile $distributionProfile)
 	{
 		$this->distributionProfile = $distributionProfile;
-		$this->fieldValues = $fieldValues;
 		$this->language = strlen($distributionProfile->language) === 0 ? 'eng' : $distributionProfile->language;
 
 		$this->schemaId = $distributionProfile->schemaId;
@@ -196,13 +189,7 @@ class TvinciDistributionFeedHelper
 
 		// Wrap as a CDATA section
 		$feedAsXml = $this->_doc->saveXML($feed);
-		if ($this->distributionProfile->xsltFile) {
-			$xslt = $this->distributionProfile->xsltFile;
-		} else {
-			// convert the xml using provided XSLT
-			chdir(__DIR__);
-			$xslt = file_get_contents("../xml/tvinci_default.xslt");
-		}
+		$xslt = file_get_contents(__DIR__."/../xml/tvinci_default.xslt");
 		$feedAsXml = $this->transformXml($feedAsXml, $xslt);
 		$data = $this->_doc->createElement('data');
 		$data->appendChild($this->_doc->createCDATASection($feedAsXml));
@@ -213,12 +200,12 @@ class TvinciDistributionFeedHelper
 		$this->setAttribute($envelopeRootNode,"xmlns:a","http://www.w3.org/2005/08/addressing");
 
 		$envelopeHeaderNode = $this->_doc->createElement('s:Header');
-		$envelopeHeaderActionNode = $this->_doc->createElement('a:Action', 'urn:Iservice/InjestTvinciData');
+		$envelopeHeaderActionNode = $this->_doc->createElement('a:Action', 'urn:Iservice/IngestTvinciData');
 		$this->setAttribute($envelopeHeaderActionNode,"s:mustUnderstand","1");
 		$envelopeHeaderNode->appendChild($envelopeHeaderActionNode);
 
 		$envelopeBodyNode = $this->_doc->createElement('s:Body');
-		$injestTvinciDataNode = $this->_doc->createElement('InjestTvinciData');
+		$ingestTvinciDataNode = $this->_doc->createElement('IngestTvinciData');
 		$tvinciDataRequestNode = $this->_doc->createElement('request');
 		$this->setAttribute($tvinciDataRequestNode,"xmlns:i","http://www.w3.org/2001/XMLSchema-instance");
 
@@ -228,8 +215,8 @@ class TvinciDistributionFeedHelper
 
 		// Attach the CDATA section
 		$tvinciDataRequestNode->appendChild($data);
-		$injestTvinciDataNode->appendChild($tvinciDataRequestNode);
-		$envelopeBodyNode->appendChild($injestTvinciDataNode);
+		$ingestTvinciDataNode->appendChild($tvinciDataRequestNode);
+		$envelopeBodyNode->appendChild($ingestTvinciDataNode);
 		$envelopeRootNode->appendChild($envelopeHeaderNode);
 		$envelopeRootNode->appendChild($envelopeBodyNode);
 
@@ -354,7 +341,10 @@ class TvinciDistributionFeedHelper
 		$this->setAttribute($fileNode, "cdn_name", "Akamai");
 		$this->setAttribute($fileNode, "cdn_code", $url);
 		$this->setAttribute($fileNode, "co_guid", $co_guid);
-		$this->setAttribute($fileNode, "billing_type", 'Tvinci');
+		$billingType = $this->schemaId() === self::DEFAULT_SCHEMA_ID ? 'Tvinci' : '';
+		$this->setAttribute($fileNode, "billing_type", $billingType);
+		$ppvModule = $this->schemaId() === self::DEFAULT_SCHEMA_ID ? 'Subscription Only' : '';
+		$this->setAttribute($fileNode, "PPV_MODULE", $ppvModule);
 
 
 		return $fileNode;
@@ -381,6 +371,7 @@ class TvinciDistributionFeedHelper
 	 * @param string $xmlStr
 	 * @param string $xslStr
 	 * @return string the result XML
+	 * @throws Exception
 	 */
 	protected function transformXml($xmlStr, $xslStr)
 	{

@@ -24,20 +24,7 @@ class Form_TvinciProfileConfiguration extends Form_ConfigurableProfileConfigurat
 	public function getObject($objectType, array $properties, $add_underscore = true, $include_empty_fields = false)
 	{
 		$object = parent::getObject($objectType, $properties, $add_underscore, $include_empty_fields);
-
 		return $object;
-	}
-
-	public function populateFromObject($object, $add_underscore = true)
-	{
-		$this->_sort();
-
-		$order = $this->_order[self::FORM_PLACEHOLDER_ELEMENT_ID];
-		$this->resetOrderOfLastElements();
-		/** @var $object Kaltura_Client_TvinciDistribution_Type_TvinciDistributionProfile */
-		$this->layoutForm($order++);
-
-		parent::populateFromObject($object, $add_underscore);
 	}
 
 	protected function addProviderElements()
@@ -48,9 +35,14 @@ class Form_TvinciProfileConfiguration extends Form_ConfigurableProfileConfigurat
 		$element->setLabel('Tvinci Specific Configuration');
 		$element->setDecorators(array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'b'))));
 		$this->addElements(array($element));
-
 		$this->addElement('hidden', self::FORM_PLACEHOLDER_ELEMENT_ID);
+		$this->_sort();
+		$order = $this->_order[self::FORM_PLACEHOLDER_ELEMENT_ID];
+		$this->resetOrderOfLastElements();
+		$this->layoutForm($order++);
 	}
+
+
 
 	public function resetOrderOfLastElements()
 	{
@@ -83,24 +75,39 @@ class Form_TvinciProfileConfiguration extends Form_ConfigurableProfileConfigurat
 				'filters'		=> array('StringTrim'),
 		));
 
-		$this->addElement('text', 'schema_id', array(
-				'label'			=> 'Schema ID:',
-				'filters'		=> array('StringTrim'),
-		));
-
-		$this->addElement('text', 'language', array(
-				'label'			=> 'Language :',
-				'filters'		=> array('StringTrim'),
-		));
-
 		$this->addDisplayGroup(
-				array('ingest_url','username','password', 'schema_id', 'language'),
+				array('ingest_url','username','password'),
 				'ingest',
 				array(
 					'legend' => 'Ingest URL Configuration',
 					'decorators' => array('FormElements', 'Fieldset'),
 					'order' => $order++,
 				)
+		);
+
+		$this->addElement('select', 'schema_id', array(
+			'label'			=> 'Schema ID:',
+			'multioptions' => array(
+				'' => '2',
+				'1' => '1',
+				'2' => '2',
+			)
+
+		));
+
+		$this->addElement('text', 'language', array(
+			'label'			=> 'Language :',
+			'filters'		=> array('StringTrim'),
+		));
+
+		$this->addDisplayGroup(
+			array('schema_id', 'language'),
+			'additional',
+			array(
+				'legend' => 'Additional Configuration',
+				'decorators' => array('FormElements', 'Fieldset'),
+				'order' => $order++,
+			)
 		);
 	}
 }
