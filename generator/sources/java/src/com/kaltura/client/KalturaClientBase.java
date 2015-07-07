@@ -94,33 +94,33 @@ abstract public class KalturaClientBase extends ReentrantLock implements Seriali
 	
 	private static final String UTF8_CHARSET = "UTF-8";
 
-    // KS v2 constants
-    private static final int BLOCK_SIZE = 16;
-    private static final String FIELD_EXPIRY = "_e";
-    private static final String FIELD_USER = "_u";
+	// KS v2 constants
+	private static final int BLOCK_SIZE = 16;
+	private static final String FIELD_EXPIRY = "_e";
+	private static final String FIELD_USER = "_u";
 	private static final String FIELD_TYPE = "_t";
 	private static final int RANDOM_SIZE = 16; 
 
 	private static final int MAX_DEBUG_RESPONSE_STRING_LENGTH = 1024;
 	protected KalturaConfiguration kalturaConfiguration;
-    protected List<KalturaServiceActionCall> callsQueue;
-    protected List<Class<?>> requestReturnType = null;
-    protected KalturaParams multiRequestParamsMap;
+	protected List<KalturaServiceActionCall> callsQueue;
+	protected List<Class<?>> requestReturnType = null;
+	protected KalturaParams multiRequestParamsMap;
 	protected Map<String, Object> clientConfiguration = new HashMap<String, Object>();
 	protected Map<String, Object> requestConfiguration = new HashMap<String, Object>();
 
 	private static IKalturaLogger logger = KalturaLogger.getLogger(KalturaClientBase.class);
-    
-    private ConcurrentHashMap<Thread, Header[]> responseHeaders = new ConcurrentHashMap<Thread, Header[]>(); 
-    
-    private boolean acceptGzipEncoding = true;
-    
-    protected static final String HTTP_HEADER_ACCEPT_ENCODING = "Accept-Encoding";
+	
+	private ConcurrentHashMap<Thread, Header[]> responseHeaders = new ConcurrentHashMap<Thread, Header[]>(); 
+	
+	private boolean acceptGzipEncoding = true;
+	
+	protected static final String HTTP_HEADER_ACCEPT_ENCODING = "Accept-Encoding";
 
 	protected static final String HTTP_HEADER_CONTENT_ENCODING = "Content-Encoding";
 
 	protected static final String ENCODING_GZIP = "gzip";
-    /**
+	/**
 	 * Set whether to accept GZIP encoding, that is, whether to
 	 * send the HTTP "Accept-Encoding" header with "gzip" as value.
 	 * <p>Default is "true". Turn this flag off if you do not want
@@ -129,15 +129,15 @@ abstract public class KalturaClientBase extends ReentrantLock implements Seriali
 	public synchronized void setAcceptGzipEncoding(boolean acceptGzipEncoding) {
 		this.acceptGzipEncoding = acceptGzipEncoding;
 	}
-    /**
+	/**
 	 * Return whether to accept GZIP encoding, that is, whether to
 	 * send the HTTP "Accept-Encoding" header with "gzip" as value.
 	 */
 	public synchronized boolean isAcceptGzipEncoding() {
 		return acceptGzipEncoding;
 	}
-    
-    /**
+	
+	/**
 	 * Determine whether the given response is a GZIP response.
 	 * <p>Default implementation checks whether the HTTP "Content-Encoding"
 	 * header contains "gzip" (in any casing).
@@ -150,8 +150,8 @@ abstract public class KalturaClientBase extends ReentrantLock implements Seriali
 		}
 		return (encodingHeader.getValue().toLowerCase().indexOf(ENCODING_GZIP) != -1);
 	}
-    
-    /**
+	
+	/**
 	 * Extract the response body from the given executed remote invocation
 	 * request.
 	 * <p>The default implementation simply fetches the PostMethod's response
@@ -176,24 +176,24 @@ abstract public class KalturaClientBase extends ReentrantLock implements Seriali
 			return postMethod.getResponseBodyAsStream();
 		}
 	}
-    
-    public synchronized Header[] getResponseHeaders()
-    {
-    	if(responseHeaders.containsKey(Thread.currentThread())){
-    		return responseHeaders.get(Thread.currentThread());
-    	}
-    	
-    	return new Header[]{};
-    }
+	
+	public synchronized Header[] getResponseHeaders()
+	{
+		if(responseHeaders.containsKey(Thread.currentThread())){
+			return responseHeaders.get(Thread.currentThread());
+		}
+		
+		return new Header[]{};
+	}
 
-    public KalturaClientBase() {
-    }
+	public KalturaClientBase() {
+	}
 
-    public KalturaClientBase(KalturaConfiguration config) {
-        this.kalturaConfiguration = config;
-        this.callsQueue = new ArrayList<KalturaServiceActionCall>();
-        this.multiRequestParamsMap = new KalturaParams();
-    }
+	public KalturaClientBase(KalturaConfiguration config) {
+		this.kalturaConfiguration = config;
+		this.callsQueue = new ArrayList<KalturaServiceActionCall>();
+		this.multiRequestParamsMap = new KalturaParams();
+	}
 
 	public synchronized boolean isMultiRequest() {
 		return (requestReturnType != null);
@@ -234,7 +234,7 @@ abstract public class KalturaClientBase extends ReentrantLock implements Seriali
 	public String serve() throws KalturaApiException {
 		try{
 			if(isMultiRequest()){
-			    throw new KalturaApiException("Serve actions cannot be called within a multi-request");
+				throw new KalturaApiException("Serve actions cannot be called within a multi-request");
 			}
 			KalturaParams kParams = new KalturaParams();
 			String url = extractParamsFromCallQueue(kParams, new KalturaFiles());
@@ -245,8 +245,8 @@ abstract public class KalturaClientBase extends ReentrantLock implements Seriali
 		}
 		finally{
 			requestReturnType = null;
-		    multiRequestParamsMap = null;
-		    resetRequest();
+			multiRequestParamsMap = null;
+			resetRequest();
 			unlock();
 		}
 	}
@@ -291,29 +291,29 @@ abstract public class KalturaClientBase extends ReentrantLock implements Seriali
 		}
 	}
 
-    protected String readRemoteInvocationResult(InputStream is)
-    	throws IOException {
-    
-        try {
-    	  return doReadRemoteInvocationResult(is);
-        }
-        finally {
-    	  is.close();
-        }
-    }
+	protected String readRemoteInvocationResult(InputStream is)
+		throws IOException {
+	
+		try {
+		  return doReadRemoteInvocationResult(is);
+		}
+		finally {
+		  is.close();
+		}
+	}
 
-    protected String doReadRemoteInvocationResult(InputStream is)
-    	throws IOException {
-    
-        byte[] buf = new byte[1024];
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        int len;
-        while ( (len = is.read(buf)) > 0)
-        {
-        	out.write(buf,0,len);
-        }
-        return new String(out.toByteArray());
-    }
+	protected String doReadRemoteInvocationResult(InputStream is)
+		throws IOException {
+	
+		byte[] buf = new byte[1024];
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		int len;
+		while ( (len = is.read(buf)) > 0)
+		{
+			out.write(buf,0,len);
+		}
+		return new String(out.toByteArray());
+	}
 
 	protected String executeMethod(HttpClient client, PostMethod method) throws KalturaApiException {
 		String responseString = "";
@@ -334,27 +334,27 @@ abstract public class KalturaClientBase extends ReentrantLock implements Seriali
 			}
 
 			// Read the response body
-            InputStream responseBodyIS = null;
-            if (isGzipResponse(method)) {
-                responseBodyIS = new GZIPInputStream(method.getResponseBodyAsStream());
-                if (logger.isEnabled()) logger.debug("Using gzip compression to handle response for: "+method.getName()+" "+method.getPath()+"?"+method.getQueryString());
-            } else {
-                responseBodyIS = method.getResponseBodyAsStream();
-                if (logger.isEnabled()) logger.debug("No gzip compression for this response");
-            }
-            String responseBody = readRemoteInvocationResult(responseBodyIS);
-            Header[] headers = method.getResponseHeaders();
-            responseHeaders.put(Thread.currentThread(), headers);
-            
-            // print server debug info
-            String serverName = null;
-            String serverSession = null;
-            for(Header header : headers)
-            {
-            	if (header.getName().compareTo("X-Me") == 0)
-                    serverName = header.getValue();
-            	else if (header.getName().compareTo("X-Kaltura-Session") == 0)
-                    serverSession = header.getValue();
+			InputStream responseBodyIS = null;
+			if (isGzipResponse(method)) {
+				responseBodyIS = new GZIPInputStream(method.getResponseBodyAsStream());
+				if (logger.isEnabled()) logger.debug("Using gzip compression to handle response for: "+method.getName()+" "+method.getPath()+"?"+method.getQueryString());
+			} else {
+				responseBodyIS = method.getResponseBodyAsStream();
+				if (logger.isEnabled()) logger.debug("No gzip compression for this response");
+			}
+			String responseBody = readRemoteInvocationResult(responseBodyIS);
+			Header[] headers = method.getResponseHeaders();
+			responseHeaders.put(Thread.currentThread(), headers);
+			
+			// print server debug info
+			String serverName = null;
+			String serverSession = null;
+			for(Header header : headers)
+			{
+				if (header.getName().compareTo("X-Me") == 0)
+					serverName = header.getValue();
+				else if (header.getName().compareTo("X-Kaltura-Session") == 0)
+					serverSession = header.getValue();
 			}
 			if (serverName != null || serverSession != null)
 				logger.debug("Server: [" + serverName + "], Session: [" + serverSession + "]");
@@ -398,16 +398,16 @@ abstract public class KalturaClientBase extends ReentrantLock implements Seriali
 	private PostMethod createPostMethod(KalturaParams kparams,
 			KalturaFiles kfiles, String url) {
 		PostMethod method = new PostMethod(url);
-        method.setRequestHeader("Accept","text/xml,application/xml,*/*");
-        method.setRequestHeader("Accept-Charset","utf-8,ISO-8859-1;q=0.7,*;q=0.5");
-        
-        if (!kfiles.isEmpty()) {        	
-            method = this.getPostMultiPartWithFiles(method, kparams, kfiles);        	
-        } else {
-            method = this.addParams(method, kparams);            
-        }
-        
-        if (isAcceptGzipEncoding()) {
+		method.setRequestHeader("Accept","text/xml,application/xml,*/*");
+		method.setRequestHeader("Accept-Charset","utf-8,ISO-8859-1;q=0.7,*;q=0.5");
+		
+		if (!kfiles.isEmpty()) {			
+			method = this.getPostMultiPartWithFiles(method, kparams, kfiles);			
+		} else {
+			method = this.addParams(method, kparams);			
+		}
+		
+		if (isAcceptGzipEncoding()) {
 			method.addRequestHeader(HTTP_HEADER_ACCEPT_ENCODING, ENCODING_GZIP);
 		}
 
@@ -463,7 +463,7 @@ abstract public class KalturaClientBase extends ReentrantLock implements Seriali
 	protected void closeHttpClient(HttpClient client) {
 		HttpConnectionManager mgr = client.getHttpConnectionManager();
 		if (mgr instanceof SimpleHttpConnectionManager) {
-		    ((SimpleHttpConnectionManager)mgr).shutdown();
+			((SimpleHttpConnectionManager)mgr).shutdown();
 		}
 		
 		if(mgr instanceof MultiThreadedHttpConnectionManager) {
@@ -852,8 +852,8 @@ abstract public class KalturaClientBase extends ReentrantLock implements Seriali
 		
 		// Encrypt
 		Cipher cipher = Cipher.getInstance("AES/CBC/NOPADDING");
-	    cipher.init(Cipher.ENCRYPT_MODE, key, iv);
-        return cipher.doFinal(textAsBytes);
+		cipher.init(Cipher.ENCRYPT_MODE, key, iv);
+		return cipher.doFinal(textAsBytes);
 	}
 	
 	
