@@ -33,18 +33,17 @@ class KalturaAttachmentAsset extends KalturaAsset
 	 */
 	public $status;
 
-    /**
-     * The file-type of the attachment
-     * @var string
-     */
-    public $fileType;
+	/**
+	 * The file-type of the attachment
+	 * @var string
+	 */
+	public $fileType;
 
-    /**
-     * The language of the attachment
-     * @var string
-     */
-    public $language;
-
+	/**
+	 * The language of the attachment
+	 * @var string
+	 */
+	public $language;
 
 	private static $map_between_objects = array
 	(
@@ -52,8 +51,8 @@ class KalturaAttachmentAsset extends KalturaAsset
 		"title",
 		"format" => "containerFormat",
 		"status",
-        "fileType",
-        "language",
+		"fileType",
+		"language",
 	);
 	
 	public function getMapBetweenObjects ( )
