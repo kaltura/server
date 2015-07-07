@@ -34,13 +34,19 @@ class TvinciDistributionProfile extends ConfigurableDistributionProfile
 		return $validationErrors;
 	}
 
-	public function validateReferenceId(EntryDistribution $entryDistribution, $action, array &$validationErrors)
+	/**
+	 * @param EntryDistribution $entryDistribution
+	 * @param $action
+	 * @param array $validationErrors
+	 * since entry distribution and entry are validated in the parent of validateForSubmission we will not add an error for them
+	 */
+	private function validateReferenceId(EntryDistribution $entryDistribution, $action, array &$validationErrors)
 	{
-		$entry = null;
-		if ( $entryDistribution->getEntryId() )
+
+		if ($entryDistribution && $entryDistribution->getEntryId() )
 		{
 			$entry = entryPeer::retrieveByPK($entryDistribution->getEntryId());
-			if (!$entry->getReferenceID())
+			if ($entry && (!$entry->getReferenceID()))
 			{
 				$validationError = $this->createValidationError($action, DistributionErrorType::MISSING_METADATA, "Reference ID" , "is a mandatory field");
 				$validationError->setValidationErrorType(DistributionValidationErrorType::STRING_EMPTY);
