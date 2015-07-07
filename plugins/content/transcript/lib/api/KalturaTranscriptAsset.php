@@ -5,22 +5,22 @@
  */
 class KalturaTranscriptAsset extends KalturaAttachmentAsset 
 {
-    /**
-     * The accuracy of the transcript
-     * @var float
-     */
-     public $accuracy;
+	/**
+	 * The accuracy of the transcript
+	 * @var float
+	 */
+	public $accuracy;
 
-     /**
-      * Was verified by human or machine
-      * @var bool
-      */
-    public $humanVerified;
+	/**
+	 * Was verified by human or machine
+	 * @var bool
+	 */
+	public $humanVerified;
 
 	private static $map_between_objects = array
 	(
-        "accuracy",
-        "humanVerified",
+		"accuracy",
+		"humanVerified",
 	);
 	
 	public function getMapBetweenObjects ( )
