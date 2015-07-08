@@ -68,7 +68,7 @@ class KalturaTvinciDistributionJobProviderData extends KalturaConfigurableDistri
 
 		$feedHelper->setDefaultThumbnailUrl( $defaultThumbUrl );
 
-		$this->initPlayManifestUrls( $entry, $feedHelper );
+		$this->createPlayManifestURLs($distributionJobData->entryDistribution, $entry, $feedHelper);
 
 		$metadatas = MetadataPeer::retrieveAllByObject(MetadataObjectType::ENTRY, $distributionJobData->entryDistribution->entryId);
 		$fullMetadataXML='';
@@ -95,24 +95,44 @@ class KalturaTvinciDistributionJobProviderData extends KalturaConfigurableDistri
 
 	}
 
-	private function initPlayManifestUrls($entry, $feedHelper)
+	private static function getVideoAssetDataMap()
 	{
-		$videoAssetDataMap = array(
-			array( 'Main',						PlaybackProtocol::AKAMAI_HDS,	'mbr',		'a4m' ),
-			array( 'Tablet Main',				PlaybackProtocol::APPLE_HTTP,	'ipad',		'm3u8' ),
-			array( 'Smartphone Main',			PlaybackProtocol::APPLE_HTTP,	'iphone',	'm3u8' ),
+		return array(
+			array( 'Main',						PlaybackProtocol::AKAMAI_HDS,	'mbr',		    		'a4m' ),
+			array( 'Tablet Main',				PlaybackProtocol::APPLE_HTTP,	'ipadnew',				'm3u8' ),
+			array( 'Smartphone Main',			PlaybackProtocol::APPLE_HTTP,	'iphonenew',			'm3u8' ),
+			array( 'Old ipad',					PlaybackProtocol::APPLE_HTTP,	'ipad',					'm3u8' ),
+			array( 'Old iphone',				PlaybackProtocol::APPLE_HTTP,	'iphone',				'm3u8' ),
 		);
+	}
 
-		// Loop and build the file nodes
+	private function createPlayManifestURLs(KalturaEntryDistribution $entryDistribution, entry $entry, TvinciDistributionFeedHelper $feedHelper)
+	{
+		$distributionFlavorAssets  = assetPeer::retrieveByIds(explode(',', $entryDistribution->flavorAssetIds));
+		$videoAssetDataMap = $this->getVideoAssetDataMap();
 		foreach ( $videoAssetDataMap as $videoAssetData )
 		{
 			$tvinciAssetName = $videoAssetData[0];
 			$playbackProtocol = $videoAssetData[1];
 			$tag = $videoAssetData[2];
 			$fileExt = $videoAssetData[3];
-			$fileCoGuid = "{$entry->getIntId()}{$entry->getFlavorParamsIds}";
-			$url = $this->getPlayManifestUrl($entry, $playbackProtocol, $tag, $fileExt);
-			$feedHelper->setVideoAssetData( $tvinciAssetName, $url,$fileCoGuid );
+			$keys = array();
+
+			foreach ( $distributionFlavorAssets as $distributionFlavorAsset )
+			{
+
+				if ($distributionFlavorAsset->isLocalReadyStatus() &&
+					$distributionFlavorAsset->hasTag($tag)){
+					$keys[] = "{$entry->getEntryId()}_{$distributionFlavorAsset->getFlavorParamsId()}";
+				}
+			}
+
+			if ($keys)
+			{
+				$fileCoGuid = implode(",", $keys);
+				$url = $this->getPlayManifestUrl($entry, $playbackProtocol, $tag, $fileExt);
+				$feedHelper->setVideoAssetData( $tvinciAssetName, $url, $fileCoGuid );
+			}
 		}
 	}
 
