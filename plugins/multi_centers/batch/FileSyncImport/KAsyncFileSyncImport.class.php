@@ -13,9 +13,15 @@ class KAsyncFileSyncImport extends KPeriodicWorker
 	{
 		// get worker parameters
 		$filter = $this->getFilter();
-		$sourceDc = $this->getAdditionalParams("sourceDc");
 		$maxCount = $this->getAdditionalParams("maxCount");
 		$maxSize = $this->getAdditionalParams("maxSize");
+		
+		// for 2 dcs environment, we can avoid setting sourceDc, and just pull from the remote DC
+		$sourceDc = $this->getAdditionalParams("sourceDc");
+		if (is_null($sourceDc))
+		{
+			$sourceDc = -1;
+		}
 		
 		$this->curlWrapper = new KCurlWrapper(self::$taskConfig->params);
 		
