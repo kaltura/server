@@ -13,9 +13,9 @@
 	<multirequest>
 		<request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
 			<template objectType="KalturaHttpNotificationTemplate">
-				<name>Metadata Field Equals</name>
-				<systemName>HTTP_METADATA_FIELD_EQUALS</systemName>
-				<description>HTTP notification template to be sent when a custom metadata field changed to specific value.</description>
+				<name>Entry custom metadata changed</name>
+				<systemName>HTTP_ENTRY_CUSTOM_METADATA_CHANGED</systemName>
+				<description>HTTP notification template to be sent when an entry's custom metadata by any metadata profile changed</description>
 				<automaticDispatchEnabled>1</automaticDispatchEnabled>
 				<eventType>6</eventType> <!-- EventNotificationEventType::OBJECT_DATA_CHANGED -->
 				<eventObjectType>metadataEventNotifications.Metadata</eventObjectType> <!-- EventNotificationEventObjectType::METADATA -->
