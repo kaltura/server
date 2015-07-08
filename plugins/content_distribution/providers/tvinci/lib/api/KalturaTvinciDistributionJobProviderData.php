@@ -34,10 +34,10 @@ class KalturaTvinciDistributionJobProviderData extends KalturaConfigurableDistri
 		$feedHelper = new TvinciDistributionFeedHelper($distributionJobData->distributionProfile);
 		$feedHelper->setEntryId( $entry->getId() );
 		$feedHelper->setReferenceId($entry->getReferenceID());
-		$feedHelper->setCreatedAt( $entry->getCreatedAtAsInt() );
 		$feedHelper->setDescription( $entry->getDescription() );
 		$feedHelper->setTitleName( $entry->getName() );
 		$feedHelper->setSunrise($distributionJobData->entryDistribution->sunrise);
+		$feedHelper->setSunset($distributionJobData->entryDistribution->sunset);
 
 		$thumbAssets = assetPeer::retrieveByIds(explode(',', $distributionJobData->entryDistribution->thumbAssetIds));
 		$picRatios = array();

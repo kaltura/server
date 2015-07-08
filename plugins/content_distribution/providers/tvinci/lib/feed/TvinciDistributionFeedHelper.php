@@ -39,11 +39,6 @@ class TvinciDistributionFeedHelper
 	protected $referenceId;
 
 	/**
-	 * var string
-	 */
-	protected $createdAt;
-
-	/**
 	 * var array
 	 */
 	protected $picRatiosArray;
@@ -111,9 +106,6 @@ class TvinciDistributionFeedHelper
 
 	public function setReferenceId( $referenceId )				{ $this->referenceId = $referenceId; }
 	public function getReferenceId()							{ return $this->referenceId; }
-
-	public function setCreatedAt( $createdAt )					{ $this->createdAt = $createdAt; }
-	public function getCreatedAt()								{ return $this->createdAt; }
 
 	public function setPicRatiosArray( $picRatiosArray )		{ $this->picRatiosArray = $picRatiosArray; }
 	public function getPicRatiosArray()							{ return $this->picRatiosArray; }
@@ -275,7 +267,7 @@ class TvinciDistributionFeedHelper
 		$datesNode = $this->_doc->createElement("dates");
 		$datesNode->appendChild( $this->createDateElement('catalog_start', $this->getSunrise()) );
 		$datesNode->appendChild( $this->createDateElement('catalog_end', $this->getSunset()) );
-		$datesNode->appendChild( $this->createDateElement('start', $this->getCreatedAt()) );
+		$datesNode->appendChild( $this->createDateElement('start', $this->getSunrise()) );
 		$datesNode->appendChild( $this->createDateElement('end', $this->getSunset()) );
 		return $datesNode;
 	}
