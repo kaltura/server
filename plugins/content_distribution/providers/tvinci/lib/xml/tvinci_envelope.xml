@@ -2,10 +2,10 @@
 <!-- this is an exemplary XML structure of how the request is sent to OTT -->
 <s:Envelope xmlns:s="http://www.w3.org/2003/05/soap-envelope" xmlns:a="http://www.w3.org/2005/08/addressing">
     <s:Header>
-        <a:Action s:mustUnderstand="1">urn:Iservice/InjestTvinciData</a:Action>
+        <a:Action s:mustUnderstand="1">urn:Iservice/IngestTvinciData</a:Action>
     </s:Header>
     <s:Body>
-        <InjestTvinciData>
+        <IngestTvinciData>
             <request xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
                 <userName>Vodafone Virtual-main</userName>
                 <passWord>Vodafone Virtual-main</passWord>
@@ -22,6 +22,6 @@ Smartphone Main" quality="HIGH" handling_type="CLIP" cdn_name="Default CDN" cdn_
 tocol/http/f/a.m3u8" co_guid="Smartphone Main" billing_type="Tvinci"/></files></media></export></feed>
 ]]></data>
             </request>
-        </InjestTvinciData>
+        </IngestTvinciData>
     </s:Body>
 </s:Envelope>
