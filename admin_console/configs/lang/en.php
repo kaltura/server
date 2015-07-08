@@ -1225,7 +1225,6 @@ return array(
 	"Kaltura_Client_Enum_DeliveryProfileType::VELOCIX_HLS" => "VELOCIX_HLS",
 
 	"Kaltura_Client_Enum_DeliveryProfileType::APPLE_HTTP" => "APPLE_HTTP",
-	"Kaltura_Client_Enum_DeliveryProfileType::APPLE_HTTP_TO_MC" => "APPLE_HTTP_TO_MC",
 	"Kaltura_Client_Enum_DeliveryProfileType::HDS" => "HDS",
 	"Kaltura_Client_Enum_DeliveryProfileType::HTTP" => "HTTP",
 	"Kaltura_Client_Enum_DeliveryProfileType::RTMP" => "RTMP",
@@ -1274,6 +1273,7 @@ return array(
 	"Kaltura_Client_Enum_DeliveryStatus::STAGING_OUT" => "Staging-out",
 	
 	"Kaltura_Client_Enum_PlaybackProtocol::APPLE_HTTP" => "APPLE_HTTP",
+	"Kaltura_Client_Enum_PlaybackProtocol::APPLE_HTTP_TO_MC" => "APPLE_HTTP_TO_MC",
 	"Kaltura_Client_Enum_PlaybackProtocol::AUTO" => "auto",
 	"Kaltura_Client_Enum_PlaybackProtocol::AKAMAI_HD" => "AKAMAI_HD",
 	"Kaltura_Client_Enum_PlaybackProtocol::AKAMAI_HDS" => "AKAMAI_HDS",
