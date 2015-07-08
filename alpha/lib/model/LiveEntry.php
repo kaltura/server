@@ -478,6 +478,12 @@ abstract class LiveEntry extends entry
 		$configurations[] = $configuration;
 		
 		$configuration = new kLiveStreamConfiguration();
+		$configuration->setProtocol(PlaybackProtocol::APPLE_HTTP_TO_MC);
+		$configuration->setUrl($hlsStreamUrl);
+		$configuration->setBackupUrl($hlsBackupStreamUrl);
+		$configurations[] = $configuration;
+		
+		$configuration = new kLiveStreamConfiguration();
 		$configuration->setProtocol(PlaybackProtocol::SILVER_LIGHT);
 		$configuration->setUrl($slStreamUrl);
 		$configurations[] = $configuration;

@@ -20,8 +20,6 @@ class KalturaTvinciDistributionJobProviderData extends KalturaConfigurableDistri
 		if(!($distributionJobData->distributionProfile instanceof KalturaTvinciDistributionProfile))
 			return;
 
-		$fieldValues = unserialize($this->fieldValues);
-
 		$entry = null;
 		if ( $distributionJobData->entryDistribution->entryId )
 		{
@@ -33,7 +31,7 @@ class KalturaTvinciDistributionJobProviderData extends KalturaConfigurableDistri
 			return;
 		}
 
-		$feedHelper = new TvinciDistributionFeedHelper($distributionJobData->distributionProfile, $fieldValues);
+		$feedHelper = new TvinciDistributionFeedHelper($distributionJobData->distributionProfile);
 		$feedHelper->setEntryId( $entry->getId() );
 		$feedHelper->setReferenceId($entry->getReferenceID());
 		$feedHelper->setCreatedAt( $entry->getCreatedAtAsInt() );
@@ -99,22 +97,11 @@ class KalturaTvinciDistributionJobProviderData extends KalturaConfigurableDistri
 
 	private function initPlayManifestUrls($entry, $feedHelper)
 	{
-		$videoAssetDataMap = array();
-		if ( $feedHelper->schemaId() == 1 )
-		{
-			$videoAssetDataMap = array(
-					array( 'Main',						PlaybackProtocol::AKAMAI_HDS,	'mbr',		'a4m' ),
-					array( 'Tablet Main',				PlaybackProtocol::APPLE_HTTP,	'ipad',		'm3u8' ),
-					array( 'Smartphone Main',			PlaybackProtocol::APPLE_HTTP,	'iphone',	'm3u8' ),
-				);
-		}
-		elseif ( $feedHelper->schemaId() == 2 ) {
-			$videoAssetDataMap = array(
-					array( 'Mobile Devices Trailer',	PlaybackProtocol::APPLE_HTTP,	'ipad',		'm3u8' ),
-					array( 'Mobile Devices Main SD',	PlaybackProtocol::APPLE_HTTP,	'ipad',		'm3u8' ),
-					array( 'Mobile Devices Main HD',	PlaybackProtocol::APPLE_HTTP,	'ipad',		'm3u8' ),
-				);
-		}
+		$videoAssetDataMap = array(
+			array( 'Main',						PlaybackProtocol::AKAMAI_HDS,	'mbr',		'a4m' ),
+			array( 'Tablet Main',				PlaybackProtocol::APPLE_HTTP,	'ipad',		'm3u8' ),
+			array( 'Smartphone Main',			PlaybackProtocol::APPLE_HTTP,	'iphone',	'm3u8' ),
+		);
 
 		// Loop and build the file nodes
 		foreach ( $videoAssetDataMap as $videoAssetData )

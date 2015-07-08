@@ -127,7 +127,6 @@ class KalturaFileSync extends KalturaObject implements IFilterable
 	 * 
 	 * @var KalturaFileSyncStatus
 	 * @filter eq,in
-	 * @readonly
 	 */
 	public $status;
 
@@ -166,7 +165,6 @@ class KalturaFileSync extends KalturaObject implements IFilterable
 	/**
 	 * 
 	 * @var string
-	 * @readonly
 	 */
 	public $fileRoot;
 
@@ -175,7 +173,6 @@ class KalturaFileSync extends KalturaObject implements IFilterable
 	/**
 	 * 
 	 * @var string
-	 * @readonly
 	 */
 	public $filePath;
 
@@ -225,6 +222,20 @@ class KalturaFileSync extends KalturaObject implements IFilterable
 	 */
 	public $isCurrentDc;
 	
+	/**
+	 *
+	 * @var bool
+	 * @readonly
+	 */
+	public $isDir;
+
+	/**
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $originalId;
+	
 	private static $map_between_objects = array
 	(
 		"id",
@@ -246,6 +257,8 @@ class KalturaFileSync extends KalturaObject implements IFilterable
 		"filePath",
 		"fileSize",
 		"readyAt",
+		"isDir",
+		"originalId",
 	);
 	
 	public function getMapBetweenObjects()

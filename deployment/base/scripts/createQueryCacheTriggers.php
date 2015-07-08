@@ -42,8 +42,11 @@ $INVALIDATION_KEYS = array(
 
 $TRIGGER_TYPES = array('INSERT', 'UPDATE', 'DELETE');
 
-$SPECIAL_TRIGGERS = array("invalid_session/INSERT" => "DO memc_set(concat('invalid_session_', IF(NEW.ks IS NULL, '', NEW.ks)), 1, IF(NEW.ks_valid_until IS NULL, 0, UNIX_TIMESTAMP(NEW.ks_valid_until) + 600));");
-	
+$SPECIAL_TRIGGERS = array(
+	"invalid_session/INSERT" => "DO memc_set(concat('invalid_session_', IF(NEW.ks IS NULL, '', NEW.ks)), 1, IF(NEW.ks_valid_until IS NULL, 0, UNIX_TIMESTAMP(NEW.ks_valid_until) + 600));",
+	"file_sync/INSERT" => "IF (NEW.original) THEN DO memc_set(concat('fileSyncMaxId-dc', NEW.dc), NEW.id); END IF;",
+);
+
 function generateInvalidationKeyCode($invalidationKey)
 {
 	$objKeys = array();

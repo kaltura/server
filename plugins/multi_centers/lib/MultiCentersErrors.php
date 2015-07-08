@@ -5,8 +5,9 @@
  */
 class MultiCentersErrors extends KalturaErrors
 {
-	const INVALID_FILESYNC_ID = "INVALID_FILESYNC_ID;;invalid filesync id";
+	const GET_MAX_FILESYNC_ID_FAILED = "GET_MAX_FILESYNC_ID_FAILED;DC;Failed to get max file sync id for dc \"@DC@\"";
 	
-	const INVALID_FILESYNC_RECORD = "INVALID_FILESYNC_RECORD;ID;invalid filesync entry with id [@ID@]";
-		
+	const GET_LOCK_CACHE_FAILED = "GET_LOCK_CACHE_FAILED;;Failed to get cache for locking file syncs";
+	
+	const GET_KEYS_CACHE_FAILED = "GET_KEYS_CACHE_FAILED;;Failed to get cache for storing file sync import status";
 }

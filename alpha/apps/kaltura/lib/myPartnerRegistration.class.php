@@ -348,6 +348,8 @@ class myPartnerRegistration
 			$newPartner->setAccountOwnerKuserId($kuserId);
 			$newPartner->save();
 			
+			$this->configurePartnerByPackage($newPartner);
+					
 			$this->setAllTemplateEntriesToAdminKuser($newPartner->getId(), $kuserId);
 
 			return array($newPartner->getId(), $newSubPartnerId, $newAdminKuserPassword, $newPassHashKey);
@@ -356,6 +358,31 @@ class myPartnerRegistration
 			//TODO: revert all changes, depending where and why we failed
 
 			throw $e;
+		}
+	}
+	
+	private function configurePartnerByPackage($partner)
+	{
+		if(!$partner)
+			return;
+			
+		if($partner->getPartnerPackage() == 100) //Developer partner
+		{
+			$permissionNames = array(PermissionName::FEATURE_LIVE_STREAM, PermissionName::FEATURE_KALTURA_LIVE_STREAM, PermissionName::FEATURE_KALTURA_LIVE_STREAM_TRANSCODE);
+			foreach ($permissionNames as $permissionName) 
+			{
+				$permission = PermissionPeer::getByNameAndPartner ( $permissionName, $partner->getId() );
+				if (!$permission) {
+		
+					$permission = new Permission ();
+					$permission->setType ( PermissionType::SPECIAL_FEATURE );
+					$permission->setPartnerId (  $partner->getId());
+					$permission->setName($permissionName);
+				}
+			
+				$permission->setStatus ( PermissionStatus::ACTIVE );
+				$permission->save ();			
+			}
 		}
 	}
 	

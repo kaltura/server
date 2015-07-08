@@ -33,7 +33,7 @@ class TvinciDistributionFeedEngine extends DistributionEngine implements
 	*/
 	public function delete(KalturaDistributionDeleteJobData $data)
 	{
-		return $this->handleAction($data, $data->distributionProfile, $data->providerData, "Delete");
+		return true;
 	}
 
 	private function validateProviderDataAndDistributionProfile(KalturaDistributionJobData $data){
@@ -57,6 +57,8 @@ class TvinciDistributionFeedEngine extends DistributionEngine implements
 	 * @param KalturaTvinciDistributionProfile $distributionProfile
 	 * @param KalturaTvinciDistributionJobProviderData $providerData
 	 * @param $actionType
+	 * @return bool
+	 * @throws Exception
 	 */
 	private function handleAction(KalturaDistributionJobData $data, KalturaTvinciDistributionProfile $distributionProfile,
 								  KalturaTvinciDistributionJobProviderData $providerData, $actionType){

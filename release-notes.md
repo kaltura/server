@@ -1,5 +1,59 @@
 # Jupiter-10.15.0 #
 
+## Add Developer Partner ##
+
+- Issue Type: New Feature  
+- Issue ID: PLAT-3326  
+
+### Configuration ###
+
+ - Added new e-mail configuration in /batch/batches/Mailer/emails_en.ini
+ - Remark for production configuration: add /alpha/crond/kaltura/monthly_quota_storage_update.sh script to kaltura.daily cron jobs 
+ 
+### Deployment Scripts ###
+
+- None.  
+		
+## File sync pull without jobs ##
+
+- Issue Type: optimization
+- Issue ID: N/A  
+
+### Configuration ###
+
+ - Update the file sync import worker configuration, sample config:
+ 
+[KAsyncFileSyncImport : PeriodicWorker]
+type                            = KAsyncFileSyncImport
+scriptPath                      = ../plugins/multi_centers/batch/FileSyncImport/KAsyncFileSyncImportExe.php
+params.curlTimeout              = 180
+params.fileChmod                = 755
+params.fileOwner                = apache
+
+[KAsyncFileSyncImportSmall : KAsyncFileSyncImport]
+id                      = 27020
+friendlyName            = FileSyncImportSmall
+filter.estimatedEffortLessThan = 5000000
+params.maxCount         = 100
+params.maxSize          = 10000000
+
+[KAsyncFileSyncImportBig : KAsyncFileSyncImport]
+id                      = 27030
+friendlyName            = FileSyncImportBig
+filter.estimatedEffortGreaterThan = 4999999
+params.maxCount         = 1
+
+[KAsyncFileSyncImportDelayed : KAsyncFileSyncImport]
+id                      = 27040
+friendlyName            = FileSyncImportDelayed
+params.maxCount         = 1
+filter.createdAtLessThanOrEqual = -39600	; now() - 11 hours
+ 
+### Deployment Scripts ###
+
+ - php deployment/updates/scripts/add_permissions/2015_07_06_file_sync_service.php
+ - php deployment/base/scripts/createQueryCacheTriggers.php create @db_host@ @db_user@ @db_pass@ realrun
+
 ## Metadata Change HTTP Notification ##
 
 - Issue Type: bug  
