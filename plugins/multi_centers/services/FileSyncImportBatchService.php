@@ -88,6 +88,12 @@ class FileSyncImportBatchService extends KalturaBatchService
 		// need to explicitly disable the cache since this action may not perform any queries
 		kApiCache::disableConditionalCache();
 		
+		// for dual dc deployments, if source dc is not specified, set it to the remote dc 
+		if ($sourceDc < 0)
+		{
+			$sourceDc = 1 - kDataCenterMgr::getCurrentDcId();
+		}
+		
 		// get caches
 		$keysCache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_QUERY_CACHE_KEYS);
 		if (!$keysCache)
