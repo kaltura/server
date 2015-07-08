@@ -1,5 +1,5 @@
 /*Table structure for table `access_control` */
-
+SET GLOBAL sql_mode = '';
 CREATE TABLE IF NOT EXISTS `access_control` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `partner_id` int(11) NOT NULL,
@@ -2419,7 +2419,7 @@ CREATE TABLE `edge_server`
 	PRIMARY KEY (`id`),
 	KEY partner_id_status_system_name(`partner_id`, `status`, `system_name`),
 	KEY host_name(`host_name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
 
 CREATE TABLE `user_entry`
 (
