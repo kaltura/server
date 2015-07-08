@@ -9,6 +9,11 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 	private static $cacheStores = null;
 	
 	/**
+	 * @var int
+	 */
+	private static $cacheVersion = null;
+	
+	/**
 	 * @return array<kBaseCacheWrapper>
 	 */
 	protected static function getStores($cacheType = kCacheManager::CACHE_TYPE_RESPONSE_PROFILE)
@@ -36,6 +41,20 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 		return self::getStores(kCacheManager::CACHE_TYPE_RESPONSE_PROFILE_INVALIDATION);
 	}
 	
+	/**
+	 * @return string
+	 */
+	protected static function addCacheVersion($key)
+	{
+		if(is_null(self::$cacheVersion))
+			self::$cacheVersion = kConf::get('response_profile_cache_version', null, 1);
+			
+		if(is_array($key))
+			return array_map(array(self, 'addCacheVersion'), $key);
+			
+		return self::$cacheVersion . '_' . $key;
+	}
+	
 	protected static function invalidateRelated(IBaseObject $object)
 	{
 		KalturaLog::debug('Invalidating object [' . get_class($object) . '] id [' . $object->getPrimaryKey() . '] related objects');
@@ -52,12 +71,14 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 	protected static function invalidate($invalidationKey)
 	{
 		$now = time();
+		$invalidationKey = self::addCacheVersion($invalidationKey);
 		KalturaLog::debug("Invalidating key [$invalidationKey] now [$now]");
 		self::set($invalidationKey, $now);
 	}
 	
 	protected static function set($key, $value)
 	{
+		$key = self::addCacheVersion($key);
 		KalturaLog::debug("Key [$key]");
 		
 		$cacheStores = self::getStores();
@@ -70,6 +91,7 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 	
 	protected static function delete($key)
 	{
+		$key = self::addCacheVersion($key);
 		KalturaLog::debug("Key [$key]");
 		$cacheStores = self::getStores();
 		foreach ($cacheStores as $cacheStore)
@@ -80,6 +102,7 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 	
 	protected static function getMulti(array $keys)
 	{
+		$key = self::addCacheVersion($key);
 		$cacheStores = self::getStores();
 		foreach ($cacheStores as $cacheStore)
 		{
@@ -98,6 +121,7 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 	
 	protected static function get($key, array $invalidationKeys = null, $touch = true)
 	{
+		$key = self::addCacheVersion($key);
 		KalturaLog::debug("Key [$key]");
 		$cacheStores = self::getStores();
 		$value = null;
@@ -120,6 +144,7 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 	
 		if($value && $invalidationKeys)
 		{
+			$invalidationKeys = self::addCacheVersion($invalidationKeys);
 			$invalidationCacheStores = self::getInvalidationStores();
 			foreach ($invalidationCacheStores as $store)
 			{
@@ -127,11 +152,11 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 			
 				if($store instanceof kCouchbaseCacheWrapper)
 				{
-					$invalidationTimes = $cacheStore->multiGetAndTouch($invalidationTimes);
+					$invalidationTimes = $cacheStore->multiGetAndTouch($invalidationKeys);
 				}
 				else
 				{
-					$invalidationTimes = $store->multiGet($invalidationTimes);
+					$invalidationTimes = $store->multiGet($invalidationKeys);
 				}
 				
 				if($invalidationTimes)
