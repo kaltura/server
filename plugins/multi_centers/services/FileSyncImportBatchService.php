@@ -309,4 +309,27 @@ class FileSyncImportBatchService extends KalturaBatchService
 		
 		return $result;
 	}	
+
+	/**
+	 * batch extendFileSyncLock action extends the expiration of a file sync lock
+	 *
+	 * @action extendFileSyncLock
+	 * @param int $id The id of the file sync 
+	 */
+	function extendFileSyncLockAction($id)
+	{
+		// need to explicitly disable the cache since this action does not perform any queries
+		kApiCache::disableConditionalCache();
+		
+		$lockCache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_LOCK_KEYS);
+		if (!$lockCache)
+		{
+			throw new KalturaAPIException(MultiCentersErrors::GET_LOCK_CACHE_FAILED);
+		}
+		
+		if (!$lockCache->set(self::LOCK_KEY_PREFIX . $id, true, self::LOCK_EXPIRY))
+		{
+			throw new KalturaAPIException(MultiCentersErrors::EXTEND_FILESYNC_LOCK_FAILED);
+		}
+	}
 }

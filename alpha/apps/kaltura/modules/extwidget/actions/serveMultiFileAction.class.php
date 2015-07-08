@@ -6,7 +6,7 @@
 class serveMultiFileAction extends sfAction
 {
 	/**
-	 * Will forward to the regular swf player according to the widget_id 
+	 * Serves multiple files for synchronization between datacenters 
 	 */
 	public function execute()
 	{
