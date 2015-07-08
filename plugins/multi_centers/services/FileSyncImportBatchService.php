@@ -311,9 +311,9 @@ class FileSyncImportBatchService extends KalturaBatchService
 	}	
 
 	/**
-	 * batch renewFileSyncLock action extends the expiration of a file sync lock
+	 * batch extendFileSyncLock action extends the expiration of a file sync lock
 	 *
-	 * @action renewFileSyncLock
+	 * @action extendFileSyncLock
 	 * @param int $id The id of the file sync 
 	 */
 	function extendFileSyncLockAction($id)
