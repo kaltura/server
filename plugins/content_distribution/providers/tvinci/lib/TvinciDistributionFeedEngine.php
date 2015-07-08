@@ -97,24 +97,24 @@ class TvinciDistributionFeedEngine extends DistributionEngine implements
 				 * this is an exemplary response from the OTT servers per legal request
 				 * <s:Envelope xmlns:s="http://www.w3.org/2003/05/soap-envelope" xmlns:a="http://www.w3.org/2005/08/addressing">
 				 * 	<s:Header>
-				 * 		<a:Action s:mustUnderstand="1">urn:Iservice/InjestTvinciDataResponse</a:Action>
+				 * 		<a:Action s:mustUnderstand="1">urn:Iservice/IngestTvinciDataResponse</a:Action>
 				 * </s:Header>
 				 * <s:Body>
-				 * 		<InjestTvinciDataResponse>
-				 * 			<InjestTvinciDataResult xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+				 * 		<IngestTvinciDataResponse>
+				 * 			<IngestTvinciDataResult xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
 				 * 				<status>OK</status>
 				 * 				<description/>
 				 * 				<assetID>1234Wicked</assetID>
 				 * 				<tvmID>279473</tvmID>
-				 * 			</InjestTvinciDataResult>
-				 * 		</InjestTvinciDataResponse>
+				 * 			</IngestTvinciDataResult>
+				 * 		</IngestTvinciDataResponse>
 				 * 	</s:Body>
 				 * </s:Envelope>
 				 */
 				$responseXml = simplexml_load_string($response['content']);
 				$childs = $responseXml->children(self::SOAP_ENVELOPE_URL)->Body;
 				$bodyElement = $childs->xpath('//s:Body');
-				$returnObject = $bodyElement[0]->InjestTvinciDataResponse->InjestTvinciDataResult;
+				$returnObject = $bodyElement[0]->IngestTvinciDataResponse->IngestTvinciDataResult;
 			}
 			catch (Exception $e)
 			{
