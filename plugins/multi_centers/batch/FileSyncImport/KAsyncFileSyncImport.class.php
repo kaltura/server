@@ -97,11 +97,16 @@ class KAsyncFileSyncImport extends KPeriodicWorker
 
 	protected function getFilter()
 	{
+		$filter = new KalturaFileSyncFilter();
 		if(KBatchBase::$taskConfig->filter)
 		{
-			return KBatchBase::$taskConfig->filter;
+			// copy the attributes since KBatchBase::$taskConfig->filter is of type KalturaBatchJobFilter
+			foreach(KBatchBase::$taskConfig->filter as $attr => $value)
+			{
+				$filter->$attr = $value;
+			}
 		}
-		return new KalturaFileSyncFilter();
+		return $filter;
 	}
 	
 	static protected function getSourceUrl($fileSyncId, $baseUrl, $dcSecret)
