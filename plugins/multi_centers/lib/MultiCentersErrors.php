@@ -10,4 +10,6 @@ class MultiCentersErrors extends KalturaErrors
 	const GET_LOCK_CACHE_FAILED = "GET_LOCK_CACHE_FAILED;;Failed to get cache for locking file syncs";
 	
 	const GET_KEYS_CACHE_FAILED = "GET_KEYS_CACHE_FAILED;;Failed to get cache for storing file sync import status";
+	
+	const EXTEND_FILESYNC_LOCK_FAILED = "EXTEND_FILESYNC_LOCK_FAILED;;Failed to extend the file sync lock";
 }

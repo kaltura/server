@@ -22,9 +22,7 @@ class KAsyncFileSyncImport extends KPeriodicWorker
 		{
 			$sourceDc = -1;
 		}
-		
-		$this->curlWrapper = new KCurlWrapper(self::$taskConfig->params);
-		
+				
 		$multiCentersPlugin = KalturaMultiCentersClientPlugin::get(self::$kClient);
 		
 		for (;;)
@@ -36,7 +34,14 @@ class KAsyncFileSyncImport extends KPeriodicWorker
 					$sourceDc,
 					$maxCount,
 					$maxSize);
+			if (!$lockResult->fileSyncs)
+			{
+				sleep(1);
+				continue;
+			}
 
+			$this->curlWrapper = new KCurlWrapper(self::$taskConfig->params);
+			
 			// handle all dirs and empty files first
 			$fileSyncs = array();
 			foreach ($lockResult->fileSyncs as $fileSync)
@@ -44,7 +49,7 @@ class KAsyncFileSyncImport extends KPeriodicWorker
 				if ($fileSync->isDir)
 				{
 					$sourceUrl = self::getSourceUrl($fileSync->originalId, $lockResult->baseUrl, $lockResult->dcSecret);
-					if ($this->fetchDir($sourceUrl, self::getFullPath($fileSync)))
+					if ($this->fetchDir($fileSync->id, $sourceUrl, self::getFullPath($fileSync)))
 					{
 						$this->markFileSyncAsReady($fileSync);
 					}
@@ -67,7 +72,7 @@ class KAsyncFileSyncImport extends KPeriodicWorker
 			{
 				$fileSync = reset($fileSyncs);
 				$sourceUrl = self::getSourceUrl($fileSync->originalId, $lockResult->baseUrl, $lockResult->dcSecret);
-				if ($this->fetchFile($sourceUrl, self::getFullPath($fileSync), $fileSync->fileSize))
+				if ($this->fetchFile($fileSync->id, $sourceUrl, self::getFullPath($fileSync), $fileSync->fileSize))
 				{
 					$this->markFileSyncAsReady($fileSync);
 				}
@@ -76,15 +81,15 @@ class KAsyncFileSyncImport extends KPeriodicWorker
 			{
 				$this->fetchMultiFiles($fileSyncs, $lockResult->baseUrl, $lockResult->dcSecret);
 			}
-			
+
+			$this->curlWrapper->close();
+
 			// if the limit was not reached, wait for more file syncs to become available
 			if (!$lockResult->limitReached)
 			{
 				sleep(1);
 			}
 		}
-		
-		$this->curlWrapper->close();
 	}
 	
 	/* (non-PHPdoc)
@@ -147,6 +152,23 @@ class KAsyncFileSyncImport extends KPeriodicWorker
 			KalturaLog::err($e);
 		}
 	}
+
+	protected function extendFileSyncLock($fileSyncId)
+	{
+		try
+		{
+			$multiCentersPlugin = KalturaMultiCentersClientPlugin::get(self::$kClient);
+			$multiCentersPlugin->filesyncImportBatch->extendFileSyncLock($fileSyncId);
+		}
+		catch(KalturaException $e)
+		{
+			KalturaLog::err($e);
+		}
+		catch(KalturaClientException $e)
+		{
+			KalturaLog::err($e);
+		}
+	}
 	
 	private function fetchEmptyFile($destination) {
 		
@@ -171,7 +193,7 @@ class KAsyncFileSyncImport extends KPeriodicWorker
 	 * @param string $sourceUrl
 	 * @param string $dirDestination
 	 */
-	private function fetchDir($sourceUrl, $dirDestination)
+	private function fetchDir($fileSyncId, $sourceUrl, $dirDestination)
 	{
 		KalturaLog::debug('fetchDir - source url ['.$sourceUrl.'], destination ['.$dirDestination.']');
 		
@@ -237,7 +259,7 @@ class KAsyncFileSyncImport extends KPeriodicWorker
 			else
 			{
 				// is a file - fetch it from server
-				$res = $this->fetchFile($newUrl, $dirDestination.'/'.$name, $filesize);
+				$res = $this->fetchFile($fileSyncId, $newUrl, $dirDestination.'/'.$name, $filesize);
 				if (!$res) 
 				{
 					return false;
@@ -255,7 +277,7 @@ class KAsyncFileSyncImport extends KPeriodicWorker
 	 * @param string $fileDestination
 	 * @param KCurlHeaderResponse $curlHeaderResponse header fetched for the $sourceUrl
 	 */
-	private function fetchFile($sourceUrl, $fileDestination, $fileSize = null)
+	private function fetchFile($fileSyncId, $sourceUrl, $fileDestination, $fileSize = null)
 	{
 		KalturaLog::debug('fetchFile - source url ['.$sourceUrl.'], destination ['.$fileDestination.']');
 		
@@ -353,13 +375,16 @@ class KAsyncFileSyncImport extends KPeriodicWorker
 				return false;
 			}
 			
-			if($fileSize && $actualFileSize < $fileSize)
+			if(!$fileSize || $actualFileSize >= $fileSize)
 			{
-				// part of file was downloaded - resume
-				$resumeOffset = $actualFileSize;
-				continue;
+				break;
 			}
-			break;
+
+			// part of file was downloaded - resume
+			$resumeOffset = $actualFileSize;
+			
+			// extend the file sync lock
+			$this->extendFileSyncLock($fileSyncId);
 		}
 
 		KalturaLog::debug('File downloaded completely - will now check if done...');
