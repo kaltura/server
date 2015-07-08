@@ -1,5 +1,19 @@
 # Jupiter-10.15.0 #
 
+## Add Developer Partner ##
+
+- Issue Type: New Feature  
+- Issue ID: PLAT-3326  
+
+### Configuration ###
+
+ - Added new e-mail configuration in /batch/batches/Mailer/emails_en.ini
+ - Remark for production configuration: add /alpha/crond/kaltura/monthly_quota_storage_update.sh script to kaltura.daily cron jobs 
+ 
+### Deployment Scripts ###
+
+- None.  
+		
 ## File sync pull without jobs ##
 
 - Issue Type: optimization
