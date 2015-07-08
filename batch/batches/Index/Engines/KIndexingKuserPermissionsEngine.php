@@ -24,7 +24,7 @@ class KIndexingKuserPermissionsEngine extends KIndexingEngine
 		KBatchBase::$kClient->startMultiRequest();
 		foreach($usersList->objects as $user)
 		{
-			KBatchBase::$kClient->user->indexAction($user->id, $shouldUpdate);
+			KBatchBase::$kClient->user->index($user->id, $shouldUpdate);
 		}
 		$results = KBatchBase::$kClient->doMultiRequest();
 		foreach($results as $index => $result)
