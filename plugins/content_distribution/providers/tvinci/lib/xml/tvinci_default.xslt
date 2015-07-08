@@ -71,7 +71,7 @@
         <!--at this point the OTTTagUniques should be as follow:-->
         <!--<meta name="Actor" value="A"/>-->
         <!-- now construct the actual result -->
-        <xsl:element name="tags">
+        <xsl:element name="metas">
             <xsl:for-each select="exsl:node-set($uniqueTags)">
                 <xsl:variable name="uniqueTagName" select="."/>
                 <xsl:element name="meta">
