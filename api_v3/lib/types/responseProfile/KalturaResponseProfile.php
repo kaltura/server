@@ -93,13 +93,6 @@ class KalturaResponseProfile extends KalturaDetachedResponseProfile implements I
 			$id = $sourceObject->getId();
 		}
 			
-		if(trim($this->systemName) && !$this->isNull('systemName'))
-		{
-			$systemNameTemplates = ResponseProfilePeer::retrieveBySystemName($this->systemName, $id);
-	        if (count($systemNameTemplates))
-	            throw new KalturaAPIException(KalturaErrors::RESPONSE_PROFILE_DUPLICATE_SYSTEM_NAME, $this->systemName);
-		}
-		
 		parent::validateForUsage($sourceObject, $propertiesToSkip);
 	}
 	
