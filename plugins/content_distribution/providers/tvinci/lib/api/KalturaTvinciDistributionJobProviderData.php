@@ -98,11 +98,9 @@ class KalturaTvinciDistributionJobProviderData extends KalturaConfigurableDistri
 	private static function getVideoAssetDataMap()
 	{
 		return array(
-			array( 'Main',						PlaybackProtocol::AKAMAI_HDS,	'mbr',		    		'a4m' ),
-			array( 'Tablet Main',				PlaybackProtocol::APPLE_HTTP,	'ipadnew',				'm3u8' ),
-			array( 'Smartphone Main',			PlaybackProtocol::APPLE_HTTP,	'iphonenew',			'm3u8' ),
-			array( 'Old ipad',					PlaybackProtocol::APPLE_HTTP,	'ipad',					'm3u8' ),
-			array( 'Old iphone',				PlaybackProtocol::APPLE_HTTP,	'iphone',				'm3u8' ),
+			array( 'Main',						PlaybackProtocol::AKAMAI_HDS,	array('mbr'),		    		'a4m' ),
+			array( 'Tablet Main',				PlaybackProtocol::APPLE_HTTP,	array('ipadnew','ipad'),		'm3u8' ),
+			array( 'Smartphone Main',			PlaybackProtocol::APPLE_HTTP,	array('iphonenew','iphone'),	'm3u8' ),
 		);
 	}
 
@@ -114,23 +112,31 @@ class KalturaTvinciDistributionJobProviderData extends KalturaConfigurableDistri
 		{
 			$tvinciAssetName = $videoAssetData[0];
 			$playbackProtocol = $videoAssetData[1];
-			$tag = $videoAssetData[2];
+			$tags = $videoAssetData[2];
 			$fileExt = $videoAssetData[3];
 			$keys = array();
-
+			$relevantTags = array();
 			foreach ( $distributionFlavorAssets as $distributionFlavorAsset )
 			{
-
-				if ($distributionFlavorAsset->isLocalReadyStatus() &&
-					$distributionFlavorAsset->hasTag($tag)){
-					$keys[] = "{$entry->getEntryId()}_{$distributionFlavorAsset->getFlavorParamsId()}";
+				foreach ($tags as $tag)
+				{
+					if ($distributionFlavorAsset->isLocalReadyStatus() &&
+						$distributionFlavorAsset->hasTag($tag) )
+					{
+						$keys[] = "{$entry->getEntryId()}_{$distributionFlavorAsset->getFlavorParamsId()}";
+						if (!in_array($tag, $relevantTags))
+						{
+							$relevantTags[] = $tag;
+						}
+					}
 				}
 			}
 
 			if ($keys)
 			{
 				$fileCoGuid = implode(",", $keys);
-				$url = $this->getPlayManifestUrl($entry, $playbackProtocol, $tag, $fileExt);
+				$tagFlag = implode(",", $relevantTags);
+				$url = $this->getPlayManifestUrl($entry, $playbackProtocol, $tagFlag, $fileExt);
 				$feedHelper->setVideoAssetData( $tvinciAssetName, $url, $fileCoGuid );
 			}
 		}
