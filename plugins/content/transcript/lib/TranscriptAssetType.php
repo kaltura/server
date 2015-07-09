@@ -3,7 +3,7 @@
  * @package plugins.transcript
  * @subpackage lib.enum
  */
-class TranscriptAssetType implements IKalturaPluginEnum, assetType
+class TranscriptAssetType extends AttachmentAssetType
 {
 	const TRANSCRIPT = 'Transcript';
 	
@@ -12,13 +12,5 @@ class TranscriptAssetType implements IKalturaPluginEnum, assetType
 		return array(
 			'TRANSCRIPT' => self::TRANSCRIPT,
 		);
-	}
-	
-	/**
-	 * @return array
-	 */
-	public static function getAdditionalDescriptions()
-	{
-		return array();
 	}
 }

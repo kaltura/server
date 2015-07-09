@@ -34,14 +34,8 @@ class KalturaAttachmentAsset extends KalturaAsset
 	public $status;
 
 	/**
-	 * The file-type of the attachment
-	 * @var string
-	 */
-	public $fileType;
-
-	/**
 	 * The language of the attachment
-	 * @var string
+	 * @var KalturaLanguageCode
 	 */
 	public $language;
 
@@ -51,7 +45,6 @@ class KalturaAttachmentAsset extends KalturaAsset
 		"title",
 		"format" => "containerFormat",
 		"status",
-		"fileType",
 		"language",
 	);
 	
