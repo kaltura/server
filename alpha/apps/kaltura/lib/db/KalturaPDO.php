@@ -117,10 +117,10 @@ class KalturaPDO extends PropelPDO
 	 */
 	public function exec($sql)
 	{
-		KalturaLog::debug($sql);
-		
 		$comment = $this->getCommentWrapped();
 		$sql = $comment . $sql;
+		
+		KalturaLog::debug($sql);
 		
 		$sqlStart = microtime(true);
 		try
