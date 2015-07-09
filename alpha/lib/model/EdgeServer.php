@@ -55,16 +55,15 @@ class EdgeServer extends BaseEdgeServer {
 	
 	public function getPlaybackHost()
 	{		
-		$playbackHostName = $this->getPlaybackHostName();
+		$playbackHostName = $this->getPlaybackHostName() . "/" . self::EDGE_SERVER_DEFAULT_LIVE_CACHE_APPLICATION_NAME . "/";
 		
 		if($this->parent_id)
 		{
 			$parentEdge = EdgeServerPeer::retrieveByPK($this->parent_id);
 			if($parentEdge)
-				$playbackHostName = $parentEdge->getPlaybackHost() . "/" . $playbackHostName;
+				$playbackHostName = $playbackHostName . $parentEdge->getPlaybackHost();
 		}
 		
-		$playbackHostName .= "/" . self::EDGE_SERVER_DEFAULT_LIVE_CACHE_APPLICATION_NAME . "/";
 		return $playbackHostName;
 	}
 	
