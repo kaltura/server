@@ -15,6 +15,7 @@
 
     <xsl:template name="convert-known-meta-element">
         <xsl:param name="prefix"/>
+        <xsl:param name="asValue"/>
         <xsl:variable name="prefix-length" select="string-length($prefix)+1"/>
         <xsl:variable name="currNodeName" select="local-name(.)"/>
         <xsl:variable name="suffix" select="substring($currNodeName,$prefix-length)"/>
@@ -24,10 +25,17 @@
                     <xsl:value-of select="$suffix"/>
                 </xsl:attribute>
                 <xsl:attribute name="ml_handling">unique</xsl:attribute>
-                <xsl:element name="value">
-                    <xsl:attribute name="lang">eng</xsl:attribute>
-                    <xsl:value-of select="."/>
-                </xsl:element>
+                <xsl:choose>
+                    <xsl:when test="$asValue">
+                        <xsl:element name="value">
+                            <xsl:attribute name="lang">eng</xsl:attribute>
+                            <xsl:value-of select="."/>
+                        </xsl:element>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:value-of select="."/>
+                    </xsl:otherwise>
+                </xsl:choose>
             </xsl:element>
         </xsl:if>
     </xsl:template>
@@ -103,6 +111,7 @@
             <xsl:for-each select="$metadatas">
                 <xsl:call-template name="convert-known-meta-element">
                     <xsl:with-param name="prefix" select="'STRING'"/>
+                    <xsl:with-param name="asValue" select="true()"/>
                 </xsl:call-template>
             </xsl:for-each>
         </xsl:element>
@@ -110,6 +119,7 @@
             <xsl:for-each select="$metadatas">
                 <xsl:call-template name="convert-known-meta-element">
                     <xsl:with-param name="prefix" select="'BOOL'"/>
+                    <xsl:with-param name="asValue" select="false()"/>
                 </xsl:call-template>
             </xsl:for-each>
         </xsl:element>
@@ -117,6 +127,7 @@
             <xsl:for-each select="$metadatas">
                 <xsl:call-template name="convert-known-meta-element">
                     <xsl:with-param name="prefix" select="'NUM'"/>
+                    <xsl:with-param name="asValue" select="false()"/>
                 </xsl:call-template>
             </xsl:for-each>
         </xsl:element>
