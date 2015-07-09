@@ -867,9 +867,10 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 		$this->appendLine ( "	protected void resetRequest(){");
 		foreach($volatileProperties as $attributeName => $properties)
 		{
+			$attributeMethodName = ucfirst($attributeName);
 			foreach($properties as $propertyName)
 			{
-				$this->appendLine("		this.{$attributeName}.remove(\"$propertyName\");");
+				$this->appendLine("		unset{$attributeMethodName}(\"$propertyName\");");
 			}
 		}
 		$this->appendLine ( "	}");
@@ -884,6 +885,7 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 	
 	protected function writeConfigurationProperty($configurationName, $name, $paramName, $type, $description)
 	{
+		$configurationMethodName = ucfirst($configurationName);
 		$methodsName = ucfirst($name);
 		
 		$this->appendLine("	/**");
@@ -895,7 +897,7 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 		$this->appendLine("	 * @param $type \${$name}");
 		$this->appendLine("	 */");
 		$this->appendLine("	public void set{$methodsName}($type $name){");
-		$this->appendLine("		this.{$configurationName}Configuration.put(\"$paramName\", $name);");
+		$this->appendLine("		set{$configurationMethodName}Configuration(\"$paramName\", $name);");
 		$this->appendLine("	}");
 		$this->appendLine("	");
 	
@@ -909,11 +911,7 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 		$this->appendLine("	 * @return $type");
 		$this->appendLine("	 */");
 		$this->appendLine("	public $type get{$methodsName}(){");
-		$this->appendLine("		if(this.{$configurationName}Configuration.containsKey(\"{$paramName}\")){");
-		$this->appendLine("			return ($type) this.{$configurationName}Configuration.get(\"{$paramName}\");");
-		$this->appendLine("		}");
-		$this->appendLine("		");
-		$this->appendLine("		return null;");
+		$this->appendLine("		return ($type) get{$configurationMethodName}Configuration(\"{$paramName}\");");
 		$this->appendLine("	}");
 		$this->appendLine("	");
 	}

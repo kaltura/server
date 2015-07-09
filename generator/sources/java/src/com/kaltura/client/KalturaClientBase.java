@@ -47,6 +47,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.zip.GZIPInputStream;
 
 import javax.crypto.Cipher;
@@ -100,16 +102,21 @@ abstract public class KalturaClientBase implements Serializable {
 	private static final int RANDOM_SIZE = 16; 
 
 	private static final int MAX_DEBUG_RESPONSE_STRING_LENGTH = 1024;
-	protected KalturaConfiguration kalturaConfiguration;
-    protected List<KalturaServiceActionCall> callsQueue;
-    protected List<Class<?>> requestReturnType;
-    protected KalturaParams multiRequestParamsMap;
-	protected Map<String, Object> clientConfiguration = new HashMap<String, Object>();
-	protected Map<String, Object> requestConfiguration = new HashMap<String, Object>();
-
-	private static IKalturaLogger logger = KalturaLogger.getLogger(KalturaClientBase.class);
-    
-    private Header[] responseHeaders = null; 
+	
+	public static IKalturaLogger logger = KalturaLogger.getLogger(KalturaClientBase.class);
+	
+	private class ThreadInfo
+	{
+		public KalturaConfiguration kalturaConfiguration;
+		public List<KalturaServiceActionCall> callsQueue;
+		public List<Class<?>> requestReturnType = null;
+		public KalturaParams multiRequestParamsMap;
+		public Map<String, Object> clientConfiguration = new HashMap<String, Object>();
+		public Map<String, Object> requestConfiguration = new HashMap<String, Object>();
+		public Header[] responseHeaders;
+	}
+	
+    private ConcurrentHashMap<Thread, ThreadInfo> threadsInfo = new ConcurrentHashMap<Thread, ThreadInfo>(); 
     
     private boolean acceptGzipEncoding = true;
     
@@ -124,14 +131,14 @@ abstract public class KalturaClientBase implements Serializable {
 	 * <p>Default is "true". Turn this flag off if you do not want
 	 * GZIP response compression even if enabled on the HTTP server.
 	 */
-	public void setAcceptGzipEncoding(boolean acceptGzipEncoding) {
+	public synchronized void setAcceptGzipEncoding(boolean acceptGzipEncoding) {
 		this.acceptGzipEncoding = acceptGzipEncoding;
 	}
     /**
 	 * Return whether to accept GZIP encoding, that is, whether to
 	 * send the HTTP "Accept-Encoding" header with "gzip" as value.
 	 */
-	public boolean isAcceptGzipEncoding() {
+	public synchronized boolean isAcceptGzipEncoding() {
 		return acceptGzipEncoding;
 	}
     
@@ -177,28 +184,48 @@ abstract public class KalturaClientBase implements Serializable {
     
     public Header[] getResponseHeaders()
     {
-        return responseHeaders;
+    	if(threadsInfo.containsKey(Thread.currentThread())){
+    		return threadsInfo.get(Thread.currentThread()).responseHeaders;
+    	}
+    	
+    	return new Header[]{};
     }
 
     public KalturaClientBase() {
     }
 
     public KalturaClientBase(KalturaConfiguration config) {
-        this.kalturaConfiguration = config;
-        this.callsQueue = new ArrayList<KalturaServiceActionCall>();
-        this.multiRequestParamsMap = new KalturaParams();
+    	ThreadInfo threadInfo = getThreadInfo();
+    		
+    	threadInfo.kalturaConfiguration = config;
+    	threadInfo.callsQueue = new ArrayList<KalturaServiceActionCall>();
+    	threadInfo.multiRequestParamsMap = new KalturaParams();
     }
 
-	public boolean isMultiRequest() {
-		return (requestReturnType != null);
+	private ThreadInfo getThreadInfo() {
+    	if(threadsInfo.containsKey(Thread.currentThread())){
+    		return threadsInfo.get(Thread.currentThread());
+    	}
+
+    	ThreadInfo threadInfo = new ThreadInfo();
+		threadsInfo.put(Thread.currentThread(), threadInfo);
+		
+		return threadInfo;
+    }
+
+	public synchronized boolean isMultiRequest() {
+    	ThreadInfo threadInfo = getThreadInfo();
+		return (threadInfo.requestReturnType != null);
 	}
 
-	public void setKalturaConfiguration(KalturaConfiguration kalturaConfiguration) {
-		this.kalturaConfiguration = kalturaConfiguration;
+	public synchronized void setKalturaConfiguration(KalturaConfiguration kalturaConfiguration) {
+    	ThreadInfo threadInfo = getThreadInfo();
+    	threadInfo.kalturaConfiguration = kalturaConfiguration;
 	}
 
-	public KalturaConfiguration getKalturaConfiguration() {
-		return this.kalturaConfiguration;
+	public synchronized KalturaConfiguration getKalturaConfiguration() {
+    	ThreadInfo threadInfo = getThreadInfo();
+		return threadInfo.kalturaConfiguration;
 	}
 	
 	public void queueServiceCall(String service, String action, KalturaParams kparams) {
@@ -214,57 +241,74 @@ abstract public class KalturaClientBase implements Serializable {
 	}
 
 	public void queueServiceCall(String service, String action, KalturaParams kparams, KalturaFiles kfiles, Class<?> expectedClass) {
-		for(Entry<String, Object> itr : this.requestConfiguration.entrySet()) {
+    	ThreadInfo threadInfo = getThreadInfo();
+		for(Entry<String, Object> itr : threadInfo.requestConfiguration.entrySet()) {
 			kparams.add(itr.getKey(), (String) itr.getValue());	   
 		}
 
 		KalturaServiceActionCall call = new KalturaServiceActionCall(service, action, kparams, kfiles);
-		if(requestReturnType != null)
-			requestReturnType.add(expectedClass);
-		this.callsQueue.add(call);
+		if(isMultiRequest())
+			threadInfo.requestReturnType.add(expectedClass);
+		threadInfo.callsQueue.add(call);
 	}
 	
 	public String serve() throws KalturaApiException {
-		
-		KalturaParams kParams = new KalturaParams();
-		String url = extractParamsFromCallQueue(kParams, new KalturaFiles());
-		String kParamsString = kParams.toQueryString();
-		url += "&" + kParamsString;
-		
-		return url;
+		try{
+			if(isMultiRequest()){
+			    throw new KalturaApiException("Serve actions cannot be called within a multi-request");
+			}
+			KalturaParams kParams = new KalturaParams();
+			String url = extractParamsFromCallQueue(kParams, new KalturaFiles());
+			String kParamsString = kParams.toQueryString();
+			url += "&" + kParamsString;
+			
+			return url;
+		}
+		finally{
+			ThreadInfo threadInfo = getThreadInfo();
+			threadInfo.requestReturnType = null;
+			threadInfo.multiRequestParamsMap = null;
+			
+			resetRequest();
+		}
 	}
 	
 	abstract protected void resetRequest();
 
 	public Element doQueue() throws KalturaApiException {
-		if (this.callsQueue.isEmpty()) return null;
-
-		if (logger.isEnabled())
-			logger.debug("service url: [" + this.kalturaConfiguration.getEndpoint() + "]");
-
-		KalturaParams kparams = new KalturaParams();
-		KalturaFiles kfiles = new KalturaFiles();
-
-		String url = extractParamsFromCallQueue(kparams, kfiles);
-
-		if (logger.isEnabled())
-			logger.debug("full reqeust url: [" + url + "?" + kparams.toQueryString() + "]");
-
-		HttpClient client = createHttpClient();
-		String responseString = null;
-		try {
-			PostMethod method = createPostMethod(kparams, kfiles, url);
-			responseString = executeMethod(client, method);	
-		} finally {
-			closeHttpClient(client);
+		ThreadInfo threadInfo = getThreadInfo();
+		try{
+			if (threadInfo.callsQueue.isEmpty()) return null;
+	
+			if (logger.isEnabled())
+				logger.debug("service url: [" + threadInfo.kalturaConfiguration.getEndpoint() + "]");
+	
+			KalturaParams kparams = new KalturaParams();
+			KalturaFiles kfiles = new KalturaFiles();
+	
+			String url = extractParamsFromCallQueue(kparams, kfiles);
+	
+			if (logger.isEnabled())
+				logger.debug("full reqeust url: [" + url + "?" + kparams.toQueryString() + "]");
+	
+			HttpClient client = createHttpClient();
+			String responseString = null;
+			try {
+				PostMethod method = createPostMethod(kparams, kfiles, url);
+				responseString = executeMethod(client, method);	
+			} finally {
+				closeHttpClient(client);
+			}
+			
+			Element responseXml = XmlUtils.parseXml(responseString);
+			Element resultXml = this.validateXmlResult(responseXml);
+			this.throwExceptionOnAPIError(resultXml);
+					
+			return resultXml;
 		}
-		resetRequest();
-		
-		Element responseXml = XmlUtils.parseXml(responseString);
-		Element resultXml = this.validateXmlResult(responseXml);
-		this.throwExceptionOnAPIError(resultXml);
-				
-		return resultXml;
+		finally{
+			resetRequest();
+		}
 	}
 
     protected String readRemoteInvocationResult(InputStream is)
@@ -319,12 +363,13 @@ abstract public class KalturaClientBase implements Serializable {
                 if (logger.isEnabled()) logger.debug("No gzip compression for this response");
             }
             String responseBody = readRemoteInvocationResult(responseBodyIS);
-            responseHeaders = method.getResponseHeaders();
+            ThreadInfo threadInfo = getThreadInfo();
+            threadInfo.responseHeaders = method.getResponseHeaders();
             
             // print server debug info
             String serverName = null;
             String serverSession = null;
-            for(Header header : responseHeaders)
+            for(Header header : threadInfo.responseHeaders)
             {
             	if (header.getName().compareTo("X-Me") == 0)
                     serverName = header.getValue();
@@ -393,6 +438,7 @@ abstract public class KalturaClientBase implements Serializable {
 	}
 
 	protected HttpClient createHttpClient() {
+		ThreadInfo threadInfo = getThreadInfo();
 		HttpClient client = new HttpClient();
 
 		// added by Unicon to handle proxy hosts
@@ -417,9 +463,9 @@ abstract public class KalturaClientBase implements Serializable {
 		client.getParams().setParameter(HttpMethodParams.HTTP_URI_CHARSET, UTF8_CHARSET);
 		
 		HttpConnectionManagerParams connParams = client.getHttpConnectionManager().getParams();
-		if(this.kalturaConfiguration.getTimeout() != 0) {
-			connParams.setSoTimeout(this.kalturaConfiguration.getTimeout());
-			connParams.setConnectionTimeout(this.kalturaConfiguration.getTimeout());
+		if(threadInfo.kalturaConfiguration.getTimeout() != 0) {
+			connParams.setSoTimeout(threadInfo.kalturaConfiguration.getTimeout());
+			connParams.setConnectionTimeout(threadInfo.kalturaConfiguration.getTimeout());
 		}
 		client.getHttpConnectionManager().setParams(connParams);
 		return client;
@@ -448,20 +494,21 @@ abstract public class KalturaClientBase implements Serializable {
 
 	private String extractParamsFromCallQueue(KalturaParams kparams, KalturaFiles kfiles) throws KalturaApiException {
 		
-		String url = this.kalturaConfiguration.getEndpoint() + "/api_v3/index.php?service=";
+		ThreadInfo threadInfo = getThreadInfo();
+		String url = threadInfo.kalturaConfiguration.getEndpoint() + "/api_v3/index.php?service=";
 		
 		// append the basic params
-		kparams.add("format", this.kalturaConfiguration.getServiceFormat());
+		kparams.add("format", threadInfo.kalturaConfiguration.getServiceFormat());
 		kparams.add("ignoreNull", true);
 	
-		for(Entry<String, Object> itr : this.clientConfiguration.entrySet()) {
+		for(Entry<String, Object> itr : threadInfo.clientConfiguration.entrySet()) {
 			kparams.add(itr.getKey(), (String) itr.getValue());	   
 		}
 		
-		if (requestReturnType != null) {
+		if (isMultiRequest()) {
 			url += "multirequest";
 			int i = 1;
-			for (KalturaServiceActionCall call : this.callsQueue) {
+			for (KalturaServiceActionCall call : threadInfo.callsQueue) {
 				KalturaParams callParams = call.getParamsForMultiRequest(i);
 				kparams.add(callParams);
 				KalturaFiles callFiles = call.getFilesForMultiRequest(i);
@@ -470,9 +517,9 @@ abstract public class KalturaClientBase implements Serializable {
 			}
 
 			// map params
-			for (String key : this.multiRequestParamsMap.keySet()) {
+			for (String key : threadInfo.multiRequestParamsMap.keySet()) {
 				String requestParam = key;
-				String resultParam = this.multiRequestParamsMap.get(key);
+				String resultParam = threadInfo.multiRequestParamsMap.get(key);
 
 				if (kparams.containsKey(requestParam)) {
 					kparams.put(requestParam, resultParam);
@@ -480,27 +527,28 @@ abstract public class KalturaClientBase implements Serializable {
 			}
 			
 			// Clean
-			this.multiRequestParamsMap.clear();
+			threadInfo.multiRequestParamsMap.clear();
 			
 		} else {
-			KalturaServiceActionCall call = this.callsQueue.get(0);
+			KalturaServiceActionCall call = threadInfo.callsQueue.get(0);
 			url += call.getService() + "&action=" + call.getAction();
 			kparams.add(call.getParams());
 			kfiles.add(call.getFiles());
 		}
 		
 		// cleanup
-		this.callsQueue.clear();
+		threadInfo.callsQueue.clear();
 		
 		kparams.put("kalsig", this.signature(kparams));
 		return url;
 	}
 
 	public void startMultiRequest() {
-		requestReturnType = new ArrayList<Class<?>>();
+		ThreadInfo threadInfo = getThreadInfo();
+		threadInfo.requestReturnType = new ArrayList<Class<?>>();
 	}
 
-	public Element getElementByXPath(Element element, String xPath) throws KalturaApiException
+	static public Element getElementByXPath(Element element, String xPath) throws KalturaApiException
 	{
 		try 
 		{
@@ -514,6 +562,7 @@ abstract public class KalturaClientBase implements Serializable {
 	
 	public KalturaMultiResponse doMultiRequest() throws KalturaApiException
 	{
+		ThreadInfo threadInfo = getThreadInfo();
 		Element multiRequestResult = doQueue();
 
 		KalturaMultiResponse multiResponse = new KalturaMultiResponse();
@@ -531,11 +580,11 @@ abstract public class KalturaClientBase implements Serializable {
 				}	
 				else if (getElementByXPath(arrayNode, "objectType") != null)
 				{
-			   		multiResponse.add(KalturaObjectFactory.create(arrayNode, requestReturnType.get(i)));
+			   		multiResponse.add(KalturaObjectFactory.create(arrayNode, threadInfo.requestReturnType.get(i)));
 				}
 				else if (getElementByXPath(arrayNode, "item/objectType") != null)
 				{
-			   		multiResponse.add(ParseUtils.parseArray(requestReturnType.get(i), arrayNode));
+			   		multiResponse.add(ParseUtils.parseArray(threadInfo.requestReturnType.get(i), arrayNode));
 				}
 				else
 				{
@@ -549,7 +598,7 @@ abstract public class KalturaClientBase implements Serializable {
 	   }
 		
 		// Cleanup
-		this.requestReturnType = null;
+		threadInfo.requestReturnType = null;
 		return multiResponse;
 	}
 	
@@ -558,14 +607,15 @@ abstract public class KalturaClientBase implements Serializable {
 		this.mapMultiRequestParam(resultNumber, null, requestNumber, requestParamName);
 	}
 
-	public void mapMultiRequestParam(int resultNumber, String resultParamName, int requestNumber, String requestParamName) {
+	public synchronized void mapMultiRequestParam(int resultNumber, String resultParamName, int requestNumber, String requestParamName) {
+		ThreadInfo threadInfo = getThreadInfo();
 		String resultParam = "{" + resultNumber + ":result";
 		if (resultParamName != null && resultParamName != "") resultParam += resultParamName;
 		resultParam += "}";
 
 		String requestParam = requestNumber + ":" + requestParamName;
 
-		this.multiRequestParamsMap.put(requestParam, resultParam);
+		threadInfo.multiRequestParamsMap.put(requestParam, resultParam);
 	}
 
 	private String signature(KalturaParams kparams) throws KalturaApiException {
@@ -676,17 +726,17 @@ abstract public class KalturaClientBase implements Serializable {
 		
 	}
 	
-	public String generateSession(String adminSecretForSigning, String userId, KalturaSessionType type, int partnerId) throws Exception
+	static public String generateSession(String adminSecretForSigning, String userId, KalturaSessionType type, int partnerId) throws Exception
 	{
-		return this.generateSession(adminSecretForSigning, userId, type, partnerId, 86400);
+		return generateSession(adminSecretForSigning, userId, type, partnerId, 86400);
 	}
 	
-	public String generateSession(String adminSecretForSigning, String userId, KalturaSessionType type, int partnerId, int expiry) throws Exception
+	static public String generateSession(String adminSecretForSigning, String userId, KalturaSessionType type, int partnerId, int expiry) throws Exception
 	{
-		return this.generateSession(adminSecretForSigning, userId, type, partnerId, expiry, "");
+		return generateSession(adminSecretForSigning, userId, type, partnerId, expiry, "");
 	}
 
-	public String generateSession(String adminSecretForSigning, String userId, KalturaSessionType type, int partnerId, int expiry, String privileges) throws Exception
+	static public String generateSession(String adminSecretForSigning, String userId, KalturaSessionType type, int partnerId, int expiry, String privileges) throws Exception
 	{
 		try
 		{
@@ -707,7 +757,7 @@ abstract public class KalturaClientBase implements Serializable {
 			byte[] infoSignature = signInfoWithSHA1(adminSecretForSigning + (sbInfo.toString()));
 			
 			// convert signature to hex:
-			String signature = this.convertToHex(infoSignature);
+			String signature = convertToHex(infoSignature);
 			
 			// build final string to base64 encode
 			StringBuilder sbToEncode = new StringBuilder();
@@ -728,7 +778,7 @@ abstract public class KalturaClientBase implements Serializable {
 		}
 	}
 
-	public String generateSessionV2(String adminSecretForSigning, String userId, KalturaSessionType type, int partnerId, int expiry, String privileges) throws Exception
+	static public String generateSessionV2(String adminSecretForSigning, String userId, KalturaSessionType type, int partnerId, int expiry, String privileges) throws Exception
 	{
 		try {
 		// build fields array
@@ -789,11 +839,11 @@ abstract public class KalturaClientBase implements Serializable {
 		} 
 	}
 	
-	private byte[] signInfoWithSHA1(String text) throws GeneralSecurityException {
+	static private byte[] signInfoWithSHA1(String text) throws GeneralSecurityException {
 		return signInfoWithSHA1(text.getBytes());
 	}
 	
-	private byte[] signInfoWithSHA1(byte[] data) throws GeneralSecurityException {
+	static private byte[] signInfoWithSHA1(byte[] data) throws GeneralSecurityException {
 		MessageDigest algorithm = MessageDigest.getInstance("SHA1");
 		algorithm.reset();
 		algorithm.update(data);
@@ -801,7 +851,7 @@ abstract public class KalturaClientBase implements Serializable {
 		return infoSignature;
 	}
 	
-	private byte[] aesEncrypt(String secretForSigning, byte[] text) throws GeneralSecurityException, UnsupportedEncodingException {
+	static private byte[] aesEncrypt(String secretForSigning, byte[] text) throws GeneralSecurityException, UnsupportedEncodingException {
 		// Key
 		byte[] hashedKey = signInfoWithSHA1(secretForSigning);
 		byte[] keyBytes = new byte[BLOCK_SIZE];
@@ -825,14 +875,14 @@ abstract public class KalturaClientBase implements Serializable {
 	}
 	
 	
-	private byte[] createRandomByteArray(int size)	{
+	static private byte[] createRandomByteArray(int size)	{
 		byte[] b = new byte[size];
 		new Random().nextBytes(b);
 		return b;
 	}
 
 	// new function to convert byte array to Hex
-	private String convertToHex(byte[] data) { 
+	static private String convertToHex(byte[] data) { 
 		StringBuffer buf = new StringBuffer();
 		for (int i = 0; i < data.length; i++) { 
 			int halfbyte = (data[i] >>> 4) & 0x0F;
@@ -847,5 +897,37 @@ abstract public class KalturaClientBase implements Serializable {
 		} 
 		return buf.toString();
 	} 
-	
+
+	protected Object getClientConfiguration(String key){
+		ThreadInfo threadInfo = getThreadInfo();
+		if(threadInfo.clientConfiguration.containsKey(key)){
+			return threadInfo.clientConfiguration.get(key);
+		}
+		
+		return null;
+	}	
+
+	protected void setClientConfiguration(String key, Object value){
+		ThreadInfo threadInfo = getThreadInfo();
+		threadInfo.clientConfiguration.put(key, value);
+	}	
+
+	protected Object getRequestConfiguration(String key){
+		ThreadInfo threadInfo = getThreadInfo();
+		if(threadInfo.requestConfiguration.containsKey(key)){
+			return threadInfo.requestConfiguration.get(key);
+		}
+		
+		return null;
+	}	
+
+	protected void setRequestConfiguration(String key, Object value){
+		ThreadInfo threadInfo = getThreadInfo();
+		threadInfo.requestConfiguration.put(key, value);
+	}	
+
+	protected void unsetRequestConfiguration(String key){
+		ThreadInfo threadInfo = getThreadInfo();
+		threadInfo.requestConfiguration.remove(key);
+	}	
 }
