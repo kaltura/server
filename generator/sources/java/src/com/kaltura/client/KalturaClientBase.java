@@ -90,37 +90,42 @@ import com.kaltura.client.utils.XmlUtils;
  *
  */
 @SuppressWarnings("serial")
-abstract public class KalturaClientBase extends ReentrantLock implements Serializable {
+abstract public class KalturaClientBase implements Serializable {
 	
 	private static final String UTF8_CHARSET = "UTF-8";
 
-	// KS v2 constants
-	private static final int BLOCK_SIZE = 16;
-	private static final String FIELD_EXPIRY = "_e";
-	private static final String FIELD_USER = "_u";
+    // KS v2 constants
+    private static final int BLOCK_SIZE = 16;
+    private static final String FIELD_EXPIRY = "_e";
+    private static final String FIELD_USER = "_u";
 	private static final String FIELD_TYPE = "_t";
 	private static final int RANDOM_SIZE = 16; 
 
 	private static final int MAX_DEBUG_RESPONSE_STRING_LENGTH = 1024;
-	protected KalturaConfiguration kalturaConfiguration;
-	protected List<KalturaServiceActionCall> callsQueue;
-	protected List<Class<?>> requestReturnType = null;
-	protected KalturaParams multiRequestParamsMap;
-	protected Map<String, Object> clientConfiguration = new HashMap<String, Object>();
-	protected Map<String, Object> requestConfiguration = new HashMap<String, Object>();
-
-	private static IKalturaLogger logger = KalturaLogger.getLogger(KalturaClientBase.class);
 	
-	private ConcurrentHashMap<Thread, Header[]> responseHeaders = new ConcurrentHashMap<Thread, Header[]>(); 
+	public static IKalturaLogger logger = KalturaLogger.getLogger(KalturaClientBase.class);
 	
-	private boolean acceptGzipEncoding = true;
+	private class ThreadInfo
+	{
+		public KalturaConfiguration kalturaConfiguration;
+		public List<KalturaServiceActionCall> callsQueue;
+		public List<Class<?>> requestReturnType = null;
+		public KalturaParams multiRequestParamsMap;
+		public Map<String, Object> clientConfiguration = new HashMap<String, Object>();
+		public Map<String, Object> requestConfiguration = new HashMap<String, Object>();
+		public Header[] responseHeaders;
+	}
 	
-	protected static final String HTTP_HEADER_ACCEPT_ENCODING = "Accept-Encoding";
+    private ConcurrentHashMap<Thread, ThreadInfo> threadsInfo = new ConcurrentHashMap<Thread, ThreadInfo>(); 
+    
+    private boolean acceptGzipEncoding = true;
+    
+    protected static final String HTTP_HEADER_ACCEPT_ENCODING = "Accept-Encoding";
 
 	protected static final String HTTP_HEADER_CONTENT_ENCODING = "Content-Encoding";
 
 	protected static final String ENCODING_GZIP = "gzip";
-	/**
+    /**
 	 * Set whether to accept GZIP encoding, that is, whether to
 	 * send the HTTP "Accept-Encoding" header with "gzip" as value.
 	 * <p>Default is "true". Turn this flag off if you do not want
@@ -129,15 +134,15 @@ abstract public class KalturaClientBase extends ReentrantLock implements Seriali
 	public synchronized void setAcceptGzipEncoding(boolean acceptGzipEncoding) {
 		this.acceptGzipEncoding = acceptGzipEncoding;
 	}
-	/**
+    /**
 	 * Return whether to accept GZIP encoding, that is, whether to
 	 * send the HTTP "Accept-Encoding" header with "gzip" as value.
 	 */
 	public synchronized boolean isAcceptGzipEncoding() {
 		return acceptGzipEncoding;
 	}
-	
-	/**
+    
+    /**
 	 * Determine whether the given response is a GZIP response.
 	 * <p>Default implementation checks whether the HTTP "Content-Encoding"
 	 * header contains "gzip" (in any casing).
@@ -150,8 +155,8 @@ abstract public class KalturaClientBase extends ReentrantLock implements Seriali
 		}
 		return (encodingHeader.getValue().toLowerCase().indexOf(ENCODING_GZIP) != -1);
 	}
-	
-	/**
+    
+    /**
 	 * Extract the response body from the given executed remote invocation
 	 * request.
 	 * <p>The default implementation simply fetches the PostMethod's response
@@ -176,35 +181,51 @@ abstract public class KalturaClientBase extends ReentrantLock implements Seriali
 			return postMethod.getResponseBodyAsStream();
 		}
 	}
-	
-	public synchronized Header[] getResponseHeaders()
-	{
-		if(responseHeaders.containsKey(Thread.currentThread())){
-			return responseHeaders.get(Thread.currentThread());
-		}
+    
+    public Header[] getResponseHeaders()
+    {
+    	if(threadsInfo.containsKey(Thread.currentThread())){
+    		return threadsInfo.get(Thread.currentThread()).responseHeaders;
+    	}
+    	
+    	return new Header[]{};
+    }
+
+    public KalturaClientBase() {
+    }
+
+    public KalturaClientBase(KalturaConfiguration config) {
+    	ThreadInfo threadInfo = getThreadInfo();
+    		
+    	threadInfo.kalturaConfiguration = config;
+    	threadInfo.callsQueue = new ArrayList<KalturaServiceActionCall>();
+    	threadInfo.multiRequestParamsMap = new KalturaParams();
+    }
+
+	private ThreadInfo getThreadInfo() {
+    	if(threadsInfo.containsKey(Thread.currentThread())){
+    		return threadsInfo.get(Thread.currentThread());
+    	}
+
+    	ThreadInfo threadInfo = new ThreadInfo();
+		threadsInfo.put(Thread.currentThread(), threadInfo);
 		
-		return new Header[]{};
-	}
-
-	public KalturaClientBase() {
-	}
-
-	public KalturaClientBase(KalturaConfiguration config) {
-		this.kalturaConfiguration = config;
-		this.callsQueue = new ArrayList<KalturaServiceActionCall>();
-		this.multiRequestParamsMap = new KalturaParams();
-	}
+		return threadInfo;
+    }
 
 	public synchronized boolean isMultiRequest() {
-		return (requestReturnType != null);
+    	ThreadInfo threadInfo = getThreadInfo();
+		return (threadInfo.requestReturnType != null);
 	}
 
 	public synchronized void setKalturaConfiguration(KalturaConfiguration kalturaConfiguration) {
-		this.kalturaConfiguration = kalturaConfiguration;
+    	ThreadInfo threadInfo = getThreadInfo();
+    	threadInfo.kalturaConfiguration = kalturaConfiguration;
 	}
 
 	public synchronized KalturaConfiguration getKalturaConfiguration() {
-		return this.kalturaConfiguration;
+    	ThreadInfo threadInfo = getThreadInfo();
+		return threadInfo.kalturaConfiguration;
 	}
 	
 	public void queueServiceCall(String service, String action, KalturaParams kparams) {
@@ -220,21 +241,21 @@ abstract public class KalturaClientBase extends ReentrantLock implements Seriali
 	}
 
 	public void queueServiceCall(String service, String action, KalturaParams kparams, KalturaFiles kfiles, Class<?> expectedClass) {
-		lock();
-		for(Entry<String, Object> itr : this.requestConfiguration.entrySet()) {
+    	ThreadInfo threadInfo = getThreadInfo();
+		for(Entry<String, Object> itr : threadInfo.requestConfiguration.entrySet()) {
 			kparams.add(itr.getKey(), (String) itr.getValue());	   
 		}
 
 		KalturaServiceActionCall call = new KalturaServiceActionCall(service, action, kparams, kfiles);
 		if(isMultiRequest())
-			requestReturnType.add(expectedClass);
-		this.callsQueue.add(call);
+			threadInfo.requestReturnType.add(expectedClass);
+		threadInfo.callsQueue.add(call);
 	}
 	
 	public String serve() throws KalturaApiException {
 		try{
 			if(isMultiRequest()){
-				throw new KalturaApiException("Serve actions cannot be called within a multi-request");
+			    throw new KalturaApiException("Serve actions cannot be called within a multi-request");
 			}
 			KalturaParams kParams = new KalturaParams();
 			String url = extractParamsFromCallQueue(kParams, new KalturaFiles());
@@ -244,21 +265,23 @@ abstract public class KalturaClientBase extends ReentrantLock implements Seriali
 			return url;
 		}
 		finally{
-			requestReturnType = null;
-			multiRequestParamsMap = null;
+			ThreadInfo threadInfo = getThreadInfo();
+			threadInfo.requestReturnType = null;
+			threadInfo.multiRequestParamsMap = null;
+			
 			resetRequest();
-			unlock();
 		}
 	}
 	
 	abstract protected void resetRequest();
 
 	public Element doQueue() throws KalturaApiException {
+		ThreadInfo threadInfo = getThreadInfo();
 		try{
-			if (this.callsQueue.isEmpty()) return null;
+			if (threadInfo.callsQueue.isEmpty()) return null;
 	
 			if (logger.isEnabled())
-				logger.debug("service url: [" + this.kalturaConfiguration.getEndpoint() + "]");
+				logger.debug("service url: [" + threadInfo.kalturaConfiguration.getEndpoint() + "]");
 	
 			KalturaParams kparams = new KalturaParams();
 			KalturaFiles kfiles = new KalturaFiles();
@@ -285,35 +308,32 @@ abstract public class KalturaClientBase extends ReentrantLock implements Seriali
 		}
 		finally{
 			resetRequest();
-			if(!isMultiRequest()){
-				unlock();
-			}
 		}
 	}
 
-	protected String readRemoteInvocationResult(InputStream is)
-		throws IOException {
-	
-		try {
-		  return doReadRemoteInvocationResult(is);
-		}
-		finally {
-		  is.close();
-		}
-	}
+    protected String readRemoteInvocationResult(InputStream is)
+    	throws IOException {
+    
+        try {
+    	  return doReadRemoteInvocationResult(is);
+        }
+        finally {
+    	  is.close();
+        }
+    }
 
-	protected String doReadRemoteInvocationResult(InputStream is)
-		throws IOException {
-	
-		byte[] buf = new byte[1024];
-		ByteArrayOutputStream out = new ByteArrayOutputStream();
-		int len;
-		while ( (len = is.read(buf)) > 0)
-		{
-			out.write(buf,0,len);
-		}
-		return new String(out.toByteArray());
-	}
+    protected String doReadRemoteInvocationResult(InputStream is)
+    	throws IOException {
+    
+        byte[] buf = new byte[1024];
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        int len;
+        while ( (len = is.read(buf)) > 0)
+        {
+        	out.write(buf,0,len);
+        }
+        return new String(out.toByteArray());
+    }
 
 	protected String executeMethod(HttpClient client, PostMethod method) throws KalturaApiException {
 		String responseString = "";
@@ -334,27 +354,27 @@ abstract public class KalturaClientBase extends ReentrantLock implements Seriali
 			}
 
 			// Read the response body
-			InputStream responseBodyIS = null;
-			if (isGzipResponse(method)) {
-				responseBodyIS = new GZIPInputStream(method.getResponseBodyAsStream());
-				if (logger.isEnabled()) logger.debug("Using gzip compression to handle response for: "+method.getName()+" "+method.getPath()+"?"+method.getQueryString());
-			} else {
-				responseBodyIS = method.getResponseBodyAsStream();
-				if (logger.isEnabled()) logger.debug("No gzip compression for this response");
-			}
-			String responseBody = readRemoteInvocationResult(responseBodyIS);
-			Header[] headers = method.getResponseHeaders();
-			responseHeaders.put(Thread.currentThread(), headers);
-			
-			// print server debug info
-			String serverName = null;
-			String serverSession = null;
-			for(Header header : headers)
-			{
-				if (header.getName().compareTo("X-Me") == 0)
-					serverName = header.getValue();
-				else if (header.getName().compareTo("X-Kaltura-Session") == 0)
-					serverSession = header.getValue();
+            InputStream responseBodyIS = null;
+            if (isGzipResponse(method)) {
+                responseBodyIS = new GZIPInputStream(method.getResponseBodyAsStream());
+                if (logger.isEnabled()) logger.debug("Using gzip compression to handle response for: "+method.getName()+" "+method.getPath()+"?"+method.getQueryString());
+            } else {
+                responseBodyIS = method.getResponseBodyAsStream();
+                if (logger.isEnabled()) logger.debug("No gzip compression for this response");
+            }
+            String responseBody = readRemoteInvocationResult(responseBodyIS);
+            ThreadInfo threadInfo = getThreadInfo();
+            threadInfo.responseHeaders = method.getResponseHeaders();
+            
+            // print server debug info
+            String serverName = null;
+            String serverSession = null;
+            for(Header header : threadInfo.responseHeaders)
+            {
+            	if (header.getName().compareTo("X-Me") == 0)
+                    serverName = header.getValue();
+            	else if (header.getName().compareTo("X-Kaltura-Session") == 0)
+                    serverSession = header.getValue();
 			}
 			if (serverName != null || serverSession != null)
 				logger.debug("Server: [" + serverName + "], Session: [" + serverSession + "]");
@@ -398,16 +418,16 @@ abstract public class KalturaClientBase extends ReentrantLock implements Seriali
 	private PostMethod createPostMethod(KalturaParams kparams,
 			KalturaFiles kfiles, String url) {
 		PostMethod method = new PostMethod(url);
-		method.setRequestHeader("Accept","text/xml,application/xml,*/*");
-		method.setRequestHeader("Accept-Charset","utf-8,ISO-8859-1;q=0.7,*;q=0.5");
-		
-		if (!kfiles.isEmpty()) {			
-			method = this.getPostMultiPartWithFiles(method, kparams, kfiles);			
-		} else {
-			method = this.addParams(method, kparams);			
-		}
-		
-		if (isAcceptGzipEncoding()) {
+        method.setRequestHeader("Accept","text/xml,application/xml,*/*");
+        method.setRequestHeader("Accept-Charset","utf-8,ISO-8859-1;q=0.7,*;q=0.5");
+        
+        if (!kfiles.isEmpty()) {        	
+            method = this.getPostMultiPartWithFiles(method, kparams, kfiles);        	
+        } else {
+            method = this.addParams(method, kparams);            
+        }
+        
+        if (isAcceptGzipEncoding()) {
 			method.addRequestHeader(HTTP_HEADER_ACCEPT_ENCODING, ENCODING_GZIP);
 		}
 
@@ -418,6 +438,7 @@ abstract public class KalturaClientBase extends ReentrantLock implements Seriali
 	}
 
 	protected HttpClient createHttpClient() {
+		ThreadInfo threadInfo = getThreadInfo();
 		HttpClient client = new HttpClient();
 
 		// added by Unicon to handle proxy hosts
@@ -442,9 +463,9 @@ abstract public class KalturaClientBase extends ReentrantLock implements Seriali
 		client.getParams().setParameter(HttpMethodParams.HTTP_URI_CHARSET, UTF8_CHARSET);
 		
 		HttpConnectionManagerParams connParams = client.getHttpConnectionManager().getParams();
-		if(this.kalturaConfiguration.getTimeout() != 0) {
-			connParams.setSoTimeout(this.kalturaConfiguration.getTimeout());
-			connParams.setConnectionTimeout(this.kalturaConfiguration.getTimeout());
+		if(threadInfo.kalturaConfiguration.getTimeout() != 0) {
+			connParams.setSoTimeout(threadInfo.kalturaConfiguration.getTimeout());
+			connParams.setConnectionTimeout(threadInfo.kalturaConfiguration.getTimeout());
 		}
 		client.getHttpConnectionManager().setParams(connParams);
 		return client;
@@ -463,7 +484,7 @@ abstract public class KalturaClientBase extends ReentrantLock implements Seriali
 	protected void closeHttpClient(HttpClient client) {
 		HttpConnectionManager mgr = client.getHttpConnectionManager();
 		if (mgr instanceof SimpleHttpConnectionManager) {
-			((SimpleHttpConnectionManager)mgr).shutdown();
+		    ((SimpleHttpConnectionManager)mgr).shutdown();
 		}
 		
 		if(mgr instanceof MultiThreadedHttpConnectionManager) {
@@ -473,20 +494,21 @@ abstract public class KalturaClientBase extends ReentrantLock implements Seriali
 
 	private String extractParamsFromCallQueue(KalturaParams kparams, KalturaFiles kfiles) throws KalturaApiException {
 		
-		String url = this.kalturaConfiguration.getEndpoint() + "/api_v3/index.php?service=";
+		ThreadInfo threadInfo = getThreadInfo();
+		String url = threadInfo.kalturaConfiguration.getEndpoint() + "/api_v3/index.php?service=";
 		
 		// append the basic params
-		kparams.add("format", this.kalturaConfiguration.getServiceFormat());
+		kparams.add("format", threadInfo.kalturaConfiguration.getServiceFormat());
 		kparams.add("ignoreNull", true);
 	
-		for(Entry<String, Object> itr : this.clientConfiguration.entrySet()) {
+		for(Entry<String, Object> itr : threadInfo.clientConfiguration.entrySet()) {
 			kparams.add(itr.getKey(), (String) itr.getValue());	   
 		}
 		
 		if (isMultiRequest()) {
 			url += "multirequest";
 			int i = 1;
-			for (KalturaServiceActionCall call : this.callsQueue) {
+			for (KalturaServiceActionCall call : threadInfo.callsQueue) {
 				KalturaParams callParams = call.getParamsForMultiRequest(i);
 				kparams.add(callParams);
 				KalturaFiles callFiles = call.getFilesForMultiRequest(i);
@@ -495,9 +517,9 @@ abstract public class KalturaClientBase extends ReentrantLock implements Seriali
 			}
 
 			// map params
-			for (String key : this.multiRequestParamsMap.keySet()) {
+			for (String key : threadInfo.multiRequestParamsMap.keySet()) {
 				String requestParam = key;
-				String resultParam = this.multiRequestParamsMap.get(key);
+				String resultParam = threadInfo.multiRequestParamsMap.get(key);
 
 				if (kparams.containsKey(requestParam)) {
 					kparams.put(requestParam, resultParam);
@@ -505,25 +527,25 @@ abstract public class KalturaClientBase extends ReentrantLock implements Seriali
 			}
 			
 			// Clean
-			this.multiRequestParamsMap.clear();
+			threadInfo.multiRequestParamsMap.clear();
 			
 		} else {
-			KalturaServiceActionCall call = this.callsQueue.get(0);
+			KalturaServiceActionCall call = threadInfo.callsQueue.get(0);
 			url += call.getService() + "&action=" + call.getAction();
 			kparams.add(call.getParams());
 			kfiles.add(call.getFiles());
 		}
 		
 		// cleanup
-		this.callsQueue.clear();
+		threadInfo.callsQueue.clear();
 		
 		kparams.put("kalsig", this.signature(kparams));
 		return url;
 	}
 
 	public void startMultiRequest() {
-		lock();
-		requestReturnType = new ArrayList<Class<?>>();
+		ThreadInfo threadInfo = getThreadInfo();
+		threadInfo.requestReturnType = new ArrayList<Class<?>>();
 	}
 
 	static public Element getElementByXPath(Element element, String xPath) throws KalturaApiException
@@ -540,49 +562,44 @@ abstract public class KalturaClientBase extends ReentrantLock implements Seriali
 	
 	public KalturaMultiResponse doMultiRequest() throws KalturaApiException
 	{
-		try
+		ThreadInfo threadInfo = getThreadInfo();
+		Element multiRequestResult = doQueue();
+
+		KalturaMultiResponse multiResponse = new KalturaMultiResponse();
+	   
+		for(int i = 0; i < multiRequestResult.getChildNodes().getLength(); i++) 
 		{
-			Element multiRequestResult = doQueue();
-	
-			KalturaMultiResponse multiResponse = new KalturaMultiResponse();
-		   
-			for(int i = 0; i < multiRequestResult.getChildNodes().getLength(); i++) 
-			{
-				Element arrayNode = (Element)multiRequestResult.getChildNodes().item(i);
-				
-				try
-				{
-					KalturaApiException exception = getExceptionOnAPIError(arrayNode);
-					if (exception != null)
-					{
-						multiResponse.add(exception);
-					}	
-					else if (getElementByXPath(arrayNode, "objectType") != null)
-					{
-				   		multiResponse.add(KalturaObjectFactory.create(arrayNode, requestReturnType.get(i)));
-					}
-					else if (getElementByXPath(arrayNode, "item/objectType") != null)
-					{
-				   		multiResponse.add(ParseUtils.parseArray(requestReturnType.get(i), arrayNode));
-					}
-					else
-					{
-						multiResponse.add(arrayNode.getTextContent());
-					}
-				}
-				catch (KalturaApiException e)
-				{
-					multiResponse.add(e);
-				}
-		   }
+			Element arrayNode = (Element)multiRequestResult.getChildNodes().item(i);
 			
-			// Cleanup
-			requestReturnType = null;
-			return multiResponse;
-		}
-		finally{
-			unlock();
-		}
+			try
+			{
+				KalturaApiException exception = getExceptionOnAPIError(arrayNode);
+				if (exception != null)
+				{
+					multiResponse.add(exception);
+				}	
+				else if (getElementByXPath(arrayNode, "objectType") != null)
+				{
+			   		multiResponse.add(KalturaObjectFactory.create(arrayNode, threadInfo.requestReturnType.get(i)));
+				}
+				else if (getElementByXPath(arrayNode, "item/objectType") != null)
+				{
+			   		multiResponse.add(ParseUtils.parseArray(threadInfo.requestReturnType.get(i), arrayNode));
+				}
+				else
+				{
+					multiResponse.add(arrayNode.getTextContent());
+				}
+			}
+			catch (KalturaApiException e)
+			{
+				multiResponse.add(e);
+			}
+	   }
+		
+		// Cleanup
+		threadInfo.requestReturnType = null;
+		return multiResponse;
 	}
 	
 	
@@ -591,13 +608,14 @@ abstract public class KalturaClientBase extends ReentrantLock implements Seriali
 	}
 
 	public synchronized void mapMultiRequestParam(int resultNumber, String resultParamName, int requestNumber, String requestParamName) {
+		ThreadInfo threadInfo = getThreadInfo();
 		String resultParam = "{" + resultNumber + ":result";
 		if (resultParamName != null && resultParamName != "") resultParam += resultParamName;
 		resultParam += "}";
 
 		String requestParam = requestNumber + ":" + requestParamName;
 
-		this.multiRequestParamsMap.put(requestParam, resultParam);
+		threadInfo.multiRequestParamsMap.put(requestParam, resultParam);
 	}
 
 	private String signature(KalturaParams kparams) throws KalturaApiException {
@@ -852,8 +870,8 @@ abstract public class KalturaClientBase extends ReentrantLock implements Seriali
 		
 		// Encrypt
 		Cipher cipher = Cipher.getInstance("AES/CBC/NOPADDING");
-		cipher.init(Cipher.ENCRYPT_MODE, key, iv);
-		return cipher.doFinal(textAsBytes);
+	    cipher.init(Cipher.ENCRYPT_MODE, key, iv);
+        return cipher.doFinal(textAsBytes);
 	}
 	
 	
@@ -879,5 +897,37 @@ abstract public class KalturaClientBase extends ReentrantLock implements Seriali
 		} 
 		return buf.toString();
 	} 
-	
+
+	protected Object getClientConfiguration(String key){
+		ThreadInfo threadInfo = getThreadInfo();
+		if(threadInfo.clientConfiguration.containsKey(key)){
+			return threadInfo.clientConfiguration.get(key);
+		}
+		
+		return null;
+	}	
+
+	protected void setClientConfiguration(String key, Object value){
+		ThreadInfo threadInfo = getThreadInfo();
+		threadInfo.clientConfiguration.put(key, value);
+	}	
+
+	protected Object getRequestConfiguration(String key){
+		ThreadInfo threadInfo = getThreadInfo();
+		if(threadInfo.requestConfiguration.containsKey(key)){
+			return threadInfo.requestConfiguration.get(key);
+		}
+		
+		return null;
+	}	
+
+	protected void setRequestConfiguration(String key, Object value){
+		ThreadInfo threadInfo = getThreadInfo();
+		threadInfo.requestConfiguration.put(key, value);
+	}	
+
+	protected void unsetRequestConfiguration(String key){
+		ThreadInfo threadInfo = getThreadInfo();
+		threadInfo.requestConfiguration.remove(key);
+	}	
 }
