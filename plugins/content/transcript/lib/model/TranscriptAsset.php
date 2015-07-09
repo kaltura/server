@@ -14,7 +14,7 @@ class TranscriptAsset extends AttachmentAsset
 	public function applyDefaultValues()
 	{
 		parent::applyDefaultValues();
-		$this->setType(AttachmentPlugin::getAssetTypeCoreValue(TranscriptAttachmentAssetType::TRANSCRIPT_ATTACHMENT));
+		$this->setType(TranscriptPlugin::getAssetTypeCoreValue(TranscriptAssetType::TRANSCRIPT));
 	}
 
 	public function getAccuracy()       {return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_ACCURACY);}
