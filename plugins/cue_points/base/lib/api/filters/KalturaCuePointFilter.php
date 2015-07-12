@@ -9,6 +9,11 @@ class KalturaCuePointFilter extends KalturaCuePointBaseFilter
 	 * @var string
 	 */
 	public $freeText;
+
+	/**
+	 * @var KalturaNullableBoolean
+	 */
+	public $userIdEqualCurrent;
 	
 	static private $map_between_objects = array
 	(
@@ -65,7 +70,14 @@ class KalturaCuePointFilter extends KalturaCuePointBaseFilter
 	protected function doGetListResponse(KalturaFilterPager $pager, $type = null)
 	{
 		$this->validateEntryIdFiltered();
-		$this->translateUserIds();
+		if (!is_null($this->userIdEqualCurrent) && $this->userIdEqualCurrent)
+		{
+			$this->userIdEqual = kCurrentContext::getCurrentKsKuserId();
+		}
+		else
+		{
+			$this->translateUserIds();
+		}
 		
 		$c = KalturaCriteria::create(CuePointPeer::OM_CLASS);
 		if($type)

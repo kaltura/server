@@ -5,6 +5,12 @@
  */
 class KalturaUserEntryFilter extends KalturaUserEntryBaseFilter
 {
+
+	/**
+	 * @var KalturaNullableBoolean
+	 */
+	public $userIdEqualCurrent;
+	
 	/**
 	 * @return baseObjectFilter
 	 */
@@ -29,7 +35,14 @@ class KalturaUserEntryFilter extends KalturaUserEntryBaseFilter
 		}
 
 		$c = new Criteria();
-		$this->fixFilterUserId();
+		if (!is_null($this->userIdEqualCurrent) && $this->userIdEqualCurrent)
+		{
+			$this->userIdEqual = kCurrentContext::getCurrentKsKuserId();
+		}
+		else
+		{
+			$this->fixFilterUserId();
+		}
 		$userEntryFilter = $this->toObject();
 		$userEntryFilter->attachToCriteria($c);
 
