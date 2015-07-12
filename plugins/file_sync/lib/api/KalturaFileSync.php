@@ -310,10 +310,14 @@ class KalturaFileSync extends KalturaObject implements IFilterable
 	{
 		parent::doFromObject($source_object, $responseProfile);
 		
-		$this->fileUrl = $source_object->getExternalUrl($this->getEntryId($source_object));
-		$this->isCurrentDc = ($source_object->getDc() == kDataCenterMgr::getCurrentDcId());
+		if($this->shouldGet('fileUrl', $responseProfile))
+			$this->fileUrl = $source_object->getExternalUrl($this->getEntryId($source_object));
 		
-		if($this->fileType == KalturaFileSyncType::LINK)
+		if($this->shouldGet('isCurrentDc', $responseProfile))
+			$this->isCurrentDc = ($source_object->getDc() == kDataCenterMgr::getCurrentDcId());
+		
+		if($this->fileType == KalturaFileSyncType::LINK && 
+			($this->shouldGet('fileRoot', $responseProfile) || $this->shouldGet('filePath', $responseProfile)))
 		{
 			$fileSync = kFileSyncUtils::resolve($source_object);
 			$this->fileRoot = $fileSync->getFileRoot();
@@ -323,10 +327,14 @@ class KalturaFileSync extends KalturaObject implements IFilterable
 		if($this->isCurrentDc)
 		{
 			$path = $this->fileRoot . $this->filePath;
-			$this->fileDiscSize = kFile::fileSize($path);
-			$content = file_get_contents($path, false, null, 0, 1024);
-			if(ctype_print($content) || ctype_cntrl($content))
-				$this->fileContent = $content;
+			if($this->shouldGet('fileDiscSize', $responseProfile))
+				$this->fileDiscSize = kFile::fileSize($path);
+			if($this->shouldGet('fileContent', $responseProfile))
+			{
+				$content = file_get_contents($path, false, null, 0, 1024);
+				if(ctype_print($content) || ctype_cntrl($content))
+					$this->fileContent = $content;
+			}
 		}
 	}
 }
