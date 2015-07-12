@@ -316,7 +316,7 @@ class KalturaFileSync extends KalturaObject implements IFilterable
 		if($this->shouldGet('isCurrentDc', $responseProfile))
 			$this->isCurrentDc = ($source_object->getDc() == kDataCenterMgr::getCurrentDcId());
 		
-		if($this->fileType == KalturaFileSyncType::LINK && 
+		if($source_object->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_LINK && 
 			($this->shouldGet('fileRoot', $responseProfile) || $this->shouldGet('filePath', $responseProfile)))
 		{
 			$fileSync = kFileSyncUtils::resolve($source_object);
@@ -324,9 +324,9 @@ class KalturaFileSync extends KalturaObject implements IFilterable
 			$this->filePath = $fileSync->getFilePath();
 		}
 		
-		if($this->isCurrentDc)
+		if($source_object->getDc() == kDataCenterMgr::getCurrentDcId())
 		{
-			$path = $this->fileRoot . $this->filePath;
+			$path = $source_object->getFullPath();
 			if($this->shouldGet('fileDiscSize', $responseProfile))
 				$this->fileDiscSize = kFile::fileSize($path);
 			if($this->shouldGet('fileContent', $responseProfile))
