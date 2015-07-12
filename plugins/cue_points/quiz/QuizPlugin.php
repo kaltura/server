@@ -350,16 +350,23 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 	 */
 	public function getReportResult($partner_id, $report_type, $report_flavor, $objectIds)
 	{
-		if ($report_type != self::getPluginName() . "." . QuizReportType::QUIZ)
+		if (($report_type != self::getPluginName() . "." . QuizReportType::QUIZ) && ($report_type != self::getPluginName() . "." . QuizReportType::QUIZ_USER_PERCENTAGE) ) 
 		{
-			return array(null, null);
+			return null;
 		}
 		switch ($report_flavor)
 		{
 			case myReportsMgr::REPORT_FLAVOR_TOTAL:
 				return $this->getTotalReport($objectIds);
 			case myReportsMgr::REPORT_FLAVOR_TABLE:
-				return $this->getTableReport($objectIds);
+				if ($report_type == self::getPluginName() . "." . QuizReportType::QUIZ)
+				{
+					return $this->getQuestionPercentageTableReport($objectIds);
+				}
+				else if ($report_type == self::getPluginName() . "." . QuizReportType::QUIZ_USER_PERCENTAGE)
+				{
+					return $this->getUserPercentageTable($objectIds);
+				}
 			case myReportsMgr::REPORT_FLAVOR_COUNT:
 				return $this->getReportCount($objectIds);
 			default:
@@ -415,7 +422,7 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 	 * @throws Exception
 	 * @throws KalturaAPIException
 	 */
-	protected function getTableReport($objectIds)
+	protected function getQuestionPercentageTableReport($objectIds)
 	{
 		$dbEntry = entryPeer::retrieveByPK($objectIds);
 		if (!$dbEntry)
@@ -502,4 +509,79 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 		return array($res);
 	}
 
+	/**
+	 * @param $objectIds
+	 * @return array
+	 * @throws Exception
+	 * @throws KalturaAPIException
+	 */
+	protected function getUserPercentageTable($objectIds)
+	{
+		$dbEntry = entryPeer::retrieveByPK($objectIds);
+		if (!$dbEntry)
+			throw new Exception(KalturaErrors::ENTRY_ID_NOT_FOUND, $objectIds);
+		/**
+		 * @var kQuiz $kQuiz
+		 */
+		$kQuiz = QuizPlugin::validateAndGetQuiz( $dbEntry );
+		$ans = array();
+		$c = new Criteria();
+		$c->add(CuePointPeer::ENTRY_ID, $objectIds);
+		$c->add(CuePointPeer::TYPE, QuizPlugin::getCoreValue('CuePointType',QuizCuePointType::QUIZ_ANSWER));
+		$answers = CuePointPeer::doSelect($c);
+		$usersCorrectAnswers = array();
+		$usersWrongAnswers = array();
+		foreach ($answers as $answer)
+		{
+			/**
+			 * @var AnswerCuePoint $answer
+			 */
+			if ($answer->getIsCorrect())
+			{
+				if (isset($usersCorrectAnswers[$answer->getKuserId()]))
+				{
+					$usersCorrectAnswers[$answer->getKuserId()]++;
+				}
+				else
+				{
+					$usersCorrectAnswers[$answer->getKuserId()] = 1;
+				}
+			}
+			else
+			{
+				if (isset($usersWrongAnswers[$answer->getKuserId()]))
+				{
+					$usersWrongAnswers[$answer->getKuserId()]++;
+				}
+				else
+				{
+					$usersWrongAnswers[$answer->getKuserId()] = 1;
+				}
+			}
+		}
+		
+		foreach (array_merge(array_keys($usersCorrectAnswers),array_keys($usersWrongAnswers)) as $kuserId)
+		{
+			$totalAnswers = 0;
+			$totalCorrect = 0;
+			if (isset($usersCorrectAnswers[$kuserId]))
+			{
+				$totalAnswers += $usersCorrectAnswers[$kuserId];
+				$totalCorrect = $usersCorrectAnswers[$kuserId]; 
+			}
+			if (isset($usersWrongAnswers[$kuserId]))
+			{
+				$totalAnswers += $usersWrongAnswers[$kuserId];
+			}
+			$userId = "unknown-user";
+			$dbKuser = kuserPeer::retrieveByPK($kuserId);
+			if ($dbKuser)
+			{
+				$userId = $dbKuser->getPuserId();
+			}
+			$ans[$userId] = ($totalCorrect/$totalAnswers)*100;
+		}
+		return array($ans);
+	}
+	
 }
