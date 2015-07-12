@@ -25,8 +25,15 @@ class KAsyncFileSyncImport extends KPeriodicWorker
 				
 		$multiCentersPlugin = KalturaMultiCentersClientPlugin::get(self::$kClient);
 		
+		// create a response profile with the minimum fields needed (saves some queries on the API server)
+		$responseProfile = new KalturaDetachedResponseProfile();
+		$responseProfile->type = KalturaResponseProfileType::INCLUDE_FIELDS;
+		$responseProfile->fields = 'id,originalId,fileSize,fileRoot,filePath,isDir';
+		
 		for (;;)
 		{
+			self::$kClient->setResponseProfile($responseProfile);
+			
 			// lock file syncs to import
 			$lockResult = $multiCentersPlugin->filesyncImportBatch->lockPendingFileSyncs(
 					$filter, 
@@ -36,6 +43,8 @@ class KAsyncFileSyncImport extends KPeriodicWorker
 					$maxSize);
 			if (!$lockResult->fileSyncs)
 			{
+				// didn't get any file syncs to import, sleep for a sec to avoid excessive
+				// queries on the database
 				sleep(1);
 				continue;
 			}
@@ -87,6 +96,8 @@ class KAsyncFileSyncImport extends KPeriodicWorker
 			// if the limit was not reached, wait for more file syncs to become available
 			if (!$lockResult->limitReached)
 			{
+				// if the limit was not reached, it means that we don't have anything more to do
+				// wait until more file syncs are created
 				sleep(1);
 			}
 		}
@@ -140,6 +151,11 @@ class KAsyncFileSyncImport extends KPeriodicWorker
 	
 		try
 		{
+			$responseProfile = new KalturaDetachedResponseProfile();
+			$responseProfile->type = KalturaResponseProfileType::INCLUDE_FIELDS;
+			$responseProfile->fields = '';		// don't need the response
+			self::$kClient->setResponseProfile($responseProfile);
+				
 			$fileSyncPlugin = KalturaFilesyncClientPlugin::get(self::$kClient);
 			$fileSyncPlugin->fileSync->update($fileSync->id, $updateFileSync);
 		}
