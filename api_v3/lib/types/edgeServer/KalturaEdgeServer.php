@@ -53,7 +53,7 @@ class KalturaEdgeServer extends KalturaObject implements IFilterable
 	 * 
 	 * @var string
 	 */
-	public $desciption;
+	public $description;
 	
 	/**
 	 * @var KalturaEdgeServerStatus
@@ -107,7 +107,7 @@ class KalturaEdgeServer extends KalturaObject implements IFilterable
 		"partnerId",
 		"name",
 		"systemName",
-		"desciption",
+		"description",
 		"status",
 		"tags",
 		"hostName",
