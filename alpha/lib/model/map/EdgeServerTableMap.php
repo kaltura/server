@@ -43,7 +43,7 @@ class EdgeServerTableMap extends TableMap {
 		$this->addColumn('PARTNER_ID', 'PartnerId', 'INTEGER', false, null, null);
 		$this->addColumn('NAME', 'Name', 'VARCHAR', false, 256, null);
 		$this->addColumn('SYSTEM_NAME', 'SystemName', 'VARCHAR', false, 256, null);
-		$this->addColumn('DESCIPTION', 'Desciption', 'VARCHAR', false, 256, null);
+		$this->addColumn('DESCRIPTION', 'Description', 'VARCHAR', false, 256, null);
 		$this->addColumn('STATUS', 'Status', 'INTEGER', false, null, null);
 		$this->addColumn('TYPE', 'Type', 'INTEGER', true, null, 0);
 		$this->addColumn('TAGS', 'Tags', 'LONGVARCHAR', false, null, null);

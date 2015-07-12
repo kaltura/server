@@ -56,10 +56,10 @@ abstract class BaseEdgeServer extends BaseObject  implements Persistent {
 	protected $system_name;
 
 	/**
-	 * The value for the desciption field.
+	 * The value for the description field.
 	 * @var        string
 	 */
-	protected $desciption;
+	protected $description;
 
 	/**
 	 * The value for the status field.
@@ -293,13 +293,13 @@ abstract class BaseEdgeServer extends BaseObject  implements Persistent {
 	}
 
 	/**
-	 * Get the [desciption] column value.
+	 * Get the [description] column value.
 	 * 
 	 * @return     string
 	 */
-	public function getDesciption()
+	public function getDescription()
 	{
-		return $this->desciption;
+		return $this->description;
 	}
 
 	/**
@@ -563,27 +563,27 @@ abstract class BaseEdgeServer extends BaseObject  implements Persistent {
 	} // setSystemName()
 
 	/**
-	 * Set the value of [desciption] column.
+	 * Set the value of [description] column.
 	 * 
 	 * @param      string $v new value
 	 * @return     EdgeServer The current object (for fluent API support)
 	 */
-	public function setDesciption($v)
+	public function setDescription($v)
 	{
-		if(!isset($this->oldColumnsValues[EdgeServerPeer::DESCIPTION]))
-			$this->oldColumnsValues[EdgeServerPeer::DESCIPTION] = $this->desciption;
+		if(!isset($this->oldColumnsValues[EdgeServerPeer::DESCRIPTION]))
+			$this->oldColumnsValues[EdgeServerPeer::DESCRIPTION] = $this->description;
 
 		if ($v !== null) {
 			$v = (string) $v;
 		}
 
-		if ($this->desciption !== $v) {
-			$this->desciption = $v;
-			$this->modifiedColumns[] = EdgeServerPeer::DESCIPTION;
+		if ($this->description !== $v) {
+			$this->description = $v;
+			$this->modifiedColumns[] = EdgeServerPeer::DESCRIPTION;
 		}
 
 		return $this;
-	} // setDesciption()
+	} // setDescription()
 
 	/**
 	 * Set the value of [status] column.
@@ -792,7 +792,7 @@ abstract class BaseEdgeServer extends BaseObject  implements Persistent {
 			$this->partner_id = ($row[$startcol + 3] !== null) ? (int) $row[$startcol + 3] : null;
 			$this->name = ($row[$startcol + 4] !== null) ? (string) $row[$startcol + 4] : null;
 			$this->system_name = ($row[$startcol + 5] !== null) ? (string) $row[$startcol + 5] : null;
-			$this->desciption = ($row[$startcol + 6] !== null) ? (string) $row[$startcol + 6] : null;
+			$this->description = ($row[$startcol + 6] !== null) ? (string) $row[$startcol + 6] : null;
 			$this->status = ($row[$startcol + 7] !== null) ? (int) $row[$startcol + 7] : null;
 			$this->type = ($row[$startcol + 8] !== null) ? (int) $row[$startcol + 8] : null;
 			$this->tags = ($row[$startcol + 9] !== null) ? (string) $row[$startcol + 9] : null;
@@ -1342,7 +1342,7 @@ abstract class BaseEdgeServer extends BaseObject  implements Persistent {
 				return $this->getSystemName();
 				break;
 			case 6:
-				return $this->getDesciption();
+				return $this->getDescription();
 				break;
 			case 7:
 				return $this->getStatus();
@@ -1392,7 +1392,7 @@ abstract class BaseEdgeServer extends BaseObject  implements Persistent {
 			$keys[3] => $this->getPartnerId(),
 			$keys[4] => $this->getName(),
 			$keys[5] => $this->getSystemName(),
-			$keys[6] => $this->getDesciption(),
+			$keys[6] => $this->getDescription(),
 			$keys[7] => $this->getStatus(),
 			$keys[8] => $this->getType(),
 			$keys[9] => $this->getTags(),
@@ -1450,7 +1450,7 @@ abstract class BaseEdgeServer extends BaseObject  implements Persistent {
 				$this->setSystemName($value);
 				break;
 			case 6:
-				$this->setDesciption($value);
+				$this->setDescription($value);
 				break;
 			case 7:
 				$this->setStatus($value);
@@ -1503,7 +1503,7 @@ abstract class BaseEdgeServer extends BaseObject  implements Persistent {
 		if (array_key_exists($keys[3], $arr)) $this->setPartnerId($arr[$keys[3]]);
 		if (array_key_exists($keys[4], $arr)) $this->setName($arr[$keys[4]]);
 		if (array_key_exists($keys[5], $arr)) $this->setSystemName($arr[$keys[5]]);
-		if (array_key_exists($keys[6], $arr)) $this->setDesciption($arr[$keys[6]]);
+		if (array_key_exists($keys[6], $arr)) $this->setDescription($arr[$keys[6]]);
 		if (array_key_exists($keys[7], $arr)) $this->setStatus($arr[$keys[7]]);
 		if (array_key_exists($keys[8], $arr)) $this->setType($arr[$keys[8]]);
 		if (array_key_exists($keys[9], $arr)) $this->setTags($arr[$keys[9]]);
@@ -1528,7 +1528,7 @@ abstract class BaseEdgeServer extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(EdgeServerPeer::PARTNER_ID)) $criteria->add(EdgeServerPeer::PARTNER_ID, $this->partner_id);
 		if ($this->isColumnModified(EdgeServerPeer::NAME)) $criteria->add(EdgeServerPeer::NAME, $this->name);
 		if ($this->isColumnModified(EdgeServerPeer::SYSTEM_NAME)) $criteria->add(EdgeServerPeer::SYSTEM_NAME, $this->system_name);
-		if ($this->isColumnModified(EdgeServerPeer::DESCIPTION)) $criteria->add(EdgeServerPeer::DESCIPTION, $this->desciption);
+		if ($this->isColumnModified(EdgeServerPeer::DESCRIPTION)) $criteria->add(EdgeServerPeer::DESCRIPTION, $this->description);
 		if ($this->isColumnModified(EdgeServerPeer::STATUS)) $criteria->add(EdgeServerPeer::STATUS, $this->status);
 		if ($this->isColumnModified(EdgeServerPeer::TYPE)) $criteria->add(EdgeServerPeer::TYPE, $this->type);
 		if ($this->isColumnModified(EdgeServerPeer::TAGS)) $criteria->add(EdgeServerPeer::TAGS, $this->tags);
@@ -1624,7 +1624,7 @@ abstract class BaseEdgeServer extends BaseObject  implements Persistent {
 
 		$copyObj->setSystemName($this->system_name);
 
-		$copyObj->setDesciption($this->desciption);
+		$copyObj->setDescription($this->description);
 
 		$copyObj->setStatus($this->status);
 
