@@ -106,28 +106,22 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 	{
 		if(!$primaryUrl)
 			return;
-
+	
 		$edgeServerIds = $this->params->getEdgeServerIds();
 		$edgeServers = EdgeServerPeer::retrieveByPKs($edgeServerIds);
-		
+	
 		if(!count($edgeServers))
 			return array(null, null);
-		
-		$token = EdgeServer::EDGE_SERVER_DEFAULT_HOST_NAME_TOKEN;
-		if(preg_match("/:\/\/(.*)/", $this->getUrl(), $matches))
-			$token = $matches[1];
-		
-		$primaryEdge = array_shift($edgeServers);
-		$primaryEdgeResolvedUrl = $primaryEdge->getPlaybackHost($token);
-		$primaryUrl = str_replace($token, $primaryEdgeResolvedUrl, $primaryUrl);
-		
+	
+		$edgeServer = array_shift($edgeServers);
+		$primaryUrl = $edgeServer->buildEdgePlaybackUrl($primaryUrl);
+	
 		if($backupUrl && count($edgeServers))
 		{
-			$backupEdge = array_shift($edgeServers);
-			$backupEdgeResolvedUrl = $backupEdge->getPlaybackHost($token);
-			$backupUrl = str_replace($token, $backupEdgeResolvedUrl, $backupUrl);
+			$edgeServer = array_shift($edgeServers);
+			$backupUrl =  $edgeServer->buildEdgePlaybackUrl($backupUrl);
 		}
-		
+	
 		return array($primaryUrl, $backupUrl);
 	}
 }

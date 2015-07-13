@@ -54,6 +54,8 @@ class Partner extends BasePartner
 	const PARTNER_TYPE_SAKAI = 108;
 	const PARTNER_TYPE_ADMIN_CONSOLE = 109;
 	
+	const CUSTOM_DATA_USAGE_WARNINGS = 'usageWarnings';
+	
 	public static $s_content_root ;
 	
 	const CDN_HOST_WHITE_LIST = 'CDNHostWhiteList';
@@ -1725,4 +1727,27 @@ class Partner extends BasePartner
 		$this->putInCustomData(self::CDN_HOST_WHITE_LIST, serialize($whiteListArr));
 	}
 
+	public function getUsageWarnings() { return $this->getFromCustomData(self::CUSTOM_DATA_USAGE_WARNINGS, null, array()); }
+	public function setUsageWarnings( $v ) { $this->putInCustomData(self::CUSTOM_DATA_USAGE_WARNINGS, $v); }
+
+	public function getUsageWarning($type, $percent){
+		$usageWarnings = $this->getUsageWarnings();
+		$key = $type.'_'.$percent;
+		if(array_key_exists($key, $usageWarnings)){
+			return $usageWarnings[$key];
+		}
+		return null;
+	}
+	
+	public function resetUsageWarning($type, $percent){
+		$usageWarnings = $this->getUsageWarnings();
+		unset($usageWarnings[$type.'_'.$percent]);
+		$this->setUsageWarnings($usageWarnings);
+	}
+	
+	public function setUsageWarning($type, $percent, $value){
+		$usageWarnings = $this->getUsageWarnings();
+		$usageWarnings[$type.'_'.$percent] = $value;
+		$this->setUsageWarnings($usageWarnings);		
+	}
 }

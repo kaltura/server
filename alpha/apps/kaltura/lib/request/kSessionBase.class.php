@@ -43,6 +43,7 @@ class kSessionBase
 	const PRIVILEGE_PREVIEW = "preview";
 	const PRIVILEGE_SESSION_ID = "sessionid";
 	const PRIVILEGE_BATCH_JOB_TYPE = "jobtype";
+	const PRIVILEGE_APP_TOKEN = "apptoken";
 	const PRIVILEGES_DELIMITER = "/";
 
 	const SECRETS_CACHE_PREFIX = 'partner_secrets_ksver_';
@@ -154,6 +155,48 @@ class kSessionBase
 		return true;
 	}
 	
+	public static function buildPrivileges(array $array)
+	{
+		$privileges = array();
+		foreach($array as $privilegeName => $privilegeValue)
+		{
+			if(count($privilegeValue))
+			{
+				$privilegeValue = implode(self::PRIVILEGES_DELIMITER, $privilegeValue);
+				$privileges[] = "$privilegeName:$privilegeValue";
+			}
+			else
+			{
+				$privileges[] = $privilegeName;
+			}
+		}
+		return implode(',', $privileges);
+	}
+	
+	public static function parsePrivileges($str)
+	{
+		$parsedPrivileges = array();
+		$privileges = explode(',', $str);
+		foreach ($privileges as $privilege)
+		{
+			list($privilegeName, $privilegeValue) = strpos($privilege, ":") !== false ? explode(':', $privilege, 2) : array($privilege, null);
+			if (!is_null($privilegeValue) && strlen($privilegeValue))
+			{
+				$privilegeValue = explode(self::PRIVILEGES_DELIMITER, $privilegeValue);
+			}
+			if (!isset($parsedPrivileges[$privilegeName]))
+			{
+				$parsedPrivileges[$privilegeName] = array();
+			}
+			if (is_array($privilegeValue) && count($privilegeValue))
+			{
+				$parsedPrivileges[$privilegeName] = array_merge($parsedPrivileges[$privilegeName], $privilegeValue);
+			}
+		}
+		
+		return $parsedPrivileges;
+	}
+	
 	public function parseKsV1($str)
 	{
 		$explodedStr = explode( "|" , $str , 2 );
@@ -204,26 +247,7 @@ class kSessionBase
 		if(isset($parts[6]))
 			$this->privileges = $parts[6];
 
-		$parsedPrivileges = array();
-		$privileges = explode(',', $this->privileges);
-		foreach ($privileges as $privilege)
-		{
-			list($privilegeName, $privilegeValue) = strpos($privilege, ":") !== false ? explode(':', $privilege, 2) : array($privilege, null);
-			if (!is_null($privilegeValue) && strlen($privilegeValue))
-			{
-				$privilegeValue = explode(self::PRIVILEGES_DELIMITER, $privilegeValue);
-			}
-			if (!isset($parsedPrivileges[$privilegeName]))
-			{
-				$parsedPrivileges[$privilegeName] = array();
-			}
-			if (is_array($privilegeValue) && count($privilegeValue))
-			{
-				$parsedPrivileges[$privilegeName] = array_merge($parsedPrivileges[$privilegeName], $privilegeValue);
-			}
-		}
-		
-		$this->parsedPrivileges = $parsedPrivileges;
+		$this->parsedPrivileges = self::parsePrivileges($this->privileges);
 			
 		if(isset($parts[7]))
 			$this->master_partner_id = $parts[7];
@@ -553,10 +577,15 @@ class kSessionBase
 		return true;
 	}
 
+	public static function buildSessionIdHash($partnerId, $sessionId)
+	{
+		return sha1($partnerId . '_' . $sessionId);
+	}
+
 	public function getSessionIdHash()
 	{
 		if(isset($this->parsedPrivileges[self::PRIVILEGE_SESSION_ID][0])) {
-			return sha1( $this->partner_id . '_' . $this->parsedPrivileges[self::PRIVILEGE_SESSION_ID][0]);
+			return self::buildSessionIdHash($this->partner_id, $this->parsedPrivileges[self::PRIVILEGE_SESSION_ID][0]);
 		}
 		return null;
 	}

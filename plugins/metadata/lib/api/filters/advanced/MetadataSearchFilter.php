@@ -392,17 +392,5 @@ class MetadataSearchFilter extends AdvancedSearchFilterOperator
 		
 		if(isset($attr['operatorType']))
 			$this->type = (int) $attr['operatorType'];
-			
-		foreach($xmlElement->item as $child)
-		{
-			$attr = $child->attributes();
-			if(!isset($attr['type']))
-				continue;
-				
-			$type = (string) $attr['type'];
-			$item = new $type();
-			$item->fillObjectFromXml($child);
-			$this->items[] = $item;
-		}
 	}
 }

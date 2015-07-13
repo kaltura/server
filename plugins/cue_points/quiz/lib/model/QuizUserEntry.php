@@ -41,9 +41,6 @@ class QuizUserEntry extends UserEntry{
 			 * @var QuestionCuePoint $question
 			 */
 			$optionalAnswers = $question->getOptionalAnswers();
-			/**
-			 * @var kOptionalAnswer $chosenAnswer
-			 */
 			foreach ($optionalAnswers as $optionalAnswer)
 			{
 				/**

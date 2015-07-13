@@ -45,7 +45,7 @@ class kFileUtils extends kFile
 		return false;
 	}
 
-	public static function getDumpFileRenderer($filePath, $mimeType, $maxAge = null, $limitFileSize = 0)
+	public static function getDumpFileRenderer($filePath, $mimeType, $maxAge = null, $limitFileSize = 0, $lastModified = null)
 	{
 		self::closeDbConnections();
 		
@@ -55,7 +55,7 @@ class kFileUtils extends kFile
 		if(! file_exists($filePath))
 			KExternalErrors::dieError(KExternalErrors::FILE_NOT_FOUND);
 		
-		return new kRendererDumpFile($filePath, $mimeType, self::xSendFileAllowed($filePath), $maxAge, $limitFileSize);
+		return new kRendererDumpFile($filePath, $mimeType, self::xSendFileAllowed($filePath), $maxAge, $limitFileSize, $lastModified);
 	}
 	
 	public static function dumpFile($file_name, $mime_type = null, $max_age = null, $limit_file_size = 0)

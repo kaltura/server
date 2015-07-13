@@ -793,6 +793,9 @@ class ThumbAssetService extends KalturaAssetService
 		}
 		elseif(! $filter instanceof KalturaThumbAssetFilter)
 		{
+                        if(!is_subclass_of('KalturaThumbAssetFilter', get_class($filter)))
+                            $filter = $filter->cast('KalturaAssetFilter');
+		    
 			$filter = $filter->cast('KalturaThumbAssetFilter');
 		}
 			

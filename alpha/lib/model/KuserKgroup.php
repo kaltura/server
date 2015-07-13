@@ -52,4 +52,8 @@ class KuserKgroup extends BaseKuserKgroup {
 	}
 
 
+	public function getCacheInvalidationKeys()
+	{
+		return array("kuserKgroup:kuserId=".strtolower($this->getKuserId()));
+	}
 } // KuserKgroup
