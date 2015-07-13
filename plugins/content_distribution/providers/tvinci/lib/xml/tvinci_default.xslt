@@ -19,10 +19,11 @@
         <xsl:variable name="prefix-length" select="string-length($prefix)+1"/>
         <xsl:variable name="currNodeName" select="local-name(.)"/>
         <xsl:variable name="suffix" select="substring($currNodeName,$prefix-length)"/>
+        <xsl:variable name="normalized-suffix" select="normalize-space(translate($suffix,'_',' '))"/>
         <xsl:if test="starts-with($currNodeName, $prefix) and (string-length($suffix) >0)">
             <xsl:element name="meta">
                 <xsl:attribute name="name">
-                    <xsl:value-of select="$suffix"/>
+                    <xsl:value-of select="$normalized-suffix"/>
                 </xsl:attribute>
                 <xsl:attribute name="ml_handling">unique</xsl:attribute>
                 <xsl:choose>
@@ -52,10 +53,11 @@
                 <xsl:variable name="prefix-length" select="string-length($prefix)+1"/>
                 <xsl:variable name="currNodeName" select="local-name(.)"/>
                 <xsl:variable name="suffix" select="substring($currNodeName,$prefix-length)"/>
+                <xsl:variable name="normalized-suffix" select="normalize-space(translate($suffix,'_',' '))"/>
                 <xsl:if test="starts-with($currNodeName, $prefix)  and (string-length($suffix) >0)">
                     <xsl:element name="otttag">
                         <xsl:attribute name="name">
-                            <xsl:value-of select="$suffix"/>
+                            <xsl:value-of select="$normalized-suffix"/>
                         </xsl:attribute>
                         <xsl:value-of select="."/>
                     </xsl:element>
