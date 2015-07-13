@@ -1018,6 +1018,10 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	public function getAssetCacheVersion()			{ return $this->getFromCustomData( "assetCacheVersion", null, entry::DEFAULT_ASSETCACHEVERSION ); }
 
 	protected function setAssetCacheVersion( $v )	{ $this->putInCustomData( "assetCacheVersion" , $v ); }
+
+	public function getAssetCacheTime()			{ return $this->getFromCustomData( "assetCacheTime", null, null ); }
+	
+	protected function setAssetCacheTime( $v )	{ $this->putInCustomData( "assetCacheTime" , $v ); }
 	
 	/**
 	 * Increment an internal version counter in order to invalidate cached thumbnails (see getThumbnailUrl())
@@ -1026,6 +1030,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	{
 		$assetCacheVersion = kDataCenterMgr::incrementVersion($this->getAssetCacheVersion());
 		$this->setAssetCacheVersion($assetCacheVersion);
+		$this->setAssetCacheTime(time());
 		return $assetCacheVersion;
 	}
 	
@@ -2989,8 +2994,6 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		
 		$copyObj->setKuserId($this->kuser_id);
 		$copyObj->setName($this->name);
-		$copyObj->setType($this->type);
-		$copyObj->setMediaType($this->media_type);
 		$copyObj->setTags($this->tags);
 		$copyObj->setAnonymous($this->anonymous);
 		$copyObj->setSource($this->source);
@@ -3370,5 +3373,22 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		$capabilities = $this->getFromCustomData(self::CAPABILITIES, null, array());
 		$capabilities[$capability] = $capability;
 		$this->putInCustomData( self::CAPABILITIES, $capabilities);
+	}
+
+	/**
+	 * Sets contents of passed object to values from current object.
+	 *
+	 * If desired, this method can also make copies of all associated (fkey referrers)
+	 * objects.
+	 *
+	 * @param      object $copyObj An object of entry (or compatible) type.
+	 * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
+	 * @throws     PropelException
+	 */
+	public function copyInto($copyObj, $deepCopy = false)
+	{
+		parent::copyInto($copyObj,$deepCopy);
+		$copyObj->setEntitledPusersEdit($this->getEntitledPusersEdit());
+		$copyObj->setEntitledPusersPublish($this->getEntitledPusersPublish());
 	}
 }

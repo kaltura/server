@@ -9,7 +9,6 @@ class KalturaQuizUserEntry extends KalturaUserEntry{
 	/**
 	 * @var int
 	 * @readonly
-	 * @filter order
 	 */
 	public $score;
 

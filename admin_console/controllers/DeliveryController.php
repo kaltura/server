@@ -96,6 +96,18 @@ class DeliveryController extends Zend_Controller_Action
 			$name = $deliveryProfile->id . " : " . $deliveryProfile->name;
 			$options[$deliveryProfile->id] = array("name" => $name, "id" => $deliveryProfile->id);
 		}
+		
+		// sort options by the order passed via dpIds
+		if ($dpIds)
+		{
+		    $sortedOptions = array();
+		
+		    $dpIdsArray = explode(",", $dpIds);
+		    foreach($dpIdsArray as $dpId)
+		        $sortedOptions[] = $options[$dpId];
+		    $options = $sortedOptions;
+		}
+				
 		return $options;
 	}
 	

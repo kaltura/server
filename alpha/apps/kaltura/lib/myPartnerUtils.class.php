@@ -11,6 +11,8 @@ class myPartnerUtils
 	
 	const ALL_PARTNERS_WILD_CHAR = "*";
 	
+	const BLOCKING_DAYS_GRACE = 7;
+	
 	
 	private static $s_current_partner_id = null;
 	private static $s_set_partner_id_policy  = self::PARTNER_SET_POLICY_NONE;
@@ -326,7 +328,11 @@ class myPartnerUtils
 		$partner = PartnerPeer::retrieveByPK( $partner_id );
 		if ($partner && $partner->isInCDNWhiteList($_SERVER['HTTP_HOST']))
 		{
-			$cdnHost = $_SERVER['HTTP_HOST'];
+			$cdnHost = $protocol.'://'.$_SERVER['HTTP_HOST'];
+			if (isset($_SERVER['SERVER_PORT']))
+			{
+				$cdnHost .= ":".$_SERVER['SERVER_PORT'];
+			}
 			return $cdnHost;
 		}
 
@@ -876,6 +882,10 @@ class myPartnerUtils
 	const KALTURA_PAID_PACKAGE_SUGGEST_UPGRADE = 85;
 	const KALTURA_EXTENED_FREE_TRAIL_ENDS_WARNING = 87;
 	
+	const KALTURA_MONTHLY_PACKAGE_EIGHTY_PERCENT_WARNING = 95;
+ 	const KALTURA_MONTHLY_PACKAGE_LIMIT_WARNING_1 = 96;
+ 	const KALTURA_MONTHLY_PACKAGE_LIMIT_WARNING_2 = 97;
+	
 	const IS_FREE_PACKAGE_PLACE_HOLDER = "{IS_FREE_PACKAGE}";
 	
 	
@@ -906,6 +916,29 @@ class myPartnerUtils
         $totalUsage = ($totalStorage*1024) + $totalTraffic; // (MB*1024 => KB) + KB
 
         return array( $totalStorage , $totalUsage , $totalTraffic );
+    }
+
+	private static function collectPartnerMonthlyStatisticsFromDWH($partner, $report_date)
+    {
+        $totalTranscoding = 0;
+        $totalBandwith = 0;
+        $totalStorage = 0;
+        
+        $fromDate = dateUtils::firstDayOfMonth($report_date);
+
+		$reportFilter = new reportsInputFilter();
+		$reportFilter->from_day = str_replace('-','',$fromDate);
+		$reportFilter->to_day = str_replace('-','',$report_date);		
+		list($header, $data) = myReportsMgr::getTotal($partner->getId(), myReportsMgr::REPORT_TYPE_PARTNER_USAGE, $reportFilter);
+
+		$bandwidth_consumption = array_search('bandwidth_consumption', $header);
+		$deleted_storage = array_search('deleted_storage', $header);
+		$added_storage = array_search('deleted_storage', $header);
+		$transcoding_consumption = array_search('transcoding_consumption', $header);	
+		$totalBandwith = $data[$bandwidth_consumption]*1024; //KB
+		$totalTranscoding = $data[$transcoding_consumption]*1024; //KB
+		$totalStorage = $data[$added_storage]*1024 - $data[$deleted_storage]*1024; //KB
+        return array( $totalStorage , $totalBandwith , $totalTranscoding );
     }
     
     /**
@@ -1026,8 +1059,7 @@ class myPartnerUtils
 		
 		$should_block_delete_partner = true;
 		
-		$blocking_days_grace = 7;
-		$block_notification_grace = time() - (dateUtils::DAY * $blocking_days_grace);
+		$block_notification_grace = time() - (dateUtils::DAY * self::BLOCKING_DAYS_GRACE);
 		$delete_grace = time() -  (dateUtils::DAY * 30);
 		
 		$packages = new PartnerPackages();
@@ -1098,7 +1130,7 @@ class myPartnerUtils
 				$partner->getUsageLimitWarning() > $delete_grace &&
 				$partner->getStatus() != Partner::PARTNER_STATUS_CONTENT_BLOCK)
 		{
-			KalturaLog::debug("partner ". $partner->getId() ." reached 100% $blocking_days_grace days ago - sending block email and blocking partner");
+			KalturaLog::debug("partner ". $partner->getId() ." reached 100% ".self::BLOCKING_DAYS_GRACE ." days ago - sending block email and blocking partner");
 				
 			/* send block email and block partner */
 			$body_params = array ( $partner->getAdminName(), $mindtouch_notice, round($totalUsageGB, 2), $email_link_hash );
@@ -1143,7 +1175,134 @@ class myPartnerUtils
 		}
 		$partner->save();		
 	}
+
+	public static function doMonthlyPartnerUsage(Partner $partner)
+	{
+		KalturaLog::debug("Validating partner [" . $partner->getId() . "]");
 		
+		$packages = new PartnerPackages();
+		$partnerPackage = $packages->getPackageDetails($partner->getPartnerPackage());
+		if($partnerPackage[PartnerPackages::PACKAGE_CYCLE_FEE] != 0){
+			KalturaLog::debug("Partner has paid package, skipping validation [" . $partner->getId() . "]");
+			return;
+		}
+				
+		$block_notification_grace = time() - (dateUtils::DAY * self::BLOCKING_DAYS_GRACE);
+		$delete_grace = time() -  (dateUtils::DAY * 30);
+		
+		$report_date = dateUtils::todayOffset(-1);
+
+		list ( $monthlyStorage, $monthlyTraffic, $monthlyTranscoding ) = myPartnerUtils::collectPartnerMonthlyStatisticsFromDWH($partner, $report_date);
+
+		$email_link_hash = 'pid='.$partner->getId().'&h='.(self::getEmailLinkHash($partner->getId(), $partner->getSecret()));
+		
+		self::validatePartnerMonthlyUsagePerType($partner, $partnerPackage, $monthlyStorage, PartnerPackages::PACKAGE_STORAGE_USAGE, $report_date, $block_notification_grace, $delete_grace, $email_link_hash);
+		self::validatePartnerMonthlyUsagePerType($partner, $partnerPackage, $monthlyTraffic, PartnerPackages::PACKAGE_TRAFFIC_USAGE, $report_date, $block_notification_grace, $delete_grace, $email_link_hash);
+		self::validatePartnerMonthlyUsagePerType($partner, $partnerPackage, $monthlyTranscoding, PartnerPackages::PACKAGE_TRANSCODING_USAGE, $report_date, $block_notification_grace, $delete_grace, $email_link_hash);
+		
+		$partner->save();		
+	}
+	
+	private static function validatePartnerMonthlyUsagePerType($partner, $partnerPackage, $usage, $usageType, $report_date, $block_notification_grace, $delete_grace, $email_link_hash)
+	{
+		if(!array_key_exists($usageType, $partnerPackage)){
+			return;
+		}
+		
+		$usageGB = $usage/1024/1024; // from KB to GB
+		$percent = round( ($usageGB / $partnerPackage[$usageType])*100, 2);
+		$notificationId = 0;
+		
+		KalturaLog::debug("percent (".$partner->getId().") is: $percent for usage type $usageType");
+				
+		//check if partner should be deleted
+		if($partner->getStatus() == Partner::PARTNER_STATUS_CONTENT_BLOCK )
+		{
+			$warning_100 = $partner->getUsageWarning($usageType, 100);
+			if($warning_100 > 0 && $warning_100 <= $delete_grace)
+			{
+				KalturaLog::debug("partner ". $partner->getId() ." reached 100% a month ago - deleting partner");
+					
+				/* delete partner */
+				$notificationId = myPartnerUtils::KALTURA_DELETE_ACCOUNT;
+				$partner->setStatus(Partner::PARTNER_STATUS_DELETED);				
+			}
+		}
+		else
+		{
+			self::resetMonthlyUsageWarningIfNotRelevant($partner, $usageType, $percent, $report_date);
+		
+			$warning_80 = $partner->getUsageWarning($usageType, 80);
+			$warning_100 = $partner->getUsageWarning($usageType, 100);
+			
+			if($percent >= 80 && $percent < 100 && !$warning_80) //send 80% usage warning
+			{
+				KalturaLog::debug("partner ". $partner->getId() ." reached 80% - setting first warning for usage ". $usageType);
+				$partner->setUsageWarning($usageType, 80, time());
+				$partner->resetUsageWarning($usageType, 100);
+				$notificationId = myPartnerUtils::KALTURA_MONTHLY_PACKAGE_EIGHTY_PERCENT_WARNING;				
+			}
+			elseif ($percent >= 80 && $percent < 100 && $warning_80 && !$warning_100)
+			{
+				KalturaLog::debug("passed the 80%, assume notification sent, nothing to do.");
+			}
+			elseif ($percent >= 100 && !$warning_100) // send 100% usage warning
+			{
+				KalturaLog::debug("partner ". $partner->getId() ." reached 100% - setting second warning for usage ". $usageType);
+				$partner->setUsageWarning($usageType, 100, time());
+				$notificationId = myPartnerUtils::KALTURA_MONTHLY_PACKAGE_LIMIT_WARNING_1;
+			}
+			elseif ($percent >= 100 && $warning_100 > 0 && $warning_100 <= $block_notification_grace && $warning_100 > $delete_grace)
+			{
+				KalturaLog::debug("partner ". $partner->getId() ." reached 100% ". self::BLOCKING_DAYS_GRACE ." days ago - sending block email and blocking partner");				
+				/* send block email and block partner */
+				$notificationId = myPartnerUtils::KALTURA_MONTHLY_PACKAGE_LIMIT_WARNING_2;			
+				$partner->setStatus(Partner::PARTNER_STATUS_CONTENT_BLOCK);
+			}
+		}
+		if($notificationId)
+		{
+			$body_params = array();
+			$usageText = PartnerPackages::getPackageUsageText($usageType);
+			switch($notificationId){
+				case myPartnerUtils::KALTURA_MONTHLY_PACKAGE_EIGHTY_PERCENT_WARNING:
+					$body_params = array ( $partner->getAdminName(), $partnerPackage[$usageType], $usageText, round($usageGB, 2), $email_link_hash );
+					break;
+				case myPartnerUtils::KALTURA_MONTHLY_PACKAGE_LIMIT_WARNING_1:
+					$body_params = array ( $partner->getAdminName(), $partnerPackage[$usageType], $usageText, round($usageGB, 2), $email_link_hash );
+					break;
+				case myPartnerUtils::KALTURA_MONTHLY_PACKAGE_LIMIT_WARNING_2:
+					$body_params = array ( $partner->getAdminName(), $partnerPackage[$usageType], $usageText, round($usageGB, 2), $email_link_hash );
+					break;
+				case myPartnerUtils::KALTURA_DELETE_ACCOUNT:
+					$body_params = array ( $partner->getAdminName() );
+					break;
+			}
+			myPartnerUtils::notifiyPartner($notificationId, $partner, $body_params);
+		}					
+	}
+	
+	private static function resetMonthlyUsageWarningIfNotRelevant($partner, $usageType, $percent, $report_date)
+	{
+		$warning_80 = $partner->getUsageWarning($usageType, 80);
+		$warning_100 = $partner->getUsageWarning($usageType, 100);
+		if($warning_100 || $warning_80)
+		{
+			$isCurrent = true;
+			$warningMonth = $warning_80 ? date("m", $warning_80) : date("m", $warning_100);
+			$dateObj = new DateTime($report_date);
+			$reportMonth = date("m", $dateObj->getTimestamp());
+			$isCurrent = ($warningMonth == $reportMonth);
+		
+			if($percent < 80 || !$isCurrent )
+			{
+				KalturaLog::debug("Reseting partner ". $partner->getId() ." warnings for usage ". $usageType);		
+				$partner->resetUsageWarning($usageType, 80);
+				$partner->resetUsageWarning($usageType, 100);			
+			}			
+		}
+	}
+	
 	public static function getParnerWidgetStatisticsFromDWH($partnerId, $startDate, $endDate) {
 		$reportFilter = new reportsInputFilter();
 		

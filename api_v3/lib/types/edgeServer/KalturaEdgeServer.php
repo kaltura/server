@@ -134,7 +134,6 @@ class KalturaEdgeServer extends KalturaObject implements IFilterable
 			
 		return parent::toInsertableObject($object_to_fill, $props_to_skip);
 	}
-	
 
 	/* (non-PHPdoc)
 	 * @see KalturaObject::validateForInsert()
@@ -160,10 +159,9 @@ class KalturaEdgeServer extends KalturaObject implements IFilterable
 	
 	public function validateMandatoryAttributes($isInsert = false)
 	{
-		if($isInsert)
-			$this->validatePropertyNotNull("hostName");
+		$this->validatePropertyMinLength("hostName", 1, !$isInsert);
 		
-		$this->validatePropertyMinLength("name", 1, true);
+		$this->validatePropertyMinLength("name", 1, !$isInsert);
 	}
 	
 	public function validateDuplications($edgeId = null)
@@ -194,7 +192,7 @@ class KalturaEdgeServer extends KalturaObject implements IFilterable
 		$c = KalturaCriteria::create(EdgeServerPeer::OM_CLASS);
 	
 		if($edgeId)
-			$c->add(EdgeServerPeer::ID, $sourceObject->getId(), Criteria::NOT_EQUAL);
+			$c->add(EdgeServerPeer::ID, $edgeId, Criteria::NOT_EQUAL);
 	
 		$c->add(EdgeServerPeer::SYSTEM_NAME, $this->systemName);
 		$c->add(EdgeServerPeer::STATUS, array(EdgeServerStatus::ACTIVE, EdgeServerStatus::DISABLED), Criteria::IN);

@@ -252,12 +252,14 @@ class KSecureEntryHelper
 
 	public function updateDeliveryAttributes(DeliveryProfileDynamicAttributes $deliveryAttributes)
 	{
-		$actionList = $this->getActionList(RuleActionType::LIMIT_DELIVERY_PROFILES);
-		if ($actionList)
+		foreach ($this->actionLists as $actionList)
 		{
-			// take only the first LIMIT_DELIVERY_PROFILES action
-			$action = reset($actionList);
-			$deliveryAttributes->setDeliveryProfileIds($action->getDeliveryProfileIds(), $action->getIsBlockedList());
+			// take only the first action of each type
+			foreach ($actionList as $action)
+			{
+				if($action->applyDeliveryProfileDynamicAttributes($deliveryAttributes))
+					break;
+			}	
 		}
 	}
 	
@@ -413,5 +415,17 @@ class KSecureEntryHelper
 	public function getContextResult()
 	{
 		return $this->contextResult;
+	}
+	
+	public function validateForServe($asset)
+	{
+		if (!$this->isFlavorParamsAllowed($asset->getFlavorParamsId()))
+		{
+			KExternalErrors::dieError(KExternalErrors::ACCESS_CONTROL_RESTRICTED);
+		}
+		if ($this->shouldBlock())
+		{
+			KExternalErrors::dieError(KExternalErrors::ACCESS_CONTROL_RESTRICTED);
+		}
 	}
 }

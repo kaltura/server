@@ -209,7 +209,9 @@ class CrossKalturaDistributionEngine extends DistributionEngine implements
 	{
 	    KalturaLog::debug('Getting source entry objects');
 	    $sourceEntryId = $data->entryDistribution->entryId;
-	    $sourceObjects = $this->getEntryObjects($this->sourceClient, $sourceEntryId, $data);	    
+		KBatchBase::impersonate($this->distributionProfile->partnerId);
+		$sourceObjects = $this->getEntryObjects(KBatchBase::$kClient, $sourceEntryId, $data);
+		KBatchBase::unimpersonate();
 	    return $sourceObjects;   
 	}
 	

@@ -21,7 +21,7 @@ class KalturaQuestionCuePoint extends KalturaCuePoint
 
 	/**
 	 * @var string
-	 * @filter like,mlikeor,mlikeand,order
+	 * @filter like,mlikeor,mlikeand
 	 */
 	public $question;
 

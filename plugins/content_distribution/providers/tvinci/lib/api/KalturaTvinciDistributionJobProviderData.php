@@ -20,8 +20,6 @@ class KalturaTvinciDistributionJobProviderData extends KalturaConfigurableDistri
 		if(!($distributionJobData->distributionProfile instanceof KalturaTvinciDistributionProfile))
 			return;
 
-		$fieldValues = unserialize($this->fieldValues);
-
 		$entry = null;
 		if ( $distributionJobData->entryDistribution->entryId )
 		{
@@ -33,12 +31,13 @@ class KalturaTvinciDistributionJobProviderData extends KalturaConfigurableDistri
 			return;
 		}
 
-		$feedHelper = new TvinciDistributionFeedHelper($distributionJobData->distributionProfile, $fieldValues);
+		$feedHelper = new TvinciDistributionFeedHelper($distributionJobData->distributionProfile);
 		$feedHelper->setEntryId( $entry->getId() );
+		$feedHelper->setReferenceId($entry->getReferenceID());
 		$feedHelper->setCreatedAt( $entry->getCreatedAtAsInt() );
-
-		$broadcasterName = 'Kaltura-' . $entry->getPartnerId();
-		$feedHelper->setBroadcasterName( $broadcasterName );
+		$feedHelper->setDescription( $entry->getDescription() );
+		$feedHelper->setTitleName( $entry->getName() );
+		$feedHelper->setSunrise($distributionJobData->entryDistribution->sunrise);
 
 		$thumbAssets = assetPeer::retrieveByIds(explode(',', $distributionJobData->entryDistribution->thumbAssetIds));
 		$picRatios = array();
@@ -67,9 +66,18 @@ class KalturaTvinciDistributionJobProviderData extends KalturaConfigurableDistri
 			$defaultThumbUrl = $picRatios[0]['url'];
 		}
 
-		$feedHelper->setDefaultThumbnailUrl( $defaultThumbUrl ); 
+		$feedHelper->setDefaultThumbnailUrl( $defaultThumbUrl );
 
 		$this->initPlayManifestUrls( $entry, $feedHelper );
+
+		$metadatas = MetadataPeer::retrieveAllByObject(MetadataObjectType::ENTRY, $distributionJobData->entryDistribution->entryId);
+		$fullMetadataXML='';
+		foreach($metadatas as $metadataField) {
+			$syncKey = $metadataField->getSyncKey(Metadata::FILE_SYNC_METADATA_DATA);
+			$currMetaXML = kFileSyncUtils::file_get_contents($syncKey, true, false);
+			$fullMetadataXML.=$currMetaXML;
+		}
+		$feedHelper->setMetasXML($fullMetadataXML);
 
 		if ($distributionJobData instanceof KalturaDistributionSubmitJobData)
 		{
@@ -83,40 +91,17 @@ class KalturaTvinciDistributionJobProviderData extends KalturaConfigurableDistri
 		{
 			$this->xml = $feedHelper->buildDeleteFeed();
 		}
+		KalturaLog::debug("XML Constructed by the Tvinci feed helper :{$this->xml}");
+
 	}
 
 	private function initPlayManifestUrls($entry, $feedHelper)
 	{
-		$videoAssetDataMap = array();
-
-		// If the following field is defined, it will override the below hardcoded defaults
-		$videoAssetConfigLines = $feedHelper->getSafeFieldValue(TvinciDistributionField::VIDEO_ASSETS_CONFIGURATION, null);
-		if ( $videoAssetConfigLines )
-		{
-			// The format is a comma separated array of these compounds: "name:protocol:tag:ext"
-			// E.g.: "name:protocol:tag:ext,name:protocol:tag:ext,name:protocol:tag:ext"
-			$configLines = explode(',', $videoAssetConfigLines);
-			foreach ( $configLines as $configLine )
-			{
-				$vad = explode(':', $configLine);
-				$videoAssetDataMap[] = array($vad[0], $vad[1], $vad[2], $vad[3]);
-			}
-		}
-		elseif ( $feedHelper->schemaId() == 1 )
-		{
-			$videoAssetDataMap = array(
-					array( 'Main',						PlaybackProtocol::AKAMAI_HDS,	'mbr',		'a4m' ),
-					array( 'Tablet Main',				PlaybackProtocol::APPLE_HTTP,	'ipad',		'm3u8' ),
-					array( 'Smartphone Main',			PlaybackProtocol::APPLE_HTTP,	'iphone',	'm3u8' ),
-				);
-		}
-		elseif ( $feedHelper->schemaId() == 2 ) {
-			$videoAssetDataMap = array(
-					array( 'Mobile Devices Trailer',	PlaybackProtocol::APPLE_HTTP,	'ipad',		'm3u8' ),
-					array( 'Mobile Devices Main SD',	PlaybackProtocol::APPLE_HTTP,	'ipad',		'm3u8' ),
-					array( 'Mobile Devices Main HD',	PlaybackProtocol::APPLE_HTTP,	'ipad',		'm3u8' ),
-				);
-		}
+		$videoAssetDataMap = array(
+			array( 'Main',						PlaybackProtocol::AKAMAI_HDS,	'mbr',		'a4m' ),
+			array( 'Tablet Main',				PlaybackProtocol::APPLE_HTTP,	'ipad',		'm3u8' ),
+			array( 'Smartphone Main',			PlaybackProtocol::APPLE_HTTP,	'iphone',	'm3u8' ),
+		);
 
 		// Loop and build the file nodes
 		foreach ( $videoAssetDataMap as $videoAssetData )
@@ -125,9 +110,9 @@ class KalturaTvinciDistributionJobProviderData extends KalturaConfigurableDistri
 			$playbackProtocol = $videoAssetData[1];
 			$tag = $videoAssetData[2];
 			$fileExt = $videoAssetData[3];
-
+			$fileCoGuid = "{$entry->getIntId()}{$entry->getFlavorParamsIds}";
 			$url = $this->getPlayManifestUrl($entry, $playbackProtocol, $tag, $fileExt);
-			$feedHelper->setVideoAssetUrl( $tvinciAssetName, $url );
+			$feedHelper->setVideoAssetData( $tvinciAssetName, $url,$fileCoGuid );
 		}
 	}
 

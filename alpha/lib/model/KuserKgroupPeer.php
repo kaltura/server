@@ -119,4 +119,8 @@ class KuserKgroupPeer extends BaseKuserKgroupPeer implements IRelatedObjectPeer
 		return false;
 	}
 
+	public static function getCacheInvalidationKeys()
+	{
+		return array(array("kuserKgroup:kuserId=%s", self::KUSER_ID));		
+	}
 } // KuserKgroupPeer

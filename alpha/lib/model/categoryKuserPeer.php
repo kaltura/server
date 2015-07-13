@@ -214,4 +214,8 @@ class categoryKuserPeer extends BasecategoryKuserPeer {
 		self::$s_criteria_filter->setFilter($c);
 	}
 	
+	public static function getCacheInvalidationKeys()
+	{
+		return array(array("categoryKuser:categoryId=%s", self::CATEGORY_ID));		
+	}
 } // categoryKuserPeer

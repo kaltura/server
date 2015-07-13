@@ -92,7 +92,6 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 	 */
 	public static function loadObject($baseClass, $enumValue, array $constructorArgs = null)
 	{
-		KalturaLog::debug("@@NA here1");
 		if($baseClass == 'KalturaCuePoint') {
 			if ( $enumValue == self::getCuePointTypeCoreValue(QuizCuePointType::QUIZ_QUESTION))
 				return new KalturaQuestionCuePoint();
@@ -115,14 +114,13 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 	 */
 	public static function getObjectClass($baseClass, $enumValue)
 	{
-		KalturaLog::debug("@@NA here2");
 		if($baseClass == 'CuePoint') {
 			if ($enumValue == self::getCuePointTypeCoreValue(QuizCuePointType::QUIZ_QUESTION))
 				return 'QuestionCuePoint';
 			if ($enumValue == self::getCuePointTypeCoreValue(QuizCuePointType::QUIZ_ANSWER))
 				return 'AnswerCuePoint';
 		}
-		if ( ($baseClass == UserEntryPeer::OM_CLASS) && ($enumValue == self::getCoreValue('UserEntryType' , QuizUserEntryType::QUIZ)) )
+		if ($baseClass == 'UserEntry' && $enumValue == self::getCoreValue('UserEntryType' , QuizUserEntryType::QUIZ))
 		{
 			return QuizUserEntry::QUIZ_OM_CLASS;
 		}

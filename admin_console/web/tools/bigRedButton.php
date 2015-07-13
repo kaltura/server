@@ -297,7 +297,7 @@ $html5Version = $_GET['playerVersion'];
 			<td><div id="current_system_time">&nbsp;</div></td>
 		</tr>
 		<tr>
-			<td>Last CuePoint time</td>
+			<td>Last sync point time</td>
 			<td><div id="last_cue_point_time">&nbsp;</div></td>
 		</tr>
 		<tr>

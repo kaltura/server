@@ -387,6 +387,13 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 	 */
 	public function execSphinx($sql, IIndexable $object)
 	{
+		$disabledPartnerIds = kConf::get('disable_sphinx_indexing_partners', 'local', array());
+		if (in_array($object->getPartnerId(), $disabledPartnerIds))
+		{
+			KalturaLog::log('skipping sphinx update for partner ' . $object->getPartnerId());
+			return;
+		}
+		
 		// limit the number of large sphinx SQLs to 1/min per object, since they load the sphinx database
 		// and sphinx servers. the upper limit of 'slightly less than 1MB' is because of the max_allowed_packet 
 		// limit in mysql (by default 1MB). the upper limit is here to prevent the addition of too many category 

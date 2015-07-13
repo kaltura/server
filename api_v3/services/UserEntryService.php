@@ -22,11 +22,6 @@ class UserEntryService extends KalturaBaseService {
 	public function addAction(KalturaUserEntry $userEntry)
 	{
 		$dbUserEntry = $userEntry->toInsertableObject(null, array('type'));
-		$userId = $userEntry->userId;
-		if ($userId == 0)
-		{
-			$userId = kCurrentContext::$ks_kuser;
-		}
 		$dbUserEntry->save();
 
 		$userEntry->fromObject($dbUserEntry, $this->getResponseProfile());
