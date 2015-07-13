@@ -14,10 +14,9 @@ class KalturaTvinciDistributionJobProviderData extends KalturaConfigurableDistri
 	{
 		parent::__construct($distributionJobData);
 
-		if(!$distributionJobData)
-			return;
-
-		if(!($distributionJobData->distributionProfile instanceof KalturaTvinciDistributionProfile))
+		if( (!$distributionJobData) ||
+			(!($distributionJobData->distributionProfile instanceof KalturaTvinciDistributionProfile)) ||
+			(! $distributionJobData->entryDistribution) )
 			return;
 
 		$entry = null;
@@ -104,6 +103,12 @@ class KalturaTvinciDistributionJobProviderData extends KalturaConfigurableDistri
 		);
 	}
 
+	private static function createFileCoGuid($entryId, $flavorParamsId)
+	{
+		return "{$entryId}_{$flavorParamsId}";
+	}
+
+
 	private function createPlayManifestURLs(KalturaEntryDistribution $entryDistribution, entry $entry, TvinciDistributionFeedHelper $feedHelper)
 	{
 		$distributionFlavorAssets  = assetPeer::retrieveByIds(explode(',', $entryDistribution->flavorAssetIds));
@@ -123,7 +128,7 @@ class KalturaTvinciDistributionJobProviderData extends KalturaConfigurableDistri
 					if ($distributionFlavorAsset->isLocalReadyStatus() &&
 						$distributionFlavorAsset->hasTag($tag) )
 					{
-						$keys[] = "{$entry->getEntryId()}_{$distributionFlavorAsset->getFlavorParamsId()}";
+						$keys[] = $this->createFileCoGuid($entry->getEntryId(),$distributionFlavorAsset->getFlavorParamsId());
 						if (!in_array($tag, $relevantTags))
 						{
 							$relevantTags[] = $tag;
