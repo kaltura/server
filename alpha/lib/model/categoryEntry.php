@@ -13,7 +13,8 @@
  * @package Core
  * @subpackage model
  */
-class categoryEntry extends BasecategoryEntry {
+class categoryEntry extends BasecategoryEntry implements IBaseObject
+{
 	
 	/* (non-PHPdoc)
 	 * @see lib/model/om/Basecategory#preSave()

@@ -13,6 +13,6 @@
  * @package plugins.drm
  * @subpackage model
  */
-class DrmKey extends BaseDrmKey {
+class DrmKey extends BaseDrmKey implements IBaseObject {
 
 } // DrmKey

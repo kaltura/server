@@ -13,6 +13,6 @@
  * @package plugins.businessProcessNotification
  * @subpackage model
  */
-abstract class BusinessProcessServer extends BaseBusinessProcessServer {
+abstract class BusinessProcessServer extends BaseBusinessProcessServer implements IBaseObject {
 
 } // BusinessProcessServer

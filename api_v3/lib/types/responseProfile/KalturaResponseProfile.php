@@ -53,6 +53,12 @@ class KalturaResponseProfile extends KalturaDetachedResponseProfile implements I
 	 */
 	public $status;
 	
+	/**
+	 * @var int
+	 * @readonly
+	 */
+	public $version;
+	
 	
 	public function __construct(ResponseProfile $responseProfile = null)
 	{
@@ -69,6 +75,7 @@ class KalturaResponseProfile extends KalturaDetachedResponseProfile implements I
 		'createdAt',
 		'updatedAt',
 		'status',
+		'version',
 	);
 	
 	/* (non-PHPdoc)
@@ -106,29 +113,7 @@ class KalturaResponseProfile extends KalturaDetachedResponseProfile implements I
 			$object = new ResponseProfile();
 		}
 		
-		if($this->filter)
-		{
-			$object->setFilterApiClassName(get_class($this->filter));
-			$object->setFilter($this->filter->toObject());
-		}
-		
 		return parent::toObject($object, $propertiesToSkip);
-	}
-	
-	/* (non-PHPdoc)
-	 * @see KalturaObject::fromObject($srcObj, $responseProfile)
-	 */
-	public function doFromObject($srcObj, KalturaDetachedResponseProfile $responseProfile = null)
-	{
-		/* @var $srcObj ResponseProfile */
-		parent::doFromObject($srcObj, $responseProfile);
-		
-		if($srcObj->getFilter() && $this->shouldGet('filter', $responseProfile))
-		{
-			$filterApiClassName = $srcObj->getFilterApiClassName();
-			$this->filter = new $filterApiClassName();
-			$this->filter->fromObject($srcObj->getFilter());
-		}
 	}
 	
 	/* (non-PHPdoc)
@@ -145,5 +130,13 @@ class KalturaResponseProfile extends KalturaDetachedResponseProfile implements I
 	public function getFilterDocs()
 	{
 		return array();
+	}
+	
+	/* (non-PHPdoc)
+	 * @see KalturaDetachedResponseProfile::getKey()
+	 */
+	public function getKey()
+	{
+		return "{$this->id}_{$this->version}";
 	}
 }

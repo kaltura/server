@@ -11,42 +11,42 @@ class kResponseProfile implements IResponseProfile
 	 * 
 	 * @var string
 	 */
-	private $name;
+	protected $name;
 	
 	/**
 	 * @var ResponseProfileType
 	 */
-	private $type;
+	protected $type;
 	
 	/**
 	 * @var array
 	 */
-	private $fields;
+	protected $fields;
 	
 	/**
 	 * @var baseObjectFilter
 	 */
-	private $filter;
+	protected $filter;
 	
 	/**
 	 * @var string
 	 */
-	private $filterApiClassName;
+	protected $filterApiClassName;
 	
 	/**
 	 * @var kFilterPager
 	 */
-	private $pager;
+	protected $pager;
 	
 	/**
 	 * @var array<IResponseProfile>
 	 */
-	private $relatedProfiles;
+	protected $relatedProfiles;
 	
 	/**
 	 * @var array<kResponseProfileMapping>
 	 */
-	private $mappings;
+	protected $mappings;
 	
 	/* (non-PHPdoc)
 	 * @see IResponseProfile::getMappings()
