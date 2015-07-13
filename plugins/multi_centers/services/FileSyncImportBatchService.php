@@ -214,7 +214,7 @@ class FileSyncImportBatchService extends KalturaBatchService
 			if ($createdAtLessThanOrEqual)
 			{
 				$firstFileSync = reset($fileSyncs);
-				$lastId = $firstFileSync->getId();
+				$prevLastId = $firstFileSync->getId();
 				
 				foreach ($fileSyncs as $index => $fileSync)
 				{
@@ -222,10 +222,15 @@ class FileSyncImportBatchService extends KalturaBatchService
 					{
 						$done = true;
 						unset($fileSyncs[$index]);
+						if (!is_null($prevLastId))
+						{
+							$lastId = $prevLastId;
+							$prevLastId = null;
+						}
 					}
 					else
 					{
-						$lastId = $fileSync->getId();
+						$prevLastId = $fileSync->getId();
 					}
 				}
 				

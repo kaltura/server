@@ -1,5 +1,7 @@
 <?php
 
+fclose(STDOUT);		// hide the log messages written to stdout
+
 require_once(dirname(__FILE__).'/../bootstrap.php');
 
 define('MAX_FILESYNC_ID_PREFIX', 'fileSyncMaxId-dc');
