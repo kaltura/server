@@ -1,5 +1,5 @@
 /*Table structure for table `access_control` */
-
+SET GLOBAL sql_mode = '';
 CREATE TABLE IF NOT EXISTS `access_control` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `partner_id` int(11) NOT NULL,
@@ -2419,7 +2419,7 @@ CREATE TABLE `edge_server`
 	PRIMARY KEY (`id`),
 	KEY partner_id_status_system_name(`partner_id`, `status`, `system_name`),
 	KEY host_name(`host_name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
 
 CREATE TABLE `user_entry`
 (
@@ -2434,4 +2434,25 @@ CREATE TABLE `user_entry`
 	`custom_data` TEXT,
 	PRIMARY KEY (`id`),
 	KEY (`entry_id`, `kuser_id`)
-)Type=InnoDB COMMENT='Describes the relationship between a specific user and a specific entry';
+)ENGINE=InnoDB COMMENT='Describes the relationship between a specific user and a specific entry';
+
+
+CREATE TABLE app_token
+(
+	id VARCHAR(20)  NOT NULL,
+	int_id INTEGER  NOT NULL AUTO_INCREMENT,
+	partner_id INTEGER,
+	created_at DATETIME,
+	updated_at DATETIME,
+	deleted_at DATETIME,
+	STATUS INTEGER,
+	expiry INTEGER,
+	session_type INTEGER,
+	session_user_id VARCHAR(100),
+	session_duration INTEGER,
+	session_privileges TEXT,
+	token TEXT,
+	custom_data TEXT,
+	PRIMARY KEY (id),
+	KEY int_id_index (int_id)
+)ENGINE=INNODB DEFAULT CHARSET=utf8;

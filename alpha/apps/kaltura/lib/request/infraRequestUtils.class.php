@@ -11,6 +11,8 @@ class infraRequestUtils
 {
 	const PROTOCOL_HTTP = 'http';
 	const PROTOCOL_HTTPS = 'https';
+
+	const DEFAULT_HTTP_TIME = 'Sun, 19 Nov 2000 08:52:00 GMT';
 	
 	protected static $isInGetRemoteAddress = false;
 	protected static $remoteAddress = null;
@@ -100,6 +102,15 @@ class infraRequestUtils
 		
 		return array($start, $end, $length);
 	}
+		
+	public static function formatHttpTime($time)
+	{
+		if (!$time)
+		{
+			return self::DEFAULT_HTTP_TIME;
+		}
+		return gmdate('D, d M Y H:i:s', $time) . ' GMT';
+	}
 
 	public static function sendCachingHeaders($max_age = 864000, $private = false, $last_modified = null)
 	{
@@ -108,15 +119,12 @@ class infraRequestUtils
 			// added max-stale=0 to fight evil proxies
 			$cache_scope = $private ? "private" : "public";
 			header("Cache-Control: $cache_scope, max-age=$max_age, max-stale=0");
-			header('Expires: ' . gmdate('D, d M Y H:i:s', time() + $max_age) . ' GMT');
-			if ($last_modified)
-				header('Last-modified: ' . gmdate('D, d M Y H:i:s', $last_modified) . ' GMT');
-			else
-				header('Last-Modified: Sun, 19 Nov 2000 08:52:00 GMT');
+			header('Expires: ' . self::formatHttpTime(time() + $max_age));
+			header('Last-modified: ' . self::formatHttpTime($last_modified));
 		}
 		else
 		{
-			header("Expires: Sun, 19 Nov 2000 08:52:00 GMT");
+			header("Expires: " . self::DEFAULT_HTTP_TIME);
 			header("Cache-Control: no-store, no-cache, must-revalidate, post-check=0, pre-check=0");
 			header("Pragma: no-cache" );
 		}

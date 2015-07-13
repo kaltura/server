@@ -95,4 +95,15 @@ class KalturaCategoryFilter extends KalturaCategoryBaseFilter
 		$response->totalCount = $totalCount;
 		return $response;
 	}
+
+	/* (non-PHPdoc)
+	 * @see KalturaRelatedFilter::validateForResponseProfile()
+	 */
+	public function validateForResponseProfile()
+	{
+		if(kEntitlementUtils::getEntitlementEnforcement())
+		{
+			throw new KalturaAPIException(KalturaErrors::CANNOT_LIST_RELATED_ENTITLED_WHEN_ENTITLEMENT_IS_ENABLE, get_class($this));
+		}
+	}
 }

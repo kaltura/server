@@ -739,3 +739,11 @@ id													= 600
 friendlyName										= Distribute Disable
 type												= KAsyncDistributeDisable
 scriptPath											= ../plugins/content_distribution/batch/Distribute/KAsyncDistributeDisableExe.php
+
+[KAsyncRecalculateCache : JobHandlerWorker]
+id													= 610
+friendlyName										= Recalculate Cache
+type												= KAsyncRecalculateCache
+scriptPath											= batches/Cache/KAsyncRecalculateCacheExe.php
+
+

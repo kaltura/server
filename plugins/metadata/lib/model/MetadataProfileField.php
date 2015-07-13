@@ -13,7 +13,7 @@
  * @package plugins.metadata
  * @subpackage model
  */
-class MetadataProfileField extends BaseMetadataProfileField {
+class MetadataProfileField extends BaseMetadataProfileField implements IBaseObject {
 
 	const STATUS_ACTIVE = 1;
 	const STATUS_DEPRECATED = 2;

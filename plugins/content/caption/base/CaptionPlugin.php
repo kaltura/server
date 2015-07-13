@@ -3,12 +3,13 @@
  * Enable caption assets management for entry objects
  * @package plugins.caption
  */
-class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPermissions, IKalturaEnumerator, IKalturaObjectLoader, IKalturaApplicationPartialView, IKalturaConfigurator, IKalturaSchemaContributor, IKalturaMrssContributor, IKalturaPlayManifestContributor
+class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPermissions, IKalturaEnumerator, IKalturaObjectLoader, IKalturaApplicationPartialView, IKalturaConfigurator, IKalturaSchemaContributor, IKalturaMrssContributor, IKalturaPlayManifestContributor, IKalturaEventConsumers
 {
 	const PLUGIN_NAME = 'caption';
 	const KS_PRIVILEGE_CAPTION = 'caption';
-	const MULTI_LANGUAGE = 'Multilingual';
-	
+
+	const MULTI_CAPTION_FLOW_MANAGER_CLASS = 'kMultiCaptionFlowManager'; 
+
 	/* (non-PHPdoc)
 	 * @see IKalturaPlugin::getPluginName()
 	 */
@@ -182,7 +183,17 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 		);
 		return $map;
 	}
-	
+
+    /* (non-PHPdoc)
+     * @see IKalturaEventConsumers::getEventConsumers()
+      */
+      public static function getEventConsumers()
+      {
+        return array(
+            self::MULTI_CAPTION_FLOW_MANAGER_CLASS,
+        );
+      }
+
 	/* (non-PHPdoc)
 	 * @see IKalturaEnumerator::getEnums()
 	 */
@@ -199,7 +210,7 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 
 		if ($baseEnumName == 'BatchJobType')
 			return array('ParseMultiLanguageCaptionAssetBatchType');
-
+	
 		return array();
 	}
 	
@@ -219,7 +230,7 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 
 		if($baseClass == 'KalturaJobData' && $enumValue == self::getApiValue(ParseMultiLanguageCaptionAssetBatchType::PARSE_MULTI_LANGUAGE_CAPTION_ASSET))
 			return new KalturaParseMultiLanguageCaptionAssetJobData();
-
+	
 		return null;
 	}
 
@@ -398,16 +409,16 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 		$value = self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
 		return kPluginableEnumsManager::apiToCore('ObjectFeatureType', $value);
 	}
-
+	
 	/**
-	 * @return int id of dynamic enum in the DB.
-	 */
+	* @return int id of dynamic enum in the DB.
+	*/
 	public static function getBatchJobTypeCoreValue($valueName)
 	{
 		$value = self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
 		return kPluginableEnumsManager::apiToCore('BatchJobType', $value);
 	}
-
+	
 	/**
 	 * @return string external API value of dynamic enum.
 	 */

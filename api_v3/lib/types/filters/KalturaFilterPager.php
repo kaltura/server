@@ -22,6 +22,19 @@ class KalturaFilterPager extends KalturaObject
 	 * @var int
 	 */
 	public $pageIndex = 1;	
+
+	private static $map_between_objects = array(
+		'pageSize', 
+		'pageIndex',
+	);
+	
+	/* (non-PHPdoc)
+	 * @see KalturaObject::getMapBetweenObjects()
+	 */
+	public function getMapBetweenObjects()
+	{
+		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
+	}
 	
 	public function toObject($object = null, $skipProperties = array())
 	{

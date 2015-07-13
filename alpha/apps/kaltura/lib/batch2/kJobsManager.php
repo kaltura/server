@@ -838,6 +838,7 @@ class kJobsManager
 		}
 		
 		$flavorAsset = assetPeer::retrieveById($flavorAssetId);
+		$flavorParamsOutput = null;
 		if($createThumb)
 		{
 			$flavorParamsOutput = assetParamsOutputPeer::retrieveByPK($flavorParamsOutputId);
@@ -1119,6 +1120,47 @@ class kJobsManager
 		$batchJob->setPartnerId($partnerId);
 		
 		return self::addJob($batchJob, $jobData, BatchJobType::COPY, $objectType);
+	}
+	
+	/**
+	 * @param int $partnerId
+	 * @param string $protocol http or https
+	 * @param SessionType $ksType
+	 * @param array $userRoles
+	 * @param string $objectType class name
+	 * @param string $objectId
+	 * @param string $startObjectKey
+	 * @param string $endObjectKey
+	 */
+	public static function addRecalculateResponseProfileCacheJob($partnerId, $protocol, $ksType, array $userRoles, $objectType, $objectId = null, $startObjectKey = null, $endObjectKey = null)
+	{
+		KalturaLog::debug("Recalculating cache partner[$partnerId] protocol[$protocol] ks[$ksType] roles[" . implode(', ', $userRoles) . "] object[$objectType] id [$objectId] start[$startObjectKey] end[$endObjectKey]");
+		
+	    $jobData = new kRecalculateResponseProfileCacheJobData();
+ 		$jobData->setProtocol($protocol);
+ 		$jobData->setKsType($ksType);
+ 		$jobData->setUserRoles($userRoles);
+ 		$jobData->setObjectType($objectType);
+ 		$jobData->setObjectId($objectId);
+ 		$jobData->setStartObjectKey($startObjectKey);
+ 		$jobData->setEndObjectKey($endObjectKey);
+ 		
+		$batchJob = new BatchJob();
+		$batchJob->setPartnerId($partnerId);
+
+		if(is_subclass_of($objectType, 'entry'))
+		{
+			$batchJob->setObjectId($objectId);
+			$batchJob->setEntryId($objectId);
+			$batchJob->setObjectType(BatchJobObjectType::ENTRY);
+		}
+		elseif(is_subclass_of($objectType, 'category'))
+		{
+			$batchJob->setObjectId($objectId);
+			$batchJob->setObjectType(BatchJobObjectType::CATEGORY);
+		}
+
+		return self::addJob($batchJob, $jobData, BatchJobType::RECALCULATE_CACHE, RecalculateCacheType::RESPONSE_PROFILE);
 	}
 	
 	/**

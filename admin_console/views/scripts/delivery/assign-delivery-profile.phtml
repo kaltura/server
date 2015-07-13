@@ -24,7 +24,9 @@
 		</td>
 		<td align="center">
 			<input type="button" id="unselect" value="&lt; unselect" /><br> 
-			<input type="button" id="select"   value="select    &gt;" />
+			<input type="button" id="select"   value="select    &gt;" /><br>
+			<input type="button" id="up" value="up" /><br>
+			<input type="button" id="down" value="down" /><br>
 		</td>
 		<td align="center">
 			<h3>Selected</h3>
@@ -48,6 +50,18 @@ jQuery("#unselect").on("click", function () {
 jQuery("#select").on("click",function () {
     var selectedItem = $("#possibleValues option:selected");
     $("#selectedValues").append(selectedItem);
+});
+
+jQuery("#up").on("click",function () {
+    var selectedItem = $("#selectedValues option:selected");
+    if(selectedItem.length)
+        selectedItem.first().prev().before(selectedItem);
+});
+
+jQuery("#down").on("click",function () {
+    var selectedItem = $("#selectedValues option:selected");
+    if(selectedItem.length)
+        selectedItem.first().next().after(selectedItem);
 });
 
 </script>

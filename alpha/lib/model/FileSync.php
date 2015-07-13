@@ -8,7 +8,7 @@
  * @package Core
  * @subpackage model
  */ 
-class FileSync extends BaseFileSync
+class FileSync extends BaseFileSync implements IBaseObject
 {
 	const FILE_SYNC_FILE_TYPE_FILE = 1;
 	const FILE_SYNC_FILE_TYPE_LINK = 2;
@@ -132,11 +132,26 @@ class FileSync extends BaseFileSync
 		if($v == FileSync::FILE_SYNC_STATUS_READY || $v == FileSync::FILE_SYNC_STATUS_ERROR)
 			$this->setReadyAt(time());
 			
+		if ($v == FileSync::FILE_SYNC_STATUS_READY)
+		{
+			// no longer need these, unset them to reduce table size
+			$this->unsetOriginalId();
+			$this->unsetOriginalDc();
+		}
+		
 		return parent::setStatus($v);
 	}
 	
 	public function getIsDir() { return $this->getFromCustomData("isDir"); }
 	public function setIsDir($v) { $this->putInCustomData("isDir", $v); }
+	
+	public function getOriginalId() { return $this->getFromCustomData("originalId"); }
+	public function setOriginalId($v) { $this->putInCustomData("originalId", $v); }
+	public function unsetOriginalId() { $this->removeFromCustomData("originalId"); }
+
+	public function getOriginalDc() { return $this->getFromCustomData("originalDc"); }
+	public function setOriginalDc($v) { $this->putInCustomData("originalDc", $v); }
+	public function unsetOriginalDc() { $this->removeFromCustomData("originalDc"); }
 	
 	public function getContentMd5 () { return $this->getFromCustomData("contentMd5"); }
 	public function setContentMd5 ($v) { $this->putInCustomData("contentMd5", $v);  }

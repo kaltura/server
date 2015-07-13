@@ -544,7 +544,9 @@ kArrayField.prototype.removeRequest = function(removeSubRequestAction){
 	for(var item in this.fields)
 	{
 		var field = this.fields[item];
-		field.removeRequest(removeSubRequestAction);
+		if (field !== undefined || field !== null) {
+			field.removeRequest(removeSubRequestAction);
+		}
 	}
 };
 

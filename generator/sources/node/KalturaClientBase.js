@@ -407,6 +407,7 @@ KalturaClientBase.prototype.doHttpRequest = function (callCompletedCallback, req
 			host : urlInfo.host,
 			path : urlInfo.path,
 			method : 'POST',
+			keepAlive : true,
 			headers : {
 				'Content-Type' : 'multipart/form-data; boundary=' + boundary,
 				'Content-Length' : multipartBody.length
@@ -414,6 +415,7 @@ KalturaClientBase.prototype.doHttpRequest = function (callCompletedCallback, req
 		};
 
 		var request = http.request(options);
+		request.setTimeout(this.config.timeout);
 		request.write(multipartBody);
 		request.end();
 		request.on('error', function(err) {
@@ -612,6 +614,7 @@ var KalturaConfiguration = module.exports.KalturaConfiguration = function (){
 	this.serviceUrl = "http://www.kaltura.com";
 	this.serviceBase = "/api_v3/index.php?service=";
 	this.format = KalturaClientBase.KALTURA_SERVICE_FORMAT_JSON;
+	this.timeout = 90000;
 	this.logger = null;
 };
 

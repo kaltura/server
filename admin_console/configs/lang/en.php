@@ -1258,6 +1258,7 @@ return array(
 	"Kaltura_Client_Enum_DeliveryProfileType::LIVE_HDS" => "LIVE_HDS",
 	"Kaltura_Client_Enum_DeliveryProfileType::LIVE_DASH" => "LIVE_DASH",
 	"Kaltura_Client_Enum_DeliveryProfileType::LIVE_RTMP" => "LIVE_RTMP",
+	"Kaltura_Client_Enum_DeliveryProfileType::LIVE_HLS_TO_MULTICAST" => "LIVE_HLS_TO_MULTICAST",
 	"Kaltura_Client_Enum_DeliveryProfileType::LIVE_AKAMAI_HDS" => "LIVE_AKAMAI_HDS",
 	"Kaltura_Client_Enum_DeliveryProfileType::UPLYNK_RTMP" => "UPLYNK_RTMP",
 	"Kaltura_Client_Enum_DeliveryProfileType::UPLYNK_HTTP" => "UPLYNK_HTTP",
@@ -1272,6 +1273,7 @@ return array(
 	"Kaltura_Client_Enum_DeliveryStatus::STAGING_OUT" => "Staging-out",
 	
 	"Kaltura_Client_Enum_PlaybackProtocol::APPLE_HTTP" => "APPLE_HTTP",
+	"Kaltura_Client_Enum_PlaybackProtocol::APPLE_HTTP_TO_MC" => "APPLE_HTTP_TO_MC",
 	"Kaltura_Client_Enum_PlaybackProtocol::AUTO" => "auto",
 	"Kaltura_Client_Enum_PlaybackProtocol::AKAMAI_HD" => "AKAMAI_HD",
 	"Kaltura_Client_Enum_PlaybackProtocol::AKAMAI_HDS" => "AKAMAI_HDS",

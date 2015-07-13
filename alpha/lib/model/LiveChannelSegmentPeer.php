@@ -12,7 +12,7 @@
  * @package Core
  * @subpackage model
  */
-class LiveChannelSegmentPeer extends BaseLiveChannelSegmentPeer
+class LiveChannelSegmentPeer extends BaseLiveChannelSegmentPeer implements IRelatedObjectPeer
 {
 	public static function setDefaultCriteriaFilter()
 	{
@@ -53,6 +53,25 @@ class LiveChannelSegmentPeer extends BaseLiveChannelSegmentPeer
 		$criteria->add(LiveChannelSegmentPeer::CHANNEL_ID, $channelId);
 		
 		return LiveChannelSegmentPeer::doCount($criteria);
+	}
+	
+	/* (non-PHPdoc)
+	 * @see IRelatedObjectPeer::getRootObjects()
+	 */
+	public function getRootObjects(IBaseObject $object)
+	{
+		/* @var $object LiveChannelSegment */
+		return array(
+			$object->getChannel()
+		);
+	}
+
+	/* (non-PHPdoc)
+	 * @see IRelatedObjectPeer::isReferenced()
+	 */
+	public function isReferenced(IBaseObject $object)
+	{
+		return false;
 	}
 
 } // LiveChannelSegmentPeer

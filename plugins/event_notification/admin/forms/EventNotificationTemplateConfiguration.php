@@ -328,10 +328,13 @@ abstract class Form_EventNotificationTemplateConfiguration extends Infra_Form
 		if($parameter instanceof Kaltura_Client_EventNotification_Type_EventNotificationArrayParameter)
 		{
 			$values = array();
-			foreach($parameter->values as $value)
+			if(is_array($parameter->values))
 			{
-				/* @var $value Kaltura_Client_Type_String */
-				$values[] = $value->value;
+				foreach($parameter->values as $value)
+				{
+					/* @var $value Kaltura_Client_Type_String */
+					$values[] = $value->value;
+				}
 			}
 			
 			foreach($parameter->allowedValues as $index => $allowedValue)
