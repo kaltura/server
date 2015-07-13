@@ -79,8 +79,7 @@ class FlavorAssetService extends KalturaAssetService
 		$dbFlavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_QUEUED);
 		$dbFlavorAsset->save();
     	
-		$flavorAsset = KalturaFlavorAsset::getInstanceByType($type);
- 		$flavorAsset->fromObject($dbFlavorAsset, $this->getResponseProfile());
+		$flavorAsset = KalturaFlavorAsset::getInstance($dbFlavorAsset, $this->getResponseProfile());
 		return $flavorAsset;
     }
     
@@ -109,8 +108,7 @@ class FlavorAssetService extends KalturaAssetService
     	$dbFlavorAsset = $flavorAsset->toUpdatableObject($dbFlavorAsset);
    		$dbFlavorAsset->save();
 		
-		$flavorAsset = KalturaFlavorAsset::getInstanceByType($dbFlavorAsset->getType());
-		$flavorAsset->fromObject($dbFlavorAsset, $this->getResponseProfile());
+		$flavorAsset = KalturaFlavorAsset::getInstance($dbFlavorAsset, $this->getResponseProfile());
 		return $flavorAsset;
     }
     
@@ -159,8 +157,7 @@ class FlavorAssetService extends KalturaAssetService
     	if(in_array($dbFlavorAsset->getStatus(), $newStatuses))
    			kEventsManager::raiseEvent(new kObjectAddedEvent($dbFlavorAsset));
    		
-		$flavorAsset = KalturaFlavorAsset::getInstanceByType($dbFlavorAsset->getType());
-		$flavorAsset->fromObject($dbFlavorAsset, $this->getResponseProfile());
+		$flavorAsset = KalturaFlavorAsset::getInstance($dbFlavorAsset, $this->getResponseProfile());
 		return $flavorAsset;
     }
     
@@ -402,8 +399,7 @@ class FlavorAssetService extends KalturaAssetService
 		if (!$flavorAssetDb || !($flavorAssetDb instanceof flavorAsset))
 			throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND, $id);
 			
-		$flavorAsset = KalturaFlavorAsset::getInstanceByType($flavorAssetDb->getType());
-		$flavorAsset->fromObject($flavorAssetDb, $this->getResponseProfile());
+		$flavorAsset = KalturaFlavorAsset::getInstance($flavorAssetDb, $this->getResponseProfile());
 		return $flavorAsset;
 	}
 	
@@ -641,7 +637,6 @@ class FlavorAssetService extends KalturaAssetService
 		}
 		else
 			$previewFileSize = null;
-
 		$ksObj = $this->getKs();
 		$ks = ($ksObj) ? $ksObj->getOriginalString() : null;
 		$securyEntryHelper = new KSecureEntryHelper($entryDb, $ks, null, ContextType::DOWNLOAD);
@@ -654,7 +649,7 @@ class FlavorAssetService extends KalturaAssetService
 		}
 		else
 			$securyEntryHelper->validateForDownload();
-
+		
 		if (!$securyEntryHelper->isAssetAllowed($assetDb))
 			throw new KalturaAPIException(KalturaErrors::ASSET_NOT_ALLOWED, $id);
  
@@ -801,8 +796,7 @@ class FlavorAssetService extends KalturaAssetService
 			$flavorParamsId = $flavorAssetDb->getFlavorParamsId();
 			$flavorAssetWithParams = new KalturaFlavorAssetWithParams();
 			$flavorAssetWithParams->entryId = $entryId;
-			$flavorAsset = KalturaFlavorAsset::getInstanceByType($flavorAssetDb->getType());
-			$flavorAsset->fromObject($flavorAssetDb, $this->getResponseProfile());
+			$flavorAsset = KalturaFlavorAsset::getInstance($flavorAssetDb, $this->getResponseProfile());
 			$flavorAssetWithParams->flavorAsset = $flavorAsset;
 			if (isset($flavorParamsArray[$flavorParamsId]))
 			{

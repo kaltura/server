@@ -114,6 +114,11 @@ class kCurrentContext
 	 */
 	public static $multiRequest_index = 1;
 	
+	/**
+	 * @var callable
+	 */	
+	public static $serializeCallback;
+	
 	public static function getEntryPoint()
 	{
 		if(self::$service && self::$action)

@@ -81,14 +81,13 @@ class CuePointService extends KalturaBaseService
 			return null;
 		}
 		
-		$cuePoint = KalturaCuePoint::getInstance($dbCuePoint->getType());
+		$cuePoint = KalturaCuePoint::getInstance($dbCuePoint, $this->getResponseProfile());
 		if(!$cuePoint)
 		{
 			KalturaLog::err("API Cue point not instantiated");
 			return null;
 		}
 			
-		$cuePoint->fromObject($dbCuePoint, $this->getResponseProfile());
 		return $cuePoint;
 	}
 	
@@ -169,11 +168,10 @@ class CuePointService extends KalturaBaseService
 		if($this->getCuePointType() && $dbCuePoint->getType() != $this->getCuePointType())
 			throw new KalturaAPIException(KalturaCuePointErrors::INVALID_CUE_POINT_ID, $id);
 			
-		$cuePoint = KalturaCuePoint::getInstance($dbCuePoint->getType());
+		$cuePoint = KalturaCuePoint::getInstance($dbCuePoint, $this->getResponseProfile());
 		if(!$cuePoint)
 			return null;
 			
-		$cuePoint->fromObject($dbCuePoint, $this->getResponseProfile());
 		return $cuePoint;
 	}
 	
