@@ -474,15 +474,20 @@ class kCouchbaseCacheWrapper extends kBaseCacheWrapper
 	 */
 	protected function doInit($config)
 	{
+		if (!class_exists('CouchbaseCluster') )
+		{
+			return;
+		}
+
 		$cluster = new CouchbaseCluster($config['dsn'], $config['username'], $config['password']);
 		$this->bucket = $cluster->openBucket($config['name']);
-		
+
 		if(isset($config['properties']))
 		{
 			foreach($config['properties'] as $propertyName => $propertyValue)
 				$this->bucket->$propertyName = $propertyValue;
 		}
-	
+
 		if(isset($config['views']))
 		{
 			foreach($config['views'] as $view => $viewConfig)
@@ -494,7 +499,7 @@ class kCouchbaseCacheWrapper extends kBaseCacheWrapper
 				);
 			}
 		}
-	}
+}
 
 	/* (non-PHPdoc)
 	 * @see kBaseCacheWrapper::doGet()
