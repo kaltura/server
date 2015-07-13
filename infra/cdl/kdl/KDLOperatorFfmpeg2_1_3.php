@@ -162,7 +162,7 @@ class KDLOperatorFfmpeg2_1_3 extends KDLOperatorFfmpeg1_1_1 {
 			
 		$key=array_search("-vf", $cmdValsArr);
 		if($key!==false) {
-			$filters = self::generateVideoFilters($vid);
+			$filters = $this->generateVideoFilters($vid);
 			if(isset($filters) && count($filters)>0){
 				$filtersStr = array_shift($filters);
 				foreach($filters as $i=>$filter){
