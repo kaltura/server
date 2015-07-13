@@ -3390,5 +3390,6 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		parent::copyInto($copyObj,$deepCopy);
 		$copyObj->setEntitledPusersEdit($this->getEntitledPusersEdit());
 		$copyObj->setEntitledPusersPublish($this->getEntitledPusersPublish());
+		$copyObj->setReferenceID($this->getReferenceID());
 	}
 }
