@@ -153,6 +153,8 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 		} else if (PermissionPeer::isValidForPartner(CuePointPermissionName::REMOVE_CUE_POINTS_WHEN_REPLACING_MEDIA, $object->getPartnerId())) {
 			$this->deleteCuePoints($c);
 		}
+
+		return true;
 	}
 
 	/**
