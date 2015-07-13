@@ -55,4 +55,27 @@ abstract class EventNotificationTemplate extends BaseEventNotificationTemplate i
 	{
 		return array("eventNotificationTemplate:partnerId=".strtolower($this->getPartnerId()));
 	}
+	
+
+	/**
+	 * @param EventNotificationTemplate $notificationTemplate
+	 * @param kEventScope $scope
+	 * @return boolean
+	 */
+	public function fulfilled(kEventScope $scope)
+	{
+	    $eventConditions = $this->getEventConditions();
+	    if(!$eventConditions || !count($eventConditions))
+	        return true;
+	
+	    foreach($eventConditions as $eventCondition)
+	    {
+	        /* @var $eventCondition kCondition */
+	        if(!$eventCondition->fulfilled($scope))
+	            return false;
+	    }
+	
+	    return true;
+	}
+	
 } // EventNotificationTemplate

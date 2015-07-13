@@ -3,7 +3,7 @@
  * @package api
  * @subpackage objects
  */
-abstract class KalturaObject 
+abstract class KalturaObject implements IApiObject
 {
 	/**
 	 * @var KalturaListResponseArray
