@@ -392,6 +392,10 @@ class playManifestAction extends kalturaAction
 		if(!$localFileSync && !$remoteFileSync)
 		{
 			$key = $this->getFlavorKeyByTag($flavorAssets, assetParams::TAG_ISM_MANIFEST, flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ISM);
+			if (!$key)
+			{
+				return false;
+			}
 			$localFileSync = kFileSyncUtils::getReadyInternalFileSyncForKey($key);
 			$remoteFileSync = kFileSyncUtils::getReadyExternalFileSyncForKey($key);
 		}
@@ -410,6 +414,8 @@ class playManifestAction extends kalturaAction
 		
 		if (!$this->deliveryAttributes->getManifestFileSync())
 			KExternalErrors::dieError(KExternalErrors::FLAVOR_NOT_FOUND);
+		
+		return true;
 	}
 
 	protected function initSmilManifest($flavorAssets)
@@ -499,6 +505,7 @@ class playManifestAction extends kalturaAction
 								
 		// get initial flavor list by input
 		$flavorAssets = array();
+		$flavorByTags = false;
 		if ($this->flavorIds)
 		{
 			$flavorAssets = assetPeer::retrieveReadyByEntryId($this->entryId, $this->flavorIds);
@@ -508,14 +515,27 @@ class playManifestAction extends kalturaAction
 		if (!$flavorAssets || !count($flavorAssets))
 		{
 			$flavorAssets = assetPeer::retrieveReadyFlavorsByEntryId($this->entryId); 
-			$flavorAssets = $this->deliveryAttributes->filterFlavorsByTags($flavorAssets);
 			$flavorAssets = $this->removeNotAllowedFlavors($flavorAssets);
 			$flavorAssets = $this->removeMaxBitrateFlavors($flavorAssets);
+			$flavorByTags = true;
 		}		
 		if($this->deliveryAttributes->getFormat() == PlaybackProtocol::SILVER_LIGHT)
 		{
-			$this->initSilverLightManifest($flavorAssets);
-			return;
+			if ($this->initSilverLightManifest($flavorAssets))
+			{
+				return;
+			}
+			
+			// revert the tags selection unless they were explicitly set by the client
+			if (!$this->getRequestParameter("tags", null))
+			{
+				$this->deliveryAttributes->setTags(array(array('ipadnew', 'iphonenew')));
+			}
+		}
+
+		if ($flavorByTags)
+		{
+			$flavorAssets = $this->deliveryAttributes->filterFlavorsByTags($flavorAssets);
 		}
 		
 		if($this->deliveryAttributes->getFormat() == PlaybackProtocol::HDS || $this->deliveryAttributes->getFormat() == PlaybackProtocol::APPLE_HTTP)
