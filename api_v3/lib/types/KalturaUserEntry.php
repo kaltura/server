@@ -107,10 +107,6 @@ abstract class KalturaUserEntry extends KalturaObject implements IRelatedFiltera
 		if (!$this->userId || $this->userId == 0)
 		{
 			$currentKsKuser = kCurrentContext::getCurrentKsKuserId();
-			if ($currentKsKuser == 0)
-			{
-				throw new KalturaAPIException(KalturaErrors::KS, $this->userId);
-			}
 			$object_to_fill->setKuserId($currentKsKuser);
 		}
 		else

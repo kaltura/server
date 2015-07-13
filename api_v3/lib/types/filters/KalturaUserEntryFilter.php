@@ -5,6 +5,12 @@
  */
 class KalturaUserEntryFilter extends KalturaUserEntryBaseFilter
 {
+
+	/**
+	 * @var KalturaNullableBoolean
+	 */
+	public $userIdEqualCurrent;
+	
 	/**
 	 * @return baseObjectFilter
 	 */
@@ -29,6 +35,14 @@ class KalturaUserEntryFilter extends KalturaUserEntryBaseFilter
 		}
 
 		$c = new Criteria();
+		if (!is_null($this->userIdEqualCurrent) && $this->userIdEqualCurrent)
+		{
+			$this->userIdEqual = kCurrentContext::getCurrentKsKuserId();
+		}
+		else
+		{
+			$this->fixFilterUserId();
+		}
 		$userEntryFilter = $this->toObject();
 		$userEntryFilter->attachToCriteria($c);
 
@@ -51,4 +65,44 @@ class KalturaUserEntryFilter extends KalturaUserEntryBaseFilter
 		return $response;
 	}
 
+	private function preparePusersToKusersFilter( $puserIdsCsv )
+	{
+		$kuserIdsArr = array();
+		$puserIdsArr = explode(',',$puserIdsCsv);
+		$kuserArr = kuserPeer::getKuserByPartnerAndUids(kCurrentContext::getCurrentPartnerId(), $puserIdsArr);
+
+		foreach($kuserArr as $kuser)
+		{
+			$kuserIdsArr[] = $kuser->getId();
+		}
+
+		if(!empty($kuserIdsArr))
+		{
+			return implode(',',$kuserIdsArr);
+		}
+
+		return -1; // no result will be returned if no puser exists
+	}
+
+	/**
+	 * The user_id is infact a puser_id and the kuser_id should be retrieved
+	 */
+	protected function fixFilterUserId()
+	{
+		if ($this->userIdEqual !== null)
+		{
+			$kuser = kuserPeer::getKuserByPartnerAndUid(kCurrentContext::getCurrentPartnerId(), $this->userIdEqual);
+			if ($kuser)
+				$this->userIdEqual = $kuser->getId();
+			else
+				$this->userIdEqual = -1; // no result will be returned when the user is missing
+		}
+
+		if(!empty($this->userIdIn))
+		{
+			$this->userIdIn = $this->preparePusersToKusersFilter( $this->userIdIn );
+		}
+
+	}
+	
 }
