@@ -50,4 +50,7 @@ The launch settings are saved in the following files:
 - 2. KalturaMainTest.launch (A main test class for quickly testing the build)
 
 There is a log4j.properties file in /src/log4j. 
- - Edit it to set the log level as desired.
+ - Edit it to set the log level as desired, defaults are:
+  log4j.category.KalturaClientBase.class=DEBUG
+  log4j.logger.com.kaltura=ERROR
+

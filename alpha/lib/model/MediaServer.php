@@ -21,11 +21,11 @@ class MediaServer extends BaseMediaServer {
 	const DEFAULT_GPUID = -1;
 	
 	const WEB_SERVICE_LIVE = 'live';
-	const WEB_SERVICE_CUE_POINTS = 'cuePoints';
+	
+	private $isExternalMediaServer = false;
 	
 	static protected $webServices = array(
 		self::WEB_SERVICE_LIVE => 'KalturaMediaServerLiveService',
-		self::WEB_SERVICE_CUE_POINTS => 'KalturaMediaServerCuePointsService',
 	);
 	
 	
@@ -126,7 +126,10 @@ class MediaServer extends BaseMediaServer {
 			}
 		}
 		
-		$hostname = preg_replace('/\..*$/', '', $this->getHostname());
+		$hostname = $this->getHostname();
+		if(!$this->isExternalMediaServer)
+			$hostname = preg_replace('/\..*$/', '', $hostname);
+		
 		$url = "$protocol://$domain:$port/$appPrefix";
 		$url = str_replace("{hostName}", $hostname, $url);
 		return $url;
@@ -180,6 +183,11 @@ class MediaServer extends BaseMediaServer {
 		$url = "$protocol://$domain:$port/$service?wsdl";
 		KalturaLog::debug("Service URL: $url");
 		return new $serviceClass($url);
+	}
+	
+	public function setIsExternalMediaServer($v)
+	{
+		$this->isExternalMediaServer = $v;
 	}
 	
 } // MediaServer

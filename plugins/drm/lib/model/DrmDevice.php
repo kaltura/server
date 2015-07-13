@@ -13,6 +13,6 @@
  * @package plugins.drm
  * @subpackage model
  */
-class DrmDevice extends BaseDrmDevice {
+class DrmDevice extends BaseDrmDevice implements IBaseObject {
 
 } // DrmDevice

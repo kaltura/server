@@ -13,7 +13,7 @@
  * @package Core
  * @subpackage model
  */
-class Report extends BaseReport 
+class Report extends BaseReport implements IBaseObject
 {
 	public function getParameters()
 	{

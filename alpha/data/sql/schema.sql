@@ -1934,10 +1934,10 @@ CREATE TABLE storage_profile
 #-- edge_server
 #-----------------------------------------------------------------------------
 
-DROP TABLE IF EXISTS `edge_server`;
+DROP TABLE IF EXISTS edge_server;
 
 
-CREATE TABLE `edge_server`
+CREATE TABLE edge_server
 (
 	id INTEGER  NOT NULL AUTO_INCREMENT,
 	created_at DATETIME,
@@ -1955,7 +1955,7 @@ CREATE TABLE `edge_server`
 	custom_data TEXT,
 	PRIMARY KEY (id),
 	KEY partner_id_status_system_name(partner_id, status, system_name),
-	KEY host_name(host_name)
+	KEY partner_id_status_host_name(partner_id, status, host_name)
 )Type=InnoDB;
 
 #-----------------------------------------------------------------------------
@@ -2423,6 +2423,61 @@ CREATE TABLE kuser_kgroup
 	CONSTRAINT kuser_kgroup_FK_2
 		FOREIGN KEY (kuser_id)
 		REFERENCES kuser (id)
+)Type=InnoDB;
+
+#-----------------------------------------------------------------------------
+#-- user_entry
+#-----------------------------------------------------------------------------
+
+DROP TABLE IF EXISTS user_entry;
+
+
+CREATE TABLE user_entry
+(
+	id INTEGER  NOT NULL AUTO_INCREMENT,
+	entry_id VARCHAR(20)  NOT NULL,
+	kuser_id INTEGER  NOT NULL,
+	partner_id INTEGER,
+	created_at DATETIME,
+	updated_at DATETIME,
+	status INTEGER,
+	type INTEGER,
+	custom_data TEXT,
+	PRIMARY KEY (id),
+	INDEX user_entry_FI_1 (entry_id),
+	CONSTRAINT user_entry_FK_1
+		FOREIGN KEY (entry_id)
+		REFERENCES entry (id),
+	INDEX user_entry_FI_2 (kuser_id),
+	CONSTRAINT user_entry_FK_2
+		FOREIGN KEY (kuser_id)
+		REFERENCES kuser (id)
+)Type=InnoDB COMMENT='Describes the relationship between a specific user and a specific entry';
+
+#-----------------------------------------------------------------------------
+#-- app_token
+#-----------------------------------------------------------------------------
+
+DROP TABLE IF EXISTS app_token;
+
+
+CREATE TABLE app_token
+(
+	id VARCHAR(20)  NOT NULL,
+	int_id INTEGER  NOT NULL AUTO_INCREMENT,
+	partner_id INTEGER,
+	created_at DATETIME,
+	updated_at DATETIME,
+	deleted_at DATETIME,
+	status INTEGER,
+	expiry INTEGER,
+	session_type INTEGER,
+	session_user_id VARCHAR(100),
+	session_duration INTEGER,
+	session_privileges TEXT,
+	token TEXT,
+	custom_data TEXT,
+	PRIMARY KEY (id)
 )Type=InnoDB;
 
 # This restores the fkey checks, after having unset them earlier

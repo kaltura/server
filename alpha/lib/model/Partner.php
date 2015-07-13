@@ -54,8 +54,12 @@ class Partner extends BasePartner
 	const PARTNER_TYPE_SAKAI = 108;
 	const PARTNER_TYPE_ADMIN_CONSOLE = 109;
 	
+	const CUSTOM_DATA_USAGE_WARNINGS = 'usageWarnings';
+	
 	public static $s_content_root ;
 	
+	const CDN_HOST_WHITE_LIST = 'CDNHostWhiteList';
+
 	public function save(PropelPDO $con = null)
 	{
 		PartnerPeer::removePartnerFromCache( $this->getId() );
@@ -1683,5 +1687,67 @@ class Partner extends BasePartner
 		}
 			
 		$this->putInCustomData($customDataKey, $tokenData, 'googleAuth');
+	}
+
+	public function isInCDNWhiteList($host)
+	{
+		KalturaLog::debug("Checking host [$host] is in partner CDN white list");
+		$whiteList = $this->getCdnHostWhiteListArray();
+		foreach ($whiteList as $regEx)
+		{
+			if (preg_match("/".$regEx."/", $host)===1)//Should $regEx be escaped?
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public function getCdnHostWhiteListArray()
+	{
+		$whiteListStr = $this->getFromCustomData(self::CDN_HOST_WHITE_LIST);
+		$whiteListArr = array();
+		if (!is_null($whiteListStr))
+		{
+			$whiteListArr = unserialize($whiteListStr);
+		}
+		return $whiteListArr;
+	}
+
+	public function getCdnHostWhiteList()
+	{
+		$whiteLiestArr = $this->getCdnHostWhiteListArray();
+		$whiteLiestStr = implode(",",$whiteLiestArr);
+		return $whiteLiestStr;
+	}
+
+	public function setCdnHostWhiteList($whiteListRegEx)
+	{
+		$whiteListArr = explode(',', rtrim($whiteListRegEx, ','));
+		$this->putInCustomData(self::CDN_HOST_WHITE_LIST, serialize($whiteListArr));
+	}
+
+	public function getUsageWarnings() { return $this->getFromCustomData(self::CUSTOM_DATA_USAGE_WARNINGS, null, array()); }
+	public function setUsageWarnings( $v ) { $this->putInCustomData(self::CUSTOM_DATA_USAGE_WARNINGS, $v); }
+
+	public function getUsageWarning($type, $percent){
+		$usageWarnings = $this->getUsageWarnings();
+		$key = $type.'_'.$percent;
+		if(array_key_exists($key, $usageWarnings)){
+			return $usageWarnings[$key];
+		}
+		return null;
+	}
+	
+	public function resetUsageWarning($type, $percent){
+		$usageWarnings = $this->getUsageWarnings();
+		unset($usageWarnings[$type.'_'.$percent]);
+		$this->setUsageWarnings($usageWarnings);
+	}
+	
+	public function setUsageWarning($type, $percent, $value){
+		$usageWarnings = $this->getUsageWarnings();
+		$usageWarnings[$type.'_'.$percent] = $value;
+		$this->setUsageWarnings($usageWarnings);		
 	}
 }

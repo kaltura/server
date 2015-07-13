@@ -8,6 +8,6 @@
  * @package Core
  * @subpackage model
  */ 
-class KceInstallationError extends BaseKceInstallationError
+class KceInstallationError extends BaseKceInstallationError implements IBaseObject
 {
 }

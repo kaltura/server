@@ -7,6 +7,7 @@ abstract class KalturaObject implements IApiObject
 {
 	/**
 	 * @var KalturaListResponseArray
+	 * @readonly
 	 */
 	public $relatedObjects;
 	
@@ -378,16 +379,25 @@ abstract class KalturaObject implements IApiObject
 		$fromObjectClass::fromObject($this, $srcObj, $responseProfile);
 		$this->doFromObject($srcObj, $responseProfile);
 		
-		if($responseProfile)
+		if($srcObj instanceof IBaseObject)
 		{
-			$this->loadRelatedObjects($responseProfile);
+			KalturaResponseProfileCacher::onPersistentObjectLoaded($srcObj);
+			if($responseProfile)
+			{
+				$this->relatedObjects = KalturaResponseProfileCacher::start($srcObj, $responseProfile);
+				if(!$this->relatedObjects)
+				{
+					$this->loadRelatedObjects($responseProfile);
+					KalturaResponseProfileCacher::stop($srcObj, $this);
+				}
+			}
 		}
 	}
 	
 	public function loadRelatedObjects(KalturaDetachedResponseProfile $responseProfile)
 	{
 		// trigger validation
-		$responseProfile->toObject();
+		$responseProfile->validateNestedObjects();
 		
 		if(!$responseProfile->relatedProfiles)
 			return;
@@ -404,6 +414,7 @@ abstract class KalturaObject implements IApiObject
 			KalturaLog::debug("Loading related response-profile [$relatedProfile->name] with filter [" . get_class($relatedProfile->filter) . "]");
 
 			$filter = clone $relatedProfile->filter;
+			/* @var $filter KalturaRelatedFilter */
 			
 			if($relatedProfile->mappings)
 			{
@@ -427,6 +438,7 @@ abstract class KalturaObject implements IApiObject
 			{
 				KalturaLog::debug("No mappings defined in response-profile [$relatedProfile->name]");
 			}
+			$filter->validateForResponseProfile();
 			
 			$pager = $relatedProfile->pager;
 			if(!$pager)
@@ -868,9 +880,10 @@ abstract class KalturaObject implements IApiObject
 	    }
 	}
 
-	public function cast($className) {
-		if(!is_subclass_of($className, get_class($this)))
-			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_TYPE, get_class($this));
+	public function cast($className) 
+	{
+            if(!is_subclass_of($className, get_class($this)) && !is_subclass_of($this,$className))
+                throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_TYPE, get_class($this));
 			
 	    return unserialize(sprintf(
 	        'O:%d:"%s"%s',

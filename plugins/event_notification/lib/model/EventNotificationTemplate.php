@@ -13,7 +13,7 @@
  * @package plugins.eventNotification
  * @subpackage model
  */
-abstract class EventNotificationTemplate extends BaseEventNotificationTemplate 
+abstract class EventNotificationTemplate extends BaseEventNotificationTemplate implements IBaseObject
 {
 	const CUSTOM_DATA_EVENT_CONDITIONS = 'eventConditions';
 	const CUSTOM_DATA_CONTENT_PARAMETERS = 'contentParameters';

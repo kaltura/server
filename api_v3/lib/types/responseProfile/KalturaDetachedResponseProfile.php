@@ -79,7 +79,7 @@ class KalturaDetachedResponseProfile extends KalturaBaseResponseProfile
 		parent::validateForUsage($sourceObject, $propertiesToSkip);
 	}
 	
-	protected function validateNestedObjects($maxPageSize = null, $maxNestingLevel = null)
+	public function validateNestedObjects($maxPageSize = null, $maxNestingLevel = null)
 	{	
 		$relatedProfiles = $this->relatedProfiles;
 		if(!$relatedProfiles)
@@ -150,5 +150,14 @@ class KalturaDetachedResponseProfile extends KalturaBaseResponseProfile
 		}
 		
 		return parent::toObject($object, $propertiesToSkip);
+	}
+	
+	/**
+	 * Return unique identifier to be used in cache
+	 * @return string
+	 */
+	public function getKey()
+	{
+		return md5(serialize($this));
 	}
 }

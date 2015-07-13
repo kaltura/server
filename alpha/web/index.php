@@ -180,13 +180,23 @@ function checkCache()
 		{
 			require_once(dirname(__FILE__) . '/../apps/kaltura/lib/renderers/kRendererDumpFile.php');
 			
-			$renderer = $cache->get("thumb$uri");
-			if ($renderer && is_object($renderer))
+			$cachedResponse = $cache->get("thumb$uri");
+			if ($cachedResponse && is_array($cachedResponse))
 			{
+				list($renderer, $invalidationKey, $cacheTime) = $cachedResponse;
+				
+				$keysStore = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_QUERY_CACHE_KEYS);
+				if ($keysStore)
+				{
+					$modifiedTime = $keysStore->get($invalidationKey);
+					if ($modifiedTime && $modifiedTime > $cacheTime)
+					{
+						return;		// entry has changed (not necessarily the thumbnail)
+					}
+				}
+				
 				require_once(dirname(__FILE__) . '/../apps/kaltura/lib/monitor/KalturaMonitorClient.php');
 				KalturaMonitorClient::initApiMonitor(true, 'extwidget.thumbnail', $renderer->partnerId);
-				$max_age = 8640000;
-				sendCachingHeaders($max_age);
 				header("X-Kaltura:cached-dispatcher-thumb");
 				$renderer->output();
 				die;

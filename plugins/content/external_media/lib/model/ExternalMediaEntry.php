@@ -38,7 +38,7 @@ class ExternalMediaEntry extends entry
 	{
 		$this->putInCustomData(self::CUSTOM_DATA_FIELD_EXTERNAL_SOURCE, $v);
 	}
-
+	
 	/* (non-PHPdoc)
 	 * @see entry::getCreateThumb()
 	 */

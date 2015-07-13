@@ -116,6 +116,12 @@ class DeliveryProfileDynamicAttributes {
 	 * @var string
 	 */
 	protected $urlParams = '';
+	
+	/**
+	 * List of edge server ids content should b server from
+	 * @var array
+	 */
+	protected $edgeServerIds;
 
 	/**
 	 * @return the $deliveryProfileIds
@@ -415,6 +421,22 @@ class DeliveryProfileDynamicAttributes {
 	}
 	
 	/**
+	 * @return the edge server ids
+	 */
+	public function getEdgeServerIds()
+	{
+		return $this->edgeServerIds;
+	}
+	
+	/**
+	 * @param array edge server ids
+	 */
+	public function setEdgeServerIds($edgeServerIds)
+	{
+		$this->edgeServerIds = $edgeServerIds;
+	}
+	
+	/**
 	 * @param array<asset|assetParams> $flavors
 	 * @return array
 	 */
@@ -481,6 +503,7 @@ class DeliveryProfileDynamicAttributes {
 		$this->usePlayServer = $newObj->getUsePlayServer();
 		$this->playerConfig = $newObj->getPlayerConfig();
 		$this->uiConfId = $newObj->getUiConfId();
+		$this->edgeServerIds = $newObj->getEdgeServerIds();
 	}
 }
 

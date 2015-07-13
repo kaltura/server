@@ -57,7 +57,7 @@ class playManifestAction extends kalturaAction
 		"tags" => 't',
 		"uiConfId" => 'ui',
 	);
-	
+
 	const KALTURA_TOKEN_MARKER = '{kt}';
 	
 	/**
@@ -129,17 +129,7 @@ class playManifestAction extends kalturaAction
 		$calcToken = sha1(kConf::get('url_token_secret') . $url);
 		return $calcToken == $urlToken;
 	}
-	
-	/**
-	 * @param string $url
-	 * @return string
-	 */
-	static protected function calculateKalturaToken($url)
-	{
-		$token = sha1(kConf::get('url_token_secret') . $url); 
-		return str_replace(self::KALTURA_TOKEN_MARKER, $token, $url);
-	}
-	
+
 	/**
 	 * @param array $params
 	 * @return array
@@ -290,7 +280,8 @@ class playManifestAction extends kalturaAction
 		if (is_null($this->flavorParamsIds))
 			return;
 			
-		$this->flavorParamsIds = $this->secureEntryHelper->filterAllowedFlavorParams($this->flavorParamsIds);
+		if($this->secureEntryHelper)
+			$this->flavorParamsIds = $this->secureEntryHelper->filterAllowedFlavorParams($this->flavorParamsIds);
 		
 		if(is_null($this->flavorParamsIds))
 			return;
@@ -446,7 +437,11 @@ class playManifestAction extends kalturaAction
 
 	private function removeNotAllowedFlavors($flavorAssets)
 	{
-		$returnedFlavors = array();		
+		if(!$this->secureEntryHelper)
+			return $flavorAssets;
+
+		$returnedFlavors = array();
+
 		foreach ($flavorAssets as $flavorAsset)
 		{
 			if ($this->secureEntryHelper->isAssetAllowed($flavorAsset))
@@ -816,6 +811,11 @@ class playManifestAction extends kalturaAction
 		}
 		
 		$this->deliveryProfile->setDynamicAttributes($this->deliveryAttributes);	
+
+		if($this->deliveryAttributes->getEdgeServerIds()) {
+			list($baseUrl, $backupUrl) = $this->deliveryProfile->getEdgeServerUrls($baseUrl, $backupUrl);
+		}
+		
 		return $this->deliveryProfile->serve($baseUrl, $backupUrl);
 	}
 	
@@ -871,8 +871,8 @@ class playManifestAction extends kalturaAction
 	
 	public function execute()
 	{
-		
-		KExternalErrors::setResponseErrorCode(KExternalErrors::HTTP_STATUS_NOT_FOUND);
+		if($this->getRequestParameter("format", "Empty") !== PlaybackProtocol::APPLE_HTTP_TO_MC)
+			KExternalErrors::setResponseErrorCode(KExternalErrors::HTTP_STATUS_NOT_FOUND);
 		
 		$this->deliveryAttributes = new DeliveryProfileDynamicAttributes();
 		// Parse input parameters
@@ -939,9 +939,10 @@ class playManifestAction extends kalturaAction
 			//In case request needs to be redirected to play-server we need to add the ui conf id to the manifest url as well
 			$this->deliveryAttributes->setUiConfId($this->getRequestParameter("uiConfId"));
 		}
-		
-		$this->secureEntryHelper->updateDeliveryAttributes($this->deliveryAttributes);
-		
+
+		if($this->secureEntryHelper)
+			$this->secureEntryHelper->updateDeliveryAttributes($this->deliveryAttributes);
+
 		$this->enforceEncryption();
 		
 		$renderer = null;

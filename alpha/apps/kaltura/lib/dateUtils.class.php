@@ -36,6 +36,17 @@ class dateUtils
 		return date ( "Y-m-d" , $calculated_day  );
 	}
 	
+	public static function firstDayOfMonth( $baseDate = null )
+	{
+		if(!$baseDate)
+			return date("Y-m-01", time());
+		else
+		{
+			$dateObj = new DateTime($baseDate);
+			return date("Y-m-01", $dateObj->getTimestamp());
+		}
+	}
+	
 	public static function nowWithMilliseconds ( )
 	{
 		$time = ( microtime(true) );

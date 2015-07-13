@@ -1,9 +1,9 @@
 <?php
 
 abstract class SyndicationFeedRenderer {
-	
+
 	const LEVEL_INDENTATION = '  ';
-	
+
 	protected $syndicationFeed;
 	protected $syndicationFeedDB;
 	protected $mimeType;

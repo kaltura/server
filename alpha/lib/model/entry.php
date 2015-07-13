@@ -140,6 +140,8 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	const DEFAULT_IMAGE_HEIGHT = 480;
 	const DEFAULT_IMAGE_WIDTH = 640;
 
+	const CAPABILITIES = "capabilities";
+
 	private $appears_in = null;
 
 	private $m_added_moderation = false;
@@ -1016,6 +1018,10 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	public function getAssetCacheVersion()			{ return $this->getFromCustomData( "assetCacheVersion", null, entry::DEFAULT_ASSETCACHEVERSION ); }
 
 	protected function setAssetCacheVersion( $v )	{ $this->putInCustomData( "assetCacheVersion" , $v ); }
+
+	public function getAssetCacheTime()			{ return $this->getFromCustomData( "assetCacheTime", null, null ); }
+	
+	protected function setAssetCacheTime( $v )	{ $this->putInCustomData( "assetCacheTime" , $v ); }
 	
 	/**
 	 * Increment an internal version counter in order to invalidate cached thumbnails (see getThumbnailUrl())
@@ -1024,6 +1030,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	{
 		$assetCacheVersion = kDataCenterMgr::incrementVersion($this->getAssetCacheVersion());
 		$this->setAssetCacheVersion($assetCacheVersion);
+		$this->setAssetCacheTime(time());
 		return $assetCacheVersion;
 	}
 	
@@ -1230,6 +1237,16 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 			$dynAttribName = kCategoryEntryAdvancedFilter::getCategoryCreatedAtDynamicAttributeName( $categoryEntry->getCategoryId() );
 			
 			$dynamicAttributes[$dynAttribName] = $createdAt;
+		}
+
+		$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaDynamicAttributesContributer');
+		foreach($pluginInstances as $pluginName => $pluginInstance) {
+			try {
+				$dynamicAttributes += $pluginInstance->getDynamicAttributes($this);
+			} catch (Exception $e) {
+				KalturaLog::err($e->getMessage());
+				continue;
+			}
 		}
 
 		return $dynamicAttributes;
@@ -1774,6 +1791,9 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 
 	public function setRedirectEntryId ( $v )	{	$this->putInCustomData ( "redirectEntryId" , $v );	}
 	public function getRedirectEntryId (  )		{	return $this->getFromCustomData( "redirectEntryId" );	}
+
+	public function setIsTrimDisabled ( $v )	{	$this->putInCustomData ( "isTrimDisabled" , $v );	}
+	public function getIsTrimDisabled (  )		{	return $this->getFromCustomData( "isTrimDisabled" );	}
 	
 	// indicates that thumbnail shouldn't be auto captured, because it already supplied by the user
 	public function setCreateThumb ( $v, thumbAsset $thumbAsset = null)		
@@ -2974,8 +2994,6 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		
 		$copyObj->setKuserId($this->kuser_id);
 		$copyObj->setName($this->name);
-		$copyObj->setType($this->type);
-		$copyObj->setMediaType($this->media_type);
 		$copyObj->setTags($this->tags);
 		$copyObj->setAnonymous($this->anonymous);
 		$copyObj->setSource($this->source);
@@ -3341,5 +3359,36 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		$userNames[] = $kuser->getScreenName();
 		
 		return implode(" ", $userNames);
+	}
+
+	public function getCapabilities()
+	{
+		$capabilitiesArr = $this->getFromCustomData(self::CAPABILITIES, null, array());
+		$capabilitiesStr = implode(",", $capabilitiesArr);
+		return $capabilitiesStr;
+	}
+
+	public function addCapability( $capability)
+	{
+		$capabilities = $this->getFromCustomData(self::CAPABILITIES, null, array());
+		$capabilities[$capability] = $capability;
+		$this->putInCustomData( self::CAPABILITIES, $capabilities);
+	}
+
+	/**
+	 * Sets contents of passed object to values from current object.
+	 *
+	 * If desired, this method can also make copies of all associated (fkey referrers)
+	 * objects.
+	 *
+	 * @param      object $copyObj An object of entry (or compatible) type.
+	 * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
+	 * @throws     PropelException
+	 */
+	public function copyInto($copyObj, $deepCopy = false)
+	{
+		parent::copyInto($copyObj,$deepCopy);
+		$copyObj->setEntitledPusersEdit($this->getEntitledPusersEdit());
+		$copyObj->setEntitledPusersPublish($this->getEntitledPusersPublish());
 	}
 }

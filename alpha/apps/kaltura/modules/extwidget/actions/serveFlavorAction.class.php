@@ -56,6 +56,9 @@ class serveFlavorAction extends kalturaAction
 		}
 
 		$clipTo = null;
+		$secureEntryHelper = new KSecureEntryHelper($flavorAsset->getentry(), null, null, ContextType::SERVE);
+		$secureEntryHelper->validateForServe($flavorAsset);
+		
 //		$securyEntryHelper = new KSecureEntryHelper($entry, $ks, $referrer, ContextType::PLAY);
 //		if ($securyEntryHelper->shouldPreview())
 //		{

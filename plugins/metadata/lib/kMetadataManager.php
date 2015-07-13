@@ -410,7 +410,9 @@ class kMetadataManager
 						$subSearchTextsResult = self::getDataSearchValues($subMetadataObject);
 						$subSearchTexts = $subSearchTextsResult[MetadataPlugin::getSphinxFieldName(MetadataPlugin::SPHINX_EXPANDER_FIELD_DATA)];
 						foreach($subSearchTexts as $subSearchText)
-							$searchTexts[] = $subSearchText;
+						{
+							$searchItems[$profileField->getId()][] = $subSearchText;
+						}
 					}
 				}
 			}

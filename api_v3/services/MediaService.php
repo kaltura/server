@@ -149,6 +149,18 @@ class MediaService extends KalturaEntryService
 		}
 		else
 		{
+			$kResource = $resource->toObject();
+			if ( ($kResource instanceof kOperationResource ) && ($this->isResourceKClip($kResource)) ) {
+				$internalResource = $kResource->getResource();
+				if ($dbEntry->getIsTrimDisabled()
+					&& $internalResource instanceof kFileSyncResource
+					&& $dbEntry->getId() == $internalResource->getOriginEntryId()
+				)
+				{
+					throw new KalturaAPIException(KalturaErrors::ENTRY_CANNOT_BE_TRIMMED);
+				}
+			}
+
 			$tempMediaEntry = new KalturaMediaEntry();
 			$tempMediaEntry->type = $dbEntry->getType();
 			$tempMediaEntry->mediaType = $dbEntry->getMediaType();
@@ -1103,6 +1115,25 @@ class MediaService extends KalturaEntryService
 				$conversionQuality = $conversionProfile->getConversionProfile2Id();
 		}
 		return $conversionQuality;
+	}
+
+	/**
+	 * @param $kResource
+	 * @return bool
+	 */
+	protected function isResourceKClip($kResource)
+	{
+		/**
+		 * @var kOperationResource $kResource
+		 */
+		foreach ($kResource->getOperationAttributes() as $opAttribute)
+		{
+			if ($opAttribute instanceof kClipAttributes)
+			{
+				return true;
+			}
+		}
+		return false;
 	}
 
 }

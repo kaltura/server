@@ -505,14 +505,16 @@ $plannedDur = 0;
 			 */
 		$sourceAnalize = self::analizeSourceContentStreams($source->_contentStreams);
 			/*
-			 * If 'streamsAsChannels' were detected do 'multiStream' processing
-			 * otherwise remove 'multiStream' settings from the target
+			 * Check analyze realts for
+			 * - 'streamsAsChannels' - process them as sorround streams
+			 * - 'languages - process them as multi-lingual
+			 * - otherwise remove the 'multiStream' object'
 			 */
 		if(isset($sourceAnalize->streamsAsChannels)){
-			if(!isset($target->_multiStream)
-			|| (isset($target->_multiStream->detect) && $target->_multiStream->detect=='auto')){
-				$target->_multiStream = self::sourceMultiStreamToTarget($source, $sourceAnalize);
-			}
+			$target->_multiStream = self::sorroundAudioSurceToTarget($source, $target->_multiStream, $sourceAnalize->streamsAsChannels);
+		}
+		else if(isset($sourceAnalize->languages)){
+			$target->_multiStream = self::multiLingualAudioSurceToTarget($source, $target->_multiStream, $sourceAnalize->languages);
 		}
 		else {
 			$target->_multiStream = null;
@@ -606,6 +608,16 @@ $plannedDur = 0;
 		if($this->_audio!=""){
 			if($source->_audio!=""){
 				$target->_audio = $this->evaluateTargetAudio($source->_audio, $target, $source->_contentStreams);
+				/*
+				 * On multi-langual flavor, 
+				 * if required language does not exist - set NonComply flag 
+				 */
+				if(isset($target->_multiStream) && isset($target->_multiStream->audio) 
+				&& isset($target->_multiStream->audio->languages) && count($target->_multiStream->audio->languages)==0){
+					$target->_flags = $this->_flags | self::MissingContentNonComplyFlagBit;
+					$target->_warnings[KDLConstants::AudioIndex][] = 
+						KDLWarnings::ToString(KDLWarnings::MissingMediaStream);
+				}
 			}
 		}
 		
@@ -1447,13 +1459,18 @@ $plannedDur = 0;
 	/**
 	 * 
 	 * @param unknown_type $source
-	 * @param unknown_type $sourceAnalize
+	 * @param unknown_type $analyzedStreams
 	 * @return NULL|stdClass
 	 */
-	private static function sourceMultiStreamToTarget($source, $sourceAnalize)
+	private static function sorroundAudioSurceToTarget($source, $multiStreamSettings, $analyzedStreams)
 	{
-		if(!isset($sourceAnalize->streamsAsChannels)){
-			return null;
+		/*
+		 * If there is manually defined multiStream/sorround preset - use it, 
+		 * don't attempt to figure it out automatically
+		 */
+		if((isset($multiStreamSettings)
+		&& !(isset($multiStreamSettings->detect) && $multiStreamSettings->detect=='auto'))){
+			return $multiStreamSettings;
 		}
 
 		/*
@@ -1479,11 +1496,63 @@ $plannedDur = 0;
 		 */
 		$mappedStreams = KDLAudioLayouts::matchLayouts($source->_contentStreams->audio, KDLAudioLayouts::DOWNMIX);
 		if(count($mappedStreams)==0) {
-			$mappedStreams = KDLAudioLayouts::matchLayouts($sourceAnalize->streamsAsChannels, array(KDLAudioLayouts::FL, KDLAudioLayouts::FR, KDLAudioLayouts::MONO,));
+			$mappedStreams = KDLAudioLayouts::matchLayouts($analyzedStreams, array(KDLAudioLayouts::FL, KDLAudioLayouts::FR, KDLAudioLayouts::MONO,));
 		}
 		foreach ($mappedStreams as $stream){
 			$multiStream->audio->mapping[] = $stream->id;
 		}
+		return $multiStream;
+	}
+	
+	/**
+	 * 
+	 * @param unknown_type $source
+	 * @param unknown_type $languages
+	 * @return - 
+	 * 	null - not applicable for that source (non multi-lingual) or for the required multiStream settings (no multi-lingual requirement)
+	 * 	stdClass obj with set audio-languages array - holding matched languages
+	 * 	stdClass obj with empty audio-languages array - no matched languages
+	 */
+	private static function multiLingualAudioSurceToTarget($source, $multiStreamSettings, $languages)
+	{
+			/*
+			 * Default behavior - avoid multi-lang processing if not asked for 
+			 */
+		if(!(isset($multiStreamSettings) && isset($multiStreamSettings->audio) 
+			 && property_exists($multiStreamSettings->audio,"languages"))){
+			return null;
+		}
+		
+			/*
+			 * If no multi-lingual data in the source, get out
+			 */
+		if(!(is_array($languages) && count($languages)>0)){
+			return null;
+		}
+
+		if(is_array($multiStreamSettings->audio->languages) && count($multiStreamSettings->audio->languages)>0){
+			$settingsLanguages = $multiStreamSettings->audio->languages;
+		}
+		else $settingsLanguages = null;
+		
+		/*
+		 * Sample json string: 
+		 * 		- {"audio":{"languages":["eng","esp"]}}
+		 */
+		$multiStream = new stdClass();
+		$multiStream->audio = new stdClass();
+		$multiStream->audio->languages = array();
+		
+		foreach ($languages as $lang=>$streams){
+			if(isset($settingsLanguages) && !in_array($lang, $settingsLanguages)){
+				continue;
+			}
+			if(count($streams)>1) {
+				return null;
+			}
+			$multiStream->audio->languages[$lang] = $streams[0];
+		}
+		
 		return $multiStream;
 	}
 	
