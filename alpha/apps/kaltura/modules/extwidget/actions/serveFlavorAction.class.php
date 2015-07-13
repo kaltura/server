@@ -61,6 +61,10 @@ class serveFlavorAction extends kalturaAction
 			$secureEntryHelper = new KSecureEntryHelper($flavorAsset->getentry(), null, null, ContextType::SERVE);
 			$secureEntryHelper->validateForServe($flavorAsset);
 		}
+		else
+		{
+			KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_FOUND);
+		}
 		
 //		$securyEntryHelper = new KSecureEntryHelper($entry, $ks, $referrer, ContextType::PLAY);
 //		if ($securyEntryHelper->shouldPreview())
