@@ -7,6 +7,9 @@
  */
 class KAsyncFileSyncImport extends KPeriodicWorker
 {
+	const MAX_EXECUTION_TIME = 3600;		// can be exceeded by one file sync
+	const IDLE_SLEEP_INTERVAL = 10;
+	
 	protected $curlWrapper;
 
 	public function run($jobs = null)
@@ -30,7 +33,9 @@ class KAsyncFileSyncImport extends KPeriodicWorker
 		$responseProfile->type = KalturaResponseProfileType::INCLUDE_FIELDS;
 		$responseProfile->fields = 'id,originalId,fileSize,fileRoot,filePath,isDir';
 		
-		for (;;)
+		$timeLimit = time() + self::MAX_EXECUTION_TIME; 
+		
+		while (time() < $timeLimit)
 		{
 			self::$kClient->setResponseProfile($responseProfile);
 			
@@ -45,7 +50,7 @@ class KAsyncFileSyncImport extends KPeriodicWorker
 			{
 				// didn't get any file syncs to import, sleep for a sec to avoid excessive
 				// queries on the database
-				sleep(1);
+				sleep(self::IDLE_SLEEP_INTERVAL);
 				continue;
 			}
 
@@ -98,7 +103,7 @@ class KAsyncFileSyncImport extends KPeriodicWorker
 			{
 				// if the limit was not reached, it means that we don't have anything more to do
 				// wait until more file syncs are created
-				sleep(1);
+				sleep(self::IDLE_SLEEP_INTERVAL);
 			}
 		}
 	}
