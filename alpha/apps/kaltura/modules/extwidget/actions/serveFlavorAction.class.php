@@ -56,15 +56,13 @@ class serveFlavorAction extends kalturaAction
 		}
 
 		$clipTo = null;
-		if ($flavorAsset->getentry())
-		{
-			$secureEntryHelper = new KSecureEntryHelper($flavorAsset->getentry(), null, null, ContextType::SERVE);
-			$secureEntryHelper->validateForServe($flavorAsset);
-		}
-		else
+		$entry = $flavorAsset->getentry(); 
+		if (!$entry)
 		{
 			KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_FOUND);
 		}
+		$secureEntryHelper = new KSecureEntryHelper($entry, null, null, ContextType::SERVE);
+		$secureEntryHelper->validateForServe($flavorAsset);
 		
 //		$securyEntryHelper = new KSecureEntryHelper($entry, $ks, $referrer, ContextType::PLAY);
 //		if ($securyEntryHelper->shouldPreview())
