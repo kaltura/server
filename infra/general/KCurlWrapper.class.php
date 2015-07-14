@@ -344,7 +344,16 @@ class KCurlWrapper
 				}
 
 				list($name, $value) = explode(':', $header, 2);
-				$curlHeaderResponse->headers[trim(strtolower($name))] = trim($value);
+                if (trim(strtolower($name))=='set-cookie')
+                {
+                    $cookieKey=trim(strtolower($this->getCookieKey($value)));
+                    $curlHeaderResponse->headers['set-cookie'][$cookieKey]=trim($value);
+                }
+                else
+                {
+                    $curlHeaderResponse->headers[trim(strtolower($name))] = (trim($value));
+                }
+
 			}
 
 			if(!$noBody)
@@ -370,7 +379,15 @@ class KCurlWrapper
 					continue;
 
 				list($name, $value) = $headerParts;
-				$curlHeaderResponse->headers[trim(strtolower($name))] = trim($value);
+                if (trim(strtolower($name))=='set-cookie')
+                {
+                    $cookieKey=trim(strtolower($this->getCookieKey($value)));
+                    $curlHeaderResponse->headers['set-cookie'][$cookieKey]=trim($value);
+                }
+                else
+                {
+                    $curlHeaderResponse->headers[trim(strtolower($name))] = (trim($value));
+                }
 			}
 
 			// if this is a good ftp url - there will be a content-length header
@@ -405,6 +422,38 @@ class KCurlWrapper
 		
 		return $curlHeaderResponse;
 	}
+    public static function getCookieValue($cookieInfo,$cookieKey)
+    {
+        //search cookie value in curlInfo
+        if (!isset($cookieInfo[strtolower($cookieKey)]))
+        {
+            throw new Exception("Cookie key not found-".$cookieKey);
+        }
+
+        $cookie = $cookieInfo[strtolower($cookieKey)];
+        $cookieVars = explode(';',$cookie);
+        foreach ($cookieVars as $cookieVar)
+        {
+            $keyVal = explode('=',$cookieVar);
+            if($keyVal[0]==$cookieKey)
+            {
+                return $keyVal[1];
+            }
+        }
+
+        return null;
+    }
+
+    private function getCookieKey($setCookieValue)
+    {
+        //list cookie vars
+        $cookie_items = explode(';',$setCookieValue);
+
+        //Get the cookie key
+        $cookieKey = explode ('=',$cookie_items[0]);
+
+        return $cookieKey[0];
+    }
 
 	/**
 	 * @param string $sourceUrl

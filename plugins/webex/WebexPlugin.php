@@ -27,19 +27,20 @@ class WebexPlugin extends KalturaPlugin implements IKalturaImportHandler
 		
 		KalturaLog::info('Handle Import data: Webex Plugin');
 		$matches = null;
-		$recordId = null;
-		$cookiesArr = explode(';', $curlInfo->headers["set-cookie"]);
-		foreach($cookiesArr as $cookie)
+		$recordId=null;
+		if(isset($curlInfo->headers['set-cookie']))
 		{
-			list($cookieName, $cookieValue) = explode('=', trim($cookie));
-			if($cookieName == 'recordId')
-				$recordId = $cookieValue;
+			$recordId = KCurlWrapper::getCookieValue($curlInfo->headers['set-cookie'], 'recordId');
+			if ($recordId==null)
+			{
+				throw new Exception('recordId value not found');
+			}
 		}
-		if (!$recordId)
+		else
 		{
-			throw new Exception('recordId value not found');
+			throw new Exception('set-cookie was not found in header');
 		}
-		
+
 		$data = file_get_contents($importData->destFileLocalPath);
 		KalturaLog::info("data:\n\n$data\n\n");
 		if(!preg_match("/href='([^']+)';/", $data, $matches))
