@@ -176,4 +176,30 @@ class ResponseProfileService extends KalturaBaseService
 		$response->totalCount = $totalCount;
 		return $response;    
 	}
+	
+	/**
+	 * List response profiles by filter and pager
+	 * 
+	 * @action clone
+	 * @param int $id
+	 * @throws KalturaErrors::RESPONSE_PROFILE_ID_NOT_FOUND
+	 * @return KalturaResponseProfile
+	 */
+	function cloneAction ($id)
+	{
+		$origResponseProfileDbObject = ResponseProfilePeer::retrieveByPK($id);
+		if (!$origResponseProfileDbObject)
+			throw new KalturaAPIException(KalturaErrors::RESPONSE_PROFILE_ID_NOT_FOUND, $id);
+			
+		$newResponseProfileDbObject = $origResponseProfileDbObject->copy();
+		$newResponseProfileDbObject->setSystemName($origResponseProfileDbObject->getSystemName() . '_' . uniqid());
+		
+		$newResponseProfile = new KalturaResponseProfile();
+		$newResponseProfileDbObject = $newResponseProfile->toInsertableObject($origResponseProfileDbObject);
+		$newResponseProfileDbObject->save();
+		
+		$newResponseProfile = new KalturaResponseProfile();
+		$newResponseProfile->fromObject($newResponseProfileDbObject, $this->getResponseProfile());
+		return $newResponseProfile;
+	}
 }
