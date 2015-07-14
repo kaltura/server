@@ -8,7 +8,7 @@
  * @package Core
  * @subpackage model
  */ 
-class widget extends Basewidget
+class widget extends Basewidget implements IBaseObject
 {
 	const WIDGET_SECURITY_TYPE_NONE = 1;
 	const WIDGET_SECURITY_TYPE_TIMEHASH = 2;

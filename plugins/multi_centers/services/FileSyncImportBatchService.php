@@ -114,12 +114,11 @@ class FileSyncImportBatchService extends KalturaBatchService
 			throw new KalturaAPIException(MultiCentersErrors::GET_MAX_FILESYNC_ID_FAILED, $sourceDc);
 		}
 		
-		$lastId = $keysCache->get(self::LAST_FILESYNC_ID_PREFIX . $workerId);
-		if (!$lastId)
-		{
-			$lastId = $maxId;
-		}
-						
+		$initialLastId = $keysCache->get(self::LAST_FILESYNC_ID_PREFIX . $workerId);
+		KalturaLog::debug("got lastId [$initialLastId] for worker [$workerId]");
+		
+		$lastId = $initialLastId ? $initialLastId : $maxId;
+								
 		// created at less than handled explicitly
 		$createdAtLessThanOrEqual = $filter->createdAtLessThanOrEqual;
 		$filter->createdAtLessThanOrEqual = null;
@@ -151,6 +150,7 @@ class FileSyncImportBatchService extends KalturaBatchService
 			// make sure last id is always increasing
 			if ($lastId <= $lastSelectId)
 			{
+				KalturaLog::debug("last id was decremented $lastId <= $lastSelectId, stopping");
 				break;
 			}
 			
@@ -214,7 +214,7 @@ class FileSyncImportBatchService extends KalturaBatchService
 			if ($createdAtLessThanOrEqual)
 			{
 				$firstFileSync = reset($fileSyncs);
-				$lastId = $firstFileSync->getId();
+				$prevLastId = $firstFileSync->getId();
 				
 				foreach ($fileSyncs as $index => $fileSync)
 				{
@@ -222,10 +222,15 @@ class FileSyncImportBatchService extends KalturaBatchService
 					{
 						$done = true;
 						unset($fileSyncs[$index]);
+						if (!is_null($prevLastId))
+						{
+							$lastId = $prevLastId;
+							$prevLastId = null;
+						}
 					}
 					else
 					{
-						$lastId = $fileSync->getId();
+						$prevLastId = $fileSync->getId();
 					}
 				}
 				
@@ -250,11 +255,13 @@ class FileSyncImportBatchService extends KalturaBatchService
 				$curKey = self::LOCK_KEY_PREFIX . $fileSync->getId();
 				if (isset($lockKeys[$curKey]))
 				{
+					KalturaLog::debug('file sync '.$fileSync->getId().' already locked');
 					continue;
 				}
 				
 				if (!$lockCache->add($curKey, true, self::LOCK_EXPIRY))
 				{
+					KalturaLog::debug('failed to lock file sync '.$fileSync->getId());
 					continue;
 				}
 				
@@ -281,8 +288,13 @@ class FileSyncImportBatchService extends KalturaBatchService
 		
 		// update the last id
 		// Note: it is possible that the last id will go back in case of race condition,
-		//		but the only effect of this is that some file syncs will be scanned again 
-		$keysCache->set(self::LAST_FILESYNC_ID_PREFIX . $workerId, $lastId);
+		//		but the only effect of this is that some file syncs will be scanned again		
+		if (!$initialLastId || $lastId > $initialLastId)
+		{
+			KalturaLog::debug("setting lastId to [$lastId] for worker [$workerId]");
+			
+			$keysCache->set(self::LAST_FILESYNC_ID_PREFIX . $workerId, $lastId);
+		}
 		
 		// make sure all file syncs have a path
 		foreach ($lockedFileSyncs as $fileSync)

@@ -89,8 +89,7 @@ class ThumbAssetService extends KalturaAssetService
 		$dbThumbAsset->setStatus(thumbAsset::ASSET_STATUS_QUEUED);
 		$dbThumbAsset->save();
 
-		$thumbAsset = KalturaThumbAsset::getInstanceByType($dbThumbAsset->getType());
-		$thumbAsset->fromObject($dbThumbAsset, $this->getResponseProfile());
+		$thumbAsset = KalturaThumbAsset::getInstance($dbThumbAsset, $this->getResponseProfile());
 		return $thumbAsset;
     }
     
@@ -150,8 +149,7 @@ class ThumbAssetService extends KalturaAssetService
 			$this->setAsDefaultAction($dbThumbAsset->getId());
 		}
 		
-		$thumbAsset = KalturaThumbAsset::getInstanceByType($dbThumbAsset->getType());
-		$thumbAsset->fromObject($dbThumbAsset, $this->getResponseProfile());
+		$thumbAsset = KalturaThumbAsset::getInstance($dbThumbAsset, $this->getResponseProfile());
 		return $thumbAsset;
     }
 	
@@ -183,8 +181,7 @@ class ThumbAssetService extends KalturaAssetService
 		if($dbEntry->getCreateThumb() && $dbThumbAsset->hasTag(thumbParams::TAG_DEFAULT_THUMB))
 			$this->setAsDefaultAction($dbThumbAsset->getId());
 			
-		$thumbAsset = KalturaThumbAsset::getInstanceByType($dbThumbAsset->getType());
-		$thumbAsset->fromObject($dbThumbAsset, $this->getResponseProfile());
+		$thumbAsset = KalturaThumbAsset::getInstance($dbThumbAsset, $this->getResponseProfile());
 		return $thumbAsset;
     }
     
@@ -743,8 +740,7 @@ class ThumbAssetService extends KalturaAssetService
 			}	
 		}
 		
-		$thumbAssets = KalturaThumbAsset::getInstanceByType($thumbAssetsDb->getType());
-		$thumbAssets->fromObject($thumbAssetsDb, $this->getResponseProfile());
+		$thumbAssets = KalturaThumbAsset::getInstance($thumbAssetsDb, $this->getResponseProfile());
 		return $thumbAssets;
 	}
 	

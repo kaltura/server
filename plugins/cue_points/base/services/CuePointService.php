@@ -81,14 +81,13 @@ class CuePointService extends KalturaBaseService
 			return null;
 		}
 		
-		$cuePoint = KalturaCuePoint::getInstance($dbCuePoint->getType());
+		$cuePoint = KalturaCuePoint::getInstance($dbCuePoint, $this->getResponseProfile());
 		if(!$cuePoint)
 		{
 			KalturaLog::err("API Cue point not instantiated");
 			return null;
 		}
 			
-		$cuePoint->fromObject($dbCuePoint, $this->getResponseProfile());
 		return $cuePoint;
 	}
 	
@@ -169,11 +168,10 @@ class CuePointService extends KalturaBaseService
 		if($this->getCuePointType() && $dbCuePoint->getType() != $this->getCuePointType())
 			throw new KalturaAPIException(KalturaCuePointErrors::INVALID_CUE_POINT_ID, $id);
 			
-		$cuePoint = KalturaCuePoint::getInstance($dbCuePoint->getType());
+		$cuePoint = KalturaCuePoint::getInstance($dbCuePoint, $this->getResponseProfile());
 		if(!$cuePoint)
 			return null;
 			
-		$cuePoint->fromObject($dbCuePoint, $this->getResponseProfile());
 		return $cuePoint;
 	}
 	
@@ -250,7 +248,9 @@ class CuePointService extends KalturaBaseService
 		}
 		
 		$dbCuePoint = $cuePoint->toUpdatableObject($dbCuePoint);
-				
+
+		$this->validateUserLog($dbCuePoint);
+		
 		$dbCuePoint->setKuserId($this->getKuser()->getId()); 
 		$dbCuePoint->save();
 		
@@ -276,7 +276,34 @@ class CuePointService extends KalturaBaseService
 		if($this->getCuePointType() && $dbCuePoint->getType() != $this->getCuePointType())
 			throw new KalturaAPIException(KalturaCuePointErrors::INVALID_CUE_POINT_ID, $id);
 		
+		$this->validateUserLog($dbCuePoint);
+		
 		$dbCuePoint->setStatus(CuePointStatus::DELETED);
 		$dbCuePoint->save();
+	}
+	
+	/*
+	 * Track delete and update api calls to identify if enabling validateUser annotation will 
+	 * break any existing functionality
+	 */
+	private function validateUserLog($dbObject)
+	{
+		$log = 'validateUserLog: action ['.$this->actionName.'] client tag ['.kCurrentContext::$client_lang.'] ';
+		if (!$this->getKs()){
+			$log = $log.'Error: No KS ';
+			KalturaLog::err($log);
+			return;
+		}		
+
+		$log = $log.'ks ['.$this->getKs()->getOriginalString().'] ';
+		// if admin always allowed
+		if (kCurrentContext::$is_admin_session)
+			return;
+
+		if (strtolower($dbObject->getPuserId()) != strtolower(kCurrentContext::$ks_uid)) 
+		{
+			$log = $log.'Error: User not an owner ';
+			KalturaLog::err($log);
+		}
 	}
 }

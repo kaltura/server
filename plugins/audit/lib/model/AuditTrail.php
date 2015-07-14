@@ -13,7 +13,7 @@
  * @package plugins.audit
  * @subpackage model
  */
-class AuditTrail extends BaseAuditTrail 
+class AuditTrail extends BaseAuditTrail implements IBaseObject
 {	
 	protected $puserId = null;
 	

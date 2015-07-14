@@ -8,7 +8,7 @@
  * @package Core
  * @subpackage model
  */ 
-class moderation extends Basemoderation
+class moderation extends Basemoderation implements IBaseObject
 {
 	const MODERATION_OBJECT_TYPE_KSHOW = 1;
 	const MODERATION_OBJECT_TYPE_ENTRY = 2;

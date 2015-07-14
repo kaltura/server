@@ -19,4 +19,12 @@ class KalturaThumbCuePointFilter extends KalturaThumbCuePointBaseFilter
 	{
 		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
 	}
+	
+	/* (non-PHPdoc)
+	 * @see KalturaRelatedFilter::validateForResponseProfile()
+	 */
+	public function validateForResponseProfile()
+	{
+		// override KalturaCuePointFilter::validateForResponseProfile because all thumb cue-points are public
+	}
 }

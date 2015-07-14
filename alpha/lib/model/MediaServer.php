@@ -21,13 +21,11 @@ class MediaServer extends BaseMediaServer {
 	const DEFAULT_GPUID = -1;
 	
 	const WEB_SERVICE_LIVE = 'live';
-	const WEB_SERVICE_CUE_POINTS = 'cuePoints';
 	
 	private $isExternalMediaServer = false;
 	
 	static protected $webServices = array(
 		self::WEB_SERVICE_LIVE => 'KalturaMediaServerLiveService',
-		self::WEB_SERVICE_CUE_POINTS => 'KalturaMediaServerCuePointsService',
 	);
 	
 	

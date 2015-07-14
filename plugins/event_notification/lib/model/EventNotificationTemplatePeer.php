@@ -141,20 +141,29 @@ class EventNotificationTemplatePeer extends BaseEventNotificationTemplatePeer
 	 * Retrieve event notification templates according to systemName
 	 * @param string $systemName
 	 * @param int $excludeId
+	 * @param array<int> $partnerIds
 	 * @param PropelPDO $con
-	 * @return array<EventNotificationTemplate>
+	 * @return EventNotificationTemplate
 	 */
-	public static function retrieveBySystemName ($systemName, $excludeId = null, PropelPDO $con = null)
+	public static function retrieveBySystemName ($systemName, $excludeId = null, $partnerIds = null, PropelPDO $con = null)
 	{
 	    $criteria = new Criteria ( EventNotificationTemplatePeer::DATABASE_NAME );
 		$criteria->add ( EventNotificationTemplatePeer::STATUS, EventNotificationTemplateStatus::ACTIVE );
 		$criteria->add ( EventNotificationTemplatePeer::SYSTEM_NAME, $systemName );
 		if ($excludeId)
 		    $criteria->add( EventNotificationTemplatePeer::ID, $excludeId, Criteria::NOT_EQUAL);
-		    
-		$criteria->add(EventNotificationTemplatePeer::PARTNER_ID, kCurrentContext::getCurrentPartnerId());
 		
-		return EventNotificationTemplatePeer::doSelect($criteria);
+		// use the partner ids list if given
+		if (!$partnerIds)
+		{
+		    $partnerIds = array (kCurrentContext::getCurrentPartnerId());
+		}
+
+		$criteria->add(EventNotificationTemplatePeer::PARTNER_ID, $partnerIds, Criteria::IN);
+		
+		$criteria->addDescendingOrderByColumn(EventNotificationTemplatePeer::PARTNER_ID);
+		
+		return EventNotificationTemplatePeer::doSelectOne($criteria);
 	}
 
 	public static function getCacheInvalidationKeys()

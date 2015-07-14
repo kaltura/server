@@ -34,7 +34,7 @@ class kMultiCaptionFlowManager implements kBatchJobStatusEventConsumer
 
 	private function updatedParseMulti($dbBatchJob,$data)
 	{
-		$captionId = $data->getParentCaptionAssetId();
+		$captionId = $data->getMultiLanaguageCaptionAssetId();
 		$captionAsset = assetPeer::retrieveById($captionId);
 		$captionAsset->setStatus(asset::ASSET_STATUS_ERROR);
 		$captionAsset->save();

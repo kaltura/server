@@ -3,7 +3,7 @@
  * @package api
  * @subpackage objects
  */
-abstract class KalturaObject 
+abstract class KalturaObject implements IApiObject
 {
 	/**
 	 * @var KalturaListResponseArray
@@ -379,16 +379,25 @@ abstract class KalturaObject
 		$fromObjectClass::fromObject($this, $srcObj, $responseProfile);
 		$this->doFromObject($srcObj, $responseProfile);
 		
-		if($responseProfile)
+		if($srcObj instanceof IBaseObject)
 		{
-			$this->loadRelatedObjects($responseProfile);
+			KalturaResponseProfileCacher::onPersistentObjectLoaded($srcObj);
+			if($responseProfile)
+			{
+				$this->relatedObjects = KalturaResponseProfileCacher::start($srcObj, $responseProfile);
+				if(!$this->relatedObjects)
+				{
+					$this->loadRelatedObjects($responseProfile);
+					KalturaResponseProfileCacher::stop($srcObj, $this);
+				}
+			}
 		}
 	}
 	
 	public function loadRelatedObjects(KalturaDetachedResponseProfile $responseProfile)
 	{
 		// trigger validation
-		$responseProfile->toObject();
+		$responseProfile->validateNestedObjects();
 		
 		if(!$responseProfile->relatedProfiles)
 			return;
@@ -405,6 +414,7 @@ abstract class KalturaObject
 			KalturaLog::debug("Loading related response-profile [$relatedProfile->name] with filter [" . get_class($relatedProfile->filter) . "]");
 
 			$filter = clone $relatedProfile->filter;
+			/* @var $filter KalturaRelatedFilter */
 			
 			if($relatedProfile->mappings)
 			{
@@ -428,6 +438,7 @@ abstract class KalturaObject
 			{
 				KalturaLog::debug("No mappings defined in response-profile [$relatedProfile->name]");
 			}
+			$filter->validateForResponseProfile();
 			
 			$pager = $relatedProfile->pager;
 			if(!$pager)

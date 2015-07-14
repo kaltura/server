@@ -6,6 +6,7 @@
  */
 class kObjectChangedEvent extends KalturaEvent implements IKalturaDatabaseEvent, IKalturaObjectRelatedEvent
 {
+	const CUSTOM_DATA_OLD_VALUES = 'CUSTOM_DATA';
 	const EVENT_CONSUMER = 'kObjectChangedEventConsumer';
 	
 	/**
@@ -91,5 +92,15 @@ class kObjectChangedEvent extends KalturaEvent implements IKalturaDatabaseEvent,
 			$scope->setPartnerId($this->object->getPartnerId());
 			
 		return $scope;
+	}
+
+	public function isCustomDataModified($name = null, $namespace = '')
+	{
+		if(isset($this->modifiedColumns[self::CUSTOM_DATA_OLD_VALUES][$namespace]) && (is_null($name) || array_key_exists($name, $this->modifiedColumns[self::CUSTOM_DATA_OLD_VALUES][$namespace])))
+		{
+			return true;
+		}
+		
+		return false;
 	}
 }

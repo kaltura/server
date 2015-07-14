@@ -610,6 +610,7 @@ abstract class LiveEntry extends entry
 		$server = new kLiveMediaServer($index, $hostname, $mediaServer ? $mediaServer->getDc() : null, $mediaServer ? $mediaServer->getId() : null, 
 			$applicationName ? $applicationName : MediaServer::DEFAULT_APPLICATION);
 		$this->putInCustomData("server-$index", $server, LiveEntry::CUSTOM_DATA_NAMESPACE_MEDIA_SERVERS);
+		$this->setLiveStatus(LiveEntryStatus::PLAYABLE);
 	}
 	
 	protected function isMediaServerRegistered($index, $hostname)
@@ -629,6 +630,10 @@ abstract class LiveEntry extends entry
 		{
 			$server = $this->removeFromCustomData("server-$index", LiveEntry::CUSTOM_DATA_NAMESPACE_MEDIA_SERVERS);
 			$this->setLastBroadcastEndTime(kApiCache::getTime());
+		}
+		
+		if(!$this->hasMediaServer()) {
+			$this->setLiveStatus(LiveEntryStatus::DEAD);
 		}
 	}
 	
@@ -650,6 +655,16 @@ abstract class LiveEntry extends entry
 		}
 		
 		return $listChanged;
+	}
+	
+	public function getLiveStatus ()
+	{
+		return $this->getFromCustomData('live_status', null, LiveEntryStatus::DEAD);
+	}
+	
+	public function setLiveStatus ($v)
+	{
+		$this->putInCustomData('live_status', $v);
 	}
 	
 	/**

@@ -7,6 +7,9 @@
  */
 class KAsyncFileSyncImport extends KPeriodicWorker
 {
+	const MAX_EXECUTION_TIME = 3600;		// can be exceeded by one file sync
+	const IDLE_SLEEP_INTERVAL = 10;
+	
 	protected $curlWrapper;
 
 	public function run($jobs = null)
@@ -25,8 +28,17 @@ class KAsyncFileSyncImport extends KPeriodicWorker
 				
 		$multiCentersPlugin = KalturaMultiCentersClientPlugin::get(self::$kClient);
 		
-		for (;;)
+		// create a response profile with the minimum fields needed (saves some queries on the API server)
+		$responseProfile = new KalturaDetachedResponseProfile();
+		$responseProfile->type = KalturaResponseProfileType::INCLUDE_FIELDS;
+		$responseProfile->fields = 'id,originalId,fileSize,fileRoot,filePath,isDir';
+		
+		$timeLimit = time() + self::MAX_EXECUTION_TIME; 
+		
+		while (time() < $timeLimit)
 		{
+			self::$kClient->setResponseProfile($responseProfile);
+			
 			// lock file syncs to import
 			$lockResult = $multiCentersPlugin->filesyncImportBatch->lockPendingFileSyncs(
 					$filter, 
@@ -36,7 +48,9 @@ class KAsyncFileSyncImport extends KPeriodicWorker
 					$maxSize);
 			if (!$lockResult->fileSyncs)
 			{
-				sleep(1);
+				// didn't get any file syncs to import, sleep for a sec to avoid excessive
+				// queries on the database
+				sleep(self::IDLE_SLEEP_INTERVAL);
 				continue;
 			}
 
@@ -87,7 +101,9 @@ class KAsyncFileSyncImport extends KPeriodicWorker
 			// if the limit was not reached, wait for more file syncs to become available
 			if (!$lockResult->limitReached)
 			{
-				sleep(1);
+				// if the limit was not reached, it means that we don't have anything more to do
+				// wait until more file syncs are created
+				sleep(self::IDLE_SLEEP_INTERVAL);
 			}
 		}
 	}
@@ -140,6 +156,11 @@ class KAsyncFileSyncImport extends KPeriodicWorker
 	
 		try
 		{
+			$responseProfile = new KalturaDetachedResponseProfile();
+			$responseProfile->type = KalturaResponseProfileType::INCLUDE_FIELDS;
+			$responseProfile->fields = '';		// don't need the response
+			self::$kClient->setResponseProfile($responseProfile);
+				
 			$fileSyncPlugin = KalturaFilesyncClientPlugin::get(self::$kClient);
 			$fileSyncPlugin->fileSync->update($fileSync->id, $updateFileSync);
 		}

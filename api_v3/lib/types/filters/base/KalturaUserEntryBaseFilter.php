@@ -74,7 +74,7 @@ abstract class KalturaUserEntryBaseFilter extends KalturaFilter
 	public $entryIdNotIn;
 
 	/**
-	 * @var int
+	 * @var string
 	 */
 	public $userIdEqual;
 

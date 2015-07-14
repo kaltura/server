@@ -56,7 +56,7 @@ class serveMultiFileAction extends sfAction
 						
 			if (!file_exists($resolvedPath))
 			{
-				$error = "Path [$resolvedPath] for fileSync id [$file_sync_id] does not exist";
+				$error = "Path [$resolvedPath] for fileSync id [".$fileSync->getId()."] does not exist";
 				KalturaLog::err($error);
 				continue;
 			}

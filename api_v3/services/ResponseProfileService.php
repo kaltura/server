@@ -174,7 +174,19 @@ class ResponseProfileService extends KalturaBaseService
 		$response = new KalturaResponseProfileListResponse();
 		$response->objects = $list;
 		$response->totalCount = $totalCount;
-		return $response;    
+		return $response;
+	}
+	
+	/**
+	 * Recalculate response profile cached objects
+	 * 
+	 * @action recalculate
+	 * @param KalturaResponseProfileCacheRecalculateOptions $options
+	 * @return KalturaResponseProfileCacheRecalculateResults
+	 */
+	function recalculateAction(KalturaResponseProfileCacheRecalculateOptions $options)
+	{
+		return KalturaResponseProfileCacher::recalculateCacheBySessionType($options);
 	}
 	
 	/**
