@@ -23,11 +23,14 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 			
 		self::$cacheStores = array();
 		$cacheSections = kCacheManager::getCacheSectionNames($cacheType);
-		foreach ($cacheSections as $cacheSection)
+		if(is_array($cacheSections))
 		{
-			$cacheStore = kCacheManager::getCache($cacheSection);
-			if ($cacheStore)
-				self::$cacheStores[] = $cacheStore;
+			foreach ($cacheSections as $cacheSection)
+			{
+				$cacheStore = kCacheManager::getCache($cacheSection);
+				if ($cacheStore)
+					self::$cacheStores[] = $cacheStore;
+			}
 		}
 		
 		return self::$cacheStores;
