@@ -19,6 +19,34 @@ class TvinciDistributionProfile extends ConfigurableDistributionProfile
 		return TvinciDistributionPlugin::getProvider();
 	}
 
+	protected function getDefaultFieldConfigArray()
+	{
+		$fieldConfigArray = parent::getDefaultFieldConfigArray();
+
+		$fieldConfig = new DistributionFieldConfig();
+		$fieldConfig->setFieldName(TvinciDistributionField::CUSTOM);
+		$fieldConfig->setUserFriendlyFieldName('Custom Data:');
+		$fieldConfig->setUpdateOnChange(true);
+		$fieldConfig->setIsDefault(true);
+		$fieldConfig->setUpdateParams( array( entryPeer::CUSTOM_DATA, entryPeer::DESCRIPTION, entryPeer::NAME));
+		$fieldConfig->setIsRequired(DistributionFieldRequiredStatus::NOT_REQUIRED);
+		$fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
+
+		return $fieldConfigArray;
+
+	}
+
+	public function getUpdateRequiredMetadataXPaths()
+	{
+		$metadataConfigArray = parent::getUpdateRequiredMetadataXPaths();
+		/* we want any change to the metadata to create an update possibility */
+		$metadataConfigArray[] = TvinciDistributionField::META;
+
+		return $metadataConfigArray;
+
+	}
+
+
 
 	public function validateForSubmission(EntryDistribution $entryDistribution, $action)
 	{
