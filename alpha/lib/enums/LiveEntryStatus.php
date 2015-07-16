@@ -5,6 +5,6 @@
  */ 
 interface LiveEntryStatus extends BaseEnum
 {
-	const DEAD = 0;
+	const STOPPED = 0;
 	const PLAYABLE = 1;
 }

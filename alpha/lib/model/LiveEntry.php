@@ -633,7 +633,7 @@ abstract class LiveEntry extends entry
 		}
 		
 		if(!$this->hasMediaServer()) {
-			$this->setLiveStatus(LiveEntryStatus::DEAD);
+			$this->setLiveStatus(LiveEntryStatus::STOPPED);
 		}
 	}
 	
@@ -659,7 +659,7 @@ abstract class LiveEntry extends entry
 	
 	public function getLiveStatus ()
 	{
-		return $this->getFromCustomData('live_status', null, LiveEntryStatus::DEAD);
+		return $this->getFromCustomData('live_status', null, LiveEntryStatus::STOPPED);
 	}
 	
 	public function setLiveStatus ($v)
