@@ -580,11 +580,9 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 			{
 				$userId = $dbKuser->getPuserId();
 			}
-//			$ans[$userId] = ($totalCorrect/$totalAnswers)*100;
 			$ans[] = array('user_id' => $userId, 'percentage' => ($totalCorrect/$totalAnswers)*100);
 		}
 		return $ans;
-//		return array($ans);
 	}
 	
 }
