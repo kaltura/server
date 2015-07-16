@@ -386,7 +386,7 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 		{
 			throw new Exception(KalturaQuizErrors::ENTRY_ID_NOT_GIVEN);
 		}
-		$ans = -1;
+		$avg = -1;
 		$dbEntry = entryPeer::retrieveByPK($objectIds);
 		if (!$dbEntry)
 			throw new Exception(KalturaErrors::ENTRY_ID_NOT_FOUND, $objectIds);
@@ -411,9 +411,9 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 				 */
 				$sumOfScores += $quiz->getScore();
 			}
-			$ans = $sumOfScores / $numOfQuizzesFound;
+			$avg = $sumOfScores / $numOfQuizzesFound;
 		}
-		return array(array('Average', $ans));
+		return array(array('average' => $avg));
 	}
 
 	/**
@@ -478,9 +478,10 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 			{
 				$pctg = 0.0;
 			}
-			$ans[$question->getId()] = $pctg*100;
+			$questPctgs = array('question_id' => $question->getId(), 'percentage' => ($pctg*100));
+			$ans[] = $questPctgs;
 		}
-		return array($ans);
+		return $ans;
 	}
 
 	/**
@@ -579,9 +580,9 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 			{
 				$userId = $dbKuser->getPuserId();
 			}
-			$ans[$userId] = ($totalCorrect/$totalAnswers)*100;
+			$ans[] = array('user_id' => $userId, 'percentage' => ($totalCorrect/$totalAnswers)*100);
 		}
-		return array($ans);
+		return $ans;
 	}
 	
 }
