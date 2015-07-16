@@ -1,1 +1,1 @@
-ALTER TABLE `edge_server` CHANGE desciption description varchar(127);
+ALTER TABLE `edge_server` CHANGE desciption description varchar(256);
