@@ -1,5 +1,23 @@
 # Jupiter-10.16.0 #
 
+
+## Edge Server - Rename column name ##
+
+-- Issue Type: Bug report
+-- Issue ID: PLAT-3441
+
+#### Configuration ####
+ 
+None.
+
+#### Deployment Scripts ####
+
+ - mysql -h@db_host@ -u@db_user@ -p@db_pass@ -P3306 kaltura < deployment/updates/sql/2015_07_26_alter_edge_server_column_name.sql
+
+#### Known Issues & Limitations ####
+
+None.
+
 ## Cache response-profile results ##
 
 - Issue Type: optimization
