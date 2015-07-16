@@ -89,8 +89,8 @@
                         <xsl:value-of select="$uniqueTagName"/>
                     </xsl:attribute>
                     <xsl:attribute name="ml_handling">unique</xsl:attribute>
-                    <xsl:element name="container">
-                        <xsl:for-each select="exsl:node-set($tagsWithAttributes)">
+                    <xsl:for-each select="exsl:node-set($tagsWithAttributes)">
+                        <xsl:element name="container">
                             <xsl:variable name="tagWithAttrName" >
                                 <xsl:value-of select="@name" />
                             </xsl:variable>
@@ -100,8 +100,8 @@
                                     <xsl:value-of select="."/>
                                 </xsl:element>
                             </xsl:if>
-                        </xsl:for-each>
-                    </xsl:element>
+                        </xsl:element>
+                    </xsl:for-each>
                 </xsl:element>
             </xsl:for-each>
         </xsl:element>
