@@ -59,6 +59,11 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 	
 	const CACHE_ROOT_OBJECTS = 'CACHE_ROOT_OBJECTS';
 	
+	const VIEW_KEY_SESSION_KEY = 'sessionKey';
+	const VIEW_KEY_TRIGGER_KEY = 'triggerKey';
+	const VIEW_KEY_OBJECT_KEY = 'objectKey';
+	const VIEW_KEY_OBJECT_TYPE = 'objectType';
+	
 	/**
 	 * @var array
 	 */
@@ -449,9 +454,9 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 				$query = $cacheStore->getNewQuery(kResponseProfileCacher::VIEW_RESPONSE_PROFILE_RELATED_OBJECT_SESSIONS);
 				if($query)
 				{
-					$query->addStartKey('triggerKey', self::getRelatedObjectKey($object));
-					$query->addStartKey('objectType', 'A');
-					$query->addStartKey('sessionKey', 'A');
+					$query->addStartKey(kResponseProfileCacher::VIEW_KEY_TRIGGER_KEY, self::getRelatedObjectKey($object));
+					$query->addStartKey(kResponseProfileCacher::VIEW_KEY_OBJECT_TYPE, 'A');
+					$query->addStartKey(kResponseProfileCacher::VIEW_KEY_SESSION_KEY, 'A');
 					$query->setLimit(1);
 					
 					$list = $cacheStore->query($query);
@@ -548,8 +553,8 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 				if(!$query)
 					continue;
 					
-				$query->addStartKey('sessionKey', $sessionKey);
-				$query->addStartKey('objectKey', $objectKey);
+				$query->addStartKey(kResponseProfileCacher::VIEW_KEY_SESSION_KEY, $sessionKey);
+				$query->addStartKey(kResponseProfileCacher::VIEW_KEY_OBJECT_KEY, $objectKey);
 				$query->setLimit(1);
 
 				$list = $cacheStore->query($query);
@@ -599,12 +604,12 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 				$query = $cacheStore->getNewQuery(kResponseProfileCacher::VIEW_RESPONSE_PROFILE_RELATED_OBJECT_SESSIONS);
 				if($query)
 				{
-					$query->addStartKey('triggerKey', $triggerKey);
-					$query->addStartKey('objectType', 'A');
-					$query->addStartKey('sessionKey', 'A');
-					$query->addEndKey('triggerKey', $triggerKey);
-					$query->addEndKey('objectType', 'z');
-					$query->addEndKey('sessionKey', 'z');
+					$query->addStartKey(kResponseProfileCacher::VIEW_KEY_TRIGGER_KEY, $triggerKey);
+					$query->addStartKey(kResponseProfileCacher::VIEW_KEY_OBJECT_TYPE, 'A');
+					$query->addStartKey(kResponseProfileCacher::VIEW_KEY_SESSION_KEY, 'A');
+					$query->addEndKey(kResponseProfileCacher::VIEW_KEY_TRIGGER_KEY, $triggerKey);
+					$query->addEndKey(kResponseProfileCacher::VIEW_KEY_OBJECT_TYPE, 'z');
+					$query->addEndKey(kResponseProfileCacher::VIEW_KEY_SESSION_KEY, 'z');
 					$query->setLimit(self::MAX_CACHE_KEYS_PER_JOB);
 
 					$offset = 0;
@@ -655,10 +660,10 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 				$query = $cacheStore->getNewQuery(kResponseProfileCacher::VIEW_RESPONSE_PROFILE_RELATED_OBJECTS_TYPES);
 				if($query)
 				{
-					$query->addStartKey('triggerKey', $triggerKey);
-					$query->addStartKey('objectType', 'A');
-					$query->addEndKey('triggerKey', $triggerKey);
-					$query->addEndKey('objectType', 'z');
+					$query->addStartKey(kResponseProfileCacher::VIEW_KEY_TRIGGER_KEY, $triggerKey);
+					$query->addStartKey(kResponseProfileCacher::VIEW_KEY_OBJECT_TYPE, 'A');
+					$query->addEndKey(kResponseProfileCacher::VIEW_KEY_TRIGGER_KEY, $triggerKey);
+					$query->addEndKey(kResponseProfileCacher::VIEW_KEY_OBJECT_TYPE, 'z');
 					$query->setLimit(self::MAX_CACHE_KEYS_PER_JOB);
 
 					$offset = 0;
@@ -701,10 +706,10 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 					$query = $cacheStore->getNewQuery(kResponseProfileCacher::VIEW_RESPONSE_PROFILE_OBJECT_SESSIONS);
 					if($query)
 					{
-						$query->addStartKey('objectKey', $objectKey);
-						$query->addStartKey('sessionKey', 'A');
-						$query->addEndKey('objectKey', $objectKey);
-						$query->addEndKey('sessionKey', 'z');
+						$query->addStartKey(kResponseProfileCacher::VIEW_KEY_OBJECT_KEY, $objectKey);
+						$query->addStartKey(kResponseProfileCacher::VIEW_KEY_SESSION_KEY, 'A');
+						$query->addEndKey(kResponseProfileCacher::VIEW_KEY_OBJECT_KEY, $objectKey);
+						$query->addEndKey(kResponseProfileCacher::VIEW_KEY_SESSION_KEY, 'z');
 						$query->setLimit(self::MAX_CACHE_KEYS_PER_JOB);
 	
 						$list = $cacheStore->query($query);

@@ -243,8 +243,8 @@ class KalturaResponseProfileCacher extends kResponseProfileCacher
 				{
 					$objectKey = "{$partnerId}_{$options->cachedObjectType}_{$options->objectId}";
 					KalturaLog::debug("Serach for key [$sessionKey, $objectKey]");
-					$query->addKey('sessionKey', $sessionKey);
-					$query->addKey('objectKey', $objectKey);
+					$query->addKey(kResponseProfileCacher::VIEW_KEY_SESSION_KEY, $sessionKey);
+					$query->addKey(kResponseProfileCacher::VIEW_KEY_OBJECT_KEY, $objectKey);
 				}
 				else 
 				{
@@ -253,13 +253,13 @@ class KalturaResponseProfileCacher extends kResponseProfileCacher
 						$objectKey = $options->startObjectKey;
 						
 					KalturaLog::debug("Serach for start key [$sessionKey, $objectKey]");
-					$query->addStartKey('sessionKey', $sessionKey);
-					$query->addStartKey('objectKey', $objectKey);
+					$query->addStartKey(kResponseProfileCacher::VIEW_KEY_SESSION_KEY, $sessionKey);
+					$query->addStartKey(kResponseProfileCacher::VIEW_KEY_OBJECT_KEY, $objectKey);
 					
 					if($options->endObjectKey)
 					{
-						$query->addEndKey('sessionKey', $sessionKey);
-						$query->addEndKey('objectKey', $options->endObjectKey);
+						$query->addEndKey(kResponseProfileCacher::VIEW_KEY_SESSION_KEY, $sessionKey);
+						$query->addEndKey(kResponseProfileCacher::VIEW_KEY_OBJECT_KEY, $options->endObjectKey);
 					}
 				}
 
