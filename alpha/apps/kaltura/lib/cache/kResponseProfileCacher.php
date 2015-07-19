@@ -1,6 +1,60 @@
 <?php
 class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDeletedEventConsumer, kObjectAddedEventConsumer
 {
+	const VIEW_RESPONSE_PROFILE_OBJECT_SPECIFIC = 'objectSpecific';
+//function (doc, meta) {
+//	if (meta.type == "json") {
+//		if(doc.type == "primaryObject"){
+//			emit(doc.objectKey, null);
+//		}
+//	}
+//}
+
+	const VIEW_RESPONSE_PROFILE_RELATED_OBJECT_SESSIONS = 'relatedObjectSessions';
+//function (doc, meta) {
+//	if (meta.type == "json") {
+//		if(doc.type == "relatedObject"){
+// 			emit([doc.triggerKey, doc.objectType, doc.sessionKey], null);
+//		}
+//	}
+//}
+	
+	const VIEW_RESPONSE_PROFILE_RELATED_OBJECTS_TYPES = 'relatedObjectsTypes';
+//function (doc, meta) {
+//	if (meta.type == "json") {
+//		if(doc.type == "relatedObject"){
+// 			emit([doc.triggerKey, doc.objectType], null);
+//		}
+//	}
+//}
+	
+	const VIEW_RESPONSE_PROFILE_OBJECT_SESSIONS = 'objectSessions';
+// function (doc, meta) {
+// 	if (meta.type == "json") {
+// 		if(doc.type == "primaryObject"){
+// 			emit([doc.objectKey, doc.sessionKey], null);
+// 		}
+// 	}
+// }
+
+	const VIEW_RESPONSE_PROFILE_OBJECT_TYPE_SESSIONS = 'objectTypeSessions';
+// function (doc, meta) {
+// 	if (meta.type == "json") {
+// 		if(doc.type == "primaryObject"){
+// 			emit([doc.objectType, doc.sessionKey], null);
+// 		}
+// 	}
+// }
+	
+	const VIEW_RESPONSE_PROFILE_SESSION_TYPE = 'sessionType';
+//function (doc, meta) {
+//	if (meta.type == "json") {
+//		if(doc.type == "primaryObject"){
+//			emit([doc.sessionKey, doc.objectKey], doc);
+//		}
+//	}
+//}
+
 	const MAX_CACHE_KEYS_PER_JOB = 1000;
 	
 	/**
@@ -385,7 +439,7 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 		{
 			if($cacheStore instanceof kCouchbaseCacheWrapper)
 			{
-				$query = $cacheStore->getNewQuery(kCouchbaseCacheQuery::VIEW_RESPONSE_PROFILE_RELATED_OBJECT_SESSIONS);
+				$query = $cacheStore->getNewQuery(kResponseProfileCacher::VIEW_RESPONSE_PROFILE_RELATED_OBJECT_SESSIONS);
 				if($query)
 				{
 					$query->addStartKey('triggerKey', self::getRelatedObjectKey($object));
@@ -430,7 +484,7 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 		{
 			if($cacheStore instanceof kCouchbaseCacheWrapper)
 			{
-				$query = $cacheStore->getNewQuery(kCouchbaseCacheQuery::VIEW_RESPONSE_PROFILE_OBJECT_SPECIFIC);
+				$query = $cacheStore->getNewQuery(kResponseProfileCacher::VIEW_RESPONSE_PROFILE_OBJECT_SPECIFIC);
 				if($query)
 				{
 					$query->setKey(self::getObjectKey($object));
@@ -464,7 +518,7 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 			if($cacheStore instanceof kCouchbaseCacheWrapper)
 			{
 				// TODO optimize using elastic search query
-				$query = $cacheStore->getNewQuery(kCouchbaseCacheQuery::VIEW_RESPONSE_PROFILE_SESSION_TYPE);
+				$query = $cacheStore->getNewQuery(kResponseProfileCacher::VIEW_RESPONSE_PROFILE_SESSION_TYPE);
 				if(!$query)
 					continue;
 					
@@ -516,7 +570,7 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 			if($cacheStore instanceof kCouchbaseCacheWrapper)
 			{
 				// TODO optimize using elastic search query
-				$query = $cacheStore->getNewQuery(kCouchbaseCacheQuery::VIEW_RESPONSE_PROFILE_RELATED_OBJECT_SESSIONS);
+				$query = $cacheStore->getNewQuery(kResponseProfileCacher::VIEW_RESPONSE_PROFILE_RELATED_OBJECT_SESSIONS);
 				if($query)
 				{
 					$query->addStartKey('triggerKey', $triggerKey);
@@ -572,7 +626,7 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 			if($cacheStore instanceof kCouchbaseCacheWrapper)
 			{
 				// TODO optimize using elastic search query
-				$query = $cacheStore->getNewQuery(kCouchbaseCacheQuery::VIEW_RESPONSE_PROFILE_RELATED_OBJECTS_TYPES);
+				$query = $cacheStore->getNewQuery(kResponseProfileCacher::VIEW_RESPONSE_PROFILE_RELATED_OBJECTS_TYPES);
 				if($query)
 				{
 					$query->addStartKey('triggerKey', $triggerKey);
@@ -618,7 +672,7 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 				if($cacheStore instanceof kCouchbaseCacheWrapper)
 				{
 					// TODO optimize using elastic search query
-					$query = $cacheStore->getNewQuery(kCouchbaseCacheQuery::VIEW_RESPONSE_PROFILE_OBJECT_SESSIONS);
+					$query = $cacheStore->getNewQuery(kResponseProfileCacher::VIEW_RESPONSE_PROFILE_OBJECT_SESSIONS);
 					if($query)
 					{
 						$query->addStartKey('objectKey', $objectKey);

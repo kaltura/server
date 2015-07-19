@@ -234,7 +234,7 @@ class KalturaResponseProfileCacher extends kResponseProfileCacher
 		{
 			if($cacheStore instanceof kCouchbaseCacheWrapper)
 			{
-				$query = $cacheStore->getNewQuery(kCouchbaseCacheQuery::VIEW_RESPONSE_PROFILE_SESSION_TYPE);
+				$query = $cacheStore->getNewQuery(kResponseProfileCacher::VIEW_RESPONSE_PROFILE_SESSION_TYPE);
 				if(!$query)
 					continue;
 					

@@ -1,61 +1,7 @@
 <?php
 
 class kCouchbaseCacheQuery
-{
-	const VIEW_RESPONSE_PROFILE_OBJECT_SPECIFIC = 'objectSpecific';
-//function (doc, meta) {
-//	if (meta.type == "json") {
-//		if(doc.type == "primaryObject"){
-//			emit(doc.objectKey, null);
-//		}
-//	}
-//}
-
-	const VIEW_RESPONSE_PROFILE_RELATED_OBJECT_SESSIONS = 'relatedObjectSessions';
-//function (doc, meta) {
-//	if (meta.type == "json") {
-//		if(doc.type == "relatedObject"){
-// 			emit([doc.triggerKey, doc.objectType, doc.sessionKey], null);
-//		}
-//	}
-//}
-	
-	const VIEW_RESPONSE_PROFILE_RELATED_OBJECTS_TYPES = 'relatedObjectsTypes';
-//function (doc, meta) {
-//	if (meta.type == "json") {
-//		if(doc.type == "relatedObject"){
-// 			emit([doc.triggerKey, doc.objectType], null);
-//		}
-//	}
-//}
-	
-	const VIEW_RESPONSE_PROFILE_OBJECT_SESSIONS = 'objectSessions';
-// function (doc, meta) {
-// 	if (meta.type == "json") {
-// 		if(doc.type == "primaryObject"){
-// 			emit([doc.objectKey, doc.sessionKey], null);
-// 		}
-// 	}
-// }
-
-	const VIEW_RESPONSE_PROFILE_OBJECT_TYPE_SESSIONS = 'objectTypeSessions';
-// function (doc, meta) {
-// 	if (meta.type == "json") {
-// 		if(doc.type == "primaryObject"){
-// 			emit([doc.objectType, doc.sessionKey], null);
-// 		}
-// 	}
-// }
-	
-	const VIEW_RESPONSE_PROFILE_SESSION_TYPE = 'sessionType';
-//function (doc, meta) {
-//	if (meta.type == "json") {
-//		if(doc.type == "primaryObject"){
-//			emit([doc.sessionKey, doc.objectKey], doc);
-//		}
-//	}
-//}
-	
+{	
 	/**
 	 * @var string
 	 */  
