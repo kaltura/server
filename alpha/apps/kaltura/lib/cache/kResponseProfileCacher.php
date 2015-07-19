@@ -57,6 +57,8 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 
 	const MAX_CACHE_KEYS_PER_JOB = 1000;
 	
+	const CACHE_ROOT_OBJECTS = 'CACHE_ROOT_OBJECTS';
+	
 	/**
 	 * @var array
 	 */
@@ -66,6 +68,11 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 	 * @var int
 	 */
 	private static $cacheVersion = null;
+	
+	/**
+	 * @var array
+	 */
+	private $queryCache = array();
 	
 	/**
 	 * @return array<kBaseCacheWrapper>
@@ -429,6 +436,11 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 			return false;
 		}
 		
+		if(isset($this->queryCache[__METHOD__]))
+		{
+			return true;
+		}
+			
 		$cacheStores = self::getStores();
 		foreach ($cacheStores as $cacheStore)
 		{
@@ -444,7 +456,10 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 					
 					$list = $cacheStore->query($query);
 					if($list->getCount())
+					{
+						$this->queryCache[__METHOD__] = true;
 						return true;
+					}
 				}
 			}
 		}
@@ -464,16 +479,29 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 		{
 			return false;
 		}
+	
+		if(isset($this->queryCache[kResponseProfileCacher::CACHE_ROOT_OBJECTS]))
+		{
+			return true;
+		}
 		
 		$roots = $peer->getRootObjects($object);
 		if(count($roots))
+		{
+			$this->queryCache[kResponseProfileCacher::CACHE_ROOT_OBJECTS] = $roots;
 			return true;
+		}
 				
 		return false;
 	}
 	
 	protected function isCachedObject(IBaseObject $object)
 	{
+		if(isset($this->queryCache[__METHOD__]))
+		{
+			return true;
+		}
+		
 		$cacheStores = self::getStores();
 		foreach ($cacheStores as $cacheStore)
 		{
@@ -487,7 +515,10 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 					
 					$list = $cacheStore->query($query);
 					if($list->getCount())
+					{
+						$this->queryCache[__METHOD__] = true;
 						return true;
+					}
 				}
 			}
 		}
@@ -745,18 +776,29 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 	protected function invalidateCachedRootObjects(IBaseObject $object, $recursionLevel = 0)
 	{
 		KalturaLog::debug('Invalidating object [' . get_class($object) . '] id [' . $object->getPrimaryKey() . '] roots');
-		$peer = $object->getPeer();
-		if($peer instanceof IRelatedObjectPeer)
+		
+		$roots = null;
+		if(isset($this->queryCache[kResponseProfileCacher::CACHE_ROOT_OBJECTS]))
 		{
-			$roots = $peer->getRootObjects($object);
-			if(is_array($roots))
+			$roots = $this->queryCache[kResponseProfileCacher::CACHE_ROOT_OBJECTS];
+		}
+		else
+		{
+			$peer = $object->getPeer();
+			if($peer instanceof IRelatedObjectPeer)
 			{
-				foreach($roots as $root)
-				{
-					$this->invalidateCachedObject($root, $recursionLevel);
-				}
+				$roots = $peer->getRootObjects($object);
 			}
 		}
+	
+		if(is_array($roots))
+		{
+			foreach($roots as $root)
+			{
+				$this->invalidateCachedObject($root, $recursionLevel);
+			}
+		}
+		
 		return true;
 	}
 	
