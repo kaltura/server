@@ -127,11 +127,17 @@ class EntryDistributionPeer extends BaseEntryDistributionPeer implements IRelate
 	public function getRootObjects(IBaseObject $object)
 	{
 		/* @var $object EntryDistribution */
+		$roots = array();
+		
 		$distributionProfile = DistributionProfilePeer::retrieveByPK($object->getDistributionProfileId());
 		if($distributionProfile)
-			return array($distributionProfile);
+			$roots[] = $distributionProfile;
+		
+		$entry = entryPeer::retrieveByPK($object->getEntryId());
+		if($entry)
+			$roots[] = $entry;
 			
-		return array();
+		return $roots;
 	}
 
 	/* (non-PHPdoc)
