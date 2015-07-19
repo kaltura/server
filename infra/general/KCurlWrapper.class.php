@@ -77,6 +77,43 @@ class KCurlHeaderResponse
 
 		return isset($goodCodes[$this->code]);
 	}
+	public function storeCookie($value)
+	{
+		$cookieKey=trim(strtolower($this->getCookieKey($value)));
+		$this->headers['set-cookie'][$cookieKey]=trim($value);
+	}
+	public function getCookieValue($cookieInfo,$cookieKey)
+	{
+		//search cookie value in curlInfo
+		if (!isset($cookieInfo[strtolower($cookieKey)]))
+		{
+			throw new Exception("Cookie key not found-".$cookieKey);
+		}
+
+		$cookie = $cookieInfo[strtolower($cookieKey)];
+		$cookieVars = explode(';',$cookie);
+		foreach ($cookieVars as $cookieVar)
+		{
+			$keyVal = explode('=',$cookieVar);
+			if($keyVal[0]==$cookieKey)
+			{
+				return $keyVal[1];
+			}
+		}
+
+		return null;
+	}
+
+	private function getCookieKey($setCookieValue)
+	{
+		//list cookie vars
+		$cookie_items = explode(';',$setCookieValue);
+
+		//Get the cookie key
+		$cookieKey = explode ('=',$cookie_items[0]);
+
+		return $cookieKey[0];
+	}
 }
 
 /**
@@ -109,11 +146,11 @@ class KCurlWrapper
 	private static function read_header($ch, $string) {
 		self::$headers .= $string;
 		if ($string == "\r\n")
-        {
-        	$curlInfo = curl_getinfo($ch);
-            $httpResponseCode = $curlInfo['http_code'];
-            if(!in_array($httpResponseCode, array(KCurlHeaderResponse::HTTP_STATUS_REDIRECT, KCurlHeaderResponse::HTTP_STATUS_MOVED))) // mark when we get to the last header so we can abort the cur
-            	self::$lastHeader = true;
+		{
+			$curlInfo = curl_getinfo($ch);
+			$httpResponseCode = $curlInfo['http_code'];
+			if(!in_array($httpResponseCode, array(KCurlHeaderResponse::HTTP_STATUS_REDIRECT, KCurlHeaderResponse::HTTP_STATUS_MOVED))) // mark when we get to the last header so we can abort the cur
+				self::$lastHeader = true;
 		}
 		
 		$length = strlen ( $string );
@@ -305,15 +342,15 @@ class KCurlWrapper
 		}
 
 		self::$headers = "";
-        self::$lastHeader = false;
-        curl_exec($this->ch);
-        
-        //Added to support multiple curl executions using the same curl. Wince this is the same curl re-used we need to reset the range option before continuing forward
-        if(!$noBody)
+		self::$lastHeader = false;
+		curl_exec($this->ch);
+
+		//Added to support multiple curl executions using the same curl. Wince this is the same curl re-used we need to reset the range option before continuing forward
+		if(!$noBody)
 			curl_setopt($this->ch, CURLOPT_RANGE, '0-');
-        
-        if(!self::$headers)
-           return false;
+
+		if(!self::$headers)
+		   return false;
 
 		self::$headers = explode("\r\n", self::$headers);
 
@@ -344,15 +381,14 @@ class KCurlWrapper
 				}
 
 				list($name, $value) = explode(':', $header, 2);
-                if (trim(strtolower($name))=='set-cookie')
-                {
-                    $cookieKey=trim(strtolower($this->getCookieKey($value)));
-                    $curlHeaderResponse->headers['set-cookie'][$cookieKey]=trim($value);
-                }
-                else
-                {
-                    $curlHeaderResponse->headers[trim(strtolower($name))] = (trim($value));
-                }
+				if (trim(strtolower($name))=='set-cookie')
+				{
+					$curlHeaderResponse->storeCookie($value);
+				}
+				else
+				{
+					$curlHeaderResponse->headers[trim(strtolower($name))] = (trim($value));
+				}
 
 			}
 
@@ -379,15 +415,14 @@ class KCurlWrapper
 					continue;
 
 				list($name, $value) = $headerParts;
-                if (trim(strtolower($name))=='set-cookie')
-                {
-                    $cookieKey=trim(strtolower($this->getCookieKey($value)));
-                    $curlHeaderResponse->headers['set-cookie'][$cookieKey]=trim($value);
-                }
-                else
-                {
-                    $curlHeaderResponse->headers[trim(strtolower($name))] = (trim($value));
-                }
+				if (trim(strtolower($name))=='set-cookie')
+				{
+					$curlHeaderResponse->storeCookie($value);
+				}
+				else
+				{
+					$curlHeaderResponse->headers[trim(strtolower($name))] = (trim($value));
+				}
 			}
 
 			// if this is a good ftp url - there will be a content-length header
@@ -422,38 +457,6 @@ class KCurlWrapper
 		
 		return $curlHeaderResponse;
 	}
-    public static function getCookieValue($cookieInfo,$cookieKey)
-    {
-        //search cookie value in curlInfo
-        if (!isset($cookieInfo[strtolower($cookieKey)]))
-        {
-            throw new Exception("Cookie key not found-".$cookieKey);
-        }
-
-        $cookie = $cookieInfo[strtolower($cookieKey)];
-        $cookieVars = explode(';',$cookie);
-        foreach ($cookieVars as $cookieVar)
-        {
-            $keyVal = explode('=',$cookieVar);
-            if($keyVal[0]==$cookieKey)
-            {
-                return $keyVal[1];
-            }
-        }
-
-        return null;
-    }
-
-    private function getCookieKey($setCookieValue)
-    {
-        //list cookie vars
-        $cookie_items = explode(';',$setCookieValue);
-
-        //Get the cookie key
-        $cookieKey = explode ('=',$cookie_items[0]);
-
-        return $cookieKey[0];
-    }
 
 	/**
 	 * @param string $sourceUrl
