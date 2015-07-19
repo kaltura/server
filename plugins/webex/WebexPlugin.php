@@ -30,7 +30,7 @@ class WebexPlugin extends KalturaPlugin implements IKalturaImportHandler
 		$recordId=null;
 		if(isset($curlInfo->headers['set-cookie']))
 		{
-			$recordId = KCurlWrapper::getCookieValue($curlInfo->headers['set-cookie'], 'recordId');
+			$recordId = $curlInfo->getCookieValue($curlInfo->headers['set-cookie'], 'recordId');
 			if ($recordId==null)
 			{
 				throw new Exception('recordId value not found');
