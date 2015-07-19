@@ -476,7 +476,7 @@ class kCouchbaseCacheWrapper extends kBaseCacheWrapper
 	{
 		if (!class_exists('CouchbaseCluster') )
 		{
-			return;
+			return false;
 		}
 
 		$cluster = new CouchbaseCluster($config['dsn'], $config['username'], $config['password']);
@@ -499,7 +499,9 @@ class kCouchbaseCacheWrapper extends kBaseCacheWrapper
 				);
 			}
 		}
-}
+		
+		return true;
+	}
 
 	/* (non-PHPdoc)
 	 * @see kBaseCacheWrapper::doGet()
