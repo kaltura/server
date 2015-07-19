@@ -352,6 +352,12 @@ abstract class KalturaObject implements IApiObject
 	
 	final public function fromObject($srcObj, KalturaDetachedResponseProfile $responseProfile = null)
 	{
+		if (!is_object($srcObj))
+		{
+			KalturaLog::err("expected an object, got " . print_r($srcObj, true));
+			return;
+		}
+		
 		$thisClass = get_class($this);
 		$srcObjClass = get_class($srcObj);
 		$fromObjectClass = "Map_{$thisClass}_{$srcObjClass}";
