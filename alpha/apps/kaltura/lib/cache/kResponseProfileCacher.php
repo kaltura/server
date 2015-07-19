@@ -219,7 +219,7 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 				if($invalidationTimes)
 				{
 					$invalidationTime = max($invalidationTimes);
-					$invalidationTime += kConf::get('cache_invalidation_threshold', 'local', 0);
+					$invalidationTime += kConf::get('cache_invalidation_threshold', 'local', 10);
 					KalturaLog::debug("Invalidation keys [" . implode(', ', $invalidationKeys) . "] times [" . implode(', ', $invalidationTimes) . "] compare to value time [{$value->time}]");
 					if(intval($invalidationTime) >= intval($value->time))
 					{
