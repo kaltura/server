@@ -41,18 +41,15 @@ class FileAssetPeer extends BaseFileAssetPeer implements IRelatedObjectPeer
 		{
 			/* @var $parentObject IBaseObject */
 			$peer = $parentObject->getPeer();
-			$rootAdded = false;
 			if($peer instanceof IRelatedObjectPeer)
 			{
 				$parentRoots = $peer->getRootObjects($parentObject);
 				if(count($parentRoots))
 				{
 					$rootObjects = array_merge($rootObjects, $parentRoots);
-					$rootAdded = true;
 				}
 			}
-			if($rootAdded)
-				$rootObjects[] = $parentObject;
+			$rootObjects[] = $parentObject;
 		}
 		
 		return $rootObjects;
