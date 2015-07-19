@@ -35,7 +35,6 @@ class WebexXmlClient
 		return (trim(file_get_contents($url)) == 'TRUE');
 	}
 
-
 	private function validateNoBackup()
 	{
 		if($this->isRunningOnBackupSite())
