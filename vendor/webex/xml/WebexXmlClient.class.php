@@ -25,7 +25,7 @@ class WebexXmlClient
 	public function __construct($url, WebexXmlSecurityContext $securityContext)
 	{
 		$this->url = $url;
-        $this->validateNoBackup();
+		$this->validateNoBackup();
 		$this->securityContext = $securityContext;
 	}
 
@@ -59,8 +59,8 @@ class WebexXmlClient
 	 */
 	public function send(WebexXmlRequestBodyContent $requestBodyContent)
 	{
-        $this->validateNoBackup();
-        $request = new WebexXmlRequest($this->securityContext, $requestBodyContent);
+		$this->validateNoBackup();
+		$request = new WebexXmlRequest($this->securityContext, $requestBodyContent);
 		$response = $this->doSend($request);
 		
 		if($response->getHeader()->getResponse()->getResult() != WebexXmlHeaderResponse::RESULT_SUCCESS)
