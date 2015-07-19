@@ -77,20 +77,22 @@ class KCurlHeaderResponse
 
 		return isset($goodCodes[$this->code]);
 	}
+
 	public function storeCookie($value)
 	{
-		$cookieKey=trim(strtolower($this->getCookieKey($value)));
+		$cookieKey=trim($this->getCookieKey($value));
 		$this->headers['set-cookie'][$cookieKey]=trim($value);
 	}
+
 	public function getCookieValue($cookieInfo,$cookieKey)
 	{
 		//search cookie value in curlInfo
-		if (!isset($cookieInfo[strtolower($cookieKey)]))
+		if (!isset($cookieInfo[$cookieKey]))
 		{
 			throw new Exception("Cookie key not found-".$cookieKey);
 		}
 
-		$cookie = $cookieInfo[strtolower($cookieKey)];
+		$cookie = $cookieInfo[$cookieKey];
 		$cookieVars = explode(';',$cookie);
 		foreach ($cookieVars as $cookieVar)
 		{
@@ -107,10 +109,10 @@ class KCurlHeaderResponse
 	private function getCookieKey($setCookieValue)
 	{
 		//list cookie vars
-		$cookie_items = explode(';',$setCookieValue);
+		$cookieItems = explode(';',$setCookieValue);
 
 		//Get the cookie key
-		$cookieKey = explode ('=',$cookie_items[0]);
+		$cookieKey = explode ('=',$cookieItems[0]);
 
 		return $cookieKey[0];
 	}
