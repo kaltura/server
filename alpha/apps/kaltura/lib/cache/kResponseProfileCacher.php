@@ -449,23 +449,27 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 		$cacheStores = self::getStores();
 		foreach ($cacheStores as $cacheStore)
 		{
-			if($cacheStore instanceof kCouchbaseCacheWrapper)
+			if(!($cacheStore instanceof kCouchbaseCacheWrapper))
 			{
-				$query = $cacheStore->getNewQuery(kResponseProfileCacher::VIEW_RESPONSE_PROFILE_RELATED_OBJECT_SESSIONS);
-				if($query)
-				{
-					$query->addStartKey(kResponseProfileCacher::VIEW_KEY_TRIGGER_KEY, self::getRelatedObjectKey($object));
-					$query->addStartKey(kResponseProfileCacher::VIEW_KEY_OBJECT_TYPE, 'A');
-					$query->addStartKey(kResponseProfileCacher::VIEW_KEY_SESSION_KEY, 'A');
-					$query->setLimit(1);
-					
-					$list = $cacheStore->query($query);
-					if($list->getCount())
-					{
-						$this->queryCache[__METHOD__] = true;
-						return true;
-					}
-				}
+				continue;
+			}
+
+			$query = $cacheStore->getNewQuery(kResponseProfileCacher::VIEW_RESPONSE_PROFILE_RELATED_OBJECT_SESSIONS);
+			if(!$query)
+			{
+				continue;
+			}
+			
+			$query->addStartKey(kResponseProfileCacher::VIEW_KEY_TRIGGER_KEY, self::getRelatedObjectKey($object));
+			$query->addStartKey(kResponseProfileCacher::VIEW_KEY_OBJECT_TYPE, 'A');
+			$query->addStartKey(kResponseProfileCacher::VIEW_KEY_SESSION_KEY, 'A');
+			$query->setLimit(1);
+			
+			$list = $cacheStore->query($query);
+			if($list->getCount())
+			{
+				$this->queryCache[__METHOD__] = true;
+				return true;
 			}
 		}
 		
@@ -510,21 +514,25 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 		$cacheStores = self::getStores();
 		foreach ($cacheStores as $cacheStore)
 		{
-			if($cacheStore instanceof kCouchbaseCacheWrapper)
+			if(!($cacheStore instanceof kCouchbaseCacheWrapper))
 			{
-				$query = $cacheStore->getNewQuery(kResponseProfileCacher::VIEW_RESPONSE_PROFILE_OBJECT_SPECIFIC);
-				if($query)
-				{
-					$query->setKey(self::getObjectKey($object));
-					$query->setLimit(1);
-					
-					$list = $cacheStore->query($query);
-					if($list->getCount())
-					{
-						$this->queryCache[__METHOD__] = true;
-						return true;
-					}
-				}
+				continue;
+			}
+			
+			$query = $cacheStore->getNewQuery(kResponseProfileCacher::VIEW_RESPONSE_PROFILE_OBJECT_SPECIFIC);
+			if(!$query)
+			{
+				continue;
+			}
+			
+			$query->setKey(self::getObjectKey($object));
+			$query->setLimit(1);
+			
+			$list = $cacheStore->query($query);
+			if($list->getCount())
+			{
+				$this->queryCache[__METHOD__] = true;
+				return true;
 			}
 		}
 		
@@ -546,48 +554,50 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 		$cacheStores = self::getStores();
 		foreach ($cacheStores as $cacheStore)
 		{
-			if($cacheStore instanceof kCouchbaseCacheWrapper)
+			if(!($cacheStore instanceof kCouchbaseCacheWrapper))
 			{
-				// TODO optimize using elastic search query
-				$query = $cacheStore->getNewQuery(kResponseProfileCacher::VIEW_RESPONSE_PROFILE_SESSION_TYPE);
-				if(!$query)
-					continue;
-					
-				$query->addStartKey(kResponseProfileCacher::VIEW_KEY_SESSION_KEY, $sessionKey);
-				$query->addStartKey(kResponseProfileCacher::VIEW_KEY_OBJECT_KEY, $objectKey);
-				$query->setLimit(1);
-
-				$list = $cacheStore->query($query);
-				$query->setLimit(2);
-				$offset = -1;
-				$array = array();
-				$startKey = null;
-				while(count($list->getObjects()))
-				{
-					$objects = $list->getObjects();
-					if(count($objects) == 1)
-					{
-						$startCacheObject = reset($objects);
-						/* @var $startCacheObject kCouchbaseCacheListItem */
-						list($cachedSessionKey, $cachedObjectKey) = $startCacheObject->getKey();
-						$startKey = $cachedObjectKey;
-					}
-					else
-					{
-						list($endCacheObject, $startCacheObject) = $objects;
-						/* @var $endCacheObject kCouchbaseCacheListItem */
-						/* @var $startCacheObject kCouchbaseCacheListItem */
-						list($cachedSessionKey, $cachedEndObjectKey) = $endCacheObject->getKey();
-						list($cachedSessionKey, $cachedStartObjectKey) = $startCacheObject->getKey();
-						$array[] = array($startKey, $cachedEndObjectKey);
-						$startKey = $cachedStartObjectKey;
-					}
-					$offset += self::MAX_CACHE_KEYS_PER_JOB;
-					$query->setOffset($offset);
-					$list = $cacheStore->query($query);
-				}
-				return $array;
+				continue;
 			}
+			
+			// TODO optimize using elastic search query
+			$query = $cacheStore->getNewQuery(kResponseProfileCacher::VIEW_RESPONSE_PROFILE_SESSION_TYPE);
+			if(!$query)
+				continue;
+				
+			$query->addStartKey(kResponseProfileCacher::VIEW_KEY_SESSION_KEY, $sessionKey);
+			$query->addStartKey(kResponseProfileCacher::VIEW_KEY_OBJECT_KEY, $objectKey);
+			$query->setLimit(1);
+
+			$list = $cacheStore->query($query);
+			$query->setLimit(2);
+			$offset = -1;
+			$array = array();
+			$startKey = null;
+			while(count($list->getObjects()))
+			{
+				$objects = $list->getObjects();
+				if(count($objects) == 1)
+				{
+					$startCacheObject = reset($objects);
+					/* @var $startCacheObject kCouchbaseCacheListItem */
+					list($cachedSessionKey, $cachedObjectKey) = $startCacheObject->getKey();
+					$startKey = $cachedObjectKey;
+				}
+				else
+				{
+					list($endCacheObject, $startCacheObject) = $objects;
+					/* @var $endCacheObject kCouchbaseCacheListItem */
+					/* @var $startCacheObject kCouchbaseCacheListItem */
+					list($cachedSessionKey, $cachedEndObjectKey) = $endCacheObject->getKey();
+					list($cachedSessionKey, $cachedStartObjectKey) = $startCacheObject->getKey();
+					$array[] = array($startKey, $cachedEndObjectKey);
+					$startKey = $cachedStartObjectKey;
+				}
+				$offset += self::MAX_CACHE_KEYS_PER_JOB;
+				$query->setOffset($offset);
+				$list = $cacheStore->query($query);
+			}
+			return $array;
 		}
 	
 		return array();
@@ -598,52 +608,56 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 		$cacheStores = self::getStores();
 		foreach ($cacheStores as $cacheStore)
 		{
-			if($cacheStore instanceof kCouchbaseCacheWrapper)
+			if(!($cacheStore instanceof kCouchbaseCacheWrapper))
 			{
-				// TODO optimize using elastic search query
-				$query = $cacheStore->getNewQuery(kResponseProfileCacher::VIEW_RESPONSE_PROFILE_RELATED_OBJECT_SESSIONS);
-				if($query)
-				{
-					$query->addStartKey(kResponseProfileCacher::VIEW_KEY_TRIGGER_KEY, $triggerKey);
-					$query->addStartKey(kResponseProfileCacher::VIEW_KEY_OBJECT_TYPE, 'A');
-					$query->addStartKey(kResponseProfileCacher::VIEW_KEY_SESSION_KEY, 'A');
-					$query->addEndKey(kResponseProfileCacher::VIEW_KEY_TRIGGER_KEY, $triggerKey);
-					$query->addEndKey(kResponseProfileCacher::VIEW_KEY_OBJECT_TYPE, 'z');
-					$query->addEndKey(kResponseProfileCacher::VIEW_KEY_SESSION_KEY, 'z');
-					$query->setLimit(self::MAX_CACHE_KEYS_PER_JOB);
-
-					$offset = 0;
-					$array = array();
-					$list = $cacheStore->query($query);
-					KalturaLog::debug('Found [' . count($list->getObjects()) . '/' . $list->getCount() . '] items');
-					while(count($list->getObjects()))
-					{
-						foreach ($list->getObjects() as $cacheObject)
-						{
-							/* @var $cacheObject kCouchbaseCacheListItem */
-							list($cacheTriggerKey, $cacheObjectType, $cacheSessionKey) = $cacheObject->getKey();
-							if(!isset($array[$cacheObjectType]))
-							{
-								$array[$cacheObjectType] = array();
-							}
-							if(isset($array[$cacheObjectType][$cacheSessionKey]))
-							{
-								$array[$cacheObjectType][$cacheSessionKey]++;
-							}
-							else
-							{
-								$array[$cacheObjectType][$cacheSessionKey] = 1;
-							}
-						}
-						
-						$offset += count($list->getObjects());
-						$query->setOffset($offset);
-						$list = $cacheStore->query($query);
-						KalturaLog::debug('Found [' . count($list->getObjects()) . '/' . $list->getCount() . '] items');
-					}
-					return $array;
-				}
+				continue;
 			}
+			
+			// TODO optimize using elastic search query
+			$query = $cacheStore->getNewQuery(kResponseProfileCacher::VIEW_RESPONSE_PROFILE_RELATED_OBJECT_SESSIONS);
+			if(!$query)
+			{
+				continue;
+			}
+			
+			$query->addStartKey(kResponseProfileCacher::VIEW_KEY_TRIGGER_KEY, $triggerKey);
+			$query->addStartKey(kResponseProfileCacher::VIEW_KEY_OBJECT_TYPE, 'A');
+			$query->addStartKey(kResponseProfileCacher::VIEW_KEY_SESSION_KEY, 'A');
+			$query->addEndKey(kResponseProfileCacher::VIEW_KEY_TRIGGER_KEY, $triggerKey);
+			$query->addEndKey(kResponseProfileCacher::VIEW_KEY_OBJECT_TYPE, 'z');
+			$query->addEndKey(kResponseProfileCacher::VIEW_KEY_SESSION_KEY, 'z');
+			$query->setLimit(self::MAX_CACHE_KEYS_PER_JOB);
+
+			$offset = 0;
+			$array = array();
+			$list = $cacheStore->query($query);
+			KalturaLog::debug('Found [' . count($list->getObjects()) . '/' . $list->getCount() . '] items');
+			while(count($list->getObjects()))
+			{
+				foreach ($list->getObjects() as $cacheObject)
+				{
+					/* @var $cacheObject kCouchbaseCacheListItem */
+					list($cacheTriggerKey, $cacheObjectType, $cacheSessionKey) = $cacheObject->getKey();
+					if(!isset($array[$cacheObjectType]))
+					{
+						$array[$cacheObjectType] = array();
+					}
+					if(isset($array[$cacheObjectType][$cacheSessionKey]))
+					{
+						$array[$cacheObjectType][$cacheSessionKey]++;
+					}
+					else
+					{
+						$array[$cacheObjectType][$cacheSessionKey] = 1;
+					}
+				}
+				
+				$offset += count($list->getObjects());
+				$query->setOffset($offset);
+				$list = $cacheStore->query($query);
+				KalturaLog::debug('Found [' . count($list->getObjects()) . '/' . $list->getCount() . '] items');
+			}
+			return $array;
 		}
 	
 		return array();
@@ -654,39 +668,43 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 		$cacheStores = self::getStores();
 		foreach ($cacheStores as $cacheStore)
 		{
-			if($cacheStore instanceof kCouchbaseCacheWrapper)
+			if(!($cacheStore instanceof kCouchbaseCacheWrapper))
 			{
-				// TODO optimize using elastic search query
-				$query = $cacheStore->getNewQuery(kResponseProfileCacher::VIEW_RESPONSE_PROFILE_RELATED_OBJECTS_TYPES);
-				if($query)
-				{
-					$query->addStartKey(kResponseProfileCacher::VIEW_KEY_TRIGGER_KEY, $triggerKey);
-					$query->addStartKey(kResponseProfileCacher::VIEW_KEY_OBJECT_TYPE, 'A');
-					$query->addEndKey(kResponseProfileCacher::VIEW_KEY_TRIGGER_KEY, $triggerKey);
-					$query->addEndKey(kResponseProfileCacher::VIEW_KEY_OBJECT_TYPE, 'z');
-					$query->setLimit(self::MAX_CACHE_KEYS_PER_JOB);
-
-					$offset = 0;
-					$array = array();
-					$list = $cacheStore->query($query);
-					KalturaLog::debug('Found [' . count($list->getObjects()) . '/' . $list->getCount() . '] items');
-					while(count($list->getObjects()))
-					{
-						foreach ($list->getObjects() as $cacheObject)
-						{
-							/* @var $cacheObject kCouchbaseCacheListItem */
-							list($cacheTriggerKey, $cacheObjectType) = $cacheObject->getKey();
-							$array[$cacheObjectType] = true;
-						}
-						
-						$offset += count($list->getObjects());
-						$query->setOffset($offset);
-						$list = $cacheStore->query($query);
-						KalturaLog::debug('Found [' . count($list->getObjects()) . '/' . $list->getCount() . '] items');
-					}
-					return array_keys($array);
-				}
+				continue;
 			}
+		
+			// TODO optimize using elastic search query
+			$query = $cacheStore->getNewQuery(kResponseProfileCacher::VIEW_RESPONSE_PROFILE_RELATED_OBJECTS_TYPES);
+			if(!$query)
+			{
+				continue;
+			}
+			
+			$query->addStartKey(kResponseProfileCacher::VIEW_KEY_TRIGGER_KEY, $triggerKey);
+			$query->addStartKey(kResponseProfileCacher::VIEW_KEY_OBJECT_TYPE, 'A');
+			$query->addEndKey(kResponseProfileCacher::VIEW_KEY_TRIGGER_KEY, $triggerKey);
+			$query->addEndKey(kResponseProfileCacher::VIEW_KEY_OBJECT_TYPE, 'z');
+			$query->setLimit(self::MAX_CACHE_KEYS_PER_JOB);
+
+			$offset = 0;
+			$array = array();
+			$list = $cacheStore->query($query);
+			KalturaLog::debug('Found [' . count($list->getObjects()) . '/' . $list->getCount() . '] items');
+			while(count($list->getObjects()))
+			{
+				foreach ($list->getObjects() as $cacheObject)
+				{
+					/* @var $cacheObject kCouchbaseCacheListItem */
+					list($cacheTriggerKey, $cacheObjectType) = $cacheObject->getKey();
+					$array[$cacheObjectType] = true;
+				}
+				
+				$offset += count($list->getObjects());
+				$query->setOffset($offset);
+				$list = $cacheStore->query($query);
+				KalturaLog::debug('Found [' . count($list->getObjects()) . '/' . $list->getCount() . '] items');
+			}
+			return array_keys($array);
 		}
 	
 		return array();
@@ -700,30 +718,34 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 			$cacheStores = self::getStores();
 			foreach ($cacheStores as $cacheStore)
 			{
-				if($cacheStore instanceof kCouchbaseCacheWrapper)
+				if(!($cacheStore instanceof kCouchbaseCacheWrapper))
 				{
-					// TODO optimize using elastic search query
-					$query = $cacheStore->getNewQuery(kResponseProfileCacher::VIEW_RESPONSE_PROFILE_OBJECT_SESSIONS);
-					if($query)
-					{
-						$query->addStartKey(kResponseProfileCacher::VIEW_KEY_OBJECT_KEY, $objectKey);
-						$query->addStartKey(kResponseProfileCacher::VIEW_KEY_SESSION_KEY, 'A');
-						$query->addEndKey(kResponseProfileCacher::VIEW_KEY_OBJECT_KEY, $objectKey);
-						$query->addEndKey(kResponseProfileCacher::VIEW_KEY_SESSION_KEY, 'z');
-						$query->setLimit(self::MAX_CACHE_KEYS_PER_JOB);
-	
-						$list = $cacheStore->query($query);
-						KalturaLog::debug('Found [' . count($list->getObjects()) . '/' . $list->getCount() . '] items');
-						$array = array();
-						foreach ($list->getObjects() as $cacheObject)
-						{
-							/* @var $cacheObject kCouchbaseCacheListItem */
-							list($cacheObjectKey, $cacheSessionKey) = $cacheObject->getKey();
-							$array[$cacheSessionKey] = $cacheSessionKey;
-						}
-						return $array;
-					}
+					continue;
 				}
+			
+				// TODO optimize using elastic search query
+				$query = $cacheStore->getNewQuery(kResponseProfileCacher::VIEW_RESPONSE_PROFILE_OBJECT_SESSIONS);
+				if(!$query)
+				{
+					continue;
+				}
+				
+				$query->addStartKey(kResponseProfileCacher::VIEW_KEY_OBJECT_KEY, $objectKey);
+				$query->addStartKey(kResponseProfileCacher::VIEW_KEY_SESSION_KEY, 'A');
+				$query->addEndKey(kResponseProfileCacher::VIEW_KEY_OBJECT_KEY, $objectKey);
+				$query->addEndKey(kResponseProfileCacher::VIEW_KEY_SESSION_KEY, 'z');
+				$query->setLimit(self::MAX_CACHE_KEYS_PER_JOB);
+
+				$list = $cacheStore->query($query);
+				KalturaLog::debug('Found [' . count($list->getObjects()) . '/' . $list->getCount() . '] items');
+				$array = array();
+				foreach ($list->getObjects() as $cacheObject)
+				{
+					/* @var $cacheObject kCouchbaseCacheListItem */
+					list($cacheObjectKey, $cacheSessionKey) = $cacheObject->getKey();
+					$array[$cacheSessionKey] = $cacheSessionKey;
+				}
+				return $array;
 			}
 		}
 	

@@ -232,64 +232,68 @@ class KalturaResponseProfileCacher extends kResponseProfileCacher
 		$cacheStores = self::getStores();
 		foreach ($cacheStores as $cacheStore)
 		{
-			if($cacheStore instanceof kCouchbaseCacheWrapper)
+			if(!($cacheStore instanceof kCouchbaseCacheWrapper))
 			{
-				$query = $cacheStore->getNewQuery(kResponseProfileCacher::VIEW_RESPONSE_PROFILE_SESSION_TYPE);
-				if(!$query)
-					continue;
-					
-				$query->setLimit($options->limit + 1);
-				if($options->objectId)
-				{
-					$objectKey = "{$partnerId}_{$options->cachedObjectType}_{$options->objectId}";
-					KalturaLog::debug("Serach for key [$sessionKey, $objectKey]");
-					$query->addKey(kResponseProfileCacher::VIEW_KEY_SESSION_KEY, $sessionKey);
-					$query->addKey(kResponseProfileCacher::VIEW_KEY_OBJECT_KEY, $objectKey);
-				}
-				else 
-				{
-					$objectKey = "{$partnerId}_{$options->cachedObjectType}_";
-					if($options->startObjectKey)
-						$objectKey = $options->startObjectKey;
-						
-					KalturaLog::debug("Serach for start key [$sessionKey, $objectKey]");
-					$query->addStartKey(kResponseProfileCacher::VIEW_KEY_SESSION_KEY, $sessionKey);
-					$query->addStartKey(kResponseProfileCacher::VIEW_KEY_OBJECT_KEY, $objectKey);
-					
-					if($options->endObjectKey)
-					{
-						$query->addEndKey(kResponseProfileCacher::VIEW_KEY_SESSION_KEY, $sessionKey);
-						$query->addEndKey(kResponseProfileCacher::VIEW_KEY_OBJECT_KEY, $options->endObjectKey);
-					}
-				}
-
-				$results->recalculated = 0;
-				$list = $cacheStore->query($query);
-				if(!$list->getCount())
-					continue;
-					
-				$cachedObjects = $list->getObjects();
-				$exitCount = count($cachedObjects) > $options->limit ? 1 : 0;
-				
-				do
-				{
-					self::recalculateCache(array_shift($cachedObjects));
-					$results->recalculated++;
-				} while(count($cachedObjects) > $exitCount);
-				
-				if(!count($cachedObjects)){
-					continue;
-				}
-				
-				$cache = reset($cachedObjects);
-				/* @var $cache kCouchbaseCacheListItem */
-				list($cachedSessionKey, $cachedObjectKey) = $cache->getKey();
-				$results->lastObjectKey = $cachedObjectKey;
-				
-				$newRecalculateTime = self::get($uniqueKey, null, false);
-				if($newRecalculateTime > $lastRecalculateTime)
-					throw new KalturaAPIException(KalturaErrors::RESPONSE_PROFILE_CACHE_RECALCULATE_RESTARTED);
+				continue;
 			}
+			
+			$query = $cacheStore->getNewQuery(kResponseProfileCacher::VIEW_RESPONSE_PROFILE_SESSION_TYPE);
+			if(!$query)
+			{
+				continue;
+			}
+				
+			$query->setLimit($options->limit + 1);
+			if($options->objectId)
+			{
+				$objectKey = "{$partnerId}_{$options->cachedObjectType}_{$options->objectId}";
+				KalturaLog::debug("Serach for key [$sessionKey, $objectKey]");
+				$query->addKey(kResponseProfileCacher::VIEW_KEY_SESSION_KEY, $sessionKey);
+				$query->addKey(kResponseProfileCacher::VIEW_KEY_OBJECT_KEY, $objectKey);
+			}
+			else 
+			{
+				$objectKey = "{$partnerId}_{$options->cachedObjectType}_";
+				if($options->startObjectKey)
+					$objectKey = $options->startObjectKey;
+					
+				KalturaLog::debug("Serach for start key [$sessionKey, $objectKey]");
+				$query->addStartKey(kResponseProfileCacher::VIEW_KEY_SESSION_KEY, $sessionKey);
+				$query->addStartKey(kResponseProfileCacher::VIEW_KEY_OBJECT_KEY, $objectKey);
+				
+				if($options->endObjectKey)
+				{
+					$query->addEndKey(kResponseProfileCacher::VIEW_KEY_SESSION_KEY, $sessionKey);
+					$query->addEndKey(kResponseProfileCacher::VIEW_KEY_OBJECT_KEY, $options->endObjectKey);
+				}
+			}
+
+			$results->recalculated = 0;
+			$list = $cacheStore->query($query);
+			if(!$list->getCount())
+				continue;
+				
+			$cachedObjects = $list->getObjects();
+			$exitCount = count($cachedObjects) > $options->limit ? 1 : 0;
+			
+			do
+			{
+				self::recalculateCache(array_shift($cachedObjects));
+				$results->recalculated++;
+			} while(count($cachedObjects) > $exitCount);
+			
+			if(!count($cachedObjects)){
+				continue;
+			}
+			
+			$cache = reset($cachedObjects);
+			/* @var $cache kCouchbaseCacheListItem */
+			list($cachedSessionKey, $cachedObjectKey) = $cache->getKey();
+			$results->lastObjectKey = $cachedObjectKey;
+			
+			$newRecalculateTime = self::get($uniqueKey, null, false);
+			if($newRecalculateTime > $lastRecalculateTime)
+				throw new KalturaAPIException(KalturaErrors::RESPONSE_PROFILE_CACHE_RECALCULATE_RESTARTED);
 		}
 		return $results;
 	}
