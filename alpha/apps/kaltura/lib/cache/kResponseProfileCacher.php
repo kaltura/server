@@ -822,7 +822,10 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 		{
 			foreach($roots as $root)
 			{
-				$this->invalidateCachedObject($root, $recursionLevel);
+				if(!is_null($root))
+				{
+					$this->invalidateCachedObject($root, $recursionLevel);
+				}
 			}
 		}
 		
