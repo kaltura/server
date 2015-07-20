@@ -71,7 +71,12 @@ class mediaInfoPeer extends BasemediaInfoPeer implements IRelatedObjectPeer
 		if($asset)
 		{
 			/* @var $asset asset */
-			$roots[] = $asset->getentry();
+			$roots[] = $asset;
+			$entry = $asset->getentry();
+			if($entry)
+			{
+				$roots[] = $entry;
+			}
 		}
 		
 		return $roots;

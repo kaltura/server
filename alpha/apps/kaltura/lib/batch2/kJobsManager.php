@@ -1159,6 +1159,11 @@ class kJobsManager
 			$batchJob->setObjectId($objectId);
 			$batchJob->setObjectType(BatchJobObjectType::CATEGORY);
 		}
+		else
+		{
+			KalturaLog::err("Object type [$objectType] is not expected to need cache recalculation");
+			return null;
+		}
 
 		return self::addJob($batchJob, $jobData, BatchJobType::RECALCULATE_CACHE, RecalculateCacheType::RESPONSE_PROFILE);
 	}
