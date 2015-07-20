@@ -416,14 +416,6 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 		return array(array('average' => $avg));
 	}
 
-	private function copmareNumbers($a,$b)
-	{
-		if ($a == $b) {
-			return 0;
-		}
-		return ($a < $b) ? -1 : 1;
-	}
-	
 	/**
 	 * @param $objectIds
 	 * @return array
@@ -490,7 +482,7 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 			$preOrderAns[$question->getId()] = $pctg*100;
 		}
 
-		uasort($preOrderAns, 'copmareNumbers');
+		uasort($preOrderAns, $this->getSortFunction($orderBy));
 		
 		foreach($preOrderAns as $questionId => $pctg)
 		{
@@ -580,6 +572,7 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 			}
 		}
 		
+		$userPerctentages = array();
 		foreach (array_merge(array_keys($usersCorrectAnswers),array_keys($usersWrongAnswers)) as $kuserId)
 		{
 			$totalAnswers = 0;
@@ -599,9 +592,51 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 			{
 				$userId = $dbKuser->getPuserId();
 			}
-			$ans[] = array('user_id' => $userId, 'percentage' => ($totalCorrect/$totalAnswers)*100);
+//			$ans[] = array('user_id' => $userId, 'percentage' => ($totalCorrect/$totalAnswers)*100);
+			$userPerctentages[$userId] = ($totalCorrect/$totalAnswers)*100;
+			
+		}
+
+		uasort($userPerctentages, $this->getSortFunction());
+		foreach ($userPerctentages as $userId => $percentage)
+		{
+			$ans[] = array('user_id' => $userId, 'percentage' => $percentage);
 		}
 		return $ans;
 	}
 	
+	private function getSortFunction($orderBy)
+	{
+		if (!$orderBy)
+		{
+			return null;
+		}
+		
+		switch ($orderBy)
+		{
+			case '+percentage':
+				return 'copmareNumbersDescending';
+			case '-percentage':
+				return 'copmareNumbersAscending';
+			default:
+				return 'copmareNumbersDescending';
+		}
+	}
+	
+}
+
+function copmareNumbersAscending($a,$b)
+{
+	if ($a == $b) {
+		return 0;
+	}
+	return ($a < $b) ? -1 : 1;
+}
+
+function copmareNumbersDescending($a,$b)
+{
+	if ($a == $b) {
+		return 0;
+	}
+	return ($a < $b) ? 1 : -1;
 }
