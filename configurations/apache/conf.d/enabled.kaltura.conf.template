@@ -55,13 +55,15 @@ FilterChain COMPRESS
 Alias /sf "/usr/share/pear/data/symfony/web/sf/"
 <Directory "@APP_DIR@/alpha/web">
 	# set caching for static files such as crossdomain.xml
-	<FilesMatch "\.(xml|flv|ico|pdf|avi|mov|ppt|doc|mp3|wmv|wav|mp4)$">
+	<FilesMatch "\.(3gp|avi|css|d2h|dll|doc|docx|dot|fla|flv|gif|gz|html|ico|jpg|js|json|mov|mp3|mp4|mpeg|mso|pdf|png|ppt|swc|swf|swz|thmx|ts|txt|wav|webm|wmv|xml|zip)$">
 		ExpiresActive On
 		ExpiresDefault "access plus 3 month"
 		Header append Cache-Control "public"
-		SetEnv force-no-vary
 		Header unset ETag
 		FileETag None
+	</FilesMatch>
+	<FilesMatch "\.(3gp|avi|d2h|dll|doc|docx|dot|fla|flv|gif|gz|ico|jpg|mov|mp3|mp4|mpeg|mso|pdf|png|ppt|swc|swf|swz|thmx|ts|wav|webm|wmv|zip)$">
+		SetEnv force-no-vary
 	</FilesMatch>
 	
 	DirectoryIndex index.php
@@ -195,7 +197,9 @@ Alias /content/uiconf "@WEB_DIR@/content/uiconf"
 <Directory "@WEB_DIR@/content/uiconf">
         AddHandler cgi-script .php .pl .py .jsp .asp .htm .shtml .sh .cgi
         Options -ExecCGI
-        SetEnv force-no-vary
+        <FilesMatch "\.(3gp|avi|d2h|dll|doc|docx|dot|fla|flv|gif|gz|ico|jpg|mov|mp3|mp4|mpeg|mso|pdf|png|ppt|swc|swf|swz|thmx|ts|wav|webm|wmv|zip)$">
+                SetEnv force-no-vary
+        </FilesMatch>
 
         ExpiresActive On
         ExpiresDefault "access plus 3 month"
@@ -211,7 +215,9 @@ Alias /content "@WEB_DIR@/content"
 <Directory "@WEB_DIR@/content">
 	#AddHandler cgi-script .php .pl .py .jsp .asp .htm .shtml .sh .cgi
 	#Options -ExecCGI
-	SetEnv force-no-vary
+	<FilesMatch "\.(3gp|avi|d2h|dll|doc|docx|dot|fla|flv|gif|gz|ico|jpg|mov|mp3|mp4|mpeg|mso|pdf|png|ppt|swc|swf|swz|thmx|ts|wav|webm|wmv|zip)$">
+		SetEnv force-no-vary
+	</FilesMatch>
 
 	ExpiresActive On
 	ExpiresDefault "access plus 3 month"
@@ -230,7 +236,9 @@ Alias /flash "@WEB_DIR@/flash"
 <Directory "@WEB_DIR@/flash">
 	AddHandler cgi-script .php .pl .py .jsp .asp .htm .shtml .sh .cgi
 	Options -ExecCGI
-	SetEnv force-no-vary
+	<FilesMatch "\.(3gp|avi|d2h|dll|doc|docx|dot|fla|flv|gif|gz|ico|jpg|mov|mp3|mp4|mpeg|mso|pdf|png|ppt|swc|swf|swz|thmx|ts|wav|webm|wmv|zip)$">
+		SetEnv force-no-vary
+	</FilesMatch>
 
 	ExpiresActive On
 	ExpiresDefault "access plus 3 month"
