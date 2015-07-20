@@ -6,7 +6,7 @@
 class TvinciDistributionFeedHelper
 {
 	const DATE_FORMAT = 'd/m/Y H:i:s';
-
+	const MAX_END = "7 November 2333";
 	const ACTION_SUBMIT = 'insert';
 	const ACTION_UPDATE = 'update';
 	const ACTION_DELETE = 'delete';
@@ -266,9 +266,14 @@ class TvinciDistributionFeedHelper
 	{
 		$datesNode = $this->_doc->createElement("dates");
 		$datesNode->appendChild( $this->createDateElement('catalog_start', $this->getSunrise()) );
-		$datesNode->appendChild( $this->createDateElement('catalog_end', $this->getSunset()) );
 		$datesNode->appendChild( $this->createDateElement('start', $this->getSunrise()) );
-		$datesNode->appendChild( $this->createDateElement('end', $this->getSunset()) );
+		if ( $this->getSunset() ) {
+			$datesNode->appendChild( $this->createDateElement('catalog_end', $this->getSunset()) );
+			$datesNode->appendChild( $this->createDateElement('end', $this->getSunset()) );
+		} else {
+			$datesNode->appendChild( $this->createDateElement('catalog_end', strtotime(self::MAX_END)) );
+			$datesNode->appendChild( $this->createDateElement('end', strtotime(self::MAX_END)) );
+		}
 		return $datesNode;
 	}
 
