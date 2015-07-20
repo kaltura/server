@@ -231,7 +231,7 @@ usort($services, "compareServicesByName");
 			onclick="toggleCode()" id="codeToggle">Show Code Example</a></li>
 	</ul>
 	<div class="code" id="codeExample" style="display: none;">
-		<div id="disclaimer"><p>Note: The auto-generated code is for reference purposes and orientation. A direct copy&paste will not work on its own. Please make sure to review the sample and adapt to your own application code.</p></div>
+		<div id="disclaimer"><p>Note: The auto-generated code is for reference purposes and orientation. A direct copy&amp;paste will not work on its own. Please make sure to review the sample and adapt to your own application code.</p></div>
 		<div id="example"></div>
 	</div>
 	<div id="httpSpy" style="display: none;">
