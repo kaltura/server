@@ -38,10 +38,11 @@ class KalturaResponseProfileCacher extends kResponseProfileCacher
 		$profileKey = $responseProfileKey;
 		$protocol = infraRequestUtils::getProtocol();
 		$ksType = kCurrentContext::getCurrentSessionType();
-		$userRoles = implode('_', $userRoles);
+		$userRoles = implode('-', $userRoles);
+		$host = (isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : '');
 		$entitlement = (int) kEntitlementUtils::getEntitlementEnforcement();
 		
-		return "obj_rp{$profileKey}_p{$partnerId}_o{$objectType}_i{$objectId}_h{$protocol}_k{$ksType}_u{$userRoles}_e{$entitlement}";
+		return "obj_rp{$profileKey}_p{$partnerId}_o{$objectType}_i{$objectId}_h{$protocol}_k{$ksType}_u{$userRoles}_w{$host}_e{$entitlement}";
 	}
 	
 	private static function getObjectTypeCacheValue(IBaseObject $object)
@@ -68,9 +69,10 @@ class KalturaResponseProfileCacher extends kResponseProfileCacher
 		$profileKey = self::$responseProfileKey;
 		$protocol = infraRequestUtils::getProtocol();
 		$ksType = kCurrentContext::getCurrentSessionType();
-		$userRoles = implode('_', $userRoles);
+		$userRoles = implode('-', $userRoles);
+		$host = (isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : '');
 		
-		return "relate_rp{$profileKey}_p{$partnerId}_o{$objectType}_h{$protocol}_k{$ksType}_u{$userRoles}";
+		return "relate_rp{$profileKey}_p{$partnerId}_o{$objectType}_h{$protocol}_k{$ksType}_u{$userRoles}_w{$host}";
 	}
 	
 	private static function getResponseProfileCacheKey($responseProfileKey, $partnerId)

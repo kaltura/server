@@ -259,7 +259,7 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 		return array();
 	}
 
-	protected static function getSessionKey($protocol = null, $ksType = null, array $userRoles = null)
+	protected static function getSessionKey($protocol = null, $ksType = null, array $userRoles = null, $host = null)
 	{
 		if(!$protocol)
 			$protocol = infraRequestUtils::getProtocol();
@@ -267,10 +267,12 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 			$ksType = kCurrentContext::getCurrentSessionType();
 		if(!$userRoles)
 			$userRoles = kPermissionManager::getCurrentRoleIds();
+		if(!$host)
+			$host = (isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : '');
 			
 		sort($userRoles);
-		$userRole = implode('_', $userRoles);
-		return "{$protocol}_{$ksType}_{$userRole}";
+		$userRole = implode('-', $userRoles);
+		return "{$protocol}_{$ksType}_{$host}_{$userRole}";
 	}
 	
 	protected static function getObjectKey(IBaseObject $object)
@@ -763,8 +765,8 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 		{
 			foreach($sessionKeys as $sessionKey => $count)
 			{
-				list($protocol, $ksType, $userRoles) = explode('_', $sessionKey, 3);
-				$userRoles = explode('_', $userRoles);
+				list($protocol, $ksType, $host, $userRoles) = explode('_', $sessionKey, 4);
+				$userRoles = explode('-', $userRoles);
 				if($count > self::MAX_CACHE_KEYS_PER_JOB)
 				{
 					$startEndObjectKeys = self::listObjectKeys($objectType, $sessionKey);
@@ -793,8 +795,8 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 		$sessionTypes = self::listObjectSessionTypes($object);
 		foreach($sessionTypes as $sessionKey)
 		{
-			list($protocol, $ksType, $userRoles) = explode('_', $sessionKey, 3);
-			$userRoles = explode('_', $userRoles);
+			list($protocol, $ksType, $host, $userRoles) = explode('_', $sessionKey, 4);
+			$userRoles = explode('-', $userRoles);
 			kJobsManager::addRecalculateResponseProfileCacheJob($partnerId, $protocol, $ksType, $userRoles, $objectType, $object->getPrimaryKey());
 		}
 		return true;
