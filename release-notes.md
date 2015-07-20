@@ -11,7 +11,7 @@ None.
 
 #### Deployment Scripts ####
 
- 	- php /opt/kaltura/app/deployment/updates/scripts/2015_07_20_create_applehttp_to_multicast_delivery_profile.php
+ 	- (Already executed on production) php /opt/kaltura/app/deployment/updates/scripts/2015_07_20_create_applehttp_to_multicast_delivery_profile.php
 
 #### Known Issues & Limitations ####
 
