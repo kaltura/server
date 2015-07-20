@@ -1,5 +1,21 @@
 # Jupiter-10.16.0 #
 
+## New applehttp to multicast delivery profile ##
+
+-- Issue Type: New Feature
+-- Issue ID: PLAT-3510
+
+#### Configuration ####
+ 
+None.
+
+#### Deployment Scripts ####
+
+ 	- php /opt/kaltura/app/deployment/updates/scripts/2015_07_20_create_applehttp_to_multicast_delivery_profile.php
+
+#### Known Issues & Limitations ####
+
+None.
 
 ## Edge Server - Rename column name ##
 
