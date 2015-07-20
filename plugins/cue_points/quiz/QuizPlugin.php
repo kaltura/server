@@ -348,7 +348,7 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 	 * @param KalturaReportType $report_type
 	 * @param string $objectIds
 	 */
-	public function getReportResult($partner_id, $report_type, $report_flavor, $objectIds)
+	public function getReportResult($partner_id, $report_type, $report_flavor, $objectIds, $orderBy = null)
 	{
 		if (($report_type != self::getPluginName() . "." . QuizReportType::QUIZ) && ($report_type != self::getPluginName() . "." . QuizReportType::QUIZ_USER_PERCENTAGE) ) 
 		{
@@ -361,11 +361,11 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 			case myReportsMgr::REPORT_FLAVOR_TABLE:
 				if ($report_type == self::getPluginName() . "." . QuizReportType::QUIZ)
 				{
-					return $this->getQuestionPercentageTableReport($objectIds);
+					return $this->getQuestionPercentageTableReport($objectIds, $orderBy);
 				}
 				else if ($report_type == self::getPluginName() . "." . QuizReportType::QUIZ_USER_PERCENTAGE)
 				{
-					return $this->getUserPercentageTable($objectIds);
+					return $this->getUserPercentageTable($objectIds, $orderBy);
 				}
 			case myReportsMgr::REPORT_FLAVOR_COUNT:
 				return $this->getReportCount($objectIds);
@@ -416,13 +416,21 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 		return array(array('average' => $avg));
 	}
 
+	private function copmareNumbers($a,$b)
+	{
+		if ($a == $b) {
+			return 0;
+		}
+		return ($a < $b) ? -1 : 1;
+	}
+	
 	/**
 	 * @param $objectIds
 	 * @return array
 	 * @throws Exception
 	 * @throws KalturaAPIException
 	 */
-	protected function getQuestionPercentageTableReport($objectIds)
+	protected function getQuestionPercentageTableReport($objectIds, $orderBy)
 	{
 		$dbEntry = entryPeer::retrieveByPK($objectIds);
 		if (!$dbEntry)
@@ -436,6 +444,7 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 		$c->add(CuePointPeer::ENTRY_ID, $objectIds);
 		$c->add(CuePointPeer::TYPE, QuizPlugin::getCoreValue('CuePointType',QuizCuePointType::QUIZ_QUESTION));
 		$questions = CuePointPeer::doSelect($c);
+		$preOrderAns = array();
 		foreach ($questions as $question)
 		{
 			$numOfCorrectAnswers = 0;
@@ -478,9 +487,19 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 			{
 				$pctg = 0.0;
 			}
-			$questPctgs = array('question_id' => $question->getId(), 'percentage' => ($pctg*100));
+			$preOrderAns[$question->getId()] = $pctg*100;
+		}
+
+		uasort($preOrderAns, 'copmareNumbers');
+		
+		foreach($preOrderAns as $questionId => $pctg)
+		{
+			$questPctgs = array('question_id' => $questionId, 'percentage' => $pctg);
 			$ans[] = $questPctgs;
 		}
+//		$questPctgs = array('question_id' => $question->getId(), 'percentage' => ($pctg*100));
+//		$ans[] = $questPctgs;
+		
 		return $ans;
 	}
 
