@@ -90,23 +90,23 @@
                     </xsl:attribute>
                     <xsl:attribute name="ml_handling">unique</xsl:attribute>
                     <xsl:for-each select="exsl:node-set($tagsWithAttributes)">
-                        <xsl:element name="container">
-                            <xsl:variable name="tagWithAttrName" >
-                                <xsl:value-of select="@name" />
-                            </xsl:variable>
-                            <xsl:if test="$tagWithAttrName=$uniqueTagName">
+                        <xsl:variable name="tagWithAttrName" >
+                            <xsl:value-of select="@name" />
+                        </xsl:variable>
+                        <xsl:if test="$tagWithAttrName=$uniqueTagName">
+                            <xsl:element name="container">
                                 <xsl:element name="value">
                                     <xsl:attribute name="lang">eng</xsl:attribute>
                                     <xsl:value-of select="."/>
                                 </xsl:element>
-                            </xsl:if>
-                        </xsl:element>
+                            </xsl:element>
+                        </xsl:if>
                     </xsl:for-each>
                 </xsl:element>
             </xsl:for-each>
         </xsl:element>
     </xsl:template>
-            
+    
     <xsl:template match="feed/export/media/structure/metas" >
         <xsl:variable name="metadatas" select="metadata/*"/>
         <xsl:element name="strings">
