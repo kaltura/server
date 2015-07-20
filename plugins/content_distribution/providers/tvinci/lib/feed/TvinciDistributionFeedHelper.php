@@ -266,7 +266,7 @@ class TvinciDistributionFeedHelper
 	{
 		$datesNode = $this->_doc->createElement("dates");
 		$datesNode->appendChild( $this->createDateElement('catalog_start', $this->getSunrise()) );
-		$datesNode->appendChild( $this->createDateElement('catalog_end', $this->getSunset()) );
+		$datesNode->appendChild( $this->createDateElement('start', $this->getSunrise()) );
 		if ( $this->getSunset() ) {
 			$datesNode->appendChild( $this->createDateElement('catalog_end', $this->getSunset()) );
 			$datesNode->appendChild( $this->createDateElement('end', $this->getSunset()) );
