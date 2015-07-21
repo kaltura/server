@@ -35,7 +35,7 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 			$this->appendLine(' */');
 		}
 		
-		$this->appendLine('require_once(dirname(__FILE__) . "/KalturaClientBase.php");');
+		$this->appendLine("require_once(dirname(__FILE__) . '/{$this->prefix}ClientBase.php');");
 		$this->appendLine('');
 	    
 		$enumNodes = $xpath->query("/xml/enums/enum");
@@ -44,7 +44,7 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 			if(!$enumNode->hasAttribute('plugin'))
 				$this->writeEnum($enumNode);
 		}
-    	$this->addFile("KalturaEnums.php", $this->getTextBlock());
+    	$this->addFile("{$this->prefix}Enums.php", $this->getTextBlock());
     	
     	
 		// classes
@@ -59,7 +59,7 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 			$this->appendLine(' */');
 		}
 		
-		$this->appendLine('require_once(dirname(__FILE__) . "/KalturaClientBase.php");');
+		$this->appendLine("require_once(dirname(__FILE__) . '/{$this->prefix}ClientBase.php');");
 		$this->appendLine('');
 		
 		$classNodes = $xpath->query("/xml/classes/class");
@@ -68,7 +68,7 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 			if(!$classNode->hasAttribute('plugin'))
 				$this->writeClass($classNode);
 		}
-    	$this->addFile("KalturaTypes.php", $this->getTextBlock());
+    	$this->addFile("{$this->prefix}Types.php", $this->getTextBlock());
 		
 		
 		// services
@@ -83,9 +83,9 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 			$this->appendLine(' */');
 		}
 		
-		$this->appendLine('require_once(dirname(__FILE__) . "/KalturaClientBase.php");');
-		$this->appendLine('require_once(dirname(__FILE__) . "/KalturaEnums.php");');
-		$this->appendLine('require_once(dirname(__FILE__) . "/KalturaTypes.php");');
+		$this->appendLine("require_once(dirname(__FILE__) . '/{$this->prefix}ClientBase.php');");
+		$this->appendLine("require_once(dirname(__FILE__) . '/{$this->prefix}Enums.php');");
+		$this->appendLine("require_once(dirname(__FILE__) . '/{$this->prefix}Types.php');");
 		$this->appendLine('');
 		
 		$serviceNodes = $xpath->query("/xml/services/service");
@@ -100,7 +100,7 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 	    $this->writeMainClient($serviceNodes, $configurationNodes);
 	    $this->appendLine();
 	    
-    	$this->addFile("KalturaClient.php", $this->getTextBlock());
+    	$this->addFile("{$this->prefix}Client.php", $this->getTextBlock());
     	
 		// plugins
     	$plugins = KalturaPluginManager::getPluginInstances();
@@ -110,7 +110,7 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 	
 	function getPluginClassName($pluginName)
 	{
-		return "Kaltura" . ucfirst($pluginName) . "ClientPlugin";
+		return $this->prefix . ucfirst($pluginName) . "ClientPlugin";
 	}
 	
 	function writePlugin(KalturaPlugin $plugin)
@@ -131,9 +131,9 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 			$this->appendLine(' */');
 		}
 		
-		$this->appendLine('require_once(dirname(__FILE__) . "/../KalturaClientBase.php");');
-		$this->appendLine('require_once(dirname(__FILE__) . "/../KalturaEnums.php");');
-		$this->appendLine('require_once(dirname(__FILE__) . "/../KalturaTypes.php");');
+		$this->appendLine("require_once(dirname(__FILE__) . '/{$this->prefix}ClientBase.php');");
+		$this->appendLine("require_once(dirname(__FILE__) . '/{$this->prefix}Enums.php');");
+		$this->appendLine("require_once(dirname(__FILE__) . '/{$this->prefix}Types.php');");
 
 		$dependencyNodes = $xpath->query("/xml/plugins/plugin[@name = '$pluginName']/dependency");
 		foreach($dependencyNodes as $dependencyNode)
@@ -179,39 +179,39 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 			$this->appendLine(' */');
 		}
 		
-		$this->appendLine("class $pluginClassName extends KalturaClientPlugin");
+		$this->appendLine("class $pluginClassName extends {$this->prefix}ClientPlugin");
 		$this->appendLine('{');
 	
 		foreach($services as $service)
 		{
 			$serviceName = ucfirst($service);
 			$this->appendLine('	/**');
-			$this->appendLine("	 * @var Kaltura{$serviceName}Service");
+			$this->appendLine("	 * @var {$this->prefix}{$serviceName}Service");
 			$this->appendLine('	 */');
 			$this->appendLine("	public \${$service} = null;");
 			$this->appendLine('');
 		}
 		
-		$this->appendLine('	protected function __construct(KalturaClient $client)');
+		$this->appendLine("	protected function __construct({$this->prefix}Client \$client)");
 		$this->appendLine('	{');
 		$this->appendLine('		parent::__construct($client);');
 		foreach($services as $service)
 		{
 			$serviceName = ucfirst($service);
-			$this->appendLine("		\$this->$service = new Kaltura{$serviceName}Service(\$client);");
+			$this->appendLine("		\$this->$service = new {$this->prefix}{$serviceName}Service(\$client);");
 		}
 		$this->appendLine('	}');
 		$this->appendLine('');
 		$this->appendLine('	/**');
 		$this->appendLine("	 * @return $pluginClassName");
 		$this->appendLine('	 */');
-		$this->appendLine('	public static function get(KalturaClient $client)');
+		$this->appendLine("	public static function get({$this->prefix}Client \$client)");
 		$this->appendLine('	{');
 		$this->appendLine("		return new $pluginClassName(\$client);");
 		$this->appendLine('	}');
 		$this->appendLine('');
 		$this->appendLine('	/**');
-		$this->appendLine('	 * @return array<KalturaServiceBase>');
+		$this->appendLine("	 * @return array<{$this->prefix}ServiceBase>");
 		$this->appendLine('	 */');
 		$this->appendLine('	public function getServices()');
 		$this->appendLine('	{');
@@ -232,7 +232,7 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 		$this->appendLine('}');
 		$this->appendLine('');
 		
-    	$this->addFile("KalturaPlugins/$pluginClassName.php", $this->getTextBlock());
+    	$this->addFile("{$this->prefix}Plugins/$pluginClassName.php", $this->getTextBlock());
 	}
 	
 	function writeEnum(DOMElement $enumNode)
@@ -247,7 +247,7 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 			$this->appendLine(' */');
 		}
 		
-	 	$this->appendLine("class $enumName");
+	 	$this->appendLine("class $enumName extends {$this->prefix}EnumBase");
 		$this->appendLine("{");
 		foreach($enumNode->childNodes as $constNode)
 		{
@@ -285,7 +285,7 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 		if ($classNode->hasAttribute("base"))
 			$this->appendLine($abstract . "class $type extends " . $classNode->getAttribute("base"));
 		else
-			$this->appendLine($abstract . "class $type extends KalturaObjectBase");
+			$this->appendLine($abstract . "class $type extends {$this->prefix}ObjectBase");
 		$this->appendLine("{");
 		// class properties
 		foreach($classNode->childNodes as $propertyNode)
@@ -337,8 +337,12 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 		$this->appendLine();
 	}
 	
-	function writeService(DOMElement $serviceNode, $serviceName = null, $serviceId = null, $actionPrefix = "", $extends = "KalturaServiceBase")
+	function writeService(DOMElement $serviceNode, $serviceName = null, $serviceId = null, $actionPrefix = "", $extends = null)
 	{
+		if(is_null($extends))
+		{
+			$extends = "{$this->prefix}ServiceBase";
+		}
 		$serviceName = $serviceName ? $serviceName : $serviceNode->getAttribute("name");
 		$serviceId = $serviceId ? $serviceId : $serviceNode->getAttribute("id");
 		
@@ -350,7 +354,7 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 		    $this->writeServicePluginClasses($servicePlugin, $serviceName, $serviceId);
 		}
 		
-		$serviceClassName = "Kaltura".$this->upperCaseFirstLetter($serviceName)."Service";
+		$serviceClassName = $this->prefix . $this->upperCaseFirstLetter($serviceName) . "Service";
 		$this->appendLine();
 		
 		if($this->generateDocs)
@@ -370,16 +374,41 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 		    {
 		        $this->appendLine("");
 		        $this->appendLine('	/**');
-			    $this->appendLine("	* @param Kaltura".$this->upperCaseFirstLetter($servicePlugin->getAttribute("name"))."ServicePlugin");
+			    $this->appendLine("	* @param {$this->prefix}".$this->upperCaseFirstLetter($servicePlugin->getAttribute("name"))."ServicePlugin");
 			    $this->appendLine('	*/');
 			    $this->appendLine("	public $".$servicePlugin->getAttribute("name").";");
 		    }
 		}
 		
-		$this->appendLine("	function __construct(KalturaClient \$client = null)");
+		$subServices = $serviceNode->getElementsByTagName("service");
+		$subServicesClasses = array();
+		if ($subServices && count($subServices))
+		{
+		    foreach ($subServices as $subServiceNode)
+		    {
+		    	$subServiceName = lcfirst($subServiceNode->getAttribute("name"));
+		    	$subServiceClassName = $this->prefix . ucfirst($subServiceName) . "Service";
+		    	$subServicesClasses[$subServiceName] = $subServiceClassName;
+		        $this->appendLine('	/**');
+			    $this->appendLine("	* @var $subServiceClassName");
+			    $this->appendLine('	*/');
+			    $this->appendLine("	public \${$subServiceName};");
+		        $this->appendLine("");
+		    }
+		}
+		
+		$this->appendLine("	function __construct({$this->prefix}Client \$client = null)");
 		$this->appendLine("	{");
 		$this->appendLine("		parent::__construct(\$client);");
 		
+		if(count($subServicesClasses))
+		{
+			$this->appendLine("		");
+			foreach($subServicesClasses as $subServiceName => $subServiceClassName)
+			{
+				$this->appendLine("		\$this->{$subServiceName} = new {$subServiceClassName}(\$client);");
+			}
+		}
 		
 		$this->appendLine("	}");
 		
@@ -390,6 +419,14 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 		}
 		
 		$this->appendLine("}");
+	
+		if ($subServices && count($subServices))
+		{
+		    foreach ($subServices as $subServiceNode)
+		    {
+		    	$this->writeService($subServiceNode);
+		    }
+		}
 	}
 	
 	function writeAction($serviceId, DOMElement $actionNode, $actionPrefix = "")
@@ -403,6 +440,24 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 	    $resultType = $resultNode->getAttribute("type");
 			
 		$paramNodes = $actionNode->getElementsByTagName("param");
+		
+		$enableInMultiRequest = true;
+		if($actionNode->hasAttribute("enableInMultiRequest"))
+		{
+			$enableInMultiRequest = intval($actionNode->getAttribute("enableInMultiRequest"));
+		}
+		
+		$supportedRequestFormats = null;
+		if($actionNode->hasAttribute("supportedRequestFormats"))
+		{
+			$supportedRequestFormats = explode(',', $actionNode->getAttribute("supportedRequestFormats"));
+		}
+		
+		$path = null;
+		if($actionNode->hasAttribute("path"))
+		{
+			$path = '/' . trim($actionNode->getAttribute("path"), '/');
+		}
 		
 		$this->appendLine();
 		
@@ -421,7 +476,10 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 				$this->appendLine("	 * @param $paramType \${$paramName} $paramDescription");
 			}
 			
-			$this->appendLine("	 * @return $resultType");
+			if($resultType && $resultType != 'null')
+			{
+				$this->appendLine("	 * @return $resultType");
+			}
 			$this->appendLine('	 */');
 		}
 				
@@ -434,65 +492,111 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 		$this->appendLine("	$signature");
 		$this->appendLine("	{");
 		
-		$this->appendLine("		\$kparams = array();");
-		$haveFiles = false;
-		foreach($paramNodes as $paramNode)
+		if(!$enableInMultiRequest)
 		{
-			$paramType = $paramNode->getAttribute("type");
-		    $paramName = $paramNode->getAttribute("name");
-		    $isEnum = $paramNode->hasAttribute("enumType");
-		    $isOptional = $paramNode->getAttribute("optional");
-			
-		    if ($haveFiles === false && $paramType == "file")
-	    	{
-		        $haveFiles = true;
-	        	$this->appendLine("		\$kfiles = array();");
-	    	}
-	    
-			if (!$this->isSimpleType($paramType))
+			$this->appendLine("		if (\$this->client->isMultiRequest())");
+			$this->appendLine("			throw new ExampleClientException(\"Action is not supported as part of multi-request.\", ExampleClientException::ERROR_ACTION_IN_MULTIREQUEST);");
+			$this->appendLine("		");
+		}
+		
+		if(count($supportedRequestFormats))
+		{
+			if(in_array('json', $supportedRequestFormats))
 			{
-				if ($isEnum)
+				$this->appendLine("		\$this->client->setRequestFormat({$this->prefix}ClientBase::KALTURA_SERVICE_FORMAT_JSON);");
+				$this->appendLine("		\$kparams = array(");
+			
+				foreach($paramNodes as $paramNode)
+				{
+				    $paramName = $paramNode->getAttribute("name");
+				    if(!$path || !preg_match("/\\{{$paramName}\\}/", $path))
+				    {
+						$this->appendLine("			'$paramName' => \${$paramName},");
+				    }
+				}
+				$this->appendLine("		);");
+				foreach($paramNodes as $paramNode)
+				{
+					$paramType = $paramNode->getAttribute("type");
+					if($paramType == 'bool')
+					{
+				    	$paramName = $paramNode->getAttribute("name");
+				    	$this->appendLine("		\${$paramName} = \${$paramName} ? 'true' : 'false';");
+					}
+				}
+				$this->appendLine("		");
+			}
+		}
+		else
+		{
+			$this->appendLine("		\$kparams = array();");
+			$haveFiles = false;
+			foreach($paramNodes as $paramNode)
+			{
+				$paramType = $paramNode->getAttribute("type");
+			    $paramName = $paramNode->getAttribute("name");
+			    $isEnum = $paramNode->hasAttribute("enumType");
+			    $isOptional = $paramNode->getAttribute("optional");
+				
+			    if ($haveFiles === false && $paramType == "file")
+		    	{
+			        $haveFiles = true;
+		        	$this->appendLine("		\$kfiles = array();");
+		    	}
+		    
+				if (!$this->isSimpleType($paramType))
+				{
+					if ($isEnum)
+					{
+						$this->appendLine("		\$this->client->addParam(\$kparams, \"$paramName\", \$$paramName);");
+					}
+					else if ($paramType == "file")
+					{
+						$this->appendLine("		\$this->client->addParam(\$kfiles, \"$paramName\", \$$paramName);");
+					}
+					else if ($paramType == "array")
+					{
+						$extraTab = "";
+						if ($isOptional)
+						{
+							$this->appendLine("		if (\$$paramName !== null)");
+							$extraTab = "	";
+						}
+						$this->appendLine("$extraTab		foreach(\$$paramName as \$index => \$obj)");
+						$this->appendLine("$extraTab		{");
+						$this->appendLine("$extraTab			\$this->client->addParam(\$kparams, \"$paramName:\$index\", \$obj->toParams());");
+						$this->appendLine("$extraTab		}");
+					}
+					else
+					{
+						$extraTab = "";
+						if ($isOptional)
+						{
+							$this->appendLine("		if (\$$paramName !== null)");
+							$extraTab = "	";
+						}
+						$this->appendLine("$extraTab		\$this->client->addParam(\$kparams, \"$paramName\", \$$paramName"."->toParams());");
+					}
+				}
+				elseif(!$path || !preg_match("/\\{{$paramName}\\}/", $path))
 				{
 					$this->appendLine("		\$this->client->addParam(\$kparams, \"$paramName\", \$$paramName);");
 				}
-				else if ($paramType == "file")
-				{
-					$this->appendLine("		\$this->client->addParam(\$kfiles, \"$paramName\", \$$paramName);");
-				}
-				else if ($paramType == "array")
-				{
-					$extraTab = "";
-					if ($isOptional)
-					{
-						$this->appendLine("		if (\$$paramName !== null)");
-						$extraTab = "	";
-					}
-					$this->appendLine("$extraTab		foreach(\$$paramName as \$index => \$obj)");
-					$this->appendLine("$extraTab		{");
-					$this->appendLine("$extraTab			\$this->client->addParam(\$kparams, \"$paramName:\$index\", \$obj->toParams());");
-					$this->appendLine("$extraTab		}");
-				}
-				else
-				{
-					$extraTab = "";
-					if ($isOptional)
-					{
-						$this->appendLine("		if (\$$paramName !== null)");
-						$extraTab = "	";
-					}
-					$this->appendLine("$extraTab		\$this->client->addParam(\$kparams, \"$paramName\", \$$paramName"."->toParams());");
-				}
-			}
-			else
-			{
-				$this->appendLine("		\$this->client->addParam(\$kparams, \"$paramName\", \$$paramName);");
 			}
 		}
 		
-		if ($haveFiles)
-			$this->appendLine("		\$this->client->queueServiceActionCall(\"".strtolower($serviceId)."\", \"$actionPrefix$action\", \$kparams, \$kfiles);");
+		if($path)
+		{
+			$path = preg_replace('/\{([^}]+)\}/', '{$$1}', $path);
+			$this->appendLine("		\$this->client->queuePathCall(\"$path\", \$kparams);");
+		}
 		else
-			$this->appendLine("		\$this->client->queueServiceActionCall(\"".strtolower($serviceId)."\", \"$actionPrefix$action\", \$kparams);");
+		{
+			if ($haveFiles)
+				$this->appendLine("		\$this->client->queueServiceActionCall(\"".strtolower($serviceId)."\", \"$actionPrefix$action\", \$kparams, \$kfiles);");
+			else
+				$this->appendLine("		\$this->client->queueServiceActionCall(\"".strtolower($serviceId)."\", \"$actionPrefix$action\", \$kparams);");
+		}
 			
 		if($resultType == 'file')
 		{
@@ -502,26 +606,42 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 		}
 		else
 		{
-			$this->appendLine("		if (\$this->client->isMultiRequest())");
-			$this->appendLine("			return \$this->client->getMultiRequestResult();");
+			if($enableInMultiRequest)
+			{
+				$this->appendLine("		if (\$this->client->isMultiRequest())");
+				$this->appendLine("			return \$this->client->getMultiRequestResult();");
+			}
 			$this->appendLine("		\$resultObject = \$this->client->doQueue();");
 			$this->appendLine("		\$this->client->throwExceptionIfError(\$resultObject);");
 			
 			if (!$resultType)
+			{
 				$resultType = "null";
+			}
 			
 			if ($resultType == 'int')
+			{
 				$resultType = "integer";
+			}
 
 			if ($resultType == 'bigint')
+			{
 				$resultType = "double";
+			}
 
 			if ($resultType == 'bool')
+			{
 				$this->appendLine("		\$resultObject = (bool) \$resultObject;");
+			}
 			else
+			{
 				$this->appendLine("		\$this->client->validateObjectType(\$resultObject, \"$resultType\");");
+			}
 				
-			$this->appendLine("		return \$resultObject;");
+			if($resultType && $resultType != 'null')
+			{
+				$this->appendLine("		return \$resultObject;");
+			}
 		}
 		
 		$this->appendLine("	}");
@@ -531,10 +651,10 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 	{
 	    $extendingPluginName = $extendingPluginNode->getAttribute("name");
 	    
-	    $servicePluginClassName = "Kaltura". $this->upperCaseFirstLetter($extendingPluginName) ."ServicePlugin";
+	    $servicePluginClassName = $this->prefix . $this->upperCaseFirstLetter($extendingPluginName) ."ServicePlugin";
 	    
 	    $this->appendLine("");
-	    $this->appendLine("class ". $servicePluginClassName . " extends BaseKalturaServicePlugin");
+	    $this->appendLine("class $servicePluginClassName extends Base{$this->prefix}ServicePlugin");
 	    $this->appendLine("{");
 	    
 	    $serviceNodes = $extendingPluginNode->getElementsByTagName("service");
@@ -543,21 +663,21 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 	        if ($serviceNode->nodeName == "service")
 	        {
 	            $this->appendLine("	/**");
-	            $this->appendLine("	* @param Kaltura". $this->upperCaseFirstLetter($serviceNode->getAttribute("name")) ."ExtendedService");
+	            $this->appendLine("	* @param {$this->prefix}" . $this->upperCaseFirstLetter($serviceNode->getAttribute("name")) ."ExtendedService");
 	            $this->appendLine("	*/");
 	            $this->appendLine("	public $".$serviceNode->getAttribute("name"));
 	            $this->appendLine("");
 	        }
 	    }
 	    
-	    $this->appendLine("	public function __construct(KalturaClient \$client = null)");
+	    $this->appendLine("	public function __construct({$this->prefix}Client \$client = null)");
 	    $this->appendLine("	{");
 	    $this->appendLine("		parent::__construct(\$client);");
 	    
 	    foreach ($serviceNodes as $serviceNode)
 	    {
 	        $extendingServiceName = $serviceNode->getAttribute("name");
-	        $this->appendLine("		$".$extendingServiceName." = new Kaltura".$this->upperCaseFirstLetter($extendingServiceName)."ExtendedService();");
+	        $this->appendLine("		\${$extendingServiceName} = new {$this->prefix}" . $this->upperCaseFirstLetter($extendingServiceName)."ExtendedService();");
 	    }
 	    
 	    $this->appendLine("	}");
@@ -568,9 +688,9 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 	    {
 	        $extendingServiceName = $serviceNode->getAttribute("name");
 	        
-	        $extendingServiceClassName = "Kaltura".$this->upperCaseFirstLetter($extendingServiceName)."Extended";
+	        $extendingServiceClassName = $this->prefix . $this->upperCaseFirstLetter($extendingServiceName) . "Extended";
 	        
-	        $this->writeService($serviceNode, $extendingServiceClassName , $extendedServiceId, $extendingPluginName."_".$extendingServiceName."_"   ,"KalturaExtendedService");
+	        $this->writeService($serviceNode, $extendingServiceClassName , $extendedServiceId, $extendingPluginName."_".$extendingServiceName."_"   ,"{$this->prefix}ExtendedService");
 	    }
 	}
 	
@@ -590,7 +710,7 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 						
 			if ($this->isSimpleType($paramType) || $paramType == "file")
 				$signature .= "$".$paramName;
-			else if ($paramType == "array")
+			else if ($paramType == "array" || $paramType == "map")
 				$signature .= "array $".$paramName;
 			else
 				$signature .= $paramType." $".$paramName;
@@ -628,7 +748,7 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 	
 	function writeMainClient(DOMNodeList $serviceNodes, DOMNodeList $configurationNodes)
 	{
-		$mainClassName = 'KalturaClient';
+		$mainClassName = "{$this->prefix}Client";
 		$apiVersion = $this->_doc->documentElement->getAttribute('apiVersion');
 		$date = date('y-m-d');
 		
@@ -640,7 +760,7 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 			$this->appendLine(' */');
 		}
 		
-		$this->appendLine("class $mainClassName extends KalturaClientBase");
+		$this->appendLine("class $mainClassName extends {$this->prefix}ClientBase");
 		$this->appendLine("{");
 	
 		foreach($serviceNodes as $serviceNode)
@@ -650,7 +770,7 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 				
 			$serviceName = $serviceNode->getAttribute("name");
 			$description = ucfirst(trim($serviceNode->getAttribute("description"), " \t\r\n"));
-			$serviceClassName = "Kaltura".$this->upperCaseFirstLetter($serviceName)."Service";
+			$serviceClassName = $this->prefix . $this->upperCaseFirstLetter($serviceName) . "Service";
 			$this->appendLine("	/**");
 			$description = str_replace("\n", "\n	 * ", $description); // to format multiline descriptions
 			$this->appendLine("	 * " . $description);
@@ -661,11 +781,11 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 		}
 		
 		$this->appendLine("	/**");
-		$this->appendLine("	 * Kaltura client constructor");
+		$this->appendLine("	 * {$this->prefix} client constructor");
 		$this->appendLine("	 *");
-		$this->appendLine("	 * @param KalturaConfiguration \$config");
+		$this->appendLine("	 * @param {$this->prefix}Configuration \$config");
 		$this->appendLine("	 */");
-		$this->appendLine("	public function __construct(KalturaConfiguration \$config)");
+		$this->appendLine("	public function __construct({$this->prefix}Configuration \$config)");
 		$this->appendLine("	{");
 		$this->appendLine("		parent::__construct(\$config);");
 		$this->appendLine("		");
@@ -679,7 +799,7 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 				continue;
 				
 			$serviceName = $serviceNode->getAttribute("name");
-			$serviceClassName = "Kaltura".$this->upperCaseFirstLetter($serviceName)."Service";
+			$serviceClassName = $this->prefix . $this->upperCaseFirstLetter($serviceName) . "Service";
 			$this->appendLine("		\$this->$serviceName = new $serviceClassName(\$this);");
 		}
 		$this->appendLine("	}");
