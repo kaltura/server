@@ -52,6 +52,43 @@ require_once(dirname(__FILE__) . "/bootstrap.php");
 $summaryFileName = 'summary.kinf';
 $tmpXmlFileName = tempnam(sys_get_temp_dir(), 'kaltura.generator.');
 
+$options = getopt('hx:p:', array(
+	'help',
+	'xml:',
+	'prefix:',
+));
+
+function showHelpAndExit()
+{
+	echo "Usage:\n";
+	echo "\tphp " . __FILE__ . " [options] [client libs] [destination]\n";
+	echo "\tOptions:\n";
+	echo "\t\t-h, --help:   \tShow this help.\n";
+	echo "\t\t-x, --xml:    \tUse XML path or URL as source XML.\n";
+	echo "\t\t-p, --prefix: \tUse as prefix to all class names.\n";
+	
+	exit;
+}
+
+$schemaXml = null;
+$prefix = 'Kaltura';
+foreach($options as $option => $value)
+{
+	if($option == 'h' || $option == 'help')
+	{
+		showHelpAndExit();
+	}
+	elseif($option == 'x' || $option == 'xml')
+	{
+		$schemaXml = $value;
+	}
+	elseif($option == 'p' || $option == 'prefix')
+	{
+		$prefix = $value;
+	}
+	array_shift($argv);
+}	 
+
 //pass the name of the generator as the first argument of the command line to
 //generate a single library. if this argument is empty or 'all', generator will create all libs.
 $generateSingle = isset($argv[1]) ? $argv[1] : null;
@@ -107,7 +144,10 @@ $generatedClients = array(
 foreach($config as $name => $item)
 {
 	// check if we need to introspect code to create schema or use the ready schema from a given url
-	$useReadySchema = $item->get("schemaxml");
+	$useReadySchema = $schemaXml;
+	if(is_null($useReadySchema)){
+		$useReadySchema = $item->get("schemaxml");
+	}
 	
 	//get the generator class name
 	$generator = $item->get("generator");
@@ -200,6 +240,7 @@ foreach($config as $name => $item)
 		
 		$instance = $reflectionClass->newInstance($tmpXmlFileName, $item);
 		/* @var $instance ClientGeneratorFromXml */
+		$instance->setPrefix($prefix);
 		
 		if($item->get("generateDocs"))
 			$instance->setGenerateDocs($item->get("generateDocs"));

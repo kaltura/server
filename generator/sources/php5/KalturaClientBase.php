@@ -71,7 +71,7 @@ class MultiRequestSubResult implements ArrayAccess
  * @package Kaltura
  * @subpackage Client
  */
-class KalturaNull
+class @PREFIX@Null
 {
 	private static $instance;
 
@@ -100,8 +100,9 @@ class KalturaNull
  * @package Kaltura
  * @subpackage Client
  */
-class KalturaClientBase
+class @PREFIX@ClientBase
 {
+	const KALTURA_SERVICE_FORMAT_KALTURA = 0;
 	const KALTURA_SERVICE_FORMAT_JSON = 1;
 	const KALTURA_SERVICE_FORMAT_XML  = 2;
 	const KALTURA_SERVICE_FORMAT_PHP  = 3;
@@ -117,7 +118,7 @@ class KalturaClientBase
 	const METHOD_GET 	= 'GET';
 
 	/**
-	 * @var KalturaConfiguration
+	 * @var @PREFIX@Configuration
 	 */
 	protected $config;
 
@@ -130,6 +131,16 @@ class KalturaClientBase
 	 * @var array
 	 */
 	protected $requestConfiguration = array();
+	
+	/**
+	 * @var int
+	 */
+	protected $requestFormat = @PREFIX@ClientBase::KALTURA_SERVICE_FORMAT_KALTURA;
+	
+	/**
+	 * @var int
+	 */
+	protected $responseFormat = @PREFIX@ClientBase::KALTURA_SERVICE_FORMAT_PHP;
 
 	/**
 	 * @var boolean
@@ -149,7 +160,7 @@ class KalturaClientBase
 	/**
 	 * Array of all plugin services
 	 *
-	 * @var array<KalturaServiceBase>
+	 * @var array<@PREFIX@ServiceBase>
 	 */
 	protected $pluginServices = array();
 
@@ -179,13 +190,14 @@ class KalturaClientBase
 	}
 
 	/**
-	 * Kaltura client constructor
+	 * @PREFIX@ client constructor
 	 *
-	 * @param KalturaConfiguration $config
+	 * @param @PREFIX@Configuration $config
 	 */
-	public function __construct(KalturaConfiguration $config)
+	public function __construct(@PREFIX@Configuration $config)
 	{
 	    $this->config = $config;
+	    $this->responseFormat = $config->format;
 
 	    $logger = $this->config->getLogger();
 		if ($logger)
@@ -194,7 +206,7 @@ class KalturaClientBase
 		}
 
 		// load all plugins
-		$pluginsFolder = realpath(dirname(__FILE__)) . '/KalturaPlugins';
+		$pluginsFolder = realpath(dirname(__FILE__)) . '/@PREFIX@Plugins';
 		if(is_dir($pluginsFolder))
 		{
 			$dir = dir($pluginsFolder);
@@ -206,11 +218,11 @@ class KalturaClientBase
 					require_once("$pluginsFolder/$fileName");
 
 					$pluginClass = $matches[1];
-					if(!class_exists($pluginClass) || !in_array('IKalturaClientPlugin', class_implements($pluginClass)))
+					if(!class_exists($pluginClass) || !in_array('I@PREFIX@ClientPlugin', class_implements($pluginClass)))
 						continue;
 
 					$plugin = call_user_func(array($pluginClass, 'get'), $this);
-					if(!($plugin instanceof IKalturaClientPlugin))
+					if(!($plugin instanceof I@PREFIX@ClientPlugin))
 						continue;
 
 					$pluginName = $plugin->getName();
@@ -223,6 +235,16 @@ class KalturaClientBase
 				}
 			}
 		}
+	}
+
+	public function setRequestFormat($requestFormat)
+	{
+		$this->requestFormat = $requestFormat;
+	}
+
+	public function setResponseFormat($responseFormat)
+	{
+		$this->responseFormat = $responseFormat;
 	}
 
 	/* Store response headers into array */
@@ -248,7 +270,7 @@ class KalturaClientBase
 		$this->log("service url: [" . $this->config->serviceUrl . "]");
 
 		// append the basic params
-		$this->addParam($params, "format", $this->config->format);
+		$this->addParam($params, "format", $this->responseFormat);
 
 		foreach($this->clientConfiguration as $param => $value)
 		{
@@ -275,7 +297,18 @@ class KalturaClientBase
 			$this->addParam($params, $param, $value);
 		}
 
-		$call = new KalturaServiceActionCall($service, $action, $params, $files);
+		$call = new @PREFIX@ServiceActionCall($service, $action, $params, $files);
+		$this->callsQueue[] = $call;
+	}
+
+	public function queuePathCall($path, $params = array(), $files = array())
+	{
+		foreach($this->requestConfiguration as $param => $value)
+		{
+			$this->addParam($params, $param, $value);
+		}
+
+		$call = new @PREFIX@PathCall($path, $params, $files);
 		$this->callsQueue[] = $call;
 	}
 
@@ -285,6 +318,8 @@ class KalturaClientBase
 		$this->returnServedResult = false;
 		$this->isMultiRequest = false;
 		$this->callsQueue = array();
+		$this->requestFormat = self::KALTURA_SERVICE_FORMAT_KALTURA;
+		$this->responseFormat = $this->config->format;
 	}
 
 	/**
@@ -297,7 +332,7 @@ class KalturaClientBase
 		if($this->isMultiRequest && ($this->destinationPath || $this->returnServedResult))
 		{
 			$this->resetRequest();
-			throw new KalturaClientException("Downloading files is not supported as part of multi-request.", KalturaClientException::ERROR_DOWNLOAD_IN_MULTIREQUEST);
+			throw new @PREFIX@ClientException("Downloading files is not supported as part of multi-request.", @PREFIX@ClientException::ERROR_DOWNLOAD_IN_MULTIREQUEST);
 		}
 
 		if (count($this->callsQueue) == 0)
@@ -313,7 +348,7 @@ class KalturaClientBase
 		$this->log("service url: [" . $this->config->serviceUrl . "]");
 
 		// append the basic params
-		$this->addParam($params, "format", $this->config->format);
+		$this->addParam($params, "format", $this->responseFormat);
 		$this->addParam($params, "ignoreNull", true);
 
 		foreach($this->clientConfiguration as $param => $value)
@@ -321,10 +356,12 @@ class KalturaClientBase
 			$this->addParam($params, $param, $value);
 		}
 
-		$url = $this->config->serviceUrl."/api_v3/index.php?service=";
+		$url = $this->config->serviceUrl;
+		$call = $this->callsQueue[0];
+		$url .= $call->getPath();
+		
 		if ($this->isMultiRequest)
 		{
-			$url .= "multirequest";
 			$i = 1;
 			foreach ($this->callsQueue as $call)
 			{
@@ -337,8 +374,6 @@ class KalturaClientBase
 		}
 		else
 		{
-			$call = $this->callsQueue[0];
-			$url .= $call->service."&action=".$call->action;
 			$params = array_merge($params, $call->params);
 			$files = $call->files;
 		}
@@ -359,7 +394,7 @@ class KalturaClientBase
 		if ($error)
 		{
 			$this->resetRequest();
-			throw new KalturaClientException($error, KalturaClientException::ERROR_GENERIC);
+			throw new @PREFIX@ClientException($error, @PREFIX@ClientException::ERROR_GENERIC);
 		}
 		else
 		{
@@ -388,25 +423,31 @@ class KalturaClientBase
 				if(!$postResult)
 				{
 					$this->resetRequest();
-					throw new KalturaClientException("failed to download file", KalturaClientException::ERROR_READ_FAILED);
+					throw new @PREFIX@ClientException("failed to download file", @PREFIX@ClientException::ERROR_READ_FAILED);
 				}
 			}
-			elseif ($this->config->format == self::KALTURA_SERVICE_FORMAT_PHP)
+			elseif ($this->responseFormat == self::KALTURA_SERVICE_FORMAT_PHP)
 			{
 				$result = @unserialize($postResult);
 
 				if ($result === false && serialize(false) !== $postResult)
 				{
 					$this->resetRequest();
-					throw new KalturaClientException("failed to unserialize server result\n$postResult", KalturaClientException::ERROR_UNSERIALIZE_FAILED);
+					throw new @PREFIX@ClientException("failed to unserialize server result\n$postResult", @PREFIX@ClientException::ERROR_UNSERIALIZE_FAILED);
 				}
+				$dump = print_r($result, true);
+				$this->log("result (object dump): " . $dump);
+			}
+			elseif ($this->responseFormat == self::KALTURA_SERVICE_FORMAT_JSON)
+			{
+				$result = $this->jsObjectToClientObject(json_decode($postResult));
 				$dump = print_r($result, true);
 				$this->log("result (object dump): " . $dump);
 			}
 			else
 			{
 				$this->resetRequest();
-				throw new KalturaClientException("unsupported format: $postResult", KalturaClientException::ERROR_FORMAT_NOT_SUPPORTED);
+				throw new @PREFIX@ClientException("unsupported format: $postResult", @PREFIX@ClientException::ERROR_FORMAT_NOT_SUPPORTED);
 			}
 		}
 		$this->resetRequest();
@@ -448,7 +489,7 @@ class KalturaClientBase
 			return $this->doCurl($url, $params, $files);
 
 		if($this->destinationPath || $this->returnServedResult)
-			throw new KalturaClientException("Downloading files is not supported with stream context http request, please use curl.", KalturaClientException::ERROR_DOWNLOAD_NOT_SUPPORTED);
+			throw new @PREFIX@ClientException("Downloading files is not supported with stream context http request, please use curl.", @PREFIX@ClientException::ERROR_DOWNLOAD_NOT_SUPPORTED);
 
 		return $this->doPostRequest($url, $params, $files);
 	}
@@ -463,22 +504,47 @@ class KalturaClientBase
 	 */
 	private function doCurl($url, $params = array(), $files = array())
 	{
-		$opt = http_build_query($params, null, "&");
-		// Force POST in case we have files
-		if(count($files) > 0) {
-			$this->config->method = self::METHOD_POST;
+		$method = $this->config->method;
+		$requestHeaders = $this->config->requestHeaders;
+		
+		if($this->requestFormat == self::KALTURA_SERVICE_FORMAT_KALTURA)
+		{
+			$params = http_build_query($params, null, "&");
+			$this->log("curl: $url&$params");
+			
+			// Force POST in case we have files
+			if(count($files) > 0) {
+				$method = self::METHOD_POST;
+			}
+			// Check for GET and append params to url
+			if($method == self::METHOD_GET) {
+				$url = $url . '&' . $params;
+			}
 		}
-		// Check for GET and append params to url
-		if( $this->config->method == self::METHOD_GET ) {
-			$url = $url . '&' . $opt;
-		}
+		if($this->requestFormat == self::KALTURA_SERVICE_FORMAT_JSON)
+		{
+			$params = $this->jsonEncode($params);
+			$this->log("curl: $url");
+			$this->log("post: $params");
+			$requestHeaders[] = 'Content-Type: application/json';
+			$requestHeaders[] = 'Accept: application/json';
+		}  
+		elseif($this->requestFormat == self::KALTURA_SERVICE_FORMAT_XML)
+		{
+			$params = $this->xmlEncode($params);
+			$this->log("curl: $url");
+			$this->log("post: $params");
+			$requestHeaders[] = 'Content-Type: text/xml';
+			$requestHeaders[] = 'Accept: text/xml';
+		}  
+		$requestHeaders[] = 'Accept: text/xml'; 
+		
 		$this->responseHeaders = array();
 		$cookies = array();
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_URL, $url);
-		if( $this->config->method == self::METHOD_POST ) {
+		if($method == self::METHOD_POST) {
 			curl_setopt($ch, CURLOPT_POST, 1);
-			$this->log("curl: $url&$opt");
 			if (count($files) > 0)
 			{
                 foreach ($files as &$file) {
@@ -494,7 +560,7 @@ class KalturaClientBase
 			}
 			else
 			{
-				curl_setopt($ch, CURLOPT_POSTFIELDS, $opt);
+				curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
 			}
 		}
 		curl_setopt($ch, CURLOPT_ENCODING, 'gzip,deflate');
@@ -543,7 +609,7 @@ class KalturaClientBase
 		}
 
 		// Set custom headers
-		curl_setopt($ch, CURLOPT_HTTPHEADER, $this->config->requestHeaders );
+		curl_setopt($ch, CURLOPT_HTTPHEADER, $requestHeaders);
 
 		// Save response headers
 		curl_setopt($ch, CURLOPT_HEADERFUNCTION, array($this, 'readHeader') );
@@ -579,7 +645,7 @@ class KalturaClientBase
 	private function doPostRequest($url, $params = array(), $files = array())
 	{
 		if (count($files) > 0)
-			throw new KalturaClientException("Uploading files is not supported with stream context http request, please use curl.", KalturaClientException::ERROR_UPLOAD_NOT_SUPPORTED);
+			throw new @PREFIX@ClientException("Uploading files is not supported with stream context http request, please use curl.", @PREFIX@ClientException::ERROR_UPLOAD_NOT_SUPPORTED);
 
 		$formattedData = http_build_query($params , "", "&");
 		$this->log("post: $url&$formattedData");
@@ -593,7 +659,7 @@ class KalturaClientBase
 		          ));
 
 		if (isset($this->config->proxyType) && $this->config->proxyType === 'SOCKS5') {
-			throw new KalturaClientException("Cannot use SOCKS5 without curl installed.", KalturaClientException::ERROR_CONNECTION_FAILED);
+			throw new @PREFIX@ClientException("Cannot use SOCKS5 without curl installed.", @PREFIX@ClientException::ERROR_CONNECTION_FAILED);
 		}
 		if (isset($this->config->proxyHost)) {
 			$proxyhost = 'tcp://' . $this->config->proxyHost;
@@ -612,11 +678,11 @@ class KalturaClientBase
 		$fp = @fopen($url, 'rb', false, $ctx);
 		if (!$fp) {
 			$phpErrorMsg = "";
-			throw new KalturaClientException("Problem with $url, $phpErrorMsg", KalturaClientException::ERROR_CONNECTION_FAILED);
+			throw new @PREFIX@ClientException("Problem with $url, $phpErrorMsg", @PREFIX@ClientException::ERROR_CONNECTION_FAILED);
 		}
 		$response = @stream_get_contents($fp);
 		if ($response === false) {
-		   throw new KalturaClientException("Problem reading data from $url, $phpErrorMsg", KalturaClientException::ERROR_READ_FAILED);
+		   throw new @PREFIX@ClientException("Problem reading data from $url, $phpErrorMsg", @PREFIX@ClientException::ERROR_READ_FAILED);
 		}
 		return array($response, '');
 	}
@@ -654,7 +720,7 @@ class KalturaClientBase
 	}
 
 	/**
-	 * @return KalturaConfiguration
+	 * @return @PREFIX@Configuration
 	 */
 	public function getConfig()
 	{
@@ -662,22 +728,23 @@ class KalturaClientBase
 	}
 
 	/**
-	 * @param KalturaConfiguration $config
+	 * @param @PREFIX@Configuration $config
 	 */
-	public function setConfig(KalturaConfiguration $config)
+	public function setConfig(@PREFIX@Configuration $config)
 	{
 		$this->config = $config;
+		$this->responseFormat = $config->format;
 
 		$logger = $this->config->getLogger();
-		if ($logger instanceof IKalturaLogger)
+		if ($logger instanceof I@PREFIX@Logger)
 		{
 			$this->shouldLog = true;
 		}
 	}
 
-	public function setClientConfiguration(KalturaClientConfiguration $configuration)
+	public function setClientConfiguration(@PREFIX@ClientConfiguration $configuration)
 	{
-		$params = get_class_vars('KalturaClientConfiguration');
+		$params = get_class_vars('@PREFIX@ClientConfiguration');
 		foreach($params as $param)
 		{
 			if(is_null($configuration->$param))
@@ -694,9 +761,9 @@ class KalturaClientBase
 		}
 	}
 
-	public function setRequestConfiguration(KalturaRequestConfiguration $configuration)
+	public function setRequestConfiguration(@PREFIX@RequestConfiguration $configuration)
 	{
-		$params = get_class_vars('KalturaRequestConfiguration');
+		$params = get_class_vars('@PREFIX@RequestConfiguration');
 		foreach($params as $param)
 		{
 			if(is_null($configuration->$param))
@@ -714,6 +781,85 @@ class KalturaClientBase
 	}
 
 	/**
+	 * @param mixed $value
+	 * @return mixed
+	 */
+	public function jsObjectToClientObject($value)
+	{
+		if(is_array($value))
+		{
+			foreach($value as &$item)
+			{
+				$item = $this->jsObjectToClientObject($item);
+			}
+		}
+		
+		if(is_object($value))
+		{
+			if(isset($value->message) && isset($value->code))
+			{
+				throw new @PREFIX@Exception($value->message, $value->code, $value->args);
+			}
+			
+			if(!isset($value->objectType))
+			{
+				throw new @PREFIX@ClientException("Response format not supported - objectType is required for all objects", @PREFIX@ClientException::ERROR_FORMAT_NOT_SUPPORTED);
+			}
+			
+			$objectType = $value->objectType;
+			$object = new $objectType();
+			$attributes = get_object_vars($value);
+			foreach($attributes as $attribute => $attributeValue)
+			{
+				if($attribute === 'objectType')
+				{
+					continue;
+				}
+				
+				$object->$attribute = $this->jsObjectToClientObject($attributeValue);
+			}
+			
+			$value = $object;
+		}
+		
+		return $value;
+	}
+
+	/**
+	 * Encodes objects
+	 * @param mixed $value
+	 * @return string
+	 */
+	public function jsonEncode($value)
+	{
+		return json_encode($this->unsetNull($value));
+	}
+
+	protected function unsetNull($object)
+	{
+		if(!is_array($object) && !is_object($object))
+			return $object;
+		
+		$array = (array) $object;
+		foreach($array as $key => $value)
+		{
+			if(is_null($value))
+			{
+				unset($array[$key]);
+			}
+			else
+			{
+				$array[$key] = $this->unsetNull($value);
+			}
+		}
+
+		if(is_object($object))
+			$array['objectType'] = get_class($object);
+			
+		return $array;
+	}
+
+	/**
 	 * Add parameter to array of parameters that is passed by reference
 	 *
 	 * @param arrat $params
@@ -725,12 +871,12 @@ class KalturaClientBase
 		if ($paramValue === null)
 			return;
 
-		if ($paramValue instanceof KalturaNull) {
+		if ($paramValue instanceof @PREFIX@Null) {
 			$params[$paramName . '__null'] = '';
 			return;
 		}
 
-		if(is_object($paramValue) && $paramValue instanceof KalturaObjectBase)
+		if(is_object($paramValue) && $paramValue instanceof @PREFIX@ObjectBase)
 		{
 			$this->addParam($params, "$paramName:objectType", get_class($paramValue));
 		    foreach($paramValue as $prop => $val)
@@ -765,7 +911,7 @@ class KalturaClientBase
 	{
 		if ($this->isError($resultObject))
 		{
-			throw new KalturaException($resultObject["message"], $resultObject["code"], $resultObject["args"]);
+			throw new @PREFIX@Exception($resultObject["message"], $resultObject["code"], $resultObject["args"]);
 		}
 	}
 
@@ -796,13 +942,23 @@ class KalturaClientBase
 		}
 		else if ( is_object($resultObject) )
 		{
-			if (!($resultObject instanceof $objectType)){
-				throw new KalturaClientException("Invalid object type - not instance of $objectType", KalturaClientException::ERROR_INVALID_OBJECT_TYPE);
+			if (!($resultObject instanceof $objectType))
+			{
+				throw new @PREFIX@ClientException("Invalid object type - not instance of $objectType", @PREFIX@ClientException::ERROR_INVALID_OBJECT_TYPE);
+			}
+		}
+		else if(is_subclass_of($objectType, '@PREFIX@EnumBase'))
+		{
+			$enum = new ReflectionClass($objectType);
+			$values = array_map('strval', $enum->getConstants());
+			if(!in_array($resultObject, $values))
+			{
+				throw new @PREFIX@ClientException("Invalid enum value", @PREFIX@ClientException::ERROR_INVALID_ENUM_VALUE);
 			}
 		}
 		else if(gettype($resultObject) !== $objectType)
 		{
-			throw new KalturaClientException("Invalid object type", KalturaClientException::ERROR_INVALID_OBJECT_TYPE);
+			throw new @PREFIX@ClientException("Invalid object type", @PREFIX@ClientException::ERROR_INVALID_OBJECT_TYPE);
 		}
 	}
 
@@ -945,12 +1101,12 @@ class KalturaClientBase
 	}
 
 	/**
-	 * @return KalturaNull
+	 * @return @PREFIX@Null
 	 */
-	public static function getKalturaNullValue()
+	public static function get@PREFIX@NullValue()
 	{
 
-        return KalturaNull::getInstance();
+        return @PREFIX@Null::getInstance();
 	}
 
 }
@@ -959,15 +1115,15 @@ class KalturaClientBase
  * @package Kaltura
  * @subpackage Client
  */
-interface IKalturaClientPlugin
+interface I@PREFIX@ClientPlugin
 {
 	/**
-	 * @return KalturaClientPlugin
+	 * @return @PREFIX@ClientPlugin
 	 */
-	public static function get(KalturaClient $client);
+	public static function get(@PREFIX@Client $client);
 
 	/**
-	 * @return array<KalturaServiceBase>
+	 * @return array<@PREFIX@ServiceBase>
 	 */
 	public function getServices();
 
@@ -981,9 +1137,9 @@ interface IKalturaClientPlugin
  * @package Kaltura
  * @subpackage Client
  */
-abstract class KalturaClientPlugin implements IKalturaClientPlugin
+abstract class @PREFIX@ClientPlugin implements I@PREFIX@ClientPlugin
 {
-	protected function __construct(KalturaClient $client)
+	protected function __construct(@PREFIX@Client $client)
 	{
 
 	}
@@ -993,19 +1149,8 @@ abstract class KalturaClientPlugin implements IKalturaClientPlugin
  * @package Kaltura
  * @subpackage Client
  */
-class KalturaServiceActionCall
+abstract class @PREFIX@Call
 {
-	/**
-	 * @var string
-	 */
-	public $service;
-
-	/**
-	 * @var string
-	 */
-	public $action;
-
-
 	/**
 	 * @var array
 	 */
@@ -1017,20 +1162,21 @@ class KalturaServiceActionCall
 	public $files;
 
 	/**
-	 * Contruct new Kaltura service action call, if params array contain sub arrays (for objects), it will be flattened
+	 * Contruct new @PREFIX@ call, if params array contain sub arrays (for objects), it will be flattened
 	 *
-	 * @param string $service
-	 * @param string $action
 	 * @param array $params
 	 * @param array $files
 	 */
-	public function __construct($service, $action, $params = array(), $files = array())
+	public function __construct($params = array(), $files = array())
 	{
-		$this->service = $service;
-		$this->action = $action;
 		$this->params = $this->parseParams($params);
 		$this->files = $files;
 	}
+	
+	/**
+	 * @return string
+	 */
+	abstract public function getPath();
 
 	/**
 	 * Parse params array and sub arrays (for objects)
@@ -1062,8 +1208,6 @@ class KalturaServiceActionCall
 	public function getParamsForMultiRequest($multiRequestIndex)
 	{
 		$multiRequestParams = array();
-		$multiRequestParams[$multiRequestIndex.":service"] = $this->service;
-		$multiRequestParams[$multiRequestIndex.":action"] = $this->action;
 		foreach($this->params as $key => $val)
 		{
 			$multiRequestParams[$multiRequestIndex.":".$key] = $val;
@@ -1071,7 +1215,7 @@ class KalturaServiceActionCall
 		return $multiRequestParams;
 	}
 
-		/**
+	/**
 	 * Return the parameters for a multi request
 	 *
 	 * @param int $multiRequestIndex
@@ -1087,36 +1231,140 @@ class KalturaServiceActionCall
 	}
 }
 
+
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
+class @PREFIX@ServiceActionCall extends @PREFIX@Call
+{
+	/**
+	 * @var string
+	 */
+	public $service;
+
+	/**
+	 * @var string
+	 */
+	public $action;
+
+	/**
+	 * Contruct new @PREFIX@ service action call, if params array contain sub arrays (for objects), it will be flattened
+	 *
+	 * @param string $service
+	 * @param string $action
+	 * @param array $params
+	 * @param array $files
+	 */
+	public function __construct($service, $action, $params = array(), $files = array())
+	{
+		parent::__construct($params, $files);
+		
+		$this->service = $service;
+		$this->action = $action;
+	}
+
+	public function getPath()
+	{
+		$path = '/api_v3/index.php?service=';
+		if ($this->isMultiRequest)
+		{
+			$path .= 'multirequest';
+		}
+		else
+		{
+			$path .= $call->service . '&action=' . $call->action;
+		}
+		return $path;
+	}
+			
+	/**
+	 * Return the parameters for a multi request
+	 *
+	 * @param int $multiRequestIndex
+	 */
+	public function getParamsForMultiRequest($multiRequestIndex)
+	{
+		$multiRequestParams = parent::getParamsForMultiRequest($multiRequestIndex);
+		$multiRequestParams[$multiRequestIndex.":service"] = $this->service;
+		$multiRequestParams[$multiRequestIndex.":action"] = $this->action;
+		return $multiRequestParams;
+	}
+}
+
+
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
+class @PREFIX@PathCall extends @PREFIX@Call
+{
+	/**
+	 * @var string
+	 */
+	public $path;
+
+	/**
+	 * Contruct new @PREFIX@ service action call, if params array contain sub arrays (for objects), it will be flattened
+	 *
+	 * @param string $path
+	 * @param array $params
+	 * @param array $files
+	 */
+	public function __construct($path, $params = array(), $files = array())
+	{
+		$this->path = $path;
+		$this->params = $this->parseParams($params);
+		$this->files = $files;
+	}
+	
+	public function getPath()
+	{
+		// TODO support multi-request
+		return $this->path;
+	}
+}
+
 /**
  * Abstract base class for all client services
  *
  * @package Kaltura
  * @subpackage Client
  */
-abstract class KalturaServiceBase
+abstract class @PREFIX@ServiceBase
 {
 	/**
-	 * @var KalturaClient
+	 * @var @PREFIX@Client
 	 */
 	protected $client;
 
 	/**
-	 * Initialize the service keeping reference to the KalturaClient
+	 * Initialize the service keeping reference to the @PREFIX@Client
 	 *
-	 * @param KalturaClient $client
+	 * @param @PREFIX@Client $client
 	 */
-	public function __construct(KalturaClient $client = null)
+	public function __construct(@PREFIX@Client $client = null)
 	{
 		$this->client = $client;
 	}
 
 	/**
-	 * @param KalturaClient $client
+	 * @param @PREFIX@Client $client
 	 */
-	public function setClient(KalturaClient $client)
+	public function setClient(@PREFIX@Client $client)
 	{
 		$this->client = $client;
 	}
+}
+
+/**
+ * Abstract base class for all client enums
+ *
+ * @package Kaltura
+ * @subpackage Client
+ */
+abstract class @PREFIX@EnumBase
+{
 }
 
 /**
@@ -1125,7 +1373,7 @@ abstract class KalturaServiceBase
  * @package Kaltura
  * @subpackage Client
  */
-abstract class KalturaObjectBase
+abstract class @PREFIX@ObjectBase
 {
 	/**
 	 * @var array
@@ -1137,7 +1385,7 @@ abstract class KalturaObjectBase
 		foreach ($params as $key => $value)
 		{
 			if (!property_exists($this, $key))
-				throw new KalturaClientException("property [{$key}] does not exist on object [".get_class($this)."]", KalturaClientException::ERROR_INVALID_OBJECT_FIELD);
+				throw new @PREFIX@ClientException("property [{$key}] does not exist on object [".get_class($this)."]", @PREFIX@ClientException::ERROR_INVALID_OBJECT_FIELD);
 			$this->$key = $value;
 		}
 	}
@@ -1146,7 +1394,7 @@ abstract class KalturaObjectBase
 	{
 		if ($paramValue !== null)
 		{
-			if($paramValue instanceof KalturaObjectBase)
+			if($paramValue instanceof @PREFIX@ObjectBase)
 			{
 				$params[$paramName] = $paramValue->toParams();
 			}
@@ -1173,7 +1421,7 @@ abstract class KalturaObjectBase
  * @package Kaltura
  * @subpackage Client
  */
-class KalturaException extends Exception
+class @PREFIX@Exception extends Exception
 {
 	private $arguments;
 
@@ -1211,7 +1459,7 @@ class KalturaException extends Exception
  * @package Kaltura
  * @subpackage Client
  */
-class KalturaClientException extends Exception
+class @PREFIX@ClientException extends Exception
 {
 	const ERROR_GENERIC = -1;
 	const ERROR_UNSERIALIZE_FAILED = -2;
@@ -1224,18 +1472,20 @@ class KalturaClientException extends Exception
 	const ERROR_INVALID_OBJECT_FIELD = -9;
 	const ERROR_DOWNLOAD_NOT_SUPPORTED = -10;
 	const ERROR_DOWNLOAD_IN_MULTIREQUEST = -11;
+	const ERROR_ACTION_IN_MULTIREQUEST = -12;
+	const ERROR_INVALID_ENUM_VALUE = -13;
 }
 
 /**
  * @package Kaltura
  * @subpackage Client
  */
-class KalturaConfiguration
+class @PREFIX@Configuration
 {
 	private $logger;
 
 	public $serviceUrl    				= "http://www.kaltura.com/";
-	public $format        				= 3;
+	public $format        				= @PREFIX@ClientBase::KALTURA_SERVICE_FORMAT_PHP;
 	public $curlTimeout   				= 120;
 	public $userAgent					= '';
 	public $startZendDebuggerSession 	= false;
@@ -1247,14 +1497,14 @@ class KalturaConfiguration
 	public $verifySSL 					= true;
 	public $sslCertificatePath			= null;
 	public $requestHeaders				= array();
-	public $method						= KalturaClientBase::METHOD_POST;
+	public $method						= @PREFIX@ClientBase::METHOD_POST;
 
 	/**
 	 * Set logger to get kaltura client debug logs
 	 *
-	 * @param IKalturaLogger $log
+	 * @param I@PREFIX@Logger $log
 	 */
-	public function setLogger(IKalturaLogger $log)
+	public function setLogger(I@PREFIX@Logger $log)
 	{
 		$this->logger = $log;
 	}
@@ -1262,7 +1512,7 @@ class KalturaConfiguration
 	/**
 	 * Gets the logger (Internal client use)
 	 *
-	 * @return IKalturaLogger
+	 * @return I@PREFIX@Logger
 	 */
 	public function getLogger()
 	{
@@ -1271,14 +1521,68 @@ class KalturaConfiguration
 }
 
 /**
- * Implement to get Kaltura Client logs
+ * Implement to get @PREFIX@ Client logs
  *
  * @package Kaltura
  * @subpackage Client
  */
-interface IKalturaLogger
+interface I@PREFIX@Logger
 {
 	function log($msg);
 }
 
+class @PREFIX@ParseUtils 
+{
+	public static function unmarshalSimpleType(\SimpleXMLElement $xml) 
+	{
+		return "$xml";
+	}
+	
+	public static function unmarshalObject(\SimpleXMLElement $xml, $fallbackType = null) 
+	{
+		$objectType = reset($xml->objectType);
+		$type = @PREFIX@TypeMap::getZendType($objectType);
+		if(!class_exists($type)) {
+			$type = @PREFIX@TypeMap::getZendType($fallbackType);
+			if(!class_exists($type))
+				throw new @PREFIX@ClientException("Invalid object type class [$type] of Kaltura type [$objectType]", @PREFIX@ClientException::ERROR_INVALID_OBJECT_TYPE);
+		}
+			
+		return new $type($xml);
+	}
+	
+	public static function unmarshalArray(\SimpleXMLElement $xml, $fallbackType = null)
+	{
+		$xmls = $xml->children();
+		$ret = array();
+		foreach($xmls as $xml)
+			$ret[] = self::unmarshalObject($xml, $fallbackType);
+			
+		return $ret;
+	}
+	
+	public static function unmarshalMap(\SimpleXMLElement $xml, $fallbackType = null)
+	{
+		$xmls = $xml->children();
+		$ret = array();
+		foreach($xmls as $xml)
+			$ret[strval($xml->itemKey)] = self::unmarshalObject($xml, $fallbackType);
+			
+		return $ret;
+	}
+
+	public static function checkIfError(\SimpleXMLElement $xml, $throwException = true) 
+	{
+		if(($xml->error) && (count($xml->children()) == 1))
+		{
+			$code = "{$xml->error->code}";
+			$message = "{$xml->error->message}";
+			$arguments = self::unmarshalArray($xml->error->args, 'KalturaApiExceptionArg');
+			if($throwException)
+				throw new @PREFIX@Exception($message, $code, $arguments);
+			else 
+				return new @PREFIX@Exception($message, $code, $arguments);
+		}
+	}
+}
 
