@@ -52,4 +52,9 @@ class KalturaAttachmentAsset extends KalturaAsset
 	{
 		return array_merge ( parent::getMapBetweenObjects() , self::$map_between_objects );
 	}
+
+    public function getCoreInstance()
+    {
+        return AttachmentPlugin::getObjectClass('asset', AttachmentPlugin::getAssetTypeCoreValue(AttachmentAssetType::ATTACHMENT));
+    }
 }
