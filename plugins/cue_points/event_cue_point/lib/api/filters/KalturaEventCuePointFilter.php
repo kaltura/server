@@ -15,4 +15,9 @@ class KalturaEventCuePointFilter extends KalturaEventCuePointBaseFilter
 	{
 		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
 	}
+
+	public function getTypeListResponse(KalturaFilterPager $pager, KalturaDetachedResponseProfile $responseProfile = null, $type = null)
+	{
+		return parent::getTypeListResponse($pager, $responseProfile, QuizPlugin::getCoreValue('CuePointType',EventCuePointType::EVENT));
+	}
 }

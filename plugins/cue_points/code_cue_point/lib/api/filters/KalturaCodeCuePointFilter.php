@@ -29,4 +29,9 @@ class KalturaCodeCuePointFilter extends KalturaCodeCuePointBaseFilter
 	{
 		// override KalturaCuePointFilter::validateForResponseProfile because all code cue-points are public
 	}
+
+	public function getTypeListResponse(KalturaFilterPager $pager, KalturaDetachedResponseProfile $responseProfile = null, $type = null)
+	{
+		return parent::getTypeListResponse($pager, $responseProfile, QuizPlugin::getCoreValue('CuePointType',CodeCuePointType::CODE));
+	}
 }

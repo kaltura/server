@@ -16,4 +16,9 @@ class KalturaAnnotationFilter extends KalturaAnnotationBaseFilter
 			parent::validateForResponseProfile();
 		}
 	}
+
+	public function getTypeListResponse(KalturaFilterPager $pager, KalturaDetachedResponseProfile $responseProfile = null, $type = null)
+	{
+		return parent::getTypeListResponse($pager, $responseProfile, QuizPlugin::getCoreValue('CuePointType', AnnotationCuePointType::ANNOTATION));
+	}
 }

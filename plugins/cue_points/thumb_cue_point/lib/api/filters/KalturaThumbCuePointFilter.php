@@ -27,4 +27,9 @@ class KalturaThumbCuePointFilter extends KalturaThumbCuePointBaseFilter
 	{
 		// override KalturaCuePointFilter::validateForResponseProfile because all thumb cue-points are public
 	}
+
+	public function getTypeListResponse(KalturaFilterPager $pager, KalturaDetachedResponseProfile $responseProfile = null, $type = null)
+	{
+		return parent::getTypeListResponse($pager, $responseProfile, QuizPlugin::getCoreValue('CuePointType',ThumbCuePointType::THUMB));
+	}
 }

@@ -26,4 +26,9 @@ class KalturaAdCuePointFilter extends KalturaAdCuePointBaseFilter
 	{
 		// override KalturaCuePointFilter::validateForResponseProfile because all ad cue-points are public
 	}
+
+	public function getTypeListResponse(KalturaFilterPager $pager, KalturaDetachedResponseProfile $responseProfile = null, $type = null)
+	{
+		return parent::getTypeListResponse($pager, $responseProfile, QuizPlugin::getCoreValue('CuePointType', AdCuePointType::AD));
+	}
 }
