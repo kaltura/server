@@ -27,4 +27,12 @@ class KalturaTranscriptAsset extends KalturaAttachmentAsset
 	{
 		return array_merge ( parent::getMapBetweenObjects() , self::$map_between_objects );
 	}
+
+    public function getCoreInstance()
+    {
+        if (class_exists('TranscriptPlugin'))
+            return TranscriptPlugin::getObjectClass('asset', TranscriptPlugin::getAssetTypeCoreValue(TranscriptAssetType::TRANSCRIPT));
+
+        return parent::getCoreInstance();
+    }
 }
