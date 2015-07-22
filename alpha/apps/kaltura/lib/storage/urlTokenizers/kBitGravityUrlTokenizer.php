@@ -42,7 +42,7 @@ class kBitGravityUrlTokenizer extends kUrlTokenizer
 	 */
 	public function tokenizeUrl($url, $baseUrl = null, $fileExtension = null)
 	{
-		$expiryTime = time() + $this->window;
+		$expiryTime = infraRequestUtils::getServerTime() + $this->window;
 		if (!$this->hashPatternRegex)
 			return $url;
 

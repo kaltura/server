@@ -60,7 +60,7 @@ class kCloudFrontUrlTokenizer extends kUrlTokenizer
 	
 	protected function generateToken($acl)
 	{
-		$DateLessThan = time() + $this->window;
+		$DateLessThan = infraRequestUtils::getServerTime() + $this->window;
 		$policy = '{"Statement":[{"Resource":"'.$acl.'","Condition":{"DateLessThan":{"AWS:EpochTime":'.$DateLessThan.'}}}]}';
 		$signature = $this->rsaSha1Sign($policy);
 		

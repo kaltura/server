@@ -89,7 +89,7 @@ class kLevel3UrlTokenizer extends kUrlTokenizer
 
 		if ($this->window)
 		{
-			$expiry = "{$this->expiryName}=" . strftime("%Y%m%d%H%M%S", time() - date("Z") + $this->window);
+			$expiry = "{$this->expiryName}=" . strftime("%Y%m%d%H%M%S", infraRequestUtils::getServerTime() - date("Z") + $this->window);
 			$url = kDeliveryUtils::addQueryParameter($url, $expiry);
 			$fullUrl = kDeliveryUtils::addQueryParameter($fullUrl, $expiry);
 		}
