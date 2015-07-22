@@ -12,6 +12,9 @@ class KalturaJsonSerializer extends KalturaSerializer
 
 	function serialize($object)
 	{
+		if(is_null($object))
+			return 'null';
+			
 		$object = parent::prepareSerializedObject($object);
 		$json = json_encode($this->unsetNull($object));
 		return $json;
@@ -33,6 +36,11 @@ class KalturaJsonSerializer extends KalturaSerializer
 			{
 				$array[$key] = $this->unsetNull($value);
 			}
+		}
+		
+		if(is_object($object) && $object instanceof KalturaObject)
+		{
+			$array['objectType'] = get_class($object);
 		}
 		
 		return $array;

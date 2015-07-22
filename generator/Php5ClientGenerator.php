@@ -131,9 +131,9 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 			$this->appendLine(' */');
 		}
 		
-		$this->appendLine("require_once(dirname(__FILE__) . '/{$this->prefix}ClientBase.php');");
-		$this->appendLine("require_once(dirname(__FILE__) . '/{$this->prefix}Enums.php');");
-		$this->appendLine("require_once(dirname(__FILE__) . '/{$this->prefix}Types.php');");
+		$this->appendLine("require_once(dirname(__FILE__) . '/../{$this->prefix}ClientBase.php');");
+		$this->appendLine("require_once(dirname(__FILE__) . '/../{$this->prefix}Enums.php');");
+		$this->appendLine("require_once(dirname(__FILE__) . '/../{$this->prefix}Types.php');");
 
 		$dependencyNodes = $xpath->query("/xml/plugins/plugin[@name = '$pluginName']/dependency");
 		foreach($dependencyNodes as $dependencyNode)
@@ -499,91 +499,65 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 			$this->appendLine("		");
 		}
 		
-		if(count($supportedRequestFormats))
+		$this->appendLine("		\$kparams = array();");
+	
+		$haveFiles = false;
+		foreach($paramNodes as $paramNode)
 		{
-			if(in_array('json', $supportedRequestFormats))
-			{
-				$this->appendLine("		\$this->client->setRequestFormat({$this->prefix}ClientBase::KALTURA_SERVICE_FORMAT_JSON);");
-				$this->appendLine("		\$kparams = array(");
-			
-				foreach($paramNodes as $paramNode)
+		    $paramName = $paramNode->getAttribute("name");
+			$paramType = $paramNode->getAttribute("type");
+		    $isOptional = $paramNode->getAttribute("optional");
+		    
+		
+		    if ($paramType == "file")
+	    	{
+		        $haveFiles = true;
+	    	}
+	    	elseif(!$path || !preg_match("/\\{{$paramName}\\}/", $path))
+		    {
+				$extraTab = '';
+				if ($isOptional)
 				{
-				    $paramName = $paramNode->getAttribute("name");
-				    if(!$path || !preg_match("/\\{{$paramName}\\}/", $path))
-				    {
-						$this->appendLine("			'$paramName' => \${$paramName},");
-				    }
+					$this->appendLine("		if(!is_null(\$$paramName))");
+					$extraTab = "	";
 				}
-				$this->appendLine("		);");
-				foreach($paramNodes as $paramNode)
-				{
-					$paramType = $paramNode->getAttribute("type");
-					if($paramType == 'bool')
-					{
-				    	$paramName = $paramNode->getAttribute("name");
-				    	$this->appendLine("		\${$paramName} = \${$paramName} ? 'true' : 'false';");
-					}
-				}
-				$this->appendLine("		");
-			}
+				$this->appendLine("$extraTab		\$kparams['$paramName'] = \${$paramName};");
+		    }
 		}
-		else
+		
+		if($haveFiles)
 		{
-			$this->appendLine("		\$kparams = array();");
-			$haveFiles = false;
+			$this->appendLine("		\$kfiles = array();");
 			foreach($paramNodes as $paramNode)
 			{
 				$paramType = $paramNode->getAttribute("type");
 			    $paramName = $paramNode->getAttribute("name");
-			    $isEnum = $paramNode->hasAttribute("enumType");
 			    $isOptional = $paramNode->getAttribute("optional");
 				
-			    if ($haveFiles === false && $paramType == "file")
-		    	{
-			        $haveFiles = true;
-		        	$this->appendLine("		\$kfiles = array();");
-		    	}
 		    
-				if (!$this->isSimpleType($paramType))
+				if($paramType == "file")
 				{
-					if ($isEnum)
+					$extraTab = '';
+					if ($isOptional)
 					{
-						$this->appendLine("		\$this->client->addParam(\$kparams, \"$paramName\", \$$paramName);");
+						$this->appendLine("		if (!is_null(\$$paramName))");
+						$extraTab = "	";
 					}
-					else if ($paramType == "file")
-					{
-						$this->appendLine("		\$this->client->addParam(\$kfiles, \"$paramName\", \$$paramName);");
-					}
-					else if ($paramType == "array")
-					{
-						$extraTab = "";
-						if ($isOptional)
-						{
-							$this->appendLine("		if (\$$paramName !== null)");
-							$extraTab = "	";
-						}
-						$this->appendLine("$extraTab		foreach(\$$paramName as \$index => \$obj)");
-						$this->appendLine("$extraTab		{");
-						$this->appendLine("$extraTab			\$this->client->addParam(\$kparams, \"$paramName:\$index\", \$obj->toParams());");
-						$this->appendLine("$extraTab		}");
-					}
-					else
-					{
-						$extraTab = "";
-						if ($isOptional)
-						{
-							$this->appendLine("		if (\$$paramName !== null)");
-							$extraTab = "	";
-						}
-						$this->appendLine("$extraTab		\$this->client->addParam(\$kparams, \"$paramName\", \$$paramName"."->toParams());");
-					}
-				}
-				elseif(!$path || !preg_match("/\\{{$paramName}\\}/", $path))
-				{
-					$this->appendLine("		\$this->client->addParam(\$kparams, \"$paramName\", \$$paramName);");
+					$this->appendLine("$extraTab		\$this->client->addParam(\$kfiles, \"$paramName\", \$$paramName);");
 				}
 			}
+		}	
+		
+		foreach($paramNodes as $paramNode)
+		{
+			$paramType = $paramNode->getAttribute("type");
+			if($paramType == 'bool')
+			{
+		    	$paramName = $paramNode->getAttribute("name");
+		    	$this->appendLine("		\${$paramName} = \${$paramName} ? 'true' : 'false';");
+			}
 		}
+		$this->appendLine("		");
 		
 		if($path)
 		{

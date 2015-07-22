@@ -454,8 +454,15 @@ class infraRequestUtils
 			$value = each($pathParts);
 			$params[$key['value']] = $value['value'];
 		}
-			
-		self::$requestParams = array_merge($params, $_GET, $_POST, $_FILES);
+		
+		$requestBody = file_get_contents("php://input");
+		$post = $_POST;
+		if(preg_match('/^\{.*\}$/', $requestBody))
+		{
+			$post = json_decode($requestBody, true);
+		}
+		
+		self::$requestParams = array_merge($params, $_GET, $post, $_FILES);
 		return self::$requestParams;
 	}
 
