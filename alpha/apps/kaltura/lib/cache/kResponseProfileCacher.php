@@ -548,7 +548,7 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 	
 	protected function deleteResponseProfileCache(ResponseProfile $responseProfile)
 	{
-		$key = self::getResponseProfileCacheKey($responseProfile->getKey());
+		$key = self::getResponseProfileCacheKey($responseProfile->getKey(), $responseProfile->getPartnerId());
 		self::delete($key);
 		
 		return true;
