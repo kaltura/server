@@ -75,11 +75,6 @@ class KalturaResponseProfileCacher extends kResponseProfileCacher
 		return "relate_rp{$profileKey}_p{$partnerId}_o{$objectType}_h{$protocol}_k{$ksType}_u{$userRoles}_w{$host}";
 	}
 	
-	private static function getResponseProfileCacheKey($responseProfileKey, $partnerId)
-	{
-		return "rp_rp{$responseProfileKey}_p{$partnerId}";
-	}
-	
 	public static function onPersistentObjectLoaded(IBaseObject $object)
 	{
 		if(!self::$cachedObject)
