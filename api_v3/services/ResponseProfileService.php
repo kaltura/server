@@ -190,24 +190,30 @@ class ResponseProfileService extends KalturaBaseService
 	}
 	
 	/**
-	 * List response profiles by filter and pager
+	 * Clone an existing response profile
 	 * 
 	 * @action clone
 	 * @param int $id
+	 * @param KalturaResponseProfile $profile
 	 * @throws KalturaErrors::RESPONSE_PROFILE_ID_NOT_FOUND
+	 * @throws KalturaErrors::RESPONSE_PROFILE_DUPLICATE_SYSTEM_NAME
 	 * @return KalturaResponseProfile
 	 */
-	function cloneAction ($id)
+	function cloneAction ($id, KalturaResponseProfile $profile)
 	{
 		$origResponseProfileDbObject = ResponseProfilePeer::retrieveByPK($id);
 		if (!$origResponseProfileDbObject)
 			throw new KalturaAPIException(KalturaErrors::RESPONSE_PROFILE_ID_NOT_FOUND, $id);
 			
 		$newResponseProfileDbObject = $origResponseProfileDbObject->copy();
-		$newResponseProfileDbObject->setSystemName($origResponseProfileDbObject->getSystemName() . '_' . uniqid());
 		
-		$newResponseProfile = new KalturaResponseProfile();
-		$newResponseProfileDbObject = $newResponseProfile->toInsertableObject($origResponseProfileDbObject);
+		if ($profile)
+			$newResponseProfileDbObject = $profile->toInsertableObject($newResponseProfileDbObject);
+		
+		$duplicates = ResponseProfilePeer::retrieveBySystemName($newResponseProfileDbObject->getSystemName());
+		if (count ($duplicates))
+			throw new KalturaAPIException(KalturaErrors::RESPONSE_PROFILE_DUPLICATE_SYSTEM_NAME, $origResponseProfileDbObject->getSystemName());
+		
 		$newResponseProfileDbObject->save();
 		
 		$newResponseProfile = new KalturaResponseProfile();
