@@ -759,6 +759,14 @@ class @PREFIX@ClientBase
 		{
 			if(isset($value->message) && isset($value->code))
 			{
+				if($this->isMultiRequest)
+				{
+					if(isset($value->args))
+					{
+						$value->args = (array) $value->args;
+					}
+					return (array) $value;
+				}
 				throw new @PREFIX@Exception($value->message, $value->code, $value->args);
 			}
 			
@@ -800,6 +808,9 @@ class @PREFIX@ClientBase
 	{
 		if(!is_array($object) && !is_object($object))
 			return $object;
+		
+		if(is_object($object) && $object instanceof MultiRequestSubResult)
+			return "$object";
 		
 		$array = (array) $object;
 		foreach($array as $key => $value)
@@ -1138,7 +1149,7 @@ class @PREFIX@ServiceActionCall
 		$multiRequestParams[$multiRequestIndex]['action'] = $this->action;
 		foreach($this->params as $key => $val)
 		{
-			$multiRequestParams[$multiRequestIndex.":".$key] = $val;
+			$multiRequestParams[$multiRequestIndex][$key] = $val;
 		}
 		return $multiRequestParams;
 	}
@@ -1153,7 +1164,7 @@ class @PREFIX@ServiceActionCall
 		$multiRequestParams = array();
 		foreach($this->files as $key => $val)
 		{
-			$multiRequestParams[$multiRequestIndex.":".$key] = $val;
+			$multiRequestParams[$multiRequestIndex][$key] = $val;
 		}
 		return $multiRequestParams;
 	}
