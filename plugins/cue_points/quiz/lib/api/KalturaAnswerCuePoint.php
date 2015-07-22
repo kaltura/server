@@ -31,7 +31,7 @@ class KalturaAnswerCuePoint extends KalturaCuePoint
 
 	/**
 	 * Array of string
-	 * @var KalturaTypedArray
+	 * @var KalturaStringArray
 	 * @readonly
 	 */
 	public $correctAnswerKeys;
