@@ -52,10 +52,9 @@ require_once(dirname(__FILE__) . "/bootstrap.php");
 $summaryFileName = 'summary.kinf';
 $tmpXmlFileName = tempnam(sys_get_temp_dir(), 'kaltura.generator.');
 
-$options = getopt('hx:p:', array(
+$options = getopt('hx:', array(
 	'help',
 	'xml:',
-	'prefix:',
 ));
 
 function showHelpAndExit()
@@ -65,13 +64,11 @@ function showHelpAndExit()
 	echo "\tOptions:\n";
 	echo "\t\t-h, --help:   \tShow this help.\n";
 	echo "\t\t-x, --xml:    \tUse XML path or URL as source XML.\n";
-	echo "\t\t-p, --prefix: \tUse as prefix to all class names.\n";
 	
 	exit;
 }
 
 $schemaXml = null;
-$prefix = 'Kaltura';
 foreach($options as $option => $value)
 {
 	if($option == 'h' || $option == 'help')
@@ -81,10 +78,6 @@ foreach($options as $option => $value)
 	elseif($option == 'x' || $option == 'xml')
 	{
 		$schemaXml = $value;
-	}
-	elseif($option == 'p' || $option == 'prefix')
-	{
-		$prefix = $value;
 	}
 	array_shift($argv);
 }	 
@@ -240,7 +233,6 @@ foreach($config as $name => $item)
 		
 		$instance = $reflectionClass->newInstance($tmpXmlFileName, $item);
 		/* @var $instance ClientGeneratorFromXml */
-		$instance->setPrefix($prefix);
 		
 		if($item->get("generateDocs"))
 			$instance->setGenerateDocs($item->get("generateDocs"));

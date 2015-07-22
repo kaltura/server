@@ -7,16 +7,10 @@ abstract class ClientGeneratorFromXml
 	protected $_sourcePath = "";
 	protected $_params = array();
 	
-	protected $prefix = 'Kaltura';
 	protected $generateDocs = false;
 	protected $package = 'External';
 	protected $subpackage = 'Kaltura';
 	protected $excludeSourcePaths = array();
-	
-	public function setPrefix($prefix)
-	{
-		$this->prefix = $prefix;
-	}
 	
 	public function setGenerateDocs($generateDocs)
 	{
@@ -94,7 +88,6 @@ abstract class ClientGeneratorFromXml
 		}
 		
 		$this->_files[$fileName] = str_replace('@DATE@', date('y-m-d'), $fileContents);
-		$this->_files[$fileName] = str_replace('@PREFIX@', $this->prefix, $fileContents);
 	}
 	
 	protected function addSourceFiles($directory, $rootSourceFolder, $rootDestFolder)
@@ -111,11 +104,9 @@ abstract class ClientGeneratorFromXml
 		if (is_file($directory)) 
 		{
 			$file = str_replace($rootSourceFolder, $rootDestFolder, $directory);
-			$file = dirname($file) . DIRECTORY_SEPARATOR . preg_replace('/^Kaltura/', $this->prefix, basename($file));
 			$this->addFile($file, file_get_contents($directory), false);
 			return;
 		}
-		
 		
 		// loop through the folder
 		$dir = dir($directory);
