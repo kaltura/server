@@ -121,8 +121,8 @@ class KalturaResponseCacher extends kApiCache
 		{
 			$max_age = !is_null($this->minCacheTTL) ? min($this->_cacheHeadersExpiry, $this->minCacheTTL) : $this->_cacheHeadersExpiry ;
 			header("Cache-Control: private, max-age=$max_age, max-stale=0");
-			header('Expires: ' . gmdate('D, d M Y H:i:s', time() + $max_age) . 'GMT');
-			header('Last-Modified: ' . gmdate('D, d M Y H:i:s', $lastModified) . 'GMT');
+			header('Expires: ' . gmdate('D, d M Y H:i:s', time() + $max_age) . ' GMT');
+			header('Last-Modified: ' . gmdate('D, d M Y H:i:s', $lastModified) . ' GMT');
 		}
 		else
 		{
