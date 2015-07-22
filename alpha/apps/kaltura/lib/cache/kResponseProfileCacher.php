@@ -541,9 +541,14 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 		return false;
 	}
 	
+	protected static function getResponseProfileCacheKey($responseProfileKey, $partnerId)
+	{
+		return "rp_rp{$responseProfileKey}_p{$partnerId}";
+	}
+	
 	protected function deleteResponseProfileCache(ResponseProfile $responseProfile)
 	{
-		$key = self::getResponseProfileCacheKey($responseProfile->getKey());
+		$key = self::getResponseProfileCacheKey($responseProfile->getKey(), $responseProfile->getPartnerId());
 		self::delete($key);
 		
 		return true;
