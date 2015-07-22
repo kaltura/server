@@ -455,11 +455,21 @@ class infraRequestUtils
 			$params[$key['value']] = $value['value'];
 		}
 		
-		$requestBody = file_get_contents("php://input");
-		$post = $_POST;
-		if(preg_match('/^\{.*\}$/', $requestBody))
+		if(isset($_SERVER['CONTENT_TYPE']) && strtolower($_SERVER['CONTENT_TYPE']) == 'application/json')
 		{
-			$post = json_decode($requestBody, true);
+			$requestBody = file_get_contents("php://input");
+			if(preg_match('/^\{.*\}$/', $requestBody))
+			{
+				$post = json_decode($requestBody, true);
+			}
+		}
+		elseif(strpos(strtolower($_SERVER['CONTENT_TYPE']), 'multipart/form-data') === 0 && isset($_POST['json']))
+		{
+			$post = json_decode($_POST['json'], true);
+		}
+		else
+		{
+			$post = $_POST;
 		}
 		
 		self::$requestParams = array_merge($params, $_GET, $post, $_FILES);

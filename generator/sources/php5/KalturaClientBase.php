@@ -494,7 +494,6 @@ class @PREFIX@ClientBase
 		$params = $this->jsonEncode($params);
 		$this->log("curl: $url");
 		$this->log("post: $params");
-		$requestHeaders[] = 'Content-Type: application/json';
 		if($this->config->format == self::KALTURA_SERVICE_FORMAT_JSON)
 		{
 			$requestHeaders[] = 'Accept: application/json';
@@ -508,19 +507,21 @@ class @PREFIX@ClientBase
 			curl_setopt($ch, CURLOPT_POST, 1);
 			if (count($files) > 0)
 			{
-                foreach ($files as &$file) {
+				$params = array('json' => $params);
+                foreach ($files as $key => $file) {
                     // The usage of the @filename API for file uploading is
                     // deprecated since PHP 5.5. CURLFile must be used instead.
                     if (PHP_VERSION_ID >= 50500) {
-                        $file = new \CURLFile($file);
+                        $params[$key] = new \CURLFile($file);
                     } else {
-                        $file = "@" . $file; // let curl know its a file
+                        $params[$key] = "@" . $file; // let curl know its a file
                     }
                 }
-                curl_setopt($ch, CURLOPT_POSTFIELDS, array_merge($params, $files));
+                curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
 			}
 			else
 			{
+				$requestHeaders[] = 'Content-Type: application/json';
 				curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
 			}
 		}

@@ -543,7 +543,7 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 						$this->appendLine("		if (!is_null(\$$paramName))");
 						$extraTab = "	";
 					}
-					$this->appendLine("$extraTab		\$this->client->addParam(\$kfiles, \"$paramName\", \$$paramName);");
+					$this->appendLine("$extraTab		\$kfiles[\"$paramName\"] = \$$paramName;");
 				}
 			}
 		}	
