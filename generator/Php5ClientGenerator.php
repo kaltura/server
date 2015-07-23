@@ -337,12 +337,8 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 		$this->appendLine();
 	}
 	
-	function writeService(DOMElement $serviceNode, $serviceName = null, $serviceId = null, $actionPrefix = "", $extends = null)
+	function writeService(DOMElement $serviceNode, $serviceName = null, $serviceId = null, $actionPrefix = "", $extends = "KalturaServiceBase")
 	{
-		if(is_null($extends))
-		{
-			$extends = "KalturaServiceBase";
-		}
 		$serviceName = $serviceName ? $serviceName : $serviceNode->getAttribute("name");
 		$serviceId = $serviceId ? $serviceId : $serviceNode->getAttribute("id");
 		
@@ -380,35 +376,10 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 		    }
 		}
 		
-		$subServices = $serviceNode->getElementsByTagName("service");
-		$subServicesClasses = array();
-		if ($subServices && count($subServices))
-		{
-		    foreach ($subServices as $subServiceNode)
-		    {
-		    	$subServiceName = lcfirst($subServiceNode->getAttribute("name"));
-		    	$subServiceClassName = 'Kaltura' . ucfirst($subServiceName) . "Service";
-		    	$subServicesClasses[$subServiceName] = $subServiceClassName;
-		        $this->appendLine('	/**');
-			    $this->appendLine("	* @var $subServiceClassName");
-			    $this->appendLine('	*/');
-			    $this->appendLine("	public \${$subServiceName};");
-		        $this->appendLine("");
-		    }
-		}
-		
 		$this->appendLine("	function __construct(KalturaClient \$client = null)");
 		$this->appendLine("	{");
 		$this->appendLine("		parent::__construct(\$client);");
 		
-		if(count($subServicesClasses))
-		{
-			$this->appendLine("		");
-			foreach($subServicesClasses as $subServiceName => $subServiceClassName)
-			{
-				$this->appendLine("		\$this->{$subServiceName} = new {$subServiceClassName}(\$client);");
-			}
-		}
 		
 		$this->appendLine("	}");
 		
@@ -419,14 +390,6 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 		}
 		
 		$this->appendLine("}");
-	
-		if ($subServices && count($subServices))
-		{
-		    foreach ($subServices as $subServiceNode)
-		    {
-		    	$this->writeService($subServiceNode);
-		    }
-		}
 	}
 	
 	function writeAction($serviceId, DOMElement $actionNode, $actionPrefix = "")
@@ -483,12 +446,11 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 		if(!$enableInMultiRequest)
 		{
 			$this->appendLine("		if (\$this->client->isMultiRequest())");
-			$this->appendLine("			throw new ExampleClientException(\"Action is not supported as part of multi-request.\", ExampleClientException::ERROR_ACTION_IN_MULTIREQUEST);");
+			$this->appendLine("			throw new KalturaClientException(\"Action is not supported as part of multi-request.\", KalturaClientException::ERROR_ACTION_IN_MULTIREQUEST);");
 			$this->appendLine("		");
 		}
 		
 		$this->appendLine("		\$kparams = array();");
-	
 		$haveFiles = false;
 		foreach($paramNodes as $paramNode)
 		{

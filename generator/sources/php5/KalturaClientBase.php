@@ -487,7 +487,6 @@ class KalturaClientBase
 	 */
 	private function doCurl($url, $params = array(), $files = array())
 	{
-		$method = $this->config->method;
 		$requestHeaders = $this->config->requestHeaders;
 		
 		$params = $this->jsonEncode($params);
@@ -496,13 +495,13 @@ class KalturaClientBase
 		if($this->config->format == self::KALTURA_SERVICE_FORMAT_JSON)
 		{
 			$requestHeaders[] = 'Accept: application/json';
-		} 
+		}
 		
 		$this->responseHeaders = array();
 		$cookies = array();
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_URL, $url);
-		if($method == self::METHOD_POST) {
+		if($this->config->method == self::METHOD_POST) {
 			curl_setopt($ch, CURLOPT_POST, 1);
 			if (count($files) > 0)
 			{
