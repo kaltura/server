@@ -472,7 +472,30 @@ class infraRequestUtils
 			$post = $_POST;
 		}
 		
-		self::$requestParams = array_merge($params, $_GET, $post, $_FILES);
+		self::$requestParams = array_merge_recursive($params, $_GET, $post);
+	
+		if(count($_FILES))
+		{
+			foreach($_FILES as $key => $value)
+			{
+				$matches = null;
+				if(preg_match('/^(\d+):(.+)$/', $key, $matches))
+				{
+					$multiRequestIndex = $matches[1];
+					$key = $matches[2];
+					if(!isset(self::$requestParams[$multiRequestIndex]))
+					{
+						self::$requestParams[$multiRequestIndex] = array();
+					}
+					self::$requestParams[$multiRequestIndex][$key] = $value;
+				}
+				else
+				{
+					self::$requestParams[$key] = $value;
+				}
+			}
+		}
+		
 		return self::$requestParams;
 	}
 

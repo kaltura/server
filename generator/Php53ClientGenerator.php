@@ -384,7 +384,7 @@ class Php53ClientGenerator extends ClientGeneratorFromXml
 			$this->appendLine(' */');
 		}
 		
-	 	$this->appendLine("class {$enumClassInfo->getClassName()} extends EnumBase");		
+	 	$this->appendLine("class {$enumClassInfo->getClassName()} extends \Kaltura\Client\EnumBase");		
 		$this->appendLine("{");
 		foreach($enumNode->childNodes as $constNode)
 		{

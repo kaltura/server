@@ -325,7 +325,7 @@ class KalturaClientBase
 		if ($this->isMultiRequest)
 		{
 			$url .= "multirequest";
-			$i = 1;
+			$i = 0;
 			foreach ($this->callsQueue as $call)
 			{
 				$callParams = $call->getParamsForMultiRequest($i);
@@ -1217,7 +1217,7 @@ class KalturaServiceActionCall
 		$multiRequestParams = array();
 		foreach($this->files as $key => $val)
 		{
-			$multiRequestParams[$multiRequestIndex][$key] = $val;
+			$multiRequestParams["$multiRequestIndex:$key"] = $val;
 		}
 		return $multiRequestParams;
 	}

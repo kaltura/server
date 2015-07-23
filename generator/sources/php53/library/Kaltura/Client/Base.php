@@ -192,7 +192,7 @@ class Base
 		if (!is_null($this->multiRequestReturnType))
 		{
 			$url .= "multirequest";
-			$i = 1;
+			$i = 0;
 			foreach ($this->callsQueue as $call)
 			{
 				$callParams = $call->getParamsForMultiRequest($i);

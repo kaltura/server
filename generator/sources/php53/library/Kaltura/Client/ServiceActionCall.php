@@ -123,7 +123,7 @@ class ServiceActionCall
 		$multiRequestParams = array();
 		foreach($this->files as $key => $val)
 		{
-			$multiRequestParams[$multiRequestIndex][$key] = $val;
+			$multiRequestParams["$multiRequestIndex:$key"] = $val;
 		}
 		return $multiRequestParams;
 	}
