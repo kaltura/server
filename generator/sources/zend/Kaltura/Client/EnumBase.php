@@ -26,32 +26,12 @@
 //
 // @ignore
 // ===================================================================================================
-
 /**
- * @namespace
- */
-namespace Kaltura\Client;
-
-/**
- * Thrown when for client library errors
+ * Abstract base class for all client enums
  * 
  * @package Kaltura
  * @subpackage Client
  */
-class ClientException extends \RuntimeException 
+abstract class Kaltura_Client_EnumBase
 {
-	const ERROR_GENERIC = -1;
-	const ERROR_UNSERIALIZE_FAILED = -2;
-	const ERROR_FORMAT_NOT_SUPPORTED = -3;
-	const ERROR_UPLOAD_NOT_SUPPORTED = -4;
-	const ERROR_CONNECTION_FAILED = -5;
-	const ERROR_READ_FAILED = -6;
-	const ERROR_INVALID_PARTNER_ID = -7;
-	const ERROR_INVALID_OBJECT_TYPE = -8;
-	const ERROR_INVALID_OBJECT_FIELD = -9;
-	const ERROR_DOWNLOAD_NOT_SUPPORTED = -10;
-	const ERROR_DOWNLOAD_IN_MULTIREQUEST = -11;
-	const ERROR_ACTION_IN_MULTIREQUEST = -12;
-	const ERROR_INVALID_ENUM_VALUE = -13;
-	const ERROR_CURL_MUST_BE_ENABLED = -20;
 }
