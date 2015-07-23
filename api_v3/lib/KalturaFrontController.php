@@ -151,7 +151,7 @@ class KalturaFrontController
 		return $paths;
 	}
 	
-	public function replaceMultiRequestResults(array $keys, $params, $results)
+	public function replaceMultiRequestResults($index, array $keys, $params, $result)
 	{
 		foreach($keys as $key => $path)
 		{
@@ -159,15 +159,14 @@ class KalturaFrontController
 			{
 				if(is_array($path))
 				{
-					$params[$key] = $this->replaceMultiRequestResults($path, $params[$key], $results);
+					$params[$key] = $this->replaceMultiRequestResults($index, $path, $params[$key], $result);
 				}
 				elseif (preg_match('/^\{([0-9]+):result:?(.*)?\}$/', $path, $matches))
 				{
-					$resultIndex = intval($matches[1]);
-					$attributePath = explode(':', $matches[2]);
-					if(isset($results[$resultIndex]))
+					if(intval($matches[1]) == $index)
 					{
-						$params[$key] = str_replace($path, $this->getValueFromObject($results[$resultIndex], $attributePath), $params[$key]);
+						$attributePath = explode(':', $matches[2]);
+						$params[$key] = str_replace($path, $this->getValueFromObject($result, $attributePath), $params[$key]);
 					}
 				}
 			}
@@ -209,10 +208,12 @@ class KalturaFrontController
 		
 		// process the requests
 		$results = array();
-		$resultObjects = array();
 		kCurrentContext::$multiRequest_index = 0;
 		foreach ($listOfRequests as $i => $currentParams)
 		{
+			// must be reasigned in case the $listOfRequests changed by multi-request results
+			$currentParams = $listOfRequests[$i];  
+			
 			if (!isset($currentParams["service"]) || !isset($currentParams["action"]))
 				break;
 
@@ -236,11 +237,6 @@ class KalturaFrontController
 				$currentParams['partnerId'] = $commonParams['partnerId'];
 			}
 			
-			if(isset($multiRequestResultsPaths[$i]))
-			{
-				$currentParams = $this->replaceMultiRequestResults($multiRequestResultsPaths[$i], $currentParams, $resultObjects);
-			}
-
 			// cached parameters should be different when the request is part of a multirequest
 			// as part of multirequest - the cached data is a serialized php object
 			// when not part of multirequest - the cached data is the actual response
@@ -279,7 +275,14 @@ class KalturaFrontController
 			}
 			$this->onRequestEnd($success, $errorCode, kCurrentContext::$multiRequest_index);
 			
-			$resultObjects[kCurrentContext::$multiRequest_index] = $currentResult;
+			for($nextMultiRequestIndex = ($i + 1); $nextMultiRequestIndex <= count($listOfRequests); $nextMultiRequestIndex++)
+			{
+				if(isset($multiRequestResultsPaths[$nextMultiRequestIndex]))
+				{
+					$listOfRequests[$nextMultiRequestIndex] = $this->replaceMultiRequestResults(kCurrentContext::$multiRequest_index, $multiRequestResultsPaths[$nextMultiRequestIndex], $listOfRequests[$nextMultiRequestIndex], $currentResult);
+				}
+			}
+			
 			$results[kCurrentContext::$multiRequest_index] = $this->serializer->serialize($currentResult);
 			
 			// in case a serve action is included in a multirequest, return only the result of the serve action
