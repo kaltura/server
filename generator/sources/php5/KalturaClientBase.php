@@ -102,7 +102,6 @@ class KalturaNull
  */
 class KalturaClientBase
 {
-	const KALTURA_SERVICE_FORMAT_KALTURA = 0;
 	const KALTURA_SERVICE_FORMAT_JSON = 1;
 	const KALTURA_SERVICE_FORMAT_XML  = 2;
 	const KALTURA_SERVICE_FORMAT_PHP  = 3;
@@ -249,11 +248,11 @@ class KalturaClientBase
 		$this->log("service url: [" . $this->config->serviceUrl . "]");
 
 		// append the basic params
-		$params['format'] = $this->config->format;
+		$this->addParam($params, "format", $this->config->format);
 
 		foreach($this->clientConfiguration as $param => $value)
 		{
-			$params[$param] = $value;
+			$this->addParam($params, $param, $value);
 		}
 
 		$call = $this->callsQueue[0];
@@ -261,7 +260,7 @@ class KalturaClientBase
 
 		$params = array_merge($params, $call->params);
 		$signature = $this->signature($params);
-		$params['kalsig'] = $signature;
+		$this->addParam($params, "kalsig", $signature);
 
 		$url = $this->config->serviceUrl . "/api_v3/index.php?service={$call->service}&action={$call->action}";
 		$url .= '&' . http_build_query($params);
@@ -273,7 +272,7 @@ class KalturaClientBase
 	{
 		foreach($this->requestConfiguration as $param => $value)
 		{
-			$params[$param] = $value;
+			$this->addParam($params, $param, $value);
 		}
 
 		$call = new KalturaServiceActionCall($service, $action, $params, $files);
@@ -314,12 +313,12 @@ class KalturaClientBase
 		$this->log("service url: [" . $this->config->serviceUrl . "]");
 
 		// append the basic params
-		$params['format'] = $this->config->format;
-		$params['ignoreNull'] = true;
+		$this->addParam($params, "format", $this->config->format);
+		$this->addParam($params, "ignoreNull", true);
 
 		foreach($this->clientConfiguration as $param => $value)
 		{
-			$params[$param] = $value;
+			$this->addParam($params, $param, $value);
 		}
 
 		$url = $this->config->serviceUrl."/api_v3/index.php?service=";
@@ -345,7 +344,7 @@ class KalturaClientBase
 		}
 
 		$signature = $this->signature($params);
-		$params['kalsig'] = $signature;
+		$this->addParam($params, "kalsig", $signature);
 
 		try
 		{
@@ -471,10 +470,10 @@ class KalturaClientBase
 	{
 		if (function_exists('curl_init'))
 			return $this->doCurl($url, $params, $files);
-			
+
 		if($this->destinationPath || $this->returnServedResult)
 			throw new KalturaClientException("Downloading files is not supported with stream context http request, please use curl.", KalturaClientException::ERROR_DOWNLOAD_NOT_SUPPORTED);
-			
+
 		return $this->doPostRequest($url, $params, $files);
 	}
 
@@ -695,7 +694,6 @@ class KalturaClientBase
 	public function setConfig(KalturaConfiguration $config)
 	{
 		$this->config = $config;
-		$this->responseFormat = $config->format;
 
 		$logger = $this->config->getLogger();
 		if ($logger instanceof IKalturaLogger)
@@ -739,6 +737,59 @@ class KalturaClientBase
 			{
 				$this->requestConfiguration[$param] = $configuration->$param;
 			}
+		}
+	}
+
+	/**
+	 * Add parameter to array of parameters that is passed by reference
+	 *
+	 * @param array $params
+	 * @param string $paramName
+	 * @param string $paramValue
+	 */
+	public function addParam(array &$params, $paramName, $paramValue)
+	{
+		if ($paramValue === null)
+			return;
+
+		if ($paramValue instanceof KalturaNull) {
+			$params[$paramName . '__null'] = '';
+			return;
+		}
+
+		if(is_object($paramValue) && $paramValue instanceof KalturaObjectBase)
+		{
+			$params[$paramName] = array(
+				'objectType' => get_class($paramValue)
+			);
+			
+		    foreach($paramValue as $prop => $val)
+				$this->addParam($params[$paramName], $prop, $val);
+
+			return;
+		}
+
+		if(is_bool($paramValue))
+		{
+			$params[$paramName] = $paramValue ? 'true' : 'false';
+			return;
+		}
+
+		if(!is_array($paramValue))
+		{
+			$params[$paramName] = (string)$paramValue;
+			return;
+		}
+
+		$params[$paramName] = array();
+		if ($paramValue)
+		{
+			foreach($paramValue as $subParamName => $subParamValue)
+				$this->addParam($params[$paramName], $subParamName, $subParamValue);
+		}
+		else
+		{
+			$params[$paramName]['-'] = '';
 		}
 	}
 
@@ -1103,8 +1154,10 @@ class KalturaServiceActionCall
 	public $files;
 
 	/**
-	 * Contruct new Kaltura call, if params array contain sub arrays (for objects), it will be flattened
+	 * Contruct new Kaltura service action call, if params array contain sub arrays (for objects), it will be flattened
 	 *
+	 * @param string $service
+	 * @param string $action
 	 * @param array $params
 	 * @param array $files
 	 */
