@@ -209,11 +209,7 @@ class ResponseProfileService extends KalturaBaseService
 		
 		if ($profile)
 			$newResponseProfileDbObject = $profile->toInsertableObject($newResponseProfileDbObject);
-		
-		$duplicates = ResponseProfilePeer::retrieveBySystemName($newResponseProfileDbObject->getSystemName());
-		if (count ($duplicates))
-			throw new KalturaAPIException(KalturaErrors::RESPONSE_PROFILE_DUPLICATE_SYSTEM_NAME, $origResponseProfileDbObject->getSystemName());
-		
+				
 		$newResponseProfileDbObject->save();
 		
 		$newResponseProfile = new KalturaResponseProfile();
