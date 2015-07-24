@@ -10,8 +10,17 @@ a:hover { color: #505050; }
 .left { height: 100%; float: left; margin: 0 15px; width: 280px; overflow: auto; }
 .left .left-content { padding: 10px; }
 	
-.right { height: 100%; float: left; border: 0; }
-.right iframe { width: 100%; height: 100%; border: 0; }
+.right { height: 100%; float: left; border: 0; overflow: auto;}
+.right .right-content { width: 100%; height: 100%; border: 15px; font-size: 13px;}
+/* JSON output color rules */
+.right .key        { color: #0000C0; }
+.right .string     { color: #45c03a; }
+.right .number     { color: #c03926; }
+.right .boolean    { color: #2cc0ba; }
+.right .null       { color: #1133c0; }
+/* XML output color rules */
+.right xmltag     { color: #393ac0; }
+.right xmlsyn     { color: #c02ea9; }
 
 #action-params, .param, .attr, .object { margin-bottom: 15px; }
 
