@@ -32,7 +32,7 @@ class KalturaAttachmentAsset extends KalturaAsset
 	 * @filter eq,in,notin
 	 */
 	public $status;
-
+	
 	private static $map_between_objects = array
 	(
 		"filename",
@@ -46,21 +46,20 @@ class KalturaAttachmentAsset extends KalturaAsset
 		return array_merge ( parent::getMapBetweenObjects() , self::$map_between_objects );
 	}
 
-    public function toObject($object_to_fill = null, $props_to_skip = array())
-    {
-        if (!$object_to_fill)
-        {
-            $className = AttachmentPlugin::getObjectClass('asset', AttachmentPlugin::getAssetTypeCoreValue(AttachmentAssetType::ATTACHMENT));
-            $object_to_fill = new $className();
-        }
+	public function toObject($object_to_fill = null, $props_to_skip = array())
+	{
+		if (!$object_to_fill)
+		{
+			$className = AttachmentPlugin::getObjectClass('asset', AttachmentPlugin::getAssetTypeCoreValue(AttachmentAssetType::ATTACHMENT));
+			$object_to_fill = new $className();
+		}
 
-        return parent::toObject($object_to_fill, $props_to_skip);
-    }
+		return parent::toObject($object_to_fill, $props_to_skip);
+	}
 
-    public function getInstance()
-    {
-        $className = get_class($this);
-        return new $className;
-    }
-
+	public function getInstance()
+	{
+		$className = get_class($this);
+		return new $className;
+	}
 }
