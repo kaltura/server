@@ -85,8 +85,8 @@ class KalturaCaptionAsset extends KalturaAsset
 		"label",
 		"format" => "containerFormat",
 		"status",
-        "parentId",
-        "accuracy",
+		"parentId",
+		"accuracy",
 	);
 	
 	public function getMapBetweenObjects ( )
