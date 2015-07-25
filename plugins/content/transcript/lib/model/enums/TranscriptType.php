@@ -5,5 +5,7 @@
  */ 
 interface TranscriptType extends AttachmentType
 {
-	const TRANSCRIPT = 4;
+	const SRT = 4;
+	const DFXP = 5;
+	const JSON = 6;
 }

@@ -13,7 +13,7 @@ class KalturaAttachmentAssetArray extends KalturaTypedArray
 
 		foreach ($arr as $obj)
 		{
-    		$nObj = new KalturaAttachmentAsset();
+			$nObj = KalturaPluginManager::loadObject('KalturaAsset', $obj->getType());
 			$nObj->fromObject($obj, $responseProfile);
 			$newArr[] = $nObj;
 		}

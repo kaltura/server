@@ -17,10 +17,23 @@ class KalturaTranscriptAsset extends KalturaAttachmentAsset
 	 */
 	public $humanVerified;
 
+    /**
+     * The language of the attachment
+     * @var KalturaLanguage
+     */
+    public $language;
+
+    /**
+     * The Transcript format
+     * @var KalturaTranscriptType 
+     */
+    public $format;
+
 	private static $map_between_objects = array
 	(
 		"accuracy",
 		"humanVerified",
+        "language",
 	);
 	
 	public function getMapBetweenObjects ( )
@@ -28,11 +41,15 @@ class KalturaTranscriptAsset extends KalturaAttachmentAsset
 		return array_merge ( parent::getMapBetweenObjects() , self::$map_between_objects );
 	}
 
-    public function getCoreInstance()
+    public function toObject($object_to_fill = null, $props_to_skip = array())
     {
-        if (class_exists('TranscriptPlugin'))
-            return TranscriptPlugin::getObjectClass('asset', TranscriptPlugin::getAssetTypeCoreValue(TranscriptAssetType::TRANSCRIPT));
+        if (!$object_to_fill)
+        {
+            $className = TranscriptPlugin::getObjectClass('asset', TranscriptPlugin::getAssetTypeCoreValue(TranscriptAssetType::TRANSCRIPT));
+            $object_to_fill = new $className();
+        }
 
-        return parent::getCoreInstance();
+       return parent::toObject($object_to_fill, $props_to_skip);
     }
+
 }
