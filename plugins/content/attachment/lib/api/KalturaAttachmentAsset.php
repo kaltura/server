@@ -33,19 +33,12 @@ class KalturaAttachmentAsset extends KalturaAsset
 	 */
 	public $status;
 
-	/**
-	 * The language of the attachment
-	 * @var KalturaLanguageCode
-	 */
-	public $language;
-
 	private static $map_between_objects = array
 	(
 		"filename",
 		"title",
 		"format" => "containerFormat",
 		"status",
-		"language",
 	);
 	
 	public function getMapBetweenObjects ( )
@@ -53,8 +46,21 @@ class KalturaAttachmentAsset extends KalturaAsset
 		return array_merge ( parent::getMapBetweenObjects() , self::$map_between_objects );
 	}
 
-    public function getCoreInstance()
+    public function toObject($object_to_fill = null, $props_to_skip = array())
     {
-        return AttachmentPlugin::getObjectClass('asset', AttachmentPlugin::getAssetTypeCoreValue(AttachmentAssetType::ATTACHMENT));
+        if (!$object_to_fill)
+        {
+            $className = AttachmentPlugin::getObjectClass('asset', AttachmentPlugin::getAssetTypeCoreValue(AttachmentAssetType::ATTACHMENT));
+            $object_to_fill = new $className();
+        }
+
+        return parent::toObject($object_to_fill, $props_to_skip);
     }
+
+    public function getInstance()
+    {
+        $className = get_class($this);
+        return new $className;
+    }
+
 }

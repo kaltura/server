@@ -9,7 +9,6 @@ class AttachmentAsset extends asset
 {
 	const CUSTOM_DATA_FIELD_FILENAME = "filename";
 	const CUSTOM_DATA_FIELD_TITLE = "title";
-	const CUSTOM_DATA_FIELD_LANGUAGE = "language";
 
 	/* (non-PHPdoc)
 	 * @see Baseasset::applyDefaultValues()
@@ -22,11 +21,9 @@ class AttachmentAsset extends asset
 
 	public function getFilename()		{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_FILENAME);}
 	public function getTitle()			{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_TITLE);}
-	public function getLanguage()       {return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_LANGUAGE);}
 
 	public function setFilename($v)		{$this->putInCustomData(self::CUSTOM_DATA_FIELD_FILENAME, $v);}
 	public function setTitle($v)		{$this->putInCustomData(self::CUSTOM_DATA_FIELD_TITLE, $v);}
-	public function setLanguage($v)     {$this->putInCustomData(self::CUSTOM_DATA_FIELD_LANGUAGE, $v);}
 	
 	public function getFinalDownloadUrlPathWithoutKs()
 	{
