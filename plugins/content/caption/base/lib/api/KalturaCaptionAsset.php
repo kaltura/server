@@ -61,21 +61,19 @@ class KalturaCaptionAsset extends KalturaAsset
 	 */
 	public $status;
 
-    /**
-     * The parent id of the asset
-     *
-     * @var string
-     * @insertonly
-     *
-     */
-    public $parentId;
+	/**
+	 * The parent id of the asset
+	 * @var string
+	 * @insertonly
+	 *
+	 */
+	public $parentId;
 
-    /**
-     * The Accuracy of the caption content
-     *
-     *@var int 
-     */
-    public $accuracy;
+	/**
+	 * The Accuracy of the caption content
+	 *@var int 
+	 */
+	public $accuracy;
 
 	private static $map_between_objects = array
 	(
