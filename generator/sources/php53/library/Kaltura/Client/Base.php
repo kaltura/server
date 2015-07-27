@@ -317,7 +317,7 @@ class Base
 		$params = $this->jsonEncode($params);
 		$this->log("curl: $url");
 		$this->log("post: $params");
-		if($this->config->format == self::KALTURA_SERVICE_FORMAT_JSON)
+		if($this->config->getFormat() == self::KALTURA_SERVICE_FORMAT_JSON)
 		{
 			$requestHeaders[] = 'Accept: application/json';
 		}
