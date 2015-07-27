@@ -75,10 +75,10 @@ class AttachmentAssetService extends KalturaAssetService
      */
     function addAction($entryId, KalturaAttachmentAsset $attachmentAsset)
     {
-    	$dbEntry = entryPeer::retrieveByPK($entryId);
-    	if(!$dbEntry || !in_array($dbEntry->getType(), $this->getEnabledMediaTypes()))
-    		throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
-    	
+		$dbEntry = entryPeer::retrieveByPK($entryId);
+		if(!$dbEntry || !in_array($dbEntry->getType(), $this->getEnabledMediaTypes()))
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
+
 		$dbAsset = $attachmentAsset->toInsertableObject();
 		$dbAsset->setEntryId($entryId);
 		$dbAsset->setPartnerId($dbEntry->getPartnerId());
@@ -87,7 +87,6 @@ class AttachmentAssetService extends KalturaAssetService
 
 		$asset = KalturaAsset::getInstance($dbAsset);
 		$asset->fromObject($dbAsset, $this->getResponseProfile());
-
 		return $asset;
     }
     
@@ -135,7 +134,7 @@ class AttachmentAssetService extends KalturaAssetService
     	if($previousStatus == AttachmentAsset::ASSET_STATUS_QUEUED && in_array($dbAttachmentAsset->getStatus(), $newStatuses))
    			kEventsManager::raiseEvent(new kObjectAddedEvent($dbAttachmentAsset));
    		
-    	$attachmentAsset = KalturaAsset::getInstance($dbAttachmentAsset);
+		$attachmentAsset = KalturaAsset::getInstance($dbAttachmentAsset);
 		$attachmentAsset->fromObject($dbAttachmentAsset, $this->getResponseProfile());
 		return $attachmentAsset;
     }
@@ -159,6 +158,7 @@ class AttachmentAssetService extends KalturaAssetService
 		$dbEntry = $dbAttachmentAsset->getentry();
     	if(!$dbEntry || !in_array($dbEntry->getType(), $this->getEnabledMediaTypes()))
     		throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $dbAttachmentAsset->getEntryId());
+		
 		
     	$dbAttachmentAsset = $attachmentAsset->toUpdatableObject($dbAttachmentAsset);
     	$dbAttachmentAsset->save();
@@ -512,6 +512,7 @@ class AttachmentAssetService extends KalturaAssetService
 		{
 			$pager = new KalturaFilterPager();
 		}
+
 		$types = KalturaPluginManager::getExtendedTypes(assetPeer::OM_CLASS, AttachmentPlugin::getAssetTypeCoreValue(AttachmentAssetType::ATTACHMENT));
 		return $filter->getTypeListResponse($pager, $this->getResponseProfile(), $types);
 	}
