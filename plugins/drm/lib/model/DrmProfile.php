@@ -13,7 +13,7 @@
  * @package plugins.drm
  * @subpackage model
  */
-class DrmProfile extends BaseDrmProfile {
+class DrmProfile extends BaseDrmProfile implements IBaseObject {
 
     const CUSTOM_DATA_SIGNING_KEY = 'signing_key';
 

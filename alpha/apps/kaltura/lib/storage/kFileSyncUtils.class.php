@@ -61,7 +61,8 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 	{
 		if ( $local )
 		{
-			$real_path = realpath( $file_sync->getFullPath() );
+			$full_path = $file_sync->getFullPath();
+			$real_path = realpath( $full_path );
 			if ( file_exists ( $real_path ) )
 			{
 				$startTime = microtime(true);
@@ -72,8 +73,8 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 			}
 			else
 			{
-				KalturaLog::info("file was not found locally [$real_path]");
-				throw new kFileSyncException("Cannot find file on local disk [$real_path] for file sync [" . $file_sync->getId() . "]", kFileSyncException::FILE_DOES_NOT_EXIST_ON_DISK);
+				KalturaLog::info("file was not found locally [$full_path]");
+				throw new kFileSyncException("Cannot find file on local disk [$full_path] for file sync [" . $file_sync->getId() . "]", kFileSyncException::FILE_DOES_NOT_EXIST_ON_DISK);
 			}
 		}
 
@@ -1365,10 +1366,10 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 			$firstLink->setFileType($fileSync->getFileType());
 			$firstLink->setLinkedId(0); // keep it zero instead of null, that's the only way to know it used to be a link.
 			$firstLink->setIsDir($fileSync->getIsDir());
-			if ($fileSync->getOriginalDc() && $fileSync->getOriginalId())
+			if (!is_null($fileSync->getOriginalDc()))
 			{
 				$firstLink->setOriginalDc($fileSync->getOriginalDc());
-				$firstLink->setOriginalId($fileSync->getOriginalId());
+				$firstLink->unsetOriginalId();		// recalculate the original id when importing the file sync
 			}
 			$firstLink->save();
 		}

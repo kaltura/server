@@ -7,7 +7,7 @@
  * @package Core
  * @subpackage model
  */
-class kvote extends Basekvote
+class kvote extends Basekvote implements IBaseObject
 {
 	private $statistics_results = null;
 	

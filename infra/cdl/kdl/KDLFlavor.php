@@ -297,7 +297,11 @@ $plannedDur = 0;
 				$prdVid = $product->_video;
 				$trgVid = $this->_video;
 
-				if($plannedDur>0){
+					/*
+					 *  On short durations, the 'granulariity' of a single frame dur might cause invalidation. 
+					 *  Don't check for <2sec
+					 */
+				if($plannedDur>2000){	
 					if($prdVid->_duration<$plannedDur*KDLSanityLimits::MinDurationFactor 
 					|| $prdVid->_duration>$plannedDur*KDLSanityLimits::MaxDurationFactor) 
 					{
@@ -335,7 +339,11 @@ $plannedDur = 0;
 				$prdAud = $product->_audio;
 				$trgAud = $this->_audio;
 				
-				if($plannedDur){ 
+					/*
+					 *  On short durations, the 'granulariity' of a single frame dur might cause invalidation. 
+					 *  Don't check for <2sec
+					 */
+				if($plannedDur>2000){ 
 					if($prdAud->_duration<$plannedDur*KDLSanityLimits::MinDurationFactor 
 					|| $prdAud->_duration>$plannedDur*KDLSanityLimits::MaxDurationFactor) {
 						$product->_errors[KDLConstants::AudioIndex][] = // Invalid product duration 
@@ -1244,6 +1252,13 @@ $plannedDur = 0;
 			$targetAud->_id=KDLAudioTarget::MP3;
 		}
 
+			/*
+			 * For MP3 w/out target bitrate - use 64Kb as default
+			 */
+		if(isset($target->_container) && $target->_container->_id==KDLContainerTarget::MP3
+				&& $targetAud->_id==KDLAudioTarget::MP3 && $targetAud->_bitRate==0) {
+			$targetAud->_bitRate = 64;
+		}
 				/* -------------
 				 * Adjust target bit depth/resolution if it is set in the source
 				 */

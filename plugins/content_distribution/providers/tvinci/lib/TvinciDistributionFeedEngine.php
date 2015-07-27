@@ -88,7 +88,6 @@ class TvinciDistributionFeedEngine extends DistributionEngine implements
 		$response = self::curlPost($url, $xml);
 		KalturaLog::info("Post XML Full response: " . print_r($response,true));
 
-		$retrunObject = null;
 		if ( $response['http_code'] == KCurlHeaderResponse::HTTP_STATUS_OK )
 		{
 			try
@@ -112,9 +111,9 @@ class TvinciDistributionFeedEngine extends DistributionEngine implements
 				 * </s:Envelope>
 				 */
 				$responseXml = simplexml_load_string($response['content']);
-				$childs = $responseXml->children(self::SOAP_ENVELOPE_URL)->Body;
-				$bodyElement = $childs->xpath('//s:Body');
-				$returnObject = $bodyElement[0]->IngestTvinciDataResponse->IngestTvinciDataResult;
+				$children = $responseXml->children(self::SOAP_ENVELOPE_URL)->Body;
+				$bodyElement = $children->xpath('//s:Body');
+				return $bodyElement[0]->IngestTvinciDataResponse->IngestTvinciDataResult;
 			}
 			catch (Exception $e)
 			{
@@ -125,8 +124,6 @@ class TvinciDistributionFeedEngine extends DistributionEngine implements
 			throw new Exception("Failed communication to host - response code is: {$response['http_code']}".
 													", error description is: {$response['error_text']}");
 		}
-
-		return $returnObject;
 	}
 	
 

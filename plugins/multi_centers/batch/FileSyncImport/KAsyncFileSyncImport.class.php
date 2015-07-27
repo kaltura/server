@@ -7,6 +7,9 @@
  */
 class KAsyncFileSyncImport extends KPeriodicWorker
 {
+	const MAX_EXECUTION_TIME = 3600;		// can be exceeded by one file sync
+	const IDLE_SLEEP_INTERVAL = 10;
+	
 	protected $curlWrapper;
 
 	public function run($jobs = null)
@@ -30,7 +33,9 @@ class KAsyncFileSyncImport extends KPeriodicWorker
 		$responseProfile->type = KalturaResponseProfileType::INCLUDE_FIELDS;
 		$responseProfile->fields = 'id,originalId,fileSize,fileRoot,filePath,isDir';
 		
-		for (;;)
+		$timeLimit = time() + self::MAX_EXECUTION_TIME; 
+		
+		while (time() < $timeLimit)
 		{
 			self::$kClient->setResponseProfile($responseProfile);
 			
@@ -45,11 +50,9 @@ class KAsyncFileSyncImport extends KPeriodicWorker
 			{
 				// didn't get any file syncs to import, sleep for a sec to avoid excessive
 				// queries on the database
-				sleep(1);
+				sleep(self::IDLE_SLEEP_INTERVAL);
 				continue;
 			}
-
-			$this->curlWrapper = new KCurlWrapper(self::$taskConfig->params);
 			
 			// handle all dirs and empty files first
 			$fileSyncs = array();
@@ -57,11 +60,15 @@ class KAsyncFileSyncImport extends KPeriodicWorker
 			{				
 				if ($fileSync->isDir)
 				{
+					$this->curlWrapper = new KCurlWrapper(self::$taskConfig->params);
+					
 					$sourceUrl = self::getSourceUrl($fileSync->originalId, $lockResult->baseUrl, $lockResult->dcSecret);
 					if ($this->fetchDir($fileSync->id, $sourceUrl, self::getFullPath($fileSync)))
 					{
 						$this->markFileSyncAsReady($fileSync);
 					}
+					
+					$this->curlWrapper->close();
 				}
 				else if ($fileSync->fileSize == 0)
 				{
@@ -76,29 +83,34 @@ class KAsyncFileSyncImport extends KPeriodicWorker
 				}
 			}
 
-			// handle regular files
-			if (count($fileSyncs) == 1)
+			if (count($fileSyncs) > 0)
 			{
-				$fileSync = reset($fileSyncs);
-				$sourceUrl = self::getSourceUrl($fileSync->originalId, $lockResult->baseUrl, $lockResult->dcSecret);
-				if ($this->fetchFile($fileSync->id, $sourceUrl, self::getFullPath($fileSync), $fileSync->fileSize))
+				$this->curlWrapper = new KCurlWrapper(self::$taskConfig->params);
+	
+				// handle regular files
+				if (count($fileSyncs) == 1)
 				{
-					$this->markFileSyncAsReady($fileSync);
+					$fileSync = reset($fileSyncs);
+					$sourceUrl = self::getSourceUrl($fileSync->originalId, $lockResult->baseUrl, $lockResult->dcSecret);
+					if ($this->fetchFile($fileSync->id, $sourceUrl, self::getFullPath($fileSync), $fileSync->fileSize))
+					{
+						$this->markFileSyncAsReady($fileSync);
+					}
 				}
+				else
+				{
+					$this->fetchMultiFiles($fileSyncs, $lockResult->baseUrl, $lockResult->dcSecret);
+				}
+	
+				$this->curlWrapper->close();
 			}
-			else if (count($fileSyncs) > 1)
-			{
-				$this->fetchMultiFiles($fileSyncs, $lockResult->baseUrl, $lockResult->dcSecret);
-			}
-
-			$this->curlWrapper->close();
 
 			// if the limit was not reached, wait for more file syncs to become available
 			if (!$lockResult->limitReached)
 			{
 				// if the limit was not reached, it means that we don't have anything more to do
 				// wait until more file syncs are created
-				sleep(1);
+				sleep(self::IDLE_SLEEP_INTERVAL);
 			}
 		}
 	}

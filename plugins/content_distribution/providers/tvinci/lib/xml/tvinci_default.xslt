@@ -15,19 +15,28 @@
 
     <xsl:template name="convert-known-meta-element">
         <xsl:param name="prefix"/>
+        <xsl:param name="asValue"/>
         <xsl:variable name="prefix-length" select="string-length($prefix)+1"/>
         <xsl:variable name="currNodeName" select="local-name(.)"/>
         <xsl:variable name="suffix" select="substring($currNodeName,$prefix-length)"/>
+        <xsl:variable name="normalized-suffix" select="normalize-space(translate($suffix,'_',' '))"/>
         <xsl:if test="starts-with($currNodeName, $prefix) and (string-length($suffix) >0)">
             <xsl:element name="meta">
                 <xsl:attribute name="name">
-                    <xsl:value-of select="$suffix"/>
+                    <xsl:value-of select="$normalized-suffix"/>
                 </xsl:attribute>
                 <xsl:attribute name="ml_handling">unique</xsl:attribute>
-                <xsl:element name="value">
-                    <xsl:attribute name="lang">eng</xsl:attribute>
-                    <xsl:value-of select="."/>
-                </xsl:element>
+                <xsl:choose>
+                    <xsl:when test="$asValue">
+                        <xsl:element name="value">
+                            <xsl:attribute name="lang">eng</xsl:attribute>
+                            <xsl:value-of select="."/>
+                        </xsl:element>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:value-of select="."/>
+                    </xsl:otherwise>
+                </xsl:choose>
             </xsl:element>
         </xsl:if>
     </xsl:template>
@@ -44,10 +53,11 @@
                 <xsl:variable name="prefix-length" select="string-length($prefix)+1"/>
                 <xsl:variable name="currNodeName" select="local-name(.)"/>
                 <xsl:variable name="suffix" select="substring($currNodeName,$prefix-length)"/>
+                <xsl:variable name="normalized-suffix" select="normalize-space(translate($suffix,'_',' '))"/>
                 <xsl:if test="starts-with($currNodeName, $prefix)  and (string-length($suffix) >0)">
                     <xsl:element name="otttag">
                         <xsl:attribute name="name">
-                            <xsl:value-of select="$suffix"/>
+                            <xsl:value-of select="$normalized-suffix"/>
                         </xsl:attribute>
                         <xsl:value-of select="."/>
                     </xsl:element>
@@ -71,7 +81,7 @@
         <!--at this point the OTTTagUniques should be as follow:-->
         <!--<meta name="Actor" value="A"/>-->
         <!-- now construct the actual result -->
-        <xsl:element name="tags">
+        <xsl:element name="metas">
             <xsl:for-each select="exsl:node-set($uniqueTags)">
                 <xsl:variable name="uniqueTagName" select="."/>
                 <xsl:element name="meta">
@@ -79,30 +89,31 @@
                         <xsl:value-of select="$uniqueTagName"/>
                     </xsl:attribute>
                     <xsl:attribute name="ml_handling">unique</xsl:attribute>
-                    <xsl:element name="container">
-                        <xsl:for-each select="exsl:node-set($tagsWithAttributes)">
-                            <xsl:variable name="tagWithAttrName" >
-                                <xsl:value-of select="@name" />
-                            </xsl:variable>
-                            <xsl:if test="$tagWithAttrName=$uniqueTagName">
+                    <xsl:for-each select="exsl:node-set($tagsWithAttributes)">
+                        <xsl:variable name="tagWithAttrName" >
+                            <xsl:value-of select="@name" />
+                        </xsl:variable>
+                        <xsl:if test="$tagWithAttrName=$uniqueTagName">
+                            <xsl:element name="container">
                                 <xsl:element name="value">
                                     <xsl:attribute name="lang">eng</xsl:attribute>
                                     <xsl:value-of select="."/>
                                 </xsl:element>
-                            </xsl:if>
-                        </xsl:for-each>
-                    </xsl:element>
+                            </xsl:element>
+                        </xsl:if>
+                    </xsl:for-each>
                 </xsl:element>
             </xsl:for-each>
         </xsl:element>
     </xsl:template>
-            
+    
     <xsl:template match="feed/export/media/structure/metas" >
         <xsl:variable name="metadatas" select="metadata/*"/>
         <xsl:element name="strings">
             <xsl:for-each select="$metadatas">
                 <xsl:call-template name="convert-known-meta-element">
                     <xsl:with-param name="prefix" select="'STRING'"/>
+                    <xsl:with-param name="asValue" select="true()"/>
                 </xsl:call-template>
             </xsl:for-each>
         </xsl:element>
@@ -110,6 +121,7 @@
             <xsl:for-each select="$metadatas">
                 <xsl:call-template name="convert-known-meta-element">
                     <xsl:with-param name="prefix" select="'BOOL'"/>
+                    <xsl:with-param name="asValue" select="false()"/>
                 </xsl:call-template>
             </xsl:for-each>
         </xsl:element>
@@ -117,6 +129,7 @@
             <xsl:for-each select="$metadatas">
                 <xsl:call-template name="convert-known-meta-element">
                     <xsl:with-param name="prefix" select="'NUM'"/>
+                    <xsl:with-param name="asValue" select="false()"/>
                 </xsl:call-template>
             </xsl:for-each>
         </xsl:element>

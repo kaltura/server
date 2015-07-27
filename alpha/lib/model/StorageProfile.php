@@ -8,7 +8,7 @@
  * @package Core
  * @subpackage model
  */ 
-class StorageProfile extends BaseStorageProfile
+class StorageProfile extends BaseStorageProfile implements IBaseObject
 {
 	const STORAGE_SERVE_PRIORITY_KALTURA_ONLY = 1;
 	const STORAGE_SERVE_PRIORITY_KALTURA_FIRST = 2;

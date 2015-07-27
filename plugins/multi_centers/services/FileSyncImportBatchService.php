@@ -72,6 +72,17 @@ class FileSyncImportBatchService extends KalturaBatchService
 		return false;
 	}
 	
+	protected static function getOriginalFileSync($fileSync)
+	{
+		$c = new Criteria();
+		$c->addAnd(FileSyncPeer::OBJECT_ID, $fileSync->getObjectId());
+		$c->addAnd(FileSyncPeer::OBJECT_TYPE, $fileSync->getObjectType());
+		$c->addAnd(FileSyncPeer::VERSION, $fileSync->getVersion());
+		$c->addAnd(FileSyncPeer::OBJECT_SUB_TYPE, $fileSync->getObjectSubType());
+		$c->addAnd(FileSyncPeer::DC, $fileSync->getOriginalDc());
+		return FileSyncPeer::doSelectOne($c);
+	}
+	
 	/**
 	 * batch lockPendingFileSyncs action locks file syncs for import by the file sync periodic worker
 	 *
@@ -214,7 +225,7 @@ class FileSyncImportBatchService extends KalturaBatchService
 			if ($createdAtLessThanOrEqual)
 			{
 				$firstFileSync = reset($fileSyncs);
-				$lastId = $firstFileSync->getId();
+				$prevLastId = $firstFileSync->getId();
 				
 				foreach ($fileSyncs as $index => $fileSync)
 				{
@@ -222,10 +233,15 @@ class FileSyncImportBatchService extends KalturaBatchService
 					{
 						$done = true;
 						unset($fileSyncs[$index]);
+						if (!is_null($prevLastId))
+						{
+							$lastId = $prevLastId;
+							$prevLastId = null;
+						}
 					}
 					else
 					{
-						$lastId = $fileSync->getId();
+						$prevLastId = $fileSync->getId();
 					}
 				}
 				
@@ -262,7 +278,20 @@ class FileSyncImportBatchService extends KalturaBatchService
 				
 				KalturaLog::debug('locked file sync ' . $fileSync->getId());
 				
-				// locked, add to the result set
+				// get the original id if not set
+				if (!$fileSync->getOriginalId())
+				{
+					$originalFileSync = self::getOriginalFileSync($fileSync);
+					if (!$originalFileSync)
+					{
+						KalturaLog::debug('failed to get original file sync for '.$fileSync->getId());
+						continue;
+					}
+					
+					$fileSync->setOriginalId($originalFileSync->getId());
+				}
+				
+				// add to the result set
 				$lockedFileSyncs[] = $fileSync;
 				$lockedFileSyncsSize += $fileSync->getFileSize();
 				

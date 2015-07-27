@@ -396,7 +396,7 @@ class kFile
 		}
 		
 		if (!copy($src,$dest)) {
-			KalturaLog::err("Failed to copy file : [$src]");
+			KalturaLog::err("Failed to copy file : [$src] to [$dest]");
 			return false;
 		}
 		if ($deleteSrc && (!unlink($src))) {

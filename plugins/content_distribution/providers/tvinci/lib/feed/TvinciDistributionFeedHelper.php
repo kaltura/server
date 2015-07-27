@@ -6,7 +6,7 @@
 class TvinciDistributionFeedHelper
 {
 	const DATE_FORMAT = 'd/m/Y H:i:s';
-
+	const MAX_END = "7 November 2333";
 	const ACTION_SUBMIT = 'insert';
 	const ACTION_UPDATE = 'update';
 	const ACTION_DELETE = 'delete';
@@ -37,11 +37,6 @@ class TvinciDistributionFeedHelper
 	 * var string
 	 */
 	protected $referenceId;
-
-	/**
-	 * var string
-	 */
-	protected $createdAt;
 
 	/**
 	 * var array
@@ -111,9 +106,6 @@ class TvinciDistributionFeedHelper
 
 	public function setReferenceId( $referenceId )				{ $this->referenceId = $referenceId; }
 	public function getReferenceId()							{ return $this->referenceId; }
-
-	public function setCreatedAt( $createdAt )					{ $this->createdAt = $createdAt; }
-	public function getCreatedAt()								{ return $this->createdAt; }
 
 	public function setPicRatiosArray( $picRatiosArray )		{ $this->picRatiosArray = $picRatiosArray; }
 	public function getPicRatiosArray()							{ return $this->picRatiosArray; }
@@ -274,9 +266,14 @@ class TvinciDistributionFeedHelper
 	{
 		$datesNode = $this->_doc->createElement("dates");
 		$datesNode->appendChild( $this->createDateElement('catalog_start', $this->getSunrise()) );
-		$datesNode->appendChild( $this->createDateElement('catalog_end', $this->getSunset()) );
-		$datesNode->appendChild( $this->createDateElement('start', $this->getCreatedAt()) );
-		$datesNode->appendChild( $this->createDateElement('end', $this->getSunset()) );
+		$datesNode->appendChild( $this->createDateElement('start', $this->getSunrise()) );
+		if ( $this->getSunset() ) {
+			$datesNode->appendChild( $this->createDateElement('catalog_end', $this->getSunset()) );
+			$datesNode->appendChild( $this->createDateElement('end', $this->getSunset()) );
+		} else {
+			$datesNode->appendChild( $this->createDateElement('catalog_end', strtotime(self::MAX_END)) );
+			$datesNode->appendChild( $this->createDateElement('end', strtotime(self::MAX_END)) );
+		}
 		return $datesNode;
 	}
 

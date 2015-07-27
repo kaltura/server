@@ -326,7 +326,7 @@ class myPartnerUtils
 			$protocol='http';
 
 		$partner = PartnerPeer::retrieveByPK( $partner_id );
-		if ($partner && $partner->isInCDNWhiteList($_SERVER['HTTP_HOST']))
+		if ($partner && isset($_SERVER['HTTP_HOST']) && $partner->isInCDNWhiteList($_SERVER['HTTP_HOST']))
 		{
 			$cdnHost = $protocol.'://'.$_SERVER['HTTP_HOST'];
 			if (isset($_SERVER['SERVER_PORT']))

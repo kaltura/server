@@ -11,14 +11,14 @@ class kFilterPager
 	 * 
 	 * @var int 
 	 */
-	private $pageSize = 30;
+	protected $pageSize = 30;
 	
 	/**
 	 * The page number for which {pageSize} of objects should be retrieved (Default is 1).
 	 * 
 	 * @var int
 	 */
-	private $pageIndex = 1;
+	protected $pageIndex = 1;
 	
 	/**
 	 * @return the $pageSize

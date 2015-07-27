@@ -85,7 +85,12 @@ class kConf extends kEnvironment
 	public static function getMap($mapName)
 	{
 		self::init();
-		
+
+		if($mapName===NULL)
+		{
+			return;
+		}
+
 		// check for a previously loaded map
 		if(isset(self::$map[$mapName . self::FULL_MAP_KEY]))
 			return self::$map[$mapName];

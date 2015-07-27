@@ -40,3 +40,49 @@ class KDLOperatorFfmpeg2_2 extends KDLOperatorFfmpeg2_1_3 {
 		return $cmdStr;
 	}
 }
+
+	/**
+	 * 
+	 * KDLOperatorFfmpeg2_7
+	 *
+	 */
+class KDLOperatorFfmpeg2_7 extends KDLOperatorFfmpeg2_2 {
+	
+	/**
+	 * generateVideoFilters
+	 * @param $vid
+	 * @return array of filters 
+	 */
+	protected static function generateVideoFilters($vid)
+	{
+		/*
+		 * FFMpeg 2.7 automatically rotates the output 
+		 * into 'non-rotated' orientation. No need to do it explicitly 
+		 */
+	$rotation = null;
+		if(isset($vid->_rotation)) {
+			$rotation = $vid->_rotation;
+			$vid->_rotation = null;
+		}
+		$filters = parent::generateVideoFilters($vid);
+		$vid->_rotation = $rotation;
+		return $filters;
+	}
+
+	/* ---------------------------
+	 * getVideoCodecSpecificParams
+	 */
+	protected function getVideoCodecSpecificParams(KDLFlavor $design, KDLFlavor $target)
+	{
+			/*
+			 * There is some quality degradation on old-style VP8 cmd line.
+			 * 'qmax=8' fixes it. 
+			 */
+		$vidCodecSpecStr = parent::getVideoCodecSpecificParams($design, $target);
+		if($target->_video->_id==KDLVideoTarget::VP8 && $target->_video->_bitRate<500) {
+			$vidCodecSpecStr.= " -qmax 8";
+		}
+		return $vidCodecSpecStr;
+	}
+}
+

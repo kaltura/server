@@ -64,6 +64,7 @@
 							<xsd:enumeration value="Question"/>
 							<xsd:enumeration value="Answer"/>
 							<xsd:enumeration value="Announcement"/>
+							<xsd:enumeration value="AnswerOnAir"/>
 						</xsd:restriction>
 					</xsd:simpleType>
 				</xsd:element>

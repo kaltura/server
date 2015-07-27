@@ -8,7 +8,7 @@
  * @package Core
  * @subpackage model
  */ 
-class syndicationFeed extends BasesyndicationFeed
+class syndicationFeed extends BasesyndicationFeed implements IBaseObject
 {
 	const CUSTOM_DATA_MRSS_PARAMETERS = 'mrss_parameters';
 	const CUSTOM_DATA_STORAGE_ID = 'storage_id';

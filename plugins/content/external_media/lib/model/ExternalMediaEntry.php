@@ -54,6 +54,11 @@ class ExternalMediaEntry extends entry
 	{
 		$copyObj = parent::copy($deepCopy);
 		$copyObj->setExternalSourceType($this->getExternalSourceType());
+		$refId = $this->getReferenceID();
+		if ($refId)
+		{
+			$copyObj->setReferenceID($refId);
+		}
 		return $copyObj;
 	}
 	

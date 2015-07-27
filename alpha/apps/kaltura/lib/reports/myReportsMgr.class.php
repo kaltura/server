@@ -6,7 +6,7 @@ class myReportsMgr
 	const REPORT_FLAVOR_TABLE= 3;
 	const REPORT_FLAVOR_COUNT = 4;
 	const REPORT_FLAVOR_BASE_TOTAL = 5;
-	
+
 	const REPORT_TYPE_TOP_CONTENT = 1;
 	const REPORT_TYPE_CONTENT_DROPOFF = 2;
 	const REPORT_TYPE_CONTENT_INTERACTIONS = 3;
@@ -723,7 +723,16 @@ class myReportsMgr
 			$sql_raw_content = file_get_contents( $file_path );
 			if ( ! $sql_raw_content )
 			{
-				throw new kCoreException("Cannot find sql for [$report_type] [$report_flavor] at [$file_path]", kCoreException::INVALID_QUERY);
+				$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaReportProvider');
+				foreach ($pluginInstances as $pluginInstance)
+				{
+					$res = $pluginInstance->getReportResult($partner_id, $report_type, $report_flavor, $object_ids);
+					if ($res)
+					{
+						return $res;
+					}
+				}
+				throw new kCoreException("Cannot find sql for [$report_type] [$report_flavor] at [$file_path]", kCoreException::QUERY_NOT_FOUND);
 			}
 			
 			$entryFilter = new entryFilter();

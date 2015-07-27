@@ -2408,7 +2408,7 @@ CREATE TABLE `edge_server`
 	`partner_id` INTEGER,
 	`name` VARCHAR(256),
 	`system_name` VARCHAR(256),
-	`desciption` VARCHAR(256),
+	`description` VARCHAR(256),
 	`status` INTEGER,
 	`type` INTEGER default 0 NOT NULL,
 	`tags` TEXT,
