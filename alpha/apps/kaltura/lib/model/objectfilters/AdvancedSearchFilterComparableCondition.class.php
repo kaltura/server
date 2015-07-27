@@ -33,6 +33,9 @@ class AdvancedSearchFilterComparableCondition extends AdvancedSearchFilterCondit
 			case KalturaSearchConditionComparison::LESS_THAN_OR_EQUAL:
 				$comparison = " <= ";
 				break;
+			case KalturaSearchConditionComparison::NOT_EQUAL:
+				$comparison = " <> ";
+				break;
 			default:
 				KalturaLog::ERR("Missing comparison type");
 				return;

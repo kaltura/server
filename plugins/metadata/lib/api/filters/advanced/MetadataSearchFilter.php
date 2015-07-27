@@ -102,6 +102,9 @@ class MetadataSearchFilter extends AdvancedSearchFilterOperator
 							case KalturaSearchConditionComparison::LESS_THAN_OR_EQUAL:
 								$comparison = " <= ";
 								break;
+							case KalturaSearchConditionComparison::NOT_EQUAL:
+								$comparison = " <> ";
+								break;
 							default:
 								KalturaLog::ERR("Missing comparison type");
 								continue;
@@ -147,7 +150,7 @@ class MetadataSearchFilter extends AdvancedSearchFilterOperator
 
 						$newCondition = $metadataField . $comparison . $value;
 
-						if ($item->getComparison() != KalturaSearchConditionComparison::EQUAL)
+						if ($item->getComparison() != KalturaSearchConditionComparison::EQUAL && $item->getComparison() != KalturaSearchConditionComparison::NOT_EQUAL)
 							$newCondition = "($newCondition AND $metadataField <> 0)";
 							
 						$this->addCondition($newCondition);
@@ -174,15 +177,21 @@ class MetadataSearchFilter extends AdvancedSearchFilterOperator
 						// exact match
 						elseif (in_array($xPaths[$field]->getType(), array(self::KMC_FIELD_TYPE_OBJECT, self::KMC_FIELD_TYPE_USER)))
 						{
-							$dataCondition = "\\\"{$pluginName}_{$fieldId} $value " . kMetadataManager::SEARCH_TEXT_SUFFIX . "_{$fieldId}" . "\\\"";
+							if ($item instanceof AdvancedSearchFilterMatchCondition && $item->not)
+								$dataCondition = "!\"{$pluginName}_{$fieldId} $value " . kMetadataManager::SEARCH_TEXT_SUFFIX . "_{$fieldId}" . "\"";
+							else
+								$dataCondition = "\\\"{$pluginName}_{$fieldId} $value " . kMetadataManager::SEARCH_TEXT_SUFFIX . "_{$fieldId}" . "\\\"";
 						}
-						
+
 						// anywhere in the field
 						else 
 						{
-							$dataCondition = "{$pluginName}_{$fieldId} << ( \"$value\" ) << " . kMetadataManager::SEARCH_TEXT_SUFFIX . "_{$fieldId}";
+							if ($item instanceof AdvancedSearchFilterMatchCondition && $item->not)
+								$dataCondition = "!\"{$pluginName}_{$fieldId} $value " . kMetadataManager::SEARCH_TEXT_SUFFIX . "_{$fieldId}\"";
+							else
+								$dataCondition = "{$pluginName}_{$fieldId} << ( \"$value\" ) << " . kMetadataManager::SEARCH_TEXT_SUFFIX . "_{$fieldId}";
 						}
-						
+
 						KalturaLog::debug("add $dataCondition");
 						$dataConditions[] = "( $dataCondition )";
 					}
