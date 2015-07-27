@@ -383,26 +383,37 @@ class kFile
 				return false;
 			}
 		} else {
-			self::copySingleFile($src, $dest, $deleteSrc);
+			return self::copySingleFile($src, $dest, $deleteSrc);
 		}
-		return true;
+        return true;
 	}
-	
+
 	private static function copySingleFile($src, $dest, $deleteSrc) {
-		if($deleteSrc) {
-			// In case of move, first try to move the file before copy & unlink.
-			if(rename($src, $dest)) 
-				return true;
-		}
-		
-		if (!copy($src,$dest)) {
+
+        if(is_writable (dirname($dest))!==true){
+            KalturaLog::err("Destination is not writable : [$dest]");
+            return false;
+        }
+
+        //check if source if is writeable so can remove it or rename it
+        $can_remove_source=is_writable($src);
+
+        if ($deleteSrc && $can_remove_source) {
+                // In case of move, first try to move the file before copy & unlink.
+                if (rename($src, $dest))
+                    return true;
+        }
+
+        if (!copy($src,$dest)) {
 			KalturaLog::err("Failed to copy file : [$src]");
 			return false;
 		}
-		if ($deleteSrc && (!unlink($src))) {
+
+		if ($deleteSrc && !$can_remove_source) {
 			KalturaLog::err("Failed to delete source file : [$src]");
 			return false;
 		}
+
 		return true;
 	}
 	
@@ -485,9 +496,12 @@ class kFile
 	// make sure the file is closed , then remove it
 	public static function deleteFile($file_name)
 	{
-		$fh = fopen($file_name, 'w') or die("can't open file");
-		fclose($fh);
-		unlink($file_name);
+        if(is_writable ($file_name)===true) {
+            unlink($file_name);
+        }
+        else{
+            KalturaLog::err("Can't delete file [$file_name]");
+        }
 	}
 	
 	static public function replaceExt($file_name, $new_ext)
