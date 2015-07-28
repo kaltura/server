@@ -29,6 +29,6 @@ class KalturaAdCuePointFilter extends KalturaAdCuePointBaseFilter
 
 	public function getTypeListResponse(KalturaFilterPager $pager, KalturaDetachedResponseProfile $responseProfile = null, $type = null)
 	{
-		return parent::getTypeListResponse($pager, $responseProfile, QuizPlugin::getCoreValue('CuePointType', AdCuePointType::AD));
+		return parent::getTypeListResponse($pager, $responseProfile, AdCuePointPlugin::getCuePointTypeCoreValue(AdCuePointType::AD));
 	}
 }

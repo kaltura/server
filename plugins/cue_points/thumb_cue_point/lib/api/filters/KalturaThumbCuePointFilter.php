@@ -30,6 +30,6 @@ class KalturaThumbCuePointFilter extends KalturaThumbCuePointBaseFilter
 
 	public function getTypeListResponse(KalturaFilterPager $pager, KalturaDetachedResponseProfile $responseProfile = null, $type = null)
 	{
-		return parent::getTypeListResponse($pager, $responseProfile, QuizPlugin::getCoreValue('CuePointType',ThumbCuePointType::THUMB));
+		return parent::getTypeListResponse($pager, $responseProfile, ThumbCuePointPlugin::getCuePointTypeCoreValue(ThumbCuePointType::THUMB));
 	}
 }

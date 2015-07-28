@@ -18,6 +18,6 @@ class KalturaEventCuePointFilter extends KalturaEventCuePointBaseFilter
 
 	public function getTypeListResponse(KalturaFilterPager $pager, KalturaDetachedResponseProfile $responseProfile = null, $type = null)
 	{
-		return parent::getTypeListResponse($pager, $responseProfile, QuizPlugin::getCoreValue('CuePointType',EventCuePointType::EVENT));
+		return parent::getTypeListResponse($pager, $responseProfile, EventCuePointPlugin::getCuePointTypeCoreValue(EventCuePointType::EVENT));
 	}
 }

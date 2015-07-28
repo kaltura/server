@@ -19,6 +19,6 @@ class KalturaAnnotationFilter extends KalturaAnnotationBaseFilter
 
 	public function getTypeListResponse(KalturaFilterPager $pager, KalturaDetachedResponseProfile $responseProfile = null, $type = null)
 	{
-		return parent::getTypeListResponse($pager, $responseProfile, QuizPlugin::getCoreValue('CuePointType', AnnotationCuePointType::ANNOTATION));
+		return parent::getTypeListResponse($pager, $responseProfile, AnnotationPlugin::getCuePointTypeCoreValue(AnnotationCuePointType::ANNOTATION));
 	}
 }

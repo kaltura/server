@@ -32,6 +32,6 @@ class KalturaCodeCuePointFilter extends KalturaCodeCuePointBaseFilter
 
 	public function getTypeListResponse(KalturaFilterPager $pager, KalturaDetachedResponseProfile $responseProfile = null, $type = null)
 	{
-		return parent::getTypeListResponse($pager, $responseProfile, QuizPlugin::getCoreValue('CuePointType',CodeCuePointType::CODE));
+		return parent::getTypeListResponse($pager, $responseProfile, CodeCuePointPlugin::getCuePointTypeCoreValue(CodeCuePointType::CODE));
 	}
 }
