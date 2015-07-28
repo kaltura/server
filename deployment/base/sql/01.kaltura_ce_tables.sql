@@ -1807,7 +1807,7 @@ CREATE TABLE IF NOT EXISTS `scheduler` (
   `updated_at` datetime DEFAULT NULL,
   `updated_by` varchar(20) DEFAULT NULL,
   `configured_id` int(11) NOT NULL,
-  `name` varchar(20) DEFAULT '',
+  `name` varchar(255) DEFAULT '',
   `description` varchar(20) DEFAULT '',
   `statuses` varchar(255) NOT NULL,
   `last_status` datetime NOT NULL,
