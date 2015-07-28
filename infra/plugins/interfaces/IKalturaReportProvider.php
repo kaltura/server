@@ -14,6 +14,6 @@ interface IKalturaReportProvider {
      * @param string $objectIds
      * @return array(array(<header> => <value>))
      */
-    public function getReportResult($partner_id, $report_type, $report_flavor, $objectIds);
+    public function getReportResult($partner_id, $report_type, $report_flavor, $objectIds, $orderBy = null);
 
 }
