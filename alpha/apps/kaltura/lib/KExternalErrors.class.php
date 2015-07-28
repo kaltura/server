@@ -51,6 +51,7 @@ class KExternalErrors
 	const ACTION_BLOCKED = 40;
 	const INVALID_HASH = 41;
 	const PARENT_ENTRY_ID_NOT_FOUND = 42;
+	const LIVE_STREAM_CONFIG_NOT_FOUND = 43;
 	
 	const HTTP_STATUS_NOT_FOUND = 404;
 	
@@ -100,7 +101,8 @@ class KExternalErrors
 			self::INVALID_SETTING_TYPE => "Invalid setting type",
 			self::ACTION_BLOCKED => "The requested action is blocked for this partner",
 			self::INVALID_HASH => "Hash key contains invalid characters",
-			self::PARENT_ENTRY_ID_NOT_FOUND => "Parent entry id provided not found in system"
+			self::PARENT_ENTRY_ID_NOT_FOUND => "Parent entry id provided not found in system",
+			self::LIVE_STREAM_CONFIG_NOT_FOUND => "Live stream playback config not found for requested live entry"
 	);
 	
 	public static function dieError($errorCode, $message = null)

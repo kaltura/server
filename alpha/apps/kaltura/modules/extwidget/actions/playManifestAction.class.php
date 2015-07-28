@@ -781,7 +781,7 @@ class playManifestAction extends kalturaAction
 	/**
 	 * @return array primary URL and backup URL
 	 */
-	private function getLiveEntryBaseUrls()
+	private function getLiveEntryStreamConfig()
 	{
 		$this->initFlavorParamsIds();
 		
@@ -797,7 +797,7 @@ class playManifestAction extends kalturaAction
 		$liveStreamConfig = $this->entry->getLiveStreamConfigurationByProtocol($this->deliveryAttributes->getFormat(), $protocol, $tag, false, $this->flavorParamsIds);
 		/* @var $liveStreamConfig kLiveStreamConfiguration */
 		if ($liveStreamConfig)
-			return array($liveStreamConfig->getUrl(), $liveStreamConfig->getBackupUrl());
+			return $liveStreamConfig;
 		
 		switch($this->deliveryAttributes->getFormat())
 		{
@@ -806,12 +806,20 @@ class playManifestAction extends kalturaAction
 				$baseUrl = rtrim($baseUrl, '/');
 				if (strpos($this->deliveryAttributes->getMediaProtocol(), "rtmp") === 0)
 					$baseUrl = $this->deliveryAttributes->getMediaProtocol() . '://' . preg_replace('/^rtmp.*?:\/\//', '', $baseUrl);
-				return array($baseUrl, null);
-					
+				
+				$liveStreamConfig = new kLiveStreamConfiguration();
+				$liveStreamConfig->setUrl($baseUrl);
+				$liveStreamConfig->setProtocol(PlaybackProtocol::RTMP);
+				return $liveStreamConfig;				
+				
 			case PlaybackProtocol::APPLE_HTTP:
-				return array($this->entry->getHlsStreamUrl(), null); // TODO pass single tag
+				// TODO pass single tag
+				$liveStreamConfig = new kLiveStreamConfiguration();
+				$liveStreamConfig->setUrl($this->entry->getHlsStreamUrl());
+				$liveStreamConfig->setProtocol(PlaybackProtocol::APPLE_HTTP);
+				return $liveStreamConfig;
 		}
-		return array(null, null);
+		return null;
 	}
 	
 	private function serveLiveEntry()
@@ -824,7 +832,9 @@ class playManifestAction extends kalturaAction
  			kApiCache::setExpiry(120);
  		}
  		
-		list($baseUrl, $backupUrl) = $this->getLiveEntryBaseUrls();
+ 		$liveStreamConfig = $this->getLiveEntryStreamConfig();
+ 		if(!$liveStreamConfig)
+ 			KExternalErrors::dieError(KExternalErrors::LIVE_STREAM_CONFIG_NOT_FOUND, "Live stream playbck configuration not found for entry [$this->entryId]");
 		$cdnHost = parse_url($baseUrl, PHP_URL_HOST);	
 		
 		if($this->deliveryAttributes->getFormat() == PlaybackProtocol::MULTICAST_SL)
@@ -840,12 +850,7 @@ class playManifestAction extends kalturaAction
 		}
 		
 		$this->deliveryProfile->setDynamicAttributes($this->deliveryAttributes);	
-
-		if($this->deliveryAttributes->getEdgeServerIds()) {
-			list($baseUrl, $backupUrl) = $this->deliveryProfile->getEdgeServerUrls($baseUrl, $backupUrl);
-		}
-		
-		return $this->deliveryProfile->serve($baseUrl, $backupUrl);
+		return $this->deliveryProfile->serve($liveStreamConfig);
 	}
 	
 	/* (non-PHPdoc)
