@@ -270,10 +270,13 @@ class BaseEntryService extends KalturaEntryService
 	    //$entry->validatePropertyMinLength("name", 1);
 	    if (!$entry->name)
 		    $entry->name = $this->getPartnerId().'_'.time();
-			
+
+	    $dbEntry = parent::add(null, $entry->conversionProfileId);
 	    // first copy all the properties to the db entry, then we'll check for security stuff
-	    $dbEntry = $entry->toInsertableObject(new entry());
-			
+	    $dbEntry = $entry->toInsertableObject($dbEntry);
+	    
+
+	    
 	    $dbEntry->setType($type);
 	    $dbEntry->setMediaType(entry::ENTRY_MEDIA_TYPE_AUTOMATIC);
 	        

@@ -965,7 +965,10 @@ class KalturaEntryService extends KalturaBaseService
 			if($templateEntry)
 			{
 				$dbEntry = $templateEntry->copyTemplate(true);
-				$dbEntry->save();
+				if ($entry)
+				{
+					$dbEntry->save();
+				}
 			}
 			else
 			{
@@ -973,7 +976,14 @@ class KalturaEntryService extends KalturaBaseService
 			}
 		}
 		
-		return $this->prepareEntryForInsert($entry, $dbEntry);
+		if ($entry)
+		{
+			return $this->prepareEntryForInsert($entry, $dbEntry);
+		}
+		else
+		{
+			return $dbEntry;
+		}
 	}
 	
 	/**
