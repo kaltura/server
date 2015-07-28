@@ -2043,7 +2043,7 @@ CREATE TABLE IF NOT EXISTS `track_entry` (
   `context` varchar(511) DEFAULT NULL,
   `partner_id` int(11) DEFAULT NULL,
   `entry_id` varchar(20) DEFAULT NULL,
-  `host_name` varchar(20) DEFAULT NULL,
+  `host_name` varchar(255) DEFAULT NULL,
   `uid` varchar(63) DEFAULT NULL,
   `track_event_status_id` smallint(6) DEFAULT NULL,
   `changed_properties` varchar(1023) DEFAULT NULL,
