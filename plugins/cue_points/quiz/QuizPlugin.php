@@ -294,8 +294,6 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 	public static function getQuizData( entry $entry )
 	{
 		$quizData = $entry->getFromCustomData( self::QUIZ_DATA );
-	/*	if( !is_null($quizData) )
-			$quizData = unserialize($quizData);*/
 		return $quizData;
 	}
 
@@ -312,7 +310,7 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 	/**
 	 * @param entry $dbEntry
 	 * @return mixed|string
-	 * @throws KalturaAPIException
+	 * @throws Exception
 	 */
 	public static function validateAndGetQuiz( entry $dbEntry ) {
 		$kQuiz = self::getQuizData($dbEntry);
@@ -347,6 +345,7 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 	 * @param string $partner_id
 	 * @param KalturaReportType $report_type
 	 * @param string $objectIds
+	 * @return array|null
 	 */
 	public function getReportResult($partner_id, $report_type, $report_flavor, $objectIds, $orderBy = null)
 	{
@@ -378,7 +377,6 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 	 * @param $objectIds
 	 * @return array
 	 * @throws Exception
-	 * @throws KalturaAPIException
 	 */
 	protected function getTotalReport($objectIds)
 	{
@@ -420,7 +418,6 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 	 * @param $objectIds
 	 * @return array
 	 * @throws Exception
-	 * @throws KalturaAPIException
 	 */
 	protected function getQuestionPercentageTableReport($objectIds, $orderBy)
 	{
@@ -489,16 +486,13 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 			$questPctgs = array('question_id' => $questionId, 'percentage' => $pctg);
 			$ans[] = $questPctgs;
 		}
-//		$questPctgs = array('question_id' => $question->getId(), 'percentage' => ($pctg*100));
-//		$ans[] = $questPctgs;
-		
 		return $ans;
 	}
 
 	/**
 	 * @param $objectIds
 	 * @return array
-	 * @throws KalturaAPIException
+	 * @throws Exception
 	 */
 	protected function getReportCount($objectIds)
 	{
@@ -592,7 +586,6 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 			{
 				$userId = $dbKuser->getPuserId();
 			}
-//			$ans[] = array('user_id' => $userId, 'percentage' => ($totalCorrect/$totalAnswers)*100);
 			$userPerctentages[$userId] = ($totalCorrect/$totalAnswers)*100;
 			
 		}
