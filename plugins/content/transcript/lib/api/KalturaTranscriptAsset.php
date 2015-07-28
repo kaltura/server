@@ -40,6 +40,6 @@ class KalturaTranscriptAsset extends KalturaAttachmentAsset
 		if (!$object_to_fill)
 			$object_to_fill = new TranscriptAsset();
 	
-	return parent::toObject($object_to_fill, $props_to_skip);
+		return parent::toObject($object_to_fill, $props_to_skip);
 	}
 }
