@@ -955,7 +955,7 @@ class KalturaEntryService extends KalturaBaseService
 	 * @param KalturaBaseEntry $entry
 	 * @return entry
 	 */
-	protected function add(KalturaBaseEntry $entry, $conversionProfileId = null)
+	protected function add($entry, $conversionProfileId = null)
 	{
 		$dbEntry = null;
 		$conversionProfile = myPartnerUtils::getConversionProfile2ForPartner($this->getPartnerId(), $conversionProfileId);
