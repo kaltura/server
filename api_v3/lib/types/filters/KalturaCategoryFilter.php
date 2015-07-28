@@ -102,7 +102,7 @@ class KalturaCategoryFilter extends KalturaCategoryBaseFilter
 	public function validateForResponseProfile()
 	{
 		if(		kEntitlementUtils::getEntitlementEnforcement()
-			&&	!kPermissionManager::isPermitted(PermissionName::FEATURE_ENABLE_RESPONSE_PROFILE_USER_CACHE))
+			&&	!PermissionPeer::isValidForPartner(PermissionName::FEATURE_ENABLE_RESPONSE_PROFILE_USER_CACHE, kCurrentContext::getCurrentPartnerId()))
 		{
 			throw new KalturaAPIException(KalturaErrors::CANNOT_LIST_RELATED_ENTITLED_WHEN_ENTITLEMENT_IS_ENABLE, get_class($this));
 		}

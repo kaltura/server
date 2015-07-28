@@ -230,7 +230,7 @@ class KalturaBaseEntryFilter extends KalturaBaseEntryBaseFilter
 	 */
 	public function validateForResponseProfile()
 	{
-		if(kPermissionManager::isPermitted(PermissionName::FEATURE_ENABLE_RESPONSE_PROFILE_USER_CACHE))
+		if(PermissionPeer::isValidForPartner(PermissionName::FEATURE_ENABLE_RESPONSE_PROFILE_USER_CACHE, kCurrentContext::getCurrentPartnerId()))
 			return;
 		
 		if(kEntitlementUtils::getEntitlementEnforcement())
