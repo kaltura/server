@@ -28,7 +28,8 @@ button, input.button { background-color: #A0A0A0; border-color: #DEDEDE #202020 
 
 .object-name { cursor: pointer; }
 .object-type {font-size: 9px}
-.object-properties { display: none; overflow: scroll; position: absolute; top: 0; padding: 0 10px; background-color: #F7F7F7;  }
+.object-properties { display: none; overflow: scroll; position: absolute; top: 0; padding: 0 10px; background-color: #F7F7F7; z-index: 99; }
+
 .body-bg .object-properties { top: 62px; }
 
 

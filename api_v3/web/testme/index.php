@@ -124,12 +124,12 @@ usort($services, "compareServicesByName");
 							editor.setShowPrintMargin(false);
 							editor.setValue(text);
 							editor.setReadOnly(true);
-
+							kTestMe.onResponse(text, format);
 
 						}
 					})
 					ev.preventDefault();
-					return true;
+					return false;
 				}
 			);
 		});
