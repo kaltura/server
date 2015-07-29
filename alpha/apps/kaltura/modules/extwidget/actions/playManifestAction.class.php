@@ -835,7 +835,7 @@ class playManifestAction extends kalturaAction
  		$liveStreamConfig = $this->getLiveEntryStreamConfig();
  		if(!$liveStreamConfig)
  			KExternalErrors::dieError(KExternalErrors::LIVE_STREAM_CONFIG_NOT_FOUND, "Live stream playbck configuration not found for entry [$this->entryId]");
-		$cdnHost = parse_url($baseUrl, PHP_URL_HOST);	
+		$cdnHost = parse_url($liveStreamConfig->getUrl(), PHP_URL_HOST);	
 		
 		if($this->deliveryAttributes->getFormat() == PlaybackProtocol::MULTICAST_SL)
 		{
