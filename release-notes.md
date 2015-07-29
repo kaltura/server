@@ -2,6 +2,26 @@
 
 ## New applehttp to multicast delivery profile ##
 
+-- Issue Type: Permission to existing API 
+-- Issue ID: PLAT-3541
+
+#### Configuration ####
+ 
+ 	- In the file "deployment/permissions/service.uiconf.ini" in the line "permissionItem7.permissions" add `,WIDGET_SESSION_PERMISSION` at the end
+
+#### Deployment Scripts ####
+
+ 	- php deployment/updates/scripts/add_permissions/2015_07_29_allow_widget_session_uiconf_listTemplates.php
+
+#### Known Issues & Limitations ####
+
+None.
+
+--
+# Jupiter-10.16.0 #
+
+## New applehttp to multicast delivery profile ##
+
 -- Issue Type: New Feature
 -- Issue ID: PLAT-3510
 
