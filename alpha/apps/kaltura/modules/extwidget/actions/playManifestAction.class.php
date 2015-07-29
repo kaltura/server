@@ -1044,6 +1044,11 @@ class playManifestAction extends kalturaAction
 
 		// Output the response
 		KExternalErrors::terminateDispatch();
+
+		$renderer->setKsObject(kCurrentContext::$ks_object);
+		$renderer->setPlaybackContext($playbackContext);
+		$renderer->setDeliveryCode($deliveryCode);
+		
 		$renderer->output($deliveryCode, $playbackContext);
 	}
 }
