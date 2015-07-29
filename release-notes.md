@@ -11,8 +11,7 @@
 
 #### Deployment Scripts ####
 
-Run:
- 	- php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+ - php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
 
 #### Known Issues & Limitations ####
 
