@@ -52,11 +52,13 @@ class MetadataProfileServiceTest < Test::Unit::TestCase
 
      # list the metadata_profiles 
      metadata_profile_filter = Kaltura::KalturaMetadataProfileFilter.new
-     filter_pager = Kaltura::KalturaFilterPager.new      
+     filter_pager = Kaltura::KalturaFilterPager.new
+     filter_pager.page_size = 1      
      
      metadata_profile_list = @client.metadata_profile_service.list(metadata_profile_filter, filter_pager)    
-     
-     assert_equal metadata_profile_list.total_count, 1
+
+     assert_equal metadata_profile_list.object.length, 1
+     assert_equal metadata_profile_list.total_count > 1, true
      
     assert_nil @client.metadata_profile_service.delete(created_metadata_profile.id)   
   end
