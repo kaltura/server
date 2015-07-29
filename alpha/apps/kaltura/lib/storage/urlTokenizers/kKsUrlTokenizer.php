@@ -1,8 +1,5 @@
 <?php
-/**
- * @package plugins.forensicWatermark
- * @subpackage storage
- */
+
 class kKsUrlTokenizer extends kUrlTokenizer
 {
 	/**
@@ -24,7 +21,7 @@ class kKsUrlTokenizer extends kUrlTokenizer
 	}
 
 	/**
-	 * @param string $partnerId
+	 * @param int $partnerId
 	 */
 	public function setPartnerId($partnerId)
 	{
