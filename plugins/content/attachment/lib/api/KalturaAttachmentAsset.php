@@ -49,10 +49,7 @@ class KalturaAttachmentAsset extends KalturaAsset
 	public function toObject($object_to_fill = null, $props_to_skip = array())
 	{
 		if (!$object_to_fill)
-		{
-			$className = AttachmentPlugin::getObjectClass('asset', AttachmentPlugin::getAssetTypeCoreValue(AttachmentAssetType::ATTACHMENT));
-			$object_to_fill = new $className();
-		}
+			$object_to_fill = new AttachmentAsset();
 	
 		return parent::toObject($object_to_fill, $props_to_skip);
 	}
