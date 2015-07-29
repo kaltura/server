@@ -51,6 +51,8 @@ class KExternalErrors
 	const ACTION_BLOCKED = 40;
 	const INVALID_HASH = 41;
 	const PARENT_ENTRY_ID_NOT_FOUND = 42;
+	const USER_NOT_FOUND = 43;
+	const INTERNAL_SERVER_ERROR = 44;
 	
 	const HTTP_STATUS_NOT_FOUND = 404;
 	
@@ -100,7 +102,9 @@ class KExternalErrors
 			self::INVALID_SETTING_TYPE => "Invalid setting type",
 			self::ACTION_BLOCKED => "The requested action is blocked for this partner",
 			self::INVALID_HASH => "Hash key contains invalid characters",
-			self::PARENT_ENTRY_ID_NOT_FOUND => "Parent entry id provided not found in system"
+			self::PARENT_ENTRY_ID_NOT_FOUND => "Parent entry id provided not found in system",
+			self::USER_NOT_FOUND => "The provided user id was not found",
+			self::INTERNAL_SERVER_ERROR => "Internal server error",
 	);
 	
 	public static function dieError($errorCode, $message = null)
@@ -116,7 +120,8 @@ class KExternalErrors
 		if($message)
 			$description .= ", $message";
 			
-		KalturaLog::err("exiting on error $errorCode - $description");
+		if (class_exists('KalturaLog'))
+			KalturaLog::err("exiting on error $errorCode - $description");
 		
 		$headers = array();
 		if(self::$responseCode)
@@ -138,7 +143,7 @@ class KExternalErrors
 			$errorCode != self::IP_COUNTRY_BLOCKED && 
 			$_SERVER["REQUEST_METHOD"] == "GET")
 		{
-			requestUtils::sendCachingHeaders(self::CACHE_EXPIRY, true, time());
+			infraRequestUtils::sendCachingHeaders(self::CACHE_EXPIRY, true, time());
 			
 			if (function_exists('apc_store'))
 			{

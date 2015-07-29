@@ -17,6 +17,23 @@
 
 None.
 
+## Allow PLAYBACK_BASE_ROLE to user user_entry and quiz ##
+
+-- Issue Type: Permission to existing API 
+-- Issue ID:
+
+#### Configuration ####
+ 
+ 	None.
+
+#### Deployment Scripts ####
+
+ 	- php deployment/updates/scripts/add_permissions/2015_07_29_update_quiz_and_userentry_permissions.php
+
+#### Known Issues & Limitations ####
+
+None.
+
 --
 # Jupiter-10.16.0 #
 
