@@ -1,6 +1,6 @@
 # Jupiter-10.17.0 #
 
-## New applehttp to multicast delivery profile ##
+## Allow users to use uiconf-->listTemplates ##
 
 -- Issue Type: Permission to existing API 
 -- Issue ID: PLAT-3541
@@ -11,7 +11,7 @@
 
 #### Deployment Scripts ####
 
- 	- php deployment/updates/scripts/add_permissions/2015_07_29_allow_widget_session_uiconf_listTemplates.php
+ 	- php deployment/updates/scripts/add_permissions/2015_07_29_allow_user_session_uiconf_listTemplates.php
 
 #### Known Issues & Limitations ####
 
