@@ -2,8 +2,8 @@
 
 ## Allow users to use uiconf-->listTemplates ##
 
--- Issue Type: Permission to existing API 
--- Issue ID: PLAT-3541
+- Issue Type: Permission to existing API 
+- Issue ID: PLAT-3541
 
 #### Configuration ####
  
@@ -19,8 +19,8 @@ None.
 
 ## Allow PLAYBACK_BASE_ROLE to user user_entry and quiz ##
 
--- Issue Type: Permission to existing API 
--- Issue ID:
+- Issue Type: Permission to existing API 
+- Issue ID:
 
 #### Configuration ####
  
