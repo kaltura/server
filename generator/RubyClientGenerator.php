@@ -213,16 +213,16 @@ class RubyClientGenerator extends ClientGeneratorFromXml
 			$propType = $propertyNode->getAttribute("type");
 			if($this->isSimpleType($propType))
 			{
-				$this->appendLine("			@".$this->camelCaseToUnderscoreAndLower($propName)." = xml_element.elements['$propName'].text");
+				$this->appendLine("			self.".$this->camelCaseToUnderscoreAndLower($propName)." = xml_element.elements['$propName'].text");
 			}
 			elseif($propType == 'array' || $propType == 'map')
 			{
 				$propArrayType = $propertyNode->getAttribute("arrayType");
-				$this->appendLine("			@".$this->camelCaseToUnderscoreAndLower($propName)." = KalturaClientBase.object_from_xml(xml_element.elements['$propName'], '$propArrayType')");	
+				$this->appendLine("			self.".$this->camelCaseToUnderscoreAndLower($propName)." = KalturaClientBase.object_from_xml(xml_element.elements['$propName'], '$propArrayType')");	
 			}
 			else
 			{
-				$this->appendLine("			@".$this->camelCaseToUnderscoreAndLower($propName)." = KalturaClientBase.object_from_xml(xml_element.elements['$propName'], '$propType')");	
+				$this->appendLine("			self.".$this->camelCaseToUnderscoreAndLower($propName)." = KalturaClientBase.object_from_xml(xml_element.elements['$propName'], '$propType')");	
 			}
 		}	
 		$this->appendLine("		end");
@@ -276,37 +276,52 @@ class RubyClientGenerator extends ClientGeneratorFromXml
 	
 		$this->appendLine("		$signaturePrefix$signature");
 		$this->appendLine("			kparams = {}");
+		
+		$haveFiles = false;
+		foreach($paramNodes as $paramNode)
+		{
+			$paramType = $paramNode->getAttribute("type");
+		    if ($haveFiles === false && $paramType == "file")
+	    	{
+		        $haveFiles = true;
+				$this->appendLine("			kfiles = {}");
+	    	}
+		}
+		
 		foreach($paramNodes as $paramNode)
 		{
 			$paramType = $paramNode->getAttribute("type");
 			$paramName = $paramNode->getAttribute("name");
 			$isEnum = $paramNode->hasAttribute("enumType");
 			
-			// comments
-			$this->writeComments("			# ", $paramNode);
-			
 			switch ($paramType)
 			{
-				case "array":
-					$this->appendLine("			$paramName.each do |obj|");
-					$this->appendLine("				client.add_param(kparams, '$paramName', obj);");
-					$this->appendLine("			end");
+				case "file":
+					$this->appendLine("			client.add_param(kfiles, '$paramName', ".$this->camelCaseToUnderscoreAndLower($paramName).")");
 					break;
 				default: 
-					$this->appendLine("			client.add_param(kparams, '$paramName', ".$this->camelCaseToUnderscoreAndLower($paramName).");");
+					$this->appendLine("			client.add_param(kparams, '$paramName', ".$this->camelCaseToUnderscoreAndLower($paramName).")");
 					break;
 			}
 		}
 		
-		$this->appendLine("			client.queue_service_action_call('$serviceId', '$action', '$resultType', kparams);");
+		if ($haveFiles)
+		{
+			$this->appendLine("			client.queue_service_action_call('$serviceId', '$action', '$resultType', kparams, kfiles)");
+		}
+		else
+		{
+			$this->appendLine("			client.queue_service_action_call('$serviceId', '$action', '$resultType', kparams)");
+		}
+		
 		if($resultType == 'file'){
-			$this->appendLine("			return client.get_serve_url();");			
+			$this->appendLine("			return client.get_serve_url()");			
 		}
 		else{
 			$this->appendLine("			if (client.is_multirequest)");
-			$this->appendLine("				return nil;");
+			$this->appendLine("				return nil");
 			$this->appendLine("			end");
-			$this->appendLine("			return client.do_queue();");			
+			$this->appendLine("			return client.do_queue()");			
 		}
 		$this->appendLine("		end");
 	}
@@ -354,7 +369,7 @@ class RubyClientGenerator extends ClientGeneratorFromXml
 		return $signature;
 	}
 	
-	function writeMainClient(DOMNodeList  $serviceNodes)
+	function writeMainClient(DOMNodeList  $serviceNodes, $configurationNodes = null)
 	{
 		$this->appendLine("	class KalturaClient < KalturaClientBase");
 		foreach($serviceNodes as $serviceNode)
@@ -369,7 +384,82 @@ class RubyClientGenerator extends ClientGeneratorFromXml
 			$this->appendLine("			end");
 			$this->appendLine("			return @$rubyServiceName");
 			$this->appendLine("		end");
+			$this->appendLine("		");
 		}
+		
+		if($configurationNodes)
+		{
+			$apiVersion = $this->_doc->documentElement->getAttribute('apiVersion');
+			$date = date('y-m-d');
+			
+			$this->appendLine("		def initialize(client)");
+			$this->appendLine("			super(client)");
+			$this->appendLine("			self.client_tag = 'ruby:$date'");
+			$this->appendLine("			self.api_version = '$apiVersion'");
+			$this->appendLine("		end");
+			$this->appendLine("		");
+		
+			$volatileProperties = array();
+			foreach($configurationNodes as $configurationNode)
+			{
+				/* @var $configurationNode DOMElement */
+				$configurationName = $configurationNode->nodeName;
+				$attributeName = $this->camelCaseToUnderscoreAndLower($configurationName) . "_configuration";
+				$volatileProperties[$attributeName] = array();
+			
+				foreach($configurationNode->childNodes as $configurationPropertyNode)
+				{
+					/* @var $configurationPropertyNode DOMElement */
+					
+					if ($configurationPropertyNode->nodeType != XML_ELEMENT_NODE)
+						continue;
+				
+					$configurationProperty = $this->camelCaseToUnderscoreAndLower($configurationPropertyNode->localName);
+					
+					if($configurationPropertyNode->hasAttribute('volatile') && $configurationPropertyNode->getAttribute('volatile'))
+					{
+						$volatileProperties[$attributeName][] = $configurationProperty;
+					}
+					
+					$this->writeConfigurationProperty($attributeName, $configurationProperty, $configurationProperty);
+					
+					if($configurationPropertyNode->hasAttribute('alias'))
+					{
+						$alias = $this->camelCaseToUnderscoreAndLower($configurationPropertyNode->getAttribute('alias'));
+						$this->writeConfigurationProperty($attributeName, $alias, $configurationProperty);					
+					}
+				}
+			}
+			
+			$this->appendLine ( "		def reset_request()");
+			$this->appendLine ( "			super");
+			foreach($volatileProperties as $attributeName => $properties)
+			{
+				foreach($properties as $propertyName)
+				{
+					$this->appendLine("			@$attributeName.delete('{$propertyName}')");
+				}
+			}
+			$this->appendLine ( "		end");
+		}
+		
 		$this->appendLine("	end");
+	}
+	
+	protected function writeConfigurationProperty($configurationName, $name, $paramName)
+	{
+		$this->appendLine("		def $name=(value)");
+		$this->appendLine("			@{$configurationName}['$paramName'] = value");
+		$this->appendLine("		end");
+		$this->appendLine("		");
+		$this->appendLine("		def $name()");
+		$this->appendLine("			if(@{$configurationName}.has_key?('$paramName'))");
+		$this->appendLine("				return @{$configurationName}['$paramName']");
+		$this->appendLine("			end");
+		$this->appendLine("			");
+		$this->appendLine("			return KalturaNotImplemented");
+		$this->appendLine("		end");
+		$this->appendLine("		");
+		$this->appendLine("	");
 	}
 }

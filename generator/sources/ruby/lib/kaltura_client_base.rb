@@ -42,30 +42,28 @@ module Kaltura
 
 	class KalturaClientBase
 		attr_accessor 	:config
-		attr_accessor 	:ks
 		attr_reader 	:is_multirequest
 		attr_reader 	:responseHeaders
 		def initialize(config)
-			@ks = KalturaNotImplemented
 			@should_log = false
 			@config = config
 			@calls_queue = []
+			@client_configuration = {}
+			@request_configuration = {}
 
 			if @config.logger != nil
 				@should_log = true
 			end
 		end
 
-		def queue_service_action_call(service, action, return_type, params = {})
+		def queue_service_action_call(service, action, return_type, params = {}, files = {})
 			# in start session partner id is optional (default nil). if partner id was not set, use the one in the config
-			if !params.key?('partnerId')
-				params['partnerId'] = config.partner_id
-				params.delete('partnerId__null') if params.key?('partnerId__null')
+
+			@request_configuration.each do |key, value|
+				params[key] = value
 			end
 
-			add_param(params, 'ks', @ks);
-
-			call = KalturaServiceActionCall.new(service, action, return_type, params);
+			call = KalturaServiceActionCall.new(service, action, return_type, params, files);
 			@calls_queue.push(call);
 		end
 
@@ -83,14 +81,17 @@ module Kaltura
 
 				# append the basic params
 				params = {}
+				files = {}
 					
 				url = @config.service_url+"/api_v3/index.php"
 				if (@is_multirequest)
 					add_param(params, "service", "multirequest")
-					i = 1
+					i = 0
 					@calls_queue.each do |call|
 						call_params = call.get_params_for_multirequest(i)
 						params.merge!(call_params)
+						call_files = call.get_files_for_multirequest(i)
+						files.merge!(call_files)
 						i = i.next
 					end
 				else
@@ -98,11 +99,13 @@ module Kaltura
 					add_param(params, "service", call.service)
 					add_param(params, "action", call.action)
 					params.merge!(call.params)
+					files = call.files
 				end
 				
 				add_param(params, "format", @config.format)
-				add_param(params, "clientTag", @config.client_tag)
-
+				@client_configuration.each do |key, value|
+					add_param(params, key, value)
+				end
 
 				signature = signature(params)
 				add_param(params, "kalsig", signature)
@@ -110,7 +113,7 @@ module Kaltura
 				log("url: " + url)
 				log("params: " + params.to_yaml)
 
-				result = do_http_request(url, params)
+				result = do_http_request(url, params, files)
 
 				@responseHeaders = result.headers
 				log("server: [" + result.headers[:x_me].to_s + "], session: [" + result.headers[:x_kaltura_session].to_s + "]")
@@ -165,20 +168,31 @@ module Kaltura
 			return serve_url
 		end
 
-		def do_http_request(url, params)
+		def do_http_request(url, params, files)
 
 			headers = @config.requestHeaders
-			headers['params'] = params
+			headers[ 'Accept'] = 'text/xml';
 				
+			payload = {}
+				
+			if(files.size > 0)
+				payload = files
+				payload[:json] = params.to_json
+			else
+				payload = params.to_json
+				headers[ 'Content-Type'] = 'application/json';
+			end
+			
 			options = {
 				:method => :post, 
 				:url => url, 
-				:headers => headers
+				:headers => headers,
+				:timeout => @config.timeout,
+				:open_timeout => @config.timeout,
+				:payload => payload
 			}
 
-			options.merge!(:timeout => @config.timeout) if @config.timeout
-			options.merge!(:open_timeout => @config.timeout) if @config.timeout
-
+			log("request options: " + JSON.pretty_generate(options))
 			res = RestClient::Request.execute(options)
 
 			return res
@@ -240,8 +254,9 @@ module Kaltura
 			if (@is_multirequest)
 				results = {}
 				request_index = 0
-				doc.elements.each('xml/result/item') do | element |
-					results.push(KalturaClientBase.object_from_xml(element, @calls_queue[request_index].return_type))
+				doc.elements.each('xml/result/*') do | element |
+					results[request_index] = KalturaClientBase.object_from_xml(element, @calls_queue[request_index].return_type)
+					request_index += 1
 				end
 				return results
 			else
@@ -286,20 +301,22 @@ module Kaltura
 			elsif value == nil
 				params[name + '__null'] = ''
 			elsif value.is_a? Hash
+				params[name] = {}
 				if value.empty?
-					add_param(params, "#{name}:-", "");
+					add_param(params[name], "-", "");
 				else
 					value.each do |sub_name, sub_value|
-						add_param(params, "#{name}:#{sub_name}", sub_value);
+						add_param(params[name], sub_name, sub_value);
 					end
 				end
 			elsif value.is_a? Array
+				params[name] = {}
 				if value.empty?
-					add_param(params, "#{name}:-", "");
+					add_param(params[name], "-", "");
 				else
 					value.each_with_index do |ele, i|
 						if ele.is_a? KalturaObjectBase
-							add_param(params, "#{name}:#{i}", ele.to_params)
+							add_param(params[name], i, ele.to_params)
 						end
 					end
 				end
@@ -325,20 +342,20 @@ module Kaltura
 
 		def generate_session(admin_secret, user_id, kaltura_session_type, partner_id, expiry=86400, privileges=nil)
 
-			ks = "#{partner_id};#{partner_id};#{Time.now.to_i + expiry};#{kaltura_session_type};#{rand.to_s.gsub("0.", "")};#{user_id};#{privileges};"
+			session = "#{partner_id};#{partner_id};#{Time.now.to_i + expiry};#{kaltura_session_type};#{rand.to_s.gsub("0.", "")};#{user_id};#{privileges};"
 
-			digest_generator = OpenSSL::Digest::Digest.new('sha1')
+			digest_generator = OpenSSL::Digest.new('sha1')
 
 			digest_generator.update(admin_secret)
-			digest_generator.update(ks)
+			digest_generator.update(session)
 
 			digest = digest_generator.hexdigest
 
-			signature = digest + "|" + ks
+			signature = digest + "|" + session
 			b64 = Base64.encode64(signature)
 			cleaned = b64.gsub("\n","")
 
-			@ks = cleaned
+			self.ks = cleaned
 		end
 	end
 
@@ -347,11 +364,14 @@ module Kaltura
 		attr_accessor :action
 		attr_accessor :return_type
 		attr_accessor :params
-		def initialize(service, action, return_type, params = array())
+		attr_accessor :files
+		
+		def initialize(service, action, return_type, params, files)
 			@service = service
 			@action = action
 			@return_type = return_type
 			@params = parse_params(params)
+			@files = files
 		end
 
 		def parse_params(params)
@@ -368,10 +388,19 @@ module Kaltura
 
 		def get_params_for_multirequest(multirequest_index)
 			multirequest_params = {}
-			multirequest_params[multirequest_index.to_s+":service"] = @service
-			multirequest_params[multirequest_index.to_s+":action"] = @action
-			@params.each_key do |key|
-				multirequest_params[multirequest_index.to_s+":"+key] = @params[key]
+			multirequest_params[multirequest_index.to_s] = {}
+			multirequest_params[multirequest_index.to_s]["service"] = @service
+			multirequest_params[multirequest_index.to_s]["action"] = @action
+			@params.each do |key, value|
+				multirequest_params[multirequest_index.to_s][key] = value
+			end
+			return multirequest_params
+		end
+		
+		def get_files_for_multirequest(multirequest_index)
+			multirequest_params = {}
+			@files.each do |key, value|
+				multirequest_params[multirequest_index.to_s + ":" + key] = value
 			end
 			return multirequest_params
 		end
@@ -424,20 +453,16 @@ module Kaltura
 		attr_accessor :logger
 		attr_accessor :service_url
 		attr_accessor :format
-		attr_accessor :client_tag
 		attr_accessor :timeout
-		attr_accessor :partner_id
 		attr_accessor :requestHeaders
 		#
 		# Adding service_url to the initialize signature to pass url to your own kaltura ce instance
 		# Default is still set to http://www.kaltura.com.
 		#
-		def initialize(partner_id = -1,service_url="http://www.kaltura.com")
-			@service_url 	= service_url
+		def initialize()
+			@service_url 	= "http://www.kaltura.com"
 			@format 		= 2 # xml
-			@client_tag 	= "ruby:15-07-28"
 			@timeout 		= 120
-			@partner_id 	= partner_id
 			@requestHeaders = {}
 		end
 
