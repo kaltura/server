@@ -7,7 +7,7 @@
 
 #### Configuration ####
  
- 	- In the file "deployment/permissions/service.uiconf.ini" in the line "permissionItem7.permissions" add `,WIDGET_SESSION_PERMISSION` at the end
+ 	- In the file "deployment/permissions/service.uiconf.ini" in the line "permissionItem7.permissions" add `,BASE_USER_SESSION_PERMISSION` at the end
 
 #### Deployment Scripts ####
 
