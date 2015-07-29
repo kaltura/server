@@ -13,7 +13,6 @@
  * @package Core
  * @subpackage model
  */
-use Aws\S3\Enum\Permission;
 class PermissionItemPeer extends BasePermissionItemPeer implements IRelatedObjectPeer
 {
 

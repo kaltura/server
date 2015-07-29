@@ -128,11 +128,9 @@ class KalturaTvinciDistributionJobProviderData extends KalturaConfigurableDistri
 					if ($distributionFlavorAsset->isLocalReadyStatus() &&
 						$distributionFlavorAsset->hasTag($tag) )
 					{
-						$keys[] = $this->createFileCoGuid($entry->getEntryId(),$distributionFlavorAsset->getFlavorParamsId());
-						if (!in_array($tag, $relevantTags))
-						{
-							$relevantTags[] = $tag;
-						}
+						$key = $this->createFileCoGuid($entry->getEntryId(),$distributionFlavorAsset->getFlavorParamsId());
+						if (!in_array($key, $keys))	$keys[] = $key;
+						if (!in_array($tag, $relevantTags))	$relevantTags[] = $tag;
 					}
 				}
 			}

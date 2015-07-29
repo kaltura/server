@@ -726,7 +726,8 @@ class myReportsMgr
 				$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaReportProvider');
 				foreach ($pluginInstances as $pluginInstance)
 				{
-					$res = $pluginInstance->getReportResult($partner_id, $report_type, $report_flavor, $object_ids);
+
+					$res = $pluginInstance->getReportResult($partner_id, $report_type, $report_flavor, $object_ids, $order_by);
 					if ($res)
 					{
 						return $res;

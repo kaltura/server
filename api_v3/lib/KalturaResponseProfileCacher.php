@@ -38,10 +38,11 @@ class KalturaResponseProfileCacher extends kResponseProfileCacher
 		$profileKey = $responseProfileKey;
 		$protocol = infraRequestUtils::getProtocol();
 		$ksType = kCurrentContext::getCurrentSessionType();
-		$userRoles = implode('_', $userRoles);
+		$userRoles = implode('-', $userRoles);
+		$host = (isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : '');
 		$entitlement = (int) kEntitlementUtils::getEntitlementEnforcement();
 		
-		return "obj_rp{$profileKey}_p{$partnerId}_o{$objectType}_i{$objectId}_h{$protocol}_k{$ksType}_u{$userRoles}_e{$entitlement}";
+		return "obj_rp{$profileKey}_p{$partnerId}_o{$objectType}_i{$objectId}_h{$protocol}_k{$ksType}_u{$userRoles}_w{$host}_e{$entitlement}";
 	}
 	
 	private static function getObjectTypeCacheValue(IBaseObject $object)
@@ -68,14 +69,10 @@ class KalturaResponseProfileCacher extends kResponseProfileCacher
 		$profileKey = self::$responseProfileKey;
 		$protocol = infraRequestUtils::getProtocol();
 		$ksType = kCurrentContext::getCurrentSessionType();
-		$userRoles = implode('_', $userRoles);
+		$userRoles = implode('-', $userRoles);
+		$host = (isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : '');
 		
-		return "relate_rp{$profileKey}_p{$partnerId}_o{$objectType}_h{$protocol}_k{$ksType}_u{$userRoles}";
-	}
-	
-	private static function getResponseProfileCacheKey($responseProfileKey, $partnerId)
-	{
-		return "rp_rp{$responseProfileKey}_p{$partnerId}";
+		return "relate_rp{$profileKey}_p{$partnerId}_o{$objectType}_h{$protocol}_k{$ksType}_u{$userRoles}_w{$host}";
 	}
 	
 	public static function onPersistentObjectLoaded(IBaseObject $object)
@@ -232,64 +229,68 @@ class KalturaResponseProfileCacher extends kResponseProfileCacher
 		$cacheStores = self::getStores();
 		foreach ($cacheStores as $cacheStore)
 		{
-			if($cacheStore instanceof kCouchbaseCacheWrapper)
+			if(!($cacheStore instanceof kCouchbaseCacheWrapper))
 			{
-				$query = $cacheStore->getNewQuery(kCouchbaseCacheQuery::VIEW_RESPONSE_PROFILE_SESSION_TYPE);
-				if(!$query)
-					continue;
-					
-				$query->setLimit($options->limit + 1);
-				if($options->objectId)
-				{
-					$objectKey = "{$partnerId}_{$options->cachedObjectType}_{$options->objectId}";
-					KalturaLog::debug("Serach for key [$sessionKey, $objectKey]");
-					$query->addKey('sessionKey', $sessionKey);
-					$query->addKey('objectKey', $objectKey);
-				}
-				else 
-				{
-					$objectKey = "{$partnerId}_{$options->cachedObjectType}_";
-					if($options->startObjectKey)
-						$objectKey = $options->startObjectKey;
-						
-					KalturaLog::debug("Serach for start key [$sessionKey, $objectKey]");
-					$query->addStartKey('sessionKey', $sessionKey);
-					$query->addStartKey('objectKey', $objectKey);
-					
-					if($options->endObjectKey)
-					{
-						$query->addEndKey('sessionKey', $sessionKey);
-						$query->addEndKey('objectKey', $options->endObjectKey);
-					}
-				}
-
-				$results->recalculated = 0;
-				$list = $cacheStore->query($query);
-				if(!$list->getCount())
-					continue;
-					
-				$cachedObjects = $list->getObjects();
-				$exitCount = count($cachedObjects) > $options->limit ? 1 : 0;
-				
-				do
-				{
-					self::recalculateCache(array_shift($cachedObjects));
-					$results->recalculated++;
-				} while(count($cachedObjects) > $exitCount);
-				
-				if(!count($cachedObjects)){
-					continue;
-				}
-				
-				$cache = reset($cachedObjects);
-				/* @var $cache kCouchbaseCacheListItem */
-				list($cachedSessionKey, $cachedObjectKey) = $cache->getKey();
-				$results->lastObjectKey = $cachedObjectKey;
-				
-				$newRecalculateTime = self::get($uniqueKey, null, false);
-				if($newRecalculateTime > $lastRecalculateTime)
-					throw new KalturaAPIException(KalturaErrors::RESPONSE_PROFILE_CACHE_RECALCULATE_RESTARTED);
+				continue;
 			}
+			
+			$query = $cacheStore->getNewQuery(kResponseProfileCacher::VIEW_RESPONSE_PROFILE_SESSION_TYPE);
+			if(!$query)
+			{
+				continue;
+			}
+				
+			$query->setLimit($options->limit + 1);
+			if($options->objectId)
+			{
+				$objectKey = "{$partnerId}_{$options->cachedObjectType}_{$options->objectId}";
+				KalturaLog::debug("Serach for key [$sessionKey, $objectKey]");
+				$query->addKey(kResponseProfileCacher::VIEW_KEY_SESSION_KEY, $sessionKey);
+				$query->addKey(kResponseProfileCacher::VIEW_KEY_OBJECT_KEY, $objectKey);
+			}
+			else 
+			{
+				$objectKey = "{$partnerId}_{$options->cachedObjectType}_";
+				if($options->startObjectKey)
+					$objectKey = $options->startObjectKey;
+					
+				KalturaLog::debug("Serach for start key [$sessionKey, $objectKey]");
+				$query->addStartKey(kResponseProfileCacher::VIEW_KEY_SESSION_KEY, $sessionKey);
+				$query->addStartKey(kResponseProfileCacher::VIEW_KEY_OBJECT_KEY, $objectKey);
+				
+				if($options->endObjectKey)
+				{
+					$query->addEndKey(kResponseProfileCacher::VIEW_KEY_SESSION_KEY, $sessionKey);
+					$query->addEndKey(kResponseProfileCacher::VIEW_KEY_OBJECT_KEY, $options->endObjectKey);
+				}
+			}
+
+			$results->recalculated = 0;
+			$list = $cacheStore->query($query);
+			if(!$list->getCount())
+				continue;
+				
+			$cachedObjects = $list->getObjects();
+			$exitCount = count($cachedObjects) > $options->limit ? 1 : 0;
+			
+			do
+			{
+				self::recalculateCache(array_shift($cachedObjects));
+				$results->recalculated++;
+			} while(count($cachedObjects) > $exitCount);
+			
+			if(!count($cachedObjects)){
+				continue;
+			}
+			
+			$cache = reset($cachedObjects);
+			/* @var $cache kCouchbaseCacheListItem */
+			list($cachedSessionKey, $cachedObjectKey) = $cache->getKey();
+			$results->lastObjectKey = $cachedObjectKey;
+			
+			$newRecalculateTime = self::get($uniqueKey, null, false);
+			if($newRecalculateTime > $lastRecalculateTime)
+				throw new KalturaAPIException(KalturaErrors::RESPONSE_PROFILE_CACHE_RECALCULATE_RESTARTED);
 		}
 		return $results;
 	}

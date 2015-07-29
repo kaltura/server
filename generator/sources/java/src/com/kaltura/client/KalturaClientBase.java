@@ -215,7 +215,7 @@ abstract public class KalturaClientBase implements Serializable {
 
 	public void queueServiceCall(String service, String action, KalturaParams kparams, KalturaFiles kfiles, Class<?> expectedClass) {
 		for(Entry<String, Object> itr : this.requestConfiguration.entrySet()) {
-			kparams.add(itr.getKey(), (String) itr.getValue());	   
+			kparams.add(itr.getKey(), String.valueOf(itr.getValue()));
 		}
 
 		KalturaServiceActionCall call = new KalturaServiceActionCall(service, action, kparams, kfiles);
@@ -455,7 +455,7 @@ abstract public class KalturaClientBase implements Serializable {
 		kparams.add("ignoreNull", true);
 	
 		for(Entry<String, Object> itr : this.clientConfiguration.entrySet()) {
-			kparams.add(itr.getKey(), (String) itr.getValue());	   
+			kparams.add(itr.getKey(), String.valueOf( itr.getValue()));
 		}
 		
 		if (requestReturnType != null) {

@@ -35,24 +35,30 @@ class FileAssetPeer extends BaseFileAssetPeer implements IRelatedObjectPeer
 	 */
 	public function getRootObjects(IBaseObject $object)
 	{
+		/* @var $object FileAsset */
+		
 		$rootObjects = array();
-		$parentObject = uiConfPeer::retrieveByPK($object->getObjectId());
+		$parentObject = null;
+		switch ($object->getObjectType())
+		{
+			case FileAssetObjectType::UI_CONF:
+				$parentObject = uiConfPeer::retrieveByPK($object->getObjectId());
+				break;
+		}
+		
 		if($parentObject)
 		{
 			/* @var $parentObject IBaseObject */
 			$peer = $parentObject->getPeer();
-			$rootAdded = false;
 			if($peer instanceof IRelatedObjectPeer)
 			{
 				$parentRoots = $peer->getRootObjects($parentObject);
 				if(count($parentRoots))
 				{
 					$rootObjects = array_merge($rootObjects, $parentRoots);
-					$rootAdded = true;
 				}
 			}
-			if($rootAdded)
-				$rootObjects[] = $parentObject;
+			$rootObjects[] = $parentObject;
 		}
 		
 		return $rootObjects;

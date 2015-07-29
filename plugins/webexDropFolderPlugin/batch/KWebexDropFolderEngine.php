@@ -16,11 +16,6 @@ class KWebexDropFolderEngine extends KDropFolderEngine
 	public function watchFolder (KalturaDropFolder $dropFolder)
 	{
 		/* @var $dropFolder KalturaWebexDropFolder */
-		if($this->isRunningOnBackupSite($dropFolder->webexServiceUrl))
-		{
-			return;
-		}
-		
 		$this->dropFolder = $dropFolder;
 		$this->webexClient = $this->initWebexClient();
 		KalturaLog::debug('Watching folder ['.$this->dropFolder->id.']');
@@ -81,13 +76,6 @@ class KWebexDropFolderEngine extends KDropFolderEngine
 		
 		/* @var $data KalturaWebexDropFolderContentProcessorJobData */
 		$dropFolder = $this->dropFolderPlugin->dropFolder->get ($data->dropFolderId);
-		
-		/* @var $dropFolder KalturaWebexDropFolder */
-		if($this->isRunningOnBackupSite($dropFolder->webexServiceUrl))
-		{
-			return;
-		}
-		
 		//In the case of the webex drop folder engine, the only possible contentMatch policy is ADD_AS_NEW.
 		//Any other policy should cause an error.
 		switch ($data->contentMatchPolicy)
@@ -101,12 +89,6 @@ class KWebexDropFolderEngine extends KDropFolderEngine
 		}
 		
 		KBatchBase::unimpersonate();
-	}
-	
-	protected function isRunningOnBackupSite($ServiceUrl)
-	{
-		$url = "{$ServiceUrl}/webex/gsbstatus.php";
-		return (trim(file_get_contents($url)) == 'TRUE');
 	}
 	
 	protected function listRecordings ($startTime = null, $endTime = null)

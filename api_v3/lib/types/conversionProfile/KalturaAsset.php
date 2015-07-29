@@ -165,17 +165,17 @@ class KalturaAsset extends KalturaObject implements IRelatedFilterable, IApiObje
 	             $object = new KalturaThumbAsset();
 	             break;
 	         default:
-	             if(in_array($type, KalturaPluginManager::getExtendedTypes(assetParamsPeer::OM_CLASS, assetType::THUMBNAIL)))
-	             {
-	                 $obj = KalturaPluginManager::loadObject('KalturaThumbAsset', $type);
+	             if($sourceObject instanceof thumbAsset)
+                     {
+	                 $object = KalturaPluginManager::loadObject('KalturaThumbAsset', $type);
 	             }
-	             elseif(in_array($type, KalturaPluginManager::getExtendedTypes(assetParamsPeer::OM_CLASS, assetType::FLAVOR)))
-	             {
-	                 $obj = KalturaPluginManager::loadObject('KalturaFlavorAsset', $type);
+	             elseif($sourceObject instanceof flavorAsset)
+                     {
+	                 $object = KalturaPluginManager::loadObject('KalturaFlavorAsset', $type);
 	             }
 	             else
 	             {
-	                 $obj = KalturaPluginManager::loadObject('KalturaAsset', $type);
+	                 $object = KalturaPluginManager::loadObject('KalturaAsset', $type);
 	             }
 	     }
 	     
