@@ -625,7 +625,6 @@ $plannedDur = 0;
 					$target->_flags = $this->_flags | self::MissingContentNonComplyFlagBit;
 					$target->_warnings[KDLConstants::AudioIndex][] = 
 						KDLWarnings::ToString(KDLWarnings::MissingMediaStream);
-					$target->_audio = null; // NOT COMMITTED
 				}
 			}
 		}
