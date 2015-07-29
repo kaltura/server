@@ -955,7 +955,7 @@ class KalturaEntryService extends KalturaBaseService
 	 * @param KalturaBaseEntry $entry
 	 * @return entry
 	 */
-	protected function add($entry, $conversionProfileId = null)
+	protected function add(KalturaBaseEntry $entry, $conversionProfileId = null)
 	{
 		$dbEntry = null;
 		$conversionProfile = myPartnerUtils::getConversionProfile2ForPartner($this->getPartnerId(), $conversionProfileId);
@@ -965,10 +965,7 @@ class KalturaEntryService extends KalturaBaseService
 			if($templateEntry)
 			{
 				$dbEntry = $templateEntry->copyTemplate(true);
-				if ($entry)
-				{
-					$dbEntry->save();
-				}
+				$dbEntry->save();
 			}
 			else
 			{
@@ -976,14 +973,7 @@ class KalturaEntryService extends KalturaBaseService
 			}
 		}
 		
-		if ($entry)
-		{
-			return $this->prepareEntryForInsert($entry, $dbEntry);
-		}
-		else
-		{
-			return $dbEntry;
-		}
+		return $this->prepareEntryForInsert($entry, $dbEntry);
 	}
 	
 	/**

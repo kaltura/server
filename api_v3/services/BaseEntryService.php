@@ -271,8 +271,8 @@ class BaseEntryService extends KalturaEntryService
 	    if (!$entry->name)
 		    $entry->name = $this->getPartnerId().'_'.time();
 
-	    $dbEntry = parent::add(null, $entry->conversionProfileId);
 	    // first copy all the properties to the db entry, then we'll check for security stuff
+	    $dbEntry = $this->duplicateTemplateEntry($entry->conversionProfileId);
 	    $dbEntry = $entry->toInsertableObject($dbEntry);
 	    
 
@@ -853,5 +853,20 @@ class BaseEntryService extends KalturaEntryService
 		$clonedEntry = myEntryUtils::copyEntry( $coreEntry, $this->getPartner() );
 
 		return $this->getEntry($clonedEntry->getId());
+	}
+	
+	protected function duplicateTemplateEntry($conversionProfileId)
+	{
+		$dbEntry = null;
+		$conversionProfile = myPartnerUtils::getConversionProfile2ForPartner($this->getPartnerId(), $conversionProfileId);
+		if($conversionProfile && $conversionProfile->getDefaultEntryId())
+		{
+			$templateEntry = entryPeer::retrieveByPKNoFilter($conversionProfile->getDefaultEntryId(), null, false);
+			if ($templateEntry)
+			{
+				$dbEntry = $templateEntry->copyTemplate(true);
+				return $dbEntry;
+			}
+		}
 	}
 }
