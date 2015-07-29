@@ -230,6 +230,9 @@ class KalturaBaseEntryFilter extends KalturaBaseEntryBaseFilter
 	 */
 	public function validateForResponseProfile()
 	{
+		if(PermissionPeer::isValidForPartner(PermissionName::FEATURE_ENABLE_RESPONSE_PROFILE_USER_CACHE, kCurrentContext::getCurrentPartnerId()))
+			return;
+		
 		if(kEntitlementUtils::getEntitlementEnforcement())
 		{
 			throw new KalturaAPIException(KalturaErrors::CANNOT_LIST_RELATED_ENTITLED_WHEN_ENTITLEMENT_IS_ENABLE, get_class($this));
