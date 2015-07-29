@@ -216,10 +216,10 @@ function serveAction($id)
 	public function serveLogAction($id)
 	{
 		$c = new Criteria();
-        $c->addAnd(BatchJobLogPeer::JOB_ID, $id);
-        $c->addAnd(BatchJobLogPeer::PARTNER_ID, $this->getPartnerId());
-        $c->addAnd(BatchJobLogPeer::JOB_TYPE, BatchJobType::BULKUPLOAD);
-        $batchJob = BatchJobLogPeer::doSelectOne($c);
+		$c->addAnd(BatchJobLogPeer::JOB_ID, $id);
+		$c->addAnd(BatchJobLogPeer::PARTNER_ID, $this->getPartnerId());
+		$c->addAnd(BatchJobLogPeer::JOB_TYPE, BatchJobType::BULKUPLOAD);
+		$batchJob = BatchJobLogPeer::doSelectOne($c);
 
 		if (!$batchJob)
 			throw new KalturaAPIException(KalturaErrors::BULK_UPLOAD_NOT_FOUND, $id);
