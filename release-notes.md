@@ -1,3 +1,22 @@
+# Jupiter-10.17.0 #
+
+## new Transcript asset ##
+
+-- Issue Type: New Feature
+-- Issue ID: PLAT-2622
+
+#### Configuration ####
+ 
+- Added 'Transcript' in configurations/plugins.ini.base and configurations/plugins.ini.admin
+
+#### Deployment Scripts ####
+
+ - php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+
+#### Known Issues & Limitations ####
+
+None.
+
 # Jupiter-10.16.0 #
 
 ## New applehttp to multicast delivery profile ##
