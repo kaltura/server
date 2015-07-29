@@ -67,6 +67,7 @@ usort($services, "compareServicesByName");
 <script type="text/javascript" src="js/kField.js"></script>
 <script type="text/javascript" src="js/kDialog.js"></script>
 <script type="text/javascript" src="js/kTestMe.js"></script>
+<script type="text/javascript" src="js/ace-builds/src/ace.js"></script>
 <script type="text/javascript" src="js/kPrettify.js"></script>
 <!-- script type="text/javascript" src="js/kHttpSpy.js"></script -->
 <script type="text/javascript">
@@ -97,16 +98,33 @@ usort($services, "compareServicesByName");
 						},
 						success: function(results) {
 							var idxFormat = this.data.indexOf('format=');
-							var format = 'XML';
+							var format = 'xml';
+							var text ="";
 							if (idxFormat >= 0 ) // if not set should consider default as XML
 							{
 								var type = this.data.substring(idxFormat+7,idxFormat+8);
 								if ( type == 1 ){
-									format = 'JSON'
+									format = 'json'
+									text = identJSON(results, "\n", " ");
 								}
 							}
-							var prettified = prettify(format, results);
-							$('#response').html(prettified);
+							if ( format == 'xml') {
+								var para = document.createElement("div");
+								para.appendChild(results.firstChild);
+								text =  para.innerHTML;
+								text = identXML(text);
+							}
+
+							var editor = ace.edit("response");
+							editor.setTheme("ace/theme/eclipse");
+							var session = editor.getSession();
+							session.setMode("ace/mode/" + format);
+							session.setTabSize(4);
+							session.setUseWrapMode(true);
+							editor.setShowPrintMargin(false);
+							editor.setValue(text);
+							editor.setReadOnly(true);
+
 
 						}
 					})
