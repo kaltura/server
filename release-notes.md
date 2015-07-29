@@ -1,5 +1,23 @@
 # Jupiter-10.17.0 #
 
+## new Transcript asset ##
+
+-- Issue Type: New Feature
+-- Issue ID: PLAT-2622
+
+#### Configuration ####
+ 
+- Added 'Transcript' in configurations/plugins.ini.base and configurations/plugins.ini.admin
+
+#### Deployment Scripts ####
+
+Run:
+ 	- php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+
+#### Known Issues & Limitations ####
+
+None.
+
 ## Allow PLAYBACK_BASE_ROLE to user user_entry and quiz ##
 
 -- Issue Type: Permission to existing API 
