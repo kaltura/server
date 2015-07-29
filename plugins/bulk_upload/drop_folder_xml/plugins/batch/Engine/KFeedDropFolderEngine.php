@@ -198,14 +198,6 @@ class KFeedDropFolderEngine extends KDropFolderEngine
 			
 		}
 		
-		//Update format of the pubDate to the Y-m-dThh:mm:ss format
-		$publishDate = strval($this->getSingleXPathResult($this->dropFolder->feedItemInfo->itemPublishDateXPath, $feedItem));
-		$pubDateItems = $feedItem->xpath ($this->dropFolder->feedItemInfo->itemPublishDateXPath);
-		foreach ($pubDateItems as $pubDateItem)
-		{
-			$pubDateItem[0][0] = date('c', strtotime($publishDate));
-		}
-		
 		$updatedGuid = str_replace (self::$searchCharacters, self::$replaceCharacters, strval ($feedItem->guid));
 		
 		$feedItemPath = KBatchBase::$taskConfig->params->mrss->xmlPath . DIRECTORY_SEPARATOR. $updatedGuid . '_' . time();
