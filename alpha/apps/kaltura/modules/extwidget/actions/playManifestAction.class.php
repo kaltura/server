@@ -996,9 +996,9 @@ class playManifestAction extends kalturaAction
 		$renderer->contributors = array();
 		$config = new kManifestContributorConfig();
 		$config->format = $this->deliveryAttributes->getFormat();
-		$config->deliveryCode = $deliveryCode;
 		$config->storageId = $this->deliveryAttributes->getStorageId();
 		$config->entryId = $this->entryId;
+		$config->rendererClass = get_class($renderer);
 		$contributors = KalturaPluginManager::getPluginInstances('IKalturaPlayManifestContributor');
 		foreach ($contributors as $contributor)
 		{
