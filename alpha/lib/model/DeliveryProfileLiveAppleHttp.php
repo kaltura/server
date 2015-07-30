@@ -147,20 +147,14 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 		return in_array(self::M3U8_PLAYLIST_END_LIST_IDENTIFIER, array_map('trim', explode("\n", $content)));
 	}
 	
-	public function disableExtraAttributes(&$baseUrl)
-	{
-		if($this->getDisableExtraAttributes()) {
-			$baseUrl = kDeliveryUtils::addQueryParameter($baseUrl, "attributes=off");
-		}
-	}
-	
 	/**
 	 * Fetch the manifest and build all flavors array
 	 * @param string $url
 	 */
 	private function buildM3u8Flavors($url, array &$flavors)
 	{
-		$this->disableExtraAttributes($url, $flavors);
+		if($this->getDisableExtraAttributes())
+			$url = kDeliveryUtils::addQueryParameter($url, "attributes=off");
 		
 		$manifest = KCurlWrapper::getContent($url);
 		if(!$manifest)
