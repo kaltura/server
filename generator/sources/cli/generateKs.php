@@ -76,12 +76,20 @@ if (isset($options['widget']))
 if (!isset($options['bare']))
 	echo "ks\t";
 
-if (!isset($options['version']) || $options['version'] == 1)
+$version = isset($options['version']) ? $options['version'] : 1;
+switch ($version)
+{ 
+case 1:
 	$ks = KalturaSession::generateKsV1($adminSecret, $user, $type, $partnerId, $expiry, $privileges, null, null);
-else if ($options['version'] == 2)
+	break;
+
+case 2:
 	$ks = KalturaSession::generateKsV2($adminSecret, $user, $type, $partnerId, $expiry, $privileges, null, null);
-else 
-	die("Invalid version {$options['version']}\n");
+	break;
+
+default:
+	die("Invalid version {$version}\n");
+}
 	
 echo $ks;
 
