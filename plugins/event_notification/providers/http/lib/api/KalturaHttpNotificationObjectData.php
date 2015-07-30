@@ -118,6 +118,6 @@ class KalturaHttpNotificationObjectData extends KalturaHttpNotificationData
 				break;
 		}
 		
-		return "data=$data";
+		return 'data=' . urlencode($data);
 	}
 }
