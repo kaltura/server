@@ -91,4 +91,34 @@ class kDeliveryUtils {
 		
 		return $url;
 	}
+
+	/**
+	 * Extract all non-empty / non-comment lines from a .m3u/.m3u8 content
+	 * @param $content array|string Full file content as a single string or as a lines-array
+	 * @return array Valid lines
+	 */
+	public static function getM3U8Urls( $content )
+	{
+		$outLines = array();
+	
+		$lines = is_array($content) ? $content : explode("\n", trim($content));
+
+		if (trim(reset($lines)) != '#EXTM3U')
+		{
+			return $outLines;
+		}
+		
+		foreach ( $lines as $line )
+		{
+			$line = trim($line);
+			if (!$line || $line[0] == '#')
+			{
+				continue;
+			}
+	
+			$outLines[] = $line;
+		}
+	
+		return $outLines;
+	}
 }
