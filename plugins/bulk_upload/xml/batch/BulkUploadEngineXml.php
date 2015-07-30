@@ -184,6 +184,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		
 		libxml_clear_errors();
 		$proc = new XSLTProcessor;
+		$proc->registerPHPFunctions(kXml::getXslEnabledPhpFunctions());
 		$xsl = new KDOMDocument();
 		if(!$xsl->loadXML($this->conversionProfileXsl)){
 			KalturaLog::debug("Could not load xsl".$this->conversionProfileXsl);
