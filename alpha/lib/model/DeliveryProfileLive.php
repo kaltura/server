@@ -91,7 +91,8 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 	
 	public function finalizeUrls(&$baseUrl, &$flavorsUrls)
 	{
-		$baseUrl = $this->getEdgeServerUrls($baseUrl);
+		if($this->params->getEdgeServerIds())
+			$baseUrl = $this->getEdgeServerUrls($baseUrl);
 	}
 	
 	public function isLive ($url) {
