@@ -38,7 +38,10 @@ class KalturaDeliveryProfileFactory {
 			case KalturaDeliveryProfileType::GENERIC_RTMP:
 				return new KalturaDeliveryProfileGenericRtmp();
 			default:
-				return new KalturaDeliveryProfile();
+				$obj = KalturaPluginManager::loadObject('KalturaDeliveryProfile', $type);
+				if(!$obj)
+					$obj = new KalturaDeliveryProfile();
+				return $obj;
 		}
 	}
 	
