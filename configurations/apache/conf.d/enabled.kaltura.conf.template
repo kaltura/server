@@ -135,7 +135,7 @@ Alias /sf "/usr/share/pear/data/symfony/web/sf/"
 	RewriteRule ^krecord/(.*)$ /index.php/extwidget/krecord/$1 [L]
 	RewriteRule ^kgeneric/(.*)$ /index.php/extwidget/kgeneric/$1 [L]
 	
-	RewriteRule ^api/(.*)$ /index.php/partnerservices2/$1 [L]
+	RewriteRule ^api/(.*)$ /api_v3/index.php/$1 [L]
 	
 	RewriteRule ^p/[-0-9]+/content/(.*)$ /content/$1 [L]
 	RewriteRule ^p/[-0-9]+/sp/[-0-9]+/content/(.*)$ /content/$1 [L]

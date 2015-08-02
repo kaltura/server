@@ -83,9 +83,9 @@ module Kaltura
 				params = {}
 				files = {}
 					
-				url = @config.service_url+"/api_v3/index.php"
+				url = @config.service_url+"/api/"
 				if (@is_multirequest)
-					add_param(params, "service", "multirequest")
+					url += "service/multirequest/"
 					i = 0
 					@calls_queue.each do |call|
 						call_params = call.get_params_for_multirequest(i)
@@ -96,8 +96,7 @@ module Kaltura
 					end
 				else
 					call = @calls_queue[0]
-					add_param(params, "service", call.service)
-					add_param(params, "action", call.action)
+					url += "service/#{call.service}/action/#{call.action}/"
 					params.merge!(call.params)
 					files = call.files
 				end
