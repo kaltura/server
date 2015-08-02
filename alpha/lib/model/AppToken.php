@@ -14,7 +14,7 @@
  */
 class AppToken extends BaseAppToken
 {
-	const CUSTOM_DATA_FIELD_HASH_FUNCTION = 'hashFunction';
+	const CUSTOM_DATA_FIELD_HASH_FUNCTION = 'hashType';
 
 	private function calculateId()
 	{
@@ -55,14 +55,20 @@ class AppToken extends BaseAppToken
 		return parent::preUpdate($con);
 	}
 
-	public function setHashFunction($hashFunction)
+	public function setHashType($hashFunction)
 	{
 		$this->putInCustomData(self::CUSTOM_DATA_FIELD_HASH_FUNCTION, $hashFunction);
 	}
 	
-	public function getHashFunction()
+	public function getHashType()
 	{
 		$hashFunctionId = $this->getFromCustomData(self::CUSTOM_DATA_FIELD_HASH_FUNCTION, null, 1);
 		return KalturaAppTokenHashType::$HASH_MAP[$hashFunctionId];
+	}
+
+	public function calcHash()
+	{
+		$hashFunction = $this->getHashType();
+		return hash($hashFunction, kCurrentContext::$ks . $this->getToken());
 	}
 } // AppToken
