@@ -349,6 +349,7 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 	 */
 	public function getReportResult($partner_id, $report_type, $report_flavor, $objectIds, $orderBy = null)
 	{
+		KalturaLog::debug("@@NA line to break on");
 		if (!in_array(str_replace(self::getPluginName().".", "", $report_type), QuizReportType::getAdditionalValues()))
 		{
 			return null;
@@ -379,7 +380,8 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 					return $this->getUserPrecentageByUserTable($objectIds, $orderBy);
 				}
 			case myReportsMgr::REPORT_FLAVOR_COUNT:
-				if ($report_type == self::getPluginName() . "." . QuizReportType::QUIZ)
+				if ( ($report_type == self::getPluginName() . "." . QuizReportType::QUIZ) ||
+					($report_type == self::getPluginName() . "." . QuizReportType::QUIZ_USER_PERCENTAGE) )
 				{
 					return $this->getReportCount($objectIds);
 				}
