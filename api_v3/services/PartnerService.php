@@ -94,16 +94,11 @@ class PartnerService extends KalturaBaseService
 			$partner_registration->sendRegistrationInformationForPartner( $dbPartner , false, $existingUser, $silent );
 
 		}
-		catch ( SignupException $se )
-		{
-			KalturaLog::INFO($se);
-			throw new KalturaAPIException( APIErrors::PARTNER_REGISTRATION_ERROR , 'SE '.$se->getMessage() );
-		}
 		catch ( Exception $ex )
 		{
 			KalturaLog::CRIT($ex);
 			// this assumes the partner name is unique - TODO - remove key from DB !
-			throw new KalturaAPIException( APIErrors::PARTNER_REGISTRATION_ERROR , $ex->getMessage() );
+			throw new KalturaAPIException( APIErrors::PARTNER_REGISTRATION_ERROR);
 		}		
 		
 		$partner = new KalturaPartner(); // start from blank
