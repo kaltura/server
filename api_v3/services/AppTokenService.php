@@ -157,7 +157,7 @@ class AppTokenService extends KalturaBaseService
 		if($dbAppToken->getStatus() != AppTokenStatus::ACTIVE)
 			throw new KalturaAPIException(KalturaErrors::APP_TOKEN_NOT_ACTIVE, $id);
 		
-		$appTokenHash = sha1(kCurrentContext::$ks . $dbAppToken->getToken());
+		$appTokenHash = $this->calcHash($dbAppToken);
 		if($appTokenHash !== $tokenHash)
 			throw new KalturaAPIException(KalturaErrors::INVALID_APP_TOKEN_HASH);
 		
@@ -212,4 +212,11 @@ class AppTokenService extends KalturaBaseService
 		
 		return $sessionInfo;
 	}
-}
+	
+	protected function calcHash(AppToken $dbAppToken)
+	{
+		$hashFunction = $dbAppToken->getHashFunction();
+		return hash($hashFunction, kCurrentContext::$ks . $dbAppToken->getToken());
+	}
+	
+};

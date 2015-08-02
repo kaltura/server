@@ -14,6 +14,8 @@
  */
 class AppToken extends BaseAppToken
 {
+	const CUSTOM_DATA_FIELD_HASH_FUNCTION = 'hashFunction';
+
 	private function calculateId()
 	{
 		$dc = kDataCenterMgr::getCurrentDc();
@@ -51,5 +53,16 @@ class AppToken extends BaseAppToken
 		}
 		
 		return parent::preUpdate($con);
+	}
+
+	public function setHashFunction($hashFunction)
+	{
+		$this->putInCustomData(self::CUSTOM_DATA_FIELD_HASH_FUNCTION, $hashFunction);
+	}
+	
+	public function getHashFunction()
+	{
+		$hashFunctionId = $this->getFromCustomData(self::CUSTOM_DATA_FIELD_HASH_FUNCTION, null, 1);
+		return KalturaAppTokenHashType::$HASH_MAP[$hashFunctionId];
 	}
 } // AppToken
