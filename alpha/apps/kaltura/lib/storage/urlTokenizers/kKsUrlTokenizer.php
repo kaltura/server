@@ -40,8 +40,12 @@ class kKsUrlTokenizer extends kUrlTokenizer
 			KExternalErrors::dieError(KExternalErrors::MISSING_PARAMETER, 'ks user');
 		}
 		
+		$uriRestrict = explode(',', $url);		// cannot contain commas, since it's used as the privileges delimiter
+		$uriRestrict = $uriRestrict[0];
+		
 		$privileges = kSessionBase::PRIVILEGE_DISABLE_ENTITLEMENT_FOR_ENTRY . ':' . $this->entryId;
 		$privileges .= ',' . kSessionBase::PRIVILEGE_VIEW . ':' . $this->entryId;
+		$privileges .= ',' . kSessionBase::PRIVILEGE_URI_RESTRICTION . ':' . $uriRestrict . '*';
 
 		$ks = kSessionBase::generateKsV2(
 			$this->key, 
