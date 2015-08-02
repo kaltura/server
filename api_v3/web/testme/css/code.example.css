@@ -10,7 +10,7 @@
 
 .code { overflow: auto; background-color: #FFFFFF;  height: 179px; }
 #example { padding-left: 10px; line-height: 20px; font-size: 12px; font-family: monospace; }
-
+#disclaimer { padding-left: 10px; line-height: 20px; font-size: 13px; font-family: monospace; font-weight: bold;}
 .indent {margin-left: 30px}
 
 .code-php-code {color: #FF0000;}

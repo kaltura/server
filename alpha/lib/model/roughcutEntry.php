@@ -8,7 +8,7 @@
  * @package Core
  * @subpackage model
  */ 
-class roughcutEntry extends BaseroughcutEntry
+class roughcutEntry extends BaseroughcutEntry implements IBaseObject
 {
 	const ROUGHCUT_ENTRY_OP_TYPE_ADD = 1;
 	const ROUGHCUT_ENTRY_OP_TYPE_REMOVE = -1;

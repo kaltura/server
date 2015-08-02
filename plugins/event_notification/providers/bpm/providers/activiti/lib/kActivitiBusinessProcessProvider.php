@@ -24,6 +24,14 @@ class kActivitiBusinessProcessProvider extends kBusinessProcessProvider
 	}
 	
 	/* (non-PHPdoc)
+	 * @see kBusinessProcessProvider::enableDebug()
+	 */
+	public function enableDebug($enable)
+	{
+		$this->client->setDebug($enable);
+	}
+	
+	/* (non-PHPdoc)
 	 * @see kBusinessProcessProvider::listBusinessProcesses()
 	 */
 	public function listBusinessProcesses()

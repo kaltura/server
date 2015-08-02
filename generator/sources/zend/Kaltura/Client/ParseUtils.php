@@ -41,7 +41,7 @@ class Kaltura_Client_ParseUtils
 		if(!class_exists($type)) {
 			$type = Kaltura_Client_TypeMap::getZendType($fallbackType);
 			if(!class_exists($type))
-				throw new ClientException("Invalid object type class [$type] of Kaltura type [$objectType]", ClientException::ERROR_INVALID_OBJECT_TYPE);
+				throw new Kaltura_Client_ClientException("Invalid object type class [$type] of Kaltura type [$objectType]", Kaltura_Client_ClientException::ERROR_INVALID_OBJECT_TYPE);
 		}
 			
 		return new $type($xml);
@@ -56,6 +56,16 @@ class Kaltura_Client_ParseUtils
 			
 		return $ret;
 	}
+	
+	public static function unmarshalMap(\SimpleXMLElement $xml, $fallbackType = null)
+	{
+		$xmls = $xml->children();
+		$ret = array();
+		foreach($xmls as $xml)
+			$ret[strval($xml->itemKey)] = self::unmarshalObject($xml, $fallbackType);
+			
+		return $ret;
+	}
 
 	public static function checkIfError(\SimpleXMLElement $xml, $throwException = true) 
 	{
@@ -63,10 +73,11 @@ class Kaltura_Client_ParseUtils
 		{
 			$code = "{$xml->error->code}";
 			$message = "{$xml->error->message}";
+			$arguments = self::unmarshalArray($xml->error->args, 'KalturaApiExceptionArg');
 			if($throwException)
-				throw new Kaltura_Client_Exception($message, $code);
+				throw new Kaltura_Client_Exception($message, $code, $arguments);
 			else 
-				return new Kaltura_Client_Exception($message, $code);
+				return new Kaltura_Client_Exception($message, $code, $arguments);
 		}
 	}
 }

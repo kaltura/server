@@ -321,7 +321,9 @@ div.description ul button { padding: 0 5px;} /* vertical-align:1px; */
 #previewModal .options .advance a { font-weight: bold; }
 #previewModal .help-block { font-size: 11px; color: #999;}
 #previewModal .checkbox { font-size: 12px; font-weight: bold; color: #444; }
+#previewModal .checkboxdisabled { font-size: 12px; font-weight: bold; color: #cacaca; cursor: auto}
 #previewModal .checkbox input { margin-right: 5px; }
+#previewModal .checkboxdisabled input { margin-right: 5px;; cursor: auto}
 #previewModal .qr-placeholder { width: 80px; height: 80px; border: 1px solid #999; background: #efefef; }
 #previewModal .qr-text { margin-top: 43%; margin-left: 14%;font-size: 11px; }
 #previewModal .copy-code { font-size: 11px}

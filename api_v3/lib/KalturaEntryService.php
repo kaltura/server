@@ -140,6 +140,7 @@ class KalturaEntryService extends KalturaBaseService
 		$tempDbEntry->setDisplayInSearch(mySearchUtils::DISPLAY_IN_SEARCH_SYSTEM);
 		$tempDbEntry->setPartnerId($dbEntry->getPartnerId());
 		$tempDbEntry->setReplacedEntryId($dbEntry->getId());
+		$tempDbEntry->setIsTemporary(true);
 		$tempDbEntry->save();
 		
 		$dbEntry->setReplacingEntryId($tempDbEntry->getId());
@@ -697,8 +698,10 @@ class KalturaEntryService extends KalturaBaseService
 			if($srcEntryId)
 			{
 				$srcEntry = entryPeer::retrieveByPKNoFilter($srcEntryId);
-				if($srcEntry)
+				if($srcEntry) {
+					$dbEntry->setSourceEntryId($srcEntryId);
 					$dbEntry->setRootEntryId($srcEntry->getRootEntryId(true));
+				}
 			}
 			
 			$dbEntry->setOperationAttributes($operationAttributes);
@@ -958,7 +961,7 @@ class KalturaEntryService extends KalturaBaseService
 		$conversionProfile = myPartnerUtils::getConversionProfile2ForPartner($this->getPartnerId(), $conversionProfileId);
 		if($conversionProfile && $conversionProfile->getDefaultEntryId())
 		{
-			$templateEntry = entryPeer::retrieveByPK($conversionProfile->getDefaultEntryId());
+			$templateEntry = entryPeer::retrieveByPKNoFilter($conversionProfile->getDefaultEntryId(), null, false);
 			if($templateEntry)
 			{
 				$dbEntry = $templateEntry->copyTemplate(true);
@@ -979,7 +982,7 @@ class KalturaEntryService extends KalturaBaseService
 	 * @param string $entryId Media entry id
 	 * @param int $conversionProfileId
 	 * @param KalturaConversionAttributeArray $dynamicConversionAttributes
-	 * @return int job id
+	 * @return bigint job id
 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
 	 * @throws KalturaErrors::CONVERSION_PROFILE_ID_NOT_FOUND
 	 * @throws KalturaErrors::FLAVOR_PARAMS_NOT_FOUND
@@ -990,9 +993,7 @@ class KalturaEntryService extends KalturaBaseService
 
 		if (!$entry)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
-			
 		
-			
 		$srcFlavorAsset = assetPeer::retrieveOriginalByEntryId($entryId);
 		if(!$srcFlavorAsset)
 			throw new KalturaAPIException(KalturaErrors::ORIGINAL_FLAVOR_ASSET_IS_MISSING);
@@ -1179,45 +1180,6 @@ class KalturaEntryService extends KalturaBaseService
 		return $listResponse;
 	}
 	
-	/**
-	 * @param KalturaBaseEntryFilter $filter
-	 * @param KalturaFilterPager $pager
-	 * @return KalturaCriteria
-	 */
-	protected function prepareEntriesCriteriaFilter(KalturaBaseEntryFilter $filter = null, KalturaFilterPager $pager = null)
-	{
-		if (!$filter)
-			$filter = new KalturaBaseEntryFilter();
-
-		// because by default we will display only READY entries, and when deleted status is requested, we don't want this to disturb
-		entryPeer::allowDeletedInCriteriaFilter(); 
-		
-		$c = KalturaCriteria::create(entryPeer::OM_CLASS);
-	
-		if( $filter->idEqual == null && $filter->redirectFromEntryId == null )
-        {
-        	$this->setDefaultStatus($filter);
-            $this->setDefaultModerationStatus($filter);
-            if($filter->parentEntryIdEqual == null)
-            	$c->add(entryPeer::DISPLAY_IN_SEARCH, mySearchUtils::DISPLAY_IN_SEARCH_SYSTEM, Criteria::NOT_EQUAL);
-		}
-		
-		$this->fixFilterUserId($filter);
-		$this->fixFilterDuration($filter);
-		
-		$entryFilter = new entryFilter();
-		$entryFilter->setPartnerSearchScope(baseObjectFilter::MATCH_KALTURA_NETWORK_AND_PRIVATE);
-		
-		$filter->toObject($entryFilter);
-		
-		if($pager)
-			$pager->attachToCriteria($c);
-			
-		$entryFilter->attachToCriteria($c);
-		
-		return $c;
-	}
-	
 	protected function listEntriesByFilter(KalturaBaseEntryFilter $filter = null, KalturaFilterPager $pager = null)
 	{
 		myDbHelper::$use_alternative_con = myDbHelper::DB_HELPER_CONN_PROPEL3;
@@ -1235,7 +1197,7 @@ class KalturaEntryService extends KalturaBaseService
 		if (!$pager)
 			$pager = new KalturaFilterPager();
 		
-		$c = $this->prepareEntriesCriteriaFilter($filter, $pager);
+		$c = $filter->prepareEntriesCriteriaFilter($pager);
 		
 		if ($disableWidgetSessionFilters)
 			KalturaCriterion::disableTag(KalturaCriterion::TAG_WIDGET_SESSION);
@@ -1253,7 +1215,10 @@ class KalturaEntryService extends KalturaBaseService
 	{
 		myDbHelper::$use_alternative_con = myDbHelper::DB_HELPER_CONN_PROPEL3;
 
-		$c = $this->prepareEntriesCriteriaFilter($filter, null);
+		if(!$filter)
+			$filter = new KalturaBaseEntryFilter();
+			
+		$c = $filter->prepareEntriesCriteriaFilter();
 		$c->applyFilters();
 		$totalCount = $c->getRecordsCount();
 		
@@ -1839,57 +1804,6 @@ class KalturaEntryService extends KalturaBaseService
 		}
 	}
 	
-	/**
-	 * The user_id is infact a puser_id and the kuser_id should be retrieved
-	 * 
-	 * @param KalturaBaseEntryFilter $filter
-	 */
-	private function fixFilterUserId(KalturaBaseEntryFilter $filter)
-	{
-		if ($filter->userIdEqual !== null)
-		{
-			$kuser = kuserPeer::getKuserByPartnerAndUid($this->getPartnerId(), $filter->userIdEqual);
-			if ($kuser)
-				$filter->userIdEqual = $kuser->getId();
-			else 
-				$filter->userIdEqual = -1; // no result will be returned when the user is missing
-		}
-
-		if(!empty($filter->userIdIn))
-		{
-			$filter->userIdIn = $this->preparePusersToKusersFilter( $filter->userIdIn );
-		}
-
-		if(!empty($filter->entitledUsersEditMatchAnd))
-		{
-			$filter->entitledUsersEditMatchAnd = $this->preparePusersToKusersFilter( $filter->entitledUsersEditMatchAnd );
-		}
-
-		if(!empty($filter->entitledUsersPublishMatchAnd))
-		{
-			$filter->entitledUsersPublishMatchAnd = $this->preparePusersToKusersFilter( $filter->entitledUsersPublishMatchAnd );
-		}
-	}
-
-	private function preparePusersToKusersFilter( $puserIdsCsv )
-	{
-		$kuserIdsArr = array();
-		$puserIdsArr = explode(',',$puserIdsCsv);
-		$kuserArr = kuserPeer::getKuserByPartnerAndUids($this->getPartnerId() , $puserIdsArr);
-
-		foreach($kuserArr as $kuser)
-		{
-			$kuserIdsArr[] = $kuser->getId();
-		}
-
-		if(!empty($kuserIdsArr))
-		{
-			return implode(',',$kuserIdsArr);
-		}
-
-		return -1; // no result will be returned if no puser exists
-	}
-
 	/**
 	 * Convert duration in seconds to msecs (because the duration field is mapped to length_in_msec)
 	 * 

@@ -24,6 +24,13 @@ class Metadata extends BaseMetadata implements IIndexable, ISyncableFile
 	 * @var MetadataProfile
 	 */
 	protected $aMetadataProfile;
+
+	/**
+	 * Metadata is counted as new during the metadata.add API
+	 *
+	 * @var bool
+	 */
+	protected $likeNew = false;
 	
 	/* (non-PHPdoc)
 	 * @see metadata/lib/model/om/BaseMetadata#preInsert()
@@ -71,7 +78,6 @@ class Metadata extends BaseMetadata implements IIndexable, ISyncableFile
 	public function incrementVersion()
 	{
 		$newVersion = kFileSyncUtils::calcObjectNewVersion($this->getId(), $this->getVersion(), FileSyncObjectType::METADATA, self::FILE_SYNC_METADATA_DATA);
-		
 		$this->setVersion($newVersion);
 	}
 	
@@ -176,6 +182,11 @@ class Metadata extends BaseMetadata implements IIndexable, ISyncableFile
 		return array("metadata:objectId=".strtolower($this->getObjectId()));
 	}
 
+	public function getSphinxMatchOptimizations() {
+		$objectName = $this->getIndexObjectName();
+		return $objectName::getSphinxMatchOptimizations($this);
+	}
+
 	/**
 	 * @return int
 	 */
@@ -208,6 +219,23 @@ class Metadata extends BaseMetadata implements IIndexable, ISyncableFile
 	 */
 	public function indexToSearchIndex()
 	{
-		kEventsManager::raiseEventDeferred(new kObjectReadyForIndexEvent($this));
+		if ($this->getObjectType() == MetadataObjectType::DYNAMIC_OBJECT)
+			kEventsManager::raiseEventDeferred(new kObjectReadyForIndexEvent($this));
+	}
+
+	/**
+	 * @return boolean
+	 */
+	public function isLikeNew()
+	{
+		return $this->likeNew;
+	}
+
+	/**
+	 * @param boolean $likeNew
+	 */
+	public function setLikeNew($likeNew)
+	{
+		$this->likeNew = $likeNew;
 	}
 } // Metadata

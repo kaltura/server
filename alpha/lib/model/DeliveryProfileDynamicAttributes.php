@@ -1,12 +1,24 @@
 <?php
 
 /**
- * This class centralizes all the delivery attributes that are specific for a given request  
+ * This class centralizes all the delivery attributes that are specific for a given request
  * and not general for the delivery definition.
  * For example- when a request is passed from the Playmanifest - all parameters should be passed through 
  * this data transfer object 
  */
 class DeliveryProfileDynamicAttributes {
+	
+	/**
+	 * List of delivery profiles ids which should be enfroced due to an access control action
+	 * @var array
+	 */
+	protected $deliveryProfileIds = null;
+	
+	/**
+	 * Defines whether the list of delivery profiles should be whitelist or blacklisted 
+	 * @var bool
+	 */
+	protected $isDeliveryProfilesBlockedList = null;
 	
 	/**
 	 * @var string
@@ -34,9 +46,9 @@ class DeliveryProfileDynamicAttributes {
 	protected $clipTo = null;
 	
 	/**
-	 * @var int
+	 * @var float
 	 */
-	protected $storageProfileId = null;
+	protected $playbackRate = null;
 	
 	/**
 	 * @var int
@@ -101,6 +113,31 @@ class DeliveryProfileDynamicAttributes {
 	protected $uiConfId = null;
 	
 	/**
+	 * @var string
+	 */
+	protected $urlParams = '';
+	
+	/**
+	 * List of edge server ids content should b server from
+	 * @var array
+	 */
+	protected $edgeServerIds;
+
+	/**
+	 * @return the $deliveryProfileIds
+	 */
+	public function getDeliveryProfileIds() {
+		return $this->deliveryProfileIds;
+	}
+
+	/**
+	 * @return the $isDeliveryProfilesBlockedList
+	 */
+	public function getIsDeliveryProfilesBlockedList() {
+		return $this->isDeliveryProfilesBlockedList;
+	}
+		
+	/**
 	 * @return the $format
 	 */
 	public function getFormat() {
@@ -134,12 +171,12 @@ class DeliveryProfileDynamicAttributes {
 	public function getClipTo() {
 		return $this->clipTo;
 	}
-
+	
 	/**
-	 * @return the $storageProfileId
+	 * @return the $playbackRate
 	 */
-	public function getStorageProfileId() {
-		return $this->storageProfileId;
+	public function getPlaybackRate() {
+		return $this->playbackRate;
 	}
 
 	/**
@@ -185,6 +222,15 @@ class DeliveryProfileDynamicAttributes {
 	}
 
 	/**
+	 * @param string $deliveryProfileIds
+	 * @param bool $isBlockedList
+	 */
+	public function setDeliveryProfileIds($deliveryProfileIds, $isBlockedList) {
+		$this->deliveryProfileIds = $deliveryProfileIds;
+		$this->isDeliveryProfilesBlockedList = $isBlockedList;
+	}
+
+	/**
 	 * @param string $format
 	 */
 	public function setFormat($format) {
@@ -220,12 +266,12 @@ class DeliveryProfileDynamicAttributes {
 	}
 
 	/**
-	 * @param number $storageProfileId
+	 * @param number $playbackRate
 	 */
-	public function setStorageProfileId($storageProfileId) {
-		$this->storageProfileId = $storageProfileId;
+	public function setPlaybackRate($playbackRate) {
+		$this->playbackRate = $playbackRate;
 	}
-
+	
 	/**
 	 * @param number $storageId
 	 */
@@ -359,6 +405,38 @@ class DeliveryProfileDynamicAttributes {
 	}
 
 	/**
+	 * @param string $urlParamsString
+	 */
+	public function setUrlParams($urlParamsString)
+	{
+		$this->urlParams = $urlParamsString;
+	}
+	
+	/**
+	 * @return the urlParams
+	 */
+	public function getUrlParams()
+	{
+		return $this->urlParams;
+	}
+	
+	/**
+	 * @return the edge server ids
+	 */
+	public function getEdgeServerIds()
+	{
+		return $this->edgeServerIds;
+	}
+	
+	/**
+	 * @param array edge server ids
+	 */
+	public function setEdgeServerIds($edgeServerIds)
+	{
+		$this->edgeServerIds = $edgeServerIds;
+	}
+	
+	/**
 	 * @param array<asset|assetParams> $flavors
 	 * @return array
 	 */
@@ -384,13 +462,35 @@ class DeliveryProfileDynamicAttributes {
 		}
 		return array();
 	}
+
+	/**
+	 * 
+	 * @param int $storageId
+	 * @param string $entryId
+	 * @param PlaybackProtocol $format
+	 * @param string $mediaProtocol
+	 * @return DeliveryProfileDynamicAttributes
+	 */
+	public static function init($storageId, $entryId, $format = PlaybackProtocol::HTTP, $mediaProtocol = null)
+	{
+		$instance = new DeliveryProfileDynamicAttributes();
+		$instance->setStorageId($storageId);
+		$instance->setEntryId($entryId);
+		$instance->setFormat($format);
+		$instance->setMediaProtocol($mediaProtocol);
+		
+		return $instance;
+	}
 	
 	public function cloneAttributes(DeliveryProfileDynamicAttributes $newObj) {
+		$this->deliveryProfileIds = $newObj->getDeliveryProfileIds();
+		$this->isDeliveryProfilesBlockedList = $newObj->getIsDeliveryProfilesBlockedList();
 		$this->format = $newObj->getFormat();
 		$this->extension = $newObj->getFileExtension();
 		$this->containerFormat = $newObj->getContainerFormat();
 		$this->seekFromTime = $newObj->getSeekFromTime();
 		$this->clipTo = $newObj->getClipTo();
+		$this->playbackRate = $newObj->getPlaybackRate();
 		$this->storageId = $newObj->getStorageId();
 		$this->entryId = $newObj->getEntryId();
 		$this->tags = $newObj->getTags();
@@ -403,6 +503,7 @@ class DeliveryProfileDynamicAttributes {
 		$this->usePlayServer = $newObj->getUsePlayServer();
 		$this->playerConfig = $newObj->getPlayerConfig();
 		$this->uiConfId = $newObj->getUiConfId();
+		$this->edgeServerIds = $newObj->getEdgeServerIds();
 	}
 }
 

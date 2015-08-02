@@ -13,6 +13,6 @@
  * @package plugins.audit
  * @subpackage model
  */
-class AuditTrailData extends BaseAuditTrailData {
+class AuditTrailData extends BaseAuditTrailData implements IBaseObject {
 
 } // AuditTrailData

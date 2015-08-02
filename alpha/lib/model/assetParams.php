@@ -8,7 +8,7 @@
  * @package Core
  * @subpackage model
  */ 
-class assetParams extends BaseassetParams
+class assetParams extends BaseassetParams implements IBaseObject
 {
 	const CONTAINER_FORMAT_FLV = "flv";
 	const CONTAINER_FORMAT_MP4 = "mp4";
@@ -21,14 +21,17 @@ class assetParams extends BaseassetParams
 	const CONTAINER_FORMAT_WMV = "wmv";
 	const CONTAINER_FORMAT_WMA = "wma";
 	const CONTAINER_FORMAT_ISMV = "ismv";
+	const CONTAINER_FORMAT_ISMA = "isma";
 	const CONTAINER_FORMAT_MKV = "mkv";
 	const CONTAINER_FORMAT_WEBM = "webm";
 	const CONTAINER_FORMAT_MPEG = "mpeg";
 	const CONTAINER_FORMAT_MPEGTS = "mpegts";
+	const CONTAINER_FORMAT_M2TS = "m2ts";
 	const CONTAINER_FORMAT_APPLEHTTP = "applehttp";
 	const CONTAINER_FORMAT_WAV = "wav";
 	const CONTAINER_FORMAT_HLS = "hls";
 	const CONTAINER_FORMAT_M4V = "m4v";
+	const CONTAINER_FORMAT_MXF = "mxf";
 	const CONTAINER_FORMAT_COPY = "copy";
 	
 	const CONTAINER_FORMAT_PDF = 'pdf';
@@ -41,6 +44,7 @@ class assetParams extends BaseassetParams
 	const CONTAINER_FORMAT_WIDEVINE = 'wvm';
 	
 	const TAG_SOURCE = "source";
+	const TAG_SAVE_SOURCE = "save_source";
 	const TAG_WEB = "web";
 	const TAG_MBR = "mbr";
 	const TAG_MOBILE = "mobile";

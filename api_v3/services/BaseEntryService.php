@@ -481,8 +481,14 @@ class BaseEntryService extends KalturaEntryService
 		{
 			$pager = new KalturaFilterPager();
 		}
-		
-		return $filter->getListResponse($pager, $this->getResponseProfile());
+
+		// NOTE: The following is a hack in order to make sure all responses are of type KalturaBaseEntryListResponse.
+		//       The reason is that baseentry::list() is not being extended by derived classes.
+		$result = $filter->getListResponse($pager, $this->getResponseProfile());
+		$response = new KalturaBaseEntryListResponse();
+		$response->objects = $result->objects;
+		$response->totalCount = $result->totalCount;
+		return $response;
 	}
 	
 	/**
@@ -729,7 +735,14 @@ class BaseEntryService extends KalturaEntryService
 		}
 		
 		$result->isScheduledNow = $dbEntry->isScheduledNow($contextDataParams->time);
-		
+
+        $result->pluginData = new KalturaPluginDataArray();
+        $pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaEntryContextDataContributor');
+        foreach ($pluginInstances as $pluginInstance)
+        {
+            $pluginInstance->contributeToEntryContextDataResult($dbEntry, $contextDataParams, $result);
+        }
+
 		return $result;
 	}
 	

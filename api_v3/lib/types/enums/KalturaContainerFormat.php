@@ -16,14 +16,17 @@ class KalturaContainerFormat extends KalturaStringEnum
 	const WMV = "wmv";
 	const WMA = "wma";
 	const ISMV = "ismv";
+	const ISMA = "isma";
 	const MKV = "mkv";
 	const WEBM = "webm";
 	const MPEG = "mpeg";
 	const MPEGTS = "mpegts";
+	const M2TS = "m2ts";
 	const APPLEHTTP = "applehttp";
 	const WAV = "wav";
 	const HLS = "hls";
 	const M4V = "m4v";
+	const MXF = "mxf";
 	const COPY = "copy";
 	
 	const SWF = 'swf';

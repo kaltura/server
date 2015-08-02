@@ -23,6 +23,7 @@ function runJavaTests($clientRoot)
 	// run the tests
 	copy("{$clientRoot}/src/DemoImage.jpg", "{$clientRoot}/bin/DemoImage.jpg");
 	copy("{$clientRoot}/src/DemoVideo.flv", "{$clientRoot}/bin/DemoVideo.flv");
+	copy("{$clientRoot}/src/test.properties", "{$clientRoot}/bin/test.properties");
 	
 	$log4jConfig = fixSlashes("{$clientRoot}/src/log4j/log4j.properties");
 	if ($log4jConfig[1] == ':')

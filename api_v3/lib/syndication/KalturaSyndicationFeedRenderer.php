@@ -455,8 +455,8 @@ class KalturaSyndicationFeedRenderer
 
 		$e = null;
 		$kalturaFeed = $this->syndicationFeed->type == KalturaSyndicationFeedType::KALTURA || $this->syndicationFeed->type == KalturaSyndicationFeedType::KALTURA_XSLT;
-
 		$nextEntry = $this->getNextEntry();
+		
 		while($nextEntry)
 		{
 			$this->enableApcProcessingFlag();
@@ -545,7 +545,8 @@ class KalturaSyndicationFeedRenderer
 			
 		if($this->syndicationFeedDb->getServePlayManifest())
 		{
-			$deliveryProfile = DeliveryProfilePeer::getRemoteDeliveryByStorageId($storage->getId(), $flavorAsset->getEntryId(), PlaybackProtocol::HTTP, "https");
+			$deliveryProfile = DeliveryProfilePeer::getRemoteDeliveryByStorageId(
+					DeliveryProfileDynamicAttributes::init($storage->getId(), $flavorAsset->getEntryId(), PlaybackProtocol::HTTP, "https"));
 			$clientTag = 'feed:' . $this->syndicationFeedDb->getId();
 		
 			if (is_null($deliveryProfile))
@@ -557,9 +558,13 @@ class KalturaSyndicationFeedRenderer
 		}
 		else
 		{
-			$urlManager = DeliveryProfilePeer::getRemoteDeliveryByStorageId($fileSync->getDc(), $flavorAsset->getEntryId(),
-					PlaybackProtocol::HTTP, null, null, $flavorAsset);
-			$url = rtrim($urlManager->getUrl(),'/') . '/' . ltrim($urlManager->getFileSyncUrl($fileSync),'/');
+			$dpda = new DeliveryProfileDynamicAttributes();
+			$urlManager = DeliveryProfilePeer::getRemoteDeliveryByStorageId(
+					DeliveryProfileDynamicAttributes::init($fileSync->getDc(), $flavorAsset->getEntryId()), null, $flavorAsset);
+			$url = ltrim($urlManager->getFileSyncUrl($fileSync),'/');
+			if (strpos($url, "://") === false){
+				$url = rtrim($urlManager->getUrl(), "/") . "/".$url ;
+			}
 		}
 		
 		return $url;
@@ -585,9 +590,18 @@ class KalturaSyndicationFeedRenderer
 		
 		if($this->syndicationFeedDb->getServePlayManifest())
 		{
+			$shouldAddKtToken = false;
+			if($this->syndicationFeed->type == KalturaSyndicationFeedType::ITUNES)
+			{
+				$entry = $flavorAsset->getentry();
+				$accessControl = $entry->getaccessControl();
+				if ($accessControl && $accessControl->hasRules())
+					$shouldAddKtToken = true;
+			}
+
 			$cdnHost = requestUtils::getApiCdnHost();
 			$clientTag = 'feed:' . $this->syndicationFeedDb->getId();
-			$url = $cdnHost . $flavorAsset->getPlayManifestUrl($clientTag);
+			$url = $cdnHost . $flavorAsset->getPlayManifestUrl($clientTag, null, PlaybackProtocol::HTTP , $shouldAddKtToken);
 		}
 		else
 		{

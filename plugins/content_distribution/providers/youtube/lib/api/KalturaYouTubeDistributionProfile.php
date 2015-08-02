@@ -201,6 +201,11 @@ class KalturaYouTubeDistributionProfile extends KalturaConfigurableDistributionP
 	 * @var bool
 	 */
 	public $releaseClaims;
+	
+	/**
+	 * @var string
+	 */
+	public $apiAuthorizeUrl;
 
 	/*
 		 * mapping between the field on this object (on the left) and the setter/getter on the object (on the right)
@@ -244,6 +249,7 @@ class KalturaYouTubeDistributionProfile extends KalturaConfigurableDistributionP
 		'captionAutosync',
 		'deleteReference',
 		'releaseClaims',
+		'apiAuthorizeUrl',
 	 );
 		 
 	public function getMapBetweenObjects()

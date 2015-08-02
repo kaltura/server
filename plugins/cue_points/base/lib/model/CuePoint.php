@@ -18,6 +18,7 @@ abstract class CuePoint extends BaseCuePoint implements IIndexable
 	const CUSTOM_DATA_FIELD_FORCE_STOP = 'forceStop';
 	const CUSTOM_DATA_FIELD_ROOT_PARENT_ID = 'rootParentId';
 	const CUSTOM_DATA_FIELD_TRIGGERED_AT = 'triggeredAt';
+	const CUSTOM_DATA_FIELD_IS_PUBLIC = 'isPublic';
 	
 	public function getIndexObjectName() {
 		return "CuePointIndex";
@@ -226,10 +227,12 @@ abstract class CuePoint extends BaseCuePoint implements IIndexable
 	
 
 	public function getForceStop()		{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_FORCE_STOP);}
-	public function getTriggeredAt()		{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_TRIGGERED_AT);}	
+	public function getTriggeredAt()		{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_TRIGGERED_AT);}
+	public function getIsPublic()	              {return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_IS_PUBLIC);}	
 
 	public function setForceStop($v)	{return $this->putInCustomData(self::CUSTOM_DATA_FIELD_FORCE_STOP, (bool)$v);}
 	public function setTriggeredAt($v)	{return $this->putInCustomData(self::CUSTOM_DATA_FIELD_TRIGGERED_AT, (int)$v);}
+	public function setIsPublic($v)                  {return $this->putInCustomData(self::CUSTOM_DATA_FIELD_IS_PUBLIC, (bool)$v);}
 	
 	public function getCacheInvalidationKeys()
 	{
@@ -257,7 +260,7 @@ abstract class CuePoint extends BaseCuePoint implements IIndexable
 		if(!is_null($ret))
 			return $ret;
 			
-		if(!$this->getParentId())
+		if( !$this->getParentId() || is_null($this->getParent()) )
 			return $this->getId();
 			
 		return $this->getParent()->getRootParentId();
@@ -384,7 +387,69 @@ abstract class CuePoint extends BaseCuePoint implements IIndexable
 		return null;
 	}
 
-	public function copyFromLiveToVodEntry( $liveEntry, $vodEntry, $adjustedStartTime )
+	public function copyFromLiveToVodEntry( $vodEntry, $adjustedStartTime )
 	{
+		return null;
+	}
+
+	public function copyToClipEntry( entry $clipEntry, $clipStartTime, $clipDuration )
+	{
+		if ( $this->shouldCopyToClip($clipStartTime, $clipDuration) && $this->hasPermissionToCopyToEntry($clipEntry) ) {
+			$newCuePoint = $this->copyToEntry($clipEntry);
+			if ( $newCuePoint->getStartTime() ) {
+				$newCuePoint->setStartTime( $newCuePoint->getStartTime() - $clipStartTime );
+			}
+			if ( !is_null($newCuePoint->getEndTime()) ) {
+				$newCuePoint->setEndTime( $newCuePoint->getEndTime() - $clipStartTime );
+				if ( $newCuePoint->getEndTime() > $clipDuration ) {
+					$newCuePoint->setEndTime( $clipDuration );
+				}
+			}
+			$newCuePoint->save();
+		}
+	}
+
+	public function shouldCopyToClip( $clipStartTime, $clipDuration ) {
+		if ( $this->getStartTime() < $clipStartTime ) {
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * @param entry $entry
+	 * @return bool true if cuepoints should be copied to given entry
+	 */
+	public function hasPermissionToCopyToEntry( entry $entry )
+	{
+		if (!$entry->getIsTemporary()
+			&& !PermissionPeer::isValidForPartner(CuePointPermissionName::DO_NOT_COPY_CUE_POINTS_TO_CLIP, $entry->getPartnerId()))
+		{
+			return true;
+		}
+
+		if ($entry->getIsTemporary()
+			&& !PermissionPeer::isValidForPartner(CuePointPermissionName::DO_NOT_COPY_CUE_POINTS_TO_TRIMMED_ENTRY, $entry->getPartnerId()))
+		{
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * @param      string $name
+	 * @param      string $namespace
+	 * @return     boolean True if $name has been modified.
+	 */
+	public function isCustomDataModified($name = null, $namespace = '')
+	{
+		if(isset($this->oldCustomDataValues[$namespace]) && (is_null($name) || array_key_exists($name, $this->oldCustomDataValues[$namespace])))
+		{
+			return true;
+		}
+
+		return false;
 	}
 } // CuePoint

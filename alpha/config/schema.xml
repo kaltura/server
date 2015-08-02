@@ -1258,6 +1258,7 @@
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="file_root" type="varchar" size="64" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="file_path" type="varchar" size="128" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="file_size" type="bigint" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="custom_data" type="longvarchar" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="deleted_id" type="bigint" />
 		<unique name="object_id-object_type-version-object_sub_type-dc-deleted_id">
 			<unique-column name="object_id" />
@@ -1719,6 +1720,32 @@
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="delivery_priority" type="integer" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="delivery_status" type="integer" />
 	</table>
+	<table skipSql="false" abstract="false" name="edge_server">
+		<column lazyLoad="false" name="id" type="integer" required="true" primaryKey="true" autoIncrement="true" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="created_at" type="timestamp" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="updated_at" type="timestamp" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="partner_id" type="integer" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="name" type="varchar" size="256" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="system_name" type="varchar" size="256" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="description" type="varchar" size="256" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="status" type="integer" />
+		<column primaryKey="false" required="true" autoIncrement="false" lazyLoad="false" name="type" type="integer" default="0" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="tags" type="longvarchar" />
+		<column primaryKey="false" required="true" autoIncrement="false" lazyLoad="false" name="host_name" type="varchar" size="256" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="playback_host_name" type="varchar" size="256" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="parent_id" default="0" type="integer" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="custom_data" type="longvarchar" />
+		<index name="partner_id_status_system_name">
+			<index-column name="partner_id" />
+			<index-column name="status" />
+			<index-column name="system_name" />
+		</index>
+		<index name="partner_id_status_host_name">
+			<index-column name="partner_id" />
+			<index-column name="status" />
+			<index-column name="host_name" />
+		</index>
+	</table>
 	<table skipSql="false" abstract="false" name="delivery_profile">
 		<column lazyLoad="false" name="id" type="integer" required="true" primaryKey="true" autoIncrement="true" />
 		<column primaryKey="false" lazyLoad="false" name="type" type="integer" required="true" inheritance="single" default="0" />
@@ -1737,7 +1764,8 @@
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="status" type="integer" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="streamer_type" type="varchar" size="30"/>	
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="media_protocols" type="varchar" size="256"/>	
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="custom_data" type="longvarchar" />	
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="custom_data" type="longvarchar" />		
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="priority" type="integer" />	
 	</table>
 	<table skipSql="false" abstract="false" name="email_ingestion_profile">
 		<column lazyLoad="false" name="id" type="integer" required="true" primaryKey="true" autoIncrement="true" />
@@ -2089,4 +2117,37 @@
             <index-column name="status" />
         </index>
     </table>
+	<table skipSql="false" abstract="false" name="user_entry" description="Describes the relationship between a specific user and a specific entry">
+		<column name="id" type="integer" required="true" autoIncrement="true" primaryKey="true"/>
+		<column name="entry_id" type="varchar" size="20" required="true"/>
+		<column name="kuser_id" type="integer" required="true"/>
+		<column name="partner_id" type="integer"/>
+		<column name="created_at" type="timestamp"/>
+		<column name="updated_at" type="timestamp"/>
+		<column name="status" type="integer"/>
+		<column name="type" type="integer" inheritance="single"/>
+		<column name="custom_data" type="longvarchar"/>
+		<foreign-key onDelete="none" onUpdate="none" foreignTable="entry">
+			<reference local="entry_id" foreign="id" />
+		</foreign-key>
+		<foreign-key onDelete="none" foreignTable="kuser">
+			<reference foreign="id" local="kuser_id"/>
+		</foreign-key>
+	</table>
+	<table skipSql="false" abstract="false" name="app_token">
+		<column name="id" type="varchar" size="20" required="true" primaryKey="true" />
+		<column name="int_id" type="integer" required="true" primaryKey="false" autoIncrement="true" />
+		<column name="partner_id" type="integer"/>
+		<column name="created_at" type="timestamp"/>
+		<column name="updated_at" type="timestamp"/>
+		<column name="deleted_at" type="timestamp"/>
+		<column name="status" type="integer"/>
+		<column name="expiry" type="integer"/>
+		<column name="session_type" type="integer"/>
+		<column name="session_user_id" type="varchar" size="100"/>
+		<column name="session_duration" type="integer"/>
+		<column name="session_privileges" type="longvarchar"/>
+		<column name="token" type="longvarchar"/>
+		<column name="custom_data" type="longvarchar"/>
+	</table>
 </database>

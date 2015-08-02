@@ -18,4 +18,17 @@ class KalturaAdCuePointFilter extends KalturaAdCuePointBaseFilter
 	{
 		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
 	}
+
+	/* (non-PHPdoc)
+	 * @see KalturaRelatedFilter::validateForResponseProfile()
+	 */
+	public function validateForResponseProfile()
+	{
+		// override KalturaCuePointFilter::validateForResponseProfile because all ad cue-points are public
+	}
+
+	public function getTypeListResponse(KalturaFilterPager $pager, KalturaDetachedResponseProfile $responseProfile = null, $type = null)
+	{
+		return parent::getTypeListResponse($pager, $responseProfile, AdCuePointPlugin::getCuePointTypeCoreValue(AdCuePointType::AD));
+	}
 }

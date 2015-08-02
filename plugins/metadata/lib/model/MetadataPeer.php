@@ -13,9 +13,8 @@
  * @package plugins.metadata
  * @subpackage model
  */
-class MetadataPeer extends BaseMetadataPeer {
-
-
+class MetadataPeer extends BaseMetadataPeer implements IRelatedObjectPeer
+{
 	public static function setDefaultCriteriaFilter()
 	{
 		if(self::$s_criteria_filter == null)
@@ -43,7 +42,7 @@ class MetadataPeer extends BaseMetadataPeer {
 	}
 
 	/**
-	 * Retrieve a single metadta object by object id and type.
+	 * Retrieve a single metadata object by object id and type.
 	 *
 	 * @param      int $metadataProfileId
 	 * @param      int $objectType
@@ -63,6 +62,29 @@ class MetadataPeer extends BaseMetadataPeer {
 		$criteria->add(MetadataPeer::OBJECT_ID, $objectId);
 
 		return MetadataPeer::doSelectOne($criteria, $con);
+	}
+
+	/**
+	 * Retrieve metadata objects by object ids and type.
+	 *
+	 * @param      int $metadataProfileId
+	 * @param      int $objectType
+	 * @param      string $objectId
+	 * @param      PropelPDO $con the connection to use
+	 * @return     Metadata
+	 */
+	public static function retrieveByObjects($metadataProfileId, $objectType, array $objectIds, PropelPDO $con = null)
+	{
+		$metadataProfile = MetadataProfilePeer::retrieveByPK($metadataProfileId, $con);
+		if(!$metadataProfile)
+			return null;
+
+		$criteria = new Criteria();
+		$criteria->add(MetadataPeer::METADATA_PROFILE_ID, $metadataProfileId);
+		$criteria->add(MetadataPeer::OBJECT_TYPE, $objectType);
+		$criteria->add(MetadataPeer::OBJECT_ID, $objectIds, Criteria::IN);
+
+		return MetadataPeer::doSelect($criteria, $con);
 	}
 	
 	/**
@@ -128,5 +150,40 @@ class MetadataPeer extends BaseMetadataPeer {
 	public static function getCacheInvalidationKeys()
 	{
 		return array(array("metadata:objectId=%s", self::OBJECT_ID));		
+	}
+
+	/* (non-PHPdoc)
+	 * @see IRelatedObjectPeer::getRootObjects()
+	 */
+	public function getRootObjects(IBaseObject $object)
+	{
+		$parentObject = kMetadataManager::getObjectFromPeer($object);
+		$roots = array();
+		if($parentObject && $parentObject instanceof IBaseObject) 
+		{
+			$parentPeer = $parentObject->getPeer();
+			if($parentPeer instanceof IRelatedObjectPeer)
+			{
+				$roots = $parentPeer->getRootObjects($parentObject);
+			}
+			$roots[] = $parentObject;
+		}
+		return $roots;
+	}
+
+	/* (non-PHPdoc)
+	 * @see IRelatedObjectPeer::isReferenced()
+	 */
+	public function isReferenced(IBaseObject $object)
+	{
+		/* @var $object Metadata */
+		if($object->getObjectType() == MetadataObjectType::DYNAMIC_OBJECT)
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
 	}
 } // MetadataPeer

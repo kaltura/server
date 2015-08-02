@@ -27,6 +27,7 @@ function getPlaybackProtocols() {
 	playbackDict["hls"] = "HLS";
 	playbackDict["hdnetworkmanifest"] = "AKAMAI_HDS";
 	playbackDict["hdnetwork"] = "AKAMAI_HD";
+	playbackDict["mpegdash"] = "MPEG_DASH";
 	return playbackDict;
 }
 

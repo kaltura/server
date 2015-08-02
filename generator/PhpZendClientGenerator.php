@@ -408,25 +408,45 @@ class PhpZendClientGenerator extends ClientGeneratorFromXml
 					break;
 					
 				case "bool" :
-					$this->appendLine("		if(!empty(\$xml->{$propName}))");
-					$this->appendLine("			\$this->$propName = true;");
+					$this->appendLine("		if(count(\$xml->{$propName}))");
+					$this->appendLine("		{");
+					$this->appendLine("			if(!empty(\$xml->{$propName}))");
+					$this->appendLine("				\$this->$propName = true;");
+					$this->appendLine("			else");
+					$this->appendLine("				\$this->$propName = false;");
+					$this->appendLine("		}");
 					break;
 					
 				case "string" :
-					$this->appendLine("		\$this->$propName = ($propType)\$xml->$propName;");
+					$this->appendLine("		if(count(\$xml->{$propName}))");
+					$this->appendLine("			\$this->$propName = ($propType)\$xml->$propName;");
 					break;
 					
 				case "array" :
 					$arrayType = $propertyNode->getAttribute ( "arrayType" );
-					$this->appendLine("		if(empty(\$xml->{$propName}))");
-					$this->appendLine("			\$this->$propName = array();");
-					$this->appendLine("		else");
-					$this->appendLine("			\$this->$propName = Kaltura_Client_ParseUtils::unmarshalArray(\$xml->$propName, \"$arrayType\");");
+					$this->appendLine("		if(count(\$xml->{$propName}))");
+					$this->appendLine("		{");
+					$this->appendLine("			if(empty(\$xml->{$propName}))");
+					$this->appendLine("				\$this->$propName = array();");
+					$this->appendLine("			else");
+					$this->appendLine("				\$this->$propName = Kaltura_Client_ParseUtils::unmarshalArray(\$xml->$propName, \"$arrayType\");");
+					$this->appendLine("		}");
+					break;
+					
+				case "map" :
+					$arrayType = $propertyNode->getAttribute ( "arrayType" );
+					$this->appendLine("		if(count(\$xml->{$propName}))");
+					$this->appendLine("		{");
+					$this->appendLine("			if(empty(\$xml->{$propName}))");
+					$this->appendLine("				\$this->$propName = array();");
+					$this->appendLine("			else");
+					$this->appendLine("				\$this->$propName = Kaltura_Client_ParseUtils::unmarshalMap(\$xml->$propName, \"$arrayType\");");
+					$this->appendLine("		}");
 					break;
 					
 				default : // sub object
 					$fallback = $propertyNode->getAttribute("type");
-					$this->appendLine("		if(!empty(\$xml->{$propName}))");
+					$this->appendLine("		if(count(\$xml->{$propName}) && !empty(\$xml->{$propName}))");
 					$this->appendLine("			\$this->$propName = Kaltura_Client_ParseUtils::unmarshalObject(\$xml->$propName, \"$fallback\");");
 					break;
 			}
@@ -633,7 +653,7 @@ class PhpZendClientGenerator extends ClientGeneratorFromXml
 				case 'bool':
 					$this->appendLine("		\$resultObject = (bool)Kaltura_Client_ParseUtils::unmarshalSimpleType(\$resultXmlObject->result);");
 					break;
-				
+				case 'bigint':
 				case 'string':
 					$this->appendLine("		\$resultObject = (string)Kaltura_Client_ParseUtils::unmarshalSimpleType(\$resultXmlObject->result);");
 					break;
@@ -773,11 +793,13 @@ class PhpZendClientGenerator extends ClientGeneratorFromXml
 		$this->appendLine("	}");
 		$this->appendLine("	");
 	
+		$volatileProperties = array();
 		foreach($configurationNodes as $configurationNode)
 		{
 			/* @var $configurationNode DOMElement */
 			$configurationName = $configurationNode->nodeName;
-			$methodsName = ucfirst($configurationName) . "Configuration";
+			$attributeName = lcfirst($configurationName) . "Configuration";
+			$volatileProperties[$attributeName] = array();
 		
 			foreach($configurationNode->childNodes as $configurationPropertyNode)
 			{
@@ -787,7 +809,13 @@ class PhpZendClientGenerator extends ClientGeneratorFromXml
 					continue;
 			
 				$configurationProperty = $configurationPropertyNode->localName;
-				$type = $configurationPropertyNode->getAttribute('type');
+				
+				if($configurationPropertyNode->hasAttribute('volatile') && $configurationPropertyNode->getAttribute('volatile'))
+				{
+					$volatileProperties[$attributeName][] = $configurationProperty;
+				}
+				
+				$type = $this->getTypeClass($configurationPropertyNode->getAttribute('type'));
 				$description = null;
 				
 				if($configurationPropertyNode->hasAttribute('description'))
@@ -803,7 +831,22 @@ class PhpZendClientGenerator extends ClientGeneratorFromXml
 				}
 			}
 		}
-	
+		
+		$this->appendLine ( "	/**");
+		$this->appendLine ( "	 * Clear all volatile configuration parameters");
+		$this->appendLine ( "	 */");
+		$this->appendLine ( "	protected function resetRequest()");
+		$this->appendLine ( "	{");
+		$this->appendLine ( "		parent::resetRequest();");
+		foreach($volatileProperties as $attributeName => $properties)
+		{
+			foreach($properties as $propertyName)
+			{
+				$this->appendLine("		unset(\$this->{$attributeName}['{$propertyName}']);");
+			}
+		}
+		$this->appendLine ( "	}");
+		
 		$this->appendLine("}");
 	}
 	

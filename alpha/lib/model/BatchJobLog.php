@@ -13,7 +13,7 @@
  * @package Core
  * @subpackage model
  */
-class BatchJobLog extends BaseBatchJobLog {
+class BatchJobLog extends BaseBatchJobLog implements IBaseObject {
 
 	/**
 	 * Initializes internal state of BatchJobLog object.

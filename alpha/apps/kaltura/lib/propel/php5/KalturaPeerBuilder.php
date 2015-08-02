@@ -650,6 +650,15 @@ abstract class ".$this->getClassname(). $extendingPeerClass . " {
 	{
 		return array();
 	}
+	
+	/**
+	 * Return array of custom-data fields that shouldn't be auto-updated.
+	 * @return array
+	 */
+	public static function getAtomicCustomDataFields()
+	{
+		return array();
+	}
 ";
 	}
 	

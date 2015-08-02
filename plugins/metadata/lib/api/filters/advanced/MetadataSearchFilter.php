@@ -10,6 +10,7 @@ class MetadataSearchFilter extends AdvancedSearchFilterOperator
 	const KMC_FIELD_TYPE_DATE = 'dateType';
 	const KMC_FIELD_TYPE_INT = 'intType';
 	const KMC_FIELD_TYPE_OBJECT = 'objectType';
+	const KMC_FIELD_TYPE_USER = 'userType';
 	const KMC_FIELD_TYPE_METADATA_OBJECT = 'metadataObjectType';
 	 
 	/**
@@ -171,7 +172,7 @@ class MetadataSearchFilter extends AdvancedSearchFilterOperator
 						}
 						
 						// exact match
-						elseif ($xPaths[$field]->getType() == self::KMC_FIELD_TYPE_LIST)
+						elseif (in_array($xPaths[$field]->getType(), array(self::KMC_FIELD_TYPE_OBJECT, self::KMC_FIELD_TYPE_USER)))
 						{
 							$dataCondition = "\\\"{$pluginName}_{$fieldId} $value " . kMetadataManager::SEARCH_TEXT_SUFFIX . "_{$fieldId}" . "\\\"";
 						}
@@ -179,7 +180,7 @@ class MetadataSearchFilter extends AdvancedSearchFilterOperator
 						// anywhere in the field
 						else 
 						{
-							$dataCondition = "{$pluginName}_{$fieldId} << ( $value ) << " . kMetadataManager::SEARCH_TEXT_SUFFIX . "_{$fieldId}";
+							$dataCondition = "{$pluginName}_{$fieldId} << ( \"$value\" ) << " . kMetadataManager::SEARCH_TEXT_SUFFIX . "_{$fieldId}";
 						}
 						
 						KalturaLog::debug("add $dataCondition");
@@ -188,7 +189,12 @@ class MetadataSearchFilter extends AdvancedSearchFilterOperator
 					elseif($item instanceof MetadataSearchFilter)
 					{
 						$item->applyCondition($this, $xPaths);
-					}					
+					}
+					elseif ($item instanceof DynamicObjectSearchFilter)
+					{
+						$item->applyCondition($this, $xPaths);
+						$dataConditions = $item->matchClause;
+					}
 				}
 			}	
 				
@@ -386,17 +392,5 @@ class MetadataSearchFilter extends AdvancedSearchFilterOperator
 		
 		if(isset($attr['operatorType']))
 			$this->type = (int) $attr['operatorType'];
-			
-		foreach($xmlElement->item as $child)
-		{
-			$attr = $child->attributes();
-			if(!isset($attr['type']))
-				continue;
-				
-			$type = (string) $attr['type'];
-			$item = new $type();
-			$item->fillObjectFromXml($child);
-			$this->items[] = $item;
-		}
 	}
 }

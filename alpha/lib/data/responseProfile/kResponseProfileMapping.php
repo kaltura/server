@@ -9,13 +9,34 @@ class kResponseProfileMapping
 	/**
 	 * @var string
 	 */
-	private $parentProperty;
+	protected $parentProperty;
 	
 	/**
 	 * @var string
 	 */
-	private $filterProperty;
+	protected $filterProperty;
 	
+	/**
+	 * @var bool
+	 */
+	protected $allowNull;
+	
+	/**
+	 * @return the $allowNull
+	 */
+	public function getAllowNull()
+	{
+		return $this->allowNull;
+	}
+
+	/**
+	 * @param bool $allowNull
+	 */
+	public function setAllowNull($allowNull)
+	{
+		$this->allowNull = $allowNull;
+	}
+
 	/**
 	 * @return the $parentProperty
 	 */

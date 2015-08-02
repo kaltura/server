@@ -129,6 +129,13 @@ class kPluginableEnumsManager
 			
 		return $value;
 	}
+	
+	public static function genericApiToCore($genericValue)
+	{
+	    list($type, $value) = explode(IKalturaEnumerator::PLUGIN_VALUE_DELIMITER, $genericValue, 2);
+	    
+	    return self::apiToCore($type, $value);
+	}
 
 	public static function apiToCore($type, $value)
 	{		

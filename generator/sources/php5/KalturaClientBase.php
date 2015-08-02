@@ -47,7 +47,7 @@ class MultiRequestSubResult implements ArrayAccess
 	{
         return new MultiRequestSubResult($this->value . ':' . $name);
 	}
-	
+
 	public function offsetExists($offset)
 	{
 		return true;
@@ -61,7 +61,7 @@ class MultiRequestSubResult implements ArrayAccess
 	public function offsetSet($offset, $value)
 	{
 	}
-	
+
 	public function offsetUnset($offset)
 	{
 	}
@@ -157,13 +157,13 @@ class KalturaClientBase
 	* @var Array of response headers
 	*/
 	private $responseHeaders = array();
-	
+
 	/**
 	 * path to save served results
 	 * @var string
 	 */
 	protected $destinationPath = null;
-	
+
 	/**
 	 * return served results without unserializing them
 	 * @var boolean
@@ -249,7 +249,7 @@ class KalturaClientBase
 
 		// append the basic params
 		$this->addParam($params, "format", $this->config->format);
-	
+
 		foreach($this->clientConfiguration as $param => $value)
 		{
 			$this->addParam($params, $param, $value);
@@ -299,7 +299,7 @@ class KalturaClientBase
 			$this->resetRequest();
 			throw new KalturaClientException("Downloading files is not supported as part of multi-request.", KalturaClientException::ERROR_DOWNLOAD_IN_MULTIREQUEST);
 		}
-		
+
 		if (count($this->callsQueue) == 0)
 		{
 			$this->resetRequest();
@@ -320,7 +320,7 @@ class KalturaClientBase
 		{
 			$this->addParam($params, $param, $value);
 		}
-		
+
 		$url = $this->config->serviceUrl."/api_v3/index.php?service=";
 		if ($this->isMultiRequest)
 		{
@@ -376,7 +376,7 @@ class KalturaClientBase
 			}
 			if (!is_null($serverName) || !is_null($serverSession))
 				$this->log("server: [{$serverName}], session: [{$serverSession}]");
-			
+
 			$this->log("result (serialized): " . $postResult);
 
 			if($this->returnServedResult)
@@ -446,10 +446,10 @@ class KalturaClientBase
 	{
 		if (function_exists('curl_init'))
 			return $this->doCurl($url, $params, $files);
-			
+
 		if($this->destinationPath || $this->returnServedResult)
 			throw new KalturaClientException("Downloading files is not supported with stream context http request, please use curl.", KalturaClientException::ERROR_DOWNLOAD_NOT_SUPPORTED);
-				
+
 		return $this->doPostRequest($url, $params, $files);
 	}
 
@@ -481,9 +481,16 @@ class KalturaClientBase
 			$this->log("curl: $url&$opt");
 			if (count($files) > 0)
 			{
-				foreach($files as &$file)
-					$file = "@".$file; // let curl know its a file
-				curl_setopt($ch, CURLOPT_POSTFIELDS, array_merge($params, $files));
+                foreach ($files as &$file) {
+                    // The usage of the @filename API for file uploading is
+                    // deprecated since PHP 5.5. CURLFile must be used instead.
+                    if (PHP_VERSION_ID >= 50500) {
+                        $file = new \CURLFile($file);
+                    } else {
+                        $file = "@" . $file; // let curl know its a file
+                    }
+                }
+                curl_setopt($ch, CURLOPT_POSTFIELDS, array_merge($params, $files));
 			}
 			else
 			{
@@ -551,12 +558,12 @@ class KalturaClientBase
 		{
 			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 		}
-		
+
 		$result = curl_exec($ch);
-		
+
 		if($destinationResource)
 			fclose($destinationResource);
-			
+
 		$curlError = curl_error($ch);
 		curl_close($ch);
 		return array($result, $curlError);
@@ -686,7 +693,7 @@ class KalturaClientBase
 			}
 		}
 	}
-	
+
 	public function setRequestConfiguration(KalturaRequestConfiguration $configuration)
 	{
 		$params = get_class_vars('KalturaRequestConfiguration');
@@ -705,7 +712,7 @@ class KalturaClientBase
 			}
 		}
 	}
-	
+
 	/**
 	 * Add parameter to array of parameters that is passed by reference
 	 *
@@ -780,16 +787,25 @@ class KalturaClientBase
 	 */
 	public function validateObjectType($resultObject, $objectType)
 	{
-		if (is_object($resultObject))
+		$knownNativeTypes = array("boolean", "integer", "double", "string");
+		if (is_null($resultObject) ||
+			( in_array(gettype($resultObject) ,$knownNativeTypes) &&
+			  in_array($objectType, $knownNativeTypes) ) )
 		{
-			if (!($resultObject instanceof $objectType))
-				throw new KalturaClientException("Invalid object type", KalturaClientException::ERROR_INVALID_OBJECT_TYPE);
+			return;// we do not check native simple types
 		}
-		else if (gettype($resultObject) !== "NULL" && gettype($resultObject) !== $objectType)
+		else if ( is_object($resultObject) )
+		{
+			if (!($resultObject instanceof $objectType)){
+				throw new KalturaClientException("Invalid object type - not instance of $objectType", KalturaClientException::ERROR_INVALID_OBJECT_TYPE);
+			}
+		}
+		else if(gettype($resultObject) !== $objectType)
 		{
 			throw new KalturaClientException("Invalid object type", KalturaClientException::ERROR_INVALID_OBJECT_TYPE);
 		}
 	}
+
 
 	public function startMultiRequest()
 	{
@@ -1115,7 +1131,7 @@ abstract class KalturaObjectBase
 	 * @var array
 	 */
 	public $relatedObjects;
-	
+
 	public function __construct($params = array())
 	{
 		foreach ($params as $key => $value)
@@ -1160,15 +1176,15 @@ abstract class KalturaObjectBase
 class KalturaException extends Exception
 {
 	private $arguments;
-	
+
     public function __construct($message, $code, $arguments)
     {
     	$this->code = $code;
     	$this->arguments = $arguments;
-    	
+
 		parent::__construct($message);
     }
-    
+
 	/**
 	 * @return array
 	 */
@@ -1176,7 +1192,7 @@ class KalturaException extends Exception
 	{
 		return $this->arguments;
 	}
-    
+
 	/**
 	 * @return string
 	 */
@@ -1186,7 +1202,7 @@ class KalturaException extends Exception
 		{
 			return $this->arguments[$argument];
 		}
-		
+
 		return null;
 	}
 }

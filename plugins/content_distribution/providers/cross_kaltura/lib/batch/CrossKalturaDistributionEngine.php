@@ -209,7 +209,9 @@ class CrossKalturaDistributionEngine extends DistributionEngine implements
 	{
 	    KalturaLog::debug('Getting source entry objects');
 	    $sourceEntryId = $data->entryDistribution->entryId;
-	    $sourceObjects = $this->getEntryObjects($this->sourceClient, $sourceEntryId, $data);	    
+		KBatchBase::impersonate($this->distributionProfile->partnerId);
+		$sourceObjects = $this->getEntryObjects(KBatchBase::$kClient, $sourceEntryId, $data);
+		KBatchBase::unimpersonate();
 	    return $sourceObjects;   
 	}
 	
@@ -430,7 +432,9 @@ class CrossKalturaDistributionEngine extends DistributionEngine implements
 	    {
 	        // get local resource
 	        $contentResource = new KalturaUrlResource();
-	        $contentResource->url = $assetService->getUrl($assetId);
+		    $options = new KalturaFlavorAssetUrlOptions();
+		    $options->fileName = $assetId;
+		    $contentResource->url = $assetService->getUrl($assetId, null, false, $options);
 	    }
 	    return $contentResource;
 	}

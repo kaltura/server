@@ -140,6 +140,8 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	const DEFAULT_IMAGE_HEIGHT = 480;
 	const DEFAULT_IMAGE_WIDTH = 640;
 
+	const CAPABILITIES = "capabilities";
+
 	private $appears_in = null;
 
 	private $m_added_moderation = false;
@@ -1016,6 +1018,10 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	public function getAssetCacheVersion()			{ return $this->getFromCustomData( "assetCacheVersion", null, entry::DEFAULT_ASSETCACHEVERSION ); }
 
 	protected function setAssetCacheVersion( $v )	{ $this->putInCustomData( "assetCacheVersion" , $v ); }
+
+	public function getAssetCacheTime()			{ return $this->getFromCustomData( "assetCacheTime", null, null ); }
+	
+	protected function setAssetCacheTime( $v )	{ $this->putInCustomData( "assetCacheTime" , $v ); }
 	
 	/**
 	 * Increment an internal version counter in order to invalidate cached thumbnails (see getThumbnailUrl())
@@ -1024,6 +1030,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	{
 		$assetCacheVersion = kDataCenterMgr::incrementVersion($this->getAssetCacheVersion());
 		$this->setAssetCacheVersion($assetCacheVersion);
+		$this->setAssetCacheTime(time());
 		return $assetCacheVersion;
 	}
 	
@@ -1232,6 +1239,16 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 			$dynamicAttributes[$dynAttribName] = $createdAt;
 		}
 
+		$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaDynamicAttributesContributer');
+		foreach($pluginInstances as $pluginName => $pluginInstance) {
+			try {
+				$dynamicAttributes += $pluginInstance->getDynamicAttributes($this);
+			} catch (Exception $e) {
+				KalturaLog::err($e->getMessage());
+				continue;
+			}
+		}
+
 		return $dynamicAttributes;
 	}
 	
@@ -1242,7 +1259,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 			$maxCategoriesPerEntry = entry::MAX_CATEGORIES_PER_ENTRY_DISABLE_LIMIT_FEATURE;
 			
 		// When batch move entry between categories it's adding the new category before deleting the old one
-		if(kCurrentContext::$ks_partner_id = Partner::BATCH_PARTNER_ID && kCurrentContext::$ks_object)
+		if(kCurrentContext::$ks_partner_id == Partner::BATCH_PARTNER_ID && kCurrentContext::$ks_object)
 		{
 			$batchJobType = kCurrentContext::$ks_object->getPrivilegeValue(ks::PRIVILEGE_BATCH_JOB_TYPE);
 			if(intval($batchJobType) == BatchJobType::MOVE_CATEGORY_ENTRIES)
@@ -1763,6 +1780,9 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	public function setReplacedEntryId ( $v )	{	$this->putInCustomData ( "replacedEntryId" , $v );	}
 	public function getReplacedEntryId (  )		{	return $this->getFromCustomData( "replacedEntryId" );	}
 
+	public function setIsTemporary ( $v )	{	$this->putInCustomData ( "isTemporary" , $v );	}
+	public function getIsTemporary (  )		{	return $this->getFromCustomData( "isTemporary", null, false );	}
+
 	public function setReplacementOptions ($v)  {	$this->putInCustomData ( "replacementOptions" , $v );	}
 	public function getReplacementOptions (  )	{	return $this->getFromCustomData( "replacementOptions", null, new kEntryReplacementOptions() );	}
 
@@ -1771,6 +1791,9 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 
 	public function setRedirectEntryId ( $v )	{	$this->putInCustomData ( "redirectEntryId" , $v );	}
 	public function getRedirectEntryId (  )		{	return $this->getFromCustomData( "redirectEntryId" );	}
+
+	public function setIsTrimDisabled ( $v )	{	$this->putInCustomData ( "isTrimDisabled" , $v );	}
+	public function getIsTrimDisabled (  )		{	return $this->getFromCustomData( "isTrimDisabled" );	}
 	
 	// indicates that thumbnail shouldn't be auto captured, because it already supplied by the user
 	public function setCreateThumb ( $v, thumbAsset $thumbAsset = null)		
@@ -1802,6 +1825,9 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	
 	public function setParentEntryId($v)	{ $this->putInCustomData("parentEntryId", $v); }
 	public function getParentEntryId() 		{ return $this->getFromCustomData( "parentEntryId", null, null ); }
+
+	public function setSourceEntryId($v)	{ $this->putInCustomData("sourceEntryId", $v); }
+	public function getSourceEntryId() 		{ return $this->getFromCustomData( "sourceEntryId", null, null ); }
 	
 	public function getParentEntry()
 	{
@@ -2968,8 +2994,6 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		
 		$copyObj->setKuserId($this->kuser_id);
 		$copyObj->setName($this->name);
-		$copyObj->setType($this->type);
-		$copyObj->setMediaType($this->media_type);
 		$copyObj->setTags($this->tags);
 		$copyObj->setAnonymous($this->anonymous);
 		$copyObj->setSource($this->source);
@@ -3301,7 +3325,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	 */
 	public function isCustomDataModified($name = null, $namespace = '')
 	{
-		if(isset($this->oldCustomDataValues[$namespace]) && (is_null($name) || isset($this->oldCustomDataValues[$namespace][$name])))
+		if(isset($this->oldCustomDataValues[$namespace]) && (is_null($name) || array_key_exists($name, $this->oldCustomDataValues[$namespace])))
 		{
 			return true;
 		}
@@ -3335,5 +3359,36 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		$userNames[] = $kuser->getScreenName();
 		
 		return implode(" ", $userNames);
+	}
+
+	public function getCapabilities()
+	{
+		$capabilitiesArr = $this->getFromCustomData(self::CAPABILITIES, null, array());
+		$capabilitiesStr = implode(",", $capabilitiesArr);
+		return $capabilitiesStr;
+	}
+
+	public function addCapability( $capability)
+	{
+		$capabilities = $this->getFromCustomData(self::CAPABILITIES, null, array());
+		$capabilities[$capability] = $capability;
+		$this->putInCustomData( self::CAPABILITIES, $capabilities);
+	}
+
+	/**
+	 * Sets contents of passed object to values from current object.
+	 *
+	 * If desired, this method can also make copies of all associated (fkey referrers)
+	 * objects.
+	 *
+	 * @param      object $copyObj An object of entry (or compatible) type.
+	 * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
+	 * @throws     PropelException
+	 */
+	public function copyInto($copyObj, $deepCopy = false)
+	{
+		parent::copyInto($copyObj,$deepCopy);
+		$copyObj->setEntitledPusersEdit($this->getEntitledPusersEdit());
+		$copyObj->setEntitledPusersPublish($this->getEntitledPusersPublish());
 	}
 }

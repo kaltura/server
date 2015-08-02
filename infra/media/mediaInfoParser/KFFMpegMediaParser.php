@@ -54,6 +54,8 @@ class KFFMpegMediaParser extends KBaseMediaParser
 	{
 		$outputlower = strtolower($output);
 		$jsonObj = json_decode($outputlower);
+			// Check for json decode errors caused by inproper utf8 encoding.
+		if(json_last_error()!=JSON_ERROR_NONE) $jsonObj = json_decode(utf8_encode($outputlower));
 		if(!(isset($jsonObj) && isset($jsonObj->format))){
 			/*
 			 * For ARF (webex) files - simulate container ID and format.
@@ -84,6 +86,20 @@ class KFFMpegMediaParser extends KBaseMediaParser
 		// mov,mp4,m4a,3gp,3g2,mj2 to check is format inside
 		if(in_array($mediaInfo->containerFormat, array("mov","mp4","m4a","3gp","3g2","mj2"))){
 			$mediaInfo->isFastStart = self::checkForFastStart($this->ffprobeBin, $this->filePath);
+		}
+		
+		/*
+		 * Detect WVC1 files with 'Progressive Segmented' mode. FFmpeg 2.6 (and earlier) cannot handle them.
+		 * To be handled by mencoder in auto-inter-src mode
+		 */
+		if(in_array($mediaInfo->videoCodecId,array("wvc1","wmv3"))){
+			$cmd = "$this->cmdPath -i $this->filePath 2>&1 ";
+			$output = shell_exec($cmd);
+			if(strstr($output,"Progressive Segmented")){
+				if(isset($mediaInfo->contentStreams) && count($mediaInfo->contentStreams['video'])>0){
+					$mediaInfo->contentStreams['video'][0]->progressiveSegmented=true;
+				}
+			}
 		}
 		KalturaLog::log(print_r($mediaInfo,1));
 		$mediaInfo->contentStreams = json_encode($mediaInfo->contentStreams);
@@ -649,5 +665,31 @@ class KFFMpegMediaParser extends KBaseMediaParser
 		$str=$this->getRawMediaInfo($auxFilename);
 */
 	}
+
+	/**
+	 *
+	 * @param unknown_type $ffprobeBin
+	 * @param unknown_type $srcFileName
+	 * @return array of keyframes
+	 */
+	public static function retrieveFramesTimings($ffprobeBin, $srcFileName)
+	{
+		KalturaLog::log("srcFileName($srcFileName)");
+			
+		$trimStr=null;
+			
+		$cmdLine = "$ffprobeBin $srcFileName -show_frames -select_streams v -v quiet -of json -show_entries frame=pkt_pts_time,key_frame,coded_picture_number";
+		KalturaLog::log("$cmdLine");
+		$lastLine=exec($cmdLine , $outputArr, $rv);
+		if($rv!=0) {
+			KalturaLog::err("Key Frames detection failed on ffmpeg call - rv($rv),lastLine($lastLine)");
+			return null;
+		}
+		$jsonObj = json_decode(implode("\n",$outputArr));
+		if(isset($jsonObj) && isset($jsonObj->frames))
+			return $jsonObj->frames;
+		else
+			return null;
+	}
+};
 	
-}

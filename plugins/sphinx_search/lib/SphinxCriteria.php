@@ -129,7 +129,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 		if (!$this->selectColumn)
 			$this->selectColumn = $objectClass::getSphinxIdField();
 		
-		$sql = "SELECT {$this->selectColumn} $conditions FROM $index $wheres $orderBy " . ($this->groupByColumn ? "GROUP BY {$this->groupByColumn} " : "" ) . "LIMIT $limit OPTION ranker={$this->ranker}, max_matches=$maxMatches, comment='".kApiCache::KALTURA_COMMENT_MARKER."'";
+		$sql = "SELECT {$this->selectColumn} $conditions FROM $index $wheres " . ($this->groupByColumn ? "GROUP BY {$this->groupByColumn} " : "" ) . "$orderBy LIMIT $limit OPTION ranker={$this->ranker}, max_matches=$maxMatches, comment='".kApiCache::KALTURA_COMMENT_MARKER."'";
 		
 		if (kConf::hasParam('sphinx_extra_options'))
 			$sql .= ', ' . kConf::get('sphinx_extra_options');
@@ -1036,7 +1036,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 			$freeText = "^$freeText$";
 			$condition = "@(" . $matchFields . ") $freeText";
 			if($isLikeExpr)
-				$condition .= "\\\*";
+				$condition .= " | $freeText\\\*";
 			$additionalConditions[] = $condition;
 		}
 		else
@@ -1066,7 +1066,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 				{
 					$condition = "@(" . $matchFields . ") $freeText";
 					if($isLikeExpr)
-						$condition .= "\\\*";
+						$condition .= " | $freeText\\\*";
 					$additionalConditions[] = $condition;
 				}
 			}
@@ -1076,7 +1076,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 				$freeTextExpr = implode(baseObjectFilter::AND_SEPARATOR, $freeTextsArr);
 				$condition = "@(" . $matchFields . ") $freeTextExpr";
 				if($isLikeExpr)
-					$condition .= "\\\*";
+					$condition .= " | $freeTextExpr\\\*";
 				$additionalConditions[] = $condition;
 			}
 		}

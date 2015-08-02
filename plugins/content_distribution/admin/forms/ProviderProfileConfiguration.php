@@ -5,13 +5,26 @@
  */
 abstract class Form_ProviderProfileConfiguration extends Form_DistributionConfiguration
 {
+	/**
+	 * @var Kaltura_Client_ContentDistribution_Type_DistributionProfile
+	 */
+	protected $distributionProfile;
+	
+	/**
+	 * @var int
+	 */
 	protected $partnerId;
+	
+	/**
+	 * @var Kaltura_Client_ContentDistribution_Enum_DistributionProviderType
+	 */
 	protected $providerType;
 	
-	public function __construct($partnerId, $providerType)
+	public function __construct($partnerId, $providerType, Kaltura_Client_ContentDistribution_Type_DistributionProfile $distributionProfile = null)
 	{
 		$this->partnerId = $partnerId;
 		$this->providerType = $providerType;
+		$this->distributionProfile = $distributionProfile;
 		
 		parent::__construct();
 	}

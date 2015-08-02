@@ -174,6 +174,46 @@ class ResponseProfileService extends KalturaBaseService
 		$response = new KalturaResponseProfileListResponse();
 		$response->objects = $list;
 		$response->totalCount = $totalCount;
-		return $response;    
+		return $response;
+	}
+	
+	/**
+	 * Recalculate response profile cached objects
+	 * 
+	 * @action recalculate
+	 * @param KalturaResponseProfileCacheRecalculateOptions $options
+	 * @return KalturaResponseProfileCacheRecalculateResults
+	 */
+	function recalculateAction(KalturaResponseProfileCacheRecalculateOptions $options)
+	{
+		return KalturaResponseProfileCacher::recalculateCacheBySessionType($options);
+	}
+	
+	/**
+	 * Clone an existing response profile
+	 * 
+	 * @action clone
+	 * @param int $id
+	 * @param KalturaResponseProfile $profile
+	 * @throws KalturaErrors::RESPONSE_PROFILE_ID_NOT_FOUND
+	 * @throws KalturaErrors::RESPONSE_PROFILE_DUPLICATE_SYSTEM_NAME
+	 * @return KalturaResponseProfile
+	 */
+	function cloneAction ($id, KalturaResponseProfile $profile)
+	{
+		$origResponseProfileDbObject = ResponseProfilePeer::retrieveByPK($id);
+		if (!$origResponseProfileDbObject)
+			throw new KalturaAPIException(KalturaErrors::RESPONSE_PROFILE_ID_NOT_FOUND, $id);
+			
+		$newResponseProfileDbObject = $origResponseProfileDbObject->copy();
+		
+		if ($profile)
+			$newResponseProfileDbObject = $profile->toInsertableObject($newResponseProfileDbObject);
+				
+		$newResponseProfileDbObject->save();
+		
+		$newResponseProfile = new KalturaResponseProfile();
+		$newResponseProfile->fromObject($newResponseProfileDbObject, $this->getResponseProfile());
+		return $newResponseProfile;
 	}
 }

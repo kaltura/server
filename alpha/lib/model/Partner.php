@@ -54,8 +54,12 @@ class Partner extends BasePartner
 	const PARTNER_TYPE_SAKAI = 108;
 	const PARTNER_TYPE_ADMIN_CONSOLE = 109;
 	
+	const CUSTOM_DATA_USAGE_WARNINGS = 'usageWarnings';
+	
 	public static $s_content_root ;
 	
+	const CDN_HOST_WHITE_LIST = 'CDNHostWhiteList';
+
 	public function save(PropelPDO $con = null)
 	{
 		PartnerPeer::removePartnerFromCache( $this->getId() );
@@ -65,8 +69,8 @@ class Partner extends BasePartner
 	
 	public function validateSecret ( $partner_secret , $partner_key , &$ks_max_expiry_in_seconds , $admin = false )
 	{
-		$secret_to_match = $admin ? $this->getAdminSecret() : $this->getSecret() ;
-		if ( $partner_secret == $secret_to_match )
+		if ($partner_secret === $this->getAdminSecret() || 
+			(!$admin && $partner_secret === $this->getSecret()))
 		{
 			$ks_max_expiry_in_seconds = $this->getKsMaxExpiryInSeconds();
 			return true;
@@ -598,7 +602,7 @@ class Partner extends BasePartner
 	public function getMaxBulkSize() { return $this->getFromCustomData("maxBulk", null, null); }
 	public function setMaxBulkSize( $v ) { $this->putInCustomData("maxBulk", (int)$v); } 
 
-	public function getStorageServePriority() { return $this->getFromCustomData("storageServePriority", null, 0); }
+	public function getStorageServePriority() { return $this->getFromCustomData("storageServePriority", null, StorageProfile::STORAGE_SERVE_PRIORITY_KALTURA_ONLY); }
 	public function setStorageServePriority( $v ) { $this->putInCustomData("storageServePriority", (int)$v); } 
 	
 	public function getStorageDeleteFromKaltura() { return $this->getFromCustomData("storageDeleteFromKaltura", null, 0); }
@@ -1649,4 +1653,101 @@ class Partner extends BasePartner
 
 	public function getReferenceId() { return $this->getFromCustomData("referenceId", null); }
 	public function setReferenceId( $v ) { $this->putInCustomData("referenceId", $v); }
+
+	public function getGoogleOAuth2($appId, $objectIdentifier = null)
+	{
+		$customDataKey = $appId;
+		if ($objectIdentifier)
+		{
+			$customDataKey .= '_' . $objectIdentifier;
+		}
+			
+		$tokenData = $this->getFromCustomData($customDataKey, 'googleAuth');
+		if(is_null($tokenData))
+		{
+			$appConfig = kConf::get($appId, 'google_auth', null);
+			if($appConfig && isset($appConfig[$objectIdentifier]))
+			{
+				$tokenJsonStr = $appConfig[$objectIdentifier];
+				$tokenData = json_decode($tokenJsonStr, true);
+			}
+		}
+		
+		return $tokenData;
+	}
+	
+	public function setGoogleOAuth2($appId, $tokenJsonStr, $objectIdentifier = null)
+	{
+		$tokenData = json_decode($tokenJsonStr, true);
+		
+		$customDataKey = $appId;
+		if ($objectIdentifier)
+		{
+			$customDataKey .= '_' . $objectIdentifier;
+		}
+			
+		$this->putInCustomData($customDataKey, $tokenData, 'googleAuth');
+	}
+
+	public function isInCDNWhiteList($host)
+	{
+		KalturaLog::debug("Checking host [$host] is in partner CDN white list");
+		$whiteList = $this->getCdnHostWhiteListArray();
+		foreach ($whiteList as $regEx)
+		{
+			if (preg_match("/".$regEx."/", $host)===1)//Should $regEx be escaped?
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public function getCdnHostWhiteListArray()
+	{
+		$whiteListStr = $this->getFromCustomData(self::CDN_HOST_WHITE_LIST);
+		$whiteListArr = array();
+		if (!is_null($whiteListStr))
+		{
+			$whiteListArr = unserialize($whiteListStr);
+		}
+		return $whiteListArr;
+	}
+
+	public function getCdnHostWhiteList()
+	{
+		$whiteLiestArr = $this->getCdnHostWhiteListArray();
+		$whiteLiestStr = implode(",",$whiteLiestArr);
+		return $whiteLiestStr;
+	}
+
+	public function setCdnHostWhiteList($whiteListRegEx)
+	{
+		$whiteListArr = explode(',', rtrim($whiteListRegEx, ','));
+		$this->putInCustomData(self::CDN_HOST_WHITE_LIST, serialize($whiteListArr));
+	}
+
+	public function getUsageWarnings() { return $this->getFromCustomData(self::CUSTOM_DATA_USAGE_WARNINGS, null, array()); }
+	public function setUsageWarnings( $v ) { $this->putInCustomData(self::CUSTOM_DATA_USAGE_WARNINGS, $v); }
+
+	public function getUsageWarning($type, $percent){
+		$usageWarnings = $this->getUsageWarnings();
+		$key = $type.'_'.$percent;
+		if(array_key_exists($key, $usageWarnings)){
+			return $usageWarnings[$key];
+		}
+		return null;
+	}
+	
+	public function resetUsageWarning($type, $percent){
+		$usageWarnings = $this->getUsageWarnings();
+		unset($usageWarnings[$type.'_'.$percent]);
+		$this->setUsageWarnings($usageWarnings);
+	}
+	
+	public function setUsageWarning($type, $percent, $value){
+		$usageWarnings = $this->getUsageWarnings();
+		$usageWarnings[$type.'_'.$percent] = $value;
+		$this->setUsageWarnings($usageWarnings);		
+	}
 }

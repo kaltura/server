@@ -96,6 +96,25 @@ class KalturaBaseEntryFilter extends KalturaBaseEntryBaseFilter
 			$this->moderationStatusNotIn = implode(",", $moderationStatusesNotIn); 
 		}
 	}
+
+	private function preparePusersToKusersFilter( $puserIdsCsv )
+	{
+		$kuserIdsArr = array();
+		$puserIdsArr = explode(',',$puserIdsCsv);
+		$kuserArr = kuserPeer::getKuserByPartnerAndUids(kCurrentContext::getCurrentPartnerId(), $puserIdsArr);
+
+		foreach($kuserArr as $kuser)
+		{
+			$kuserIdsArr[] = $kuser->getId();
+		}
+
+		if(!empty($kuserIdsArr))
+		{
+			return implode(',',$kuserIdsArr);
+		}
+
+		return -1; // no result will be returned if no puser exists
+	}
 	
 	/**
 	 * The user_id is infact a puser_id and the kuser_id should be retrieved
@@ -131,7 +150,7 @@ class KalturaBaseEntryFilter extends KalturaBaseEntryBaseFilter
 	 * @param KalturaFilterPager $pager
 	 * @return KalturaCriteria
 	 */
-	protected function prepareEntriesCriteriaFilter(KalturaFilterPager $pager)
+	public function prepareEntriesCriteriaFilter(KalturaFilterPager $pager = null)
 	{
 		// because by default we will display only READY entries, and when deleted status is requested, we don't want this to disturb
 		entryPeer::allowDeletedInCriteriaFilter(); 
@@ -140,7 +159,7 @@ class KalturaBaseEntryFilter extends KalturaBaseEntryBaseFilter
 	
 		if( $this->idEqual == null && $this->redirectFromEntryId == null )
         {
-        	$this->setDefaultStatus($this);
+        	$this->setDefaultStatus();
             $this->setDefaultModerationStatus($this);
             if($this->parentEntryIdEqual == null)
             	$c->add(entryPeer::DISPLAY_IN_SEARCH, mySearchUtils::DISPLAY_IN_SEARCH_SYSTEM, Criteria::NOT_EQUAL);
@@ -204,5 +223,36 @@ class KalturaBaseEntryFilter extends KalturaBaseEntryBaseFilter
 		$response->totalCount = $totalCount;
 		
 		return $response;
+	}
+
+	/* (non-PHPdoc)
+	 * @see KalturaRelatedFilter::validateForResponseProfile()
+	 */
+	public function validateForResponseProfile()
+	{
+		if(PermissionPeer::isValidForPartner(PermissionName::FEATURE_ENABLE_RESPONSE_PROFILE_USER_CACHE, kCurrentContext::getCurrentPartnerId()))
+			return;
+		
+		if(kEntitlementUtils::getEntitlementEnforcement())
+		{
+			throw new KalturaAPIException(KalturaErrors::CANNOT_LIST_RELATED_ENTITLED_WHEN_ENTITLEMENT_IS_ENABLE, get_class($this));
+		}
+		
+		if(		!kCurrentContext::$is_admin_session
+			&&	!$this->idEqual 
+			&&	!$this->idIn
+			&&	!$this->referenceIdEqual
+			&&	!$this->redirectFromEntryId
+			&&	!$this->referenceIdIn 
+			&&	!$this->parentEntryIdEqual)
+		{
+			if(kCurrentContext::$ks_object->privileges === ks::PATTERN_WILDCARD)
+				return;
+			
+			if(kCurrentContext::$ks_object->getPrivilegeValue(ks::PRIVILEGE_LIST) === ks::PATTERN_WILDCARD)
+				return;
+				
+			throw new KalturaAPIException(KalturaErrors::USER_KS_CANNOT_LIST_RELATED_ENTRIES, get_class($this));
+		}
 	}
 }

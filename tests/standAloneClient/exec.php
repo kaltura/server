@@ -232,9 +232,8 @@ function executeRequest(KalturaClient $client, SimpleXMLElement $request)
 	{
 		if (!is_null($impersonatePartner))
 		{
-			$config = $client->getConfig();
-			$configPartnerId = $config->partnerId;
-			$config->partnerId = $impersonatePartner;
+		    $configPartnerId = $client->getPartnerId();
+			$client->setPartnerId($impersonatePartner);
 		}
 		if ($client->isMultiRequest())
 			$doing = 'Queuing';
@@ -244,8 +243,7 @@ function executeRequest(KalturaClient $client, SimpleXMLElement $request)
 		$result = call_user_func_array(array($service, $actionName), $arguments);
 		if (!is_null($impersonatePartner))
 		{
-			$config = $client->getConfig();
-			$config->partnerId = $configPartnerId;
+			$client->setPartnerId($configPartnerId);
 		}
 	}
 	catch(Exception $e)
@@ -322,7 +320,12 @@ if(isset($inXml->session))
 		{
 			$password = askForUserParameter('Partner password:');
 		}
-		$ks = $client->user->loginByLoginId($email, $password);
+		if(!$partnerId)
+		{
+		    $partnerId = askForUserParameter('Partner ID:');
+		}
+		    
+		$ks = $client->user->loginByLoginId($email, $password, $partnerId);
 	}
 	$client->setKs($ks);
 }

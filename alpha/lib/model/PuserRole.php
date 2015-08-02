@@ -8,7 +8,7 @@
  * @package Core
  * @subpackage model
  */ 
-class PuserRole extends BasePuserRole
+class PuserRole extends BasePuserRole implements IBaseObject
 {
 	const PUSER_ROLE_PRODUCER = 1;
 	const PUSER_ROLE_RECIPIENT = 2;

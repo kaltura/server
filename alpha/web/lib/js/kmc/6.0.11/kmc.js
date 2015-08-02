@@ -1,6 +1,6 @@
-/*! KMC - v6.0.11 - 2014-12-30
+/*! KMC - v6.0.11 - 2015-06-29
 * https://github.com/kaltura/KMC_V2
-* Copyright (c) 2014 Amir Chervinsky; Licensed GNU */
+* Copyright (c) 2015 Amir Chervinsky; Licensed GNU */
 /**
  * angular-translate - v1.1.1 - 2013-11-24
  * http://github.com/PascalPrecht/angular-translate
@@ -3590,7 +3590,7 @@ kmcApp.controller('PreviewCtrl', ['$scope', '$translate', 'previewService', func
 			options = options || {};
 			var playerId = (options.uiConfId) ? options.uiConfId : undefined;
 			// Exit if player not loaded
-			if(!kmc.vars.playlists_list || !kmc.vars.players_list) {
+			if(!kmc.vars.playlists_list && !kmc.vars.players_list) {
 				return ;
 			}
 			// List of players
@@ -3693,9 +3693,11 @@ kmcApp.controller('PreviewCtrl', ['$scope', '$translate', 'previewService', func
 	});
 
 	$scope.$on('changePlayer', function(e, playerId) {
-		playerId = ( playerId ) ? playerId : $scope.players[0].id;
-		$scope.player = playerId;
-		draw();
+		if ( playerId || ( playerId === undefined && $scope.players && $scope.players.length )){
+			playerId = ( playerId ) ? playerId : $scope.players[0].id;
+			$scope.player = playerId;
+			draw();
+		}
 	});
 
 	$scope.$on('changeDelivery', function(e, deliveryTypeId) {
@@ -3728,6 +3730,9 @@ kmcApp.controller('PreviewCtrl', ['$scope', '$translate', 'previewService', func
 	$scope.$watch('deliveryType', function() {
 		var deliveryType = Preview.getObjectById($scope.deliveryType, $scope.deliveryTypes);
 		previewService.set('deliveryType', deliveryType);
+		if ( deliveryType.id === "hds" ){
+			$scope.secureEmbed = false;
+		}
 	});
 	$scope.$watch('embedType', function() {
 		previewService.set('embedType', $scope.embedType);

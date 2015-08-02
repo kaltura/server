@@ -64,7 +64,7 @@ $fltStr = null;
 			$cmdStr = str_replace(" -deinterlace", "", $cmdStr);
 		}
 		
-		$filters = self::generateVideoFilters($vid);
+		$filters = $this->generateVideoFilters($vid);
 		if(count($filters)>0){
 			$fltStr = implode(',', $filters);
 			$cmdStr.= " -vf '$fltStr'";
@@ -252,12 +252,12 @@ $nullDev ="/dev/null";
 			return false;
 		
 			/*
-			 * HD codecs (prores & dnxhd) can be packaged only in MOV
+			 * HD codecs (prores & dnxhd) can be packaged only in MOV/MXF
 			 */
 $hdCodecsArr = array(KDLVideoTarget::APCO,KDLVideoTarget::APCS,KDLVideoTarget::APCN,KDLVideoTarget::APCH,KDLVideoTarget::DNXHD);
 		if(isset($target->_container))
 		{
-			if($target->_container->_id!=KDLContainerTarget::MOV && in_array($target->_video->_id, $hdCodecsArr)){
+			if(!$target->_container->IsFormatOf(array(KDLContainerTarget::MOV,KDLContainerTarget::MXF)) && in_array($target->_video->_id, $hdCodecsArr)){
 				$target->_errors[KDLConstants::ContainerIndex][] = 
 					KDLErrors::ToString(KDLErrors::PackageMovOnly, $target->_video->_id);
 				return true;
