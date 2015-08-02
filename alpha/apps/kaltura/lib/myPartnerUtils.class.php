@@ -1480,6 +1480,7 @@ class myPartnerUtils
  		foreach($categories as $category)
  		{
  			/* @var $category category */
+ 			$category->setPuserId(null);
  			$newCategory= $category->copy();
  			$newCategory->setPartnerId($toPartner->getId());
  			if($category->getParentId())
