@@ -390,6 +390,9 @@ abstract class KalturaObject implements IApiObject
 			KalturaResponseProfileCacher::onPersistentObjectLoaded($srcObj);
 			if($responseProfile)
 			{
+				// trigger validation
+				$responseProfile->validateNestedObjects();
+		
 				$this->relatedObjects = KalturaResponseProfileCacher::start($srcObj, $responseProfile);
 				if(!$this->relatedObjects)
 				{
@@ -401,10 +404,7 @@ abstract class KalturaObject implements IApiObject
 	}
 	
 	public function loadRelatedObjects(KalturaDetachedResponseProfile $responseProfile)
-	{
-		// trigger validation
-		$responseProfile->validateNestedObjects();
-		
+	{	
 		if(!$responseProfile->relatedProfiles)
 			return;
 			
@@ -444,7 +444,6 @@ abstract class KalturaObject implements IApiObject
 			{
 				KalturaLog::debug("No mappings defined in response-profile [$relatedProfile->name]");
 			}
-			$filter->validateForResponseProfile();
 			
 			$pager = $relatedProfile->pager;
 			if(!$pager)
