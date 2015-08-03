@@ -854,19 +854,4 @@ class BaseEntryService extends KalturaEntryService
 
 		return $this->getEntry($clonedEntry->getId());
 	}
-	
-	protected function duplicateTemplateEntry($conversionProfileId)
-	{
-		$dbEntry = null;
-		$conversionProfile = myPartnerUtils::getConversionProfile2ForPartner($this->getPartnerId(), $conversionProfileId);
-		if($conversionProfile && $conversionProfile->getDefaultEntryId())
-		{
-			$templateEntry = entryPeer::retrieveByPKNoFilter($conversionProfile->getDefaultEntryId(), null, false);
-			if ($templateEntry)
-			{
-				$dbEntry = $templateEntry->copyTemplate(true);
-				return $dbEntry;
-			}
-		}
-	}
 }
