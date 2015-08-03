@@ -17,9 +17,11 @@ class DeliveryProfileLiveRtmp extends DeliveryProfileLive {
 		return $this->getFromCustomData("enforceRtmpe");
 	}
 	
-	public function serve($baseUrl, $backupUrl) {
+	public function doServe(kLiveStreamConfiguration $liveStreamConfig)
+	{
 		$flavors = $this->buildRtmpLiveStreamFlavorsArray();
-		
+
+		$baseUrl = $liveStreamConfig->getUrl();
 		$this->finalizeUrls($baseUrl, $flavors);
 		
 		$renderer = $this->getRenderer($flavors);
@@ -35,6 +37,7 @@ class DeliveryProfileLiveRtmp extends DeliveryProfileLive {
 			$baseUrl = preg_replace('/^rtmp:\/\//', 'rtmpe://', $baseUrl);
 			$baseUrl = preg_replace('/^rtmpt:\/\//', 'rtmpte://', $baseUrl);
 		}
+		
 		parent::finalizeUrls($baseUrl, $flavorsUrls);
 	}
 	

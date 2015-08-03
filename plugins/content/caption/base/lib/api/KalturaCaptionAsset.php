@@ -60,15 +60,20 @@ class KalturaCaptionAsset extends KalturaAsset
 	 * @filter eq,in,notin
 	 */
 	public $status;
-	
+
 	/**
 	 * The parent id of the asset
-	 *
-	 *@var string
-	 *@insertonly
+	 * @var string
+	 * @insertonly
 	 *
 	 */
 	public $parentId;
+
+	/**
+	 * The Accuracy of the caption content
+	 *@var int 
+	 */
+	public $accuracy;
 
 	private static $map_between_objects = array
 	(
@@ -78,7 +83,8 @@ class KalturaCaptionAsset extends KalturaAsset
 		"label",
 		"format" => "containerFormat",
 		"status",
-		"parentId",		
+		"parentId",
+		"accuracy",
 	);
 	
 	public function getMapBetweenObjects ( )

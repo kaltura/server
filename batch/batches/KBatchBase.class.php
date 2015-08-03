@@ -79,7 +79,9 @@ abstract class KBatchBase implements IKalturaLogger
 
 	public function done()
 	{
-		KalturaLog::info("Done after [" . (microtime ( true ) - $this->start ) . "] seconds");
+		$done = "Done after [" . (microtime ( true ) - $this->start ) . "] seconds";
+		KalturaLog::info($done);
+		KalturaLog::stderr($done, KalturaLog::INFO);
 	}
 
 	/**
@@ -233,6 +235,7 @@ abstract class KBatchBase implements IKalturaLogger
 
 		// clear seperator between executions
 		KalturaLog::debug('___________________________________________________________________________________');
+		KalturaLog::stderr('___________________________________________________________________________________', KalturaLog::DEBUG);
 		KalturaLog::info(file_get_contents(dirname( __FILE__ ) . "/../VERSION.txt"));
 
 		if(! (self::$taskConfig instanceof KSchedularTaskConfig))
