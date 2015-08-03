@@ -975,9 +975,9 @@ class KalturaEntryService extends KalturaBaseService
 			if ($templateEntry)
 			{
 				$dbEntry = $templateEntry->copyTemplate(true);
-				return $dbEntry;
 			}
 		}
+		return $dbEntry;
 	}
 	
 	/**
