@@ -858,15 +858,19 @@ class playManifestAction extends kalturaAction
 	 */
 	public function getRequestParameter($name, $default = null)
 	{
-		$val = parent::getRequestParameter($name, null);
-		if (!is_null($val))
-			return $val;
+		$requestParams = infraRequestUtils::getRequestParams();
+		if (array_key_exists($name, $requestParams))
+		{
+			return $requestParams[$name];
+		}
 
 		if (isset(self::$shortNames[$name]))
 		{
-			$val = parent::getRequestParameter(self::$shortNames[$name], null);
-			if (!is_null($val))
-				return $val;
+			$shortName = self::$shortNames[$name];
+			if (array_key_exists($shortName, $requestParams))
+			{
+				return $requestParams[$shortName];
+			}
 		}
 
 		return $default;

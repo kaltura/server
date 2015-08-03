@@ -452,7 +452,10 @@ class infraRequestUtils
 		{
 			$key = each($pathParts);
 			$value = each($pathParts);
-			$params[$key['value']] = $value['value'];
+			if (!array_key_exists($key['value'], $params))
+			{
+				$params[$key['value']] = $value['value'];
+			}
 		}
 			
 		self::$requestParams = array_merge($_FILES, $_POST, $_GET, $params);
