@@ -5,8 +5,16 @@
  */
 class serveManifestAction extends sfAction
 {
-	private $entry;
-	
+	/**
+	 * @var entry
+	 */
+	private $entry = null;
+
+	/**
+	 * @var asset
+	 */
+	private $flavorAsset = null;
+		
 	/**
 	 * Will forward to the regular swf player according to the widget_id 
 	 */
@@ -30,6 +38,8 @@ class serveManifestAction extends sfAction
 		$syncKey = $this->getFileSyncKey($objectId, $type);
 		
 		KalturaMonitorClient::initApiMonitor(false, 'extwidget.serveManifest', $this->entry->getPartnerId());
+		
+		myPartnerUtils::enforceDelivery($this->entry, $this->flavorAsset);
 		
 		if (!kFileSyncUtils::file_exists($syncKey, false))
 		{
@@ -149,15 +159,15 @@ class serveManifestAction extends sfAction
 	{
 		if($isAsset)
 		{
-			$flavorAsset = assetPeer::retrieveById($objectId);
-			if (is_null($flavorAsset))
+			$this->flavorAsset = assetPeer::retrieveById($objectId);
+			if (is_null($this->flavorAsset))
 				KExternalErrors::dieError(KExternalErrors::FLAVOR_NOT_FOUND);
 				
-			$this->entry = entryPeer::retrieveByPK($flavorAsset->getEntryId());
+			$this->entry = entryPeer::retrieveByPK($this->flavorAsset->getEntryId());
 			if (is_null($this->entry))
 				KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_FOUND);
 				
-			return $flavorAsset;
+			return $this->flavorAsset;
 		}	
 		else
 		{
