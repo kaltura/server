@@ -451,7 +451,7 @@ class CSharpClientGenerator extends ClientGeneratorFromXml
 		$this->appendLine("{");
 		$this->appendLine("	public static class KalturaObjectFactory");
 		$this->appendLine("	{");
-		$this->appendLine("		public static object Create(XmlElement xmlElement, string fallbackClass = null)");
+		$this->appendLine("		public static object Create(XmlElement xmlElement, string fallbackClass)");
 		$this->appendLine("		{");
 		$this->appendLine("			if (xmlElement[\"objectType\"] == null)");
 		$this->appendLine("			{");
