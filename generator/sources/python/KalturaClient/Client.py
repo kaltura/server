@@ -185,9 +185,9 @@ class KalturaClient(object):
         params.put("apiVersion", self.apiVersion)
         params.put("format", self.config.format)
         params.put("clientTag", self.config.clientTag)
-        url = self.config.serviceUrl + "/api_v3/index.php?service="
+        url = self.config.serviceUrl + "/api"
         if (self.multiRequestReturnType != None):
-            url += "multirequest"
+            url += "/service/multirequest"
             i = 1
             for call in self.callsQueue:
                 callParams = call.getParamsForMultiRequest(i)
@@ -197,7 +197,7 @@ class KalturaClient(object):
                 i += 1
         else:
             call = self.callsQueue[0]
-            url += call.service + "&action=" + call.action
+            url += "/service/" + call.service + "/action/" + call.action
             params.update(call.params)
             files.update(call.files)
 

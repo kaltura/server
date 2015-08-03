@@ -133,11 +133,11 @@ namespace Kaltura
             kparams.Add("clientTag", this._Config.ClientTag);
             kparams.AddIntIfNotNull("format", this._Config.ServiceFormat.GetHashCode());
 
-            string url = this._Config.ServiceUrl + "/api_v3/index.php?service=";
+            string url = this._Config.ServiceUrl + "/api";
 
             if (_MultiRequestReturnType != null)
             {
-                url += "multirequest";
+                url += "/service/multirequest";
                 int i = 1;
                 foreach (KalturaServiceActionCall call in _CallsQueue)
                 {
@@ -163,7 +163,7 @@ namespace Kaltura
             else
             {
                 KalturaServiceActionCall call = _CallsQueue[0];
-                url += call.Service + "&action=" + call.Action;
+                url += "/service/" + call.Service + "/action/" + call.Action;
                 kparams.Add(call.Params);
                 kfiles.Add(call.Files);
             }
