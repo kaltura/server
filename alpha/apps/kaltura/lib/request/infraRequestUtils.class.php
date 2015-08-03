@@ -455,7 +455,7 @@ class infraRequestUtils
 			$params[$key['value']] = $value['value'];
 		}
 			
-		self::$requestParams = array_merge($params, $_GET, $_POST, $_FILES);
+		self::$requestParams = array_merge($_FILES, $_POST, $_GET, $params);
 		return self::$requestParams;
 	}
 
