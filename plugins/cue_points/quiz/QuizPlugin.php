@@ -358,33 +358,33 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 			case myReportsMgr::REPORT_FLAVOR_TOTAL:
 				return $this->getTotalReport($objectIds);
 			case myReportsMgr::REPORT_FLAVOR_TABLE:
-				if ($report_type == self::getPluginName() . "." . QuizReportType::QUIZ)
+				if ($report_type == (self::getPluginName() . "." . QuizReportType::QUIZ))
 				{
 					return $this->getQuestionPercentageTableReport($objectIds, $orderBy);
 				}
-				else if ($report_type == self::getPluginName() . "." . QuizReportType::QUIZ_USER_PERCENTAGE)
+				else if ($report_type == (self::getPluginName() . "." . QuizReportType::QUIZ_USER_PERCENTAGE))
 				{
 					return $this->getUserPercentageTable($objectIds, $orderBy);
 				}
-				else if ($report_type == self::getPluginName() . "." . QuizReportType::QUIZ_AGGREGATE_BY_QUESTION)
+				else if ($report_type == (self::getPluginName() . "." . QuizReportType::QUIZ_AGGREGATE_BY_QUESTION))
 				{
 					return $this->getQuizQuestionPercentageTableReport($objectIds, $orderBy);
 				}
-				else if ($report_type == self::getPluginName() . "." . QuizReportType::QUIZ_USER_AGGREGATE_BY_QUESTION)
+				else if ($report_type == (self::getPluginName() . "." . QuizReportType::QUIZ_USER_AGGREGATE_BY_QUESTION))
 				{
 					return $this->getUserPrecentageByUserTable($objectIds, $orderBy);
 				}
 			case myReportsMgr::REPORT_FLAVOR_COUNT:
-				if ( ($report_type == self::getPluginName() . "." . QuizReportType::QUIZ) ||
-					($report_type == self::getPluginName() . "." . QuizReportType::QUIZ_USER_PERCENTAGE) )
+				if ( ($report_type == (self::getPluginName() . "." . QuizReportType::QUIZ)) ||
+					($report_type == (self::getPluginName() . "." . QuizReportType::QUIZ_USER_PERCENTAGE)) )
 				{
 					return $this->getReportCount($objectIds);
 				}
-				else if ($report_type == self::getPluginName() . "." . QuizReportType::QUIZ_AGGREGATE_BY_QUESTION)
+				else if ($report_type == (self::getPluginName() . "." . QuizReportType::QUIZ_AGGREGATE_BY_QUESTION))
 				{
 					return $this->getQuestionCountByQusetionIds($objectIds);
 				}
-				else if ($report_type == self::getPluginName() . "." . QuizReportType::QUIZ_USER_AGGREGATE_BY_QUESTION)
+				else if ($report_type == (self::getPluginName() . "." . QuizReportType::QUIZ_USER_AGGREGATE_BY_QUESTION))
 				{
 					return $this->getAnswerCountByUserIds($objectIds);
 				}
@@ -503,19 +503,7 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 	
 	protected function getAnswerCountByUserIds($objectIds)
 	{
-		$c = new Criteria();
-		$c->add(CuePointPeer::TYPE, QuizPlugin::getCoreValue('CuePointType',QuizCuePointType::QUIZ_ANSWER));
-		$userIds = explode(",", $objectIds);
-		$kuserIds = array();
-		foreach ($userIds as $userId)
-		{
-			$kuser = kuserPeer::getKuserByPartnerAndUid(kCurrentContext::$ks_partner_id, $userId);
-			if ($kuser)
-			{
-				$kuserIds[] = $kuser->getKuserId();
-			}
-		}
-		$c->add(CuePointPeer::KUSER_ID, $kuserIds, Criteria::IN);
+		$c = $this->createGetCuePointByUserIdsCriteria($objectIds);
 		$numOfAnswers = CuePointPeer::doCount($c);
 		$res['count_all'] = $numOfAnswers;
 		return array($res);
@@ -545,19 +533,7 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 	
 	protected function getUserPrecentageByUserTable($objectIds, $orderBy)
 	{
-		$c = new Criteria();
-		$c->add(CuePointPeer::TYPE, QuizPlugin::getCoreValue('CuePointType',QuizCuePointType::QUIZ_ANSWER));
-		$userIds = explode(",", $objectIds);
-		$kuserIds = array();
-		foreach ($userIds as $userId)
-		{
-			$kuser = kuserPeer::getKuserByPartnerAndUid(kCurrentContext::$ks_partner_id, $userId);
-			if ($kuser)
-			{
-				$kuserIds[] = $kuser->getKuserId();
-			}
-		}
-		$c->add(CuePointPeer::KUSER_ID, $kuserIds, Criteria::IN);
+		$c = $this->createGetCuePointByUserIdsCriteria($objectIds);
 		$answers = CuePointPeer::doSelect($c);
 		return $this->getAggregateDataForUsers($answers, $orderBy);
 	}
@@ -631,7 +607,10 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 			{
 				$pctg = 0.0;
 			}
-			$ans[] = array('question_id' => $question->getId(), 'percentage' => $pctg * 100, 'num_of_correct_answers' => $numOfCorrectAnswers, 'num_of_wrong_answers' => ($numOfAnswers - $numOfCorrectAnswers));
+			$ans[] = array('question_id' => $question->getId(), 
+				'percentage' => $pctg * 100, 
+				'num_of_correct_answers' => $numOfCorrectAnswers,
+				'num_of_wrong_answers' => ($numOfAnswers - $numOfCorrectAnswers));
 		}
 
 		uasort($ans, $this->getSortFunction($orderBy));
@@ -693,7 +672,10 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 			{
 				$userId = $dbKuser->getPuserId();
 			}
-			$ans[$userId] = array('user_id' => $userId, 'percentage' => ($totalCorrect / $totalAnswers) * 100, 'num_of_correct_answers' => $totalCorrect, 'num_of_wrong_answers' => ($totalAnswers - $totalCorrect));
+			$ans[$userId] = array('user_id' => $userId, 
+				'percentage' => ($totalCorrect / $totalAnswers) * 100, 
+				'num_of_correct_answers' => $totalCorrect, 
+				'num_of_wrong_answers' => ($totalAnswers - $totalCorrect));
 		}
 
 		uasort($ans, $this->getSortFunction($orderBy));
@@ -701,24 +683,50 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 		return $ans;
 	}
 
+	/**
+	 * @param $objectIds
+	 * @return Criteria
+	 */
+	protected function createGetCuePointByUserIdsCriteria($objectIds)
+	{
+		$c = new Criteria();
+		$c->add(CuePointPeer::TYPE, QuizPlugin::getCoreValue('CuePointType', QuizCuePointType::QUIZ_ANSWER));
+		$userIds = explode(",", $objectIds);
+		$kuserIds = array();
+		foreach ($userIds as $userId)
+		{
+			$kuser = kuserPeer::getKuserByPartnerAndUid(kCurrentContext::$ks_partner_id, $userId);
+			if ($kuser)
+			{
+				$kuserIds[] = $kuser->getKuserId();
+			}
+		}
+		$c->add(CuePointPeer::KUSER_ID, $kuserIds, Criteria::IN);
+		return $c;
+	}
+
 }
 
 function copmareNumbersAscending($a,$b)
 {
-	$prctgA = $a['percentage'];
-	$prctgB = $b['percentage'];
-	if ($prctgA == $prctgB) {
-		return 0;
-	}
-	return ($prctgA < $prctgB) ? -1 : 1;
+	return innerCompare($a,$b);
 }
 
 function copmareNumbersDescending($a,$b)
 {
+    return innerCompare($a,$b)*(-1);
+}
+
+function innerCompare($a, $b)
+{
+	if (!isset($a['percentage']) || !isset($b['percentage']))
+	{
+		return 0;
+	}
 	$prctgA = $a['percentage'];
 	$prctgB = $b['percentage'];
 	if ($prctgA == $prctgB) {
 		return 0;
 	}
-	return ($prctgA < $prctgB) ? 1 : -1;
+	return ($prctgA < $prctgB) ? -1 : 1;	
 }
