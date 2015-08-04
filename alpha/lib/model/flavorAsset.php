@@ -10,6 +10,10 @@
  */
 class flavorAsset extends asset
 {
+
+	const KALTURA_TOKEN_MARKER = '{kt}';
+	const KALTURA_TOKEN_PARAM_NAME = '/kt/';
+
 	/**
 	 * Applies default values to this object.
 	 * This method should be called from the object's constructor (or
@@ -281,7 +285,7 @@ class flavorAsset extends asset
 		{
 			list($fileName , $extension) = kAssetUtils::getFileName($entry , $this);
 			$fileName = str_replace("\n", ' ', $fileName);
-			$fileName = kString::stripInvalidUrlChars($fileName);
+			$fileName = kString::keepOnlyValidUrlChars($fileName);
 	
 			if ($extension)
 				$fileName .= ".$extension";
@@ -299,7 +303,7 @@ class flavorAsset extends asset
 	}
 	
 	
-	public function getPlayManifestUrl($clientTag, $storageProfileId = null, $mediaProtocol = PlaybackProtocol::HTTP) {
+	public function getPlayManifestUrl($clientTag, $storageProfileId = null, $mediaProtocol = PlaybackProtocol::HTTP, $addKtToken = false) {
 		$entryId = $this->getEntryId();
 		$partnerId = $this->getPartnerId();
 		$subpId = $this->getentry()->getSubpId();
@@ -309,11 +313,18 @@ class flavorAsset extends asset
 		$url = "$partnerPath/playManifest/entryId/$entryId/flavorId/$flavorAssetId/protocol/$mediaProtocol/format/url";
 		if($storageProfileId)
 			$url .= "/storageId/" . $storageProfileId;
-	
+
+		if($addKtToken)
+			$url .= self::KALTURA_TOKEN_PARAM_NAME . self::KALTURA_TOKEN_MARKER;
+
 		if ($this->getFileExt())
 			$url .= "/a." . $this->getFileExt();
-	
+
 		$url .= "?clientTag=$clientTag";
+
+		if($addKtToken)
+			$url = self::calculateKalturaToken($url);
+
 		return $url;
 	}
 	
@@ -322,5 +333,11 @@ class flavorAsset extends asset
 		$size = $orginalSizeKB * ($seconds / ($entry->getLengthInMsecs() / 1000)) * 1.2;
 		$size = min($orginalSizeKB, floor($size)) * 1024;
 		return $size;
+	}
+	
+	static protected function calculateKalturaToken($url)
+	{
+		$token = sha1(kConf::get('url_token_secret') . $url);
+		return str_replace(self::KALTURA_TOKEN_MARKER, $token, $url);
 	}
 }

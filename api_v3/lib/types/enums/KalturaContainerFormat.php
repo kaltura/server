@@ -16,6 +16,7 @@ class KalturaContainerFormat extends KalturaStringEnum
 	const WMV = "wmv";
 	const WMA = "wma";
 	const ISMV = "ismv";
+	const ISMA = "isma";
 	const MKV = "mkv";
 	const WEBM = "webm";
 	const MPEG = "mpeg";

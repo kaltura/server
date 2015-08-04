@@ -31,7 +31,6 @@ class serveFlavorAction extends kalturaAction
 
 		$flavorId = $this->getRequestParameter("flavorId");
 		$shouldProxy = $this->getRequestParameter("forceproxy", false);
-		$ks = $this->getRequestParameter( "ks" );
 		$fileName = $this->getRequestParameter( "fileName" );
 		$fileParam = $this->getRequestParameter( "file" );
 		$fileParam = basename($fileParam);
@@ -56,20 +55,16 @@ class serveFlavorAction extends kalturaAction
 		}
 
 		$clipTo = null;
-//		$securyEntryHelper = new KSecureEntryHelper($entry, $ks, $referrer, ContextType::PLAY);
-//		if ($securyEntryHelper->shouldPreview())
-//		{
-//			$clipTo = $securyEntryHelper->getPreviewLength() * 1000;
-//		}
-//		else
-//		{
-//			$securyEntryHelper->validateForPlay($entry, $ks);
-//		}
-
+		
+		$entry = $flavorAsset->getentry();
+		if (!$entry)
+		{
+			KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_FOUND);
+		}
+		
 		KalturaMonitorClient::initApiMonitor(false, 'extwidget.serveFlavor', $flavorAsset->getPartnerId());
 			
-		myPartnerUtils::blockInactivePartner($flavorAsset->getPartnerId());
-		myPartnerUtils::enforceDelivery($flavorAsset->getPartnerId());
+		myPartnerUtils::enforceDelivery($entry, $flavorAsset);
 		
 		$version = $this->getRequestParameter( "v" );
 		if (!$version)
@@ -100,6 +95,12 @@ class serveFlavorAction extends kalturaAction
 			}
 			$renderer->output();
 			KExternalErrors::dieGracefully();
+		}
+		
+		if (kConf::hasParam('serve_flavor_allowed_partners') && 
+			!in_array($flavorAsset->getPartnerId(), kConf::get('serve_flavor_allowed_partners')))
+		{
+			KExternalErrors::dieError(KExternalErrors::ACTION_BLOCKED);
 		}
 
 		if (!kFileSyncUtils::file_exists($syncKey, false))

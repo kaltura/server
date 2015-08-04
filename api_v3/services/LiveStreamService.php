@@ -166,7 +166,10 @@ class LiveStreamService extends KalturaLiveEntryService
 			if($url)
 			{
 				KalturaLog::info('Determining status of live stream URL [' .$url. ']');
-				$deliveryProfile = DeliveryProfilePeer::getLiveDeliveryProfileByHostName(parse_url($url, PHP_URL_HOST), $entryId, $protocol);
+				$dpda= new DeliveryProfileDynamicAttributes();
+				$dpda->setEntryId($entryId);
+				$dpda->setFormat($protocol);
+				$deliveryProfile = DeliveryProfilePeer::getLiveDeliveryProfileByHostName(parse_url($url, PHP_URL_HOST), $dpda);
 				if($deliveryProfile && $deliveryProfile->isLive($url))
 				{
 					throw new KalturaAPIException(KalturaErrors::LIVE_STREAM_ALREADY_BROADCASTING, $entryId, $mediaServer->getHostname());
@@ -280,6 +283,7 @@ class LiveStreamService extends KalturaLiveEntryService
 	 */
 	function updateAction($entryId, KalturaLiveStreamEntry $liveStreamEntry)
 	{
+		$this->dumpApiRequest($entryId);
 		return $this->updateEntry($entryId, $liveStreamEntry, KalturaEntryType::LIVE_STREAM);
 	}
 
@@ -394,6 +398,10 @@ class LiveStreamService extends KalturaLiveEntryService
 			return $liveStreamEntry->hasMediaServer();
 		}
 		
+		$dpda= new DeliveryProfileDynamicAttributes();
+		$dpda->setEntryId($id);
+		$dpda->setFormat($protocol);
+		
 		switch ($protocol)
 		{
 			case KalturaPlaybackProtocol::HLS:
@@ -410,7 +418,7 @@ class LiveStreamService extends KalturaLiveEntryService
 				}
 				KalturaLog::info('Determining status of live stream URL [' .$url. ']');
 				
-				$urlManager = DeliveryProfilePeer::getLiveDeliveryProfileByHostName(parse_url($url, PHP_URL_HOST), $id, $protocol);
+				$urlManager = DeliveryProfilePeer::getLiveDeliveryProfileByHostName(parse_url($url, PHP_URL_HOST), $dpda);
 				if($urlManager) 
 					return $urlManager->isLive($url);
 				break;
@@ -422,7 +430,7 @@ class LiveStreamService extends KalturaLiveEntryService
 				{
 					$url = $config->getUrl();
 					KalturaLog::info('Determining status of live stream URL [' .$url . ']');
-					$urlManager = DeliveryProfilePeer::getLiveDeliveryProfileByHostName(parse_url($url, PHP_URL_HOST), $id, $protocol);
+					$urlManager = DeliveryProfilePeer::getLiveDeliveryProfileByHostName(parse_url($url, PHP_URL_HOST), $dpda);
 					if($urlManager)
 						return $urlManager->isLive($url);
 				}
@@ -445,6 +453,8 @@ class LiveStreamService extends KalturaLiveEntryService
 	 */
 	public function addLiveStreamPushPublishConfigurationAction ($entryId, $protocol, $url = null, KalturaLiveStreamConfiguration $liveStreamConfiguration = null)
 	{
+		$this->dumpApiRequest($entryId);
+		
 		$entry = entryPeer::retrieveByPK($entryId);
 		if (!$entry || $entry->getType() != entryType::LIVE_STREAM)
 			throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_ID);
@@ -492,6 +502,8 @@ class LiveStreamService extends KalturaLiveEntryService
 	 */
 	public function removeLiveStreamPushPublishConfigurationAction ($entryId, $protocol)
 	{
+		$this->dumpApiRequest($entryId);
+		
 		$entry = entryPeer::retrieveByPK($entryId);
 		if (!$entry || $entry->getType() != entryType::LIVE_STREAM)
 			throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_ID);

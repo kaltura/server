@@ -166,6 +166,7 @@ class XmlClientGenerator extends ClientGeneratorFromPhp
 	private function appendConfiguration(DOMElement $configurationsElement, $name, $class)
 	{
 	    $configurationElement = $this->_doc->createElement($name);
+	    $configurationElement->setAttribute('type', $class);
 	    
 	    $reflectClass = new ReflectionClass($class);
 		$properties = $reflectClass->getProperties(ReflectionProperty::IS_PUBLIC);
@@ -180,6 +181,11 @@ class XmlClientGenerator extends ClientGeneratorFromPhp
 				if($parsedDocComment->alias)
 				{
 					$paramElement->setAttribute('alias', $parsedDocComment->alias);
+				}
+				
+				if($parsedDocComment->volatile)
+				{
+					$paramElement->setAttribute('volatile', true);
 				}
 				
 				if($parsedDocComment->description)

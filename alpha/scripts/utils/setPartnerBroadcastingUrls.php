@@ -24,7 +24,9 @@ if (!$partner)
 
 $partner->setBroadcastUrlManager('kPartnerBroadcastUrlManager');
 $partner->setPrimaryBroadcastUrl($primaryBroadcatUrl);
-$partner->setSecondaryBroadcastUrl($secondaryBroadcastUrl);
+
+if($secondaryBroadcastUrl)
+	$partner->setSecondaryBroadcastUrl($secondaryBroadcastUrl);
 
 $liveStreamConfigurations = array ('http' => $httpPlaybackUrl);
 if($httpsPlaybackUrl)

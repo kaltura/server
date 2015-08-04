@@ -270,10 +270,13 @@ class BaseEntryService extends KalturaEntryService
 	    //$entry->validatePropertyMinLength("name", 1);
 	    if (!$entry->name)
 		    $entry->name = $this->getPartnerId().'_'.time();
-			
+
 	    // first copy all the properties to the db entry, then we'll check for security stuff
-	    $dbEntry = $entry->toInsertableObject(new entry());
-			
+	    $dbEntry = $this->duplicateTemplateEntry($entry->conversionProfileId);
+	    $dbEntry = $entry->toInsertableObject($dbEntry);
+	    
+
+	    
 	    $dbEntry->setType($type);
 	    $dbEntry->setMediaType(entry::ENTRY_MEDIA_TYPE_AUTOMATIC);
 	        
@@ -481,8 +484,14 @@ class BaseEntryService extends KalturaEntryService
 		{
 			$pager = new KalturaFilterPager();
 		}
-		
-		return $filter->getListResponse($pager, $this->getResponseProfile());
+
+		// NOTE: The following is a hack in order to make sure all responses are of type KalturaBaseEntryListResponse.
+		//       The reason is that baseentry::list() is not being extended by derived classes.
+		$result = $filter->getListResponse($pager, $this->getResponseProfile());
+		$response = new KalturaBaseEntryListResponse();
+		$response->objects = $result->objects;
+		$response->totalCount = $result->totalCount;
+		return $response;
 	}
 	
 	/**
@@ -729,7 +738,14 @@ class BaseEntryService extends KalturaEntryService
 		}
 		
 		$result->isScheduledNow = $dbEntry->isScheduledNow($contextDataParams->time);
-		
+
+        $result->pluginData = new KalturaPluginDataArray();
+        $pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaEntryContextDataContributor');
+        foreach ($pluginInstances as $pluginInstance)
+        {
+            $pluginInstance->contributeToEntryContextDataResult($dbEntry, $contextDataParams, $result);
+        }
+
 		return $result;
 	}
 	

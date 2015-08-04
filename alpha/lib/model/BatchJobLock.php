@@ -13,7 +13,7 @@
  * @package Core
  * @subpackage model
  */
-class BatchJobLock extends BaseBatchJobLock {
+class BatchJobLock extends BaseBatchJobLock implements IBaseObject {
 	
 	public function isRetriesExceeded()
 	{

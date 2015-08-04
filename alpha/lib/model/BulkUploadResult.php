@@ -8,7 +8,7 @@
  * @package Core
  * @subpackage model
  */ 
-class BulkUploadResult extends BaseBulkUploadResult
+class BulkUploadResult extends BaseBulkUploadResult implements IBaseObject
 {   
 	/**
 	 * Get the [plugins_data] column value.

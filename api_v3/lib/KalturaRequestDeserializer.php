@@ -201,6 +201,9 @@ class KalturaRequestDeserializer
 			return null;
 		}
 		
+		$partnerId = kCurrentContext::getCurrentPartnerId();
+		myPartnerUtils::addPartnerToCriteria('ResponseProfile', $partnerId, true, "$partnerId,0");
+		
 		$responseProfile = null;
 		if(isset($this->paramsGrouped[$paramName]['id'])){
 			$responseProfile = ResponseProfilePeer::retrieveByPK($this->paramsGrouped[$paramName]['id']);
@@ -319,6 +322,10 @@ class KalturaRequestDeserializer
 			
 			if ($property->isEnum())
 			{
+				if(strtolower($value) == 'true')
+					$value = 1;
+				if(strtolower($value) == 'false')
+					$value = 0;
 				if (!$property->getTypeReflector()->checkEnumValue($value))
 					throw new KalturaAPIException(KalturaErrors::INVALID_ENUM_VALUE, $value, $name, $property->getType());
 			

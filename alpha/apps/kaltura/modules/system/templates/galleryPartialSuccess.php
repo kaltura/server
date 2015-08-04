@@ -54,7 +54,7 @@ foreach ( $entries as $entry ) {
 ?>
 <td style="font-size: 11px; width: 150px ; background-color:<?= $media_type_style[$entry->getMediaType()] ?>">
 <a href='javascript:investigate ( "<?= $entry->getId() ?>");'>
-<?=  $entry->getId() . " [" . $entry->getPartnerId() . "]" .
+<?php=  $entry->getId() . " [" . $entry->getPartnerId() . "]" .
 "<br>" . $entry->getName()?></a>
 <br>
 <table border=0>
@@ -66,7 +66,7 @@ foreach ( $entries as $entry ) {
 		<tr><td>p</td><td><?= $entry->getPlays() ?></td></tr>
 		<tr><td>c</td><td><?= $entry->getCreatedAt() ?></td></tr>
 </table>
-<? 
+<?php
 ++$i; 
 if ( $i %5 == 0 ) echo "</tr><tr>";
 } ?>

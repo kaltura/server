@@ -267,10 +267,15 @@ class kApiCache extends kApiCacheBase
 		}
 		return self::$_coordinates;
 	}
+	
+	static protected function getExtraFieldType($extraField)
+	{
+		return is_array($extraField) ? $extraField["type"] : $extraField;
+	}
 
 	protected function getFieldValues($extraField)
 	{
-		switch ($extraField)
+		switch (self::getExtraFieldType($extraField))
 		{
 		case self::ECF_REFERRER:
 			$values = array();
@@ -293,6 +298,9 @@ class kApiCache extends kApiCacheBase
 			return array(self::getCoordinates());
 
 			case self::ECF_IP:
+			if (is_array($extraField))
+				return array(infraRequestUtils::getIpFromHttpHeader($extraField[self::ECFD_IP_HTTP_HEADER], $extraField[self::ECFD_IP_ACCEPT_INTERNAL_IPS], true));
+
 			return array(infraRequestUtils::getRemoteAddress());
 		}
 
@@ -373,12 +381,15 @@ class kApiCache extends kApiCacheBase
 	{
 		foreach ($this->getFieldValues($extraField) as $valueIndex => $fieldValue)
 		{
-			if ($extraField == self::ECF_REFERRER)
+			$extraFieldType = self::getExtraFieldType($extraField);
+			$extraFieldCacheKey = is_array($extraField) ? json_encode($extraField) : $extraField;
+			
+			if ($extraFieldType == self::ECF_REFERRER)
 				$strippedFieldValue = infraRequestUtils::parseUrlHost($fieldValue);
 			else
 				$strippedFieldValue = $fieldValue;
 			$conditionResult = $this->applyCondition($fieldValue, $condition, $refValue, $strippedFieldValue);
-			$key = "___cache___{$extraField}_{$valueIndex}" . $this->getConditionKey($condition, $refValue);
+			$key = "___cache___{$extraFieldCacheKey}_{$valueIndex}" . $this->getConditionKey($condition, $refValue);
 			$this->_params[$key] = $conditionResult;
 		}
 

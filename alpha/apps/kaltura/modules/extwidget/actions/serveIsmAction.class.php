@@ -5,7 +5,15 @@
  */
 class serveIsmAction extends sfAction
 {
-	private $entry;
+	/**
+	 * @var entry
+	 */
+	private $entry = null;
+
+	/**
+	 * @var asset
+	 */
+	private $flavorAsset = null;
 	
 	/**
 	 * Will forward to the regular swf player according to the widget_id 
@@ -28,8 +36,10 @@ class serveIsmAction extends sfAction
 			$referrer = '';
 						
 		$syncKey = $this->getFileSyncKey($objectId, $type);
-		
+				
 		KalturaMonitorClient::initApiMonitor(false, 'extwidget.serveIsm', $this->entry->getPartnerId());
+		
+		myPartnerUtils::enforceDelivery($this->entry, $this->flavorAsset);
 		
 		if (!kFileSyncUtils::file_exists($syncKey, false))
 		{
@@ -95,6 +105,7 @@ class serveIsmAction extends sfAction
 					$subType = entry::FILE_SYNC_ENTRY_SUB_TYPE_ISMC;
 				break;
 			case 'ismv':
+			case 'isma':
 				$subType = flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET;
 				$isAsset = true;
 				break;
@@ -143,15 +154,15 @@ class serveIsmAction extends sfAction
 	{
 		if($isAsset)
 		{
-			$flavorAsset = assetPeer::retrieveById($objectId);
-			if (is_null($flavorAsset))
+			$this->flavorAsset = assetPeer::retrieveById($objectId);
+			if (is_null($this->flavorAsset))
 				KExternalErrors::dieError(KExternalErrors::FLAVOR_NOT_FOUND);
 				
-			$this->entry = entryPeer::retrieveByPK($flavorAsset->getEntryId());
+			$this->entry = entryPeer::retrieveByPK($this->flavorAsset->getEntryId());
 			if (is_null($this->entry))
 				KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_FOUND);
 				
-			return $flavorAsset;
+			return $this->flavorAsset;
 		}	
 		else
 		{
@@ -159,7 +170,7 @@ class serveIsmAction extends sfAction
 			if (is_null($this->entry))
 				KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_FOUND);
 				
-				return $this->entry;
+			return $this->entry;
 		}				
 	}
 	
@@ -178,13 +189,13 @@ class serveIsmAction extends sfAction
 			{
 				if($asset->hasTag(assetParams::TAG_ISM_MANIFEST))
 				{
-					list($replacingFileName, $fileName) = $this->getReplacedAndReplacingFileNames($asset, flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ISMC, 'ismc');
+					list($replacingFileName, $fileName) = $this->getReplacedAndReplacingFileNames($asset, flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ISMC);
 					if($replacingFileName && $fileName)
 						$fileData = str_replace("content=\"$replacingFileName\"", "content=\"$fileName\"", $fileData);			
 				}
 				else
 				{
-					list($replacingFileName, $fileName) = $this->getReplacedAndReplacingFileNames($asset, flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET, 'ismv');
+					list($replacingFileName, $fileName) = $this->getReplacedAndReplacingFileNames($asset, flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
 					if($replacingFileName && $fileName)					
 						$fileData = str_replace("src=\"$replacingFileName\"", "src=\"$fileName\"", $fileData);
 				}
@@ -195,7 +206,7 @@ class serveIsmAction extends sfAction
 			return $fileData;	
 	}
 	
-	private function getReplacedAndReplacingFileNames($asset, $fileSyncObjectSubType, $fileExt)
+	private function getReplacedAndReplacingFileNames($asset, $fileSyncObjectSubType)
 	{
 		$replacingFileName = null;
 		$fileName = null;
@@ -204,6 +215,7 @@ class serveIsmAction extends sfAction
 		if($fileSync)			
 		{
 			$replacingFileName = basename($fileSync->getFilePath());
+			$fileExt = pathinfo($fileSync->getFilePath(), PATHINFO_EXTENSION);
 			$fileName = $asset->getEntryId().'_'.$asset->getId().'_'.$fileSync->getVersion().'.'.$fileExt;
 		}
 		return array($replacingFileName, $fileName);

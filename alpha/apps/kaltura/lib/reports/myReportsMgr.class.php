@@ -6,7 +6,7 @@ class myReportsMgr
 	const REPORT_FLAVOR_TABLE= 3;
 	const REPORT_FLAVOR_COUNT = 4;
 	const REPORT_FLAVOR_BASE_TOTAL = 5;
-	
+
 	const REPORT_TYPE_TOP_CONTENT = 1;
 	const REPORT_TYPE_CONTENT_DROPOFF = 2;
 	const REPORT_TYPE_CONTENT_INTERACTIONS = 3;
@@ -723,7 +723,17 @@ class myReportsMgr
 			$sql_raw_content = file_get_contents( $file_path );
 			if ( ! $sql_raw_content )
 			{
-				throw new kCoreException("Cannot find sql for [$report_type] [$report_flavor] at [$file_path]", kCoreException::INVALID_QUERY);
+				$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaReportProvider');
+				foreach ($pluginInstances as $pluginInstance)
+				{
+
+					$res = $pluginInstance->getReportResult($partner_id, $report_type, $report_flavor, $object_ids, $order_by);
+					if ($res)
+					{
+						return $res;
+					}
+				}
+				throw new kCoreException("Cannot find sql for [$report_type] [$report_flavor] at [$file_path]", kCoreException::QUERY_NOT_FOUND);
 			}
 			
 			$entryFilter = new entryFilter();
@@ -1288,8 +1298,14 @@ class myReportsMgr
 		kApiCache::disableConditionalCache();
 	
 		$mysql_function = 'mysqli';
-		
 		$db_config = kConf::get( "reports_db_config" );
+		if (!isset($db_config["port"])) {
+		    if(ini_get("mysqli.default_port")!==null){
+			$db_config["port"]=ini_get("mysqli.default_port");
+		    }else{
+			$db_config["port"]=3306;
+		    }
+		}	    
 		$timeout = isset ( $db_config["timeout"] ) ? $db_config["timeout"] : 40;
 		
 		ini_set('mysql.connect_timeout', $timeout );
@@ -1297,7 +1313,7 @@ class myReportsMgr
 		if ( isset ( $db_config["port"] ) && $db_config["port"]  && $mysql_function != 'mysqli' ) $host .= ":" . $db_config["port"];
 		
 		$connect_function = $mysql_function.'_connect';
-		$link  = $connect_function( $host , $db_config["user"] , $db_config["password"] , null );
+		$link  = $connect_function( $host , $db_config["user"] , $db_config["password"] , null, $db_config["port"] );
 
 KalturaLog::log( "Reports query using database host: [$host] user [" . $db_config["user"] . "]" );
 		

@@ -8,7 +8,7 @@
  * @package Core
  * @subpackage model
  */ 
-class syndicationFeed extends BasesyndicationFeed
+class syndicationFeed extends BasesyndicationFeed implements IBaseObject
 {
 	const CUSTOM_DATA_MRSS_PARAMETERS = 'mrss_parameters';
 	const CUSTOM_DATA_STORAGE_ID = 'storage_id';
@@ -27,7 +27,7 @@ class syndicationFeed extends BasesyndicationFeed
 		for ( $i = 0 ; $i < 10 ; ++$i)
 		{
 			$id = $dc["id"].'_'.kString::generateStringId();
-			$existing_object = entryPeer::retrieveByPKNoFilter( $id );
+			$existing_object = syndicationFeedPeer::retrieveByPKNoFilter( $id );
 			
 			if ( ! $existing_object ) return $id;
 		}

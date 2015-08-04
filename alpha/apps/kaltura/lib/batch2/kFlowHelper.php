@@ -293,49 +293,18 @@ class kFlowHelper
 		if(count($files) > 1)
 		{
 			// find replacing entry id
-			$replacingEntryId = $recordedEntry->getReplacingEntryId();
-			$replacingEntry = null;
 			
-			// in replacement
-			if($replacingEntryId)
-			{
-				$replacingEntry = entryPeer::retrieveByPKNoFilter($replacingEntryId);
-				
-				// check if asset already ingested
-				$replacingAsset = assetPeer::retrieveByEntryIdAndParams($replacingEntryId, $asset->getFlavorParamsId());
-				if($replacingAsset)
-				{
-					KalturaLog::err('Asset with params [' . $asset->getFlavorParamsId() . '] already replaced');
-					return $dbBatchJob;
-				}
+			$replacingEntry = kFlowHelper::getReplacingEntry($recordedEntry, $asset);
+			if(is_null($replacingEntry)) {
+				KalturaLog::err('Failed to retrieve replacing entry');
+				return $dbBatchJob;
 			}
-			// not in replacement
-			else
-			{
-		    	$advancedOptions = new kEntryReplacementOptions();
-		    	$advancedOptions->setKeepManualThumbnails(true);
-		    	$recordedEntry->setReplacementOptions($advancedOptions);
-		
-				$replacingEntry = new entry();
-			 	$replacingEntry->setType(entryType::MEDIA_CLIP);
-				$replacingEntry->setMediaType(entry::ENTRY_MEDIA_TYPE_VIDEO);
-				$replacingEntry->setConversionProfileId($recordedEntry->getConversionProfileId());
-				$replacingEntry->setName($recordedEntry->getPartnerId().'_'.time());
-				$replacingEntry->setKuserId($recordedEntry->getKuserId());
-				$replacingEntry->setAccessControlId($recordedEntry->getAccessControlId());
-				$replacingEntry->setPartnerId($recordedEntry->getPartnerId());
-				$replacingEntry->setSubpId($recordedEntry->getPartnerId() * 100);
-				$replacingEntry->setDefaultModerationStatus();
-				$replacingEntry->setDisplayInSearch(mySearchUtils::DISPLAY_IN_SEARCH_SYSTEM);
-				$replacingEntry->setReplacedEntryId($recordedEntry->getId());
-				$replacingEntry->save();
-				
-				$recordedEntry->setReplacingEntryId($replacingEntry->getId());
-				$recordedEntry->setReplacementStatus(entryReplacementStatus::APPROVED_BUT_NOT_READY);
-				$recordedEntry->save();
-			}
-	
+			
 			$flavorParams = assetParamsPeer::retrieveByPKNoFilter($asset->getFlavorParamsId());
+			if(is_null($flavorParams)) { 
+				KalturaLog::err('Failed to retrieve asset params');
+				return $dbBatchJob;
+			}
 		
 			// create asset
 			$replacingAsset = assetPeer::getNewAsset(assetType::FLAVOR);
@@ -355,6 +324,62 @@ class kFlowHelper
 		}
 		
 		return $dbBatchJob;
+	}
+	
+	protected static function getReplacingEntry($recordedEntry, $asset, $retries = 1) {
+		$replacingEntryId = $recordedEntry->getReplacingEntryId();
+		$replacingEntry = null;
+		// in replacement
+		if($replacingEntryId)
+		{
+			$replacingEntry = entryPeer::retrieveByPKNoFilter($replacingEntryId);
+		
+			// check if asset already ingested
+			$replacingAsset = assetPeer::retrieveByEntryIdAndParams($replacingEntryId, $asset->getFlavorParamsId());
+			if($replacingAsset)
+			{
+				KalturaLog::err('Asset with params [' . $asset->getFlavorParamsId() . '] already replaced');
+				return null;
+			}
+		}
+		// not in replacement
+		else
+		{
+			$advancedOptions = new kEntryReplacementOptions();
+			$advancedOptions->setKeepManualThumbnails(true);
+			$recordedEntry->setReplacementOptions($advancedOptions);
+		
+			$replacingEntry = new entry();
+			$replacingEntry->setType(entryType::MEDIA_CLIP);
+			$replacingEntry->setMediaType(entry::ENTRY_MEDIA_TYPE_VIDEO);
+			$replacingEntry->setConversionProfileId($recordedEntry->getConversionProfileId());
+			$replacingEntry->setName($recordedEntry->getPartnerId().'_'.time());
+			$replacingEntry->setKuserId($recordedEntry->getKuserId());
+			$replacingEntry->setAccessControlId($recordedEntry->getAccessControlId());
+			$replacingEntry->setPartnerId($recordedEntry->getPartnerId());
+			$replacingEntry->setSubpId($recordedEntry->getPartnerId() * 100);
+			$replacingEntry->setDefaultModerationStatus();
+			$replacingEntry->setDisplayInSearch(mySearchUtils::DISPLAY_IN_SEARCH_SYSTEM);
+			$replacingEntry->setReplacedEntryId($recordedEntry->getId());
+			$replacingEntry->save();
+		
+			$recordedEntry->setReplacingEntryId($replacingEntry->getId());
+			$recordedEntry->setReplacementStatus(entryReplacementStatus::APPROVED_BUT_NOT_READY);
+			$affectedRows = $recordedEntry->save();
+			if(!$affectedRows) {
+				$replacingEntry->delete();
+				$replacingEntry = null;
+				if($retries) {
+					sleep(10);
+					$recordedEntry = entryPeer::retrieveByPKNoFilter($recordedEntry->getId());
+					return kFlowHelper::getReplacingEntry($recordedEntry, $asset, 0);
+				} else {
+					KalturaLog::err("Failed to update replacing entry");
+					return null;
+				}
+			}
+		}
+		return $replacingEntry;
 	}
 
 	/**
@@ -1028,6 +1053,8 @@ class kFlowHelper
 		if(!is_null($thumbAsset->getFlavorParamsId()))
 			kFlowHelper::generateThumbnailsFromFlavor($dbBatchJob->getEntryId(), $dbBatchJob, $thumbAsset->getFlavorParamsId());
 
+		self::handleLocalFileSyncDeletion($dbBatchJob->getEntryId(), $dbBatchJob->getPartner());
+		
 		return $dbBatchJob;
 	}
 
@@ -1204,6 +1231,8 @@ class kFlowHelper
 		$thumbAsset->setStatus(thumbAsset::FLAVOR_ASSET_STATUS_ERROR);
 		$thumbAsset->save();
 
+		self::handleLocalFileSyncDeletion($dbBatchJob->getEntryId(), $dbBatchJob->getPartner());
+		
 		return $dbBatchJob;
 	}
 
@@ -2531,9 +2560,11 @@ class kFlowHelper
 				KalturaLog::err("Entry id [" . $uploadToken->getObjectId() . "] not found");
 				return;
 			}
-
+			
+			//Keep original extention
+			$ext = pathinfo($fullPath, PATHINFO_EXTENSION);
 			// increments version
-			$dbEntry->setData('100000.jpg');
+			$dbEntry->setData('100000.'.$ext);
 			$dbEntry->save();
 
 			$syncKey = $dbEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA);

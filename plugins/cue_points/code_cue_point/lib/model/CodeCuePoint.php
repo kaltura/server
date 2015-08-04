@@ -30,4 +30,6 @@ class CodeCuePoint extends CuePoint implements IMetadataObject
 	{
 		return CodeCuePointMetadataPlugin::getMetadataObjectTypeCoreValue(CodeCuePointMetadataObjectType::CODE_CUE_POINT);
 	}
+	
+	public function getIsPublic()	              {return true;}
 }

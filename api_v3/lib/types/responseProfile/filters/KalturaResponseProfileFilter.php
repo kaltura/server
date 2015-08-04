@@ -3,7 +3,7 @@
  * @package api
  * @subpackage filters
  */
-class KalturaResponseProfileFilter extends KalturaDetachedResponseProfileFilter
+class KalturaResponseProfileFilter extends KalturaResponseProfileBaseFilter
 {
 	/* (non-PHPdoc)
 	 * @see KalturaFilter::getCoreFilter()

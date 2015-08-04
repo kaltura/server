@@ -8,7 +8,7 @@
  * @package Core
  * @subpackage model
  */ 
-class WidgetLog extends BaseWidgetLog
+class WidgetLog extends BaseWidgetLog implements IBaseObject
 {
 	
 	public static function getKshowEntryId($kshow_id, $entry_id)

@@ -475,25 +475,44 @@ class Php53ClientGenerator extends ClientGeneratorFromXml
 					break;
 					
 				case "bool" :
-					$this->appendLine("		if(!empty(\$xml->{$propName}))");
-					$this->appendLine("			\$this->$propName = true;");
+					$this->appendLine("		if(count(\$xml->{$propName}))");
+					$this->appendLine("		{");
+					$this->appendLine("			if(!empty(\$xml->{$propName}))");
+					$this->appendLine("				\$this->$propName = true;");
+					$this->appendLine("			else");
+					$this->appendLine("				\$this->$propName = false;");
+					$this->appendLine("		}");
 					break;
 					
 				case "string" :
-					$this->appendLine("		\$this->$propName = ($propType)\$xml->$propName;");
+					$this->appendLine("		if(count(\$xml->{$propName}))");
+					$this->appendLine("			\$this->$propName = ($propType)\$xml->$propName;");
 					break;
 					
 				case "array" :
+					$arrayType = $propertyNode->getAttribute ( "arrayType" );
+					$this->appendLine("		if(count(\$xml->{$propName}))");
+					$this->appendLine("		{");
+					$this->appendLine("			if(empty(\$xml->{$propName}))");
+					$this->appendLine("				\$this->$propName = array();");
+					$this->appendLine("			else");
+					$this->appendLine("				\$this->$propName = \Kaltura\Client\ParseUtils::unmarshalArray(\$xml->$propName, \"$arrayType\");");
+					$this->appendLine("		}");
+					break;
+					
 				case "map" :
 					$arrayType = $propertyNode->getAttribute ( "arrayType" );
-					$this->appendLine("		if(empty(\$xml->{$propName}))");
-					$this->appendLine("			\$this->$propName = array();");
-					$this->appendLine("		else");
-					$this->appendLine("			\$this->$propName = \Kaltura\Client\ParseUtils::unmarshalArray(\$xml->$propName, \"$arrayType\");");
+					$this->appendLine("		if(count(\$xml->{$propName}))");
+					$this->appendLine("		{");
+					$this->appendLine("			if(empty(\$xml->{$propName}))");
+					$this->appendLine("				\$this->$propName = array();");
+					$this->appendLine("			else");
+					$this->appendLine("				\$this->$propName = \Kaltura\Client\ParseUtils::unmarshalMap(\$xml->$propName, \"$arrayType\");");
+					$this->appendLine("		}");
 					break;
 					
 				default : // sub object
-					$this->appendLine("		if(!empty(\$xml->{$propName}))");
+					$this->appendLine("		if(count(\$xml->{$propName}) && !empty(\$xml->{$propName}))");
 					$this->appendLine("			\$this->$propName = \Kaltura\Client\ParseUtils::unmarshalObject(\$xml->$propName, \"{$propType}\");");
 					break;
 			}
@@ -886,11 +905,13 @@ class Php53ClientGenerator extends ClientGeneratorFromXml
 			$this->appendLine("	}");
 		}
 	
+		$volatileProperties = array();
 		foreach($configurationNodes as $configurationNode)
 		{
 			/* @var $configurationNode DOMElement */
 			$configurationName = $configurationNode->nodeName;
-			$methodsName = ucfirst($configurationName) . "Configuration";
+			$attributeName = lcfirst($configurationName) . "Configuration";
+			$volatileProperties[$attributeName] = array();
 		
 			foreach($configurationNode->childNodes as $configurationPropertyNode)
 			{
@@ -900,7 +921,15 @@ class Php53ClientGenerator extends ClientGeneratorFromXml
 					continue;
 			
 				$configurationProperty = $configurationPropertyNode->localName;
+				
+				if($configurationPropertyNode->hasAttribute('volatile') && $configurationPropertyNode->getAttribute('volatile'))
+				{
+					$volatileProperties[$attributeName][] = $configurationProperty;
+				}
+				
 				$type = $configurationPropertyNode->getAttribute('type');
+				if(!$this->isSimpleType($type))
+					$type = $this->getTypeClassInfo($type)->getFullyQualifiedName();
 				$description = null;
 				
 				if($configurationPropertyNode->hasAttribute('description'))
@@ -916,6 +945,21 @@ class Php53ClientGenerator extends ClientGeneratorFromXml
 				}
 			}
 		}
+		
+		$this->appendLine ( "	/**");
+		$this->appendLine ( "	 * Clear all volatile configuration parameters");
+		$this->appendLine ( "	 */");
+		$this->appendLine ( "	protected function resetRequest()");
+		$this->appendLine ( "	{");
+		$this->appendLine ( "		parent::resetRequest();");
+		foreach($volatileProperties as $attributeName => $properties)
+		{
+			foreach($properties as $propertyName)
+			{
+				$this->appendLine("		unset(\$this->{$attributeName}['{$propertyName}']);");
+			}
+		}
+		$this->appendLine ( "	}");
 		
 		$this->appendLine("}");
 	}

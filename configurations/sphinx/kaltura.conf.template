@@ -404,6 +404,8 @@ index kaltura_cue_point:kaltura_base
 	rt_attr_timestamp = updated_at
 	rt_attr_string = str_entry_id
 	rt_attr_string = str_cue_point_id
+	rt_attr_uint = is_public
+	rt_field = plugins_data
 }
 
 index kaltura_entry_distribution:kaltura_base

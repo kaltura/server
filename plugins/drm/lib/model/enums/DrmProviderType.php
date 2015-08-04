@@ -5,4 +5,5 @@
  */ 
 interface DrmProviderType extends BaseEnum
 {
+    const CENC = 1;
 }

@@ -184,6 +184,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		
 		libxml_clear_errors();
 		$proc = new XSLTProcessor;
+		$proc->registerPHPFunctions(kXml::getXslEnabledPhpFunctions());
 		$xsl = new KDOMDocument();
 		if(!$xsl->loadXML($this->conversionProfileXsl)){
 			KalturaLog::debug("Could not load xsl".$this->conversionProfileXsl);
@@ -1248,7 +1249,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
             }
             catch (Exception $e)
             {
-                if ($e->getCode() == DUPLICATE_CATEGORY)
+                if ($e->getCode() == 'DUPLICATE_CATEGORY')
                 {
                 	KalturaLog::debug("Categroy [$fullNameEq] already exist");
                     $catFilter = new KalturaCategoryFilter();

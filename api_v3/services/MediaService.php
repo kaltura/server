@@ -149,12 +149,35 @@ class MediaService extends KalturaEntryService
 		}
 		else
 		{
+			$kResource = $resource->toObject();
+			if ( ($kResource instanceof kOperationResource ) && ($this->isResourceKClip($kResource)) ) {
+				$internalResource = $kResource->getResource();
+				if ($dbEntry->getIsTrimDisabled()
+					&& $internalResource instanceof kFileSyncResource
+					&& $dbEntry->getId() == $internalResource->getOriginEntryId()
+				)
+				{
+					throw new KalturaAPIException(KalturaErrors::ENTRY_CANNOT_BE_TRIMMED);
+				}
+			}
 
 			$tempMediaEntry = new KalturaMediaEntry();
-		 	$tempMediaEntry->type = $dbEntry->getType();
+			$tempMediaEntry->type = $dbEntry->getType();
 			$tempMediaEntry->mediaType = $dbEntry->getMediaType();
-			$tempMediaEntry->conversionProfileId = $dbEntry->getConversionQuality();
 
+			if ( !$conversionProfileId ) {
+				$originalConversionProfileId = $dbEntry->getConversionQuality();
+				$conversionProfile = conversionProfile2Peer::retrieveByPK($originalConversionProfileId);
+				if ( is_null($conversionProfile) || $conversionProfile->getType() != ConversionProfileType::MEDIA )
+				{
+					$defaultConversionProfile = myPartnerUtils::getConversionProfile2ForPartner( $this->getPartnerId() );
+					if ( !is_null($defaultConversionProfile) ) {
+						$conversionProfileId = $defaultConversionProfile->getId();
+					}
+				} else {
+					$conversionProfileId = $originalConversionProfileId;
+				}
+			}
 			if($conversionProfileId)
 				$tempMediaEntry->conversionProfileId = $conversionProfileId;
 
@@ -647,7 +670,7 @@ class MediaService extends KalturaEntryService
 	 * @param string $entryId Media entry id
 	 * @param int $conversionProfileId
 	 * @param KalturaConversionAttributeArray $dynamicConversionAttributes
-	 * @return int job id
+	 * @return bigint job id
 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
 	 * @throws KalturaErrors::CONVERSION_PROFILE_ID_NOT_FOUND
 	 * @throws KalturaErrors::FLAVOR_PARAMS_NOT_FOUND
@@ -1092,6 +1115,25 @@ class MediaService extends KalturaEntryService
 				$conversionQuality = $conversionProfile->getConversionProfile2Id();
 		}
 		return $conversionQuality;
+	}
+
+	/**
+	 * @param $kResource
+	 * @return bool
+	 */
+	protected function isResourceKClip($kResource)
+	{
+		/**
+		 * @var kOperationResource $kResource
+		 */
+		foreach ($kResource->getOperationAttributes() as $opAttribute)
+		{
+			if ($opAttribute instanceof kClipAttributes)
+			{
+				return true;
+			}
+		}
+		return false;
 	}
 
 }

@@ -1,3 +1,883 @@
+# Jupiter-10.17.0 #
+
+## Allow users to use uiconf-->listTemplates ##
+
+- Issue Type: Permission to existing API 
+- Issue ID: PLAT-3541
+
+#### Configuration ####
+ 
+ 	- In the file "deployment/permissions/service.uiconf.ini" in the line "permissionItem7.permissions" add `,BASE_USER_SESSION_PERMISSION` at the end
+
+#### Deployment Scripts ####
+
+ 	- php deployment/updates/scripts/add_permissions/2015_07_29_allow_user_session_uiconf_listTemplates.php
+
+#### Known Issues & Limitations ####
+
+None.
+
+## new Transcript asset ##
+
+-- Issue Type: New Feature
+-- Issue ID: PLAT-2622
+
+#### Configuration ####
+ 
+- Added 'Transcript' in configurations/plugins.ini.base and configurations/plugins.ini.admin
+
+#### Deployment Scripts ####
+
+Run:
+ 	- php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+
+#### Known Issues & Limitations ####
+
+None.
+
+## Allow PLAYBACK_BASE_ROLE to user user_entry and quiz ##
+
+- Issue Type: Permission to existing API 
+- Issue ID:
+
+#### Configuration ####
+ 
+ 	None.
+
+#### Deployment Scripts ####
+
+ 	- php deployment/updates/scripts/add_permissions/2015_07_29_update_quiz_and_userentry_permissions.php
+
+#### Known Issues & Limitations ####
+
+None.
+
+--
+# Jupiter-10.16.0 #
+
+## New applehttp to multicast delivery profile ##
+
+-- Issue Type: New Feature
+-- Issue ID: PLAT-3510
+
+#### Configuration ####
+ 
+None.
+
+#### Deployment Scripts ####
+
+ 	- (Already executed on production) php /opt/kaltura/app/deployment/updates/scripts/2015_07_20_create_applehttp_to_multicast_delivery_profile.php
+
+#### Known Issues & Limitations ####
+
+None.
+
+## Edge Server - Rename column name ##
+
+-- Issue Type: Bug report
+-- Issue ID: PLAT-3441
+
+#### Configuration ####
+ 
+None.
+
+#### Deployment Scripts ####
+
+ - mysql -h@db_host@ -u@db_user@ -p@db_pass@ -P3306 kaltura < deployment/updates/sql/2015_07_26_alter_edge_server_column_name.sql
+
+#### Known Issues & Limitations ####
+
+None.
+
+## Cache response-profile results ##
+
+- Issue Type: optimization
+
+### Couchbase Deployment Instructions ###
+Download Couchbase server and install according to [official instructions](http://www.couchbase.com/nosql-databases/downloads#Couchbase_Server "http://www.couchbase.com/").
+
+#### Server Setup ####
+
+ - Install Couchbase PHP extension: `pecl install couchbase`
+     - Required `php-devel` and `libcouchbase-devel`.
+ - Add couchbase extension in your php.ini file.
+ - Setup Couchbase server [http://@WWW_HOST@:8091](http://@WWW_HOST@:8091 "").
+ - Define username and password to be used later in cache.ini configuration.
+ - Create new data bucket named `ResponseProfile`.
+
+#### Views Setup ####
+
+ - Create design-document: `_design/dev_deploy1`.
+ - Create View: `objectSpecific`:
+```javascript
+	function (doc, meta) {
+    	if (meta.type == "json") {
+    		if(doc.type == "primaryObject"){
+    			emit(doc.objectKey, null);
+    		}
+    	}
+}
+```
+
+ - Create View: `relatedObjectSessions`:
+```javascript
+	function (doc, meta) {
+    	if (meta.type == "json") {
+    		if(doc.type == "relatedObject"){
+    	 			emit([doc.triggerKey, doc.objectType, doc.sessionKey], null);
+    		}
+    	}
+}
+```
+	
+ - Create View: `objectSessions`:
+```javascript
+	function (doc, meta) {
+	 	if (meta.type == "json") {
+	 		if(doc.type == "primaryObject"){
+	 			emit([doc.objectKey, doc.sessionKey], null);
+	 		}
+	 	}
+}
+```
+
+ - Create View: `objectTypeSessions`:
+```javascript
+	function (doc, meta) {
+	 	if (meta.type == "json") {
+	 		if(doc.type == "primaryObject"){
+	 			emit([doc.objectType, doc.sessionKey], null);
+	 		}
+	 	}
+}
+```
+	
+ - Create View: `sessionType`:
+```javascript
+	function (doc, meta) {
+    	if (meta.type == "json") {
+    		if(doc.type == "primaryObject"){
+    			emit([doc.sessionKey, doc.objectKey], null);
+    		}
+    	}
+}
+```
+	
+ - Create View: `relatedObjectsTypes`:
+```javascript
+	function (doc, meta) {
+		if (meta.type == "json") {
+			if(doc.type == "relatedObject"){
+	 			emit([doc.triggerKey, doc.objectType], null);
+			}
+		}
+}
+```
+ - Publish the design-document.
+
+### Configuration ###
+ - Update configurations/cache.ini under couchbase section to use the username and password you configured for couchbase server.
+ - Add new worker into configurations/batch/batch.ini:
+
+```ini
+[KAsyncRecalculateCache : JobHandlerWorker]
+id													= 590
+friendlyName										= Recalculate Cache
+type												= KAsyncRecalculateCache
+scriptPath											= batch/batches/Cache/KAsyncRecalculateCacheExe.php
+```
+ - Add new module to the admin-console in admin.ini:
+
+```ini
+moduls.recalculateResponseProfile.enabled = true
+moduls.recalculateResponseProfile.permissionType = 2
+moduls.recalculateResponseProfile.label = "Recalculate response-profile cache"
+moduls.recalculateResponseProfile.permissionName = FEATURE_RECALCULATE_RESPONSE_PROFILE_CACHE
+moduls.recalculateResponseProfile.basePermissionType = 2
+moduls.recalculateResponseProfile.basePermissionType =
+moduls.recalculateResponseProfile.basePermissionName =
+moduls.recalculateResponseProfile.group = GROUP_ENABLE_DISABLE_FEATURES
+```
+
+### Deployment Scripts ###
+ - php deployment/updates/scripts/add_permissions/2015_06_09_response_profile.php
+
+### Known Issues & Limitations ###
+None.
+
+---
+# Jupiter-10.15.0 #
+
+## Add Developer Partner ##
+
+- Issue Type: New Feature  
+- Issue ID: PLAT-3326  
+
+### Configuration ###
+
+ - Added new e-mail configuration in /batch/batches/Mailer/emails_en.ini
+ - Remark for production configuration: add /alpha/crond/kaltura/monthly_quota_storage_update.sh script to kaltura.daily cron jobs 
+ 
+### Deployment Scripts ###
+
+- None.  
+		
+## File sync pull without jobs ##
+
+- Issue Type: optimization
+- Issue ID: N/A  
+
+### Configuration ###
+
+ - Update the file sync import worker configuration, sample config:
+ 
+[KAsyncFileSyncImport : PeriodicWorker]
+type                            = KAsyncFileSyncImport
+scriptPath                      = ../plugins/multi_centers/batch/FileSyncImport/KAsyncFileSyncImportExe.php
+params.curlTimeout              = 180
+params.fileChmod                = 755
+params.fileOwner                = apache
+
+[KAsyncFileSyncImportSmall : KAsyncFileSyncImport]
+id                      = 27020
+friendlyName            = FileSyncImportSmall
+filter.estimatedEffortLessThan = 5000000
+params.maxCount         = 100
+params.maxSize          = 10000000
+
+[KAsyncFileSyncImportBig : KAsyncFileSyncImport]
+id                      = 27030
+friendlyName            = FileSyncImportBig
+filter.estimatedEffortGreaterThan = 4999999
+params.maxCount         = 1
+
+[KAsyncFileSyncImportDelayed : KAsyncFileSyncImport]
+id                      = 27040
+friendlyName            = FileSyncImportDelayed
+params.maxCount         = 1
+filter.createdAtLessThanOrEqual = -39600	; now() - 11 hours
+ 
+### Deployment Scripts ###
+
+ - php deployment/updates/scripts/add_permissions/2015_07_06_file_sync_service.php
+ - php deployment/base/scripts/createQueryCacheTriggers.php create @db_host@ @db_user@ @db_pass@ realrun
+
+## Metadata Change HTTP Notification ##
+
+- Issue Type: bug  
+- Issue ID: PS-2287  
+
+### Configuration ###
+
+ - None.
+ 
+### Deployment Scripts ###
+
+- run the following deployment script:  
+		php exec.php /opt/kaltura/app/tests/standAloneClient/entryCustomMetadataChangedHttpNotification.xml  
+
+
+## Application authentication token ##
+
+-- Issue Type: New feature
+-- Issue ID: PLAT-3095
+
+#### Configuration ####
+ 
+None.
+
+#### Deployment Scripts ####
+
+ - php deployment/updates/scripts/add_permissions/2015_06_22_app_token_service.php
+ - mysql -h@db_host@ -u@db_user@ -p@db_pass@ -P3306 kaltura < deployment/updates/sql/2015_06_22_create_app_token_table.sql
+
+#### Known Issues & Limitations ####
+
+None.
+
+
+## Update KMC docs  ##
+
+-- Issue Type: Doc change
+-- Issue ID: SUP-3117
+
+#### Configuration ####
+
+Need to update the following doc on the SAAS server under location /web/content/docs/kaltura_batch_upload_falcon.zip
+from repository kmc-docs.
+
+#### Deployment Scripts ####
+
+None.
+
+#### Known Issues & Limitations ####
+
+None.
+
+
+
+---
+# Jupiter-10.14.0 #
+
+## Email Notifications ##
+
+- Issue Type: Email notifications send all addresses in the "To" field
+- Issue ID: SUP-4339 
+
+#### Configuration ####
+ 
+- None.
+
+#### Deployment Scripts ####
+
+/deployment/updates/scripts/2015_06_18_update_mediaspace_email_notification_templates.php
+
+#### Known Issues & Limitations ####
+
+None.
+
+## On the fly encryption ##
+
+- Issue Type: Configuration for existing feature
+- Issue ID: PLAT-2675 
+
+#### Configuration ####
+ 
+- Add relevant value of "license_server_url" in "drm.ini", see saas-config
+
+#### Deployment Scripts ####
+
+None.
+
+#### Known Issues & Limitations ####
+
+None.
+
+
+## in video quiz ##
+
+- Issue Type: new feature  
+- Issue ID: PLAT-2795 and PLAT-2792 and PLAT-2791 and PLAT-2790 and PLAT-2786 and PLAT-2857
+
+#### Configuration ####
+
+- Add the following line to the plugins.ini file:  
+        Quiz 
+
+- Add the following lines from admin.template.ini to admin.ini:
+
+		moduls.quizCuePoint.enabled = true
+		moduls.quizCuePoint.permissionType = 3
+		moduls.quizCuePoint.label = Quiz - Cue Points
+		moduls.quizCuePoint.permissionName = QUIZ_PLUGIN_PERMISSION
+		moduls.quizCuePoint.basePermissionType = 3
+		moduls.quizCuePoint.basePermissionName = CUEPOINT_PLUGIN_PERMISSION
+		moduls.quizCuePoint.group = GROUP_ENABLE_DISABLE_FEATURES
+		
+#### Deployment Scripts ####
+
+- run the Following deployemnt scripts:
+        
+		Create new user_entry table:
+        mysql -h@db_host@ -u@db_user@ -p@db_pass@ -P3306 kaltura < deployment/updates/sql/2015_15_06_create_user_entry_table.sql
+        
+
+		Update new services permissions:
+		php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2015_04_11_update_quiz_permissions.php
+		php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2015_05_07_update_userentry_permissions.php
+		php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2015_06_07_update_quiz_analytics_permissions.php
+
+		Install Plugins:
+		php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+
+		
+		
+
+#### Known Issues & Limitations ####
+
+None.
+
+
+# Jupiter-10.13.0 #
+
+## New edgeServer service - drop one of the dynamic eCDN ##
+
+- Issue Type: new feature  
+- Issue ID: PLAT-3007 
+
+### Configuration ###
+- Add the following to the admin.ini under "AVAILABLE MODULES (permissionType)":
+
+		moduls.EdgeServer.enabled = true
+		moduls.EdgeServer.permissionType = 2
+		moduls.EdgeServer.label = "Edge server usage"
+		moduls.EdgeServer.permissionName = FEATURE_EDGE_SERVER
+		moduls.EdgeServer.basePermissionType =
+		moduls.EdgeServer.basePermissionName =
+		moduls.EdgeServer.group = GROUP_ENABLE_DISABLE_FEATURES
+
+#### Deployment Scripts ####
+- run the Following deployemnt scripts:
+
+		Update new servcie permissions: 
+		php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2015_05_28_edge_server_service.php
+
+		create new edge_Server table:
+		mysql -h@db_host@ -u@db_user@ -p@db_pass@ -P3306 kaltura < deployment/updates/sql/2015_27_05_create_edge_server_table.sql
+
+#### Known Issues & Limitations ####
+
+* To enable this feature on your account you will need you will need to flip on the feature in the partner configuration section.
+
+##multi-language caption ingestion##
+- Issue Type: feature request
+- Issue ID: PLAT-2500
+
+#### Configuration ####
+
+- allocate worker/s for KAsyncParseMultiLanguageCaptionAsset.
+
+#### Deployment Scripts ####
+
+	php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+
+- deploy server-saas-config to update batch client.
+
+#### Known Issues & Limitations ####
+
+Players will allow choosing 'multi-language' captions ,by default.
+
+
+## Search for tags with spaces and words with less than 3 characters ##
+
+- Issue Type: bug fix
+- Issue ID: SUP-4362
+
+#### Configuration ####
+
+None.
+
+#### Deployment Scripts ####
+
+    - Need to re-build so that spaces in tags will be replaced by '=' & re-index the tag sphinx table.
+
+#### Known Issues & Limitations ####
+
+None.
+
+
+# Jupiter-10.12.0 #
+
+## Set new permission to flavorasset geturl ##
+
+- Issue Type: Permission change
+- Issue ID : SUP-4739
+
+### Configuration ###
+ 
+None.
+
+#### Deployment Script ####
+
+- Run php deployment/updates/scripts/add_permissions/2015_05_18_update_flavorasset_permissions.php
+
+## New event notification template- drop folder error description changed ##
+
+- Issue Type: new feature  
+- Issue ID: PS-2251  
+
+#### Deployment Script ####
+
+- Run php /opt/kaltura/app/tests/standAloneClient/exec.php /opt/kaltura/app/tests/standAloneClient/emailDropFolderFailedStatusMessage.xml  
+
+## Server ingestion of chapter cue points without slides ##
+
+- Issue Type: bug fix
+- Issue ID: PLAT-2204
+
+### Configuration ###
+- **workers.ini**
+
+under 'KAsyncBulkUpload'
+
+		params.xmlSchemaVersion		= 7
+
+#### Deployment Scripts ####
+
+None.
+
+#### Known Issues & Limitations ####
+
+None.
+
+## New event notification template- entry custom data changed ##
+
+- Issue Type: new feature  
+- Issue ID: PS-2253  
+
+#### Deployment Script ####
+
+- Run php /opt/kaltura/app/tests/standAloneClient/exec.php /opt/kaltura/app/tests/standAloneClient/metadataObjectChanged.xml  
+
+## "Entry flagged for review" Email Notification missing on production ##
+
+- Issue Type: bug  
+- Issue ID: PS-2252  
+
+#### Deployment Script ####
+
+- Run php /opt/kaltura/app/tests/standAloneClient/exec.php /opt/kaltura/app/tests/standAloneClient/kmcModerationNotificationsTemplates.xml  
+
+## uDRM on the fly encryption ##
+
+- Issue Type: new feature
+- Issue ID: PLAT-2675
+
+#### Configuration ####
+
+- Clone @APP_DIR/configurations/drm.template.ini to @APP_DIR/configurations/drm.ini
+- In @APP_DIR/configurations/drm.ini replace @UDRM_SIGNING_KEY@ with key given from me.
+- Add the following permission block to @APP_DIR@/configurations/admin.ini:
+
+		moduls.drmBase.enabled = true
+		moduls.drmBase.permissionType = 3
+		moduls.drmBase.label = DRM - Base
+		moduls.drmBase.permissionName = DRM_PLUGIN_PERMISSION
+		moduls.drmBase.basePermissionType =
+		moduls.drmBase.basePermissionName =
+		moduls.drmBase.group = GROUP_ENABLE_DISABLE_FEATURES
+		
+		moduls.drmCencFlavors.enabled = false
+		moduls.drmCencFlavors.permissionType = 2
+		moduls.drmCencFlavors.label = DRM – Enable CENC Flavors
+		moduls.drmCencFlavors.permissionName = DRM_CENC_FLAVORS
+		moduls.drmCencFlavors.basePermissionType = 3
+		moduls.drmCencFlavors.basePermissionName = DRM_PLUGIN_PERMISSION
+		moduls.drmCencFlavors.group = GROUP_ENABLE_DISABLE_FEATURES
+
+
+#### Deployment Scripts ####
+
+		- run php /opt/kaltura/app/deployment/updates/scripts/2015_05_17_update_DRM_access_control.php
+		- run php deployment/updates/scripts/add_permissions/2015_05_17_update_drm_license_access_permissions.php
+        - run php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+
+#### Known Issues & Limitations ####
+
+None.
+
+
+# Jupiter-10.11.0 #
+
+## Server support for Q&A feature ##
+
+- Issue Type: new feature
+- Issue ID: PLAT-2850
+
+### Configuration ###
+- update sphinx kaltura.conf:
+	
+		Add the following to kaltura_cue_point index:
+		- rt_attr_uint = is_public
+		- rt_field = plugins_data
+
+#### Deployment Scripts ####
+
+		- Need to re-build & re-index the cue point sphinx table.
+		- run php /opt/kaltura/app/deployment/updates/scripts/2015_05_11_create_qAndA_default_schema.php
+
+#### Known Issues & Limitations ####
+
+None.
+
+
+## New feature- hide template partner uiconfs ##
+
+- Issue Type: bug fix  
+- Issue ID: PLAT-2946
+
+### Configuration ###
+- Add the following permission block to @APP_DIR@/configurations/admin.ini:
+		moduls.hideTemplatePartnerUiConfs.enabled = true  
+        moduls.hideTemplatePartnerUiConfs.permissionType = 2  
+        moduls.hideTemplatePartnerUiConfs.label = "Hide template partner ui-confs from preview&embed menu"  
+        moduls.hideTemplatePartnerUiConfs.permissionName = FEATURE_HIDE_TEMPLATE_PARTNER_UICONFS  
+        moduls.hideTemplatePartnerUiConfs.basePermissionType = 2  
+        moduls.hideTemplatePartnerUiConfs.basePermissionType =  
+        moduls.hideTemplatePartnerUiConfs.basePermissionName =  
+        moduls.hideTemplatePartnerUiConfs.group = GROUP_ENABLE_DISABLE_FEATURES  
+
+## Error when manually dispatching notification template ##
+
+- Issue Type: bug fix
+- Issue ID: PLAT-2387
+### Deployment ###
+
+- Run the following script:  
+			cd /opt/kaltura/app/tests/standAloneClient  
+			php exec.php commentAddedEnabledForManualDispatch.xml    
+- Delete older email notification from partner 0.
+
+## Too many logs are written to file on batch ##
+
+- Issue Type: bug fix
+- Issue ID: PLAT-2914
+
+### Configuration ###
+- update batch.ini
+Add the following parameters to the batch.ini [template] configuration
+logWorkerInterval										= 60
+
+
+#### Deployment Scripts ####
+
+None.
+
+#### Known Issues & Limitations ####
+
+None.
+
+## Avoid the need to update many metadata objects ##
+
+- Issue Type: new feature
+- Issue ID: PLAT-1998
+
+### Configuration ###
+
+None.
+
+#### Deployment Scripts ####
+
+- Run mysql -h@db_host@ -u@db_user@ -p@db_pass@ -P3306 kaltura < deployment/updates/sql/2014_11_06_metadata_profile_file_sync_version.sql
+
+#### Known Issues & Limitations ####
+
+None.
+
+
+# Jupiter-10.10.0 #
+## Support marking file_sync's as directories ##
+
+- Issue type - new feature
+- Issue ID - WEBC-467
+
+### Configuration ###
+
+None.
+   
+  
+### Deployment ###
+ 
+ - Run mysql -h@db_host@ -u@db_user@ -p@db_pass@ -P3306 kaltura < deployment/updates/sql/2015_04_28_alter_file_sync_table_custom_data_field.sql
+	
+		Please verify this column does not exist propir to running.
+
+#### Known Issues & Limitations ####
+
+None.
+
+
+ 
+## Feed Drop Folder Feature ##
+
+- Issue type - new feature
+- Issue ID - PLAT-2042
+
+### Configuration ###
+
+Add the following line to the plugins.ini file:  
+        FeedDropFolder 
+   
+Add the following parameters to the batch.ini DropFolderWatcher worker configuration:  
+        params.mrss.xmlPath									= @WEB_DIR@/tmp/dropFolderFiles  
+        params.mrss.limitProcessEachRun						= 20
+   
+  
+### Deployment ###
+ 
+ - clear the cache
+ - run php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+ - Create new folder : @WEB_DIR@/tmp/dropFolderFiles
+
+## Time Based Playlist Filters ##
+
+Allows adding timebased filters to playlists that support expiry of a filter on a certain time.
+
+- Issue Type: New Feature
+- Issue ID: PLAT-2817
+
+#### Configuration ####
+
+None.
+
+#### Deployment Scripts ####
+
+None.
+
+#### Known Issues & Limitations ####
+
+None.
+
+
+## Live to VOD entry should support copying all metadata ##
+
+- Issue Type: Story
+- Issue ID: PLAT-2744
+
+#### Configuration ####
+
+Add the following lines from admin.template.ini to admin.ini:
+
+    moduls.liveStreamRecordShouldCopyEntitelment.enabled = true
+    moduls.liveStreamRecordShouldCopyEntitelment.permissionType = 2
+    moduls.liveStreamRecordShouldCopyEntitelment.label = Kaltura Live Streams - Copy entitelment
+    moduls.liveStreamRecordShouldCopyEntitelment.permissionName = FEATURE_LIVE_STREAM_COPY_ENTITELMENTS
+    moduls.liveStreamRecordShouldCopyEntitelment.basePermissionType = 2
+    moduls.liveStreamRecordShouldCopyEntitelment.basePermissionName = FEATURE_LIVE_STREAM
+    moduls.liveStreamRecordShouldCopyEntitelment.group = GROUP_ENABLE_DISABLE_FEATURES
+
+#### Deployment Scripts ####
+
+None.
+
+#### Known Issues & Limitations ####
+
+None.
+
+## Delivery Profile selection logic for playback ##
+
+Added logic to the selection of deliveryProfiles for playback.
+A priority attributes orders available deliveryProfile.
+Each deliveryProfile may override the base class implementation of supportsDeliveryDynamicAttributes which returns 
+whether the deliveryProfile supports the required playback constraints (progressive media seek, flv support etc), doesn't support or partially support it. 
+Partial support means the playback will work but a feature (e.g. seek within flash progressive download) won't.
+These enhancements allow for multiple deliveryProfiles to be configured as default and provide fall back in case of delivery constraints.
+Delivered by - Eran Itam.
+
+- Issue Type:Enhancement
+- Issue ID: No ID
+
+#### Configuration ####
+
+None.
+
+#### Deployment Scripts ####
+
+deployment/updates/sql/2015_04_25_alter_delivery_profile_add_priority.sql
+
+#### Known Issues & Limitations ####
+
+None.
+
+----------
+# Jupiter-10.9.0 #
+
+## Copy cue points to clips and trimmed entries ##
+
+- Issue Type: bug fix
+- Issue ID: PLAT-1118
+
+#### Configuration ####
+
+Add the following lines from admin.template.ini to admin.ini:
+
+	moduls.annotationCopyToClip.enabled = true
+	moduls.annotationCopyToClip.permissionType = 2
+	moduls.annotationCopyToClip.label = Time Based - Copy annotation cue points when user clips entries
+	moduls.annotationCopyToClip.permissionName = COPY_ANNOTATIONS_TO_CLIP
+	moduls.annotationCopyToClip.basePermissionType = 3
+	moduls.annotationCopyToClip.basePermissionName = ANNOTATION_PLUGIN_PERMISSION
+	moduls.annotationCopyToClip.group = GROUP_ENABLE_DISABLE_FEATURES
+
+	moduls.annotationCopyToTrim.enabled = true
+	moduls.annotationCopyToTrim.permissionType = 2
+	moduls.annotationCopyToTrim.label = Time Based - Do not keep annotation cue points when user trims entries
+	moduls.annotationCopyToTrim.permissionName = DO_NOT_COPY_ANNOTATIONS_TO_TRIMMED_ENTRY
+	moduls.annotationCopyToTrim.basePermissionType = 3
+	moduls.annotationCopyToTrim.basePermissionName = ANNOTATION_PLUGIN_PERMISSION
+	moduls.annotationCopyToTrim.group = GROUP_ENABLE_DISABLE_FEATURES
+
+	moduls.cuePointCopyToClip.enabled = true
+	moduls.cuePointCopyToClip.permissionType = 2
+	moduls.cuePointCopyToClip.label = Time Based - Do not copy code, thumb and ad cue points when user clips entries
+	moduls.cuePointCopyToClip.permissionName = DO_NOT_COPY_CUE_POINTS_TO_CLIP
+	moduls.cuePointCopyToClip.basePermissionType = 3
+	moduls.cuePointCopyToClip.basePermissionName = CUEPOINT_PLUGIN_PERMISSION
+	moduls.cuePointCopyToClip.group = GROUP_ENABLE_DISABLE_FEATURES
+
+	moduls.cuePointCopyToTrim.enabled = true
+	moduls.cuePointCopyToTrim.permissionType = 2
+	moduls.cuePointCopyToTrim.label = Time Based - Do not keep code, thumb, and ad cue points when user trims entries
+	moduls.cuePointCopyToTrim.permissionName = DO_NOT_COPY_CUE_POINTS_TO_TRIMMED_ENTRY
+	moduls.cuePointCopyToTrim.basePermissionType = 3
+	moduls.cuePointCopyToTrim.basePermissionName = CUEPOINT_PLUGIN_PERMISSION
+	moduls.cuePointCopyToTrim.group = GROUP_ENABLE_DISABLE_FEATURES
+
+	moduls.keepCuePointsOnMediaReplacement.enabled = true
+	moduls.keepCuePointsOnMediaReplacement.permissionType = 2
+	moduls.keepCuePointsOnMediaReplacement.label = Time Based - Remove original cue points when user replaces media in existing entry
+	moduls.keepCuePointsOnMediaReplacement.permissionName = REMOVE_CUE_POINTS_WHEN_REPLACING_MEDIA
+	moduls.keepCuePointsOnMediaReplacement.basePermissionType = 3
+	moduls.keepCuePointsOnMediaReplacement.basePermissionName = CUEPOINT_PLUGIN_PERMISSION
+	moduls.keepCuePointsOnMediaReplacement.group = GROUP_ENABLE_DISABLE_FEATURES
+
+#### Deployment Scripts ####
+
+None.
+
+#### Known Issues & Limitations ####
+
+None.
+
+## YouTube API connector V3 ##
+
+***Note:*** Manual migration required to all existing accounts. 
+
+- Issue Type: bug fix
+- Issue ID: PLAT-2776
+
+#### Configuration ####
+
+**google_auth.ini**
+
+Added `youtubeapi` section.
+
+#### Deployment Scripts ####
+
+		deployment/updates/scripts/2015_04_12_migrate_youtube_api_category.php
+
+#### Known Issues & Limitations ####
+
+The new API, currently, doesn't support existing features:
+
+- Disallow comments
+- Disallow ratings
+- Disallow responses
+- Set raw file name
+- Set start and end dates
+
+## Redirect live entry updates via its original DC ##
+
+- Issue Type: bug fix
+- Issue ID: PLAT-2762
+
+#### Configuration ####
+
+** local.ini **
+
+Added the following configuration.
+
+	;set to true when one of the DC's is down
+	disable_dump_api_request = false
+
+#### Deployment Scripts ####
+
+None.
+
+#### Known Issues & Limitations ####
+
+None.
+
 ----------
 # Jupiter-10.8.0 #
 
@@ -8,7 +888,7 @@
 
 #### Configuration ####
 
-** sphinx/kaltura.conf **
+**sphinx/kaltura.conf**
 
 Added the following attribute to the kaltura_tag sphinx table. please re-index.
 
@@ -47,11 +927,11 @@ None.
 
 #### Configuration ####
 
-*plugins.ini*
+**plugins.ini**
 
 Add `MetadataSphinx` to the end of `Mandatory plugins` section (after `SphinxSearch`)
 
-*sphinx*
+**sphinx**
 
 Update `configurations/sphinx/kaltura.conf` according to template (a new index `kaltura_metadata` was added).
 
@@ -220,26 +1100,28 @@ Add the following lines as new sections:
 #### Activiti Deployment Instructions ####
 
  - Install [Apache Tomcat 7](http://tomcat.apache.org/tomcat-7.0-doc/setup.html#Unix_daemon "Apache Tomcat 7")
- - Make sure $CATALINA_HOME is defined.
+ - Make sure $CATALINA_BASE is defined.
  - Install [Apache Ant](http://ant.apache.org/manual/installlist.html "Apache Ant")
  - Download [Activiti 5.17.0](https://github.com/Activiti/Activiti/releases/download/activiti-5.17.0/activiti-5.17.0.zip "Activiti 5.17.0")
  - Open zip: `unzip activiti-5.17.0.zip`
- - Copy WAR files: `cp activiti-5.17.0/wars/* $CATALINA_HOME/webapps/`
+ - Copy WAR files: 
+  - `cp activiti-5.17.0/wars/activiti-explorer.war $CATALINA_BASE/webapps/activiti-explorer##5.17.0.war`
+  - `cp activiti-5.17.0/wars/activiti-rest.war $CATALINA_BASE/webapps/activiti-rest##5.17.0.war`
  - Restart Apache Tomcat.
  - Create DB **(replace tokens)**: `mysql -uroot -p`
 
 		CREATE DATABASE activiti;
-		GRANT INSERT,UPDATE,DELETE,SELECT,ALTER,CREATE ON activiti.* TO '@DB1_USER@'@'%';
+		GRANT INSERT,UPDATE,DELETE,SELECT,ALTER,CREATE,INDEX ON activiti.* TO '@DB1_USER@'@'%';
 		FLUSH PRIVILEGES;
 
- - Edit **(replace tokens)** $CATALINA_HOME/webapps/**activiti-explorer**/WEB-INF/classes/db.properties
+ - Edit **(replace tokens)** $CATALINA_BASE/webapps/**activiti-explorer**/WEB-INF/classes/db.properties
 
 		jdbc.driver=com.mysql.jdbc.Driver
 		jdbc.url=jdbc:mysql://@DB1_HOST@:@DB1_PORT@/activiti
 		jdbc.username=@DB1_USER@
 		jdbc.password=@DB1_PASS@
 
- - Edit **(replace tokens)** $CATALINA_HOME/webapps/**activiti-rest**/WEB-INF/classes/db.properties
+ - Edit **(replace tokens)** $CATALINA_BASE/webapps/**activiti-rest**/WEB-INF/classes/db.properties
 
 		jdbc.driver=com.mysql.jdbc.Driver
 		jdbc.url=jdbc:mysql://@DB1_HOST@:@DB1_PORT@/activiti
@@ -248,7 +1130,7 @@ Add the following lines as new sections:
 
  - Download [mysql jdbc connector 5.0.8](http://cdn.mysql.com/Downloads/Connector-J/mysql-connector-java-5.0.8.zip "mysql jdbc connector 5.0.8")
  - Open zip: `unzip mysql-connector-java-5.0.8.zip`
- - Copy the mysql jdbc connector: `cp mysql-connector-java-5.0.8/mysql-connector-java-5.0.8-bin.jar $CATALINA_HOME/lib/`
+ - Copy the mysql jdbc connector: `cp mysql-connector-java-5.0.8/mysql-connector-java-5.0.8-bin.jar $CATALINA_BASE/lib/`
  - Restart Apache Tomcat.
  - Open your browser to validate installation **(replace tokens)**: http://@WWW_HOST@:8080/activiti-explorer/
 	 - Username: kermit

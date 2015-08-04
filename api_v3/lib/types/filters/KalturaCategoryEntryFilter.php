@@ -136,4 +136,16 @@ class KalturaCategoryEntryFilter extends KalturaCategoryEntryBaseFilter
 		$response->totalCount = $totalCount; // no pager since category entry is limited to ENTRY::MAX_CATEGORIES_PER_ENTRY
 		return $response;
 	}
+
+	/* (non-PHPdoc)
+	 * @see KalturaRelatedFilter::validateForResponseProfile()
+	 */
+	public function validateForResponseProfile()
+	{
+		if(		kEntitlementUtils::getEntitlementEnforcement()
+			&&	!PermissionPeer::isValidForPartner(PermissionName::FEATURE_ENABLE_RESPONSE_PROFILE_USER_CACHE, kCurrentContext::getCurrentPartnerId()))
+		{
+			throw new KalturaAPIException(KalturaErrors::CANNOT_LIST_RELATED_ENTITLED_WHEN_ENTITLEMENT_IS_ENABLE, get_class($this));
+		}
+	}
 }

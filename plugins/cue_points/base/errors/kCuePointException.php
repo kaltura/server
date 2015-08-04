@@ -3,6 +3,6 @@
  * @package plugins.cuePoint
  * @subpackage api.errors
  */
-class kCuePointException extends kCoreException implements kQuePointErrors
+class kCuePointException extends kCoreException implements kCuePointErrors
 {
 }

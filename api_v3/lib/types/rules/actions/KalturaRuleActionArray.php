@@ -36,6 +36,10 @@ class KalturaRuleActionArray extends KalturaTypedArray
 				return new KalturaAccessControlLimitFlavorsAction();
 			case RuleActionType::ADD_TO_STORAGE:
 				return new KalturaStorageAddAction();	
+			case RuleActionType::LIMIT_DELIVERY_PROFILES:
+				return new KalturaAccessControlLimitDeliveryProfilesAction();
+			case RuleActionType::SERVE_FROM_REMOTE_SERVER:
+				return new KalturaAccessControlServeRemoteEdgeServerAction();
 			default:
 				return KalturaPluginManager::loadObject('KalturaRuleAction', $dbObject->getType());
 		}		

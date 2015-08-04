@@ -8,7 +8,7 @@
  * @package Core
  * @subpackage model
  */ 
-class EmailIngestionProfile extends BaseEmailIngestionProfile
+class EmailIngestionProfile extends BaseEmailIngestionProfile implements IBaseObject
 {
 	const EMAIL_INGESTION_PROFILE_STATUS_INACTIVE = 0;
 	const EMAIL_INGESTION_PROFILE_STATUS_ACTIVE = 1;

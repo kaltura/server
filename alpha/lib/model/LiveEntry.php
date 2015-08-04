@@ -313,8 +313,10 @@ abstract class LiveEntry extends entry
 		$backupMediaServer = null;
 		$primaryApplicationName = null;
 		$backupApplicationName = null;
+		$isExternalMediaServerStream = false;
 		
 		$kMediaServers = $this->getMediaServers();
+		$partnerMediaServerConfiguration = $this->getPartner()->getMediaServersConfiguration();
 		if(count($kMediaServers))
 		{
 			foreach($kMediaServers as $key => $kMediaServer)
@@ -340,6 +342,13 @@ abstract class LiveEntry extends entry
 				if($kMediaServer && $kMediaServer instanceof kLiveMediaServer)
 				{
 					$primaryMediaServer = $kMediaServer->getMediaServer();
+					if(!$primaryMediaServer && $partnerMediaServerConfiguration && isset($partnerMediaServerConfiguration[$kMediaServer->getHostname()]))
+					{
+						$primaryMediaServer = new MediaServer();
+						$primaryMediaServer->setHostname($kMediaServer->getHostname());
+						$primaryMediaServer->setIsExternalMediaServer(true);
+						$isExternalMediaServerStream = true;
+					}
 					$primaryApplicationName = $kMediaServer->getApplicationName();
 				}
 			}
@@ -352,6 +361,13 @@ abstract class LiveEntry extends entry
 				if($kMediaServer && $kMediaServer instanceof kLiveMediaServer)
 				{
 					$backupMediaServer = $kMediaServer->getMediaServer();
+					if(!$backupMediaServer && $partnerMediaServerConfiguration && isset($partnerMediaServerConfiguration[$kMediaServer->getHostname()]))
+					{
+						$backupMediaServer = new MediaServer();
+						$backupMediaServer->setHostname($kMediaServer->getHostname());
+						$backupMediaServer->setIsExternalMediaServer(true);
+						$isExternalMediaServerStream = true;
+					}
 					$backupApplicationName = $kMediaServer->getApplicationName();
 				}
 			}
@@ -369,10 +385,10 @@ abstract class LiveEntry extends entry
 		}
 		elseif($primaryMediaServer)
 		{
-			$manifestUrl = $primaryMediaServer->getManifestUrl($protocol, $this->getPartner()->getMediaServersConfiguration());
+			$manifestUrl = $primaryMediaServer->getManifestUrl($protocol, $partnerMediaServerConfiguration);
 			if($backupMediaServer)
 			{
-				$backupManifestUrl = $backupMediaServer->getManifestUrl($protocol, $this->getPartner()->getMediaServersConfiguration());
+				$backupManifestUrl = $backupMediaServer->getManifestUrl($protocol, $partnerMediaServerConfiguration);
 			}
 		}
 		
@@ -450,28 +466,40 @@ abstract class LiveEntry extends entry
 		$configuration->setProtocol(PlaybackProtocol::HDS);
 		$configuration->setUrl($hdsStreamUrl);
 		$configuration->setBackupUrl($hdsBackupStreamUrl);
+		$configuration->setIsExternalStream($isExternalMediaServerStream);
 		$configurations[] = $configuration;
 		
 		$configuration = new kLiveStreamConfiguration();
 		$configuration->setProtocol(PlaybackProtocol::HLS);
 		$configuration->setUrl($hlsStreamUrl);
 		$configuration->setBackupUrl($hlsBackupStreamUrl);
+		$configuration->setIsExternalStream($isExternalMediaServerStream);
 		$configurations[] = $configuration;
 		
 		$configuration = new kLiveStreamConfiguration();
 		$configuration->setProtocol(PlaybackProtocol::APPLE_HTTP);
 		$configuration->setUrl($hlsStreamUrl);
 		$configuration->setBackupUrl($hlsBackupStreamUrl);
+		$configuration->setIsExternalStream($isExternalMediaServerStream);
+		$configurations[] = $configuration;
+		
+		$configuration = new kLiveStreamConfiguration();
+		$configuration->setProtocol(PlaybackProtocol::APPLE_HTTP_TO_MC);
+		$configuration->setUrl($hlsStreamUrl);
+		$configuration->setBackupUrl($hlsBackupStreamUrl);
+		$configuration->setIsExternalStream($isExternalMediaServerStream);
 		$configurations[] = $configuration;
 		
 		$configuration = new kLiveStreamConfiguration();
 		$configuration->setProtocol(PlaybackProtocol::SILVER_LIGHT);
 		$configuration->setUrl($slStreamUrl);
+		$configuration->setIsExternalStream($isExternalMediaServerStream);
 		$configurations[] = $configuration;
 		
 		$configuration = new kLiveStreamConfiguration();
 		$configuration->setProtocol(PlaybackProtocol::MPEG_DASH);
 		$configuration->setUrl($mpdStreamUrl);
+		$configuration->setIsExternalStream($isExternalMediaServerStream);
 		$configurations[] = $configuration;
 		
 		if ($this->getPushPublishEnabled())
@@ -591,6 +619,7 @@ abstract class LiveEntry extends entry
 		$server = new kLiveMediaServer($index, $hostname, $mediaServer ? $mediaServer->getDc() : null, $mediaServer ? $mediaServer->getId() : null, 
 			$applicationName ? $applicationName : MediaServer::DEFAULT_APPLICATION);
 		$this->putInCustomData("server-$index", $server, LiveEntry::CUSTOM_DATA_NAMESPACE_MEDIA_SERVERS);
+		$this->setLiveStatus(LiveEntryStatus::PLAYABLE);
 	}
 	
 	protected function isMediaServerRegistered($index, $hostname)
@@ -610,6 +639,10 @@ abstract class LiveEntry extends entry
 		{
 			$server = $this->removeFromCustomData("server-$index", LiveEntry::CUSTOM_DATA_NAMESPACE_MEDIA_SERVERS);
 			$this->setLastBroadcastEndTime(kApiCache::getTime());
+		}
+		
+		if(!$this->hasMediaServer()) {
+			$this->setLiveStatus(LiveEntryStatus::STOPPED);
 		}
 	}
 	
@@ -631,6 +664,16 @@ abstract class LiveEntry extends entry
 		}
 		
 		return $listChanged;
+	}
+	
+	public function getLiveStatus ()
+	{
+		return $this->getFromCustomData('live_status', null, LiveEntryStatus::STOPPED);
+	}
+	
+	public function setLiveStatus ($v)
+	{
+		$this->putInCustomData('live_status', $v);
 	}
 	
 	/**

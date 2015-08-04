@@ -3,7 +3,7 @@
  * @package api
  * @subpackage objects
  */
-class KalturaBaseEntry extends KalturaObject implements IFilterable 
+class KalturaBaseEntry extends KalturaObject implements IRelatedFilterable, IApiObjectFactory
 {
 	/**
 	 * Auto generated 10 characters alphanumeric string
@@ -219,7 +219,7 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 	 * Thumbnail URL
 	 * 
 	 * @var string
-	 * @insertonly
+	 * @readonly
 	 */
 	public $thumbnailUrl;
 	
@@ -345,7 +345,16 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 	 * @var string
 	 * @filter matchand
 	 */
-	public $entitledUsersPublish;	
+	public $entitledUsersPublish;
+
+	/**
+	 * Comma seperated string of the capabilities of the entry. Any capability needed can be added to this list.
+	 *
+	 * @dynamicType KalturaEntryCapability
+	 * @var string
+	 * @readonly
+	 */
+	public $capabilities;
 	
 	/*
 	 * mapping between the field on this object (on the left) and the setter/getter on the entry object (on the right)  
@@ -390,7 +399,8 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 	 	"parentEntryId",
 	 	"entitledUsersEdit" => "entitledPusersEdit",
 	 	"entitledUsersPublish" => "entitledPusersPublish",
-	 	"operationAttributes"
+	 	"operationAttributes",
+		"capabilities",
 	 );
 		 
 	public function getMapBetweenObjects()
@@ -715,5 +725,15 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 			"categoriesMatchOr" => "All entries within these categories or their child categories.",
 			"categoriesIdsMatchOr" => "All entries of the categories, excluding their child categories.\nTo include entries of the child categories, use categoryAncestorIdIn, or categoriesMatchOr.",
 		);
+	}
+	
+	public static function getInstance($sourceObject, KalturaDetachedResponseProfile $responseProfile = null)
+	{
+	    $object = KalturaEntryFactory::getInstanceByType($sourceObject->getType());
+	    if (!$object)
+	        return null;
+	    
+	    $object->fromObject($sourceObject, $responseProfile);
+	    return $object;
 	}
 }

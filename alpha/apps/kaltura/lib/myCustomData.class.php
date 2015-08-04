@@ -120,7 +120,7 @@ class myCustomData
 	{
 		if($namespace)
 		{
-			if ($name)
+			if (isset($name))
 			{
 				if (isset($this->data[$namespace][$name]))
 					return $this->data[$namespace][$name];

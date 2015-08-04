@@ -280,10 +280,10 @@ class entryPeer extends BaseentryPeer
 		return $res;
 	}
 
-	public static function retrieveByPKNoFilter ($pk, $con = null)
+	public static function retrieveByPKNoFilter ($pk, $con = null, $filterEntitlements = true)
 	{
 		KalturaCriterion::disableTags(array(KalturaCriterion::TAG_ENTITLEMENT_ENTRY, KalturaCriterion::TAG_WIDGET_SESSION));
-		self::$filerResults = true;
+		self::$filerResults = $filterEntitlements;
 		self::setUseCriteriaFilter ( false );
 		$res = parent::retrieveByPK( $pk , $con );
 		self::setUseCriteriaFilter ( true );
@@ -582,18 +582,7 @@ class entryPeer extends BaseentryPeer
 
 	public static function doSelectJoinkuser(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
 	{
-		$c = clone $criteria;
-
-		if($c instanceof KalturaCriteria)
-		{
-			$skipApplyFilters = entryPeer::applyEntitlementCriteria($c);
-
-			if(!$skipApplyFilters)
-			{
-				$c->applyFilters();
-				$criteria->setRecordsCount($c->getRecordsCount());
-			}
-		}
+		$c = self::prepareEntitlementCriteriaAndFilters( $criteria );
 
 		$results = parent::doSelectJoinkuser($c, $con, $join_behavior);
 		self::$filerResults = false;
@@ -607,18 +596,7 @@ class entryPeer extends BaseentryPeer
 	 */
 	public static function doSelect(Criteria $criteria, PropelPDO $con = null)
 	{
-		$c = clone $criteria;
-
-		if($c instanceof KalturaCriteria)
-		{
-			$skipApplyFilters = entryPeer::applyEntitlementCriteria($c);
-
-			if(!$skipApplyFilters)
-			{
-				$c->applyFilters();
-				$criteria->setRecordsCount($c->getRecordsCount());
-			}
-		}
+		$c = self::prepareEntitlementCriteriaAndFilters( $criteria );
 
 		$queryResult =  parent::doSelect($c, $con);
 
@@ -663,6 +641,24 @@ class entryPeer extends BaseentryPeer
 		return $skipApplyFilters;
 	}
 
+	public static function prepareEntitlementCriteriaAndFilters(Criteria $criteria)
+	{
+		$c = clone $criteria;
+
+		if($c instanceof KalturaCriteria)
+		{
+			$skipApplyFilters = entryPeer::applyEntitlementCriteria($c);
+
+			if(!$skipApplyFilters)
+			{
+				$c->applyFilters();
+				$criteria->setRecordsCount($c->getRecordsCount());
+			}
+		}
+
+		return $c;
+	}
+
 	public static function getDurationType($duration)
 	{
 		if ($duration >= 0 && $duration <= 4*60)
@@ -689,6 +685,15 @@ class entryPeer extends BaseentryPeer
 	{
 		return array(entryPeer::STATUS);
 	}
+	
+	/* (non-PHPdoc)
+	 * @see BaseentryPeer::getAtomicCustomDataFields()
+	*/
+	public static function getAtomicCustomDataFields()
+	{
+		return array("replacingEntryId");
+	}
+	
 
 	private static function filterByAccessControl($entry) {
 

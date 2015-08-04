@@ -3,7 +3,7 @@
  * @package api
  * @subpackage objects
  */
-class KalturaMediaServer extends KalturaObject implements IFilterable
+class KalturaMediaServer extends KalturaObject
 {
 	/**
 	 * Unique identifier
@@ -64,21 +64,5 @@ class KalturaMediaServer extends KalturaObject implements IFilterable
 	public function getMapBetweenObjects()
 	{
 		return array_merge(parent::getMapBetweenObjects(), self::$mapBetweenObjects);
-	}
-	
-	/* (non-PHPdoc)
-	 * @see IFilterable::getExtraFilters()
-	 */
-	public function getExtraFilters()
-	{
-		return array();
-	}
-	
-	/* (non-PHPdoc)
-	 * @see IFilterable::getFilterDocs()
-	 */
-	public function getFilterDocs()
-	{
-		return array();
 	}
 }

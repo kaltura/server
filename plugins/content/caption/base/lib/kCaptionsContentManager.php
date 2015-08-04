@@ -59,4 +59,25 @@ abstract class kCaptionsContentManager
 				return KalturaPluginManager::loadObject('kCaptionsContentManager', $type);
 		}
 	}
+	
+	public static function addParseMultiLanguageCaptionAssetJob($captionAsset, $fileLocation)
+	{
+		$batchJob = new BatchJob();
+
+		$id = $captionAsset->getId();
+		$entryId = $captionAsset->getEntryId();
+
+		$jobData = new kParseMultiLanguageCaptionAssetJobData();
+		$jobData->setMultiLanaguageCaptionAssetId($id);
+		$jobData->setEntryId($entryId);
+		$jobData->setFileLocation($fileLocation);
+
+		$jobType = CaptionPlugin::getBatchJobTypeCoreValue(ParseMultiLanguageCaptionAssetBatchType::PARSE_MULTI_LANGUAGE_CAPTION_ASSET);
+		$batchJob->setObjectType(BatchJobObjectType::ASSET);
+		$batchJob->setEntryId($entryId);
+		$batchJob->setPartnerId($captionAsset->getPartnerId());
+		$batchJob->setObjectId($id);
+
+		return kJobsManager::addJob($batchJob, $jobData, $jobType);
+	}
 }

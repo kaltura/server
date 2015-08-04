@@ -22,6 +22,19 @@ class KalturaFilterPager extends KalturaObject
 	 * @var int
 	 */
 	public $pageIndex = 1;	
+
+	private static $map_between_objects = array(
+		'pageSize', 
+		'pageIndex',
+	);
+	
+	/* (non-PHPdoc)
+	 * @see KalturaObject::getMapBetweenObjects()
+	 */
+	public function getMapBetweenObjects()
+	{
+		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
+	}
 	
 	public function toObject($object = null, $skipProperties = array())
 	{
@@ -32,15 +45,28 @@ class KalturaFilterPager extends KalturaObject
 		
 		return parent::toObject($object, $skipProperties);
 	}
+
+	public function calcPageSize()
+	{
+		return max(min($this->pageSize, baseObjectFilter::getMaxInValues()), 0);
+	}
+
+	public function calcPageIndex()
+	{
+		return max(self::MIN_PAGE_INDEX, $this->pageIndex);
+	}
+
+	public function calcOffset()
+	{
+		return ($this->calcPageIndex() - 1) * $this->calcPageSize();
+	}
 	
 	public function attachToCriteria ( Criteria $c )
 	{
-		$this->pageSize = max(min($this->pageSize, baseObjectFilter::getMaxInValues()), 0);
+		$this->pageIndex = $this->calcPageIndex();
+		$this->pageSize = $this->calcPageSize();
 		$c->setLimit( $this->pageSize );
-		
-		$this->pageIndex = max(self::MIN_PAGE_INDEX, $this->pageIndex);		
-		$offset = ($this->pageIndex - 1) * $this->pageSize;
-		$c->setOffset( $offset );
+		$c->setOffset( $this->calcOffset() );
 	}
 	
 	public static function detachFromCriteria(Criteria $c)

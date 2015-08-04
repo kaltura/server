@@ -20,6 +20,7 @@ class KalturaLog
     const DEBUG   = Zend_Log::DEBUG;
     
     const LOG_TYPE_ANALYTICS = 'LOG_TYPE_ANALYTICS';
+    const STANDARD_ERROR = 'STANDARD_ERROR';
 	
 	public static function getInstance ()
 	{
@@ -111,6 +112,11 @@ class KalturaLog
 	static function analytics(array $data)
 	{
 		self::logByType(implode(',', $data), self::LOG_TYPE_ANALYTICS, self::NOTICE);
+	}
+
+	static function stderr($message, $priority = self::ERR)
+	{
+		self::logByType($message, self::STANDARD_ERROR, $priority);
 	}
 	
 	static function logByType($message, $type, $priority = self::DEBUG)
@@ -235,5 +241,19 @@ class LogDuration
 		self::$_lastMicroTime = $curTime;
 		
 		return $result;
+	}
+}
+
+/**
+ * @package infra
+ * @subpackage log
+ */
+class SessionIndex
+{
+	static $_currentIndex = 0;
+	public function __toString()
+	{
+		self::$_currentIndex++;
+		return '' . self::$_currentIndex;
 	}
 }

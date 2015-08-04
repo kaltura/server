@@ -11,6 +11,8 @@ class infraRequestUtils
 {
 	const PROTOCOL_HTTP = 'http';
 	const PROTOCOL_HTTPS = 'https';
+
+	const DEFAULT_HTTP_TIME = 'Sun, 19 Nov 2000 08:52:00 GMT';
 	
 	protected static $isInGetRemoteAddress = false;
 	protected static $remoteAddress = null;
@@ -100,6 +102,15 @@ class infraRequestUtils
 		
 		return array($start, $end, $length);
 	}
+		
+	public static function formatHttpTime($time)
+	{
+		if (!$time)
+		{
+			return self::DEFAULT_HTTP_TIME;
+		}
+		return gmdate('D, d M Y H:i:s', $time) . ' GMT';
+	}
 
 	public static function sendCachingHeaders($max_age = 864000, $private = false, $last_modified = null)
 	{
@@ -108,15 +119,12 @@ class infraRequestUtils
 			// added max-stale=0 to fight evil proxies
 			$cache_scope = $private ? "private" : "public";
 			header("Cache-Control: $cache_scope, max-age=$max_age, max-stale=0");
-			header('Expires: ' . gmdate('D, d M Y H:i:s', time() + $max_age) . ' GMT');
-			if ($last_modified)
-				header('Last-modified: ' . gmdate('D, d M Y H:i:s', $last_modified) . ' GMT');
-			else
-				header('Last-Modified: Sun, 19 Nov 2000 08:52:00 GMT');
+			header('Expires: ' . self::formatHttpTime(time() + $max_age));
+			header('Last-modified: ' . self::formatHttpTime($last_modified));
 		}
 		else
 		{
-			header("Expires: Sun, 19 Nov 2000 08:52:00 GMT");
+			header("Expires: " . self::DEFAULT_HTTP_TIME);
 			header("Cache-Control: no-store, no-cache, must-revalidate, post-check=0, pre-check=0");
 			header("Pragma: no-cache" );
 		}
@@ -168,6 +176,9 @@ class infraRequestUtils
 						case "3gp":
 								$content_type ="video/3gpp";
 								break;
+				case "js":
+					$content_type ="application/javascript";
+					break;
 				default:
 					$content_type ="image/$ext";
 					break;
@@ -244,6 +255,35 @@ class infraRequestUtils
 
 		return self::$hostname;
 	}
+
+	public static function getIpFromHttpHeader($httpHeader, $acceptInternalIps, $phpizeHeader = false)
+	{
+		if ($phpizeHeader)
+			$httpHeader = "HTTP_".strtoupper(str_replace("-", "_", $httpHeader));
+		
+		if (!isset($_SERVER[$httpHeader]))
+				return null;
+		
+		$remote_addr = null;
+				
+		// pick the first non private ip
+		$headerIPs = explode(',', trim($_SERVER[$httpHeader], ','));
+		foreach ($headerIPs as $ip)
+		{
+			preg_match('/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/', trim($ip), $matches); // ignore any string after the ip address
+			if (!isset($matches[0]))
+				continue;
+	
+			$tempAddr = trim($matches[0]);
+			if (!$acceptInternalIps && self::isIpPrivate($tempAddr))	// verify that ip is not from a private range
+				continue;
+	
+			$remote_addr = $tempAddr;
+			break;
+		}
+		 
+		return $remote_addr;
+	}
 	
 	public static function getRemoteAddress()
 	{
@@ -306,22 +346,7 @@ class infraRequestUtils
 			isset($_SERVER['HTTP_X_FORWARDED_HOST']) &&
 			in_array($_SERVER['HTTP_X_FORWARDED_HOST'], kConf::get('remote_addr_whitelisted_hosts') ) ) )
 		{
-			// pick the first non private ip
-			$headerIPs = trim($_SERVER['HTTP_X_FORWARDED_FOR'], ',');
-			$headerIPs = explode(',', $headerIPs);
-			foreach ($headerIPs as $ip)
-			{
-				preg_match('/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/', trim($ip), $matches); // ignore any string after the ip address
-				if (!isset($matches[0]))
-					continue;
-					
-	 			$tempAddr = trim($matches[0]);
-	 			if (!kConf::get('accept_private_ips') && self::isIpPrivate($tempAddr))	// verify that ip is not from a private range
-	 				continue;
-	 			
-	 			$remote_addr = $tempAddr;
-	 			break;
-		 	}
+			$remote_addr = self::getIpFromHttpHeader('HTTP_X_FORWARDED_FOR', kConf::get('accept_private_ips'));
 		}
 
 		// support passing ip when proxying through apache. check the proxying server is indeed an internal server
@@ -427,10 +452,13 @@ class infraRequestUtils
 		{
 			$key = each($pathParts);
 			$value = each($pathParts);
-			$params[$key['value']] = $value['value'];
+			if (!array_key_exists($key['value'], $params))
+			{
+				$params[$key['value']] = $value['value'];
+			}
 		}
 			
-		self::$requestParams = array_merge($params, $_GET, $_POST, $_FILES);
+		self::$requestParams = array_merge($_FILES, $_POST, $_GET, $params);
 		return self::$requestParams;
 	}
 

@@ -25,7 +25,7 @@ class KDropFolderFileTransferEngine extends KDropFolderEngine
 			$dropFolderFilesMap = array();
 
 		$maxModificationTime = 0;
-		foreach ($physicalFiles as $physicalFile) 
+		foreach ($physicalFiles as &$physicalFile)
 		{
 			/* @var $physicalFile FileObject */	
 			$physicalFileName = $physicalFile->filename;
@@ -426,8 +426,13 @@ class KDropFolderFileTransferEngine extends KDropFolderEngine
 		{
 			throw new kFileTransferMgrException('Drop folder path not valid ['.$this->dropFolder->path.']', kFileTransferMgrException::remotePathNotValid);
 		}
-			
-		KalturaLog::debug("physical files: ".print_r($physicalFiles, true));
+
+		KalturaLog::debug("physical files: ");
+		foreach ($physicalFiles as &$currlFile)
+		{
+			KalturaLog::debug(print_r($currlFile, true));
+		}
+		
 		return $physicalFiles;
 	}
 	

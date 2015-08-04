@@ -5,9 +5,13 @@
  * @package Core
  * @subpackage model
  */
-abstract class DeliveryProfile extends BaseDeliveryProfile {
-	
+abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObject
+{
 	protected $DEFAULT_RENDERER_CLASS = 'kF4MManifestRenderer';
+	
+	const DYNAMIC_ATTRIBUTES_FULL_SUPPORT = 0;		// the profile fully supports the required attirbutes
+	const DYNAMIC_ATTRIBUTES_PARTIAL_SUPPORT = 1;	// the profile may support the required attirbutes however its better to try and find a more suitable profile
+	const DYNAMIC_ATTRIBUTES_NO_SUPPORT = 2;		// the profile doesn't support the required attirbutes
 	
 	/**
 	 * @var DeliveryProfileDynamicAttributes
@@ -33,6 +37,24 @@ abstract class DeliveryProfile extends BaseDeliveryProfile {
 		$newObject->setTokenizer($this->getTokenizer());
 		$newObject->save(null, true);
 		return $newObject;
+	}
+
+	/**
+	 * returns whether the delivery profile supports the passed deliveryAttributes such as mediaProtocol, flv support, etc..
+	 * @param DeliveryProfileDynamicAttributes $deliveryAttributes
+	 */
+	public function supportsDeliveryDynamicAttributes(DeliveryProfileDynamicAttributes $deliveryAttributes) {
+		if(!$deliveryAttributes->getMediaProtocol())
+			return self::DYNAMIC_ATTRIBUTES_FULL_SUPPORT;
+
+ 		if(!is_null($this->getMediaProtocols()))
+		{
+			$supportedProtocols = explode(",", $this->getMediaProtocols());
+			if(!in_array($deliveryAttributes->getMediaProtocol(), $supportedProtocols)) 
+				return self::DYNAMIC_ATTRIBUTES_NO_SUPPORT;
+		}
+		
+		return self::DYNAMIC_ATTRIBUTES_FULL_SUPPORT;
 	}
 	
 	/**
@@ -165,8 +187,8 @@ abstract class DeliveryProfile extends BaseDeliveryProfile {
 		return $this->params->setEntryId($entryId);
 	}
 	
-	public function setStorageProfileId($storageProfileId) {
-		return $this->params->setStorageProfileId($storageProfileId);
+	public function setStorageId($storageId) {
+		return $this->params->setStorageId($storageId);
 	}
 	
 	// -------------------------------------

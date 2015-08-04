@@ -64,7 +64,7 @@ $fltStr = null;
 			$cmdStr = str_replace(" -deinterlace", "", $cmdStr);
 		}
 		
-		$filters = self::generateVideoFilters($vid);
+		$filters = $this->generateVideoFilters($vid);
 		if(count($filters)>0){
 			$fltStr = implode(',', $filters);
 			$cmdStr.= " -vf '$fltStr'";

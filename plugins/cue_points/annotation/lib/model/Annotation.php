@@ -5,6 +5,8 @@
  */
 class Annotation extends CuePoint implements IMetadataObject
 {
+    const CUSTOM_DATA_FIELD_SEARCHABLE_ON_ENTRY = 'searchableOnEntry';
+    
 	public function __construct() 
 	{
 		parent::__construct();
@@ -31,14 +33,67 @@ class Annotation extends CuePoint implements IMetadataObject
 	
 	public function contributeData()
 	{
-		$data = null;
-		
-		if($this->getText())
-			$data = $data . $this->getText() . ' ';
-		
-		if($this->getTags())
-			$data = $data . $this->getTags() . ' ';
+	   $data = null;
+
+	   if($this->getSearchableOnEntry())
+	   {
+	       if($this->getText())
+    			$data = $data . $this->getText() . ' ';
+    		
+    		if($this->getTags())
+    			$data = $data . $this->getTags() . ' ';
+	    }
 			
 		return $data;
 	}
+
+	/**
+	 * @param entry $entry
+	 * @return bool true if cuepoints should be copied to given entry
+	 */
+	public function hasPermissionToCopyToEntry( entry $entry )
+	{
+		if (!$entry->getIsTemporary()
+			&& PermissionPeer::isValidForPartner(AnnotationCuePointPermissionName::COPY_ANNOTATIONS_TO_CLIP, $entry->getPartnerId())) {
+			return true;
+		}
+
+		if ($entry->getIsTemporary()
+			&& !PermissionPeer::isValidForPartner(AnnotationCuePointPermissionName::DO_NOT_COPY_ANNOTATIONS_TO_TRIMMED_ENTRY, $entry->getPartnerId())) {
+			return true;
+		}
+
+		return false;
+	}
+
+	public function shouldCopyToClip( $clipStartTime, $clipDuration ) {
+		//child annotations have starttime 0, check parent starttime
+		if ( !$this->getStartTime() ) {
+			$parentAnnotation = $this->getParent();
+			if ( !is_null($parentAnnotation) ) {
+				return $parentAnnotation->shouldCopyToClip($clipStartTime, $clipDuration);
+			}
+		} else if ( $this->getStartTime() >= $clipStartTime && $this->getStartTime() <= ($clipStartTime + $clipDuration) ) {
+			return true;
+		}
+
+		return false;
+	}
+
+	public function copyToEntry( $entry, PropelPDO $con = null)
+	{
+		$annotation = parent::copyToEntry( $entry );
+		if ( $annotation->getParentId() ) {
+			$mappedId = kObjectCopyHandler::getMappedId('Annotation', $annotation->getParentId());
+			if ( $mappedId ) {
+				$annotation->setParentId( $mappedId );
+			}
+		}
+		$annotation->save();
+		return $annotation;
+	}
+	
+	public function getSearchableOnEntry()	      		{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_SEARCHABLE_ON_ENTRY);}
+	public function setSearchableOnEntry($v)        	{return $this->putInCustomData(self::CUSTOM_DATA_FIELD_SEARCHABLE_ON_ENTRY, (bool)$v);}
+	
 }

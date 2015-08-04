@@ -589,6 +589,11 @@ class KalturaTypeReflector
 		return $reflectionClass->implementsInterface("IFilterable");
 	}
 	
+	public function isRelatedFilterable()
+	{
+		return is_subclass_of($this->_type, 'IRelatedFilterable');
+	}
+	
 	/**
 	 * @return string plugin name
 	 */

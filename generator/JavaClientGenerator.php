@@ -816,11 +816,13 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 			$this->appendLine ( "	" );
 		}
 	
+		$volatileProperties = array();
 		foreach($configurationNodes as $configurationNode)
 		{
 			/* @var $configurationNode DOMElement */
 			$configurationName = $configurationNode->nodeName;
-			$methodsName = ucfirst($configurationName) . "Configuration";
+			$attributeName = lcfirst($configurationName) . "Configuration";
+			$volatileProperties[$attributeName] = array();
 		
 			foreach($configurationNode->childNodes as $configurationPropertyNode)
 			{
@@ -830,6 +832,12 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 					continue;
 			
 				$configurationProperty = $configurationPropertyNode->localName;
+				
+				if($configurationPropertyNode->hasAttribute('volatile') && $configurationPropertyNode->getAttribute('volatile'))
+				{
+					$volatileProperties[$attributeName][] = $configurationProperty;
+				}
+				
 				$type = $configurationPropertyNode->getAttribute("type");
 				if(!$this->isSimpleType($type) && !$this->isArrayType($type))
 				{
@@ -853,6 +861,20 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 			}
 		}
 		
+		$this->appendLine ( "	/**");
+		$this->appendLine ( "	 * Clear all volatile configuration parameters");
+		$this->appendLine ( "	 */");
+		$this->appendLine ( "	protected void resetRequest(){");
+		foreach($volatileProperties as $attributeName => $properties)
+		{
+			foreach($properties as $propertyName)
+			{
+				$this->appendLine("		this.{$attributeName}.remove(\"$propertyName\");");
+			}
+		}
+		$this->appendLine ( "	}");
+	
+		
 		$this->appendLine ( "}" );
 		
 		$imports .= "\n";
@@ -872,8 +894,7 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 		}
 		$this->appendLine("	 * @param $type \${$name}");
 		$this->appendLine("	 */");
-		$this->appendLine("	public void set{$methodsName}($type $name)");
-		$this->appendLine("	{");
+		$this->appendLine("	public void set{$methodsName}($type $name){");
 		$this->appendLine("		this.{$configurationName}Configuration.put(\"$paramName\", $name);");
 		$this->appendLine("	}");
 		$this->appendLine("	");
@@ -887,10 +908,8 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 		}
 		$this->appendLine("	 * @return $type");
 		$this->appendLine("	 */");
-		$this->appendLine("	public $type get{$methodsName}()");
-		$this->appendLine("	{");
-		$this->appendLine("		if(this.{$configurationName}Configuration.containsKey(\"{$paramName}\"))");
-		$this->appendLine("		{");
+		$this->appendLine("	public $type get{$methodsName}(){");
+		$this->appendLine("		if(this.{$configurationName}Configuration.containsKey(\"{$paramName}\")){");
 		$this->appendLine("			return ($type) this.{$configurationName}Configuration.get(\"{$paramName}\");");
 		$this->appendLine("		}");
 		$this->appendLine("		");
@@ -1067,7 +1086,10 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 			$serviceImports[] = "com.kaltura.client.types.*";
 				
 			return ("Map<String, " . $arrayType . ">");
-			
+
+		case "bigint" :
+			return "long";
+
 		case "bool" :
 			return "boolean";
 			

@@ -145,6 +145,8 @@ class KalturaErrors extends APIErrors
 
 	const ENTRY_CANNOT_BE_FLAGGED = "ENTRY_CANNOT_BE_FLAGGED;;Entry cannot be flagged";
 
+	const ENTRY_CANNOT_BE_TRIMMED = "ENTRY_CANNOT_BE_TRIMMED;;Entry cannot be trimmed";
+
 	/**
 	 * Notification Service
 	 */
@@ -189,6 +191,18 @@ class KalturaErrors extends APIErrors
 	
 	const CANNOT_TRANSFER_ENTRIES_TO_ANOTHER_ACCESS_CONTROL_OBJECT = "CANNOT_TRANSFER_ENTRIES_TO_ANOTHER_ACCESS_CONTROL_OBJECT;;no default access control for current partner";
 
+	/**
+	 * App Token
+	 */
+	const APP_TOKEN_ID_NOT_FOUND = "APP_TOKEN_ID_NOT_FOUND;ID;Application token id \"@ID@\" not found";
+	
+	const APP_TOKEN_NOT_ACTIVE = "APP_TOKEN_NOT_ACTIVE;ID;Application token id \"@ID@\" not active";
+	
+	const APP_TOKEN_EXPIRED = "APP_TOKEN_EXPIRED;ID;Application token id \"@ID@\" expired";
+	
+	const INVALID_APP_TOKEN_HASH = "INVALID_APP_TOKEN_HASH;;Invalid application token hash";
+	
+	
 	/**
 	 * ConversionProfile Service
 	 */
@@ -502,6 +516,10 @@ class KalturaErrors extends APIErrors
 	 */
 	const CANNOT_INDEX_OBJECT_WHEN_ENTITLEMENT_IS_ENABLE = "CANNOT_INDEX_OBJECT_WHEN_ENTITLEMENT_IS_ENABLE;;Cannot index object when enetitlment is enabled";
 
+	const CANNOT_LIST_RELATED_ENTITLED_WHEN_ENTITLEMENT_IS_ENABLE = "CANNOT_LIST_RELATED_ENTITLED_WHEN_ENTITLEMENT_IS_ENABLE;FILTER;Objects that require entitlement should not be listed [@FILTER@] as related-objects when enetitlment is enabled";
+
+	const USER_KS_CANNOT_LIST_RELATED_ENTRIES = "USER_KS_CANNOT_LIST_RELATED_ENTRIES;FILTER;Entries should not be listed [@FILTER@] as related-objects with unprivileged user ks";
+	
 	// live stream
 	const LIVE_STREAM_STATUS_CANNOT_BE_DETERMINED = "LIVE_STREAM_STATUS_CANNOT_BE_DETERMINED;PROT;Status cannot be determined for live stream protocol [@PROT@]";
 
@@ -572,4 +590,22 @@ class KalturaErrors extends APIErrors
 	const RESPONSE_PROFILE_DUPLICATE_SYSTEM_NAME = 'RESPONSE_PROFILE_DUPLICATE_SYSTEM_NAME;SYSTEM_NAME;Response profile system-name [@SYSTEM_NAME@] already exists';
 	
 	const RESPONSE_PROFILE_MAX_NESTING_LEVEL = 'RESPONSE_PROFILE_MAX_NESTING_LEVEL;;Response profile cross maximum nesting level';
+	
+	const RESPONSE_PROFILE_CACHE_NOT_FOUND = 'RESPONSE_PROFILE_MAX_NESTING_LEVEL;KEY;Response-Profile key [@KEY@] not found in cache';
+	
+	const RESPONSE_PROFILE_CACHE_ALREADY_RECALCULATED = 'RESPONSE_PROFILE_CACHE_ALREADY_RECALCULATED;;Response-Profile cache was recalculated already by a different process';
+	
+	const RESPONSE_PROFILE_CACHE_RECALCULATE_RESTARTED = 'RESPONSE_PROFILE_CACHE_RECALCULATE_RESTARTED;;Response-Profile cache recalculate was restarted by a different process';
+
+	/*
+	 * User-Entry Service
+	 */
+	const USER_ENTRY_NOT_FOUND = 'USER_ENTRY_NOT_FOUND;USER_ENTRY_ID; User-Entry id [@USER_ENTRY_ID@] not found';
+	const USER_ENTRY_DOES_NOT_MATCH_ENTRY_ID = 'USER_ENTRY_DOES_NOT_MATCH_ENTRY_ID;USER_ENTRY_ID;The entry id in the user-entry [@USER_ENTRY_ID@] does not match the entry-id given';
+	const USER_ENTRY_OBJECT_TYPE_ERROR = 'USER_ENTRY_OBJECT_TYPE_ERROR;OBJ_TYPE;USER_ENTRY_ID;There is an error in the DB, object type [@OBJ_TYPE@] of UserEntry id [@USER_ENTRY_ID@] is unknown';
+
+	/*
+	 * Edge Server service
+	 */
+	const HOST_NAME_ALREADY_EXISTS = "HOST_NAME_ALREADY_EXISTS;HOST_NAME;Host Name [@HOST_NAME@] already exists";
 }
