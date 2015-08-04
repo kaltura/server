@@ -25,7 +25,7 @@
 //
 // @ignore
 // ===================================================================================================
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Net;
@@ -42,41 +42,39 @@ namespace Kaltura
     {
         #region Private Fields
 
-        protected string _ApiVersion;
+        protected IDictionary<string, Object> clientConfiguration;
+        protected IDictionary<string, Object> requestConfiguration;
+
         protected KalturaConfiguration _Config;
-        private string _KS;
         private bool _ShouldLog;
         private List<KalturaServiceActionCall> _CallsQueue;
         private List<string> _MultiRequestReturnType;
         private KalturaParams _MultiRequestParamsMap;
-		private WebHeaderCollection _ResponseHeaders;
+        private WebHeaderCollection _ResponseHeaders;
 
         #endregion
 
         #region Properties
-
-        public string KS
-        {
-            get { return _KS; }
-            set { _KS = value; }
-        }
 
         public bool IsMultiRequest
         {
             get { return (_MultiRequestReturnType != null); }
         }
 
-		public WebHeaderCollection ResponseHeaders
+        public WebHeaderCollection ResponseHeaders
         {
             get { return _ResponseHeaders; }
         }
-		
+
         #endregion
 
         #region CTor
 
         public KalturaClientBase(KalturaConfiguration config)
         {
+            clientConfiguration = new Dictionary<string, Object>();
+            requestConfiguration = new Dictionary<string, Object>();
+
             _Config = config;
             if (_Config.Logger != null)
             {
@@ -97,14 +95,10 @@ namespace Kaltura
 
         public void QueueServiceCall(string service, string action, string fallbackClass, KalturaParams kparams, KalturaFiles kfiles)
         {
-            // in start session partner id is optional (default -1). if partner id was not set, use the one in the config
-            if (!kparams.ContainsKey("partnerId"))
-                kparams.AddIntIfNotNull("partnerId", this._Config.PartnerId);
-
-            if (kparams["partnerId"] == "-1")
-                kparams["partnerId"] = this._Config.PartnerId.ToString();
-
-            kparams.AddStringIfNotNull("ks", this._KS);
+            foreach (string param in requestConfiguration.Keys)
+            {
+                kparams.Add(param, requestConfiguration[param].ToString());
+            }
 
             KalturaServiceActionCall call = new KalturaServiceActionCall(service, action, kparams, kfiles);
             if (_MultiRequestReturnType != null)
@@ -116,8 +110,7 @@ namespace Kaltura
         {
             if (_CallsQueue.Count == 0)
             {
-                _MultiRequestReturnType.Clear();
-                _MultiRequestReturnType = null;
+                resetRequest();
                 return null;
             }
 
@@ -128,9 +121,10 @@ namespace Kaltura
             KalturaParams kparams = new KalturaParams();
             KalturaFiles kfiles = new KalturaFiles();
 
-            // append the basic params
-            kparams.Add("apiVersion", this._ApiVersion);
-            kparams.Add("clientTag", this._Config.ClientTag);
+            foreach (string param in clientConfiguration.Keys)
+            {
+                kparams.Add(param, clientConfiguration[param].ToString());
+            }
             kparams.AddIntIfNotNull("format", this._Config.ServiceFormat.GetHashCode());
 
             string url = this._Config.ServiceUrl + "/api";
@@ -189,10 +183,10 @@ namespace Kaltura
             request.Method = "POST";
             request.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
             request.Headers = _Config.RequestHeaders;
-			
-			// Add proxy information if required
+
+            // Add proxy information if required
             createProxy(request, _Config);
-            			
+
             if (kfiles.Count > 0)
             {
                 this.PostMultiPartWithFiles(request, kparams, kfiles);
@@ -264,15 +258,15 @@ namespace Kaltura
             XmlElement multiRequestResult = DoQueue();
 
             KalturaMultiResponse multiResponse = new KalturaMultiResponse();
-			if (multiRequestResult == null)
-			{
-				return multiResponse;
-			}
+            if (multiRequestResult == null)
+            {
+                return multiResponse;
+            }
             int i = 0;
             foreach (XmlElement arrayNode in multiRequestResult.ChildNodes)
             {
-				XmlElement error = arrayNode["error"];
-				if (error != null && error["code"] != null && error["message"] != null)
+                XmlElement error = arrayNode["error"];
+                if (error != null && error["code"] != null && error["message"] != null)
                     multiResponse.Add(new KalturaAPIException(error["code"].InnerText, error["message"].InnerText));
                 else if (arrayNode["objectType"] != null)
                     multiResponse.Add(KalturaObjectFactory.Create(arrayNode, _MultiRequestReturnType[i]));
@@ -281,8 +275,7 @@ namespace Kaltura
                 i++;
             }
 
-            _MultiRequestReturnType.Clear();
-            _MultiRequestReturnType = null;
+            resetRequest();
             return multiResponse;
         }
 
@@ -472,9 +465,9 @@ namespace Kaltura
         }
 
         public long UnixTimeNow()
-        {	
-                TimeSpan _TimeSpan = (DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0));
-                return (long)_TimeSpan.TotalSeconds;	
+        {
+            TimeSpan _TimeSpan = (DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0));
+            return (long)_TimeSpan.TotalSeconds;
         }
 
         private string EncodeTo64(string toEncode)
@@ -482,6 +475,12 @@ namespace Kaltura
             byte[] toEncodeAsBytes = System.Text.ASCIIEncoding.ASCII.GetBytes(toEncode);
             string returnValue = System.Convert.ToBase64String(toEncodeAsBytes);
             return returnValue;
+        }
+
+        protected void resetRequest()
+        {
+            _MultiRequestReturnType.Clear();
+            _MultiRequestReturnType = null;
         }
 
         #endregion

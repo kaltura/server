@@ -26,13 +26,59 @@
 // @ignore
 // ===================================================================================================
 using System;
+using System.Xml;
 using System.Text;
 using System.ComponentModel;
+using System.Collections.Generic;
 
 namespace Kaltura
 {
     public class KalturaObjectBase : INotifyPropertyChanged
     {
+        #region Private Fields
+        private IDictionary<string, KalturaListResponse> _RelatedObjects;
+        #endregion
+
+        #region Properties
+        public IDictionary<string, KalturaListResponse> RelatedObjects
+        {
+            get { return _RelatedObjects; }
+            set
+            {
+                _RelatedObjects = value;
+                OnPropertyChanged("RelatedObjects");
+            }
+        }
+        #endregion
+
+        #region CTor
+		public KalturaObjectBase()
+		{
+		}
+
+        public KalturaObjectBase(XmlElement node)
+        {
+            foreach (XmlElement propertyNode in node.ChildNodes)
+            {
+                string txt = propertyNode.InnerText;
+                switch (propertyNode.Name)
+                {
+                    case "relatedObjects":
+                        {
+                            int index = 0;
+                            this.RelatedObjects = new Dictionary<string, KalturaListResponse>();
+                            foreach (XmlElement arrayNode in propertyNode.ChildNodes)
+                            {
+                                this.RelatedObjects[index.ToString()] = (KalturaListResponse)KalturaObjectFactory.Create(arrayNode, "KalturaListResponse");
+                                index++;
+                            }
+                        }
+                        continue;
+                }
+            }
+		}
+        #endregion
+
         #region Methods
         public virtual KalturaParams ToParams()
         {
