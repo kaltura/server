@@ -452,7 +452,10 @@ class infraRequestUtils
 		{
 			$key = each($pathParts);
 			$value = each($pathParts);
-			$params[$key['value']] = $value['value'];
+			if (!array_key_exists($key['value'], $params))
+			{
+				$params[$key['value']] = $value['value'];
+			}
 		}
 		
 		if(isset($_SERVER['CONTENT_TYPE']) && strtolower($_SERVER['CONTENT_TYPE']) == 'application/json')
@@ -472,8 +475,6 @@ class infraRequestUtils
 			$post = $_POST;
 		}
 		
-		self::$requestParams = array_merge_recursive($params, $_GET, $post);
-	
 		if(count($_FILES))
 		{
 			foreach($_FILES as $key => $value)
@@ -483,18 +484,20 @@ class infraRequestUtils
 				{
 					$multiRequestIndex = $matches[1];
 					$key = $matches[2];
-					if(!isset(self::$requestParams[$multiRequestIndex]))
+					if(!isset($post[$multiRequestIndex]))
 					{
-						self::$requestParams[$multiRequestIndex] = array();
+						$post[$multiRequestIndex] = array();
 					}
-					self::$requestParams[$multiRequestIndex][$key] = $value;
+					$post[$multiRequestIndex][$key] = $value;
 				}
 				else
 				{
-					self::$requestParams[$key] = $value;
+					$post[$key] = $value;
 				}
 			}
 		}
+		
+		self::$requestParams = array_merge_recursive($post, $_GET, $params);
 		
 		return self::$requestParams;
 	}

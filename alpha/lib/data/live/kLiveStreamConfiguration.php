@@ -34,6 +34,10 @@ class kLiveStreamConfiguration
 	 */
 	protected $streamName;
 	
+	/**
+	 * @var boolean
+	 */
+	protected $isExternalStream = false;
 	
 	/**
 	 * @return the $streamName
@@ -105,5 +109,13 @@ class kLiveStreamConfiguration
 	 */
 	public function setPublishUrl($publishUrl) {
 		$this->publishUrl = $publishUrl;
+	}
+	
+	public function setIsExternalStream($v) {
+		$this->isExternalStream = $v;
+	}
+	
+	public function getIsExternalStream() {
+		return $this->isExternalStream;
 	}
 }

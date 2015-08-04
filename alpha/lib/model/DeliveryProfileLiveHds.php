@@ -83,8 +83,7 @@ class DeliveryProfileLiveHds extends DeliveryProfileLive {
 	/* (non-PHPdoc)
 	 * @see DeliveryProfileLive::serve()
 	 */
-	public function serve($baseUrl, $backupUrl) 
-	{
+//	public function doServe(kLiveStreamConfiguration $liveStreamConfig)	{
 //		if($backupUrl)
 //		{
 //			$entryId = $this->params->getEntryId();
@@ -142,9 +141,12 @@ class DeliveryProfileLiveHds extends DeliveryProfileLive {
 //			}
 //		}
 		
-		$flavor = $this->getFlavorAssetInfo('', $baseUrl);		// passing the url as urlPrefix so that only the path will be tokenized
-		$renderer = $this->getRenderer(array($flavor));
-		return $renderer;
-	}
+//		$flavors = array();
+//		$baseUrl = $liveStreamConfig->getUrl();
+//		$this->finalizeUrls($baseUrl, $flavors);
+//		$flavors[] = $this->getFlavorAssetInfo('', $baseUrl);		// passing the url as urlPrefix so that only the path will be tokenized
+//		$renderer = $this->getRenderer($flavors);
+//		return $renderer;
+//	}
 }
 

@@ -85,7 +85,12 @@ class kPlayManifestCacher extends kApiCache
 			require_once($requiredFile);
 		}
 		$renderer = unserialize($serializedRenderer);
-		$renderer->output($this->_deliveryCode, $this->_playbackContext);
+		
+		$renderer->setKsObject($this->_ksObj);
+		$renderer->setPlaybackContext($this->_playbackContext);
+		$renderer->setDeliveryCode($this->_deliveryCode);
+		
+		$renderer->output();
 		die;
 	}
 	

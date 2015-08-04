@@ -1480,6 +1480,7 @@ class myPartnerUtils
  		foreach($categories as $category)
  		{
  			/* @var $category category */
+ 			$category->setPuserId(null);
  			$newCategory= $category->copy();
  			$newCategory->setPartnerId($toPartner->getId());
  			if($category->getParentId())
@@ -1715,21 +1716,29 @@ class myPartnerUtils
 		}
 	}
 	
-	/*
+	/**
 	 * Ensure the request for media arrived in a way approved by the partner.
 	 * this may include restricting to a specific cdn, enforcing token usage etc..
 	 * Die in case of a breach.
 	 * 
-	 * @param int $partnerId
+	 * @param entry $entry
+	 * @param asset $asset
 	 */
-	public static function enforceDelivery($partnerId)
+	public static function enforceDelivery($entry, $asset = null)
 	{
-		$partner = PartnerPeer::retrieveByPK( $partnerId );
-		if ( !$partner )
-			return;
+		// block inactive partner
+		$partnerId = $entry->getPartnerId();
+		self::blockInactivePartner($partnerId);
+
+		// validate serve access control
+		$flavorParamsId = $asset ? $asset->getFlavorParamsId() : null;
+		$secureEntryHelper = new KSecureEntryHelper($entry, null, null, ContextType::SERVE);
+		$secureEntryHelper->validateForServe($flavorParamsId);
+
+		// enforce delivery
+		$partner = PartnerPeer::retrieveByPK($partnerId);		// Note: Partner was already loaded by blockInactivePartner, no need to check for null
 		
 		$restricted = DeliveryProfilePeer::isRequestRestricted($partner);
-		
 		if ($restricted)
 		{
 			KalturaLog::log ( "DELIVERY_METHOD_NOT_ALLOWED partner [$partnerId]" );

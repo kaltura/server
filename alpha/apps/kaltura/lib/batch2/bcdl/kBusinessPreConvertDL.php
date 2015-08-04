@@ -4,6 +4,10 @@ class kBusinessPreConvertDL
 {
 
 	const SAVE_ORIGINAL_SOURCE_FLAVOR_PARAM_SYS_NAME = 'save_original_source_flavor_params';
+
+	const TAG_VARIANT_A = 'watermark_a';
+	const TAG_VARIANT_B = 'watermark_b';
+	const TAG_VARIANT_PAIR_ID = 'watermark_pair_';
 	
 	/**
 	 * batch redecideFlavorConvert is the decision layer for a single flavor conversion
@@ -670,7 +674,14 @@ class kBusinessPreConvertDL
 		foreach($tagedFlavors as $tag => $tagedFlavorsArray)
 		{
 			KalturaLog::log("Filtering flavors by tag [$tag]");
-			$finalTagedFlavors[$tag] = kBusinessConvertDL::filterTagFlavors($tagedFlavorsArray);
+				/*
+				 * Digital-watermark tags should not participate in the 'tagged' flavor activation logic 
+				 */
+			if(strstr($tag,"watermark_pair_")==false && strstr($tag,self::TAG_VARIANT_A)==false && strstr($tag,self::TAG_VARIANT_B)==false) {
+				$finalTagedFlavors[$tag] = kBusinessConvertDL::filterTagFlavors($tagedFlavorsArray);
+			}
+			else 
+				$finalTagedFlavors[$tag] = $tagedFlavorsArray;
 		}
 			
 		$finalFlavors = array();
@@ -679,7 +690,13 @@ class kBusinessPreConvertDL
 			foreach($tagedFlavorsArray as $flavorParamsId => $tagedFlavor)
 				$finalFlavors[$flavorParamsId] = $tagedFlavor;
 		}
-		
+			/*
+			 * Digital-watermark flavors go through 'find the matching pair' procedure
+			 */
+		if(array_key_exists(self::TAG_VARIANT_A,$finalTagedFlavors) && array_key_exists(self::TAG_VARIANT_B,$finalTagedFlavors)) {
+			$finalFlavors = self::adjustToPairedDigitalWatermarking(self::TAG_VARIANT_A, $finalTagedFlavors, $finalFlavors);
+			$finalFlavors = self::adjustToPairedDigitalWatermarking(self::TAG_VARIANT_B, $finalTagedFlavors, $finalFlavors);
+		}
 		// sort the flavors to decide which one will be performed first
 		usort($finalFlavors, array('kBusinessConvertDL', 'compareFlavors'));
 		KalturaLog::log(count($finalFlavors) . " flavors sorted for execution");
@@ -687,6 +704,48 @@ class kBusinessPreConvertDL
 		return $finalFlavors;
 	}
 
+	/**
+	 * batch adjustToPairedDigitalWatermarking 
+	 *
+	 * @param watermarkVersionString version tag
+	 * @param array finalTagedFlavors is array of flavorParamsOutput
+	 * @param array finalFlavors
+	 * @return array of flavorParamsOutput
+	 */
+	protected static function adjustToPairedDigitalWatermarking($watermarkVersionString, $finalTagedFlavors, $finalFlavors)
+	{
+		foreach($finalTagedFlavors[$watermarkVersionString] as  $flavorParamsId => $final){
+				// If not to be produced - not-applicable and not forced (or not 'create_anyway')
+				// ==> carry on to next flavor
+			if(($final->_isRedundant || $final->_isNonComply) && !($final->_create_anyway || $final->_force)){
+				continue;
+			}
+			KalturaLog::log("id:$flavorParamsId,".($final->getName()).",rdn:".$final->_isRedundant.",non:".$final->_isNonComply.",frc:".$final->_force.",any:".$final->_create_anyway.",tags:".$final->getTags());
+			$tags = explode(',', $final->getTags());
+			foreach($tags as $tag) {
+				// Only for 'digital-watermark' flavors, otherwise - skip
+				if(strstr($tag,self::TAG_VARIANT_PAIR_ID)==false) 
+					continue;
+				
+				KalturaLog::log("found tag:$tag,count:".(count($finalTagedFlavors[$tag])));
+				// Only a pair of flavors allowed for 'digital-watermark', otherwsie - skip
+				if(count($finalTagedFlavors[$tag])==2){
+					$f1 = reset($finalTagedFlavors[$tag]);
+					$f2 = end($finalTagedFlavors[$tag]);
+					KalturaLog::log("found pair:".($f1->getFlavorParamsId()).",".$f2->getFlavorParamsId());
+					if($f1->getFlavorParamsId()==$flavorParamsId) {
+						$finalFlavors[$f2->getFlavorParamsId()]->_create_anyway = 1;
+					}
+					else {
+						$finalFlavors[$f1->getFlavorParamsId()]->_create_anyway = 1;
+					}
+				}
+				break;
+			}
+		}
+		return $finalFlavors;
+	}
+	
 	/**
 	 * batch adjustToFramesize - verify that in the given set of target flvors,
 	 * there is at least one flavor that matches (or as close as possible)
