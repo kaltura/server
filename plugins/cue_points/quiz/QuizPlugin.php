@@ -353,10 +353,6 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 		{
 			return null;
 		}
-		/*if (($report_type != self::getPluginName() . "." . QuizReportType::QUIZ) && ($report_type != self::getPluginName() . "." . QuizReportType::QUIZ_USER_PERCENTAGE) ) 
-		{
-			return null;
-		}*/
 		switch ($report_flavor)
 		{
 			case myReportsMgr::REPORT_FLAVOR_TOTAL:
