@@ -326,9 +326,19 @@ class myPartnerUtils
 			$protocol='http';
 
 		$partner = PartnerPeer::retrieveByPK( $partner_id );
-		if ($partner && isset($_SERVER['HTTP_HOST']) && $partner->isInCDNWhiteList($_SERVER['HTTP_HOST']))
+		$hostToTest = null;
+		if (isset($_SERVER['HTTP_X_FORWARDED_HOST']))
 		{
-			$cdnHost = $protocol.'://'.$_SERVER['HTTP_HOST'];
+			$xForwardedHosts = explode(',',$_SERVER['HTTP_X_FORWARDED_HOST']);
+			$hostToTest = $xForwardedHosts[0];
+		}
+		else if (isset($_SERVER['HTTP_HOST']))
+		{
+			$hostToTest = $_SERVER['HTTP_HOST'];
+		}
+		if ($partner && !is_null($hostToTest) && $partner->isInCDNWhiteList($hostToTest))
+		{
+			$cdnHost = $protocol.'://'.$hostToTest;
 			if (isset($_SERVER['SERVER_PORT']))
 			{
 				$cdnHost .= ":".$_SERVER['SERVER_PORT'];
