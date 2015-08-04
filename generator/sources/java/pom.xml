@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <!--                                                           -->
-<!-- Maven POM file for KalturaClient Java library.            -->
+<!-- Maven POM file for packaging and testing the              -->
+<!-- KalturaClient Java library.                               -->
 <!--                                                           -->
 <!-- Contributed by:  Mark Ratliff, ratliff@princeton.edu      -->
 <!--                                                           -->
@@ -15,6 +16,7 @@
   <artifactId>kalturaClient</artifactId>
   <version>10.9.0</version>
 
+  <!-- Project description -->
   <name>KalturaClient Java Library</name>
   <description>
     Library of Java classes that can be used to interact 
@@ -22,7 +24,7 @@
   </description>
   <url>http://github.com/kaltura/KalturaGeneratedAPIClientsJava</url>
   
-  <!-- Define the license under which this Kaltura software can be used. -->
+  <!-- Define the license under which this software can be used. -->
   <licenses>
     <license>
       <name>GNU Affero General Public License, Version 3.0</name>
@@ -103,7 +105,7 @@
     </dependency>
   </dependencies>
 
-  <!-- Build, test, and package the code, source files, and javadoc files. -->
+  <!-- Build, test, and package the class files, source files, and javadoc files. -->
   <build>
     <plugins>
 
