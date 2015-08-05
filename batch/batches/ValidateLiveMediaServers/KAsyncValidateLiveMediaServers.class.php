@@ -58,14 +58,7 @@ class KAsyncValidateLiveMediaServers extends KPeriodicWorker
 				catch (KalturaException $e)
 				{
 					self::unimpersonate();
-					if ($e->getCode() == 'SERVICE_FORBIDDEN_CONTENT_BLOCKED')
-					{
-						KalturaLog::err("Caught service is forbidden with message [" . $e->getMessage()."]");
-					}
-					else
-					{
-						throw $e;
-					}
+					KalturaLog::err("Caught exception with message [" . $e->getMessage()."]");
 				}
 			}
 			
