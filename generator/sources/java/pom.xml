@@ -19,8 +19,12 @@
   <!-- Project description -->
   <name>KalturaClient Java Library</name>
   <description>
-    Library of Java classes that can be used to interact 
-    with the Kaltura REST API http://corp.kaltura.com/Products/Kaltura-API
+    KalturaClient is a library of Java classes that can be used to interact 
+    with the Kaltura REST API.  More information about the REST API can be
+    found at http://corp.kaltura.com/Products/Kaltura-API  Many of the Java classes
+    in this library are auto-generated from a schema that defines the objects that
+    are used to interect with the API.  The current schema can be found at
+    http://www.kaltura.com/api_v3/api_schema.php
   </description>
   <url>http://github.com/kaltura/KalturaGeneratedAPIClientsJava</url>
   
