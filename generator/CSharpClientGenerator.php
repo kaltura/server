@@ -337,12 +337,12 @@ class CSharpClientGenerator extends ClientGeneratorFromXml
 							$arrayType = 'KalturaObjectBase';
 							
 						$this->appendLine("						{");		// TODO: remove the index once the keys are added to the response
-						$this->appendLine("							int index = 0;");
+						$this->appendLine("							string key;");
 						$this->appendLine("							this.$dotNetPropName = new Dictionary<string, $arrayType>();");
 						$this->appendLine("							foreach(XmlElement arrayNode in propertyNode.ChildNodes)");
 						$this->appendLine("							{");
-						$this->appendLine("								this.{$dotNetPropName}[index.ToString()] = ($arrayType)KalturaObjectFactory.Create(arrayNode, \"$arrayType\");");
-						$this->appendLine("								index++;");
+						$this->appendLine("								key = arrayNode[\"itemKey\"].InnerText;;");
+						$this->appendLine("								this.{$dotNetPropName}[key] = ($arrayType)KalturaObjectFactory.Create(arrayNode, \"$arrayType\");");
 						$this->appendLine("							}");
 						$this->appendLine("						}");
 						break;

@@ -95,9 +95,18 @@ namespace Kaltura
 
         public void QueueServiceCall(string service, string action, string fallbackClass, KalturaParams kparams, KalturaFiles kfiles)
         {
+            Object value;
             foreach (string param in requestConfiguration.Keys)
             {
-                kparams.Add(param, requestConfiguration[param].ToString());
+                value = requestConfiguration[param];
+                if (value is KalturaObjectBase)
+                {
+                    kparams.Add(param, ((KalturaObjectBase)value).ToParams());
+                }
+                else
+                {
+                    kparams.Add(param, value.ToString());
+                }
             }
 
             KalturaServiceActionCall call = new KalturaServiceActionCall(service, action, kparams, kfiles);
@@ -162,10 +171,6 @@ namespace Kaltura
                 kfiles.Add(call.Files);
             }
 
-            // cleanup
-            _CallsQueue.Clear();
-            _MultiRequestParamsMap.Clear();
-
             kparams.Add("kalsig", this.Signature(kparams));
 
             this.Log("full reqeust url: [" + url + "]");
@@ -229,6 +234,9 @@ namespace Kaltura
                 XmlElement result = xml["xml"]["result"];
                 this.ThrowExceptionOnAPIError(result);
 
+                if(!IsMultiRequest)
+                    resetRequest();
+
                 return result;
             }
         }
@@ -260,6 +268,7 @@ namespace Kaltura
             KalturaMultiResponse multiResponse = new KalturaMultiResponse();
             if (multiRequestResult == null)
             {
+                resetRequest();
                 return multiResponse;
             }
             int i = 0;
@@ -479,8 +488,14 @@ namespace Kaltura
 
         protected void resetRequest()
         {
-            _MultiRequestReturnType.Clear();
-            _MultiRequestReturnType = null;
+            if (IsMultiRequest)
+            {
+                _MultiRequestReturnType.Clear();
+                _MultiRequestReturnType = null;
+            }
+
+            _CallsQueue.Clear();
+            _MultiRequestParamsMap.Clear();
         }
 
         #endregion

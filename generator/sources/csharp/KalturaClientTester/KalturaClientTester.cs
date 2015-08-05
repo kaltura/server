@@ -38,11 +38,14 @@ namespace Kaltura
 		private const string ADMIN_SECRET = "@YOUR_ADMIN_SECRET@"; //enter your admin secret
 		private const string SERVICE_URL = "@SERVICE_URL@";
         private const string USER_ID = "testUser";
+        
+        private static string uniqueTag;
 
         static void Main(string[] args)
         {
             Console.WriteLine("Starting C# Kaltura API Client Library");
             int code = 0;
+            uniqueTag = Guid.NewGuid().ToString();
 
             try
             {
@@ -336,14 +339,14 @@ namespace Kaltura
 
             foreach (object obj in response)
             {
-                if (obj.GetType() == typeof(KalturaAPIException))
+                if (obj is KalturaAPIException)
                 {
                     Console.WriteLine("Error occurred: " + ((KalturaAPIException)obj).Message);
                 }
             }
 
             // when accessing the response object we will use an index and not the response number (response number - 1)
-            if (response[3].GetType() == typeof(KalturaMediaEntry))
+            if (response[3] is KalturaMediaEntry)
             {
                 KalturaMediaEntry newMediaEntry = (KalturaMediaEntry)response[3];
                 Console.WriteLine("Multirequest newly added entry id: " + newMediaEntry.Id + ", status: " + newMediaEntry.Status);
@@ -359,6 +362,7 @@ namespace Kaltura
 		    entry.MediaType = KalturaMediaType.VIDEO;
 		    entry.Name = "test_" + Guid.NewGuid().ToString();
 		    entry.Description = "test_" + Guid.NewGuid().ToString();
+            entry.Tags = uniqueTag;
     		
 		    return client.MediaService.Add(entry);
 	    }
@@ -378,7 +382,7 @@ namespace Kaltura
 	    private static KalturaMetadataProfile createMetadataProfile(KalturaMetadataObjectType objectType, string xsdData)
 	    {
             KalturaClient client = new KalturaClient(GetConfig());
-            client.KS = client.GenerateSession(ADMIN_SECRET, USER_ID, KalturaSessionType.USER, PARTNER_ID, 86400, "");
+            client.KS = client.GenerateSession(ADMIN_SECRET, USER_ID, KalturaSessionType.ADMIN, PARTNER_ID, 86400, "");
 
 		    KalturaMetadataProfile metadataProfile = new KalturaMetadataProfile();
 		    metadataProfile.MetadataObjectType = objectType;
@@ -396,7 +400,7 @@ namespace Kaltura
         private static IList<KalturaMediaEntry> createEntriesWithMetadataObjects(int entriesCount, int metadataProfileCount)
 	    {
 		    IList<KalturaMediaEntry> entries = new List<KalturaMediaEntry>(2);
-		    IList<KalturaMetadataProfile> metadataProfiles = new List<KalturaMetadataProfile>(3);
+            IDictionary<string, KalturaMetadataProfile> metadataProfiles = new Dictionary<string, KalturaMetadataProfile>(3);
 
             string xsd;
             for(int i = 1; i <= metadataProfileCount; i++)
@@ -451,24 +455,23 @@ namespace Kaltura
         </xsd:simpleType>
     </xsd:schema>";
     				
-                metadataProfiles[i] = createMetadataProfile(KalturaMetadataObjectType.ENTRY, xsd);
+                metadataProfiles.Add(i.ToString(), createMetadataProfile(KalturaMetadataObjectType.ENTRY, xsd));
             }
     		
             string xml;
-            int j;
             for(int i = 0; i < entriesCount; i++)
             {
                 KalturaMediaEntry entry = createEntry();
                 entries.Add(entry);
-    			
-                for(j = 1; j <= metadataProfileCount; j++)
+
+                foreach (string index in metadataProfiles.Keys)
                 {
                     xml = @"<metadata>
-        <Choice" + j + ">on</Choice" + j + @">
-        <FreeText" + j + ">example text " + j + "</FreeText" + j + @">
+        <Choice" + index + ">on</Choice" + index + @">
+        <FreeText" + index + ">example text " + index + "</FreeText" + index + @">
     </metadata>";
-    		
-                    createMetadata(metadataProfiles[j].Id, KalturaMetadataObjectType.ENTRY, entry.Id, xml);
+
+                    createMetadata(metadataProfiles[index].Id, KalturaMetadataObjectType.ENTRY, entry.Id, xml);
                 }
             }
     		
@@ -478,7 +481,7 @@ namespace Kaltura
         private static void ResponseProfileExample()
         {
             KalturaClient client = new KalturaClient(GetConfig());
-            client.KS = client.GenerateSession(ADMIN_SECRET, USER_ID, KalturaSessionType.USER, PARTNER_ID, 86400, "");
+            client.KS = client.GenerateSession(ADMIN_SECRET, USER_ID, KalturaSessionType.ADMIN, PARTNER_ID, 86400, "");
 
 		    int entriesTotalCount = 4;
 		    int metadataProfileTotalCount = 2;
@@ -487,7 +490,8 @@ namespace Kaltura
             IList<KalturaMediaEntry> entries = createEntriesWithMetadataObjects(entriesTotalCount, metadataProfileTotalCount);
     		
             KalturaMediaEntryFilter entriesFilter = new KalturaMediaEntryFilter();
-            entriesFilter.StatusIn = KalturaEntryStatus.PENDING.GetHashCode() + "," + KalturaEntryStatus.NO_CONTENT.GetHashCode();
+            entriesFilter.StatusIn = KalturaEntryStatus.PENDING.ToString() + "," + KalturaEntryStatus.NO_CONTENT.ToString();
+            entriesFilter.TagsLike = uniqueTag;
     		
             KalturaFilterPager entriesPager = new KalturaFilterPager();
             entriesPager.PageSize = entriesTotalCount;
@@ -518,9 +522,12 @@ namespace Kaltura
 
             KalturaResponseProfile responseProfile = new KalturaResponseProfile();
             responseProfile.Name = "test_" + Guid.NewGuid().ToString();
+            responseProfile.SystemName = "test_" + Guid.NewGuid().ToString();
             responseProfile.Type = KalturaResponseProfileType.INCLUDE_FIELDS;
             responseProfile.Fields = "id,name,createdAt";
             responseProfile.RelatedProfiles = metadataResponseProfiles;
+
+            responseProfile = client.ResponseProfileService.Add(responseProfile);
     		    		
             KalturaResponseProfileHolder nestedResponseProfile = new KalturaResponseProfileHolder();
             nestedResponseProfile.Id = responseProfile.Id;
@@ -544,13 +551,13 @@ namespace Kaltura
                 {
                     throw new Exception("Related object [" + metadataResponseProfile.Name + "] is missing");
                 }
-                
-                if(entry.RelatedObjects[metadataResponseProfile.Name].GetType() != typeof(KalturaMetadataListResponse))
+
+                if (!(entry.RelatedObjects[metadataResponseProfile.Name] is KalturaMetadataListResponse))
                 {
                     throw new Exception("Related object [" + metadataResponseProfile.Name + "] has wrong type [" + entry.RelatedObjects[metadataResponseProfile.Name].GetType() + "]");
                 }
-
                 KalturaMetadataListResponse metadataListResponse = (KalturaMetadataListResponse)entry.RelatedObjects[metadataResponseProfile.Name];
+
                 if(metadataListResponse.Objects.Count != metadataProfileTotalCount)
                 {
                     throw new Exception("Related object [" + metadataResponseProfile.Name + "] has wrong number of objects");

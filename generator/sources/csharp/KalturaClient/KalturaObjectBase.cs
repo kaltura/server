@@ -65,12 +65,12 @@ namespace Kaltura
                 {
                     case "relatedObjects":
                         {
-                            int index = 0;
+                            string key;
                             this.RelatedObjects = new Dictionary<string, KalturaListResponse>();
                             foreach (XmlElement arrayNode in propertyNode.ChildNodes)
                             {
-                                this.RelatedObjects[index.ToString()] = (KalturaListResponse)KalturaObjectFactory.Create(arrayNode, "KalturaListResponse");
-                                index++;
+                                key = arrayNode["itemKey"].InnerText;
+                                this.RelatedObjects[key] = (KalturaListResponse)KalturaObjectFactory.Create(arrayNode, "KalturaListResponse");
                             }
                         }
                         continue;
