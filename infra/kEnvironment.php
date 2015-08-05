@@ -58,6 +58,12 @@ class kEnvironment
 			{
 				if(!isset($newConfig[$key])) // nothing to append
 					continue;
+				elseif(is_array($value) && isset($newConfig[$key]['disable']) && $newConfig[$key]['disable'] = "true")
+				{
+					KalturaLog::debug("Value for key [$key] is set to be removed");
+					unset($returnedConfig[$key]);
+					continue;
+				}
 				elseif(is_array($value))
 					$returnedConfig[$key] = self::mergeConfigItem($srcConfig[$key], $newConfig[$key], $valuesOnly, $overwrite);
 				elseif($overwrite)
