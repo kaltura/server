@@ -370,84 +370,9 @@ class CSharpClientGenerator extends ClientGeneratorFromXml
 			if ($propertyNode->nodeType != XML_ELEMENT_NODE)
 				continue;
 				
-			$propType = $propertyNode->getAttribute("type");
 			$propName = $propertyNode->getAttribute("name");
-			$isEnum = $propertyNode->hasAttribute("enumType");
-			$dotNetPropName = $this->upperCaseFirstLetter($propName);
-			
-			switch($propType)
-			{
-				case "bigint":
-					$this->appendLine("			kparams.AddLongIfNotNull(\"$propName\", this.$dotNetPropName);");
-					break;
-				case "int":
-					if ($isEnum)
-						$this->appendLine("			kparams.AddEnumIfNotNull(\"$propName\", this.$dotNetPropName);");
-					else
-						$this->appendLine("			kparams.AddIntIfNotNull(\"$propName\", this.$dotNetPropName);");
-					break;
-				case "string":
-					if ($isEnum)
-						$this->appendLine("			kparams.AddStringEnumIfNotNull(\"$propName\", this.$dotNetPropName);");
-					else
-						$this->appendLine("			kparams.AddStringIfNotNull(\"$propName\", this.$dotNetPropName);");
-					break;
-				case "bool":
-					$this->appendLine("			kparams.AddBoolIfNotNull(\"$propName\", this.$dotNetPropName);");
-					break;
-				case "float":
-					$this->appendLine("			kparams.AddFloatIfNotNull(\"$propName\", this.$dotNetPropName);");
-					break;
-				case "enum":
-					$this->appendLine("			kparams.AddEnumIfNotNull(\"$propName\", this.$dotNetPropName);");
-					break;
-				case "array":
-					$arrayType = $propertyNode->getAttribute("arrayType");
-					if($arrayType == 'KalturaObject')
-						$arrayType = 'KalturaObjectBase';
-						
-					$this->appendLine("			if (this.$dotNetPropName != null)");
-					$this->appendLine("			{");
-					$this->appendLine("				if (this.$dotNetPropName.Count == 0)");
-					$this->appendLine("				{");
-					$this->appendLine("					kparams.Add(\"".$propName.":-\", \"\");");
-					$this->appendLine("				}");
-					$this->appendLine("				else");
-					$this->appendLine("				{");
-					$this->appendLine("					int i = 0;");
-					$this->appendLine("					foreach ($arrayType item in this.$dotNetPropName)");
-					$this->appendLine("					{");
-					$this->appendLine("						kparams.Add(\"".$propName.":\" + i, item.ToParams());");
-					$this->appendLine("						i++;");
-					$this->appendLine("					}");
-					$this->appendLine("				}");
-					$this->appendLine("			}");
-					break;
-				case "map":
-					$arrayType = $propertyNode->getAttribute("arrayType");
-					if($arrayType == 'KalturaObject')
-						$arrayType = 'KalturaObjectBase';
-						
-					$this->appendLine("			if (this.$dotNetPropName != null)");
-					$this->appendLine("			{");
-					$this->appendLine("				if (this.$dotNetPropName.Count == 0)");
-					$this->appendLine("				{");
-					$this->appendLine("					kparams.Add(\"".$propName.":-\", \"\");");
-					$this->appendLine("				}");
-					$this->appendLine("				else");
-					$this->appendLine("				{");
-					$this->appendLine("					foreach (KeyValuePair<string, $arrayType> curEntry in this.$dotNetPropName)");
-					$this->appendLine("					{");
-					$this->appendLine("						kparams.Add(\"".$propName.":\" + curEntry.Key, curEntry.Value.ToParams());");
-					$this->appendLine("					}");
-					$this->appendLine("				}");
-					$this->appendLine("			}");
-					break;
-				default: // for objects
-					$this->appendLine("			if (this.$dotNetPropName != null)");
-					$this->appendLine("				kparams.Add(\"$propName\", this.$dotNetPropName.ToParams());");
-					break;
-			}
+			$dotNetPropName = $this->upperCaseFirstLetter($propName);			
+			$this->appendLine("			kparams.AddIfNotNull(\"$propName\", this.$dotNetPropName);");
 		}
 		$this->appendLine("			return kparams;");
 		$this->appendLine("		}");
@@ -693,48 +618,18 @@ class CSharpClientGenerator extends ClientGeneratorFromXml
 			$paramName = $paramNode->getAttribute("name");
 			$isEnum = $paramNode->hasAttribute("enumType");
 			
-			if ($haveFiles === false && $paramType === "file")
+			if ($paramType === "file")
 			{
-				$haveFiles = true;
-				$this->appendLine("			KalturaFiles kfiles = new KalturaFiles();");
-			}	 
-
-			switch ($paramType)
+				if ($haveFiles === false)
+				{
+					$haveFiles = true;
+					$this->appendLine("			KalturaFiles kfiles = new KalturaFiles();");
+				}	 
+				$this->appendLine("			kfiles.Add(\"$paramName\", ".$this->fixParamName($paramName).");");
+			}
+			else
 			{
-				case "string":
-					if ($isEnum)
-						$this->appendLine("			kparams.AddStringEnumIfNotNull(\"$paramName\", ".$this->fixParamName($paramName).");");
-					else
-						$this->appendLine("			kparams.AddStringIfNotNull(\"$paramName\", ".$this->fixParamName($paramName).");");
-					break;
-				case "float":
-						$this->appendLine("			kparams.AddFloatIfNotNull(\"$paramName\", ".$this->fixParamName($paramName).");");
-					break;
-				case "bigint":
-						$this->appendLine("			kparams.AddLongIfNotNull(\"$paramName\", ".$this->fixParamName($paramName).");");
-					break;
-			   	case "int":
-					if ($isEnum)
-						$this->appendLine("			kparams.AddEnumIfNotNull(\"$paramName\", ".$this->fixParamName($paramName).");");
-					else
-						$this->appendLine("			kparams.AddIntIfNotNull(\"$paramName\", ".$this->fixParamName($paramName).");");
-					break;
-				case "bool":
-					$this->appendLine("			kparams.AddBoolIfNotNull(\"$paramName\", ".$this->fixParamName($paramName).");");
-					break;
-				case "array":
-					$this->appendLine("			foreach(".$paramNode->getAttribute("arrayType")." obj in ".$this->fixParamName($paramName).")");
-					$this->appendLine("			{");
-					$this->appendLine("				kparams.Add(\"$paramName\", obj.ToParams());");
-					$this->appendLine("			}");
-					break;
-				case "file":
-					$this->appendLine("			kfiles.Add(\"$paramName\", ".$this->fixParamName($paramName).");");
-					break;
-				default: // for objects
-					$this->appendLine("			if (".$this->fixParamName($paramName)." != null)");
-					$this->appendLine("				kparams.Add(\"$paramName\", ".$this->fixParamName($paramName).".ToParams());");
-					break;
+				$this->appendLine("			kparams.AddIfNotNull(\"$paramName\", ".$this->fixParamName($paramName).");");
 			}
 		}
 		

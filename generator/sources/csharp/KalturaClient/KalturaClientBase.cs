@@ -29,6 +29,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Net;
+using System.Web;
 using System.IO;
 using System.Security.Cryptography;
 using System.Xml;
@@ -134,7 +135,7 @@ namespace Kaltura
             {
                 kparams.Add(param, clientConfiguration[param].ToString());
             }
-            kparams.AddIntIfNotNull("format", this._Config.ServiceFormat.GetHashCode());
+            kparams.AddIfNotNull("format", this._Config.ServiceFormat.GetHashCode());
 
             string url = this._Config.ServiceUrl + "/api";
 
@@ -152,10 +153,10 @@ namespace Kaltura
                 }
 
                 // map params
-                foreach (KeyValuePair<string, string> item in _MultiRequestParamsMap)
+                foreach (KeyValuePair<string, IKalturaSerializable> item in _MultiRequestParamsMap)
                 {
                     string requestParam = item.Key;
-                    string resultParam = item.Value;
+                    IKalturaSerializable resultParam = item.Value;
 
                     if (kparams.ContainsKey(requestParam))
                     {
@@ -172,8 +173,10 @@ namespace Kaltura
             }
 
             kparams.Add("kalsig", this.Signature(kparams));
+            string json = kparams.ToJson();
 
             this.Log("full reqeust url: [" + url + "]");
+            this.Log("full reqeust data: [" + json + "]");
 
             // build request
             HttpWebRequest request = (HttpWebRequest)HttpWebRequest.Create(url);
@@ -188,17 +191,18 @@ namespace Kaltura
             request.Method = "POST";
             request.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
             request.Headers = _Config.RequestHeaders;
+            request.Accept = "application/json";
 
             // Add proxy information if required
             createProxy(request, _Config);
 
             if (kfiles.Count > 0)
             {
-                this.PostMultiPartWithFiles(request, kparams, kfiles);
+                this.PostMultiPartWithFiles(request, json, kfiles);
             }
             else
             {
-                this.PostUrlEncodedParams(request, kparams);
+                this.PostUrlEncodedParams(request, json);
             }
 
             // get the response
@@ -363,14 +367,8 @@ namespace Kaltura
 
         private string Signature(KalturaParams kparams)
         {
-            string str = "";
-            foreach (KeyValuePair<string, string> param in kparams)
-            {
-                str += (param.Key + param.Value);
-            }
-
             MD5CryptoServiceProvider md5 = new MD5CryptoServiceProvider();
-            byte[] data = Encoding.ASCII.GetBytes(str);
+            byte[] data = Encoding.ASCII.GetBytes(kparams.ToJson());
             data = md5.ComputeHash(data);
             StringBuilder sBuilder = new StringBuilder();
             for (int i = 0; i < data.Length; i++)
@@ -402,12 +400,12 @@ namespace Kaltura
                 throw new KalturaAPIException(error["code"].InnerText, error["message"].InnerText);
         }
 
-        private void PostMultiPartWithFiles(HttpWebRequest request, KalturaParams kparams, KalturaFiles kfiles)
+        private void PostMultiPartWithFiles(HttpWebRequest request, string json, KalturaFiles kfiles)
         {
             string boundary = "---------------------------" + DateTime.Now.Ticks.ToString("x");
             request.ContentType = "multipart/form-data; boundary=" + boundary;
 
-            byte[] paramsBuffer = BuildMultiPartParamsBuffer(kparams, boundary);
+            byte[] paramsBuffer = BuildMultiPartParamsBuffer(json, boundary);
 
             SortedList<string, MultiPartFileDescriptor> filesDescriptions = new SortedList<string, MultiPartFileDescriptor>();
             foreach (KeyValuePair<string, FileStream> file in kfiles)
@@ -445,17 +443,14 @@ namespace Kaltura
         /// <returns>
         /// The parameters' byte array ready to be streamed.
         /// </returns>
-        private byte[] BuildMultiPartParamsBuffer(KalturaParams kparams, string boundary)
+        private byte[] BuildMultiPartParamsBuffer(string json, string boundary)
         {
             StringBuilder sb = new StringBuilder();
             sb.Append("--" + boundary + "\r\n");
-            foreach (KeyValuePair<string, string> param in kparams)
-            {
-                sb.Append("Content-Disposition: form-data; name=\"" + param.Key + "\"" + "\r\n");
-                sb.Append("\r\n");
-                sb.Append(param.Value);
-                sb.Append("\r\n--" + boundary + "\r\n");
-            }
+            sb.Append("Content-Disposition: form-data; name=\"json\"\r\n");
+            sb.Append("\r\n");
+            sb.Append(HttpUtility.UrlDecode(json));
+            sb.Append("\r\n--" + boundary + "\r\n");
 
             return Encoding.UTF8.GetBytes(sb.ToString()); 
         }
@@ -486,13 +481,12 @@ namespace Kaltura
             return result;
         }
 
-        private void PostUrlEncodedParams(HttpWebRequest request, KalturaParams kparams)
+        private void PostUrlEncodedParams(HttpWebRequest request, string json)
         {
             byte[] buffer;
-            string paramsString = kparams.ToQueryString();
-            buffer = System.Text.Encoding.UTF8.GetBytes(paramsString);
-            request.ContentType = "application/x-www-form-urlencoded";
-            request.ContentLength = paramsString.Length;
+            buffer = System.Text.Encoding.UTF8.GetBytes(json);
+            request.ContentType = "application/json";
+            request.ContentLength = json.Length;
             Stream requestStream = request.GetRequestStream();
             requestStream.Write(buffer, 0, buffer.Length);
             requestStream.Close();

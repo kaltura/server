@@ -32,7 +32,7 @@ using System.IO;
 
 namespace Kaltura
 {
-    class KalturaClientTester
+    class KalturaClientTester : IKalturaLogger
     {
 		private const int PARTNER_ID = @YOUR_PARTNER_ID@; //enter your partner id
 		private const string ADMIN_SECRET = "@YOUR_ADMIN_SECRET@"; //enter your admin secret
@@ -41,11 +41,16 @@ namespace Kaltura
         
         private static string uniqueTag;
 
+        public void Log(string msg)
+        {
+            Console.WriteLine(msg);
+        }
+
         static void Main(string[] args)
         {
             Console.WriteLine("Starting C# Kaltura API Client Library");
             int code = 0;
-            uniqueTag = Guid.NewGuid().ToString();
+            uniqueTag = Guid.NewGuid().ToString().Replace("-", "").Substring(0, 20);
 
             try
             {
@@ -99,6 +104,7 @@ namespace Kaltura
         {
             KalturaConfiguration config = new KalturaConfiguration();
             config.ServiceUrl = SERVICE_URL;
+            config.Logger = new KalturaClientTester();
             return config;
         }
 
@@ -360,8 +366,7 @@ namespace Kaltura
 
 		    KalturaMediaEntry entry = new KalturaMediaEntry();
 		    entry.MediaType = KalturaMediaType.VIDEO;
-		    entry.Name = "test_" + Guid.NewGuid().ToString();
-		    entry.Description = "test_" + Guid.NewGuid().ToString();
+            entry.Name = "test_" + Guid.NewGuid().ToString();
             entry.Tags = uniqueTag;
     		
 		    return client.MediaService.Add(entry);
@@ -385,9 +390,8 @@ namespace Kaltura
             client.KS = client.GenerateSession(ADMIN_SECRET, USER_ID, KalturaSessionType.ADMIN, PARTNER_ID, 86400, "");
 
 		    KalturaMetadataProfile metadataProfile = new KalturaMetadataProfile();
-		    metadataProfile.MetadataObjectType = objectType;
-		    metadataProfile.Name = "test_" + Guid.NewGuid().ToString();
-		    metadataProfile.SystemName = "test_" + Guid.NewGuid().ToString();   
+            metadataProfile.MetadataObjectType = objectType;
+            metadataProfile.Name = "test_" + Guid.NewGuid().ToString();
     		
 		    return client.MetadataProfileService.Add(metadataProfile, xsdData);
 	    }
@@ -510,7 +514,7 @@ namespace Kaltura
             metadataPager.PageSize = metadataPageSize;
     		
             KalturaDetachedResponseProfile metadataResponseProfile = new KalturaDetachedResponseProfile();
-            metadataResponseProfile.Name = "test_" + Guid.NewGuid().ToString();
+            metadataResponseProfile.Name = "metadata_" + uniqueTag;
             metadataResponseProfile.Type = KalturaResponseProfileType.INCLUDE_FIELDS;
             metadataResponseProfile.Fields = "id,objectId,createdAt, xml";
             metadataResponseProfile.Filter = metadataFilter;
@@ -521,8 +525,8 @@ namespace Kaltura
             metadataResponseProfiles.Add(metadataResponseProfile);
 
             KalturaResponseProfile responseProfile = new KalturaResponseProfile();
-            responseProfile.Name = "test_" + Guid.NewGuid().ToString();
-            responseProfile.SystemName = "test_" + Guid.NewGuid().ToString();
+            responseProfile.Name = "test_" + uniqueTag;
+            responseProfile.SystemName = "test_" + uniqueTag;
             responseProfile.Type = KalturaResponseProfileType.INCLUDE_FIELDS;
             responseProfile.Fields = "id,name,createdAt";
             responseProfile.RelatedProfiles = metadataResponseProfiles;
