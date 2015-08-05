@@ -47,12 +47,26 @@ class KAsyncValidateLiveMediaServers extends KPeriodicWorker
 		{
 			foreach($entries->objects as $entry)
 			{
-				/* @var $entry KalturaLiveEntry */
-				self::impersonate($entry->partnerId);
-				self::$kClient->liveStream->validateRegisteredMediaServers($entry->id);
-				self::unimpersonate();
-				
-				$filter->createdAtGreaterThanOrEqual = $entry->createdAt;
+				try
+				{
+					/* @var $entry KalturaLiveEntry */
+					self::impersonate($entry->partnerId);
+					self::$kClient->liveStream->validateRegisteredMediaServers($entry->id);
+					self::unimpersonate();
+					$filter->createdAtGreaterThanOrEqual = $entry->createdAt;
+				}
+				catch (KalturaException $e)
+				{
+					self::unimpersonate();
+					if ($e->getCode() == 'SERVICE_FORBIDDEN_CONTENT_BLOCKED')
+					{
+						KalturaLog::err("Caught service is forbidden with message [" . $e->getMessage()."]");
+					}
+					else
+					{
+						throw $e;
+					}
+				}
 			}
 			
 			$pager->pageIndex++;
