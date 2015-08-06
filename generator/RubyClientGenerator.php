@@ -414,14 +414,15 @@ class RubyClientGenerator extends ClientGeneratorFromXml
 					if ($configurationPropertyNode->nodeType != XML_ELEMENT_NODE)
 						continue;
 				
-					$configurationProperty = $this->camelCaseToUnderscoreAndLower($configurationPropertyNode->localName);
+					$configurationProperty = $configurationPropertyNode->localName;
 					
 					if($configurationPropertyNode->hasAttribute('volatile') && $configurationPropertyNode->getAttribute('volatile'))
 					{
 						$volatileProperties[$attributeName][] = $configurationProperty;
 					}
 					
-					$this->writeConfigurationProperty($attributeName, $configurationProperty, $configurationProperty);
+					$configurationPropertyName = $this->camelCaseToUnderscoreAndLower($configurationPropertyNode->localName);
+					$this->writeConfigurationProperty($attributeName, $configurationPropertyName, $configurationProperty);
 					
 					if($configurationPropertyNode->hasAttribute('alias'))
 					{

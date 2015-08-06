@@ -60,7 +60,7 @@ module Kaltura
 			# in start session partner id is optional (default nil). if partner id was not set, use the one in the config
 
 			@request_configuration.each do |key, value|
-				params[key] = value
+				add_param(params, key, value)
 			end
 
 			call = KalturaServiceActionCall.new(service, action, return_type, params, files);
@@ -200,10 +200,18 @@ module Kaltura
 		def self.object_from_xml(xml_element, return_type = nil)
 			instance = nil
 			if xml_element.elements.size > 0
-				if xml_element.elements[1].name == 'item' # array
-					instance = []
-					xml_element.elements.each('item') do | element |
-						instance.push(KalturaClientBase.object_from_xml(element, return_type))
+				if xml_element.elements[1].name == 'item' # array or map
+					if (xml_element.elements[1].elements['itemKey'].nil?) # array
+						instance = []
+						xml_element.elements.each('item') do | element |
+							instance.push(KalturaClientBase.object_from_xml(element, return_type))
+						end
+					else # map
+						instance = {}
+						xml_element.elements.each('item') do | element |
+							item_key = element.get_text('itemKey').to_s
+							instance[item_key] = KalturaClientBase.object_from_xml(element, return_type)
+						end
 					end
 				else # object
 					object_type_element = xml_element.get_text('objectType')
@@ -232,6 +240,8 @@ module Kaltura
 						end
 					end
 				end
+			elsif return_type != nil
+					return nil 
 			else # simple type
 				return xml_element.text
 			end
@@ -407,8 +417,10 @@ module Kaltura
 
 	class KalturaObjectBase
 		attr_accessor :object_type
+		attr_accessor :related_objects
 
 		def from_xml(xml_element)
+			self.related_objects = KalturaClientBase.object_from_xml(xml_element.elements['relatedObjects'], 'KalturaListResponse')
 		end
 		
 		def to_params
