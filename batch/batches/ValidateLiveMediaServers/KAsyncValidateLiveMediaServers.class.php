@@ -58,7 +58,7 @@ class KAsyncValidateLiveMediaServers extends KPeriodicWorker
 				catch (KalturaException $e)
 				{
 					self::unimpersonate();
-					KalturaLog::err("Caught exception with message [" . $e->getMessage()."]");
+					KalturaLog::err($e);
 				}
 			}
 			
