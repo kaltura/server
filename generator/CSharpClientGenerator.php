@@ -192,6 +192,10 @@ class CSharpClientGenerator extends ClientGeneratorFromXml
 			{
 				$dotNetPropType  = "long";
 			}
+			else if ($propType == "time")
+			{
+				$dotNetPropType  = "int";
+			}
 			else 
 			{
 				$dotNetPropType = $propType;
@@ -607,7 +611,7 @@ class CSharpClientGenerator extends ClientGeneratorFromXml
 		if(!$enableInMultiRequest)
 		{
 			$this->appendLine("			if (this._Client.IsMultiRequest)");
-			$this->appendLine("				throw new Exception(\"Action is not supported as part of multi-request.\")");
+			$this->appendLine("				throw new Exception(\"Action is not supported as part of multi-request.\");");
 		}
 		
 		$this->appendLine("			KalturaParams kparams = new KalturaParams();");
