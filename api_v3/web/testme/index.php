@@ -67,6 +67,8 @@ usort($services, "compareServicesByName");
 <script type="text/javascript" src="js/kField.js"></script>
 <script type="text/javascript" src="js/kDialog.js"></script>
 <script type="text/javascript" src="js/kTestMe.js"></script>
+<script type="text/javascript" src="js/ace-builds/src/ace.js"></script>
+<script type="text/javascript" src="js/kPrettify.js"></script>
 <!-- script type="text/javascript" src="js/kHttpSpy.js"></script -->
 <script type="text/javascript">
 <?php
@@ -82,6 +84,56 @@ usort($services, "compareServicesByName");
 	}
 ?>
 </script>
+	<script type="text/javascript">
+		$(document).ready(function(){
+			$("form").submit(function(ev){
+					var frm = $('#request');
+					jQuery.ajax({
+						data: frm.serialize(),
+						url: frm.attr('action'),
+						enctype: frm.attr('enctype'),
+						type: frm.attr('method'),
+						error: function() {
+							$('#response').html("Failed to get response, please retry later.");
+						},
+						success: function(results) {
+							var idxFormat = this.data.indexOf('format=');
+							var format = 'xml';
+							var text ="";
+							if (idxFormat >= 0 ) // if not set should consider default as XML
+							{
+								var type = this.data.substring(idxFormat+7,idxFormat+8);
+								if ( type == 1 ){
+									format = 'json'
+									text = identJSON(results, "\n", " ");
+								}
+							}
+							if ( format == 'xml') {
+								var para = document.createElement("div");
+								para.appendChild(results.firstChild);
+								text =  para.innerHTML;
+								text = identXML(text);
+							}
+
+							var editor = ace.edit("response");
+							editor.setTheme("ace/theme/eclipse");
+							var session = editor.getSession();
+							session.setMode("ace/mode/" + format);
+							session.setTabSize(4);
+							session.setUseWrapMode(true);
+							editor.setShowPrintMargin(false);
+							editor.setValue(text);
+							editor.setReadOnly(true);
+							kTestMe.onResponse(text, format);
+
+						}
+					})
+					ev.preventDefault();
+					return false;
+				}
+			);
+		});
+	</script>
 </head>
 	<?php
 		
@@ -114,7 +166,7 @@ usort($services, "compareServicesByName");
 						<option>Select request</option>
 					</select>
 				</div>
-				
+
 				<div class="param">
 					<label for="ks">KS (string):</label>
 					<input id="ks" type="text" class="" name="ks" size="30" />
@@ -146,7 +198,7 @@ usort($services, "compareServicesByName");
 						}
 					}
 				?>
-			
+
 				<div id="dvService">
 					<div class="attr">
 						<label for="service">Select service:</label>
@@ -161,13 +213,13 @@ usort($services, "compareServicesByName");
 									$serviceName = $serviceActionItem->serviceInfo->serviceName;
 									$serviceLabel = $serviceActionItem->serviceInfo->serviceName;
 									$pluginName = $serviceActionItem->serviceInfo->package;
-									
+
 									if ($pluginName)
 										$serviceName = "$pluginName.$serviceName";
-									
+
 									if ($serviceActionItem->serviceInfo->deprecated)
 										$serviceLabel .= ' (deprecated)';
-									
+
 									echo "<option value=\"$serviceId\" title=\"$serviceName\">$serviceLabel</option>";
 								}
 							?>
@@ -182,17 +234,17 @@ usort($services, "compareServicesByName");
 					<div class="attr" style="display: none">
 						<input type="button" class="add-request-button button" value="Add Request" />
 					</div>
-					
+
 					<div class="action-params"></div>
 					<div class="objects-containter"></div>
 				</div>
-			
+
 				<div>
 					<button type="submit">Send</button>
 				</div>
-				
+
 				<?php
-					
+
 					if($indexConfig->get("logParser"))
 					{
 						?>
@@ -208,13 +260,13 @@ usort($services, "compareServicesByName");
 							</div>
 						<?php
 					}
-					
+
 				?>
 			</div>
 		</form>
 	</div>
 	<div class="right">
-		<iframe id="response" name="response" src=""></iframe>
+		<div class="right-content" id="response" name="response" src=""></div>
 	</div>
 	<ul id="codeSubMenu">
 		<li class="code-menu code-menu-php active"><a href="#"

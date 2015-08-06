@@ -207,6 +207,9 @@ class KCurlWrapper
 		
 		if($params && isset($params->curlTimeout) && $params->curlTimeout)
 			$this->setTimeout($params->curlTimeout);
+
+		if($params && isset($params->curlDnsCacheTimeout) && $params->curlDnsCacheTimeout)
+			curl_setopt($this->ch, CURLOPT_DNS_CACHE_TIMEOUT, $params->curlDnsCacheTimeout);
 		
 		if($params && isset($params->curlVerbose) && $params->curlVerbose)
 			curl_setopt($this->ch, CURLOPT_VERBOSE, true);
@@ -520,7 +523,7 @@ class KCurlWrapper
 	{
 	}
 
-	public static function getContent($url)
+	public static function getContent($url, $headers = null)
 	{
 		$ch = curl_init();
 		
@@ -532,6 +535,10 @@ class KCurlWrapper
 		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
 		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+		if ($headers)
+		{
+			curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+		}
 			
 		$content = curl_exec($ch);
 		curl_close($ch);

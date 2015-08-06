@@ -452,10 +452,58 @@ class infraRequestUtils
 		{
 			$key = each($pathParts);
 			$value = each($pathParts);
-			$params[$key['value']] = $value['value'];
+			if (!array_key_exists($key['value'], $params))
+			{
+				$params[$key['value']] = $value['value'];
+			}
 		}
-			
-		self::$requestParams = array_merge($params, $_GET, $_POST, $_FILES);
+		
+		$post = null;
+		if(isset($_SERVER['CONTENT_TYPE']))
+		{
+			if(strtolower($_SERVER['CONTENT_TYPE']) == 'application/json')
+			{
+				$requestBody = file_get_contents("php://input");
+				if(preg_match('/^\{.*\}$/', $requestBody))
+				{
+					$post = json_decode($requestBody, true);
+				}
+			}
+			elseif(strpos(strtolower($_SERVER['CONTENT_TYPE']), 'multipart/form-data') === 0 && isset($_POST['json']))
+			{
+				$post = json_decode($_POST['json'], true);
+			}
+		}
+		
+		if(!$post)
+		{
+			$post = $_POST;
+		}
+		
+		if(count($_FILES))
+		{
+			foreach($_FILES as $key => $value)
+			{
+				$matches = null;
+				if(preg_match('/^(\d+):(.+)$/', $key, $matches))
+				{
+					$multiRequestIndex = $matches[1];
+					$key = $matches[2];
+					if(!isset($post[$multiRequestIndex]))
+					{
+						$post[$multiRequestIndex] = array();
+					}
+					$post[$multiRequestIndex][$key] = $value;
+				}
+				else
+				{
+					$post[$key] = $value;
+				}
+			}
+		}
+		
+		self::$requestParams = array_merge_recursive($post, $_GET, $params);
+		
 		return self::$requestParams;
 	}
 

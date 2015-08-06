@@ -358,14 +358,18 @@ class KalturaRequestDeserializer
 				{
 					foreach($value as $arrayItemKey => $arrayItemParams)
 					{
+						if($arrayItemKey === '-')
+							break;
 						$arrayObj[$arrayItemKey] = $this->buildObject($property->getArrayTypeReflector(), $arrayItemParams, "{$objectName}:$name");
 					}
 				}
 				else
 				{
 					ksort($value);
-					foreach($value as $arrayItemParams)
+					foreach($value as $arrayItemKey => $arrayItemParams)
 					{
+						if($arrayItemKey === '-')
+							break;
 						$arrayObj[] = $this->buildObject($property->getArrayTypeReflector(), $arrayItemParams, "{$objectName}:$name");
 					}
 				}

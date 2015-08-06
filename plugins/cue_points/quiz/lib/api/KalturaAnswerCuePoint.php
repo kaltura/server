@@ -7,6 +7,7 @@ class KalturaAnswerCuePoint extends KalturaCuePoint
 {
 	/**
 	 * @var string
+	 * @filter eq,in
 	 * @insertonly
 	 */
 	public $parentId;
@@ -30,7 +31,7 @@ class KalturaAnswerCuePoint extends KalturaCuePoint
 
 	/**
 	 * Array of string
-	 * @var KalturaTypedArray
+	 * @var KalturaStringArray
 	 * @readonly
 	 */
 	public $correctAnswerKeys;

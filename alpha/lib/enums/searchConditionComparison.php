@@ -10,4 +10,5 @@ interface searchConditionComparison extends BaseEnum
 	const GREATER_THAN_OR_EQUAL = 3;
 	const LESS_THAN = 4;
 	const LESS_THAN_OR_EQUAL = 5;
+	const NOT_EQUAL = 6;
 }

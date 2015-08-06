@@ -94,6 +94,12 @@ class KalturaResponseProfile extends KalturaDetachedResponseProfile implements I
 		// Allow null in case of update
 		$this->validatePropertyMinLength('systemName', 2, !is_null($sourceObject));
 		
+		//Check uniqueness of new object's system name
+		$systemNameProfile = ResponseProfilePeer::retrieveBySystemName($this->systemName, ($sourceObject && $sourceObject->getId()) ? $sourceObject->getId() : null);
+		if ($systemNameProfile)
+			throw new KalturaAPIException(KalturaErrors::RESPONSE_PROFILE_DUPLICATE_SYSTEM_NAME, $this->systemName);
+	
+		
 		$id = $this->id;
 		if($sourceObject && $sourceObject->getId())
 		{

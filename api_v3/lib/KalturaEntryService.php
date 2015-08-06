@@ -957,23 +957,27 @@ class KalturaEntryService extends KalturaBaseService
 	 */
 	protected function add(KalturaBaseEntry $entry, $conversionProfileId = null)
 	{
+		$dbEntry = $this->duplicateTemplateEntry($conversionProfileId);
+		if ($dbEntry)
+		{
+			$dbEntry->save();
+		}
+		return $this->prepareEntryForInsert($entry, $dbEntry);
+	}
+	
+	protected function duplicateTemplateEntry($conversionProfileId)
+	{
 		$dbEntry = null;
 		$conversionProfile = myPartnerUtils::getConversionProfile2ForPartner($this->getPartnerId(), $conversionProfileId);
 		if($conversionProfile && $conversionProfile->getDefaultEntryId())
 		{
 			$templateEntry = entryPeer::retrieveByPKNoFilter($conversionProfile->getDefaultEntryId(), null, false);
-			if($templateEntry)
+			if ($templateEntry)
 			{
 				$dbEntry = $templateEntry->copyTemplate(true);
-				$dbEntry->save();
-			}
-			else
-			{
-				KalturaLog::err("Template entry id [" . $conversionProfile->getDefaultEntryId() . "] not found");
 			}
 		}
-		
-		return $this->prepareEntryForInsert($entry, $dbEntry);
+		return $dbEntry;
 	}
 	
 	/**
