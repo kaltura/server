@@ -129,7 +129,7 @@ function checkCache()
 				$max_age = 60 * 10;
 				header("X-Kaltura:cached-dispatcher");
 				header("Content-Type: application/x-shockwave-flash");
-				sendCachingHeaders($max_age, true, time());
+				sendCachingHeaders($max_age, false, time());
 				header("Content-Length: ".strlen($cachedResponse));
 				echo $cachedResponse;
 				die;
