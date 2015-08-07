@@ -9,17 +9,29 @@ DeflateCompressionLevel 9
 FilterDeclare COMPRESS
 
 <IfVersion >= 2.4>
-FilterProvider COMPRESS DEFLATE "%{CONTENT_TYPE} = 'text/html'"
+FilterProvider COMPRESS DEFLATE "%{CONTENT_TYPE} =~ /text/"
+FilterProvider COMPRESS DEFLATE "%{CONTENT_TYPE} = 'application/javascript'"
 FilterProvider COMPRESS DEFLATE "%{CONTENT_TYPE} = 'application/x-javascript'"
-FilterProvider COMPRESS DEFLATE "%{CONTENT_TYPE} = 'application/.*xml.*'"
+FilterProvider COMPRESS DEFLATE "%{CONTENT_TYPE} = 'application/json'"
+FilterProvider COMPRESS DEFLATE "%{CONTENT_TYPE} = 'application/atom+xml'"
+FilterProvider COMPRESS DEFLATE "%{CONTENT_TYPE} = 'application/rss+xml'"
+FilterProvider COMPRESS DEFLATE "%{CONTENT_TYPE} = 'application/xhtml+xml'"
+FilterProvider COMPRESS DEFLATE "%{CONTENT_TYPE} = 'application/xml'"
+FilterProvider COMPRESS DEFLATE "%{CONTENT_TYPE} = 'application/xslt+xml'"
 FilterProvider COMPRESS DEFLATE "%{CONTENT_TYPE} = 'image/svg+xml'"
 </IfVersion>
 
 <IfVersion < 2.4>
 FilterProvider COMPRESS DEFLATE resp=Content-Type $text
-FilterProvider COMPRESS DEFLATE resp=Content-Type $application/x-javascript
-FilterProvider COMPRESS DEFLATE resp=Content-Type $application/.*xml.*
-FilterProvider COMPRESS DEFLATE resp=Content-Type $image/svg+xml
+FilterProvider COMPRESS DEFLATE resp=Content-Type application/javascript
+FilterProvider COMPRESS DEFLATE resp=Content-Type application/x-javascript
+FilterProvider COMPRESS DEFLATE resp=Content-Type application/json
+FilterProvider COMPRESS DEFLATE resp=Content-Type application/atom+xml
+FilterProvider COMPRESS DEFLATE resp=Content-Type application/rss+xml
+FilterProvider COMPRESS DEFLATE resp=Content-Type application/xhtml+xml
+FilterProvider COMPRESS DEFLATE resp=Content-Type application/xml
+FilterProvider COMPRESS DEFLATE resp=Content-Type application/xslt+xml
+FilterProvider COMPRESS DEFLATE resp=Content-Type image/svg+xml
 </IfVersion>
 
 FilterChain COMPRESS
@@ -43,13 +55,15 @@ FilterChain COMPRESS
 Alias /sf "/usr/share/pear/data/symfony/web/sf/"
 <Directory "@APP_DIR@/alpha/web">
 	# set caching for static files such as crossdomain.xml
-	<FilesMatch "\.(xml|flv|ico|pdf|avi|mov|ppt|doc|mp3|wmv|wav|mp4)$">
+	<FilesMatch "\.(3gp|avi|css|d2h|dll|doc|docx|dot|fla|flv|gif|gz|html|ico|jpg|js|json|mov|mp3|mp4|mpeg|mso|pdf|png|ppt|swc|swf|swz|thmx|ts|txt|wav|webm|wmv|xml|zip)$">
 		ExpiresActive On
 		ExpiresDefault "access plus 3 month"
 		Header append Cache-Control "public"
-		SetEnv force-no-vary
 		Header unset ETag
 		FileETag None
+	</FilesMatch>
+	<FilesMatch "\.(3gp|avi|d2h|dll|doc|docx|dot|fla|flv|gif|gz|ico|jpg|mov|mp3|mp4|mpeg|mso|pdf|png|ppt|swc|swf|swz|thmx|ts|wav|webm|wmv|zip)$">
+		SetEnv force-no-vary
 	</FilesMatch>
 	
 	DirectoryIndex index.php
@@ -183,7 +197,9 @@ Alias /content/uiconf "@WEB_DIR@/content/uiconf"
 <Directory "@WEB_DIR@/content/uiconf">
         AddHandler cgi-script .php .pl .py .jsp .asp .htm .shtml .sh .cgi
         Options -ExecCGI
-        SetEnv force-no-vary
+        <FilesMatch "\.(3gp|avi|d2h|dll|doc|docx|dot|fla|flv|gif|gz|ico|jpg|mov|mp3|mp4|mpeg|mso|pdf|png|ppt|swc|swf|swz|thmx|ts|wav|webm|wmv|zip)$">
+                SetEnv force-no-vary
+        </FilesMatch>
 
         ExpiresActive On
         ExpiresDefault "access plus 3 month"
@@ -199,7 +215,9 @@ Alias /content "@WEB_DIR@/content"
 <Directory "@WEB_DIR@/content">
 	#AddHandler cgi-script .php .pl .py .jsp .asp .htm .shtml .sh .cgi
 	#Options -ExecCGI
-	SetEnv force-no-vary
+	<FilesMatch "\.(3gp|avi|d2h|dll|doc|docx|dot|fla|flv|gif|gz|ico|jpg|mov|mp3|mp4|mpeg|mso|pdf|png|ppt|swc|swf|swz|thmx|ts|wav|webm|wmv|zip)$">
+		SetEnv force-no-vary
+	</FilesMatch>
 
 	ExpiresActive On
 	ExpiresDefault "access plus 3 month"
@@ -218,7 +236,9 @@ Alias /flash "@WEB_DIR@/flash"
 <Directory "@WEB_DIR@/flash">
 	AddHandler cgi-script .php .pl .py .jsp .asp .htm .shtml .sh .cgi
 	Options -ExecCGI
-	SetEnv force-no-vary
+	<FilesMatch "\.(3gp|avi|d2h|dll|doc|docx|dot|fla|flv|gif|gz|ico|jpg|mov|mp3|mp4|mpeg|mso|pdf|png|ppt|swc|swf|swz|thmx|ts|wav|webm|wmv|zip)$">
+		SetEnv force-no-vary
+	</FilesMatch>
 
 	ExpiresActive On
 	ExpiresDefault "access plus 3 month"
