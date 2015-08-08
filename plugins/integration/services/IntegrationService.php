@@ -38,7 +38,7 @@ class IntegrationService extends KalturaBaseService
 			
 		return $job->getId();
 	}
-
+	
 	/**
 	 * @action notify
 	 * @disableTags TAG_WIDGET_SESSION,TAG_ENTITLEMENT_ENTRY,TAG_ENTITLEMENT_CATEGORY
@@ -48,25 +48,41 @@ class IntegrationService extends KalturaBaseService
 	{
 		$coreType = IntegrationPlugin::getBatchJobTypeCoreValue(IntegrationBatchJobType::INTEGRATION);
 		$batchJob = BatchJobPeer::retrieveByPK($id);
-		$invalid = false;
+		$invalidJobId = false;
+		$invalidKs = false;
 		if(!$batchJob)
 		{
-			$invalid = true;
+			$invalidJobId = true;
 			KalturaLog::err("Job [$id] not found");
 		}
 		elseif($batchJob->getJobType() != $coreType)
 		{
-			$invalid = true;
+			$invalidJobId = true;
 			KalturaLog::err("Job [$id] wrong type [" . $batchJob->getJobType() . "] expected [" . $coreType . "]");
 		}
 		elseif($batchJob->getStatus() != KalturaBatchJobStatus::ALMOST_DONE)
 		{
-			$invalid = true;
+			$invalidJobId = true;
 			KalturaLog::err("Job [$id] wrong status [" . $batchJob->getStatus() . "] expected [" . KalturaBatchJobStatus::ALMOST_DONE . "]");
 		}
-		if($invalid)
+		elseif($batchJob->getPartnerId() != kCurrentContext::getCurrentPartnerId())
+		{
+			$invalidKs = true;
+			KalturaLog::err("Job [$id] of wrong partner [" . $batchJob->getPartnerId() . "] expected [" . kCurrentContext::getCurrentPartnerId() . "]");
+		}
+		elseif(!kIntegrationFlowManager::validateKs(kCurrentContext::$ks_object, $batchJob))
+		{
+			$invalidKs = true;
+			KalturaLog::err("ks not valid for notifying job [$id]");
+		}
+	
+		if($invalidJobId)
 		{
 			throw new KalturaAPIException(KalturaErrors::INVALID_BATCHJOB_ID, $id);
+		}
+		if($invalidKs)
+		{
+			throw new KalturaAPIException(KalturaIntegrationErrors::INTEGRATION_NOTIFY_FAILED);
 		}
 			
 		kJobsManager::updateBatchJob($batchJob, KalturaBatchJobStatus::FINISHED);

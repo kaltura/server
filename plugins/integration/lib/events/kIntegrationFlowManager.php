@@ -40,6 +40,19 @@ class kIntegrationFlowManager implements kBatchJobStatusEventConsumer
 	{
 		$partnerId = kCurrentContext::getCurrentPartnerId();
 		
+		$providerType = $data->getProviderType();
+		$integrationProviderObj = IntegrationProviderPlugin::getProvider($providerType);
+		
+		if($integrationProviderObj)
+		{
+			$permissions = $integrationProviderObj->getPermissions($partnerId);
+			if(empty($permissions))
+			{
+				KalturaLog::err("partner $partnerId not permitted with provider type $providerType");
+				return false;
+			}
+		}
+		
 		$batchJob = new BatchJob();
 		$batchJob->setPartnerId($partnerId);
 		$batchJob->setObjectType($objectType);
@@ -59,7 +72,19 @@ class kIntegrationFlowManager implements kBatchJobStatusEventConsumer
 		$batchJob->setStatus(BatchJob::BATCHJOB_STATUS_DONT_PROCESS);
 		
 		$jobType = IntegrationPlugin::getBatchJobTypeCoreValue(IntegrationBatchJobType::INTEGRATION);
-		$batchJob = kJobsManager::addJob($batchJob, $data, $jobType, $data->getProviderType());
+		$batchJob = kJobsManager::addJob($batchJob, $data, $jobType, $providerType);
 		return kJobsManager::updateBatchJob($batchJob, BatchJob::BATCHJOB_STATUS_PENDING);
+	}
+	
+	public static function validateKs(ks $ks, $job)
+	{
+		$data = $job->getData();
+		$providerDataType = $data->getProviderType();
+		$integrationProviderObj = IntegrationProviderPlugin::getProvider($providerDataType);
+	
+		if(!$integrationProviderObj)
+			return true;
+	
+		return $integrationProviderObj->validateKs($ks, $job);
 	}
 }
