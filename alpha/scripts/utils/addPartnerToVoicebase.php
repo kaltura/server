@@ -76,17 +76,17 @@
 			$userRoleToAdd->setPermissionNames(EXTERNAL_SERVICE_ACTIONS_PERMISSION_NAME);
 			$userRoleToAdd->save();
 			$userRoleToAddId = $userRoleToAdd->getId();
-						KalturaLog::debug("added user-role [$userRoleToAddId]");
+			KalturaLog::debug("added user-role [$userRoleToAddId]");
 		}
 		else
 		{
 			$userRoleId = $userRole->getId();
-						KalturaLog::debug("user-role [$userRoleId] already exists");
+			KalturaLog::debug("user-role [$userRoleId] already exists");
 		}
 	
 		$c->clear();
-				$c->add(PermissionPeer::PARTNER_ID, PartnerPeer::GLOBAL_PARTNER);
-				$c->add(PermissionPeer::NAME, VoicebasePlugin::PARTNER_LEVEL_PERMISSION_NAME);
+		$c->add(PermissionPeer::PARTNER_ID, PartnerPeer::GLOBAL_PARTNER);
+		$c->add(PermissionPeer::NAME, VoicebasePlugin::PARTNER_LEVEL_PERMISSION_NAME);
 		$c->add(PermissionPeer::TYPE, PermissionType::SPECIAL_FEATURE);
 		$partnerPermission = PermissionPeer::doSelectOne($c);
 		if(!$partnerPermission)

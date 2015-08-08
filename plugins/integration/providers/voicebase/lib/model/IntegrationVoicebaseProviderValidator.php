@@ -25,7 +25,7 @@ class IntegrationVoicebaseProviderValidator implements IIntegrationProvider
 		$entryId = $providerData->getEntryId();
 	
 		$dcParams = kDataCenterMgr::getCurrentDc();
-				$token = $dcParams["secret"];
+		$token = $dcParams["secret"];
 	
 		$createdString = md5($entryId . $token);
 	

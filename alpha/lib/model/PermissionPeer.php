@@ -322,15 +322,16 @@ class PermissionPeer extends BasePermissionPeer
 	 *
 	 * @param      int $partnerId
 	 * @param      PropelPDO $con the connection to use
+	 * @param      array $names
 	 * @return     array<Permission>
 	 */
-	public static function retrievePartnerLevelPermissions($partnerId, PropelPDO $con = null, $names = null)
+	public static function retrievePartnerLevelPermissions($partnerId, PropelPDO $con = null, array $names = null)
 	{
 		$criteria = new Criteria();
 		$criteria->add(PermissionPeer::PARTNER_ID, $partnerId);
 		$criteria->add(PermissionPeer::STATUS, PermissionStatus::ACTIVE);
 		$criteria->add(PermissionPeer::TYPE, array(PermissionType::PLUGIN, PermissionType::SPECIAL_FEATURE), Criteria::IN);
-		if($names && count($names))
+		if(is_array($names) && count($names))
 			$criteria->add(PermissionPeer::NAME, $names, Criteria::IN);
 
 		return PermissionPeer::doSelect($criteria, $con);
