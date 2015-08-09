@@ -3,7 +3,7 @@
  * @package plugins.voicebase
  * @subpackage lib.enum
  */
-class VoicebaseIntegrationProvider implements IKalturaPluginEnum, IntegrationProviderType
+class VoicebaseIntegrationProviderType implements IKalturaPluginEnum, IntegrationProviderType
 {
 	const VOICEBASE = 'Voicebase';
 	

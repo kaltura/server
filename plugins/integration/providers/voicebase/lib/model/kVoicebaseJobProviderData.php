@@ -50,7 +50,7 @@ class kVoicebaseJobProviderData extends kIntegrationJobProviderData
 	
 	/**
 	 * should replace remote media content
-	 * @var string
+	 * @var bool
 	 */
 	private $replaceMediaContent;
 	
@@ -189,7 +189,7 @@ class kVoicebaseJobProviderData extends kIntegrationJobProviderData
 	}
 	
 	/**
-	 * @return int
+	 * @return bool
 	 */
 	public function getReplaceMediaContent()
 	{
@@ -197,7 +197,7 @@ class kVoicebaseJobProviderData extends kIntegrationJobProviderData
 	}
 	
 	/**
-	 * @param int $replaceMediaContent
+	 * @param bool $replaceMediaContent
 	 */
 	public function setReplaceMediaContent($replaceMediaContent)
 	{

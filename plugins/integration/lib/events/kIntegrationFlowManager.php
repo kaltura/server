@@ -14,7 +14,7 @@ class kIntegrationFlowManager implements kBatchJobStatusEventConsumer
 		
 		return true;
 	}
-
+	
 	/* (non-PHPdoc)
 	 * @see kBatchJobStatusEventConsumer::shouldConsumeJobStatusEvent()
 	 */
@@ -24,7 +24,7 @@ class kIntegrationFlowManager implements kBatchJobStatusEventConsumer
 		{
 			return false;
 		} 
-		 
+		
 		$closedStatusList = array(
 			BatchJob::BATCHJOB_STATUS_FINISHED,
 			BatchJob::BATCHJOB_STATUS_FAILED,
@@ -39,20 +39,16 @@ class kIntegrationFlowManager implements kBatchJobStatusEventConsumer
 	public static function addintegrationJob($objectType, $objectId, kIntegrationJobData $data) 
 	{
 		$partnerId = kCurrentContext::getCurrentPartnerId();
-		
+	
 		$providerType = $data->getProviderType();
 		$integrationProviderObj = IntegrationProviderPlugin::getProvider($providerType);
-		
-		if($integrationProviderObj)
+	
+		if($integrationProviderObj && !$integrationProviderObj->validatePermissions($partnerId))
 		{
-			$permissions = $integrationProviderObj->getPermissions($partnerId);
-			if(empty($permissions))
-			{
-				KalturaLog::err("partner $partnerId not permitted with provider type $providerType");
-				return false;
-			}
+			KalturaLog::err("partner $partnerId not permitted with provider type $providerType");
+			return false;
 		}
-		
+	
 		$batchJob = new BatchJob();
 		$batchJob->setPartnerId($partnerId);
 		$batchJob->setObjectType($objectType);
@@ -74,17 +70,5 @@ class kIntegrationFlowManager implements kBatchJobStatusEventConsumer
 		$jobType = IntegrationPlugin::getBatchJobTypeCoreValue(IntegrationBatchJobType::INTEGRATION);
 		$batchJob = kJobsManager::addJob($batchJob, $data, $jobType, $providerType);
 		return kJobsManager::updateBatchJob($batchJob, BatchJob::BATCHJOB_STATUS_PENDING);
-	}
-	
-	public static function validateKs(ks $ks, $job)
-	{
-		$data = $job->getData();
-		$providerDataType = $data->getProviderType();
-		$integrationProviderObj = IntegrationProviderPlugin::getProvider($providerDataType);
-	
-		if(!$integrationProviderObj)
-			return true;
-	
-		return $integrationProviderObj->validateKs($ks, $job);
 	}
 }

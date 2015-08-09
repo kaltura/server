@@ -11,3 +11,7 @@ passthru("php $script $config");
 
 $config = realpath(dirname(__FILE__)) . '/../../../permissions/service.integration.integration.ini';
 passthru("php $script $config");
+
+//add user role
+$config = realpath(dirname(__FILE__)) . '/../2015_08_23_create_external_services_role.php';
+passthru("php $config realrun");

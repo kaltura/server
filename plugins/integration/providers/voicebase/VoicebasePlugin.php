@@ -6,8 +6,6 @@ class VoicebasePlugin extends IntegrationProviderPlugin implements IKalturaEvent
 {
 	const PLUGIN_NAME = 'voicebase';
 	const FLOW_MANAGER = 'kVoicebaseFlowManager';
-	const EXTERNAL_INTEGRATION_SERVICES_ROLE_NAME = "EXTERNAL_INTEGRATION_SERVICES_ROLE";
-	const PARTNER_LEVEL_PERMISSION_NAME = "VOICEBASE_PLUGIN";
 	
 	const INTEGRATION_PLUGIN_VERSION_MAJOR = 1;
 	const INTEGRATION_PLUGIN_VERSION_MINOR = 0;
@@ -48,7 +46,7 @@ class VoicebasePlugin extends IntegrationProviderPlugin implements IKalturaEvent
 	 */
 	public static function getIntegrationProviderClassName()
 	{
-		return 'VoicebaseIntegrationProvider';
+		return 'VoicebaseIntegrationProviderType';
 	}
 	
 	/* (non-PHPdoc)
@@ -56,14 +54,14 @@ class VoicebasePlugin extends IntegrationProviderPlugin implements IKalturaEvent
 	 */
 	public static function getObjectClass($baseClass, $enumValue)
 	{
-		if($baseClass == 'kIntegrationJobProviderData' && $enumValue == self::getApiValue(VoicebaseIntegrationProvider::VOICEBASE))
+		if($baseClass == 'kIntegrationJobProviderData' && $enumValue == self::getApiValue(VoicebaseIntegrationProviderType::VOICEBASE))
 		{
 			return 'kVoicebaseJobProviderData';
 		}
 	
 		if($baseClass == 'KalturaIntegrationJobProviderData')
 		{
-			if($enumValue == self::getApiValue(VoicebaseIntegrationProvider::VOICEBASE) || $enumValue == self::getIntegrationProviderCoreValue(VoicebaseIntegrationProvider::VOICEBASE))
+			if($enumValue == self::getApiValue(VoicebaseIntegrationProviderType::VOICEBASE) || $enumValue == self::getIntegrationProviderCoreValue(VoicebaseIntegrationProviderType::VOICEBASE))
 				return 'KalturaVoicebaseJobProviderData';
 		}
 	
@@ -72,9 +70,9 @@ class VoicebasePlugin extends IntegrationProviderPlugin implements IKalturaEvent
 			if($enumValue == KalturaIntegrationProviderType::VOICEBASE)
 				return 'KVoicebaseIntegrationEngine';
 		}
-		if($baseClass == 'IIntegrationProvider' && $enumValue == self::getIntegrationProviderCoreValue(VoicebaseIntegrationProvider::VOICEBASE))
+		if($baseClass == 'IIntegrationProvider' && $enumValue == self::getIntegrationProviderCoreValue(VoicebaseIntegrationProviderType::VOICEBASE))
 		{
-			return 'IntegrationVoicebaseProviderValidator';
+			return 'IntegrationVoicebaseProvider';
 		}
 	
 	}
@@ -96,21 +94,23 @@ class VoicebasePlugin extends IntegrationProviderPlugin implements IKalturaEvent
 		return new VoicebaseClientHelper($apiKey, $apiPassword);
 	}
 	
+	/**
+	 * @return VoicebaseOptions
+	 */	
 	public static function getPartnerVoicebaseOptions($partnerId)
 	{
 		$partner = PartnerPeer::retrieveByPK($partnerId);
 		if(!$partner)
 			return null;
-		return $partner->getFromCustomData(VoicebaseIntegrationProvider::VOICEBASE);
+		return $partner->getFromCustomData(VoicebaseIntegrationProviderType::VOICEBASE);
 	}
 	
-	public static function setPartnerVoicebaseOptions($partnerId, array $params)
+	public static function setPartnerVoicebaseOptions($partnerId, VoicebaseOptions $options)
 	{
-		$obj = new VoicebaseOptions($params);
 		$partner = PartnerPeer::retrieveByPK($partnerId);
 		if(!$partner)
 			return;
-		$partner->putInCustomData(VoicebaseIntegrationProvider::VOICEBASE, $obj);
+		$partner->putInCustomData(VoicebaseIntegrationProviderType::VOICEBASE, $options);
 		$partner->save();
 	}
 }

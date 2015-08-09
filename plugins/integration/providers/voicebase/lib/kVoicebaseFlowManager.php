@@ -9,12 +9,10 @@ class kVoicebaseFlowManager implements kBatchJobStatusEventConsumer
 	 */
 	public function shouldConsumeJobStatusEvent(BatchJob $dbBatchJob)
 	{
-		$triggerStatuses = array(BatchJob::BATCHJOB_STATUS_DONT_PROCESS, BatchJob::BATCHJOB_STATUS_FINISHED);
-		$jobStatus = $dbBatchJob->getStatus();
-		if(in_array($jobStatus, $triggerStatuses) && $dbBatchJob->getJobType() == IntegrationPlugin::getBatchJobTypeCoreValue(IntegrationBatchJobType::INTEGRATION))
+		if(in_array($dbBatchJob->getStatus(), array(BatchJob::BATCHJOB_STATUS_DONT_PROCESS, BatchJob::BATCHJOB_STATUS_FINISHED)) && $dbBatchJob->getJobType() == IntegrationPlugin::getBatchJobTypeCoreValue(IntegrationBatchJobType::INTEGRATION))
 		{
 			$providerType = $dbBatchJob->getJobSubType();
-			if ($providerType == VoicebasePlugin::getProviderTypeCoreValue(VoicebaseIntegrationProvider::VOICEBASE))
+			if ($providerType == VoicebasePlugin::getProviderTypeCoreValue(VoicebaseIntegrationProviderType::VOICEBASE))
 				return true;
 		}
 		return false;
@@ -33,7 +31,7 @@ class kVoicebaseFlowManager implements kBatchJobStatusEventConsumer
 	
 		if($dbBatchJob->getStatus() == BatchJob::BATCHJOB_STATUS_DONT_PROCESS)
 		{
-			$transcript = $this->getObjects($entryId, array(TranscriptPlugin::getAssetTypeCoreValue(TranscriptAssetType::TRANSCRIPT)), $spokenLanguage, true);	
+			$transcript = $this->getAssetsByLanguage($entryId, array(TranscriptPlugin::getAssetTypeCoreValue(TranscriptAssetType::TRANSCRIPT)), $spokenLanguage, true);	
 			if(!$transcript)
 			{
 				$transcript = new TranscriptAsset();
@@ -68,8 +66,8 @@ class kVoicebaseFlowManager implements kBatchJobStatusEventConsumer
 			$formatsArray[] = "TXT";
 			$contentsArray = $clientHelper->getRemoteTranscripts($entryId, $formatsArray);
 			KalturaLog::debug('contents are - ' . print_r($contentsArray, true));
-			$transcript = $this->getObjects($entryId, array(TranscriptPlugin::getAssetTypeCoreValue(TranscriptAssetType::TRANSCRIPT)), $spokenLanguage, true);
-			$captions = $this->getObjects($entryId, array(CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION)), $spokenLanguage);
+			$transcript = $this->getAssetsByLanguage($entryId, array(TranscriptPlugin::getAssetTypeCoreValue(TranscriptAssetType::TRANSCRIPT)), $spokenLanguage, true);
+			$captions = $this->getAssetsByLanguage($entryId, array(CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION)), $spokenLanguage);
 		
 			$this->setObjectContent($transcript, $contentsArray["TXT"]);
 			unset($contentsArray["TXT"]);
@@ -96,7 +94,7 @@ class kVoicebaseFlowManager implements kBatchJobStatusEventConsumer
 		return true;					    
 	}
 	
-	function getObjects($entryId, array $assetTypes, $spokenLanguage = null, $returnSingleObject = false)
+	function getAssetsByLanguage($entryId, array $assetTypes, $spokenLanguage, $returnSingleObject = false)
 	{
 		$objects = $returnSingleObject ? null : array();
 		$statuses = array(asset::ASSET_STATUS_QUEUED, asset::ASSET_STATUS_READY);
@@ -104,27 +102,18 @@ class kVoicebaseFlowManager implements kBatchJobStatusEventConsumer
 	
 		foreach($resultArray as $object)
 		{
-			if($spokenLanguage)
+			if($object->getLanguage() == $spokenLanguage)
 			{
-				if($object->getLanguage() == $spokenLanguage)
-				{
-					if ($returnSingleObject)
-						return $object;
-					$objects[$object->getContainerFormat()] = $object;
-				}
-			}
-			elseif($returnSingleObject)
-				return $object;
-			else
+				if ($returnSingleObject)
+					return $object;
 				$objects[$object->getContainerFormat()] = $object;
+			}
 		}	
 		return $objects;
 	}
 	
 	private function setObjectContent($assetObject, $content, $format = null)
 	{
-		file_put_contents($fname = tempnam(myContentStorage::getFSUploadsPath(), "VBF"), $content); //prefix for - voicebase file
-	
 		$assetObject->incrementVersion();
 		$ext = "txt";
 		if($format)
@@ -138,23 +127,9 @@ class kVoicebaseFlowManager implements kBatchJobStatusEventConsumer
 		$assetObject->setFileExt($ext);
 		$assetObject->setSize(kFile::fileSize($fname));
 		$assetObject->save();
-	
 		$syncKey = $assetObject->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
 	
-		try 
-		{
-			kFileSyncUtils::moveFromFile($fname, $syncKey, true, false);
-		}
-		catch (Exception $e)
-		{     
-			if($attachmentAsset->getStatus() == AttachmentAsset::ASSET_STATUS_QUEUED || $attachmentAsset->getStatus() == AttachmentAsset::ASSET_STATUS_NOT_APPLICABLE)
-			{
-				$assetObject->setDescription($e->getMessage());
-				$assetObject->setStatus(AttachmentAsset::ASSET_STATUS_ERROR);
-				$assetObject->save();
-			}                                               
-			throw $e;
-		}
+		kFileSyncUtils::file_put_contents($syncKey, $content); 		
 	
 		$finalPath = kFileSyncUtils::getLocalFilePathForKey($syncKey);
 		$assetObject->setSize(kFile::fileSize($finalPath));

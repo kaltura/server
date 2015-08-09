@@ -34,6 +34,9 @@ abstract class IntegrationProviderPlugin extends KalturaPlugin implements IInteg
 		return array();
 	}
 
+	/**
+	 * @return IIntegrationProvider
+	 */
 	public static function getProvider($providerType)
 	{
 		return KalturaPluginManager::loadObject('IIntegrationProvider', $providerType);

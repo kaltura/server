@@ -58,7 +58,7 @@ class KalturaVoicebaseJobProviderData extends KalturaIntegrationJobProviderData
 	
 	/**
 	 * should replace remote media content
-	 * @var KalturaNullableBoolean
+	 * @var bool
 	 */
 	public $replaceMediaContent;
 	
@@ -162,25 +162,12 @@ class KalturaVoicebaseJobProviderData extends KalturaIntegrationJobProviderData
 		$partner = $entry->getPartner();
 		$userSecret = $partner->getSecret();
 	
-		//actionslimit:1
-		$privileges = kSessionBase::PRIVILEGE_SET_ROLE . ":" . VoicebasePlugin::EXTERNAL_INTEGRATION_SERVICES_ROLE_NAME;	
-		$privileges .= "," . kSessionBase::PRIVILEGE_ACTIONS_LIMIT . ":1";
-		
-		$dcParams = kDataCenterMgr::getCurrentDc();
-		$token = $dcParams["secret"];
-		$additionalData = md5($entryId . $token);
-
-		$ks = "";
-		$creationSucces = kSessionUtils::startKSession ($partnerId , $userSecret , "" , $ks , 86400 , KalturaSessionType::USER , "" , $privileges, null ,$additionalData);
-		if ( $creationSucces >= 0 )
-		{
-			$object->setKsForExternalService($ks);
-		}
+		$ks = IntegrationPlugin::generateKs($partnerId, $entryId);
+		if(!ks)
+			throw new KalturaAPIException (APIErrors::START_SESSION_ERROR ,$partnerId);
 		else
-		{
-			throw new KalturaAPIException ( APIErrors::START_SESSION_ERROR ,$partnerId );
-		}
-	
+			$object->setKsForExternalService($ks);
+		
 		return $object;
 	}
 }

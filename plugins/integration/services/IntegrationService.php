@@ -38,7 +38,7 @@ class IntegrationService extends KalturaBaseService
 			
 		return $job->getId();
 	}
-
+	
 	/**
 	 * @action notify
 	 * @disableTags TAG_WIDGET_SESSION,TAG_ENTITLEMENT_ENTRY,TAG_ENTITLEMENT_CATEGORY
@@ -70,7 +70,7 @@ class IntegrationService extends KalturaBaseService
 			$invalidKs = true;
 			KalturaLog::err("Job [$id] of wrong partner [" . $batchJob->getPartnerId() . "] expected [" . kCurrentContext::getCurrentPartnerId() . "]");
 		}
-		elseif(!kIntegrationFlowManager::validateKs(kCurrentContext::$ks_object, $batchJob))
+		elseif(!self::validateKs($batchJob))
 		{
 			$invalidKs = true;
 			KalturaLog::err("ks not valid for notifying job [$id]");
@@ -86,5 +86,23 @@ class IntegrationService extends KalturaBaseService
 		}
 			
 		kJobsManager::updateBatchJob($batchJob, KalturaBatchJobStatus::FINISHED);
+	}
+	
+	public static function validateKs($job)
+	{	
+		$data = $job->getData();
+		$providerData = $data->getProviderData();
+		$entryId = $providerData->getEntryId();
+		
+		$dcParams = kDataCenterMgr::getCurrentDc();
+		$token = $dcParams["secret"];
+		
+		$createdString = md5($entryId . $token);
+		
+		$ks = kCurrentContext::$ks_object;
+		if($createdString == $ks->additional_data)
+			return true;
+		
+		return false;
 	}
 }
