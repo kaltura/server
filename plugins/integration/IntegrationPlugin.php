@@ -75,7 +75,7 @@ class IntegrationPlugin extends KalturaPlugin implements IKalturaPermissions, IK
 			
 		return array();
 	}
-	
+
 	/* (non-PHPdoc)
 	 * @see IKalturaVersion::getVersion()
 	 */
@@ -87,7 +87,7 @@ class IntegrationPlugin extends KalturaPlugin implements IKalturaPermissions, IK
 			self::PLUGIN_VERSION_BUILD
 		);
 	}
-	
+
 	/* (non-PHPdoc)
 	 * @see IKalturaObjectLoader::loadObject()
 	 */
@@ -109,7 +109,7 @@ class IntegrationPlugin extends KalturaPlugin implements IKalturaPermissions, IK
 			return new $objectClass();
 		}
 	}
-	
+
 	/* (non-PHPdoc)
 	 * @see IKalturaObjectLoader::getObjectClass()
 	 */
@@ -145,7 +145,7 @@ class IntegrationPlugin extends KalturaPlugin implements IKalturaPermissions, IK
 	{
 		return self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
 	}
-	
+
 	/* (non-PHPdoc)
 	 * @see IKalturaConfigurator::getConfig()
 	 */
