@@ -14,7 +14,7 @@ class kIntegrationFlowManager implements kBatchJobStatusEventConsumer
 		
 		return true;
 	}
-	
+
 	/* (non-PHPdoc)
 	 * @see kBatchJobStatusEventConsumer::shouldConsumeJobStatusEvent()
 	 */

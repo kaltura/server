@@ -38,7 +38,7 @@ class IntegrationService extends KalturaBaseService
 			
 		return $job->getId();
 	}
-	
+
 	/**
 	 * @action notify
 	 * @disableTags TAG_WIDGET_SESSION,TAG_ENTITLEMENT_ENTRY,TAG_ENTITLEMENT_CATEGORY

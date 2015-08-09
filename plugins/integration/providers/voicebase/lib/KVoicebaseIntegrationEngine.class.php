@@ -52,7 +52,7 @@ class KVoicebaseIntegrationEngine implements KIntegrationCloserEngine
 			if(!$uploadSuccess)
 				throw new Exception("upload failed");
 		}
-		elseif($shouldReplaceRemoteMedia == KalturaNullableBoolean::TRUE_VALUE)
+		elseif($shouldReplaceRemoteMedia == true)
 		{
 			$this->clientHelper->deleteRemoteFile($entryId);
 			$uploadSuccess = $this->clientHelper->uploadMedia($flavorUrl, $entryId, $callBackUrl, $spokenLanguage, $fileLocation);
