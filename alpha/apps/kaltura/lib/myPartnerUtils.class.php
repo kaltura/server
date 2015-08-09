@@ -943,7 +943,7 @@ class myPartnerUtils
 
 		$bandwidth_consumption = array_search('bandwidth_consumption', $header);
 		$deleted_storage = array_search('deleted_storage', $header);
-		$added_storage = array_search('deleted_storage', $header);
+		$added_storage = array_search('added_storage', $header);
 		$transcoding_consumption = array_search('transcoding_consumption', $header);	
 		$totalBandwith = $data[$bandwidth_consumption]*1024; //KB
 		$totalTranscoding = $data[$transcoding_consumption]*1024; //KB
