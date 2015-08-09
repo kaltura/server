@@ -458,7 +458,7 @@ class infraRequestUtils
 			}
 		}
 			
-		self::$requestParams = array_merge($_FILES, $_POST, $_GET, $params);
+		self::$requestParams = array_merge($_POST, $_FILES, $_GET, $params);
 		return self::$requestParams;
 	}
 
