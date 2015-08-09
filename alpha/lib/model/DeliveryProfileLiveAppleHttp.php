@@ -200,7 +200,7 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 	public function doServe(kLiveStreamConfiguration $liveStreamConfig) 
 	{	
 		if($this->params->getUsePlayServer()) {
-			$liveStreamConfig->setUrl($this->getPlayServerUrl($baseUrl));
+			$liveStreamConfig->setUrl($this->getPlayServerUrl($liveStreamConfig->getUrl()));
 			$liveStreamConfig->setBackupUrl(null);
 		}
 		
