@@ -1,3 +1,58 @@
+# Jupiter-10.17.0 #
+
+## Allow users to use uiconf-->listTemplates ##
+
+- Issue Type: Permission to existing API 
+- Issue ID: PLAT-3541
+
+#### Configuration ####
+ 
+ 	- In the file "deployment/permissions/service.uiconf.ini" in the line "permissionItem7.permissions" add `,BASE_USER_SESSION_PERMISSION` at the end
+
+#### Deployment Scripts ####
+
+ 	- php deployment/updates/scripts/add_permissions/2015_07_29_allow_user_session_uiconf_listTemplates.php
+
+#### Known Issues & Limitations ####
+
+None.
+
+## new Transcript asset ##
+
+-- Issue Type: New Feature
+-- Issue ID: PLAT-2622
+
+#### Configuration ####
+ 
+- Added 'Transcript' in configurations/plugins.ini.base and configurations/plugins.ini.admin
+
+#### Deployment Scripts ####
+
+Run:
+ 	- php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+
+#### Known Issues & Limitations ####
+
+None.
+
+## Allow PLAYBACK_BASE_ROLE to user user_entry and quiz ##
+
+- Issue Type: Permission to existing API 
+- Issue ID:
+
+#### Configuration ####
+ 
+ 	None.
+
+#### Deployment Scripts ####
+
+ 	- php deployment/updates/scripts/add_permissions/2015_07_29_update_quiz_and_userentry_permissions.php
+
+#### Known Issues & Limitations ####
+
+None.
+
+--
 # Jupiter-10.16.0 #
 
 ## New applehttp to multicast delivery profile ##

@@ -4,12 +4,12 @@ body, html { margin:0; padding:0; height: 100%; overflow: auto; }
 body { background: #f7f7f7; font: normal 62.5% arial,sans-serif; overflow: hidden; }
 .body-bg { background: url(../images/bg.png) repeat-x #f7f7f7;}
 
-a { color: #202020; } 
+a { color: #202020; }
 a:hover { color: #505050; }
 
 .left { height: 100%; float: left; margin: 0 15px; width: 280px; overflow: auto; }
 .left .left-content { padding: 10px; }
-	
+
 .right { height: 100%; float: left; border: 0; }
 .right iframe { width: 100%; height: 100%; border: 0; }
 

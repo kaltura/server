@@ -46,40 +46,7 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 
 		return $isLive;
 	}
-	
-	/**
-	 * Extract all non-empty / non-comment lines from a .m3u/.m3u8 content
-	 * @param $content array|string Full file content as a single string or as a lines-array
-	 * @return array Valid lines
-	 */
-	protected function getM3U8Urls( $content )
-	{
-		$outLines = array();
-
-		if ( strpos($content, "#EXTM3U") !== 0 )
-		{
-			return $outLines;
-		}
-
-		if ( !is_array($content) )
-		{
-			$lines = explode("\n", trim($content));
-		}
-
-		foreach ( $lines as $line )
-		{
-			$line = trim($line);
-			if (!$line || $line[0] == '#')
-			{
-				continue;
-			}
-
-			$outLines[] = $line;
-		}
-
-		return $outLines;
-	}
-	
+		
 	/**
 	 * Check if the given URL contains live entries (typically live .m3u8 URLs)
 	 * @param string $url
@@ -88,7 +55,7 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 	 */
 	protected function checkIsLiveMasterPlaylist( $url, $urlContent )
 	{
-		$lines = $this->getM3U8Urls( $urlContent );
+		$lines = kDeliveryUtils::getM3U8Urls( $urlContent );
 
 		foreach ($lines as $urlLine)
 		{
@@ -122,7 +89,7 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 		if($this->isDvrContent($urlContent))
 			return false;
 		
-		$lines = $this->getM3U8Urls( $urlContent );
+		$lines = kDeliveryUtils::getM3U8Urls( $urlContent );
 
 		$lines = array_slice($lines, -self::MAX_IS_LIVE_ATTEMPTS, self::MAX_IS_LIVE_ATTEMPTS, true);
 		foreach ($lines as $urlLine)
@@ -147,25 +114,20 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 		return in_array(self::M3U8_PLAYLIST_END_LIST_IDENTIFIER, array_map('trim', explode("\n", $content)));
 	}
 	
-	public function finalizeUrls(&$baseUrl, &$flavorsUrls)
-	{
-		if($this->getDisableExtraAttributes()) {
-			$baseUrl = kDeliveryUtils::addQueryParameter($baseUrl, "attributes=off");
-		}
-	}
-	
 	/**
 	 * Fetch the manifest and build all flavors array
 	 * @param string $url
 	 */
 	private function buildM3u8Flavors($url, array &$flavors)
 	{
-		$this->finalizeUrls($url, $flavors);
+		if($this->getDisableExtraAttributes())
+			$url = kDeliveryUtils::addQueryParameter($url, "attributes=off");
 		
 		$manifest = KCurlWrapper::getContent($url);
 		if(!$manifest)
 			return;
 	
+		$this->finalizeUrls($url, $flavors);
 		$manifestLines = explode("\n", $manifest);
 		$manifestLine = reset($manifestLines);
 		while($manifestLine)
@@ -235,26 +197,19 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 	    return ($a['bitrate'] < $b['bitrate']) ? -1 : 1;
 	}
 
-	/* (non-PHPdoc)
-	 * @see DeliveryProfileLive::serve()
-	 */
-	public final function serve($baseUrl, $backupUrl) 
-	{
-		if($this->params->getUsePlayServer())
-		{
-			$baseUrl = $this->getPlayServerUrl($baseUrl);
-			$backupUrl = null;
+	public function doServe(kLiveStreamConfiguration $liveStreamConfig) 
+	{	
+		if($this->params->getUsePlayServer()) {
+			$liveStreamConfig->setUrl($this->getPlayServerUrl($liveStreamConfig->getUrl()));
+			$liveStreamConfig->setBackupUrl(null);
 		}
 		
-		return $this->doServe($baseUrl, $backupUrl);
-	}
-
-	protected function doServe($baseUrl, $backupUrl) 
-	{
-		if((!$backupUrl && (!$this->getForceProxy() || $this->params->getEdgeServerIds())) || $this->params->getUsePlayServer())
-		{
-			return parent::serve($baseUrl, $backupUrl);
+		if((!$liveStreamConfig->getBackupUrl() && !$this->getForceProxy()) || $this->params->getUsePlayServer() || $liveStreamConfig->getIsExternalStream()) {
+			return parent::doServe($liveStreamConfig);
 		}
+		
+		$baseUrl = $liveStreamConfig->getUrl();
+		$backupUrl = $liveStreamConfig->getBackupUrl();
 		
 		$entry = entryPeer::retrieveByPK($this->params->getEntryId());
 		/* @var $entry LiveEntry */

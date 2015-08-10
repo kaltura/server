@@ -48,10 +48,19 @@ abstract class kManifestRenderer
 	public $defaultDeliveryCode = '';
 	
 	/**
+	 * @var kSessionBase
+	 */
+	protected $ksObject = null;
+	
+	/**
 	 * Array of classes required for load into the renderer scope in order to expand the manifest
 	 * @var array
 	 */
 	public $contributors;
+	
+	protected function prepareFlavors()
+	{
+	}
 	
 	/**
 	 * @return array<string>
@@ -96,23 +105,44 @@ abstract class kManifestRenderer
 	abstract protected function replaceDeliveryCode();
 	
 	abstract protected function tokenizeUrls();
-		
+
+	/**
+	 * @param kSessionBase $ksObject
+	 */
+	public function setKsObject($ksObject)
+	{
+		$this->ksObject = $ksObject;
+		if ($this->tokenizer)
+		{
+			$this->tokenizer->setKsObject($ksObject);
+		}
+	}
+	
 	/**
 	 * @param string $playbackContext
 	 */
-	final public function output($deliveryCode, $playbackContext)
+	public function setPlaybackContext($playbackContext)
 	{
-		$this->deliveryCode = $this->defaultDeliveryCode;
-		if ($deliveryCode)
-			$this->deliveryCode = $deliveryCode;
-				
-		if ($this->deliveryCode)
-			$this->replaceDeliveryCode();
-	
 		if ($this->tokenizer)
 		{
 			$this->tokenizer->setPlaybackContext($playbackContext);
 		}
+	}
+	
+	/**
+	 * @param string $deliveryCode
+	 */
+	public function setDeliveryCode($deliveryCode)
+	{
+		$this->deliveryCode = $deliveryCode ? $deliveryCode : $this->defaultDeliveryCode;
+	}
+	
+	final public function output()
+	{
+		$this->prepareFlavors();
+		
+		if ($this->deliveryCode)
+			$this->replaceDeliveryCode();
 		
 		$this->tokenizeUrls();
 	
@@ -139,13 +169,19 @@ abstract class kManifestRenderer
 			$footer = $contributorInstance->editManifestFooter ($footer);
 			$flavors = $contributorInstance->editManifestFlavors($flavors);
 		}
-		$content = $header;
+		
 		$separator = $this->getSeparator();
 		
-		$flavorsString = implode($separator, $flavors);
-		$content .= $separator.$flavorsString;
+		$content = $header;
+		if ($content)
+		{
+			$content .= $separator;
+		}
+		$content .= implode($separator, $flavors);
+		$content .= $separator . $footer;
 		
-		$content.=$separator.$footer;
+		header('Content-Length: ' . strlen($content));		// avoid chunked encoding
+		
 		echo $content;
 		
 		die;
@@ -154,6 +190,8 @@ abstract class kManifestRenderer
 	public function getRequiredFiles()
 	{
 		$result = array(__file__);
+		$thisClass = new ReflectionClass(get_class($this));
+		$result[] = $thisClass->getFileName();
 		if ($this->tokenizer)
 		{
 			$result[] = dirname(__file__) . '/storage/urlTokenizers/kUrlTokenizer.php';
@@ -254,9 +292,9 @@ class kMultiFlavorManifestRenderer extends kManifestRenderer
 	 */
 	public $baseUrl = '';
 	
-	function __construct($flavor, $entryId = null, $baseUrl = '')
+	function __construct($flavors, $entryId = null, $baseUrl = '')
 	{
-		$this->flavors = $flavor;
+		$this->flavors = $flavors;
 		$this->entryId = $entryId;
 		$this->baseUrl = $baseUrl;
 	}

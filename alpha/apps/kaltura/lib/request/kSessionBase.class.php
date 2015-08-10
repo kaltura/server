@@ -33,6 +33,7 @@ class kSessionBase
 	const PRIVILEGE_ACTIONS_LIMIT = "actionslimit";
 	const PRIVILEGE_SET_ROLE = "setrole";
 	const PRIVILEGE_IP_RESTRICTION = "iprestrict";
+	const PRIVILEGE_URI_RESTRICTION = "urirestrict";
 	const PRIVILEGE_ENABLE_ENTITLEMENT = "enableentitlement";
 	const PRIVILEGE_DISABLE_ENTITLEMENT = "disableentitlement";
 	const PRIVILEGE_DISABLE_ENTITLEMENT_FOR_ENTRY = "disableentitlementforentry";
@@ -60,6 +61,7 @@ class kSessionBase
 	const INVALID_LKS = -7;
 	const EXCEEDED_ACTIONS_LIMIT = -8;
 	const EXCEEDED_RESTRICTED_IP = -9;
+	const EXCEEDED_RESTRICTED_URI = -11;		// skipping -10 since it's Partner::VALIDATE_LKS_DISABLED
 	const UNKNOWN = 0;
 	const OK = 1;
 	
@@ -382,7 +384,7 @@ class kSessionBase
 		return $this->partner_id;
 	}
 	
-	public function tryToValidateKS()
+	public function isValidBase()
 	{
 		if (!$this->real_str || !$this->hash)
 			return self::INVALID_STR;			// KS parsing failed
@@ -390,22 +392,36 @@ class kSessionBase
 		if ($this->valid_until <= time())
 			return self::EXPIRED;				// KS is expired
 			
-		if ($this->partner_id == -1 ||			// Batch KS are never invalidated
-			$this->isWidgetSession())			// Since anyone can create a widget session, no need to check for invalidation
-			return self::OK;
-
-		$allPrivileges = explode(',', $this->privileges);
-		foreach($allPrivileges as $priv)
+		if (array_key_exists(self::PRIVILEGE_IP_RESTRICTION, $this->parsedPrivileges) &&
+			!in_array(infraRequestUtils::getRemoteAddress(), $this->parsedPrivileges[self::PRIVILEGE_IP_RESTRICTION]))
 		{
-			$exPrivileges = explode(':', $priv);
-			if (count($exPrivileges) == 2 && 
-				$exPrivileges[0] == self::PRIVILEGE_IP_RESTRICTION &&
-				$exPrivileges[1] != infraRequestUtils::getRemoteAddress())
+			return self::EXCEEDED_RESTRICTED_IP;
+		}
+		
+		if (array_key_exists(self::PRIVILEGE_URI_RESTRICTION, $this->parsedPrivileges))
+		{
+			$value = implode(self::PRIVILEGES_DELIMITER, $this->parsedPrivileges[self::PRIVILEGE_URI_RESTRICTION]);
+			if ($_SERVER["REQUEST_URI"] != $value &&		// exact match
+				(substr($value, -1) != '*' || 				// prefix match
+				substr($_SERVER["REQUEST_URI"], 0, strlen($value) - 1) != substr($value, 0, -1)))
 			{
-				return self::EXCEEDED_RESTRICTED_IP;
+				return self::EXCEEDED_RESTRICTED_URI;
 			}
 		}
 
+		return self::OK;
+	}
+	
+	public function tryToValidateKS()
+	{
+		$result = $this->isValidBase();
+		if ($result != self::OK)
+			return $result;
+		
+		if ($this->partner_id == -1 ||			// Batch KS are never invalidated
+			$this->isWidgetSession())			// Since anyone can create a widget session, no need to check for invalidation
+			return self::OK;
+		
 		$isInvalidated = $this->isKSInvalidated();
 		if ($isInvalidated)
 			return self::LOGOUT;

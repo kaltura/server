@@ -34,8 +34,18 @@ class KOperationEngineFfmpeg  extends KSingleOutputOperationEngine
 		// impersonite
 		KBatchBase::impersonate($this->data->flavorParamsOutput->partnerId); // !!!!!!!!!!!$this->job->partnerId);
 
-		$wmCmdLine = KConversionEngineFfmpeg::buildWatermarkedCommandLine($wmData, $this->data->destFileSyncLocalPath, $cmdLine,
-						KBatchBase::$taskConfig->params->ffmpegCmd, KBatchBase::$taskConfig->params->mediaInfoCmd);
+		$wmCmdLine = null;
+		if(isset($wmData)){
+			$wmCmdLine = KConversionEngineFfmpeg::buildWatermarkedCommandLine($wmData, $this->data->destFileSyncLocalPath, $cmdLine,
+					KBatchBase::$taskConfig->params->ffmpegCmd, KBatchBase::$taskConfig->params->mediaInfoCmd);
+		}
+				/*
+				 * 'watermark_pair_' tag for NGS digital signature watermarking flow
+				 */
+		if(isset($this->data->flavorParamsOutput->tags) && strstr($this->data->flavorParamsOutput->tags,'watermark_pair_')!=false){
+			$wmCmdLine = KConversionEngineFfmpeg::buildNGSPairedDigitalWatermarkingCommandLine((isset($wmCmdLine)?$wmCmdLine:$cmdLine), $this->data);
+		}
+
 		// un-impersonite
 		KBatchBase::unimpersonate();
 

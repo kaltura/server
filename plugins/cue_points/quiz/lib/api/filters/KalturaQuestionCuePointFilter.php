@@ -12,4 +12,9 @@ class KalturaQuestionCuePointFilter extends KalturaQuestionCuePointBaseFilter
 	{
 		// override KalturaCuePointFilter::validateForResponseProfile because all question cue-points are public
 	}
+
+	public function getTypeListResponse(KalturaFilterPager $pager, KalturaDetachedResponseProfile $responseProfile = null, $type = null)
+	{
+		return parent::getTypeListResponse($pager, $responseProfile, QuizPlugin::getCoreValue('CuePointType',QuizCuePointType::QUIZ_QUESTION));
+	}
 }

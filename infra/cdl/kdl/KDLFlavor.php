@@ -301,7 +301,7 @@ $plannedDur = 0;
 					 *  On short durations, the 'granulariity' of a single frame dur might cause invalidation. 
 					 *  Don't check for <2sec
 					 */
-				if($plannedDur>2000){	
+				if($plannedDur>2000){
 					if($prdVid->_duration<$plannedDur*KDLSanityLimits::MinDurationFactor 
 					|| $prdVid->_duration>$plannedDur*KDLSanityLimits::MaxDurationFactor) 
 					{
@@ -338,10 +338,10 @@ $plannedDur = 0;
 			else {
 				$prdAud = $product->_audio;
 				$trgAud = $this->_audio;
-				
+
 					/*
-					 *  On short durations, the 'granulariity' of a single frame dur might cause invalidation. 
-					 *  Don't check for <2sec
+					 * On short durations, the 'granulariity' of a single frame dur might cause invalidation.
+					 * Don't check for <2sec
 					 */
 				if($plannedDur>2000){ 
 					if($prdAud->_duration<$plannedDur*KDLSanityLimits::MinDurationFactor 
@@ -617,7 +617,7 @@ $plannedDur = 0;
 			if($source->_audio!=""){
 				$target->_audio = $this->evaluateTargetAudio($source->_audio, $target, $source->_contentStreams);
 				/*
-				 * On multi-langual flavor, 
+				 * On multi-lingual flavor, 
 				 * if required language does not exist - set NonComply flag 
 				 */
 				if(isset($target->_multiStream) && isset($target->_multiStream->audio) 
