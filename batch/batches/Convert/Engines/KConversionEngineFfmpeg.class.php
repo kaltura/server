@@ -495,6 +495,7 @@ $pixFmt = "yuv420p";
 				return null;
 		}
 
+$stub=null;
 	if(strstr($data->flavorParamsOutput->tags,KConversionEngineFfmpeg::TAG_NGS_STUB)!=false)
 		$stub="--stub";
 	//$digSignStub = "-f rawvideo -pix_fmt $srcPixFmt - | $ngsBin -w $srcWid -h $srcHgt -f $srcFps $stub --$prepMode| $ffmpegBin -f rawvideo -s $srcWidx$srcHgt -r $srcFps -i - -i $srcFile -map 0:v -map 1:a ";
