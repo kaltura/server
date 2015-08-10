@@ -22,7 +22,9 @@ class AnswerCuePointService extends KalturaBaseService{
 	{
 		$cuePointService = new CuePointService();
 		$cuePointService->initService($this->serviceId,$this->serviceName, $this->actionName);
-		return $cuePointService->addAction($answerCuePoint);
+		$kalturaAnswerCuePoint = $cuePointService->addAction($answerCuePoint);
+		$kalturaAnswerCuePoint->isCorrect = null;
+		return $kalturaAnswerCuePoint;
 	}
 
 	/**
@@ -38,7 +40,9 @@ class AnswerCuePointService extends KalturaBaseService{
 	{
 		$cuePointService = new CuePointService();
 		$cuePointService->initService($this->serviceId,$this->serviceName, $this->actionName);
-		return $cuePointService->updateAction($id, $answerCuePoint);//The validation is called during the toUpdatableObject
+		$kalturaAnswerCuePoint = $cuePointService->updateAction($id, $answerCuePoint);//The validation is called during the toUpdatableObject
+		$kalturaAnswerCuePoint->isCorrect = null;
+		return $kalturaAnswerCuePoint;
 	}
 
 
