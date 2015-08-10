@@ -10,7 +10,8 @@ class KConversionEngineFfmpeg  extends KJobConversionEngine
 	const TAG_VARIANT_A = 'watermark_a';
 	const TAG_VARIANT_B = 'watermark_b';
 	const TAG_VARIANT_PAIR_ID = 'watermark_pair_';
-	
+	const TAG_NGS_STUB = "stub";
+
 	public function getName()
 	{
 		return self::FFMPEG;
@@ -494,7 +495,8 @@ $pixFmt = "yuv420p";
 				return null;
 		}
 
-//		if(isset($stub)) $stub="--stub";
+	if(strstr($data->flavorParamsOutput->tags,KConversionEngineFfmpeg::TAG_NGS_STUB)!=false)
+		$stub="--stub";
 	//$digSignStub = "-f rawvideo -pix_fmt $srcPixFmt - | $ngsBin -w $srcWid -h $srcHgt -f $srcFps $stub --$prepMode| $ffmpegBin -f rawvideo -s $srcWidx$srcHgt -r $srcFps -i - -i $srcFile -map 0:v -map 1:a ";
 $digSignStub = "-f rawvideo -pix_fmt yuv420p - | %s -w %d -h %d -f %d %s --%s| %s -f rawvideo -s %dx%d -r %d -i -";
 
