@@ -939,7 +939,7 @@ class myPartnerUtils
 		$reportFilter = new reportsInputFilter();
 		$reportFilter->from_day = str_replace('-','',$fromDate);
 		$reportFilter->to_day = str_replace('-','',$report_date);		
-		list($header, $data) = myReportsMgr::getTotal($partner->getId(), myReportsMgr::REPORT_TYPE_PARTNER_USAGE, $reportFilter);
+		list($header, $data) = myReportsMgr::getTotal($partner->getId(), myReportsMgr::REPORT_TYPE_PARTNER_USAGE, $reportFilter, $partner->getId());
 
 		$bandwidth_consumption = array_search('bandwidth_consumption', $header);
 		$deleted_storage = array_search('deleted_storage', $header);
