@@ -62,8 +62,8 @@ class AppToken extends BaseAppToken
 	
 	public function getHashType()
 	{
-		$hashFunctionId = $this->getFromCustomData(self::CUSTOM_DATA_FIELD_HASH_FUNCTION, null, 1);
-		return KalturaAppTokenHashType::$HASH_MAP[$hashFunctionId];
+		return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_HASH_FUNCTION, null, "SHA1");
+		
 	}
 
 	public function calcHash()
