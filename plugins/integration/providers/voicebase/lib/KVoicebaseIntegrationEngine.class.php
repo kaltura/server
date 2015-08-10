@@ -31,7 +31,7 @@ class KVoicebaseIntegrationEngine implements KIntegrationCloserEngine
 		$spokenLanguage = $providerData->spokenLanguage;
 		$formatsString = $providerData->captionAssetFormats;
 		$formatsArray = explode(',', $formatsString);
-	
+
 		$shouldReplaceRemoteMedia = $providerData->replaceMediaContent;
 		$fileLocation = $providerData->fileLocation;
 		$ks = $providerData->ksForExternalService; 
@@ -68,7 +68,7 @@ class KVoicebaseIntegrationEngine implements KIntegrationCloserEngine
 		{
 			return true;
 		}
-	
+
 		return false;
 	}
 	

@@ -83,7 +83,6 @@ class VoicebasePlugin extends IntegrationProviderPlugin implements IKalturaEvent
 		{
 			return 'IntegrationVoicebaseProvider';
 		}
-
 	}
 	
 	/**
@@ -99,7 +98,7 @@ class VoicebasePlugin extends IntegrationProviderPlugin implements IKalturaEvent
 	{
 		return new VoicebaseClientHelper($apiKey, $apiPassword);
 	}
-
+	
 	/**
 	 * @return VoicebaseOptions
 	 */	

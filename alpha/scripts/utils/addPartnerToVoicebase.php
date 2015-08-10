@@ -17,10 +17,5 @@
 	
 	$plugin = new VoicebasePlugin();
 	$options = new VoicebaseOptions($apiKey, $apiPassword);
-/*
-	$partner = PartnerPeer::retrieveByPK($partnerId);
-	$partner->removeFromCustomData(VoicebaseIntegrationProviderType::VOICEBASE);
-	$partner->save();
-*/	
 	$plugin->setPartnerVoicebaseOptions($partnerId, $options);
 	

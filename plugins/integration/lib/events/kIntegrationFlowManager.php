@@ -24,7 +24,7 @@ class kIntegrationFlowManager implements kBatchJobStatusEventConsumer
 		{
 			return false;
 		} 
-		 
+		
 		$closedStatusList = array(
 			BatchJob::BATCHJOB_STATUS_FINISHED,
 			BatchJob::BATCHJOB_STATUS_FAILED,
@@ -39,7 +39,7 @@ class kIntegrationFlowManager implements kBatchJobStatusEventConsumer
 	public static function addintegrationJob($objectType, $objectId, kIntegrationJobData $data) 
 	{
 		$partnerId = kCurrentContext::getCurrentPartnerId();
-
+	
 		$providerType = $data->getProviderType();
 		$integrationProviderObj = KalturaPluginManager::loadObject('IIntegrationProvider', $providerType);
 
@@ -48,7 +48,7 @@ class kIntegrationFlowManager implements kBatchJobStatusEventConsumer
 			KalturaLog::err("partner $partnerId not permitted with provider type $providerType");
 			return false;
 		}
-
+	
 		$batchJob = new BatchJob();
 		$batchJob->setPartnerId($partnerId);
 		$batchJob->setObjectType($objectType);

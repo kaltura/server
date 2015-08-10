@@ -8,7 +8,7 @@ class ExampleIntegrationPlugin extends IntegrationProviderPlugin
 	const INTEGRATION_PLUGIN_VERSION_MAJOR = 1;
 	const INTEGRATION_PLUGIN_VERSION_MINOR = 0;
 	const INTEGRATION_PLUGIN_VERSION_BUILD = 0;
-	
+
 	/* (non-PHPdoc)
 	 * @see IKalturaPlugin::getPluginName()
 	 */

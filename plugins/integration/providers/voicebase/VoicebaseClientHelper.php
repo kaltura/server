@@ -123,8 +123,7 @@ class VoicebaseClientHelper
 	}
 	
 	public function getRemoteTranscripts($entryId, array $formats)
-	{
-		
+	{	
 		$params = array("action" => "getTranscript", "externalID" => $entryId);
 		$getTranscriptUrl = $this->addUrlParams($this->baseEndpointUrl, $params);
 	
@@ -140,8 +139,7 @@ class VoicebaseClientHelper
 	}
 	
 	public function deleteRemoteFile($entryId)
-	{
-		
+	{	
 		$params = array("action" => "deleteFile", "externalID" => $entryId);
 		$deleteUrl = $this->addUrlParams($this->baseEndpointUrl, $params);
 	

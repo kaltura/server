@@ -43,12 +43,12 @@ class kVoicebaseFlowManager implements kBatchJobStatusEventConsumer
 			}
 			$transcript->setStatus(AttachmentAsset::ASSET_STATUS_QUEUED);
 			$transcript->save();
-
+	
 			return true;
 		}
 	
 		$formatsString = $providerData->getCaptionAssetFormats();		
-
+	
 		if($dbBatchJob->getStatus() == BatchJob::BATCHJOB_STATUS_FINISHED)
 		{
 			$clientHelper = VoicebasePlugin::getClientHelper($providerData->getApiKey(), $providerData->getApiPassword());
@@ -124,9 +124,9 @@ class kVoicebaseFlowManager implements kBatchJobStatusEventConsumer
 		$assetObject->setFileExt($ext);
 		$assetObject->save();
 		$syncKey = $assetObject->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
-
+	
 		kFileSyncUtils::file_put_contents($syncKey, $content); 		
-
+	
 		$finalPath = kFileSyncUtils::getLocalFilePathForKey($syncKey);
 		$assetObject->setSize(kFile::fileSize($finalPath));
 	
