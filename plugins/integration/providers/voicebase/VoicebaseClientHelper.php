@@ -56,12 +56,12 @@ class VoicebaseClientHelper
 			$adjustedLocation = "@" . $fileLocation;
 			$postParams["transcript"] = $adjustedLocation;
 			$postParams["transcriptType"] = "human";
-			$params["humanReadyCallBack"] = $callBackUrl;
+			$postParams["humanReadyCallBack"] = $callBackUrl;
 		}
 		else
 		{
 			$postParams["transcriptType"] = "machine";
-			$params["machineReadyCallBack"] = $callBackUrl;
+			$postParams["machineReadyCallBack"] = $callBackUrl;
 		}
 		$uploadAPIUrl = $this->addUrlParams($this->baseEndpointUrl, $params);
 
@@ -103,6 +103,7 @@ class VoicebaseClientHelper
 				curl_close($ch);
 				throw new Exception("json decode error with response - " . $stringResult);
 			}
+			
 		}
 		KalturaLog::debug('result is - ' . var_dump($result));
 		curl_close($ch);
@@ -123,6 +124,7 @@ class VoicebaseClientHelper
 	
 	public function getRemoteTranscripts($entryId, array $formats)
 	{
+		
 		$params = array("action" => "getTranscript", "externalID" => $entryId);
 		$getTranscriptUrl = $this->addUrlParams($this->baseEndpointUrl, $params);
 	
@@ -139,6 +141,7 @@ class VoicebaseClientHelper
 	
 	public function deleteRemoteFile($entryId)
 	{
+		
 		$params = array("action" => "deleteFile", "externalID" => $entryId);
 		$deleteUrl = $this->addUrlParams($this->baseEndpointUrl, $params);
 	

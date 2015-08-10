@@ -8,7 +8,7 @@ class ExampleIntegrationPlugin extends IntegrationProviderPlugin
 	const INTEGRATION_PLUGIN_VERSION_MAJOR = 1;
 	const INTEGRATION_PLUGIN_VERSION_MINOR = 0;
 	const INTEGRATION_PLUGIN_VERSION_BUILD = 0;
-
+	
 	/* (non-PHPdoc)
 	 * @see IKalturaPlugin::getPluginName()
 	 */
@@ -36,7 +36,15 @@ class ExampleIntegrationPlugin extends IntegrationProviderPlugin
 	{
 		return 'ExampleIntegrationProvider';
 	}
-
+	
+	/*
+	 * @return IIntegrationProvider
+	 */
+	public function getProvider()
+	{
+		return new IntegrationExampleProvider();
+	}
+	
 	/* (non-PHPdoc)
 	 * @see IKalturaObjectLoader::getObjectClass()
 	 */
@@ -57,6 +65,10 @@ class ExampleIntegrationPlugin extends IntegrationProviderPlugin
 		{
 			if($enumValue == KalturaIntegrationProviderType::EXAMPLE)
 				return 'KExampleIntegrationEngine';
+		}
+		if($baseClass == 'IIntegrationProvider' && $enumValue == self::getIntegrationProviderCoreValue(ExampleIntegrationProvider::EXAMPLE))
+		{
+			return 'IntegrationExampleProvider';
 		}
 	}
 }

@@ -9,9 +9,7 @@ class IntegrationPlugin extends KalturaPlugin implements IKalturaPermissions, IK
 	const PLUGIN_VERSION_MINOR = 0;
 	const PLUGIN_VERSION_BUILD = 0;
 	const INTEGRATION_FLOW_MANAGER = 'kIntegrationFlowManager';
-	
-	const EXTERNAL_INTEGRATION_SERVICES_ROLE_NAME = "EXTERNAL_INTEGRATION_SERVICES_ROLE";
-	
+
 	/* (non-PHPdoc)
 	 * @see IKalturaPlugin::getPluginName()
 	 */
@@ -158,29 +156,5 @@ class IntegrationPlugin extends KalturaPlugin implements IKalturaPermissions, IK
 			return new Zend_Config_Ini(dirname(__FILE__) . '/config/testme.ini');
 			
 		return null;
-	}
-	
-	/**
-	 * @return string
-	 */
-	public static function generateKs($partnerId, $entryId)
-	{
-		$partner = PartnerPeer::retrieveByPK($partnerId);
-		$userSecret = $partner->getSecret();
-	
-		//actionslimit:1
-		$privileges = kSessionBase::PRIVILEGE_SET_ROLE . ":" . self::EXTERNAL_INTEGRATION_SERVICES_ROLE_NAME;
-		$privileges .= "," . kSessionBase::PRIVILEGE_ACTIONS_LIMIT . ":1";
-		
-		$dcParams = kDataCenterMgr::getCurrentDc();
-		$token = $dcParams["secret"];
-		$additionalData = md5($entryId . $token);
-		
-		$ks = "";
-		$creationSucces = kSessionUtils::startKSession ($partnerId, $userSecret, "", $ks, 86400, KalturaSessionType::USER, "", $privileges, null,$additionalData);
-		if ($creationSucces >= 0 )	
-			return $ks;
-	
-		return false;
 	}
 }

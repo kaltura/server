@@ -14,11 +14,9 @@ class VoicebaseOptions
 	 */
 	public $apiPassword;
 	
-	function __construct($params)
+	function __construct($apiKey, $apiPassword)
 	{
-		if(isset($params['apiKey']))
-			$this->apiKey = $params['apiKey'];
-		if(isset($params['apiPassword']))
-			$this->apiPassword = $params['apiPassword'];
+		$this->apiKey = $apiKey;
+		$this->apiPassword = $apiPassword;
 	}
 }

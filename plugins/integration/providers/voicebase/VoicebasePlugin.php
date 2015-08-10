@@ -48,6 +48,15 @@ class VoicebasePlugin extends IntegrationProviderPlugin implements IKalturaEvent
 	{
 		return 'VoicebaseIntegrationProviderType';
 	}
+
+	/*
+	 * @return IIntegrationProvider
+	 */
+	public function getProvider()
+	{
+		return new IntegrationVoicebaseProvider(); 
+	}
+	
 	
 	/* (non-PHPdoc)
 	 * @see IKalturaObjectLoader::getObjectClass()
@@ -74,7 +83,7 @@ class VoicebasePlugin extends IntegrationProviderPlugin implements IKalturaEvent
 		{
 			return 'IntegrationVoicebaseProvider';
 		}
-	
+
 	}
 	
 	/**
@@ -86,14 +95,11 @@ class VoicebasePlugin extends IntegrationProviderPlugin implements IKalturaEvent
 		return kPluginableEnumsManager::apiToCore('IntegrationProviderType', $value);
 	}
 	
-	public static function getClientHelper(array $params)
+	public static function getClientHelper($apiKey, $apiPassword)
 	{
-		$apiKey = $params['apiKey'];
-		$apiPassword = $params['apiPassword'];
-		
 		return new VoicebaseClientHelper($apiKey, $apiPassword);
 	}
-	
+
 	/**
 	 * @return VoicebaseOptions
 	 */	

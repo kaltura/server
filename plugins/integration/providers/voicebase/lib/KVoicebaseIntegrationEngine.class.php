@@ -31,7 +31,7 @@ class KVoicebaseIntegrationEngine implements KIntegrationCloserEngine
 		$spokenLanguage = $providerData->spokenLanguage;
 		$formatsString = $providerData->captionAssetFormats;
 		$formatsArray = explode(',', $formatsString);
-
+	
 		$shouldReplaceRemoteMedia = $providerData->replaceMediaContent;
 		$fileLocation = $providerData->fileLocation;
 		$ks = $providerData->ksForExternalService; 
@@ -39,8 +39,9 @@ class KVoicebaseIntegrationEngine implements KIntegrationCloserEngine
 		$callBackUrl = $data->callbackNotificationBaseUrl;
 		$callBackUrl .= "/id/" . $job->id . "/ks/$ks";
 	
-		$serviceProviderParams = array('apiKey' => $providerData->apiKey , 'apiPassword' => $providerData->apiPassword);
-		$this->clientHelper = VoicebasePlugin::getClientHelper($serviceProviderParams);
+		KalturaLog::debug('callback is - ' . $callBackUrl);	
+	
+		$this->clientHelper = VoicebasePlugin::getClientHelper($providerData->apiKey, $providerData->apiPassword);
 	
 		$flavorAssetId = $this->validateFlavorAssetId($entryId, $flavorAssetId);
 		$flavorUrl = KBatchBase::$kClient->flavorAsset->getUrl($flavorAssetId);
@@ -67,7 +68,7 @@ class KVoicebaseIntegrationEngine implements KIntegrationCloserEngine
 		{
 			return true;
 		}
-
+	
 		return false;
 	}
 	

@@ -67,7 +67,7 @@ class KalturaVoicebaseJobProviderData extends KalturaIntegrationJobProviderData
 	 * @var string
 	 * @readonly
 	 */
-	public $ksForExternalService;
+	 public $ksForExternalService;
 	
 	private static $map_between_objects = array
 	(
@@ -159,10 +159,8 @@ class KalturaVoicebaseJobProviderData extends KalturaIntegrationJobProviderData
 			$fileSync = FileSyncPeer::retrieveByFileSyncKey($key, true);
 			$object->setFileLocation($fileSync->getFullPath());
 		}
-		$partner = $entry->getPartner();
-		$userSecret = $partner->getSecret();
-	
-		$ks = IntegrationPlugin::generateKs($partnerId, $entryId);
+
+		$ks = self::generateKs($partnerId, $entryId);
 		if(!ks)
 			throw new KalturaAPIException (APIErrors::START_SESSION_ERROR ,$partnerId);
 		else

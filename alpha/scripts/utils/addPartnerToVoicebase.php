@@ -15,10 +15,12 @@
 	$apiKey = $argv[3];
 	$apiPassword = $argv[4];
 	
-	$params = array('apiKey' => $apiKey, 'apiPassword' => $apiPassword);
-	
 	$plugin = new VoicebasePlugin();
-	$options = new VoicebaseOptions($params);
-	
+	$options = new VoicebaseOptions($apiKey, $apiPassword);
+/*
+	$partner = PartnerPeer::retrieveByPK($partnerId);
+	$partner->removeFromCustomData(VoicebaseIntegrationProviderType::VOICEBASE);
+	$partner->save();
+*/	
 	$plugin->setPartnerVoicebaseOptions($partnerId, $options);
 	
