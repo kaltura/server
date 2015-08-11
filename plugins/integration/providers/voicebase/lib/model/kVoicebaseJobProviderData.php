@@ -55,12 +55,6 @@ class kVoicebaseJobProviderData extends kIntegrationJobProviderData
 	private $replaceMediaContent;
 	
 	/**
-	 * restricted ks for service provider
-	 * @var string
-	 */
-	private $ksForExternalService;
-	
-	/**
 	 * @return string
 	 */
 	public function getEntryId()
@@ -202,21 +196,5 @@ class kVoicebaseJobProviderData extends kIntegrationJobProviderData
 	public function setReplaceMediaContent($replaceMediaContent)
 	{
 		$this->replaceMediaContent = $replaceMediaContent;
-	}
-	
-	/**
-	 * @return string
-	 */
-	public function getKsForExternalService()
-	{
-		return $this->ksForExternalService;
-	}
-	
-	/**
-	 * @param string $ksForExternalService
-	 */
-	public function setKsForExternalService($ksForExternalService)
-	{
-		$this->ksForExternalService = $ksForExternalService;
 	}
 }

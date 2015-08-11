@@ -26,6 +26,12 @@ class kIntegrationJobData extends kJobData
 	private $triggerType;
 	
 	/**
+	 * restricted ks for service provider
+	 * @var string
+	 */
+	private $ksForExternalService;
+	
+	/**
 	 * @return IntegrationProviderType
 	 */
 	public function getProviderType()
@@ -87,5 +93,21 @@ class kIntegrationJobData extends kJobData
 	public function setTriggerData(kIntegrationJobTriggerData $triggerData)
 	{
 		$this->triggerData = $triggerData;
+	}
+	
+	/**
+	 * @return string
+	 */
+	public function getKsForExternalService()
+	{
+		return $this->ksForExternalService;
+	}
+	
+	/**
+	 * @param string $ksForExternalService
+	 */
+	public function setKsForExternalService($ksForExternalService)
+	{
+		$this->ksForExternalService = $ksForExternalService;
 	}
 }

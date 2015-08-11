@@ -34,7 +34,7 @@ class KVoicebaseIntegrationEngine implements KIntegrationCloserEngine
 
 		$shouldReplaceRemoteMedia = $providerData->replaceMediaContent;
 		$fileLocation = $providerData->fileLocation;
-		$ks = $providerData->ksForExternalService; 
+		$ks = $data->ksForExternalService; 
 	
 		$callBackUrl = $data->callbackNotificationBaseUrl;
 		$callBackUrl .= "/id/" . $job->id . "/ks/$ks";

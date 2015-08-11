@@ -62,13 +62,6 @@ class KalturaVoicebaseJobProviderData extends KalturaIntegrationJobProviderData
 	 */
 	public $replaceMediaContent;
 	
-	/**
-	 * restricted ks for service provider
-	 * @var string
-	 * @readonly
-	 */
-	 public $ksForExternalService;
-	
 	private static $map_between_objects = array
 	(
 		"entryId",
@@ -80,7 +73,6 @@ class KalturaVoicebaseJobProviderData extends KalturaIntegrationJobProviderData
 		"spokenLanguage",
 		"fileLocation",
 		"replaceMediaContent",
-		"ksForExternalService"
 	);
 	
 	/* (non-PHPdoc)
@@ -159,12 +151,6 @@ class KalturaVoicebaseJobProviderData extends KalturaIntegrationJobProviderData
 			$fileSync = FileSyncPeer::retrieveByFileSyncKey($key, true);
 			$object->setFileLocation($fileSync->getFullPath());
 		}
-
-		$ks = self::generateKs($partnerId, $entryId);
-		if(!ks)
-			throw new KalturaAPIException (APIErrors::START_SESSION_ERROR ,$partnerId);
-		else
-			$object->setKsForExternalService($ks);
 		
 		return $object;
 	}

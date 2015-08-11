@@ -32,10 +32,18 @@ class KalturaIntegrationJobData extends KalturaJobData
 	 */
 	public $triggerData;
 	
+	/**
+	 * restricted ks for service provider
+	 * @var string
+	 * @readonly
+	 */
+	public $ksForExternalService;
+	
 	private static $map_between_objects = array
 	(
 		"providerType" ,
 		"triggerType" ,
+		"ksForExternalService"
 	);
 
 	public function __construct($subType = null)
@@ -107,7 +115,7 @@ class KalturaIntegrationJobData extends KalturaJobData
 				$object->setTriggerData($triggerData);
 			}
 		}
-		
+
 		return $object;
 	}
 	

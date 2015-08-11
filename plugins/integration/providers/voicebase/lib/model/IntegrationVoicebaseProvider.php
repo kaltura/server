@@ -13,4 +13,13 @@ class IntegrationVoicebaseProvider implements IIntegrationProvider
 	{
 		return PermissionPeer::isAllowedPlugin(VoicebasePlugin::getPluginName(), $partnerId);
 	}
+	
+	/* (non-PHPdoc)
+	 * @see IIntegrationProvider::shouldSendCallBack()
+	 * @return bool
+	 */
+	public static function shouldSendCallBack()
+	{
+		return true;
+	}
 }

@@ -3,7 +3,7 @@
  * @package plugins.exampleIntegration
  * @subpackage lib.enum
  */
-class ExampleIntegrationProvider implements IKalturaPluginEnum, IntegrationProviderType
+class ExampleIntegrationProviderType implements IKalturaPluginEnum, IntegrationProviderType
 {
 	const EXAMPLE = 'Example';
 	
