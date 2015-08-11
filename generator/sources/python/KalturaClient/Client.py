@@ -72,9 +72,6 @@ class PluginServicesProxy(object):
         setattr(self, serviceName, serviceClass)
 
 class KalturaClient(object):
-    METHOD_POST = 0
-    METHOD_GET = 1
-
     RANDOM_SIZE = 16
 
     FIELD_EXPIRY =              '_e'
@@ -88,8 +85,6 @@ class KalturaClient(object):
         self.shouldLog = False
         self.multiRequestReturnType = None
         self.callsQueue = []
-
-        self.method = KalturaClient.METHOD_POST
         self.requestHeaders = {}
 
         self.config = config
@@ -164,7 +159,7 @@ class KalturaClient(object):
         self.callsQueue = []
 
         if params != None:
-            result += '&' + urllib.urlencode(params.get())
+            result += '?' + urllib.urlencode(params.get())
         self.log("Returned url [%s]" % result)
         return result        
         
@@ -204,11 +199,7 @@ class KalturaClient(object):
         signature = params.signature()
         params.put("kalsig", signature)
 
-        if self.method == KalturaClient.METHOD_GET and len(files.get()) == 0:
-            url += '&' + urllib.urlencode(params.get())
-            params = None
-
-        self.log("request url: [%s]" % url)
+        self.log("request url: [%s]" % (url + '?' + urllib.urlencode(params.get())))
 
         return (url, params, files)
 
