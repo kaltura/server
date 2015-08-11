@@ -3,16 +3,12 @@
 require(__DIR__ . '/IndexableField.php');
 require(__DIR__ . '/IndexableObject.php');
 require(__DIR__ . '/IndexableOptimization.php');
+require(__DIR__ . '/IndexGeneratorBase.php');
 
 require_once(__DIR__ . '/../../../bootstrap.php');
 
-class IndexObjectsGenerator  
+class IndexObjectsGenerator extends IndexGeneratorBase
 {
-	private $searchableObjects = array();	
-	private $searchableFields = array();
-	private $searchableIndices = array();
-	private $indexFiles = array();
-	
 	public function generateIndexFiles($keys, $dirname)
 	{
 		foreach($keys as $key) {
@@ -51,6 +47,8 @@ class IndexObjectsGenerator
 		$this->generateMapping("getIndexOrderList", $fp, $key, "orderFields");
 		$this->generateMapping("getIndexSkipFieldsList", $fp, $key, "skipFields");
 		$this->generateMapping("getSphinxConditionsToKeep", $fp, $key, "conditionToKeep");
+		$this->generateMapping("getApiCompareAttributesMap", $fp, $key, "apiCompareAttributesMap");
+		$this->generateMapping("getApiMatchAttributesMap", $fp, $key, "apiMatchAttributesMap");
 		
 		$this->generateIndexMapping("getSphinxOptimizationMap", $fp, $key, "name");
 		$this->generateIndexMapping("getSphinxOptimizationValues", $fp, $key, "getter");
@@ -61,133 +59,7 @@ class IndexObjectsGenerator
 		
 		fclose($fp);
 	}
-	
-	public function load($inputFile)
-	{
-		$objects = array();
-		if (!file_exists ($inputFile))
-		{
-			KalturaLog::err ("input file ". $inputFile ." not found");
-			exit(1);
-		}
-		
-		$inputXml = file_get_contents($inputFile);
-		$xml = new SimpleXMLElement($inputXml);
-		foreach($xml->children() as $searchableObject) {
-			$objectAttribtues = $searchableObject->attributes();
-			$objName = $objectAttribtues["name"];
-			
- 			$this->parseObject("$objName", $objectAttribtues);
- 			$this->searchableIndices["$objName"] = array();
- 			
-			foreach($searchableObject->children() as $type => $searchableField) {
-				switch($type) {
-					case "field":
-						$this->parseField("$objName", $searchableField);
-						break;
-					case "index":
-						$this->parseIndex("$objName", $searchableField);
-						break;
-				}
-			}
-			$objects[] = "$objName";
-		}
-		return $objects;
-	}
-	
-	private function parseObject($objName, $objectAttribtues) {
-		$object = new IndexableObject($objName);
-		if(isset($objectAttribtues["indexId"]))
-			$object->setIndexId($objectAttribtues["indexId"]);
-		if(isset($objectAttribtues["objectId"]))
-			$object->setObjectId($objectAttribtues["objectId"]);
-		if(isset($objectAttribtues["id"]))
-			$object->setId($objectAttribtues["id"]);
-		
-		if(isset($objectAttribtues["peerName"])) {
-			$object->setPeerName($objectAttribtues["peerName"]);
-		} else {
-			$object->setPeerName($objName . "Peer");
-		}
-		
-		if(isset($objectAttribtues["indexName"])) {
-			$object->setIndexName($objectAttribtues["indexName"]);
-		} else {
-			$indexName = strtolower(preg_replace('/([a-z])([A-Z])/', '$1_$2', $objName));
-			$object->setIndexName($indexName);
-		}
-		
-		$this->searchableObjects[$objName] = $object;
-	}
-	
-	private function parseField($objName, $searchableField) 
-	{
-		$fieldAttribtues = $searchableField->attributes();
-		$name = $fieldAttribtues["name"];
-		$index = $fieldAttribtues["indexName"];
-		$type = $fieldAttribtues["type"];
-		$field = new IndexableField("$name", "$index", "$type");
-		
-		$field->setGetter(isset($fieldAttribtues["getter"]) ? $fieldAttribtues["getter"] :
-				preg_replace('/_(.?)/e',"strtoupper('$1')","$name"));
-		
-		if(isset($fieldAttribtues["nullable"]))
-			$field->setNullable($fieldAttribtues["nullable"] == "yes");
-		
-		if(isset($fieldAttribtues["orderable"]))
-			$field->setOrderable($fieldAttribtues["orderable"] == "yes");
-		
-		if(isset($fieldAttribtues["searchableonly"]))
-			$field->setSearchOnly($fieldAttribtues["searchableonly"] == "yes");
-		
-		if(isset($fieldAttribtues["skipField"]))
-			$field->setSkipField($fieldAttribtues["skipField"] == "yes");
-		
-		if(isset($fieldAttribtues["matchable"]))
-			$field->setMatchable($fieldAttribtues["matchable"] == "yes");
-		
-		if(isset($fieldAttribtues["indexEscapeType"]))
-			$field->setIndexEscapeType($fieldAttribtues["indexEscapeType"]);
-		
-		if(isset($fieldAttribtues["searchEscapeType"]))
-			$field->setSearchEscapeType($fieldAttribtues["searchEscapeType"]);
-		
-		if(isset($fieldAttribtues["keepCondition"]))
-			$field->setKeepCondition($fieldAttribtues["keepCondition"] == "yes");
-		
-		if(isset($fieldAttribtues["sphinxStringAttribute"])) {
-			$sphinxType = $fieldAttribtues["sphinxStringAttribute"];
-			$field->setSphinxStringAttribute("$sphinxType");
-		}
-		
-		$this->searchableFields[$objName]["$name"] = $field;
-	}
-	
-	private function parseIndex($objName, $indexComplex)
-	{
-		$index = array();
-		$fieldAttribtues = $indexComplex->attributes();
-		$format = $fieldAttribtues["format"];
-		$index[] = "\"$format\"";
-		foreach($indexComplex->children() as $indexValue) {
-			$idxValueAttr = $indexValue->attributes();
-			$fieldName = $idxValueAttr["field"];
-			$getter = array_key_exists("getter", $idxValueAttr) ? $idxValueAttr["getter"] :
-				"get" . ucwords(preg_replace('/_(.?)/e',"strtoupper('$1')", $fieldName));
-			if(strpos($fieldName, ".") === FALSE)
-				$fieldName = $this->toPeerName($this->searchableObjects[$objName], $fieldName);
-			
-			$index[] = new IndexableOptimization('"' . $fieldName . '"', '"' . $getter . '"');
-		}
-		
-		$this->searchableIndices[$objName][] = $index;
-	}
-	
-	private function toPeerName($object, $field) {
-		$indexName = strtolower(preg_replace('/([a-z])([A-Z])/', '$1_$2', $object->name));
-		return $indexName . "." . strtoupper($field);
-	}
-	
+
 	private function createFileHeader($fp, $class) {
 		$this->printToFile($fp, "<?php");
 		$this->printToFile($fp, "");
@@ -232,7 +104,7 @@ class IndexObjectsGenerator
 				$this->printToFile($fp, "const " . strtoupper($key) . " = \"$key\";\n" ,1);
 	}
 	
-	private function generateSimpleFunction($functionName, $fp, $object) {
+	private function generateSimpleFunction($functionName, $fp, IndexableObject $object) {
 		$callback = array("IndexObjectsGenerator", $functionName);
 		$this->printToFile($fp, "public static function {$functionName}()",1);
 		$this->printToFile($fp, "{",1);
@@ -241,21 +113,21 @@ class IndexObjectsGenerator
 		$this->printToFile($fp, "");
 	}
 	
-	private function getObjectName($fp, $object) {
+	private function getObjectName($fp, IndexableObject $object) {
 		$indexName = strtolower(preg_replace('/([a-z])([A-Z])/', '$1_$2', $object->name));
 		$this->printToFile($fp, "return '$indexName';",2);
 	}
 	
-	private function getObjectIndexName($fp, $object) {
+	private function getObjectIndexName($fp, IndexableObject $object) {
 		$this->printToFile($fp, "return '" . $object->indexName . "';",2);
 	}
 	
-	private function getIndexFieldsMap($fp, $object, $key , $value) {
+	private function getIndexFieldsMap($fp, IndexableObject $object, $key, IndexableField $value) {
 		if(!$value->searchOnly)
 			$this->printToFile($fp, "'" . $value->indexName . "' => '" . $value->getter . "',",4);
 	}
 	
-	private function getIndexFieldTypesMap($fp, $obejct, $key , $value) {
+	private function getIndexFieldTypesMap($fp, $obejct, $key, IndexableField $value) {
 		$type = null;
 		switch($value->type) {
 			case "string":
@@ -277,33 +149,33 @@ class IndexObjectsGenerator
 			$this->printToFile($fp, "'" . $value->indexName . "' => " . $type . ",",4);
 	}
 	
-	private function getIndexSearchableFieldsMap($fp, $object, $key , $value) {
+	private function getIndexSearchableFieldsMap($fp, IndexableObject $object, $key, IndexableField $value) {
 		$objectField = $this->toPeerName($object, $key);
 		$this->printToFile($fp, "'" .  $objectField . "' => '" . $value->indexName . "',",4);
 	}
 	
-	private function getIndexOrderList($fp, $object, $key , $value) {
+	private function getIndexOrderList($fp, IndexableObject $object, $key, IndexableField $value) {
 		$objectField = $this->toPeerName($object, $key);
 		if($value->orderable)
 			$this->printToFile($fp, "'" .  $objectField . "' => '" . $value->indexName . "',",4);
 	}
 	
-	private function getIndexNullableList($fp, $object, $key , $value) {
+	private function getIndexNullableList($fp, IndexableObject $object, $key, IndexableField $value) {
 		if($value->nullable)
 			$this->printToFile($fp, "'" . $value->indexName . "',",4);
 	}
 	
-	private function getIndexMatchableList($fp, $object, $key , $value) {
+	private function getIndexMatchableList($fp, IndexableObject $object, $key, IndexableField $value) {
 		if($value->matchable)
 			$this->printToFile($fp, "\"" . $key . "\",",4);
 	}
 	
-	private function getIndexSkipFieldsList($fp, $object, $key , $value) {
+	private function getIndexSkipFieldsList($fp, IndexableObject $object, $key, IndexableField $value) {
 		if($value->skipField) 
 			$this->printToFile($fp, "'" . $this->toPeerName($object, $key) . "',",4);
 	}
 	
-	private function getIndexFieldsEscapeTypeList($fp, $object, $key , $value) {
+	private function getIndexFieldsEscapeTypeList($fp, IndexableObject $object, $key, IndexableField $value) {
 		
 		$val = $value->indexEscapeType;
 		if(!is_null($val)) {
@@ -326,7 +198,7 @@ class IndexObjectsGenerator
 		}
 	}
 	
-	private function getSearchFieldsEscapeTypeList($fp, $object, $key , $value) {
+	private function getSearchFieldsEscapeTypeList($fp, IndexableObject $object, $key, IndexableField $value) {
 	
 		$val = $value->searchEscapeType;
 		if(!is_null($val)) {
@@ -349,27 +221,37 @@ class IndexObjectsGenerator
 		}
 	}
 	
-	private function getSphinxConditionsToKeep($fp, $object, $key , $value) {
+	private function getSphinxConditionsToKeep($fp, IndexableObject $object, $key, IndexableField $value) {
 		if($value->keepCondition) 
 			$this->printToFile($fp, "'" . $this->toPeerName($object, $key) . "',",4);
 	}
+
+	private function getApiCompareAttributesMap($fp, IndexableObject $object, $key, IndexableField $value) {
+		if($value->apiName && in_array($value->type, array('int', 'bint', 'datetime')))
+			$this->printToFile($fp, "'" .  $value->apiName . "' => '" . $value->indexName . "',",4);
+	}
+
+	private function getApiMatchAttributesMap($fp, IndexableObject $object, $key, IndexableField $value) {
+		if($value->apiName && $value->type == 'string')
+			$this->printToFile($fp, "'" . $value->apiName . "' => '" . $value->indexName . "',",4);
+	}
 	
-	private function getSphinxIdField($fp, $object) {
+	private function getSphinxIdField($fp, IndexableObject $object) {
 		$this->printToFile($fp, "return '" . $object->indexId . "';",2);
 	}
 	
-	private function getPropelIdField($fp, $object) {
+	private function getPropelIdField($fp, IndexableObject $object) {
 		$this->printToFile($fp, "return " . $object->peerName . "::" . $object->objectId . ";",2);
 	}
 	
-	private function getIdField($fp, $object) {
+	private function getIdField($fp, IndexableObject $object) {
 		if(is_null($object->id))
 			$this->printToFile($fp, "return null;",2);
 		else
 			$this->printToFile($fp, "return " . $object->peerName . "::" . $object->id . ";",2);
 	}
 	
-	private function getDefaultCriteriaFilter($fp, $object) {
+	private function getDefaultCriteriaFilter($fp, IndexableObject $object) {
 		$this->printToFile($fp, "return " . $object->peerName . "::getCriteriaFilter();",2);
 	}
 	
@@ -380,11 +262,7 @@ class IndexObjectsGenerator
 		$this->printToFile($fp, "}",1);
 		$this->printToFile($fp, "");
 	}
-	
-	private function printToFile($fp, $string, $tabs = 0) {
-		fwrite($fp, str_repeat("\t",$tabs) . $string . "\n");
-	}
-	
+
 	private function generateIndexMapping($function, $fp, $key, $field) {
 		$this->printToFile($fp, "public static function $function()",1);
 		$this->printToFile($fp, "{",1);

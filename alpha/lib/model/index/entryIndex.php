@@ -305,11 +305,11 @@ class entryIndex extends BaseIndexObject
 				"replacing_entry_id",
 				"replaced_entry_id",
 				"roots",
+				"entitled_kusers_publish",
+				"entitled_kusers_edit",
 				"dynamic_attributes",
 				"plugins_data",
 				"search_text",
-				"entitled_kusers_edit",
-				"entitled_kusers_publish",
 			);
 		}
 		return self::$matchableFields;
@@ -376,6 +376,64 @@ class entryIndex extends BaseIndexObject
 			);
 		}
 		return self::$conditionToKeep;
+	}
+
+	protected static $apiCompareAttributesMap;
+
+	public static function getApiCompareAttributesMap()
+	{
+		if (!self::$apiCompareAttributesMap)
+		{
+			self::$apiCompareAttributesMap = array(
+				'status' => 'entry_status',
+				'type' => 'type',
+				'mediaType' => 'media_type',
+				'views' => 'views',
+				'partnerId' => 'partner_id',
+				'moderationStatus' => 'moderation_status',
+				'msDuration' => 'length_in_msecs',
+				'accessControlId' => 'access_control_id',
+				'moderationCount' => 'moderation_count',
+				'rank' => 'rank',
+				'totalRank' => 'total_rank',
+				'plays' => 'plays',
+				'partnerSortValue' => 'partner_sort_value',
+				'replacementStatus' => 'replacement_status',
+				'createdAt' => 'created_at',
+				'updatedAt' => 'updated_at',
+				'mediaDate' => 'media_date',
+				'startDate' => 'start_date',
+				'endDate' => 'end_date',
+				'lastPlayedAt' => 'last_played_at',
+			);
+		}
+		return self::$apiCompareAttributesMap;
+	}
+
+	protected static $apiMatchAttributesMap;
+
+	public static function getApiMatchAttributesMap()
+	{
+		if (!self::$apiMatchAttributesMap)
+		{
+			self::$apiMatchAttributesMap = array(
+				'id' => 'entry_id',
+				'name' => 'name',
+				'tags' => 'tags',
+				'categoriesIds' => 'categories',
+				'flavorParamsIds' => 'flavor_params',
+				'groupId' => 'group_id',
+				'description' => 'description',
+				'adminTags' => 'admin_tags',
+				'durationType' => 'duration_type',
+				'referenceId' => 'reference_id',
+				'replacingEntryId' => 'replacing_entry_id',
+				'replacedEntryId' => 'replaced_entry_id',
+				'userId' => 'puser_id',
+				'creatorId' => 'creator_puser_id',
+			);
+		}
+		return self::$apiMatchAttributesMap;
 	}
 
 	public static function getSphinxOptimizationMap()
