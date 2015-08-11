@@ -14,7 +14,7 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 	 */
 	private $_doc = null;
 	private $_csprojIncludes = array ();
-	protected $_baseClientPath = "src/com/kaltura/client";
+	protected $_baseClientPath = "src/main/java/com/kaltura/client";
 	protected $_usePrivateAttributes;
 	
 	function __construct($xmlPath, Zend_Config $config, $sourcePath = "sources/java")
