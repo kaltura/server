@@ -16,7 +16,6 @@ config = ConfigParser.ConfigParser()
 config.read(filename)
 PARTNER_ID = config.getint("Test", "partnerId")
 SERVICE_URL = config.get("Test", "serviceUrl")
-SECRET = config.get("Test", "secret")
 ADMIN_SECRET = config.get("Test", "adminSecret")
 USER_NAME = config.get("Test", "userName")
 
