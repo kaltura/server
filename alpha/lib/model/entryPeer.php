@@ -25,6 +25,9 @@ class entryPeer extends BaseentryPeer
 	private static $accessControlScope;
 
 	private static $kuserBlongToMoreThanMaxCategoriesForSearch = false;
+	
+	private static $lastInitializedContext = null; // last initialized security context (ks + partner id)
+	private static $validatedEntries = array();
 
 	// cache classes by their type
 	private static $class_types_cache = array(
@@ -796,29 +799,46 @@ class entryPeer extends BaseentryPeer
 		return entryPeer::doSelect($criteria, $con);
 	}
 
+	public static function addValidatedEntry($entryId)
+	{
+		$securityContext = array(kCurrentContext::$partner_id, kCurrentContext::$ks);
+		if (self::$lastInitializedContext && self::$lastInitializedContext !== $securityContext) {
+			KalturaLog::log('Reinitalized security context');
+			self::$validatedEntries = array();
+		}
+		
+		self::$validatedEntries[] = $entryId;
+	}
+
 	public static function filterEntriesByPartnerOrKalturaNetwork(array $entryIds, $partnerId)
 	{
-		$entryIds = array_slice($entryIds, 0, baseObjectFilter::getMaxInValues());
-		
-		$c = KalturaCriteria::create(entryPeer::OM_CLASS);
-		$c->addAnd(entryPeer::ID, $entryIds, Criteria::IN);
-		
-		if($partnerId >= 0)
+		KalturaLog::debug("Valid enties: " . implode(',', self::$validatedEntries));
+		$validatedEntries = array_intersect($entryIds, self::$validatedEntries);
+		$entryIds = array_diff($entryIds, self::$validatedEntries);
+		KalturaLog::debug("More enties to validate: " . implode(',', $entryIds));
+		if(count($entryIds))
 		{
-			$criterionPartnerOrKn = $c->getNewCriterion(entryPeer::PARTNER_ID, $partnerId);
-			$criterionPartnerOrKn->addOr($c->getNewCriterion(entryPeer::DISPLAY_IN_SEARCH, mySearchUtils::DISPLAY_IN_SEARCH_KALTURA_NETWORK));
-			$c->addAnd($criterionPartnerOrKn);
+			$entryIds = array_slice($entryIds, 0, baseObjectFilter::getMaxInValues());
+			
+			$c = KalturaCriteria::create(entryPeer::OM_CLASS);
+			$c->addAnd(entryPeer::ID, $entryIds, Criteria::IN);
+			
+			if($partnerId >= 0)
+			{
+				$criterionPartnerOrKn = $c->getNewCriterion(entryPeer::PARTNER_ID, $partnerId);
+				$criterionPartnerOrKn->addOr($c->getNewCriterion(entryPeer::DISPLAY_IN_SEARCH, mySearchUtils::DISPLAY_IN_SEARCH_KALTURA_NETWORK));
+				$c->addAnd($criterionPartnerOrKn);
+			}
+	
+			$dbEntries = self::doSelect($c);
+	
+			foreach ($dbEntries as $dbEntry)
+			{
+				$validatedEntries[] = $dbEntry->getId();
+			}
 		}
 
-		$dbEntries = self::doSelect($c);
-
-		$entryIds = array();
-		foreach ($dbEntries as $dbEntry)
-		{
-			$entryIds[] = $dbEntry->getId();
-		}
-
-		return $entryIds;
+		return $validatedEntries;
 	}
 
 }
