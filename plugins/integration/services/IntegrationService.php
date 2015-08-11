@@ -90,14 +90,10 @@ class IntegrationService extends KalturaBaseService
 	
 	public static function validateKs($job)
 	{	
-		$data = $job->getData();
-		$providerData = $data->getProviderData();
-		$entryId = $providerData->getEntryId();
-		
 		$dcParams = kDataCenterMgr::getCurrentDc();
 		$token = $dcParams["secret"];
 		
-		$createdString = md5($entryId . $token);
+		$createdString = md5($job->getId() . $token);
 		
 		$ks = kCurrentContext::$ks_object;
 		if($createdString == $ks->additional_data)

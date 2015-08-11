@@ -36,7 +36,7 @@ class ExampleIntegrationPlugin extends IntegrationProviderPlugin
 	{
 		return 'ExampleIntegrationProviderType';
 	}
-
+	
 	/*
 	 * @return IIntegrationProvider
 	 */
@@ -44,7 +44,7 @@ class ExampleIntegrationPlugin extends IntegrationProviderPlugin
 	{
 		return new IntegrationExampleProvider();
 	}
-
+	
 	/* (non-PHPdoc)
 	 * @see IKalturaObjectLoader::getObjectClass()
 	 */

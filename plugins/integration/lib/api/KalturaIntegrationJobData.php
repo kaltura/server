@@ -115,7 +115,7 @@ class KalturaIntegrationJobData extends KalturaJobData
 				$object->setTriggerData($triggerData);
 			}
 		}
-
+		
 		return $object;
 	}
 	
