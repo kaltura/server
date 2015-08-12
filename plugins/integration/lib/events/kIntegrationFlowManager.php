@@ -26,7 +26,7 @@ class kIntegrationFlowManager implements kBatchJobStatusEventConsumer
 		{
 			return false;
 		} 
-		
+		 
 		$closedStatusList = array(
 			BatchJob::BATCHJOB_STATUS_FINISHED,
 			BatchJob::BATCHJOB_STATUS_FAILED,
@@ -41,16 +41,16 @@ class kIntegrationFlowManager implements kBatchJobStatusEventConsumer
 	public static function addintegrationJob($objectType, $objectId, kIntegrationJobData $data) 
 	{
 		$partnerId = kCurrentContext::getCurrentPartnerId();
-	
+		
 		$providerType = $data->getProviderType();
-		$integrationProviderObj = KalturaPluginManager::loadObject('IIntegrationProvider', $providerType);
+		$integrationProvider = KalturaPluginManager::loadObject('IIntegrationProvider', $providerType);
 
-		if($integrationProviderObj && !$integrationProviderObj->validatePermissions($partnerId))
+		if(!$integrationProvider || !$integrationProvider->validatePermissions($partnerId))
 		{
 			KalturaLog::err("partner $partnerId not permitted with provider type $providerType");
 			return false;
 		}
-	
+		
 		$batchJob = new BatchJob();
 		$batchJob->setPartnerId($partnerId);
 		$batchJob->setObjectType($objectType);
@@ -72,11 +72,17 @@ class kIntegrationFlowManager implements kBatchJobStatusEventConsumer
 		$jobType = IntegrationPlugin::getBatchJobTypeCoreValue(IntegrationBatchJobType::INTEGRATION);
 		$batchJob = kJobsManager::addJob($batchJob, $data, $jobType, $providerType);
 		
-		if($integrationProviderObj && $integrationProviderObj->shouldSendCallBack())
+		if($integrationProvider->shouldSendCallBack())
 		{
-			$ks = self::generateKs($partnerId, $batchJob->getId());
+			$jobId = $batchJob->getId();
+			$ks = self::generateKs($partnerId, $jobId);
+
+			$callBackUrl = "http://" . kConf::get('cdn_api_host');
+			$callBackUrl .= "/api_v3/index.php/service/integration_integration/action/notify";
+			$callBackUrl .= "/id/$jobId/ks/$ks";
+
 			$data = $batchJob->getData();
-			$data->setKsForExternalService($ks);
+			$data->setCallbackNotificationUrl($callBackUrl);
 			$batchJob->setData($data);
 		}
 		

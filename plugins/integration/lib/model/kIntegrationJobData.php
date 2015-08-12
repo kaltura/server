@@ -6,6 +6,11 @@
 class kIntegrationJobData extends kJobData
 {
 	/**
+	 * @var string
+	 */
+	private $callbackNotificationUrl;
+
+	/**
 	 * @var kIntegrationJobProviderData
 	 */
 	private $providerData;
@@ -26,10 +31,20 @@ class kIntegrationJobData extends kJobData
 	private $triggerType;
 	
 	/**
-	 * restricted ks for service provider
-	 * @var string
+	 * @return string
 	 */
-	private $ksForExternalService;
+	public function getCallbackNotificationUrl()
+	{
+		return $this->callbackNotificationUrl;
+	}
+	
+	/**
+	 * @param string $callbackNotificationUrl
+	 */
+	public function setCallbackNotificationUrl($callbackNotificationUrl)
+	{
+		$this->callbackNotificationUrl = $callbackNotificationUrl;
+	}
 	
 	/**
 	 * @return IntegrationProviderType
@@ -93,21 +108,5 @@ class kIntegrationJobData extends kJobData
 	public function setTriggerData(kIntegrationJobTriggerData $triggerData)
 	{
 		$this->triggerData = $triggerData;
-	}
-	
-	/**
-	 * @return string
-	 */
-	public function getKsForExternalService()
-	{
-		return $this->ksForExternalService;
-	}
-	
-	/**
-	 * @param string $ksForExternalService
-	 */
-	public function setKsForExternalService($ksForExternalService)
-	{
-		$this->ksForExternalService = $ksForExternalService;
 	}
 }
