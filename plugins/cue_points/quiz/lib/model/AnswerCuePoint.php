@@ -84,6 +84,7 @@ class AnswerCuePoint extends CuePoint implements IMetadataObject
 		if ($this->isCustomDataModified(AnswerCuePoint::CUSTOM_DATA_ANSWER_KEY))
 		{
 			$this->setIsCorrect(in_array($this->getAnswerKey(), $this->getCorrectAnswerKeys()));
+			$this->setCustomDataObj();
 		}
 		return parent::preSave($con);
 	}
