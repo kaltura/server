@@ -27,6 +27,10 @@ class QuizUserEntryService extends KalturaBaseService{
 		{
 			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_TYPE, $dbUserEntry->getType());
 		}
+		if ($dbUserEntry->getStatus() == QuizPlugin::getCoreValue('UserEntryStatus', QuizUserEntryStatus::QUIZ_SUBMITTED))
+		{
+			throw new KalturaAPIException(KalturaQuizErrors::USER_ENTRY_QUIZ_ALREADY_SUBMITTED);
+		}
 		/**
 		 * @var QuizUserEntry $dbUserEntry
 		 */

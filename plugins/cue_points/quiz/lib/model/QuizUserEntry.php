@@ -23,39 +23,53 @@ class QuizUserEntry extends UserEntry{
 	public function getScore(){ return $this->getFromCustomData("score");}
 
 	/**
-	 * @param $entryId
 	 * @return int
 	 */
 	public function calculateScore()
 	{
 		$finalScore = 0;
-		$answerType = QuizPlugin::getCuePointTypeCoreValue(QuizCuePointType::QUIZ_ANSWER);
-		$answers = CuePointPeer::retrieveByEntryId($this->getEntryId(), array($answerType));
-		foreach ($answers as $answer)
+		$questionType = QuizPlugin::getCuePointTypeCoreValue(QuizCuePointType::QUIZ_QUESTION);
+		$questions = CuePointPeer::retrieveByEntryId($this->getEntryId(), array($questionType));
+		$totalPoints = 0;
+		$userPoints = 0;
+		foreach ($questions as $question)
 		{
-			/**
-			 * @var AnswerCuePoint $answer
-			 */
-			$question = CuePointPeer::retrieveByPK($answer->getParentId());
 			/**
 			 * @var QuestionCuePoint $question
 			 */
+			$answersCrit = new Criteria();
+			$answersCrit->add(CuePointPeer::ENTRY_ID,$this->getEntryId());
+			$answersCrit->add(CuePointPeer::PARENT_ID, $question->getId());
+			$answers = CuePointPeer::doSelect($answersCrit);
+			$currAnswer = null;
+			foreach ($answers as $answer)
+			{
+				/**
+				 * @var AnswerCuePoint $answer
+				 */
+				if ($answer->getQuizUserEntryId() == $this->id)
+				{
+					$currAnswer = $answer;
+					break;
+				}
+			}
 			$optionalAnswers = $question->getOptionalAnswers();
 			foreach ($optionalAnswers as $optionalAnswer)
 			{
 				/**
 				 * @var kOptionalAnswer $optionalAnswer
 				 */
-				if ($optionalAnswer->getKey() === $answer->getAnswerKey())
+				if ($optionalAnswer->getIsCorrect())
 				{
-					if ($optionalAnswer->getIsCorrect())
+					$totalPoints += $optionalAnswer->getWeight();
+					if ($currAnswer && ($optionalAnswer->getKey() == $currAnswer->getAnswerKey()) )
 					{
-						$finalScore += $optionalAnswer->getWeight();
+						$userPoints += $optionalAnswer->getWeight();
 					}
 				}
 			}
 		}
-		return $finalScore;
+		return $totalPoints?($userPoints/$totalPoints):0;
 	}
 
 }
