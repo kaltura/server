@@ -67,6 +67,8 @@ usort($services, "compareServicesByName");
 	<script type="text/javascript" src="js/kField.js"></script>
 	<script type="text/javascript" src="js/kDialog.js"></script>
 	<script type="text/javascript" src="js/kTestMe.js"></script>
+	<script type="text/javascript" src="js/ace-builds/src/ace.js"></script>
+	<script type="text/javascript" src="js/kPrettify.js"></script>
 	<!-- script type="text/javascript" src="js/kHttpSpy.js"></script -->
 	<script type="text/javascript">
 		<?php
@@ -81,6 +83,72 @@ usort($services, "compareServicesByName");
                 echo "kTestMe.registerService(\"$serviceId\", \"$serviceName\", \"$pluginName\", $deprecated);\n";
             }
         ?>
+	</script>
+	<script type="text/javascript">
+		$(document).ready(function() {
+			var myframe = document.getElementById('hiddenResponse');
+
+			if (myframe.attachEvent) {
+				myframe.attachEvent('onload', function(){handleResponse();});
+
+			} else {
+				myframe.onload = function(){handleResponse();};
+			}
+		});
+
+
+		function handleResponse(){
+			var myframe = document.getElementById('hiddenResponse');
+			var doc = ( myframe.contentDocument || myframe.contentWindow.document);
+
+			var formatSelector = document.getElementsByName('format');
+			var format = 'XML';
+			if (formatSelector && formatSelector.length > 0){
+				format = formatSelector[0].options[formatSelector[0].selectedIndex].text;
+			}
+			var text ="";
+			if ( format == 'JSON' &&
+				typeof doc.body != 'undefined' &&
+				typeof doc.body.innerText != 'undefined'&&
+				(doc.body.innerText.indexOf("{" != -1) )){
+				format = 'json';
+				text = indentJSON(doc.body.innerText, "\n", " ");
+			} else if (format == 'XML' &&
+				typeof doc.firstChild != 'undefined' )  {
+				if ( doc.firstChild.localName == 'xml'){
+					var para = document.createElement("div");
+					para.appendChild(doc.firstChild);
+					text = para.innerHTML;
+					text = indentXML(text);
+					format = 'xml';
+				} else {
+					var data = doc.getElementsByTagName("pre")[0];
+					text = data.innerHTML;
+				}
+			} else {
+				text = doc;
+				format = 'txt';
+			}
+			setAceEditorWithText(text, format);
+		}
+
+		function setAceEditorWithText(text, format){
+			var presentationFrame = document.getElementById('response');
+			var doc = ( presentationFrame.contentDocument || presentationFrame.contentWindow.document);
+			var editor = ace.edit(doc.getElementById('editorDiv'));
+			editor.setTheme("ace/theme/eclipse");
+			var session = editor.getSession();
+			session.setMode("ace/mode/" + format);
+			session.setTabSize(4);
+			session.setUseWrapMode(true);
+			editor.setShowPrintMargin(false);
+			editor.setValue(text);
+			editor.setReadOnly(true);
+			kTestMe.onResponse(text, format);
+		}
+
+
+
 	</script>
 </head>
 <?php
@@ -106,7 +174,7 @@ else
 
 ?>
 <div class="left">
-	<form id="request" action="../" method="post" target="response" enctype="multipart/form-data">
+	<form id="request" action="../" method="post" target="hiddenResponse" enctype="multipart/form-data">
 		<div class="left-content">
 			<div class="attr">
 				<label for="history">History: </label>
@@ -214,7 +282,8 @@ else
 	</form>
 </div>
 <div class="right">
-	<iframe id="response" name="response" src=""></iframe>
+	<iframe class="right-content" id="response" name="response" src="./testme.result.php"></iframe>
+	<iframe id="hiddenResponse" name="hiddenResponse" src=""></iframe>
 </div>
 <ul id="codeSubMenu">
 	<li class="code-menu code-menu-php active"><a href="#"
@@ -240,5 +309,7 @@ else
 		<input type="button" id="parseHttpSpy" value="Parse"  />
 	</div>
 </div>
+
+
 </body>
 </html>
