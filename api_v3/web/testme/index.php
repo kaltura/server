@@ -107,15 +107,24 @@ usort($services, "compareServicesByName");
 				format = formatSelector[0].options[formatSelector[0].selectedIndex].text;
 			}
 			var text ="";
-			if ( format == 'JSON' ){
+			if ( format == 'JSON' &&
+				typeof doc.body != 'undefined' &&
+				typeof doc.body.innerText != 'undefined'&&
+				(doc.body.innerText.indexOf("{" != -1) )){
 				format = 'json';
-				text = identJSON(doc.body.innerText, "\n", " ");
-			} else if (format == 'XML' && typeof doc.firstChild != 'undefined')  {
-				var para = document.createElement("div");
-				para.appendChild(doc.firstChild);
-				text = para.innerHTML;
-				text = identXML(text);
-				format = 'xml';
+				text = indentJSON(doc.body.innerText, "\n", " ");
+			} else if (format == 'XML' &&
+				typeof doc.firstChild != 'undefined' )  {
+				if ( doc.firstChild.localName == 'xml'){
+					var para = document.createElement("div");
+					para.appendChild(doc.firstChild);
+					text = para.innerHTML;
+					text = indentXML(text);
+					format = 'xml';
+				} else {
+					var data = doc.getElementsByTagName("pre")[0];
+					text = data.innerHTML;
+				}
 			} else {
 				text = doc;
 				format = 'txt';
