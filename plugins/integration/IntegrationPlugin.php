@@ -123,19 +123,7 @@ class IntegrationPlugin extends KalturaPlugin implements IKalturaPermissions, IK
 		{
 			if($enumValue == self::getApiValue(IntegrationBatchJobType::INTEGRATION) || $enumValue == self::getBatchJobTypeCoreValue(IntegrationBatchJobType::INTEGRATION))
 				return 'KalturaIntegrationJobData';
-		}
-		
-		if($baseClass == 'kIntegrationJobTriggerData' && $enumValue == IntegrationTriggerType::MANUAL)
-		{
-			return 'kIntegrationJobManualTriggerData';
-		}
-	
-		if($baseClass == 'KalturaIntegrationJobTriggerData')
-		{
-			if($enumValue == self::getApiValue(BpmEventNotificationIntegrationTrigger::BPM_EVENT_NOTIFICATION) || $enumValue == IntegrationTriggerType::MANUAL)
-				return 'KalturaIntegrationJobManualTriggerData';
-		}
-		
+		}		
 	}
 	
 	/**

@@ -121,6 +121,9 @@ class KalturaIntegrationJobData extends KalturaJobData
 		$this->validatePropertyNotNull('providerType');
 		$this->validatePropertyNotNull('providerData');
 		$this->validatePropertyNotNull('triggerType');
+		
+		if ($this->triggerType != KalturaIntegrationTriggerType::MANUAL)
+			$this->validatePropertyNotNull('triggerData');
 	}
 	
 	/* (non-PHPdoc)
