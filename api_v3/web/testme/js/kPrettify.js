@@ -5,7 +5,7 @@
 var IDENT_TAB_SIZE = 4;
 var HTML_SPACE_CHAR = '&nbsp;';
 
-function indentXML(xml)
+function identXML(xml)
 {
     var idented = '';
     var reg = /(>)(<)(\/*)/g;
@@ -39,7 +39,7 @@ function indentXML(xml)
     return idented;
 }
 
-function indentJSON(json, newline, space) {
+function identJSON(json, newline, space) {
     var jsonCopy = "" ;
     var spaces = 0;
     var inquotes = false;
