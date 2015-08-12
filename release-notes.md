@@ -1,3 +1,26 @@
+# Jupiter-10.18.0 #
+
+## Voicebase plugin ##
+
+-- Issue Type: New Feature
+-- Issue ID: PLAT-2599
+
+#### Configuration ####
+ 
+- Added 'Voicebase' in configurations/plugins.ini.base
+
+#### Deployment Scripts ####
+
+Run:
+ 	- php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+	- php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2015_08_23_add_integration_notify_permission.php
+	- php /opt/kaltura/app/alpha/scripts/utils/permissions/enablePermissionForPartner.php [PID] VOICEBASE_PLUGIN_PERMISSION 2 realrun ((developer's responsibility))
+	- php /opt/kaltura/app/alpha/scripts/utils/addPartnerToVoicebase.php /opt/kaltura/app [PID] [voicebase-api-key] [voicebase-api-password] (developer's responsibility)
+	
+#### Known Issues & Limitations ####
+
+None.
+
 # Jupiter-10.17.0 #
 
 ## Allow users to use uiconf-->listTemplates ##
