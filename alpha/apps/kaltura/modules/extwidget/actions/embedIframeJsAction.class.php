@@ -88,18 +88,42 @@ class embedIframeJsAction extends sfAction
 		}
 		
 		header("pragma:");
-
 		if($iframeEmbed) {
 			$url .= ((strpos($url, "?") === false) ? "?" : "&") . 'wid=' . $widget_id . '&' . $_SERVER["QUERY_STRING"];
 		} else if ($autoEmbed) {
 			header('Content-Type: application/javascript');
 			$params = "protocol=$protocol&".$_SERVER["QUERY_STRING"];
-
+			
 			$url .= ((strpos($url, "?") === false) ? "?" : "&") . $params;
 
 			if ($relativeUrl)
 			{
 				kFileUtils::dumpUrl($url."?".$params, true, false, array("X-Forwarded-For" =>  requestUtils::getRemoteAddress()));
+			}
+		}
+		
+		if (!$iframeEmbed)
+		{
+			$partner = PartnerPeer::retrieveByPK( $partner_id );
+			$hostToTest = null;
+			if (isset($_SERVER['HTTP_X_FORWARDED_HOST']))
+			{
+				$xForwardedHosts = explode(',',$_SERVER['HTTP_X_FORWARDED_HOST']);
+				$hostToTest = $xForwardedHosts[0];
+			}
+			else if (isset($_SERVER['HTTP_HOST']))
+			{
+				$hostToTest = $_SERVER['HTTP_HOST'];
+			}
+			if ($partner && !is_null($hostToTest) && $partner->isInCDNWhiteList($hostToTest))
+			{
+				$cdnHost = $protocol.'://'.$hostToTest;
+				if (isset($_SERVER['SERVER_PORT']))
+				{
+					$cdnHost .= ":".$_SERVER['SERVER_PORT'];
+				}
+				$params .= "&od=".urlencode($cdnHost);
+				$url .= ((strpos($url, "?") === false) ? "?" : "&") . $params;
 			}
 		}
 
