@@ -728,7 +728,7 @@ class myReportsMgr
 				{
 
 					$res = $pluginInstance->getReportResult($partner_id, $report_type, $report_flavor, $object_ids, $order_by);
-					if ($res)
+					if (!is_null($res))
 					{
 						return $res;
 					}
