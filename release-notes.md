@@ -7,7 +7,8 @@
 
 #### Configuration ####
  
-- Added 'Voicebase' in configurations/plugins.ini.base
+- Added 'Voicebase' in plugins.ini.base.
+- Added 'Voicebase' module to the admin-console in admin.ini.
 
 #### Deployment Scripts ####
 	php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
