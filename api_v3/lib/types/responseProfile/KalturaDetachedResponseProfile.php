@@ -81,6 +81,11 @@ class KalturaDetachedResponseProfile extends KalturaBaseResponseProfile
 	
 	public function validateNestedObjects($maxPageSize = null, $maxNestingLevel = null)
 	{	
+		if($this->filter)
+		{
+			$this->filter->validateForResponseProfile();
+		}
+		
 		$relatedProfiles = $this->relatedProfiles;
 		if(!$relatedProfiles)
 		{
