@@ -22,6 +22,7 @@ None.
 ## Add service to add/update cue-points by anonymous users ##
 
 - Issue Type: New Feature
+- Issue ID: KMS-8423
 
 #### Configuration ####
 
