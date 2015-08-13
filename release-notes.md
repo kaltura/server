@@ -15,7 +15,7 @@
 	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2015_08_23_add_integration_notify_permission.php
 	(developer's responsibility) php /opt/kaltura/app/alpha/scripts/utils/addPartnerToVoicebase.php /opt/kaltura/app {PID} {voicebase-api-key} {voicebase-api-password} 
 	
-#### Know	n Issues & Limitations ####
+#### Known Issues & Limitations ####
 
 None.
 
