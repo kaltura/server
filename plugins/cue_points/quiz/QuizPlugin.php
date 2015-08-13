@@ -273,8 +273,7 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 		if ( $object instanceof entry ) {
 			if ( !is_null($object->getFromCustomData(self::QUIZ_DATA)) )
 			{
-				$dynamicAttribute = array(self::getDynamicAttributeName() => 1);
-				return $dynamicAttribute;
+				return array(self::getDynamicAttributeName() => 1);
 			}
 		}
 
