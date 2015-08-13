@@ -7,7 +7,7 @@
 
 #### Configuration ####
  
-- Added 'Voicebase' in plugins.ini.base.
+- Added 'Voicebase' in plugins.ini.base, plugins.ini.admin.
 - Added 'Voicebase' module to the admin-console in admin.ini.
 
 #### Deployment Scripts ####
