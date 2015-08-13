@@ -150,7 +150,11 @@ class KExternalErrors
 			if (function_exists('apc_store'))
 			{
 				$protocol = infraRequestUtils::getProtocol();
-				$host = isset($_SERVER['HTTP_X_FORWARDED_HOST']) ? $_SERVER['HTTP_X_FORWARDED_HOST'] : $_SERVER['HTTP_HOST'];
+				$host = kConf::get('www_host');
+				if (isset($_SERVER['HTTP_X_FORWARDED_HOST']))
+					$host =  $_SERVER['HTTP_X_FORWARDED_HOST'];
+				else if (isset($_SERVER['HTTP_HOST']))
+					$host = $_SERVER['HTTP_HOST'];
 				$uri = $_SERVER["REQUEST_URI"];
 				apc_store("exterror-$protocol://$host$uri", $headers, self::CACHE_EXPIRY);
 			}
