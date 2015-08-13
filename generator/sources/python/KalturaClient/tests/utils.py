@@ -29,7 +29,7 @@ class KalturaLogger(IKalturaLogger):
         logging.info(msg)
 
 def GetConfig():
-    config = KalturaConfiguration(PARTNER_ID)
+    config = KalturaConfiguration()
     config.serviceUrl = SERVICE_URL
     config.setLogger(KalturaLogger())
     return config
