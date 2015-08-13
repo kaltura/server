@@ -150,7 +150,7 @@ class KExternalErrors
 			if (function_exists('apc_store'))
 			{
 				$protocol = infraRequestUtils::getProtocol();
-				$host = kConf::get('www_host');
+				$host = "";
 				if (isset($_SERVER['HTTP_X_FORWARDED_HOST']))
 					$host =  $_SERVER['HTTP_X_FORWARDED_HOST'];
 				else if (isset($_SERVER['HTTP_HOST']))
