@@ -812,10 +812,8 @@ class entryPeer extends BaseentryPeer
 
 	public static function filterEntriesByPartnerOrKalturaNetwork(array $entryIds, $partnerId)
 	{
-		KalturaLog::debug("Valid enties: " . implode(',', self::$validatedEntries));
 		$validatedEntries = array_intersect($entryIds, self::$validatedEntries);
 		$entryIds = array_diff($entryIds, self::$validatedEntries);
-		KalturaLog::debug("More enties to validate: " . implode(',', $entryIds));
 		if(count($entryIds))
 		{
 			$entryIds = array_slice($entryIds, 0, baseObjectFilter::getMaxInValues());
