@@ -431,6 +431,7 @@ class entryIndex extends BaseIndexObject
 				'replacedEntryId' => 'replaced_entry_id',
 				'userId' => 'puser_id',
 				'creatorId' => 'creator_puser_id',
+				'searchText' => '(name,tags,description,entry_id,reference_id,roots,puser_id)',
 			);
 		}
 		return self::$apiMatchAttributesMap;

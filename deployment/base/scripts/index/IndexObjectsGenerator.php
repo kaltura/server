@@ -232,7 +232,7 @@ class IndexObjectsGenerator extends IndexGeneratorBase
 	}
 
 	private function getApiMatchAttributesMap($fp, IndexableObject $object, $key, IndexableField $value) {
-		if($value->apiName && $value->type == 'string')
+		if($value->apiName && ($value->type == 'string' || $value->matchable))
 			$this->printToFile($fp, "'" . $value->apiName . "' => '" . $value->indexName . "',",4);
 	}
 	
