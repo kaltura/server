@@ -12,27 +12,6 @@ function getIndexSchemas($dirname)
 	return $indexSchemas;
 }
 
-function getIndexSchemasForApiObjects($dirname, $isPlugin)
-{
-	$indexSchemas = array();
-	$it = new RecursiveDirectoryIterator($dirname);
-	foreach (new RecursiveIteratorIterator($it) as $file) {
-		if(basename($file) == "IndexSchema.xml") {
-			if ($isPlugin)
-				$path = dirname($file) . "/../lib/api/search/";
-			else
-				$path = dirname($file) . "/../../api_v3/lib/types/search/";
-
-			if (!file_exists($path))
-				mkdir($path, 0777, true);
-
-			$indexSchemas[realpath($file)] = realpath($path);
-		}
-	}
-	return $indexSchemas;
-
-}
-
 $indexSchemas = getIndexSchemas(__DIR__ . "/../../../../alpha/");
 $indexSchemas = array_merge( $indexSchemas, getIndexSchemas(__DIR__ . "/../../../../plugins/"));
 
@@ -52,13 +31,7 @@ passthru("php {$exe} {$template} {$generatedConf} {$args}", $returnVar);
 if ($returnVar > 0)
 	exit ($returnVar);
 
-$indexSchemas = getIndexSchemasForApiObjects(__DIR__ . "/../../../../alpha/", false);
-$indexSchemas = array_merge( $indexSchemas, getIndexSchemasForApiObjects(__DIR__ . "/../../../../plugins/", true));
-
-$args = "";
-foreach($indexSchemas as $schemaPath => $dirPath) {
-	$args .= "$schemaPath=$dirPath ";
-}
+$args = implode(array_keys($indexSchemas), ' ');
 
 $exe = __DIR__ . "/IndexObjectsGenerator.php";
 $template = __DIR__ . "/../../../../configurations/sphinx/kaltura.conf.source";

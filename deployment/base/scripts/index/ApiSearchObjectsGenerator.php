@@ -11,21 +11,21 @@ KalturaTypeReflector::setClassInheritMapPath(KAutoloader::buildPath(kConf::get("
 
 class ApiSearchObjectsGenerator extends IndexGeneratorBase
 {
-	public function generateEnumFiles($keys, $dirPath)
+	public function generateEnumFiles($keys)
 	{
 		foreach($keys as $key) {
-			$this->handleSingleEnumFile($key, $dirPath);
+			$this->handleSingleEnumFile($key);
 		}
 	}
 
-	public function generateSearchObjectFiles($keys, $dirPath)
+	public function generateSearchObjectFiles($keys)
 	{
 		foreach($keys as $key) {
-			$this->handleSingleSearchObjectFile($key, $dirPath);
+			$this->handleSingleSearchObjectFile($key);
 		}
 	}
 	
-	private function handleSingleEnumFile($key, $dirPath) {
+	private function handleSingleEnumFile($key) {
 		/** @var IndexableObject $object */
 		$object = $this->searchableObjects[$key];
 		if (!$object->apiName)
@@ -48,10 +48,12 @@ class ApiSearchObjectsGenerator extends IndexGeneratorBase
 		{
 			$typeReflector = KalturaTypeReflectorCacher::get($apiType);
 			$enumsToGenerate[$apiType.'MatchAttribute'] = array(
+				$apiType,
 				$this->filterAttributeByClass($typeReflector, $matchAttributes),
 				($parentApiType) ? $parentApiType.'MatchAttribute' : 'KalturaStringEnum',
 			);
 			$enumsToGenerate[$apiType.'CompareAttribute'] = array(
+				$apiType,
 				$this->filterAttributeByClass($typeReflector, $compareAttributes),
 				($parentApiType) ? $parentApiType.'CompareAttribute' : 'KalturaStringEnum'
 			);
@@ -65,16 +67,20 @@ class ApiSearchObjectsGenerator extends IndexGeneratorBase
 
 		foreach($enumsToGenerate as $enumClass => $additionalData)
 		{
-			$filePath = $dirPath . "{$enumClass}.php";
+			$apiObjectClass = $additionalData[0];
+			$constants = $additionalData[1];
+			$parentEnumClass = $additionalData[2];
+
+			$filePath = $this->getFilePathForEnum($apiObjectClass, $enumClass);
+			if (!file_exists(dirname($filePath)))
+				mkdir(dirname($filePath), 0777, true);
 			$fp = fopen($filePath, 'w+');
 			if(!$fp)
 			{
-				KalturaLog::err("Failed to open file " . $dirPath);
+				KalturaLog::err("Failed to open file " . $filePath);
 				exit(1);
 			}
 
-			$constants = $additionalData[0];
-			$parentEnumClass = $additionalData[1];
 			print "\tGenerating enum $enumClass\n";
 			$this->createEnumFileHeader($fp, $enumClass, $parentEnumClass);
 			$this->generateConstants($fp, $constants);
@@ -83,13 +89,14 @@ class ApiSearchObjectsGenerator extends IndexGeneratorBase
 		}
 	}
 
-	private function handleSingleSearchObjectFile($key, $dirPath) {
+	private function handleSingleSearchObjectFile($key) {
 		/** @var IndexableObject $object */
 		$object = $this->searchableObjects[$key];
 		if (!$object->apiName)
 			return;
 
 		$typeReflector = KalturaTypeReflectorCacher::get($object->apiName);
+
 		$apiTypes = array_merge(array($object->apiName), $typeReflector->getSubTypesNames());
 		$classesToGenerate = array();
 		foreach($apiTypes as $apiType)
@@ -100,17 +107,19 @@ class ApiSearchObjectsGenerator extends IndexGeneratorBase
 
 		foreach($classesToGenerate as $className => $additionalData)
 		{
-			$filePath = $dirPath . "/{$className}.php";
-			$fp = fopen($filePath, 'w+');
-			if(!$fp)
-			{
-				KalturaLog::err("Failed to open file " . $dirPath);
-				exit(1);
-			}
-
 			$apiObjectClass = $additionalData[0];
 			$enumType = $additionalData[1];
 			$parentClass = $additionalData[2];
+
+			$filePath = $this->getFilePathForSearchObject($apiObjectClass, $className);
+			if (!file_exists(dirname($filePath)))
+				mkdir(dirname($filePath), 0777, true);
+			$fp = fopen($filePath, 'w+');
+			if(!$fp)
+			{
+				KalturaLog::err("Failed to open file " . $filePath);
+				exit(1);
+			}
 
 			print "\tGenerating API object $className\n";
 			$this->createClassFileHeader($fp, $className, $parentClass, $apiObjectClass, $enumType);
@@ -234,6 +243,28 @@ class ApiSearchObjectsGenerator extends IndexGeneratorBase
 		return null;
 	}
 
+	private function getFilePathForEnum($apiObjectClass, $enumClass)
+	{
+		$apiObjectFilePath = $this->getClassFilePath($apiObjectClass);
+		$path = dirname($apiObjectFilePath) . "/filters/attributeEnums/$enumClass.php";
+		return $path;
+	}
+
+	private function getFilePathForSearchObject($apiObjectClass, $enumClass)
+	{
+		$apiObjectFilePath = $this->getClassFilePath($apiObjectClass);
+		$path = dirname($apiObjectFilePath) . "/filters/advanced/$enumClass.php";
+		return $path;
+	}
+
+	private function getClassFilePath($class)
+	{
+		$map = KAutoloader::getClassMap();
+		if(!isset($map[$class]))
+			throw new Exception("File path was not found for [$class]");
+		return $map[$class];
+	}
+
 	private function attributesError($attributes, $class)
 	{
 		echo 'Attributes '.implode(', ', array_keys($attributes)). ' could not be found on class "'.$class.'" or one of it\'s child classes."'.PHP_EOL;
@@ -245,24 +276,19 @@ function main($argv)
 {
 	if(count($argv) < 2)
 	{
-		KalturaLog::err("Illegal command. use IndexObjectsGenerator <indexFile>=<generationPath>\n");
+		KalturaLog::err("Illegal command. use IndexObjectsGenerator <indexFile>\n");
 		exit(1);
 	}
 
 	$generator = new ApiSearchObjectsGenerator();
-	
-	foreach($argv as $arg) {
-		if(strpos($arg, "=") === false)
-			continue;
-		
-		list($indexFile, $dirPath) = explode("=", $arg);
+
+	$args = array_slice($argv, 1);
+	foreach($args as $arg) {
+		$indexFile = $arg;
 		KalturaLog::info("Handling Index file $indexFile");
 		$keys = $generator->load($indexFile);
-		$dirPathEnums = $dirPath."/enums/";
-		if (!file_exists($dirPathEnums))
-			mkdir($dirPathEnums, 0777, true);
-		$generator->generateEnumFiles($keys, $dirPathEnums);
-		$generator->generateSearchObjectFiles($keys, $dirPath);
+		$generator->generateEnumFiles($keys);
+		$generator->generateSearchObjectFiles($keys);
 	}
 }
 
