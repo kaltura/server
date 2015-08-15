@@ -20,6 +20,9 @@ class IndexableObject {
 	
 	/** The index table name */
 	public $indexName;
+
+	/** The API name of the base object */
+	public $apiName;
 	
 	/** The ID field in case of 'string' id.
 	 * relevant only for objects in which ID is string.*/
@@ -113,7 +116,20 @@ class IndexableObject {
 		$this->indexName = $indexName;
 	}
 
-	
-	
+	/**
+	 * @return string
+	 */
+	public function getApiName()
+	{
+		return $this->apiName;
+	}
+
+	/**
+	 * @param string $apiName
+	 */
+	public function setApiName($apiName)
+	{
+		$this->apiName = $apiName;
+	}
 }
 
