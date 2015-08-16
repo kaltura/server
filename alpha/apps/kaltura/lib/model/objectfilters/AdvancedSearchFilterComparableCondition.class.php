@@ -50,7 +50,7 @@ class AdvancedSearchFilterComparableCondition extends AdvancedSearchFilterCondit
 			return;
 		}
 
-		$newCondition = $fieldValue . $comparison . SphinxUtils::escapeString($value);
+		$newCondition = $fieldValue . $comparison . KalturaCriteria::escapeString($value);
 
 		$query->addCondition($newCondition);
 	}
