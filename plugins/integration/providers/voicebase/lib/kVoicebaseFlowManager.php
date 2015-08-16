@@ -111,7 +111,7 @@ class kVoicebaseFlowManager implements kBatchJobStatusEventConsumer
 		return $objects;
 	}
 	
-	private function setObjectContent($assetObject, $content, $format = null, $shouldSetFileName = false)
+	private function setObjectContent($assetObject, $content, $format = null, $shouldSetTranscriptFileName = false)
 	{
 		$assetObject->incrementVersion();
 		$ext = "txt";
@@ -132,7 +132,7 @@ class kVoicebaseFlowManager implements kBatchJobStatusEventConsumer
 		$finalPath = kFileSyncUtils::getLocalFilePathForKey($syncKey);
 		$assetObject->setSize(kFile::fileSize($finalPath));
 	
-		if ($shouldSetFileName && !$assetObject->getFileName())
+		if ($shouldSetTranscriptFileName && !$assetObject->getFileName())
 		{
 			$fileName = str_replace("{entryId}", $assetObject->getEntryId(), self::FILE_NAME_PATTERN);
 			$assetObject->setFileName($fileName);
