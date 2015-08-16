@@ -26,6 +26,7 @@
 # @ignore
 # ===================================================================================================
 import hashlib
+import json
 
 # Service response formats
 KALTURA_SERVICE_FORMAT_JSON = 1
@@ -93,11 +94,10 @@ class KalturaParams(object):
             self.params[key] = str(value)
 
     def update(self, props):
-        self.params.update(props.get())
+        self.params.update(props)
 
     def add(self, key, objectProps):
-        for (curKey, curValue) in objectProps.items():
-            self.put('%s:%s' % (key, curKey), curValue)
+        self.params[key] = objectProps
 
     def addObjectIfDefined(self, key, obj):
         if obj == NotImplemented:
@@ -114,10 +114,12 @@ class KalturaParams(object):
             self.put(key)
             return
         if len(array) == 0:
-            self.put('%s:-' % key, '')
+            self.params[key] = {'-': ''}
         else:
+            dict = {}
             for curIndex in xrange(len(array)):
-                self.addObjectIfDefined('%s:%s' % (key, curIndex), array[curIndex])
+                dict[curIndex] = array[curIndex].toParams().get()
+            self.params[key] = dict
 
     def addStringIfDefined(self, key, value):
         if value != NotImplemented:
@@ -164,13 +166,26 @@ class KalturaParams(object):
         else:
             self.put(key, '0')
 
-    def signature(self):
-        params = self.params.items()
-        params.sort()
-        str = ""
-        for (k, v) in params:
-            str += '%s%s' % (k, v)
-        return self.md5(str)
+    def sort(self, params):
+        for key in params:
+            if isinstance(params[key], dict):
+                params[key] = self.sort(params[key])
+                
+        sortedKeys = sorted(params.keys())
+        sortedDict = {}
+        for key in sortedKeys:
+            sortedDict[key] = params[key]
+            
+        return sortedDict
+        
+    def toJson(self):
+        return json.dumps(self.params)
+        
+    def signature(self, params = None):
+        if params == None:
+            params = self.params
+        params = self.sort(params)
+        return self.md5(self.toJson())
 
     @staticmethod
     def md5(str):
@@ -190,7 +205,7 @@ class KalturaFiles(object):
         self.params[key] = value
 
     def update(self, props):
-        self.params.update(props.get())
+        self.params.update(props)
 
 # Kaltura objects factory
 class KalturaObjectFactory(object):

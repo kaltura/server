@@ -192,7 +192,7 @@ class KalturaClient(object):
                 
         call = KalturaServiceActionCall(service, action, params, files)
         if(self.multiRequestReturnType != None):
-			self.multiRequestReturnType.append(returnType)
+            self.multiRequestReturnType.append(returnType)
         self.callsQueue.append(call)
 
     def getRequestParams(self):
@@ -204,7 +204,7 @@ class KalturaClient(object):
         url = self.config.serviceUrl + "/api"
         if (self.multiRequestReturnType != None):
             url += "/service/multirequest"
-            i = 1
+            i = 0
             for call in self.callsQueue:
                 callParams = call.getParamsForMultiRequest(i)
                 callFiles = call.getFilesForMultiRequest(i)
@@ -214,13 +214,14 @@ class KalturaClient(object):
         else:
             call = self.callsQueue[0]
             url += "/service/" + call.service + "/action/" + call.action
-            params.update(call.params)
-            files.update(call.files)
+            params.update(call.params.get())
+            files.update(call.files.get())
 
         signature = params.signature()
         params.put("kalsig", signature)
 
-        self.log("request url: [%s]" % (url + '?' + urllib.urlencode(params.get())))
+        self.log("request url: [%s]" % url)
+        self.log("request json: [%s]" % params.toJson())
 
         return (url, params, files)
 
@@ -230,15 +231,17 @@ class KalturaClient(object):
 
     @staticmethod
     def openRequestUrl(url, params, files, requestHeaders):
+        requestHeaders['Accept'] = 'text/xml'
         requestHeaders['Accept-encoding'] = 'gzip'
         if len(files.get()) == 0:
-            data = None
-            if params != None:
-                data = urllib.urlencode(params.get())
-            request = urllib2.Request(url, data, requestHeaders)
+            requestHeaders['Content-Type'] = 'application/json'
+            request = urllib2.Request(url, params.toJson(), requestHeaders)
         else:
-            fullParams = params
-            fullParams.update(files)
+            if 'Content-Type' in requestHeaders:
+                del requestHeaders['Content-Type']
+            fullParams = KalturaParams()
+            fullParams.put('json', params.toJson())
+            fullParams.update(files.get())
             datagen, headers = multipart_encode(fullParams.get())
             headers.update(requestHeaders)
             request = urllib2.Request(url, datagen, headers)
@@ -335,9 +338,6 @@ class KalturaClient(object):
         # issue the request        
         postResult = self.doHttpRequest(url, params, files)
 
-        # parse the result            
-        resultNode = self.parsePostResult(postResult)
-
         endTime = time.time()
         self.log("execution time for [%s]: [%s]" % (url, endTime - startTime))
 
@@ -351,6 +351,9 @@ class KalturaClient(object):
                 serverSession = curHeader.split(':', 1)[1].strip()
         if serverName != None or serverSession != None:
             self.log("server: [%s], session [%s]" % (serverName, serverSession))
+
+        # parse the result            
+        resultNode = self.parsePostResult(postResult)
 
         return resultNode
         
@@ -473,15 +476,15 @@ class KalturaServiceActionCall(object):
         
     # Return the parameters for a multi request
     def getParamsForMultiRequest(self, multiRequestIndex):
+        self.params.put('service', self.service)
+        self.params.put('action', self.action)
+        
         multiRequestParams = KalturaParams()
-        multiRequestParams.put("%s:service" % multiRequestIndex, self.service)
-        multiRequestParams.put("%s:action" % multiRequestIndex, self.action)
-        for (key, val) in self.params.get().items():
-            multiRequestParams.put("%s:%s" % (multiRequestIndex, key), val)
-        return multiRequestParams
+        multiRequestParams.add(multiRequestIndex, self.params.get())
+        return multiRequestParams.get()
 
     def getFilesForMultiRequest(self, multiRequestIndex):
         multiRequestParams = KalturaFiles()
         for (key, val) in self.files.get().items():
             multiRequestParams.put("%s:%s" % (multiRequestIndex, key), val)
-        return multiRequestParams
+        return multiRequestParams.get()
