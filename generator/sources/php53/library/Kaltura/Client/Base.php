@@ -1,9 +1,9 @@
 <?php
 // ===================================================================================================
-//                           _  __     _ _
-//                          | |/ /__ _| | |_ _  _ _ _ __ _
-//                          | ' </ _` | |  _| || | '_/ _` |
-//                          |_|\_\__,_|_|\__|\_,_|_| \__,_|
+//						   _  __	 _ _
+//						  | |/ /__ _| | |_ _  _ _ _ __ _
+//						  | ' </ _` | |  _| || | '_/ _` |
+//						  |_|\_\__,_|_|\__|\_,_|_| \__,_|
 //
 // This file is part of the Kaltura Collaborative Media Suite which allows users
 // to do with audio, video, and animation what Wiki platfroms allow them to do with
@@ -41,9 +41,9 @@ class Base
 	// KS V2 constants
 	const RANDOM_SIZE = 16;
 
-	const FIELD_EXPIRY =              '_e';
-	const FIELD_TYPE =                '_t';
-	const FIELD_USER =                '_u';
+	const FIELD_EXPIRY =			  '_e';
+	const FIELD_TYPE =				'_t';
+	const FIELD_USER =				'_u';
 
 	const KALTURA_SERVICE_FORMAT_JSON = 1;
 	const KALTURA_SERVICE_FORMAT_XML  = 2;
@@ -91,9 +91,9 @@ class Base
 	 */
 	public function __construct(Configuration $config)
 	{
-	    $this->config = $config;
+		$this->config = $config;
 
-	    $logger = $this->config->getLogger();
+		$logger = $this->config->getLogger();
 		if ($logger)
 			$this->shouldLog = true;
 	}
@@ -192,7 +192,7 @@ class Base
 		if (!is_null($this->multiRequestReturnType))
 		{
 			$url .= "multirequest";
-			$i = 1;
+			$i = 0;
 			foreach ($this->callsQueue as $call)
 			{
 				$callParams = $call->getParamsForMultiRequest($i);
@@ -259,6 +259,23 @@ class Base
 	}
 
 	/**
+	 * Sorts array recursively
+	 *
+	 * @param array $params
+	 * @param int $flags
+	 * @return boolean
+	 */
+	protected function ksortRecursive(&$array, $flags = null) 
+	{
+		ksort($array, $flags);
+		foreach($array as &$arr) {
+			if(is_array($arr))
+				$this->ksortRecursive($arr, $flags);
+		}
+		return true;
+	}
+
+	/**
 	 * Sign array of parameters
 	 *
 	 * @param array $params
@@ -266,13 +283,8 @@ class Base
 	 */
 	private function signature($params)
 	{
-		ksort($params);
-		$str = "";
-		foreach ($params as $k => $v)
-		{
-			$str .= $k.$v;
-		}
-		return md5($str);
+		$this->ksortRecursive($params);
+		return md5($this->jsonEncode($params));
 	}
 
 	/**
@@ -300,28 +312,38 @@ class Base
 	private function doCurl($url, $params = array(), $files = array())
 	{
 		$this->responseHeaders = array();
+		$requestHeaders = $this->config->getRequestHeaders();
+		
+		$params = $this->jsonEncode($params);
+		$this->log("curl: $url");
+		$this->log("post: $params");
+		if($this->config->getFormat() == self::KALTURA_SERVICE_FORMAT_JSON)
+		{
+			$requestHeaders[] = 'Accept: application/json';
+		}
+		
 		$cookies = array();
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_URL, $url);
 		curl_setopt($ch, CURLOPT_POST, 1);
 		if (count($files) > 0)
 		{
-            foreach ($files as &$file) {
-                // The usage of the @filename API for file uploading is
-                // deprecated since PHP 5.5. CURLFile must be used instead.
-                if (PHP_VERSION_ID >= 50500) {
-                    $file = new \CURLFile($file);
-                } else {
-                    $file = "@" . $file; // let curl know its a file
-                }
-            }
-            curl_setopt($ch, CURLOPT_POSTFIELDS, array_merge($params, $files));
+			$params = array('json' => $params);
+			foreach ($files as $key => $file) {
+				// The usage of the @filename API for file uploading is
+				// deprecated since PHP 5.5. CURLFile must be used instead.
+				if (PHP_VERSION_ID >= 50500) {
+					$params[$key] = new \CURLFile($file);
+				} else {
+					$params[$key] = "@" . $file; // let curl know its a file
+				}
+			}
+			curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
 		}
 		else
 		{
-			$opt = http_build_query($params, null, "&");
-			$this->log("curl: $url&$opt");
-			curl_setopt($ch, CURLOPT_POSTFIELDS, $opt);
+			$requestHeaders[] = 'Content-Type: application/json';
+			curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
 		}
 		curl_setopt($ch, CURLOPT_ENCODING, 'gzip,deflate');
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -365,7 +387,7 @@ class Base
 		}
 
 		// Set custom headers
-		curl_setopt($ch, CURLOPT_HTTPHEADER, $this->config->getRequestHeaders());
+		curl_setopt($ch, CURLOPT_HTTPHEADER, $requestHeaders);
 
 		// Save response headers
 		curl_setopt($ch, CURLOPT_HEADERFUNCTION, array($this, 'readHeader') );
@@ -440,11 +462,11 @@ class Base
 	/**
 	 * Add parameter to array of parameters that is passed by reference
 	 *
-	 * @param arrat $params
+	 * @param array $params
 	 * @param string $paramName
 	 * @param string $paramValue
 	 */
-	public function addParam(&$params, $paramName, $paramValue)
+	public function addParam(array &$params, $paramName, $paramValue)
 	{
 		if ($paramValue === null)
 			return;
@@ -456,10 +478,19 @@ class Base
 
 		if(is_object($paramValue) && $paramValue instanceof ObjectBase)
 		{
-			$this->addParam($params, "$paramName:objectType", $paramValue->getKalturaObjectType());
-		    foreach($paramValue as $prop => $val)
-				$this->addParam($params, "$paramName:$prop", $val);
+			$params[$paramName] = array(
+				'objectType' => get_class($paramValue)
+			);
+			
+			foreach($paramValue as $prop => $val)
+				$this->addParam($params[$paramName], $prop, $val);
 
+			return;
+		}
+
+		if(is_bool($paramValue))
+		{
+			$params[$paramName] = $paramValue ? 'true' : 'false';
 			return;
 		}
 
@@ -469,15 +500,106 @@ class Base
 			return;
 		}
 
+		$params[$paramName] = array();
 		if ($paramValue)
 		{
 			foreach($paramValue as $subParamName => $subParamValue)
-				$this->addParam($params, "$paramName:$subParamName", $subParamValue);
+				$this->addParam($params[$paramName], $subParamName, $subParamValue);
 		}
 		else
 		{
-			$this->addParam($params, "$paramName:-", "");
+			$params[$paramName]['-'] = '';
 		}
+	}
+
+	/**
+	 * @param mixed $value
+	 * @return mixed
+	 */
+	public function jsObjectToClientObject($value)
+	{
+		if(is_array($value))
+		{
+			foreach($value as &$item)
+			{
+				$item = $this->jsObjectToClientObject($item);
+			}
+		}
+		
+		if(is_object($value))
+		{
+			if(isset($value->message) && isset($value->code))
+			{
+				if($this->isMultiRequest)
+				{
+					if(isset($value->args))
+					{
+						$value->args = (array) $value->args;
+					}
+					return (array) $value;
+				}
+				throw new KalturaException($value->message, $value->code, $value->args);
+			}
+			
+			if(!isset($value->objectType))
+			{
+				throw new ClientException("Response format not supported - objectType is required for all objects", ClientException::ERROR_FORMAT_NOT_SUPPORTED);
+			}
+			
+			$objectType = $value->objectType;
+			$object = new $objectType();
+			$attributes = get_object_vars($value);
+			foreach($attributes as $attribute => $attributeValue)
+			{
+				if($attribute === 'objectType')
+				{
+					continue;
+				}
+				
+				$object->$attribute = $this->jsObjectToClientObject($attributeValue);
+			}
+			
+			$value = $object;
+		}
+		
+		return $value;
+	}
+
+	/**
+	 * Encodes objects
+	 * @param mixed $value
+	 * @return string
+	 */
+	public function jsonEncode($value)
+	{
+		return json_encode($this->unsetNull($value));
+	}
+
+	protected function unsetNull($object)
+	{
+		if(!is_array($object) && !is_object($object))
+			return $object;
+		
+		if(is_object($object) && $object instanceof MultiRequestSubResult)
+			return "$object";
+		
+		$array = (array) $object;
+		foreach($array as $key => $value)
+		{
+			if(is_null($value))
+			{
+				unset($array[$key]);
+			}
+			else
+			{
+				$array[$key] = $this->unsetNull($value);
+			}
+		}
+
+		if(is_object($object))
+			$array['objectType'] = get_class($object);
+			
+		return $array;
 	}
 
 	/**
@@ -497,8 +619,18 @@ class Base
 		}
 		else if ( is_object($resultObject) )
 		{
-			if (!($resultObject instanceof $objectType)){
+			if (!($resultObject instanceof $objectType))
+			{
 				throw new ClientException("Invalid object type - not instance of $objectType", ClientException::ERROR_INVALID_OBJECT_TYPE);
+			}
+		}
+		else if(is_subclass_of($objectType, 'EnumBase'))
+		{
+			$enum = new ReflectionClass($objectType);
+			$values = array_map('strval', $enum->getConstants());
+			if(!in_array($resultObject, $values))
+			{
+				throw new ClientException("Invalid enum value", ClientException::ERROR_INVALID_ENUM_VALUE);
 			}
 		}
 		else if(gettype($resultObject) !== $objectType)
@@ -549,9 +681,9 @@ class Base
 		return count($this->callsQueue);
 	}
 
-    public function getMultiRequestResult()
+	public function getMultiRequestResult()
 	{
-        return new MultiRequestSubResult($this->getMultiRequestQueueSize() . ':result');
+		return new MultiRequestSubResult($this->getMultiRequestQueueSize() . ':result');
 	}
 
 	/**
@@ -671,7 +803,7 @@ class Base
 	 */
 	public static function getKalturaNullValue()
 	{
-        return NullValue::getInstance();
+		return NullValue::getInstance();
 	}
 
 	public function __get($prop)

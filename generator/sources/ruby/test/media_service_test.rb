@@ -173,6 +173,7 @@ class MediaServiceTest < Test::Unit::TestCase
     media_entry_filter = Kaltura::KalturaMediaEntryFilter.new
     media_entry_filter.name_multi_like_or = "kaltura_test3"
     filter_pager = Kaltura::KalturaFilterPager.new
+	filter_pager.page_size = 1
     @client.media_service.list(media_entry_filter, filter_pager)
     
     retVal = @client.do_multirequest
@@ -190,24 +191,24 @@ class MediaServiceTest < Test::Unit::TestCase
     media_entry.media_type = Kaltura::KalturaMediaType::VIDEO
     video_file = File.open("test/media/test.wmv")
     
-    video_token = @client.media_service.upload(video_file)
-    
-    @client.start_multirequest
-    
-    @client.media_service.add_from_uploaded_file(media_entry, video_token)
-    
     media_entry_filter = Kaltura::KalturaMediaEntryFilter.new
     media_entry_filter.name_multi_like_or = "kaltura_test3"
     filter_pager = Kaltura::KalturaFilterPager.new
+	filter_pager.page_size = 1
+        
+    @client.start_multirequest
+
+    @client.media_service.upload(video_file)
+    @client.media_service.add_from_uploaded_file(media_entry, "{1:result}")
     @client.media_service.list(media_entry_filter, filter_pager)
     
     retVal = @client.do_multirequest
     
-    assert_instance_of Kaltura::KalturaMediaEntry, retVal[0]
-    assert_instance_of Kaltura::KalturaMediaListResponse, retVal[1]    
-    assert_not_nil retVal[0].id
-    assert_not_nil retVal[1].total_count
-    assert_nil @client.media_service.delete(retVal[0].id)  
+    assert_instance_of Kaltura::KalturaMediaEntry, retVal[1]
+    assert_instance_of Kaltura::KalturaMediaListResponse, retVal[2]    
+    assert_not_nil retVal[1].id
+    assert_not_nil retVal[2].total_count
+    assert_nil @client.media_service.delete(retVal[1].id)  
   end
   
   # this test retrieves error objects when a action in a multi request fails.  
@@ -216,12 +217,13 @@ class MediaServiceTest < Test::Unit::TestCase
     media_entry = Kaltura::KalturaMediaEntry.new
     media_entry.media_type = Kaltura::KalturaMediaType::VIDEO
     
+    media_entry_filter = Kaltura::KalturaMediaEntryFilter.new
+    filter_pager = Kaltura::KalturaFilterPager.new
+    filter_pager.page_size = 1
+    
     @client.start_multirequest
     
     @client.media_service.get("invalid entry id")
-    
-    media_entry_filter = Kaltura::KalturaMediaEntryFilter.new
-    filter_pager = Kaltura::KalturaFilterPager.new
     @client.media_service.list(media_entry_filter, filter_pager)
     
     retVal = @client.do_multirequest
