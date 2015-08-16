@@ -102,19 +102,10 @@ class embedIframeJsAction extends sfAction
 			}
 		}
 		
-		if (!$iframeEmbed)
+		if (!$iframeEmbed)//Means we're redirecting to mwEmbedLoader
 		{
 			$partner = PartnerPeer::retrieveByPK( $partner_id );
-			$hostToTest = null;
-			if (isset($_SERVER['HTTP_X_FORWARDED_HOST']))
-			{
-				$xForwardedHosts = explode(',',$_SERVER['HTTP_X_FORWARDED_HOST']);
-				$hostToTest = $xForwardedHosts[0];
-			}
-			else if (isset($_SERVER['HTTP_HOST']))
-			{
-				$hostToTest = $_SERVER['HTTP_HOST'];
-			}
+			$hostToTest = myPartnerUtils::getHostForWhiteList();
 			if ($partner && !is_null($hostToTest) && $partner->isInCDNWhiteList($hostToTest))
 			{
 				$cdnHost = $protocol.'://'.$hostToTest;
@@ -122,7 +113,7 @@ class embedIframeJsAction extends sfAction
 				{
 					$cdnHost .= ":".$_SERVER['SERVER_PORT'];
 				}
-				$params .= "&od=".urlencode($cdnHost);
+				$params = "&od=".urlencode($cdnHost);
 				$url .= ((strpos($url, "?") === false) ? "?" : "&") . $params;
 			}
 		}

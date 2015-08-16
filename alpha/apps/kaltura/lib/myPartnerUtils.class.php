@@ -326,16 +326,7 @@ class myPartnerUtils
 			$protocol='http';
 
 		$partner = PartnerPeer::retrieveByPK( $partner_id );
-		$hostToTest = null;
-		if (isset($_SERVER['HTTP_X_FORWARDED_HOST']))
-		{
-			$xForwardedHosts = explode(',',$_SERVER['HTTP_X_FORWARDED_HOST']);
-			$hostToTest = $xForwardedHosts[0];
-		}
-		else if (isset($_SERVER['HTTP_HOST']))
-		{
-			$hostToTest = $_SERVER['HTTP_HOST'];
-		}
+		$hostToTest = self::getHostForWhiteList();
 		if ($partner && !is_null($hostToTest) && $partner->isInCDNWhiteList($hostToTest))
 		{
 			$cdnHost = $protocol.'://'.$hostToTest;
@@ -1793,5 +1784,23 @@ class myPartnerUtils
 			
 		}	
 		return true;
+	}
+
+	/**
+	 * @return null
+	 */
+	public static function getHostForWhiteList()
+	{
+		$hostToTest = null;
+		if (isset($_SERVER['HTTP_X_FORWARDED_HOST']))
+		{
+			$xForwardedHosts = explode(',', $_SERVER['HTTP_X_FORWARDED_HOST']);
+			$hostToTest = $xForwardedHosts[0];
+			return $hostToTest;
+		} else if (isset($_SERVER['HTTP_HOST']))
+		{
+			$hostToTest = $_SERVER['HTTP_HOST'];
+			return $hostToTest;
+		}return $hostToTest;
 	}
 }
