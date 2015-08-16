@@ -3,6 +3,7 @@ class kVoicebaseFlowManager implements kBatchJobStatusEventConsumer
 {
 	private $baseEndpointUrl = null;
 	const DEFAULT_ACCURACY = 60;
+	const FILE_NAME_PATTERN = "{entryId}-Transcript.txt";
 	
 	/* (non-PHPdoc)
 	 * @see kBatchJobStatusEventConsumer::shouldConsumeJobStatusEvent()
@@ -39,6 +40,7 @@ class kVoicebaseFlowManager implements kBatchJobStatusEventConsumer
 				$transcript->setEntryId($entryId);
 				$transcript->setPartnerId($partnerId);
 				$transcript->setLanguage($spokenLanguage);
+				$transcript->setContainerFormat(AttachmentType::TEXT);
 				$transcript->setAccuracy(self::DEFAULT_ACCURACY);
 			}
 			$transcript->setStatus(AttachmentAsset::ASSET_STATUS_QUEUED);
@@ -66,7 +68,7 @@ class kVoicebaseFlowManager implements kBatchJobStatusEventConsumer
 			$transcript = $this->getAssetsByLanguage($entryId, array(TranscriptPlugin::getAssetTypeCoreValue(TranscriptAssetType::TRANSCRIPT)), $spokenLanguage, true);
 			$captions = $this->getAssetsByLanguage($entryId, array(CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION)), $spokenLanguage);
 		
-			$this->setObjectContent($transcript, $contentsArray["TXT"]);
+			$this->setObjectContent($transcript, $contentsArray["TXT"], null, true);
 			unset($contentsArray["TXT"]);
 	
 			foreach ($contentsArray as $format => $content)
@@ -109,7 +111,7 @@ class kVoicebaseFlowManager implements kBatchJobStatusEventConsumer
 		return $objects;
 	}
 	
-	private function setObjectContent($assetObject, $content, $format = null)
+	private function setObjectContent($assetObject, $content, $format = null, $shouldSetFileName = false)
 	{
 		$assetObject->incrementVersion();
 		$ext = "txt";
@@ -130,6 +132,12 @@ class kVoicebaseFlowManager implements kBatchJobStatusEventConsumer
 		$finalPath = kFileSyncUtils::getLocalFilePathForKey($syncKey);
 		$assetObject->setSize(kFile::fileSize($finalPath));
 	
+		if ($shouldSetFileName && !$assetObject->getFileName())
+		{
+			$fileName = str_replace("{entryId}", $assetObject->getEntryId(), self::FILE_NAME_PATTERN);
+			$assetObject->setFileName($fileName);
+		}
+		
 		$assetObject->setStatus(AttachmentAsset::ASSET_STATUS_READY);
 		$assetObject->save();
 	} 
