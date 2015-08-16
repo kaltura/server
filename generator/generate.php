@@ -68,7 +68,7 @@ function showHelpAndExit()
 	exit;
 }
 
-$schemaXml = null;
+$schemaXmlPath = null;
 foreach($options as $option => $value)
 {
 	if($option == 'h' || $option == 'help')
@@ -77,7 +77,7 @@ foreach($options as $option => $value)
 	}
 	elseif($option == 'x' || $option == 'xml')
 	{
-		$schemaXml = $value;
+		$schemaXmlPath = $value;
 	}
 	array_shift($argv);
 }	 
@@ -137,7 +137,7 @@ $generatedClients = array(
 foreach($config as $name => $item)
 {
 	// check if we need to introspect code to create schema or use the ready schema from a given url
-	$useReadySchema = $schemaXml;
+	$useReadySchema = $schemaXmlPath;
 	if(is_null($useReadySchema)){
 		$useReadySchema = $item->get("schemaxml");
 	}
