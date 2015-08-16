@@ -145,6 +145,18 @@ abstract class BaseIndexObject
 		$searchableFields = static::getIndexSearchableFieldsMap();
 		return array_key_exists($columnName, $searchableFields);
 	}
+
+	public static function getCompareFieldByApiName($apiName)
+	{
+		$map = static::getApiCompareAttributesMap();
+		return isset($map[$apiName]) ? $map[$apiName] : null;
+	}
+
+	public static function getMatchFieldByApiName($apiName)
+	{
+		$map = static::getApiMatchAttributesMap();
+		return isset($map[$apiName]) ? $map[$apiName] : null;
+	}
 	
 	public static function fixFieldName($fieldName) {
 		if(strpos($fieldName, '.') === false)

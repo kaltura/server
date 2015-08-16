@@ -1,16 +1,16 @@
 <?php
 /**
- * @package plugins.exampleIntegration
+ * @package plugins.voicebase
  * @subpackage lib.enum
  */
-class ExampleIntegrationProvider implements IKalturaPluginEnum, IntegrationProviderType
+class VoicebaseIntegrationProviderType implements IKalturaPluginEnum, IntegrationProviderType
 {
-	const EXAMPLE = 'Example';
+	const VOICEBASE = 'Voicebase';
 	
 	public static function getAdditionalValues()
 	{
 		return array(
-			'EXAMPLE' => self::EXAMPLE,
+			'VOICEBASE' => self::VOICEBASE,
 		);
 	}
 	

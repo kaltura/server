@@ -6,6 +6,11 @@
 class kIntegrationJobData extends kJobData
 {
 	/**
+	 * @var string
+	 */
+	private $callbackNotificationUrl;
+
+	/**
 	 * @var kIntegrationJobProviderData
 	 */
 	private $providerData;
@@ -24,6 +29,22 @@ class kIntegrationJobData extends kJobData
 	 * @var IntegrationTriggerType
 	 */
 	private $triggerType;
+	
+	/**
+	 * @return string
+	 */
+	public function getCallbackNotificationUrl()
+	{
+		return $this->callbackNotificationUrl;
+	}
+	
+	/**
+	 * @param string $callbackNotificationUrl
+	 */
+	public function setCallbackNotificationUrl($callbackNotificationUrl)
+	{
+		$this->callbackNotificationUrl = $callbackNotificationUrl;
+	}
 	
 	/**
 	 * @return IntegrationProviderType

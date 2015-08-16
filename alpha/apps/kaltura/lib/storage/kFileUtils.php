@@ -183,7 +183,11 @@ class kFileUtils extends kFile
 		// when proxying request to other datacenter we may be already in a proxied request (from one of the internal proxy servers)
 		// we need to ensure the original HOST is sent in order to allow restirctions checks
 
-		$host = isset($_SERVER["HTTP_X_FORWARDED_HOST"]) ? $_SERVER["HTTP_X_FORWARDED_HOST"] : $_SERVER["HTTP_HOST"];
+		$host = kConf::get('www_host');
+		if (isset($_SERVER['HTTP_X_FORWARDED_HOST']))
+			$host =  $_SERVER['HTTP_X_FORWARDED_HOST'];
+		else if (isset($_SERVER['HTTP_HOST']))
+			$host = $_SERVER['HTTP_HOST'];
 
 		for($i = 0; $i < count($sendHeaders); $i++)
 		{

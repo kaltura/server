@@ -55,61 +55,61 @@
 	<field name="created_at" indexName="created_at" type="datetime" orderable="yes"/>
 	<field name="updated_at" indexName="updated_at" type="datetime" orderable="yes"/>
 </object>
-<object name="entry" indexId="str_entry_id" id="ID" >
-	<field name="entry_id" indexName="entry_id" getter="id" type="string" />
-	<field name="str_entry_id" indexName="str_entry_id" getter="id" type="string" sphinxStringAttribute="string" />
+<object name="entry" indexId="str_entry_id" id="ID" apiName="KalturaBaseEntry" >
+	<field name="entry_id" indexName="@name" apiName="@getter" getter="id" type="string" />
+	<field name="str_entry_id" indexName="@name" getter="id" type="string" sphinxStringAttribute="string" />
 	<field name="id" indexName="int_entry_id" getter="indexedId" type="int" skipField="yes" />
-	<field name="name" indexName="name" type="string" orderable="yes" matchable="yes" sphinxStringAttribute="both" />
-	<field name="tags" indexName="tags" type="string" nullable="yes" matchable="yes" />
-	<field name="categories_ids" indexName="categories" getter="categoriesEntryIds" type="string" nullable="yes" matchable="yes" />
-	<field name="flavor_params_ids" indexName="flavor_params" getter="flavorParamsIds" type="string" nullable="yes" matchable="yes" />
-	<field name="kshow_id" indexName="kshow_id" type="string" nullable="yes" />
-	<field name="group_id" indexName="group_id" type="string" nullable="yes" />
-	<field name="description" indexName="description" type="string" nullable="yes" matchable="yes" />
-	<field name="admin_tags" indexName="admin_tags" type="string" nullable="yes" matchable="yes" />
-	<field name="duration_type" indexName="duration_type" type="string" matchable="yes" />
-	<field name="reference_id" indexName="reference_id" type="string" nullable="yes" matchable="yes" />
-	<field name="replacing_entry_id" indexName="replacing_entry_id" type="string" nullable="yes" matchable="yes" />
-	<field name="replaced_entry_id" indexName="replaced_entry_id" type="string" nullable="yes" matchable="yes" />
-	<field name="roots" indexName="roots" type="string" nullable="yes" matchable="yes" />
-	<field name="kuser_id" indexName="kuser_id" type="string" orderable="yes" />
-	<field name="puser_id" indexName="puser_id" type="string" />
-	<field name="status" indexName="entry_status" getter="status" type="bint" orderable="yes" />
-	<field name="type" indexName="type" type="int" orderable="yes" />
-	<field name="media_type" indexName="media_type" type="int" orderable="yes" />
-	<field name="views" indexName="views" type="int" orderable="yes" />
-	<field name="partner_id" indexName="partner_id" type="bint" orderable="yes" keepCondition="yes" />
-	<field name="moderation_status" indexName="moderation_status" type="int" orderable="yes" />
-	<field name="display_in_search" indexName="display_in_search" type="bint" orderable="yes" />
-	<field name="length_in_msecs" indexName="length_in_msecs" type="int" orderable="yes" />
-	<field name="access_control_id" indexName="access_control_id" type="int" orderable="yes" />
-	<field name="moderation_count" indexName="moderation_count" type="int" orderable="yes" />
-	<field name="rank" indexName="rank" type="int" orderable="yes" />
-	<field name="total_rank" indexName="total_rank" type="int" orderable="yes" />
-	<field name="plays" indexName="plays" type="int" orderable="yes" />
-	<field name="partner_sort_value" indexName="partner_sort_value" type="bint" orderable="yes" />
-	<field name="replacement_status" indexName="replacement_status" type="int" />
-	<field name="sphinx_match_optimizations" indexName="sphinx_match_optimizations" type="string" />
-	<field name="created_at" indexName="created_at" type="datetime" orderable="yes" />
-	<field name="updated_at" indexName="updated_at" type="datetime" orderable="yes" />
-	<field name="modified_at" indexName="modified_at" type="datetime" orderable="yes" />
-	<field name="media_date" indexName="media_date" type="datetime" orderable="yes" />
-	<field name="start_date" indexName="start_date" type="datetime" orderable="yes" />
-	<field name="end_date" indexName="end_date" type="datetime" orderable="yes" />
-	<field name="available_from" indexName="available_from" type="datetime" orderable="yes" />
-	<field name="last_played_at" indexName="last_played_at" type="datetime" orderable="yes" />
-	<field name="entitled_kusers_publish" indexName="entitled_kusers_publish" type="string" nullable="yes" />
-	<field name="entitled_kusers_edit" indexName="entitled_kusers_edit" type="string" nullable="yes" />
-	<field name="entitled_kusers" indexName="entitled_kusers" type="string" nullable="yes" />
-	<field name="privacy_by_contexts" indexName="privacy_by_contexts" type="string" nullable="yes" />
-	<field name="creator_kuser_id" indexName="creator_kuser_id" type="string" />
-	<field name="creator_puser_id" indexName="creator_puser_id" type="string" />
-	<field name="dynamic_attributes" indexName="dynamic_attributes" type="json" matchable="yes" />
+	<field name="name" indexName="@name" apiName="@name" type="string" orderable="yes" matchable="yes" sphinxStringAttribute="both" />
+	<field name="tags" indexName="@name" apiName="@name" type="string" nullable="yes" matchable="yes" />
+	<field name="categories_ids" indexName="categories" apiName="@name" getter="categoriesEntryIds" type="string" nullable="yes" matchable="yes" />
+	<field name="flavor_params_ids" indexName="flavor_params" apiName="@name" getter="flavorParamsIds" type="string" nullable="yes" matchable="yes" />
+	<field name="kshow_id" indexName="@name" type="string" nullable="yes" />
+	<field name="group_id" indexName="@name" apiName="@name" type="string" nullable="yes" />
+	<field name="description" indexName="@name" apiName="@name" type="string" nullable="yes" matchable="yes" />
+	<field name="admin_tags" indexName="@name" apiName="@name" type="string" nullable="yes" matchable="yes" />
+	<field name="duration_type" indexName="@name" apiName="@name" type="string" matchable="yes" />
+	<field name="reference_id" indexName="@name" apiName="@name" type="string" nullable="yes" matchable="yes" />
+	<field name="replacing_entry_id" indexName="@name" apiName="@name" type="string" nullable="yes" matchable="yes" />
+	<field name="replaced_entry_id" indexName="@name" apiName="@name" type="string" nullable="yes" matchable="yes" />
+	<field name="roots" indexName="@name" type="string" nullable="yes" matchable="yes" />
+	<field name="kuser_id" indexName="@name" type="string" orderable="yes" />
+	<field name="puser_id" indexName="@name" apiName="userId" type="string" />
+	<field name="status" indexName="entry_status" apiName="@name" getter="status" type="bint" orderable="yes" />
+	<field name="type" indexName="@name" apiName="@name" type="int" orderable="yes" />
+	<field name="media_type" indexName="@name" apiName="@name" type="int" orderable="yes" />
+	<field name="views" indexName="@name" apiName="@name" type="int" orderable="yes" />
+	<field name="partner_id" indexName="@name" apiName="@name" type="bint" orderable="yes" keepCondition="yes" />
+	<field name="moderation_status" indexName="@name" apiName="@name" type="int" orderable="yes" />
+	<field name="display_in_search" indexName="@name" type="bint" orderable="yes" />
+	<field name="length_in_msecs" indexName="@name" apiName="msDuration" type="int" orderable="yes" />
+	<field name="access_control_id" indexName="@name" apiName="@name" type="int" orderable="yes" />
+	<field name="moderation_count" indexName="@name" apiName="@name" type="int" orderable="yes" />
+	<field name="rank" indexName="@name" apiName="@name" type="int" orderable="yes" />
+	<field name="total_rank" indexName="@name" apiName="@name" type="int" orderable="yes" />
+	<field name="plays" indexName="@name" apiName="@name" type="int" orderable="yes" />
+	<field name="partner_sort_value" indexName="@name" apiName="@name" type="bint" orderable="yes" />
+	<field name="replacement_status" indexName="@name" apiName="@name" type="int" />
+	<field name="sphinx_match_optimizations" indexName="@name" type="string" />
+	<field name="created_at" indexName="@name" apiName="@name" type="datetime" orderable="yes" />
+	<field name="updated_at" indexName="@name" apiName="@name" type="datetime" orderable="yes" />
+	<field name="modified_at" indexName="@name" type="datetime" orderable="yes" />
+	<field name="media_date" indexName="@name" apiName="@name" type="datetime" orderable="yes" />
+	<field name="start_date" indexName="@name" apiName="@name" type="datetime" orderable="yes" />
+	<field name="end_date" indexName="@name" apiName="@name" type="datetime" orderable="yes" />
+	<field name="available_from" indexName="@name" type="datetime" orderable="yes" />
+	<field name="last_played_at" indexName="@name" apiName="@name" type="datetime" orderable="yes" />
+	<field name="entitled_kusers_publish" indexName="@name" type="string" nullable="yes" matchable="yes" />
+	<field name="entitled_kusers_edit" indexName="@name" type="string" nullable="yes" matchable="yes" />
+	<field name="entitled_kusers" indexName="@name" type="string" nullable="yes" />
+	<field name="privacy_by_contexts" indexName="@name" type="string" nullable="yes" />
+	<field name="creator_kuser_id" indexName="@name" type="string" />
+	<field name="creator_puser_id" indexName="@name" apiName="creatorId" type="string" />
+	<field name="dynamic_attributes" indexName="@name" type="json" matchable="yes" />
 	<field name="first_broadcast" indexName="dynamic_attributes.first_broadcast" type="null" searchableonly="yes" orderable="yes" />
-	<field name="user_names" indexName="user_names" type="string"/>
-	<field name="source" indexName="source" type="int"/>
-	<field name="plugins_data" indexName="plugins_data" type="string" searchableonly="yes" matchable="yes" />
-	<field name="search_text" indexName="(name,tags,description,entry_id,reference_id,roots,puser_id)" type="null" searchableonly="yes" matchable="yes" />
+	<field name="user_names" indexName="@name" type="string"/>
+	<field name="source" indexName="@name" type="int"/>
+	<field name="plugins_data" indexName="@name" type="string" searchableonly="yes" matchable="yes" />
+	<field name="search_text" indexName="(name,tags,description,entry_id,reference_id,roots,puser_id)" apiName="@name" type="null" searchableonly="yes" matchable="yes" />
 	<index format="P%sST%s">
 		<value field="partner_id" />
 		<value field="status" />
