@@ -18,13 +18,7 @@ SSLCryptoDevice builtin
 
 SSLCertificateFile @SSL_CERTIFICATE_FILE@
 SSLCertificateKeyFile @SSL_CERTIFICATE_KEY_FILE@
-
-<IfVersion < 2.4>
-    SSLCertificateChainFile @SSL_CERTIFICATE_CHAIN_FILE@
-</IfVersion>
-<IfVersion >= 2.4>
-    SSLCertificateFile @SSL_CERTIFICATE_CHAIN_FILE@
-</IfVersion>
+SSLCACertificateFile @SSL_CERTIFICATE_CHAIN_FILE@
 <VirtualHost @KALTURA_FULL_VIRTUAL_HOST_NAME@>
 	SSLEngine on
 	SSLProtocol all -SSLv2
