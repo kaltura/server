@@ -71,6 +71,12 @@ class KVoicebaseIntegrationEngine implements KIntegrationCloserEngine
 	
 	protected function doClose(KalturaBatchJob $job, KalturaIntegrationJobData &$data, KalturaVoicebaseJobProviderData $providerData)
 	{
+		$entryId = $providerData->entryId;
+		KalturaLog::debug("checking entry id - $entryId");
+		$this->clientHelper = VoicebasePlugin::getClientHelper($providerData->apiKey, $providerData->apiPassword);
+		if($this->clientHelper->checkExitingExternalContent($entryId))
+			return true;
+		
 		return false;
 	}
 	
