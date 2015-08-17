@@ -595,7 +595,7 @@ abstract class LiveEntry extends entry
 		$cacheType = self::getCacheType();
 		$cacheStore = kCacheManager::getSingleLayerCache($cacheType);
 		if(! $cacheStore) {
-			KalturaLog::debug("cacheStore is null. returning false");
+			KalturaLog::debug("cacheStore is null. cacheType: $cacheType . returning false");
 			return false;
 		}
 		return $cacheStore->set($key, true, kConf::get('media_server_cache_expiry', 'local', self::DEFAULT_CACHE_EXPIRY));
@@ -613,8 +613,10 @@ abstract class LiveEntry extends entry
 		}
 		
 		$key = $this->getId() . "_{$hostname}_{$index}";
-		if($this->storeInCache($key) && $this->isMediaServerRegistered($index, $hostname))
+		if($this->storeInCache($key) && $this->isMediaServerRegistered($index, $hostname)) {
+			KalturaLog::debug("cached and registered - index: $index, hostname: $hostname");
 			return;
+		}
 
 		KalturaLog::debug("about to setMediaServer. index: $index, hostname: $hostname");
 		$this->setLastBroadcast(kApiCache::getTime());
