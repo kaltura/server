@@ -14,7 +14,7 @@ class AdvancedSearchFilterMatchAttributeCondition extends AdvancedSearchFilterMa
 		if (!$query instanceof IKalturaIndexQuery)
 			return;
 
-		$matchText = '"'.SphinxUtils::escapeString($this->value).'"';
+		$matchText = '"'.KalturaCriteria::escapeString($this->value).'"';
 		if ($this->not)
 			$matchText = '!'.$matchText;
 		$query->addMatch("@$this->field (".$matchText.")");
