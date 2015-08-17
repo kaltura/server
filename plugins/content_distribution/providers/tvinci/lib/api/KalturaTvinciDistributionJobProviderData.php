@@ -147,7 +147,7 @@ class KalturaTvinciDistributionJobProviderData extends KalturaConfigurableDistri
 
 	private function getAssetDownloadUrl($asset)
 	{
-		$downloadUrl = myPartnerUtils::getCdnHost($asset->getPartnerId()) . $asset->getFinalDownloadUrlPathWithoutKs();
+		$downloadUrl = myPartnerUtils::getCdnHost($asset->getPartnerId(), null, 'thumbnail') . $asset->getFinalDownloadUrlPathWithoutKs();
 		$downloadUrl .= '/f/' . $asset->getId() . '.' . $asset->getFileExt();
 		return $downloadUrl;
 	}
@@ -156,7 +156,7 @@ class KalturaTvinciDistributionJobProviderData extends KalturaConfigurableDistri
 	{
 		$partnerPath = myPartnerUtils::getUrlForPartner($entry->getPartnerId(), $entry->getSubpId());
 
-		$downloadUrl = myPartnerUtils::getCdnHost($entry->getPartnerId())
+		$downloadUrl = myPartnerUtils::getCdnHost($entry->getPartnerId(), null , 'api')
 						. $partnerPath
 						. "/playManifest"
 						. "/entryId/{$entry->getId()}"
