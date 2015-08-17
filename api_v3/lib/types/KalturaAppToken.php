@@ -88,11 +88,6 @@ class KalturaAppToken extends KalturaObject implements IFilterable
 	 * @var string
 	 */
 	public $sessionPrivileges;
-
-	/**
-	 * @var KalturaAppTokenHashType
-	 */
-	public $hashType;
 	
 	private static $mapBetweenObjects = array
 	(
@@ -107,7 +102,6 @@ class KalturaAppToken extends KalturaObject implements IFilterable
 		"sessionType",
 		"sessionDuration",
 		"sessionPrivileges",
-		'hashType',
 	);
 	
 	/* (non-PHPdoc)
@@ -166,5 +160,4 @@ class KalturaAppToken extends KalturaObject implements IFilterable
 	{
 		return array();
 	}
-	
 }
