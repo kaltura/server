@@ -301,6 +301,7 @@ class CSharpClientGenerator extends ClientGeneratorFromXml
 						$this->appendLine("						this.$dotNetPropName = ParseLong(txt);");
 						break;
 					case "int":
+					case "time":
 						if ($isEnum)
 						{
 							$enumType = $propertyNode->getAttribute("enumType");
