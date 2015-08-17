@@ -180,7 +180,8 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 	 */
 	protected function cuePointAdded(CuePoint $cuePoint)
 	{
-		$this->reIndexCuePointEntry($cuePoint);
+		if(self::shouldReIndexEntry($cuePoint))
+			$this->reIndexCuePointEntry($cuePoint);
 	}
 	
 	/**
@@ -194,7 +195,8 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 		$this->deleteCuePoints($c);
 			
 		//re-index cue point on entry
-		$this->reIndexCuePointEntry($cuePoint);
+		if(self::shouldReIndexEntry($cuePoint))
+			$this->reIndexCuePointEntry($cuePoint);
 	}
 	
 	/**
@@ -512,9 +514,12 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 		return false;
 	}
 	
-	public static function shouldReIndexEntry(BaseObject $object, array $modifiedColumns)
+	public static function shouldReIndexEntry(BaseObject $object, array $modifiedColumns = array())
 	{
 		if(!($object instanceof CuePoint))
+			return false;
+		
+		if($object instanceof Annotation && $object->getSearchableOnEntry() == false)
 			return false;
 		
 		$indexOnEntryTypes = CuePointPlugin::getIndexOnEntryTypes();
@@ -524,6 +529,11 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 		if(!in_array($object->getType(), $indexOnEntryTypes))
 			return false;
 		
+		//This should happen in cases where the check is being done for cue point added/deleted
+		if(!count($modifiedColumns))
+			return true;
+		
+		//If modified columns has values we need to check that the fileds updated are the once that should trigger re-in 
 		$fieldsToMonitor = array(CuePointPeer::TEXT, CuePointPeer::TAGS, CuePointPeer::NAME);
 		
 		if(count(array_intersect($fieldsToMonitor, $modifiedColumns)) > 0)
