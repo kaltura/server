@@ -3,7 +3,7 @@ class kVoicebaseFlowManager implements kBatchJobStatusEventConsumer
 {
 	private $baseEndpointUrl = null;
 	const DEFAULT_ACCURACY = 60;
-	const FILE_NAME_PATTERN = "{entryId}-Transcript.txt";
+	const FILE_NAME_PATTERN = "{entryId}-Transcript-{language}.txt";
 	
 	/* (non-PHPdoc)
 	 * @see kBatchJobStatusEventConsumer::shouldConsumeJobStatusEvent()
@@ -134,7 +134,11 @@ class kVoicebaseFlowManager implements kBatchJobStatusEventConsumer
 	
 		if ($shouldSetTranscriptFileName && !$assetObject->getFileName())
 		{
-			$fileName = str_replace("{entryId}", $assetObject->getEntryId(), self::FILE_NAME_PATTERN);
+			$language = str_replace(" ", "", $assetObject->getLanguage());
+			
+			$patterns = array("{entryId}","{language}");
+			$replacements = array($assetObject->getEntryId(), $language);
+			$fileName = str_replace($patterns, $replacements, self::FILE_NAME_PATTERN);
 			$assetObject->setFileName($fileName);
 		}
 		
