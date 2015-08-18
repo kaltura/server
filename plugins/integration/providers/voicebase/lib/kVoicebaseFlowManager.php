@@ -55,7 +55,7 @@ class kVoicebaseFlowManager implements kBatchJobStatusEventConsumer
 		{
 			$clientHelper = VoicebasePlugin::getClientHelper($providerData->getApiKey(), $providerData->getApiPassword());
 		
-			$externalEntryExists = $clientHelper->checkExitingExternalContent($entryId);
+			$externalEntryExists = $clientHelper->checkExistingExternalContent($entryId);
 			if (!$externalEntryExists)
 			{
 				KalturaLog::err('remote content does not exist');

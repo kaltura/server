@@ -43,7 +43,7 @@ class KVoicebaseIntegrationEngine implements KIntegrationCloserEngine
 		$flavorAssetId = $this->validateFlavorAssetId($entryId, $flavorAssetId);
 		$flavorUrl = KBatchBase::$kClient->flavorAsset->getUrl($flavorAssetId);
 	
-		$externalEntryExists = $this->clientHelper->checkExitingExternalContent($entryId);
+		$externalEntryExists = $this->clientHelper->checkExistingExternalContent($entryId);
 		if (!$externalEntryExists)
 		{
 			$uploadSuccess = $this->clientHelper->uploadMedia($flavorUrl, $entryId, $callBackUrl, $spokenLanguage, $fileLocation);
@@ -71,12 +71,6 @@ class KVoicebaseIntegrationEngine implements KIntegrationCloserEngine
 	
 	protected function doClose(KalturaBatchJob $job, KalturaIntegrationJobData &$data, KalturaVoicebaseJobProviderData $providerData)
 	{
-		$entryId = $providerData->entryId;
-		KalturaLog::debug("checking entry id - $entryId");
-		$this->clientHelper = VoicebasePlugin::getClientHelper($providerData->apiKey, $providerData->apiPassword);
-		if($this->clientHelper->checkExitingExternalContent($entryId))
-			return true;
-		
 		return false;
 	}
 	
