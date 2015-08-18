@@ -118,6 +118,9 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		$xdoc = new KDOMDocument();
 		
 		$this->xslTransformedContent = $this->xslTransform($this->data->filePath);
+		
+		KalturaLog::info("Tranformed content: " . $this->xslTransformedContent);
+		
 		libxml_clear_errors();
 		if(!$xdoc->loadXML($this->xslTransformedContent)){
 			$errorMessage = kXml::getLibXmlErrorDescription($this->xslTransformedContent);
