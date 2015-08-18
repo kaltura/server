@@ -51,6 +51,23 @@ None.
 
 None.
 
+## Add service to add/update cue-points by anonymous users ##
+
+- Issue Type: New Feature
+- Issue ID: KMS-8423
+
+#### Configuration ####
+
+None.
+
+#### Deployment Scripts ####
+
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2015_08_04_answer_cue_point_permission.php
+	 
+#### Known Issues & Limitations ####
+
+None.
+
 # Jupiter-10.17.0 #
 
 ## Allow users to use uiconf-->listTemplates ##
