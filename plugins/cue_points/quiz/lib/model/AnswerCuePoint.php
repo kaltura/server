@@ -107,4 +107,11 @@ class AnswerCuePoint extends CuePoint implements IMetadataObject
 			$userEntry->save();
 		}
 	}
+
+	public function shouldReIndexEntry(array $modifiedColumns = array())
+	{
+		return false;
+	}
+
+
 }
