@@ -277,7 +277,7 @@
 									}
 									elseif($file->status == Kaltura_Client_FileSync_Enum_FileSyncStatus::READY)
 									{
-										?><td><a href="<?php echo $file->fileUrl; ?>" target="_blank"><?php echo $file->id; ?></a></td><?php
+										?><td><a href="<?php echo $file->fileUrl; ?>" download="<?php echo basename($file->filePath); ?>" target="_blank"><?php echo $file->id; ?></a></td><?php
 									}
 									else
 									{
