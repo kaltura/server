@@ -46,7 +46,9 @@ class QuizUserEntry extends UserEntry{
 				$currAnswer = CuePointPeer::retrieveByPK($answerId);
 				$answers[] = $currAnswer;
 			}
-			list($totalPoints, $userPoints) = $this->getCorrectAnswerWeight($optionalAnswers, $answers);
+			list($totalForQuestion, $userPointsForQuestion) = $this->getCorrectAnswerWeight($optionalAnswers, $answers);
+			$totalPoints += $totalForQuestion;
+			$userPoints += $userPointsForQuestion;
 		}
 		return $totalPoints?($userPoints/$totalPoints):0;
 	}
