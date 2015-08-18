@@ -3,6 +3,7 @@ class kVoicebaseFlowManager implements kBatchJobStatusEventConsumer
 {
 	private $baseEndpointUrl = null;
 	const DEFAULT_ACCURACY = 60;
+	const FILE_NAME_PATTERN = "{entryId}-Transcript-{language}.txt";
 	
 	/* (non-PHPdoc)
 	 * @see kBatchJobStatusEventConsumer::shouldConsumeJobStatusEvent()
@@ -39,6 +40,7 @@ class kVoicebaseFlowManager implements kBatchJobStatusEventConsumer
 				$transcript->setEntryId($entryId);
 				$transcript->setPartnerId($partnerId);
 				$transcript->setLanguage($spokenLanguage);
+				$transcript->setContainerFormat(AttachmentType::TEXT);
 				$transcript->setAccuracy(self::DEFAULT_ACCURACY);
 			}
 			$transcript->setStatus(AttachmentAsset::ASSET_STATUS_QUEUED);
@@ -53,7 +55,7 @@ class kVoicebaseFlowManager implements kBatchJobStatusEventConsumer
 		{
 			$clientHelper = VoicebasePlugin::getClientHelper($providerData->getApiKey(), $providerData->getApiPassword());
 		
-			$externalEntryExists = $clientHelper->checkExitingExternalContent($entryId);
+			$externalEntryExists = $clientHelper->checkExistingExternalContent($entryId);
 			if (!$externalEntryExists)
 			{
 				KalturaLog::err('remote content does not exist');
@@ -66,7 +68,7 @@ class kVoicebaseFlowManager implements kBatchJobStatusEventConsumer
 			$transcript = $this->getAssetsByLanguage($entryId, array(TranscriptPlugin::getAssetTypeCoreValue(TranscriptAssetType::TRANSCRIPT)), $spokenLanguage, true);
 			$captions = $this->getAssetsByLanguage($entryId, array(CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION)), $spokenLanguage);
 		
-			$this->setObjectContent($transcript, $contentsArray["TXT"]);
+			$this->setObjectContent($transcript, $contentsArray["TXT"], null, true);
 			unset($contentsArray["TXT"]);
 	
 			foreach ($contentsArray as $format => $content)
@@ -109,7 +111,7 @@ class kVoicebaseFlowManager implements kBatchJobStatusEventConsumer
 		return $objects;
 	}
 	
-	private function setObjectContent($assetObject, $content, $format = null)
+	private function setObjectContent($assetObject, $content, $format = null, $shouldSetTranscriptFileName = false)
 	{
 		$assetObject->incrementVersion();
 		$ext = "txt";
@@ -130,6 +132,16 @@ class kVoicebaseFlowManager implements kBatchJobStatusEventConsumer
 		$finalPath = kFileSyncUtils::getLocalFilePathForKey($syncKey);
 		$assetObject->setSize(kFile::fileSize($finalPath));
 	
+		if ($shouldSetTranscriptFileName && !$assetObject->getFileName())
+		{
+			$language = str_replace(" ", "", $assetObject->getLanguage());
+			
+			$patterns = array("{entryId}","{language}");
+			$replacements = array($assetObject->getEntryId(), $language);
+			$fileName = str_replace($patterns, $replacements, self::FILE_NAME_PATTERN);
+			$assetObject->setFileName($fileName);
+		}
+		
 		$assetObject->setStatus(AttachmentAsset::ASSET_STATUS_READY);
 		$assetObject->save();
 	} 
