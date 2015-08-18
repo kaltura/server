@@ -43,7 +43,7 @@ class TagIndex extends BaseIndexObject
 		{
 			self::$fieldsMap = array(
 				'int_id' => 'intId',
-				'tag' => 'TagWithEqual',
+				'tag' => 'tagWithEqual',
 				'partner_id' => 'partnerId',
 				'object_type' => 'indexObjectType',
 				'created_at' => 'createdAt',
