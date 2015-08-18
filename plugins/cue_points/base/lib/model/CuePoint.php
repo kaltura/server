@@ -397,7 +397,7 @@ abstract class CuePoint extends BaseCuePoint implements IIndexable
 		if(!count($indexOnEntryTypes))
 			return false;
 			
-		if(!in_array($object->getType(), $indexOnEntryTypes))
+		if(!in_array($this->getType(), $indexOnEntryTypes))
 			return false;
 		
 		//If modified columns has values we need to check that the fileds updated are the once that should trigger re-in
