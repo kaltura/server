@@ -39,27 +39,45 @@ class QuizUserEntry extends UserEntry{
 		foreach ($questions as $question)
 		{
 			$optionalAnswers = $question->getOptionalAnswers();
-			$currAnswer = null;
+			$answers = array();
 			if (isset($answerIds[$question->getId()]))
 			{
-				$currAnswer = CuePointPeer::retrieveByPK($answerIds[$question->getId()]);
+				$answerId = $answerIds[$question->getId()];
+				$currAnswer = CuePointPeer::retrieveByPK($answerId);
+				$answers[] = $currAnswer;
 			}
-			foreach ($optionalAnswers as $optionalAnswer)
+			list($totalPoints, $userPoints) = $this->getCorrectAnswerWeight($optionalAnswers, $answers);
+		}
+		return $totalPoints?($userPoints/$totalPoints):0;
+	}
+
+	/**
+	 * @param $optionalAnswers
+	 * @param $answers
+	 * @return array
+	 */
+	protected function getCorrectAnswerWeight($optionalAnswers, $answers)
+	{
+		$totalPoints = 0;
+		$userPoints = 0;
+		foreach ($optionalAnswers as $optionalAnswer)
+		{
+			/**
+			 * @var kOptionalAnswer $optionalAnswer
+			 */
+			if ($optionalAnswer->getIsCorrect())
 			{
-				/**
-				 * @var kOptionalAnswer $optionalAnswer
-				 */
-				if ($optionalAnswer->getIsCorrect())
+				$totalPoints += $optionalAnswer->getWeight();
+				foreach ($answers as $currAnswer)
 				{
-					$totalPoints += $optionalAnswer->getWeight();
-					if ($currAnswer && ($optionalAnswer->getKey() == $currAnswer->getAnswerKey()) )
+					if ($optionalAnswer->getKey() == $currAnswer->getAnswerKey())
 					{
 						$userPoints += $optionalAnswer->getWeight();
 					}
 				}
 			}
 		}
-		return $totalPoints?($userPoints/$totalPoints):0;
+		return array($totalPoints, $userPoints);
 	}
 
 }
