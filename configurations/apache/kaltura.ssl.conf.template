@@ -8,12 +8,17 @@ SSLSessionCache         shmcb:/var/cache/mod_ssl/scache(512000)
 SSLSessionCacheTimeout  300
 SSLRandomSeed startup file:/dev/urandom  256
 SSLRandomSeed connect builtin
-SSLMutex default
+<IfVersion < 2.4>
+        SSLMutex default
+</IfVersion>
+<IfVersion >= 2.4>
+        Mutex sysvsem default
+</IfVersion>
 SSLCryptoDevice builtin
 
 SSLCertificateFile @SSL_CERTIFICATE_FILE@
 SSLCertificateKeyFile @SSL_CERTIFICATE_KEY_FILE@
-SSLCertificateChainFile @SSL_CERTIFICATE_CHAIN_FILE@
+SSLCACertificateFile @SSL_CERTIFICATE_CHAIN_FILE@
 <VirtualHost @KALTURA_FULL_VIRTUAL_HOST_NAME@>
 	SSLEngine on
 	SSLProtocol all -SSLv2

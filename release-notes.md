@@ -17,6 +17,21 @@ None.
 
 None.
 
+## Dexter/JCare Integration Plugin ##
+
+- Issue Type: New Feature  
+- Issue ID: PLAT-2595  
+
+### Installation ###
+
+- Run the installPlugins.php script:
+	php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+
+### Configuration ###
+
+- Run the following permission script:
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2015_08_12_add_metadata_profile_get_action_for_partner_-1.php
+
 ## Voicebase plugin ##
 
 - Issue Type: New Feature

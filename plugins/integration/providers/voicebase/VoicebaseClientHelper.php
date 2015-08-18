@@ -23,7 +23,7 @@ class VoicebaseClientHelper
 		$this->baseEndpointUrl = $url;
 	}
 	
-	public function checkExitingExternalContent($entryId)
+	public function checkExistingExternalContent($entryId)
 	{
 		$exitingEntryQueryUrl = $this->baseEndpointUrl;
 	
