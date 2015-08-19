@@ -735,7 +735,7 @@ class entryFilter extends baseObjectFilter
 			return false;
 		}
 		
-		if ($this->get('_in_user_id') && !in_array($entry->getUserScreenName(), explode(',', $this->get('_in_user_id'))) )
+		if ($this->get('_in_user_id') && !in_array($entry->getPuserId(), explode(',', $this->get('_in_user_id'))) )
 		{
 			return false;
 		}
