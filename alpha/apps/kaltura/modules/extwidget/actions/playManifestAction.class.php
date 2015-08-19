@@ -794,7 +794,35 @@ class playManifestAction extends kalturaAction
 		if(in_array($this->deliveryAttributes->getFormat(), self::$httpFormats) && !in_array($protocol, self::$httpProtocols))
 			$protocol = requestUtils::getProtocol();
 		
-		$liveStreamConfig = $this->entry->getLiveStreamConfigurationByProtocol($this->deliveryAttributes->getFormat(), $protocol, $tag, false, $this->flavorParamsIds);
+		$flavorParamsIds = $this->flavorParamsIds;
+		// use only cloud transcode flavors if timeAlignedRenditions was set
+		$partnerId = $this->entry->getPartnerId();
+		$partner = PartnerPeer::retrieveByPK($partnerId);
+		$partnerTimeAligned = $partner->getTimeAlignedRenditions();
+		
+		if ( ($partnerTimeAligned) && ($this->getRequestParameter("timeAlignedRenditions")) ) {
+    		// check entry's flavors
+    		$entryFlavorParams = assetParamsPeer::retrieveByPKs(explode(',', $this->entry->getFlavorParamsIds()));
+    		$hasPassthrough = false;
+    		$transcodeParamsIds = array();
+    		foreach ($entryFlavorParams as $flavor)
+    		{
+    		    // check if we have any ingest flavor
+    		    if ($flavor->hasTag("ingest")) {
+    		        $hasPassthrough = true;
+    		    }
+    		    else {
+    		        $transcodeParamsIds[] = $flavor->getId();
+    		    }
+    		}
+    		 
+    		// if so, use only the transcode (if there are)
+    		if (($hasPassthrough) && count($transcodeParamsIds)) {
+    		    $flavorParamsIds = $transcodeParamsIds;
+    		}
+		}
+		
+		$liveStreamConfig = $this->entry->getLiveStreamConfigurationByProtocol($this->deliveryAttributes->getFormat(), $protocol, $tag, false, $flavorParamsIds);
 		/* @var $liveStreamConfig kLiveStreamConfiguration */
 		if ($liveStreamConfig)
 			return $liveStreamConfig;
