@@ -800,7 +800,7 @@ class playManifestAction extends kalturaAction
 		$partner = PartnerPeer::retrieveByPK($partnerId);
 		$partnerTimeAligned = $partner->getTimeAlignedRenditions();
 		
-		if ( ($partnerTimeAligned) && ($this->getRequestParameter("timeAlignedRenditions")) ) {
+		if ( ($partnerTimeAligned) && ((bool) $this->getRequestParameter("timeAlignedRenditions")) ) {
     		// check entry's flavors
     		$entryFlavorParams = assetParamsPeer::retrieveByPKs(explode(',', $this->entry->getFlavorParamsIds()));
     		$hasPassthrough = false;
