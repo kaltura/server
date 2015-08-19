@@ -146,4 +146,21 @@ class DynamicObjectSearchFilter extends AdvancedSearchFilterOperator
 		}
 		return $xPaths;
 	}
+
+	public function addToXml(SimpleXMLElement &$xmlElement)
+	{
+		parent::addToXml($xmlElement);
+
+		$xmlElement->addAttribute('field', $this->field);
+		// $this->metadataProfileId should always be retrieved dynamically
+	}
+
+	public function fillObjectFromXml(SimpleXMLElement $xmlElement)
+	{
+		parent::fillObjectFromXml($xmlElement);
+
+		$attr = $xmlElement->attributes();
+		if(isset($attr['field']))
+			$this->field = (string)$attr['field'];
+	}
 }
