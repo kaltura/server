@@ -46,6 +46,11 @@ class kAkamaiUniversalProvisionJobData extends kProvisionJobData
 	 * @var string
 	 */
 	protected $notificationEmail;
+	
+	/**
+	 * @var array
+	 */
+	protected $basePlaybackUrls;
 
 	/**
 	 * @return the $notificationEmail
@@ -188,6 +193,7 @@ class kAkamaiUniversalProvisionJobData extends kProvisionJobData
 			$this->primaryContact = $liveParams["primaryContact"];
 			$this->secondaryContact = $liveParams["secondaryContact"];
 			$this->notificationEmail = $liveParams["notificationEmail"];
+			$this->basePlaybackUrls = $liveParams["basePlaybackUrls"];
 		}
 		
 	}
@@ -199,11 +205,23 @@ class kAkamaiUniversalProvisionJobData extends kProvisionJobData
 		$entry->setPrimaryBroadcastingUrl($this->getPrimaryBroadcastingUrl());
 		$entry->setSecondaryBroadcastingUrl($this->getSecondaryBroadcastingUrl());
 		$entry->setStreamName($this->getStreamName(). "_1_%i@".$entry->getStreamRemoteId());
-		$entry->setHlsStreamUrl("http://". ($this->getDomainName() ? $this->getDomainName() : self::DEFAULT_DOMAIN_NAME) ."/i/".$this->getStreamName()."_1@".$this->getStreamID()."/master.m3u8");
+
+		if (isset($this->basePlaybackUrls[PlaybackProtocol::APPLE_HTTP]))
+		    $baseHlsUrl = $this->basePlaybackUrls[PlaybackProtocol::APPLE_HTTP];
+		else
+		    $baseHlsUrl = "http://". ($this->getDomainName() ? $this->getDomainName() : self::DEFAULT_DOMAIN_NAME) ."/i/";
+		$entry->setHlsStreamUrl($baseHlsUrl.$this->getStreamName()."_1@".$this->getStreamID()."/master.m3u8");
+		
 		$configs = $entry->getLiveStreamConfigurations();
 		$config = new kLiveStreamConfiguration();
 		$config->setProtocol(PlaybackProtocol::AKAMAI_HDS);
-		$config->setUrl("http://". ($this->getDomainName() ? $this->getDomainName() : self::DEFAULT_DOMAIN_NAME) ."/z/".$this->getStreamName()."_1@".$this->getStreamID()."/manifest.f4m");
+
+		if (isset($this->basePlaybackUrls[PlaybackProtocol::AKAMAI_HDS]))
+		    $baseHdsUrl = $this->basePlaybackUrls[PlaybackProtocol::AKAMAI_HDS];
+		else
+		    $baseHdsUrl = "http://". ($this->getDomainName() ? $this->getDomainName() : self::DEFAULT_DOMAIN_NAME) ."/z/";
+		$config->setUrl($baseHdsUrl.$this->getStreamName()."_1@".$this->getStreamID()."/manifest.f4m");
+		
 		$configs[] = $config;
 		$entry->setLiveStreamConfigurations($configs);
 	}
