@@ -457,7 +457,11 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 	protected function getQuizQuestionPercentageTableReport($objectIds, $orderBy)
 	{
 		$questionIds = explode(",", $objectIds);
-		$questions = CuePointPeer::retrieveByPKs($questionIds);
+		$questionsCriteria = new Criteria();
+		$questionsCriteria->add(CuePointPeer::ID, $questionIds, Criteria::IN);
+		$questionsCriteria->add(CuePointPeer::TYPE, QuizPlugin::getCoreValue('CuePointType',QuizCuePointType::QUIZ_QUESTION));
+		$questions = CuePointPeer::doSelect($questionsCriteria);
+
 		return $this->getAggregateDataForQuestions($questions, $orderBy);
 	}
 	
