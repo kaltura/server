@@ -1,21 +1,15 @@
 <?php
-	if($argc < 4)
+	require_once(__dir__ . '/../bootstrap.php');	
+
+	if($argc < 3)
 	{
-		die("Usage: php addVoicebaseParamsToPartner [kaltura base directory] [partner id] [apiKey] [apiPassword]" . PHP_EOL);
+		die("Usage: php addVoicebaseParamsToPartner [partner id] [apiKey] [apiPassword]" . PHP_EOL);
 	}
 	
-	$currentWorkingEnv = $argv[1];
-	if(!file_exists($currentWorkingEnv))
-		die("input kaltura base directory \"$currentWorkingEnv\" does not exists");
+	$partnerId = $argv[1];
+	$apiKey = $argv[2];
+	$apiPassword = $argv[3];
 	
-	require_once($currentWorkingEnv . '/alpha/scripts/bootstrap.php');
-	
-	$currentWorkingEnv = $argv[1];
-	$partnerId = $argv[2];
-	$apiKey = $argv[3];
-	$apiPassword = $argv[4];
-	
-	$plugin = new VoicebasePlugin();
 	$options = new VoicebaseOptions($apiKey, $apiPassword);
-	$plugin->setPartnerVoicebaseOptions($partnerId, $options);
+	VoicebasePlugin::setPartnerVoicebaseOptions($partnerId, $options);
 	
