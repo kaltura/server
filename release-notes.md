@@ -51,6 +51,23 @@ None.
 
 None.
 
+## Allow users to use attachmentAsset->add ##
+
+- Issue Type: Permission to an existing API 
+- Issue ID: PLAT-3652
+
+#### Configuration ####
+ 
+ 	None.
+
+#### Deployment Scripts ####
+
+ 	- php deployment/updates/scripts/add_permissions/2015_08_16_add_attachment_asset_permission.php
+
+#### Known Issues & Limitations ####
+
+None.
+
 # Jupiter-10.17.0 #
 
 ## Allow users to use uiconf-->listTemplates ##
