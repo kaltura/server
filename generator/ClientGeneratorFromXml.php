@@ -110,9 +110,12 @@ abstract class ClientGeneratorFromXml
 		
 		
 		// loop through the folder
-		$dir = dir($directory);
+		if (is_dir($directory)){
+		    $dir = dir($directory);
+		}
+		//                                                         
 		$sourceFilesPaths = array();
-		while (false !== $entry = $dir->read()) 
+		while (get_class($dir)==='Directory' && (false !== $entry = $dir->read())) 
 		{
 			// skip source control files
 			if ($this->beginsWith($entry, ".svn") || 
@@ -128,7 +131,9 @@ abstract class ClientGeneratorFromXml
 			$sourceFilesPaths[] = realpath("$directory/$entry");
 		}
 		// clean up
-		$dir->close();
+		if(get_class($dir)==='Directory'){
+		    $dir->close();
+		}
 		
 		foreach($sourceFilesPaths as $sourceFilesPath)
 			$this->addSourceFiles($sourceFilesPath, $rootSourceFolder, $rootDestFolder);
