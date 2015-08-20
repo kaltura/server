@@ -110,6 +110,7 @@ abstract class ClientGeneratorFromXml
 		
 		
 		// loop through the folder
+		$dir=null;
 		if (is_dir($directory)){
 		    $dir = dir($directory);
 		}
