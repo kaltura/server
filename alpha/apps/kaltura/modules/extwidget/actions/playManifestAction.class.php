@@ -794,35 +794,34 @@ class playManifestAction extends kalturaAction
 		if(in_array($this->deliveryAttributes->getFormat(), self::$httpFormats) && !in_array($protocol, self::$httpProtocols))
 			$protocol = requestUtils::getProtocol();
 		
-		$flavorParamsIds = $this->flavorParamsIds;
 		// use only cloud transcode flavors if timeAlignedRenditions was set
 		$partnerId = $this->entry->getPartnerId();
 		$partner = PartnerPeer::retrieveByPK($partnerId);
 		$partnerTimeAligned = $partner->getTimeAlignedRenditions();
 		
 		if ( ($partnerTimeAligned) && ((bool) $this->getRequestParameter("timeAlignedRenditions")) ) {
-    		// check entry's flavors
-    		$entryFlavorParams = assetParamsPeer::retrieveByPKs(explode(',', $this->entry->getFlavorParamsIds()));
-    		$hasPassthrough = false;
-    		$transcodeParamsIds = array();
-    		foreach ($entryFlavorParams as $flavor)
-    		{
-    		    // check if we have any ingest flavor
-    		    if ($flavor->hasTag("ingest")) {
-    		        $hasPassthrough = true;
-    		    }
-    		    else {
-    		        $transcodeParamsIds[] = $flavor->getId();
-    		    }
-    		}
+			// check entry's flavors
+			$entryFlavorParams = assetParamsPeer::retrieveByPKs(explode(',', $this->entry->getFlavorParamsIds()));
+			$hasPassthrough = false;
+			$hasTranscode = false;
+			foreach ($entryFlavorParams as $flavor)
+			{
+				// check if we have any ingest flavor
+				if ($flavor->hasTag("ingest")) {
+					$hasPassthrough = true;
+				}
+				else {
+					$hasTranscode = true;
+				}
+			}
     		 
-    		// if so, use only the transcode (if there are)
-    		if (($hasPassthrough) && count($transcodeParamsIds)) {
-    		    $flavorParamsIds = $transcodeParamsIds;
-    		}
+			// if so, use only the transcode (if there are)
+			if (($hasPassthrough) && ($hasTranscode)) {
+				$tag = 'mbr';
+			}
 		}
 		
-		$liveStreamConfig = $this->entry->getLiveStreamConfigurationByProtocol($this->deliveryAttributes->getFormat(), $protocol, $tag, false, $flavorParamsIds);
+		$liveStreamConfig = $this->entry->getLiveStreamConfigurationByProtocol($this->deliveryAttributes->getFormat(), $protocol, $tag, false, $this->flavorParamsIds);
 		/* @var $liveStreamConfig kLiveStreamConfiguration */
 		if ($liveStreamConfig)
 			return $liveStreamConfig;
