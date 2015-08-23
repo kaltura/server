@@ -502,7 +502,24 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 	protected function getAnswerCountByUserIds($objectIds)
 	{
 		$c = $this->createGetCuePointByUserIdsCriteria($objectIds);
-		$numOfAnswers = CuePointPeer::doCount($c);
+		$numOfAnswers = 0;// = CuePointPeer::doCount($c);
+		$answers = CuePointPeer::doSelect($c);
+		foreach ($answers as $answer)
+		{
+			/**
+			 * @var AnswerCuePoint $answer
+			 */
+			$quizUserEntryId = $answer->getQuizUserEntryId();
+			if (!isset($quizUserEntries[$quizUserEntryId]))
+			{
+				$quizUserEntries[$quizUserEntryId] = $this->isQuizUserEntrySubmitted($quizUserEntryId);
+			}
+			if ($quizUserEntries[$quizUserEntryId] === false)
+			{
+				continue;
+			}
+			$numOfAnswers++;
+		}
 		$res['count_all'] = $numOfAnswers;
 		return array($res);
 	}
@@ -575,33 +592,45 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 			$c->add(CuePointPeer::TYPE, QuizPlugin::getCoreValue('CuePointType', QuizCuePointType::QUIZ_ANSWER));
 			$c->add(CuePointPeer::PARENT_ID, $question->getId());
 			$answers = CuePointPeer::doSelect($c);
-			$numOfAnswers = count($answers);
-			if ($numOfAnswers)
+			$numOfAnswers = 0;count($answers);
+			$quizUserEntries = array();
+			foreach ($answers as $answer)
 			{
-				foreach ($answers as $answer)
+				/**
+				 * @var AnswerCuePoint $answer
+				 */
+				$quizUserEntryId = $answer->getQuizUserEntryId();
+				if (!isset($quizUserEntries[$quizUserEntryId]))
+				{
+					$quizUserEntries[$quizUserEntryId] = $this->isQuizUserEntrySubmitted($quizUserEntryId);
+				}
+				if ($quizUserEntries[$quizUserEntryId] === false)
+				{
+					continue;
+				}
+				$numOfAnswers++;
+				$optionalAnswers = $question->getOptionalAnswers();
+				$correct = false;
+				foreach ($optionalAnswers as $optionalAnswer)
 				{
 					/**
-					 * @var AnswerCuePoint $answer
+					 * @var kOptionalAnswer $optionalAnswer
 					 */
-					$optionalAnswers = $question->getOptionalAnswers();
-					$correct = false;
-					foreach ($optionalAnswers as $optionalAnswer)
+					if ($optionalAnswer->getKey() === $answer->getAnswerKey())
 					{
-						/**
-						 * @var kOptionalAnswer $optionalAnswer
-						 */
-						if ($optionalAnswer->getKey() === $answer->getAnswerKey())
+						if ($optionalAnswer->getIsCorrect())
 						{
-							if ($optionalAnswer->getIsCorrect())
-							{
-								$numOfCorrectAnswers++;
-								break;
-							}
+							$numOfCorrectAnswers++;
+							break;
 						}
 					}
 				}
+			}
+			if ($numOfAnswers)
+			{
 				$pctg = $numOfCorrectAnswers / $numOfAnswers;
-			} else
+			}
+			else
 			{
 				$pctg = 0.0;
 			}
@@ -623,6 +652,7 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 	protected function getAggregateDataForUsers($answers, $orderBy)
 	{
 		$ans = array();
+		$quizUserEntries = array();
 		$usersCorrectAnswers = array();
 		$usersWrongAnswers = array();
 		foreach ($answers as $answer)
@@ -630,6 +660,16 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 			/**
 			 * @var AnswerCuePoint $answer
 			 */
+			$quizUserEntryId = $answer->getQuizUserEntryId();
+			if (!isset($quizUserEntries[$quizUserEntryId]))
+			{
+				$quizUserEntries[$quizUserEntryId] = $this->isQuizUserEntrySubmitted($quizUserEntryId);
+			}
+
+			if ($quizUserEntries[$quizUserEntryId] === false)
+			{
+				continue;
+			}
 			if ($answer->getIsCorrect())
 			{
 				if (isset($usersCorrectAnswers[$answer->getKuserId()]))
@@ -702,6 +742,20 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 		$c->add(CuePointPeer::KUSER_ID, $kuserIds, Criteria::IN);
 		return $c;
 	}
+	
+	protected function isQuizUserEntrySubmitted($quizUserEntryId)
+	{
+		$ans = false;
+		$quizUserEntry = UserEntryPeer::retrieveByPK($quizUserEntryId);
+		if ($quizUserEntry)
+		{
+			if ($quizUserEntry->getStatus() == self::getCoreValue('UserEntryStatus', QuizUserEntryStatus::QUIZ_SUBMITTED))
+			{
+				$ans = true;
+			}
+		}
+		return $ans;
+	}
 
 }
 
@@ -728,3 +782,4 @@ function innerCompare($a, $b)
 	}
 	return ($prctgA < $prctgB) ? -1 : 1;	
 }
+
