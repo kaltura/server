@@ -802,21 +802,17 @@ class playManifestAction extends kalturaAction
 		if ( ($partnerTimeAligned) && ((bool) $this->getRequestParameter("timeAlignedRenditions")) ) {
 			// check entry's flavors
 			$entryFlavorParams = assetParamsPeer::retrieveByPKs(explode(',', $this->entry->getFlavorParamsIds()));
-			$hasPassthrough = false;
 			$hasTranscode = false;
 			foreach ($entryFlavorParams as $flavor)
 			{
-				// check if we have any ingest flavor
-				if ($flavor->hasTag("ingest")) {
-					$hasPassthrough = true;
-				}
-				else {
+				// check if we have any transcode flavor
+				if (!$flavor->hasTag("ingest")) {
 					$hasTranscode = true;
 				}
 			}
     		 
-			// if so, use only the transcode (if there are)
-			if (($hasPassthrough) && ($hasTranscode)) {
+			// if so, use only the transcode
+			if ($hasTranscode) {
 				$tag = 'mbr';
 			}
 		}
