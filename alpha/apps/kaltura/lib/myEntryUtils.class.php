@@ -738,9 +738,9 @@ class myEntryUtils
 				// if we already captured the frame at that second, dont recapture, just use the existing file
 				if (!file_exists($orig_image_path))
 				{
-				    // limit creation of more than XX ffmpeg image extraction processes
-				    if (trim(exec("ps auxw|grep -c ".kConf::get("bin_path_ffmpeg") )) > kConf::get("resize_thumb_max_processes_ffmpeg", "local", 10))
-				        KExternalErrors::dieError(KExternalErrors::TOO_MANY_PROCESSES);
+					// limit creation of more than XX ffmpeg image extraction processes
+					if (trim(exec("ps auxw|grep -c ".kConf::get("bin_path_ffmpeg") )) > kConf::get("resize_thumb_max_processes_ffmpeg", "local", 10))
+						KExternalErrors::dieError(KExternalErrors::TOO_MANY_PROCESSES);
 				    
 					// creating the thumbnail is a very heavy operation
 					// prevent calling it in parallel for the same thubmnail for 5 minutes
@@ -805,9 +805,9 @@ class myEntryUtils
 			// close db connections as we won't be requiring the database anymore and image manipulation may take a long time
 			kFile::closeDbConnections();
 			
-		    // limit creation of more than XX Imagemagick processes
-		    if (trim(exec("ps auxw|grep -c ".kConf::get("bin_path_imagemagick") )) > kConf::get("resize_thumb_max_processes_imagemagick", "local", 20))
-		        KExternalErrors::dieError(KExternalErrors::TOO_MANY_PROCESSES);
+			// limit creation of more than XX Imagemagick processes
+			if (trim(exec("ps auxw|grep -c ".kConf::get("bin_path_imagemagick") )) > kConf::get("resize_thumb_max_processes_imagemagick", "local", 20))
+				KExternalErrors::dieError(KExternalErrors::TOO_MANY_PROCESSES);
 				    
 			// resizing (and editing)) an image file that failes results in a long server waiting time
 			// prevent this waiting time (of future requests) in case the resizeing failes
