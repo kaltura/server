@@ -70,6 +70,7 @@ class AnswerCuePoint extends CuePoint implements IMetadataObject
 		$this->setCorrectAnswerKeys( $correctKeys );
 		$this->setExplanation( $dbParentCuePoint->getExplanation() );
 		$this->setIsCorrect( in_array( $this->getAnswerKey(), $correctKeys ) );
+		$this->setCustomDataObj();
 		return parent::preInsert($con);
 	}
 
@@ -83,6 +84,7 @@ class AnswerCuePoint extends CuePoint implements IMetadataObject
 		if ($this->isCustomDataModified(AnswerCuePoint::CUSTOM_DATA_ANSWER_KEY))
 		{
 			$this->setIsCorrect(in_array($this->getAnswerKey(), $this->getCorrectAnswerKeys()));
+			$this->setCustomDataObj();
 		}
 		return parent::preSave($con);
 	}
@@ -91,4 +93,25 @@ class AnswerCuePoint extends CuePoint implements IMetadataObject
 	{
 		return QuizPlugin::getCoreValue('MetadataObjectType', QuizCuePointMetadataObjectType::ANSWER_CUE_POINT);
 	}
+
+	/* (non-PHPdoc)
+	 * @see BaseCuePoint::postInsert()
+	 */
+	public function postInsert(PropelPDO $con = null)
+	{
+		parent::postInsert($con);
+		$userEntry = UserEntryPeer::retrieveByPK($this->getQuizUserEntryId());
+		if (!is_null($userEntry))
+		{
+			$userEntry->addAnswerId($this->parent_id, $this->id);
+			$userEntry->save();
+		}
+	}
+
+	public function shouldReIndexEntry(array $modifiedColumns = array())
+	{
+		return false;
+	}
+
+
 }

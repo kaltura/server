@@ -97,7 +97,7 @@ class KalturaTvinciDistributionJobProviderData extends KalturaConfigurableDistri
 	private static function getVideoAssetDataMap()
 	{
 		return array(
-			array( 'Main',						PlaybackProtocol::SILVER_LIGHT,	array('mbr'),		    		'ism' ),
+			array( 'Main',						PlaybackProtocol::SILVER_LIGHT,	array('ism'),		    		'ism' ),
 			array( 'Tablet Main',				PlaybackProtocol::APPLE_HTTP,	array('ipadnew','ipad'),		'm3u8' ),
 			array( 'Smartphone Main',			PlaybackProtocol::APPLE_HTTP,	array('iphonenew','iphone'),	'm3u8' ),
 		);

@@ -1,3 +1,73 @@
+# Jupiter-10.18.0 #
+
+## Allow answer cue points to be added by player and anonymous users ##
+
+- Issue Type: New Feature
+- Issue ID: KMS-8423
+
+#### Configuration ####
+
+None.
+
+#### Deployment Scripts ####
+
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2015_08_16_allow_adding_answer_cue_points_with_widget_ks.php
+	 
+#### Known Issues & Limitations ####
+
+None.
+
+## Dexter/JCare Integration Plugin ##
+
+- Issue Type: New Feature  
+- Issue ID: PLAT-2595  
+
+### Installation ###
+
+- Run the installPlugins.php script:
+	php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+
+### Configuration ###
+
+- Run the following permission script:
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2015_08_12_add_metadata_profile_get_action_for_partner_-1.php
+
+## Voicebase plugin ##
+
+- Issue Type: New Feature
+- Issue ID: PLAT-2599
+
+#### Configuration ####
+ 
+- Added 'Voicebase' in plugins.ini.base, plugins.ini.admin.
+- Added 'Voicebase' module to the admin-console in admin.ini.
+
+#### Deployment Scripts ####
+	php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2015_08_23_add_integration_notify_permission.php
+	(developer's responsibility) php /opt/kaltura/app/alpha/scripts/utils/addPartnerToVoicebase.php /opt/kaltura/app {PID} {voicebase-api-key} {voicebase-api-password} 
+	
+#### Known Issues & Limitations ####
+
+None.
+
+## Allow users to use attachmentAsset->add ##
+
+- Issue Type: Permission to an existing API 
+- Issue ID: PLAT-3652
+
+#### Configuration ####
+ 
+ 	None.
+
+#### Deployment Scripts ####
+
+ 	- php deployment/updates/scripts/add_permissions/2015_08_16_add_attachment_asset_permission.php
+
+#### Known Issues & Limitations ####
+
+None.
+
 # Jupiter-10.17.0 #
 
 ## Allow users to use uiconf-->listTemplates ##

@@ -38,7 +38,7 @@ class KalturaDataEntry extends KalturaBaseEntry
 	public function toObject($dbDataEntry = null, $propsToSkip = array())
 	{
 		if(is_null($dbDataEntry))
-			$dbDataEntry = new KalturaDataEntry();
+			$dbDataEntry = new entry();
 			
 		if ($this->retrieveDataContentByGet === null)
 			$this->retrieveDataContentByGet = 1;

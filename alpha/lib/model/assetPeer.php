@@ -236,14 +236,17 @@ class assetPeer extends BaseassetPeer
 	/**
 	 * @param string $entryId
 	 * @param array $types
+	 * @param array $statuses
 	 * @return array<flavorAsset>
 	 */
-	public static function retrieveByEntryId($entryId, array $types = null)
+	public static function retrieveByEntryId($entryId, array $types = null, array $statuses = null)
 	{
 		$c = new Criteria();
 		$c->add(self::ENTRY_ID, $entryId);
 		if(count($types))
 			$c->add(self::TYPE, $types, Criteria::IN);
+		if(is_array($statuses) && count($statuses))
+			$c->add(self::STATUS, $statuses, Criteria::IN);
 		
 		return self::doSelect($c);
 	}
