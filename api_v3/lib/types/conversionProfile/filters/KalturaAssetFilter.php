@@ -40,6 +40,10 @@ class KalturaAssetFilter extends KalturaAssetBaseFilter
 		}
 		
 		$entryIds = entryPeer::filterEntriesByPartnerOrKalturaNetwork($entryIds, kCurrentContext::getCurrentPartnerId());
+		if (!$entryIds)
+		{
+			return array(array(), 0);
+		}
 		
 		$this->entryIdEqual = null;
 		$this->entryIdIn = implode(',', $entryIds);

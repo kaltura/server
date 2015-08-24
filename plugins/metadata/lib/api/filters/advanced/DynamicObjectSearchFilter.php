@@ -106,7 +106,7 @@ class DynamicObjectSearchFilter extends AdvancedSearchFilterOperator
 					KalturaLog::ERR("Missing field: $innerField in inner xpath array: " . print_r($innerXPaths, true));
 					continue;
 				}
-				$innerValue = $item->getValue();
+				$innerValue = SphinxUtils::escapeString($item->getValue());
 				$innerFieldType = $innerXPaths[$innerField]->getType();
 				$innerFieldId = $innerXPaths[$innerField]->getId();
 				$innerPrefix = $pluginName .'_'. $innerFieldId;

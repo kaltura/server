@@ -313,7 +313,7 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 	public static function validateAndGetQuiz( entry $dbEntry ) {
 		$kQuiz = self::getQuizData($dbEntry);
 		if ( !$kQuiz )
-			throw new Exception(KalturaQuizErrors::PROVIDED_ENTRY_IS_NOT_A_QUIZ, $dbEntry->getEntryId());
+			throw new kCoreException("Entry is not a quiz",kCoreException::INVALID_ENTRY_ID, $dbEntry->getId());
 
 		return $kQuiz;
 	}
@@ -402,13 +402,10 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 		{
 			throw new kCoreException("",kCoreException::INVALID_ENTRY_ID, $objectIds);
 		}
-		$avg = -1;
+		$avg = 0;
 		$dbEntry = entryPeer::retrieveByPK($objectIds);
 		if (!$dbEntry)
 			throw new kCoreException("",kCoreException::INVALID_ENTRY_ID, $objectIds);
-		/**
-		 * @var kQuiz $kQuiz
-		 */
 		$kQuiz = QuizPlugin::validateAndGetQuiz($dbEntry);
 		$c = new Criteria();
 		$c->add(UserEntryPeer::ENTRY_ID, $objectIds);
@@ -457,7 +454,11 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 	protected function getQuizQuestionPercentageTableReport($objectIds, $orderBy)
 	{
 		$questionIds = explode(",", $objectIds);
-		$questions = CuePointPeer::retrieveByPKs($questionIds);
+		$questionsCriteria = new Criteria();
+		$questionsCriteria->add(CuePointPeer::ID, $questionIds, Criteria::IN);
+		$questionsCriteria->add(CuePointPeer::TYPE, QuizPlugin::getCoreValue('CuePointType',QuizCuePointType::QUIZ_QUESTION));
+		$questions = CuePointPeer::doSelect($questionsCriteria);
+
 		return $this->getAggregateDataForQuestions($questions, $orderBy);
 	}
 	
