@@ -93,4 +93,25 @@ class AnswerCuePoint extends CuePoint implements IMetadataObject
 	{
 		return QuizPlugin::getCoreValue('MetadataObjectType', QuizCuePointMetadataObjectType::ANSWER_CUE_POINT);
 	}
+
+	/* (non-PHPdoc)
+	 * @see BaseCuePoint::postInsert()
+	 */
+	public function postInsert(PropelPDO $con = null)
+	{
+		parent::postInsert($con);
+		$userEntry = UserEntryPeer::retrieveByPK($this->getQuizUserEntryId());
+		if (!is_null($userEntry))
+		{
+			$userEntry->addAnswerId($this->parent_id, $this->id);
+			$userEntry->save();
+		}
+	}
+
+	public function shouldReIndexEntry(array $modifiedColumns = array())
+	{
+		return false;
+	}
+
+
 }
