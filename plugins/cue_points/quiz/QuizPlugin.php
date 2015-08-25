@@ -414,6 +414,12 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 		$c->add(UserEntryPeer::ENTRY_ID, $objectIds);
 		$c->add(UserEntryPeer::TYPE, QuizPlugin::getCoreValue('UserEntryType', QuizUserEntryType::QUIZ));
 		$c->add(UserEntryPeer::STATUS, QuizPlugin::getCoreValue('UserEntryStatus', QuizUserEntryStatus::QUIZ_SUBMITTED));
+		$anonKuser = $this->getAnonymousKuser($dbEntry->getPartnerId());
+		if (!is_null($anonKuser))
+		{
+			$c->add(UserEntryPeer::KUSER_ID, $anonKuser->getKuserId(), Criteria::NOT_IN);
+		}
+
 		$quizzes = UserEntryPeer::doSelect($c);
 		$numOfQuizzesFound = count($quizzes);
 		KalturaLog::debug("Found $numOfQuizzesFound quizzes that were submitted");
@@ -442,9 +448,6 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 		$dbEntry = entryPeer::retrieveByPK($objectIds);
 		if (!$dbEntry)
 			throw new Exception(KalturaErrors::ENTRY_ID_NOT_FOUND, $objectIds);
-		/**
-		 * @var kQuiz $kQuiz
-		 */
 		$kQuiz = QuizPlugin::validateAndGetQuiz( $dbEntry );
 		$c = new Criteria();
 		$c->add(CuePointPeer::ENTRY_ID, $objectIds);
@@ -482,6 +485,12 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 		$c = new Criteria();
 		$c->add(CuePointPeer::ENTRY_ID, $objectIds);
 		$c->add(CuePointPeer::TYPE, QuizPlugin::getCoreValue('CuePointType', QuizCuePointType::QUIZ_QUESTION));
+		$anonKuser = $this->getAnonymousKuser($dbEntry->getPartnerId());
+		if (!is_null($anonKuser))
+		{
+			$c->add(CuePointPeer::KUSER_ID, $anonKuser->getKuserId(), Criteria::NOT_IN);
+		}
+
 		$numOfquestions = CuePointPeer::doCount($c);
 		$res = array();
 		$res['count_all'] = $numOfquestions;
@@ -525,6 +534,11 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 		$c = new Criteria();
 		$c->add(CuePointPeer::ENTRY_ID, $objectIds);
 		$c->add(CuePointPeer::TYPE, QuizPlugin::getCoreValue('CuePointType',QuizCuePointType::QUIZ_ANSWER));
+		$anonKuser = $this->getAnonymousKuser($dbEntry->getPartnerId());
+		if (!is_null($anonKuser))
+		{
+			$c->add(CuePointPeer::KUSER_ID, $anonKuser->getKuserId(), Criteria::NOT_IN);
+		}
 		$answers = CuePointPeer::doSelect($c);
 		return $this->getAggregateDataForUsers($answers, $orderBy);
 	}
@@ -574,6 +588,11 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 			$c->add(CuePointPeer::ENTRY_ID, $question->getEntryId());
 			$c->add(CuePointPeer::TYPE, QuizPlugin::getCoreValue('CuePointType', QuizCuePointType::QUIZ_ANSWER));
 			$c->add(CuePointPeer::PARENT_ID, $question->getId());
+			$anonKuser = $this->getAnonymousKuser($question->getPartnerId());
+			if (!is_null($anonKuser))
+			{
+				$c->add(CuePointPeer::KUSER_ID, $anonKuser->getKuserId(), Criteria::NOT_IN);
+			}
 			$answers = CuePointPeer::doSelect($c);
 			$numOfAnswers = count($answers);
 			if ($numOfAnswers)
@@ -701,6 +720,16 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 		}
 		$c->add(CuePointPeer::KUSER_ID, $kuserIds, Criteria::IN);
 		return $c;
+	}
+
+	/**
+	 * @param $partnerID
+	 * @return kuser
+	 */
+	protected function getAnonymousKuser($partnerID)
+	{
+		$anonKuser = kuserPeer::getKuserByPartnerAndUid($partnerID, 0, true);
+		return $anonKuser;
 	}
 
 }
