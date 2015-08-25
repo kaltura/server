@@ -597,20 +597,20 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 				if ($this->isQuizUserEntrySubmitted($quizUserEntryId))
 				{
 					$numOfAnswers++;
-				}
-				$optionalAnswers = $question->getOptionalAnswers();
-				$correct = false;
-				foreach ($optionalAnswers as $optionalAnswer)
-				{
-					/**
-					 * @var kOptionalAnswer $optionalAnswer
-					 */
-					if ($optionalAnswer->getKey() === $answer->getAnswerKey())
+					$optionalAnswers = $question->getOptionalAnswers();
+					$correct = false;
+					foreach ($optionalAnswers as $optionalAnswer)
 					{
-						if ($optionalAnswer->getIsCorrect())
+						/**
+						 * @var kOptionalAnswer $optionalAnswer
+						 */
+						if ($optionalAnswer->getKey() === $answer->getAnswerKey())
 						{
-							$numOfCorrectAnswers++;
-							break;
+							if ($optionalAnswer->getIsCorrect())
+							{
+								$numOfCorrectAnswers++;
+								break;
+							}
 						}
 					}
 				}
@@ -651,25 +651,24 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 			$quizUserEntryId = $answer->getQuizUserEntryId();
 			if ($this->isQuizUserEntrySubmitted($quizUserEntryId))
 			{
-				continue;
-			}
-			if ($answer->getIsCorrect())
-			{
-				if (isset($usersCorrectAnswers[$answer->getKuserId()]))
+				if ($answer->getIsCorrect())
 				{
-					$usersCorrectAnswers[$answer->getKuserId()]++;
+					if (isset($usersCorrectAnswers[$answer->getKuserId()]))
+					{
+						$usersCorrectAnswers[$answer->getKuserId()]++;
+					} else
+					{
+						$usersCorrectAnswers[$answer->getKuserId()] = 1;
+					}
 				} else
 				{
-					$usersCorrectAnswers[$answer->getKuserId()] = 1;
-				}
-			} else
-			{
-				if (isset($usersWrongAnswers[$answer->getKuserId()]))
-				{
-					$usersWrongAnswers[$answer->getKuserId()]++;
-				} else
-				{
-					$usersWrongAnswers[$answer->getKuserId()] = 1;
+					if (isset($usersWrongAnswers[$answer->getKuserId()]))
+					{
+						$usersWrongAnswers[$answer->getKuserId()]++;
+					} else
+					{
+						$usersWrongAnswers[$answer->getKuserId()] = 1;
+					}
 				}
 			}
 		}
