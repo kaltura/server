@@ -502,7 +502,7 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 	protected function getAnswerCountByUserIds($objectIds)
 	{
 		$c = $this->createGetCuePointByUserIdsCriteria($objectIds);
-		$numOfAnswers = 0;// = CuePointPeer::doCount($c);
+		$numOfAnswers = 0;
 		$answers = CuePointPeer::doSelect($c);
 		foreach ($answers as $answer)
 		{
@@ -510,15 +510,10 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 			 * @var AnswerCuePoint $answer
 			 */
 			$quizUserEntryId = $answer->getQuizUserEntryId();
-			if (!isset($quizUserEntries[$quizUserEntryId]))
+			if ($this->isQuizUserEntrySubmitted($quizUserEntryId))
 			{
-				$quizUserEntries[$quizUserEntryId] = $this->isQuizUserEntrySubmitted($quizUserEntryId);
+				$numOfAnswers++;
 			}
-			if ($quizUserEntries[$quizUserEntryId] === false)
-			{
-				continue;
-			}
-			$numOfAnswers++;
 		}
 		$res['count_all'] = $numOfAnswers;
 		return array($res);
@@ -592,23 +587,17 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 			$c->add(CuePointPeer::TYPE, QuizPlugin::getCoreValue('CuePointType', QuizCuePointType::QUIZ_ANSWER));
 			$c->add(CuePointPeer::PARENT_ID, $question->getId());
 			$answers = CuePointPeer::doSelect($c);
-			$numOfAnswers = 0;count($answers);
-			$quizUserEntries = array();
+			$numOfAnswers = 0;
 			foreach ($answers as $answer)
 			{
 				/**
 				 * @var AnswerCuePoint $answer
 				 */
 				$quizUserEntryId = $answer->getQuizUserEntryId();
-				if (!isset($quizUserEntries[$quizUserEntryId]))
+				if ($this->isQuizUserEntrySubmitted($quizUserEntryId))
 				{
-					$quizUserEntries[$quizUserEntryId] = $this->isQuizUserEntrySubmitted($quizUserEntryId);
+					$numOfAnswers++;
 				}
-				if ($quizUserEntries[$quizUserEntryId] === false)
-				{
-					continue;
-				}
-				$numOfAnswers++;
 				$optionalAnswers = $question->getOptionalAnswers();
 				$correct = false;
 				foreach ($optionalAnswers as $optionalAnswer)
@@ -652,7 +641,6 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 	protected function getAggregateDataForUsers($answers, $orderBy)
 	{
 		$ans = array();
-		$quizUserEntries = array();
 		$usersCorrectAnswers = array();
 		$usersWrongAnswers = array();
 		foreach ($answers as $answer)
@@ -661,12 +649,7 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 			 * @var AnswerCuePoint $answer
 			 */
 			$quizUserEntryId = $answer->getQuizUserEntryId();
-			if (!isset($quizUserEntries[$quizUserEntryId]))
-			{
-				$quizUserEntries[$quizUserEntryId] = $this->isQuizUserEntrySubmitted($quizUserEntryId);
-			}
-
-			if ($quizUserEntries[$quizUserEntryId] === false)
+			if ($this->isQuizUserEntrySubmitted($quizUserEntryId))
 			{
 				continue;
 			}
