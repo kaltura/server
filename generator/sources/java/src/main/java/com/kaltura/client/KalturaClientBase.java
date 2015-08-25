@@ -248,7 +248,7 @@ abstract public class KalturaClientBase implements Serializable {
 		String url = extractParamsFromCallQueue(kparams, kfiles);
 
 		if (logger.isEnabled())
-			logger.debug("full reqeust url: [" + url + "?" + kparams.toQueryString() + "]");
+			logger.debug("full request url: [" + url + "?" + kparams.toQueryString() + "]");
 
 		HttpClient client = createHttpClient();
 		String responseString = null;
