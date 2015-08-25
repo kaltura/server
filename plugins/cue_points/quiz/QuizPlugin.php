@@ -736,12 +736,12 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 
 function copmareNumbersAscending($a,$b)
 {
-	return innerCompare($a,$b);
+	return innerCompare($a,$b)*(-1);
 }
 
 function copmareNumbersDescending($a,$b)
 {
-    return innerCompare($a,$b)*(-1);
+    return innerCompare($a,$b);
 }
 
 function innerCompare($a, $b)
