@@ -799,7 +799,7 @@ class playManifestAction extends kalturaAction
 		$partner = PartnerPeer::retrieveByPK($partnerId);
 		$partnerTimeAligned = $partner->getTimeAlignedRenditions();
 		
-		if ( ($partnerTimeAligned) && ((bool) $this->getRequestParameter("timeAlignedRenditions")) ) {
+		if ( ($partnerTimeAligned) && ((bool) $this->getRequestParameter("flashPlayer")) ) {
 			// check entry's flavors
 			$entryFlavorParams = assetParamsPeer::retrieveByPKs(explode(',', $this->entry->getFlavorParamsIds()));
 			$hasTranscode = false;
