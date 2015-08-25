@@ -394,18 +394,18 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 	/**
 	 * @param $objectIds
 	 * @return array
-	 * @throws Exception
+	 * @throws kCoreException
 	 */
 	protected function getTotalReport($objectIds)
 	{
 		if (!$objectIds)
 		{
-			throw new Exception(KalturaQuizErrors::ENTRY_ID_NOT_GIVEN);
+			throw new kCoreException("",kCoreException::INVALID_ENTRY_ID, $objectIds);
 		}
 		$avg = -1;
 		$dbEntry = entryPeer::retrieveByPK($objectIds);
 		if (!$dbEntry)
-			throw new Exception(KalturaErrors::ENTRY_ID_NOT_FOUND, $objectIds);
+			throw new kCoreException("",kCoreException::INVALID_ENTRY_ID, $objectIds);
 		/**
 		 * @var kQuiz $kQuiz
 		 */
@@ -435,13 +435,13 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 	/**
 	 * @param $objectIds
 	 * @return array
-	 * @throws Exception
+	 * @throws kCoreException
 	 */
 	protected function getQuestionPercentageTableReport($objectIds, $orderBy)
 	{
 		$dbEntry = entryPeer::retrieveByPK($objectIds);
 		if (!$dbEntry)
-			throw new Exception(KalturaErrors::ENTRY_ID_NOT_FOUND, $objectIds);
+			throw new kCoreException("",kCoreException::INVALID_ENTRY_ID, $objectIds);
 		/**
 		 * @var kQuiz $kQuiz
 		 */
@@ -465,14 +465,14 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 	/**
 	 * @param $objectIds
 	 * @return array
-	 * @throws Exception
+	 * @throws kCoreException
 	 */
 	protected function getReportCount($objectIds)
 	{
 		$dbEntry = entryPeer::retrieveByPK($objectIds);
 		if (!$dbEntry)
 		{
-			throw new Exception(KalturaErrors::ENTRY_ID_NOT_FOUND, $objectIds);
+			throw new kCoreException("", kCoreException::INVALID_ENTRY_ID, $objectIds);
 		}
 		/**
 		 * @var kQuiz $kQuiz
@@ -510,14 +510,14 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 	/**
 	 * @param $objectIds
 	 * @return array
-	 * @throws Exception
+	 * @throws kCoreException
 	 * @throws KalturaAPIException
 	 */
 	protected function getUserPercentageTable($objectIds, $orderBy)
 	{
 		$dbEntry = entryPeer::retrieveByPK($objectIds);
 		if (!$dbEntry)
-			throw new Exception(KalturaErrors::ENTRY_ID_NOT_FOUND, $objectIds);
+			throw new kCoreException("",kCoreException::INVALID_ENTRY_ID, $objectIds);
 		/**
 		 * @var kQuiz $kQuiz
 		 */
