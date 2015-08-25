@@ -414,7 +414,7 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 		$c->add(UserEntryPeer::ENTRY_ID, $objectIds);
 		$c->add(UserEntryPeer::TYPE, QuizPlugin::getCoreValue('UserEntryType', QuizUserEntryType::QUIZ));
 		$c->add(UserEntryPeer::STATUS, QuizPlugin::getCoreValue('UserEntryStatus', QuizUserEntryStatus::QUIZ_SUBMITTED));
-		$anonKuser = kuserPeer::getKuserByPartnerAndUid($dbEntry->getPartnerId(), 0, true);
+		$anonKuser = $this->getAnonymousKuser($dbEntry->getPartnerId());
 		if (!is_null($anonKuser))
 		{
 			$c->add(UserEntryPeer::KUSER_ID, $anonKuser->getKuserId(), Criteria::NOT_IN);
@@ -485,7 +485,7 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 		$c = new Criteria();
 		$c->add(CuePointPeer::ENTRY_ID, $objectIds);
 		$c->add(CuePointPeer::TYPE, QuizPlugin::getCoreValue('CuePointType', QuizCuePointType::QUIZ_QUESTION));
-		$anonKuser = kuserPeer::getKuserByPartnerAndUid($dbEntry->getPartnerId(), 0, true);
+		$anonKuser = $this->getAnonymousKuser($dbEntry->getPartnerId());
 		if (!is_null($anonKuser))
 		{
 			$c->add(CuePointPeer::KUSER_ID, $anonKuser->getKuserId(), Criteria::NOT_IN);
@@ -534,7 +534,7 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 		$c = new Criteria();
 		$c->add(CuePointPeer::ENTRY_ID, $objectIds);
 		$c->add(CuePointPeer::TYPE, QuizPlugin::getCoreValue('CuePointType',QuizCuePointType::QUIZ_ANSWER));
-		$anonKuser = kuserPeer::getKuserByPartnerAndUid($dbEntry->getPartnerId(), 0, true);
+		$anonKuser = $this->getAnonymousKuser($dbEntry->getPartnerId());
 		if (!is_null($anonKuser))
 		{
 			$c->add(CuePointPeer::KUSER_ID, $anonKuser->getKuserId(), Criteria::NOT_IN);
@@ -588,7 +588,7 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 			$c->add(CuePointPeer::ENTRY_ID, $question->getEntryId());
 			$c->add(CuePointPeer::TYPE, QuizPlugin::getCoreValue('CuePointType', QuizCuePointType::QUIZ_ANSWER));
 			$c->add(CuePointPeer::PARENT_ID, $question->getId());
-			$anonKuser = kuserPeer::getKuserByPartnerAndUid($question->getPartnerId(), 0, true);
+			$anonKuser = $this->getAnonymousKuser($question->getPartnerId());
 			if (!is_null($anonKuser))
 			{
 				$c->add(CuePointPeer::KUSER_ID, $anonKuser->getKuserId(), Criteria::NOT_IN);
@@ -720,6 +720,16 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 		}
 		$c->add(CuePointPeer::KUSER_ID, $kuserIds, Criteria::IN);
 		return $c;
+	}
+
+	/**
+	 * @param $partnerID
+	 * @return kuser
+	 */
+	protected function getAnonymousKuser($partnerID)
+	{
+		$anonKuser = kuserPeer::getKuserByPartnerAndUid($partnerID, 0, true);
+		return $anonKuser;
 	}
 
 }
