@@ -373,10 +373,13 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 					return $this->getUserPrecentageByUserTable($objectIds, $orderBy);
 				}
 			case myReportsMgr::REPORT_FLAVOR_COUNT:
-				if ( ($report_type == (self::getPluginName() . "." . QuizReportType::QUIZ)) ||
-					($report_type == (self::getPluginName() . "." . QuizReportType::QUIZ_USER_PERCENTAGE)) )
+				if ($report_type == (self::getPluginName() . "." . QuizReportType::QUIZ))
 				{
 					return $this->getReportCount($objectIds);
+				}
+				else if ($report_type == (self::getPluginName() . "." . QuizReportType::QUIZ_USER_PERCENTAGE) )
+				{
+					return $this->getUserPercentageCount($objectIds);
 				}
 				else if ($report_type == (self::getPluginName() . "." . QuizReportType::QUIZ_AGGREGATE_BY_QUESTION))
 				{
@@ -489,6 +492,31 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 		return array($res);
 	}
 
+	protected function getUserPercentageCount($objectIds)
+	{
+		$c = new Criteria();
+		$c->add(CuePointPeer::ENTRY_ID, $objectIds);
+		$c->add(CuePointPeer::TYPE, QuizPlugin::getCoreValue('CuePointType',QuizCuePointType::QUIZ_ANSWER));
+				
+		$answers = CuePointPeer::doSelect($c);
+		$kuserIds = array();
+		foreach ($answers as $answer)
+		{
+			if (isset($kuserIds[$answer->getKuserId()]))
+			{
+				$kuserIds[$answer->getKuserId()]++;
+			}
+			else
+			{
+				$kuserIds[$answer->getKuserId()] = 0;
+			}
+		}
+		$numOfAnswers = count($kuserIds);
+		$res = array();
+		$res['count_all'] = $numOfAnswers;
+		return array($res);
+	}
+	
 	protected function getQuestionCountByQusetionIds($objectIds)
 	{
 		$questionIds = explode(",", $objectIds);
