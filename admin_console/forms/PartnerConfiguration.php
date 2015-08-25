@@ -112,7 +112,7 @@ class Form_PartnerConfiguration extends Infra_Form
 			));
 
 		$this->addElement('checkbox', 'time_aligned_renditions', array(
-		    'label'	  => 'Exclude Source from Transcoded Renditions',
+		    'label'	  => 'Kaltura Live Streams - Exclude Source Rendition',
 		    'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'partner_configuration_checkbox_field')))
 		));		
 						
