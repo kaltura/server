@@ -34,16 +34,24 @@ namespace Kaltura
 {
     public class KalturaParams : SortedList<string, IKalturaSerializable>, IKalturaSerializable
     {
+        private bool isArray;
+
         public string ToJson()
         {
             string[] values = new string[this.Count];
             int index = 0;
             foreach (KeyValuePair<string, IKalturaSerializable> item in this)
             {
-                values[index++] = "\"" + item.Key + "\":" + item.Value.ToJson();
+                if (isArray)
+                    values[index++] = item.Value.ToJson();
+                else
+                    values[index++] = "\"" + item.Key + "\":" + item.Value.ToJson();
             }
 
-            return "{" + string.Join(",", values) + "}";
+            if (isArray)
+                return string.Format("[{0}]", string.Join(",", values));
+            else
+                return string.Format("{{{0}}}", string.Join(",", values));
         }
 
         public string ToQueryString()
@@ -60,7 +68,7 @@ namespace Kaltura
 
         public void Add(KalturaParams properties)
         {
-            foreach(string key in properties.Keys)
+            foreach (string key in properties.Keys)
                 Add(key, properties[key]);
         }
 
@@ -83,7 +91,7 @@ namespace Kaltura
             if (array == null)
                 return;
 
-            KalturaParams arrayParams = new KalturaParams();
+            KalturaParams arrayParams = new KalturaParams() { isArray = true };
             if (array.Count == 0)
             {
                 arrayParams.Add("-", "");
