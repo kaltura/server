@@ -144,7 +144,6 @@ class AppTokenService extends KalturaBaseService
 	 * @param string $userId session user id, will be ignored if a different user id already defined on the application token
 	 * @param KalturaSessionType $type session type, will be ignored if a different session type already defined on the application token
 	 * @param int $expiry session expiry (in seconds), could be overwritten by shorter expiry of the application token and the session-expiry that defined on the application token 
-	 * @param string $privileges session privileges, will be appended to privileges that defined on the application token
 	 * @throws KalturaErrors::APP_TOKEN_ID_NOT_FOUND
 	 * @return KalturaSessionInfo
 	 */
@@ -157,7 +156,7 @@ class AppTokenService extends KalturaBaseService
 		if($dbAppToken->getStatus() != AppTokenStatus::ACTIVE)
 			throw new KalturaAPIException(KalturaErrors::APP_TOKEN_NOT_ACTIVE, $id);
 		
-		$appTokenHash = sha1(kCurrentContext::$ks . $dbAppToken->getToken());
+		$appTokenHash = $dbAppToken->calcHash();
 		if($appTokenHash !== $tokenHash)
 			throw new KalturaAPIException(KalturaErrors::INVALID_APP_TOKEN_HASH);
 		
@@ -212,4 +211,5 @@ class AppTokenService extends KalturaBaseService
 		
 		return $sessionInfo;
 	}
-}
+	
+};
