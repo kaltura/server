@@ -31,6 +31,7 @@ class QuizUserEntry extends UserEntry{
 	
 	public function calculateScore()
 	{
+		//TODO when we have indexing of CuePoints in the sphinx we don't need the answerIds in the custom_data since we can just get the answers of the specific userEntry
 		$answerIds = $this->getAnswerIds();
 		$questionType = QuizPlugin::getCuePointTypeCoreValue(QuizCuePointType::QUIZ_QUESTION);
 		$questions = CuePointPeer::retrieveByEntryId($this->getEntryId(), array($questionType));
@@ -43,6 +44,7 @@ class QuizUserEntry extends UserEntry{
 			if (isset($answerIds[$question->getId()]))
 			{
 				$answerId = $answerIds[$question->getId()];
+				//TODO change to retrieveByPks (multiple, only one query, no need for multiple)
 				$currAnswer = CuePointPeer::retrieveByPK($answerId);
 				$answers[] = $currAnswer;
 			}
