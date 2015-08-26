@@ -21,14 +21,60 @@ class KalturaTvinciDistributionProfile extends KalturaConfigurableDistributionPr
 	public $password;
 
 	/**
-	 * @var int
+	 * @var string
 	 */
-	public $schemaId;
+	public $ismFileName;
 
 	/**
 	 * @var string
 	 */
-	public $language;
+	public $ismPpvModule;
+
+	/**
+	 * @var string
+	 */
+	public $ipadnewFileName;
+
+	/**
+	 * @var string
+	 */
+	public $ipadnewPpvModule;
+
+	/**
+	 * @var string
+	 */
+	public $iphonenewFileName;
+
+	/**
+	 * @var string
+	 */
+	public $iphonenewPpvModule;
+
+	/**
+	 * @var string
+	 */
+	public $mbrFileName;
+
+	/**
+	 * @var string
+	 */
+	public $mbrPpvModule;
+
+	/**
+	 * @var string
+	 */
+	public $dashFileName;
+
+	/**
+	 * @var string
+	 */
+	public $dashPpvModule;
+
+	/**
+	 * @var string
+	 */
+	public $xsltFile;
+
 
 
 	/*
@@ -39,8 +85,17 @@ class KalturaTvinciDistributionProfile extends KalturaConfigurableDistributionPr
 		'ingestUrl',
 		'username',
 		'password',
-		'schemaId',
-		'language',
+		'ismFileName',
+		'ismPpvModule',
+		'ipadnewFileName',
+		'ipadnewPpvModule',
+		'iphonenewFileName',
+		'iphonenewPpvModule',
+		'mbrFileName',
+		'mbrPpvModule',
+		'dashFileName',
+		'dashPpvModule',
+		'xsltFile',
 	 );
 		 
 	public function getMapBetweenObjects()
