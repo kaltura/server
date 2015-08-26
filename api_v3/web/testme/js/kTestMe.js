@@ -136,25 +136,37 @@ var kTestMe = {
 	appendDialog: function(dialog) {
 		this.jqObjectsContainer.append(dialog.jqElement);
 	},
-	
-	onResponse: function() {
-		if(this.loaded == null){
-			this.loaded = true;
-			return;
+
+	getKSFromTextByFormat: function(responseText, format){
+		const INVALID ="";
+		switch (format)	{
+			case 'xml' :
+				var startResult = responseText.indexOf('<result>');
+				var endResult = responseText.indexOf('</result>');
+				if ( startResult > -1 && endResult > -1) {
+					return responseText.substring(startResult + 8, endResult );
+				}
+			case 'json' :
+				return responseText.slice(1,-1);
+			default :
+				break;
 		}
+		return INVALID;
+	},
+
+	onResponse: function(responseText, format) {
 		
 		if ((this.call.getServiceId() == 'session') && (this.call.getActionId() == 'start')) {
-			var iframeDoc = jQuery('#response')[0].contentWindow.document;
-			var xmlDoc = (iframeDoc.XMLDocument) ? iframeDoc.XMLDocument : iframeDoc.documentElement;
-			var response = jQuery(xmlDoc).find('result');
+
+			var ksText = this.getKSFromTextByFormat(responseText, format);
 			var field = jQuery('#ks');
 			if(!field || !field.size()){
 				kTestMe.log.error('KS field not found.');
 				return;
 			}
 			
-			if (response.size() && !response.find('error').size()){
-				field.val(response.text());
+			if (ksText.length > 0){
+				field.val(ksText);
 			}
 			// if not empty, empty it
 			else if (field.val()){

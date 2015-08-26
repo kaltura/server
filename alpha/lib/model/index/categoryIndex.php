@@ -303,6 +303,30 @@ class categoryIndex extends BaseIndexObject
 		return self::$conditionToKeep;
 	}
 
+	protected static $apiCompareAttributesMap;
+
+	public static function getApiCompareAttributesMap()
+	{
+		if (!self::$apiCompareAttributesMap)
+		{
+			self::$apiCompareAttributesMap = array(
+			);
+		}
+		return self::$apiCompareAttributesMap;
+	}
+
+	protected static $apiMatchAttributesMap;
+
+	public static function getApiMatchAttributesMap()
+	{
+		if (!self::$apiMatchAttributesMap)
+		{
+			self::$apiMatchAttributesMap = array(
+			);
+		}
+		return self::$apiMatchAttributesMap;
+	}
+
 	public static function getSphinxOptimizationMap()
 	{
 		return array(

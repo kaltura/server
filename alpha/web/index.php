@@ -30,7 +30,11 @@ function checkCache()
 	$start_time = microtime(true);
 
 	$protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') ? "https" : "http";
-	$host = isset($_SERVER['HTTP_X_FORWARDED_HOST']) ? $_SERVER['HTTP_X_FORWARDED_HOST'] : $_SERVER['HTTP_HOST'];
+	$host = "";
+	if (isset($_SERVER['HTTP_X_FORWARDED_HOST']))
+		$host =  $_SERVER['HTTP_X_FORWARDED_HOST'];
+	else if (isset($_SERVER['HTTP_HOST']))
+		$host = $_SERVER['HTTP_HOST'];
 	$uri = $_SERVER["REQUEST_URI"];
 	
 	if (function_exists('apc_fetch'))

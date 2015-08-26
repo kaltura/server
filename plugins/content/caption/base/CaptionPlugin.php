@@ -463,6 +463,12 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 		switch ($config->format)
 		{
 			case PlaybackProtocol::APPLE_HTTP:
+				
+				if ($config->rendererClass != 'kM3U8ManifestRenderer')
+				{
+					return array();
+				}
+				
 				$contributor = new WebVttCaptionsManifestEditor();
 				$contributor->captions = array();
 				//retrieve the current working partner's captions according to the entryId

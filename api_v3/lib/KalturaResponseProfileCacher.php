@@ -11,6 +11,11 @@ class KalturaResponseProfileCacher extends kResponseProfileCacher
 	 */
 	private static $responseProfileKey = null;
 	
+	/**
+	 * @var boolean
+	 */
+	private static $cachePerUser = false;
+	
 	private static function getObjectSpecificCacheValue(KalturaObject $apiObject, IBaseObject $object, $responseProfileKey)
 	{
 		return array(
@@ -42,7 +47,15 @@ class KalturaResponseProfileCacher extends kResponseProfileCacher
 		$host = (isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : '');
 		$entitlement = (int) kEntitlementUtils::getEntitlementEnforcement();
 		
-		return "obj_rp{$profileKey}_p{$partnerId}_o{$objectType}_i{$objectId}_h{$protocol}_k{$ksType}_u{$userRoles}_w{$host}_e{$entitlement}";
+		if(self::$cachePerUser)
+		{
+			$user = kCurrentContext::getCurrentKsKuserId();
+			return "obj_rp{$profileKey}_p{$partnerId}_o{$objectType}_i{$objectId}_h{$protocol}_k{$ksType}_u{$userRoles}_w{$host}_e{$entitlement}_us{$user}";
+		}
+		else
+		{
+			return "obj_rp{$profileKey}_p{$partnerId}_o{$objectType}_i{$objectId}_h{$protocol}_k{$ksType}_u{$userRoles}_w{$host}_e{$entitlement}";
+		}
 	}
 	
 	private static function getObjectTypeCacheValue(IBaseObject $object)
@@ -94,6 +107,11 @@ class KalturaResponseProfileCacher extends kResponseProfileCacher
 				self::set($key, $value);
 			}
 		}
+	}
+	
+	public static function useUserCache()
+	{
+		self::$cachePerUser = true;
 	}
 	
 	public static function start(IBaseObject $object, KalturaDetachedResponseProfile $responseProfile)
@@ -154,6 +172,7 @@ class KalturaResponseProfileCacher extends kResponseProfileCacher
 		self::set($key, $value);
 		
 		self::$cachedObject = null;
+		self::$cachePerUser = false;
 	}
 	
 	protected static function recalculateCache(kCouchbaseCacheListItem $cache, KalturaDetachedResponseProfile $responseProfile = null)

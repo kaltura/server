@@ -123,8 +123,7 @@ class IntegrationPlugin extends KalturaPlugin implements IKalturaPermissions, IK
 		{
 			if($enumValue == self::getApiValue(IntegrationBatchJobType::INTEGRATION) || $enumValue == self::getBatchJobTypeCoreValue(IntegrationBatchJobType::INTEGRATION))
 				return 'KalturaIntegrationJobData';
-		}
-		
+		}		
 	}
 	
 	/**

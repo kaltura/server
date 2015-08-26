@@ -313,6 +313,7 @@ abstract class LiveEntry extends entry
 		$backupMediaServer = null;
 		$primaryApplicationName = null;
 		$backupApplicationName = null;
+		$isExternalMediaServerStream = false;
 		
 		$kMediaServers = $this->getMediaServers();
 		$partnerMediaServerConfiguration = $this->getPartner()->getMediaServersConfiguration();
@@ -346,6 +347,7 @@ abstract class LiveEntry extends entry
 						$primaryMediaServer = new MediaServer();
 						$primaryMediaServer->setHostname($kMediaServer->getHostname());
 						$primaryMediaServer->setIsExternalMediaServer(true);
+						$isExternalMediaServerStream = true;
 					}
 					$primaryApplicationName = $kMediaServer->getApplicationName();
 				}
@@ -364,6 +366,7 @@ abstract class LiveEntry extends entry
 						$backupMediaServer = new MediaServer();
 						$backupMediaServer->setHostname($kMediaServer->getHostname());
 						$backupMediaServer->setIsExternalMediaServer(true);
+						$isExternalMediaServerStream = true;
 					}
 					$backupApplicationName = $kMediaServer->getApplicationName();
 				}
@@ -463,34 +466,40 @@ abstract class LiveEntry extends entry
 		$configuration->setProtocol(PlaybackProtocol::HDS);
 		$configuration->setUrl($hdsStreamUrl);
 		$configuration->setBackupUrl($hdsBackupStreamUrl);
+		$configuration->setIsExternalStream($isExternalMediaServerStream);
 		$configurations[] = $configuration;
 		
 		$configuration = new kLiveStreamConfiguration();
 		$configuration->setProtocol(PlaybackProtocol::HLS);
 		$configuration->setUrl($hlsStreamUrl);
 		$configuration->setBackupUrl($hlsBackupStreamUrl);
+		$configuration->setIsExternalStream($isExternalMediaServerStream);
 		$configurations[] = $configuration;
 		
 		$configuration = new kLiveStreamConfiguration();
 		$configuration->setProtocol(PlaybackProtocol::APPLE_HTTP);
 		$configuration->setUrl($hlsStreamUrl);
 		$configuration->setBackupUrl($hlsBackupStreamUrl);
+		$configuration->setIsExternalStream($isExternalMediaServerStream);
 		$configurations[] = $configuration;
 		
 		$configuration = new kLiveStreamConfiguration();
 		$configuration->setProtocol(PlaybackProtocol::APPLE_HTTP_TO_MC);
 		$configuration->setUrl($hlsStreamUrl);
 		$configuration->setBackupUrl($hlsBackupStreamUrl);
+		$configuration->setIsExternalStream($isExternalMediaServerStream);
 		$configurations[] = $configuration;
 		
 		$configuration = new kLiveStreamConfiguration();
 		$configuration->setProtocol(PlaybackProtocol::SILVER_LIGHT);
 		$configuration->setUrl($slStreamUrl);
+		$configuration->setIsExternalStream($isExternalMediaServerStream);
 		$configurations[] = $configuration;
 		
 		$configuration = new kLiveStreamConfiguration();
 		$configuration->setProtocol(PlaybackProtocol::MPEG_DASH);
 		$configuration->setUrl($mpdStreamUrl);
+		$configuration->setIsExternalStream($isExternalMediaServerStream);
 		$configurations[] = $configuration;
 		
 		if ($this->getPushPublishEnabled())
@@ -585,9 +594,10 @@ abstract class LiveEntry extends entry
 	{
 		$cacheType = self::getCacheType();
 		$cacheStore = kCacheManager::getSingleLayerCache($cacheType);
-		if(! $cacheStore)
+		if(! $cacheStore) {
+			KalturaLog::debug("cacheStore is null. cacheType: $cacheType . returning false");
 			return false;
-		
+		}
 		return $cacheStore->set($key, true, kConf::get('media_server_cache_expiry', 'local', self::DEFAULT_CACHE_EXPIRY));
 	}
 	
@@ -603,9 +613,12 @@ abstract class LiveEntry extends entry
 		}
 		
 		$key = $this->getId() . "_{$hostname}_{$index}";
-		if($this->storeInCache($key) && $this->isMediaServerRegistered($index, $hostname))
+		if($this->storeInCache($key) && $this->isMediaServerRegistered($index, $hostname)) {
+			KalturaLog::debug("cached and registered - index: $index, hostname: $hostname");
 			return;
-		
+		}
+
+		KalturaLog::debug("about to setMediaServer. index: $index, hostname: $hostname");
 		$this->setLastBroadcast(kApiCache::getTime());
 		$server = new kLiveMediaServer($index, $hostname, $mediaServer ? $mediaServer->getDc() : null, $mediaServer ? $mediaServer->getId() : null, 
 			$applicationName ? $applicationName : MediaServer::DEFAULT_APPLICATION);
@@ -619,7 +632,8 @@ abstract class LiveEntry extends entry
 		/* @var $server kLiveMediaServer */
 		if($server && $server->getHostname() == $hostname)
 			return true;
-		
+
+		KalturaLog::debug("mediaServer is not registered. hostname: $hostname , index: $index , server: " . print_r($server,true));
 		return false;
 	}
 	

@@ -47,12 +47,19 @@ class KAsyncValidateLiveMediaServers extends KPeriodicWorker
 		{
 			foreach($entries->objects as $entry)
 			{
-				/* @var $entry KalturaLiveEntry */
-				self::impersonate($entry->partnerId);
-				self::$kClient->liveStream->validateRegisteredMediaServers($entry->id);
-				self::unimpersonate();
-				
-				$filter->createdAtGreaterThanOrEqual = $entry->createdAt;
+				try
+				{
+					/* @var $entry KalturaLiveEntry */
+					self::impersonate($entry->partnerId);
+					self::$kClient->liveStream->validateRegisteredMediaServers($entry->id);
+					self::unimpersonate();
+					$filter->createdAtGreaterThanOrEqual = $entry->createdAt;
+				}
+				catch (KalturaException $e)
+				{
+					self::unimpersonate();
+					KalturaLog::err("Caught exception with message [" . $e->getMessage()."]");
+				}
 			}
 			
 			$pager->pageIndex++;

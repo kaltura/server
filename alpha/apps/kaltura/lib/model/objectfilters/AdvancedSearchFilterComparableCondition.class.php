@@ -33,6 +33,9 @@ class AdvancedSearchFilterComparableCondition extends AdvancedSearchFilterCondit
 			case KalturaSearchConditionComparison::LESS_THAN_OR_EQUAL:
 				$comparison = " <= ";
 				break;
+			case KalturaSearchConditionComparison::NOT_EQUAL:
+				$comparison = " <> ";
+				break;
 			default:
 				KalturaLog::ERR("Missing comparison type");
 				return;
@@ -40,6 +43,20 @@ class AdvancedSearchFilterComparableCondition extends AdvancedSearchFilterCondit
 
 		$field = $this->getField();
 		$value = $this->getValue();
+		$fieldValue = $this->getFieldValue($field);
+		if (is_null($fieldValue))
+		{
+			KalturaLog::err('Unknown field [' . $field . ']');
+			return;
+		}
+
+		$newCondition = $fieldValue . $comparison . KalturaCriteria::escapeString($value);
+
+		$query->addCondition($newCondition);
+	}
+
+	protected function getFieldValue($field)
+	{
 		$fieldValue = null;
 		switch($field)
 		{
@@ -52,14 +69,8 @@ class AdvancedSearchFilterComparableCondition extends AdvancedSearchFilterCondit
 			case Criteria::CURRENT_TIMESTAMP:
 				$fieldValue = time();
 				break;
-			default:
-				KalturaLog::err('Unknown field ['.$field.']');
-				return;
 		}
-
-		$newCondition = $fieldValue . $comparison . SphinxUtils::escapeString($value);
-
-		$query->addCondition($newCondition);
+		return $fieldValue ;
 	}
 
 	public function addToXml(SimpleXMLElement &$xmlElement)

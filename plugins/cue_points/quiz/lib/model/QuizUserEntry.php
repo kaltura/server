@@ -21,41 +21,67 @@ class QuizUserEntry extends UserEntry{
 
 	public function setScore($v){ $this->putInCustomData("score", $v);}
 	public function getScore(){ return $this->getFromCustomData("score");}
-
-	/**
-	 * @param $entryId
-	 * @return int
-	 */
+	public function addAnswerId($questionId, $answerId)
+	{
+		$answerIds = $this->getAnswerIds();
+		$answerIds[$questionId] = $answerId;
+		$this->putInCustomData("answerIds", $answerIds);
+	}
+	public function getAnswerIds(){return $this->getFromCustomData("answerIds", null, array());}
+	
 	public function calculateScore()
 	{
-		$finalScore = 0;
-		$answerType = QuizPlugin::getCuePointTypeCoreValue(QuizCuePointType::QUIZ_ANSWER);
-		$answers = CuePointPeer::retrieveByEntryId($this->getEntryId(), array($answerType));
-		foreach ($answers as $answer)
+		//TODO when we have indexing of CuePoints in the sphinx we don't need the answerIds in the custom_data since we can just get the answers of the specific userEntry
+		$answerIds = $this->getAnswerIds();
+		$questionType = QuizPlugin::getCuePointTypeCoreValue(QuizCuePointType::QUIZ_QUESTION);
+		$questions = CuePointPeer::retrieveByEntryId($this->getEntryId(), array($questionType));
+		$totalPoints = 0;
+		$userPoints = 0;
+		foreach ($questions as $question)
+		{
+			$optionalAnswers = $question->getOptionalAnswers();
+			$answers = array();
+			if (isset($answerIds[$question->getId()]))
+			{
+				$answerId = $answerIds[$question->getId()];
+				//TODO change to retrieveByPks (multiple, only one query, no need for multiple)
+				$currAnswer = CuePointPeer::retrieveByPK($answerId);
+				$answers[] = $currAnswer;
+			}
+			list($totalForQuestion, $userPointsForQuestion) = $this->getCorrectAnswerWeight($optionalAnswers, $answers);
+			$totalPoints += $totalForQuestion;
+			$userPoints += $userPointsForQuestion;
+		}
+		return $totalPoints?($userPoints/$totalPoints):0;
+	}
+
+	/**
+	 * @param $optionalAnswers
+	 * @param $answers
+	 * @return array
+	 */
+	protected function getCorrectAnswerWeight($optionalAnswers, $answers)
+	{
+		$totalPoints = 0;
+		$userPoints = 0;
+		foreach ($optionalAnswers as $optionalAnswer)
 		{
 			/**
-			 * @var AnswerCuePoint $answer
+			 * @var kOptionalAnswer $optionalAnswer
 			 */
-			$question = CuePointPeer::retrieveByPK($answer->getParentId());
-			/**
-			 * @var QuestionCuePoint $question
-			 */
-			$optionalAnswers = $question->getOptionalAnswers();
-			foreach ($optionalAnswers as $optionalAnswer)
+			if ($optionalAnswer->getIsCorrect())
 			{
-				/**
-				 * @var kOptionalAnswer $optionalAnswer
-				 */
-				if ($optionalAnswer->getKey() === $answer->getAnswerKey())
+				$totalPoints += $optionalAnswer->getWeight();
+				foreach ($answers as $currAnswer)
 				{
-					if ($optionalAnswer->getIsCorrect())
+					if ($optionalAnswer->getKey() == $currAnswer->getAnswerKey())
 					{
-						$finalScore += $optionalAnswer->getWeight();
+						$userPoints += $optionalAnswer->getWeight();
 					}
 				}
 			}
 		}
-		return $finalScore;
+		return array($totalPoints, $userPoints);
 	}
 
 }

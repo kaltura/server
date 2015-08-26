@@ -189,5 +189,4 @@ class MediaServer extends BaseMediaServer {
 	{
 		$this->isExternalMediaServer = $v;
 	}
-	
 } // MediaServer

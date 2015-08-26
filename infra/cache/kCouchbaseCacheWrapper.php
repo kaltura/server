@@ -426,7 +426,15 @@ class kCouchbaseCacheWrapper extends kBaseCacheWrapper
 		}
 
 		$cluster = new CouchbaseCluster($config['dsn'], $config['username'], $config['password']);
-		$this->bucket = $cluster->openBucket($config['name']);
+		try
+		{
+			$this->bucket = $cluster->openBucket($config['name']);
+		}
+		catch(CouchbaseException $e)
+		{
+			KalturaLog::err($e);
+			return false;
+		}
 
 		if(isset($config['properties']))
 		{

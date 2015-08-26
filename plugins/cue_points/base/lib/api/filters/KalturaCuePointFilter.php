@@ -159,6 +159,12 @@ class KalturaCuePointFilter extends KalturaCuePointBaseFilter
 			&&	!$this->systemNameEqual
 			&&	!$this->systemNameIn)
 		{
+			if(PermissionPeer::isValidForPartner(PermissionName::FEATURE_ENABLE_RESPONSE_PROFILE_USER_CACHE, kCurrentContext::getCurrentPartnerId()))
+			{
+				KalturaResponseProfileCacher::useUserCache();
+				return;
+			}
+			
 			throw new KalturaAPIException(KalturaCuePointErrors::USER_KS_CANNOT_LIST_RELATED_CUE_POINTS, get_class($this));
 		}
 	}

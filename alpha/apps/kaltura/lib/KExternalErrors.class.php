@@ -53,6 +53,7 @@ class KExternalErrors
 	const PARENT_ENTRY_ID_NOT_FOUND = 42;
 	const USER_NOT_FOUND = 43;
 	const INTERNAL_SERVER_ERROR = 44;
+	const LIVE_STREAM_CONFIG_NOT_FOUND = 45;
 	
 	const HTTP_STATUS_NOT_FOUND = 404;
 	
@@ -105,6 +106,7 @@ class KExternalErrors
 			self::PARENT_ENTRY_ID_NOT_FOUND => "Parent entry id provided not found in system",
 			self::USER_NOT_FOUND => "The provided user id was not found",
 			self::INTERNAL_SERVER_ERROR => "Internal server error",
+			self::LIVE_STREAM_CONFIG_NOT_FOUND => "Live stream playback config not found for requested live entry"
 	);
 	
 	public static function dieError($errorCode, $message = null)
@@ -148,7 +150,11 @@ class KExternalErrors
 			if (function_exists('apc_store'))
 			{
 				$protocol = infraRequestUtils::getProtocol();
-				$host = isset($_SERVER['HTTP_X_FORWARDED_HOST']) ? $_SERVER['HTTP_X_FORWARDED_HOST'] : $_SERVER['HTTP_HOST'];
+				$host = "";
+				if (isset($_SERVER['HTTP_X_FORWARDED_HOST']))
+					$host =  $_SERVER['HTTP_X_FORWARDED_HOST'];
+				else if (isset($_SERVER['HTTP_HOST']))
+					$host = $_SERVER['HTTP_HOST'];
 				$uri = $_SERVER["REQUEST_URI"];
 				apc_store("exterror-$protocol://$host$uri", $headers, self::CACHE_EXPIRY);
 			}

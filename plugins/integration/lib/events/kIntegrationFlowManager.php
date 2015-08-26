@@ -5,6 +5,8 @@
  */
 class kIntegrationFlowManager implements kBatchJobStatusEventConsumer
 {
+	const EXTERNAL_INTEGRATION_SERVICES_ROLE_NAME = "EXTERNAL_INTEGRATION_SERVICES_ROLE";
+
 	/* (non-PHPdoc)
 	 * @see kBatchJobStatusEventConsumer::updatedJob()
 	 */
@@ -40,6 +42,15 @@ class kIntegrationFlowManager implements kBatchJobStatusEventConsumer
 	{
 		$partnerId = kCurrentContext::getCurrentPartnerId();
 		
+		$providerType = $data->getProviderType();
+		$integrationProvider = KalturaPluginManager::loadObject('IIntegrationProvider', $providerType);
+
+		if(!$integrationProvider || !$integrationProvider->validatePermissions($partnerId))
+		{
+			KalturaLog::err("partner $partnerId not permitted with provider type $providerType");
+			return false;
+		}
+		
 		$batchJob = new BatchJob();
 		$batchJob->setPartnerId($partnerId);
 		$batchJob->setObjectType($objectType);
@@ -59,7 +70,46 @@ class kIntegrationFlowManager implements kBatchJobStatusEventConsumer
 		$batchJob->setStatus(BatchJob::BATCHJOB_STATUS_DONT_PROCESS);
 		
 		$jobType = IntegrationPlugin::getBatchJobTypeCoreValue(IntegrationBatchJobType::INTEGRATION);
-		$batchJob = kJobsManager::addJob($batchJob, $data, $jobType, $data->getProviderType());
+		$batchJob = kJobsManager::addJob($batchJob, $data, $jobType, $providerType);
+		
+		if($integrationProvider->shouldSendCallBack())
+		{
+			$jobId = $batchJob->getId();
+			$ks = self::generateKs($partnerId, $jobId);
+
+			$callBackUrl = "http://" . kConf::get('cdn_api_host');
+			$callBackUrl .= "/api_v3/index.php/service/integration_integration/action/notify";
+			$callBackUrl .= "/id/$jobId/ks/$ks";
+
+			$data = $batchJob->getData();
+			$data->setCallbackNotificationUrl($callBackUrl);
+			$batchJob->setData($data);
+		}
+		
 		return kJobsManager::updateBatchJob($batchJob, BatchJob::BATCHJOB_STATUS_PENDING);
+	}
+	
+	/**
+	 * @return string
+	 */
+	public static function generateKs($partnerId, $tokenPrefix)
+	{
+		$partner = PartnerPeer::retrieveByPK($partnerId);
+		$userSecret = $partner->getSecret();
+		
+		//actionslimit:1
+		$privileges = kSessionBase::PRIVILEGE_SET_ROLE . ":" . self::EXTERNAL_INTEGRATION_SERVICES_ROLE_NAME;
+		$privileges .= "," . kSessionBase::PRIVILEGE_ACTIONS_LIMIT . ":1";
+		
+		$dcParams = kDataCenterMgr::getCurrentDc();
+		$token = $dcParams["secret"];
+		$additionalData = md5($tokenPrefix . $token);
+		
+		$ks = "";
+		$creationSucces = kSessionUtils::startKSession ($partnerId, $userSecret, "", $ks, 86400, KalturaSessionType::USER, "", $privileges, null,$additionalData);
+		if ($creationSucces >= 0 )
+				return $ks;
+		
+		return false;
 	}
 }

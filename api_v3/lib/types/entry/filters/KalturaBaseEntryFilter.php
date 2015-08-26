@@ -229,9 +229,15 @@ class KalturaBaseEntryFilter extends KalturaBaseEntryBaseFilter
 	 * @see KalturaRelatedFilter::validateForResponseProfile()
 	 */
 	public function validateForResponseProfile()
-	{
+	{		
 		if(kEntitlementUtils::getEntitlementEnforcement())
 		{
+			if(PermissionPeer::isValidForPartner(PermissionName::FEATURE_ENABLE_RESPONSE_PROFILE_USER_CACHE, kCurrentContext::getCurrentPartnerId()))
+			{
+				KalturaResponseProfileCacher::useUserCache();
+				return;
+			}
+			
 			throw new KalturaAPIException(KalturaErrors::CANNOT_LIST_RELATED_ENTITLED_WHEN_ENTITLEMENT_IS_ENABLE, get_class($this));
 		}
 		
@@ -243,12 +249,17 @@ class KalturaBaseEntryFilter extends KalturaBaseEntryBaseFilter
 			&&	!$this->referenceIdIn 
 			&&	!$this->parentEntryIdEqual)
 		{
-			if(kCurrentContext::$ks_object->privileges === ks::PATTERN_WILDCARD)
+			if(kCurrentContext::$ks_object->privileges === ks::PATTERN_WILDCARD || kCurrentContext::$ks_object->getPrivilegeValue(ks::PRIVILEGE_LIST) === ks::PATTERN_WILDCARD)
+			{
 				return;
+			}
 			
-			if(kCurrentContext::$ks_object->getPrivilegeValue(ks::PRIVILEGE_LIST) === ks::PATTERN_WILDCARD)
+			if(PermissionPeer::isValidForPartner(PermissionName::FEATURE_ENABLE_RESPONSE_PROFILE_USER_CACHE, kCurrentContext::getCurrentPartnerId()))
+			{
+				KalturaResponseProfileCacher::useUserCache();
 				return;
-				
+			}
+			
 			throw new KalturaAPIException(KalturaErrors::USER_KS_CANNOT_LIST_RELATED_ENTRIES, get_class($this));
 		}
 	}

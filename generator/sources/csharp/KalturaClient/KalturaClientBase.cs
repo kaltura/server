@@ -264,28 +264,35 @@ namespace Kaltura
             XmlElement multiRequestResult = DoQueue();
 
             KalturaMultiResponse multiResponse = new KalturaMultiResponse();
-			if (multiRequestResult == null)
-			{
-				return multiResponse;
-			}
-            int i = 0;
-            foreach (XmlElement arrayNode in multiRequestResult.ChildNodes)
+	    if (multiRequestResult == null)
             {
-				XmlElement error = arrayNode["error"];
-				if (error != null && error["code"] != null && error["message"] != null)
-                    multiResponse.Add(new KalturaAPIException(error["code"].InnerText, error["message"].InnerText));
-                else if (arrayNode["objectType"] != null)
-                    multiResponse.Add(KalturaObjectFactory.Create(arrayNode, _MultiRequestReturnType[i]));
-                else
-                    multiResponse.Add(arrayNode.InnerText);
-                i++;
+            	return multiResponse;
             }
+            multiResponse = ParseMultiRequestResult(multiRequestResult);
 
             _MultiRequestReturnType.Clear();
             _MultiRequestReturnType = null;
             return multiResponse;
         }
-
+        
+	private KalturaMultiResponse ParseMultiRequestResult(XmlElement childNode, bool incrementI = true) 
+	{
+            int i = 0;			
+	    KalturaMultiResponse multiResponse = new KalturaMultiResponse();
+	    foreach(XmlElement arrayNode in childNode.ChildNodes) 
+	    {
+		XmlElement error = arrayNode["error"];
+		if (error != null && error["code"] != null && error["message"] != null) multiResponse.Add(new KalturaAPIException(error["code"].InnerText, error["message"].InnerText));
+		else if (arrayNode["objectType"] != null) multiResponse.Add(KalturaObjectFactory.Create(arrayNode, _MultiRequestReturnType[i]));
+		else if (arrayNode["item"] != null) multiResponse.Add(ParseMultiRequestResult(arrayNode, false));
+		else multiResponse.Add(arrayNode.InnerText);
+		if (incrementI) 
+		    i++;
+ 	    }
+	
+	    return multiResponse;
+	}
+        
         public void MapMultiRequestParam(int resultNumber, int requestNumber, string requestParamName)
         {
             this.MapMultiRequestParam(resultNumber, null, requestNumber, requestParamName);
