@@ -79,6 +79,19 @@ namespace Kaltura
             {
                 Console.WriteLine("Failed AdvancedMultiRequestExample: " + e1.Message);
             }
+            
+            try
+            {
+                PlaylistExecuteMultiRequestExample();
+            }
+            catch (KalturaAPIException e1)
+            {
+                Console.WriteLine("Failed PlaylistExecuteMultiRequestExample: " + e1.Message);
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine("Exception thrown: " + ex.Message);
+            }
 			
 			Console.WriteLine("Finished running client library tests");
         }
@@ -108,6 +121,78 @@ namespace Kaltura
                 return list.Objects[0].AssetParamsId;
             else
                 return null;
+        }
+        
+        static void PlaylistExecuteMultiRequestExample()
+        {
+            KalturaClient client = new KalturaClient(GetConfig());
+
+            client.StartMultiRequest();
+
+            // Request 1
+            client.SessionService.Start(ADMIN_SECRET, "", KalturaSessionType.ADMIN, PARTNER_ID, 86400, "");
+            client.KS = "{1:result}"; // for the current multi request, the result of the first call will be used as the ks for next calls
+
+            // Request 2
+            client.MediaService.List();
+
+            KalturaMultiResponse response = client.DoMultiRequest();
+
+            foreach (object obj in response)
+            {
+                if (obj.GetType() == typeof(KalturaAPIException))
+                {
+                    Console.WriteLine("Error occurred: " + ((KalturaAPIException)obj).Message);
+                }
+            }
+
+            String twoEntries = "";
+
+            if (response[1].GetType() == typeof(KalturaMediaListResponse))
+            {
+                KalturaMediaListResponse mediaListResponse = (KalturaMediaListResponse)response[1];
+                twoEntries = mediaListResponse.Objects[0].Id + ", " + mediaListResponse.Objects[1].Id;
+                Console.WriteLine("We will use the first 2 entries we got as a reponse: " + twoEntries);
+            }
+
+            if(twoEntries.Equals(""))
+            {
+                return;
+            }
+
+            string ks = client.GenerateSession(ADMIN_SECRET, USER_ID, KalturaSessionType.ADMIN, PARTNER_ID, 86400, "");
+            client.KS = ks;
+
+            KalturaPlaylist newPlaylist = new KalturaPlaylist();
+            newPlaylist.Name = "Test Playlist";
+            newPlaylist.PlaylistContent = twoEntries;
+            newPlaylist.PlaylistType = KalturaPlaylistType.STATIC_LIST;
+
+            KalturaPlaylist kPlaylist = client.PlaylistService.Add(newPlaylist);
+
+            // new multirequest
+            client.StartMultiRequest();
+
+            client.PlaylistService.Execute(kPlaylist.Id);
+            client.PlaylistService.Execute(kPlaylist.Id);
+
+            response = client.DoMultiRequest();
+
+            foreach (object obj in response)
+            {
+                if (obj.GetType() == typeof(KalturaAPIException))
+                {
+                    Console.WriteLine("Error occurred: " + ((KalturaAPIException)obj).Message);
+                }
+            }
+
+            foreach (var currentResponse in response)
+            {
+                if(currentResponse.GetType() != typeof(KalturaMultiResponse))
+                {
+                    throw new Exception("Unexpected multirequest response");
+                }
+            }
         }
         
         // This will guide you through uploading a video, getting a specific transcoding flavor, replacing a flavor, and uploading a caption file.
