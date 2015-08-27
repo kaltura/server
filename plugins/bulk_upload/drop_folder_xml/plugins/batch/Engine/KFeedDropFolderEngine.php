@@ -11,9 +11,6 @@ class KFeedDropFolderEngine extends KDropFolderEngine
 	 */
 	protected $feedNamespaces;
 	
-	static $searchCharacters = array ('/');
-	static $replaceCharacters = array('_');
-	
 	protected $handledUniqueIds = array();
 	
 	/* (non-PHPdoc)
@@ -125,7 +122,7 @@ class KFeedDropFolderEngine extends KDropFolderEngine
 	    	$newDropFolderFile->lastModificationTime = strval($this->getSingleXPathResult($this->dropFolder->feedItemInfo->itemPublishDateXPath, $feedItem)); 
 	    	$newDropFolderFile->hash = strval($this->getSingleXPathResult($this->dropFolder->feedItemInfo->itemHashXPath, $feedItem));
 	    	$newDropFolderFile->fileSize = self::DEFAULT_CONTENT_ITEM_SIZE;
-	    	
+	    		
 	    	// Disabled this code for the time being, until there is a requirement for MRSS feed updates. Drop folder file size will be set to 1. 
 //	    	$fileSize = $this->getSingleXPathResult($this->dropFolder->feedItemInfo->itemContentFileSizeXPath, $feedItem); 
 //	    	if (!is_null ($fileSize))
@@ -198,9 +195,9 @@ class KFeedDropFolderEngine extends KDropFolderEngine
 			
 		}
 		
-		$updatedGuid = str_replace (self::$searchCharacters, self::$replaceCharacters, strval ($feedItem->guid));
+		$feedFileName = uniqid ("dropFolderFile_{$this->dropFolder->id}_" . time() . '_');
 		
-		$feedItemPath = KBatchBase::$taskConfig->params->mrss->xmlPath . DIRECTORY_SEPARATOR. $updatedGuid . '_' . time();
+		$feedItemPath = KBatchBase::$taskConfig->params->mrss->xmlPath . DIRECTORY_SEPARATOR. $feedFileName;
 		$res = file_put_contents($feedItemPath, $feedItem->saveXML());
 		chmod($feedItemPath, KBatchBase::$taskConfig->chmod ? octdec(KBatchBase::$taskConfig->chmod) : 0660);
 		return $feedItemPath;
@@ -234,15 +231,7 @@ class KFeedDropFolderEngine extends KDropFolderEngine
 			$this->handleItemAdded($existingDropFolderFile->fileName, $feedItem, false);
 			return true;
 		}
-		
-		$retryStatuses = array (KalturaDropFolderFileStatus::ERROR_HANDLING);
-		if (in_array ($existingDropFolderFile->status, $retryStatuses))
-		{
-			KalturaLog::info("File status condition met- retrying [" . $existingDropFolderFile->fileName ."]");
-			$this->handleItemAdded($existingDropFolderFile->fileName, $feedItem);
-			return true;
-		}
-		
+			
 		//If neither of the conditions above were true, neither the metadata nor the content were changed- do nothing.
 		return false;
 	}

@@ -37,6 +37,8 @@ class kKsUrlTokenizer extends kUrlTokenizer
 	{
 		if (!$this->ksObject || !$this->ksObject->user)
 		{
+			require_once(__DIR__ . '/../../KExternalErrors.class.php');
+			
 			KExternalErrors::dieError(KExternalErrors::MISSING_PARAMETER, 'ks user');
 		}
 		
