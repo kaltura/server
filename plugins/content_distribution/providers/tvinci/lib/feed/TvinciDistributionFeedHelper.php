@@ -70,7 +70,7 @@ class TvinciDistributionFeedHelper
 		);
 	}
 
-	private function createXml($action)
+	private function createXml()
 	{
 		// Init the document
 		$this->_doc = new DOMDocument();
