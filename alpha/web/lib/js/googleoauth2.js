@@ -34,11 +34,24 @@
 				service: 'user',
 				action: 'loginByLoginId',
 				loginId: $email.val(),
-				password: $password.val()
+                password: $password.val(),
+                partnerId: getQueryVariable("partnerId")
+
 			};
 			callApi(data, onLoginApiSuccess, onLoginApiError);
 			return false;
 		}
+		
+		function getQueryVariable(variable) {
+               var query = window.location.search.substring(1);
+               var vars = query.split("&");
+               for (var i=0;i<vars.length;i++) {
+                       var pair = vars[i].split("=");
+                       if(pair[0] == variable){return pair[1];}
+               }
+               return(false);
+        }
+
 
 		function onLoginApiSuccess(data) {
 			$('body').removeClass('wait');
