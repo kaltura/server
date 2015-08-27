@@ -409,7 +409,9 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 		$dbEntry = entryPeer::retrieveByPK($objectIds);
 		if (!$dbEntry)
 			throw new kCoreException("",kCoreException::INVALID_ENTRY_ID, $objectIds);
-		$kQuiz = QuizPlugin::validateAndGetQuiz($dbEntry);
+		$kQuiz = self::getQuizData($dbEntry);
+		if ( !$kQuiz )
+			return array(array('average' => null));
 		$c = new Criteria();
 		$c->add(UserEntryPeer::ENTRY_ID, $objectIds);
 		$c->add(UserEntryPeer::TYPE, QuizPlugin::getCoreValue('UserEntryType', QuizUserEntryType::QUIZ));
