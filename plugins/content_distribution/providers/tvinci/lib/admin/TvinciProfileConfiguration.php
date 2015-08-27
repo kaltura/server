@@ -50,6 +50,10 @@ class Form_TvinciProfileConfiguration extends Form_ConfigurableProfileConfigurat
 		$this->addElements(array($element));
 
 		$this->addElement('hidden', self::FORM_PLACEHOLDER_ELEMENT_ID);
+		$this->_sort();
+		$order = $this->_order[self::FORM_PLACEHOLDER_ELEMENT_ID];
+		$this->resetOrderOfLastElements();
+		$this->layoutForm($order++);
 	}
 
 	public function populateFromObject($object, $add_underscore = true)
@@ -57,13 +61,27 @@ class Form_TvinciProfileConfiguration extends Form_ConfigurableProfileConfigurat
 		$this->_sort();
 
 		$order = $this->_order[self::FORM_PLACEHOLDER_ELEMENT_ID];
+		$this->resetOrderOfLastElements();
 		if ($object->xsltFile) {
 			$this->getElement('xsltFileText')->setValue(json_encode($object->xsltFile));
 		}
-		$this->addTvinciElements($order++);
+		$this->layoutForm($order++);
 
 		parent::populateFromObject($object, $add_underscore);
 
+	}
+
+	public function resetOrderOfLastElements()
+	{
+		$found = false;
+		foreach ($this->_order as $key => &$order)
+		{
+			if ($found)
+				$order = null;
+
+			if ($key == self::FORM_PLACEHOLDER_ELEMENT_ID)
+				$found = true;
+		}
 	}
 
 	private function addTagItems($tagName, &$order){
@@ -90,7 +108,7 @@ class Form_TvinciProfileConfiguration extends Form_ConfigurableProfileConfigurat
 
 
 
-	protected function addTvinciElements($order)
+	protected function layoutForm($order)
 	{
 		// Ingest Configuration
 		$this->addElement('text', 'ingest_url', array(
@@ -127,8 +145,21 @@ class Form_TvinciProfileConfiguration extends Form_ConfigurableProfileConfigurat
 
 		// xslt configuration
 		$this->addElement('file', 'xsltFile', array(
-			'label' => 'XSLT:',
+			'label' => 'XSLT:'
+
 		));
+
+		$element = new Zend_Form_Element_File('xsltFile');
+		$element->setLabel('XSLT:');
+		// limit only 1 file
+		$element->addValidator('Count', false, 1);
+		// limit to 100K (the default one is 31K)
+		$element->addValidator('Size', false, 102400);
+		// only XML related file extensions
+		$element->addValidator('Extension', false, 'xml,xslt,xsl');
+		$element->addValidator(new XSLTFileValidator());
+		$this->addElement($element, 'xsltFile');
+
 
 		$this->addElement('textarea', 'xsltFileText', array(
 			'label' => 'XSLT Data:',

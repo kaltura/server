@@ -184,12 +184,6 @@ class TvinciDistributionPlugin extends KalturaParentContributedPlugin implements
 		return $distributionProvider;
 	}
 
-	public function contribute(BaseObject $object, SimpleXMLElement $mrss, kMrssParameters $mrssParams = null)
-	{
-		parent::contribute($object, $mrss, $mrssParams);
-	}
-
-
 	/**
 	 * Append provider specific nodes and attributes to the MRSS
 	 *
@@ -199,11 +193,6 @@ class TvinciDistributionPlugin extends KalturaParentContributedPlugin implements
 	public static function contributeMRSS(EntryDistribution $entryDistribution, SimpleXMLElement $mrss)
 	{
 
-	}
-
-	public function getObjectFeatureType ()
-	{
-		return parent::getObjectFeatureType();
 	}
 
 
