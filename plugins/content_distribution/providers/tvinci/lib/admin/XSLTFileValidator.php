@@ -1,0 +1,30 @@
+<?php
+
+class XSLTFileValidator extends Zend_Validate_Abstract
+{
+
+    const ERROR = 'error';
+
+    protected $_messageTemplates = array(
+        self::ERROR      => "xml structure on loaded file is invalid",
+    );
+
+    function isValid( $value, $context = null ) {
+
+        // first try to read the tmp file
+        $data = file_get_contents($value);
+        if ($data) {
+            // this means there is data there - try to parse as XML
+            $dom = new DOMDocument;
+            $result = $dom->loadXML($data);
+            if ($result) {
+                return true;
+            }
+        }
+        $this->_error(self::ERROR);
+        return false;
+
+    }
+}
+
+?>
