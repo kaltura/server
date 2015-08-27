@@ -34,8 +34,8 @@
 				service: 'user',
 				action: 'loginByLoginId',
 				loginId: $email.val(),
-                password: $password.val(),
-                partnerId: getQueryVariable("partnerId")
+                		password: $password.val(),
+                		partnerId: getQueryVariable("partnerId")
 
 			};
 			callApi(data, onLoginApiSuccess, onLoginApiError);
