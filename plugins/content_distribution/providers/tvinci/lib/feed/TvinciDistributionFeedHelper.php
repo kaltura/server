@@ -79,9 +79,13 @@ class TvinciDistributionFeedHelper
 
 		$feedAsXml = kMrssManager::getEntryMrssXml($this->entry);
 
-		if ($this->distributionProfile->xsltFile) {
+		if ($this->distributionProfile->xsltFile &&
+			(strlen($this->distributionProfile->xsltFile) !== 0) ) {
+			// custom non empty xslt
+			KalturaLog::info("BUGA running with custom xslt ");
 			$xslt = $this->distributionProfile->xsltFile;
 		} else {
+			KalturaLog::info("BUGA running with default xslt ");
 			$xslt = file_get_contents(__DIR__."/../xml/tvinci_default.xslt");
 		}
 		$feedAsString = kXml::transformXmlUsingXslt($feedAsXml->saveXML(), $xslt, $this->createArgumentsForXSLT());

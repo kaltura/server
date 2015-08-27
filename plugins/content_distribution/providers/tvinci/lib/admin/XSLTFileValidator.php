@@ -13,7 +13,10 @@ class XSLTFileValidator extends Zend_Validate_Abstract
 
         // first try to read the tmp file
         $data = file_get_contents($value);
-        if ($data) {
+        if ($data === ""){
+            // if you want to truncate the xslt
+            return true;
+        } else if ($data !== false) {
             // this means there is data there - try to parse as XML
             $dom = new DOMDocument;
             $result = $dom->loadXML($data);
