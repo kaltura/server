@@ -108,7 +108,7 @@ class KExternalErrors
 			self::USER_NOT_FOUND => "The provided user id was not found",
 			self::INTERNAL_SERVER_ERROR => "Internal server error",
 			self::LIVE_STREAM_CONFIG_NOT_FOUND => "Live stream playback config not found for requested live entry",
-			self::TOO_MANY_PROCESSES => "Too many executed processes"
+			self::TOO_MANY_PROCESSES => "Too many executed processes",
 	);
 	
 	public static function dieError($errorCode, $message = null)
