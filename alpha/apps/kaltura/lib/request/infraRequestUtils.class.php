@@ -173,11 +173,14 @@ class infraRequestUtils
 				case "ts":
 					$content_type ="video/MP2T";
 					break;
-						case "3gp":
-								$content_type ="video/3gpp";
-								break;
+				case "3gp":
+					$content_type ="video/3gpp";
+					break;
 				case "js":
 					$content_type ="application/javascript";
+					break;
+				case "htm":
+					$content_type = "text/html";
 					break;
 				default:
 					$content_type ="image/$ext";
