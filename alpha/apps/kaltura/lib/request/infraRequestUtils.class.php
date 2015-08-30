@@ -180,6 +180,7 @@ class infraRequestUtils
 					$content_type ="application/javascript";
 					break;
 				case "htm":
+				case "html":
 					$content_type = "text/html";
 					break;
 				default:
