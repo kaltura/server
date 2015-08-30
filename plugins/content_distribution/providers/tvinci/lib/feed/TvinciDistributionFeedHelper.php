@@ -54,20 +54,30 @@ class TvinciDistributionFeedHelper
 			. $partnerPath
 			. "/playManifest"
 			. "/entryId/";
-		return array(
+		$arguments = array(
 			"distributionProfileId" => $this->distributionProfile->id,
-			"playManifestPrefix" => $prefix,
-			"ipadnewPpvModule" => $this->distributionProfile->ipadnewPpvModule,
-    		"ipadnewTypeName" => $this->distributionProfile->ipadnewFileName,
-    		"ismPpvModule" => $this->distributionProfile->ismPpvModule,
-    		"ismTypeName" => $this->distributionProfile->ismFileName,
-    		"iphonenewPpvModule" => $this->distributionProfile->iphonenewPpvModule,
-    		"iphonenewTypeName" => $this->distributionProfile->iphonenewFileName,
-    		"mbrPpvModule" => $this->distributionProfile->mbrPpvModule,
-    		"mbrTypeName" => $this->distributionProfile->mbrFileName,
-		    "dashPpvModule" => $this->distributionProfile->dashPpvModule,
-    		"dashTypeName" => $this->distributionProfile->dashFileName
-		);
+			"playManifestPrefix" => $prefix);
+		if($this->distributionProfile->ipadnewPpvModule)
+			$arguments["ipadnewPpvModule"] = $this->distributionProfile->ipadnewPpvModule;
+		if($this->distributionProfile->ipadnewFileName)
+    		$arguments["ipadnewTypeName"] = $this->distributionProfile->ipadnewFileName;
+		if($this->distributionProfile->ismPpvModule)
+    		$arguments["ismPpvModule"] = $this->distributionProfile->ismPpvModule;
+		if($this->distributionProfile->ismFileName)
+    		$arguments["ismTypeName"] = $this->distributionProfile->ismFileName;
+		if($this->distributionProfile->iphonenewPpvModule)
+    		$arguments["iphonenewPpvModule"] = $this->distributionProfile->iphonenewPpvModule;
+		if($this->distributionProfile->iphonenewFileName)
+    		$arguments["iphonenewTypeName"] = $this->distributionProfile->iphonenewFileName;
+		if($this->distributionProfile->mbrPpvModule)
+    		$arguments["mbrPpvModule"] = $this->distributionProfile->mbrPpvModule;
+		if($this->distributionProfile->mbrFileName)
+    		$arguments["mbrTypeName"] = $this->distributionProfile->mbrFileName;
+		if($this->distributionProfile->dashPpvModule)
+		    $arguments["dashPpvModule"] = $this->distributionProfile->dashPpvModule;
+		if($this->distributionProfile->dashFileName)
+    		$arguments["dashTypeName"] = $this->distributionProfile->dashFileName;
+		return $arguments;
 	}
 
 	private function createXml()
@@ -79,7 +89,9 @@ class TvinciDistributionFeedHelper
 
 		$feedAsXml = kMrssManager::getEntryMrssXml($this->entry);
 
-		if ($this->distributionProfile->xsltFile) {
+		if ($this->distributionProfile->xsltFile &&
+			(strlen($this->distributionProfile->xsltFile) !== 0) ) {
+			// custom non empty xslt
 			$xslt = $this->distributionProfile->xsltFile;
 		} else {
 			$xslt = file_get_contents(__DIR__."/../xml/tvinci_default.xslt");
