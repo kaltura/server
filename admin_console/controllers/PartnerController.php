@@ -142,7 +142,7 @@ class PartnerController extends Zend_Controller_Action
 		}
 		else {
 			$this->view->commercialFiltered = true;
-			$partnerFilter->partnerPackageLessThanOrEqual = self::PARTNER_PACKAGE_FREE;
+			$partnerFilter->partnerPackageIn = self::PARTNER_PACKAGE_FREE.','.self::PARTNER_PACKAGE_DEVELOPER;
 		}
 							
 		
