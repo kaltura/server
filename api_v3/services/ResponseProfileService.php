@@ -10,7 +10,10 @@ class ResponseProfileService extends KalturaBaseService
 	public function initService($serviceId, $serviceName, $actionName)
 	{
 		parent::initService($serviceId, $serviceName, $actionName);
-		$this->applyPartnerFilterForClass('ResponseProfile'); 	
+		
+		//Don;t apply partner filter if action is list to avoid returning default partner 0 response profiles on every call
+		if($actionName !== "list")
+			$this->applyPartnerFilterForClass('ResponseProfile'); 	
 	}
 	
 	/* (non-PHPdoc)
@@ -21,7 +24,6 @@ class ResponseProfileService extends KalturaBaseService
 		
 		switch ($this->actionName)
 		{
-			case 'list':
 			case 'get':
 				return $this->partnerGroup . ',0';
 		}
@@ -155,6 +157,12 @@ class ResponseProfileService extends KalturaBaseService
 	{
 		if (!$filter)
 			$filter = new KalturaResponseProfileFilter();
+		
+		//Add partner 0 to filter only in case systemNmae or Id are provided in the filter to avoid returning it by default
+		if(isset($filter->systemNameEqual) || isset($filter->idEqual)) {
+			$this->partnerGroup .= ",0";
+		}
+		$this->applyPartnerFilterForClass('ResponseProfile');
 
 		if (!$pager)
 			$pager = new KalturaFilterPager();
