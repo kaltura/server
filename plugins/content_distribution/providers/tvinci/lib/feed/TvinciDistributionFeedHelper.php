@@ -60,23 +60,23 @@ class TvinciDistributionFeedHelper
 		if($this->distributionProfile->ipadnewPpvModule)
 			$arguments["ipadnewPpvModule"] = $this->distributionProfile->ipadnewPpvModule;
 		if($this->distributionProfile->ipadnewFileName)
-    		$arguments["ipadnewTypeName"] = $this->distributionProfile->ipadnewFileName;
+			$arguments["ipadnewTypeName"] = $this->distributionProfile->ipadnewFileName;
 		if($this->distributionProfile->ismPpvModule)
-    		$arguments["ismPpvModule"] = $this->distributionProfile->ismPpvModule;
+			$arguments["ismPpvModule"] = $this->distributionProfile->ismPpvModule;
 		if($this->distributionProfile->ismFileName)
-    		$arguments["ismTypeName"] = $this->distributionProfile->ismFileName;
+			$arguments["ismTypeName"] = $this->distributionProfile->ismFileName;
 		if($this->distributionProfile->iphonenewPpvModule)
-    		$arguments["iphonenewPpvModule"] = $this->distributionProfile->iphonenewPpvModule;
+			$arguments["iphonenewPpvModule"] = $this->distributionProfile->iphonenewPpvModule;
 		if($this->distributionProfile->iphonenewFileName)
-    		$arguments["iphonenewTypeName"] = $this->distributionProfile->iphonenewFileName;
+			$arguments["iphonenewTypeName"] = $this->distributionProfile->iphonenewFileName;
 		if($this->distributionProfile->mbrPpvModule)
-    		$arguments["mbrPpvModule"] = $this->distributionProfile->mbrPpvModule;
+			$arguments["mbrPpvModule"] = $this->distributionProfile->mbrPpvModule;
 		if($this->distributionProfile->mbrFileName)
-    		$arguments["mbrTypeName"] = $this->distributionProfile->mbrFileName;
+			$arguments["mbrTypeName"] = $this->distributionProfile->mbrFileName;
 		if($this->distributionProfile->dashPpvModule)
-		    $arguments["dashPpvModule"] = $this->distributionProfile->dashPpvModule;
+			$arguments["dashPpvModule"] = $this->distributionProfile->dashPpvModule;
 		if($this->distributionProfile->dashFileName)
-    		$arguments["dashTypeName"] = $this->distributionProfile->dashFileName;
+			$arguments["dashTypeName"] = $this->distributionProfile->dashFileName;
 		return $arguments;
 	}
 

@@ -1,59 +1,71 @@
 <!-- This xslt is used to take a feed representing kaltura entry (mrss - xml structure) and convert it to a OTT fitting feed -->
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-                xmlns:exsl="http://exslt.org/common" xmlns:xsd="http://www.w3.org/1999/XSL/Transform"
+                xmlns:exsl="http://exslt.org/common"
                 extension-element-prefixes="exsl"
-                version="1.0">
+                xmlns:php="http://php.net/xsl"
+                version="1.0" >
 
-    <xsl:output omit-xml-declaration="no" indent="yes" />
+    <xsl:output omit-xml-declaration="no" indent="yes"/>
     <xsl:strip-space elements="*"/>
     <!-- tag constants -->
-    <xsl:variable name="ISM_TAG"       select="'ism'"/>
-    <xsl:variable name="IPAD_TAG"      select="'ipadnew'"/>
-    <xsl:variable name="IPHONE_TAG"    select="'iphonenew'"/>
-    <xsl:variable name="MBR_TAG"       select="'mbr'"/>
-    <xsl:variable name="DASH_TAG"      select="'dash'"/>
+    <xsl:variable name="ISM_TAG" select="'ism'"/>
+    <xsl:variable name="IPAD_TAG" select="'ipadnew'"/>
+    <xsl:variable name="IPHONE_TAG" select="'iphonenew'"/>
+    <xsl:variable name="MBR_TAG" select="'mbr'"/>
+    <xsl:variable name="DASH_TAG" select="'dash'"/>
     <!-- constants -->
-    <xsl:variable name="CONST_LANG"               select="'eng'"/>
-    <xsl:variable name="CONST_RATIO"              select="'3:4'"/>
-    <xsl:variable name="CONST_QUALITY"            select="'HIGH'"/>
-    <xsl:variable name="CONST_BILLING_TYPE"       select="'Tvinci'"/>
-    <xsl:variable name="CONST_HANDLING_TYPE"      select="'Clip'"/>
-    <xsl:variable name="CONST_CDN_NAME"           select="'Akamai'"/>
-    <xsl:variable name="CONST_ACTION"             select="'insert'"/>
-    <xsl:variable name="CONST_IS_ACTIVE"          select="'true'"/>
-    <xsl:variable name="CONST_ERASE"              select="'false'"/>
-    <xsl:variable name="CONST_END_OF_TIME"        select="'5233709533'"/>
-    <xsl:variable name="CONST_TRAILER_NAME"       select="'Trailer'"/>
-    <xsl:variable name="CONST_ISM_MANIFEST_SUFFIX"        select="'/format/sl/tags/ism/protocol/http/f/a.ism'"/>
-    <xsl:variable name="CONST_IPHONENEW_MANIFEST_SUFFIX"  select="'/format/applehttp/tags/iphonenew/protocol/http/f/a.m3u8'"/>
-    <xsl:variable name="CONST_IPADNEW_MANIFEST_SUFFIX"    select="'/format/applehttp/tags/ipadnew/protocol/http/f/a.m3u8'"/>
-    <xsl:variable name="CONST_MBR_MANIFEST_SUFFIX"        select="'/format/hdnetworkmanifest/tags/mbr/protocol/http/f/a.a4m'"/>
-    <xsl:variable name="CONST_DASH_MANIFEST_SUFFIX"       select="'/format/mpegdash/tags/dash/protocol/http/f/a.mpd'"/>
+    <xsl:variable name="CONST_LANG" select="'eng'"/>
+    <xsl:variable name="CONST_RATIO" select="'3:4'"/>
+    <xsl:variable name="CONST_QUALITY" select="'HIGH'"/>
+    <xsl:variable name="CONST_BILLING_TYPE" select="'Tvinci'"/>
+    <xsl:variable name="CONST_HANDLING_TYPE" select="'Clip'"/>
+    <xsl:variable name="CONST_CDN_NAME" select="'Akamai'"/>
+    <xsl:variable name="CONST_ACTION" select="'insert'"/>
+    <xsl:variable name="CONST_IS_ACTIVE" select="'true'"/>
+    <xsl:variable name="CONST_ERASE" select="'false'"/>
+    <xsl:variable name="CONST_END_OF_TIME" select="'5233709533'"/>
+    <xsl:variable name="CONST_TRAILER_NAME" select="'Trailer'"/>
+    <xsl:variable name="CONST_TVM_DATE_FORMAT" select="'d/m/Y H:i:s'"/>
+    <xsl:variable name="CONST_ISM_MANIFEST_SUFFIX" select="'/format/sl/tags/ism/protocol/http/f/a.ism'"/>
+    <xsl:variable name="CONST_IPHONENEW_MANIFEST_SUFFIX" select="'/format/applehttp/tags/iphonenew/protocol/http/f/a.m3u8'"/>
+    <xsl:variable name="CONST_IPADNEW_MANIFEST_SUFFIX" select="'/format/applehttp/tags/ipadnew/protocol/http/f/a.m3u8'"/>
+    <xsl:variable name="CONST_MBR_MANIFEST_SUFFIX" select="'/format/hdnetworkmanifest/tags/mbr/protocol/http/f/a.a4m'"/>
+    <xsl:variable name="CONST_DASH_MANIFEST_SUFFIX" select="'/format/mpegdash/tags/dash/protocol/http/f/a.mpd'"/>
     <!-- media element -->
-    <xsl:variable name="refernceID"     select="item/referenceID"/>
-    <xsl:variable name="entryID"        select="item/entryId"/>
+    <xsl:variable name="refernceID" select="item/referenceID"/>
+    <xsl:variable name="entryID" select="item/entryId"/>
     <!-- basic element -->
-    <xsl:variable name="mediaType"      select="item/customData/metadata/MediaType"/>
-    <xsl:variable name="epgIdentifier"  select="''"/>
-    <xsl:variable name="title"          select="item/title"/>
-    <xsl:variable name="description"    select="item/description"/>
-    <xsl:variable name="thumbnailUrl"   select="item/thumbnailUrl/@url"/>
+    <xsl:variable name="mediaType" select="item/customData/metadata/MediaType"/>
+    <xsl:variable name="epgIdentifier" select="''"/>
+    <xsl:variable name="title" select="item/title"/>
+    <xsl:variable name="description" select="item/description"/>
+    <xsl:variable name="thumbnailUrl" select="item/thumbnailUrl/@url"/>
     <!-- rules -->
-    <xsl:variable name="geoBlockRule"           select="item/customData/metadata/GEOBlockRule"/>
-    <xsl:variable name="watchPermissionRule"    select="item/customData/metadata/WatchPermissionRule"/>
+    <xsl:variable name="geoBlockRule" select="item/customData/metadata/GEOBlockRule"/>
+    <xsl:variable name="watchPermissionRule" select="item/customData/metadata/WatchPermissionRule"/>
     <!--tags as a nodeset -->
     <xsl:variable name="tags">
-        <xsl:element name="tag"><xsl:value-of select="$MBR_TAG"/></xsl:element>
-        <xsl:element name="tag"><xsl:value-of select="$ISM_TAG"/></xsl:element>
-        <xsl:element name="tag"><xsl:value-of select="$IPHONE_TAG"/></xsl:element>
-        <xsl:element name="tag"><xsl:value-of select="$IPAD_TAG"/></xsl:element>
-        <xsl:element name="tag"><xsl:value-of select="$DASH_TAG"/></xsl:element>
+        <xsl:element name="tag">
+            <xsl:value-of select="$MBR_TAG"/>
+        </xsl:element>
+        <xsl:element name="tag">
+            <xsl:value-of select="$ISM_TAG"/>
+        </xsl:element>
+        <xsl:element name="tag">
+            <xsl:value-of select="$IPHONE_TAG"/>
+        </xsl:element>
+        <xsl:element name="tag">
+            <xsl:value-of select="$IPAD_TAG"/>
+        </xsl:element>
+        <xsl:element name="tag">
+            <xsl:value-of select="$DASH_TAG"/>
+        </xsl:element>
     </xsl:variable>
 
 
     <!-- Parameters for this xslt file -->
-    <xsl:param name="playManifestPrefix" />
-    <xsl:param name="distributionProfileId" />
+    <xsl:param name="playManifestPrefix"/>
+    <xsl:param name="distributionProfileId"/>
 
     <!--ipadnew -->
     <xsl:param name="ipadnewPpvModule" select="''"/>
@@ -99,7 +111,7 @@
                     <!--structure elements-->
                     <xsl:element name="structure">
                         <xsl:call-template name="create-inner-structure">
-                            <xsl:with-param name="metadatas" select="item/customData/metadata/*" />
+                            <xsl:with-param name="metadatas" select="item/customData/metadata/*"/>
                         </xsl:call-template>
                     </xsl:element>
                     <!--files elements-->
@@ -164,17 +176,17 @@
         <xsl:element name="pic_ratios">
             <!--<xsl:variable name="thumbnails" select="item/thumbnail"/>-->
             <!--<xsl:for-each select="$thumbnails">-->
-                <!--<xsl:variable name="url" select="./@url"/>-->
-                <!--<xsl:variable name="height" select="./@height"/>-->
-                <!--<xsl:variable name="width" select="./@width"/>-->
-                <!--<xsl:element name="ratio">-->
-                    <!--<xsl:attribute name="thumb">-->
-                        <!--<xsd:value-of select="$url"/>-->
-                    <!--</xsl:attribute>-->
-                    <!--<xsl:attribute name="ratio">-->
-                        <!--<xsd:value-of select="$CONST_RATIO"/>-->
-                    <!--</xsl:attribute>-->
-                <!--</xsl:element>-->
+            <!--<xsl:variable name="url" select="./@url"/>-->
+            <!--<xsl:variable name="height" select="./@height"/>-->
+            <!--<xsl:variable name="width" select="./@width"/>-->
+            <!--<xsl:element name="ratio">-->
+            <!--<xsl:attribute name="thumb">-->
+            <!--<xsl:value-of select="$url"/>-->
+            <!--</xsl:attribute>-->
+            <!--<xsl:attribute name="ratio">-->
+            <!--<xsl:value-of select="$CONST_RATIO"/>-->
+            <!--</xsl:attribute>-->
+            <!--</xsl:element>-->
             <!--</xsl:for-each>-->
         </xsl:element>
         <xsl:element name="rules">
@@ -186,12 +198,13 @@
             </xsl:element>
         </xsl:element>
         <xsl:element name="dates">
-            <xsl:variable name="sunrise"    select="item/distribution/sunrise"/>
+            <xsl:variable name="sunrise" select="item/distribution/sunrise"/>
+            <xsl:variable name="sunriseFormatted" select="php:function('date' ,string($CONST_TVM_DATE_FORMAT),string($sunrise))"/>
             <xsl:element name="catalog_start">
-                <xsl:value-of select="$sunrise"/>
+                <xsl:value-of select="$sunriseFormatted"/>
             </xsl:element>
             <xsl:element name="start">
-                <xsl:value-of select="$sunrise"/>
+                <xsl:value-of select="$sunriseFormatted"/>
             </xsl:element>
             <xsl:variable name="sunset">
                 <xsl:choose>
@@ -203,11 +216,12 @@
                     </xsl:otherwise>
                 </xsl:choose>
             </xsl:variable>
+            <xsl:variable name="sunsetFormatted" select="php:function('date', string($CONST_TVM_DATE_FORMAT), string($sunset))"/>
             <xsl:element name="catalog_end">
-                <xsl:value-of select="$sunset"/>
+                <xsl:value-of select="$sunsetFormatted"/>
             </xsl:element>
             <xsl:element name="end">
-                <xsl:value-of select="$sunset"/>
+                <xsl:value-of select="$sunsetFormatted"/>
             </xsl:element>
         </xsl:element>
     </xsl:template>
@@ -272,7 +286,7 @@
             <xsl:for-each select="exsl:node-set($tagsWithAttributes)">
                 <xsl:if test="not(./@name = preceding-sibling::otttag/@name)">
                     <xsl:element name="OTTTagUnique">
-                        <xsl:value-of select="./@name" />
+                        <xsl:value-of select="./@name"/>
                     </xsl:element>
                 </xsl:if>
             </xsl:for-each>
@@ -290,8 +304,8 @@
                     </xsl:attribute>
                     <xsl:attribute name="ml_handling">unique</xsl:attribute>
                     <xsl:for-each select="exsl:node-set($tagsWithAttributes)">
-                        <xsl:variable name="tagWithAttrName" >
-                            <xsl:value-of select="@name" />
+                        <xsl:variable name="tagWithAttrName">
+                            <xsl:value-of select="@name"/>
                         </xsl:variable>
                         <xsl:if test="$tagWithAttrName=$uniqueTagName">
                             <xsl:element name="container">
@@ -347,7 +361,7 @@
         <!-- First build the parent files -->
         <xsl:for-each select="exsl:node-set($tags)/tag">
             <xsl:variable name="tag" select="."/>
-            <xsl:call-template name="create-tag-relevant-files" >
+            <xsl:call-template name="create-tag-relevant-files">
                 <xsl:with-param name="contents" select="$parentContents"/>
                 <xsl:with-param name="duration" select="$parentDuration"/>
                 <xsl:with-param name="distributionFlavorParamIds" select="$distributionFlavorParamIds"/>
@@ -358,14 +372,14 @@
             <xsl:for-each select="exsl:node-set($children)">
                 <xsl:variable name="childEntryId" select="./entryId"/>
                 <xsl:variable name="childContents" select="./content"/>
-                <xsl:variable name="childDuration" select="./media/duration" />
-                <xsl:call-template name="create-tag-relevant-files" >
+                <xsl:variable name="childDuration" select="./media/duration"/>
+                <xsl:call-template name="create-tag-relevant-files">
                     <xsl:with-param name="contents" select="$childContents"/>
                     <xsl:with-param name="duration" select="$childDuration"/>
                     <xsl:with-param name="distributionFlavorParamIds" select="$distributionFlavorParamIds"/>
                     <xsl:with-param name="tag" select="$tag"/>
                     <xsl:with-param name="relevantEntryId" select="$childEntryId"/>
-                    <xsl:with-param name="isChild" select="true()" />
+                    <xsl:with-param name="isChild" select="true()"/>
                     <xsl:with-param name="childIdx" select="position()"/>
                 </xsl:call-template>
             </xsl:for-each>
@@ -378,11 +392,11 @@
     <xsl:template name="create-tag-relevant-files">
         <xsl:param name="tag"/>
         <xsl:param name="relevantEntryId"/>
-        <xsl:param name="duration" />
+        <xsl:param name="duration"/>
         <xsl:param name="contents"/>
         <xsl:param name="distributionFlavorParamIds"/>
         <xsl:param name="isChild" select="false()"/>
-        <xsl:param name="childIdx" select="0" />
+        <xsl:param name="childIdx" select="0"/>
         <!--find all the content elements that have hte specific tag -->
         <xsl:variable name="tagMatchingContents">
             <xsl:call-template name="get-matching-contents">
@@ -390,7 +404,7 @@
                 <xsl:with-param name="contents" select="$contents"/>
             </xsl:call-template>
         </xsl:variable>
-        <xsl:if test="not(count(exsl:node-set($tagMatchingContents)/contentItem) = 0)" >
+        <xsl:if test="not(count(exsl:node-set($tagMatchingContents)/contentItem) = 0)">
             <xsl:variable name="filteredItems">
                 <xsl:call-template name="filter-non-distribution-item">
                     <xsl:with-param name="distributionFlavorParamIds" select="$distributionFlavorParamIds"/>
@@ -430,8 +444,8 @@
                 <xsl:with-param name="cdnCode" select="concat($playManifestPrefix, $relevantEntryId, $suffix)"/>
                 <xsl:with-param name="coGuid" select="$coGuid"/>
                 <xsl:with-param name="duration" select="$duration"/>
-                <xsl:with-param name="ppvModule" select="$ppvModule" />
-                <xsl:with-param name="type"  select="$typeName" />
+                <xsl:with-param name="ppvModule" select="$ppvModule"/>
+                <xsl:with-param name="type" select="$typeName"/>
             </xsl:call-template>
         </xsl:if>
     </xsl:template>
@@ -441,9 +455,9 @@
         <xsl:param name="tag"/>
         <xsl:param name="contents"/>
         <xsl:for-each select="$contents">
-            <xsl:variable name="contentTags"            select="./tags/tag"/>
-            <xsl:variable name="contentFlavorAssetId"   select="./@flavorAssetId"/>
-            <xsl:variable name="contentFlavorParamsId"  select="./@flavorParamsId"/>
+            <xsl:variable name="contentTags" select="./tags/tag"/>
+            <xsl:variable name="contentFlavorAssetId" select="./@flavorAssetId"/>
+            <xsl:variable name="contentFlavorParamsId" select="./@flavorParamsId"/>
             <xsl:for-each select="$contentTags">
                 <xsl:variable name="currTag" select="."/>
                 <xsl:if test="$currTag = $tag">
@@ -460,14 +474,14 @@
         </xsl:for-each>
     </xsl:template>
     <!-- filter given nodeset for only elements that have the relevant flavorParamId-->
-    <xsl:template name="filter-non-distribution-item" >
-        <xsl:param name="distributionFlavorParamIds" />
-        <xsl:param name="matchingContents" />
+    <xsl:template name="filter-non-distribution-item">
+        <xsl:param name="distributionFlavorParamIds"/>
+        <xsl:param name="matchingContents"/>
         <xsl:for-each select="exsl:node-set($matchingContents)/contentItem">
             <xsl:variable name="itemContent" select="."/>
             <xsl:variable name="itemContentFlavorId" select="./@flavorParamsId"/>
             <xsl:for-each select="exsl:node-set($distributionFlavorParamIds)/paramId">
-                <xsl:variable name="distributionFlavorId" >
+                <xsl:variable name="distributionFlavorId">
                     <xsl:value-of select="."/>
                 </xsl:variable>
                 <xsl:if test="$distributionFlavorId = $itemContentFlavorId">
@@ -477,14 +491,14 @@
         </xsl:for-each>
     </xsl:template>
     <!-- given a nodeset of distribution ids and the real content construct a nodeset to include the flavorParamIds -->
-    <xsl:template name="get-distribution-flavor-param-ids" >
-        <xsl:param name="distributionIds" />
-        <xsl:param name="parentContents" />
+    <xsl:template name="get-distribution-flavor-param-ids">
+        <xsl:param name="distributionIds"/>
+        <xsl:param name="parentContents"/>
         <xsl:for-each select="exsl:node-set($parentContents)">
             <xsl:variable name="itemContentFlavorAssetId" select="./@flavorAssetId"/>
             <xsl:variable name="itemContentFlavorParamsId" select="./@flavorParamsId"/>
             <xsl:for-each select="$distributionIds">
-                <xsl:variable name="distributionFlavorId" >
+                <xsl:variable name="distributionFlavorId">
                     <xsl:value-of select="."/>
                 </xsl:variable>
                 <xsl:if test="$distributionFlavorId = $itemContentFlavorAssetId">
@@ -534,7 +548,7 @@
     </xsl:template>
     <!-- get the matching tag suffix - which is given as argument to this code -->
     <xsl:template name="suffix-matching-tag">
-        <xsl:param name="tag" />
+        <xsl:param name="tag"/>
         <xsl:choose>
             <xsl:when test="$tag = $ISM_TAG">
                 <xsl:value-of select="$CONST_ISM_MANIFEST_SUFFIX"/>
@@ -555,7 +569,7 @@
     </xsl:template>
     <!-- get the matching tag ppvModule - which is given as argument to this code -->
     <xsl:template name="ppvModule-matching-tag">
-        <xsl:param name="tag" />
+        <xsl:param name="tag"/>
         <xsl:choose>
             <xsl:when test="$tag = $ISM_TAG">
                 <xsl:value-of select="$ismPpvModule"/>
@@ -576,9 +590,9 @@
     </xsl:template>
     <!-- get the matching tag file name - which is given as argument to this code -->
     <xsl:template name="type-name-matching-tag">
-        <xsl:param name="tag" />
-        <xsl:param name="isChild" />
-        <xsl:param name="childNumber" />
+        <xsl:param name="tag"/>
+        <xsl:param name="isChild"/>
+        <xsl:param name="childNumber"/>
         <xsl:variable name="configuredName">
             <xsl:choose>
                 <xsl:when test="$tag = $ISM_TAG">
@@ -599,7 +613,7 @@
             </xsl:choose>
         </xsl:variable>
         <xsl:variable name="nameSuffix">
-            <xsl:if test="$isChild" >
+            <xsl:if test="$isChild">
                 <xsl:variable name="trailerSuffix">
                     <xsl:value-of select="concat(' ',$CONST_TRAILER_NAME)"/>
                 </xsl:variable>
@@ -608,10 +622,10 @@
                         <xsl:value-of select="concat(' ',$childNumber)"/>
                     </xsl:if>
                 </xsl:variable>
-                <xsl:value-of select="concat($trailerSuffix, $trailerIdxSuffix)" />
+                <xsl:value-of select="concat($trailerSuffix, $trailerIdxSuffix)"/>
             </xsl:if>
         </xsl:variable>
-        <xsl:value-of select="concat($configuredName, $nameSuffix)" />
+        <xsl:value-of select="concat($configuredName, $nameSuffix)"/>
     </xsl:template>
 
 </xsl:stylesheet>
