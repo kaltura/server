@@ -411,42 +411,43 @@
                     <xsl:with-param name="matchingContents" select="$tagMatchingContents"/>
                 </xsl:call-template>
             </xsl:variable>
+            <xsl:if test="not(count(exsl:node-set($filteredItems)/contentItem) = 0)">
+                <xsl:variable name="coGuid">
+                    <xsl:for-each select="exsl:node-set($filteredItems)/contentItem">
+                        <xsl:variable name="flavorParamId" select="./@flavorParamsId"/>
+                        <xsl:value-of select="concat($relevantEntryId, '_' , $flavorParamId)"/>
+                        <xsl:if test="not(position() = last())">,</xsl:if>
+                    </xsl:for-each>
+                </xsl:variable>
 
-            <xsl:variable name="coGuid">
-                <xsl:for-each select="exsl:node-set($filteredItems)/contentItem">
-                    <xsl:variable name="flavorParamId" select="./@flavorParamsId"/>
-                    <xsl:value-of select="concat($relevantEntryId, '_' , $flavorParamId)"/>
-                    <xsl:if test="not(position() = last())">,</xsl:if>
-                </xsl:for-each>
-            </xsl:variable>
+                <xsl:variable name="suffix">
+                    <xsl:call-template name="suffix-matching-tag">
+                        <xsl:with-param name="tag" select="$tag"/>
+                    </xsl:call-template>
+                </xsl:variable>
 
-            <xsl:variable name="suffix">
-                <xsl:call-template name="suffix-matching-tag">
-                    <xsl:with-param name="tag" select="$tag"/>
+                <xsl:variable name="typeName">
+                    <xsl:call-template name="type-name-matching-tag">
+                        <xsl:with-param name="tag" select="$tag"/>
+                        <xsl:with-param name="isChild" select="$isChild"/>
+                        <xsl:with-param name="childNumber" select="$childIdx"/>
+                    </xsl:call-template>
+                </xsl:variable>
+
+                <xsl:variable name="ppvModule">
+                    <xsl:call-template name="ppvModule-matching-tag">
+                        <xsl:with-param name="tag" select="$tag"/>
+                    </xsl:call-template>
+                </xsl:variable>
+
+                <xsl:call-template name="create-file-element">
+                    <xsl:with-param name="cdnCode" select="concat($playManifestPrefix, $relevantEntryId, $suffix)"/>
+                    <xsl:with-param name="coGuid" select="$coGuid"/>
+                    <xsl:with-param name="duration" select="$duration"/>
+                    <xsl:with-param name="ppvModule" select="$ppvModule"/>
+                    <xsl:with-param name="type" select="$typeName"/>
                 </xsl:call-template>
-            </xsl:variable>
-
-            <xsl:variable name="typeName">
-                <xsl:call-template name="type-name-matching-tag">
-                    <xsl:with-param name="tag" select="$tag"/>
-                    <xsl:with-param name="isChild" select="$isChild"/>
-                    <xsl:with-param name="childNumber" select="$childIdx"/>
-                </xsl:call-template>
-            </xsl:variable>
-
-            <xsl:variable name="ppvModule">
-                <xsl:call-template name="ppvModule-matching-tag">
-                    <xsl:with-param name="tag" select="$tag"/>
-                </xsl:call-template>
-            </xsl:variable>
-
-            <xsl:call-template name="create-file-element">
-                <xsl:with-param name="cdnCode" select="concat($playManifestPrefix, $relevantEntryId, $suffix)"/>
-                <xsl:with-param name="coGuid" select="$coGuid"/>
-                <xsl:with-param name="duration" select="$duration"/>
-                <xsl:with-param name="ppvModule" select="$ppvModule"/>
-                <xsl:with-param name="type" select="$typeName"/>
-            </xsl:call-template>
+            </xsl:if>
         </xsl:if>
     </xsl:template>
     <!-- given a tag and contents return only those contents that include the tag -->
