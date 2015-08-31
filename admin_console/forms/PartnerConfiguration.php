@@ -459,7 +459,7 @@ class Form_PartnerConfiguration extends Infra_Form
 			
 			$permissionNames[self::GROUP_CONTENT_INGESTION_OPTIONS]['Content Moderation'] = 'moderate_content';
 		    $permissionNames[self::GROUP_ENABLE_DISABLE_FEATURES]['Default Entitlement Enforcement'] = 'default_entitlement_enforcement';
-		    $permissionNames[self::GROUP_ENABLE_DISABLE_FEATURES]['Exclude Source from Transcoded Renditions'] = 'time_aligned_renditions';
+		    $permissionNames[self::GROUP_ENABLE_DISABLE_FEATURES]['Kaltura Live Streams - Exclude Source Rendition'] = 'time_aligned_renditions';
 			ksort($permissionNames[self::GROUP_ENABLE_DISABLE_FEATURES]);
 			ksort($permissionNames[self::GROUP_CONTENT_INGESTION_OPTIONS]);
 			ksort($permissionNames[self::GROUP_REMOTE_STORAGE]);
