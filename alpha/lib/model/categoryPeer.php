@@ -11,7 +11,7 @@ class categoryPeer extends BasecategoryPeer implements IRelatedObjectPeer
 {
 	const CATEGORY_SEPARATOR = ">";
 	
-	const MAX_CATEGORY_NAME = 60;
+	const MAX_CATEGORY_NAME = 200;
 	
 	const MEMBERS = 'category.MEMBERS';
 	const CATEGORY_ID = 'category.CATEGORY_ID';
