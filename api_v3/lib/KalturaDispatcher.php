@@ -168,7 +168,10 @@ class KalturaDispatcher
 		if(!class_exists($objectClassPeer))
 			return;
 			
-		$dbObject = $objectClassPeer::retrieveByPK($objectId);
+		if (method_exists($objectClassPeer, "retrieveById"))
+				$dbObject = $objectClassPeer::retrieveById($objectId);
+		else
+				$dbObject = $objectClassPeer::retrieveByPK($objectId);
 		
 		if($objectGetters)
 		{

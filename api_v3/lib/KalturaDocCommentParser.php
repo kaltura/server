@@ -44,7 +44,7 @@ class KalturaDocCommentParser
     
     const DOCCOMMENT_PERMISSIONS = "/\\@requiresPermission ([\\w\\,\\s]*)/";
     
-    const DOCCOMMENT_VALIDATE_USER = "/\\@validateUser\\s+(\\w+)\\s+(\\w+)\\s*(\\w*)/";
+    const DOCCOMMENT_VALIDATE_USER = "/\\@validateUser\\s+([\\w:]+)\\s+(\\w+)\\s*(\\w*)/";
     
     const DOCCOMMENT_ALIAS_ACTION = "/\\@actionAlias\\s(\\w+\\.\\w+)/";
     
