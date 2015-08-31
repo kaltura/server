@@ -26,6 +26,7 @@ class partnerFilter extends baseObjectFilter
 			"_eq_partner_package",
 			"_gte_partner_package",
 			"_lte_partner_package",
+			"_in_partner_package",
 		    "_eq_partner_group_type",
 		    "_in_partner_group_type",
 			"_eq_partner_parent_id",
