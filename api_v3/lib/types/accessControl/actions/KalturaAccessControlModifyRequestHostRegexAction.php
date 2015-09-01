@@ -3,25 +3,35 @@
  * @package api
  * @subpackage objects
  */
-class KalturaAccessControlAddRequestHostPrefixAction extends KalturaRuleAction
+class KalturaAccessControlModifyRequestHostRegexAction extends KalturaRuleAction
 {
 	/**
-	 * Request host prefix to add to player calls
+	 * Request host regex pattern
 	 * 
 	 * @var string
 	 */
-	public $requestHostPrefix;
+	public $pattern;
+	
+	/**
+	 * Request host regex replacment
+	 *
+	 * @var string
+	 */
+	public $replacement;
+	
+	
 	
 	private static $mapBetweenObjects = array
 	(
-		'requestHostPrefix',
+		'pattern',
+		'replacement',
 	);
 	/**
 	 * Init object type
 	 */
 	public function __construct() 
 	{
-		$this->type = RuleActionType::ADD_REQUEST_HOST_PREFIX;
+		$this->type = RuleActionType::REQUEST_HOST_REGEX;
 	}
 	
 	public function getMapBetweenObjects()
@@ -35,7 +45,7 @@ class KalturaAccessControlAddRequestHostPrefixAction extends KalturaRuleAction
 	public function toObject($dbObject = null, $skip = array())
 	{
 		if(!$dbObject)
-			$dbObject = new kAccessControlAddRequestHostPrefixAction();
+			$dbObject = new kAccessControlModifyRequestHostRegexAction();
 			
 		return parent::toObject($dbObject, $skip);
 	}
