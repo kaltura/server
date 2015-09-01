@@ -96,21 +96,7 @@ class KalturaCielo24JobProviderData extends KalturaIntegrationJobProviderData
 		}
 		
 		$cielo24ParamsMap = kConf::get('cielo24','integration');
-		if($this->captionAssetFormats)
-		{
-			$formatsString = $this->captionAssetFormats;
-			$formatsArray = explode(',', $formatsString);
-			
-			$excludedFormats = $cielo24ParamsMap['exclude_formats'];
-			foreach($formatsArray as $format)
-			{
-				if(!constant("KalturaCaptionType::" . $format) || in_array($format, $excludedFormats))
-					throw new KalturaAPIException(KalturaCielo24Errors::INVALID_TYPES,$formatsString);
-			}
-		}
-	
 		$supportedLanguages = $cielo24ParamsMap['languages'];
-	
 		if($this->spokenLanguage)
 		{
 			if (!isset($supportedLanguages[$this->spokenLanguage]))
@@ -140,16 +126,30 @@ class KalturaCielo24JobProviderData extends KalturaIntegrationJobProviderData
 			$object->setFlavorAssetId($sourceAsset->getId());
 		}
 		
+		$cielo24ParamsMap = kConf::get('cielo24','integration');
 		if(!$object->getSpokenLanguage())
 		{
-			$cielo24ParamsMap = kConf::get('cielo24','integration');
 			$object->setSpokenLanguage($cielo24ParamsMap['default_language']);
 		}
-		
-		if(!$object->getCaptionAssetFormats())
+	
+		$formatsString = $object->getCaptionAssetFormats();
+		if($formatsString)
 		{
-			if(!$cielo24ParamsMap)
-				$cielo24ParamsMap = kConf::get('cielo24','integration');
+			$formatsArray = explode(',', $formatsString);
+			$excludedFormats = $cielo24ParamsMap['exclude_formats'];
+			$sanitizedFormatsArray = array();
+			foreach($formatsArray as $format)
+			{
+				$format = preg_replace("/[^A-Z]/", "", $format);
+				if(!constant("KalturaCaptionType::" . $format) || in_array($format, $excludedFormats))
+					throw new KalturaAPIException(KalturaCielo24Errors::INVALID_TYPES,$formatsString);
+				$sanitizedFormatsArray[] = $format;
+			}
+			$sanitizedFormats = implode(",", $sanitizedFormatsArray);
+			$object->setCaptionAssetFormats($sanitizedFormats);
+		}
+		else
+		{
 			$defaultFormats = implode(",", $cielo24ParamsMap['default_formats']);
 			$object->setCaptionAssetFormats($defaultFormats);
 		}
