@@ -3,36 +3,31 @@
  * @package plugins.cielo24
  */
 class Cielo24ClientHelper
-{
-	const API_CALL_NAME_PATTERN = "{API-CALL-NAME}";
-	
+{	
 	private $supportedLanguages = array();
 	private $baseEndpointUrl = null;
+	private $apiCredentialsStr = null;
 	
 	public function __construct($username, $password)
 	{
 		$cielo24ParamsMap = kConf::get('cielo24','integration');
-		$baseUrl = $cielo24ParamsMap['base_url'];
-		$version = $cielo24ParamsMap['version'];
-		$baseUrl = $baseUrl . "account/login?v=$version";
+		$this->baseEndpointUrl = $cielo24ParamsMap['base_url'];
+		$this->apiCredentialsStr = "v=" . $cielo24ParamsMap['version'];
+		
 		$loginParams = array("username" => $username, "password" => $password);	
-		$loginUrl = $this->addUrlParams($baseUrl, $loginParams);
-	
+		$loginUrl = $this->createAPIUrl("account/login", $loginParams);
 		$loginResult = self::sendAPICall($loginUrl);
 		$apiToken = $loginResult->ApiToken;
-			
-		$this->baseEndpointUrl = str_replace("account/login", self::API_CALL_NAME_PATTERN, $baseUrl);
-		$this->baseEndpointUrl .= "&api_token=$apiToken";   
+		$this->apiCredentialsStr .= "&api_token=$apiToken";   
 		
 		$this->supportedLanguages = $cielo24ParamsMap['languages'];
 	}
 	
+	
 	public function getRemoteFinishedJobId($entryId)
 	{
-		$remoteJobsListAPIUrl = str_replace(self::API_CALL_NAME_PATTERN, "job/list", $this->baseEndpointUrl);
 		$listParams = array("ExternalID" => $entryId, "JobStatus" => "Complete");
-		$remoteJobsListAPIUrl = $this->addUrlParams($remoteJobsListAPIUrl, $listParams);
-	
+		$remoteJobsListAPIUrl = $this->createAPIUrl("job/list", $listParams);
 		$exitingJobsResult = $this->sendAPICall($remoteJobsListAPIUrl);
 		if($exitingJobsResult && isset($exitingJobsResult->ActiveJobs) && count($exitingJobsResult->ActiveJobs))
 		{
@@ -46,11 +41,8 @@ class Cielo24ClientHelper
 		$languageExternalServiceParam = $this->supportedLanguages[$spokenLanguage];
 		
 		//adding a job
-		$createJobAPIUrl = str_replace(self::API_CALL_NAME_PATTERN, "job/new", $this->baseEndpointUrl);
-		$jobCreationParams = array("language" => $languageExternalServiceParam,
-						"external_id" => $entryId
-						);
-		$createJobAPIUrl = $this->addUrlParams($createJobAPIUrl, $jobCreationParams);
+		$jobCreationParams = array("language" => $languageExternalServiceParam,"external_id" => $entryId);
+		$createJobAPIUrl = $this->createAPIUrl("job/new", $jobCreationParams);
 		$jobAdditionResult = $this->sendAPICall($createJobAPIUrl);
 		if($jobAdditionResult && isset($jobAdditionResult->JobId))
 			$jobId = $jobAdditionResult->JobId;
@@ -58,21 +50,19 @@ class Cielo24ClientHelper
 			return false;
 		
 		// attaching media to the job
-		$addMediaAPIUrl = str_replace(self::API_CALL_NAME_PATTERN, "job/add_media", $this->baseEndpointUrl);
 		$addMediaParams = array("job_id" => $jobId, "media_url" => $flavorUrl);
-		$addMediaAPIUrl = $this->addUrlParams($addMediaAPIUrl, $addMediaParams);
+		$addMediaAPIUrl = $this->createAPIUrl("job/add_media", $addMediaParams);
 		$mediaAdditionResult = $this->sendAPICall($addMediaAPIUrl);
 		if(!$mediaAdditionResult || !isset($mediaAdditionResult->TaskId))
 			return false;
 		
 		//request transcription
-		$requestTransctiptAPIUrl = str_replace(self::API_CALL_NAME_PATTERN, "job/perform_transcription", $this->baseEndpointUrl);
 		$requestParams = array("job_id" => $jobId,
-					"transcription_fidelity" => $fidelity,
-					"priority" => $priority,
-					"callback_url" => $callBackUrl
-					);
-		$requestTransctiptAPIUrl = $this->addUrlParams($requestTransctiptAPIUrl, $requestParams);
+								"transcription_fidelity" => $fidelity,
+								"priority" => $priority,
+								"callback_url" => $callBackUrl
+								);
+		$requestTransctiptAPIUrl = $this->createAPIUrl("job/perform_transcription", $requestParams);
 		$requestTranscriptionResult = $this->sendAPICall($requestTransctiptAPIUrl);
 		if(!$requestTranscriptionResult || !isset($requestTranscriptionResult->TaskId))
 			return false;
@@ -83,12 +73,12 @@ class Cielo24ClientHelper
 	private function sendAPICall($url, $noDecoding = false)
 	{
 		KalturaLog::debug("sending API call - $url");
-	
+
 		$ch = curl_init($url);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-	
+
 		$result = curl_exec($ch);
-	
+
 		if(($errString = curl_error($ch)) !== '' || ($errNum = curl_errno($ch)) !== 0)
 		{
 			KalturaLog::err('problem with curl - ' . $errString . ' error num - ' . $errNum);
@@ -114,7 +104,6 @@ class Cielo24ClientHelper
 	
 	public function getRemoteTranscript($externalServiceJobId)
 	{	
-		$getTranscriptAPIUrl = str_replace(self::API_CALL_NAME_PATTERN, "job/get_transcript", $this->baseEndpointUrl);
 		$transcriptRetrievalParams = array("job_id" => $externalServiceJobId,
 							"create_paragraphs" => "false",
 							"remove_sound_references" => "true",
@@ -124,7 +113,7 @@ class Cielo24ClientHelper
 							"remove_disfluencies" => "true",
 							"timecode_every_paragraph" => "false"
 							);
-		$getTranscriptAPIUrl = $this->addUrlParams($getTranscriptAPIUrl, $transcriptRetrievalParams);
+		$getTranscriptAPIUrl = $this->createAPIUrl("job/get_transcript", $transcriptRetrievalParams);
 		$transcriptContentResult = $this->sendAPICall($getTranscriptAPIUrl, true);
 		
 		return $transcriptContentResult;
@@ -133,14 +122,11 @@ class Cielo24ClientHelper
 	public function getRemoteCaptions($externalServiceJobId, array $formats)
 	{
 		$captionContents = array();
-		
-		$baseGetCaptionAPIUrl = str_replace(self::API_CALL_NAME_PATTERN, "job/get_caption", $this->baseEndpointUrl);
 		$captionRetrievalParam = array("job_id" => $externalServiceJobId);
-		$baseGetCaptionAPIUrl = $this->addUrlParams($baseGetCaptionAPIUrl, $captionRetrievalParam);
+		$baseGetCaptionAPIUrl = $this->createAPIUrl("job/get_caption", $captionRetrievalParam);
 		foreach($formats as $format)
 		{
-			$formatParam = array("caption_format" => $format);
-			$getCaptionAPIUrl = $this->addUrlParams($baseGetCaptionAPIUrl, $formatParam);
+			$getCaptionAPIUrl = $this->appendToUrl($baseGetCaptionAPIUrl, array("caption_format" => $format));
 			$captionContentResult = $this->sendAPICall($getCaptionAPIUrl, true);
 			$captionContents[$format] = $captionContentResult;
 		}
@@ -150,14 +136,19 @@ class Cielo24ClientHelper
 	
 	public function deleteRemoteFile($externalServiceJobId)
 	{	
-		$deleteExternalJobAPIUrl = str_replace(self::API_CALL_NAME_PATTERN, "job/delete", $this->baseEndpointUrl);
 		$deletJobParams = array("job_id" => $externalServiceJobId);
-		$deleteExternalJobAPIUrl = $this->addUrlParams($deleteExternalJobAPIUrl, $deletJobParams);
+		$deleteExternalJobAPIUrl = $this->createAPIUrl("job/delete", $deletJobParams);
 		
 		$this->sendAPICall($deleteExternalJobAPIUrl);
 	}
 	
-	private function addUrlParams($url, array $params)
+	private function createAPIUrl($actionStr, array $params)
+	{
+		$url = $this->baseEndpointUrl . $actionStr . "?" . $this->apiCredentialsStr;
+		return $this->appendToUrl($url, $params);
+	}
+	
+	private function appendToUrl($url, array $params)
 	{
 		return $url . "&" . http_build_query($params);
 	}
