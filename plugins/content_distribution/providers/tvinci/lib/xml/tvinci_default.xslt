@@ -39,7 +39,6 @@
     <xsl:variable name="epgIdentifier" select="''"/>
     <xsl:variable name="title" select="item/title"/>
     <xsl:variable name="description" select="item/description"/>
-    <xsl:variable name="thumbnailUrl" select="item/thumbnailUrl/@url"/>
     <!-- rules -->
     <xsl:variable name="geoBlockRule" select="item/customData/metadata/GEOBlockRule"/>
     <xsl:variable name="watchPermissionRule" select="item/customData/metadata/WatchPermissionRule"/>
@@ -170,7 +169,25 @@
         </xsl:call-template>
         <xsl:element name="thumb">
             <xsl:attribute name="url">
-                <xsl:value-of select="$thumbnailUrl"/>
+                <xsl:choose>
+                    <xsl:when test="item/thumbnail/@isDefault='true'">
+                        <!-- if there is default thumb we'll take it -->
+                        <xsl:for-each select="item/thumbnail">
+                            <xsl:if test="./@isDefault='true'">
+                                <xsl:value-of select="./@url"/>
+                            </xsl:if>
+                        </xsl:for-each>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:for-each select="item/thumbnail">
+                            <xsl:sort select="./@fileSize" data-type="number" order="descending"/>
+                            <!-- we only care about the largest one -->
+                            <xsl:if test="position()=1">
+                                <xsl:value-of select="./@url"/>
+                            </xsl:if>
+                        </xsl:for-each>
+                    </xsl:otherwise>
+                </xsl:choose>
             </xsl:attribute>
         </xsl:element>
         <xsl:element name="pic_ratios">
