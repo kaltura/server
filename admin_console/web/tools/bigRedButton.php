@@ -116,6 +116,7 @@ $html5Version = $_GET['playerVersion'];
 					 "flashvars": {
 							 "streamerType": "hds",
 							 "autoPlay": true,
+							 "forceHDS": true,
 							 "LeadWithHLSOnFlash": false
 					 },
 					 "cache_st": 1410340114,
