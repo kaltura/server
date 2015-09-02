@@ -3,9 +3,9 @@ class kCielo24FlowManager implements kBatchJobStatusEventConsumer
 {
 	private $baseEndpointUrl = null;
 	const FILE_NAME_PATTERN = "{entryId}-Transcript-{language}.txt";
-	const MECHNICAL_TRANSCRIPTION_ACCURACY_VALUE = 70;
-	const PREMIUM_TRANSCRIPTION_ACCURACY_VALUE = 95;
-	const PROFESSIONAL_TRANSCRIPTION_ACCURACY_VALUE = 99;
+	const MECHNICAL_TRANSCRIPTION_ACCURACY_VALUE = 0.7;
+	const PREMIUM_TRANSCRIPTION_ACCURACY_VALUE = 0.95;
+	const PROFESSIONAL_TRANSCRIPTION_ACCURACY_VALUE = 0.99;
 	
 	/* (non-PHPdoc)
 	 * @see kBatchJobStatusEventConsumer::shouldConsumeJobStatusEvent()

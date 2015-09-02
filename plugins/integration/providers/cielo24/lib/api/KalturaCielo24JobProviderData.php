@@ -84,7 +84,7 @@ class KalturaCielo24JobProviderData extends KalturaIntegrationJobProviderData
 	{
 		$entryId = $this->entryId;
 		$entry = entryPeer::retrieveByPK($entryId);
-		if(!$entry)
+		if(!$entry || $entry->getType() != entryType::MEDIA_CLIP || !in_array($entry->getMediaType(), array(entry::ENTRY_MEDIA_TYPE_VIDEO,entry::ENTRY_MEDIA_TYPE_AUDIO)))
 			throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_ID, $entryId);
 	
 		$flavorAssetId = $this->flavorAssetId;
