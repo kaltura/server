@@ -39,7 +39,6 @@
     <xsl:variable name="epgIdentifier" select="''"/>
     <xsl:variable name="title" select="item/title"/>
     <xsl:variable name="description" select="item/description"/>
-    <xsl:variable name="thumbnailUrl" select="item/thumbnailUrl/@url"/>
     <!-- rules -->
     <xsl:variable name="geoBlockRule" select="item/customData/metadata/GEOBlockRule"/>
     <xsl:variable name="watchPermissionRule" select="item/customData/metadata/WatchPermissionRule"/>
@@ -170,7 +169,25 @@
         </xsl:call-template>
         <xsl:element name="thumb">
             <xsl:attribute name="url">
-                <xsl:value-of select="$thumbnailUrl"/>
+                <xsl:choose>
+                    <xsl:when test="item/thumbnail/@isDefault='true'">
+                        <!-- if there is default thumb we'll take it -->
+                        <xsl:for-each select="item/thumbnail">
+                            <xsl:if test="./@isDefault='true'">
+                                <xsl:value-of select="./@url"/>
+                            </xsl:if>
+                        </xsl:for-each>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:for-each select="item/thumbnail">
+                            <xsl:sort select="./@fileSize" data-type="number" order="descending"/>
+                            <!-- we only care about the largest one -->
+                            <xsl:if test="position()=1">
+                                <xsl:value-of select="./@url"/>
+                            </xsl:if>
+                        </xsl:for-each>
+                    </xsl:otherwise>
+                </xsl:choose>
             </xsl:attribute>
         </xsl:element>
         <xsl:element name="pic_ratios">
@@ -411,42 +428,43 @@
                     <xsl:with-param name="matchingContents" select="$tagMatchingContents"/>
                 </xsl:call-template>
             </xsl:variable>
+            <xsl:if test="not(count(exsl:node-set($filteredItems)/contentItem) = 0)">
+                <xsl:variable name="coGuid">
+                    <xsl:for-each select="exsl:node-set($filteredItems)/contentItem">
+                        <xsl:variable name="flavorParamId" select="./@flavorParamsId"/>
+                        <xsl:value-of select="concat($relevantEntryId, '_' , $flavorParamId)"/>
+                        <xsl:if test="not(position() = last())">,</xsl:if>
+                    </xsl:for-each>
+                </xsl:variable>
 
-            <xsl:variable name="coGuid">
-                <xsl:for-each select="exsl:node-set($filteredItems)/contentItem">
-                    <xsl:variable name="flavorParamId" select="./@flavorParamsId"/>
-                    <xsl:value-of select="concat($relevantEntryId, '_' , $flavorParamId)"/>
-                    <xsl:if test="not(position() = last())">,</xsl:if>
-                </xsl:for-each>
-            </xsl:variable>
+                <xsl:variable name="suffix">
+                    <xsl:call-template name="suffix-matching-tag">
+                        <xsl:with-param name="tag" select="$tag"/>
+                    </xsl:call-template>
+                </xsl:variable>
 
-            <xsl:variable name="suffix">
-                <xsl:call-template name="suffix-matching-tag">
-                    <xsl:with-param name="tag" select="$tag"/>
+                <xsl:variable name="typeName">
+                    <xsl:call-template name="type-name-matching-tag">
+                        <xsl:with-param name="tag" select="$tag"/>
+                        <xsl:with-param name="isChild" select="$isChild"/>
+                        <xsl:with-param name="childNumber" select="$childIdx"/>
+                    </xsl:call-template>
+                </xsl:variable>
+
+                <xsl:variable name="ppvModule">
+                    <xsl:call-template name="ppvModule-matching-tag">
+                        <xsl:with-param name="tag" select="$tag"/>
+                    </xsl:call-template>
+                </xsl:variable>
+
+                <xsl:call-template name="create-file-element">
+                    <xsl:with-param name="cdnCode" select="concat($playManifestPrefix, $relevantEntryId, $suffix)"/>
+                    <xsl:with-param name="coGuid" select="$coGuid"/>
+                    <xsl:with-param name="duration" select="$duration"/>
+                    <xsl:with-param name="ppvModule" select="$ppvModule"/>
+                    <xsl:with-param name="type" select="$typeName"/>
                 </xsl:call-template>
-            </xsl:variable>
-
-            <xsl:variable name="typeName">
-                <xsl:call-template name="type-name-matching-tag">
-                    <xsl:with-param name="tag" select="$tag"/>
-                    <xsl:with-param name="isChild" select="$isChild"/>
-                    <xsl:with-param name="childNumber" select="$childIdx"/>
-                </xsl:call-template>
-            </xsl:variable>
-
-            <xsl:variable name="ppvModule">
-                <xsl:call-template name="ppvModule-matching-tag">
-                    <xsl:with-param name="tag" select="$tag"/>
-                </xsl:call-template>
-            </xsl:variable>
-
-            <xsl:call-template name="create-file-element">
-                <xsl:with-param name="cdnCode" select="concat($playManifestPrefix, $relevantEntryId, $suffix)"/>
-                <xsl:with-param name="coGuid" select="$coGuid"/>
-                <xsl:with-param name="duration" select="$duration"/>
-                <xsl:with-param name="ppvModule" select="$ppvModule"/>
-                <xsl:with-param name="type" select="$typeName"/>
-            </xsl:call-template>
+            </xsl:if>
         </xsl:if>
     </xsl:template>
     <!-- given a tag and contents return only those contents that include the tag -->
