@@ -64,7 +64,7 @@ class DeliveryProfileRtmp extends DeliveryProfileVod {
 			}
 			$url = $this->getPrefix() . $url;
 		}
-		$url = $this->formatByExtension($url); 
+		$url = $this->formatByExtension($url, false); 
 		
 		$url = str_replace($this->REDUNDANT_EXTENSIONS, '', $url);
 		return $url;
