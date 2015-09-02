@@ -1,7 +1,7 @@
 <?php
 	require_once(__dir__ . '/../bootstrap.php');	
 
-	if($argc < 3)
+	if($argc < 4)
 	{
 		die("Usage: php addVoicebaseParamsToPartner [partner id] [apiKey] [apiPassword]" . PHP_EOL);
 	}

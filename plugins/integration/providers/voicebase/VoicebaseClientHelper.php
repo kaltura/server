@@ -25,8 +25,6 @@ class VoicebaseClientHelper
 	
 	public function checkExistingExternalContent($entryId)
 	{
-		$exitingEntryQueryUrl = $this->baseEndpointUrl;
-	
 		$params = array("action" => "getFileStatus", "externalID" => $entryId);
 		$exitingEntryQueryUrl = $this->addUrlParams($this->baseEndpointUrl, $params);
 	

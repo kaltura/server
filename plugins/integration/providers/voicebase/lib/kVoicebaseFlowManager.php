@@ -10,7 +10,7 @@ class kVoicebaseFlowManager implements kBatchJobStatusEventConsumer
 	 */
 	public function shouldConsumeJobStatusEvent(BatchJob $dbBatchJob)
 	{
-		if(in_array($dbBatchJob->getStatus(), array(BatchJob::BATCHJOB_STATUS_DONT_PROCESS, BatchJob::BATCHJOB_STATUS_FINISHED)) && $dbBatchJob->getJobType() == IntegrationPlugin::getBatchJobTypeCoreValue(IntegrationBatchJobType::INTEGRATION))
+		if(in_array($dbBatchJob->getStatus(), array(BatchJob::BATCHJOB_STATUS_FAILED, BatchJob::BATCHJOB_STATUS_DONT_PROCESS, BatchJob::BATCHJOB_STATUS_FINISHED)) && $dbBatchJob->getJobType() == IntegrationPlugin::getBatchJobTypeCoreValue(IntegrationBatchJobType::INTEGRATION))
 		{
 			$providerType = $dbBatchJob->getJobSubType();
 			if ($providerType == VoicebasePlugin::getProviderTypeCoreValue(VoicebaseIntegrationProviderType::VOICEBASE))
@@ -29,10 +29,19 @@ class kVoicebaseFlowManager implements kBatchJobStatusEventConsumer
 		$entryId = $providerData->getEntryId();
 		$partnerId = $dbBatchJob->getPartnerId();
 		$spokenLanguage = $providerData->getSpokenLanguage();
-	
+		$transcript = $this->getAssetsByLanguage($entryId, array(TranscriptPlugin::getAssetTypeCoreValue(TranscriptAssetType::TRANSCRIPT)), $spokenLanguage, true);
+		
+		if($dbBatchJob->getStatus() == BatchJob::BATCHJOB_STATUS_FAILED)
+		{
+			if($transcript)
+			{
+				$transcript->setStatus(AttachmentAsset::FLAVOR_ASSET_STATUS_ERROR);
+				$transcript->save();
+			}
+		}
+
 		if($dbBatchJob->getStatus() == BatchJob::BATCHJOB_STATUS_DONT_PROCESS)
 		{
-			$transcript = $this->getAssetsByLanguage($entryId, array(TranscriptPlugin::getAssetTypeCoreValue(TranscriptAssetType::TRANSCRIPT)), $spokenLanguage, true);	
 			if(!$transcript)
 			{
 				$transcript = new TranscriptAsset();
@@ -65,7 +74,6 @@ class kVoicebaseFlowManager implements kBatchJobStatusEventConsumer
 			$formatsArray[] = "TXT";
 			$contentsArray = $clientHelper->getRemoteTranscripts($entryId, $formatsArray);
 			KalturaLog::debug('contents are - ' . print_r($contentsArray, true));
-			$transcript = $this->getAssetsByLanguage($entryId, array(TranscriptPlugin::getAssetTypeCoreValue(TranscriptAssetType::TRANSCRIPT)), $spokenLanguage, true);
 			$captions = $this->getAssetsByLanguage($entryId, array(CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION)), $spokenLanguage);
 		
 			$this->setObjectContent($transcript, $contentsArray["TXT"], null, true);
