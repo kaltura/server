@@ -140,7 +140,7 @@ class KalturaCielo24JobProviderData extends KalturaIntegrationJobProviderData
 			$sanitizedFormatsArray = array();
 			foreach($formatsArray as $format)
 			{
-				$format = preg_replace("/[^A-Z]/", "", $format);
+				$format = preg_replace("/[^A-Z_]/", "", $format);
 				if(!constant("KalturaCaptionType::" . $format) || in_array($format, $excludedFormats))
 					throw new KalturaAPIException(KalturaCielo24Errors::INVALID_TYPES,$formatsString);
 				$sanitizedFormatsArray[] = $format;

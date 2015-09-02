@@ -3,6 +3,9 @@ class kCielo24FlowManager implements kBatchJobStatusEventConsumer
 {
 	private $baseEndpointUrl = null;
 	const FILE_NAME_PATTERN = "{entryId}-Transcript-{language}.txt";
+	const MECHNICAL_TRANSCRIPTION_ACCURACY_VALUE = 70;
+	const PREMIUM_TRANSCRIPTION_ACCURACY_VALUE = 95;
+	const PROFESSIONAL_TRANSCRIPTION_ACCURACY_VALUE = 99;
 	
 	/* (non-PHPdoc)
 	 * @see kBatchJobStatusEventConsumer::shouldConsumeJobStatusEvent()
@@ -77,8 +80,20 @@ class kCielo24FlowManager implements kBatchJobStatusEventConsumer
 			KalturaLog::debug("captions content - " . print_r($captionsContentArray, true));
 	
 			$captions = $this->getAssetsByLanguage($entryId, array(CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION)), $spokenLanguage);
-		
-			$this->setObjectContent($transcript, $transcriptContent, null, true);
+			switch ($providerData->getFidelity())
+			{
+				case KalturaCielo24Fidelity::MECHANICAL:
+					$accuracyRate = self::MECHNICAL_TRANSCRIPTION_ACCURACY_VALUE;
+					break;
+				case KalturaCielo24Fidelity::PREMIUM:
+					$accuracyRate = self::PREMIUM_TRANSCRIPTION_ACCURACY_VALUE;
+					break;
+				case KalturaCielo24Fidelity::PROFESSIONAL:
+					$accuracyRate = self::PROFESSIONAL_TRANSCRIPTION_ACCURACY_VALUE;
+					break;
+			}
+
+			$this->setObjectContent($transcript, $transcriptContent, $accuracyRate, null, true);
 	
 			foreach ($captionsContentArray as $format => $content)
 			{        
@@ -95,7 +110,7 @@ class kCielo24FlowManager implements kBatchJobStatusEventConsumer
 					$caption->setStatus(CaptionAsset::ASSET_STATUS_QUEUED);
 					$caption->save();
 				}
-				$this->setObjectContent($caption, $content, $format);
+				$this->setObjectContent($caption, $content, $accuracyRate, $format);
 			}
 		}
 		return true;					    
@@ -121,7 +136,7 @@ class kCielo24FlowManager implements kBatchJobStatusEventConsumer
 		return $objects;
 	}
 	
-	private function setObjectContent($assetObject, $content, $format = null, $shouldSetTranscriptFileName = false)
+	private function setObjectContent($assetObject, $content, $accuracy, $format = null, $shouldSetTranscriptFileName = false)
 	{
 		$assetObject->incrementVersion();
 		$ext = "txt";
@@ -152,6 +167,7 @@ class kCielo24FlowManager implements kBatchJobStatusEventConsumer
 			$assetObject->setFileName($fileName);
 		}
 		
+		$assetObject->setAccuracy($accuracy);
 		$assetObject->setStatus(AttachmentAsset::ASSET_STATUS_READY);
 		$assetObject->save();
 	} 
