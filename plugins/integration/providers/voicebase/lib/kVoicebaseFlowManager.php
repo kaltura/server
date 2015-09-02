@@ -2,7 +2,7 @@
 class kVoicebaseFlowManager implements kBatchJobStatusEventConsumer 
 {
 	private $baseEndpointUrl = null;
-	const DEFAULT_ACCURACY = 60;
+	const DEFAULT_ACCURACY = 0.6;
 	const FILE_NAME_PATTERN = "{entryId}-Transcript-{language}.txt";
 	
 	/* (non-PHPdoc)
