@@ -154,6 +154,12 @@ class KalturaCielo24JobProviderData extends KalturaIntegrationJobProviderData
 			$object->setCaptionAssetFormats($defaultFormats);
 		}
 		
+		if(!$object->getPriority())
+			$object->setPriority($cielo24ParamsMap['default_priority']);
+		
+		if(!$object->getFidelity())
+			$object->setFidelity($cielo24ParamsMap['default_fidelity']);
+		
 		return $object;
 	}
 }
