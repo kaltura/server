@@ -1845,7 +1845,7 @@ CREATE TABLE IF NOT EXISTS `scheduler_config` (
 /*Table structure for table `scheduler_status` */
 
 CREATE TABLE IF NOT EXISTS `scheduler_status` (
-  `id`  bigint(20) NOT NULL AUTO_INCREMENT,
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `created_at` datetime DEFAULT NULL,
   `created_by` varchar(20) DEFAULT NULL,
   `updated_at` datetime DEFAULT NULL,
