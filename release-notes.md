@@ -1,3 +1,12 @@
+# Jupiter-10.19.0 #
+
+### Configuration ###
+
+- Run the following permission script:
+
+## Changed kaltura.scheduler_status.id from int(11) to bigint(20) ##
+- mysql -h@db_host@ -u@db_user@ -p@db_pass@ -P3306 kaltura <  deployment/updates/sql/2015_09_06_alter_scheduler_status_bigint.sql
+
 # Jupiter-10.18.0 #
 
 ## Allow answer cue points to be added by player and anonymous users ##
