@@ -13,7 +13,7 @@
  * @package Core
  * @subpackage model
  */
-class categoryEntryPeer extends BasecategoryEntryPeer {
+class categoryEntryPeer extends BasecategoryEntryPeer implements IRelatedObjectPeer {
 
 	private static $skipEntrySave = false;
 	
@@ -358,5 +358,36 @@ class categoryEntryPeer extends BasecategoryEntryPeer {
 	public static function getCacheInvalidationKeys()
 	{
 		return array(array("categoryEntry:entryId=%s", self::ENTRY_ID));		
+	}
+	
+	/* (non-PHPdoc)
+	 * @see IRelatedObjectPeer::getRootObjects()
+	 */
+	public function getRootObjects(IBaseObject $object)
+	{
+		/* @var $object categoryEntry */
+		
+		$roots = array();
+		
+		$category = categoryPeer::retrieveByPK($object->getCategoryId());
+		if($category)
+		{
+			$roots = categoryPeer::getRootObjects($category);
+			$roots[] = $category;
+		}
+		
+		$entry = entryPeer::retrieveByPK($object->getEntryId());
+		if($entry)
+			$roots[] = $entry;
+		
+		return $roots;
+	}
+
+	/* (non-PHPdoc)
+	 * @see IRelatedObjectPeer::isReferenced()
+	 */
+	public function isReferenced(IBaseObject $object)
+	{
+		return false;
 	}
 } // categoryEntryPeer
