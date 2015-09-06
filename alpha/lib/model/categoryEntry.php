@@ -64,6 +64,9 @@ class categoryEntry extends BasecategoryEntry implements IBaseObject
 			
 		if(!categoryEntryPeer::getSkipSave())
 			$entry->indexToSearchIndex();
+			
+		if (!$this->alreadyInSave)
+			kEventsManager::raiseEvent(new kObjectAddedEvent($this));
 	}
 	
 	/* (non-PHPdoc)
