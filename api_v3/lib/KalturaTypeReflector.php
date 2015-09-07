@@ -103,9 +103,19 @@ class KalturaTypeReflector
 	    	$this->_serverOnly = $commentsParser->serverOnly;
 	    	$this->_package = $commentsParser->package;
 	    	$this->_subpackage = $commentsParser->subpackage;
+
+		    $permissions = array();
+		    $parentType = get_parent_class($this->_type);
+		    if ($parentType !== false)
+		    {
+				$parentReflector = KalturaTypeReflectorCacher::get($parentType);
+			    $permissions = array_merge($permissions, $parentReflector->_permissions);
+		    }
+		    
 	    	if (!is_null($commentsParser->permissions)) {
-	    		$this->_permissions = explode(',',trim($commentsParser->permissions));
+	    		$permissions = array_merge($permissions,explode(',',trim($commentsParser->permissions)));
 	    	}
+		    $this->_permissions=$permissions;
 	    }
 	}
 	

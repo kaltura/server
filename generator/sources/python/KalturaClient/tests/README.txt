@@ -1,5 +1,5 @@
 Some (ok, most...) Tests require you to connect to a working Kaltura Server.
-To specify credentials, see "secret_config.py"
+To specify credentials, copy "config.template.ini" to "config.ini" and edit the the values. 
 
 Take the time to make sure your .gitignore file is correct, 
  so you don't commit your 'secret' credentials.

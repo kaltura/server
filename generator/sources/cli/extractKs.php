@@ -30,6 +30,35 @@
 
 require_once(dirname(__file__) . '/lib/KalturaSession.php');
 
+function formatTimeInterval($secs)
+{
+	$bit = array(
+		' year'   => intval($secs / 31556926),
+		' month'  => $secs / 2628000 % 12,
+		' day'    => $secs / 86400 % 30,
+		' hour'   => $secs / 3600 % 24,
+		' minute' => $secs / 60 % 60,
+		' second' => $secs % 60
+	);
+
+	foreach($bit as $k => $v)
+	{
+		if($v > 1)
+		{
+			$ret[] = $v . $k . 's';
+		}
+		else if($v == 1)
+		{
+			$ret[] = $v . $k;
+		}
+	}
+	
+	$ret = array_slice($ret, 0, 2);		// don't care about more than 2 levels
+	array_splice($ret, count($ret) - 1, 0, 'and');
+
+	return join(' ', $ret);
+}
+
 KalturaSecretRepository::init();
 
 if ($argc < 2)
@@ -45,4 +74,21 @@ echo str_pad('Fields', 20) . $ksObj->real_str . "\n";
 echo "---\n";
 $fieldNames = array('partner_id','partner_pattern','valid_until','type','rand','user','privileges','master_partner_id','additional_data');
 foreach ($fieldNames as $fieldName)
-	echo str_pad($fieldName, 20) . $ksObj->$fieldName . "\n";
+{
+	echo str_pad($fieldName, 20) . $ksObj->$fieldName;
+	if ($fieldName == 'valid_until')
+	{
+		$currentTime = time();
+		echo ' = ' . date('Y-m-d H:i:s', $ksObj->valid_until);
+		if ($currentTime >= $ksObj->valid_until)
+		{
+			echo ' (expired ' . formatTimeInterval($currentTime - $ksObj->valid_until) . ' ago';
+		}
+		else
+		{
+			echo ' (will expire in ' . formatTimeInterval($ksObj->valid_until - $currentTime);
+		}
+		echo ')';
+	}
+	echo "\n";
+}

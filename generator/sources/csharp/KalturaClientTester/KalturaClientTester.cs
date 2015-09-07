@@ -32,61 +32,94 @@ using System.IO;
 
 namespace Kaltura
 {
-    class KalturaClientTester
+    class KalturaClientTester : IKalturaLogger
     {
-	private const int PARTNER_ID = @YOUR_PARTNER_ID@; //enter your partner id
-	private const string SECRET = "@YOUR_USER_SECRET@"; //enter your user secret
-	private const string ADMIN_SECRET = "@YOUR_ADMIN_SECRET@"; //enter your admin secret
-	private const string SERVICE_URL = "@SERVICE_URL@";
+		private const int PARTNER_ID = @YOUR_PARTNER_ID@; //enter your partner id
+		private const string ADMIN_SECRET = "@YOUR_ADMIN_SECRET@"; //enter your admin secret
+		private const string SERVICE_URL = "@SERVICE_URL@";
         private const string USER_ID = "testUser";
+        
+        private static string uniqueTag;
+
+        public void Log(string msg)
+        {
+            Console.WriteLine(msg);
+        }
 
         static void Main(string[] args)
         {
             Console.WriteLine("Starting C# Kaltura API Client Library");
+            int code = 0;
+            uniqueTag = Guid.NewGuid().ToString().Replace("-", "").Substring(0, 20);
+
+            try
+            {
+                ResponseProfileExample();
+            }
+            catch (KalturaAPIException e)
+            {
+                Console.WriteLine("Failed ResponseProfileExample: " + e.Message);
+                code = -1;
+            }
 
             try
             {
                 SampleReplaceVideoFlavorAndAddCaption();
             }
-            catch (KalturaAPIException e1)
+            catch (KalturaAPIException e)
             {
-                Console.WriteLine("Failed SampleReplaceVideoFlavorAndAddCaption: " + e1.Message);
+                Console.WriteLine("Failed SampleReplaceVideoFlavorAndAddCaption: " + e.Message);
+                code = -1;
             }
 
             try
             {
                 SampleMetadataOperations();
             }
-            catch (KalturaAPIException e1)
+            catch (KalturaAPIException e)
             {
-                Console.WriteLine("Failed SampleMetadataOperations: " + e1.Message);
-            }
-
-            try
-            {
-                MultiRequestExample();
-            }
-            catch (KalturaAPIException e1)
-            {
-                Console.WriteLine("Failed MultiRequestExample: " + e1.Message);
+                Console.WriteLine("Failed SampleMetadataOperations: " + e.Message);
+                code = -1;
             }
 
             try
             {
                 AdvancedMultiRequestExample();
             }
+            catch (KalturaAPIException e)
+            {
+                Console.WriteLine("Failed AdvancedMultiRequestExample: " + e.Message);
+                code = -1;
+            }
+            
+            try
+            {
+                PlaylistExecuteMultiRequestExample();
+            }
             catch (KalturaAPIException e1)
             {
-                Console.WriteLine("Failed AdvancedMultiRequestExample: " + e1.Message);
+                Console.WriteLine("Failed PlaylistExecuteMultiRequestExample: " + e1.Message);
+                code = -1;
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine("Exception thrown: " + ex.Message);
+                code = -1;
             }
 			
-			Console.WriteLine("Finished running client library tests");
+            if (code == 0)
+            {
+                Console.WriteLine("Finished running client library tests");
+            }
+
+            Environment.Exit(code);
         }
 
         static KalturaConfiguration GetConfig()
         {
-            KalturaConfiguration config = new KalturaConfiguration(PARTNER_ID);
+            KalturaConfiguration config = new KalturaConfiguration();
             config.ServiceUrl = SERVICE_URL;
+            config.Logger = new KalturaClientTester();
             return config;
         }
 
@@ -94,8 +127,7 @@ namespace Kaltura
         static int? CheckIfFlavorExist(String name)
         {
             KalturaClient client = new KalturaClient(GetConfig());
-            string ks = client.GenerateSession(ADMIN_SECRET, USER_ID, KalturaSessionType.ADMIN, PARTNER_ID, 86400, "");
-            client.KS = ks;
+            client.KS = client.GenerateSession(ADMIN_SECRET, USER_ID, KalturaSessionType.ADMIN, PARTNER_ID);
 			
             //verify that the account we're testing has the new iPad flavor enabled on the default conversion profile
             KalturaConversionProfile defaultProfile = client.ConversionProfileService.GetDefault();
@@ -110,6 +142,78 @@ namespace Kaltura
                 return null;
         }
         
+        static void PlaylistExecuteMultiRequestExample()
+        {
+            KalturaClient client = new KalturaClient(GetConfig());
+
+            client.StartMultiRequest();
+
+            // Request 1
+            client.SessionService.Start(ADMIN_SECRET, "", KalturaSessionType.ADMIN, PARTNER_ID, 86400, "");
+            client.KS = "{1:result}"; // for the current multi request, the result of the first call will be used as the ks for next calls
+
+            // Request 2
+            client.MediaService.List();
+
+            KalturaMultiResponse response = client.DoMultiRequest();
+
+            foreach (object obj in response)
+            {
+                if (obj.GetType() == typeof(KalturaAPIException))
+                {
+                    Console.WriteLine("Error occurred: " + ((KalturaAPIException)obj).Message);
+                }
+            }
+
+            String twoEntries = "";
+
+            if (response[1].GetType() == typeof(KalturaMediaListResponse))
+            {
+                KalturaMediaListResponse mediaListResponse = (KalturaMediaListResponse)response[1];
+                twoEntries = mediaListResponse.Objects[0].Id + ", " + mediaListResponse.Objects[1].Id;
+                Console.WriteLine("We will use the first 2 entries we got as a reponse: " + twoEntries);
+            }
+
+            if(twoEntries.Equals(""))
+            {
+                return;
+            }
+
+            string ks = client.GenerateSession(ADMIN_SECRET, USER_ID, KalturaSessionType.ADMIN, PARTNER_ID, 86400, "");
+            client.KS = ks;
+
+            KalturaPlaylist newPlaylist = new KalturaPlaylist();
+            newPlaylist.Name = "Test Playlist";
+            newPlaylist.PlaylistContent = twoEntries;
+            newPlaylist.PlaylistType = KalturaPlaylistType.STATIC_LIST;
+
+            KalturaPlaylist kPlaylist = client.PlaylistService.Add(newPlaylist);
+
+            // new multirequest
+            client.StartMultiRequest();
+
+            client.PlaylistService.Execute(kPlaylist.Id);
+            client.PlaylistService.Execute(kPlaylist.Id);
+
+            response = client.DoMultiRequest();
+
+            foreach (object obj in response)
+            {
+                if (obj.GetType() == typeof(KalturaAPIException))
+                {
+                    Console.WriteLine("Error occurred: " + ((KalturaAPIException)obj).Message);
+                }
+            }
+
+            foreach (var currentResponse in response)
+            {
+                if(currentResponse.GetType() != typeof(KalturaMultiResponse))
+                {
+                    throw new Exception("Unexpected multirequest response");
+                }
+            }
+        }
+        
         // This will guide you through uploading a video, getting a specific transcoding flavor, replacing a flavor, and uploading a caption file.
         static void SampleReplaceVideoFlavorAndAddCaption()
         {
@@ -117,8 +221,7 @@ namespace Kaltura
             Console.WriteLine("1. Upload a video file");
             FileStream fileStream = new FileStream("DemoVideo.flv", FileMode.Open, FileAccess.Read);
             KalturaClient client = new KalturaClient(GetConfig());
-            string ks = client.GenerateSession(ADMIN_SECRET, USER_ID, KalturaSessionType.ADMIN, PARTNER_ID, 86400, "");
-            client.KS = ks;
+            client.KS = client.GenerateSession(ADMIN_SECRET, USER_ID, KalturaSessionType.ADMIN, PARTNER_ID, 86400, "");
             KalturaUploadToken uploadToken = client.UploadTokenService.Add();
             client.UploadTokenService.Upload(uploadToken.Id, fileStream);
             KalturaUploadedFileTokenResource mediaResource = new KalturaUploadedFileTokenResource();
@@ -211,109 +314,50 @@ namespace Kaltura
 
         static void SampleMetadataOperations()
         {
-            // The metadata field we'll add/update
-            string metaDataFieldName = "SubtitleFormat";
-            string fieldValue = "VobSub";
 
             // The Schema file for the field
             // Currently, you must build the xsd yourself. There is no utility provided.
             string xsdFile = "MetadataSchema.xsd";
+            StreamReader fileStream = File.OpenText(xsdFile);
+            string xsd = fileStream.ReadToEnd();
+
+            string fieldValue = "VobSub";
+            string xmlData = "<metadata><SubtitleFormat>" + fieldValue + "</SubtitleFormat></metadata>";
 
             KalturaClient client = new KalturaClient(GetConfig());
 
             // start new session (client session is enough when we do operations in a users scope)
-            string ks = client.GenerateSession(ADMIN_SECRET, USER_ID, KalturaSessionType.ADMIN, PARTNER_ID, 86400, "");
-            client.KS = ks;
+            client.KS = client.GenerateSession(ADMIN_SECRET, USER_ID, KalturaSessionType.ADMIN, PARTNER_ID);
 
             // Setup a pager and search to use
+            KalturaMediaEntryFilter mediaEntryFilter = new KalturaMediaEntryFilter();
+            mediaEntryFilter.OrderBy = KalturaMediaEntryOrderBy.CREATED_AT_ASC;
+            mediaEntryFilter.MediaTypeEqual = KalturaMediaType.VIDEO;
+
             KalturaFilterPager pager = new KalturaFilterPager();
-            KalturaMediaEntryFilter search = new KalturaMediaEntryFilter();
-            search.OrderBy = KalturaMediaEntryOrderBy.CREATED_AT_ASC;
-            search.MediaTypeEqual = KalturaMediaType.VIDEO;  // Video only
-            pager.PageSize = 10;
+            pager.PageSize = 1;
             pager.PageIndex = 1;
 
+            KalturaMetadataProfile newMetadataProfile = new KalturaMetadataProfile();
+            newMetadataProfile.MetadataObjectType = KalturaMetadataObjectType.ENTRY;
+            newMetadataProfile.Name = "Test";
+
             Console.WriteLine("List videos, get the first one...");
-
-            // Get 10 video entries, but we'll just use the first one returned
-            IList<KalturaMediaEntry> entries = client.MediaService.List(search, pager).Objects;
-            // Check if there are any custom fields defined in the KMC (Settings -> Custom Data)
-            // for the first item returned by the previous listaction
-            KalturaMetadataProfileFilter filter = new KalturaMetadataProfileFilter();
-            IList<KalturaMetadataProfile> metadata = client.MetadataProfileService.List(filter, pager).Objects;
-            int profileId = 0;
-            string name = "";
-            string id = "";
+            IList<KalturaMediaEntry> entries = client.MediaService.List(mediaEntryFilter, pager).Objects;
+            KalturaMediaEntry entry = entries[0];
             
-            if (metadata.Count > 0)
-            {
-                profileId = metadata[0].Id;
-                name = entries[0].Name;
-                id = entries[0].Id;
-                Console.WriteLine("1. There are custom fields for video: " + name + ", entryid: " + id);
-            }
-            else
-            {
-                Console.WriteLine("1. This publisher account doesn't have any custom metadata profiles enabled.");
-                Console.WriteLine("Exiting the metadata test (enable customer metadata in Admin Console and create a profile in KMC first).");
-				return;
-            }
-            
-            // Add a custom data entry in the KMC  (Settings -> Custom Data)
-            KalturaMetadataProfile profile = new KalturaMetadataProfile();
-            profile.MetadataObjectType = KalturaMetadataObjectType.ENTRY;
-            profile.Name = metadata[0].Name;
-            string viewsData = "";
+            KalturaMetadataProfile metadataProfile = client.MetadataProfileService.Add(newMetadataProfile, xsd);
+            Console.WriteLine("1. Successfully created the custom metadata profile " + metadataProfile.Name + ".");
 
-            StreamReader fileStream = File.OpenText(xsdFile);
-            string xsd = fileStream.ReadToEnd();
-            KalturaMetadataProfile metadataResult = client.MetadataProfileService.Update(profileId, profile, xsd, viewsData);
+            KalturaMetadata metadata = client.MetadataService.Add(metadataProfile.Id, metadataProfile.MetadataObjectType, entry.Id, xmlData);
+            Console.WriteLine("2. Successfully added the custom data field for entryid: " + entry.Id);
 
-            if (metadataResult.Xsd != null)
-            {
-	            Console.WriteLine("2. Successfully created the custom data field " + metaDataFieldName + ".");
-            } else {
-	            Console.WriteLine("2. Failed to create the custom data field.");
-            }
-
-            // Add the custom metadata value to the first video
-            KalturaMetadataFilter filter2 = new KalturaMetadataFilter();
-            filter2.ObjectIdEqual = entries[0].Id;
-            string xmlData = "<metadata><SubtitleFormat>" + fieldValue + "</SubtitleFormat></metadata>";
-            KalturaMetadata metadata2 = client.MetadataService.Add(profileId, profile.MetadataObjectType, entries[0].Id, xmlData);
-
-            if (metadata2.Xml != null) {
-	            Console.WriteLine("3. Successfully added the custom data field for video: "+name+", entryid: "+id);
-	            string xmlStr = metadata2.Xml;
-	            Console.WriteLine("XML used: " + xmlStr);
-            } else {
-	            Console.WriteLine("3. Failed to add the custom data field.");
-            }
-
-            // Now lets change the value (update) of the custom field
-            // Get the metadata for the video
-            KalturaMetadataFilter filter3 = new KalturaMetadataFilter();
-            filter3.ObjectIdEqual = entries[0].Id;
-            IList<KalturaMetadata> metadataList = client.MetadataService.List(filter3).Objects;
-            if (metadataList[0].Xml != null) {
-	            Console.WriteLine("4. Current metadata for video: " + name + ", entryid: " + id);
-	            string xmlquoted = metadataList[0].Xml;
-	            Console.WriteLine("XML: " + xmlquoted);
-	            string xml = metadataList[0].Xml;
-	            // Make sure we find the old value in the current metadata
-	            int pos = xml.IndexOf("<" + metaDataFieldName + ">" + fieldValue + "</" + metaDataFieldName + ">");
-	            if (pos == -1) {
-		            Console.WriteLine("4. Failed to find metadata STRING for video: " + name + ", entryid: " + id);
-	            } else {
-                    System.Text.RegularExpressions.Regex pattern = new System.Text.RegularExpressions.Regex ("@<" + metaDataFieldName + ">(.+)</" + metaDataFieldName + ">@");
-                    xml = pattern.Replace(xml, "<" + metaDataFieldName + ">Ogg Writ</" + metaDataFieldName + ">");
-                    KalturaMetadata rc = client.MetadataService.Update(metadataList[0].Id, xml);
-		            Console.WriteLine("5. Updated metadata for video: " + name + ", entryid: " + id);
-		            xmlquoted = rc.Xml;
-		            Console.WriteLine("XML: " + xmlquoted);
-	            }
-            } else {
-	            Console.WriteLine("4. Failed to find metadata for video: " + name + ", entryid: " + id);
+            KalturaMetadataFilter metadataFilter = new KalturaMetadataFilter();
+            metadataFilter.ObjectIdEqual = entry.Id;
+            metadataFilter.MetadataProfileIdEqual = metadataProfile.Id;
+            IList<KalturaMetadata> metadataList = client.MetadataService.List(metadataFilter).Objects;
+            if (metadataList.Count == 0) {
+                throw new Exception("Failed to find metadata for entryid: " + entry.Id);
             }
         }
 
@@ -325,8 +369,7 @@ namespace Kaltura
             KalturaClient client = new KalturaClient(GetConfig());
 
             // start new session (client session is enough when we do operations in a users scope)
-            string ks = client.GenerateSession(SECRET, USER_ID, KalturaSessionType.USER, PARTNER_ID, 86400, "");
-            client.KS = ks;
+            client.KS = client.GenerateSession(ADMIN_SECRET, USER_ID, KalturaSessionType.USER, PARTNER_ID, 86400, "");
 
             // upload the media
             string uploadTokenId = client.MediaService.Upload(fileStream); // synchronous proccess
@@ -350,8 +393,7 @@ namespace Kaltura
             KalturaClient client = new KalturaClient(GetConfig());
 
             // start new session (client session is enough when we do operations in a users scope)
-            string ks = client.GenerateSession(SECRET, USER_ID, KalturaSessionType.USER, PARTNER_ID, 86400, "");
-            client.KS = ks;
+            client.KS = client.GenerateSession(ADMIN_SECRET, USER_ID, KalturaSessionType.USER, PARTNER_ID, 86400, "");
 
             KalturaMediaEntry mediaEntry = new KalturaMediaEntry();
             mediaEntry.Name = "Media Entry Using .Net Client";
@@ -364,93 +406,261 @@ namespace Kaltura
         }
 
         /// <summary>
-        /// Simple multi request example showing how to start session and list media in a single HTTP request
-        /// </summary>
-        static void MultiRequestExample()
-        {
-            KalturaClient client = new KalturaClient(GetConfig());
-
-            client.StartMultiRequest();
-
-            client.SessionService.Start(ADMIN_SECRET, "", KalturaSessionType.ADMIN, PARTNER_ID, 86400, "");
-            client.KS = "{1:result}"; // for the current multi request, the result of the first call will be used as the ks for next calls
-
-            KalturaMediaEntryFilter filter = new KalturaMediaEntryFilter();
-            filter.OrderBy = KalturaMediaEntryOrderBy.CREATED_AT_DESC;
-            client.MediaService.List(filter, new KalturaFilterPager());
-
-            KalturaMultiResponse response = client.DoMultiRequest();
-
-            // in multi request, when there is an error, an exception is NOT thrown, so we should check manually
-            if (response[1].GetType() == typeof(KalturaAPIException))
-            {
-                Console.WriteLine("Error listing media " + ((KalturaAPIException)response[1]).Message);
-
-                // we can throw the exception if we want
-                //throw (KalturaAPIException)response[1]; 
-            }
-            else
-            {
-                KalturaMediaListResponse mediaList = (KalturaMediaListResponse)response[1];
-                Console.WriteLine("Total media entries: " + mediaList.TotalCount);
-                foreach (KalturaMediaEntry mediaEntry in mediaList.Objects)
-                {
-                    Console.WriteLine("Media Name: " + mediaEntry.Name);
-                }
-            }
-        }
-
-        /// <summary>
         /// Shows how to start session, create a mix, add media, and append it to a mix timeline using multi request
         /// </summary>
         private static void AdvancedMultiRequestExample()
         {
-            KalturaClient client = new KalturaClient(GetConfig());
-
-            client.StartMultiRequest();
-
-            // Request 1
-            client.SessionService.Start(ADMIN_SECRET, "", KalturaSessionType.ADMIN, PARTNER_ID, 86400, "");
-            client.KS = "{1:result}"; // for the current multi request, the result of the first call will be used as the ks for next calls
-
             FileStream fileStream = new FileStream("DemoVideo.flv", FileMode.Open, FileAccess.Read);
 
-            // Request 2
-            KalturaUploadToken uploadToken = client.UploadTokenService.Add();
-            
-            // Request 3
-            uploadToken = client.UploadTokenService.Upload("{2:result}", fileStream);
-            
-            // Request 4
             KalturaMediaEntry mediaEntry = new KalturaMediaEntry();
             mediaEntry.Name = "Media Entry Using C#.Net Client To Test Flavor Replace";
             mediaEntry.MediaType = KalturaMediaType.VIDEO;
-            mediaEntry = client.MediaService.Add(mediaEntry);
 
-            // Request 5
             KalturaUploadedFileTokenResource mediaResource = new KalturaUploadedFileTokenResource();
-            mediaResource.Token = "{2:result:id}";
-            mediaEntry = client.MediaService.AddContent("{4:result}", mediaResource);
-            
-            // map paramters from responses to requests according to response calling order and names to request calling order and C# method parameter name
-            client.MapMultiRequestParam(2, ":id", 3, "uploadTokenId");
-            client.MapMultiRequestParam(4, ":id", 5, "entryId");
+            mediaResource.Token = "{1:result:id}";
 
+            KalturaClient client = new KalturaClient(GetConfig());
+
+            client.KS = client.GenerateSession(ADMIN_SECRET, "", KalturaSessionType.ADMIN, PARTNER_ID);
+            client.StartMultiRequest();
+            client.UploadTokenService.Add();
+            client.MediaService.Add(mediaEntry);
+            client.UploadTokenService.Upload("{1:result:id}", fileStream);
+            client.MediaService.AddContent("{2:result:id}", mediaResource);
+            
             KalturaMultiResponse response = client.DoMultiRequest();
 
             foreach (object obj in response)
             {
-                if (obj.GetType() == typeof(KalturaAPIException))
+                if (obj is KalturaAPIException)
                 {
                     Console.WriteLine("Error occurred: " + ((KalturaAPIException)obj).Message);
                 }
             }
 
             // when accessing the response object we will use an index and not the response number (response number - 1)
-            if (response[4].GetType() == typeof(KalturaMediaEntry))
+            if (response[3] is KalturaMediaEntry)
             {
-                KalturaMediaEntry newMediaEntry = (KalturaMediaEntry)response[4];
-                Console.WriteLine("Multirequest newly added entry id: " + newMediaEntry.Id);
+                KalturaMediaEntry newMediaEntry = (KalturaMediaEntry)response[3];
+                Console.WriteLine("Multirequest newly added entry id: " + newMediaEntry.Id + ", status: " + newMediaEntry.Status);
+            }
+        }
+        
+	    private static KalturaMediaEntry createEntry()
+	    {
+            KalturaClient client = new KalturaClient(GetConfig());
+            client.KS = client.GenerateSession(ADMIN_SECRET, USER_ID, KalturaSessionType.USER, PARTNER_ID, 86400, "");
+
+		    KalturaMediaEntry entry = new KalturaMediaEntry();
+		    entry.MediaType = KalturaMediaType.VIDEO;
+            entry.Name = "test_" + Guid.NewGuid().ToString();
+            entry.Tags = uniqueTag;
+    		
+		    return client.MediaService.Add(entry);
+	    }
+
+	    private static KalturaMetadata createMetadata(int metadataProfileId, KalturaMetadataObjectType objectType, string objectId, string xmlData)
+	    {
+            KalturaClient client = new KalturaClient(GetConfig());
+            client.KS = client.GenerateSession(ADMIN_SECRET, USER_ID, KalturaSessionType.USER, PARTNER_ID, 86400, "");
+
+		    KalturaMetadata metadata = new KalturaMetadata();
+		    metadata.MetadataObjectType = objectType;
+		    metadata.ObjectId = objectId;
+    		
+		    return client.MetadataService.Add(metadataProfileId, objectType, objectId, xmlData);
+	    }
+        
+	    private static KalturaMetadataProfile createMetadataProfile(KalturaMetadataObjectType objectType, string xsdData)
+	    {
+            KalturaClient client = new KalturaClient(GetConfig());
+            client.KS = client.GenerateSession(ADMIN_SECRET, USER_ID, KalturaSessionType.ADMIN, PARTNER_ID, 86400, "");
+
+		    KalturaMetadataProfile metadataProfile = new KalturaMetadataProfile();
+            metadataProfile.MetadataObjectType = objectType;
+            metadataProfile.Name = "test_" + Guid.NewGuid().ToString();
+    		
+		    return client.MetadataProfileService.Add(metadataProfile, xsdData);
+	    }
+
+        private static IList<KalturaMediaEntry> createEntriesWithMetadataObjects(int entriesCount)
+	    {
+            return createEntriesWithMetadataObjects(entriesCount, 2);
+        }
+
+        private static IList<KalturaMediaEntry> createEntriesWithMetadataObjects(int entriesCount, int metadataProfileCount)
+	    {
+		    IList<KalturaMediaEntry> entries = new List<KalturaMediaEntry>(2);
+            IDictionary<string, KalturaMetadataProfile> metadataProfiles = new Dictionary<string, KalturaMetadataProfile>(3);
+
+            string xsd;
+            for(int i = 1; i <= metadataProfileCount; i++)
+            {
+                xsd = @"<xsd:schema xmlns:xsd=""http://www.w3.org/2001/XMLSchema"">
+        <xsd:element name=""metadata"">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element name=""Choice" + i + @""" minOccurs=""0"" maxOccurs=""1"">
+                        <xsd:annotation>
+                            <xsd:documentation></xsd:documentation>
+                            <xsd:appinfo>
+                                <label>Example choice " + i + @"</label>
+                                <key>choice" + i + @"</key>
+                                <searchable>true</searchable>
+                                <description>Example choice " + i + @"</description>
+                            </xsd:appinfo>
+                        </xsd:annotation>
+                        <xsd:simpleType>
+                            <xsd:restriction base=""listType"">
+                                <xsd:enumeration value=""on"" />
+                                <xsd:enumeration value=""off"" />
+                            </xsd:restriction>
+                        </xsd:simpleType>
+                    </xsd:element>
+                    <xsd:element name=""FreeText" + i + @""" minOccurs=""0"" maxOccurs=""1"" type=""textType"">
+                        <xsd:annotation>
+                            <xsd:documentation></xsd:documentation>
+                            <xsd:appinfo>
+                                <label>Free text " + i + @"</label>
+                                <key>freeText" + i + @"</key>
+                                <searchable>true</searchable>
+                                <description>Free text " + i + @"</description>
+                            </xsd:appinfo>
+                        </xsd:annotation>
+                    </xsd:element>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+        <xsd:complexType name=""textType"">
+            <xsd:simpleContent>
+                <xsd:extension base=""xsd:string"" />
+            </xsd:simpleContent>
+        </xsd:complexType>
+        <xsd:complexType name=""objectType"">
+            <xsd:simpleContent>
+                <xsd:extension base=""xsd:string"" />
+            </xsd:simpleContent>
+        </xsd:complexType>
+        <xsd:simpleType name=""listType"">
+            <xsd:restriction base=""xsd:string"" />
+        </xsd:simpleType>
+    </xsd:schema>";
+    				
+                metadataProfiles.Add(i.ToString(), createMetadataProfile(KalturaMetadataObjectType.ENTRY, xsd));
+            }
+    		
+            string xml;
+            for(int i = 0; i < entriesCount; i++)
+            {
+                KalturaMediaEntry entry = createEntry();
+                entries.Add(entry);
+
+                foreach (string index in metadataProfiles.Keys)
+                {
+                    xml = @"<metadata>
+        <Choice" + index + ">on</Choice" + index + @">
+        <FreeText" + index + ">example text " + index + "</FreeText" + index + @">
+    </metadata>";
+
+                    createMetadata(metadataProfiles[index].Id, KalturaMetadataObjectType.ENTRY, entry.Id, xml);
+                }
+            }
+    		
+            return entries;
+	    }
+        // Show how to use response-profile
+        private static void ResponseProfileExample()
+        {
+            KalturaClient client = new KalturaClient(GetConfig());
+            client.KS = client.GenerateSession(ADMIN_SECRET, USER_ID, KalturaSessionType.ADMIN, PARTNER_ID, 86400, "");
+
+		    int entriesTotalCount = 4;
+		    int metadataProfileTotalCount = 2;
+            int metadataPageSize = 2;
+
+            IList<KalturaMediaEntry> entries = createEntriesWithMetadataObjects(entriesTotalCount, metadataProfileTotalCount);
+    		
+            KalturaMediaEntryFilter entriesFilter = new KalturaMediaEntryFilter();
+            entriesFilter.StatusIn = KalturaEntryStatus.PENDING.ToString() + "," + KalturaEntryStatus.NO_CONTENT.ToString();
+            entriesFilter.TagsLike = uniqueTag;
+    		
+            KalturaFilterPager entriesPager = new KalturaFilterPager();
+            entriesPager.PageSize = entriesTotalCount;
+    		
+            KalturaMetadataFilter metadataFilter = new KalturaMetadataFilter();
+            metadataFilter.MetadataObjectTypeEqual = KalturaMetadataObjectType.ENTRY;
+    		
+            KalturaResponseProfileMapping metadataMapping = new KalturaResponseProfileMapping();
+            metadataMapping.FilterProperty = "objectIdEqual";
+            metadataMapping.ParentProperty = "id";
+
+            IList<KalturaResponseProfileMapping> metadataMappings = new List<KalturaResponseProfileMapping>();
+            metadataMappings.Add(metadataMapping);
+    		
+            KalturaFilterPager metadataPager = new KalturaFilterPager();
+            metadataPager.PageSize = metadataPageSize;
+    		
+            KalturaDetachedResponseProfile metadataResponseProfile = new KalturaDetachedResponseProfile();
+            metadataResponseProfile.Name = "metadata_" + uniqueTag;
+            metadataResponseProfile.Type = KalturaResponseProfileType.INCLUDE_FIELDS;
+            metadataResponseProfile.Fields = "id,objectId,createdAt, xml";
+            metadataResponseProfile.Filter = metadataFilter;
+            metadataResponseProfile.Pager = metadataPager;
+            metadataResponseProfile.Mappings = metadataMappings;
+    		
+            IList<KalturaDetachedResponseProfile> metadataResponseProfiles = new List<KalturaDetachedResponseProfile>();
+            metadataResponseProfiles.Add(metadataResponseProfile);
+
+            KalturaResponseProfile responseProfile = new KalturaResponseProfile();
+            responseProfile.Name = "test_" + uniqueTag;
+            responseProfile.SystemName = "test_" + uniqueTag;
+            responseProfile.Type = KalturaResponseProfileType.INCLUDE_FIELDS;
+            responseProfile.Fields = "id,name,createdAt";
+            responseProfile.RelatedProfiles = metadataResponseProfiles;
+
+            responseProfile = client.ResponseProfileService.Add(responseProfile);
+    		    		
+            KalturaResponseProfileHolder nestedResponseProfile = new KalturaResponseProfileHolder();
+            nestedResponseProfile.Id = responseProfile.Id;
+    		
+            client.ResponseProfile = nestedResponseProfile;
+            IList<KalturaBaseEntry> list = client.BaseEntryService.List(entriesFilter, entriesPager).Objects;
+    		
+            if(entriesTotalCount != list.Count)
+            {
+                throw new Exception("entriesTotalCount[" + entriesTotalCount + "] != list.Count[" + list.Count + "]");
+            }
+    		
+            foreach(KalturaBaseEntry entry in list)
+            {	
+                if(entry.RelatedObjects == null)
+                {
+                    throw new Exception("Related objects are missing");
+                }
+
+                if(!entry.RelatedObjects.ContainsKey(metadataResponseProfile.Name))
+                {
+                    throw new Exception("Related object [" + metadataResponseProfile.Name + "] is missing");
+                }
+
+                if (!(entry.RelatedObjects[metadataResponseProfile.Name] is KalturaMetadataListResponse))
+                {
+                    throw new Exception("Related object [" + metadataResponseProfile.Name + "] has wrong type [" + entry.RelatedObjects[metadataResponseProfile.Name].GetType() + "]");
+                }
+                KalturaMetadataListResponse metadataListResponse = (KalturaMetadataListResponse)entry.RelatedObjects[metadataResponseProfile.Name];
+
+                if(metadataListResponse.Objects.Count != metadataProfileTotalCount)
+                {
+                    throw new Exception("Related object [" + metadataResponseProfile.Name + "] has wrong number of objects");
+                }
+
+                foreach(KalturaMetadata metadata in metadataListResponse.Objects)
+                {
+                    if (metadata.ObjectId != entry.Id)
+                    {
+                        throw new Exception("Related object [" + metadataResponseProfile.Name + "] metadata [" + metadata.Id + "] related to wrong object [" + metadata.ObjectId + "]");
+                    }
+                }
             }
         }
     }

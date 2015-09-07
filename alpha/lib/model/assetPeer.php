@@ -8,7 +8,7 @@
  * @package Core
  * @subpackage model
  */ 
-class assetPeer extends BaseassetPeer
+class assetPeer extends BaseassetPeer implements IRelatedObjectPeer
 {
 	const FLAVOR_OM_CLASS = 'flavorAsset';
 	const THUMBNAIL_OM_CLASS = 'thumbAsset';
@@ -236,14 +236,17 @@ class assetPeer extends BaseassetPeer
 	/**
 	 * @param string $entryId
 	 * @param array $types
+	 * @param array $statuses
 	 * @return array<flavorAsset>
 	 */
-	public static function retrieveByEntryId($entryId, array $types = null)
+	public static function retrieveByEntryId($entryId, array $types = null, array $statuses = null)
 	{
 		$c = new Criteria();
 		$c->add(self::ENTRY_ID, $entryId);
 		if(count($types))
 			$c->add(self::TYPE, $types, Criteria::IN);
+		if(is_array($statuses) && count($statuses))
+			$c->add(self::STATUS, $statuses, Criteria::IN);
 		
 		return self::doSelect($c);
 	}
@@ -649,5 +652,27 @@ class assetPeer extends BaseassetPeer
 	public static function getAtomicColumns()
 	{
 		return array(assetPeer::STATUS);
+	}
+	
+	/* (non-PHPdoc)
+	 * @see IRelatedObjectPeer::getRootObjects()
+	 */
+	public function getRootObjects(IBaseObject $object)
+	{
+		/* @var $object asset */
+		
+		$entry = $object->getentry();
+		if($entry)
+			return array($entry);
+			
+		return array();
+	}
+
+	/* (non-PHPdoc)
+	 * @see IRelatedObjectPeer::isReferenced()
+	 */
+	public function isReferenced(IBaseObject $object)
+	{
+		return false;
 	}
 }

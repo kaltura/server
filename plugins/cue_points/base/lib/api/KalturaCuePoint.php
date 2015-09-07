@@ -3,6 +3,7 @@
  * @package plugins.cuePoint
  * @subpackage api.objects
  * @abstract
+ * @requiresPermission insert,update 
  */
 abstract class KalturaCuePoint extends KalturaObject implements IRelatedFilterable, IApiObjectFactory
 {

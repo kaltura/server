@@ -46,5 +46,8 @@ class QuestionCuePoint extends CuePoint implements IMetadataObject
 		return QuizPlugin::getCoreValue('MetadataObjectType', QuizCuePointMetadataObjectType::QUESTION_CUE_POINT);
 	}
 
-
+	public function shouldReIndexEntry(array $modifiedColumns = array())
+	{
+		return false;
+	}
 }

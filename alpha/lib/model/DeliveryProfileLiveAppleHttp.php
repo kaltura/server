@@ -199,15 +199,6 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 
 	public function doServe(kLiveStreamConfiguration $liveStreamConfig) 
 	{	
-		if($this->params->getUsePlayServer()) {
-			$liveStreamConfig->setUrl($this->getPlayServerUrl($baseUrl));
-			$liveStreamConfig->setBackupUrl(null);
-		}
-		
-		if((!$liveStreamConfig->getBackupUrl() && !$this->getForceProxy()) || $this->params->getUsePlayServer() || $liveStreamConfig->getIsExternalStream()) {
-			return parent::doServe($liveStreamConfig);
-		}
-		
 		$baseUrl = $liveStreamConfig->getUrl();
 		$backupUrl = $liveStreamConfig->getBackupUrl();
 		
@@ -220,6 +211,16 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 				$backupUrl = str_replace('_all.smil', '_publish.smil', $backupUrl);
 		}
 		
+		if($this->params->getUsePlayServer()) {
+			
+			$liveStreamConfig->setUrl($this->getPlayServerUrl($baseUrl));
+			$liveStreamConfig->setBackupUrl(null);
+		}
+				
+		if((!$liveStreamConfig->getBackupUrl() && !$this->getForceProxy()) || $this->params->getUsePlayServer() || $liveStreamConfig->getIsExternalStream()) {
+			return parent::doServe($liveStreamConfig);
+		}
+				
 		$flavors = array();
 		$this->buildM3u8Flavors($baseUrl, $flavors);
 		if($backupUrl)

@@ -326,9 +326,10 @@ class myPartnerUtils
 			$protocol='http';
 
 		$partner = PartnerPeer::retrieveByPK( $partner_id );
-		if ($partner && isset($_SERVER['HTTP_HOST']) && $partner->isInCDNWhiteList($_SERVER['HTTP_HOST']))
+		$hostToTest = self::getHostForWhiteList();
+		if ($partner && !is_null($hostToTest) && $partner->isInCDNWhiteList($hostToTest))
 		{
-			$cdnHost = $protocol.'://'.$_SERVER['HTTP_HOST'];
+			$cdnHost = $protocol.'://'.$hostToTest;
 			if (isset($_SERVER['SERVER_PORT']))
 			{
 				$cdnHost .= ":".$_SERVER['SERVER_PORT'];
@@ -929,11 +930,11 @@ class myPartnerUtils
 		$reportFilter = new reportsInputFilter();
 		$reportFilter->from_day = str_replace('-','',$fromDate);
 		$reportFilter->to_day = str_replace('-','',$report_date);		
-		list($header, $data) = myReportsMgr::getTotal($partner->getId(), myReportsMgr::REPORT_TYPE_PARTNER_USAGE, $reportFilter);
+		list($header, $data) = myReportsMgr::getTotal($partner->getId(), myReportsMgr::REPORT_TYPE_PARTNER_USAGE, $reportFilter, $partner->getId());
 
 		$bandwidth_consumption = array_search('bandwidth_consumption', $header);
 		$deleted_storage = array_search('deleted_storage', $header);
-		$added_storage = array_search('deleted_storage', $header);
+		$added_storage = array_search('added_storage', $header);
 		$transcoding_consumption = array_search('transcoding_consumption', $header);	
 		$totalBandwith = $data[$bandwidth_consumption]*1024; //KB
 		$totalTranscoding = $data[$transcoding_consumption]*1024; //KB
@@ -1716,21 +1717,29 @@ class myPartnerUtils
 		}
 	}
 	
-	/*
+	/**
 	 * Ensure the request for media arrived in a way approved by the partner.
 	 * this may include restricting to a specific cdn, enforcing token usage etc..
 	 * Die in case of a breach.
 	 * 
-	 * @param int $partnerId
+	 * @param entry $entry
+	 * @param asset $asset
 	 */
-	public static function enforceDelivery($partnerId)
+	public static function enforceDelivery($entry, $asset = null)
 	{
-		$partner = PartnerPeer::retrieveByPK( $partnerId );
-		if ( !$partner )
-			return;
+		// block inactive partner
+		$partnerId = $entry->getPartnerId();
+		self::blockInactivePartner($partnerId);
+
+		// validate serve access control
+		$flavorParamsId = $asset ? $asset->getFlavorParamsId() : null;
+		$secureEntryHelper = new KSecureEntryHelper($entry, null, null, ContextType::SERVE);
+		$secureEntryHelper->validateForServe($flavorParamsId);
+
+		// enforce delivery
+		$partner = PartnerPeer::retrieveByPK($partnerId);		// Note: Partner was already loaded by blockInactivePartner, no need to check for null
 		
 		$restricted = DeliveryProfilePeer::isRequestRestricted($partner);
-		
 		if ($restricted)
 		{
 			KalturaLog::log ( "DELIVERY_METHOD_NOT_ALLOWED partner [$partnerId]" );
@@ -1775,5 +1784,23 @@ class myPartnerUtils
 			
 		}	
 		return true;
+	}
+
+	/**
+	 * @return null
+	 */
+	public static function getHostForWhiteList()
+	{
+		$hostToTest = null;
+		if (isset($_SERVER['HTTP_X_FORWARDED_HOST']))
+		{
+			$xForwardedHosts = explode(',', $_SERVER['HTTP_X_FORWARDED_HOST']);
+			$hostToTest = $xForwardedHosts[0];
+			return $hostToTest;
+		} else if (isset($_SERVER['HTTP_HOST']))
+		{
+			$hostToTest = $_SERVER['HTTP_HOST'];
+			return $hostToTest;
+		}return $hostToTest;
 	}
 }

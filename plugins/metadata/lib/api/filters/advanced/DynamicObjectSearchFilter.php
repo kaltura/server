@@ -106,7 +106,7 @@ class DynamicObjectSearchFilter extends AdvancedSearchFilterOperator
 					KalturaLog::ERR("Missing field: $innerField in inner xpath array: " . print_r($innerXPaths, true));
 					continue;
 				}
-				$innerValue = $item->getValue();
+				$innerValue = SphinxUtils::escapeString($item->getValue());
 				$innerFieldType = $innerXPaths[$innerField]->getType();
 				$innerFieldId = $innerXPaths[$innerField]->getId();
 				$innerPrefix = $pluginName .'_'. $innerFieldId;
@@ -145,5 +145,22 @@ class DynamicObjectSearchFilter extends AdvancedSearchFilterOperator
 			$xPaths[$profileField->getXpath()] = $profileField;
 		}
 		return $xPaths;
+	}
+
+	public function addToXml(SimpleXMLElement &$xmlElement)
+	{
+		parent::addToXml($xmlElement);
+
+		$xmlElement->addAttribute('field', $this->field);
+		// $this->metadataProfileId should always be retrieved dynamically
+	}
+
+	public function fillObjectFromXml(SimpleXMLElement $xmlElement)
+	{
+		parent::fillObjectFromXml($xmlElement);
+
+		$attr = $xmlElement->attributes();
+		if(isset($attr['field']))
+			$this->field = (string)$attr['field'];
 	}
 }

@@ -456,7 +456,8 @@ class KalturaBaseEntry extends KalturaObject implements IRelatedFilterable, IApi
 	{
 		if(!$sourceObject)
 			return;
-			
+	
+		entryPeer::addValidatedEntry($sourceObject->getId());		
 		parent::doFromObject($sourceObject, $responseProfile);
 		
 		$partnerId = kCurrentContext::$ks_partner_id ? kCurrentContext::$ks_partner_id : kCurrentContext::$partner_id;

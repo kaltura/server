@@ -21,7 +21,7 @@ class serveMultiFileAction extends sfAction
 		{
 			$error = "Invalid hash - ids [$fileSyncIds] got [$hash] expected [$expectedHash]";
 			KalturaLog::err($error); 
-			throw new Exception ( $error );			
+			KExternalErrors::dieError(KExternalErrors::INVALID_TOKEN);
 		}
 		
 		// load file syncs
@@ -39,7 +39,7 @@ class serveMultiFileAction extends sfAction
 			{
 				$error = "FileSync id [".$fileSync->getId()."] does not belong to this DC";
 				KalturaLog::err($error);
-				throw new Exception ( $error );
+				KExternalErrors::dieError(KExternalErrors::BAD_QUERY);
 			}
 			
 			// resolve if file_sync is link
@@ -51,7 +51,7 @@ class serveMultiFileAction extends sfAction
 			{
 				$error = "FileSync id [".$fileSync->getId()."] is a directory";
 				KalturaLog::err($error);
-				throw new Exception ( $error );
+				KExternalErrors::dieError(KExternalErrors::BAD_QUERY);
 			}
 						
 			if (!file_exists($resolvedPath))

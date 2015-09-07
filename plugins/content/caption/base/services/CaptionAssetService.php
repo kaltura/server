@@ -400,7 +400,7 @@ class CaptionAssetService extends KalturaAssetService
 		$securyEntryHelper->validateForDownload();
 		
 		$captionAsset = null;
-		if(is_null($captionParamId))
+		if(!$captionParamId)
 		{
 			$captionAssets = assetPeer::retrieveByEntryId($entryId, array(CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION)));
 			foreach($captionAssets as $checkCaptionAsset)
