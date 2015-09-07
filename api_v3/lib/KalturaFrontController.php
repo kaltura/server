@@ -180,6 +180,7 @@ class KalturaFrontController
 		// arrange the parameters by request index
 		$commonParams = array();
 		$listOfRequests = array();
+		ksort($this->params);
 		foreach ($this->params as $paramName => $paramValue)
 		{
 			if(is_numeric($paramName))
