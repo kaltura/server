@@ -28,7 +28,7 @@ class EdgeServer extends BaseEdgeServer {
 	 */
 	public function applyDefaultValues()
 	{
-		$this->setType(edgeServerType::NODE);
+		$this->setType(serverNodeType::EDGE);
 	}
 	
 	/* Delivery Settings */

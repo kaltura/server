@@ -3,7 +3,7 @@
  * @package Core
  * @subpackage model.filters
  */ 
-class EdgeServerFilter extends baseObjectFilter
+class ServerNodeFilter extends baseObjectFilter
 {
 	public function init ()
 	{
@@ -16,6 +16,8 @@ class EdgeServerFilter extends baseObjectFilter
 			"_lte_created_at",
 			"_gte_updated_at",
 			"_lte_updated_at",
+			"_gte_heartbeat_time",
+			"_lte_heartbeat_time",
 			"_eq_partner_id",
 			"_in_partner_id",
 			"_eq_system_name",
@@ -38,6 +40,7 @@ class EdgeServerFilter extends baseObjectFilter
 		$this->allowed_order_fields = array ( 
 			"created_at",
 			"updated_at",
+			"heartbeat_time",
 		);
 			
 	}
@@ -46,7 +49,7 @@ class EdgeServerFilter extends baseObjectFilter
 	{
 		return 
 			array (
-				"display_name" => "EdgeServerFilter",
+				"display_name" => "ServerNodeFilter",
 				"desc" => ""
 			);
 	}
@@ -55,13 +58,13 @@ class EdgeServerFilter extends baseObjectFilter
 	// The base class should invoke $peek_class::translateFieldName( $field_name , BasePeer::TYPE_FIELDNAME , BasePeer::TYPE_COLNAME );
 	public function getFieldNameFromPeer ( $field_name )
 	{
-		$res = EdgeServerPeer::translateFieldName( $field_name , $this->field_name_translation_type , BasePeer::TYPE_COLNAME );
+		$res = ServerNodePeer::translateFieldName( $field_name , $this->field_name_translation_type , BasePeer::TYPE_COLNAME );
 		return $res;
 	}
 
 	public function getIdFromPeer (  )
 	{
-		return EdgeServerPeer::ID;
+		return ServerNodePeer::ID;
 	}
 }
 
