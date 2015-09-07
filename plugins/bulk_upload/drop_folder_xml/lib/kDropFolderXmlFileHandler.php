@@ -282,6 +282,7 @@ class kDropFolderXmlFileHandler
 
 		libxml_clear_errors();
 		$proc = new XSLTProcessor;
+		$proc->registerPHPFunctions(kXml::getXslEnabledPhpFunctions());
 		$xsl = new KDOMDocument();
 		if(!$xsl->loadXML($conversionProfile->getXsl()))
 		{

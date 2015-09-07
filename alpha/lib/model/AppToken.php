@@ -14,6 +14,8 @@
  */
 class AppToken extends BaseAppToken
 {
+	const CUSTOM_DATA_FIELD_HASH_FUNCTION = 'hashType';
+
 	private function calculateId()
 	{
 		$dc = kDataCenterMgr::getCurrentDc();
@@ -51,5 +53,22 @@ class AppToken extends BaseAppToken
 		}
 		
 		return parent::preUpdate($con);
+	}
+
+	public function setHashType($hashFunction)
+	{
+		$this->putInCustomData(self::CUSTOM_DATA_FIELD_HASH_FUNCTION, $hashFunction);
+	}
+	
+	public function getHashType()
+	{
+		return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_HASH_FUNCTION, null, "SHA1");
+		
+	}
+
+	public function calcHash()
+	{
+		$hashFunction = $this->getHashType();
+		return hash($hashFunction, kCurrentContext::$ks . $this->getToken());
 	}
 } // AppToken
