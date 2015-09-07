@@ -798,21 +798,6 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 		return $c;
 	}
 	
-	//TODO: When cuePoints will be indexed in the sphinx we won't need this anymore since we'll be able to query the shpinx for this info
-/*	protected function isQuizUserEntrySubmitted($quizUserEntryId)
-	{
-		$ans = false;
-		$quizUserEntry = UserEntryPeer::retrieveByPK($quizUserEntryId);
-		if ($quizUserEntry)
-		{
-			if ($quizUserEntry->getStatus() == self::getCoreValue('UserEntryStatus', QuizUserEntryStatus::QUIZ_SUBMITTED))
-			{
-				$ans = true;
-			}
-		}
-		return $ans;
-	}
-*/
 	/**
 	 * @param $partnerID
 	 * @return kuser
