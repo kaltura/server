@@ -329,6 +329,11 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	 * @var string
 	 */
 	public $liveThumbEntryId;
+	
+	/**
+	 * @var bool
+	 */
+	public $timeAlignedRenditions;
 
 	
 	
@@ -395,6 +400,7 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		"audioThumbEntryId",
 		"liveThumbEntryId",		
 		"deliveryProfileIds",
+	    "timeAlignedRenditions",
 	);
 
 	public function getMapBetweenObjects()

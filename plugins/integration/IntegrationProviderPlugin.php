@@ -6,6 +6,8 @@ abstract class IntegrationProviderPlugin extends KalturaPlugin implements IInteg
 {
 	const INTEGRATION_PLUGIN_NAME = 'integration';
 	
+	//exteding classes should implement this function to make sure 
+	//there will be an object implementing IIntegrationProvider interface
 	abstract function getProvider();
 
 	/* (non-PHPdoc)

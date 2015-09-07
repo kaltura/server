@@ -46,6 +46,14 @@ class Annotation extends CuePoint implements IMetadataObject
 			
 		return $data;
 	}
+	
+	public function shouldReIndexEntry(array $modifiedColumns = array())
+	{
+		if(!$this->getSearchableOnEntry())
+			return false;
+		
+		return parent::shouldReIndexEntry($modifiedColumns);
+	}
 
 	/**
 	 * @param entry $entry
@@ -93,7 +101,7 @@ class Annotation extends CuePoint implements IMetadataObject
 		return $annotation;
 	}
 	
-	public function getSearchableOnEntry()	      		{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_SEARCHABLE_ON_ENTRY);}
+	public function getSearchableOnEntry()	      		{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_SEARCHABLE_ON_ENTRY, null, false);}
 	public function setSearchableOnEntry($v)        	{return $this->putInCustomData(self::CUSTOM_DATA_FIELD_SEARCHABLE_ON_ENTRY, (bool)$v);}
 	
 }

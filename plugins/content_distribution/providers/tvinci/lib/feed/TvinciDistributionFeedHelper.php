@@ -5,128 +5,31 @@
  */
 class TvinciDistributionFeedHelper
 {
-	const DATE_FORMAT = 'd/m/Y H:i:s';
-	const MAX_END = "7 November 2333";
 	const ACTION_SUBMIT = 'insert';
 	const ACTION_UPDATE = 'update';
 	const ACTION_DELETE = 'delete';
 
-	const DEFAULT_SCHEMA_ID = 2;
-	
+
 	/**
 	 * var KalturaTvinciDistributionProfile
 	 */
 	protected $distributionProfile;
 
 	/**
-	 * var string
+	 * var baseEntry
 	 */
-	protected $entryId;
+	protected $entry;
 
-	/**
-	 * var string
-	 */
-	protected $description;
-
-	/**
-	 * var string
-	 */
-	protected $titleName;
-
-	/**
-	 * var string
-	 */
-	protected $referenceId;
-
-	/**
-	 * var array
-	 */
-	protected $picRatiosArray;
-
-	/**
-	 * var string
-	 */
-	protected $defaultThumbUrl;
-
-	/**
-	 * var array
-	 */
-	protected $videoAssetToUrlMap;
-
-	/**
-	 * @var int
-	 */
-	protected $schemaId;
-	
-	/**
-	 * var string
-	 */
-	protected $language;
-
-	/**
-	 * var string
-	 */
-	protected $metasXML;
-
-	/**
-	 * var date
-	 */
-	protected $sunrise;
-
-	/**
-	 * var date
-	 */
-	protected $sunset;
 
 	/**
 	 * @var DOMDocument
 	 */
 	protected $_doc;
 
-	public function __construct(KalturaTvinciDistributionProfile $distributionProfile)
+	public function __construct(KalturaTvinciDistributionProfile $distributionProfile, BaseEntry $entry)
 	{
 		$this->distributionProfile = $distributionProfile;
-		$this->language = strlen($distributionProfile->language) === 0 ? 'eng' : $distributionProfile->language;
-
-		$this->schemaId = $distributionProfile->schemaId;
-		if ( $this->schemaId != 1 && $this->schemaId != 2 )
-		{
-			$this->schemaId = self::DEFAULT_SCHEMA_ID;
-		}
-	}
-
-	public function setEntryId( $entryId )						{ $this->entryId = $entryId; }
-	public function getEntryId()								{ return $this->entryId; }
-
-	public function setDescription( $description )				{ $this->description = $description; }
-	public function getDescription()							{ return $this->description; }
-
-	public function setTitleName( $name )						{ $this->titleName = $name; }
-	public function getTitleName()								{ return $this->titleName; }
-
-	public function setReferenceId( $referenceId )				{ $this->referenceId = $referenceId; }
-	public function getReferenceId()							{ return $this->referenceId; }
-
-	public function setPicRatiosArray( $picRatiosArray )		{ $this->picRatiosArray = $picRatiosArray; }
-	public function getPicRatiosArray()							{ return $this->picRatiosArray; }
-
-	public function setDefaultThumbnailUrl( $defaultThumbUrl )	{ $this->defaultThumbUrl = $defaultThumbUrl; }
-	public function getDefaultThumbnailUrl()					{ return $this->defaultThumbUrl; }
-
-	public function schemaId()									{ return $this->schemaId; }
-
-	public function setMetasXML($metadataXml)					{$this->metasXML = $metadataXml; }
-	public function getMetasXML()								{return $this->metasXML;}
-
-	public function setSunrise($sunrise)						{$this->sunrise = $sunrise;}
-	public function getSunrise()								{return $this->sunrise;}
-
-	public function setSunset($sunset)							{$this->sunset = $sunset;}
-	public function getSunset()									{return $this->sunset;}
-
-	public function setVideoAssetData( $name, $url , $co_guid)
-	{
-		$this->videoAssetToUrlMap[$name] = array( $url, $co_guid);
+		$this->entry = $entry;
 	}
 
 	public function buildSubmitFeed()
@@ -144,47 +47,59 @@ class TvinciDistributionFeedHelper
 		return $this->createXml( self::ACTION_DELETE );
 	}
 
-	private function createXml($action)
+	private function createArgumentsForXSLT()
+	{
+		$partnerPath = myPartnerUtils::getUrlForPartner($this->entry->getPartnerId(), $this->entry->getSubpId());
+		$prefix = myPartnerUtils::getCdnHost($this->entry->getPartnerId(), null , 'api')
+			. $partnerPath
+			. "/playManifest"
+			. "/entryId/";
+		$arguments = array(
+			"distributionProfileId" => $this->distributionProfile->id,
+			"playManifestPrefix" => $prefix);
+		if($this->distributionProfile->ipadnewPpvModule)
+			$arguments["ipadnewPpvModule"] = $this->distributionProfile->ipadnewPpvModule;
+		if($this->distributionProfile->ipadnewFileName)
+			$arguments["ipadnewTypeName"] = $this->distributionProfile->ipadnewFileName;
+		if($this->distributionProfile->ismPpvModule)
+			$arguments["ismPpvModule"] = $this->distributionProfile->ismPpvModule;
+		if($this->distributionProfile->ismFileName)
+			$arguments["ismTypeName"] = $this->distributionProfile->ismFileName;
+		if($this->distributionProfile->iphonenewPpvModule)
+			$arguments["iphonenewPpvModule"] = $this->distributionProfile->iphonenewPpvModule;
+		if($this->distributionProfile->iphonenewFileName)
+			$arguments["iphonenewTypeName"] = $this->distributionProfile->iphonenewFileName;
+		if($this->distributionProfile->mbrPpvModule)
+			$arguments["mbrPpvModule"] = $this->distributionProfile->mbrPpvModule;
+		if($this->distributionProfile->mbrFileName)
+			$arguments["mbrTypeName"] = $this->distributionProfile->mbrFileName;
+		if($this->distributionProfile->dashPpvModule)
+			$arguments["dashPpvModule"] = $this->distributionProfile->dashPpvModule;
+		if($this->distributionProfile->dashFileName)
+			$arguments["dashTypeName"] = $this->distributionProfile->dashFileName;
+		return $arguments;
+	}
+
+	private function createXml()
 	{
 		// Init the document
 		$this->_doc = new DOMDocument();
 		$this->_doc->formatOutput = true;
 		$this->_doc->encoding = "UTF-8";
-		// Build the feed
-		$feed = $this->_doc->createElement('feed');
-		$export = $this->_doc->createElement('export');
-		$feed->appendChild($export);
 
-		$media = $this->_doc->createElement('media');
-		$export->appendChild($media);
+		$feedAsXml = kMrssManager::getEntryMrssXml($this->entry);
 
-		$this->setAttribute($media, "co_guid", $this->referenceId);
-		$this->setAttribute($media, "entry_id", $this->entryId);
-
-		if ($action === self::ACTION_DELETE) {
-			$this->setAttribute($media, "action", self::ACTION_DELETE);
+		if ($this->distributionProfile->xsltFile &&
+			(strlen($this->distributionProfile->xsltFile) !== 0) ) {
+			// custom non empty xslt
+			$xslt = $this->distributionProfile->xsltFile;
 		} else {
-			$this->setAttribute($media, "action", self::ACTION_SUBMIT);
+			$xslt = file_get_contents(__DIR__."/../xml/tvinci_default.xslt");
 		}
+		$feedAsString = kXml::transformXmlUsingXslt($feedAsXml->saveXML(), $xslt, $this->createArgumentsForXSLT());
 
-		if ( $action != self::ACTION_DELETE ) // No need for the following content in case of a delete scenario
-		{
-			//$isActive = $this->fieldValues[TvinciDistributionField::ACTIVATE_PUBLISHING];
-			// agreed that the is_active and erase will be hard coded for first phase
-			$this->setAttribute($media, "is_active", "true");
-			$this->setAttribute($media, "erase", "false");
-
-			$media->appendChild( $this->createBasicElement() );
-			$media->appendChild( $this->createStructureElement() );
-			$media->appendChild( $this->createFilesElement() );
-		}
-
-		// Wrap as a CDATA section
-		$feedAsXml = $this->_doc->saveXML($feed);
-		$xslt = file_get_contents(__DIR__."/../xml/tvinci_default.xslt");
-		$feedAsXml = $this->transformXml($feedAsXml, $xslt);
 		$data = $this->_doc->createElement('data');
-		$data->appendChild($this->_doc->createCDATASection($feedAsXml));
+		$data->appendChild($this->_doc->createCDATASection($feedAsString));
 
 		// Create the document's root node
 		$envelopeRootNode = $this->_doc->createElement('s:Envelope');
@@ -203,7 +118,6 @@ class TvinciDistributionFeedHelper
 
 		$tvinciDataRequestNode->appendChild($this->_doc->createElement('userName', $this->distributionProfile->username));
 		$tvinciDataRequestNode->appendChild($this->_doc->createElement('passWord', $this->distributionProfile->password));
-		$tvinciDataRequestNode->appendChild($this->_doc->createElement('schemaID', $this->distributionProfile->schemaId));
 
 		// Attach the CDATA section
 		$tvinciDataRequestNode->appendChild($data);
@@ -216,135 +130,6 @@ class TvinciDistributionFeedHelper
 		$this->_doc->appendChild($envelopeRootNode);
 
 		return $this->getXml();
-	}
-
-
-	/**
-	 * Result XML:
-	 * 	<$name>
-	 * 		<value lang="$lang">$value</value>
-	 * 	</$name>
-	 */
-	protected function createValueWithLangElement($name, $value, $lang)
-	{
-		$valueNode = $this->_doc->createElement('value', $value);
-		$this->setAttribute($valueNode, "lang", $lang);
-
-		$namedNode = $this->_doc->createElement($name);
-		$namedNode->appendChild($valueNode);
-
-		return $namedNode;
-	}
-
-	private function createDateElement($fieldName, $timestamp)
-	{
-		$formattedDate = date(self::DATE_FORMAT, $timestamp);
-		$dateNode = $this->_doc->createElement($fieldName, $formattedDate);
-		return $dateNode;
-	}
-
-	private function createBasicElement()
-	{
-		$basicNode = $this->_doc->createElement("basic");
-		$basicNode->appendChild( $this->createValueWithLangElement('name', $this->getTitleName(), $this->language));
-		$basicNode->appendChild( $this->createValueWithLangElement('description', $this->getDescription(), $this->language));
-
-		// Add default thumbnail
-		if ( isset($this->defaultThumbUrl) )
-		{
-			$thumbnail = $this->_doc->createElement("thumb");
-			$this->setAttribute($thumbnail, "url", $this->defaultThumbUrl);
-			$basicNode->appendChild( $thumbnail );
-		}
-		$basicNode->appendChild( $this->createDatesElement());
-		$basicNode->appendChild( $this->createPicRatiosElement() );
-
-		return $basicNode;
-	}
-
-	private function createDatesElement()
-	{
-		$datesNode = $this->_doc->createElement("dates");
-		$datesNode->appendChild( $this->createDateElement('catalog_start', $this->getSunrise()) );
-		$datesNode->appendChild( $this->createDateElement('start', $this->getSunrise()) );
-		if ( $this->getSunset() ) {
-			$datesNode->appendChild( $this->createDateElement('catalog_end', $this->getSunset()) );
-			$datesNode->appendChild( $this->createDateElement('end', $this->getSunset()) );
-		} else {
-			$datesNode->appendChild( $this->createDateElement('catalog_end', strtotime(self::MAX_END)) );
-			$datesNode->appendChild( $this->createDateElement('end', strtotime(self::MAX_END)) );
-		}
-		return $datesNode;
-	}
-
-	private function createPicRatiosElement()
-	{
-		$picRatiosNode = $this->_doc->createElement("pic_ratios");
-
-		$picRatiosArray = $this->picRatiosArray;
-		foreach ( $picRatiosArray as $picRatio )
-		{
-			$ratioNode = $this->_doc->createElement("ratio");
-			$this->setAttribute($ratioNode, "thumb", $picRatio['url']);
-			$this->setAttribute($ratioNode, "ratio", $picRatio['ratio']);
-			$picRatiosNode->appendChild( $ratioNode );
-		}
-
-		return $picRatiosNode;
-	}
-
-	private function createStructureElement()
-	{
-		$structure = $this->_doc->createElement("structure");
- 		$structure->appendChild( $this->createMetasElement() );
- 		return $structure;
-	}
-
-
-	private function createMetasElement()
-	{
-		$kalturaMetaDom = new DOMDocument();
-		$kalturaMetaDom->formatOutput = true;
-		$kalturaMetaDom->encoding = "UTF-8";
-		$tmpMetaStructure = "<tmpMetaStructure>".$this->getMetasXML()."</tmpMetaStructure>";
-		$kalturaMetaDom->loadXML($tmpMetaStructure);
-		$metas = $this->_doc->createElement("metas");
-		foreach ($kalturaMetaDom->firstChild->childNodes as $metaNode) {
-			$tmpNode = $this->_doc->importNode($metaNode, true);
-			$metas->appendChild($tmpNode);
-		}
-		return $metas;
-	}
-
-	private function createFilesElement()
-	{
-		$files = $this->_doc->createElement("files");
-		foreach ( $this->videoAssetToUrlMap as $name => $fileData )
-		{
-			$url = $fileData[0];
-			$co_guid = $fileData[1];
-			$files->appendChild( $this->createFileElement($name, $url, $co_guid) );
-		}
- 		return $files;
-	}
-
-	private function createFileElement($fileType, $url, $co_guid)
-	{
-		$fileNode = $this->_doc->createElement("file");
-
-		$this->setAttribute($fileNode, "type", $fileType);
-		$this->setAttribute($fileNode, "quality", "HIGH");
-		$this->setAttribute($fileNode, "handling_type", "CLIP");
-		$this->setAttribute($fileNode, "cdn_name", "Akamai");
-		$this->setAttribute($fileNode, "cdn_code", $url);
-		$this->setAttribute($fileNode, "co_guid", $co_guid);
-		$billingType = $this->schemaId() === self::DEFAULT_SCHEMA_ID ? 'Tvinci' : '';
-		$this->setAttribute($fileNode, "billing_type", $billingType);
-		$ppvModule = $this->schemaId() === self::DEFAULT_SCHEMA_ID ? 'Subscription Only' : '';
-		$this->setAttribute($fileNode, "PPV_MODULE", $ppvModule);
-
-
-		return $fileNode;
 	}
 
 	private function setAttribute($node, $attribName, $attribValue)
@@ -362,46 +147,4 @@ class TvinciDistributionFeedHelper
 		return $this->_doc->saveXML();
 	}
 
-
-	/**
-	 * Transform XML using XSLT
-	 * @param string $xmlStr
-	 * @param string $xslStr
-	 * @return string the result XML
-	 * @throws Exception
-	 */
-	protected function transformXml($xmlStr, $xslStr)
-	{
-		$xmlObj = new DOMDocument();
-		if (!$xmlObj->loadXML($xmlStr))
-		{
-			throw new Exception('Error loading source XML');
-		}
-
-		$xslObj = new DOMDocument();
-		if(!$xslObj->loadXML($xslStr))
-		{
-			throw new Exception('Error loading XSLT');
-		}
-
-		$proc = new XSLTProcessor;
-		$proc->registerPHPFunctions(kXml::getXslEnabledPhpFunctions());
-		$proc->importStyleSheet($xslObj);
-
-		$resultXmlObj = $proc->transformToDoc($xmlObj);
-		if (!$resultXmlObj)
-		{
-			throw new Exception('Error transforming XML');
-			return null;
-		}
-
-		$resultXmlStr = $resultXmlObj->saveXML();
-
-		// DEBUG logs
-		KalturaLog::debug('source xml = '.$xmlStr);
-		KalturaLog::debug('xslt = '.$xslStr);
-		KalturaLog::debug('result xml = '.$resultXmlStr);
-
-		return $resultXmlStr;
-	}
 }

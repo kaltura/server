@@ -8,7 +8,7 @@
  * @package Core
  * @subpackage model
  */ 
-class assetPeer extends BaseassetPeer
+class assetPeer extends BaseassetPeer implements IRelatedObjectPeer
 {
 	const FLAVOR_OM_CLASS = 'flavorAsset';
 	const THUMBNAIL_OM_CLASS = 'thumbAsset';
@@ -652,5 +652,27 @@ class assetPeer extends BaseassetPeer
 	public static function getAtomicColumns()
 	{
 		return array(assetPeer::STATUS);
+	}
+	
+	/* (non-PHPdoc)
+	 * @see IRelatedObjectPeer::getRootObjects()
+	 */
+	public function getRootObjects(IBaseObject $object)
+	{
+		/* @var $object asset */
+		
+		$entry = $object->getentry();
+		if($entry)
+			return array($entry);
+			
+		return array();
+	}
+
+	/* (non-PHPdoc)
+	 * @see IRelatedObjectPeer::isReferenced()
+	 */
+	public function isReferenced(IBaseObject $object)
+	{
+		return false;
 	}
 }

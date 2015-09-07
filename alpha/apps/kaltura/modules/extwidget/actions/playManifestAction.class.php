@@ -794,6 +794,29 @@ class playManifestAction extends kalturaAction
 		if(in_array($this->deliveryAttributes->getFormat(), self::$httpFormats) && !in_array($protocol, self::$httpProtocols))
 			$protocol = requestUtils::getProtocol();
 		
+		// use only cloud transcode flavors if timeAlignedRenditions was set
+		$partnerId = $this->entry->getPartnerId();
+		$partner = PartnerPeer::retrieveByPK($partnerId);
+		$partnerTimeAligned = $partner->getTimeAlignedRenditions();
+		
+		if ( ($partnerTimeAligned) && ( $this->getRequestParameter("playerType") === 'flash' ) ) {
+			// check entry's flavors
+			$entryFlavorParams = assetParamsPeer::retrieveByPKs(explode(',', $this->entry->getFlavorParamsIds()));
+			$hasTranscode = false;
+			foreach ($entryFlavorParams as $flavor)
+			{
+				// check if we have any transcode flavor
+				if (!$flavor->hasTag("ingest")) {
+					$hasTranscode = true;
+				}
+			}
+    		 
+			// if so, use only the transcode
+			if ($hasTranscode) {
+				$tag = 'mbr';
+			}
+		}
+		
 		$liveStreamConfig = $this->entry->getLiveStreamConfigurationByProtocol($this->deliveryAttributes->getFormat(), $protocol, $tag, false, $this->flavorParamsIds);
 		/* @var $liveStreamConfig kLiveStreamConfiguration */
 		if ($liveStreamConfig)

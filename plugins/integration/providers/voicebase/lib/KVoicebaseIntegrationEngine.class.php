@@ -43,7 +43,7 @@ class KVoicebaseIntegrationEngine implements KIntegrationCloserEngine
 		$flavorAssetId = $this->validateFlavorAssetId($entryId, $flavorAssetId);
 		$flavorUrl = KBatchBase::$kClient->flavorAsset->getUrl($flavorAssetId);
 	
-		$externalEntryExists = $this->clientHelper->checkExitingExternalContent($entryId);
+		$externalEntryExists = $this->clientHelper->checkExistingExternalContent($entryId);
 		if (!$externalEntryExists)
 		{
 			$uploadSuccess = $this->clientHelper->uploadMedia($flavorUrl, $entryId, $callBackUrl, $spokenLanguage, $fileLocation);

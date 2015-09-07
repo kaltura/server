@@ -180,7 +180,8 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 	 */
 	protected function cuePointAdded(CuePoint $cuePoint)
 	{
-		$this->reIndexCuePointEntry($cuePoint);
+		if($cuePoint->shouldReIndexEntry())
+			$this->reIndexCuePointEntry($cuePoint);
 	}
 	
 	/**
@@ -194,7 +195,8 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 		$this->deleteCuePoints($c);
 			
 		//re-index cue point on entry
-		$this->reIndexCuePointEntry($cuePoint);
+		if($cuePoint->shouldReIndexEntry())
+			$this->reIndexCuePointEntry($cuePoint);
 	}
 	
 	/**
@@ -517,19 +519,8 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 		if(!($object instanceof CuePoint))
 			return false;
 		
-		$indexOnEntryTypes = CuePointPlugin::getIndexOnEntryTypes();
-		if(!count($indexOnEntryTypes))
-			return false;
-			
-		if(!in_array($object->getType(), $indexOnEntryTypes))
-			return false;
-		
-		$fieldsToMonitor = array(CuePointPeer::TEXT, CuePointPeer::TAGS, CuePointPeer::NAME);
-		
-		if(count(array_intersect($fieldsToMonitor, $modifiedColumns)) > 0)
-			return true;
-
-		return false;
+		/* @var $object CuePoint */
+		return $object->shouldReIndexEntry($modifiedColumns);
 	}
 
 	public static function postProcessCuePoints( $liveEntry, $cuePointsIds = null )

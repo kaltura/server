@@ -289,6 +289,7 @@ class FileSyncImportBatchService extends KalturaBatchService
 					}
 					
 					$fileSync->setOriginalId($originalFileSync->getId());
+					$fileSync->setCustomDataObj();	// update $fileSync->custom_data so that originalId will be set by fromObject
 				}
 				
 				// add to the result set

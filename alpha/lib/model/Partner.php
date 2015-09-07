@@ -836,6 +836,10 @@ class Partner extends BasePartner
 	public function setStripThumbProfile($v) { $this->putInCustomData('stripThumbProfile', $v);}
 	public function getStripThumbProfile() { return $this->getFromCustomData('stripThumbProfile');}
 	
+	//use time aligned renditions in playManifest for live entries
+	public function setTimeAlignedRenditions($v) { $this->putInCustomData('timeAlignedRenditions', $v);}
+	public function getTimeAlignedRenditions() { return $this->getFromCustomData('timeAlignedRenditions', null); }
+	
 	// additionalParams - key/value array
 	public function getAdditionalParams() 
 	{ 
