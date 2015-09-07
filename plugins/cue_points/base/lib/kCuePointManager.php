@@ -254,15 +254,16 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 		
 		$cuePoint->setPartnerId($partnerId);
 		$cuePoint->setStartTime(kXml::timeToInteger($scene->sceneStartTime));
-	
-		$tags = array();
-		foreach ($scene->tags->children() as $tag)
+		if (isset($scene->tags))
 		{
-			$value = "$tag";
-			if($value)
-				$tags[] = $value;
+			$tags = array();
+			foreach ($scene->tags->children() as $tag) {
+				$value = "$tag";
+				if ($value)
+					$tags[] = $value;
+			}
+			$cuePoint->setTags(implode(',', $tags));
 		}
-		$cuePoint->setTags(implode(',', $tags));
 		
 		$cuePoint->setEntryId($entryId);
 		if(isset($scene['systemName']))
