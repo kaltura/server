@@ -588,6 +588,9 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 	
 	protected function getUserPrecentageByUserTable($objectIds, $orderBy)
 	{
+		if (is_null($objectIds) || $objectIds === "" ) {
+			return array();
+		}	    
 		$c = $this->createGetCuePointByUserIdsCriteria($objectIds);
 		$answers = CuePointPeer::doSelect($c);
 		return $this->getAggregateDataForUsers($answers, $orderBy);
