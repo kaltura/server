@@ -1,3 +1,25 @@
+# Jupiter-10.20.0 #
+
+## Cielo24 plugin ##
+
+- Issue Type: New Feature
+- Issue ID: PLAT-2598
+
+#### Configuration ####
+ 
+- Added 'Cielo24' in plugins.ini.base, plugins.ini.admin.
+- Added 'Cielo24' module to the admin-console in admin.ini.
+
+#### Deployment Scripts ####
+	php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2015_09_20_update_integration_notify_permission_name.php
+	(developer's responsibility) php /opt/kaltura/app/alpha/scripts/utils/addPartnerToCielo24.php /opt/kaltura/app {PID} {cielo24-api-username} {cielo24-api-password} 
+	
+#### Known Issues & Limitations ####
+
+None.
+
+
 # Jupiter-10.18.0 #
 
 ## Allow answer cue points to be added by player and anonymous users ##
