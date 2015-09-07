@@ -1,5 +1,14 @@
 # Jupiter-10.20.0 #
 
+### Configuration ###
+
+## Changed kaltura.scheduler_status.id from int(11) to bigint(20) ##
+
+- Run the following permission script:
+
+  mysql -h@db_host@ -u@db_user@ -p@db_pass@ -P3306 kaltura <  deployment/updates/sql/2015_09_06_alter_scheduler_status_bigint.sql
+
+
 ## Cielo24 plugin ##
 
 - Issue Type: New Feature
