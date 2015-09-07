@@ -11,7 +11,7 @@ class KalturaTranscriptAssetFilter extends KalturaAttachmentAssetFilter
 	 */
 	public $typeIn;
 
-	function __construct()
+	public function __construct()
 	{
 		$this->typeIn = TranscriptPlugin::getAssetTypeCoreValue(TranscriptAssetType::TRANSCRIPT);
 	}
