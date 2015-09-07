@@ -328,7 +328,7 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 		if ( kCurrentContext::$is_admin_session || kCurrentContext::getCurrentKsKuserId() == $dbEntry->getKuserId())
 			return true;
 
-		$entitledKusers = explode(',', $dbEntry->getEntitledKusersEdit());
+		$entitledKusers = getObjectIdsAsArray($dbEntry->getEntitledKusersEdit());
 		if(in_array(kCurrentContext::getCurrentKsKuserId(), $entitledKusers))
 		{
 			return true;
@@ -461,7 +461,7 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 	
 	protected function getQuizQuestionPercentageTableReport($objectIds, $orderBy)
 	{
-		$questionIds = explode(",", $objectIds);
+		$questionIds = getObjectIdsAsArray($objectIds);
 		$questionsCriteria = new Criteria();
 		$questionsCriteria->add(CuePointPeer::ID, $questionIds, Criteria::IN);
 		$questionsCriteria->add(CuePointPeer::TYPE, QuizPlugin::getCoreValue('CuePointType',QuizCuePointType::QUIZ_QUESTION));
@@ -521,7 +521,7 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 
 	protected function getQuestionCountByQusetionIds($objectIds)
 	{
-		$questionIds = explode(",", $objectIds);
+		$questionIds = getObjectIdsAsArray($objectIds);
 		$c = new Criteria();
 		$c->add(CuePointPeer::ID, $questionIds, Criteria::IN);
 		$numOfquestions = CuePointPeer::doCount($c);
@@ -755,7 +755,7 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 	{
 		$c = new Criteria();
 		$c->add(CuePointPeer::TYPE, QuizPlugin::getCoreValue('CuePointType', QuizCuePointType::QUIZ_ANSWER));
-		$userIds = explode(",", $objectIds);
+		$userIds = getObjectIdsAsArray($objectIds);
 		$kuserIds = array();
 		foreach ($userIds as $userId)
 		{
@@ -818,4 +818,8 @@ function innerCompare($a, $b)
 		return 0;
 	}
 	return ($prctgA < $prctgB) ? -1 : 1;	
+}
+
+function getObjectIdsAsArray($objectIds){
+	return explode(',', str_replace(' ','', $objectIds));
 }
