@@ -214,7 +214,7 @@ package com.kaltura.delegates {
 
 
 			//create the service request for normal calls
-			var url:String = _config.protocol + _config.domain + "/" + _config.srvUrl + "?service=" + call.service + "&action=" + call.action + "&kalsig=" + kalsig;;
+			var url:String = _config.protocol + _config.domain + "/" + _config.srvUrl + "/service/" + call.service + "/action/" + call.action + "?kalsig=" + kalsig;;
 
 			if (_call.method == URLRequestMethod.GET)
 				url += "&";
@@ -401,7 +401,7 @@ package com.kaltura.delegates {
 		 * @return URLRequest with relevant parameters
 		* */
 		public function getServeUrl(call:KalturaCall):URLRequest {
-			var url:String = _config.protocol + _config.domain + "/" + _config.srvUrl + "?service=" + call.service + "&action=" + call.action;
+			var url:String = _config.protocol + _config.domain + "/" + _config.srvUrl + "/service/" + call.service + "/action/" + call.action + "?delegate=1";
 			for (var key:String in call.args) {
 				url += "&" + key + "=" + call.args[key];
 			}

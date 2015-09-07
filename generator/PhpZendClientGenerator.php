@@ -329,7 +329,7 @@ class PhpZendClientGenerator extends ClientGeneratorFromXml
 			$this->appendLine(' */');
 		}
 		
-	 	$this->appendLine("class $enumName");		
+	 	$this->appendLine("class $enumName extends Kaltura_Client_EnumBase");		
 		$this->appendLine("{");
 		foreach($enumNode->childNodes as $constNode)
 		{
@@ -550,6 +550,12 @@ class PhpZendClientGenerator extends ClientGeneratorFromXml
 	    $resultNode = $actionNode->getElementsByTagName("result")->item(0);
 	    $resultType = $resultNode->getAttribute("type");
 	    $arrayObjectType = ($resultType == 'array') ? $resultNode->getAttribute ( "arrayType" ) : null;
+		
+		$enableInMultiRequest = true;
+		if($actionNode->hasAttribute("enableInMultiRequest"))
+		{
+			$enableInMultiRequest = intval($actionNode->getAttribute("enableInMultiRequest"));
+		}
 	    
 		
 		// method signature
@@ -565,6 +571,13 @@ class PhpZendClientGenerator extends ClientGeneratorFromXml
 		$this->appendLine();	
 		$this->appendLine("	$signature");
 		$this->appendLine("	{");
+		
+		if(!$enableInMultiRequest)
+		{
+			$this->appendLine("		if (\$this->client->isMultiRequest())");
+			$this->appendLine("			throw new Kaltura_Client_ClientException(\"Action is not supported as part of multi-request.\", Kaltura_Client_ClientException::ERROR_ACTION_IN_MULTIREQUEST);");
+			$this->appendLine("		");
+		}
 		
 		$this->appendLine("		\$kparams = array();");
 		$haveFiles = false;
@@ -630,16 +643,29 @@ class PhpZendClientGenerator extends ClientGeneratorFromXml
 	    {
 	    	$fallbackClass = 'null';
 	    	if($resultType == 'array')
+	    	{
 	    		$fallbackClass = "\"$arrayObjectType\"";
+	    	}
 	    	else if($resultType && !$this->isSimpleType($resultType))
+	    	{
 	    		$fallbackClass = "\"$resultType\"";
+	    	}
 	    	
 			if ($haveFiles)
+			{
 				$this->appendLine("		\$this->client->queueServiceActionCall(\"".strtolower($serviceId)."\", \"$action\",  $fallbackClass, \$kparams, \$kfiles);");
+			}
 			else
+			{
 				$this->appendLine("		\$this->client->queueServiceActionCall(\"".strtolower($serviceId)."\", \"$action\", $fallbackClass, \$kparams);");
-			$this->appendLine("		if (\$this->client->isMultiRequest())");
-			$this->appendLine("			return \$this->client->getMultiRequestResult();");
+			}
+			
+			if($enableInMultiRequest)
+			{
+				$this->appendLine("		if (\$this->client->isMultiRequest())");
+				$this->appendLine("			return \$this->client->getMultiRequestResult();");
+			}
+			
 			$this->appendLine("		\$resultXml = \$this->client->doQueue();");
 			$this->appendLine("		\$resultXmlObject = new \\SimpleXMLElement(\$resultXml);");
 			$this->appendLine("		Kaltura_Client_ParseUtils::checkIfError(\$resultXmlObject->result);");
@@ -672,8 +698,11 @@ class PhpZendClientGenerator extends ClientGeneratorFromXml
 			}
 	    }
 			
-		if($resultType)
+		if($resultType && $resultType != 'null')
+		{
 			$this->appendLine("		return \$resultObject;");
+		}
+		
 		$this->appendLine("	}");
 	}
 	
@@ -690,7 +719,7 @@ class PhpZendClientGenerator extends ClientGeneratorFromXml
 			{
 				$signature .= "$".$paramName;
 			}
-			else if ($paramType == "array")
+			else if ($paramType == "array" || $paramType == "map")
 			{
 				$signature .= "array $".$paramName;
 			}

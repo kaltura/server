@@ -177,7 +177,7 @@ class SingleRequestTests(KalturaBaseTest):
 
 
 from utils import PARTNER_ID, SERVICE_URL
-from utils import SECRET, ADMIN_SECRET, USER_NAME
+from utils import ADMIN_SECRET, USER_NAME
 
 class MultiRequestTests(KalturaBaseTest):
     
