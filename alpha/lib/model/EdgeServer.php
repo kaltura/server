@@ -13,7 +13,7 @@
  * @package Core
  * @subpackage model
  */
-class EdgeServer extends BaseEdgeServer {
+class EdgeServer extends ServerNode {
 	
 	const CUSTOM_DATA_DELIVERY_IDS = 'delivery_profile_ids';
 	const CUSTOM_DATA_EDGE_PLAYBACK_CONFIGURATION = 'edge_playback_configuration';
@@ -28,6 +28,8 @@ class EdgeServer extends BaseEdgeServer {
 	 */
 	public function applyDefaultValues()
 	{
+		parent::applyDefaultValues();
+		
 		$this->setType(serverNodeType::EDGE);
 	}
 	
@@ -59,7 +61,7 @@ class EdgeServer extends BaseEdgeServer {
 		
 		if($this->parent_id)
 		{
-			$parentEdge = EdgeServerPeer::retrieveByPK($this->parent_id);
+			$parentEdge = ServerNodePeer::retrieveByPK($this->parent_id);
 			if($parentEdge)
 				$playbackHostName = $playbackHostName . $parentEdge->getPlaybackHost();
 		}

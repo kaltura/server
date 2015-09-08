@@ -37,7 +37,7 @@ class kAccessControlServeRemoteEdgeServerAction extends kRuleAction
 		$deliveryAttributes->setEdgeServerIds($edgeServerIds);
 	
 		//Check if there are any edge server that override the delivery profiles
-		$edgeServers = EdgeServerPeer::retrieveByPKs($edgeServerIds);
+		$edgeServers = ServerNodePeer::retrieveByPKs($edgeServerIds);
 		if(!count($edgeServers))
 			return false;
 	

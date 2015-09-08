@@ -13,7 +13,7 @@
  * @package Core
  * @subpackage model
  */
-class MediaServer extends BaseMediaServer {
+class MediaServer extends ServerNode {
 	const DEFAULT_MANIFEST_PORT = 1935;
 	const DEFAULT_WEB_SERVICES_PORT = 888;
 	const DEFAULT_APPLICATION = 'kLive';
@@ -22,12 +22,27 @@ class MediaServer extends BaseMediaServer {
 	
 	const WEB_SERVICE_LIVE = 'live';
 	
+	const CUSTOM_DATA_PORTT_PROTOCOL_ARRAY = 'port_protocol_array';
+	const CUSTOM_DATA_APP_PREFIX = 'app_prefix';
+	const CUSTOM_DATA_IS_INTERNAL = 'is_internal';
+	
 	private $isExternalMediaServer = false;
 	
 	static protected $webServices = array(
 		self::WEB_SERVICE_LIVE => 'KalturaMediaServerLiveService',
 	);
 	
+	/**
+	 * Applies default values to this object.
+	 * This method should be called from the object's constructor (or equivalent initialization method).
+	 * @see __construct()
+	 */
+	public function applyDefaultValues()
+	{
+		parent::applyDefaultValues();
+		
+		$this->setType(serverNodeType::MEDIA_SERVER);
+	}
 	
 	public function getTranscoder()
 	{
@@ -81,7 +96,7 @@ class MediaServer extends BaseMediaServer {
 			$portField .= "-$protocol";
 		
 		if(kConf::hasMap('media_servers'))
-		{
+		{			
 			$mediaServers = kConf::getMap('media_servers');
 			if ($partnerMediaServerConfigurations)
 				$mediaServers = array_merge($mediaServers, $partnerMediaServerConfigurations);
@@ -93,7 +108,6 @@ class MediaServer extends BaseMediaServer {
 				$domain = $mediaServers['domain'];
 			elseif(isset($mediaServers['search_regex_pattern']) && isset($mediaServers['replacement']))
 				$domain = preg_replace($mediaServers['search_regex_pattern'], $mediaServers['replacement'], $domain);
-
 			if (isset ($mediaServers['appPrefix']))
 				$appPrefix = $mediaServers['appPrefix'];
 			
@@ -185,8 +199,47 @@ class MediaServer extends BaseMediaServer {
 		return new $serviceClass($url);
 	}
 	
-	public function setIsExternalMediaServer($v)
+	/* (non-PHPdoc)
+	 * @see lib/model/om/Baseentry#preInsert()
+	 */
+	public function preInsert(PropelPDO $con = null)
 	{
-		$this->isExternalMediaServer = $v;
+		if($this->getPartnerId() !== Partner::MEDIA_SERVER_PARTNER_ID)
+			$this->setIsExternalMediaServer(true);
+		else 
+			$this->setDc(kDataCenterMgr::getCurrentDcId());
+		
+		return parent::preInsert($con);
 	}
+	
+	public function setIsExternalMediaServer($isInternal)
+	{
+		$this->putInCustomData(self::CUSTOM_DATA_IS_INTERNAL, $isInternal);
+	}
+	
+	public function getIsExternalMediaServer()
+	{
+		return $this->getFromCustomData(self::CUSTOM_DATA_IS_INTERNAL, null, false);
+	}
+	
+	public function setAppPrefix($appPrefix)
+	{
+		$this->putInCustomData(self::CUSTOM_DATA_APP_PREFIX, $appPrefix);
+	}
+	
+	public function getAppPrefix()
+	{
+		return $this->getFromCustomData(self::CUSTOM_DATA_APP_PREFIX, null, "");
+	}
+	
+	public function setProtocolPort($protocolPortArray)
+	{
+		$this->putInCustomData(self::CUSTOM_DATA_PORTT_PROTOCOL_ARRAY, $protocolPortArray);
+	}
+	
+	public function getProtocolPort()
+	{
+		return $this->getFromCustomData(self::CUSTOM_DATA_PORTT_PROTOCOL_ARRAY, null, null);
+	}
+
 } // MediaServer

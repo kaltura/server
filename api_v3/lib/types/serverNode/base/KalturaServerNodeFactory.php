@@ -14,11 +14,11 @@ class KalturaServerNodeFactory
 		switch ($type) 
 		{
 			case KalturaServerNodeType::EDGE:
-				$obj = new KalturaEdgeServer();
+				$obj = new KalturaEdgeServerNode();
 				break;
 				
 			case KalturaServerNodeType::MEDIA_SERVER:
-				$obj = new KalturaMediaServer();
+				$obj = new KalturaMediaServerNode();
 				break;
 				
 			default:

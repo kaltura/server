@@ -121,7 +121,7 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
         	return null;
 		
 		$edgeServerIds = $this->params->getEdgeServerIds();
-		$edgeServers = EdgeServerPeer::retrieveOrderedEdgeServersArrayByPKs($edgeServerIds);
+		$edgeServers = ServerNodePeer::retrieveOrderedServerNodesArrayByPKs($edgeServerIds);
 		
 		if(!count($edgeServers))
 		{
