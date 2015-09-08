@@ -67,7 +67,7 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 	/**
 	 * @var array
 	 */
-	private static $cacheStores = null;
+	private static $cacheStores = array();
 	
 	/**
 	 * @var int
@@ -84,10 +84,10 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 	 */
 	protected static function getStores($cacheType = kCacheManager::CACHE_TYPE_RESPONSE_PROFILE)
 	{
-		if(is_array(self::$cacheStores))
-			return self::$cacheStores;
+		if(isset(self::$cacheStores[$cacheType]))
+			return self::$cacheStores[$cacheType];
 			
-		self::$cacheStores = array();
+		self::$cacheStores[$cacheType] = array();
 		$cacheSections = kCacheManager::getCacheSectionNames($cacheType);
 		if(is_array($cacheSections))
 		{
@@ -95,11 +95,11 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 			{
 				$cacheStore = kCacheManager::getCache($cacheSection);
 				if ($cacheStore)
-					self::$cacheStores[] = $cacheStore;
+					self::$cacheStores[$cacheType][] = $cacheStore;
 			}
 		}
 		
-		return self::$cacheStores;
+		return self::$cacheStores[$cacheType];
 	}
 	
 	/**
@@ -503,6 +503,12 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 		}
 		
 		$roots = $peer->getRootObjects($object);
+		foreach($roots as $index => $root)
+		{
+			if(!$this->isCachedObject($root))
+				unset($roots[$index]);
+		}
+		
 		if(count($roots))
 		{
 			$this->queryCache[kResponseProfileCacher::CACHE_ROOT_OBJECTS] = $roots;
