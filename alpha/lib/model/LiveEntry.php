@@ -6,6 +6,8 @@
 abstract class LiveEntry extends entry
 {
 	const IS_LIVE = 'isLive';
+	const PRIMARY_HOSTNAME = 'primaryHostname';
+	const BACKUP_HOSTNAME = 'backupHostname';
 	const FIRST_BROADCAST = 'first_broadcast';
 	const RECORDED_ENTRY_ID = 'recorded_entry_id';
 
@@ -539,6 +541,22 @@ abstract class LiveEntry extends entry
 		KalturaLog::debug("No Valid Media Servers Were Found For Current Live Entry [" . $this->getEntryId() . "]" );
 		return null;
 	}
+
+	public function getHostnames()
+	{
+		$hostnames = array();
+		$kMediaServers = $this->getMediaServers();
+
+		foreach($kMediaServers as $kMediaServer)
+		{
+			if($kMediaServer instanceof kLiveMediaServer)
+			{
+				$hostnames[] = $kMediaServer->getHostname();
+			}
+		}
+		KalturaLog::debug("returning hostnames: " . print_r($hostnames,true));
+		return $hostnames;
+	}
 	
 	/**
 	 * @return boolean
@@ -694,10 +712,14 @@ abstract class LiveEntry extends entry
 	 */
 	public function getDynamicAttributes()
 	{
+		$hostnames = $this->getHostnames();
+
 		$dynamicAttributes = array(
 				LiveEntry::IS_LIVE => intval($this->hasMediaServer()),
 				LiveEntry::FIRST_BROADCAST => $this->getFirstBroadcast(),
 				LiveEntry::RECORDED_ENTRY_ID => $this->getRecordedEntryId(),
+				LiveEntry::PRIMARY_HOSTNAME => count($hostnames) > 0 ? $hostnames[0] : null,	//todo, empty string? will match empty string
+				LiveEntry::BACKUP_HOSTNAME => count($hostnames) > 1 ? $hostnames[1] : null,
 		);
 		
 		return array_merge( $dynamicAttributes, parent::getDynamicAttributes() ); 

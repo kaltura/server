@@ -169,7 +169,15 @@ class SphinxEntryCriteria extends SphinxCriteria
 			else
 				$filter->set ( "_matchor_categories_ids",category::CATEGORY_ID_THAT_DOES_NOT_EXIST);
 			$filter->unsetByName('_in_categories_full_name');
-		}		
+		}
+
+		if($filter->is_set('_media_server_hostname'))
+		{
+			//mysql> select in(dynamic_attributes.xyz, 'afd') or in(dynamic_attributes.xyz, 'af') as cnd1 from kaltura_entry where cnd1 > 0 and  match('p4374871');
+			$cond = "in(" . entryIndex::DYNAMIC_ATTRIBUTES . "." . LiveEntry::PRIMARY_HOSTNAME .", '" . $filter->get('_media_server_hostname') . "') or in(" . entryIndex::DYNAMIC_ATTRIBUTES . "." . LiveEntry::BACKUP_HOSTNAME .", '" . $filter->get('_media_server_hostname') . "')";
+			$this->addCondition($cond);
+			$filter->unsetByName('_media_server_hostname');
+		}
 	
 		if($filter->is_set('_is_live'))
 		{

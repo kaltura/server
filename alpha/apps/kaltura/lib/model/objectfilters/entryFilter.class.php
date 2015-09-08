@@ -145,6 +145,7 @@ class entryFilter extends baseObjectFilter
 			"_in_source",
 			"_notin_source",
 			"_is_recorded_entry_id_empty",
+			"_media_server_hostname",
 		) , NULL );
 
 		$this->allowed_order_fields = array ( "created_at" , "updated_at" , "views", "name", "media_date" , 
@@ -721,6 +722,11 @@ class entryFilter extends baseObjectFilter
 	public function setIsLive($v)
 	{
 		$this->set('_is_live', intval($v));
+	}
+
+	public function setMediaServerHostname($v)
+	{
+		$this->set('_media_server_hostname', $v);
 	}
 	
 	public function typeMatches(entry $entry)
