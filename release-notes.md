@@ -1,23 +1,5 @@
 # Jupiter-10.18.0 #
 
-## Add comment text and other params to email notification ##
-
-- Issue Type: Customer Request
-- Issue ID: SUP-4380
-
-#### Configuration ####
- 
-  None.
-
-#### Deployment Scripts ####
-
-  - php /opt/kaltura/app/tests/standAloneClient/exec.php /opt/kaltura/app/deployment/updates/scripts/xml/updateCommentWasAddedToEntryEmailNotificationTemplate.xml
-
-  (Will require service url, user and password (for admin console) partner id = -2)
-#### Known Issues & Limitations ####
-
-None.
-
 ## Allow answer cue points to be added by player and anonymous users ##
 
 - Issue Type: New Feature
