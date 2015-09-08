@@ -164,12 +164,19 @@ class KalturaResponseProfileCacher extends kResponseProfileCacher
 			return;
 		}
 
-		KalturaLog::debug("Stop " . get_class($apiObject) . " [" . print_r($apiObject, true) . "]");
-		
-		$key = self::getObjectSpecificCacheKey(self::$cachedObject, self::$responseProfileKey);
-		$value = self::getObjectSpecificCacheValue($apiObject, self::$cachedObject, self::$responseProfileKey);
-		
-		self::set($key, $value);
+		if($apiObject->relatedObjects)
+		{
+			KalturaLog::debug("Stop " . get_class($apiObject) . " [" . print_r($apiObject, true) . "]");
+			
+			$key = self::getObjectSpecificCacheKey(self::$cachedObject, self::$responseProfileKey);
+			$value = self::getObjectSpecificCacheValue($apiObject, self::$cachedObject, self::$responseProfileKey);
+			
+			self::set($key, $value);
+		}
+		else
+		{
+			KalturaLog::debug("API Object [" . get_class($apiObject) . "] has no related objects");
+		}
 		
 		self::$cachedObject = null;
 		self::$cachePerUser = false;
