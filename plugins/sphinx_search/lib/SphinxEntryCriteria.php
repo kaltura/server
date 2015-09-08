@@ -173,7 +173,7 @@ class SphinxEntryCriteria extends SphinxCriteria
 
 		if($filter->is_set('_media_server_hostname'))
 		{
-			//mysql> select in(dynamic_attributes.xyz, 'afd') or in(dynamic_attributes.xyz, 'af') as cnd1 from kaltura_entry where cnd1 > 0 and  match('p4374871');
+			//sphinx query: select in(dynamic_attributes.xyz, 'some_val') or in(dynamic_attributes.xyz, 'some_val') as cnd1 from ... where cnd1 > 0 ...
 			$cond = "in(" . entryIndex::DYNAMIC_ATTRIBUTES . "." . LiveEntry::PRIMARY_HOSTNAME .", '" . $filter->get('_media_server_hostname') . "') or in(" . entryIndex::DYNAMIC_ATTRIBUTES . "." . LiveEntry::BACKUP_HOSTNAME .", '" . $filter->get('_media_server_hostname') . "')";
 			$this->addCondition($cond);
 			$filter->unsetByName('_media_server_hostname');

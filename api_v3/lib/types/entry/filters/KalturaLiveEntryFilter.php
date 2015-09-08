@@ -14,7 +14,7 @@ class KalturaLiveEntryFilter extends KalturaLiveEntryBaseFilter
 	(
 		"isLive" => "_is_live",
 		"isRecordedEntryIdEmpty" => "_is_recorded_entry_id_empty",
-		"mediaServerHostname" => "_media_server_hostname",	//todo
+		"mediaServerHostname" => "_media_server_hostname",
 	);
 	
 	public function getMapBetweenObjects()
