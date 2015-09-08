@@ -13,7 +13,7 @@
  * @package Core
  * @subpackage model
  */
-class categoryEntryPeer extends BasecategoryEntryPeer {
+class categoryEntryPeer extends BasecategoryEntryPeer implements IKalturaMrssContributor{
 
 	private static $skipEntrySave = false;
 	
@@ -359,4 +359,57 @@ class categoryEntryPeer extends BasecategoryEntryPeer {
 	{
 		return array(array("categoryEntry:entryId=%s", self::ENTRY_ID));		
 	}
+	
+	/* (non-PHPdoc)
+	 * @see IKalturaMrssContributor::contribute()
+	 */
+	public function contribute(BaseObject $object, SimpleXMLElement $mrss, kMrssParameters $mrssParams = null) 
+	{
+		//If the feed context is the default context- the category entries are not necessary
+		if (kMrssManager::getFeedContext() == kMrssManager::DEFAULT_FEED_CONTEXT)
+			return $mrss;
+		
+		$categoryEntries = array();	
+		if ($object instanceof entry)
+		{
+			$categoryEntries = self::retrieveActiveByEntryId($object->getId());
+		}
+		
+		if (!count ($categoryEntries))
+		{
+			return $mrss;
+		}
+		
+		$categoryEntriesMrss = $mrss->addChild('categoryEntries');
+		foreach ($categoryEntries as $categoryEntry)
+		{
+			$this->contributeCategoryEntry ($categoryEntry, $categoryEntry, $mrssParams);
+		}
+	}
+	
+	protected function contributeCategoryEntry (CategoryEntry $categoryEntry, SimpleXMLElement $mrss, kMrssParameters $mrssParams = null)
+	{
+		$categoryEntryMrss = $mrss->addChild('categoryEntry');
+		$categoryEntryMrss->addChild('entryId', $categoryEntry->getEntryId());
+		$categoryEntryMrss->addChild('categoryId', $categoryEntry->getCategoryId());
+		$categoryEntryMrss->addChild('categoryFullIds', $categoryEntry->getCategoryFullIds());
+		$categoryEntryMrss->addChild('privacyContext', $categoryEntry->getPrivacyContext());
+	}
+
+	/* (non-PHPdoc)
+	 * @see IKalturaMrssContributor::getObjectFeatureType()
+	 */
+	public function getObjectFeatureType() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	/* (non-PHPdoc)
+	 * @see IKalturaBase::getInstance()
+	 */
+	public function getInstance($interface) {
+		return ObjectFeatureType::CATEGORY_ENTRIES;
+		
+	}
+
 } // categoryEntryPeer

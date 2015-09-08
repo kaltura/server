@@ -3,6 +3,8 @@ class kMrssManager
 {
 	const FORMAT_DATETIME = 'Y-m-d\TH:i:s';
 	
+	const DEFAULT_FEED_CONTEXT = 'DEFAULT_FEED_CONTEXT';
+	
 	/**
 	 * @var array<IKalturaMrssContributor>
 	 */
@@ -23,6 +25,22 @@ class kMrssManager
 	 * @var bool
 	 */
 	protected static $instancesEnabled = true;
+	
+	protected static $feedContext = self::DEFAULT_FEED_CONTEXT;
+
+	/**
+	 * @return the $feedContext
+	 */
+	public static function getFeedContext() {
+		return kMrssManager::$feedContext;
+	}
+
+	/**
+	 * @param field_type $feedContext
+	 */
+	public static function setFeedContext($feedContext) {
+		kMrssManager::$feedContext = $feedContext;
+	}
 
 	/**
 	 * Enables or disables the static instances pool caching
@@ -123,6 +141,7 @@ class kMrssManager
 			return self::$mrssContributors;
 			
 		self::$mrssContributors = KalturaPluginManager::getPluginInstances('IKalturaMrssContributor');
+		self::$mrssContributors[] = new categoryEntryPeer();
 		return self::$mrssContributors;
 	}
 	
@@ -713,5 +732,4 @@ class kMrssManager
 		
 		return $mrss;
 	}
-	
 }
