@@ -542,7 +542,7 @@ abstract class LiveEntry extends entry
 		return null;
 	}
 
-	public function getHostnames()
+	protected function getMediaServersHostnames()
 	{
 		$hostnames = array();
 		$kMediaServers = $this->getMediaServers();
@@ -554,7 +554,7 @@ abstract class LiveEntry extends entry
 				$hostnames[] = $kMediaServer->getHostname();
 			}
 		}
-		KalturaLog::debug("returning hostnames: " . print_r($hostnames,true));
+		KalturaLog::debug("media servers hostnames: " . print_r($hostnames,true));
 		return $hostnames;
 	}
 	
@@ -712,17 +712,24 @@ abstract class LiveEntry extends entry
 	 */
 	public function getDynamicAttributes()
 	{
-		$hostnames = $this->getHostnames();
 
 		$dynamicAttributes = array(
 				LiveEntry::IS_LIVE => intval($this->hasMediaServer()),
 				LiveEntry::FIRST_BROADCAST => $this->getFirstBroadcast(),
 				LiveEntry::RECORDED_ENTRY_ID => $this->getRecordedEntryId(),
-				LiveEntry::PRIMARY_HOSTNAME => count($hostnames) > 0 ? $hostnames[0] : null,	//todo, empty string? will match empty string
-				LiveEntry::BACKUP_HOSTNAME => count($hostnames) > 1 ? $hostnames[1] : null,
+
 		);
-		
-		return array_merge( $dynamicAttributes, parent::getDynamicAttributes() ); 
+
+		$mediaServers = $this->getMediaServersHostnames();
+		$hostnamesCount = count($mediaServers);
+		if ($hostnamesCount > 0) {
+			$dynamicAttributes[LiveEntry::PRIMARY_HOSTNAME] = $mediaServers[0];
+		}
+		if ($hostnamesCount > 1) {
+			$dynamicAttributes[LiveEntry::BACKUP_HOSTNAME] = $mediaServers[1];
+
+		}
+		return array_merge( $dynamicAttributes, parent::getDynamicAttributes() );
 	}
 	
 	/**
