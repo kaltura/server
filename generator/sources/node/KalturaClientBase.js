@@ -371,7 +371,7 @@ KalturaClientBase.prototype.encodeFile = function(boundary, type, name, filename
 	return returnPart;
 };
 
-function sendRequestHelper(that, options, body, requestIndex, onCompleteCallback) {
+function sendRequestHelper(that, options, body, requestIndex, onCompleteCallback, timeout) {
 	var request = http.request(options, function(response) {
 		response.setEncoding('utf8');
 
@@ -394,6 +394,9 @@ function sendRequestHelper(that, options, body, requestIndex, onCompleteCallback
 		onCompleteCallback(null, err);
 	});
 
+	if (timeout) {
+		request.setTimeout(timeout);
+	}
 	request.write(body);
 	request.end();
 }
@@ -440,7 +443,7 @@ KalturaClientBase.prototype.doHttpRequest = function (callCompletedCallback, req
 			'Content-Type': 'multipart/form-data; boundary=' + boundary,
 			'Content-Length': multipartBody.length
 		};
-		sendRequestHelper(that, options, multipartBody, requestIndex, callCompletedCallback);
+		sendRequestHelper(that, options, multipartBody, requestIndex, callCompletedCallback, this.config.timeout);
 
 	} else {
 		var data = http_build_query(params);
