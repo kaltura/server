@@ -136,6 +136,27 @@ class VoicebaseClientHelper
 		return $results;
 	}
 	
+	public function calculateAccuracy($entryId)
+	{
+		$contentArr = $this->getRemoteTranscripts($entryId, array("JSON"));
+		$transcriptWordObjects = json_decode($contentArr["JSON"]);
+		$sumOfAccuracies = 0;
+		$numberOfElements = 0;
+		
+		foreach($transcriptWordObjects as $wordObject)
+		{
+			if(0 <= $wordObject->c && $wordObject->c <= 1)
+			{
+				$sumOfAccuracies += $wordObject->c;
+				$numberOfElements++;
+			}
+		}
+	
+		if($numberOfElements)
+			return $sumOfAccuracies/$numberOfElements;
+		return 0;
+	}
+	
 	public function deleteRemoteFile($entryId)
 	{	
 		$params = array("action" => "deleteFile", "externalID" => $entryId);
