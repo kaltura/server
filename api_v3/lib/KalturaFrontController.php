@@ -180,11 +180,15 @@ class KalturaFrontController
 		// arrange the parameters by request index
 		$commonParams = array();
 		$listOfRequests = array();
-		ksort($this->params);
+		$requestStartIndex = 1;
+		$requestEndIndex = 1;
 		foreach ($this->params as $paramName => $paramValue)
 		{
 			if(is_numeric($paramName))
 			{
+				$paramName = intval($paramName);
+				$requestStartIndex = min($requestStartIndex, $paramName);
+				$requestEndIndex = max($requestEndIndex, $paramName);
 				$listOfRequests[$paramName] = $paramValue;
 				continue;
 			}
@@ -197,6 +201,8 @@ class KalturaFrontController
 			}
 		
 			$requestIndex = (int)$explodedName[0];
+			$requestStartIndex = min($requestStartIndex, $requestIndex);
+			$requestEndIndex = max($requestEndIndex, $requestIndex);
 			$paramName = $explodedName[1];
 			if (!array_key_exists($requestIndex, $listOfRequests))
 			{
@@ -210,9 +216,8 @@ class KalturaFrontController
 		// process the requests
 		$results = array();
 		kCurrentContext::$multiRequest_index = 0;
-		foreach ($listOfRequests as $i => $currentParams)
+		for($i = $requestStartIndex; $i <= $requestEndIndex; $i++)
 		{
-			// must be reasigned in case the $listOfRequests changed by multi-request results
 			$currentParams = $listOfRequests[$i];  
 			
 			if (!isset($currentParams["service"]) || !isset($currentParams["action"]))
