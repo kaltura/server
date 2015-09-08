@@ -227,7 +227,7 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 			
 				if($store instanceof kCouchbaseCacheWrapper)
 				{
-					$invalidationTimes = $cacheStore->multiGetAndTouch($invalidationKeys);
+					$invalidationTimes = $store->multiGetAndTouch($invalidationKeys);
 				}
 				else
 				{
