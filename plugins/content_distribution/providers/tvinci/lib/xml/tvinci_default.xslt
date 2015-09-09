@@ -174,7 +174,7 @@
                         <!-- if there is default thumb we'll take it -->
                         <xsl:for-each select="item/thumbnail">
                             <xsl:if test="./@isDefault='true'">
-                                <xsl:value-of select="concat(./@url,'?image.jpg')"/>
+                                <xsl:value-of select="concat(./@url,'/image.jpg')"/>
                             </xsl:if>
                         </xsl:for-each>
                     </xsl:when>
@@ -183,7 +183,7 @@
                             <xsl:sort select="./@fileSize" data-type="number" order="descending"/>
                             <!-- we only care about the largest one -->
                             <xsl:if test="position()=1">
-                                <xsl:value-of select="concat(./@url,'?image.jpg')"/>
+                                <xsl:value-of select="concat(./@url,'/image.jpg')"/>
                             </xsl:if>
                         </xsl:for-each>
                     </xsl:otherwise>
