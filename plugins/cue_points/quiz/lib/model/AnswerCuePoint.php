@@ -54,12 +54,10 @@ class AnswerCuePoint extends CuePoint implements IMetadataObject
 	}
 	
     public function setKuserId($v) {
-		$userEntry = UserEntryPeer::retrieveByPK($this->getQuizUserEntryId());
-		if ($userEntry) {
-			if (($userEntry->getKuserId() === kCurrentContext::getCurrentKsKuserId()) || (kCurrentContext::$is_admin_session))
-				return parent::setKuserId($userEntry->getKuserId());
-			else
-				throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID);
+		if (kCurrentContext::$is_admin_session) {
+		    $userEntry = UserEntryPeer::retrieveByPK($this->getQuizUserEntryId());
+		    if ($userEntry) 
+		        return parent::setKuserId($userEntry->getKuserId());
 		}
 		return parent::setKuserId($v);
 	}
