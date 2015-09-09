@@ -1,7 +1,5 @@
 # Jupiter-10.20.0 #
 
-### Configuration ###
-
 ## Add comment text and other params to email notification ##
 
 - Issue Type: Customer Request
@@ -19,6 +17,8 @@
 #### Known Issues & Limitations ####
 
 None.
+
+### Configuration ###
 
 ## Changed kaltura.scheduler_status.id from int(11) to bigint(20) ##
 
