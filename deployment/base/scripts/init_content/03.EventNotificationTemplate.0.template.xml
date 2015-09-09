@@ -1072,6 +1072,72 @@
 							<code>$scope->getObject()->getDuration()</code>
 						</value>
 					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>comment_text</key>
+						<value objectType="KalturaEvalStringField">
+							<code>$scope->getObject()->getText()</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>comment_id</key>
+						<value objectType="KalturaEvalStringField">
+							<code>$scope->getObject()->getId()</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>comment_parent_id</key>
+						<value objectType="KalturaEvalStringField">
+							<code>$scope->getObject()->getParentId()</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>comment_system_name</key>
+						<value objectType="KalturaEvalStringField">
+							<code>$scope->getObject()->getSystemName()</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>comment_user_id</key>
+						<value objectType="KalturaEvalStringField">
+							<code>$scope->getObject()->getPuserId()</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>comment_created_at</key>
+						<value objectType="KalturaEvalStringField">
+							<code>$scope->getObject()->getCreatedAt()</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>comment_updated_at</key>
+						<value objectType="KalturaEvalStringField">
+							<code>$scope->getObject()->getUpdatedAt()</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>comment_partner_data</key>
+						<value objectType="KalturaEvalStringField">
+							<code>$scope->getObject()->getPartnerData()</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>comment_start_time</key>
+						<value objectType="KalturaEvalStringField">
+							<code>$scope->getObject()->getStartTime()</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>comment_end_time</key>
+						<value objectType="KalturaEvalStringField">
+							<code>$scope->getObject()->getEndTime()</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>comment_duration</key>
+						<value objectType="KalturaEvalStringField">
+							<code>$scope->getObject()->getDuration()</code>
+						</value>
+					</item>
 				</contentParameters>
 			</template>
 		</request>
