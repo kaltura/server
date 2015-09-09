@@ -122,11 +122,20 @@ class ServerNodeService extends KalturaBaseService
 	 * @param string $hostName
 	 * @return KalturaServerNode
 	 */
-	function reportStatusAction($hostName)
+	function reportStatusAction($hostName, KalturaServerNode $serverNode = null)
 	{
 		$dbServerNode = ServerNodePeer::retrieveByPartnerIdAndHostName($this->getPartnerId(), $hostName);
-		if(!$dbServerNode)
-			throw new KalturaAPIException(KalturaErrors::EDGE_SERVER_NOT_FOUND, $hostName);
+		
+		//Allow serverNodes auto registration without calling add
+		if (!$dbServerNode)
+		{
+			if($serverNode)
+			{
+				return $this->addAction($serverNode);
+			}
+			else 
+				throw new KalturaAPIException(KalturaErrors::EDGE_SERVER_NOT_FOUND, $hostName);
+		}
 	
 		$dbServerNode->setHeartbeatTime(time());
 		$dbServerNode->save();

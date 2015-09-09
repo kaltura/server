@@ -1,19 +1,6 @@
 <?php
 
-
-/**
- * Skeleton subclass for representing a row from the 'edge_server' table.
- *
- * 
- *
- * You should add additional methods to this class to meet the
- * application requirements.  This class will only be generated as
- * long as it does not already exist in the output directory.
- *
- * @package Core
- * @subpackage model
- */
-class EdgeServer extends ServerNode {
+class EdgeServerNode extends DeliveryServerNode {
 	
 	const CUSTOM_DATA_DELIVERY_IDS = 'delivery_profile_ids';
 	const CUSTOM_DATA_EDGE_PLAYBACK_CONFIGURATION = 'edge_playback_configuration';
@@ -45,16 +32,6 @@ class EdgeServer extends ServerNode {
 		return $this->getFromCustomData(self::CUSTOM_DATA_DELIVERY_IDS, null, null);
 	}
 	
-	public function getPlaybackHostName()
-	{
-		$playbackHostName = $this->playback_host_name;
-		
-		if(!$playbackHostName)
-			$playbackHostName = $this->host_name;
-		
-		return $playbackHostName;
-	}
-	
 	public function getPlaybackHost()
 	{		
 		$playbackHostName = $this->getPlaybackHostName() . "/" . self::EDGE_SERVER_DEFAULT_LIVE_CACHE_APPLICATION_NAME . "/";
@@ -69,7 +46,7 @@ class EdgeServer extends ServerNode {
 		return $playbackHostName;
 	}
 	
-	public function buildEdgePlaybackUrl($originalPlaybackUrl)
+	public function buildPlaybackUrl($originalPlaybackUrl)
 	{
 		$edgePlaybackHost = $this->getPlaybackHost();
 		

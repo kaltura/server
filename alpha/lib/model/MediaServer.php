@@ -1,19 +1,6 @@
 <?php
 
-
-/**
- * Skeleton subclass for representing a row from the 'media_server' table.
- *
- * 
- *
- * You should add additional methods to this class to meet the
- * application requirements.  This class will only be generated as
- * long as it does not already exist in the output directory.
- *
- * @package Core
- * @subpackage model
- */
-class MediaServer extends ServerNode {
+class MediaServer extends DeliveryServerNode {
 	const DEFAULT_MANIFEST_PORT = 1935;
 	const DEFAULT_WEB_SERVICES_PORT = 888;
 	const DEFAULT_APPLICATION = 'kLive';
