@@ -2,6 +2,24 @@
 
 ### Configuration ###
 
+## Add comment text and other params to email notification ##
+
+- Issue Type: Customer Request
+- Issue ID: SUP-4380
+
+#### Configuration ####
+ 
+  None.
+
+#### Deployment Scripts ####
+
+  - php /opt/kaltura/app/tests/standAloneClient/exec.php /opt/kaltura/app/deployment/updates/scripts/xml/updateCommentWasAddedToEntryEmailNotificationTemplate.xml
+
+  (Will require service url, user and password (for admin console) partner id = -2)
+#### Known Issues & Limitations ####
+
+None.
+
 ## Changed kaltura.scheduler_status.id from int(11) to bigint(20) ##
 
 - Run the following permission script:
