@@ -281,7 +281,12 @@ namespace Kaltura
             return multiResponse;
         }
         
-        private KalturaMultiResponse ParseMultiRequestResult(XmlElement childNode, bool incrementI = true) 
+        private KalturaMultiResponse ParseMultiRequestResult(XmlElement childNode) 
+        {
+            return ParseMultiRequestResult(childNode, true);
+        }
+        
+        private KalturaMultiResponse ParseMultiRequestResult(XmlElement childNode, bool incrementI)  
         {
             int i = 0;
             KalturaMultiResponse multiResponse = new KalturaMultiResponse();
