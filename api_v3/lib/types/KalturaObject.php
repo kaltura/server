@@ -388,7 +388,7 @@ abstract class KalturaObject implements IApiObject
 		if($srcObj instanceof IBaseObject)
 		{
 			KalturaResponseProfileCacher::onPersistentObjectLoaded($srcObj);
-			if($responseProfile)
+			if($responseProfile && $responseProfile->relatedProfiles)
 			{
 				// trigger validation
 				$responseProfile->validateNestedObjects();
@@ -405,9 +405,6 @@ abstract class KalturaObject implements IApiObject
 	
 	public function loadRelatedObjects(KalturaDetachedResponseProfile $responseProfile)
 	{	
-		if(!$responseProfile->relatedProfiles)
-			return;
-			
 		$this->relatedObjects = new KalturaListResponseArray();
 		foreach($responseProfile->relatedProfiles as $relatedProfile)
 		{
