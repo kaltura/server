@@ -52,6 +52,11 @@ class AnswerCuePoint extends CuePoint implements IMetadataObject
 	{
 		return false;
 	}
+	
+    public function setKuserId($v) {
+		$userEntry = UserEntryPeer::retrieveByPK($this->getQuizUserEntryId());
+		parent::setKuserId($userEntry->getKuserId());
+	}
 
 
 	/** (non-PHPdoc)
