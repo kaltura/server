@@ -44,11 +44,6 @@ class embedIframeJsAction extends sfAction
 		}
 
 		$autoEmbed = $this->getRequestParameter('autoembed');
-		if ($autoEmbed)
-		{
-			$host = "$protocol://". kConf::get('html5lib_host') ."/";
-
-		}
 
 		$iframeEmbed = $this->getRequestParameter('iframeembed');
 		$scriptName = ($iframeEmbed) ? 'mwEmbedFrame.php' : 'mwEmbedLoader.php';
@@ -93,38 +88,17 @@ class embedIframeJsAction extends sfAction
 		header("pragma:");
 		if($iframeEmbed) {
 			$url .= ((strpos($url, "?") === false) ? "?" : "&") . 'wid=' . $widget_id . '&' . $_SERVER["QUERY_STRING"];
-		} else if ($autoEmbed) {
-			header('Content-Type: application/javascript');
+		}
+		else
+		{
 			$params = "protocol=$protocol&".$_SERVER["QUERY_STRING"];
 			
 			$url .= ((strpos($url, "?") === false) ? "?" : "&") . $params;
 
 			if ($relativeUrl)
 			{
-				kFileUtils::dumpUrl($url."?".$params, true, false, array("X-Forwarded-For" =>  requestUtils::getRemoteAddress()));
-			}
-		}
-		
-		if (!$iframeEmbed)//Means we're redirecting to mwEmbedLoader
-		{
-			if ($relativeUrl)
-			{
-				$params = "protocol=$protocol&".$_SERVER["QUERY_STRING"];
-				$url .= ((strpos($url, "?") === false) ? "?" : "&") . $params;
+				header('Content-Type: application/javascript');
 				kFileUtils::dumpUrl($url, true, false, array("X-Forwarded-For" =>  requestUtils::getRemoteAddress()));
-			}
-				
-			$partner = PartnerPeer::retrieveByPK( $partner_id );
-			$hostToTest = myPartnerUtils::getHostForWhiteList();
-			if ($partner && !is_null($hostToTest) && $partner->isInCDNWhiteList($hostToTest))
-			{
-				$cdnHost = $protocol.'://'.$hostToTest;
-				if (isset($_SERVER['SERVER_PORT']))
-				{
-					$cdnHost .= ":".$_SERVER['SERVER_PORT'];
-				}
-				$params = "&od=".urlencode($cdnHost);
-				$url .= ((strpos($url, "?") === false) ? "?" : "&") . $params;
 			}
 		}
 
