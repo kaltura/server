@@ -12,7 +12,7 @@
  * @package plugins.metadata
  * @subpackage model
  */
-class Metadata extends BaseMetadata implements IIndexable, ISyncableFile
+class Metadata extends BaseMetadata implements IIndexable, ISyncableFile, IRelatedObject
 {
 	const FILE_SYNC_METADATA_DATA = 1;
 	

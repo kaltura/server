@@ -13,7 +13,7 @@
  * @package Core
  * @subpackage model
  */
-class categoryEntry extends BasecategoryEntry implements IBaseObject
+class categoryEntry extends BasecategoryEntry implements IRelatedObject
 {
 	
 	/* (non-PHPdoc)

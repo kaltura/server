@@ -2,7 +2,7 @@
 class KalturaResponseProfileCacher extends kResponseProfileCacher
 {
 	/**
-	 * @var IBaseObject
+	 * @var IRelatedObject
 	 */
 	private static $cachedObject = null;
 	
@@ -16,7 +16,7 @@ class KalturaResponseProfileCacher extends kResponseProfileCacher
 	 */
 	private static $cachePerUser = false;
 	
-	private static function getObjectSpecificCacheValue(KalturaObject $apiObject, IBaseObject $object, $responseProfileKey)
+	private static function getObjectSpecificCacheValue(KalturaObject $apiObject, IRelatedObject $object, $responseProfileKey)
 	{
 		return array(
 			'type' => 'primaryObject',
@@ -32,7 +32,7 @@ class KalturaResponseProfileCacher extends kResponseProfileCacher
 		);
 	}
 	
-	private static function getObjectSpecificCacheKey(IBaseObject $object, $responseProfileKey)
+	private static function getObjectSpecificCacheKey(IRelatedObject $object, $responseProfileKey)
 	{
 		$userRoles = kPermissionManager::getCurrentRoleIds();
 		sort($userRoles);
@@ -58,7 +58,7 @@ class KalturaResponseProfileCacher extends kResponseProfileCacher
 		}
 	}
 	
-	private static function getObjectTypeCacheValue(IBaseObject $object)
+	private static function getObjectTypeCacheValue(IRelatedObject $object)
 	{
 		return array(
 			'type' => 'relatedObject',
@@ -72,7 +72,7 @@ class KalturaResponseProfileCacher extends kResponseProfileCacher
 		);
 	}
 	
-	private static function getObjectTypeCacheKey(IBaseObject $object)
+	private static function getObjectTypeCacheKey(IRelatedObject $object)
 	{
 		$userRoles = kPermissionManager::getCurrentRoleIds();
 		sort($userRoles);
@@ -88,7 +88,7 @@ class KalturaResponseProfileCacher extends kResponseProfileCacher
 		return "relate_rp{$profileKey}_p{$partnerId}_o{$objectType}_h{$protocol}_k{$ksType}_u{$userRoles}_w{$host}";
 	}
 	
-	public static function onPersistentObjectLoaded(IBaseObject $object)
+	public static function onPersistentObjectLoaded(IRelatedObject $object)
 	{
 		if(!self::$cachedObject)
 			return;
@@ -114,7 +114,7 @@ class KalturaResponseProfileCacher extends kResponseProfileCacher
 		self::$cachePerUser = true;
 	}
 	
-	public static function start(IBaseObject $object, KalturaDetachedResponseProfile $responseProfile)
+	public static function start(IRelatedObject $object, KalturaDetachedResponseProfile $responseProfile)
 	{
 		if(self::$cachedObject)
 		{
@@ -156,7 +156,7 @@ class KalturaResponseProfileCacher extends kResponseProfileCacher
 			self::set($responseProfileCacheKey, serialize($responseProfile));
 	}
 	
-	public static function stop(IBaseObject $object, KalturaObject $apiObject)
+	public static function stop(IRelatedObject $object, KalturaObject $apiObject)
 	{
 		if($object !== self::$cachedObject)
 		{
@@ -214,7 +214,7 @@ class KalturaResponseProfileCacher extends kResponseProfileCacher
 			self::delete($cache->getId());
 			return;
 		}
-		/* @var $object IBaseObject */
+		/* @var $object IRelatedObject */
 		
 		$apiObject = unserialize($data['apiObject']);
 		$apiObject->fromObject($object, $responseProfile);
@@ -250,7 +250,7 @@ class KalturaResponseProfileCacher extends kResponseProfileCacher
 		$partnerId = kCurrentContext::getCurrentPartnerId();
 		$results = new KalturaResponseProfileCacheRecalculateResults();
 		
-		/* @var $object IBaseObject */
+		/* @var $object IRelatedObject */
 		$responseProfile = null;
 		$cacheStores = self::getStores();
 		foreach ($cacheStores as $cacheStore)
