@@ -13,7 +13,7 @@ class TrackEntryPeer extends BaseTrackEntryPeer implements IRelatedObjectPeer
 	/* (non-PHPdoc)
 	 * @see IRelatedObjectPeer::getRootObjects()
 	 */
-	public function getRootObjects(IBaseObject $object)
+	public function getRootObjects(IRelatedObjectPeer $object)
 	{
 		return array(entryPeer::retrieveByPK($object->getEntryId()));
 	}
@@ -21,7 +21,7 @@ class TrackEntryPeer extends BaseTrackEntryPeer implements IRelatedObjectPeer
 	/* (non-PHPdoc)
 	 * @see IRelatedObjectPeer::isReferenced()
 	 */
-	public function isReferenced(IBaseObject $object)
+	public function isReferenced(IRelatedObjectPeer $object)
 	{
 		return false;
 	}

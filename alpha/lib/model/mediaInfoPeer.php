@@ -63,7 +63,7 @@ class mediaInfoPeer extends BasemediaInfoPeer implements IRelatedObjectPeer
 	/* (non-PHPdoc)
 	 * @see IRelatedObjectPeer::getRootObjects()
 	 */
-	public function getRootObjects(IBaseObject $object)
+	public function getRootObjects(IRelatedObjectPeer $object)
 	{
 		/* @var $object mediaInfo */
 		$asset = $object->getasset();
@@ -85,7 +85,7 @@ class mediaInfoPeer extends BasemediaInfoPeer implements IRelatedObjectPeer
 	/* (non-PHPdoc)
 	 * @see IRelatedObjectPeer::isReferenced()
 	 */
-	public function isReferenced(IBaseObject $object)
+	public function isReferenced(IRelatedObjectPeer $object)
 	{
 		return false;
 	}

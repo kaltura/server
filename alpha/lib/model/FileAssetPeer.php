@@ -33,7 +33,7 @@ class FileAssetPeer extends BaseFileAssetPeer implements IRelatedObjectPeer
 	/* (non-PHPdoc)
 	 * @see IRelatedObjectPeer::getRootObjects()
 	 */
-	public function getRootObjects(IBaseObject $object)
+	public function getRootObjects(IRelatedObjectPeer $object)
 	{
 		/* @var $object FileAsset */
 		
@@ -48,7 +48,7 @@ class FileAssetPeer extends BaseFileAssetPeer implements IRelatedObjectPeer
 		
 		if($parentObject)
 		{
-			/* @var $parentObject IBaseObject */
+			/* @var $parentObject IRelatedObjectPeer */
 			$peer = $parentObject->getPeer();
 			if($peer instanceof IRelatedObjectPeer)
 			{
@@ -67,7 +67,7 @@ class FileAssetPeer extends BaseFileAssetPeer implements IRelatedObjectPeer
 	/* (non-PHPdoc)
 	 * @see IRelatedObjectPeer::isReferenced()
 	 */
-	public function isReferenced(IBaseObject $object)
+	public function isReferenced(IRelatedObjectPeer $object)
 	{
 		return false;
 	}
