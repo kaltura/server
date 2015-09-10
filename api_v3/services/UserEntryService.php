@@ -84,7 +84,7 @@ class UserEntryService extends KalturaBaseService {
 			$pager = new KalturaFilterPager();
 		}
 		// return empty list when userId was not given
-		if ( $this->getKs() && !$this->getKs()->isAdmin() && (!kCurrentContext::$ks_uid || kCurrentContext::$ks_uid == "") ) {
+		if ( $this->getKs() && !$this->getKs()->isAdmin() && !kCurrentContext::$ks_uid ) {
 		    return new KalturaUserEntryListResponse();
 		}
 		return $filter->getListResponse($pager, $this->getResponseProfile());
