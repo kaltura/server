@@ -46,7 +46,6 @@ class embedIframeJsAction extends sfAction
 		$autoEmbed = $this->getRequestParameter('autoembed');
 		if ($autoEmbed)
 		{
-			$port = $_SERVER['SERVER_PORT'];
 			$host = "$protocol://". kConf::get('html5lib_host') ."/";
 
 		}
@@ -64,14 +63,18 @@ class embedIframeJsAction extends sfAction
 			$relativeUrl = false;
 			$url = $ui_conf_html5_url; // absolute URL
 		}
-		else if ($ui_conf_html5_url)
-		{
-			$url =  $host . $ui_conf_html5_url;
-		}
 		else
 		{
-			$html5_version = kConf::get('html5_version');
-			$url =  "$host/html5/html5lib/{$html5_version}/" . $scriptName;
+			$host = "$protocol://". kConf::get('html5lib_host') ."/";
+			if ($ui_conf_html5_url)
+			{
+				$url =  $host . $ui_conf_html5_url;
+			}
+			else
+			{
+				$html5_version = kConf::get('html5_version');
+				$url =  "$host/html5/html5lib/{$html5_version}/" . $scriptName;
+			}
 		}
 
 		// append uiconf_id and partner id for optimizing loading of html5 library. append them only for "standard" urls by looking for the mwEmbedLoader.php/mwEmbedFrame.php suffix
@@ -104,6 +107,11 @@ class embedIframeJsAction extends sfAction
 		
 		if (!$iframeEmbed)//Means we're redirecting to mwEmbedLoader
 		{
+			if ($relativeUrl)
+			{
+				kFileUtils::dumpUrl($url."?".$params, true, false, array("X-Forwarded-For" =>  requestUtils::getRemoteAddress()));
+			}
+				
 			$partner = PartnerPeer::retrieveByPK( $partner_id );
 			$hostToTest = myPartnerUtils::getHostForWhiteList();
 			if ($partner && !is_null($hostToTest) && $partner->isInCDNWhiteList($hostToTest))
