@@ -727,7 +727,7 @@ class myReportsMgr
 				foreach ($pluginInstances as $pluginInstance)
 				{
 
-					$res = $pluginInstance->getReportResult($partner_id, $report_type, $report_flavor, $object_ids, $order_by);
+					$res = $pluginInstance->getReportResult($partner_id, $report_type, $report_flavor, $object_ids, $input_filter, $order_by);
 					if (!is_null($res))
 					{
 						return $res;

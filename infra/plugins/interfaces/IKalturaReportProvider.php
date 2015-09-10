@@ -9,11 +9,13 @@ interface IKalturaReportProvider {
     /**
      * Receives the data needed in order to generate the total report of said plugin
      *
-     * @param string $partner_id
-     * @param KalturaReportType $report_type
-     * @param string $objectIds
-     * @return array(array(<header> => <value>))
+     * @param $partner_id
+     * @param $report_type
+     * @param $report_flavor
+     * @param $objectIds
+     * @param $inputFilter
+     * @param null $orderBy
+     * @return mixed array(array(<header> => <value>))
      */
-    public function getReportResult($partner_id, $report_type, $report_flavor, $objectIds, $orderBy = null);
-
+    public function getReportResult($partner_id, $report_type, $report_flavor, $objectIds, $inputFilter, $orderBy = null);
 }

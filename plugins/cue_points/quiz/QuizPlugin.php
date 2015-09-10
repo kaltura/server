@@ -337,15 +337,18 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 		return false;
 	}
 
+
 	/**
-	 * Receives the data needed in order to generate the total report of said plugin
-	 *
-	 * @param string $partner_id
-	 * @param KalturaReportType $report_type
-	 * @param string $objectIds
+	 * @param $partner_id
+	 * @param $report_type
+	 * @param $report_flavor
+	 * @param $objectIds
+	 * @param $inputFilter
+	 * @param null $orderBy
 	 * @return array|null
-	 */
-	public function getReportResult($partner_id, $report_type, $report_flavor, $objectIds, $orderBy = null)
+	 * @throws kCoreException
+     */
+	public function getReportResult($partner_id, $report_type, $report_flavor, $objectIds, $inputFilter, $orderBy = null)
 	{
 		if (!in_array(str_replace(self::getPluginName().".", "", $report_type), QuizReportType::getAdditionalValues()))
 		{
@@ -370,7 +373,7 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 				}
 				else if ($report_type == (self::getPluginName() . "." . QuizReportType::QUIZ_USER_AGGREGATE_BY_QUESTION))
 				{
-					return $this->getUserPrecentageByUserTable($objectIds, $orderBy);
+					return $this->getUserPrecentageByUserAndEntryTable($objectIds, $inputFilter, $orderBy);
 				}
 			case myReportsMgr::REPORT_FLAVOR_COUNT:
 				if ($report_type == (self::getPluginName() . "." . QuizReportType::QUIZ))
@@ -387,7 +390,7 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 				}
 				else if ($report_type == (self::getPluginName() . "." . QuizReportType::QUIZ_USER_AGGREGATE_BY_QUESTION))
 				{
-					return $this->getAnswerCountByUserIds($objectIds);
+					return $this->getAnswerCountByUserIdsAndEntryIds($objectIds, $inputFilter);
 				}
 			default:
 				return null;
@@ -529,10 +532,30 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 		$res['count_all'] = $numOfquestions;
 		return array($res);
 	}
-	
-	protected function getAnswerCountByUserIds($objectIds)
+
+	private function getUserIdsFromFilter($inputFilter){
+		if ($inputFilter instanceof endUserReportsInputFilter &&
+			isset($inputFilter->userIds)){
+			return $inputFilter->userIds ;
+		}
+		return null;
+	}
+
+	private function isWithoutValue($text){
+		return is_null($text) || $text === "";
+	}
+
+
+
+	protected function getAnswerCountByUserIdsAndEntryIds($entryIds, $inputFilter)
 	{
-		$c = $this->createGetCuePointByUserIdsCriteria($objectIds);
+		$userIds = $this->getUserIdsFromFilter($inputFilter);
+		$c = new Criteria();
+		if (!$this->isWithoutValue($userIds)) {
+			$this->createGetCuePointByUserIdsCriteria($userIds, $c);
+		}
+		$c->add(CuePointPeer::ENTRY_ID, explode(",", $entryIds), Criteria::IN);
+		$c->add(CuePointPeer::TYPE, QuizPlugin::getCoreValue('CuePointType', QuizCuePointType::QUIZ_ANSWER));
 		$numOfAnswers = 0;
 		$answers = CuePointPeer::doSelect($c);
 		foreach ($answers as $answer)
@@ -577,12 +600,23 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 		return $this->getAggregateDataForUsers($answers, $orderBy);
 	}
 	
-	protected function getUserPrecentageByUserTable($objectIds, $orderBy)
+	protected function getUserPrecentageByUserAndEntryTable($entryIds, $inputFilter, $orderBy)
 	{
-		if (is_null($objectIds) || $objectIds === "" ) {
+		$userIds = $this->getUserIdsFromFilter($inputFilter);
+		$noEntryIds =  $this->isWithoutValue($entryIds);
+		$noUserIds = $this->isWithoutValue($userIds);
+		if ( $noEntryIds && $noUserIds){
 			return array();
-		}	    
-		$c = $this->createGetCuePointByUserIdsCriteria($objectIds);
+		}
+		$userIds = $this->getUserIdsFromFilter($inputFilter);
+		$c = new Criteria();
+		$c->add(CuePointPeer::TYPE, QuizPlugin::getCoreValue('CuePointType',QuizCuePointType::QUIZ_ANSWER));
+		if (!$noUserIds){
+			$this->createGetCuePointByUserIdsCriteria($userIds, $c);
+		}
+		if (!$noEntryIds){
+			$c->add(CuePointPeer::ENTRY_ID, explode(",", $entryIds), Criteria::IN);
+		}
 		$answers = CuePointPeer::doSelect($c);
 		return $this->getAggregateDataForUsers($answers, $orderBy);
 	}
@@ -749,11 +783,10 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 
 	/**
 	 * @param $objectIds
-	 * @return Criteria
+	 * @param $c criteria
 	 */
-	protected function createGetCuePointByUserIdsCriteria($objectIds)
+	protected function createGetCuePointByUserIdsCriteria($objectIds, &$c)
 	{
-		$c = new Criteria();
 		$c->add(CuePointPeer::TYPE, QuizPlugin::getCoreValue('CuePointType', QuizCuePointType::QUIZ_ANSWER));
 		$userIds = explode(",", $objectIds);
 		$kuserIds = array();
@@ -766,7 +799,6 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 			}
 		}
 		$c->add(CuePointPeer::KUSER_ID, $kuserIds, Criteria::IN);
-		return $c;
 	}
 	
 	//TODO: When cuePoints will be indexed in the sphinx we won't need this anymore since we'll be able to query the shpinx for this info
