@@ -13,7 +13,7 @@
  * @package plugins.cuePoint
  * @subpackage model
  */
-abstract class CuePoint extends BaseCuePoint implements IIndexable 
+abstract class CuePoint extends BaseCuePoint implements IIndexable, IRelatedObject
 {
 	const CUSTOM_DATA_FIELD_FORCE_STOP = 'forceStop';
 	const CUSTOM_DATA_FIELD_ROOT_PARENT_ID = 'rootParentId';

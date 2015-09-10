@@ -7,7 +7,7 @@
  * @package Core
  * @subpackage model
  */
-class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
+class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IRelatedObject
 {
 	protected $new_categories = '';
 	protected $new_categories_ids = '';

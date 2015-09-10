@@ -385,7 +385,7 @@ abstract class KalturaObject implements IApiObject
 		$fromObjectClass::fromObject($this, $srcObj, $responseProfile);
 		$this->doFromObject($srcObj, $responseProfile);
 		
-		if($srcObj instanceof IBaseObject)
+		if($srcObj instanceof IRelatedObject)
 		{
 			KalturaResponseProfileCacher::onPersistentObjectLoaded($srcObj);
 			if($responseProfile && $responseProfile->relatedProfiles)

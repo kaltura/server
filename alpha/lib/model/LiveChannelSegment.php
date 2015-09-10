@@ -13,7 +13,7 @@
  * @package Core
  * @subpackage model
  */
-class LiveChannelSegment extends BaseLiveChannelSegment implements IBaseObject
+class LiveChannelSegment extends BaseLiveChannelSegment implements IRelatedObject
 {
 	/**
 	 * @return LiveChannel

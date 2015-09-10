@@ -8,7 +8,7 @@
  * @package Core
  * @subpackage model
  */
-class category extends Basecategory implements IIndexable
+class category extends Basecategory implements IIndexable, IRelatedObject
 {
 	protected $childs_for_save = array();
 	

@@ -8,7 +8,7 @@
  * @package Core
  * @subpackage model
  */ 
-class kuser extends Basekuser implements IIndexable
+class kuser extends Basekuser implements IIndexable, IRelatedObject
 {
 	public function __construct()
 	{

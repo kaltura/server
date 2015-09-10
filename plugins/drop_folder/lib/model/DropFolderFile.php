@@ -13,7 +13,7 @@
  * @package plugins.dropFolder
  * @subpackage model
  */
-class DropFolderFile extends BaseDropFolderFile implements IBaseObject
+class DropFolderFile extends BaseDropFolderFile implements IRelatedObject
 {
 
 	const CUSTOM_DATA_LAST_MODIFICATION_TIME = 'last_modification_time';
