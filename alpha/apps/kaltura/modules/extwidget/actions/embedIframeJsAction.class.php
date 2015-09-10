@@ -109,7 +109,9 @@ class embedIframeJsAction extends sfAction
 		{
 			if ($relativeUrl)
 			{
-				kFileUtils::dumpUrl($url."?".$params, true, false, array("X-Forwarded-For" =>  requestUtils::getRemoteAddress()));
+				$params = "protocol=$protocol&".$_SERVER["QUERY_STRING"];
+				$url .= ((strpos($url, "?") === false) ? "?" : "&") . $params;
+				kFileUtils::dumpUrl($url, true, false, array("X-Forwarded-For" =>  requestUtils::getRemoteAddress()));
 			}
 				
 			$partner = PartnerPeer::retrieveByPK( $partner_id );
