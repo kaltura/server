@@ -339,10 +339,10 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 
 
 	/**
-	 * @param $partner_id
-	 * @param $report_type
-	 * @param $report_flavor
-	 * @param $objectIds
+	 * @param string $partner_id
+	 * @param QuizReportType $report_type
+	 * @param QuizReportType $report_flavor
+	 * @param string $objectIds
 	 * @param $inputFilter
 	 * @param null $orderBy
 	 * @return array|null
@@ -541,7 +541,7 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 		return null;
 	}
 
-	private function isWithoutValue($text){
+	private static function isWithoutValue($text){
 		return is_null($text) || $text === "";
 	}
 
@@ -551,10 +551,12 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 	{
 		$userIds = $this->getUserIdsFromFilter($inputFilter);
 		$c = new Criteria();
-		if (!$this->isWithoutValue($userIds)) {
-			$this->createGetCuePointByUserIdsCriteria($userIds, $c);
+		if (!QuizPlugin::isWithoutValue($userIds)) {
+			$c = $this->createGetCuePointByUserIdsCriteria($userIds, $c);
 		}
-		$c->add(CuePointPeer::ENTRY_ID, explode(",", $entryIds), Criteria::IN);
+		if (!QuizPlugin::sWithoutValue($entryIds)) {
+			$c->add(CuePointPeer::ENTRY_ID, explode(",", $entryIds), Criteria::IN);
+		}
 		$c->add(CuePointPeer::TYPE, QuizPlugin::getCoreValue('CuePointType', QuizCuePointType::QUIZ_ANSWER));
 		$numOfAnswers = 0;
 		$answers = CuePointPeer::doSelect($c);
@@ -603,8 +605,8 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 	protected function getUserPrecentageByUserAndEntryTable($entryIds, $inputFilter, $orderBy)
 	{
 		$userIds = $this->getUserIdsFromFilter($inputFilter);
-		$noEntryIds =  $this->isWithoutValue($entryIds);
-		$noUserIds = $this->isWithoutValue($userIds);
+		$noEntryIds =  QuizPlugin::isWithoutValue($entryIds);
+		$noUserIds = QuizPlugin::isWithoutValue($userIds);
 		if ( $noEntryIds && $noUserIds){
 			return array();
 		}
@@ -612,7 +614,7 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 		$c = new Criteria();
 		$c->add(CuePointPeer::TYPE, QuizPlugin::getCoreValue('CuePointType',QuizCuePointType::QUIZ_ANSWER));
 		if (!$noUserIds){
-			$this->createGetCuePointByUserIdsCriteria($userIds, $c);
+			$c = $this->createGetCuePointByUserIdsCriteria($userIds, $c);
 		}
 		if (!$noEntryIds){
 			$c->add(CuePointPeer::ENTRY_ID, explode(",", $entryIds), Criteria::IN);
@@ -620,7 +622,7 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 		$answers = CuePointPeer::doSelect($c);
 		return $this->getAggregateDataForUsers($answers, $orderBy);
 	}
-	
+
 	private function getSortFunction($orderBy)
 	{
 		if (!$orderBy)
@@ -784,8 +786,9 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 	/**
 	 * @param $objectIds
 	 * @param $c criteria
+	 * @return criteria
 	 */
-	protected function createGetCuePointByUserIdsCriteria($objectIds, &$c)
+	protected function createGetCuePointByUserIdsCriteria($objectIds, $c)
 	{
 		$c->add(CuePointPeer::TYPE, QuizPlugin::getCoreValue('CuePointType', QuizCuePointType::QUIZ_ANSWER));
 		$userIds = explode(",", $objectIds);
@@ -799,6 +802,7 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 			}
 		}
 		$c->add(CuePointPeer::KUSER_ID, $kuserIds, Criteria::IN);
+		return $c;
 	}
 	
 	//TODO: When cuePoints will be indexed in the sphinx we won't need this anymore since we'll be able to query the shpinx for this info
