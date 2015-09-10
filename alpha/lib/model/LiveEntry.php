@@ -7,7 +7,7 @@ abstract class LiveEntry extends entry
 {
 	const IS_LIVE = 'isLive';
 	const PRIMARY_HOSTNAME = 'primaryHostname';
-	const BACKUP_HOSTNAME = 'backupHostname';
+	const SECONDARY_HOSTNAME = 'backupHostname';
 	const FIRST_BROADCAST = 'first_broadcast';
 	const RECORDED_ENTRY_ID = 'recorded_entry_id';
 
@@ -551,7 +551,7 @@ abstract class LiveEntry extends entry
 		{
 			if($kMediaServer instanceof kLiveMediaServer)
 			{
-				$hostnames[] = $kMediaServer->getHostname();
+				$hostnames[$kMediaServer->getIndex()] = $kMediaServer->getHostname();
 			}
 		}
 		KalturaLog::debug("media servers hostnames: " . print_r($hostnames,true));
@@ -712,22 +712,18 @@ abstract class LiveEntry extends entry
 	 */
 	public function getDynamicAttributes()
 	{
-
 		$dynamicAttributes = array(
 				LiveEntry::IS_LIVE => intval($this->hasMediaServer()),
 				LiveEntry::FIRST_BROADCAST => $this->getFirstBroadcast(),
 				LiveEntry::RECORDED_ENTRY_ID => $this->getRecordedEntryId(),
 
 		);
-
 		$mediaServers = $this->getMediaServersHostnames();
-		$hostnamesCount = count($mediaServers);
-		if ($hostnamesCount > 0) {
-			$dynamicAttributes[LiveEntry::PRIMARY_HOSTNAME] = $mediaServers[0];
+		if (isset($mediaServers[MediaServerIndex::PRIMARY])) {
+			$dynamicAttributes[LiveEntry::PRIMARY_HOSTNAME] = $mediaServers[MediaServerIndex::PRIMARY];
 		}
-		if ($hostnamesCount > 1) {
-			$dynamicAttributes[LiveEntry::BACKUP_HOSTNAME] = $mediaServers[1];
-
+		if (isset($mediaServers[MediaServerIndex::SECONDARY])) {
+			$dynamicAttributes[LiveEntry::SECONDARY_HOSTNAME] = $mediaServers[MediaServerIndex::SECONDARY];
 		}
 		return array_merge( $dynamicAttributes, parent::getDynamicAttributes() );
 	}

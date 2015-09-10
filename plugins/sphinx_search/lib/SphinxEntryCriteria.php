@@ -175,7 +175,7 @@ class SphinxEntryCriteria extends SphinxCriteria
 		{
 			//sphinx query: select in(dynamic_attributes.xyz, 'some_val') or in(dynamic_attributes.xyz, 'some_val') as cnd1 from ... where cnd1 > 0 ...
 			$mediaServerHostname = $filter->get('_has_media_server_hostname');
-			$cond = "in(" . entryIndex::DYNAMIC_ATTRIBUTES . "." . LiveEntry::PRIMARY_HOSTNAME .", '" . $mediaServerHostname . "') or in(" . entryIndex::DYNAMIC_ATTRIBUTES . "." . LiveEntry::BACKUP_HOSTNAME .", '" . $mediaServerHostname . "')";
+			$cond = "in(" . entryIndex::DYNAMIC_ATTRIBUTES . "." . LiveEntry::PRIMARY_HOSTNAME .", '" . $mediaServerHostname . "') or in(" . entryIndex::DYNAMIC_ATTRIBUTES . "." . LiveEntry::SECONDARY_HOSTNAME .", '" . $mediaServerHostname . "')";
 			$this->addCondition($cond);
 			$filter->unsetByName('_has_media_server_hostname');
 		}
