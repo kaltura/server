@@ -24,16 +24,16 @@ class UserEntryPeer extends BaseUserEntryPeer {
 	 */
 	public static function setDefaultCriteriaFilter()
 	{
+	    if(self::$s_criteria_filter == null)
+	        self::$s_criteria_filter = new criteriaFilter();
+	    
 	    // when session is not admin, allow access to user's userEntries only
 	    if (kCurrentContext::$ks && !kCurrentContext::$is_admin_session) {
-    	    if(self::$s_criteria_filter == null)
-    	        self::$s_criteria_filter = new criteriaFilter();
-    	    
     	    $c = KalturaCriteria::create(UserEntryPeer::OM_CLASS);
     	    $c->addAnd(UserEntryPeer::KUSER_ID, kCurrentContext::getCurrentKsKuserId());
-    	    
-    	    self::$s_criteria_filter->setFilter($c);
 	    }
+	    
+	    self::$s_criteria_filter->setFilter($c);
 	}
 	
 	public static function getOMClass($row, $colnum)
