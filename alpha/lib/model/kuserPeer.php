@@ -628,7 +628,7 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 	/* (non-PHPdoc)
 	 * @see IRelatedObjectPeer::getRootObjects()
 	 */
-	public function getRootObjects(IBaseObject $object)
+	public function getRootObjects(IRelatedObjectPeer $object)
 	{
 		return array();
 	}
@@ -636,7 +636,7 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 	/* (non-PHPdoc)
 	 * @see IRelatedObjectPeer::isReferenced()
 	 */
-	public function isReferenced(IBaseObject $object)
+	public function isReferenced(IRelatedObjectPeer $object)
 	{
 		return true;
 	}
