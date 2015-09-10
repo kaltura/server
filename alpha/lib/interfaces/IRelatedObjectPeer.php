@@ -7,11 +7,11 @@ interface IRelatedObjectPeer
 	 * @param IBaseObject $object
 	 * @return array<IRelatedObjectPeer>
 	 */
-	public function getRootObjects(IRelatedObjectPeer $object);
+	public function getRootObjects(IRelatedObject $object);
 	
 	/**
 	 * Indicates that the parent object is pointing to the child and the current object is not pointing to its parent
 	 * @return boolean
 	 */
-	public function isReferenced(IRelatedObjectPeer $object);
+	public function isReferenced(IRelatedObject $object);
 }

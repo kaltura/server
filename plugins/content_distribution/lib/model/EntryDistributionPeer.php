@@ -124,7 +124,7 @@ class EntryDistributionPeer extends BaseEntryDistributionPeer implements IRelate
 	/* (non-PHPdoc)
 	 * @see IRelatedObjectPeer::getRootObjects()
 	 */
-	public function getRootObjects(IRelatedObjectPeer $object)
+	public function getRootObjects(IRelatedObject $object)
 	{
 		/* @var $object EntryDistribution */
 		$roots = array();
@@ -143,7 +143,7 @@ class EntryDistributionPeer extends BaseEntryDistributionPeer implements IRelate
 	/* (non-PHPdoc)
 	 * @see IRelatedObjectPeer::isReferenced()
 	 */
-	public function isReferenced(IRelatedObjectPeer $object)
+	public function isReferenced(IRelatedObject $object)
 	{
 		return false;
 	}
