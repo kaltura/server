@@ -924,7 +924,7 @@ function openPlayer ( entry_id , pl_width_str , pl_height_str , ui_conf_id  , jw
 		{
 			if ( ! ui_conf_id )
 			{
-				ui_conf_id = '<? echo $player_uiconf_list[0]->getId(); ?>';
+				ui_conf_id = '<?php echo $player_uiconf_list[0] ? $player_uiconf_list[0]->getId() : ''; ?>';
 			}
 
 			if ( pl_width_str )
@@ -933,7 +933,7 @@ function openPlayer ( entry_id , pl_width_str , pl_height_str , ui_conf_id  , jw
 			}
 			else
 			{
-				width_str = '<? echo $player_uiconf_list[0]->getWidth(); ?>';
+				width_str = '<?php echo $player_uiconf_list[0] ? $player_uiconf_list[0]->getWidth(): ''; ?>';
 			}
 
 			if ( pl_height_str )
@@ -942,7 +942,7 @@ function openPlayer ( entry_id , pl_width_str , pl_height_str , ui_conf_id  , jw
 			}
 			else
 			{
-				height_str = '<? echo $player_uiconf_list[0]->getHeight(); ?>';
+				height_str = '<?php echo $player_uiconf_list[0] ? $player_uiconf_list[0]->getHeight() : ''; ?>';
 			}
 		}
 <?	} ?>
