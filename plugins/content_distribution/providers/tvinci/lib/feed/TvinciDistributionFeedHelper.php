@@ -77,6 +77,14 @@ class TvinciDistributionFeedHelper
 			$arguments["dashPpvModule"] = $this->distributionProfile->dashPpvModule;
 		if($this->distributionProfile->dashFileName)
 			$arguments["dashTypeName"] = $this->distributionProfile->dashFileName;
+		if($this->distributionProfile->widevinePpvModule)
+			$arguments["widevinePpvModule"] = $this->distributionProfile->widevinePpvModule;
+		if($this->distributionProfile->widevineFileName)
+			$arguments["widevineTypeName"] = $this->distributionProfile->widevineFileName;
+		if($this->distributionProfile->widevineMbrPpvModule)
+			$arguments["widevineMbrPpvModule"] = $this->distributionProfile->widevineMbrPpvModule;
+		if($this->distributionProfile->widevineMbrFileName)
+			$arguments["widevineMbrFileName"] = $this->distributionProfile->widevineMbrFileName;
 		return $arguments;
 	}
 
