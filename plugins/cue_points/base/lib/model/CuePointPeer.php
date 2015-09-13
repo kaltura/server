@@ -124,7 +124,7 @@ class CuePointPeer extends BaseCuePointPeer implements IMetadataPeer, IRelatedOb
 			foreach ($selectResults as $key => $cuePoint)
 			{
 				/* @var $cuePoint CuePoint */
-				if(kCurrentContext::$ks_uid && $cuePoint->getPuserId() !== kCurrentContext::$ks_uid && !$cuePoint->getIsPublic())
+				if(kCurrentContext::$ks_uid && strtolower($cuePoint->getPuserId()) !== strtolower(kCurrentContext::$ks_uid) && !$cuePoint->getIsPublic())
 				{
 					unset($selectResults[$key]);
 					$removedRecordsCount++;
