@@ -69,6 +69,24 @@ class KalturaTvinciDistributionProfile extends KalturaConfigurableDistributionPr
 	 * @var string
 	 */
 	public $dashPpvModule;
+	/**
+	 * @var string
+	 */
+	public $widevineFileName;
+
+	/**
+	 * @var string
+	 */
+	public $widevinePpvModule;
+	/**
+	 * @var string
+	 */
+	public $widevineMbrFileName;
+
+	/**
+	 * @var string
+	 */
+	public $widevineMbrPpvModule;
 
 	/**
 	 * @var string
@@ -95,6 +113,10 @@ class KalturaTvinciDistributionProfile extends KalturaConfigurableDistributionPr
 		'mbrPpvModule',
 		'dashFileName',
 		'dashPpvModule',
+		'widevineFileName',
+		'widevinePpvModule',
+		'widevineMbrFileName',
+ 		'widevineMbrPpvModule',
 		'xsltFile',
 	 );
 		 
