@@ -18,6 +18,7 @@
 	</session>
 	<multirequest>
 		<request service="conversionProfile" action="getDefault">
+			<partnerId>-4</partnerId>
 		</request>
 		<request service="dropFolder" action="add" plugin="dropFolder">
 			<dropFolder objectType="KalturaDropFolder">
