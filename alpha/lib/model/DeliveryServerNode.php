@@ -2,8 +2,7 @@
 
 abstract class DeliveryServerNode extends ServerNode {
 	
-	abstract public function buildPlaybackUrl($originalPlaybackUrl);
-	
+	abstract public function getManifestUr($protocol = 'http');
 	abstract public function getPlaybackHost();
 	
 	public function getPlaybackHostName()

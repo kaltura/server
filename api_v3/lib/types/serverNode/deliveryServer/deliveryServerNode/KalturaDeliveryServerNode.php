@@ -6,16 +6,16 @@
 abstract class KalturaDeliveryServerNode extends KalturaServerNode
 {	
 	/**
-	 * remoteServer host name
+	 * Delivery server playback Domain
 	 *
 	 * @var string
 	 * @filter like,mlikeor,mlikeand
 	 */
-	public $playbackHostName;
+	public $playbackDomain;
 		
 	private static $map_between_objects = array 
 	(
-		"playbackHostName",
+		"playbackDomain" => "playbackHostName",
 	);
 	
 	/* (non-PHPdoc)

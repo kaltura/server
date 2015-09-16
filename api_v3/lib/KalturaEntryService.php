@@ -324,7 +324,7 @@ class KalturaEntryService extends KalturaBaseService
 			if(!$mediaServer)
 				throw new KalturaAPIException(KalturaErrors::NO_MEDIA_SERVER_FOUND, $dbLiveEntry->getId());
 				
-			$mediaServerLiveService = $mediaServer->getWebService(MediaServer::WEB_SERVICE_LIVE);
+			$mediaServerLiveService = $mediaServer->getWebService($mediaServer->getLiveWebServiceIdentifier());
 			if($mediaServerLiveService && $mediaServerLiveService instanceof KalturaMediaServerLiveService)
 			{
 				$mediaServerLiveService->splitRecordingNow($dbLiveEntry->getId());
@@ -333,7 +333,7 @@ class KalturaEntryService extends KalturaBaseService
 			}
 			else 
 			{
-				throw new KalturaAPIException(KalturaErrors::MEDIA_SERVER_SERVICE_NOT_FOUND, $mediaServer->getId(), MediaServer::WEB_SERVICE_LIVE);
+				throw new KalturaAPIException(KalturaErrors::MEDIA_SERVER_SERVICE_NOT_FOUND, $mediaServer->getId(), $mediaServer->getLiveWebServiceIdentifier());
 			}
 			return $dbAsset;
 		}

@@ -17,13 +17,12 @@ class ServerNodePeer extends BaseServerNodePeer {
 
 
 	const EDGE_SERVER_OM_CLASS = 'EdgeServerNode';
-	const MEDIA_SERVER_OM_CLASS = 'MediaServer';
 	
 	// cache classes by their type
 	protected static $class_types_cache = array(
 			serverNodeType::EDGE => self::EDGE_SERVER_OM_CLASS,
-			serverNodeType::MEDIA_SERVER => self::MEDIA_SERVER_OM_CLASS,
 	);
+	
 	public static function setDefaultCriteriaFilter ()
 	{
 		if ( self::$s_criteria_filter == null )
@@ -33,6 +32,15 @@ class ServerNodePeer extends BaseServerNodePeer {
 		$c->addAnd ( ServerNodePeer::STATUS, ServerNodeStatus::DELETED, Criteria::NOT_EQUAL);
 	
 		self::$s_criteria_filter->setFilter($c);
+	}
+	
+	public static function retrieveByHostName($hostName)
+	{
+		$c = new Criteria();
+	
+		$c->add(ServerNodePeer::HOST_NAME, $hostName);
+	
+		return ServerNodePeer::doSelectOne($c);
 	}
 	
 	public static function retrieveByPartnerIdAndHostName($partnerId, $hostName)

@@ -3,26 +3,26 @@
  * @package api
  * @subpackage objects
  */
-class KalturaMediaServerNode extends KalturaDeliveryServerNode
-{	
+abstract class KalturaMediaServerNode extends KalturaDeliveryServerNode
+{
 	/**
-	 * Media server app prefix
+	 * Media server application name
 	 *
 	 * @var string
 	 */
-	public $appPrefix;
-	
+	public $applicationName;
+			
 	/**
-	 * Media server app prefix
+	 * Media server port per protcol configuration
 	 *
 	 * @var KalturaKeyValueArray
 	 */
-	public $protocolPort;
+	public $protocolPortConfig;
 	
 	private static $mapBetweenObjects = array
 	(
-		'appPrefix',
-		'protocolPort',
+		'applicationName',
+		'protocolPortConfig',
 	);
 	
 	/* (non-PHPdoc)
@@ -34,32 +34,18 @@ class KalturaMediaServerNode extends KalturaDeliveryServerNode
 	}
 	
 	/* (non-PHPdoc)
-	 * @see KalturaObject::toInsertableObject()
-	 */
-	public function toInsertableObject($object_to_fill = null, $props_to_skip = array())
-	{
-		if(is_null($object_to_fill))
-			$object_to_fill = new MediaServer();
-			
-		return parent::toInsertableObject($object_to_fill, $props_to_skip);
-	}
-	
-	/* (non-PHPdoc)
 	 * @see KalturaObject::toObject()
 	 */
 	public function toObject($dbObject = null, $skip = array())
 	{
-		if(!$dbObject)
-			$dbObject = new MediaServer();
-	
 		$dbObject = parent::toObject($dbObject, $skip);
 	
-		if (!is_null($this->protocolPort))
+		if (!is_null($this->protocolPortConfig))
 		{
-			$protocolPort = array();
-			foreach($this->protocolPort as $keyValue)
-				$protocolPort[$keyValue->key] = $keyValue->value;
-			$dbObject->setProtocolPort($protocolPort);
+			$protocolPortConfig = array();
+			foreach($this->protocolPortConfig as $keyValue)
+				$protocolPortConfig[$keyValue->key] = $keyValue->value;
+			$dbObject->setProtocolPortConfig($protocolPortConfig);
 		}
 	
 		return $dbObject;
@@ -70,10 +56,10 @@ class KalturaMediaServerNode extends KalturaDeliveryServerNode
 	 */
 	public function doFromObject($source_object, KalturaDetachedResponseProfile $responseProfile = null)
 	{
-		/* @var $source_object MediaServer */
+		/* @var $source_object MediaServerNode */
 		parent::doFromObject($source_object, $responseProfile);
 	
-		if($this->shouldGet('protocolPort', $responseProfile) && !is_null($source_object->getProtocolPort()))
-			$this->protocolPort = KalturaKeyValueArray::fromKeyValueArray($source_object->getProtocolPort());
+		if($this->shouldGet('protocolPortConfig', $responseProfile) && !is_null($source_object->getProtocolPortConfig()))
+			$this->protocolPortConfig = KalturaKeyValueArray::fromKeyValueArray($source_object->getProtocolPortConfig());
 	}
 }

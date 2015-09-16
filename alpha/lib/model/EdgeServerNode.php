@@ -20,6 +20,27 @@ class EdgeServerNode extends DeliveryServerNode {
 		$this->setType(serverNodeType::EDGE);
 	}
 	
+	public function getManifestUr($protocol = 'http')
+	{
+		$edgePlaybackHost = $this->getPlaybackHost();
+		
+		return $protocol . '://' . rtrim($edgePlaybackHost, '/') . '/';
+	}
+	
+	public function getPlaybackHost()
+	{
+		$playbackHostName = $this->getPlaybackHostName() . "/" . self::EDGE_SERVER_DEFAULT_LIVE_CACHE_APPLICATION_NAME . "/";
+	
+		if($this->parent_id)
+		{
+			$parentEdge = ServerNodePeer::retrieveByPK($this->parent_id);
+			if($parentEdge)
+				$playbackHostName = $playbackHostName . $parentEdge->getPlaybackHost();
+		}
+	
+		return $playbackHostName;
+	}
+	
 	/* Delivery Settings */
 	
 	public function setDeliveryProfileIds($params)
@@ -32,27 +53,13 @@ class EdgeServerNode extends DeliveryServerNode {
 		return $this->getFromCustomData(self::CUSTOM_DATA_DELIVERY_IDS, null, null);
 	}
 	
-	public function getPlaybackHost()
-	{		
-		$playbackHostName = $this->getPlaybackHostName() . "/" . self::EDGE_SERVER_DEFAULT_LIVE_CACHE_APPLICATION_NAME . "/";
-		
-		if($this->parent_id)
-		{
-			$parentEdge = ServerNodePeer::retrieveByPK($this->parent_id);
-			if($parentEdge)
-				$playbackHostName = $playbackHostName . $parentEdge->getPlaybackHost();
-		}
-		
-		return $playbackHostName;
-	}
-	
 	public function buildPlaybackUrl($originalPlaybackUrl)
 	{
-		$edgePlaybackHost = $this->getPlaybackHost();
-		
 		$urlParts = explode("://", $originalPlaybackUrl);
 		
-		return $urlParts[0] . "://" . $edgePlaybackHost . "/" . $urlParts[1];
+		$edgeUrl = $this->getManifestUr($urlParts[0]);
+		
+		return $edgeUrl . $urlParts[1];
 	}
 
 } // EdgeServer
