@@ -43,4 +43,10 @@ abstract class KalturaSearchComparableAttributeCondition extends KalturaAttribut
 		$objectToFill->setField($field);
 		return $objectToFill;
 	}
+
+	protected function doFromObject($srcObj, KalturaDetachedResponseProfile $responseProfile = null)
+	{
+		if ($srcObj instanceof AdvancedSearchFilterComparableAttributeCondition)
+			$this->attribute = $srcObj->getField();
+	}
 }

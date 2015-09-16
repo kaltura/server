@@ -43,4 +43,10 @@ abstract class KalturaSearchMatchAttributeCondition extends KalturaAttributeCond
 		$objectToFill->setField($field);
 		return $objectToFill;
 	}
+
+	protected function doFromObject($srcObj, KalturaDetachedResponseProfile $responseProfile = null)
+	{
+		if ($srcObj instanceof AdvancedSearchFilterMatchAttributeCondition)
+			$this->attribute = $srcObj->getField();
+	}
 }
