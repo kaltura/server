@@ -46,7 +46,8 @@ abstract class KalturaSearchComparableAttributeCondition extends KalturaAttribut
 
 	protected function doFromObject($srcObj, KalturaDetachedResponseProfile $responseProfile = null)
 	{
-		if ($srcObj instanceof AdvancedSearchFilterComparableAttributeCondition)
+		/** @var $srcObj AdvancedSearchFilterComparableAttributeCondition) */
+		if ($this->shouldGet('attribute', $responseProfile))
 			$this->attribute = $srcObj->getField();
 	}
 }
