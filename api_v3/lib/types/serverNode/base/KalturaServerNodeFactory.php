@@ -17,10 +17,6 @@ class KalturaServerNodeFactory
 				$obj = new KalturaEdgeServerNode();
 				break;
 				
-			case KalturaServerNodeType::MEDIA_SERVER:
-				$obj = new KalturaMediaServerNode();
-				break;
-				
 			default:
 				$obj = KalturaPluginManager::loadObject('KalturaServerNode', $type);
 				

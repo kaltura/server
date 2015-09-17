@@ -3,7 +3,9 @@
 abstract class MediaServerNode extends DeliveryServerNode {	
 	
 	const CUSTOM_DATA_PROTOCOL_PORT_CONFIG_ARRAY = 'protocol_port_config';
+	const CUSTOM_DATA_APPLICATION_NAME = 'application_name';
 	const CUSTOM_DATA_IS_EXTERNAL = 'is_external';
+	const DEFAULT_APPLICATION = 'kLive';
 	
 	abstract public function getWebService($serviceName);
 	abstract public function getLiveWebServiceName();
@@ -21,9 +23,9 @@ abstract class MediaServerNode extends DeliveryServerNode {
 		return parent::preInsert($con);
 	}
 	
-	public function setIsExternalMediaServer($isInternal)
+	public function setIsExternalMediaServer($isExternal)
 	{
-		$this->putInCustomData(self::CUSTOM_DATA_IS_EXTERNAL, $isInternal);
+		$this->putInCustomData(self::CUSTOM_DATA_IS_EXTERNAL, $isExternal);
 	}
 	
 	public function getIsExternalMediaServer()

@@ -20,7 +20,7 @@ class EdgeServerNode extends DeliveryServerNode {
 		$this->setType(serverNodeType::EDGE);
 	}
 	
-	public function getManifestUr($protocol = 'http')
+	public function getManifestUrl($protocol = 'http')
 	{
 		$edgePlaybackHost = $this->getPlaybackHost();
 		
@@ -57,7 +57,7 @@ class EdgeServerNode extends DeliveryServerNode {
 	{
 		$urlParts = explode("://", $originalPlaybackUrl);
 		
-		$edgeUrl = $this->getManifestUr($urlParts[0]);
+		$edgeUrl = $this->getManifestUrl($urlParts[0]);
 		
 		return $edgeUrl . $urlParts[1];
 	}

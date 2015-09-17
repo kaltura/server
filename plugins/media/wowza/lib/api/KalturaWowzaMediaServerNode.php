@@ -1,6 +1,6 @@
 <?php
 /**
- * @package plugins.codeCuePoint
+ * @package plugins.Wowza
  * @subpackage api.objects
  */
 class KalturaWowzaMediaServerNode extends KalturaMediaServerNode
@@ -51,7 +51,7 @@ class KalturaWowzaMediaServerNode extends KalturaMediaServerNode
 	(
 		'appPrefix',
 		'transcoder',
-		'gpuid',
+		'GPUID',
 		'liveServicePort',
 		'liveServiceProtocol',
 		'liveServiceInternalDomain',

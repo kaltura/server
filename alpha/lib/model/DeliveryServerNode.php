@@ -2,7 +2,7 @@
 
 abstract class DeliveryServerNode extends ServerNode {
 	
-	abstract public function getManifestUr($protocol = 'http');
+	abstract public function getManifestUrl($protocol = 'http');
 	abstract public function getPlaybackHost();
 	
 	public function getPlaybackHostName()

@@ -4,14 +4,12 @@ class WowzaMediaServerNode extends MediaServerNode {
 	const DEFAULT_MANIFEST_PORT = 1935;
 	const DEFAULT_WEB_SERVICES_PORT = 888;
 	const DEFAULT_WEB_SERVICES_PROTOCOL = 'http';
-	const DEFAULT_APPLICATION = 'kLive';
 	const DEFAULT_TRANSCODER = 'default';
 	const DEFAULT_GPUID = -1;
 	
 	const CUSTOM_DATA_APP_PREFIX = 'app_prefix';
-	const CUSTOM_DATA_TRANSCIDER_CONFIG = 'transcoder';
+	const CUSTOM_DATA_TRANSCODER_CONFIG = 'transcoder';
 	const CUSTOM_DATA_GPUID = 'gpuid';
-	const CUSTOM_DATA_APPLICATION_NAME = 'application_name';
 	const CUSTOM_DATA_LIVE_SERVICE_PORT = 'live_service_port';
 	const CUSTOM_DATA_LIVE_SERVICE_PROTOCOL = 'live_service_protocol';
 	const CUSTOM_DATA_LIVE_SERVICE_INTERNAL_DOMAIN = 'live_service_internal_domain';
@@ -33,12 +31,20 @@ class WowzaMediaServerNode extends MediaServerNode {
 	{
 		parent::applyDefaultValues();
 		
-		$this->setType(serverNodeType::MEDIA_SERVER);
+		$this->setType(WowzaPlugin::getWowzaMediaServerTypeCoreValue(WowzaMediaServerNodeType::WOWZA_MEDIA_SERVER));
 	}
 	
 	public function getManifestUrl($protocol = 'http')
 	{		
 		$playbackHost = $this->getPlaybackHost();
+		
+		$protocolPortConfiguration = $this->getProtocolPortConfig();
+		if(count($protocolPortConfiguration) && isset($protocolPortConfiguration[$protocol]) && $protocolPortConfiguration[$protocol] !== WowzaMediaServerNode::DEFAULT_MANIFEST_PORT)
+			$playbackHost = str_replace(":" . WowzaMediaServerNode::DEFAULT_MANIFEST_PORT, ":$protocolPortConfiguration[$protocol]", $playbackHost);
+		
+		$hostname = $this->getHostname();
+		if(!$this->getIsExternalMediaServer())
+			$hostname = preg_replace('/\..*$/', '', $hostname);
 		
 		$url = "$protocol://$playbackHost";
 		$url = str_replace("{hostName}", $hostname, $url);
@@ -54,16 +60,8 @@ class WowzaMediaServerNode extends MediaServerNode {
 	public function getPlaybackHost()
 	{
 		$domain = $this->getPlaybackHostName();
-		$hostname = $this->getHostname();
 		$appPrefix = $this->getAppPrefix();
 		$port = WowzaMediaServerNode::DEFAULT_MANIFEST_PORT;
-		
-		$protocolPortConfiguration = $this->getProtocolPort();
-		if(count($protocolPortConfiguration) && isset($protocolPortConfiguration[$protocol]))
-			$port = $protocolPortConfiguration[$protocol];
-		
-		if(!$this->getIsExternalMediaServer())
-			$hostname = preg_replace('/\..*$/', '', $hostname);
 		
 		return "$domain:$port/$appPrefix";
 	}
@@ -80,8 +78,8 @@ class WowzaMediaServerNode extends MediaServerNode {
 		$serviceClass = self::$webServices[$service];
 		
 		$domain = $this->getLiveServiceInternalDomain() ? $this->getLiveServiceInternalDomain() : $this->getHostname();
-		$port = $this->getLiveServiceProtocol() ? $this->getLiveServiceProtocol() : WowzaMediaServerNode::DEFAULT_WEB_SERVICES_PORT;
-		$protocol = $this->getLiveServiceProtocol() ? $this->getLiveServiceProtocol() : WowzaMediaServerNode::DEFAULT_WEB_SERVICES_PROTOCOL;
+		$port = $this->getLiveServicePort();
+		$protocol = $this->getLiveServiceProtocol();
 		
 		$url = "$protocol://$domain:$port/$service?wsdl";
 		KalturaLog::debug("Service URL: $url");
@@ -100,12 +98,12 @@ class WowzaMediaServerNode extends MediaServerNode {
 	
 	public function setTranscoder($transcoder)
 	{
-		$this->putInCustomData(self::CUSTOM_DATA_TRANSCIDER_CONFIG, $transcoder);
+		$this->putInCustomData(self::CUSTOM_DATA_TRANSCODER_CONFIG, $transcoder);
 	}
 	
 	public function getTranscoder()
 	{
-		return $this->getFromCustomData(self::CUSTOM_DATA_TRANSCIDER_CONFIG, null, WowzaMediaServerNode::DEFAULT_TRANSCODER);
+		return $this->getFromCustomData(self::CUSTOM_DATA_TRANSCODER_CONFIG, null, WowzaMediaServerNode::DEFAULT_TRANSCODER);
 	}
 	
 	public function setGPUID($gpuid)
@@ -125,7 +123,7 @@ class WowzaMediaServerNode extends MediaServerNode {
 	
 	public function getLiveServicePort()
 	{
-		return $this->getFromCustomData(self::CUSTOM_DATA_LIVE_SERVICE_PORT, null, null);
+		return $this->getFromCustomData(self::CUSTOM_DATA_LIVE_SERVICE_PORT, null, WowzaMediaServerNode::DEFAULT_WEB_SERVICES_PORT);
 	}
 	
 	public function setLiveServiceProtocol($liveServiceProtocol)
@@ -135,7 +133,7 @@ class WowzaMediaServerNode extends MediaServerNode {
 	
 	public function getLiveServiceProtocol()
 	{
-		return $this->getFromCustomData(self::CUSTOM_DATA_LIVE_SERVICE_PROTOCOL, null, null);
+		return $this->getFromCustomData(self::CUSTOM_DATA_LIVE_SERVICE_PROTOCOL, null, WowzaMediaServerNode::DEFAULT_WEB_SERVICES_PROTOCOL);
 	}
 	
 	public function setLiveServiceInternalDomain($liveServiceInternalDomain)
