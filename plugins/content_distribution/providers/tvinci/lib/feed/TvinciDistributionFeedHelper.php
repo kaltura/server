@@ -104,7 +104,10 @@ class TvinciDistributionFeedHelper
 		} else {
 			$xslt = file_get_contents(__DIR__."/../xml/tvinci_default.xslt");
 		}
-		$feedAsString = kXml::transformXmlUsingXslt($feedAsXml->saveXML(), $xslt, $this->createArgumentsForXSLT());
+		$arguments = $this->createArgumentsForXSLT();
+		$feedAsString = kXml::transformXmlUsingXslt($feedAsXml->saveXML(), $xslt, $arguments);
+		$argumentsAsString = print_r($arguments, true);
+		KalturaLog::debug("Transformed XML : source [".$feedAsXml->saveXML()."] \nxslt [".$xslt."] \narguments [".$argumentsAsString."] \nresult [".$feedAsString."]");
 
 		$data = $this->_doc->createElement('data');
 		$data->appendChild($this->_doc->createCDATASection($feedAsString));
