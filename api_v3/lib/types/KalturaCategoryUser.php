@@ -158,6 +158,8 @@ class KalturaCategoryUser extends KalturaObject implements IRelatedFilterable
 		if ($category->getInheritanceType () == InheritanceType::INHERIT)
 			throw new KalturaAPIException ( KalturaErrors::CATEGORY_INHERIT_MEMBERS, $this->categoryId );
 		
+		$this->validatePropertyMinLength('userId',1);
+		
 		$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
 		
 		$kuser = kuserPeer::getKuserByPartnerAndUid ($partnerId , $this->userId );
