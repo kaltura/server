@@ -53,6 +53,13 @@ class kCloudFrontUrlTokenizer extends kUrlTokenizer
 			$acl = substr($acl, 0, $commaPos);
 		}
 	
+		// if the base url has a port, remove it
+		$parsedUrl = parse_url($baseUrl);
+		if (isset($parsedUrl['port']))
+		{
+			$baseUrl = $parsedUrl['scheme'] . '://' . $parsedUrl['host'] . $parsedUrl['path'];
+		}
+		
 		$acl = $baseUrl . $acl . '*';
 	
 		return $acl;
