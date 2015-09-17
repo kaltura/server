@@ -13,8 +13,6 @@
     <xsl:variable name="IPHONE_TAG" select="'iphonenew'"/>
     <xsl:variable name="MBR_TAG" select="'mbr'"/>
     <xsl:variable name="DASH_TAG" select="'dash'"/>
-    <xsl:variable name="WIDEVINE_TAG" select="'widevine'"/>
-    <xsl:variable name="WIDEVINE_MBR_TAG" select="'widevine_mbr'"/>
     <!-- constants -->
     <xsl:variable name="CONST_LANG" select="'eng'"/>
     <xsl:variable name="CONST_RATIO" select="'3:4'"/>
@@ -33,8 +31,6 @@
     <xsl:variable name="CONST_IPADNEW_MANIFEST_SUFFIX" select="'/format/applehttp/tags/ipadnew/protocol/http/f/a.m3u8'"/>
     <xsl:variable name="CONST_MBR_MANIFEST_SUFFIX" select="'/format/hdnetworkmanifest/tags/mbr/protocol/http/f/a.a4m'"/>
     <xsl:variable name="CONST_DASH_MANIFEST_SUFFIX" select="'/format/mpegdash/tags/dash/protocol/http/f/a.mpd'"/>
-    <xsl:variable name="CONST_WIDEVINE_MANIFEST_SUFFIX" select="'/format/http/tags/widevine/protocol/http/f/a.wvm'"/>
-    <xsl:variable name="CONST_WIDEVINE_MBR_MANIFEST_SUFFIX" select="'/format/http/tags/widevine_mbr/protocol/http/f/a.wvm'"/>
     <!-- media element -->
     <xsl:variable name="refernceID" select="item/referenceID"/>
     <xsl:variable name="entryID" select="item/entryId"/>
@@ -63,12 +59,6 @@
         <xsl:element name="tag">
             <xsl:value-of select="$DASH_TAG"/>
         </xsl:element>
-        <xsl:element name="tag">
-            <xsl:value-of select="$WIDEVINE_TAG"/>
-        </xsl:element>
-        <xsl:element name="tag">
-            <xsl:value-of select="$WIDEVINE_MBR_TAG"/>
-        </xsl:element>
     </xsl:variable>
 
 
@@ -91,12 +81,6 @@
     <!--dash-->
     <xsl:param name="dashPpvModule" select="''"/>
     <xsl:param name="dashTypeName" select="'dash Main'"/>
-    <!--widevine-->
-    <xsl:param name="widevinePpvModule" select="''"/>
-    <xsl:param name="widevineTypeName" select="'widevine Main'"/>
-    <!--widevine mbr-->
-    <xsl:param name="widevineMbrPpvModule" select="''"/>
-    <xsl:param name="widevineMbrTypeName" select="'widevine_mbr Main'"/>
 
     <!--main logic -->
     <xsl:template match="/">
@@ -599,12 +583,6 @@
             <xsl:when test="$tag = $DASH_TAG">
                 <xsl:value-of select="$CONST_DASH_MANIFEST_SUFFIX"/>
             </xsl:when>
-            <xsl:when test="$tag = $WIDEVINE_TAG">
-                <xsl:value-of select="$CONST_WIDEVINE_MANIFEST_SUFFIX"/>
-            </xsl:when>
-            <xsl:when test="$tag = $WIDEVINE_MBR_TAG">
-                <xsl:value-of select="$CONST_WIDEVINE_MBR_MANIFEST_SUFFIX"/>
-            </xsl:when>
         </xsl:choose>
     </xsl:template>
     <!-- get the matching tag ppvModule - which is given as argument to this code -->
@@ -625,12 +603,6 @@
             </xsl:when>
             <xsl:when test="$tag = $DASH_TAG">
                 <xsl:value-of select="$dashPpvModule"/>
-            </xsl:when>
-            <xsl:when test="$tag = $WIDEVINE_TAG">
-                <xsl:value-of select="$widevinePpvModule"/>
-            </xsl:when>
-            <xsl:when test="$tag = $WIDEVINE_MBR_TAG">
-                <xsl:value-of select="$widevineMbrPpvModule"/>
             </xsl:when>
         </xsl:choose>
     </xsl:template>
@@ -655,12 +627,6 @@
                 </xsl:when>
                 <xsl:when test="$tag = $DASH_TAG">
                     <xsl:value-of select="$dashTypeName"/>
-                </xsl:when>
-                <xsl:when test="$tag = $WIDEVINE_TAG">
-                    <xsl:value-of select="$widevineTypeName"/>
-                </xsl:when>
-                <xsl:when test="$tag = $WIDEVINE_MBR_TAG">
-                    <xsl:value-of select="$widevineMbrTypeName"/>
                 </xsl:when>
             </xsl:choose>
         </xsl:variable>
