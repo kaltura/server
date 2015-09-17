@@ -116,7 +116,7 @@ class BulkUploadCsvPlugin extends KalturaPlugin implements IKalturaBulkUpload, I
 		header("Content-Type: text/plain; charset=UTF-8");
 
 		$criteria = new Criteria();
-		$criteria->add(BulkUploadResultPeer::BULK_UPLOAD_JOB_ID, $batchJob->getJobId());
+		$criteria->add(BulkUploadResultPeer::BULK_UPLOAD_JOB_ID, $batchJob->getId());
 		$criteria->addAscendingOrderByColumn(BulkUploadResultPeer::LINE_INDEX);
 		$criteria->setLimit(100);
 		$bulkUploadResults = BulkUploadResultPeer::doSelect($criteria);
