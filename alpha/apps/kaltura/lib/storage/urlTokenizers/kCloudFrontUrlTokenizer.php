@@ -11,6 +11,11 @@ class kCloudFrontUrlTokenizer extends kUrlTokenizer
 	 * @var string
 	 */
 	protected $rootDir;
+
+	/**
+	 * @var bool
+	 */
+	protected $limitIpAddress;
 	
 	static function urlSafeBase64Encode($value)
 	{
@@ -65,10 +70,26 @@ class kCloudFrontUrlTokenizer extends kUrlTokenizer
 		return $acl;
 	}
 	
+	protected static function getRemoteAddress()
+	{
+		$remoteAddr = infraRequestUtils::getIpFromHttpHeader('HTTP_X_FORWARDED_FOR', false);	
+		if (!$remoteAddr) 
+		{
+			$remoteAddr = $_SERVER['REMOTE_ADDR'];
+		}
+	
+		return $remoteAddr;
+	}
+	
 	protected function generateToken($acl)
 	{
 		$DateLessThan = time() + $this->window;
-		$policy = '{"Statement":[{"Resource":"'.$acl.'","Condition":{"DateLessThan":{"AWS:EpochTime":'.$DateLessThan.'}}}]}';
+		$conditions = array('"DateLessThan":{"AWS:EpochTime":'.$DateLessThan.'}');
+		if ($this->limitIpAddress)
+		{
+			$conditions[] = '"IpAddress":{"AWS:SourceIp":"'.self::getRemoteAddress().'/32"}';
+		}
+		$policy = '{"Statement":[{"Resource":"'.$acl.'","Condition":{'.implode(',', $conditions).'}}]}';
 		$signature = $this->rsaSha1Sign($policy);
 		
 		$policy = self::urlSafeBase64Encode($policy);
@@ -150,5 +171,21 @@ class kCloudFrontUrlTokenizer extends kUrlTokenizer
 	public function setRootDir($rootDir) 
 	{
 		$this->rootDir = $rootDir;
+	}
+
+	/**
+	 * @return the $limitIpAddress
+	 */
+	public function getLimitIpAddress() 
+	{
+		return $this->limitIpAddress;
+	}
+	
+	/**
+	 * @param string $limitIpAddress
+	 */
+	public function setLimitIpAddress($limitIpAddress) 
+	{
+		$this->limitIpAddress = $limitIpAddress;
 	}
 }
