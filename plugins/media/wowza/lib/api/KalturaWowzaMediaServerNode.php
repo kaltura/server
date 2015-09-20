@@ -1,6 +1,6 @@
 <?php
 /**
- * @package plugins.Wowza
+ * @package plugins.wowza
  * @subpackage api.objects
  */
 class KalturaWowzaMediaServerNode extends KalturaMediaServerNode

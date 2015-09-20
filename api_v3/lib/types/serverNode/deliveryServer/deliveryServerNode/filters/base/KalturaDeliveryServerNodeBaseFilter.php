@@ -8,9 +8,9 @@ abstract class KalturaDeliveryServerNodeBaseFilter extends KalturaServerNodeFilt
 {
 	static private $map_between_objects = array
 	(
-		"playbackHostNameLike" => "_like_playback_host_name",
-		"playbackHostNameMultiLikeOr" => "_mlikeor_playback_host_name",
-		"playbackHostNameMultiLikeAnd" => "_mlikeand_playback_host_name",
+		"playbackDomainLike" => "_like_playback_domain",
+		"playbackDomainMultiLikeOr" => "_mlikeor_playback_domain",
+		"playbackDomainMultiLikeAnd" => "_mlikeand_playback_domain",
 	);
 
 	static private $order_by_map = array
@@ -30,15 +30,15 @@ abstract class KalturaDeliveryServerNodeBaseFilter extends KalturaServerNodeFilt
 	/**
 	 * @var string
 	 */
-	public $playbackHostNameLike;
+	public $playbackDomainLike;
 
 	/**
 	 * @var string
 	 */
-	public $playbackHostNameMultiLikeOr;
+	public $playbackDomainMultiLikeOr;
 
 	/**
 	 * @var string
 	 */
-	public $playbackHostNameMultiLikeAnd;
+	public $playbackDomainMultiLikeAnd;
 }
