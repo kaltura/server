@@ -25,7 +25,7 @@ class KalturaServerNodeFilter extends KalturaServerNodeBaseFilter
 	
 	protected function doGetListResponse(KalturaFilterPager $pager, $type = null)
 	{
-		$c = KalturaCriteria::create(ServerNodePeer::OM_CLASS);
+		$c = new Criteria();
 			
 		if($type)
 			$c->add(ServerNodePeer::TYPE, $type);
@@ -35,8 +35,9 @@ class KalturaServerNodeFilter extends KalturaServerNodeBaseFilter
 		$pager->attachToCriteria($c);
 			
 		$list = ServerNodePeer::doSelect($c);
+		$totalCount = count($list);
 	
-		return array($list, $c->getRecordsCount());
+		return array($list, $totalCount);
 	}
 	/* (non-PHPdoc)
 	 * @see KalturaRelatedFilter::getListResponse()

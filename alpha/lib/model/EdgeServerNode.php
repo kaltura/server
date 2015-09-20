@@ -41,18 +41,6 @@ class EdgeServerNode extends DeliveryServerNode {
 		return $playbackHostName;
 	}
 	
-	/* Delivery Settings */
-	
-	public function setDeliveryProfileIds($params)
-	{
-		$this->putInCustomData(self::CUSTOM_DATA_DELIVERY_IDS, $params);
-	}
-	
-	public function getDeliveryProfileIds()
-	{
-		return $this->getFromCustomData(self::CUSTOM_DATA_DELIVERY_IDS, null, null);
-	}
-	
 	public function buildPlaybackUrl($originalPlaybackUrl)
 	{
 		$urlParts = explode("://", $originalPlaybackUrl);
