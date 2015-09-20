@@ -462,30 +462,7 @@ class infraRequestUtils
 			}
 		}
 		
-		$post = null;
-		if(isset($_SERVER['CONTENT_TYPE']))
-		{
-			if(strtolower($_SERVER['CONTENT_TYPE']) == 'application/json')
-			{
-				$requestBody = file_get_contents("php://input");
-				if(preg_match('/^\{.*\}$/', $requestBody))
-				{
-					$post = json_decode($requestBody, true);
-				}
-			}
-			elseif(strpos(strtolower($_SERVER['CONTENT_TYPE']), 'multipart/form-data') === 0 && isset($_POST['json']))
-			{
-				$post = json_decode($_POST['json'], true);
-			}
-		}
-		
-		if(!$post)
-		{
-			$post = $_POST;
-		}
-		
-		self::$requestParams = array_merge_recursive($post, $_FILES, $_GET, $params);
-		
+		self::$requestParams = array_merge($_POST, $_FILES, $_GET, $params);
 		return self::$requestParams;
 	}
 
