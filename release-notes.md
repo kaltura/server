@@ -5,14 +5,18 @@
 - Issue Type: New Feature  
 - Issue ID: PLAT-3864
 
-### Installation ###
+#### Installation ####
 
-None
+None.
 
-### Configuration ###
+#### Configuration ####
 
 - Run the following permission script:
 	php deployment\updates\scripts\add_permissions\2015_09_17_update_quiz_permissions.php
+
+#### Known Issues & Limitations ####
+
+None.
 	
 
 # Jupiter-10.20.0 #
