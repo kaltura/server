@@ -413,6 +413,7 @@ class PythonClientGenerator extends ClientGeneratorFromXml
 			{
 				case "bigint":
 				case "int" :
+				case "time" :
 					if ($isEnum) 
 					{
 						$enumType = $propertyNode->getAttribute ( "enumType" );
@@ -593,6 +594,8 @@ class PythonClientGenerator extends ClientGeneratorFromXml
 		    $isEnum = $paramNode->hasAttribute("enumType");
 		    $isOptional = $paramNode->getAttribute("optional");
 			
+		    $argName = $this->replaceReservedWords($paramName);
+		    
 		    if ($haveFiles === false && $paramType == "file")
 	    	{
 		        $haveFiles = true;
@@ -602,26 +605,26 @@ class PythonClientGenerator extends ClientGeneratorFromXml
 			switch ($paramType) 
 			{
 				case "string" :
-					$this->appendLine ( "        kparams.addStringIfDefined(\"$paramName\", " . $paramName . ")" );
+					$this->appendLine ( "        kparams.addStringIfDefined(\"$paramName\", " . $argName . ")" );
 					break;
 				case "float" :
-					$this->appendLine ( "        kparams.addFloatIfDefined(\"$paramName\", " . $paramName . ")" );
+					$this->appendLine ( "        kparams.addFloatIfDefined(\"$paramName\", " . $argName . ")" );
 					break;
 				case "bigint":
 				case "int" :
-					$this->appendLine ( "        kparams.addIntIfDefined(\"$paramName\", " . $paramName . ");" );
+					$this->appendLine ( "        kparams.addIntIfDefined(\"$paramName\", " . $argName . ");" );
 					break;
 				case "bool" :
-					$this->appendLine ( "        kparams.addBoolIfDefined(\"$paramName\", " . $paramName . ");" );
+					$this->appendLine ( "        kparams.addBoolIfDefined(\"$paramName\", " . $argName . ");" );
 					break;
 				case "array" :
-					$this->appendLine("        kparams.addArrayIfDefined(\"$paramName\", $paramName)");
+					$this->appendLine("        kparams.addArrayIfDefined(\"$paramName\", $argName)");
 					break;
 				case "file" :
-					$this->appendLine ( "        kfiles.put(\"$paramName\", " . $paramName . ");" );
+					$this->appendLine ( "        kfiles.put(\"$paramName\", " . $argName . ");" );
 					break;
 				default : // for objects
-					$this->appendLine("        kparams.addObjectIfDefined(\"$paramName\", $paramName)");
+					$this->appendLine("        kparams.addObjectIfDefined(\"$paramName\", $argName)");
 					break;
 			}
 		}
@@ -681,7 +684,7 @@ class PythonClientGenerator extends ClientGeneratorFromXml
 		$signature = "self, ";
 		foreach($paramNodes as $paramNode)
 		{
-			$paramName = $paramNode->getAttribute("name");
+			$paramName = $this->replaceReservedWords($paramNode->getAttribute("name"));
 			$paramType = $paramNode->getAttribute("type");
 			$defaultValue = $paramNode->getAttribute("default");
 						
@@ -724,6 +727,8 @@ class PythonClientGenerator extends ClientGeneratorFromXml
 		switch ($propertyName)
 		{
 			case "not":
+				return "{$propertyName}_";
+			case "with":
 				return "{$propertyName}_";
 			default:
 				return $propertyName;
