@@ -116,10 +116,10 @@ class KalturaParams(object):
         if len(array) == 0:
             self.params[key] = {'-': ''}
         else:
-            dict = {}
+            arr = [None] * len(array)
             for curIndex in xrange(len(array)):
-                dict[curIndex] = array[curIndex].toParams().get()
-            self.params[key] = dict
+                arr[curIndex] = array[curIndex].toParams().get()
+            self.params[key] = arr
 
     def addStringIfDefined(self, key, value):
         if value != NotImplemented:
