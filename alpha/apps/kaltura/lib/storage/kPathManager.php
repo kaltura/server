@@ -5,8 +5,6 @@
  */
 class kPathManager
 {
-    const PATH_FORMAT_PARAM = 'path_format';
-    
 	static $sessionCache = array();
 	
 	protected static function getStorageProfile($storageProfileId = null)

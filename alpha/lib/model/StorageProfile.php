@@ -30,6 +30,7 @@ class StorageProfile extends BaseStorageProfile implements IBaseObject
 	
 	const CUSTOM_DATA_DELIVERY_IDS = 'delivery_profile_ids';
 	const CUSTOM_DATA_PATH_MANAGER_PARAMS = 'path_manager_params';
+	const CUSTOM_DATA_PATH_FORMAT = 'path_format';
 	const CUSTOM_DATA_READY_BEHAVIOR = 'ready_behavior';
 	const CUSTOM_DATA_RULES = 'rules';
 	const CUSTOM_DATA_CREATE_FILE_LINK ='create_file_link';
@@ -71,8 +72,17 @@ class StorageProfile extends BaseStorageProfile implements IBaseObject
 	public function setTrigger( $v ) { $this->putInCustomData("trigger", (int)$v); }
 	
 	//external path format
-	public function setPathFormat($v) { $this->putInCustomData('path_format', $v);}
-	public function getPathFormat() { return $this->getFromCustomData('path_format', null);}
+	public function setPathFormat($v) { $this->putInCustomData(self::CUSTOM_DATA_PATH_FORMAT, $v);}
+	public function getPathFormat()
+	{
+		$params = $this->getPathManagerParams();
+		if (isset($params[self::CUSTOM_DATA_PATH_FORMAT]))
+		{
+		    return $params[self::CUSTOM_DATA_PATH_FORMAT];
+		}
+		
+		return $this->getFromCustomData(self::CUSTOM_DATA_PATH_FORMAT);
+	}
 	
 	/**
 	 * 
