@@ -36,6 +36,7 @@ import random
 import base64
 import socket
 import urllib
+import types
 import gzip
 import time
 import os
@@ -49,6 +50,9 @@ try:
     from Crypto.Cipher import AES
 except ImportError:
     pass            # PyCrypto is required only for creating KS V2
+
+from KalturaClient.Plugins.Core import KalturaClientConfiguration
+from KalturaClient.Plugins.Core import KalturaRequestConfiguration
 
 # Register the streaming http handlers with urllib2
 register_openers()
@@ -72,9 +76,6 @@ class PluginServicesProxy(object):
         setattr(self, serviceName, serviceClass)
 
 class KalturaClient(object):
-    METHOD_POST = 0
-    METHOD_GET = 1
-
     RANDOM_SIZE = 16
 
     FIELD_EXPIRY =              '_e'
@@ -82,23 +83,37 @@ class KalturaClient(object):
     FIELD_USER =                '_u'
 
     def __init__(self, config):
-        self.apiVersion = API_VERSION
         self.config = None
-        self.ks = NotImplemented
         self.shouldLog = False
         self.multiRequestReturnType = None
         self.callsQueue = []
-
-        self.method = KalturaClient.METHOD_POST
         self.requestHeaders = {}
+        self.clientConfiguration = {}
+        self.requestConfiguration = {}
 
         self.config = config
         logger = self.config.getLogger()
         if (logger):
             self.shouldLog = True
 
-        self.loadPlugins()            
+        self.loadPlugins()
+        self.loadConfigurations()
 
+    def loadConfigurationItem(self, configurationMap, property):
+        ucfirst = property[0].upper() + property[1:]
+        setter = lambda self, value: configurationMap.update({property: value})
+        setattr(self, 'set' + ucfirst, types.MethodType(setter, self))
+        getter = lambda self: configurationMap[property]
+        setattr(self, 'get' + ucfirst, types.MethodType(getter, self))
+
+    def loadConfiguration(self, configurationClass, configurationMap):
+        for property in configurationClass.PROPERTY_LOADERS:
+            self.loadConfigurationItem(configurationMap, property)
+
+    def loadConfigurations(self):
+        self.loadConfiguration(KalturaClientConfiguration, self.clientConfiguration)
+        self.loadConfiguration(KalturaRequestConfiguration, self.requestConfiguration)
+        
     def loadPlugins(self):
         pluginFiles = ['Core']
         pluginsFolder = os.path.normpath(os.path.join(os.path.dirname(__file__), 'Plugins'))
@@ -164,31 +179,32 @@ class KalturaClient(object):
         self.callsQueue = []
 
         if params != None:
-            result += '&' + urllib.urlencode(params.get())
+            result += '?' + urllib.urlencode(params.get())
         self.log("Returned url [%s]" % result)
         return result        
         
     def queueServiceActionCall(self, service, action, returnType, params = KalturaParams(), files = KalturaFiles()):
-        # in start session partner id is optional (default -1). if partner id was not set, use the one in the config
-        if not params.get().has_key("partnerId") or params.get()["partnerId"] == -1:
-            if self.config.partnerId != None:
-                params.put("partnerId", self.config.partnerId)
-        params.addStringIfDefined("ks", self.ks)
+        for param in self.requestConfiguration:
+            if isinstance(self.requestConfiguration[param], KalturaObjectBase):
+                params.addObjectIfDefined(param, self.requestConfiguration[param])
+            else:
+                params.put(param, self.requestConfiguration[param])
+                
         call = KalturaServiceActionCall(service, action, params, files)
         if(self.multiRequestReturnType != None):
-			self.multiRequestReturnType.append(returnType)
+            self.multiRequestReturnType.append(returnType)
         self.callsQueue.append(call)
 
     def getRequestParams(self):
         params = KalturaParams()
         files = KalturaFiles()
-        params.put("apiVersion", self.apiVersion)
+        for param in self.clientConfiguration:
+            params.put(param, self.clientConfiguration[param])
         params.put("format", self.config.format)
-        params.put("clientTag", self.config.clientTag)
-        url = self.config.serviceUrl + "/api_v3/index.php?service="
+        url = self.config.serviceUrl + "/api"
         if (self.multiRequestReturnType != None):
-            url += "multirequest"
-            i = 1
+            url += "/service/multirequest"
+            i = 0
             for call in self.callsQueue:
                 callParams = call.getParamsForMultiRequest(i)
                 callFiles = call.getFilesForMultiRequest(i)
@@ -197,18 +213,15 @@ class KalturaClient(object):
                 i += 1
         else:
             call = self.callsQueue[0]
-            url += call.service + "&action=" + call.action
-            params.update(call.params)
-            files.update(call.files)
+            url += "/service/" + call.service + "/action/" + call.action
+            params.update(call.params.get())
+            files.update(call.files.get())
 
         signature = params.signature()
         params.put("kalsig", signature)
 
-        if self.method == KalturaClient.METHOD_GET and len(files.get()) == 0:
-            url += '&' + urllib.urlencode(params.get())
-            params = None
-
         self.log("request url: [%s]" % url)
+        self.log("request json: [%s]" % params.toJson())
 
         return (url, params, files)
 
@@ -218,15 +231,17 @@ class KalturaClient(object):
 
     @staticmethod
     def openRequestUrl(url, params, files, requestHeaders):
+        requestHeaders['Accept'] = 'text/xml'
         requestHeaders['Accept-encoding'] = 'gzip'
         if len(files.get()) == 0:
-            data = None
-            if params != None:
-                data = urllib.urlencode(params.get())
-            request = urllib2.Request(url, data, requestHeaders)
+            requestHeaders['Content-Type'] = 'application/json'
+            request = urllib2.Request(url, params.toJson(), requestHeaders)
         else:
-            fullParams = params
-            fullParams.update(files)
+            if 'Content-Type' in requestHeaders:
+                del requestHeaders['Content-Type']
+            fullParams = KalturaParams()
+            fullParams.put('json', params.toJson())
+            fullParams.update(files.get())
             datagen, headers = multipart_encode(fullParams.get())
             headers.update(requestHeaders)
             request = urllib2.Request(url, datagen, headers)
@@ -323,9 +338,6 @@ class KalturaClient(object):
         # issue the request        
         postResult = self.doHttpRequest(url, params, files)
 
-        # parse the result            
-        resultNode = self.parsePostResult(postResult)
-
         endTime = time.time()
         self.log("execution time for [%s]: [%s]" % (url, endTime - startTime))
 
@@ -340,13 +352,10 @@ class KalturaClient(object):
         if serverName != None or serverSession != None:
             self.log("server: [%s], session [%s]" % (serverName, serverSession))
 
-        return resultNode
+        # parse the result            
+        resultNode = self.parsePostResult(postResult)
 
-    def getKs(self):
-        return self.ks
-        
-    def setKs(self, ks):
-        self.ks = ks
+        return resultNode
         
     def getConfig(self):
         return self.config
@@ -467,15 +476,15 @@ class KalturaServiceActionCall(object):
         
     # Return the parameters for a multi request
     def getParamsForMultiRequest(self, multiRequestIndex):
+        self.params.put('service', self.service)
+        self.params.put('action', self.action)
+        
         multiRequestParams = KalturaParams()
-        multiRequestParams.put("%s:service" % multiRequestIndex, self.service)
-        multiRequestParams.put("%s:action" % multiRequestIndex, self.action)
-        for (key, val) in self.params.get().items():
-            multiRequestParams.put("%s:%s" % (multiRequestIndex, key), val)
-        return multiRequestParams
+        multiRequestParams.add(multiRequestIndex, self.params.get())
+        return multiRequestParams.get()
 
     def getFilesForMultiRequest(self, multiRequestIndex):
         multiRequestParams = KalturaFiles()
         for (key, val) in self.files.get().items():
             multiRequestParams.put("%s:%s" % (multiRequestIndex, key), val)
-        return multiRequestParams
+        return multiRequestParams.get()

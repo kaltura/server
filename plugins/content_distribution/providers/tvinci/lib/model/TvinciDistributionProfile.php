@@ -132,5 +132,4 @@ class TvinciDistributionProfile extends ConfigurableDistributionProfile
 	public function getIpadnewPpvModule()		{return $this->getFromCustomData(self::CUSTOM_IPADNEW_PPV_MODULE);}
 	public function setIpadnewPpvModule($v)		{$this->putInCustomData(self::CUSTOM_IPADNEW_PPV_MODULE, $v);}
 
-
 }

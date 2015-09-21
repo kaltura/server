@@ -13,7 +13,7 @@
  * @package Core
  * @subpackage model
  */
-class KuserKgroup extends BaseKuserKgroup implements IBaseObject
+class KuserKgroup extends BaseKuserKgroup implements IRelatedObject
 {
 	const MAX_NUMBER_OF_GROUPS_PER_USER = 100;
 

@@ -229,7 +229,7 @@ abstract public class KalturaClientBase implements Serializable {
 		KalturaParams kParams = new KalturaParams();
 		String url = extractParamsFromCallQueue(kParams, new KalturaFiles());
 		String kParamsString = kParams.toQueryString();
-		url += "&" + kParamsString;
+		url += "?" + kParamsString;
 		
 		return url;
 	}
@@ -248,7 +248,7 @@ abstract public class KalturaClientBase implements Serializable {
 		String url = extractParamsFromCallQueue(kparams, kfiles);
 
 		if (logger.isEnabled())
-			logger.debug("full reqeust url: [" + url + "?" + kparams.toQueryString() + "]");
+			logger.debug("full request url: [" + url + "?" + kparams.toQueryString() + "]");
 
 		HttpClient client = createHttpClient();
 		String responseString = null;
@@ -448,7 +448,7 @@ abstract public class KalturaClientBase implements Serializable {
 
 	private String extractParamsFromCallQueue(KalturaParams kparams, KalturaFiles kfiles) throws KalturaApiException {
 		
-		String url = this.kalturaConfiguration.getEndpoint() + "/api_v3/index.php?service=";
+		String url = this.kalturaConfiguration.getEndpoint() + "/api";
 		
 		// append the basic params
 		kparams.add("format", this.kalturaConfiguration.getServiceFormat());
@@ -459,7 +459,7 @@ abstract public class KalturaClientBase implements Serializable {
 		}
 		
 		if (requestReturnType != null) {
-			url += "multirequest";
+			url += "/service/multirequest";
 			int i = 1;
 			for (KalturaServiceActionCall call : this.callsQueue) {
 				KalturaParams callParams = call.getParamsForMultiRequest(i);
@@ -484,7 +484,7 @@ abstract public class KalturaClientBase implements Serializable {
 			
 		} else {
 			KalturaServiceActionCall call = this.callsQueue.get(0);
-			url += call.getService() + "&action=" + call.getAction();
+			url += "/service/" + call.getService() + "/action/" + call.getAction();
 			kparams.add(call.getParams());
 			kfiles.add(call.getFiles());
 		}

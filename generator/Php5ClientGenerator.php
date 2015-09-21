@@ -247,7 +247,7 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 			$this->appendLine(' */');
 		}
 		
-	 	$this->appendLine("class $enumName");
+	 	$this->appendLine("class $enumName extends KalturaEnumBase");
 		$this->appendLine("{");
 		foreach($enumNode->childNodes as $constNode)
 		{
@@ -404,6 +404,12 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 			
 		$paramNodes = $actionNode->getElementsByTagName("param");
 		
+		$enableInMultiRequest = true;
+		if($actionNode->hasAttribute("enableInMultiRequest"))
+		{
+			$enableInMultiRequest = intval($actionNode->getAttribute("enableInMultiRequest"));
+		}
+		
 		$this->appendLine();
 		
 		if($this->generateDocs)
@@ -421,7 +427,10 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 				$this->appendLine("	 * @param $paramType \${$paramName} $paramDescription");
 			}
 			
-			$this->appendLine("	 * @return $resultType");
+			if($resultType && $resultType != 'null')
+			{
+				$this->appendLine("	 * @return $resultType");
+			}
 			$this->appendLine('	 */');
 		}
 				
@@ -433,6 +442,13 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 		
 		$this->appendLine("	$signature");
 		$this->appendLine("	{");
+		
+		if(!$enableInMultiRequest)
+		{
+			$this->appendLine("		if (\$this->client->isMultiRequest())");
+			$this->appendLine("			throw new KalturaClientException(\"Action is not supported as part of multi-request.\", KalturaClientException::ERROR_ACTION_IN_MULTIREQUEST);");
+			$this->appendLine("		");
+		}
 		
 		$this->appendLine("		\$kparams = array();");
 		$haveFiles = false;
@@ -502,26 +518,42 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 		}
 		else
 		{
-			$this->appendLine("		if (\$this->client->isMultiRequest())");
-			$this->appendLine("			return \$this->client->getMultiRequestResult();");
+			if($enableInMultiRequest)
+			{
+				$this->appendLine("		if (\$this->client->isMultiRequest())");
+				$this->appendLine("			return \$this->client->getMultiRequestResult();");
+			}
 			$this->appendLine("		\$resultObject = \$this->client->doQueue();");
 			$this->appendLine("		\$this->client->throwExceptionIfError(\$resultObject);");
 			
 			if (!$resultType)
+			{
 				$resultType = "null";
+			}
 			
 			if ($resultType == 'int')
+			{
 				$resultType = "integer";
+			}
 
 			if ($resultType == 'bigint')
+			{
 				$resultType = "double";
+			}
 
 			if ($resultType == 'bool')
+			{
 				$this->appendLine("		\$resultObject = (bool) \$resultObject;");
+			}
 			else
+			{
 				$this->appendLine("		\$this->client->validateObjectType(\$resultObject, \"$resultType\");");
+			}
 				
-			$this->appendLine("		return \$resultObject;");
+			if($resultType && $resultType != 'null')
+			{
+				$this->appendLine("		return \$resultObject;");
+			}
 		}
 		
 		$this->appendLine("	}");
@@ -590,7 +622,7 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 						
 			if ($this->isSimpleType($paramType) || $paramType == "file")
 				$signature .= "$".$paramName;
-			else if ($paramType == "array")
+			else if ($paramType == "array" || $paramType == "map")
 				$signature .= "array $".$paramName;
 			else
 				$signature .= $paramType." $".$paramName;

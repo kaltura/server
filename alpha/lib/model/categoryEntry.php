@@ -13,7 +13,7 @@
  * @package Core
  * @subpackage model
  */
-class categoryEntry extends BasecategoryEntry implements IBaseObject
+class categoryEntry extends BasecategoryEntry implements IRelatedObject
 {
 	
 	/* (non-PHPdoc)
@@ -64,6 +64,9 @@ class categoryEntry extends BasecategoryEntry implements IBaseObject
 			
 		if(!categoryEntryPeer::getSkipSave())
 			$entry->indexToSearchIndex();
+			
+		if (!$this->alreadyInSave)
+			kEventsManager::raiseEvent(new kObjectAddedEvent($this));
 	}
 	
 	/* (non-PHPdoc)

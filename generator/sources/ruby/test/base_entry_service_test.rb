@@ -43,34 +43,6 @@ class BaseEntryServiceTest < Test::Unit::TestCase
       assert_not_nil created_entry.id
       assert_nil @client.base_entry_service.delete(created_entry.id)
    end
-  
-  # this test uploads a file to kaltura and creates an entry using the uploaded file.   
-   should "upload a file and create an entry" do
-       
-       base_entry = Kaltura::KalturaBaseEntry.new
-       base_entry.type = Kaltura::KalturaEntryType::AUTOMATIC
-       base_entry.name = "kaltura_test"
-       swf_file = File.open("test/media/test.swf")
-       
-       pdf_token = @client.base_entry_service.upload(swf_file)
-       created_entry = @client.base_entry_service.add_from_uploaded_file(base_entry, pdf_token)
-       
-       assert_not_nil created_entry.id
-       assert_nil @client.base_entry_service.delete(created_entry.id)
-    end
-    
-    # this test simulates an api response with 'not supported' attributes and try to parse and generate an entry object out of it.
-    should "silently ignore any fields returned from the server that it does not recognize" do
-        
-        response_body = 
-        <<-XML
-        <?xml version='1.0' encoding='utf-8'?><xml><result><objectType>KalturaBaseEntry</objectType><id>0_npdg4rrs</id><not_supported_attr>not_supported_attr val</not_supported_attr><name>102_1321456940</name><description></description><partnerId>102</partnerId><userId></userId><tags></tags><adminTags></adminTags><categories></categories><status>2</status><moderationStatus>6</moderationStatus><moderationCount>0</moderationCount><type>10</type><createdAt>1321456940</createdAt><rank>0</rank><totalRank>0</totalRank><votes>0</votes><groupId></groupId><partnerData></partnerData><downloadUrl>http://ec2-174-129-124-16.compute-1.amazonaws.com/p/102/sp/10200/raw/entry_id/0_npdg4rrs/version/100000</downloadUrl><searchText>  102_1321456940 </searchText><licenseType>-1</licenseType><version>100000</version><thumbnailUrl>http://ec2-174-129-124-16.compute-1.amazonaws.com/p/102/sp/10200/thumbnail/entry_id/0_npdg4rrs/version/0</thumbnailUrl><accessControlId>4</accessControlId><startDate></startDate><endDate></endDate></result><executionTime>0.110525846481</executionTime></xml>
-        XML
-        created_entry = @client.parse_to_objects(response_body)
-        
-        assert_instance_of Kaltura::KalturaBaseEntry, created_entry
-        assert_not_nil created_entry.id
-     end
     
     # this test creates an entry and retrieves the list of entries and count from kaltura by setting a filter.
     should "get the base entry list" do

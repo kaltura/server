@@ -16,7 +16,6 @@ config = ConfigParser.ConfigParser()
 config.read(filename)
 PARTNER_ID = config.getint("Test", "partnerId")
 SERVICE_URL = config.get("Test", "serviceUrl")
-SECRET = config.get("Test", "secret")
 ADMIN_SECRET = config.get("Test", "adminSecret")
 USER_NAME = config.get("Test", "userName")
 
@@ -30,7 +29,7 @@ class KalturaLogger(IKalturaLogger):
         logging.info(msg)
 
 def GetConfig():
-    config = KalturaConfiguration(PARTNER_ID)
+    config = KalturaConfiguration()
     config.serviceUrl = SERVICE_URL
     config.setLogger(KalturaLogger())
     return config
