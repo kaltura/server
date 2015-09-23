@@ -55,6 +55,7 @@ import javax.crypto.spec.SecretKeySpec;
 import javax.xml.xpath.XPathExpressionException;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.httpclient.ConnectTimeoutException;
 import org.apache.commons.httpclient.DefaultHttpMethodRetryHandler;
@@ -576,7 +577,7 @@ abstract public class KalturaClientBase implements Serializable {
 			str += (key + kparams.get(key));
 		}
 
-		String md5 = DigestUtils.md5Hex(str);
+		String md5 = new String(Hex.encodeHex(DigestUtils.md5(str)));;
 		
 		return md5;
 	}
