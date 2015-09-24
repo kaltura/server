@@ -58,8 +58,11 @@ class WowzaMediaServerNode extends MediaServerNode {
 	}
 	
 	public function getPlaybackHost()
-	{
+	{	
 		$domain = $this->getPlaybackHostName();
+		if($this->partner_media_server_config && $this->partner_media_server_config['domain'])
+			$domain = $this->partner_media_server_config['domain'];
+		
 		$appPrefix = $this->getAppPrefix();
 		$port = WowzaMediaServerNode::DEFAULT_MANIFEST_PORT;
 		

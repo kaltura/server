@@ -24,6 +24,8 @@ class ServerNodeFilter extends baseObjectFilter
 			"_in_system_name",
 			"_eq_status",
 			"_in_status",
+			"_eq_type",
+			"_in_type",
 			"_like_tags" ,
 			"_mlikeor_tags" ,
 			"_mlikeand_tags",
@@ -33,8 +35,10 @@ class ServerNodeFilter extends baseObjectFilter
 			"_like_playback_host_name",
 			"_mlikeor_playback_host_name",
 			"_mlikeand_playback_host_name",
-			"_eq_parent_edge_server_id",
-			"_in_parent_edge_server_id",
+			"_eq_dc",
+			"_in_dc",
+			"_eq_parent_id",
+			"_in_parent_id",
 			) , NULL );
 
 		$this->allowed_order_fields = array ( 

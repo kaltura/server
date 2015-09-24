@@ -15,12 +15,11 @@
  */
 class ServerNodePeer extends BaseServerNodePeer {
 
-
-	const EDGE_SERVER_OM_CLASS = 'EdgeServerNode';
+	const EDGE_SERVER_NODE_OM_CLASS = 'EdgeServerNode';
 	
 	// cache classes by their type
 	protected static $class_types_cache = array(
-			serverNodeType::EDGE => self::EDGE_SERVER_OM_CLASS,
+			serverNodeType::EDGE => self::EDGE_SERVER_NODE_OM_CLASS,
 	);
 	
 	public static function setDefaultCriteriaFilter ()

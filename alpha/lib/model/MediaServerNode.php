@@ -2,6 +2,8 @@
 
 abstract class MediaServerNode extends DeliveryServerNode {	
 	
+	protected $partner_media_server_config = null;
+	
 	const CUSTOM_DATA_PROTOCOL_PORT_CONFIG_ARRAY = 'protocol_port_config';
 	const CUSTOM_DATA_APPLICATION_NAME = 'application_name';
 	const CUSTOM_DATA_IS_EXTERNAL = 'is_external';
@@ -51,6 +53,11 @@ abstract class MediaServerNode extends DeliveryServerNode {
 	public function getApplicationName()
 	{
 		return $this->getFromCustomData(self::CUSTOM_DATA_APPLICATION_NAME, null, self::DEFAULT_APPLICATION);
+	}
+	
+	public function setPartnerMediaServerConfig($partnerMediaServerConfiguration)
+	{
+		$this->partner_media_server_config = $partnerMediaServerConfiguration;
 	}
 
 } // MediaServerNode

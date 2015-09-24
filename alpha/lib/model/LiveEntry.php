@@ -316,7 +316,6 @@ abstract class LiveEntry extends entry
 		$isExternalMediaServerStream = false;
 		
 		$kMediaServers = $this->getMediaServers();
-		$partnerMediaServerConfiguration = $this->getPartner()->getMediaServersConfiguration();
 		if(count($kMediaServers))
 		{
 			foreach($kMediaServers as $key => $kMediaServer)
@@ -370,10 +369,14 @@ abstract class LiveEntry extends entry
 		}
 		elseif($primaryMediaServer)
 		{
-			$manifestUrl = $primaryMediaServer->getManifestUrl($protocol, $partnerMediaServerConfiguration);
+			$partnerMediaServerConfiguration = $this->getPartner()->getMediaServersConfiguration();
+			$primaryMediaServer->setPartnerMediaServerConfig($partnerMediaServerConfiguration);
+			
+			$manifestUrl = $primaryMediaServer->getManifestUrl($protocol);
 			if($backupMediaServer)
 			{
-				$backupManifestUrl = $backupMediaServer->getManifestUrl($protocol, $partnerMediaServerConfiguration);
+				$backupMediaServer->setPartnerMediaServerConfig($partnerMediaServerConfiguration);
+				$backupManifestUrl = $backupMediaServer->getManifestUrl($protocol);
 			}
 		}
 		

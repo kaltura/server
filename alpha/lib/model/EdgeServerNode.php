@@ -1,10 +1,7 @@
 <?php
 
 class EdgeServerNode extends DeliveryServerNode {
-	
-	const CUSTOM_DATA_DELIVERY_IDS = 'delivery_profile_ids';
-	const CUSTOM_DATA_EDGE_PLAYBACK_CONFIGURATION = 'edge_playback_configuration';
-	const EDGE_SERVER_DEFAULT_HOST_NAME_TOKEN = "{playbackHost}";
+
 	const EDGE_SERVER_DEFAULT_LIVE_CACHE_APPLICATION_NAME = "kCache";
 	const EDGE_SERVER_DEFAULT_LIVE_UNICAST_TO_MC_APPLICATION_NAME = "kMulticast";
 	

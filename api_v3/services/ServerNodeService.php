@@ -134,7 +134,7 @@ class ServerNodeService extends KalturaBaseService
 				return $this->addAction($serverNode);
 			}
 			else 
-				throw new KalturaAPIException(KalturaErrors::EDGE_SERVER_NOT_FOUND, $hostName);
+				throw new KalturaAPIException(KalturaErrors::SERVER_NODE_NOT_FOUND, $hostName);
 		}
 	
 		$dbServerNode->setHeartbeatTime(time());

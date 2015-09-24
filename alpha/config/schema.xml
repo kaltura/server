@@ -321,14 +321,6 @@
 			<index-column name="status" />
 		</index>
 	</table>
-	<table skipSql="false" abstract="false" name="media_server" phpName="MediaServer">
-		<column lazyLoad="false" name="id" type="integer" required="true" primaryKey="true" autoIncrement="true" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="created_at" type="timestamp" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="updated_at" type="timestamp" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="hostname" type="varchar" size="255" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="dc" type="integer" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="custom_data" type="longvarchar" />
-	</table>
 	<table skipSql="false" abstract="false" name="kvote" phpName="kvote">
 		<column lazyLoad="false" name="id" type="integer" required="true" primaryKey="true" autoIncrement="true" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="kshow_id" type="varchar" size="20" />
