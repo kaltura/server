@@ -138,5 +138,23 @@ class kQuiz {
 		$this->showCorrectAfterSubmission = $showCorrectAfterSubmission;
 	}
 
+	/**
+	 * @param string $entryId - db quiz entry id
+	 */
+	public function servePdf($entryId)
+	{
+		KalturaLog::debug("PDF::: servePdf enter");
+
+		$dbEntry = entryPeer::retrieveByPK($entryId);
+		if (!$dbEntry)
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
+
+		$kp = new kQuizPdf($entryId);
+
+		$kp->createQuestionPdf();
+
+		return $kp->submitDocument();
+
+	}
 
 }
