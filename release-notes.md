@@ -1,3 +1,24 @@
+# Jupiter-10.21.0 #
+
+## In Video Quiz - Permissions Update ##
+
+- Issue Type: New Feature  
+- Issue ID: PLAT-3864
+
+#### Installation ####
+
+None.
+
+#### Configuration ####
+
+- Run the following permission script:
+	php deployment\updates\scripts\add_permissions\2015_09_17_update_quiz_permissions.php
+
+#### Known Issues & Limitations ####
+
+None.
+	
+
 # Jupiter-10.20.0 #
 
 ### Configuration ###
