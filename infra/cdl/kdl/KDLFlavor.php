@@ -795,6 +795,29 @@ $plannedDur = 0;
 			}
 		}
 
+		/*
+		 * Watermark - evaluate scale value in case of 'percentage-of-the-source'
+		 * Sample 'scale' value "x30%" stands for - 
+		 * make the height to be 30% of the source, calculate the width to match the height
+		 */
+		if(isset($targetVid->_watermarkData) && isset($targetVid->_watermarkData->scale)){
+			$scaleArrNew = array();
+			$scaleArr = explode("x",$targetVid->_watermarkData->scale);
+			foreach ($scaleArr as $i=>$val){
+				if(isset($val) && strlen($val)>0) {
+					$arr = explode('%', $val);
+					if(count($arr)==2){
+						if(isset($sourceVid->_width) && isset($sourceVid->_height)) {
+							$val = round(($i==0?$sourceVid->_width: $sourceVid->_height)*$arr[0]/100);
+						}
+						else $val = "";
+					}
+				}
+				$scaleArrNew[$i] = $val;
+			}
+			$targetVid->_watermarkData->scale = implode('x', $scaleArrNew);
+		}
+		
 		$targetVid->_rotation = $sourceVid->_rotation;
 		$targetVid->_scanType = $sourceVid->_scanType;
 		
