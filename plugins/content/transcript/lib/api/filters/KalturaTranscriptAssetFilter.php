@@ -1,41 +1,22 @@
 <?php
 /**
- * @package api
- * @subpackage filters
+ * @package plugins.transcript
+ * @subpackage api.filters
  */
-class KalturaTranscriptAssetFilter extends KalturaAttachmentAssetFilter
+class KalturaTranscriptAssetFilter extends KalturaTranscriptAssetBaseFilter
 {	
-	/**
-	 * @dynamicType KalturaAssetType
-	 * @var string
-	 */
-	public $typeIn;
-
-	public function __construct()
-	{
-		$this->typeIn = TranscriptPlugin::getAssetTypeCoreValue(TranscriptAssetType::TRANSCRIPT);
-	}
-	
-	static private $map_between_objects = array("typeIn" => "_in_type");
-	static private $order_by_map = array();
-
-	public function getMapBetweenObjects()
-	{
-		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
-	}
-
-	public function getOrderByMap()
-        {
-                return array_merge(parent::getOrderByMap(), self::$order_by_map);
-        }
-	
-		/* (non-PHPdoc)
+	/* (non-PHPdoc)
 	 * @see KalturaAssetFilter::getTypeListResponse()
 	 */
 	public function getTypeListResponse(KalturaFilterPager $pager, KalturaDetachedResponseProfile $responseProfile = null, array $types = null)
 	{
-		$types = $this->typeIn ? explode(",",$this->typeIn) : $types;
-		return parent::getTypeListResponse($pager, $responseProfile, $types);
+		$types = KalturaPluginManager::getExtendedTypes(assetPeer::OM_CLASS, TranscriptPlugin::getAssetTypeCoreValue(TranscriptAssetType::TRANSCRIPT));
+		list($list, $totalCount) = $this->doGetListResponse($pager, $types);
+
+		$response = new KalturaTranscriptAssetListResponse();
+		$response->objects = KalturaTranscriptAssetArray::fromDbArray($list, $responseProfile);
+		$response->totalCount = $totalCount;
+		return $response;
 	}
 
 	/* (non-PHPdoc)
