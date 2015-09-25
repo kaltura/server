@@ -10,11 +10,14 @@
 main(_) ->
     application:start(inets),
     
+    ClientConfiguration = #kaltura_configuration{
+    	client_options = [{verbose, debug}]
+    }, 
     ClientRequest = #kaltura_request{
     	ks = <<"KS Place Holder">>
     },
     Entry = #kaltura_media_entry{name = <<"test entry">>, mediaType = 2},
-    Results = kaltura_media_service:add(ClientRequest, Entry),
+    Results = kaltura_media_service:add(ClientConfiguration, ClientRequest, Entry),
 
 	io:format("Created entry: ~p~n", [Results]).
 	

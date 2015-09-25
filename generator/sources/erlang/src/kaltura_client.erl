@@ -27,16 +27,11 @@
 
 -module(kaltura_client).
                    
--export([request/2]).
+-export([request/3]).
 -export([add_params/2, add_params/3]).
-
--export_type([kaltura_client_request/0]).
 
 -include_lib("src/kaltura_client.hrl").
      
--type kaltura_response_profile() :: {Id::string(), Name::string()}.
--type kaltura_client_request()  :: {ClientTag::string(), ApiVersion::string(), KS::string(), ResponseProfile::kaltura_response_profile(), PartnerId::integer()}.
-
 -type reason()       :: term().
 -type property()     :: atom() | tuple().
 -type proplist()     :: [property()].
@@ -46,10 +41,6 @@
 -type response()     :: {ok, SessionId::integer(), ServerName::string(), Results::results()} |
                         {server_error, SessionId::integer(), ServerName::string(), Code::string(), Message::string(), Args::error_args()} |
                         {client_error, Reason::reason()}.
-
--define(DEFAULT_ENCODING, json).
--define(DEFAULT_CTYPE, "application/json").
-
 
 %%% API ========================================================================
 
@@ -69,21 +60,21 @@ add_params(Params, Key, KalturaObject) when is_tuple(KalturaObject) ->
 add_params(Params, Key, Value) ->
 	add_params(Params, [{Key, Value}]).
 
--spec request(ClientRequest::#kaltura_request{}, Params::body()) -> Response::response().
-request(ClientRequest, Params) ->
+-spec request(ClientConfiguration::#kaltura_configuration{}, ClientRequest::#kaltura_request{}, Params::body()) -> Response::response().
+request(ClientConfiguration, ClientRequest, Params) ->
 	Params1 = add_params(Params, kaltura_request_to_proplist(ClientRequest)),
 	Params2 = add_params(Params1, [{format, 1}]),
     
-    request(Params2).
+    request(ClientConfiguration, Params2).
 
 %%% INTERNAL ===================================================================
 
-request(Body) ->
-	Url = "http://dev-hudson10.dev.kaltura.com/api_v3/index.php?debug=erlang",
+request(ClientConfiguration, Body) ->
+	Url = ClientConfiguration#kaltura_configuration.url,
     Headers = [{"Accept", "application/json"}, {"Content-Type", "application/json"}],
     Request = get_request(Url, Headers,  Body),
-    httpc:set_options([{verbose, debug}]),
-    Response = parse_response(httpc:request(post, Request, [], [{body_format, binary}])),
+    httpc:set_options(ClientConfiguration#kaltura_configuration.client_options),
+    Response = parse_response(httpc:request(post, Request, ClientConfiguration#kaltura_configuration.request_options, [{body_format, binary}])),
 	case Response of
 		{ok, _, _, Results} ->
 			Results;
