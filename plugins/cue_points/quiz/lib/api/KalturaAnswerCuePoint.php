@@ -14,6 +14,7 @@ class KalturaAnswerCuePoint extends KalturaCuePoint
 
 	/**
 	 * @var string
+	 * @filter eq,in
 	 * @insertonly
 	 */
 	public $quizUserEntryId;

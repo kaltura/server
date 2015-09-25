@@ -742,6 +742,7 @@ class YouTubeDistributionProfile extends ConfigurableDistributionProfile
 					
 		$url = kConf::get('apphome_url');
 		$url .= "/index.php/extservices/googleoauth2/ytid/$appId/subid/$subId";
+		$url .= "?partnerId=".$this->getPartnerId();
 		return $url;
 	}
 }

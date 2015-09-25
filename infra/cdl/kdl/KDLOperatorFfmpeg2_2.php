@@ -43,10 +43,10 @@ class KDLOperatorFfmpeg2_2 extends KDLOperatorFfmpeg2_1_3 {
 
 	/**
 	 * 
-	 * KDLOperatorFfmpeg2_7
+	 * KDLOperatorFfmpeg2_7_2
 	 *
 	 */
-class KDLOperatorFfmpeg2_7 extends KDLOperatorFfmpeg2_2 {
+class KDLOperatorFfmpeg2_7_2 extends KDLOperatorFfmpeg2_2 {
 	
 	/**
 	 * generateVideoFilters
@@ -79,8 +79,8 @@ class KDLOperatorFfmpeg2_7 extends KDLOperatorFfmpeg2_2 {
 			 * 'qmax=8' fixes it. 
 			 */
 		$vidCodecSpecStr = parent::getVideoCodecSpecificParams($design, $target);
-		if($target->_video->_id==KDLVideoTarget::VP8 && $target->_video->_bitRate<500) {
-			$vidCodecSpecStr.= " -qmax 8";
+		if($target->_video->_id==KDLVideoTarget::VP8) {
+			$vidCodecSpecStr.= " -quality good -cpu-used 0 -qmin 10";
 		}
 		return $vidCodecSpecStr;
 	}
