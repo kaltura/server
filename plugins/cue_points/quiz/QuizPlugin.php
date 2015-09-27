@@ -554,7 +554,7 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 		if (!QuizPlugin::isWithoutValue($userIds)) {
 			$c = $this->createGetCuePointByUserIdsCriteria($userIds, $c);
 		}
-		if (!QuizPlugin::sWithoutValue($entryIds)) {
+		if (!QuizPlugin::isWithoutValue($entryIds)) {
 			$c->add(CuePointPeer::ENTRY_ID, explode(",", $entryIds), Criteria::IN);
 		}
 		$c->add(CuePointPeer::TYPE, QuizPlugin::getCoreValue('CuePointType', QuizCuePointType::QUIZ_ANSWER));
