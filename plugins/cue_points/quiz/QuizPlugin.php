@@ -419,11 +419,6 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 		$c->add(UserEntryPeer::ENTRY_ID, $objectIds);
 		$c->add(UserEntryPeer::TYPE, QuizPlugin::getCoreValue('UserEntryType', QuizUserEntryType::QUIZ));
 		$c->add(UserEntryPeer::STATUS, QuizPlugin::getCoreValue('UserEntryStatus', QuizUserEntryStatus::QUIZ_SUBMITTED));
-		$anonKuserIds = $this->getAnonymousKuserIds($dbEntry->getPartnerId());
-		if (!empty($anonKuserIds))
-		{
-			$c->add(UserEntryPeer::KUSER_ID, $anonKuserIds, Criteria::NOT_IN);
-		}
 
 		$quizzes = UserEntryPeer::doSelect($c);
 		$numOfQuizzesFound = count($quizzes);
@@ -593,11 +588,6 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 		$c = new Criteria();
 		$c->add(CuePointPeer::ENTRY_ID, $objectIds);
 		$c->add(CuePointPeer::TYPE, QuizPlugin::getCoreValue('CuePointType',QuizCuePointType::QUIZ_ANSWER));
-		$anonKuserIds = $this->getAnonymousKuserIds($dbEntry->getPartnerId());
-		if (!empty($anonKuserIds))
-		{
-			$c->add(CuePointPeer::KUSER_ID, $anonKuserIds, Criteria::NOT_IN);
-		}
 		$answers = CuePointPeer::doSelect($c);
 		return $this->getAggregateDataForUsers($answers, $orderBy);
 	}
