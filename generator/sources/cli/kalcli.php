@@ -42,8 +42,6 @@ define('API_LOG_FILENAME', $config['logDir'] . '/kaltura_api_v3.log');
 
 function formatResponseKalcliInput($resp, $prefix = '', $varName = null)
 {
-	global $DATE_FIELD_SUFFIXES;
-
 	$returnCode = 0;
 
 	switch (gettype($resp))
@@ -85,8 +83,6 @@ function formatResponseKalcliInput($resp, $prefix = '', $varName = null)
 			unset($properties['__PHP_Incomplete_Class_Name']);
 			foreach ($properties as $name => $value)
 			{
-				if ($name == '__PHP_Incomplete_Class_Name')
-					continue;
 				$newPrefix = $prefix . ':' . $name;
 				list($formattedValue, $internalReturnCode) = formatResponseKalcliInput($value, $newPrefix, $name);
 					
@@ -96,7 +92,7 @@ function formatResponseKalcliInput($resp, $prefix = '', $varName = null)
 	}
 }
 
-function formatResponse($resp, $prefix = '', $varName = null)
+function formatResponse($resp, $indent = '', $varName = null)
 {
 	global $DATE_FIELD_SUFFIXES;
 	
@@ -124,12 +120,11 @@ function formatResponse($resp, $prefix = '', $varName = null)
 		$result = "array";
 		foreach ($resp as $index => $elem)
 		{
-			list($value, $internalReturnCode) = formatResponse($elem, $prefix . "\t", $index);
-
-			$result .= "\n{$prefix}\t{$index}\t{$value}";
+			list($value, $internalReturnCode) = formatResponse($elem, $indent . "\t", $index);
+			$result .= "\n{$indent}\t{$index}\t{$value}";
 		}
 		
-		if ($prefix == "" && isset($resp['objectType']) && strpos($resp['objectType'], 'Exception') !== false)
+		if ($indent == "" && isset($resp['objectType']) && strpos($resp['objectType'], 'Exception') !== false)
 		{
 			$returnCode = 1;
 		}
@@ -142,11 +137,8 @@ function formatResponse($resp, $prefix = '', $varName = null)
 		unset($properties['__PHP_Incomplete_Class_Name']);
 		foreach ($properties as $name => $value)
 		{
-			if ($name == '__PHP_Incomplete_Class_Name')
-				continue;
-			list($formattedValue, $internalReturnCode) = formatResponse($value, $prefix . "\t", $name);
-			
-			$result .= "\n{$prefix}\t{$name}\t{$formattedValue}";
+			list($value, $internalReturnCode) = formatResponse($value, $indent . "\t", $name);
+			$result .= "\n{$indent}\t{$name}\t{$value}";
 		}
 		return array($result, $returnCode);
 	}
