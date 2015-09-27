@@ -618,6 +618,7 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 				$anonKuserIds = $this->getAnonymousKuserIds($dbEntry->getPartnerId());
 				if (!empty($anonKuserIds)) {
 					$hasAnonymous = true;
+					break;
 				}
 			}
 			if ($hasAnonymous) { 
