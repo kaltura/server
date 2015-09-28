@@ -55,13 +55,13 @@ public class SessionServiceTest extends BaseTest {
 			
 		} catch (KalturaApiException e) {
 			e.printStackTrace();
-			fail();
+			fail(e.getMessage());
 		}
 		
 		// Test close connection
 		try {
 			client.getMediaService().list();
-			fail();
+			fail("Listing entries without KS should fail");
 		} catch (KalturaApiException e) {
 			// Should fail since the connection is closed.
 		}
@@ -79,7 +79,7 @@ public class SessionServiceTest extends BaseTest {
 			assertNotNull(response);
 		} catch (Exception e) {
 			e.printStackTrace();
-			fail();
+			fail(e.getMessage());
 		}
 
 		try {
@@ -89,7 +89,7 @@ public class SessionServiceTest extends BaseTest {
 			client.setSessionId(KS);
 
 			client.getMediaService().list();
-			fail();
+			fail("Listing entries with invalid KS should fail");
 		} catch (Exception e) {
 			assertTrue(e instanceof KalturaApiException);
 			String msg = ((KalturaApiException)e).getMessage();

@@ -32,6 +32,11 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import javax.json.Json;
+import javax.json.JsonObjectBuilder;
+import javax.json.JsonString;
+import javax.json.JsonValue;
+
 import com.kaltura.client.enums.KalturaEnumAsInt;
 import com.kaltura.client.enums.KalturaEnumAsString;
 
@@ -42,44 +47,100 @@ import com.kaltura.client.enums.KalturaEnumAsString;
  * @author jpotts
  * 
  */
-public class KalturaParams extends HashMap<String, String> {
+public class KalturaParams extends HashMap<String, IKalturaParam> implements IKalturaParam {
 	
-	private static final String PARAMS_SEPERATOR = ":";
-
 	private static final long serialVersionUID = 6630046786691120850L;
 
 	private static final String ENCODING = "UTF-8";
 	
-	public String toQueryString() throws KalturaApiException {
+	class StringParam implements JsonString, IKalturaParam{
+		public String value;
 
-		try {
+		public StringParam(String stringValue){
+			value = stringValue;
+		}
+		
+		@Override
+		public Object toQueryString(String key) throws KalturaApiException {
 			StringBuffer str = new StringBuffer();
-
-			boolean isFirst = true;
-			for (java.util.Map.Entry<String, String> itr : this.entrySet()) {
-				if(isFirst) {
-					isFirst = false;
-				} else {
-					str.append("&");
-				}
-				str.append(itr.getKey());
-				str.append("=");
-				str.append(URLEncoder.encode(itr.getValue(), ENCODING));
+			str.append(key);
+			str.append("=");
+			
+			try {
+				str.append(URLEncoder.encode(value, ENCODING));
+			} catch (UnsupportedEncodingException e) {
+				throw new KalturaApiException("Failed to generate query string");
 			}
-
+			
 			return str.toString();
-		} catch (UnsupportedEncodingException e) {
-			throw new KalturaApiException("Failed to generate query string");
+		}
+
+		@Override
+		public JsonValue toJsonObject() {
+			return this;
+		}
+
+		@Override
+		public ValueType getValueType() {
+			return JsonValue.ValueType.STRING;
+		}
+
+		@Override
+		public String getString() {
+			return value;
+		}
+
+		@Override
+		public CharSequence getChars() {
+			return value;
 		}
 	}
+	
+	public String toQueryString() throws KalturaApiException {
+		return toQueryString(null);
+	}
+	
+	public String toQueryString(String prefix) throws KalturaApiException {
 
+		StringBuffer str = new StringBuffer();
+		IKalturaParam value;
+		for (String key : keySet()) {
+			if(str.length() > 0) {
+				str.append("&");
+			}
+			
+			value = get(key);
+			if(prefix != null){
+				key = prefix + "[" + key + "]";
+			}
+				
+			str.append(value.toQueryString(key));
+		}
+
+		return str.toString();
+	}
+
+	public String toJson() {
+		return toJsonObject().toString();
+	}
+
+	public JsonValue toJsonObject() {
+		JsonObjectBuilder jsonBuilder = Json.createObjectBuilder();
+		IKalturaParam value;
+		for (String key : this.keySet()) {
+			value = get(key);
+			jsonBuilder.add(key, value.toJsonObject());
+		}
+		return jsonBuilder.build();
+	}
+	
 	public void add(String key, int value) {
 		if (value == KalturaParamsValueDefaults.KALTURA_UNDEF_INT)
 			return;
 		if (value == KalturaParamsValueDefaults.KALTURA_NULL_INT)
 			putNull(key);
 		else
-			this.put(key, Integer.toString(value));
+			this.put(key, new StringParam(Integer.toString(value)));
 	}
 	
 	public void add(String key, long value) {
@@ -88,7 +149,7 @@ public class KalturaParams extends HashMap<String, String> {
 		if (value == KalturaParamsValueDefaults.KALTURA_NULL_LONG)
 			putNull(key);
 		else
-			this.put(key, Long.toString(value));
+			this.put(key, new StringParam(Long.toString(value)));
 	}
 
 	public void add(String key, double value) {
@@ -97,7 +158,7 @@ public class KalturaParams extends HashMap<String, String> {
 		if (value == KalturaParamsValueDefaults.KALTURA_NULL_DOUBLE)
 			putNull(key);
 		else
-			this.put(key, Double.toString(value));
+			this.put(key, new StringParam(Double.toString(value)));
 	}
 
 	public void add(String key, String value) {
@@ -106,33 +167,34 @@ public class KalturaParams extends HashMap<String, String> {
 		if (value.equals(KalturaParamsValueDefaults.KALTURA_NULL_STRING))
 			putNull(key);
 		else
-			this.put(key, value);
+			this.put(key, new StringParam(value));
 	}
 	
 	public void add(String key, KalturaObjectBase object) {
 		if (object == null)
 			return;
-
-		for (java.util.Map.Entry<String, String> itr : object.toParams().entrySet()) {
-			this.put(key + PARAMS_SEPERATOR + itr.getKey(), itr.getValue());
-		}
+		
+		this.put(key, object.toParams());
 	}
 
 	public <T extends KalturaObjectBase> void add(String key, ArrayList<T> array) {
 		if (array == null)
 			return;
 
-		int index = 0;
-		for (KalturaObjectBase baseObj : array) {
-			for (java.util.Map.Entry<String, String> itr : baseObj.toParams().entrySet()) {
-				this.put(key + PARAMS_SEPERATOR + index + PARAMS_SEPERATOR
-						+ itr.getKey(), itr.getValue());
-			}
-			index++;
-		}
 
 		if (array.isEmpty()) {
-			this.put(key + PARAMS_SEPERATOR + "-", "");
+			KalturaParams emptyParams = new KalturaParams();
+			emptyParams.put("-", new StringParam(""));
+			this.put(key, emptyParams);
+		}
+		else{
+			KalturaParams arrayParams = new KalturaParams();
+			int index = 0;
+			for (KalturaObjectBase baseObj : array) {
+				arrayParams.add(Integer.toString(index), baseObj);
+				index++;
+			}
+			this.put(key, arrayParams);
 		}
 	}
 
@@ -140,18 +202,28 @@ public class KalturaParams extends HashMap<String, String> {
 		if (map == null)
 			return;
 
-		int index = 0;
-		for (String itemKey : map.keySet()) {
-			KalturaObjectBase baseObj = map.get(itemKey);
-			for (java.util.Map.Entry<String, String> itr : baseObj.toParams().entrySet()) {
-				this.put(key + PARAMS_SEPERATOR + index + PARAMS_SEPERATOR
-						+ itr.getKey(), itr.getValue());
-			}
-			index++;
-		}
-
 		if (map.isEmpty()) {
-			this.put(key + PARAMS_SEPERATOR + "-", "");
+			KalturaParams emptyParams = new KalturaParams();
+			emptyParams.put("-", new StringParam(""));
+			this.put(key, emptyParams);
+		}
+		else{
+			KalturaParams mapParams = new KalturaParams();
+			for (String itemKey : map.keySet()) {
+				KalturaObjectBase baseObj = map.get(itemKey);
+				mapParams.add(itemKey, baseObj);
+			}
+			this.put(key, mapParams);
+		}
+	}
+	
+	public <T extends KalturaObjectBase> void add(String key, IKalturaParam params) {
+		if(params instanceof KalturaParams && containsKey(key) && get(key) instanceof KalturaParams){
+			KalturaParams existingParams = (KalturaParams) get(key);
+			existingParams.putAll((KalturaParams) params);
+		}
+		else{
+			put(key, params);
 		}
 	}
 	
@@ -159,18 +231,8 @@ public class KalturaParams extends HashMap<String, String> {
 		this.putAll(objectProperties);
 	}
 	
-	public void addMulti(int idx, KalturaParams objectProperties) {
-		for (java.util.Map.Entry<String, String> itr : objectProperties.entrySet()) {
-			this.put(Integer.toString(idx) + PARAMS_SEPERATOR + itr.getKey(), itr.getValue());           
-		}
-	}
-	
-	public void addMulti(int idx, String key, String value) {
-		this.put(Integer.toString(idx) + PARAMS_SEPERATOR + key, value);
-	}
-
 	protected void putNull(String key) {
-		this.put(key + "__null", "");
+		this.put(key + "__null", new StringParam(""));
 	}
 	
 	/**
@@ -178,7 +240,7 @@ public class KalturaParams extends HashMap<String, String> {
 	 * neither it supports setting value to null.
 	 */
 	public void add(String key, boolean value) {
-		this.put(key, value ? "1" : "0");
+		this.put(key, new StringParam(value ? "1" : "0"));
 	}
 	
 	/**

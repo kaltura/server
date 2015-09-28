@@ -77,10 +77,10 @@ public class UiConfServiceTest extends BaseTest {
 			KalturaUiConf addedConf = addUiConf(name);
 			assertNotNull(addedConf);
 			
-		} catch (KalturaApiException kae) {
+		} catch (KalturaApiException e) {
 			if (logger.isEnabled())
-				logger.error(kae);
-			fail();
+				logger.error(e);
+			fail(e.getMessage());
 		}
 		
 	}
@@ -99,10 +99,10 @@ public class UiConfServiceTest extends BaseTest {
 			KalturaUiConf retrievedConf = confService.get(addedConfId);
 			assertEquals(retrievedConf.getId(), addedConfId);
 			
-		} catch (KalturaApiException kae) {
+		} catch (KalturaApiException e) {
 			if (logger.isEnabled())
-				logger.error(kae);
-			fail();
+				logger.error(e);
+			fail(e.getMessage());
 		}
 		
 	}
@@ -124,7 +124,7 @@ public class UiConfServiceTest extends BaseTest {
 			
 			try {
 				confService.get(addedConfId);
-				fail();
+				fail("Getting deleted ui-conf should fail");
 			} catch (KalturaApiException kae) {
 				// Wanted behavior
 			} finally {
@@ -132,10 +132,10 @@ public class UiConfServiceTest extends BaseTest {
 				this.testUiConfIds.remove(testUiConfIds.size() - 1);
 			}
 						
-		} catch (KalturaApiException kae) {
+		} catch (KalturaApiException e) {
 			if (logger.isEnabled())
-				logger.error(kae);
-			fail();
+				logger.error(e);
+			fail(e.getMessage());
 		}
 	}
 
@@ -156,10 +156,10 @@ public class UiConfServiceTest extends BaseTest {
 					logger.debug("uiConf id:" + uiConf.getId() + " name:" + uiConf.getName());
 			}
 			
-		} catch (KalturaApiException kae) {
+		} catch (KalturaApiException e) {
 			if (logger.isEnabled())
-				logger.error(kae);
-			fail();
+				logger.error(e);
+			fail(e.getMessage());
 		}
 	}
 	
