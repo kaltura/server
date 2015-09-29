@@ -42,7 +42,7 @@ abstract class MediaServerNode extends DeliveryServerNode {
 	
 	public function getProtocolPortConfig()
 	{
-		return $this->getFromCustomData(self::CUSTOM_DATA_PROTOCOL_PORT_CONFIG_ARRAY, null, array());
+		return $this->getFromCustomData(self::CUSTOM_DATA_PROTOCOL_PORT_CONFIG_ARRAY, null, null);
 	}
 	
 	public function setApplicationName($applicationName)

@@ -39,7 +39,7 @@ class WowzaMediaServerNode extends MediaServerNode {
 		$playbackHost = $this->getPlaybackHost();
 		
 		$protocolPortConfiguration = $this->getProtocolPortConfig();
-		if(count($protocolPortConfiguration) && isset($protocolPortConfiguration[$protocol]) && $protocolPortConfiguration[$protocol] !== WowzaMediaServerNode::DEFAULT_MANIFEST_PORT)
+		if($protocolPortConfiguration && isset($protocolPortConfiguration[$protocol]) && $protocolPortConfiguration[$protocol] !== WowzaMediaServerNode::DEFAULT_MANIFEST_PORT)
 			$playbackHost = str_replace(":" . WowzaMediaServerNode::DEFAULT_MANIFEST_PORT, ":$protocolPortConfiguration[$protocol]", $playbackHost);
 		
 		$hostname = $this->getHostname();
