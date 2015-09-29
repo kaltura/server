@@ -145,7 +145,7 @@ class VoicebaseClientHelper
 		
 		foreach($transcriptWordObjects as $wordObject)
 		{
-			if(0 <= $wordObject->c && $wordObject->c <= 1)
+			if(isset($wordObject->c) && 0 <= $wordObject->c && $wordObject->c <= 1)
 			{
 				$sumOfAccuracies += $wordObject->c;
 				$numberOfElements++;
