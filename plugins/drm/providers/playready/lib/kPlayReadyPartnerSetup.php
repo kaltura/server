@@ -118,6 +118,7 @@ class kPlayReadyPartnerSetup
 		$action->setPolicyId($policyId);
 		$rule->setConditions(array($condition));
 		$rule->setActions(array($action));
+		$rule->setContexts(array(ContextType::PLAY));
 		return $rule;
 	}
 }
