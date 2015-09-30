@@ -774,11 +774,14 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 			{
 				$totalAnswers += $usersWrongAnswers[$kuserId];
 			}
-			$userId = "unknown-user";
+			$userId = "Unknown";
 			$dbKuser = kuserPeer::retrieveByPK($kuserId);
 			if ($dbKuser)
 			{
-				$userId = $dbKuser->getPuserId();
+				if($dbKuser->getPuserId())
+				{
+					$userId = $dbKuser->getPuserId();
+				}
 			}
 			$ans[$userId] = array('user_id' => $userId, 
 				'percentage' => ($totalCorrect / $totalAnswers) * 100, 
