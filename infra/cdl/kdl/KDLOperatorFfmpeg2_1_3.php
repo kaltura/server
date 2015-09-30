@@ -359,13 +359,13 @@ class KDLOperatorFfmpeg2_1_3 extends KDLOperatorFfmpeg1_1_1 {
 
 	/**
 	 * 
-	 * @param unknown_type $wmData
+	 * @param unknown_type $watermarkData
 	 * @param unknown_type $flip
 	 * @param unknown_type $wmWid
 	 * @param unknown_type $wmHgt
 	 * @return string
 	 */
-	protected static function generateWatermarkParams($wmData, $rotation=null, $wmWid=KDLCmdlinePlaceholders::WaterMarkWidth, $wmHgt=KDLCmdlinePlaceholders::WaterMarkHeight)
+	protected static function generateWatermarkParams($watermarkData, $rotation=null, $wmWid=KDLCmdlinePlaceholders::WaterMarkWidth, $wmHgt=KDLCmdlinePlaceholders::WaterMarkHeight)
 	{
 /*
 	if(isset(
@@ -385,9 +385,13 @@ $wmData->opacity
 					$prepArr[]="transpose=1";
 			}
 		}
-		if(isset($wmData->scale)) {
-			$wmData->scale = explode("x",$wmData->scale);
-			KalturaLog::log("Watermark data:\n".print_r($wmData,1));
+
+			// Don't change the passed WM arg, clone it!!!
+		$wmAux = clone($watermarkData);
+
+		if(isset($wmAux->scale)) {
+			$wmAux->scale = explode("x",$wmAux->scale);
+			KalturaLog::log("Watermark data:\n".print_r($wmAux,1));
 			$prepArr[] ="scale=$wmWid:$wmHgt,setsar=$wmWid/$wmHgt";
 		}
 		if(isset($prepArr)) {
@@ -399,18 +403,18 @@ $wmData->opacity
 		}
 		$marginsCrop = null;
 		$marginsOver = null;
-		if(isset($wmData->margins)) {
-			$wmData->margins = explode("x",$wmData->margins);
+		if(isset($wmAux->margins)) {
+			$wmAux->margins = explode("x",$wmAux->margins);
 			if(isset($rotation) && $rotation!=180){
-				$m=$wmData->margins[0];
-				$wmData->margins[0]=$wmData->margins[1];
-				$wmData->margins[1]=$m;
+				$m=$wmAux->margins[0];
+				$wmAux->margins[0]=$wmAux->margins[1];
+				$wmAux->margins[1]=$m;
 			}
-			$w = $wmData->margins[0];
+			$w = $wmAux->margins[0];
 			if(($centerW=strstr($w,"center"))!=false) $w = (int)str_replace("center", "",$w);
 			$w = in_array($w, array(null,0,-1))? 0: $w;
 			
-			$h = $wmData->margins[1];
+			$h = $wmAux->margins[1];
 			if(($centerH=strstr($h,"center"))!=false) $h = (int)str_replace("center", "",$h);
 			$h = in_array($h, array(null,0,-1))? 0: $h;
 			
@@ -434,9 +438,9 @@ $wmData->opacity
 		}
 		$marginsOver = str_replace(array("iw","ow","ih","oh"), array("main_w","overlay_w","main_h","overlay_h"), $marginsCrop);
 
-		if(isset($wmData->opacity)){
+		if(isset($wmAux->opacity)){
 			$watermarkStr.= "[0:v]crop=$wmWid:$wmHgt:".$marginsCrop.",setsar=$wmWid/".$wmHgt."[cropped];";
-			$watermarkStr.= "[cropped][$wmImg]blend=all_mode='overlay':all_opacity=".min(1,$wmData->opacity)."[blended];";
+			$watermarkStr.= "[cropped][$wmImg]blend=all_mode='overlay':all_opacity=".min(1,$wmAux->opacity)."[blended];";
 			$watermarkStr.= "[0:v][blended]overlay=$marginsOver";
 		}
 		else {
