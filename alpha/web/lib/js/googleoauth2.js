@@ -30,15 +30,22 @@
 				return false;
 			}
 
-			var data = {
-				service: 'user',
-				action: 'loginByLoginId',
-				loginId: $email.val(),
-                		password: $password.val(),
-                		partnerId: getQueryVariable("partnerId")
-
-			};
-			callApi(data, onLoginApiSuccess, onLoginApiError);
+			var partnerId = getQueryVariable("partnerId");
+			if (partnerId == false)
+			{
+				$el.find('.error').text('partnerId param not found, please contact Kaltura Support');
+			}
+			else
+			{
+				var data = {
+				    service: 'user',
+				    action: 'loginByLoginId',
+				    loginId: $email.val(),
+				    password: $password.val(),
+				    partnerId: partnerId
+				};
+				callApi(data, onLoginApiSuccess, onLoginApiError);
+			}
 			return false;
 		}
 		
