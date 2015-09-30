@@ -457,13 +457,13 @@ class thumbnailAction extends sfAction
 		{
 			$cacheAge = 0;
 		}
+		else if($partnerCacheAge)
+		{
+		    $cacheAge = $partnerCacheAge;
+		}
 		else if (strpos($tempThumbPath, "_NOCACHE_") !== false)
 		{
 			$cacheAge = 60;
-		}
-		else if($partnerCacheAge)
-		{
-		        $cacheAge = $partnerCacheAge;
 		}
 		else
 		{
