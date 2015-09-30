@@ -76,6 +76,8 @@ class kVoicebaseFlowManager implements kBatchJobStatusEventConsumer
 			KalturaLog::debug('contents are - ' . print_r($contentsArray, true));
 			$captions = $this->getAssetsByLanguage($entryId, array(CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION)), $spokenLanguage);
 			$accuracy = $clientHelper->calculateAccuracy($entryId);
+			if($accuracy)
+				$accuracy = floor($accuracy * 100) / 100;
 
 			$this->setObjectContent($transcript, $contentsArray["TXT"], $accuracy, null, true);
 			unset($contentsArray["TXT"]);

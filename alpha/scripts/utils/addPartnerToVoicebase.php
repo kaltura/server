@@ -3,7 +3,7 @@
 
 	if($argc < 4)
 	{
-		die("Usage: php addVoicebaseParamsToPartner [partner id] [apiKey] [apiPassword]" . PHP_EOL);
+		die("Usage: php " . basename(__FILE__) . " [partner id] [apiKey] [apiPassword]" . PHP_EOL);
 	}
 	
 	$partnerId = $argv[1];
