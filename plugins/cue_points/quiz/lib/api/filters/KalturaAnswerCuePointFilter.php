@@ -20,4 +20,12 @@ class KalturaAnswerCuePointFilter extends KalturaAnswerCuePointBaseFilter
 	{
 		return parent::getTypeListResponse($pager, $responseProfile, QuizPlugin::getCoreValue('CuePointType',QuizCuePointType::QUIZ_ANSWER));
 	}
+	
+	/* (non-PHPdoc)
+	 * @see KalturaFilter::getCoreFilter()
+	 */
+	protected function getCoreFilter()
+	{
+	    return new AnswerCuePointFilter();
+	}	
 }
