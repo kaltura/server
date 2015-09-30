@@ -6,6 +6,7 @@
 class kIntegrationFlowManager implements kBatchJobStatusEventConsumer
 {
 	const EXTERNAL_INTEGRATION_SERVICES_ROLE_NAME = "EXTERNAL_INTEGRATION_SERVICES_ROLE";
+	const THREE_DAYS_IN_SECONDS = 259200;
 
 	/* (non-PHPdoc)
 	 * @see kBatchJobStatusEventConsumer::updatedJob()
@@ -106,7 +107,7 @@ class kIntegrationFlowManager implements kBatchJobStatusEventConsumer
 		$additionalData = md5($tokenPrefix . $token);
 		
 		$ks = "";
-		$creationSucces = kSessionUtils::startKSession ($partnerId, $userSecret, "", $ks, 86400, KalturaSessionType::USER, "", $privileges, null,$additionalData);
+		$creationSucces = kSessionUtils::startKSession ($partnerId, $userSecret, "", $ks, self::THREE_DAYS_IN_SECONDS, KalturaSessionType::USER, "", $privileges, null,$additionalData);
 		if ($creationSucces >= 0 )
 				return $ks;
 		
