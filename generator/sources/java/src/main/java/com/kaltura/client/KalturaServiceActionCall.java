@@ -71,7 +71,7 @@ public class KalturaServiceActionCall {
         
         params.add("service", service);
         params.add("action", action);
-        multiRequestParams.put(Integer.toString(multiRequestNumber), params);
+        multiRequestParams.add(Integer.toString(multiRequestNumber), params);
         
         return multiRequestParams;
     }

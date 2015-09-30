@@ -38,7 +38,7 @@ import java.io.Serializable;
 @SuppressWarnings("serial")
 public class KalturaObjectBase implements Serializable {
 
-	public KalturaParams toParams() {
+	public KalturaParams toParams() throws KalturaApiException {
 		return new KalturaParams();
 	}
 	

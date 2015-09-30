@@ -32,6 +32,7 @@ class AndroidClientGenerator extends JavaClientGenerator
 	public function generate() 
 	{
 		$this->addFiles("sources/java/src", "KalturaClient/src/");
+		$this->removeFiles("KalturaClient/src/main/java/Kaltura.java");
 		$this->removeFiles("KalturaClient/src/main/java/com/kaltura/client/KalturaLoggerLog4j.java");
 		$this->addFiles("sources/java/src/test", "KalturaClientTester/src/main/");
 

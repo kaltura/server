@@ -41,7 +41,6 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -63,7 +62,6 @@ import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpConnectionManager;
 import org.apache.commons.httpclient.HttpException;
-import org.apache.commons.httpclient.HttpState;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
 import org.apache.commons.httpclient.ProxyHost;
@@ -204,19 +202,19 @@ abstract public class KalturaClientBase implements Serializable {
 		return this.kalturaConfiguration;
 	}
 	
-	public void queueServiceCall(String service, String action, KalturaParams kparams) {
+	public void queueServiceCall(String service, String action, KalturaParams kparams) throws KalturaApiException {
 		this.queueServiceCall(service, action, kparams, new KalturaFiles(), null);
 	}
 	
-	public void queueServiceCall(String service, String action, KalturaParams kparams, Class<?> expectedClass) {
+	public void queueServiceCall(String service, String action, KalturaParams kparams, Class<?> expectedClass) throws KalturaApiException {
 		this.queueServiceCall(service, action, kparams, new KalturaFiles(), expectedClass);
 	}
 	
-	public void queueServiceCall(String service, String action, KalturaParams kparams, KalturaFiles kfiles) {
+	public void queueServiceCall(String service, String action, KalturaParams kparams, KalturaFiles kfiles) throws KalturaApiException {
 		this.queueServiceCall(service, action, kparams, kfiles, null);
 	}
 
-	public void queueServiceCall(String service, String action, KalturaParams kparams, KalturaFiles kfiles, Class<?> expectedClass) {
+	public void queueServiceCall(String service, String action, KalturaParams kparams, KalturaFiles kfiles, Class<?> expectedClass) throws KalturaApiException {
 		for(Entry<String, Object> itr : this.requestConfiguration.entrySet()) {
 			kparams.add(itr.getKey(), String.valueOf(itr.getValue()));
 		}
@@ -252,7 +250,7 @@ abstract public class KalturaClientBase implements Serializable {
 
 		if (logger.isEnabled())
 		{
-			logger.debug("JSON: [" + kparams.toJson() + "]");
+			logger.debug("JSON: [" + kparams + "]");
 		}
 
 		PostMethod method;
@@ -480,9 +478,9 @@ abstract public class KalturaClientBase implements Serializable {
 			}
 
 			// map params
-			for (String key : this.multiRequestParamsMap.keySet()) {
-				String requestParam = key;
-				IKalturaParam resultParam = this.multiRequestParamsMap.get(key);
+			for (Object key : this.multiRequestParamsMap.keySet()) {
+				String requestParam = (String) key;
+				KalturaParams resultParam = this.multiRequestParamsMap.getParams(requestParam);
 
 				if (kparams.containsKey(requestParam)) {
 					kparams.add(requestParam, resultParam);
@@ -564,11 +562,11 @@ abstract public class KalturaClientBase implements Serializable {
 	}
 	
 	
-	public void mapMultiRequestParam(int resultNumber, int requestNumber, String requestParamName) {
+	public void mapMultiRequestParam(int resultNumber, int requestNumber, String requestParamName) throws KalturaApiException {
 		this.mapMultiRequestParam(resultNumber, null, requestNumber, requestParamName);
 	}
 
-	public void mapMultiRequestParam(int resultNumber, String resultParamName, int requestNumber, String requestParamName) {
+	public void mapMultiRequestParam(int resultNumber, String resultParamName, int requestNumber, String requestParamName) throws KalturaApiException {
 		String resultParam = "{" + resultNumber + ":result";
 		if (resultParamName != null && resultParamName != ""){
 			resultParam += resultParamName;
@@ -582,15 +580,7 @@ abstract public class KalturaClientBase implements Serializable {
 	}
 
 	private String signature(KalturaParams kparams) throws KalturaApiException {
-		String str = "";
-		List<String> keys = new ArrayList<String>(kparams.keySet());
-		Collections.sort(keys);
-		for (String key : keys) {
-			str += (key + kparams.get(key));
-		}
-
-		String md5 = new String(Hex.encodeHex(DigestUtils.md5(str)));;
-		
+		String md5 = new String(Hex.encodeHex(DigestUtils.md5(kparams.toString())));;
 		return md5;
 	}
 
@@ -637,7 +627,7 @@ abstract public class KalturaClientBase implements Serializable {
 		List <Part> parts = new ArrayList<Part>();
 		parts.add(new StringPart (HttpMethodParams.MULTIPART_BOUNDARY, boundary));
  
-		parts.add(new StringPart ("json", kparams.toJson()));	   
+		parts.add(new StringPart ("json", kparams.toString()));	   
 
 		for (String key : kfiles.keySet()) {
 			final KalturaFile kFile = kfiles.get(key);
@@ -681,7 +671,7 @@ abstract public class KalturaClientBase implements Serializable {
 	}
 		
 	private PostMethod addParams(PostMethod method, KalturaParams kparams) throws UnsupportedEncodingException {
-		String content = kparams.toJson();
+		String content = kparams.toString();
 		String contentType = "application/json";
 		StringRequestEntity requestEntity = new StringRequestEntity(content, contentType , null);
 		

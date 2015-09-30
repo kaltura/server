@@ -98,7 +98,7 @@ public class ErrorTest extends BaseTest {
 	/**
 	 * Tests case in which XML format is completely ruined
 	 */
-	public void testXmlParsingError() {
+	public void testXmlParsingError() throws KalturaApiException {
 		KalturaClientMock mockClient = new KalturaClientMock(this.kalturaConfig, "<xml>");
 		mockClient.queueServiceCall("system", "ping", new KalturaParams());
 		try {
