@@ -6,6 +6,8 @@
 abstract class LiveEntry extends entry
 {
 	const IS_LIVE = 'isLive';
+	const PRIMARY_HOSTNAME = 'primaryHostname';
+	const SECONDARY_HOSTNAME = 'backupHostname';
 	const FIRST_BROADCAST = 'first_broadcast';
 	const RECORDED_ENTRY_ID = 'recorded_entry_id';
 
@@ -375,6 +377,8 @@ abstract class LiveEntry extends entry
 		
 		$manifestUrl = null;
 		$backupManifestUrl = null;
+		$hlsManifestUrl = null;
+		$hlsBackupManifestUrl = null;
 		
 		if (count ($this->getPartner()->getLiveStreamPlaybackUrlConfigurations()))
 		{
@@ -386,9 +390,11 @@ abstract class LiveEntry extends entry
 		elseif($primaryMediaServer)
 		{
 			$manifestUrl = $primaryMediaServer->getManifestUrl($protocol, $partnerMediaServerConfiguration);
+			$hlsManifestUrl = $primaryMediaServer->getManifestUrl($protocol, $partnerMediaServerConfiguration, PlaybackProtocol::HLS);
 			if($backupMediaServer)
 			{
 				$backupManifestUrl = $backupMediaServer->getManifestUrl($protocol, $partnerMediaServerConfiguration);
+				$hlsBackupManifestUrl = $backupMediaServer->getManifestUrl($protocol, $partnerMediaServerConfiguration, PlaybackProtocol::HLS);
 			}
 		}
 		
@@ -442,7 +448,11 @@ abstract class LiveEntry extends entry
 			$rtmpStreamUrl = $manifestUrl;
 			
 			$manifestUrl .= $streamName;
-			$hlsStreamUrl = "$manifestUrl/playlist.m3u8" . $queryString;
+			
+			$hlsManifestUrl .= "$primaryApplicationName/";
+			$hlsManifestUrl .= $streamName;
+			
+			$hlsStreamUrl = "$hlsManifestUrl/playlist.m3u8" . $queryString;
 			$hdsStreamUrl = "$manifestUrl/manifest.f4m" . $queryString;
 			$slStreamUrl = "$manifestUrl/Manifest" . $queryString;
 			$mpdStreamUrl = "$manifestUrl/manifest.mpd" . $queryString;
@@ -451,9 +461,13 @@ abstract class LiveEntry extends entry
 			{
 				$backupManifestUrl .= "$backupApplicationName/";
 				$backupManifestUrl .= $streamName;
-				$hlsBackupStreamUrl = "$backupManifestUrl/playlist.m3u8" . $queryString;
+				$hlsbackupManifestUrl .= "$backupApplicationName/";
+				$hlsbackupManifestUrl .= $streamName;
+				$hlsBackupStreamUrl = "$hlsbackupManifestUrl/playlist.m3u8" . $queryString;
 				$hdsBackupStreamUrl = "$backupManifestUrl/manifest.f4m" . $queryString;
 			}
+			
+			
 		}
 			
 //		TODO - enable it and test it in non-SaaS environment
@@ -538,6 +552,22 @@ abstract class LiveEntry extends entry
 			
 		KalturaLog::debug("No Valid Media Servers Were Found For Current Live Entry [" . $this->getEntryId() . "]" );
 		return null;
+	}
+
+	protected function getMediaServersHostnames()
+	{
+		$hostnames = array();
+		$kMediaServers = $this->getMediaServers();
+
+		foreach($kMediaServers as $kMediaServer)
+		{
+			if($kMediaServer instanceof kLiveMediaServer)
+			{
+				$hostnames[$kMediaServer->getIndex()] = $kMediaServer->getHostname();
+			}
+		}
+		KalturaLog::debug("media servers hostnames: " . print_r($hostnames,true));
+		return $hostnames;
 	}
 	
 	/**
@@ -698,9 +728,16 @@ abstract class LiveEntry extends entry
 				LiveEntry::IS_LIVE => intval($this->hasMediaServer()),
 				LiveEntry::FIRST_BROADCAST => $this->getFirstBroadcast(),
 				LiveEntry::RECORDED_ENTRY_ID => $this->getRecordedEntryId(),
+
 		);
-		
-		return array_merge( $dynamicAttributes, parent::getDynamicAttributes() ); 
+		$mediaServers = $this->getMediaServersHostnames();
+		if (isset($mediaServers[MediaServerIndex::PRIMARY])) {
+			$dynamicAttributes[LiveEntry::PRIMARY_HOSTNAME] = $mediaServers[MediaServerIndex::PRIMARY];
+		}
+		if (isset($mediaServers[MediaServerIndex::SECONDARY])) {
+			$dynamicAttributes[LiveEntry::SECONDARY_HOSTNAME] = $mediaServers[MediaServerIndex::SECONDARY];
+		}
+		return array_merge( $dynamicAttributes, parent::getDynamicAttributes() );
 	}
 	
 	/**

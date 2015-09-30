@@ -41,7 +41,7 @@ abstract class KalturaParentContributedPlugin extends KalturaPlugin implements I
      */
     public function getObjectFeatureType()
     {
-        $value = self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . ParentObjectFeatureType::PARENT;
+        $value = $this->getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . ParentObjectFeatureType::PARENT;
         return kPluginableEnumsManager::apiToCore('ObjectFeatureType', $value);
     }
 }

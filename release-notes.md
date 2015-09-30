@@ -1,3 +1,53 @@
+# Jupiter-10.21.0 #
+
+## In Video Quiz - Permissions Update ##
+
+- Issue Type: New Feature  
+- Issue ID: PLAT-3864
+
+#### Installation ####
+
+None.
+
+#### Configuration ####
+
+- Run the following permission script:
+	php deployment\updates\scripts\add_permissions\2015_09_17_update_quiz_permissions.php
+
+#### Known Issues & Limitations ####
+
+None.
+
+## In Video Quiz - Sphinx Implementation for Answer Cue-Point ##
+
+- Issue Type: New Feature  
+- Issue ID: PLAT-3836
+
+#### Installation ####
+
+- Add QuizSphinx to plugins.ini (as demonstrated in plugins.ini.template)
+- Run the installPlugins.php script: deployment/base/scripts/installPlugins.php
+- Run the cue-points population sphinx script: deployment/base/scripts/populateSphinxCuePoints.php
+
+#### Configuration ####
+
+None.
+
+#### Known Issues & Limitations ####
+
+None.	
+	
+	
+# Jupiter-10.20.0 #
+
+### Configuration ###
+
+## Changed kaltura.scheduler_status.id from int(11) to bigint(20) ##
+
+- Run the following permission script:
+
+  mysql -h@db_host@ -u@db_user@ -p@db_pass@ -P3306 kaltura <  deployment/updates/sql/2015_09_06_alter_scheduler_status_bigint.sql
+
 # Jupiter-10.18.0 #
 
 ## Allow answer cue points to be added by player and anonymous users ##

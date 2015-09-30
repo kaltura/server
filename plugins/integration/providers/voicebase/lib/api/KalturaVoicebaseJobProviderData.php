@@ -87,8 +87,16 @@ class KalturaVoicebaseJobProviderData extends KalturaIntegrationJobProviderData
 	{
 		$entryId = $this->entryId;
 		$entry = entryPeer::retrieveByPK($entryId);
-		if(!$entry)
+		if(!$entry || $entry->getType() != entryType::MEDIA_CLIP || !in_array($entry->getMediaType(), array(entry::ENTRY_MEDIA_TYPE_VIDEO,entry::ENTRY_MEDIA_TYPE_AUDIO)))
 			throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_ID, $entryId);
+		
+		$flavorAssetId = $this->flavorAssetId;
+		if($flavorAssetId)
+		{
+			$flavorAsset = assetPeer::retrieveById($flavorAssetId);
+			if(!$flavorAsset || $flavorAsset->getEntryId() != $entryId)
+				throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND, $flavorAssetId);
+		}
 	
 		$transcriptId = $this->transcriptId;
 		if($transcriptId)
@@ -98,28 +106,8 @@ class KalturaVoicebaseJobProviderData extends KalturaIntegrationJobProviderData
 				throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $transcriptId);
 		}
 	
-		$voicebaseParamsMap = kConf::get('voicebase','integration');
-		if(!$this->captionAssetFormats)
-		{
-			$defaultFormatsArray = $voicebaseParamsMap['default_formats'];
-			$this->captionAssetFormats = implode(',', $defaultFormatsArray);
-		}
-		else
-		{
-			$formatsString = $this->captionAssetFormats;
-			$formatsArray = explode(',', $formatsString);
-	
-			$excludedFormats = $voicebaseParamsMap['exclude_formats'];
-	
-			foreach($formatsArray as $format)
-			{
-				if(!constant("KalturaCaptionType::" . $format) || in_array($format, $excludedFormats))
-					throw new KalturaAPIException(KalturaVoicebaseErrors::INVALID_TYPES,$formatsString);
-			}
-		}
-	
+		$voicebaseParamsMap = kConf::get('voicebase','integration');	
 		$supportedLanguages = $voicebaseParamsMap['languages'];
-	
 		if($this->spokenLanguage)
 		{
 			if (!isset($supportedLanguages[$this->spokenLanguage]))
@@ -144,6 +132,43 @@ class KalturaVoicebaseJobProviderData extends KalturaIntegrationJobProviderData
 		$object->setApiKey($voicebaseOptionsObj->apiKey);
 		$object->setApiPassword($voicebaseOptionsObj->apiPassword);
 		
+		if(!$object->getFlavorAssetId())
+		{
+			$sourceAsset = assetPeer::retrieveOriginalReadyByEntryId($entryId);
+			if(!$sourceAsset)
+				throw new KalturaAPIException(KalturaVoicebaseErrors::NO_FLAVOR_ASSET_FOUND, $entryId);
+			$object->setFlavorAssetId($sourceAsset->getId());
+		}
+
+		$voicebaseParamsMap = kConf::get('voicebase','integration');
+
+		if(!$object->getSpokenLanguage())
+		{
+			$object->setSpokenLanguage($voicebaseParamsMap['default_language']);
+		}
+
+		$formatsString = $object->getCaptionAssetFormats();
+		if($formatsString)
+		{
+			$formatsArray = explode(',', $formatsString);
+			$excludedFormats = $voicebaseParamsMap['exclude_formats'];
+			$sanitizedFormatsArray = array();
+			foreach($formatsArray as $format)
+			{
+				$format = preg_replace("/[^A-Z_]/", "", $format);
+				if(!constant("KalturaCaptionType::" . $format) || in_array($format, $excludedFormats))
+					throw new KalturaAPIException(KalturaVoicebaseErrors::INVALID_TYPES,$formatsString);
+				$sanitizedFormatsArray[] = $format;
+			}
+			$sanitizedFormats = implode(",", $sanitizedFormatsArray);
+			$object->setCaptionAssetFormats($sanitizedFormats);
+		}
+		else
+		{
+			$defaultFormats = implode(",", $voicebaseParamsMap['default_formats']);
+			$object->setCaptionAssetFormats($defaultFormats);
+		}
+	
 		if($transcriptId)
 		{
 			$transcript = assetPeer::retrieveById($transcriptId);

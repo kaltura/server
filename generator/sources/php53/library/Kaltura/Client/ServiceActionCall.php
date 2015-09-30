@@ -104,11 +104,11 @@ class ServiceActionCall
 	public function getParamsForMultiRequest($multiRequestIndex)
 	{
 		$multiRequestParams = array();
-		$multiRequestParams[$multiRequestIndex.":service"] = $this->service;
-		$multiRequestParams[$multiRequestIndex.":action"] = $this->action;
+		$multiRequestParams[$multiRequestIndex]['service'] = $this->service;
+		$multiRequestParams[$multiRequestIndex]['action'] = $this->action;
 		foreach($this->params as $key => $val)
 		{
-			$multiRequestParams[$multiRequestIndex.":".$key] = $val;
+			$multiRequestParams[$multiRequestIndex][$key] = $val;
 		}
 		return $multiRequestParams;
 	}
@@ -123,7 +123,7 @@ class ServiceActionCall
 		$multiRequestParams = array();
 		foreach($this->files as $key => $val)
 		{
-			$multiRequestParams[$multiRequestIndex.":".$key] = $val;
+			$multiRequestParams["$multiRequestIndex:$key"] = $val;
 		}
 		return $multiRequestParams;
 	}

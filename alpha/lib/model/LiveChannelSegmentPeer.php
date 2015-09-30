@@ -58,7 +58,7 @@ class LiveChannelSegmentPeer extends BaseLiveChannelSegmentPeer implements IRela
 	/* (non-PHPdoc)
 	 * @see IRelatedObjectPeer::getRootObjects()
 	 */
-	public function getRootObjects(IBaseObject $object)
+	public function getRootObjects(IRelatedObject $object)
 	{
 		/* @var $object LiveChannelSegment */
 		return array(
@@ -69,7 +69,7 @@ class LiveChannelSegmentPeer extends BaseLiveChannelSegmentPeer implements IRela
 	/* (non-PHPdoc)
 	 * @see IRelatedObjectPeer::isReferenced()
 	 */
-	public function isReferenced(IBaseObject $object)
+	public function isReferenced(IRelatedObject $object)
 	{
 		return false;
 	}

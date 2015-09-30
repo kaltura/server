@@ -8,7 +8,7 @@
  * @package Core
  * @subpackage model
  */
-class uiConf extends BaseuiConf implements ISyncableFile
+class uiConf extends BaseuiConf implements ISyncableFile, IRelatedObject
 {
 	const MYSQL_CODE_DUPLICATE_KEY = 23000;
 	

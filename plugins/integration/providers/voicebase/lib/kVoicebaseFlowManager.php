@@ -2,7 +2,7 @@
 class kVoicebaseFlowManager implements kBatchJobStatusEventConsumer 
 {
 	private $baseEndpointUrl = null;
-	const DEFAULT_ACCURACY = 60;
+	const DEFAULT_ACCURACY = 0.6;
 	const FILE_NAME_PATTERN = "{entryId}-Transcript-{language}.txt";
 	
 	/* (non-PHPdoc)
@@ -10,7 +10,7 @@ class kVoicebaseFlowManager implements kBatchJobStatusEventConsumer
 	 */
 	public function shouldConsumeJobStatusEvent(BatchJob $dbBatchJob)
 	{
-		if(in_array($dbBatchJob->getStatus(), array(BatchJob::BATCHJOB_STATUS_DONT_PROCESS, BatchJob::BATCHJOB_STATUS_FINISHED)) && $dbBatchJob->getJobType() == IntegrationPlugin::getBatchJobTypeCoreValue(IntegrationBatchJobType::INTEGRATION))
+		if(in_array($dbBatchJob->getStatus(), array(BatchJob::BATCHJOB_STATUS_FAILED, BatchJob::BATCHJOB_STATUS_DONT_PROCESS, BatchJob::BATCHJOB_STATUS_FINISHED)) && $dbBatchJob->getJobType() == IntegrationPlugin::getBatchJobTypeCoreValue(IntegrationBatchJobType::INTEGRATION))
 		{
 			$providerType = $dbBatchJob->getJobSubType();
 			if ($providerType == VoicebasePlugin::getProviderTypeCoreValue(VoicebaseIntegrationProviderType::VOICEBASE))
@@ -29,10 +29,20 @@ class kVoicebaseFlowManager implements kBatchJobStatusEventConsumer
 		$entryId = $providerData->getEntryId();
 		$partnerId = $dbBatchJob->getPartnerId();
 		$spokenLanguage = $providerData->getSpokenLanguage();
-	
+
+		$transcript = $this->getAssetsByLanguage($entryId, array(TranscriptPlugin::getAssetTypeCoreValue(TranscriptAssetType::TRANSCRIPT)), $spokenLanguage, true);
+		
+		if($dbBatchJob->getStatus() == BatchJob::BATCHJOB_STATUS_FAILED)
+		{
+			if($transcript)
+			{
+				$transcript->setStatus(AttachmentAsset::FLAVOR_ASSET_STATUS_ERROR);
+				$transcript->save();
+			}
+		}
+
 		if($dbBatchJob->getStatus() == BatchJob::BATCHJOB_STATUS_DONT_PROCESS)
 		{
-			$transcript = $this->getAssetsByLanguage($entryId, array(TranscriptPlugin::getAssetTypeCoreValue(TranscriptAssetType::TRANSCRIPT)), $spokenLanguage, true);	
 			if(!$transcript)
 			{
 				$transcript = new TranscriptAsset();
@@ -41,7 +51,6 @@ class kVoicebaseFlowManager implements kBatchJobStatusEventConsumer
 				$transcript->setPartnerId($partnerId);
 				$transcript->setLanguage($spokenLanguage);
 				$transcript->setContainerFormat(AttachmentType::TEXT);
-				$transcript->setAccuracy(self::DEFAULT_ACCURACY);
 			}
 			$transcript->setStatus(AttachmentAsset::ASSET_STATUS_QUEUED);
 			$transcript->save();
@@ -65,10 +74,12 @@ class kVoicebaseFlowManager implements kBatchJobStatusEventConsumer
 			$formatsArray[] = "TXT";
 			$contentsArray = $clientHelper->getRemoteTranscripts($entryId, $formatsArray);
 			KalturaLog::debug('contents are - ' . print_r($contentsArray, true));
-			$transcript = $this->getAssetsByLanguage($entryId, array(TranscriptPlugin::getAssetTypeCoreValue(TranscriptAssetType::TRANSCRIPT)), $spokenLanguage, true);
 			$captions = $this->getAssetsByLanguage($entryId, array(CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION)), $spokenLanguage);
-		
-			$this->setObjectContent($transcript, $contentsArray["TXT"], null, true);
+			$accuracy = $clientHelper->calculateAccuracy($entryId);
+			if($accuracy)
+				$accuracy = floor($accuracy * 100) / 100;
+
+			$this->setObjectContent($transcript, $contentsArray["TXT"], $accuracy, null, true);
 			unset($contentsArray["TXT"]);
 	
 			foreach ($contentsArray as $format => $content)
@@ -83,11 +94,10 @@ class kVoicebaseFlowManager implements kBatchJobStatusEventConsumer
 					$caption->setPartnerId($partnerId);
 					$caption->setLanguage($spokenLanguage);
 					$caption->setContainerFormat($captionFormatConst);
-					$caption->setAccuracy(self::DEFAULT_ACCURACY);
 					$caption->setStatus(CaptionAsset::ASSET_STATUS_QUEUED);
 					$caption->save();
 				}
-				$this->setObjectContent($caption, $content, $format);
+				$this->setObjectContent($caption, $content, $accuracy, $format);
 			}
 		}
 		return true;					    
@@ -111,7 +121,7 @@ class kVoicebaseFlowManager implements kBatchJobStatusEventConsumer
 		return $objects;
 	}
 	
-	private function setObjectContent($assetObject, $content, $format = null, $shouldSetTranscriptFileName = false)
+	private function setObjectContent($assetObject, $content, $accuracy = null, $format = null, $shouldSetTranscriptFileName = false)
 	{
 		$assetObject->incrementVersion();
 		$ext = "txt";
@@ -141,7 +151,11 @@ class kVoicebaseFlowManager implements kBatchJobStatusEventConsumer
 			$fileName = str_replace($patterns, $replacements, self::FILE_NAME_PATTERN);
 			$assetObject->setFileName($fileName);
 		}
-		
+
+		if(!$accuracy)
+			$accuracy = self::DEFAULT_ACCURACY;		
+
+		$assetObject->setAccuracy($accuracy);
 		$assetObject->setStatus(AttachmentAsset::ASSET_STATUS_READY);
 		$assetObject->save();
 	} 

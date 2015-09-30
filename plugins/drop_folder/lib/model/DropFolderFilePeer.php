@@ -123,7 +123,7 @@ class DropFolderFilePeer extends BaseDropFolderFilePeer implements IRelatedObjec
 	/* (non-PHPdoc)
 	 * @see IRelatedObjectPeer::getRootObjects()
 	 */
-	public function getRootObjects(IBaseObject $object)
+	public function getRootObjects(IRelatedObject $object)
 	{
 		return array(DropFolderPeer::retrieveByPK($object->getDropFolderId()));
 	}
@@ -131,7 +131,7 @@ class DropFolderFilePeer extends BaseDropFolderFilePeer implements IRelatedObjec
 	/* (non-PHPdoc)
 	 * @see IRelatedObjectPeer::isReferenced()
 	 */
-	public function isReferenced(IBaseObject $object)
+	public function isReferenced(IRelatedObject $object)
 	{
 		return false;
 	}

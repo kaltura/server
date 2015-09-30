@@ -3,10 +3,10 @@
  * @package plugins.transcript
  * @subpackage api.objects
  */
-class KalturaTranscriptAsset extends KalturaAttachmentAsset 
+class KalturaTranscriptAsset extends KalturaAttachmentAsset
 {
 	/**
-	 * The accuracy of the transcript
+	 * The accuracy of the transcript - values between 0 and 1
 	 * @var float
 	 */
 	public $accuracy;
@@ -18,7 +18,7 @@ class KalturaTranscriptAsset extends KalturaAttachmentAsset
 	public $humanVerified;
 	
 	/**
-	 * The language of the attachment
+	 * The language of the transcript
 	 * @var KalturaLanguage
 	 */
 	public $language;

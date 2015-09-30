@@ -13,7 +13,7 @@
  * @package Core
  * @subpackage model
  */
-class categoryEntryPeer extends BasecategoryEntryPeer implements IKalturaMrssContributor{
+class categoryEntryPeer extends BasecategoryEntryPeer implements IRelatedObjectPeer {
 
 	private static $skipEntrySave = false;
 	
@@ -361,55 +361,33 @@ class categoryEntryPeer extends BasecategoryEntryPeer implements IKalturaMrssCon
 	}
 	
 	/* (non-PHPdoc)
-	 * @see IKalturaMrssContributor::contribute()
+	 * @see IRelatedObjectPeer::getRootObjects()
 	 */
-	public function contribute(BaseObject $object, SimpleXMLElement $mrss, kMrssParameters $mrssParams = null) 
+	public function getRootObjects(IRelatedObject $object)
 	{
-		//If the feed context is the default context- the category entries are not necessary
-		if (kMrssManager::getFeedContext() == kMrssManager::DEFAULT_FEED_CONTEXT)
-			return $mrss;
+		/* @var $object categoryEntry */
 		
-		$categoryEntries = array();	
-		if ($object instanceof entry)
+		$roots = array();
+		
+		$category = categoryPeer::retrieveByPK($object->getCategoryId());
+		if($category)
 		{
-			$categoryEntries = self::retrieveActiveByEntryId($object->getId());
+			$roots = categoryPeer::getRootObjects($category);
+			$roots[] = $category;
 		}
 		
-		if (!count ($categoryEntries))
-		{
-			return $mrss;
-		}
+		$entry = entryPeer::retrieveByPK($object->getEntryId());
+		if($entry)
+			$roots[] = $entry;
 		
-		$categoryEntriesMrss = $mrss->addChild('categoryEntries');
-		foreach ($categoryEntries as $categoryEntry)
-		{
-			$this->contributeCategoryEntry ($categoryEntry, $categoryEntry, $mrssParams);
-		}
-	}
-	
-	protected function contributeCategoryEntry (CategoryEntry $categoryEntry, SimpleXMLElement $mrss, kMrssParameters $mrssParams = null)
-	{
-		$categoryEntryMrss = $mrss->addChild('categoryEntry');
-		$categoryEntryMrss->addChild('entryId', $categoryEntry->getEntryId());
-		$categoryEntryMrss->addChild('categoryId', $categoryEntry->getCategoryId());
-		$categoryEntryMrss->addChild('categoryFullIds', $categoryEntry->getCategoryFullIds());
-		$categoryEntryMrss->addChild('privacyContext', $categoryEntry->getPrivacyContext());
+		return $roots;
 	}
 
 	/* (non-PHPdoc)
-	 * @see IKalturaMrssContributor::getObjectFeatureType()
+	 * @see IRelatedObjectPeer::isReferenced()
 	 */
-	public function getObjectFeatureType() {
-		// TODO Auto-generated method stub
-		
+	public function isReferenced(IRelatedObject $object)
+	{
+		return false;
 	}
-
-	/* (non-PHPdoc)
-	 * @see IKalturaBase::getInstance()
-	 */
-	public function getInstance($interface) {
-		return ObjectFeatureType::CATEGORY_ENTRIES;
-		
-	}
-
 } // categoryEntryPeer

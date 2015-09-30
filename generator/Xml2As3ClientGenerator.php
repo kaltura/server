@@ -671,7 +671,7 @@ class Xml2As3ClientGenerator extends ClientGeneratorFromXml
 					$str .= "			\n";
 					$str .= "			//create the service request for normal calls\n";
 					$str .= "			var variables:String = decodeURIComponent(call.args.toString());\n";
-					$str .= "			var req:String = _config.protocol + _config.domain + \"/\" + _config.srvUrl + \"?service=\" + call.service + \"&action=\" + call.action + \"&\" + variables;\n";
+					$str .= "			var req:String = _config.protocol + _config.domain + \"/\" + _config.srvUrl + \"/service/\" + call.service + \"/action/\" + call.action + \"?\" + variables;\n";
 					$str .= "			if ((call as " . $this->toUpperCamaleCase($xml->attributes()->name) . $this->toUpperCamaleCase( $child->attributes()->name ) . ").$fileAttributeName is FileReference) {\n";
 					$str .= "				(call as " . $this->toUpperCamaleCase($xml->attributes()->name) . $this->toUpperCamaleCase( $child->attributes()->name ) . ").$fileAttributeName.addEventListener(DataEvent.UPLOAD_COMPLETE_DATA,onDataComplete);\n";
 					$str .= "				var urlRequest:URLRequest = new URLRequest(req);\n";

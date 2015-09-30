@@ -26,8 +26,6 @@ class kMrssManager
 	 */
 	protected static $instancesEnabled = true;
 	
-	protected static $feedContext = self::DEFAULT_FEED_CONTEXT;
-
 	/**
 	 * @return the $feedContext
 	 */
@@ -141,7 +139,6 @@ class kMrssManager
 			return self::$mrssContributors;
 			
 		self::$mrssContributors = KalturaPluginManager::getPluginInstances('IKalturaMrssContributor');
-		self::$mrssContributors[] = new categoryEntryPeer();
 		return self::$mrssContributors;
 	}
 	

@@ -108,7 +108,6 @@ abstract class ClientGeneratorFromXml
 			return;
 		}
 		
-		
 		// loop through the folder
 		$dir=null;
 		if (is_dir($directory)){
@@ -181,9 +180,14 @@ abstract class ClientGeneratorFromXml
 		$this->_txt = "";
 	}
 	
+	protected function append($txt = "")
+	{
+		$this->_txt .= $txt;
+	}
+	
 	protected function appendLine($txt = "")
 	{
-		$this->_txt .= $txt ."\n";
+		$this->append($txt ."\n");
 	}
 	
 	protected function getTextBlock()

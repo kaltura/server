@@ -71,14 +71,23 @@ class MediaServer extends BaseMediaServer {
 		return MediaServer::DEFAULT_GPUID;
 	}
 	
-	public function getManifestUrl($protocol = 'http', $partnerMediaServerConfigurations = null)
+	public function getManifestUrl($protocol = 'http', $partnerMediaServerConfigurations = null, $format = null)
 	{
 		$domain = $this->getHostname();
 		$port = MediaServer::DEFAULT_MANIFEST_PORT;
 		$portField = 'port';
+		$domainFieldByFormat = 'domain';
+		$portFieldByFormat = 'port';
 		$appPrefix = '';
+			
 		if($protocol != 'http')
 			$portField .= "-$protocol";
+		$portFieldByFormat = $portField;
+		if ($format) {
+			$portFieldByFormat .=  "-$format";
+			$domainFieldByFormat .= "-$format";
+		}
+			
 		
 		if(kConf::hasMap('media_servers'))
 		{
@@ -88,11 +97,16 @@ class MediaServer extends BaseMediaServer {
 			
 			if(isset($mediaServers[$portField]))
 				$port = $mediaServers[$portField];
+			if(isset($mediaServers[$portFieldByFormat]))
+				$port = $mediaServers[$portFieldByFormat];
 				
 			if(isset($mediaServers['domain']))
 				$domain = $mediaServers['domain'];
 			elseif(isset($mediaServers['search_regex_pattern']) && isset($mediaServers['replacement']))
 				$domain = preg_replace($mediaServers['search_regex_pattern'], $mediaServers['replacement'], $domain);
+				
+			if(isset($mediaServers[$domainFieldByFormat]))
+				$domain = $mediaServers[$domainFieldByFormat];	
 
 			if (isset ($mediaServers['appPrefix']))
 				$appPrefix = $mediaServers['appPrefix'];

@@ -47,4 +47,5 @@ $commandLineSwitches = array(
 	array(KalturaCommandLineParser::SWITCH_REQUIRES_VALUE, 'H', 'header', 'Add a request header'),
 	array(KalturaCommandLineParser::SWITCH_REQUIRES_VALUE, 'u', 'url', 'Set the API service url'),
 	array(KalturaCommandLineParser::SWITCH_REQUIRES_VALUE, 'r', 'range', 'Retrieve a byte range'),
-);
+	array(KalturaCommandLineParser::SWITCH_REQUIRES_VALUE, 'p', 'param-name', 'Output the response in kalcli input format with the given parameter name'),
+	);

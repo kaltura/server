@@ -45,9 +45,11 @@
     <Compile Include="KalturaServiceActionCall.cs" />
     <Compile Include="KalturaServiceBase.cs" />
     <Compile Include="IKalturaLogger.cs" />
+    <Compile Include="IKalturaSerializable.cs" />
     <Compile Include="KalturaEnums.cs" />
     <Compile Include="KalturaClientBase.cs" />
     <Compile Include="KalturaConfiguration.cs" />
+    <Compile Include="KalturaParam.cs" />
     <Compile Include="KalturaParams.cs" />
     <Compile Include="KalturaStringEnum.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
