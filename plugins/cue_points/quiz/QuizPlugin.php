@@ -3,7 +3,7 @@
  * Enable question cue point objects and answer cue point objects management on entry objects
  * @package plugins.quiz
  */
-class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServices, IKalturaDynamicAttributesContributer, IKalturaEventConsumers, IKalturaReportProvider
+class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServices, IKalturaDynamicAttributesContributer, IKalturaEventConsumers, IKalturaReportProvider, IKalturaSearchDataContributor
 {
 	const PLUGIN_NAME = 'quiz';
 
@@ -16,6 +16,8 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 	const QUIZ_MANAGER = "kQuizManager";
 	const IS_QUIZ = "isQuiz";
 	const QUIZ_DATA = "quizData";
+	
+	const SEARCH_TEXT_SUFFIX = 'qend';
 
 	/* (non-PHPdoc)
 	 * @see IKalturaPlugin::getPluginName()
@@ -844,6 +846,24 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 		return explode(',', str_replace(' ','', $objectIds));
 	}
 
+	/* (non-PHPdoc)
+	 * @see IKalturaSearchDataContributor::getSearchData()
+	 */
+	public static function getSearchData(BaseObject $object)
+	{
+	    if ($object instanceof AnswerCuePoint)
+	        return self::getAnswerCuePointSearchData($object);
+	
+	    return null;
+	}
+	
+	public static function getAnswerCuePointSearchData(AnswerCuePoint $answerCuePoint)
+	{
+	    $data = $answerCuePoint->getQuizUserEntryId();
+	    return array(
+	        'plugins_data' => QuizPlugin::PLUGIN_NAME . ' ' . $data . $answerCuePoint->getPartnerId() . QuizPlugin::SEARCH_TEXT_SUFFIX
+	    );
+	}
 
 }
 
