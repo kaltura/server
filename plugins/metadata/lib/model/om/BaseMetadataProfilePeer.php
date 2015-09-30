@@ -499,20 +499,20 @@ abstract class BaseMetadataProfilePeer {
 		}
 		else
 		{
+                       // $partnerGroup hold a list of partners separated by ',' or $kalturaNetwork is not empty (should be mySearchUtils::KALTURA_NETWORK = 'kn')
+                       $partners = explode(',', trim($partnerGroup));
 			// private data is allowed
 			if(!strlen(strval($partnerGroup)))
 			{
 				// the default case
 				$criteria->addAnd(self::PARTNER_ID, $partnerId);
 			}
-			elseif ($partnerGroup == myPartnerUtils::ALL_PARTNERS_WILD_CHAR)
+			elseif (in_array(myPartnerUtils::ALL_PARTNERS_WILD_CHAR, $partners))
 			{
 				// all is allowed - don't add anything to the criteria
 			}
 			else 
 			{
-				// $partnerGroup hold a list of partners separated by ',' or $kalturaNetwork is not empty (should be mySearchUtils::KALTURA_NETWORK = 'kn')
-				$partners = explode(',', trim($partnerGroup));
 				foreach($partners as &$p)
 					trim($p); // make sure there are not leading or trailing spaces
 
