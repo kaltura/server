@@ -17,8 +17,27 @@ None.
 #### Known Issues & Limitations ####
 
 None.
-	
 
+## In Video Quiz - Sphinx Implementation for Answer Cue-Point ##
+
+- Issue Type: New Feature  
+- Issue ID: PLAT-3836
+
+#### Installation ####
+
+- Add QuizSphinx to plugins.ini (as demonstrated in plugins.ini.template)
+- Run the installPlugins.php script: deployment/base/scripts/installPlugins.php
+- Run the cue-points population sphinx script: deployment/base/scripts/populateSphinxCuePoints.php
+
+#### Configuration ####
+
+None.
+
+#### Known Issues & Limitations ####
+
+None.	
+	
+	
 # Jupiter-10.20.0 #
 
 ### Configuration ###
