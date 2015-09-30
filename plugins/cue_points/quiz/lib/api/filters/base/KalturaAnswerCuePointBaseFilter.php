@@ -10,8 +10,8 @@ abstract class KalturaAnswerCuePointBaseFilter extends KalturaCuePointFilter
 	(
 		"parentIdEqual" => "_eq_parent_id",
 		"parentIdIn" => "_in_parent_id",
-		"userEntryIdEqual" => "_eq_user_entry_id",
-		"userEntryIdIn" => "_in_user_entry_id",
+		"userQuizEntryIdEqual" => "_eq_quiz_user_entry_id",
+		"userQuizEntryIdIn" => "_in_quiz_user_entry_id",
 	);
 
 	static private $order_by_map = array
@@ -41,11 +41,11 @@ abstract class KalturaAnswerCuePointBaseFilter extends KalturaCuePointFilter
 	/**
 	 * @var string
 	 */
-	public $userEntryIdEqual;
+	public $userQuizEntryIdEqual;
 	
 
 	/**
 	 * @var string
 	 */
-	public $userEntryIdIn;
+	public $userQuizEntryIdIn;
 }

@@ -10,8 +10,8 @@ class AnswerCuePointFilter extends CuePointFilter
 	    parent::init();
 	    
 	    $extendedFields = kArray::makeAssociativeDefaultValue ( array (
-				"_eq_user_entry_id",
-				"_in_user_entry_id",
+				"_eq_quiz_user_entry_id",
+				"_in_quiz_user_entry_id",
 			) , NULL );
 	    
 		$this->fields = array_merge($this->fields , $extendedFields);
