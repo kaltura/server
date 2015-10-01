@@ -94,8 +94,8 @@ class KalturaAnswerCuePoint extends KalturaCuePoint
 			 */
 			$kQuiz = QuizPlugin::validateAndGetQuiz( $dbEntry );
 
-			$dbUesrEntry = UserEntryPeer::retrieveByPK($this->quizUserEntryId);
-			if ($dbUesrEntry->getStatus() == QuizPlugin::getCoreValue('UserEntryStatus', QuizUserEntryStatus::QUIZ_SUBMITTED))
+			$dbUserEntry = UserEntryPeer::retrieveByPK($this->quizUserEntryId);
+			if ($dbUserEntry && $dbUserEntry->getStatus() == QuizPlugin::getCoreValue('UserEntryStatus', QuizUserEntryStatus::QUIZ_SUBMITTED))
 			{
 				if (!$kQuiz->getShowCorrectAfterSubmission())
 				{
