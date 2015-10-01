@@ -48,6 +48,10 @@ abstract class KalturaSearchComparableAttributeCondition extends KalturaAttribut
 	{
 		/** @var $srcObj AdvancedSearchFilterComparableAttributeCondition) */
 		if ($this->shouldGet('attribute', $responseProfile))
-			$this->attribute = $srcObj->getField();
+		{
+			/** @var BaseIndexObject $indexClass */
+			$indexClass = $this->getIndexClass();
+			$this->attribute = $indexClass::getApiNameByCompareField($srcObj->getField());
+		}
 	}
 }
