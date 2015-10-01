@@ -375,7 +375,7 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 	public function generateToParamsMethod($classNode) 
 	{	
 		$type = $classNode->getAttribute ( "name" );
-		$this->appendLine ( "    public KalturaParams toParams() {" );
+		$this->appendLine ( "    public KalturaParams toParams() throws KalturaApiException {" );
 		$this->appendLine ( "        KalturaParams kparams = super.toParams();" );
 		$this->appendLine ( "        kparams.add(\"objectType\", \"$type\");" );
 		
@@ -400,8 +400,7 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 	{	
 		$type = $classNode->getAttribute ( "name" );
 		$this->appendLine ( "    public $type(Element node) throws KalturaApiException {" );
-		if ($needsSuperConstructor)
-			$this->appendLine ( "        super(node);" );
+		$this->appendLine ( "        super(node);" );
 			
 		if ($classNode->childNodes->length) 
 		{
