@@ -239,7 +239,6 @@ class PdfGenerator extends FPDF
             $this->addSignature();
         }
 
-        //$this->Output('/opt/kaltura/log/outQuiz.pdf','F');
         return ($this->Output('outQuizToBrowser.pdf','D'));
 
     }

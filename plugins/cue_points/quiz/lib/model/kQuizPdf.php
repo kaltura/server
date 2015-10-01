@@ -108,8 +108,6 @@ class kQuizPdf
         KalturaLog::debug("PDF::: kQuizPdf submitDocument");
 
         $kRend = new kRendererPdfFile($this->pdf);
-        //$kRend = new kRendererPdfFile($this->pdf->Submit());
-        //$this->pdf->Submit();
         if (!empty($kRend))
         {
             return $kRend->output();
