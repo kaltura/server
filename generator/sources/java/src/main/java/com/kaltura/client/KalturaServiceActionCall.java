@@ -66,12 +66,12 @@ public class KalturaServiceActionCall {
         return this.files;
     }
 
-    public KalturaParams getParamsForMultiRequest(int multiRequestNumber) {
+    public KalturaParams getParamsForMultiRequest(int multiRequestNumber) throws KalturaApiException {
         KalturaParams multiRequestParams = new KalturaParams();
         
-        multiRequestParams.addMulti(multiRequestNumber, "service", this.service);
-        multiRequestParams.addMulti(multiRequestNumber, "action", this.action);
-        multiRequestParams.addMulti(multiRequestNumber, this.params);
+        params.add("service", service);
+        params.add("action", action);
+        multiRequestParams.add(Integer.toString(multiRequestNumber), params);
         
         return multiRequestParams;
     }
@@ -79,7 +79,7 @@ public class KalturaServiceActionCall {
     public KalturaFiles getFilesForMultiRequest(int multiRequestNumber) {
     	
         KalturaFiles multiRequestFiles = new KalturaFiles();
-        multiRequestFiles.add(Integer.toString(multiRequestNumber), this.files);
+        multiRequestFiles.add(Integer.toString(multiRequestNumber), files);
         return multiRequestFiles;
     }
 

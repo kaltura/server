@@ -27,32 +27,26 @@
 // ===================================================================================================
 package com.kaltura.client.test;
 
-import com.kaltura.client.KalturaLogger;
-import com.kaltura.client.IKalturaLogger;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
-import com.kaltura.client.services.KalturaSystemService;
+public class TestUtils {
+	protected static KalturaTestConfig testConfig;
 
-public class SystemServiceTest extends BaseTest {
-	
-	private IKalturaLogger logger = KalturaLogger.getLogger(SystemServiceTest.class);
-			
-	/**
-	 * Tests that ping to the session works
-	 */
-	public void testPing() {
-		if (logger.isEnabled())
-			logger.info("Starting ping test");
-
-		try {
-			startUserSession();
-			KalturaSystemService systemService = this.client.getSystemService();
-			boolean result = systemService.ping();
-			assertTrue(result);
-			BaseTest.closeSession(client);
-		} catch (Exception e) {
-			fail();
+	static public InputStream getTestVideo() throws IOException {
+		if(testConfig == null){
+			testConfig = new KalturaTestConfig();
 		}
 		
+		return new FileInputStream("src/test/resources/" + testConfig.getUploadVideo());
 	}
+	
+	static public InputStream getTestImage() throws IOException {
+		if(testConfig == null){
+			testConfig = new KalturaTestConfig();
+		}
 		
+		return new FileInputStream("src/test/resources/" + testConfig.getUploadImage());
+	}
 }

@@ -50,7 +50,7 @@ public class SystemServiceTest extends BaseTest {
 			assertTrue(result);
 			BaseTest.closeSession(client);
 		} catch (Exception e) {
-			fail();
+			fail(e.getMessage());
 		}
 		
 	}
