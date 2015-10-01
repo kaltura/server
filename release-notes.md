@@ -35,9 +35,22 @@ None.
 
 #### Known Issues & Limitations ####
 
-None.	
-	
-	
+None.
+
+## In Video Quiz - new action servePdf under quiz service##
+
+- Issue Type: New Feature  
+- Issue ID: PLAT-2784 Add Quiz PDF support
+
+#### Installation ####
+
+- run deployment script - 2015_10_1_update_quiz_permissions.php
+- clear cache
+
+#### Configuration ####
+
+None.
+		
 # Jupiter-10.20.0 #
 
 ### Configuration ###
