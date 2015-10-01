@@ -30,15 +30,35 @@
 				return false;
 			}
 
-			var data = {
-				service: 'user',
-				action: 'loginByLoginId',
-				loginId: $email.val(),
-				password: $password.val()
-			};
-			callApi(data, onLoginApiSuccess, onLoginApiError);
+			var partnerId = getQueryVariable("partnerId");
+			if (partnerId == false)
+			{
+				$el.find('.error').text('partnerId param not found, please contact Kaltura Support');
+			}
+			else
+			{
+				var data = {
+				    service: 'user',
+				    action: 'loginByLoginId',
+				    loginId: $email.val(),
+				    password: $password.val(),
+				    partnerId: partnerId
+				};
+				callApi(data, onLoginApiSuccess, onLoginApiError);
+			}
 			return false;
 		}
+		
+		function getQueryVariable(variable) {
+	               var query = window.location.search.substring(1);
+	               var vars = query.split("&");
+	               for (var i=0;i<vars.length;i++) {
+	                       var pair = vars[i].split("=");
+	                       if(pair[0] == variable){return pair[1];}
+               		}
+               		return(false);
+        	}
+
 
 		function onLoginApiSuccess(data) {
 			$('body').removeClass('wait');
