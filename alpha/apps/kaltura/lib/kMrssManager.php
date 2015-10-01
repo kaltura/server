@@ -25,20 +25,6 @@ class kMrssManager
 	 * @var bool
 	 */
 	protected static $instancesEnabled = true;
-	
-	/**
-	 * @return the $feedContext
-	 */
-	public static function getFeedContext() {
-		return kMrssManager::$feedContext;
-	}
-
-	/**
-	 * @param field_type $feedContext
-	 */
-	public static function setFeedContext($feedContext) {
-		kMrssManager::$feedContext = $feedContext;
-	}
 
 	/**
 	 * Enables or disables the static instances pool caching
@@ -476,6 +462,17 @@ class kMrssManager
 		}
 			
 		$categories = explode(',', $entry->getCategories());
+		if (count($features) && in_array (ObjectFeatureType::CATEGORY_ENTRIES, $features))
+		{
+			$categoryEntries = categoryEntryPeer::retrieveActiveByEntryId($entry->getId());
+			$categories = array ();
+			foreach ($categoryEntries as $categoryEntry)
+			{
+				$category = categoryPeer::retrieveByPK($categoryEntry->getCategoryId());
+				$categories[] = $category->getFullName();
+			}
+		}
+		
 		foreach($categories as $category)
 		{
 			$category = trim($category);
