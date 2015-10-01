@@ -133,7 +133,7 @@ class QuizService extends KalturaBaseService
 	 *
 	 * @action servePdf
 	 * @param string $entryId
-	 * @return File
+	 * @return KalturaQuiz
 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
 	 * @throws KalturaQuizErrors::PROVIDED_ENTRY_IS_NOT_A_QUIZ
 	 */
