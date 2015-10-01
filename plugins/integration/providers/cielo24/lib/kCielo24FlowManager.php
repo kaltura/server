@@ -80,7 +80,6 @@ class kCielo24FlowManager implements kBatchJobStatusEventConsumer
 			KalturaLog::debug("captions content - " . print_r($captionsContentArray, true));
 	
 			$captions = $this->getAssetsByLanguage($entryId, array(CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION)), $spokenLanguage);
-			$humanVerified = 0;
 			switch ($providerData->getFidelity())
 			{
 				case KalturaCielo24Fidelity::MECHANICAL:
@@ -88,15 +87,13 @@ class kCielo24FlowManager implements kBatchJobStatusEventConsumer
 					break;
 				case KalturaCielo24Fidelity::PREMIUM:
 					$accuracyRate = self::PREMIUM_TRANSCRIPTION_ACCURACY_VALUE;
-					$humanVerified = 1;
 					break;
 				case KalturaCielo24Fidelity::PROFESSIONAL:
 					$accuracyRate = self::PROFESSIONAL_TRANSCRIPTION_ACCURACY_VALUE;
-					$humanVerified = 1;
 					break;
 			}
 
-			$this->setObjectContent($transcript, $transcriptContent, $accuracyRate, null, true, $humanVerified);
+			$this->setObjectContent($transcript, $transcriptContent, $accuracyRate, null, true);
 	
 			foreach ($captionsContentArray as $format => $content)
 			{        
@@ -139,7 +136,7 @@ class kCielo24FlowManager implements kBatchJobStatusEventConsumer
 		return $objects;
 	}
 	
-	private function setObjectContent($assetObject, $content, $accuracy, $format = null, $shouldSetTranscriptFileName = false, $humanVerified = false)
+	private function setObjectContent($assetObject, $content, $accuracy, $format = null, $shouldSetTranscriptFileName = false)
 	{
 		$assetObject->incrementVersion();
 		$ext = "txt";
@@ -170,9 +167,6 @@ class kCielo24FlowManager implements kBatchJobStatusEventConsumer
 			$assetObject->setFileName($fileName);
 		}
 		
-		if($humanVerified !== false)
-			$assetObject->setHumanVerified($humanVerified);
-
 		$assetObject->setAccuracy($accuracy);
 		$assetObject->setStatus(AttachmentAsset::ASSET_STATUS_READY);
 		$assetObject->save();
