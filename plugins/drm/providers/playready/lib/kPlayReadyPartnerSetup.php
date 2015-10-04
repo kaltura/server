@@ -13,8 +13,8 @@ class kPlayReadyPartnerSetup
 		if(!count($policies))
 		{
 			KalturaLog::debug("playready setup for partner ".$partnerId);
-			list ($defaultPolicy, $rentalPolicy, $purchasePolicy, $subscriptionPolicy) = self::createPartnerPolicies($partnerId);
-			self::createDefaultAccessControl($partnerId, $defaultPolicy, $rentalPolicy, $purchasePolicy, $subscriptionPolicy);
+			list ($defaultPolicy) = self::createPartnerPolicies($partnerId);
+			self::createDefaultAccessControl($partnerId, $defaultPolicy);
 		}
 	}
 	
@@ -27,35 +27,10 @@ class kPlayReadyPartnerSetup
 							DrmLicenseExpirationPolicy::FIXED_DURATION, 
 							1);
 		KalturaLog::debug("Default policy id:".$defaultPolicy->getId());
-							
-		$rentalPolicy = 
-		self::createPolicy(	$partnerId, 
-							"rental_".$partnerId, 
-							PlayReadyPlugin::getCoreValue('DrmLicenseScenario', PlayReadyLicenseScenario::RENTAL), 
-							DrmLicenseExpirationPolicy::FIXED_DURATION, 
-							7);
-		KalturaLog::debug("Rental policy id:".$rentalPolicy->getId());
-							
-		$purchasePolicy = 
-		self::createPolicy(	$partnerId, 
-							"purchase_".$partnerId, 
-							PlayReadyPlugin::getCoreValue('DrmLicenseScenario', PlayReadyLicenseScenario::PURCHASE), 
-							DrmLicenseExpirationPolicy::UNLIMITED);	
-		KalturaLog::debug("Purchase policy id:".$purchasePolicy->getId());
-		
-		$subscriptionPolicy = 
-		self::createPolicy(	$partnerId, 
-							"subscription_".$partnerId, 
-							PlayReadyPlugin::getCoreValue('DrmLicenseScenario', PlayReadyLicenseScenario::SUBSCRIPTION), 
-							DrmLicenseExpirationPolicy::FIXED_DURATION,
-							7);	
-		KalturaLog::debug("Subscription policy id:".$subscriptionPolicy->getId());
-		
-		
-		return array($defaultPolicy, $rentalPolicy, $purchasePolicy, $subscriptionPolicy);
+		return array($defaultPolicy);
 	}
 	
-	private static function createDefaultAccessControl($partnerId, $defaultPolicy, $rentalPolicy, $purchasePolicy, $subscriptionPolicy)
+	private static function createDefaultAccessControl($partnerId, $defaultPolicy)
 	{
 		$accessControlProfile = new accessControl();
 		$accessControlProfile->setDescription('Play Ready default access control');
@@ -63,12 +38,9 @@ class kPlayReadyPartnerSetup
 		$accessControlProfile->setPartnerId($partnerId);
 		$accessControlProfile->setSystemName('play_ready_default_'.$partnerId);
 		
-		$rulePurchase = self::addAccessControlRule('scenario_purchase', $purchasePolicy->getId());		
-		$ruleRental = self::addAccessControlRule('scenario_rental', $rentalPolicy->getId());		
-		$ruleDefault = self::addAccessControlRule('scenario_default', $defaultPolicy->getId());
-		$ruleSubscription = self::addAccessControlRule('scenario_subscription', $subscriptionPolicy->getId());
+		$ruleDefault = self::addAccessControlRule($defaultPolicy->getId());
 		
-		$accessControlProfile->setRulesArray(array($rulePurchase, $ruleRental, $ruleDefault, $ruleSubscription));
+		$accessControlProfile->setRulesArray(array($ruleDefault));
 		
 		$accessControlProfile->save();
 		
@@ -109,15 +81,13 @@ class kPlayReadyPartnerSetup
 		return $dbPolicy;
 	}
 	
-	private static function addAccessControlRule($priviledge, $policyId)
+	private static function addAccessControlRule($policyId)
 	{
 		$rule = new kRule();
-		$condition = new kAuthenticatedCondition();
-		$condition->setPrivileges(array($priviledge));
 		$action = new kAccessControlDrmPolicyAction();
 		$action->setPolicyId($policyId);
-		$rule->setConditions(array($condition));
 		$rule->setActions(array($action));
+		$rule->setContexts(array(ContextType::PLAY));
 		return $rule;
 	}
 }
