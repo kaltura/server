@@ -117,9 +117,14 @@ class MediaServer extends BaseMediaServer {
 		    
 		    	if(isset($mediaServer[$portField]))
 		     		$port = $mediaServer[$portField];
+				if(isset($mediaServer[$portFieldByFormat]))
+		     		$port = $mediaServer[$portFieldByFormat];
+				
 		    
 		    	if(isset($mediaServer['domain']))
 		     		$domain = $mediaServer['domain'];
+				if(isset($mediaServers[$domainFieldByFormat]))
+					$domain = $mediaServers[$domainFieldByFormat];	
 		     	
 		     	if (isset ($mediaServer['appPrefix']))
 					$appPrefix = $mediaServer['appPrefix'];
@@ -131,9 +136,13 @@ class MediaServer extends BaseMediaServer {
 				
 				if(isset($mediaServer[$portField]))
 					$port = $mediaServer[$portField];
+				if(isset($mediaServer[$portFieldByFormat]))
+		     		$port = $mediaServer[$portFieldByFormat];
 				
 				if(isset($mediaServer['domain']))
 					$domain = $mediaServer['domain'];
+				if(isset($mediaServers[$domainFieldByFormat]))
+					$domain = $mediaServers[$domainFieldByFormat];	
 				
 				if (isset ($mediaServer['appPrefix']))
 					$appPrefix = $mediaServer['appPrefix'];
