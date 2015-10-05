@@ -5,6 +5,16 @@
  */
 abstract class Form_ConfigurableProfileConfiguration extends Form_ProviderProfileConfiguration
 {
+	public function init ()
+	{
+		parent::init();
+		
+		$this->addElement('checkbox', 'excludeLegacyCategories', array(
+			'label' => 'Exclude legacy categories',
+			'isArray' => true,
+		));
+		
+	}
 	
 	public function getObject($objectType, array $properties, $add_underscore = true, $include_empty_fields = false)
 	{
@@ -90,6 +100,7 @@ abstract class Form_ConfigurableProfileConfiguration extends Form_ProviderProfil
 		$i = 1;
 		$extendCategory = false;
 		$extendParentCategory = false;
+		
 		foreach($itemXpathsToExtend as $itemXPath)
 		{
 			/* @var $itemXPath Kaltura_Client_Type_ExtendingItemMrssParameter */
@@ -148,6 +159,7 @@ abstract class Form_ConfigurableProfileConfiguration extends Form_ProviderProfil
 			'isArray' => true,
 			'value' => $extendParentCategory,
 		));
+		
 		$subForm->getElement('includeCategoryParentInMrss')->getDecorator('Label')->setOption('placement', 'APPEND');
 		$subForm->getElement('includeCategoryParentInMrss')->setChecked($extendParentCategory);
 		$mainSubForm->addSubForm($subForm, 'itemXpathsToExtend_subform_'.$i++,100);
