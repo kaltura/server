@@ -14,6 +14,13 @@ abstract class Form_ConfigurableProfileConfiguration extends Form_ProviderProfil
 			'isArray' => true,
 		));
 		
+		$this->addDisplayGroup(array ('exclude_legacy_categories'), 
+		'configurable_distribution_profile_general_settings',
+		array(
+				'legend' => 'Configurable Distribution Profile- General Settings',
+				'decorators' => array('FormElements', 'Fieldset', array('HtmlTag', array('class' => "configurable_distribution_profile_general_settings"))),
+			));
+		
 	}
 	
 	public function getObject($objectType, array $properties, $add_underscore = true, $include_empty_fields = false)
@@ -63,7 +70,6 @@ abstract class Form_ConfigurableProfileConfiguration extends Form_ProviderProfil
 	{
 		parent::populateFromObject($object, $add_underscore);
 		$this->addFieldConfigArray($object->fieldConfigArray);
-		
 		$this->addItemXpathsToExtend($object->itemXpathsToExtend);
 	}	
 	
