@@ -9,7 +9,7 @@ abstract class Form_ConfigurableProfileConfiguration extends Form_ProviderProfil
 	{
 		parent::init();
 		
-		$this->addElement('checkbox', 'excludeLegacyCategories', array(
+		$this->addElement('checkbox', 'exclude_legacy_categories', array(
 			'label' => 'Exclude legacy categories',
 			'isArray' => true,
 		));

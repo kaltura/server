@@ -51,4 +51,15 @@ abstract class KalturaConfigurableDistributionProfile extends KalturaDistributio
 		
 		return $dbObject;
 	}
+	
+	protected function doFromObject($srcObj, KalturaDetachedResponseProfile $responseProfile = null)
+	{
+		parent::doFromObject($srcObj);
+		
+		$features = $srcObj->getExtendedFeatures ();
+		if (in_array (ObjectFeatureType::CATEGORY_ENTRIES, $features))
+		{
+			$this->excludeLegacyCategories = true;
+		}
+	}
 }
