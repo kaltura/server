@@ -133,21 +133,19 @@ class QuizService extends KalturaBaseService
 	 *
 	 * @action servePdf
 	 * @param string $entryId
-	 * @return KalturaQuiz
+	 * @return file
 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
-	 * @throws KalturaQuizErrors::PROVIDED_ENTRY_IS_NOT_A_QUIZ
 	 */
 	public function servePdfAction($entryId)
 	{
+		KalturaLog::debug("PDF::: Create a PDF Document for entry id [ " .$entryId. " ]");
 		$dbEntry = entryPeer::retrieveByPK($entryId);
 
 		if (!$dbEntry)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 
 		$kp = new kQuizPdf($entryId);
-
 		$kp->createQuestionPdf();
-
 		return $kp->submitDocument();
 	}
 }
