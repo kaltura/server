@@ -74,8 +74,6 @@ class PdfGenerator extends FPDF
 
     public function Header()
     {
-        KalturaLog::debug("PDF::: PdfGenerator Header() - enter  ");
-
         // set the font to be ariel
         $this->SetFont('Arial','',8);
         $this->SetY(10);
@@ -88,14 +86,12 @@ class PdfGenerator extends FPDF
 
     public function Footer()
     {
-        KalturaLog::debug("PDF::: PdfGenerator Footer()");
         if ($this->PageNo()>0)
         {
             $this->Line(10, 280, 200, 280);
 
             // Position at 1.5 cm from bottom
             $this->SetY(-15);
-
             // Arial italic 8
             $this->SetFont('Arial', 'I', 8);
             // Page number
@@ -109,7 +105,7 @@ class PdfGenerator extends FPDF
      */
     public function addTitle($str, PdfStyle $style)
     {
-        KalturaLog::debug("PDF::: PdfGenerator addTitle()");
+        KalturaLog::debug("PDF::: Title is: ".$str);
         if (!isset ($str) || (!is_string($str)))
         {
             return;
@@ -125,7 +121,7 @@ class PdfGenerator extends FPDF
      */
     public function addList($sign, $text, PdfStyle $style)
     {
-        KalturaLog::debug("PDF::: PdfGenerator addList()");
+        KalturaLog::debug("PDF::: list sign is [ " .$sign . " ]  text is: ".$text);
         if (!isset($text) || !strlen($text) > 0)
         {
             return;
@@ -140,7 +136,6 @@ class PdfGenerator extends FPDF
             $text = $sign." ".$text;
         }
 
-        //$style = new PdfStyle('Normal', 'Times', 12, '', $addLine, false, 'L', 5);
         $this->addText($text, $style);
     }
 
@@ -167,12 +162,10 @@ class PdfGenerator extends FPDF
      */
     public function addHeadline($level='1', $text, PdfStyle $style)
     {
-
-        KalturaLog::debug("PDF::: PdfGenerator addHeadline()");
+        KalturaLog::debug("PDF::: Headline is: ".$text);
 
         if (!isset ($text) || (!is_string($text)))
         {
-
             return;
         }
         $this->addText($text, $style);
@@ -202,7 +195,7 @@ class PdfGenerator extends FPDF
 
     private function addText($text, PdfStyle $style)
     {
-        KalturaLog::debug("PDF::: PdfGenerator addText()");
+        KalturaLog::debug("PDF::: The following text is added: ".$text);
         if (strlen($text)> 0)
         {
             if ($style->isAddLineBefore())
@@ -233,14 +226,11 @@ class PdfGenerator extends FPDF
 
     public function Submit()
     {
-        KalturaLog::debug("PDF::: PdfGenerator Submit()");
         if (strlen($this->signature) > 0)
         {
             $this->addSignature();
         }
-
         return ($this->Output('outQuizToBrowser.pdf','D'));
-
     }
 
 }

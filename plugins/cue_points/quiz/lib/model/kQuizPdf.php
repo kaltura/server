@@ -46,18 +46,13 @@ class kQuizPdf
         $this->listWithAddLineBeforeStyle = new PdfStyle('ListWithAddLineBefore', 'Times', 12, 'I', true);
         $this->indentedListWithAddLineBefore = new PdfStyle('IndentListWithAddLineBefore', 'Times', 12, '',
                                                                                                 true, false, 'L', 5);
-
-
         $this->titleStyle = new PdfStyle('Title', 'Arial', 14, 'BU', true, false, 'C');
-
         $this->heading1Style = new PdfStyle('Heading1', 'Times', 18);
         $this->heading2Style = new PdfStyle('Heading2', 'Times', 16);
         $this->heading3Style = new PdfStyle('Heading3', 'Times', 15);
         $this->heading4Style = new PdfStyle('Heading4', 'Times', 14);
         $this->heading5Style = new PdfStyle('Heading5', 'Times', 13);
         $this->heading6Style = new PdfStyle('Heading6', 'Times', 12);
-
-
 
         $this->entryId = $entryId;
         $this->pdf = new PdfGenerator('Thank You', 'Questionnaire', '','Questionnaire',
@@ -74,14 +69,9 @@ class kQuizPdf
 
     public function createQuestionPdf()
     {
-
-        KalturaLog::debug("PDF::: createQuestionPdf - enter  ");
-
         $dbEntry = entryPeer::retrieveByPK($this->entryId);
         $title = "Here are the questions from  [".$dbEntry->getName()."]";
-
         $this->pdf->addTitle($title, $this->titleStyle);
-
         $questionType = QuizPlugin::getCuePointTypeCoreValue(QuizCuePointType::QUIZ_QUESTION);
         $questions = CuePointPeer::retrieveByEntryId($this->entryId, array($questionType));
 
@@ -105,13 +95,6 @@ class kQuizPdf
 
     public function submitDocument()
     {
-        KalturaLog::debug("PDF::: kQuizPdf submitDocument");
-
-        $kRend = new kRendererPdfFile($this->pdf);
-        if (!empty($kRend))
-        {
-            return $kRend->output();
-
-        }
+        return new kRendererPdfFile($this->pdf);
     }
 }

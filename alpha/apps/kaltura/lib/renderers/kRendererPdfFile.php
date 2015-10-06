@@ -14,7 +14,6 @@ class kRendererPdfFile implements kRendererBase
     private $pdfObj;
 
     public function __construct(PdfGenerator $obj)
-    //public function __construct($obj)
     {
         $this->pdfObj = $obj;
     }
@@ -26,9 +25,7 @@ class kRendererPdfFile implements kRendererBase
 
     public function output()
     {
-        KalturaLog::debug("PDF::: kQuizPdf output");
         echo $this->pdfObj->Submit();
-        KExternalErrors::dieGracefully();
     }
 
 
