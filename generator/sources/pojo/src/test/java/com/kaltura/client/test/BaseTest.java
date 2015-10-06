@@ -92,7 +92,7 @@ public class BaseTest extends TestCase {
 			} catch (Exception e) {
 				if (logger.isEnabled())
 					logger.error("Couldn't delete " + id, e);
-				fail();
+				fail(e.getMessage());
 			}
 		} //next id
 	}

@@ -41,6 +41,7 @@ public class KalturaTestSuite extends TestSuite
 		suite.addTestSuite(MediaServiceFieldsTest.class);
 		suite.addTestSuite(UiConfServiceTest.class);
 		suite.addTestSuite(MultiRequestTest.class);
+		suite.addTestSuite(ResponseProfileTest.class);
 		suite.addTestSuite(PluginTest.class);
 		suite.addTestSuite(ErrorTest.class);
 

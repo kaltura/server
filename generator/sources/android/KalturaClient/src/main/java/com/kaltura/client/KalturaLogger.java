@@ -29,7 +29,7 @@ package com.kaltura.client;
 
 import com.kaltura.client.KalturaLoggerAndroid;
 
-abstract public class KalturaLogger 
+abstract public class KalturaLogger implements IKalturaLogger
 {
 	// Creation & retrieval methods:
 	public static KalturaLogger getLogger(String name)

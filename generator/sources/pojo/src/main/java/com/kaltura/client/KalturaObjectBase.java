@@ -45,7 +45,7 @@ import com.kaltura.client.utils.ParseUtils;
  */
 @SuppressWarnings("serial")
 public class KalturaObjectBase implements Serializable {
-    public HashMap<String, KalturaListResponse> relatedObjects;
+	private HashMap<String, KalturaListResponse> relatedObjects;
 
     public KalturaObjectBase() {
     }
@@ -64,5 +64,12 @@ public class KalturaObjectBase implements Serializable {
 	public KalturaParams toParams() throws KalturaApiException {
 		return new KalturaParams();
 	}
-	
+
+    public HashMap<String, KalturaListResponse> getRelatedObjects(){
+        return this.relatedObjects;
+    }
+    
+    public void setRelatedObjects(HashMap<String, KalturaListResponse> relatedObjects){
+        this.relatedObjects = relatedObjects;
+    }
 }
