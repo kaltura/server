@@ -131,8 +131,8 @@ class MediaServer extends BaseMediaServer {
 		    
 		    	if(isset($mediaServer['domain']) && !$isDomainByFormat)
 		     		$domain = $mediaServer['domain'];
-				if($format && isset($mediaServers[$domainFieldByFormat])) {
-					$domain = $mediaServers[$domainFieldByFormat];	
+				if($format && isset($mediaServer[$domainFieldByFormat])) {
+					$domain = $mediaServer[$domainFieldByFormat];	
 					$isDomainByFormat = true;
 				}
 		     	
@@ -153,8 +153,8 @@ class MediaServer extends BaseMediaServer {
 				
 				if(isset($mediaServer['domain']) && !$isDomainByFormat)
 					$domain = $mediaServer['domain'];
-				if($format && isset($mediaServers[$domainFieldByFormat])) {
-					$domain = $mediaServers[$domainFieldByFormat];	
+				if($format && isset($mediaServer[$domainFieldByFormat])) {
+					$domain = $mediaServer[$domainFieldByFormat];	
 					$isDomainByFormat = true;
 				}
 				
