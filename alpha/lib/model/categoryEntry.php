@@ -159,7 +159,7 @@ class categoryEntry extends BasecategoryEntry implements IRelatedObject
 			
 		$category->save();
 
-		//only categories with no context are saved on entry - this is only for Backward compatible
+		//only categories with no context are saved on entry - this is only for backward compatiblity
 		if($entry && !categoryEntryPeer::getSkipSave() && (trim($category->getPrivacyContexts()) == '' || $category->getPrivacyContexts() == null))
 		{
 			$categories = array();
@@ -177,6 +177,10 @@ class categoryEntry extends BasecategoryEntry implements IRelatedObject
 			$entry->parentSetCategories(implode(entry::ENTRY_CATEGORY_SEPARATOR, $categories));
 			$entry->parentSetCategoriesIds(implode(entry::ENTRY_CATEGORY_SEPARATOR, $categoriesIds));
 			$entry->justSave();
+		} elseif ($entry && !categoryEntryPeer::getSkipSave() && $category->getPrivacyContexts()) {
+			$entry->setUpdatedAt(time());
+			$entry->save();
+			$entry->indexToSearchIndex();
 		}
 		
 		return $entry;
