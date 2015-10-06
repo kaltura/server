@@ -20,6 +20,7 @@ class ContentDistributionBatchService extends KalturaBaseService
 		
 		// serach all records that their sun status changed to after sunset
 		$criteria = KalturaCriteria::create(EntryDistributionPeer::OM_CLASS);
+		$criteria->add(EntryDistributionPeer::STATUS, EntryDistributionStatus::READY);
 		$criteria->add(EntryDistributionPeer::SUN_STATUS, EntryDistributionSunStatus::AFTER_SUNSET , Criteria::NOT_EQUAL);
 		$crit1 = $criteria->getNewCriterion(EntryDistributionPeer::SUNSET, time(), Criteria::LESS_THAN);
 		$criteria->add($crit1);
@@ -41,6 +42,7 @@ class ContentDistributionBatchService extends KalturaBaseService
 
 		// serach all records that their sun status changed to after sunrise
 		$criteria = KalturaCriteria::create(EntryDistributionPeer::OM_CLASS);
+		$criteria->add(EntryDistributionPeer::STATUS, EntryDistributionStatus::QUEUED);
 		$criteria->add(EntryDistributionPeer::SUN_STATUS, EntryDistributionSunStatus::BEFORE_SUNRISE);
 		$criteria->add(EntryDistributionPeer::SUNRISE, time(), Criteria::LESS_THAN);
 		$entryDistributions = EntryDistributionPeer::doSelect($criteria);
