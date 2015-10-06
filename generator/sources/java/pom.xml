@@ -1,24 +1,22 @@
 <?xml version="1.0"?>
-<!--                                                           -->
-<!-- Maven POM file for packaging and testing the              -->
-<!-- KalturaClient Java library.                               -->
-<!--                                                           -->
-<!-- Contributed by:  Mark Ratliff, ratliff@princeton.edu      -->
-<!--                                                           -->
+<!-- -->
+<!-- Maven POM file for packaging and testing the -->
+<!-- KalturaClient Java library. -->
+<!-- -->
+<!-- Contributed by: Mark Ratliff, ratliff@princeton.edu -->
+<!-- -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
-  <!-- Define the GAV coordinate for the project -->
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>com.kaltura</groupId>
-  <artifactId>kalturaClient</artifactId>
-  <version>3.2.0</version>
+	<!-- Define the GAV coordinate for the project -->
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.kaltura</groupId>
+	<artifactId>KalturaClient</artifactId>
+	<version>3.2.0</version>
 
-  <!-- Project description -->
-  <name>KalturaClient Java Library</name>
-  <description>
+	<!-- Project description -->
+	<name>KalturaClient Java Library</name>
+	<description>
     KalturaClient is a library of Java classes that can be used to interact 
     with the Kaltura REST API.  More information about the REST API can be
     found at http://corp.kaltura.com/Products/Kaltura-API  Many of the Java classes
@@ -26,139 +24,145 @@
     are used to interect with the API.  The current schema can be found at
     http://www.kaltura.com/api_v3/api_schema.php
   </description>
-  <url>http://github.com/kaltura/KalturaGeneratedAPIClientsJava</url>
-  
-  <!-- Define the license under which this software can be used. -->
-  <licenses>
-    <license>
-      <name>GNU Affero General Public License, Version 3.0</name>
-      <url>https://www.gnu.org/licenses/agpl-3.0.html</url>
-      <distribution>repo</distribution>
-      <comments/>
-    </license>
-  </licenses>
-  
-  <!-- Developers who contribute to this software. -->
-  <developers>
-    <developer>
-      <name>Jess Portnoy</name>
-      <email>jess.portnoy@kaltura.com</email>
-      <organization>Kaltura</organization>
-      <organizationUrl>http://www.kaltura.com</organizationUrl>
-    </developer>
-  </developers>
-  
-  <scm>
-    <connection>scm:git:git@github.com:kaltura/KalturaGeneratedAPIClientsJava.git</connection>
-    <developerConnection>scm:git:git@github.com:kaltura/KalturaGeneratedAPIClientsJava.git</developerConnection>
-    <url>scm:git:git@github.com:kaltura/KalturaGeneratedAPIClientsJava.git</url>
-  </scm>
+	<url>http://github.com/kaltura/KalturaGeneratedAPIClientsJava</url>
 
-  <!-- Libraries on which the kalturaClient depends -->
-  <dependencies>
-    <dependency>
-      <groupId>commons-codec</groupId>
-      <artifactId>commons-codec</artifactId>
-      <version>1.4</version>
-    </dependency>
+	<!-- Define the license under which this software can be used. -->
+	<licenses>
+		<license>
+			<name>GNU Affero General Public License, Version 3.0</name>
+			<url>https://www.gnu.org/licenses/agpl-3.0.html</url>
+			<distribution>repo</distribution>
+			<comments />
+		</license>
+	</licenses>
 
-    <dependency>
-      <groupId>commons-httpclient</groupId>
-      <artifactId>commons-httpclient</artifactId>
-      <version>3.1</version>
-    </dependency>
+	<!-- Developers who contribute to this software. -->
+	<developers>
+		<developer>
+			<name>Jess Portnoy</name>
+			<email>jess.portnoy@kaltura.com</email>
+			<organization>Kaltura</organization>
+			<organizationUrl>http://www.kaltura.com</organizationUrl>
+		</developer>
+	</developers>
 
-    <dependency>
-      <groupId>log4j</groupId>
-      <artifactId>log4j</artifactId>
-      <version>1.2.15</version>
-      <exclusions>
-        <exclusion>
-          <groupId>com.sun.jmx</groupId>
-          <artifactId>jmxri</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>com.sun.jdmk</groupId>
-          <artifactId>jmxtools</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>javax.jms</groupId>
-          <artifactId>jms</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
+	<scm>
+		<connection>scm:git:git@github.com:kaltura/KalturaGeneratedAPIClientsJava.git</connection>
+		<developerConnection>scm:git:git@github.com:kaltura/KalturaGeneratedAPIClientsJava.git</developerConnection>
+		<url>scm:git:git@github.com:kaltura/KalturaGeneratedAPIClientsJava.git</url>
+	</scm>
 
-    <!-- JUnit for testing -->
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>4.7</version>
-      <scope>test</scope>
-    </dependency>
+	<!-- Libraries on which the KalturaClient depends -->
+	<dependencies>
+		<dependency>
+			<groupId>commons-codec</groupId>
+			<artifactId>commons-codec</artifactId>
+			<version>1.4</version>
+		</dependency>
 
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit-dep</artifactId>
-      <version>4.7</version>
-    </dependency>
-  </dependencies>
+		<dependency>
+			<groupId>commons-httpclient</groupId>
+			<artifactId>commons-httpclient</artifactId>
+			<version>3.1</version>
+		</dependency>
 
-  <!-- Build, test, and package the class files, source files, and javadoc files. -->
-  <build>
-    <plugins>
+		<dependency>
+			<groupId>org.json</groupId>
+			<artifactId>json</artifactId>
+			<version>20090211</version>
+		</dependency>
 
-      <!-- Use java version 1.6 to compile the code -->
-      <!-- This may not be a strict requirement, so may want to loosen in future -->
-      <plugin>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>2.3.2</version>
-        <configuration>
-          <source>1.6</source>
-          <target>1.6</target>
-        </configuration>
-      </plugin>
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+			<version>1.2.15</version>
+			<exclusions>
+				<exclusion>
+					<groupId>com.sun.jmx</groupId>
+					<artifactId>jmxri</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.sun.jdmk</groupId>
+					<artifactId>jmxtools</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>javax.jms</groupId>
+					<artifactId>jms</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
 
-      <!-- Run the test suite defined in KalturaTestSuite.java -->
-      <!-- Build the JAR file without running tests with:  mvn -Dmaven.test.skip=true package -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <version>2.18.1</version>
-        <configuration>
-          <includes>
-            <include>**/KalturaTestSuite.java</include>
-          </includes>
-        </configuration>
-      </plugin>
+		<!-- JUnit for testing -->
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.7</version>
+			<scope>test</scope>
+		</dependency>
 
-      <!-- Build JAR file containing source files. -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-source-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>attach-sources</id>
-            <goals>
-              <goal>jar</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit-dep</artifactId>
+			<version>4.7</version>
+		</dependency>
+	</dependencies>
 
-      <!-- Build JAR file containing JavaDoc files. -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-javadoc-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>attach-javadocs</id>
-            <goals>
-              <goal>jar</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
-  </build>
+	<!-- Build, test, and package the class files, source files, and javadoc files. -->
+	<build>
+		<plugins>
+
+			<!-- Use java version 1.6 to compile the code -->
+			<!-- This may not be a strict requirement, so may want to loosen in future -->
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>2.3.2</version>
+				<configuration>
+					<source>1.6</source>
+					<target>1.6</target>
+				</configuration>
+			</plugin>
+
+			<!-- Run the test suite defined in KalturaTestSuite.java -->
+			<!-- Build the JAR file without running tests with: mvn -Dmaven.test.skip=true package -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>2.18.1</version>
+				<configuration>
+					<includes>
+						<include>**/KalturaTestSuite.java</include>
+					</includes>
+				</configuration>
+			</plugin>
+
+			<!-- Build JAR file containing source files. -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>attach-sources</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+			<!-- Build JAR file containing JavaDoc files. -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>attach-javadocs</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
 
 </project>

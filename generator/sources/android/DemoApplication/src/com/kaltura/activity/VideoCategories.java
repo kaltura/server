@@ -736,10 +736,10 @@ public class VideoCategories extends TemplateActivity implements Observer, ListV
             ll_info.getLayoutParams().height = (int) Math.round((float) display.getHeight() * 0.6);
             if (display.getHeight() > display.getWidth()) {
                 ll_info.getLayoutParams().width = display.getWidth() / 2;
-                url = entry.thumbnailUrl + "/width/" + new Integer(display.getWidth() / 2).toString();
+                url = entry.thumbnailUrl + "/width/" + Integer.valueOf(display.getWidth() / 2).toString();
             } else {
                 ll_info.getLayoutParams().width = display.getHeight() / 2;
-                url = entry.thumbnailUrl + "/width/" + new Integer(display.getHeight() / 2).toString();
+                url = entry.thumbnailUrl + "/width/" + Integer.valueOf(display.getHeight() / 2).toString();
             }
             new DownloadThumb().execute();
 
@@ -793,7 +793,7 @@ public class VideoCategories extends TemplateActivity implements Observer, ListV
 
                 @Override
                 public void onClick(View v) {
-                    String url = entry.thumbnailUrl + "/width/" + new Integer(display.getWidth()).toString() + "/height/" + new Integer(display.getHeight() / 2).toString();
+                    String url = entry.thumbnailUrl + "/width/" + Integer.valueOf(display.getWidth()).toString() + "/height/" + Integer.valueOf(display.getHeight() / 2).toString();
                     countShowDialog = 0;
                     getActivityMediator().showPlayer(entry.id, entry.downloadUrl, entry.duration, url, entry.partnerId);
                     dialogUpload.cancel();
@@ -859,9 +859,9 @@ public class VideoCategories extends TemplateActivity implements Observer, ListV
         progressBar = new ArrayList<ProgressBar>();
 
         for (KalturaMediaEntry entry : listEntries) {
-            url.add(entry.thumbnailUrl + "/width/" + new Integer(/*
+            url.add(entry.thumbnailUrl + "/width/" + Integer.valueOf(/*
                      * display.getWidth()
-                     */300).toString() + "/height/" + new Integer(/*
+                     */300).toString() + "/height/" + Integer.valueOf(/*
                      * display.getHeight()/2
                      */300).toString());
         }
@@ -967,9 +967,9 @@ public class VideoCategories extends TemplateActivity implements Observer, ListV
         progressBar = new ArrayList<ProgressBar>();
 
         for (KalturaMediaEntry entry : listEntries) {
-            url.add(entry.thumbnailUrl + "/width/" + new Integer(/*
+            url.add(entry.thumbnailUrl + "/width/" + Integer.valueOf(/*
                      * display.getWidth()
-                     */300).toString() + "/height/" + new Integer(/*
+                     */300).toString() + "/height/" + Integer.valueOf(/*
                      * display.getHeight()/2
                      */300).toString());
         }
@@ -1107,7 +1107,7 @@ public class VideoCategories extends TemplateActivity implements Observer, ListV
 
         listAllCategories.setVisiblityHighlight(this.visibleHightLight);
         listAllCategories.notifyDataSetChanged();
-        listAllCategories.setHighlightIndex(this.position);
+        listAllCategories.setHighlightIndex(position);
         lvAllCategories.setAdapter(listAllCategories);
         searchText.init(TAG, etSearch, listCategory);
         etSearch.addTextChangedListener(searchText);
@@ -1152,7 +1152,7 @@ public class VideoCategories extends TemplateActivity implements Observer, ListV
         switch (v.getId()) {
             case R.id.iv_bar_menu:
                 getActivityMediator().showMain();
-                this.position = 0;
+                position = 0;
                 finish();
                 break;
             case R.id.iv_bar_search:
@@ -1201,7 +1201,7 @@ public class VideoCategories extends TemplateActivity implements Observer, ListV
             case Configuration.SCREENLAYOUT_SIZE_LARGE:
             case Configuration.SCREENLAYOUT_SIZE_UNDEFINED:
                 Log.w(TAG, "itemClick: position = " + position + ", id = " + id + "selectedId" + parent.getSelectedItemId());
-                this.position = position;
+                position = position;
 
                 listAllCategories.setHighlightIndex(position);
                 listAllCategories.setVisiblityHighlight(true);
@@ -1392,7 +1392,7 @@ public class VideoCategories extends TemplateActivity implements Observer, ListV
                     KalturaMediaEntryFilter filter = new KalturaMediaEntryFilter();
                     filter.mediaTypeEqual = KalturaMediaType.VIDEO;
                     if (!isMostPopular) {
-                        filter.categoriesIdsMatchAnd = new Integer(categoryId).toString();
+                        filter.categoriesIdsMatchAnd = Integer.valueOf(categoryId).toString();
                     }
                     listEntries = Media.listAllEntriesByIdCategories(TAG, filter, 1, 500);
                 }

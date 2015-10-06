@@ -466,6 +466,9 @@ class Partner extends BasePartner
 	
 	public function getThumbnailHost()	{		return $this->getFromCustomData( "thumbnailHost" , null, false  );	}
 	public function setThumbnailHost( $v )	{		return $this->putInCustomData( "thumbnailHost", $v );	}	
+	
+	public function getThumbnailCacheAge()	{		return $this->getFromCustomData( "thumbnailCacheAge" , null, 0);	}
+	public function setThumbnailCacheAge( $v )	{		return $this->putInCustomData( "thumbnailCacheAge", $v);	}
 		
 	public function getForceCdnHost()	{		return $this->getFromCustomData( "forceCdnHost" , null, false  );	}
 	public function setForceCdnHost( $v )	{		return $this->putInCustomData( "forceCdnHost", $v );	}	

@@ -62,7 +62,7 @@ public abstract class TemplateActivity extends Activity {
         /**
          * Hide soft keyboard
          */
-        imm = (InputMethodManager) getSystemService(this.INPUT_METHOD_SERVICE);
+        imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
         /**
          *          */

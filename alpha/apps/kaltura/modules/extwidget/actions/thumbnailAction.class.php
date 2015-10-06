@@ -450,9 +450,16 @@ class thumbnailAction extends sfAction
 
 		$cache = null;
 		
+		if(!is_null($entry->getPartner()))
+		      $partnerCacheAge = $entry->getPartner()->getThumbnailCacheAge();
+		
 		if ($nocache)
 		{
 			$cacheAge = 0;
+		}
+		else if($partnerCacheAge)
+		{
+		    $cacheAge = $partnerCacheAge;
 		}
 		else if (strpos($tempThumbPath, "_NOCACHE_") !== false)
 		{

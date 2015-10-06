@@ -83,7 +83,7 @@ public class MediaServiceTest extends BaseTest {
 			assertEquals(KalturaEntryStatus.IMPORT, addedEntry.status);
 		} catch (Exception e) {
 			e.printStackTrace();
-			fail();
+			fail(e.getMessage());
 		}
 	}
 	
@@ -172,7 +172,7 @@ public class MediaServiceTest extends BaseTest {
 			
 		} catch (Exception e) {
 			e.printStackTrace();
-			fail();
+			fail(e.getMessage());
 		}
 	}
 	
@@ -192,7 +192,7 @@ public class MediaServiceTest extends BaseTest {
 		// upload
 		try {
 			client.getUploadTokenService().upload(token.id, file, false);
-			fail();
+			fail("Uploading non-existing file should fail");
 		} catch (IllegalArgumentException e) {
 			assert(e.getMessage().contains("is not readable or not a file"));
 		}
@@ -228,7 +228,7 @@ public class MediaServiceTest extends BaseTest {
 			
 		} catch (Exception e) {
 			e.printStackTrace();
-			fail();
+			fail(e.getMessage());
 		}
 	}
 	
@@ -247,12 +247,12 @@ public class MediaServiceTest extends BaseTest {
 			startUserSession();
 			KalturaMediaService mediaService = this.client.getMediaService();
 			badEntry = mediaService.get("badid");
-			fail();
+			fail("Getting invalid entry id should fail");
 		} catch (KalturaApiException kae) {
 			// expected behavior
 		} catch (Exception e) {
 			e.printStackTrace();
-			fail();
+			fail(e.getMessage());
 		}
 		
 		assertNull(badEntry);
@@ -280,7 +280,7 @@ public class MediaServiceTest extends BaseTest {
 			
 		} catch (Exception e) {
 			e.printStackTrace();
-			fail();
+			fail(e.getMessage());
 		}
 		
 	}
@@ -336,7 +336,7 @@ public class MediaServiceTest extends BaseTest {
 
 		} catch (Exception e) {
 			e.printStackTrace();
-			fail();
+			fail(e.getMessage());
 		}
 	}
 	
@@ -388,7 +388,7 @@ public class MediaServiceTest extends BaseTest {
 			if (logger.isEnabled())
 				logger.error("Got exception testing moderation flag", e);	
 			e.printStackTrace();
-			fail();
+			fail(e.getMessage());
 		} 
 		
 	}
@@ -425,14 +425,14 @@ public class MediaServiceTest extends BaseTest {
 		} catch (Exception e) {
 			if (logger.isEnabled())
 				logger.error("Trouble deleting", e);
-			fail();
+			fail(e.getMessage());
 		} 
 
 		// Second delete - should fail
 		KalturaMediaEntry deletedEntry = null;
 		try {
 			deletedEntry = mediaService.get(idToDelete);
-			fail();
+			fail("Getting deleted entry should fail");
 		} catch (KalturaApiException kae) {
 			// Wanted behavior
 		} 
@@ -472,7 +472,7 @@ public class MediaServiceTest extends BaseTest {
 		} catch (Exception e) {
 			if (logger.isEnabled())
 				logger.error("Trouble uploading", e);
-			fail();
+			fail(e.getMessage());
 		} 
 		
 		assertNotNull(entry.id);
@@ -490,7 +490,7 @@ public class MediaServiceTest extends BaseTest {
 			//client.getDataService().serve();
 		} catch (Exception e) {
 			e.printStackTrace();
-			fail();
+			fail(e.getMessage());
 		} 
 	}
 	
@@ -514,7 +514,7 @@ public class MediaServiceTest extends BaseTest {
 			
 		} catch (Exception e) {
 			e.printStackTrace();
-			fail();
+			fail(e.getMessage());
 		} 
 	}
 	
@@ -537,7 +537,7 @@ public class MediaServiceTest extends BaseTest {
 			
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
-			fail();
+			fail(e.getMessage());
 		} 
 	}
 	
@@ -554,13 +554,13 @@ public class MediaServiceTest extends BaseTest {
 			
 		} catch (IOException e) {
 			e.printStackTrace();
-			fail();
+			fail(e.getMessage());
 		} finally {
 			if(in != null)
 				try {
 					in.close();
 				} catch (IOException e) {
-					fail();
+					fail(e.getMessage());
 				}
 		}
 

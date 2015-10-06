@@ -375,7 +375,7 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 	public function generateToParamsMethod($classNode) 
 	{	
 		$type = $classNode->getAttribute ( "name" );
-		$this->appendLine ( "    public KalturaParams toParams() {" );
+		$this->appendLine ( "    public KalturaParams toParams() throws KalturaApiException {" );
 		$this->appendLine ( "        KalturaParams kparams = super.toParams();" );
 		$this->appendLine ( "        kparams.add(\"objectType\", \"$type\");" );
 		
@@ -400,8 +400,7 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 	{	
 		$type = $classNode->getAttribute ( "name" );
 		$this->appendLine ( "    public $type(Element node) throws KalturaApiException {" );
-		if ($needsSuperConstructor)
-			$this->appendLine ( "        super(node);" );
+		$this->appendLine ( "        super(node);" );
 			
 		if ($classNode->childNodes->length) 
 		{
@@ -412,6 +411,9 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 			$this->appendLine ( "        NodeList childNodes = node.getChildNodes();" );
 			$this->appendLine ( "        for (int i = 0; i < childNodes.getLength(); i++) {" );
 			$this->appendLine ( "            Node aNode = childNodes.item(i);" );
+//			$this->appendLine ( "            if(aNode.getChildNodes().getLength() == 0){" );
+//			$this->appendLine ( "            	continue;" );
+//			$this->appendLine ( "            }" );
 			$this->appendLine ( "            String nodeName = aNode.getNodeName();" );
 			$propBlock = "            ";
 			
