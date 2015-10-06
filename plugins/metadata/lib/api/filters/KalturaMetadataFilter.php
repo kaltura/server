@@ -117,7 +117,20 @@ class KalturaMetadataFilter extends KalturaMetadataBaseFilter
 		
 		$response = new KalturaMetadataListResponse();
 		$response->objects = KalturaMetadataArray::fromDbArray($list, $responseProfile);
-		$response->totalCount = $c->getRecordsCount();
+		
+		if($c instanceof SphinxMetadataCriteria)
+		{
+			$response->totalCount = $c->getRecordsCount();
+		}
+		elseif($pager->pageIndex == 1 && count($response->objects) < $pager->pageSize)
+		{
+			$response->totalCount = count($response->objects);
+		}
+		else
+		{
+			$pager->detachFromCriteria($c);
+			$response->totalCount = MetadataPeer::doCount($c);
+		}
 		
 		return $response;
 	}
