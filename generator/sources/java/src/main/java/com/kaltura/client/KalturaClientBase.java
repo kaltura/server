@@ -215,8 +215,15 @@ abstract public class KalturaClientBase implements Serializable {
 	}
 
 	public void queueServiceCall(String service, String action, KalturaParams kparams, KalturaFiles kfiles, Class<?> expectedClass) throws KalturaApiException {
+		Object value;
 		for(Entry<String, Object> itr : this.requestConfiguration.entrySet()) {
-			kparams.add(itr.getKey(), String.valueOf(itr.getValue()));
+			value = itr.getValue();
+			if(value instanceof KalturaObjectBase){
+				kparams.add(itr.getKey(), (KalturaObjectBase)value);
+			}
+			else{				
+				kparams.add(itr.getKey(), String.valueOf(value));
+			}
 		}
 
 		KalturaServiceActionCall call = new KalturaServiceActionCall(service, action, kparams, kfiles);
@@ -462,8 +469,15 @@ abstract public class KalturaClientBase implements Serializable {
 		kparams.add("format", this.kalturaConfiguration.getServiceFormat());
 		kparams.add("ignoreNull", true);
 	
+		Object value;
 		for(Entry<String, Object> itr : this.clientConfiguration.entrySet()) {
-			kparams.add(itr.getKey(), String.valueOf( itr.getValue()));
+			value = itr.getValue();
+			if(value instanceof KalturaObjectBase){
+				kparams.add(itr.getKey(), (KalturaObjectBase)value);
+			}
+			else{				
+				kparams.add(itr.getKey(), String.valueOf(value));
+			}
 		}
 		
 		if (requestReturnType != null) {
