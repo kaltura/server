@@ -40,6 +40,20 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 	}
 
 	/**
+	 * @param string $protocol
+	 * @return boolean
+	 */
+	public function isProtocolSupported($protocol) {
+		$deliveryAttributes = $this->getDynamicAttributes();
+		if($deliveryAttributes && $deliveryAttributes->getMediaProtocol() == $protocol){
+			return true;
+		}
+
+		$mediaProtocols = explode(',', $this->getMediaProtocols());
+		return in_array($protocol, $mediaProtocols);
+	}
+
+	/**
 	 * returns whether the delivery profile supports the passed deliveryAttributes such as mediaProtocol, flv support, etc..
 	 * @param DeliveryProfileDynamicAttributes $deliveryAttributes
 	 */
