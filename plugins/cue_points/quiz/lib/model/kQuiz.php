@@ -44,7 +44,7 @@ class kQuiz {
 	/**
 	 * @var boolean
 	 */
-	protected $allowDownloadQuiz;
+	protected $allowDownload;
 
 	/**
 	 * @return int
@@ -145,17 +145,17 @@ class kQuiz {
 	/**
 	 * @return boolean
 	 */
-	public function getAllowDownloadQuiz()
+	public function getAllowDownload()
 	{
-		return $this->allowDownloadQuiz;
+		return $this->allowDownload;
 	}
 
 	/**
 	 * @param boolean $allowDownloadQuiz
 	 */
-	public function setAllowDownloadQuiz($allowDownloadQuiz)
+	public function setAllowDownload($allowDownload)
 	{
-		$this->allowDownloadQuiz = $allowDownloadQuiz;
+		$this->allowDownload = $allowDownload;
 	}
 
 
