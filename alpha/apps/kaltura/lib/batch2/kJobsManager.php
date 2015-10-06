@@ -1161,7 +1161,7 @@ class kJobsManager
 		}
 		else
 		{
-			KalturaLog::err("Object type [$objectType] is not expected to need cache recalculation");
+			KalturaLog::warning("Object type [$objectType] is not expected to need cache recalculation");
 			return null;
 		}
 
