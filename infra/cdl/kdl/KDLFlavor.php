@@ -480,6 +480,15 @@ $plannedDur = 0;
 			$target->_explicitClipDur = $target->_clipDur;
 			
 			/*
+			 * Fading needs explicit time limitation on the WM image loop. 
+			 * We'll do it with '_explicitClipDur' field 
+			 */
+		if(!isset($target->_explicitClipDur) && isset($target->_video)
+		&& isset($target->_video->_watermarkData) && isset($target->_video->_watermarkData->fade)){
+			$target->_explicitClipDur = $sourceDur;
+		}
+
+			/*
 			 * mpeg2 and theora video formats does not allow reliable 'fastSeekTo' (used on clipping)
 			 */
 		if($source->_video && $source->_video->IsFormatOf(array("mpeg video","theora"))){
