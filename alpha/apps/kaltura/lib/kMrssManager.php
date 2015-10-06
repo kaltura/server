@@ -464,13 +464,12 @@ class kMrssManager
 		$categories = explode(',', $entry->getCategories());
 		if (count($features) && in_array (ObjectFeatureType::CATEGORY_ENTRIES, $features))
 		{
-			$categoryEntries = categoryEntryPeer::retrieveActiveByEntryId($entry->getId());
 			$categories = array ();
-			foreach ($categoryEntries as $categoryEntry)
-			{
-				$category = categoryPeer::retrieveByPK($categoryEntry->getCategoryId());
-				$categories[] = $category->getFullName();
-			}
+			$categoryEntries = categoryEntryPeer::retrieveActiveByEntryId($entry->getId());
+			$categoryIds = array_walk($categoryEntries, function (CategoryEntry $catEntry) {return $catEntry->getCategoryId();});
+			$entryCats = categoryPeer::retrieveByPKs($categoryIds);
+			
+			$categories = array_walk($entryCats, function (category $cat) {return $cat->getFullName();});
 		}
 		
 		foreach($categories as $category)
