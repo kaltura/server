@@ -9,12 +9,12 @@ abstract class Form_ConfigurableProfileConfiguration extends Form_ProviderProfil
 	{
 		parent::init();
 		
-		$this->addElement('checkbox', 'exclude_legacy_categories', array(
-			'label' => 'Exclude legacy categories',
+		$this->addElement('checkbox', 'use_category_entries', array(
+			'label' => 'Query category entries',
 			'isArray' => true,
 		));
 		
-		$this->addDisplayGroup(array ('exclude_legacy_categories'), 
+		$this->addDisplayGroup(array ('use_category_entries'), 
 		'configurable_distribution_profile_general_settings',
 		array(
 				'legend' => 'Configurable Distribution Profile- General Settings',

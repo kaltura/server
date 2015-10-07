@@ -21,7 +21,7 @@ abstract class KalturaConfigurableDistributionProfile extends KalturaDistributio
 	 * When checking custom XSLT conditions using the fieldConfigArray - address only categories associated with the entry via the categoryEntry object
 	 * @var bool
 	 */
-	public $excludeLegacyCategories;
+	public $useCategoryEntries;
 	
 	/*
 	 * mapping between the field on this object (on the left) and the setter/getter on the object (on the right)  
@@ -42,7 +42,7 @@ abstract class KalturaConfigurableDistributionProfile extends KalturaDistributio
 		/* @var $dbObject ConfigurableDistributionProfile */
 		parent::toObject($dbObject, $skip);
 		
-		if ($this->excludeLegacyCategories)
+		if ($this->$useCategoryEntries)
 		{
 			$features = $dbObject->getExtendedFeatures();
 			$features[] = ObjectFeatureType::CATEGORY_ENTRIES;
@@ -59,7 +59,7 @@ abstract class KalturaConfigurableDistributionProfile extends KalturaDistributio
 		$features = $srcObj->getExtendedFeatures ();
 		if (in_array (ObjectFeatureType::CATEGORY_ENTRIES, $features))
 		{
-			$this->excludeLegacyCategories = true;
+			$this->$useCategoryEntries = true;
 		}
 	}
 }
