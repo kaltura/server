@@ -483,6 +483,9 @@ class kMrssManager
 
 			if ($partnerEntitlement)
 				kEntitlementUtils::initEntitlementEnforcement($partner->getId() , true);
+				
+			$keyToDelete = array_search(ObjectFeatureType::CATEGORY_ENTRIES, $features);
+			unset ($features[$keyToDelete]);
 		}
 		
 		foreach($categories as $category)
