@@ -41,6 +41,10 @@ class kQuiz {
 	 * @var boolean
 	 */
 	protected $showCorrectAfterSubmission;
+	/**
+	 * @var boolean
+	 */
+	protected $allowDownloadQuiz;
 
 	/**
 	 * @return int
@@ -137,6 +141,24 @@ class kQuiz {
 	{
 		$this->showCorrectAfterSubmission = $showCorrectAfterSubmission;
 	}
+
+	/**
+	 * @return boolean
+	 */
+	public function getAllowDownloadQuiz()
+	{
+		return $this->allowDownloadQuiz;
+	}
+
+	/**
+	 * @param boolean $allowDownloadQuiz
+	 */
+	public function setAllowDownloadQuiz($allowDownloadQuiz)
+	{
+		$this->allowDownloadQuiz = $allowDownloadQuiz;
+	}
+
+
 
 
 }
