@@ -42,7 +42,7 @@ abstract class KalturaConfigurableDistributionProfile extends KalturaDistributio
 		/* @var $dbObject ConfigurableDistributionProfile */
 		parent::toObject($dbObject, $skip);
 		
-		if ($this->$useCategoryEntries)
+		if ($this->useCategoryEntries)
 		{
 			$features = $dbObject->getExtendedFeatures();
 			$features[] = ObjectFeatureType::CATEGORY_ENTRIES;
@@ -59,7 +59,7 @@ abstract class KalturaConfigurableDistributionProfile extends KalturaDistributio
 		$features = $srcObj->getExtendedFeatures ();
 		if (in_array (ObjectFeatureType::CATEGORY_ENTRIES, $features))
 		{
-			$this->$useCategoryEntries = true;
+			$this->useCategoryEntries = true;
 		}
 	}
 }
