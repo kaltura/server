@@ -13,4 +13,4 @@
                then exec "/sbin/service mysql reload"
 
         check file mysqld
-            with path "/usr/bin/mysqld_safe
+            with path "/usr/bin/mysqld_safe"
