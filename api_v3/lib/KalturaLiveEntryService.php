@@ -106,6 +106,12 @@ class KalturaLiveEntryService extends KalturaEntryService
 			$mediaInfoParser = new KMediaInfoMediaParser($filename, kConf::get('bin_path_mediainfo'));
 			$recordedSegmentDurationInMsec = $mediaInfoParser->getMediaInfo()->videoDuration;
 
+			// Extract AMF data from all data frames in the segment
+			$amfParser = new KAMFMediaInfoParser($filename, kConf::get('bin_path_mediainfo'));
+			$AMFs = $amfParser->getMediaInfo();
+			KalturaLog::debug("KAMFMediaInfoParser.getMediaInfo returned '$AMFs'");
+
+
 			$currentSegmentVodToLiveDeltaTime = $liveSegmentDurationInMsec - $recordedSegmentDurationInMsec;
 			$recordedSegmentsInfo = $dbEntry->getRecordedSegmentsInfo();
 			$recordedSegmentsInfo->addSegment( $lastDuration, $recordedSegmentDurationInMsec, $currentSegmentVodToLiveDeltaTime );
@@ -120,7 +126,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 			$dbEntry->save();
 		}
 
-		kJobsManager::addConvertLiveSegmentJob(null, $dbAsset, $mediaServerIndex, $filename, $currentDuration);
+		kJobsManager::addConvertLiveSegmentJob(null, $dbAsset, $mediaServerIndex, $filename, $currentDuration, $AMFs);
 		
 		if($mediaServerIndex == KalturaMediaServerIndex::PRIMARY)
 		{

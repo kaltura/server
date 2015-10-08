@@ -108,4 +108,25 @@ class kRecordedSegmentsInfo
 
 		return "N/A";
 	}
+
+	public function getLiveSegmentStartTimeFromCuePointTime( $cuePointTime )
+	{
+		$numSegments = count($this->segments);
+
+		$i = 0;
+
+		while ( $i < $numSegments )
+		{
+			$segment = $this->segments[$i];
+			$liveStart = $segment[self::LIVE_START];
+			if ( $cuePointTime >= $liveStart )
+			{
+				return $liveStart;
+			}
+		}
+
+		// The time signature is greater than the total VOD duration
+		KalturaLog::debug("Couldn't get a segment whos start time is less than " . $cuePointTime);
+		return null;
+	}
 }
