@@ -44,8 +44,6 @@ class KalturaTvinciDistributionJobProviderData extends KalturaConfigurableDistri
 		{
 			$this->xml = $feedHelper->buildDeleteFeed();
 		}
-		KalturaLog::debug("XML Constructed by the Tvinci feed helper :{$this->xml}");
-
 	}
 
 	private static $map_between_objects = array

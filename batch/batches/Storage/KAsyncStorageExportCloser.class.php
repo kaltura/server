@@ -16,7 +16,6 @@ class KAsyncStorageExportCloser extends KJobCloserWorker
 	
 	protected function closeStorageExport (KalturaBatchJob $job)
 	{
-		KalturaLog::info("Attempting to close the job");
 		$storageExportEngine = KExportEngine::getInstance($job->jobSubType, $job->partnerId, $job->data);
 		
 		$closeResult = $storageExportEngine->verifyExportedResource();

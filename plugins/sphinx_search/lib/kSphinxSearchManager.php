@@ -156,7 +156,7 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 	 */
 	public function objectAdded(BaseObject $object, BatchJob $raisedJob = null)
 	{
-		KalturaLog::debug("Raising deferred event for object of type: ". get_class($object));
+		KalturaLog::info("Raising deferred event for object of type: ". get_class($object));
 		/** @var IIndexable $object */
 		$object->indexToSearchIndex();
 		return true;

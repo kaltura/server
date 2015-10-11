@@ -207,7 +207,7 @@ class thumbnailAction extends sfAction
 					myFileConverter::convertImage($src_full_path, $thumb_full_path, $width, $height, $type, $bgcolor, true, $quality, $src_x, $src_y, $src_w, $src_h, $density, $stripProfiles, null, $format);
 					kFileUtils::dumpFile($thumb_full_path);
 				} else {
-					KalturaLog::debug ( "token_id [$upload_token_id] not found in DC [". kDataCenterMgr::getCurrentDcId ()."]. dump url to romote DC");
+					KalturaLog::info ( "token_id [$upload_token_id] not found in DC [". kDataCenterMgr::getCurrentDcId ()."]. dump url to romote DC");
 					$remoteUrl = kDataCenterMgr::getRemoteDcExternalUrlByDcId ( 1 - kDataCenterMgr::getCurrentDcId () ) .$_SERVER['REQUEST_URI'];
 					kFileUtils::dumpUrl($remoteUrl);
 				}
@@ -336,7 +336,6 @@ class thumbnailAction extends sfAction
 		if($entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_IMAGE)
 			$subType = entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA;
 			
-		KalturaLog::debug("get thumbnail filesyncs");
 		$dataKey = $entry->getSyncKey($subType);
 		list ( $file_sync , $local ) = kFileSyncUtils::getReadyFileSyncForKey( $dataKey ,true , false );
 		
@@ -406,7 +405,7 @@ class thumbnailAction extends sfAction
 			{
 				if($ex->getCode() != kFileSyncException::FILE_DOES_NOT_EXIST_ON_CURRENT_DC)
 				{
-					KalturaLog::log( "Error - resize image failed");
+					KalturaLog::err( "Resize image failed");
 					KExternalErrors::dieError(KExternalErrors::MISSING_THUMBNAIL_FILESYNC);
 				}
 				
@@ -414,7 +413,7 @@ class thumbnailAction extends sfAction
 				$origFlavorAsset = assetPeer::retrieveOriginalByEntryId($entry_id);
 				if(!$origFlavorAsset)
 				{
-					KalturaLog::log( "Error - no original flavor for entry [$entry_id]");
+					KalturaLog::err( "No original flavor for entry [$entry_id]");
 					KExternalErrors::dieError(KExternalErrors::FLAVOR_NOT_FOUND);
 				}
 
@@ -429,7 +428,7 @@ class thumbnailAction extends sfAction
 				
 				if($remoteFileSync->getDc() == kDataCenterMgr::getCurrentDcId())
 				{
-					KalturaLog::log("ERROR - Trying to redirect to myself - stop here.");
+					KalturaLog::err("Trying to redirect to myself - stop here.");
 					KExternalErrors::dieError(KExternalErrors::MISSING_THUMBNAIL_FILESYNC);
 				}
 				

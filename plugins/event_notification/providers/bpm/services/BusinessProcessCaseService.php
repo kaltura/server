@@ -154,21 +154,21 @@ class BusinessProcessCaseService extends KalturaBaseService
 			$dbTemplate = EventNotificationTemplatePeer::retrieveByPK($templateId);
 			if(!$dbTemplate || !($dbTemplate instanceof BusinessProcessStartNotificationTemplate))
 			{
-				KalturaLog::debug("Template [$templateId] not found");
+				KalturaLog::info("Template [$templateId] not found");
 				continue;
 			}
 			
 			$caseIds = $dbTemplate->getCaseIds($dbObject, false);
 			if(!count($caseIds))
 			{
-				KalturaLog::debug("No cases found");
+				KalturaLog::info("No cases found");
 				continue;
 			}
 			
 			$dbBusinessProcessServer = BusinessProcessServerPeer::retrieveByPK($dbTemplate->getServerId());
 			if (!$dbBusinessProcessServer)
 			{
-				KalturaLog::debug("Business-Process server [" . $dbTemplate->getServerId() . "] not found");
+				KalturaLog::info("Business-Process server [" . $dbTemplate->getServerId() . "] not found");
 				continue;
 			}
 			
@@ -177,7 +177,7 @@ class BusinessProcessCaseService extends KalturaBaseService
 			$provider = kBusinessProcessProvider::get($businessProcessServer);
 			if(!$provider)
 			{
-				KalturaLog::debug("Provider [" . $businessProcessServer->type . "] not found");
+				KalturaLog::info("Provider [" . $businessProcessServer->type . "] not found");
 				continue;
 			}
 			

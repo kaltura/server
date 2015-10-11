@@ -25,7 +25,6 @@ class KAsyncJobSuspender extends KPeriodicWorker
 	*/
 	public function run($jobs = null)
 	{
-		KalturaLog::info("Suspender batch is running");
 		self::$kClient->batch->suspendJobs();
 	}
 }

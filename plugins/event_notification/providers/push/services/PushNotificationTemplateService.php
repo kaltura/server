@@ -75,7 +75,6 @@ class PushNotificationTemplateService extends KalturaBaseService
 	    foreach ($userParamsArray as $userParam) {
 	        $userParamObj = $userParam->toObject();
 	        if (!$userParamObj->getValue()) {
-	            KalturaLog::debug(print_r($userParamObj,true));
 	            throw new KalturaAPIException(KalturaErrors::MISSING_MANDATORY_PARAMETER, "Value of ". $userParamObj->getKey() );
 	        }
 	    }	    

@@ -71,7 +71,6 @@ class DropFolderPlugin extends KalturaPlugin implements IKalturaPending, IKaltur
 			if ($baseClass == 'KalturaJobData')
 			{
 				$jobSubType = $constructorArgs["coreJobSubType"];
-				KalturaLog::debug("in KalturaJobData checking for enum");
 			    if ($enumValue == DropFolderPlugin::getApiValue(DropFolderBatchType::DROP_FOLDER_CONTENT_PROCESSOR) &&
 					in_array($jobSubType, array(DropFolderType::FTP, DropFolderType::LOCAL, DropFolderType::S3, DropFolderType::SCP, DropFolderType::SFTP)))
 				{

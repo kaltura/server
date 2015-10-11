@@ -90,7 +90,6 @@ class KalturaQuestionCuePoint extends KalturaCuePoint
 		$dbEntry = entryPeer::retrieveByPK($this->entryId);
 		QuizPlugin::validateAndGetQuiz($dbEntry);
 		if ( !QuizPlugin::validateUserEntitledForQuizEdit($dbEntry) ) {
-			KalturaLog::debug('Update quiz questions is allowed only with admin KS or entry owner or co-editor');
 			throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID);
 		}
 	}

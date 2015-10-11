@@ -45,11 +45,11 @@ class KFFMpegThumbnailMaker extends KBaseThumbnailMaker
 		if($rv==0 && $this->parseOutput($output)==true)
 			return true;
 
-		KalturaLog::debug("THUMB Capture Failure - First attempt failed due to ffmpeg crash or 'missing-keyframe' issue.\nSecond attempt with 'slow-thumb-capture' mode");
+		KalturaLog::warning("First attempt failed due to ffmpeg crash or 'missing-keyframe' issue.\nSecond attempt with 'slow-thumb-capture' mode");
 		$cmd= $cmdArr[1];
 		if(isset($cmd) ){
 			if($position>30) {
-				KalturaLog::debug("THUMB Capture - can not run 2nd attempt - 'slow-thumb-capture' is allowed up to 30 sec position");
+				KalturaLog::err("Can not run 2nd attempt - 'slow-thumb-capture' is allowed up to 30 sec position");
 			}
 			else {
 				$rv = null;

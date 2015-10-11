@@ -38,9 +38,6 @@ class kQuizPdf
 
     public function __construct($entryId)
     {
-        KalturaLog::debug("PDF::: __construct - Create a new QuizPdf  ");
-
-
         $this->normalStyle = new PdfStyle('Normal', 'Times');
         $this->indentListStyle = new PdfStyle('IndentList', 'Times', 12, '', false, false, 'L', 5);
         $this->listWithAddLineBeforeStyle = new PdfStyle('ListWithAddLineBefore', 'Times', 12, 'I', true);
@@ -79,14 +76,12 @@ class kQuizPdf
         foreach ($questions as $question)
         {
             $questNum +=1;
-            KalturaLog::debug("PDF::: call addList for question with add line ");
             $this->pdf->addList($questNum, $question->getName(), $this->listWithAddLineBeforeStyle);
             $this->pdf->addHeadline(6, "Optional Answers:", $this->heading6Style);
             $ansNum = 0;
             foreach ($question->getOptionalAnswers() as $optionalAnswer)
             {
                 $ansNum +=1;
-                KalturaLog::debug("PDF::: call addList for answer without add line ");
                 $this->pdf->addList($ansNum, $optionalAnswer->getText(), $this->indentListStyle);
             }
         }

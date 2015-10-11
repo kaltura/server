@@ -28,8 +28,6 @@ class KalturaSearchCondition extends KalturaSearchItem
 	
 	public function toObject ( $object_to_fill = null , $props_to_skip = array() )
 	{
-		KalturaLog::debug("To object: field [$this->field] value [$this->value]");
-		
 		if(is_null($object_to_fill))
 			$object_to_fill = new AdvancedSearchFilterCondition();
 			

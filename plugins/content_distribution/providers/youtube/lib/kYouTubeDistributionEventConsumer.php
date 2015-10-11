@@ -108,10 +108,8 @@ class kYouTubeDistributionEventConsumer implements kBatchJobStatusEventConsumer
 	protected static function saveCurrentPlaylistsToCustomData(kDistributionJobData $data, $entryDistribution)
 	{
 		$providerData = $data->getProviderData();
-		KalturaLog::debug('provider data type' . get_class($providerData));
 		if ($providerData instanceof kYouTubeDistributionJobProviderData)
 		{
-			KalturaLog::debug('setting currentPlaylists to entryDistribution custom data');
 			$entryDistribution->putInCustomData('currentPlaylists', $providerData->getCurrentPlaylists());
 			$entryDistribution->save();
 		}

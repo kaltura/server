@@ -388,7 +388,6 @@ class MetadataService extends KalturaBaseService
 				$entryIds = entryPeer::filterEntriesByPartnerOrKalturaNetwork($entryIds, kCurrentContext::getCurrentPartnerId());
 				if(!count($entryIds))
 				{
-					KalturaLog::debug("No entries found");
 					$response = new KalturaMetadataListResponse();
 					$response->objects = new KalturaMetadataArray();
 					$response->totalCount = 0;

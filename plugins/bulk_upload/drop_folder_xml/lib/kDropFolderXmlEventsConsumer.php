@@ -106,7 +106,6 @@ class kDropFolderXmlEventsConsumer implements kBatchJobStatusEventConsumer, kObj
 		$xmlDropFolderFile = DropFolderFilePeer::retrieveByPK($dbBatchJob->getObjectId());
 		if(!$xmlDropFolderFile)
 			return;		
-		KalturaLog::debug('object id '.$dbBatchJob->getObjectId());
 		switch($dbBatchJob->getStatus())
 		{
 			case BatchJob::BATCHJOB_STATUS_QUEUED:
@@ -133,13 +132,11 @@ class kDropFolderXmlEventsConsumer implements kBatchJobStatusEventConsumer, kObj
 				break;
 			case BatchJob::BATCHJOB_STATUS_FINISHED:
 			case BatchJob::BATCHJOB_STATUS_FINISHED_PARTIALLY:
-				KalturaLog::debug("Handling Bulk Upload finished");
 				$xmlDropFolderFile->setStatus(DropFolderFileStatus::HANDLED);
 				$xmlDropFolderFile->save();
 				break;
 			case BatchJob::BATCHJOB_STATUS_FAILED:
 			case BatchJob::BATCHJOB_STATUS_FATAL:
-				KalturaLog::debug("Handling Bulk Upload failed");
 				$relatedFiles = DropFolderFilePeer::retrieveByLeadIdAndStatuses($xmlDropFolderFile->getId(), array(DropFolderFileStatus::PROCESSING));
 				foreach ($relatedFiles as $relatedFile) 
 				{
@@ -156,14 +153,12 @@ class kDropFolderXmlEventsConsumer implements kBatchJobStatusEventConsumer, kObj
 	{
 		$file->setStatus(DropFolderFileStatus::PROCESSING);
 		$affectedRows = $file->save();
-		KalturaLog::debug('Changing file status to Processing, file id ['.$file->getId().'] affected rows ['.$affectedRows.']');
 		if($affectedRows > 0)
 		{
 			foreach ($relatedFiles as $relatedFile) 
 			{
 				if($relatedFile->getId() != $file->getId())
 				{
-					KalturaLog::debug('Changing file status to Processing, file id ['.$relatedFile->getId().']');
 					$relatedFile->setStatus(DropFolderFileStatus::PROCESSING);
 					$relatedFile->save();
 				}
@@ -204,7 +199,6 @@ class kDropFolderXmlEventsConsumer implements kBatchJobStatusEventConsumer, kObj
 	 */
 	private function onXmlDropFolderFileStatusChangedToPending(DropFolder $folder, DropFolderFile $file)
 	{
-		KalturaLog::debug('in onXmlDropFolderFileStatusChangedToPending file id ['.$file->getId().'] folder id ['.$folder->getId().']');
 		$relatedFiles = array();
 		try 
 		{

@@ -195,10 +195,7 @@ class KalturaDropFolderFile extends KalturaObject implements IFilterable
 			$dbObject = new DropFolderFile();
 		
 			
-		parent::toObject($dbObject, $skip);
-		KalturaLog::debug('file size in api: '. $this->fileSize);
-		KalturaLog::debug("dbObject: " . print_r($dbObject, true));
-		return $dbObject;
+		return parent::toObject($dbObject, $skip);
 	}
 
 	public function getExtraFilters()

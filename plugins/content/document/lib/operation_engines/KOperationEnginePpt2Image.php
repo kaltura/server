@@ -17,7 +17,6 @@ class KOperationEnginePpt2Image extends KOperationEngineDocument
 	
 	protected function createOutputDirectory() {
 		if(!kFile::fullMkfileDir($this->outFilePath)){
-			KalturaLog::debug('failed to create ['.$this->outFilePath.'] directory');
 			throw new KOperationEngineException('failed to create ['.$this->outFilePath.'] directory');
 		}
 	}

@@ -460,7 +460,7 @@ class flvclipperAction extends kalturaAction
 					$limit_file_size = floor((@kFile::fileSize($path) * ($clip_to / $duration))*1.2);
 				}
 			}
-			KalturaLog::DEBUG("serving file [$path] entry id [$entry_id] limit file size [$limit_file_size] clip_to [$clip_to]");
+			KalturaLog::info("serving file [$path] entry id [$entry_id] limit file size [$limit_file_size] clip_to [$clip_to]");
 			kFileUtils::dumpFile($path, null, null, $limit_file_size);
 		}
 		

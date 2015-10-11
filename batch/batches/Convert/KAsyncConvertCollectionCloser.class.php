@@ -62,8 +62,6 @@ class KAsyncConvertCollectionCloser extends KJobCloserWorker
 	
 	private function closeConvert(KalturaBatchJob $job, KalturaConvertCollectionJobData $data)
 	{
-		KalturaLog::debug("closeConvertCollection($job->id)");
-	
 		if(($job->queueTime + self::$taskConfig->params->maxTimeBeforeFail) < time())
 			return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::CLOSER_TIMEOUT, 'Timed out', KalturaBatchJobStatus::FAILED);
 
@@ -98,8 +96,6 @@ class KAsyncConvertCollectionCloser extends KJobCloserWorker
 	
 	private function moveFiles(KalturaBatchJob $job, KalturaConvertCollectionJobData $data)
 	{
-		KalturaLog::debug("moveFiles(destDirLocalPath [$data->destDirLocalPath])");
-		
 		clearstatcache();
 		$files2move = array();
 		
@@ -189,8 +185,6 @@ class KAsyncConvertCollectionCloser extends KJobCloserWorker
 	 */
 	private function fetchFile($srcFileSyncRemoteUrl, $srcFileSyncLocalPath, &$errDescription = null)
 	{
-		KalturaLog::debug("fetchFile($srcFileSyncRemoteUrl, $srcFileSyncLocalPath)");
-		
 		try
 		{
 			$curlWrapper = new KCurlWrapper();
@@ -224,11 +218,10 @@ class KAsyncConvertCollectionCloser extends KJobCloserWorker
 				}
 				
 				KalturaLog::log("File [$srcFileSyncLocalPath] already exists with wrong size[$actualFileSize] expected size[$fileSize]");
-				KalturaLog::debug("Unlink file[$srcFileSyncLocalPath]");
+				KalturaLog::info("Unlink file[$srcFileSyncLocalPath]");
 				unlink($srcFileSyncLocalPath);
 			}
 			
-			KalturaLog::debug("Executing curl");
 			$curlWrapper = new KCurlWrapper();
 			$res = $curlWrapper->exec($srcFileSyncRemoteUrl, $srcFileSyncLocalPath);
 			KalturaLog::debug("Curl results: $res");
@@ -249,7 +242,7 @@ class KAsyncConvertCollectionCloser extends KJobCloserWorker
 			
 			clearstatcache();
 			$actualFileSize = kFile::fileSize($srcFileSyncLocalPath);
-			KalturaLog::debug("Fetched file to [$srcFileSyncLocalPath] size[$actualFileSize]");
+			KalturaLog::info("Fetched file to [$srcFileSyncLocalPath] size[$actualFileSize]");
 				
 			if($fileSize)
 			{

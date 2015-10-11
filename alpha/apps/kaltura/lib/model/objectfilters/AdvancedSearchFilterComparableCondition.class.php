@@ -37,7 +37,7 @@ class AdvancedSearchFilterComparableCondition extends AdvancedSearchFilterCondit
 				$comparison = " <> ";
 				break;
 			default:
-				KalturaLog::ERR("Missing comparison type");
+				KalturaLog::err("Missing comparison type");
 				return;
 		}
 

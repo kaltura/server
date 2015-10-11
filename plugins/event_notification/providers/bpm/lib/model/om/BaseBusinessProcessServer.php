@@ -763,7 +763,7 @@ abstract class BaseBusinessProcessServer extends BaseObject  implements Persiste
                 if ($affectedRows || !$this->isColumnModified(BusinessProcessServerPeer::CUSTOM_DATA)) //ask if custom_data wasn't modified to avoid retry with atomic column 
                 	break;
 
-                KalturaLog::debug("was unable to save! retrying for the $retries time");
+                KalturaLog::info("was unable to save! retrying for the $retries time");
                 $criteria = $this->buildPkeyCriteria();
 				$criteria->addSelectColumn(BusinessProcessServerPeer::CUSTOM_DATA);
                 $stmt = BasePeer::doSelect($criteria, $con);

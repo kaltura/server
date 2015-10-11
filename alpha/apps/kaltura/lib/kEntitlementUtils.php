@@ -56,7 +56,7 @@ class kEntitlementUtils
 			$entry = $entry->getParentEntry();
 			if(!$entry)
 			{
-				KalturaLog::debug('Parent entry not found, cannot validate entitlement');
+				KalturaLog::log('Parent entry not found, cannot validate entitlement');
 				return false;
 			}
 		}
@@ -65,7 +65,7 @@ class kEntitlementUtils
 		
 		if(self::$entitlementForced === false)
 		{
-			KalturaLog::debug('Entitlement forced to be disabled');
+			KalturaLog::log('Entitlement forced to be disabled');
 			return true;
 		}
 		
@@ -73,7 +73,7 @@ class kEntitlementUtils
 		// for actions with no ks - need to check if partner have default entitlement feature enable.
 		if(!self::getEntitlementEnforcement() && $ks)
 		{
-			KalturaLog::debug('Entry entitled: entitlement disabled');
+			KalturaLog::log('Entry entitled: entitlement disabled');
 			return true;
 		}
 		
@@ -81,13 +81,13 @@ class kEntitlementUtils
 		
 		if(!$ks && !$partner->getDefaultEntitlementEnforcement())
 		{
-			KalturaLog::debug('Entry [' . print_r($entry->getId(), true) . '] entitled: no ks and default is with no enforcement');
+			KalturaLog::info('Entry [' . print_r($entry->getId(), true) . '] entitled: no ks and default is with no enforcement');
 			return true;
 		}
 		
 		if($ks && in_array($entry->getId(), $ks->getDisableEntitlementForEntry()))
 		{
-			KalturaLog::debug('Entry [' . print_r($entry->getId(), true) . '] entitled: ks disble entitlement for this entry');
+			KalturaLog::info('Entry [' . print_r($entry->getId(), true) . '] entitled: ks disble entitlement for this entry');
 			return true;
 		}
 					
@@ -98,7 +98,7 @@ class kEntitlementUtils
 			// kuser is set on the entry as creator or uploader
 			if ($kuserId != '' && ($entry->getKuserId() == $kuserId))
 			{
-				KalturaLog::debug('Entry [' . print_r($entry->getId(), true) . '] entitled: ks user is the same as entry->kuserId or entry->creatorKuserId [' . $kuserId . ']');
+				KalturaLog::info('Entry [' . print_r($entry->getId(), true) . '] entitled: ks user is the same as entry->kuserId or entry->creatorKuserId [' . $kuserId . ']');
 				return true;
 			}
 				
@@ -106,7 +106,7 @@ class kEntitlementUtils
 			$entitledKusers = array_merge(explode(',', $entry->getEntitledKusersEdit()), explode(',', $entry->getEntitledKusersPublish()));
 			if(in_array($kuserId, $entitledKusers))
 			{
-				KalturaLog::debug('Entry [' . print_r($entry->getId(), true) . '] entitled: ks user is the same as entry->entitledKusersEdit or entry->entitledKusersPublish');
+				KalturaLog::info('Entry [' . print_r($entry->getId(), true) . '] entitled: ks user is the same as entry->entitledKusersEdit or entry->entitledKusersPublish');
 				return true;
 			}
 		}
@@ -118,7 +118,7 @@ class kEntitlementUtils
 			$categoryEntry = categoryEntryPeer::retrieveOneActiveByEntryId($entry->getId());
 			if(!$categoryEntry)
 			{
-				KalturaLog::debug('Entry [' . print_r($entry->getId(), true) . '] entitled: entry does not belong to any category');
+				KalturaLog::info('Entry [' . print_r($entry->getId(), true) . '] entitled: entry does not belong to any category');
 				return true;
 			}			
 		}
@@ -136,7 +136,7 @@ class kEntitlementUtils
 				$categoryEntry = categoryEntryPeer::retrieveOneByEntryIdStatusPrivacyContextExistance($entry->getId(), array(CategoryEntryStatus::PENDING, CategoryEntryStatus::ACTIVE));
 				if($categoryEntry)
 				{
-					KalturaLog::debug('Entry [' . print_r($entry->getId(), true) . '] entitled: entry belongs to public category and privacy context on the ks is not set');
+					KalturaLog::info('Entry [' . print_r($entry->getId(), true) . '] entitled: entry belongs to public category and privacy context on the ks is not set');
 					return true;				
 				}
 			}
@@ -149,7 +149,7 @@ class kEntitlementUtils
 			if($ks && (!$ksPrivacyContexts || trim($ksPrivacyContexts) == '') && !count($allCategoriesEntry))
 			{
 				// entry that doesn't belong to any category is public
-				KalturaLog::debug('Entry [' . print_r($entry->getId(), true) . '] entitled: entry does not belong to any category and privacy context on the ks is not set');
+				KalturaLog::info('Entry [' . print_r($entry->getId(), true) . '] entitled: entry does not belong to any category and privacy context on the ks is not set');
 				return true;
 			}
 		}
@@ -222,11 +222,11 @@ class kEntitlementUtils
 
 		if($category)
 		{
-			KalturaLog::debug('Entry [' . print_r($entry->getId(), true) . '] entitled: ks user is a member of this category or category privacy is set to public of authenticated');
+			KalturaLog::info('Entry [' . print_r($entry->getId(), true) . '] entitled: ks user is a member of this category or category privacy is set to public of authenticated');
 			return true;
 		}
 		
-		KalturaLog::debug('Entry [' . print_r($entry->getId(), true) . '] not entitled');
+		KalturaLog::info('Entry [' . print_r($entry->getId(), true) . '] not entitled');
 		return false;				
 	}
 		
@@ -363,7 +363,7 @@ class kEntitlementUtils
 		foreach ($privacyContexts as $categoryPrivacyContext => $Privacy)
 			$entryPrivacyContexts[] = $categoryPrivacyContext . '_' . $Privacy;
 		
-		KalturaLog::debug('Privacy by context: ' . print_r($entryPrivacyContexts,true));
+		KalturaLog::info('Privacy by context: ' . print_r($entryPrivacyContexts,true));
 			
 		return $entryPrivacyContexts;
 	}
