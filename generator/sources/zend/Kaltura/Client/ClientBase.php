@@ -725,7 +725,7 @@ class Kaltura_Client_ClientBase
 				throw new Kaltura_Client_ClientException("Invalid object type - not instance of $objectType", Kaltura_Client_ClientException::ERROR_INVALID_OBJECT_TYPE);
 			}
 		}
-		else if(is_subclass_of($objectType, 'Kaltura_Client_EnumBase'))
+		else if(class_exists($objectType) && is_subclass_of($objectType, 'Kaltura_Client_EnumBase'))
 		{
 			$enum = new ReflectionClass($objectType);
 			$values = array_map('strval', $enum->getConstants());
