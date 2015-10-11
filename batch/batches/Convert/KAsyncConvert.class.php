@@ -141,8 +141,6 @@ class KAsyncConvert extends KJobHandlerWorker
 		
 	protected function convertJob(KalturaBatchJob $job, KalturaConvertJobData $data)
 	{
-		KalturaLog::info("Converting flavor job");
-		
 		// ASSUME:
 		// 1. full input file path for each ($data->srcFileSyncs actualFileSyncLocalPath)
 		// 2. flavorParams ($data->flavorParams)
@@ -258,8 +256,6 @@ class KAsyncConvert extends KJobHandlerWorker
 	
 	private function moveFile(KalturaBatchJob $job, KalturaConvertJobData $data)
 	{
-		KalturaLog::debug("moveFile($job->id, $data->destFileSyncLocalPath)");
-		
 		$uniqid = uniqid("convert_{$job->entryId}_");
 		$sharedFile = $this->sharedTempPath . DIRECTORY_SEPARATOR . $uniqid;
 				

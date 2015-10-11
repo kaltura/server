@@ -125,7 +125,7 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 		
 		if(!count($edgeServers))
 		{
-		        KalturaLog::debug("No active edge servers found to handle [$url]");
+		        KalturaLog::info("No active edge servers found to handle [$url]");
 		        return null;
 		}
 		

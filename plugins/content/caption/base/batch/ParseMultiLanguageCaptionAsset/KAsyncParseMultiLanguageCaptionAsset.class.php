@@ -30,8 +30,6 @@ class KAsyncParseMultiLanguageCaptionAsset extends KJobHandlerWorker
 	
 	protected function parseMultiLanguage(KalturaBatchJob $job, KalturaParseMultiLanguageCaptionAssetJobData $data)
 	{
-		KalturaLog::debug("parse Multi Language job id - ($job->id)");
-
 		$this->updateJob($job, "Start parsing multi-language caption asset [$data->multiLanaguageCaptionAssetId]", KalturaBatchJobStatus::QUEUED);
 
 		$this->captionClientPlugin = KalturaCaptionClientPlugin::get(self::$kClient);
@@ -106,7 +104,7 @@ class KAsyncParseMultiLanguageCaptionAsset extends KJobHandlerWorker
 			{
 				if(is_null($headerLanguageLong))
 				{
-					KalturaLog::debug("failed to find language in div number $divCounter");
+					KalturaLog::info("failed to find language in div number $divCounter");
 					continue;
 				}
 				$languageShort = $headerLanguageShort;
@@ -116,7 +114,7 @@ class KAsyncParseMultiLanguageCaptionAsset extends KJobHandlerWorker
 			if(isset($captionChildernIds[$languageShort]))
 			{
 				$id = $captionChildernIds[$languageShort];
-				KalturaLog::debug("language $languageShort exists as a child of asset $parentId");
+				KalturaLog::info("language $languageShort exists as a child of asset $parentId");
 				$onlyUpdate = true;
 				unset($captionChildernIds[$languageShort]);
 			}
@@ -163,7 +161,7 @@ class KAsyncParseMultiLanguageCaptionAsset extends KJobHandlerWorker
 		catch(Exception $e)
 		{
 			$languageCode = $captionAsset->languageCode;
-			KalturaLog::debug("problem with caption creation - language $languageCode - " . $e->getMessage());
+			KalturaLog::info("problem with caption creation - language $languageCode - " . $e->getMessage());
 			return false;
 		}
 		return $this->setCaptionContent($captionCreated->id, $contentResource);
@@ -178,7 +176,7 @@ class KAsyncParseMultiLanguageCaptionAsset extends KJobHandlerWorker
 		}
 		catch(Exception $e)
 		{
-			KalturaLog::debug("problem with caption content-setting id - $id - " . $e->getMessage());
+			KalturaLog::info("problem with caption content-setting id - $id - " . $e->getMessage());
 			return false;
 		}
 	}
@@ -195,7 +193,7 @@ class KAsyncParseMultiLanguageCaptionAsset extends KJobHandlerWorker
 				}
 				catch(Exception $e)
 				{
-					KalturaLog::debug("problem with deleting caption id - $captionId - language $language - " . $e->getMessage());
+					KalturaLog::info("problem with deleting caption id - $captionId - language $language - " . $e->getMessage());
 				}
 			}
 		}

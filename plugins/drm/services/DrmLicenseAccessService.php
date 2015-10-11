@@ -30,7 +30,6 @@ class DrmLicenseAccessService extends KalturaBaseService
      **/
     public function getAccessAction($entryId, $flavorIds, $referrer)
     {
-        KalturaLog::debug("Starting");
         $response = new KalturaDrmLicenseAccessDetails();
         $response->policy = "";
         $response->duration = 0;
@@ -45,7 +44,7 @@ class DrmLicenseAccessService extends KalturaBaseService
                 if ($this->validateFlavorAssetssAllowed($drmLU, $flavorIdsArr) == true)
                 {
                     $policyId = $drmLU->getPolicyId();
-                    KalturaLog::debug("policy_id is '$policyId'");
+                    KalturaLog::info("policy_id is '$policyId'");
 
                     $dbPolicy = DrmPolicyPeer::retrieveByPK($policyId);
                     if (isset($dbPolicy)) {
@@ -55,7 +54,7 @@ class DrmLicenseAccessService extends KalturaBaseService
                         $response->policy = $dbPolicy->getName();
                         $response->duration = $expirationDate;
                         $response->absolute_duration = $expirationDate;
-                        KalturaLog::debug("response is  '" . print_r($response, true) . "' ");
+                        KalturaLog::info("response is  '" . print_r($response, true) . "' ");
                     } else {
                         KalturaLog::err("Could not get DRM policy from DB");
                     }

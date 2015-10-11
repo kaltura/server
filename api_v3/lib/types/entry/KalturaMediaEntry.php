@@ -112,11 +112,8 @@ class KalturaMediaEntry extends KalturaPlayableEntry {
 	 */
 	public function toObject($entry = null, $a = array()) {
 		if (is_null ( $entry )) {
-			KalturaLog::debug ( "Creating new entry" );
 			$entry = new entry ();
 		}
-		
-		KalturaLog::debug ( "type: {$this->mediaType} , duration: {$this->msDuration}" );
 		
 		$entry = parent::toObject ( $entry );
 		

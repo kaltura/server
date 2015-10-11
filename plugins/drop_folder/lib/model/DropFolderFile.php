@@ -22,7 +22,6 @@ class DropFolderFile extends BaseDropFolderFile implements IRelatedObject
 	
 	public function setFileSize($size)
 	{
-		KalturaLog::debug('in file size setter');
 		if ($size !== $this->getFileSize()) {
 		    self::setFileSizeLastSetAt(time());
 		}

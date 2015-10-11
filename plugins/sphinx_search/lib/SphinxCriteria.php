@@ -155,7 +155,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 		
 		$idsCount = count($ids);
 		$this->setFetchedIds($ids);
-		KalturaLog::debug("Found $idsCount ids");
+		KalturaLog::info("Found $idsCount ids");
 		
 		foreach($this->keyToRemove as $key)
 		{
@@ -186,7 +186,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 				{
 					$metaItem = reset($metaItems);
 					$this->recordsCount = (int)$metaItem['Value'];
-					KalturaLog::debug('Sphinx query total_found: ' . $this->recordsCount);
+					KalturaLog::info('Sphinx query total_found: ' . $this->recordsCount);
 				}
 			}
 			
@@ -363,12 +363,9 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 			
 		$this->criteriasLeft = 0;
 		
-		KalturaLog::debug("Applies " . count($this->filters) . " filters");
-		
-		
 		foreach($this->filters as $index => $filter)
 		{
-			KalturaLog::debug("Applies filter $index");
+			KalturaLog::info("Applies filter $index");
 			$this->applyFilter(clone $filter);
 		}
 		
@@ -377,7 +374,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 		
 		if(!$this->hasAdvancedSearchFilter && !count($this->matchClause) && $this->shouldSkipSphinx() && !isset($this->groupByColumn) && !isset($this->selectColumn))
 		{
-			KalturaLog::debug('Skip Sphinx');
+			KalturaLog::log('Skip Sphinx');
 			$this->sphinxSkipped = true;
 			return;
 		}
@@ -782,10 +779,6 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 				$advancedSearch->apply($filter, $this);
 				
 			$this->hasAdvancedSearchFilter = true;
-		}
-		else
-		{
-			KalturaLog::debug('No advanced filter found');
 		}
 		
 		$this->applyFilterFields($filter);

@@ -29,7 +29,7 @@ class kObjectCreatedHandler implements kObjectCreatedEventConsumer
 		$liveEntry = entryPeer::retrieveByPK($rootEntryId);
 		if(!$liveEntry)
 		{
-			KalturaLog::debug("Live entry with id [{$object->getRootEntryId()}] not found, categories will not be copied");
+			KalturaLog::info("Live entry with id [{$object->getRootEntryId()}] not found, categories will not be copied");
 			return true;
 		}
 		

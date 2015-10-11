@@ -72,7 +72,7 @@ class kFileUtils extends kFile
 		if($onlyIfAvailable){
 			//validate that the other DC is available before dumping the request
 			if(kConf::hasParam('disable_dump_api_request') && kConf::get('disable_dump_api_request')){
-				KalturaLog::debug('dumpApiRequest is disabled');
+				KalturaLog::info('dumpApiRequest is disabled');
 				return;
 			}			
 		}

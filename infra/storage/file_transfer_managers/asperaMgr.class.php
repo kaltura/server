@@ -105,7 +105,7 @@ class asperaMgr extends kFileTransferMgr
 	}
 	
 	private function executeCmd($cmd){
-		KalturaLog::debug('Executing command: '.$cmd);
+		KalturaLog::info('Executing command: '.$cmd);
 		$return_value = null;
 		$beginTime = time();
 		system($cmd, $return_value);

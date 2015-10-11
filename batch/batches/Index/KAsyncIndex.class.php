@@ -34,8 +34,6 @@ class KAsyncIndex extends KJobHandlerWorker
 	 */
 	private function indexObjects(KalturaBatchJob $job, KalturaIndexJobData $data)
 	{
-		KalturaLog::debug("Index objects job id [$job->id]");
-		
 		$engine = KIndexingEngine::getInstance($job->jobSubType);
 		$engine->configure($job->partnerId);
 	

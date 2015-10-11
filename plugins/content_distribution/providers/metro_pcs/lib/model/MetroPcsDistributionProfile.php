@@ -330,7 +330,6 @@ class MetroPcsDistributionProfile extends ConfigurableDistributionProfile
 		{
 			if ($endDate < $startDate)
 			{
-				KalturaLog::debug('End Date precedes start date');
 				$errorMsg = 'End Date precedes start date';			
 	    		$validationError = $this->createValidationError($action, DistributionErrorType::INVALID_DATA);    		
 	    		$validationError->setValidationErrorType(DistributionValidationErrorType::CUSTOM_ERROR);

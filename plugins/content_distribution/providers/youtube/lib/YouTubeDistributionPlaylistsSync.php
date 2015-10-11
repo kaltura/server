@@ -77,8 +77,8 @@ class YouTubeDistributionPlaylistsSync
 			return $currentVideoPlaylists;
 		}
 
-		KalturaLog::debug('Current playlists: ' . $currentVideoPlaylists);
-		KalturaLog::debug('New playlists: ' . $newVideoPlaylists);
+		KalturaLog::info('Current playlists: ' . $currentVideoPlaylists);
+		KalturaLog::info('New playlists: ' . $newVideoPlaylists);
 		$currentPlaylistsArray = explode(',', $currentVideoPlaylists);
 		$newPlaylistsArray = explode(',', $newVideoPlaylists);
 		sort($currentPlaylistsArray);

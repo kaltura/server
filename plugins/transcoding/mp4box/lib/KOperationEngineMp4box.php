@@ -152,7 +152,6 @@ KalturaLog::log("ERROR:".$this->message);
 			KalturaLog::err("Error: output file ($cptFilePath) doesn't exist");
 			return null;
 		}
-		KalturaLog::debug("Finished");
 		return $cptFilePath;
 	}
 }

@@ -61,7 +61,7 @@ class adddownloadAction extends defPartnerservices2Action
 		
 		if ( ! $entry )
 		{
-			KalturaLog::log("add download Action entry not found");
+			KalturaLog::err("Add download Action - entry not found");
 			$this->addError ( APIErrors::INVALID_ENTRY_ID, $this->getObjectPrefix() , $entry_id );
 			return;
 		}
@@ -108,14 +108,14 @@ class adddownloadAction extends defPartnerservices2Action
 				KalturaLog::log ( __METHOD__ . ": redirecting to [$url]" );
 				kFileUtils::dumpUrl($url);
 			}
-			KalturaLog::log("add download Action sync key doesn't exists");
+			KalturaLog::err("Add download Action - sync key doesn't exists");
 			$this->addError ( APIErrors::INVALID_ENTRY_VERSION, $this->getObjectPrefix(), $entry_id, $version );
 			return; 
 		}
 		
 		if ( $entry->getType() == entryType::MIX  )
 		{
-			KalturaLog::log("The Batch job for flattening a mix is no longer supported");
+			KalturaLog::err("The Batch job for flattening a mix is no longer supported");
 			$this->addError(APIErrors::INVALID_ENTRY_TYPE, $this->getObjectPrefix(), $entry_id, $version );
 			return;
 		}

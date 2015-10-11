@@ -208,7 +208,7 @@ class kObjectDeleteHandler implements kObjectDeletedEventConsumer
 		//In Case Flavor Deleted Belongs To Partner 0 Exit Without Deleteing
 		if($assetParam->getPartnerId() == 0) 
 		{
-			KalturaLog::DEBUG("Deleting Flavor Param Of Partner 0 Is Restricted");
+			KalturaLog::log("Deleting Flavor Param Of Partner 0 Is Restricted");
 			return;
 		}
 		
@@ -232,7 +232,7 @@ class kObjectDeleteHandler implements kObjectDeletedEventConsumer
 			flavorParamsConversionProfilePeer::clearInstancePool();
 		}
 		
-		KalturaLog::DEBUG("Flavor Params Conversion Profile Relations were deleted for flavor param id [" . $assetParam->getId() . "]");
+		KalturaLog::info("Flavor Params Conversion Profile Relations were deleted for flavor param id [" . $assetParam->getId() . "]");
 	}
 	
 	/**

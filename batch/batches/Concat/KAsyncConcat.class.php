@@ -102,8 +102,6 @@ class KAsyncConcat extends KJobHandlerWorker
 	 */
 	protected function moveFile(KalturaBatchJob $job, KalturaConcatJobData $data, $localTempFilePath, $sharedTempFilePath)
 	{
-		KalturaLog::debug("Moving file from [$localTempFilePath] to [$sharedTempFilePath]");
-	
 		$this->updateJob($job, "Moving file from [$localTempFilePath] to [$sharedTempFilePath]", KalturaBatchJobStatus::MOVEFILE);
 		
 		kFile::moveFile($localTempFilePath, $sharedTempFilePath, true);
@@ -131,7 +129,6 @@ class KAsyncConcat extends KJobHandlerWorker
 	 */
 	protected static function concatFiles($ffmpegBin, $ffprobeBin, array $filesArr, $outFilename, $clipStart = null, $clipDuration = null)
 	{
-		KalturaLog::log("Started");
 		$fixLargeDeltaFlag = null;
 		$chunkBr = null;
 		$concateStr = null;

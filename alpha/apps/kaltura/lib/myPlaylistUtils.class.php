@@ -918,7 +918,6 @@ HTML;
 	 */
 	protected static function replaceContextTokens (SimpleXMLElement $contentXml)
 	{
-		KalturaLog::debug("Replace context tokens");
 	    $properties = $contentXml->children();
 	    foreach ($properties as $property)
 	    {

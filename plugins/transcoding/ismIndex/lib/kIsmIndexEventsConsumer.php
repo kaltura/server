@@ -39,7 +39,7 @@ class kIsmIndexEventsConsumer implements kObjectChangedEventConsumer
 		kFileSyncUtils::moveFromFile($ismcPrevVersionFilePath, $ismcFileSyncKey);			
 		$ismcNewName = basename(kFileSyncUtils::getLocalFilePathForKey($ismcFileSyncKey));
 		
-		KalturaLog::debug("Editing ISM set content to [$ismcNewName]");
+		KalturaLog::info("Editing ISM set content to [$ismcNewName]");
 			
 		$ismXml = new SimpleXMLElement($ismContents);
 		$ismXml->head->meta['content'] = $ismcNewName;

@@ -333,8 +333,6 @@ class YouTubeDistributionRightsFeedEngine extends DistributionEngine implements
 			return false;
 		}
 
-		KalturaLog::info('Status file was found');
-
 		$data->results = $statusXml;
 		return $statusXml;
 	}
@@ -354,7 +352,6 @@ class YouTubeDistributionRightsFeedEngine extends DistributionEngine implements
 		{
 			KalturaLog::info('Trying to get the following status file: ['.$statusFilePath.']');
 			$statusXml = $sftpManager->getFile($statusFilePath);
-			KalturaLog::info('Status file was found');
 			return $statusXml;
 		}
 		catch(kFileTransferMgrException $ex) // file is still missing
