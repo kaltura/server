@@ -622,8 +622,6 @@ class CaptionAssetService extends KalturaAssetService
 		$thisKuserId = $this->getKuser()->getId();
 		$isNotAdmin = !kCurrentContext::$ks_object->isAdmin();
 		
-		KalturaLog::debug("entryKuserId [$entryKuserId], thisKuserId [$thisKuserId], isNotAdmin [$isNotAdmin ]");
-
 		if(!$entry || ($isNotAdmin && !is_null($entryKuserId) && $entryKuserId != $thisKuserId))  
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $captionAsset->getEntryId());
 			

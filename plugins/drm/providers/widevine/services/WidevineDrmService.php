@@ -89,8 +89,6 @@ class WidevineDrmService extends KalturaBaseService
 	
 	private function validateAccessControl(entry $entry, flavorAsset $flavorAsset, $referrer64base)
 	{
-		KalturaLog::debug("Validating access control");
-		
 		$referrer = base64_decode(str_replace(" ", "+", $referrer64base));
 		if (!is_string($referrer))
 			$referrer = ""; // base64_decode can return binary data		

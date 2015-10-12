@@ -480,8 +480,6 @@ class addentryAction extends defPartnerservices2Action
                 $metadata = $kshow->getMetadata();
                 if ($metadata !== null) // probably the roughcut doesnt exist
                 {
-	            	KalturaLog::info("Having metadata");
-	            	
 	                $relevant_kshow_version = 1 + $kshow->getVersion(); // the next metadata will be the first relevant version for this new entry
 	
 	                $version_info = array();

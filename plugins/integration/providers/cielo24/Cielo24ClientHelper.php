@@ -92,7 +92,6 @@ class Cielo24ClientHelper
 		
 			if (json_last_error() !== JSON_ERROR_NONE)
 			{
-				KalturaLog::err("bad response from service provider");
 				curl_close($ch);
 				throw new Exception("json decode error with response - " . $stringResult);
 			}

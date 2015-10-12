@@ -138,14 +138,14 @@ class kThumbCuePointManager implements kObjectDeletedEventConsumer, kObjectChang
 		$cuePointId = $timedThumbAsset->getCuePointID();
 		if(!$cuePointId)
 		{
-			KalturaLog::debug("CuePoint Id not found on object");
+			KalturaLog::info("CuePoint Id not found on object");
 			return null;
 		}
 			
 		$cuePoint = CuePointPeer::retrieveByPK($cuePointId);
 		if(!$cuePoint)
 		{
-			KalturaLog::debug("CuePoint with ID [$cuePointId] not found");
+			KalturaLog::info("CuePoint with ID [$cuePointId] not found");
 			return null;
 		}
 		

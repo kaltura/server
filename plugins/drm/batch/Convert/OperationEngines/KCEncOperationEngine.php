@@ -28,7 +28,6 @@ class KCEncOperationEngine extends KOperationEngine
 	 */
 	protected function doOperation()
 	{
-        KalturaLog::debug("starting");
 		KBatchBase::impersonate($this->job->partnerId);
         $drmPlugin = KalturaDrmClientPlugin::get(KBatchBase::$kClient);
         $profile = $drmPlugin->drmProfile->getByProvider(KalturaDrmProviderType::CENC);
@@ -97,7 +96,7 @@ class KCEncOperationEngine extends KOperationEngine
             $psshEncoded = self::strToHex(base64_decode($currPssh->data));
             $cmdLine .= " --pssh ".$psshEncoded;
         }
-        KalturaLog::debug("Going to run command '".$cmdLine."' ");
+        KalturaLog::info("Going to run command '".$cmdLine."' ");
 
         $result = system($cmdLine, $system_ret_val);
 	    if ($system_ret_val != 0)
@@ -114,7 +113,7 @@ class KCEncOperationEngine extends KOperationEngine
     {
         $cmdLine = $this->params->exePath."mpd_generator --input=".$this->data->destFileSyncLocalPath.
         ".media_info --output=".$this->data->destFileSyncLocalPath.".mpd ";
-        KalturaLog::debug("Going to run command '".$cmdLine."' ");
+        KalturaLog::info("Going to run command '".$cmdLine."' ");
 
         $result = system($cmdLine, $system_ret_val);
 	    if ($system_ret_val != 0)

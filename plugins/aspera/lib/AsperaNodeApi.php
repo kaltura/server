@@ -67,7 +67,7 @@ class AsperaNodeApi
 		curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($params));
 		curl_setopt($curl, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
 		$responseStr = curl_exec($curl);
-		KalturaLog::debug('Raw response from aspera node api: '. $responseStr);
+		KalturaLog::info('Raw response from aspera node api: '. $responseStr);
 		$error = curl_error($curl);
 		if ($error)
 			throw new kCoreException('Failed to call node api server: ' . $error);

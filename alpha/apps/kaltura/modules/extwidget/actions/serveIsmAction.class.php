@@ -113,8 +113,6 @@ class serveIsmAction extends sfAction
 				KExternalErrors::dieError(KExternalErrors::INVALID_ISM_FILE_TYPE);
 		}
 		
-		KalturaLog::debug('subType: '.$subType);
-		
 		$object = $this->getObject($objectId, $isAsset);
 		if(!$object)
 			KExternalErrors::dieError(KExternalErrors::FLAVOR_NOT_FOUND);
@@ -134,8 +132,6 @@ class serveIsmAction extends sfAction
 			$objectId = $parts[0].'_'.$parts[1];
 			$subType = $parts[2];
 			$version = $parts[3];
-				
-			KalturaLog::debug('objectId: '.$objectId.', subType: '.$subType.', version: '.$version);
 		}
 		else if(count($parts) == 5)
 		{
@@ -143,8 +139,6 @@ class serveIsmAction extends sfAction
 			$objectId = $parts[2].'_'.$parts[3];
 			$version = $parts[4];
 			$isAsset = true;
-				
-			KalturaLog::debug('objectId: '.$objectId.', version: '.$version);
 		}	
 
 		return array($objectId, $version, $subType, $isAsset, $entryId);

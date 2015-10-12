@@ -245,7 +245,6 @@ class KalturaActionReflector extends KalturaReflector
 	 */
 	public function initService(KalturaDetachedResponseProfile $responseProfile = null)
 	{
-		KalturaLog::debug("Create or retrieve instance of action class [". $this->_actionClass ."]");
 		$instance = $this->getServiceInstance();
 		
 		if($responseProfile)

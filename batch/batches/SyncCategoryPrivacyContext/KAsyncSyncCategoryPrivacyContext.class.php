@@ -38,8 +38,6 @@ class KAsyncSyncCategoryPrivacyContext extends KJobHandlerWorker
 	 */
 	protected function syncPrivacyContext(KalturaBatchJob $job, KalturaSyncCategoryPrivacyContextJobData $data)
 	{
-		KalturaLog::debug("Sync category entries and entries for category [$data->categoryId]");
-		
 	    KBatchBase::impersonate($job->partnerId);
 	    
 	    $this->syncCategoryPrivacyContext($job, $data, $data->categoryId);
@@ -67,7 +65,6 @@ class KAsyncSyncCategoryPrivacyContext extends KJobHandlerWorker
 			KBatchBase::$kClient->startMultiRequest();
 			foreach ($categoryEntryList->objects as $categoryEntry) 
 			{
-				KalturaLog::debug('entryId '.$categoryEntry->entryId.' categoryId '.$categoryEntry->categoryId);
 				KBatchBase::$kClient->categoryEntry->syncPrivacyContext($categoryEntry->entryId, $categoryEntry->categoryId);				
 			}
 

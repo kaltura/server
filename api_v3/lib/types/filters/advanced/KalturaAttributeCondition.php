@@ -25,8 +25,6 @@ abstract class KalturaAttributeCondition extends KalturaSearchItem
 
 	public function toObject($objectToFill = null, $propsToSkip = array())
 	{
-		KalturaLog::debug("To object: Value [$this->value]");
-
 		if (is_null($objectToFill))
 			$objectToFill = new AdvancedSearchFilterAttributeCondition();
 

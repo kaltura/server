@@ -25,8 +25,6 @@ class KAsyncValidateLiveMediaServers extends KPeriodicWorker
 	*/
 	public function run($jobs = null)
 	{
-		KalturaLog::info("Validating live media servers");
-		
 		$filter = new KalturaLiveStreamEntryFilter();
 		$filter->isLive = KalturaNullableBoolean::TRUE_VALUE;
 		$filter->orderBy = KalturaLiveStreamEntryOrderBy::CREATED_AT_ASC;

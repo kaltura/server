@@ -34,7 +34,7 @@ class KScheduledTaskDryRunner extends KJobHandlerWorker
 				throw new Exception('Shared path ['.$sharedPath.'] doesn\'t exist and could not be created');
 		}
 
-		KalturaLog::debug('Temp shared path: '.$sharedPath);
+		KalturaLog::info('Temp shared path: '.$sharedPath);
 
 		/** @var KalturaScheduledTaskJobData $jobData */
 		$jobData = $job->data;
@@ -80,7 +80,7 @@ class KScheduledTaskDryRunner extends KJobHandlerWorker
 		}
 
 		$sharedFilePath = $sharedPath.'/'.uniqid('sheduledtask_');
-		KalturaLog::debug('Temp shared file: '.$sharedFilePath);
+		KalturaLog::info('Temp shared file: '.$sharedFilePath);
 		file_put_contents($sharedFilePath, serialize($response));
 		$jobData->resultsFilePath = $sharedFilePath;
 		return $this->closeJob($job, null, null, 'Dry run finished', KalturaBatchJobStatus::FINISHED, $jobData);

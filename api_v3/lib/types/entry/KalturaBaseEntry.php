@@ -412,7 +412,6 @@ class KalturaBaseEntry extends KalturaObject implements IRelatedFilterable, IApi
 	{
 		if (is_null($dbObject))
 		{
-			KalturaLog::debug("Creating new entry");
 			$dbObject = new entry();
 		}
 		

@@ -1100,7 +1100,7 @@ class myPartnerUtils
 			$partner->getEightyPercentWarning() &&
 			!$partner->getUsageLimitWarning())
 		{
-			KalturaLog::debug("passed the 80%, assume notification sent, nothing to do.");
+			KalturaLog::log("passed the 80%, assume notification sent, nothing to do.");
 		}
 		elseif ($percent < 80 &&
 				$partner->getEightyPercentWarning())
@@ -1245,7 +1245,7 @@ class myPartnerUtils
 			}
 			elseif ($percent >= 80 && $percent < 100 && $warning_80 && !$warning_100)
 			{
-				KalturaLog::debug("passed the 80%, assume notification sent, nothing to do.");
+				KalturaLog::log("passed the 80%, assume notification sent, nothing to do.");
 			}
 			elseif ($percent >= 100 && !$warning_100) // send 100% usage warning
 			{

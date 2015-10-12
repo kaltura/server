@@ -28,8 +28,6 @@ abstract class KalturaSearchComparableAttributeCondition extends KalturaAttribut
 
 	public function toObject($objectToFill = null, $propsToSkip = array())
 	{
-		KalturaLog::debug("To object compare attribute condition [$this->comparison]");
-
 		/** @var AdvancedSearchFilterComparableAttributeCondition $objectToFill */
 		if (is_null($objectToFill))
 			$objectToFill = new AdvancedSearchFilterComparableAttributeCondition();

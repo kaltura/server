@@ -22,7 +22,7 @@ class BulkUploadCategoryEngineCsv extends BulkUploadEngineCsv
 		//we will wait for in progress category items because there might be dependencies between the category bulk items.
 		if($openedEntries)
 		{
-			KalturaLog::debug("Some earlier category uploads are still in progress.");
+			KalturaLog::info("Some earlier category uploads are still in progress.");
 			//will make the worker to restart the job.
 			$this->exceededMaxRecordsEachRun = true;
 			return;
@@ -191,7 +191,7 @@ class BulkUploadCategoryEngineCsv extends BulkUploadEngineCsv
 		foreach($this->bulkUploadResults as $bulkUploadResult)
 		{
 			/* @var $bulkUploadResult KalturaBulkUploadResultCategory */
-		    KalturaLog::debug("Handling bulk upload result: [". $bulkUploadResult->name ."]");
+		    KalturaLog::info("Handling bulk upload result: [". $bulkUploadResult->name ."]");
 		    try 
 		    {
     		    switch ($bulkUploadResult->action)

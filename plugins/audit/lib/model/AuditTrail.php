@@ -168,7 +168,6 @@ class AuditTrail extends BaseAuditTrail implements IBaseObject
 	{
 		if(!kAuditTrailManager::traceEnabled($this->getPartnerId(), $this))
 		{
-			KalturaLog::debug("No audit created object type [$this->object_type] action [$this->action]");
 			return 0;
 		}
 

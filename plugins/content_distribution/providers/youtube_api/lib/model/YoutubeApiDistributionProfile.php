@@ -302,7 +302,6 @@ class YoutubeApiDistributionProfile extends ConfigurableDistributionProfile
 		if(!$enforce)
 		{
 			$tokenData = $this->getGoogleOAuth2Data();
-			KalturaLog::debug(print_r($tokenData, true));
 			if(!is_null($tokenData))
 			{
 				return null;

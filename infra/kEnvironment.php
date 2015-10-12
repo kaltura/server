@@ -60,7 +60,6 @@ class kEnvironment
 					continue;
 				elseif(is_array($value) && isset($newConfig[$key]['disable']) && $newConfig[$key]['disable'] == true)
 				{
-					KalturaLog::debug("Value for key [$key] is set to be removed");
 					unset($returnedConfig[$key]);
 					continue;
 				}

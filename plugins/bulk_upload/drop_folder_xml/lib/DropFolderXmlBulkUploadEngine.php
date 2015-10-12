@@ -62,8 +62,6 @@ class DropFolderXmlBulkUploadEngine extends BulkUploadEngineXml
 	 */
 	public function handleBulkUpload()
 	{
-		KalturaLog::debug("Starting BulkUpload for XML drop folder file with id [".$this->job->jobObjectId.']');
-		
 		KBatchBase::impersonate($this->currentPartnerId);
 		$dropFolderPlugin = KalturaDropFolderClientPlugin::get(KBatchBase::$kClient);
 		$this->setContentResourceFilesMap($dropFolderPlugin);
@@ -124,11 +122,9 @@ class DropFolderXmlBulkUploadEngine extends BulkUploadEngineXml
 	 */
 	protected function validateResource(KalturaResource $resource, SimpleXMLElement $elementToSearchIn)
 	{
-		KalturaLog::debug('In validateResource');
 		if($resource instanceof KalturaDropFolderFileResource)
 		{
 			$fileId = $resource->dropFolderFileId;
-			KalturaLog::debug('drop folder file id '.$fileId);
 			if (is_null($fileId)) {
 				throw new KalturaBulkUploadXmlException("Drop folder id is null", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
 			}
@@ -146,7 +142,6 @@ class DropFolderXmlBulkUploadEngine extends BulkUploadEngineXml
 	
 	private function getFilePath(SimpleXMLElement $elementToSearchIn)
 	{
-		KalturaLog::debug('In getFilePath');
 		$attributes = $elementToSearchIn->dropFolderFileContentResource->attributes();
 		$filePath = (string)$attributes['filePath'];
 		
@@ -167,12 +162,10 @@ class DropFolderXmlBulkUploadEngine extends BulkUploadEngineXml
 	{
 		if(isset($elementToSearchIn->dropFolderFileContentResource->fileSize))
 		{
-			KalturaLog::debug("Validating file size");
 			$fileSize = $this->fileTransferMgr->fileSize($filePath);
 			$xmlFileSize = (int)$elementToSearchIn->dropFolderFileContentResource->fileSize;
 			if($xmlFileSize != $fileSize)
 				throw new KalturaBulkUploadXmlException("File size is invalid for file [$filePath], Xml size [$xmlFileSize], actual size [$fileSize]", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
-			KalturaLog::debug("Filesize [$fileSize] verified for local resource [$filePath]");
 		}
 	}
 	
@@ -194,7 +187,7 @@ class DropFolderXmlBulkUploadEngine extends BulkUploadEngineXml
 			{
 				throw new KalturaBulkUploadXmlException("File checksum is invalid for file [$filePath], Xml checksum [$xmlChecksum], actual checksum [$checksum]", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
 			}
-			KalturaLog::debug("Checksum [$checksum] verified for local resource [$filePath]");
+			KalturaLog::info("Checksum [$checksum] verified for local resource [$filePath]");
 		}
 	}
 	
@@ -231,12 +224,12 @@ class DropFolderXmlBulkUploadEngine extends BulkUploadEngineXml
 		if(KBatchBase::$taskConfig->getChmod())
 			$chmod = octdec(KBatchBase::$taskConfig->getChmod());
 			
-		KalturaLog::debug("chmod($filepath, $chmod)");
+		KalturaLog::info("chmod($filepath, $chmod)");
 		@chmod($filepath, $chmod);
 		
 		$chown_name = KBatchBase::$taskConfig->params->fileOwner;
 		if ($chown_name) {
-			KalturaLog::debug("Changing owner of file [$filepath] to [$chown_name]");
+			KalturaLog::info("Changing owner of file [$filepath] to [$chown_name]");
 			@chown($filepath, $chown_name);
 		}
 	}

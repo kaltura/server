@@ -98,8 +98,6 @@ class KalturaLiveEntryService extends KalturaEntryService
 
 		if($dbAsset->hasTag(assetParams::TAG_RECORDING_ANCHOR) && $mediaServerIndex == KalturaMediaServerIndex::PRIMARY)
 		{
-			KalturaLog::debug("Appending assetId $assetId to entryId $entryId");
-
 			$dbEntry->setLengthInMsecs($currentDuration);
 
 			// Extract the exact video segment duration from the recorded file
@@ -150,7 +148,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 		$recordedAsset = assetPeer::retrieveByEntryIdAndParams($entry->getId(), $flavorParamsId);
 		if($recordedAsset)
 		{
-			KalturaLog::debug("Asset [" . $recordedAsset->getId() . "] of flavor params id [$flavorParamsId] already exists");
+			KalturaLog::info("Asset [" . $recordedAsset->getId() . "] of flavor params id [$flavorParamsId] already exists");
 			return;
 		}
 		

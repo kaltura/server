@@ -188,7 +188,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		$partner = PartnerPeer::retrieveByPK($partnerId);
 		// If on the partner it's set not to reset the password - skip the email sending
 		if($partner->getEnabledService(PermissionName::FEATURE_DISABLE_RESET_PASSWORD_EMAIL)) {
-			KalturaLog::debug("Skipping reset-password email sending according to partner configuration.");
+			KalturaLog::log("Skipping reset-password email sending according to partner configuration.");
 			return true;
 		}
 		
@@ -365,7 +365,6 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		
 		if ((is_null($ksUserId) || $ksUserId === '') && $useOwnerIfNoUser)
 		{
-			KalturaLog::log('No user id on KS, trying to login as the account owner');
 			$partner = PartnerPeer::retrieveByPK($ksPartnerId);
 			if (!$partner) {
 				throw new kUserException('Invalid partner id ['.$ksPartnerId.']', kUserException::INVALID_PARTNER);
@@ -578,7 +577,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 				throw new kUserException('', kUserException::LOGIN_ID_ALREADY_USED);
 			}
 						
-			KalturaLog::debug('Existing login data with the same email & password exists - returning id ['.$existingData->getId().']');	
+			KalturaLog::info('Existing login data with the same email & password exists - returning id ['.$existingData->getId().']');	
 			$alreadyExisted = true;
 			
 			if ($isAdminUser && !$existingData->isLastLoginPartnerIdSet()) {

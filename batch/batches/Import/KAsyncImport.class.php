@@ -47,8 +47,6 @@ class KAsyncImport extends KJobHandlerWorker
 	 */
 	private function fetchFile(KalturaBatchJob $job, KalturaImportJobData $data)
 	{
-		KalturaLog::debug("fetchFile($job->id)");
-
 		$jobSubType = $job->jobSubType;
 
 		$sshProtocols = array(
@@ -65,7 +63,6 @@ class KAsyncImport extends KJobHandlerWorker
 		try
 		{
 			$sourceUrl = $data->srcFileUrl;
-			KalturaLog::debug("sourceUrl [$sourceUrl]");
 
 			$this->updateJob($job, 'Downloading file header', KalturaBatchJobStatus::QUEUED);
 			$fileSize = null;
@@ -145,7 +142,6 @@ class KAsyncImport extends KJobHandlerWorker
 				$this->updateJob($job, "Downloading file, size: $fileSize", KalturaBatchJobStatus::PROCESSING, $data);
 			}
 
-			KalturaLog::debug("Executing curl");
 			$res = $curlWrapper->exec($sourceUrl, $data->destFileLocalPath);
 			KalturaLog::debug("Curl results: $res");
 
@@ -235,12 +231,9 @@ class KAsyncImport extends KJobHandlerWorker
 	 */
 	private function fetchFileSsh(KalturaBatchJob $job, KalturaSshImportJobData $data)
 	{
-		KalturaLog::debug("fetchFile($job->id)");
-
 		try
 		{
 			$sourceUrl = $data->srcFileUrl;
-			KalturaLog::debug("sourceUrl [$sourceUrl]");
 
             // extract information from URL and job data
 			$parsedUrl = parse_url($sourceUrl);
@@ -309,7 +302,7 @@ class KAsyncImport extends KJobHandlerWorker
 	
 				// download file - overwrite local if exists
 				$this->updateJob($job, "Downloading file, size: $fileSize", KalturaBatchJobStatus::PROCESSING, $data);
-				KalturaLog::debug("Downloading remote file [$remotePath] to local path [$destFile]");
+				KalturaLog::info("Downloading remote file [$remotePath] to local path [$destFile]");
 				$res = $fileTransferMgr->getFile($remotePath, $destFile);
 				
 			}
@@ -358,8 +351,6 @@ class KAsyncImport extends KJobHandlerWorker
 	 */
 	private function moveFile(KalturaBatchJob $job, $destFile)
 	{
-		KalturaLog::debug("moveFile($job->id, $destFile)");
-
 		try
 		{
 			// creates a shared file path

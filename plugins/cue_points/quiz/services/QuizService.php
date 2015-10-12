@@ -73,7 +73,6 @@ class QuizService extends KalturaBaseService
 	private function validateAndUpdateQuizData( entry $dbEntry, KalturaQuiz $quiz, $currentVersion = 0, kQuiz $newQuiz = null )
 	{
 		if ( !QuizPlugin::validateUserEntitledForQuizEdit($dbEntry) ) {
-			KalturaLog::debug('Update quiz allowed only with admin KS or entry owner or co-editor');
 			throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID);
 		}
 		$quizData = $quiz->toObject($newQuiz);
@@ -138,7 +137,6 @@ class QuizService extends KalturaBaseService
 	 */
 	public function servePdfAction($entryId)
 	{
-		KalturaLog::debug("PDF::: Create a PDF Document for entry id [ " .$entryId. " ]");
 		$dbEntry = entryPeer::retrieveByPK($entryId);
 
 		if (!$dbEntry)

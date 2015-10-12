@@ -54,7 +54,7 @@ class VirusScanProfilePeer extends BaseVirusScanProfilePeer
 		
 		if (!$profiles)
 		{
-			KalturaLog::debug('No virus scan profiles found for partner ['.$entry->getPartnerId().']');
+			KalturaLog::info('No virus scan profiles found for partner ['.$entry->getPartnerId().']');
 			return null;
 		}
 		
@@ -65,7 +65,7 @@ class VirusScanProfilePeer extends BaseVirusScanProfilePeer
 			
 			if ($virusEntryFilter->matches($entry))
 			{
-				KalturaLog::debug('Returning profile with id ['.$profile->getId().']');
+				KalturaLog::info('Returning profile with id ['.$profile->getId().']');
 				return $profile;
 			}
 				

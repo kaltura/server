@@ -34,8 +34,6 @@ class KAsyncProvisionProvide extends KJobHandlerWorker
 	
 	protected function provision(KalturaBatchJob $job, KalturaProvisionJobData $data)
 	{
-		KalturaLog::notice ( "Provision entry");
-		
 		$job = $this->updateJob($job, null, KalturaBatchJobStatus::QUEUED);
 		
 		$engine = KProvisionEngine::getInstance( $job->jobSubType , $data);

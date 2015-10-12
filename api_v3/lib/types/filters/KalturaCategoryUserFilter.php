@@ -117,7 +117,6 @@ class KalturaCategoryUserFilter extends KalturaCategoryUserBaseFilter
 			
 			if (!$kuser)
 			{
-				KalturaLog::debug('User not found');
 				$response = new KalturaCategoryUserListResponse();
         		$response->objects = new KalturaCategoryUserArray();
         		$response->totalCount = 0;

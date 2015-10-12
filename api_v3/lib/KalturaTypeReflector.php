@@ -84,8 +84,6 @@ class KalturaTypeReflector
 	 */
 	public function KalturaTypeReflector($type)
 	{
-//		KalturaLog::debug("Reflecting type [$type]");
-		
 		if (!class_exists($type))
 			throw new KalturaReflectionException("Type \"".$type."\" not found");
 			

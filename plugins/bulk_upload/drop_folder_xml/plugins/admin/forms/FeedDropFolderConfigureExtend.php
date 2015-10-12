@@ -25,7 +25,6 @@ class Form_FeedDropFolderConfigureExtend_SubForm extends Form_DropFolderConfigur
 		parent::populateFromObject($dropFolder, false);
 		
 		/* @var $dropFolder Kaltura_Client_DropFolder_Type_FeedDropFolder */
-		KalturaLog::debug(print_r($dropFolder->feedItemInfo, true));
 		$feedItemInfoForm = $this->getSubForm('feedItemInfo');
 		/* @var $feedItemInfoForm Form_FeedItemInfoConfigureExtend */
 		$feedItemInfoForm->populateFromObject($dropFolder->feedItemInfo, false);

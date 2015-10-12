@@ -109,7 +109,6 @@ class KalturaSyndicationFeedRenderer
 		myDbHelper::$use_alternative_con = myDbHelper::DB_HELPER_CONN_PROPEL3;
 
 		$microTimeStart = microtime(true);
-		KalturaLog::info("syndicationFeedRenderer- initialize ");
 				
 		$this->syndicationFeedDb = $syndicationFeedDB = syndicationFeedPeer::retrieveByPK($feedId);
 		if( !$syndicationFeedDB )

@@ -229,7 +229,7 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 		
 		$delivery = self::selectByDeliveryAttributes($deliveries, $deliveryAttributes);
 		if($delivery) {
-			KalturaLog::debug("Delivery ID for partnerId [$partnerId] and streamer type [$streamerType] is " . $delivery->getId());
+			KalturaLog::info("Delivery ID for partnerId [$partnerId] and streamer type [$streamerType] is " . $delivery->getId());
 		} else {
 			$mediaProtocol = $deliveryAttributes ? $deliveryAttributes->getMediaProtocol() : null;
 			KalturaLog::err("Delivery ID can't be determined for partnerId [$partnerId] streamer type [$streamerType] and media protocol [$mediaProtocol]");
@@ -276,7 +276,7 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 		$deliveries = DeliveryProfilePeer::retrieveByPKs($deliveryIds[$streamerType]);
 		$delivery = self::selectByDeliveryAttributes($deliveries, $deliveryAttributes);
 		if($delivery) {
-			KalturaLog::debug("Delivery ID for storageId [$storageId] ( PartnerId [" . $storageProfile->getPartnerId() . "] ) and streamer type [$streamerType] is " . $delivery->getId());
+			KalturaLog::info("Delivery ID for storageId [$storageId] ( PartnerId [" . $storageProfile->getPartnerId() . "] ) and streamer type [$streamerType] is " . $delivery->getId());
 			$delivery->setEntryId($deliveryAttributes->getEntryId());
 			$delivery->setStorageId($storageId);
 			
@@ -374,7 +374,7 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 		
 		$delivery = self::selectByDeliveryAttributes($deliveries, $deliveryAttributes);
 		if($delivery) {
-			KalturaLog::debug("Delivery ID for Host Name: [$cdnHost] and streamer type: [$streamerType] is [" . $delivery->getId());
+			KalturaLog::info("Delivery ID for Host Name: [$cdnHost] and streamer type: [$streamerType] is [" . $delivery->getId());
 			$delivery->setEntryId($entryId);
 		} else {
 			KalturaLog::err("Delivery ID can't be determined for Host Name [$cdnHost] and streamer type [$streamerType]");

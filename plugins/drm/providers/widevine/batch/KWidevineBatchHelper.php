@@ -58,7 +58,7 @@ class KWidevineBatchHelper
 		
 		$cmd = $widevineExe.' -a '.$assetName.' -u '.$wvRegServerHost.' -p '.$portal.' -o '.$portal.' -t '.$inputFiles.' -d '.$destinationFile.' -g '.$gop.' 2>&1';
 		
-		KalturaLog::debug("Encrypt package command: ".$cmd);
+		KalturaLog::info("Encrypt package command: ".$cmd);
 		
 		//$cmd = $cmd.' -v '.$iv.' -k '.$key;
 		return $cmd;
@@ -171,7 +171,7 @@ class KWidevineBatchHelper
 	{
 		$cmd =  "$ffmpegCmd -i $inputFile -i $inputFile -map 0:v -map 1:a -c copy -shortest -y -f mp4 -threads 1 $fixedInputFile 2>&1";
 		
-		KalturaLog::debug("Executing command to fix asset : ".$cmd);
+		KalturaLog::info("Executing command to fix asset : ".$cmd);
 		
 		return $cmd;
 	}
@@ -184,7 +184,7 @@ class KWidevineBatchHelper
 			$params[self::PROVIDER] = self::providerRequestEncode($providerParams);
 		$url .= http_build_query($params, '', '&');
 		
-		KalturaLog::debug("Request URL: ".$url);
+		KalturaLog::info("Request URL: ".$url);
 				
 		$ch = curl_init();		
 		curl_setopt($ch, CURLOPT_URL, $url);

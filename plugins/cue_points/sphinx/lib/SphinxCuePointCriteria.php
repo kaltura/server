@@ -42,8 +42,6 @@ class SphinxCuePointCriteria extends SphinxCriteria
 		{
 			$this->sphinxSkipped = false;
 			$freeTexts = $filter->get('_free_text');
-			KalturaLog::debug("Attach free text [$freeTexts]");
-			
 			$this->addFreeTextToMatchClauseByMatchFields($freeTexts, CuePointFilter::FREE_TEXT_FIELDS);
 		}
 		$filter->unsetByName('_free_text');
