@@ -71,14 +71,25 @@ class MediaServer extends BaseMediaServer {
 		return MediaServer::DEFAULT_GPUID;
 	}
 	
-	public function getManifestUrl($protocol = 'http', $partnerMediaServerConfigurations = null)
+	public function getManifestUrl($protocol = 'http', $partnerMediaServerConfigurations = null, $format = null)
 	{
 		$domain = $this->getHostname();
 		$port = MediaServer::DEFAULT_MANIFEST_PORT;
 		$portField = 'port';
+		$domainFieldByFormat = 'domain';
+		$portFieldByFormat = 'port';
 		$appPrefix = '';
+		$isPortByFormat = false;
+		$isDomainByFormat = false;
+			
 		if($protocol != 'http')
 			$portField .= "-$protocol";
+		$portFieldByFormat = $portField;
+		if ($format) {
+			$portFieldByFormat .=  "-$format";
+			$domainFieldByFormat .= "-$format";
+		}
+			
 		
 		if(kConf::hasMap('media_servers'))
 		{
@@ -88,11 +99,20 @@ class MediaServer extends BaseMediaServer {
 			
 			if(isset($mediaServers[$portField]))
 				$port = $mediaServers[$portField];
+			if($format && isset($mediaServers[$portFieldByFormat])) {
+				$port = $mediaServers[$portFieldByFormat];
+				$isPortByFormat = true;
+			}
 				
 			if(isset($mediaServers['domain']))
 				$domain = $mediaServers['domain'];
 			elseif(isset($mediaServers['search_regex_pattern']) && isset($mediaServers['replacement']))
 				$domain = preg_replace($mediaServers['search_regex_pattern'], $mediaServers['replacement'], $domain);
+				
+			if($format && isset($mediaServers[$domainFieldByFormat])) {
+				$domain = $mediaServers[$domainFieldByFormat];	
+				$isDomainByFormat = true;
+			}
 
 			if (isset ($mediaServers['appPrefix']))
 				$appPrefix = $mediaServers['appPrefix'];
@@ -101,11 +121,20 @@ class MediaServer extends BaseMediaServer {
 		    {
 		    	$mediaServer = $mediaServers['dc-'.$this->getDc()];
 		    
-		    	if(isset($mediaServer[$portField]))
+		    	if(isset($mediaServer[$portField]) && !$isPortByFormat)
 		     		$port = $mediaServer[$portField];
+				if($format && isset($mediaServer[$portFieldByFormat])) {
+		     		$port = $mediaServer[$portFieldByFormat];
+					$isPortByFormat = true;
+				}
+				
 		    
-		    	if(isset($mediaServer['domain']))
+		    	if(isset($mediaServer['domain']) && !$isDomainByFormat)
 		     		$domain = $mediaServer['domain'];
+				if($format && isset($mediaServer[$domainFieldByFormat])) {
+					$domain = $mediaServer[$domainFieldByFormat];	
+					$isDomainByFormat = true;
+				}
 		     	
 		     	if (isset ($mediaServer['appPrefix']))
 					$appPrefix = $mediaServer['appPrefix'];
@@ -115,11 +144,19 @@ class MediaServer extends BaseMediaServer {
 			{
 				$mediaServer = $mediaServers[$this->getHostname()];
 				
-				if(isset($mediaServer[$portField]))
+				if(isset($mediaServer[$portField]) && !$isPortByFormat)
 					$port = $mediaServer[$portField];
+				if($format && isset($mediaServer[$portFieldByFormat])) {
+		     		$port = $mediaServer[$portFieldByFormat];
+					$isPortByFormat = true;
+				}
 				
-				if(isset($mediaServer['domain']))
+				if(isset($mediaServer['domain']) && !$isDomainByFormat)
 					$domain = $mediaServer['domain'];
+				if($format && isset($mediaServer[$domainFieldByFormat])) {
+					$domain = $mediaServer[$domainFieldByFormat];	
+					$isDomainByFormat = true;
+				}
 				
 				if (isset ($mediaServer['appPrefix']))
 					$appPrefix = $mediaServer['appPrefix'];

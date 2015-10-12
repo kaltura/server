@@ -50,7 +50,7 @@ public class ErrorTest extends BaseTest {
 		try {
 			this.client = new KalturaClient(this.kalturaConfig);
 			client.getSystemService().ping();
-			fail();
+			fail("Ping to invalid end-point should fail");
 		} catch (Exception e) {
 			// Expected behavior
 		}
@@ -63,7 +63,7 @@ public class ErrorTest extends BaseTest {
 		try {
 			this.client = new KalturaClient(this.kalturaConfig);
 			client.getSystemService().ping();
-			fail();
+			fail("Ping to invalid end-point should fail");
 		} catch (Exception e) {
 			// Expected behavior
 		}
@@ -98,12 +98,12 @@ public class ErrorTest extends BaseTest {
 	/**
 	 * Tests case in which XML format is completely ruined
 	 */
-	public void testXmlParsingError() {
+	public void testXmlParsingError() throws KalturaApiException {
 		KalturaClientMock mockClient = new KalturaClientMock(this.kalturaConfig, "<xml>");
 		mockClient.queueServiceCall("system", "ping", new KalturaParams());
 		try {
 			mockClient.doQueue();
-			fail();
+			fail("Invalid XML response should fail");
 		} catch (KalturaApiException e) {
 			assertEquals("Failed while parsing response.", e.getMessage());
 		}
@@ -118,7 +118,7 @@ public class ErrorTest extends BaseTest {
 		Element resultXmlElement = mockClient.doQueue();
 		try {
 			KalturaObjectFactory.create(resultXmlElement, null);
-			fail();
+			fail("Invalid XML response should fail");
 		} catch (Exception e) {
 			// Expected behavior
 		}
@@ -133,7 +133,7 @@ public class ErrorTest extends BaseTest {
 		Element resultXmlElement = mockClient.doQueue();
 		try {
 			KalturaObjectFactory.create(resultXmlElement, null);
-			fail();
+			fail("Invalid XML response should fail");
 		} catch (Exception e) {
 			// Expected behavior
 		}
@@ -148,7 +148,7 @@ public class ErrorTest extends BaseTest {
 		Element resultXmlElement = mockClient.doQueue();
 		try {
 			KalturaObjectFactory.create(resultXmlElement, null);
-			fail();
+			fail("Invalid XML response should fail");
 		} catch (Exception e) {
 			// Expected behavior
 		}
@@ -160,7 +160,7 @@ public class ErrorTest extends BaseTest {
 		Element resultXmlElement = mockClient.doQueue();
 		try {
 			KalturaObjectFactory.create(resultXmlElement, null);
-			fail();
+			fail("Invalid XML response should fail");
 		} catch (Exception e) {
 			// Expected behavior
 		}
@@ -172,7 +172,7 @@ public class ErrorTest extends BaseTest {
 		Element resultXmlElement = mockClient.doQueue();
 		try {
 			KalturaObjectFactory.create(resultXmlElement, null);
-			fail();
+			fail("Invalid XML response should fail");
 		} catch (Exception e) {
 			// Expected behavior
 		}
@@ -184,7 +184,7 @@ public class ErrorTest extends BaseTest {
 		Element resultXmlElement = mockClient.doQueue();
 		try {
 			KalturaObjectFactory.create(resultXmlElement, null);
-			fail();
+			fail("Invalid XML response should fail");
 		} catch (Exception e) {
 			assertEquals("Invalid object : UnknownObjectType", e.getMessage());
 		}
@@ -196,7 +196,7 @@ public class ErrorTest extends BaseTest {
 		Element resultXmlElement = mockClient.doQueue();
 		try {
 			KalturaObjectFactory.create(resultXmlElement, null);
-			fail();
+			fail("Invalid XML response should fail");
 		} catch (Exception e) {
 			assertEquals("Invalid object : NSString", e.getMessage());
 		}
@@ -222,7 +222,7 @@ public class ErrorTest extends BaseTest {
 			assertTrue(entry2.name.equals("test2"));
 		} catch (Exception e) {
 			e.printStackTrace();
-			fail();
+			fail(e.getMessage());
 		}
 	}
 }

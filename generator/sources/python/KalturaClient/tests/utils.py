@@ -7,7 +7,6 @@ from KalturaClient.Base import KalturaObjectFactory, KalturaEnumsFactory
 from KalturaClient.Base import IKalturaLogger
 
 from KalturaClient.Plugins.Core import KalturaSessionType
-from KalturaClient.Plugins.Core import KalturaMediaType
 
 dir = os.path.dirname(__file__)
 filename = os.path.join(dir, 'config.ini')

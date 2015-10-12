@@ -480,6 +480,15 @@ $plannedDur = 0;
 			$target->_explicitClipDur = $target->_clipDur;
 			
 			/*
+			 * Fading needs explicit time limitation on the WM image loop. 
+			 * We'll do it with '_explicitClipDur' field 
+			 */
+		if(!isset($target->_explicitClipDur) && isset($target->_video)
+		&& isset($target->_video->_watermarkData) && isset($target->_video->_watermarkData->fade)){
+			$target->_explicitClipDur = $sourceDur;
+		}
+
+			/*
 			 * mpeg2 and theora video formats does not allow reliable 'fastSeekTo' (used on clipping)
 			 */
 		if($source->_video && $source->_video->IsFormatOf(array("mpeg video","theora"))){
@@ -795,6 +804,29 @@ $plannedDur = 0;
 			}
 		}
 
+		/*
+		 * Watermark - evaluate scale value in case of 'percentage-of-the-source'
+		 * Sample 'scale' value "x30%" stands for - 
+		 * make the height to be 30% of the source, calculate the width to match the height
+		 */
+		if(isset($targetVid->_watermarkData) && isset($targetVid->_watermarkData->scale)){
+			$scaleArrNew = array();
+			$scaleArr = explode("x",$targetVid->_watermarkData->scale);
+			foreach ($scaleArr as $i=>$val){
+				if(isset($val) && strlen($val)>0) {
+					$arr = explode('%', $val);
+					if(count($arr)==2){
+						if(isset($sourceVid->_width) && isset($sourceVid->_height)) {
+							$val = round(($i==0?$sourceVid->_width: $sourceVid->_height)*$arr[0]/100);
+						}
+						else $val = "";
+					}
+				}
+				$scaleArrNew[$i] = $val;
+			}
+			$targetVid->_watermarkData->scale = implode('x', $scaleArrNew);
+		}
+		
 		$targetVid->_rotation = $sourceVid->_rotation;
 		$targetVid->_scanType = $sourceVid->_scanType;
 		

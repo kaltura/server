@@ -85,6 +85,11 @@ class KalturaCuePointFilter extends KalturaCuePointBaseFilter
 		}
 	}
 	
+	protected function getCriteria()
+	{
+	    return KalturaCriteria::create(CuePointPeer::OM_CLASS);
+	}
+	
 	protected function doGetListResponse(KalturaFilterPager $pager, $type = null)
 	{
 		$this->validateEntryIdFiltered();
@@ -97,7 +102,7 @@ class KalturaCuePointFilter extends KalturaCuePointBaseFilter
 			$this->translateUserIds();
 		}
 		
-		$c = KalturaCriteria::create(CuePointPeer::OM_CLASS);
+		$c = $this->getCriteria();
 		if($type)
 		{
 			$c->add(CuePointPeer::TYPE, $type);

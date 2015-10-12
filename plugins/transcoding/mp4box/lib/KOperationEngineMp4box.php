@@ -23,11 +23,11 @@ class KOperationEngineMp4box  extends KSingleOutputOperationEngine
 			$captionsStr = null;
 			{
 					// impersonite
-				$preImpersoniteId = KBatchBase::$kClient->getConfig()->partnerId;
+				KBatchBase::impersonate($this->job->partnerId);
 				
 				$captionsStr = $this->buildSubTitleCommandParam($this->data);
 					// un-impersonite
-				KBatchBase::$kClient->getConfig()->partnerId = $preImpersoniteId;
+				KBatchBase::unimpersonate();
 			}
 			if(isset($captionsStr)){
 				$exeCmd = str_replace(

@@ -25,8 +25,6 @@ class VoicebaseClientHelper
 	
 	public function checkExistingExternalContent($entryId)
 	{
-		$exitingEntryQueryUrl = $this->baseEndpointUrl;
-	
 		$params = array("action" => "getFileStatus", "externalID" => $entryId);
 		$exitingEntryQueryUrl = $this->addUrlParams($this->baseEndpointUrl, $params);
 	
@@ -136,6 +134,27 @@ class VoicebaseClientHelper
 			$results[$format] = $result->transcript;
 		}
 		return $results;
+	}
+	
+	public function calculateAccuracy($entryId)
+	{
+		$contentArr = $this->getRemoteTranscripts($entryId, array("JSON"));
+		$transcriptWordObjects = json_decode($contentArr["JSON"]);
+		$sumOfAccuracies = 0;
+		$numberOfElements = 0;
+		
+		foreach($transcriptWordObjects as $wordObject)
+		{
+			if(isset($wordObject->c) && 0 <= $wordObject->c && $wordObject->c <= 1)
+			{
+				$sumOfAccuracies += $wordObject->c;
+				$numberOfElements++;
+			}
+		}
+	
+		if($numberOfElements)
+			return $sumOfAccuracies/$numberOfElements;
+		return 0;
 	}
 	
 	public function deleteRemoteFile($entryId)

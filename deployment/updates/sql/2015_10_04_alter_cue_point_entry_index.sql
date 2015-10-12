@@ -1,0 +1,1 @@
+alter table cue_point drop index entry_id, add index entry_status(entry_id,status);

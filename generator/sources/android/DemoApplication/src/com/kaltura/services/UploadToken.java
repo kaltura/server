@@ -33,7 +33,7 @@ public class UploadToken extends Observable {
     private KalturaClient client;
     private int setAttemptUpload;
     private KalturaMediaEntry newEntry;
-    private float remainingUploadFileSize;
+    private double remainingUploadFileSize;
     private boolean startUpload;
     private int readSum = 0;
     
@@ -112,7 +112,7 @@ public class UploadToken extends Observable {
         }
         int i = 0;
         boolean errUpload = false;
-        Log.w(TAG, "HASH:" + new Float(fileData.length()).hashCode());
+        Log.w(TAG, "HASH:" + Float.valueOf(fileData.length()).hashCode());
         int attemptUpload = 0;
         
         boolean wasFirst = false;
@@ -189,7 +189,7 @@ public class UploadToken extends Observable {
             notifyObservers(getUploadedFileSize());
         } while (!uploaded && !(attemptUpload >= setAttemptUpload) && startUpload);
         
-        Log.w(TAG, "HASH:" + new Float(kalturaUploadToken.uploadedFileSize).hashCode());
+        Log.w(TAG, "HASH:" + Double.valueOf(kalturaUploadToken.uploadedFileSize).hashCode());
         if (uploaded) {
             startUpload = false;
             try {

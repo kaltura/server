@@ -83,9 +83,10 @@ class KFFMpegThumbnailMaker extends KBaseThumbnailMaker
 		}
 		
 		$cmdArr = array();
-		$cmdArr[] = "$this->cmdPath $position_str -i $this->srcPath -an -y -r 1 $dimensions -vframes $frameCount -f $targetType $position_str_suffix" .
+			// '-noautorotate' to adjust to ffm2.7.2 that automatically normalizes rotated sources
+		$cmdArr[] = "$this->cmdPath $position_str -noautorotate -i $this->srcPath -an -y -r 1 $dimensions -vframes $frameCount -f $targetType $position_str_suffix" .
 			" $this->targetPath >> $this->targetPath.log 2>&1";
-		$cmdArr[] = "$this->cmdPath -i $this->srcPath $position_str -an -y -r 1 $dimensions -vframes $frameCount -f $targetType" .
+		$cmdArr[] = "$this->cmdPath -noautorotate -i $this->srcPath $position_str -an -y -r 1 $dimensions -vframes $frameCount -f $targetType" .
 			" $this->targetPath >> $this->targetPath.log 2>&1";
 		return $cmdArr;
 		

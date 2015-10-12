@@ -72,18 +72,13 @@ class s3Mgr extends kFileTransferMgr
 				)
 		);
 		
-		$connectionSuccess = false;
-		try
-		{
-			$buckets = $this->s3->listBuckets(); // just to check whether the connection is good, throws an exception in case of error
-			$connectionSuccess = true;
-		}
-		catch ( Exception $e )
-		{
-			KalturaLog::err("Can't connect to S3: {$e->getMessage()}");
-		}
-
-		return $connectionSuccess;
+		/** 
+		 * There is no way of "checking the credentials" on s3.
+		 * Doing a ListBuckets would only check that the user has the s3:ListAllMyBuckets permission
+		 * which we don't use anywhere else in the code anyway. The code will fail soon enough in the
+		 * code elsewhere if the permissions are not sufficient.
+		 **/
+		return true;
 	}
 
 

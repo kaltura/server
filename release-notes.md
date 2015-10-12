@@ -1,3 +1,75 @@
+# Jupiter-10.21.0 #
+
+## Cielo24 plugin ##
+
+- Issue Type: New Feature
+- Issue ID: PLAT-2598
+
+#### Configuration ####
+ 
+- Added 'Cielo24' in plugins.ini.base, plugins.ini.admin.
+- Added 'Cielo24' module to the admin-console in admin.ini.
+
+#### Deployment Scripts ####
+	php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2015_09_20_update_integration_notify_permission_name.php
+	(developer's responsibility) php /opt/kaltura/app/alpha/scripts/utils/addPartnerToCielo24.php /opt/kaltura/app {PID} {cielo24-api-username} {cielo24-api-password} 
+	
+#### Known Issues & Limitations ####
+
+None.
+
+## In Video Quiz - Permissions Update ##
+
+- Issue Type: New Feature  
+- Issue ID: PLAT-3864
+
+#### Installation ####
+
+None.
+
+#### Configuration ####
+
+- Run the following permission script:
+	php deployment\updates\scripts\add_permissions\2015_09_17_update_quiz_permissions.php
+
+#### Known Issues & Limitations ####
+
+None.
+
+## In Video Quiz - Sphinx Implementation for Answer Cue-Point ##
+
+- Issue Type: New Feature  
+- Issue ID: PLAT-3836
+
+#### Installation ####
+
+- Add QuizSphinx to plugins.ini (as demonstrated in plugins.ini.template)
+- Run the installPlugins.php script: deployment/base/scripts/installPlugins.php
+- Run the cue-points population sphinx script: deployment/base/scripts/populateSphinxCuePoints.php
+
+#### Configuration ####
+
+None.
+
+#### Known Issues & Limitations ####
+
+None.
+
+## In Video Quiz - new action servePdf under quiz service##
+
+- Issue Type: New Feature  
+- Issue ID: PLAT-2784 Add Quiz PDF support
+
+#### Installation ####
+
+- run deployment script - 2015_10_1_update_quiz_permissions.php
+- clear cache
+
+#### Configuration ####
+
+None.
+		
 # Jupiter-10.20.0 #
 
 ### Configuration ###

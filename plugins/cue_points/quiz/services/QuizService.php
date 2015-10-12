@@ -128,4 +128,24 @@ class QuizService extends KalturaBaseService
 		return $filter->getListResponse($pager, $this->getResponseProfile());
 	}
 
+	/**
+	 * creates a pdf from quiz object
+	 *
+	 * @action servePdf
+	 * @param string $entryId
+	 * @return file
+	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
+	 */
+	public function servePdfAction($entryId)
+	{
+		KalturaLog::debug("PDF::: Create a PDF Document for entry id [ " .$entryId. " ]");
+		$dbEntry = entryPeer::retrieveByPK($entryId);
+
+		if (!$dbEntry)
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
+
+		$kp = new kQuizPdf($entryId);
+		$kp->createQuestionPdf();
+		return $kp->submitDocument();
+	}
 }

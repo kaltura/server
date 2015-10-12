@@ -2,58 +2,11 @@
 class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDeletedEventConsumer, kObjectAddedEventConsumer
 {
 	const VIEW_RESPONSE_PROFILE_OBJECT_SPECIFIC = 'objectSpecific';
-//function (doc, meta) {
-//	if (meta.type == "json") {
-//		if(doc.type == "primaryObject"){
-//			emit(doc.objectKey, null);
-//		}
-//	}
-//}
-
 	const VIEW_RESPONSE_PROFILE_RELATED_OBJECT_SESSIONS = 'relatedObjectSessions';
-//function (doc, meta) {
-//	if (meta.type == "json") {
-//		if(doc.type == "relatedObject"){
-// 			emit([doc.triggerKey, doc.objectType, doc.sessionKey], null);
-//		}
-//	}
-//}
-	
 	const VIEW_RESPONSE_PROFILE_RELATED_OBJECTS_TYPES = 'relatedObjectsTypes';
-//function (doc, meta) {
-//	if (meta.type == "json") {
-//		if(doc.type == "relatedObject"){
-// 			emit([doc.triggerKey, doc.objectType], null);
-//		}
-//	}
-//}
-	
 	const VIEW_RESPONSE_PROFILE_OBJECT_SESSIONS = 'objectSessions';
-// function (doc, meta) {
-// 	if (meta.type == "json") {
-// 		if(doc.type == "primaryObject"){
-// 			emit([doc.objectKey, doc.sessionKey], null);
-// 		}
-// 	}
-// }
-
 	const VIEW_RESPONSE_PROFILE_OBJECT_TYPE_SESSIONS = 'objectTypeSessions';
-// function (doc, meta) {
-// 	if (meta.type == "json") {
-// 		if(doc.type == "primaryObject"){
-// 			emit([doc.objectType, doc.sessionKey], null);
-// 		}
-// 	}
-// }
-	
 	const VIEW_RESPONSE_PROFILE_SESSION_TYPE = 'sessionType';
-//function (doc, meta) {
-//	if (meta.type == "json") {
-//		if(doc.type == "primaryObject"){
-//			emit([doc.sessionKey, doc.objectKey], doc);
-//		}
-//	}
-//}
 
 	const MAX_CACHE_KEYS_PER_JOB = 1000;
 	
@@ -119,7 +72,7 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 			self::$cacheVersion = kConf::get('response_profile_cache_version', 'local', 1);
 			
 		if(is_array($key))
-			return array_map(array(self, 'addCacheVersion'), $key);
+			return array_map(array('self', 'addCacheVersion'), $key);
 			
 		return self::$cacheVersion . '_' . $key;
 	}
@@ -289,10 +242,13 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 		return "{$partnerId}_{$objectType}_{$objectId}";
 	}
 	
-	protected static function getRelatedObjectKey(IRelatedObject $object)
+	protected static function getRelatedObjectKey(IRelatedObject $object, $responseProfileKey = null)
 	{
 		$partnerId = $object->getPartnerId();
 		$objectType = get_class($object);
+		if($responseProfileKey)
+			return "{$partnerId}_{$objectType}_{$responseProfileKey}";
+			
 		return "{$partnerId}_{$objectType}";
 	}
 	
@@ -443,12 +399,6 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 	
 	protected function hasCachedRelatedObjects(IRelatedObject $object)
 	{
-		$peer = $object->getPeer();
-		if(!($peer instanceof IRelatedObjectPeer) || !$peer->isReferenced($object))
-		{
-			return false;
-		}
-		
 		if(isset($this->queryCache[__METHOD__]))
 		{
 			return true;

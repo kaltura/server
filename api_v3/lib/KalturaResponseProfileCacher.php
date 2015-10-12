@@ -63,7 +63,7 @@ class KalturaResponseProfileCacher extends kResponseProfileCacher
 		return array(
 			'type' => 'relatedObject',
 			'triggerKey' => self::getRelatedObjectKey($object),
-			'objectType' => get_class(self::$cachedObject),
+			'objectType' => get_class(self::$cachedObject) . '_' . self::$responseProfileKey,
 			'objectPeer' => get_class(self::$cachedObject->getPeer()),
 			'triggerObjectType' => get_class($object),
 			'partnerId' => self::$cachedObject->getPartnerId(),
@@ -98,14 +98,11 @@ class KalturaResponseProfileCacher extends kResponseProfileCacher
 		$peer = $object->getPeer();
 		if($peer instanceof IRelatedObjectPeer)
 		{
-			if($peer->isReferenced($object))
-			{
-				$key = self::getObjectTypeCacheKey($object);
-				$value = self::getObjectTypeCacheValue($object);
-				KalturaLog::debug("Set [$key] value [" . print_r($value, true) . "]");
-				
-				self::set($key, $value);
-			}
+			$key = self::getObjectTypeCacheKey($object);
+			$value = self::getObjectTypeCacheValue($object);
+			KalturaLog::debug("Set [$key] value [" . print_r($value, true) . "]");
+			
+			self::set($key, $value);
 		}
 	}
 	
@@ -132,7 +129,7 @@ class KalturaResponseProfileCacher extends kResponseProfileCacher
 			$key = self::getObjectSpecificCacheKey($object, $responseProfileKey);
 			$invalidationKeys = array(
 				self::getObjectKey($object),
-				self::getRelatedObjectKey($object),
+				self::getRelatedObjectKey($object, $responseProfileKey),
 			);
 			
 			$value = self::get($key, $invalidationKeys);
