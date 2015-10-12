@@ -6,7 +6,16 @@
  * Time: 3:34 PM
  */
 
+class AMFData
+{
+    public $pts;
+    public $offset;
+
+};
+
 class KAMFMediaInfoParser extends KBaseMediaParser{
+
+
 
     protected $cmdPath;
     protected $ffmprobeBin;
@@ -19,22 +28,22 @@ class KAMFMediaInfoParser extends KBaseMediaParser{
     {
         $this->cmdPath = $cmdPath;
         $this->ffprobeBin = $ffprobeBin;
-        //parent::__construct($filePath);
+        parent::__construct($filePath);
     }
 
     protected function getCommand()
     {
         if(!isset($filePath)) $filePath=$this->filePath;
-        return "{$this->ffprobeBin} -i {$filePath} -select_streams 2:2 -show_streams -show_programs -v quiet -show_data -show_packets -print_format json";
+        return "{$this->ffprobeBin} -i {$filePath} -select_streams 2:2 -show_streams -show_programs -v quiet -show_data -show_packets -print_format json 2>&1";
     }
 
-    /**
-     * @return KalturaMediaInfo
-     */
-    public function getMediaInfoFromString($str)
-    {
-        return $this->parseOutput($str);
-    }
+//    /**
+//     * @return KalturaMediaInfo
+//     */
+//    public function getMediaInfoFromString($str)
+//    {
+//        return $this->parseOutput($str);
+//    }
 
     // parse the output of the command and return an array of objects
     // - pts
@@ -42,27 +51,39 @@ class KAMFMediaInfoParser extends KBaseMediaParser{
     // - offset
     protected function parseOutput($output)
     {
+        KalturaLog::debug('in KAMFMediaInfoParser.parseOutput: ' . print_r($output, true));
+
         $outputlower = strtolower($output);
         $jsonObj = json_decode($outputlower);
 
         // Check for json decode errors caused by inproper utf8 encoding.
         if(json_last_error()!=JSON_ERROR_NONE) $jsonObj = json_decode(utf8_encode($outputlower));
 
-        $jsonObj = $jsonObj->packets_and_frames;
+        $jsonObj = $jsonObj->packets;
+
+        $amf = array();
 
         for ($i = 0; $i < count($jsonObj); $i++) {
-            //print "$i\n";
             $tmp = $jsonObj[$i];
-            print $tmp->pts;
-            print "\n";
-            print $this->getOffsetFromAMF($tmp->data);
-            print "\n";
+            // the first data packet is of smaller size of 205 chars
+            if (strlen($tmp->data) > 205) {
+
+                $amfData = new AMFData();
+                $amfData->pts = $tmp->pts;
+                $amfData->offset = $this->getOffsetFromAMF($tmp->data);
+
+                KalturaLog::debug('adding to AMF array: ' . print_r($amfData, true));
+
+                array_push($amf, $amfData);
+            }
         }
 
-        return $jsonObj;
+        KalturaLog::debug('amf array: ' . print_r($amf, true));
+
+        return $amf;
     }
 
-    private function getOffsetFromAMF($AMFData){
+     private function getOffsetFromAMF($AMFData){
         $AMFDataStream = $this->getByteStreamFromFFProbeAMFData($AMFData);
 
         // look for 74696d657374616d70 which is the hex encoding of "timestamp"
@@ -70,15 +91,25 @@ class KAMFMediaInfoParser extends KBaseMediaParser{
         // this is fallowed by a 64bit (8 bytes = 16 chars) of the number
 
         $pos = strpos($AMFDataStream, "74696d657374616d70");
-
         $ret = substr($AMFDataStream, $pos + 2 + 18, 16);
-
-        print $pos."\n";
-        print $AMFDataStream."\n";
-        print $ret;
-
-        return $ret;
+        return $this->hex2float($ret);
     }
+
+    private function hex2float($number) {
+        $binfinal = sprintf("%064b",hexdec($number));
+        $sign = substr($binfinal, 0, 1);
+        $exp = substr($binfinal, 1, 11);
+        $mantissa = "1".substr($binfinal, 12);
+        $mantissa = str_split($mantissa);
+        $exp = bindec($exp)-1023;
+        $significand=0;
+        for ($i = 0; $i < 53; $i++) {
+            $significand += (1 / pow(2,$i))*$mantissa[$i];
+        }
+        return $significand * pow(2,$exp) * ($sign*-2+1);
+    }
+
+
 
     // parse the output of ffprobe that looks like:
     //        \n00000000: 0200 0a6f 6e4d 6574 6144 6174 6103 0008  ...onMetaData...

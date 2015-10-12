@@ -13,15 +13,17 @@ class kRecordedSegmentsInfo
 	const LIVE_START = 'ls'; // Live start time = Total live duration at the beginning of the segment
 	const VOD_SEGMENT_DURATION = 'vsd';
 	const VOD_TO_LIVE_DELTA_TIME = 'dt'; // The diff between live and VOD segments duration (liveStart + vodSegmentDuration + vodToLiveDeltaTime = liveEnd)
+	const AMF_DATA = 'amf';
 
 	protected $segments = array();
 
-	public function addSegment( $liveStart, $vodSegmentDuration, $vodToLiveDeltaTime )
+	public function addSegment( $liveStart, $vodSegmentDuration, $vodToLiveDeltaTime, $AMFs)
 	{
 		$this->segments[] = array(
 				self::LIVE_START => $liveStart,
 				self::VOD_SEGMENT_DURATION => $vodSegmentDuration,
 				self::VOD_TO_LIVE_DELTA_TIME => $vodToLiveDeltaTime,
+				self::AMF_DATA => $AMFs
 			);
 	}
 
@@ -128,5 +130,29 @@ class kRecordedSegmentsInfo
 		// The time signature is greater than the total VOD duration
 		KalturaLog::debug("Couldn't get a segment whos start time is less than " . $cuePointTime);
 		return null;
+	}
+
+	// for debug prints
+	public function printAMFsForAllSegments(){
+		KalturaLog::debug("in printAMFsForAllSegments\n");
+		$numSegments = count($this->segments);
+		KalturaLog::debug("we have " . $numSegments . "segments\n");
+
+		//while ( $i < $numSegments )
+		for ($i = 0; $i < $numSegments; $i++)
+		{
+			KalturaLog::debug("segment #" . $i);
+
+			$segment = $this->segments[$i];
+			$liveStart = $segment[self::LIVE_START];
+			$vsd = $segment[self::VOD_SEGMENT_DURATION];
+			$dt = $segment[self::VOD_TO_LIVE_DELTA_TIME];
+			$amf = $segment[self::AMF_DATA];
+
+			KalturaLog::debug('liveStart: ' . print_r($liveStart, true));
+			KalturaLog::debug('vsd: ' . print_r($vsd, true));
+			KalturaLog::debug('dt: ' . print_r($dt, true));
+			KalturaLog::debug('amf: ' . print_r($amf, true));
+		}
 	}
 }

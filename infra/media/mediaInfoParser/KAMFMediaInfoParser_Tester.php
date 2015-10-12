@@ -57,5 +57,5 @@
 
 $aaa = new KAMFMediaInfoParser($str);
 $bbb = $aaa->getMediaInfoFromString($str);
-//var_dump($bbb);
+var_dump($bbb);
 ?>
