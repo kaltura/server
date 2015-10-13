@@ -19,9 +19,9 @@ class LikeService extends KalturaBaseService
 		if(!LikePlugin::isAllowedPartner($this->getPartnerId()))
 		{
 		    throw new KalturaAPIException(KalturaErrors::FEATURE_FORBIDDEN, LikePlugin::PLUGIN_NAME);
-		}	
-		
-		if (!kCurrentContext::$ks_uid || kCurrentContext::$ks_uid == "")
+		}		
+	
+		if ((!kCurrentContext::$ks_uid || kCurrentContext::$ks_uid == "") && $actionName != "list")
 		{
 		    throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID);
 		}
@@ -121,5 +121,21 @@ class LikeService extends KalturaBaseService
 	    return true;
         	    
     }
+
+	/**
+	 * @action list
+	 * @param KalturaLike
+	 * @return string
+	 */
+	public function listAction(KalturaLikeFilter $filter = null, KalturaFilterPager $pager = null)
+	{
+		if(!$filter)
+			$filter = new KalturaLikeFilter();
+		
+		if(!$pager)
+			$pager = new KalturaFilterPager();
+
+		return $filter->getListResponse($pager, null);
+	}
 
 }
