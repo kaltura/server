@@ -505,7 +505,7 @@ public class MediaServiceTest extends BaseTest {
 			
 			// generate filter
 			KalturaMediaEntryFilterForPlaylist filter = new KalturaMediaEntryFilterForPlaylist();
-			filter.setIdEqual(entry.getId());
+			filter.setReferenceIdEqual(entry.getReferenceId());
 			ArrayList<KalturaMediaEntryFilterForPlaylist> filters = new ArrayList<KalturaMediaEntryFilterForPlaylist>();
 			filters.add(filter);
 			List<KalturaBaseEntry> res = client.getPlaylistService().executeFromFilters(filters, 5);

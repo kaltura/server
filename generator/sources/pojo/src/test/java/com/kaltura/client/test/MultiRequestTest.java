@@ -100,7 +100,7 @@ public class MultiRequestTest extends BaseTest{
 		
 		// execute from filters (Array: Array, int)
 		KalturaMediaEntryFilterForPlaylist filter = new KalturaMediaEntryFilterForPlaylist();
-		filter.setIdEqual(mEntry.getId());
+		filter.setReferenceIdEqual(mEntry.getReferenceId());
 		ArrayList<KalturaMediaEntryFilterForPlaylist> filters = new ArrayList<KalturaMediaEntryFilterForPlaylist>();
 		filters.add(filter);
 		List<KalturaBaseEntry> res = client.getPlaylistService().executeFromFilters(filters, 5);
