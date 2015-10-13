@@ -1193,7 +1193,7 @@ class myReportsMgr
 		return $order_by_str;
 	}
 	
-	private static function getReplacedSql ( $sql_content , $partner_id , reportsInputFilter $input_filter , 
+	private static function getReplacedSql ( $link, $sql_content , $partner_id , reportsInputFilter $input_filter , 
 		$page_size , $page_index  , $order_by , $obj_ids_clause = null, $cat_ids_clause = null , $offset = null)
 	{
 		// TODO - format the search_text according to the the $input_filter
