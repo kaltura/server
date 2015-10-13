@@ -607,7 +607,14 @@ class KalturaSyndicationFeedRenderer
 		{
 			$urlManager = DeliveryProfilePeer::getDeliveryProfile($flavorAsset->getEntryId());
 			$urlManager->initDeliveryDynamicAttributes(null, $flavorAsset);
-			$url = "http://" . $urlManager->getFullAssetUrl($flavorAsset);
+			$protocol = requestUtils::getProtocol();
+			if(!$urlManager->isProtocolSupported($protocol)){
+				$protocol = ($protocol == 'http' ? 'https' : 'http');
+				if(!$urlManager->isProtocolSupported($protocol)){
+					$protocol = 'http';
+				}
+			}
+			$url = $protocol . '://' . $urlManager->getFullAssetUrl($flavorAsset);
 		}
 		
 		return $url;
