@@ -1248,6 +1248,9 @@ abstract class BaseBatchJobLockSuspend extends BaseObject  implements Persistent
 	 */
 	public function hydrate($row, $startcol = 0, $rehydrate = false)
 	{
+		// Nullify cached objects
+		$this->m_custom_data = null;
+		
 		try {
 
 			$this->id = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
@@ -1339,7 +1342,9 @@ abstract class BaseBatchJobLockSuspend extends BaseObject  implements Persistent
 		// already in the pool.
 
 		BatchJobLockSuspendPeer::setUseCriteriaFilter(false);
-		$stmt = BatchJobLockSuspendPeer::doSelectStmt($this->buildPkeyCriteria(), $con);
+		$criteria = $this->buildPkeyCriteria();
+		BatchJobLockSuspendPeer::addSelectColumns($criteria);
+		$stmt = BasePeer::doSelect($criteria, $con);
 		BatchJobLockSuspendPeer::setUseCriteriaFilter(true);
 		$row = $stmt->fetch(PDO::FETCH_NUM);
 		$stmt->closeCursor();
@@ -1422,18 +1427,80 @@ abstract class BaseBatchJobLockSuspend extends BaseObject  implements Persistent
 			} else {
 				$ret = $ret && $this->preUpdate($con);
 			}
-			if ($ret) {
-				$affectedRows = $this->doSave($con);
-				if ($isInsert) {
-					$this->postInsert($con);
-				} else {
-					$this->postUpdate($con);
-				}
-				$this->postSave($con);
-				BatchJobLockSuspendPeer::addInstanceToPool($this);
-			} else {
-				$affectedRows = 0;
+			
+			if (!$ret || !$this->isModified()) {
+				$con->commit();
+				return 0;
 			}
+			
+			for ($retries = 1; $retries < KalturaPDO::SAVE_MAX_RETRIES; $retries++)
+			{
+               $affectedRows = $this->doSave($con);
+                if ($affectedRows || !$this->isColumnModified(BatchJobLockSuspendPeer::CUSTOM_DATA)) //ask if custom_data wasn't modified to avoid retry with atomic column 
+                	break;
+
+                KalturaLog::debug("was unable to save! retrying for the $retries time");
+                $criteria = $this->buildPkeyCriteria();
+				$criteria->addSelectColumn(BatchJobLockSuspendPeer::CUSTOM_DATA);
+                $stmt = BasePeer::doSelect($criteria, $con);
+                $cutsomDataArr = $stmt->fetchAll(PDO::FETCH_COLUMN);
+                $newCustomData = $cutsomDataArr[0];
+                
+                $this->custom_data_md5 = md5($newCustomData);
+
+                $valuesToChangeTo = $this->m_custom_data->toArray();
+				$this->m_custom_data = myCustomData::fromString($newCustomData); 
+
+				//set custom data column values we wanted to change to
+				$validUpdate = true;
+				$atomicCustomDataFields = BatchJobLockSuspendPeer::getAtomicCustomDataFields();
+			 	foreach ($this->oldCustomDataValues as $namespace => $namespaceValues){
+                	foreach($namespaceValues as $name => $oldValue)
+					{
+						$newValue = null;
+						if ($namespace)
+						{
+							if (isset ($valuesToChangeTo[$namespace][$name]))
+								$newValue = $valuesToChangeTo[$namespace][$name];
+						}
+						else
+						{ 
+							$newValue = $valuesToChangeTo[$name];
+						}
+					 
+						if (!is_null($newValue)) {
+							$atomicField = false;
+							if($namespace) {
+								$atomicField = array_key_exists($namespace, $atomicCustomDataFields) && in_array($name, $atomicCustomDataFields[$namespace]);
+							} else {
+								$atomicField = in_array($name, $atomicCustomDataFields);
+							}
+							if($atomicField) {
+								$dbValue = $this->m_custom_data->get($name, $namespace);
+								if($oldValue != $dbValue) {
+									$validUpdate = false;
+									break;
+								}
+							}
+							$this->putInCustomData($name, $newValue, $namespace);
+						}
+					}
+                   }
+                   
+				if(!$validUpdate) 
+					break;
+					                   
+				$this->setCustomData($this->m_custom_data->toString());
+			}
+
+			if ($isInsert) {
+				$this->postInsert($con);
+			} else {
+				$this->postUpdate($con);
+			}
+			$this->postSave($con);
+			BatchJobLockSuspendPeer::addInstanceToPool($this);
+			
 			$con->commit();
 			return $affectedRows;
 		} catch (PropelException $e) {
@@ -1522,7 +1589,7 @@ abstract class BaseBatchJobLockSuspend extends BaseObject  implements Persistent
 	/**
 	 * Code to be run before persisting the object
 	 * @param PropelPDO $con
-	 * @return bloolean
+	 * @return boolean
 	 */
 	public function preSave(PropelPDO $con = null)
 	{
@@ -1551,8 +1618,7 @@ abstract class BaseBatchJobLockSuspend extends BaseObject  implements Persistent
 	 */
 	public function preInsert(PropelPDO $con = null)
 	{
-    	$this->setCreatedAt(time());
-    	
+		$this->setCreatedAt(time());
 		return parent::preInsert($con);
 	}
 	
@@ -2230,6 +2296,12 @@ abstract class BaseBatchJobLockSuspend extends BaseObject  implements Persistent
 	 * @var myCustomData
 	 */
 	protected $m_custom_data = null;
+	
+	/**
+	 * The md5 value for the custom_data field.
+	 * @var        string
+	 */
+	protected $custom_data_md5;
 
 	/**
 	 * Store custom data old values before the changes
@@ -2287,8 +2359,17 @@ abstract class BaseBatchJobLockSuspend extends BaseObject  implements Persistent
 	 */
 	public function removeFromCustomData ( $name , $namespace = null)
 	{
-
-		$customData = $this->getCustomDataObj( );
+		$customData = $this->getCustomDataObj();
+		
+		$currentNamespace = '';
+		if($namespace)
+			$currentNamespace = $namespace;
+			
+		if(!isset($this->oldCustomDataValues[$currentNamespace]))
+			$this->oldCustomDataValues[$currentNamespace] = array();
+		if(!isset($this->oldCustomDataValues[$currentNamespace][$name]))
+			$this->oldCustomDataValues[$currentNamespace][$name] = $customData->get($name, $namespace);
+		
 		return $customData->remove ( $name , $namespace );
 	}
 
@@ -2301,6 +2382,16 @@ abstract class BaseBatchJobLockSuspend extends BaseObject  implements Persistent
 	public function incInCustomData ( $name , $delta = 1, $namespace = null)
 	{
 		$customData = $this->getCustomDataObj( );
+		
+		$currentNamespace = '';
+		if($namespace)
+			$currentNamespace = $namespace;
+			
+		if(!isset($this->oldCustomDataValues[$currentNamespace]))
+			$this->oldCustomDataValues[$currentNamespace] = array();
+		if(!isset($this->oldCustomDataValues[$currentNamespace][$name]))
+			$this->oldCustomDataValues[$currentNamespace][$name] = $customData->get($name, $namespace);
+		
 		return $customData->inc ( $name , $delta , $namespace  );
 	}
 
@@ -2335,6 +2426,7 @@ abstract class BaseBatchJobLockSuspend extends BaseObject  implements Persistent
 	{
 		if ( $this->m_custom_data != null )
 		{
+			$this->custom_data_md5 = is_null($this->custom_data) ? null : md5($this->custom_data);
 			$this->setCustomData( $this->m_custom_data->toString() );
 		}
 	}

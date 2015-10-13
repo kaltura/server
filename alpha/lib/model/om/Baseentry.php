@@ -479,6 +479,16 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 	private $lastassetCriteria = null;
 
 	/**
+	 * @var        array UserEntry[] Collection to store aggregation of UserEntry objects.
+	 */
+	protected $collUserEntrys;
+
+	/**
+	 * @var        Criteria The criteria used to select the current contents of collUserEntrys.
+	 */
+	private $lastUserEntryCriteria = null;
+
+	/**
 	 * Flag to prevent endless save loop, if this object is referenced
 	 * by another object which falls in this transaction.
 	 * @var        boolean
@@ -3038,6 +3048,9 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 			$this->collassets = null;
 			$this->lastassetCriteria = null;
 
+			$this->collUserEntrys = null;
+			$this->lastUserEntryCriteria = null;
+
 		} // if (deep)
 	}
 
@@ -3362,6 +3375,14 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 
 			if ($this->collassets !== null) {
 				foreach ($this->collassets as $referrerFK) {
+					if (!$referrerFK->isDeleted()) {
+						$affectedRows += $referrerFK->save($con);
+					}
+				}
+			}
+
+			if ($this->collUserEntrys !== null) {
+				foreach ($this->collUserEntrys as $referrerFK) {
 					if (!$referrerFK->isDeleted()) {
 						$affectedRows += $referrerFK->save($con);
 					}
@@ -3698,6 +3719,14 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 
 				if ($this->collassets !== null) {
 					foreach ($this->collassets as $referrerFK) {
+						if (!$referrerFK->validate($columns)) {
+							$failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
+						}
+					}
+				}
+
+				if ($this->collUserEntrys !== null) {
+					foreach ($this->collUserEntrys as $referrerFK) {
 						if (!$referrerFK->validate($columns)) {
 							$failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
 						}
@@ -4552,6 +4581,12 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 			foreach ($this->getassets() as $relObj) {
 				if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
 					$copyObj->addasset($relObj->copy($deepCopy));
+				}
+			}
+
+			foreach ($this->getUserEntrys() as $relObj) {
+				if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+					$copyObj->addUserEntry($relObj->copy($deepCopy));
 				}
 			}
 
@@ -7483,6 +7518,11 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 					$o->clearAllReferences($deep);
 				}
 			}
+			if ($this->collUserEntrys) {
+				foreach ((array) $this->collUserEntrys as $o) {
+					$o->clearAllReferences($deep);
+				}
+			}
 		} // if ($deep)
 
 		$this->collLiveChannelSegmentsRelatedByChannelId = null;
@@ -7496,6 +7536,7 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 		$this->collwidgets = null;
 		$this->collassetParamsOutputs = null;
 		$this->collassets = null;
+		$this->collUserEntrys = null;
 			$this->akshow = null;
 			$this->akuser = null;
 			$this->aaccessControl = null;

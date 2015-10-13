@@ -514,7 +514,7 @@ abstract class BaseinvalidSession extends BaseObject  implements Persistent {
 
 		invalidSessionPeer::setUseCriteriaFilter(false);
 		$criteria = $this->buildPkeyCriteria();
-		entryPeer::addSelectColumns($criteria);
+		invalidSessionPeer::addSelectColumns($criteria);
 		$stmt = BasePeer::doSelect($criteria, $con);
 		invalidSessionPeer::setUseCriteriaFilter(true);
 		$row = $stmt->fetch(PDO::FETCH_NUM);
@@ -690,7 +690,7 @@ abstract class BaseinvalidSession extends BaseObject  implements Persistent {
 	/**
 	 * Code to be run before persisting the object
 	 * @param PropelPDO $con
-	 * @return bloolean
+	 * @return boolean
 	 */
 	public function preSave(PropelPDO $con = null)
 	{

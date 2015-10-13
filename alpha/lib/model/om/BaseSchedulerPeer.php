@@ -811,6 +811,15 @@ abstract class BaseSchedulerPeer {
 	{
 		return array();
 	}
+	
+	/**
+	 * Return array of custom-data fields that shouldn't be auto-updated.
+	 * @return array
+	 */
+	public static function getAtomicCustomDataFields()
+	{
+		return array();
+	}
 
 	/**
 	 * Method to DELETE all rows from the scheduler table.

@@ -21,7 +21,7 @@ abstract class BaseFileAsset extends BaseObject  implements Persistent {
 
 	/**
 	 * The value for the id field.
-	 * @var        int
+	 * @var        string
 	 */
 	protected $id;
 
@@ -87,7 +87,7 @@ abstract class BaseFileAsset extends BaseObject  implements Persistent {
 
 	/**
 	 * The value for the size field.
-	 * @var        int
+	 * @var        string
 	 */
 	protected $size;
 
@@ -139,7 +139,7 @@ abstract class BaseFileAsset extends BaseObject  implements Persistent {
 	/**
 	 * Get the [id] column value.
 	 * 
-	 * @return     int
+	 * @return     string
 	 */
 	public function getId()
 	{
@@ -309,7 +309,7 @@ abstract class BaseFileAsset extends BaseObject  implements Persistent {
 	/**
 	 * Get the [size] column value.
 	 * 
-	 * @return     int
+	 * @return     string
 	 */
 	public function getSize()
 	{
@@ -319,7 +319,7 @@ abstract class BaseFileAsset extends BaseObject  implements Persistent {
 	/**
 	 * Set the value of [id] column.
 	 * 
-	 * @param      int $v new value
+	 * @param      string $v new value
 	 * @return     FileAsset The current object (for fluent API support)
 	 */
 	public function setId($v)
@@ -328,7 +328,7 @@ abstract class BaseFileAsset extends BaseObject  implements Persistent {
 			$this->oldColumnsValues[FileAssetPeer::ID] = $this->id;
 
 		if ($v !== null) {
-			$v = (int) $v;
+			$v = (string) $v;
 		}
 
 		if ($this->id !== $v) {
@@ -624,7 +624,7 @@ abstract class BaseFileAsset extends BaseObject  implements Persistent {
 	/**
 	 * Set the value of [size] column.
 	 * 
-	 * @param      int $v new value
+	 * @param      string $v new value
 	 * @return     FileAsset The current object (for fluent API support)
 	 */
 	public function setSize($v)
@@ -633,7 +633,7 @@ abstract class BaseFileAsset extends BaseObject  implements Persistent {
 			$this->oldColumnsValues[FileAssetPeer::SIZE] = $this->size;
 
 		if ($v !== null) {
-			$v = (int) $v;
+			$v = (string) $v;
 		}
 
 		if ($this->size !== $v) {
@@ -676,7 +676,7 @@ abstract class BaseFileAsset extends BaseObject  implements Persistent {
 	{
 		try {
 
-			$this->id = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
+			$this->id = ($row[$startcol + 0] !== null) ? (string) $row[$startcol + 0] : null;
 			$this->created_at = ($row[$startcol + 1] !== null) ? (string) $row[$startcol + 1] : null;
 			$this->updated_at = ($row[$startcol + 2] !== null) ? (string) $row[$startcol + 2] : null;
 			$this->version = ($row[$startcol + 3] !== null) ? (int) $row[$startcol + 3] : null;
@@ -687,7 +687,7 @@ abstract class BaseFileAsset extends BaseObject  implements Persistent {
 			$this->name = ($row[$startcol + 8] !== null) ? (string) $row[$startcol + 8] : null;
 			$this->system_name = ($row[$startcol + 9] !== null) ? (string) $row[$startcol + 9] : null;
 			$this->file_ext = ($row[$startcol + 10] !== null) ? (string) $row[$startcol + 10] : null;
-			$this->size = ($row[$startcol + 11] !== null) ? (int) $row[$startcol + 11] : null;
+			$this->size = ($row[$startcol + 11] !== null) ? (string) $row[$startcol + 11] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -750,7 +750,9 @@ abstract class BaseFileAsset extends BaseObject  implements Persistent {
 		// already in the pool.
 
 		FileAssetPeer::setUseCriteriaFilter(false);
-		$stmt = FileAssetPeer::doSelectStmt($this->buildPkeyCriteria(), $con);
+		$criteria = $this->buildPkeyCriteria();
+		FileAssetPeer::addSelectColumns($criteria);
+		$stmt = BasePeer::doSelect($criteria, $con);
 		FileAssetPeer::setUseCriteriaFilter(true);
 		$row = $stmt->fetch(PDO::FETCH_NUM);
 		$stmt->closeCursor();
@@ -925,7 +927,7 @@ abstract class BaseFileAsset extends BaseObject  implements Persistent {
 	/**
 	 * Code to be run before persisting the object
 	 * @param PropelPDO $con
-	 * @return bloolean
+	 * @return boolean
 	 */
 	public function preSave(PropelPDO $con = null)
 	{
@@ -950,8 +952,7 @@ abstract class BaseFileAsset extends BaseObject  implements Persistent {
 	 */
 	public function preInsert(PropelPDO $con = null)
 	{
-    	$this->setCreatedAt(time());
-    	
+		$this->setCreatedAt(time());
 		$this->setUpdatedAt(time());
 		return parent::preInsert($con);
 	}
@@ -986,7 +987,8 @@ abstract class BaseFileAsset extends BaseObject  implements Persistent {
 		if($this->isModified())
 		{
 			kQueryCache::invalidateQueryCache($this);
-			kEventsManager::raiseEvent(new kObjectChangedEvent($this, $this->tempModifiedColumns));
+			$modifiedColumns = $this->tempModifiedColumns;
+			kEventsManager::raiseEvent(new kObjectChangedEvent($this, $modifiedColumns));
 		}
 			
 		$this->tempModifiedColumns = array();
@@ -998,7 +1000,7 @@ abstract class BaseFileAsset extends BaseObject  implements Persistent {
 	 * @var array
 	 */
 	private $tempModifiedColumns = array();
-		
+	
 	/**
 	 * Returns whether the object has been modified.
 	 *
@@ -1377,7 +1379,7 @@ abstract class BaseFileAsset extends BaseObject  implements Persistent {
 
 	/**
 	 * Returns the primary key for this object (row).
-	 * @return     int
+	 * @return     string
 	 */
 	public function getPrimaryKey()
 	{
@@ -1387,7 +1389,7 @@ abstract class BaseFileAsset extends BaseObject  implements Persistent {
 	/**
 	 * Generic method to set the primary key (id column).
 	 *
-	 * @param      int $key Primary key.
+	 * @param      string $key Primary key.
 	 * @return     void
 	 */
 	public function setPrimaryKey($key)

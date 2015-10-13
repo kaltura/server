@@ -874,6 +874,15 @@ abstract class BaseFileAssetPeer {
 	{
 		return array();
 	}
+	
+	/**
+	 * Return array of custom-data fields that shouldn't be auto-updated.
+	 * @return array
+	 */
+	public static function getAtomicCustomDataFields()
+	{
+		return array();
+	}
 
 	/**
 	 * Method to DELETE all rows from the file_asset table.
@@ -1002,7 +1011,7 @@ abstract class BaseFileAssetPeer {
 	/**
 	 * Retrieve a single object by pkey.
 	 *
-	 * @param      int $pk the primary key.
+	 * @param      string $pk the primary key.
 	 * @param      PropelPDO $con the connection to use
 	 * @return     FileAsset
 	 */
