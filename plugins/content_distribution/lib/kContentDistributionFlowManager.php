@@ -1578,7 +1578,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 				
 			if($entryDistribution->getDirtyStatus() == EntryDistributionDirtyStatus::DELETE_REQUIRED)
 			{
-				KalturaLog::log("Entry distribution [" . $entryDistribution->getId() . "] already flaged for deletion");
+				KalturaLog::log("Entry distribution [" . $entryDistribution->getId() . "] already flagged for deletion");
 				continue;
 			}
 				

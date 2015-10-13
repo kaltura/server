@@ -702,10 +702,11 @@ class MediaService extends KalturaEntryService
      * @action getMrss
      * @param string $entryId Entry id
      * @param KalturaExtendingItemMrssParameterArray $extendingItemsArray
+     * @param string $features
      * @return string
      * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
      */
-    function getMrssAction($entryId, KalturaExtendingItemMrssParameterArray $extendingItemsArray = null)
+    function getMrssAction($entryId, KalturaExtendingItemMrssParameterArray $extendingItemsArray = null, $features = null)
     {
         $dbEntry = entryPeer::retrieveByPKNoFilter($entryId);
 		if (!$dbEntry || $dbEntry->getType() != KalturaEntryType::MEDIA_CLIP)
@@ -717,7 +718,7 @@ class MediaService extends KalturaEntryService
 			$mrssParams->setItemXpathsToExtend($coreExtendingItemArray);
 		}
         /* @var $mrss SimpleXMLElement */
-        $mrss = kMrssManager::getEntryMrssXml($dbEntry, null, $mrssParams);
+        $mrss = kMrssManager::getEntryMrssXml($dbEntry, null, $mrssParams, explode(',', $features));
         return $mrss->asXML();
     }
 
