@@ -134,6 +134,7 @@ class QuizService extends KalturaBaseService
 	 * @param string $entryId
 	 * @return file
 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
+	 * @throws KalturaQuizErrors::PROVIDED_ENTRY_IS_NOT_A_QUIZ
 	 */
 	public function servePdfAction($entryId)
 	{
@@ -141,6 +142,10 @@ class QuizService extends KalturaBaseService
 
 		if (!$dbEntry)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
+
+		$kQuiz = QuizPlugin::getQuizData($dbEntry);
+		if ( is_null( $kQuiz ) )
+			throw new KalturaAPIException(KalturaQuizErrors::PROVIDED_ENTRY_IS_NOT_A_QUIZ, $entryId);
 
 		$kp = new kQuizPdf($entryId);
 		$kp->createQuestionPdf();

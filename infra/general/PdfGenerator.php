@@ -142,12 +142,10 @@ class PdfGenerator extends FPDF
      */
     public function addParagraph($string)
     {
-
         if (!isset ($string) || (!is_string($string)))
         {
             return;
         }
-
         $style = new PdfStyle('Normal', 'Times', 12, '', true, false, '');
         $this->addText($string, $style);
     }
