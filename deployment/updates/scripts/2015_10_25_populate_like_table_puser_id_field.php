@@ -18,13 +18,10 @@
 
 		foreach($kVotes as $kVote)
 		{
-			KalturaLog::debug("XXXXXXXXX - 1 - kvote - " . print_r($kVote, true));
 			$kuserId = $kVote->getKuserId();
 			kuserPeer::setUseCriteriaFilter(false);
 			$kuser = kuserPeer::retrieveByPKNoFilter($kuserId);
 			kuserPeer::setUseCriteriaFilter(true);
-
-			KalturaLog::debug("XXXXXXXXX - 1 - kuser - " . print_r($kuser, true));
 
 			if(!$kuser)
 			{
