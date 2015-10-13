@@ -869,14 +869,15 @@ class myReportsMgr
 			if ( is_numeric( $report_type ))
 				$order_by = self::getOrderBy( self::$type_map[$report_type] , $order_by );
 			
-			$query = self::getReplacedSql( $sql_raw_content , $partner_id , $input_filter , $page_size , $page_index , $order_by , $obj_ids_clause, $category_ids_clause , $offset);
+			$link = self::getConnection(); 
+			$query = self::getReplacedSql($link, $sql_raw_content , $partner_id , $input_filter , $page_size , $page_index , $order_by , $obj_ids_clause, $category_ids_clause , $offset);
 			if ( is_numeric( $report_type ))
 				$query_header = "/* -- " . self::$type_map[$report_type] . " " . self::$flavor_map[$report_flavor] . " -- */\n";
 			else 
 				$query_header = "/* -- " . $report_type . " -- */\n";
 			KalturaLog::log( "\n{$query_header}{$query}" );
 			
-			$res = self::executeQuery ( $query );
+			$res = self::executeQuery ( $query, $link );
 			
 			$end = microtime(true);
 			KalturaLog::log( "Query took [" . ( $end - $start ) . "]" );
@@ -1263,8 +1264,8 @@ class myReportsMgr
 				$partner_id ,
 				self::intToDateTime($input_filter->from_date), 
 				self::intToDateTime($input_filter->to_date ),
-				$input_filter->from_day, 
-				$input_filter->to_day,
+				mysqli_real_escape_string($link, $input_filter->from_day),
+				mysqli_real_escape_string($link, $input_filter->to_day),
 				self::intToDateId($input_filter->to_date , -7 ),
 				self::intToDateId($input_filter->to_date , -30 ),
 				self::intToDateId($input_filter->to_date , -180 ),
@@ -1274,7 +1275,7 @@ class myReportsMgr
 				$page_size ,
 				$obj_ids_str , 
 				$time_shift,
-				$cat_ids_str,
+				mysqli_real_escape_string($link, $cat_ids_str),
 				($input_filter->interval == reportInterval::MONTHS ? "month_id" : "date_id"),
 			);
 				
@@ -1283,7 +1284,7 @@ class myReportsMgr
 			foreach ( $input_filter->extra_map as $name => $value  )	
 			{
 				$names[] = $name;
-				$values[] = $value;				
+				$values[] = mysqli_real_escape_string($link, $value);				
 			}
 		}
 		$replaced_sql = str_replace ( $names , $values , $sql_content );	
@@ -1293,7 +1294,7 @@ class myReportsMgr
 		return $replaced_sql;
 	}
 	
-	private static function executeQuery ( $query )
+	private static function executeQuery ( $query, $link )
 	{
 		kApiCache::disableConditionalCache();
 	
@@ -1315,7 +1316,8 @@ class myReportsMgr
 		$connect_function = $mysql_function.'_connect';
 		$link  = $connect_function( $host , $db_config["user"] , $db_config["password"] , null, $db_config["port"] );
 
-KalturaLog::log( "Reports query using database host: [$host] user [" . $db_config["user"] . "]" );
+		KalturaLog::log( "Reports query using database host: [$host] user [" . $db_config["user"] . "]" );
+		$db_config = kConf::get( "reports_db_config" );
 		
 		if($mysql_function == 'mysql') $db_selected =  mysql_select_db ( $db_config["db_name"] , $link );
 		else $db_selected =  mysqli_select_db ( $link , $db_config["db_name"] );
@@ -1438,6 +1440,22 @@ KalturaLog::log( "Reports query using database host: [$host] user [" . $db_confi
 			$timestamp = $timestamp + $day_offset * 60 * 60 * 24;
 		return date ( "Ymd" , $timestamp );	 
 	}
+	
+	private static function getConnection() 
+	{
+		$mysql_function = 'mysqli';
+		
+		$db_config = kConf::get( "reports_db_config" );
+		$timeout = isset ( $db_config["timeout"] ) ? $db_config["timeout"] : 40;
+		
+		ini_set('mysql.connect_timeout', $timeout );
+		$host = $db_config["host"];
+		if ( isset ( $db_config["port"] ) && $db_config["port"]  && $mysql_function != 'mysqli' ) $host .= ":" . $db_config["port"];
+		
+		$connect_function = $mysql_function.'_connect';
+		$link  = $connect_function( $host , $db_config["user"] , $db_config["password"] , null );
+		return $link;
+	}	
 
 }
 
