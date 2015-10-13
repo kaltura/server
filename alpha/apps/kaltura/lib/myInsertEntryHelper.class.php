@@ -57,8 +57,6 @@ class myInsertEntryHelper
 	
 	private function handleEntry($onlyExtractThumb, $prefix, $type, $entry_id, $name = null, $tags = null, $entry=null)
 	{
-		KalturaLog::debug("handleEntry($type, $entry_id, $name)");
-		
 		$this->clear($prefix, $entry_id);
 		$kuser_id = $this->kuser_id;
 		$entry_data_prefix = $kuser_id.'_'. ($prefix == '' ? 'data' : rtrim($prefix, '_'));
@@ -300,7 +298,7 @@ class myInsertEntryHelper
 		if ($entry_status == entryStatus::ERROR_IMPORTING)
 		{
 			$need_thumb = false; // we wont be needing a thumb for an errornous entry
-			KalturaLog::debug("handleEntry: error importing, thumb not needed");
+			KalturaLog::log("handleEntry: error importing, thumb not needed");
 		}
 		else
 		{
@@ -469,7 +467,6 @@ class myInsertEntryHelper
 		// if needed a job will be submitted for importing external media sources
 		if ($entry->getStatus() == entryStatus::IMPORT)
  		{
- 			KalturaLog::debug("handleEntry: creating import job");
  			// changed by Tan-Tan, Nov 09 to support the new batch mechanism
  			kJobsManager::addImportJob(null, $this->entry_id, $this->partner_id, $entry_url);
  			
@@ -487,7 +484,6 @@ class myInsertEntryHelper
 			{
 	 			// changed by Tan-Tan, Dec 09 to support the new batch mechanism
 	 			
- 				KalturaLog::debug("handleEntry: creating original flavor asset for pre convert");
 				$flavorAsset = kFlowHelper::createOriginalFlavorAsset($this->partner_id, $this->entry_id);
 				if($flavorAsset)
 				{
@@ -543,7 +539,6 @@ class myInsertEntryHelper
 						
 			if ($media_type == entry::ENTRY_MEDIA_TYPE_VIDEO || $media_type == entry::ENTRY_MEDIA_TYPE_AUDIO)
 			{
-	 			KalturaLog::debug("handleEntry: creating original flavor asset for ready entry");
 				$flavorAsset = kFlowHelper::createOriginalFlavorAsset($this->partner_id, $this->entry_id);
 				if($flavorAsset)
 				{
@@ -627,7 +622,6 @@ class myInsertEntryHelper
 			else if ($entry->getType() == entryType::DOCUMENT)
 			{
 				 //TODO: document should be handled by the plugin manager)
-				KalturaLog::debug("handleEntry: creating original flavor asset for ready entry");
 				$flavorAsset = kFlowHelper::createOriginalFlavorAsset($this->partner_id, $this->entry_id);
 				if($flavorAsset)
 				{

@@ -152,10 +152,24 @@ abstract class BaseIndexObject
 		return isset($map[$apiName]) ? $map[$apiName] : null;
 	}
 
+	public static function getApiNameByCompareField($field)
+	{
+		$map = static::getApiCompareAttributesMap();
+		$apiName = array_search($field, $map, true);
+		return $apiName ? $apiName : null;
+	}
+
 	public static function getMatchFieldByApiName($apiName)
 	{
 		$map = static::getApiMatchAttributesMap();
 		return isset($map[$apiName]) ? $map[$apiName] : null;
+	}
+
+	public static function getApiNameByMatchField($field)
+	{
+		$map = static::getApiMatchAttributesMap();
+		$apiName = array_search($field, $map, true);
+		return $apiName ? $apiName : null;
 	}
 	
 	public static function fixFieldName($fieldName) {

@@ -352,7 +352,7 @@ abstract class ConfigurableDistributionProfile extends DistributionProfile
 		    }
 		    
 		    $valuesXmlStr = $valuesXmlObj->saveXML();
-		    KalturaLog::debug('All field values result XML: '.$valuesXmlStr);
+		    KalturaLog::info('All field values result XML: '.$valuesXmlStr);
 		    
 		    $fieldValues = array();
 		    $fieldConfigArray = $this->getFieldConfigArray();

@@ -100,7 +100,7 @@ class RabbitMQProvider extends QueueProvider
             new PhpAmqpLib\Wire\AMQPTable(array("x-expires"  => (int) $this->timeout ))
         );
         // close used resources 
-        KalturaLog::debug("Queue [$queueName] created.");
+        KalturaLog::info("Queue [$queueName] created.");
         $channel->close();
         $connection->close();        
     }
@@ -122,6 +122,6 @@ class RabbitMQProvider extends QueueProvider
         
         $channel->basic_publish($msg, '', $queueName);
         
-        KalturaLog::debug("Message [$data] was sent to [$queueName].");
+        KalturaLog::info("Message [$data] was sent to [$queueName].");
     }
 }

@@ -26,8 +26,6 @@ class KAsyncDropFolderWatcher extends KPeriodicWorker
 	*/
 	public function run($jobs = null)
 	{
-		KalturaLog::info("Drop folder watcher batch is running");
-		
 		$this->dropFolderPlugin = KalturaDropFolderClientPlugin::get(self::$kClient);
 		
 		if(self::$taskConfig->isInitOnly())
@@ -153,6 +151,6 @@ class KAsyncDropFolderWatcher extends KPeriodicWorker
 	function log($message)
 	{
 		if(!strstr($message, 'KalturaDropFolderListResponse') && !strstr($message, 'KalturaDropFolderFileListResponse'))
-			KalturaLog::debug($message);
+			KalturaLog::info($message);
 	}	
 }

@@ -138,22 +138,22 @@ public class Player extends Observable implements MediaPlayer.OnErrorListener,
     @Override
     public boolean onInfo(MediaPlayer mp, int what, int extra) {
         Log.w(TAG, "PlayerService onInfo : ");
-        if (what == mp.MEDIA_INFO_UNKNOWN) {
+        if (what == MediaPlayer.MEDIA_INFO_UNKNOWN) {
             Log.w(TAG, "MEDIA_INFO_UNKNOWN");
         }
-        if (what == mp.MEDIA_INFO_VIDEO_TRACK_LAGGING) {
+        if (what == MediaPlayer.MEDIA_INFO_VIDEO_TRACK_LAGGING) {
             Log.w(TAG, "MEDIA_INFO_VIDEO_TRACK_LAGGING");
         }
-        if (what == mp.MEDIA_INFO_METADATA_UPDATE) {
+        if (what == MediaPlayer.MEDIA_INFO_METADATA_UPDATE) {
             Log.w(TAG, "MEDIA_INFO_METADATA_UPDATE");
         }
-        if (what == mp.MEDIA_INFO_BAD_INTERLEAVING) {
+        if (what == MediaPlayer.MEDIA_INFO_BAD_INTERLEAVING) {
             Log.w(TAG, "MEDIA_INFO_BAD_INTERLEAVING");
         }
-        if (what == mp.MEDIA_INFO_NOT_SEEKABLE) {
+        if (what == MediaPlayer.MEDIA_INFO_NOT_SEEKABLE) {
             Log.w(TAG, "MEDIA_INFO_NOT_SEEKABLE");
         }
-        if (what == mp.MEDIA_INFO_METADATA_UPDATE) {
+        if (what == MediaPlayer.MEDIA_INFO_METADATA_UPDATE) {
             Log.w(TAG, "MEDIA_INFO_METADATA_UPDATE");
         }
         return false;

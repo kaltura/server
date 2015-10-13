@@ -441,7 +441,6 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 	{
 		$securityContext = array(kCurrentContext::$partner_id, kCurrentContext::$ks);
 		if ($securityContext === self::$lastInitializedContext) {
-			KalturaLog::log('Already initalized for this security context');
 			self::$cacheWatcher->apply();
 			return;
 		}

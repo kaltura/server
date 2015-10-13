@@ -12,7 +12,7 @@ class kDrmPartnerSetup
 		$policies = DrmPolicyPeer::doSelectOne($c);
 		if(!count($policies))
 		{
-			KalturaLog::debug("DRM setup for partner ".$partnerId);
+			KalturaLog::info("DRM setup for partner ".$partnerId);
 			list ($defaultPolicy) = self::createPartnerPolicies($partnerId);
 			self::createDefaultAccessControl($partnerId, $defaultPolicy);
 		}
@@ -24,7 +24,7 @@ class kDrmPartnerSetup
 							"default_".$partnerId,
 							"",
 							1);
-		KalturaLog::debug("Default policy id:".$defaultPolicy->getId());
+		KalturaLog::info("Default policy id:".$defaultPolicy->getId());
 
 		return array($defaultPolicy);
 	}
@@ -41,7 +41,7 @@ class kDrmPartnerSetup
 
 		$accessControlProfile->setRulesArray(array($ruleDefault));
 		$accessControlProfile->save();
-		KalturaLog::debug("Access control profile id:".$accessControlProfile->getId());
+		KalturaLog::info("Access control profile id:".$accessControlProfile->getId());
 	}
 
 	private static function createPolicy($partnerId, $policyName, $scenario, $expirationPolicy, $duration = null)

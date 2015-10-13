@@ -461,9 +461,9 @@ abstract class LiveEntry extends entry
 			{
 				$backupManifestUrl .= "$backupApplicationName/";
 				$backupManifestUrl .= $streamName;
-				$hlsbackupManifestUrl .= "$backupApplicationName/";
-				$hlsbackupManifestUrl .= $streamName;
-				$hlsBackupStreamUrl = "$hlsbackupManifestUrl/playlist.m3u8" . $queryString;
+				$hlsBackupManifestUrl .= "$backupApplicationName/";
+				$hlsBackupManifestUrl .= $streamName;
+				$hlsBackupStreamUrl = "$hlsBackupManifestUrl/playlist.m3u8" . $queryString;
 				$hdsBackupStreamUrl = "$backupManifestUrl/manifest.f4m" . $queryString;
 			}
 			
@@ -550,7 +550,7 @@ abstract class LiveEntry extends entry
 		if($kMediaServer && $kMediaServer instanceof kLiveMediaServer)
 			return $kMediaServer->getMediaServer();
 			
-		KalturaLog::debug("No Valid Media Servers Were Found For Current Live Entry [" . $this->getEntryId() . "]" );
+		KalturaLog::info("No Valid Media Servers Were Found For Current Live Entry [" . $this->getEntryId() . "]" );
 		return null;
 	}
 
@@ -566,7 +566,7 @@ abstract class LiveEntry extends entry
 				$hostnames[$kMediaServer->getIndex()] = $kMediaServer->getHostname();
 			}
 		}
-		KalturaLog::debug("media servers hostnames: " . print_r($hostnames,true));
+		KalturaLog::info("media servers hostnames: " . print_r($hostnames,true));
 		return $hostnames;
 	}
 	
@@ -663,7 +663,7 @@ abstract class LiveEntry extends entry
 		if($server && $server->getHostname() == $hostname)
 			return true;
 
-		KalturaLog::debug("mediaServer is not registered. hostname: $hostname , index: $index , server: " . print_r($server,true));
+		KalturaLog::info("mediaServer is not registered. hostname: $hostname , index: $index , server: " . print_r($server,true));
 		return false;
 	}
 	
@@ -693,7 +693,7 @@ abstract class LiveEntry extends entry
 			if(!$kMediaServer || ! $this->isCacheValid($kMediaServer))
 			{
 				$listChanged = true;
-				KalturaLog::debug("Removing media server [" . ($kMediaServer ? $kMediaServer->getHostname() : $key) . "]");
+				KalturaLog::info("Removing media server [" . ($kMediaServer ? $kMediaServer->getHostname() : $key) . "]");
 				$this->removeFromCustomData($key, LiveEntry::CUSTOM_DATA_NAMESPACE_MEDIA_SERVERS);
 			}
 		}

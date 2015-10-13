@@ -740,7 +740,7 @@ class MediaService extends KalturaEntryService
 			$dcIndex = kDataCenterMgr::getDCByObjectId($entryId, true);
 			if ($dcIndex != kDataCenterMgr::getCurrentDcId())
 			{
-				KalturaLog::debug("EntryID [$entryId] wasn't found on current DC. dumping the request to DC id [$dcIndex]");
+				KalturaLog::info("EntryID [$entryId] wasn't found on current DC. dumping the request to DC id [$dcIndex]");
 				kFileUtils::dumpApiRequest ( kDataCenterMgr::getRemoteDcExternalUrlByDcId ($dcIndex ) );
 			}
 		}
@@ -1110,7 +1110,6 @@ class MediaService extends KalturaEntryService
 			return null;
 		$conversionProfile2 = conversionProfile2Peer::retrieveByPK($conversionQuality);
 		if (!$conversionProfile2) {
-			KalturaLog::debug("Maybe old conversion profile");
 			$conversionProfile = ConversionProfilePeer::retrieveByPK($conversionQuality);
 			if ($conversionProfile)
 				$conversionQuality = $conversionProfile->getConversionProfile2Id();

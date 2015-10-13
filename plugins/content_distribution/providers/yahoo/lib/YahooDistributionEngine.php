@@ -104,7 +104,6 @@ class YahooDistributionEngine extends DistributionEngine implements
 	 */
 	protected function handleSubmit(KalturaDistributionJobData $data, KalturaYahooDistributionProfile $distributionProfile, KalturaYahooDistributionJobProviderData $providerData)
 	{
-		KalturaLog::debug("Yahoo: submit");
 		$distributionProfile = $data->distributionProfile;
 		$providerData = $data->providerData;
 		$entryDistribution = $data->entryDistribution;
@@ -136,7 +135,7 @@ class YahooDistributionEngine extends DistributionEngine implements
 			
 		$xmlString = $feed->getXmlString();	
 		file_put_contents($srcFile, $xmlString);	
-		KalturaLog::debug("XML written to file [$srcFile]");
+		KalturaLog::info("XML written to file [$srcFile]");
 		//upload file to FTP
 
 		$ftpManager = $this->getFTPManager($distributionProfile);
@@ -172,7 +171,6 @@ class YahooDistributionEngine extends DistributionEngine implements
 			KalturaLog::err("fieldValues array is empty or null");
 			throw new Exception("fieldValues array is empty or null");	
 		}		
-		KalturaLog::debug("Yahoo: delete");
 		$entryDistribution = $data->entryDistribution;	
 		$feed = new YahooDistributionFeedHelper(self::DELETE_FEED_TEMPLATE, $distributionProfile, $providerData, $entryDistribution, null);			
 		//create a feed with expiration time set to yesterday
@@ -192,7 +190,7 @@ class YahooDistributionEngine extends DistributionEngine implements
 	
 		$xmlString = $feed->getXmlString();
 		file_put_contents($srcFile, $xmlString);
-		KalturaLog::debug("XML written to file [$srcFile]");
+		KalturaLog::info("XML written to file [$srcFile]");
 		//upload file to FTP
 		$ftpManager = $this->getFTPManager($distributionProfile);
 		$ftpManager->putFile($destFile, $srcFile, true);

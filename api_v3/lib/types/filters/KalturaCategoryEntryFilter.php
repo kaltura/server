@@ -111,7 +111,7 @@ class KalturaCategoryEntryFilter extends KalturaCategoryEntryBaseFilter
 			{
 				if(!in_array($dbCategoryEntry->getCategoryId(), $categoryIds))
 				{
-					KalturaLog::debug('Category [' . print_r($dbCategoryEntry->getCategoryId(),true) . '] is not listed to user');
+					KalturaLog::info('Category [' . print_r($dbCategoryEntry->getCategoryId(),true) . '] is not listed to user');
 					unset($dbCategoriesEntry[$key]);
 				}
 			}

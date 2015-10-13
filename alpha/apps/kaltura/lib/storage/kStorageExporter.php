@@ -97,7 +97,7 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 		/* @var $fileSync FileSync */
 		list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($key,true,false);
 		if (!$fileSync || $fileSync->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL) {
-			KalturaLog::debug("no ready fileSync was found for key [$key]");
+			KalturaLog::info("no ready fileSync was found for key [$key]");
 			return;
 		}
 		
@@ -124,7 +124,7 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 		{
 			if ($e->getCode()==kCoreException::PROFILE_STATUS_DISABLED)
 			{
-				KalturaLog::debug("Profile status disabled exportEntry will not be called [{$entry->getId()}]");
+				KalturaLog::info("Profile status disabled exportEntry will not be called [{$entry->getId()}]");
 			}
 			return false;
 		}
@@ -297,12 +297,10 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 			if ($object->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL)
 			{
 				$storage = StorageProfilePeer::retrieveByPK($object->getDc());
-				KalturaLog::debug("storage auto delete policy: ".$storage->getAllowAutoDelete());
 				if ($storage->getStatus() == StorageProfile::STORAGE_STATUS_AUTOMATIC && $storage->getAllowAutoDelete())
 				{
 					return true;
 				}
-				KalturaLog::debug('Unable to consume deleted event; storageProfile status is not equal to '. StorageProfile::STORAGE_STATUS_AUTOMATIC );
 			}
 		}
 		return false;
@@ -356,8 +354,6 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 	 */
 	protected static function delete(entry $entry, StorageProfile $profile, FileSyncKey $key)
 	{
-		KalturaLog::debug('Start delete storage export');
-		
 		$externalFileSync = kFileSyncUtils::getReadyPendingExternalFileSyncForKey($key, $profile->getId());
 		if(!$externalFileSync)
 			return;

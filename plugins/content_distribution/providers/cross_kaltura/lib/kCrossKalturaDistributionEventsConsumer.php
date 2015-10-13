@@ -43,16 +43,8 @@ class kCrossKalturaDistributionEventsConsumer implements kBatchJobStatusEventCon
 	 */
 	public function updatedJob(BatchJob $dbBatchJob, BatchJob $twinJob = null)
 	{		
-		$shouldConsume = $this->shouldConsumeJobStatusEvent($dbBatchJob);
-		if (!$shouldConsume)
-		{
-		    KalturaLog::err('updatedJob function called even though should not consume event');
-		    return true;
-		}			
-		
 		if ($dbBatchJob->getStatus() == BatchJob::BATCHJOB_STATUS_FINISHED)
 		{				
-		    KalturaLog::debug('Consuming job finished event');
 			return self::onDistributionJobFinished($dbBatchJob);
 		}
 		
@@ -80,9 +72,6 @@ class kCrossKalturaDistributionEventsConsumer implements kBatchJobStatusEventCon
 		    KalturaLog::err('Wrong provider data class ['.get_class($providerData).']');
 			return $dbBatchJob;
 		}
-		
-		
-		KalturaLog::debug('Updating CrossKaltura job provider data in entry distribution custom data');		
 		
 		$entryDistribution->putInCustomData(CrossKalturaDistributionCustomDataField::DISTRIBUTED_FLAVOR_ASSETS, $providerData->getDistributedFlavorAssets());
 		$entryDistribution->putInCustomData(CrossKalturaDistributionCustomDataField::DISTRIBUTED_THUMB_ASSETS, $providerData->getDistributedThumbAssets());

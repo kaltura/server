@@ -14,12 +14,6 @@ class KAsyncCopyPartnerTest extends PHPUnit_Framework_TestCase
 {
 	const JOB_NAME = 'KAsyncCopyPartner';
 
-	public function testHelloWorld()
-	{
-		echo "Hello, world!";
-		KalturaLog::debug("Hello, world!");
-	}
-	
 	public function testCopyPartner()
 	{
 		$iniFile = realpath(__DIR__ . "/../../../configurations/batch" );
@@ -42,8 +36,6 @@ class KAsyncCopyPartnerTest extends PHPUnit_Framework_TestCase
 		$instance = new $config->type($config);
 		$instance->setUnitTest(true);
 
-		KalturaLog::debug("\n\n\ntestCopyPartner() - START\n\n");
-
 		echo "Starting to run...\n";
 		$jobs = $instance->run($jobs);
 		echo "Done running...\n";
@@ -54,8 +46,6 @@ class KAsyncCopyPartnerTest extends PHPUnit_Framework_TestCase
 			echo "Asserting job status is FINISHED...\n";				
 			$this->assertEquals(KalturaBatchJobStatus::FINISHED, $job->status);
 		}
-		
-		KalturaLog::debug("\n\ntestCopyPartner() - END\n\n\n");
 	}
 
 	

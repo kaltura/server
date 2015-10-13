@@ -73,7 +73,6 @@ class QuizService extends KalturaBaseService
 	private function validateAndUpdateQuizData( entry $dbEntry, KalturaQuiz $quiz, $currentVersion = 0, kQuiz $newQuiz = null )
 	{
 		if ( !QuizPlugin::validateUserEntitledForQuizEdit($dbEntry) ) {
-			KalturaLog::debug('Update quiz allowed only with admin KS or entry owner or co-editor');
 			throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID);
 		}
 		$quizData = $quiz->toObject($newQuiz);
@@ -128,4 +127,23 @@ class QuizService extends KalturaBaseService
 		return $filter->getListResponse($pager, $this->getResponseProfile());
 	}
 
+	/**
+	 * creates a pdf from quiz object
+	 *
+	 * @action servePdf
+	 * @param string $entryId
+	 * @return file
+	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
+	 */
+	public function servePdfAction($entryId)
+	{
+		$dbEntry = entryPeer::retrieveByPK($entryId);
+
+		if (!$dbEntry)
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
+
+		$kp = new kQuizPdf($entryId);
+		$kp->createQuestionPdf();
+		return $kp->submitDocument();
+	}
 }

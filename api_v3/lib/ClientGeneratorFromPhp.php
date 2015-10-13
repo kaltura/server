@@ -617,12 +617,10 @@ abstract class ClientGeneratorFromPhp
 					
 				if ($action == "*")
 				{
-	//				KalturaLog::debug("Excluding service [$service]");
 					unset($includeList[$service]);
 				}
 				else
 				{
-	//				KalturaLog::debug("Excluding action [$service.$action]");
 					unset($includeList[$service][$action]);
 				}
 			}

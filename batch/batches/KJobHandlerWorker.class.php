@@ -293,7 +293,6 @@ abstract class KJobHandlerWorker extends KBatchBase
 		
 		$type = KBatchBase::$taskConfig->name;
 		$file = "$type.flt";
-		KalturaLog::debug("Saving filter to $file: " . print_r($filter, true));
 		
 		KScheduleHelperManager::saveFilter($file, $filter);
 	}

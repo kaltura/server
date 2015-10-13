@@ -23,8 +23,6 @@ class KAsyncIntegrate extends KJobHandlerWorker
 	
 	protected function integrate(KalturaBatchJob $job, KalturaIntegrationJobData $data)
 	{
-		KalturaLog::debug("integrate($job->id)");
-		
 		$engine = $this->getEngine($job->jobSubType);
 		if(!$engine)
 		{

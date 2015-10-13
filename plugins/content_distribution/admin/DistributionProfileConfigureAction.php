@@ -72,8 +72,6 @@ class DistributionProfileConfigureAction extends KalturaApplicationPlugin
 				$form = KalturaPluginManager::loadObject('Form_ProviderProfileConfiguration', $providerType, array($partnerId, $providerType, $distributionProfile));
 				$profileClass = KalturaPluginManager::getObjectClass($profileClass, $providerType);
 			}
-			KalturaLog::debug("profile class [$profileClass]");
-			
 			if(!$form)
 			{
 				$action->view->errMessage = "Profile form not found for provider [$providerType]";

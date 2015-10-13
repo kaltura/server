@@ -492,9 +492,13 @@ class KalturaFrontController
 	public function setSerializerByFormat()
 	{
 		if (isset($this->params["ignoreNull"]))
-			$ignoreNull = ($this->params["ignoreNull"] === "1") ? true : false;
+		{
+			$ignoreNull = ($this->params["ignoreNull"] === "1" || $this->params["ignoreNull"] === true) ? true : false;
+		}
 		else
+		{
 			$ignoreNull = false;
+		}
 		
 		// Determine the output format (or default to XML)
 		$format = isset($this->params["format"]) ? $this->params["format"] : KalturaResponseType::RESPONSE_TYPE_XML;

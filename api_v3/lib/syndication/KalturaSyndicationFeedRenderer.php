@@ -109,7 +109,6 @@ class KalturaSyndicationFeedRenderer
 		myDbHelper::$use_alternative_con = myDbHelper::DB_HELPER_CONN_PROPEL3;
 
 		$microTimeStart = microtime(true);
-		KalturaLog::info("syndicationFeedRenderer- initialize ");
 				
 		$this->syndicationFeedDb = $syndicationFeedDB = syndicationFeedPeer::retrieveByPK($feedId);
 		if( !$syndicationFeedDB )
@@ -607,7 +606,14 @@ class KalturaSyndicationFeedRenderer
 		{
 			$urlManager = DeliveryProfilePeer::getDeliveryProfile($flavorAsset->getEntryId());
 			$urlManager->initDeliveryDynamicAttributes(null, $flavorAsset);
-			$url = "http://" . $urlManager->getFullAssetUrl($flavorAsset);
+			$protocol = requestUtils::getProtocol();
+			if(!$urlManager->isProtocolSupported($protocol)){
+				$protocol = ($protocol == 'http' ? 'https' : 'http');
+				if(!$urlManager->isProtocolSupported($protocol)){
+					$protocol = 'http';
+				}
+			}
+			$url = $protocol . '://' . $urlManager->getFullAssetUrl($flavorAsset);
 		}
 		
 		return $url;

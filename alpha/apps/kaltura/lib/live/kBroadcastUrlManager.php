@@ -65,7 +65,6 @@ class kBroadcastUrlManager
 			return self::DEFAULT_SUFFIX;
 			
 		$reflector = new ReflectionClass("EntrySourceType");
-		KalturaLog::debug(print_r($reflector, true));
 		$constantNames = array_flip($reflector->getConstants());
 		
 		return $constantNames[$sourceType];

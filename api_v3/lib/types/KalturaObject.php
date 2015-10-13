@@ -414,7 +414,6 @@ abstract class KalturaObject implements IApiObject
 				KalturaLog::notice("Related response-profile [$relatedProfile->name] has no filter and should not be used as nested profile");
 				continue;
 			}
-			KalturaLog::debug("Loading related response-profile [$relatedProfile->name] with filter [" . get_class($relatedProfile->filter) . "]");
 
 			$filter = clone $relatedProfile->filter;
 			/* @var $filter KalturaRelatedFilter */
@@ -436,10 +435,6 @@ abstract class KalturaObject implements IApiObject
 					KalturaLog::warning("Mappings could not be applied for response-profile [$relatedProfile->name]");
 					continue;
 				}
-			}
-			else 
-			{
-				KalturaLog::debug("No mappings defined in response-profile [$relatedProfile->name]");
 			}
 			
 			$pager = $relatedProfile->pager;

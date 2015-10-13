@@ -109,7 +109,6 @@ class KFeedDropFolderEngine extends KDropFolderEngine
 			//Register MRSS media namespaces on the separate <item>
 			foreach ($this->feedNamespaces as $nameSpace => $url)
 			{
-				KalturaLog::debug("Add original namespace $nameSpace with URL $url to separate <item>");
 				//This is a PHP weakness- the only way to prettily add a namespace to an XML
 				$feedItem->addAttribute("xmlns:xmlns:$nameSpace", $url);
 			}
@@ -172,7 +171,6 @@ class KFeedDropFolderEngine extends KDropFolderEngine
 	{
 		if (!$contentUpdateRequired)
 		{
-			KalturaLog::debug("Removing content tags from feed");
 			$contentItems = $feedItem->xpath ($this->dropFolder->feedItemInfo->itemContentXpath);
 			foreach ($contentItems as $contentItem)
 			{
@@ -214,7 +212,6 @@ class KFeedDropFolderEngine extends KDropFolderEngine
 		$feedItemHash = strval($this->getSingleXPathResult($this->dropFolder->feedItemInfo->itemHashXPath, $feedItem));
 		if ($feedItemHash)
 		{
-			KalturaLog::info('Hash found- checking whether content needs to be updated');
 			if ($feedItemHash != $existingDropFolderFile->hash)
 			{
 				KalturaLog::info('Hash has changed for drop folder file named ['. $existingDropFolderFile->fileName .'] - content will be updated.');

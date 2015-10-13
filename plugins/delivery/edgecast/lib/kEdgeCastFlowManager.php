@@ -149,8 +149,7 @@ class kEdgeCastFlowManager implements kObjectDeletedEventConsumer
         $curlResults = self::doJsonCurl($edgeApiUrl, $mediaPaths, $edgeApiTokenHeader);
         
         // just output the results to the log since there is nothing we can do if this failed
-        KalturaLog::debug('Curl Params: '.print_r($mediaPaths, true));
-        KalturaLog::debug('Curl results: '.print_r($curlResults, true));
+        KalturaLog::info('Curl results: '.print_r($curlResults, true));
 	}
 	
 	

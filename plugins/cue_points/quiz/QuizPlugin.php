@@ -424,7 +424,6 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 
 		$quizzes = UserEntryPeer::doSelect($c);
 		$numOfQuizzesFound = count($quizzes);
-		KalturaLog::debug("Found $numOfQuizzesFound quizzes that were submitted");
 		if ($numOfQuizzesFound)
 		{
 			$sumOfScores = 0;

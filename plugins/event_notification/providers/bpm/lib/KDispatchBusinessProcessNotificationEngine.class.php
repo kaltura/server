@@ -54,9 +54,9 @@ class KDispatchBusinessProcessNotificationEngine extends KDispatchEventNotificat
 	public function startBusinessProcess(KalturaBusinessProcessStartNotificationTemplate $template, KalturaBusinessProcessNotificationDispatchJobData &$data, $variables)
 	{	
 		$provider = $this->getBusinessProcessProvider($data->server);
-		KalturaLog::debug("Starting business-process [{$template->processId}] with variables [" . print_r($variables, true) . "]");
+		KalturaLog::info("Starting business-process [{$template->processId}] with variables [" . print_r($variables, true) . "]");
 		$data->caseId = $provider->startBusinessProcess($template->processId, $variables);
-		KalturaLog::debug("Started business-process case [{$data->caseId}]");
+		KalturaLog::info("Started business-process case [{$data->caseId}]");
 	}
 
 	/**
@@ -66,7 +66,7 @@ class KDispatchBusinessProcessNotificationEngine extends KDispatchEventNotificat
 	public function signalCase(KalturaBusinessProcessSignalNotificationTemplate $template, KalturaBusinessProcessNotificationDispatchJobData &$data, $variables)
 	{
 		$provider = $this->getBusinessProcessProvider($data->server);
-		KalturaLog::debug("Signaling business-process [{$template->processId}] case [{$data->caseId}] with message [{$template->message}] on blocking event [{$template->eventId}]");
+		KalturaLog::info("Signaling business-process [{$template->processId}] case [{$data->caseId}] with message [{$template->message}] on blocking event [{$template->eventId}]");
 		$provider->signalCase($data->caseId, $template->eventId, $template->message, $variables);
 	}
 
@@ -77,7 +77,7 @@ class KDispatchBusinessProcessNotificationEngine extends KDispatchEventNotificat
 	public function abortCase(KalturaBusinessProcessStartNotificationTemplate $template, KalturaBusinessProcessNotificationDispatchJobData &$data)
 	{
 		$provider = $this->getBusinessProcessProvider($data->server);
-		KalturaLog::debug("Aborting business-process [{$template->processId}] case [{$data->caseId}]");
+		KalturaLog::info("Aborting business-process [{$template->processId}] case [{$data->caseId}]");
 		$provider->abortCase($data->caseId);
 	}
 }
