@@ -3,8 +3,6 @@ class kMrssManager
 {
 	const FORMAT_DATETIME = 'Y-m-d\TH:i:s';
 	
-	const DEFAULT_FEED_CONTEXT = 'DEFAULT_FEED_CONTEXT';
-	
 	/**
 	 * @var array<IKalturaMrssContributor>
 	 */
