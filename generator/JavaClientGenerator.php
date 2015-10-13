@@ -64,6 +64,7 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 		if($propertyNode->hasAttribute ( "description" ))
 		{
 			$desc = $propertyNode->getAttribute ( "description" );
+			$desc = str_replace(array("&", "<", ">"), array("&amp;", "&lt;", "&gt;"), $desc);
 			$formatDesc = wordwrap(str_replace(array("\t", "\n", "\r"), " ", $desc) , 80, "\n" . $prefix . "  ");
 			if($desc)
 				return ( $prefix . "/**  $formatDesc  */" );
@@ -461,6 +462,7 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 		switch ($propType) 
 		{
 			case "bigint" :
+			case "time" :
 			case "int" :
 			case "string" :
 			case "bool" :
@@ -468,6 +470,10 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 				if ( $propType == "float" )
 				{
 					$propType = "double";
+				}
+				if ( $propType == "time" )
+				{
+					$propType = "bigint";
 				}
 
 				$txtIsUsed = true;
@@ -761,6 +767,7 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 				$returnCall .= "return ParseUtils.parseMap($arrayType.class, resultXmlElement);";
 				break;
 			case "bigint":
+			case "time":
 			case "int" :
 			case "float" :
 			case "bool" :
@@ -975,7 +982,6 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 		$banner .= "/**\n";
 		$banner .= " * This class was generated using $currentFile\n";
 		$banner .= " * against an XML schema provided by Kaltura.\n";
-		$banner .= " * @date " . date ( DATE_RFC822 ) . "\n";
 		$banner .= " * \n";
 		$banner .= " * MANUAL CHANGES TO THIS CLASS WILL BE OVERWRITTEN.\n";
 		$banner .= " */\n";
@@ -1003,6 +1009,7 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 			return "Double.MIN_VALUE";
 			
 		case "bigint" :
+		case "time" :
 			return "Long.MIN_VALUE";
 		case "int" :
 			if ($propertyNode->hasAttribute ("enumType")) 
@@ -1025,6 +1032,7 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 		case "int":
 		case "float":
 		case "bigint":
+		case "time":
 			return '0';
 			
 		case "bool":
@@ -1048,6 +1056,7 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 			else
 				return "\"" . $defaultValue . "\"";
 		case "bigint":
+		case "time":
 			$value = trim ( $defaultValue );
 			if ($value == 'null')
 				$value = "Long.MIN_VALUE";
@@ -1090,6 +1099,7 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 			return ("Map<String, " . $arrayType . ">");
 
 		case "bigint" :
+		case "time" :
 			return "long";
 
 		case "bool" :
@@ -1119,6 +1129,7 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 			return $enforceObject ? "Double" : "double";
 
 		case "bigint" :
+		case "time" :
 			return $enforceObject ? "Long" : "long";
 			
 		case "int" :

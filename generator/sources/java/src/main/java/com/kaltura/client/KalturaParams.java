@@ -33,6 +33,7 @@ import java.util.Iterator;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.json.JSONArray;
 
 import com.kaltura.client.enums.KalturaEnumAsInt;
 import com.kaltura.client.enums.KalturaEnumAsString;
@@ -49,7 +50,7 @@ public class KalturaParams extends JSONObject {
 	public String toQueryString() throws KalturaApiException {
 		return toQueryString(null);
 	}
-	
+
 	public String toQueryString(String prefix) throws KalturaApiException {
 
 		StringBuffer str = new StringBuffer();
@@ -57,23 +58,22 @@ public class KalturaParams extends JSONObject {
 		String key;
 		for (Object keyObject : keySet()) {
 			key = (String) keyObject;
-			if(str.length() > 0) {
+			if (str.length() > 0) {
 				str.append("&");
 			}
-			
+
 			try {
 				value = get(key);
 			} catch (JSONException e) {
 				throw new KalturaApiException(e.getMessage());
 			}
-			
-			if(prefix != null){
+
+			if (prefix != null) {
 				key = prefix + "[" + key + "]";
 			}
-			if(value instanceof KalturaParams){
+			if (value instanceof KalturaParams) {
 				str.append(((KalturaParams) value).toQueryString(key));
-			}
-			else{
+			} else {
 				str.append(key);
 				str.append("=");
 				str.append(value);
@@ -82,15 +82,13 @@ public class KalturaParams extends JSONObject {
 
 		return str.toString();
 	}
-	
+
 	public void add(String key, int value) throws KalturaApiException {
-		if (value == KalturaParamsValueDefaults.KALTURA_UNDEF_INT)
-		{
+		if (value == KalturaParamsValueDefaults.KALTURA_UNDEF_INT) {
 			return;
 		}
-		
-		if (value == KalturaParamsValueDefaults.KALTURA_NULL_INT)
-		{
+
+		if (value == KalturaParamsValueDefaults.KALTURA_NULL_INT) {
 			putNull(key);
 			return;
 		}
@@ -101,18 +99,16 @@ public class KalturaParams extends JSONObject {
 			throw new KalturaApiException(e.getMessage());
 		}
 	}
-	
+
 	public void add(String key, long value) throws KalturaApiException {
-		if (value == KalturaParamsValueDefaults.KALTURA_UNDEF_LONG)
-		{
+		if (value == KalturaParamsValueDefaults.KALTURA_UNDEF_LONG) {
 			return;
 		}
-		if (value == KalturaParamsValueDefaults.KALTURA_NULL_LONG)
-		{
+		if (value == KalturaParamsValueDefaults.KALTURA_NULL_LONG) {
 			putNull(key);
 			return;
 		}
-		
+
 		try {
 			put(key, value);
 		} catch (JSONException e) {
@@ -121,16 +117,14 @@ public class KalturaParams extends JSONObject {
 	}
 
 	public void add(String key, double value) throws KalturaApiException {
-		if (value == KalturaParamsValueDefaults.KALTURA_UNDEF_DOUBLE)
-		{
+		if (value == KalturaParamsValueDefaults.KALTURA_UNDEF_DOUBLE) {
 			return;
 		}
-		if (value == KalturaParamsValueDefaults.KALTURA_NULL_DOUBLE)
-		{
+		if (value == KalturaParamsValueDefaults.KALTURA_NULL_DOUBLE) {
 			putNull(key);
 			return;
 		}
-		
+
 		try {
 			put(key, value);
 		} catch (JSONException e) {
@@ -139,28 +133,27 @@ public class KalturaParams extends JSONObject {
 	}
 
 	public void add(String key, String value) throws KalturaApiException {
-		if (value == null)
-		{
+		if (value == null) {
 			return;
 		}
-		
-		if (value.equals(KalturaParamsValueDefaults.KALTURA_NULL_STRING))
-		{
+
+		if (value.equals(KalturaParamsValueDefaults.KALTURA_NULL_STRING)) {
 			putNull(key);
 			return;
 		}
-		
+
 		try {
 			put(key, value);
 		} catch (JSONException e) {
 			throw new KalturaApiException(e.getMessage());
 		}
 	}
-	
-	public void add(String key, KalturaObjectBase object) throws KalturaApiException {
+
+	public void add(String key, KalturaObjectBase object)
+			throws KalturaApiException {
 		if (object == null)
 			return;
-		
+
 		try {
 			put(key, object.toParams());
 		} catch (JSONException e) {
@@ -168,10 +161,10 @@ public class KalturaParams extends JSONObject {
 		}
 	}
 
-	public <T extends KalturaObjectBase> void add(String key, ArrayList<T> array) throws KalturaApiException {
+	public <T extends KalturaObjectBase> void add(String key, ArrayList<T> array)
+			throws KalturaApiException {
 		if (array == null)
 			return;
-
 
 		if (array.isEmpty()) {
 			KalturaParams emptyParams = new KalturaParams();
@@ -181,13 +174,10 @@ public class KalturaParams extends JSONObject {
 			} catch (JSONException e) {
 				throw new KalturaApiException(e.getMessage());
 			}
-		}
-		else{
-			KalturaParams arrayParams = new KalturaParams();
-			int index = 0;
+		} else {
+			JSONArray arrayParams = new JSONArray();
 			for (KalturaObjectBase baseObj : array) {
-				arrayParams.add(Integer.toString(index), baseObj);
-				index++;
+				arrayParams.put(baseObj.toParams());
 			}
 			try {
 				put(key, arrayParams);
@@ -197,7 +187,8 @@ public class KalturaParams extends JSONObject {
 		}
 	}
 
-	public <T extends KalturaObjectBase> void add(String key, HashMap<String, T> map) throws KalturaApiException {
+	public <T extends KalturaObjectBase> void add(String key,
+			HashMap<String, T> map) throws KalturaApiException {
 		if (map == null)
 			return;
 
@@ -209,8 +200,7 @@ public class KalturaParams extends JSONObject {
 			} catch (JSONException e) {
 				throw new KalturaApiException(e.getMessage());
 			}
-		}
-		else{
+		} else {
 			KalturaParams mapParams = new KalturaParams();
 			for (String itemKey : map.keySet()) {
 				KalturaObjectBase baseObj = map.get(itemKey);
@@ -223,14 +213,15 @@ public class KalturaParams extends JSONObject {
 			}
 		}
 	}
-	
-	public <T extends KalturaObjectBase> void add(String key, KalturaParams params) throws KalturaApiException {
-		try{
-			if(params instanceof KalturaParams && has(key) && get(key) instanceof KalturaParams){
+
+	public <T extends KalturaObjectBase> void add(String key,
+			KalturaParams params) throws KalturaApiException {
+		try {
+			if (params instanceof KalturaParams && has(key)
+					&& get(key) instanceof KalturaParams) {
 				KalturaParams existingParams = (KalturaParams) get(key);
 				existingParams.putAll((KalturaParams) params);
-			}
-			else{
+			} else {
 				put(key, params);
 			}
 		} catch (JSONException e) {
@@ -248,7 +239,7 @@ public class KalturaParams extends JSONObject {
 	}
 
 	private void putAll(KalturaParams params) throws KalturaApiException {
-		for(Object key : params.keySet()){
+		for (Object key : params.keySet()) {
 			String keyString = (String) key;
 			try {
 				put(keyString, params.get(keyString));
@@ -261,7 +252,7 @@ public class KalturaParams extends JSONObject {
 	public void add(KalturaParams objectProperties) throws KalturaApiException {
 		putAll(objectProperties);
 	}
-	
+
 	protected void putNull(String key) throws KalturaApiException {
 		try {
 			put(key + "__null", "");
@@ -269,7 +260,7 @@ public class KalturaParams extends JSONObject {
 			throw new KalturaApiException(e.getMessage());
 		}
 	}
-	
+
 	/**
 	 * Pay attention - this function does not check if the value is null.
 	 * neither it supports setting value to null.
@@ -281,24 +272,26 @@ public class KalturaParams extends JSONObject {
 			throw new KalturaApiException(e.getMessage());
 		}
 	}
-	
+
 	/**
 	 * Pay attention - this function does not support setting value to null.
 	 */
-	public void add(String key, KalturaEnumAsString value) throws KalturaApiException {
-		if(value == null) 
+	public void add(String key, KalturaEnumAsString value)
+			throws KalturaApiException {
+		if (value == null)
 			return;
-		
+
 		add(key, value.getHashCode());
 	}
-	
+
 	/**
 	 * Pay attention - this function does not support setting value to null.
 	 */
-	public void add(String key, KalturaEnumAsInt value) throws KalturaApiException {
-		if(value == null) 
+	public void add(String key, KalturaEnumAsInt value)
+			throws KalturaApiException {
+		if (value == null)
 			return;
-		
+
 		add(key, value.getHashCode());
 	}
 
@@ -307,25 +300,26 @@ public class KalturaParams extends JSONObject {
 	}
 
 	public void clear() {
-		for(Object key : keySet()){
+		for (Object key : keySet()) {
 			remove((String) key);
 		}
 	}
 
 	public KalturaParams getParams(String key) throws KalturaApiException {
-		if(!has(key))
+		if (!has(key))
 			return null;
-		
+
 		Object value;
 		try {
 			value = get(key);
 		} catch (JSONException e) {
 			throw new KalturaApiException(e.getMessage());
 		}
-		if(value instanceof KalturaParams)
+		if (value instanceof KalturaParams)
 			return (KalturaParams) value;
-		
-		throw new KalturaApiException("Key value [" + key + "] is not instance of KalturaParams");
+
+		throw new KalturaApiException("Key value [" + key
+				+ "] is not instance of KalturaParams");
 	}
-	
+
 }

@@ -150,6 +150,7 @@
 			</plugin>
 
 			<!-- Build JAR file containing JavaDoc files. -->
+			<!-- TODO fix comments before enabling javadoc
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
@@ -162,6 +163,7 @@
 					</execution>
 				</executions>
 			</plugin>
+			-->
 		</plugins>
 	</build>
 
