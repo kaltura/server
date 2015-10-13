@@ -64,6 +64,7 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 		if($propertyNode->hasAttribute ( "description" ))
 		{
 			$desc = $propertyNode->getAttribute ( "description" );
+			$desc = str_replace(array("&", "<", ">"), array("&amp;", "&lt;", "&gt;"), $desc);
 			$formatDesc = wordwrap(str_replace(array("\t", "\n", "\r"), " ", $desc) , 80, "\n" . $prefix . "  ");
 			if($desc)
 				return ( $prefix . "/**  $formatDesc  */" );
@@ -981,7 +982,6 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 		$banner .= "/**\n";
 		$banner .= " * This class was generated using $currentFile\n";
 		$banner .= " * against an XML schema provided by Kaltura.\n";
-		$banner .= " * @date " . date ( DATE_RFC822 ) . "\n";
 		$banner .= " * \n";
 		$banner .= " * MANUAL CHANGES TO THIS CLASS WILL BE OVERWRITTEN.\n";
 		$banner .= " */\n";

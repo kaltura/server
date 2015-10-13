@@ -58,6 +58,7 @@ public class MultiRequestTest extends BaseTest{
 		KalturaMediaEntry entry = new KalturaMediaEntry();
 		entry.setName("test (" + new Date() + ")");
 		entry.setMediaType(KalturaMediaType.IMAGE);
+		entry.setReferenceId(getUniqueString());
 		InputStream fileData = TestUtils.getTestImage();
 		entry = client.getMediaService().add(entry);
 		assertNull(entry);
