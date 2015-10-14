@@ -582,6 +582,7 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 
 		KalturaLog::log("Saving the live entry [{$liveEntry->getId()}] cue points into the associated VOD entry [{$vodEntry->getId()}]");
 
+		// select up to MAX_CUE_POINTS_TO_COPY_TO_VOD to handle
 		$c = new KalturaCriteria();
 		$c->add( CuePointPeer::ENTRY_ID, $liveEntry->getId() );
 		$c->add( CuePointPeer::START_TIME, $liveEntry->getLengthInMsecs(), KalturaCriteria::LESS_EQUAL ); // Don't copy future cuepoints
@@ -600,10 +601,21 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 		{
 			$recordedSegmentsInfo = $liveEntry->getRecordedSegmentsInfo();
 
+			// debug print - remove it, and comment out the corresponding function
 			$recordedSegmentsInfo->printAMFsForAllSegments();
 
 			foreach ( $liveCuePointsToCopy as $liveCuePoint )
 			{
+				// for every cue point we need to calculate it's time relative to the begining of the recording
+				// $recordedSegmentsInfo->getTotalVodTimeOffset will return the length of the recording till the begining of this segment
+				// today it gets a relative time as an argument, but this will have to change, since the relative time wont exist with live anymore.
+				//
+				// $recordedSegmentsInfo->getOffsetFromBeginningOfContainingSegment($timestamp)
+				//
+				// @questions
+				// - should all this logic for calculation the offsets reside in kRecordedSegmentsInfo?
+				// - should we have a single function that calculate the cue point offset in kRecordedSegmentsInfo
+
 				$processedCuePointIds[] = $liveCuePoint->getId();
 
 				$startTime = $liveCuePoint->getStartTime();
@@ -612,25 +624,18 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 				$cuePointCreationTime = $liveCuePoint->getCreatedAt(NULL);
 				KalturaLog::debug("cuePointCreationTime is $cuePointCreationTime");
 
-				$recordingSegmentStartTime = $recordedSegmentsInfo->getLiveSegmentStartTimeFromCuePointTime($cuePointCreationTime);
-				KalturaLog::debug("recordingSegmentStartTime is $recordingSegmentStartTime");
-
-				$cuePointSecondsFromSegmentStart = $cuePointCreationTime - $recordingSegmentStartTime;
-				KalturaLog::debug("cuePointSecondsFromSegmentStart is $cuePointSecondsFromSegmentStart");
+				$offsetForTS = $recordedSegmentsInfo->getOffsetForTimestamp($cuePointCreationTime);
 
 				$copyMsg = "cuepoint [{$liveCuePoint->getId()}] from live entry [{$liveEntry->getId()}] to VOD entry [{$vodEntry->getId()}] with startTime [$startTime]";
 				KalturaLog::debug("Preparing to copy $copyMsg");
 
 				$totalVodOffsetTime = $recordedSegmentsInfo->getTotalVodTimeOffset( $startTime );
-				$recordingSegmentStartTime_totalVODOffset = $recordedSegmentsInfo->getTotalVodTimeOffset( $recordingSegmentStartTime );
-				KalturaLog::debug("recordingSegmentStartTime_totalVODOffset is $recordingSegmentStartTime_totalVODOffset");
-				KalturaLog::debug("totalVodOffsetTime is $totalVodOffsetTime");
-				$totalVodOffsetTime_new = $recordingSegmentStartTime_totalVODOffset + $cuePointSecondsFromSegmentStart;
-				KalturaLog::debug("totalVodOffsetTime_new is $totalVodOffsetTime_new");
 
 				if ( ! is_null( $totalVodOffsetTime ) )
 				{
 					$adjustedStartTime = $startTime - $totalVodOffsetTime;
+					KalturaLog::debug("Avi_: ".$adjustedStartTime . "Asaf: ".$offsetForTS);
+
 					KalturaLog::debug("Copying $copyMsg and adjustedStartTime [$adjustedStartTime] (totalVodOffsetTime [$totalVodOffsetTime])" );
 					KalturaLog::debug("");
 					$liveCuePoint->copyFromLiveToVodEntry( $vodEntry, $adjustedStartTime );

@@ -9,7 +9,7 @@
 class AMFData
 {
     public $pts;
-    public $offset;
+    public $timestamp;
 
 };
 
@@ -48,7 +48,6 @@ class KAMFMediaInfoParser extends KBaseMediaParser{
     // parse the output of the command and return an array of objects
     // - pts
     // - timestamp (unix timestamp)
-    // - offset
     protected function parseOutput($output)
     {
         KalturaLog::debug('in KAMFMediaInfoParser.parseOutput: ' . print_r($output, true));
@@ -70,7 +69,8 @@ class KAMFMediaInfoParser extends KBaseMediaParser{
 
                 $amfData = new AMFData();
                 $amfData->pts = $tmp->pts;
-                $amfData->offset = $this->getOffsetFromAMF($tmp->data);
+                // round number down, so we won't have cue points that were created before the beginning of the stream.
+                $amfData->timestamp = floor($this->getTimestampFromAMF($tmp->data)/1000);
 
                 KalturaLog::debug('adding to AMF array: ' . print_r($amfData, true));
 
@@ -83,7 +83,7 @@ class KAMFMediaInfoParser extends KBaseMediaParser{
         return $amf;
     }
 
-     private function getOffsetFromAMF($AMFData){
+     private function getTimestampFromAMF($AMFData){
         $AMFDataStream = $this->getByteStreamFromFFProbeAMFData($AMFData);
 
         // look for 74696d657374616d70 which is the hex encoding of "timestamp"

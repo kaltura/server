@@ -110,7 +110,6 @@ class KalturaLiveEntryService extends KalturaEntryService
 			// Extract AMF data from all data frames in the segment
 			$amfParser = new KAMFMediaInfoParser($filename, kConf::get('bin_path_mediainfo'), kConf::get('bin_path_ffprobe'));
 			$AMFs = $amfParser->getMediaInfo();
-			var_dump($AMFs);
 
 			$currentSegmentVodToLiveDeltaTime = $liveSegmentDurationInMsec - $recordedSegmentDurationInMsec;
 			$recordedSegmentsInfo = $dbEntry->getRecordedSegmentsInfo();

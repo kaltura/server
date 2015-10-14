@@ -27,6 +27,104 @@ class kRecordedSegmentsInfo
 			);
 	}
 
+	public function getOffsetForTimestamp($timestamp)
+	{
+		KalturaLog::debug("in kRecordedSegmentsInfo.getOffsetForTimestamp timestamp= " . $timestamp);
+		$numSegments = count($this->segments);
+		$totalVodOffset = 0;
+		$i = 0;
+
+		while ( $i < $numSegments ) {
+			KalturaLog::debug("in kRecordedSegmentsInfo.getOffsetForTimestamp - " . $i . " of " . $numSegments);
+
+			$segment = $this->segments[$i];
+			$nextSegment = $i+1 < $numSegments ? $this->segments[$i+1] : null;
+
+			$segmentStartTime = $this->getSegmentStartTime($segment);
+			$nextSegmentStartTime = $nextSegment ? $this->getSegmentStartTime($nextSegment) : null;
+
+			KalturaLog::debug("segmentStartTime: " . $segmentStartTime);
+			KalturaLog::debug("nextSegmentStartTime: " . $nextSegmentStartTime);
+			KalturaLog::debug("totalVodOffset: " . $totalVodOffset);
+
+			if ($timestamp >= $segmentStartTime && (is_null($nextSegmentStartTime) || $timestamp < $nextSegmentStartTime)) {
+				$totalVodOffset += $this->getSegmentDurationTillTS($segment, $timestamp);
+				KalturaLog::debug("kRecordedSegmentsInfo.getOffsetForTimestamp returning " . $totalVodOffset);
+				return $totalVodOffset;
+			} else {
+				$totalVodOffset += $segment[self::VOD_SEGMENT_DURATION]/1000;
+				KalturaLog::debug("adding " .  $segment[self::VOD_SEGMENT_DURATION] . " to totalVodOffset so now its " . $totalVodOffset);
+			}
+			$i++;
+		}
+
+		KalturaLog::err("Couldn't get offset for timestamp [$timestamp]");
+		return null;
+	}
+
+	// assumption: $timestamp >= getSegmentStartTime($segment)
+	private function getSegmentDurationTillTS($segment, $timestamp)
+	{
+		KalturaLog::debug("in getSegmentDurationTillTS with segment=" . print_r($segment, true) . " and timestamp=" . print_r($timestamp, true));
+
+		$prevAMF = null;
+		$nextAMF = null;
+		$numAMFs = count($segment[self::AMF_DATA]);
+		KalturaLog::debug("there are " . $numAMFs . " AMFs");
+		for($i = 0; $i < $numAMFs; $i++){
+			KalturaLog::debug("AMF # " . $i . " :timestamp= ". $segment[self::AMF_DATA][$i]->timestamp);
+			if ($segment[self::AMF_DATA][$i]->timestamp >= $timestamp){
+				KalturaLog::debug("AMF #" .$i. " is after the timestamp");
+				$nextAMF = $segment[self::AMF_DATA][$i];
+				KalturaLog::debug("setting nextAMF to " . print_r($nextAMF,true));
+				if ($i > 0){
+					$prevAMF = $segment[self::AMF_DATA][$i-1];
+					KalturaLog::debug("setting prevAMF to " . print_r($prevAMF,true));
+				}
+				break;
+			}
+		}
+
+		if (is_null($nextAMF)){
+			$prevAMF = $segment[self::AMF_DATA][$numAMFs-1];
+			KalturaLog::debug("nextAMF was null. setting prevAMF to" . print_r($prevAMF,true));
+		}
+
+		// At this point:
+		// if $nextAMF and $prevAMF are not null - the time is between them
+		// 		return $prevAMF.pts + timestamp - $prevAMF.timestamp
+		// if $nextAMF is null - the time is after the last AMF
+		// 		return $prevAMF.pts + timestamp - $prevAMF.timestamp
+		// if $prevAMF is null - the time is before the first AMF.
+		// 		return $nextAMF.pts - ($nextAMF.timestamp - timestamp)
+		$ret = 0;
+		KalturaLog::debug("timestamp= " . $timestamp);
+		KalturaLog::debug("prevAMF->timestamp= ". $prevAMF->timestamp);
+		KalturaLog::debug("prevAMF->pts= " . $prevAMF->pts);
+		KalturaLog::debug("nextAMF->timestamp= ". $nextAMF->timestamp);
+		KalturaLog::debug("nextAMF->pts= " . $nextAMF->pts);
+
+		if (!is_null($prevAMF)){
+			$ret = $prevAMF->pts/1000 + $timestamp - $prevAMF->timestamp;
+		}
+		else{
+			$ret = $nextAMF->pts/1000 - ($nextAMF->timestamp - $timestamp);
+		}
+
+		KalturaLog::debug("getSegmentDurationTillTS returning " . $ret);
+		return $ret;
+	}
+
+	// get the first AMF and reduce the AMF->pts from the AMF->timestamp to know the segment start time
+	private function getSegmentStartTime($segment)
+	{
+		// use floor so we won't have a segment that starts after it's cue points
+		return floor($segment[self::AMF_DATA][0]->timestamp - $segment[self::AMF_DATA][0]->pts/1000);
+	}
+
+
+	//@todo - change the argument $time to timestamp (cue point creation time) and use the AMF data to know in which segment the cue point reside.
+	//        question to self - if the last AMF in a segment is X, and the first of the next segment is X+10 and the timestamp we get is X+5, what to we do?
 	/**
 	 * Get the total VOD offset for a given time. Total = the sum of all VOD delta times throughout the segments.
 	 * @return int|null The offset that should be subtracted from the given time, or
@@ -149,6 +247,9 @@ class kRecordedSegmentsInfo
 			$dt = $segment[self::VOD_TO_LIVE_DELTA_TIME];
 			$amf = $segment[self::AMF_DATA];
 
+			$segmentStartTime = $this->getSegmentStartTime($segment);
+
+			KalturaLog::debug('segmentStartTime: ' . $segmentStartTime);
 			KalturaLog::debug('liveStart: ' . print_r($liveStart, true));
 			KalturaLog::debug('vsd: ' . print_r($vsd, true));
 			KalturaLog::debug('dt: ' . print_r($dt, true));
