@@ -765,23 +765,33 @@ class kBusinessPreConvertDL
 		
 		$matchSourceHeightIdx = null;	// index of the smallest flavor that matches the source height
 		$matchSourceOriginalFlavorBR = 0;
+		$targetLargestHeight = 0;		// To save the height of the largest target flavor and its key
+		$targetLargestHeightKey = null;	// and its key id.
+		
 		foreach($targetFlavorArr as $key=>$target){
 
 				/*
 				 * Ignore flavors that are smaller than the source -
-				 * they are not in the scope of 'adjustToFramesize'
+				 * they are not in the scope of 'adjustToFramesize'.
+				 * Track the largest target flavor, required for cases when the source height is larger than ALL flavors
 				 */
 			if($target->getHeight()<$srcHgt){
 KalturaLog::log("Source is larger than the target, skipping - key:$key, srcHgt:$srcHgt, trgHgt:".$target->getHeight());
+
+				if($targetLargestHeight<$target->getHeight()){
+					$targetLargestHeight=$target->getHeight();
+					$targetLargestHeightKey = $key;
+				}
 				continue;
 			}
 			
 				/*
-				 * Stop searcing if there is a flavor, in that set, that matches the source frame size -
+				 * Stop searching if there is a flavor, in that set, that matches the source frame size -
 				 * no need to activate another flavor conversion
 				 */
 			if(!$target->_isNonComply || $target->_force || $target->_create_anyway) {
 				$matchSourceHeightIdx = null;
+				$targetLargestHeightKey = null;
 KalturaLog::log("Found COMPLY/forced/create_anyway, leaving - key:$key, srcHgt:$srcHgt, trgHgt:".$target->getHeight());
 				break;
 			}
@@ -814,8 +824,15 @@ KalturaLog::log("Switch to matchSourceHeightIdx:$matchSourceHeightIdx, matchSour
 
 		}
 		
+			/*
+			 * If no match was found, use the largest target flavor 
+			 */
+		if(!isset($matchSourceHeightIdx) && isset($targetLargestHeightKey)
+		&& $targetFlavorArr[$targetLargestHeightKey]->getHeight()<$srcHgt){
+			$matchSourceHeightIdx = $targetLargestHeightKey;
+		}
 				/*
-				 * If samllest-source-height-matching is found and it is 'non-compliant' (therefore it willnot be generated),
+				 * If smallest-source-height-matching is found and it is 'non-compliant' (therefore it will not be generated),
 				 * set '_create_anyway' flag for the 'matchSourceHeightIdx' flavor.
 				 */
 		if(isset($matchSourceHeightIdx) && $targetFlavorArr[$matchSourceHeightIdx]->_isNonComply) {
@@ -828,7 +845,6 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 			}
 			*/
 		}
-
 	}
 	
 	/**
