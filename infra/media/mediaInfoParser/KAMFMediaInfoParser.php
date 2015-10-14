@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by IntelliJ IDEA.
- * User: asafrobinovich
- * Date: 10/7/15
- * Time: 3:34 PM
- */
 
 class AMFData
 {
@@ -15,18 +9,15 @@ class AMFData
 
 class KAMFMediaInfoParser extends KBaseMediaParser{
 
+    const timestampHexVal = "74696d657374616d70";
+    const AMFNumberDataTypePrefix ="00";
+    const IEEE754DoubleFloatInHexLength = 16;
+    const MinAMFSizeToTryParse = 205;
 
-
-    protected $cmdPath;
     protected $ffmprobeBin;
 
-    /**
-     * @param string $filePath
-     * @param string $cmdPath
-     */
-    public function __construct($filePath, $cmdPath="ffmpeg", $ffprobeBin="ffprobe")
+    public function __construct($filePath, $ffprobeBin="ffprobe")
     {
-        $this->cmdPath = $cmdPath;
         $this->ffprobeBin = $ffprobeBin;
         parent::__construct($filePath);
     }
@@ -37,26 +28,16 @@ class KAMFMediaInfoParser extends KBaseMediaParser{
         return "{$this->ffprobeBin} -i {$filePath} -select_streams 2:2 -show_streams -show_programs -v quiet -show_data -show_packets -print_format json 2>&1";
     }
 
-//    /**
-//     * @return KalturaMediaInfo
-//     */
-//    public function getMediaInfoFromString($str)
-//    {
-//        return $this->parseOutput($str);
-//    }
-
-    // parse the output of the command and return an array of objects
-    // - pts
-    // - timestamp (unix timestamp)
+    // parse the output of the command and return an array of AMFData objects
     protected function parseOutput($output)
     {
         KalturaLog::debug('in KAMFMediaInfoParser.parseOutput: ' . print_r($output, true));
 
-        $outputlower = strtolower($output);
-        $jsonObj = json_decode($outputlower);
+        $outputLower = strtolower($output);
+        $jsonObj = json_decode($outputLower);
 
         // Check for json decode errors caused by inproper utf8 encoding.
-        if(json_last_error()!=JSON_ERROR_NONE) $jsonObj = json_decode(utf8_encode($outputlower));
+        if(json_last_error()!=JSON_ERROR_NONE) $jsonObj = json_decode(utf8_encode($outputLower));
 
         $jsonObj = $jsonObj->packets;
 
@@ -65,7 +46,7 @@ class KAMFMediaInfoParser extends KBaseMediaParser{
         for ($i = 0; $i < count($jsonObj); $i++) {
             $tmp = $jsonObj[$i];
             // the first data packet is of smaller size of 205 chars
-            if (strlen($tmp->data) > 205) {
+            if (strlen($tmp->data) > self::MinAMFSizeToTryParse) {
 
                 $amfData = new AMFData();
                 $amfData->pts = $tmp->pts;
@@ -88,27 +69,33 @@ class KAMFMediaInfoParser extends KBaseMediaParser{
         // look for 74696d657374616d70 which is the hex encoding of "timestamp"
         // this is fallowed by 00 (AMF for Encoded as IEEE 64-bit double-precision floating point number)
         // this is fallowed by a 64bit (8 bytes = 16 chars) of the number
-
-        $pos = strpos($AMFDataStream, "74696d657374616d70");
-        $ret = substr($AMFDataStream, $pos + 2 + 18, 16);
-        return $this->hex2float($ret);
+        $pos = strpos($AMFDataStream, self::timestampHexVal);
+        $numAsHex = substr($AMFDataStream, $pos + strlen(self::AMFNumberDataTypePrefix) + strlen(self::timestampHexVal), self::IEEE754DoubleFloatInHexLength);
+        return $this->hex2float($numAsHex);
     }
 
+    // get number from hex representation of IEEE 754 double-precision binary floating-point format
     private function hex2float($number) {
+        // convert hex string to binary
         $binfinal = sprintf("%064b",hexdec($number));
+
+        // first bit is the sign bit
         $sign = substr($binfinal, 0, 1);
+
+        // get and decode exponent
         $exp = substr($binfinal, 1, 11);
+        $exp = bindec($exp)-1023;
+
+        // get the significant digits as an array
         $mantissa = "1".substr($binfinal, 12);
         $mantissa = str_split($mantissa);
-        $exp = bindec($exp)-1023;
+
         $significand=0;
         for ($i = 0; $i < 53; $i++) {
             $significand += (1 / pow(2,$i))*$mantissa[$i];
         }
         return $significand * pow(2,$exp) * ($sign*-2+1);
     }
-
-
 
     // parse the output of ffprobe that looks like:
     //        \n00000000: 0200 0a6f 6e4d 6574 6144 6174 6103 0008  ...onMetaData...
