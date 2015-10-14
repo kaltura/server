@@ -606,39 +606,17 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 
 			foreach ( $liveCuePointsToCopy as $liveCuePoint )
 			{
-				// for every cue point we need to calculate it's time relative to the begining of the recording
-				// $recordedSegmentsInfo->getTotalVodTimeOffset will return the length of the recording till the begining of this segment
-				// today it gets a relative time as an argument, but this will have to change, since the relative time wont exist with live anymore.
-				//
-				// $recordedSegmentsInfo->getOffsetFromBeginningOfContainingSegment($timestamp)
-				//
-				// @questions
-				// - should all this logic for calculation the offsets reside in kRecordedSegmentsInfo?
-				// - should we have a single function that calculate the cue point offset in kRecordedSegmentsInfo
-
 				$processedCuePointIds[] = $liveCuePoint->getId();
 
-				$startTime = $liveCuePoint->getStartTime();
-				KalturaLog::debug("startTime is $startTime");
-
 				$cuePointCreationTime = $liveCuePoint->getCreatedAt(NULL)*1000;
-				KalturaLog::debug("c	 $cuePointCreationTime");
-
 				$offsetForTS = $recordedSegmentsInfo->getOffsetForTimestamp($cuePointCreationTime);
 
-				$copyMsg = "cuepoint [{$liveCuePoint->getId()}] from live entry [{$liveEntry->getId()}] to VOD entry [{$vodEntry->getId()}] with startTime [$startTime]";
+				$copyMsg = "cuepoint [{$liveCuePoint->getId()}] from live entry [{$liveEntry->getId()}] to VOD entry [{$vodEntry->getId()}]";
 				KalturaLog::debug("Preparing to copy $copyMsg");
 
-				$totalVodOffsetTime = $recordedSegmentsInfo->getTotalVodTimeOffset( $startTime );
-
-				if ( ! is_null( $totalVodOffsetTime ) )
+				if ( ! is_null( $offsetForTS ) )
 				{
-					$adjustedStartTime = $startTime - $totalVodOffsetTime;
-					KalturaLog::debug("Avi_: ".$adjustedStartTime . " Asaf: ".$offsetForTS);
-
-					KalturaLog::debug("Copying $copyMsg and adjustedStartTime [$adjustedStartTime] (totalVodOffsetTime [$totalVodOffsetTime])" );
-					KalturaLog::debug("");
-					$liveCuePoint->copyFromLiveToVodEntry( $vodEntry, $adjustedStartTime );
+					$liveCuePoint->copyFromLiveToVodEntry( $vodEntry, $offsetForTS );
 				}
 				else
 				{
