@@ -69,8 +69,7 @@ class KAMFMediaInfoParser extends KBaseMediaParser{
 
                 $amfData = new AMFData();
                 $amfData->pts = $tmp->pts;
-                // round number down, so we won't have cue points that were created before the beginning of the stream.
-                $amfData->timestamp = floor($this->getTimestampFromAMF($tmp->data)/1000);
+                $amfData->timestamp = $this->getTimestampFromAMF($tmp->data);
 
                 KalturaLog::debug('adding to AMF array: ' . print_r($amfData, true));
 

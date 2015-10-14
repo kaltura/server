@@ -47,12 +47,20 @@ class kRecordedSegmentsInfo
 			KalturaLog::debug("nextSegmentStartTime: " . $nextSegmentStartTime);
 			KalturaLog::debug("totalVodOffset: " . $totalVodOffset);
 
+			// since the timestamp on the cue point is in seconds, and everything else is in milliseconds we can get
+			// a cue point (that was created less than one second from the beginning of the stream) can get negative time
+			// and we will need to "fix" its time
+			if ($segmentStartTime > $timestamp){
+				KalturaLog::debug("timestamp " . $timestamp . " passed to getOffsetForTimestamp was less than segmentStartTime " . $segmentStartTime);
+				$timestamp = $segmentStartTime;
+			}
+
 			if ($timestamp >= $segmentStartTime && (is_null($nextSegmentStartTime) || $timestamp < $nextSegmentStartTime)) {
 				$totalVodOffset += $this->getSegmentDurationTillTS($segment, $timestamp);
 				KalturaLog::debug("kRecordedSegmentsInfo.getOffsetForTimestamp returning " . $totalVodOffset);
 				return $totalVodOffset;
 			} else {
-				$totalVodOffset += $segment[self::VOD_SEGMENT_DURATION]/1000;
+				$totalVodOffset += $segment[self::VOD_SEGMENT_DURATION];
 				KalturaLog::debug("adding " .  $segment[self::VOD_SEGMENT_DURATION] . " to totalVodOffset so now its " . $totalVodOffset);
 			}
 			$i++;
@@ -105,10 +113,10 @@ class kRecordedSegmentsInfo
 		KalturaLog::debug("nextAMF->pts= " . $nextAMF->pts);
 
 		if (!is_null($prevAMF)){
-			$ret = $prevAMF->pts/1000 + $timestamp - $prevAMF->timestamp;
+			$ret = $prevAMF->pts + $timestamp - $prevAMF->timestamp;
 		}
 		else{
-			$ret = $nextAMF->pts/1000 - ($nextAMF->timestamp - $timestamp);
+			$ret = $nextAMF->pts - ($nextAMF->timestamp - $timestamp);
 		}
 
 		KalturaLog::debug("getSegmentDurationTillTS returning " . $ret);
@@ -119,7 +127,7 @@ class kRecordedSegmentsInfo
 	private function getSegmentStartTime($segment)
 	{
 		// use floor so we won't have a segment that starts after it's cue points
-		return floor($segment[self::AMF_DATA][0]->timestamp - $segment[self::AMF_DATA][0]->pts/1000);
+		return $segment[self::AMF_DATA][0]->timestamp - $segment[self::AMF_DATA][0]->pts;
 	}
 
 

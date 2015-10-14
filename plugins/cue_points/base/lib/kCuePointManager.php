@@ -621,8 +621,8 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 				$startTime = $liveCuePoint->getStartTime();
 				KalturaLog::debug("startTime is $startTime");
 
-				$cuePointCreationTime = $liveCuePoint->getCreatedAt(NULL);
-				KalturaLog::debug("cuePointCreationTime is $cuePointCreationTime");
+				$cuePointCreationTime = $liveCuePoint->getCreatedAt(NULL)*1000;
+				KalturaLog::debug("c	 $cuePointCreationTime");
 
 				$offsetForTS = $recordedSegmentsInfo->getOffsetForTimestamp($cuePointCreationTime);
 
@@ -634,7 +634,7 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 				if ( ! is_null( $totalVodOffsetTime ) )
 				{
 					$adjustedStartTime = $startTime - $totalVodOffsetTime;
-					KalturaLog::debug("Avi_: ".$adjustedStartTime . "Asaf: ".$offsetForTS);
+					KalturaLog::debug("Avi_: ".$adjustedStartTime . " Asaf: ".$offsetForTS);
 
 					KalturaLog::debug("Copying $copyMsg and adjustedStartTime [$adjustedStartTime] (totalVodOffsetTime [$totalVodOffsetTime])" );
 					KalturaLog::debug("");
