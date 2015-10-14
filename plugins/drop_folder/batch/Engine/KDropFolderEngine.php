@@ -56,9 +56,7 @@ abstract class KDropFolderEngine implements IKalturaLogger
 		do
 		{
 			$pager->pageIndex++;
-			KalturaLog::debug('getting page ['.$pager->pageIndex. '] from Drop Folder File ');
 			$dropFolderFiles = $this->dropFolderFileService->listAction($dropFolderFileFilter, $pager);
-			KalturaLog::debug('response: '. print_r($dropFolderFiles, true));
 			$dropFolderFiles = $dropFolderFiles->objects;
 			foreach ($dropFolderFiles as $dropFolderFile) 
 			{
@@ -105,7 +103,6 @@ abstract class KDropFolderEngine implements IKalturaLogger
 	 */
 	protected function handleFilePurged($dropFolderFileId)
 	{
-		KalturaLog::debug('Handling drop folder file purged id ['.$dropFolderFileId.']');
 		try 
 		{
 			return $this->dropFolderFileService->updateStatus($dropFolderFileId, KalturaDropFolderFileStatus::PURGED);

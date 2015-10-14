@@ -36,11 +36,9 @@ class KVoicebaseIntegrationEngine implements KIntegrationCloserEngine
 		$fileLocation = $providerData->fileLocation;
 		$callBackUrl = $data->callbackNotificationUrl;
 	
-		KalturaLog::debug('callback is - ' . $callBackUrl);	
+		KalturaLog::debug('callback is - ' . $callBackUrl);
 	
 		$this->clientHelper = VoicebasePlugin::getClientHelper($providerData->apiKey, $providerData->apiPassword);
-	
-		$flavorAssetId = $this->validateFlavorAssetId($entryId, $flavorAssetId);
 		$flavorUrl = KBatchBase::$kClient->flavorAsset->getUrl($flavorAssetId);
 	
 		$externalEntryExists = $this->clientHelper->checkExistingExternalContent($entryId);
@@ -72,26 +70,5 @@ class KVoicebaseIntegrationEngine implements KIntegrationCloserEngine
 	protected function doClose(KalturaBatchJob $job, KalturaIntegrationJobData &$data, KalturaVoicebaseJobProviderData $providerData)
 	{
 		return false;
-	}
-	
-	private function validateFlavorAssetId($entryId, $flavorAssetId = null)
-	{
-		$sourceAssetId = null;
-	
-		$filter = new KalturaAssetFilter();
-		$filter->entryIdEqual = $entryId;
-		$pager = null;
-		$assetsobjectList = KBatchBase::$kClient->flavorAsset->listAction($filter, $pager);
-	
-		foreach($assetsobjectList->objects as $entryAsset)
-		{
-			if($flavorAssetId && $entryAsset->id == $flavorAssetId)
-				return $flavorAssetId;
-	
-			if($entryAsset->isOriginal == 1)
-				$sourceAssetId = $entryAsset->id;
-		}
-	
-		return $sourceAssetId;
 	}
 }

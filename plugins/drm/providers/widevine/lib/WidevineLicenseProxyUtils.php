@@ -57,7 +57,7 @@ class WidevineLicenseProxyUtils
 			$baseUrl = WidevinePlugin::getWidevineConfigParam('license_server_url');
 			$portal = WidevinePlugin::getWidevineConfigParam('portal');
 		}
-		KalturaLog::debug("sign input: ".$signInput);
+		KalturaLog::info("sign input: ".$signInput);
 		
 		$sign = self::createRequestSignature($signInput, $key, $iv);		
 		$requestParams[self::PTIME] = $ptime;
@@ -88,7 +88,7 @@ class WidevineLicenseProxyUtils
 	
 	public static function printLicenseResponseStatus($response)
 	{
-		KalturaLog::debug("Encoded license response: ". $response);
+		KalturaLog::info("Encoded license response: ". $response);
 		$decoded_response = base64_decode($response);
 
 		// bytes 0 through 3 contain response status code
@@ -101,9 +101,9 @@ class WidevineLicenseProxyUtils
 		}
 		$response_status_dec = hexdec($response_status);
 		if($response_status == 1)
-			KalturaLog::debug("License response status OK");
+			KalturaLog::info("License response status OK");
 		else
-			KalturaLog::debug("License response status Error with code: ".$response_status_dec);
+			KalturaLog::info("License response status Error with code: ".$response_status_dec);
 	}
 
 	//this utility function used by both batch and API
@@ -164,8 +164,8 @@ class WidevineLicenseProxyUtils
 	{
 		$requestParamsStr = http_build_query($requestParams, '', '&');
 		
-		KalturaLog::debug("License request URL: ".$baseUrl);
-		KalturaLog::debug("License request params: ".$requestParamsStr);
+		KalturaLog::info("License request URL: ".$baseUrl);
+		KalturaLog::info("License request params: ".$requestParamsStr);
 		
 		$ch = curl_init();		
 		curl_setopt($ch, CURLOPT_URL, $baseUrl);

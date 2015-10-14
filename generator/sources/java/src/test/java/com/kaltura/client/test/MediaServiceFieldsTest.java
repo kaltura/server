@@ -180,6 +180,7 @@ public class MediaServiceFieldsTest extends BaseTest {
 		
 		// Test null update - shouldn't update
 		KalturaAccessControl accessControl2 = new KalturaAccessControl();
+		accessControl2.name = "updated access control";
 		accessControl2.restrictions = null; 
 		accessControl2 = client.getAccessControlService().update(accessControl.id, accessControl2);
 		
@@ -187,6 +188,7 @@ public class MediaServiceFieldsTest extends BaseTest {
 		
 		// Test update Empty array - should update
 		KalturaAccessControl accessControl3 = new KalturaAccessControl();
+		accessControl3.name = "reset access control";
 		accessControl3.restrictions = new ArrayList<KalturaBaseRestriction>(); 
 		accessControl3 = client.getAccessControlService().update(accessControl.id, accessControl3);
 		

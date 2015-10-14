@@ -239,7 +239,7 @@ class kQueryCache
 		
 		if ($cacheResult === false)
 		{
-			KalturaLog::debug("kQueryCache: failed to query keys memcache, not using query cache");
+			KalturaLog::log("kQueryCache: failed to query keys memcache, not using query cache");
 			return null;
 		}
 
@@ -261,7 +261,7 @@ class kQueryCache
 		if (array_key_exists(self::DONT_CACHE_KEY, $cacheResult) && 
 			$cacheResult[self::DONT_CACHE_KEY])
 		{
-			KalturaLog::debug("kQueryCache: dontCache key is set -> not caching the result");
+			KalturaLog::log("kQueryCache: dontCache key is set -> not caching the result");
 			$cacheQuery = false;
 		}
 		unset($cacheResult[self::DONT_CACHE_KEY]);

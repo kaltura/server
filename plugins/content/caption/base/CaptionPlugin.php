@@ -520,7 +520,6 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 					$contributor->captions[] = $captionAssetObj;
 				}
 				
-				KalturaLog::debug("contributor captions :" . print_r($contributor->captions, true));
 				if ($contributor->captions)
 					$contributors[] = $contributor;
 				

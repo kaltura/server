@@ -170,7 +170,6 @@ class LiveReportsService extends KalturaBaseService
 			KExternalErrors::dieError(KExternalErrors::ACCESS_CONTROL_RESTRICTED);
 	
 		if(!preg_match($fileNameRegex, $id, $matches)) {
-			KalturaLog::err("Report Id Format doesn't match the file name format");
 			throw new KalturaAPIException(KalturaErrors::REPORT_NOT_FOUND, $id);
 		}
 		

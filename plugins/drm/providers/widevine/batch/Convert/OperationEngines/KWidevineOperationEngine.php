@@ -43,7 +43,7 @@ class KWidevineOperationEngine extends KOperationEngine
 		$entry = KBatchBase::$kClient->baseEntry->get($this->job->entryId);
 		$this->buildPackageName($entry);
 		
-		KalturaLog::debug('start Widevine packaging: '.$this->packageName);
+		KalturaLog::info('start Widevine packaging: '.$this->packageName);
 		
 		$drmPlugin = KalturaDrmClientPlugin::get(KBatchBase::$kClient);
 		$profile = $drmPlugin->drmProfile->getByProvider(KalturaDrmProviderType::WIDEVINE);
@@ -95,7 +95,7 @@ class KWidevineOperationEngine extends KOperationEngine
 			throw new KOperationEngineException($logMessage);
 		}
 										
-		KalturaLog::debug('Widevine asset id: '.$wvAssetId);
+		KalturaLog::info('Widevine asset id: '.$wvAssetId);
 		
 		return $wvAssetId;
 	}
@@ -110,7 +110,7 @@ class KWidevineOperationEngine extends KOperationEngine
 		//try to fix source assets sync and re-try encryption
 		if($returnValue == KWidevineBatchHelper::FIX_ASSET_ERROR_RETURN_CODE)
 		{
-			KalturaLog::debug("Trying to fix input files due to mismatch error ...");
+			KalturaLog::info("Trying to fix input files due to mismatch error ...");
 			$fixedInputFiles = $this->fixInputAssets($inputFiles);
 			$returnValue = $this->executeEncryptPackageCmd($profile, $fixedInputFiles);
 			if($returnValue != 0)
@@ -141,7 +141,7 @@ class KWidevineOperationEngine extends KOperationEngine
 										$profile->portal);
 										
 		exec($cmd, $output, $returnValue);
-		KalturaLog::debug('Command execution output: '.print_r($output, true));	
+		KalturaLog::info('Command execution output: '.print_r($output, true));	
 
 		if($returnValue != 0)
 		{
@@ -207,7 +207,7 @@ class KWidevineOperationEngine extends KOperationEngine
 		{
 			if(in_array($srcFileSyncDescriptor->assetId, $redundantAssets))
 			{
-				KalturaLog::debug('Skipping flavor asset due to redundant bitrate: '.$srcFileSyncDescriptor->assetId);
+				KalturaLog::info('Skipping flavor asset due to redundant bitrate: '.$srcFileSyncDescriptor->assetId);
 			}
 			else 
 			{
@@ -275,7 +275,7 @@ class KWidevineOperationEngine extends KOperationEngine
 			$cmd = KWidevineBatchHelper::getFixAssetCmdLine($this->params->ffmpegCmd, $inputFile, $fixedInputFile);
 			$lastLine = exec($cmd, $output, $returnValue);
 			
-			KalturaLog::debug('Command execution output: '.print_r($output, true));
+			KalturaLog::info('Command execution output: '.print_r($output, true));
 		
 			if($returnValue != 0)
 			{

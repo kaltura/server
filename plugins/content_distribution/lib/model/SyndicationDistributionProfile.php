@@ -111,12 +111,9 @@ class SyndicationDistributionProfile extends DistributionProfile
 	
 		if($this->xslModified && $this->xsl && $this->getFeedId())
 		{
-			KalturaLog::debug("loads syndication feed id [" . $this->getFeedId() . "]");
 			$syndicationFeed = syndicationFeedPeer::retrieveByPK($this->getFeedId());
-			KalturaLog::debug("syndication feed id [" . $syndicationFeed->getId() . "] syndication feed type [" . get_class($syndicationFeed) . "]");
 			if($syndicationFeed && $syndicationFeed instanceof genericSyndicationFeed)
 			{
-				KalturaLog::log("Updating syndication feed xsl");
 				$syndicationFeed->setType(syndicationFeedType::KALTURA_XSLT);
 				$syndicationFeed->incrementVersion();
 				$syndicationFeed->save();

@@ -9,4 +9,6 @@ interface ObjectFeatureType extends BaseEnum
 	
 	const ANCESTOR_RECURSIVE = 2;
 	
+	const CATEGORY_ENTRIES = 3;
+	
 } 

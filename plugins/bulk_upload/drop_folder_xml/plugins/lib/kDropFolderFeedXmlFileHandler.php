@@ -35,7 +35,6 @@ class kDropFolderFeedXmlFileHandler extends kDropFolderXmlFileHandler
 	private function addXMLBulkUploadJob(DropFolder $folder, DropFolderFile $leadDropFolderFile)
 	{
 		/* @var $leadDropFolderFile FeedDropFolderFile */
-		KalturaLog::info('Adding BulkUpload job');
 		try 
 		{
 			$coreBulkUploadType = BulkUploadXmlPlugin::getBulkUploadTypeCoreValue(BulkUploadXmlType::XML);

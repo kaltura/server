@@ -45,7 +45,6 @@ class KOperationEnginePdfCreator extends KOperationEngineDocument
 	
 	public function operate(kOperator $operator = null, $inFilePath, $configFilePath = null)
 	{
-		KalturaLog::debug("document : operator [". print_r($operator, true)."] inFilePath [$inFilePath]"); 
 		if ($configFilePath) {
 			$configFilePath = realpath($configFilePath);
 		}

@@ -101,7 +101,7 @@ class kEventNotificationFlowManager implements kGenericEventConsumer
 		if(is_null(self::$allNotificationTemplates))
 		{
 			self::$allNotificationTemplates = EventNotificationTemplatePeer::retrieveByPartnerId($partnerId);
-			KalturaLog::debug("Found [" . count(self::$allNotificationTemplates) . "] templates");
+			KalturaLog::info("Found [" . count(self::$allNotificationTemplates) . "] templates");
 		}
 		
 		$notificationTemplates = array();

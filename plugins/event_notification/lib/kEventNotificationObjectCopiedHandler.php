@@ -40,7 +40,7 @@ class kEventNotificationObjectCopiedHandler implements kObjectCopiedEventConsume
 		$fromPartnerId = $fromPartner->getId();
 		$toPartnerId = $toPartner->getId();
 		
-		KalturaLog::debug("Copy event-notification templates from [$fromPartnerId] to [$toPartnerId]");
+		KalturaLog::info("Copy event-notification templates from [$fromPartnerId] to [$toPartnerId]");
 		
  		$c = new Criteria();
  		$c->add(EventNotificationTemplatePeer::PARTNER_ID, $fromPartnerId);

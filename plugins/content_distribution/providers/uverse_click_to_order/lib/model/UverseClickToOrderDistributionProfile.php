@@ -157,7 +157,6 @@ class UverseClickToOrderDistributionProfile extends ConfigurableDistributionProf
 			$relatedEntryName = $categoryEntryIdObject[0]->getName();	
 			if (strlen($relatedEntryName) > self::CATEGORY_ENTRY_NAME_MAXIMUM_LENGTH)
 			{
-				KalturaLog::debug('related category name exceeds the maximum length of '.self::CATEGORY_ENTRY_NAME_MAXIMUM_LENGTH. ' characters');
 				$errorMsg = 'related category name exceeds the maximum length of '.self::CATEGORY_ENTRY_NAME_MAXIMUM_LENGTH. ' characters';			
 	    		$validationError = $this->createValidationError($action, DistributionErrorType::INVALID_DATA);    		
 	    		$validationError->setValidationErrorType(DistributionValidationErrorType::CUSTOM_ERROR);

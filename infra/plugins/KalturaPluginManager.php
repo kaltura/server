@@ -94,7 +94,7 @@ class KalturaPluginManager
 				return $obj;
 		}
 		
-		KalturaLog::debug("Object [$baseClass] not found, enum value [$enumValue], constructor arguments [" . print_r($constructorArgs, true) . "], plugins [" . print_r(array_keys($pluginInstances), true) . "]");
+		KalturaLog::info("Object [$baseClass] not found, enum value [$enumValue], constructor arguments [" . print_r($constructorArgs, true) . "], plugins [" . print_r(array_keys($pluginInstances), true) . "]");
 		return null;
 	}
 	

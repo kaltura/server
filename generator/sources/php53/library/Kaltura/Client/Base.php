@@ -624,7 +624,7 @@ class Base
 				throw new ClientException("Invalid object type - not instance of $objectType", ClientException::ERROR_INVALID_OBJECT_TYPE);
 			}
 		}
-		else if(is_subclass_of($objectType, 'EnumBase'))
+		else if(class_exists($objectType) && is_subclass_of($objectType, 'EnumBase'))
 		{
 			$enum = new ReflectionClass($objectType);
 			$values = array_map('strval', $enum->getConstants());

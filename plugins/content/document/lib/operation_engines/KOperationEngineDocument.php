@@ -6,7 +6,7 @@ abstract class KOperationEngineDocument extends KSingleOutputOperationEngine {
 		$pdfInfoExe = KBatchBase::$taskConfig->params->pdfInfo;
 		$output = null;
 		$command = $pdfInfoExe . " \"" . realpath($file) . "\" 2>&1";
-		KalturaLog::debug("Executing: $command");
+		KalturaLog::info("Executing: $command");
 		exec($command, $output);
 		return $output;
 	}
@@ -16,7 +16,7 @@ abstract class KOperationEngineDocument extends KSingleOutputOperationEngine {
 		$returnValue = null;
 		$output = null;
 		$command = "file '{$filePath}'";
-		KalturaLog::debug("Executing: $command");
+		KalturaLog::info("Executing: $command");
 		exec($command, $output, $returnValue);
 		return implode("\n",$output);
 	}
@@ -36,7 +36,7 @@ abstract class KOperationEngineDocument extends KSingleOutputOperationEngine {
 				return null;
 		}
 	
-		KalturaLog::debug("file $filePath is of unexpected type : {$fileType}");
+		KalturaLog::info("file $filePath is of unexpected type : {$fileType}");
 		return "invalid file type: {$fileType}";
 	}
 }

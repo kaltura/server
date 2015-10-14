@@ -58,7 +58,6 @@ class KOperationEngineImageMagick extends KOperationEngineDocument
 	public function operate(kOperator $operator = null, $inFilePath, $configFilePath = null)
 	{
 		if(kFile::fullMkfileDir($this->outFilePath)){
-			KalturaLog::debug('dir ['.$this->outFilePath.'] created');
 			//outFilePath will be the path to the directory in which the images will be saved.
 			$outDirPath = $this->outFilePath;
 			//imageMagick decides the format of the output file according to the outFilePath's extension.so the format need to be added.
@@ -66,7 +65,6 @@ class KOperationEngineImageMagick extends KOperationEngineDocument
 		}
 		else
 		{
-			KalturaLog::debug('failed to create ['.$this->outFilePath.'] directory');
 			throw new KOperationEngineException('failed to create ['.$this->outFilePath.'] directory');
 		}
 		
@@ -148,7 +146,7 @@ class KOperationEngineImageMagick extends KOperationEngineDocument
 		$returnValue = null;
 		$output = null;
 		$command = $identifyExe . " -verbose '{$filePath}' 2>&1";
-		KalturaLog::debug("Executing: $command");
+		KalturaLog::info("Executing: $command");
 		exec($command, $output, $returnValue);
 	
 		$std = -1;

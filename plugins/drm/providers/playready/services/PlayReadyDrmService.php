@@ -185,7 +185,7 @@ class PlayReadyDrmService extends KalturaBaseService
 			{
 				if($e->getCause() && $e->getCause()->getCode() == self::MYSQL_CODE_DUPLICATE_KEY) //unique constraint
 				{
-					KalturaLog::debug("device already registered");
+					KalturaLog::info("device already registered");
 				}
 				else
 				{

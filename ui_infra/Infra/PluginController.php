@@ -32,7 +32,6 @@ class Infra_PluginController extends Zend_Controller_Action
 		if(!$plugin || !($plugin instanceof IKalturaApplicationImages))
 		{
 			$message = "Plugin [$pluginName] is not an application images plugin";
-			KalturaLog::debug($message);
 			throw new Infra_Exception($message, Infra_Exception::ERROR_CODE_MISSING_PLUGIN);
 		}
 		
@@ -40,7 +39,6 @@ class Infra_PluginController extends Zend_Controller_Action
 		if(!file_exists($imgPath))
 		{
 			$message = "File [$imgPath] not found";
-			KalturaLog::debug($message);
 			throw new Infra_Exception($message, Infra_Exception::ERROR_CODE_MISSING_PLUGIN_FILE);
 		}
 		

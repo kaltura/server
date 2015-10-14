@@ -35,7 +35,18 @@ class ErlangClientGenerator extends ClientGeneratorFromXml
 		$this->appendLine('-type void() :: void.');
 		$this->appendLine();
 		
-		$this->appendLine('-record(kaltura_error, {code = null :: string(), message = null :: string(), args = [] :: list()}).');
+		$this->appendLine('-record(kaltura_error, {');
+		$this->appendLine('	code = null :: string(),');
+		$this->appendLine('	message = null :: string(),');
+		$this->appendLine('	args = [] :: list()');
+		$this->appendLine('}).');
+		$this->appendLine();
+		
+		$this->appendLine('-record(kaltura_configuration, {');
+		$this->appendLine('	url = "http://www.kaltura.com/api" :: string(),');
+		$this->appendLine('	client_options = [{verbose, false}] :: httpc:options(),');
+		$this->appendLine('	request_options = [{timeout, 90000}] :: httpc:http_options()');
+		$this->appendLine('}).');
 		$this->appendLine();
 		
 		$this->appendLine('-record(kaltura_request, {');
@@ -323,7 +334,7 @@ class ErlangClientGenerator extends ClientGeneratorFromXml
 		$signitures = array();
 		for($i = $min; $i <= $max; $i++)
 		{
-			$args = $i + 1;
+			$args = $i + 2; // additional two arguments for ClientConfiguration and ClientRequest
 			$signitures[] = "$actionName/$args";
 		}
 		
@@ -378,11 +389,11 @@ class ErlangClientGenerator extends ClientGeneratorFromXml
 			if(count($params))
 			{
 				$arguments = $this->getSpecSignature($params);
-				$this->append("-spec $actionName(ClientRequest::#kaltura_request{}, $arguments)");
+				$this->append("-spec $actionName(ClientConfiguration::#kaltura_configuration{}, ClientRequest::#kaltura_request{}, $arguments)");
 			}
 			else
 			{
-				$this->append("-spec $actionName(ClientRequest::#kaltura_request{})");
+				$this->append("-spec $actionName(ClientConfiguration::#kaltura_configuration{}, ClientRequest::#kaltura_request{})");
 			}
 			if($resultType)
 			{
@@ -405,11 +416,11 @@ class ErlangClientGenerator extends ClientGeneratorFromXml
 		if(count($params))
 		{
 			$arguments = $this->getSpecSignature($params);
-			$this->append("-spec $actionName(ClientRequest::#kaltura_request{}, $arguments)");
+			$this->append("-spec $actionName(ClientConfiguration::#kaltura_configuration{}, ClientRequest::#kaltura_request{}, $arguments)");
 		}
 		else
 		{
-			$this->append("-spec $actionName(ClientRequest::#kaltura_request{})");
+			$this->append("-spec $actionName(ClientConfiguration::#kaltura_configuration{}, ClientRequest::#kaltura_request{})");
 		}
 		if($resultType)
 		{
@@ -441,16 +452,16 @@ class ErlangClientGenerator extends ClientGeneratorFromXml
 			for($i = count($params); $i < $paramNodes->length; $i++)
 				$optionalParams[] = $paramNodes->item($i);
 				
-			$callArguments = 'ClientRequest, ';
+			$callArguments = 'ClientConfiguration, ClientRequest, ';
 			if(count($params))
 			{
 				$arguments = $this->getSignature($params);
 				$callArguments .= $this->getCallSignature($params) . ', ';
-				$this->append("$actionName(#kaltura_request{}=ClientRequest, $arguments)");
+				$this->append("$actionName(#kaltura_configuration{}=ClientConfiguration, #kaltura_request{}=ClientRequest, $arguments)");
 			}
 			else
 			{
-				$this->append("$actionName(#kaltura_request{}=ClientRequest)");
+				$this->append("$actionName(#kaltura_configuration{}=ClientConfiguration, #kaltura_request{}=ClientRequest)");
 			}
 			$this->appendLine(" -> ");
 			
@@ -466,11 +477,11 @@ class ErlangClientGenerator extends ClientGeneratorFromXml
 		if(count($params))
 		{
 			$arguments = $this->getSignature($params);
-			$this->appendLine("$actionName(#kaltura_request{}=ClientRequest, $arguments) ->");
+			$this->appendLine("$actionName(#kaltura_configuration{}=ClientConfiguration, #kaltura_request{}=ClientRequest, $arguments) ->");
 		}
 		else
 		{
-			$this->appendLine("$actionName(#kaltura_request{}=ClientRequest) ->");
+			$this->appendLine("$actionName(#kaltura_configuration{}=ClientConfiguration, #kaltura_request{}=ClientRequest) ->");
 		}
 		$paramsCounter = 1;
 		$this->appendLine("	Params{$paramsCounter} = [");
@@ -490,7 +501,7 @@ class ErlangClientGenerator extends ClientGeneratorFromXml
 		
 		if($resultType)
 		{
-			$this->appendLine("	Results = kaltura_client:request(ClientRequest, Params{$paramsCounter}),");
+			$this->appendLine("	Results = kaltura_client:request(ClientConfiguration, ClientRequest, Params{$paramsCounter}),");
 			if($resultType[0] == '#')
 			{
 				$recordName = preg_replace(array('/^#/', '/\{\}$/'), array('', ''), $resultType);
@@ -503,7 +514,7 @@ class ErlangClientGenerator extends ClientGeneratorFromXml
 		}
 		else
 		{
-			$this->appendLine("	kaltura_client:request(ClientRequest, Params),");
+			$this->appendLine("	kaltura_client:request(ClientConfiguration, ClientRequest, Params{$paramsCounter}),");
 			$this->appendLine("	void.");
 		}
 	}
@@ -603,14 +614,14 @@ class ErlangClientGenerator extends ClientGeneratorFromXml
 				if($configurationProperty == 'clientTag')
 				{
 					$date = date('y-m-d');
-					$value = 'erlang:$date';
+					$value = "<<\"erlang:$date\">>";
 				}
 				if($configurationProperty == 'apiVersion')
 				{
-					$value = $this->_doc->documentElement->getAttribute('apiVersion');;
+					$value = '<<"' . $this->_doc->documentElement->getAttribute('apiVersion') . '">>';
 				}
 				
-				$this->append("	$configurationProperty = null :: $type");
+				$this->append("	$configurationProperty = $value :: $type");
 				$isFirst = false;
 			}
 		}

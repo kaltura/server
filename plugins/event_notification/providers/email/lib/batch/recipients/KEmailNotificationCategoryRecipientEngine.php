@@ -13,8 +13,10 @@ class KEmailNotificationCategoryRecipientEngine extends KEmailNotificationRecipi
 	function getRecipients(array $contentParameters)
 	{
 		$recipients = array();
+		$pager = new KalturaFilterPager();
+		$pager->pageSize = 500;
 		//List categoryKusers
-		$categoryUserList = KBatchBase::$kClient->categoryUser->listAction($this->recipientJobData->categoryUserFilter, new KalturaFilterPager());
+		$categoryUserList = KBatchBase::$kClient->categoryUser->listAction($this->recipientJobData->categoryUserFilter, $pager);
 		if (!count($categoryUserList->objects))
 			return $recipients;
 		
@@ -24,7 +26,7 @@ class KEmailNotificationCategoryRecipientEngine extends KEmailNotificationRecipi
 		
 		$userFilter = new KalturaUserFilter();
 		$userFilter->idIn = implode(',', $categoryUserIds);
-		$userList = KBatchBase::$kClient->user->listAction($userFilter, new KalturaFilterPager());
+		$userList = KBatchBase::$kClient->user->listAction($userFilter, $pager);
 		foreach ($userList->objects as $user)
 		{
 			/* @var $user KalturaUser */

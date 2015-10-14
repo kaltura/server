@@ -78,6 +78,7 @@ class KalturaBaseEntry extends KalturaObject implements IRelatedFilterable, IApi
 	 * Comma separated list of full names of categories to which this entry belongs. Only categories that don't have entitlement (privacy context) are listed, to retrieve the full list of categories, use the categoryEntry.list action. 
 	 * 
 	 * @var string
+	 * @deprecated
 	 * @filter matchand, matchor, notcontains
 	 * @requiresPermission insert,update
 	 */
@@ -87,6 +88,7 @@ class KalturaBaseEntry extends KalturaObject implements IRelatedFilterable, IApi
 	 * Comma separated list of ids of categories to which this entry belongs. Only categories that don't have entitlement (privacy context) are listed, to retrieve the full list of categories, use the categoryEntry.list action. 
 	 * 
 	 * @var string
+	 * @deprecated
 	 * @filter matchand, matchor, notcontains, empty
 	 * @requiresPermission insert,update
 	 */
@@ -412,7 +414,6 @@ class KalturaBaseEntry extends KalturaObject implements IRelatedFilterable, IApi
 	{
 		if (is_null($dbObject))
 		{
-			KalturaLog::debug("Creating new entry");
 			$dbObject = new entry();
 		}
 		

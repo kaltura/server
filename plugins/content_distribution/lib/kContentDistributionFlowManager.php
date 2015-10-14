@@ -1075,7 +1075,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		
 		$entry = entryPeer::retrieveByPK($metadata->getObjectId());
 		if (!$entry){
-			KalturaLog::debug("Entry [".$metadata->getObjectId()."] not found");
+			KalturaLog::info("Entry [".$metadata->getObjectId()."] not found");
 			return true; 
 		}
 		$entryDistributions = EntryDistributionPeer::retrieveByEntryId($metadata->getObjectId());
@@ -1169,7 +1169,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		$xmlPath = kFileSyncUtils::getLocalFilePathForKey($syncKey);
 		if(!$xmlPath)
 		{
-			KalturaLog::log("Entry metadata xml not found");
+			KalturaLog::err("Entry metadata xml not found");
 			return true;
 		}
 		$xml = new KDOMDocument();
@@ -1185,15 +1185,11 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 				$previousXml = new KDOMDocument();
 				$previousXml->load($xmlPath);
 			}
-			else 
-			{
-				KalturaLog::log("Entry metadata previous version xml not found");
-			}
 		}
 		
 		$entry = entryPeer::retrieveByPK($metadata->getObjectId());
 		if (!$entry){
-			KalturaLog::debug("Entry [".$metadata->getObjectId()."] not found");
+			KalturaLog::info("Entry [".$metadata->getObjectId()."] not found");
 			return true; 
 		}
 		
@@ -1582,7 +1578,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 				
 			if($entryDistribution->getDirtyStatus() == EntryDistributionDirtyStatus::DELETE_REQUIRED)
 			{
-				KalturaLog::log("Entry distribution [" . $entryDistribution->getId() . "] already flaged for deletion");
+				KalturaLog::log("Entry distribution [" . $entryDistribution->getId() . "] already flagged for deletion");
 				continue;
 			}
 				
@@ -1618,7 +1614,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 			$entryDistribution = EntryDistributionPeer::retrieveByEntryAndProfileId($entry->getId(), $distributionProfile->getId());
 			if($entryDistribution)
 			{
-				KalturaLog::debug("Found entry distribution object with id [" . $entryDistribution->getId() . "] for distrinution profle [" . $distributionProfile->getId() . "]");
+				KalturaLog::info("Found entry distribution object with id [" . $entryDistribution->getId() . "] for distrinution profle [" . $distributionProfile->getId() . "]");
 				self::onEntryDistributionUpdateRequired($entryDistribution);
 				continue;
 			}

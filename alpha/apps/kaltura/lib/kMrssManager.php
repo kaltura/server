@@ -460,6 +460,32 @@ class kMrssManager
 		}
 			
 		$categories = explode(',', $entry->getCategories());
+		if (count($features) && in_array (ObjectFeatureType::CATEGORY_ENTRIES, $features))
+		{
+			$partner = PartnerPeer::retrieveByPK(kCurrentContext::getCurrentPartnerId());
+			$partnerEntitlement = $partner->getDefaultEntitlementEnforcement();
+	
+			kEntitlementUtils::initEntitlementEnforcement($partner->getId() , false);
+			$categories = array ();
+			$categoryEntries = categoryEntryPeer::retrieveActiveByEntryId($entry->getId());
+			$categoryIds = array ();
+			foreach ($categoryEntries as $categoryEntry)
+			{
+				$categoryIds[] = $categoryEntry->getCategoryId();
+			}
+			$entryCats = categoryPeer::retrieveByPKs($categoryIds);
+			
+			foreach ($entryCats as $entryCat){
+				$categories[] = $entryCat->getFullName();
+			}	
+
+			if ($partnerEntitlement)
+				kEntitlementUtils::initEntitlementEnforcement($partner->getId() , true);
+				
+			$keyToDelete = array_search(ObjectFeatureType::CATEGORY_ENTRIES, $features);
+			unset ($features[$keyToDelete]);
+		}
+		
 		foreach($categories as $category)
 		{
 			$category = trim($category);
@@ -713,5 +739,4 @@ class kMrssManager
 		
 		return $mrss;
 	}
-	
 }

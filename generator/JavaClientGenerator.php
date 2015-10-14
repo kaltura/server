@@ -64,6 +64,7 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 		if($propertyNode->hasAttribute ( "description" ))
 		{
 			$desc = $propertyNode->getAttribute ( "description" );
+			$desc = str_replace(array("&", "<", ">"), array("&amp;", "&lt;", "&gt;"), $desc);
 			$formatDesc = wordwrap(str_replace(array("\t", "\n", "\r"), " ", $desc) , 80, "\n" . $prefix . "  ");
 			if($desc)
 				return ( $prefix . "/**  $formatDesc  */" );
@@ -375,7 +376,7 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 	public function generateToParamsMethod($classNode) 
 	{	
 		$type = $classNode->getAttribute ( "name" );
-		$this->appendLine ( "    public KalturaParams toParams() {" );
+		$this->appendLine ( "    public KalturaParams toParams() throws KalturaApiException {" );
 		$this->appendLine ( "        KalturaParams kparams = super.toParams();" );
 		$this->appendLine ( "        kparams.add(\"objectType\", \"$type\");" );
 		
@@ -400,8 +401,7 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 	{	
 		$type = $classNode->getAttribute ( "name" );
 		$this->appendLine ( "    public $type(Element node) throws KalturaApiException {" );
-		if ($needsSuperConstructor)
-			$this->appendLine ( "        super(node);" );
+		$this->appendLine ( "        super(node);" );
 			
 		if ($classNode->childNodes->length) 
 		{
@@ -412,6 +412,9 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 			$this->appendLine ( "        NodeList childNodes = node.getChildNodes();" );
 			$this->appendLine ( "        for (int i = 0; i < childNodes.getLength(); i++) {" );
 			$this->appendLine ( "            Node aNode = childNodes.item(i);" );
+//			$this->appendLine ( "            if(aNode.getChildNodes().getLength() == 0){" );
+//			$this->appendLine ( "            	continue;" );
+//			$this->appendLine ( "            }" );
 			$this->appendLine ( "            String nodeName = aNode.getNodeName();" );
 			$propBlock = "            ";
 			
@@ -459,6 +462,7 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 		switch ($propType) 
 		{
 			case "bigint" :
+			case "time" :
 			case "int" :
 			case "string" :
 			case "bool" :
@@ -466,6 +470,10 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 				if ( $propType == "float" )
 				{
 					$propType = "double";
+				}
+				if ( $propType == "time" )
+				{
+					$propType = "bigint";
 				}
 
 				$txtIsUsed = true;
@@ -759,6 +767,7 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 				$returnCall .= "return ParseUtils.parseMap($arrayType.class, resultXmlElement);";
 				break;
 			case "bigint":
+			case "time":
 			case "int" :
 			case "float" :
 			case "bool" :
@@ -973,7 +982,6 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 		$banner .= "/**\n";
 		$banner .= " * This class was generated using $currentFile\n";
 		$banner .= " * against an XML schema provided by Kaltura.\n";
-		$banner .= " * @date " . date ( DATE_RFC822 ) . "\n";
 		$banner .= " * \n";
 		$banner .= " * MANUAL CHANGES TO THIS CLASS WILL BE OVERWRITTEN.\n";
 		$banner .= " */\n";
@@ -1001,6 +1009,7 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 			return "Double.MIN_VALUE";
 			
 		case "bigint" :
+		case "time" :
 			return "Long.MIN_VALUE";
 		case "int" :
 			if ($propertyNode->hasAttribute ("enumType")) 
@@ -1023,6 +1032,7 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 		case "int":
 		case "float":
 		case "bigint":
+		case "time":
 			return '0';
 			
 		case "bool":
@@ -1046,6 +1056,7 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 			else
 				return "\"" . $defaultValue . "\"";
 		case "bigint":
+		case "time":
 			$value = trim ( $defaultValue );
 			if ($value == 'null')
 				$value = "Long.MIN_VALUE";
@@ -1088,6 +1099,7 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 			return ("Map<String, " . $arrayType . ">");
 
 		case "bigint" :
+		case "time" :
 			return "long";
 
 		case "bool" :
@@ -1117,6 +1129,7 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 			return $enforceObject ? "Double" : "double";
 
 		case "bigint" :
+		case "time" :
 			return $enforceObject ? "Long" : "long";
 			
 		case "int" :

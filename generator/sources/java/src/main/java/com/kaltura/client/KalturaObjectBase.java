@@ -28,6 +28,14 @@
 package com.kaltura.client;
 
 import java.io.Serializable;
+import java.util.HashMap;
+
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import com.kaltura.client.types.KalturaListResponse;
+import com.kaltura.client.utils.ParseUtils;
 
 /**
  * Ancestor class for all of the generated classes in the com.kaltura.client.types package.
@@ -37,8 +45,23 @@ import java.io.Serializable;
  */
 @SuppressWarnings("serial")
 public class KalturaObjectBase implements Serializable {
+    public HashMap<String, KalturaListResponse> relatedObjects;
 
-	public KalturaParams toParams() {
+    public KalturaObjectBase() {
+    }
+    
+    public KalturaObjectBase(Element node) throws KalturaApiException {
+        NodeList childNodes = node.getChildNodes();
+        for (int i = 0; i < childNodes.getLength(); i++) {
+            Node aNode = childNodes.item(i);
+            String nodeName = aNode.getNodeName();
+            if (nodeName.equals("relatedObjects")) {
+                this.relatedObjects = ParseUtils.parseMap(KalturaListResponse.class, aNode);
+            } 
+        }
+    }
+    
+	public KalturaParams toParams() throws KalturaApiException {
 		return new KalturaParams();
 	}
 	

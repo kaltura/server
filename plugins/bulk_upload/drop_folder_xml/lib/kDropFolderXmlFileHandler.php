@@ -31,16 +31,12 @@ class kDropFolderXmlFileHandler
 			
 			if($xmlFile)
 			{
-				KalturaLog::debug('All files finished uploading');
-	
-				KalturaLog::debug('Retrieving related files from the database');
 				$statuses = array(DropFolderFileStatus::PENDING, DropFolderFileStatus::WAITING);
 				$relatedFiles = DropFolderFilePeer::retrieveByLeadIdAndStatuses($file->getLeadDropFolderFileId(), $statuses);
 					
 				if($this->setFileProcessing($xmlFile, $relatedFiles))
 				{
 					$job = $this->addXMLBulkUploadJob($folder, $xmlFile);
-					KalturaLog::debug('BulkUpload added with job id ['.$job->getId().']');
 					$xmlFile->setBatchJobId($job->getId());
 					$xmlFile->save();
 				}			
@@ -112,11 +108,9 @@ class kDropFolderXmlFileHandler
 	 */
 	private function getXmlFileIfReadyForProcessing(DropFolderFile $file)
 	{
-		KalturaLog::debug('Check if file ['.$file->getId().'] ready for processing ');
-		
 		if(!$file->getLeadDropFolderFileId())
 		{
-			KalturaLog::debug('The XML file is not uploaded yet - changing status to WAITING');
+			KalturaLog::info('The XML file is not uploaded yet - changing status to WAITING');
 			return false;
 		}
 		$statuses = array(DropFolderFileStatus::PARSED, DropFolderFileStatus::UPLOADING, DropFolderFileStatus::DETECTED);
@@ -124,7 +118,7 @@ class kDropFolderXmlFileHandler
 		
 		if($nonReadyFiles && count($nonReadyFiles) > 0)
 		{
-			KalturaLog::debug('Not all the files finished uploading - changing status to WAITING');
+			KalturaLog::info('Not all the files finished uploading - changing status to WAITING');
 			return false;
 		}
 		
@@ -148,7 +142,6 @@ class kDropFolderXmlFileHandler
 	 */
 	private function addParsedContentResourceFile($fileName, DropFolderFile $leadFile, DropFolder $folder)
 	{
-		KalturaLog::debug('Trying to add content resource in status PARSED ['.$fileName.']');
 		try
 	    {
     	    $newFile = new DropFolderFile();
@@ -170,17 +163,14 @@ class kDropFolderXmlFileHandler
 					$unprocessedStatuses = array(DropFolderFileStatus::WAITING, DropFolderFileStatus::DETECTED, DropFolderFileStatus::UPLOADING, DropFolderFileStatus::PENDING);
 					if(in_array($existingFile->getStatus(), $unprocessedStatuses))
 					{
-						KalturaLog::debug('Updating drop folder file ['.$existingFile->getId().'] with lead id ['.$leadFile->getId().']');
 						$existingFile->setLeadDropFolderFileId($leadFile->getId());
 						$existingFile->save();						
 					}
 					else 
 					{
-						KalturaLog::debug('Deleting drop folder file ['.$existingFile->getId().']');
 						$existingFile->setStatus(DropFolderFileStatus::PURGED);
 						$existingFile->save();
 						
-						KalturaLog::debug('Adding new drop folder file ['.$newFile->getFileName().'] with status PARSED');
 						$newFileCopy = $newFile->copy();
 						$newFileCopy->save();					
 					}
@@ -202,8 +192,6 @@ class kDropFolderXmlFileHandler
 	 */
 	private function getContentResources(DropFolder $folder, DropFolderFile $file)
 	{
-		KalturaLog::debug('Parsing content resources from Xml');
-		
 		$contentResources = array();
 		$engineOptions = array(
 			'useCmd' => false,
@@ -216,7 +204,6 @@ class kDropFolderXmlFileHandler
 			throw new Exception(DropFolderXmlBulkUploadPlugin::XML_FILE_SIZE_EXCEED_LIMIT_MESSAGE, DropFolderXmlBulkUploadPlugin::getErrorCodeCoreValue(DropFolderXmlBulkUploadErrorCode::XML_FILE_SIZE_EXCEED_LIMIT));
 			
 		$xmlPath = $folder->getLocalFilePath($file->getFileName(), $file->getId(), $fileTransferManager);
-		KalturaLog::debug('Local XML path ['.$xmlPath.']');
 		
 		$xmlContent = $this->getOriginalOrTransformIfNeeded($folder, $xmlPath);
 		
@@ -236,14 +223,12 @@ class kDropFolderXmlFileHandler
 	{
 		$file->setStatus(DropFolderFileStatus::PROCESSING);
 		$affectedRows = $file->save();
-		KalturaLog::debug('Changing file status to Processing, file id ['.$file->getId().'] affected rows ['.$affectedRows.']');
 		if($affectedRows > 0)
 		{
 			foreach ($relatedFiles as $relatedFile) 
 			{
 				if($relatedFile->getId() != $file->getId())
 				{
-					KalturaLog::debug('Changing file status to Processing, file id ['.$relatedFile->getId().']');
 					$relatedFile->setStatus(DropFolderFileStatus::PROCESSING);
 					$relatedFile->save();
 				}
@@ -259,7 +244,7 @@ class kDropFolderXmlFileHandler
 		
 		if(!$folder->getConversionProfileId())
 		{
-			KalturaLog::debug('No conversion profile found on drop folder [' . $folder->getId() . '] assuming no xsl transformation is needed');
+			KalturaLog::info('No conversion profile found on drop folder [' . $folder->getId() . '] assuming no xsl transformation is needed');
 			return file_get_contents($xmlPath);
 		}
 		
@@ -267,7 +252,7 @@ class kDropFolderXmlFileHandler
 		
 		if(!$conversionProfile || (strlen($conversionProfile->getXsl()) == 0))
 		{
-			KalturaLog::debug('No conversion profile found Or no xsl transform found');
+			KalturaLog::info('No conversion profile found Or no xsl transform found');
 			return file_get_contents($xmlPath);
 		}
 		
@@ -275,7 +260,6 @@ class kDropFolderXmlFileHandler
 		$origianlXml = new KDOMDocument();
 		if(!$origianlXml->loadXML($originalXmlDoc))
 		{
-			KalturaLog::debug('Could not load original xml');
 			$errorMessage = kXml::getLibXmlErrorDescription($originalXmlDoc);
 			throw new Exception(DropFolderXmlBulkUploadPlugin::MALFORMED_XML_FILE_MESSAGE, DropFolderXmlBulkUploadPlugin::getErrorCodeCoreValue(DropFolderXmlBulkUploadErrorCode::MALFORMED_XML_FILE));
 		}
@@ -286,7 +270,6 @@ class kDropFolderXmlFileHandler
 		$xsl = new KDOMDocument();
 		if(!$xsl->loadXML($conversionProfile->getXsl()))
 		{
-			KalturaLog::debug('Could not load xsl '. $conversionProfile->getXsl());
 			$errorMessage = kXml::getLibXmlErrorDescription($conversionProfile->getXsl());
 			throw new Exception(DropFolderXmlBulkUploadPlugin::MALFORMED_XML_FILE_MESSAGE, DropFolderXmlBulkUploadPlugin::getErrorCodeCoreValue(DropFolderXmlBulkUploadErrorCode::MALFORMED_XML_FILE));
 		}
@@ -296,7 +279,6 @@ class kDropFolderXmlFileHandler
 		$transformedXml = $proc->transformToXML($origianlXml);
 		if(!$transformedXml)
 		{
-			KalturaLog::debug('Could not transform xml ' . $conversionProfile->getXsl());
 			$errorMessage = kXml::getLibXmlErrorDescription($conversionProfile->getXsl());
 			throw new Exception(DropFolderXmlBulkUploadPlugin::MALFORMED_XML_FILE_MESSAGE, DropFolderXmlBulkUploadPlugin::getErrorCodeCoreValue(DropFolderXmlBulkUploadErrorCode::MALFORMED_XML_FILE));
 		}
@@ -319,7 +301,6 @@ class kDropFolderXmlFileHandler
 	 */
 	private function addXMLBulkUploadJob(DropFolder $folder, DropFolderFile $leadDropFolderFile)
 	{	
-		KalturaLog::debug('Adding BulkUpload job');
 		try 
 		{
 			$coreBulkUploadType = DropFolderXmlBulkUploadPlugin::getBulkUploadTypeCoreValue(DropFolderXmlBulkUploadType::DROP_FOLDER_XML);
@@ -333,7 +314,6 @@ class kDropFolderXmlFileHandler
 			$data->setFileName($leadDropFolderFile->getFileName());
 						
 			$objectData = new kBulkUploadEntryData();
-			KalturaLog::debug('conversion profile id: '.$folder->getConversionProfileId());
 			$objectData->setConversionProfileId($folder->getConversionProfileId());
 			$data->setObjectData($objectData);
 	
@@ -357,10 +337,8 @@ class kDropFolderXmlFileHandler
 	 */
 	private function isXmlFile($fileName, DropFolder $folder)
 	{
-		KalturaLog::debug('checking if file '.$fileName.' is XML');
 		$isXml = false;
 		$fileNamePatterns = trim($folder->getFileNamePatterns(), ' *');
-		KalturaLog::debug('file name pattern [ '.$fileNamePatterns.']');
 		if($fileNamePatterns)
 			$isXml = stristr($fileName, $fileNamePatterns);
 		else

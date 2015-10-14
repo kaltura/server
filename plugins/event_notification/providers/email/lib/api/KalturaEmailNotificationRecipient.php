@@ -49,7 +49,6 @@ class KalturaEmailNotificationRecipient extends KalturaObject
 		
 		
 		$emailType = get_class($dbObject->getEmail());
-		KalturaLog::debug("Loading KalturaStringValue from type [$emailType]");
 		switch ($emailType)
 		{
 			case 'kStringValue':
@@ -73,7 +72,6 @@ class KalturaEmailNotificationRecipient extends KalturaObject
 		
 			
 		$nameType = get_class($dbObject->getName());
-		KalturaLog::debug("Loading KalturaStringValue from type [$nameType]");
 		switch ($nameType)
 		{
 			case 'kStringValue':

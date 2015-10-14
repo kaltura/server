@@ -23,7 +23,6 @@ class DrmLicenseUtils {
      */
     public function getPolicyId()
     {
-        KalturaLog::debug("Validating access control");
         $actions = $this->secureEntryHelper->getContextResult()->getActions();
         $policyId = null;
         foreach($actions as $action)

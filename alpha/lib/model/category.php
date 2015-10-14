@@ -385,7 +385,6 @@ class category extends Basecategory implements IIndexable, IRelatedObject
 	private function entryAlreadyBlongToCategory(array $entryCategoriesIds = null)
 	{
 		if (!$entryCategoriesIds){
-			KalturaLog::debug("No entry categories ids supplied");
 			return false;
 		}
 		

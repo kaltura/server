@@ -338,14 +338,14 @@ class kXml
 		$xml = new KDOMDocument();
 		if(!$xml->loadXML($xmlStr))
 		{
-			KalturaLog::debug("Could not load xmlStr");
+			KalturaLog::err("Could not load xmlStr");
 			return null;
 		}
 		
 		$xsl = new KDOMDocument();
 		if(!$xsl->loadXML($xslt))
 		{
-			KalturaLog::debug("Could not load xslt");
+			KalturaLog::err("Could not load xslt");
 			return null;
 		}
 		

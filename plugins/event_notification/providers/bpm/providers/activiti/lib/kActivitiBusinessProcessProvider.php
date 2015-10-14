@@ -43,7 +43,6 @@ class kActivitiBusinessProcessProvider extends kBusinessProcessProvider
 		$ret = array();
 		while($processes)
 		{
-			KalturaLog::debug('processes [' . print_r($processes, true) . ']');
 			foreach($processes->getData() as $process)
 			{
 				/* @var $process ActivitiListOfProcessDefinitionsResponseData */

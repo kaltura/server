@@ -65,7 +65,6 @@ class PartnerController extends Zend_Controller_Action
 				$partner->type = Kaltura_Client_Enum_PartnerType::ADMIN_CONSOLE;
 				$templatePartnerId = $form->getValue('partner_template_id');
 				$client->startMultiRequest();
-				KalturaLog::debug("is multi request: ".$client->isMultiRequest());
 				$client->partner->register($partner, null, $templatePartnerId);
 				$config = new Kaltura_Client_SystemPartner_Type_SystemPartnerConfiguration();
 				$config->partnerPackage = $form->getValue('partner_package');
@@ -277,8 +276,6 @@ class PartnerController extends Zend_Controller_Action
 		$form = KalturaPluginManager::loadObject('Form_Partner_BaseStorageConfiguration', $type, array($partnerId, $type));
 		/* @var $form Form_StorageConfiguration */
 		
-		KalturaLog::debug("form class: ". get_class($form));
-		
 		if(!$form || !($form instanceof Form_Partner_BaseStorageConfiguration))
 		{
 			if($type == Kaltura_Client_Enum_StorageProfileProtocol::LOCAL)
@@ -390,7 +387,6 @@ class PartnerController extends Zend_Controller_Action
 			}
 		}
 		
-		KalturaLog::debug("storage protocol: $type");
 		$this->view->form = $form;
 		$this->view->protocol = $type;
 	}
