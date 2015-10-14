@@ -1,3 +1,25 @@
+# Kajam-11.0.0 #
+
+## Like->list API call ##
+
+- Issue Type: New Feature
+- Issue ID: PLAT-3920
+
+#### Configuration ####
+ 
+None.
+
+#### Deployment Scripts ####
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2015_10_25_add_like_list_permission.php
+
+	(only for on-prem/CE environments)
+	php deployment/updates/sql/2015_10_25_alter_kvote_table_puser_id_table.sql
+	php deployment/updates/scripts/2015_10_25_populate_like_table_puser_id_field.php
+	
+#### Known Issues & Limitations ####
+
+None.
+
 # Jupiter-10.21.0 #
 
 ## Cielo24 plugin ##
