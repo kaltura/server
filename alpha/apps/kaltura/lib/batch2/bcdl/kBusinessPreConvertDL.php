@@ -9,12 +9,6 @@ class kBusinessPreConvertDL
 	const TAG_VARIANT_B = 'watermark_b';
 	const TAG_VARIANT_PAIR_ID = 'watermark_pair_';
 	
-	const TRANSCODING_METADATA_PROF_SYSNAME = 'TRANSCODINGPARAMS';
-		
-	const TRANSCODING_METADATA_WATERMMARK_SETTINGS = 'WatermarkSettings';
-	const TRANSCODING_METADATA_WATERMMARK_IMAGE_ENTRY = 'WatermarkImageEntry';
-	const TRANSCODING_METADATA_WATERMMARK_IMAGE_URL = 'WatermarkImageURL';
-
 	/**
 	 * batch redecideFlavorConvert is the decision layer for a single flavor conversion
 	 *
@@ -423,7 +417,6 @@ class kBusinessPreConvertDL
 		
 		$flavorParams->setDynamicAttributes($dynamicAttributes);
 			
-		self::adjustFlavorParamsToCustomMetadataTransodingSettings($entryId, array($flavorParams));
 		$flavor = self::validateFlavorAndMediaInfo($flavorParams, $mediaInfo, $errDescription);
 		
 		if (is_null($flavor))
@@ -493,7 +486,6 @@ class kBusinessPreConvertDL
 					KalturaLog::log("Creating flavor params output for asset [" . $tagedFlavorAsset->getId() . "]");
 				
 					$flavorParams = assetParamsPeer::retrieveByPK($tagedFlavorAsset->getId());
-					self::adjustFlavorParamsToCustomMetadataTransodingSettings($entryId, array($flavorParams));
 					$flavorParamsOutput = self::validateFlavorAndMediaInfo($flavorParams, $mediaInfo, $errDescription);
 					
 					if (is_null($flavorParamsOutput))
@@ -549,7 +541,6 @@ class kBusinessPreConvertDL
 			KalturaLog::log("Validate Conversion Profile, media info [" . $mediaInfo->getId() . "]");
 		}
 		
-		self::adjustFlavorParamsToCustomMetadataTransodingSettings($entryId, $flavors);
 		// call the decision layer
 		KalturaLog::log("Generate Target " . count($flavors) . " Flavors supplied");
 		$cdl = KDLWrap::CDLGenerateTargetFlavors($mediaInfo, $flavors);
@@ -1433,7 +1424,6 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 		{
 			KalturaLog::log("Source flavor asset requires conversion");
 				
-			self::adjustFlavorParamsToCustomMetadataTransodingSettings($entryId, array($sourceFlavor));
 			$srcSyncKey = $originalFlavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 			$errDescription = null;
 			$sourceFlavorOutput = self::validateFlavorAndMediaInfo($sourceFlavor, $mediaInfo, $errDescription);
@@ -1659,153 +1649,5 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 			}
 		}	
 		return $shouldConvert;	
-	}
-	
-	/**
-	 * 
-	 * @param unknown_type $entryId
-	 * @param array $flavors
-	 */
-	protected static function adjustFlavorParamsToCustomMetadataTransodingSettings($entryId, array $flavors)
-	{
-		$entry = entryPeer::retrieveByPK($entryId);
-		if(!isset($entry)){
-			KalturaLog::log("Bad entry id ($entryId).");
-			return;
-		}
-		
-		$partnerId = $entry->getPartnerId();
-		$profile = MetadataProfilePeer::retrieveBySystemName(self::TRANSCODING_METADATA_PROF_SYSNAME,$partnerId);
-		if(!isset($profile)){
-			KalturaLog::log("No Transcoding Metadata Profile (sysName:".self::TRANSCODING_METADATA_PROF_SYSNAME.", partner:$partnerId). Nothing to adjust");
-			return;
-		}
-
-		$metadata = MetadataPeer::retrieveByObject($profile->getId(), MetadataObjectType::ENTRY, $entryId);
-		if(!isset($metadata)){
-			KalturaLog::log("No Metadata for entry($entryId), metadata profile (id:".$profile->getId()."). Nothing to adjust");
-			return;
-		}
-
-		KalturaLog::log("Entry ($entryId) has following metadata fields:".print_r($metadata,1));
-		
-			/*
-			 * Retrieve the associated XML file
-			 */
-		$key = $metadata->getSyncKey(Metadata::FILE_SYNC_METADATA_DATA);
-		if(!isset($key)){
-			KalturaLog::log("Entry($entryId) metadata object misses file sync key! Nothing to adjust");
-			return;
-		}
-		$xmlStr = kFileSyncUtils::file_get_contents($key, true, false);
-		if(!isset($xmlStr)){
-			KalturaLog::log("Entry($entryId) metadata object misses valid file sync! Nothing to adjust");
-			return;
-		}
-		
-		KalturaLog::log("Adjusting: entry($entryId),metadata profile(".self::TRANSCODING_METADATA_PROF_SYSNAME."),xml==>$xmlStr");
-
-		$watermarkSettingsStr = null;
-		$imageEntry = null;
-		$imageUrl = null;
-		
-			/*
-			 * Retrieve the custom metadata fields from the asocieted XML
-			 */
-		$xml = new SimpleXMLElement($xmlStr);
-		$fldName = self::TRANSCODING_METADATA_WATERMMARK_SETTINGS;
-		if(isset($xml->$fldName)) {
-			$watermarkSettingsStr =(string)$xml->$fldName;
-			KalturaLog::log("Found metadata - $fldName($watermarkSettingsStr)");
-		}
-		
-		$fldName = self::TRANSCODING_METADATA_WATERMMARK_IMAGE_ENTRY;
-		if(isset($xml->$fldName)) {
-			$imageEntry =(string)$xml->$fldName;
-			KalturaLog::log("Found metadata - $fldName($imageEntry)");
-		}
-		$fldName = self::TRANSCODING_METADATA_WATERMMARK_IMAGE_URL;
-		if(isset($xml->$fldName)) {
-			$imageUrl =(string)$xml->$fldName;
-			KalturaLog::log("Found metadata - $fldName($imageUrl)");
-		}
-			/*
-			 * The imageEntry is preffered if both imageEntry and url are set,
-			 * in such case - remove the url
-			 */
-		if(isset($imageEntry) && isset($imageUrl)) {
-			KalturaLog::log("Found both ".self::TRANSCODING_METADATA_WATERMMARK_IMAGE_URL."($imageEntry) and $fldName($imageUrl). Removing $fldName");
-			$imageUrl = null; // 
-		}
-		
-			/*
-			 * If custom-metadate contains 'full' WM settings ('watermarkSettingsStr' is set), 
-			 * adjust it to custom meta imageEntry/imageUrl values,
-			 * if those provided.
-			 */
-		if(isset($watermarkSettingsStr)) {
-			$watermarkSettings = json_decode($watermarkSettingsStr);
-			self::adjustWatermarSettings($watermarkSettings, $imageEntry, $imageUrl);
-		}
-		
-			/*
-			 * Loop through the flavor params to update the WM settings,
-			 * if it is required.
-			 */
-		foreach($flavors as $k=>$flavor) {
-			KalturaLog::log("Processing flavor id:".$flavor->getId());
-			$wmDataObj = null;
-			/*
-			 * The 'full' WM settings in the custom metadata overides any exitings WM settings 
-			 */
-			if(isset($watermarkSettings)) {
-				$wmDataObj = clone $watermarkSettings;
-			}
-			else {
-			/*
-			 * No 'full' settings.
-			 * Adjust the existing flavor WM data with custom metadata imageEntry/imageUrl
-			 */
-				$wmDataStr = $flavor->getWatermarkData();
-				if(isset($wmDataStr)){
-					$wmDataObj = json_decode($wmDataStr);
-					if(self::adjustWatermarSettings($wmDataObj, $imageEntry, $imageUrl)==false){
-						continue;
-					}
-				}
-			}
-			
-			if(isset($wmDataObj)) {
-				$toJson = json_encode($wmDataObj);
-				$flavor->setWatermarkData($toJson);
-				$flavors[$k]= $flavor;
-				KalturaLog::log("Set flavor (".$flavor->getId().") WM to $toJson");
-			}
-		}
-	}
-
-	/**
-	 * 
-	 * @param unknown_type $watermarkSettings
-	 * @param unknown_type $imageEntry
-	 * @param unknown_type $imageUrl
-	 */
-	protected static function adjustWatermarSettings($watermarkSettings, $imageEntry, $imageUrl)
-	{
-		if(isset($imageEntry)) {
-			$watermarkSettings->imageEntry = $imageEntry;
-			if(isset($watermarkSettings->url)){
-				unset($watermarkSettings->url);
-			}
-		}
-		else if(isset($imageUrl)) {
-			$watermarkSettings->imageUrl = $imageUrl;
-			if(isset($watermarkSettings->imageEntry)){
-				unset($watermarkSettings->imageEntry);
-			}
-		}
-		else
-			return false;
-		return true;
 	}
 }
