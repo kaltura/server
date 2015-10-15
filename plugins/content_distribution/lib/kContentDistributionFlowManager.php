@@ -1743,10 +1743,33 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 				}
 				
 				$listChanged = self::assignAssetsAndValidateForSubmission($entryDistribution, $entry, $distributionProfile, DistributionAction::UPDATE);
+				
+				//handle case where one of the validation errors is cause for deleting the distributed data
+				$validationErrors = $entryDistribution->getValidationErrors();
+				foreach ($validationErrors as $validationError)
+				{
+					/* @var $validationError kDistributionValidationError */
+					if ($validationError->getRequiresDelete ())
+					{
+						KalturaLog::log("Entry distribution [" . $entryDistribution->getId() . "] has a validation error that should trigger it's deletion");
+						if ($distributionProfile->getDeleteEnabled() == DistributionProfileActionStatus::AUTOMATIC)
+						{
+							self::submitDeleteEntryDistribution($entryDistribution, $distributionProfile);
+						}
+						else
+						{
+							KalturaLog::log("Entry distribution [" . $entryDistribution->getId() . "] should not be deleted automatically");
+							$entryDistribution->setDirtyStatus(EntryDistributionDirtyStatus::DELETE_REQUIRED);
+							$entryDistribution->save();
+							continue;
+						}
+					}	
+				
+				}
+				
 				if (!$listChanged){
 					continue;
 				}
-				$validationErrors = $entryDistribution->getValidationErrors();
 				
 				if(!count($validationErrors) && $distributionProfile->getUpdateEnabled() == DistributionProfileActionStatus::AUTOMATIC)
 				{

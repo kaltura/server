@@ -57,6 +57,13 @@ class Form_DistributionFieldConfig_SubForm extends Zend_Form_SubForm
 			'label' 		=> 'Trigger Update:', 
 		));
 		
+		$this->addElement('checkbox', 'triggerDeleteOnError', array(
+			'filters'		=> array('StringTrim'),
+			'decorators'	=> array('ViewHelper'),
+			'class' 		=> 'update-on-change',
+			'label' 		=> 'Trigger data deletion on error:', 
+		));
+		
 		$this->addElement('text', 'updateParamsArrayString', array(
 			'filters'		=> array('StringTrim'),
 			'class'			=> 'update-param',
