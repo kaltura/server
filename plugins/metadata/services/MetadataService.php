@@ -317,6 +317,7 @@ class MetadataService extends KalturaBaseService
 			else 
 			{
 				KalturaLog::info("XML data MD5 matches current filesync content MD5. Update is not necessary.");
+				$dbMetadata->save();
 			}
 		}
 		
