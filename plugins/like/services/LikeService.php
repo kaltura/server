@@ -10,7 +10,6 @@ class LikeService extends KalturaBaseService
 {
     const KVOTE_LIKE_RANK_VALUE = 1;
     const KVOTE_UNLIKE_RANK_VALUE = 0;
-    const SEARCH_LIKES_FOR_ALL_USERS = "LIKE_LIST_SEARCH";
     
     public function initService($serviceId, $serviceName, $actionName)
     {
@@ -136,8 +135,8 @@ class LikeService extends KalturaBaseService
 		{			
 			if($filter->entryIdEqual && !entryPeer::retrieveByPK($filter->entryIdEqual))			
 				throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $filter->entryIdEqual);			
-			if(!$filter->userIdEqual && !PermissionPeer::isValidForPartner(self::SEARCH_LIKES_FOR_ALL_USERS,kCurrentContext::$ks_partner_id))			
-				throw new KalturaAPIException(KalturaLikeErrors::SEARCH_ALL_USERS_FORBIDEN);			
+			if($filter->userIdEqual && !kuserPeer::getActiveKuserByPartnerAndUid(kCurrentContext::$ks_partner_id, $filter->userIdEqual))
+				throw new KalturaAPIException(KalturaErrors::USER_NOT_FOUND);			
 		}
 		
 		if(!$pager)

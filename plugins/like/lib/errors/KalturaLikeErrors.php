@@ -8,6 +8,4 @@ class KalturaLikeErrors extends KalturaErrors
 	const USER_LIKE_FOR_ENTRY_ALREADY_EXISTS = "USER_LIKE_FOR_ENTRY_ALREADY_EXISTS;;This user already likes this entry";
 	
 	const USER_LIKE_FOR_ENTRY_NOT_FOUND = "USER_LIKE_FOR_ENTRY_NOT_FOUND;;This user does not like this entry";
-	
-	const SEARCH_ALL_USERS_FORBIDDEN = "SEARCH_ALL_USERS_FORBIDDEN;;not allowed to search entries' likes of all users";
 }
