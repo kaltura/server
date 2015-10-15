@@ -1,6 +1,6 @@
 <?php
 
-class AMFData
+class KAMFData
 {
     public $pts;
     public $timestamp;
@@ -48,7 +48,7 @@ class KAMFMediaInfoParser extends KBaseMediaParser{
             // the first data packet is of smaller size of 205 chars
             if (strlen($tmp->data) > self::MinAMFSizeToTryParse) {
 
-                $amfData = new AMFData();
+                $amfData = new KAMFData();
                 $amfData->pts = $tmp->pts;
                 $amfData->timestamp = $this->getTimestampFromAMF($tmp->data);
 
