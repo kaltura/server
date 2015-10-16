@@ -316,7 +316,7 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 		
 		foreach($dataTimes as $key => $value)
 		{
-			$data[$key] = is_numeric($value) ? $value : 0;
+			$data[$key] = is_numeric($value) ? min($value, 0x7fffffff) : 0;
 		}
 		
 		foreach($dataJson as $key => $value)
