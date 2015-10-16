@@ -1771,6 +1771,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 					continue;
 				}
 				
+				$validationErrors = $entryDistribution->getValidationErrors();
 				if(!count($validationErrors) && $distributionProfile->getUpdateEnabled() == DistributionProfileActionStatus::AUTOMATIC)
 				{
 					self::submitUpdateEntryDistribution($entryDistribution, $distributionProfile);
