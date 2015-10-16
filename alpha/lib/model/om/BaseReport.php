@@ -727,7 +727,9 @@ abstract class BaseReport extends BaseObject  implements Persistent {
 		// already in the pool.
 
 		ReportPeer::setUseCriteriaFilter(false);
-		$stmt = ReportPeer::doSelectStmt($this->buildPkeyCriteria(), $con);
+		$criteria = $this->buildPkeyCriteria();
+		ReportPeer::addSelectColumns($criteria);
+		$stmt = BasePeer::doSelect($criteria, $con);
 		ReportPeer::setUseCriteriaFilter(true);
 		$row = $stmt->fetch(PDO::FETCH_NUM);
 		$stmt->closeCursor();
@@ -902,7 +904,7 @@ abstract class BaseReport extends BaseObject  implements Persistent {
 	/**
 	 * Code to be run before persisting the object
 	 * @param PropelPDO $con
-	 * @return bloolean
+	 * @return boolean
 	 */
 	public function preSave(PropelPDO $con = null)
 	{
@@ -927,8 +929,7 @@ abstract class BaseReport extends BaseObject  implements Persistent {
 	 */
 	public function preInsert(PropelPDO $con = null)
 	{
-    	$this->setCreatedAt(time());
-    	
+		$this->setCreatedAt(time());
 		$this->setUpdatedAt(time());
 		return parent::preInsert($con);
 	}
@@ -963,7 +964,8 @@ abstract class BaseReport extends BaseObject  implements Persistent {
 		if($this->isModified())
 		{
 			kQueryCache::invalidateQueryCache($this);
-			kEventsManager::raiseEvent(new kObjectChangedEvent($this, $this->tempModifiedColumns));
+			$modifiedColumns = $this->tempModifiedColumns;
+			kEventsManager::raiseEvent(new kObjectChangedEvent($this, $modifiedColumns));
 		}
 			
 		$this->tempModifiedColumns = array();
@@ -1307,17 +1309,20 @@ abstract class BaseReport extends BaseObject  implements Persistent {
 
 		$criteria->add(ReportPeer::ID, $this->id);
 		
-		if($this->alreadyInSave && count($this->modifiedColumns) == 2 && $this->isColumnModified(ReportPeer::UPDATED_AT))
+		if($this->alreadyInSave)
 		{
-			$theModifiedColumn = null;
-			foreach($this->modifiedColumns as $modifiedColumn)
-				if($modifiedColumn != ReportPeer::UPDATED_AT)
-					$theModifiedColumn = $modifiedColumn;
-					
-			$atomicColumns = ReportPeer::getAtomicColumns();
-			if(in_array($theModifiedColumn, $atomicColumns))
-				$criteria->add($theModifiedColumn, $this->getByName($theModifiedColumn, BasePeer::TYPE_COLNAME), Criteria::NOT_EQUAL);
-		}
+			if (count($this->modifiedColumns) == 2 && $this->isColumnModified(ReportPeer::UPDATED_AT))
+			{
+				$theModifiedColumn = null;
+				foreach($this->modifiedColumns as $modifiedColumn)
+					if($modifiedColumn != ReportPeer::UPDATED_AT)
+						$theModifiedColumn = $modifiedColumn;
+						
+				$atomicColumns = ReportPeer::getAtomicColumns();
+				if(in_array($theModifiedColumn, $atomicColumns))
+					$criteria->add($theModifiedColumn, $this->getByName($theModifiedColumn, BasePeer::TYPE_COLNAME), Criteria::NOT_EQUAL);
+			}
+		}		
 
 		return $criteria;
 	}

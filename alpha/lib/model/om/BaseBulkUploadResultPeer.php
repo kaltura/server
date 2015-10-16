@@ -961,6 +961,15 @@ abstract class BaseBulkUploadResultPeer {
 	{
 		return array();
 	}
+	
+	/**
+	 * Return array of custom-data fields that shouldn't be auto-updated.
+	 * @return array
+	 */
+	public static function getAtomicCustomDataFields()
+	{
+		return array();
+	}
 
 	/**
 	 * Method to DELETE all rows from the bulk_upload_result table.

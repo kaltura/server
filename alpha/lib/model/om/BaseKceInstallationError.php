@@ -558,7 +558,9 @@ abstract class BaseKceInstallationError extends BaseObject  implements Persisten
 		// already in the pool.
 
 		KceInstallationErrorPeer::setUseCriteriaFilter(false);
-		$stmt = KceInstallationErrorPeer::doSelectStmt($this->buildPkeyCriteria(), $con);
+		$criteria = $this->buildPkeyCriteria();
+		KceInstallationErrorPeer::addSelectColumns($criteria);
+		$stmt = BasePeer::doSelect($criteria, $con);
 		KceInstallationErrorPeer::setUseCriteriaFilter(true);
 		$row = $stmt->fetch(PDO::FETCH_NUM);
 		$stmt->closeCursor();
@@ -733,7 +735,7 @@ abstract class BaseKceInstallationError extends BaseObject  implements Persisten
 	/**
 	 * Code to be run before persisting the object
 	 * @param PropelPDO $con
-	 * @return bloolean
+	 * @return boolean
 	 */
 	public function preSave(PropelPDO $con = null)
 	{
@@ -791,7 +793,8 @@ abstract class BaseKceInstallationError extends BaseObject  implements Persisten
 		if($this->isModified())
 		{
 			kQueryCache::invalidateQueryCache($this);
-			kEventsManager::raiseEvent(new kObjectChangedEvent($this, $this->tempModifiedColumns));
+			$modifiedColumns = $this->tempModifiedColumns;
+			kEventsManager::raiseEvent(new kObjectChangedEvent($this, $modifiedColumns));
 		}
 			
 		$this->tempModifiedColumns = array();

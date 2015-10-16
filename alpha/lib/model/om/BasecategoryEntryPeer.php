@@ -26,7 +26,7 @@ abstract class BasecategoryEntryPeer {
 	const TM_CLASS = 'categoryEntryTableMap';
 	
 	/** The total number of columns. */
-	const NUM_COLUMNS = 9;
+	const NUM_COLUMNS = 10;
 
 	/** The number of lazy-loaded columns. */
 	const NUM_LAZY_LOAD_COLUMNS = 0;
@@ -863,6 +863,15 @@ abstract class BasecategoryEntryPeer {
 	 * @return array
 	 */
 	public static function getAtomicColumns()
+	{
+		return array();
+	}
+	
+	/**
+	 * Return array of custom-data fields that shouldn't be auto-updated.
+	 * @return array
+	 */
+	public static function getAtomicCustomDataFields()
 	{
 		return array();
 	}

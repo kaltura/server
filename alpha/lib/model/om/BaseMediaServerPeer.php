@@ -291,7 +291,7 @@ abstract class BaseMediaServerPeer {
 			}
 		}
 	}
-	
+						
 	/**
 	 * Adds the supplied object array to the instance pool.
 	 *  
@@ -788,6 +788,15 @@ abstract class BaseMediaServerPeer {
 	 * @return array
 	 */
 	public static function getAtomicColumns()
+	{
+		return array();
+	}
+	
+	/**
+	 * Return array of custom-data fields that shouldn't be auto-updated.
+	 * @return array
+	 */
+	public static function getAtomicCustomDataFields()
 	{
 		return array();
 	}

@@ -1357,6 +1357,9 @@ abstract class BasesyndicationFeed extends BaseObject  implements Persistent {
 	 */
 	public function hydrate($row, $startcol = 0, $rehydrate = false)
 	{
+		// Nullify cached objects
+		$this->m_custom_data = null;
+		
 		try {
 
 			$this->id = ($row[$startcol + 0] !== null) ? (string) $row[$startcol + 0] : null;
@@ -1449,7 +1452,9 @@ abstract class BasesyndicationFeed extends BaseObject  implements Persistent {
 		// already in the pool.
 
 		syndicationFeedPeer::setUseCriteriaFilter(false);
-		$stmt = syndicationFeedPeer::doSelectStmt($this->buildPkeyCriteria(), $con);
+		$criteria = $this->buildPkeyCriteria();
+		syndicationFeedPeer::addSelectColumns($criteria);
+		$stmt = BasePeer::doSelect($criteria, $con);
 		syndicationFeedPeer::setUseCriteriaFilter(true);
 		$row = $stmt->fetch(PDO::FETCH_NUM);
 		$stmt->closeCursor();
@@ -1536,18 +1541,80 @@ abstract class BasesyndicationFeed extends BaseObject  implements Persistent {
 			} else {
 				$ret = $ret && $this->preUpdate($con);
 			}
-			if ($ret) {
-				$affectedRows = $this->doSave($con, $skipReload);
-				if ($isInsert) {
-					$this->postInsert($con);
-				} else {
-					$this->postUpdate($con);
-				}
-				$this->postSave($con);
-				syndicationFeedPeer::addInstanceToPool($this);
-			} else {
-				$affectedRows = 0;
+			
+			if (!$ret || !$this->isModified()) {
+				$con->commit();
+				return 0;
 			}
+			
+			for ($retries = 1; $retries < KalturaPDO::SAVE_MAX_RETRIES; $retries++)
+			{
+               $affectedRows = $this->doSave($con);
+                if ($affectedRows || !$this->isColumnModified(syndicationFeedPeer::CUSTOM_DATA)) //ask if custom_data wasn't modified to avoid retry with atomic column 
+                	break;
+
+                KalturaLog::debug("was unable to save! retrying for the $retries time");
+                $criteria = $this->buildPkeyCriteria();
+				$criteria->addSelectColumn(syndicationFeedPeer::CUSTOM_DATA);
+                $stmt = BasePeer::doSelect($criteria, $con);
+                $cutsomDataArr = $stmt->fetchAll(PDO::FETCH_COLUMN);
+                $newCustomData = $cutsomDataArr[0];
+                
+                $this->custom_data_md5 = md5($newCustomData);
+
+                $valuesToChangeTo = $this->m_custom_data->toArray();
+				$this->m_custom_data = myCustomData::fromString($newCustomData); 
+
+				//set custom data column values we wanted to change to
+				$validUpdate = true;
+				$atomicCustomDataFields = syndicationFeedPeer::getAtomicCustomDataFields();
+			 	foreach ($this->oldCustomDataValues as $namespace => $namespaceValues){
+                	foreach($namespaceValues as $name => $oldValue)
+					{
+						$newValue = null;
+						if ($namespace)
+						{
+							if (isset ($valuesToChangeTo[$namespace][$name]))
+								$newValue = $valuesToChangeTo[$namespace][$name];
+						}
+						else
+						{ 
+							$newValue = $valuesToChangeTo[$name];
+						}
+					 
+						if (!is_null($newValue)) {
+							$atomicField = false;
+							if($namespace) {
+								$atomicField = array_key_exists($namespace, $atomicCustomDataFields) && in_array($name, $atomicCustomDataFields[$namespace]);
+							} else {
+								$atomicField = in_array($name, $atomicCustomDataFields);
+							}
+							if($atomicField) {
+								$dbValue = $this->m_custom_data->get($name, $namespace);
+								if($oldValue != $dbValue) {
+									$validUpdate = false;
+									break;
+								}
+							}
+							$this->putInCustomData($name, $newValue, $namespace);
+						}
+					}
+                   }
+                   
+				if(!$validUpdate) 
+					break;
+					                   
+				$this->setCustomData($this->m_custom_data->toString());
+			}
+
+			if ($isInsert) {
+				$this->postInsert($con);
+			} else {
+				$this->postUpdate($con);
+			}
+			$this->postSave($con);
+			syndicationFeedPeer::addInstanceToPool($this);
+			
 			$con->commit();
 			return $affectedRows;
 		} catch (PropelException $e) {
@@ -1634,7 +1701,7 @@ abstract class BasesyndicationFeed extends BaseObject  implements Persistent {
 	/**
 	 * Code to be run before persisting the object
 	 * @param PropelPDO $con
-	 * @return bloolean
+	 * @return boolean
 	 */
 	public function preSave(PropelPDO $con = null)
 	{
@@ -1663,8 +1730,7 @@ abstract class BasesyndicationFeed extends BaseObject  implements Persistent {
 	 */
 	public function preInsert(PropelPDO $con = null)
 	{
-    	$this->setCreatedAt(time());
-    	
+		$this->setCreatedAt(time());
 		$this->setUpdatedAt(time());
 		return parent::preInsert($con);
 	}
@@ -1699,7 +1765,9 @@ abstract class BasesyndicationFeed extends BaseObject  implements Persistent {
 		if($this->isModified())
 		{
 			kQueryCache::invalidateQueryCache($this);
-			kEventsManager::raiseEvent(new kObjectChangedEvent($this, $this->tempModifiedColumns));
+			$modifiedColumns = $this->tempModifiedColumns;
+			$modifiedColumns[kObjectChangedEvent::CUSTOM_DATA_OLD_VALUES] = $this->oldCustomDataValues;
+			kEventsManager::raiseEvent(new kObjectChangedEvent($this, $modifiedColumns));
 		}
 			
 		$this->tempModifiedColumns = array();
@@ -2214,17 +2282,29 @@ abstract class BasesyndicationFeed extends BaseObject  implements Persistent {
 
 		$criteria->add(syndicationFeedPeer::ID, $this->id);
 		
-		if($this->alreadyInSave && count($this->modifiedColumns) == 2 && $this->isColumnModified(syndicationFeedPeer::UPDATED_AT))
+		if($this->alreadyInSave)
 		{
-			$theModifiedColumn = null;
-			foreach($this->modifiedColumns as $modifiedColumn)
-				if($modifiedColumn != syndicationFeedPeer::UPDATED_AT)
-					$theModifiedColumn = $modifiedColumn;
-					
-			$atomicColumns = syndicationFeedPeer::getAtomicColumns();
-			if(in_array($theModifiedColumn, $atomicColumns))
-				$criteria->add($theModifiedColumn, $this->getByName($theModifiedColumn, BasePeer::TYPE_COLNAME), Criteria::NOT_EQUAL);
-		}
+			if ($this->isColumnModified(syndicationFeedPeer::CUSTOM_DATA))
+			{
+				if (!is_null($this->custom_data_md5))
+					$criteria->add(syndicationFeedPeer::CUSTOM_DATA, "MD5(cast(" . syndicationFeedPeer::CUSTOM_DATA . " as char character set latin1)) = '$this->custom_data_md5'", Criteria::CUSTOM);
+					//casting to latin char set to avoid mysql and php md5 difference
+				else 
+					$criteria->add(syndicationFeedPeer::CUSTOM_DATA, NULL, Criteria::ISNULL);
+			}
+			
+			if (count($this->modifiedColumns) == 2 && $this->isColumnModified(syndicationFeedPeer::UPDATED_AT))
+			{
+				$theModifiedColumn = null;
+				foreach($this->modifiedColumns as $modifiedColumn)
+					if($modifiedColumn != syndicationFeedPeer::UPDATED_AT)
+						$theModifiedColumn = $modifiedColumn;
+						
+				$atomicColumns = syndicationFeedPeer::getAtomicColumns();
+				if(in_array($theModifiedColumn, $atomicColumns))
+					$criteria->add($theModifiedColumn, $this->getByName($theModifiedColumn, BasePeer::TYPE_COLNAME), Criteria::NOT_EQUAL);
+			}
+		}		
 
 		return $criteria;
 	}
@@ -2401,6 +2481,12 @@ abstract class BasesyndicationFeed extends BaseObject  implements Persistent {
 	 * @var myCustomData
 	 */
 	protected $m_custom_data = null;
+	
+	/**
+	 * The md5 value for the custom_data field.
+	 * @var        string
+	 */
+	protected $custom_data_md5;
 
 	/**
 	 * Store custom data old values before the changes
@@ -2458,8 +2544,17 @@ abstract class BasesyndicationFeed extends BaseObject  implements Persistent {
 	 */
 	public function removeFromCustomData ( $name , $namespace = null)
 	{
-
-		$customData = $this->getCustomDataObj( );
+		$customData = $this->getCustomDataObj();
+		
+		$currentNamespace = '';
+		if($namespace)
+			$currentNamespace = $namespace;
+			
+		if(!isset($this->oldCustomDataValues[$currentNamespace]))
+			$this->oldCustomDataValues[$currentNamespace] = array();
+		if(!isset($this->oldCustomDataValues[$currentNamespace][$name]))
+			$this->oldCustomDataValues[$currentNamespace][$name] = $customData->get($name, $namespace);
+		
 		return $customData->remove ( $name , $namespace );
 	}
 
@@ -2472,6 +2567,16 @@ abstract class BasesyndicationFeed extends BaseObject  implements Persistent {
 	public function incInCustomData ( $name , $delta = 1, $namespace = null)
 	{
 		$customData = $this->getCustomDataObj( );
+		
+		$currentNamespace = '';
+		if($namespace)
+			$currentNamespace = $namespace;
+			
+		if(!isset($this->oldCustomDataValues[$currentNamespace]))
+			$this->oldCustomDataValues[$currentNamespace] = array();
+		if(!isset($this->oldCustomDataValues[$currentNamespace][$name]))
+			$this->oldCustomDataValues[$currentNamespace][$name] = $customData->get($name, $namespace);
+		
 		return $customData->inc ( $name , $delta , $namespace  );
 	}
 
@@ -2506,6 +2611,7 @@ abstract class BasesyndicationFeed extends BaseObject  implements Persistent {
 	{
 		if ( $this->m_custom_data != null )
 		{
+			$this->custom_data_md5 = is_null($this->custom_data) ? null : md5($this->custom_data);
 			$this->setCustomData( $this->m_custom_data->toString() );
 		}
 	}
