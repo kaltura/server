@@ -1,5 +1,4 @@
 <?php
-require_once(SF_ROOT_DIR.DIRECTORY_SEPARATOR.'lib/model/comment.php');
 
 /**
  * Will handle creation of the URL, inserting into the DB and verifying that each email should indeed be sent
