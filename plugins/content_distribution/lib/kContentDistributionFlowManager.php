@@ -1766,11 +1766,9 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 				}
 				
 				$listChanged = self::assignAssetsAndValidateForSubmission($entryDistribution, $entry, $distributionProfile, DistributionAction::UPDATE);
-				
 				if (!$listChanged){
 					continue;
 				}
-				
 				$validationErrors = $entryDistribution->getValidationErrors();
 				if(!count($validationErrors) && $distributionProfile->getUpdateEnabled() == DistributionProfileActionStatus::AUTOMATIC)
 				{
