@@ -1509,13 +1509,13 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 							if ($distributionProfile->getDeleteEnabled() == DistributionProfileActionStatus::AUTOMATIC)
 							{
 								self::submitDeleteEntryDistribution($entryDistribution, $distributionProfile);
+								continue;
 							}
 							else
 							{
 								KalturaLog::log("Entry distribution [" . $entryDistribution->getId() . "] should not be deleted automatically");
 								$entryDistribution->setDirtyStatus(EntryDistributionDirtyStatus::DELETE_REQUIRED);
 								$entryDistribution->save();
-								continue;
 							}
 						}	
 					
