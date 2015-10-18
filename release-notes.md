@@ -11,6 +11,7 @@ None.
 
 #### Deployment Scripts ####
 	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2015_10_25_add_like_list_permission.php
+	php /opt/kaltura/app/alpha/scripts/utils/permissions/addPermissionToRole.php 0 Basic\ User\ Session\ Role LIKE_LIST_USER realrun (please use copy-paste carefully here)
 
 	(only for on-prem/CE environments)
 	php deployment/updates/sql/2015_10_25_alter_kvote_table_puser_id_table.sql
