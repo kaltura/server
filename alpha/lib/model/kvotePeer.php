@@ -88,6 +88,7 @@ class kvotePeer extends BasekvotePeer
 		    $kuser->setStatus(KuserStatus::ACTIVE);
 		    $kuser->save();
 		}
+		$kvote->setPuserId($puserId);
 		$kvote->setKuserId($kuser->getId());
 		$kvote->setRank($rank);
 		$kvote->save();
