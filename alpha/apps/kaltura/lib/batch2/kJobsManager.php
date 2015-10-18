@@ -51,8 +51,11 @@ class kJobsManager
 		foreach($dbBatchJobLocks as $dbBatchJobLock) {
 			/* @var $dbBatchJobLock BatchJobLock */
 			$dbBatchJob = $dbBatchJobLock->getBatchJob();
-			$dbBatchJob->setMessage("Aborted entry");
-			self::abortDbBatchJob($dbBatchJob);
+			if (!is_null($dbBatchJob))
+			{    
+			     $dbBatchJob->setMessage("Aborted entry");
+			     self::abortDbBatchJob($dbBatchJob);
+			}
 		}
 	}
 	
