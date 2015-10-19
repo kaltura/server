@@ -1500,27 +1500,30 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 					self::assignAssetsAndValidateForSubmission($entryDistribution, $entry, $distributionProfile, DistributionAction::SUBMIT);
 					//handle case where one of the validation errors is cause for deleting the distributed data
 					$validationErrors = $entryDistribution->getValidationErrors();
-					foreach ($validationErrors as $validationError)
+					
+					if ($entryDistribution->getStatus() == EntryDistributionStatus::READY)
 					{
-						/* @var $validationError kDistributionValidationError */
-						if ($validationError->getRequiresDelete ())
+						foreach ($validationErrors as $validationError)
 						{
-							KalturaLog::log("Entry distribution [" . $entryDistribution->getId() . "] has a validation error that should trigger its deletion");
-							if ($distributionProfile->getDeleteEnabled() == DistributionProfileActionStatus::AUTOMATIC)
+							/* @var $validationError kDistributionValidationError */
+							if ($validationError->getRequiresDelete ())
 							{
-								self::submitDeleteEntryDistribution($entryDistribution, $distributionProfile);
-								continue;
-							}
-							else
-							{
-								KalturaLog::log("Entry distribution [" . $entryDistribution->getId() . "] should not be deleted automatically");
-								$entryDistribution->setDirtyStatus(EntryDistributionDirtyStatus::DELETE_REQUIRED);
-								$entryDistribution->save();
-							}
-						}	
-					
+								KalturaLog::log("Entry distribution [" . $entryDistribution->getId() . "] has a validation error that should trigger its deletion");
+								if ($distributionProfile->getDeleteEnabled() == DistributionProfileActionStatus::AUTOMATIC)
+								{
+									self::submitDeleteEntryDistribution($entryDistribution, $distributionProfile);
+									continue;
+								}
+								else
+								{
+									KalturaLog::log("Entry distribution [" . $entryDistribution->getId() . "] should not be deleted automatically");
+									$entryDistribution->setDirtyStatus(EntryDistributionDirtyStatus::DELETE_REQUIRED);
+									$entryDistribution->save();
+								}
+							}	
+						
+						}
 					}
-					
 					
 					if(!$updateRequired)
 					{
