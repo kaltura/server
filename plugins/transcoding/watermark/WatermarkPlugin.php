@@ -1,6 +1,6 @@
 <?php
 /**
- * Extension plugin for scheduled task plugin to add support metadata related object tasks
+ * Adjust asset-params with watermarks according to custom metadata
  *
  * @package plugins.watermark
  */
