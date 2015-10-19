@@ -112,6 +112,8 @@ class Form_TvinciProfileConfiguration extends Form_ConfigurableProfileConfigurat
 		$this->addTagItems("iphonenew");
 		$this->addTagItems("mbr");
 		$this->addTagItems("dash");
+		$this->addTagItems("widevine");
+		$this->addTagItems("widevine_mbr");
 
 		// xslt configuration
 		$this->addElement('file', 'xsltFile', array(
