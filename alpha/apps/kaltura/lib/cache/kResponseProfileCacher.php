@@ -2,58 +2,11 @@
 class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDeletedEventConsumer, kObjectAddedEventConsumer
 {
 	const VIEW_RESPONSE_PROFILE_OBJECT_SPECIFIC = 'objectSpecific';
-//function (doc, meta) {
-//	if (meta.type == "json") {
-//		if(doc.type == "primaryObject"){
-//			emit(doc.objectKey, null);
-//		}
-//	}
-//}
-
 	const VIEW_RESPONSE_PROFILE_RELATED_OBJECT_SESSIONS = 'relatedObjectSessions';
-//function (doc, meta) {
-//	if (meta.type == "json") {
-//		if(doc.type == "relatedObject"){
-// 			emit([doc.triggerKey, doc.objectType, doc.sessionKey], null);
-//		}
-//	}
-//}
-	
 	const VIEW_RESPONSE_PROFILE_RELATED_OBJECTS_TYPES = 'relatedObjectsTypes';
-//function (doc, meta) {
-//	if (meta.type == "json") {
-//		if(doc.type == "relatedObject"){
-// 			emit([doc.triggerKey, doc.objectType], null);
-//		}
-//	}
-//}
-	
 	const VIEW_RESPONSE_PROFILE_OBJECT_SESSIONS = 'objectSessions';
-// function (doc, meta) {
-// 	if (meta.type == "json") {
-// 		if(doc.type == "primaryObject"){
-// 			emit([doc.objectKey, doc.sessionKey], null);
-// 		}
-// 	}
-// }
-
 	const VIEW_RESPONSE_PROFILE_OBJECT_TYPE_SESSIONS = 'objectTypeSessions';
-// function (doc, meta) {
-// 	if (meta.type == "json") {
-// 		if(doc.type == "primaryObject"){
-// 			emit([doc.objectType, doc.sessionKey], null);
-// 		}
-// 	}
-// }
-	
 	const VIEW_RESPONSE_PROFILE_SESSION_TYPE = 'sessionType';
-//function (doc, meta) {
-//	if (meta.type == "json") {
-//		if(doc.type == "primaryObject"){
-//			emit([doc.sessionKey, doc.objectKey], doc);
-//		}
-//	}
-//}
 
 	const MAX_CACHE_KEYS_PER_JOB = 1000;
 	
@@ -64,10 +17,15 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 	const VIEW_KEY_OBJECT_KEY = 'objectKey';
 	const VIEW_KEY_OBJECT_TYPE = 'objectType';
 	
+	const CACHE_VALUE_HOSTNAME = 'X-Me';
+	const CACHE_VALUE_TIME = 'X-Time';
+	const CACHE_VALUE_SESSION = 'X-Kaltura-Session';
+	const CACHE_VALUE_VERSION = 'X-Cache-Version';
+	
 	/**
 	 * @var array
 	 */
-	private static $cacheStores = null;
+	private static $cacheStores = array();
 	
 	/**
 	 * @var int
@@ -84,10 +42,10 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 	 */
 	protected static function getStores($cacheType = kCacheManager::CACHE_TYPE_RESPONSE_PROFILE)
 	{
-		if(is_array(self::$cacheStores))
-			return self::$cacheStores;
+		if(isset(self::$cacheStores[$cacheType]))
+			return self::$cacheStores[$cacheType];
 			
-		self::$cacheStores = array();
+		self::$cacheStores[$cacheType] = array();
 		$cacheSections = kCacheManager::getCacheSectionNames($cacheType);
 		if(is_array($cacheSections))
 		{
@@ -95,11 +53,11 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 			{
 				$cacheStore = kCacheManager::getCache($cacheSection);
 				if ($cacheStore)
-					self::$cacheStores[] = $cacheStore;
+					self::$cacheStores[$cacheType][] = $cacheStore;
 			}
 		}
 		
-		return self::$cacheStores;
+		return self::$cacheStores[$cacheType];
 	}
 	
 	/**
@@ -110,21 +68,26 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 		return self::getStores(kCacheManager::CACHE_TYPE_RESPONSE_PROFILE_INVALIDATION);
 	}
 	
+	protected static function getCacheVersion()
+	{
+		if(is_null(self::$cacheVersion))
+			self::$cacheVersion = kConf::get('response_profile_cache_version', 'local', 1);
+			
+		return self::$cacheVersion;
+	}
+	
 	/**
 	 * @return string
 	 */
 	protected static function addCacheVersion($key)
 	{
-		if(is_null(self::$cacheVersion))
-			self::$cacheVersion = kConf::get('response_profile_cache_version', 'local', 1);
-			
 		if(is_array($key))
-			return array_map(array(self, 'addCacheVersion'), $key);
+			return array_map(array('self', 'addCacheVersion'), $key);
 			
-		return self::$cacheVersion . '_' . $key;
+		return self::getCacheVersion() . '_' . $key;
 	}
 	
-	protected static function invalidateRelated(IBaseObject $object)
+	protected static function invalidateRelated(IRelatedObject $object)
 	{
 		KalturaLog::debug('Invalidating object [' . get_class($object) . '] id [' . $object->getPrimaryKey() . '] related objects');
 		
@@ -139,20 +102,31 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 	
 	protected static function invalidate($invalidationKey)
 	{
-		$now = time();
+		$value = array(
+			self::CACHE_VALUE_HOSTNAME => infraRequestUtils::getHostname(),
+			self::CACHE_VALUE_TIME => time(),
+			self::CACHE_VALUE_SESSION => UniqueId::get(),
+			self::CACHE_VALUE_VERSION => self::getCacheVersion(),
+		);
+		
 		$invalidationKey = self::addCacheVersion($invalidationKey);
-		KalturaLog::debug("Invalidating key [$invalidationKey] now [$now]");
+		KalturaLog::debug("Invalidating key [$invalidationKey] now [" . date('Y-m-d H:i:s', $value->{self::CACHE_VALUE_TIME}) . "]");
 		
 		$cacheStores = self::getInvalidationStores();
 		foreach ($cacheStores as $cacheStore)
 		{
 			/* @var $cacheStore kBaseCacheWrapper */
-			$cacheStore->set($invalidationKey, $now);
+			$cacheStore->set($invalidationKey, $value);
 		}
 	}
 	
-	protected static function set($key, $value)
+	protected static function set($key, array $value = array())
 	{
+		$value[self::CACHE_VALUE_HOSTNAME] = infraRequestUtils::getHostname();
+		$value[self::CACHE_VALUE_TIME] = time();
+		$value[self::CACHE_VALUE_SESSION] = UniqueId::get();
+		$value[self::CACHE_VALUE_VERSION] = self::getCacheVersion();
+		
 		$key = self::addCacheVersion($key);
 		KalturaLog::debug("Key [$key]");
 		
@@ -175,80 +149,88 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 		}
 	}
 	
-	protected static function getMulti(array $keys)
+	protected static function get($keys, $touch = true)
 	{
-		$key = self::addCacheVersion($key);
-		$cacheStores = self::getStores();
-		foreach ($cacheStores as $cacheStore)
-		{
-			if($cacheStore instanceof kCouchbaseCacheWrapper)
-			{
-				return $cacheStore->multiGetAndTouch($keys);
-			}
-			else
-			{
-				return $cacheStore->multiGet($keys);
-			}
-		}
-		
-		return false;
-	}
-	
-	protected static function get($key, array $invalidationKeys = null, $touch = true)
-	{
-		$key = self::addCacheVersion($key);
-		KalturaLog::debug("Key [$key]");
+		$keys = self::addCacheVersion($keys);
 		$cacheStores = self::getStores();
 		$value = null;
 		foreach ($cacheStores as $cacheStore)
 		{
 			if($touch && $cacheStore instanceof kCouchbaseCacheWrapper)
 			{
-				$value = $cacheStore->getAndTouch($key);
+				$value = is_array($keys) ? $cacheStore->multiGetAndTouch($keys) : $cacheStore->getAndTouch($keys);
 			}
 			else
 			{
-				$value = $cacheStore->get($key);
+				$value = is_array($keys) ? $cacheStore->multiGet($keys) : $cacheStore->get($keys);
 			}
 			
 			if($value)
 			{
-				break;
-			}
-		}
-	
-		if($value && $invalidationKeys)
-		{
-			$invalidationKeys = self::addCacheVersion($invalidationKeys);
-			$invalidationCacheStores = self::getInvalidationStores();
-			foreach ($invalidationCacheStores as $store)
-			{
-				/* @var $store kBaseCacheWrapper */
-			
-				if($store instanceof kCouchbaseCacheWrapper)
+				if(is_array($keys))
 				{
-					$invalidationTimes = $cacheStore->multiGetAndTouch($invalidationKeys);
+					foreach($value as $key => $item)
+					{
+						KalturaLog::debug("Key [$key] Server[" . $item->{self::CACHE_VALUE_HOSTNAME} . "] Session[" . $item->{self::CACHE_VALUE_SESSION} . "] Time[" . date('Y-m-d H:i:s', $item->{self::CACHE_VALUE_TIME}) . "]");
+					}
 				}
 				else
 				{
-					$invalidationTimes = $store->multiGet($invalidationKeys);
+					KalturaLog::debug("Key [$keys] Server[" . $value->{self::CACHE_VALUE_HOSTNAME} . "] Session[" . $value->{self::CACHE_VALUE_SESSION} . "] Time[" . date('Y-m-d H:i:s', $value->{self::CACHE_VALUE_TIME}) . "]");
 				}
-				
-				if($invalidationTimes)
-				{
-					$invalidationTime = max($invalidationTimes);
-					$invalidationTime += kConf::get('cache_invalidation_threshold', 'local', 10);
-					KalturaLog::debug("Invalidation keys [" . implode(', ', $invalidationKeys) . "] times [" . implode(', ', $invalidationTimes) . "] compare to value time [{$value->time}]");
-					if(intval($invalidationTime) >= intval($value->time))
-					{
-						KalturaLog::debug("Invalidation time [$invalidationTime] >= value time [{$value->time}]");
-						return null;
-					}
-				}	
+				return $value;
 			}
 		}
+		KalturaLog::debug("Key [$keys] not found");
 			
-		return $value;
+		return null;
+	}
+	
+	protected static function areKeysValid(array $invalidationKeys, $time)
+	{
+		$invalidationKeys = self::addCacheVersion($invalidationKeys);
+		$invalidationCacheStores = self::getInvalidationStores();
+		foreach ($invalidationCacheStores as $store)
+		{
+			/* @var $store kBaseCacheWrapper */
+		
+			if($store instanceof kCouchbaseCacheWrapper)
+			{
+				$invalidationCaches = $store->multiGetAndTouch($invalidationKeys);
+			}
+			else
+			{
+				$invalidationCaches = $store->multiGet($invalidationKeys);
+			}
+			
+			if($invalidationCaches)
+			{
+				$invalidationTimes = array();
+				foreach($invalidationKeys as $invalidationKey)
+				{
+					if(isset($invalidationCaches[$invalidationKey]))
+					{
+						$value = $invalidationCaches[$invalidationKey];
+						KalturaLog::debug("Invalidation key [$invalidationKey] Server[" . $value->{self::CACHE_VALUE_HOSTNAME} . "] Session[" . $value->{self::CACHE_VALUE_SESSION} . "] Time[" . date('Y-m-d H:i:s', $value->{self::CACHE_VALUE_TIME}) . "]");
+						$invalidationTimes[] = $value->{self::CACHE_VALUE_TIME};
+					}
+					else
+					{
+						KalturaLog::debug("Invalidation key [$invalidationKey] not found");
+					}
+				}
+				
+				$invalidationTime = max($invalidationTimes);
+				$invalidationTime += kConf::get('cache_invalidation_threshold', 'local', 10);
+				if(intval($invalidationTime) >= intval($time))
+				{
+					KalturaLog::debug("Invalidation times [" . implode(', ', $invalidationTimes) . "] >= [{$time}]");
+					return false;
+				}
+			}	
+		}
+		
+		return true;
 	}
 	
 	protected static function query(kCouchbaseCacheQuery $query)
@@ -281,7 +263,7 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 		return "{$protocol}_{$ksType}_{$host}_{$userRole}";
 	}
 	
-	protected static function getObjectKey(IBaseObject $object)
+	protected static function getObjectKey(IRelatedObject $object)
 	{
 		$partnerId = $object->getPartnerId();
 		$objectType = get_class($object);
@@ -289,10 +271,13 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 		return "{$partnerId}_{$objectType}_{$objectId}";
 	}
 	
-	protected static function getRelatedObjectKey(IBaseObject $object)
+	protected static function getRelatedObjectKey(IRelatedObject $object, $responseProfileKey = null)
 	{
 		$partnerId = $object->getPartnerId();
-		$objectType = get_class($object);
+		$objectType = $object->getRelatedObjectType();
+		if($responseProfileKey)
+			return "{$partnerId}_{$objectType}_{$responseProfileKey}";
+			
 		return "{$partnerId}_{$objectType}";
 	}
 	
@@ -304,7 +289,7 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 		if($object instanceof ResponseProfile)
 			return $this->deleteResponseProfileCache($object);
 
-		/* @var $object IBaseObject */
+		/* @var $object IRelatedObject */
 		if($this->isCachedObject($object))
 		{
 			KalturaLog::debug('Object [' . get_class($object) . '] id [' . $object->getPrimaryKey() . '] is cached object');
@@ -334,7 +319,7 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 		if($object instanceof ResponseProfile)
 			return true;
 
-		if($object instanceof IBaseObject)
+		if($object instanceof IRelatedObject)
 		{
 			if($this->hasCachedRelatedObjects($object))
 				return true;
@@ -357,7 +342,7 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 		if($object instanceof ResponseProfile)
 			return $this->deleteResponseProfileCache($object);
 
-		/* @var $object IBaseObject */
+		/* @var $object IRelatedObject */
 		
 		if($this->isCachedObject($object))
 		{
@@ -388,7 +373,7 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 		if($object instanceof ResponseProfile)
 			return true;
 
-		if($object instanceof IBaseObject)
+		if($object instanceof IRelatedObject)
 		{
 			if($this->hasCachedRelatedObjects($object))
 				return true;
@@ -408,7 +393,7 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 	 */
 	public function objectAdded(BaseObject $object, BatchJob $raisedJob = null)
 	{
-		/* @var $object IBaseObject */
+		/* @var $object IRelatedObject */
 		if($this->hasCachedRelatedObjects($object))
 		{
 			KalturaLog::debug('Object [' . get_class($object) . '] id [' . $object->getPrimaryKey() . '] has cached related objects');
@@ -429,7 +414,7 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 	 */
 	public function shouldConsumeAddedEvent(BaseObject $object)
 	{
-		if($object instanceof IBaseObject)
+		if($object instanceof IRelatedObject)
 		{
 			if($this->hasCachedRelatedObjects($object))
 				return true;
@@ -441,14 +426,8 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 		return false;
 	}
 	
-	protected function hasCachedRelatedObjects(IBaseObject $object)
+	protected function hasCachedRelatedObjects(IRelatedObject $object)
 	{
-		$peer = $object->getPeer();
-		if(!($peer instanceof IRelatedObjectPeer) || !$peer->isReferenced($object))
-		{
-			return false;
-		}
-		
 		if(isset($this->queryCache[__METHOD__]))
 		{
 			return true;
@@ -484,7 +463,7 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 		return false;
 	}
 	
-	protected function hasCachedRootObjects(IBaseObject $object)
+	protected function hasCachedRootObjects(IRelatedObject $object)
 	{
 		$peer = $object->getPeer();
 		if(!($peer instanceof IRelatedObjectPeer))
@@ -503,6 +482,12 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 		}
 		
 		$roots = $peer->getRootObjects($object);
+		foreach($roots as $index => $root)
+		{
+			if(!$this->isCachedObject($root))
+				unset($roots[$index]);
+		}
+		
 		if(count($roots))
 		{
 			$this->queryCache[kResponseProfileCacher::CACHE_ROOT_OBJECTS] = $roots;
@@ -512,7 +497,7 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 		return false;
 	}
 	
-	protected function isCachedObject(IBaseObject $object)
+	protected function isCachedObject(IRelatedObject $object)
 	{
 		if(isset($this->queryCache[__METHOD__]))
 		{
@@ -726,7 +711,7 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 	protected static function listObjectSessionTypes(BaseObject $object)
 	{
 		$objectKey = self::getObjectKey($object);
-		if($object instanceof IBaseObject)
+		if($object instanceof IRelatedObject)
 		{
 			$cacheStores = self::getStores();
 			foreach ($cacheStores as $cacheStore)
@@ -765,7 +750,7 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 		return array();
 	}
 
-	protected function addRecalculateRelatedObjectsCacheJob(IBaseObject $object)
+	protected function addRecalculateRelatedObjectsCacheJob(IRelatedObject $object)
 	{
 		KalturaLog::debug('Recalculating object [' . get_class($object) . '] id [' . $object->getPrimaryKey() . '] related objects');
 		
@@ -796,7 +781,7 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 		return true;
 	}
 	
-	protected function addRecalculateObjectCacheJob(IBaseObject $object)
+	protected function addRecalculateObjectCacheJob(IRelatedObject $object)
 	{
 		KalturaLog::debug('Recalculating object [' . get_class($object) . '] id [' . $object->getPrimaryKey() . '] cache');
 		$objectType = get_class($object);
@@ -813,7 +798,7 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 		return true;
 	}
 	
-	protected function invalidateCachedRootObjects(IBaseObject $object)
+	protected function invalidateCachedRootObjects(IRelatedObject $object)
 	{
 		KalturaLog::debug('Invalidating object [' . get_class($object) . '] id [' . $object->getPrimaryKey() . '] roots');
 		
@@ -845,7 +830,7 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 		return true;
 	}
 	
-	protected function invalidateCachedObject(IBaseObject $object)
+	protected function invalidateCachedObject(IRelatedObject $object)
 	{
 		self::invalidate(self::getObjectKey($object));
 		
@@ -857,7 +842,7 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 		return true;
 	}
 		
-	protected function invalidateCachedRelatedObjects(IBaseObject $object)
+	protected function invalidateCachedRelatedObjects(IRelatedObject $object)
 	{
 		self::invalidateRelated($object);
 		

@@ -151,11 +151,10 @@ class DrmPlugin extends KalturaPlugin implements IKalturaServices, IKalturaAdmin
     {
 	    if ($this->shouldContribute($entry))
 	    {
-		    KalturaLog::debug("Drm contributing to context data");
 		    $signingKey = $this->getSigningKey();
 		    if (!is_null($signingKey))
 		    {
-			    KalturaLog::debug("Signing key is '$signingKey'");
+			    KalturaLog::info("Signing key is '$signingKey'");
 			    $customDataJson = DrmLicenseUtils::createCustomData($entry->getId(), $result->flavorAssets, $signingKey);
 			    $drmContextData = new KalturaDrmEntryContextPluginData();
 			    $drmContextData->flavorData = $customDataJson;

@@ -223,8 +223,6 @@ class KAsyncFileSyncImport extends KPeriodicWorker
 	 */
 	private function fetchDir($fileSyncId, $sourceUrl, $dirDestination)
 	{
-		KalturaLog::debug('fetchDir - source url ['.$sourceUrl.'], destination ['.$dirDestination.']');
-		
 		// create directory if does not exist
 		$res = $this->createAndSetDir($dirDestination);
 		if (!$res) 
@@ -234,7 +232,6 @@ class KAsyncFileSyncImport extends KPeriodicWorker
 		}
 		
 		// get directory contents
-		KalturaLog::debug('Executing CURL to get directory contents for ['.$sourceUrl.']');	
 		$contents = $this->curlWrapper->exec($sourceUrl);
 		$curlError = $this->curlWrapper->getError();
 		$curlErrorNumber = $this->curlWrapper->getErrorNumber();
@@ -295,7 +292,6 @@ class KAsyncFileSyncImport extends KPeriodicWorker
 			}
 		}
 
-		KalturaLog::debug('fetchDir - completed successfully');
 		return true;
 	}
 	
@@ -307,8 +303,6 @@ class KAsyncFileSyncImport extends KPeriodicWorker
 	 */
 	private function fetchFile($fileSyncId, $sourceUrl, $fileDestination, $fileSize = null)
 	{
-		KalturaLog::debug('fetchFile - source url ['.$sourceUrl.'], destination ['.$fileDestination.']');
-		
 		if (!$fileSize)
 		{
 			// fetch header if not given
@@ -331,13 +325,13 @@ class KAsyncFileSyncImport extends KPeriodicWorker
 			if($actualFileSize >= $fileSize)
 			{
 				// file download finished ?
-				KalturaLog::debug('File exists with size ['.$actualFileSize.'] - checking if finished...');
+				KalturaLog::info('File exists with size ['.$actualFileSize.'] - checking if finished...');
 				return $this->checkFile($fileDestination, $fileSize);
 			}
 			else
 			{
 				// will resume from the current offset
-				KalturaLog::debug('File partialy exists - resume offset set to ['.$actualFileSize.']');
+				KalturaLog::info('File partialy exists - resume offset set to ['.$actualFileSize.']');
 				$resumeOffset = $actualFileSize;
 			}
 		}
@@ -361,7 +355,6 @@ class KAsyncFileSyncImport extends KPeriodicWorker
 			}
 				
 			// download directly to the dest file
-			KalturaLog::debug("Executing curl for downloading file at [$sourceUrl]");
 			$res = $this->curlWrapper->exec($sourceUrl, $fileDestination); // download file
 			$curlError = $this->curlWrapper->getError();
 			$curlErrorNumber = $this->curlWrapper->getErrorNumber();
@@ -369,7 +362,7 @@ class KAsyncFileSyncImport extends KPeriodicWorker
 			// reset the resume offset, since the curl handle is reused
 			$this->curlWrapper->setResumeOffset(0);
 
-			KalturaLog::debug("Curl results: $res");
+			KalturaLog::info("Curl results: $res");
 	
 			// handle errors
 			if (!$res || $curlError)
@@ -383,7 +376,7 @@ class KAsyncFileSyncImport extends KPeriodicWorker
 				else
 				{
 					// timeout error occured, ignore and try to resume
-					KalturaLog::debug('Curl timeout');
+					KalturaLog::log('Curl timeout');
 				}
 			}
 			
@@ -415,8 +408,6 @@ class KAsyncFileSyncImport extends KPeriodicWorker
 			$this->extendFileSyncLock($fileSyncId);
 		}
 
-		KalturaLog::debug('File downloaded completely - will now check if done...');
-		
 		// file downloaded completely - check it
 		return $this->checkFile($fileDestination, $fileSize);
 	}
@@ -502,8 +493,6 @@ class KAsyncFileSyncImport extends KPeriodicWorker
 				$baseUrl,
 				$dcSecret);
 		
-		KalturaLog::debug('fetchMultiFiles - source url ['.$sourceUrl.']');
-		
 		$contents = $this->curlWrapper->exec($sourceUrl);
 		$curlError = $this->curlWrapper->getError();
 		
@@ -554,8 +543,6 @@ class KAsyncFileSyncImport extends KPeriodicWorker
 			}
 		}
 
-		KalturaLog::debug('fetchMultiFiles - done');
-		
 		return true;
 	}
 	
@@ -568,8 +555,6 @@ class KAsyncFileSyncImport extends KPeriodicWorker
 	 */
 	private function checkFile($destFile, $fileSize = null)
 	{
-		KalturaLog::debug("checkFile($destFile, $fileSize)");
-
 		if(!file_exists($destFile))
 		{
 			// destination file does not exist
@@ -593,7 +578,7 @@ class KAsyncFileSyncImport extends KPeriodicWorker
 		$chown_name = self::$taskConfig->params->fileOwner;
 		if ($chown_name) 
 		{
-			KalturaLog::debug("Changing owner of file [$destFile] to [$chown_name]");
+			KalturaLog::info("Changing owner of file [$destFile] to [$chown_name]");
 			@chown($destFile, $chown_name);
 		}
 		
@@ -603,7 +588,7 @@ class KAsyncFileSyncImport extends KPeriodicWorker
 		{
 			$chmod_perm = 0644;
 		}
-		KalturaLog::debug("Changing mode of file [$destFile] to [$chmod_perm]");
+		KalturaLog::info("Changing mode of file [$destFile] to [$chmod_perm]");
 		@chmod($destFile, $chmod_perm);
 
 		// IMPORTANT - check's if file is seen by apache
@@ -622,8 +607,6 @@ class KAsyncFileSyncImport extends KPeriodicWorker
 	 */
 	private function fetchHeader($url)
 	{
-		KalturaLog::debug('Fetching header for ['.$url.']');
-		
 		// fetch the http headers
 		$curlHeaderResponse = $this->curlWrapper->getHeader($url);
 		$curlError = $this->curlWrapper->getError();
@@ -691,8 +674,6 @@ class KAsyncFileSyncImport extends KPeriodicWorker
 	private function createAndSetDir($dirPath)
 	{
 		// create directory if does not exist
-		KalturaLog::debug('Creating new directory ['.$dirPath.']');
-
 		$res = self::createDirRecursive( $dirPath );
 		if (!$res) 
 		{
@@ -703,7 +684,7 @@ class KAsyncFileSyncImport extends KPeriodicWorker
 		$chown_name = self::$taskConfig->params->fileOwner;
 		if ($chown_name) 
 		{
-			KalturaLog::debug("Changing owner of directory [$dirPath] to [$chown_name]");
+			KalturaLog::info("Changing owner of directory [$dirPath] to [$chown_name]");
 			@chown($dirPath, $chown_name);
 		}
 		
@@ -713,7 +694,7 @@ class KAsyncFileSyncImport extends KPeriodicWorker
 		{
 			$chmod_perm = 0644;
 		}
-		KalturaLog::debug("Changing mode of directory [$dirPath] to [$chmod_perm]");
+		KalturaLog::info("Changing mode of directory [$dirPath] to [$chmod_perm]");
 		@chmod($dirPath, $chmod_perm);
 		
 		return true;

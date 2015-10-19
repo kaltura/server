@@ -656,7 +656,6 @@ class Form_PartnerConfiguration extends Infra_Form
 					$element->setAttrib('data-checked', true);
 				else
 			        $element->setAttrib('data-checked', false);
-        		KalturaLog::debug("delivery_type_{$customDeliveryType->key} was set to [".$customDeliveryType->value."]");
 			}
 		}
 		
@@ -664,7 +663,6 @@ class Form_PartnerConfiguration extends Infra_Form
 			return;
 			
 		foreach($object->permissions as $permission){
-			KalturaLog::debug("Set Permission: "  . $permission->name . " status: " . $permission->status);
 			$this->setDefault($permission->name, ($permission->status == Kaltura_Client_Enum_PermissionStatus::ACTIVE));
 		}
 		
@@ -722,14 +720,12 @@ class Form_PartnerConfiguration extends Infra_Form
 						$basePermission->status = $permission->status;
 											
 						$permissionSet = false;
-						KalturaLog::debug("try to add permission: ". $basePermission->name);
 						foreach ($systemPartnerConfiguration->permissions as $permission)
 						{
 							if (($permission->name == $basePermission->name) && ($permission->type == $basePermission->type))
 							{
 								if ($basePermission->status == Kaltura_Client_Enum_PermissionStatus::ACTIVE)
 									$permission->status = $basePermission->status;
-								KalturaLog::debug("permission exists with status : " . $permission->status);
 								$permissionSet = true;
 								break;
 							}
@@ -737,7 +733,6 @@ class Form_PartnerConfiguration extends Infra_Form
 						
 						if(!$permissionSet)
 						{
-							KalturaLog::debug("permission didn't exist with status : " . $permission->status);
 							$systemPartnerConfiguration->permissions[] = $basePermission;
 						}
 					}

@@ -231,7 +231,6 @@ class KalturaDailymotionDistributionJobProviderData extends KalturaConfigurableD
 	}
 	
 	private function getCaptionFormat($asset){		
-		KalturaLog::debug("format:". $asset->getPartnerDescription());
 		if ($asset instanceof  AttachmentAsset && ($asset->getPartnerDescription() == 'smpte-tt'))
 			return KalturaDailymotionDistributionCaptionFormat::TT;
 			

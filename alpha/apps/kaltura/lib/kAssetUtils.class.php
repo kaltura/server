@@ -149,7 +149,7 @@ class kAssetUtils
 					$url = rtrim($urlManager->getUrl(), "/") . "/".$url ;
 				}
 			} else {
-				KalturaLog::debug("Couldn't determine delivery profile for storage id");
+				KalturaLog::warning("Couldn't determine delivery profile for storage id");
 				$url = null;
 			}
 		}

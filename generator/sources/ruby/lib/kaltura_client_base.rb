@@ -319,7 +319,7 @@ module Kaltura
 					end
 				end
 			elsif value.is_a? Array
-				params[name] = {}
+				params[name] = Array.new(value.size)
 				if value.empty?
 					add_param(params[name], "-", "");
 				else

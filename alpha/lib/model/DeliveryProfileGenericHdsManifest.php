@@ -28,7 +28,7 @@ class DeliveryProfileGenericHdsManifest extends DeliveryProfileGenericHds {
 			$manifestInfo = $this->getFlavorAssetInfo($url);
 			return $this->getRenderer(array($manifestInfo));
 		} else {
-			KalturaLog::debug("No manifest file was found");
+			KalturaLog::log("No manifest file was found");
 			return null;
 		}
 	}

@@ -6,6 +6,8 @@
 abstract class LiveEntry extends entry
 {
 	const IS_LIVE = 'isLive';
+	const PRIMARY_HOSTNAME = 'primaryHostname';
+	const SECONDARY_HOSTNAME = 'backupHostname';
 	const FIRST_BROADCAST = 'first_broadcast';
 	const RECORDED_ENTRY_ID = 'recorded_entry_id';
 
@@ -529,8 +531,24 @@ abstract class LiveEntry extends entry
 		if($kMediaServer && $kMediaServer instanceof kLiveMediaServer)
 			return $kMediaServer->getMediaServer();
 			
-		KalturaLog::debug("No Valid Media Servers Were Found For Current Live Entry [" . $this->getEntryId() . "]" );
+		KalturaLog::info("No Valid Media Servers Were Found For Current Live Entry [" . $this->getEntryId() . "]" );
 		return null;
+	}
+
+	protected function getMediaServersHostnames()
+	{
+		$hostnames = array();
+		$kMediaServers = $this->getMediaServers();
+
+		foreach($kMediaServers as $kMediaServer)
+		{
+			if($kMediaServer instanceof kLiveMediaServer)
+			{
+				$hostnames[$kMediaServer->getIndex()] = $kMediaServer->getHostname();
+			}
+		}
+		KalturaLog::info("media servers hostnames: " . print_r($hostnames,true));
+		return $hostnames;
 	}
 	
 	/**
@@ -623,7 +641,7 @@ abstract class LiveEntry extends entry
 		if($server && $server->getHostname() == $hostname)
 			return true;
 
-		KalturaLog::debug("mediaServer is not registered. hostname: $hostname , index: $index , server: " . print_r($server,true));
+		KalturaLog::info("mediaServer is not registered. hostname: $hostname , index: $index , server: " . print_r($server,true));
 		return false;
 	}
 	
@@ -653,7 +671,7 @@ abstract class LiveEntry extends entry
 			if(!$kMediaServer || ! $this->isCacheValid($kMediaServer))
 			{
 				$listChanged = true;
-				KalturaLog::debug("Removing media server [" . ($kMediaServer ? $kMediaServer->getHostname() : $key) . "]");
+				KalturaLog::info("Removing media server [" . ($kMediaServer ? $kMediaServer->getHostname() : $key) . "]");
 				$this->removeFromCustomData($key, LiveEntry::CUSTOM_DATA_NAMESPACE_MEDIA_SERVERS);
 			}
 		}
@@ -688,9 +706,16 @@ abstract class LiveEntry extends entry
 				LiveEntry::IS_LIVE => intval($this->hasMediaServer()),
 				LiveEntry::FIRST_BROADCAST => $this->getFirstBroadcast(),
 				LiveEntry::RECORDED_ENTRY_ID => $this->getRecordedEntryId(),
+
 		);
-		
-		return array_merge( $dynamicAttributes, parent::getDynamicAttributes() ); 
+		$mediaServers = $this->getMediaServersHostnames();
+		if (isset($mediaServers[MediaServerIndex::PRIMARY])) {
+			$dynamicAttributes[LiveEntry::PRIMARY_HOSTNAME] = $mediaServers[MediaServerIndex::PRIMARY];
+		}
+		if (isset($mediaServers[MediaServerIndex::SECONDARY])) {
+			$dynamicAttributes[LiveEntry::SECONDARY_HOSTNAME] = $mediaServers[MediaServerIndex::SECONDARY];
+		}
+		return array_merge( $dynamicAttributes, parent::getDynamicAttributes() );
 	}
 	
 	/**

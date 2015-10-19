@@ -34,24 +34,23 @@ abstract class KCollectionConversionEngine extends KConversionEngine
 	{
 		$uniqid = uniqid("convert_") . '.xml';
 		$xmlPath = $data->destDirLocalPath . DIRECTORY_SEPARATOR . $uniqid;
-		KalturaLog::debug("copy($data->inputXmlLocalPath, $xmlPath)");
 		copy($data->inputXmlLocalPath, $xmlPath);
 		$xml = file_get_contents($xmlPath);
 		$xml = str_replace(KDLCmdlinePlaceholders::OutDir, $data->destDirLocalPath, $xml);
 		file_put_contents($xmlPath, $xml);
 
-		KalturaLog::debug(__METHOD__ . " Config File Path: $xmlPath");
+		KalturaLog::debug("Config File Path: $xmlPath");
 		$this->configFilePath = $xmlPath;
 		$this->logFilePath = $data->destDirLocalPath . DIRECTORY_SEPARATOR . $data->destFileName . '.log';
 		
 				
-		KalturaLog::debug(__METHOD__ . " Command Line Str: " . $data->commandLinesStr);
+		KalturaLog::debug("Command Line Str: " . $data->commandLinesStr);
 		$cmd_line_arr = $this->getCmdArray($data->commandLinesStr);
 		
 		$conversion_engine_result_list = array();
 		foreach ( $cmd_line_arr as $type => $cmd_line )
 		{
-			KalturaLog::debug(__METHOD__ . " Command Line type[$type] line[$cmd_line]");
+			KalturaLog::debug("Command Line type[$type] line[$cmd_line]");
 			
 			if($type != $this->getType())
 				continue;

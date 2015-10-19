@@ -150,7 +150,6 @@ class KGenericScheduler
 			$subConfigItems = $this->createConfigItem($taskConfig->toArray(), $taskConfig->id, $taskConfig->name);
 			$configItems = array_merge($configItems, $subConfigItems);
 		}
-		KalturaLog::info("sending configuration to the server");
 		KScheduleHelperManager::saveConfigItems($configItems);
 	}
 	
@@ -189,7 +188,6 @@ class KGenericScheduler
 
 	public function run()
 	{
-		KalturaLog::debug("Running");
 		$startTime = time();
 
 		while($this->keepRunning)
@@ -197,8 +195,7 @@ class KGenericScheduler
 			$this->loop();
 		}
 
-		KalturaLog::info("-- Done --");
-		KalturaLog::debug("ended after [" . (time() - $startTime) . "] seconds");
+		KalturaLog::debug("Ended after [" . (time() - $startTime) . "] seconds");
 	}
 
 	public function loop()

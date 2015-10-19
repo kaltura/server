@@ -331,6 +331,18 @@ function xmlToArray($xmlstring)
 		//return null;
 	}
 
+	// strip any namespaces from the xml
+	$matches = null;
+	if (preg_match_all('/<([\w]+):/', $xmlstring, $matches))
+	{
+		$namespaces = array_unique($matches[1]);
+		foreach ($namespaces as $namespace)
+		{
+			$xmlstring = str_replace("<{$namespace}:", "<{$namespace}_", $xmlstring);
+			$xmlstring = str_replace("</{$namespace}:", "</{$namespace}_", $xmlstring);
+		}
+	}
+	
 	// parse the xml
 	$xml = @simplexml_load_string($xmlstring);
 	$json = json_encode($xml);

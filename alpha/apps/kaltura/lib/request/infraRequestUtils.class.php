@@ -484,7 +484,7 @@ class infraRequestUtils
 			$post = $_POST;
 		}
 		
-		self::$requestParams = array_merge_recursive($post, $_FILES, $_GET, $params);
+		self::$requestParams = array_replace_recursive($post, $_FILES, $_GET, $params);
 		
 		return self::$requestParams;
 	}

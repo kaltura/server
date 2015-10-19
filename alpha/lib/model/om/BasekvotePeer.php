@@ -26,7 +26,7 @@ abstract class BasekvotePeer {
 	const TM_CLASS = 'kvoteTableMap';
 	
 	/** The total number of columns. */
-	const NUM_COLUMNS = 10;
+	const NUM_COLUMNS = 11;
 
 	/** The number of lazy-loaded columns. */
 	const NUM_LAZY_LOAD_COLUMNS = 0;
@@ -42,6 +42,9 @@ abstract class BasekvotePeer {
 
 	/** the column name for the KUSER_ID field */
 	const KUSER_ID = 'kvote.KUSER_ID';
+
+	/** the column name for the PUSER_ID field */
+	const PUSER_ID = 'kvote.PUSER_ID';
 
 	/** the column name for the PARTNER_ID field */
 	const PARTNER_ID = 'kvote.PARTNER_ID';
@@ -77,11 +80,11 @@ abstract class BasekvotePeer {
 	 * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
 	 */
 	private static $fieldNames = array (
-		BasePeer::TYPE_PHPNAME => array ('Id', 'KshowId', 'EntryId', 'KuserId', 'PartnerId', 'Rank', 'Status', 'KvoteType', 'CreatedAt', 'CustomData', ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'kshowId', 'entryId', 'kuserId', 'partnerId', 'rank', 'status', 'kvoteType', 'createdAt', 'customData', ),
-		BasePeer::TYPE_COLNAME => array (self::ID, self::KSHOW_ID, self::ENTRY_ID, self::KUSER_ID, self::PARTNER_ID, self::RANK, self::STATUS, self::KVOTE_TYPE, self::CREATED_AT, self::CUSTOM_DATA, ),
-		BasePeer::TYPE_FIELDNAME => array ('id', 'kshow_id', 'entry_id', 'kuser_id', 'partner_id', 'rank', 'status', 'kvote_type', 'created_at', 'custom_data', ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, )
+		BasePeer::TYPE_PHPNAME => array ('Id', 'KshowId', 'EntryId', 'KuserId', 'PuserId', 'PartnerId', 'Rank', 'Status', 'KvoteType', 'CreatedAt', 'CustomData', ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'kshowId', 'entryId', 'kuserId', 'puserId', 'partnerId', 'rank', 'status', 'kvoteType', 'createdAt', 'customData', ),
+		BasePeer::TYPE_COLNAME => array (self::ID, self::KSHOW_ID, self::ENTRY_ID, self::KUSER_ID, self::PUSER_ID, self::PARTNER_ID, self::RANK, self::STATUS, self::KVOTE_TYPE, self::CREATED_AT, self::CUSTOM_DATA, ),
+		BasePeer::TYPE_FIELDNAME => array ('id', 'kshow_id', 'entry_id', 'kuser_id', 'puser_id', 'partner_id', 'rank', 'status', 'kvote_type', 'created_at', 'custom_data', ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, )
 	);
 
 	/**
@@ -91,11 +94,11 @@ abstract class BasekvotePeer {
 	 * e.g. self::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
 	 */
 	private static $fieldKeys = array (
-		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'KshowId' => 1, 'EntryId' => 2, 'KuserId' => 3, 'PartnerId' => 4, 'Rank' => 5, 'Status' => 6, 'KvoteType' => 7, 'CreatedAt' => 8, 'CustomData' => 9, ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'kshowId' => 1, 'entryId' => 2, 'kuserId' => 3, 'partnerId' => 4, 'rank' => 5, 'status' => 6, 'kvoteType' => 7, 'createdAt' => 8, 'customData' => 9, ),
-		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::KSHOW_ID => 1, self::ENTRY_ID => 2, self::KUSER_ID => 3, self::PARTNER_ID => 4, self::RANK => 5, self::STATUS => 6, self::KVOTE_TYPE => 7, self::CREATED_AT => 8, self::CUSTOM_DATA => 9, ),
-		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'kshow_id' => 1, 'entry_id' => 2, 'kuser_id' => 3, 'partner_id' => 4, 'rank' => 5, 'status' => 6, 'kvote_type' => 7, 'created_at' => 8, 'custom_data' => 9, ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, )
+		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'KshowId' => 1, 'EntryId' => 2, 'KuserId' => 3, 'PuserId' => 4, 'PartnerId' => 5, 'Rank' => 6, 'Status' => 7, 'KvoteType' => 8, 'CreatedAt' => 9, 'CustomData' => 10, ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'kshowId' => 1, 'entryId' => 2, 'kuserId' => 3, 'puserId' => 4, 'partnerId' => 5, 'rank' => 6, 'status' => 7, 'kvoteType' => 8, 'createdAt' => 9, 'customData' => 10, ),
+		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::KSHOW_ID => 1, self::ENTRY_ID => 2, self::KUSER_ID => 3, self::PUSER_ID => 4, self::PARTNER_ID => 5, self::RANK => 6, self::STATUS => 7, self::KVOTE_TYPE => 8, self::CREATED_AT => 9, self::CUSTOM_DATA => 10, ),
+		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'kshow_id' => 1, 'entry_id' => 2, 'kuser_id' => 3, 'puser_id' => 4, 'partner_id' => 5, 'rank' => 6, 'status' => 7, 'kvote_type' => 8, 'created_at' => 9, 'custom_data' => 10, ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, )
 	);
 
 	/**
@@ -169,6 +172,7 @@ abstract class BasekvotePeer {
 		$criteria->addSelectColumn(kvotePeer::KSHOW_ID);
 		$criteria->addSelectColumn(kvotePeer::ENTRY_ID);
 		$criteria->addSelectColumn(kvotePeer::KUSER_ID);
+		$criteria->addSelectColumn(kvotePeer::PUSER_ID);
 		$criteria->addSelectColumn(kvotePeer::PARTNER_ID);
 		$criteria->addSelectColumn(kvotePeer::RANK);
 		$criteria->addSelectColumn(kvotePeer::STATUS);
@@ -1769,6 +1773,15 @@ abstract class BasekvotePeer {
 	 * @return array
 	 */
 	public static function getAtomicColumns()
+	{
+		return array();
+	}
+	
+	/**
+	 * Return array of custom-data fields that shouldn't be auto-updated.
+	 * @return array
+	 */
+	public static function getAtomicCustomDataFields()
 	{
 		return array();
 	}

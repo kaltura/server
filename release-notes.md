@@ -1,4 +1,27 @@
-# Jupiter-10.20.0 #
+# Kajam-11.0.0 #
+
+## Like->list API call ##
+
+- Issue Type: New Feature
+- Issue ID: PLAT-3920
+
+#### Configuration ####
+ 
+None.
+
+#### Deployment Scripts ####
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2015_10_25_add_like_list_permission.php
+	php /opt/kaltura/app/alpha/scripts/utils/permissions/addPermissionToRole.php 0 Basic\ User\ Session\ Role LIKE_LIST_USER realrun (please use copy-paste carefully here)
+
+	(only for on-prem/CE environments)
+	mysql -h@db_host@ -u@db_user@ -p@db_pass@ -P3306 kaltura < deployment/updates/sql/2015_10_25_alter_kvote_table_puser_id_table.sql
+	php deployment/updates/scripts/2015_10_25_populate_like_table_puser_id_field.php
+	
+#### Known Issues & Limitations ####
+
+None.
+
+# Jupiter-10.21.0 #
 
 ## Cielo24 plugin ##
 
@@ -19,6 +42,66 @@
 
 None.
 
+## In Video Quiz - Permissions Update ##
+
+- Issue Type: New Feature  
+- Issue ID: PLAT-3864
+
+#### Installation ####
+
+None.
+
+#### Configuration ####
+
+- Run the following permission script:
+	php deployment\updates\scripts\add_permissions\2015_09_17_update_quiz_permissions.php
+
+#### Known Issues & Limitations ####
+
+None.
+
+## In Video Quiz - Sphinx Implementation for Answer Cue-Point ##
+
+- Issue Type: New Feature  
+- Issue ID: PLAT-3836
+
+#### Installation ####
+
+- Add QuizSphinx to plugins.ini (as demonstrated in plugins.ini.template)
+- Run the installPlugins.php script: deployment/base/scripts/installPlugins.php
+- Run the cue-points population sphinx script: deployment/base/scripts/populateSphinxCuePoints.php
+
+#### Configuration ####
+
+None.
+
+#### Known Issues & Limitations ####
+
+None.
+
+## In Video Quiz - new action servePdf under quiz service##
+
+- Issue Type: New Feature  
+- Issue ID: PLAT-2784 Add Quiz PDF support
+
+#### Installation ####
+
+- run deployment script - 2015_10_1_update_quiz_permissions.php
+- clear cache
+
+#### Configuration ####
+
+None.
+		
+# Jupiter-10.20.0 #
+
+### Configuration ###
+
+## Changed kaltura.scheduler_status.id from int(11) to bigint(20) ##
+
+- Run the following permission script:
+
+  mysql -h@db_host@ -u@db_user@ -p@db_pass@ -P3306 kaltura <  deployment/updates/sql/2015_09_06_alter_scheduler_status_bigint.sql
 
 # Jupiter-10.18.0 #
 

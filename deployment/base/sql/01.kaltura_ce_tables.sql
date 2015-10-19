@@ -1325,6 +1325,7 @@ CREATE TABLE IF NOT EXISTS `kvote` (
   `kshow_id` varchar(20) DEFAULT NULL,
   `entry_id` varchar(20) DEFAULT NULL,
   `kuser_id` int(11) DEFAULT NULL,
+  `puser_id` VARCHAR(100),
   `rank` int(11) DEFAULT NULL,
   `created_at` datetime DEFAULT NULL,
   `status` int(11) DEFAULT NULL,
@@ -1845,7 +1846,7 @@ CREATE TABLE IF NOT EXISTS `scheduler_config` (
 /*Table structure for table `scheduler_status` */
 
 CREATE TABLE IF NOT EXISTS `scheduler_status` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `created_at` datetime DEFAULT NULL,
   `created_by` varchar(20) DEFAULT NULL,
   `updated_at` datetime DEFAULT NULL,

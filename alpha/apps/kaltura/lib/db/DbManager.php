@@ -217,7 +217,6 @@ class DbManager
 				$cacheExpiry);
 			if (!self::$sphinxConnection)
 			{
-				KalturaLog::debug("getSphinxConnection: Failed to connect to any Sphinx config");
 				throw new Exception('Failed to connect to any Sphinx config');
 			}
 		}
@@ -277,7 +276,7 @@ class DbManager
 				}
 				catch(Exception $ex)
 				{
-					KalturaLog::debug("failed to connect to $key");
+					KalturaLog::err("failed to connect to $key");
 				}
 
 				if (function_exists('apc_store'))

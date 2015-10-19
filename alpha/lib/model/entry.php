@@ -7,7 +7,7 @@
  * @package Core
  * @subpackage model
  */
-class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
+class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IRelatedObject
 {
 	protected $new_categories = '';
 	protected $new_categories_ids = '';
@@ -947,7 +947,6 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	{
 		if($v && $v == $this->getDataContent())
 		{
-			KalturaLog::info("Data content didn't change, ignoring the setter");
 			return;
 		}
 		
@@ -1833,7 +1832,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	{
 		if(!$this->getParentEntryId())
 		{
-			KalturaLog::debug("Attempting to get parent entry of entry " . $this->getId() . " but parent does not exist, returning original entry");
+			KalturaLog::info("Attempting to get parent entry of entry " . $this->getId() . " but parent does not exist, returning original entry");
 			return $this;
 		}
 		
@@ -2575,7 +2574,6 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	{
 		if($this->getStatus() == entryStatus::DELETED)
 		{
-			KalturaLog::debug("Entry [" . $this->getId() . "] is deleted, no need to sync it");
 			return;
 		}
 			

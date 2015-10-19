@@ -22,7 +22,6 @@ class kvote extends Basekvote implements IBaseObject
 		   $this->statistics_results = myStatisticsMgr::modifyEntryVotesBykVote($this); 
 		}
 		
-		KalturaLog::debug("kvote status before save: ". $this->getStatus());
 		return parent::save( $con );
 	}
 	

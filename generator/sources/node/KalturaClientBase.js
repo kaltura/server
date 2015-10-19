@@ -371,6 +371,36 @@ KalturaClientBase.prototype.encodeFile = function(boundary, type, name, filename
 	return returnPart;
 };
 
+function sendRequestHelper(that, options, body, requestIndex, onCompleteCallback, timeout) {
+	var request = http.request(options, function(response) {
+		response.setEncoding('utf8');
+
+		var data = '';
+		response.on('data', function(chunk) {
+			data += chunk;
+		});
+		response.on('end', function() {
+			var headers = [];
+			for ( var header in response.headers) {
+				headers.push(header + ': ' + response.headers[header]);
+			}
+			that.debug('Headers [' + requestIndex + ']: \n\t' + headers.join('\n\t'));
+			that.debug('Response [' + requestIndex + ']: ' + data);
+			onCompleteCallback(JSON.parse(data));
+		});
+	});
+	request.on('error', function(err) {
+		console.log(err);
+		onCompleteCallback(null, err);
+	});
+
+	if (timeout) {
+		request.setTimeout(timeout);
+	}
+	request.write(body);
+	request.end();
+}
+
 /**
  * send the http request.
  * @param string url						the url to call.
@@ -378,14 +408,20 @@ KalturaClientBase.prototype.encodeFile = function(boundary, type, name, filename
  * @return array							 the results and errors inside an array.
  */
 KalturaClientBase.prototype.doHttpRequest = function (callCompletedCallback, requestUrl, params, files) {
-	var This = this;
+
+	var that = this;
 	var requestIndex = KalturaClientBase.requestIndex++;
-	var data = http_build_query(params);
 	var debugUrl = requestUrl + '&' + data;
 	var urlInfo = url.parse(debugUrl);
 	this.log('Request [' + requestIndex + ']: ' + debugUrl);
-	
-	if(Object.keys(files).length > 0){	
+
+	var options = {
+		host : urlInfo.host,
+		path : urlInfo.path,
+		method : 'POST'
+	};
+
+	if(Object.keys(files).length > 0){
 		var crlf = '\r\n';
 		var boundary = '---------------------------' + Math.random();
 		var delimiter = crlf + '--' + boundary;
@@ -402,76 +438,20 @@ KalturaClientBase.prototype.doHttpRequest = function (callCompletedCallback, req
 		}
 		postData.push(new Buffer(delimiter + '--'));
 		var multipartBody = Buffer.concat(postData);
-		
-		var options = {
-			host : urlInfo.host,
-			path : urlInfo.path,
-			method : 'POST',
-			keepAlive : true,
-			headers : {
-				'Content-Type' : 'multipart/form-data; boundary=' + boundary,
-				'Content-Length' : multipartBody.length
-			}
+
+		options.headers = {
+			'Content-Type': 'multipart/form-data; boundary=' + boundary,
+			'Content-Length': multipartBody.length
 		};
+		sendRequestHelper(that, options, multipartBody, requestIndex, callCompletedCallback, this.config.timeout);
 
-		var request = http.request(options);
-		request.setTimeout(this.config.timeout);
-		request.write(multipartBody);
-		request.end();
-		request.on('error', function(err) {
-			console.log(err);
-		});
-		request.on('response', function(response) {
-			response.setEncoding('utf8');
-
-			var data = '';
-			response.on('data', function(chunk) {
-				data += chunk;
-			});
-			response.on('end', function() {
-				var headers = [];
-				for ( var header in response.headers) {
-					headers.push(header + ': ' + response.headers[header]);
-				}
-				This.debug('Headers [' + requestIndex + ']: \n\t' + headers.join('\n\t'));
-				This.debug('Response [' + requestIndex + ']: ' + data);
-				callCompletedCallback(JSON.parse(data));
-			});
-		});
 	} else {
-		var options = {
-			host : urlInfo.host,
-			path : urlInfo.path,
-			method : 'POST',
-			headers : {
-				'Content-Type' : 'application/x-www-form-urlencoded',
-				'Content-Length' : Buffer.byteLength(data)
-			}
+		var data = http_build_query(params);
+		options.headers = {
+			'Content-Type' : 'application/x-www-form-urlencoded',
+			'Content-Length' : Buffer.byteLength(data)
 		};
-
-		var request = http.request(options);
-		request.write(data);
-		request.end();
-		
-		request.on('error', function(err) {
-			console.log(err);
-		});
-		request.on('response', function(response) {
-			response.setEncoding('utf8');
-			var data = '';
-			response.on('data', function(chunk) {
-				data += chunk;
-			});
-			response.on("end", function() {
-				var headers = [];
-				for(var header in response.headers){
-					headers.push(header + ": " + response.headers[header]);
-				}
-				This.debug("Headers [" + requestIndex + "]: \n\t" + headers.join("\n\t"));
-				This.debug("Response [" + requestIndex + "]: " + data);
-				callCompletedCallback(JSON.parse(data));
-			});
-		});
+		sendRequestHelper(that, options, data, requestIndex, callCompletedCallback);
 	}
 };
 

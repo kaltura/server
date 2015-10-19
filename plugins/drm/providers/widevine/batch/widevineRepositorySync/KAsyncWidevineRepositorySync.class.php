@@ -50,8 +50,6 @@ class KAsyncWidevineRepositorySync extends KJobHandlerWorker
 	 */
 	private function sendModifyRequest(KalturaBatchJob $job, KalturaWidevineRepositorySyncJobData $data)
 	{
-		KalturaLog::debug("Starting sendModifyRequest");
-		
 		$dataWrap = new WidevineRepositorySyncJobDataWrap($data);		
 		$widevineAssets = $dataWrap->getWidevineAssetIds();
 		$licenseStartDate = $dataWrap->getLicenseStartDate();
@@ -129,8 +127,6 @@ class KAsyncWidevineRepositorySync extends KJobHandlerWorker
 		{
 			if($flavorAsset instanceof KalturaWidevineFlavorAsset && $dataWrap->hasAssetId($flavorAsset->widevineAssetId))
 			{
-				KalturaLog::debug('Updating flavor asset ['.$flavorAsset->id.']');	
-				
 				$updatedFlavorAsset = new KalturaWidevineFlavorAsset();
 				$updatedFlavorAsset->widevineDistributionStartDate = $startDate;
 				$updatedFlavorAsset->widevineDistributionEndDate = $endDate;

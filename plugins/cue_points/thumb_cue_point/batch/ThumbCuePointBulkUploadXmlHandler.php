@@ -71,7 +71,7 @@ class ThumbCuePointBulkUploadXmlHandler extends CuePointBulkUploadXmlHandler
 		catch (Exception $ex)
 		{
 			KBatchBase::unimpersonate();
-			KalturaLog::debug("Entry ID [" . $this->entryId . "] not found, continuing with no conversion profile");
+			KalturaLog::info("Entry ID [" . $this->entryId . "] not found, continuing with no conversion profile");
 		}
 		
 		foreach($results as $index => $cuePoint)

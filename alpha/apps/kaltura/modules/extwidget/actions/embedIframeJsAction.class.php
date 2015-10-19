@@ -44,12 +44,6 @@ class embedIframeJsAction extends sfAction
 		}
 
 		$autoEmbed = $this->getRequestParameter('autoembed');
-		if ($autoEmbed)
-		{
-			$port = $_SERVER['SERVER_PORT'];
-			$host = "$protocol://". kConf::get('html5lib_host') ."/";
-
-		}
 
 		$iframeEmbed = $this->getRequestParameter('iframeembed');
 		$scriptName = ($iframeEmbed) ? 'mwEmbedFrame.php' : 'mwEmbedLoader.php';
@@ -64,14 +58,20 @@ class embedIframeJsAction extends sfAction
 			$relativeUrl = false;
 			$url = $ui_conf_html5_url; // absolute URL
 		}
-		else if ($ui_conf_html5_url)
-		{
-			$url =  $host . $ui_conf_html5_url;
-		}
 		else
 		{
-			$html5_version = kConf::get('html5_version');
-			$url =  "$host/html5/html5lib/{$html5_version}/" . $scriptName;
+			if (!$iframeEmbed)
+				$host = "$protocol://". kConf::get('html5lib_host') ."/";
+			
+			if ($ui_conf_html5_url)
+			{
+				$url =  $host . $ui_conf_html5_url;
+			}
+			else
+			{
+				$html5_version = kConf::get('html5_version');
+				$url =  "$host/html5/html5lib/{$html5_version}/" . $scriptName;
+			}
 		}
 
 		// append uiconf_id and partner id for optimizing loading of html5 library. append them only for "standard" urls by looking for the mwEmbedLoader.php/mwEmbedFrame.php suffix
@@ -90,31 +90,17 @@ class embedIframeJsAction extends sfAction
 		header("pragma:");
 		if($iframeEmbed) {
 			$url .= ((strpos($url, "?") === false) ? "?" : "&") . 'wid=' . $widget_id . '&' . $_SERVER["QUERY_STRING"];
-		} else if ($autoEmbed) {
-			header('Content-Type: application/javascript');
+		}
+		else
+		{
 			$params = "protocol=$protocol&".$_SERVER["QUERY_STRING"];
 			
 			$url .= ((strpos($url, "?") === false) ? "?" : "&") . $params;
 
 			if ($relativeUrl)
 			{
-				kFileUtils::dumpUrl($url."?".$params, true, false, array("X-Forwarded-For" =>  requestUtils::getRemoteAddress()));
-			}
-		}
-		
-		if (!$iframeEmbed)//Means we're redirecting to mwEmbedLoader
-		{
-			$partner = PartnerPeer::retrieveByPK( $partner_id );
-			$hostToTest = myPartnerUtils::getHostForWhiteList();
-			if ($partner && !is_null($hostToTest) && $partner->isInCDNWhiteList($hostToTest))
-			{
-				$cdnHost = $protocol.'://'.$hostToTest;
-				if (isset($_SERVER['SERVER_PORT']))
-				{
-					$cdnHost .= ":".$_SERVER['SERVER_PORT'];
-				}
-				$params = "&od=".urlencode($cdnHost);
-				$url .= ((strpos($url, "?") === false) ? "?" : "&") . $params;
+				header('Content-Type: application/javascript');
+				kFileUtils::dumpUrl($url, true, false, array("X-Forwarded-For" =>  requestUtils::getRemoteAddress()));
 			}
 		}
 

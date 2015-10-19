@@ -118,8 +118,6 @@ class CuePointPeer extends BaseCuePointPeer implements IMetadataPeer, IRelatedOb
 	{
 		if(!empty($selectResults) && self::$userContentOnly)
 		{
-			KalturaLog::debug('Filter cuePoint User results');
-		
 			$removedRecordsCount = 0;
 			foreach ($selectResults as $key => $cuePoint)
 			{
@@ -136,8 +134,6 @@ class CuePointPeer extends BaseCuePointPeer implements IMetadataPeer, IRelatedOb
 				$recordsCount = $criteria->getRecordsCount();
 				$criteria->setRecordsCount($recordsCount - $removedRecordsCount);
 			}
-			
-			KalturaLog::debug('Filter cuePoint Results - done');
 		}
 	
 		parent::filterSelectResults($selectResults, $criteria);
@@ -236,7 +232,7 @@ class CuePointPeer extends BaseCuePointPeer implements IMetadataPeer, IRelatedOb
 	/* (non-PHPdoc)
 	 * @see IRelatedObjectPeer::getRootObjects()
 	 */
-	public function getRootObjects(IBaseObject $object)
+	public function getRootObjects(IRelatedObject $object)
 	{
 		/* @var $object CuePoint */
 		$entry = entryPeer::retrieveByPK($object->getEntryId());
@@ -249,7 +245,7 @@ class CuePointPeer extends BaseCuePointPeer implements IMetadataPeer, IRelatedOb
 	/* (non-PHPdoc)
 	 * @see IRelatedObjectPeer::isReferenced()
 	 */
-	public function isReferenced(IBaseObject $object)
+	public function isReferenced(IRelatedObject $object)
 	{
 		return false;
 	}

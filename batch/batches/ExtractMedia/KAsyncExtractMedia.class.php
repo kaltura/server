@@ -44,8 +44,6 @@ class KAsyncExtractMedia extends KJobHandlerWorker
 	 */
 	private function extractMediaInfo($mediaFile)
 	{
-		KalturaLog::debug("file path [$mediaFile]");
-		
 		$engine = KBaseMediaParser::getParser($job->jobSubType, realpath($mediaFile), self::$taskConfig);
 		if($engine)
 			return $engine->getMediaInfo();		
@@ -58,8 +56,6 @@ class KAsyncExtractMedia extends KJobHandlerWorker
 	 */
 	private function extract(KalturaBatchJob $job, KalturaExtractMediaJobData $data)
 	{
-		KalturaLog::debug("extract($job->id)");
-		
 		$srcFileSyncDescriptor = reset($data->srcFileSyncs);
 		$mediaFile = null;
 		if($srcFileSyncDescriptor)
@@ -71,19 +67,16 @@ class KAsyncExtractMedia extends KJobHandlerWorker
  		if(!is_file($mediaFile))
  			return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::NFS_FILE_DOESNT_EXIST, "Source file $mediaFile is not a file", KalturaBatchJobStatus::FAILED);
 			
-		KalturaLog::debug("mediaFile [$mediaFile]");
 		$this->updateJob($job, "Extracting file media info on $mediaFile", KalturaBatchJobStatus::QUEUED);
 			
 		$mediaInfo = null;
 		try
 		{
 			$mediaFile = realpath($mediaFile);
-			KalturaLog::debug("file path [$mediaFile]");
 			
 			$engine = KBaseMediaParser::getParser($job->jobSubType, $mediaFile, self::$taskConfig, $job);
 			if($engine)
 			{
-				KalturaLog::debug("Found engine [" . get_class($engine) . "]");
 				$mediaInfo = $engine->getMediaInfo();
 			}
 			else
@@ -103,7 +96,6 @@ class KAsyncExtractMedia extends KJobHandlerWorker
 			return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::EXTRACT_MEDIA_FAILED, "Failed to extract media info: $mediaFile", KalturaBatchJobStatus::RETRY);
 		}
 		
-		KalturaLog::debug("flavorAssetId [$data->flavorAssetId]");
 		$mediaInfo->flavorAssetId = $data->flavorAssetId;
 		$mediaInfo = $this->getClient()->batch->addMediaInfo($mediaInfo);
 		$data->mediaInfoId = $mediaInfo->id;

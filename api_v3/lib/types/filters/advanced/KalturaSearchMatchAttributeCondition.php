@@ -28,8 +28,6 @@ abstract class KalturaSearchMatchAttributeCondition extends KalturaAttributeCond
 
 	public function toObject($objectToFill = null, $propsToSkip = array())
 	{
-		KalturaLog::debug("To object match attribute condition [$this->not]");
-
 		/** @var AdvancedSearchFilterMatchAttributeCondition $objectToFill */
 		if (is_null($objectToFill))
 			$objectToFill = new AdvancedSearchFilterMatchAttributeCondition();
@@ -42,5 +40,16 @@ abstract class KalturaSearchMatchAttributeCondition extends KalturaAttributeCond
 		KalturaLog::debug("Mapping [$this->attribute] to [$field]");
 		$objectToFill->setField($field);
 		return $objectToFill;
+	}
+
+	protected function doFromObject($srcObj, KalturaDetachedResponseProfile $responseProfile = null)
+	{
+		/** @var $srcObj AdvancedSearchFilterMatchAttributeCondition) */
+		if ($this->shouldGet('attribute', $responseProfile))
+		{
+			/** @var BaseIndexObject $indexClass */
+			$indexClass = $this->getIndexClass();
+			$this->attribute = $indexClass::getApiNameByMatchField($srcObj->getField());
+		}
 	}
 }

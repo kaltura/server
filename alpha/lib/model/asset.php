@@ -8,7 +8,7 @@
  * @package Core
  * @subpackage model
  */ 
-class asset extends Baseasset implements ISyncableFile
+class asset extends Baseasset implements ISyncableFile, IRelatedObject
 {
 	/**
 	 * @deprecated use ASSET_STATUS_ERROR instead

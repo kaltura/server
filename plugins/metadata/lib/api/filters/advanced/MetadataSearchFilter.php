@@ -106,7 +106,7 @@ class MetadataSearchFilter extends AdvancedSearchFilterOperator
 								$comparison = " <> ";
 								break;
 							default:
-								KalturaLog::ERR("Missing comparison type");
+								KalturaLog::err("Missing comparison type");
 								continue;
 						}
 											

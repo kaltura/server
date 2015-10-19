@@ -749,8 +749,6 @@ class entryPeer extends BaseentryPeer
 			!kEntitlementUtils::getInitialized()) // if initEntitlement hasn't run - skip filters.
 			return parent::filterSelectResults($selectResults, $criteria);
 
-		KalturaLog::debug('Entitlement: Filter Results');
-
 		if(is_null(kCurrentContext::$ks) && count($selectResults))
 		{
 			$entry = $selectResults[0];
@@ -780,8 +778,6 @@ class entryPeer extends BaseentryPeer
 
 		self::$filerResults = false;
 		parent::filterSelectResults($selectResults, $criteria);
-
-		KalturaLog::debug('Entitlement: Filter Results - done');
 	}
 
 	/* (non-PHPdoc)
@@ -803,7 +799,6 @@ class entryPeer extends BaseentryPeer
 	{
 		$securityContext = array(kCurrentContext::$partner_id, kCurrentContext::$ks);
 		if (self::$lastInitializedContext && self::$lastInitializedContext !== $securityContext) {
-			KalturaLog::log('Reinitalized security context');
 			self::$validatedEntries = array();
 		}
 		

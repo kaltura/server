@@ -126,7 +126,7 @@ class FileSyncImportBatchService extends KalturaBatchService
 		}
 		
 		$initialLastId = $keysCache->get(self::LAST_FILESYNC_ID_PREFIX . $workerId);
-		KalturaLog::debug("got lastId [$initialLastId] for worker [$workerId]");
+		KalturaLog::info("got lastId [$initialLastId] for worker [$workerId]");
 		
 		$lastId = $initialLastId ? $initialLastId : $maxId;
 								
@@ -161,7 +161,7 @@ class FileSyncImportBatchService extends KalturaBatchService
 			// make sure last id is always increasing
 			if ($lastId <= $lastSelectId)
 			{
-				KalturaLog::debug("last id was decremented $lastId <= $lastSelectId, stopping");
+				KalturaLog::info("last id was decremented $lastId <= $lastSelectId, stopping");
 				break;
 			}
 			
@@ -187,8 +187,6 @@ class FileSyncImportBatchService extends KalturaBatchService
 			FileSyncPeer::setUseCriteriaFilter(false);
 			$fileSyncs = FileSyncPeer::doSelect($c);
 			FileSyncPeer::setUseCriteriaFilter(true);
-			
-			KalturaLog::debug('got '.count($fileSyncs).' file syncs');
 			
 			if (!$fileSyncs)
 			{
@@ -266,17 +264,17 @@ class FileSyncImportBatchService extends KalturaBatchService
 				$curKey = self::LOCK_KEY_PREFIX . $fileSync->getId();
 				if (isset($lockKeys[$curKey]))
 				{
-					KalturaLog::debug('file sync '.$fileSync->getId().' already locked');
+					KalturaLog::info('file sync '.$fileSync->getId().' already locked');
 					continue;
 				}
 				
 				if (!$lockCache->add($curKey, true, self::LOCK_EXPIRY))
 				{
-					KalturaLog::debug('failed to lock file sync '.$fileSync->getId());
+					KalturaLog::info('failed to lock file sync '.$fileSync->getId());
 					continue;
 				}
 				
-				KalturaLog::debug('locked file sync ' . $fileSync->getId());
+				KalturaLog::info('locked file sync ' . $fileSync->getId());
 				
 				// get the original id if not set
 				if (!$fileSync->getOriginalId())
@@ -284,7 +282,7 @@ class FileSyncImportBatchService extends KalturaBatchService
 					$originalFileSync = self::getOriginalFileSync($fileSync);
 					if (!$originalFileSync)
 					{
-						KalturaLog::debug('failed to get original file sync for '.$fileSync->getId());
+						KalturaLog::info('failed to get original file sync for '.$fileSync->getId());
 						continue;
 					}
 					
@@ -316,7 +314,7 @@ class FileSyncImportBatchService extends KalturaBatchService
 		//		but the only effect of this is that some file syncs will be scanned again		
 		if (!$initialLastId || $lastId > $initialLastId)
 		{
-			KalturaLog::debug("setting lastId to [$lastId] for worker [$workerId]");
+			KalturaLog::info("setting lastId to [$lastId] for worker [$workerId]");
 			
 			$keysCache->set(self::LAST_FILESYNC_ID_PREFIX . $workerId, $lastId);
 		}

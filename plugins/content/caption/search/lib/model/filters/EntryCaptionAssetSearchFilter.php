@@ -123,14 +123,12 @@ class EntryCaptionAssetSearchFilter extends AdvancedSearchFilterItem
 	protected function createSphinxMatchPhrase($text)
 	{
 		$condition = "ca_prefix<<$text<<ca_sufix";
-		KalturaLog::debug("condition [$condition]");
 		$prefix = '@' . CaptionSearchPlugin::getSearchFieldName(CaptionSearchPlugin::SEARCH_FIELD_DATA);
 		return $prefix . ' ' . $condition;
 	}
 
 	public function getFreeTextConditions($partnerScope, $freeTexts)
 	{
-		KalturaLog::debug("freeText [$freeTexts]");
 		$additionalConditions = array();
 
 		if(strpos($freeTexts, baseObjectFilter::IN_SEPARATOR) > 0)

@@ -50,8 +50,6 @@ class Infra_AuthHelper
         if(!$namespace)
         	$namespace = isset($settings->cookieNameSpace) ? $settings->cookieNameSpace : Zend_Auth_Storage_Session::NAMESPACE_DEFAULT;
         
-        KalturaLog::debug("set namespace [$namespace]");
-        
         if ($settings->sessionSavePath)
             session_save_path($settings->sessionSavePath);
         

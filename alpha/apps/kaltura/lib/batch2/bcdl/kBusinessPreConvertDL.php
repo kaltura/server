@@ -64,31 +64,31 @@ class kBusinessPreConvertDL
 		
 		if($sourceParamsId)
 		{
-			KalturaLog::debug("Look for flavor params [$sourceParamsId]");
+			KalturaLog::info("Look for flavor params [$sourceParamsId]");
 			$srcAsset = assetPeer::retrieveByEntryIdAndParams($entryId, $sourceParamsId);
 			if($srcAsset && $srcAsset->isLocalReadyStatus())
 				return $srcAsset;
 		}
 
-		KalturaLog::debug("Look for a flavor tagged with thumbsource of entry [$entryId]");
+		KalturaLog::info("Look for a flavor tagged with thumbsource of entry [$entryId]");
 		$srcAsset = assetPeer::retrieveHighestBitrateByEntryId($entryId, flavorParams::TAG_THUMBSOURCE);
 		if($srcAsset && $srcAsset->isLocalReadyStatus())
 			return $srcAsset;
 		
 		
-		KalturaLog::debug("Look for original flavor of entry [$entryId]");
+		KalturaLog::info("Look for original flavor of entry [$entryId]");
 		$srcAsset = assetPeer::retrieveOriginalByEntryId($entryId);
 		if($srcAsset && $srcAsset->isLocalReadyStatus())
 			return $srcAsset;
 					
 			
-		KalturaLog::debug("Look for highest bitrate flavor with web tag on entry [$entryId]");
+		KalturaLog::info("Look for highest bitrate flavor with web tag on entry [$entryId]");
 		$srcAsset = assetPeer::retrieveHighestBitrateByEntryId($entryId, flavorParams::TAG_WEB);
 		if($srcAsset && $srcAsset->isLocalReadyStatus())
 			return $srcAsset;
 					
 			
-		KalturaLog::debug("Look for highest bitrate flavor of entry [$entryId]");
+		KalturaLog::info("Look for highest bitrate flavor of entry [$entryId]");
 		$srcAsset = assetPeer::retrieveHighestBitrateByEntryId($entryId);
 		if($srcAsset && $srcAsset->isLocalReadyStatus())
 			return $srcAsset;
@@ -216,7 +216,7 @@ class kBusinessPreConvertDL
 			// creats the file sync
 			$logSyncKey = $thumbAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_CONVERT_LOG);
 			kFileSyncUtils::moveFromFile($logPath, $logSyncKey);
-			KalturaLog::debug("Log archived file to: " . kFileSyncUtils::getLocalFilePathForKey($logSyncKey));
+			KalturaLog::info("Log archived file to: " . kFileSyncUtils::getLocalFilePathForKey($logSyncKey));
 		}
 		else
 		{
@@ -225,7 +225,7 @@ class kBusinessPreConvertDL
 		
 		$syncKey = $thumbAsset->getSyncKey(thumbAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 		kFileSyncUtils::moveFromFile($capturedPath, $syncKey);
-		KalturaLog::debug("Thumbnail archived file to: " . kFileSyncUtils::getLocalFilePathForKey($syncKey));
+		KalturaLog::info("Thumbnail archived file to: " . kFileSyncUtils::getLocalFilePathForKey($syncKey));
 		
 		$thumbAsset->setStatus(thumbAsset::ASSET_STATUS_READY);
 		$thumbAsset->save();
@@ -268,9 +268,7 @@ class kBusinessPreConvertDL
 			if($entryThumbAsset->getId() !== $thumbAsset->getId() &&
 			   $entryThumbAsset->hasTag(thumbParams::TAG_DEFAULT_THUMB))
 			   {
-			   	KalturaLog::debug("Found default tag on thumbAsset id[" . $entryThumbAsset->getId() . "]");
 			   	$thumbAsset->removeTags(array(thumbParams::TAG_DEFAULT_THUMB));
-			   	KalturaLog::debug("Removed default tag from thumbAsset id[" .  $thumbAsset->getId() . "]");
 			   	return;
 			   }
 		}
@@ -419,6 +417,7 @@ class kBusinessPreConvertDL
 		
 		$flavorParams->setDynamicAttributes($dynamicAttributes);
 			
+		self::adjustAssetParams($entryId, array($flavorParams));
 		$flavor = self::validateFlavorAndMediaInfo($flavorParams, $mediaInfo, $errDescription);
 		
 		if (is_null($flavor))
@@ -452,7 +451,6 @@ class kBusinessPreConvertDL
 		$flavorAsset = kBatchManager::createFlavorAsset($flavor, $partnerId, $entryId, $flavorAssetId);
 		if (!$flavorAsset)
 		{
-			KalturaLog::err("Failed to create flavor asset");
 			return null;
 		}
 		
@@ -489,6 +487,7 @@ class kBusinessPreConvertDL
 					KalturaLog::log("Creating flavor params output for asset [" . $tagedFlavorAsset->getId() . "]");
 				
 					$flavorParams = assetParamsPeer::retrieveByPK($tagedFlavorAsset->getId());
+					self::adjustAssetParams($entryId, array($flavorParams));
 					$flavorParamsOutput = self::validateFlavorAndMediaInfo($flavorParams, $mediaInfo, $errDescription);
 					
 					if (is_null($flavorParamsOutput))
@@ -544,6 +543,7 @@ class kBusinessPreConvertDL
 			KalturaLog::log("Validate Conversion Profile, media info [" . $mediaInfo->getId() . "]");
 		}
 		
+		self::adjustAssetParams($entryId, $flavors);
 		// call the decision layer
 		KalturaLog::log("Generate Target " . count($flavors) . " Flavors supplied");
 		$cdl = KDLWrap::CDLGenerateTargetFlavors($mediaInfo, $flavors);
@@ -768,23 +768,33 @@ class kBusinessPreConvertDL
 		
 		$matchSourceHeightIdx = null;	// index of the smallest flavor that matches the source height
 		$matchSourceOriginalFlavorBR = 0;
+		$targetLargestHeight = 0;		// To save the height of the largest target flavor and its key
+		$targetLargestHeightKey = null;	// and its key id.
+		
 		foreach($targetFlavorArr as $key=>$target){
 
 				/*
 				 * Ignore flavors that are smaller than the source -
-				 * they are not in the scope of 'adjustToFramesize'
+				 * they are not in the scope of 'adjustToFramesize'.
+				 * Track the largest target flavor, required for cases when the source height is larger than ALL flavors
 				 */
 			if($target->getHeight()<$srcHgt){
 KalturaLog::log("Source is larger than the target, skipping - key:$key, srcHgt:$srcHgt, trgHgt:".$target->getHeight());
+
+				if($targetLargestHeight<$target->getHeight()){
+					$targetLargestHeight=$target->getHeight();
+					$targetLargestHeightKey = $key;
+				}
 				continue;
 			}
 			
 				/*
-				 * Stop searcing if there is a flavor, in that set, that matches the source frame size -
+				 * Stop searching if there is a flavor, in that set, that matches the source frame size -
 				 * no need to activate another flavor conversion
 				 */
 			if(!$target->_isNonComply || $target->_force || $target->_create_anyway) {
 				$matchSourceHeightIdx = null;
+				$targetLargestHeightKey = null;
 KalturaLog::log("Found COMPLY/forced/create_anyway, leaving - key:$key, srcHgt:$srcHgt, trgHgt:".$target->getHeight());
 				break;
 			}
@@ -817,8 +827,15 @@ KalturaLog::log("Switch to matchSourceHeightIdx:$matchSourceHeightIdx, matchSour
 
 		}
 		
+			/*
+			 * If no match was found, use the largest target flavor 
+			 */
+		if(!isset($matchSourceHeightIdx) && isset($targetLargestHeightKey)
+		&& $targetFlavorArr[$targetLargestHeightKey]->getHeight()<$srcHgt){
+			$matchSourceHeightIdx = $targetLargestHeightKey;
+		}
 				/*
-				 * If samllest-source-height-matching is found and it is 'non-compliant' (therefore it willnot be generated),
+				 * If smallest-source-height-matching is found and it is 'non-compliant' (therefore it will not be generated),
 				 * set '_create_anyway' flag for the 'matchSourceHeightIdx' flavor.
 				 */
 		if(isset($matchSourceHeightIdx) && $targetFlavorArr[$matchSourceHeightIdx]->_isNonComply) {
@@ -831,7 +848,6 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 			}
 			*/
 		}
-
 	}
 	
 	/**
@@ -1047,7 +1063,7 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 			$flavorsIds[] = $flavorsId;
 			$conversionProfileFlavorParams[$flavorsId] = $flavorParamsConversionProfile;
 		}
-		KalturaLog::debug("Flavors in conversion profile [" . implode(',', $flavorsIds) . "]");
+		KalturaLog::info("Flavors in conversion profile [" . implode(',', $flavorsIds) . "]");
 		
 		$sourceFlavor = null;
 		$flavors = assetParamsPeer::retrieveFlavorsByPKs($flavorsIds);
@@ -1256,7 +1272,6 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 			$flavorAsset = kBatchManager::createFlavorAsset($flavor, $entry->getPartnerId(), $entry->getId());
 			if(!$flavorAsset)
 			{
-				KalturaLog::log("Flavor asset could not be created, flavor conversion won't be created");
 				continue;
 			}
 			
@@ -1302,7 +1317,6 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 	
 	public static function decideFlavorConvert(flavorAsset $flavorAsset, flavorParamsOutput $flavor, flavorAsset $originalFlavorAsset, $conversionProfileId = null, $mediaInfoId = null, BatchJob $parentJob = null, $lastEngineType = null, $sameRoot = true, $priority = 0)
 	{
-		KalturaLog::debug('Source params ids ['.$flavor->getSourceAssetParamsIds().'], flavor asset id ['.$flavorAsset->getId().']');
 		if(strlen(trim($flavor->getSourceAssetParamsIds())))
 		{
 			$readySrcFlavorAssets = self::getSourceFlavorAssets($flavorAsset, $flavor);
@@ -1319,7 +1333,7 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 		{
 			$flavorAsset->setStatus(flavorAsset::ASSET_STATUS_QUEUED);
 			$affectedRows = $flavorAsset->save();
-			KalturaLog::debug('Changing asset status from Waiting to Queued, affected rows ['.$affectedRows.']');
+			KalturaLog::info('Changing asset status from Waiting to Queued, affected rows ['.$affectedRows.']');
 			if(!$affectedRows)
 				return false;
 			
@@ -1336,10 +1350,8 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 
 	private static function getParentJobForWaitingAssetConversion($entryId, BatchJob $parentJob = null)
 	{
-		KalturaLog::debug('start');
 		if($parentJob && $parentJob->getJobType() == BatchJobType::POSTCONVERT) 
 		{
-			KalturaLog::debug('parent is postconvert');
 			//In case the flavor conversion is triggered by the ingested flavor add the conversion job
 			//under the convert profile job if available
 			$c = new Criteria();
@@ -1352,7 +1364,6 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 			$batchJob = BatchJobPeer::doSelectOne( $c );
 			if($batchJob)
 			{
-				KalturaLog::debug("parent job id ".$batchJob->getId());
 				return $batchJob;
 			}
 		}
@@ -1370,10 +1381,10 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 		
 		$readyAndNonApplicableAssetsCount = assetPeer::doCount($c);
 		
-		KalturaLog::debug('Verify source flavors are ready: number of ready and NA assets ['.$readyAndNonApplicableAssetsCount.'], number of source params ids ['.count($srcFlavorParamsIds).']');
+		KalturaLog::info('Verify source flavors are ready: number of ready and NA assets ['.$readyAndNonApplicableAssetsCount.'], number of source params ids ['.count($srcFlavorParamsIds).']');
 		if($readyAndNonApplicableAssetsCount < count($srcFlavorParamsIds))
 		{
-			KalturaLog::debug('Not all source flavors are ready, changing status to WAIT_FOR_CONVERT');
+			KalturaLog::info('Not all source flavors are ready, changing status to WAIT_FOR_CONVERT');
 			$flavorAsset->setStatus(flavorAsset::ASSET_STATUS_WAIT_FOR_CONVERT);
 			$flavorAsset->setDescription("Source flavor assets are not ready");
 			$flavorAsset->save();
@@ -1416,6 +1427,7 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 		{
 			KalturaLog::log("Source flavor asset requires conversion");
 				
+			self::adjustAssetParams($entryId, array($sourceFlavor));
 			$srcSyncKey = $originalFlavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 			$errDescription = null;
 			$sourceFlavorOutput = self::validateFlavorAndMediaInfo($sourceFlavor, $mediaInfo, $errDescription);
@@ -1558,7 +1570,7 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 		{
 			/* @var $flavor assetParams */
 			
-			KalturaLog::debug("Check flavor [" . $flavor->getId() . "]");
+			KalturaLog::info("Check flavor [" . $flavor->getId() . "]");
 			if(!isset($conversionProfileFlavorParams[$flavor->getId()]))
 				continue;
 				
@@ -1585,7 +1597,7 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 			{
 				$sourceFlavor = $flavor;
 				unset($flavors[$index]);
-				KalturaLog::debug("Flavor [" . $flavor->getId() . "] won't be converted because it has source tag");
+				KalturaLog::info("Flavor [" . $flavor->getId() . "] won't be converted because it has source tag");
 				continue;
 			}
 		
@@ -1593,7 +1605,7 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 			{
 				unset($flavors[$index]);
 				$ingestedNeeded = true;
-				KalturaLog::debug("Flavor [" . $flavor->getId() . "] won't be converted because it's ingested recorded live");
+				KalturaLog::info("Flavor [" . $flavor->getId() . "] won't be converted because it's ingested recorded live");
 				continue;
 			}
 			
@@ -1604,14 +1616,14 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 			{
 				unset($flavors[$index]);
 				$ingestedNeeded = true;
-				KalturaLog::debug("Flavor [" . $flavor->getId() . "] won't be converted because it should be ingested");
+				KalturaLog::info("Flavor [" . $flavor->getId() . "] won't be converted because it should be ingested");
 				continue;
 			}
 
 			if(in_array($flavor->getId(), $entryIngestedFlavors) &&
 				$conversionProfileFlavorParamsItem->getOrigin() == assetParamsOrigin::CONVERT_WHEN_MISSING)
 			{
-				KalturaLog::debug("Flavor [" . $flavor->getId() . "] won't be converted because it already ingested");
+				KalturaLog::info("Flavor [" . $flavor->getId() . "] won't be converted because it already ingested");
 				unset($flavors[$index]);
 			}
 		}	
@@ -1641,5 +1653,20 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 			}
 		}	
 		return $shouldConvert;	
+	}
+	
+	/**
+	 * 
+	 * @param string $entryId
+	 * @param array<assetParams> $flavors
+	 */
+	protected static function adjustAssetParams($entryId, array $flavors)
+	{
+		$assetParamsAdjusters = KalturaPluginManager::getPluginInstances('IKalturaAssetParamsAdjuster');
+		foreach($assetParamsAdjusters as $assetParamsAdjuster)
+		{
+			/* @var $assetParamsAdjuster IKalturaAssetParamsAdjuster */
+			$assetParamsAdjuster->adjustAssetParams($entryId, $flavors);
+		}
 	}
 }

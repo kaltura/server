@@ -12,8 +12,30 @@ class KDLOperatorFfmpeg2_1_3 extends KDLOperatorFfmpeg1_1_1 {
 	{
 		$cmdStr = parent::generateSinglePassCommandLine($design, $target, $extra);
 		if(isset($target->_video) && isset($target->_video->_watermarkData)) {
+				// Fading requires looping of the WM image
+			if(isset($target->_video->_watermarkData->fade)){
+				$loopTime = 0;
+				/*
+				 * The loop time should be minimum of the video duration (_explicitClipDur) and 
+				 * the calculated largest fade time.
+				 * Otherwise set loop time to 60 sec
+				 */
+				if(isset($target->_video->_watermarkFadeLoopTime) && $target->_video->_watermarkFadeLoopTime)
+					$loopTime = $target->_video->_watermarkFadeLoopTime + 0.5;
+				if(isset($target->_explicitClipDur) && $target->_explicitClipDur>0){
+					if($loopTime>0) 
+						$loopTime = min($loopTime, round($target->_explicitClipDur/1000));
+					else $loopTime = round($target->_explicitClipDur/1000);
+				}
+				if($loopTime==0)
+					$loopTime = 60;
+					
+				$loopStr = "-loop 1 -t $loopTime";
+			}
+			else 
+				$loopStr = null;
 			$cmdStr = str_replace(KDLCmdlinePlaceholders::InFileName, 
-					KDLCmdlinePlaceholders::InFileName." -i ".KDLCmdlinePlaceholders::WaterMarkFileName,
+					KDLCmdlinePlaceholders::InFileName." $loopStr -i ".KDLCmdlinePlaceholders::WaterMarkFileName,
 					$cmdStr);
 		}
 		
@@ -151,7 +173,7 @@ class KDLOperatorFfmpeg2_1_3 extends KDLOperatorFfmpeg1_1_1 {
 			return $cmdStr;
 
 		$vid = $target->_video;
-		$watermarkStr = self::generateWatermarkParams($vid->_watermarkData, $vid->_rotation);
+		$watermarkStr = self::generateWatermarkParams($vid);
 
 		$cmdValsArr = explode(' ', $cmdStr);
 			
@@ -359,23 +381,54 @@ class KDLOperatorFfmpeg2_1_3 extends KDLOperatorFfmpeg1_1_1 {
 
 	/**
 	 * 
-	 * @param unknown_type $wmData
-	 * @param unknown_type $flip
+	 * @param unknown_type $targetVid
 	 * @param unknown_type $wmWid
 	 * @param unknown_type $wmHgt
 	 * @return string
 	 */
-	protected static function generateWatermarkParams($wmData, $rotation=null, $wmWid=KDLCmdlinePlaceholders::WaterMarkWidth, $wmHgt=KDLCmdlinePlaceholders::WaterMarkHeight)
+	protected static function generateWatermarkParams($targetVid, $wmWid=KDLCmdlinePlaceholders::WaterMarkWidth, $wmHgt=KDLCmdlinePlaceholders::WaterMarkHeight)
 	{
 /*
-	if(isset(
-$wmData->scale
-$wmData->margins
-$wmData->opacity
+	Watermark Data
+	- imageEntry (optional, either 'imageEntry or 'url' must be provided)
+		An image entry that will be used as a watermark image. 
+		Supported - PNG and JPG. Transparent alpha layer (PNG only) is supported.
+	?- url (optional, either 'imageEntry or 'url' must be provided)
+		External url for the watermark image file. 
+		Formats same as above.
+	- margins (optional)
+		'WxH', distance from the video frame borders. 
+		Positive numbers refer to LeftUp corner, negative to RightDown corner of the video frame.
+		'center' allowed to place the WM relatively to the center of the image. Offset allowed
+		If omitted - LeftUp is assumed. 
+		Example - 
+			'-100x10'- 100pix from right side, 10 pixs from the upper side
+			'center-10xcenter+30' - place the WM 10pix left to the middle and 30pix bellow the middle 
+	- opacity (optional) 
+		0-1.0 range. Defines the blending level between the watermark image and the video frame. 
+		If omitted the watermark is presented un-blended.
+	- scale (optional)
+		'WxH' - scale the water mark image to the given size. If one of the dimensions is omitted, 
+		it is calculated to preserve the watermark image aspect ratio.
+		'n%' to scale to n% of the source size. 
+		Example
+			'x30%' - scale to 30% of the source height. Calc the width to match the aspect ratio
+	- fade (optional)
+		Several fade in/outs are allowed
+		-- type - in/out, default 'in'
+		-- start_time - in sec (flaot), default 0
+		-- alpha - If set to 1, fade only alpha channel, if one exists on the input. default 0 
+		-- duration - in sec, default ~1sec.
+		
+	Sample Json string - 
+		{"imageEntry":"0_abcd1234", "margins":"centerxcenter","scale":"0x100%",
+		"fade":[{"type":"in","start_time":"0.3","alpha":"1","duration":"0.5"},
+				{"type":"out","start_time":"10","alpha":"1","duration":"0.6"}]}
+		
 */
 		$watermarkStr = null;
-		if(isset($rotation)){
-			switch ($rotation){
+		if(isset($targetVid->_rotation)){
+			switch ($targetVid->_rotation){
 				case 90:
 					$prepArr[]="transpose=1";
 				case 180:
@@ -385,10 +438,40 @@ $wmData->opacity
 					$prepArr[]="transpose=1";
 			}
 		}
-		if(isset($wmData->scale)) {
-			$wmData->scale = explode("x",$wmData->scale);
-			KalturaLog::log("Watermark data:\n".print_r($wmData,1));
+
+			// Don't change the passed WM arg, clone it!!!
+		$wmAux = clone($targetVid->_watermarkData);
+
+		KalturaLog::log("Watermark data:\n".print_r($wmAux,1));
+			// Scaling
+		if(isset($wmAux->scale)) {
+			$wmAux->scale = explode("x",$wmAux->scale);
 			$prepArr[] ="scale=$wmWid:$wmHgt,setsar=$wmWid/$wmHgt";
+		}
+			// Fading
+		if(isset($wmAux->fade)){
+			if(is_array($wmAux->fade)) $fadeArr = $wmAux->fade;
+			else $fadeArr = array($wmAux->fade);
+			$duration = $start_time = 0;
+			foreach($fadeArr as $fade){
+				$params = array();
+				foreach($fade as $k=>$v) {
+					switch($k){
+						case "duration":
+						case "start_time":
+							$$k = max($$k, $v);
+						case "type":
+						case "alpha":
+							$params[] = "$k=$v";
+							break;
+					}
+				}
+				if(count($params)>0)
+					$prepArr[] = "fade=".(implode(":",$params));
+			}
+			if($duration>0 || $start_time>0){
+				$targetVid->_watermarkFadeLoopTime = $duration+$start_time;
+			}
 		}
 		if(isset($prepArr)) {
 			$wmImg = "wmimg";
@@ -399,18 +482,18 @@ $wmData->opacity
 		}
 		$marginsCrop = null;
 		$marginsOver = null;
-		if(isset($wmData->margins)) {
-			$wmData->margins = explode("x",$wmData->margins);
+		if(isset($wmAux->margins)) {
+			$wmAux->margins = explode("x",$wmAux->margins);
 			if(isset($rotation) && $rotation!=180){
-				$m=$wmData->margins[0];
-				$wmData->margins[0]=$wmData->margins[1];
-				$wmData->margins[1]=$m;
+				$m=$wmAux->margins[0];
+				$wmAux->margins[0]=$wmAux->margins[1];
+				$wmAux->margins[1]=$m;
 			}
-			$w = $wmData->margins[0];
+			$w = $wmAux->margins[0];
 			if(($centerW=strstr($w,"center"))!=false) $w = (int)str_replace("center", "",$w);
 			$w = in_array($w, array(null,0,-1))? 0: $w;
 			
-			$h = $wmData->margins[1];
+			$h = $wmAux->margins[1];
 			if(($centerH=strstr($h,"center"))!=false) $h = (int)str_replace("center", "",$h);
 			$h = in_array($h, array(null,0,-1))? 0: $h;
 			
@@ -434,9 +517,9 @@ $wmData->opacity
 		}
 		$marginsOver = str_replace(array("iw","ow","ih","oh"), array("main_w","overlay_w","main_h","overlay_h"), $marginsCrop);
 
-		if(isset($wmData->opacity)){
+		if(isset($wmAux->opacity)){
 			$watermarkStr.= "[0:v]crop=$wmWid:$wmHgt:".$marginsCrop.",setsar=$wmWid/".$wmHgt."[cropped];";
-			$watermarkStr.= "[cropped][$wmImg]blend=all_mode='overlay':all_opacity=".min(1,$wmData->opacity)."[blended];";
+			$watermarkStr.= "[cropped][$wmImg]blend=all_mode='overlay':all_opacity=".min(1,$wmAux->opacity)."[blended];";
 			$watermarkStr.= "[0:v][blended]overlay=$marginsOver";
 		}
 		else {

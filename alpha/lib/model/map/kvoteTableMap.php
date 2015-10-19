@@ -41,6 +41,7 @@ class kvoteTableMap extends TableMap {
 		$this->addForeignKey('KSHOW_ID', 'KshowId', 'VARCHAR', 'kshow', 'ID', false, 20, null);
 		$this->addForeignKey('ENTRY_ID', 'EntryId', 'VARCHAR', 'entry', 'ID', false, 20, null);
 		$this->addForeignKey('KUSER_ID', 'KuserId', 'INTEGER', 'kshow', 'ID', false, null, null);
+		$this->addColumn('PUSER_ID', 'PuserId', 'VARCHAR', false, 100, null);
 		$this->addColumn('PARTNER_ID', 'PartnerId', 'INTEGER', false, null, null);
 		$this->addColumn('RANK', 'Rank', 'INTEGER', false, null, null);
 		$this->addColumn('STATUS', 'Status', 'INTEGER', false, null, null);

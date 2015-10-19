@@ -317,6 +317,8 @@ class MetadataService extends KalturaBaseService
 			else 
 			{
 				KalturaLog::info("XML data MD5 matches current filesync content MD5. Update is not necessary.");
+				//adding this save() in order to save the metadata profile version field in case there are no diffrences
+				$dbMetadata->save();
 			}
 		}
 		
@@ -388,7 +390,6 @@ class MetadataService extends KalturaBaseService
 				$entryIds = entryPeer::filterEntriesByPartnerOrKalturaNetwork($entryIds, kCurrentContext::getCurrentPartnerId());
 				if(!count($entryIds))
 				{
-					KalturaLog::debug("No entries found");
 					$response = new KalturaMetadataListResponse();
 					$response->objects = new KalturaMetadataArray();
 					$response->totalCount = 0;

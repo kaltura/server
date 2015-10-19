@@ -103,7 +103,7 @@ public final class ParseUtils {
 		for (int j = 0; j < subNodeList.getLength(); j++) {
 			Node itemNode = subNodeList.item(j);
 			if(itemNode instanceof Element){
-				NodeList nameNodes = ((Element)itemNode).getElementsByTagName("name");
+				NodeList nameNodes = ((Element)itemNode).getElementsByTagName("itemKey");
 		        String name = nameNodes.item(0).getTextContent();
 		        
 				tmpMap.put(name, (T) KalturaObjectFactory.create((Element) itemNode, clz));

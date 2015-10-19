@@ -404,6 +404,17 @@ class kCouchbaseCacheList
 class kCouchbaseCacheWrapper extends kBaseCacheWrapper
 {
 	const ERROR_CODE_THE_KEY_ALREADY_EXISTS_IN_THE_SERVER = 12;
+	const ERROR_CODE_THE_KEY_DOES_NOT_EXIST_IN_THE_SERVER = 13;
+	
+	/**
+	 * @var string
+	 */
+	protected $name;
+	
+	/**
+	 * @var boolean
+	 */
+	protected $debug;
 	
 	/**
 	 * @var CouchbaseBucket
@@ -425,10 +436,18 @@ class kCouchbaseCacheWrapper extends kBaseCacheWrapper
 			return false;
 		}
 
+		if(isset($config['debug']) && $config['debug'])
+			$this->debug = true;
+			
 		$cluster = new CouchbaseCluster($config['dsn'], $config['username'], $config['password']);
 		try
 		{
-			$this->bucket = $cluster->openBucket($config['name']);
+			$this->name = $config['name'];
+			
+			if($this->debug)
+				KalturaLog::debug("Bucket name [$this->name]");
+				
+			$this->bucket = $cluster->openBucket($this->name);
 		}
 		catch(CouchbaseException $e)
 		{
@@ -465,13 +484,19 @@ class kCouchbaseCacheWrapper extends kBaseCacheWrapper
 		try
 		{
 			$meta = $this->bucket->get($key);
-			KalturaLog::debug("key [$key], meta [" . print_r($meta, true) . "]");
+			
+			if($this->debug)
+				KalturaLog::debug("key [$key], meta [" . print_r($meta, true) . "]");
+				
 			return $meta->value;
 		}
 		catch(CouchbaseException $e)
 		{
+			if($e->getCode() == self::ERROR_CODE_THE_KEY_DOES_NOT_EXIST_IN_THE_SERVER)
+				return false;
+				
+			throw $e;
 		}
-		return false;
 	}
 	
 	/* (non-PHPdoc)
@@ -482,17 +507,29 @@ class kCouchbaseCacheWrapper extends kBaseCacheWrapper
 		try
 		{
 			$metas = $this->bucket->get($keys);
-			KalturaLog::debug("key [" . print_r($keys, true) . "], metas [" . print_r($metas, true) . "]");
+			
+			if($this->debug)
+				KalturaLog::debug("key [" . print_r($keys, true) . "], metas [" . print_r($metas, true) . "]");
+				
 			$values = array();
 			foreach($metas as $meta)
+			{
+				if($meta->error && $meta->error->getCode() != self::ERROR_CODE_THE_KEY_DOES_NOT_EXIST_IN_THE_SERVER)
+				{
+					throw $meta->error;
+				}
 				$values[] = $meta->value;
+			}
 				
 			return $values;
 		}
 		catch(CouchbaseException $e)
 		{
+			if($e->getCode() == self::ERROR_CODE_THE_KEY_DOES_NOT_EXIST_IN_THE_SERVER)
+				return false;
+				
+			throw $e;
 		}
-		return false;
 	}
 	
 	/* (non-PHPdoc)
@@ -501,7 +538,10 @@ class kCouchbaseCacheWrapper extends kBaseCacheWrapper
 	protected function doIncrement($key, $delta = 1)
 	{
 		$meta = $this->bucket->counter($key, $delta);
-		KalturaLog::debug("key [$key], meta [" . print_r($meta, true) . "]");
+		
+		if($this->debug)
+			KalturaLog::debug("key [$key], meta [" . print_r($meta, true) . "]");
+			
 		return $meta->value;
 	}
 
@@ -510,6 +550,9 @@ class kCouchbaseCacheWrapper extends kBaseCacheWrapper
 	 */
 	protected function doSet($key, $var, $expiry = 0)
 	{
+		if($this->debug)
+			KalturaLog::debug("Bucket name [$this->name] key [$key] var [" . print_r($var, true) . "]");
+			
 		$meta = $this->bucket->upsert($key, $var, array(
 			'expiry' => $expiry
 		));
@@ -522,7 +565,9 @@ class kCouchbaseCacheWrapper extends kBaseCacheWrapper
 	 */
 	protected function doAdd($key, $var, $expiry = 0)
 	{
-		KalturaLog::debug("key [$key], var [" . print_r($var, true) . "]");
+		if($this->debug)
+			KalturaLog::debug("key [$key], var [" . print_r($var, true) . "]");
+			
 		try
 		{
 			$meta = $this->bucket->insert($key, $var, array(
@@ -545,7 +590,9 @@ class kCouchbaseCacheWrapper extends kBaseCacheWrapper
 	 */
 	protected function doDelete($key)
 	{
-		KalturaLog::debug("key [$key]");
+		if($this->debug)
+			KalturaLog::debug("key [$key]");
+			
 		try
 		{
 			$meta = $this->bucket->remove($key);
@@ -553,8 +600,11 @@ class kCouchbaseCacheWrapper extends kBaseCacheWrapper
 		}
 		catch(CouchbaseException $e)
 		{
+			if($e->getCode() == self::ERROR_CODE_THE_KEY_DOES_NOT_EXIST_IN_THE_SERVER)
+				return false;
+				
+			throw $e;
 		}
-		return false;
 	}
 
 	/**
@@ -564,19 +614,14 @@ class kCouchbaseCacheWrapper extends kBaseCacheWrapper
 	 */
 	public function replace($key, $var, $expiry = 0)
 	{
-		try
-		{
-			$meta = $this->bucket->replace($key, $var, array(
-				'expiry' => $expiry
-			));
+		$meta = $this->bucket->replace($key, $var, array(
+			'expiry' => $expiry
+		));
+		
+		if($this->debug)
 			KalturaLog::debug("key [$key] var [" . print_r($var, true) . "] meta [" . print_r($meta, true) . "]");
-			
-			return is_null($meta->error);
-		}
-		catch(CouchbaseException $e)
-		{
-		}
-		return false;
+		
+		return is_null($meta->error);
 	}
 
 	/**
@@ -585,16 +630,12 @@ class kCouchbaseCacheWrapper extends kBaseCacheWrapper
 	 */
 	public function append($key, $var)
 	{
-		try
-		{
-			$meta = $this->bucket->append($key, $var);
+		$meta = $this->bucket->append($key, $var);
+		
+		if($this->debug)
 			KalturaLog::debug("key [$key] var [" . print_r($var, true) . "] meta [" . print_r($meta, true) . "]");
-			return $meta->value;
-		}
-		catch(CouchbaseException $e)
-		{
-		}
-		return false;
+			
+		return $meta->value;
 	}
 
 	/**
@@ -603,16 +644,12 @@ class kCouchbaseCacheWrapper extends kBaseCacheWrapper
 	 */
 	public function prepend($key, $var)
 	{
-		try
-		{
-			$meta = $this->bucket->prepend($key, $var);
+		$meta = $this->bucket->prepend($key, $var);
+		
+		if($this->debug)
 			KalturaLog::debug("key [$key] var [" . print_r($var, true) . "] meta [" . print_r($meta, true) . "]");
-			return $meta->value;
-		}
-		catch(CouchbaseException $e)
-		{
-		}
-		return false;
+			
+		return $meta->value;
 	}
 
 	/**
@@ -624,11 +661,18 @@ class kCouchbaseCacheWrapper extends kBaseCacheWrapper
 		try
 		{
 			$meta = $this->bucket->get($key);
-			KalturaLog::debug("key [$key]");
+			
+			if($this->debug)
+				KalturaLog::debug("key [$key]");
+				
 			return $meta->value;
 		}
 		catch(CouchbaseException $e)
 		{
+			if($e->getCode() == self::ERROR_CODE_THE_KEY_DOES_NOT_EXIST_IN_THE_SERVER)
+				return false;
+				
+			throw $e;
 		}
 		return false;
 	}
@@ -642,12 +686,18 @@ class kCouchbaseCacheWrapper extends kBaseCacheWrapper
 		try
 		{
 			$metas = $this->bucket->remove($keys);
-			KalturaLog::debug("key [" . print_r($keys, true) . "]");
+			
+			if($this->debug)
+				KalturaLog::debug("key [" . print_r($keys, true) . "]");
+				
 			return true;
 		}
 		catch(CouchbaseException $e)
 		{
-			return false;
+			if($e->getCode() == self::ERROR_CODE_THE_KEY_DOES_NOT_EXIST_IN_THE_SERVER)
+				return false;
+				
+			throw $e;
 		}
 	}
 
@@ -660,7 +710,10 @@ class kCouchbaseCacheWrapper extends kBaseCacheWrapper
 		try
 		{
 			$metas = $this->bucket->get($keys);
-			KalturaLog::debug("key [" . print_r($keys, true) . "]");
+			
+			if($this->debug)
+				KalturaLog::debug("key [" . implode(', ', $keys) . "], metas [" . print_r($metas, true) . "]");
+				
 			$values = array();
 			foreach($keys as $key)
 			{
@@ -677,8 +730,11 @@ class kCouchbaseCacheWrapper extends kBaseCacheWrapper
 		}
 		catch(CouchbaseException $e)
 		{
+			if($e->getCode() == self::ERROR_CODE_THE_KEY_DOES_NOT_EXIST_IN_THE_SERVER)
+				return false;
+				
+			throw $e;
 		}
-		return false;
 	}
 
 	/**
@@ -693,7 +749,9 @@ class kCouchbaseCacheWrapper extends kBaseCacheWrapper
 			return null;
 		}
 			
-		KalturaLog::debug("Loads query [" . print_r($this->views[$view], true) . "]");
+		if($this->debug)
+			KalturaLog::debug("Loads query [" . print_r($this->views[$view], true) . "]");
+			
 		$designDocumentName = $this->views[$view]['designDocumentName'];
 		$viewName = $this->views[$view]['viewName'];
 		return new kCouchbaseCacheQuery($designDocumentName, $viewName);

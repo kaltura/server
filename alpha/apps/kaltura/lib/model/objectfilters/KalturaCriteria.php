@@ -123,10 +123,6 @@ class KalturaCriteria extends Criteria implements IKalturaDbQuery
 				
 			$this->hasAdvancedSearchFilter = true;
 		}
-		else
-		{
-			KalturaLog::debug('No advanced filter found');
-		}
 		
 		// attach all unhandled fields
 		$filter->attachToFinalCriteria($this);

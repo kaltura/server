@@ -477,7 +477,7 @@ class categoryPeer extends BasecategoryPeer implements IRelatedObjectPeer
 	/* (non-PHPdoc)
 	 * @see IRelatedObjectPeer::getRootObjects()
 	 */
-	public function getRootObjects(IBaseObject $object)
+	public function getRootObjects(IRelatedObject $object)
 	{
 		/* @var $object category */
 		
@@ -491,7 +491,7 @@ class categoryPeer extends BasecategoryPeer implements IRelatedObjectPeer
 	/* (non-PHPdoc)
 	 * @see IRelatedObjectPeer::isReferenced()
 	 */
-	public function isReferenced(IBaseObject $object)
+	public function isReferenced(IRelatedObject $object)
 	{
 		return false;
 	}

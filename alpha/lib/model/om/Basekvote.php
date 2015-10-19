@@ -44,6 +44,12 @@ abstract class Basekvote extends BaseObject  implements Persistent {
 	protected $kuser_id;
 
 	/**
+	 * The value for the puser_id field.
+	 * @var        string
+	 */
+	protected $puser_id;
+
+	/**
 	 * The value for the partner_id field.
 	 * @var        int
 	 */
@@ -199,6 +205,16 @@ abstract class Basekvote extends BaseObject  implements Persistent {
 	public function getKuserId()
 	{
 		return $this->kuser_id;
+	}
+
+	/**
+	 * Get the [puser_id] column value.
+	 * 
+	 * @return     string
+	 */
+	public function getPuserId()
+	{
+		return $this->puser_id;
 	}
 
 	/**
@@ -396,6 +412,29 @@ abstract class Basekvote extends BaseObject  implements Persistent {
 	} // setKuserId()
 
 	/**
+	 * Set the value of [puser_id] column.
+	 * 
+	 * @param      string $v new value
+	 * @return     kvote The current object (for fluent API support)
+	 */
+	public function setPuserId($v)
+	{
+		if(!isset($this->oldColumnsValues[kvotePeer::PUSER_ID]))
+			$this->oldColumnsValues[kvotePeer::PUSER_ID] = $this->puser_id;
+
+		if ($v !== null) {
+			$v = (string) $v;
+		}
+
+		if ($this->puser_id !== $v) {
+			$this->puser_id = $v;
+			$this->modifiedColumns[] = kvotePeer::PUSER_ID;
+		}
+
+		return $this;
+	} // setPuserId()
+
+	/**
 	 * Set the value of [partner_id] column.
 	 * 
 	 * @param      int $v new value
@@ -590,18 +629,22 @@ abstract class Basekvote extends BaseObject  implements Persistent {
 	 */
 	public function hydrate($row, $startcol = 0, $rehydrate = false)
 	{
+		// Nullify cached objects
+		$this->m_custom_data = null;
+		
 		try {
 
 			$this->id = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
 			$this->kshow_id = ($row[$startcol + 1] !== null) ? (string) $row[$startcol + 1] : null;
 			$this->entry_id = ($row[$startcol + 2] !== null) ? (string) $row[$startcol + 2] : null;
 			$this->kuser_id = ($row[$startcol + 3] !== null) ? (int) $row[$startcol + 3] : null;
-			$this->partner_id = ($row[$startcol + 4] !== null) ? (int) $row[$startcol + 4] : null;
-			$this->rank = ($row[$startcol + 5] !== null) ? (int) $row[$startcol + 5] : null;
-			$this->status = ($row[$startcol + 6] !== null) ? (int) $row[$startcol + 6] : null;
-			$this->kvote_type = ($row[$startcol + 7] !== null) ? (int) $row[$startcol + 7] : null;
-			$this->created_at = ($row[$startcol + 8] !== null) ? (string) $row[$startcol + 8] : null;
-			$this->custom_data = ($row[$startcol + 9] !== null) ? (string) $row[$startcol + 9] : null;
+			$this->puser_id = ($row[$startcol + 4] !== null) ? (string) $row[$startcol + 4] : null;
+			$this->partner_id = ($row[$startcol + 5] !== null) ? (int) $row[$startcol + 5] : null;
+			$this->rank = ($row[$startcol + 6] !== null) ? (int) $row[$startcol + 6] : null;
+			$this->status = ($row[$startcol + 7] !== null) ? (int) $row[$startcol + 7] : null;
+			$this->kvote_type = ($row[$startcol + 8] !== null) ? (int) $row[$startcol + 8] : null;
+			$this->created_at = ($row[$startcol + 9] !== null) ? (string) $row[$startcol + 9] : null;
+			$this->custom_data = ($row[$startcol + 10] !== null) ? (string) $row[$startcol + 10] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -611,7 +654,7 @@ abstract class Basekvote extends BaseObject  implements Persistent {
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 10; // 10 = kvotePeer::NUM_COLUMNS - kvotePeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 11; // 11 = kvotePeer::NUM_COLUMNS - kvotePeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating kvote object", $e);
@@ -673,7 +716,9 @@ abstract class Basekvote extends BaseObject  implements Persistent {
 		// already in the pool.
 
 		kvotePeer::setUseCriteriaFilter(false);
-		$stmt = kvotePeer::doSelectStmt($this->buildPkeyCriteria(), $con);
+		$criteria = $this->buildPkeyCriteria();
+		kvotePeer::addSelectColumns($criteria);
+		$stmt = BasePeer::doSelect($criteria, $con);
 		kvotePeer::setUseCriteriaFilter(true);
 		$row = $stmt->fetch(PDO::FETCH_NUM);
 		$stmt->closeCursor();
@@ -758,18 +803,80 @@ abstract class Basekvote extends BaseObject  implements Persistent {
 			} else {
 				$ret = $ret && $this->preUpdate($con);
 			}
-			if ($ret) {
-				$affectedRows = $this->doSave($con);
-				if ($isInsert) {
-					$this->postInsert($con);
-				} else {
-					$this->postUpdate($con);
-				}
-				$this->postSave($con);
-				kvotePeer::addInstanceToPool($this);
-			} else {
-				$affectedRows = 0;
+			
+			if (!$ret || !$this->isModified()) {
+				$con->commit();
+				return 0;
 			}
+			
+			for ($retries = 1; $retries < KalturaPDO::SAVE_MAX_RETRIES; $retries++)
+			{
+               $affectedRows = $this->doSave($con);
+                if ($affectedRows || !$this->isColumnModified(kvotePeer::CUSTOM_DATA)) //ask if custom_data wasn't modified to avoid retry with atomic column 
+                	break;
+
+                KalturaLog::debug("was unable to save! retrying for the $retries time");
+                $criteria = $this->buildPkeyCriteria();
+				$criteria->addSelectColumn(kvotePeer::CUSTOM_DATA);
+                $stmt = BasePeer::doSelect($criteria, $con);
+                $cutsomDataArr = $stmt->fetchAll(PDO::FETCH_COLUMN);
+                $newCustomData = $cutsomDataArr[0];
+                
+                $this->custom_data_md5 = md5($newCustomData);
+
+                $valuesToChangeTo = $this->m_custom_data->toArray();
+				$this->m_custom_data = myCustomData::fromString($newCustomData); 
+
+				//set custom data column values we wanted to change to
+				$validUpdate = true;
+				$atomicCustomDataFields = kvotePeer::getAtomicCustomDataFields();
+			 	foreach ($this->oldCustomDataValues as $namespace => $namespaceValues){
+                	foreach($namespaceValues as $name => $oldValue)
+					{
+						$newValue = null;
+						if ($namespace)
+						{
+							if (isset ($valuesToChangeTo[$namespace][$name]))
+								$newValue = $valuesToChangeTo[$namespace][$name];
+						}
+						else
+						{ 
+							$newValue = $valuesToChangeTo[$name];
+						}
+					 
+						if (!is_null($newValue)) {
+							$atomicField = false;
+							if($namespace) {
+								$atomicField = array_key_exists($namespace, $atomicCustomDataFields) && in_array($name, $atomicCustomDataFields[$namespace]);
+							} else {
+								$atomicField = in_array($name, $atomicCustomDataFields);
+							}
+							if($atomicField) {
+								$dbValue = $this->m_custom_data->get($name, $namespace);
+								if($oldValue != $dbValue) {
+									$validUpdate = false;
+									break;
+								}
+							}
+							$this->putInCustomData($name, $newValue, $namespace);
+						}
+					}
+                   }
+                   
+				if(!$validUpdate) 
+					break;
+					                   
+				$this->setCustomData($this->m_custom_data->toString());
+			}
+
+			if ($isInsert) {
+				$this->postInsert($con);
+			} else {
+				$this->postUpdate($con);
+			}
+			$this->postSave($con);
+			kvotePeer::addInstanceToPool($this);
+			
 			$con->commit();
 			return $affectedRows;
 		} catch (PropelException $e) {
@@ -877,7 +984,7 @@ abstract class Basekvote extends BaseObject  implements Persistent {
 	/**
 	 * Code to be run before persisting the object
 	 * @param PropelPDO $con
-	 * @return bloolean
+	 * @return boolean
 	 */
 	public function preSave(PropelPDO $con = null)
 	{
@@ -906,8 +1013,7 @@ abstract class Basekvote extends BaseObject  implements Persistent {
 	 */
 	public function preInsert(PropelPDO $con = null)
 	{
-    	$this->setCreatedAt(time());
-    	
+		$this->setCreatedAt(time());
 		return parent::preInsert($con);
 	}
 	
@@ -941,7 +1047,9 @@ abstract class Basekvote extends BaseObject  implements Persistent {
 		if($this->isModified())
 		{
 			kQueryCache::invalidateQueryCache($this);
-			kEventsManager::raiseEvent(new kObjectChangedEvent($this, $this->tempModifiedColumns));
+			$modifiedColumns = $this->tempModifiedColumns;
+			$modifiedColumns[kObjectChangedEvent::CUSTOM_DATA_OLD_VALUES] = $this->oldCustomDataValues;
+			kEventsManager::raiseEvent(new kObjectChangedEvent($this, $modifiedColumns));
 		}
 			
 		$this->tempModifiedColumns = array();
@@ -1133,21 +1241,24 @@ abstract class Basekvote extends BaseObject  implements Persistent {
 				return $this->getKuserId();
 				break;
 			case 4:
-				return $this->getPartnerId();
+				return $this->getPuserId();
 				break;
 			case 5:
-				return $this->getRank();
+				return $this->getPartnerId();
 				break;
 			case 6:
-				return $this->getStatus();
+				return $this->getRank();
 				break;
 			case 7:
-				return $this->getKvoteType();
+				return $this->getStatus();
 				break;
 			case 8:
-				return $this->getCreatedAt();
+				return $this->getKvoteType();
 				break;
 			case 9:
+				return $this->getCreatedAt();
+				break;
+			case 10:
 				return $this->getCustomData();
 				break;
 			default:
@@ -1175,12 +1286,13 @@ abstract class Basekvote extends BaseObject  implements Persistent {
 			$keys[1] => $this->getKshowId(),
 			$keys[2] => $this->getEntryId(),
 			$keys[3] => $this->getKuserId(),
-			$keys[4] => $this->getPartnerId(),
-			$keys[5] => $this->getRank(),
-			$keys[6] => $this->getStatus(),
-			$keys[7] => $this->getKvoteType(),
-			$keys[8] => $this->getCreatedAt(),
-			$keys[9] => $this->getCustomData(),
+			$keys[4] => $this->getPuserId(),
+			$keys[5] => $this->getPartnerId(),
+			$keys[6] => $this->getRank(),
+			$keys[7] => $this->getStatus(),
+			$keys[8] => $this->getKvoteType(),
+			$keys[9] => $this->getCreatedAt(),
+			$keys[10] => $this->getCustomData(),
 		);
 		return $result;
 	}
@@ -1225,21 +1337,24 @@ abstract class Basekvote extends BaseObject  implements Persistent {
 				$this->setKuserId($value);
 				break;
 			case 4:
-				$this->setPartnerId($value);
+				$this->setPuserId($value);
 				break;
 			case 5:
-				$this->setRank($value);
+				$this->setPartnerId($value);
 				break;
 			case 6:
-				$this->setStatus($value);
+				$this->setRank($value);
 				break;
 			case 7:
-				$this->setKvoteType($value);
+				$this->setStatus($value);
 				break;
 			case 8:
-				$this->setCreatedAt($value);
+				$this->setKvoteType($value);
 				break;
 			case 9:
+				$this->setCreatedAt($value);
+				break;
+			case 10:
 				$this->setCustomData($value);
 				break;
 		} // switch()
@@ -1270,12 +1385,13 @@ abstract class Basekvote extends BaseObject  implements Persistent {
 		if (array_key_exists($keys[1], $arr)) $this->setKshowId($arr[$keys[1]]);
 		if (array_key_exists($keys[2], $arr)) $this->setEntryId($arr[$keys[2]]);
 		if (array_key_exists($keys[3], $arr)) $this->setKuserId($arr[$keys[3]]);
-		if (array_key_exists($keys[4], $arr)) $this->setPartnerId($arr[$keys[4]]);
-		if (array_key_exists($keys[5], $arr)) $this->setRank($arr[$keys[5]]);
-		if (array_key_exists($keys[6], $arr)) $this->setStatus($arr[$keys[6]]);
-		if (array_key_exists($keys[7], $arr)) $this->setKvoteType($arr[$keys[7]]);
-		if (array_key_exists($keys[8], $arr)) $this->setCreatedAt($arr[$keys[8]]);
-		if (array_key_exists($keys[9], $arr)) $this->setCustomData($arr[$keys[9]]);
+		if (array_key_exists($keys[4], $arr)) $this->setPuserId($arr[$keys[4]]);
+		if (array_key_exists($keys[5], $arr)) $this->setPartnerId($arr[$keys[5]]);
+		if (array_key_exists($keys[6], $arr)) $this->setRank($arr[$keys[6]]);
+		if (array_key_exists($keys[7], $arr)) $this->setStatus($arr[$keys[7]]);
+		if (array_key_exists($keys[8], $arr)) $this->setKvoteType($arr[$keys[8]]);
+		if (array_key_exists($keys[9], $arr)) $this->setCreatedAt($arr[$keys[9]]);
+		if (array_key_exists($keys[10], $arr)) $this->setCustomData($arr[$keys[10]]);
 	}
 
 	/**
@@ -1291,6 +1407,7 @@ abstract class Basekvote extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(kvotePeer::KSHOW_ID)) $criteria->add(kvotePeer::KSHOW_ID, $this->kshow_id);
 		if ($this->isColumnModified(kvotePeer::ENTRY_ID)) $criteria->add(kvotePeer::ENTRY_ID, $this->entry_id);
 		if ($this->isColumnModified(kvotePeer::KUSER_ID)) $criteria->add(kvotePeer::KUSER_ID, $this->kuser_id);
+		if ($this->isColumnModified(kvotePeer::PUSER_ID)) $criteria->add(kvotePeer::PUSER_ID, $this->puser_id);
 		if ($this->isColumnModified(kvotePeer::PARTNER_ID)) $criteria->add(kvotePeer::PARTNER_ID, $this->partner_id);
 		if ($this->isColumnModified(kvotePeer::RANK)) $criteria->add(kvotePeer::RANK, $this->rank);
 		if ($this->isColumnModified(kvotePeer::STATUS)) $criteria->add(kvotePeer::STATUS, $this->status);
@@ -1356,6 +1473,8 @@ abstract class Basekvote extends BaseObject  implements Persistent {
 		$copyObj->setEntryId($this->entry_id);
 
 		$copyObj->setKuserId($this->kuser_id);
+
+		$copyObj->setPuserId($this->puser_id);
 
 		$copyObj->setPartnerId($this->partner_id);
 
@@ -1604,6 +1723,12 @@ abstract class Basekvote extends BaseObject  implements Persistent {
 	 * @var myCustomData
 	 */
 	protected $m_custom_data = null;
+	
+	/**
+	 * The md5 value for the custom_data field.
+	 * @var        string
+	 */
+	protected $custom_data_md5;
 
 	/**
 	 * Store custom data old values before the changes
@@ -1661,8 +1786,17 @@ abstract class Basekvote extends BaseObject  implements Persistent {
 	 */
 	public function removeFromCustomData ( $name , $namespace = null)
 	{
-
-		$customData = $this->getCustomDataObj( );
+		$customData = $this->getCustomDataObj();
+		
+		$currentNamespace = '';
+		if($namespace)
+			$currentNamespace = $namespace;
+			
+		if(!isset($this->oldCustomDataValues[$currentNamespace]))
+			$this->oldCustomDataValues[$currentNamespace] = array();
+		if(!isset($this->oldCustomDataValues[$currentNamespace][$name]))
+			$this->oldCustomDataValues[$currentNamespace][$name] = $customData->get($name, $namespace);
+		
 		return $customData->remove ( $name , $namespace );
 	}
 
@@ -1675,6 +1809,16 @@ abstract class Basekvote extends BaseObject  implements Persistent {
 	public function incInCustomData ( $name , $delta = 1, $namespace = null)
 	{
 		$customData = $this->getCustomDataObj( );
+		
+		$currentNamespace = '';
+		if($namespace)
+			$currentNamespace = $namespace;
+			
+		if(!isset($this->oldCustomDataValues[$currentNamespace]))
+			$this->oldCustomDataValues[$currentNamespace] = array();
+		if(!isset($this->oldCustomDataValues[$currentNamespace][$name]))
+			$this->oldCustomDataValues[$currentNamespace][$name] = $customData->get($name, $namespace);
+		
 		return $customData->inc ( $name , $delta , $namespace  );
 	}
 
@@ -1709,6 +1853,7 @@ abstract class Basekvote extends BaseObject  implements Persistent {
 	{
 		if ( $this->m_custom_data != null )
 		{
+			$this->custom_data_md5 = is_null($this->custom_data) ? null : md5($this->custom_data);
 			$this->setCustomData( $this->m_custom_data->toString() );
 		}
 	}

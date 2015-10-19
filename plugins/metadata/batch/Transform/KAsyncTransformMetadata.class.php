@@ -67,8 +67,6 @@ class KAsyncTransformMetadata extends KJobHandlerWorker
 	
 	private function upgrade(KalturaBatchJob $job, KalturaTransformMetadataJobData $data)
 	{
-		KalturaLog::debug("transform($job->id)");
-		
 		if(self::$taskConfig->params->multiRequestSize)
 			$this->multiRequestSize = self::$taskConfig->params->multiRequestSize;
 		

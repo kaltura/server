@@ -13,7 +13,7 @@
  * @package plugins.dropFolder
  * @subpackage model
  */
-class DropFolder extends BaseDropFolder implements IBaseObject
+class DropFolder extends BaseDropFolder implements IRelatedObject
 {
 	
 	const AUTO_FILE_DELETE_DAYS_DEFAULT_VALUE = 0;
