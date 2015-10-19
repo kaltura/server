@@ -68,7 +68,7 @@ class Form_DistributionFieldConfig_SubForm extends Zend_Form_SubForm
 			'filters'		=> array('StringTrim'),
 			'decorators'	=> array('ViewHelper'),
 			'class' 		=> 'trigger-delete-on-error',
-			'label' 		=> 'Trigger data deletion on error:', 
+			'label' 		=> 'Trigger data deletion on invalidation:', 
 		));
 	}
 	
