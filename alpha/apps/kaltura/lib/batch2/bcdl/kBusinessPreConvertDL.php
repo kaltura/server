@@ -417,6 +417,7 @@ class kBusinessPreConvertDL
 		
 		$flavorParams->setDynamicAttributes($dynamicAttributes);
 			
+		self::adjustAssetParams($entryId, array($flavorParams));
 		$flavor = self::validateFlavorAndMediaInfo($flavorParams, $mediaInfo, $errDescription);
 		
 		if (is_null($flavor))
@@ -486,6 +487,7 @@ class kBusinessPreConvertDL
 					KalturaLog::log("Creating flavor params output for asset [" . $tagedFlavorAsset->getId() . "]");
 				
 					$flavorParams = assetParamsPeer::retrieveByPK($tagedFlavorAsset->getId());
+					self::adjustAssetParams($entryId, array($flavorParams));
 					$flavorParamsOutput = self::validateFlavorAndMediaInfo($flavorParams, $mediaInfo, $errDescription);
 					
 					if (is_null($flavorParamsOutput))
@@ -541,6 +543,7 @@ class kBusinessPreConvertDL
 			KalturaLog::log("Validate Conversion Profile, media info [" . $mediaInfo->getId() . "]");
 		}
 		
+		self::adjustAssetParams($entryId, $flavors);
 		// call the decision layer
 		KalturaLog::log("Generate Target " . count($flavors) . " Flavors supplied");
 		$cdl = KDLWrap::CDLGenerateTargetFlavors($mediaInfo, $flavors);
@@ -1424,6 +1427,7 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 		{
 			KalturaLog::log("Source flavor asset requires conversion");
 				
+			self::adjustAssetParams($entryId, array($sourceFlavor));
 			$srcSyncKey = $originalFlavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 			$errDescription = null;
 			$sourceFlavorOutput = self::validateFlavorAndMediaInfo($sourceFlavor, $mediaInfo, $errDescription);
@@ -1649,5 +1653,20 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 			}
 		}	
 		return $shouldConvert;	
+	}
+	
+	/**
+	 * 
+	 * @param string $entryId
+	 * @param array<assetParams> $flavors
+	 */
+	protected static function adjustAssetParams($entryId, array $flavors)
+	{
+		$assetParamsAdjusters = KalturaPluginManager::getPluginInstances('IKalturaAssetParamsAdjuster');
+		foreach($assetParamsAdjusters as $assetParamsAdjuster)
+		{
+			/* @var $assetParamsAdjuster IKalturaAssetParamsAdjuster */
+			$assetParamsAdjuster->adjustAssetParams($entryId, $flavors);
+		}
 	}
 }
