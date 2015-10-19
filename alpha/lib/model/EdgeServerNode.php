@@ -17,14 +17,14 @@ class EdgeServerNode extends DeliveryServerNode {
 		$this->setType(serverNodeType::EDGE);
 	}
 	
-	public function getManifestUrl($protocol = 'http')
+	public function getManifestUrl($protocol = 'http', $format = null)
 	{
 		$edgePlaybackHost = $this->getPlaybackHost();
 		
 		return $protocol . '://' . rtrim($edgePlaybackHost, '/') . '/';
 	}
 	
-	public function getPlaybackHost()
+	public function getPlaybackHost($protocol = 'http', $format = null)
 	{
 		$playbackHostName = $this->getPlaybackHostName() . "/" . self::EDGE_SERVER_DEFAULT_LIVE_CACHE_APPLICATION_NAME . "/";
 	

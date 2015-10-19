@@ -4,7 +4,8 @@ abstract class MediaServerNode extends DeliveryServerNode {
 	
 	protected $partner_media_server_config = null;
 	
-	const CUSTOM_DATA_PROTOCOL_PORT_CONFIG_ARRAY = 'protocol_port_config';
+	const CUSTOM_DATA_PROTOCOL_PORT_CONFIG_ARRAY = 'media_server_port_config';
+	const CUSTOM_DATA_PLAYBACK_DOMAIN_CONFIG_ARRAY = 'media_server_playback_domain_config';
 	const CUSTOM_DATA_APPLICATION_NAME = 'application_name';
 	const CUSTOM_DATA_IS_EXTERNAL = 'is_external';
 	const DEFAULT_APPLICATION = 'kLive';
@@ -35,14 +36,24 @@ abstract class MediaServerNode extends DeliveryServerNode {
 		return $this->getFromCustomData(self::CUSTOM_DATA_IS_EXTERNAL, null, false);
 	}
 	
-	public function setProtocolPortConfig($protocolPortConfigArray)
+	public function setMediaServerPortConfig($mediaServerPortConfig)
 	{
-		$this->putInCustomData(self::CUSTOM_DATA_PROTOCOL_PORT_CONFIG_ARRAY, $protocolPortConfigArray);
+		$this->putInCustomData(self::CUSTOM_DATA_PROTOCOL_PORT_CONFIG_ARRAY, $mediaServerPortConfig);
 	}
 	
-	public function getProtocolPortConfig()
+	public function getMediaServerPortConfig()
 	{
 		return $this->getFromCustomData(self::CUSTOM_DATA_PROTOCOL_PORT_CONFIG_ARRAY, null, null);
+	}
+	
+	public function setMediaServerPlaybackDomainConfig($mediaServerPlaybackDomainConfig)
+	{
+		$this->putInCustomData(self::CUSTOM_DATA_PLAYBACK_DOMAIN_CONFIG_ARRAY, $mediaServerPlaybackDomainConfig);
+	}
+	
+	public function getMediaServerPlaybackDomainConfig()
+	{
+		return $this->getFromCustomData(self::CUSTOM_DATA_PLAYBACK_DOMAIN_CONFIG_ARRAY, null, null);
 	}
 	
 	public function setApplicationName($applicationName)

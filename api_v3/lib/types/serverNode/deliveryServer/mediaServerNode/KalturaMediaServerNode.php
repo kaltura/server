@@ -13,16 +13,24 @@ abstract class KalturaMediaServerNode extends KalturaDeliveryServerNode
 	public $applicationName;
 			
 	/**
-	 * Media server port per protcol configuration
+	 * Media server playback port configuration by protocol and format
 	 *
 	 * @var KalturaKeyValueArray
 	 */
-	public $protocolPortConfig;
+	public $mediaServerPortConfig;
+	
+	/**
+	 * Media server playback Domain configuration by protocol and format
+	 *
+	 * @var KalturaKeyValueArray
+	 */
+	public $mediaServerPlaybackDomainConfig;
 	
 	private static $mapBetweenObjects = array
 	(
 		'applicationName',
-		'protocolPortConfig',
+		'mediaServerPortConfig',
+		'mediaServerPlaybackDomainConfig',
 	);
 	
 	/* (non-PHPdoc)
@@ -42,10 +50,18 @@ abstract class KalturaMediaServerNode extends KalturaDeliveryServerNode
 	
 		if (!is_null($this->protocolPortConfig))
 		{
-			$protocolPortConfig = array();
-			foreach($this->protocolPortConfig as $keyValue)
-				$protocolPortConfig[$keyValue->key] = $keyValue->value;
-			$dbObject->setProtocolPortConfig($protocolPortConfig);
+			$mediaServerPortConfig = array();
+			foreach($this->mediaServerPortConfig as $keyValue)
+				$mediaServerPortConfig[$keyValue->key] = $keyValue->value;
+			$dbObject->setMediaServerPortConfig($mediaServerPortConfig);
+		}
+		
+		if(!is_null($this->mediaServerPlaybackDomainConfig))
+		{
+			$mediaServerDomainConfig = array();
+			foreach($this->mediaServerPlaybackDomainConfig as $keyValue)
+				$mediaServerDomainConfig[$keyValue->key] = $keyValue->value;
+			$dbObject->setMediaServerPlaybackDomainConfig($mediaServerDomainConfig);
 		}
 	
 		return $dbObject;
@@ -59,7 +75,10 @@ abstract class KalturaMediaServerNode extends KalturaDeliveryServerNode
 		/* @var $source_object MediaServerNode */
 		parent::doFromObject($source_object, $responseProfile);
 	
-		if($this->shouldGet('protocolPortConfig', $responseProfile) && !is_null($source_object->getProtocolPortConfig()))
-			$this->protocolPortConfig = KalturaKeyValueArray::fromKeyValueArray($source_object->getProtocolPortConfig());
+		if($this->shouldGet('mediaServerPortConfig', $responseProfile) && !is_null($source_object->getMediaServerPortConfig()))
+			$this->mediaServerPortConfig = KalturaKeyValueArray::fromKeyValueArray($source_object->getMediaServerPortConfig());
+		
+		if($this->shouldGet('mediaServerPlaybackDomainConfig', $responseProfile) && !is_null($source_object->getMediaServerPlaybackDomainConfig()))
+			$this->mediaServerPlaybackDomainConfig = KalturaKeyValueArray::fromKeyValueArray($source_object->getMediaServerPlaybackDomainConfig());
 	}
 }

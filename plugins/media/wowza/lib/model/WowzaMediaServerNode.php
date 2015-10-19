@@ -16,8 +16,6 @@ class WowzaMediaServerNode extends MediaServerNode {
 	
 	const WEB_SERVICE_LIVE = 'live';
 	
-	private $isExternalMediaServer = false;
-	
 	static protected $webServices = array(
 		self::WEB_SERVICE_LIVE => 'KalturaMediaServerLiveService',
 	);
@@ -34,13 +32,9 @@ class WowzaMediaServerNode extends MediaServerNode {
 		$this->setType(WowzaPlugin::getWowzaMediaServerTypeCoreValue(WowzaMediaServerNodeType::WOWZA_MEDIA_SERVER));
 	}
 	
-	public function getManifestUrl($protocol = 'http')
+	public function getManifestUrl($protocol = 'http', $format = null)
 	{		
-		$playbackHost = $this->getPlaybackHost();
-		
-		$protocolPortConfiguration = $this->getProtocolPortConfig();
-		if($protocolPortConfiguration && isset($protocolPortConfiguration[$protocol]) && $protocolPortConfiguration[$protocol] !== WowzaMediaServerNode::DEFAULT_MANIFEST_PORT)
-			$playbackHost = str_replace(":" . WowzaMediaServerNode::DEFAULT_MANIFEST_PORT, ":$protocolPortConfiguration[$protocol]", $playbackHost);
+		$playbackHost = $this->getPlaybackHost($protocol, $format);
 		
 		$hostname = $this->getHostname();
 		if(!$this->getIsExternalMediaServer())
@@ -57,14 +51,13 @@ class WowzaMediaServerNode extends MediaServerNode {
 		return WowzaMediaServerNode::WEB_SERVICE_LIVE;
 	}
 	
-	public function getPlaybackHost()
+	public function getPlaybackHost($protocol = 'http', $format = null)
 	{	
-		$domain = $this->getPlaybackHostName();
-		if($this->partner_media_server_config && $this->partner_media_server_config['domain'])
-			$domain = $this->partner_media_server_config['domain'];
+		$domain = $this->getDomainByProtocolAndFormat($protocol, $format);
+		
+		$port = $this->getPortByProtocolAndFormat($protocol, $format);
 		
 		$appPrefix = $this->getAppPrefix();
-		$port = WowzaMediaServerNode::DEFAULT_MANIFEST_PORT;
 		
 		return "$domain:$port/$appPrefix";
 	}
@@ -87,6 +80,58 @@ class WowzaMediaServerNode extends MediaServerNode {
 		$url = "$protocol://$domain:$port/$service?wsdl";
 		KalturaLog::debug("Service URL: $url");
 		return new $serviceClass($url);
+	}
+	
+	public function getDomainByProtocolAndFormat($protocol = 'http', $format = null)
+	{	
+		$domain = $this->getPlaybackHostName();
+		
+		$domainField = $protocol;
+		if(!$format)
+			$domainField .= $format;
+		
+		$mediaServerPlaybackDomainConfig = $this->getMediaServerPlaybackDomainConfig();
+		if($mediaServerPlaybackDomainConfig && isset($mediaServerPlaybackDomainConfig[$domainField]) && $mediaServerPlaybackDomainConfig[$domainField] !== $domain)
+			$domain = $mediaServerPlaybackDomainConfig[$domainField];
+		
+		if(!$this->partner_media_server_config)
+			return $domain;
+
+		$domainField = "domain-" . $domainField; 
+		if(isset($this->partner_media_server_config[$domainField]))
+			$domain = $this->partner_media_server_config[$domainField];
+		if(isset($this->partner_media_server_config['dc-'.$this->getDc()][$domainField]))
+			$domain = $this->partner_media_server_config['dc-'.$this->getDc()][$domainField];
+		if(isset($this->partner_media_server_config[$this->getHostname()][$domainField]))
+			$domain = $this->partner_media_server_config[$this->getHostname()][$domainField];
+		
+		return $domain;
+	}
+	
+	public function getPortByProtocolAndFormat($protocol = 'http', $format = null)
+	{
+		$port = WowzaMediaServerNode::DEFAULT_MANIFEST_PORT;
+		
+		$portField = $protocol;
+		if($format)
+			$portField .= "-$format";
+		
+		$mediaServerPortConfig = $this->getMediaServerPortConfig();
+		if($mediaServerPortConfig && isset($mediaServerPortConfig[$portField]) && $mediaServerPortConfig[$portField] !== WowzaMediaServerNode::DEFAULT_MANIFEST_PORT)
+			$port = $mediaServerPortConfig[$portField];
+		
+		if(!$this->partner_media_server_config)
+			return $port;
+		
+		$portField = "port-" . $portField;
+		if(isset($this->partner_media_server_config[$portField]))
+			$port = $this->partner_media_server_config[$portField];
+		if(isset($this->partner_media_server_config['dc-'.$this->getDc()][$portField]))
+			$port = $this->partner_media_server_config['dc-'.$this->getDc()][$portField];
+		if(isset($this->partner_media_server_config[$this->getHostname()][$portField]))
+			$port = $this->partner_media_server_config[$this->getHostname()][$portField];
+		
+		return port;
 	}
 	
 	public function setAppPrefix($appPrefix)

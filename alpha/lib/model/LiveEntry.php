@@ -359,6 +359,8 @@ abstract class LiveEntry extends entry
 		
 		$manifestUrl = null;
 		$backupManifestUrl = null;
+		$hlsManifestUrl = null;
+		$hlsBackupManifestUrl = null;
 		
 		if (count ($this->getPartner()->getLiveStreamPlaybackUrlConfigurations()))
 		{
@@ -373,10 +375,12 @@ abstract class LiveEntry extends entry
 			$primaryMediaServer->setPartnerMediaServerConfig($partnerMediaServerConfiguration);
 			
 			$manifestUrl = $primaryMediaServer->getManifestUrl($protocol);
+			$hlsManifestUrl = $primaryMediaServer->getManifestUrl($protocol, PlaybackProtocol::HLS);
 			if($backupMediaServer)
 			{
 				$backupMediaServer->setPartnerMediaServerConfig($partnerMediaServerConfiguration);
 				$backupManifestUrl = $backupMediaServer->getManifestUrl($protocol);
+				$hlsBackupManifestUrl = $backupMediaServer->getManifestUrl($protocol, PlaybackProtocol::HLS);
 			}
 		}
 		
@@ -430,7 +434,7 @@ abstract class LiveEntry extends entry
 			$rtmpStreamUrl = $manifestUrl;
 			
 			$manifestUrl .= $streamName;
-			$hlsStreamUrl = "$manifestUrl/playlist.m3u8" . $queryString;
+			$hlsStreamUrl .= $hlsManifestUrl . "$primaryApplicationName/" . $streamName . "/playlist.m3u8" . $queryString;
 			$hdsStreamUrl = "$manifestUrl/manifest.f4m" . $queryString;
 			$slStreamUrl = "$manifestUrl/Manifest" . $queryString;
 			$mpdStreamUrl = "$manifestUrl/manifest.mpd" . $queryString;
@@ -439,6 +443,7 @@ abstract class LiveEntry extends entry
 			{
 				$backupManifestUrl .= "$backupApplicationName/";
 				$backupManifestUrl .= $streamName;
+				$hlsBackupStreamUrl .= $hlsBackupManifestUrl . "$backupApplicationName/" . $streamName . "/playlist.m3u8" .  $queryString;				
 				$hlsBackupStreamUrl = "$backupManifestUrl/playlist.m3u8" . $queryString;
 				$hdsBackupStreamUrl = "$backupManifestUrl/manifest.f4m" . $queryString;
 			}
