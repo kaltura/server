@@ -357,6 +357,14 @@ abstract class KalturaObject implements IApiObject
 			KalturaLog::err("expected an object, got " . print_r($srcObj, true));
 			return;
 		}
+	
+		if($srcObj instanceof IRelatedObject && $responseProfile && $responseProfile->relatedProfiles)
+		{
+			if(KalturaResponseProfileCacher::start($this, $srcObj, $responseProfile))
+			{
+				return;
+			}
+		}
 		
 		$thisClass = get_class($this);
 		$srcObjClass = get_class($srcObj);
@@ -390,15 +398,9 @@ abstract class KalturaObject implements IApiObject
 			KalturaResponseProfileCacher::onPersistentObjectLoaded($srcObj);
 			if($responseProfile && $responseProfile->relatedProfiles)
 			{
-				// trigger validation
 				$responseProfile->validateNestedObjects();
-		
-				$this->relatedObjects = KalturaResponseProfileCacher::start($srcObj, $responseProfile);
-				if(!$this->relatedObjects)
-				{
-					$this->loadRelatedObjects($responseProfile);
-					KalturaResponseProfileCacher::stop($srcObj, $this);
-				}
+				$this->loadRelatedObjects($responseProfile);
+				KalturaResponseProfileCacher::stop($srcObj, $this);
 			}
 		}
 	}

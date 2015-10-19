@@ -9,7 +9,6 @@
 class LikeService extends KalturaBaseService
 {
     const KVOTE_LIKE_RANK_VALUE = 1;
-    
     const KVOTE_UNLIKE_RANK_VALUE = 0;
     
     public function initService($serviceId, $serviceName, $actionName)
@@ -21,7 +20,7 @@ class LikeService extends KalturaBaseService
 		    throw new KalturaAPIException(KalturaErrors::FEATURE_FORBIDDEN, LikePlugin::PLUGIN_NAME);
 		}	
 		
-		if (!kCurrentContext::$ks_uid || kCurrentContext::$ks_uid == "")
+		if ((!kCurrentContext::$ks_uid || kCurrentContext::$ks_uid == "") && $actionName != "list")
 		{
 		    throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID);
 		}
@@ -122,4 +121,28 @@ class LikeService extends KalturaBaseService
         	    
     }
 
+	/**
+	 * @action list
+	 * @param KalturaLikeFilter $filter
+	 * @param KalturaFilterPager $pager
+	 * @return KalturaLikeListResponse
+	 */
+	public function listAction(KalturaLikeFilter $filter = null, KalturaFilterPager $pager = null)
+	{
+		if(!$filter)
+			$filter = new KalturaLikeFilter();
+		else	
+		{			
+			if($filter->entryIdEqual && !entryPeer::retrieveByPK($filter->entryIdEqual))			
+				throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $filter->entryIdEqual);			
+			if($filter->userIdEqual && !kuserPeer::getActiveKuserByPartnerAndUid(kCurrentContext::$ks_partner_id, $filter->userIdEqual))
+				throw new KalturaAPIException(KalturaErrors::USER_NOT_FOUND);			
+		}
+		
+		if(!$pager)
+			$pager = new KalturaFilterPager();
+
+		return $filter->getListResponse($pager, null);
+	}
+	
 }
