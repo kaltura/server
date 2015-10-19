@@ -908,7 +908,16 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		$entryDistribution->setErrorType(null);
 		$entryDistribution->setErrorNumber(null);
 		$entryDistribution->setErrorDescription(null);
-		$entryDistribution->setStatus(EntryDistributionStatus::REMOVED);
+		
+		// If the distribution's associated entry still exists and the status is not DELETED, check the distribution's validation errors.
+		$entry = entryPeer::retrieveByPK($entryDistribution->getEntryId());
+		if ($entry && $entry->getStatus() != entryStatus::DELETED)
+		{
+			$entryDistribution->setStatus(EntryDistributionStatus::QUEUED);
+		}
+		else {
+			$entryDistribution->setStatus(EntryDistributionStatus::REMOVED);
+		}
 		$entryDistribution->setDirtyStatus(null);
 		$entryDistribution->save();
 		
