@@ -14,8 +14,8 @@ None.
 	php /opt/kaltura/app/alpha/scripts/utils/permissions/addPermissionToRole.php 0 Basic\ User\ Session\ Role LIKE_LIST_USER realrun (please use copy-paste carefully here)
 
 	(only for on-prem/CE environments)
-	php deployment/updates/sql/2015_10_25_alter_kvote_table_puser_id_table.sql
 	mysql -h@db_host@ -u@db_user@ -p@db_pass@ -P3306 kaltura < deployment/updates/sql/2015_10_25_alter_kvote_table_puser_id_table.sql
+	php deployment/updates/scripts/2015_10_25_populate_like_table_puser_id_field.php
 	
 #### Known Issues & Limitations ####
 
