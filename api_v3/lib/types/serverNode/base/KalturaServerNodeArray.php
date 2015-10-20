@@ -11,7 +11,7 @@ class KalturaServerNodeArray extends KalturaTypedArray
 		foreach($arr as $obj)
 		{
 		    /* @var $obj StorageProfile */
-			$nObj = KalturaServerNodeFactory::getInstanceByType($obj->getType());
+			$nObj = KalturaServerNode::getInstance($obj);
 			$nObj->fromObject($obj, $responseProfile);
 			$newArr[] = $nObj;
 		}

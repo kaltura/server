@@ -3,7 +3,7 @@
  * @package api
  * @subpackage objects
  */
-abstract class KalturaServerNode extends KalturaObject implements IRelatedFilterable, IApiObjectFactory
+abstract class KalturaServerNode extends KalturaObject implements IFilterable, IApiObjectFactory
 {
 	/**
 	 * @var int
@@ -71,6 +71,7 @@ abstract class KalturaServerNode extends KalturaObject implements IRelatedFilter
 	
 	/**
 	 * @var KalturaServerNodeStatus
+	 * @readonly
 	 * @filter eq,in
 	 */
 	public $status;
@@ -177,7 +178,6 @@ abstract class KalturaServerNode extends KalturaObject implements IRelatedFilter
 			$c->add(ServerNodePeer::ID, $serverNodeId, Criteria::NOT_EQUAL);
 		
 		$c->add(ServerNodePeer::HOST_NAME, $this->hostName);
-		$c->add(ServerNodePeer::STATUS, array(ServerNodeStatus::ACTIVE, ServerNodeStatus::DISABLED), Criteria::IN);
 		
 		if(ServerNodePeer::doCount($c))
 			throw new KalturaAPIException(KalturaErrors::HOST_NAME_ALREADY_EXISTS, $this->hostName);
@@ -191,7 +191,6 @@ abstract class KalturaServerNode extends KalturaObject implements IRelatedFilter
 			$c->add(ServerNodePeer::ID, $serverNodeId, Criteria::NOT_EQUAL);
 	
 		$c->add(ServerNodePeer::SYSTEM_NAME, $this->systemName);
-		$c->add(ServerNodePeer::STATUS, array(ServerNodeStatus::ACTIVE, ServerNodeStatus::DISABLED), Criteria::IN);
 	
 		if(ServerNodePeer::doCount($c))
 			throw new KalturaAPIException(KalturaErrors::SYSTEM_NAME_ALREADY_EXISTS, $this->systemName);
@@ -204,7 +203,7 @@ abstract class KalturaServerNode extends KalturaObject implements IRelatedFilter
 	{
 		parent::doFromObject($source_object, $responseProfile);
 		
-		if($source_object->getHeartbeatTime() < (time() - 90))
+		if($this->shouldGet('status', $responseProfile) && $source_object->getHeartbeatTime() < (time() - 90) && $this->status !== ServerNodeStatus::DISABLED)
 			$this->status = ServerNodeStatus::NOT_REGISTERED;
 	}
 	
@@ -226,7 +225,21 @@ abstract class KalturaServerNode extends KalturaObject implements IRelatedFilter
 	
 	public static function getInstance($sourceObject, KalturaDetachedResponseProfile $responseProfile = null)
 	{
-		$object = KalturaServerNodeFactory::getInstanceByType($sourceObject->getType());
+		$type = $sourceObject->getType();
+		
+		switch ($type)
+		{
+			case KalturaServerNodeType::EDGE:
+				$object = new KalturaEdgeServerNode();
+				break;
+		
+			default:
+				$object = KalturaPluginManager::loadObject('KalturaServerNode', $type);
+				if(!$object)
+					$object = new KalturaServerNode();
+				break;
+		}
+		
 		if (!$object)
 			return null;
 		 

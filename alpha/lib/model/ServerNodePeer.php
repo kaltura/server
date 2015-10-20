@@ -33,22 +33,18 @@ class ServerNodePeer extends BaseServerNodePeer {
 		self::$s_criteria_filter->setFilter($c);
 	}
 	
-	public static function retrieveByHostName($hostName)
+	public static function retrieveActiveServerNodes($hostName = null, $partnerId = null)
 	{
 		$c = new Criteria();
-	
-		$c->add(ServerNodePeer::HOST_NAME, $hostName);
-	
-		return ServerNodePeer::doSelectOne($c);
-	}
-	
-	public static function retrieveByPartnerIdAndHostName($partnerId, $hostName)
-	{
-		$c = new Criteria();
-	
-		$c->add(ServerNodePeer::PARTNER_ID, $partnerId);
-		$c->add(ServerNodePeer::HOST_NAME, $hostName);
-	
+		
+		if($hostName)
+			$c->add(ServerNodePeer::HOST_NAME, $hostName);
+		
+		if($partnerId)
+			$c->add(ServerNodePeer::PARENT_ID, $partnerId);
+		
+		$c->add(ServerNodePeer::STATUS, ServerNodeStatus::DISABLED, Criteria::NOT_EQUAL);
+		
 		return ServerNodePeer::doSelectOne($c);
 	}
 	

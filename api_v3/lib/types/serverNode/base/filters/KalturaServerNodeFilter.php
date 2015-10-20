@@ -39,9 +39,7 @@ class KalturaServerNodeFilter extends KalturaServerNodeBaseFilter
 	
 		return array($list, $totalCount);
 	}
-	/* (non-PHPdoc)
-	 * @see KalturaRelatedFilter::getListResponse()
-	 */
+
 	public function getListResponse(KalturaFilterPager $pager, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		return $this->getTypeListResponse($pager, $responseProfile);

@@ -49,20 +49,10 @@ abstract class KalturaMediaServerNode extends KalturaDeliveryServerNode
 		$dbObject = parent::toObject($dbObject, $skip);
 	
 		if (!is_null($this->protocolPortConfig))
-		{
-			$mediaServerPortConfig = array();
-			foreach($this->mediaServerPortConfig as $keyValue)
-				$mediaServerPortConfig[$keyValue->key] = $keyValue->value;
-			$dbObject->setMediaServerPortConfig($mediaServerPortConfig);
-		}
+			$dbObject->setMediaServerPortConfig($this->protocolPortConfig->toObjectsArray());
 		
 		if(!is_null($this->mediaServerPlaybackDomainConfig))
-		{
-			$mediaServerDomainConfig = array();
-			foreach($this->mediaServerPlaybackDomainConfig as $keyValue)
-				$mediaServerDomainConfig[$keyValue->key] = $keyValue->value;
-			$dbObject->setMediaServerPlaybackDomainConfig($mediaServerDomainConfig);
-		}
+			$dbObject->setMediaServerPlaybackDomainConfig($this->mediaServerPlaybackDomainConfig->toObjectsArray());
 	
 		return $dbObject;
 	}

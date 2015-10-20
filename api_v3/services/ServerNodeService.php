@@ -31,11 +31,9 @@ class ServerNodeService extends KalturaBaseService
 		if(!$serverNode->status)
 			$serverNode->status = KalturaServerNodeStatus::DISABLED; 
 		
-		$dbServerNode = $serverNode->toInsertableObject();
-		$dbServerNode->setPartnerId($this->getPartnerId());
-		$dbServerNode->save();
+		$dbServerNode = $this->addNewServerNode($serverNode);
 		
-		$serverNode = KalturaServerNodeFactory::getInstanceByType($dbServerNode->getType());
+		$serverNode = KalturaServerNode::getInstance($dbServerNode);
 		$serverNode->fromObject($dbServerNode, $this->getResponseProfile());
 		return $serverNode;
 	}
@@ -54,7 +52,7 @@ class ServerNodeService extends KalturaBaseService
 		if (!$dbServerNode)
 			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $serverNodeId);
 		
-		$serverNode = KalturaServerNodeFactory::getInstanceByType($dbServerNode->getType());
+		$serverNode = KalturaServerNode::getInstance($dbServerNode);
 		$serverNode->fromObject($dbServerNode, $this->getResponseProfile());
 		return $serverNode;
 	}
@@ -76,7 +74,7 @@ class ServerNodeService extends KalturaBaseService
 		$dbServerNode = $serverNode->toUpdatableObject($dbServerNode);
 		$dbServerNode->save();
 		
-		$serverNode = KalturaServerNodeFactory::getInstanceByType($dbServerNode->getType());
+		$serverNode = KalturaServerNode::getInstance($dbServerNode);
 		$serverNode->fromObject($dbServerNode, $this->getResponseProfile());
 		return $serverNode;
 	}
@@ -95,6 +93,40 @@ class ServerNodeService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $serverNodeId);
 	
 		$dbServerNode->setStatus(ServerNodeStatus::DELETED);
+		$dbServerNode->save();
+	}
+	
+	/**
+	 * Disable server node by id
+	 *
+	 * @action disable
+	 * @param string $serverNodeId
+	 * @throws KalturaErrors::INVALID_OBJECT_ID
+	 */
+	function disableAction($serverNodeId)
+	{
+		$dbServerNode = ServerNodePeer::retrieveByPK($serverNodeId);
+		if(!$dbServerNode)
+			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $serverNodeId);
+	
+		$dbServerNode->setStatus(ServerNodeStatus::DISABLED);
+		$dbServerNode->save();
+	}
+	
+	/**
+	 * Enable server node by id
+	 *
+	 * @action enable
+	 * @param string $serverNodeId
+	 * @throws KalturaErrors::INVALID_OBJECT_ID
+	 */
+	function enableAction($serverNodeId)
+	{
+		$dbServerNode = ServerNodePeer::retrieveByPK($serverNodeId);
+		if(!$dbServerNode)
+			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $serverNodeId);
+	
+		$dbServerNode->setStatus(ServerNodeStatus::ACTIVE);
 		$dbServerNode->save();
 	}
 	
@@ -124,14 +156,14 @@ class ServerNodeService extends KalturaBaseService
 	 */
 	function reportStatusAction($hostName, KalturaServerNode $serverNode = null)
 	{
-		$dbServerNode = ServerNodePeer::retrieveByPartnerIdAndHostName($this->getPartnerId(), $hostName);
+		$dbServerNode = ServerNodePeer::retrieveActiveServerNodes($hostName, $this->getPartnerId());
 		
 		//Allow serverNodes auto registration without calling add
 		if (!$dbServerNode)
 		{
 			if($serverNode)
 			{
-				return $this->addAction($serverNode);
+				$dbServerNode = $this->addNewServerNode($serverNode);
 			}
 			else 
 				throw new KalturaAPIException(KalturaErrors::SERVER_NODE_NOT_FOUND, $hostName);
@@ -140,8 +172,17 @@ class ServerNodeService extends KalturaBaseService
 		$dbServerNode->setHeartbeatTime(time());
 		$dbServerNode->save();
 	
-		$serverNode = KalturaServerNodeFactory::getInstanceByType($dbServerNode->getType());
+		$serverNode = KalturaServerNode::getInstance($dbServerNode);
 		$serverNode->fromObject($dbServerNode, $this->getResponseProfile());
 		return $serverNode;
+	}
+	
+	private function addNewServerNode(KalturaServerNode $serverNode)
+	{
+		$dbServerNode = $serverNode->toInsertableObject();
+		$dbServerNode->setPartnerId($this->getPartnerId());
+		$dbServerNode->save();
+		
+		return $dbServerNode;
 	}
 }
