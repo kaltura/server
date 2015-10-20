@@ -19,6 +19,10 @@ class TvinciDistributionProfile extends ConfigurableDistributionProfile
 	const CUSTOM_MBR_PPV_MODULE = 'mbrPpvModule';
 	const CUSTOM_DASH_FILENAME = 'dashFileName';
 	const CUSTOM_DASH_PPV_MODULE = 'dashPpvModule';
+	const CUSTOM_WIDEVINE_FILENAME = 'widevineFileName';
+	const CUSTOM_WIDEVINE_PPV_MODULE = 'widevinePpvModule';
+	const CUSTOM_WIDEVINE_MBR_FILENAME = 'widevineMbrFileName';
+	const CUSTOM_WIDEVINE_MBR_PPV_MODULE = 'widevineMbrPpvModule';
 
 	/* (non-PHPdoc)
 	 * @see DistributionProfile::getProvider()
@@ -132,4 +136,13 @@ class TvinciDistributionProfile extends ConfigurableDistributionProfile
 	public function getIpadnewPpvModule()		{return $this->getFromCustomData(self::CUSTOM_IPADNEW_PPV_MODULE);}
 	public function setIpadnewPpvModule($v)		{$this->putInCustomData(self::CUSTOM_IPADNEW_PPV_MODULE, $v);}
 
+	public function getWidevineFileName()		{return $this->getFromCustomData(self::CUSTOM_WIDEVINE_FILENAME);}
+	public function setWidevineFileName($v)		{$this->putInCustomData(self::CUSTOM_WIDEVINE_FILENAME, $v);}
+	public function getWidevinePpvModule()		{return $this->getFromCustomData(self::CUSTOM_WIDEVINE_PPV_MODULE);}
+	public function setWidevinePpvModule($v)	{$this->putInCustomData(self::CUSTOM_WIDEVINE_PPV_MODULE, $v);}
+
+	public function getWidevineMbrFileName()	{return $this->getFromCustomData(self::CUSTOM_WIDEVINE_MBR_FILENAME);}
+	public function setWidevineMbrFileName($v)	{$this->putInCustomData(self::CUSTOM_WIDEVINE_MBR_FILENAME, $v);}
+	public function getWidevineMbrPpvModule()	{return $this->getFromCustomData(self::CUSTOM_WIDEVINE_MBR_PPV_MODULE);}
+	public function setWidevineMbrPpvModule($v)	{$this->putInCustomData(self::CUSTOM_WIDEVINE_MBR_PPV_MODULE, $v);}
 }

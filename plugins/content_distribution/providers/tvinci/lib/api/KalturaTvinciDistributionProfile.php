@@ -75,7 +75,25 @@ class KalturaTvinciDistributionProfile extends KalturaConfigurableDistributionPr
 	 */
 	public $xsltFile;
 
+	/**
+	 * @var string
+	 */
+	public $widevineFileName;
 
+	/**
+	  * @var string
+	  */
+	public $widevinePpvModule;
+
+	/**
+	 * @var string
+	 */
+	public $widevineMbrFileName;
+
+	/**
+	 * @var string
+	 */
+	public $widevineMbrPpvModule;
 
 	/*
 	 * mapping between the field on this object (on the left) and the setter/getter on the object (on the right)
@@ -95,6 +113,10 @@ class KalturaTvinciDistributionProfile extends KalturaConfigurableDistributionPr
 		'mbrPpvModule',
 		'dashFileName',
 		'dashPpvModule',
+		'widevineFileName',
+		'widevinePpvModule',
+		'widevineMbrFileName',
+		'widevineMbrPpvModule',
 		'xsltFile',
 	 );
 		 
