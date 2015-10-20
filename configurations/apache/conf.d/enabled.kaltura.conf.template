@@ -154,10 +154,10 @@ Alias /sf "/usr/share/pear/data/symfony/web/sf/"
 	RewriteRule clientTest/api_v3/index.php /api_v3/web/clientTest.php [L]
 					
 	RedirectMatch permanent ^/tiny/([0-9a-z]{4,})$ /api_v3/index.php?service=shortLink_shortLink\&action=goto\&id=$1	
-	RedirectMatch permanent ^/api_v3/service/(.*)$ /api_v3/index.php/service/$1
+	RewriteRule api_v3/service/(.*)$ api_v3/index.php/service/$1 [L]
 
 	RewriteCond %{HTTPS} ON
-	RewriteRule ^/api_v3/service/(.*)$ https://%{SERVER_NAME}//api_v3/index.php/service/$1 [R=301,L]
+	RewriteRule api_v3/service/(.*)$ https://%{SERVER_NAME}//api_v3/index.php/service/$1 [R=301,L]
 
     Options FollowSymLinks ExecCGI Includes
     AllowOverride None
