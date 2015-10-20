@@ -10,6 +10,8 @@
 			<?php echo $this->element->getElement('userFriendlyFieldName'); ?>
 			<?php echo $this->element->getElement('entryMrssXslt'); ?>
 			<?php echo $this->element->getElement('isRequired'); ?>
+			<dt><label for="<?php echo $this->element->getElement('triggerDeleteOnError')->getId(); ?>"><?php echo $this->element->getElement('triggerDeleteOnError')->getLabel(); ?></label></dt>
+			<dd><?php echo $this->element->getElement('triggerDeleteOnError'); ?></dd>
 			<dt><label for="<?php echo $this->element->getElement('updateOnChange')->getId(); ?>"><?php echo $this->element->getElement('updateOnChange')->getLabel(); ?></label></dt>
 			<dd><?php echo $this->element->getElement('updateOnChange'); ?><?php echo $this->element->getElement('updateParamsArrayString'); ?></dd>
 		</dl>
