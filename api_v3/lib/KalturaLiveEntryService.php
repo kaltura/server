@@ -122,7 +122,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 			$dbEntry->save();
 		}
 
-		kJobsManager::addConvertLiveSegmentJob(null, $dbAsset, $mediaServerIndex, $filename, $currentDuration, $AMFs);
+		kJobsManager::addConvertLiveSegmentJob(null, $dbAsset, $mediaServerIndex, $filename, $currentDuration);
 		
 		if($mediaServerIndex == KalturaMediaServerIndex::PRIMARY)
 		{

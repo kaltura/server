@@ -24,15 +24,12 @@ class KAMFMediaInfoParser extends KBaseMediaParser{
 
     protected function getCommand()
     {
-        if(!isset($filePath)) $filePath=$this->filePath;
-        return "{$this->ffprobeBin} -i {$filePath} -select_streams 2:2 -show_streams -show_programs -v quiet -show_data -show_packets -print_format json 2>&1";
+        return "{$this->ffprobeBin} -i {$this->filePath} -select_streams 2:2 -show_streams -show_programs -v quiet -show_data -show_packets -print_format json 2>&1";
     }
 
     // parse the output of the command and return an array of AMFData objects
     protected function parseOutput($output)
     {
-        KalturaLog::debug('in KAMFMediaInfoParser.parseOutput: ' . print_r($output, true));
-
         $outputLower = strtolower($output);
         $jsonObj = json_decode($outputLower);
 
@@ -51,8 +48,6 @@ class KAMFMediaInfoParser extends KBaseMediaParser{
                 $amfData = new KAMFData();
                 $amfData->pts = $tmp->pts;
                 $amfData->timestamp = $this->getTimestampFromAMF($tmp->data);
-
-                KalturaLog::debug('adding to AMF array: ' . print_r($amfData, true));
 
                 array_push($amf, $amfData);
             }

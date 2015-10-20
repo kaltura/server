@@ -596,9 +596,6 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 		{
 			$recordedSegmentsInfo = $liveEntry->getRecordedSegmentsInfo();
 
-			// debug print - remove it, and comment out the corresponding function
-			$recordedSegmentsInfo->printAMFsForAllSegments();
-
 			foreach ( $liveCuePointsToCopy as $liveCuePoint )
 			{
 				$processedCuePointIds[] = $liveCuePoint->getId();

@@ -163,7 +163,15 @@ class kRecordedSegmentsInfo
 		return $this->getSegmentStartTime($segment) + $segment[self::VOD_SEGMENT_DURATION];
 	}
 
-	// for debug prints
+	public function isAMFContinues($prevAMF, $nextAMF){
+		$ptsDiff = $nextAMF->pts - $prevAMF->pts;
+		$timestampDiff = $nextAMF->timestamp - $prevAMF->timestamp;
+
+		return ($timestampDiff <= $ptsDiff + self::PTS_TIMESTAMP_EPSILON);
+	}
+
+	// for debug prints - uncomment to use.
+	/*
 	public function printAMFsForAllSegments(){
 		KalturaLog::debug("in printAMFsForAllSegments\n");
 		$numSegments = count($this->segments);
@@ -184,12 +192,5 @@ class kRecordedSegmentsInfo
 			KalturaLog::debug('vsd: ' . print_r($vsd, true));
 			KalturaLog::debug('amf: ' . print_r($amf, true));
 		}
-	}
-
-	public function isAMFContinues($prevAMF, $nextAMF){
-		$ptsDiff = $nextAMF->pts - $prevAMF->pts;
-		$timestampDiff = $nextAMF->timestamp - $prevAMF->timestamp;
-
-		return ($timestampDiff <= $ptsDiff + self::PTS_TIMESTAMP_EPSILON);
-	}
+	}*/
 }
