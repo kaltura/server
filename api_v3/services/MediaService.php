@@ -332,8 +332,8 @@ class MediaService extends KalturaEntryService
 	 */
 	function addFromSearchResultAction(KalturaMediaEntry $mediaEntry = null, KalturaSearchResult $searchResult = null)
 	{
-    	if($mediaEntry->conversionQuality && !$mediaEntry->conversionProfileId)
-    		$mediaEntry->conversionProfileId = $mediaEntry->conversionQuality;
+		if($mediaEntry->conversionQuality && !$mediaEntry->conversionProfileId)
+			$mediaEntry->conversionProfileId = $mediaEntry->conversionQuality;
 
 		if ($mediaEntry === null)
 			$mediaEntry = new KalturaMediaEntry();
@@ -1090,10 +1090,19 @@ class MediaService extends KalturaEntryService
 		$entry->validatePropertyNotNull("mediaType");
 
 		$conversionQuality = $this->getConversionQuality($entry);
-		if (!is_null($conversionQuality))
+		if (!is_null($conversionQuality)) {
 			$entry->conversionQuality = $conversionQuality;
+			if (!$entry->conversionProfileId) {
+				$entry->conversionProfileId = $entry->conversionQuality;
+			}
+		}
+
+		if ($dbEntry == null){
+			$dbEntry = $this->duplicateTemplateEntry($entry->conversionProfileId);
+		}
 
 		$dbEntry = parent::prepareEntryForInsert($entry, $dbEntry);
+
 		$kshow = $this->createDummyKShow();
         $kshowId = $kshow->getId();
         $dbEntry->setKshowId($kshowId);
