@@ -10,20 +10,16 @@
 class kRecordedSegmentsInfo
 {
 	// The following string literals are short for the sake of a compact serialization
-	const LIVE_START = 'ls'; // Live start time = Total live duration at the beginning of the segment
 	const VOD_SEGMENT_DURATION = 'vsd';
-	const VOD_TO_LIVE_DELTA_TIME = 'dt'; // The diff between live and VOD segments duration (liveStart + vodSegmentDuration + vodToLiveDeltaTime = liveEnd)
 	const AMF_DATA = 'amf';
 	const PTS_TIMESTAMP_EPSILON = 100; // when checking for continuety of AMFs, allow up to 100ms of diff
 
 	protected $segments = array();
 
-	public function addSegment( $liveStart, $vodSegmentDuration, $vodToLiveDeltaTime, $AMFs)
+	public function addSegment( $vodSegmentDuration, $AMFs)
 	{
 		$this->segments[] = array(
-				self::LIVE_START => $liveStart,
 				self::VOD_SEGMENT_DURATION => $vodSegmentDuration,
-				self::VOD_TO_LIVE_DELTA_TIME => $vodToLiveDeltaTime,
 				self::AMF_DATA => $AMFs
 			);
 	}
@@ -179,17 +175,13 @@ class kRecordedSegmentsInfo
 			KalturaLog::debug("segment #" . $i);
 
 			$segment = $this->segments[$i];
-			$liveStart = $segment[self::LIVE_START];
 			$vsd = $segment[self::VOD_SEGMENT_DURATION];
-			$dt = $segment[self::VOD_TO_LIVE_DELTA_TIME];
 			$amf = $segment[self::AMF_DATA];
 
 			$segmentStartTime = $this->getSegmentStartTime($segment);
 
 			KalturaLog::debug('segmentStartTime: ' . $segmentStartTime);
-			KalturaLog::debug('liveStart: ' . print_r($liveStart, true));
 			KalturaLog::debug('vsd: ' . print_r($vsd, true));
-			KalturaLog::debug('dt: ' . print_r($dt, true));
 			KalturaLog::debug('amf: ' . print_r($amf, true));
 		}
 	}
