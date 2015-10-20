@@ -4,7 +4,7 @@
 
  - Issue Type: New Feature
  - Issue ID: PS-2330  
- - 
+  
 ### Deployment scripts ###  
 
 php /opt/kaltura/app/tests/standAloneClient/exec.php /opt/kaltura/app/tests/standAloneClient/scheduledTaskProfiles/30DayDeleteAfterScheduleEnd.xml
