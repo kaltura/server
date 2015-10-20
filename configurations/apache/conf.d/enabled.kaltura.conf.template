@@ -157,7 +157,7 @@ Alias /sf "/usr/share/pear/data/symfony/web/sf/"
 	RewriteRule api_v3/service/(.*)$ api_v3/index.php/service/$1 [L]
 
 	RewriteCond %{HTTPS} ON
-	RewriteRule ^/api_v3/service/(.*)$ https://%{SERVER_NAME}//api_v3/index.php/service/$1 [R=301,L]
+	RewriteRule api_v3/service/(.*)$ https://%{SERVER_NAME}//api_v3/index.php/service/$1 [R=301,L]
 
     Options FollowSymLinks ExecCGI Includes
     AllowOverride None
