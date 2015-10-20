@@ -1,6 +1,6 @@
 # Kajam-11.0.0 #
 
-## New scheduled task profile ## 
+## New scheduled task profile ##
 
  - Issue Type: New Feature
  - Issue ID: PS-2330  
