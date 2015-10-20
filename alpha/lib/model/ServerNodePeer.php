@@ -41,7 +41,7 @@ class ServerNodePeer extends BaseServerNodePeer {
 			$c->add(ServerNodePeer::HOST_NAME, $hostName);
 		
 		if($partnerId)
-			$c->add(ServerNodePeer::PARENT_ID, $partnerId);
+			$c->add(ServerNodePeer::PARTNER_ID, $partnerId);
 		
 		$c->add(ServerNodePeer::STATUS, ServerNodeStatus::DISABLED, Criteria::NOT_EQUAL);
 		
