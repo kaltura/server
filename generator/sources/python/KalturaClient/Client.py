@@ -201,7 +201,7 @@ class KalturaClient(object):
         for param in self.clientConfiguration:
             params.put(param, self.clientConfiguration[param])
         params.put("format", self.config.format)
-        url = self.config.serviceUrl + "/api"
+        url = self.config.serviceUrl + "/api_v3"
         if (self.multiRequestReturnType != None):
             url += "/service/multirequest"
             i = 0
