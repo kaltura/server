@@ -42,22 +42,6 @@ abstract class KalturaMediaServerNode extends KalturaDeliveryServerNode
 	}
 	
 	/* (non-PHPdoc)
-	 * @see KalturaObject::toObject()
-	 */
-	public function toObject($dbObject = null, $skip = array())
-	{
-		$dbObject = parent::toObject($dbObject, $skip);
-	
-		if (!is_null($this->protocolPortConfig))
-			$dbObject->setMediaServerPortConfig($this->protocolPortConfig->toObjectsArray());
-		
-		if(!is_null($this->mediaServerPlaybackDomainConfig))
-			$dbObject->setMediaServerPlaybackDomainConfig($this->mediaServerPlaybackDomainConfig->toObjectsArray());
-	
-		return $dbObject;
-	}
-	
-	/* (non-PHPdoc)
 	 * @see KalturaObject::fromObject()
 	 */
 	public function doFromObject($source_object, KalturaDetachedResponseProfile $responseProfile = null)

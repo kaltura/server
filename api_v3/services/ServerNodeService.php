@@ -33,7 +33,7 @@ class ServerNodeService extends KalturaBaseService
 		
 		$dbServerNode = $this->addNewServerNode($serverNode);
 		
-		$serverNode = KalturaServerNode::getInstance($dbServerNode);
+		$serverNode = KalturaServerNode::getInstance($dbServerNode, $this->getResponseProfile());
 		$serverNode->fromObject($dbServerNode, $this->getResponseProfile());
 		return $serverNode;
 	}
@@ -52,7 +52,7 @@ class ServerNodeService extends KalturaBaseService
 		if (!$dbServerNode)
 			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $serverNodeId);
 		
-		$serverNode = KalturaServerNode::getInstance($dbServerNode);
+		$serverNode = KalturaServerNode::getInstance($dbServerNode, $this->getResponseProfile());
 		$serverNode->fromObject($dbServerNode, $this->getResponseProfile());
 		return $serverNode;
 	}
@@ -74,7 +74,7 @@ class ServerNodeService extends KalturaBaseService
 		$dbServerNode = $serverNode->toUpdatableObject($dbServerNode);
 		$dbServerNode->save();
 		
-		$serverNode = KalturaServerNode::getInstance($dbServerNode);
+		$serverNode = KalturaServerNode::getInstance($dbServerNode, $this->getResponseProfile());
 		$serverNode->fromObject($dbServerNode, $this->getResponseProfile());
 		return $serverNode;
 	}
@@ -102,6 +102,7 @@ class ServerNodeService extends KalturaBaseService
 	 * @action disable
 	 * @param string $serverNodeId
 	 * @throws KalturaErrors::INVALID_OBJECT_ID
+	 * @return KalturaServerNode
 	 */
 	function disableAction($serverNodeId)
 	{
@@ -119,6 +120,7 @@ class ServerNodeService extends KalturaBaseService
 	 * @action enable
 	 * @param string $serverNodeId
 	 * @throws KalturaErrors::INVALID_OBJECT_ID
+	 * @return KalturaServerNode
 	 */
 	function enableAction($serverNodeId)
 	{
@@ -172,7 +174,7 @@ class ServerNodeService extends KalturaBaseService
 		$dbServerNode->setHeartbeatTime(time());
 		$dbServerNode->save();
 	
-		$serverNode = KalturaServerNode::getInstance($dbServerNode);
+		$serverNode = KalturaServerNode::getInstance($dbServerNode, $this->getResponseProfile());
 		$serverNode->fromObject($dbServerNode, $this->getResponseProfile());
 		return $serverNode;
 	}
