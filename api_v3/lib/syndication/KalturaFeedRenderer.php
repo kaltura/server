@@ -162,7 +162,8 @@ class KalturaFeedRenderer extends SyndicationFeedRenderer{
 		$mrssParams->setServePlayManifest($syndicationFeed->getServePlayManifest());
 		$mrssParams->setPlayManifestClientTag('feed:' . $syndicationFeed->getId());
 	
-		$mrss = kMrssManager::getEntryMrssXml($entry, null, $mrssParams);
+		$features = $syndicationFeed->getUseCategoryEntries()? "3" : null;
+		$mrss = kMrssManager::getEntryMrssXml($entry, null, $mrssParams, $features);
 	
 		if(!$mrss)
 		{
