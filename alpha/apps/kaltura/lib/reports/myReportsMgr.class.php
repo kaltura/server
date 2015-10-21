@@ -63,53 +63,6 @@ class myReportsMgr
 										self::REPORT_TYPE_TOP_CONTENT,
 										self::REPORT_TYPE_TOP_PLAYBACK_CONTEXT);
 										
-
-	public static function runQuery ( $query_file , $map , $debug = false )
-	{
-		if ( strpos ($query_file,".") === 0 || strpos ($query_file,"/") === 0 || strpos ($query_file,"http") === 0 )
-		{
-			throw new kCoreException("Will not search for invalid report_type [$query_file", kCoreException::INVALID_QUERY);
-		}
-		$file_path = dirname(__FILE__)."/". $query_file . ".sql";
-		
-		$sql_raw_content = file_get_contents( $file_path );
-		if ( ! $sql_raw_content )
-		{
-			throw new kCoreException("Cannot find sql for [$query_file] at [$file_path]", kCoreException::INVALID_QUERY);
-		}	
-
-		// replace all params in $sql_raw_content with map
-
-		foreach ( $map as $name => $value )
-		{
-			$sql_raw_content = str_replace ( "{" . strtoupper( $name ) . "}" , $value , $sql_raw_content );
-		}
-		
-		$query = $sql_raw_content;
-		
-		$header = null;
-		
-		if ( !$debug )
-		{
-			$res = self::executeQuery ( $query );	
-			if ( $res )
-			{
-				$row = $res[0];
-				$header = array();
-				foreach ( $row as $name => $value )
-				{
-					$header[]= $name;
-					$data[] = $value;
-				}				
-			}
-		}
-		else
-		{
-			$res = null;
-		}
-		
-		return array ( $query , $res , $header );
-	}
 	
 	/**
 	 * @param int $partner_id
@@ -773,6 +726,7 @@ class myReportsMgr
 			if ($input_filter->categories) 
 			{ 
 				$entryFilter->set("_matchor_categories", $input_filter->categories);
+				$entryFilter->set("_matchor_categories", $input_filter->categories);
 				$shouldSelectFromSearchEngine = true;
 			}
 			
@@ -1264,8 +1218,8 @@ class myReportsMgr
 				$partner_id ,
 				self::intToDateTime($input_filter->from_date), 
 				self::intToDateTime($input_filter->to_date ),
-				mysqli_real_escape_string($link, $input_filter->from_day),
-				mysqli_real_escape_string($link, $input_filter->to_day),
+				$input_filter->from_day,
+				$input_filter->to_day,
 				self::intToDateId($input_filter->to_date , -7 ),
 				self::intToDateId($input_filter->to_date , -30 ),
 				self::intToDateId($input_filter->to_date , -180 ),
@@ -1275,7 +1229,7 @@ class myReportsMgr
 				$page_size ,
 				$obj_ids_str , 
 				$time_shift,
-				mysqli_real_escape_string($link, $cat_ids_str),
+				$cat_ids_str,
 				($input_filter->interval == reportInterval::MONTHS ? "month_id" : "date_id"),
 			);
 				
@@ -1284,9 +1238,14 @@ class myReportsMgr
 			foreach ( $input_filter->extra_map as $name => $value  )	
 			{
 				$names[] = $name;
-				$values[] = mysqli_real_escape_string($link, $value);				
+				$values[] = $value;				
 			}
 		}
+		
+		foreach ($values as $key => $value) {
+			$values[$key] = mysqli_real_escape_string($link, $value);
+		}
+			
 		$replaced_sql = str_replace ( $names , $values , $sql_content );	
 
 		date_default_timezone_set($origTimeZone);
@@ -1298,24 +1257,6 @@ class myReportsMgr
 	{
 		kApiCache::disableConditionalCache();
 	
-		$mysql_function = 'mysqli';
-		$db_config = kConf::get( "reports_db_config" );
-		if (!isset($db_config["port"])) {
-		    if(ini_get("mysqli.default_port")!==null){
-			$db_config["port"]=ini_get("mysqli.default_port");
-		    }else{
-			$db_config["port"]=3306;
-		    }
-		}	    
-		$timeout = isset ( $db_config["timeout"] ) ? $db_config["timeout"] : 40;
-		
-		ini_set('mysql.connect_timeout', $timeout );
-		$host = $db_config["host"];
-		if ( isset ( $db_config["port"] ) && $db_config["port"]  && $mysql_function != 'mysqli' ) $host .= ":" . $db_config["port"];
-		
-		$connect_function = $mysql_function.'_connect';
-		$link  = $connect_function( $host , $db_config["user"] , $db_config["password"] , null, $db_config["port"] );
-
 		KalturaLog::log( "Reports query using database host: [$host] user [" . $db_config["user"] . "]" );
 		$db_config = kConf::get( "reports_db_config" );
 		
@@ -1444,8 +1385,14 @@ class myReportsMgr
 	private static function getConnection() 
 	{
 		$mysql_function = 'mysqli';
-		
 		$db_config = kConf::get( "reports_db_config" );
+		if (!isset($db_config["port"])) {
+		    if(ini_get("mysqli.default_port")!==null){
+			$db_config["port"]=ini_get("mysqli.default_port");
+		    }else{
+			$db_config["port"]=3306;
+		    }
+		}	    
 		$timeout = isset ( $db_config["timeout"] ) ? $db_config["timeout"] : 40;
 		
 		ini_set('mysql.connect_timeout', $timeout );
@@ -1453,7 +1400,7 @@ class myReportsMgr
 		if ( isset ( $db_config["port"] ) && $db_config["port"]  && $mysql_function != 'mysqli' ) $host .= ":" . $db_config["port"];
 		
 		$connect_function = $mysql_function.'_connect';
-		$link  = $connect_function( $host , $db_config["user"] , $db_config["password"] , null );
+		$link  = $connect_function( $host , $db_config["user"] , $db_config["password"] , null, $db_config["port"] );
 		return $link;
 	}	
 
