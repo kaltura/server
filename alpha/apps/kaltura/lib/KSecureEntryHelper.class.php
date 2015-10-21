@@ -139,6 +139,12 @@ class KSecureEntryHelper
 
 	public function validateForPlay($performApiAccessCheck = true)
 	{
+        if ($this->ks &&
+            ( $this->ks->hasPrivilege(ks::PRIVILEGE_VIEW) ||
+              $this->ks->hasPrivilege(ks::PRIVILEGE_VIEW_ENTRY_OF_PLAYLIST))) {
+            return;
+        }
+
 	    if ($this->contexts != array(ContextType::THUMBNAIL))
 	    {
 		    $this->validateModeration();
