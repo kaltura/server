@@ -112,6 +112,10 @@ class ServerNodeService extends KalturaBaseService
 	
 		$dbServerNode->setStatus(ServerNodeStatus::DISABLED);
 		$dbServerNode->save();
+		
+		$serverNode = KalturaServerNode::getInstance($dbServerNode, $this->getResponseProfile());
+		$serverNode->fromObject($dbServerNode, $this->getResponseProfile());
+		return $serverNode;
 	}
 	
 	/**
@@ -130,6 +134,10 @@ class ServerNodeService extends KalturaBaseService
 	
 		$dbServerNode->setStatus(ServerNodeStatus::ACTIVE);
 		$dbServerNode->save();
+		
+		$serverNode = KalturaServerNode::getInstance($dbServerNode, $this->getResponseProfile());
+		$serverNode->fromObject($dbServerNode, $this->getResponseProfile());
+		return $serverNode;
 	}
 	
 	/**	
