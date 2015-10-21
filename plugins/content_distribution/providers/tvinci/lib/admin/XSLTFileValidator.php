@@ -11,6 +11,10 @@ class XSLTFileValidator extends Zend_Validate_Abstract
 
     function isValid( $value, $context = null ) {
 
+        // empty file is valid
+        if (!$value || empty($value)){
+            return true;
+        }
         // first try to read the tmp file
         $data = file_get_contents($value);
         if ($data === ""){

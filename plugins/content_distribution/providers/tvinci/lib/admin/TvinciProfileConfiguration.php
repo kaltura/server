@@ -26,8 +26,11 @@ class Form_TvinciProfileConfiguration extends Form_ConfigurableProfileConfigurat
 
 			if (isset($files['xsltFile'])) {
 				$file = $files['xsltFile'];
-				$content = file_get_contents($file['tmp_name']);
-				$object->xsltFile = $content;
+				$xslt_file = $file['tmp_name'];
+				if (!empty($xslt_file)){
+					$content = file_get_contents($xslt_file);
+					$object->xsltFile = $content;
+				}
 			}
 		}
 		return $object;
