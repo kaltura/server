@@ -40,19 +40,4 @@ abstract class KalturaMediaServerNode extends KalturaDeliveryServerNode
 	{
 		return array_merge(parent::getMapBetweenObjects(), self::$mapBetweenObjects);
 	}
-	
-	/* (non-PHPdoc)
-	 * @see KalturaObject::fromObject()
-	 */
-	public function doFromObject($source_object, KalturaDetachedResponseProfile $responseProfile = null)
-	{
-		/* @var $source_object MediaServerNode */
-		parent::doFromObject($source_object, $responseProfile);
-	
-		if($this->shouldGet('mediaServerPortConfig', $responseProfile) && !is_null($source_object->getMediaServerPortConfig()))
-			$this->mediaServerPortConfig = KalturaKeyValueArray::fromKeyValueArray($source_object->getMediaServerPortConfig());
-		
-		if($this->shouldGet('mediaServerPlaybackDomainConfig', $responseProfile) && !is_null($source_object->getMediaServerPlaybackDomainConfig()))
-			$this->mediaServerPlaybackDomainConfig = KalturaKeyValueArray::fromKeyValueArray($source_object->getMediaServerPlaybackDomainConfig());
-	}
 }
