@@ -159,7 +159,7 @@ class KalturaCategoryUser extends KalturaObject implements IRelatedFilterable
 			throw new KalturaAPIException ( KalturaErrors::CATEGORY_INHERIT_MEMBERS, $this->categoryId );
 		
 		//validating userId is not 0 or null
-		if($this->userId == 0)
+		if($this->userId == "0")
 		    throw new KalturaAPIException ( KalturaErrors::INVALID_USER_ID);
 		$this->validatePropertyMinLength('userId',1);
 		
