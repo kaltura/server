@@ -33,7 +33,7 @@ class RequestBodyUrlEncoded implements RequestBodyInterface
     /**
      * @var array The parameters to send with this request.
      */
-    protected $params = [];
+    protected $params = array();
 
     /**
      * Creates a new GraphUrlEncodedBody entity.

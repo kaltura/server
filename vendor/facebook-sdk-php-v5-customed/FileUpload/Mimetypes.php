@@ -38,7 +38,7 @@ class Mimetypes
     protected static $instance;
 
     /** @var array Mapping of extension to mimetype */
-    protected $mimetypes = [
+    protected $mimetypes = array(
         '3dml' => 'text/vnd.in3d.3dml',
         '3g2' => 'video/3gpp2',
         '3gp' => 'video/3gpp',
@@ -942,7 +942,7 @@ class Mimetypes
         'zir' => 'application/vnd.zul',
         'zirz' => 'application/vnd.zul',
         'zmm' => 'application/vnd.handheld-entertainment+xml'
-    ];
+    );
 
     /**
      * Get a singleton instance of the class

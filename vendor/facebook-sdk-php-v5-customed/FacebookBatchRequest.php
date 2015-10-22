@@ -54,9 +54,9 @@ class FacebookBatchRequest extends FacebookRequest implements IteratorAggregate,
      * @param AccessToken|string|null $accessToken
      * @param string|null             $graphVersion
      */
-    public function __construct(FacebookApp $app = null, array $requests = [], $accessToken = null, $graphVersion = null)
+    public function __construct(FacebookApp $app = null, array $requests = array(), $accessToken = null, $graphVersion = null)
     {
-        parent::__construct($app, $accessToken, 'POST', '', [], null, $graphVersion);
+        parent::__construct($app, $accessToken, 'POST', '', array(), null, $graphVersion);
 
         $this->add($requests);
     }
@@ -86,10 +86,10 @@ class FacebookBatchRequest extends FacebookRequest implements IteratorAggregate,
         }
 
         $this->addFallbackDefaults($request);
-        $requestToAdd = [
+        $requestToAdd = array(
             'name' => $name,
             'request' => $request,
-        ];
+        );
 
         // File uploads
         $attachedFiles = $this->extractFileAttachments($request);
@@ -143,7 +143,7 @@ class FacebookBatchRequest extends FacebookRequest implements IteratorAggregate,
         }
 
         $files = $request->getFiles();
-        $fileNames = [];
+        $fileNames = array();
         foreach ($files as $file) {
             $fileName = uniqid();
             $this->addFile($fileName, $file);
@@ -175,10 +175,10 @@ class FacebookBatchRequest extends FacebookRequest implements IteratorAggregate,
     {
         $this->validateBatchRequestCount();
 
-        $params = [
+        $params = array(
             'batch' => $this->convertRequestsToJson(),
             'include_headers' => true,
-        ];
+        );
         $this->setParams($params);
     }
 
@@ -189,7 +189,7 @@ class FacebookBatchRequest extends FacebookRequest implements IteratorAggregate,
      */
     public function convertRequestsToJson()
     {
-        $requests = [];
+        $requests = array();
         foreach ($this->requests as $request) {
             $attachedFiles = isset($request['attached_files']) ? $request['attached_files'] : null;
             $requests[] = $this->requestEntityToBatchArray($request['request'], $request['name'], $attachedFiles);
@@ -225,17 +225,17 @@ class FacebookBatchRequest extends FacebookRequest implements IteratorAggregate,
      */
     public function requestEntityToBatchArray(FacebookRequest $request, $requestName = null, $attachedFiles = null)
     {
-        $compiledHeaders = [];
+        $compiledHeaders = array();
         $headers = $request->getHeaders();
         foreach ($headers as $name => $value) {
             $compiledHeaders[] = $name . ': ' . $value;
         }
 
-        $batch = [
+        $batch = array(
             'headers' => $compiledHeaders,
             'method' => $request->getMethod(),
             'relative_url' => $request->getUrl(),
-        ];
+        );
 
         // Since file uploads are moved to the root request of a batch request,
         // the child requests will always be URL-encoded.

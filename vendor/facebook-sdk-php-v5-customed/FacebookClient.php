@@ -168,22 +168,22 @@ class FacebookClient
         // If we're sending files they should be sent as multipart/form-data
         if ($request->containsFileUploads()) {
             $requestBody = $request->getMultipartBody();
-            $request->setHeaders([
+            $request->setHeaders(array(
                 'Content-Type' => 'multipart/form-data; boundary=' . $requestBody->getBoundary(),
-            ]);
+            ));
         } else {
             $requestBody = $request->getUrlEncodedBody();
-            $request->setHeaders([
+            $request->setHeaders(array(
                 'Content-Type' => 'application/x-www-form-urlencoded',
-            ]);
+            ));
         }
 
-        return [
+        return array(
             $url,
             $request->getMethod(),
             $request->getHeaders(),
             $requestBody->getBody(),
-        ];
+        );
     }
 
     /**

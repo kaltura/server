@@ -33,7 +33,7 @@ class FacebookMemoryPersistentDataHandler implements PersistentDataInterface
     /**
      * @var array The session data to keep in memory.
      */
-    protected $sessionData = [];
+    protected $sessionData = array();
 
     /**
      * @inheritdoc

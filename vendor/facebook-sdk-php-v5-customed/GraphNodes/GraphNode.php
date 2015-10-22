@@ -33,14 +33,14 @@ class GraphNode extends Collection
     /**
      * @var array Maps object key names to Graph object types.
      */
-    protected static $graphObjectMap = [];
+    protected static $graphObjectMap = array();
 
     /**
      * Init this Graph object.
      *
      * @param array $data
      */
-    public function __construct(array $data = [])
+    public function __construct(array $data = array())
     {
         parent::__construct($this->castItems($data));
     }
@@ -57,7 +57,7 @@ class GraphNode extends Collection
      */
     public function castItems(array $data)
     {
-        $items = [];
+        $items = array();
 
         foreach ($data as $k => $v) {
             if ($this->shouldCastAsDateTime($k)
@@ -141,7 +141,7 @@ class GraphNode extends Collection
      */
     public function shouldCastAsDateTime($key)
     {
-        return in_array($key, [
+        return in_array($key, array(
             'created_time',
             'updated_time',
             'start_time',
@@ -151,7 +151,7 @@ class GraphNode extends Collection
             'expires_at',
             'birthday',
             'publish_time'
-        ], true);
+        ), true);
     }
 
     /**

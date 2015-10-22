@@ -25,9 +25,9 @@ namespace Facebook\PseudoRandomString;
 
 use Facebook\Exceptions\FacebookSDKException;
 
-class OpenSslPseudoRandomStringGenerator implements PseudoRandomStringGeneratorInterface
+class OpenSslPseudoRandomStringGenerator extends PseudoRandomStringGeneratorTrait implements PseudoRandomStringGeneratorInterface
 {
-    use PseudoRandomStringGeneratorTrait;
+//    use PseudoRandomStringGeneratorTrait;
 
     /**
      * @const string The error message when generating the string fails.
@@ -43,7 +43,7 @@ class OpenSslPseudoRandomStringGenerator implements PseudoRandomStringGeneratorI
             throw new FacebookSDKException(static::ERROR_MESSAGE . 'The function openssl_random_pseudo_bytes() does not exist.');
         }
     }
-
+    
     /**
      * @inheritdoc
      */

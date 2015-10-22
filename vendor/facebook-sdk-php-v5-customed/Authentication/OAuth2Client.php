@@ -104,7 +104,7 @@ class OAuth2Client
     public function debugToken($accessToken)
     {
         $accessToken = $accessToken instanceof AccessToken ? $accessToken->getValue() : $accessToken;
-        $params = ['input_token' => $accessToken];
+        $params = array('input_token' => $accessToken);
 
         $this->lastRequest = new FacebookRequest(
             $this->app,
@@ -132,16 +132,16 @@ class OAuth2Client
      *
      * @return string
      */
-    public function getAuthorizationUrl($redirectUrl, $state, array $scope = [], array $params = [], $separator = '&')
+    public function getAuthorizationUrl($redirectUrl, $state, array $scope = array(), array $params = array(), $separator = '&')
     {
-        $params += [
+        $params += array(
             'client_id' => $this->app->getId(),
             'state' => $state,
             'response_type' => 'code',
             'sdk' => 'php-sdk-' . Facebook::VERSION,
             'redirect_uri' => $redirectUrl,
             'scope' => implode(',', $scope)
-        ];
+        );
 
         return static::BASE_AUTHORIZATION_URL . '/' . $this->graphVersion . '/dialog/oauth?' . http_build_query($params, null, $separator);
     }
@@ -158,10 +158,10 @@ class OAuth2Client
      */
     public function getAccessTokenFromCode($code, $redirectUri = '')
     {
-        $params = [
+        $params = array(
             'code' => $code,
             'redirect_uri' => $redirectUri,
-        ];
+        );
 
         return $this->requestAnAccessToken($params);
     }
@@ -178,10 +178,10 @@ class OAuth2Client
     public function getLongLivedAccessToken($accessToken)
     {
         $accessToken = $accessToken instanceof AccessToken ? $accessToken->getValue() : $accessToken;
-        $params = [
+        $params = array(
             'grant_type' => 'fb_exchange_token',
             'fb_exchange_token' => $accessToken,
-        ];
+        );
 
         return $this->requestAnAccessToken($params);
     }
@@ -198,9 +198,9 @@ class OAuth2Client
      */
     public function getCodeFromLongLivedAccessToken($accessToken, $redirectUri = '')
     {
-        $params = [
+        $params = array(
             'redirect_uri' => $redirectUri,
-        ];
+        );
 
         $response = $this->sendRequestWithClientParams('/oauth/client_code', $params, $accessToken);
         $data = $response->getDecodedBody();
@@ -229,7 +229,7 @@ class OAuth2Client
         if (!isset($data['access_token'])) {
             throw new FacebookSDKException('Access token was not returned from Graph.', 401);
         }
-
+		
         // Graph returns two different key names for expiration time
         // on the same endpoint. Doh! :/
         $expiresAt = 0;
@@ -284,9 +284,9 @@ class OAuth2Client
      */
     protected function getClientParams()
     {
-        return [
+        return array(
             'client_id' => $this->app->getId(),
             'client_secret' => $this->app->getSecret(),
-        ];
+        );
     }
 }

@@ -33,10 +33,10 @@ class GraphGroup extends GraphNode
     /**
      * @var array Maps object key names to GraphNode types.
      */
-    protected static $graphObjectMap = [
+    protected static $graphObjectMap = array(
         'cover' => '\Facebook\GraphNodes\GraphCoverPhoto',
         'venue' => '\Facebook\GraphNodes\GraphLocation',
-    ];
+    );
 
     /**
      * Returns the `id` (The Group ID) as string if present.

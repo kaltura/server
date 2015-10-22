@@ -25,10 +25,10 @@ namespace Facebook\PseudoRandomString;
 
 use Facebook\Exceptions\FacebookSDKException;
 
-class UrandomPseudoRandomStringGenerator implements PseudoRandomStringGeneratorInterface
+class UrandomPseudoRandomStringGenerator extends PseudoRandomStringGeneratorTrait implements PseudoRandomStringGeneratorInterface
 {
 
-    use PseudoRandomStringGeneratorTrait;
+    //use PseudoRandomStringGeneratorTrait;
 
     /**
      * @const string The error message when generating the string fails.

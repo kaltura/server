@@ -49,14 +49,14 @@ class RequestBodyMultipart implements RequestBodyInterface
     /**
      * @var array The files to send with this request.
      */
-    private $files = [];
+    private $files = array();
 
     /**
      * @param array  $params   The parameters to send with this request.
      * @param array  $files    The files to send with this request.
      * @param string $boundary Provide a specific boundary.
      */
-    public function __construct(array $params = [], array $files = [], $boundary = null)
+    public function __construct(array $params = array(), array $files = array(), $boundary = null)
     {
         $this->params = $params;
         $this->files = $files;
@@ -146,7 +146,7 @@ class RequestBodyMultipart implements RequestBodyInterface
     {
         $query = http_build_query($params, null, '&');
         $params = explode('&', $query);
-        $result = [];
+        $result = array();
 
         foreach ($params as $param) {
             list($key, $value) = explode('=', $param, 2);

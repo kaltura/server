@@ -44,7 +44,7 @@ class FacebookUrlManipulator
 
         $query = '';
         if (isset($parts['query'])) {
-            $params = [];
+            $params = array();
             parse_str($parts['query'], $params);
 
             // Remove query params
@@ -74,7 +74,7 @@ class FacebookUrlManipulator
      *
      * @return string
      */
-    public static function appendParamsToUrl($url, array $newParams = [])
+    public static function appendParamsToUrl($url, array $newParams = array())
     {
         if (!$newParams) {
             return $url;
@@ -85,7 +85,7 @@ class FacebookUrlManipulator
         }
 
         list($path, $query) = explode('?', $url, 2);
-        $existingParams = [];
+        $existingParams = array();
         parse_str($query, $existingParams);
 
         // Favor params from the original URL over $newParams
@@ -108,9 +108,9 @@ class FacebookUrlManipulator
     {
         $query = parse_url($url, PHP_URL_QUERY);
         if (!$query) {
-            return [];
+            return array();
         }
-        $params = [];
+        $params = array();
         parse_str($query, $params);
 
         return $params;

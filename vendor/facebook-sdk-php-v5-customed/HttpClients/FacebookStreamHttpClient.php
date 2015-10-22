@@ -46,21 +46,21 @@ class FacebookStreamHttpClient implements FacebookHttpClientInterface
      */
     public function send($url, $method, $body, array $headers, $timeOut)
     {
-        $options = [
-            'http' => [
+        $options = array(
+            'http' => array(
                 'method' => $method,
                 'header' => $this->compileHeader($headers),
                 'content' => $body,
                 'timeout' => $timeOut,
                 'ignore_errors' => true
-            ],
-            'ssl' => [
+            ),
+            'ssl' => array(
                 'verify_peer' => true,
                 'verify_peer_name' => true,
                 'allow_self_signed' => true, // All root certificates are self-signed
                 'cafile' => __DIR__ . '/certs/DigiCertHighAssuranceEVRootCA.pem',
-            ],
-        ];
+            ),
+        );
 
         $this->facebookStream->streamContextCreate($options);
         $rawBody = $this->facebookStream->fileGetContents($url);
@@ -84,7 +84,7 @@ class FacebookStreamHttpClient implements FacebookHttpClientInterface
      */
     public function compileHeader(array $headers)
     {
-        $header = [];
+        $header = array();
         foreach ($headers as $k => $v) {
             $header[] = $k . ': ' . $v;
         }

@@ -148,7 +148,7 @@ class FacebookRedirectLoginHelper
      *
      * @return string
      */
-    private function makeUrl($redirectUrl, array $scope, array $params = [], $separator = '&')
+    private function makeUrl($redirectUrl, array $scope, array $params = array(), $separator = '&')
     {
         $state = $this->pseudoRandomStringGenerator->getPseudoRandomString(static::CSRF_LENGTH);
         $this->persistentDataHandler->set('state', $state);
@@ -165,9 +165,9 @@ class FacebookRedirectLoginHelper
      *
      * @return string
      */
-    public function getLoginUrl($redirectUrl, array $scope = [], $separator = '&')
+    public function getLoginUrl($redirectUrl, array $scope = array(), $separator = '&')
     {
-        return $this->makeUrl($redirectUrl, $scope, [], $separator);
+        return $this->makeUrl($redirectUrl, $scope, array(), $separator);
     }
 
     /**
@@ -191,10 +191,10 @@ class FacebookRedirectLoginHelper
             throw new FacebookSDKException('Cannot generate a logout URL with an app access token.', 722);
         }
 
-        $params = [
+        $params = array(
             'next' => $next,
             'access_token' => $accessToken->getValue(),
-        ];
+        );
 
         return 'https://www.facebook.com/logout.php?' . http_build_query($params, null, $separator);
     }
@@ -208,9 +208,9 @@ class FacebookRedirectLoginHelper
      *
      * @return string
      */
-    public function getReRequestUrl($redirectUrl, array $scope = [], $separator = '&')
+    public function getReRequestUrl($redirectUrl, array $scope = array(), $separator = '&')
     {
-        $params = ['auth_type' => 'rerequest'];
+        $params = array('auth_type' => 'rerequest');
 
         return $this->makeUrl($redirectUrl, $scope, $params, $separator);
     }
@@ -224,9 +224,9 @@ class FacebookRedirectLoginHelper
      *
      * @return string
      */
-    public function getReAuthenticationUrl($redirectUrl, array $scope = [], $separator = '&')
+    public function getReAuthenticationUrl($redirectUrl, array $scope = array(), $separator = '&')
     {
-        $params = ['auth_type' => 'reauthenticate'];
+        $params = array('auth_type' => 'reauthenticate');
 
         return $this->makeUrl($redirectUrl, $scope, $params, $separator);
     }
@@ -250,7 +250,7 @@ class FacebookRedirectLoginHelper
 
         $redirectUrl = $redirectUrl ?: $this->urlDetectionHandler->getCurrentUrl();
         // At minimum we need to remove the state param
-        $redirectUrl = FacebookUrlManipulator::removeParamsFromUrl($redirectUrl, ['state']);
+        $redirectUrl = FacebookUrlManipulator::removeParamsFromUrl($redirectUrl, array('state'));
 
         return $this->oAuth2Client->getAccessTokenFromCode($code, $redirectUrl);
     }
@@ -265,8 +265,12 @@ class FacebookRedirectLoginHelper
         $state = $this->getState();
         $savedState = $this->persistentDataHandler->get('state');
 
-        if (!$state || !$savedState) {
+        if (!$state) {
             throw new FacebookSDKException('Cross-site request forgery validation failed. Required param "state" missing.');
+        }
+        
+        if (!$savedState) {
+            throw new FacebookSDKException('Cross-site request forgery validation failed. Required param "saved state" missing.');
         }
 
         $savedLen = strlen($savedState);

@@ -102,7 +102,7 @@ class FacebookCurlHttpClient implements FacebookHttpClientInterface
      */
     public function openConnection($url, $method, $body, array $headers, $timeOut)
     {
-        $options = [
+        $options = array(
             CURLOPT_CUSTOMREQUEST => $method,
             CURLOPT_HTTPHEADER => $this->compileRequestHeaders($headers),
             CURLOPT_URL => $url,
@@ -113,7 +113,7 @@ class FacebookCurlHttpClient implements FacebookHttpClientInterface
             CURLOPT_SSL_VERIFYHOST => 2,
             CURLOPT_SSL_VERIFYPEER => true,
             CURLOPT_CAINFO => __DIR__ . '/certs/DigiCertHighAssuranceEVRootCA.pem',
-        ];
+        );
 
         if ($method !== "GET") {
             $options[CURLOPT_POSTFIELDS] = $body;
@@ -148,7 +148,7 @@ class FacebookCurlHttpClient implements FacebookHttpClientInterface
      */
     public function compileRequestHeaders(array $headers)
     {
-        $return = [];
+        $return = array();
 
         foreach ($headers as $key => $value) {
             $return[] = $key . ': ' . $value;
@@ -169,7 +169,7 @@ class FacebookCurlHttpClient implements FacebookHttpClientInterface
         $rawHeaders = mb_substr($this->rawResponse, 0, $headerSize);
         $rawBody = mb_substr($this->rawResponse, $headerSize);
 
-        return [trim($rawHeaders), trim($rawBody)];
+        return array(trim($rawHeaders), trim($rawBody));
     }
 
     /**

@@ -42,7 +42,7 @@ class FacebookBatchResponse extends FacebookResponse implements IteratorAggregat
     /**
      * @var array An array of FacebookResponse entities.
      */
-    protected $responses = [];
+    protected $responses = array();
 
     /**
      * Creates a new Response entity.
@@ -82,7 +82,7 @@ class FacebookBatchResponse extends FacebookResponse implements IteratorAggregat
      */
     public function setResponses(array $responses)
     {
-        $this->responses = [];
+        $this->responses = array();
 
         foreach ($responses as $key => $graphResponse) {
             $this->addResponse($key, $graphResponse);
@@ -102,7 +102,7 @@ class FacebookBatchResponse extends FacebookResponse implements IteratorAggregat
 
         $httpResponseBody = isset($response['body']) ? $response['body'] : null;
         $httpResponseCode = isset($response['code']) ? $response['code'] : null;
-        $httpResponseHeaders = isset($response['headers']) ? $response['headers'] : [];
+        $httpResponseHeaders = isset($response['headers']) ? $response['headers'] : array();
 
         $this->responses[$originalRequestName] = new FacebookResponse(
             $originalRequest,

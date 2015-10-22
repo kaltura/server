@@ -261,7 +261,7 @@ class GraphNodeFactory
         // Remember the parent node ID
         $parentNodeId = isset($data['id']) ? $data['id'] : null;
 
-        $items = [];
+        $items = array();
 
         foreach ($data as $k => $v) {
             // Array means could be recurable
@@ -329,7 +329,7 @@ class GraphNodeFactory
             throw new FacebookSDKException('Cannot cast data to GraphEdge. Expected a "data" key.', 620);
         }
 
-        $dataList = [];
+        $dataList = array();
         foreach ($data['data'] as $graphNode) {
             $dataList[] = $this->safelyMakeGraphNode($graphNode, $subclassName, $parentKey, $parentNodeId);
         }
@@ -366,7 +366,7 @@ class GraphNodeFactory
      */
     public static function isCastableAsGraphEdge(array $data)
     {
-        if ($data === []) {
+        if ($data === array()) {
             return true;
         }
 

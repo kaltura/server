@@ -52,7 +52,7 @@ class FacebookResponse
     /**
      * @var array The decoded body of the Graph response.
      */
-    protected $decodedBody = [];
+    protected $decodedBody = array();
 
     /**
      * @var FacebookRequest The original request that returned this response.
@@ -72,7 +72,7 @@ class FacebookResponse
      * @param int|null        $httpStatusCode
      * @param array|null      $headers
      */
-    public function __construct(FacebookRequest $request, $body = null, $httpStatusCode = null, array $headers = [])
+    public function __construct(FacebookRequest $request, $body = null, $httpStatusCode = null, array $headers = array())
     {
         $this->request = $request;
         $this->body = $body;
@@ -236,19 +236,19 @@ class FacebookResponse
         $this->decodedBody = json_decode($this->body, true);
 
         if ($this->decodedBody === null) {
-            $this->decodedBody = [];
+            $this->decodedBody = array();
             parse_str($this->body, $this->decodedBody);
         } elseif (is_bool($this->decodedBody)) {
             // Backwards compatibility for Graph < 2.1.
             // Mimics 2.1 responses.
             // @TODO Remove this after Graph 2.0 is no longer supported
-            $this->decodedBody = ['success' => $this->decodedBody];
+            $this->decodedBody = array('success' => $this->decodedBody);
         } elseif (is_numeric($this->decodedBody)) {
-            $this->decodedBody = ['id' => $this->decodedBody];
+            $this->decodedBody = array('id' => $this->decodedBody);
         }
 
         if (!is_array($this->decodedBody)) {
-            $this->decodedBody = [];
+            $this->decodedBody = array();
         }
 
         if ($this->isError()) {

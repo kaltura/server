@@ -23,7 +23,7 @@
  */
 namespace Facebook\PseudoRandomString;
 
-trait PseudoRandomStringGeneratorTrait
+class PseudoRandomStringGeneratorTrait
 {
     /**
      * Validates the length argument of a random string.

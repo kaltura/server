@@ -42,7 +42,7 @@ class GraphEdge extends Collection
     /**
      * @var array An array of Graph meta data like pagination, etc.
      */
-    protected $metaData = [];
+    protected $metaData = array();
 
     /**
      * @var string|null The parent Graph edge endpoint that generated the list.
@@ -63,7 +63,7 @@ class GraphEdge extends Collection
      * @param string|null     $parentEdgeEndpoint The parent Graph edge endpoint that generated the list.
      * @param string|null     $subclassName       The subclass of the child GraphNode's.
      */
-    public function __construct(FacebookRequest $request, array $data = [], array $metaData = [], $parentEdgeEndpoint = null, $subclassName = null)
+    public function __construct(FacebookRequest $request, array $data = array(), array $metaData = array(), $parentEdgeEndpoint = null, $subclassName = null)
     {
         $this->request = $request;
         $this->metaData = $metaData;

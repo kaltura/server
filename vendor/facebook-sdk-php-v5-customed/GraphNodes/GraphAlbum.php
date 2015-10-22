@@ -34,10 +34,10 @@ class GraphAlbum extends GraphNode
     /**
      * @var array Maps object key names to Graph object types.
      */
-    protected static $graphObjectMap = [
+    protected static $graphObjectMap = array(
         'from' => '\Facebook\GraphNodes\GraphUser',
         'place' => '\Facebook\GraphNodes\GraphPage',
-    ];
+    );
 
     /**
      * Returns the ID for the album.
