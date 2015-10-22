@@ -34,7 +34,6 @@ class ServerNodeService extends KalturaBaseService
 		$dbServerNode = $this->addNewServerNode($serverNode);
 		
 		$serverNode = KalturaServerNode::getInstance($dbServerNode, $this->getResponseProfile());
-		$serverNode->fromObject($dbServerNode, $this->getResponseProfile());
 		return $serverNode;
 	}
 	
@@ -53,7 +52,6 @@ class ServerNodeService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $serverNodeId);
 		
 		$serverNode = KalturaServerNode::getInstance($dbServerNode, $this->getResponseProfile());
-		$serverNode->fromObject($dbServerNode, $this->getResponseProfile());
 		return $serverNode;
 	}
 	
@@ -75,7 +73,6 @@ class ServerNodeService extends KalturaBaseService
 		$dbServerNode->save();
 		
 		$serverNode = KalturaServerNode::getInstance($dbServerNode, $this->getResponseProfile());
-		$serverNode->fromObject($dbServerNode, $this->getResponseProfile());
 		return $serverNode;
 	}
 	
@@ -114,7 +111,6 @@ class ServerNodeService extends KalturaBaseService
 		$dbServerNode->save();
 		
 		$serverNode = KalturaServerNode::getInstance($dbServerNode, $this->getResponseProfile());
-		$serverNode->fromObject($dbServerNode, $this->getResponseProfile());
 		return $serverNode;
 	}
 	
@@ -136,7 +132,6 @@ class ServerNodeService extends KalturaBaseService
 		$dbServerNode->save();
 		
 		$serverNode = KalturaServerNode::getInstance($dbServerNode, $this->getResponseProfile());
-		$serverNode->fromObject($dbServerNode, $this->getResponseProfile());
 		return $serverNode;
 	}
 	
@@ -183,7 +178,6 @@ class ServerNodeService extends KalturaBaseService
 		$dbServerNode->save();
 	
 		$serverNode = KalturaServerNode::getInstance($dbServerNode, $this->getResponseProfile());
-		$serverNode->fromObject($dbServerNode, $this->getResponseProfile());
 		return $serverNode;
 	}
 	
