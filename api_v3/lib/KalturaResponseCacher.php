@@ -121,8 +121,8 @@ class KalturaResponseCacher extends kApiCache
 			(!self::hasExtraFields() || $forceCachingHeaders)) 
 		{
 			$v3cacheHeadersExpiry = kConf::get('v3cache_headers_expiry', 'local', array());
-	        if(isset($v3cacheHeadersExpiry[$partnerId]))
-	            $this->_cacheHeadersExpiry = $v3cacheHeadersExpiry[$partnerId];
+			if(isset($v3cacheHeadersExpiry[$partnerId]))
+				$this->_cacheHeadersExpiry = $v3cacheHeadersExpiry[$partnerId];
 		    		    
 			$max_age = !is_null($this->minCacheTTL) ? min($this->_cacheHeadersExpiry, $this->minCacheTTL) : $this->_cacheHeadersExpiry ;
 			header("Cache-Control: private, max-age=$max_age, max-stale=0");
