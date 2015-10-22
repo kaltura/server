@@ -110,15 +110,20 @@ class KalturaResponseCacher extends kApiCache
 
 		// we should never return caching headers for non widget sessions since the KS can be ended and the CDN won't know
 		$isAnonymous = $this->isAnonymous($this->_ksObj);
+		$partnerId = $this->_ksObj ? $this->_ksObj->partner_id : 0;
 		
 		$forceCachingHeaders = false;
-		if ($this->_ksObj && kConf::hasParam("force_caching_headers") && in_array($this->_ksObj->partner_id, kConf::get("force_caching_headers")))
+		if ($this->_ksObj && kConf::hasParam("force_caching_headers") && in_array($partnerId, kConf::get("force_caching_headers")))
 			$forceCachingHeaders = true;
 		
 		// for GET requests with kalsig (signature of call params) return cdn/browser caching headers
 		if ($usingCache && $isAnonymous && $_SERVER["REQUEST_METHOD"] == "GET" && isset($_REQUEST["kalsig"]) &&  
 			(!self::hasExtraFields() || $forceCachingHeaders)) 
 		{
+			$v3cacheHeadersExpiry = kConf::get('v3cache_headers_expiry', 'local', array());
+			if(isset($v3cacheHeadersExpiry[$partnerId]))
+				$this->_cacheHeadersExpiry = $v3cacheHeadersExpiry[$partnerId];
+		    		    
 			$max_age = !is_null($this->minCacheTTL) ? min($this->_cacheHeadersExpiry, $this->minCacheTTL) : $this->_cacheHeadersExpiry ;
 			header("Cache-Control: private, max-age=$max_age, max-stale=0");
 			header('Expires: ' . gmdate('D, d M Y H:i:s', time() + $max_age) . ' GMT');
