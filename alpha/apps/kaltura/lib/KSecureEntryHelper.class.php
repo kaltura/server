@@ -137,46 +137,45 @@ class KSecureEntryHelper
 			KExternalErrors::dieError(KExternalErrors::SERVICE_ACCESS_CONTROL_RESTRICTED);
 	}
 
-	public function validateForPlay($performApiAccessCheck = true)
-	{
+    public function validateForPlay($performApiAccessCheck = true)
+    {
         if ($this->ks)
         {
             if ( $this->isKsAdmin() || // no need to validate when ks is admin
-                // no need to validate when a wildcard or a the specific entry are mentioned
+                //// no need to validate when a wildcard or a the specific entry are mentioned
                 $this->ks->verifyPrivileges(ks::PRIVILEGE_VIEW, ks::PRIVILEGE_WILDCARD) ||
-                ( $this->entry && $this->ks->verifyPrivileges(ks::PRIVILEGE_VIEW, $this->entry->getId())))
+                $this->ks->verifyPrivileges(ks::PRIVILEGE_VIEW, $this->entry->getId()))
             {
                 return;
             }
         }
 
-	    if ($this->contexts != array(ContextType::THUMBNAIL))
-	    {
-		    $this->validateModeration();
-			$this->validateScheduling();
-	    }
-		$this->validateAccessControl($performApiAccessCheck);
-	}
-	
-	public function validateForDownload()
-	{
-		$this->validateApiAccessControl();
-		
-		if ($this->ks)
-		{
-			if ($this->isKsAdmin() ||  // no need to validate when ks is admin
+        if ($this->contexts != array(ContextType::THUMBNAIL))
+        {
+            $this->validateModeration();
+            $this->validateScheduling();
+        }
+        $this->validateAccessControl($performApiAccessCheck);
+    }
+
+    public function validateForDownload()
+    {
+        $this->validateApiAccessControl();
+        if ($this->ks)
+        {
+            if ($this->isKsAdmin() ||  // no need to validate when ks is admin
                 // no need to validate when a wildcard or a the specific entry are mentioned
-			    $this->ks->verifyPrivileges(ks::PRIVILEGE_DOWNLOAD, ks::PRIVILEGE_WILDCARD) ||
-                ($this->entry && $this->ks->verifyPrivileges(ks::PRIVILEGE_DOWNLOAD, $this->entry->getId())))
+                $this->ks->verifyPrivileges(ks::PRIVILEGE_DOWNLOAD, ks::PRIVILEGE_WILDCARD) ||
+                $this->ks->verifyPrivileges(ks::PRIVILEGE_DOWNLOAD, $this->entry->getId()))
             {
                 return;
             }
-		}
-			
-		$this->validateForPlay(false);
-	}
-	
-	protected function validateModeration()
+        }
+
+        $this->validateForPlay(false);
+    }
+
+    protected function validateModeration()
 	{
 		if ($this->isKsAdmin()) // no need to validate when ks is admin
 			return;
