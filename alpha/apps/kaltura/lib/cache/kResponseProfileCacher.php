@@ -274,7 +274,7 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 	protected static function getRelatedObjectKey(IRelatedObject $object, $responseProfileKey = null)
 	{
 		$partnerId = $object->getPartnerId();
-		$objectType = $object->getRelatedObjectType();
+		$objectType = get_class($object);
 		if($responseProfileKey)
 			return "{$partnerId}_{$objectType}_{$responseProfileKey}";
 			
