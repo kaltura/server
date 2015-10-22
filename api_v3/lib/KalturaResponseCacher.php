@@ -120,12 +120,9 @@ class KalturaResponseCacher extends kApiCache
 		if ($usingCache && $isAnonymous && $_SERVER["REQUEST_METHOD"] == "GET" && isset($_REQUEST["kalsig"]) &&  
 			(!self::hasExtraFields() || $forceCachingHeaders)) 
 		{
-		    if(kConf::hasParam('v3cache_headers_expiry'))
-		    {
-		        $v3cacheHeadersExpiry = kConf::get('v3cache_headers_expiry');
-		        if(isset($v3cacheHeadersExpiry[$partnerId]))
-		            $this->_cacheHeadersExpiry = $v3cacheHeadersExpiry[$partnerId];
-		    }
+			$v3cacheHeadersExpiry = kConf::get('v3cache_headers_expiry', 'local', array());
+	        if(isset($v3cacheHeadersExpiry[$partnerId]))
+	            $this->_cacheHeadersExpiry = $v3cacheHeadersExpiry[$partnerId];
 		    		    
 			$max_age = !is_null($this->minCacheTTL) ? min($this->_cacheHeadersExpiry, $this->minCacheTTL) : $this->_cacheHeadersExpiry ;
 			header("Cache-Control: private, max-age=$max_age, max-stale=0");
