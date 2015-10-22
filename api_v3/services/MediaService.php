@@ -718,7 +718,7 @@ class MediaService extends KalturaEntryService
 			$mrssParams->setItemXpathsToExtend($coreExtendingItemArray);
 		}
         /* @var $mrss SimpleXMLElement */
-        $mrss = kMrssManager::getEntryMrssXml($dbEntry, null, $mrssParams, explode(',', $features));
+        $mrss = kMrssManager::getEntryMrssXml($dbEntry, null, $mrssParams, ($features ? explode(',', $features) : null));
         return $mrss->asXML();
     }
 
