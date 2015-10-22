@@ -13,6 +13,7 @@ class kRecordedSegmentsInfo
 	const VOD_SEGMENT_DURATION = 'vsd';
 	const AMF_DATA = 'amf';
 	const PTS_TIMESTAMP_EPSILON = 100; // when checking for continuety of AMFs, allow up to 100ms of diff
+	const ALLOW_OLD_CUE_POINT_TOLERANCE = 2000; // 1 sec for NTP offset and one for the miss-match of time resolution between AMF data and server data
 
 	protected $segments = array();
 
@@ -51,15 +52,21 @@ class kRecordedSegmentsInfo
 			$segmentEndTime = $this->getSegmentEndTime($segment);
 			$nextSegmentStartTime = $nextSegment ? $this->getSegmentStartTime($nextSegment) : null;
 
-			KalturaLog::debug("segmentStartTime: " . $segmentStartTime);
-			KalturaLog::debug("segmentEndTime: " . $segmentEndTime);
-			KalturaLog::debug("nextSegmentStartTime: " . $nextSegmentStartTime);
-			KalturaLog::debug("totalVodOffset: " . $totalVodOffset);
+			KalturaLog::debug("segmentStartTime: " . $segmentStartTime .
+				" segmentEndTime: " . $segmentEndTime .
+				" nextSegmentStartTime: " . $nextSegmentStartTime .
+				" totalVodOffset: " . $totalVodOffset);
 
 			// since the timestamp on the cue point is in seconds, and everything else is in milliseconds we can get
 			// a cue point (that was created less than one second from the beginning of the stream) can get negative time
 			// and we will need to "fix" its time
 			if ($segmentStartTime > $timestamp){
+
+				if ($segmentStartTime > $timestamp + self::ALLOW_OLD_CUE_POINT_TOLERANCE) {
+					KalturaLog::warning("not copying coue point with time " . $timestamp . " segment start is " . $segmentStartTime);
+					return null;
+				}
+
 				KalturaLog::debug("timestamp " . $timestamp . " passed to getOffsetForTimestamp was less than segmentStartTime " . $segmentStartTime);
 				$timestamp = $segmentStartTime;
 			}
@@ -129,11 +136,11 @@ class kRecordedSegmentsInfo
 		// if $prevAMF is null - the time is before the first AMF.
 		// 		return $nextAMF.pts - ($nextAMF.timestamp - timestamp)
 		$ret = 0;
-		KalturaLog::debug("timestamp= " . $timestamp);
-		KalturaLog::debug("prevAMF->timestamp= ". $prevAMF->timestamp);
-		KalturaLog::debug("prevAMF->pts= " . $prevAMF->pts);
-		KalturaLog::debug("nextAMF->timestamp= ". $nextAMF->timestamp);
-		KalturaLog::debug("nextAMF->pts= " . $nextAMF->pts);
+		KalturaLog::debug("timestamp= " . $timestamp .
+			" prevAMF->timestamp= ". $prevAMF->timestamp .
+			" prevAMF->pts= " . $prevAMF->pts .
+			" nextAMF->timestamp= ". $nextAMF->timestamp .
+			" nextAMF->pts= " . $nextAMF->pts);
 
 		// we are between AMFs - check that the difference between the timestamps and the difference between PTSs are the same
 		if (!is_null($prevAMF) && !is_null($nextAMF) && !$this->isAMFContinues($prevAMF, $nextAMF)){

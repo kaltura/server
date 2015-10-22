@@ -7,7 +7,7 @@ class KAMFData
 
 };
 
-class KAMFMediaInfoParser extends KBaseMediaParser{
+class KAMFMediaInfoParser{
 
     const timestampHexVal = "74696d657374616d70";
     const AMFNumberDataTypePrefix ="00";
@@ -15,11 +15,34 @@ class KAMFMediaInfoParser extends KBaseMediaParser{
     const MinAMFSizeToTryParse = 205;
 
     protected $ffmprobeBin;
+    protected $filePath;
 
     public function __construct($filePath, $ffprobeBin="ffprobe")
     {
         $this->ffprobeBin = $ffprobeBin;
-        parent::__construct($filePath);
+        if (!file_exists($filePath))
+            throw new kApplicativeException(KBaseMediaParser::ERROR_NFS_FILE_DOESNT_EXIST, "File not found at [$filePath]");
+
+        $this->filePath = $filePath;
+    }
+
+    // returns an array of KAMFData
+    public function getAMFInfo()
+    {
+        $output = $this->getRawMediaInfo();
+        return $this->parseOutput($output);
+    }
+
+    // get the raw output of running the command
+    public function getRawMediaInfo()
+    {
+        $cmd = $this->getCommand();
+        KalturaLog::debug("Executing '$cmd'");
+        $output = shell_exec($cmd);
+        if (trim($output) === "")
+            throw new kApplicativeException(KBaseMediaParser::ERROR_EXTRACT_MEDIA_FAILED, "Failed to parse media using " . get_class($this));
+
+        return $output;
     }
 
     protected function getCommand()
