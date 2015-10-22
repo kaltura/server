@@ -166,7 +166,7 @@ class KalturaFeedRenderer extends SyndicationFeedRenderer{
 		if ($syndicationFeed->getUseCategoryEntries())
 		{
 			KalturaLog::info("Getting entry's associated categories from the category_entry table");
-			$features = array ("3");
+			$features = array (ObjectFeatureType::CATEGORY_ENTRIES);
 		}
 		
 		$mrss = kMrssManager::getEntryMrssXml($entry, null, $mrssParams, $features);
