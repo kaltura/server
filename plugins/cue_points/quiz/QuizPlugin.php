@@ -601,7 +601,7 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 		if ( $noEntryIds && $noUserIds){
 			return array();
 		}
-		$userIds = $this->getUserIdsFromFilter($inputFilter);
+
 		$c = new Criteria();
 		$c->add(CuePointPeer::TYPE, QuizPlugin::getCoreValue('CuePointType',QuizCuePointType::QUIZ_ANSWER));
 		if (!$noUserIds){
@@ -623,7 +623,7 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 				}
 			}
 			if ($hasAnonymous) { 
-				$c->add(CuePointPeer::KUSER_ID, $anonKuserIds, Criteria::NOT_IN);
+				$c->addAnd(CuePointPeer::KUSER_ID, $anonKuserIds, Criteria::NOT_IN);
 			}
 		}
 		$answers = CuePointPeer::doSelect($c);
