@@ -141,13 +141,21 @@ var kTestMe = {
 		const INVALID ="";
 		switch (format)	{
 			case 'xml' :
-				var startResult = responseText.indexOf('<result>');
-				var endResult = responseText.indexOf('</result>');
-				if ( startResult > -1 && endResult > -1) {
-					return responseText.substring(startResult + 8, endResult );
+				var isThereError = responseText.indexOf('<error>') != -1;
+				if (!isThereError) {
+					var startResult = responseText.indexOf('<result>');
+					var endResult = responseText.indexOf('</result>');
+					if (startResult > -1 && endResult > -1) {
+						return responseText.substring(startResult + 8, endResult);
+					}
 				}
+				break;
 			case 'json' :
-				return responseText.slice(1,-1);
+				var isThereError = responseText.indexOf("{") != -1;
+				if (!isThereError) {
+					return responseText.slice(1, -1);
+				}
+				break;
 			default :
 				break;
 		}
