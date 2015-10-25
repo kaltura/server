@@ -16,6 +16,11 @@ class KalturaResponseProfileCacher extends kResponseProfileCacher
 	 */
 	private static $cachePerUser = false;
 	
+	/**
+	 * @var array
+	 */
+	private static $storedObjectTypeKeys = array();
+	
 	private static function getObjectSpecificCacheValue(KalturaObject $apiObject, IRelatedObject $object, $responseProfileKey)
 	{
 		return array(
@@ -99,6 +104,11 @@ class KalturaResponseProfileCacher extends kResponseProfileCacher
 		if($peer instanceof IRelatedObjectPeer)
 		{
 			$key = self::getObjectTypeCacheKey($object);
+			if(isset(self::$storedObjectTypeKeys[$key]))
+			{
+				return;
+			}
+			self::$storedObjectTypeKeys[$key] = true;
 			$value = self::getObjectTypeCacheValue($object);
 			KalturaLog::debug("Set [$key]");
 			

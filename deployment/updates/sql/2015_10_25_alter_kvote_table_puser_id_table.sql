@@ -1,1 +1,1 @@
-ALTER TABLE `kvote` ADD `puser_id` TEXT AFTER `kuser_id`;
+ALTER TABLE kvote ADD puser_id varchar(100) AFTER kuser_id;

@@ -1383,7 +1383,7 @@ class KalturaConfiguration
 	private $logger;
 
 	public $serviceUrl    				= "http://www.kaltura.com/";
-	public $format        				= KalturaClientBase::KALTURA_SERVICE_FORMAT_JSON;
+	public $format        				= KalturaClientBase::KALTURA_SERVICE_FORMAT_PHP;
 	public $curlTimeout   				= 120;
 	public $userAgent					= '';
 	public $startZendDebuggerSession 	= false;

@@ -1,5 +1,21 @@
 # Kajam-11.0.0 #
 
+## New scheduled task profile ##
+
+ - Issue Type: New Feature
+ - Issue ID: PS-2330  
+  
+### Deployment scripts ###
+
+	php /opt/kaltura/app/tests/standAloneClient/exec.php /opt/kaltura/app/tests/standAloneClient/scheduledTaskProfiles/30DayDeleteAfterScheduleEnd.xml  
+	Input: 
+	- partner ID - 1956791
+	- Max total count allowed per execution: 500
+	- Host name: www.kaltura.com
+	- Partner email address: admin console admin user
+	- Partner password: user's password
+	- Partner ID: -2
+	
 ## Like->list API call ##
 
 - Issue Type: New Feature

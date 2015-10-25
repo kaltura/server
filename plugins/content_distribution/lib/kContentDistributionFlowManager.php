@@ -908,7 +908,16 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		$entryDistribution->setErrorType(null);
 		$entryDistribution->setErrorNumber(null);
 		$entryDistribution->setErrorDescription(null);
-		$entryDistribution->setStatus(EntryDistributionStatus::REMOVED);
+		
+		$entry = entryPeer::retrieveByPK($entryDistribution->getEntryId());
+		if ($entry && $entry->getStatus() != entryStatus::DELETED)
+		{
+			$entryDistribution->setRemoteId(null);
+			$entryDistribution->setStatus(EntryDistributionStatus::QUEUED);
+		}
+		else {
+			$entryDistribution->setStatus(EntryDistributionStatus::REMOVED);
+		}
 		$entryDistribution->setDirtyStatus(null);
 		$entryDistribution->save();
 		
@@ -1498,6 +1507,32 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 					}
 				
 					self::assignAssetsAndValidateForSubmission($entryDistribution, $entry, $distributionProfile, DistributionAction::SUBMIT);
+					//handle case where one of the validation errors is cause for deleting the distributed data
+					$validationErrors = $entryDistribution->getValidationErrors();
+					
+					if ($entryDistribution->getStatus() == EntryDistributionStatus::READY)
+					{
+						foreach ($validationErrors as $validationError)
+						{
+							/* @var $validationError kDistributionValidationError */
+							if ($validationError->getRequiresDelete ())
+							{
+								KalturaLog::log("Entry distribution [" . $entryDistribution->getId() . "] has a validation error that should trigger its deletion");
+								if ($distributionProfile->getDeleteEnabled() == DistributionProfileActionStatus::AUTOMATIC)
+								{
+									self::submitDeleteEntryDistribution($entryDistribution, $distributionProfile);
+									continue;
+								}
+								else
+								{
+									KalturaLog::log("Entry distribution [" . $entryDistribution->getId() . "] should not be deleted automatically");
+									$entryDistribution->setDirtyStatus(EntryDistributionDirtyStatus::DELETE_REQUIRED);
+									$entryDistribution->save();
+								}
+							}	
+						
+						}
+					}
 					
 					if(!$updateRequired)
 					{
@@ -1747,7 +1782,6 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 					continue;
 				}
 				$validationErrors = $entryDistribution->getValidationErrors();
-				
 				if(!count($validationErrors) && $distributionProfile->getUpdateEnabled() == DistributionProfileActionStatus::AUTOMATIC)
 				{
 					self::submitUpdateEntryDistribution($entryDistribution, $distributionProfile);
