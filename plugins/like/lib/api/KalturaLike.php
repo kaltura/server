@@ -21,7 +21,7 @@ class KalturaLike extends KalturaObject implements IRelatedFilterable
 
 	/**
 	 * The date of the like's creation
-	 * @var string
+	 * @var time
 	 */
 	public $createdAt;
 	
