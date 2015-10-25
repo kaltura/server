@@ -18,11 +18,18 @@ class KalturaLike extends KalturaObject implements IRelatedFilterable
 	 * @filter eq
 	 */
 	public $userId;
+
+	/**
+	 * The date of the like's creation
+	 * @var string
+	 */
+	public $createdAt;
 	
 	private static $map_between_objects = array
 	(
 		"entryId",
-		"userId" => "puserId"		
+		"userId" => "puserId",
+		"createdAt"
 	);
 	
 	public function getMapBetweenObjects ( )
