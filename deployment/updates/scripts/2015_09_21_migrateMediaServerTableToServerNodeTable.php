@@ -68,80 +68,11 @@ function getWowzaServerNodeDynamicType($link)
 	return $row['id'];
 }
 
-function getWowzaconfig($wowzaHostName, $wowzaDc)
-{
-	$wowzaConfig = array();
-	$mediaServers = kConf::getMap('media_servers');
-	
-	if(!$mediaServers)
-	{
-		echo "No media Server configuration found\n";
-		exit(-1);
-	}
-	
-	if(isset($mediaServers['port']))
-		$wowzaConfig['http_port'] = $mediaServers['port'];
-	
-	if(isset($mediaServers['port-rtmp']))
-		$wowzaConfig['rtmp_port'] = $mediaServers['port-rtmp'];
-	
-	if(isset($mediaServers['port-https']))
-		$wowzaConfig['https_port'] = $mediaServers['port-https'];
-	
-	if(isset($mediaServers['domain']))
-		$wowzaConfig['domain'] = $mediaServers['domain'];
-	
-	if (isset ($mediaServers['appPrefix']))
-		$wowzaConfig['appPrefix'] = $mediaServers['appPrefix'];
-	
-	if (isset ($mediaServers['dc-' . $wowzaDc]))
-	{
-		$mediaServer = $mediaServers['dc-' . $wowzaDc];
-	
-		if(isset($mediaServer['port']))
-		$wowzaConfig['http_port'] = $mediaServer['port'];
-	
-		if(isset($mediaServer['port-rtmp']))
-			$wowzaConfig['rtmp_port'] = $mediaServer['port-rtmp'];
-	
-		if(isset($mediaServer['port-https']))
-			$wowzaConfig['https_port'] = $mediaServer['port-https'];
-	
-		if(isset($mediaServer['domain']))
-			$wowzaConfig['domain'] = $mediaServer['domain'];
-	
-		if (isset ($mediaServer['appPrefix']))
-			$wowzaConfig['appPrefix'] = $mediaServer['appPrefix'];
-	}
-	
-	if (isset ($mediaServers[$wowzaHostName]))
-	{
-		$mediaServer = $mediaServers[$wowzaHostName];
-	
-		if(isset($mediaServer['port']))
-			$wowzaConfig['http_port'] = $mediaServer['port'];
-	
-		if(isset($mediaServer['port-rtmp']))
-			$wowzaConfig['rtmp_port'] = $mediaServer['port-rtmp'];
-	
-		if(isset($mediaServer['port-https']))
-			$wowzaConfig['https_port'] = $mediaServer['port-https'];
-	
-		if(isset($mediaServer['domain']))
-			$wowzaConfig['domain'] = $mediaServer['domain'];
-	
-		if (isset ($mediaServer['appPrefix']))
-			$wowzaConfig['appPrefix'] = $mediaServer['appPrefix'];
-	}
-	
-	return $wowzaConfig;
-}
-
 function validateHostNameDoesNotExist($link, $wowzaHostName, $wowzaServerNodeType)
 {
 	$res = false;
 	
-	$mysqli_result = mysqli_query($link, "select * from server_node where host_name = $wowzaHostName and type = $wowzaServerNodeType");
+	$mysqli_result = mysqli_query($link, "select * from server_node where host_name = \"$wowzaHostName\" and type = $wowzaServerNodeType");
 	
 	if($mysqli_result->num_rows > 0)
 		$res = true;
@@ -151,18 +82,19 @@ function validateHostNameDoesNotExist($link, $wowzaHostName, $wowzaServerNodeTyp
 	return $res;
 }
 
-function getInsertCommand($wowzaHostName, $wowzaDc, $wowzaConfig, $wowzaServerNodeType)
+function getInsertCommand($wowzaHostName, $wowzaDc, $wowzaServerNodeType)
 {
 	$t = time();
 	$date = date("Y-m-d",$t);
 	
-	$insertCommand = "insert into server_node set created_at = \"$date\", updated_at = \"$date\", dc = $wowzaDc, name = \"$wowzaHostName\", host_name = \"$wowzaHostName\", type = $wowzaServerNodeType, playback_host_name = \"" .
-	$wowzaConfig['domain'] . "\", partner_id = -5, status = 1";
+	$insertCommand = "insert into server_node set created_at = \"$date\", updated_at = \"$date\", dc = $wowzaDc, name = \"$wowzaHostName\", host_name = \"$wowzaHostName\", type = $wowzaServerNodeType, partner_id = -5, status = 1";
 	
-	$custom_data = 'a:3:{s:16:"application_name";s:5:"kLive";s:20:"protocol_port_config";a:3:{s:4:"http";s:2:"' . $wowzaConfig['http_port'];
-	$custom_data .= '";s:4:"rtmp";s:2:"' . $wowzaConfig['rtmp_port'] . '";s:5:"https";s:3:"' . $wowzaConfig['https_port'] . '";}s:10:"app_prefix";s:18:"' . $wowzaConfig['appPrefix'] . '";}';
+	$custom_data = array();
+	$custom_data["application_name"] = "kLive";
 	
-	$insertCommand .= ", custom_data = '$custom_data'";
+	$serializedCustomData = serialize($custom_data);
+	
+	$insertCommand .= ", custom_data = '$serializedCustomData'";
 	
 	return $insertCommand;
 }
@@ -176,11 +108,10 @@ while ($row = $mysqli_result->fetch_assoc())
 {
 	$wowzaDc = $row[DC_INDEX];
 	$wowzaHostName = $row[HOST_NAME_INDEX];
-	$wowzaConfig = getWowzaconfig($wowzaHostName, $wowzaDc);
 	
 	if(!validateHostNameDoesNotExist($link, $wowzaHostName, $wowzaServerNodeType))
 	{
-		$insertCommand = getInsertCommand($wowzaHostName, $wowzaDc, $wowzaConfig, $wowzaServerNodeType);
+		$insertCommand = getInsertCommand($wowzaHostName, $wowzaDc, $wowzaServerNodeType);
 		$result = mysqli_query($link, $insertCommand);
 
 		if (!$result) {

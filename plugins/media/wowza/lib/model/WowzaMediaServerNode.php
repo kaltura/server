@@ -86,24 +86,21 @@ class WowzaMediaServerNode extends MediaServerNode {
 	{	
 		$domain = $this->getPlaybackHostName();
 		
-		$domainField = $protocol;
-		if($format)
-			$domainField .= "-$format";
+		$domainField = "domain" . $format ? "-$format" : "";
 		
-		$mediaServerPlaybackDomainConfig = $this->getMediaServerPlaybackDomainConfig();
-		if($mediaServerPlaybackDomainConfig && isset($mediaServerPlaybackDomainConfig[$domainField]) && $mediaServerPlaybackDomainConfig[$domainField] !== $domain)
-			$domain = $mediaServerPlaybackDomainConfig[$domainField];
+		if(kConf::hasMap('media_servers'))
+			$domain = $this->getValueByField(kConf::getMap('media_servers'), $domainField, $domain);
 		
-		if(!$this->partner_media_server_config)
-			return $domain;
-
-		$domainField = "domain-" . $domainField; 
-		if(isset($this->partner_media_server_config[$domainField]))
-			$domain = $this->partner_media_server_config[$domainField];
-		if(isset($this->partner_media_server_config['dc-'.$this->getDc()][$domainField]))
-			$domain = $this->partner_media_server_config['dc-'.$this->getDc()][$domainField];
-		if(isset($this->partner_media_server_config[$this->getHostname()][$domainField]))
-			$domain = $this->partner_media_server_config[$this->getHostname()][$domainField];
+		if($this->partner_media_server_config)
+			$domain = $this->getValueByField($this->partner_media_server_config, $domainField, $domain);
+		
+		$mediaServerPortConfig = $this->getMediaServerPortConfig();
+		if($mediaServerPortConfig)
+		{
+			$domainField = $protocol . $format ? "-$format" : "";
+			if(isset($mediaServerPortConfig[$domainField]) && $mediaServerPortConfig[$domainField] !== WowzaMediaServerNode::DEFAULT_MANIFEST_PORT)
+				$domain = $mediaServerPortConfig[$domainField];
+		}
 		
 		return $domain;
 	}
@@ -112,26 +109,37 @@ class WowzaMediaServerNode extends MediaServerNode {
 	{
 		$port = WowzaMediaServerNode::DEFAULT_MANIFEST_PORT;
 		
-		$portField = $protocol;
-		if($format)
-			$portField .= "-$format";
+		$portField = 'port' . $protocol != 'http' ? "-$protocol" : "" . $format ? "-$format" : "";
+		
+		if(kConf::hasMap('media_servers'))
+			$port = $this->getValueByField(kConf::getMap('media_servers'), $portField, $port);
+		
+		if($this->partner_media_server_config)
+			$port = $this->getValueByField($this->partner_media_server_config, $portField, $port);
 		
 		$mediaServerPortConfig = $this->getMediaServerPortConfig();
-		if($mediaServerPortConfig && isset($mediaServerPortConfig[$portField]) && $mediaServerPortConfig[$portField] !== WowzaMediaServerNode::DEFAULT_MANIFEST_PORT)
-			$port = $mediaServerPortConfig[$portField];
-		
-		if(!$this->partner_media_server_config)
-			return $port;
-		
-		$portField = "port-" . $portField;
-		if(isset($this->partner_media_server_config[$portField]))
-			$port = $this->partner_media_server_config[$portField];
-		if(isset($this->partner_media_server_config['dc-'.$this->getDc()][$portField]))
-			$port = $this->partner_media_server_config['dc-'.$this->getDc()][$portField];
-		if(isset($this->partner_media_server_config[$this->getHostname()][$portField]))
-			$port = $this->partner_media_server_config[$this->getHostname()][$portField];
+		if($mediaServerPortConfig)
+		{
+			$portField = $protocol . $format ? "-$format" : "";
+			if(isset($mediaServerPortConfig[$portField]) && $mediaServerPortConfig[$portField] !== WowzaMediaServerNode::DEFAULT_MANIFEST_PORT)
+				$port = $mediaServerPortConfig[$portField];
+		}
 		
 		return $port;
+	}
+	
+	public function getValueByField($config, $filedValue, $defaultValue)
+	{
+		$value = $defaultValue;
+		
+		if(isset($config[$filedValue]))
+			$value = $config[$filedValue];
+		if(isset($config['dc-'.$this->getDc()][$filedValue]))
+			$value = $config['dc-'.$this->getDc()][$filedValue];
+		if(isset($config[$this->getHostname()][$filedValue]))
+			$value = $config[$this->getHostname()][$filedValue];
+		
+		return $value;
 	}
 	
 	public function setAppPrefix($appPrefix)
