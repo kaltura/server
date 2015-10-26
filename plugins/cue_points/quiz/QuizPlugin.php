@@ -346,12 +346,16 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 	 * @param QuizReportType $report_flavor
 	 * @param string $objectIds
 	 * @param $inputFilter
+	 * @param $page_size
+	 * @param $page_index
 	 * @param null $orderBy
 	 * @return array|null
 	 * @throws kCoreException
-     */
-	public function getReportResult($partner_id, $report_type, $report_flavor, $objectIds, $inputFilter, $orderBy = null)
+	 */
+	public function getReportResult($partner_id, $report_type, $report_flavor, $objectIds, $inputFilter,
+									$page_size , $page_index, $orderBy = null)
 	{
+		$ans = array();
 		if (!in_array(str_replace(self::getPluginName().".", "", $report_type), QuizReportType::getAdditionalValues()))
 		{
 			return null;
@@ -363,20 +367,22 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 			case myReportsMgr::REPORT_FLAVOR_TABLE:
 				if ($report_type == (self::getPluginName() . "." . QuizReportType::QUIZ))
 				{
-					return $this->getQuestionPercentageTableReport($objectIds, $orderBy);
+					$ans = $this->getQuestionPercentageTableReport($objectIds, $orderBy);
 				}
 				else if ($report_type == (self::getPluginName() . "." . QuizReportType::QUIZ_USER_PERCENTAGE))
 				{
-					return $this->getUserPercentageTable($objectIds, $orderBy);
+					$ans = $this->getUserPercentageTable($objectIds, $orderBy);
 				}
 				else if ($report_type == (self::getPluginName() . "." . QuizReportType::QUIZ_AGGREGATE_BY_QUESTION))
 				{
-					return $this->getQuizQuestionPercentageTableReport($objectIds, $orderBy);
+					$ans = $this->getQuizQuestionPercentageTableReport($objectIds, $orderBy);
 				}
 				else if ($report_type == (self::getPluginName() . "." . QuizReportType::QUIZ_USER_AGGREGATE_BY_QUESTION))
 				{
-					return $this->getUserPrecentageByUserAndEntryTable($objectIds, $inputFilter, $orderBy);
+					$ans = $this->getUserPrecentageByUserAndEntryTable($objectIds, $inputFilter, $orderBy);
 				}
+				return $this->pagerResults($ans, $page_size , $page_index);
+
 			case myReportsMgr::REPORT_FLAVOR_COUNT:
 				if ($report_type == (self::getPluginName() . "." . QuizReportType::QUIZ))
 				{
@@ -397,6 +403,40 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 			default:
 				return null;
 		}
+	}
+
+	/**
+	 * The method returns only part of the results according to the $page_size and $page_index parameters
+	 * $ans - array of all the answers
+	 * $page_size - The number of entries that should be displyed on the screen
+	 * $page_index - The index pf the first entry that will be displayed on the screen
+	 * @param $ans
+	 * @param $page_size
+	 * @param $page_index
+	 * @return array
+	 */
+	protected function pagerResults(array $ans, $page_size , $page_index)
+	{
+		KalturaLog::debug("QUIZ Report::: page_size [$page_size] page_index [$page_index] array size [" .count($ans)."]");
+		$res = array();
+		if ($page_index ==0)
+			$page_index = 1;
+
+		if ($page_index * $page_size > count($ans))
+		{
+			return $res;
+		}
+
+		$indexInArray = ($page_index -1) * $page_size;
+		$j= 0;
+		for ($i = $indexInArray; $i < $indexInArray + $page_size; $i++)
+		{
+			$res[$j] = $ans[$i];
+			++$j;
+		}
+
+		KalturaLog::debug("QUIZ Report::: The number of arguments in the response is [" .count($res)."]");
+		return $res;
 	}
 
 	/**
