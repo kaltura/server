@@ -429,7 +429,6 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 
 		$indexInArray = ($page_index -1) * $page_size;
 		$res = array_slice($ans, $indexInArray, $page_size, false );
-
 		KalturaLog::debug("QUIZ Report::: The number of arguments in the response is [" .count($res)."]");
 		return $res;
 	}
