@@ -52,12 +52,20 @@ class WowzaMediaServerNode extends MediaServerNode {
 	}
 	
 	public function getPlaybackHost($protocol = 'http', $format = null)
-	{	
-		$domain = $this->getDomainByProtocolAndFormat($protocol, $format);
+	{
+		$mediaServerGlobalConfig = array();
 		
-		$port = $this->getPortByProtocolAndFormat($protocol, $format);
+		if(kConf::hasMap('media_servers'))
+			$mediaServerGlobalConfig = array_merge($mediaServerGlobalConfig, kConf::getMap('media_servers'));
 		
-		$appPrefix = $this->getAppPrefix();
+		if($this->partner_media_server_config)
+			$mediaServerGlobalConfig = array_merge($mediaServerGlobalConfig, $this->partner_media_server_config);
+			
+		$domain = $this->getDomainByProtocolAndFormat($mediaServerGlobalConfig, $protocol, $format);
+		
+		$port = $this->getPortByProtocolAndFormat($mediaServerGlobalConfig, $protocol, $format);
+		
+		$appPrefix = $this->getApplicationPrefix($mediaServerGlobalConfig);
 		
 		return "$domain:$port/$appPrefix";
 	}
@@ -82,17 +90,13 @@ class WowzaMediaServerNode extends MediaServerNode {
 		return new $serviceClass($url);
 	}
 	
-	public function getDomainByProtocolAndFormat($protocol = 'http', $format = null)
+	public function getDomainByProtocolAndFormat($mediaServerConfig, $protocol = 'http', $format = null)
 	{	
 		$domain = $this->getPlaybackHostName();
 		
 		$domainField = "domain" . ($format ? "-$format" : "");
 		
-		if(kConf::hasMap('media_servers'))
-			$domain = $this->getValueByField(kConf::getMap('media_servers'), $domainField, $domain);
-		
-		if($this->partner_media_server_config)
-			$domain = $this->getValueByField($this->partner_media_server_config, $domainField, $domain);
+		$domain = $this->getValueByField($mediaServerConfig, $domainField, $domain);
 		
 		$mediaServerPortConfig = $this->getMediaServerPortConfig();
 		if($mediaServerPortConfig)
@@ -105,17 +109,13 @@ class WowzaMediaServerNode extends MediaServerNode {
 		return $domain;
 	}
 	
-	public function getPortByProtocolAndFormat($protocol = 'http', $format = null)
+	public function getPortByProtocolAndFormat($mediaServerConfig, $protocol = 'http', $format = null)
 	{
 		$port = WowzaMediaServerNode::DEFAULT_MANIFEST_PORT;
 		
 		$portField = 'port' . ($protocol != 'http' ? "-$protocol" : "") . ($format ? "-$format" : "");
 		
-		if(kConf::hasMap('media_servers'))
-			$port = $this->getValueByField(kConf::getMap('media_servers'), $portField, $port);
-		
-		if($this->partner_media_server_config)
-			$port = $this->getValueByField($this->partner_media_server_config, $portField, $port);
+		$port = $this->getValueByField($mediaServerConfig, $portField, $port);
 		
 		$mediaServerPortConfig = $this->getMediaServerPortConfig();
 		if($mediaServerPortConfig)
@@ -126,6 +126,18 @@ class WowzaMediaServerNode extends MediaServerNode {
 		}
 		
 		return $port;
+	}
+	
+	public function getApplicationPrefix($mediaServerConfig)
+	{
+		$appPrefix = "";
+
+		$appPrefix = $this->getValueByField($mediaServerConfig, 'appPrefix', $appPrefix);
+		
+		if($this->getAppPrefix())
+			$appPrefix = $this->getApplicationPrefix();
+		
+		return $appPrefix;
 	}
 	
 	public function getValueByField($config, $filedValue, $defaultValue)
@@ -149,7 +161,7 @@ class WowzaMediaServerNode extends MediaServerNode {
 	
 	public function getAppPrefix()
 	{
-		return $this->getFromCustomData(self::CUSTOM_DATA_APP_PREFIX, null, "");
+		return $this->getFromCustomData(self::CUSTOM_DATA_APP_PREFIX, null, null);
 	}
 	
 	public function setTranscoder($transcoder)
