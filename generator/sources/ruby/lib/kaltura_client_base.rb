@@ -83,7 +83,7 @@ module Kaltura
 				params = {}
 				files = {}
 					
-				url = @config.service_url+"/api/"
+				url = @config.service_url+"/api_v3/"
 				if (@is_multirequest)
 					url += "service/multirequest/"
 					i = 0
@@ -145,19 +145,19 @@ module Kaltura
 		end
 
 		def get_serve_url()
-			url = @config.service_url+"/api_v3/index.php?service="
+			url = @config.service_url+"/api_v3/service/"
 
 			call = @calls_queue[0]
-			url += call.service + "&action=" + call.action
+			url += call.service + "/action/" + call.action
 			params = call.params
 
 			# reset
 			@calls_queue = []
 			@is_multirequest = false
 
-			query_string = ''
+			query_string = '?'
 			params.each do |name, value|
-				query_string << "&#{name}=#{CGI::escape(value.to_s)}"
+				query_string << "#{name}=#{CGI::escape(value.to_s)}&"
 			end
 
 			serve_url = "#{url}#{query_string}"

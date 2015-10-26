@@ -360,7 +360,7 @@ KalturaClientBase.prototype.doQueue = function(callback)
 	var url = this.config.serviceUrl + this.config.serviceBase;
 	var call = null;
 	if (this.useMultiRequest){
-		url += "multirequest";
+		url += "/multirequest";
 		$i = 1;
 		for(var v in this.callsQueue){
 			call = this.callsQueue[v];
@@ -374,7 +374,7 @@ KalturaClientBase.prototype.doQueue = function(callback)
 		}
 	} else {
 		call = this.callsQueue[0];
-		url += call.service + "&action=" + call.action;
+		url += "/" + call.service + "/action/" + call.action;
 		for(var sv3 in call.params)
 			params[sv3] = call.params[sv3];
 		for(var sv4 in call.files)
@@ -413,7 +413,7 @@ KalturaClientBase.prototype.signature = function(params)
  */
 KalturaClientBase.prototype.doHttpRequest = function (callCompletedCallback, url, params, files)
 {
-	url += '&' + http_build_query(params);
+	url += '?' + http_build_query(params);
 	OX.AJAST.call(url, "callback", callCompletedCallback, 20000, false);
 };
 
@@ -565,7 +565,7 @@ function KalturaConfiguration(partnerId)
 
 KalturaConfiguration.prototype.logger		= null;
 KalturaConfiguration.prototype.serviceUrl	= "http://www.kaltura.com";
-KalturaConfiguration.prototype.serviceBase 	= "/api_v3/index.php?service=";
+KalturaConfiguration.prototype.serviceBase 	= "/api_v3/service";
 KalturaConfiguration.prototype.partnerId	= null;
 KalturaConfiguration.prototype.format		= KalturaClientBase.prototype.KALTURA_SERVICE_FORMAT_JSONP;
 KalturaConfiguration.prototype.clientTag	= "js:@DATE@";
