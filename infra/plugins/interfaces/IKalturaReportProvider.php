@@ -17,5 +17,6 @@ interface IKalturaReportProvider {
      * @param null $orderBy
      * @return mixed array(array(<header> => <value>))
      */
-    public function getReportResult($partner_id, $report_type, $report_flavor, $objectIds, $inputFilter, $orderBy = null);
+    public function getReportResult($partner_id, $report_type, $report_flavor, $objectIds, $inputFilter,
+                                    $page_size , $page_index, $orderBy = null);
 }
