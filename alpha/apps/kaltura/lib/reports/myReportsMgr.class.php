@@ -1241,9 +1241,10 @@ class myReportsMgr
 			}
 		}
 		
-		foreach ($values as $key => $value) {
-			$values[$key] = mysqli_real_escape_string($link, $value);
-		}
+		foreach ($values as $key => &$value) {
+            $value = mysqli_real_escape_string($link, $value);
+        }
+
 			
 		$replaced_sql = str_replace ( $names , $values , $sql_content );	
 
@@ -1256,7 +1257,6 @@ class myReportsMgr
 	{
 		kApiCache::disableConditionalCache();
 	
-		KalturaLog::log( "Reports query using database host: [$host] user [" . $db_config["user"] . "]" );
 		$db_config = kConf::get( "reports_db_config" );
 		
 		if($mysql_function == 'mysql') $db_selected =  mysql_select_db ( $db_config["db_name"] , $link );
@@ -1400,6 +1400,8 @@ class myReportsMgr
 		
 		$connect_function = $mysql_function.'_connect';
 		$link  = $connect_function( $host , $db_config["user"] , $db_config["password"] , null, $db_config["port"] );
+		KalturaLog::log( "Reports query using database host: [$host] user [" . $db_config["user"] . "]" );
+		
 		return $link;
 	}	
 
