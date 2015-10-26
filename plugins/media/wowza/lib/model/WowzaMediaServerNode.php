@@ -86,7 +86,7 @@ class WowzaMediaServerNode extends MediaServerNode {
 	{	
 		$domain = $this->getPlaybackHostName();
 		
-		$domainField = "domain" . $format ? "-$format" : "";
+		$domainField = "domain" . ($format ? "-$format" : "");
 		
 		if(kConf::hasMap('media_servers'))
 			$domain = $this->getValueByField(kConf::getMap('media_servers'), $domainField, $domain);
@@ -97,7 +97,7 @@ class WowzaMediaServerNode extends MediaServerNode {
 		$mediaServerPortConfig = $this->getMediaServerPortConfig();
 		if($mediaServerPortConfig)
 		{
-			$domainField = $protocol . $format ? "-$format" : "";
+			$domainField = $protocol . ($format ? "-$format" : "");
 			if(isset($mediaServerPortConfig[$domainField]) && $mediaServerPortConfig[$domainField] !== WowzaMediaServerNode::DEFAULT_MANIFEST_PORT)
 				$domain = $mediaServerPortConfig[$domainField];
 		}
@@ -109,7 +109,7 @@ class WowzaMediaServerNode extends MediaServerNode {
 	{
 		$port = WowzaMediaServerNode::DEFAULT_MANIFEST_PORT;
 		
-		$portField = 'port' . $protocol != 'http' ? "-$protocol" : "" . $format ? "-$format" : "";
+		$portField = 'port' . ($protocol != 'http' ? "-$protocol" : "") . ($format ? "-$format" : "");
 		
 		if(kConf::hasMap('media_servers'))
 			$port = $this->getValueByField(kConf::getMap('media_servers'), $portField, $port);
@@ -120,7 +120,7 @@ class WowzaMediaServerNode extends MediaServerNode {
 		$mediaServerPortConfig = $this->getMediaServerPortConfig();
 		if($mediaServerPortConfig)
 		{
-			$portField = $protocol . $format ? "-$format" : "";
+			$portField = $protocol . ($format ? "-$format" : "");
 			if(isset($mediaServerPortConfig[$portField]) && $mediaServerPortConfig[$portField] !== WowzaMediaServerNode::DEFAULT_MANIFEST_PORT)
 				$port = $mediaServerPortConfig[$portField];
 		}
