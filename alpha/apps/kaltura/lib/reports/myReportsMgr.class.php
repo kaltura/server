@@ -1256,6 +1256,7 @@ class myReportsMgr
 	private static function executeQuery ( $query, $link )
 	{
 		kApiCache::disableConditionalCache();
+		$mysql_function = 'mysqli';
 	
 		$db_config = kConf::get( "reports_db_config" );
 		
