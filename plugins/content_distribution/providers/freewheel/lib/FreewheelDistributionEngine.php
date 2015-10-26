@@ -272,24 +272,18 @@ class FreewheelDistributionEngine extends DistributionEngine implements
 		}
 		$mydata["rating"] = "<fwRating>".$rating."</fwRating>";
 		
-		//KalturaLog::debug("entry data: ".print_r($mydata, TRUE));
-		
 		//do something
 		$xmlTemplate = realpath(dirname(__FILE__) . '/../') . '/xml/submit.template.xml';
 		$handle = fopen($xmlTemplate, "r");
 		$template = fread($handle, 4096);
 		foreach ($mydata as $key=>$value) {
-//			$needle = "%%".$key."%%";
-//			KalturaLog::debug($needle);
 			$template = str_replace("%%".$key."%%", $value, $template);
 		}
-		KalturaLog::debug("template: ".$template);
 		fclose($handle);		
 
 		$this->token = $distributionProfile->apikey;
 		$this->service_url = "https://api.freewheel.tv/services/upload/bvi.xml";
 		$result = $this->upload($entryId.".xml",$template);
-		//KalturaLog::debug("result: ".$result);
 	}
 	
 	/**

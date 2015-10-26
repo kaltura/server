@@ -490,18 +490,13 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		{
 			foreach($this->permissions as $permission)
 			{
-				KalturaLog::debug("partner: " . $object_to_fill->getId() . " add permissions: " . print_r($permission,true));
-				
 				$dbPermission = PermissionPeer::getByNameAndPartner($permission->name, array($object_to_fill->getId()));
 				if($dbPermission)
 				{
-					KalturaLog::debug("add permission: exists in DB; set status; " . $permission->status);
-					KalturaLog::debug("db permissions:  " . print_r($dbPermission,true));
 					$dbPermission->setStatus($permission->status);
 				}
 				else
 				{
-					KalturaLog::debug("add permissions: does not exist in DB");
 					$dbPermission = new Permission();
 					$dbPermission->setType($permission->type);
 					$dbPermission->setPartnerId($object_to_fill->getId());
@@ -510,7 +505,6 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 					$dbPermission = $permission->toInsertableObject($dbPermission);
 				}
 				
-				KalturaLog::debug("add permissions: save" . print_r($dbPermission,true));
 				$dbPermission->save();
 				
 				

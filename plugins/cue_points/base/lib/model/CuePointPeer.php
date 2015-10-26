@@ -118,8 +118,6 @@ class CuePointPeer extends BaseCuePointPeer implements IMetadataPeer, IRelatedOb
 	{
 		if(!empty($selectResults) && self::$userContentOnly)
 		{
-			KalturaLog::debug('Filter cuePoint User results');
-		
 			$removedRecordsCount = 0;
 			foreach ($selectResults as $key => $cuePoint)
 			{
@@ -136,8 +134,6 @@ class CuePointPeer extends BaseCuePointPeer implements IMetadataPeer, IRelatedOb
 				$recordsCount = $criteria->getRecordsCount();
 				$criteria->setRecordsCount($recordsCount - $removedRecordsCount);
 			}
-			
-			KalturaLog::debug('Filter cuePoint Results - done');
 		}
 	
 		parent::filterSelectResults($selectResults, $criteria);

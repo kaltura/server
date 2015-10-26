@@ -105,7 +105,6 @@ class PdfGenerator extends FPDF
      */
     public function addTitle($str, PdfStyle $style)
     {
-        KalturaLog::debug("PDF::: Title is: ".$str);
         if (!isset ($str) || (!is_string($str)))
         {
             return;
@@ -121,7 +120,6 @@ class PdfGenerator extends FPDF
      */
     public function addList($sign, $text, PdfStyle $style)
     {
-        KalturaLog::debug("PDF::: list sign is [ " .$sign . " ]  text is: ".$text);
         if (!isset($text) || !strlen($text) > 0)
         {
             return;
@@ -144,12 +142,10 @@ class PdfGenerator extends FPDF
      */
     public function addParagraph($string)
     {
-
         if (!isset ($string) || (!is_string($string)))
         {
             return;
         }
-
         $style = new PdfStyle('Normal', 'Times', 12, '', true, false, '');
         $this->addText($string, $style);
     }
@@ -162,8 +158,6 @@ class PdfGenerator extends FPDF
      */
     public function addHeadline($level='1', $text, PdfStyle $style)
     {
-        KalturaLog::debug("PDF::: Headline is: ".$text);
-
         if (!isset ($text) || (!is_string($text)))
         {
             return;
@@ -195,7 +189,6 @@ class PdfGenerator extends FPDF
 
     private function addText($text, PdfStyle $style)
     {
-        KalturaLog::debug("PDF::: The following text is added: ".$text);
         if (strlen($text)> 0)
         {
             if ($style->isAddLineBefore())

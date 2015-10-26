@@ -41,7 +41,10 @@ class TvinciDistributionPlugin extends KalturaParentContributedPlugin implements
 	public static function getEnums($baseEnumName = null)
 	{
 		if(is_null($baseEnumName))
-			return array('TvinciDistributionProviderType');
+			return array('TvinciDistributionProviderType', 'ParentObjectFeatureType');
+
+		if($baseEnumName == 'ObjectFeatureType')
+			return array('ParentObjectFeatureType');
 
 		if($baseEnumName == 'DistributionProviderType')
 			return array('TvinciDistributionProviderType');

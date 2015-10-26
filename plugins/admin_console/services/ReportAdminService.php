@@ -137,7 +137,6 @@ class ReportAdminService extends KalturaBaseService
 		catch(Exception $ex)
 		{
 			KalturaLog::err($ex);
-			KalturaLog::info('Rethrowing KalturaAPIException with the exception details');
 			throw new KalturaAPIException(KalturaErrors::INTERNAL_SERVERL_ERROR_DEBUG, $ex->getMessage());
 		}
 		

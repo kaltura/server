@@ -102,7 +102,7 @@ class KalturaFeedRenderer extends SyndicationFeedRenderer{
 		$xsl = new DOMDocument();
 		if(!@$xsl->loadXML($xslt))
 		{
-			KalturaLog::debug("Could not load xslt");
+			KalturaLog::err("Could not load xslt");
 			return null;
 		}
 	
@@ -131,7 +131,7 @@ class KalturaFeedRenderer extends SyndicationFeedRenderer{
 		$xsl = new DOMDocument();
 		if(!@$xsl->loadXML($xslt))
 		{
-			KalturaLog::debug("Could not load xslt");
+			KalturaLog::err("Could not load xslt");
 			return null;
 		}
 	

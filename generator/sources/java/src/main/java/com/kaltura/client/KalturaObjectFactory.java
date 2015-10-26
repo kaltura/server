@@ -46,19 +46,26 @@ public class KalturaObjectFactory {
     @SuppressWarnings("unchecked")
 	public static <T> T create(Element xmlElement, Class<T> fallbackClazz) throws KalturaApiException {
     	NodeList objectTypeNodes = xmlElement.getElementsByTagName("objectType");
-        Node objectTypeNode = objectTypeNodes.item(0);
-        String objectType = objectTypeNode.getTextContent();
-        
+        Node objectTypeNode = objectTypeNodes.item(0);    
+
 		Class<T> clazz = null;
-		try {
-			clazz = (Class<T>) Class.forName("com.kaltura.client.types." + objectType);
-		} catch (ClassNotFoundException e1) {
+        if (objectTypeNode != null) {
+	        String objectType = objectTypeNode.getTextContent();
+	        
+			try {
+				clazz = (Class<T>) Class.forName("com.kaltura.client.types." + objectType);
+			} catch (ClassNotFoundException e1) {
+				clazz = null;
+			}
+        }
+        
+        if(clazz == null){
 			if(fallbackClazz != null) {
 				clazz = fallbackClazz;
 			} else {
-				throw new KalturaApiException("Invalid object : " + objectType );
+				throw new KalturaApiException("Invalid object type" );
 			}
-		}
+        }
 
         try {
             Constructor<?> ctor = clazz.getConstructor(Element.class);

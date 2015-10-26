@@ -215,7 +215,6 @@ class KDLWrap
 	 */
 	public static function CDLMediaInfo2Tags(mediaInfo $cdlMediaInfo, $tagList) 
 	{
-		KalturaLog::log("==>\n");
 		$mediaSet = new KDLMediaDataSet();
 		self::ConvertMediainfoCdl2Mediadataset($cdlMediaInfo, $mediaSet);
 		KalturaLog::log( "...S-->".$mediaSet->ToString());
@@ -229,7 +228,6 @@ class KDLWrap
 	 */
 	public static function CDLIsFLV(mediaInfo $cdlMediaInfo) 
 	{
-		KalturaLog::log("==>\n");
 		$tagList[] = "flv";
 		$mediaSet = new KDLMediaDataSet();
 		self::ConvertMediainfoCdl2Mediadataset($cdlMediaInfo, $mediaSet);
@@ -237,11 +235,9 @@ class KDLWrap
 		$tagsOut = array();
 		$tagsOut = $mediaSet->ToTags($tagList);
 		if(count($tagsOut)==1) {
-			KalturaLog::log("... an FLV file");
 			return true;
 		}
 		else {
-			KalturaLog::log("... NOT an FLV file");
 			return false;
 		}
 	}
@@ -627,7 +623,6 @@ class KDLWrap
 	 */
 	public static function ConvertMediainfoCdl2FlavorAsset(mediaInfo $cdlMediaInfo, flavorAsset &$fla)
 	{
-		KalturaLog::log("==>");
 		KalturaLog::log("\nCDL mediaInfo==>\n".print_r($cdlMediaInfo,true));
 	  	$medSet = new KDLMediaDataSet();
 		self::ConvertMediainfoCdl2Mediadataset($cdlMediaInfo, $medSet);

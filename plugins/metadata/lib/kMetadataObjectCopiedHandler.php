@@ -60,8 +60,6 @@ class kMetadataObjectCopiedHandler implements kObjectCopiedEventConsumer, kObjec
 	 */
 	protected function copyMetadata($objectType, BaseObject $fromObject, BaseObject $toObject)
 	{
-		KalturaLog::debug("Copy metadata type [$objectType] from " . get_class($fromObject) . '[' . $fromObject->getId() . "] to[" . $toObject->getId() . "]");
-			
  		$c = new Criteria();
  		$c->add(MetadataPeer::OBJECT_TYPE, $objectType);
  		$c->add(MetadataPeer::OBJECT_ID, $fromObject->getId());
@@ -106,8 +104,6 @@ class kMetadataObjectCopiedHandler implements kObjectCopiedEventConsumer, kObjec
 	{
 		$fromPartnerId = $fromPartner->getId();
 		$toPartnerId = $toPartner->getId();
-		
-		KalturaLog::debug("Copy metadata profiles from [$fromPartnerId] to [$toPartnerId]");
 		
  		$c = new Criteria();
  		$c->add(MetadataProfilePeer::PARTNER_ID, $fromPartnerId);

@@ -11,8 +11,6 @@ class kMemoryManager
 	
 	public static function clearMemory()
 	{
-		KalturaLog::log('Clearing memory');
-		
 		foreach (self::$peerNames as $peerName => $dontCare)
 		{
 			call_user_func(array($peerName, 'clearInstancePool'));

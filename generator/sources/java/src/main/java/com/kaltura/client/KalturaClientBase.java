@@ -463,7 +463,7 @@ abstract public class KalturaClientBase implements Serializable {
 
 	private String extractParamsFromCallQueue(KalturaParams kparams, KalturaFiles kfiles) throws KalturaApiException {
 		
-		String url = this.kalturaConfiguration.getEndpoint() + "/api";
+		String url = this.kalturaConfiguration.getEndpoint() + "/api_v3";
 		
 		// append the basic params
 		kparams.add("format", this.kalturaConfiguration.getServiceFormat());

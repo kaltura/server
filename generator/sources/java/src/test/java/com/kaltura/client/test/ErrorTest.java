@@ -139,21 +139,6 @@ public class ErrorTest extends BaseTest {
 		}
 	}
 	
-	/**
-	 * Tests case in which the response has xml format, but empty object
-	 */
-	public void testEmptyObject() throws KalturaApiException {
-		KalturaClientMock mockClient = new KalturaClientMock(this.kalturaConfig, "<xml><result><objectType>KalturaPlaylist</objectType><filters><item/></filters></result></xml>");
-		mockClient.queueServiceCall("system", "ping", new KalturaParams());
-		Element resultXmlElement = mockClient.doQueue();
-		try {
-			KalturaObjectFactory.create(resultXmlElement, null);
-			fail("Invalid XML response should fail");
-		} catch (Exception e) {
-			// Expected behavior
-		}
-	}
-	
 	public void testTagInObjectDoesntStartWithType() throws KalturaApiException {
 		KalturaClientMock mockClient = new KalturaClientMock(this.kalturaConfig, "<xml><result><id>1234</id></result></xml>");
 		mockClient.queueServiceCall("system", "ping", new KalturaParams());
@@ -186,7 +171,7 @@ public class ErrorTest extends BaseTest {
 			KalturaObjectFactory.create(resultXmlElement, null);
 			fail("Invalid XML response should fail");
 		} catch (Exception e) {
-			assertEquals("Invalid object : UnknownObjectType", e.getMessage());
+			assertEquals("Invalid object type", e.getMessage());
 		}
 	}
 	
@@ -198,7 +183,7 @@ public class ErrorTest extends BaseTest {
 			KalturaObjectFactory.create(resultXmlElement, null);
 			fail("Invalid XML response should fail");
 		} catch (Exception e) {
-			assertEquals("Invalid object : NSString", e.getMessage());
+			assertEquals("Invalid object type", e.getMessage());
 		}
 	}
 	

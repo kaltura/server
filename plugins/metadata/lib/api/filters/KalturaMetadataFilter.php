@@ -91,7 +91,6 @@ class KalturaMetadataFilter extends KalturaMetadataBaseFilter
 				$categories = categoryPeer::retrieveByPKs($categoryIds);
 				if(!count($categories))
 				{
-					KalturaLog::debug("No categories found");
 					$response = new KalturaMetadataListResponse();
 					$response->objects = new KalturaMetadataArray();
 					$response->totalCount = 0;

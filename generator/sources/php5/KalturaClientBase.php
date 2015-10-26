@@ -927,7 +927,7 @@ class KalturaClientBase
 				throw new KalturaClientException("Invalid object type - not instance of $objectType", KalturaClientException::ERROR_INVALID_OBJECT_TYPE);
 			}
 		}
-		else if(is_subclass_of($objectType, 'KalturaEnumBase'))
+		else if(class_exists($objectType) && is_subclass_of($objectType, 'KalturaEnumBase'))
 		{
 			$enum = new ReflectionClass($objectType);
 			$values = array_map('strval', $enum->getConstants());
@@ -1383,7 +1383,7 @@ class KalturaConfiguration
 	private $logger;
 
 	public $serviceUrl    				= "http://www.kaltura.com/";
-	public $format        				= KalturaClientBase::KALTURA_SERVICE_FORMAT_JSON;
+	public $format        				= KalturaClientBase::KALTURA_SERVICE_FORMAT_PHP;
 	public $curlTimeout   				= 120;
 	public $userAgent					= '';
 	public $startZendDebuggerSession 	= false;

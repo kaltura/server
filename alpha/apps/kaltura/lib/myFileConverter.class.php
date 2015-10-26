@@ -466,7 +466,6 @@ class myFileConverter
 		
 		// do convertion
 		$status = null;
-		KalturaLog::debug("target file for crop: $target_file");
 		$imageCropper = new KImageMagickCropper($source_file, $target_file, kConf::get('bin_path_imagemagick'));
 		$status = $imageCropper->crop($quality, $crop_type, $width, $height, $src_x, $src_y, $src_w, $src_h, null, null, $bgcolor, $density, null, $stripProfiles);
 		if (!$status)

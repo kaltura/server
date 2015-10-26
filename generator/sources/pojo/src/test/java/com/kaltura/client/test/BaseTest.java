@@ -33,6 +33,7 @@ import java.io.IOException;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import junit.framework.TestCase;
 
@@ -127,6 +128,7 @@ public class BaseTest extends TestCase {
 		KalturaMediaEntry entry = new KalturaMediaEntry();
 		entry.setName(name);
 		entry.setMediaType(KalturaMediaType.IMAGE);
+		entry.setReferenceId(getUniqueString());
 		
 		InputStream fileData = TestUtils.getTestImage();
 		int fileSize = fileData.available();
@@ -152,6 +154,9 @@ public class BaseTest extends TestCase {
 		return client.getMediaService().get(entry.getId());
 	}
 	
+	protected String getUniqueString() {
+		return UUID.randomUUID().toString();
+	}
 	public static KalturaMediaEntry getProcessedEntry(KalturaClient client, String id) throws Exception {
 		return getProcessedEntry(client, id, false);
 	}

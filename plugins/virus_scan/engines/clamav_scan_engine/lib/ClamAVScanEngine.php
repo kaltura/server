@@ -53,7 +53,7 @@ class ClamAVScanEngine extends VirusScanEngine
 		$errorDescription = null;
 		$output = null;
 		
-		KalturaLog::debug("Executing - [$cmd]");
+		KalturaLog::info("Executing - [$cmd]");
 		exec($cmd, $output, $return_value);
 				
 		$statusLine = false;

@@ -134,8 +134,6 @@ class MsnDistributionEngine extends DistributionEngine implements
 		$password = $distributionProfile->password;
 		
 		$url = "https://{$domain}/admin/services/storevideoandfiles.aspx";
-		KalturaLog::debug("url [$url]");
-		KalturaLog::debug("xml [{$providerData->xml}]");
 		
 		$ch = curl_init();
 
@@ -220,7 +218,6 @@ class MsnDistributionEngine extends DistributionEngine implements
 		$password = $distributionProfile->password;
 		
 		$url = "https://{$domain}/admin/services/videobyuuid.aspx?uuid={$data->remoteId}";
-		KalturaLog::debug("url [$url]");
 		
 		$ch = curl_init();
 
@@ -249,7 +246,7 @@ class MsnDistributionEngine extends DistributionEngine implements
 		}
 		curl_close($ch);
 
-		KalturaLog::debug("results [$results]");
+		KalturaLog::info("results [$results]");
 		
 		$xml = new DOMDocument();
 		if($xml->loadXML($results))

@@ -112,8 +112,6 @@ class EntryCuePointSearchFilter extends AdvancedSearchFilterItem
 			$condition = CuePointPlugin::PLUGIN_NAME . "_" . $partnerId . " << $conditionStr << " . CuePointPlugin::SEARCH_TEXT_SUFFIX;
 		}
 		
-		KalturaLog::debug("condition [" . print_r($condition, true) . "]");
-		
 		return '@' . CuePointPlugin::getSearchFieldName(CuePointPlugin::SEARCH_FIELD_DATA) . " " . $condition;
 	}
 	
@@ -132,7 +130,6 @@ class EntryCuePointSearchFilter extends AdvancedSearchFilterItem
 	
 	public function getFreeTextConditions($partnerScope, $freeTexts) 
 	{
-		KalturaLog::debug("freeText [$freeTexts]");
 		$additionalConditions = array();
 		
 		if($this->getCuePointsFreeText())

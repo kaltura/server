@@ -116,7 +116,7 @@ Encapsulated: null-body=0
 				continue;		// don't count this as an attempt, since the command wasn't sent to the server
 			}
 		
-			KalturaLog::debug("Buffer received from scan engine: $response");
+			KalturaLog::info("Buffer received from scan engine: $response");
 
 			if (!kString::beginsWith($response, 'ICAP/1.0 '))
 			{

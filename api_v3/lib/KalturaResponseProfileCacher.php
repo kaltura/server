@@ -16,6 +16,11 @@ class KalturaResponseProfileCacher extends kResponseProfileCacher
 	 */
 	private static $cachePerUser = false;
 	
+	/**
+	 * @var array
+	 */
+	private static $storedObjectTypeKeys = array();
+	
 	private static function getObjectSpecificCacheValue(KalturaObject $apiObject, IRelatedObject $object, $responseProfileKey)
 	{
 		return array(
@@ -99,8 +104,13 @@ class KalturaResponseProfileCacher extends kResponseProfileCacher
 		if($peer instanceof IRelatedObjectPeer)
 		{
 			$key = self::getObjectTypeCacheKey($object);
+			if(isset(self::$storedObjectTypeKeys[$key]))
+			{
+				return;
+			}
+			self::$storedObjectTypeKeys[$key] = true;
 			$value = self::getObjectTypeCacheValue($object);
-			KalturaLog::debug("Set [$key] value [" . print_r($value, true) . "]");
+			KalturaLog::debug("Set [$key]");
 			
 			self::set($key, $value);
 		}
@@ -111,46 +121,56 @@ class KalturaResponseProfileCacher extends kResponseProfileCacher
 		self::$cachePerUser = true;
 	}
 	
-	public static function start(IRelatedObject $object, KalturaDetachedResponseProfile $responseProfile)
+	/**
+	 * @param KalturaObject $apiObject
+	 * @param IRelatedObject $object
+	 * @param KalturaDetachedResponseProfile $responseProfile
+	 * @return boolean
+	 */
+	public static function start(KalturaObject $apiObject, IRelatedObject $object, KalturaDetachedResponseProfile $responseProfile)
 	{
 		if(self::$cachedObject)
 		{
 			KalturaLog::debug("Object [" . get_class(self::$cachedObject) . "][" . self::$cachedObject->getId() . "] still caching");
-			return null;
+			return false;
 		}
 			
-		KalturaLog::debug("Start " . get_class($object) . " [" . $object->getId() . "]");
 		$responseProfileKey = $responseProfile->getKey();
-		$setResponseProfile = (self::$responseProfileKey != $responseProfileKey);
-		
+		$key = self::getObjectSpecificCacheKey($object, $responseProfileKey);
 		$responseProfileCacheKey = self::getResponseProfileCacheKey($responseProfileKey, $object->getPartnerId());
-		if(self::get($responseProfileCacheKey))
+		
+		list($value, $responseProfileCache) = self::get(array($key, $responseProfileCacheKey));
+		
+		$invalidationKeys = array(
+			self::getObjectKey($object),
+			self::getRelatedObjectKey($object, $responseProfileKey),
+		);
+		
+		if($value && self::areKeysValid($invalidationKeys, $value->{self::CACHE_VALUE_TIME}))
 		{
-			$key = self::getObjectSpecificCacheKey($object, $responseProfileKey);
-			$invalidationKeys = array(
-				self::getObjectKey($object),
-				self::getRelatedObjectKey($object, $responseProfileKey),
-			);
-			
-			$value = self::get($key, $invalidationKeys);
-			if($value)
+			$cachedApiObject = unserialize($value->apiObject);
+			if($cachedApiObject instanceof KalturaObject)
 			{
-				$apiObject = unserialize($value->apiObject);
-				KalturaLog::debug("Returned object: [" . print_r($apiObject, true) . "]");
-				if($apiObject instanceof KalturaObject)
-					return $apiObject->relatedObjects;
+				$properties = get_object_vars($cachedApiObject);
+				foreach ($properties as $propertyName => $propertyValue)
+				{
+					$apiObject->$propertyName = $propertyValue;
+				}
+				return true;
 			}
-			KalturaLog::debug("Object [" . get_class($object) . "][" . $object->getId() . "] - response profile found but object not cached");
+			KalturaLog::err("Object [" . get_class($object) . "][" . $object->getId() . "] - invalid object cached");
 		}
-		else 
+		KalturaLog::debug("Start " . get_class($object) . " [" . $object->getId() . "]");
+		
+		if(self::$responseProfileKey != $responseProfileKey && !$responseProfileCache)
 		{
-			KalturaLog::debug("Object [" . get_class($object) . "][" . $object->getId() . "] - response profile not found");
+			self::set($responseProfileCacheKey, array('responseProfile' => serialize($responseProfile)));
 		}
+		
 		self::$cachedObject = $object;
 		self::$responseProfileKey = $responseProfileKey;
 		
-		if($setResponseProfile)
-			self::set($responseProfileCacheKey, serialize($responseProfile));
+		return false;
 	}
 	
 	public static function stop(IRelatedObject $object, KalturaObject $apiObject)
@@ -163,7 +183,7 @@ class KalturaResponseProfileCacher extends kResponseProfileCacher
 
 		if($apiObject->relatedObjects)
 		{
-			KalturaLog::debug("Stop " . get_class($apiObject) . " [" . print_r($apiObject, true) . "]");
+			KalturaLog::debug("Stop " . get_class($apiObject));
 			
 			$key = self::getObjectSpecificCacheKey(self::$cachedObject, self::$responseProfileKey);
 			$value = self::getObjectSpecificCacheValue($apiObject, self::$cachedObject, self::$responseProfileKey);
@@ -194,7 +214,7 @@ class KalturaResponseProfileCacher extends kResponseProfileCacher
 		{
 			$responseProfileCacheKey = self::getResponseProfileCacheKey($data['responseProfileKey'], $data['partnerId']);
 			$value = self::get($responseProfileCacheKey);
-			$responseProfile = unserialize($value);
+			$responseProfile = unserialize($value['responseProfile']);
 			if(!$responseProfile)
 			{
 				KalturaLog::err("Response-Profile key [$responseProfileCacheKey] not found in cache");
@@ -234,14 +254,15 @@ class KalturaResponseProfileCacher extends kResponseProfileCacher
 		if($options->objectId)
 			$uniqueKey .= "_{$options->objectId}";
 			
-		$lastRecalculateTime = self::get($uniqueKey, null, false);
+		$lastRecalculateCache = self::get($uniqueKey, false);
+		$lastRecalculateTime = $lastRecalculateCache->{self::CACHE_VALUE_TIME};
 		if($options->isFirstLoop)
 		{
 			if($lastRecalculateTime >= $options->jobCreatedAt)
 				throw new KalturaAPIException(KalturaErrors::RESPONSE_PROFILE_CACHE_ALREADY_RECALCULATED);
 				
 			$lastRecalculateTime = time();
-			self::set($uniqueKey, $lastRecalculateTime);
+			self::set($uniqueKey);
 		}
 		
 		$partnerId = kCurrentContext::getCurrentPartnerId();
@@ -311,7 +332,8 @@ class KalturaResponseProfileCacher extends kResponseProfileCacher
 			list($cachedSessionKey, $cachedObjectKey) = $cache->getKey();
 			$results->lastObjectKey = $cachedObjectKey;
 			
-			$newRecalculateTime = self::get($uniqueKey, null, false);
+			$newRecalculateCache = self::get($uniqueKey, false);
+			$newRecalculateTime = $lastRecalculateCache->{self::CACHE_VALUE_TIME};
 			if($newRecalculateTime > $lastRecalculateTime)
 				throw new KalturaAPIException(KalturaErrors::RESPONSE_PROFILE_CACHE_RECALCULATE_RESTARTED);
 		}

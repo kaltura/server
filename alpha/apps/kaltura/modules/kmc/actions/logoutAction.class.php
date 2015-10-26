@@ -29,7 +29,7 @@ class logoutAction extends kalturaAction
 				
 				$ksObj->kill();
 			}
-			KalturaLog::debug("Killing session with ks - [$ksStr], decoded - [".base64_decode($ksStr)."]");
+			KalturaLog::info("Killing session with ks - [$ksStr], decoded - [".base64_decode($ksStr)."]");
 		}
 		else {
 			KalturaLog::err('logoutAction called with no KS');

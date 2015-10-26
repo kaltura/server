@@ -279,7 +279,6 @@ class WidevineBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPendi
 
 		if($flavorAssetId)
 		{
-			KalturaLog::debug("updating flavor asset: ".$flavorAssetId);
 			KBatchBase::$kClient->flavorAsset->update($flavorAssetId, $widevineAsset);
 		}
 	}

@@ -88,7 +88,6 @@ class kVelocixProvisionJobData extends kProvisionJobData
 	public function populateEntryFromData (LiveStreamEntry $entry)
 	{
 		$configurations = array();
-		KalturaLog::debug('provisioningParams: '.print_r($this->provisioningParams,true));
 		foreach ($this->provisioningParams as $key => $provisioningParam){
 			switch ($key){
 				case self::HDS_URLS:

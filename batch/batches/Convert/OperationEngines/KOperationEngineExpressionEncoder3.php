@@ -99,7 +99,7 @@ class KOperationEngineExpressionEncoder3 extends KOperationEngine
 			$src = $this->outDir . DIRECTORY_SEPARATOR . $videoEntity->getAttribute("src");
 			$bitrate = $videoEntity->getAttribute("systemBitrate") / 1000;
 			
-			KalturaLog::debug("Media found in ism bitrate[$bitrate] source[$src]");
+			KalturaLog::info("Media found in ism bitrate[$bitrate] source[$src]");
 			$this->outFilesPath[$bitrate] = $src;
 		}
 	}

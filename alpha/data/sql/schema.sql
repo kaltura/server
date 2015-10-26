@@ -316,6 +316,7 @@ CREATE TABLE `kvote`
 	`kshow_id` VARCHAR(20),
 	`entry_id` VARCHAR(20),
 	`kuser_id` INTEGER,
+	`puser_id` VARCHAR(100),
 	`partner_id` INTEGER,
 	`rank` INTEGER,
 	`status` INTEGER,

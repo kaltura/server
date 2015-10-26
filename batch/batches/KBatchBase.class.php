@@ -248,8 +248,7 @@ abstract class KBatchBase implements IKalturaLogger
 		set_time_limit(self::$taskConfig->maximumExecutionTime);
 
 
-		KalturaLog::debug('This batch index: ' . $this->getIndex());
-		KalturaLog::debug('This session key: ' . $this->sessionKey);
+		KalturaLog::info('Batch index [' . $this->getIndex() . '] session key [' . $this->sessionKey . ']');
 
 		self::$kClientConfig = new KalturaConfiguration();
 		self::$kClientConfig->setLogger($this);
@@ -488,7 +487,7 @@ abstract class KBatchBase implements IKalturaLogger
 			$retries --;
 		}
 
-		KalturaLog::debug("Passed max retries");
+		KalturaLog::log("Passed max retries");
 		return false;
 	}
 
@@ -576,9 +575,8 @@ abstract class KBatchBase implements IKalturaLogger
 		$descriptorspec = array(); // stdin is a pipe that the child will read from
 		$other_options = array('suppress_errors' => FALSE, 'bypass_shell' => FALSE);
 
-		KalturaLog::debug("Killer config:\n" . print_r($killConfig, true));
-		KalturaLog::debug("Now executing [$cmdLine]");
-		KalturaLog::info('Starting monitor');
+		KalturaLog::log("Now executing [$cmdLine]");
+		KalturaLog::debug('Starting monitor');
 		$this->monitorHandle = proc_open($cmdLine, $descriptorspec, $pipes, null, null, $other_options);
 	}
 
@@ -587,7 +585,7 @@ abstract class KBatchBase implements IKalturaLogger
 		if(!$this->monitorHandle || !is_resource($this->monitorHandle))
 			return;
 
-		KalturaLog::info('Stoping monitor');
+		KalturaLog::debug('Stoping monitor');
 
 		$status = proc_get_status($this->monitorHandle);
 		if($status['running'] == true)

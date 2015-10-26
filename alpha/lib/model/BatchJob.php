@@ -138,8 +138,6 @@ class BatchJob extends BaseBatchJob implements ISyncableFile
 			// we check the file sync of the source flavor asset (if one exists)
 	
 			$dc = kDataCenterMgr::getCurrentDcId();
-	
-			KalturaLog::debug("setting the job's DC to [$dc]");
 			$this->setDc ( $dc );
 		}
 			

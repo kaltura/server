@@ -28,7 +28,7 @@ class PushNotificationTemplate extends EventNotificationTemplate
         $queueProvider = QueueProvider::getInstance();
         if (!$queueProvider->exists($queueKey))
         {
-            KalturaLog::debug("Queue [$queueKey] doesn't exist.");
+            KalturaLog::info("Queue [$queueKey] doesn't exist.");
             return false;
         }
         return true;

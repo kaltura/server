@@ -22,7 +22,7 @@ class KObjectTaskStorageExportEngine extends KObjectTaskEntryEngineBase
 		if (!$storageId)
 			throw new Exception('Storage profile was not configured');
 
-		KalturaLog::debug("Submitting entry export for entry $entryId to remote storage $storageId");
+		KalturaLog::info("Submitting entry export for entry $entryId to remote storage $storageId");
 
 		$client = $this->getClient();
 		$this->impersonate($object->partnerId);

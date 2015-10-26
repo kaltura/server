@@ -115,7 +115,7 @@ class kMetadataManager
 					$xPathPattern .= "/*[local-name()='$match']";
 			}
 		}
-		KalturaLog::debug("Metadata xpath [$xPathPattern]");
+		KalturaLog::info("Metadata xpath [$xPathPattern]");
 		
 		$xPath = new DOMXPath($xml);
 		$elementsList = $xPath->query($xPathPattern);
@@ -297,7 +297,7 @@ class kMetadataManager
 	public static function getSearchValuesByObject($objectType, $objectId)
 	{
 		$metadatas = MetadataPeer::retrieveAllByObject($objectType, $objectId);
-		KalturaLog::debug("Found " . count($metadatas) . " metadata object");
+		KalturaLog::info("Found " . count($metadatas) . " metadata object");
 
 		return self::getMetadataValuesByMetadataObjects($metadatas);
 	}
@@ -327,7 +327,6 @@ class kMetadataManager
 	 */
 	public static function getDataSearchValues(Metadata $metadata, $searchValues = array())
 	{
-		KalturaLog::debug("Parsing metadata [" . $metadata->getId() . "] search values");
 		$searchTexts = array();
 		if (isset($searchValues[MetadataPlugin::getSphinxFieldName(MetadataPlugin::SPHINX_EXPANDER_FIELD_DATA)])){
 			foreach ($searchValues[MetadataPlugin::getSphinxFieldName(MetadataPlugin::SPHINX_EXPANDER_FIELD_DATA)] as $DataSerachValue)
@@ -406,7 +405,7 @@ class kMetadataManager
 					foreach($subMetadataObjects as $subMetadataObject)
 					{
 						/** @var Metadata $subMetadataObject */
-						KalturaLog::debug("Found metadata object for profile $subMetadataProfileId and id {$subMetadataObject->getObjectId()}, extracting search data");
+						KalturaLog::info("Found metadata object for profile $subMetadataProfileId and id {$subMetadataObject->getObjectId()}, extracting search data");
 						$subSearchTextsResult = self::getDataSearchValues($subMetadataObject);
 						$subSearchTexts = $subSearchTextsResult[MetadataPlugin::getSphinxFieldName(MetadataPlugin::SPHINX_EXPANDER_FIELD_DATA)];
 						foreach($subSearchTexts as $subSearchText)
@@ -483,7 +482,6 @@ class kMetadataManager
 	 */
 	public static function validateMetadata($metadataProfileId, $metadata, &$errorMessage, $compareAgainstPreviousVersion = false)
 	{
-		KalturaLog::debug("Validating metadata [$metadata]");
 		$metadataProfile = MetadataProfilePeer::retrieveByPK($metadataProfileId);
 		if(!$metadataProfile)
 		{
@@ -518,7 +516,6 @@ class kMetadataManager
 				return false;
 			}
 			
-			KalturaLog::debug("Metadata is valid");
 			return true;
 		}
 		

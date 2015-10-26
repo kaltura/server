@@ -113,7 +113,6 @@ class KProvisionEngineVelocix extends KProvisionEngine
 	private function createAssetProfile($provisioningParams){
 		$url = $this->baseServiceUrl . "/vxoa/assets/".$this->streamName.'/formats';
 		$data = array();
-		KalturaLog::debug("configuration: ".print_r($provisioningParams,true));
 		foreach ($provisioningParams as $provisioningParam){
 			/* @var $provisioningParam KalturaKeyValue */
 			if ($provisioningParam->key == KalturaPlaybackProtocol::SILVER_LIGHT)

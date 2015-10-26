@@ -25,14 +25,12 @@ class KAsyncDirectoryCleanup extends KPeriodicWorker
 	*/
 	public function run($jobs = null)
 	{
-		KalturaLog::info("Directory Cleanup is running");
-
 		$path = $this->getAdditionalParams("path");
 		$pattern = $this->getAdditionalParams("pattern");
 		$simulateOnly = $this->getAdditionalParams("simulateOnly");
 		$minutesOld = $this->getAdditionalParams("minutesOld");
 		$searchPath = $path . $pattern;
-		KalturaLog::debug("Searching [$searchPath]");
+		KalturaLog::info("Searching [$searchPath]");
 
 		if($this->getAdditionalParams("usePHP"))
 		{
@@ -61,11 +59,10 @@ class KAsyncDirectoryCleanup extends KPeriodicWorker
 		$secondsOld = $minutesOld * 60;
 
 		$files = glob ( $searchPath);
-		KalturaLog::debug("Found [" . count ( $files ) . "] to scan");
+		KalturaLog::info("Found [" . count ( $files ) . "] to scan");
 
 		$now = time();
-		KalturaLog::debug("The time now is: " . date('c', $now));
-		KalturaLog::debug("Deleting files that are " . $secondsOld ." seconds old (modified before " . date('c', $now - $secondsOld) . ")");
+		KalturaLog::info("Deleting files that are " . $secondsOld ." seconds old (modified before " . date('c', $now - $secondsOld) . ")");
 		$deletedCount = 0;
 		foreach ( $files as $file )
 		{
@@ -75,18 +72,17 @@ class KAsyncDirectoryCleanup extends KPeriodicWorker
 
 			if ( $simulateOnly )
 			{
-				KalturaLog::debug( "Simulating: Deleting file [$file], it's last modification time was " . date('c', $filemtime));
+				KalturaLog::info( "Simulating: Deleting file [$file], it's last modification time was " . date('c', $filemtime));
 				continue;
 			}
 
-			KalturaLog::debug("Deleting file [$file], it's last modification time was " . date('c', $filemtime));
+			KalturaLog::info("Deleting file [$file], it's last modification time was " . date('c', $filemtime));
 			$res = @unlink ( $file );
 			if ( ! $res ){
-				KalturaLog::debug("Error: problem while deleting [$file]");
+				KalturaLog::err("Error: problem while deleting [$file]");
 				continue;
 			}
 			$deletedCount++;
 		}
-		KalturaLog::debug("Deleted $deletedCount files");
 	}
 }

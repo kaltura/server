@@ -58,6 +58,7 @@ public class MultiRequestTest extends BaseTest{
 		KalturaMediaEntry entry = new KalturaMediaEntry();
 		entry.setName("test (" + new Date() + ")");
 		entry.setMediaType(KalturaMediaType.IMAGE);
+		entry.setReferenceId(getUniqueString());
 		InputStream fileData = TestUtils.getTestImage();
 		entry = client.getMediaService().add(entry);
 		assertNull(entry);
@@ -100,7 +101,7 @@ public class MultiRequestTest extends BaseTest{
 		
 		// execute from filters (Array: Array, int)
 		KalturaMediaEntryFilterForPlaylist filter = new KalturaMediaEntryFilterForPlaylist();
-		filter.setIdEqual(mEntry.getId());
+		filter.setReferenceIdEqual(mEntry.getReferenceId());
 		ArrayList<KalturaMediaEntryFilterForPlaylist> filters = new ArrayList<KalturaMediaEntryFilterForPlaylist>();
 		filters.add(filter);
 		List<KalturaBaseEntry> res = client.getPlaylistService().executeFromFilters(filters, 5);

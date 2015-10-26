@@ -9,7 +9,7 @@ class kWidevineEventsConsumer implements kObjectChangedEventConsumer, kObjectDel
 		try 
 		{
 			$wvFlavorAssets = $this->getWidevineFlavorAssetsForEntry($object->getId());
-			KalturaLog::debug('Found '.count($wvFlavorAssets).' widevine flavors');	
+			KalturaLog::info('Found '.count($wvFlavorAssets).' widevine flavors');	
 
 			if(count($wvFlavorAssets))
 			{
@@ -78,7 +78,6 @@ class kWidevineEventsConsumer implements kObjectChangedEventConsumer, kObjectDel
 		$wvFlavorParamsOutput = assetParamsOutputPeer::retrieveByPK($object->getId());
 		if($entry && $wvFlavorParamsOutput)
 		{
-			KalturaLog::debug('setting widevine distribution dates from entry');
 			$wvFlavorParamsOutput->setWidevineDistributionStartDate($this->getLicenseStartDateFromEntry($entry));
 			$wvFlavorParamsOutput->setWidevineDistributionEndDate($this->getLicenseEndDateFromEntry($entry));
 			$wvFlavorParamsOutput->save();	
@@ -101,7 +100,6 @@ class kWidevineEventsConsumer implements kObjectChangedEventConsumer, kObjectDel
 	
 	private function addWidevineRepositoryModifySyncJob($entryId, $partnerId, array $flavorAssets, $entryStartDate, $entryEndDate, $monitorSyncCompletion = true)
 	{	
-		KalturaLog::debug('adding  WidevineRepositorySync job, mode = MODIFY');		
  		$batchJobType = WidevinePlugin::getCoreValue('BatchJobType', WidevineBatchJobType::WIDEVINE_REPOSITORY_SYNC);
  		
 		$batchJob = new BatchJob();
@@ -123,7 +121,7 @@ class kWidevineEventsConsumer implements kObjectChangedEventConsumer, kObjectDel
 		
 		if(!count($wvAssetIds))
 		{
-			KalturaLog::debug("No valid WV assets found, Widevine Sync job is not created");
+			KalturaLog::info("No valid WV assets found, Widevine Sync job is not created");
 			return;
 		}
 			
@@ -182,7 +180,7 @@ class kWidevineEventsConsumer implements kObjectChangedEventConsumer, kObjectDel
 		$entriesCount = $c->getRecordsCount();
 		if($entriesCount)
 		{
-			KalturaLog::debug('Found active flavors for WV asset id ['.$wvAssetId.']');
+			KalturaLog::info('Found active flavors for WV asset id ['.$wvAssetId.']');
 			return true;
 		}
 		else					

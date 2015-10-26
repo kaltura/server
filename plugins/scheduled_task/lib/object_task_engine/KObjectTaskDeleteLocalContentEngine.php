@@ -14,7 +14,7 @@ class KObjectTaskDeleteLocalContentEngine extends KObjectTaskEntryEngineBase
 	{
 		$client = $this->getClient();
 		$entryId = $object->id;
-		KalturaLog::debug("Deleting local content for entry [$entryId]");
+		KalturaLog::info("Deleting local content for entry [$entryId]");
 		$flavors = $this->getEntryFlavors($object, $client);
 		if (!count($flavors))
 			return;
@@ -46,7 +46,7 @@ class KObjectTaskDeleteLocalContentEngine extends KObjectTaskEntryEngineBase
 			throw new Exception('Too many flavors were found where pagination is not supported');
 
 		$flavors = $flavorsResponse->objects;
-		KalturaLog::debug('Found '.count($flavors). ' flavors');
+		KalturaLog::info('Found '.count($flavors). ' flavors');
 		return $flavors;
 	}
 
@@ -57,13 +57,12 @@ class KObjectTaskDeleteLocalContentEngine extends KObjectTaskEntryEngineBase
 	 */
 	protected function deleteFlavor($id, $partnerId)
 	{
-		KalturaLog::debug("Deleting local content of flavor id [$id]");
 		$client = $this->getClient();
 		$this->impersonate($partnerId);
 		try
 		{
 			$client->flavorAsset->deleteLocalContent($id);
-			KalturaLog::debug("Local content of flavor id [$id] was deleted");
+			KalturaLog::info("Local content of flavor id [$id] was deleted");
 			$this->unimpersonate();
 		}
 		catch(Exception $ex)

@@ -258,11 +258,11 @@ class KCurlWrapper
 				if($fileSize > $maxFileSize)
 					throw new Exception("File size [$fileSize] Excedded Max Siae Allowed [$maxFileSize]");
 					
-				KalturaLog::debug("File size [$fileSize] validated");
+				KalturaLog::info("File size [$fileSize] validated");
 			}
 			else 
 			{
-				KalturaLog::debug("File size validation skipped");
+				KalturaLog::info("File size validation skipped");
 			}
 		}
 		

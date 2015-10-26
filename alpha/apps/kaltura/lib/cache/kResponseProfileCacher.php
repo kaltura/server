@@ -17,6 +17,11 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 	const VIEW_KEY_OBJECT_KEY = 'objectKey';
 	const VIEW_KEY_OBJECT_TYPE = 'objectType';
 	
+	const CACHE_VALUE_HOSTNAME = 'X-Me';
+	const CACHE_VALUE_TIME = 'X-Time';
+	const CACHE_VALUE_SESSION = 'X-Kaltura-Session';
+	const CACHE_VALUE_VERSION = 'X-Cache-Version';
+	
 	/**
 	 * @var array
 	 */
@@ -63,18 +68,23 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 		return self::getStores(kCacheManager::CACHE_TYPE_RESPONSE_PROFILE_INVALIDATION);
 	}
 	
+	protected static function getCacheVersion()
+	{
+		if(is_null(self::$cacheVersion))
+			self::$cacheVersion = kConf::get('response_profile_cache_version', 'local', 1);
+			
+		return self::$cacheVersion;
+	}
+	
 	/**
 	 * @return string
 	 */
 	protected static function addCacheVersion($key)
 	{
-		if(is_null(self::$cacheVersion))
-			self::$cacheVersion = kConf::get('response_profile_cache_version', 'local', 1);
-			
 		if(is_array($key))
 			return array_map(array('self', 'addCacheVersion'), $key);
 			
-		return self::$cacheVersion . '_' . $key;
+		return self::getCacheVersion() . '_' . $key;
 	}
 	
 	protected static function invalidateRelated(IRelatedObject $object)
@@ -92,20 +102,31 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 	
 	protected static function invalidate($invalidationKey)
 	{
-		$now = time();
+		$value = array(
+			self::CACHE_VALUE_HOSTNAME => infraRequestUtils::getHostname(),
+			self::CACHE_VALUE_TIME => time(),
+			self::CACHE_VALUE_SESSION => UniqueId::get(),
+			self::CACHE_VALUE_VERSION => self::getCacheVersion(),
+		);
+		
 		$invalidationKey = self::addCacheVersion($invalidationKey);
-		KalturaLog::debug("Invalidating key [$invalidationKey] now [$now]");
+		KalturaLog::debug("Invalidating key [$invalidationKey] now [" . date('Y-m-d H:i:s', $value->{self::CACHE_VALUE_TIME}) . "]");
 		
 		$cacheStores = self::getInvalidationStores();
 		foreach ($cacheStores as $cacheStore)
 		{
 			/* @var $cacheStore kBaseCacheWrapper */
-			$cacheStore->set($invalidationKey, $now);
+			$cacheStore->set($invalidationKey, $value);
 		}
 	}
 	
-	protected static function set($key, $value)
+	protected static function set($key, array $value = array())
 	{
+		$value[self::CACHE_VALUE_HOSTNAME] = infraRequestUtils::getHostname();
+		$value[self::CACHE_VALUE_TIME] = time();
+		$value[self::CACHE_VALUE_SESSION] = UniqueId::get();
+		$value[self::CACHE_VALUE_VERSION] = self::getCacheVersion();
+		
 		$key = self::addCacheVersion($key);
 		KalturaLog::debug("Key [$key]");
 		
@@ -128,80 +149,88 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 		}
 	}
 	
-	protected static function getMulti(array $keys)
+	protected static function get($keys, $touch = true)
 	{
-		$key = self::addCacheVersion($key);
-		$cacheStores = self::getStores();
-		foreach ($cacheStores as $cacheStore)
-		{
-			if($cacheStore instanceof kCouchbaseCacheWrapper)
-			{
-				return $cacheStore->multiGetAndTouch($keys);
-			}
-			else
-			{
-				return $cacheStore->multiGet($keys);
-			}
-		}
-		
-		return false;
-	}
-	
-	protected static function get($key, array $invalidationKeys = null, $touch = true)
-	{
-		$key = self::addCacheVersion($key);
-		KalturaLog::debug("Key [$key]");
+		$keys = self::addCacheVersion($keys);
 		$cacheStores = self::getStores();
 		$value = null;
 		foreach ($cacheStores as $cacheStore)
 		{
 			if($touch && $cacheStore instanceof kCouchbaseCacheWrapper)
 			{
-				$value = $cacheStore->getAndTouch($key);
+				$value = is_array($keys) ? $cacheStore->multiGetAndTouch($keys) : $cacheStore->getAndTouch($keys);
 			}
 			else
 			{
-				$value = $cacheStore->get($key);
+				$value = is_array($keys) ? $cacheStore->multiGet($keys) : $cacheStore->get($keys);
 			}
 			
 			if($value)
 			{
-				break;
-			}
-		}
-	
-		if($value && $invalidationKeys)
-		{
-			$invalidationKeys = self::addCacheVersion($invalidationKeys);
-			$invalidationCacheStores = self::getInvalidationStores();
-			foreach ($invalidationCacheStores as $store)
-			{
-				/* @var $store kBaseCacheWrapper */
-			
-				if($store instanceof kCouchbaseCacheWrapper)
+				if(is_array($keys))
 				{
-					$invalidationTimes = $store->multiGetAndTouch($invalidationKeys);
+					foreach($value as $key => $item)
+					{
+						KalturaLog::debug("Key [$key] Server[" . $item->{self::CACHE_VALUE_HOSTNAME} . "] Session[" . $item->{self::CACHE_VALUE_SESSION} . "] Time[" . date('Y-m-d H:i:s', $item->{self::CACHE_VALUE_TIME}) . "]");
+					}
 				}
 				else
 				{
-					$invalidationTimes = $store->multiGet($invalidationKeys);
+					KalturaLog::debug("Key [$keys] Server[" . $value->{self::CACHE_VALUE_HOSTNAME} . "] Session[" . $value->{self::CACHE_VALUE_SESSION} . "] Time[" . date('Y-m-d H:i:s', $value->{self::CACHE_VALUE_TIME}) . "]");
 				}
-				
-				if($invalidationTimes)
-				{
-					$invalidationTime = max($invalidationTimes);
-					$invalidationTime += kConf::get('cache_invalidation_threshold', 'local', 10);
-					KalturaLog::debug("Invalidation keys [" . implode(', ', $invalidationKeys) . "] times [" . implode(', ', $invalidationTimes) . "] compare to value time [{$value->time}]");
-					if(intval($invalidationTime) >= intval($value->time))
-					{
-						KalturaLog::debug("Invalidation time [$invalidationTime] >= value time [{$value->time}]");
-						return null;
-					}
-				}	
+				return $value;
 			}
 		}
+		KalturaLog::debug("Key [$keys] not found");
 			
-		return $value;
+		return null;
+	}
+	
+	protected static function areKeysValid(array $invalidationKeys, $time)
+	{
+		$invalidationKeys = self::addCacheVersion($invalidationKeys);
+		$invalidationCacheStores = self::getInvalidationStores();
+		foreach ($invalidationCacheStores as $store)
+		{
+			/* @var $store kBaseCacheWrapper */
+		
+			if($store instanceof kCouchbaseCacheWrapper)
+			{
+				$invalidationCaches = $store->multiGetAndTouch($invalidationKeys);
+			}
+			else
+			{
+				$invalidationCaches = $store->multiGet($invalidationKeys);
+			}
+			
+			if($invalidationCaches)
+			{
+				$invalidationTimes = array();
+				foreach($invalidationKeys as $invalidationKey)
+				{
+					if(isset($invalidationCaches[$invalidationKey]))
+					{
+						$value = $invalidationCaches[$invalidationKey];
+						KalturaLog::debug("Invalidation key [$invalidationKey] Server[" . $value->{self::CACHE_VALUE_HOSTNAME} . "] Session[" . $value->{self::CACHE_VALUE_SESSION} . "] Time[" . date('Y-m-d H:i:s', $value->{self::CACHE_VALUE_TIME}) . "]");
+						$invalidationTimes[] = $value->{self::CACHE_VALUE_TIME};
+					}
+					else
+					{
+						KalturaLog::debug("Invalidation key [$invalidationKey] not found");
+					}
+				}
+				
+				$invalidationTime = max($invalidationTimes);
+				$invalidationTime += kConf::get('cache_invalidation_threshold', 'local', 10);
+				if(intval($invalidationTime) >= intval($time))
+				{
+					KalturaLog::debug("Invalidation times [" . implode(', ', $invalidationTimes) . "] >= [{$time}]");
+					return false;
+				}
+			}	
+		}
+		
+		return true;
 	}
 	
 	protected static function query(kCouchbaseCacheQuery $query)

@@ -27,18 +27,10 @@ class myEntryUtils
 	
 	public static function createThumbnailAssetFromFile(entry $entry, $filePath)
 	{	
-		try {
-			$fileLocation = tempnam(sys_get_temp_dir(), $entry->getId());
-			$res = KCurlWrapper::getDataFromFile($filePath, $fileLocation, kConf::get('thumb_size_limit'));
-		}
-		catch(Exception $e) {
-			KalturaLog::debug($e->getMessage());
-			throw new Exception("Data Retrieval Failed");	
-		}
-		
+		$fileLocation = tempnam(sys_get_temp_dir(), $entry->getId());
+		$res = KCurlWrapper::getDataFromFile($filePath, $fileLocation, kConf::get('thumb_size_limit'));
 		if (!$res){
-			KalturaLog::debug("thumbnail cannot be created from $filePath " . error_get_last());
-			throw new Exception("thumbnail file path is not valid");
+			throw new Exception("thumbnail cannot be created from $filePath " . error_get_last());
 		}	
 		
 		$thumbAsset = new thumbAsset();
@@ -327,13 +319,12 @@ class myEntryUtils
 			return ; // don't do this twice !
 			
 		 if ($onlyIfAllJobsDone) {
-			KalturaLog::DEBUG("onlyIfAllJobsDone = ". (int)$onlyIfAllJobsDone);
 			$dbEntryBatchJobLocks = BatchJobLockPeer::retrieveByEntryId($entry->getId());
 			foreach($dbEntryBatchJobLocks as $jobLock) {
 				/* @var $jobLock BatchJobLock */
 				$job = $jobLock->getBatchJob();
 				/* @var $job BatchJob */
-				KalturaLog::DEBUG("Entry [". $entry->getId() ."] still has an unhandled batchjob [". $job->getId()."] with status [". $job->getStatus()."] - aborting deletion process.");
+				KalturaLog::info("Entry [". $entry->getId() ."] still has an unhandled batchjob [". $job->getId()."] with status [". $job->getStatus()."] - aborting deletion process.");
 				//mark entry for later deletion
 				$entry->setMarkedForDeletion(true);
 				$entry->save();

@@ -156,7 +156,7 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 	 */
 	public function objectAdded(BaseObject $object, BatchJob $raisedJob = null)
 	{
-		KalturaLog::debug("Raising deferred event for object of type: ". get_class($object));
+		KalturaLog::info("Raising deferred event for object of type: ". get_class($object));
 		/** @var IIndexable $object */
 		$object->indexToSearchIndex();
 		return true;
@@ -316,7 +316,7 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 		
 		foreach($dataTimes as $key => $value)
 		{
-			$data[$key] = is_numeric($value) ? $value : 0;
+			$data[$key] = is_numeric($value) ? min($value, 0x7fffffff) : 0;
 		}
 		
 		foreach($dataJson as $key => $value)

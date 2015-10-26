@@ -1325,6 +1325,7 @@ CREATE TABLE IF NOT EXISTS `kvote` (
   `kshow_id` varchar(20) DEFAULT NULL,
   `entry_id` varchar(20) DEFAULT NULL,
   `kuser_id` int(11) DEFAULT NULL,
+  `puser_id` VARCHAR(100),
   `rank` int(11) DEFAULT NULL,
   `created_at` datetime DEFAULT NULL,
   `status` int(11) DEFAULT NULL,

@@ -670,7 +670,7 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject
 		if (!$this->getFirstName() && parent::getFullName())
 		{
 			// full_name is deprecated - this is for backward compatibiliy and for migration
-			KalturaLog::ALERT('Field [full_name] on object [kuser] is deprecated but still being read');
+			KalturaLog::alert('Field [full_name] on object [kuser] is deprecated but still being read');
 			return parent::getFullName();
 		}
 		return trim($this->getFirstName().' '.$this->getLastName());
@@ -890,35 +890,35 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject
 	public function setSalt($v)
 	{
 		// salt column is deprecated
-		KalturaLog::ALERT('Field [salt] on object [kuser] is deprecated');
+		KalturaLog::alert('Field [salt] on object [kuser] is deprecated');
 		throw new Exception('Field [salt] on object [kuser] is deprecated');
 	}
 	
 	public function setSha1Password($v)
 	{
 		// sha1_password column is deprecated
-		KalturaLog::ALERT('Field [sha1_password] on object [kuser] is deprecated - trace: ');
+		KalturaLog::alert('Field [sha1_password] on object [kuser] is deprecated - trace: ');
 		throw new Exception('Field [sha1_password] on object [kuser] is deprecated');
 	}
 	
 	public function getSalt()
 	{
 		// salt column is deprecated
-		KalturaLog::ALERT('Field [salt] on object [kuser] is deprecated - getSalt should be removed from schema after migration');
+		KalturaLog::alert('Field [salt] on object [kuser] is deprecated - getSalt should be removed from schema after migration');
 		return parent::getSalt();
 	}
 	
 	public function getSha1Password()
 	{
 		// sha1_password column is deprecated
-		KalturaLog::ALERT('Field [sha1_password] on object [kuser] is deprecated - getSha1Password should be removed from schema after migration');
+		KalturaLog::alert('Field [sha1_password] on object [kuser] is deprecated - getSha1Password should be removed from schema after migration');
 		return parent::getSha1Password();
 	}
 	
 	public function setFullName($v)
 	{
 		// full_name column is deprecated
-		KalturaLog::ALERT('Field [full_name] on object [kuser] is deprecated');
+		KalturaLog::alert('Field [full_name] on object [kuser] is deprecated');
 		list($firstName, $lastName) = kString::nameSplit($v);
 		$this->setFirstName($firstName);
 		$this->setLastName($lastName);

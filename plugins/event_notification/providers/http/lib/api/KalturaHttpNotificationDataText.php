@@ -52,7 +52,6 @@ class KalturaHttpNotificationDataText extends KalturaHttpNotificationData
 		if($this->shouldGet('content', $responseProfile))
 		{
 			$contentType = get_class($dbObject->getContent());
-			KalturaLog::debug("Loading KalturaStringValue from type [$contentType]");
 			switch ($contentType)
 			{
 				case 'kStringValue':

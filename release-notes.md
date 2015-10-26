@@ -1,3 +1,42 @@
+# Kajam-11.0.0 #
+
+## New scheduled task profile ##
+
+ - Issue Type: New Feature
+ - Issue ID: PS-2330  
+  
+### Deployment scripts ###
+
+	php /opt/kaltura/app/tests/standAloneClient/exec.php /opt/kaltura/app/tests/standAloneClient/scheduledTaskProfiles/30DayDeleteAfterScheduleEnd.xml  
+	Input: 
+	- partner ID - 1956791
+	- Max total count allowed per execution: 500
+	- Host name: www.kaltura.com
+	- Partner email address: admin console admin user
+	- Partner password: user's password
+	- Partner ID: -2
+	
+## Like->list API call ##
+
+- Issue Type: New Feature
+- Issue ID: PLAT-3920
+
+#### Configuration ####
+ 
+None.
+
+#### Deployment Scripts ####
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2015_10_25_add_like_list_permission.php
+	php /opt/kaltura/app/alpha/scripts/utils/permissions/addPermissionToRole.php 0 Basic\ User\ Session\ Role LIKE_LIST_USER realrun (please use copy-paste carefully here)
+
+	(only for on-prem/CE environments)
+	mysql -h@db_host@ -u@db_user@ -p@db_pass@ -P3306 kaltura < deployment/updates/sql/2015_10_25_alter_kvote_table_puser_id_table.sql
+	php deployment/updates/scripts/2015_10_25_populate_like_table_puser_id_field.php
+	
+#### Known Issues & Limitations ####
+
+None.
+
 # Jupiter-10.21.0 #
 
 ## Cielo24 plugin ##

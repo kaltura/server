@@ -136,7 +136,6 @@ class PushNotificationPlugin extends KalturaPlugin implements IKalturaPermission
             $langFilePath = __DIR__ . "/config/lang/$default.php";
         }
     
-        KalturaLog::debug("Loading file [$langFilePath]");
         $array = include($langFilePath);
     
         return array($locale => $array);
