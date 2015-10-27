@@ -168,11 +168,13 @@ class QuizService extends KalturaBaseService
 	 *
 	 * @action getUrl
 	 * @param string $entryId
+	 * @param KalturaQuizFileType $quizFileType
 	 * @return string
 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
 	 * @throws KalturaQuizErrors::PROVIDED_ENTRY_IS_NOT_A_QUIZ
+	 * @throws KalturaQuizErrors::NO_SUCH_FILE_TYPE
 	 */
-	public function getUrlAction($entryId)
+	public function getUrlAction($entryId, $quizFileType)
 	{
 		KalturaLog::debug("Create a URL PDF Document download for entry id [ " .$entryId. " ]");
 
@@ -184,7 +186,11 @@ class QuizService extends KalturaBaseService
 		if ( is_null( $kQuiz ) )
 			throw new KalturaAPIException(KalturaQuizErrors::PROVIDED_ENTRY_IS_NOT_A_QUIZ, $entryId);
 
-		$finalPath ='/api_v3/index.php/service/quiz_quiz/action/serve/entryId/';
+		if ($quizFileType != KalturaQuizFileType::PDF)
+		{
+			throw new KalturaAPIException(KalturaQuizErrors::NO_SUCH_FILE_TYPE);
+		}
+		$finalPath ='/api_v3/index.php/service/quiz_quiz/action/serve/quizFileType/1/entryId/';
 		$finalPath .="$entryId";
 
 		$ksObj = $this->getKs();
