@@ -470,7 +470,7 @@ class myNotificationsConfig
 	}
 
 	// the separator can be either ',' or ';'
-	private function myNotificationsConfig ( $config_str )
+	private function __construct ( $config_str )
 	{
 		//$arr = explode ( "," , trim($config_str ));
 		$arr = preg_split ( "/[,;]/" , trim($config_str ) );

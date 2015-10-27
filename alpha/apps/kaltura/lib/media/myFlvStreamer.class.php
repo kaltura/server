@@ -17,7 +17,7 @@ class myFlvStreamer
 	
 	private $metadata;
 
-	public function myFlvStreamer ( $filePath, $timeline, $streamNum, $addPadding = false)
+	public function __construct ( $filePath, $timeline, $streamNum, $addPadding = false)
 	{
 		$this->addPadding = $addPadding;
 		$contentRoot = myContentStorage::getFSContentRootPath();

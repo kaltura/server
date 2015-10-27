@@ -207,7 +207,7 @@ class memoryCache
 {
 	private $m_expiry; // in seconds
 	private static $s_map = array();
-	function memoryCache ( $expiry = null )
+	function __construct ( $expiry = null )
 	{
 		$this->m_expiry = $expiry; 
 	}

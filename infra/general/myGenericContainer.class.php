@@ -7,7 +7,7 @@ class myGenericContainer
 {
 	private $map = null;
 	
-	public function myGenericContainer ( $map )
+	public function __construct ( $map )
 	{
 		$this->map = $map;
 	}

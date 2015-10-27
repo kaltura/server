@@ -9,7 +9,7 @@
 class kshowStub extends myBaseObject
 {
 
-	public function kshowStub ( kshow $kshow )
+	public function __construct ( kshow $kshow )
 	{
 		$this->init();
 		$this->fillObjectFromObject( $kshow , 
