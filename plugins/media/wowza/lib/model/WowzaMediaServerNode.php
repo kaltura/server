@@ -98,12 +98,12 @@ class WowzaMediaServerNode extends MediaServerNode {
 		
 		$domain = $this->getValueByField($mediaServerConfig, $domainField, $domain);
 		
-		$mediaServerPortConfig = $this->getMediaServerPortConfig();
-		if($mediaServerPortConfig)
+		$mediaServerPlaybackDomainConfig = $this->getMediaServerPlaybackDomainConfig();
+		if($mediaServerPlaybackDomainConfig)
 		{
 			$domainField = $protocol . ($format ? "-$format" : "");
-			if(isset($mediaServerPortConfig[$domainField]) && $mediaServerPortConfig[$domainField] !== WowzaMediaServerNode::DEFAULT_MANIFEST_PORT)
-				$domain = $mediaServerPortConfig[$domainField];
+			if(isset($mediaServerPlaybackDomainConfig[$domainField]))
+				$domain = $mediaServerPlaybackDomainConfig[$domainField];
 		}
 		
 		return $domain;
