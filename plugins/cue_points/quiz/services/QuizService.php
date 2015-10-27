@@ -92,7 +92,7 @@ class QuizService extends KalturaBaseService
 	 * @param string $entryId
 	 * @return KalturaQuiz
 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
-	 * @throws KalturaQuizErrors::PROVIDED_ENTRY_IS_NOT_A_QUIZ
+	 *
 	 */
 	public function getAction( $entryId )
 	{
@@ -137,7 +137,6 @@ class QuizService extends KalturaBaseService
 	 * @return file
 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
 	 * @throws KalturaQuizErrors::PROVIDED_ENTRY_IS_NOT_A_QUIZ
-	 * @throws KalturaQuizErrors::NO_SUCH_FILE_TYPE
 	 */
 	public function serveAction($entryId, $quizOutputType)
 	{
