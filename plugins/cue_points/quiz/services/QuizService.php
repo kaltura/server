@@ -151,15 +151,9 @@ class QuizService extends KalturaBaseService
 		if ( is_null( $kQuiz ) )
 			throw new KalturaAPIException(KalturaQuizErrors::PROVIDED_ENTRY_IS_NOT_A_QUIZ, $entryId);
 
-		if ($quizOutputType == KalturaQuizOutputType::PDF) {
-			$kp = new kQuizPdf($entryId);
-			$kp->createQuestionPdf();
-			return $kp->submitDocument();
-		}
-		else
-		{
-			throw new KalturaAPIException(KalturaQuizErrors::NO_SUCH_FILE_TYPE);
-		}
+		$kp = new kQuizPdf($entryId);
+		$kp->createQuestionPdf();
+		return $kp->submitDocument();
 	}
 
 
@@ -186,8 +180,6 @@ class QuizService extends KalturaBaseService
 		if ( is_null( $kQuiz ) )
 			throw new KalturaAPIException(KalturaQuizErrors::PROVIDED_ENTRY_IS_NOT_A_QUIZ, $entryId);
 
-		//$outType = KalturaQuizFileType::PDF;
-		//$finalPath ='/api_v3/index.php/service/quiz_quiz/action/serve/quizOutputType/KalturaQuizFileType::PDF/entryId/';
 		$finalPath ='/api_v3/index.php/service/quiz_quiz/action/serve/quizOutputType/';
 
 		$finalPath .="$quizOutputType";
