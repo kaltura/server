@@ -1,3 +1,18 @@
+# Kajam-11.1.0 #
+## Add new action 'getUrl' and update the 'servePdf' Action
+ - Issue Type: New Feature
+ - Issue ID: PLAT-3975
+
+#### Configuration ####
+
+- Run the following permission script:
+	php deployment\updates\scripts\add_permissions\2015_09_17_update_quiz_permissions.php
+
+#### Known Issues & Limitations ####
+
+None.
+
+
 # Kajam-11.0.0 #
 
 ## New scheduled task profile ##
