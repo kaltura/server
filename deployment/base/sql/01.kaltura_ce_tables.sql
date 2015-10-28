@@ -2250,6 +2250,17 @@ CREATE TABLE `api_server`
 	PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+CREATE TABLE `media_server`
+(
+	`id` INTEGER  NOT NULL AUTO_INCREMENT,
+	`created_at` DATETIME,
+	`updated_at` DATETIME,
+	`hostname` VARCHAR(255),
+	`dc` INTEGER,
+	`custom_data` TEXT,
+	PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 CREATE TABLE `file_asset`
 (
 	`id` BIGINT NOT NULL AUTO_INCREMENT,
@@ -2390,13 +2401,11 @@ CREATE TABLE response_profile
 	KEY partner_status(partner_id, status)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-CREATE TABLE `server_node`
+CREATE TABLE `edge_server`
 (
 	`id` INTEGER  NOT NULL AUTO_INCREMENT,
-	`dc` INTEGER,
 	`created_at` DATETIME,
 	`updated_at` DATETIME,
-	`heartbeat_time` DATETIME,
 	`partner_id` INTEGER,
 	`name` VARCHAR(256),
 	`system_name` VARCHAR(256),

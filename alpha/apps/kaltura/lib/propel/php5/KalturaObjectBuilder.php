@@ -244,7 +244,6 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 			return parent::addSaveBody($script);
 		$reloadOnUpdate = $table->isReloadOnUpdate();
 		$reloadOnInsert = $table->isReloadOnInsert();
-		$customDataColumn = $table->getColumn(self::KALTURA_COLUMN_CUSTOM_DATA);
 
 		$script .= "
 		if (\$this->isDeleted()) {
@@ -279,14 +278,7 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 				\$con->commit();
 				return 0;
 			}
-			";
 			
-			if($customDataColumn)
-			$script .= "
-			\$this->setCustomDataObj();
-			";
-			
-			$script .= "
 			for (\$retries = 1; \$retries < KalturaPDO::SAVE_MAX_RETRIES; \$retries++)
 			{
                \$affectedRows = \$this->doSave(\$con);
