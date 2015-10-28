@@ -1,3 +1,57 @@
+# Kajam-11.1.0 #
+
+## eCDN - create server_node machine hierarchy ##
+
+ - Issue Type: New Feature
+ - Issue ID: PLAT-3634 
+
+### Deployment scripts ###
+	 - mysql -h@db_host@ -u@db_user@ -p@db_pass@ -P3306 kaltura < deployment/updates/sql/2015_09_05_alter_edge_server_table.sql
+
+	 - mysql -h@db_host@ -u@db_user@ -p@db_pass@ -P3306 kaltura < deployment/updates/sql/2015_09_05_rename_edge_server_table.sql
+	 
+	 - php deployment/updates/scripts/2015_09_21_migrateMediaServerTableToServerNodeTable.php
+	 
+	 - php deployment/updates/scripts/add_permissions/2015_09_08_server_node_service.php
+	 
+	 - php deployment/updates/scripts/add_permissions/2015_09_16_media_server_server_node.php
+	 
+	 - php deployment/base/scripts/installPlugins.php
+	 
+#### Configuration ####
+
+	- Add new module to the admin-console in admin.ini:
+		moduls.ServerNode.enabled = true
+		moduls.ServerNode.permissionType = 2
+		moduls.ServerNode.label = "Server node service usage"
+		moduls.ServerNode.permissionName = FEATURE_SERVER_NODE
+		moduls.ServerNode.basePermissionType =
+		moduls.ServerNode.basePermissionName =
+		moduls.ServerNode.group = GROUP_ENABLE_DISABLE_FEATURES
+
+	- remove the following from admin.ini:
+		moduls.EdgeServer.enabled = true
+		moduls.EdgeServer.permissionType = 2
+		moduls.EdgeServer.label = "Edge server usage"
+		moduls.EdgeServer.permissionName = FEATURE_EDGE_SERVER
+		moduls.EdgeServer.basePermissionType =
+		moduls.EdgeServer.basePermissionName =
+		moduls.EdgeServer.group = GROUP_ENABLE_DISABLE_FEATURES
+
+	- Add the following to media_server.ini:
+		port-hls = 80
+		port-https-hls=443
+		domain-hls = "kalsegsec-a.akamaihd.net"
+
+	- Edited Wowza Server.xml:
+		- property: "KalturaServerManagers"
+		  new value:  com.kaltura.media.server.wowza.LiveStreamManager, com.kaltura.media.server.wowza.PushPublishManager
+
+#### Known Issues & Limitations ####
+
+None.
+
+
 # Kajam-11.0.0 #
 
 ## New scheduled task profile ##
