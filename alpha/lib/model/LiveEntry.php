@@ -318,6 +318,7 @@ abstract class LiveEntry extends entry
 		$isExternalMediaServerStream = false;
 		
 		$kMediaServers = $this->getMediaServers();
+		$partnerMediaServerConfiguration = $this->getPartner()->getMediaServersConfiguration();
 		if(count($kMediaServers))
 		{
 			foreach($kMediaServers as $key => $kMediaServer)
@@ -343,17 +344,32 @@ abstract class LiveEntry extends entry
 				if($kMediaServer && $kMediaServer instanceof kLiveMediaServer)
 				{
 					$primaryMediaServer = $kMediaServer->getMediaServer();
+					if(!$primaryMediaServer && $partnerMediaServerConfiguration && isset($partnerMediaServerConfiguration[$kMediaServer->getHostname()]))
+					{
+						$primaryMediaServer = new MediaServer();
+						$primaryMediaServer->setHostname($kMediaServer->getHostname());
+						$primaryMediaServer->setIsExternalMediaServer(true);
+						$isExternalMediaServerStream = true;
+					}
 					$primaryApplicationName = $kMediaServer->getApplicationName();
-					$isExternalMediaServerStream = $primaryMediaServer->getIsExternalMediaServer();
 				}
 			}
 			
+			
+				
 			if(!$currentDcOnly && count($kMediaServers))
 			{
 				$kMediaServer = reset($kMediaServers);
 				if($kMediaServer && $kMediaServer instanceof kLiveMediaServer)
 				{
 					$backupMediaServer = $kMediaServer->getMediaServer();
+					if(!$backupMediaServer && $partnerMediaServerConfiguration && isset($partnerMediaServerConfiguration[$kMediaServer->getHostname()]))
+					{
+						$backupMediaServer = new MediaServer();
+						$backupMediaServer->setHostname($kMediaServer->getHostname());
+						$backupMediaServer->setIsExternalMediaServer(true);
+						$isExternalMediaServerStream = true;
+					}
 					$backupApplicationName = $kMediaServer->getApplicationName();
 				}
 			}
@@ -373,16 +389,12 @@ abstract class LiveEntry extends entry
 		}
 		elseif($primaryMediaServer)
 		{
-			$partnerMediaServerConfiguration = $this->getPartner()->getMediaServersConfiguration();
-			$primaryMediaServer->setPartnerMediaServerConfig($partnerMediaServerConfiguration);
-			
-			$manifestUrl = $primaryMediaServer->getManifestUrl($protocol);
-			$hlsManifestUrl = $primaryMediaServer->getManifestUrl($protocol, PlaybackProtocol::HLS);
+			$manifestUrl = $primaryMediaServer->getManifestUrl($protocol, $partnerMediaServerConfiguration);
+			$hlsManifestUrl = $primaryMediaServer->getManifestUrl($protocol, $partnerMediaServerConfiguration, PlaybackProtocol::HLS);
 			if($backupMediaServer)
 			{
-				$backupMediaServer->setPartnerMediaServerConfig($partnerMediaServerConfiguration);
-				$backupManifestUrl = $backupMediaServer->getManifestUrl($protocol);
-				$hlsBackupManifestUrl = $backupMediaServer->getManifestUrl($protocol, PlaybackProtocol::HLS);
+				$backupManifestUrl = $backupMediaServer->getManifestUrl($protocol, $partnerMediaServerConfiguration);
+				$hlsBackupManifestUrl = $backupMediaServer->getManifestUrl($protocol, $partnerMediaServerConfiguration, PlaybackProtocol::HLS);
 			}
 		}
 		
@@ -436,7 +448,11 @@ abstract class LiveEntry extends entry
 			$rtmpStreamUrl = $manifestUrl;
 			
 			$manifestUrl .= $streamName;
-			$hlsStreamUrl .= $hlsManifestUrl . "$primaryApplicationName/" . $streamName . "/playlist.m3u8" . $queryString;
+			
+			$hlsManifestUrl .= "$primaryApplicationName/";
+			$hlsManifestUrl .= $streamName;
+			
+			$hlsStreamUrl = "$hlsManifestUrl/playlist.m3u8" . $queryString;
 			$hdsStreamUrl = "$manifestUrl/manifest.f4m" . $queryString;
 			$slStreamUrl = "$manifestUrl/Manifest" . $queryString;
 			$mpdStreamUrl = "$manifestUrl/manifest.mpd" . $queryString;
@@ -445,10 +461,13 @@ abstract class LiveEntry extends entry
 			{
 				$backupManifestUrl .= "$backupApplicationName/";
 				$backupManifestUrl .= $streamName;
-				$hlsBackupStreamUrl .= $hlsBackupManifestUrl . "$backupApplicationName/" . $streamName . "/playlist.m3u8" .  $queryString;				
-				$hlsBackupStreamUrl = "$backupManifestUrl/playlist.m3u8" . $queryString;
+				$hlsBackupManifestUrl .= "$backupApplicationName/";
+				$hlsBackupManifestUrl .= $streamName;
+				$hlsBackupStreamUrl = "$hlsBackupManifestUrl/playlist.m3u8" . $queryString;
 				$hdsBackupStreamUrl = "$backupManifestUrl/manifest.f4m" . $queryString;
 			}
+			
+			
 		}
 			
 //		TODO - enable it and test it in non-SaaS environment
@@ -507,7 +526,7 @@ abstract class LiveEntry extends entry
 	}
 	
 	/**
-	 * @return MediaServerNode
+	 * @return MediaServer
 	 */
 	public function getMediaServer($currentDcOnly = false)
 	{
@@ -617,9 +636,11 @@ abstract class LiveEntry extends entry
 		if(is_null($this->getFirstBroadcast())) 
 			$this->setFirstBroadcast(kApiCache::getTime());
 				
-		$mediaServerNode = ServerNodePeer::retrieveActiveServerNodes($hostname);
-		if (!$mediaServerNode)
-			throw new kCoreException("Media server with host name [$hostname] not found", kCoreException::MEDIA_SERVER_NOT_FOUND);
+		$mediaServer = MediaServerPeer::retrieveByHostname($hostname);
+		if (!$mediaServer)
+		{
+			KalturaLog::info("External media server with hostname [$hostname] is being used to stream this entry");
+		}
 		
 		$key = $this->getId() . "_{$hostname}_{$index}";
 		if($this->storeInCache($key) && $this->isMediaServerRegistered($index, $hostname)) {
@@ -629,7 +650,8 @@ abstract class LiveEntry extends entry
 
 		KalturaLog::debug("about to setMediaServer. index: $index, hostname: $hostname");
 		$this->setLastBroadcast(kApiCache::getTime());
-		$server = new kLiveMediaServer($index, $hostname, $mediaServerNode->getDc(), $mediaServerNode->getId(), $applicationName ? $applicationName : $mediaServerNode->getApplicationName());
+		$server = new kLiveMediaServer($index, $hostname, $mediaServer ? $mediaServer->getDc() : null, $mediaServer ? $mediaServer->getId() : null, 
+			$applicationName ? $applicationName : MediaServer::DEFAULT_APPLICATION);
 		$this->putInCustomData("server-$index", $server, LiveEntry::CUSTOM_DATA_NAMESPACE_MEDIA_SERVERS);
 		$this->setLiveStatus(LiveEntryStatus::PLAYABLE);
 	}

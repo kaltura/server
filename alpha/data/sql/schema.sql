@@ -286,6 +286,24 @@ CREATE TABLE `live_channel_segment`
 )Type=InnoDB;
 
 #-----------------------------------------------------------------------------
+#-- media_server
+#-----------------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `media_server`;
+
+
+CREATE TABLE `media_server`
+(
+	`id` INTEGER  NOT NULL AUTO_INCREMENT,
+	`created_at` DATETIME,
+	`updated_at` DATETIME,
+	`hostname` VARCHAR(255),
+	`dc` INTEGER,
+	`custom_data` TEXT,
+	PRIMARY KEY (`id`)
+)Type=InnoDB;
+
+#-----------------------------------------------------------------------------
 #-- kvote
 #-----------------------------------------------------------------------------
 
@@ -1914,19 +1932,17 @@ CREATE TABLE `storage_profile`
 )Type=InnoDB;
 
 #-----------------------------------------------------------------------------
-#-- server_node
+#-- edge_server
 #-----------------------------------------------------------------------------
 
-DROP TABLE IF EXISTS `server_node`;
+DROP TABLE IF EXISTS `edge_server`;
 
 
-CREATE TABLE `server_node`
+CREATE TABLE `edge_server`
 (
 	`id` INTEGER  NOT NULL AUTO_INCREMENT,
-	`dc` INTEGER,
 	`created_at` DATETIME,
 	`updated_at` DATETIME,
-	`heartbeat_time` DATETIME,
 	`partner_id` INTEGER,
 	`name` VARCHAR(256),
 	`system_name` VARCHAR(256),

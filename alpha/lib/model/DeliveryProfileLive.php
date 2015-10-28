@@ -92,7 +92,7 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 	public function finalizeUrls(&$baseUrl, &$flavorsUrls)
 	{
 		if($this->params->getEdgeServerIds())
-			$baseUrl = $this->getDeliveryServerNodeUrl($baseUrl);
+			$baseUrl = $this->getEdgeServerUrls($baseUrl);
 	}
 	
 	public function isLive ($url) {
@@ -115,25 +115,25 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 		throw new Exception('Status cannot be determined for live stream protocol. Delivery Profile ID: '.$this->getId());
 	}
 	
-	public function getDeliveryServerNodeUrl($url)
+	public function getEdgeServerUrls($url)
 	{
 		if(!$url)
         	return null;
 		
-		$deliveryNodeIds = $this->params->getEdgeServerIds();
-		$deliveryNodes = ServerNodePeer::retrieveOrderedServerNodesArrayByPKs($deliveryNodeIds);
+		$edgeServerIds = $this->params->getEdgeServerIds();
+		$edgeServers = EdgeServerPeer::retrieveOrderedEdgeServersArrayByPKs($edgeServerIds);
 		
-		if(!count($deliveryNodes))
+		if(!count($edgeServers))
 		{
-		        KalturaLog::debug("No active delivery nodes found to handle [$url]");
+		        KalturaLog::info("No active edge servers found to handle [$url]");
 		        return null;
 		}
 		
-		$deliveryNode = array_shift($deliveryNodes);
-		$url = $deliveryNode->buildPlaybackUrl($url);
+		$edgeServer = array_shift($edgeServers);
+		$url = $edgeServer->buildEdgePlaybackUrl($url);
 		
-		if(count($deliveryNodes))
-		        $this->params->setEdgeServerIds(array_diff($deliveryNodeIds, array($deliveryNode->getId())));
+		if(count($edgeServers))
+		        $this->params->setEdgeServerIds(array_diff($edgeServerIds, array($edgeServer->getId())));
 		
 		return $url;
 	}
