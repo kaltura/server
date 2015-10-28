@@ -73,7 +73,7 @@ class KalturaQuestionCuePoint extends KalturaCuePoint
 		parent::doFromObject($dbObject, $responseProfile);
 		$this->optionalAnswers = KalturaOptionalAnswersArray::fromDbArray($dbObject->getOptionalAnswers(), $responseProfile);
 		$dbEntry = entryPeer::retrieveByPK($dbObject->getEntryId());
-		if ( !QuizPlugin::validateUserEntitledForQuizEdit($dbEntry) ) {
+		if ( !kEntitlementUtils::isEntitledForEditEntry($dbEntry) ) {
 			foreach ( $this->optionalAnswers as $answer ) {
 				$answer->isCorrect = KalturaNullableBoolean::NULL_VALUE;
 			}
@@ -89,7 +89,7 @@ class KalturaQuestionCuePoint extends KalturaCuePoint
 		parent::validateForInsert($propertiesToSkip);
 		$dbEntry = entryPeer::retrieveByPK($this->entryId);
 		QuizPlugin::validateAndGetQuiz($dbEntry);
-		if ( !QuizPlugin::validateUserEntitledForQuizEdit($dbEntry) ) {
+		if ( !kEntitlementUtils::isEntitledForEditEntry($dbEntry) ) {
 			throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID);
 		}
 	}

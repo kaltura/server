@@ -88,7 +88,7 @@ class KalturaAnswerCuePoint extends KalturaCuePoint
 		parent::doFromObject($dbObject, $responseProfile);
 
 		$dbEntry = entryPeer::retrieveByPK($dbObject->getEntryId());
-		if ( !QuizPlugin::validateUserEntitledForQuizEdit($dbEntry) ) {
+		if ( !kEntitlementUtils::isEntitledForEditEntry($dbEntry) ) {
 			/**
 			 * @var kQuiz $kQuiz
 			 */
