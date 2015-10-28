@@ -69,6 +69,7 @@ class QuizService extends KalturaBaseService
 	 * @param kQuiz|null $newQuiz
 	 * @return KalturaQuiz
 	 * @throws KalturaAPIException
+	 * @throws KalturaQuizErrors::PROVIDED_ENTRY_IS_NOT_A_QUIZ
 	 */
 	private function validateAndUpdateQuizData( entry $dbEntry, KalturaQuiz $quiz, $currentVersion = 0, kQuiz $newQuiz = null )
 	{
@@ -165,7 +166,6 @@ class QuizService extends KalturaBaseService
 	 * @return string
 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
 	 * @throws KalturaQuizErrors::PROVIDED_ENTRY_IS_NOT_A_QUIZ
-	 * @throws KalturaQuizErrors::NO_SUCH_FILE_TYPE
 	 */
 	public function getUrlAction($entryId, $quizOutputType)
 	{
@@ -179,7 +179,7 @@ class QuizService extends KalturaBaseService
 		if ( is_null( $kQuiz ) )
 			throw new KalturaAPIException(KalturaQuizErrors::PROVIDED_ENTRY_IS_NOT_A_QUIZ, $entryId);
 
-		$finalPath ='/api_v3/index.php/service/quiz_quiz/action/serve/quizOutputType/';
+		$finalPath ='/api_v3/service/quiz_quiz/action/serve/quizOutputType/';
 
 		$finalPath .="$quizOutputType";
 		$finalPath .= '/entryId/';
