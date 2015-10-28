@@ -5,18 +5,18 @@
  - Issue Type: New Feature
  - Issue ID: PLAT-3634 
 
-### Deployment scripts ###
-	 - mysql -h@db_host@ -u@db_user@ -p@db_pass@ -P3306 kaltura < deployment/updates/sql/2015_09_05_alter_edge_server_table.sql
+### Deployment scripts (note the order of the scripts is important run them as listed ) ###
+	 - php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
 
-	 - mysql -h@db_host@ -u@db_user@ -p@db_pass@ -P3306 kaltura < deployment/updates/sql/2015_09_05_rename_edge_server_table.sql
+	 - php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2015_09_08_server_node_service.php
 	 
-	 - php deployment/updates/scripts/2015_09_21_migrateMediaServerTableToServerNodeTable.php
+	 - php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2015_09_16_media_server_server_node.php
+
+	 - mysql -h@db_host@ -u@db_user@ -p@db_pass@ -P3306 kaltura < /opt/kaltura/app/deployment/updates/sql/2015_09_08_alter_edge_server_table.sql
+
+	 - mysql -h@db_host@ -u@db_user@ -p@db_pass@ -P3306 kaltura < /opt/kaltura/app/deployment/updates/sql/2015_09_08_rename_edge_server_table.sql
 	 
-	 - php deployment/updates/scripts/add_permissions/2015_09_08_server_node_service.php
-	 
-	 - php deployment/updates/scripts/add_permissions/2015_09_16_media_server_server_node.php
-	 
-	 - php deployment/base/scripts/installPlugins.php
+	 - php /opt/kaltura/app/deployment/updates/scripts/2015_09_21_migrateMediaServerTableToServerNodeTable.php
 	 
 #### Configuration ####
 
@@ -38,14 +38,14 @@
 		moduls.EdgeServer.basePermissionName =
 		moduls.EdgeServer.group = GROUP_ENABLE_DISABLE_FEATURES
 
-	- Add the following to media_server.ini:
-		port-hls = 80
-		port-https-hls=443
-		domain-hls = "kalsegsec-a.akamaihd.net"
+	- Add the following to media_servers.ini:
+		port-hls = SAME_AS_THE_PORT_VALUE
+		port-https-hls = SAME_AS_THE_HTTPS_VALUE
+		domain-hls = SAME_AS_THE_DOMAIN_VALUE
 
 	- Edited Wowza Server.xml:
 		- property: "KalturaServerManagers"
-		  new value:  com.kaltura.media.server.wowza.LiveStreamManager, com.kaltura.media.server.wowza.PushPublishManager
+		  Remove the value "com.kaltura.media.server.wowza.StatusManager"
 
 #### Known Issues & Limitations ####
 
