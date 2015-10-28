@@ -47,7 +47,7 @@ class myMultiRequest extends defPartnerservices2Action
 	 * @param array $original_request_params
 	 * @return myMultipleRequest
 	 */
-	public function myMultiRequest ( $original_request_params ,
+	public function __construct ( $original_request_params ,
 									$container_action = null ,
 									$input_type = self::REQUEST_TYPE_HTTP_REQUEST ,
 									$stop_on_error = self::STOP_ON_FIRST_ERROR )

@@ -6,7 +6,7 @@ class kArgs
 {
 	private $prefix = "";
 	private $arr;
-	public function kArgs ( array $arr )
+	public function __construct ( array $arr )
 	{
 		$this->arr = $arr;
 	}
@@ -59,7 +59,7 @@ exception
 class kApiEvent 
 {
 	private $arr;
-	public function kApiEvent (  )
+	public function __construct (  )
 	{
 
 	}

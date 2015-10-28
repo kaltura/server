@@ -8,7 +8,7 @@ class kEvent
 {
 	private $arr;
 	private $prefix;
-	public function kEvent ( array $arr , $prefix )
+	public function __construct ( array $arr , $prefix )
 	{
 		$this->arr = $arr;
 		$this->prefix = $prefix;

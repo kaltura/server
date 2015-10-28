@@ -36,7 +36,7 @@ class PartnerPackages
 	private $packagesClassOfService = null;
 	private $packagesVertical = null;
 	
-	public function PartnerPackages ()
+	public function __construct ()
 	{
 		$package_config = simplexml_load_string(file_get_contents(dirname(__FILE__).'/../../config/partnerPackages.xml'));
 		$package_nodes = $package_config->xpath('/packages/package');

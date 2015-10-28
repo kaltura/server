@@ -13,7 +13,7 @@ class KalturaRequestDeserializer
 
 	const PREFIX = ":";
 
-	public function KalturaRequestDeserializer($params)
+	public function __construct($params)
 	{
 		$this->params = $params;
 		$this->groupParams();

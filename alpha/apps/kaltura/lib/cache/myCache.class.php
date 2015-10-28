@@ -20,7 +20,7 @@ class myCache
 
 	// if the cache will be used many times, a default expiry can be set to avoid setting evey time in the put method
 	// this is good when most objects have the same expiry time
-	public function myCache ( $namespace , $expiry = NULL )
+	public function __construct ( $namespace , $expiry = NULL )
 	{
 		$this->m_namespace = $namespace;
 		$this->m_expiry = $expiry ? $expiry : self::DEFAULT_EXPIRY_IN_SECONDS;
