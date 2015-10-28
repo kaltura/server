@@ -24,7 +24,7 @@
     self.portalId = [[NSString alloc] initWithString: @"kaltura"];
 
     //EMM
-    self.drmServer = [[NSString alloc] initWithFormat: @"%@/api_v3/index.php?service=widevine_widevinedrm&action=getLicense&format=widevine&flavorAssetId=%@&ks=%@" , hostName, flavorId, ks];
+    self.drmServer = [[NSString alloc] initWithFormat: @"%@/api_v3/service/widevine_widevinedrm/action/getLicense?format=widevine&flavorAssetId=%@&ks=%@" , hostName, flavorId, ks];
     
 //    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
 //    nativeAdapting = [defaults boolForKey:@"native_adapting"];

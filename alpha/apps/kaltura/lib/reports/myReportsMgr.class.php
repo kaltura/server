@@ -63,53 +63,6 @@ class myReportsMgr
 										self::REPORT_TYPE_TOP_CONTENT,
 										self::REPORT_TYPE_TOP_PLAYBACK_CONTEXT);
 										
-
-	public static function runQuery ( $query_file , $map , $debug = false )
-	{
-		if ( strpos ($query_file,".") === 0 || strpos ($query_file,"/") === 0 || strpos ($query_file,"http") === 0 )
-		{
-			throw new kCoreException("Will not search for invalid report_type [$query_file", kCoreException::INVALID_QUERY);
-		}
-		$file_path = dirname(__FILE__)."/". $query_file . ".sql";
-		
-		$sql_raw_content = file_get_contents( $file_path );
-		if ( ! $sql_raw_content )
-		{
-			throw new kCoreException("Cannot find sql for [$query_file] at [$file_path]", kCoreException::INVALID_QUERY);
-		}	
-
-		// replace all params in $sql_raw_content with map
-
-		foreach ( $map as $name => $value )
-		{
-			$sql_raw_content = str_replace ( "{" . strtoupper( $name ) . "}" , $value , $sql_raw_content );
-		}
-		
-		$query = $sql_raw_content;
-		
-		$header = null;
-		
-		if ( !$debug )
-		{
-			$res = self::executeQuery ( $query );	
-			if ( $res )
-			{
-				$row = $res[0];
-				$header = array();
-				foreach ( $row as $name => $value )
-				{
-					$header[]= $name;
-					$data[] = $value;
-				}				
-			}
-		}
-		else
-		{
-			$res = null;
-		}
-		
-		return array ( $query , $res , $header );
-	}
 	
 	/**
 	 * @param int $partner_id
@@ -727,7 +680,7 @@ class myReportsMgr
 				foreach ($pluginInstances as $pluginInstance)
 				{
 
-					$res = $pluginInstance->getReportResult($partner_id, $report_type, $report_flavor, $object_ids, $input_filter, $order_by);
+					$res = $pluginInstance->getReportResult($partner_id, $report_type, $report_flavor, $object_ids, $input_filter, $page_size, $page_index,  $order_by);
 					if (!is_null($res))
 					{
 						return $res;
@@ -869,14 +822,15 @@ class myReportsMgr
 			if ( is_numeric( $report_type ))
 				$order_by = self::getOrderBy( self::$type_map[$report_type] , $order_by );
 			
-			$query = self::getReplacedSql( $sql_raw_content , $partner_id , $input_filter , $page_size , $page_index , $order_by , $obj_ids_clause, $category_ids_clause , $offset);
+			$link = self::getConnection(); 
+			$query = self::getReplacedSql($link, $sql_raw_content , $partner_id , $input_filter , $page_size , $page_index , $order_by , $obj_ids_clause, $category_ids_clause , $offset);
 			if ( is_numeric( $report_type ))
 				$query_header = "/* -- " . self::$type_map[$report_type] . " " . self::$flavor_map[$report_flavor] . " -- */\n";
 			else 
 				$query_header = "/* -- " . $report_type . " -- */\n";
 			KalturaLog::log( "\n{$query_header}{$query}" );
 			
-			$res = self::executeQuery ( $query );
+			$res = self::executeQuery ( $query, $link );
 			
 			$end = microtime(true);
 			KalturaLog::log( "Query took [" . ( $end - $start ) . "]" );
@@ -1192,7 +1146,7 @@ class myReportsMgr
 		return $order_by_str;
 	}
 	
-	private static function getReplacedSql ( $sql_content , $partner_id , reportsInputFilter $input_filter , 
+	private static function getReplacedSql ( $link, $sql_content , $partner_id , reportsInputFilter $input_filter , 
 		$page_size , $page_index  , $order_by , $obj_ids_clause = null, $cat_ids_clause = null , $offset = null)
 	{
 		// TODO - format the search_text according to the the $input_filter
@@ -1263,7 +1217,7 @@ class myReportsMgr
 				$partner_id ,
 				self::intToDateTime($input_filter->from_date), 
 				self::intToDateTime($input_filter->to_date ),
-				$input_filter->from_day, 
+				$input_filter->from_day,
 				$input_filter->to_day,
 				self::intToDateId($input_filter->to_date , -7 ),
 				self::intToDateId($input_filter->to_date , -30 ),
@@ -1286,6 +1240,12 @@ class myReportsMgr
 				$values[] = $value;				
 			}
 		}
+		
+		foreach ($values as $key => &$value) {
+            $value = mysqli_real_escape_string($link, $value);
+        }
+
+			
 		$replaced_sql = str_replace ( $names , $values , $sql_content );	
 
 		date_default_timezone_set($origTimeZone);
@@ -1293,29 +1253,12 @@ class myReportsMgr
 		return $replaced_sql;
 	}
 	
-	private static function executeQuery ( $query )
+	private static function executeQuery ( $query, $link )
 	{
 		kApiCache::disableConditionalCache();
-	
 		$mysql_function = 'mysqli';
+	
 		$db_config = kConf::get( "reports_db_config" );
-		if (!isset($db_config["port"])) {
-		    if(ini_get("mysqli.default_port")!==null){
-			$db_config["port"]=ini_get("mysqli.default_port");
-		    }else{
-			$db_config["port"]=3306;
-		    }
-		}	    
-		$timeout = isset ( $db_config["timeout"] ) ? $db_config["timeout"] : 40;
-		
-		ini_set('mysql.connect_timeout', $timeout );
-		$host = $db_config["host"];
-		if ( isset ( $db_config["port"] ) && $db_config["port"]  && $mysql_function != 'mysqli' ) $host .= ":" . $db_config["port"];
-		
-		$connect_function = $mysql_function.'_connect';
-		$link  = $connect_function( $host , $db_config["user"] , $db_config["password"] , null, $db_config["port"] );
-
-KalturaLog::log( "Reports query using database host: [$host] user [" . $db_config["user"] . "]" );
 		
 		if($mysql_function == 'mysql') $db_selected =  mysql_select_db ( $db_config["db_name"] , $link );
 		else $db_selected =  mysqli_select_db ( $link , $db_config["db_name"] );
@@ -1438,6 +1381,30 @@ KalturaLog::log( "Reports query using database host: [$host] user [" . $db_confi
 			$timestamp = $timestamp + $day_offset * 60 * 60 * 24;
 		return date ( "Ymd" , $timestamp );	 
 	}
+	
+	private static function getConnection() 
+	{
+		$mysql_function = 'mysqli';
+		$db_config = kConf::get( "reports_db_config" );
+		if (!isset($db_config["port"])) {
+		    if(ini_get("mysqli.default_port")!==null){
+			$db_config["port"]=ini_get("mysqli.default_port");
+		    }else{
+			$db_config["port"]=3306;
+		    }
+		}	    
+		$timeout = isset ( $db_config["timeout"] ) ? $db_config["timeout"] : 40;
+		
+		ini_set('mysql.connect_timeout', $timeout );
+		$host = $db_config["host"];
+		if ( isset ( $db_config["port"] ) && $db_config["port"]  && $mysql_function != 'mysqli' ) $host .= ":" . $db_config["port"];
+		
+		$connect_function = $mysql_function.'_connect';
+		$link  = $connect_function( $host , $db_config["user"] , $db_config["password"] , null, $db_config["port"] );
+		KalturaLog::log( "Reports query using database host: [$host] user [" . $db_config["user"] . "]" );
+		
+		return $link;
+	}	
 
 }
 

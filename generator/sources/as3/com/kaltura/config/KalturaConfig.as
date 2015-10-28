@@ -36,7 +36,7 @@ package com.kaltura.config
 		protected var _clientTag:String;
 		protected var _protocol:String = "http://";
 		protected var _domain : String = "www.kaltura.com";
-		protected var _srvUrl:String = "/api"; //will be defined by the genertor
+		protected var _srvUrl:String = "/api_v3"; //will be defined by the genertor
 		protected var _ignoreNull : int = 1;
 		
 		public function KalturaConfig() {
@@ -59,7 +59,7 @@ package com.kaltura.config
 		
 		/**
 		 * services url on given domain,
-		 * i.e. <code>/api</code>
+		 * i.e. <code>/api_v3</code>
 		 */		
 		public function set srvUrl(value:String):void { _srvUrl= value; }
 		public function get srvUrl():String { return _srvUrl; }

@@ -13,7 +13,7 @@ import com.kaltura.services.AdminUser;
 public class WidevineHandler {
 	
 	public static String WIDEVINE_MIME_TYPE = "video/wvm";
-	public static String DRM_SERVER_URI = "/api/service/widevine_widevinedrm/action/getLicense?format=widevine&flavorAssetId=";
+	public static String DRM_SERVER_URI = "/api_v3/service/widevine_widevinedrm/action/getLicense?format=widevine&flavorAssetId=";
 	
 	//widevine wvm URL	
 	public String url;

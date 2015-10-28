@@ -33,8 +33,8 @@
     <xsl:variable name="CONST_IPADNEW_MANIFEST_SUFFIX" select="'/format/applehttp/tags/ipadnew/protocol/http/f/a.m3u8'"/>
     <xsl:variable name="CONST_MBR_MANIFEST_SUFFIX" select="'/format/hdnetworkmanifest/tags/mbr/protocol/http/f/a.a4m'"/>
     <xsl:variable name="CONST_DASH_MANIFEST_SUFFIX" select="'/format/mpegdash/tags/dash/protocol/http/f/a.mpd'"/>
-    <xsl:variable name="CONST_WIDEVINE_MANIFEST_SUFFIX" select="'/format/http/tags/widevine/protocol/http/f/a.wvm'"/>
-    <xsl:variable name="CONST_WIDEVINE_MBR_MANIFEST_SUFFIX" select="'/format/http/tags/widevine_mbr/protocol/http/f/a.wvm'"/>
+    <xsl:variable name="CONST_WIDEVINE_MANIFEST_SUFFIX" select="'/format/url/tags/widevine/protocol/http/f/a.wvm'"/>
+    <xsl:variable name="CONST_WIDEVINE_MBR_MANIFEST_SUFFIX" select="'/format/url/tags/widevine_mbr/protocol/http/f/a.wvm'"/>
     <!-- media element -->
     <xsl:variable name="refernceID" select="item/referenceID"/>
     <xsl:variable name="entryID" select="item/entryId"/>
@@ -597,6 +597,12 @@
             </xsl:when>
             <xsl:when test="$tag = $DASH_TAG">
                 <xsl:value-of select="$CONST_DASH_MANIFEST_SUFFIX"/>
+            </xsl:when>
+            <xsl:when test="$tag = $WIDEVINE_TAG">
+                <xsl:value-of select="$CONST_WIDEVINE_MANIFEST_SUFFIX"/>
+            </xsl:when>
+            <xsl:when test="$tag = $WIDEVINE_MBR_TAG">
+                <xsl:value-of select="$CONST_WIDEVINE_MBR_MANIFEST_SUFFIX"/>
             </xsl:when>
         </xsl:choose>
     </xsl:template>

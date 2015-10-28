@@ -304,7 +304,7 @@ KalturaClientBase.prototype.doQueue = function(callback){
 	var url = this.config.serviceUrl + this.config.serviceBase;
 	var call = null;
 	if (this.useMultiRequest){
-		url += "multirequest";
+		url += "/multirequest";
 		var i = 1;
 		for(var v = 0; v < this.callsQueue.length; v++){
 			call = this.callsQueue[v];
@@ -320,7 +320,7 @@ KalturaClientBase.prototype.doQueue = function(callback){
 		}
 	} else {
 		call = this.callsQueue[0];
-		url += call.service + "&action=" + call.action;
+		url += "/" + call.service + "/action/" + call.action;
 		for(var sv3 in call.params) {
 			params[sv3] = call.params[sv3];
 		}
@@ -411,7 +411,7 @@ KalturaClientBase.prototype.doHttpRequest = function (callCompletedCallback, req
 
 	var that = this;
 	var requestIndex = KalturaClientBase.requestIndex++;
-	var debugUrl = requestUrl + '&' + data;
+	var debugUrl = requestUrl + '?' + data;
 	var urlInfo = url.parse(debugUrl);
 	this.log('Request [' + requestIndex + ']: ' + debugUrl);
 
@@ -592,7 +592,7 @@ KalturaServiceBase.prototype.client = null;
  */
 var KalturaConfiguration = module.exports.KalturaConfiguration = function (){
 	this.serviceUrl = "http://www.kaltura.com";
-	this.serviceBase = "/api_v3/index.php?service=";
+	this.serviceBase = "/api_v3/service";
 	this.format = KalturaClientBase.KALTURA_SERVICE_FORMAT_JSON;
 	this.timeout = 90000;
 	this.logger = null;
