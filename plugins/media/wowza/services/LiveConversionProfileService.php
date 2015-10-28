@@ -61,7 +61,7 @@ class LiveConversionProfileService extends KalturaBaseService
 			
 		$mediaServer = null;
 		if($hostname)
-			$mediaServer = MediaServerPeer::retrieveByHostname($hostname);
+			$mediaServer = ServerNodePeer::retrieveActiveServerNodes($hostname);
 			
 		$conversionProfileId = $entry->getConversionProfileId();
 		$liveParams = assetParamsPeer::retrieveByProfile($conversionProfileId);
@@ -152,7 +152,7 @@ class LiveConversionProfileService extends KalturaBaseService
 		return new kRendererString($dom->saveXML(), 'text/xml');
 	}
 	
-	protected function appendLiveParams(LiveStreamEntry $entry, MediaServer $mediaServer = null, SimpleXMLElement $encodes, liveParams $liveParams)
+	protected function appendLiveParams(LiveStreamEntry $entry, WowzaMediaServerNode $mediaServer = null, SimpleXMLElement $encodes, liveParams $liveParams)
 	{
 		$streamName = $entry->getId() . '_' . $liveParams->getId();
 		$videoCodec = 'PassThru';
@@ -228,8 +228,8 @@ class LiveConversionProfileService extends KalturaBaseService
 			}
 		}
 		
-		$video->addChild('Transcoder', $mediaServer ? $mediaServer->getTranscoder() : MediaServer::DEFAULT_TRANSCODER);
-		$video->addChild('GPUID', $mediaServer ? $mediaServer->getGPUID() : MediaServer::DEFAULT_GPUID);
+		$video->addChild('Transcoder', $mediaServer ? $mediaServer->getTranscoder() : WowzaMediaServerNode::DEFAULT_TRANSCODER);
+		$video->addChild('GPUID', $mediaServer ? $mediaServer->getGPUID() : WowzaMediaServerNode::DEFAULT_GPUID);
 		$frameSize = $video->addChild('FrameSize');
 	
 		if(!$liveParams->getWidth() && !$liveParams->getHeight())

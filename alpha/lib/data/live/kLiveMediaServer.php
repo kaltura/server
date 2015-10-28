@@ -57,11 +57,11 @@ class kLiveMediaServer
 	}
 	
 	/**
-	 * @return MediaServer
+	 * @return MediaServerNode
 	 */
 	public function getMediaServer()
 	{
-		return MediaServerPeer::retrieveByPK($this->mediaServerId);
+		return ServerNodePeer::retrieveByPK($this->mediaServerId);
 	}
 
 	/**
