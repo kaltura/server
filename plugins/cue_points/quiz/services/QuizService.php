@@ -72,7 +72,7 @@ class QuizService extends KalturaBaseService
 	 */
 	private function validateAndUpdateQuizData( entry $dbEntry, KalturaQuiz $quiz, $currentVersion = 0, kQuiz $newQuiz = null )
 	{
-		if ( !QuizPlugin::validateUserEntitledForQuizEdit($dbEntry) ) {
+		if ( !kEntitlementUtils::isEntitledForEditEntry($dbEntry) ) {
 			KalturaLog::debug('Update quiz allowed only with admin KS or entry owner or co-editor');
 			throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID);
 		}

@@ -322,25 +322,6 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 
 
 	/**
-	 * @param entry $dbEntry
-	 * @return bool if current user is admin / entyr owner / co-editor
-	 */
-	public static function validateUserEntitledForQuizEdit( entry $dbEntry )
-	{
-		if ( kCurrentContext::$is_admin_session || kCurrentContext::getCurrentKsKuserId() == $dbEntry->getKuserId())
-			return true;
-
-		$entitledKusers = QuizPlugin::getObjectIdsAsArray($dbEntry->getEntitledKusersEdit());
-		if(in_array(kCurrentContext::getCurrentKsKuserId(), $entitledKusers))
-		{
-			return true;
-		}
-
-		return false;
-	}
-
-
-	/**
 	 * @param string $partner_id
 	 * @param QuizReportType $report_type
 	 * @param QuizReportType $report_flavor
@@ -495,7 +476,7 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 	
 	protected function getQuizQuestionPercentageTableReport($objectIds, $orderBy)
 	{
-		$questionIds = QuizPlugin::getObjectIdsAsArray($objectIds);
+		$questionIds = baseObjectUtils::getObjectIdsAsArray($objectIds);
 		$questionsCriteria = new Criteria();
 		$questionsCriteria->add(CuePointPeer::ID, $questionIds, Criteria::IN);
 		$questionsCriteria->add(CuePointPeer::TYPE, QuizPlugin::getCoreValue('CuePointType',QuizCuePointType::QUIZ_QUESTION));
@@ -555,7 +536,7 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 
 	protected function getQuestionCountByQusetionIds($objectIds)
 	{
-		$questionIds = QuizPlugin::getObjectIdsAsArray($objectIds);
+		$questionIds = baseObjectUtils::getObjectIdsAsArray($objectIds);
 		$c = new Criteria();
 		$c->add(CuePointPeer::ID, $questionIds, Criteria::IN);
 		$numOfquestions = CuePointPeer::doCount($c);
@@ -876,11 +857,6 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 		    $anonKuserIds[] = $anonKuser->getKuserId();
 		}
 		return $anonKuserIds;
-	}
-
-	private static function getObjectIdsAsArray($objectIds)
-	{
-		return explode(',', str_replace(' ','', $objectIds));
 	}
 
 	/* (non-PHPdoc)
