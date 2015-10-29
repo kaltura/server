@@ -14,4 +14,5 @@ class KalturaQuizErrors extends KalturaErrors
 	const USER_ENTRY_QUIZ_ALREADY_SUBMITTED = 'USER_ENTRY_QUIZ_ALREADY_SUBMITTED;The user-entry-quiz id is already submitted, answers cannot be added/updated';
 	const ENTRY_ID_NOT_GIVEN = 'ENTRY_ID_NOT_GIVEN; No entry id given';
 	const NO_SUCH_FILE_TYPE = 'Document cannot be provided. No such file type';
+	const QUIZ_CANNOT_BE_DOWNLOAD = 'Quiz connat be download';
 }
