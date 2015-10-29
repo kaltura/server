@@ -130,7 +130,8 @@ class QuizService extends KalturaBaseService
 
 	/**
 	 * creates a pdf from quiz object
-	 *
+	 * The Output type defines the file format in which the quiz will be generated
+	 * Currently only PDF files are supported
 	 * @action serve
 	 * @param string $entryId
 	 * @param KalturaQuizOutputType $quizOutputType
@@ -143,13 +144,16 @@ class QuizService extends KalturaBaseService
 		KalturaLog::debug("Create a PDF Document for entry id [ " .$entryId. " ]");
 		$dbEntry = entryPeer::retrieveByPK($entryId);
 
+		//validity check
 		if (!$dbEntry)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 
+		//validity check
 		$kQuiz = QuizPlugin::getQuizData($dbEntry);
 		if ( is_null( $kQuiz ) )
 			throw new KalturaAPIException(KalturaQuizErrors::PROVIDED_ENTRY_IS_NOT_A_QUIZ, $entryId);
 
+		//create a pdf
 		$kp = new kQuizPdf($entryId);
 		$kp->createQuestionPdf();
 		return $kp->submitDocument();
