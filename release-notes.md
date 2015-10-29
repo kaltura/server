@@ -18,6 +18,8 @@
 	 
 	 - php /opt/kaltura/app/deployment/updates/scripts/2015_09_21_migrateMediaServerTableToServerNodeTable.php
 	 
+	 - php /opt/kaltura/app/deployment/updates/scripts/2015_10_29_migrate_edge_server_permissions.php
+	 
 #### Configuration ####
 
 	- Add new module to the admin-console in admin.ini:
