@@ -25,7 +25,7 @@
 	- Add new module to the admin-console in admin.ini:
 		moduls.ServerNode.enabled = true
 		moduls.ServerNode.permissionType = 2
-		moduls.ServerNode.label = "Server node service usage"
+		moduls.ServerNode.label = "Enable Server-Node"
 		moduls.ServerNode.permissionName = FEATURE_SERVER_NODE
 		moduls.ServerNode.basePermissionType =
 		moduls.ServerNode.basePermissionName =
