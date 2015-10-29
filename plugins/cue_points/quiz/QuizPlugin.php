@@ -817,7 +817,7 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 	protected function createGetCuePointByUserIdsCriteria($objectIds, $c)
 	{
 		$c->add(CuePointPeer::TYPE, QuizPlugin::getCoreValue('CuePointType', QuizCuePointType::QUIZ_ANSWER));
-		$userIds = QuizPlugin::getObjectIdsAsArray($objectIds);
+		$userIds = baseObjectUtils::getObjectIdsAsArray($objectIds);
 		$kuserIds = array();
 		foreach ($userIds as $userId)
 		{
