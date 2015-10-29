@@ -619,7 +619,7 @@ abstract class LiveEntry extends entry
 				
 		$mediaServerNode = ServerNodePeer::retrieveActiveServerNodes($hostname);
 		if (!$mediaServerNode)
-			throw new kCoreException("Media server with host name [$hostname] not found", kCoreException::MEDIA_SERVER_NOT_FOUND);
+			KalturaLog::info("External media server with hostname [$hostname] is being used to stream entry [" . $this->getId() . "]");
 		
 		$key = $this->getId() . "_{$hostname}_{$index}";
 		if($this->storeInCache($key) && $this->isMediaServerRegistered($index, $hostname)) {

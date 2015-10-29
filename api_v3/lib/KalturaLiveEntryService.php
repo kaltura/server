@@ -205,21 +205,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 		if (!$dbEntry || !($dbEntry instanceof LiveEntry))
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 		
-		try 
-		{
-			$dbEntry->setMediaServer($mediaServerIndex, $hostname, $applicationName);
-		}
-		catch(kCoreException $ex) 
-		{
-			$code = $e->getCode();
-			switch($code)
-			{
-				case kCoreException::MEDIA_SERVER_NOT_FOUND :
-					throw new KalturaAPIException(KalturaErrors::MEDIA_SERVER_NOT_FOUND, $hostname);
-				default:
-					throw $ex;
-			}		
-		}
+		$dbEntry->setMediaServer($mediaServerIndex, $hostname, $applicationName);
 		$dbEntry->setRedirectEntryId(null);
 		
 		if($dbEntry->save())
