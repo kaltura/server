@@ -9,10 +9,17 @@
 	<meta property="og:type" content="video.other" />
 	<meta property="og:image" content="<?php echo $entry_thumbnail_url; ?>/width/<?php echo $uiConf->getWidth();?>" />
 	<meta property="og:image:secure_url" content="<?php echo $entry_thumbnail_secure_url; ?>/width/<?php echo $uiConf->getWidth();?>" />
-	<meta property="og:video" content="<?php echo $swfSecureUrl; ?>" />
-	<meta property="og:video:width" content="<?php echo $uiConf->getWidth();?>" />
-	<meta property="og:video:height" content="<?php echo $uiConf->getHeight();?>" />	
-	<meta property="og:video:type" content="application/x-shockwave-flash" />
+	
+	<?php if( isset($flavorUrl) ) { ?>
+	<meta property="og:video" content="<?php echo $flavorUrl; ?>" />
+	<meta property="og:video:type" content="video/mp4" />	
+	<?php } ?>
+	
+	<meta property="og:video:url" content="<?php echo $playerUrl; ?>">
+	<meta property="og:video:secure_url" content="<?php echo $playerUrl; ?>">
+	<meta property="og:video:type" content="text/html">
+	<meta property="og:video:width" content="<?php echo $uiConf->getHeight();?>">
+	<meta property="og:video:height" content="<?php echo $uiConf->getHeight();?>">
 
 	<meta name="twitter:card" content="player"/>
     <meta name="twitter:site" content="@kaltura"/>
@@ -23,15 +30,11 @@
     <meta name="twitter:player" content="<?php echo $playerUrl; ?>" />
     <?php if( isset($flavorUrl) ) { ?>
     <meta name="twitter:player:stream" content="<?php echo $flavorUrl; ?>" />
+    <meta name="twitter:player:stream:content_type" content="video/mp4"/>
     <?php } ?>
-	<meta name="twitter:player:stream:content_type" content="video/mp4"/>
     <meta name="twitter:player:height" content="<?php echo $uiConf->getHeight();?>" />
     <meta name="twitter:player:width" content="<?php echo $uiConf->getWidth();?>" />
 
-	<?php if( isset($flavorUrl) ) { ?>
-	<meta property="og:video" content="<?php echo $flavorUrl; ?>" />
-	<meta property="og:video:type" content="video/mp4" />	
-	<?php } ?>
 	<meta property="og:site_name" content="Kaltura" />
 	<title><?php echo htmlspecialchars($entry_name); ?></title>
 </head>
