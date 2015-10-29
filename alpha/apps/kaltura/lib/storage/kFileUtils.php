@@ -113,8 +113,16 @@ class kFileUtils extends kFile
 	  	if ($ipHeader){
 	  		list($headerName, $headerValue) = $ipHeader;
 	  		$httpHeader[] = ($headerName . ": ". $headerValue);
-	  	}	  	
-		
+	  	}
+	  	if(isset($_SERVER['CONTENT_TYPE']))
+	  	{
+	  		if(strtolower($_SERVER['CONTENT_TYPE']) == 'application/json' || (strpos(strtolower($_SERVER['CONTENT_TYPE']), 'multipart/form-data') === 0 && isset($_POST['json'])))
+	  		{
+	  			$httpHeader[] = ("Content-Type: multipart/form-data");
+	  			$post_params['json'] = json_encode(infraRequestUtils::getRequestParams());
+	  		}
+	  	}
+	  	
 		$ch = curl_init();
 		// set URL and other appropriate options
 		curl_setopt($ch, CURLOPT_URL, $host . $url );
