@@ -479,7 +479,7 @@ class Base
 		if(is_object($paramValue) && $paramValue instanceof ObjectBase)
 		{
 			$params[$paramName] = array(
-				'objectType' => get_class($paramValue)
+				'objectType' => $paramValue->getKalturaObjectType()
 			);
 			
 			foreach($paramValue as $prop => $val)
@@ -596,8 +596,8 @@ class Base
 			}
 		}
 
-		if(is_object($object))
-			$array['objectType'] = get_class($object);
+		if(is_object($object) && $object instanceof ObjectBase)
+			$array['objectType'] = $object->getKalturaObjectType();
 			
 		return $array;
 	}
