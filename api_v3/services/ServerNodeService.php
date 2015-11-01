@@ -28,9 +28,6 @@ class ServerNodeService extends KalturaBaseService
 	 */
 	function addAction(KalturaServerNode $serverNode)
 	{	
-		if(!$serverNode->status)
-			$serverNode->status = KalturaServerNodeStatus::DISABLED; 
-		
 		$dbServerNode = $this->addNewServerNode($serverNode);
 		
 		$serverNode = KalturaServerNode::getInstance($dbServerNode, $this->getResponseProfile());
@@ -184,7 +181,9 @@ class ServerNodeService extends KalturaBaseService
 	private function addNewServerNode(KalturaServerNode $serverNode)
 	{
 		$dbServerNode = $serverNode->toInsertableObject();
+		/* @var $dbServerNode ServerNode */
 		$dbServerNode->setPartnerId($this->getPartnerId());
+		$dbServerNode->setStatus(ServerNodeStatus::DISABLED);
 		$dbServerNode->save();
 		
 		return $dbServerNode;
