@@ -106,6 +106,14 @@ class kFileUtils extends kFile
 		$url = $_SERVER['REQUEST_URI'];
 		if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on' && kConf::hasParam('https_param_salt'))
 			$post_params['apiProtocol'] = 'https_' . kConf::get('https_param_salt');
+		
+		if(isset($_SERVER['CONTENT_TYPE']))
+		{
+			if(strtolower($_SERVER['CONTENT_TYPE']) == 'application/json' || (strpos(strtolower($_SERVER['CONTENT_TYPE']), 'multipart/form-data') === 0 && isset($_POST['json'])))
+			{
+				$post_params = array_merge($post_params, infraRequestUtils::getRequestParams());
+			}
+		}
 			
 		$httpHeader = array("X-Kaltura-Proxy: dumpApiRequest");
 		
@@ -113,14 +121,6 @@ class kFileUtils extends kFile
 	  	if ($ipHeader){
 	  		list($headerName, $headerValue) = $ipHeader;
 	  		$httpHeader[] = ($headerName . ": ". $headerValue);
-	  	}
-	  	if(isset($_SERVER['CONTENT_TYPE']))
-	  	{
-	  		if(strtolower($_SERVER['CONTENT_TYPE']) == 'application/json' || (strpos(strtolower($_SERVER['CONTENT_TYPE']), 'multipart/form-data') === 0 && isset($_POST['json'])))
-	  		{
-	  			$httpHeader[] = ("Content-Type: multipart/form-data");
-	  			$post_params['json'] = json_encode(infraRequestUtils::getRequestParams());
-	  		}
 	  	}
 	  	
 		$ch = curl_init();
