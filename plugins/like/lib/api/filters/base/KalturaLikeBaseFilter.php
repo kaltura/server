@@ -10,6 +10,8 @@ abstract class KalturaLikeBaseFilter extends KalturaRelatedFilter
 	(
 		"entryIdEqual" => "_eq_entry_id",
 		"userIdEqual" => "_eq_user_id",
+		"createdAtGreaterThanOrEqual" => "_gte_created_at",
+		"createdAtLessThanOrEqual" => "_lte_created_at",
 	);
 
 	static private $order_by_map = array
@@ -35,4 +37,14 @@ abstract class KalturaLikeBaseFilter extends KalturaRelatedFilter
 	 * @var string
 	 */
 	public $userIdEqual;
+
+	/**
+	 * @var time
+	 */
+	public $createdAtGreaterThanOrEqual;
+
+	/**
+	 * @var time
+	 */
+	public $createdAtLessThanOrEqual;
 }
