@@ -84,5 +84,28 @@ class KDLOperatorFfmpeg2_7_2 extends KDLOperatorFfmpeg2_2 {
 		}
 		return $vidCodecSpecStr;
 	}
+	
+	/**
+	 *
+	 * @param unknown_type $targetVid
+	 * @param unknown_type $wmWid
+	 * @param unknown_type $wmHgt
+	 * @return string
+	 */
+	protected static function generateWatermarkParams($targetVid, $wmWid=KDLCmdlinePlaceholders::WaterMarkWidth, $wmHgt=KDLCmdlinePlaceholders::WaterMarkHeight)
+	{
+		/*
+		 * FFMpeg 2.7 automatically rotates the output 
+		 * into 'non-rotated' orientation. No need to do it explicitly 
+		 */
+$rotation = null;
+		if(isset($targetVid->_rotation)) {
+			$rotation = $targetVid->_rotation;
+			$targetVid->_rotation = null;
+		}
+		$watermarkStr = parent::generateWatermarkParams($targetVid, $wmWid, $wmHgt);
+		$targetVid->_rotation = $rotation;
+		return $watermarkStr;
+	}
 }
 
