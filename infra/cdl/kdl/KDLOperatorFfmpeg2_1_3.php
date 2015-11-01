@@ -173,7 +173,7 @@ class KDLOperatorFfmpeg2_1_3 extends KDLOperatorFfmpeg1_1_1 {
 			return $cmdStr;
 
 		$vid = $target->_video;
-		$watermarkStr = self::generateWatermarkParams($vid);
+		$watermarkStr = $this->generateWatermarkParams($vid);
 
 		$cmdValsArr = explode(' ', $cmdStr);
 			
