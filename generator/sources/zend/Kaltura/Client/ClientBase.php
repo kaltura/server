@@ -557,7 +557,7 @@ class Kaltura_Client_ClientBase
 		if(is_object($paramValue) && $paramValue instanceof Kaltura_Client_ObjectBase)
 		{
 			$params[$paramName] = array(
-				'objectType' => get_class($paramValue)
+				'objectType' => $paramValue->getKalturaObjectType()
 			);
 			
 			foreach($paramValue as $prop => $val)
@@ -674,8 +674,8 @@ class Kaltura_Client_ClientBase
 			}
 		}
 
-		if(is_object($object))
-			$array['objectType'] = get_class($object);
+		if(is_object($object) && $object instanceof Kaltura_Client_ObjectBase)
+			$array['objectType'] = $object->getKalturaObjectType();
 			
 		return $array;
 	}
