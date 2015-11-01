@@ -245,8 +245,12 @@ class KDLOperatorFfmpeg2_1_3 extends KDLOperatorFfmpeg1_1_1 {
 			if(isset($target->_video)) {
 				$cmdStr.= " -map v";
 			}
+				// Add language prop to the mapped output audio streams
+			$langIdx = 0;
 			foreach ($target->_multiStream->audio->languages as $lang){
 				$cmdStr.= " -map 0:".$lang->id;
+				$cmdStr.= " -metadata:s:a:$langIdx language=$lang->audioLanguage";
+				$langIdx++;
 			}
 		}
 		
