@@ -63,6 +63,9 @@ class myReportsMgr
 										self::REPORT_TYPE_TOP_CONTENT,
 										self::REPORT_TYPE_TOP_PLAYBACK_CONTEXT);
 										
+	static $escaped_params = array("{OBJ_ID_CLAUSE}",  
+								   "{CAT_ID_CLAUSE}");
+										
 	
 	/**
 	 * @param int $partner_id
@@ -648,7 +651,7 @@ class myReportsMgr
 		$start = microtime(true);
 		try
 		{
-			
+			$link = self::getConnection();
 			$add_search_text = false;
 			
 			$has_object_ids = false;
@@ -764,6 +767,8 @@ class myReportsMgr
 				$object_ids = str_replace ( "'" , '' , $object_ids ) ; 
 				// quote all the objects with SINGLE-QUOTES			
 				$object_ids_str = "'" . str_replace ( "," , "','" , $object_ids ) . "'";
+				// escape object_ids string before adding where clause 
+				$object_ids_str = mysqli_real_escape_string($link, $object_ids_str);
 				
 				if ( $report_type == self::REPORT_TYPE_CONTENT_CONTRIBUTIONS )
 				{
@@ -822,7 +827,6 @@ class myReportsMgr
 			if ( is_numeric( $report_type ))
 				$order_by = self::getOrderBy( self::$type_map[$report_type] , $order_by );
 			
-			$link = self::getConnection(); 
 			$query = self::getReplacedSql($link, $sql_raw_content , $partner_id , $input_filter , $page_size , $page_index , $order_by , $obj_ids_clause, $category_ids_clause , $offset);
 			if ( is_numeric( $report_type ))
 				$query_header = "/* -- " . self::$type_map[$report_type] . " " . self::$flavor_map[$report_flavor] . " -- */\n";
@@ -1242,7 +1246,8 @@ class myReportsMgr
 		}
 		
 		foreach ($values as $key => &$value) {
-            $value = mysqli_real_escape_string($link, $value);
+			if (!in_array($names[$key], self::$escaped_params))
+				$value = mysqli_real_escape_string($link, $value);
         }
 
 			
