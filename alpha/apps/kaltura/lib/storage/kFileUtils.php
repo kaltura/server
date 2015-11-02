@@ -169,6 +169,12 @@ class kFileUtils extends kFile
 			
 		$sendHeaders = array("X-Kaltura-Proxy: dumpUrl");
 		
+		$ipHeader = infraRequestUtils::getSignedIpAddressHeader();
+		if ($ipHeader){
+			list($headerName, $headerValue) = $ipHeader;
+			$sendHeaders[] = ($headerName . ": ". $headerValue);
+		}
+				
 		if($passHeaders)
 		{
 			$sentHeaders = self::getRequestHeaders();
