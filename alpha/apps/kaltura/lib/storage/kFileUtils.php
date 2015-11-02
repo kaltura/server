@@ -106,14 +106,6 @@ class kFileUtils extends kFile
 		$url = $_SERVER['REQUEST_URI'];
 		if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on' && kConf::hasParam('https_param_salt'))
 			$post_params['apiProtocol'] = 'https_' . kConf::get('https_param_salt');
-		
-		if(isset($_SERVER['CONTENT_TYPE']))
-		{
-			if(strtolower($_SERVER['CONTENT_TYPE']) == 'application/json' || (strpos(strtolower($_SERVER['CONTENT_TYPE']), 'multipart/form-data') === 0 && isset($_POST['json'])))
-			{
-				$post_params = array_merge($post_params, infraRequestUtils::getRequestParams());
-			}
-		}
 			
 		$httpHeader = array("X-Kaltura-Proxy: dumpApiRequest");
 		
@@ -121,8 +113,8 @@ class kFileUtils extends kFile
 	  	if ($ipHeader){
 	  		list($headerName, $headerValue) = $ipHeader;
 	  		$httpHeader[] = ($headerName . ": ". $headerValue);
-	  	}
-	  	
+	  	}	  	
+		
 		$ch = curl_init();
 		// set URL and other appropriate options
 		curl_setopt($ch, CURLOPT_URL, $host . $url );
@@ -168,6 +160,12 @@ class kFileUtils extends kFile
 			KExternalErrors::dieError(KExternalErrors::PROXY_LOOPBACK);
 			
 		$sendHeaders = array("X-Kaltura-Proxy: dumpUrl");
+		
+		$ipHeader = infraRequestUtils::getSignedIpAddressHeader();
+		if ($ipHeader){
+			list($headerName, $headerValue) = $ipHeader;
+			$sendHeaders[] = ($headerName . ": ". $headerValue);
+		}
 		
 		if($passHeaders)
 		{
