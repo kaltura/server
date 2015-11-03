@@ -398,6 +398,13 @@ class SphinxCriterion extends KalturaCriterion implements IKalturaIndexQuery
 		$clauses = $this->getClauses();
 		foreach($clauses as $index => $clause)
 		{
+			$attributesClause = implode($this->getConjunction(), array_unique($this->conditionClause));
+			$matches = null;
+			if (preg_match("/^\($sphinxField <> 0 AND $sphinxField <= (\\d+)\) OR \($sphinxField = 0\)$/", $attributesClause, $matches))
+			{
+				$this->conditionClause = array("$sphinxField <= ".$matches[1]);
+			}
+
 			if(!($clause instanceof SphinxCriterion))
 			{
 				KalturaLog::debug("Clause [" . $clause->getColumn() . "] is not Sphinx criterion");
@@ -459,16 +466,6 @@ class SphinxCriterion extends KalturaCriterion implements IKalturaIndexQuery
 				$condition = $this->getConjunction() . $attributesClause;
 				KalturaLog::debug("Add condition criterion[$field] as sphinx field[$sphinxField] of type [$type] condition [$condition] line [" . __LINE__ . "]");
 				$query->addCondition($condition);
-
-				if ($query instanceof SphinxCriterion)
-				{
-					$fullCondition = implode('', $query->conditionClause);
-					$matches = null;
-					if (preg_match("/^\($sphinxField <> 0 AND $sphinxField <= (\\d+)\) OR \($sphinxField = 0\)$/", $fullCondition, $matches))
-					{
-						$query->conditionClause = array("$sphinxField <= ".$matches[1]);
-					}
-				}
 			}
 		}
 		
