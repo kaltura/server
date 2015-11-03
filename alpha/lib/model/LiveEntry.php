@@ -348,7 +348,7 @@ abstract class LiveEntry extends entry
 					if($primaryMediaServer)
 						$isExternalMediaServerStream = $primaryMediaServer->getIsExternalMediaServer();
 					else 
-						KalturaLog::debug("Cannot retrrive extra information for un-registered media server");
+						KalturaLog::debug("Cannot retrrive extra information for un-registered media server with host name [" . $kMediaServer->getHostname() . "]");
 				}
 			}
 			
