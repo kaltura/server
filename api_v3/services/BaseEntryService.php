@@ -487,7 +487,9 @@ class BaseEntryService extends KalturaEntryService
 
 		$result = $filter->getListResponse($pager, $this->getResponseProfile());
 		
-		if ($result->totalCount == 1 && $result->objects[0]->status != KalturaEntryStatus::READY)
+		if ($result->totalCount == 1 && 
+			count($result->objects) == 1 && 
+			$result->objects[0]->status != KalturaEntryStatus::READY)
 		{
 			// the purpose of this is to solve a case in which a player attempts to play a non-ready entry, 
 			// and the request becomes cached for a long time, preventing playback even after the entry
