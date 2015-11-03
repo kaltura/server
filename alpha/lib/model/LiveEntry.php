@@ -446,7 +446,6 @@ abstract class LiveEntry extends entry
 				$backupManifestUrl .= "$backupApplicationName/";
 				$backupManifestUrl .= $streamName;
 				$hlsBackupStreamUrl .= $hlsBackupManifestUrl . "$backupApplicationName/" . $streamName . "/playlist.m3u8" .  $queryString;				
-				$hlsBackupStreamUrl = "$backupManifestUrl/playlist.m3u8" . $queryString;
 				$hdsBackupStreamUrl = "$backupManifestUrl/manifest.f4m" . $queryString;
 			}
 		}
