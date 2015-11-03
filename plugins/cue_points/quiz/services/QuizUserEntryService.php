@@ -19,7 +19,6 @@ class QuizUserEntryService extends KalturaBaseService{
 	 */
 	public function submitQuizAction($id)
 	{
-		KalturaLog::debug("Submit Quiz for QuizUserEntryId [" .$id."]");
 		$dbUserEntry = UserEntryPeer::retrieveByPK($id);
 		if (!$dbUserEntry)
 		{
@@ -38,7 +37,6 @@ class QuizUserEntryService extends KalturaBaseService{
 		$dbUserEntry->setScore($score);
 		KalturaLog::debug("Quiz score is [" .$score."]");
 		$dbUserEntry->setStatus(QuizPlugin::getCoreValue('UserEntryStatus', QuizUserEntryStatus::QUIZ_SUBMITTED));
-		$dbUserEntry->save();
 
 		$userEntry = new KalturaQuizUserEntry();
 		$userEntry->fromObject($dbUserEntry, $this->getResponseProfile());
@@ -56,29 +54,12 @@ class QuizUserEntryService extends KalturaBaseService{
 			throw new KalturaAPIException(KalturaQuizErrors::PROVIDED_ENTRY_IS_NOT_A_QUIZ, $entryId);
 		}
 
-		$partnetId = $entry->getPartnerId();
-		if (!$partnetId)
-		{
-			throw new KalturaAPIException(KalturaErrors::UNKNOWN_PARTNER_ID, $id);
-		}
-
-		$dbPartner = PartnerPeer::retrieveByPK($partnetId);
-		if (!$dbPartner)
-		{
-			throw new KalturaAPIException(KalturaErrors::UNKNOWN_PARTNER_ID, $id);
-		}
-
-		$userId = $dbPartner->getAdminUserId();
-		$kuser = kuserPeer::getKuserByPartnerAndUid($partnetId, $userId);
-		if (!$kuser)
-		{
-			throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID, $userId);
-		}
-
-		if (!$kQuiz->getShowGradeAfterSubmission() || !$kuser->getIsAdmin())
+		if (!$kQuiz->getShowGradeAfterSubmission() || !$this->getKuser()->getIsAdmin())
 		{
 			$userEntry->score = null;
 		}
+
+		$dbUserEntry->save();
 
 		return $userEntry;
 	}
