@@ -908,8 +908,6 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		$entryDistribution->setErrorType(null);
 		$entryDistribution->setErrorNumber(null);
 		$entryDistribution->setErrorDescription(null);
-		
-		$entry = entryPeer::retrieveByPK($entryDistribution->getEntryId());
 		$entryDistribution->setStatus(EntryDistributionStatus::REMOVED);
 		$entryDistribution->setDirtyStatus(null);
 		$entryDistribution->save();
