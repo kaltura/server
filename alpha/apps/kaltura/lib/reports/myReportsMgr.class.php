@@ -63,8 +63,6 @@ class myReportsMgr
 										self::REPORT_TYPE_TOP_CONTENT,
 										self::REPORT_TYPE_TOP_PLAYBACK_CONTEXT);
 										
-	static $escaped_params = array("{OBJ_ID_CLAUSE}",  
-								   "{CAT_ID_CLAUSE}");
 										
 	
 	/**
@@ -767,8 +765,6 @@ class myReportsMgr
 				$object_ids = str_replace ( "'" , '' , $object_ids ) ; 
 				// quote all the objects with SINGLE-QUOTES			
 				$object_ids_str = "'" . str_replace ( "," , "','" , $object_ids ) . "'";
-				// escape object_ids string before adding where clause 
-				$object_ids_str = mysqli_real_escape_string($link, $object_ids_str);
 				
 				if ( $report_type == self::REPORT_TYPE_CONTENT_CONTRIBUTIONS )
 				{
@@ -1245,12 +1241,6 @@ class myReportsMgr
 			}
 		}
 		
-		foreach ($values as $key => &$value) {
-			if (!in_array($names[$key], self::$escaped_params))
-				$value = mysqli_real_escape_string($link, $value);
-        }
-
-			
 		$replaced_sql = str_replace ( $names , $values , $sql_content );	
 
 		date_default_timezone_set($origTimeZone);
