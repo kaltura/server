@@ -63,6 +63,7 @@ class myReportsMgr
 										self::REPORT_TYPE_TOP_CONTENT,
 										self::REPORT_TYPE_TOP_PLAYBACK_CONTEXT);
 										
+										
 	
 	/**
 	 * @param int $partner_id
@@ -648,7 +649,7 @@ class myReportsMgr
 		$start = microtime(true);
 		try
 		{
-			
+			$link = self::getConnection();
 			$add_search_text = false;
 			
 			$has_object_ids = false;
@@ -822,7 +823,6 @@ class myReportsMgr
 			if ( is_numeric( $report_type ))
 				$order_by = self::getOrderBy( self::$type_map[$report_type] , $order_by );
 			
-			$link = self::getConnection(); 
 			$query = self::getReplacedSql($link, $sql_raw_content , $partner_id , $input_filter , $page_size , $page_index , $order_by , $obj_ids_clause, $category_ids_clause , $offset);
 			if ( is_numeric( $report_type ))
 				$query_header = "/* -- " . self::$type_map[$report_type] . " " . self::$flavor_map[$report_flavor] . " -- */\n";
@@ -1241,11 +1241,6 @@ class myReportsMgr
 			}
 		}
 		
-		foreach ($values as $key => &$value) {
-            $value = mysqli_real_escape_string($link, $value);
-        }
-
-			
 		$replaced_sql = str_replace ( $names , $values , $sql_content );	
 
 		date_default_timezone_set($origTimeZone);
