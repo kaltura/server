@@ -35,7 +35,7 @@ class kXml
 {
 	public static function getXslEnabledPhpFunctions()
 	{
-		return array('date', 'gmdate', 'strtotime');
+		return array('date', 'gmdate', 'strtotime','urlencode');
 	}
 	
 	//check if the prop's value is valid for xml encoding.
