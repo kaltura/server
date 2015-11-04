@@ -485,9 +485,20 @@ class BaseEntryService extends KalturaEntryService
 			$pager = new KalturaFilterPager();
 		}
 
+		$result = $filter->getListResponse($pager, $this->getResponseProfile());
+		
+		if ($result->totalCount == 1 && 
+			count($result->objects) == 1 && 
+			$result->objects[0]->status != KalturaEntryStatus::READY)
+		{
+			// the purpose of this is to solve a case in which a player attempts to play a non-ready entry, 
+			// and the request becomes cached for a long time, preventing playback even after the entry
+			// becomes ready
+			kApiCache::setExpiry(60);
+		}
+		
 		// NOTE: The following is a hack in order to make sure all responses are of type KalturaBaseEntryListResponse.
 		//       The reason is that baseentry::list() is not being extended by derived classes.
-		$result = $filter->getListResponse($pager, $this->getResponseProfile());
 		$response = new KalturaBaseEntryListResponse();
 		$response->objects = $result->objects;
 		$response->totalCount = $result->totalCount;
@@ -700,6 +711,14 @@ class BaseEntryService extends KalturaEntryService
 		$dbEntry = entryPeer::retrieveByPK($entryId);
 		if (!$dbEntry)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
+		
+		if ($dbEntry->getStatus() != entryStatus::READY)
+		{
+			// the purpose of this is to solve a case in which a player attempts to play a non-ready entry,
+			// and the request becomes cached for a long time, preventing playback even after the entry
+			// becomes ready
+			kApiCache::setExpiry(60);
+		}
 		
 		$asset = null;
 		if($contextDataParams->flavorAssetId)

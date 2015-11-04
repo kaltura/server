@@ -576,6 +576,9 @@ class kApiCache extends kApiCacheBase
 					$cacheExpiry = time() + $expiryInterval;
 					$this->_cacheRules[self::CACHE_MODE_ANONYMOUS] = array($cacheExpiry, $expiryInterval, $conditions);
 					$this->_cacheRulesDirty = true;
+					
+					// in case of multirequest, limit the cache time of the multirequest according to this request
+					$this->setExpiry($expiryInterval);
 				}
 				
 				if (count(self::$_activeInstances) > 1)
@@ -598,6 +601,9 @@ class kApiCache extends kApiCacheBase
 				if (kConf::hasParam('disable_cache_warmup_client_tags') && !in_array($this->clientTag, kConf::get('disable_cache_warmup_client_tags')))
 					self::warmCache($this->_cacheKey);
 			}
+			
+			// in case of multirequest, limit the cache time of the multirequest according to this request
+			$this->setExpiry($expiryInterval);
 
 			return self::CACHE_MODE_ANONYMOUS;
 		}

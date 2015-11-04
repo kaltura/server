@@ -322,9 +322,7 @@ class myEntryUtils
 			$dbEntryBatchJobLocks = BatchJobLockPeer::retrieveByEntryId($entry->getId());
 			foreach($dbEntryBatchJobLocks as $jobLock) {
 				/* @var $jobLock BatchJobLock */
-				$job = $jobLock->getBatchJob();
-				/* @var $job BatchJob */
-				KalturaLog::info("Entry [". $entry->getId() ."] still has an unhandled batchjob [". $job->getId()."] with status [". $job->getStatus()."] - aborting deletion process.");
+				KalturaLog::info("Entry [". $entry->getId() ."] still has an unhandled batchjob [". $jobLock->getId()."] with status [". $jobLock->getStatus()."] - aborting deletion process.");
 				//mark entry for later deletion
 				$entry->setMarkedForDeletion(true);
 				$entry->save();
