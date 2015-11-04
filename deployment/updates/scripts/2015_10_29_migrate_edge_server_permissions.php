@@ -14,6 +14,7 @@ $permissions = PermissionPeer::doSelect($permCrit);
 foreach ($permissions as $perm)
 {
 	/* @var $perm Permission */
-	$perm->setName("FEATURE_SERVER_NODE");
-	$perm->save();
+	$newPermission = $perm->copy();
+	$newPermission->setName("FEATURE_SERVER_NODE");
+	$newPermission->save();
 }
