@@ -260,25 +260,30 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 	{
 		$ext = null;
 		$audioLanguage = null;
+		$audioLanguageName = null;
 		if ($flavor)
 		{
-		    if (is_callable(array($flavor, 'getFileExt'))) {
-		        $ext = $flavor->getFileExt();
-		    }
-		    //Extract the audio language tag from flavor
+			if (is_callable(array($flavor, 'getFileExt'))) {
+				$ext = $flavor->getFileExt();
+			}
+		    //Extract the audio language code from flavor
 		    if ($flavor->hasTag(assetParams::TAG_AUDIO_ONLY)) {
-		        $mediaInfoObj = mediaInfoPeer::retrieveByFlavorAssetId($flavor->getId());
-		        $contentStreams = $mediaInfoObj->getContentStreams();
-		        if (isset($contentStreams)) {
-		            $parsedJson = json_decode($contentStreams,true);
-		            if (isset($parsedJson)) {
-		                $audioLanguage = $parsedJson['audio'][0]['audioLanguage'];
-		            }
-		            else {
-		                $audioLanguage = 'und';
-		            }
-		        }
-		    }
+				$mediaInfoObj = mediaInfoPeer::retrieveByFlavorAssetId($flavor->getId());
+				$audioLanguage = $mediaInfoObj->getAttributeFromContentStreams("$.audio.0.audioLanguage");
+				if (!isset($audioLanguage)) {
+					$audioLanguage = 'und';
+					$audioLanguageName = 'Undefined';
+				}
+				else {
+					if (!defined('LanguageKey::' . strtoupper($audioLanguage))) {
+						$audioLanguageName = "Unknown ($audioLanguage)";
+						KalturaLog::info("Language code [$audioLanguage] was not found. Setting [$audioLanguageName] instead");
+					}
+					else {
+						$audioLanguageName = constant('LanguageKey::' . strtoupper($audioLanguage));
+					}		            
+				}
+			}
 		}
 		if (!$ext)
 		{
@@ -299,7 +304,8 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 				'bitrate' => $bitrate,
 				'width' => $width,
 				'height' => $height,
-				'audioLanguage' => $audioLanguage
+				'audioLanguage' => $audioLanguage,
+				'audioLanguageName' => $audioLanguageName
 		);
 	}
 	
