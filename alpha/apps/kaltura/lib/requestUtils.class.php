@@ -34,7 +34,7 @@ class requestUtils extends infraRequestUtils
 	    if ($targetUrl[0] == '/') 
 	    	$path = '';
 	
-	    $port = isset($parsed_url['port']) ? ':' . $parsed_url['port'] : '';
+	    $port = isset($parsed_url['port']) && $parsed_url['port'] !== 80 && $parsed_url['port'] !== 443  ? ':' . $parsed_url['port'] : '';
 
 	    /* dirty absolute URL */
 	    $abs = "$host$port$path/$targetUrl";
