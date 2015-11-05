@@ -196,7 +196,7 @@ class LiveStreamService extends KalturaLiveEntryService
 		$entries = entryPeer::doSelect($baseCriteria);
 	
 		$maxInputStreams = $this->getPartner()->getMaxLiveStreamInputs();
-		if(is_null($maxInputStreams))
+		if(is_null($maxInputStreams) || $maxInputStreams == 0)
 			$maxInputStreams = kConf::get('partner_max_live_stream_inputs', 'local', 10);
 		KalturaLog::debug("Max live stream inputs [$maxInputStreams]");
 			
@@ -204,7 +204,7 @@ class LiveStreamService extends KalturaLiveEntryService
 		if(PermissionPeer::isValidForPartner(PermissionName::FEATURE_KALTURA_LIVE_STREAM_TRANSCODE, $this->getPartnerId()))
 		{
 			$maxTranscodedStreams = $this->getPartner()->getMaxLiveStreamOutputs();
-			if(is_null($maxTranscodedStreams))
+			if(is_null($maxTranscodedStreams) || $maxTranscodedStreams == 0)
 				$maxTranscodedStreams = kConf::get('partner_max_live_stream_outputs', 'local', 10);
 		}
 		KalturaLog::debug("Max live stream outputs [$maxTranscodedStreams]");
