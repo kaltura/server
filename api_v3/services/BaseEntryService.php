@@ -755,15 +755,8 @@ class BaseEntryService extends KalturaEntryService
 			if(!$dbEntry)
 				throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $parentEntryId);
 		}
-
+		
 		$result->isScheduledNow = $dbEntry->isScheduledNow($contextDataParams->time);
-		if (!($result->isScheduledNow) ){
-			// in case the sview is defined in the ks simulate schedule now true to allow player to pass verification
-			if(	$this->getKs()->verifyPrivileges(ks::PRIVILEGE_VIEW, ks::PRIVILEGE_WILDCARD) ||
-				$this->getKs()->verifyPrivileges(ks::PRIVILEGE_VIEW, $entryId)) {
-				$result->isScheduledNow = true;
-			}
-		}
 
         $result->pluginData = new KalturaPluginDataArray();
         $pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaEntryContextDataContributor');
