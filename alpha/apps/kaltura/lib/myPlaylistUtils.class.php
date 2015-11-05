@@ -304,11 +304,11 @@ class myPlaylistUtils
 		
 		if (!self::$isAdminKs)
 		{
-			self::addSchedulingToCriteria($c);
+			self::addSchedulingToCriteria($c, $entry_filter);
 		}
-		
+
 		self::addModerationToCriteria($c);
-		
+
 		if ( $entry_filter )
 		{
 			if ( $entry_filter->getLimit() > 0 )
@@ -325,17 +325,17 @@ class myPlaylistUtils
 			}
 			$entry_filter->setPartnerSearchScope(baseObjectFilter::MATCH_KALTURA_NETWORK_AND_PRIVATE);
 			$entry_filter->attachToCriteria( $c );
-			
+
 			// add some hard-coded criteria
 			$c->addAnd ( entryPeer::TYPE , array ( entryType::MEDIA_CLIP , entryType::MIX, entryType::LIVE_STREAM ) , Criteria::IN ); // search only for clips or roughcuts
-			$c->addAnd ( entryPeer::STATUS , entryStatus::READY ); // search only for READY entries 
+			$c->addAnd ( entryPeer::STATUS , entryStatus::READY ); // search only for READY entries
 
 			if ( $display_in_search >= 2 )
 			{
 				// We don't allow searching in the KalturaNEtwork anymore (mainly for performance reasons)
-				// allow only assets for the partner  
-				$c->addAnd ( entryPeer::PARTNER_ID , $partner_id ); // 
-/*				
+				// allow only assets for the partner
+				$c->addAnd ( entryPeer::PARTNER_ID , $partner_id ); //
+/*
 				$crit = $c->getNewCriterion ( entryPeer::PARTNER_ID , $partner_id );
 				$crit->addOr ( $c->getNewCriterion ( entryPeer::DISPLAY_IN_SEARCH , $display_in_search ) );
 				$c->addAnd ( $crit );
@@ -347,9 +347,9 @@ class myPlaylistUtils
 			$unsorted_entry_list = entryPeer::doSelectJoinkuser( $c ); // maybe join with kuser to add some data about the contributor
 		else
 			$unsorted_entry_list = entryPeer::doSelect( $c ); // maybe join with kuser to add some data about the contributor
-	
+
 		// now sort the list according to $entry_id_list
-		
+
 		$entry_list = array();
 		// build a map where the key is the id of the entry
 		$id_list = self::buildIdMap( $unsorted_entry_list );
@@ -393,9 +393,9 @@ class myPlaylistUtils
 						}
 					}
 
-					// add to the entry_list only when the entry_id is not empty 
+					// add to the entry_list only when the entry_id is not empty
 					$entry_list[] = $current_entry;
-				} 
+				}
 			}
 		}
 		if ( count( $entry_list ) == 0 ) return null;
@@ -412,9 +412,9 @@ class myPlaylistUtils
 		}
 		return $ids;
 	}
-	
-// TODO - create a schema for the xml 
-		
+
+// TODO - create a schema for the xml
+
 /**
  * <playlist>
 	<total_results>6</total_results>
@@ -436,29 +436,29 @@ class myPlaylistUtils
 		</filter>
 	</filters>
 </playlist>
- 
- */	
+
+ */
 	public static function getDynamicPlaylistFilters($xml)
 	{
 		list ( $total_results , $list_of_filters ) = self::getPlaylistFilterListStruct ( $xml );
-		if ( ! $list_of_filters ) 
+		if ( ! $list_of_filters )
 			return array();
-	
+
 		$entry_filters = array();
 		foreach ( $list_of_filters as $entry_filter_xml )
 		{
 			$entry_filter = new entryFilter();
-			$entry_filter->fillObjectFromXml( $entry_filter_xml , "_" ); 
-			
+			$entry_filter->fillObjectFromXml( $entry_filter_xml , "_" );
+
 			$entry_filters[] = $entry_filter;
 		}
 		return $entry_filters;
 	}
-	
+
 	public static function executeDynamicPlaylist ( $partner_id , $xml , $filter = null ,$detailed = true, $pager = null )
 	{
 		list ( $total_results , $list_of_filters ) = self::getPlaylistFilterListStruct ( $xml );
-	
+
 		$entry_filters = array();
 
 		if ( ! $list_of_filters ) return null;
@@ -485,20 +485,20 @@ class myPlaylistUtils
 			// 	in general this service can fetch entries from kaltura networks.
 			// for each filter we should decide if thie assumption is true...
 			$allow_partner_only = true;
-			
+
 			self::replaceContextTokens($entry_filter_xml);
-			
+
 			// compile all the filters - only then execute them if not yet reached the total_results
 			// TODO - optimize - maybe create them only when needed. - For now it's safer to compile all even if not needed.
 			$entry_filter = new entryFilter();
 			// add the desired prefix "_" because the XML is not expected to have it while the entryFilter class expects it
-			$entry_filter->fillObjectFromXml( $entry_filter_xml , "_" ); 
+			$entry_filter->fillObjectFromXml( $entry_filter_xml , "_" );
 			// make sure there is alway a limit for each filter - if not an explicit one - the system limit should be used
 			if( $entry_filter->getLimit() == null || $entry_filter->getLimit() < 1 )
 			{
 				$entry_filter->setLimit( self::TOTAL_RESULTS );
 			}
-			
+
 			// merge the current_filter with the correcponding extra_filter
 			// allow the extra_filter to override properties of the current filter
 
@@ -513,18 +513,18 @@ class myPlaylistUtils
 					$filter->setLimit( $filterLimit );
 				}
 
-				$entry_filter->fillObjectFromObject( $filter , 
-					myBaseObject::CLONE_FIELD_POLICY_THIS , 
+				$entry_filter->fillObjectFromObject( $filter ,
+					myBaseObject::CLONE_FIELD_POLICY_THIS ,
 					myBaseObject::CLONE_POLICY_PREFER_NEW , null , null , false );
-					
+
 				$entry_filter->setPartnerSearchScope ( baseObjectFilter::MATCH_KALTURA_NETWORK_AND_PRIVATE );
 			}
-			
+
 			self::updateEntryFilter( $entry_filter ,  $partner_id , true );
-			
+
 			$entry_filters[] = $entry_filter;
 		}
-		
+
 		if ( $pager )
 		{
 			$startOffset = $pager->calcOffset();
@@ -547,13 +547,13 @@ class myPlaylistUtils
 			if ( $current_limit <= 0 ) break;
 
 			$c = KalturaCriteria::create(entryPeer::OM_CLASS);
-			
-			
+
+
 			// don't fetch the same entries twice - filter out all the entries that were already fetched
 			if( $entry_ids_list ) $c->add ( entryPeer::ID , $entry_ids_list , Criteria::NOT_IN );
-			
+
 			$filter_limit = $entry_filter->getLimit ();
-			
+
 			if ( $filter_limit > $current_limit )
 			{
 				// set a smaller limit incase the filter's limit is to high
@@ -566,35 +566,35 @@ class myPlaylistUtils
 			{
 				$entry_filter->set ( "_eq_display_in_search" , null );
 			}
-			
+
 			$entry_filter->attachToCriteria( $c );
 
 			// add some hard-coded criteria
 			$c->addAnd ( entryPeer::TYPE , array ( entryType::MEDIA_CLIP , entryType::MIX , entryType::LIVE_STREAM ) , Criteria::IN ); // search only for clips or roughcuts
-			$c->addAnd ( entryPeer::STATUS , entryStatus::READY ); // search only for READY entries 
+			$c->addAnd ( entryPeer::STATUS , entryStatus::READY ); // search only for READY entries
 			$c->addAnd ( entryPeer::DISPLAY_IN_SEARCH , mySearchUtils::DISPLAY_IN_SEARCH_SYSTEM, Criteria::NOT_EQUAL);
 
 			if ( $display_in_search >= 2 )
 			{
 				// We don't allow searching in the KalturaNEtwork anymore (mainly for performance reasons)
-				// allow only assets for the partner  
-				$c->addAnd ( entryPeer::PARTNER_ID , $partner_id ); // 
-/*				
+				// allow only assets for the partner
+				$c->addAnd ( entryPeer::PARTNER_ID , $partner_id ); //
+/*
 				$crit = $c->getNewCriterion ( entryPeer::PARTNER_ID , $partner_id );
 				$crit->addOr ( $c->getNewCriterion ( entryPeer::DISPLAY_IN_SEARCH , $display_in_search ) );
 				$c->addAnd ( $crit );
 */
 			}
-			
+
 			if (!self::$isAdminKs)
 			{
-				self::addSchedulingToCriteria($c);
+				self::addSchedulingToCriteria($c, $entry_filter);
 			}
-			
+
 			self::addModerationToCriteria($c);
 			$c = entryPeer::prepareEntitlementCriteriaAndFilters( $c );
 			$entry_ids_list_for_filter = $c->getFetchedIds();
-			
+
 			// update total count and merge current result with the global list
 			$entry_ids_list = array_merge ( $entry_ids_list , $entry_ids_list_for_filter );
 		}
@@ -619,7 +619,7 @@ class myPlaylistUtils
 		{
 			$entry_map[ $entry->getId() ] = $entry;
 		}
-		
+
 		// Build entry_list according to the playlist order
 		$entry_list = array();
 		foreach ( $entry_ids_list as $entryId )
@@ -627,9 +627,9 @@ class myPlaylistUtils
 			$entry_list[] = $entry_map[$entryId];
 		}
 
-		return $entry_list;		 
+		return $entry_list;
 	}
-	
+
 	// will assume that user_id is actually the puser_id and should be replaced by kuser_id to be able to search by in the entry table
 	private static function setUser ( $partner_id , $filter )
 	{
@@ -646,42 +646,42 @@ class myPlaylistUtils
 				}
 				self::setPuserKuserFromCache( $target_puser_id , $puser_kuser );
 			}
-		}		
+		}
 	}
-	
+
 	private static function getPuserKuserFromCache ( $puser_id )
 	{
 		if ( self::$user_cache == null ) return null;
 		{
 			return  @self::$user_cache[$puser_id] ;
-		} 
+		}
 	}
 
 	private static  function setPuserKuserFromCache ( $puser_id , $puser_kuser )
 	{
 		if ( self::$user_cache == null ) self::$user_cache = array();
-		self::$user_cache[$puser_id] = $puser_kuser; 
+		self::$user_cache[$puser_id] = $puser_kuser;
 	}
-	
+
 	public static function getPlaylistFilterListStruct ( $xml )
 	{
 		try
 		{
 			@$simple_xml = new SimpleXMLElement( $xml );
-//print_r ( $simple_xml );			
+//print_r ( $simple_xml );
 			$total_results_node = $simple_xml->xpath ( "total_results" );
 			$total_result = self::TOTAL_RESULTS;
 			if ( $total_results_node  )
-			{ 
+			{
 				if ( is_array ( $total_results_node ) )
 				{
 					if( count ( $total_results_node ) > 1 ) throw new Exception ( "Must not have more than 1 element of 'total_results'");
-//print_r ( $total_results_node)	;				
-					$total_result = $total_results_node[0]; 				
+//print_r ( $total_results_node)	;
+					$total_result = $total_results_node[0];
 				}
-			}	
+			}
 
-			// TODO - stick to the first option and change all the <filter> objects to be children of <filters>  
+			// TODO - stick to the first option and change all the <filter> objects to be children of <filters>
 			$list_of_filters = $total_results_node = $simple_xml->xpath ( "filters/filter" );
 			if ( ! $list_of_filters )
 				$list_of_filters = $total_results_node = $simple_xml->xpath ( "filter" );
@@ -690,107 +690,107 @@ class myPlaylistUtils
 		}
 		catch ( Exception $ex )
 		{
-			
-		}		
+
+		}
 	}
-	
+
 	public static function getEmbedCode ( entry $playlist , $wid , $ui_conf_id , $uid = null , $autoplay = null )
 	{
 		if ( $playlist == null ) return "";
-		
+
 		if ( ! $uid ) $uid = "0";
-		
+
 		$partner_id = $playlist->getPartnerId();
 		$subp_id  = $playlist->getSubpId();
 		$partner= PartnerPeer::retrieveByPK( $partner_id );
-		
+
 		$host = myPartnerUtils::getHost($partner_id);
-		
+
 		$playlist_flashvars = self::toPlaylistUrl ( $playlist , $host ) ;
-		
+
 		if ( $wid == null ) $wid = $partner->getDefaultWidgetId();
 		$widget = widgetPeer::retrieveByPK( $wid );
-		
-		// use the ui_conf from the widget only if it was not explicitly set 
-		if ( $ui_conf_id == null )	$ui_conf_id = $widget->getUiConfId(); 
+
+		// use the ui_conf from the widget only if it was not explicitly set
+		if ( $ui_conf_id == null )	$ui_conf_id = $widget->getUiConfId();
 		$ui_conf = uiConfPeer::retrieveByPK( $ui_conf_id );
-		
-		if ( ! $ui_conf ) 
+
+		if ( ! $ui_conf )
 		{
 			throw new kCoreException("Invalid uiconf id [$ui_conf_id] for widget [$wid]", APIErrors::INVALID_UI_CONF_ID);
 		}
-		
-//		$autoplay_str = $autoplay ? "autoPlay=true" : "autoPlay=false" ; 
+
+//		$autoplay_str = $autoplay ? "autoPlay=true" : "autoPlay=false" ;
 		$autoplay_str = "";
 $embed = <<< HTML
-<object height="{$ui_conf->getHeight()}" width="{$ui_conf->getWidth()}" type="application/x-shockwave-flash" data="{$host}/kwidget/wid/{$wid}/ui_conf_id/{$ui_conf_id}" id="kaltura_playlist" style="visibility: visible;">		
+<object height="{$ui_conf->getHeight()}" width="{$ui_conf->getWidth()}" type="application/x-shockwave-flash" data="{$host}/kwidget/wid/{$wid}/ui_conf_id/{$ui_conf_id}" id="kaltura_playlist" style="visibility: visible;">
 <param name="allowscriptaccess" value="always"/><param name="allownetworking" value="all"/><param name="bgcolor" value="#000000"/><param name="wmode" value="opaque"/><param name="allowfullscreen" value="true"/>
 <param name="movie" value="{$host}/kwidget/wid/{$wid}/ui_conf_id/{$ui_conf_id}"/>
 <param name="flashvars" value="layoutId=playlistLight&uid={$uid}&partner_id={$partner_id}&subp_id={$subp_id}&$playlist_flashvars"/></object>
 HTML;
-		return array ( $embed , $ui_conf->getWidth() ,  $ui_conf->getHeight() ); 		
+		return array ( $embed , $ui_conf->getWidth() ,  $ui_conf->getHeight() );
 	}
-	
+
 	public static function toPlaylistUrl ( entry $playlist , $host  , $uid = null )
 	{
 		$partner_id = $playlist->getPartnerId();
-		$subp_id  = $playlist->getSubpId();			
-		
-		if ( $playlist->getMediaType() == entry::ENTRY_MEDIA_TYPE_GENERIC_1 ) 
+		$subp_id  = $playlist->getSubpId();
+
+		if ( $playlist->getMediaType() == entry::ENTRY_MEDIA_TYPE_GENERIC_1 )
 		{
-			$playlist_url = urlencode ( $playlist->getDataContent() ); // when of type GENERIC === MRSS -> the data content is the url to point to 
+			$playlist_url = urlencode ( $playlist->getDataContent() ); // when of type GENERIC === MRSS -> the data content is the url to point to
 		}
 		else
 		{
 			$playlist_url = urlencode ( $host . "/index.php/partnerservices2/executeplaylist?" .
 				"uid={$uid}&partner_id={$partner_id}&subp_id={$subp_id}&format=8&" .   // make sure the format is 8 - mRss
-				"ks={ks}&" .   
-				self::toQueryString( $playlist , false ) ); 
+				"ks={ks}&" .
+				self::toQueryString( $playlist , false ) );
 		}
-		
+
 //		$str = "k_pl_autoContinue=true&k_pl_autoInsertMedia=true&k_pl_0_name=" . $playlist->getName() . "&k_pl_0_url=" . $playlist_url;
 		$str = "k_pl_0_name=" . $playlist->getName() . "&k_pl_0_url=" . $playlist_url;
 		return $str;
 	}
-	
+
 	public static function getExecutionUrl ( entry $playlist )
 	{
 		if ( ! $playlist ) return "";
 		if ( $playlist->getMediaType() == entry::ENTRY_MEDIA_TYPE_GENERIC_1 )
 		{
-			return $playlist->getDataContent(); 
+			return $playlist->getDataContent();
 		}
-		
+
 		$host = requestUtils::getRequestHost();
-		$playlist_url = 
+		$playlist_url =
 			$host . "/index.php/partnerservices2/executeplaylist?format=8&" .
 //				"uid={uid}&partner_id={partnerid}&subp_id={subpid}&" .   // make sure the format is 8 - mRss
-				"ks={ks}&" .   
-				self::toQueryString( $playlist , false ) ; 		
-		return 	$playlist_url;			
+				"ks={ks}&" .
+				self::toQueryString( $playlist , false ) ;
+		return 	$playlist_url;
 	}
-	
+
 	// for now - don't appen dht efilter to the url
 	public static function toQueryString ( entry $playlist ,$should_append_filter_to_url = false )
 	{
 		$query = "playlist_id={$playlist->getId()}";
-		
+
 		if ( $playlist->getMediaType() != entry::ENTRY_MEDIA_TYPE_XML )
 			return $query;
-			
+
 		if ( !$should_append_filter_to_url ) return $query;
-		 
+
 		$xml = $playlist->getDataContent();
 		list ( $total_results , $list_of_filters ) = self::getPlaylistFilterListStruct ( $xml );
-		
+
 		$entry_filters = array();
-		$partner_id = $playlist->getPartnerId(); 
-		
-		// add ks=_KS_ for the playlist to replace it before hitting the executePlaylist 
+		$partner_id = $playlist->getPartnerId();
+
+		// add ks=_KS_ for the playlist to replace it before hitting the executePlaylist
 		$query .= "&fp=f"; // make sure the filter prefix is short
-		
+
 		if ( ! $list_of_filters ) return $query;
-		
+
 		$i = 1; // the extra_filter is 1-based
 		foreach ( $list_of_filters as $entry_filter_xml )
 		{
@@ -798,18 +798,18 @@ HTML;
 			// 	in general this service can fetch entries from kaltura networks.
 			// for each filter we should decide if thie assumption is true...
 			$allow_partner_only = true;
-			
+
 			// compile all the filters - only then execute them if not yet reached the total_results
 			// TODO - optimize - maybe create them only when needed. - For now it's safer to compile all even if not needed.
 			$entry_filter = new entryFilter();
 			// add the desired prefix "_" because the XML is not expected to have it while the entryFilter class expects it
-			$entry_filter->fillObjectFromXml( $entry_filter_xml , "_" ); 
+			$entry_filter->fillObjectFromXml( $entry_filter_xml , "_" );
 			// make sure there is alway a limit for each filter - if not an explicit one - the system limit should be used
 			if( $entry_filter->getLimit() == null || $entry_filter->getLimit() < 1 )
 			{
 				$entry_filter->setLimit( self::TOTAL_RESULTS );
 			}
-			
+
 			$entry_filter->setPartnerSearchScope ( baseObjectFilter::MATCH_KALTURA_NETWORK_AND_PRIVATE );
 			self::updateEntryFilter( $entry_filter ,  $partner_id );
 
@@ -818,57 +818,131 @@ HTML;
 			foreach ( $fields as $field => $value )
 			{
 				if ( $value )
-				$query .= "&" . $prefix . $field . "=" . $value;				
+				$query .= "&" . $prefix . $field . "=" . $value;
 			}
-			$i++;	
+			$i++;
 		}
 		return $query;
 	}
-	
+
 	// will update the entry filter according to the partner_id, $use_filter_puser_id and some of the attributes in the entry_filter
 	private static function updateEntryFilter(entryFilter $entry_filter, $partner_id)
 	{
 		self::setUser ( $partner_id , $entry_filter );
-		
+
 		$display_in_search = $entry_filter->getDisplayInSearchEquel();
-	
+
 		// 2009-07-12, Liron: changed the detfault - prferer partner only unless explicitly defined $display_in_search=2;
 		$allow_partner_only = ( $display_in_search === null || $display_in_search < 2 );
-		if ( $allow_partner_only ) 
+		if ( $allow_partner_only )
 		{
 			$entry_filter->setPartnerIdEquel($partner_id);
 			$entry_filter->setPartnerSearchScope($partner_id);
-		}	
+		}
 		else
 		{
 			$entry_filter->setPartnerSearchScope(baseObjectFilter::MATCH_KALTURA_NETWORK_AND_PRIVATE);
 		}
 	}
-	
-	
+
+
 	private static function getIds ( $list )
 	{
 		$id_list  =array();
 		foreach ( $list as $elem )
 		{
-			$id_list[] = $elem->getId(); 
+			$id_list[] = $elem->getId();
 		}
-		
+
 		return $id_list;
 	}
-	
-	private static function addSchedulingToCriteria(Criteria $c)
+
+	//combine the scheduling filtering provided by the filter and enforce the entry to be in  the scheduling window
+	private static function addSchedulingToCriteria(Criteria $c, entryFilter $filter = null)
 	{
-		$startDateCriterion = $c->getNewCriterion(entryPeer::START_DATE, kApiCache::getTime(), Criteria::LESS_EQUAL);
-		$startDateCriterion->addOr($c->getNewCriterion(entryPeer::START_DATE, null));
-		
-		$endDateCriterion = $c->getNewCriterion(entryPeer::END_DATE, kApiCache::getTime(), Criteria::GREATER_EQUAL);
-		$endDateCriterion->addOr($c->getNewCriterion(entryPeer::END_DATE, null));
-		
+		$currentTime = kApiCache::getTime();
+		$startDateCriterion = null;
+
+		if(is_null($filter) || (!$filter->is_set('_lteornull_start_date') && !$filter->is_set('_gteornull_start_date') && !$filter->is_set('_lte_start_date') && !$filter->is_set('_gte_start_date')))
+		{
+			$startDateCriterion = $c->getNewCriterion(entryPeer::START_DATE, $currentTime, Criteria::LESS_EQUAL);
+			$startDateCriterion->addOr($c->getNewCriterion(entryPeer::START_DATE, null));
+		}
+		else {
+			if ($filter->is_set('_lteornull_start_date')) {
+				$minTime = $filter->get('_lteornull_start_date') <= $currentTime ? $filter->get('_lteornull_start_date') : $currentTime;
+				$startDateCriterion = $c->getNewCriterion(entryPeer::START_DATE, $minTime, Criteria::LESS_EQUAL);
+				$startDateCriterion->addOr($c->getNewCriterion(entryPeer::START_DATE, null));
+				$filter->unsetByName('_lteornull_start_date');
+			}
+
+			if ($filter->is_set('_gteornull_start_date')) {
+				$gteOrNullStartDate = $c->getNewCriterion(entryPeer::START_DATE, $currentTime, Criteria::LESS_EQUAL);
+				$gteOrNullStartDate->addAnd($c->getNewCriterion(entryPeer::START_DATE, $filter->get('_gteornull_start_date'), Criteria::GREATER_EQUAL));
+				$gteOrNullStartDate2 = $c->getNewCriterion(entryPeer::START_DATE, null);
+				$gteOrNullStartDate->addOr($gteOrNullStartDate2);
+				$startDateCriterion = is_null($startDateCriterion) ? $gteOrNullStartDate : $startDateCriterion->addAnd($gteOrNullStartDate);
+				$filter->unsetByName('_gteornull_start_date');
+			}
+
+			if ($filter->is_set('_lte_start_date')) {
+				$minTime = $filter->get('_lte_start_date') <= $currentTime ? $filter->get('_lte_start_date') : $currentTime;
+				$lteStartDate = $c->getNewCriterion(entryPeer::START_DATE, $minTime, Criteria::LESS_EQUAL);
+				$startDateCriterion = is_null($startDateCriterion) ? $lteStartDate : $startDateCriterion->addAnd($lteStartDate);
+				$filter->unsetByName('_lte_start_date');
+			}
+
+			if ($filter->is_set('_gte_start_date')) {
+				$gteStartDate = $c->getNewCriterion(entryPeer::START_DATE, $currentTime, Criteria::LESS_EQUAL);
+				$gteStartDate->addAnd($c->getNewCriterion(entryPeer::START_DATE, $filter->get('_gte_start_date'), Criteria::GREATER_EQUAL));
+				$startDateCriterion = is_null($startDateCriterion) ? $gteStartDate : $startDateCriterion->addAnd($gteStartDate);
+				$filter->unsetByName('_gte_start_date');
+			}
+		}
+
+		$endDateCriterion = null;
+
+		if(is_null($filter) || (!$filter->is_set('_lteornull_end_date') && !$filter->is_set('_gteornull_end_date') && !$filter->is_set('_lte_end_date') && !$filter->is_set('_gte_end_date'))) {
+			$endDateCriterion = $c->getNewCriterion(entryPeer::END_DATE, kApiCache::getTime(), Criteria::GREATER_EQUAL);
+			$endDateCriterion->addOr($c->getNewCriterion(entryPeer::END_DATE, null));
+		}
+		else{
+
+			if ($filter->is_set('_gteornull_end_date')) {
+				$maxTime = $filter->get('_gteornull_end_date') >= $currentTime ? $filter->get('_gteornull_end_date') : $currentTime;
+				$endDateCriterion = $c->getNewCriterion(entryPeer::END_DATE, $maxTime, Criteria::GREATER_EQUAL);
+				$endDateCriterion->addOr($c->getNewCriterion(entryPeer::END_DATE, null));
+				$filter->unsetByName('_gteornull_end_date');
+			}
+
+			if ($filter->is_set('_lteornull_end_date')) {
+				$lteOrNullEndDate = $c->getNewCriterion(entryPeer::END_DATE, $currentTime, Criteria::GREATER_EQUAL);
+				$lteOrNullEndDate->addAnd($c->getNewCriterion(entryPeer::END_DATE, $filter->get('_lteornull_end_date'), Criteria::LESS_EQUAL));
+				$lteOrNullEndDate2 = $c->getNewCriterion(entryPeer::END_DATE, null);
+				$lteOrNullEndDate->addOr($lteOrNullEndDate2);
+				$endDateCriterion = is_null($endDateCriterion) ? $lteOrNullEndDate : $endDateCriterion->addAnd($lteOrNullEndDate);
+				$filter->unsetByName('_lteornull_end_date');
+			}
+
+			if ($filter->is_set('_lte_end_date')) {
+				$lteEndDate = $c->getNewCriterion(entryPeer::END_DATE, $currentTime, Criteria::GREATER_EQUAL);
+				$lteEndDate->addAnd($c->getNewCriterion(entryPeer::END_DATE, $filter->get('_lte_end_date'), Criteria::LESS_EQUAL));
+				$endDateCriterion = is_null($endDateCriterion) ? $lteEndDate : $endDateCriterion->addAnd($lteEndDate);
+				$filter->unsetByName('_lte_end_date');
+			}
+
+			if ($filter->is_set('_gte_end_date')) {
+				$maxTime = $filter->get('_gte_end_date') >= $currentTime ? $filter->get('_gte_end_date') : $currentTime;
+				$gteEndDate = $c->getNewCriterion(entryPeer::END_DATE, $maxTime, Criteria::GREATER_EQUAL);
+				$endDateCriterion = is_null($endDateCriterion) ? $gteEndDate : $endDateCriterion->addAnd($gteEndDate);
+				$filter->unsetByName('_gte_end_date');
+			}
+		}
+
 		$c->addAnd($startDateCriterion);
 		$c->addAnd($endDateCriterion);
 	}
-	
+
 	private static function addModerationToCriteria(Criteria $c)
 	{
 		// add moderation status not pending moderation or rejected
