@@ -1,8 +1,7 @@
 <?php
 ini_set("memory_limit","1024M");
 
-chdir(__DIR__);
-require_once (__DIR__ . '/../../bootstrap.php');
+require_once(__DIR__ . "/../../../alpha/scripts/bootstrap.php");
 
 $permCrit = new Criteria();
 $permCrit->add(PermissionPeer::NAME, 'FEATURE_EDGE_SERVER');
