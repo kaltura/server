@@ -757,6 +757,13 @@ class BaseEntryService extends KalturaEntryService
 		}
 		
 		$result->isScheduledNow = $dbEntry->isScheduledNow($contextDataParams->time);
+		if (!($result->isScheduledNow) && $this->getKs() ){
+			// in case the sview is defined in the ks simulate schedule now true to allow player to pass verification
+			if ( $this->getKs()->verifyPrivileges(ks::PRIVILEGE_VIEW, ks::PRIVILEGE_WILDCARD) ||
+				$this->getKs()->verifyPrivileges(ks::PRIVILEGE_VIEW, $entryId)) {
+				$result->isScheduledNow = true;
+			}
+		}
 
         $result->pluginData = new KalturaPluginDataArray();
         $pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaEntryContextDataContributor');
