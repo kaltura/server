@@ -688,6 +688,19 @@ class kM3U8ManifestRenderer extends kMultiFlavorManifestRenderer
      * @var bool
      */    
     protected $hasAudioFlavors = false;
+
+    function __construct($flavors, $entryId = null, $baseUrl = '')
+    {
+		parent::__construct($flavors, $entryId, $baseUrl);
+        
+        // check if audio flavors exist
+		foreach($this->flavors as $flavor) {
+			if (isset($flavor['audioLanguage'])) {
+				$this->hasAudioFlavors = true;
+				break;
+			}
+		}
+    }
     
 	/**
 	 * @return array<string>
@@ -697,19 +710,6 @@ class kM3U8ManifestRenderer extends kMultiFlavorManifestRenderer
 		return array("Content-Type: application/x-mpegurl");
 	}
 
-	/**
-	 * @var bool
-	 */	
-	protected function hasAudioFlavors() {
-		foreach($this->flavors as $flavor) {
-			if (isset($flavor['audioLanguage'])) {
-				$this->hasAudioFlavors = true;
-				return true;
-			}
-		}
-		return false;
-	}
-	
 	/* (non-PHPdoc)
 	 * @see kManifestRenderer::getManifestFlavors()
 	 */
@@ -767,7 +767,7 @@ class kM3U8ManifestRenderer extends kMultiFlavorManifestRenderer
 	{
 		$header = "#EXTM3U";
 		// add version in case of audio flavors
-		if ($this->hasAudioFlavors()) {
+		if ($this->hasAudioFlavors) {
 			$header .= "\n#EXT-X-VERSION:5";
 		}
 		return $header;
