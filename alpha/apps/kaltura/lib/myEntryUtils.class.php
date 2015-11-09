@@ -1098,15 +1098,9 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 			   }
 		}
 
-		$bCopy = true;
-		if (is_null($cloneOptions))
-		{
-			$bCopy = false;
-		}
-		elseif ($cloneOptions->shouldCopyEntitlement != KalturaNullableBoolean::TRUE_VALUE)
-		{
-			$bCopy = false;
-		}
+		$shouldCopyCategory = false;
+		if (!is_null($cloneOptions)&& $cloneOptions->shouldCopyEntitlement == KalturaNullableBoolean::TRUE_VALUE)
+			$shouldCopyCategory = true;
 
  	    //if entry is a static playlist, link between it and its new child entries
 		if ($entry->getType() == entryType::PLAYLIST)
@@ -1130,10 +1124,10 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		            $toPlaylistXml = new SimpleXMLElement("<playlist/>");
 		            $toPlaylistXml->addChild("total_results", $totalResults);
 		            $toFiltersXml = $toPlaylistXml->addChild("filters");
-					if ($bCopy)
+					if ($shouldCopyCategory)
 					{
-						foreach ($fromFiltersList as $filterXML) {
-							$entryFilter = new entryFilter();
+                        foreach ($fromFiltersList as $filterXML) {
+                            $entryFilter = new entryFilter();
 							$entryFilter->fillObjectFromXml($filterXML, "_");
 							if (isset($entryFilter->fields["_matchand_categories_ids"])) {
 								$categoriesIds = explode(",", $entryFilter->fields["_matchand_categories_ids"]);
@@ -1226,7 +1220,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		foreach($sourceAssets as $sourceAsset)
 			$sourceAsset->copyToEntry($newEntry->getId(), $newEntry->getPartnerId());
 
-		if ($bCopy)
+		if ($shouldCopyCategory)
 		{
 			// copy relationships to categories
 			KalturaLog::debug('Copy relationships to categories from entry [' . $entry->getId() . '] to entry [' . $newEntry->getId() . ']');
