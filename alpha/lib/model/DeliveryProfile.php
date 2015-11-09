@@ -252,9 +252,6 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 	
 	protected function getAudioLanguage($flavor) 
 	{
-		$audioLanguage = null;
-		$audioLanguageName = null;
-		
 		$mediaInfoObj = mediaInfoPeer::retrieveByFlavorAssetId($flavor->getId());
 		if (!$mediaInfoObj) 
 			return null;
@@ -264,13 +261,10 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 			return null;
 		
 		$parsedJson = json_decode($contentStreams,true);
-		if (!isset($parsedJson)) 
+		if (!isset($parsedJson['audio'][0]['audioLanguage'])) 
 			return null;
 		
 		$audioLanguage = $parsedJson['audio'][0]['audioLanguage'];
-		if (!isset($audioLanguage)) 
-			return null;
-		
 		if (defined('LanguageKey::' . strtoupper($audioLanguage))) {
 			$audioLanguageName = constant('LanguageKey::' . strtoupper($audioLanguage));
 		}
@@ -305,8 +299,7 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 					$audioLanguageName = 'Undefined';
 				}
 				else {
-					$audioLanguage = $audioLanguageData[0];
-					$audioLanguageName = $audioLanguageData[1];
+					list($audioLanguage, $audioLanguageName) = $audioLanguageData;
 				}
 			}
 		}
