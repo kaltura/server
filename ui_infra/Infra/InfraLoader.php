@@ -11,7 +11,7 @@ require_once __DIR__ . '/../../infra/kEnvironment.php';
  */
 class Infra_InfraLoader implements Zend_Loader_Autoloader_Interface
 {
-	public function Infra_InfraLoader(Zend_Config $config = null)
+	public function __construct(Zend_Config $config = null)
 	{
 		$infaFolder = null;
 		$pluginsFolder = null;

@@ -15,7 +15,7 @@ class KalturaFrontController
 	private $disptacher = null;
 	private $serializer;
 	
-	private function KalturaFrontController()
+	private function __construct()
 	{
 		$this->dispatcher = KalturaDispatcher::getInstance();
 		

@@ -43,7 +43,7 @@ class Location {
      * @param  integer the column number
      * @access public
      */
-    function Location($fileName = null, $lineNumber = null, $columnNumber = null) {
+    function __construct($fileName = null, $lineNumber = null, $columnNumber = null) {
         $this->fileName = $fileName;
         $this->lineNumber = $lineNumber;
         $this->columnNumber = $columnNumber;
