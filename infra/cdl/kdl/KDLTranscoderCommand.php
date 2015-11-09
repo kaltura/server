@@ -103,7 +103,7 @@ class KDLTranscoderCommand {
 	private $_design;
 	private $_target;
 			
-	public function KDLTranscoderCommand(KDLFlavor $design, KDLFlavor $target)
+	public function __construct(KDLFlavor $design, KDLFlavor $target)
 	{
 		$this->_design = $design;
 		$this->_target = $target;

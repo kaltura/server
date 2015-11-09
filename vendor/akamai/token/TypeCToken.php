@@ -23,7 +23,7 @@ class TypeCToken extends StreamToken {
     /*
      * Ctor for token type.
      */
-    function TypeCToken($userPath,
+    function __construct($userPath,
                $userIP,
                $userProfile,
                $userPasswd,

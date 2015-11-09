@@ -23,7 +23,7 @@ class NIST_CBC {
 
     var $cipher;
 
-    function NIST_CBC() {
+    function __construct() {
     }
 
     function init($state, $key) {

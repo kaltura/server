@@ -250,6 +250,32 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 		return $renderer;
 	}
 	
+	protected function getAudioLanguage($flavor) 
+	{
+		$mediaInfoObj = mediaInfoPeer::retrieveByFlavorAssetId($flavor->getId());
+		if (!$mediaInfoObj) 
+			return null;
+		
+		$contentStreams = $mediaInfoObj->getContentStreams();
+		if (!isset($contentStreams)) 
+			return null;
+		
+		$parsedJson = json_decode($contentStreams,true);
+		if (!isset($parsedJson['audio'][0]['audioLanguage'])) 
+			return null;
+		
+		$audioLanguage = $parsedJson['audio'][0]['audioLanguage'];
+		if (defined('LanguageKey::' . strtoupper($audioLanguage))) {
+			$audioLanguageName = constant('LanguageKey::' . strtoupper($audioLanguage));
+		}
+		else {
+			$audioLanguageName = "Unknown ($audioLanguage)";
+			KalturaLog::info("Language code [$audioLanguage] was not found. Setting [$audioLanguageName] instead");	                    
+		}
+	    
+		return array($audioLanguage, $audioLanguageName);
+	}
+	
 	/**
 	 * @param string $url
 	 * @param string $urlPrefix
@@ -259,9 +285,23 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 	protected function getFlavorAssetInfo($url, $urlPrefix = '', $flavor = null)
 	{
 		$ext = null;
-		if ($flavor && is_callable(array($flavor, 'getFileExt')))
-		{
-			$ext = $flavor->getFileExt();
+		$audioLanguage = null;
+		$audioLanguageName = null;
+		if ($flavor) {
+			if (is_callable(array($flavor, 'getFileExt'))) {
+				$ext = $flavor->getFileExt();
+			}
+			//Extract the audio language code from flavor
+			if ($flavor->hasTag(assetParams::TAG_AUDIO_ONLY)) {
+				$audioLanguageData = $this->getAudioLanguage($flavor);
+				if (!$audioLanguageData) {
+					$audioLanguage = 'und';
+					$audioLanguageName = 'Undefined';
+				}
+				else {
+					list($audioLanguage, $audioLanguageName) = $audioLanguageData;
+				}
+			}
 		}
 		if (!$ext)
 		{
@@ -281,7 +321,9 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 				'ext' => $ext,
 				'bitrate' => $bitrate,
 				'width' => $width,
-				'height' => $height);
+				'height' => $height,
+				'audioLanguage' => $audioLanguage,
+				'audioLanguageName' => $audioLanguageName);
 	}
 	
 	public function getCacheInvalidationKeys()

@@ -9,7 +9,7 @@ class LiveReportAudienceEngine extends LiveReportEngine {
 	
 	protected $formatter;
 	
-	public function LiveReportAudienceEngine(LiveReportDateFormatter $formatter) {
+	public function __construct(LiveReportDateFormatter $formatter) {
 		$this->formatter = $formatter;
 	}
 	
