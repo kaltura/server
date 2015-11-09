@@ -1,4 +1,4 @@
-# Kajam-11.1.0 #
+# Kajam-11.2.0 #
 
 ## Capturespace update ##
 
@@ -12,6 +12,8 @@
                 /opt/kaltura/web/content/third_party/capturespace
         - Edit the plugins/collaajUpdatePlugin/collaajClientUpdate.ini file according to the scheme shown in it.
 
+
+# Kajam-11.1.0 #
 
 ## eCDN - create server_node machine hierarchy ##
 
