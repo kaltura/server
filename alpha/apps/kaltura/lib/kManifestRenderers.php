@@ -769,7 +769,7 @@ class kM3U8ManifestRenderer extends kMultiFlavorManifestRenderer
 		$header = "#EXTM3U";
 		// add version in case of audio flavors
 		if ($this->hasAudioFlavors) {
-			$header .= "\n#EXT-X-VERSION:5";
+			$header .= "\n#EXT-X-VERSION:4";
 		}
 		return $header;
 	}
