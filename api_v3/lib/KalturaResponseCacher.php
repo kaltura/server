@@ -88,6 +88,20 @@ class KalturaResponseCacher extends kApiCache
 		
 		foreach($this->_params as $key => $value)
 		{
+			if (is_numeric($key) && is_array($value) && array_key_exists('ks', $value))
+			{
+				$curKs = $value['ks'];
+				if (strpos($curKs, ':result') !== false)
+					continue;				// the ks is the result of some sub request
+				
+				if ($ks && $ks != $curKs)
+					return false;			// several different ks's in a multirequest - don't use cache
+				
+				$ks = $curKs;
+				unset($this->_params[$key]['ks']);
+				continue;
+			}
+			
 			if(!preg_match('/[\d]+:ks/', $key))
 				continue;				// not a ks
 
