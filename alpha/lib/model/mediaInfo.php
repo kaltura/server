@@ -1,5 +1,7 @@
 <?php
 
+require_once(KALTURA_ROOT_PATH . '/vendor/jsonUtils/jsonpath.php');
+
 /**
  * Subclass for representing a row from the 'media_info' table.
  *
@@ -23,4 +25,16 @@ class mediaInfo extends BasemediaInfo
 	
 	public function setContentStreams($v)	{$this->putInCustomData('ContentStreams', $v);}
 	public function getContentStreams()	{return $this->getFromCustomData('ContentStreams', null, null);}
+	
+	public function getAttributeFromContentStreams($expr) {
+	    $contentStreams = $this->getContentStreams();
+	    if (isset($contentStreams)) {
+	        $parsedJson = json_decode($contentStreams,true);
+	        if (isset($parsedJson)) {
+	           $result = jsonPath($parsedJson, $expr);
+	           return $result[0];
+	        }
+	    }
+	    return null;
+	}
 }
