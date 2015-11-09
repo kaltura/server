@@ -1,4 +1,4 @@
-<?php
+L<?php
 /**
  * Extends the 'kFileTransferMgr' class & implements a file transfer manager using the SFTP protocol.
  * For additional comments please look at the 'kFileTransferMgr' class.
@@ -533,7 +533,10 @@ class sftpMgr extends kFileTransferMgr
 		if($this->privKeyFile)
 			$cliCommand .= " -oIdentityFile={$this->privKeyFile}";
 		else
-			$cliCommand = "{$this->sshpassCmd} -p '{$this->password}' $cliCommand";
+		{
+		        $fixedPassword = str_replace("'","'\''",$this->password);
+			$cliCommand = "{$this->sshpassCmd} -p '$fixedPassword' $cliCommand";
+		}
 			
 		$cliCommand .= " {$this->username}@{$this->host}";
 		
