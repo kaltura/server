@@ -259,9 +259,34 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 	protected function getFlavorAssetInfo($url, $urlPrefix = '', $flavor = null)
 	{
 		$ext = null;
-		if ($flavor && is_callable(array($flavor, 'getFileExt')))
-		{
-			$ext = $flavor->getFileExt();
+		$audioLanguage = null;
+		$audioLanguageName = null;
+		if ($flavor) {
+			if (is_callable(array($flavor, 'getFileExt'))) {
+				$ext = $flavor->getFileExt();
+			}
+			//Extract the audio language code from flavor
+		    if ($flavor->hasTag(assetParams::TAG_AUDIO_ONLY)) {
+				$mediaInfoObj = mediaInfoPeer::retrieveByFlavorAssetId($flavor->getId());
+				$contentStreams = $mediaInfoObj->getContentStreams();
+				if (isset($contentStreams)) {
+					$parsedJson = json_decode($contentStreams,true);
+					if (isset($parsedJson)) {
+						$audioLanguage = $parsedJson['audio'][0]['audioLanguage'];
+						if (!defined('LanguageKey::' . strtoupper($audioLanguage))) {
+							$audioLanguageName = "Unknown ($audioLanguage)";
+							KalturaLog::info("Language code [$audioLanguage] was not found. Setting [$audioLanguageName] instead");
+						}
+						else {
+							$audioLanguageName = constant('LanguageKey::' . strtoupper($audioLanguage));
+						}
+					}
+					else {
+						$audioLanguage = 'und';
+						$audioLanguageName = 'Undefined';
+					}
+				}
+			}
 		}
 		if (!$ext)
 		{
@@ -281,7 +306,9 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 				'ext' => $ext,
 				'bitrate' => $bitrate,
 				'width' => $width,
-				'height' => $height);
+				'height' => $height,
+				'audioLanguage' => $audioLanguage,
+				'audioLanguageName' => $audioLanguageName);
 	}
 	
 	public function getCacheInvalidationKeys()
