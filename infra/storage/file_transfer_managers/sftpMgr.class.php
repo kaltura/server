@@ -1,4 +1,4 @@
-L<?php
+<?php
 /**
  * Extends the 'kFileTransferMgr' class & implements a file transfer manager using the SFTP protocol.
  * For additional comments please look at the 'kFileTransferMgr' class.
