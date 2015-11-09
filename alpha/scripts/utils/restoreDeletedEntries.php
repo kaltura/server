@@ -58,9 +58,15 @@ foreach ($entries as $deletedEntry)
 		{
 			if ($assetfileSync->getStatus () == FileSync::FILE_SYNC_STATUS_DELETED) 
 			{
-				$assetfileSync->setStatus ( FileSync::FILE_SYNC_STATUS_READY );
+			    $file_full_path=$assetfileSync->getFullPath();
+			    if (file_exists($file_full_path)){
+				    echo('LOG: Changing status of file_sync '. $assetfileSync->getId().' to: '. FileSync::FILE_SYNC_STATUS_READY.".\n");
+				    $assetfileSync->setStatus (FileSync::FILE_SYNC_STATUS_READY);
+				    $assetfileSync->save ();
+			    }else{
+				    echo "LOG: will not revive file sync as $file_full_path does not exist on disk.\n";
+			    }
 			}
-			$assetfileSync->save ();
 		}
 		
 		//restore asset's convert-log's file syncs.
@@ -70,9 +76,14 @@ foreach ($entries as $deletedEntry)
 		{
 			if ($assetConvertLogfileSync->getStatus () == FileSync::FILE_SYNC_STATUS_DELETED) 
 			{
-				$assetConvertLogfileSync->setStatus ( FileSync::FILE_SYNC_STATUS_READY );
+			    $file_full_path=$assetConvertLogfileSync->getFullPath();
+			    if (file_exists($file_full_path)){
+				    $assetConvertLogfileSync->setStatus (FileSync::FILE_SYNC_STATUS_READY);
+				    $assetConvertLogfileSync->save ();
+			    }else{
+				    echo "LOG: will not revive file sync as $file_full_path does not exist on disk.\n";
+			    }
 			}
-			$assetConvertLogfileSync->save ();
 		}
 		
 		
