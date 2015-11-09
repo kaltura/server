@@ -857,92 +857,87 @@ HTML;
 		return $id_list;
 	}
 
-	//combine the scheduling filtering provided by the filter and enforce the entry to be in  the scheduling window
+	private static function addSchedulingCriterion(Criteria $c, $field, $min, $max, $allowNull)
+	{
+		$criterion = null;
+		if($min){
+			$criterion = $c->getNewCriterion($field, $min, Criteria::GREATER_EQUAL);
+		}
+
+		if($max){
+			if($criterion){
+				$criterion->addAnd($c->getNewCriterion($field, $max, Criteria::LESS_EQUAL));
+			}
+			else {
+				$criterion = $c->getNewCriterion($field, $max, Criteria::LESS_EQUAL);
+			}
+		}
+
+		if($allowNull){
+			$criterion->addOr($c->getNewCriterion($field, null));
+		}
+
+		$c->addAnd($criterion);
+	}
+
 	private static function addSchedulingToCriteria(Criteria $c, entryFilter $filter = null)
 	{
-		$currentTime = kApiCache::getTime();
-		$startDateCriterion = null;
-
-		if(is_null($filter) || (!$filter->is_set('_lteornull_start_date') && !$filter->is_set('_gteornull_start_date') && !$filter->is_set('_lte_start_date') && !$filter->is_set('_gte_start_date')))
+		$min = 0;
+		$max = kApiCache::getTime();
+		$allowNull = true;
+		if($filter)
 		{
-			$startDateCriterion = $c->getNewCriterion(entryPeer::START_DATE, $currentTime, Criteria::LESS_EQUAL);
-			$startDateCriterion->addOr($c->getNewCriterion(entryPeer::START_DATE, null));
-		}
-		else {
 			if ($filter->is_set('_lteornull_start_date')) {
-				$minTime = $filter->get('_lteornull_start_date') <= $currentTime ? $filter->get('_lteornull_start_date') : $currentTime;
-				$startDateCriterion = $c->getNewCriterion(entryPeer::START_DATE, $minTime, Criteria::LESS_EQUAL);
-				$startDateCriterion->addOr($c->getNewCriterion(entryPeer::START_DATE, null));
+				$max = min($max, $filter->get('_lteornull_start_date'));
 				$filter->unsetByName('_lteornull_start_date');
 			}
-
 			if ($filter->is_set('_gteornull_start_date')) {
-				$gteOrNullStartDate = $c->getNewCriterion(entryPeer::START_DATE, $currentTime, Criteria::LESS_EQUAL);
-				$gteOrNullStartDate->addAnd($c->getNewCriterion(entryPeer::START_DATE, $filter->get('_gteornull_start_date'), Criteria::GREATER_EQUAL));
-				$gteOrNullStartDate2 = $c->getNewCriterion(entryPeer::START_DATE, null);
-				$gteOrNullStartDate->addOr($gteOrNullStartDate2);
-				$startDateCriterion = is_null($startDateCriterion) ? $gteOrNullStartDate : $startDateCriterion->addAnd($gteOrNullStartDate);
+				$min = max($min, $filter->get('_gteornull_start_date'));
 				$filter->unsetByName('_gteornull_start_date');
 			}
-
 			if ($filter->is_set('_lte_start_date')) {
-				$minTime = $filter->get('_lte_start_date') <= $currentTime ? $filter->get('_lte_start_date') : $currentTime;
-				$lteStartDate = $c->getNewCriterion(entryPeer::START_DATE, $minTime, Criteria::LESS_EQUAL);
-				$startDateCriterion = is_null($startDateCriterion) ? $lteStartDate : $startDateCriterion->addAnd($lteStartDate);
+				$max = min($max, $filter->get('_lte_start_date'));
+				$allowNull = false;
 				$filter->unsetByName('_lte_start_date');
 			}
-
 			if ($filter->is_set('_gte_start_date')) {
-				$gteStartDate = $c->getNewCriterion(entryPeer::START_DATE, $currentTime, Criteria::LESS_EQUAL);
-				$gteStartDate->addAnd($c->getNewCriterion(entryPeer::START_DATE, $filter->get('_gte_start_date'), Criteria::GREATER_EQUAL));
-				$startDateCriterion = is_null($startDateCriterion) ? $gteStartDate : $startDateCriterion->addAnd($gteStartDate);
+				$min = max($min, $filter->get('_gte_start_date'));
+				$allowNull = false;
 				$filter->unsetByName('_gte_start_date');
 			}
 		}
+		self::addSchedulingCriterion($c, entryPeer::START_DATE, $min, $max, $allowNull);
 
-		$endDateCriterion = null;
 
-		if(is_null($filter) || (!$filter->is_set('_lteornull_end_date') && !$filter->is_set('_gteornull_end_date') && !$filter->is_set('_lte_end_date') && !$filter->is_set('_gte_end_date'))) {
-			$endDateCriterion = $c->getNewCriterion(entryPeer::END_DATE, kApiCache::getTime(), Criteria::GREATER_EQUAL);
-			$endDateCriterion->addOr($c->getNewCriterion(entryPeer::END_DATE, null));
-		}
-		else{
-
-			if ($filter->is_set('_gteornull_end_date')) {
-				$maxTime = $filter->get('_gteornull_end_date') >= $currentTime ? $filter->get('_gteornull_end_date') : $currentTime;
-				$endDateCriterion = $c->getNewCriterion(entryPeer::END_DATE, $maxTime, Criteria::GREATER_EQUAL);
-				$endDateCriterion->addOr($c->getNewCriterion(entryPeer::END_DATE, null));
-				$filter->unsetByName('_gteornull_end_date');
-			}
-
+		$min = kApiCache::getTime();
+		$max = 0;
+		$allowNull = true;
+		if($filter)
+		{
 			if ($filter->is_set('_lteornull_end_date')) {
-				$lteOrNullEndDate = $c->getNewCriterion(entryPeer::END_DATE, $currentTime, Criteria::GREATER_EQUAL);
-				$lteOrNullEndDate->addAnd($c->getNewCriterion(entryPeer::END_DATE, $filter->get('_lteornull_end_date'), Criteria::LESS_EQUAL));
-				$lteOrNullEndDate2 = $c->getNewCriterion(entryPeer::END_DATE, null);
-				$lteOrNullEndDate->addOr($lteOrNullEndDate2);
-				$endDateCriterion = is_null($endDateCriterion) ? $lteOrNullEndDate : $endDateCriterion->addAnd($lteOrNullEndDate);
+				$max = min($max, $filter->get('_lteornull_end_date'));
 				$filter->unsetByName('_lteornull_end_date');
 			}
-
+			if ($filter->is_set('_gteornull_end_date')) {
+				$min = max($min, $filter->get('_gteornull_end_date'));
+				$filter->unsetByName('_gteornull_end_date');
+			}
 			if ($filter->is_set('_lte_end_date')) {
-				$lteEndDate = $c->getNewCriterion(entryPeer::END_DATE, $currentTime, Criteria::GREATER_EQUAL);
-				$lteEndDate->addAnd($c->getNewCriterion(entryPeer::END_DATE, $filter->get('_lte_end_date'), Criteria::LESS_EQUAL));
-				$endDateCriterion = is_null($endDateCriterion) ? $lteEndDate : $endDateCriterion->addAnd($lteEndDate);
+				$max = min($max, $filter->get('_lte_end_date'));
+				$allowNull = false;
 				$filter->unsetByName('_lte_end_date');
 			}
-
 			if ($filter->is_set('_gte_end_date')) {
-				$maxTime = $filter->get('_gte_end_date') >= $currentTime ? $filter->get('_gte_end_date') : $currentTime;
-				$gteEndDate = $c->getNewCriterion(entryPeer::END_DATE, $maxTime, Criteria::GREATER_EQUAL);
-				$endDateCriterion = is_null($endDateCriterion) ? $gteEndDate : $endDateCriterion->addAnd($gteEndDate);
+				$min = max($min, $filter->get('_gte_end_date'));
+				$allowNull = false;
 				$filter->unsetByName('_gte_end_date');
 			}
 		}
-
-		$c->addAnd($startDateCriterion);
-		$c->addAnd($endDateCriterion);
+		self::addSchedulingCriterion($c, entryPeer::END_DATE, $min, $max, $allowNull);
 	}
-	
+
+
+
 	private static function addModerationToCriteria(Criteria $c)
 	{
 		// add moderation status not pending moderation or rejected
