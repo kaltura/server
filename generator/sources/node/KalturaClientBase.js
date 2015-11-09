@@ -121,7 +121,7 @@ function addIfNotNull(obj, params, paramName, paramValue)
  * @param obj	The object who's members to serialize.
  * @return		a serialized object.
  */
-module.exports.toParams = toParams = function(obj)
+var toParams = module.exports.toParams = function(obj)
 {
 	var params = {};
 	params["objectType"] = getClass(obj);
