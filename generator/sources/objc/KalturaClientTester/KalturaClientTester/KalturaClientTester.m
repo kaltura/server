@@ -462,7 +462,7 @@
         NULL, 
         (CFStringRef)@"!*'();:@&=+$,/?%#[] \"\\<>{}|^~`", 
         kCFStringEncodingUTF8);
-    NSString* expectedPrefix = [NSString stringWithFormat:@"%@/api_v3/index.php?kalsig=", self->_client.config.serviceUrl];
+    NSString* expectedPrefix = [NSString stringWithFormat:@"%@/api_v3?kalsig=", self->_client.config.serviceUrl];
     NSString* expectedPostfix = [NSString stringWithFormat:@"&version=5&service=data&partnerId=%d&ks=%@&ignoreNull=1&format=2&forceProxy=1&entryId=12345&clientTag=%@&apiVersion=%@&action=serve&", PARTNER_ID, encodedKs, encodedClientTag, self->_client.apiVersion];
     [encodedKs release];
     [encodedClientTag release];
@@ -644,7 +644,7 @@
     
     // verify
     NSString* result = [client queueServeService:@"test" withAction:@"testAct"];
-    NSString* expectedResult = [NSString stringWithFormat:@"%@/api_v3/index.php?kalsig=b2e9bd151b7edf43c2e210e45ffb15fd&string=strVal&service=test&partnerId=56789&object%%3AobjectType=KalturaMediaEntry&object%%3Aname=abcd&ks=abcdef&int=1234&ignoreNull=1&format=2&emptyString__null=&emptyObject__null=&emptyInt__null=&emptyFloat__null=&emptyBool__null=&emptyArray%%3A-=&clientTag=testTag&bool=0&array%%3A0%%3Avalue=dummy&array%%3A0%%3AobjectType=KalturaString&apiVersion=9.8.7&action=testAct&", DEFAULT_SERVICE_URL];
+    NSString* expectedResult = [NSString stringWithFormat:@"%@/api_v3?kalsig=b2e9bd151b7edf43c2e210e45ffb15fd&string=strVal&service=test&partnerId=56789&object%%3AobjectType=KalturaMediaEntry&object%%3Aname=abcd&ks=abcdef&int=1234&ignoreNull=1&format=2&emptyString__null=&emptyObject__null=&emptyInt__null=&emptyFloat__null=&emptyBool__null=&emptyArray%%3A-=&clientTag=testTag&bool=0&array%%3A0%%3Avalue=dummy&array%%3A0%%3AobjectType=KalturaString&apiVersion=9.8.7&action=testAct&", DEFAULT_SERVICE_URL];
     assert([result compare:expectedResult] == NSOrderedSame);
     
     // cleanup

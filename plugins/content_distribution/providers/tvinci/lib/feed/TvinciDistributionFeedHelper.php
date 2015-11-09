@@ -84,7 +84,7 @@ class TvinciDistributionFeedHelper
 		if($this->distributionProfile->widevineMbrPpvModule)
 			$arguments["widevineMbrPpvModule"] = $this->distributionProfile->widevineMbrPpvModule;
 		if($this->distributionProfile->widevineMbrFileName)
-			$arguments["widevineMbrFileName"] = $this->distributionProfile->widevineMbrFileName;
+			$arguments["widevineMbrTypeName"] = $this->distributionProfile->widevineMbrFileName;
 		return $arguments;
 	}
 

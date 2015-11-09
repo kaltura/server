@@ -1,0 +1,31 @@
+{
+  "name": "kaltura",
+  "version": "3.2.0",
+  "description": "Kaltura NodeJS clientlibs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kaltura/KalturaGeneratedAPIClientsNodeJS"
+  },
+  "keywords": [
+    "Kaltura",
+    "API",
+    "clientlibs"
+  ],
+  "author": "Kaltura Community <community@kaltura.com>",
+  "license": "AGPLv3",
+  "bugs": {
+    "url": "https://github.com/kaltura/server/issues"
+  },  
+  "dependencies": {
+    "crypto": "*",
+    "http": "*",
+    "path": "*",
+    "url": "*",
+    "fs": "*",
+    "utils": "*"
+  }
+}

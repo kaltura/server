@@ -34,24 +34,12 @@ class kAccessControlServeRemoteEdgeServerAction extends kRuleAction
 	public function applyDeliveryProfileDynamicAttributes(DeliveryProfileDynamicAttributes $deliveryAttributes)
 	{
 		$edgeServerIds = explode(',', $this->getEdgeServerIds());
-		$deliveryAttributes->setEdgeServerIds($edgeServerIds);
-	
-		//Check if there are any edge server that override the delivery profiles
-		$edgeServers = EdgeServerPeer::retrieveByPKs($edgeServerIds);
+		
+		$edgeServers = ServerNodePeer::retrieveByPKs($edgeServerIds);
 		if(!count($edgeServers))
 			return false;
-	
-		$edgeDeliveryProfilesIds = array();
-		foreach ($edgeServers as $edgeServer)
-		{
-			if(!$edgeServer->getDeliveryProfileIds())
-				continue;
-			$edgeDeliveryProfilesIds = array_merge($edgeDeliveryProfilesIds, explode(",", $edgeServer->getDeliveryProfileIds()));
-		}
-	
-		if(count($edgeDeliveryProfilesIds))
-			$deliveryAttributes->setDeliveryProfileIds($edgeDeliveryProfilesIds, false);
 		
+		$deliveryAttributes->setEdgeServerIds($edgeServerIds);
 		return true;
 	}
 }

@@ -16,9 +16,9 @@ class XmlClientGenerator extends ClientGeneratorFromPhp
      */
     private $_requiredPlugins = array();
     
-    public function XmlClientGenerator()
+    public function __construct()
     {
-        parent::ClientGeneratorFromPhp();
+        parent::__construct();
         $this->_doc = new DOMDocument();
         $this->_doc->formatOutput = true; 
     }

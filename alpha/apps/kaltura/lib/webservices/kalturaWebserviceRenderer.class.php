@@ -23,7 +23,7 @@ class kalturaWebserviceRenderer
 	
 	private $my_cache;
 	private $cached_content = null;
-	public function kalturaWebserviceRenderer ( $container_action )
+	public function __construct ( $container_action )
 	{
 		$this->container_action = $container_action;
 	}

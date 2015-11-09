@@ -140,11 +140,17 @@ class KSecureEntryHelper
 	public function validateForPlay($performApiAccessCheck = true)
 	{
 	    if ($this->contexts != array(ContextType::THUMBNAIL))
-	    {
-		    $this->validateModeration();
-			$this->validateScheduling();
-	    }
-		$this->validateAccessControl($performApiAccessCheck);
+        {
+            if ( ! ($this->ks &&
+                   ($this->isKsAdmin() ||
+                    $this->ks->verifyPrivileges(ks::PRIVILEGE_VIEW, ks::PRIVILEGE_WILDCARD) ||
+                    $this->ks->verifyPrivileges(ks::PRIVILEGE_VIEW, $this->entry->getId()) ))){
+                $this->validateModeration();
+                $this->validateScheduling();
+            }
+        }
+
+        $this->validateAccessControl($performApiAccessCheck);
 	}
 	
 	public function validateForDownload()

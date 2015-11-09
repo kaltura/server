@@ -322,36 +322,21 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 
 
 	/**
-	 * @param entry $dbEntry
-	 * @return bool if current user is admin / entyr owner / co-editor
-	 */
-	public static function validateUserEntitledForQuizEdit( entry $dbEntry )
-	{
-		if ( kCurrentContext::$is_admin_session || kCurrentContext::getCurrentKsKuserId() == $dbEntry->getKuserId())
-			return true;
-
-		$entitledKusers = QuizPlugin::getObjectIdsAsArray($dbEntry->getEntitledKusersEdit());
-		if(in_array(kCurrentContext::getCurrentKsKuserId(), $entitledKusers))
-		{
-			return true;
-		}
-
-		return false;
-	}
-
-
-	/**
 	 * @param string $partner_id
 	 * @param QuizReportType $report_type
 	 * @param QuizReportType $report_flavor
 	 * @param string $objectIds
 	 * @param $inputFilter
+	 * @param $page_size
+	 * @param $page_index
 	 * @param null $orderBy
 	 * @return array|null
 	 * @throws kCoreException
-     */
-	public function getReportResult($partner_id, $report_type, $report_flavor, $objectIds, $inputFilter, $orderBy = null)
+	 */
+	public function getReportResult($partner_id, $report_type, $report_flavor, $objectIds, $inputFilter,
+									$page_size , $page_index, $orderBy = null)
 	{
+		$ans = array();
 		if (!in_array(str_replace(self::getPluginName().".", "", $report_type), QuizReportType::getAdditionalValues()))
 		{
 			return null;
@@ -363,20 +348,22 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 			case myReportsMgr::REPORT_FLAVOR_TABLE:
 				if ($report_type == (self::getPluginName() . "." . QuizReportType::QUIZ))
 				{
-					return $this->getQuestionPercentageTableReport($objectIds, $orderBy);
+					$ans = $this->getQuestionPercentageTableReport($objectIds, $orderBy);
 				}
 				else if ($report_type == (self::getPluginName() . "." . QuizReportType::QUIZ_USER_PERCENTAGE))
 				{
-					return $this->getUserPercentageTable($objectIds, $orderBy);
+					$ans = $this->getUserPercentageTable($objectIds, $orderBy);
 				}
 				else if ($report_type == (self::getPluginName() . "." . QuizReportType::QUIZ_AGGREGATE_BY_QUESTION))
 				{
-					return $this->getQuizQuestionPercentageTableReport($objectIds, $orderBy);
+					$ans = $this->getQuizQuestionPercentageTableReport($objectIds, $orderBy);
 				}
 				else if ($report_type == (self::getPluginName() . "." . QuizReportType::QUIZ_USER_AGGREGATE_BY_QUESTION))
 				{
-					return $this->getUserPrecentageByUserAndEntryTable($objectIds, $inputFilter, $orderBy);
+					$ans = $this->getUserPrecentageByUserAndEntryTable($objectIds, $inputFilter, $orderBy);
 				}
+				return $this->pagerResults($ans, $page_size , $page_index);
+
 			case myReportsMgr::REPORT_FLAVOR_COUNT:
 				if ($report_type == (self::getPluginName() . "." . QuizReportType::QUIZ))
 				{
@@ -397,6 +384,34 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 			default:
 				return null;
 		}
+	}
+
+	/**
+	 * The method returns only part of the results according to the $page_size and $page_index parameters
+	 * $ans - array of all the answers
+	 * $page_size - The number of entries that should be displyed on the screen
+	 * $page_index - The index pf the first entry that will be displayed on the screen
+	 * @param $ans
+	 * @param $page_size
+	 * @param $page_index
+	 * @return array
+	 */
+	protected function pagerResults(array $ans, $page_size , $page_index)
+	{
+		KalturaLog::debug("QUIZ Report::: page_size [$page_size] page_index [$page_index] array size [" .count($ans)."]");
+		$res = array();
+		if ($page_index ==0)
+			$page_index = 1;
+
+		if ($page_index * $page_size > count($ans))
+		{
+			return $ans;
+		}
+
+		$indexInArray = ($page_index -1) * $page_size;
+		$res = array_slice($ans, $indexInArray, $page_size, false );
+		KalturaLog::debug("QUIZ Report::: The number of arguments in the response is [" .count($res)."]");
+		return $res;
 	}
 
 	/**
@@ -424,6 +439,7 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 
 		$quizzes = UserEntryPeer::doSelect($c);
 		$numOfQuizzesFound = count($quizzes);
+		KalturaLog::debug("Found $numOfQuizzesFound quizzes that were submitted");
 		if ($numOfQuizzesFound)
 		{
 			$sumOfScores = 0;
@@ -460,7 +476,7 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 	
 	protected function getQuizQuestionPercentageTableReport($objectIds, $orderBy)
 	{
-		$questionIds = QuizPlugin::getObjectIdsAsArray($objectIds);
+		$questionIds = baseObjectUtils::getObjectIdsAsArray($objectIds);
 		$questionsCriteria = new Criteria();
 		$questionsCriteria->add(CuePointPeer::ID, $questionIds, Criteria::IN);
 		$questionsCriteria->add(CuePointPeer::TYPE, QuizPlugin::getCoreValue('CuePointType',QuizCuePointType::QUIZ_QUESTION));
@@ -520,7 +536,7 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 
 	protected function getQuestionCountByQusetionIds($objectIds)
 	{
-		$questionIds = QuizPlugin::getObjectIdsAsArray($objectIds);
+		$questionIds = baseObjectUtils::getObjectIdsAsArray($objectIds);
 		$c = new Criteria();
 		$c->add(CuePointPeer::ID, $questionIds, Criteria::IN);
 		$numOfquestions = CuePointPeer::doCount($c);
@@ -601,7 +617,7 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 		if ( $noEntryIds && $noUserIds){
 			return array();
 		}
-		$userIds = $this->getUserIdsFromFilter($inputFilter);
+
 		$c = new Criteria();
 		$c->add(CuePointPeer::TYPE, QuizPlugin::getCoreValue('CuePointType',QuizCuePointType::QUIZ_ANSWER));
 		if (!$noUserIds){
@@ -623,7 +639,7 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 				}
 			}
 			if ($hasAnonymous) { 
-				$c->add(CuePointPeer::KUSER_ID, $anonKuserIds, Criteria::NOT_IN);
+				$c->addAnd(CuePointPeer::KUSER_ID, $anonKuserIds, Criteria::NOT_IN);
 			}
 		}
 		$answers = CuePointPeer::doSelect($c);
@@ -801,7 +817,7 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 	protected function createGetCuePointByUserIdsCriteria($objectIds, $c)
 	{
 		$c->add(CuePointPeer::TYPE, QuizPlugin::getCoreValue('CuePointType', QuizCuePointType::QUIZ_ANSWER));
-		$userIds = QuizPlugin::getObjectIdsAsArray($objectIds);
+		$userIds = baseObjectUtils::getObjectIdsAsArray($objectIds);
 		$kuserIds = array();
 		foreach ($userIds as $userId)
 		{
@@ -841,11 +857,6 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 		    $anonKuserIds[] = $anonKuser->getKuserId();
 		}
 		return $anonKuserIds;
-	}
-
-	private static function getObjectIdsAsArray($objectIds)
-	{
-		return explode(',', str_replace(' ','', $objectIds));
 	}
 
 	/* (non-PHPdoc)

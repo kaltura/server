@@ -25,7 +25,7 @@ class kConversionClientBase extends myBatchBase
 	protected $conv_cmd;
 
 
-	public function kConversionClientBase ( $script_name ,  $in_path , $server_cmd_path , $server_res_path , $commercial_server_cmd_path = null , $mode = 3 )
+	public function __construct ( $script_name ,  $in_path , $server_cmd_path , $server_res_path , $commercial_server_cmd_path = null , $mode = 3 )
 	{
 		$this->script_name = $script_name;
 		if ( $script_name )	$this->register( $script_name , $in_path , $server_res_path , $mode );

@@ -15,7 +15,7 @@ class myCustomData
 	/**
 	 * @param string $str
 	 */
-	private function  myCustomData ( $str )
+	private function  __construct ( $str )
 	{
 		if ( empty ( $str ) )
 			$this->data = array();

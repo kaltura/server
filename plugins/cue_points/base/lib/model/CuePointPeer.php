@@ -175,7 +175,7 @@ class CuePointPeer extends BaseCuePointPeer implements IMetadataPeer, IRelatedOb
 	 */
 	public static function retrieveBySystemName($entryId, $systemName, PropelPDO $con = null)
 	{
-		$criteria = new Criteria();
+		$criteria = KalturaCriteria::create(CuePointPeer::OM_CLASS);
 		$criteria->add(CuePointPeer::ENTRY_ID, $entryId);
 		$criteria->add(CuePointPeer::SYSTEM_NAME, $systemName);
 

@@ -88,7 +88,7 @@ class kConfigTable
 		return $ct;
 	}
 	
-	protected function kConfigTable ( $file_name , $ignore_non_existing_columns = false )
+	protected function __construct ( $file_name , $ignore_non_existing_columns = false )
 	{
 		$this->id = $file_name;
 		

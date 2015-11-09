@@ -7,7 +7,7 @@ class KalturaXmlSerializer extends KalturaSerializer
 {
 	private $_ignoreNull = false;
 	
-	function KalturaXmlSerializer($ignoreNull)
+	function __construct($ignoreNull)
 	{
 		$this->_ignoreNull = (bool)$ignoreNull;
 	}

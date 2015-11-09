@@ -521,4 +521,22 @@ class kEntitlementUtils
 		if ($enableCategoryModeration)
 			self::$categoryModeration = true;
 	}
+
+	/**
+	 * @param entry $dbEntry
+	 * @return bool if current user is admin / entry's owner / co-editor
+	 */
+	public static function isEntitledForEditEntry( entry $dbEntry )
+	{
+		if ( kCurrentContext::$is_admin_session || kCurrentContext::getCurrentKsKuserId() == $dbEntry->getKuserId())
+			return true;
+
+		$entitledKusers = baseObjectUtils::getObjectIdsAsArray($dbEntry->getEntitledKusersEdit());
+		if(in_array(kCurrentContext::getCurrentKsKuserId(), $entitledKusers))
+		{
+			return true;
+		}
+
+		return false;
+	}
 }

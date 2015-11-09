@@ -1,3 +1,72 @@
+# Kajam-11.1.0 #
+
+## eCDN - create server_node machine hierarchy ##
+
+ - Issue Type: New Feature
+ - Issue ID: PLAT-3634 
+
+### Deployment scripts (note the order of the scripts is important run them as listed ) ###
+	 - php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+
+	 - php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2015_09_08_server_node_service.php
+	 
+	 - php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2015_09_16_media_server_server_node.php
+
+	 - mysql -h@db_host@ -u@db_user@ -p@db_pass@ -P3306 kaltura < /opt/kaltura/app/deployment/updates/sql/2015_09_08_alter_edge_server_table.sql
+
+	 - mysql -h@db_host@ -u@db_user@ -p@db_pass@ -P3306 kaltura < /opt/kaltura/app/deployment/updates/sql/2015_09_08_rename_edge_server_table.sql
+	 
+	 - php /opt/kaltura/app/deployment/updates/scripts/2015_09_21_migrateMediaServerTableToServerNodeTable.php
+	 
+	 - php /opt/kaltura/app/deployment/updates/scripts/2015_10_29_migrate_edge_server_permissions.php
+	 
+#### Configuration ####
+
+	- Add new module to the admin-console in admin.ini:
+		moduls.ServerNode.enabled = true
+		moduls.ServerNode.permissionType = 2
+		moduls.ServerNode.label = "Enable Server-Node"
+		moduls.ServerNode.permissionName = FEATURE_SERVER_NODE
+		moduls.ServerNode.basePermissionType =
+		moduls.ServerNode.basePermissionName =
+		moduls.ServerNode.group = GROUP_ENABLE_DISABLE_FEATURES
+
+	- remove the following from admin.ini:
+		moduls.EdgeServer.enabled = true
+		moduls.EdgeServer.permissionType = 2
+		moduls.EdgeServer.label = "Edge server usage"
+		moduls.EdgeServer.permissionName = FEATURE_EDGE_SERVER
+		moduls.EdgeServer.basePermissionType =
+		moduls.EdgeServer.basePermissionName =
+		moduls.EdgeServer.group = GROUP_ENABLE_DISABLE_FEATURES
+
+	- Add the following to media_servers.ini:
+		port-hls = SAME_AS_THE_PORT_VALUE
+		port-https-hls = SAME_AS_THE_HTTPS_VALUE
+		domain-hls = SAME_AS_THE_DOMAIN_VALUE
+
+	- Edited Wowza Server.xml:
+		- property: "KalturaServerManagers"
+		  Remove the value "com.kaltura.media.server.wowza.StatusManager"
+
+#### Known Issues & Limitations ####
+
+None.
+
+## Add new action 'getUrl' and update the 'servePdf' Action
+ - Issue Type: New Feature
+ - Issue ID: PLAT-3975
+
+#### Configuration ####
+
+- Run the following permission script:
+	php deployment\updates\scripts\add_permissions\2015_09_17_update_quiz_permissions.php
+
+#### Known Issues & Limitations ####
+
+None.
+
+
 # Kajam-11.0.0 #
 
 ## New scheduled task profile ##

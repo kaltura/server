@@ -7,9 +7,9 @@ class KalturaParamInfo extends KalturaPropertyInfo
 {
 	private $_optional = false;
 	 
-	public function KalturaParamInfo($type, $name, $optional = false)
+	public function __construct ($type, $name, $optional = false)
 	{
-		parent::KalturaPropertyInfo($type, $name);
+		parent::__construct($type, $name);
 		$this->_optional = $optional;
 	}
 

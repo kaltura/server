@@ -46,7 +46,7 @@ abstract class ClientGeneratorFromPhp
 		return $this->_includeList;
 	}
 
-	public function ClientGeneratorFromPhp($sourcePath = null)
+	public function __construct($sourcePath = null)
 	{
 		$this->_sourcePath = realpath($sourcePath);
 		
@@ -617,10 +617,12 @@ abstract class ClientGeneratorFromPhp
 					
 				if ($action == "*")
 				{
+	//				KalturaLog::debug("Excluding service [$service]");
 					unset($includeList[$service]);
 				}
 				else
 				{
+	//				KalturaLog::debug("Excluding action [$service.$action]");
 					unset($includeList[$service][$action]);
 				}
 			}
