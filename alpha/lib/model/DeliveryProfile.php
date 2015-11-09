@@ -250,6 +250,38 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 		return $renderer;
 	}
 	
+	protected function getAudioLanguage($flavor) 
+	{
+		$audioLanguage = null;
+		$audioLanguageName = null;
+		
+		$mediaInfoObj = mediaInfoPeer::retrieveByFlavorAssetId($flavor->getId());
+		if (!$mediaInfoObj) 
+			return null;
+		
+		$contentStreams = $mediaInfoObj->getContentStreams();
+		if (!isset($contentStreams)) 
+			return null;
+		
+		$parsedJson = json_decode($contentStreams,true);
+		if (!isset($parsedJson)) 
+			return null;
+		
+		$audioLanguage = $parsedJson['audio'][0]['audioLanguage'];
+		if (!isset($audioLanguage)) 
+			return null;
+		
+		if (defined('LanguageKey::' . strtoupper($audioLanguage))) {
+			$audioLanguageName = constant('LanguageKey::' . strtoupper($audioLanguage));
+		}
+		else {
+			$audioLanguageName = "Unknown ($audioLanguage)";
+			KalturaLog::info("Language code [$audioLanguage] was not found. Setting [$audioLanguageName] instead");	                    
+		}
+	    
+		return array($audioLanguage, $audioLanguageName);
+	}
+	
 	/**
 	 * @param string $url
 	 * @param string $urlPrefix
@@ -266,25 +298,15 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 				$ext = $flavor->getFileExt();
 			}
 			//Extract the audio language code from flavor
-		    if ($flavor->hasTag(assetParams::TAG_AUDIO_ONLY)) {
-				$mediaInfoObj = mediaInfoPeer::retrieveByFlavorAssetId($flavor->getId());
-				$contentStreams = $mediaInfoObj->getContentStreams();
-				if (isset($contentStreams)) {
-					$parsedJson = json_decode($contentStreams,true);
-					if (isset($parsedJson)) {
-						$audioLanguage = $parsedJson['audio'][0]['audioLanguage'];
-						if (!defined('LanguageKey::' . strtoupper($audioLanguage))) {
-							$audioLanguageName = "Unknown ($audioLanguage)";
-							KalturaLog::info("Language code [$audioLanguage] was not found. Setting [$audioLanguageName] instead");
-						}
-						else {
-							$audioLanguageName = constant('LanguageKey::' . strtoupper($audioLanguage));
-						}
-					}
-					else {
-						$audioLanguage = 'und';
-						$audioLanguageName = 'Undefined';
-					}
+			if ($flavor->hasTag(assetParams::TAG_AUDIO_ONLY)) {
+				$audioLanguageData = $this->getAudioLanguage($flavor);
+				if (!$audioLanguageData) {
+					$audioLanguage = 'und';
+					$audioLanguageName = 'Undefined';
+				}
+				else {
+					$audioLanguage = $audioLanguageData[0];
+					$audioLanguageName = $audioLanguageData[1];
 				}
 			}
 		}
