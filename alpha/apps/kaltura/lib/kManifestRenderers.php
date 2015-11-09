@@ -715,6 +715,7 @@ class kM3U8ManifestRenderer extends kMultiFlavorManifestRenderer
 	 */
 	protected function getManifestFlavors()
 	{
+	    $audioFlavorsArr = array(); 
 		$audio = null;
 		if ($this->hasAudioFlavors) {
 			$audio = ",AUDIO=\"audio\"";
