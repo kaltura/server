@@ -749,7 +749,7 @@ class kM3U8ManifestRenderer extends kMultiFlavorManifestRenderer
 						$resolution = ",RESOLUTION={$width}x{$height}";
 				}
 					
-				$content = "#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH={$bitrate}{$resolution}{$codecs}\n";
+				$content = "#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH={$bitrate}{$resolution}{$codecs}{$audio}\n";
 				$content .= $flavor['url'];
 				$flavorsArr[] = $content;
 			}
