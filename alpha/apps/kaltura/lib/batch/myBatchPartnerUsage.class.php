@@ -7,7 +7,7 @@ class myBatchPartnerUsage extends myBatchBase
 {
 	const SLEEP_TIME = 1;
 	
-	public function myBatchPartnerUsage($partnerId = null, $partnerPackage = 1)
+	public function __construct($partnerId = null, $partnerPackage = 1)
 	{
 		self::initDb();
 		$partners_exists = true;

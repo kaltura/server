@@ -58,7 +58,7 @@ class TGettext_PO extends TGettext
      * @return  object      File_Gettext_PO
      * @param   string      path to GNU PO file
      */
-    function TGettext_PO($file = '')
+    function __construct($file = '')
     {
         $this->file = $file;
     }

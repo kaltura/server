@@ -8,7 +8,7 @@ class LiveReportEntryEngine extends LiveReportEngine {
 	protected $formatter;
 	protected $printResult;
 	
-	public function LiveReportEntryEngine($field, $title = null, LiveReportFormatter $formatter = null, $printResult = false) {
+	public function __construct($field, $title = null, LiveReportFormatter $formatter = null, $printResult = false) {
 		$this->fieldName = $field;
 		$this->title = $title;
 		$this->formatter = $formatter;

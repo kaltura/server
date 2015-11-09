@@ -23,7 +23,7 @@ class RijndaelConstants {
     var $U3;
     var $U4;
 
-    function RijndaelConstants() {
+    function __construct() {
         $this->shifts = array(
             array( array(0,0) ,array(1,3) ,array(2,2) ,array(3,1) ),
             array( array(0,0) ,array(1,5) ,array(2,4) ,array(3,3) ),

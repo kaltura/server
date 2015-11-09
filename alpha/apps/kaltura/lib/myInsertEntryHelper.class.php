@@ -12,7 +12,7 @@ class myInsertEntryHelper
 	
 	private $partner_id = null;
 	
-	public function myInsertEntryHelper($action, $kuser_id, $kshow_id, $paramsArray = null)
+	public function __construct($action, $kuser_id, $kshow_id, $paramsArray = null)
 	{
 		$this->paramsArray = $paramsArray;
 		$this->action = $action;

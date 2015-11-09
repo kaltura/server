@@ -8,7 +8,7 @@ var $I;
 var $U;
 var $HREF;
 
-function PDF($orientation='P', $unit='mm', $size='A4')
+function __construct($orientation='P', $unit='mm', $size='A4')
 {
 	// Call parent constructor
 	$this->FPDF($orientation,$unit,$size);

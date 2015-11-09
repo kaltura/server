@@ -65,7 +65,7 @@ class BatchJobFilter extends baseObjectFilter
 	
 	protected $queryFromBatchJob;
 	
-	public function BatchJobFilter($queryFromBatchJob) {
+	public function __construct($queryFromBatchJob) {
 		$this->queryFromBatchJob = $queryFromBatchJob; 
 		parent::__construct();
 	}
