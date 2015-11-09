@@ -30,13 +30,13 @@ class QuizUserEntryService extends KalturaBaseService{
 		 * @var QuizUserEntry $dbUserEntry
 		 */
 		$score = $dbUserEntry->calculateScore();
-    $dbUserEntry->setScore($score);
-    KalturaLog::debug("Quiz score is [" .$score."]");
+		$dbUserEntry->setScore($score);
+		KalturaLog::debug("Quiz score is [" .$score."]");
     
 		$dbUserEntry->setStatus(QuizPlugin::getCoreValue('UserEntryStatus', QuizUserEntryStatus::QUIZ_SUBMITTED));
  		$userEntry = new KalturaQuizUserEntry();
 		$userEntry->fromObject($dbUserEntry, $this->getResponseProfile());
-    $entryId = $dbUserEntry->getEntryId();
+		$entryId = $dbUserEntry->getEntryId();
 		$entry = entryPeer::retrieveByPK($entryId);
 		if(!$entry)
 			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $entryId);
@@ -48,7 +48,7 @@ class QuizUserEntryService extends KalturaBaseService{
 		if (!$kQuiz->getShowGradeAfterSubmission() || !$this->getKuser()->getIsAdmin())
 				$userEntry->score = null;
 	  
-    $dbUserEntry->save();
+		$dbUserEntry->save();
 
 		return $userEntry;
 	}
