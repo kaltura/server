@@ -55,7 +55,7 @@ class CollaajUpdateService extends KalturaBaseService
         $t = $collaajini->getVersion();
         if ($t) {
             $fileName = array_pop(explode('/', $filePath));    // Extracting only the file name
-            $actualFilePath = "/tmp/updates/".$fileName; // TODO: replace the path to be taken from a conf file
+            $actualFilePath = "../../../../web/content/third_party/capturespace/".$fileName; // TODO: replace the path to be taken from a conf file
             if (is_readable($actualFilePath)) {
                 $fileName = array_pop(explode('/', $filePath));    // Extracting only the file name
                 $mimeType = kFile::mimeType($actualFilePath);
@@ -83,7 +83,7 @@ class CollaajUpdateService extends KalturaBaseService
         if ($filtered_results) {
             $filePath = $filtered_results["download_url"];  // url contains the full file name
             $fileName = array_pop(explode('/', $filePath));    // Extracting only the file name
-            $actualFilePath = "/tmp/updates/".$fileName; // TODO: replace the path to be taken from a conf file
+            $actualFilePath = "../../../../web/content/third_party/capturespace/".$fileName; // TODO: replace the path to be taken from a conf file
             if (is_readable($actualFilePath)) {
                 $mimeType = kFile::mimeType($actualFilePath);
                 header("Content-Disposition: attachment; filename=\"$fileName\"");
