@@ -715,7 +715,7 @@ class kM3U8ManifestRenderer extends kMultiFlavorManifestRenderer
 	 */
 	protected function getManifestFlavors()
 	{
-	    $audioFlavorsArr = array(); 
+		$audioFlavorsArr = array(); 
 		$audio = null;
 		if ($this->hasAudioFlavors) {
 			$audio = ",AUDIO=\"audio\"";
@@ -725,8 +725,8 @@ class kM3U8ManifestRenderer extends kMultiFlavorManifestRenderer
 		foreach($this->flavors as $flavor)
 		{
 			// Sperate audio flavors from video flavors
-			$language = $flavor['audioLanguage'];
-			if (isset($language)) {
+			if (isset($flavor['audioLanguage'])) {
+				$language = $flavor['audioLanguage'];
 				$languageName = $flavor['audioLanguageName'];
 				$content = "#EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID=\"audio\",LANGUAGE=\"{$language}\",NAME=\"{$languageName}\",URI=\"{$flavor['url']}\"";
 				$audioFlavorsArr[] = $content;
