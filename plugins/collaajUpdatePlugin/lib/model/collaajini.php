@@ -18,7 +18,6 @@ class collaajini
         "md5" => "",
     );
 
-    // Constructor
     public function __construct() {
         $this->collaaj_data = new collaajInstallData(self::INI_FILE_NAME);
     }
