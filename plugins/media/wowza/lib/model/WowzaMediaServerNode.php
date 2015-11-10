@@ -67,12 +67,7 @@ class WowzaMediaServerNode extends MediaServerNode {
 		
 		$appPrefix = $this->getApplicationPrefix($mediaServerGlobalConfig);
 		
-		$playbackHost = $domain;
-		if($port !== 80 && $port !== 443)
-			$playbackHost . ":$port";
-		$playbackHost .= "/$appPrefix";
-			
-		return $playbackHost;
+		return "$domain:$port/$appPrefix";
 	}
 	
 	/**
