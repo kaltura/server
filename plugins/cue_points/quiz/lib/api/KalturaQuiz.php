@@ -45,11 +45,6 @@ class KalturaQuiz extends KalturaObject
 	public $allowDownload;
 
 
-	/**
-	 * @var KalturaNullableBoolean
-	 */
-	public $showGradeAfterSubmission;
-
 	private static $mapBetweenObjects = array
 	(
 		"version",
@@ -59,7 +54,6 @@ class KalturaQuiz extends KalturaObject
 		"allowAnswerUpdate",
 		"showCorrectAfterSubmission",
 		"allowDownload",
-		"showGradeAfterSubmission",
 	);
 
 	/* (non-PHPdoc)
