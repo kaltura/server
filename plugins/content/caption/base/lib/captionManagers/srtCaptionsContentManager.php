@@ -10,8 +10,13 @@ class srtCaptionsContentManager extends kCaptionsContentManager
 	 */
 	public function parse($content)
 	{
+		if (kString::beginsWith($content, "\xff\xfe"))
+		{
+			$content = iconv('utf-16', 'utf-8', substr($content, 2));
+		}
+		
 		$matches = null;
-		$regex = '/(?P<index>\d+)\r?\n\s*(?P<startHours>\d{1,2}):(?P<startMinutes>\d{1,2}):(?P<startSeconds>\d{1,2})[,\.](?P<startMilliseconds>\d{1,3})\s*-->\s*(?P<endHours>\d{1,2}):(?P<endMinutes>\d{1,2}):(?P<endSeconds>\d{1,2})[,\.](?P<endMilliseconds>\d{1,3})\s*\r?\n((?P<content>.+)\r?(\n|$))?\s*\r?(\n|$)/sU';
+		$regex = '/(?P<index>\d+)\s*\r?\n\s*(?P<startHours>\d{1,2}):(?P<startMinutes>\d{1,2}):(?P<startSeconds>\d{1,2})[,\.](?P<startMilliseconds>\d{1,3})\s*-->\s*(?P<endHours>\d{1,2}):(?P<endMinutes>\d{1,2}):(?P<endSeconds>\d{1,2})[,\.](?P<endMilliseconds>\d{1,3})\s*\r?\n((?P<content>.+)\r?(\n|$))?\s*\r?(\n|$)/sU';
 		if(!preg_match_all($regex, $content, $matches) || !count($matches) || !count($matches[0]))
 		{
 			KalturaLog::err("Content regex not found");
