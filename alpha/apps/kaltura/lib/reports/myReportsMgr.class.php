@@ -50,6 +50,12 @@ class myReportsMgr
 	const COUNT_PLAYS_HEADER = "count_plays";
 	const UNIQUE_USERS = "unique_known_users";
 	const UNIQUE_VIDEOS = "unique_videos";
+	
+	const OBJECT_IDS_PLACE_HOLDER = "{OBJ_ID_CLAUSE}";
+	const APPLICATION_NAME_PLACE_HOLDER = "{APPLICATION_NAME}";
+	const PUSERS_PLACE_HOLDER = "{PUSER_ID}";
+	const UNKNOWN_PUSER_ID_CLAUSE = "'0'";
+	const UNKNOWN_NAME_CLAUSE = "'Unknown'";
 
 	static $unique_total_reports = array (self::REPORT_TYPE_USER_ENGAGEMENT,
 										self::REPORT_TYPE_SPEFICIC_USER_ENGAGEMENT, 
@@ -62,6 +68,10 @@ class myReportsMgr
 										self::REPORT_TYPE_BROWSERS,
 										self::REPORT_TYPE_TOP_CONTENT,
 										self::REPORT_TYPE_TOP_PLAYBACK_CONTEXT);
+										
+	static $escaped_params = array(self::OBJECT_IDS_PLACE_HOLDER,
+								   self::APPLICATION_NAME_PLACE_HOLDER,
+								   self::PUSERS_PLACE_HOLDER);
 										
 										
 	
@@ -722,6 +732,17 @@ class myReportsMgr
 							
 					$category_ids_clause = "ev.context_id in ( $categoryIds )";
 				}
+				
+				if ($input_filter->application) {
+					$input_filter->extra_map[self::APPLICATION_NAME_PLACE_HOLDER] = "'" . mysqli_real_escape_string($link, $input_filter->application) . "'";
+				} 
+				if ($input_filter->userIds != null) {
+					$escapedobjectIds = self::explodeAndEscape($input_filter->userIds, $link);
+					$puserIds = "('" . implode("','", $escapedobjectIds) . "')";
+					// replace puser_id '0' with 'Unknown' as it saved on dwh pusers table
+					$puserIds = str_replace(self::UNKNOWN_PUSER_ID_CLAUSE, self::UNKNOWN_NAME_CLAUSE, $puserIds);
+					$input_filter->extra_map[self::PUSERS_PLACE_HOLDER] = $puserIds;
+				}
 			}
 			
 			if ($input_filter->categories) 
@@ -761,10 +782,8 @@ class myReportsMgr
 			
 			if($object_ids)
 			{
-				//the object ids are not supposed to include single quotes - if they do have them - remove them
-				$object_ids = str_replace ( "'" , '' , $object_ids ) ; 
-				// quote all the objects with SINGLE-QUOTES			
-				$object_ids_str = "'" . str_replace ( "," , "','" , $object_ids ) . "'";
+				$escapedobjectIds = self::explodeAndEscape($object_ids, $link);
+				$object_ids_str = "'" . implode("','" , $escapedobjectIds) . "'";
 				
 				if ( $report_type == self::REPORT_TYPE_CONTENT_CONTRIBUTIONS )
 				{
@@ -792,8 +811,7 @@ class myReportsMgr
 				}
 				else
 				{
-					$objectIds = explode(',', $object_ids);
-					$entryIds = "'" . implode("','", array_merge($objectIds, $entryIdsFromDB)) . "'";
+					$entryIds = "'" . implode("','", array_merge($escapedobjectIds, $entryIdsFromDB)) . "'";
 					$obj_ids_clause = "ev.entry_id in ( $entryIds )";
 				}
 			}
@@ -1241,6 +1259,12 @@ class myReportsMgr
 			}
 		}
 		
+		foreach ($values as $key => &$value) {
+			if (!in_array($names[$key], self::$escaped_params))
+				$value = mysqli_real_escape_string($link, $value);
+		}
+
+		
 		$replaced_sql = str_replace ( $names , $values , $sql_content );	
 
 		date_default_timezone_set($origTimeZone);
@@ -1400,6 +1424,17 @@ class myReportsMgr
 		
 		return $link;
 	}	
+	
+	private static function explodeAndEscape($ids, $link) {
+		$escapedobjectIds = array();
+		$objectIds = explode(',', $ids);
+		foreach ($objectIds as $objectId) {
+			$escapedobjectId = trim($objectId, "'");
+			$escapedobjectId = mysqli_real_escape_string($link, $escapedobjectId);
+			$escapedobjectIds[] = $escapedobjectId;
+		}
+		return $escapedobjectIds;
+	}
 
 }
 
