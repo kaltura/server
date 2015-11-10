@@ -2,7 +2,6 @@
 
 class iniReader
 {
-    // private members  ///////////////////////////////////////////////////////////////////////////////////////
     const INI_STRUCTURE = "download_url,md5";
 
     private $file_name = "";
@@ -18,7 +17,6 @@ class iniReader
         } else throw new Exception ("Could not read " . $this->$filename_input);
     }
 
-    // Functions //////////////////////////////////////////////////////////////////////////////////////////
     private function readIniFile() {
         if ($this->file_name != '') {
             return parse_ini_file($this->file_name, TRUE);
@@ -42,8 +40,6 @@ class iniReader
     }
 
 
-
-    // Setters & getters	///////////////////////////////////////////////////////////////////////////////////////
     public function getFfile_name () {
         return $this->file_name;
     }
@@ -51,6 +47,4 @@ class iniReader
     public function getIni_content() {
         return $this->ini_content;
     }
-
-
 }
