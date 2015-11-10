@@ -1,24 +1,12 @@
 <?php
 
-// TODO: remove when done
-//require_once ("/opt/kaltura/app/plugins/collaajUpdatePlugin/lib/model/iniReader.php");
 // This class handles all the data queries relevant for colaaj and the ini file
 class collaajInstallData
 {
-
-//returnFilteredByOs - done as returnFilteredByExtension
-//returnNewerVersion - not needed
-//getLatestVersionData - done
-//returnVersionUpdateInfo - done
-
-
-    // private members  ///////////////////////////////////////////////////////////////////////////////////////
     private $ini_handle = "";  // handle to the ini object
     private $ini_content = "";
     private $ini_sorted_versions_array = array ();
 
-    // Constructor
-//    public function __construct($ini_file_name, $current_version, $needed_extension ){
     public function __construct($ini_file_name){
         if ($ini_file_name) {
             $this->ini_handle = new iniReader($ini_file_name);
@@ -27,7 +15,6 @@ class collaajInstallData
         } else throw new Exception ("ini file name was not provided");
     }
 
-    // functions /////////////////////////////////////////////////////////////////////////////////////////////
 
     public function getLatestVersionData ($needed_extension) {
         $ini_filtered_by_extension = $this->returnFilteredByExtension($needed_extension);
@@ -65,8 +52,6 @@ class collaajInstallData
 
 //    Returns an array containing only the requested extension, version is key
     public function returnFilteredByExtension($needed_ext) {
-//		print "returnFilteredByOs: $needed_os\n";
-//        print_r ($this->ini_content);
         $temp_array = array();
         foreach ($this->ini_content as $key => $value) {
             if (in_array($needed_ext, array_keys($this->ini_content[$key]))) {
@@ -89,7 +74,6 @@ class collaajInstallData
         }
     }
 
-    // Setters & getters	///////////////////////////////////////////////////////////////////////////////////////
     public function getIni_sorted_versions_array(){
         return $this->ini_sorted_versions_array;
     }
