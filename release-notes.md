@@ -1,18 +1,3 @@
-# Kajam-11.2.0 #
-
-## Capturespace update ##
-
-- Issue Type: New Feature
-- Issue ID: PLAT-3434
-
-### Deployment scripts ###
-
-        - php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
-        - Place the update files received from Collaaj in the following path:
-                /opt/kaltura/web/content/third_party/capturespace
-        - Edit the plugins/collaajUpdatePlugin/collaajClientUpdate.ini file according to the scheme shown in it.
-
-
 # Kajam-11.1.0 #
 
 ## eCDN - create server_node machine hierarchy ##
