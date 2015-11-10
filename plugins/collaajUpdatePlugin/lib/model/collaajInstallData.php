@@ -37,15 +37,15 @@ class collaajInstallData
                 if ( in_array( $needed_extension,  $version_content_keys ))  {
                     return  ($version_content[$needed_extension]);
                 } else {
-                    print "NOT FOUND $needed_extension\n"; // TODO: remove this line when done
+                    KalturaLog::notice ("NOT FOUND $needed_extension\n");
                     return 1;
                 }
             } else {
-                print "Version $current_version does not contain this version $current_version\n";
+                KalturaLog::notice ("Version $current_version does not contain this version $current_version\n");
                 return 1;
             }
         } else {
-            print "Key $current_version not found in ini file\n";
+            KalturaLog::notice ("Key $current_version not found in ini file\n");
             return 1;
         }
     }

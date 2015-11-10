@@ -25,22 +25,19 @@ class collaajini
     public function returnLatestVersionUrl($given_os, $current_version) {
         $actual_extension = $this->identifyNeededExtension($given_os, "install");
         $ini_returned_data = $this->collaaj_data->getLatestVersionData($actual_extension);
-        print_r ($ini_returned_data);
         if ($ini_returned_data) {
             foreach ($ini_returned_data as $key => $value) {
                 $this->returned_data[$key] = $value;
             }
             // Appending the current file name to the to future url
             $this->returned_data["url"] = $this->prepareDownloadUrl($given_os,$current_version, "serveinstall",self::DOWNLOAD_URL_TEMPLATE.$this->returned_data[self::DOWNLOAD_URL]);
-            print $this->returned_data[self::DOWNLOAD_URL];
             return $this->returned_data[self::DOWNLOAD_URL];
-        } else throw new Exception ("No install version found for $given_os");
+        } else throw new KalturaAPIException ("No install version found for $given_os");
     }
 
     public function returnUpdateFileUrl($given_os, $current_version) {
         $actual_extension = $this->identifyNeededExtension($given_os, "update");
         $returned_data = $this->collaaj_data->returnVersionUpdateInfo($actual_extension, $current_version);
-        print_r ($returned_data);
         if ($returned_data != 1) {
             foreach ($returned_data as $key => $value) {
                 $this->returned_data[$key] = $value;
@@ -48,7 +45,7 @@ class collaajini
             $this->returned_data["url"] = $this->prepareDownloadUrl($given_os,$current_version, "serveupdate",self::DOWNLOAD_URL_TEMPLATE.$this->returned_data[self::DOWNLOAD_URL]);
             return $this->returned_data;
 
-        } else throw new Exception ("There is no update for $current_version");
+        } else throw new KalturaAPIException ("There is no update for $current_version");
     }
 
     public function prepareDownloadUrl($needed_os, $current_version, $action, $original_url) {
@@ -71,9 +68,9 @@ class collaajini
             }
             if (in_array($given_os, $os_types) ) {
                 return $os_types[array_search($given_os, $os_types)];
-            } else throw new Exception ("OS not supported / wrong is provided: '". $given_os."");
+            } else throw new KalturaAPIException ("OS not supported / wrong is provided: '". $given_os."");
         }
-        else throw new Exception ("No OS was provided");
+        else throw new KalturaAPIException ("No OS was provided");
     }
 
     //  Returns the needed extension in order to identify the file to be fetched. Note that it assumes that all checks regarding values were done before
