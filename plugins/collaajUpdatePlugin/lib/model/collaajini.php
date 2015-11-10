@@ -19,7 +19,8 @@ class collaajini
     );
 
     public function __construct() {
-        $this->collaaj_data = new collaajInstallData(self::INI_FILE_NAME);
+        $relative_ini_path = dirname(__FILE__) .'/'.self::INI_FILE_NAME;
+        $this->collaaj_data = new collaajInstallData($relative_ini_path);
     }
 
     public function returnLatestVersionUrl($given_os, $current_version) {
