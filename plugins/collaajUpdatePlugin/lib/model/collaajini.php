@@ -1,16 +1,14 @@
 <?php
 
-//require_once ("/opt/kaltura/app/plugins/collaajUpdatePlugin/lib/model/collaajInstallData.php");
 class collaajini
 {
-    const INI_FILE_NAME = "/opt/kaltura/app/plugins/collaajUpdatePlugin/collaajClientUpdate.ini";
+    const INI_FILE_NAME = "../../collaajClientUpdate.ini";
     const AVAILABLE_OS_TYPES = "Mac OS X,Windows";
     const UPDATE_KEY = "version";
     const DOWNLOAD_URL = "download_url";
     const MD5 = "md5";
     const DOWNLOAD_URL_TEMPLATE = "http://<HOSTNAME>/api_v3/index.php/service/collaajupdate_collaajupdate/action/<ACTION>/os/<OS>/version/<VERSION>/filename/";
 
-    // private members  ///////////////////////////////////////////////////////////////////////////////////////
     private $collaaj_data = "";
 
     private $returned_data = array(
@@ -25,7 +23,6 @@ class collaajini
         $this->collaaj_data = new collaajInstallData(self::INI_FILE_NAME);
     }
 
-    // Functions //////////////////////////////////////////////////////////////////////////////////////////
     public function returnLatestVersionUrl($given_os, $current_version) {
         $actual_extension = $this->identifyNeededExtension($given_os, "install");
         $ini_returned_data = $this->collaaj_data->getLatestVersionData($actual_extension);
@@ -54,8 +51,6 @@ class collaajini
 
         } else throw new Exception ("There is no update for $current_version");
     }
-
-
 
     public function prepareDownloadUrl($needed_os, $current_version, $action, $original_url) {
         $returned_url = $original_url;
@@ -92,7 +87,6 @@ class collaajini
         return $extension_mapping[$action][$actual_os];
     }
 
-    // Setters & getters	///////////////////////////////////////////////////////////////////////////////////////
     public function returnReturned_data () {
         return $this->returned_data;
     }
