@@ -875,8 +875,13 @@ class BaseEntryService extends KalturaEntryService
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 		}
 
-		// Copy the entry into a new one based on the given partner data. 
-		$clonedEntry = myEntryUtils::copyEntry( $coreEntry, $this->getPartner() );
+		if ($coreEntry->getStatus()!= entryStatus::READY)
+		{
+			throw new KalturaAPIException(KalturaErrors::ENTRY_NOT_READY, $entryId);
+		}
+
+		// Copy the entry into a new one based on the given partner data.
+		$clonedEntry = myEntryUtils::copyEntry($coreEntry, $this->getPartner());
 
 		return $this->getEntry($clonedEntry->getId());
 	}
