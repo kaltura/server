@@ -603,7 +603,7 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 				$cuePointCreationTime = $liveCuePoint->getCreatedAt(NULL)*1000;
 				$offsetForTS = $recordedSegmentsInfo->getOffsetForTimestamp($cuePointCreationTime);
 
-				$copyMsg = "cuepoint [{$liveCuePoint->getId()}] from live entry [{$liveEntry->getId()}] to VOD entry [{$vodEntry->getId()}]";
+				$copyMsg = "cuepoint [{$liveCuePoint->getId()}] from live entry [{$liveEntry->getId()}] to VOD entry [{$vodEntry->getId()}] cuePointCreationTime= $cuePointCreationTime offsetForTS= $offsetForTS";
 				KalturaLog::debug("Preparing to copy $copyMsg");
 
 				if ( ! is_null( $offsetForTS ) )
