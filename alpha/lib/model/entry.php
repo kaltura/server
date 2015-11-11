@@ -1917,25 +1917,26 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	
 	public function getEntitledKusersEdit()
 	{
-		$entitledUserPuserEdit = $this->getFromCustomData( "entitledUserPuserEdit", null, 0 );
-		if (!$entitledUserPuserEdit)
-			return '';
-
-		return implode(',', array_keys(unserialize($entitledUserPuserEdit)));
+		return implode(',', array_keys($this->getEntitledUserPuserEditArray()));
 	}
 	
 	public function getEntitledPusersEdit()
 	{
-		$entitledUserPuserEdit = $this->getFromCustomData( "entitledUserPuserEdit", null, 0 );
-		if (!$entitledUserPuserEdit)
-			return '';
-			
-		return implode(',', unserialize($entitledUserPuserEdit));
+		return implode(',', $this->getEntitledUserPuserEditArray());
 	}
 	
 	public function isEntitledKuserEdit( $kuserId )
 	{
-		return in_array( trim($kuserId), explode( ',', $this->getEntitledKusersEdit() ) );
+		return in_array( trim($kuserId), array_keys($this->getEntitledUserPuserEditArray()));
+	}
+
+	private function getEntitledUserPuserEditArray()
+	{
+		$entitledUserPuserEdit = $this->getFromCustomData( "entitledUserPuserEdit", null, 0 );
+		if (!$entitledUserPuserEdit)
+			return array();
+
+		return unserialize($entitledUserPuserEdit);
 	}
 
 	public function setEntitledPusersPublish($v)
