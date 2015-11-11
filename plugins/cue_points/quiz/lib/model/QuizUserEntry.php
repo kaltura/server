@@ -12,6 +12,17 @@ class QuizUserEntry extends UserEntry{
 	 */
 	protected $score;
 
+	/**
+	 * @var int
+	 */
+	protected $numOfQuestions;
+
+	/**
+	 * @var int
+	 */
+	protected $numOfCorrectAnswers;
+
+
 	public function applyDefaultValues()
 	{
 		parent::applyDefaultValues();
@@ -21,6 +32,10 @@ class QuizUserEntry extends UserEntry{
 
 	public function setScore($v){ $this->putInCustomData("score", $v);}
 	public function getScore(){ return $this->getFromCustomData("score");}
+	public function setNumOfQuestions($v){ $this->putInCustomData("numOfQuestions", $v);}
+	public function getNumOfQuestions(){ return $this->getFromCustomData("numOfQuestions");}
+	public function setNumOfCorrectAnswers($v){ $this->putInCustomData("numOfCorrectAnswers", $v);}
+	public function getNumOfCorrectAnswers(){ return $this->getFromCustomData("numOfCorrectAnswers");}
 	public function addAnswerId($questionId, $answerId)
 	{
 		$answerIds = $this->getAnswerIds();
@@ -29,7 +44,7 @@ class QuizUserEntry extends UserEntry{
 	}
 	public function getAnswerIds(){return $this->getFromCustomData("answerIds", null, array());}
 	
-	public function calculateScore()
+	public function calculateScoreAndCorrectAnswers()
 	{
 		//TODO when we have indexing of CuePoints in the sphinx we don't need the answerIds in the custom_data since we can just get the answers of the specific userEntry
 		$answerIds = $this->getAnswerIds();
@@ -37,6 +52,7 @@ class QuizUserEntry extends UserEntry{
 		$questions = CuePointPeer::retrieveByEntryId($this->getEntryId(), array($questionType));
 		$totalPoints = 0;
 		$userPoints = 0;
+		$numOfCorrectAnswers = 0;
 		foreach ($questions as $question)
 		{
 			$optionalAnswers = $question->getOptionalAnswers();
@@ -46,13 +62,16 @@ class QuizUserEntry extends UserEntry{
 				$answerId = $answerIds[$question->getId()];
 				//TODO change to retrieveByPks (multiple, only one query, no need for multiple)
 				$currAnswer = CuePointPeer::retrieveByPK($answerId);
+				if ( $currAnswer->getIsCorrect() )
+					$numOfCorrectAnswers++;
 				$answers[] = $currAnswer;
 			}
 			list($totalForQuestion, $userPointsForQuestion) = $this->getCorrectAnswerWeight($optionalAnswers, $answers);
 			$totalPoints += $totalForQuestion;
 			$userPoints += $userPointsForQuestion;
 		}
-		return $totalPoints?($userPoints/$totalPoints):0;
+		$score = $totalPoints?($userPoints/$totalPoints):0;
+		return array( $score, $numOfCorrectAnswers );
 	}
 
 	/**
