@@ -458,7 +458,7 @@ class BaseEntryService extends KalturaEntryService
 	 *
 	 * @action delete
 	 * @param string $entryId Entry id to delete
-	 * @validateUser entry entryId edit
+	 * @validateUser entry entryId edit ownerOnly
 	 */
 	function deleteAction($entryId)
 	{

@@ -44,7 +44,7 @@ class KalturaDocCommentParser
     
     const DOCCOMMENT_PERMISSIONS = "/\\@requiresPermission ([\\w\\,\\s]*)/";
     
-    const DOCCOMMENT_VALIDATE_USER = "/\\@validateUser\\s+(\\w+)\\s+(\\w+)\\s*(\\w*)/";
+    const DOCCOMMENT_VALIDATE_USER = "/\\@validateUser\\s+(\\w+)\\s+(\\w+)\\s+(\\w+)\\s*(\\w*)/";
     
     const DOCCOMMENT_ALIAS_ACTION = "/\\@actionAlias\\s(\\w+\\.\\w+)/";
     
@@ -193,6 +193,11 @@ class KalturaDocCommentParser
      * @var string
      */
     public $validateUserPrivilege = null;
+
+	/**
+     * @var string comma seperated validateUser options
+     */
+    public $validateOptions = null;
     
     /**
      * @var array
@@ -313,7 +318,12 @@ class KalturaDocCommentParser
         	$this->validateUserObjectClass = $result[1];
         	$this->validateUserIdParamName = $result[2];
         	if(isset($result[3]) && strlen($result[3]))
-        		$this->validateUserPrivilege = $result[3];
+			{
+				$this->validateUserPrivilege = $result[3];
+				if(isset($result[4]) && strlen($result[4]))
+					$this->validateOptions = $result[4];
+			}
+
         } 
         
         self::fillConstraint($comment, self::MIN_LENGTH_CONSTRAINT);
