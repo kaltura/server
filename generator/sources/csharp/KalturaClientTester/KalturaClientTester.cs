@@ -34,9 +34,9 @@ namespace Kaltura
 {
     class KalturaClientTester : IKalturaLogger
     {
-		private const int PARTNER_ID = @YOUR_PARTNER_ID@; //enter your partner id
-		private const string ADMIN_SECRET = "@YOUR_ADMIN_SECRET@"; //enter your admin secret
-		private const string SERVICE_URL = "@SERVICE_URL@";
+		private const int PARTNER_ID = 1676801; //enter your partner id
+		private const string ADMIN_SECRET = "5f8b98c59d2f4904ab9a1c2054d79055"; //enter your admin secret
+		private const string SERVICE_URL = "http://www.kaltura.com";
         private const string USER_ID = "testUser";
         
         private static string uniqueTag;

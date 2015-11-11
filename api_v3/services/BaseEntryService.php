@@ -858,14 +858,11 @@ class BaseEntryService extends KalturaEntryService
 	 * 
 	 * @action clone
 	 * @param string $entryId Id of entry to clone
-	 * @param KalturaBaseEntryCloneOptions $cloneOptions
+	 * @param KalturaBaseEntry $updateEntry [optional] Attributes from these entry will be updated into the cloned entry
 	 * @return KalturaBaseEntry The cloned entry
 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
 	 */
-
-	//* @param KalturaBaseEntry $updateEntry [optional] Attributes from these entry will be updated into the cloned entry
-
-	public function cloneAction( $entryId, $cloneOptions )
+	function cloneAction( $entryId )
 	{
 		// Reset criteria filters such that it will be  
 		entryPeer::setUseCriteriaFilter(false);
@@ -884,7 +881,7 @@ class BaseEntryService extends KalturaEntryService
 		}
 
 		// Copy the entry into a new one based on the given partner data.
-		$clonedEntry = myEntryUtils::copyEntry( $coreEntry, $cloneOptions, $this->getPartner());
+		$clonedEntry = myEntryUtils::copyEntry($coreEntry, $this->getPartner());
 
 		return $this->getEntry($clonedEntry->getId());
 	}
