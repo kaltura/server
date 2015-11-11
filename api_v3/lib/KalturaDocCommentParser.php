@@ -58,8 +58,6 @@ class KalturaDocCommentParser
     const MAX_LENGTH_CONSTRAINT = "maxLength";
     const MIN_VALUE_CONSTRAINT = "minValue";
     const MAX_VALUE_CONSTRAINT = "maxValue";
-
-	const OWNER_ONLY_CONDITION = "ownerOnly";
     
     /**
      * @var bool
@@ -197,9 +195,9 @@ class KalturaDocCommentParser
     public $validateUserPrivilege = null;
 
 	/**
-     * @var string
+     * @var string comma seperated validateUser options
      */
-    public $validateCondition = null;
+    public $validateOptions = null;
     
     /**
      * @var array
@@ -323,7 +321,7 @@ class KalturaDocCommentParser
 			{
 				$this->validateUserPrivilege = $result[3];
 				if(isset($result[4]) && strlen($result[4]))
-					$this->validateCondition = $result[4];
+					$this->validateOptions = $result[4];
 			}
 
         } 
