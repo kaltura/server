@@ -107,7 +107,7 @@ class KalturaDispatcher
 //				throw new KalturaAPIException(KalturaErrors::MISSING_MANDATORY_PARAMETER, $actionInfo->validateUserIdParamName);
 			KalturaLog::debug("validateUserIdParamName: ".$actionInfo->validateUserIdParamName);
 			$objectId = $params[$actionInfo->validateUserIdParamName];
-			$this->validateUser($actionInfo->validateUserObjectClass, $objectId, $actionInfo->validateUserPrivilege);
+			$this->validateUser($actionInfo->validateUserObjectClass, $objectId, $actionInfo->validateUserPrivilege, $actionInfo->validateCondition);
 		}
 		
 		// initialize the service before invoking the action on it
@@ -144,9 +144,10 @@ class KalturaDispatcher
 	 * @param string $objectClass
 	 * @param string $objectId
 	 * @param string $privilege optional
+	 * @param string $condition optional
 	 * @throws KalturaErrors::INVALID_KS
 	 */
-	protected function validateUser($objectClass, $objectId, $privilege = null)
+	protected function validateUser($objectClass, $objectId, $privilege = null, $condition = null)
 	{
 		// don't allow operations without ks
 		if (!kCurrentContext::$ks_object)
@@ -209,8 +210,11 @@ class KalturaDispatcher
 			
 		}
 
-		if (strtolower($dbObject->getPuserId()) != strtolower(kCurrentContext::$ks_uid) &&
-			!$dbObject->isEntitledKuserEdit(kCurrentContext::getCurrentKsKuserId()))
+		if (strtolower($dbObject->getPuserId()) != strtolower(kCurrentContext::$ks_uid)
+			&&
+			(!$dbObject->isEntitledKuserEdit(kCurrentContext::getCurrentKsKuserId())
+				||
+				($condition && $condition == KalturaDocCommentParser::OWNER_ONLY_CONDITION)))
 			throw new KalturaAPIException(KalturaErrors::INVALID_KS, "", ks::INVALID_TYPE, ks::getErrorStr(ks::INVALID_TYPE));
 	}
 }
