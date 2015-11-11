@@ -17,7 +17,7 @@ class KAMFMediaInfoParser{
     protected $ffmprobeBin;
     protected $filePath;
 
-    public function __construct($filePath, $ffprobeBin="ffprobe")
+    public function __construct($filePath, $ffprobeBin="ffprobeKAMFMediaInfoParser")
     {
         $this->ffprobeBin = $ffprobeBin;
         if (!file_exists($filePath))
