@@ -173,7 +173,7 @@ class nusoap_server extends nusoap_base {
 	* @access   public
 	*/
 	function __construct($wsdl=false){
-		parent::nusoap_base();
+		parent::__construct();
 		// turn on debugging?
 		global $debug;
 		global $HTTP_SERVER_VARS;

@@ -63,7 +63,7 @@ class nusoap_parser extends nusoap_base {
 	*/
 	function __construct($xml,$encoding='UTF-8',$method='',$decode_utf8=true,$keep_type = false){
 		
-		parent::nusoap_base();
+		parent::__construct();
 		$this->xml = $xml;
 		$this->xml_encoding = $encoding;
 		$this->method = $method;
