@@ -27,7 +27,7 @@ class CaptureSpaceService extends KalturaBaseService
 			throw new KalturaAPIException(CaptureSpaceErrors::NO_UPDATE_IS_AVAILABLE, $version, $os);
 		}
 			
-		$path = "/api_v3/service/collaaj_collaajini/action/serve/serveUpdateAction/os/$os/version/$version";
+		$path = "/api_v3/service/captureSpace_captureSpace/action/serve/serveUpdateAction/os/$os/version/$version";
 		$downloadUrl = myPartnerUtils::getCdnHost(null) . $path;
 		
 		$info = new KalturaCaptureSpaceUpdateResponseInfo();
