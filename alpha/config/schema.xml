@@ -222,17 +222,8 @@
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="flavor_params_ids" type="varchar" size="512" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="available_from" type="timestamp" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="last_played_at" type="timestamp" />
-		<foreign-key onDelete="none" onUpdate="none" foreignTable="kshow">
-			<reference local="kshow_id" foreign="id" />
-		</foreign-key>
 		<foreign-key onDelete="none" onUpdate="none" foreignTable="kuser">
 			<reference local="kuser_id" foreign="id" />
-		</foreign-key>
-		<foreign-key onDelete="none" onUpdate="none" foreignTable="access_control">
-			<reference local="access_control_id" foreign="id" />
-		</foreign-key>
-		<foreign-key onDelete="none" onUpdate="none" foreignTable="conversion_profile_2">
-			<reference local="conversion_profile_id" foreign="id" />
 		</foreign-key>
 		<index name="kshow_rank_index">
 			<index-column name="kshow_id" />

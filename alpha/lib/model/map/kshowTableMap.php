@@ -97,7 +97,6 @@ class kshowTableMap extends TableMap {
 	public function buildRelations()
 	{
     $this->addRelation('kuser', 'kuser', RelationMap::MANY_TO_ONE, array('producer_id' => 'id', ), null, null);
-    $this->addRelation('entry', 'entry', RelationMap::ONE_TO_MANY, array('id' => 'kshow_id', ), null, null);
     $this->addRelation('kvoteRelatedByKshowId', 'kvote', RelationMap::ONE_TO_MANY, array('id' => 'kshow_id', ), null, null);
     $this->addRelation('kvoteRelatedByKuserId', 'kvote', RelationMap::ONE_TO_MANY, array('id' => 'kuser_id', ), null, null);
     $this->addRelation('KshowKuser', 'KshowKuser', RelationMap::ONE_TO_MANY, array('id' => 'kshow_id', ), null, null);
