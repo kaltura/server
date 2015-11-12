@@ -1580,15 +1580,7 @@ CREATE TABLE flavor_asset
 	type INTEGER default 0 NOT NULL,
 	custom_data TEXT,
 	PRIMARY KEY (int_id),
-	INDEX I_referenced_media_info_FK_1_1 (id),
-	INDEX flavor_asset_FI_1 (entry_id),
-	CONSTRAINT flavor_asset_FK_1
-		FOREIGN KEY (entry_id)
-		REFERENCES entry (id),
-	INDEX flavor_asset_FI_2 (flavor_params_id),
-	CONSTRAINT flavor_asset_FK_2
-		FOREIGN KEY (flavor_params_id)
-		REFERENCES flavor_params (id)
+	INDEX I_referenced_media_info_FK_1_1 (id)
 )Type=InnoDB;
 
 #-----------------------------------------------------------------------------

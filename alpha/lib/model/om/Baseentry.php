@@ -454,16 +454,6 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 	private $lastassetParamsOutputCriteria = null;
 
 	/**
-	 * @var        array asset[] Collection to store aggregation of asset objects.
-	 */
-	protected $collassets;
-
-	/**
-	 * @var        Criteria The criteria used to select the current contents of collassets.
-	 */
-	private $lastassetCriteria = null;
-
-	/**
 	 * @var        array UserEntry[] Collection to store aggregation of UserEntry objects.
 	 */
 	protected $collUserEntrys;
@@ -3006,9 +2996,6 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 			$this->collassetParamsOutputs = null;
 			$this->lastassetParamsOutputCriteria = null;
 
-			$this->collassets = null;
-			$this->lastassetCriteria = null;
-
 			$this->collUserEntrys = null;
 			$this->lastUserEntryCriteria = null;
 
@@ -3309,14 +3296,6 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 
 			if ($this->collassetParamsOutputs !== null) {
 				foreach ($this->collassetParamsOutputs as $referrerFK) {
-					if (!$referrerFK->isDeleted()) {
-						$affectedRows += $referrerFK->save($con);
-					}
-				}
-			}
-
-			if ($this->collassets !== null) {
-				foreach ($this->collassets as $referrerFK) {
 					if (!$referrerFK->isDeleted()) {
 						$affectedRows += $referrerFK->save($con);
 					}
@@ -3635,14 +3614,6 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 
 				if ($this->collassetParamsOutputs !== null) {
 					foreach ($this->collassetParamsOutputs as $referrerFK) {
-						if (!$referrerFK->validate($columns)) {
-							$failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
-						}
-					}
-				}
-
-				if ($this->collassets !== null) {
-					foreach ($this->collassets as $referrerFK) {
 						if (!$referrerFK->validate($columns)) {
 							$failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
 						}
@@ -4499,12 +4470,6 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 			foreach ($this->getassetParamsOutputs() as $relObj) {
 				if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
 					$copyObj->addassetParamsOutput($relObj->copy($deepCopy));
-				}
-			}
-
-			foreach ($this->getassets() as $relObj) {
-				if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-					$copyObj->addasset($relObj->copy($deepCopy));
 				}
 			}
 
@@ -6827,207 +6792,6 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 	}
 
 	/**
-	 * Clears out the collassets collection (array).
-	 *
-	 * This does not modify the database; however, it will remove any associated objects, causing
-	 * them to be refetched by subsequent calls to accessor method.
-	 *
-	 * @return     void
-	 * @see        addassets()
-	 */
-	public function clearassets()
-	{
-		$this->collassets = null; // important to set this to NULL since that means it is uninitialized
-	}
-
-	/**
-	 * Initializes the collassets collection (array).
-	 *
-	 * By default this just sets the collassets collection to an empty array (like clearcollassets());
-	 * however, you may wish to override this method in your stub class to provide setting appropriate
-	 * to your application -- for example, setting the initial array to the values stored in database.
-	 *
-	 * @return     void
-	 */
-	public function initassets()
-	{
-		$this->collassets = array();
-	}
-
-	/**
-	 * Gets an array of asset objects which contain a foreign key that references this object.
-	 *
-	 * If this collection has already been initialized with an identical Criteria, it returns the collection.
-	 * Otherwise if this entry has previously been saved, it will retrieve
-	 * related assets from storage. If this entry is new, it will return
-	 * an empty collection or the current collection, the criteria is ignored on a new object.
-	 *
-	 * @param      PropelPDO $con
-	 * @param      Criteria $criteria
-	 * @return     array asset[]
-	 * @throws     PropelException
-	 */
-	public function getassets($criteria = null, PropelPDO $con = null)
-	{
-		if ($criteria === null) {
-			$criteria = new Criteria(entryPeer::DATABASE_NAME);
-		}
-		elseif ($criteria instanceof Criteria)
-		{
-			$criteria = clone $criteria;
-		}
-
-		if ($this->collassets === null) {
-			if ($this->isNew()) {
-			   $this->collassets = array();
-			} else {
-
-				$criteria->add(assetPeer::ENTRY_ID, $this->id);
-
-				assetPeer::addSelectColumns($criteria);
-				$this->collassets = assetPeer::doSelect($criteria, $con);
-			}
-		} else {
-			// criteria has no effect for a new object
-			if (!$this->isNew()) {
-				// the following code is to determine if a new query is
-				// called for.  If the criteria is the same as the last
-				// one, just return the collection.
-
-
-				$criteria->add(assetPeer::ENTRY_ID, $this->id);
-
-				assetPeer::addSelectColumns($criteria);
-				if (!isset($this->lastassetCriteria) || !$this->lastassetCriteria->equals($criteria)) {
-					$this->collassets = assetPeer::doSelect($criteria, $con);
-				}
-			}
-		}
-		$this->lastassetCriteria = $criteria;
-		return $this->collassets;
-	}
-
-	/**
-	 * Returns the number of related asset objects.
-	 *
-	 * @param      Criteria $criteria
-	 * @param      boolean $distinct
-	 * @param      PropelPDO $con
-	 * @return     int Count of related asset objects.
-	 * @throws     PropelException
-	 */
-	public function countassets(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
-	{
-		if ($criteria === null) {
-			$criteria = new Criteria(entryPeer::DATABASE_NAME);
-		} else {
-			$criteria = clone $criteria;
-		}
-
-		if ($distinct) {
-			$criteria->setDistinct();
-		}
-
-		$count = null;
-
-		if ($this->collassets === null) {
-			if ($this->isNew()) {
-				$count = 0;
-			} else {
-
-				$criteria->add(assetPeer::ENTRY_ID, $this->id);
-
-				$count = assetPeer::doCount($criteria, false, $con);
-			}
-		} else {
-			// criteria has no effect for a new object
-			if (!$this->isNew()) {
-				// the following code is to determine if a new query is
-				// called for.  If the criteria is the same as the last
-				// one, just return count of the collection.
-
-
-				$criteria->add(assetPeer::ENTRY_ID, $this->id);
-
-				if (!isset($this->lastassetCriteria) || !$this->lastassetCriteria->equals($criteria)) {
-					$count = assetPeer::doCount($criteria, false, $con);
-				} else {
-					$count = count($this->collassets);
-				}
-			} else {
-				$count = count($this->collassets);
-			}
-		}
-		return $count;
-	}
-
-	/**
-	 * Method called to associate a asset object to this object
-	 * through the asset foreign key attribute.
-	 *
-	 * @param      asset $l asset
-	 * @return     void
-	 * @throws     PropelException
-	 */
-	public function addasset(asset $l)
-	{
-		if ($this->collassets === null) {
-			$this->initassets();
-		}
-		if (!in_array($l, $this->collassets, true)) { // only add it if the **same** object is not already associated
-			array_push($this->collassets, $l);
-			$l->setentry($this);
-		}
-	}
-
-
-	/**
-	 * If this collection has already been initialized with
-	 * an identical criteria, it returns the collection.
-	 * Otherwise if this entry is new, it will return
-	 * an empty collection; or if this entry has previously
-	 * been saved, it will retrieve related assets from storage.
-	 *
-	 * This method is protected by default in order to keep the public
-	 * api reasonable.  You can provide public methods for those you
-	 * actually need in entry.
-	 */
-	public function getassetsJoinassetParams($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
-	{
-		if ($criteria === null) {
-			$criteria = new Criteria(entryPeer::DATABASE_NAME);
-		}
-		elseif ($criteria instanceof Criteria)
-		{
-			$criteria = clone $criteria;
-		}
-
-		if ($this->collassets === null) {
-			if ($this->isNew()) {
-				$this->collassets = array();
-			} else {
-
-				$criteria->add(assetPeer::ENTRY_ID, $this->id);
-
-				$this->collassets = assetPeer::doSelectJoinassetParams($criteria, $con, $join_behavior);
-			}
-		} else {
-			// the following code is to determine if a new query is
-			// called for.  If the criteria is the same as the last
-			// one, just return the collection.
-
-			$criteria->add(assetPeer::ENTRY_ID, $this->id);
-
-			if (!isset($this->lastassetCriteria) || !$this->lastassetCriteria->equals($criteria)) {
-				$this->collassets = assetPeer::doSelectJoinassetParams($criteria, $con, $join_behavior);
-			}
-		}
-		$this->lastassetCriteria = $criteria;
-
-		return $this->collassets;
-	}
-
-	/**
 	 * Clears out the collUserEntrys collection (array).
 	 *
 	 * This does not modify the database; however, it will remove any associated objects, causing
@@ -7290,11 +7054,6 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 					$o->clearAllReferences($deep);
 				}
 			}
-			if ($this->collassets) {
-				foreach ((array) $this->collassets as $o) {
-					$o->clearAllReferences($deep);
-				}
-			}
 			if ($this->collUserEntrys) {
 				foreach ((array) $this->collUserEntrys as $o) {
 					$o->clearAllReferences($deep);
@@ -7312,7 +7071,6 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 		$this->collroughcutEntrysRelatedByEntryId = null;
 		$this->collwidgets = null;
 		$this->collassetParamsOutputs = null;
-		$this->collassets = null;
 		$this->collUserEntrys = null;
 			$this->akuser = null;
 	}
