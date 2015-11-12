@@ -45,7 +45,7 @@ class QuizUserEntryService extends KalturaBaseService{
 		if (!$kQuiz)
 			throw new KalturaAPIException(KalturaQuizErrors::PROVIDED_ENTRY_IS_NOT_A_QUIZ, $entryId);
 
-		if (!$kQuiz->getShowGradeAfterSubmission() || !$this->getKuser()->getIsAdmin())
+		if (!$kQuiz->getShowGradeAfterSubmission() && !$this->getKuser()->getIsAdmin())
 				$userEntry->score = null;
 	  
 		$dbUserEntry->save();
