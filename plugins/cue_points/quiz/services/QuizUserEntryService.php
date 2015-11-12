@@ -26,13 +26,6 @@ class QuizUserEntryService extends KalturaBaseService{
 		if ($dbUserEntry->getType() != QuizPlugin::getCoreValue('UserEntryType',QuizUserEntryType::QUIZ))
 			throw new KalturaAPIException(KalturaQuizErrors::PROVIDED_ENTRY_IS_NOT_A_QUIZ, $id);
 
-		/**
-		 * @var QuizUserEntry $dbUserEntry
-		 */
-		$score = $dbUserEntry->calculateScore();
-		$dbUserEntry->setScore($score);
-		KalturaLog::debug("Quiz score is [" .$score."]");
-    
 		$dbUserEntry->setStatus(QuizPlugin::getCoreValue('UserEntryStatus', QuizUserEntryStatus::QUIZ_SUBMITTED));
  		$userEntry = new KalturaQuizUserEntry();
 		$userEntry->fromObject($dbUserEntry, $this->getResponseProfile());
@@ -45,9 +38,13 @@ class QuizUserEntryService extends KalturaBaseService{
 		if (!$kQuiz)
 			throw new KalturaAPIException(KalturaQuizErrors::PROVIDED_ENTRY_IS_NOT_A_QUIZ, $entryId);
 
-		if (!$kQuiz->getShowGradeAfterSubmission() && !$this->getKuser()->getIsAdmin())
-				$userEntry->score = null;
-	  
+
+		if ($kQuiz->getShowGradeAfterSubmission() || $this->getKuser()->getIsAdmin())
+		{
+			$userEntry->score = $dbUserEntry->calculateScore();
+			$dbUserEntry->setScore($userEntry->score);
+		}
+
 		$dbUserEntry->save();
 
 		return $userEntry;
