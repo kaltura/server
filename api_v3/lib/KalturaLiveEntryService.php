@@ -72,9 +72,12 @@ class KalturaLiveEntryService extends KalturaEntryService
 		if (!$dbAsset || !($dbAsset instanceof liveAsset))
 			throw new KalturaAPIException(KalturaErrors::ASSET_ID_NOT_FOUND, $assetId);
 			
-		$lastDuration = $dbEntry->getLengthInMsecs();
-		if(!$lastDuration)
-			$lastDuration = 0;
+		$lastDuration = 0;
+		if ($dbEntry->getRecordedEntryId())
+		{
+			$recordedEntry = entryPeer::retrieveByPK($dbEntry->getRecordedEntryId());
+			$lastDuration = $recordedEntry->getLengthInMsecs();
+		}
 
 		$liveSegmentDurationInMsec = (int)($duration * 1000);
 		$currentDuration = $lastDuration + $liveSegmentDurationInMsec;
