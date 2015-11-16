@@ -1261,10 +1261,10 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 						$oldElements = $xPath->query($updateRequiredMetadataXPath);
 					}
 					
-					if((!$newElements && !$oldElements) || (!$newElements->length && $oldElements->length))
+					if((!$newElements || !$newElements->length) && (!$oldElements && !$oldElements->length))
 						continue;
 						
-					if((!$newElements XOR !$oldElements) || (!$newElements->length XOR !$oldElements->length))
+					if((!$newElements || !$newElements->length) XOR (!$oldElements || !$oldElements->length))
 					{
 						$updateRequired = true;
 					}
