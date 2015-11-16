@@ -76,7 +76,18 @@ class KalturaLiveEntryService extends KalturaEntryService
 		if ($dbEntry->getRecordedEntryId())
 		{
 			$recordedEntry = entryPeer::retrieveByPK($dbEntry->getRecordedEntryId());
-			$lastDuration = $recordedEntry->getLengthInMsecs();
+			if ($recordedEntry) {
+				// if entry is in replacement, the replacement duration is more accurate 
+				if ($recordedEntry->getReplacedEntryId()) {
+					$replacementRecordedEntry = entryPeer::retrieveByPK($recordedEntry->getReplacedEntryId());
+					if ($replacementRecordedEntry) {
+						$lastDuration = $replacementRecordedEntry->getLengthInMsecs();
+					}
+				}
+				else {
+					$lastDuration = $recordedEntry->getLengthInMsecs();
+				}
+			}
 		}
 
 		$liveSegmentDurationInMsec = (int)($duration * 1000);
@@ -101,8 +112,6 @@ class KalturaLiveEntryService extends KalturaEntryService
 
 		if($dbAsset->hasTag(assetParams::TAG_RECORDING_ANCHOR) && $mediaServerIndex == KalturaMediaServerIndex::PRIMARY)
 		{
-			$dbEntry->setLengthInMsecs($currentDuration);
-
 			// Extract the exact video segment duration from the recorded file
 			$mediaInfoParser = new KMediaInfoMediaParser($filename, kConf::get('bin_path_mediainfo'));
 			$recordedSegmentDurationInMS = $mediaInfoParser->getMediaInfo()->videoDuration;
