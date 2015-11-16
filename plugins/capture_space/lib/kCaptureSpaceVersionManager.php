@@ -38,7 +38,7 @@ class kCaptureSpaceVersionManager{
 		}
 		else {
 			uksort($config, 'version_compare');
-			$section = reset($config);
+			$section = array_pop($config);
 		}
 			
 		$osFileType = null;
