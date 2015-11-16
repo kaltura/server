@@ -28,19 +28,18 @@ class kCaptureSpaceVersionManager{
 	
 	private static function getConfig($os, $osTypes, $version = null){
 		$config = self::initConfig();
-		
 		if($version){
 			$version = str_replace('.', '_', $version);
 			if(!isset($config[$version])){
 				return null;
 			}
-			$section = $config[$version];
+			$sections = array($version => $config[$version]);
 		}
 		else {
 			uksort($config, 'version_compare');
-			$section = array_pop($config);
+			$sections = $config;
 		}
-			
+		
 		$osFileType = null;
 		foreach($osTypes as $osType => $fileType){
 			if(strpos($os, $osType) === 0){
@@ -49,11 +48,13 @@ class kCaptureSpaceVersionManager{
 			}
 		}
 		
-		if(!isset($section[$osFileType])){
-			return null;
+		foreach($sections as $section){
+			if(isset($section[$osFileType])){		
+				return explode(',', $section[$osFileType]);
+			}
 		}
 		
-		return explode(',', $section[$osFileType]);
+		return null;
 	}
 	
 	public static function isLatest($os, $version){
