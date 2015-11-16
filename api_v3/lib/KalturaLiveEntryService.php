@@ -72,9 +72,23 @@ class KalturaLiveEntryService extends KalturaEntryService
 		if (!$dbAsset || !($dbAsset instanceof liveAsset))
 			throw new KalturaAPIException(KalturaErrors::ASSET_ID_NOT_FOUND, $assetId);
 			
-		$lastDuration = $dbEntry->getLengthInMsecs();
-		if(!$lastDuration)
-			$lastDuration = 0;
+		$lastDuration = 0;
+		if ($dbEntry->getRecordedEntryId())
+		{
+			$recordedEntry = entryPeer::retrieveByPK($dbEntry->getRecordedEntryId());
+			if ($recordedEntry) {
+				// if entry is in replacement, the replacement duration is more accurate 
+				if ($recordedEntry->getReplacedEntryId()) {
+					$replacementRecordedEntry = entryPeer::retrieveByPK($recordedEntry->getReplacedEntryId());
+					if ($replacementRecordedEntry) {
+						$lastDuration = $replacementRecordedEntry->getLengthInMsecs();
+					}
+				}
+				else {
+					$lastDuration = $recordedEntry->getLengthInMsecs();
+				}
+			}
+		}
 
 		$liveSegmentDurationInMsec = (int)($duration * 1000);
 		$currentDuration = $lastDuration + $liveSegmentDurationInMsec;
@@ -82,7 +96,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 		$maxRecordingDuration = (kConf::get('max_live_recording_duration_hours') + 1) * 60 * 60 * 1000;
 		if($currentDuration > $maxRecordingDuration)
 		{
-			KalturaLog::err("Entry [$entryId] duration [" . $dbEntry->getLengthInMsecs() . "] and current duration [$currentDuration] is more than max allwoed duration [$maxRecordingDuration]");
+			KalturaLog::err("Entry [$entryId] duration [" . $lastDuration . "] and current duration [$currentDuration] is more than max allwoed duration [$maxRecordingDuration]");
 			throw new KalturaAPIException(KalturaErrors::LIVE_STREAM_EXCEEDED_MAX_RECORDED_DURATION, $entryId);
 		}
 			
@@ -98,8 +112,6 @@ class KalturaLiveEntryService extends KalturaEntryService
 
 		if($dbAsset->hasTag(assetParams::TAG_RECORDING_ANCHOR) && $mediaServerIndex == KalturaMediaServerIndex::PRIMARY)
 		{
-			$dbEntry->setLengthInMsecs($currentDuration);
-
 			// Extract the exact video segment duration from the recorded file
 			$mediaInfoParser = new KMediaInfoMediaParser($filename, kConf::get('bin_path_mediainfo'));
 			$recordedSegmentDurationInMS = $mediaInfoParser->getMediaInfo()->videoDuration;
