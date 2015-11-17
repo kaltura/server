@@ -4,7 +4,7 @@
  */
 class CaptureSpacePlugin extends KalturaPlugin implements IKalturaServices {
 
-    const PLUGIN_NAME = "captureSpaceUpdate";
+    const PLUGIN_NAME = "captureSpace";
 
     public static function getPluginName() {
         return self::PLUGIN_NAME;
