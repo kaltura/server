@@ -5,7 +5,19 @@
 to do so: add bin_path_ffprobeKAMFMediaInfoParser to local.ini to be a symbolic link to /opt/kaltura/bin/ffmpeg-2.7.2-bin/ffprobe.sh
 the symbolic link should be named ffprobeKAMFMediaInfoParser
 
-# Kajam-11.1.0 #
+## Update permissions ##
+ - Issue type: Bug
+ - KMS-3890
+
+### Deployment scripts ##
+
+ - php deployment\updates\scripts\add_permissions\2015_09_17_update_quiz_permissions.php
+
+#### Configuration ####
+
+ - None
+
+#Kajam-11.1.0 #
 
 ## eCDN - create server_node machine hierarchy ##
 
