@@ -1,5 +1,4 @@
 <?php
-require_once(SF_ROOT_DIR.DIRECTORY_SEPARATOR.'lib/model/comment.php');
 
 /**
  * Will handle creation of the URL, inserting into the DB and verifying that each email should indeed be sent
@@ -8,8 +7,11 @@ class myBlockedEmailUtils
 {
 	const SEPARATOR = ";";
 	const EXPIRY_INTERVAL = 2592000; // 30 days in seconds
-
-	private static $key = "myBlockedEmailUtils";
+	
+	private static function getKalturaEmailHash ()
+        {
+                return kConf::get("kaltura_email_hash");
+        }
 
 	public static function createBlockEmailUrl ( $email )
 	{
@@ -19,7 +21,7 @@ class myBlockedEmailUtils
 
 	public static function createBlockEmailStr ( $email )
 	{
-		return  $email . self::SEPARATOR . kString::expiryHash( $email , self::$key , self::EXPIRY_INTERVAL );
+		return  $email . self::SEPARATOR . kString::expiryHash( $email , self::getKalturaEmailHash() , self::EXPIRY_INTERVAL );
 	}
 	
 	// TODO - remove  $should_update_db  - should always update DB !
@@ -29,7 +31,7 @@ class myBlockedEmailUtils
 		$email = @$params[0];
 		$email_hash = @$params[1];
 
-		$valid = kString::verifyExpiryHash( $email , self::$key , $email_hash , self::EXPIRY_INTERVAL);
+		$valid = kString::verifyExpiryHash( $email , self::getKalturaEmailHash() , $email_hash , self::EXPIRY_INTERVAL);
 
 		if ( $valid )
 		{

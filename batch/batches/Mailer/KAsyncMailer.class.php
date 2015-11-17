@@ -277,13 +277,16 @@ class KAsyncMailer extends KJobHandlerWorker
 	}
 	
 	
-	// should be the same as on the server
-	protected static $key = "myBlockedEmailUtils";
 	const SEPARATOR = ";";
 	const EXPIRY_INTERVAL = 2592000; // 30 days in seconds
 	
+	protected static function getKalturaEmailHash ()
+        {
+                return self::$taskConfig->params->kalturaEmailHash;
+        }
+
 	protected static function createBlockEmailStr ( $email )
 	{
-		return  $email . self::SEPARATOR . kString::expiryHash( $email , self::$key , self::EXPIRY_INTERVAL );
+		return  $email . self::SEPARATOR . kString::expiryHash( $email , self::getKalturaEmailHash() , self::EXPIRY_INTERVAL );
 	}
 }

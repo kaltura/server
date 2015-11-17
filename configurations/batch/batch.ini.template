@@ -194,6 +194,8 @@ maxJobsEachRun										= 10
 scriptPath											= batches/Mailer/KAsyncMailerExe.php
 params.forumUrl										= @FORUMS_URLS@
 params.unsubscribeUrl								= "@UNSUBSCRIBE_EMAIL_URL@"
+;kaltura email hash must match the kaltura_email_hash variable on the API servers for the unsubscribe link to work
+params.kalturaEmailHash                                                         = "@KALTURA_EMAIL_HASH@"
 
 [KAsyncExtractMedia : JobHandlerWorker]
 id													= 60
