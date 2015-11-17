@@ -26,7 +26,6 @@ class QuizUserEntryService extends KalturaBaseService{
 		if ($dbUserEntry->getType() != QuizPlugin::getCoreValue('UserEntryType',QuizUserEntryType::QUIZ))
 			throw new KalturaAPIException(KalturaQuizErrors::PROVIDED_ENTRY_IS_NOT_A_QUIZ, $id);
 
-		$dbUserEntry->setStatus(QuizPlugin::getCoreValue('UserEntryStatus', QuizUserEntryStatus::QUIZ_SUBMITTED));
  		$userEntry = new KalturaQuizUserEntry();
 		$userEntry->fromObject($dbUserEntry, $this->getResponseProfile());
 		$entryId = $dbUserEntry->getEntryId();
@@ -55,6 +54,7 @@ class QuizUserEntryService extends KalturaBaseService{
 		$c->add(CuePointPeer::ENTRY_ID, $dbUserEntry->getEntryId(), Criteria::EQUAL);
 		$c->add(CuePointPeer::TYPE, QuizPlugin::getCoreValue('CuePointType', QuizCuePointType::QUIZ_QUESTION));
 		$dbUserEntry->setNumOfQuestions(CuePointPeer::doCount($c));
+		$dbUserEntry->setStatus(QuizPlugin::getCoreValue('UserEntryStatus', QuizUserEntryStatus::QUIZ_SUBMITTED));
 		$dbUserEntry->save();
 
 		return $userEntry;
