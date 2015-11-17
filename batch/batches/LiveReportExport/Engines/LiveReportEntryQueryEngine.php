@@ -12,7 +12,7 @@ class LiveReportEntryQueryEngine extends LiveReportEngine {
 	protected $fieldName;
 	protected $defaultVal = array(0); // If didn't retrieve any value - use this as default.
 
-	public function LiveReportEntryQueryEngine($field, $timeFrame, $title = null, $printResult = true) {
+	public function __construct($field, $timeFrame, $title = null, $printResult = true) {
 		$this->fieldName = $field;
 		$this->timeFrame = $timeFrame;
 		$this->title = $title;

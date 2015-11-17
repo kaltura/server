@@ -50,7 +50,7 @@ class StreamToken {
     /*
      * Default class constructor.  Initializes member variables.
      */
-    function StreamToken() {
+    function __construct() {
         $this->choices64 = array('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j',
                  'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't',
                  'u', 'v', 'w', 'x', 'y', 'z',

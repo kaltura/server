@@ -82,7 +82,7 @@ class KalturaTypeReflector
 	 * @param string $type
 	 * @return KalturaTypeReflector
 	 */
-	public function KalturaTypeReflector($type)
+	public function __construct($type)
 	{
 		if (!class_exists($type))
 			throw new KalturaReflectionException("Type \"".$type."\" not found");

@@ -5,7 +5,7 @@ class LiveReportDateFormatter extends LiveReportFormatter {
 	protected $format;
 	protected $timeZoneOffset;
 	
-	public function LiveReportDateFormatter($format, $timeZoneOffset = 0) {
+	public function __construct($format, $timeZoneOffset = 0) {
 		$this->format = $format;
 		$this->timeZoneOffset = $timeZoneOffset;
 	}

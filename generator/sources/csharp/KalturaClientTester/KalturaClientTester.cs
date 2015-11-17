@@ -37,7 +37,7 @@ namespace Kaltura
 		private const int PARTNER_ID = @YOUR_PARTNER_ID@; //enter your partner id
 		private const string ADMIN_SECRET = "@YOUR_ADMIN_SECRET@"; //enter your admin secret
 		private const string SERVICE_URL = "@SERVICE_URL@";
-        private const string USER_ID = "testUser";
+		private const string USER_ID = "testUser";
         
         private static string uniqueTag;
 

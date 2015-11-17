@@ -133,23 +133,19 @@ abstract class KalturaServerNode extends KalturaObject implements IFilterable, I
 	{
 		return array_merge ( parent::getMapBetweenObjects() , self::$map_between_objects );
 	}	
-	/* (non-PHPdoc)
-	 * @see KalturaObject::validateForInsert()
-	 */
-	public function validateForInsert($propertiesToSkip = array())
+	
+	public function validateForInsertByType($propertiesToSkip, $type)
 	{
 		$this->validateMandatoryAttributes(true);
-		$this->validateDuplications();
+		$this->validateDuplications(null, $type);
 	
 		return parent::validateForInsert($propertiesToSkip);
 	}
-	/* (non-PHPdoc)
-	 * @see KalturaObject::validateForUpdate()
-	 */
-	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
+	
+	public function validateForUpdateByType($sourceObject, $propertiesToSkip = array(), $type)
 	{
 		$this->validateMandatoryAttributes();
-		$this->validateDuplications($sourceObject->getId());
+		$this->validateDuplications($sourceObject->getId(), $type);
 				
 		return parent::validateForUpdate($sourceObject, $propertiesToSkip);
 	}
@@ -161,16 +157,16 @@ abstract class KalturaServerNode extends KalturaObject implements IFilterable, I
 		$this->validatePropertyMinLength("name", 1, !$isInsert);
 	}
 	
-	public function validateDuplications($serverNodeId = null)
+	public function validateDuplications($serverNodeId = null, $type)
 	{
 		if($this->hostName)		
-			$this->validateHostNameDuplication($serverNodeId);
+			$this->validateHostNameDuplication($serverNodeId, $type);
 		
 		if($this->systemName)
-			$this->validateSystemNameDuplication($serverNodeId);
+			$this->validateSystemNameDuplication($serverNodeId, $type);
 	}
 	
-	public function validateHostNameDuplication($serverNodeId = null)
+	public function validateHostNameDuplication($serverNodeId = null, $type)
 	{
 		$c = KalturaCriteria::create(ServerNodePeer::OM_CLASS);
 		
@@ -178,12 +174,13 @@ abstract class KalturaServerNode extends KalturaObject implements IFilterable, I
 			$c->add(ServerNodePeer::ID, $serverNodeId, Criteria::NOT_EQUAL);
 		
 		$c->add(ServerNodePeer::HOST_NAME, $this->hostName);
+		$c->add(ServerNodePeer::TYPE, $type);
 		
 		if(ServerNodePeer::doCount($c))
 			throw new KalturaAPIException(KalturaErrors::HOST_NAME_ALREADY_EXISTS, $this->hostName);
 	}
 	
-	public function validateSystemNameDuplication($serverNodeId = null)
+	public function validateSystemNameDuplication($serverNodeId = null, $type)
 	{
 		$c = KalturaCriteria::create(ServerNodePeer::OM_CLASS);
 	
@@ -191,6 +188,7 @@ abstract class KalturaServerNode extends KalturaObject implements IFilterable, I
 			$c->add(ServerNodePeer::ID, $serverNodeId, Criteria::NOT_EQUAL);
 	
 		$c->add(ServerNodePeer::SYSTEM_NAME, $this->systemName);
+		$c->add(ServerNodePeer::TYPE, $type);
 	
 		if(ServerNodePeer::doCount($c))
 			throw new KalturaAPIException(KalturaErrors::SYSTEM_NAME_ALREADY_EXISTS, $this->systemName);

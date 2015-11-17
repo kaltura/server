@@ -685,6 +685,24 @@ class kSmilManifestRenderer extends kMultiFlavorManifestRenderer
 class kM3U8ManifestRenderer extends kMultiFlavorManifestRenderer
 {
 	/**
+	* @var bool
+	*/
+	protected $hasAudioFlavors = false;
+	
+	function __construct($flavors, $entryId = null, $baseUrl = '') 
+	{
+		parent::__construct($flavors, $entryId, $baseUrl);
+		
+		// check if audio flavors exist
+		foreach($this->flavors as $flavor) {
+			if (isset($flavor['audioLanguage'])) {
+				$this->hasAudioFlavors = true;
+				break;
+			}
+		}
+	}
+    
+	/**
 	 * @return array<string>
 	 */
 	protected function getHeaders()
@@ -697,32 +715,49 @@ class kM3U8ManifestRenderer extends kMultiFlavorManifestRenderer
 	 */
 	protected function getManifestFlavors()
 	{
+		$audioFlavorsArr = array(); 
+		$audio = null;
+		if ($this->hasAudioFlavors) {
+			$audio = ",AUDIO=\"audio\"";
+		}
+		
 		$flavorsArr = array();
 		foreach($this->flavors as $flavor)
 		{
-			$bitrate = (isset($flavor['bitrate']) ? $flavor['bitrate'] : 0) * 1024;
-			$codecs = "";
-			if ($bitrate && $bitrate <= 65536)
-				$codecs = ',CODECS="mp4a.40.2"';
-
-			// in case of Akamai HDN1.0 increase the reported bitrate due to mpeg2-ts overhead
-			if (strpos($flavor['url'], "index_0_av.m3u8"))
-				$bitrate += 40 * 1024;
-
-			$resolution = '';
-			if(isset($flavor['width']) && isset($flavor['height']))
-			{
-				$width = $flavor['width'];
-				$height = $flavor['height'];
-				if ($width && $height)
-					$resolution = ",RESOLUTION={$width}x{$height}";
+			// Sperate audio flavors from video flavors
+			if (isset($flavor['audioLanguage'])) {
+				$language = $flavor['audioLanguage'];
+				$languageName = $flavor['audioLanguageName'];
+				$content = "#EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID=\"audio\",LANGUAGE=\"{$language}\",NAME=\"{$languageName}\",URI=\"{$flavor['url']}\"";
+				$audioFlavorsArr[] = $content;
 			}
-				
-			$content = "#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH={$bitrate}{$resolution}{$codecs}\n";
-			$content .= $flavor['url'];
-			$flavorsArr[] = $content;
+			else {
+				$bitrate = (isset($flavor['bitrate']) ? $flavor['bitrate'] : 0) * 1024;
+				$codecs = "";
+				if ($bitrate && $bitrate <= 65536)
+					$codecs = ',CODECS="mp4a.40.2"';
+
+				// in case of Akamai HDN1.0 increase the reported bitrate due to mpeg2-ts overhead
+				if (strpos($flavor['url'], "index_0_av.m3u8"))
+					$bitrate += 40 * 1024;
+
+				$resolution = '';
+				if(isset($flavor['width']) && isset($flavor['height']))
+				{
+					$width = $flavor['width'];
+					$height = $flavor['height'];
+					if ($width && $height)
+						$resolution = ",RESOLUTION={$width}x{$height}";
+				}
+					
+				$content = "#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH={$bitrate}{$resolution}{$codecs}{$audio}\n";
+				$content .= $flavor['url'];
+				$flavorsArr[] = $content;
+			}
 		}
-		
+		if (count($audioFlavorsArr) > 0) {
+			return array_merge($audioFlavorsArr, array(''), $flavorsArr);
+		}		
 		return $flavorsArr;
 	}
 	
@@ -731,7 +766,12 @@ class kM3U8ManifestRenderer extends kMultiFlavorManifestRenderer
 	 */
 	protected function getManifestHeader()
 	{
-		return "#EXTM3U";
+		$header = "#EXTM3U";
+		// add version in case of audio flavors
+		if ($this->hasAudioFlavors) {
+			$header .= "\n#EXT-X-VERSION:4";
+		}
+		return $header;
 	}
 
 }
