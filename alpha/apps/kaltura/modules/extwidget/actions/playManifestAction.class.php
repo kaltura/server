@@ -873,7 +873,7 @@ class playManifestAction extends kalturaAction
 		}
 		
 		$this->deliveryProfile->setDynamicAttributes($this->deliveryAttributes);
-		$this->setLiveStreamConfig($liveStreamConfig);	
+		$this->deliveryProfile->setLiveStreamConfig($liveStreamConfig);	
 		return $this->deliveryProfile->serve();
 	}
 	

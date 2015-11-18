@@ -239,8 +239,13 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 			unset($flavors[$index]['index']);
 		}
 		
+		return $flavors;
+	}
+	
+	public function getRenderer($flavors)
+	{
 		$this->DEFAULT_RENDERER_CLASS = 'kM3U8ManifestRenderer';
-		$renderer = $this->getRenderer($flavors);
+		$renderer = parent::getRenderer($flavors);
 		return $renderer;
 	}
 }
