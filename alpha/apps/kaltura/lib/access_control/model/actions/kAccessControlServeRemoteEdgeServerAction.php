@@ -39,7 +39,10 @@ class kAccessControlServeRemoteEdgeServerAction extends kRuleAction
 		if(!count($edgeServers))
 			return false;
 		
-		$deliveryAttributes->setEdgeServerIds($edgeServerIds);
+		foreach ($edgeServers as $edgeServer) 
+			$activeEdgeServerIds[] = $edgeServer->getId();
+		
+		$deliveryAttributes->setEdgeServerIds($activeEdgeServerIds);
 		return true;
 	}
 }

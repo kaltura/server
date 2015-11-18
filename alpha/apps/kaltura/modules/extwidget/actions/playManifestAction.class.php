@@ -872,8 +872,9 @@ class playManifestAction extends kalturaAction
 			return null;
 		}
 		
-		$this->deliveryProfile->setDynamicAttributes($this->deliveryAttributes);	
-		return $this->deliveryProfile->serve($liveStreamConfig);
+		$this->deliveryProfile->setDynamicAttributes($this->deliveryAttributes);
+		$this->setLiveStreamConfig($liveStreamConfig);	
+		return $this->deliveryProfile->serve();
 	}
 	
 	/* (non-PHPdoc)

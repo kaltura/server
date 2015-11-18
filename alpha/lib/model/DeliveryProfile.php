@@ -7,6 +7,8 @@
  */
 abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObject
 {
+	abstract protected function buildServeFlavors();
+	
 	protected $DEFAULT_RENDERER_CLASS = 'kF4MManifestRenderer';
 	
 	const DYNAMIC_ATTRIBUTES_FULL_SUPPORT = 0;		// the profile fully supports the required attirbutes
@@ -22,6 +24,21 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 	{
 		parent::__construct();
 		$this->params = new DeliveryProfileDynamicAttributes();
+	}
+	
+	public final function serve()
+	{
+		$flavors = $this->buildServeFlavors();
+		
+		if(!$flavors)
+			return null;
+		
+		if($this->params->getEdgeServerIds())
+			$this->applyFlavorsDomainPrefix($flavors);
+		
+		$renderer = $this->getRenderer($flavors);
+		
+		return $renderer;
 	}
 	
 	/**
@@ -330,4 +347,42 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 	{
 		return array("deliveryProfile:id=".strtolower($this->getId()), "deliveryProfile:partnerId=".strtolower($this->getPartnerId()));
 	}
+	
+	public function applyFlavorsDomainPrefix(&$flavors)
+	{
+		foreach ($flavors as &$flavor)
+		{
+			$domainPrefix = $this->getDeliveryServerNodeUrl();
+			if($domainPrefix)
+			{
+				if(isset($flavor['domainPrefix']))
+					continue;
+					
+				$flavor['domainPrefix'] = $domainPrefix;
+			}
+		}
+	}
+	
+	public function getDeliveryServerNodeUrl($removeAfterUse = false)
+	{
+		$deliveryUrl = null;
+	
+		$deliveryNodeIds = $this->params->getEdgeServerIds();
+		$deliveryNodes = ServerNodePeer::retrieveOrderedServerNodesArrayByPKs($deliveryNodeIds);
+	
+		if(!count($deliveryNodes))
+		{
+			KalturaLog::debug("No active delivery nodes found to handle [$url]");
+			return null;
+		}
+	
+		$deliveryNode = array_shift($deliveryNodes);
+		$deliveryUrl = $deliveryNode->getPlaybackHost();
+	
+		if(count($deliveryNodes) && $removeAfterUse)
+			$this->params->setEdgeServerIds(array_diff($deliveryNodeIds, array($deliveryNode->getId())));
+	
+		return $deliveryUrl;
+	}
+	
 } 
