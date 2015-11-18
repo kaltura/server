@@ -49,7 +49,7 @@ class DeliveryProfileGenericAppleHttp extends DeliveryProfileAppleHttp {
 		return kDeliveryUtils::formatGenericUrl($url, $pattern, $this->params);
 	}
 	
-	public function doServe()
+	public function buildServeFlavors()
 	{
 		if ($this->getManifestRedirect() && $this->getHostName() != $_SERVER['HTTP_HOST'])
 		{
@@ -62,17 +62,17 @@ class DeliveryProfileGenericAppleHttp extends DeliveryProfileAppleHttp {
 			return array($flavor);
 		}
 		
-		return parent::doServe();
+		return parent::buildServeFlavors();
 	}
 	
-	public function doGetRenderer($flavors)
+	public function getRenderer($flavors)
 	{
 		if ($this->getManifestRedirect() && $this->getHostName() != $_SERVER['HTTP_HOST'])
 		{
 			return new kRedirectManifestRenderer($flavors, $this->params->getEntryId());
 		}
 		
-		return parent::doGetRenderer($flavors);
+		return parent::getRenderer($flavors);
 	}
 }
 

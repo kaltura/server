@@ -37,14 +37,4 @@ class EdgeServerNode extends DeliveryServerNode {
 	
 		return $playbackHostName;
 	}
-	
-	public function buildPlaybackUrl($originalPlaybackUrl)
-	{
-		$urlParts = explode("://", $originalPlaybackUrl);
-		
-		$edgeUrl = $this->getManifestUrl($urlParts[0]);
-		
-		return $edgeUrl . $urlParts[1];
-	}
-
 } // EdgeServer
