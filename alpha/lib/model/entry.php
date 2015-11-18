@@ -1827,7 +1827,10 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 
 	public function setSourceEntryId($v)	{ $this->putInCustomData("sourceEntryId", $v); }
 	public function getSourceEntryId() 		{ return $this->getFromCustomData( "sourceEntryId", null, null ); }
-	
+
+	public function setReachedMaxRecordingDuration ( $v )	{	$this->putInCustomData ( "reachedMaxRecordingDuration" , (bool) $v );	}
+	public function getReachedMaxRecordingDuration() 	{	return (bool) $this->getFromCustomData( "reachedMaxRecordingDuration" ,null, false );	}
+		
 	public function getParentEntry()
 	{
 		if(!$this->getParentEntryId())
