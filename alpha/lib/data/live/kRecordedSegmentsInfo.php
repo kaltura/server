@@ -55,7 +55,8 @@ class kRecordedSegmentsInfo
 			KalturaLog::debug("segmentStartTime: " . $segmentStartTime .
 				" segmentEndTime: " . $segmentEndTime .
 				" nextSegmentStartTime: " . $nextSegmentStartTime .
-				" totalVodOffset: " . $totalVodOffset);
+				" totalVodOffset: " . $totalVodOffset .
+				" segmentDuration: ". $segment[self::VOD_SEGMENT_DURATION]);
 
 			// since the timestamp on the cue point is in seconds, and everything else is in milliseconds we can get
 			// a cue point (that was created less than one second from the beginning of the stream) can get negative time
@@ -72,7 +73,7 @@ class kRecordedSegmentsInfo
 			}
 
 			// cue point is in this segment
-			if ($timestamp >= $segmentStartTime && (is_null($nextSegmentStartTime) || $timestamp < $nextSegmentStartTime)){
+			if ($timestamp >= $segmentStartTime && (is_null($nextSegmentStartTime) || $timestamp <= $segmentEndTime)){
 
 				if ($timestamp <= $segmentEndTime) {
 					$totalVodOffset += $this->getSegmentDurationTillTS($segment, $timestamp);
@@ -82,7 +83,6 @@ class kRecordedSegmentsInfo
 					$totalVodOffset += $segment[self::VOD_SEGMENT_DURATION];
 					KalturaLog::debug("required timestamp " . $timestamp . "is between segments. setting its time to the end of this segment");
 				}
-
 
 				KalturaLog::debug("kRecordedSegmentsInfo.getOffsetForTimestamp returning " . $totalVodOffset);
 				return $totalVodOffset;
@@ -161,13 +161,25 @@ class kRecordedSegmentsInfo
 	// get the first AMF and reduce the AMF->pts from the AMF->timestamp to know the segment start time
 	private function getSegmentStartTime($segment)
 	{
-		// use floor so we won't have a segment that starts after it's cue points
-		return $segment[self::AMF_DATA][0]->timestamp - $segment[self::AMF_DATA][0]->pts;
+		// if there are no AMFs (bad Wowza file) - don't try to access them
+		if (count($segment[self::AMF_DATA]) > 0){
+			// use floor so we won't have a segment that starts after it's cue points
+			return $segment[self::AMF_DATA][0]->timestamp - $segment[self::AMF_DATA][0]->pts;
+		}
+		KalturaLog::warning("got a segment with no AMFs - returning 0 as start time");
+		return 0;
 	}
 
 	private function getSegmentEndTime($segment)
 	{
-		return $this->getSegmentStartTime($segment) + $segment[self::VOD_SEGMENT_DURATION];
+		$numAMFs = count($segment[self::AMF_DATA]);
+		if ($numAMFs == 0)
+			return 0;
+
+		$lastAMF = $segment[self::AMF_DATA][$numAMFs-1];
+
+		// time between the pts of the last AMF and the duration + last AMF timestamp
+		return $segment[self::VOD_SEGMENT_DURATION] - $lastAMF->pts + $lastAMF->timestamp;
 	}
 
 	public function isAMFContinues($prevAMF, $nextAMF){
