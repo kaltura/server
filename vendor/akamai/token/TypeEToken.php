@@ -34,7 +34,7 @@ class TypeEToken extends StreamToken {
        $durBuf = "";
 
        // Call parent ctor
-       parent::StreamToken();
+       parent::__construct();
 
        // Set member functions
        // Note: removed deep copy constuct from java

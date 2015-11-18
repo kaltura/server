@@ -23,7 +23,7 @@ class RijndaelAlgorithm extends RijndaelConstants {
       * Ctor.
       */
      function __construct() {
-         parent::RijndaelConstants();
+	 parent::__construct();
      }
 
      /*
