@@ -57,24 +57,6 @@ class kCaptureSpaceVersionManager{
 		return null;
 	}
 	
-	public static function isLatest($os, $version){
-		$config = self::initConfig();
-		$versions = array_keys($config);
-		uasort($versions, 'version_compare');
-		
-		$latestVersion = array_pop($versions);
-		$section = $config[$latestVersion];
-		
-		if($latestVersion == $version){
-			foreach(self::$osUpdateTypes as $osType => $fileType){
-				if(strpos($os, $osType) === 0){
-					return isset($section[$fileType]);
-				}
-			}
-		}
-		return false;
-	}
-	
 	public static function getUpdateHash($os, $version){
 		$config = self::getConfig($os, self::$osUpdateTypes, $version);
 		if(!$config){
