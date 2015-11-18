@@ -18,26 +18,22 @@ class kCaptureSpaceVersionManager{
 	
     private static $config = null;
     
-	private static function initConfig(){
+	private static function getConfig($os, $osTypes, $version = null){
 		if(!self::$config){
 			$filename = __DIR__ . '/../config/' . self::INI_FILE_NAME;
 			self::$config = parse_ini_file($filename, true);
 		}
-		return self::$config;
-	}
-	
-	private static function getConfig($os, $osTypes, $version = null){
-		$config = self::initConfig();
+		
 		if($version){
 			$version = str_replace('.', '_', $version);
-			if(!isset($config[$version])){
+			if(!isset(self::$config[$version])){
 				return null;
 			}
-			$sections = array($version => $config[$version]);
+			$sections = array($version => self::$config[$version]);
 		}
 		else {
-			uksort($config, 'version_compare');
-			$sections = array_reverse($config, true);
+			uksort(self::$config, 'version_compare');
+			$sections = array_reverse(self::$config, true);
 		}
 		
 		$osFileType = null;
@@ -55,24 +51,6 @@ class kCaptureSpaceVersionManager{
 		}
 		
 		return null;
-	}
-	
-	public static function isLatest($os, $version){
-		$config = self::initConfig();
-		$versions = array_keys($config);
-		uasort($versions, 'version_compare');
-		
-		$latestVersion = array_pop($versions);
-		$section = $config[$latestVersion];
-		
-		if($latestVersion == $version){
-			foreach(self::$osUpdateTypes as $osType => $fileType){
-				if(strpos($os, $osType) === 0){
-					return isset($section[$fileType]);
-				}
-			}
-		}
-		return false;
 	}
 	
 	public static function getUpdateHash($os, $version){

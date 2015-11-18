@@ -18,16 +18,12 @@ class CaptureSpaceService extends KalturaBaseService
 	 */
 	function clientUpdatesAction ($os, $version)
 	{
-		if(kCaptureSpaceVersionManager::isLatest($os, $version)){
-			throw new KalturaAPIException(CaptureSpaceErrors::ALREADY_LATEST_VERSION, $version, $os);
-		}
-		
 		$hashValue = kCaptureSpaceVersionManager::getUpdateHash($os, $version);
 		if (!$hashValue) {
 			throw new KalturaAPIException(CaptureSpaceErrors::NO_UPDATE_IS_AVAILABLE, $version, $os);
 		}
 			
-		$path = "/api_v3/service/captureSpace_captureSpace/action/serve/serveUpdateAction/os/$os/version/$version";
+		$path = "/api_v3/service/captureSpace_captureSpace/action/serveUpdate/os/$os/version/$version";
 		$downloadUrl = myPartnerUtils::getCdnHost(null) . $path;
 		
 		$info = new KalturaCaptureSpaceUpdateResponseInfo();
