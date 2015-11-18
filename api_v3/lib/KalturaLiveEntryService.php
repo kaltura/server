@@ -73,10 +73,15 @@ class KalturaLiveEntryService extends KalturaEntryService
 			throw new KalturaAPIException(KalturaErrors::ASSET_ID_NOT_FOUND, $assetId);
 			
 		$lastDuration = 0;
+		$recordedEntry = null;
 		if ($dbEntry->getRecordedEntryId())
 		{
 			$recordedEntry = entryPeer::retrieveByPK($dbEntry->getRecordedEntryId());
 			if ($recordedEntry) {
+				if ($recordedEntry->getReachedMaxRecordingDuration()) {
+					KalturaLog::err("Entry [$entryId] has already reached its maximal recording duration.");
+					throw new KalturaAPIException(KalturaErrors::LIVE_STREAM_EXCEEDED_MAX_RECORDED_DURATION, $entryId);
+				}
 				// if entry is in replacement, the replacement duration is more accurate 
 				if ($recordedEntry->getReplacedEntryId()) {
 					$replacementRecordedEntry = entryPeer::retrieveByPK($recordedEntry->getReplacedEntryId());
@@ -96,6 +101,10 @@ class KalturaLiveEntryService extends KalturaEntryService
 		$maxRecordingDuration = (kConf::get('max_live_recording_duration_hours') + 1) * 60 * 60 * 1000;
 		if($currentDuration > $maxRecordingDuration)
 		{
+			if ($recordedEntry) {
+				$recordedEntry->setReachedMaxRecordingDuration(true);
+				$recordedEntry->save();
+			}
 			KalturaLog::err("Entry [$entryId] duration [" . $lastDuration . "] and current duration [$currentDuration] is more than max allwoed duration [$maxRecordingDuration]");
 			throw new KalturaAPIException(KalturaErrors::LIVE_STREAM_EXCEEDED_MAX_RECORDED_DURATION, $entryId);
 		}
