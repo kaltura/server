@@ -24,7 +24,6 @@ class kCaptureSpaceVersionManager{
 			self::$config = parse_ini_file($filename, true);
 		}
 		
-		self::$config = self::initConfig();
 		if($version){
 			$version = str_replace('.', '_', $version);
 			if(!isset(self::$config[$version])){
