@@ -580,7 +580,7 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 		// select up to MAX_CUE_POINTS_TO_COPY_TO_VOD to handle
 		$c = new KalturaCriteria();
 		$c->add( CuePointPeer::ENTRY_ID, $liveEntry->getId() );
-		$c->add( CuePointPeer::START_TIME, $liveEntry->getLengthInMsecs(), KalturaCriteria::LESS_EQUAL ); // Don't copy future cuepoints
+		$c->add( CuePointPeer::START_TIME, null, KalturaCriteria::ISNOTNULL ); // Don't copy future cuepoints
 		$c->add( CuePointPeer::STATUS, CuePointStatus::READY ); // READY, but not yet HANDLED
 
 		$c->addAscendingOrderByColumn(CuePointPeer::START_TIME);
