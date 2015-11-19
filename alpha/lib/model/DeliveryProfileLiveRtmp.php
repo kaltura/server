@@ -19,11 +19,11 @@ class DeliveryProfileLiveRtmp extends DeliveryProfileLive {
 		return $this->getFromCustomData("enforceRtmpe");
 	}
 	
-	public function buildServeFlavors(kLiveStreamConfiguration $liveStreamConfig)
+	public function buildServeFlavors()
 	{
 		$flavors = $this->buildRtmpLiveStreamFlavorsArray();
 
-		$baseUrl = $liveStreamConfig->getUrl();
+		$baseUrl = $this->liveStreamConfig->getUrl();
 		$this->finalizeUrls($baseUrl, $flavors);
 		$this->baseUrl = $baseUrl;
 		
