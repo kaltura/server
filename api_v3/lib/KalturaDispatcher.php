@@ -217,10 +217,20 @@ class KalturaDispatcher
 			if ( $options ) {
 				$optionsArray = explode(",", $options);
 			}
-			if (!$dbObject->isEntitledKuserEdit(kCurrentContext::getCurrentKsKuserId())
+
+			$currentKuserId = kCurrentContext::getCurrentKsKuserId();
+			if (!$dbObject->isEntitledKuserEdit($currentKuserId)
 				||
 				(in_array(self::OWNER_ONLY_OPTION,$optionsArray)))
-				throw new KalturaAPIException(KalturaErrors::INVALID_KS, "", ks::INVALID_TYPE, ks::getErrorStr(ks::INVALID_TYPE));
+				{
+					$kuserKGroupIds = KuserKgroupPeer::retrieveKgroupIdsByKuserIds(array($currentKuserId));
+					foreach($kuserKGroupIds as $groupKId)
+					{
+						if($dbObject->isEntitledKuserEdit($groupKId))
+							return;
+					}
+					throw new KalturaAPIException(KalturaErrors::INVALID_KS, "", ks::INVALID_TYPE, ks::getErrorStr(ks::INVALID_TYPE));
+				}
 		}
 	}
 }
