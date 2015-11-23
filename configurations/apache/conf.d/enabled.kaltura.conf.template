@@ -181,7 +181,6 @@ Alias /start "@APP_DIR@/start"
 
 Alias /content/uiconf "@WEB_DIR@/content/uiconf"
 <Directory "@WEB_DIR@/content/uiconf">
-        AddHandler cgi-script .php .pl .py .jsp .asp .htm .shtml .sh .cgi
         Options -ExecCGI
         SetEnv force-no-vary
 
@@ -197,10 +196,9 @@ Alias /content/uiconf "@WEB_DIR@/content/uiconf"
 
 Alias /content "@WEB_DIR@/content"
 <Directory "@WEB_DIR@/content">
-	#AddHandler cgi-script .php .pl .py .jsp .asp .htm .shtml .sh .cgi
-	#Options -ExecCGI
+	Options -ExecCGI -Indexes
 	SetEnv force-no-vary
-
+	php_flag engine off
 	ExpiresActive On
 	ExpiresDefault "access plus 3 month"
 	Header unset ETag
