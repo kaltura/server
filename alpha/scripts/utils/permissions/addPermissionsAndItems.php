@@ -247,7 +247,9 @@ function addParameterPermissionItem($itemCfg)
 			}
 					
 			$setterCallback = array ( $item ,"set{$key}");	
-			call_user_func_array( $setterCallback , array ($value ) );
+			if (method_exists($item,'set'.$key)){
+			    call_user_func_array( $setterCallback , array ($value ) );
+			}
 		}
 		$item->save();
 		KalturaLog::log('New permission item id ['.$item->getId().'] added for ['.$item->getAction().'->'.$item->getObject().'->'.$item->getParameter().'] partner id ['.$item->getPartnerId().']');
