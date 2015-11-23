@@ -361,6 +361,11 @@ class KalturaPartner extends KalturaObject implements IFilterable
 	 */
 	public function toPartner()
 	{
+		$this->name=strip_tags($this->name);
+		$this->adminName=strip_tags($this->adminName);
+		$this->adminEmail=strip_tags($this->adminEmail);
+		$this->website=strip_tags($this->website);
+		$this->company=strip_tags($this->company);
 		
 		if($this->adminName && $this->firstName === null && $this->lastName === null)
 		{
