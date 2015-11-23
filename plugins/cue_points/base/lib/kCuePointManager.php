@@ -580,7 +580,7 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 		// select up to MAX_CUE_POINTS_TO_COPY_TO_VOD to handle
 		$c = new KalturaCriteria();
 		$c->add( CuePointPeer::ENTRY_ID, $liveEntry->getId() );
-		$c->add( CuePointPeer::START_TIME, null, KalturaCriteria::ISNOTNULL ); // make sure START_TIME of the cue point is not null
+		$c->add( CuePointPeer::START_TIME, $liveEntry->getLengthInMsecs(), KalturaCriteria::LESS_EQUAL ); // Don't copy future cuepoints
 		$c->add( CuePointPeer::STATUS, CuePointStatus::READY ); // READY, but not yet HANDLED
 
 		$c->addAscendingOrderByColumn(CuePointPeer::START_TIME);
@@ -599,21 +599,20 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 			foreach ( $liveCuePointsToCopy as $liveCuePoint )
 			{
 				$processedCuePointIds[] = $liveCuePoint->getId();
-
-				$cuePointCreationTime = $liveCuePoint->getCreatedAt(NULL)*1000;
-				$offsetForTS = $recordedSegmentsInfo->getOffsetForTimestamp($cuePointCreationTime);
-
-				$copyMsg = "cuepoint [{$liveCuePoint->getId()}] from live entry [{$liveEntry->getId()}] to VOD entry [{$vodEntry->getId()}] cuePointCreationTime= $cuePointCreationTime offsetForTS= $offsetForTS";
-				KalturaLog::debug("Preparing to copy $copyMsg");
-
-				if ( ! is_null( $offsetForTS ) )
+				$startTime = $liveCuePoint->getStartTime();
+				$copyMsg = "cuepoint [{$liveCuePoint->getId()}] from live entry [{$liveEntry->getId()}] to VOD entry [{$vodEntry->getId()}] with startTime [$startTime]";
+				KalturaLog::info("Preparing to copy $copyMsg");
+				$totalVodOffsetTime = $recordedSegmentsInfo->getTotalVodTimeOffset( $startTime );
+				if ( ! is_null( $totalVodOffsetTime ) )
 				{
-					$liveCuePoint->copyFromLiveToVodEntry( $vodEntry, $offsetForTS );
+					$adjustedStartTime = $startTime - $totalVodOffsetTime;
+					KalturaLog::info("Copying $copyMsg and adjustedStartTime [$adjustedStartTime] (totalVodOffsetTime [$totalVodOffsetTime])" );
+					$liveCuePoint->copyFromLiveToVodEntry( $vodEntry, $adjustedStartTime );
 				}
 				else
 				{
 					KalturaLog::info("Not copying $copyMsg" );
-				}				
+				}
 			}
 		}
 
