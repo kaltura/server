@@ -160,8 +160,8 @@ class myPartnerRegistration
 	 */
 	private function createNewPartner( $partner_name , $contact, $email, $ID_is_for, $SDK_terms_agreement, $description, $website_url , $password = null , $newPartner = null, $templatePartnerId = null )
 	{
-		$secret = md5($this->str_makerand(5,10,true, false, true));
-		$admin_secret = md5($this->str_makerand(5,10,true, false, true));
+		$secret = md5($this->str_makerand(50,100,true,true,true));
+		$admin_secret = md5($this->str_makerand(50,100,true,true,true));
 
 		if (!$newPartner)
 			$newPartner = new Partner();
