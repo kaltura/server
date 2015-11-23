@@ -160,8 +160,8 @@ class myPartnerRegistration
 	 */
 	private function createNewPartner( $partner_name , $contact, $email, $ID_is_for, $SDK_terms_agreement, $description, $website_url , $password = null , $newPartner = null, $templatePartnerId = null )
 	{
-		$secret = md5(mcrypt_create_iv(100));
-		$admin_secret = md5(mcrypt_create_iv(100));
+		$secret = md5(mcrypt_create_iv(16));
+		$admin_secret = md5(mcrypt_create_iv(16));
 
 		if (!$newPartner)
 			$newPartner = new Partner();
