@@ -7,7 +7,7 @@ class LiveReportLivePartnerExactTimeEngine extends LiveReportLivePartnerEngine {
 	
 	protected $timeReferenceFix;
 	
-	public function LiveReportLivePartnerExactTimeEngine($field, $timeFrame, $title = null) {
+	public function __construct($field, $timeFrame, $title = null) {
 		parent::__construct($field, $timeFrame, $title, false);
 		$this->timeFrame = 0;
 		$this->timeReferenceFix = $timeFrame;

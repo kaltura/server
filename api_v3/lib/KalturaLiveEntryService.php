@@ -72,9 +72,28 @@ class KalturaLiveEntryService extends KalturaEntryService
 		if (!$dbAsset || !($dbAsset instanceof liveAsset))
 			throw new KalturaAPIException(KalturaErrors::ASSET_ID_NOT_FOUND, $assetId);
 			
-		$lastDuration = $dbEntry->getLengthInMsecs();
-		if(!$lastDuration)
-			$lastDuration = 0;
+		$lastDuration = 0;
+		$recordedEntry = null;
+		if ($dbEntry->getRecordedEntryId())
+		{
+			$recordedEntry = entryPeer::retrieveByPK($dbEntry->getRecordedEntryId());
+			if ($recordedEntry) {
+				if ($recordedEntry->getReachedMaxRecordingDuration()) {
+					KalturaLog::err("Entry [$entryId] has already reached its maximal recording duration.");
+					throw new KalturaAPIException(KalturaErrors::LIVE_STREAM_EXCEEDED_MAX_RECORDED_DURATION, $entryId);
+				}
+				// if entry is in replacement, the replacement duration is more accurate 
+				if ($recordedEntry->getReplacedEntryId()) {
+					$replacementRecordedEntry = entryPeer::retrieveByPK($recordedEntry->getReplacedEntryId());
+					if ($replacementRecordedEntry) {
+						$lastDuration = $replacementRecordedEntry->getLengthInMsecs();
+					}
+				}
+				else {
+					$lastDuration = $recordedEntry->getLengthInMsecs();
+				}
+			}
+		}
 
 		$liveSegmentDurationInMsec = (int)($duration * 1000);
 		$currentDuration = $lastDuration + $liveSegmentDurationInMsec;
@@ -82,7 +101,11 @@ class KalturaLiveEntryService extends KalturaEntryService
 		$maxRecordingDuration = (kConf::get('max_live_recording_duration_hours') + 1) * 60 * 60 * 1000;
 		if($currentDuration > $maxRecordingDuration)
 		{
-			KalturaLog::err("Entry [$entryId] duration [" . $dbEntry->getLengthInMsecs() . "] and current duration [$currentDuration] is more than max allwoed duration [$maxRecordingDuration]");
+			if ($recordedEntry) {
+				$recordedEntry->setReachedMaxRecordingDuration(true);
+				$recordedEntry->save();
+			}
+			KalturaLog::err("Entry [$entryId] duration [" . $lastDuration . "] and current duration [$currentDuration] is more than max allwoed duration [$maxRecordingDuration]");
 			throw new KalturaAPIException(KalturaErrors::LIVE_STREAM_EXCEEDED_MAX_RECORDED_DURATION, $entryId);
 		}
 			
@@ -98,15 +121,17 @@ class KalturaLiveEntryService extends KalturaEntryService
 
 		if($dbAsset->hasTag(assetParams::TAG_RECORDING_ANCHOR) && $mediaServerIndex == KalturaMediaServerIndex::PRIMARY)
 		{
-			$dbEntry->setLengthInMsecs($currentDuration);
-
 			// Extract the exact video segment duration from the recorded file
 			$mediaInfoParser = new KMediaInfoMediaParser($filename, kConf::get('bin_path_mediainfo'));
-			$recordedSegmentDurationInMsec = $mediaInfoParser->getMediaInfo()->videoDuration;
+			$recordedSegmentDurationInMS = $mediaInfoParser->getMediaInfo()->videoDuration;
 
-			$currentSegmentVodToLiveDeltaTime = $liveSegmentDurationInMsec - $recordedSegmentDurationInMsec;
+			KalturaLog::debug("about to call amfParser->getMediaInfo()");
+			// Extract AMF data from all data frames in the segment
+			$amfParser = new KAMFMediaInfoParser($filename, kConf::get('bin_path_ffprobeKAMFMediaInfoParser'));
+			$AMFs = $amfParser->getAMFInfo();
+
 			$recordedSegmentsInfo = $dbEntry->getRecordedSegmentsInfo();
-			$recordedSegmentsInfo->addSegment( $lastDuration, $recordedSegmentDurationInMsec, $currentSegmentVodToLiveDeltaTime );
+			$recordedSegmentsInfo->addSegment( $recordedSegmentDurationInMS, $AMFs);
 			$dbEntry->setRecordedSegmentsInfo( $recordedSegmentsInfo );
 
 			if ( $isLastChunk )
@@ -205,11 +230,10 @@ class KalturaLiveEntryService extends KalturaEntryService
 		if (!$dbEntry || !($dbEntry instanceof LiveEntry))
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 		
-		try
-		{
+		try {
 			$dbEntry->setMediaServer($mediaServerIndex, $hostname, $applicationName);
 		}
-		catch(kCoreException $ex) 
+		catch(kCoreException $ex)
 		{
 			$code = $ex->getCode();
 			switch($code)
@@ -218,8 +242,9 @@ class KalturaLiveEntryService extends KalturaEntryService
 					throw new KalturaAPIException(KalturaErrors::MEDIA_SERVER_NOT_FOUND, $hostname);
 				default:
 					throw $ex;
-			}		
+			}
 		}
+
 		$dbEntry->setRedirectEntryId(null);
 		
 		if($dbEntry->save())

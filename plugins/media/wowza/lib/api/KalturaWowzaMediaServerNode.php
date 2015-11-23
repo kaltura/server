@@ -58,6 +58,23 @@ class KalturaWowzaMediaServerNode extends KalturaMediaServerNode
 	);
 	
 	/* (non-PHPdoc)
+	 * @see KalturaObject::validateForInsert()
+	 */
+	public function validateForInsert($propertiesToSkip = array())
+	{
+		return parent::validateForInsertByType($propertiesToSkip, WowzaPlugin::getWowzaMediaServerTypeCoreValue(WowzaMediaServerNodeType::WOWZA_MEDIA_SERVER));
+	}
+	
+	/* (non-PHPdoc)
+	 * @see KalturaObject::validateForUpdate()
+	 */
+	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
+	{
+		return parent::validateForUpdateByType($sourceObject, $propertiesToSkip, WowzaPlugin::getWowzaMediaServerTypeCoreValue(WowzaMediaServerNodeType::WOWZA_MEDIA_SERVER));
+	}
+	
+	
+	/* (non-PHPdoc)
 	 * @see KalturaObject::getMapBetweenObjects()
 	 */
 	public function getMapBetweenObjects()

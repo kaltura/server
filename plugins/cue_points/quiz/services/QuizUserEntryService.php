@@ -22,22 +22,41 @@ class QuizUserEntryService extends KalturaBaseService{
 		$dbUserEntry = UserEntryPeer::retrieveByPK($id);
 		if (!$dbUserEntry)
 			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $id);
-
+		
 		if ($dbUserEntry->getType() != QuizPlugin::getCoreValue('UserEntryType',QuizUserEntryType::QUIZ))
-		{
-			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_TYPE, $dbUserEntry->getType());
-		}
-		/**
-		 * @var QuizUserEntry $dbUserEntry
-		 */
-		$score = $dbUserEntry->calculateScore();
+			throw new KalturaAPIException(KalturaQuizErrors::PROVIDED_ENTRY_IS_NOT_A_QUIZ, $id);
+		
+		$dbUserEntry->setStatus(QuizPlugin::getCoreValue('UserEntryStatus', QuizUserEntryStatus::QUIZ_SUBMITTED));
+		$userEntry = new KalturaQuizUserEntry();
+		$userEntry->fromObject($dbUserEntry, $this->getResponseProfile());
+		$entryId = $dbUserEntry->getEntryId();
+		$entry = entryPeer::retrieveByPK($entryId);
+		if(!$entry)
+			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $entryId);
+		
+		$kQuiz = QuizPlugin::getQuizData($entry);
+		if (!$kQuiz)
+			throw new KalturaAPIException(KalturaQuizErrors::PROVIDED_ENTRY_IS_NOT_A_QUIZ, $entryId);
+		
+		list($score, $numOfCorrectAnswers) = $dbUserEntry->calculateScoreAndCorrectAnswers();
 		$dbUserEntry->setScore($score);
-//		$dbUserEntry->setStatus(QuizUserEntryStatus::QUIZ_SUBMITTED);
+		$dbUserEntry->setNumOfCorrectAnswers($numOfCorrectAnswers);	
+		if ($kQuiz->getShowGradeAfterSubmission()== KalturaNullableBoolean::TRUE_VALUE || $this->getKs()->isAdmin() == true)
+		{
+			$userEntry->score = $score;
+		}
+		else
+		{
+			$userEntry->score = null;
+		}
+
+		$c = new Criteria();
+		$c->add(CuePointPeer::ENTRY_ID, $dbUserEntry->getEntryId(), Criteria::EQUAL);
+		$c->add(CuePointPeer::TYPE, QuizPlugin::getCoreValue('CuePointType', QuizCuePointType::QUIZ_QUESTION));
+		$dbUserEntry->setNumOfQuestions(CuePointPeer::doCount($c));
 		$dbUserEntry->setStatus(QuizPlugin::getCoreValue('UserEntryStatus', QuizUserEntryStatus::QUIZ_SUBMITTED));
 		$dbUserEntry->save();
 
-		$userEntry = new KalturaQuizUserEntry();
-		$userEntry->fromObject($dbUserEntry, $this->getResponseProfile());
 		return $userEntry;
 	}
 }

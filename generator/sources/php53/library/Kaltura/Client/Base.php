@@ -205,7 +205,7 @@ class Base
 		else
 		{
 			$call = $this->callsQueue[0];
-			$url .= "/{$call->service}/&action/{$call->action}";
+			$url .= "/{$call->service}/action/{$call->action}";
 			$params = array_merge($params, $call->params);
 			$files = $call->files;
 		}

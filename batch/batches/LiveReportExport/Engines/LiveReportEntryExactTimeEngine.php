@@ -8,7 +8,7 @@ class LiveReportEntryExactTimeEngine extends LiveReportEntryQueryEngine {
 	protected $timeReferenceFix;
 	protected $shouldPrintResult;
 
-	public function LiveReportEntryExactTimeEngine($field, $timeFrame, $title = null, $printResult = true) {
+	public function __construct($field, $timeFrame, $title = null, $printResult = true) {
 		parent::__construct($field, $timeFrame, $title, false);
 		$this->timeFrame = 0;
 		$this->timeReferenceFix = $timeFrame;

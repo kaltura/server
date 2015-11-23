@@ -531,12 +531,6 @@ class kEntitlementUtils
 		if ( kCurrentContext::$is_admin_session || kCurrentContext::getCurrentKsKuserId() == $dbEntry->getKuserId())
 			return true;
 
-		$entitledKusers = baseObjectUtils::getObjectIdsAsArray($dbEntry->getEntitledKusersEdit());
-		if(in_array(kCurrentContext::getCurrentKsKuserId(), $entitledKusers))
-		{
-			return true;
-		}
-
-		return false;
+		return $dbEntry->isEntitledKuserEdit(kCurrentContext::getCurrentKsKuserId());
 	}
 }

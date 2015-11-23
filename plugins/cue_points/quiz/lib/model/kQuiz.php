@@ -47,6 +47,11 @@ class kQuiz {
 	protected $allowDownload;
 
 	/**
+	 * @var boolean
+	 */
+	protected $showGradeAfterSubmission;
+
+	/**
 	 * @return int
 	 */
 	public function getVersion()
@@ -158,7 +163,19 @@ class kQuiz {
 		$this->allowDownload = $allowDownload;
 	}
 
+	/**
+	 * @return boolean
+	 */
+	public function getShowGradeAfterSubmission()
+	{
+		return $this->showGradeAfterSubmission;
+	}
 
-
-
+	/**
+	 * @param boolean $showAfterSubmit
+	 */
+	public function setShowGradeAfterSubmission($showAfterSubmit)
+	{
+		$this->showGradeAfterSubmission = $showAfterSubmit;
+	}
 }

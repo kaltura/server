@@ -1261,13 +1261,14 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 						$oldElements = $xPath->query($updateRequiredMetadataXPath);
 					}
 					
-					if(is_null($newElements) && is_null($oldElements))
+					if((!$newElements || !$newElements->length) && (!$oldElements && !$oldElements->length))
 						continue;
 						
-					if(is_null($newElements) XOR is_null($oldElements))
+					if((!$newElements || !$newElements->length) XOR (!$oldElements || !$oldElements->length))
 					{
 						$updateRequired = true;
 					}
+					
 					elseif($newElements->length == $oldElements->length)
 					{
 						for($index = 0; $index < $newElements->length; $index++)
@@ -1462,7 +1463,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 				
 					if($entryDistribution->getDirtyStatus() == EntryDistributionDirtyStatus::UPDATE_REQUIRED || $entryDistribution->getDirtyStatus() == EntryDistributionDirtyStatus::SUBMIT_REQUIRED)
 					{
-						KalturaLog::log("Entry distribution [" . $entryDistribution->getId() . "] already flaged for updating");
+						KalturaLog::log("Entry distribution [" . $entryDistribution->getId() . "] already flagged for updating");
 //						continue;
 					}
 					

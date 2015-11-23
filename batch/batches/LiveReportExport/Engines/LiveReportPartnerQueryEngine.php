@@ -11,7 +11,7 @@ class LiveReportPartnerEngine extends LiveReportEngine {
 	protected $fieldName;
 	protected $printResult;
 	
-	public function LiveReportPartnerEngine($field, $timeFrame, $title, $printResult = true) {
+	public function __construct($field, $timeFrame, $title, $printResult = true) {
 		$this->fieldName = $field;
 		$this->timeFrame = $timeFrame;
 		$this->title = $title;
