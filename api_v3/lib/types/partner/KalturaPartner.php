@@ -363,7 +363,7 @@ class KalturaPartner extends KalturaObject implements IFilterable
 	{
 		$vars_arr=get_object_vars($this);
 		foreach ($vars_arr as $key => $val){
-		    if (gettype($this->$key === 'string') && isset($this->$key)){
+		    if (gettype($this->$key === 'string')){
                         $this->$key=strip_tags($this->$key);
                     }    
                 }   
