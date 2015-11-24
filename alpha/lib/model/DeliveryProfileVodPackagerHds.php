@@ -12,7 +12,7 @@ class DeliveryProfileVodPackagerHds extends DeliveryProfileHds {
 		return $url;
 	}
 	
-	public function serve()
+	public function buildServeFlavors()
 	{
 		$flavors = $this->buildHttpFlavorsArray();
 		$flavors = $this->sortFlavors($flavors);
@@ -22,7 +22,7 @@ class DeliveryProfileVodPackagerHds extends DeliveryProfileHds {
 				'/manifest.f4m', 
 				$this->params);
 		
-		return $this->getRenderer(array($flavor));
+		return array($flavor);
 	}
 
 	/**
