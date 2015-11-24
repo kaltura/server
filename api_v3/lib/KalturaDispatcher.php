@@ -217,14 +217,10 @@ class KalturaDispatcher
 			if ( $options ) {
 				$optionsArray = explode(",", $options);
 			}
-
-			$currentKuserId = kCurrentContext::getCurrentKsKuserId();
-			if (!$dbObject->isEntitledKuserEdit($currentKuserId)
+			if (!$dbObject->isEntitledKuserEdit(kCurrentContext::getCurrentKsKuserId())
 				||
 				(in_array(self::OWNER_ONLY_OPTION,$optionsArray)))
-				{
 					throw new KalturaAPIException(KalturaErrors::INVALID_KS, "", ks::INVALID_TYPE, ks::getErrorStr(ks::INVALID_TYPE));
-				}
 		}
 	}
 }
