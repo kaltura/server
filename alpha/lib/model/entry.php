@@ -1930,14 +1930,14 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	
 	public function isEntitledKuserEdit( $kuserId )
 	{
-		$entitledUserPuserArray = $this->getEntitledUserPuserEditArray();
-		if(in_array(trim($kuserId), array_keys($entitledUserPuserArray)))
+		$entitledKuserArray = array_keys($this->getEntitledUserPuserEditArray());
+		if(in_array(trim($kuserId), $entitledKuserArray))
 			return true;
 		
 		$kuserKGroupIds = KuserKgroupPeer::retrieveKgroupIdsByKuserIds(array($kuserId));
 		foreach($kuserKGroupIds as $groupKId)
 		{
-			if(in_array($groupKId, array_keys($entitledUserPuserArray)))
+			if(in_array($groupKId, $entitledKuserArray))
 				return true;
 		}
 
