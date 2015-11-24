@@ -1930,7 +1930,18 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	
 	public function isEntitledKuserEdit( $kuserId )
 	{
-		return in_array( trim($kuserId), array_keys($this->getEntitledUserPuserEditArray()));
+		$entitledUserPuserArray = $this->getEntitledUserPuserEditArray();
+		if(in_array(trim($kuserId), array_keys($entitledUserPuserArray)))
+			return true;
+		
+		$kuserKGroupIds = KuserKgroupPeer::retrieveKgroupIdsByKuserIds(array($kuserId));
+		foreach($kuserKGroupIds as $groupKId)
+		{
+			if(in_array($groupKId, array_keys($entitledUserPuserArray)))
+				return true;
+		}
+
+		return false;
 	}
 
 	private function getEntitledUserPuserEditArray()
@@ -1995,7 +2006,20 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	
 	public function isEntitledKuserPublish( $kuserId )
 	{
-		return in_array( trim($kuserId), explode( ',', $this->getEntitledKusersPublish() ) );
+		$entitledKusersArray = explode(',', $this->getEntitledKusersPublish());
+		if(in_array(trim($kuserId), $entitledKusersArray))
+			return true;
+
+		$kuserKGroupIds = KuserKgroupPeer::retrieveKgroupIdsByKuserIds(array($kuserId));
+
+		foreach($kuserKGroupIds as $groupKId)
+		{
+			KalturaLog::debug("group id is - $groupKId");
+			if(in_array($groupKId, $entitledKusersArray))
+				return true;
+		}
+
+		return false;	
 	}
 
 	public function getRoots()

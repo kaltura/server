@@ -103,8 +103,7 @@ class kEntitlementUtils
 			}
 				
 			// kuser is set on the entry entitled users edit or publish
-			$entitledKusers = array_merge(explode(',', $entry->getEntitledKusersEdit()), explode(',', $entry->getEntitledKusersPublish()));
-			if(in_array($kuserId, $entitledKusers))
+			if($entry->isEntitledKuserEdit($kuserId) || $entry->isEntitledKuserPublish($kuserId))
 			{
 				KalturaLog::info('Entry [' . print_r($entry->getId(), true) . '] entitled: ks user is the same as entry->entitledKusersEdit or entry->entitledKusersPublish');
 				return true;
