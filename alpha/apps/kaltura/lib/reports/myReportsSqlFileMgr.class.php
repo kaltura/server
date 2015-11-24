@@ -639,6 +639,10 @@ KalturaLog::log ( __METHOD__. ": [$type_str] [$flavor_str] [$add_search_text] [$
 				"count_by_app" => "count_by_app",
 				"count_by_app_for_objects" => "count_by_app_for_objects",
 			),
+			"vpaas_usage" => array (
+				"detail_no_text" => "detail_no_text",
+				"count_no_text" => "count_no_text",
+			),
 			
 		);
 

@@ -41,6 +41,7 @@ class myReportsMgr
 	const REPORT_TYPE_BROWSERS = 23;
 	const REPORT_TYPE_LIVE = 24;
 	const REPORT_TYPE_TOP_PLAYBACK_CONTEXT = 25;
+	const REPORT_TYPE_VPAAS_USAGE = 26;
 
 	const REPORTS_TABLE_MAX_QUERY_SIZE = 20000;
 	const REPORTS_CSV_MAX_QUERY_SIZE = 130000;
@@ -441,29 +442,48 @@ class myReportsMgr
 			return $url;
 		}
 	*/	
-		$arr = self::getGraph( $partner_id , 
-			$report_type , 
-			$input_filter ,
-			$dimension , 
-			$object_ids );
-
-		list ( $total_header , $total_data ) = self::getTotal( $partner_id , 
-			$report_type , 
-			$input_filter , $object_ids );			
 		$csv = new myCsvWrapper ();
+		
+		$arr = array();
+		try {
+			$arr = self::getGraph( $partner_id , 
+				$report_type , 
+				$input_filter ,
+				$dimension , 
+				$object_ids );
+		} catch (Exception $ex) {
+			KalturaLog::log( "Can't export graph data for $report_type" );
+		}
+		
+		try {
+			list ( $total_header , $total_data ) = self::getTotal( $partner_id , 
+				$report_type , 
+				$input_filter , $object_ids );			
+		} catch (Exception $ex) {
+			KalturaLog::log( "Can't export list data for $report_type" );
+		} 
+		
+		
 	
 		if ($page_size < self::REPORTS_TABLE_RESULTS_SINGLE_ITERATION_SIZE)
 		{
-			list ( $table_header , $table_data , $table_total_count ) = self::getTable( $partner_id ,
-				$report_type ,
-				$input_filter ,
-				$page_size , $page_index ,
-				$order_by ,  $object_ids );
+			try {
+				list ( $table_header , $table_data , $table_total_count ) = self::getTable( $partner_id ,
+					$report_type ,
+					$input_filter ,
+					$page_size , $page_index ,
+					$order_by ,  $object_ids );
+					
+					if ($input_filter instanceof endUserReportsInputFilter)
+					{
+						$table_total_count =  self::getTotalTableCount($partner_id, $report_type, $input_filter, $page_size, $page_index, $order_by, $object_ids);
+					}
+					
+			} catch (Exception $ex) {
+				KalturaLog::log( "Can't export table data for $report_type" );
+			} 
 	
-			if ($input_filter instanceof endUserReportsInputFilter)
-			{
-					$table_total_count =  self::getTotalTableCount($partner_id, $report_type, $input_filter, $page_size, $page_index, $order_by, $object_ids);
-			}
+			
 	
 			$csv = myCsvReport::createReport( $report_title , $report_text , $headers ,
 				$report_type , $input_filter , $dimension ,
@@ -908,6 +928,7 @@ class myReportsMgr
 		self::REPORT_TYPE_BROWSERS => 'browsers',
 		self::REPORT_TYPE_LIVE => "live",
 		self::REPORT_TYPE_TOP_PLAYBACK_CONTEXT => "top_playback_context",
+		self::REPORT_TYPE_VPAAS_USAGE => "vpaas_usage",
 	
 	);
 	
@@ -1112,6 +1133,15 @@ class myReportsMgr
 				"count_loads" ,
 				"avg_view_drop_off",
 				"load_play_ratio" ,		
+			),
+			"vpaas_usage" => array (
+				"month_id",
+				"total_plays",
+				"bandwidth_gb",
+				"avg_storage_gb",
+				"transcoding_gb",
+				"total_media_entries",
+				"total_end_users", 
 			)
 		);
 		
