@@ -79,9 +79,9 @@ class ComcastMrssFeed
 		$this->thumbnail = $node->cloneNode(true);
 		$node->parentNode->removeChild($node);
 		
-		// thumbnail node template
+		// caption node template
 		$node = $this->xpath->query('media:group/media:subTitle', $this->item)->item(0);
-		$this->thumbnail = $node->cloneNode(true);
+		$this->caption = $node->cloneNode(true);
 		$node->parentNode->removeChild($node);
 		
 		// category node template
@@ -321,11 +321,11 @@ class ComcastMrssFeed
 			$content = $this->caption->cloneNode(true);
 			$mediaGroup = $this->xpath->query('media:group', $item)->item(0);
 			$mediaGroup->appendChild($content);
-			$url = $this->getAssetUrl($captionAsset);
+			$url = $captionAsset->getDownloadUrl(true);
 			
-			kXml::setNodeValue($this->xpath,'@url', $url, $content);
+			kXml::setNodeValue($this->xpath,'@href', $url, $content);
 			kXml::setNodeValue($this->xpath,'@lang', $captionAsset->getLanguage(), $content);
-			kXml::setNodeValue($this->xpath,'@type', $captionAsset->getType(), $content);
+			kXml::setNodeValue($this->xpath,'@type', $captionAsset->getFileExt(), $content);
 		}
 	}
 	
