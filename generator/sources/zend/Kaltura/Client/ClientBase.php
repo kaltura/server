@@ -568,7 +568,7 @@ class Kaltura_Client_ClientBase
 
 		if(is_bool($paramValue))
 		{
-			$params[$paramName] = $paramValue ? 'true' : 'false';
+			$params[$paramName] = $paramValue;
 			return;
 		}
 
