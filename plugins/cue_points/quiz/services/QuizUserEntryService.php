@@ -51,11 +51,37 @@ class QuizUserEntryService extends KalturaBaseService{
 		}
 
 		$c = new Criteria();
+
 		$c->add(CuePointPeer::ENTRY_ID, $dbUserEntry->getEntryId(), Criteria::EQUAL);
 		$c->add(CuePointPeer::TYPE, QuizPlugin::getCoreValue('CuePointType', QuizCuePointType::QUIZ_QUESTION));
 		$dbUserEntry->setNumOfQuestions(CuePointPeer::doCount($c));
 		$dbUserEntry->setStatus(QuizPlugin::getCoreValue('UserEntryStatus', QuizUserEntryStatus::QUIZ_SUBMITTED));
 		$dbUserEntry->save();
+
+		if ($kQuiz->getShowCorrectAfterSubmission())
+		{
+			$questionType = QuizPlugin::getCuePointTypeCoreValue(QuizCuePointType::QUIZ_QUESTION);
+			$questions = CuePointPeer::retrieveByEntryId($entryId, array($questionType));
+			$userEntry->correctAnswerKeys = array();
+			/**
+			 * @var QuestionCuePoint $question
+			 */
+			foreach ($questions as $question)
+			{
+				$optionalAnswers = $question->getOptionalAnswers();
+				/**
+				 * @var kOptionalAnswer $optAns
+				 */
+
+				foreach ($optionalAnswers as $optAns)
+				{
+					if (!is_null($optAns->getIsCorrect()) && $optAns->getIsCorrect() == KalturaNullableBoolean::TRUE_VALUE)
+					{
+						$userEntry->correctAnswerKeys[] = $optAns->getKey();
+					}
+				}
+			}
+		}
 
 		return $userEntry;
 	}

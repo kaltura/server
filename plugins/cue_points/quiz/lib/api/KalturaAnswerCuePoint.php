@@ -31,13 +31,6 @@ class KalturaAnswerCuePoint extends KalturaCuePoint
 	public $isCorrect;
 
 	/**
-	 * Array of string
-	 * @var KalturaStringArray
-	 * @readonly
-	 */
-	public $correctAnswerKeys;
-
-	/**
 	 * @var string
 	 * @readonly
 	 */
@@ -54,7 +47,6 @@ class KalturaAnswerCuePoint extends KalturaCuePoint
 		"quizUserEntryId",
 		"answerKey",
 		"parentId",
-		"correctAnswerKeys",
 		"isCorrect",
 		"explanation"
 	);
@@ -88,31 +80,63 @@ class KalturaAnswerCuePoint extends KalturaCuePoint
 		parent::doFromObject($dbObject, $responseProfile);
 
 		$dbEntry = entryPeer::retrieveByPK($dbObject->getEntryId());
-		if ( !kEntitlementUtils::isEntitledForEditEntry($dbEntry) ) {
+		if ( !kEntitlementUtils::isEntitledForEditEntry($dbEntry) )
+		{
 			/**
 			 * @var kQuiz $kQuiz
 			 */
 			$kQuiz = QuizPlugin::validateAndGetQuiz( $dbEntry );
 
+			//Find the corresponding question cue point
+			$this->validateParentId();
+			$dbQuestionCuePoint = CuePointPeer::retrieveByPK($this->parentId);
+
+			$kQuestionEntry= $this->getEntry($dbQuestionCuePoint->getEntryId(), $dbQuestionCuePoint->getType());
+			$this->explanation = $kQuestionEntry->explanation;
+
 			$dbUserEntry = UserEntryPeer::retrieveByPK($this->quizUserEntryId);
-			if ($dbUserEntry && $dbUserEntry->getStatus() == QuizPlugin::getCoreValue('UserEntryStatus', QuizUserEntryStatus::QUIZ_SUBMITTED))
+
+			if ($kQuiz->getShowCorrectKeyOnAnswer() )
 			{
-				if (!$kQuiz->getShowCorrectAfterSubmission())
+				$optionalAnswers = $dbQuestionCuePoint->getFromCustomData(QuestionCuePoint::CUSTOM_DATA_OPTIONAL_ANSWERS, null, array());
+				if(is_array($optionalAnswers))
 				{
-					$this->isCorrect = KalturaNullableBoolean::NULL_VALUE;
-					$this->correctAnswerKeys = null;
-					$this->explanation = null;
+					$optionalAnswers = KalturaOptionalAnswersArray::fromDbArray($dbQuestionCuePoint->getOptionalAnswers());
+				}
+
+				foreach ( $optionalAnswers as $optAnswer ) {
+					if ($optAnswer->isCorrect)
+					{
+						if (is_null($this->correctAnswerKeys))
+						{
+							$this->correctAnswerKeys = new KalturaOptionalAnswer();
+						}
+						$this->correctAnswerKeys->fromObject($optAnswer, $responseProfile);
+					}
 				}
 			}
-			else
-			{
-				if (!$kQuiz->getShowResultOnAnswer())
-					$this->isCorrect = KalturaNullableBoolean::NULL_VALUE;
 
-				if (!$kQuiz->getShowCorrectKeyOnAnswer())
+			if ($kQuiz->getShowResultOnAnswer())
+			{
+				$optionalAnswers = $dbQuestionCuePoint->getFromCustomData(QuestionCuePoint::CUSTOM_DATA_OPTIONAL_ANSWERS, null, array());
+				if(is_array($optionalAnswers))
 				{
-					$this->correctAnswerKeys = null;
-					$this->explanation = null;
+					$optionalAnswers = KalturaOptionalAnswersArray::fromDbArray($dbQuestionCuePoint->getOptionalAnswers());
+				}
+				/**
+				 * @var kOptionalAnswer $optAns
+				 */
+				foreach ( $optionalAnswers as $optAnswer )
+				{
+					if ($optAnswer->isCorrect && $this->answerKey == $optAnswer->key)
+					{
+						$this->isCorrect = true;
+						break;
+					}
+					else
+					{
+						$this->isCorrect = false;
+					}
 				}
 			}
 		}
