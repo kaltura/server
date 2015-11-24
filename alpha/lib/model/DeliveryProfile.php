@@ -352,14 +352,12 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 	{
 		foreach ($flavors as &$flavor)
 		{
+			if(isset($flavor['domainPrefix']))
+				continue;
+			
 			$domainPrefix = $this->getDeliveryServerNodeUrl();
 			if($domainPrefix)
-			{
-				if(isset($flavor['domainPrefix']))
-					continue;
-					
 				$flavor['domainPrefix'] = $domainPrefix;
-			}
 		}
 	}
 	
@@ -376,8 +374,9 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 			return null;
 		}
 	
+		/* @var $deliveryNode EdgeServerNode */
 		$deliveryNode = array_shift($deliveryNodes);
-		$deliveryUrl = $deliveryNode->getPlaybackHost();
+		$deliveryUrl = $deliveryNode->getPlaybackHost($this->params->getMediaProtocol(), $this->params->getFormat(), $this->getType());
 	
 		if(count($deliveryNodes) && $removeAfterUse)
 			$this->params->setEdgeServerIds(array_diff($deliveryNodeIds, array($deliveryNode->getId())));
