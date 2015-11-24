@@ -250,7 +250,7 @@ function addParameterPermissionItem($itemCfg)
 			if (method_exists($item,'set'.$key)){
 			    call_user_func_array( $setterCallback , array ($value ) );
 			}else{
-			    KalturaLog::log("Skipping call to set$key() since there is no such method.");
+			    KalturaLog::err("Skipping call to set$key() since there is no such method.");
 			}
 		}
 		$item->save();
