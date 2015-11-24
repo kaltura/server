@@ -73,6 +73,12 @@ class myReportsMgr
 	static $escaped_params = array(self::OBJECT_IDS_PLACE_HOLDER,
 								   self::APPLICATION_NAME_PLACE_HOLDER,
 								   self::PUSERS_PLACE_HOLDER);
+								   
+	static $reports_without_graph = array(self::REPORT_TYPE_VPAAS_USAGE);
+	
+	static $reports_without_totals = array(self::REPORT_TYPE_VPAAS_USAGE);
+	
+	static $reports_without_table = array();
 										
 										
 	
@@ -445,29 +451,27 @@ class myReportsMgr
 		$csv = new myCsvWrapper ();
 		
 		$arr = array();
-		try {
+		
+		if (!in_array($report_type, self::$reports_without_graph))
+		{
 			$arr = self::getGraph( $partner_id , 
 				$report_type , 
 				$input_filter ,
 				$dimension , 
 				$object_ids );
-		} catch (Exception $ex) {
-			KalturaLog::log( "Can't export graph data for $report_type" );
 		}
 		
-		try {
+		
+		if (!in_array($report_type, self::$reports_without_totals))
 			list ( $total_header , $total_data ) = self::getTotal( $partner_id , 
 				$report_type , 
 				$input_filter , $object_ids );			
-		} catch (Exception $ex) {
-			KalturaLog::log( "Can't export list data for $report_type" );
-		} 
-		
 		
 	
 		if ($page_size < self::REPORTS_TABLE_RESULTS_SINGLE_ITERATION_SIZE)
 		{
-			try {
+			if (!in_array($report_type, self::$reports_without_table))
+			{
 				list ( $table_header , $table_data , $table_total_count ) = self::getTable( $partner_id ,
 					$report_type ,
 					$input_filter ,
@@ -479,12 +483,8 @@ class myReportsMgr
 						$table_total_count =  self::getTotalTableCount($partner_id, $report_type, $input_filter, $page_size, $page_index, $order_by, $object_ids);
 					}
 					
-			} catch (Exception $ex) {
-				KalturaLog::log( "Can't export table data for $report_type" );
 			} 
-	
 			
-	
 			$csv = myCsvReport::createReport( $report_title , $report_text , $headers ,
 				$report_type , $input_filter , $dimension ,
 				$arr , $total_header , $total_data , $table_header , $table_data , $table_total_count, $csv);
