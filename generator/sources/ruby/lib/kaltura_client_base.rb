@@ -240,10 +240,15 @@ module Kaltura
 						end
 					end
 				end
-			elsif return_type != nil
-					return nil 
+			elsif return_type == nil
+				return nil 
 			else # simple type
-				return xml_element.text
+				value = xml_element.text
+				if return_type == "int"
+					return value.to_i
+				end
+				
+				return value
 			end
 
 			return instance;
