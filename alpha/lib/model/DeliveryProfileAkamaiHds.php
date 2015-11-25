@@ -27,7 +27,7 @@ class DeliveryProfileAkamaiHds extends DeliveryProfileHds {
 		return $url;
 	}
 	
-	public function serve()
+	public function buildServeFlavors()
 	{
 		$flavor = $this->getSecureHdUrl();
 		if (!$flavor)
@@ -36,7 +36,7 @@ class DeliveryProfileAkamaiHds extends DeliveryProfileHds {
 			return null;
 		}
 		
-		return $this->getRenderer(array($flavor));
+		return array($flavor);
 	}
 	
 	/**

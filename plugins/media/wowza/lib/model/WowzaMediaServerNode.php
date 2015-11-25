@@ -51,7 +51,7 @@ class WowzaMediaServerNode extends MediaServerNode {
 		return WowzaMediaServerNode::WEB_SERVICE_LIVE;
 	}
 	
-	public function getPlaybackHost($protocol = 'http', $format = null)
+	public function getPlaybackHost($protocol = 'http', $format = null, $deliveryType = null)
 	{
 		$mediaServerGlobalConfig = array();
 		

@@ -17,7 +17,7 @@ class DeliveryProfileVodPackagerDash extends DeliveryProfileDash {
 		return $url;
 	}
 	
-	public function serve()
+	public function buildServeFlavors()
 	{
 		$flavors = $this->buildHttpFlavorsArray();
 		
@@ -27,6 +27,6 @@ class DeliveryProfileVodPackagerDash extends DeliveryProfileDash {
 				'/manifest.mpd', 
 				$this->params);
 		
-		return $this->getRenderer(array($flavor));
+		return array($flavor);
 	}
 }
