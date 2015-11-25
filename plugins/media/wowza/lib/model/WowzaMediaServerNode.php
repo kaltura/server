@@ -76,16 +76,16 @@ class WowzaMediaServerNode extends MediaServerNode {
 	 */
 	public function getWebService($serviceName)
 	{	
-		if(!isset(self::$webServices[$service]))
+		if(!isset(self::$webServices[$serviceName]))
 			return null;
 			
-		$serviceClass = self::$webServices[$service];
+		$serviceClass = self::$webServices[$serviceName];
 		
 		$domain = $this->getLiveServiceInternalDomain() ? $this->getLiveServiceInternalDomain() : $this->getHostname();
 		$port = $this->getLiveServicePort();
 		$protocol = $this->getLiveServiceProtocol();
 		
-		$url = "$protocol://$domain:$port/$service?wsdl";
+		$url = "$protocol://$domain:$port/$serviceName?wsdl";
 		KalturaLog::debug("Service URL: $url");
 		return new $serviceClass($url);
 	}
