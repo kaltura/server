@@ -319,10 +319,11 @@ module Kaltura
 					end
 				end
 			elsif value.is_a? Array
-				params[name] = Array.new(value.size)
 				if value.empty?
+					params[name] = {}
 					add_param(params[name], "-", "");
 				else
+					params[name] = Array.new(value.size)
 					value.each_with_index do |ele, i|
 						if ele.is_a? KalturaObjectBase
 							add_param(params[name], i, ele.to_params)
