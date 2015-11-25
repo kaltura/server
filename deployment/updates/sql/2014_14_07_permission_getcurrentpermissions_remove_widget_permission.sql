@@ -1,1 +1,0 @@
-DELETE FROM permission_to_permission_item WHERE permission_id = (SELECT id FROM permission WHERE name = 'WIDGET_SESSION_PERMISSION') AND permission_item_id = (SELECT id FROM permission_item WHERE param_1 = 'permission' AND param_2 = 'getcurrentpermissions') LIMIT 1;
