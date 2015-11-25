@@ -33,7 +33,7 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 		if(!$flavors)
 			return null;
 		
-		if($this->params->getEdgeServerIds())
+		if($this->params->getEdgeServerIds() && count($this->params->getEdgeServerIds()))
 			$this->applyFlavorsDomainPrefix($flavors);
 		
 		$renderer = $this->getRenderer($flavors);
@@ -370,7 +370,7 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 	
 		if(!count($deliveryNodes))
 		{
-			KalturaLog::debug("No active delivery nodes found to handle [$url]");
+			KalturaLog::debug("No active delivery nodes found among the requested edge list: " . print_r($deliveryNodeIds, true));
 			return null;
 		}
 	
