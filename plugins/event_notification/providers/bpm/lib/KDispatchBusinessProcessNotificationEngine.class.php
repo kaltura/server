@@ -11,7 +11,7 @@ class KDispatchBusinessProcessNotificationEngine extends KDispatchEventNotificat
 	 */
 	public function getBusinessProcessProvider(KalturaBusinessProcessServer $server)
 	{
-		$provider = kBusinessProcessProvider::get($data->server);
+		$provider = kBusinessProcessProvider::get($server);
 		$provider->enableDebug(true);
 		
 		return $provider;
