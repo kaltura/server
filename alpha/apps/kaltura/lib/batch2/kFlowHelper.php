@@ -2031,6 +2031,15 @@ class kFlowHelper
 		if($entry)
 		{
 			kBusinessConvertDL::checkForPendingLiveClips($entry);
+			$clonePendingEntriesArray = $entry->getClonePendingEntries();
+			foreach ($clonePendingEntriesArray as $pendingEntryId)
+			{
+				$pendingEntry = entryPeer::retrieveByPK($pendingEntryId);
+				if ( $pendingEntry ) {
+					myEntryUtils::copyEntryData($entry, $pendingEntry);
+				}
+			}
+			$entry->setClonePendingEntries(array());
 		}
 		
 		return $dbBatchJob;
