@@ -8,91 +8,107 @@
  */
 class kRecordedSegmentsInfo
 {
-	// The following string literals are short for the sake of a compact serialization
-	const LIVE_START = 'ls'; // Live start time = Total live duration at the beginning of the segment
-	const VOD_SEGMENT_DURATION = 'vsd';
-	const VOD_TO_LIVE_DELTA_TIME = 'dt'; // The diff between live and VOD segments duration (liveStart + vodSegmentDuration + vodToLiveDeltaTime = liveEnd)
-	protected $segments = array();
-	public function addSegment( $liveStart, $vodSegmentDuration, $vodToLiveDeltaTime )
+	// 50bytes per AMF * 50 AMFs = 2500 = 2.5k
+	// We can get up to 15 AMFs per segment (limit in KAMFMediaInfoParser to max 1 AMF per minute) * 4 segments
+	const MAX_AMF_TO_HOLD = 60;
+	const MAX_TIME_TO_SAVE_AMF_IN_SECONDS = 3600; //one hour
+
+	protected $AMFs = array();
+	protected $lastSegmentEndPTS = 0;
+
+	public function addSegment( $vodSegmentDuration, $AMFs)
 	{
-		$this->segments[] = array(
-			self::LIVE_START => $liveStart,
-			self::VOD_SEGMENT_DURATION => $vodSegmentDuration,
-			self::VOD_TO_LIVE_DELTA_TIME => $vodToLiveDeltaTime,
-		);
+		KalturaLog::debug('in addSegment. vodSegmentDuration is ' . $vodSegmentDuration . ' lastSegmentEndPTS was ' . $this->lastSegmentEndPTS);
+
+		for($i=0; $i < count($AMFs); ++$i){
+			$amf = $AMFs[$i];
+			$amf->pts += $this->lastSegmentEndPTS;
+			array_push($this->AMFs, $amf);
+		}
+		$this->lastSegmentEndPTS += $vodSegmentDuration;
+
+		// now delete old AMFs if needed
+		// first delete by date, and after that, if needed, delete last AMFs
+		$tsThreshold = $this->AMFs[count($this->AMFs)-1]->ts - self::MAX_TIME_TO_SAVE_AMF_IN_SECONDS * 1000;
+		while (count($this->AMFs) > 1 && $this->AMFs[0]->ts < $tsThreshold){
+			KalturaLog::debug('removing AMF with TS= ' . $this->AMFs[0]->ts . ' which is below ' . $tsThreshold);
+			array_shift($this->AMFs);
+		}
+
+		while (count($this->AMFs) > self::MAX_AMF_TO_HOLD){
+			KalturaLog::debug('removing AMF since there are over ' . self::MAX_AMF_TO_HOLD . ' AMFs in the array');
+			array_shift($this->AMFs);
+		}
+
+		KalturaLog::debug('After AMF cleanup array is:' . print_r($this->AMFs, true));
 	}
-	/**
-	 * Get the total VOD offset for a given time. Total = the sum of all VOD delta times throughout the segments.
-	 * @return int|null The offset that should be subtracted from the given time, or
-	 * 					null to indicate that this time signature is in the gap between the end
-	 * 					of a VOD segment and the end of the live segment (marked with x's below).
-	 *					<pre>
-	 *					Live Start          VOD End    Live End
-	 *					   ^                  ^           ^
-	 *					   |                  |xxxxxxxxxxx|
-	 *					   +------------------+-----------+
-	 *					</pre>
-	 */
-	public function getTotalVodTimeOffset( $time )
-	{
-		$numSegments = count($this->segments);
-		$totalVodOffset = 0; // Initially zero because there's no time drift in the first segment.
-		$i = 0;
-		$dbgPrevSegment = null;
-		while ( $i < $numSegments )
-		{
-			$segment = $this->segments[$i];
-			$liveStart = $segment[self::LIVE_START];
-			$vodAdjustedEndTime = $this->getVodAdjustedEndTime($segment);
-			if ( $time <= $vodAdjustedEndTime )
-			{
-				if ( $time >= $liveStart )
-				{
-					return $totalVodOffset;
-				}
-				else
-				{
-					KalturaLog::debug("Time [$time] <= $vodAdjustedEndTime but not >= $liveStart. Segment data: {$this->segmentAsString($dbgPrevSegment)}");
-					return null;
+
+	public function getLastAMFTS(){
+		$AMFCount = count($this->AMFs);
+		if ($AMFCount == 0){
+			return 0;
+		}
+		return $this->AMFs[$AMFCount-1]->ts;
+	}
+
+	public function getOffsetForTimestamp($timestamp){
+
+		KalturaLog::debug('getOffsetForTimestamp ' . $timestamp);
+
+		$minDistanceIndex = $this->getClosestAMFIndex($timestamp);
+
+		$ret = 0;
+		if (is_null($minDistanceIndex)){
+			KalturaLog::debug('minDistanceIndex is null - returning 0');
+		}
+		else if ($this->AMFs[$minDistanceIndex]->ts > $timestamp){
+			KalturaLog::debug('timestamp is before index #' . $minDistanceIndex);
+			$ret = $this->AMFs[$minDistanceIndex]->pts - ($this->AMFs[$minDistanceIndex]->ts - $timestamp);
+		}
+		else{
+			KalturaLog::debug('timestamp is after index #' . $minDistanceIndex);
+			$ret = $this->AMFs[$minDistanceIndex]->pts + ($timestamp - $this->AMFs[$minDistanceIndex]->ts);
+		}
+
+		KalturaLog::debug('AMFs array is:' . print_r($this->AMFs, true) . 'getOffsetForTimestamp returning ' . $ret);
+		return $ret;
+
+	}
+
+	protected function getClosestAMFIndex($timestamp){
+		$len = count($this->AMFs);
+		$ret = null;
+
+		if ($len == 1){
+			$ret = 0;
+		}
+		else if ($timestamp >= $this->AMFs[$len-1]->ts){
+			$ret = $len-1;
+		}
+		else if ($timestamp <= $this->AMFs[0]->ts){
+			$ret = 0;
+		}
+		else if ($len > 1) {
+			$lo = 0;
+			$hi = $len - 1;
+
+			while ($hi - $lo > 1) {
+				$mid = round(($lo + $hi) / 2);
+				if ($this->AMFs[$mid]->ts <= $timestamp) {
+					$lo = $mid;
+				} else {
+					$hi = $mid;
 				}
 			}
-			else
-			{
-				// Add up this segment's offset and move on to the next segment
-				$totalVodOffset += $segment[self::VOD_TO_LIVE_DELTA_TIME];
-				$dbgPrevSegment = $segment;
-				$i++;
+
+			if (abs($this->AMFs[$hi]->ts - $timestamp) > abs($this->AMFs[$lo]->ts - $timestamp)) {
+				return $lo;
+			} else {
+				return $hi;
 			}
 		}
-		// The time signature is greater than the total VOD duration
-		KalturaLog::debug("Couldn't get offset for time [$time]. Segment data: {$this->segmentAsString($segment)}");
-		return null;
-	}
-	/**
-	 * Not the real VOD end time, rather current segment's (live start time) + (vod duration).
-	 */
-	protected function getVodAdjustedEndTime( $segment )
-	{
-		if ( $segment )
-		{
-			return $segment[self::LIVE_START] + $segment[self::VOD_SEGMENT_DURATION];
-		}
-		return -1;
-	}
-	protected function getLiveEndTime( $segment )
-	{
-		if ( $segment )
-		{
-			return $segment[self::LIVE_START] + $segment[self::VOD_SEGMENT_DURATION] + $segment[self::VOD_TO_LIVE_DELTA_TIME];
-		}
-		return -1;
-	}
-	public function segmentAsString( $segment )
-	{
-		if ( $segment )
-		{
-			return "Live start: {$segment[self::LIVE_START]}, Live end: {$this->getLiveEndTime($segment)}, VOD translated end: {$this->getVodAdjustedEndTime($segment)} (VOD segment duration: {$segment[self::VOD_SEGMENT_DURATION]}, VOD to live delta: {$segment[self::VOD_TO_LIVE_DELTA_TIME]})";
-		}
-		return "N/A";
+
+		KalturaLog::debug('getClosestAMFIndex returning ' . $ret);
+		return $ret;
 	}
 }

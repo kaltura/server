@@ -3,7 +3,7 @@
 class KAMFData
 {
     public $pts;
-    public $timestamp;
+    public $ts;
 
 };
 
@@ -13,6 +13,8 @@ class KAMFMediaInfoParser{
     const AMFNumberDataTypePrefix ="00";
     const IEEE754DoubleFloatInHexLength = 16;
     const MinAMFSizeToTryParse = 205;
+    const MAXAmfDiscontinuanceMS = 200;//1000;
+    const MinDistanceBetweenAMFsInMS = 10000;//60000;
 
     protected $ffmprobeBin;
     protected $filePath;
@@ -70,9 +72,32 @@ class KAMFMediaInfoParser{
 
                 $amfData = new KAMFData();
                 $amfData->pts = $tmp->pts;
-                $amfData->timestamp = $this->getTimestampFromAMF($tmp->data);
+                $amfData->ts = $this->getTimestampFromAMF($tmp->data);
 
-                array_push($amf, $amfData);
+                // to save on space, we only want to save an AMF if there is a discontinuance between them
+                if (count($amf) == 0) {
+                    KalturaLog::debug('adding AMF - first in the segment ts= ' . $amfData->ts . ' pts= ' . $tmp->pts);
+                    array_push($amf, $amfData);
+                }
+                else{
+                    $lastAMF = $amf[count($amf)-1];
+                    $tsDelta = $amfData->ts - $lastAMF->ts;
+                    $ptsDelta = $amfData->pts - $lastAMF->pts;
+
+                    if (abs($tsDelta - $ptsDelta) >=  self::MAXAmfDiscontinuanceMS){
+                        if ($tsDelta > self::MinDistanceBetweenAMFsInMS) {
+                            KalturaLog::debug('got discontinuance - adding AMF. ' . 'tsDelta= ' . $tsDelta . ' ptsDelta= ' . $ptsDelta);
+                            array_push($amf, $amfData);
+                        }
+                        else{
+                            KalturaLog::debug('got discontinuance, but not adding AMF since time from last AMF is less than ' . self::MinDistanceBetweenAMFsInMS . 'ms. tsDelta= ' . $tsDelta . ' ptsDelta= ' . $ptsDelta);
+                        }
+                    }
+                    // @todo - remove the else before commit
+                    else{
+                        KalturaLog::debug('NOT adding AMF. ' . 'tsDelta= ' . $tsDelta . ' ptsDelta= ' . $ptsDelta);
+                    }
+                }
             }
         }
 
