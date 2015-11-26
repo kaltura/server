@@ -202,16 +202,27 @@ class KMediaInfoMediaParser extends KBaseMediaParser
 		
 			/*
 			 * For ARF (webex) files - simulate container ID and format.
+			 * ARF format considered to be a file that has ARF ext 
+			 * and DOES NOT have both video and audio setting.
 			 * On no-content return null
 			 */
-		if($fieldCnt>=5) 
-			return $mediaInfo;
-		else if(strstr($this->filePath,".arf")){
-			$mediaInfo->containerFormat = "arf";
-			$mediaInfo->containerId = "arf";
-			return $mediaInfo;
+		if(strstr($this->filePath,".arf")){
+			if((isset($mediaInfo->audioFormat) || isset($mediaInfo->audioCodecId))
+			&& (isset($mediaInfo->videoFormat) || isset($mediaInfo->videoCodecId)) ){
+				return $mediaInfo;
+			}
+			else {
+				$m = new KalturaMediaInfo();
+				$m->rawData = $mediaInfo->rawData;
+				$m->fileSize = $mediaInfo->fileSize;
+				$m->containerFormat = "arf";
+				$m->containerId = "arf";
+				return $m;
+			}
 		}
-		else
+		else if($fieldCnt>=5) 
+			return $mediaInfo;
+		else 
 			return null; 
 		 
 	}
