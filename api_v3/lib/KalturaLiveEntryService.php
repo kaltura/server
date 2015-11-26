@@ -78,7 +78,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 					KalturaLog::err("Entry [$entryId] has already reached its maximal recording duration.");
 					throw new KalturaAPIException(KalturaErrors::LIVE_STREAM_EXCEEDED_MAX_RECORDED_DURATION, $entryId);
 				}
-				// if entry is in replacement, the replacement duration is more accurate 
+				// if entry is in replacement, the replacement duration is more accurate
 				if ($recordedEntry->getReplacedEntryId()) {
 					$replacementRecordedEntry = entryPeer::retrieveByPK($recordedEntry->getReplacedEntryId());
 					if ($replacementRecordedEntry) {
@@ -240,14 +240,32 @@ class KalturaLiveEntryService extends KalturaEntryService
 		{
 			if($mediaServerIndex == MediaServerIndex::PRIMARY && $dbEntry->getRecordStatus())
 			{
+				KalturaLog::info("Checking if recorded entry needs to be created for entry $entryId");
 				$createRecordedEntry = false;
 				if(!$dbEntry->getRecordedEntryId())
 				{
 					$createRecordedEntry = true;
+					KalturaLog::info("Creating a new recorded entry for $entryId ");
 				}
-				elseif($dbEntry->getRecordStatus() == RecordStatus::PER_SESSION && ($dbEntry->getLastBroadcastEndTime() + kConf::get('live_session_reconnect_timeout', 'local', 180) < time()))
-				{
-					$createRecordedEntry = true;
+				else {
+					$dbRecordedEntry = entryPeer::retrieveByPK($dbEntry->getRecordedEntryId());
+					if (!$dbRecordedEntry) {
+						$createRecordedEntry = true;
+					}
+					else{
+						$recordedEntryCreationTime = $dbRecordedEntry->getCreatedAt(null);
+
+						$isNewSession = $dbEntry->getLastBroadcastEndTime() + kConf::get('live_session_reconnect_timeout', 'local', 180) < $dbEntry->getCurrentBroadcastStartTime();
+						$recordedEntryNotYetCreatedForCurrentSession = $recordedEntryCreationTime < $dbEntry->getCurrentBroadcastStartTime();
+
+						if ($dbEntry->getRecordStatus() == RecordStatus::PER_SESSION) {
+							if ($isNewSession && $recordedEntryNotYetCreatedForCurrentSession)
+							{
+								KalturaLog::info("Creating a recorded entry for $entryId ");
+								$createRecordedEntry = true;
+							}
+						}	
+					}					
 				}
 
 				if($createRecordedEntry)
@@ -267,21 +285,21 @@ class KalturaLiveEntryService extends KalturaEntryService
 	{
 		$lock = kLock::create("live_record_" . $dbEntry->getId());
 
-		if ($lock && !$lock->lock(self::KLOCK_CREATE_RECORDED_ENTRY_GRAB_TIMEOUT , self::KLOCK_CREATE_RECORDED_ENTRY_HOLD_TIMEOUT))
-		{
-			return;
-		}
+	    if ($lock && !$lock->lock(self::KLOCK_CREATE_RECORDED_ENTRY_GRAB_TIMEOUT , self::KLOCK_CREATE_RECORDED_ENTRY_HOLD_TIMEOUT))
+	    {
+	    	return;
+	    }
 
-		// If while we were waiting for the lock, someone has updated the recorded entry id - we should use it.
-		$dbEntry->reload();
-		if(($dbEntry->getRecordStatus() != RecordStatus::PER_SESSION) && ($dbEntry->getRecordedEntryId())) {
-			$lock->unlock();
-			$recordedEntry = entryPeer::retrieveByPK($dbEntry->getRecordedEntryId());
-			return $recordedEntry;
-		}
+	    // If while we were waiting for the lock, someone has updated the recorded entry id - we should use it.
+	    $dbEntry->reload();
+	    if(($dbEntry->getRecordStatus() != RecordStatus::PER_SESSION) && ($dbEntry->getRecordedEntryId())) {
+	    	$lock->unlock();
+	    	$recordedEntry = entryPeer::retrieveByPK($dbEntry->getRecordedEntryId());
+	    	return $recordedEntry;
+	    }
 
-		$recordedEntry = null;
-		try{
+	    $recordedEntry = null;
+     	try{
 			$recordedEntryName = $dbEntry->getName();
 			if($dbEntry->getRecordStatus() == RecordStatus::PER_SESSION)
 				$recordedEntryName .= ' ' . ($dbEntry->getRecordedEntryIndex() + 1);

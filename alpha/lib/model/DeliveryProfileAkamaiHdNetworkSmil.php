@@ -8,16 +8,16 @@ class DeliveryProfileAkamaiHdNetworkSmil extends DeliveryProfileVod {
 	}
 	
 	/**
-	 * @return kManifestRenderer
+	 * @return array $flavors
 	 */
-	public function serve()
+	public function buildServeFlavors()
 	{
 		$flavors = $this->buildHttpFlavorsArray();
 	
 		// When playing HDS with Akamai HD the bitrates in the manifest must be unique
 		$this->ensureUniqueBitrates($flavors);
-	
-		return $this->getRenderer($flavors);
+		
+		return $flavors;
 	}
 	
 	protected function ensureUniqueBitrates(array &$flavors)

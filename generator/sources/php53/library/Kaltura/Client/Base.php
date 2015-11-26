@@ -490,7 +490,7 @@ class Base
 
 		if(is_bool($paramValue))
 		{
-			$params[$paramName] = $paramValue ? 'true' : 'false';
+			$params[$paramName] = $paramValue;
 			return;
 		}
 

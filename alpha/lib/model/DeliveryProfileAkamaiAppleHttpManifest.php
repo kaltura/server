@@ -17,10 +17,11 @@ class DeliveryProfileAkamaiAppleHttpManifest extends DeliveryProfileAkamaiAppleH
    	return $this->getFromCustomData("supportClipping", null, true);
    }
 	
-	public function serve()
+	public function buildServeFlavors()
 	{
 		$flavor = $this->getSecureHdUrl();
-		return $this->getRenderer(array($flavor));
+		
+		return array($flavor);
 	}
 	
 	protected function doGetFlavorAssetUrl(flavorAsset $flavorAsset) {

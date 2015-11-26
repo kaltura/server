@@ -34,6 +34,11 @@ class ComcastMrssFeed
 	/**
 	 * @var DOMElement
 	 */
+	protected $caption;
+	
+	/**
+	 * @var DOMElement
+	 */
 	protected $category;
 	
 	/**
@@ -72,6 +77,11 @@ class ComcastMrssFeed
 		// thumbnail node template
 		$node = $this->xpath->query('media:group/media:thumbnail', $this->item)->item(0);
 		$this->thumbnail = $node->cloneNode(true);
+		$node->parentNode->removeChild($node);
+		
+		// caption node template
+		$node = $this->xpath->query('media:group/media:subTitle', $this->item)->item(0);
+		$this->caption = $node->cloneNode(true);
 		$node->parentNode->removeChild($node);
 		
 		// category node template
@@ -155,9 +165,9 @@ class ComcastMrssFeed
 		$channelNode->appendChild($importedItem);
 	}
 
-	public function getItemXml(array $values, array $flavorAssets = null, array $thumbAssets = null)
+	public function getItemXml(array $values, array $flavorAssets = null, array $thumbAssets = null, array $captions = null)
 	{
-		$item = $this->getItem($values, $flavorAssets, $thumbAssets);
+		$item = $this->getItem($values, $flavorAssets, $thumbAssets, $captions);
 		return $this->doc->saveXML($item);
 	}
 	
@@ -173,7 +183,7 @@ class ComcastMrssFeed
 	 * @param array $flavorAssets
 	 * @param array $thumbAssets
 	 */
-	public function getItem(array $values, array $flavorAssets = null, array $thumbAssets = null)
+	public function getItem(array $values, array $flavorAssets = null, array $thumbAssets = null, array $captionsAssets = null)
 	{
 		$item = $this->item->cloneNode(true);
 		
@@ -218,6 +228,9 @@ class ComcastMrssFeed
 			
 		if (is_array($thumbAssets))
 			$this->setThumbAssets($item, $thumbAssets);
+			
+		if (is_array($captionsAssets))
+			$this->setCaptionAssets($item, $captionsAssets);
 			
 		return $item;
 	}
@@ -297,6 +310,22 @@ class ComcastMrssFeed
 			kXml::setNodeValue($this->xpath,'@url', $url, $content);
 			kXml::setNodeValue($this->xpath,'@width', $thumbAsset->getWidth(), $content);
 			kXml::setNodeValue($this->xpath,'@height', $thumbAsset->getHeight(), $content);
+		}
+	}
+	
+	public function setCaptionAssets (DOMElement $item, array $captionAssets)
+	{
+		foreach ($captionAssets as $captionAsset)
+		{
+			/* @var $captionAsset captionAsset */
+			$content = $this->caption->cloneNode(true);
+			$mediaGroup = $this->xpath->query('media:group', $item)->item(0);
+			$mediaGroup->appendChild($content);
+			$url = $captionAsset->getDownloadUrl(true);
+			
+			kXml::setNodeValue($this->xpath,'@href', $url, $content);
+			kXml::setNodeValue($this->xpath,'@lang', $captionAsset->getLanguage(), $content);
+			kXml::setNodeValue($this->xpath,'@type', $captionAsset->getFileExt(), $content);
 		}
 	}
 	

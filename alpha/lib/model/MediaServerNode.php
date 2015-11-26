@@ -7,7 +7,6 @@ abstract class MediaServerNode extends DeliveryServerNode {
 	const CUSTOM_DATA_PROTOCOL_PORT_CONFIG_ARRAY = 'media_server_port_config';
 	const CUSTOM_DATA_PLAYBACK_DOMAIN_CONFIG_ARRAY = 'media_server_playback_domain_config';
 	const CUSTOM_DATA_APPLICATION_NAME = 'application_name';
-	const CUSTOM_DATA_IS_EXTERNAL = 'is_external';
 	const DEFAULT_APPLICATION = 'kLive';
 	
 	abstract public function getWebService($serviceName);
@@ -18,22 +17,15 @@ abstract class MediaServerNode extends DeliveryServerNode {
 	 */
 	public function preInsert(PropelPDO $con = null)
 	{
-		if($this->getPartnerId() !== Partner::MEDIA_SERVER_PARTNER_ID)
-			$this->setIsExternalMediaServer(true);
-		else
+		if($this->getPartnerId() === Partner::MEDIA_SERVER_PARTNER_ID)
 			$this->setDc(kDataCenterMgr::getCurrentDcId());
 		
 		return parent::preInsert($con);
 	}
 	
-	public function setIsExternalMediaServer($isExternal)
-	{
-		$this->putInCustomData(self::CUSTOM_DATA_IS_EXTERNAL, $isExternal);
-	}
-	
 	public function getIsExternalMediaServer()
 	{
-		return $this->getFromCustomData(self::CUSTOM_DATA_IS_EXTERNAL, null, false);
+		return $this->getPartnerId() !== Partner::MEDIA_SERVER_PARTNER_ID;
 	}
 	
 	public function setMediaServerPortConfig($mediaServerPortConfig)

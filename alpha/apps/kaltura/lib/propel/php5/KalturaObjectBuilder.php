@@ -279,14 +279,7 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 				\$con->commit();
 				return 0;
 			}
-			";
 			
-			if($customDataColumn)
-			$script .= "
-			\$this->setCustomDataObj();
-			";
-			
-			$script .= "
 			for (\$retries = 1; \$retries < KalturaPDO::SAVE_MAX_RETRIES; \$retries++)
 			{
                \$affectedRows = \$this->doSave(\$con);

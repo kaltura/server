@@ -105,6 +105,8 @@ abstract class kManifestRenderer
 	abstract protected function replaceDeliveryCode();
 	
 	abstract protected function tokenizeUrls();
+	
+	abstract protected function applyDomainPrefix();
 
 	/**
 	 * @param kSessionBase $ksObject
@@ -145,6 +147,7 @@ abstract class kManifestRenderer
 			$this->replaceDeliveryCode();
 		
 		$this->tokenizeUrls();
+		$this->applyDomainPrefix();
 	
 		$headers = $this->getHeaders();
 		$headers[] = "Access-Control-Allow-Origin:*";
@@ -278,6 +281,18 @@ class kSingleUrlManifestRenderer extends kManifestRenderer
 		
 		$this->flavor['url'] = $url;
 	}
+	
+	protected function applyDomainPrefix()
+	{
+		$domainPrefix = isset($this->flavor['domainPrefix']) ? $this->flavor['domainPrefix'] : null;
+		
+		if($domainPrefix)
+		{
+			$urlParts = explode("://", $this->flavor['url']);
+			$this->flavor['url'] = $urlParts[0] . "://" . $domainPrefix . $urlParts[1];
+			unset($this->flavor['domainPrefix']);
+		}
+	}
 }
 
 class kMultiFlavorManifestRenderer extends kManifestRenderer
@@ -366,6 +381,21 @@ class kMultiFlavorManifestRenderer extends kManifestRenderer
 			}
 			
 			$flavor['url'] = $url;
+		}
+	}
+	
+	protected function applyDomainPrefix()
+	{
+		foreach ($this->flavors as &$flavor)
+		{
+			$domainPrefix = isset($flavor['domainPrefix']) ? $flavor['domainPrefix'] : null;
+			
+			if($domainPrefix)
+			{
+				$urlParts = explode("://", $flavor['url']);
+				$flavor['url'] = $urlParts[0] . "://" . $domainPrefix . $urlParts[1];
+				unset($flavor['domainPrefix']);
+			}
 		}
 	}
 }

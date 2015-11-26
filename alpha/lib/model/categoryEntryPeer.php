@@ -372,7 +372,7 @@ class categoryEntryPeer extends BasecategoryEntryPeer implements IRelatedObjectP
 		$category = categoryPeer::retrieveByPK($object->getCategoryId());
 		if($category)
 		{
-			$roots = categoryPeer::getRootObjects($category);
+			$roots = $category->getPeer()->getRootObjects($category);
 			$roots[] = $category;
 		}
 		

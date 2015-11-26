@@ -35,6 +35,13 @@ class ComcastMrssService extends ContentDistributionServiceBase
 		$fields = $this->profile->getAllFieldValues($entryDistribution);
 		$flavorAssets = assetPeer::retrieveByIds(explode(',', $entryDistribution->getFlavorAssetIds()));
 		$thumbAssets = assetPeer::retrieveByIds(explode(',', $entryDistribution->getThumbAssetIds()));
-		return $feed->getItemXml($fields, $flavorAssets, $thumbAssets);
+		
+		//get caption assets from the entryDistribution.assetIds list
+		$c = new Criteria();
+		$c->add(assetPeer::ID, explode(',', $entryDistribution->getAssetIds()), Criteria::IN);
+		$c->add(assetPeer::TYPE, CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION));
+		$captionAssets = assetPeer::doSelect($c);
+		
+		return $feed->getItemXml($fields, $flavorAssets, $thumbAssets, $captionAssets);
 	}
 }
