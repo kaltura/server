@@ -13,8 +13,8 @@ class KAMFMediaInfoParser{
     const AMFNumberDataTypePrefix ="00";
     const IEEE754DoubleFloatInHexLength = 16;
     const MinAMFSizeToTryParse = 205;
-    const MAXAmfDiscontinuanceMS = 200;//1000;
-    const MinDistanceBetweenAMFsInMS = 10000;//60000;
+    const MAXAmfDiscontinuanceMS = 1000;
+    const MinDistanceBetweenAMFsInMS = 60000;
 
     protected $ffmprobeBin;
     protected $filePath;
