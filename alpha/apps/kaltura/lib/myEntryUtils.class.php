@@ -1164,6 +1164,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 			$clonePendingEntries = $entry->getClonePendingEntries();
 			$clonePendingEntries[] = $newEntry->getId();
 			$entry->setClonePendingEntries($clonePendingEntries);
+			$entry->save();
 		} else {
 			self::copyEntryData( $entry, $newEntry );
 		}
