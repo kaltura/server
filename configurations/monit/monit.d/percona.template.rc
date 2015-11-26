@@ -1,5 +1,5 @@
         check process mysql
-           with pidfile "/var/lib/mysql/`hostname`.pid"
+           with pidfile "/var/lib/mysql/@hostname@.pid"
            start program = "/sbin/service mysql start" with timeout 60 seconds
            stop program = "/sbin/service mysql stop"
            #if 10 restarts within 10 cycles then timeout
