@@ -2542,24 +2542,6 @@ class kFlowHelper
 		}
 	}
 
-//	public static function handleEntryReady(entry $entry)
-//	{
-//		$clonePendingEntriesArray = $entry->getClonePendingEntries();
-//		foreach ($clonePendingEntriesArray as $pendingEntryId)
-//		{
-//			$pendingEntry = entryPeer::retrieveByPK($pendingEntryId);
-//			if ( $pendingEntry ) {
-//				myEntryUtils::copyEntryData($entry, $pendingEntry);
-//				$pendingEntry->setStatus(entryStatus::READY);
-//				$pendingEntry->setLengthInMsecs($entry->getLengthInMsecs());
-//				$pendingEntry->save();
-//
-//			}
-//		}
-//		$entry->setClonePendingEntries(array());
-//		$entry->save();
-//	}
-
 	/**
 	 * @param entry $tempEntry
 	 */
