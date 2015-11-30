@@ -93,7 +93,7 @@ class ComcastMrssFeed
 		$node->parentNode->removeChild($node);
 		
 		// cue point node template
-		$node = $this->xpath->query('item/cim:chapter', $this->item)->item(0);
+		$node = $this->xpath->query('cim:chapter', $this->item)->item(0);
 		$this->cuePoint = $node->cloneNode(true);
 		$node->parentNode->removeChild($node);
 		
