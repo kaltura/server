@@ -99,7 +99,7 @@ $con = $target->_container;
 			 */
 		if(in_array('libfaac', $cmdValsArr)) {
 			$key = array_search('libfaac', $cmdValsArr);
-			$cmdValsArr[$key] = 'libfdk_aac';
+			$cmdValsArr[$key] = 'aac -strict -2';
 		}
 		
 		$cmdStr = implode(" ", $cmdValsArr);
