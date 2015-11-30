@@ -30,6 +30,8 @@ class Form_ComcastMrssProfileConfiguration extends Form_ConfigurableProfileConfi
 		}
 		$object->cPlatformTvSeries = $cPlatformArray;
 		$object->cPlatformTvSeriesField = $this->getValue('c_platform_tv_series_field'); // because parent::getObject doesn't include empty fields 
+		$object->shouldIncludeCaptions = $this->getValue('should_include_captions');
+		$object->shouldIncludeCuePoints = $this->getValue('should_include_cue_points');
 		$object->feedLink = $this->getValue('feed_link'); // because parent::getObject doesn't include empty fields 
 			
 		return $object;
@@ -147,6 +149,16 @@ class Form_ComcastMrssProfileConfiguration extends Form_ConfigurableProfileConfi
 		
 		$this->addElement('select', 'c_platform_tv_series_field', array(
 			'label' => 'cPlatform TV Series Field:',
+		));
+		
+		$this->addElement('checkbox', 'should_include_captions', array(
+			'label' => 'Include Entry Closed Captions',
+			'isArray' => true,
+		));
+		
+		$this->addElement('checkbox', 'should_include_cue_points', array(
+			'label' => 'Include Entry Ad Cue Points',
+			'isArray' => true,
 		));
 		
 		$this->addElement('textarea', 'cplatform_xml', array(

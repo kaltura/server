@@ -27,6 +27,7 @@
 			<cim:link></cim:link>
 			<cim:brand></cim:brand>
 			<cim:videoContentType></cim:videoContentType>
+			<cim:chapter type="" startTime=""></cim:chapter>
 		</item>
 	</channel>
 </rss>
