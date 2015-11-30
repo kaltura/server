@@ -153,12 +153,10 @@ class Form_ComcastMrssProfileConfiguration extends Form_ConfigurableProfileConfi
 		
 		$this->addElement('checkbox', 'should_include_captions', array(
 			'label' => 'Include Entry Closed Captions',
-			'isArray' => true,
 		));
 		
 		$this->addElement('checkbox', 'should_include_cue_points', array(
 			'label' => 'Include Entry Ad Cue Points',
-			'isArray' => true,
 		));
 		
 		$this->addElement('textarea', 'cplatform_xml', array(
