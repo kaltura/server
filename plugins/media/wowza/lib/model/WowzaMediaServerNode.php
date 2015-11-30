@@ -92,7 +92,7 @@ class WowzaMediaServerNode extends MediaServerNode {
 	
 	public function getDomainByProtocolAndFormat($mediaServerConfig, $protocol = 'http', $format = null)
 	{	
-		$domain = $this->getPlaybackHostName();
+		$domain = $this->getPlaybackDomain();
 		
 		$domainField = "domain" . ($format ? "-$format" : "");
 		
