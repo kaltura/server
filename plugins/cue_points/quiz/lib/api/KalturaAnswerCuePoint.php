@@ -29,6 +29,12 @@ class KalturaAnswerCuePoint extends KalturaCuePoint
 	 * @readonly
 	 */
 	public $isCorrect;
+	/**
+	 * Array of string
+	 * @var KalturaStringArray
+	 * @readonly
+	 */
+	public $correctAnswerKeys;
 
 	/**
 	 * @var string
@@ -48,6 +54,7 @@ class KalturaAnswerCuePoint extends KalturaCuePoint
 		"answerKey",
 		"parentId",
 		"isCorrect",
+		"correctAnswerKeys",
 		"explanation"
 	);
 
@@ -80,63 +87,70 @@ class KalturaAnswerCuePoint extends KalturaCuePoint
 		parent::doFromObject($dbObject, $responseProfile);
 
 		$dbEntry = entryPeer::retrieveByPK($dbObject->getEntryId());
-		if ( !kEntitlementUtils::isEntitledForEditEntry($dbEntry) )
+		if ( !kEntitlementUtils::isEntitledForEditEntry($dbEntry))
 		{
-			/**
-			 * @var kQuiz $kQuiz
-			 */
-			$kQuiz = QuizPlugin::validateAndGetQuiz( $dbEntry );
-
-			//Find the corresponding question cue point
 			$this->validateParentId();
 			$dbQuestionCuePoint = CuePointPeer::retrieveByPK($this->parentId);
+			$questCp = new KalturaQuestionCuePoint();
+			$questCp->fromObject($dbQuestionCuePoint);
 
-			$kQuestionEntry= $this->getEntry($dbQuestionCuePoint->getEntryId(), $dbQuestionCuePoint->getType());
-			$this->explanation = $kQuestionEntry->explanation;
+			$this->explanation = $questCp->explanation;
+			$this->setIsCorrectAnswer($dbObject);
+			$this->setCorrectAnswerKeys($dbObject, $responseProfile);
+		}
+	}
 
-			$dbUserEntry = UserEntryPeer::retrieveByPK($this->quizUserEntryId);
+	private function setCorrectAnswerKeys($dbObject, KalturaDetachedResponseProfile $responseProfile = null)
+	{
+		$dbEntry = entryPeer::retrieveByPK($dbObject->getEntryId());
+		/**
+		 * @var kQuiz $kQuiz
+		 */
+		$kQuiz = QuizPlugin::validateAndGetQuiz( $dbEntry );
+		$dbQuestionCuePoint = CuePointPeer::retrieveByPK($this->parentId);
 
-			if ($kQuiz->getShowCorrectKeyOnAnswer() )
+		if ($kQuiz->getShowCorrectKey())
+		{
+			$this->correctAnswerKeys = null;
+			foreach ($dbQuestionCuePoint->getOptionalAnswers() as $obj)
 			{
-				$optionalAnswers = $dbQuestionCuePoint->getFromCustomData(QuestionCuePoint::CUSTOM_DATA_OPTIONAL_ANSWERS, null, array());
-				if(is_array($optionalAnswers))
+				$optAnswer = new KalturaOptionalAnswer();
+				$optAnswer->fromObject($obj, $responseProfile);
+				if ($optAnswer->isCorrect)
 				{
-					$optionalAnswers = KalturaOptionalAnswersArray::fromDbArray($dbQuestionCuePoint->getOptionalAnswers());
-				}
-
-				foreach ( $optionalAnswers as $optAnswer ) {
-					if ($optAnswer->isCorrect)
+					if (is_null($this->correctAnswerKeys))
 					{
-						if (is_null($this->correctAnswerKeys))
-						{
-							$this->correctAnswerKeys = new KalturaOptionalAnswer();
-						}
-						$this->correctAnswerKeys->fromObject($optAnswer, $responseProfile);
+						$this->correctAnswerKeys = new KalturaOptionalAnswersArray();
 					}
+					$this->correctAnswerKeys[] = $optAnswer;
 				}
 			}
+		}
+	}
 
-			if ($kQuiz->getShowResultOnAnswer())
+	private function setIsCorrectAnswer($dbObject)
+	{
+		$dbEntry = entryPeer::retrieveByPK($dbObject->getEntryId());
+		/**
+		 * @var kQuiz $kQuiz
+		 */
+		$kQuiz = QuizPlugin::validateAndGetQuiz( $dbEntry );
+		$dbQuestionCuePoint = CuePointPeer::retrieveByPK($this->parentId);
+
+		if ($kQuiz->getShowCorrect())
+		{
+
+			$optionalAnswers = KalturaOptionalAnswersArray::fromDbArray($dbQuestionCuePoint->getOptionalAnswers());
+			$this->isCorrect = false;
+			/**
+			 * @var kOptionalAnswer $optAns
+			 */
+			foreach ($optionalAnswers as $optAnswer)
 			{
-				$optionalAnswers = $dbQuestionCuePoint->getFromCustomData(QuestionCuePoint::CUSTOM_DATA_OPTIONAL_ANSWERS, null, array());
-				if(is_array($optionalAnswers))
+				if ($optAnswer->isCorrect && $this->answerKey == $optAnswer->key)
 				{
-					$optionalAnswers = KalturaOptionalAnswersArray::fromDbArray($dbQuestionCuePoint->getOptionalAnswers());
-				}
-				/**
-				 * @var kOptionalAnswer $optAns
-				 */
-				foreach ( $optionalAnswers as $optAnswer )
-				{
-					if ($optAnswer->isCorrect && $this->answerKey == $optAnswer->key)
-					{
-						$this->isCorrect = true;
-						break;
-					}
-					else
-					{
-						$this->isCorrect = false;
-					}
+					$this->isCorrect = true;
+					return;
 				}
 			}
 		}
@@ -168,17 +182,15 @@ class KalturaAnswerCuePoint extends KalturaCuePoint
 		$dbUserEntry = UserEntryPeer::retrieveByPK($this->quizUserEntryId);
 		if (!$dbUserEntry)
 			throw new KalturaAPIException(KalturaErrors::USER_ENTRY_NOT_FOUND, $this->quizUserEntryId);
+
 		if ($dbUserEntry->getEntryId() !== $this->entryId)
-		{
 			throw new KalturaAPIException(KalturaCuePointErrors::USER_ENTRY_DOES_NOT_MATCH_ENTRY_ID, $this->quizUserEntryId);
-		}
+
 		if ($dbUserEntry->getStatus() === QuizPlugin::getCoreValue('UserEntryStatus', QuizUserEntryStatus::QUIZ_SUBMITTED))
-		{
 			throw new KalturaAPIException(KalturaQuizErrors::USER_ENTRY_QUIZ_ALREADY_SUBMITTED);
-		}
-		if (!kCurrentContext::$is_admin_session && ($dbUserEntry->getKuserId() != kCurrentContext::getCurrentKsKuserId()) ) {
+
+		if (!kCurrentContext::$is_admin_session && ($dbUserEntry->getKuserId() != kCurrentContext::getCurrentKsKuserId()) )
 		    throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID);
-		}
 	}
 
 	/* (non-PHPdoc)
