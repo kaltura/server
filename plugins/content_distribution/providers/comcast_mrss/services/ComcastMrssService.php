@@ -75,6 +75,6 @@ class ComcastMrssService extends ContentDistributionServiceBase
 		$c->add(assetPeer::TYPE, CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION));
 		$c->add(assetPeer::STATUS, asset::ASSET_STATUS_READY);
 		
-		return CuePointPeer::doSelect($c);
+		return assetPeer::doSelect($c);
 	}
 }
