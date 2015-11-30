@@ -58,7 +58,7 @@ class EdgeServerNode extends DeliveryServerNode {
 	
 	public function getedgePath($format, $deliveryType = null)
 	{
-		$edgePath = $this->getPlaybackHostName();
+		$edgePath = $this->getPlaybackDomain();
 		
 		$edgeSpecificDeliveryProfileByType = $this->getEdgeSpecificDeliveryProfileByType($format, $deliveryType);
 		if(!$edgeSpecificDeliveryProfileByType)
