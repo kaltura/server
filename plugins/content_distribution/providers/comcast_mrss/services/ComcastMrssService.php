@@ -39,12 +39,14 @@ class ComcastMrssService extends ContentDistributionServiceBase
 		$captionAssets = null;
 		if ($this->	profile instanceof ComcastMrssDistributionProfile && $this->profile->getShouldIncludeCaptions())
 		{
+			KalturaLog::info("Adding entry captions.");
 			$captionAssets = $this->getCaptions($entry->getPartnerId(), $entry->getId());
 		}
 		
 		$cuePoints = null;
 		if ($this->	profile instanceof ComcastMrssDistributionProfile && $this->profile->getShouldIncludeCuePoints())
 		{
+			KalturaLog::info("Adding entry cue points.");
 			$cuePoints = $this->getCuePoints($entry->getPartnerId(), $entry->getId()); 
 		}
 		
