@@ -11,18 +11,11 @@ class KalturaQuizUserEntry extends KalturaUserEntry{
 	 * @readonly
 	 */
 	public $score;
-	/**
-	 * Array of string
-	 * @var KalturaStringArray
-	 * @readonly
-	 */
-	public $correctAnswerKeys;
 
 
 	private static $map_between_objects = array
 	(
-		"score",
-		"correctAnswerKeys"
+		"score"
 	);
 
 	public function getMapBetweenObjects ( )

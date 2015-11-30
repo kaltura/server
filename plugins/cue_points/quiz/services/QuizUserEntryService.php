@@ -37,7 +37,8 @@ class QuizUserEntryService extends KalturaBaseService{
 		$kQuiz = QuizPlugin::getQuizData($entry);
 		if (!$kQuiz)
 			throw new KalturaAPIException(KalturaQuizErrors::PROVIDED_ENTRY_IS_NOT_A_QUIZ, $entryId);
-		
+
+		$userEntry->score = null;
 		list($score, $numOfCorrectAnswers) = $dbUserEntry->calculateScoreAndCorrectAnswers();
 		$dbUserEntry->setScore($score);
 		$dbUserEntry->setNumOfCorrectAnswers($numOfCorrectAnswers);	
@@ -45,43 +46,13 @@ class QuizUserEntryService extends KalturaBaseService{
 		{
 			$userEntry->score = $score;
 		}
-		else
-		{
-			$userEntry->score = null;
-		}
 
 		$c = new Criteria();
-
 		$c->add(CuePointPeer::ENTRY_ID, $dbUserEntry->getEntryId(), Criteria::EQUAL);
 		$c->add(CuePointPeer::TYPE, QuizPlugin::getCoreValue('CuePointType', QuizCuePointType::QUIZ_QUESTION));
 		$dbUserEntry->setNumOfQuestions(CuePointPeer::doCount($c));
 		$dbUserEntry->setStatus(QuizPlugin::getCoreValue('UserEntryStatus', QuizUserEntryStatus::QUIZ_SUBMITTED));
 		$dbUserEntry->save();
-
-		if ($kQuiz->getShowCorrectAfterSubmission())
-		{
-			$questionType = QuizPlugin::getCuePointTypeCoreValue(QuizCuePointType::QUIZ_QUESTION);
-			$questions = CuePointPeer::retrieveByEntryId($entryId, array($questionType));
-			$userEntry->correctAnswerKeys = array();
-			/**
-			 * @var QuestionCuePoint $question
-			 */
-			foreach ($questions as $question)
-			{
-				$optionalAnswers = $question->getOptionalAnswers();
-				/**
-				 * @var kOptionalAnswer $optAns
-				 */
-
-				foreach ($optionalAnswers as $optAns)
-				{
-					if (!is_null($optAns->getIsCorrect()) && $optAns->getIsCorrect() == KalturaNullableBoolean::TRUE_VALUE)
-					{
-						$userEntry->correctAnswerKeys[] = $optAns->getKey();
-					}
-				}
-			}
-		}
 
 		return $userEntry;
 	}
