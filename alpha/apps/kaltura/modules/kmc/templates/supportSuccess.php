@@ -18,7 +18,7 @@
 			label.error em  { color:red;}
 		  input, textarea, select { float:right;}
 		   input[type="text"], input.text, input.file {width:300px; #height:24px; padding: 3px 2px 2px; margin-top:-5px; #margin-top:-20px;}
-		   input[type="checkbox"], input.checkbox { width:auto; margin-left:63px; vertical-align:-2px; float:none;}
+		   input[type="checkbox"], input.checkbox { width:auto; margin-left:80px; vertical-align:-2px; float:none;}
 		  select { width:300px; padding: 2px 2px 2px 1px; margin: -4px 0 10px; #margin-top:-18px;}
 		  textarea { width:300px; padding-left:3px; margin: -2px 0 12px; #margin: -18px 0 -2px;}
 		  fieldset div { height:34px; margin-left:155px; display:none;}
