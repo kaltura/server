@@ -245,6 +245,9 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 	public function getRenderer($flavors)
 	{
 		$this->DEFAULT_RENDERER_CLASS = 'kM3U8ManifestRenderer';
+		if($this->params->getUsePlayServer()) {
+			$this->DEFAULT_RENDERER_CLASS = 'kRedirectManifestRenderer';
+		}
 		$renderer = parent::getRenderer($flavors);
 		return $renderer;
 	}
