@@ -1,4 +1,6 @@
 <?php
+
+
 /**
  * @package plugins.facebookDistribution
  * @subpackage model
@@ -12,8 +14,10 @@ class FacebookDistributionProfile extends ConfigurableDistributionProfile
 	const CUSTOM_DATA_RE_REQUEST_PERMISSIONS = 'reRequestPermissions';
 		
 	const CALL_TO_ACTION_TYPE_VALID_VALUES = 'SHOP_NOW,BOOK_TRAVEL,LEARN_MORE,SIGN_UP,DOWNLOAD,WATCH_MORE';
-	const DEFAULT_PERMISSIONS = array('manage_pages','publish_actions','user_videos');
-	
+	const DEFAULT_RE_REQUEST_PERMISSIONS = 'false';
+	private static $DEFAULT_PERMISSIONS = array('manage_pages', 'publish_actions', 'user_videos');
+
+
 	/* (non-PHPdoc)
 	 * @see DistributionProfile::getProvider()
 	 */
@@ -66,16 +70,16 @@ class FacebookDistributionProfile extends ConfigurableDistributionProfile
 					
 		return $validationErrors;
 	}
-	
-	public function getPageId()				{return $this->getFromCustomData(self::CUSTOM_DATA_PAGE_ID);}
-	public function setPageId($v)			{$this->putInCustomData(self::CUSTOM_DATA_PAGE_ID, $v);}
-	public function getPageAccessToken()	{return $this->getFromCustomData(self::CUSTOM_DATA_PAGE_ACCESS_TOKEN);}
-	public function setPageAccessToken($v)	{$this->putInCustomData(self::CUSTOM_DATA_PAGE_ACCESS_TOKEN, $v);}
-	public function getUserAccessToken()	{return $this->getFromCustomData(self::CUSTOM_DATA_USER_ACCESS_TOKEN);}
-	public function setUserAccessToken($v)	{$this->putInCustomData(self::CUSTOM_DATA_USER_ACCESS_TOKEN, $v);}
-	public function getPermissions()	{return $this->getFromCustomData(self::CUSTOM_DATA_PERMISSIONS, null, self::DEFAULT_PERMISSIONS);}
-	public function setPermissions($v)	{$this->putInCustomData(self::CUSTOM_DATA_PERMISSIONS, $v);}
-	public function getReRequestPermissions()	{return $this->getFromCustomData(self::CUSTOM_DATA_RE_REQUEST_PERMISSIONS);}
+
+	public function getPageId()				    {return $this->getFromCustomData(self::CUSTOM_DATA_PAGE_ID);}
+	public function setPageId($v)			    {$this->putInCustomData(self::CUSTOM_DATA_PAGE_ID, $v);}
+	public function getPageAccessToken()	    {return $this->getFromCustomData(self::CUSTOM_DATA_PAGE_ACCESS_TOKEN);}
+	public function setPageAccessToken($v)	    {$this->putInCustomData(self::CUSTOM_DATA_PAGE_ACCESS_TOKEN, $v);}
+	public function getUserAccessToken()	    {return $this->getFromCustomData(self::CUSTOM_DATA_USER_ACCESS_TOKEN);}
+	public function setUserAccessToken($v)	    {$this->putInCustomData(self::CUSTOM_DATA_USER_ACCESS_TOKEN, $v);}
+	public function getPermissions()	        {return $this->getFromCustomData(self::CUSTOM_DATA_PERMISSIONS, null, self::$DEFAULT_PERMISSIONS);}
+	public function setPermissions($v)	        {$this->putInCustomData(self::CUSTOM_DATA_PERMISSIONS, $v);}
+	public function getReRequestPermissions()	{return $this->getFromCustomData(self::CUSTOM_DATA_RE_REQUEST_PERMISSIONS, null , self::DEFAULT_RE_REQUEST_PERMISSIONS);}
 	public function setReRequestPermissions($v)	{$this->putInCustomData(self::CUSTOM_DATA_RE_REQUEST_PERMISSIONS, $v);}
 	
 	protected function getDefaultFieldConfigArray()
@@ -90,11 +94,11 @@ class FacebookDistributionProfile extends ConfigurableDistributionProfile
 	    $fieldConfig->setUpdateParams(array(entryPeer::NAME));
 	    $fieldConfig->setIsRequired(DistributionFieldRequiredStatus::REQUIRED_BY_PROVIDER);
 	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
-	    	    
+
 	    $fieldConfig = new DistributionFieldConfig();
 	    $fieldConfig->setFieldName(FacebookDistributionField::DESCRIPTION);
 	    $fieldConfig->setUserFriendlyFieldName('Entry description');
-	    $fieldConfig->setEntryMrssXslt('
+	    /*$fieldConfig->setEntryMrssXslt('
         			<xsl:choose>
                     	<xsl:when test="customData/metadata/'.self::METADATA_FIELD_DESCRIPTION.' != \'\'">
                     		<xsl:value-of select="customData/metadata/'.self::METADATA_FIELD_DESCRIPTION.'" />
@@ -102,12 +106,13 @@ class FacebookDistributionProfile extends ConfigurableDistributionProfile
                     	<xsl:otherwise>
                     		<xsl:value-of select="string(description)" />
                     	</xsl:otherwise>
-                    </xsl:choose>');
+                    </xsl:choose>');*/
+
 	    $fieldConfig->setUpdateOnChange(true);
-	    $fieldConfig->setUpdateParams(array(entryPeer::DESCRIPTION,"/*[local-name()='metadata']/*[local-name()='".self::METADATA_FIELD_DESCRIPTION."']"));
+	    //$fieldConfig->setUpdateParams(array(entryPeer::DESCRIPTION,"/*[local-name()='metadata']/*[local-name()='".self::METADATA_FIELD_DESCRIPTION."']"));
 	    $fieldConfig->setIsRequired(DistributionFieldRequiredStatus::REQUIRED_BY_PROVIDER);
 	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
-	    
+
 	    $fieldConfig = new DistributionFieldConfig();
 	    $fieldConfig->setFieldName(FacebookDistributionField::SCHEDULE_PUBLISHING_TIME);
 	    $fieldConfig->setUserFriendlyFieldName('Schedule Publishing Time');
@@ -152,14 +157,17 @@ class FacebookDistributionProfile extends ConfigurableDistributionProfile
 	      
 	    return $fieldConfigArray;
 	}
-	
+
 	public function getApiAuthorizeUrl()
 	{
-		$callbackUrl = ""; //TODO
 		$permissions = implode(',', $this->getPermissions());
-		
 		$url = kConf::get('apphome_url');
-		$url .= "/index.php/extservices/facebookoauth2/pageId/".$this->getPageId()."/permissions/".$permissions."/reRequestPermissions/".$this->getReRequestPermissions()."/callbackUrl/".$callbackUrl;					
+		$url .= "/index.php/extservices/facebookoauth2".
+            "/".FacebookRequestParameters::FACEBOOK_PROVIDER_ID_REQUEST_PARAM."/".base64_encode($this->getId()).
+            "/".FacebookRequestParameters::FACEBOOK_PAGE_ID_REQUEST_PARAM."/".base64_encode($this->getPageId()).
+            "/".FacebookRequestParameters::FACEBOOK_PERMISSIONS_REQUEST_PARAM."/".base64_encode($permissions).
+            "/".FacebookRequestParameters::FACEBOOK_RE_REQUEST_PERMISSIONS_REQUEST_PARAM."/".base64_encode($this->getReRequestPermissions())
+        ;
 
 		return $url;
 	}

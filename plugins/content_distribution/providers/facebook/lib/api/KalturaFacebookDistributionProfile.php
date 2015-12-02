@@ -44,12 +44,9 @@ class KalturaFacebookDistributionProfile extends KalturaConfigurableDistribution
 	 */
 	private static $map_between_objects = array 
 	(
-		'pageAccessToken',
-		'userAccessToken',
-		'permissions',
-		'pageId',
-		'reRequestPermissions',
-		'apiAuthorizeUrl',
+        'apiAuthorizeUrl',
+        'pageId',
+
 	 );
 		 
 	public function getMapBetweenObjects()
