@@ -1,1 +1,0 @@
-alter table bulk_upload_result modify bulk_upload_job_id bigint;
