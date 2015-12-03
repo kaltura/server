@@ -290,8 +290,9 @@ class kSingleUrlManifestRenderer extends kManifestRenderer
 		{
 			$urlParts = explode("://", $this->flavor['url']);
 			$this->flavor['url'] = $urlParts[0] . "://" . $domainPrefix . $urlParts[1];
-			unset($this->flavor['domainPrefix']);
 		}
+		
+		unset($this->flavor['domainPrefix']);
 	}
 }
 
@@ -394,8 +395,9 @@ class kMultiFlavorManifestRenderer extends kManifestRenderer
 			{
 				$urlParts = explode("://", $flavor['url']);
 				$flavor['url'] = $urlParts[0] . "://" . $domainPrefix . $urlParts[1];
-				unset($flavor['domainPrefix']);
 			}
+			
+			unset($flavor['domainPrefix']);
 		}
 	}
 }
