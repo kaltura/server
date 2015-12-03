@@ -739,7 +739,7 @@ class CSharpClientGenerator extends ClientGeneratorFromXml
 					$dotNetType = "IDictionary<string, ".$paramNode->getAttribute("arrayType").">";
 					break;
 				case "file":
-					$dotNetType = "FileStream";
+					$dotNetType = "Stream";
 					break;
 				case "bigint":
 					$dotNetType = "long";

@@ -79,7 +79,7 @@ namespace Kaltura
         public KalturaFiles GetFilesForMultiRequest(int multiRequestNumber)
         {
             KalturaFiles multiRequestParams = new KalturaFiles();
-            foreach (KeyValuePair<string, FileStream> param in this._Files)
+            foreach (KeyValuePair<string, Stream> param in this._Files)
             {
                 multiRequestParams.Add(multiRequestNumber + ":" + param.Key, param.Value);
             }
