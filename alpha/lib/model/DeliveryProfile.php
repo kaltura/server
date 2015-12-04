@@ -26,18 +26,7 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 		$this->params = new DeliveryProfileDynamicAttributes();
 	}
 	
-	/**
-	 * @return kManifestRenderer
-	 */
-	public final function serve()
-	{
-		return $this->doServe();
-	}
-	
-	/**
-	 * @return kManifestRenderer
-	 */
-	public function doServe()
+	public function serve()
 	{
 		$flavors = $this->buildServeFlavors();
 		
