@@ -316,9 +316,10 @@ class kFlowHelper
 			}		
 			$replacingAsset->save();
 
-			$job = kJobsManager::addConcatJob($dbBatchJob, $replacingAsset, $files);
+			KalturaLog::debug('calling kJobsManager::addConcatJob. AMFs: ' . print_r($data->getAMFs(), true));
+			$job = kJobsManager::addConcatJob($dbBatchJob, $replacingAsset, $files, null, null, $data->getAMFs());
 		}
-		
+
 		return $dbBatchJob;
 	}
 	

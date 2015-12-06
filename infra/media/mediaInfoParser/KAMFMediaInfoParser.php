@@ -1,12 +1,5 @@
 <?php
 
-class KAMFData
-{
-    public $pts;
-    public $ts;
-
-};
-
 class KAMFMediaInfoParser{
 
     const timestampHexVal = "74696d657374616d70";
@@ -52,7 +45,7 @@ class KAMFMediaInfoParser{
         return "{$this->ffprobeBin} -i {$this->filePath} -select_streams 2:2 -show_streams -show_programs -v quiet -show_data -show_packets -print_format json 2>&1";
     }
 
-    // parse the output of the command and return an array of AMFData objects
+    // parse the output of the command and return an array of string of the form pts;timestamp
     protected function parseOutput($output)
     {
         $outputLower = strtolower($output);
@@ -70,9 +63,7 @@ class KAMFMediaInfoParser{
             // the first data packet is of smaller size of 205 chars
             if (strlen($tmp->data) > self::MinAMFSizeToTryParse) {
 
-                $amfData = new KAMFData();
-                $amfData->pts = $tmp->pts;
-                $amfData->ts = $this->getTimestampFromAMF($tmp->data);
+                $amfData = $tmp->pts . ';' . $this->getTimestampFromAMF($tmp->data);
 
                 // to save on space, we only want to save an AMF if there is a discontinuance between them
                 if (count($amf) == 0) {

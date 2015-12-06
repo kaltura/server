@@ -29,7 +29,12 @@ class kConcatJobData extends kJobData
 	 * @var float
 	 */
 	private $duration;
-	
+
+	/**
+	 * @var array
+	 */
+	private $AMFs;
+
 	/**
 	 * @return array $srcFiles
 	 */
@@ -108,5 +113,21 @@ class kConcatJobData extends kJobData
 	public function setDuration($duration)
 	{
 		$this->duration = $duration;
+	}
+
+	/**
+	 * @return the $AMFs array
+	 */
+	public function getAMFs()
+	{
+		return $this->AMFs;
+	}
+
+	/**
+	 * @param KalturaKeyValueArray $AMFs
+	 */
+	public function setAMFs($AMFs)
+	{
+		$this->AMFs = $AMFs;
 	}
 }

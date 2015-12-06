@@ -34,7 +34,12 @@ class KalturaConcatJobData extends KalturaJobData
 	 * @var float
 	 */
 	public $duration;
-	
+
+	/**
+	 * @var KalturaKeyValueArray
+	 */
+	public $AMFs;
+
 	private static $map_between_objects = array
 	(
 		'srcFiles',
@@ -42,6 +47,7 @@ class KalturaConcatJobData extends KalturaJobData
 		'flavorAssetId',
 		'offset',
 		'duration',
+		'AMFs',
 	);
 
 	/* (non-PHPdoc)

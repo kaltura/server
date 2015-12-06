@@ -1,11 +1,79 @@
 <?php
+
+class KAMFData
+{
+	public $pts;
+	public $ts;
+
+};
+
 /**
  * @package plugins.cuePoint
  */
-class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEventConsumer, kObjectAddedEventConsumer, kObjectCreatedEventConsumer, kObjectReplacedEventConsumer
+class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEventConsumer, kObjectChangedEventConsumer, kObjectAddedEventConsumer, kObjectCreatedEventConsumer, kObjectReplacedEventConsumer
 {
 	const MAX_CUE_POINTS_TO_COPY_TO_VOD = 100;
 	const MAX_CUE_POINTS_TO_COPY_TO_CLIP = 1000;
+
+	/* (non-PHPdoc)
+ 	 * @see kBatchJobStatusEventConsumer::updatedJob()
+ 	 */
+	public function updatedJob(BatchJob $dbBatchJob)
+	{
+		KalturaLog::debug('in kCuePointManager.updatedJob - jobID:' . $dbBatchJob->getId() . ' job type: ' . $dbBatchJob->getJobType()  . ' JobStatus= ' . $dbBatchJob->getStatus());
+
+		if ($jobType = $dbBatchJob->getJobType() == BatchJobType::CONCAT){
+			self::handleConcatJobFinished($dbBatchJob, $dbBatchJob->getData());
+		}
+		else if ($jobType = $dbBatchJob->getJobType() == BatchJobType::CONVERT_LIVE_SEGMENT) {
+			self::handleConvertLiveSegmentJobFinished($dbBatchJob, $dbBatchJob->getData());
+		}
+		return true;
+	}
+
+	private function handleConvertLiveSegmentJobFinished(BatchJob $dbBatchJob, kConvertLiveSegmentJobData $data)
+	{
+		KalturaLog::debug('in kCuePointManager.handleConvertLiveSegmentJobFinished - file index is ' . $data->getFileIndex());
+		if ($data->getFileIndex() == 0) {
+			KalturaLog::debug('in kCuePointManager.handleConvertLiveSegmentJobFinished - running KMediaInfoMediaParser');
+			$mediaInfoParser = new KMediaInfoMediaParser($data->getDestFilePath(), kConf::get('bin_path_mediainfo'));
+			$recordedVODDurationInMS = $mediaInfoParser->getMediaInfo()->videoDuration;
+			KalturaLog::debug('in kCuePointManager.handleConvertLiveSegmentJobFinished - running KMediaInfoMediaParser - finished ' .
+				$dbBatchJob->getEntry()->getRecordedEntryId() . ' ' . $recordedVODDurationInMS . ' ' . $recordedVODDurationInMS . ' ' . print_r($data->getAMFs(), true));
+			self::copyCuePointsFromLiveToVodEntry($dbBatchJob->getEntry()->getRecordedEntryId(), $recordedVODDurationInMS, $recordedVODDurationInMS, $data->getAMFs());
+		}
+	}
+
+	private function handleConcatJobFinished(BatchJob $dbBatchJob, kConcatJobData $data)
+	{
+		KalturaLog::debug('in kCuePointManager.handleConcatJobFinished');
+
+		$mediaInfoParser = new KMediaInfoMediaParser($data->getDestFilePath(), kConf::get('bin_path_mediainfo'));
+		$recordedVODDurationInMS = $mediaInfoParser->getMediaInfo()->videoDuration;
+
+		// get the duration of the new segment file
+		$segmentFiles = $data->getSrcFiles();
+		$mediaInfoParser2 = new KMediaInfoMediaParser($segmentFiles[1], kConf::get('bin_path_mediainfo'));
+		$lastSegmentDurationInMS = $mediaInfoParser2->getMediaInfo()->videoDuration;
+
+		self::copyCuePointsFromLiveToVodEntry( $dbBatchJob->getParentJob()->getEntry()->getRecordedEntryId(), $recordedVODDurationInMS, $lastSegmentDurationInMS, $data->getAMFs());
+	}
+
+	/* (non-PHPdoc)
+ 	 * @see kBatchJobStatusEventConsumer::shouldConsumeJobStatusEvent()
+ 	 */
+	public function shouldConsumeJobStatusEvent(BatchJob $dbBatchJob)
+	{
+		KalturaLog::debug('in kCuePointManager.shouldConsumeJobStatusEvent. JobType= ' . $dbBatchJob->getJobType() . ' JobStatus= ' . $dbBatchJob->getStatus());
+		$jobType = $dbBatchJob->getJobType();
+		if (($jobType == BatchJobType::CONVERT_LIVE_SEGMENT || $jobType == BatchJobType::CONCAT) && $dbBatchJob->getStatus() == BatchJob::BATCHJOB_STATUS_FINISHED){
+			KalturaLog::debug('in kCuePointManager.shouldConsumeJobStatusEvent - returning true');
+			return true;
+		}
+		KalturaLog::debug('in kCuePointManager.shouldConsumeJobStatusEvent - returning false');
+		return false;
+	}
+
 	/* (non-PHPdoc)
 	 * @see kObjectAddedEventConsumer::shouldConsumeAddedEvent()
 	 */
@@ -35,12 +103,9 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 	*/
 	public function shouldConsumeCreatedEvent(BaseObject $object)
 	{
-		if ( self::getVodEntryBasedOnMediaInfoFlavorAsset($object) )
-		{
-			return true;
-		}
 		return false;
 	}
+
 	/* (non-PHPdoc)
 	 * @see kObjectReplacedEventConsumer::shouldConsumeReplacedEvent()
 	 */
@@ -51,6 +116,7 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 		}
 		return false;
 	}
+
 	/**
 	 * Return a VOD entry (sourceType = RECORDED_LIVE) based on the flavorAsset that is
 	 * associated with the given mediaInfo object
@@ -75,6 +141,7 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 		}
 		return $vodEntry;
 	}
+
 	/* (non-PHPdoc)
 	 * @see kObjectAddedEventConsumer::objectAdded()
 	 */
@@ -85,7 +152,6 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 
 		return true;
 	}
-
 
 	/* (non-PHPdoc)
 	 * @see kObjectDeletedEventConsumer::objectDeleted()
@@ -109,6 +175,7 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 		self::copyCuePointsFromLiveToVodEntry( $object );
 		return true;
 	}
+
 	/* (non-PHPdoc)
 	 * @see kObjectReplacedEventConsumer::objectReplaced()
 	*/
@@ -140,6 +207,7 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 		}
 		return true;
 	}
+
 	/**
 	 * @param BaseObject $entry entry to check
 	 * @return kClipAttributes|null
@@ -156,6 +224,7 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 		}
 		return null;
 	}
+
 	/**
 	 * @param CuePoint $cuePoint
 	 */
@@ -304,6 +373,7 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 
 		return $scene;
 	}
+
 	/**
 	 * @param string $xmlPath
 	 * @param int $partnerId
@@ -353,6 +423,7 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 
 		return $cuePoints;
 	}
+
 	/**
 	 * @param array<CuePoint> $cuePoints
 	 * @param SimpleXMLElement $scenes
@@ -367,6 +438,7 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 				$scene = $pluginInstance->syndicate($cuePoint, $scenes, $scene);
 		}
 	}
+
 	/**
 	 * @param array<CuePoint> $cuePoints
 	 * @return string xml
@@ -429,6 +501,7 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 		}
 		return true;
 	}
+
 	/* (non-PHPdoc)
 	 * @see kObjectChangedEventConsumer::shouldConsumeChangedEvent()
 	 */
@@ -447,6 +520,7 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 		}
 		return false;
 	}
+
 	public static function wasEntryClipped(BaseObject $object, array $modifiedColumns)
 	{
 		if ( ($object instanceof entry)
@@ -458,6 +532,7 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 		}
 		return false;
 	}
+
 	public static function isPostProcessCuePointsEvent(BaseObject $object, array $modifiedColumns)
 	{
 		if(	$object instanceof LiveEntry
@@ -484,6 +559,7 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 		/* @var $object CuePoint */
 		return $object->shouldReIndexEntry($modifiedColumns);
 	}
+
 	public static function postProcessCuePoints( $liveEntry, $cuePointsIds = null )
 	{
 		$select = new Criteria();
@@ -515,12 +591,18 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 			$cuePoint->indexToSearchIndex();
 		}
 	}
+
 	/**
-	 * @param entry $vodEntry
+	 * @param string $vodEntryId
 	 */
-	public static function copyCuePointsFromLiveToVodEntry( $mediaInfo )
+	public static function copyCuePointsFromLiveToVodEntry( $vodEntryId, $totalVODDuration, $lastSegmentDuration, $AMFs )
 	{
-		$vodEntry = self::getVodEntryBasedOnMediaInfoFlavorAsset( $mediaInfo );
+		KalturaLog::debug("in copyCuePointsFromLiveToVodEntry with VOD entry ID: " . $vodEntryId .
+			" totalVODDuration: " . $totalVODDuration .
+			" lastSegmentDuration " . $lastSegmentDuration .
+			" AMFs: " . print_r($AMFs, true));
+
+		$vodEntry = entryPeer::retrieveByPK($vodEntryId);
 		if ( ! $vodEntry )
 		{
 			return;
@@ -534,13 +616,16 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 			return;
 		}
 
-		$recordedSegmentsInfo = $liveEntry->getRecordedSegmentsInfo();
+		$currentSegmentEndTime = self::getSegmentEndTime($AMFs, $lastSegmentDuration);
+
+		$AMFs = self::parseAMFs($AMFs, $totalVODDuration, $lastSegmentDuration);
 
 		KalturaLog::log("Saving the live entry [{$liveEntry->getId()}] cue points into the associated VOD entry [{$vodEntry->getId()}]");
+
 		// select up to MAX_CUE_POINTS_TO_COPY_TO_VOD to handle
 		$c = new KalturaCriteria();
 		$c->add( CuePointPeer::ENTRY_ID, $liveEntry->getId() );
-		$c->add( CuePointPeer::CREATED_AT, $recordedSegmentsInfo->getLastAMFTS()/1000, KalturaCriteria::LESS_EQUAL ); // Don't copy future cuepoints
+		$c->add( CuePointPeer::CREATED_AT, $currentSegmentEndTime, KalturaCriteria::LESS_EQUAL ); // Don't copy future cuepoints
 		$c->add( CuePointPeer::STATUS, CuePointStatus::READY ); // READY, but not yet HANDLED
 		$c->addAscendingOrderByColumn(CuePointPeer::START_TIME);
 		$c->setLimit( self::MAX_CUE_POINTS_TO_COPY_TO_VOD );
@@ -555,7 +640,7 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 			{
 				$processedCuePointIds[] = $liveCuePoint->getId();
 				$cuePointCreationTime = $liveCuePoint->getCreatedAt(NULL)*1000;
-				$offsetForTS = $recordedSegmentsInfo->getOffsetForTimestamp($cuePointCreationTime);
+				$offsetForTS = self::getOffsetForTimestamp($cuePointCreationTime, $AMFs);
 				$copyMsg = "cuepoint [{$liveCuePoint->getId()}] from live entry [{$liveEntry->getId()}] to VOD entry [{$vodEntry->getId()}] cuePointCreationTime= $cuePointCreationTime offsetForTS= $offsetForTS";
 				KalturaLog::debug("Preparing to copy $copyMsg");
 				if ( ! is_null( $offsetForTS ) )
@@ -575,6 +660,93 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 		}
 	}
 
+	private static function getOffsetForTimestamp($timestamp, $AMFs){
+		KalturaLog::debug('getOffsetForTimestamp ' . $timestamp);
+
+		$minDistanceIndex = self::getClosestAMFIndex($timestamp, $AMFs);
+
+		$ret = 0;
+		if (is_null($minDistanceIndex)){
+			KalturaLog::debug('minDistanceIndex is null - returning 0');
+		}
+		else if ($AMFs[$minDistanceIndex]->ts > $timestamp){
+			KalturaLog::debug('timestamp is before index #' . $minDistanceIndex);
+			$ret = $AMFs[$minDistanceIndex]->pts - ($AMFs[$minDistanceIndex]->ts - $timestamp);
+		}
+		else{
+			KalturaLog::debug('timestamp is after index #' . $minDistanceIndex);
+			$ret = $AMFs[$minDistanceIndex]->pts + ($timestamp - $AMFs[$minDistanceIndex]->ts);
+		}
+
+		KalturaLog::debug('AMFs array is:' . print_r($AMFs, true) . 'getOffsetForTimestamp returning ' . $ret);
+		return $ret;
+	}
+
+	private static function getClosestAMFIndex($timestamp, $AMFs){
+		$len = count($AMFs);
+		$ret = null;
+
+		if ($len == 1){
+			$ret = 0;
+		}
+		else if ($timestamp >= $AMFs[$len-1]->ts){
+			$ret = $len-1;
+		}
+		else if ($timestamp <= $AMFs[0]->ts){
+			$ret = 0;
+		}
+		else if ($len > 1) {
+			$lo = 0;
+			$hi = $len - 1;
+
+			while ($hi - $lo > 1) {
+				$mid = round(($lo + $hi) / 2);
+				if ($AMFs[$mid]->ts <= $timestamp) {
+					$lo = $mid;
+				} else {
+					$hi = $mid;
+				}
+			}
+
+			if (abs($AMFs[$hi]->ts - $timestamp) > abs($AMFs[$lo]->ts - $timestamp)) {
+				return $lo;
+			} else {
+				return $hi;
+			}
+		}
+
+		KalturaLog::debug('getClosestAMFIndex returning ' . $ret);
+		return $ret;
+	}
+
+	// Get an array of strings of the form pts;ts and return an array of KAMFData
+	private static function parseAMFs($AMFs, $totalVODDuration, $currentSegmentDuration){
+		$retArr = array();
+
+		for($i=0; $i < count($AMFs); ++$i){
+			$amf = new KAMFData();
+			$amfParts = explode(';', $AMFs[$i]);
+			$amf->pts = $amfParts[0] + $totalVODDuration - $currentSegmentDuration;
+			$amf->ts = $amfParts[1];
+
+			KalturaLog::debug('adding AMF to AMFs: ' . print_r($amf, true) . ' extracted from ' . $AMFs[$i]);
+			array_push($retArr, $amf);
+		}
+
+		return $retArr;
+	}
+
+	private static function getSegmentEndTime($AMFs, $segmentDuration){
+		if (count($AMFs) == 0){
+			KalturaLog::warning("getSegmentEndTime got an empty AMFs array - returning 0 az segment end time");
+		}
+		$amfParts = explode(';', $AMFs[0]);
+		$ts = $amfParts[0];
+		$pts = $amfParts[1];
+
+		return ($pts - $ts + $segmentDuration)/1000;
+	}
+
 	protected function reIndexCuePointEntry(CuePoint $cuePoint)
 	{
 		//index the entry after the cue point was added|deleted
@@ -586,6 +758,7 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 			$entry->indexToSearchIndex();
 		}
 	}
+
 	/**
 	 *
 	 * @param entry $clipEntry new entry to copy and adjust cue points from root entry to
