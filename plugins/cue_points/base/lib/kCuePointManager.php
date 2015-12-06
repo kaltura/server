@@ -14,6 +14,7 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 {
 	const MAX_CUE_POINTS_TO_COPY_TO_VOD = 100;
 	const MAX_CUE_POINTS_TO_COPY_TO_CLIP = 1000;
+	const CUE_POINT_TIME_EPSILON = 1;
 
 	/* (non-PHPdoc)
  	 * @see kBatchJobStatusEventConsumer::updatedJob()
@@ -51,9 +52,12 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 		$mediaInfoParser = new KMediaInfoMediaParser($data->getDestFilePath(), kConf::get('bin_path_mediainfo'));
 		$recordedVODDurationInMS = $mediaInfoParser->getMediaInfo()->videoDuration;
 
+		//kConvertLiveSegmentJobData tmp =
+		$convertJobData = ($dbBatchJob->getParentJob()->getData());
+
 		// get the duration of the new segment file
 		$segmentFiles = $data->getSrcFiles();
-		$mediaInfoParser2 = new KMediaInfoMediaParser($segmentFiles[1], kConf::get('bin_path_mediainfo'));
+		$mediaInfoParser2 = new KMediaInfoMediaParser($segmentFiles[$convertJobData->getFileIndex()], kConf::get('bin_path_mediainfo'));
 		$lastSegmentDurationInMS = $mediaInfoParser2->getMediaInfo()->videoDuration;
 
 		self::copyCuePointsFromLiveToVodEntry( $dbBatchJob->getParentJob()->getEntry()->getRecordedEntryId(), $recordedVODDurationInMS, $lastSegmentDurationInMS, $data->getAMFs());
@@ -617,6 +621,7 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 		}
 
 		$currentSegmentEndTime = self::getSegmentEndTime($AMFs, $lastSegmentDuration);
+		$currentSegmentStartTime = self::getSegmentStartTime($AMFs);
 
 		$AMFs = self::parseAMFs($AMFs, $totalVODDuration, $lastSegmentDuration);
 
@@ -626,8 +631,9 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 		$c = new KalturaCriteria();
 		$c->add( CuePointPeer::ENTRY_ID, $liveEntry->getId() );
 		$c->add( CuePointPeer::CREATED_AT, $currentSegmentEndTime, KalturaCriteria::LESS_EQUAL ); // Don't copy future cuepoints
+		$c->addAnd( CuePointPeer::CREATED_AT, $currentSegmentStartTime - self::CUE_POINT_TIME_EPSILON, KalturaCriteria::GREATER_EQUAL ); // Don't copy cuepoints before segment begining
 		$c->add( CuePointPeer::STATUS, CuePointStatus::READY ); // READY, but not yet HANDLED
-		$c->addAscendingOrderByColumn(CuePointPeer::START_TIME);
+		$c->addAscendingOrderByColumn(CuePointPeer::CREATED_AT);
 		$c->setLimit( self::MAX_CUE_POINTS_TO_COPY_TO_VOD );
 		$liveCuePointsToCopy = CuePointPeer::doSelect($c);
 
@@ -738,13 +744,26 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 
 	private static function getSegmentEndTime($AMFs, $segmentDuration){
 		if (count($AMFs) == 0){
-			KalturaLog::warning("getSegmentEndTime got an empty AMFs array - returning 0 az segment end time");
+			KalturaLog::warning("getSegmentEndTime got an empty AMFs array - returning 0 as segment end time");
+			return 0;
 		}
 		$amfParts = explode(';', $AMFs[0]);
 		$ts = $amfParts[0];
 		$pts = $amfParts[1];
 
 		return ($pts - $ts + $segmentDuration)/1000;
+	}
+
+	private static function getSegmentStartTime($AMFs){
+		if (count($AMFs) == 0){
+			KalturaLog::warning("getSegmentStartTime got an empty AMFs array - returning 0 as segment end time");
+			return 0;
+		}
+		$amfParts = explode(';', $AMFs[0]);
+		$ts = $amfParts[0];
+		$pts = $amfParts[1];
+
+		return ($pts - $ts)/1000;
 	}
 
 	protected function reIndexCuePointEntry(CuePoint $cuePoint)
