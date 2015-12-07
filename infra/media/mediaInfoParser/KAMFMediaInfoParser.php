@@ -6,7 +6,7 @@ class KAMFMediaInfoParser{
     const AMFNumberDataTypePrefix ="00";
     const IEEE754DoubleFloatInHexLength = 16;
     const MinAMFSizeToTryParse = 205;
-    const MAXAmfDiscontinuanceMS = 1000;
+    const MaxAMFDiscontinuanceMS = 1000;
     const MinDistanceBetweenAMFsInMS = 60000;
 
     protected $ffmprobeBin;
@@ -75,7 +75,7 @@ class KAMFMediaInfoParser{
                     $tsDelta = $amfData->ts - $lastAMF->ts;
                     $ptsDelta = $amfData->pts - $lastAMF->pts;
 
-                    if (abs($tsDelta - $ptsDelta) >=  self::MAXAmfDiscontinuanceMS){
+                    if (abs($tsDelta - $ptsDelta) >=  self::MaxAMFDiscontinuanceMS){
                         if ($tsDelta > self::MinDistanceBetweenAMFsInMS) {
                             KalturaLog::debug('got discontinuance - adding AMF. ' . 'tsDelta= ' . $tsDelta . ' ptsDelta= ' . $ptsDelta);
                             array_push($amf, $amfData);

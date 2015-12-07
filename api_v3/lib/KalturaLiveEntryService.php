@@ -132,7 +132,6 @@ class KalturaLiveEntryService extends KalturaEntryService
 			$dbEntry->save();
 		}
 
-		KalturaLog::debug("about to call amfParser->getAMFInfo()");
 		// Extract AMF data from all data frames in the segment
 		$amfParser = new KAMFMediaInfoParser($filename, kConf::get('bin_path_ffprobeKAMFMediaInfoParser'));
 		$AMFs = $amfParser->getAMFInfo();
