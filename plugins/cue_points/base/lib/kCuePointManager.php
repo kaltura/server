@@ -57,6 +57,8 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 
 		// get the duration of the new segment file
 		$segmentFiles = $data->getSrcFiles();
+		sort($segmentFiles);
+
 		$mediaInfoParser2 = new KMediaInfoMediaParser($segmentFiles[$convertJobData->getFileIndex()], kConf::get('bin_path_mediainfo'));
 		$lastSegmentDurationInMS = $mediaInfoParser2->getMediaInfo()->videoDuration;
 
