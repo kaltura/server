@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Base class for live streams and live channels
  *
@@ -17,6 +18,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 	public function initService($serviceId, $serviceName, $actionName)
 	{
 		parent::initService($serviceId, $serviceName, $actionName);
+
 		// KAsyncValidateLiveMediaServers lists all live entries of all partners
 		if($this->getPartnerId() == Partner::BATCH_PARTNER_ID && $actionName == 'list')
 			myPartnerUtils::resetPartnerFilter('entry');
@@ -35,6 +37,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 		}
 		return parent::partnerRequired($actionName);
 	}
+
 	function dumpApiRequest($entryId, $onlyIfAvailable = true)
 	{
 		$entryDc = substr($entryId, 0, 1);
@@ -64,6 +67,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 		$dbEntry = entryPeer::retrieveByPK($entryId);
 		if (!$dbEntry || !($dbEntry instanceof LiveEntry))
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
+
 		$dbAsset = assetPeer::retrieveById($assetId);
 		if (!$dbAsset || !($dbAsset instanceof liveAsset))
 			throw new KalturaAPIException(KalturaErrors::ASSET_ID_NOT_FOUND, $assetId);
@@ -90,6 +94,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 				}
 			}
 		}
+
 		$liveSegmentDurationInMsec = (int)($duration * 1000);
 		$currentDuration = $lastDuration + $liveSegmentDurationInMsec;
 
@@ -113,14 +118,17 @@ class KalturaLiveEntryService extends KalturaEntryService
 			chgrp($filename, kConf::get('content_group'));
 			chmod($filename, 0640);
 		}
+
 		if($dbAsset->hasTag(assetParams::TAG_RECORDING_ANCHOR) && $mediaServerIndex == KalturaMediaServerIndex::PRIMARY)
 		{
 			$dbEntry->setLengthInMsecs($currentDuration);
+
 			if ( $isLastChunk )
 			{
 				// Save last elapsed recording time
 				$dbEntry->setLastElapsedRecordingTime( $currentDuration );
 			}
+
 			$dbEntry->save();
 		}
 
@@ -148,6 +156,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 		$entry->fromObject($dbEntry, $this->getResponseProfile());
 		return $entry;
 	}
+
 	private function ingestAsset(entry $entry, $dbAsset, $filename)
 	{
 		$flavorParamsId = $dbAsset->getFlavorParamsId();
@@ -192,6 +201,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 
 		kEventsManager::raiseEvent(new kObjectAddedEvent($recordedAsset));
 	}
+
 	/**
 	 * Register media server to live entry
 	 *
@@ -227,8 +237,8 @@ class KalturaLiveEntryService extends KalturaEntryService
 					throw $ex;
 			}
 		}
-		$dbEntry->setRedirectEntryId(null);
 
+		$dbEntry->setRedirectEntryId(null);
 		if($dbEntry->save())
 		{
 			if($mediaServerIndex == MediaServerIndex::PRIMARY && $dbEntry->getRecordStatus())
@@ -260,7 +270,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 						}	
 					}					
 				}
-
+				
 				if($createRecordedEntry)
 					$this->createRecordedEntry($dbEntry, $mediaServerIndex);
 			}
@@ -270,6 +280,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 		$entry->fromObject($dbEntry, $this->getResponseProfile());
 		return $entry;
 	}
+
 	/**
 	 * @param LiveEntry $dbEntry
 	 * @return entry
@@ -311,7 +322,9 @@ class KalturaLiveEntryService extends KalturaEntryService
 			$recordedEntry->setModerationStatus($dbEntry->getModerationStatus());
 			$recordedEntry->setIsRecordedEntry(true);
 			$recordedEntry->setTags($dbEntry->getTags());
+
 			$recordedEntry->save();
+
 			$dbEntry->setRecordedEntryId($recordedEntry->getId());
 			$dbEntry->save();
 
@@ -324,14 +337,15 @@ class KalturaLiveEntryService extends KalturaEntryService
 			}
 		}
 		catch(Exception $e){
-			$lock->unlock();
-			throw $e;
+       		$lock->unlock();
+       		throw $e;
 		}
 
 		$lock->unlock();
 
 		return $recordedEntry;
 	}
+
 	/**
 	 * Unregister media server from live entry
 	 *
@@ -358,6 +372,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 		{
 			$dbEntry->setRedirectEntryId($dbEntry->getRecordedEntryId());
 		}
+
 		if ( count( $dbEntry->getMediaServers() ) == 0 )
 		{
 			// Reset currentBroadcastStartTime
@@ -367,12 +382,14 @@ class KalturaLiveEntryService extends KalturaEntryService
 				$dbEntry->setCurrentBroadcastStartTime( 0 );
 			}
 		}
+
 		$dbEntry->save();
 
 		$entry = KalturaEntryFactory::getInstanceByType($dbEntry->getType());
 		$entry->fromObject($dbEntry, $this->getResponseProfile());
 		return $entry;
 	}
+
 	/**
 	 * Validates all registered media servers
 	 *
