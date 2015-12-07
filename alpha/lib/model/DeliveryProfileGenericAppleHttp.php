@@ -49,7 +49,7 @@ class DeliveryProfileGenericAppleHttp extends DeliveryProfileAppleHttp {
 		return kDeliveryUtils::formatGenericUrl($url, $pattern, $this->params);
 	}
 	
-	public function serve()
+	public function buildServeFlavors()
 	{
 		if ($this->getManifestRedirect() && $this->getHostName() != $_SERVER['HTTP_HOST'])
 		{
@@ -58,10 +58,21 @@ class DeliveryProfileGenericAppleHttp extends DeliveryProfileAppleHttp {
 			$flavor = array(
 				'urlPrefix' => $this->params->getMediaProtocol() . '://' . $parsedUrl['host'], 
 				'url' => $_SERVER["REQUEST_URI"]);
-			return new kRedirectManifestRenderer(array($flavor), $this->params->getEntryId());
+			
+			return array($flavor);
 		}
 		
-		return parent::serve();
+		return parent::buildServeFlavors();
+	}
+	
+	public function getRenderer($flavors)
+	{
+		if ($this->getManifestRedirect() && $this->getHostName() != $_SERVER['HTTP_HOST'])
+		{
+			return new kRedirectManifestRenderer($flavors, $this->params->getEntryId());
+		}
+		
+		return parent::getRenderer($flavors);
 	}
 }
 

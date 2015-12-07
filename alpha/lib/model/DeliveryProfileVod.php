@@ -183,9 +183,9 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 	/** -------------------
 	 * 		Serve
 	 * --------------------*/
-	public function serve() {
-		$flavors = $this->buildFlavors();
-		return $this->retrieveRenderer($flavors);
+	public function buildServeFlavors() 
+	{
+		return array();
 	}
 	
 	/**

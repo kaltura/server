@@ -279,12 +279,12 @@ class DynamicPlaylistTests(KalturaBaseTest):
                 
         #create category entry hierarchy
         topCategory = KalturaCategory()
-        topCategory.setName("TopCategory")
+        topCategory.setName('TopCategory_' + str(time.time()))
         topCategory = self.client.category.add(topCategory)
         self.addCleanup(self.client.category.delete, topCategory.getId())
         
         subCategory = KalturaCategory()
-        subCategory.setName("SubCategory")
+        subCategory.setName("SubCategory" + str(time.time()))
         subCategory.setParentId(topCategory.getId())
         subCategory = self.client.category.add(subCategory)
         self.addCleanup(self.client.category.delete, subCategory.getId())

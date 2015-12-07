@@ -32,17 +32,12 @@ class MetadataProfileServiceTest < Test::Unit::TestCase
 	# this test adds a metadata_profile and retrieves the list of metadata_profiles to demonstrate the use of kaltura plugins.
 	should "creates a metadata_profile and get the metadata_profile list" do
 
-		# cleaning up the list
-		metadata_profile_filter = Kaltura::KalturaMetadataProfileFilter.new
-		filter_pager = Kaltura::KalturaFilterPager.new
-		metadata_profile_list = @client.metadata_profile_service.list(metadata_profile_filter, filter_pager)
-		metadata_profile_list.objects.each do |obj|
-			@client.metadata_profile_service.delete(obj.id) rescue nil
-		end  if metadata_profile_list.objects
-
+		unique_id = (0...8).map { (97 + rand(26)).chr }.join
+		
 		# creates a metadata_profile
 		metadata_profile = Kaltura::KalturaMetadataProfile.new
 		metadata_profile.name = "test profile"
+		metadata_profile.system_name = unique_id
 		metadata_profile.metadata_object_type = Kaltura::KalturaMetadataObjectType::ENTRY
 		metadata_profile.create_mode = Kaltura::KalturaMetadataProfileCreateMode::API
 
@@ -52,13 +47,14 @@ class MetadataProfileServiceTest < Test::Unit::TestCase
 
 		# list the metadata_profiles
 		metadata_profile_filter = Kaltura::KalturaMetadataProfileFilter.new
+		metadata_profile_filter.system_name_equal = unique_id
 		filter_pager = Kaltura::KalturaFilterPager.new
 		filter_pager.page_size = 1
 
 		metadata_profile_list = @client.metadata_profile_service.list(metadata_profile_filter, filter_pager)
 
-		assert_equal metadata_profile_list.objects.length, 1
-		assert_equal metadata_profile_list.total_count > 1, true
+		assert_equal 1, metadata_profile_list.objects.length
+		assert_equal 1, metadata_profile_list.total_count
 
 		assert_nil @client.metadata_profile_service.delete(created_metadata_profile.id)
 	end

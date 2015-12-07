@@ -51,7 +51,7 @@ class WowzaMediaServerNode extends MediaServerNode {
 		return WowzaMediaServerNode::WEB_SERVICE_LIVE;
 	}
 	
-	public function getPlaybackHost($protocol = 'http', $format = null)
+	public function getPlaybackHost($protocol = 'http', $format = null, $deliveryType = null)
 	{
 		$mediaServerGlobalConfig = array();
 		
@@ -76,23 +76,23 @@ class WowzaMediaServerNode extends MediaServerNode {
 	 */
 	public function getWebService($serviceName)
 	{	
-		if(!isset(self::$webServices[$service]))
+		if(!isset(self::$webServices[$serviceName]))
 			return null;
 			
-		$serviceClass = self::$webServices[$service];
+		$serviceClass = self::$webServices[$serviceName];
 		
 		$domain = $this->getLiveServiceInternalDomain() ? $this->getLiveServiceInternalDomain() : $this->getHostname();
 		$port = $this->getLiveServicePort();
 		$protocol = $this->getLiveServiceProtocol();
 		
-		$url = "$protocol://$domain:$port/$service?wsdl";
+		$url = "$protocol://$domain:$port/$serviceName?wsdl";
 		KalturaLog::debug("Service URL: $url");
 		return new $serviceClass($url);
 	}
 	
 	public function getDomainByProtocolAndFormat($mediaServerConfig, $protocol = 'http', $format = null)
 	{	
-		$domain = $this->getPlaybackHostName();
+		$domain = $this->getPlaybackDomain();
 		
 		$domainField = "domain" . ($format ? "-$format" : "");
 		

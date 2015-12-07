@@ -220,7 +220,7 @@ class KalturaDispatcher
 			if (!$dbObject->isEntitledKuserEdit(kCurrentContext::getCurrentKsKuserId())
 				||
 				(in_array(self::OWNER_ONLY_OPTION,$optionsArray)))
-				throw new KalturaAPIException(KalturaErrors::INVALID_KS, "", ks::INVALID_TYPE, ks::getErrorStr(ks::INVALID_TYPE));
+					throw new KalturaAPIException(KalturaErrors::INVALID_KS, "", ks::INVALID_TYPE, ks::getErrorStr(ks::INVALID_TYPE));
 		}
 	}
 }
