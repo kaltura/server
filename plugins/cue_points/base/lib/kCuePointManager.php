@@ -10,7 +10,7 @@ class KAMFData
 /**
  * @package plugins.cuePoint
  */
-class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEventConsumer, kObjectChangedEventConsumer, kObjectAddedEventConsumer, kObjectCreatedEventConsumer, kObjectReplacedEventConsumer
+class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEventConsumer, kObjectChangedEventConsumer, kObjectAddedEventConsumer, kObjectReplacedEventConsumer
 {
 	const MAX_CUE_POINTS_TO_COPY_TO_VOD = 100;
 	const MAX_CUE_POINTS_TO_COPY_TO_CLIP = 1000;
@@ -105,14 +105,6 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 	}
 
 	/* (non-PHPdoc)
-	 * @see kObjectCreatedEventConsumer::shouldConsumeCreatedEvent()
-	*/
-	public function shouldConsumeCreatedEvent(BaseObject $object)
-	{
-		return false;
-	}
-
-	/* (non-PHPdoc)
 	 * @see kObjectReplacedEventConsumer::shouldConsumeReplacedEvent()
 	 */
 	public function shouldConsumeReplacedEvent(BaseObject $object)
@@ -170,15 +162,6 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 		if($object instanceof CuePoint)
 			$this->cuePointDeleted($object);
 
-		return true;
-	}
-
-	/* (non-PHPdoc)
-	 * @see kObjectCreatedEventConsumer::objectCreated()
-	*/
-	public function objectCreated(BaseObject $object)
-	{
-		self::copyCuePointsFromLiveToVodEntry( $object );
 		return true;
 	}
 
