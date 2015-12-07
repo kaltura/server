@@ -3,7 +3,7 @@
  * @package api
  * @subpackage api.objects
  */
-class KalturaFileAsset extends KalturaObject implements IFilterable 
+class KalturaFileAsset extends KalturaObject implements IRelatedFilterable 
 {
 	/**
 	 * @var int

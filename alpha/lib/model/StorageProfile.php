@@ -8,7 +8,7 @@
  * @package Core
  * @subpackage model
  */ 
-class StorageProfile extends BaseStorageProfile
+class StorageProfile extends BaseStorageProfile implements IBaseObject
 {
 	const STORAGE_SERVE_PRIORITY_KALTURA_ONLY = 1;
 	const STORAGE_SERVE_PRIORITY_KALTURA_FIRST = 2;
@@ -30,6 +30,7 @@ class StorageProfile extends BaseStorageProfile
 	
 	const CUSTOM_DATA_DELIVERY_IDS = 'delivery_profile_ids';
 	const CUSTOM_DATA_PATH_MANAGER_PARAMS = 'path_manager_params';
+	const CUSTOM_DATA_PATH_FORMAT = 'path_format';
 	const CUSTOM_DATA_READY_BEHAVIOR = 'ready_behavior';
 	const CUSTOM_DATA_RULES = 'rules';
 	const CUSTOM_DATA_CREATE_FILE_LINK ='create_file_link';
@@ -71,8 +72,17 @@ class StorageProfile extends BaseStorageProfile
 	public function setTrigger( $v ) { $this->putInCustomData("trigger", (int)$v); }
 	
 	//external path format
-	public function setPathFormat($v) { $this->putInCustomData('path_format', $v);}
-	public function getPathFormat() { return $this->getFromCustomData('path_format', null);}
+	public function setPathFormat($v) { $this->putInCustomData(self::CUSTOM_DATA_PATH_FORMAT, $v);}
+	public function getPathFormat()
+	{
+		$params = $this->getPathManagerParams();
+		if (isset($params[self::CUSTOM_DATA_PATH_FORMAT]))
+		{
+		    return $params[self::CUSTOM_DATA_PATH_FORMAT];
+		}
+		
+		return $this->getFromCustomData(self::CUSTOM_DATA_PATH_FORMAT);
+	}
 	
 	/**
 	 * 
@@ -166,16 +176,13 @@ class StorageProfile extends BaseStorageProfile
 	 */
 	public function shouldExportFlavorAsset(flavorAsset $flavorAsset, $skipFlavorAssetStatusValidation = false)
 	{
-		KalturaLog::debug('Checking if flavor asset ['.$flavorAsset->getId().'] should be exported to ['.$this->getId().']');
 		if(!$skipFlavorAssetStatusValidation && !$flavorAsset->isLocalReadyStatus())
 		{
-			KalturaLog::debug('Flavor is not ready for export');
 			return false;
 		}
 					
 		if(!$this->isFlavorAssetConfiguredForExport($flavorAsset))
 		{
-			KalturaLog::debug('Flavor asset is not configured for export');
 			return false;
 		}
 
@@ -183,11 +190,10 @@ class StorageProfile extends BaseStorageProfile
 		$scope->setEntryId($flavorAsset->getEntryId());
 		if(!$this->fulfillsRules($scope))
 		{
-			KalturaLog::debug('Storage profile export rules are not fulfilled');
+			KalturaLog::log('Storage profile export rules are not fulfilled');
 			return false;
 		}
 			
-		KalturaLog::debug('Flavor should be exported');
 		return true;	    
 	}
 	
@@ -195,12 +201,12 @@ class StorageProfile extends BaseStorageProfile
 	{
 		if($this->isExported($key))
 		{
-			KalturaLog::debug('Flavor was already exported');
+			KalturaLog::info('Flavor was already exported');
 			return false;
 		}
 		if(!$this->isValidFileSync($key))
 		{
-			KalturaLog::debug('File sync is not valid for export');
+			KalturaLog::info('File sync is not valid for export');
 			return false;
 		}
 		return true;	    
@@ -258,12 +264,10 @@ class StorageProfile extends BaseStorageProfile
 		
 		if(array_key_exists($scope->getEntryId(), kStorageExporter::$entryContextDataResult[$this->getId()]))
 		{
-			KalturaLog::debug("Found rule->applyContext result in cache");
 			$context = kStorageExporter::$entryContextDataResult[$this->getId()][$scope->getEntryId()];
 		}
 		else
 		{	
-			KalturaLog::debug("Validating rules");						
 			$context = new kContextDataResult();	
 			foreach ($this->getRules() as $rule) 
 			{

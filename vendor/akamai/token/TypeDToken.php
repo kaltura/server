@@ -24,7 +24,7 @@ class TypeDToken extends StreamToken {
     /*
      * Ctor for token type.
      */
-    function TypeDToken($userPath,
+    function __construct($userPath,
                $userIP,
                $userProfile,
                $userPasswd,
@@ -36,7 +36,7 @@ class TypeDToken extends StreamToken {
        $durBuf = "";
 
        // Call parent ctor
-       parent::StreamToken();
+       parent::__construct();
 
        // Set member functions
        // Note: removed deep copy constuct from java

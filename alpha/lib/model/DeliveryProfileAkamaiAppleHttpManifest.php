@@ -17,10 +17,11 @@ class DeliveryProfileAkamaiAppleHttpManifest extends DeliveryProfileAkamaiAppleH
    	return $this->getFromCustomData("supportClipping", null, true);
    }
 	
-	public function serve()
+	public function buildServeFlavors()
 	{
 		$flavor = $this->getSecureHdUrl();
-		return $this->getRenderer(array($flavor));
+		
+		return array($flavor);
 	}
 	
 	protected function doGetFlavorAssetUrl(flavorAsset $flavorAsset) {
@@ -65,7 +66,7 @@ class DeliveryProfileAkamaiAppleHttpManifest extends DeliveryProfileAkamaiAppleH
 		$flavor = AkamaiDeliveryUtils::getHDN2ManifestUrl($flavors, $this->params->getMediaProtocol(), $this->getUrl(), '/master.m3u8', '/i', $params);
 		if (!$flavor)
 		{
-			KalturaLog::debug(get_class() . ' failed to find flavor');
+			KalturaLog::info(get_class() . ' failed to find flavor');
 			return null;
 		}
 	

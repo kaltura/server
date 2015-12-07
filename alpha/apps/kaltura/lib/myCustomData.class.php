@@ -1,6 +1,9 @@
 <?php
 class myCustomData
 {
+	// max custom_data size for later storing as a varchar column in the db, leaving a bit of spare space if we will actually hit this limit
+	const MAX_CUSTOM_DATE_SIZE = 65000; 
+	
 	private $data;
 	
 	/**
@@ -15,7 +18,7 @@ class myCustomData
 	/**
 	 * @param string $str
 	 */
-	private function  myCustomData ( $str )
+	private function  __construct ( $str )
 	{
 		if ( empty ( $str ) )
 			$this->data = array();
@@ -57,7 +60,12 @@ class myCustomData
 	{
 		if ( $null_if_empty && ( $this->data == null || count ( $this->data ) == 0 ) )
 			return null;
-		return serialize( $this->data );
+		
+		$s = serialize( $this->data );
+		if (strlen($s) > self::MAX_CUSTOM_DATE_SIZE)
+			throw new kCoreException('Exceeded custom data max size', kCoreException::EXCEEDED_MAX_CUSTOM_DATA_SIZE);
+			
+		return $s; 
 	}
 	
 	/**
@@ -120,7 +128,7 @@ class myCustomData
 	{
 		if($namespace)
 		{
-			if ($name)
+			if (isset($name))
 			{
 				if (isset($this->data[$namespace][$name]))
 					return $this->data[$namespace][$name];

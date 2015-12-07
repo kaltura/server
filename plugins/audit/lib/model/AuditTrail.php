@@ -13,7 +13,7 @@
  * @package plugins.audit
  * @subpackage model
  */
-class AuditTrail extends BaseAuditTrail 
+class AuditTrail extends BaseAuditTrail implements IBaseObject
 {	
 	protected $puserId = null;
 	
@@ -168,7 +168,6 @@ class AuditTrail extends BaseAuditTrail
 	{
 		if(!kAuditTrailManager::traceEnabled($this->getPartnerId(), $this))
 		{
-			KalturaLog::debug("No audit created object type [$this->object_type] action [$this->action]");
 			return 0;
 		}
 

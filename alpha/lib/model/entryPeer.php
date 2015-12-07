@@ -25,6 +25,9 @@ class entryPeer extends BaseentryPeer
 	private static $accessControlScope;
 
 	private static $kuserBlongToMoreThanMaxCategoriesForSearch = false;
+	
+	private static $lastInitializedContext = null; // last initialized security context (ks + partner id)
+	private static $validatedEntries = array();
 
 	// cache classes by their type
 	private static $class_types_cache = array(
@@ -280,10 +283,10 @@ class entryPeer extends BaseentryPeer
 		return $res;
 	}
 
-	public static function retrieveByPKNoFilter ($pk, $con = null)
+	public static function retrieveByPKNoFilter ($pk, $con = null, $filterEntitlements = true)
 	{
 		KalturaCriterion::disableTags(array(KalturaCriterion::TAG_ENTITLEMENT_ENTRY, KalturaCriterion::TAG_WIDGET_SESSION));
-		self::$filerResults = true;
+		self::$filerResults = $filterEntitlements;
 		self::setUseCriteriaFilter ( false );
 		$res = parent::retrieveByPK( $pk , $con );
 		self::setUseCriteriaFilter ( true );
@@ -582,18 +585,7 @@ class entryPeer extends BaseentryPeer
 
 	public static function doSelectJoinkuser(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
 	{
-		$c = clone $criteria;
-
-		if($c instanceof KalturaCriteria)
-		{
-			$skipApplyFilters = entryPeer::applyEntitlementCriteria($c);
-
-			if(!$skipApplyFilters)
-			{
-				$c->applyFilters();
-				$criteria->setRecordsCount($c->getRecordsCount());
-			}
-		}
+		$c = self::prepareEntitlementCriteriaAndFilters( $criteria );
 
 		$results = parent::doSelectJoinkuser($c, $con, $join_behavior);
 		self::$filerResults = false;
@@ -607,18 +599,7 @@ class entryPeer extends BaseentryPeer
 	 */
 	public static function doSelect(Criteria $criteria, PropelPDO $con = null)
 	{
-		$c = clone $criteria;
-
-		if($c instanceof KalturaCriteria)
-		{
-			$skipApplyFilters = entryPeer::applyEntitlementCriteria($c);
-
-			if(!$skipApplyFilters)
-			{
-				$c->applyFilters();
-				$criteria->setRecordsCount($c->getRecordsCount());
-			}
-		}
+		$c = self::prepareEntitlementCriteriaAndFilters( $criteria );
 
 		$queryResult =  parent::doSelect($c, $con);
 
@@ -661,6 +642,24 @@ class entryPeer extends BaseentryPeer
 		}
 
 		return $skipApplyFilters;
+	}
+
+	public static function prepareEntitlementCriteriaAndFilters(Criteria $criteria)
+	{
+		$c = clone $criteria;
+
+		if($c instanceof KalturaCriteria)
+		{
+			$skipApplyFilters = entryPeer::applyEntitlementCriteria($c);
+
+			if(!$skipApplyFilters)
+			{
+				$c->applyFilters();
+				$criteria->setRecordsCount($c->getRecordsCount());
+			}
+		}
+
+		return $c;
 	}
 
 	public static function getDurationType($duration)
@@ -750,8 +749,6 @@ class entryPeer extends BaseentryPeer
 			!kEntitlementUtils::getInitialized()) // if initEntitlement hasn't run - skip filters.
 			return parent::filterSelectResults($selectResults, $criteria);
 
-		KalturaLog::debug('Entitlement: Filter Results');
-
 		if(is_null(kCurrentContext::$ks) && count($selectResults))
 		{
 			$entry = $selectResults[0];
@@ -781,8 +778,6 @@ class entryPeer extends BaseentryPeer
 
 		self::$filerResults = false;
 		parent::filterSelectResults($selectResults, $criteria);
-
-		KalturaLog::debug('Entitlement: Filter Results - done');
 	}
 
 	/* (non-PHPdoc)
@@ -800,29 +795,43 @@ class entryPeer extends BaseentryPeer
 		return entryPeer::doSelect($criteria, $con);
 	}
 
+	public static function addValidatedEntry($entryId)
+	{
+		$securityContext = array(kCurrentContext::$partner_id, kCurrentContext::$ks);
+		if (self::$lastInitializedContext && self::$lastInitializedContext !== $securityContext) {
+			self::$validatedEntries = array();
+		}
+		
+		self::$validatedEntries[] = $entryId;
+	}
+
 	public static function filterEntriesByPartnerOrKalturaNetwork(array $entryIds, $partnerId)
 	{
-		$entryIds = array_slice($entryIds, 0, baseObjectFilter::getMaxInValues());
-		
-		$c = KalturaCriteria::create(entryPeer::OM_CLASS);
-		$c->addAnd(entryPeer::ID, $entryIds, Criteria::IN);
-		
-		if($partnerId >= 0)
+		$validatedEntries = array_intersect($entryIds, self::$validatedEntries);
+		$entryIds = array_diff($entryIds, self::$validatedEntries);
+		if(count($entryIds))
 		{
-			$criterionPartnerOrKn = $c->getNewCriterion(entryPeer::PARTNER_ID, $partnerId);
-			$criterionPartnerOrKn->addOr($c->getNewCriterion(entryPeer::DISPLAY_IN_SEARCH, mySearchUtils::DISPLAY_IN_SEARCH_KALTURA_NETWORK));
-			$c->addAnd($criterionPartnerOrKn);
+			$entryIds = array_slice($entryIds, 0, baseObjectFilter::getMaxInValues());
+			
+			$c = KalturaCriteria::create(entryPeer::OM_CLASS);
+			$c->addAnd(entryPeer::ID, $entryIds, Criteria::IN);
+			
+			if($partnerId >= 0)
+			{
+				$criterionPartnerOrKn = $c->getNewCriterion(entryPeer::PARTNER_ID, $partnerId);
+				$criterionPartnerOrKn->addOr($c->getNewCriterion(entryPeer::DISPLAY_IN_SEARCH, mySearchUtils::DISPLAY_IN_SEARCH_KALTURA_NETWORK));
+				$c->addAnd($criterionPartnerOrKn);
+			}
+	
+			$dbEntries = self::doSelect($c);
+	
+			foreach ($dbEntries as $dbEntry)
+			{
+				$validatedEntries[] = $dbEntry->getId();
+			}
 		}
 
-		$dbEntries = self::doSelect($c);
-
-		$entryIds = array();
-		foreach ($dbEntries as $dbEntry)
-		{
-			$entryIds[] = $dbEntry->getId();
-		}
-
-		return $entryIds;
+		return $validatedEntries;
 	}
 
 }

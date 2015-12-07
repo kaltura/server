@@ -13,7 +13,9 @@
  * @package Core
  * @subpackage model
  */
-class KuserKgroupPeer extends BaseKuserKgroupPeer {
+class KuserKgroupPeer extends BaseKuserKgroupPeer implements IRelatedObjectPeer
+{
+	private static $kgroupIdsByKuserId = array();
 
 	/**
 	 * Creates default criteria filter
@@ -89,7 +91,36 @@ class KuserKgroupPeer extends BaseKuserKgroupPeer {
 	 * @return array
 	 */
 	public static function retrieveKgroupIdsByKuserId($kuserId){
-		return self::retrieveKgroupIdsByKuserIds(array($kuserId));
+		if (isset(self::$kgroupIdsByKuserId[$kuserId])){
+			return self::$kgroupIdsByKuserId[$kuserId];
+		}
+
+		self::$kgroupIdsByKuserId[$kuserId] = self::retrieveKgroupIdsByKuserIds(array($kuserId));
+
+		return self::$kgroupIdsByKuserId[$kuserId];
+	}
+	
+	/* (non-PHPdoc)
+	 * @see IRelatedObjectPeer::getRootObjects()
+	 */
+	public function getRootObjects(IRelatedObject $object)
+	{
+		return array(
+			kuserPeer::retrieveByPK($object->getKuserId()),
+			kuserPeer::retrieveByPK($object->getKgroupId()),
+		);
 	}
 
+	/* (non-PHPdoc)
+	 * @see IRelatedObjectPeer::isReferenced()
+	 */
+	public function isReferenced(IRelatedObject $object)
+	{
+		return false;
+	}
+
+	public static function getCacheInvalidationKeys()
+	{
+		return array(array("kuserKgroup:kuserId=%s", self::KUSER_ID));		
+	}
 } // KuserKgroupPeer

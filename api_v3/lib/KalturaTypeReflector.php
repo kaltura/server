@@ -82,10 +82,8 @@ class KalturaTypeReflector
 	 * @param string $type
 	 * @return KalturaTypeReflector
 	 */
-	public function KalturaTypeReflector($type)
+	public function __construct($type)
 	{
-//		KalturaLog::debug("Reflecting type [$type]");
-		
 		if (!class_exists($type))
 			throw new KalturaReflectionException("Type \"".$type."\" not found");
 			
@@ -103,9 +101,19 @@ class KalturaTypeReflector
 	    	$this->_serverOnly = $commentsParser->serverOnly;
 	    	$this->_package = $commentsParser->package;
 	    	$this->_subpackage = $commentsParser->subpackage;
+
+		    $permissions = array();
+		    $parentType = get_parent_class($this->_type);
+		    if ($parentType !== false)
+		    {
+				$parentReflector = KalturaTypeReflectorCacher::get($parentType);
+			    $permissions = array_merge($permissions, $parentReflector->_permissions);
+		    }
+		    
 	    	if (!is_null($commentsParser->permissions)) {
-	    		$this->_permissions = explode(',',trim($commentsParser->permissions));
+	    		$permissions = array_merge($permissions,explode(',',trim($commentsParser->permissions)));
 	    	}
+		    $this->_permissions=$permissions;
 	    }
 	}
 	
@@ -587,6 +595,11 @@ class KalturaTypeReflector
 	{
 		$reflectionClass = new ReflectionClass($this->_type);
 		return $reflectionClass->implementsInterface("IFilterable");
+	}
+	
+	public function isRelatedFilterable()
+	{
+		return is_subclass_of($this->_type, 'IRelatedFilterable');
 	}
 	
 	/**

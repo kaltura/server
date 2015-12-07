@@ -7,7 +7,7 @@ class myBatchPartnerUsage extends myBatchBase
 {
 	const SLEEP_TIME = 1;
 	
-	public function myBatchPartnerUsage($partnerId = null)
+	public function __construct($partnerId = null, $partnerPackage = 1)
 	{
 		self::initDb();
 		$partners_exists = true;
@@ -21,7 +21,7 @@ class myBatchPartnerUsage extends myBatchBase
 				$c->addAnd(PartnerPeer::ID, $partnerId);
 			}
 			
-			$c->addAnd(PartnerPeer::PARTNER_PACKAGE, 1); // get only free partners
+			$c->addAnd(PartnerPeer::PARTNER_PACKAGE, $partnerPackage); 
 			$c->addAnd(PartnerPeer::MONITOR_USAGE, 1);
 			$c->addAnd(PartnerPeer::STATUS, Partner::PARTNER_STATUS_DELETED, Criteria::NOT_EQUAL);
 			$c->setOffset($start_pos);
@@ -37,7 +37,14 @@ class myBatchPartnerUsage extends myBatchBase
 				KalturaLog::debug( "Looping ". ($start_pos + $bulk_size -1) ." partners, offset: $start_pos ." );
 				foreach($partners as $partner)
 				{
-					myPartnerUtils::doPartnerUsage($partner, true);
+					if($partnerPackage == 1) //free
+					{
+						myPartnerUtils::doPartnerUsage($partner, true);
+					}
+					else if($partnerPackage == 100) //monthly developer
+					{
+						myPartnerUtils::doMonthlyPartnerUsage($partner);
+					}
 				}
 			}
 			unset($partners);

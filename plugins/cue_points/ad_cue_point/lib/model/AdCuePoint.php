@@ -39,4 +39,6 @@ class AdCuePoint extends CuePoint implements IMetadataObject
 	{
 		return AdCuePointMetadataPlugin::getMetadataObjectTypeCoreValue(AdCuePointMetadataObjectType::AD_CUE_POINT);
 	}
+	
+	public function getIsPublic()	              {return true;}
 }

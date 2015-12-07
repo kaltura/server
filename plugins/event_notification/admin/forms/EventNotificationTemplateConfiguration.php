@@ -122,12 +122,8 @@ abstract class Form_EventNotificationTemplateConfiguration extends Infra_Form
 	public function getObject($objectType, array $properties, $add_underscore = true, $include_empty_fields = false)
 	{
 		$object = parent::getObject($objectType, $properties, $add_underscore, $include_empty_fields);
-		KalturaLog::debug("Loading object type [" . get_class($object) . "] for type [$objectType]");
-		
 		if($object instanceof Kaltura_Client_EventNotification_Type_EventNotificationTemplate)
 		{
-			KalturaLog::debug("Search properties [" . print_r($properties, true) . "]");
-			
 			$userParameters = $object->userParameters;
 			if(!$userParameters || !is_array($userParameters))
 				$userParameters = array();
@@ -328,10 +324,13 @@ abstract class Form_EventNotificationTemplateConfiguration extends Infra_Form
 		if($parameter instanceof Kaltura_Client_EventNotification_Type_EventNotificationArrayParameter)
 		{
 			$values = array();
-			foreach($parameter->values as $value)
+			if(is_array($parameter->values))
 			{
-				/* @var $value Kaltura_Client_Type_String */
-				$values[] = $value->value;
+				foreach($parameter->values as $value)
+				{
+					/* @var $value Kaltura_Client_Type_String */
+					$values[] = $value->value;
+				}
 			}
 			
 			foreach($parameter->allowedValues as $index => $allowedValue)

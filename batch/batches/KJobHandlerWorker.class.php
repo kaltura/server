@@ -32,12 +32,19 @@ abstract class KJobHandlerWorker extends KBatchBase
 	 */
 	protected static function setCurrentJob(KalturaBatchJob $currentJob)
 	{
+		KalturaLog::debug("Start job[$currentJob->id] type[$currentJob->jobType] sub-type[$currentJob->jobSubType] object[$currentJob->jobObjectType] object-id[$currentJob->jobObjectId] partner-id[$currentJob->partnerId] dc[$currentJob->dc] parent-id[$currentJob->parentJobId] root-id[$currentJob->rootJobId]");
 		self::$currentJob = $currentJob;
+		
+		self::$kClient->setClientTag(self::$clientTag . " partnerId: " . $currentJob->partnerId);
 	}
 
 	protected static function unsetCurrentJob()
 	{
+		$currentJob = self::getCurrentJob();
+		KalturaLog::debug("End job[$currentJob->id]");
 		self::$currentJob = null;
+
+		self::$kClient->setClientTag(self::$clientTag);
 	}
 	
 	protected function init()
@@ -286,7 +293,6 @@ abstract class KJobHandlerWorker extends KBatchBase
 		
 		$type = KBatchBase::$taskConfig->name;
 		$file = "$type.flt";
-		KalturaLog::debug("Saving filter to $file: " . print_r($filter, true));
 		
 		KScheduleHelperManager::saveFilter($file, $filter);
 	}

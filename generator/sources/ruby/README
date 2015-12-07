@@ -1,3 +1,6 @@
+Kaltura Ruby API Client Library.
+Compatible with Kaltura server version 10.20.0 and above.
+
 This source contains:
  - The Kaltura client library (kaltura_client_base.rb)
  - Auto generated core APIs (kaltura_client.rb)

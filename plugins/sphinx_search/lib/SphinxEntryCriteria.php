@@ -169,7 +169,16 @@ class SphinxEntryCriteria extends SphinxCriteria
 			else
 				$filter->set ( "_matchor_categories_ids",category::CATEGORY_ID_THAT_DOES_NOT_EXIST);
 			$filter->unsetByName('_in_categories_full_name');
-		}		
+		}
+
+		if($filter->is_set('_has_media_server_hostname'))
+		{
+			//sphinx query: select in(dynamic_attributes.xyz, 'some_val') or in(dynamic_attributes.xyz, 'some_val') as cnd1 from ... where cnd1 > 0 ...
+			$mediaServerHostname = $filter->get('_has_media_server_hostname');
+			$cond = "in(" . entryIndex::DYNAMIC_ATTRIBUTES . "." . LiveEntry::PRIMARY_HOSTNAME .", '" . $mediaServerHostname . "') or in(" . entryIndex::DYNAMIC_ATTRIBUTES . "." . LiveEntry::SECONDARY_HOSTNAME .", '" . $mediaServerHostname . "')";
+			$this->addCondition($cond);
+			$filter->unsetByName('_has_media_server_hostname');
+		}
 	
 		if($filter->is_set('_is_live'))
 		{
@@ -225,7 +234,7 @@ class SphinxEntryCriteria extends SphinxCriteria
 			
 		if($filter->get(baseObjectFilter::ORDER) === "recent" || $filter->get(baseObjectFilter::ORDER) === "-recent")
 		{
-			$filter->set("_lte_available_from", time());
+			$filter->set("_lte_available_from", kApiCache::getTime());
 			//$filter->set("_gteornull_end_date", time()); // schedule not finished
 			$filter->set(baseObjectFilter::ORDER, "-available_from");
 		}

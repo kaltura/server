@@ -13,8 +13,8 @@
  * @package Core
  * @subpackage model
  */
-class UserLoginDataPeer extends BaseUserLoginDataPeer {
-
+class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectPeer
+{
 	const KALTURAS_CMS_PASSWORD_RESET = 51;
 	
 	public static function generateNewPassword()
@@ -188,7 +188,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer {
 		$partner = PartnerPeer::retrieveByPK($partnerId);
 		// If on the partner it's set not to reset the password - skip the email sending
 		if($partner->getEnabledService(PermissionName::FEATURE_DISABLE_RESET_PASSWORD_EMAIL)) {
-			KalturaLog::debug("Skipping reset-password email sending according to partner configuration.");
+			KalturaLog::log("Skipping reset-password email sending according to partner configuration.");
 			return true;
 		}
 		
@@ -365,7 +365,6 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer {
 		
 		if ((is_null($ksUserId) || $ksUserId === '') && $useOwnerIfNoUser)
 		{
-			KalturaLog::log('No user id on KS, trying to login as the account owner');
 			$partner = PartnerPeer::retrieveByPK($ksPartnerId);
 			if (!$partner) {
 				throw new kUserException('Invalid partner id ['.$ksPartnerId.']', kUserException::INVALID_PARTNER);
@@ -578,7 +577,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer {
 				throw new kUserException('', kUserException::LOGIN_ID_ALREADY_USED);
 			}
 						
-			KalturaLog::debug('Existing login data with the same email & password exists - returning id ['.$existingData->getId().']');	
+			KalturaLog::info('Existing login data with the same email & password exists - returning id ['.$existingData->getId().']');	
 			$alreadyExisted = true;
 			
 			if ($isAdminUser && !$existingData->isLastLoginPartnerIdSet()) {
@@ -633,5 +632,19 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer {
 		
 	}
 	
-	
+	/* (non-PHPdoc)
+	 * @see IRelatedObjectPeer::getRootObjects()
+	 */
+	public function getRootObjects(IRelatedObject $object)
+	{
+		return array();
+	}
+
+	/* (non-PHPdoc)
+	 * @see IRelatedObjectPeer::isReferenced()
+	 */
+	public function isReferenced(IRelatedObject $object)
+	{
+		return true;
+	}
 } // UserLoginDataPeer

@@ -110,6 +110,11 @@ class Form_PartnerConfiguration extends Infra_Form
 				'label'	  => 'Default Entitlement Enforcement',
 				'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'partner_configuration_checkbox_field')))
 			));
+
+		$this->addElement('checkbox', 'time_aligned_renditions', array(
+		    'label'	  => 'Kaltura Live Streams - Exclude Source Rendition',
+		    'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'partner_configuration_checkbox_field')))
+		));		
 						
 //--------------------------- Publisher specific Delivery Settings ---------------------------
 
@@ -402,7 +407,14 @@ class Form_PartnerConfiguration extends Infra_Form
 			'filters'		=> array('StringTrim'),
 		));
 		
-		
+		//--------------- Host white list ----------------------------
+
+		$this->addElement('text', 'cdn_host_white_list', array(
+			'label'			=> 'CDN Host white list regex (comma seperated)',
+			'filters'		=> array('StringTrim'),
+		));
+
+
 //-----------------------------------------------------------------------
 		$this->addElement('hidden', 'crossLine', array(
 			'lable'			=> 'line',
@@ -447,6 +459,7 @@ class Form_PartnerConfiguration extends Infra_Form
 			
 			$permissionNames[self::GROUP_CONTENT_INGESTION_OPTIONS]['Content Moderation'] = 'moderate_content';
 		    $permissionNames[self::GROUP_ENABLE_DISABLE_FEATURES]['Default Entitlement Enforcement'] = 'default_entitlement_enforcement';
+		    $permissionNames[self::GROUP_ENABLE_DISABLE_FEATURES]['Kaltura Live Streams - Exclude Source Rendition'] = 'time_aligned_renditions';
 			ksort($permissionNames[self::GROUP_ENABLE_DISABLE_FEATURES]);
 			ksort($permissionNames[self::GROUP_CONTENT_INGESTION_OPTIONS]);
 			ksort($permissionNames[self::GROUP_REMOTE_STORAGE]);
@@ -643,7 +656,6 @@ class Form_PartnerConfiguration extends Infra_Form
 					$element->setAttrib('data-checked', true);
 				else
 			        $element->setAttrib('data-checked', false);
-        		KalturaLog::debug("delivery_type_{$customDeliveryType->key} was set to [".$customDeliveryType->value."]");
 			}
 		}
 		
@@ -651,7 +663,6 @@ class Form_PartnerConfiguration extends Infra_Form
 			return;
 			
 		foreach($object->permissions as $permission){
-			KalturaLog::debug("Set Permission: "  . $permission->name . " status: " . $permission->status);
 			$this->setDefault($permission->name, ($permission->status == Kaltura_Client_Enum_PermissionStatus::ACTIVE));
 		}
 		
@@ -709,14 +720,12 @@ class Form_PartnerConfiguration extends Infra_Form
 						$basePermission->status = $permission->status;
 											
 						$permissionSet = false;
-						KalturaLog::debug("try to add permission: ". $basePermission->name);
 						foreach ($systemPartnerConfiguration->permissions as $permission)
 						{
 							if (($permission->name == $basePermission->name) && ($permission->type == $basePermission->type))
 							{
 								if ($basePermission->status == Kaltura_Client_Enum_PermissionStatus::ACTIVE)
 									$permission->status = $basePermission->status;
-								KalturaLog::debug("permission exists with status : " . $permission->status);
 								$permissionSet = true;
 								break;
 							}
@@ -724,7 +733,6 @@ class Form_PartnerConfiguration extends Infra_Form
 						
 						if(!$permissionSet)
 						{
-							KalturaLog::debug("permission didn't exist with status : " . $permission->status);
 							$systemPartnerConfiguration->permissions[] = $basePermission;
 						}
 					}
@@ -879,7 +887,9 @@ class Form_PartnerConfiguration extends Infra_Form
 			'liveStreamConfig',
 			array('legend' => 'Live Stream Config')
 		);
-									
+		$this->addDisplayGroup(array('cdn_host_white_list'), 'cdnHostWhiteList');
+
+
 	}
 	
 	protected function addLimitSubForm($subForm, $subFormName)

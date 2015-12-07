@@ -86,10 +86,18 @@ class KalturaMediaEntry extends KalturaPlayableEntry {
 	 * @filter matchor,matchand
 	 */
 	public $flavorParamsIds;
-	
+
+	/**
+	 * True if trim action is disabled for this entry
+	 *
+	 * @var KalturaNullableBoolean
+	 * @readonly
+	 */
+	public $isTrimDisabled;
+
 	private static $map_between_objects = array ("mediaType", "conversionQuality", "sourceType" , "searchProviderType", // see special logic for this field below
 	//"searchProviderType", // see special logic for this field below
-	"searchProviderId" => "sourceId", "creditUserName" => "credit", "creditUrl" => "siteUrl", "partnerId", "mediaDate", "dataUrl", "flavorParamsIds" );
+	"searchProviderId" => "sourceId", "creditUserName" => "credit", "creditUrl" => "siteUrl", "partnerId", "mediaDate", "dataUrl", "flavorParamsIds", "isTrimDisabled" );
 	
 	public function __construct() {
 		$this->type = KalturaEntryType::MEDIA_CLIP;
@@ -104,11 +112,8 @@ class KalturaMediaEntry extends KalturaPlayableEntry {
 	 */
 	public function toObject($entry = null, $a = array()) {
 		if (is_null ( $entry )) {
-			KalturaLog::debug ( "Creating new entry" );
 			$entry = new entry ();
 		}
-		
-		KalturaLog::debug ( "type: {$this->mediaType} , duration: {$this->msDuration}" );
 		
 		$entry = parent::toObject ( $entry );
 		

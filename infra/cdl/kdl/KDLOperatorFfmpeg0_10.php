@@ -64,7 +64,7 @@ $fltStr = null;
 			$cmdStr = str_replace(" -deinterlace", "", $cmdStr);
 		}
 		
-		$filters = self::generateVideoFilters($vid);
+		$filters = $this->generateVideoFilters($vid);
 		if(count($filters)>0){
 			$fltStr = implode(',', $filters);
 			$cmdStr.= " -vf '$fltStr'";
@@ -167,12 +167,16 @@ $fltStr = null;
 			$duration=$target->_clipDur/1000;
 		else
 			$duration = $target->_container->_duration/1000;
+			
+/*  Replace self-calculated KF's with FFMpeg formula
 		if($duration>7200) {
 			$forcedKF = "expr:'gte(t,n_forced*".round($gopInSecs).")'";
 		}
 		else {
 			$forcedKF = KDLCmdlinePlaceholders::ForceKeyframes.$duration."_$gopInSecs";
 		}
+*/
+		$forcedKF = "expr:'gte(t,n_forced*".round($gopInSecs).")'";
 		return " -force_key_frames $forcedKF";
     }
     

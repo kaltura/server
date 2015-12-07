@@ -45,7 +45,7 @@ class kFileUtils extends kFile
 		return false;
 	}
 
-	public static function getDumpFileRenderer($filePath, $mimeType, $maxAge = null, $limitFileSize = 0)
+	public static function getDumpFileRenderer($filePath, $mimeType, $maxAge = null, $limitFileSize = 0, $lastModified = null)
 	{
 		self::closeDbConnections();
 		
@@ -55,7 +55,7 @@ class kFileUtils extends kFile
 		if(! file_exists($filePath))
 			KExternalErrors::dieError(KExternalErrors::FILE_NOT_FOUND);
 		
-		return new kRendererDumpFile($filePath, $mimeType, self::xSendFileAllowed($filePath), $maxAge, $limitFileSize);
+		return new kRendererDumpFile($filePath, $mimeType, self::xSendFileAllowed($filePath), $maxAge, $limitFileSize, $lastModified);
 	}
 	
 	public static function dumpFile($file_name, $mime_type = null, $max_age = null, $limit_file_size = 0)
@@ -72,7 +72,7 @@ class kFileUtils extends kFile
 		if($onlyIfAvailable){
 			//validate that the other DC is available before dumping the request
 			if(kConf::hasParam('disable_dump_api_request') && kConf::get('disable_dump_api_request')){
-				KalturaLog::debug('dumpApiRequest is disabled');
+				KalturaLog::info('dumpApiRequest is disabled');
 				return;
 			}			
 		}
@@ -106,6 +106,14 @@ class kFileUtils extends kFile
 		$url = $_SERVER['REQUEST_URI'];
 		if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on' && kConf::hasParam('https_param_salt'))
 			$post_params['apiProtocol'] = 'https_' . kConf::get('https_param_salt');
+		
+		if(isset($_SERVER['CONTENT_TYPE']))
+		{
+			if(strtolower($_SERVER['CONTENT_TYPE']) == 'application/json' || (strpos(strtolower($_SERVER['CONTENT_TYPE']), 'multipart/form-data') === 0 && isset($_POST['json'])))
+			{
+				$post_params = array_merge($post_params, infraRequestUtils::getRequestParams());
+			}
+		}
 			
 		$httpHeader = array("X-Kaltura-Proxy: dumpApiRequest");
 		
@@ -113,8 +121,8 @@ class kFileUtils extends kFile
 	  	if ($ipHeader){
 	  		list($headerName, $headerValue) = $ipHeader;
 	  		$httpHeader[] = ($headerName . ": ". $headerValue);
-	  	}	  	
-		
+	  	}
+	  	
 		$ch = curl_init();
 		// set URL and other appropriate options
 		curl_setopt($ch, CURLOPT_URL, $host . $url );
@@ -161,6 +169,12 @@ class kFileUtils extends kFile
 			
 		$sendHeaders = array("X-Kaltura-Proxy: dumpUrl");
 		
+		$ipHeader = infraRequestUtils::getSignedIpAddressHeader();
+		if ($ipHeader){
+			list($headerName, $headerValue) = $ipHeader;
+			$sendHeaders[] = ($headerName . ": ". $headerValue);
+		}
+				
 		if($passHeaders)
 		{
 			$sentHeaders = self::getRequestHeaders();
@@ -183,7 +197,11 @@ class kFileUtils extends kFile
 		// when proxying request to other datacenter we may be already in a proxied request (from one of the internal proxy servers)
 		// we need to ensure the original HOST is sent in order to allow restirctions checks
 
-		$host = isset($_SERVER["HTTP_X_FORWARDED_HOST"]) ? $_SERVER["HTTP_X_FORWARDED_HOST"] : $_SERVER["HTTP_HOST"];
+		$host = kConf::get('www_host');
+		if (isset($_SERVER['HTTP_X_FORWARDED_HOST']))
+			$host =  $_SERVER['HTTP_X_FORWARDED_HOST'];
+		else if (isset($_SERVER['HTTP_HOST']))
+			$host = $_SERVER['HTTP_HOST'];
 
 		for($i = 0; $i < count($sendHeaders); $i++)
 		{

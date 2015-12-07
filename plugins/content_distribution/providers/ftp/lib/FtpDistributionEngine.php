@@ -61,11 +61,10 @@ class FtpDistributionEngine extends DistributionEngine implements
 		foreach($data->mediaFiles as $remoteFile)
 		{
 			/* @var $remoteFile KalturaDistributionRemoteMediaFile */
-			KalturaLog::debug('Trying to delete file ['.$remoteFile->remoteId.'], version ['.$remoteFile->version.'] for asset id ['.$remoteFile->assetId.']');
+			KalturaLog::info('Trying to delete file ['.$remoteFile->remoteId.'], version ['.$remoteFile->version.'] for asset id ['.$remoteFile->assetId.']');
 			try
 			{
 				$fileManager->delFile($remoteFile->remoteId);
-				KalturaLog::debug('File was deleted successfully');
 			}
 			catch(Exception $ex)
 			{
@@ -167,19 +166,18 @@ class FtpDistributionEngine extends DistributionEngine implements
 	protected function distributeFile(kFileTransferMgr $fileManager, KalturaFtpDistributionFile $file, KalturaFtpDistributionProfile $distributionProfile)
 	{
 		$remoteFilePath = $this->cleanPath($distributionProfile->basePath . '/' . $file->filename);
-		KalturaLog::debug('Remote file path ['.$remoteFilePath.']');
 		if ($file->contents)
 		{
 			$filename = uniqid(null, true) . '.' . pathinfo($file->filename, PATHINFO_EXTENSION);
 			$localTempFilePath = $this->tempFilePath . '/' . $filename;
-			KalturaLog::debug('Sending contents, using temp path ['.$localTempFilePath.']');
+			KalturaLog::info('Sending contents, using temp path ['.$localTempFilePath.']');
 			file_put_contents($localTempFilePath, $file->contents);
 			$fileManager->putFile($remoteFilePath, $localTempFilePath);
 			unlink($localTempFilePath);
 		}
 		else
 		{
-			KalturaLog::debug('Sending local file ['.$file->localFilePath.']');
+			KalturaLog::info('Sending local file ['.$file->localFilePath.']');
 			$fileManager->putFile($remoteFilePath, $file->localFilePath);
 		}
 		

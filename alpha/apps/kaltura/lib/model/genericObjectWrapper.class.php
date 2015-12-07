@@ -14,7 +14,7 @@ class genericObjectWrapper  implements Iterator
 	 * ignore null objects while extracting nested objects - if some object along the line is null, extracting of it's elements will return 
 	 * 	empty nullWrappers which will return empty strings
 	 */
-	public function genericObjectWrapper ( $object , $recursive_wrapping = false , $ignore_null = false  )
+	public function __construct ( $object , $recursive_wrapping = false , $ignore_null = false  )
 	{
 		$this->m_obj = $object;
 		$this->m_is_array = is_array( $object );

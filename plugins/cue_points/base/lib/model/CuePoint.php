@@ -13,11 +13,12 @@
  * @package plugins.cuePoint
  * @subpackage model
  */
-abstract class CuePoint extends BaseCuePoint implements IIndexable 
+abstract class CuePoint extends BaseCuePoint implements IIndexable, IRelatedObject
 {
 	const CUSTOM_DATA_FIELD_FORCE_STOP = 'forceStop';
 	const CUSTOM_DATA_FIELD_ROOT_PARENT_ID = 'rootParentId';
 	const CUSTOM_DATA_FIELD_TRIGGERED_AT = 'triggeredAt';
+	const CUSTOM_DATA_FIELD_IS_PUBLIC = 'isPublic';
 	
 	public function getIndexObjectName() {
 		return "CuePointIndex";
@@ -226,10 +227,12 @@ abstract class CuePoint extends BaseCuePoint implements IIndexable
 	
 
 	public function getForceStop()		{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_FORCE_STOP);}
-	public function getTriggeredAt()		{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_TRIGGERED_AT);}	
+	public function getTriggeredAt()		{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_TRIGGERED_AT);}
+	public function getIsPublic()	              {return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_IS_PUBLIC);}	
 
 	public function setForceStop($v)	{return $this->putInCustomData(self::CUSTOM_DATA_FIELD_FORCE_STOP, (bool)$v);}
 	public function setTriggeredAt($v)	{return $this->putInCustomData(self::CUSTOM_DATA_FIELD_TRIGGERED_AT, (int)$v);}
+	public function setIsPublic($v)                  {return $this->putInCustomData(self::CUSTOM_DATA_FIELD_IS_PUBLIC, (bool)$v);}
 	
 	public function getCacheInvalidationKeys()
 	{
@@ -257,7 +260,7 @@ abstract class CuePoint extends BaseCuePoint implements IIndexable
 		if(!is_null($ret))
 			return $ret;
 			
-		if(!$this->getParentId())
+		if( !$this->getParentId() || is_null($this->getParent()) )
 			return $this->getId();
 			
 		return $this->getParent()->getRootParentId();
@@ -383,6 +386,28 @@ abstract class CuePoint extends BaseCuePoint implements IIndexable
 	{
 		return null;
 	}
+	
+	public function shouldReIndexEntry(array $modifiedColumns = array())
+	{
+		//This case handles adding/deleting an existing cue point
+		if(!count($modifiedColumns))
+			return true;
+		
+		$indexOnEntryTypes = CuePointPlugin::getIndexOnEntryTypes();
+		if(!count($indexOnEntryTypes))
+			return false;
+			
+		if(!in_array($this->getType(), $indexOnEntryTypes))
+			return false;
+		
+		//If modified columns has values we need to check that the fileds updated are the once that should trigger re-in
+		$fieldsToMonitor = array(CuePointPeer::TEXT, CuePointPeer::TAGS, CuePointPeer::NAME);
+		
+		if(count(array_intersect($fieldsToMonitor, $modifiedColumns)) > 0)
+			return true;
+		
+		return false;
+	}
 
 	public function copyFromLiveToVodEntry( $vodEntry, $adjustedStartTime )
 	{
@@ -428,6 +453,21 @@ abstract class CuePoint extends BaseCuePoint implements IIndexable
 
 		if ($entry->getIsTemporary()
 			&& !PermissionPeer::isValidForPartner(CuePointPermissionName::DO_NOT_COPY_CUE_POINTS_TO_TRIMMED_ENTRY, $entry->getPartnerId()))
+		{
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * @param      string $name
+	 * @param      string $namespace
+	 * @return     boolean True if $name has been modified.
+	 */
+	public function isCustomDataModified($name = null, $namespace = '')
+	{
+		if(isset($this->oldCustomDataValues[$namespace]) && (is_null($name) || array_key_exists($name, $this->oldCustomDataValues[$namespace])))
 		{
 			return true;
 		}

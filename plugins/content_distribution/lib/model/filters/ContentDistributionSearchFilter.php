@@ -190,7 +190,6 @@ class ContentDistributionSearchFilter extends AdvancedSearchFilterItem
 	{
 		if ($query instanceof IKalturaIndexQuery){
 			$condition = $this->getCondition();
-			KalturaLog::debug("condition [" . print_r($condition, true) . "]");
 			$key = '@' . ContentDistributionSphinxPlugin::getSphinxFieldName(ContentDistributionPlugin::SPHINX_EXPANDER_FIELD_DATA);
 			$query->addMatch("($key $condition)");
 		}

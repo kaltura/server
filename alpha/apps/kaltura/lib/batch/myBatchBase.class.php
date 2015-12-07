@@ -155,7 +155,6 @@ abstract class myBatchBase
 	
 	protected static function initDb( $should_perform_shutdown = false )
 	{
-		KalturaLog::debug ( "----------------- Initializing DB ------------------- ");
 		if ( self::$s_databaseManager == NULL )
 		{
 			$dbConf = kConf::getDB();
@@ -164,7 +163,7 @@ abstract class myBatchBase
 		}
 		if ( $should_perform_shutdown )
 		{
-			KalturaLog::debug ( "Attempting shutdown of DB due to errors" );
+			KalturaLog::log ( "Attempting shutdown of DB due to errors" );
 			// All of this brutal shutdown & init is to release all DB connections and restart as clean as possible
 			//
 			//self::$s_databaseManager->shutdown();
@@ -229,7 +228,7 @@ abstract class myBatchBase
 		{
 			if ( self::$s_pending_tasks == 0  )
 			{
-				KalturaLog::debug ( "Gracefully exiting..." );
+				KalturaLog::log ( "Gracefully exiting..." );
 				die();
 			}
 			else 

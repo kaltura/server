@@ -11,13 +11,13 @@ class DeliveryProfileVodPackagerMss extends DeliveryProfileSilverLight {
 	{
 		$url = parent::doGetFlavorAssetUrl($flavorAsset);
 		$url .= '/forceproxy/true';
-
 		if($this->params->getFileExtension())
 			$url .= "/name/a." . $this->params->getFileExtension();
+		$url .= VodPackagerDeliveryUtils::getExtraParams($this->params);
 		return $url;
 	}
 	
-	public function serve()
+	public function buildServeFlavors()
 	{
 		$flavors = $this->buildHttpFlavorsArray();
 		$flavors = $this->sortFlavors($flavors);
@@ -27,6 +27,6 @@ class DeliveryProfileVodPackagerMss extends DeliveryProfileSilverLight {
 				'/manifest', 
 				$this->params);
 		
-		return $this->getRenderer(array($flavor));
+		return array($flavor);
 	}
 }

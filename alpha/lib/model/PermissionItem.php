@@ -13,7 +13,7 @@
  * @package Core
  * @subpackage model
  */
-class PermissionItem extends BasePermissionItem
+class PermissionItem extends BasePermissionItem implements IRelatedObject
 {
 	
 	const ALL_VALUES_IDENTIFIER = '*'; // means that a certain parameter is not limited to a specific value - can be used in different places

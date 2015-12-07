@@ -10,7 +10,7 @@ class myObjectCache
 	
 	private $m_expiry_in_seconds;
 	
-	public function myObjectCache( $expiry_in_seconds = 1000 )
+	public function __construct( $expiry_in_seconds = 1000 )
 	{
 		if ( self::$s_cache == null )
 		{
@@ -207,7 +207,7 @@ class memoryCache
 {
 	private $m_expiry; // in seconds
 	private static $s_map = array();
-	function memoryCache ( $expiry = null )
+	function __construct ( $expiry = null )
 	{
 		$this->m_expiry = $expiry; 
 	}

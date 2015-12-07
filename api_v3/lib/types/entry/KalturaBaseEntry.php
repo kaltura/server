@@ -3,7 +3,7 @@
  * @package api
  * @subpackage objects
  */
-class KalturaBaseEntry extends KalturaObject implements IFilterable 
+class KalturaBaseEntry extends KalturaObject implements IRelatedFilterable, IApiObjectFactory
 {
 	/**
 	 * Auto generated 10 characters alphanumeric string
@@ -78,6 +78,7 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 	 * Comma separated list of full names of categories to which this entry belongs. Only categories that don't have entitlement (privacy context) are listed, to retrieve the full list of categories, use the categoryEntry.list action. 
 	 * 
 	 * @var string
+	 * @deprecated
 	 * @filter matchand, matchor, notcontains
 	 * @requiresPermission insert,update
 	 */
@@ -87,6 +88,7 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 	 * Comma separated list of ids of categories to which this entry belongs. Only categories that don't have entitlement (privacy context) are listed, to retrieve the full list of categories, use the categoryEntry.list action. 
 	 * 
 	 * @var string
+	 * @deprecated
 	 * @filter matchand, matchor, notcontains, empty
 	 * @requiresPermission insert,update
 	 */
@@ -219,7 +221,7 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 	 * Thumbnail URL
 	 * 
 	 * @var string
-	 * @insertonly
+	 * @readonly
 	 */
 	public $thumbnailUrl;
 	
@@ -345,7 +347,16 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 	 * @var string
 	 * @filter matchand
 	 */
-	public $entitledUsersPublish;	
+	public $entitledUsersPublish;
+
+	/**
+	 * Comma seperated string of the capabilities of the entry. Any capability needed can be added to this list.
+	 *
+	 * @dynamicType KalturaEntryCapability
+	 * @var string
+	 * @readonly
+	 */
+	public $capabilities;
 	
 	/*
 	 * mapping between the field on this object (on the left) and the setter/getter on the entry object (on the right)  
@@ -390,7 +401,8 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 	 	"parentEntryId",
 	 	"entitledUsersEdit" => "entitledPusersEdit",
 	 	"entitledUsersPublish" => "entitledPusersPublish",
-	 	"operationAttributes"
+	 	"operationAttributes",
+		"capabilities",
 	 );
 		 
 	public function getMapBetweenObjects()
@@ -402,7 +414,6 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 	{
 		if (is_null($dbObject))
 		{
-			KalturaLog::debug("Creating new entry");
 			$dbObject = new entry();
 		}
 		
@@ -446,7 +457,8 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 	{
 		if(!$sourceObject)
 			return;
-			
+	
+		entryPeer::addValidatedEntry($sourceObject->getId());		
 		parent::doFromObject($sourceObject, $responseProfile);
 		
 		$partnerId = kCurrentContext::$ks_partner_id ? kCurrentContext::$ks_partner_id : kCurrentContext::$partner_id;
@@ -715,5 +727,15 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 			"categoriesMatchOr" => "All entries within these categories or their child categories.",
 			"categoriesIdsMatchOr" => "All entries of the categories, excluding their child categories.\nTo include entries of the child categories, use categoryAncestorIdIn, or categoriesMatchOr.",
 		);
+	}
+	
+	public static function getInstance($sourceObject, KalturaDetachedResponseProfile $responseProfile = null)
+	{
+	    $object = KalturaEntryFactory::getInstanceByType($sourceObject->getType());
+	    if (!$object)
+	        return null;
+	    
+	    $object->fromObject($sourceObject, $responseProfile);
+	    return $object;
 	}
 }

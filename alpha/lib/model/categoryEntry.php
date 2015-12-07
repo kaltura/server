@@ -13,7 +13,8 @@
  * @package Core
  * @subpackage model
  */
-class categoryEntry extends BasecategoryEntry {
+class categoryEntry extends BasecategoryEntry implements IRelatedObject
+{
 	
 	/* (non-PHPdoc)
 	 * @see lib/model/om/Basecategory#preSave()
@@ -63,6 +64,9 @@ class categoryEntry extends BasecategoryEntry {
 			
 		if(!categoryEntryPeer::getSkipSave())
 			$entry->indexToSearchIndex();
+			
+		if (!$this->alreadyInSave)
+			kEventsManager::raiseEvent(new kObjectAddedEvent($this));
 	}
 	
 	/* (non-PHPdoc)
@@ -155,24 +159,33 @@ class categoryEntry extends BasecategoryEntry {
 			
 		$category->save();
 
-		//only categories with no context are saved on entry - this is only for Backward compatible
-		if($entry && !categoryEntryPeer::getSkipSave() && (trim($category->getPrivacyContexts()) == '' || $category->getPrivacyContexts() == null))
+		//only categories with no context are saved on entry - this is only for backward compatiblity
+		if($entry && !categoryEntryPeer::getSkipSave()) 
 		{
-			$categories = array();
-			if(trim($entry->getCategories()) != '')
-				$categories = explode(entry::ENTRY_CATEGORY_SEPARATOR, $entry->getCategories());
+			if( (trim($category->getPrivacyContexts()) == '' || $category->getPrivacyContexts() == null))
+			{
+				$categories = array();
+				if(trim($entry->getCategories()) != '')
+					$categories = explode(entry::ENTRY_CATEGORY_SEPARATOR, $entry->getCategories());
+					
+				$categories[] = $category->getFullName();
 				
-			$categories[] = $category->getFullName();
-			
-			$categoriesIds = array();
-			if(trim($entry->getCategoriesIds()) != '')
-				$categoriesIds = explode(entry::ENTRY_CATEGORY_SEPARATOR, $entry->getCategoriesIds());
+				$categoriesIds = array();
+				if(trim($entry->getCategoriesIds()) != '')
+					$categoriesIds = explode(entry::ENTRY_CATEGORY_SEPARATOR, $entry->getCategoriesIds());
+					
+				$categoriesIds[] = $category->getId();
 				
-			$categoriesIds[] = $category->getId();
-			
-			$entry->parentSetCategories(implode(entry::ENTRY_CATEGORY_SEPARATOR, $categories));
-			$entry->parentSetCategoriesIds(implode(entry::ENTRY_CATEGORY_SEPARATOR, $categoriesIds));
-			$entry->justSave();
+				$entry->parentSetCategories(implode(entry::ENTRY_CATEGORY_SEPARATOR, $categories));
+				$entry->parentSetCategoriesIds(implode(entry::ENTRY_CATEGORY_SEPARATOR, $categoriesIds));
+				$entry->justSave();
+			}
+			else
+			{
+				$entry->setUpdatedAt(time());
+				$entry->justSave();
+				$entry->indexToSearchIndex();
+			}
 		}
 		
 		return $entry;

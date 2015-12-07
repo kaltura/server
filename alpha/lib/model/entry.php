@@ -7,7 +7,7 @@
  * @package Core
  * @subpackage model
  */
-class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
+class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IRelatedObject
 {
 	protected $new_categories = '';
 	protected $new_categories_ids = '';
@@ -139,6 +139,8 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 
 	const DEFAULT_IMAGE_HEIGHT = 480;
 	const DEFAULT_IMAGE_WIDTH = 640;
+
+	const CAPABILITIES = "capabilities";
 
 	private $appears_in = null;
 
@@ -945,7 +947,6 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	{
 		if($v && $v == $this->getDataContent())
 		{
-			KalturaLog::info("Data content didn't change, ignoring the setter");
 			return;
 		}
 		
@@ -1016,6 +1017,10 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	public function getAssetCacheVersion()			{ return $this->getFromCustomData( "assetCacheVersion", null, entry::DEFAULT_ASSETCACHEVERSION ); }
 
 	protected function setAssetCacheVersion( $v )	{ $this->putInCustomData( "assetCacheVersion" , $v ); }
+
+	public function getAssetCacheTime()			{ return $this->getFromCustomData( "assetCacheTime", null, null ); }
+	
+	protected function setAssetCacheTime( $v )	{ $this->putInCustomData( "assetCacheTime" , $v ); }
 	
 	/**
 	 * Increment an internal version counter in order to invalidate cached thumbnails (see getThumbnailUrl())
@@ -1024,6 +1029,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	{
 		$assetCacheVersion = kDataCenterMgr::incrementVersion($this->getAssetCacheVersion());
 		$this->setAssetCacheVersion($assetCacheVersion);
+		$this->setAssetCacheTime(time());
 		return $assetCacheVersion;
 	}
 	
@@ -1230,6 +1236,16 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 			$dynAttribName = kCategoryEntryAdvancedFilter::getCategoryCreatedAtDynamicAttributeName( $categoryEntry->getCategoryId() );
 			
 			$dynamicAttributes[$dynAttribName] = $createdAt;
+		}
+
+		$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaDynamicAttributesContributer');
+		foreach($pluginInstances as $pluginName => $pluginInstance) {
+			try {
+				$dynamicAttributes += $pluginInstance->getDynamicAttributes($this);
+			} catch (Exception $e) {
+				KalturaLog::err($e->getMessage());
+				continue;
+			}
 		}
 
 		return $dynamicAttributes;
@@ -1774,6 +1790,9 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 
 	public function setRedirectEntryId ( $v )	{	$this->putInCustomData ( "redirectEntryId" , $v );	}
 	public function getRedirectEntryId (  )		{	return $this->getFromCustomData( "redirectEntryId" );	}
+
+	public function setIsTrimDisabled ( $v )	{	$this->putInCustomData ( "isTrimDisabled" , $v );	}
+	public function getIsTrimDisabled (  )		{	return $this->getFromCustomData( "isTrimDisabled" );	}
 	
 	// indicates that thumbnail shouldn't be auto captured, because it already supplied by the user
 	public function setCreateThumb ( $v, thumbAsset $thumbAsset = null)		
@@ -1805,12 +1824,18 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	
 	public function setParentEntryId($v)	{ $this->putInCustomData("parentEntryId", $v); }
 	public function getParentEntryId() 		{ return $this->getFromCustomData( "parentEntryId", null, null ); }
-	
+
+	public function setSourceEntryId($v)	{ $this->putInCustomData("sourceEntryId", $v); }
+	public function getSourceEntryId() 		{ return $this->getFromCustomData( "sourceEntryId", null, null ); }
+
+	public function setReachedMaxRecordingDuration ( $v )	{	$this->putInCustomData ( "reachedMaxRecordingDuration" , (bool) $v );	}
+	public function getReachedMaxRecordingDuration() 	{	return (bool) $this->getFromCustomData( "reachedMaxRecordingDuration" ,null, false );	}
+		
 	public function getParentEntry()
 	{
 		if(!$this->getParentEntryId())
 		{
-			KalturaLog::debug("Attempting to get parent entry of entry " . $this->getId() . " but parent does not exist, returning original entry");
+			KalturaLog::info("Attempting to get parent entry of entry " . $this->getId() . " but parent does not exist, returning original entry");
 			return $this;
 		}
 		
@@ -1895,25 +1920,40 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	
 	public function getEntitledKusersEdit()
 	{
-		$entitledUserPuserEdit = $this->getFromCustomData( "entitledUserPuserEdit", null, 0 );
-		if (!$entitledUserPuserEdit)
-			return '';
-
-		return implode(',', array_keys(unserialize($entitledUserPuserEdit)));
+		return implode(',', array_keys($this->getEntitledUserPuserEditArray()));
 	}
 	
 	public function getEntitledPusersEdit()
 	{
-		$entitledUserPuserEdit = $this->getFromCustomData( "entitledUserPuserEdit", null, 0 );
-		if (!$entitledUserPuserEdit)
-			return '';
-			
-		return implode(',', unserialize($entitledUserPuserEdit));
+		return implode(',', $this->getEntitledUserPuserEditArray());
 	}
 	
-	public function isEntitledKuserEdit( $kuserId )
+	public function isEntitledKuserEdit($kuserId, $useUserGroups = true)
 	{
-		return in_array( trim($kuserId), explode( ',', $this->getEntitledKusersEdit() ) );
+		$entitledKuserArray = array_keys($this->getEntitledUserPuserEditArray());
+		if(in_array(trim($kuserId), $entitledKuserArray))
+			return true;
+
+		if($useUserGroups == true)
+		{
+			$kuserKGroupIds = KuserKgroupPeer::retrieveKgroupIdsByKuserIds(array($kuserId));
+			foreach($kuserKGroupIds as $groupKId)
+			{
+				if(in_array($groupKId, $entitledKuserArray))
+					return true;
+			}
+
+		}
+		return false;
+	}
+
+	private function getEntitledUserPuserEditArray()
+	{
+		$entitledUserPuserEdit = $this->getFromCustomData( "entitledUserPuserEdit", null, 0 );
+		if (!$entitledUserPuserEdit)
+			return array();
+
+		return unserialize($entitledUserPuserEdit);
 	}
 
 	public function setEntitledPusersPublish($v)
@@ -1967,9 +2007,23 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		return implode(',', unserialize($entitledUserPuserPublish));
 	}
 	
-	public function isEntitledKuserPublish( $kuserId )
+	public function isEntitledKuserPublish($kuserId, $useUserGroups = true)
 	{
-		return in_array( trim($kuserId), explode( ',', $this->getEntitledKusersPublish() ) );
+		$entitledKusersArray = explode(',', $this->getEntitledKusersPublish());
+		if(in_array(trim($kuserId), $entitledKusersArray))
+			return true;
+
+		if($useUserGroups == true)
+		{
+			$kuserKGroupIds = KuserKgroupPeer::retrieveKgroupIdsByKuserIds(array($kuserId));
+			foreach($kuserKGroupIds as $groupKId)
+			{
+				if(in_array($groupKId, $entitledKusersArray))
+					return true;
+			}
+		}
+
+		return false;	
 	}
 
 	public function getRoots()
@@ -2552,7 +2606,6 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	{
 		if($this->getStatus() == entryStatus::DELETED)
 		{
-			KalturaLog::debug("Entry [" . $this->getId() . "] is deleted, no need to sync it");
 			return;
 		}
 			
@@ -2971,8 +3024,6 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		
 		$copyObj->setKuserId($this->kuser_id);
 		$copyObj->setName($this->name);
-		$copyObj->setType($this->type);
-		$copyObj->setMediaType($this->media_type);
 		$copyObj->setTags($this->tags);
 		$copyObj->setAnonymous($this->anonymous);
 		$copyObj->setSource($this->source);
@@ -3175,6 +3226,16 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	{
 		$this->setSource($value);
 	}
+
+	public function setClonePendingEntries(array $clonePendingEntries)
+	{
+		$this->putInCustomData("clonePendingEntries", $clonePendingEntries);
+	}
+
+	public function getClonePendingEntries()
+	{
+		return $this->getFromCustomData("clonePendingEntries", null, array());
+	}
 	
 	/**
 	 * 
@@ -3338,5 +3399,36 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		$userNames[] = $kuser->getScreenName();
 		
 		return implode(" ", $userNames);
+	}
+
+	public function getCapabilities()
+	{
+		$capabilitiesArr = $this->getFromCustomData(self::CAPABILITIES, null, array());
+		$capabilitiesStr = implode(",", $capabilitiesArr);
+		return $capabilitiesStr;
+	}
+
+	public function addCapability( $capability)
+	{
+		$capabilities = $this->getFromCustomData(self::CAPABILITIES, null, array());
+		$capabilities[$capability] = $capability;
+		$this->putInCustomData( self::CAPABILITIES, $capabilities);
+	}
+
+	/**
+	 * Sets contents of passed object to values from current object.
+	 *
+	 * If desired, this method can also make copies of all associated (fkey referrers)
+	 * objects.
+	 *
+	 * @param      object $copyObj An object of entry (or compatible) type.
+	 * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
+	 * @throws     PropelException
+	 */
+	public function copyInto($copyObj, $deepCopy = false)
+	{
+		parent::copyInto($copyObj,$deepCopy);
+		$copyObj->setEntitledPusersEdit($this->getEntitledPusersEdit());
+		$copyObj->setEntitledPusersPublish($this->getEntitledPusersPublish());
 	}
 }

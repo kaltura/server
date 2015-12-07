@@ -5,7 +5,7 @@ class myFileIndicator
 	private $pattern;
 	private static $s_indicator_path = null;// myContentStorage::getFSContentRootPath() . "../indicators/";
 	
-	public function myFileIndicator ( $file_name )
+	public function __construct ( $file_name )
 	{
 		if ( ! self::$s_indicator_path  )
 		{

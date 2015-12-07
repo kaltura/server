@@ -103,8 +103,6 @@ $debug .= "property: $not_property = [$value]\n";
 	public static function createNotification ( $notification_type , $object_data , $partner_id=null , $puser_id=null , $prefix=null ,
 		$extra_notification_data = null, $entry_id = null )
 	{
-		KalturaLog::log ( "Create notification");
-		
 		if(!$entry_id && $object_data instanceof entry)
 			$entry_id = $object_data->getId();
 		
@@ -472,7 +470,7 @@ class myNotificationsConfig
 	}
 
 	// the separator can be either ',' or ';'
-	private function myNotificationsConfig ( $config_str )
+	private function __construct ( $config_str )
 	{
 		//$arr = explode ( "," , trim($config_str ));
 		$arr = preg_split ( "/[,;]/" , trim($config_str ) );

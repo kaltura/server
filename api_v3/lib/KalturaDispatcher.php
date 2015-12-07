@@ -7,7 +7,8 @@ class KalturaDispatcher
 {
 	private static $instance = null;
 	private $arguments = null;
-	
+
+	const OWNER_ONLY_OPTION = "ownerOnly";
 	/**
 	 * Return a KalturaDispatcher instance
 	 *
@@ -107,7 +108,7 @@ class KalturaDispatcher
 //				throw new KalturaAPIException(KalturaErrors::MISSING_MANDATORY_PARAMETER, $actionInfo->validateUserIdParamName);
 			KalturaLog::debug("validateUserIdParamName: ".$actionInfo->validateUserIdParamName);
 			$objectId = $params[$actionInfo->validateUserIdParamName];
-			$this->validateUser($actionInfo->validateUserObjectClass, $objectId, $actionInfo->validateUserPrivilege);
+			$this->validateUser($actionInfo->validateUserObjectClass, $objectId, $actionInfo->validateUserPrivilege, $actionInfo->validateOptions);
 		}
 		
 		// initialize the service before invoking the action on it
@@ -144,9 +145,10 @@ class KalturaDispatcher
 	 * @param string $objectClass
 	 * @param string $objectId
 	 * @param string $privilege optional
+	 * @param string $options optional
 	 * @throws KalturaErrors::INVALID_KS
 	 */
-	protected function validateUser($objectClass, $objectId, $privilege = null)
+	protected function validateUser($objectClass, $objectId, $privilege = null, $options = null)
 	{
 		// don't allow operations without ks
 		if (!kCurrentContext::$ks_object)
@@ -209,7 +211,16 @@ class KalturaDispatcher
 			
 		}
 
-		if (strtolower($dbObject->getPuserId()) != strtolower(kCurrentContext::$ks_uid)) 
-			throw new KalturaAPIException(KalturaErrors::INVALID_KS, "", ks::INVALID_TYPE, ks::getErrorStr(ks::INVALID_TYPE));
+		if (strtolower($dbObject->getPuserId()) != strtolower(kCurrentContext::$ks_uid))
+		{
+			$optionsArray = array();
+			if ( $options ) {
+				$optionsArray = explode(",", $options);
+			}
+			if (!$dbObject->isEntitledKuserEdit(kCurrentContext::getCurrentKsKuserId())
+				||
+				(in_array(self::OWNER_ONLY_OPTION,$optionsArray)))
+					throw new KalturaAPIException(KalturaErrors::INVALID_KS, "", ks::INVALID_TYPE, ks::getErrorStr(ks::INVALID_TYPE));
+		}
 	}
 }

@@ -98,6 +98,10 @@ class KDLWrap
 		KalturaLog::log( "...S-->".$mediaSet->ToString());
 		
 		$profile = new KDLProfile();
+			/*
+			 * TEMPORARY - Look for WV cases in order to disable duplicate GOP generation. After a while this will be the default behaviour  
+			 */
+		$isForWideVine = false;
 		foreach($cdlFlavorList as $cdlFlavor) {
 			$kdlFlavor = self::ConvertFlavorCdl2Kdl($cdlFlavor);
 			if ($kdlFlavor->_errors)
@@ -105,10 +109,20 @@ class KDLWrap
 				$this->_rv = false;
 				return $this;
 			}
+			
+			if(isset($kdlFlavor->_video) && preg_match('/widevine/', strtolower($kdlFlavor->_tags), $matches)){
+				$isForWideVine = true;
+			}
 			$profile->_flavors[] = $kdlFlavor;
 			KalturaLog::log( "...F-->".$kdlFlavor->ToString());
 		}
-				
+
+		if($isForWideVine==true) {
+			foreach($profile->_flavors as $k=>$kdlFlavor) {
+				$profile->_flavors[$k]->_video->_forWideVine = true;
+			}
+		}
+
 		$trgList = array();
 		{
 			$dlPrc = new KDLProcessor();
@@ -201,7 +215,6 @@ class KDLWrap
 	 */
 	public static function CDLMediaInfo2Tags(mediaInfo $cdlMediaInfo, $tagList) 
 	{
-		KalturaLog::log("==>\n");
 		$mediaSet = new KDLMediaDataSet();
 		self::ConvertMediainfoCdl2Mediadataset($cdlMediaInfo, $mediaSet);
 		KalturaLog::log( "...S-->".$mediaSet->ToString());
@@ -215,7 +228,6 @@ class KDLWrap
 	 */
 	public static function CDLIsFLV(mediaInfo $cdlMediaInfo) 
 	{
-		KalturaLog::log("==>\n");
 		$tagList[] = "flv";
 		$mediaSet = new KDLMediaDataSet();
 		self::ConvertMediainfoCdl2Mediadataset($cdlMediaInfo, $mediaSet);
@@ -223,11 +235,9 @@ class KDLWrap
 		$tagsOut = array();
 		$tagsOut = $mediaSet->ToTags($tagList);
 		if(count($tagsOut)==1) {
-			KalturaLog::log("... an FLV file");
 			return true;
 		}
 		else {
-			KalturaLog::log("... NOT an FLV file");
 			return false;
 		}
 	}
@@ -274,6 +284,14 @@ class KDLWrap
 		{
 			$toJson = json_encode($target->_multiStream);
 			$flavor->setMultiStream($toJson);
+			/*
+			 * Audio-only flavors w/multi-lingual setup, might get wiped out by bitrate-optimization logic.
+			 * To avoid this - turn such flavors into 'forced'.
+			 */
+			if(isset($target->_audio) && !isset($target->_video)
+			&& isset($target->_multiStream->audio) && isset($target->_multiStream->audio->languages) && count($target->_multiStream->audio->languages)>0){
+				$flavor->_force = true;
+			}
 		}
 
 		$flavor->_errors   = $flavor->_errors + $target->_errors;
@@ -605,7 +623,6 @@ class KDLWrap
 	 */
 	public static function ConvertMediainfoCdl2FlavorAsset(mediaInfo $cdlMediaInfo, flavorAsset &$fla)
 	{
-		KalturaLog::log("==>");
 		KalturaLog::log("\nCDL mediaInfo==>\n".print_r($cdlMediaInfo,true));
 	  	$medSet = new KDLMediaDataSet();
 		self::ConvertMediainfoCdl2Mediadataset($cdlMediaInfo, $medSet);

@@ -309,7 +309,7 @@ class mySecurityRule
 	
 	private $m_rule_name = null;
 	
-	function mySecurityRule ( $rule_name )
+	function __construct ( $rule_name )
 	{
 		$this->m_rule_name = $rule_name;
 		$rule = sfConfig::get ( $rule_name );
@@ -353,7 +353,7 @@ class mySecurityRule
 
 class mySecurityError
 {
-	function mySecurityError ( $error )
+	function __construct ( $error )
 	{
 		echo "<br><strong>$error</strong><br>";
 	}

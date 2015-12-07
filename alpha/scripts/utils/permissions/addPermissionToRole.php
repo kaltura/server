@@ -32,7 +32,7 @@ $parmissionNames = explode(',', $argv[3]);
 	
 	
 $criteria = new Criteria();
-if($partnerId)
+if(!is_null($partnerId))
 	$criteria->addAnd(UserRolePeer::PARTNER_ID, $partnerId, Criteria::EQUAL);
 $criteria->addAnd(UserRolePeer::NAME, $roleName, Criteria::EQUAL);
 $criteria->addAscendingOrderByColumn(UserRolePeer::ID);

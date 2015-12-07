@@ -102,8 +102,6 @@ class KAsyncConcat extends KJobHandlerWorker
 	 */
 	protected function moveFile(KalturaBatchJob $job, KalturaConcatJobData $data, $localTempFilePath, $sharedTempFilePath)
 	{
-		KalturaLog::debug("Moving file from [$localTempFilePath] to [$sharedTempFilePath]");
-	
 		$this->updateJob($job, "Moving file from [$localTempFilePath] to [$sharedTempFilePath]", KalturaBatchJobStatus::MOVEFILE);
 		
 		kFile::moveFile($localTempFilePath, $sharedTempFilePath, true);
@@ -131,7 +129,6 @@ class KAsyncConcat extends KJobHandlerWorker
 	 */
 	protected static function concatFiles($ffmpegBin, $ffprobeBin, array $filesArr, $outFilename, $clipStart = null, $clipDuration = null)
 	{
-		KalturaLog::log("Started");
 		$fixLargeDeltaFlag = null;
 		$chunkBr = null;
 		$concateStr = null;
@@ -187,10 +184,17 @@ class KAsyncConcat extends KJobHandlerWorker
 				$concateStr.= "$fileName|";
 			}
 			
-				/*
+				/* 
+				 * ##############
+				 * ############## DISABLE the 'small-distortion-fix' code
+				 * ############## There were cases when the the 'fix' cuased another distortion
+				 * ############## Hopefully WWZ fixed their chunks generation procedure in 4.1.2
+				 * ############## If it does - all this code/remark should be removed,
+				 * ############## otherwise (in case that the fix will still be required) - it should be enhanced.
+				 * ############## 
 				 * Evaluate chunk duration for drift validation
 				 * - only one duration anomaly is required to set the drift fix flag, no need to check following chunk files
-				 */
+				 *
 			if(!isset($fixLargeDeltaFlag)) {
 				if(isset($mi->containerDuration) && $mi->containerDuration>0)
 					$duration = $mi->containerDuration;
@@ -202,9 +206,9 @@ class KAsyncConcat extends KJobHandlerWorker
 					$duration = 0;
 
 				if($duration>0){
-					/*
+					 *
 					 * If the duration is too small - stop/start flow, don't fix 
-					 */
+					 *
 					if(KAsyncConcat::LiveChunkDuration-$duration>30000){
 						$fixLargeDeltaFlag = false;
 					}
@@ -214,6 +218,7 @@ class KAsyncConcat extends KJobHandlerWorker
 				}
 				KalturaLog::log("Chunk duration($duration), Wowza chunk setting(".KAsyncConcat::LiveChunkDuration."),max-allowed-delta(".KAsyncConcat::MaxChunkDelta."),fixLargeDeltaFlag($fixLargeDeltaFlag) ");
 			}
+				*/
 		}
 	
 			/*
@@ -246,15 +251,19 @@ class KAsyncConcat extends KJobHandlerWorker
 		}
 	
 			/*
+			 * ##############
+			 * ############## DISABLE the 'small-distortion-fix' code, see above
+			 * ##############
 			 * For fix-durtion-delta flow - split the input concat to separate video and audio streams,
 			 * otherwise - normal single input
-			 */
+			 *
 		if($fixLargeDeltaFlag && $audioParamStr) {
 			KalturaLog::log("Will attempt to fix the audio-video drift ");
 			$cmdStr = "$ffmpegBin -probesize 15M -analyzeduration 25M -i $concateStr -probesize 15M -analyzeduration 25M -i $concateStr";
 			$cmdStr.= " -map 0:v -map 1:a $videoParamStr $audioParamStr";
 		}
-		else {
+		else */
+		{
 			$cmdStr = "$ffmpegBin -probesize 15M -analyzeduration 25M -i $concateStr $videoParamStr $audioParamStr";
 		}
 		$cmdStr .= " $clipStr -f mp4 -y $outFilename 2>&1";

@@ -35,7 +35,7 @@ class TagService extends KalturaBaseService
         }
         
         $tagFilter->validate();
-        
+
         $c = KalturaCriteria::create(TagPeer::OM_CLASS);
         $tagCoreFilter = new TagFilter();
         $tagFilter->toObject($tagCoreFilter);

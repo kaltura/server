@@ -26,7 +26,6 @@ class KConversionEngineExpressionEncoder3 extends KCollectionConversionEngine
 	{
 		$error_message = "";
 		$actualFileSyncLocalPath = $this->getSrcActualPathFromData($data);
-		KalturaLog::debug(__METHOD__ . " Src File Path: " . $actualFileSyncLocalPath);
 		
 		if ( ! file_exists ( $actualFileSyncLocalPath ) )
 		{
@@ -36,7 +35,6 @@ class KConversionEngineExpressionEncoder3 extends KCollectionConversionEngine
 		}
 
 		$log_file = $data->destDirLocalPath . DIRECTORY_SEPARATOR . $data->destFileName . '.log';
-		KalturaLog::debug(__METHOD__ . " Log File Path: $log_file");
 	
 		// will hold a list of commands
 		// there is a list (most probably holding a single command)
@@ -111,8 +109,6 @@ class KConversionEngineExpressionEncoder3 extends KCollectionConversionEngine
 		$xml = file_get_contents($xmlPath);
 		$xml = mb_convert_encoding($xml, 'ASCII', 'UTF-16');
 		
-		KalturaLog::debug("ism content:\n$xml");
-		
 		$arr = null;
 		if(preg_match('/(<smil[\s\w\W]+<\/smil>)/', $xml, $arr))
 			$xml = $arr[1];
@@ -127,12 +123,12 @@ class KConversionEngineExpressionEncoder3 extends KCollectionConversionEngine
 			$src = $data->destDirLocalPath . DIRECTORY_SEPARATOR . $videoEntity->getAttribute("src");
 			$bitrate = $videoEntity->getAttribute("systemBitrate") / 1000;
 			
-			KalturaLog::debug("Media found in ism bitrate[$bitrate] source[$src]");
+			KalturaLog::info("Media found in ism bitrate[$bitrate] source[$src]");
 			foreach($data->flavors as $index => $flavor)
 			{
 				if($flavor->videoBitrate == $bitrate)
 				{
-					KalturaLog::debug("Source[$src] assigned to flavor[" . $data->flavors[$index]->flavorAssetId . "]");
+					KalturaLog::info("Source[$src] assigned to flavor[" . $data->flavors[$index]->flavorAssetId . "]");
 					$data->flavors[$index]->destFileSyncLocalPath = $src;
 				}
 			}

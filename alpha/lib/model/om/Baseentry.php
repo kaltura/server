@@ -2856,6 +2856,9 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 	 */
 	public function hydrate($row, $startcol = 0, $rehydrate = false)
 	{
+		// Nullify cached objects
+		$this->m_custom_data = null;
+		
 		try {
 
 			$this->id = ($row[$startcol + 0] !== null) ? (string) $row[$startcol + 0] : null;
@@ -3119,7 +3122,6 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 			
 			for ($retries = 1; $retries < KalturaPDO::SAVE_MAX_RETRIES; $retries++)
 			{
-				
                $affectedRows = $this->doSave($con);
                 if ($affectedRows || !$this->isColumnModified(entryPeer::CUSTOM_DATA)) //ask if custom_data wasn't modified to avoid retry with atomic column 
                 	break;
@@ -3171,10 +3173,10 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 						}
 					}
                    }
-				
-				if (!$validUpdate)
-					break;
                    
+				if(!$validUpdate) 
+					break;
+					                   
 				$this->setCustomData($this->m_custom_data->toString());
 			}
 
@@ -3457,7 +3459,9 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 		if($this->isModified())
 		{
 			kQueryCache::invalidateQueryCache($this);
-			kEventsManager::raiseEvent(new kObjectChangedEvent($this, $this->tempModifiedColumns));
+			$modifiedColumns = $this->tempModifiedColumns;
+			$modifiedColumns[kObjectChangedEvent::CUSTOM_DATA_OLD_VALUES] = $this->oldCustomDataValues;
+			kEventsManager::raiseEvent(new kObjectChangedEvent($this, $modifiedColumns));
 		}
 			
 		$this->tempModifiedColumns = array();
@@ -7212,6 +7216,207 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 	}
 
 	/**
+	 * Clears out the collUserEntrys collection (array).
+	 *
+	 * This does not modify the database; however, it will remove any associated objects, causing
+	 * them to be refetched by subsequent calls to accessor method.
+	 *
+	 * @return     void
+	 * @see        addUserEntrys()
+	 */
+	public function clearUserEntrys()
+	{
+		$this->collUserEntrys = null; // important to set this to NULL since that means it is uninitialized
+	}
+
+	/**
+	 * Initializes the collUserEntrys collection (array).
+	 *
+	 * By default this just sets the collUserEntrys collection to an empty array (like clearcollUserEntrys());
+	 * however, you may wish to override this method in your stub class to provide setting appropriate
+	 * to your application -- for example, setting the initial array to the values stored in database.
+	 *
+	 * @return     void
+	 */
+	public function initUserEntrys()
+	{
+		$this->collUserEntrys = array();
+	}
+
+	/**
+	 * Gets an array of UserEntry objects which contain a foreign key that references this object.
+	 *
+	 * If this collection has already been initialized with an identical Criteria, it returns the collection.
+	 * Otherwise if this entry has previously been saved, it will retrieve
+	 * related UserEntrys from storage. If this entry is new, it will return
+	 * an empty collection or the current collection, the criteria is ignored on a new object.
+	 *
+	 * @param      PropelPDO $con
+	 * @param      Criteria $criteria
+	 * @return     array UserEntry[]
+	 * @throws     PropelException
+	 */
+	public function getUserEntrys($criteria = null, PropelPDO $con = null)
+	{
+		if ($criteria === null) {
+			$criteria = new Criteria(entryPeer::DATABASE_NAME);
+		}
+		elseif ($criteria instanceof Criteria)
+		{
+			$criteria = clone $criteria;
+		}
+
+		if ($this->collUserEntrys === null) {
+			if ($this->isNew()) {
+			   $this->collUserEntrys = array();
+			} else {
+
+				$criteria->add(UserEntryPeer::ENTRY_ID, $this->id);
+
+				UserEntryPeer::addSelectColumns($criteria);
+				$this->collUserEntrys = UserEntryPeer::doSelect($criteria, $con);
+			}
+		} else {
+			// criteria has no effect for a new object
+			if (!$this->isNew()) {
+				// the following code is to determine if a new query is
+				// called for.  If the criteria is the same as the last
+				// one, just return the collection.
+
+
+				$criteria->add(UserEntryPeer::ENTRY_ID, $this->id);
+
+				UserEntryPeer::addSelectColumns($criteria);
+				if (!isset($this->lastUserEntryCriteria) || !$this->lastUserEntryCriteria->equals($criteria)) {
+					$this->collUserEntrys = UserEntryPeer::doSelect($criteria, $con);
+				}
+			}
+		}
+		$this->lastUserEntryCriteria = $criteria;
+		return $this->collUserEntrys;
+	}
+
+	/**
+	 * Returns the number of related UserEntry objects.
+	 *
+	 * @param      Criteria $criteria
+	 * @param      boolean $distinct
+	 * @param      PropelPDO $con
+	 * @return     int Count of related UserEntry objects.
+	 * @throws     PropelException
+	 */
+	public function countUserEntrys(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+	{
+		if ($criteria === null) {
+			$criteria = new Criteria(entryPeer::DATABASE_NAME);
+		} else {
+			$criteria = clone $criteria;
+		}
+
+		if ($distinct) {
+			$criteria->setDistinct();
+		}
+
+		$count = null;
+
+		if ($this->collUserEntrys === null) {
+			if ($this->isNew()) {
+				$count = 0;
+			} else {
+
+				$criteria->add(UserEntryPeer::ENTRY_ID, $this->id);
+
+				$count = UserEntryPeer::doCount($criteria, false, $con);
+			}
+		} else {
+			// criteria has no effect for a new object
+			if (!$this->isNew()) {
+				// the following code is to determine if a new query is
+				// called for.  If the criteria is the same as the last
+				// one, just return count of the collection.
+
+
+				$criteria->add(UserEntryPeer::ENTRY_ID, $this->id);
+
+				if (!isset($this->lastUserEntryCriteria) || !$this->lastUserEntryCriteria->equals($criteria)) {
+					$count = UserEntryPeer::doCount($criteria, false, $con);
+				} else {
+					$count = count($this->collUserEntrys);
+				}
+			} else {
+				$count = count($this->collUserEntrys);
+			}
+		}
+		return $count;
+	}
+
+	/**
+	 * Method called to associate a UserEntry object to this object
+	 * through the UserEntry foreign key attribute.
+	 *
+	 * @param      UserEntry $l UserEntry
+	 * @return     void
+	 * @throws     PropelException
+	 */
+	public function addUserEntry(UserEntry $l)
+	{
+		if ($this->collUserEntrys === null) {
+			$this->initUserEntrys();
+		}
+		if (!in_array($l, $this->collUserEntrys, true)) { // only add it if the **same** object is not already associated
+			array_push($this->collUserEntrys, $l);
+			$l->setentry($this);
+		}
+	}
+
+
+	/**
+	 * If this collection has already been initialized with
+	 * an identical criteria, it returns the collection.
+	 * Otherwise if this entry is new, it will return
+	 * an empty collection; or if this entry has previously
+	 * been saved, it will retrieve related UserEntrys from storage.
+	 *
+	 * This method is protected by default in order to keep the public
+	 * api reasonable.  You can provide public methods for those you
+	 * actually need in entry.
+	 */
+	public function getUserEntrysJoinkuser($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+	{
+		if ($criteria === null) {
+			$criteria = new Criteria(entryPeer::DATABASE_NAME);
+		}
+		elseif ($criteria instanceof Criteria)
+		{
+			$criteria = clone $criteria;
+		}
+
+		if ($this->collUserEntrys === null) {
+			if ($this->isNew()) {
+				$this->collUserEntrys = array();
+			} else {
+
+				$criteria->add(UserEntryPeer::ENTRY_ID, $this->id);
+
+				$this->collUserEntrys = UserEntryPeer::doSelectJoinkuser($criteria, $con, $join_behavior);
+			}
+		} else {
+			// the following code is to determine if a new query is
+			// called for.  If the criteria is the same as the last
+			// one, just return the collection.
+
+			$criteria->add(UserEntryPeer::ENTRY_ID, $this->id);
+
+			if (!isset($this->lastUserEntryCriteria) || !$this->lastUserEntryCriteria->equals($criteria)) {
+				$this->collUserEntrys = UserEntryPeer::doSelectJoinkuser($criteria, $con, $join_behavior);
+			}
+		}
+		$this->lastUserEntryCriteria = $criteria;
+
+		return $this->collUserEntrys;
+	}
+
+	/**
 	 * Resets all collections of referencing foreign keys.
 	 *
 	 * This method is a user-space workaround for PHP's inability to garbage collect objects
@@ -7389,6 +7594,16 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 	public function incInCustomData ( $name , $delta = 1, $namespace = null)
 	{
 		$customData = $this->getCustomDataObj( );
+		
+		$currentNamespace = '';
+		if($namespace)
+			$currentNamespace = $namespace;
+			
+		if(!isset($this->oldCustomDataValues[$currentNamespace]))
+			$this->oldCustomDataValues[$currentNamespace] = array();
+		if(!isset($this->oldCustomDataValues[$currentNamespace][$name]))
+			$this->oldCustomDataValues[$currentNamespace][$name] = $customData->get($name, $namespace);
+		
 		return $customData->inc ( $name , $delta , $namespace  );
 	}
 

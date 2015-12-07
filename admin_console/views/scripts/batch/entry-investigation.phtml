@@ -277,7 +277,7 @@
 									}
 									elseif($file->status == Kaltura_Client_FileSync_Enum_FileSyncStatus::READY)
 									{
-										?><td><a href="<?php echo $file->fileUrl; ?>" target="_blank"><?php echo $file->id; ?></a></td><?php
+										?><td><a href="<?php echo $file->fileUrl; ?>" download="<?php echo basename($file->filePath); ?>" target="_blank"><?php echo $file->id; ?></a></td><?php
 									}
 									else
 									{
@@ -1046,19 +1046,21 @@
 											</tr>
 										</thead>
 										<tbody>
-											<?php foreach($job->history as $historyRecord): ?>
-												<tr>
-													<td><?php echo date($this->translate('time format'), $historyRecord->timeStamp); ?></td>
-													<td><?php echo $historyRecord->hostName; ?></td>
-													<td><?php echo $historyRecord->sessionId; ?></td>
-													<td><?php echo $historyRecord->schedulerId; ?></td>
-													<td><?php echo $historyRecord->workerId; ?></td>
-													<td><?php echo $historyRecord->batchIndex; ?></td>
-													<td><?php echo $historyRecord->message; ?></td>
-													<td><?php echo $historyRecord->errType; ?></td>
-													<td><?php echo $historyRecord->errNumber; ?></td>
-												</tr>
-											<?php endforeach; ?>
+											<?php if(is_array($job->history)): ?>
+												<?php foreach($job->history as $historyRecord): ?>
+													<tr>
+														<td><?php echo date($this->translate('time format'), $historyRecord->timeStamp); ?></td>
+														<td><?php echo $historyRecord->hostName; ?></td>
+														<td><?php echo $historyRecord->sessionId; ?></td>
+														<td><?php echo $historyRecord->schedulerId; ?></td>
+														<td><?php echo $historyRecord->workerId; ?></td>
+														<td><?php echo $historyRecord->batchIndex; ?></td>
+														<td><?php echo $historyRecord->message; ?></td>
+														<td><?php echo $historyRecord->errType; ?></td>
+														<td><?php echo $historyRecord->errNumber; ?></td>
+													</tr>
+												<?php endforeach; ?>
+											<?php endif; ?>
 										</tbody>
 									</table>
 								</td>

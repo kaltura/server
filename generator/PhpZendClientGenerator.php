@@ -329,7 +329,7 @@ class PhpZendClientGenerator extends ClientGeneratorFromXml
 			$this->appendLine(' */');
 		}
 		
-	 	$this->appendLine("class $enumName");		
+	 	$this->appendLine("class $enumName extends Kaltura_Client_EnumBase");		
 		$this->appendLine("{");
 		foreach($enumNode->childNodes as $constNode)
 		{
@@ -408,25 +408,45 @@ class PhpZendClientGenerator extends ClientGeneratorFromXml
 					break;
 					
 				case "bool" :
-					$this->appendLine("		if(!empty(\$xml->{$propName}))");
-					$this->appendLine("			\$this->$propName = true;");
+					$this->appendLine("		if(count(\$xml->{$propName}))");
+					$this->appendLine("		{");
+					$this->appendLine("			if(!empty(\$xml->{$propName}))");
+					$this->appendLine("				\$this->$propName = true;");
+					$this->appendLine("			else");
+					$this->appendLine("				\$this->$propName = false;");
+					$this->appendLine("		}");
 					break;
 					
 				case "string" :
-					$this->appendLine("		\$this->$propName = ($propType)\$xml->$propName;");
+					$this->appendLine("		if(count(\$xml->{$propName}))");
+					$this->appendLine("			\$this->$propName = ($propType)\$xml->$propName;");
 					break;
 					
 				case "array" :
 					$arrayType = $propertyNode->getAttribute ( "arrayType" );
-					$this->appendLine("		if(empty(\$xml->{$propName}))");
-					$this->appendLine("			\$this->$propName = array();");
-					$this->appendLine("		else");
-					$this->appendLine("			\$this->$propName = Kaltura_Client_ParseUtils::unmarshalArray(\$xml->$propName, \"$arrayType\");");
+					$this->appendLine("		if(count(\$xml->{$propName}))");
+					$this->appendLine("		{");
+					$this->appendLine("			if(empty(\$xml->{$propName}))");
+					$this->appendLine("				\$this->$propName = array();");
+					$this->appendLine("			else");
+					$this->appendLine("				\$this->$propName = Kaltura_Client_ParseUtils::unmarshalArray(\$xml->$propName, \"$arrayType\");");
+					$this->appendLine("		}");
+					break;
+					
+				case "map" :
+					$arrayType = $propertyNode->getAttribute ( "arrayType" );
+					$this->appendLine("		if(count(\$xml->{$propName}))");
+					$this->appendLine("		{");
+					$this->appendLine("			if(empty(\$xml->{$propName}))");
+					$this->appendLine("				\$this->$propName = array();");
+					$this->appendLine("			else");
+					$this->appendLine("				\$this->$propName = Kaltura_Client_ParseUtils::unmarshalMap(\$xml->$propName, \"$arrayType\");");
+					$this->appendLine("		}");
 					break;
 					
 				default : // sub object
 					$fallback = $propertyNode->getAttribute("type");
-					$this->appendLine("		if(!empty(\$xml->{$propName}))");
+					$this->appendLine("		if(count(\$xml->{$propName}) && !empty(\$xml->{$propName}))");
 					$this->appendLine("			\$this->$propName = Kaltura_Client_ParseUtils::unmarshalObject(\$xml->$propName, \"$fallback\");");
 					break;
 			}
@@ -530,6 +550,12 @@ class PhpZendClientGenerator extends ClientGeneratorFromXml
 	    $resultNode = $actionNode->getElementsByTagName("result")->item(0);
 	    $resultType = $resultNode->getAttribute("type");
 	    $arrayObjectType = ($resultType == 'array') ? $resultNode->getAttribute ( "arrayType" ) : null;
+		
+		$enableInMultiRequest = true;
+		if($actionNode->hasAttribute("enableInMultiRequest"))
+		{
+			$enableInMultiRequest = intval($actionNode->getAttribute("enableInMultiRequest"));
+		}
 	    
 		
 		// method signature
@@ -545,6 +571,13 @@ class PhpZendClientGenerator extends ClientGeneratorFromXml
 		$this->appendLine();	
 		$this->appendLine("	$signature");
 		$this->appendLine("	{");
+		
+		if(!$enableInMultiRequest)
+		{
+			$this->appendLine("		if (\$this->client->isMultiRequest())");
+			$this->appendLine("			throw new Kaltura_Client_ClientException(\"Action is not supported as part of multi-request.\", Kaltura_Client_ClientException::ERROR_ACTION_IN_MULTIREQUEST);");
+			$this->appendLine("		");
+		}
 		
 		$this->appendLine("		\$kparams = array();");
 		$haveFiles = false;
@@ -610,16 +643,29 @@ class PhpZendClientGenerator extends ClientGeneratorFromXml
 	    {
 	    	$fallbackClass = 'null';
 	    	if($resultType == 'array')
+	    	{
 	    		$fallbackClass = "\"$arrayObjectType\"";
+	    	}
 	    	else if($resultType && !$this->isSimpleType($resultType))
+	    	{
 	    		$fallbackClass = "\"$resultType\"";
+	    	}
 	    	
 			if ($haveFiles)
+			{
 				$this->appendLine("		\$this->client->queueServiceActionCall(\"".strtolower($serviceId)."\", \"$action\",  $fallbackClass, \$kparams, \$kfiles);");
+			}
 			else
+			{
 				$this->appendLine("		\$this->client->queueServiceActionCall(\"".strtolower($serviceId)."\", \"$action\", $fallbackClass, \$kparams);");
-			$this->appendLine("		if (\$this->client->isMultiRequest())");
-			$this->appendLine("			return \$this->client->getMultiRequestResult();");
+			}
+			
+			if($enableInMultiRequest)
+			{
+				$this->appendLine("		if (\$this->client->isMultiRequest())");
+				$this->appendLine("			return \$this->client->getMultiRequestResult();");
+			}
+			
 			$this->appendLine("		\$resultXml = \$this->client->doQueue();");
 			$this->appendLine("		\$resultXmlObject = new \\SimpleXMLElement(\$resultXml);");
 			$this->appendLine("		Kaltura_Client_ParseUtils::checkIfError(\$resultXmlObject->result);");
@@ -633,7 +679,7 @@ class PhpZendClientGenerator extends ClientGeneratorFromXml
 				case 'bool':
 					$this->appendLine("		\$resultObject = (bool)Kaltura_Client_ParseUtils::unmarshalSimpleType(\$resultXmlObject->result);");
 					break;
-				
+				case 'bigint':
 				case 'string':
 					$this->appendLine("		\$resultObject = (string)Kaltura_Client_ParseUtils::unmarshalSimpleType(\$resultXmlObject->result);");
 					break;
@@ -652,8 +698,11 @@ class PhpZendClientGenerator extends ClientGeneratorFromXml
 			}
 	    }
 			
-		if($resultType)
+		if($resultType && $resultType != 'null')
+		{
 			$this->appendLine("		return \$resultObject;");
+		}
+		
 		$this->appendLine("	}");
 	}
 	
@@ -670,7 +719,7 @@ class PhpZendClientGenerator extends ClientGeneratorFromXml
 			{
 				$signature .= "$".$paramName;
 			}
-			else if ($paramType == "array")
+			else if ($paramType == "array" || $paramType == "map")
 			{
 				$signature .= "array $".$paramName;
 			}
@@ -773,11 +822,13 @@ class PhpZendClientGenerator extends ClientGeneratorFromXml
 		$this->appendLine("	}");
 		$this->appendLine("	");
 	
+		$volatileProperties = array();
 		foreach($configurationNodes as $configurationNode)
 		{
 			/* @var $configurationNode DOMElement */
 			$configurationName = $configurationNode->nodeName;
-			$methodsName = ucfirst($configurationName) . "Configuration";
+			$attributeName = lcfirst($configurationName) . "Configuration";
+			$volatileProperties[$attributeName] = array();
 		
 			foreach($configurationNode->childNodes as $configurationPropertyNode)
 			{
@@ -787,7 +838,13 @@ class PhpZendClientGenerator extends ClientGeneratorFromXml
 					continue;
 			
 				$configurationProperty = $configurationPropertyNode->localName;
-				$type = $configurationPropertyNode->getAttribute('type');
+				
+				if($configurationPropertyNode->hasAttribute('volatile') && $configurationPropertyNode->getAttribute('volatile'))
+				{
+					$volatileProperties[$attributeName][] = $configurationProperty;
+				}
+				
+				$type = $this->getTypeClass($configurationPropertyNode->getAttribute('type'));
 				$description = null;
 				
 				if($configurationPropertyNode->hasAttribute('description'))
@@ -803,7 +860,22 @@ class PhpZendClientGenerator extends ClientGeneratorFromXml
 				}
 			}
 		}
-	
+		
+		$this->appendLine ( "	/**");
+		$this->appendLine ( "	 * Clear all volatile configuration parameters");
+		$this->appendLine ( "	 */");
+		$this->appendLine ( "	protected function resetRequest()");
+		$this->appendLine ( "	{");
+		$this->appendLine ( "		parent::resetRequest();");
+		foreach($volatileProperties as $attributeName => $properties)
+		{
+			foreach($properties as $propertyName)
+			{
+				$this->appendLine("		unset(\$this->{$attributeName}['{$propertyName}']);");
+			}
+		}
+		$this->appendLine ( "	}");
+		
 		$this->appendLine("}");
 	}
 	

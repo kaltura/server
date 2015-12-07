@@ -178,10 +178,24 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 			substr($parentReload, 0, $doSelectPos) .
 			$this->getPeerClassname() . "::setUseCriteriaFilter(false);" . $newLine .
 			"\$criteria = \$this->buildPkeyCriteria();" . $newLine .
-			"entryPeer::addSelectColumns(\$criteria);" . $newLine .
+			$this->getPeerClassname() . "::addSelectColumns(\$criteria);" . $newLine .
 			"\$stmt = BasePeer::doSelect(\$criteria, \$con);" . $newLine . 
 			$this->getPeerClassname() . "::setUseCriteriaFilter(true);" .
 			substr($parentReload, $doSelectPos + strlen($doSelectStmt));
+		
+		
+	}
+	
+	protected function addHydrateOpen(&$script) {
+		parent::addHydrateOpen($script);
+		$newLine = "\n\t\t";
+		
+		$table = $this->getTable();
+		$customDataColumn = $table->getColumn(self::KALTURA_COLUMN_CUSTOM_DATA);
+		if($customDataColumn) {
+			$script .= $newLine . "// Nullify cached objects";
+			$script .= $newLine . "\$this->m_custom_data = null;" . $newLine;
+		}
 	}
 
 	/* (non-PHPdoc)
@@ -230,6 +244,7 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 			return parent::addSaveBody($script);
 		$reloadOnUpdate = $table->isReloadOnUpdate();
 		$reloadOnInsert = $table->isReloadOnInsert();
+		$customDataColumn = $table->getColumn(self::KALTURA_COLUMN_CUSTOM_DATA);
 
 		$script .= "
 		if (\$this->isDeleted()) {
@@ -696,7 +711,15 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 		if(\$this->isModified())
 		{
 			kQueryCache::invalidateQueryCache(\$this);
-			kEventsManager::raiseEvent(new kObjectChangedEvent(\$this, \$this->tempModifiedColumns));
+			\$modifiedColumns = \$this->tempModifiedColumns;";
+			
+			if($customDataColumn) {
+				$script .= "
+			\$modifiedColumns[kObjectChangedEvent::CUSTOM_DATA_OLD_VALUES] = \$this->oldCustomDataValues;";
+			}
+			
+			$script .= "
+			kEventsManager::raiseEvent(new kObjectChangedEvent(\$this, \$modifiedColumns));
 		}
 			
 		\$this->tempModifiedColumns = array();
@@ -1070,6 +1093,16 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 	public function incInCustomData ( \$name , \$delta = 1, \$namespace = null)
 	{
 		\$customData = \$this->getCustomDataObj( );
+		
+		\$currentNamespace = '';
+		if(\$namespace)
+			\$currentNamespace = \$namespace;
+			
+		if(!isset(\$this->oldCustomDataValues[\$currentNamespace]))
+			\$this->oldCustomDataValues[\$currentNamespace] = array();
+		if(!isset(\$this->oldCustomDataValues[\$currentNamespace][\$name]))
+			\$this->oldCustomDataValues[\$currentNamespace][\$name] = \$customData->get(\$name, \$namespace);
+		
 		return \$customData->inc ( \$name , \$delta , \$namespace  );
 	}
 

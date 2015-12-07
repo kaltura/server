@@ -13,7 +13,7 @@
  * @package plugins.dropFolder
  * @subpackage model
  */
-class DropFolderFile extends BaseDropFolderFile
+class DropFolderFile extends BaseDropFolderFile implements IRelatedObject
 {
 
 	const CUSTOM_DATA_LAST_MODIFICATION_TIME = 'last_modification_time';
@@ -22,7 +22,6 @@ class DropFolderFile extends BaseDropFolderFile
 	
 	public function setFileSize($size)
 	{
-		KalturaLog::debug('in file size setter');
 		if ($size !== $this->getFileSize()) {
 		    self::setFileSizeLastSetAt(time());
 		}

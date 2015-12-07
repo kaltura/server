@@ -102,7 +102,7 @@ class KalturaFeedRenderer extends SyndicationFeedRenderer{
 		$xsl = new DOMDocument();
 		if(!@$xsl->loadXML($xslt))
 		{
-			KalturaLog::debug("Could not load xslt");
+			KalturaLog::err("Could not load xslt");
 			return null;
 		}
 	
@@ -131,7 +131,7 @@ class KalturaFeedRenderer extends SyndicationFeedRenderer{
 		$xsl = new DOMDocument();
 		if(!@$xsl->loadXML($xslt))
 		{
-			KalturaLog::debug("Could not load xslt");
+			KalturaLog::err("Could not load xslt");
 			return null;
 		}
 	
@@ -161,8 +161,15 @@ class KalturaFeedRenderer extends SyndicationFeedRenderer{
 		$mrssParams->setStorageId($syndicationFeed->getStorageId());
 		$mrssParams->setServePlayManifest($syndicationFeed->getServePlayManifest());
 		$mrssParams->setPlayManifestClientTag('feed:' . $syndicationFeed->getId());
-	
-		$mrss = kMrssManager::getEntryMrssXml($entry, null, $mrssParams);
+
+		$features = null;
+		if ($syndicationFeed->getUseCategoryEntries())
+		{
+			KalturaLog::info("Getting entry's associated categories from the category_entry table");
+			$features = array (ObjectFeatureType::CATEGORY_ENTRIES);
+		}
+		
+		$mrss = kMrssManager::getEntryMrssXml($entry, null, $mrssParams, $features);
 	
 		if(!$mrss)
 		{

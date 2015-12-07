@@ -25,7 +25,7 @@
 //
 // @ignore
 // ===================================================================================================
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
@@ -66,14 +66,12 @@ namespace Kaltura
         }
 
         public KalturaParams GetParamsForMultiRequest(int multiRequestNumber)
-        {
+        {  
+            _Params.Add("service", this._Service);
+            _Params.Add("action", this._Action);
+          
             KalturaParams multiRequestParams = new KalturaParams();
-            multiRequestParams.Add(multiRequestNumber + ":service", this._Service);
-            multiRequestParams.Add(multiRequestNumber + ":action", this._Action);
-            foreach (KeyValuePair<string, string> param in this._Params)
-            {
-                multiRequestParams.Add(multiRequestNumber + ":" + param.Key, param.Value);
-            }
+            multiRequestParams.Add(multiRequestNumber.ToString(), this._Params);
 
             return multiRequestParams;
         }

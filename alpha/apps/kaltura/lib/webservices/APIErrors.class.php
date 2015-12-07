@@ -198,7 +198,7 @@ class APIErrors
 	const NO_FIELDS_SET_FOR_PARTNER = "NO_FIELDS_SET_FOR_PARTNER;;Missing fiedls when adding partner" ;
 	
 	// ERR_TEXT - a more specific error from myPartnerRegistration - TODO - make the module use more specific error codes
-	const PARTNER_REGISTRATION_ERROR = "PARTNER_REGISTRATION_ERROR;ERR_TEXT;Error while registering partner: @ERR_TEXT@";
+	const PARTNER_REGISTRATION_ERROR = "PARTNER_REGISTRATION_ERROR;;Error while registering partner";
 	
 	// MEDIA_TYPE - media_type
 	const SEARCH_UNSUPPORTED_MEDIA_TYPE = "SEARCH_UNSUPPORTED_MEDIA_TYPE;MEDIA_TYPE;Unsupported media type [@MEDIA_TYPE@]";

@@ -24,6 +24,14 @@ class kActivitiBusinessProcessProvider extends kBusinessProcessProvider
 	}
 	
 	/* (non-PHPdoc)
+	 * @see kBusinessProcessProvider::enableDebug()
+	 */
+	public function enableDebug($enable)
+	{
+		$this->client->setDebug($enable);
+	}
+	
+	/* (non-PHPdoc)
 	 * @see kBusinessProcessProvider::listBusinessProcesses()
 	 */
 	public function listBusinessProcesses()
@@ -35,7 +43,6 @@ class kActivitiBusinessProcessProvider extends kBusinessProcessProvider
 		$ret = array();
 		while($processes)
 		{
-			KalturaLog::debug('processes [' . print_r($processes, true) . ']');
 			foreach($processes->getData() as $process)
 			{
 				/* @var $process ActivitiListOfProcessDefinitionsResponseData */

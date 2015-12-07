@@ -40,6 +40,58 @@ define('MIN_TIME_STAMP', 946677600);		// 2000
 define('MAX_TIME_STAMP', 2147483647);		// 2038
 define('API_LOG_FILENAME', $config['logDir'] . '/kaltura_api_v3.log');
 
+function formatResponseKalcliInput($resp, $prefix = '', $varName = null)
+{
+	$returnCode = 0;
+
+	switch (gettype($resp))
+	{
+		case 'boolean':
+			return array($resp ? '=1' : '=0', $returnCode);
+		
+		case 'integer':
+		case 'double':
+		case 'string':
+		case 'NULL':
+			$escapedValue = preg_replace('/([^a-zA-Z0-9_,.:\/])/', '\\\\$1', (string)$resp);
+			return array('='.$escapedValue, $returnCode);
+
+		case 'array':
+			$result = $resp ? '' : ':-';
+			$firstTime = true;
+			foreach ($resp as $index => $elem)
+			{
+				$newPrefix = $prefix . ':' . $index;
+				list($value, $internalReturnCode) = formatResponseKalcliInput($elem, $newPrefix, $index);
+
+				if ($firstTime)
+				{
+					$firstTime = false;
+					$result .= ":{$index}{$value}";
+				}
+				else
+				{
+					$result .= "\n{$newPrefix}{$value}";
+				}
+			}
+			return array($result, $returnCode);
+
+		case 'object':
+			$properties = get_object_vars($resp);
+			$objectType = $properties['__PHP_Incomplete_Class_Name'];
+			$result = ":objectType={$objectType}";
+			unset($properties['__PHP_Incomplete_Class_Name']);
+			foreach ($properties as $name => $value)
+			{
+				$newPrefix = $prefix . ':' . $name;
+				list($formattedValue, $internalReturnCode) = formatResponseKalcliInput($value, $newPrefix, $name);
+					
+				$result .= "\n{$newPrefix}{$formattedValue}";
+			}
+			return array($result, $returnCode);
+	}
+}
+
 function formatResponse($resp, $indent = '', $varName = null)
 {
 	global $DATE_FIELD_SUFFIXES;
@@ -85,8 +137,6 @@ function formatResponse($resp, $indent = '', $varName = null)
 		unset($properties['__PHP_Incomplete_Class_Name']);
 		foreach ($properties as $name => $value)
 		{
-			if ($name == '__PHP_Incomplete_Class_Name')
-				continue;
 			list($value, $internalReturnCode) = formatResponse($value, $indent . "\t", $name);
 			$result .= "\n{$indent}\t{$name}\t{$value}";
 		}
@@ -209,7 +259,7 @@ if (strpos($serviceUrl, '://') === false)
 		$serviceUrl = 'http://' . $serviceUrl;
 }
 
-$url = $serviceUrl . "/api_v3/index.php?service={$service}&action={$action}";
+$url = $serviceUrl . "/api_v3/service/{$service}/action/{$action}";
 
 if (isset($options['curl']))
 {
@@ -237,7 +287,7 @@ if (isset($options['curl']))
 	}
 	else if ($params)
 	{
-		$url .= '&' . http_build_query($params);
+		$url .= '?' . http_build_query($params);
 	}
 	$commandLine .= ' "'.$url.'"';
 	
@@ -299,7 +349,17 @@ if (!isset($options['head']))
 		$unserializedResult = @unserialize($result);
 		if ($unserializedResult !== false || $result === 'b:0;')
 		{
-			list($result, $returnCode) = formatResponse($unserializedResult);
+			if (isset($options['param-name']))
+			{
+				list($result, $returnCode) = formatResponseKalcliInput(
+						$unserializedResult, 
+						$options['param-name']);
+				$result = $options['param-name']. str_replace("\n", " \\\n", $result);
+			}
+			else
+			{
+				list($result, $returnCode) = formatResponse($unserializedResult);
+			}
 			$result .= "\n";
 		}
 	}

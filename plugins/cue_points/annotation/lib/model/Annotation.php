@@ -5,6 +5,8 @@
  */
 class Annotation extends CuePoint implements IMetadataObject
 {
+    const CUSTOM_DATA_FIELD_SEARCHABLE_ON_ENTRY = 'searchableOnEntry';
+    
 	public function __construct() 
 	{
 		parent::__construct();
@@ -31,15 +33,26 @@ class Annotation extends CuePoint implements IMetadataObject
 	
 	public function contributeData()
 	{
-		$data = null;
-		
-		if($this->getText())
-			$data = $data . $this->getText() . ' ';
-		
-		if($this->getTags())
-			$data = $data . $this->getTags() . ' ';
+	   $data = null;
+
+	   if($this->getSearchableOnEntry())
+	   {
+	       if($this->getText())
+    			$data = $data . $this->getText() . ' ';
+    		
+    		if($this->getTags())
+    			$data = $data . $this->getTags() . ' ';
+	    }
 			
 		return $data;
+	}
+	
+	public function shouldReIndexEntry(array $modifiedColumns = array())
+	{
+		if(!$this->getSearchableOnEntry())
+			return false;
+		
+		return parent::shouldReIndexEntry($modifiedColumns);
 	}
 
 	/**
@@ -87,4 +100,8 @@ class Annotation extends CuePoint implements IMetadataObject
 		$annotation->save();
 		return $annotation;
 	}
+	
+	public function getSearchableOnEntry()	      		{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_SEARCHABLE_ON_ENTRY, null, false);}
+	public function setSearchableOnEntry($v)        	{return $this->putInCustomData(self::CUSTOM_DATA_FIELD_SEARCHABLE_ON_ENTRY, (bool)$v);}
+	
 }

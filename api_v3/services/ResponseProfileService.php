@@ -10,7 +10,10 @@ class ResponseProfileService extends KalturaBaseService
 	public function initService($serviceId, $serviceName, $actionName)
 	{
 		parent::initService($serviceId, $serviceName, $actionName);
-		$this->applyPartnerFilterForClass('ResponseProfile'); 	
+		
+		//Don;t apply partner filter if action is list to avoid returning default partner 0 response profiles on every call
+		if($actionName !== "list")
+			$this->applyPartnerFilterForClass('ResponseProfile'); 	
 	}
 	
 	/* (non-PHPdoc)
@@ -21,7 +24,6 @@ class ResponseProfileService extends KalturaBaseService
 		
 		switch ($this->actionName)
 		{
-			case 'list':
 			case 'get':
 				return $this->partnerGroup . ',0';
 		}
@@ -155,6 +157,12 @@ class ResponseProfileService extends KalturaBaseService
 	{
 		if (!$filter)
 			$filter = new KalturaResponseProfileFilter();
+		
+		//Add partner 0 to filter only in case systemNmae or Id are provided in the filter to avoid returning it by default
+		if(isset($filter->systemNameEqual) || isset($filter->idEqual)) {
+			$this->partnerGroup .= ",0";
+		}
+		$this->applyPartnerFilterForClass('ResponseProfile');
 
 		if (!$pager)
 			$pager = new KalturaFilterPager();
@@ -174,6 +182,46 @@ class ResponseProfileService extends KalturaBaseService
 		$response = new KalturaResponseProfileListResponse();
 		$response->objects = $list;
 		$response->totalCount = $totalCount;
-		return $response;    
+		return $response;
+	}
+	
+	/**
+	 * Recalculate response profile cached objects
+	 * 
+	 * @action recalculate
+	 * @param KalturaResponseProfileCacheRecalculateOptions $options
+	 * @return KalturaResponseProfileCacheRecalculateResults
+	 */
+	function recalculateAction(KalturaResponseProfileCacheRecalculateOptions $options)
+	{
+		return KalturaResponseProfileCacher::recalculateCacheBySessionType($options);
+	}
+	
+	/**
+	 * Clone an existing response profile
+	 * 
+	 * @action clone
+	 * @param int $id
+	 * @param KalturaResponseProfile $profile
+	 * @throws KalturaErrors::RESPONSE_PROFILE_ID_NOT_FOUND
+	 * @throws KalturaErrors::RESPONSE_PROFILE_DUPLICATE_SYSTEM_NAME
+	 * @return KalturaResponseProfile
+	 */
+	function cloneAction ($id, KalturaResponseProfile $profile)
+	{
+		$origResponseProfileDbObject = ResponseProfilePeer::retrieveByPK($id);
+		if (!$origResponseProfileDbObject)
+			throw new KalturaAPIException(KalturaErrors::RESPONSE_PROFILE_ID_NOT_FOUND, $id);
+			
+		$newResponseProfileDbObject = $origResponseProfileDbObject->copy();
+		
+		if ($profile)
+			$newResponseProfileDbObject = $profile->toInsertableObject($newResponseProfileDbObject);
+				
+		$newResponseProfileDbObject->save();
+		
+		$newResponseProfile = new KalturaResponseProfile();
+		$newResponseProfile->fromObject($newResponseProfileDbObject, $this->getResponseProfile());
+		return $newResponseProfile;
 	}
 }

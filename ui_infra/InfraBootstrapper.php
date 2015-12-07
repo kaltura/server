@@ -48,7 +48,6 @@ class InfraBootstrapper extends Zend_Application_Bootstrap_Bootstrap
 		$loggerName = $configSettings->applicationName;
 		$appLogger = $loggerConfig->get($loggerName);
 		KalturaLog::initLog($appLogger);
-		KalturaLog::debug('starting request');
 		
 	}
 	
@@ -89,7 +88,6 @@ class InfraBootstrapper extends Zend_Application_Bootstrap_Bootstrap
 			foreach($pluginInstances as $pluginInstance)
 			{
 				/* @var $pluginInstance KalturaPlugin */
-				KalturaLog::debug("Loading plugin[" . $pluginInstance->getPluginName() . "]");
 				foreach($pluginInstance->getApplicationPages() as $pluginPage)
 					$pluginPages[] = $pluginPage;
 			}

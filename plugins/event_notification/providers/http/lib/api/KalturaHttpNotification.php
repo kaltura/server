@@ -21,7 +21,7 @@ class KalturaHttpNotification extends KalturaObject
 	
 	/**
 	 * ID of the batch job that execute the notification
-	 * @var int
+	 * @var bigint
 	 */
 	public $eventNotificationJobId;
 	

@@ -206,12 +206,9 @@ class PodcastDistributionProfile extends DistributionProfile
 	
 		if($this->xslModified && $this->xsl && $this->getFeedId())
 		{
-			KalturaLog::debug("loads podcast feed id [" . $this->getFeedId() . "]");
 			$podcastFeed = syndicationFeedPeer::retrieveByPK($this->getFeedId());
-			KalturaLog::debug("podcast feed id [" . $podcastFeed->getId() . "] podcast feed type [" . get_class($podcastFeed) . "]");
 			if($podcastFeed && $podcastFeed instanceof genericSyndicationFeed)
 			{
-				KalturaLog::log("Updating podcast feed xsl");
 				$podcastFeed->setType(syndicationFeedType::KALTURA_XSLT);
 				$podcastFeed->incrementVersion();
 				$podcastFeed->save();

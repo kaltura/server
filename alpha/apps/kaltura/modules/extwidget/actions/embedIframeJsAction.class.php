@@ -25,9 +25,7 @@ class embedIframeJsAction extends sfAction
 		$widget_id = $this->getRequestParameter("widget_id", '_' . $partner_id);
 		
 		$protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') ? "https" : "http";
-		$embed_host = (kConf::hasParam('cdn_api_host')) ? kConf::get('cdn_api_host') : kConf::get('www_host');
-		$embed_host_https = (kConf::hasParam('cdn_api_host_https')) ? kConf::get('cdn_api_host_https') : kConf::get('www_host');
-		$host = ($protocol == 'https') ? 'https://' . $embed_host_https : 'http://' . $embed_host;
+		$host = myPartnerUtils::getCdnHost($partner_id, $protocol, 'api');
 
 		$ui_conf_html5_url = $uiConf->getHtml5Url();
 
@@ -46,12 +44,6 @@ class embedIframeJsAction extends sfAction
 		}
 
 		$autoEmbed = $this->getRequestParameter('autoembed');
-		if ($autoEmbed)
-		{
-			$port = $_SERVER['SERVER_PORT'];
-			$host = "$protocol://". kConf::get('html5lib_host') ."/";
-
-		}
 
 		$iframeEmbed = $this->getRequestParameter('iframeembed');
 		$scriptName = ($iframeEmbed) ? 'mwEmbedFrame.php' : 'mwEmbedLoader.php';
@@ -66,14 +58,20 @@ class embedIframeJsAction extends sfAction
 			$relativeUrl = false;
 			$url = $ui_conf_html5_url; // absolute URL
 		}
-		else if ($ui_conf_html5_url)
-		{
-			$url =  $host . $ui_conf_html5_url;
-		}
 		else
 		{
-			$html5_version = kConf::get('html5_version');
-			$url =  "$host/html5/html5lib/{$html5_version}/" . $scriptName;
+			if (!$iframeEmbed)
+				$host = "$protocol://". kConf::get('html5lib_host') ."/";
+			
+			if ($ui_conf_html5_url)
+			{
+				$url =  $host . $ui_conf_html5_url;
+			}
+			else
+			{
+				$html5_version = kConf::get('html5_version');
+				$url =  "$host/html5/html5lib/{$html5_version}/" . $scriptName;
+			}
 		}
 
 		// append uiconf_id and partner id for optimizing loading of html5 library. append them only for "standard" urls by looking for the mwEmbedLoader.php/mwEmbedFrame.php suffix
@@ -90,22 +88,23 @@ class embedIframeJsAction extends sfAction
 		}
 		
 		header("pragma:");
-
 		if($iframeEmbed) {
 			$url .= ((strpos($url, "?") === false) ? "?" : "&") . 'wid=' . $widget_id . '&' . $_SERVER["QUERY_STRING"];
-		} else if ($autoEmbed) {
-			header('Content-Type: application/javascript');
+		}
+		else
+		{
 			$params = "protocol=$protocol&".$_SERVER["QUERY_STRING"];
-
+			
 			$url .= ((strpos($url, "?") === false) ? "?" : "&") . $params;
 
 			if ($relativeUrl)
 			{
-				kFileUtils::dumpUrl($url."?".$params, true, false, array("X-Forwarded-For" =>  requestUtils::getRemoteAddress()));
+				header('Content-Type: application/javascript');
+				kFileUtils::dumpUrl($url, true, false, array("X-Forwarded-For" =>  requestUtils::getRemoteAddress()));
 			}
 		}
 
-		requestUtils::sendCachingHeaders(60);
+		requestUtils::sendCachingHeaders(60, true, time());
 		
 		kFile::cacheRedirect($url);
 		header("Location:$url");

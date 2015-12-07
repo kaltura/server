@@ -1,0 +1,16 @@
+        check process mysql
+           with pidfile "/var/lib/mysql/`hostname`.pid"
+           start program = "/sbin/service mysql start" with timeout 60 seconds
+           stop program = "/sbin/service mysql stop"
+           #if 10 restarts within 10 cycles then timeout
+           group kaltura
+           depends on my.cnf, mysqld
+
+        check file my.cnf
+            with path "/etc/my.cnf"
+            # Reload mysql if the my.cnf file was changed
+            if changed checksum
+               then exec "/sbin/service mysql reload"
+
+        check file mysqld
+            with path "/usr/bin/mysqld_safe"

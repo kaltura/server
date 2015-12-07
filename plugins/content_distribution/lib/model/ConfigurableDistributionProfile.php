@@ -14,7 +14,6 @@ abstract class ConfigurableDistributionProfile extends DistributionProfile
 	
 	protected $requiredFields = null;
 		
-	
 	/********************************/
 	/* Field config array functions */
     /********************************/
@@ -270,7 +269,7 @@ abstract class ConfigurableDistributionProfile extends DistributionProfile
     		$mrssParams = new kMrssParameters();
     		if ($this->getItemXpathsToExtend())
     			$mrssParams->setItemXpathsToExtend($this->getItemXpathsToExtend());
-    		$mrss = kMrssManager::getEntryMrssXml($entry, $mrss, $mrssParams);
+    		$mrss = kMrssManager::getEntryMrssXml($entry, $mrss, $mrssParams, $this->getExtendedFeatures());
     		$mrssStr = $mrss->asXML();
 		}
 		catch (Exception $e)
@@ -353,7 +352,7 @@ abstract class ConfigurableDistributionProfile extends DistributionProfile
 		    }
 		    
 		    $valuesXmlStr = $valuesXmlObj->saveXML();
-		    KalturaLog::debug('All field values result XML: '.$valuesXmlStr);
+		    KalturaLog::info('All field values result XML: '.$valuesXmlStr);
 		    
 		    $fieldValues = array();
 		    $fieldConfigArray = $this->getFieldConfigArray();
@@ -474,7 +473,6 @@ abstract class ConfigurableDistributionProfile extends DistributionProfile
 		return $validationErrors;
 	}
 	
-    
 	protected function validateNotEmpty($fieldArray, $allFieldValues, $action)
 	{
 	    $validationErrors = array();
@@ -487,6 +485,9 @@ abstract class ConfigurableDistributionProfile extends DistributionProfile
 					if ( $this->getSubmitEnabled() == DistributionProfileActionStatus::AUTOMATIC ) {
 						$validationError = $this->createValidationError($action, DistributionErrorType::CONDITION_NOT_MET, $this->getUserFriendlyFieldName($fieldName));
 						$validationError->setValidationErrorType(DistributionValidationErrorType::CUSTOM_ERROR);
+						if ($this->fieldConfigArray[$fieldName]->getTriggerDeleteOnError())
+							$validationError->setRequiresDelete(true);
+							
 						$validationErrors[] = $validationError;
 					}
     			}
@@ -577,6 +578,20 @@ abstract class ConfigurableDistributionProfile extends DistributionProfile
 		
 		$templates[] = $stringReplaceAllTemplate;
 		return $templates;
+	}
+	
+	/**
+	 * @return the $extendedFeatures
+	 */
+	public function getExtendedFeatures() {
+		return $this->getFromCustomData('extended_features', null, array());
+	}
+
+	/**
+	 * @param array $extendedFeatures
+	 */
+	public function setExtendedFeatures($extendedFeatures) {
+		$this->putInCustomData('extended_features', $extendedFeatures);
 	}
 	
 }

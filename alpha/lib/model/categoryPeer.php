@@ -7,11 +7,11 @@
  * @package Core
  * @subpackage model
  */ 
-class categoryPeer extends BasecategoryPeer
+class categoryPeer extends BasecategoryPeer implements IRelatedObjectPeer
 {
 	const CATEGORY_SEPARATOR = ">";
 	
-	const MAX_CATEGORY_NAME = 60;
+	const MAX_CATEGORY_NAME = 200;
 	
 	const MEMBERS = 'category.MEMBERS';
 	const CATEGORY_ID = 'category.CATEGORY_ID';
@@ -474,5 +474,25 @@ class categoryPeer extends BasecategoryPeer
 		
 	}
 	
-	
+	/* (non-PHPdoc)
+	 * @see IRelatedObjectPeer::getRootObjects()
+	 */
+	public function getRootObjects(IRelatedObject $object)
+	{
+		/* @var $object category */
+		
+		$rootCategory = $object->getRootCategoryFromFullIds($object);
+		if($rootCategory)
+			return array($rootCategory);
+			
+		return array();
+	}
+
+	/* (non-PHPdoc)
+	 * @see IRelatedObjectPeer::isReferenced()
+	 */
+	public function isReferenced(IRelatedObject $object)
+	{
+		return false;
+	}
 }

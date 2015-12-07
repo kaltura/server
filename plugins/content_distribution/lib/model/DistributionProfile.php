@@ -13,7 +13,7 @@
  * @package plugins.contentDistribution
  * @subpackage model
  */
-abstract class DistributionProfile extends BaseDistributionProfile implements ISyncableFile
+abstract class DistributionProfile extends BaseDistributionProfile implements ISyncableFile, IRelatedObject
 {
 	const FILE_SYNC_DISTRIBUTION_PROFILE_CONFIG = 1;
 	

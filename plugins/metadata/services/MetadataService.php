@@ -21,6 +21,21 @@ class MetadataService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::FEATURE_FORBIDDEN, MetadataPlugin::PLUGIN_NAME);
 	}
 	
+	/* (non-PHPdoc)
+	 * @see KalturaBaseService::partnerGroup()
+	 */
+	protected function partnerGroup($peer = null)
+	{
+	    if(in_array($this->actionName, array('get', 'list')) && $peer == 'Metadata'){
+	        return $this->partnerGroup . ',0';
+	    }
+	    elseif (in_array($this->actionName, array('add', 'get', 'list', 'update')) && $peer == 'MetadataProfile'){
+	        return $this->partnerGroup . ',0';
+	    }
+	
+	    return $this->partnerGroup;
+	}
+	
 	protected function kalturaNetworkAllowed($actionName)
 	{
 		if ($actionName == 'list')
@@ -126,6 +141,7 @@ class MetadataService extends KalturaBaseService
 		$dbMetadata->setObjectType($objectType);
 		$dbMetadata->setObjectId($objectId);
 		$dbMetadata->setStatus(KalturaMetadataStatus::VALID);
+		$dbMetadata->setLikeNew(true);
 
 		// dynamic objects are metadata only, skip validating object id
 		if ($objectType != KalturaMetadataObjectType::DYNAMIC_OBJECT)
@@ -276,7 +292,7 @@ class MetadataService extends KalturaBaseService
 					
 				// validates against previous version
 				$errorMessagePrevVersion = '';
-				if(!kMetadataManager::validateMetadata($dbMetadata->getMetadataProfileId(), $xmlData, $errorMessagePrevVersion, $dbMetadata->getMetadataProfileVersion()))
+				if(!kMetadataManager::validateMetadata($dbMetadata->getMetadataProfileId(), $xmlData, $errorMessagePrevVersion, true))
 				{
 					KalturaLog::err("Failed to validate metadata object [$id] against metadata profile previous version [" . $dbMetadata->getMetadataProfileVersion() . "] error: $errorMessagePrevVersion");
 
@@ -289,14 +305,21 @@ class MetadataService extends KalturaBaseService
 				$dbMetadata->setMetadataProfileVersion($dbMetadataProfile->getVersion());
 			}
 			
-			$dbMetadata->incrementVersion();
-		
 			$key = $dbMetadata->getSyncKey(Metadata::FILE_SYNC_METADATA_DATA);
-			kFileSyncUtils::file_put_contents($key, $xmlData);
-			
-			$dbMetadata->save();
-			
-			kEventsManager::raiseEvent(new kObjectDataChangedEvent($dbMetadata, $previousVersion));
+			if (!kFileSyncUtils::compareContent($key, $xmlData))
+			{
+				$dbMetadata->incrementVersion();
+				$key = $dbMetadata->getSyncKey(Metadata::FILE_SYNC_METADATA_DATA);
+				kFileSyncUtils::file_put_contents($key, $xmlData);
+				$dbMetadata->save();
+				kEventsManager::raiseEvent(new kObjectDataChangedEvent($dbMetadata, $previousVersion));
+			}
+			else 
+			{
+				KalturaLog::info("XML data MD5 matches current filesync content MD5. Update is not necessary.");
+				//adding this save() in order to save the metadata profile version field in case there are no diffrences
+				$dbMetadata->save();
+			}
 		}
 		
 		$metadata = new KalturaMetadata();
@@ -358,7 +381,8 @@ class MetadataService extends KalturaBaseService
 			}
 			
 			if (!$entryIds && kConf::hasParam('metadata_list_without_object_filtering_partners') && 
-				!in_array(kCurrentContext::getCurrentPartnerId(), kConf::get('metadata_list_without_object_filtering_partners'))) 
+				!in_array(kCurrentContext::getCurrentPartnerId(), kConf::get('metadata_list_without_object_filtering_partners')) &&
+				kCurrentContext::$ks_partner_id != Partner::BATCH_PARTNER_ID)
 				throw new KalturaAPIException(MetadataErrors::MUST_FILTER_ON_OBJECT_ID);
 			
 			if($entryIds)
@@ -366,7 +390,6 @@ class MetadataService extends KalturaBaseService
 				$entryIds = entryPeer::filterEntriesByPartnerOrKalturaNetwork($entryIds, kCurrentContext::getCurrentPartnerId());
 				if(!count($entryIds))
 				{
-					KalturaLog::debug("No entries found");
 					$response = new KalturaMetadataListResponse();
 					$response->objects = new KalturaMetadataArray();
 					$response->totalCount = 0;

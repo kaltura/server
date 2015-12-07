@@ -138,7 +138,7 @@ class KalturaPartner extends KalturaObject implements IFilterable
 	
 	/**
 	 * @var int
-	 * @filter eq,gte,lte
+	 * @filter eq,gte,lte,in
 	 * @readonly
 	 */
 	public $partnerPackage;
@@ -307,6 +307,12 @@ class KalturaPartner extends KalturaObject implements IFilterable
 	 * @var string
 	 */
 	public $referenceId;
+	
+	/**
+	 * @var bool
+	 * @readonly
+	 */
+	public $timeAlignedRenditions;
 
 	private static $map_between_objects = array
 	(
@@ -316,7 +322,7 @@ class KalturaPartner extends KalturaObject implements IFilterable
 		'maxUploadSize' , 'partnerPackage' , 'secret' , 'adminSecret' , 'allowMultiNotification', 'adminLoginUsersQuota', 'adminUserId',
 		'firstName' , 'lastName' , 'country' , 'state' , 'publishersQuota', 'partnerGroupType', 'defaultEntitlementEnforcement', 
 		'defaultDeliveryType', 'defaultEmbedCodeType', 'deliveryTypes', 'embedCodeTypes',  'templatePartnerId', 'ignoreSeoLinks', 
-		'host', 'cdnHost', 'isFirstLogin', 'logoutUrl', 'partnerParentId','crmId', 'referenceId',
+		'host', 'cdnHost', 'isFirstLogin', 'logoutUrl', 'partnerParentId','crmId', 'referenceId', 'timeAlignedRenditions',
 	);
 	
 	public function getMapBetweenObjects ( )
@@ -355,6 +361,12 @@ class KalturaPartner extends KalturaObject implements IFilterable
 	 */
 	public function toPartner()
 	{
+		$vars_arr=get_object_vars($this);
+		foreach ($vars_arr as $key => $val){
+		    if (is_string($this->$key)){
+                        $this->$key=strip_tags($this->$key);
+                    }    
+                }   
 		
 		if($this->adminName && $this->firstName === null && $this->lastName === null)
 		{

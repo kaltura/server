@@ -3,10 +3,11 @@
  * @package api
  * @subpackage objects
  */
-abstract class KalturaObject 
+abstract class KalturaObject implements IApiObject
 {
 	/**
 	 * @var KalturaListResponseArray
+	 * @readonly
 	 */
 	public $relatedObjects;
 	
@@ -351,6 +352,20 @@ abstract class KalturaObject
 	
 	final public function fromObject($srcObj, KalturaDetachedResponseProfile $responseProfile = null)
 	{
+		if (!is_object($srcObj))
+		{
+			KalturaLog::err("expected an object, got " . print_r($srcObj, true));
+			return;
+		}
+	
+		if($srcObj instanceof IRelatedObject && $responseProfile && $responseProfile->relatedProfiles)
+		{
+			if(KalturaResponseProfileCacher::start($this, $srcObj, $responseProfile))
+			{
+				return;
+			}
+		}
+		
 		$thisClass = get_class($this);
 		$srcObjClass = get_class($srcObj);
 		$fromObjectClass = "Map_{$thisClass}_{$srcObjClass}";
@@ -378,17 +393,21 @@ abstract class KalturaObject
 		$fromObjectClass::fromObject($this, $srcObj, $responseProfile);
 		$this->doFromObject($srcObj, $responseProfile);
 		
-		if($responseProfile)
+		if($srcObj instanceof IRelatedObject)
 		{
-			$this->loadRelatedObjects($responseProfile);
+			KalturaResponseProfileCacher::onPersistentObjectLoaded($srcObj);
+			if($responseProfile && $responseProfile->relatedProfiles)
+			{
+				$responseProfile->validateNestedObjects();
+				$this->loadRelatedObjects($responseProfile);
+				KalturaResponseProfileCacher::stop($srcObj, $this);
+			}
 		}
 	}
 	
 	public function loadRelatedObjects(KalturaDetachedResponseProfile $responseProfile)
-	{
-		// trigger validation
-		$responseProfile->toObject();
-		
+	{	
+		$this->relatedObjects = new KalturaListResponseArray();
 		foreach($responseProfile->relatedProfiles as $relatedProfile)
 		{
 			/* @var $relatedProfile KalturaDetachedResponseProfile */
@@ -397,9 +416,9 @@ abstract class KalturaObject
 				KalturaLog::notice("Related response-profile [$relatedProfile->name] has no filter and should not be used as nested profile");
 				continue;
 			}
-			KalturaLog::debug("Loading related response-profile [$relatedProfile->name] with filter [" . get_class($relatedProfile->filter) . "]");
 
 			$filter = clone $relatedProfile->filter;
+			/* @var $filter KalturaRelatedFilter */
 			
 			if($relatedProfile->mappings)
 			{
@@ -418,10 +437,6 @@ abstract class KalturaObject
 					KalturaLog::warning("Mappings could not be applied for response-profile [$relatedProfile->name]");
 					continue;
 				}
-			}
-			else 
-			{
-				KalturaLog::debug("No mappings defined in response-profile [$relatedProfile->name]");
 			}
 			
 			$pager = $relatedProfile->pager;
@@ -669,11 +684,12 @@ abstract class KalturaObject
 	
 	public function validateForInsert($propertiesToSkip = array())
 	{
-		$reflector = KalturaTypeReflectorCacher::get(get_class($this));
+		$className = get_class($this);
+		$reflector = KalturaTypeReflectorCacher::get($className);
 		$properties = $reflector->getProperties();
 		
-		if ($reflector->requiresInsertPermission()&& !kPermissionManager::getInsertPermitted(get_class($this), kApiParameterPermissionItem::ALL_VALUES_IDENTIFIER)) {
-			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_NO_INSERT_PERMISSION, get_class($this));
+		if ($reflector->requiresInsertPermission()&& !kPermissionManager::getInsertPermitted($className, kApiParameterPermissionItem::ALL_VALUES_IDENTIFIER)) {
+			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_NO_INSERT_PERMISSION, $className);
 		}
 		
 		foreach($properties as $property)
@@ -702,7 +718,7 @@ abstract class KalturaObject
 					}
 				}
 
-				$this->validateHtmlTags($property);
+				$this->validateHtmlTags($className, $property);
 			}
 		}
 	}
@@ -710,11 +726,12 @@ abstract class KalturaObject
 	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
 	{
 		$updatableProperties = array();
-		$reflector = KalturaTypeReflectorCacher::get(get_class($this));
+		$className = get_class($this);
+		$reflector = KalturaTypeReflectorCacher::get($className);
 		$properties = $reflector->getProperties();
 		
-		if ($reflector->requiresUpdatePermission()&& !kPermissionManager::getUpdatePermitted(get_class($this), kApiParameterPermissionItem::ALL_VALUES_IDENTIFIER)) {
-			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_NO_UPDATE_PERMISSION, get_class($this));
+		if ($reflector->requiresUpdatePermission()&& !kPermissionManager::getUpdatePermitted($className, kApiParameterPermissionItem::ALL_VALUES_IDENTIFIER)) {
+			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_NO_UPDATE_PERMISSION, $className);
 		}
 		
 		foreach($properties as $property)
@@ -757,7 +774,7 @@ abstract class KalturaObject
 					}
 				}
 
-				$this->validateHtmlTags($property);
+				$this->validateHtmlTags($className, $property);
 			}
 		}
 		
@@ -767,7 +784,7 @@ abstract class KalturaObject
 	/**
 	 * @param KalturaPropertyInfo $property
 	 */
-	public function validateHtmlTags( $property )
+	public function validateHtmlTags( $className, $property )
 	{
 		if ( $property->getType() != 'string' )
 		{
@@ -775,7 +792,8 @@ abstract class KalturaObject
 		}
 
 		$propName = $property->getName();
-		return requestUtils::stripUnsafeHtmlTags($this->$propName, $propName);
+		$value = $this->$propName;
+		return kHtmlPurifier::purify($className, $propName, $value);
 	}
 
 	public function validateForUsage($sourceObject, $propertiesToSkip = array())
@@ -861,9 +879,10 @@ abstract class KalturaObject
 	    }
 	}
 
-	public function cast($className) {
-		if(!is_subclass_of($className, get_class($this)))
-			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_TYPE, get_class($this));
+	public function cast($className) 
+	{
+            if(!is_subclass_of($className, get_class($this)) && !is_subclass_of($this,$className))
+                throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_TYPE, get_class($this));
 			
 	    return unserialize(sprintf(
 	        'O:%d:"%s"%s',

@@ -53,6 +53,12 @@ class KalturaResponseProfile extends KalturaDetachedResponseProfile implements I
 	 */
 	public $status;
 	
+	/**
+	 * @var int
+	 * @readonly
+	 */
+	public $version;
+	
 	
 	public function __construct(ResponseProfile $responseProfile = null)
 	{
@@ -69,6 +75,7 @@ class KalturaResponseProfile extends KalturaDetachedResponseProfile implements I
 		'createdAt',
 		'updatedAt',
 		'status',
+		'version',
 	);
 	
 	/* (non-PHPdoc)
@@ -87,19 +94,18 @@ class KalturaResponseProfile extends KalturaDetachedResponseProfile implements I
 		// Allow null in case of update
 		$this->validatePropertyMinLength('systemName', 2, !is_null($sourceObject));
 		
-		$id = null;
-		if($sourceObject)
+		//Check uniqueness of new object's system name
+		$systemNameProfile = ResponseProfilePeer::retrieveBySystemName($this->systemName, ($sourceObject && $sourceObject->getId()) ? $sourceObject->getId() : null);
+		if ($systemNameProfile)
+			throw new KalturaAPIException(KalturaErrors::RESPONSE_PROFILE_DUPLICATE_SYSTEM_NAME, $this->systemName);
+	
+		
+		$id = $this->id;
+		if($sourceObject && $sourceObject->getId())
 		{
 			$id = $sourceObject->getId();
 		}
 			
-		if(trim($this->systemName) && !$this->isNull('systemName'))
-		{
-			$systemNameTemplates = ResponseProfilePeer::retrieveBySystemName($this->systemName, $id);
-	        if (count($systemNameTemplates))
-	            throw new KalturaAPIException(KalturaErrors::RESPONSE_PROFILE_DUPLICATE_SYSTEM_NAME, $this->systemName);
-		}
-		
 		parent::validateForUsage($sourceObject, $propertiesToSkip);
 	}
 	
@@ -113,29 +119,7 @@ class KalturaResponseProfile extends KalturaDetachedResponseProfile implements I
 			$object = new ResponseProfile();
 		}
 		
-		if($this->filter)
-		{
-			$object->setFilterApiClassName(get_class($this->filter));
-			$object->setFilter($this->filter->toObject());
-		}
-		
 		return parent::toObject($object, $propertiesToSkip);
-	}
-	
-	/* (non-PHPdoc)
-	 * @see KalturaObject::fromObject($srcObj, $responseProfile)
-	 */
-	public function doFromObject($srcObj, KalturaDetachedResponseProfile $responseProfile = null)
-	{
-		/* @var $srcObj ResponseProfile */
-		parent::doFromObject($srcObj, $responseProfile);
-		
-		if($srcObj->getFilter() && $this->shouldGet('filter', $responseProfile))
-		{
-			$filterApiClassName = $srcObj->getFilterApiClassName();
-			$this->filter = new $filterApiClassName();
-			$this->filter->fromObject($srcObj->getFilter());
-		}
 	}
 	
 	/* (non-PHPdoc)
@@ -152,5 +136,13 @@ class KalturaResponseProfile extends KalturaDetachedResponseProfile implements I
 	public function getFilterDocs()
 	{
 		return array();
+	}
+	
+	/* (non-PHPdoc)
+	 * @see KalturaDetachedResponseProfile::getKey()
+	 */
+	public function getKey()
+	{
+		return "{$this->id}_{$this->version}";
 	}
 }

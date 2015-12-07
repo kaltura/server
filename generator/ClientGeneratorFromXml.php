@@ -108,11 +108,14 @@ abstract class ClientGeneratorFromXml
 			return;
 		}
 		
-		
 		// loop through the folder
-		$dir = dir($directory);
+		$dir=null;
+		if (is_dir($directory)){
+		    $dir = dir($directory);
+		}
+		//                                                         
 		$sourceFilesPaths = array();
-		while (false !== $entry = $dir->read()) 
+		while (get_class($dir)==='Directory' && (false !== $entry = $dir->read())) 
 		{
 			// skip source control files
 			if ($this->beginsWith($entry, ".svn") || 
@@ -128,7 +131,9 @@ abstract class ClientGeneratorFromXml
 			$sourceFilesPaths[] = realpath("$directory/$entry");
 		}
 		// clean up
-		$dir->close();
+		if(get_class($dir)==='Directory'){
+		    $dir->close();
+		}
 		
 		foreach($sourceFilesPaths as $sourceFilesPath)
 			$this->addSourceFiles($sourceFilesPath, $rootSourceFolder, $rootDestFolder);
@@ -175,9 +180,14 @@ abstract class ClientGeneratorFromXml
 		$this->_txt = "";
 	}
 	
+	protected function append($txt = "")
+	{
+		$this->_txt .= $txt;
+	}
+	
 	protected function appendLine($txt = "")
 	{
-		$this->_txt .= $txt ."\n";
+		$this->append($txt ."\n");
 	}
 	
 	protected function getTextBlock()
@@ -191,4 +201,8 @@ abstract class ClientGeneratorFromXml
 	 * @return string 
 	 */
 	protected abstract function getSingleLineCommentMarker();
+	
+	public function done($outputPath)
+	{
+	}
 }

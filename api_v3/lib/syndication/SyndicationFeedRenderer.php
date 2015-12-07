@@ -1,9 +1,9 @@
 <?php
 
 abstract class SyndicationFeedRenderer {
-	
+
 	const LEVEL_INDENTATION = '  ';
-	
+
 	protected $syndicationFeed;
 	protected $syndicationFeedDB;
 	protected $mimeType;
@@ -42,7 +42,7 @@ abstract class SyndicationFeedRenderer {
 	protected function getPlayerUrl($entryId)
 	{
 		$uiconfId = ($this->syndicationFeed->playerUiconfId)? '/ui_conf_id/'.$this->syndicationFeed->playerUiconfId: '';
-		$url = 'http://'.kConf::get('www_host').
+		$url = requestUtils::getProtocol() . '://' . kConf::get('www_host').
 		'/kwidget/wid/_'.$this->syndicationFeed->partnerId.
 		'/entry_id/'.$entryId.$uiconfId;
 		return $url;

@@ -39,6 +39,23 @@ class kSessionUtils
 		}
 	}
 	
+	public static function createKSession($partner_id, $partner_secret, $puser_id, $expiry, $type, $privileges, $additional_data = null, $master_partner_id = null)
+	{
+		$ks = new ks();
+		$ks->valid_until = kApiCache::getTime() + $expiry; // store in milliseconds to make comparison easier at validation time
+		$ks->type = $type;
+		$ks->partner_id = $partner_id;
+		$ks->master_partner_id = $master_partner_id;
+		$ks->partner_pattern = $partner_id;
+		$ks->error = 0;
+		$ks->rand = microtime(true);
+		$ks->user = $puser_id;
+		$ks->privileges = $privileges;
+		$ks->additional_data = $additional_data;
+		
+		return $ks;
+	}
+		
 	/*
 	* will validate the partner_id, secret & key and return a kaltura-session string (KS)
 	* the ks will be a 2-way hashed string that expires after a given period of time and holds data about the partner
@@ -61,22 +78,11 @@ class kSessionUtils
 
 			//	echo "startKSession: from DB: $ks_max_expiry_in_seconds | desired: $desired_expiry_in_seconds " ;
 
-			$ks = new ks();
-			$ks->valid_until = kApiCache::getTime() + $desired_expiry_in_seconds ; // store in milliseconds to make comparison easier at validation time
-//			$ks->type = $admin ? ks::TYPE_KAS : ks::TYPE_KS;
-			if ( $admin == false )
-				$ks->type = ks::TYPE_KS;
-			else
-				$ks->type = $admin ; // if the admin > 1 - use it rather than automatially setting it to be 2
-
-			$ks->partner_id = $partner_id;
-			$ks->master_partner_id = $master_partner_id;
-			$ks->partner_pattern = $partner_id;
-			$ks->error = 0;
-			$ks->rand = microtime(true);
-			$ks->user = $puser_id;
-			$ks->privileges = $privileges;
-			$ks->additional_data = $additional_data;
+			$ks_type = ks::TYPE_KS;
+			if($admin)
+				$ks_type = $admin ; // if the admin > 1 - use it rather than automatially setting it to be 2
+				
+			$ks = self::createKSession($partner_id, $partner_secret, $puser_id, $desired_expiry_in_seconds, $ks_type, $privileges, $additional_data, $master_partner_id);
 			$ks_str = $ks->toSecureString();
 			return 0;
 		}
@@ -228,8 +234,6 @@ class ks extends kSessionBase
 	const PATTERN_WILDCARD = "*";
 	
 	public $error;
-
-	private $valid_string=false;
 	
 	/**
 	 * @var kuser
@@ -240,8 +244,18 @@ class ks extends kSessionBase
 	{
 		if ( self::$ERROR_MAP == null )
 		{
-			self::$ERROR_MAP  = array ( self::INVALID_STR => "INVALID_STR" , self::INVALID_PARTNER => "INVALID_PARTNER" , self::INVALID_USER => "INVALID_USER" ,
-				self::INVALID_TYPE => "INVALID_TYPE" , self::EXPIRED => "EXPIRED" , self::LOGOUT => "LOGOUT" , Partner::VALIDATE_LKS_DISABLED => "LKS_DISABLED", self::EXCEEDED_ACTIONS_LIMIT => 'EXCEEDED_ACTIONS_LIMIT',self::EXCEEDED_RESTRICTED_IP=>'EXCEEDED_RESTRICTED_IP');
+			self::$ERROR_MAP  = array ( 
+				self::INVALID_STR => "INVALID_STR", 
+				self::INVALID_PARTNER => "INVALID_PARTNER", 
+				self::INVALID_USER => "INVALID_USER", 
+				self::INVALID_TYPE => "INVALID_TYPE", 
+				self::EXPIRED => "EXPIRED", 
+				self::LOGOUT => "LOGOUT", 
+				Partner::VALIDATE_LKS_DISABLED => "LKS_DISABLED", 
+				self::EXCEEDED_ACTIONS_LIMIT => 'EXCEEDED_ACTIONS_LIMIT', 
+				self::EXCEEDED_RESTRICTED_IP => 'EXCEEDED_RESTRICTED_IP', 
+				self::EXCEEDED_RESTRICTED_URI => 'EXCEEDED_RESTRICTED_URI', 
+			);
 		}
 		
 		$str =  @self::$ERROR_MAP[$code];
@@ -269,7 +283,6 @@ class ks extends kSessionBase
 			throw new Exception ( self::getErrorStr ( self::INVALID_STR ) );
 		}
 
-		$ks->valid_string = true;
 		return $ks;
 	}
 
@@ -299,22 +312,20 @@ class ks extends kSessionBase
 	}
 	
 	public function isValid( $partner_id , $puser_id , $type = false)
-	{
-		if ( ! $this->valid_string ) return self::INVALID_STR;
+	{		
+		$result = $this->tryToValidateKS();
+		if ($result != self::UNKNOWN && $result != self::OK)
+		{
+			return $result;
+		}
+		
 		if ( ! $this->matchPartner ( $partner_id ) ) return self::INVALID_PARTNER;
 		if ( ! $this->matchUser ( $puser_id ) ) return self::INVALID_USER;
 		if ($type !== false) { // do not check ks type
 			if ( ! $this->type == $type  ) return self::INVALID_TYPE;
 		}
 		
-		if ( $this->expired ( ) ) return self::EXPIRED ;
-
-		if (!$this->isUserIPAllowed()) return self::EXCEEDED_RESTRICTED_IP;
-		
-		if($this->original_str &&
-			$partner_id != Partner::BATCH_PARTNER_ID &&		// Avoid querying the database on batch KS, since they are never invalidated
-			!$this->isWidgetSession() &&					// Since anyone can create a widget session, no need to check for invalidation
-			$this->isKSInvalidated() !== false)				// Could not check for invalidation using the memcache
+		if($result == self::UNKNOWN)
 		{
 			$criteria = new Criteria();
 			
@@ -390,10 +401,13 @@ class ks extends kSessionBase
 	
 	public function isValidForPartner($partner_id)
 	{
-		if ( ! $this->valid_string ) return self::INVALID_STR;
+		$result = $this->isValidBase();
+		if ($result != self::OK)
+		{
+			return $result;
+		}
+		
 		if ( ! $this->matchPartner ( $partner_id ) ) return self::INVALID_PARTNER;
-		if ( $this->expired ( ) ) return self::EXPIRED ;
-		if (!$this->isUserIPAllowed()) return  self::EXCEEDED_RESTRICTED_IP;
 		return self::OK;
 	}
 
@@ -477,41 +491,7 @@ class ks extends kSessionBase
 		
 		return false;
 	}
-	
-	public function isSetIPRestriction()
-	{
-		$allPrivileges = explode(',', $this->privileges);
-		// for each pair - check privileges
-		foreach($allPrivileges as $priv)
-		{
-			// extract privilege ID from pair
-			$exPrivileges = explode(':', $priv);
-			if ($exPrivileges[0] == self::PRIVILEGE_IP_RESTRICTION)
-				if ( preg_match( "/^(([1-9]?[0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5]).){3}([1-9]?[0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$/", $exPrivileges[1]) )
-				{
-					//If $exPrivileges[1] is a valid IP address - return value.
-					return $exPrivileges[1];
-				}
-				else
-				{
-					throw new kCoreException(kCoreException::INTERNAL_SERVER_ERROR, APIErrors::PRIVILEGE_IP_RESTRICTION);
-				}
-		}
 		
-		return false;
-	}
-	
-	public function isUserIPAllowed()
-	{
-		$allowedIPRestriction = $this->isSetIPRestriction();
-		if ($allowedIPRestriction && $allowedIPRestriction != infraRequestUtils::getRemoteAddress())
-		{
-			KalturaLog::err("IP Restriction; allowed IP: [$allowedIPRestriction], user ip [". infraRequestUtils::getRemoteAddress() ."] is not in range");
-			return false; 
-		}
-		return true; 
-	}
-	
 	public function getEnableEntitlement()
 	{
 		// break all privileges to their pairs - this is to support same "multi-priv" method expected for
@@ -636,7 +616,6 @@ class ks extends kSessionBase
 				if ($roleId){
 					$roleIds = $roleId->getId();
 				}else{
-					KalturaLog::debug("Role id [$exPrivileges[1]] does not exists");
 					throw new kCoreException(kCoreException::INTERNAL_SERVER_ERROR, APIErrors::UNKNOWN_ROLE_ID ,$exPrivileges[1]);
 				}
 			}
@@ -668,11 +647,6 @@ class ks extends kSessionBase
 			return $default;
 	}
 	
-	private function expired ( )
-	{
-		return ( time() >= $this->valid_until );
-	}
-
 	private function matchPartner ( $partner_id )
 	{
 		if ( $this->partner_id == $partner_id ) return true;

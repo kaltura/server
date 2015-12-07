@@ -2,9 +2,19 @@
 
 abstract class DeliveryProfileLive extends DeliveryProfile {
 	
+	/**
+	 * @var kLiveStreamConfiguration
+	 */
+	protected $liveStreamConfig;
+	
 	function __construct() {
 		parent::__construct();
 		$this->DEFAULT_RENDERER_CLASS = 'kRedirectManifestRenderer';
+	}
+	
+	public function setLiveStreamConfig(kLiveStreamConfiguration $liveStreamConfig)
+	{
+		$this->liveStreamConfig = $liveStreamConfig;
 	}
 	
 	/**
@@ -73,13 +83,13 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 		return $urlToCheck;
 	}
 	
-	public function serve($baseUrl, $backupUrl) {
+	public function buildServeFlavors() 
+	{
 		$flavors = array();
-		$this->finalizeUrls($baseUrl, $flavors);
+		$baseUrl = $this->liveStreamConfig->getUrl();
+		$flavors[] = $this->getFlavorAssetInfo('', $baseUrl);		// passing the url as urlPrefix so that only the path will be tokenized
 		
-		$flavor = $this->getFlavorAssetInfo('', $baseUrl);		// passing the url as urlPrefix so that only the path will be tokenized
-		$renderer = $this->getRenderer(array($flavor));
-		return $renderer;
+		return $flavors;
 	}
 	
 	public function isLive ($url) {

@@ -16,6 +16,7 @@ CREATE TABLE `metadata_profile`
 	`created_at` DATETIME,
 	`updated_at` DATETIME,
 	`version` INTEGER,
+	`file_sync_version` INTEGER,
 	`views_version` INTEGER,
 	`partner_id` INTEGER,
 	`name` VARCHAR(31),

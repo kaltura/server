@@ -16,9 +16,9 @@ class XmlClientGenerator extends ClientGeneratorFromPhp
      */
     private $_requiredPlugins = array();
     
-    public function XmlClientGenerator()
+    public function __construct()
     {
-        parent::ClientGeneratorFromPhp();
+        parent::__construct();
         $this->_doc = new DOMDocument();
         $this->_doc->formatOutput = true; 
     }
@@ -166,6 +166,7 @@ class XmlClientGenerator extends ClientGeneratorFromPhp
 	private function appendConfiguration(DOMElement $configurationsElement, $name, $class)
 	{
 	    $configurationElement = $this->_doc->createElement($name);
+	    $configurationElement->setAttribute('type', $class);
 	    
 	    $reflectClass = new ReflectionClass($class);
 		$properties = $reflectClass->getProperties(ReflectionProperty::IS_PUBLIC);
@@ -180,6 +181,11 @@ class XmlClientGenerator extends ClientGeneratorFromPhp
 				if($parsedDocComment->alias)
 				{
 					$paramElement->setAttribute('alias', $parsedDocComment->alias);
+				}
+				
+				if($parsedDocComment->volatile)
+				{
+					$paramElement->setAttribute('volatile', true);
 				}
 				
 				if($parsedDocComment->description)
@@ -491,6 +497,7 @@ class XmlClientGenerator extends ClientGeneratorFromPhp
 		$description = $actionInfo->description;
 		$description = $this->fixDescription($description);
 	    $actionElement->setAttribute("description", kString::stripUtf8InvalidChars($description));
+		$actionElement->setAttribute("enableInMultiRequest", ($outputType === 'file' ? "0" : "1"));
 		
 		$actionElement->appendChild($resultElement);
 		

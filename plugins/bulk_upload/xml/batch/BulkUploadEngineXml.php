@@ -118,10 +118,12 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		$xdoc = new KDOMDocument();
 		
 		$this->xslTransformedContent = $this->xslTransform($this->data->filePath);
+		
+		KalturaLog::info("Tranformed content: " . $this->xslTransformedContent);
+		
 		libxml_clear_errors();
 		if(!$xdoc->loadXML($this->xslTransformedContent)){
 			$errorMessage = kXml::getLibXmlErrorDescription($this->xslTransformedContent);
-			KalturaLog::debug("Could not load xml");
 			throw new KalturaBatchException("Could not load xml [{$this->job->id}], $errorMessage", KalturaBatchJobAppErrors::BULK_VALIDATION_FAILED);
 		}
 		//Validate the XML file against the schema
@@ -135,7 +137,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		if(!$xdoc->schemaValidateSource($xsd))
 		{
 			$errorMessage = kXml::getLibXmlErrorDescription($this->xslTransformedContent);
-			KalturaLog::debug("XML is invalid:\n$errorMessage");
 			throw new KalturaBatchException("Validate files failed on job [{$this->job->id}], $errorMessage", KalturaBatchJobAppErrors::BULK_VALIDATION_FAILED);
 		}
 		
@@ -177,16 +178,15 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		libxml_clear_errors();
 		$xml = new KDOMDocument();
 		if(!$xml->loadXML($xdoc)){
-			KalturaLog::debug("Could not load xml");
 			$errorMessage = kXml::getLibXmlErrorDescription($xdoc);
 			throw new KalturaBatchException("Could not load xml [{$this->job->id}], $errorMessage", KalturaBatchJobAppErrors::BULK_VALIDATION_FAILED);
 		}
 		
 		libxml_clear_errors();
 		$proc = new XSLTProcessor;
+		$proc->registerPHPFunctions(kXml::getXslEnabledPhpFunctions());
 		$xsl = new KDOMDocument();
 		if(!$xsl->loadXML($this->conversionProfileXsl)){
-			KalturaLog::debug("Could not load xsl".$this->conversionProfileXsl);
 			$errorMessage = kXml::getLibXmlErrorDescription($this->conversionProfileXsl);
 			throw new KalturaBatchException("Could not load xsl [{$this->job->id}], $errorMessage", KalturaBatchJobAppErrors::BULK_VALIDATION_FAILED);
 		}
@@ -194,7 +194,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		libxml_clear_errors();
 		$transformedXml = $proc->transformToXML($xml);
 		if(!$transformedXml){
-			KalturaLog::debug("Could not transform xml".$this->conversionProfileXsl);
 			$errorMessage = kXml::getLibXmlErrorDescription($this->conversionProfileXsl);
 			throw new KalturaBatchException("Could not transform xml [{$this->job->id}], $errorMessage", KalturaBatchJobAppErrors::BULK_VALIDATION_FAILED);
 		}
@@ -298,7 +297,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	protected function handleChannel(SimpleXMLElement $channel)
 	{
 		$startIndex = $this->getStartIndex();
-		KalturaLog::debug("startIndex [$startIndex]");
 		
 		//Gets all items from the channel
 		foreach( $channel->item as $item)
@@ -419,8 +417,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 */
 	protected function handleItemUpdate(SimpleXMLElement $item)
 	{
-		KalturaLog::debug("xml [" . $item->asXML() . "]");
-		
 		$entryId = null;
 		$conversionProfileId = null;
 		if(isset($item->entryId))
@@ -450,7 +446,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		// Overwriting conversionProfileId if one is supplied in the XML
 		if(isset($item->conversionProfileId) || isset($item->conversionProfile))
 			$conversionProfileId = $this->getConversionProfileId($item);
-		KalturaLog::DEBUG("Conversion profile found within XML - setting to [ $conversionProfileId ]");
+		KalturaLog::info("Conversion profile found within XML - setting to [ $conversionProfileId ]");
 		
 		//Throw exception in case of max proccessed items and handle all exceptions there
 		$updatedEntryBulkUploadResult = $this->createUploadResult($item, KalturaBulkUploadAction::UPDATE);
@@ -461,7 +457,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		$entry = $this->createEntryFromItem($item, $existingEntry->type); //Creates the entry from the item element
 		
 		$this->handleTypedElement($entry, $item); //Sets the typed element values (Mix, Media, ...)
-		KalturaLog::debug("current entry is: " . print_r($entry, true));
 				
 		$thumbAssets = array();
 		$thumbAssetsResources = array();
@@ -511,7 +506,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		{
 			foreach ($item->contentAssets->content as $contentElement)
 			{
-				KalturaLog::debug("contentElement [" . print_r($contentElement->asXml(), true). "]");
+				KalturaLog::info("contentElement [" . print_r($contentElement->asXml(), true). "]");
 				
 				if(empty($contentElement)) // if the content is empty skip
 				{
@@ -528,11 +523,11 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 				$assetId = kXml::getXmlAttributeAsString($contentElement, "assetId");
 				if($assetId) // if we have an asset id then we need to update the asset
 				{
-					KalturaLog::debug("Asset id [ $assetId]");
+					KalturaLog::info("Asset id [ $assetId]");
 					$assetParamsId = $this->getAssetParamsIdFromAssetId($assetId, $entryId);
 				}
 			
-				KalturaLog::debug("assetParamsId [$assetParamsId]");
+				KalturaLog::info("assetParamsId [$assetParamsId]");
 							
 				if(is_null($assetParamsId)) // no params resource
 				{
@@ -563,7 +558,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 					continue;
 				}
 				
-				KalturaLog::debug("thumbElement [" . print_r($thumbElement->asXml(), true). "]");
+				KalturaLog::info("thumbElement [" . print_r($thumbElement->asXml(), true). "]");
 							
 				$thumbAsset = $this->getThumbAsset($thumbElement, $conversionProfileId);
 				$thumbAssetResource = $this->getResource($thumbElement, $conversionProfileId);
@@ -575,11 +570,11 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 				$assetId = kXml::getXmlAttributeAsString($thumbElement, "assetId");
 				if($assetId) // if we have an asset id then we need to update the asset
 				{
-					KalturaLog::debug("Asset id [ $assetId]");
+					KalturaLog::info("Asset id [ $assetId]");
 					$assetParamsId = $this->getAssetParamsIdFromAssetId($assetId, $entryId);
 				}
 							
-				KalturaLog::debug("assetParamsId [$assetParamsId]");
+				KalturaLog::info("assetParamsId [$assetParamsId]");
 				
 				if(is_null($assetParamsId))
 				{
@@ -683,7 +678,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 										array $noParamsThumbAssets, array $noParamsThumbResources)
 	{
 		
-		KalturaLog::debug("Resource is: " . print_r($resource, true));
+		KalturaLog::info("Resource is: " . print_r($resource, true));
 		
 		KBatchBase::impersonate($this->currentPartnerId);;
 		$updateEntry = $this->removeNonUpdatbleFields($entry);
@@ -775,8 +770,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 */
 	protected function handleItemAdd(SimpleXMLElement $item)
 	{
-		KalturaLog::debug("xml [" . $item->asXML() . "]");
-		
 		//Throw exception in case of  max proccessed items and handle all exceptions there
 		$createdEntryBulkUploadResult = $this->createUploadResult($item, KalturaBulkUploadAction::ADD);
 		if($this->exceededMaxRecordsEachRun) // exit if we have proccessed max num of items
@@ -785,7 +778,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		$entry = $this->createEntryFromItem($item); //Creates the entry from the item element
 		$this->handleTypedElement($entry, $item); //Sets the typed element values (Mix, Media, ...)
 		$entry->creatorId = $this->data->userId;
-		KalturaLog::debug("current entry is: " . print_r($entry, true));
 				
 		$thumbAssets = array();
 		$flavorAssets = array();
@@ -810,13 +802,13 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 				
 				if(is_null($flavorAsset->flavorParamsId))
 				{
-					KalturaLog::debug("flavorAsset [". print_r($flavorAsset, true) . "]");
+					KalturaLog::info("flavorAsset [". print_r($flavorAsset, true) . "]");
 					$noParamsFlavorAssets[] = $flavorAsset;
 					$noParamsFlavorResources[] = $assetResource;
 				}
 				else
 				{
-					KalturaLog::debug("flavorAsset->flavorParamsId [$flavorAsset->flavorParamsId]");
+					KalturaLog::info("flavorAsset->flavorParamsId [$flavorAsset->flavorParamsId]");
 					$flavorAssets[$flavorAsset->flavorParamsId] = $flavorAsset;
 					$assetResourceContainer->assetParamsId = $flavorAsset->flavorParamsId;
 					$assetResourceContainer->resource = $assetResource;
@@ -839,13 +831,13 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 				
 				if(is_null($thumbAsset->thumbParamsId))
 				{
-					KalturaLog::debug("thumbAsset [". print_r($thumbAsset, true) . "]");
+					KalturaLog::info("thumbAsset [". print_r($thumbAsset, true) . "]");
 					$noParamsThumbAssets[] = $thumbAsset;
 					$noParamsThumbResources[] = $assetResource;
 				}
 				else //we have a thumbParamsId so we add to the resources
 				{
-					KalturaLog::debug("thumbAsset->thumbParamsId [$thumbAsset->thumbParamsId]");
+					KalturaLog::info("thumbAsset->thumbParamsId [$thumbAsset->thumbParamsId]");
 					$thumbAssets[$thumbAsset->thumbParamsId] = $thumbAsset;
 					$assetResourceContainer->assetParamsId = $thumbAsset->thumbParamsId;
 					$assetResourceContainer->resource = $assetResource;
@@ -915,7 +907,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		KBatchBase::impersonate($this->currentPartnerId);;
 		KBatchBase::$kClient->startMultiRequest();
 		
-		KalturaLog::debug("Resource is: " . print_r($resource, true));
+		KalturaLog::info("Resource is: " . print_r($resource, true));
 		
 		KBatchBase::$kClient->baseEntry->add($entry); //Adds the entry
 		$newEntryId = KBatchBase::$kClient->getMultiRequestResult()->id;							// TODO: use the return value of add instead of getMultiRequestResult
@@ -1177,7 +1169,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 				{
 					if(!in_array($categoryName, $existingCategoryNames)) //Category does not exis
 					{
-						KalturaLog::debug("Creating a new category by the name [$categoryName]");
+						KalturaLog::info("Creating a new category by the name [$categoryName]");
 						$createdCategories[] = $this->createCategoryByPath($categoryName);
 					}
 				}
@@ -1198,7 +1190,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 				$categoryIdsToRemove = array_diff($existingCategoryIds, $requiredCategoryIds);
 				foreach($categoryIdsToRemove as $categoryIdToRemove)
 				{
-					KalturaLog::debug("Removing category ID [$categoryIdToRemove] from entry [$entryId]");
+					KalturaLog::info("Removing category ID [$categoryIdToRemove] from entry [$entryId]");
 					KBatchBase::$kClient->categoryEntry->delete($entryId, $categoryIdToRemove);
 				}
 			}
@@ -1210,7 +1202,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 				$categoryEntryToAdd = new KalturaCategoryEntry();
 				$categoryEntryToAdd->categoryId = $categoryIdToAdd;
 				$categoryEntryToAdd->entryId = $entryId;
-				KalturaLog::debug("Adding category ID [$categoryIdToAdd] to entry [$entryId]");
+				KalturaLog::info("Adding category ID [$categoryIdToAdd] to entry [$entryId]");
 				KBatchBase::$kClient->categoryEntry->add($categoryEntryToAdd);
 			}
 			
@@ -1248,9 +1240,9 @@ class BulkUploadEngineXml extends KBulkUploadEngine
             }
             catch (Exception $e)
             {
-                if ($e->getCode() == DUPLICATE_CATEGORY)
+                if ($e->getCode() == 'DUPLICATE_CATEGORY')
                 {
-                	KalturaLog::debug("Categroy [$fullNameEq] already exist");
+                	KalturaLog::info("Categroy [$fullNameEq] already exist");
                     $catFilter = new KalturaCategoryFilter();
                     $catFilter->fullNameEqual = $fullNameEq;
                     $res = KBatchBase::$kClient->category->listAction($catFilter);
@@ -1324,7 +1316,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 				
 			if(isset($elementToSearchIn->serverFileContentResource->fileChecksum)) //Check checksum if exists
 			{
-				KalturaLog::debug("Validating checksum");
 				if($elementToSearchIn->serverFileContentResource->fileChecksum['type'] == 'sha1')
 				{
 					 $checksum = sha1_file($filePath);
@@ -1344,8 +1335,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			
 			if(isset($elementToSearchIn->serverFileContentResource->fileSize)) //Check checksum if exists
 			{
-				KalturaLog::debug("Validating file size");
-				
 				$fileSize = kFile::fileSize($filePath);
 				$xmlFileSize = (int)$elementToSearchIn->serverFileContentResource->fileSize;
 				if($xmlFileSize != $fileSize)
@@ -1385,7 +1374,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		{
 			if($this->allowServerResource)
 			{
-				KalturaLog::debug("Resource is : serverFileContentResource");
 				$resource = new KalturaServerFileResource();
 				$localContentResource = $elementToSearchIn->serverFileContentResource;
 				$resource->localFilePath = kXml::getXmlAttributeAsString($localContentResource, "filePath");
@@ -1397,14 +1385,12 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		}
 		elseif(isset($elementToSearchIn->urlContentResource))
 		{
-			KalturaLog::debug("Resource is : urlContentResource");
 			$resource = new KalturaUrlResource();
 			$urlContentResource = $elementToSearchIn->urlContentResource;
 			$resource->url = kXml::getXmlAttributeAsString($urlContentResource, "url");
 		}
 		elseif(isset($elementToSearchIn->sshUrlContentResource))
 		{
-			KalturaLog::debug("Resource is : sshUrlContentResource");
 			$resource = new KalturaSshUrlResource();
 			$sshUrlContentResource = $elementToSearchIn->sshUrlContentResource;
 			$resource->url = kXml::getXmlAttributeAsString($sshUrlContentResource, "url");
@@ -1414,7 +1400,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		}
 		elseif(isset($elementToSearchIn->remoteStorageContentResource))
 		{
-			KalturaLog::debug("Resource is : remoteStorageContentResource");
 			$resource = new KalturaRemoteStorageResource();
 			$remoteContentResource = $elementToSearchIn->remoteStorageContentResource;
 			$resource->url = kXml::getXmlAttributeAsString($remoteContentResource, "url");
@@ -1422,7 +1407,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		}
 		elseif(isset($elementToSearchIn->remoteStorageContentResources))
 		{
-			KalturaLog::debug("Resource is : remoteStorageContentResources");
 			$resource = new KalturaRemoteStorageResources();
 			$resource->resources = array();
 			$remoteContentResources = $elementToSearchIn->remoteStorageContentResources;
@@ -1430,7 +1414,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			foreach($remoteContentResources->remoteStorageContentResource as $remoteContentResource)
 			{
 				/* @var $remoteContentResource SimpleXMLElement */
-				KalturaLog::debug("Resources name [" . $remoteContentResource->getName() . "] url [" . $remoteContentResource['url'] . "] storage [$remoteContentResource->storageProfile]");
+				KalturaLog::info("Resources name [" . $remoteContentResource->getName() . "] url [" . $remoteContentResource['url'] . "] storage [$remoteContentResource->storageProfile]");
 				$childResource = new KalturaRemoteStorageResource();
 				$childResource->url = kXml::getXmlAttributeAsString($remoteContentResource, "url");
 				$childResource->storageProfileId = $this->getStorageProfileId($remoteContentResource);
@@ -1439,7 +1423,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		}
 		elseif(isset($elementToSearchIn->entryContentResource))
 		{
-			KalturaLog::debug("Resource is : entryContentResource");
 			$resource = new KalturaEntryResource();
 			$entryContentResource = $elementToSearchIn->entryContentResource;
 			$resource->entryId = kXml::getXmlAttributeAsString($entryContentResource, "entryId");
@@ -1447,7 +1430,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		}
 		elseif(isset($elementToSearchIn->assetContentResource))
 		{
-			KalturaLog::debug("Resource is : assetContentResource");
 			$resource = new KalturaAssetResource();
 			$assetContentResource = $elementToSearchIn->assetContentResource;
 			$resource->assetId = kXml::getXmlAttributeAsString($assetContentResource, "assetId");
@@ -1545,12 +1527,12 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	{
 		$conversionProfileId = $this->getConversionProfileIdFromElement($elementToSearchIn);
 		
-		KalturaLog::debug("conversionProfileid from element [ $conversionProfileId ]");
+		KalturaLog::info("conversionProfileid from element [ $conversionProfileId ]");
 		
 		if(is_null($conversionProfileId)) // if we didn't set it in the item element
 		{
 			$conversionProfileId = $this->data->conversionProfileId;
-			KalturaLog::debug("conversionProfileid from data [ $conversionProfileId ]");
+			KalturaLog::info("conversionProfileid from data [ $conversionProfileId ]");
 		}
 		
 		if(is_null($conversionProfileId)) // if we didn't set it in the item element
@@ -1565,7 +1547,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			}
 			
 			$conversionProfileId = $this->defaultConversionProfileId;
-			KalturaLog::debug("conversionProfileid from default [ $conversionProfileId ]");
+			KalturaLog::info("conversionProfileid from default [ $conversionProfileId ]");
 		}
 		
 		return $conversionProfileId;
@@ -1735,8 +1717,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		KBatchBase::unimpersonate();
 		$allFlavorParams = $allFlavorParams->objects;
 		
-//		KalturaLog::debug("allFlavorParams [" . print_r($allFlavorParams, true). "]");
-		
 		foreach ($allFlavorParams as $flavorParams)
 		{
 			if($flavorParams->systemName)
@@ -1744,8 +1724,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			else //NO system name so we add them to a default name
 				$this->assetParamsNameToIdPerConversionProfile[$conversionProfileId]["NO SYSTEM NAME $flavorParams->assetParamsId"] = $flavorParams->assetParamsId;
 		}
-		
-//		KalturaLog::debug("new assetParamsNameToIdPerConversionProfile [" . print_r($this->assetParamsNameToIdPerConversionProfile, true). "]");
 	}
 	
 	/**
@@ -1761,8 +1739,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		KBatchBase::unimpersonate();
 		$allAccessControl = $allAccessControl->objects;
 		
-//		KalturaLog::debug("allAccessControl [" . print_r($allAccessControl, true). "]");
-		
 		foreach ($allAccessControl as $accessControl)
 		{
 			if($accessControl->systemName)
@@ -1771,8 +1747,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 				$this->accessControlNameToId["No system name " ."$accessControl->id"] = $accessControl->id;
 			
 		}
-		
-//		KalturaLog::debug("new accessControlNameToId [" . print_r($this->accessControlNameToId, true). "]");
 	}
 
 	/**
@@ -1786,9 +1760,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		$allThumbAssets = KBatchBase::$kClient->thumbAsset->getByEntryId($entryId);
 		KBatchBase::unimpersonate();
 						
-//		KalturaLog::debug("allFlavorAssets [" . print_r($allFlavorAssets, true). "]");
-//		KalturaLog::debug("allThumbAssets [" . print_r($allThumbAssets, true). "]");
-		
 		foreach ($allFlavorAssets as $flavorAsset)
 		{
 			if(!is_null($flavorAsset->id)) //Should always have an id
@@ -1800,8 +1771,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			if(!is_null($thumbAsset->id)) //Should always have an id
 				$this->assetIdToAssetParamsId[$entryId][$thumbAsset->id] = $thumbAsset->thumbParamsId;
 		}
-		
-//		KalturaLog::debug("new assetIdToAssetParamsId [" . print_r($this->assetIdToAssetParamsId, true). "]");
 	}
 	
 	/**
@@ -1817,8 +1786,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		KBatchBase::unimpersonate();
 		$allConversionProfile = $allConversionProfile->objects;
 		
-//		KalturaLog::debug("allConversionProfile [" . print_r($allConversionProfile,true) ." ]");
-		
 		foreach ($allConversionProfile as $conversionProfile)
 		{
 			$systemName = $conversionProfile->systemName;
@@ -1827,8 +1794,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			else //NO system name so we add them to a default name
 				$this->conversionProfileNameToId["No system name " ."{$conversionProfile->id}"] = $conversionProfile->id;
 		}
-		
-//		KalturaLog::debug("new conversionProfileNameToId [" . print_r($this->conversionProfileNameToId, true). "]");
 	}
 
 	/**
@@ -1844,8 +1809,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		KBatchBase::unimpersonate();
 		$allStorageProfiles = $allStorageProfiles->objects;
 		
-//		KalturaLog::debug("allStorageProfiles [" . print_r($allStorageProfiles,true) ." ]");
-		
 		foreach ($allStorageProfiles as $storageProfile)
 		{
 			if($storageProfile->systemName)
@@ -1853,8 +1816,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			else //NO system name so we add them to a default name
 				$this->storageProfileNameToId["No system name " ."{$storageProfile->id}"] = $storageProfile->id;
 		}
-		
-//		KalturaLog::debug("new storageProfileNameToId [" . print_r($this->storageProfileNameToId, true). "]");
 	}
 		
 	/**
@@ -2134,7 +2095,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		}
 		
 		$ret = implode(',', $ret);
-		KalturaLog::debug("The created string [$ret]");
 		return $ret;
 	}
 
@@ -2168,8 +2128,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		
 		//TODO: What should we write in the bulk upload result for update?
 		//only the changed parameters or just the one theat was changed
-//		KalturaLog::debug("Creating upload result");
-		KalturaLog::debug("this->handledRecordsThisRun [$this->handledRecordsThisRun], this->maxRecordsEachRun [$this->maxRecordsEachRun]");
 					
 		$bulkUploadResult = new KalturaBulkUploadResultEntry();
 		$bulkUploadResult->status = KalturaBulkUploadResultStatus::IN_PROGRESS;

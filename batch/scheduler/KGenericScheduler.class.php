@@ -28,6 +28,7 @@ class KGenericScheduler
 	private $schedulerStatusInterval;
 	private $nextStatusTime = 0;
 	private $nextSchedulerStatusTime = 0;
+	private $logWorkerInterval;
 
 	/**
 	 * Stores all groups of tasks, the index is the task type
@@ -52,6 +53,12 @@ class KGenericScheduler
 	 * @var array
 	 */
 	private $queueSizes = array();
+
+	/**
+	 * Stores the last time each worker had a log issued.
+	 * @var array
+	 */
+	private $lastWorkerLog = array();
 
 	/**
 	 * @param string $phpPath
@@ -115,7 +122,8 @@ class KGenericScheduler
 		$this->schedulerStatusInterval = $this->schedulerConfig->getSchedulerStatusInterval();
 		KDwhClient::setEnabled($this->schedulerConfig->getDwhEnabled());
 		KDwhClient::setFileName($this->schedulerConfig->getDwhPath());
-		
+		$this->logWorkerInterval = $this->schedulerConfig->getLogWorkerInterval();
+
 		$taskConfigsValidations = array();
 		foreach($taskConfigs as $taskConfig)
 		{
@@ -142,7 +150,6 @@ class KGenericScheduler
 			$subConfigItems = $this->createConfigItem($taskConfig->toArray(), $taskConfig->id, $taskConfig->name);
 			$configItems = array_merge($configItems, $subConfigItems);
 		}
-		KalturaLog::info("sending configuration to the server");
 		KScheduleHelperManager::saveConfigItems($configItems);
 	}
 	
@@ -181,7 +188,6 @@ class KGenericScheduler
 
 	public function run()
 	{
-		KalturaLog::debug("Running");
 		$startTime = time();
 
 		while($this->keepRunning)
@@ -189,8 +195,7 @@ class KGenericScheduler
 			$this->loop();
 		}
 
-		KalturaLog::info("-- Done --");
-		KalturaLog::debug("ended after [" . (time() - $startTime) . "] seconds");
+		KalturaLog::debug("Ended after [" . (time() - $startTime) . "] seconds");
 	}
 
 	public function loop()
@@ -325,6 +330,11 @@ class KGenericScheduler
 				return false;
 		}
 
+		if ($this->shouldPrintWorkerLog($taskConfig->id))
+		{
+			KalturaLog::debug("Worker [{$taskConfig->name}] id [{$taskConfig->id}] running batches [$runningBatches] max instances [{$taskConfig->maxInstances}]");
+			$this->lastWorkerLog[$taskConfig->id] = time();
+		}
 		if($runningBatches >= $taskConfig->maxInstances)
 			return false;
 
@@ -728,5 +738,21 @@ class KGenericScheduler
 		$event->host_name = $this->schedulerConfig->getName();
 
 		KDwhClient::send($event);
+	}
+
+	private function shouldPrintWorkerLog($taskConfigId)
+	{
+		if (!isset($this->lastWorkerLog[$taskConfigId]))
+		{
+			return true;
+		}
+		if ($this->logWorkerInterval <= 0)
+		{
+			return false;
+		}
+		if (time() >= ($this->lastWorkerLog[$taskConfigId] + $this->logWorkerInterval) )
+		{
+			return true;
+		}
 	}
 }

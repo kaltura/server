@@ -99,7 +99,7 @@ function handleFile($filePath)
 					return $this;
 				}
 				
-				protected function doSave(PropelPDO $con)
+				protected function doSave(PropelPDO $con,$skipReload = false)
 				{
 					$affectedRows = 0; // initialize var to track total num of affected rows
 					if (!$this->alreadyInSave) {
@@ -178,6 +178,11 @@ function handleFile($filePath)
 					throw new Exception("Attribute [$attributeName] file path [$value] not found");
 
 				$value = file_get_contents($valueFilePath);
+			}
+			
+			if(preg_match('/^#[^#]+$/', $value))
+			{
+			    $value = kPluginableEnumsManager::genericApiToCore(substr($value, 1));
 			}
 
 			$setters[$setter] = $value;

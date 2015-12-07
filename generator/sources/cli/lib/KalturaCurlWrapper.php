@@ -64,7 +64,7 @@ class KalturaCurlWrapper
 		}
 		else if ($params)
 		{	
-			$url .= '&' . http_build_query($params);
+			$url .= '?' . http_build_query($params);
 		}
 		curl_setopt($ch, CURLOPT_URL, $url);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);

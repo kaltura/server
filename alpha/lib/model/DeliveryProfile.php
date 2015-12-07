@@ -5,9 +5,15 @@
  * @package Core
  * @subpackage model
  */
-abstract class DeliveryProfile extends BaseDeliveryProfile {
+abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObject
+{
+	abstract protected function buildServeFlavors();
 	
 	protected $DEFAULT_RENDERER_CLASS = 'kF4MManifestRenderer';
+	
+	const DYNAMIC_ATTRIBUTES_FULL_SUPPORT = 0;		// the profile fully supports the required attirbutes
+	const DYNAMIC_ATTRIBUTES_PARTIAL_SUPPORT = 1;	// the profile may support the required attirbutes however its better to try and find a more suitable profile
+	const DYNAMIC_ATTRIBUTES_NO_SUPPORT = 2;		// the profile doesn't support the required attirbutes
 	
 	/**
 	 * @var DeliveryProfileDynamicAttributes
@@ -18,6 +24,21 @@ abstract class DeliveryProfile extends BaseDeliveryProfile {
 	{
 		parent::__construct();
 		$this->params = new DeliveryProfileDynamicAttributes();
+	}
+	
+	public function serve()
+	{
+		$flavors = $this->buildServeFlavors();
+		
+		if(!$flavors)
+			return null;
+		
+		if($this->params->getEdgeServerIds() && count($this->params->getEdgeServerIds()))
+			$this->applyFlavorsDomainPrefix($flavors);
+		
+		$renderer = $this->getRenderer($flavors);
+		
+		return $renderer;
 	}
 	
 	/**
@@ -33,6 +54,37 @@ abstract class DeliveryProfile extends BaseDeliveryProfile {
 		$newObject->setTokenizer($this->getTokenizer());
 		$newObject->save(null, true);
 		return $newObject;
+	}
+
+	/**
+	 * @param string $protocol
+	 * @return boolean
+	 */
+	public function isProtocolSupported($protocol) {
+		if(!$this->getMediaProtocols()){ // null means all protocols are allowed
+			return true;
+		}
+
+		$mediaProtocols = explode(',', $this->getMediaProtocols());
+		return in_array($protocol, $mediaProtocols);
+	}
+
+	/**
+	 * returns whether the delivery profile supports the passed deliveryAttributes such as mediaProtocol, flv support, etc..
+	 * @param DeliveryProfileDynamicAttributes $deliveryAttributes
+	 */
+	public function supportsDeliveryDynamicAttributes(DeliveryProfileDynamicAttributes $deliveryAttributes) {
+		if(!$deliveryAttributes->getMediaProtocol())
+			return self::DYNAMIC_ATTRIBUTES_FULL_SUPPORT;
+
+ 		if(!is_null($this->getMediaProtocols()))
+		{
+			$supportedProtocols = explode(",", $this->getMediaProtocols());
+			if(!in_array($deliveryAttributes->getMediaProtocol(), $supportedProtocols)) 
+				return self::DYNAMIC_ATTRIBUTES_NO_SUPPORT;
+		}
+		
+		return self::DYNAMIC_ATTRIBUTES_FULL_SUPPORT;
 	}
 	
 	/**
@@ -165,8 +217,8 @@ abstract class DeliveryProfile extends BaseDeliveryProfile {
 		return $this->params->setEntryId($entryId);
 	}
 	
-	public function setStorageProfileId($storageProfileId) {
-		return $this->params->setStorageProfileId($storageProfileId);
+	public function setStorageId($storageId) {
+		return $this->params->setStorageId($storageId);
 	}
 	
 	// -------------------------------------
@@ -215,6 +267,32 @@ abstract class DeliveryProfile extends BaseDeliveryProfile {
 		return $renderer;
 	}
 	
+	protected function getAudioLanguage($flavor) 
+	{
+		$mediaInfoObj = mediaInfoPeer::retrieveByFlavorAssetId($flavor->getId());
+		if (!$mediaInfoObj) 
+			return null;
+		
+		$contentStreams = $mediaInfoObj->getContentStreams();
+		if (!isset($contentStreams)) 
+			return null;
+		
+		$parsedJson = json_decode($contentStreams,true);
+		if (!isset($parsedJson['audio'][0]['audioLanguage'])) 
+			return null;
+		
+		$audioLanguage = $parsedJson['audio'][0]['audioLanguage'];
+		if (defined('LanguageKey::' . strtoupper($audioLanguage))) {
+			$audioLanguageName = constant('LanguageKey::' . strtoupper($audioLanguage));
+		}
+		else {
+			$audioLanguageName = "Unknown ($audioLanguage)";
+			KalturaLog::info("Language code [$audioLanguage] was not found. Setting [$audioLanguageName] instead");	                    
+		}
+	    
+		return array($audioLanguage, $audioLanguageName);
+	}
+	
 	/**
 	 * @param string $url
 	 * @param string $urlPrefix
@@ -224,9 +302,23 @@ abstract class DeliveryProfile extends BaseDeliveryProfile {
 	protected function getFlavorAssetInfo($url, $urlPrefix = '', $flavor = null)
 	{
 		$ext = null;
-		if ($flavor && is_callable(array($flavor, 'getFileExt')))
-		{
-			$ext = $flavor->getFileExt();
+		$audioLanguage = null;
+		$audioLanguageName = null;
+		if ($flavor) {
+			if (is_callable(array($flavor, 'getFileExt'))) {
+				$ext = $flavor->getFileExt();
+			}
+			//Extract the audio language code from flavor
+			if ($flavor->hasTag(assetParams::TAG_AUDIO_ONLY)) {
+				$audioLanguageData = $this->getAudioLanguage($flavor);
+				if (!$audioLanguageData) {
+					$audioLanguage = 'und';
+					$audioLanguageName = 'Undefined';
+				}
+				else {
+					list($audioLanguage, $audioLanguageName) = $audioLanguageData;
+				}
+			}
 		}
 		if (!$ext)
 		{
@@ -246,11 +338,50 @@ abstract class DeliveryProfile extends BaseDeliveryProfile {
 				'ext' => $ext,
 				'bitrate' => $bitrate,
 				'width' => $width,
-				'height' => $height);
+				'height' => $height,
+				'audioLanguage' => $audioLanguage,
+				'audioLanguageName' => $audioLanguageName);
 	}
 	
 	public function getCacheInvalidationKeys()
 	{
 		return array("deliveryProfile:id=".strtolower($this->getId()), "deliveryProfile:partnerId=".strtolower($this->getPartnerId()));
 	}
+	
+	public function applyFlavorsDomainPrefix(&$flavors)
+	{
+		foreach ($flavors as &$flavor)
+		{
+			if(isset($flavor['domainPrefix']))
+				continue;
+			
+			$domainPrefix = $this->getDeliveryServerNodeUrl();
+			if($domainPrefix)
+				$flavor['domainPrefix'] = $domainPrefix;
+		}
+	}
+	
+	public function getDeliveryServerNodeUrl($removeAfterUse = false)
+	{
+		$deliveryUrl = null;
+	
+		$deliveryNodeIds = $this->params->getEdgeServerIds();
+		$deliveryNodes = ServerNodePeer::retrieveOrderedServerNodesArrayByPKs($deliveryNodeIds);
+	
+		if(!count($deliveryNodes))
+		{
+			KalturaLog::debug("No active delivery nodes found among the requested edge list: " . print_r($deliveryNodeIds, true));
+			return null;
+		}
+	
+		/* @var $deliveryNode EdgeServerNode */
+		$deliveryNode = array_shift($deliveryNodes);
+		$deliveryUrl = $deliveryNode->getPlaybackHost($this->params->getMediaProtocol(), $this->params->getFormat(), $this->getType());
+	
+		if(count($deliveryNodes) && $removeAfterUse)
+			$this->params->setEdgeServerIds(array_diff($deliveryNodeIds, array($deliveryNode->getId())));
+	
+		return $deliveryUrl;
+	}
+	
 } 

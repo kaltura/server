@@ -11,13 +11,13 @@ class DeliveryProfileVodPackagerDash extends DeliveryProfileDash {
 	{
 		$url = parent::doGetFlavorAssetUrl($flavorAsset);
 		$url .= '/forceproxy/true';
-
 		if($this->params->getFileExtension())
 			$url .= "/name/a." . $this->params->getFileExtension();
+		$url .= VodPackagerDeliveryUtils::getExtraParams($this->params);
 		return $url;
 	}
 	
-	public function serve()
+	public function buildServeFlavors()
 	{
 		$flavors = $this->buildHttpFlavorsArray();
 		
@@ -27,6 +27,6 @@ class DeliveryProfileVodPackagerDash extends DeliveryProfileDash {
 				'/manifest.mpd', 
 				$this->params);
 		
-		return $this->getRenderer(array($flavor));
+		return array($flavor);
 	}
 }

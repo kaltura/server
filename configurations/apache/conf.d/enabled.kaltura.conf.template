@@ -1,7 +1,7 @@
 ProxyTimeout 30
 ServerName @KALTURA_VIRTUAL_HOST_NAME@
 DocumentRoot "@APP_DIR@/alpha/web"
-LogFormat "%h %l %u %t \"%r\" %>s %b %T/%D \"%{Referer}i\" \"%{User-Agent}i\" \"%{uv}C\" %a \"%{X-Kaltura}o\" \"%{HOST}i\"" vhost_kalt
+LogFormat "%h %l %u %t \"%r\" %>s %O %T/%D \"%{Referer}i\" \"%{User-Agent}i\" \"%{uv}C\" %a \"%{X-Kaltura}o\" \"%{HOST}i\" %P %{X-Kaltura-Session}o %X %I \"%{Content-Range}o\" \"%{X-FORWARDED-FOR}i\" \"%{X-FORWARDED-SERVER}i\" \"%{X-FORWARDED-HOST}i\" \"%{Cache-Control}o\" %{Kaltura_PartnerId}n" vhost_kalt
 DirectoryIndex index.html
 
 DeflateFilterNote Ratio ratio
@@ -135,7 +135,7 @@ Alias /sf "/usr/share/pear/data/symfony/web/sf/"
 	RewriteRule ^krecord/(.*)$ /index.php/extwidget/krecord/$1 [L]
 	RewriteRule ^kgeneric/(.*)$ /index.php/extwidget/kgeneric/$1 [L]
 	
-	RewriteRule ^api/(.*)$ /index.php/partnerservices2/$1 [L]
+	RewriteRule ^api/(.*)$ /api_v3/index.php/$1 [L]
 	
 	RewriteRule ^p/[-0-9]+/content/(.*)$ /content/$1 [L]
 	RewriteRule ^p/[-0-9]+/sp/[-0-9]+/content/(.*)$ /content/$1 [L]
@@ -154,10 +154,10 @@ Alias /sf "/usr/share/pear/data/symfony/web/sf/"
 	RewriteRule clientTest/api_v3/index.php /api_v3/web/clientTest.php [L]
 					
 	RedirectMatch permanent ^/tiny/([0-9a-z]{4,})$ /api_v3/index.php?service=shortLink_shortLink\&action=goto\&id=$1	
-	RedirectMatch permanent ^/api_v3/service/(.*)$ /api_v3/index.php/service/$1
+	RewriteRule api_v3/service/(.*)$ api_v3/index.php/service/$1 [L]
 
 	RewriteCond %{HTTPS} ON
-	RewriteRule ^/api_v3/service/(.*)$ https://%{SERVER_NAME}//api_v3/index.php/service/$1 [R=301,L]
+	RewriteRule api_v3/service/(.*)$ https://%{SERVER_NAME}//api_v3/index.php/service/$1 [R=301,L]
 
     Options FollowSymLinks ExecCGI Includes
     AllowOverride None
@@ -181,7 +181,6 @@ Alias /start "@APP_DIR@/start"
 
 Alias /content/uiconf "@WEB_DIR@/content/uiconf"
 <Directory "@WEB_DIR@/content/uiconf">
-        AddHandler cgi-script .php .pl .py .jsp .asp .htm .shtml .sh .cgi
         Options -ExecCGI
         SetEnv force-no-vary
 
@@ -197,10 +196,9 @@ Alias /content/uiconf "@WEB_DIR@/content/uiconf"
 
 Alias /content "@WEB_DIR@/content"
 <Directory "@WEB_DIR@/content">
-	#AddHandler cgi-script .php .pl .py .jsp .asp .htm .shtml .sh .cgi
-	#Options -ExecCGI
+	Options -ExecCGI -Indexes
 	SetEnv force-no-vary
-
+	php_flag engine off
 	ExpiresActive On
 	ExpiresDefault "access plus 3 month"
 	Header unset ETag

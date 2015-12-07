@@ -13,7 +13,7 @@
  * @package plugins.contentDistribution
  * @subpackage model
  */
-class EntryDistributionPeer extends BaseEntryDistributionPeer 
+class EntryDistributionPeer extends BaseEntryDistributionPeer implements IRelatedObjectPeer
 {
 	/** the search index column name for the NEXT_REPORT field */
 	const NEXT_REPORT = 'entry_distribution.NEXT_REPORT';
@@ -119,5 +119,32 @@ class EntryDistributionPeer extends BaseEntryDistributionPeer
 	public static function getCacheInvalidationKeys()
 	{
 		return array(array("entryDistribution:entryId=%s", self::ENTRY_ID));		
+	}
+	
+	/* (non-PHPdoc)
+	 * @see IRelatedObjectPeer::getRootObjects()
+	 */
+	public function getRootObjects(IRelatedObject $object)
+	{
+		/* @var $object EntryDistribution */
+		$roots = array();
+		
+		$distributionProfile = DistributionProfilePeer::retrieveByPK($object->getDistributionProfileId());
+		if($distributionProfile)
+			$roots[] = $distributionProfile;
+		
+		$entry = entryPeer::retrieveByPK($object->getEntryId());
+		if($entry)
+			$roots[] = $entry;
+			
+		return $roots;
+	}
+
+	/* (non-PHPdoc)
+	 * @see IRelatedObjectPeer::isReferenced()
+	 */
+	public function isReferenced(IRelatedObject $object)
+	{
+		return false;
 	}
 } // EntryDistributionPeer

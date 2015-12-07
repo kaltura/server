@@ -93,6 +93,11 @@ class KalturaMetadataProfile extends KalturaObject implements IFilterable
 	 * @filter eq,not,in,notin
 	 */
 	public $createMode;
+
+	/**
+	 * @var bool
+	 */
+	public $disableReIndexing;
 	
 	private static $map_between_objects = array
 	(
@@ -107,6 +112,7 @@ class KalturaMetadataProfile extends KalturaObject implements IFilterable
 		"updatedAt",
 		"status",
 		"createMode",
+		"disableReIndexing",
 	);
 	
 	public function getMapBetweenObjects()

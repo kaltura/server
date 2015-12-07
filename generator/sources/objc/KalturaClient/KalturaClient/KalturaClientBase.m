@@ -33,7 +33,7 @@
 /*
  String constants
  */
-static NSString* const KalturaServiceBaseUrl = @"/api_v3/index.php";
+static NSString* const KalturaServiceBaseUrl = @"/api_v3";
 static NSString* const KalturaServiceFormatXml = @"2";
 NSString* const KalturaClientErrorDomain = @"KalturaClientErrorDomain";
 

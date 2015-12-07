@@ -22,7 +22,7 @@ abstract class LiveReportEngine
 
 		foreach ($response->objects as $object) {
 			if ($object->dvrStatus) {
-				KalturaLog::debug("Found entry with DVR status = true: " . $object->id);
+				KalturaLog::info("Found entry with DVR status = true: " . $object->id);
 				return true;
 			}
 		}

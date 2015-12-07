@@ -33,6 +33,7 @@ class kSessionBase
 	const PRIVILEGE_ACTIONS_LIMIT = "actionslimit";
 	const PRIVILEGE_SET_ROLE = "setrole";
 	const PRIVILEGE_IP_RESTRICTION = "iprestrict";
+	const PRIVILEGE_URI_RESTRICTION = "urirestrict";
 	const PRIVILEGE_ENABLE_ENTITLEMENT = "enableentitlement";
 	const PRIVILEGE_DISABLE_ENTITLEMENT = "disableentitlement";
 	const PRIVILEGE_DISABLE_ENTITLEMENT_FOR_ENTRY = "disableentitlementforentry";
@@ -43,6 +44,7 @@ class kSessionBase
 	const PRIVILEGE_PREVIEW = "preview";
 	const PRIVILEGE_SESSION_ID = "sessionid";
 	const PRIVILEGE_BATCH_JOB_TYPE = "jobtype";
+	const PRIVILEGE_APP_TOKEN = "apptoken";
 	const PRIVILEGES_DELIMITER = "/";
 
 	const SECRETS_CACHE_PREFIX = 'partner_secrets_ksver_';
@@ -59,6 +61,7 @@ class kSessionBase
 	const INVALID_LKS = -7;
 	const EXCEEDED_ACTIONS_LIMIT = -8;
 	const EXCEEDED_RESTRICTED_IP = -9;
+	const EXCEEDED_RESTRICTED_URI = -11;		// skipping -10 since it's Partner::VALIDATE_LKS_DISABLED
 	const UNKNOWN = 0;
 	const OK = 1;
 	
@@ -154,6 +157,48 @@ class kSessionBase
 		return true;
 	}
 	
+	public static function buildPrivileges(array $array)
+	{
+		$privileges = array();
+		foreach($array as $privilegeName => $privilegeValue)
+		{
+			if(count($privilegeValue))
+			{
+				$privilegeValue = implode(self::PRIVILEGES_DELIMITER, $privilegeValue);
+				$privileges[] = "$privilegeName:$privilegeValue";
+			}
+			else
+			{
+				$privileges[] = $privilegeName;
+			}
+		}
+		return implode(',', $privileges);
+	}
+	
+	public static function parsePrivileges($str)
+	{
+		$parsedPrivileges = array();
+		$privileges = explode(',', $str);
+		foreach ($privileges as $privilege)
+		{
+			list($privilegeName, $privilegeValue) = strpos($privilege, ":") !== false ? explode(':', $privilege, 2) : array($privilege, null);
+			if (!is_null($privilegeValue) && strlen($privilegeValue))
+			{
+				$privilegeValue = explode(self::PRIVILEGES_DELIMITER, $privilegeValue);
+			}
+			if (!isset($parsedPrivileges[$privilegeName]))
+			{
+				$parsedPrivileges[$privilegeName] = array();
+			}
+			if (is_array($privilegeValue) && count($privilegeValue))
+			{
+				$parsedPrivileges[$privilegeName] = array_merge($parsedPrivileges[$privilegeName], $privilegeValue);
+			}
+		}
+		
+		return $parsedPrivileges;
+	}
+	
 	public function parseKsV1($str)
 	{
 		$explodedStr = explode( "|" , $str , 2 );
@@ -180,7 +225,7 @@ class kSessionBase
 			return null;
 		}
 
-		if (sha1($salt . $real_str) != $hash)
+		if (sha1($salt . $real_str) !== $hash)
 		{
 			$this->logError("Hash [$hash] doesn't match the sha1 on the salt on partner [$partnerId].");
 			return false;
@@ -204,26 +249,7 @@ class kSessionBase
 		if(isset($parts[6]))
 			$this->privileges = $parts[6];
 
-		$parsedPrivileges = array();
-		$privileges = explode(',', $this->privileges);
-		foreach ($privileges as $privilege)
-		{
-			list($privilegeName, $privilegeValue) = strpos($privilege, ":") !== false ? explode(':', $privilege, 2) : array($privilege, null);
-			if (!is_null($privilegeValue) && strlen($privilegeValue))
-			{
-				$privilegeValue = explode(self::PRIVILEGES_DELIMITER, $privilegeValue);
-			}
-			if (!isset($parsedPrivileges[$privilegeName]))
-			{
-				$parsedPrivileges[$privilegeName] = array();
-			}
-			if (is_array($privilegeValue) && count($privilegeValue))
-			{
-				$parsedPrivileges[$privilegeName] = array_merge($parsedPrivileges[$privilegeName], $privilegeValue);
-			}
-		}
-		
-		$this->parsedPrivileges = $parsedPrivileges;
+		$this->parsedPrivileges = self::parsePrivileges($this->privileges);
 			
 		if(isset($parts[7]))
 			$this->master_partner_id = $parts[7];
@@ -358,7 +384,7 @@ class kSessionBase
 		return $this->partner_id;
 	}
 	
-	public function tryToValidateKS()
+	public function isValidBase()
 	{
 		if (!$this->real_str || !$this->hash)
 			return self::INVALID_STR;			// KS parsing failed
@@ -366,22 +392,36 @@ class kSessionBase
 		if ($this->valid_until <= time())
 			return self::EXPIRED;				// KS is expired
 			
-		if ($this->partner_id == -1 ||			// Batch KS are never invalidated
-			$this->isWidgetSession())			// Since anyone can create a widget session, no need to check for invalidation
-			return self::OK;
-
-		$allPrivileges = explode(',', $this->privileges);
-		foreach($allPrivileges as $priv)
+		if (array_key_exists(self::PRIVILEGE_IP_RESTRICTION, $this->parsedPrivileges) &&
+			!in_array(infraRequestUtils::getRemoteAddress(), $this->parsedPrivileges[self::PRIVILEGE_IP_RESTRICTION]))
 		{
-			$exPrivileges = explode(':', $priv);
-			if (count($exPrivileges) == 2 && 
-				$exPrivileges[0] == self::PRIVILEGE_IP_RESTRICTION &&
-				$exPrivileges[1] != infraRequestUtils::getRemoteAddress())
+			return self::EXCEEDED_RESTRICTED_IP;
+		}
+		
+		if (array_key_exists(self::PRIVILEGE_URI_RESTRICTION, $this->parsedPrivileges))
+		{
+			$value = implode(self::PRIVILEGES_DELIMITER, $this->parsedPrivileges[self::PRIVILEGE_URI_RESTRICTION]);
+			if ($_SERVER["REQUEST_URI"] != $value &&		// exact match
+				(substr($value, -1) != '*' || 				// prefix match
+				substr($_SERVER["REQUEST_URI"], 0, strlen($value) - 1) != substr($value, 0, -1)))
 			{
-				return self::EXCEEDED_RESTRICTED_IP;
+				return self::EXCEEDED_RESTRICTED_URI;
 			}
 		}
 
+		return self::OK;
+	}
+	
+	public function tryToValidateKS()
+	{
+		$result = $this->isValidBase();
+		if ($result != self::OK)
+			return $result;
+		
+		if ($this->partner_id == -1 ||			// Batch KS are never invalidated
+			$this->isWidgetSession())			// Since anyone can create a widget session, no need to check for invalidation
+			return self::OK;
+		
 		$isInvalidated = $this->isKSInvalidated();
 		if ($isInvalidated)
 			return self::LOGOUT;
@@ -506,7 +546,7 @@ class kSessionBase
 		
 		$hash = substr($decKs, 0, self::SHA1_SIZE);
 		$fields = substr($decKs, self::SHA1_SIZE);
-		if ($hash != sha1($fields, true))
+		if ($hash !== sha1($fields, true))
 		{
 			$this->logError("Hash [$hash] doesn't match sha1 on partner [$partnerId].");
 			return false;						// invalid signature
@@ -553,10 +593,15 @@ class kSessionBase
 		return true;
 	}
 
+	public static function buildSessionIdHash($partnerId, $sessionId)
+	{
+		return sha1($partnerId . '_' . $sessionId);
+	}
+
 	public function getSessionIdHash()
 	{
 		if(isset($this->parsedPrivileges[self::PRIVILEGE_SESSION_ID][0])) {
-			return sha1( $this->partner_id . '_' . $this->parsedPrivileges[self::PRIVILEGE_SESSION_ID][0]);
+			return self::buildSessionIdHash($this->partner_id, $this->parsedPrivileges[self::PRIVILEGE_SESSION_ID][0]);
 		}
 		return null;
 	}

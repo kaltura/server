@@ -111,7 +111,7 @@ class KalturaCategoryEntryFilter extends KalturaCategoryEntryBaseFilter
 			{
 				if(!in_array($dbCategoryEntry->getCategoryId(), $categoryIds))
 				{
-					KalturaLog::debug('Category [' . print_r($dbCategoryEntry->getCategoryId(),true) . '] is not listed to user');
+					KalturaLog::info('Category [' . print_r($dbCategoryEntry->getCategoryId(),true) . '] is not listed to user');
 					unset($dbCategoriesEntry[$key]);
 				}
 			}
@@ -135,5 +135,22 @@ class KalturaCategoryEntryFilter extends KalturaCategoryEntryBaseFilter
 		$response->objects = $categoryEntrylist;
 		$response->totalCount = $totalCount; // no pager since category entry is limited to ENTRY::MAX_CATEGORIES_PER_ENTRY
 		return $response;
+	}
+
+	/* (non-PHPdoc)
+	 * @see KalturaRelatedFilter::validateForResponseProfile()
+	 */
+	public function validateForResponseProfile()
+	{
+		if(kEntitlementUtils::getEntitlementEnforcement())
+		{
+			if(PermissionPeer::isValidForPartner(PermissionName::FEATURE_ENABLE_RESPONSE_PROFILE_USER_CACHE, kCurrentContext::getCurrentPartnerId()))
+			{
+				KalturaResponseProfileCacher::useUserCache();
+				return;
+			}
+			
+			throw new KalturaAPIException(KalturaErrors::CANNOT_LIST_RELATED_ENTITLED_WHEN_ENTITLEMENT_IS_ENABLE, get_class($this));
+		}
 	}
 }

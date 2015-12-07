@@ -3,7 +3,7 @@
  * Enable serving live conversion profile to the Wowza servers as XML
  * @package plugins.wowza
  */
-class WowzaPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaServices, IKalturaConfigurator
+class WowzaPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaServices, IKalturaConfigurator, IKalturaObjectLoader, IKalturaEnumerator
 {
 	const PLUGIN_NAME = 'wowza';
 	
@@ -54,5 +54,46 @@ class WowzaPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaServ
 			return new Zend_Config_Ini(dirname(__FILE__) . '/config/testme.ini');
 			
 		return null;
+	}
+	
+	/* (non-PHPdoc)
+	 * @see IKalturaEnumerator::getEnums()
+	 */
+	public static function getEnums($baseEnumName = null)
+	{
+		if(is_null($baseEnumName))
+			return array('WowzaMediaServerNodeType');
+	
+		if($baseEnumName == 'serverNodeType')
+			return array('WowzaMediaServerNodeType');
+			
+		return array();
+	}
+	
+	/* (non-PHPdoc)
+	 * @see IKalturaObjectLoader::loadObject()
+	 */
+	public static function loadObject($baseClass, $enumValue, array $constructorArgs = null)
+	{
+		if($baseClass == 'KalturaServerNode' && $enumValue == self::getWowzaMediaServerTypeCoreValue(WowzaMediaServerNodeType::WOWZA_MEDIA_SERVER))
+			return new KalturaWowzaMediaServerNode();
+	}
+	
+	/* (non-PHPdoc)
+	 * @see IKalturaObjectLoader::getObjectClass()
+	 */
+	public static function getObjectClass($baseClass, $enumValue)
+	{
+		if($baseClass == 'ServerNode' && $enumValue == self::getWowzaMediaServerTypeCoreValue(WowzaMediaServerNodeType::WOWZA_MEDIA_SERVER))
+			return 'WowzaMediaServerNode';
+	}
+	
+	/* (non-PHPdoc)
+	 * @see IKalturaCuePoint::getCuePointTypeCoreValue()
+	 */
+	public static function getWowzaMediaServerTypeCoreValue($valueName)
+	{
+		$value = self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
+		return kPluginableEnumsManager::apiToCore('serverNodeType', $value);
 	}
 }
