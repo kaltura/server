@@ -23,7 +23,7 @@ class KFeedDropFolderEngine extends KDropFolderEngine
 		
 		//Get Drop Folder feed and import it into a SimpleXMLElement
 		
-		$feed = new SimpleXMLElement (file_get_contents($dropFolder->path));
+		$feed = new SimpleXMLElement ($this->fetchFeedContent($dropFolder->path));
 		$this->feedNamespaces = $feed->getNamespaces(true);
 		
 		//get items
@@ -275,4 +275,36 @@ class KFeedDropFolderEngine extends KDropFolderEngine
 		
 		return max ($bitrates);
 	}
+	
+	protected function fetchFeedContent ($url)
+	{
+		$user = parse_url ($url, PHP_URL_USER);
+		if (!is_null ($user))
+		{
+			$password = parse_url ($url, PHP_URL_PASS);
+			$user = parse_url($url, PHP_URL_USER);
+			$password = parse_url($url, PHP_URL_PASS);
+			
+			$protocol = parse_url($url, PHP_URL_SCHEME);
+			$hostname = parse_url($url, PHP_URL_HOST);
+			$port = parse_url($url, PHP_URL_PORT);
+			$params = parse_url($url, PHP_URL_PATH);
+			$queryArgs = parse_url($url, PHP_URL_QUERY);
+
+			$url =  "$protocol://$hostname" .  ($port? ":$port" : "") . "$params?$queryArgs";
+		}
+		
+		$ch = curl_init ($url);
+		if (!is_null ($user))
+		{
+			curl_setopt($ch, CURLOPT_USERPWD, "$user:$password");
+			curl_setopt ($ch, CURLOPT_HTTPAUTH, CURLAUTH_ANY);
+		}
+		curl_setopt ($ch, CURLOPT_FOLLOWLOCATION, true);
+		curl_setopt ($ch, CURLOPT_RETURNTRANSFER, true);
+		
+		return curl_exec($ch);
+	}
+	
+	
 }
