@@ -32,16 +32,6 @@ class HttpNotificationTemplate extends BatchEventNotificationTemplate implements
 		$this->setType(HttpNotificationPlugin::getHttpNotificationTemplateTypeCoreValue(HttpNotificationTemplateType::HTTP));
 		parent::__construct();
 	}
-	
-	/* (non-PHPdoc)
-	 * @see BaseEventNotificationTemplate::copy()
-	 */
-	public function copy($deepCopy = false)
-	{
-		$returnObj = parent::copy($deepCopy);
-		$returnObj->setPost($this->getPost());
-		return $returnObj;
-	}
 
 	/* (non-PHPdoc)
 	 * @see BatchEventNotificationTemplate::getJobData()

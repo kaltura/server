@@ -11,8 +11,6 @@ class myPartnerUtils
 	
 	const ALL_PARTNERS_WILD_CHAR = "*";
 	
-	const BLOCKING_DAYS_GRACE = 7;
-	
 	
 	private static $s_current_partner_id = null;
 	private static $s_set_partner_id_policy  = self::PARTNER_SET_POLICY_NONE;
@@ -314,60 +312,27 @@ class myPartnerUtils
 	}
 	
 	
-	public static function getCdnHost ( $partner_id, $protocol = null, $hostType = null )
+	public static function getCdnHost ( $partner_id, $protocol = null )
 	{
 		// in case the request came through https, force https url
 		if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on')
 			$protocol = 'https';
+
+		$partner = PartnerPeer::retrieveByPK( $partner_id );
+		if ( !$partner || (! $partner->getCdnHost() ) ) return requestUtils::getCdnHost($protocol === null ? 'http' : $protocol);
+
+		$cdnHost = $partner->getCdnHost();
 
 		// temporary default is http since the system is not aligned to use https in all of its components (e.g. kmc)
 		// right now, if a partner cdnHost is set to https:// the kmc wont work well if we reply with https prefix to its requests
 		if ($protocol === null)
 			$protocol='http';
 
-		$partner = PartnerPeer::retrieveByPK( $partner_id );
-		$hostToTest = self::getHostForWhiteList();
-		if ($partner && !is_null($hostToTest) && $partner->isInCDNWhiteList($hostToTest))
-		{
-			$cdnHost = $protocol.'://'.$hostToTest;
-			if (isset($_SERVER['SERVER_PORT']))
-			{
-				$cdnHost .= ":".$_SERVER['SERVER_PORT'];
-			}
-			return $cdnHost;
-		}
-
-		switch ($hostType)
-		{
-			case 'thumbnail':
-				if ($partner && $partner->getThumbnailHost())
-				{
-					return preg_replace('/^https?/', $protocol, $partner->getThumbnailHost());
-				}
-				if ($partner && $partner->getCdnHost())
-				{
-					return preg_replace('/^https?/', $protocol, $partner->getCdnHost());
-				}
-				return requestUtils::getThumbnailCdnHost($protocol);
-			case 'api':
-				if ($protocol == 'https')
-				{
-					$apiHost = (kConf::hasParam('cdn_api_host_https')) ? kConf::get('cdn_api_host_https') : kConf::get('www_host');
-					return 'https://' . $apiHost;
-				}
-				else
-				{
-					$apiHost = (kConf::hasParam('cdn_api_host')) ? kConf::get('cdn_api_host') : kConf::get('www_host');
-					return 'http://' . $apiHost;
-				}
-				break;
-			default:
-				if ($partner && $partner->getCdnHost())
-				{
-					return preg_replace('/^https?/', $protocol, $partner->getCdnHost());
-				}
-				return requestUtils::getCdnHost($protocol);
-		}
+		// if a protocol was set manually (or by the temporary http default above) use it instead of the partner setting
+		if ($protocol !== null)
+			$cdnHost = preg_replace('/^https?/', $protocol, $cdnHost);
+			
+		return $cdnHost;
 	}
 	
 	
@@ -389,7 +354,7 @@ class myPartnerUtils
 	public static function getThumbnailHost ($partner_id, $protocol = null)
 	{
 	    $partner = PartnerPeer::retrieveByPK( $partner_id );
-	    if ( !$partner || (! $partner->getThumbnailHost() ) ) return self::getCdnHost($partner_id, $protocol, "thumbnail");
+	    if ( !$partner || (! $partner->getThumbnailHost() ) ) return self::getCdnHost($partner_id, $protocol);
 	    
 	    // in case the request came through https, force https url
 		if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on')
@@ -403,7 +368,8 @@ class myPartnerUtils
 			$protocol='http';
 
 		// if a protocol was set manually (or by the temporary http default above) use it instead of the partner setting
-		$thumbHost = preg_replace('/^https?/', $protocol, $thumbHost);
+		if ($protocol !== null)
+			$thumbHost = preg_replace('/^https?/', $protocol, $thumbHost);
 			
 		return $thumbHost;
 	}
@@ -883,10 +849,6 @@ class myPartnerUtils
 	const KALTURA_PAID_PACKAGE_SUGGEST_UPGRADE = 85;
 	const KALTURA_EXTENED_FREE_TRAIL_ENDS_WARNING = 87;
 	
-	const KALTURA_MONTHLY_PACKAGE_EIGHTY_PERCENT_WARNING = 95;
- 	const KALTURA_MONTHLY_PACKAGE_LIMIT_WARNING_1 = 96;
- 	const KALTURA_MONTHLY_PACKAGE_LIMIT_WARNING_2 = 97;
-	
 	const IS_FREE_PACKAGE_PLACE_HOLDER = "{IS_FREE_PACKAGE}";
 	
 	
@@ -917,29 +879,6 @@ class myPartnerUtils
         $totalUsage = ($totalStorage*1024) + $totalTraffic; // (MB*1024 => KB) + KB
 
         return array( $totalStorage , $totalUsage , $totalTraffic );
-    }
-
-	private static function collectPartnerMonthlyStatisticsFromDWH($partner, $report_date)
-    {
-        $totalTranscoding = 0;
-        $totalBandwith = 0;
-        $totalStorage = 0;
-        
-        $fromDate = dateUtils::firstDayOfMonth($report_date);
-
-		$reportFilter = new reportsInputFilter();
-		$reportFilter->from_day = str_replace('-','',$fromDate);
-		$reportFilter->to_day = str_replace('-','',$report_date);		
-		list($header, $data) = myReportsMgr::getTotal($partner->getId(), myReportsMgr::REPORT_TYPE_PARTNER_USAGE, $reportFilter, $partner->getId());
-
-		$bandwidth_consumption = array_search('bandwidth_consumption', $header);
-		$deleted_storage = array_search('deleted_storage', $header);
-		$added_storage = array_search('added_storage', $header);
-		$transcoding_consumption = array_search('transcoding_consumption', $header);	
-		$totalBandwith = $data[$bandwidth_consumption]*1024; //KB
-		$totalTranscoding = $data[$transcoding_consumption]*1024; //KB
-		$totalStorage = $data[$added_storage]*1024 - $data[$deleted_storage]*1024; //KB
-        return array( $totalStorage , $totalBandwith , $totalTranscoding );
     }
     
     /**
@@ -1060,7 +999,8 @@ class myPartnerUtils
 		
 		$should_block_delete_partner = true;
 		
-		$block_notification_grace = time() - (dateUtils::DAY * self::BLOCKING_DAYS_GRACE);
+		$blocking_days_grace = 7;
+		$block_notification_grace = time() - (dateUtils::DAY * $blocking_days_grace);
 		$delete_grace = time() -  (dateUtils::DAY * 30);
 		
 		$packages = new PartnerPackages();
@@ -1100,7 +1040,7 @@ class myPartnerUtils
 			$partner->getEightyPercentWarning() &&
 			!$partner->getUsageLimitWarning())
 		{
-			KalturaLog::log("passed the 80%, assume notification sent, nothing to do.");
+			KalturaLog::debug("passed the 80%, assume notification sent, nothing to do.");
 		}
 		elseif ($percent < 80 &&
 				$partner->getEightyPercentWarning())
@@ -1131,7 +1071,7 @@ class myPartnerUtils
 				$partner->getUsageLimitWarning() > $delete_grace &&
 				$partner->getStatus() != Partner::PARTNER_STATUS_CONTENT_BLOCK)
 		{
-			KalturaLog::debug("partner ". $partner->getId() ." reached 100% ".self::BLOCKING_DAYS_GRACE ." days ago - sending block email and blocking partner");
+			KalturaLog::debug("partner ". $partner->getId() ." reached 100% $blocking_days_grace days ago - sending block email and blocking partner");
 				
 			/* send block email and block partner */
 			$body_params = array ( $partner->getAdminName(), $mindtouch_notice, round($totalUsageGB, 2), $email_link_hash );
@@ -1176,134 +1116,7 @@ class myPartnerUtils
 		}
 		$partner->save();		
 	}
-
-	public static function doMonthlyPartnerUsage(Partner $partner)
-	{
-		KalturaLog::debug("Validating partner [" . $partner->getId() . "]");
 		
-		$packages = new PartnerPackages();
-		$partnerPackage = $packages->getPackageDetails($partner->getPartnerPackage());
-		if($partnerPackage[PartnerPackages::PACKAGE_CYCLE_FEE] != 0){
-			KalturaLog::debug("Partner has paid package, skipping validation [" . $partner->getId() . "]");
-			return;
-		}
-				
-		$block_notification_grace = time() - (dateUtils::DAY * self::BLOCKING_DAYS_GRACE);
-		$delete_grace = time() -  (dateUtils::DAY * 30);
-		
-		$report_date = dateUtils::todayOffset(-1);
-
-		list ( $monthlyStorage, $monthlyTraffic, $monthlyTranscoding ) = myPartnerUtils::collectPartnerMonthlyStatisticsFromDWH($partner, $report_date);
-
-		$email_link_hash = 'pid='.$partner->getId().'&h='.(self::getEmailLinkHash($partner->getId(), $partner->getSecret()));
-		
-		self::validatePartnerMonthlyUsagePerType($partner, $partnerPackage, $monthlyStorage, PartnerPackages::PACKAGE_STORAGE_USAGE, $report_date, $block_notification_grace, $delete_grace, $email_link_hash);
-		self::validatePartnerMonthlyUsagePerType($partner, $partnerPackage, $monthlyTraffic, PartnerPackages::PACKAGE_TRAFFIC_USAGE, $report_date, $block_notification_grace, $delete_grace, $email_link_hash);
-		self::validatePartnerMonthlyUsagePerType($partner, $partnerPackage, $monthlyTranscoding, PartnerPackages::PACKAGE_TRANSCODING_USAGE, $report_date, $block_notification_grace, $delete_grace, $email_link_hash);
-		
-		$partner->save();		
-	}
-	
-	private static function validatePartnerMonthlyUsagePerType($partner, $partnerPackage, $usage, $usageType, $report_date, $block_notification_grace, $delete_grace, $email_link_hash)
-	{
-		if(!array_key_exists($usageType, $partnerPackage)){
-			return;
-		}
-		
-		$usageGB = $usage/1024/1024; // from KB to GB
-		$percent = round( ($usageGB / $partnerPackage[$usageType])*100, 2);
-		$notificationId = 0;
-		
-		KalturaLog::debug("percent (".$partner->getId().") is: $percent for usage type $usageType");
-				
-		//check if partner should be deleted
-		if($partner->getStatus() == Partner::PARTNER_STATUS_CONTENT_BLOCK )
-		{
-			$warning_100 = $partner->getUsageWarning($usageType, 100);
-			if($warning_100 > 0 && $warning_100 <= $delete_grace)
-			{
-				KalturaLog::debug("partner ". $partner->getId() ." reached 100% a month ago - deleting partner");
-					
-				/* delete partner */
-				$notificationId = myPartnerUtils::KALTURA_DELETE_ACCOUNT;
-				$partner->setStatus(Partner::PARTNER_STATUS_DELETED);				
-			}
-		}
-		else
-		{
-			self::resetMonthlyUsageWarningIfNotRelevant($partner, $usageType, $percent, $report_date);
-		
-			$warning_80 = $partner->getUsageWarning($usageType, 80);
-			$warning_100 = $partner->getUsageWarning($usageType, 100);
-			
-			if($percent >= 80 && $percent < 100 && !$warning_80) //send 80% usage warning
-			{
-				KalturaLog::debug("partner ". $partner->getId() ." reached 80% - setting first warning for usage ". $usageType);
-				$partner->setUsageWarning($usageType, 80, time());
-				$partner->resetUsageWarning($usageType, 100);
-				$notificationId = myPartnerUtils::KALTURA_MONTHLY_PACKAGE_EIGHTY_PERCENT_WARNING;				
-			}
-			elseif ($percent >= 80 && $percent < 100 && $warning_80 && !$warning_100)
-			{
-				KalturaLog::log("passed the 80%, assume notification sent, nothing to do.");
-			}
-			elseif ($percent >= 100 && !$warning_100) // send 100% usage warning
-			{
-				KalturaLog::debug("partner ". $partner->getId() ." reached 100% - setting second warning for usage ". $usageType);
-				$partner->setUsageWarning($usageType, 100, time());
-				$notificationId = myPartnerUtils::KALTURA_MONTHLY_PACKAGE_LIMIT_WARNING_1;
-			}
-			elseif ($percent >= 100 && $warning_100 > 0 && $warning_100 <= $block_notification_grace && $warning_100 > $delete_grace)
-			{
-				KalturaLog::debug("partner ". $partner->getId() ." reached 100% ". self::BLOCKING_DAYS_GRACE ." days ago - sending block email and blocking partner");				
-				/* send block email and block partner */
-				$notificationId = myPartnerUtils::KALTURA_MONTHLY_PACKAGE_LIMIT_WARNING_2;			
-				$partner->setStatus(Partner::PARTNER_STATUS_CONTENT_BLOCK);
-			}
-		}
-		if($notificationId)
-		{
-			$body_params = array();
-			$usageText = PartnerPackages::getPackageUsageText($usageType);
-			switch($notificationId){
-				case myPartnerUtils::KALTURA_MONTHLY_PACKAGE_EIGHTY_PERCENT_WARNING:
-					$body_params = array ( $partner->getAdminName(), $partnerPackage[$usageType], $usageText, round($usageGB, 2), $email_link_hash );
-					break;
-				case myPartnerUtils::KALTURA_MONTHLY_PACKAGE_LIMIT_WARNING_1:
-					$body_params = array ( $partner->getAdminName(), $partnerPackage[$usageType], $usageText, round($usageGB, 2), $email_link_hash );
-					break;
-				case myPartnerUtils::KALTURA_MONTHLY_PACKAGE_LIMIT_WARNING_2:
-					$body_params = array ( $partner->getAdminName(), $partnerPackage[$usageType], $usageText, round($usageGB, 2), $email_link_hash );
-					break;
-				case myPartnerUtils::KALTURA_DELETE_ACCOUNT:
-					$body_params = array ( $partner->getAdminName() );
-					break;
-			}
-			myPartnerUtils::notifiyPartner($notificationId, $partner, $body_params);
-		}					
-	}
-	
-	private static function resetMonthlyUsageWarningIfNotRelevant($partner, $usageType, $percent, $report_date)
-	{
-		$warning_80 = $partner->getUsageWarning($usageType, 80);
-		$warning_100 = $partner->getUsageWarning($usageType, 100);
-		if($warning_100 || $warning_80)
-		{
-			$isCurrent = true;
-			$warningMonth = $warning_80 ? date("m", $warning_80) : date("m", $warning_100);
-			$dateObj = new DateTime($report_date);
-			$reportMonth = date("m", $dateObj->getTimestamp());
-			$isCurrent = ($warningMonth == $reportMonth);
-		
-			if($percent < 80 || !$isCurrent )
-			{
-				KalturaLog::debug("Reseting partner ". $partner->getId() ." warnings for usage ". $usageType);		
-				$partner->resetUsageWarning($usageType, 80);
-				$partner->resetUsageWarning($usageType, 100);			
-			}			
-		}
-	}
-	
 	public static function getParnerWidgetStatisticsFromDWH($partnerId, $startDate, $endDate) {
 		$reportFilter = new reportsInputFilter();
 		
@@ -1481,7 +1294,6 @@ class myPartnerUtils
  		foreach($categories as $category)
  		{
  			/* @var $category category */
- 			$category->setPuserId(null);
  			$newCategory= $category->copy();
  			$newCategory->setPartnerId($toPartner->getId());
  			if($category->getParentId())
@@ -1717,29 +1529,21 @@ class myPartnerUtils
 		}
 	}
 	
-	/**
+	/*
 	 * Ensure the request for media arrived in a way approved by the partner.
 	 * this may include restricting to a specific cdn, enforcing token usage etc..
 	 * Die in case of a breach.
 	 * 
-	 * @param entry $entry
-	 * @param asset $asset
+	 * @param int $partnerId
 	 */
-	public static function enforceDelivery($entry, $asset = null)
+	public static function enforceDelivery($partnerId)
 	{
-		// block inactive partner
-		$partnerId = $entry->getPartnerId();
-		self::blockInactivePartner($partnerId);
-
-		// validate serve access control
-		$flavorParamsId = $asset ? $asset->getFlavorParamsId() : null;
-		$secureEntryHelper = new KSecureEntryHelper($entry, null, null, ContextType::SERVE);
-		$secureEntryHelper->validateForServe($flavorParamsId);
-
-		// enforce delivery
-		$partner = PartnerPeer::retrieveByPK($partnerId);		// Note: Partner was already loaded by blockInactivePartner, no need to check for null
+		$partner = PartnerPeer::retrieveByPK( $partnerId );
+		if ( !$partner )
+			return;
 		
 		$restricted = DeliveryProfilePeer::isRequestRestricted($partner);
+		
 		if ($restricted)
 		{
 			KalturaLog::log ( "DELIVERY_METHOD_NOT_ALLOWED partner [$partnerId]" );
@@ -1784,23 +1588,5 @@ class myPartnerUtils
 			
 		}	
 		return true;
-	}
-
-	/**
-	 * @return null
-	 */
-	public static function getHostForWhiteList()
-	{
-		$hostToTest = null;
-		if (isset($_SERVER['HTTP_X_FORWARDED_HOST']))
-		{
-			$xForwardedHosts = explode(',', $_SERVER['HTTP_X_FORWARDED_HOST']);
-			$hostToTest = $xForwardedHosts[0];
-			return $hostToTest;
-		} else if (isset($_SERVER['HTTP_HOST']))
-		{
-			$hostToTest = $_SERVER['HTTP_HOST'];
-			return $hostToTest;
-		}return $hostToTest;
 	}
 }

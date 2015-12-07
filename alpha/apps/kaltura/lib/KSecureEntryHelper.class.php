@@ -57,10 +57,28 @@ class KSecureEntryHelper
 	private $contextResult;
 	
 	/**
-	 * access control actions lists keyed by RuleActionType
-	 * @var array
+	 * Indicates if the context has LIMIT_FLAVORS action
+	 * @var bool
 	 */
-	private $actionLists = array();
+	private $hasLimitFlavorsAction = false;
+	
+	/**
+	 * Indicates if the context has BLOCKED action
+	 * @var bool
+	 */
+	private $hasBlockAction = false;
+
+	/**
+	 * Indicates if the context has PREVIEW action
+	 * @var bool
+	 */	
+	private $hasPreviewAction = false;
+	
+	/**
+	 * 
+	 * @var kAccessControlLimitFlavorsAction
+	 */
+	private $limitFlavorsAction = null;
 	
 	/**
 	 * 
@@ -107,11 +125,11 @@ class KSecureEntryHelper
 			
 		// should preview only when the access control is valid, but the preview and session restrictions exists
 		if ($this->contextResult)
-		{
-			if ($this->shouldBlock())
+		{			
+			if($this->hasBlockAction)
 				return false;
 					
-			return $this->getActionList(RuleActionType::PREVIEW);
+			return $this->hasPreviewAction;
 		}
 		return false;
 	}
@@ -119,12 +137,13 @@ class KSecureEntryHelper
 	public function getPreviewLength()
 	{
 		$preview = null;
-		if ($this->contextResult && $this->getActionList(RuleActionType::PREVIEW))
+		if ($this->contextResult && $this->hasPreviewAction)
 		{			
-			$actions = $this->getActionList(RuleActionType::PREVIEW);
+			$actions = $this->contextResult->getActions();
 			foreach($actions as $action)
 			{
-				$preview = $preview ? min($preview, $action->getLimit()) : $action->getLimit();
+				if($action instanceof kAccessControlPreviewAction)
+					$preview = $preview ? min($preview, $action->getLimit()) : $action->getLimit();
 			}
 		}
 		return $preview;
@@ -140,17 +159,11 @@ class KSecureEntryHelper
 	public function validateForPlay($performApiAccessCheck = true)
 	{
 	    if ($this->contexts != array(ContextType::THUMBNAIL))
-        {
-            if ( ! ($this->ks &&
-                   ($this->isKsAdmin() ||
-                    $this->ks->verifyPrivileges(ks::PRIVILEGE_VIEW, ks::PRIVILEGE_WILDCARD) ||
-                    $this->ks->verifyPrivileges(ks::PRIVILEGE_VIEW, $this->entry->getId()) ))){
-                $this->validateModeration();
-                $this->validateScheduling();
-            }
-        }
-
-        $this->validateAccessControl($performApiAccessCheck);
+	    {
+		    $this->validateModeration();
+			$this->validateScheduling();
+	    }
+		$this->validateAccessControl($performApiAccessCheck);
 	}
 	
 	public function validateForDownload()
@@ -196,33 +209,25 @@ class KSecureEntryHelper
 			foreach($this->contextResult->getMessages() as $msg)
 				header("X-Kaltura: access-control: $msg");
 		}
-
-		if ($this->shouldBlock())
+		
+		if($this->hasBlockAction)
 		{
 			KExternalErrors::dieError(KExternalErrors::ACCESS_CONTROL_RESTRICTED);
 		}
 	}
-
-	public function getActionList($actionType)
-	{
-		if (!isset($this->actionLists[$actionType]))
-			return null;
-		
-		return $this->actionLists[$actionType]; 
-	}
 	
 	public function filterAllowedFlavorParams(array $flavorParamsIds)
 	{
-		$actionList = $this->getActionList(RuleActionType::LIMIT_FLAVORS);
-		if ($actionList)
+		if($this->hasLimitFlavorsAction)
 		{
-			// take only the first LIMIT_FLAVORS action
-			$action = reset($actionList);
-		
-			$actionflavorParamsIds = explode(',', $action->getFlavorParamsIds());
-			$flavorParamsIds = $action->getIsBlockedList() ? array_diff($flavorParamsIds, $actionflavorParamsIds) :	array_intersect($flavorParamsIds, $actionflavorParamsIds);
+			$filteredFlavorParamsIds = array();
+			foreach ($flavorParamsIds as $flavorParamsId) 
+			{
+				if($this->isFlavorParamsAllowed($flavorParamsId))
+					$filteredFlavorParamsIds[] = $flavorParamsId;
+			}
+			return $filteredFlavorParamsIds;
 		}
-		
 		return $flavorParamsIds;
 	}
 	
@@ -236,37 +241,21 @@ class KSecureEntryHelper
 	
 	public function shouldBlock()
 	{
-		return $this->getActionList(RuleActionType::BLOCK);		
+		return $this->hasBlockAction;
 	}
 	
 	protected function isFlavorParamsAllowed($flavorParamsId)
 	{
-		$actionList = $this->getActionList(RuleActionType::LIMIT_FLAVORS);
-		if ($actionList)
+		if($this->hasLimitFlavorsAction)
 		{
-			// take only the first LIMIT_FLAVORS action
-			$action = reset($actionList);
-			$flavorParamsIds = explode(',', $action->getFlavorParamsIds());
+			$flavorParamsIds = explode(',', $this->limitFlavorsAction->getFlavorParamsIds());
 			$exists = in_array($flavorParamsId, $flavorParamsIds);
-			if($action->getIsBlockedList())
+			if($this->limitFlavorsAction->getIsBlockedList())
 				return !$exists;
 			else 
 				return $exists;
 		}
 		return true;
-	}
-
-	public function updateDeliveryAttributes(DeliveryProfileDynamicAttributes $deliveryAttributes)
-	{
-		foreach ($this->actionLists as $actionList)
-		{
-			// take only the first action of each type
-			foreach ($actionList as $action)
-			{
-				if($action->applyDeliveryProfileDynamicAttributes($deliveryAttributes))
-					break;
-			}	
-		}
 	}
 	
 	protected function applyContext()
@@ -282,16 +271,28 @@ class KSecureEntryHelper
 			$this->disableCache = $accessControl->applyContext($this->contextResult, $scope);
 		else
 			$this->disableCache = false;
-		
-		if (count ( $this->contextResult->getActions () )) {
-			foreach ( $this->contextResult->getActions () as $action )
+			
+		if(count($this->contextResult->getActions()))
+		{
+			$actions = $this->contextResult->getActions();
+			foreach($actions as $action)
 			{
-				if (!isset($this->actionLists[$action->getType()]))
-					$this->actionLists[$action->getType()] = array($action);
-				else
-					array_push($this->actionLists[$action->getType()], $action);
+				/* @var $action kAccessControlAction */
+				switch ($action->getType())
+				{
+					case RuleActionType::BLOCK:
+						$this->hasBlockAction = true;
+						break;
+					case RuleActionType::LIMIT_FLAVORS:
+						$this->hasLimitFlavorsAction = true;
+						$this->limitFlavorsAction = $action;
+						break;
+					case RuleActionType::PREVIEW:
+						$this->hasPreviewAction = true;
+						break;					
+				}
 			}
-		}
+		}			
 	}
 	
 	protected function validateScheduling()
@@ -421,17 +422,5 @@ class KSecureEntryHelper
 	public function getContextResult()
 	{
 		return $this->contextResult;
-	}
-	
-	public function validateForServe($flavorParamsId)
-	{
-		if (!$this->isFlavorParamsAllowed($flavorParamsId))
-		{
-			KExternalErrors::dieError(KExternalErrors::ACCESS_CONTROL_RESTRICTED);
-		}
-		if ($this->shouldBlock())
-		{
-			KExternalErrors::dieError(KExternalErrors::ACCESS_CONTROL_RESTRICTED);
-		}
 	}
 }

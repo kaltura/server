@@ -88,7 +88,7 @@ class DailymotionDistributionEngine extends DistributionEngine implements
 
 		$geoBlocking = $this->getGeoBlocking($distributionProfile, $providerData);
 
-		KalturaLog::info('Geo blocking array: '.print_r($geoBlocking, true));
+		KalturaLog::debug('Geo blocking array: '.print_r($geoBlocking, true));
 		if (count($geoBlocking))
 			$props['geoblocking'] = $geoBlocking;
 
@@ -143,6 +143,16 @@ class DailymotionDistributionEngine extends DistributionEngine implements
 		if (FALSE === strstr($videoFilePath, "."))
 		{
 			$videoFilePathNew = $this->tempXmlPath . "/" . uniqid() . ".dme";
+/*			try
+			{
+    		KalturaLog::debug("DM : before " . $videoFilePathNew);
+    			@symlink ($videoFilePath, $videoFilePathNew);
+    		KalturaLog::debug("DM : after");
+    		}
+    		catch(Exception $ex)
+    		{
+    		KalturaLog::debug("DM : exception");
+    		}*/
 			if (!file_exists($videoFilePathNew))
 			{
 				copy($videoFilePath,$videoFilePathNew);
@@ -339,7 +349,7 @@ class DailymotionDistributionEngine extends DistributionEngine implements
 	private function submitCaption(DailymotionImpl $dailymotionImpl, $captionInfo, $remoteId) {
 		if (!file_exists($captionInfo->filePath ))
 			throw new KalturaDistributionException('The caption file ['.$captionInfo->filePath.'] was not found (probably not synced yet), the job will retry');
-		KalturaLog::info ( 'Submitting caption [' . $captionInfo->assetId . ']' );
+		KalturaLog::debug ( 'Submitting caption [' . $captionInfo->assetId . ']' );
 		$captionRemoteId = $dailymotionImpl->uploadSubtitle($remoteId, $captionInfo);
 		return $this->getNewRemoteMediaFile ( $captionRemoteId, $captionInfo );
 	}

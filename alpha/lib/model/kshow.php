@@ -8,7 +8,7 @@
  * @package Core
  * @subpackage model
  */
-class kshow extends Basekshow implements IBaseObject
+class kshow extends Basekshow
 {
 	const SANDBOX_ID = "2";//301599;
 	

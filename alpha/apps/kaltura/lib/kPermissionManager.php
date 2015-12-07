@@ -441,6 +441,7 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 	{
 		$securityContext = array(kCurrentContext::$partner_id, kCurrentContext::$ks);
 		if ($securityContext === self::$lastInitializedContext) {
+			KalturaLog::log('Already initalized for this security context');
 			self::$cacheWatcher->apply();
 			return;
 		}
@@ -907,13 +908,6 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 		return $partnerGroup;
 	}
 	
-	/**
-	 * @return array current role ids
-	 */
-	public static function getCurrentRoleIds()
-	{
-		return self::$roleIds;
-	}
 	
 	/**
 	 * @return return current permission names

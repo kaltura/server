@@ -69,6 +69,7 @@ class KAsyncPostConvert extends KJobHandlerWorker
 					return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::NFS_FILE_DOESNT_EXIST, "Source file $mediaFile is not a file", KalturaBatchJobStatus::FAILED);
 			}
 			
+			KalturaLog::debug("mediaFile [$mediaFile]");
 			$this->updateJob($job,"Extracting file media info on $mediaFile", KalturaBatchJobStatus::QUEUED);
 		}
 		catch(Exception $ex)
@@ -180,6 +181,8 @@ class KAsyncPostConvert extends KJobHandlerWorker
 	 */
 	private function moveFile(KalturaBatchJob $job, KalturaPostConvertJobData $data)
 	{
+		KalturaLog::debug("moveFile($job->id, $data->thumbPath)");
+		
 		// creates a temp file path
 		$rootPath = KBatchBase::$taskConfig->params->sharedTempPath;
 		if(! is_dir($rootPath))
@@ -228,6 +231,8 @@ class KAsyncPostConvert extends KJobHandlerWorker
 	 */
 	private function checkForValidityOfWebexProduct(KalturaPostConvertJobData $data, $srcFileName, KalturaMediaInfo $mediaInfo, &$detectMsg)
 	{
+		KalturaLog::debug("contDur:$mediaInfo->containerDuration,vidDur:$mediaInfo->videoDuration,audDur:$mediaInfo->audioDuration");
+
 		$rv = true;
 		$detectMsg = null;
 		/*

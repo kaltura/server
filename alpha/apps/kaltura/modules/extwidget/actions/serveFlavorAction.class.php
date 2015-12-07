@@ -31,6 +31,7 @@ class serveFlavorAction extends kalturaAction
 
 		$flavorId = $this->getRequestParameter("flavorId");
 		$shouldProxy = $this->getRequestParameter("forceproxy", false);
+		$ks = $this->getRequestParameter( "ks" );
 		$fileName = $this->getRequestParameter( "fileName" );
 		$fileParam = $this->getRequestParameter( "file" );
 		$fileParam = basename($fileParam);
@@ -55,16 +56,20 @@ class serveFlavorAction extends kalturaAction
 		}
 
 		$clipTo = null;
-		
-		$entry = $flavorAsset->getentry();
-		if (!$entry)
-		{
-			KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_FOUND);
-		}
-		
+//		$securyEntryHelper = new KSecureEntryHelper($entry, $ks, $referrer, ContextType::PLAY);
+//		if ($securyEntryHelper->shouldPreview())
+//		{
+//			$clipTo = $securyEntryHelper->getPreviewLength() * 1000;
+//		}
+//		else
+//		{
+//			$securyEntryHelper->validateForPlay($entry, $ks);
+//		}
+
 		KalturaMonitorClient::initApiMonitor(false, 'extwidget.serveFlavor', $flavorAsset->getPartnerId());
 			
-		myPartnerUtils::enforceDelivery($entry, $flavorAsset);
+		myPartnerUtils::blockInactivePartner($flavorAsset->getPartnerId());
+		myPartnerUtils::enforceDelivery($flavorAsset->getPartnerId());
 		
 		$version = $this->getRequestParameter( "v" );
 		if (!$version)
@@ -87,20 +92,14 @@ class serveFlavorAction extends kalturaAction
 			}
 		
 			$renderer = new kRendererString(
-				'{"sequences":[{"clips":[{"type":"source","path":"' . $path . '"}]}]}', 
-				'application/json');
+				'<?xml version="1.0" encoding="utf-8"?><xml><result>' . $path . '</result></xml>', 
+				'text/xml');
 			if ($path)
 			{
 				$this->storeCache($renderer, $flavorAsset->getPartnerId());
 			}
 			$renderer->output();
 			KExternalErrors::dieGracefully();
-		}
-		
-		if (kConf::hasParam('serve_flavor_allowed_partners') && 
-			!in_array($flavorAsset->getPartnerId(), kConf::get('serve_flavor_allowed_partners')))
-		{
-			KExternalErrors::dieError(KExternalErrors::ACTION_BLOCKED);
 		}
 
 		if (!kFileSyncUtils::file_exists($syncKey, false))

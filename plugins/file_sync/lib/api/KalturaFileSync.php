@@ -127,6 +127,7 @@ class KalturaFileSync extends KalturaObject implements IFilterable
 	 * 
 	 * @var KalturaFileSyncStatus
 	 * @filter eq,in
+	 * @readonly
 	 */
 	public $status;
 
@@ -165,6 +166,7 @@ class KalturaFileSync extends KalturaObject implements IFilterable
 	/**
 	 * 
 	 * @var string
+	 * @readonly
 	 */
 	public $fileRoot;
 
@@ -173,6 +175,7 @@ class KalturaFileSync extends KalturaObject implements IFilterable
 	/**
 	 * 
 	 * @var string
+	 * @readonly
 	 */
 	public $filePath;
 
@@ -222,20 +225,6 @@ class KalturaFileSync extends KalturaObject implements IFilterable
 	 */
 	public $isCurrentDc;
 	
-	/**
-	 *
-	 * @var bool
-	 * @readonly
-	 */
-	public $isDir;
-
-	/**
-	 *
-	 * @var int
-	 * @readonly
-	 */
-	public $originalId;
-	
 	private static $map_between_objects = array
 	(
 		"id",
@@ -257,8 +246,6 @@ class KalturaFileSync extends KalturaObject implements IFilterable
 		"filePath",
 		"fileSize",
 		"readyAt",
-		"isDir",
-		"originalId",
 	);
 	
 	public function getMapBetweenObjects()
@@ -310,31 +297,23 @@ class KalturaFileSync extends KalturaObject implements IFilterable
 	{
 		parent::doFromObject($source_object, $responseProfile);
 		
-		if($this->shouldGet('fileUrl', $responseProfile))
-			$this->fileUrl = $source_object->getExternalUrl($this->getEntryId($source_object));
+		$this->fileUrl = $source_object->getExternalUrl($this->getEntryId($source_object));
+		$this->isCurrentDc = ($source_object->getDc() == kDataCenterMgr::getCurrentDcId());
 		
-		if($this->shouldGet('isCurrentDc', $responseProfile))
-			$this->isCurrentDc = ($source_object->getDc() == kDataCenterMgr::getCurrentDcId());
-		
-		if($source_object->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_LINK && 
-			($this->shouldGet('fileRoot', $responseProfile) || $this->shouldGet('filePath', $responseProfile)))
+		if($this->fileType == KalturaFileSyncType::LINK)
 		{
 			$fileSync = kFileSyncUtils::resolve($source_object);
 			$this->fileRoot = $fileSync->getFileRoot();
 			$this->filePath = $fileSync->getFilePath();
 		}
 		
-		if($source_object->getDc() == kDataCenterMgr::getCurrentDcId())
+		if($this->isCurrentDc)
 		{
-			$path = $source_object->getFullPath();
-			if($this->shouldGet('fileDiscSize', $responseProfile))
-				$this->fileDiscSize = kFile::fileSize($path);
-			if($this->shouldGet('fileContent', $responseProfile))
-			{
-				$content = file_get_contents($path, false, null, 0, 1024);
-				if(ctype_print($content) || ctype_cntrl($content))
-					$this->fileContent = $content;
-			}
+			$path = $this->fileRoot . $this->filePath;
+			$this->fileDiscSize = kFile::fileSize($path);
+			$content = file_get_contents($path, false, null, 0, 1024);
+			if(ctype_print($content) || ctype_cntrl($content))
+				$this->fileContent = $content;
 		}
 	}
 }

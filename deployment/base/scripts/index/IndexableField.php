@@ -47,9 +47,6 @@ class IndexableField {
 	/** Whether the field is both sphinx Field and Attribute*/
 	public $sphinxStringAttribute = "field";
 
-	/** Api name for this field */
-	public $apiName = null;
-
 	public function __construct($name, $index, $type) {
 		$this->name = $name;
 		$this->indexName = $index;
@@ -237,21 +234,6 @@ class IndexableField {
 	public function setSphinxStringAttribute($sphinxStringAttribute) {
 		$this->sphinxStringAttribute = $sphinxStringAttribute;
 	}
-
-	/**
-	 * @return string
-	 */
-	public function getApiName()
-	{
-		return $this->apiName;
-	}
-
-	/**
-	 * @param string $apiName
-	 */
-	public function setApiName($apiName)
-	{
-		$this->apiName = $apiName;
-	}
+	
 }
 

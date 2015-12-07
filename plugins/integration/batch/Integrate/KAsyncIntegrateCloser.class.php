@@ -23,6 +23,8 @@ class KAsyncIntegrateCloser extends KJobCloserWorker
 	
 	protected function close(KalturaBatchJob $job, KalturaIntegrationJobData $data)
 	{
+		KalturaLog::debug("close($job->id)");
+		
 		if(($job->queueTime + self::$taskConfig->params->maxTimeBeforeFail) < time())
 		{
 			return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::CLOSER_TIMEOUT, 'Timed out', KalturaBatchJobStatus::FAILED);

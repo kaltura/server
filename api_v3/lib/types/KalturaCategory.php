@@ -3,7 +3,7 @@
  * @package api
  * @subpackage objects
  */
-class KalturaCategory extends KalturaObject implements IRelatedFilterable 
+class KalturaCategory extends KalturaObject implements IFilterable 
 {
 	/**
 	 * The id of the Category

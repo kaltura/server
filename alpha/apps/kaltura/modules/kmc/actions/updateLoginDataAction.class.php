@@ -243,7 +243,7 @@ class KalturaLoginDataException extends Exception
 {
 	protected $code;
 	
-	public function __construct($errorString)
+	public function KalturaLoginDataException($errorString)
 	{
 		$errorArgs = func_get_args();
         array_shift( $errorArgs );

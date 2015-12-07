@@ -8,7 +8,7 @@
  * @package Core
  * @subpackage model
  */ 
-class assetParamsOutput extends BaseassetParamsOutput implements IBaseObject
+class assetParamsOutput extends BaseassetParamsOutput
 {
 	const STR_SEPARATOR = "|||" ;
 	const KEY_SEPARATOR = "@@@" ; 

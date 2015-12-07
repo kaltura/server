@@ -110,8 +110,10 @@ class VerizonVcastDistributionEngine extends DistributionEngine implements
 	 */
 	public function handleSubmit(KalturaDistributionJobData $data, KalturaVerizonVcastDistributionProfile $distributionProfile, KalturaVerizonVcastDistributionJobProviderData $providerData)
 	{
+		KalturaLog::debug("Submiting data");
+		
 		$fileName = $data->entryDistribution->entryId . '_' . date('Y-m-d_H-i-s') . '.xml';
-		KalturaLog::info('Sending file '. $fileName);
+		KalturaLog::debug('Sending file '. $fileName);
 		
 		$ftpManager = $this->getFTPManager($distributionProfile);
 		$tmpFile = tmpfile();
@@ -124,6 +126,8 @@ class VerizonVcastDistributionEngine extends DistributionEngine implements
 		
 		if ($res === false)
 			throw new Exception('Failed to upload tmp file to ftp');
+			
+		KalturaLog::info('File was sent successfully');
 			
 		$data->remoteId = $fileName;
 		$data->sentData = $providerData->xml;

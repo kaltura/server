@@ -511,8 +511,8 @@ class YouTubeDistributionLegacyFeedHelper
 	public function setPlaylists($currentPlaylists)
 	{
 		$newPlaylists = $this->getValueForField(KalturaYouTubeDistributionField::PLAYLISTS);
-		KalturaLog::info('Current playlists: ' . $currentPlaylists);
-		KalturaLog::info('New playlists: ' . $newPlaylists);
+		KalturaLog::debug('Current playlists: ' . $currentPlaylists);
+		KalturaLog::debug('New playlists: ' . $newPlaylists);
 		$currentPlaylistsArray = explode(',', $currentPlaylists);
 		$newPlaylistsArray = explode(',', $newPlaylists);
 		sort($currentPlaylistsArray);

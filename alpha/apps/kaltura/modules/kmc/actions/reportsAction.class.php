@@ -9,7 +9,18 @@ class reportsAction extends kalturaAction
 	{
 		$this->ks = $this->getP ( "ks" );
 		$this->partner_id = $this->getP ( "partner_id" );
-				
+		
+		if ( ! $this->ks )
+		{
+			$ks = null;
+			$this->partner_id = 0;
+			kSessionUtils::createKSessionNoValidations( $this->partner_id ,
+				 0 , $ks ,8640000 , true , "" , "" );	
+			$this->ks = $ks;
+			
+		}
+		
+		
 		$this->subp_id = $this->getP ( "subp_id" );
 		$this->uid = $this->getP ( "uid" );
 

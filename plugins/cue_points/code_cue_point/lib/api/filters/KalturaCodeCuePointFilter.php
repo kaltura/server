@@ -21,17 +21,4 @@ class KalturaCodeCuePointFilter extends KalturaCodeCuePointBaseFilter
 	{
 		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
 	}
-
-	/* (non-PHPdoc)
-	 * @see KalturaRelatedFilter::validateForResponseProfile()
-	 */
-	public function validateForResponseProfile()
-	{
-		// override KalturaCuePointFilter::validateForResponseProfile because all code cue-points are public
-	}
-
-	public function getTypeListResponse(KalturaFilterPager $pager, KalturaDetachedResponseProfile $responseProfile = null, $type = null)
-	{
-		return parent::getTypeListResponse($pager, $responseProfile, CodeCuePointPlugin::getCuePointTypeCoreValue(CodeCuePointType::CODE));
-	}
 }

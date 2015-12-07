@@ -255,6 +255,7 @@ class BusinessProcessNotificationPlugin extends KalturaPlugin implements IKaltur
 			$langFilePath = __DIR__ . "/config/lang/$default.php";
 		}
 		
+		KalturaLog::debug("Loading file [$langFilePath]");
 		$array = include($langFilePath);
 	
 		return array($locale => $array);

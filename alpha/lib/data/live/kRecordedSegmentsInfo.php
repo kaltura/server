@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Map duration and offset of a live and its associated VOD entries
  *
@@ -12,15 +13,18 @@ class kRecordedSegmentsInfo
 	const LIVE_START = 'ls'; // Live start time = Total live duration at the beginning of the segment
 	const VOD_SEGMENT_DURATION = 'vsd';
 	const VOD_TO_LIVE_DELTA_TIME = 'dt'; // The diff between live and VOD segments duration (liveStart + vodSegmentDuration + vodToLiveDeltaTime = liveEnd)
+
 	protected $segments = array();
+
 	public function addSegment( $liveStart, $vodSegmentDuration, $vodToLiveDeltaTime )
 	{
 		$this->segments[] = array(
-			self::LIVE_START => $liveStart,
-			self::VOD_SEGMENT_DURATION => $vodSegmentDuration,
-			self::VOD_TO_LIVE_DELTA_TIME => $vodToLiveDeltaTime,
-		);
+				self::LIVE_START => $liveStart,
+				self::VOD_SEGMENT_DURATION => $vodSegmentDuration,
+				self::VOD_TO_LIVE_DELTA_TIME => $vodToLiveDeltaTime,
+			);
 	}
+
 	/**
 	 * Get the total VOD offset for a given time. Total = the sum of all VOD delta times throughout the segments.
 	 * @return int|null The offset that should be subtracted from the given time, or
@@ -36,8 +40,10 @@ class kRecordedSegmentsInfo
 	public function getTotalVodTimeOffset( $time )
 	{
 		$numSegments = count($this->segments);
+
 		$totalVodOffset = 0; // Initially zero because there's no time drift in the first segment.
 		$i = 0;
+
 		$dbgPrevSegment = null;
 		while ( $i < $numSegments )
 		{
@@ -64,10 +70,12 @@ class kRecordedSegmentsInfo
 				$i++;
 			}
 		}
+
 		// The time signature is greater than the total VOD duration
 		KalturaLog::debug("Couldn't get offset for time [$time]. Segment data: {$this->segmentAsString($segment)}");
 		return null;
 	}
+
 	/**
 	 * Not the real VOD end time, rather current segment's (live start time) + (vod duration).
 	 */
@@ -77,22 +85,27 @@ class kRecordedSegmentsInfo
 		{
 			return $segment[self::LIVE_START] + $segment[self::VOD_SEGMENT_DURATION];
 		}
+
 		return -1;
 	}
+
 	protected function getLiveEndTime( $segment )
 	{
 		if ( $segment )
 		{
 			return $segment[self::LIVE_START] + $segment[self::VOD_SEGMENT_DURATION] + $segment[self::VOD_TO_LIVE_DELTA_TIME];
 		}
+
 		return -1;
 	}
+
 	public function segmentAsString( $segment )
 	{
 		if ( $segment )
 		{
 			return "Live start: {$segment[self::LIVE_START]}, Live end: {$this->getLiveEndTime($segment)}, VOD translated end: {$this->getVodAdjustedEndTime($segment)} (VOD segment duration: {$segment[self::VOD_SEGMENT_DURATION]}, VOD to live delta: {$segment[self::VOD_TO_LIVE_DELTA_TIME]})";
 		}
+
 		return "N/A";
 	}
 }

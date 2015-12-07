@@ -87,7 +87,6 @@ class startwidgetsessionAction extends startsessionAction
 		else
 		{
 			// 	the session will be for NON admins and privileges of view only
-			$puser_id = 0;
 			$result = kSessionUtils::createKSessionNoValidations ( $partner_id , $puser_id , $ks_str , $expiry , false , "" , $privileges );
 		}
 

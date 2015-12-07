@@ -65,6 +65,7 @@ class SchemaService extends KalturaBaseService
 			$plugin = kPluginableEnumsManager::getPlugin($type);
 			if($plugin instanceof IKalturaSchemaDefiner)
 			{
+				KalturaLog::debug("Found plugin [" . get_class($plugin) . "]");
 				$baseXsdElement = $plugin->getPluginSchema($type);
 			}
 		}
@@ -95,8 +96,13 @@ class SchemaService extends KalturaBaseService
 			$elements = $schemaContributor->contributeToSchema($type);
 			if($elements)
 			{
+				KalturaLog::debug("Schema contributor [" . get_class($schemaContributor) . "] appeneded elements");
 				$elementsXSD .= $elements;
 				fwrite($xsdFile, $elements);
+			}
+			else
+			{
+				KalturaLog::debug("Schema contributor [" . get_class($schemaContributor) . "] did not append elements");
 			}
 		}
 		

@@ -175,6 +175,7 @@ abstract class KalturaBaseService
 			$this->partnerId != Partner::BATCH_PARTNER_ID && 
 			!$this->getPartner())
 		{
+			KalturaLog::err("Partner is required and ks not supplied");
 			throw new KalturaAPIException(KalturaErrors::MISSING_KS);
 		}
 		

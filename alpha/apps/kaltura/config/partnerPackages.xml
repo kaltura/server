@@ -54,16 +54,4 @@
 		<overage_fee>1.2</overage_fee>
 		<support_types>14</support_types>
 	</package>
-	<package>
-		<id>100</id>
-		<name>Kaltura Developer</name>
-		<cycle_type>1</cycle_type>
-		<cycle_bw>25</cycle_bw>
-		<cycle_storage>5</cycle_storage>
-		<cycle_traffic>20</cycle_traffic>
-		<cycle_transcoding>2</cycle_transcoding>
-		<cycle_fee>0</cycle_fee>
-		<overage_fee>0</overage_fee>
-		<support_types>1</support_types>
-	</package>
 </packages>

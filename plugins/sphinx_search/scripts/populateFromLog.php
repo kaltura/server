@@ -60,9 +60,7 @@ DbManager::initialize();
 $limit = 1000; 	// The number of sphinxLog records we want to query
 $gap = 500;	// The gap from 'getLastLogId' we want to query
 
-$sphinxReadConn = myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_SPHINX_LOG_READ);
-
-$serverLastLogs = SphinxLogServerPeer::retrieveByServer($sphinxServer, $sphinxReadConn);
+$serverLastLogs = SphinxLogServerPeer::retrieveByServer($sphinxServer);
 $lastLogs = array();
 $handledRecords = array();
 
@@ -73,13 +71,13 @@ foreach($serverLastLogs as $serverLastLog) {
 
 while(true)
 {
-	$sphinxLogs = SphinxLogPeer::retrieveByLastId($lastLogs, $gap, $limit, $handledRecords, $sphinxReadConn);
+	$sphinxLogs = SphinxLogPeer::retrieveByLastId($lastLogs, $gap, $limit, $handledRecords);
 	
 	while(!count($sphinxLogs))
 	{
 		$skipExecutedUpdates = true;
 		sleep(1);
-		$sphinxLogs = SphinxLogPeer::retrieveByLastId($lastLogs, $gap, $limit, $handledRecords, $sphinxReadConn);
+		$sphinxLogs = SphinxLogPeer::retrieveByLastId($lastLogs, $gap, $limit, $handledRecords);
 	}
 
 	$sphinxCon = null;

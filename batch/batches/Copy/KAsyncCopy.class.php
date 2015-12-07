@@ -34,6 +34,8 @@ class KAsyncCopy extends KJobHandlerWorker
 	 */
 	private function copyObjects(KalturaBatchJob $job, KalturaCopyJobData $data)
 	{
+		KalturaLog::debug("Copy objects job id [$job->id]");
+		
 		$engine = KCopyingEngine::getInstance($job->jobSubType);
 		$engine->configure($job->partnerId);
 	

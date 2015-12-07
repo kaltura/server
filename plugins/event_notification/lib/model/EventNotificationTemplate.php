@@ -13,7 +13,7 @@
  * @package plugins.eventNotification
  * @subpackage model
  */
-abstract class EventNotificationTemplate extends BaseEventNotificationTemplate implements IBaseObject
+abstract class EventNotificationTemplate extends BaseEventNotificationTemplate 
 {
 	const CUSTOM_DATA_EVENT_CONDITIONS = 'eventConditions';
 	const CUSTOM_DATA_CONTENT_PARAMETERS = 'contentParameters';
@@ -55,27 +55,4 @@ abstract class EventNotificationTemplate extends BaseEventNotificationTemplate i
 	{
 		return array("eventNotificationTemplate:partnerId=".strtolower($this->getPartnerId()));
 	}
-	
-
-	/**
-	 * @param EventNotificationTemplate $notificationTemplate
-	 * @param kEventScope $scope
-	 * @return boolean
-	 */
-	public function fulfilled(kEventScope $scope)
-	{
-	    $eventConditions = $this->getEventConditions();
-	    if(!$eventConditions || !count($eventConditions))
-	        return true;
-	
-	    foreach($eventConditions as $eventCondition)
-	    {
-	        /* @var $eventCondition kCondition */
-	        if(!$eventCondition->fulfilled($scope))
-	            return false;
-	    }
-	
-	    return true;
-	}
-	
 } // EventNotificationTemplate

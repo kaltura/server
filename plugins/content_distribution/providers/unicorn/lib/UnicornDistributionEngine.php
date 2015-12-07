@@ -193,7 +193,7 @@ class UnicornDistributionEngine extends DistributionEngine implements IDistribut
 		$remoteId = $this->send($distributionProfile, $xml);
 		if($remoteId)
 		{
-			KalturaLog::info("Remote ID [$remoteId]");
+			KalturaLog::debug("Remote ID [$remoteId]");
 			$data->remoteId = $remoteId;
 		}
 		
@@ -219,6 +219,8 @@ class UnicornDistributionEngine extends DistributionEngine implements IDistribut
 	 */
 	protected function send(KalturaUnicornDistributionProfile $distributionProfile, $xml)
 	{
+		KalturaLog::debug("XML [$xml]");
+		
 		$ch = curl_init($distributionProfile->apiHostUrl);
 		curl_setopt($ch, CURLOPT_POST, true);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true );
@@ -236,11 +238,12 @@ class UnicornDistributionEngine extends DistributionEngine implements IDistribut
 			throw new KalturaDispatcherException("HTTP request failed: $curlError", $curlErrorNumber);
 		}
 		curl_close($ch);
-		KalturaLog::info("Response [$response]");
+		KalturaLog::debug("Response [$response]");
 	
 		$matches = null;
 		if(preg_match_all('/HTTP\/?[\d.]{0,3} ([\d]{3}) ([^\n\r]+)/', $response, $matches))
 		{
+			KalturaLog::debug("Matches [" . print_r($matches, true) . "]");
 			foreach($matches[0] as $index => $match)
 			{
 				$code = intval($matches[1][$index]);

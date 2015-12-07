@@ -25,24 +25,9 @@ class WebexXmlClient
 	public function __construct($url, WebexXmlSecurityContext $securityContext)
 	{
 		$this->url = $url;
-		$this->validateNoBackup();
 		$this->securityContext = $securityContext;
 	}
-
-	protected function isRunningOnBackupSite()
-	{
-		$url = "{$this->url}/webex/gsbstatus.php";
-		return (trim(file_get_contents($url)) == 'TRUE');
-	}
-
-	private function validateNoBackup()
-	{
-		if($this->isRunningOnBackupSite())
-		{
-			throw new WebexXmlException ('Cannot run on backup.');
-		}
-	}
-
+	
 	/**
 	 * @param boolean $verbose
 	 */
@@ -58,7 +43,6 @@ class WebexXmlClient
 	 */
 	public function send(WebexXmlRequestBodyContent $requestBodyContent)
 	{
-		$this->validateNoBackup();
 		$request = new WebexXmlRequest($this->securityContext, $requestBodyContent);
 		$response = $this->doSend($request);
 		

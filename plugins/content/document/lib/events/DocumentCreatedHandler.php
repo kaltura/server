@@ -41,6 +41,8 @@ class DocumentCreatedHandler implements kObjectCreatedEventConsumer, kObjectAdde
 		$mediaType = null;
 		if($object->getType() == entryType::AUTOMATIC)
 		{
+			KalturaLog::debug("entry id [" . $object->getId() . "] type [" . $object->getType() . "] source link [" . $object->getSourceLink() . "]");
+			
 			$mediaType = $object->getMediaType();
 			if(isset(self::$fileExtensions[$mediaType]))
 			{
@@ -54,7 +56,7 @@ class DocumentCreatedHandler implements kObjectCreatedEventConsumer, kObjectAdde
 		
 		if($object->getType() != entryType::DOCUMENT)
 		{
-			KalturaLog::info("entry id [" . $object->getId() . "] type [" . $object->getType() . "]");
+			KalturaLog::debug("entry id [" . $object->getId() . "] type [" . $object->getType() . "]");
 			return true;
 		}
 	
@@ -65,10 +67,12 @@ class DocumentCreatedHandler implements kObjectCreatedEventConsumer, kObjectAdde
 			
 		if($object instanceof DocumentEntry)
 		{
-			KalturaLog::info("entry id [" . $object->getId() . "] already handled");
+			KalturaLog::debug("entry id [" . $object->getId() . "] already handled");
 			return true;
 		}
 	
+		KalturaLog::debug("Handling object [" . get_class($object) . "] type [" . $object->getType() . "] id [" . $object->getId() . "] status [" . $object->getStatus() . "]");
+
 		if ($object->getConversionProfileId())
 		{
 			$object->setStatus(entryStatus::PRECONVERT);

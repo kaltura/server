@@ -28,6 +28,8 @@ class kContentDistributionObjectCopiedHandler implements kObjectCopiedEventConsu
 	 */
 	protected function copyDistributionProfiles($fromPartnerId, $toPartnerId)
 	{
+		KalturaLog::debug("Copy distribution profiles from [$fromPartnerId] to [$toPartnerId]");
+		
  		$c = new Criteria();
  		$c->add(DistributionProfilePeer::PARTNER_ID, $fromPartnerId);
  		

@@ -8,7 +8,7 @@
  * @package Core
  * @subpackage model
  */ 
-class ConversionParams extends BaseConversionParams implements IBaseObject
+class ConversionParams extends BaseConversionParams
 {
 	const CONVERSION_PARAMS_CREATION_MODE_MANUAL = 1;
 	const CONVERSION_PARAMS_CREATION_MODE_KMC = 2;

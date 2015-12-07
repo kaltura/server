@@ -14,8 +14,7 @@ $akamaiLiveUniversalStreamType = null;
 $akamaiLiveUniversalEmailId = null;
 $akamaiLiveUniversalPrimaryContact = null;
 $akamaiLiveUniversalSecondaryContact = null;
-/*optional - set manually the hls/hds url. MAKE SURE TO INCLUDE the /i/ or /z/*/
-$akamaiLiveUniversalUrls = array( PlaybackProtocol::APPLE_HTTP =>null, PlaybackProtocol::AKAMAI_HDS =>null);
+
 
 // don't add to database if one of the parameters is missing or is an empty string
 if (!($partnerId) || !($akamaiLiveUniversalUsername) || !($akamaiLiveUniversalPassword) || !($akamaiLiveUniversalDomain) || !($akamaiLiveUniversalStreamType)
@@ -39,8 +38,6 @@ $liveParams["streamType"] = $akamaiLiveUniversalStreamType;
 $liveParams["primaryContact"] = $akamaiLiveUniversalPrimaryContact;
 $liveParams["secondaryContact"] = $akamaiLiveUniversalSecondaryContact;
 $liveParams["notificationEmail"] = $akamaiLiveUniversalEmailId;
-$liveParams["basePlaybackUrls"] = $akamaiLiveUniversalUrls;
-
 $partner->setAkamaiUniversalStreamingLiveParams($liveParams);
 $partner->save();	
 

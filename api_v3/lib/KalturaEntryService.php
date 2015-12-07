@@ -127,6 +127,7 @@ class KalturaEntryService extends KalturaBaseService
 		$partner = $this->getPartner();
 		if(!$partner->getEnabledService(PermissionName::FEATURE_ENTRY_REPLACEMENT))
 		{
+			KalturaLog::notice("Replacement is not allowed to the partner permission [FEATURE_ENTRY_REPLACEMENT] is needed");
 			throw new KalturaAPIException(KalturaErrors::FEATURE_FORBIDDEN, PermissionName::FEATURE_ENTRY_REPLACEMENT);
 		}
 		
@@ -290,6 +291,7 @@ class KalturaEntryService extends KalturaBaseService
 	
 		if(!$dbAsset)
 		{
+ 			KalturaLog::debug("Creating original flavor asset for local file");
 			$dbAsset = kFlowHelper::createOriginalFlavorAsset($this->getPartnerId(), $dbEntry->getId());
 		}
 		
@@ -322,7 +324,7 @@ class KalturaEntryService extends KalturaBaseService
 			if(!$mediaServer)
 				throw new KalturaAPIException(KalturaErrors::NO_MEDIA_SERVER_FOUND, $dbLiveEntry->getId());
 				
-			$mediaServerLiveService = $mediaServer->getWebService($mediaServer->getLiveWebServiceName());
+			$mediaServerLiveService = $mediaServer->getWebService(MediaServer::WEB_SERVICE_LIVE);
 			if($mediaServerLiveService && $mediaServerLiveService instanceof KalturaMediaServerLiveService)
 			{
 				$mediaServerLiveService->splitRecordingNow($dbLiveEntry->getId());
@@ -331,7 +333,7 @@ class KalturaEntryService extends KalturaBaseService
 			}
 			else 
 			{
-				throw new KalturaAPIException(KalturaErrors::MEDIA_SERVER_SERVICE_NOT_FOUND, $mediaServer->getId(), $mediaServer->getLiveWebServiceName());
+				throw new KalturaAPIException(KalturaErrors::MEDIA_SERVER_SERVICE_NOT_FOUND, $mediaServer->getId(), MediaServer::WEB_SERVICE_LIVE);
 			}
 			return $dbAsset;
 		}
@@ -348,6 +350,7 @@ class KalturaEntryService extends KalturaBaseService
 		if(!$dbAsset)
 		{
 			$isNewAsset = true;
+ 			KalturaLog::debug("Creating original flavor asset for recorded live");
 			$dbAsset = kFlowHelper::createOriginalFlavorAsset($this->getPartnerId(), $dbEntry->getId());
 		}
 		
@@ -434,6 +437,7 @@ class KalturaEntryService extends KalturaBaseService
 		if(!$dbAsset)
 		{
 			$isNewAsset = true;
+ 			KalturaLog::debug("Creating original flavor asset for unready local file");
 			$dbAsset = kFlowHelper::createOriginalFlavorAsset($this->getPartnerId(), $dbEntry->getId());
 		}
 		
@@ -522,6 +526,7 @@ class KalturaEntryService extends KalturaBaseService
 		if(!$dbAsset)
 		{
 			$isNewAsset = true;
+ 			KalturaLog::debug("Creating original flavor asset for local file");
 			$dbAsset = kFlowHelper::createOriginalFlavorAsset($this->getPartnerId(), $dbEntry->getId());
 		}
 		
@@ -651,6 +656,7 @@ class KalturaEntryService extends KalturaBaseService
 		{
 			$isNewAsset = true;
 			$isSource = true;
+ 			KalturaLog::debug("Creating original flavor asset");
 			$dbAsset = kFlowHelper::createOriginalFlavorAsset($this->getPartnerId(), $dbEntry->getId());
 		}
 	
@@ -692,10 +698,8 @@ class KalturaEntryService extends KalturaBaseService
 			if($srcEntryId)
 			{
 				$srcEntry = entryPeer::retrieveByPKNoFilter($srcEntryId);
-				if($srcEntry) {
-					$dbEntry->setSourceEntryId($srcEntryId);
+				if($srcEntry)
 					$dbEntry->setRootEntryId($srcEntry->getRootEntryId(true));
-				}
 			}
 			
 			$dbEntry->setOperationAttributes($operationAttributes);
@@ -843,6 +847,8 @@ class KalturaEntryService extends KalturaBaseService
 	 */
 	protected function attachAssetsParamsResourceContainers(kAssetsParamsResourceContainers $resource, entry $dbEntry)
 	{
+		KalturaLog::debug("Resources [" . count($resource->getResources()) . "]");
+		
 		$ret = null;
 		foreach($resource->getResources() as $assetParamsResourceContainer)
 		{
@@ -927,6 +933,7 @@ class KalturaEntryService extends KalturaBaseService
 		}
 			
 		$dbEntry = $entry->toInsertableObject($dbEntry);
+//		KalturaLog::debug("Inserted entry id [" . $dbEntry->getId() . "] data [" . print_r($dbEntry->toArray(), true) . "]");
 
 		$this->checkAndSetValidUserInsert($entry, $dbEntry);
 		$this->checkAdminOnlyInsertProperties($entry);
@@ -948,27 +955,23 @@ class KalturaEntryService extends KalturaBaseService
 	 */
 	protected function add(KalturaBaseEntry $entry, $conversionProfileId = null)
 	{
-		$dbEntry = $this->duplicateTemplateEntry($conversionProfileId);
-		if ($dbEntry)
-		{
-			$dbEntry->save();
-		}
-		return $this->prepareEntryForInsert($entry, $dbEntry);
-	}
-	
-	protected function duplicateTemplateEntry($conversionProfileId)
-	{
 		$dbEntry = null;
 		$conversionProfile = myPartnerUtils::getConversionProfile2ForPartner($this->getPartnerId(), $conversionProfileId);
 		if($conversionProfile && $conversionProfile->getDefaultEntryId())
 		{
-			$templateEntry = entryPeer::retrieveByPKNoFilter($conversionProfile->getDefaultEntryId(), null, false);
-			if ($templateEntry)
+			$templateEntry = entryPeer::retrieveByPK($conversionProfile->getDefaultEntryId());
+			if($templateEntry)
 			{
 				$dbEntry = $templateEntry->copyTemplate(true);
+				$dbEntry->save();
+			}
+			else
+			{
+				KalturaLog::err("Template entry id [" . $conversionProfile->getDefaultEntryId() . "] not found");
 			}
 		}
-		return $dbEntry;
+		
+		return $this->prepareEntryForInsert($entry, $dbEntry);
 	}
 	
 	/**
@@ -977,7 +980,7 @@ class KalturaEntryService extends KalturaBaseService
 	 * @param string $entryId Media entry id
 	 * @param int $conversionProfileId
 	 * @param KalturaConversionAttributeArray $dynamicConversionAttributes
-	 * @return bigint job id
+	 * @return int job id
 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
 	 * @throws KalturaErrors::CONVERSION_PROFILE_ID_NOT_FOUND
 	 * @throws KalturaErrors::FLAVOR_PARAMS_NOT_FOUND
@@ -988,7 +991,9 @@ class KalturaEntryService extends KalturaBaseService
 
 		if (!$entry)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
+			
 		
+			
 		$srcFlavorAsset = assetPeer::retrieveOriginalByEntryId($entryId);
 		if(!$srcFlavorAsset)
 			throw new KalturaAPIException(KalturaErrors::ORIGINAL_FLAVOR_ASSET_IS_MISSING);
@@ -1246,6 +1251,8 @@ class KalturaEntryService extends KalturaBaseService
    	 */
 	protected function checkAndSetValidUserInsert(KalturaBaseEntry $entry, entry $dbEntry)
 	{
+		KalturaLog::debug("Entry puser id [" . $entry->userId . "]");
+
 		// for new entry, puser ID is null - set it from service scope
 		if ($entry->userId === null)
 		{
@@ -1291,7 +1298,7 @@ class KalturaEntryService extends KalturaBaseService
 		// user id not being changed
 		if ($entry->userId === null)
 		{
-			KalturaLog::log("entry->userId is null, not changing user");
+			KalturaLog::debug("entry->userId is null, not changing user");
 			return;
 		}
 		
@@ -1328,11 +1335,13 @@ class KalturaEntryService extends KalturaBaseService
 			if($this->getKuser()->getId() != $dbEntry->getKuserId())
 			{
 				if($entry->entitledUsersEdit !== null && strtolower($entry->entitledUsersEdit) != strtolower($dbEntry->getEntitledPusersEdit())){
+					KalturaLog::debug('Update to entitledUsersEdit allowed only with admin KS or entry owner');
 					throw new KalturaAPIException(KalturaErrors::INVALID_KS, "", ks::INVALID_TYPE, ks::getErrorStr(ks::INVALID_TYPE));					
 					
 				}
 				
 				if($entry->entitledUsersPublish !== null && strtolower($entry->entitledUsersPublish) != strtolower($dbEntry->getEntitledPusersPublish())){
+					KalturaLog::debug('Update to entitledUsersPublish allowed only with admin KS or entry owner');
 					throw new KalturaAPIException(KalturaErrors::INVALID_KS, "", ks::INVALID_TYPE, ks::getErrorStr(ks::INVALID_TYPE));					
 					
 				}
@@ -1605,6 +1614,7 @@ class KalturaEntryService extends KalturaBaseService
 		
 		if (!$updateThumbnailResult)
 		{
+			KalturaLog::CRIT("An unknwon error occured while trying to update thumbnail");
 			throw new KalturaAPIException(KalturaErrors::INTERNAL_SERVERL_ERROR);
 		}
 		

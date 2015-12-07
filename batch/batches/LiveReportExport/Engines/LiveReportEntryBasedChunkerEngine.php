@@ -10,7 +10,7 @@ class LiveReportEntryBasedChunkerEngine extends LiveReportEngine {
 	/** Array of LiveReportEntryQueryEngine working as subengines */
 	protected $subEngines;
 
-	public function __construct(array $subEngines) {
+	public function LiveReportEntryBasedChunkerEngine(array $subEngines) {
 		$this->subEngines = $subEngines;
 	}
 

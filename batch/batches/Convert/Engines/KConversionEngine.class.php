@@ -242,7 +242,7 @@ abstract class KConversionEngine
 	 */
 	protected function addToLogFile ( $file_name , $str )
 	{
-		KalturaLog::debug($str);
+		KalturaLog::debug(__METHOD__ . " $str");
 		
 		// TODO - append text to file, don't read it all and then write it again
 		if ( file_exists ( $file_name ))		$log_content = @file_get_contents( $file_name ) ;

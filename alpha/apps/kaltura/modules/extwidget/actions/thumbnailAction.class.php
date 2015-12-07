@@ -207,7 +207,7 @@ class thumbnailAction extends sfAction
 					myFileConverter::convertImage($src_full_path, $thumb_full_path, $width, $height, $type, $bgcolor, true, $quality, $src_x, $src_y, $src_w, $src_h, $density, $stripProfiles, null, $format);
 					kFileUtils::dumpFile($thumb_full_path);
 				} else {
-					KalturaLog::info ( "token_id [$upload_token_id] not found in DC [". kDataCenterMgr::getCurrentDcId ()."]. dump url to romote DC");
+					KalturaLog::debug ( "token_id [$upload_token_id] not found in DC [". kDataCenterMgr::getCurrentDcId ()."]. dump url to romote DC");
 					$remoteUrl = kDataCenterMgr::getRemoteDcExternalUrlByDcId ( 1 - kDataCenterMgr::getCurrentDcId () ) .$_SERVER['REQUEST_URI'];
 					kFileUtils::dumpUrl($remoteUrl);
 				}
@@ -336,6 +336,7 @@ class thumbnailAction extends sfAction
 		if($entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_IMAGE)
 			$subType = entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA;
 			
+		KalturaLog::debug("get thumbnail filesyncs");
 		$dataKey = $entry->getSyncKey($subType);
 		list ( $file_sync , $local ) = kFileSyncUtils::getReadyFileSyncForKey( $dataKey ,true , false );
 		
@@ -405,7 +406,7 @@ class thumbnailAction extends sfAction
 			{
 				if($ex->getCode() != kFileSyncException::FILE_DOES_NOT_EXIST_ON_CURRENT_DC)
 				{
-					KalturaLog::err( "Resize image failed");
+					KalturaLog::log( "Error - resize image failed");
 					KExternalErrors::dieError(KExternalErrors::MISSING_THUMBNAIL_FILESYNC);
 				}
 				
@@ -413,7 +414,7 @@ class thumbnailAction extends sfAction
 				$origFlavorAsset = assetPeer::retrieveOriginalByEntryId($entry_id);
 				if(!$origFlavorAsset)
 				{
-					KalturaLog::err( "No original flavor for entry [$entry_id]");
+					KalturaLog::log( "Error - no original flavor for entry [$entry_id]");
 					KExternalErrors::dieError(KExternalErrors::FLAVOR_NOT_FOUND);
 				}
 
@@ -428,7 +429,7 @@ class thumbnailAction extends sfAction
 				
 				if($remoteFileSync->getDc() == kDataCenterMgr::getCurrentDcId())
 				{
-					KalturaLog::err("Trying to redirect to myself - stop here.");
+					KalturaLog::log("ERROR - Trying to redirect to myself - stop here.");
 					KExternalErrors::dieError(KExternalErrors::MISSING_THUMBNAIL_FILESYNC);
 				}
 				
@@ -447,47 +448,19 @@ class thumbnailAction extends sfAction
 			(!$securyEntryHelper->isKsWidget() && $securyEntryHelper->hasRules(ContextType::THUMBNAIL)))
 			$nocache = true;
 
-		$cache = null;
-		
-		if(!is_null($entry->getPartner()))
-		      $partnerCacheAge = $entry->getPartner()->getThumbnailCacheAge();
-		
 		if ($nocache)
-		{
 			$cacheAge = 0;
-		}
-		else if($partnerCacheAge)
-		{
-		    $cacheAge = $partnerCacheAge;
-		}
 		else if (strpos($tempThumbPath, "_NOCACHE_") !== false)
-		{
 			$cacheAge = 60;
-		}
 		else
 		{
-			$cacheAge = 3600;
-				
-			$cache = new myCache("thumb", 2592000); // 30 days, the max memcache allows
-		}
-
-		$lastModified = $entry->getAssetCacheTime();
-		
-		$renderer = kFileUtils::getDumpFileRenderer($tempThumbPath, null, $cacheAge, 0, $lastModified);
-		$renderer->partnerId = $entry->getPartnerId();
-		
-		if ($cache)
-		{
-			$invalidationKey = $entry->getCacheInvalidationKeys();
-			$invalidationKey = kQueryCache::CACHE_PREFIX_INVALIDATION_KEY . $invalidationKey[0];
-			$cacheTime = time() - kQueryCache::CLOCK_SYNC_TIME_MARGIN_SEC;
-			$cachedResponse = array($renderer, $invalidationKey, $cacheTime);
-			$cache->put($_SERVER["REQUEST_URI"], $cachedResponse);
+			$cacheAge = 8640000;
+			$requestKey = $_SERVER["REQUEST_URI"];
+			$cache = new myCache("thumb", $cacheAge); // 30 days
+			$cache->put($requestKey, $tempThumbPath);
 		}
 		
-		$renderer->output();
-	
-		KExternalErrors::dieGracefully();
+		kFileUtils::dumpFile($tempThumbPath, null, $cacheAge);
 		
 		// TODO - can delete from disk assuming we caneasily recreate it and it will anyway be cached in the CDN
 		// however dumpfile dies at the end so we cant just write it here (maybe register a shutdown callback)

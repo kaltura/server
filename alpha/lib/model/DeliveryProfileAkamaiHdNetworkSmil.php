@@ -8,16 +8,16 @@ class DeliveryProfileAkamaiHdNetworkSmil extends DeliveryProfileVod {
 	}
 	
 	/**
-	 * @return array $flavors
+	 * @return kManifestRenderer
 	 */
-	public function buildServeFlavors()
+	public function serve()
 	{
 		$flavors = $this->buildHttpFlavorsArray();
 	
 		// When playing HDS with Akamai HD the bitrates in the manifest must be unique
 		$this->ensureUniqueBitrates($flavors);
-		
-		return $flavors;
+	
+		return $this->getRenderer($flavors);
 	}
 	
 	protected function ensureUniqueBitrates(array &$flavors)
@@ -39,8 +39,6 @@ class DeliveryProfileAkamaiHdNetworkSmil extends DeliveryProfileVod {
 		$host = preg_replace("(https?://)", "", $this->getUrl() );
 		
 		$url = "http://". $host . $url . '/forceproxy/true';
-		if($this->params->getFileExtension())
-			$url .= "/name/a." . $this->params->getFileExtension();
 		return $url;
 	}
 	

@@ -8,7 +8,7 @@
  * @package Core
  * @subpackage model
  */ 
-class UploadToken extends BaseUploadToken implements IBaseObject
+class UploadToken extends BaseUploadToken
 {
 	/**
 	 * Token created but no upload has been started yet

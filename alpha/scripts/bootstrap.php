@@ -11,8 +11,7 @@ KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "vendor", "*
 KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "infra", "*"));
 KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "plugins", "*"));
 KAutoloader::setClassMapFilePath(kConf::get("cache_root_path") . '/scripts/classMap.cache');
-KAutoloader::addExcludePath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "vendor", "aws", "*")); // Do not load AWS files
-KAutoloader::addExcludePath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "vendor", "HTMLPurifier", "*")); // Do not load HTMLPurifier files
+KAutoloader::addExcludePath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "vendor", "aws", "*")); // Do not load AWS files, rather use their autoloader (see below)
 KAutoloader::register();
 
 date_default_timezone_set(kConf::get("date_default_timezone"));

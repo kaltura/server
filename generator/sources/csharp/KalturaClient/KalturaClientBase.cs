@@ -25,11 +25,10 @@
 //
 // @ignore
 // ===================================================================================================
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Net;
-using System.Web;
 using System.IO;
 using System.Security.Cryptography;
 using System.Xml;
@@ -43,39 +42,41 @@ namespace Kaltura
     {
         #region Private Fields
 
-        protected IDictionary<string, Object> clientConfiguration;
-        protected IDictionary<string, Object> requestConfiguration;
-
+        protected string _ApiVersion;
         protected KalturaConfiguration _Config;
+        private string _KS;
         private bool _ShouldLog;
         private List<KalturaServiceActionCall> _CallsQueue;
         private List<string> _MultiRequestReturnType;
         private KalturaParams _MultiRequestParamsMap;
-        private WebHeaderCollection _ResponseHeaders;
+		private WebHeaderCollection _ResponseHeaders;
 
         #endregion
 
         #region Properties
+
+        public string KS
+        {
+            get { return _KS; }
+            set { _KS = value; }
+        }
 
         public bool IsMultiRequest
         {
             get { return (_MultiRequestReturnType != null); }
         }
 
-        public WebHeaderCollection ResponseHeaders
+		public WebHeaderCollection ResponseHeaders
         {
             get { return _ResponseHeaders; }
         }
-
+		
         #endregion
 
         #region CTor
 
         public KalturaClientBase(KalturaConfiguration config)
         {
-            clientConfiguration = new Dictionary<string, Object>();
-            requestConfiguration = new Dictionary<string, Object>();
-
             _Config = config;
             if (_Config.Logger != null)
             {
@@ -96,19 +97,14 @@ namespace Kaltura
 
         public void QueueServiceCall(string service, string action, string fallbackClass, KalturaParams kparams, KalturaFiles kfiles)
         {
-            Object value;
-            foreach (string param in requestConfiguration.Keys)
-            {
-                value = requestConfiguration[param];
-                if (value is KalturaObjectBase)
-                {
-                    kparams.Add(param, ((KalturaObjectBase)value).ToParams());
-                }
-                else
-                {
-                    kparams.Add(param, value.ToString());
-                }
-            }
+            // in start session partner id is optional (default -1). if partner id was not set, use the one in the config
+            if (!kparams.ContainsKey("partnerId"))
+                kparams.AddIntIfNotNull("partnerId", this._Config.PartnerId);
+
+            if (kparams["partnerId"] == "-1")
+                kparams["partnerId"] = this._Config.PartnerId.ToString();
+
+            kparams.AddStringIfNotNull("ks", this._KS);
 
             KalturaServiceActionCall call = new KalturaServiceActionCall(service, action, kparams, kfiles);
             if (_MultiRequestReturnType != null)
@@ -120,7 +116,8 @@ namespace Kaltura
         {
             if (_CallsQueue.Count == 0)
             {
-                resetRequest();
+                _MultiRequestReturnType.Clear();
+                _MultiRequestReturnType = null;
                 return null;
             }
 
@@ -131,17 +128,16 @@ namespace Kaltura
             KalturaParams kparams = new KalturaParams();
             KalturaFiles kfiles = new KalturaFiles();
 
-            foreach (string param in clientConfiguration.Keys)
-            {
-                kparams.Add(param, clientConfiguration[param].ToString());
-            }
-            kparams.AddIfNotNull("format", this._Config.ServiceFormat.GetHashCode());
+            // append the basic params
+            kparams.Add("apiVersion", this._ApiVersion);
+            kparams.Add("clientTag", this._Config.ClientTag);
+            kparams.AddIntIfNotNull("format", this._Config.ServiceFormat.GetHashCode());
 
-            string url = this._Config.ServiceUrl + "/api_v3";
+            string url = this._Config.ServiceUrl + "/api_v3/index.php?service=";
 
             if (_MultiRequestReturnType != null)
             {
-                url += "/service/multirequest";
+                url += "multirequest";
                 int i = 1;
                 foreach (KalturaServiceActionCall call in _CallsQueue)
                 {
@@ -153,10 +149,10 @@ namespace Kaltura
                 }
 
                 // map params
-                foreach (KeyValuePair<string, IKalturaSerializable> item in _MultiRequestParamsMap)
+                foreach (KeyValuePair<string, string> item in _MultiRequestParamsMap)
                 {
                     string requestParam = item.Key;
-                    IKalturaSerializable resultParam = item.Value;
+                    string resultParam = item.Value;
 
                     if (kparams.ContainsKey(requestParam))
                     {
@@ -167,16 +163,18 @@ namespace Kaltura
             else
             {
                 KalturaServiceActionCall call = _CallsQueue[0];
-                url += "/service/" + call.Service + "/action/" + call.Action;
+                url += call.Service + "&action=" + call.Action;
                 kparams.Add(call.Params);
                 kfiles.Add(call.Files);
             }
 
+            // cleanup
+            _CallsQueue.Clear();
+            _MultiRequestParamsMap.Clear();
+
             kparams.Add("kalsig", this.Signature(kparams));
-            string json = kparams.ToJson();
 
             this.Log("full reqeust url: [" + url + "]");
-            this.Log("full reqeust data: [" + json + "]");
 
             // build request
             HttpWebRequest request = (HttpWebRequest)HttpWebRequest.Create(url);
@@ -191,18 +189,17 @@ namespace Kaltura
             request.Method = "POST";
             request.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
             request.Headers = _Config.RequestHeaders;
-            request.Accept = "application/json";
-
-            // Add proxy information if required
+			
+			// Add proxy information if required
             createProxy(request, _Config);
-
+            			
             if (kfiles.Count > 0)
             {
-                this.PostMultiPartWithFiles(request, json, kfiles);
+                this.PostMultiPartWithFiles(request, kparams, kfiles);
             }
             else
             {
-                this.PostUrlEncodedParams(request, json);
+                this.PostUrlEncodedParams(request, kparams);
             }
 
             // get the response
@@ -238,9 +235,6 @@ namespace Kaltura
                 XmlElement result = xml["xml"]["result"];
                 this.ThrowExceptionOnAPIError(result);
 
-                if(!IsMultiRequest)
-                    resetRequest();
-
                 return result;
             }
         }
@@ -270,44 +264,28 @@ namespace Kaltura
             XmlElement multiRequestResult = DoQueue();
 
             KalturaMultiResponse multiResponse = new KalturaMultiResponse();
-            if (multiRequestResult == null)
-            {
-                resetRequest();
-                return multiResponse;
-            }
-            
-            multiResponse = ParseMultiRequestResult(multiRequestResult);
-            resetRequest();
-            return multiResponse;
-        }
-        
-        private KalturaMultiResponse ParseMultiRequestResult(XmlElement childNode) 
-        {
-            return ParseMultiRequestResult(childNode, true);
-        }
-        
-        private KalturaMultiResponse ParseMultiRequestResult(XmlElement childNode, bool incrementI)  
-        {
+			if (multiRequestResult == null)
+			{
+				return multiResponse;
+			}
             int i = 0;
-            KalturaMultiResponse multiResponse = new KalturaMultiResponse();
-            foreach(XmlElement arrayNode in childNode.ChildNodes) 
+            foreach (XmlElement arrayNode in multiRequestResult.ChildNodes)
             {
-                XmlElement error = arrayNode["error"];
-                if (error != null && error["code"] != null && error["message"] != null) 
+				XmlElement error = arrayNode["error"];
+				if (error != null && error["code"] != null && error["message"] != null)
                     multiResponse.Add(new KalturaAPIException(error["code"].InnerText, error["message"].InnerText));
                 else if (arrayNode["objectType"] != null)
                     multiResponse.Add(KalturaObjectFactory.Create(arrayNode, _MultiRequestReturnType[i]));
-                else if (arrayNode["item"] != null)
-                    multiResponse.Add(ParseMultiRequestResult(arrayNode, false));
                 else
                     multiResponse.Add(arrayNode.InnerText);
-                if (incrementI) 
-                    i++;
+                i++;
             }
-    
+
+            _MultiRequestReturnType.Clear();
+            _MultiRequestReturnType = null;
             return multiResponse;
         }
-        
+
         public void MapMultiRequestParam(int resultNumber, int requestNumber, string requestParamName)
         {
             this.MapMultiRequestParam(resultNumber, null, requestNumber, requestParamName);
@@ -383,8 +361,14 @@ namespace Kaltura
 
         private string Signature(KalturaParams kparams)
         {
+            string str = "";
+            foreach (KeyValuePair<string, string> param in kparams)
+            {
+                str += (param.Key + param.Value);
+            }
+
             MD5CryptoServiceProvider md5 = new MD5CryptoServiceProvider();
-            byte[] data = Encoding.ASCII.GetBytes(kparams.ToJson());
+            byte[] data = Encoding.ASCII.GetBytes(str);
             data = md5.ComputeHash(data);
             StringBuilder sBuilder = new StringBuilder();
             for (int i = 0; i < data.Length; i++)
@@ -416,102 +400,81 @@ namespace Kaltura
                 throw new KalturaAPIException(error["code"].InnerText, error["message"].InnerText);
         }
 
-        private void PostMultiPartWithFiles(HttpWebRequest request, string json, KalturaFiles kfiles)
+        private void PostMultiPartWithFiles(HttpWebRequest request, KalturaParams kparams, KalturaFiles kfiles)
         {
             string boundary = "---------------------------" + DateTime.Now.Ticks.ToString("x");
             request.ContentType = "multipart/form-data; boundary=" + boundary;
 
-            byte[] paramsBuffer = BuildMultiPartParamsBuffer(json, boundary);
+            // use a memory stream because we don't know the content length of the request when we have multiple files
+            MemoryStream memStream = new MemoryStream();
+            byte[] buffer;
+            int bytesRead = 0;
 
-            SortedList<string, MultiPartFileDescriptor> filesDescriptions = new SortedList<string, MultiPartFileDescriptor>();
-            foreach (KeyValuePair<string, FileStream> file in kfiles)
-                filesDescriptions.Add(file.Key, BuildMultiPartFileDescriptor(file, boundary));
-
-            // Set content's length
-            request.ContentLength = paramsBuffer.LongLength;
-            foreach (KeyValuePair<string, MultiPartFileDescriptor> fileDesc in filesDescriptions)
-                request.ContentLength += fileDesc.Value.GetTotalLength();
-
-            // And let's upload
-            request.AllowWriteStreamBuffering = false; // A more sensible approach may be relevant
-            Stream requestStream = request.GetRequestStream();
-            requestStream.Write(paramsBuffer, 0, paramsBuffer.Length);
-            foreach (KeyValuePair<string, MultiPartFileDescriptor> fileDesc in filesDescriptions)
-            {
-                requestStream.Write(fileDesc.Value._Header, 0, fileDesc.Value._Header.Length);
-
-                byte[] buffer = new Byte[checked(Math.Min((uint)4096, fileDesc.Value._Stream.Length))];
-                int bytesRead = 0;
-                while ((bytesRead = fileDesc.Value._Stream.Read(buffer, 0, buffer.Length)) != 0)
-                    requestStream.Write(buffer, 0, bytesRead);
-
-                requestStream.Write(fileDesc.Value._Footer, 0, fileDesc.Value._Footer.Length);
-            }
-
-            requestStream.Close();
-        }
-
-        /// <summary>
-        /// Compiles the parameters required for PostMultiPartWithFiles(...) into a byte buffer ready to be streamed.
-        /// </summary>
-        /// <param name="kparams">The request's parameters.</param>
-        /// <param name="boundary">The multipart's boundary.</param>
-        /// <returns>
-        /// The parameters' byte array ready to be streamed.
-        /// </returns>
-        private byte[] BuildMultiPartParamsBuffer(string json, string boundary)
-        {
             StringBuilder sb = new StringBuilder();
             sb.Append("--" + boundary + "\r\n");
-            sb.Append("Content-Disposition: form-data; name=\"json\"\r\n");
-            sb.Append("\r\n");
-            sb.Append(HttpUtility.UrlDecode(json));
-            sb.Append("\r\n--" + boundary + "\r\n");
+            foreach (KeyValuePair<string, string> param in kparams)
+            {
+                sb.Append("Content-Disposition: form-data; name=\"" + param.Key + "\"" + "\r\n");
+                sb.Append("\r\n");
+                sb.Append(param.Value);
+                sb.Append("\r\n--" + boundary + "\r\n");
+            }
 
-            return Encoding.UTF8.GetBytes(sb.ToString()); 
+            buffer = Encoding.UTF8.GetBytes(sb.ToString());
+            memStream.Write(buffer, 0, buffer.Length);
+
+            foreach (KeyValuePair<string, FileStream> file in kfiles)
+            {
+                sb = new StringBuilder();
+                FileStream fileStream = file.Value;
+                sb.Append("Content-Disposition: form-data; name=\"" + file.Key + "\"; filename=\"" + Path.GetFileName(fileStream.Name) + "\"" + "\r\n");
+                sb.Append("Content-Type: application/octet-stream" + "\r\n");
+                sb.Append("\r\n");
+
+                // write the current string builder content
+                buffer = Encoding.UTF8.GetBytes(sb.ToString());
+                memStream.Write(buffer, 0, buffer.Length);
+
+                // write the file content
+                buffer = new Byte[checked((uint)Math.Min(4096, (int)fileStream.Length))];
+                bytesRead = 0;
+                while ((bytesRead = fileStream.Read(buffer, 0, buffer.Length)) != 0)
+                    memStream.Write(buffer, 0, bytesRead);
+
+                buffer = Encoding.UTF8.GetBytes("\r\n--" + boundary + "\r\n");
+                memStream.Write(buffer, 0, buffer.Length);
+            }
+
+            request.ContentLength = memStream.Length;
+
+            Stream requestStream = request.GetRequestStream();
+            // write the memorty stream to the request stream
+            memStream.Seek(0, SeekOrigin.Begin);
+            buffer = new Byte[checked((uint)Math.Min(4096, (int)memStream.Length))];
+            bytesRead = 0;
+            while ((bytesRead = memStream.Read(buffer, 0, buffer.Length)) != 0)
+                requestStream.Write(buffer, 0, bytesRead);
+
+            requestStream.Close();
+            memStream.Close();
         }
 
-        /// <summary>
-        /// Pre-compiles the multipart data required for a given file.
-        /// </summary>
-        /// <param name="fileEntry">The provided file infos.</param>
-        /// <param name="boundary">The multipart's boundary.</param>
-        /// <returns>
-        /// A description containing the file's stream and the part's header and footer.
-        /// </returns>
-        private MultiPartFileDescriptor BuildMultiPartFileDescriptor(KeyValuePair<string, FileStream> fileEntry, string boundary)
-        {
-            MultiPartFileDescriptor result = new MultiPartFileDescriptor();
-            result._Stream = fileEntry.Value;
-
-            // Build header
-            StringBuilder sb = new StringBuilder();
-            FileStream fileStream = fileEntry.Value;
-            sb.Append("Content-Disposition: form-data; name=\"" + fileEntry.Key + "\"; filename=\"" + Path.GetFileName(fileStream.Name) + "\"" + "\r\n");
-            sb.Append("Content-Type: application/octet-stream" + "\r\n");
-            sb.Append("\r\n");
-            result._Header = Encoding.UTF8.GetBytes(sb.ToString());
-
-            result._Footer = Encoding.UTF8.GetBytes("\r\n--" + boundary + "\r\n");
-
-            return result;
-        }
-
-        private void PostUrlEncodedParams(HttpWebRequest request, string json)
+        private void PostUrlEncodedParams(HttpWebRequest request, KalturaParams kparams)
         {
             byte[] buffer;
-            buffer = System.Text.Encoding.UTF8.GetBytes(json);
-            request.ContentType = "application/json";
-            request.ContentLength = json.Length;
+            string paramsString = kparams.ToQueryString();
+            buffer = System.Text.Encoding.UTF8.GetBytes(paramsString);
+            request.ContentType = "application/x-www-form-urlencoded";
+            request.ContentLength = paramsString.Length;
             Stream requestStream = request.GetRequestStream();
             requestStream.Write(buffer, 0, buffer.Length);
             requestStream.Close();
         }
 
         public long UnixTimeNow()
-        {
-            TimeSpan _TimeSpan = (DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0));
-            return (long)_TimeSpan.TotalSeconds;
+        {	
+                TimeSpan _TimeSpan = (DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0));
+                return (long)_TimeSpan.TotalSeconds;	
         }
 
         private string EncodeTo64(string toEncode)
@@ -519,34 +482,6 @@ namespace Kaltura
             byte[] toEncodeAsBytes = System.Text.ASCIIEncoding.ASCII.GetBytes(toEncode);
             string returnValue = System.Convert.ToBase64String(toEncodeAsBytes);
             return returnValue;
-        }
-
-        protected void resetRequest()
-        {
-            if (IsMultiRequest)
-            {
-                _MultiRequestReturnType.Clear();
-                _MultiRequestReturnType = null;
-            }
-
-            _CallsQueue.Clear();
-            _MultiRequestParamsMap.Clear();
-        }
-
-        #endregion
-
-        #region Support Types
-
-        private struct MultiPartFileDescriptor
-        {
-            public FileStream _Stream;
-            public byte[] _Header;
-            public byte[] _Footer;
-
-            public long GetTotalLength()
-            {
-                return _Stream.Length + _Header.LongLength + _Footer.LongLength;
-            }
         }
 
         #endregion

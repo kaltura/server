@@ -79,13 +79,8 @@ class KalturaDetachedResponseProfile extends KalturaBaseResponseProfile
 		parent::validateForUsage($sourceObject, $propertiesToSkip);
 	}
 	
-	public function validateNestedObjects($maxPageSize = null, $maxNestingLevel = null)
+	protected function validateNestedObjects($maxPageSize = null, $maxNestingLevel = null)
 	{	
-		if($this->filter)
-		{
-			$this->filter->validateForResponseProfile();
-		}
-		
 		$relatedProfiles = $this->relatedProfiles;
 		if(!$relatedProfiles)
 		{
@@ -155,14 +150,5 @@ class KalturaDetachedResponseProfile extends KalturaBaseResponseProfile
 		}
 		
 		return parent::toObject($object, $propertiesToSkip);
-	}
-	
-	/**
-	 * Return unique identifier to be used in cache
-	 * @return string
-	 */
-	public function getKey()
-	{
-		return md5(serialize($this));
 	}
 }

@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <buildpath>
-	<buildpathentry combineaccessrules="false" kind="prj" path="/infra"/>
 	<buildpathentry kind="src" path=""/>
-	<buildpathentry kind="con" path="com.zend.php.phpunit.CONTAINER"/>
 	<buildpathentry kind="con" path="org.eclipse.php.core.LANGUAGE"/>
+	<buildpathentry combineaccessrules="false" kind="prj" path="/infra"/>
+	<buildpathentry combineaccessrules="false" kind="prj" path="/vendor"/>
 	<buildpathentry kind="con" path="org.eclipse.dltk.USER_LIBRARY/INFRA"/>
 	<buildpathentry kind="con" path="org.eclipse.dltk.USER_LIBRARY/VENDOR"/>
-	<buildpathentry combineaccessrules="false" kind="prj" path="/vendor"/>
 </buildpath>

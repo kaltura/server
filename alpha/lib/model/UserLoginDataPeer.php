@@ -13,8 +13,8 @@
  * @package Core
  * @subpackage model
  */
-class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectPeer
-{
+class UserLoginDataPeer extends BaseUserLoginDataPeer {
+
 	const KALTURAS_CMS_PASSWORD_RESET = 51;
 	
 	public static function generateNewPassword()
@@ -188,7 +188,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		$partner = PartnerPeer::retrieveByPK($partnerId);
 		// If on the partner it's set not to reset the password - skip the email sending
 		if($partner->getEnabledService(PermissionName::FEATURE_DISABLE_RESET_PASSWORD_EMAIL)) {
-			KalturaLog::log("Skipping reset-password email sending according to partner configuration.");
+			KalturaLog::debug("Skipping reset-password email sending according to partner configuration.");
 			return true;
 		}
 		
@@ -365,6 +365,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		
 		if ((is_null($ksUserId) || $ksUserId === '') && $useOwnerIfNoUser)
 		{
+			KalturaLog::log('No user id on KS, trying to login as the account owner');
 			$partner = PartnerPeer::retrieveByPK($ksPartnerId);
 			if (!$partner) {
 				throw new kUserException('Invalid partner id ['.$ksPartnerId.']', kUserException::INVALID_PARTNER);
@@ -577,7 +578,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 				throw new kUserException('', kUserException::LOGIN_ID_ALREADY_USED);
 			}
 						
-			KalturaLog::info('Existing login data with the same email & password exists - returning id ['.$existingData->getId().']');	
+			KalturaLog::debug('Existing login data with the same email & password exists - returning id ['.$existingData->getId().']');	
 			$alreadyExisted = true;
 			
 			if ($isAdminUser && !$existingData->isLastLoginPartnerIdSet()) {
@@ -632,19 +633,5 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		
 	}
 	
-	/* (non-PHPdoc)
-	 * @see IRelatedObjectPeer::getRootObjects()
-	 */
-	public function getRootObjects(IRelatedObject $object)
-	{
-		return array();
-	}
-
-	/* (non-PHPdoc)
-	 * @see IRelatedObjectPeer::isReferenced()
-	 */
-	public function isReferenced(IRelatedObject $object)
-	{
-		return true;
-	}
+	
 } // UserLoginDataPeer

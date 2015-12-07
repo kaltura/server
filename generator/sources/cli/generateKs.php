@@ -32,7 +32,6 @@ require_once(dirname(__file__) . '/lib/KalturaCommandLineParser.php');
 require_once(dirname(__file__) . '/lib/KalturaSession.php');
 
 $commandLineSwitches = array(
-	array(KalturaCommandLineParser::SWITCH_REQUIRES_VALUE, 'v', 'version', 'Session version (1/2)'),
 	array(KalturaCommandLineParser::SWITCH_REQUIRES_VALUE, 't', 'type', 'Session type - 0=USER, 2=ADMIN'),
 	array(KalturaCommandLineParser::SWITCH_REQUIRES_VALUE, 'u', 'user', 'User name'),
 	array(KalturaCommandLineParser::SWITCH_REQUIRES_VALUE, 'e', 'expiry', 'Session expiry (seconds)'),
@@ -58,7 +57,7 @@ KalturaSecretRepository::init();
 
 $adminSecret = KalturaSecretRepository::getAdminSecret($partnerId);
 if (!$adminSecret)
-    die("Failed to get secret for partner {$partnerId}\n");
+    die("Failed to get secret for partner {$partnerId}");
 
 $type = (isset($options['type']) ? $options['type'] : 2);
 $user = (isset($options['user']) ? $options['user'] : 'admin');
@@ -76,22 +75,7 @@ if (isset($options['widget']))
 if (!isset($options['bare']))
 	echo "ks\t";
 
-$version = isset($options['version']) ? $options['version'] : 1;
-switch ($version)
-{ 
-case 1:
-	$ks = KalturaSession::generateKsV1($adminSecret, $user, $type, $partnerId, $expiry, $privileges, null, null);
-	break;
-
-case 2:
-	$ks = KalturaSession::generateKsV2($adminSecret, $user, $type, $partnerId, $expiry, $privileges, null, null);
-	break;
-
-default:
-	die("Invalid version {$version}\n");
-}
-	
-echo $ks;
+echo KalturaSession::generateKsV1($adminSecret, $user, $type, $partnerId, $expiry, $privileges, null, null);
 
 if (!isset($options['bare']))
 	echo "\n";

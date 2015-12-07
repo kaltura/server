@@ -170,7 +170,7 @@ class IdeticDistributionProvider extends ConfigurableDistributionProvider
 			{
 				$varNode->textContent = $providerData->$name;
 				$varNode->appendChild($xsl->createTextNode($providerData->$name));
-				KalturaLog::info("Set variable [$name] to [{$providerData->$name}]");
+				KalturaLog::debug("Set variable [$name] to [{$providerData->$name}]");
 			}
 		}
 

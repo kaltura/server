@@ -556,10 +556,5 @@ class baseObjectUtils
 		}
 		return $all_field_names;
 	}
-
-	public static function getObjectIdsAsArray($objectIds)
-	{
-		return explode(',', str_replace(' ','', $objectIds));
-	}
 }
 ?>

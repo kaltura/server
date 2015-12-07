@@ -10,10 +10,10 @@ class KalturaAttachmentAssetArray extends KalturaTypedArray
 		$newArr = new KalturaAttachmentAssetArray();
 		if ($arr == null)
 			return $newArr;
-	
+
 		foreach ($arr as $obj)
 		{
-			$nObj = KalturaAsset::getInstance($obj);
+    		$nObj = new KalturaAttachmentAsset();
 			$nObj->fromObject($obj, $responseProfile);
 			$newArr[] = $nObj;
 		}

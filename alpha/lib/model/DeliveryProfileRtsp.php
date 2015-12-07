@@ -8,15 +8,14 @@ class DeliveryProfileRtsp extends DeliveryProfileVod {
 	}
 	
 	/**
-	 * @return array $flavors
+	 * @return kManifestRenderer
 	 */
-	public function buildServeFlavors()
+	public function serve()
 	{
 		$flavorAssets = $this->params->getFlavorAssets();
 		$flavorAsset = reset($flavorAssets);
 		$flavorInfo = $this->getFlavorHttpUrl($flavorAsset);
-		
-		return array($flavorInfo);
+		return $this->getRenderer(array($flavorInfo));
 	}
 }
 

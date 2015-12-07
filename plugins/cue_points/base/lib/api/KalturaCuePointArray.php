@@ -13,7 +13,8 @@ class KalturaCuePointArray extends KalturaTypedArray
 		
 		foreach ($arr as $obj)
 		{
-    		$nObj = KalturaCuePoint::getInstance($obj, $responseProfile);
+    		$nObj = KalturaCuePoint::getInstance($obj->getType());
+			$nObj->fromObject($obj, $responseProfile);
 			$newArr[] = $nObj;
 		}
 		

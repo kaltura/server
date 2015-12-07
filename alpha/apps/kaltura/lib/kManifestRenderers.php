@@ -48,19 +48,10 @@ abstract class kManifestRenderer
 	public $defaultDeliveryCode = '';
 	
 	/**
-	 * @var kSessionBase
-	 */
-	protected $ksObject = null;
-	
-	/**
 	 * Array of classes required for load into the renderer scope in order to expand the manifest
 	 * @var array
 	 */
 	public $contributors;
-	
-	protected function prepareFlavors()
-	{
-	}
 	
 	/**
 	 * @return array<string>
@@ -105,49 +96,25 @@ abstract class kManifestRenderer
 	abstract protected function replaceDeliveryCode();
 	
 	abstract protected function tokenizeUrls();
-	
-	abstract protected function applyDomainPrefix();
-
-	/**
-	 * @param kSessionBase $ksObject
-	 */
-	public function setKsObject($ksObject)
-	{
-		$this->ksObject = $ksObject;
-		if ($this->tokenizer)
-		{
-			$this->tokenizer->setKsObject($ksObject);
-		}
-	}
-	
+		
 	/**
 	 * @param string $playbackContext
 	 */
-	public function setPlaybackContext($playbackContext)
+	final public function output($deliveryCode, $playbackContext)
 	{
+		$this->deliveryCode = $this->defaultDeliveryCode;
+		if ($deliveryCode)
+			$this->deliveryCode = $deliveryCode;
+				
+		if ($this->deliveryCode)
+			$this->replaceDeliveryCode();
+	
 		if ($this->tokenizer)
 		{
 			$this->tokenizer->setPlaybackContext($playbackContext);
 		}
-	}
-	
-	/**
-	 * @param string $deliveryCode
-	 */
-	public function setDeliveryCode($deliveryCode)
-	{
-		$this->deliveryCode = $deliveryCode ? $deliveryCode : $this->defaultDeliveryCode;
-	}
-	
-	final public function output()
-	{
-		$this->prepareFlavors();
-		
-		if ($this->deliveryCode)
-			$this->replaceDeliveryCode();
 		
 		$this->tokenizeUrls();
-		$this->applyDomainPrefix();
 	
 		$headers = $this->getHeaders();
 		$headers[] = "Access-Control-Allow-Origin:*";
@@ -172,19 +139,13 @@ abstract class kManifestRenderer
 			$footer = $contributorInstance->editManifestFooter ($footer);
 			$flavors = $contributorInstance->editManifestFlavors($flavors);
 		}
-		
+		$content = $header;
 		$separator = $this->getSeparator();
 		
-		$content = $header;
-		if ($content)
-		{
-			$content .= $separator;
-		}
-		$content .= implode($separator, $flavors);
-		$content .= $separator . $footer;
+		$flavorsString = implode($separator, $flavors);
+		$content .= $separator.$flavorsString;
 		
-		header('Content-Length: ' . strlen($content));		// avoid chunked encoding
-		
+		$content.=$separator.$footer;
 		echo $content;
 		
 		die;
@@ -193,8 +154,6 @@ abstract class kManifestRenderer
 	public function getRequiredFiles()
 	{
 		$result = array(__file__);
-		$thisClass = new ReflectionClass(get_class($this));
-		$result[] = $thisClass->getFileName();
 		if ($this->tokenizer)
 		{
 			$result[] = dirname(__file__) . '/storage/urlTokenizers/kUrlTokenizer.php';
@@ -267,32 +226,18 @@ class kSingleUrlManifestRenderer extends kManifestRenderer
 	{
 		self::normalizeUrlPrefix($this->flavor);
 		$url = $this->flavor['url'];
-		$urlPrefix = isset($this->flavor['urlPrefix']) ? $this->flavor['urlPrefix'] : null;
 		if ($this->tokenizer)
 		{
-			$url = $this->tokenizer->tokenizeSingleUrl($url, $urlPrefix);
+			$url = $this->tokenizer->tokenizeSingleUrl($url);
 		}
 		
-		if($urlPrefix !== null)
+		if(isset($this->flavor['urlPrefix']))
 		{
-			$url = self::urlJoin($urlPrefix, $url);
+			$url = self::urlJoin($this->flavor['urlPrefix'], $url);
 			unset($this->flavor['urlPrefix']);	// no longer need the prefix
 		}
 		
 		$this->flavor['url'] = $url;
-	}
-	
-	protected function applyDomainPrefix()
-	{
-		$domainPrefix = isset($this->flavor['domainPrefix']) ? $this->flavor['domainPrefix'] : null;
-		
-		if($domainPrefix)
-		{
-			$urlParts = explode("://", $this->flavor['url']);
-			$this->flavor['url'] = $urlParts[0] . "://" . $domainPrefix . $urlParts[1];
-		}
-		
-		unset($this->flavor['domainPrefix']);
 	}
 }
 
@@ -308,9 +253,9 @@ class kMultiFlavorManifestRenderer extends kManifestRenderer
 	 */
 	public $baseUrl = '';
 	
-	function __construct($flavors, $entryId = null, $baseUrl = '')
+	function __construct($flavor, $entryId = null, $baseUrl = '')
 	{
-		$this->flavors = $flavors;
+		$this->flavors = $flavor;
 		$this->entryId = $entryId;
 		$this->baseUrl = $baseUrl;
 	}
@@ -369,35 +314,18 @@ class kMultiFlavorManifestRenderer extends kManifestRenderer
 		foreach ($this->flavors as &$flavor)
 		{
 			$url = $flavor['url'];
-			$urlPrefix = isset($flavor['urlPrefix']) ? $flavor['urlPrefix'] : null;
 			if ($this->tokenizer)
 			{
-				$url = $this->tokenizer->tokenizeSingleUrl($url, $urlPrefix);
+				$url = $this->tokenizer->tokenizeSingleUrl($url);
 			}
 			
-			if($urlPrefix !== null)
+			if(isset($flavor['urlPrefix']))
 			{
-				$url = self::urlJoin($urlPrefix, $url);
+				$url = self::urlJoin($flavor['urlPrefix'], $url);
 				unset($flavor['urlPrefix']);		// no longer need the prefix
 			}
 			
 			$flavor['url'] = $url;
-		}
-	}
-	
-	protected function applyDomainPrefix()
-	{
-		foreach ($this->flavors as &$flavor)
-		{
-			$domainPrefix = isset($flavor['domainPrefix']) ? $flavor['domainPrefix'] : null;
-			
-			if($domainPrefix)
-			{
-				$urlParts = explode("://", $flavor['url']);
-				$flavor['url'] = $urlParts[0] . "://" . $domainPrefix . $urlParts[1];
-			}
-			
-			unset($flavor['domainPrefix']);
 		}
 	}
 }
@@ -717,24 +645,6 @@ class kSmilManifestRenderer extends kMultiFlavorManifestRenderer
 class kM3U8ManifestRenderer extends kMultiFlavorManifestRenderer
 {
 	/**
-	* @var bool
-	*/
-	protected $hasAudioFlavors = false;
-	
-	function __construct($flavors, $entryId = null, $baseUrl = '') 
-	{
-		parent::__construct($flavors, $entryId, $baseUrl);
-		
-		// check if audio flavors exist
-		foreach($this->flavors as $flavor) {
-			if (isset($flavor['audioLanguage'])) {
-				$this->hasAudioFlavors = true;
-				break;
-			}
-		}
-	}
-    
-	/**
 	 * @return array<string>
 	 */
 	protected function getHeaders()
@@ -747,49 +657,32 @@ class kM3U8ManifestRenderer extends kMultiFlavorManifestRenderer
 	 */
 	protected function getManifestFlavors()
 	{
-		$audioFlavorsArr = array(); 
-		$audio = null;
-		if ($this->hasAudioFlavors) {
-			$audio = ",AUDIO=\"audio\"";
-		}
-		
 		$flavorsArr = array();
 		foreach($this->flavors as $flavor)
 		{
-			// Sperate audio flavors from video flavors
-			if (isset($flavor['audioLanguage'])) {
-				$language = $flavor['audioLanguage'];
-				$languageName = $flavor['audioLanguageName'];
-				$content = "#EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID=\"audio\",LANGUAGE=\"{$language}\",NAME=\"{$languageName}\",URI=\"{$flavor['url']}\"";
-				$audioFlavorsArr[] = $content;
-			}
-			else {
-				$bitrate = (isset($flavor['bitrate']) ? $flavor['bitrate'] : 0) * 1024;
-				$codecs = "";
-				if ($bitrate && $bitrate <= 65536)
-					$codecs = ',CODECS="mp4a.40.2"';
+			$bitrate = (isset($flavor['bitrate']) ? $flavor['bitrate'] : 0) * 1024;
+			$codecs = "";
+			if ($bitrate && $bitrate <= 65536)
+				$codecs = ',CODECS="mp4a.40.2"';
 
-				// in case of Akamai HDN1.0 increase the reported bitrate due to mpeg2-ts overhead
-				if (strpos($flavor['url'], "index_0_av.m3u8"))
-					$bitrate += 40 * 1024;
+			// in case of Akamai HDN1.0 increase the reported bitrate due to mpeg2-ts overhead
+			if (strpos($flavor['url'], "index_0_av.m3u8"))
+				$bitrate += 40 * 1024;
 
-				$resolution = '';
-				if(isset($flavor['width']) && isset($flavor['height']))
-				{
-					$width = $flavor['width'];
-					$height = $flavor['height'];
-					if ($width && $height)
-						$resolution = ",RESOLUTION={$width}x{$height}";
-				}
-					
-				$content = "#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH={$bitrate}{$resolution}{$codecs}{$audio}\n";
-				$content .= $flavor['url'];
-				$flavorsArr[] = $content;
+			$resolution = '';
+			if(isset($flavor['width']) && isset($flavor['height']))
+			{
+				$width = $flavor['width'];
+				$height = $flavor['height'];
+				if ($width && $height)
+					$resolution = ",RESOLUTION={$width}x{$height}";
 			}
+				
+			$content = "#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH={$bitrate}{$resolution}{$codecs}\n";
+			$content .= $flavor['url'];
+			$flavorsArr[] = $content;
 		}
-		if (count($audioFlavorsArr) > 0) {
-			return array_merge($audioFlavorsArr, array(''), $flavorsArr);
-		}		
+		
 		return $flavorsArr;
 	}
 	
@@ -798,12 +691,7 @@ class kM3U8ManifestRenderer extends kMultiFlavorManifestRenderer
 	 */
 	protected function getManifestHeader()
 	{
-		$header = "#EXTM3U";
-		// add version in case of audio flavors
-		if ($this->hasAudioFlavors) {
-			$header .= "\n#EXT-X-VERSION:4";
-		}
-		return $header;
+		return "#EXTM3U";
 	}
 
 }

@@ -13,7 +13,7 @@
  * @package Core
  * @subpackage model
  */
-class UserRole extends BaseUserRole implements IRelatedObject
+class UserRole extends BaseUserRole
 {
 	const ALL_PARTNER_PERMISSIONS_WILDCARD = '*';
 	

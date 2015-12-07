@@ -63,6 +63,8 @@ class KAsyncEmailIngestion extends KPeriodicWorker
 	*/
 	public function run($jobs = null)
 	{
+		KalturaLog::info("Email ingestion batch is running");
+
 		if(self::$taskConfig->isInitOnly()) {
 			return $this->init();
 		}

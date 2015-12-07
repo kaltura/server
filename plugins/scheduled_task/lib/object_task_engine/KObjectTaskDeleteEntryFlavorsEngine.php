@@ -36,11 +36,11 @@ class KObjectTaskDeleteEntryFlavorsEngine extends KObjectTaskEntryEngineBase
 			throw new Exception('Too many flavors were found where pagination is not supported');
 
 		$flavors = $flavorsResponse->objects;
-		KalturaLog::info('Found '.count($flavors). ' flavors');
+		KalturaLog::debug('Found '.count($flavors). ' flavors');
 		if (!count($flavors))
 			return;
 
-		KalturaLog::info('Delete type is '.$deleteType);
+		KalturaLog::debug('Delete type is '.$deleteType);
 		switch($deleteType)
 		{
 			case KalturaDeleteFlavorsLogicType::DELETE_LIST:
@@ -60,12 +60,13 @@ class KObjectTaskDeleteEntryFlavorsEngine extends KObjectTaskEntryEngineBase
 	 */
 	protected function deleteFlavor($id, $partnerId)
 	{
+		KalturaLog::debug('Deleting flavor id '.$id);
 		$client = $this->getClient();
 		$this->impersonate($partnerId);
 		try
 		{
 			$client->flavorAsset->delete($id);
-			KalturaLog::info('Flavor id '.$id.' was deleted');
+			KalturaLog::debug('Flavor id '.$id.' was deleted');
 			$this->unimpersonate();
 		}
 		catch(Exception $ex)

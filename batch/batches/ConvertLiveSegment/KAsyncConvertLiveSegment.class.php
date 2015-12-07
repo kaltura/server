@@ -92,6 +92,8 @@ class KAsyncConvertLiveSegment extends KJobHandlerWorker
 	 */
 	protected function moveFile(KalturaBatchJob $job, KalturaConvertLiveSegmentJobData $data, $localTempFilePath, $sharedTempFilePath)
 	{
+		KalturaLog::debug("Moving file from [$localTempFilePath] to [$sharedTempFilePath]");
+		
 		$this->updateJob($job, "Moving file from [$localTempFilePath] to [$sharedTempFilePath]", KalturaBatchJobStatus::MOVEFILE);
 		
 		kFile::moveFile($localTempFilePath, $sharedTempFilePath, true);

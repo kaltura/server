@@ -19,11 +19,6 @@ abstract class kUrlTokenizer
 	protected $playbackContext;
 	
 	/**
-	 * @var kSessionBase
-	 */
-	protected $ksObject;
-	
-	/**
 	 * @param string $playbackContext
 	 */
 	public function setPlaybackContext($playbackContext)
@@ -41,10 +36,9 @@ abstract class kUrlTokenizer
 	
 	/**
 	 * @param string $url
-	 * @param string $urlPrefix
 	 * @return string
 	 */
-	public function tokenizeSingleUrl($url, $urlPrefix = null)
+	public function tokenizeSingleUrl($url)
 	{
 		return $url;
 	}
@@ -89,10 +83,6 @@ abstract class kUrlTokenizer
 		$this->key = $key;
 	}
 
-	/**
-	 * @param kSessionBase $ksObject
-	 */
-	public function setKsObject($ksObject) {
-		$this->ksObject = $ksObject;
-	}
+	
+	
 }

@@ -21,6 +21,11 @@ class KalturaLiveStreamBitrateArray extends KalturaTypedArray
 		return $newArr;
 	}
 		
+	public function toArray()
+	{
+		return $this->toObjectsArray();
+	}
+		
 	public function __construct()
 	{
 		parent::__construct("KalturaLiveStreamBitrate");	

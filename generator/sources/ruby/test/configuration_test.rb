@@ -56,16 +56,15 @@ class ConfigurationTest < Test::Unit::TestCase
     timeout = config["test"]["timeout"]
     
     service_url.gsub(/http:/, "https:/")
-
-    config = Kaltura::KalturaConfiguration.new()
-    config.service_url = service_url
+    
+    config = Kaltura::KalturaConfiguration.new(partner_id, service_url)
     config.logger = Logger.new(STDOUT)
     config.timeout = timeout
     
     @client = Kaltura::KalturaClient.new( config )
     assert_equal @client.ks, Kaltura::KalturaNotImplemented
     
-    session = @client.session_service.start( administrator_secret, '', Kaltura::KalturaSessionType::ADMIN, partner_id)
+    session = @client.session_service.start( administrator_secret, '', Kaltura::KalturaSessionType::ADMIN )
     @client.ks = session
     
     assert_not_nil @client.ks
@@ -79,15 +78,14 @@ class ConfigurationTest < Test::Unit::TestCase
     partner_id = config["test"]["partner_id"]
     service_url = "http://invalid-service-url"
     administrator_secret = config["test"]["administrator_secret"]
-
-    config = Kaltura::KalturaConfiguration.new()
-    config.service_url = service_url
+    
+    config = Kaltura::KalturaConfiguration.new(partner_id, service_url)
     config.logger = Logger.new(STDOUT)
     
     @client = Kaltura::KalturaClient.new( config )
     
     assert_raise Kaltura::KalturaAPIError do
-      session = @client.session_service.start( administrator_secret, '', Kaltura::KalturaSessionType::ADMIN, partner_id)
+      session = @client.session_service.start( administrator_secret, '', Kaltura::KalturaSessionType::ADMIN )
     end
   end
   
@@ -98,15 +96,14 @@ class ConfigurationTest < Test::Unit::TestCase
         
     partner_id = config["test"]["partner_id"]
     service_url = config["test"]["service_url"]
-
-    config = Kaltura::KalturaConfiguration.new()
-    config.service_url = service_url
+    
+    config = Kaltura::KalturaConfiguration.new(partner_id, service_url)
     config.logger = Logger.new(STDOUT)
     
     @client = Kaltura::KalturaClient.new( config )
     
     assert_raise Kaltura::KalturaAPIError do
-      session = @client.session_service.start( "invalid_administrator_secret", '', Kaltura::KalturaSessionType::ADMIN, partner_id)
+      session = @client.session_service.start( "invalid_administrator_secret", '', Kaltura::KalturaSessionType::ADMIN )
       @client.ks = session
     end
     
@@ -122,9 +119,8 @@ class ConfigurationTest < Test::Unit::TestCase
       service_url = config["test"]["service_url"]
       administrator_secret = config["test"]["administrator_secret"]
       timeout = config["test"]["timeout"]
-
-    config = Kaltura::KalturaConfiguration.new()
-    config.service_url = service_url
+  
+      config = Kaltura::KalturaConfiguration.new(partner_id, service_url)
       config.logger = Logger.new(STDOUT)
       config.timeout = timeout
   
@@ -158,15 +154,14 @@ class ConfigurationTest < Test::Unit::TestCase
     service_url = config["test"]["service_url"]
     administrator_secret = config["test"]["administrator_secret"]
     timeout = 0
-
-    config = Kaltura::KalturaConfiguration.new()
-    config.service_url = service_url
+    
+    config = Kaltura::KalturaConfiguration.new(partner_id, service_url)
     config.logger = Logger.new(STDOUT)
     config.timeout = timeout
     
     exception = assert_raise Kaltura::KalturaAPIError do
       @client = Kaltura::KalturaClient.new( config )
-      session = @client.session_service.start( administrator_secret, '', Kaltura::KalturaSessionType::ADMIN, partner_id)
+      session = @client.session_service.start( administrator_secret, '', Kaltura::KalturaSessionType::ADMIN )
       
       @client.ks = session
       

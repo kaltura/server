@@ -22,7 +22,19 @@ class kXslPathManager extends kPathManager
 		}
 		
 		$storageProfile = kPathManager::getStorageProfile($storageProfileId);
-		$pathXsl = $storageProfile->getPathFormat();
+		$params = $storageProfile->getPathManagerParams();
+		
+		$pathXsl = null;
+		if (isset($params[kPathManager::PATH_FORMAT_PARAM]))
+		{
+		    $pathXsl = $params[kPathManager::PATH_FORMAT_PARAM];
+		}
+		else
+		{
+		    $pathXsl = $this->getDefaultPathXsl();
+		}
+		
+		
 		$entry = $object->getEntry();
 		$xslVariables = $this->getXslVariables($storageProfile, $object, $subType, $version, $entry);
 		$xslStr = $this->getXsl($pathXsl, $xslVariables);

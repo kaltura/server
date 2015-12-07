@@ -4,7 +4,7 @@
  * @subpackage objects
  * @abstract
  */
-abstract class KalturaPermissionItem extends KalturaObject implements IRelatedFilterable
+abstract class KalturaPermissionItem extends KalturaObject implements IFilterable
 {
 
 	/**

@@ -52,12 +52,6 @@ class SphinxLogPeer extends BaseSphinxLogPeer {
 		if($criterions)
 			$criteria->addAnd($criterions);
 			
-		$disabledPartnerIds = kConf::get('disable_sphinx_indexing_partners', 'local', array());
-		if ($disabledPartnerIds)
-		{
-			$criteria->add(SphinxLogPeer::PARTNER_ID, $disabledPartnerIds, Criteria::NOT_IN);
-		}
-		
 		$criteria->addAscendingOrderByColumn(SphinxLogPeer::ID);
 		$criteria->setLimit($limit);
 

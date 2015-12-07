@@ -9,7 +9,6 @@
  */
 class SystemService extends KalturaBaseService
 {
-	const APIV3_FAIL_PING = "APIV3_FAIL_PING";
 	
 	protected function partnerRequired($actionName)
 	{
@@ -25,9 +24,6 @@ class SystemService extends KalturaBaseService
 	 */
 	function pingAction()
 	{
-		if(function_exists('apc_fetch') && apc_fetch(self::APIV3_FAIL_PING))
-			return false;
-		
 		return true;
 	}
 	

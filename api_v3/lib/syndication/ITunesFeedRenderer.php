@@ -107,8 +107,8 @@ class ITunesFeedRenderer extends SyndicationFeedRenderer {
 		return $res;
 	}
 
-	public function handleBody($entry, $e = null, $flavorAssetUrl = null)
-	{
+	public function handleBody($entry, $e = null, $flavorAssetUrl = null) {
+		
 		$res = '';
 		$res .= $this->writeOpenXmlNode('item',2);
 		$res .= $this->writeFullXmlNode('title', $this->stringToSafeXml($e->name), 3);

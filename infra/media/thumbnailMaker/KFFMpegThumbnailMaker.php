@@ -45,11 +45,11 @@ class KFFMpegThumbnailMaker extends KBaseThumbnailMaker
 		if($rv==0 && $this->parseOutput($output)==true)
 			return true;
 
-		KalturaLog::warning("First attempt failed due to ffmpeg crash or 'missing-keyframe' issue.\nSecond attempt with 'slow-thumb-capture' mode");
+		KalturaLog::debug("THUMB Capture Failure - First attempt failed due to ffmpeg crash or 'missing-keyframe' issue.\nSecond attempt with 'slow-thumb-capture' mode");
 		$cmd= $cmdArr[1];
 		if(isset($cmd) ){
 			if($position>30) {
-				KalturaLog::err("Can not run 2nd attempt - 'slow-thumb-capture' is allowed up to 30 sec position");
+				KalturaLog::debug("THUMB Capture - can not run 2nd attempt - 'slow-thumb-capture' is allowed up to 30 sec position");
 			}
 			else {
 				$rv = null;
@@ -83,10 +83,9 @@ class KFFMpegThumbnailMaker extends KBaseThumbnailMaker
 		}
 		
 		$cmdArr = array();
-			// '-noautorotate' to adjust to ffm2.7.2 that automatically normalizes rotated sources
-		$cmdArr[] = "$this->cmdPath $position_str -noautorotate -i $this->srcPath -an -y -r 1 $dimensions -vframes $frameCount -f $targetType $position_str_suffix" .
+		$cmdArr[] = "$this->cmdPath $position_str -i $this->srcPath -an -y -r 1 $dimensions -vframes $frameCount -f $targetType $position_str_suffix" .
 			" $this->targetPath >> $this->targetPath.log 2>&1";
-		$cmdArr[] = "$this->cmdPath -noautorotate -i $this->srcPath $position_str -an -y -r 1 $dimensions -vframes $frameCount -f $targetType" .
+		$cmdArr[] = "$this->cmdPath -i $this->srcPath $position_str -an -y -r 1 $dimensions -vframes $frameCount -f $targetType" .
 			" $this->targetPath >> $this->targetPath.log 2>&1";
 		return $cmdArr;
 		

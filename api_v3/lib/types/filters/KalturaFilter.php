@@ -118,6 +118,7 @@ abstract class KalturaFilter extends KalturaObject
 		 		
 		if(is_object($this->advancedSearch))
 		{
+			KalturaLog::debug("Advanced Search [" . print_r($this->advancedSearch, true) . "]");
 			if($this->advancedSearch instanceof KalturaSearchItem)
 			{
 				$advancedSearch = $this->advancedSearch->toObject();
@@ -202,6 +203,10 @@ abstract class KalturaFilter extends KalturaObject
 				$this->advancedSearch = new $apiClass();
 				$this->advancedSearch->fromObject($advancedSearch);
 			}
+		}
+		else
+		{
+			KalturaLog::debug("Advanced search not defined");
 		}
 	}
 	

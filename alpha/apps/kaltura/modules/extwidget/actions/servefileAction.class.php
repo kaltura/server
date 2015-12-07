@@ -25,7 +25,7 @@ class servefileAction extends sfAction
 			$current_dc_id = kDataCenterMgr::getCurrentDcId();
 			$error = "DC[$current_dc_id]: Cannot find FileSync with id [$file_sync_id]";
 			KalturaLog::err($error);
-			KExternalErrors::dieError(KExternalErrors::FILE_NOT_FOUND);
+			throw new Exception ($error);
 		}
 		
 		KalturaMonitorClient::initApiMonitor(false, 'extwidget.serveFile', $file_sync->getPartnerId());

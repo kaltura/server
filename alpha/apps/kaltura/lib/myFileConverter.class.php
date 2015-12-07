@@ -195,8 +195,8 @@ class myFileConverter
 		$position_str = $position ? " -ss $position " : "";
 		$position_str_suffix = $position ? " -ss 0.01 " : "";
 		$dimensions = ($width == -1 || $height == -1) ? "" : ("-s ". $width ."x" . $height);
-			// '-noautorotate' to adjust to ffm2.7.2 that automatically normalizes rotated sources
-		$exec_cmd = $cmd . $position_str . " -noautorotate -i " . "\"$source_file\"" . " -an -y -r 1 " . $dimensions .
+		
+		$exec_cmd = $cmd . $position_str . " -i " . "\"$source_file\"" . " -an -y -r 1 " . $dimensions .
 			" " . " -vframes $frame_count -f \"" . $target_type . "\" " . $position_str_suffix . "\"$target_file\"" . " 2>&1";
 		
 		KalturaLog::log("ffmpeg cmd [$exec_cmd]");
@@ -213,8 +213,7 @@ class myFileConverter
 
 				KalturaLog::log("FFMpeg response - \n".print_r(implode($output),1));
 				KalturaLog::log("The ffmpeg responded with 'first-frame-not-a-keyframe'. The fast-seek mode failed to properly get the right frame. Switching to the 'slow-mode' that is limited to th3 first 30sec only ".print_r(implode($output),1));
-					// '-noautorotate' to adjust to ffm2.7.2 that automatically normalizes rotated sources
-				$exec_cmd = kConf::get ( "bin_path_ffmpeg" ) . " -noautorotate -i \"$source_file\"". $position_str  . " -an -y -r 1 " . $dimensions .
+				$exec_cmd = kConf::get ( "bin_path_ffmpeg" ) . " -i \"$source_file\"". $position_str  . " -an -y -r 1 " . $dimensions .
 					" " . " -vframes $frame_count -f \"" . $target_type . "\" " . "\"$target_file\"" . " 2>&1";
 				KalturaLog::log("fmpeg cmd [$exec_cmd]");
 				$output = array ();
@@ -466,6 +465,7 @@ class myFileConverter
 		
 		// do convertion
 		$status = null;
+		KalturaLog::debug("target file for crop: $target_file");
 		$imageCropper = new KImageMagickCropper($source_file, $target_file, kConf::get('bin_path_imagemagick'));
 		$status = $imageCropper->crop($quality, $crop_type, $width, $height, $src_x, $src_y, $src_w, $src_h, null, null, $bgcolor, $density, null, $stripProfiles);
 		if (!$status)

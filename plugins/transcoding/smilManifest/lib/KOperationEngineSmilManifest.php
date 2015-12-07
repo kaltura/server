@@ -19,6 +19,8 @@ class KOperationEngineSmilManifest extends KSingleOutputOperationEngine
 	 */
 	protected function doOperation()
 	{
+		KalturaLog::debug('starting smil manifest operation');
+		
 		if(!$this->data->srcFileSyncs)
 			return true;
 

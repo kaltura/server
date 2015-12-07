@@ -3,8 +3,7 @@
  * @package api
  * @subpackage objects
  */
-class KalturaUserLoginData extends KalturaObject implements IRelatedFilterable
-
+class KalturaUserLoginData extends KalturaObject implements IFilterable 
 {
 	/**
 	 * @var string

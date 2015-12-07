@@ -78,6 +78,8 @@ class kFlowHelper
 	 */
 	public static function handleImportRetried(BatchJob $dbBatchJob, kImportJobData $data)
 	{
+		KalturaLog::debug("Import retried, with file: " . $data->getDestFileLocalPath());
+
 		if($dbBatchJob->getExecutionStatus() == BatchJobExecutionStatus::ABORTED)
 			return $dbBatchJob;
 
@@ -112,6 +114,8 @@ class kFlowHelper
 	 */
 	public static function handleImportFinished(BatchJob $dbBatchJob, kImportJobData $data)
 	{
+		KalturaLog::debug("Import finished, with file: " . $data->getDestFileLocalPath());
+
 		if($dbBatchJob->getExecutionStatus() == BatchJobExecutionStatus::ABORTED)
 			return $dbBatchJob;
 
@@ -442,6 +446,8 @@ class kFlowHelper
 	 */
 	public static function handleConcatFinished(BatchJob $dbBatchJob, kConcatJobData $data)
 	{
+		KalturaLog::debug("Concat finished, with file: " . $data->getDestFilePath());
+
 		if($dbBatchJob->getExecutionStatus() == BatchJobExecutionStatus::ABORTED)
 			return $dbBatchJob;
 
@@ -478,6 +484,8 @@ class kFlowHelper
 	 */
 	public static function handleExtractMediaClosed(BatchJob $dbBatchJob, kExtractMediaJobData $data)
 	{
+		KalturaLog::debug("Extract media closed");
+
 		if($dbBatchJob->getExecutionStatus() == BatchJobExecutionStatus::ABORTED)
 			return $dbBatchJob;
 
@@ -553,6 +561,7 @@ class kFlowHelper
 		 || in_array($mediaInfo->getVideoCodecId(),$webCamVideoCodecs))
 		&& (in_array($mediaInfo->getAudioFormat(),array("nellymoser"))
 		 || in_array($mediaInfo->getAudioCodecId(),array("nellymoser"))) ){
+			KalturaLog::log("webcam type of source");
 			if($mediaInfo->getVideoDuration()>0)
 				$durToTest = $mediaInfo->getVideoDuration();
 			else if($mediaInfo->getAudioDuration()>0)
@@ -578,7 +587,7 @@ class kFlowHelper
 			if(($durToTest>KDLSanityLimits::MaxDuration	// 360000000
 			 ||($calcBrToTest>0 && $calcBrToTest<KDLSanityLimits::MinBitrate) )
 			 ||($brToTest>0 && $brToTest<KDLSanityLimits::MinBitrate)) {
-				KalturaLog::err("invalid source, should be fixed");
+				KalturaLog::log("invalid source, should be fixed");
 				$flavorAsset = assetPeer::retrieveById($data->getFlavorAssetId());
 				if($flavorAsset && $flavorAsset->getVersion()<40){
 					$flavorAsset->incrementVersion();
@@ -607,6 +616,8 @@ class kFlowHelper
 	 */
 	public static function handleConvertPending(BatchJob $dbBatchJob, kConvertJobData $data)
 	{
+		KalturaLog::debug("Convert created with source file: " . $data->getSrcFileSyncLocalPath());
+
 		// save the data to the db
 		$dbBatchJob->setData($data);
 		$dbBatchJob->save();
@@ -633,6 +644,8 @@ class kFlowHelper
 	 */
 	public static function handleConvertCollectionPending(BatchJob $dbBatchJob, kConvertCollectionJobData $data)
 	{
+		KalturaLog::debug("Convert collection created with source file: " . $data->getSrcFileSyncLocalPath());
+
 		$flavors = $data->getFlavors();
 		foreach($flavors as $flavor)
 		{
@@ -658,6 +671,8 @@ class kFlowHelper
 	 */
 	public static function handleConvertFinished(BatchJob $dbBatchJob, kConvertJobData $data)
 	{
+		KalturaLog::debug("convert finished, start handling");	
+
 		if($dbBatchJob->getExecutionStatus() == BatchJobExecutionStatus::ABORTED)
 			return $dbBatchJob;
 
@@ -711,7 +726,7 @@ class kFlowHelper
 		if(!$data->getDestFileSyncLocalPath() && $fileSync) 
 		{
 			//no flavors were created in the last conversion, updating the DestFileSyncLocalPath to the path of the last created flavor
-			KalturaLog::info('Setting destFileSyncLocalPath with: '.$fileSync->getFullPath());
+			KalturaLog::debug('Setting destFileSyncLocalPath with: '.$fileSync->getFullPath());
 			$data->setDestFileSyncLocalPath($fileSync->getFullPath());		
 		}
 		$nextJob = self::createNextJob($flavorParamsOutput, $dbBatchJob, $data, $syncKey); //todo validate sync key
@@ -728,6 +743,7 @@ class kFlowHelper
 	}
 	private static function handleFlavorAssetConvertFinished(flavorAsset $flavorAsset, flavorParamsOutput $flavorParamsOutput, BatchJob $dbBatchJob, kConvertJobData $data)
 	{
+		KalturaLog::debug("Convert finished with destination file: " . $data->getDestFileSyncLocalPath());
 		$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 		$storageProfileId = $flavorParamsOutput->getSourceRemoteStorageProfileId();
 		if($storageProfileId == StorageProfile::STORAGE_KALTURA_DC)
@@ -763,6 +779,7 @@ class kFlowHelper
 		if($storageProfileId == StorageProfile::STORAGE_KALTURA_DC)
 		{
 			$data->setDestFileSyncLocalPath(kFileSyncUtils::getLocalFilePathForKey($syncKey));
+			KalturaLog::debug("Convert archived file to: " . $data->getDestFileSyncLocalPath());
 
 			// save the data changes to the db
 			$dbBatchJob->setData($data);
@@ -773,11 +790,16 @@ class kFlowHelper
 	{
 		$operatorSet = new kOperatorSets();
 		$operatorSet->setSerialized(stripslashes($flavorParamsOutput->getOperators()));
+		//		KalturaLog::debug("Operators: ".$flavorParamsOutput->getOperators()
+		//			."\ngetCurrentOperationSet:".$data->getCurrentOperationSet()
+		//			."\ngetCurrentOperationIndex:".$data->getCurrentOperationIndex());
+		//		KalturaLog::debug("Operators set: " . print_r($operatorSet, true));
 		$nextOperator = $operatorSet->getOperator($data->getCurrentOperationSet(), $data->getCurrentOperationIndex() + 1);
 
 		$nextJob = null;
 		if($nextOperator)
 		{
+			//			KalturaLog::debug("Found next operator");
 			//Note: consequent operators doesn't support at the moment conversion based on outputs of multiple sources
 			$nextJob = kJobsManager::addFlavorConvertJob(array($syncKey), $flavorParamsOutput, $data->getFlavorAssetId(), null,
 					$data->getMediaInfoId(), $dbBatchJob, $dbBatchJob->getJobSubType());
@@ -908,14 +930,18 @@ class kFlowHelper
 	 */
 	private static function handleAdditionalFilesConvertFinished(flavorAsset $flavorAsset, BatchJob $dbBatchJob, kConvertJobData $data)
 	{
+		KalturaLog::debug("Convert finished, creating additional file syncs ");
 		if(!$flavorAsset->getVersion() || !kFileSyncUtils::fileSync_exists($flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET)))
 		{
+			KalturaLog::debug("Incrementing version");
 			$flavorAsset->incrementVersion();
 			$flavorAsset->save();
 		}
 		
 		foreach ($data->getExtraDestFileSyncs() as $destFileSyncDesc) 
 		{
+			KalturaLog::debug("Creating file sync for destination file: ".$destFileSyncDesc->getFileSyncLocalPath());
+
 			$syncKey = $flavorAsset->getSyncKey($destFileSyncDesc->getFileSyncObjectSubType());
 
 			$flavorParamsOutput = $data->getFlavorParamsOutput();
@@ -943,6 +969,8 @@ class kFlowHelper
 	 */
 	public static function handleCaptureThumbFinished(BatchJob $dbBatchJob, kCaptureThumbJobData $data)
 	{
+		KalturaLog::debug("Capture thumbnail finished with destination file: " . $data->getThumbPath());
+
 		if($dbBatchJob->getExecutionStatus() == BatchJobExecutionStatus::ABORTED)
 			return $dbBatchJob;
 
@@ -995,7 +1023,7 @@ class kFlowHelper
 		kFileSyncUtils::moveFromFile($data->getThumbPath(), $syncKey);
 
 		$data->setThumbPath(kFileSyncUtils::getLocalFilePathForKey($syncKey));
-		KalturaLog::info("Thumbnail archived file to: " . $data->getThumbPath());
+		KalturaLog::debug("Thumbnail archived file to: " . $data->getThumbPath());
 
 		// save the data changes to the db
 		$dbBatchJob->setData($data);
@@ -1025,8 +1053,6 @@ class kFlowHelper
 		if(!is_null($thumbAsset->getFlavorParamsId()))
 			kFlowHelper::generateThumbnailsFromFlavor($dbBatchJob->getEntryId(), $dbBatchJob, $thumbAsset->getFlavorParamsId());
 
-		self::handleLocalFileSyncDeletion($dbBatchJob->getEntryId(), $dbBatchJob->getPartner());
-		
 		return $dbBatchJob;
 	}
 
@@ -1086,6 +1112,8 @@ class kFlowHelper
 	 */
 	public static function handleConvertFailed(BatchJob $dbBatchJob, kConvertJobData $data)
 	{
+		KalturaLog::debug("Convert failed with destination file: " . $data->getDestFileSyncLocalPath());
+
 		if($dbBatchJob->getExecutionStatus() == BatchJobExecutionStatus::ABORTED)
 			return $dbBatchJob;
 
@@ -1183,6 +1211,8 @@ class kFlowHelper
 	 */
 	public static function handleCaptureThumbFailed(BatchJob $dbBatchJob, kCaptureThumbJobData $data)
 	{
+		KalturaLog::debug("Captura thumbnail failed with destination file: " . $data->getThumbPath());
+
 		if($dbBatchJob->getExecutionStatus() == BatchJobExecutionStatus::ABORTED)
 			return $dbBatchJob;
 
@@ -1199,8 +1229,6 @@ class kFlowHelper
 		$thumbAsset->setStatus(thumbAsset::FLAVOR_ASSET_STATUS_ERROR);
 		$thumbAsset->save();
 
-		self::handleLocalFileSyncDeletion($dbBatchJob->getEntryId(), $dbBatchJob->getPartner());
-		
 		return $dbBatchJob;
 	}
 
@@ -1211,6 +1239,8 @@ class kFlowHelper
 	 */
 	public static function handlePostConvertFailed(BatchJob $dbBatchJob, kPostConvertJobData $data)
 	{
+		KalturaLog::debug("Post Convert failed for flavor params output: " . $data->getFlavorParamsOutputId());
+
 		// get additional info from the parent job
 		$engineType = null;
 		$mediaInfoId = null;
@@ -1235,6 +1265,8 @@ class kFlowHelper
 	 */
 	public static function handleDeleteFileFinished(BatchJob $dbBatchJob, kDeleteFileJobData $data)
 	{
+		KalturaLog::debug("File delete finished for file path: ". $data->getLocalFileSyncPath().", data center: ".$dbBatchJob->getDc());
+
 		//Change status of the filesync to "purged"
 		FileSyncPeer::setUseCriteriaFilter(false);
 		$fileSyncFroDeletedFile = FileSyncPeer::retrieveByFileSyncKey($data->getSyncKey(), true);
@@ -1257,6 +1289,8 @@ class kFlowHelper
 	 */
 	public static function handleConvertCollectionFinished(BatchJob $dbBatchJob, kConvertCollectionJobData $data)
 	{
+		KalturaLog::debug("Convert Collection finished for entry id: " . $dbBatchJob->getEntryId());
+
 		if($dbBatchJob->getExecutionStatus() == BatchJobExecutionStatus::ABORTED)
 			return $dbBatchJob;
 
@@ -1301,9 +1335,9 @@ class kFlowHelper
 			// replacing the file name in the ism file
 			$oldName = basename($flavor->getDestFileSyncLocalPath());
 			$flavor->setDestFileSyncLocalPath(kFileSyncUtils::getLocalFilePathForKey($syncKey));
-			KalturaLog::info("Convert archived file to: " . $flavor->getDestFileSyncLocalPath());
+			KalturaLog::debug("Convert archived file to: " . $flavor->getDestFileSyncLocalPath());
 			$newName = basename($flavor->getDestFileSyncLocalPath());
-			KalturaLog::info("Editing ISM [$oldName] to [$newName]");
+			KalturaLog::debug("Editing ISM [$oldName] to [$newName]");
 			$ismContent = str_replace("src=\"$oldName\"", "src=\"$newName\"", $ismContent);
 
 			// creating post convert job (without thumb)
@@ -1327,7 +1361,7 @@ class kFlowHelper
 		// replacing the ismc file name in the ism file
 		$oldName = basename($ismcPath);
 		$newName = basename(kFileSyncUtils::getLocalFilePathForKey($syncKey));
-		KalturaLog::info("Editing ISM [$oldName] to [$newName]");
+		KalturaLog::debug("Editing ISM [$oldName] to [$newName]");
 		$ismContent = str_replace("content=\"$oldName\"", "content=\"$newName\"", $ismContent);
 
 		$ismPath .= '.tmp';
@@ -1408,6 +1442,8 @@ class kFlowHelper
 	 */
 	public static function handleConvertCollectionFailed(BatchJob $dbBatchJob, kConvertCollectionJobData $data)
 	{
+		KalturaLog::debug("Convert Collection failed for entry id: " . $dbBatchJob->getEntryId());
+
 		kBusinessPostConvertDL::handleConvertCollectionFailed($dbBatchJob, $data, $dbBatchJob->getJobSubType());
 
 		return $dbBatchJob;
@@ -1518,6 +1554,8 @@ class kFlowHelper
 	 */
 	protected static function createThumbnail(BatchJob $dbBatchJob, kPostConvertJobData $data)
 	{
+		KalturaLog::debug("Post Convert finished with thumnail: " . $data->getThumbPath());
+
 		$ignoreThumbnail = false;
 
 		// this logic decide when this thumbnail should be used
@@ -1576,6 +1614,7 @@ class kFlowHelper
 			$entry->setThumbGrabbedFromAssetId($thisFlavorId);
 			$entry->save();
 
+			KalturaLog::debug("Saving thumbnail from: " . $data->getThumbPath());
 			// creats thumbnail the file sync
 			$entry = $dbBatchJob->getEntry(false, false);
 			if(!$entry)
@@ -1584,14 +1623,14 @@ class kFlowHelper
 				return;
 			}
 
-			KalturaLog::info("Entry duration: " . $entry->getLengthInMsecs());
+			KalturaLog::debug("Entry duration: " . $entry->getLengthInMsecs());
 			if(!$entry->getLengthInMsecs())
 			{
-				KalturaLog::info("Copy duration from flvor asset: " . $data->getFlavorAssetId());
+				KalturaLog::debug("Copy duration from flvor asset: " . $data->getFlavorAssetId());
 				$mediaInfo = mediaInfoPeer::retrieveByFlavorAssetId($data->getFlavorAssetId());
 				if($mediaInfo)
 				{
-					KalturaLog::info("Set duration to: " . $mediaInfo->getContainerDuration());
+					KalturaLog::debug("Set duration to: " . $mediaInfo->getContainerDuration());
 					$entry->setDimensionsIfBigger($mediaInfo->getVideoWidth(), $mediaInfo->getVideoHeight());
 					
 					if($entry->getCalculateDuration())
@@ -1684,6 +1723,10 @@ class kFlowHelper
 					if($entry)
 						kJobsManager::addConvertProfileJob(null, $entry, $currentFlavorAsset->getId(), $path);
 				}
+				else
+				{
+					KalturaLog::debug("File sync not created yet");
+				}
 				$currentFlavorAsset = null;
 			}
 		}
@@ -1759,6 +1802,8 @@ class kFlowHelper
 	 */
 	public static function handleStorageExportFinished(BatchJob $dbBatchJob, kStorageExportJobData $data)
 	{
+		KalturaLog::debug("Export to storage finished for sync file[" . $data->getSrcFileSyncId() . "]");
+
 		$fileSync = FileSyncPeer::retrieveByPK($data->getSrcFileSyncId());
 		if(!$fileSync)
 		{
@@ -1821,7 +1866,7 @@ class kFlowHelper
 		$originalEntryFileSync = FileSyncPeer::doSelectOne($c);
 		if(!$originalEntryFileSync)
 		{
-			KalturaLog::info("Origianl entry file sync not found with the following details: [object_type, object_sub_type, Partner_id, Linked_id] [" . $fileSync->getObjectType() 
+			KalturaLog::debug("Origianl entry file sync not found with the following details: [object_type, object_sub_type, Partner_id, Linked_id] [" . $fileSync->getObjectType() 
 							. ", " . $fileSync->getObjectSubType() . ", " . $fileSync->getPartnerId() . ", " . $fileSync->getId() . "]");
 			return;
 		}
@@ -1829,7 +1874,7 @@ class kFlowHelper
 		$originalAssetToDeleteFileSyncFor = assetPeer::retrieveById($originalEntryFileSync->getObjectId());
 		if(!$originalAssetToDeleteFileSyncFor)
 		{
-			KalturaLog::info("Could not find asset matching file sync object id " . $originalEntryFileSync->getObjectId());
+			KalturaLog::debug("Could not find asset matching file sync object id " . $originalEntryFileSync->getObjectId());
 			return;
 		}
 		
@@ -1887,7 +1932,7 @@ class kFlowHelper
 		{
 			/* @var $assetToDelete asset */
 			$versionsToDelete =  $assetToDelete->getFileSyncVersionsToDelete();
-			KalturaLog::info("file sync versions to delete are " . print_r($versionsToDelete, true));
+			KalturaLog::debug("file sync versions to delete are " . print_r($versionsToDelete, true));
 			if($versionsToDelete)
 			{
 				foreach ($versionsToDelete as $version)
@@ -1918,6 +1963,7 @@ class kFlowHelper
 	 */
 	public static function handleStorageExportFailed(BatchJob $dbBatchJob, kStorageExportJobData $data)
 	{
+		KalturaLog::debug("Export to storage failed for sync file[" . $data->getSrcFileSyncId() . "]");
 		if ($dbBatchJob->getErrType() == BatchJobErrorTypes::APP && $dbBatchJob->getErrNumber() == BatchJobAppErrors::FILE_ALREADY_EXISTS){
 			KalturaLog::notice("remote file already exists");
 			return $dbBatchJob;
@@ -1955,6 +2001,8 @@ class kFlowHelper
 
     public static function handleStorageDeleteFinished (BatchJob $dbBatchJob, kStorageDeleteJobData $data)
 	{
+	    KalturaLog::debug("Remote storage file deletion finished for fileysnc ID:[ ". $data->getSrcFileSyncId() ."]");
+
 	    $fileSync = FileSyncPeer::retrieveByPK($data->getSrcFileSyncId());
 		if(!$fileSync)
 		{
@@ -1975,6 +2023,8 @@ class kFlowHelper
 	 */
 	public static function handleConvertProfilePending(BatchJob $dbBatchJob, kConvertProfileJobData $data)
 	{
+		KalturaLog::debug("Convert Profile created, with input file: " . $data->getInputFileSyncLocalPath());
+
 		if($data->getExtractMedia()) // check if extract media required
 		{
 			// creates extract media job
@@ -2010,6 +2060,8 @@ class kFlowHelper
 
 	public static function handleConvertProfileFailed(BatchJob $dbBatchJob, kConvertProfileJobData $data)
 	{
+		KalturaLog::debug("Convert Profile failed");
+
 		kBatchManager::updateEntry($dbBatchJob->getEntryId(), entryStatus::ERROR_CONVERTING);
 
 		self::deleteTemporaryFlavors($dbBatchJob->getEntryId());
@@ -2021,6 +2073,8 @@ class kFlowHelper
 
 	public static function handleConvertProfileFinished(BatchJob $dbBatchJob, kConvertProfileJobData $data)
 	{
+		KalturaLog::debug("Convert Profile finished");
+
 		self::deleteTemporaryFlavors($dbBatchJob->getEntryId());
 		
 		self::handleLocalFileSyncDeletion($dbBatchJob->getEntryId(), $dbBatchJob->getPartner());
@@ -2031,21 +2085,6 @@ class kFlowHelper
 		if($entry)
 		{
 			kBusinessConvertDL::checkForPendingLiveClips($entry);
-
-			$clonePendingEntriesArray = $entry->getClonePendingEntries();
-			foreach ($clonePendingEntriesArray as $pendingEntryId)
-			{
-				$pendingEntry = entryPeer::retrieveByPK($pendingEntryId);
-				if ( $pendingEntry ) {
-					myEntryUtils::copyEntryData($entry, $pendingEntry);
-					$pendingEntry->setStatus($entry->getStatus());
-					$pendingEntry->setLengthInMsecs($entry->getLengthInMsecs());
-					$pendingEntry->save();
-
-				}
-			}
-			$entry->setClonePendingEntries(array());
-			$entry->save();
 		}
 		
 		return $dbBatchJob;
@@ -2290,6 +2329,7 @@ class kFlowHelper
 			$profile = null;
 			try{
 				$profile = myPartnerUtils::getConversionProfile2ForEntry($dbAsset->getEntryId());
+				KalturaLog::debug("profile [" . $profile->getId() . "]");
 			}
 			catch(Exception $e)
 			{
@@ -2385,9 +2425,10 @@ class kFlowHelper
 	 */
 	public static function handleUploadFinished(UploadToken $uploadToken)
 	{
+		KalturaLog::debug("File asset id [" . $uploadToken->getObjectId() . "] finished");
 		if(!is_subclass_of($uploadToken->getObjectType(), assetPeer::OM_CLASS) && $uploadToken->getObjectType() != FileAssetPeer::OM_CLASS && $uploadToken->getObjectType() != entryPeer::OM_CLASS)
 		{
-			KalturaLog::info("Class [" . $uploadToken->getObjectType() . "] not supported");
+			KalturaLog::debug("Class [" . $uploadToken->getObjectType() . "] not supported");
 			return;
 		}
 
@@ -2395,7 +2436,7 @@ class kFlowHelper
 
 		if(!file_exists($fullPath))
 		{
-			KalturaLog::info("File path [$fullPath] not found");
+			KalturaLog::debug("File path [$fullPath] not found");
 			$remoteDCHost = kUploadTokenMgr::getRemoteHostForUploadToken($uploadToken->getId(), kDataCenterMgr::getCurrentDcId());
 			if(!$remoteDCHost)
 			{
@@ -2443,7 +2484,7 @@ class kFlowHelper
 			$uploadToken->setStatus(UploadToken::UPLOAD_TOKEN_CLOSED);
 			$uploadToken->save();
 			
-			KalturaLog::info("File asset [" . $dbFileAsset->getId() . "] handled");
+			KalturaLog::debug("File asset [" . $dbFileAsset->getId() . "] handled");
 			return;
 		}
 		
@@ -2547,6 +2588,7 @@ class kFlowHelper
 	 */
 	public static function handleEntryReplacement(entry $tempEntry)
 	{
+		KalturaLog::debug("Handling temp entry id [" . $tempEntry->getId() . "] for real entry id [" . $tempEntry->getReplacedEntryId() . "]");
 		$entry = entryPeer::retrieveByPK($tempEntry->getReplacedEntryId());
 		if(!$entry)
 		{
@@ -2568,7 +2610,7 @@ class kFlowHelper
 		switch($entry->getReplacementStatus())
 		{
 			case entryReplacementStatus::APPROVED_BUT_NOT_READY:
-				KalturaLog::log("status changed to ready");
+				KalturaLog::debug("status changed to ready");
 				kEventsManager::raiseEventDeferred(new kObjectReadyForReplacmentEvent($tempEntry));
 				break;
 
@@ -2764,6 +2806,7 @@ class kFlowHelper
 	
 	private static function deleteTemporaryFlavors($entryId)
 	{
+		KalturaLog::debug('checking for temporary flavors to delete');
 		$originalflavorAsset = assetPeer::retrieveOriginalByEntryId($entryId);
 		if($originalflavorAsset && $originalflavorAsset->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_TEMP)
 		{
@@ -2786,6 +2829,7 @@ class kFlowHelper
 			$tempFlavorAsset = assetPeer::retrieveByEntryIdAndParams($entryId, $tempFlavorsParam->getFlavorParamsId());
 			if($tempFlavorAsset)
 			{
+				KalturaLog::debug('Deleting flavor ['.$tempFlavorAsset->getId().']');				
 				$tempFlavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_DELETED);
 				$tempFlavorAsset->setDeletedAt(time());
 				$tempFlavorAsset->save();
@@ -2797,7 +2841,10 @@ class kFlowHelper
 	{
 		if($partner && $partner->getStorageDeleteFromKaltura())
 		{
+			KalturaLog::debug("searching for exported assets of entry [$entryId] to delete local file syncs for");
+			
 			$readyAssets = assetPeer::retrieveReadyFlavorsByEntryId($entryId);
+			
 			self::deleteAssetLocalFileSyncsByAssetArray($readyAssets);
 		}
 	}
@@ -2812,6 +2859,7 @@ class kFlowHelper
 		$batchJob = BatchJobPeer::doSelectOne( $c );	
 		if($batchJob)
 		{
+			KalturaLog::debug('Activating convert profile job, local file path ['.$localFilePath.']');
 			$data = $batchJob->getData();
 			$data->setInputFileSyncLocalPath($localFilePath);
 			$batchJob->setData($data);

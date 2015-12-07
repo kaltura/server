@@ -10,10 +10,6 @@
  */
 class flavorAsset extends asset
 {
-
-	const KALTURA_TOKEN_MARKER = '{kt}';
-	const KALTURA_TOKEN_PARAM_NAME = '/kt/';
-
 	/**
 	 * Applies default values to this object.
 	 * This method should be called from the object's constructor (or
@@ -122,6 +118,7 @@ class flavorAsset extends asset
      */
     public function setStatusLocalReady()
     {
+	    KalturaLog::debug('Setting local ready status for asset id ['.$this->getId().']');
 	    $newStatus = asset::ASSET_STATUS_READY;
 	    
 	    $externalStorages = StorageProfilePeer::retrieveExternalByPartnerId($this->getPartnerId());
@@ -129,12 +126,12 @@ class flavorAsset extends asset
 	    {
 	    	if($this->requiredToExportFlavor($externalStorage))
 			{
-				KalturaLog::info('Asset id ['.$this->getId().'] is required to export to profile ['.$externalStorage->getId().'] - setting status to [EXPORTING]');
+				KalturaLog::debug('Asset id ['.$this->getId().'] is required to export to profile ['.$externalStorage->getId().'] - setting status to [EXPORTING]');
 				$newStatus = asset::ASSET_STATUS_EXPORTING;
 				break;			
 			}			
 	    }
-        KalturaLog::info('Setting status to ['.$newStatus.']');
+        KalturaLog::debug('Setting status to ['.$newStatus.']');
 	    $this->setStatus($newStatus);
 	}
 	
@@ -149,14 +146,14 @@ class flavorAsset extends asset
 		    
 		// check if export should happen now or wait for another trigger
 		if (!$storage->triggerFitsReadyAsset($this->getEntryId())) {
-			KalturaLog::info('Asset id ['.$this->getId().'] is not ready to export to profile ['.$storage->getId().']');
+			KalturaLog::debug('Asset id ['.$this->getId().'] is not ready to export to profile ['.$storage->getId().']');
 		    return false;
 		}
 		    
 		// check if asset needs to be exported to the remote storage
 		if (!$storage->shouldExportFlavorAsset($this, true))
 		{
-			KalturaLog::info('Should not export asset id ['.$this->getId().'] to profile ['.$storage->getId().']');
+			KalturaLog::debug('Should not export asset id ['.$this->getId().'] to profile ['.$storage->getId().']');
     		return false;
     	}
 		    
@@ -178,7 +175,7 @@ class flavorAsset extends asset
 			// check if asset is currently being exported to the remote storage
     		if ($storage->isPendingExport($key))
     		{
-    		   	KalturaLog::info('Asset id ['.$this->getId().'] is currently being exported to profile ['.$storage->getId().']');
+    		   	KalturaLog::debug('Asset id ['.$this->getId().'] is currently being exported to profile ['.$storage->getId().']');
 		      	return true;
 			}
 		}
@@ -229,6 +226,7 @@ class flavorAsset extends asset
 	    	}
 	    	elseif ($entry->getStatus() != entryStatus::DELETED)
 	    	{
+		    	KalturaLog::debug('Synchronizing flavor params ids for entry id ['.$entry->getId().']');
 	        	$entry->syncFlavorParamsIds();
 	        	$entry->save();
 	    	}
@@ -283,7 +281,7 @@ class flavorAsset extends asset
 		{
 			list($fileName , $extension) = kAssetUtils::getFileName($entry , $this);
 			$fileName = str_replace("\n", ' ', $fileName);
-			$fileName = kString::keepOnlyValidUrlChars($fileName);
+			$fileName = kString::stripInvalidUrlChars($fileName);
 	
 			if ($extension)
 				$fileName .= ".$extension";
@@ -301,7 +299,7 @@ class flavorAsset extends asset
 	}
 	
 	
-	public function getPlayManifestUrl($clientTag, $storageProfileId = null, $mediaProtocol = PlaybackProtocol::HTTP, $addKtToken = false) {
+	public function getPlayManifestUrl($clientTag, $storageProfileId = null, $mediaProtocol = PlaybackProtocol::HTTP) {
 		$entryId = $this->getEntryId();
 		$partnerId = $this->getPartnerId();
 		$subpId = $this->getentry()->getSubpId();
@@ -311,18 +309,11 @@ class flavorAsset extends asset
 		$url = "$partnerPath/playManifest/entryId/$entryId/flavorId/$flavorAssetId/protocol/$mediaProtocol/format/url";
 		if($storageProfileId)
 			$url .= "/storageId/" . $storageProfileId;
-
-		if($addKtToken)
-			$url .= self::KALTURA_TOKEN_PARAM_NAME . self::KALTURA_TOKEN_MARKER;
-
+	
 		if ($this->getFileExt())
 			$url .= "/a." . $this->getFileExt();
-
+	
 		$url .= "?clientTag=$clientTag";
-
-		if($addKtToken)
-			$url = self::calculateKalturaToken($url);
-
 		return $url;
 	}
 	
@@ -331,11 +322,5 @@ class flavorAsset extends asset
 		$size = $orginalSizeKB * ($seconds / ($entry->getLengthInMsecs() / 1000)) * 1.2;
 		$size = min($orginalSizeKB, floor($size)) * 1024;
 		return $size;
-	}
-	
-	static protected function calculateKalturaToken($url)
-	{
-		$token = sha1(kConf::get('url_token_secret') . $url);
-		return str_replace(self::KALTURA_TOKEN_MARKER, $token, $url);
 	}
 }

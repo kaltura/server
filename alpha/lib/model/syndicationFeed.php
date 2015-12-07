@@ -8,14 +8,13 @@
  * @package Core
  * @subpackage model
  */ 
-class syndicationFeed extends BasesyndicationFeed implements IBaseObject
+class syndicationFeed extends BasesyndicationFeed
 {
 	const CUSTOM_DATA_MRSS_PARAMETERS = 'mrss_parameters';
 	const CUSTOM_DATA_STORAGE_ID = 'storage_id';
 	const CUSTOM_DATA_ENTRIES_ORDER_BY = 'entries_order_by';
 	const CUSTOM_DATA_ENFORCE_ORDER = 'enforce_order';
 	const CUSTOM_DATA_SERVE_PLAY_MANIFEST = 'serve_play_manifest';
-	const CUSTOM_DATA_USE_CATEGORY_ENTRIES = 'use_category_entries';
 
 	// copied from KalturaSyndicationFeedStatus
 	const SYNDICATION_DELETED = -1;
@@ -28,7 +27,7 @@ class syndicationFeed extends BasesyndicationFeed implements IBaseObject
 		for ( $i = 0 ; $i < 10 ; ++$i)
 		{
 			$id = $dc["id"].'_'.kString::generateStringId();
-			$existing_object = syndicationFeedPeer::retrieveByPKNoFilter( $id );
+			$existing_object = entryPeer::retrieveByPKNoFilter( $id );
 			
 			if ( ! $existing_object ) return $id;
 		}
@@ -167,21 +166,5 @@ class syndicationFeed extends BasesyndicationFeed implements IBaseObject
 	public function getServePlayManifest()
 	{
 		return $this->getFromCustomData(self::CUSTOM_DATA_SERVE_PLAY_MANIFEST, null, false);
-	}
-	
-/**
-	 * @param boolean $v
-	 */
-	public function setUseCategoryEntries($v)
-	{
-		$this->putInCustomData(self::CUSTOM_DATA_USE_CATEGORY_ENTRIES, $v);
-	}
-	
-	/**
-	 * @return boolean
-	 */
-	public function getUseCategoryEntries()
-	{
-		return $this->getFromCustomData(self::CUSTOM_DATA_USE_CATEGORY_ENTRIES, null, false);
 	}
 }

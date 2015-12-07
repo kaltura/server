@@ -1,4 +1,4 @@
-/*! KMC - v6.0.11 - 2015-11-29
+/*! KMC - v6.0.11 - 2015-03-25
 * https://github.com/kaltura/KMC_V2
 * Copyright (c) 2015 Amir Chervinsky; Licensed GNU */
 /**
@@ -3590,7 +3590,7 @@ kmcApp.controller('PreviewCtrl', ['$scope', '$translate', 'previewService', func
 			options = options || {};
 			var playerId = (options.uiConfId) ? options.uiConfId : undefined;
 			// Exit if player not loaded
-			if(!kmc.vars.playlists_list && !kmc.vars.players_list) {
+			if(!kmc.vars.playlists_list || !kmc.vars.players_list) {
 				return ;
 			}
 			// List of players
@@ -3615,9 +3615,9 @@ kmcApp.controller('PreviewCtrl', ['$scope', '$translate', 'previewService', func
 		};
 
 	var setDeliveryTypes = function(player) {
-			//if( $scope.liveBitrates && $scope.liveBitrates != false ) {
+			if( $scope.liveBitrates && $scope.liveBitrates != false ) {
 				previewService.setDeliveryType('auto');
-			//}
+			}
 			var deliveryTypes = Preview.objectToArray(kmc.vars.delivery_types);
 			var defaultType = $scope.deliveryType || Preview.getDefault('deliveryType');
 			var validDeliveryTypes = [];
@@ -3693,11 +3693,9 @@ kmcApp.controller('PreviewCtrl', ['$scope', '$translate', 'previewService', func
 	});
 
 	$scope.$on('changePlayer', function(e, playerId) {
-		if ( playerId || ( playerId === undefined && $scope.players && $scope.players.length )){
-			playerId = ( playerId ) ? playerId : $scope.players[0].id;
-			$scope.player = playerId;
-			draw();
-		}
+		playerId = ( playerId ) ? playerId : $scope.players[0].id;
+		$scope.player = playerId;
+		draw();
 	});
 
 	$scope.$on('changeDelivery', function(e, deliveryTypeId) {

@@ -172,8 +172,8 @@ class nusoap_server extends nusoap_base {
     * @param mixed $wsdl file path or URL (string), or wsdl instance (object)
 	* @access   public
 	*/
-	function __construct($wsdl=false){
-		parent::__construct();
+	function nusoap_server($wsdl=false){
+		parent::nusoap_base();
 		// turn on debugging?
 		global $debug;
 		global $HTTP_SERVER_VARS;

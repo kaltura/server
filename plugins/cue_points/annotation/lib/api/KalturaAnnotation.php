@@ -56,21 +56,6 @@ class KalturaAnnotation extends KalturaCuePoint
 	 * @readonly
 	 */
 	public $directChildrenCount;
-	
-	/**
-	 * Is the annotation public.
-	 * @var KalturaNullableBoolean
-	 * @filter eq
-	 */
-	public $isPublic;
-	
-	/**
-	 * Should the cue point get indexed on the entry.
-	 * @var KalturaNullableBoolean
-	 */
-	public $searchableOnEntry;
-	
-	
 
 	public function __construct()
 	{
@@ -86,8 +71,6 @@ class KalturaAnnotation extends KalturaCuePoint
 		"depth",
 		"childrenCount",
 		"directChildrenCount",
-	    "isPublic",
-	    "searchableOnEntry",
 	);
 	
 	/* (non-PHPdoc)
@@ -122,12 +105,6 @@ class KalturaAnnotation extends KalturaCuePoint
 		$this->validateParentId();
 		if($this->parentId)
 			$this->validateEndTime();
-		
-		if(!isset($this->isPublic) || is_null($this->isPublic))
-		    $this->isPublic = false;
-		
-		if(!isset($this->searchableOnEntry) || is_null($this->searchableOnEntry))
-		    $this->searchableOnEntry=true;
 	}
 	
 	/* (non-PHPdoc)

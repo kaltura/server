@@ -114,7 +114,7 @@ class FiltersGenerator extends ClientGeneratorFromPhp
 				break;			
 		}
 		
-		$partnetClassName = ($parentType ? $parentType->getType() . "Filter" : ($type->isRelatedFilterable() ? "KalturaRelatedFilter" : "KalturaFilter"));
+		$partnetClassName = ($parentType ? $parentType->getType() . "Filter" : "KalturaFilter");
 		
 		$subpackage = ($type->getPackage() == 'api' ? '' : 'api.') . 'filters.base';
 		$this->appendLine("<?php");
@@ -441,7 +441,7 @@ class FiltersGenerator extends ClientGeneratorFromPhp
 	
 	private function appendLine($txt = "")
 	{
-		$this->_txt .= "$txt\n";
+		$this->_txt .= $txt . PHP_EOL;
 	}
 	
 	private function writeToFile($fileName, $contents)

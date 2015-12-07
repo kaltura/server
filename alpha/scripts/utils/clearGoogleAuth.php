@@ -4,12 +4,7 @@
  */
 
 
-chdir('/opt/kaltura/Jupiter-10.9.0/alpha/scripts/utils');
-
-require_once('/opt/kaltura/Jupiter-10.9.0/alpha/scripts/bootstrap.php');
-
-$realRun = in_array('realrun', $argv);
-KalturaStatement::setDryRun(!$realRun);
+require_once(__DIR__.'/../bootstrap.php');
 
 if (count($argv) < 2)
 {
@@ -22,27 +17,6 @@ if($partnerId <= 0)
 	die ("Partner id must be a real partner id.\n");
 }
 
-$customDataKey = null;
-if(!isset($argv[2]))
-{
-	$distributionProfile = DistributionProfilePeer::retrieveByPK(intval($argv[2]));
-	$objectIdentifier = null;
-	if($distributionProfile instanceof YoutubeApiDistributionProfile)
-	{
-		$appId = YoutubeApiDistributionPlugin::GOOGLE_APP_ID;
-		$objectIdentifier = md5(get_class($distributionProfile) . $distributionProfile->getUsername());
-	}
-	elseif($distributionProfile instanceof YouTubeDistributionProfile)
-	{
-		$appId = YoutubeApiDistributionPlugin::GOOGLE_APP_ID;
-		$objectIdentifier = $distributionProfile->getId();
-	}
-	else 
-	{
-		die ("Distribution-profile [" . $argv[2] . "] not found.\n");
-	}
-	$customDataKey = $appId . '_' . $objectIdentifier;
-}
 $partner = PartnerPeer::retrieveByPK($partnerId);
-$partner->removeFromCustomData($customDataKey, 'googleAuth');
+$partner->removeFromCustomData(null, 'googleAuth');
 $partner->save();

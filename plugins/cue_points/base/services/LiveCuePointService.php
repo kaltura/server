@@ -15,10 +15,8 @@ class LiveCuePointService extends KalturaBaseService
 		$this->applyPartnerFilterForClass('CuePoint');
 
 		// when session is not admin, allow access to user entries only
-		if (!$this->getKs() || !$this->getKs()->isAdmin()) {
-			KalturaCriterion::enableTag(KalturaCriterion::TAG_USER_SESSION);
-			CuePointPeer::setUserContentOnly(true);
-		}
+		if (!$this->getKs() || !$this->getKs()->isAdmin())
+			CuePointPeer::setDefaultCriteriaFilterByKuser();
 		
 		if(!CuePointPlugin::isAllowedPartner($this->getPartnerId()))
 			throw new KalturaAPIException(KalturaErrors::FEATURE_FORBIDDEN, CuePointPlugin::PLUGIN_NAME);
@@ -32,7 +30,6 @@ class LiveCuePointService extends KalturaBaseService
 	 * 
 	 * @action createPeriodicSyncPoints
 	 * @actionAlias liveStream.createPeriodicSyncPoints
-	 * @deprecated This actions is not required, sync points are sent automatically on the stream.
 	 * @param string $entryId Kaltura live-stream entry id
 	 * @param int $interval Events interval in seconds 
 	 * @param int $duration Duration in seconds
@@ -43,5 +40,31 @@ class LiveCuePointService extends KalturaBaseService
 	 */
 	function createPeriodicSyncPoints($entryId, $interval, $duration)
 	{
+		$entryDc = substr($entryId, 0, 1);
+		if($entryDc != kDataCenterMgr::getCurrentDcId())
+		{
+			$remoteDCHost = kDataCenterMgr::getRemoteDcExternalUrlByDcId($entryDc);
+			kFileUtils::dumpApiRequest($remoteDCHost, true);
+		}
+		
+		$dbEntry = entryPeer::retrieveByPK($entryId);
+
+		if (!$dbEntry || $dbEntry->getType() != KalturaEntryType::LIVE_STREAM || !in_array($dbEntry->getSource(), array(KalturaSourceType::LIVE_STREAM, KalturaSourceType::LIVE_STREAM_ONTEXTDATA_CAPTIONS)))
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
+			
+		/* @var $dbEntry LiveStreamEntry */
+		$mediaServer = $dbEntry->getMediaServer(true);
+		if(!$mediaServer)
+			throw new KalturaAPIException(KalturaErrors::NO_MEDIA_SERVER_FOUND, $entryId);
+			
+		$mediaServerCuePointsService = $mediaServer->getWebService(MediaServer::WEB_SERVICE_CUE_POINTS);
+		if($mediaServerCuePointsService && $mediaServerCuePointsService instanceof KalturaMediaServerCuePointsService)
+		{
+			$mediaServerCuePointsService->createTimeCuePoints($entryId, $interval, $duration);
+		}
+		else 
+		{
+			throw new KalturaAPIException(KalturaErrors::MEDIA_SERVER_SERVICE_NOT_FOUND, $mediaServer->getId(), MediaServer::WEB_SERVICE_LIVE);
+		}
 	}
 }

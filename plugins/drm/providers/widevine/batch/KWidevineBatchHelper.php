@@ -19,10 +19,6 @@ class KWidevineBatchHelper
 	const PTIME = 'ptime';
 	const SIGN = 'sign';
 	
-	const SYNC_FRAME_OFFSET_MATCH_ERROR = 11;
-	const FIX_ASSET_ERROR = 'Stream duration mismatched';
-	const FIX_ASSET_ERROR_RETURN_CODE = 100;
-	
 	private static $encryptionErrorCodes = array(
 						'OK', 'InvalidUsage', 'OwnerNotSpecified', 'ProviderNotSpecified', 'AssetNotSpecified', 'WVEncError',
   						'ConversionError', 'FinalIndexError', 'SyncFrameCountError', 'TrickPlaySyncFrameTooFarError', 'SyncFrameTooFarError',
@@ -56,9 +52,9 @@ class KWidevineBatchHelper
 		if(!$portal)
 			$portal = WidevinePlugin::KALTURA_PROVIDER;
 		
-		$cmd = $widevineExe.' -a '.$assetName.' -u '.$wvRegServerHost.' -p '.$portal.' -o '.$portal.' -t '.$inputFiles.' -d '.$destinationFile.' -g '.$gop.' 2>&1';
+		$cmd = $widevineExe.' -a '.$assetName.' -u '.$wvRegServerHost.' -p '.$portal.' -o '.$portal.' -t '.$inputFiles.' -d '.$destinationFile.' -g '.$gop;
 		
-		KalturaLog::info("Encrypt package command: ".$cmd);
+		KalturaLog::debug("Encrypt package command: ".$cmd);
 		
 		//$cmd = $cmd.' -v '.$iv.' -k '.$key;
 		return $cmd;
@@ -71,10 +67,6 @@ class KWidevineBatchHelper
 	 */
 	public static function getEncryptPackageErrorMessage($status)
 	{
-		if($status == self::FIX_ASSET_ERROR_RETURN_CODE)
-		{
-			return self::FIX_ASSET_ERROR;
-		}
 		return self::$encryptionErrorCodes[$status];
 	}
 	
@@ -167,15 +159,6 @@ class KWidevineBatchHelper
 		}
 	}
 	
-	public static function getFixAssetCmdLine($ffmpegCmd, $inputFile, $fixedInputFile)
-	{
-		$cmd =  "$ffmpegCmd -i $inputFile -i $inputFile -map 0:v -map 1:a -c copy -shortest -y -f mp4 -threads 1 $fixedInputFile 2>&1";
-		
-		KalturaLog::info("Executing command to fix asset : ".$cmd);
-		
-		return $cmd;
-	}
-	
 	private static function sendHttpRequest($wvRegServerUrl, $params, $providerParams = null)
 	{
 		$url = $wvRegServerUrl.'?';
@@ -184,7 +167,7 @@ class KWidevineBatchHelper
 			$params[self::PROVIDER] = self::providerRequestEncode($providerParams);
 		$url .= http_build_query($params, '', '&');
 		
-		KalturaLog::info("Request URL: ".$url);
+		KalturaLog::debug("Request URL: ".$url);
 				
 		$ch = curl_init();		
 		curl_setopt($ch, CURLOPT_URL, $url);

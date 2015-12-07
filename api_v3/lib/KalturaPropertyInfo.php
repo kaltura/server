@@ -101,7 +101,7 @@ class KalturaPropertyInfo
 	 * @param string $type class name
 	 * @param string $name property name
 	 */
-	public function __construct($type, $name = '')
+	public function KalturaPropertyInfo($type, $name = '')
 	{
 		if ($type == 'time')
 		{

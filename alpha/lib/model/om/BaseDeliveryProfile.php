@@ -131,12 +131,6 @@ abstract class BaseDeliveryProfile extends BaseObject  implements Persistent {
 	protected $custom_data;
 
 	/**
-	 * The value for the priority field.
-	 * @var        int
-	 */
-	protected $priority;
-
-	/**
 	 * Flag to prevent endless save loop, if this object is referenced
 	 * by another object which falls in this transaction.
 	 * @var        boolean
@@ -442,16 +436,6 @@ abstract class BaseDeliveryProfile extends BaseObject  implements Persistent {
 	public function getCustomData()
 	{
 		return $this->custom_data;
-	}
-
-	/**
-	 * Get the [priority] column value.
-	 * 
-	 * @return     int
-	 */
-	public function getPriority()
-	{
-		return $this->priority;
 	}
 
 	/**
@@ -918,29 +902,6 @@ abstract class BaseDeliveryProfile extends BaseObject  implements Persistent {
 	} // setCustomData()
 
 	/**
-	 * Set the value of [priority] column.
-	 * 
-	 * @param      int $v new value
-	 * @return     DeliveryProfile The current object (for fluent API support)
-	 */
-	public function setPriority($v)
-	{
-		if(!isset($this->oldColumnsValues[DeliveryProfilePeer::PRIORITY]))
-			$this->oldColumnsValues[DeliveryProfilePeer::PRIORITY] = $this->priority;
-
-		if ($v !== null) {
-			$v = (int) $v;
-		}
-
-		if ($this->priority !== $v) {
-			$this->priority = $v;
-			$this->modifiedColumns[] = DeliveryProfilePeer::PRIORITY;
-		}
-
-		return $this;
-	} // setPriority()
-
-	/**
 	 * Indicates whether the columns in this object are only set to default values.
 	 *
 	 * This method can be used in conjunction with isModified() to indicate whether an object is both
@@ -1002,7 +963,6 @@ abstract class BaseDeliveryProfile extends BaseObject  implements Persistent {
 			$this->streamer_type = ($row[$startcol + 15] !== null) ? (string) $row[$startcol + 15] : null;
 			$this->media_protocols = ($row[$startcol + 16] !== null) ? (string) $row[$startcol + 16] : null;
 			$this->custom_data = ($row[$startcol + 17] !== null) ? (string) $row[$startcol + 17] : null;
-			$this->priority = ($row[$startcol + 18] !== null) ? (int) $row[$startcol + 18] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -1012,7 +972,7 @@ abstract class BaseDeliveryProfile extends BaseObject  implements Persistent {
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 19; // 19 = DeliveryProfilePeer::NUM_COLUMNS - DeliveryProfilePeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 18; // 18 = DeliveryProfilePeer::NUM_COLUMNS - DeliveryProfilePeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating DeliveryProfile object", $e);
@@ -1066,7 +1026,7 @@ abstract class BaseDeliveryProfile extends BaseObject  implements Persistent {
 
 		DeliveryProfilePeer::setUseCriteriaFilter(false);
 		$criteria = $this->buildPkeyCriteria();
-		DeliveryProfilePeer::addSelectColumns($criteria);
+		entryPeer::addSelectColumns($criteria);
 		$stmt = BasePeer::doSelect($criteria, $con);
 		DeliveryProfilePeer::setUseCriteriaFilter(true);
 		$row = $stmt->fetch(PDO::FETCH_NUM);
@@ -1174,44 +1134,22 @@ abstract class BaseDeliveryProfile extends BaseObject  implements Persistent {
 				$this->m_custom_data = myCustomData::fromString($newCustomData); 
 
 				//set custom data column values we wanted to change to
-				$validUpdate = true;
-				$atomicCustomDataFields = DeliveryProfilePeer::getAtomicCustomDataFields();
 			 	foreach ($this->oldCustomDataValues as $namespace => $namespaceValues){
                 	foreach($namespaceValues as $name => $oldValue)
 					{
-						$newValue = null;
 						if ($namespace)
 						{
-							if (isset ($valuesToChangeTo[$namespace][$name]))
-								$newValue = $valuesToChangeTo[$namespace][$name];
+							$newValue = $valuesToChangeTo[$namespace][$name];
 						}
 						else
 						{ 
 							$newValue = $valuesToChangeTo[$name];
 						}
 					 
-						if (!is_null($newValue)) {
-							$atomicField = false;
-							if($namespace) {
-								$atomicField = array_key_exists($namespace, $atomicCustomDataFields) && in_array($name, $atomicCustomDataFields[$namespace]);
-							} else {
-								$atomicField = in_array($name, $atomicCustomDataFields);
-							}
-							if($atomicField) {
-								$dbValue = $this->m_custom_data->get($name, $namespace);
-								if($oldValue != $dbValue) {
-									$validUpdate = false;
-									break;
-								}
-							}
-							$this->putInCustomData($name, $newValue, $namespace);
-						}
+						$this->putInCustomData($name, $newValue, $namespace);
 					}
                    }
                    
-				if(!$validUpdate) 
-					break;
-					                   
 				$this->setCustomData($this->m_custom_data->toString());
 			}
 
@@ -1304,7 +1242,7 @@ abstract class BaseDeliveryProfile extends BaseObject  implements Persistent {
 	/**
 	 * Code to be run before persisting the object
 	 * @param PropelPDO $con
-	 * @return boolean
+	 * @return bloolean
 	 */
 	public function preSave(PropelPDO $con = null)
 	{
@@ -1580,9 +1518,6 @@ abstract class BaseDeliveryProfile extends BaseObject  implements Persistent {
 			case 17:
 				return $this->getCustomData();
 				break;
-			case 18:
-				return $this->getPriority();
-				break;
 			default:
 				return null;
 				break;
@@ -1622,7 +1557,6 @@ abstract class BaseDeliveryProfile extends BaseObject  implements Persistent {
 			$keys[15] => $this->getStreamerType(),
 			$keys[16] => $this->getMediaProtocols(),
 			$keys[17] => $this->getCustomData(),
-			$keys[18] => $this->getPriority(),
 		);
 		return $result;
 	}
@@ -1708,9 +1642,6 @@ abstract class BaseDeliveryProfile extends BaseObject  implements Persistent {
 			case 17:
 				$this->setCustomData($value);
 				break;
-			case 18:
-				$this->setPriority($value);
-				break;
 		} // switch()
 	}
 
@@ -1753,7 +1684,6 @@ abstract class BaseDeliveryProfile extends BaseObject  implements Persistent {
 		if (array_key_exists($keys[15], $arr)) $this->setStreamerType($arr[$keys[15]]);
 		if (array_key_exists($keys[16], $arr)) $this->setMediaProtocols($arr[$keys[16]]);
 		if (array_key_exists($keys[17], $arr)) $this->setCustomData($arr[$keys[17]]);
-		if (array_key_exists($keys[18], $arr)) $this->setPriority($arr[$keys[18]]);
 	}
 
 	/**
@@ -1783,7 +1713,6 @@ abstract class BaseDeliveryProfile extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(DeliveryProfilePeer::STREAMER_TYPE)) $criteria->add(DeliveryProfilePeer::STREAMER_TYPE, $this->streamer_type);
 		if ($this->isColumnModified(DeliveryProfilePeer::MEDIA_PROTOCOLS)) $criteria->add(DeliveryProfilePeer::MEDIA_PROTOCOLS, $this->media_protocols);
 		if ($this->isColumnModified(DeliveryProfilePeer::CUSTOM_DATA)) $criteria->add(DeliveryProfilePeer::CUSTOM_DATA, $this->custom_data);
-		if ($this->isColumnModified(DeliveryProfilePeer::PRIORITY)) $criteria->add(DeliveryProfilePeer::PRIORITY, $this->priority);
 
 		return $criteria;
 	}
@@ -1895,8 +1824,6 @@ abstract class BaseDeliveryProfile extends BaseObject  implements Persistent {
 		$copyObj->setMediaProtocols($this->media_protocols);
 
 		$copyObj->setCustomData($this->custom_data);
-
-		$copyObj->setPriority($this->priority);
 
 
 		$copyObj->setNew(true);
@@ -2069,16 +1996,6 @@ abstract class BaseDeliveryProfile extends BaseObject  implements Persistent {
 	public function incInCustomData ( $name , $delta = 1, $namespace = null)
 	{
 		$customData = $this->getCustomDataObj( );
-		
-		$currentNamespace = '';
-		if($namespace)
-			$currentNamespace = $namespace;
-			
-		if(!isset($this->oldCustomDataValues[$currentNamespace]))
-			$this->oldCustomDataValues[$currentNamespace] = array();
-		if(!isset($this->oldCustomDataValues[$currentNamespace][$name]))
-			$this->oldCustomDataValues[$currentNamespace][$name] = $customData->get($name, $namespace);
-		
 		return $customData->inc ( $name , $delta , $namespace  );
 	}
 

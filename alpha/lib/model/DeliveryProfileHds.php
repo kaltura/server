@@ -8,14 +8,13 @@ class DeliveryProfileHds extends DeliveryProfileVod {
 	}
 	
 	/**
-	 * @return array $flavors
+	 * @return kManifestRenderer
 	 */
-	public function buildServeFlavors()
+	public function serve()
 	{
 		$flavors = $this->buildHttpFlavorsArray();
 		$flavors = $this->sortFlavors($flavors);
-		
-		return $flavors;
+		return $this->getRenderer($flavors);
 	}
 }
 

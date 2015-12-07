@@ -93,7 +93,7 @@ class KalturaClientBase
 		$this->addParam($params, "clientTag", $this->config->clientTag);
 		$this->addParam($params, "ks", $this->ks);
 		
-		$url = $this->config->serviceUrl."/api_v3/service/$service/action/$action";
+		$url = $this->config->serviceUrl."/api_v3/index.php?service=".$service."&action=".$action;
 		$this->log("full reqeust url: [" . $url . "]");
 		
 		// flatten sub arrays (the objects)
@@ -285,28 +285,19 @@ class KalturaClientBase
 			$this->setError(array("code" => $resultObject["code"], "message" => $resultObject["message"]));
 		}
 	}
-
+	
 	function validateObjectType($resultObject, $objectType)
 	{
-		$knownNativeTypes = array("boolean", "integer", "double", "string");
-		if (is_null($resultObject) ||
-			( in_array(gettype($resultObject) ,$knownNativeTypes) &&
-			  in_array($objectType, $knownNativeTypes) ) )
+		if (is_object($resultObject))
 		{
-			return;// we do not check native simple types
-		}
-		else if ( is_object($resultObject) )
-		{
-			if (!(is_a($resultObject ,$objectType))){
+			if (!(is_a($resultObject, $objectType)))
 				$this->setError(array("code" => 0, "message" => "Invalid object type"));
-			}
 		}
-		else if(gettype($resultObject) !== $objectType)
+		else if (gettype($resultObject) !== "NULL" && gettype($resultObject) !== $objectType)
 		{
 			$this->setError(array("code" => 0, "message" => "Invalid object type"));
 		}
 	}
-
 	
 	function log($msg)
 	{

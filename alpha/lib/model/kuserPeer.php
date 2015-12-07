@@ -7,7 +7,7 @@
  * @package Core
  * @subpackage model
  */ 
-class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
+class kuserPeer extends BasekuserPeer 
 {	
 	const KALTURA_NEW_USER_EMAIL = 120;
 	const KALTURA_NEW_EXISTING_USER_EMAIL = 121;
@@ -624,20 +624,5 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 		self::setUseCriteriaFilter(true);
 		return $ret;
 	}
-	
-	/* (non-PHPdoc)
-	 * @see IRelatedObjectPeer::getRootObjects()
-	 */
-	public function getRootObjects(IRelatedObject $object)
-	{
-		return array();
-	}
 
-	/* (non-PHPdoc)
-	 * @see IRelatedObjectPeer::isReferenced()
-	 */
-	public function isReferenced(IRelatedObject $object)
-	{
-		return true;
-	}
 }

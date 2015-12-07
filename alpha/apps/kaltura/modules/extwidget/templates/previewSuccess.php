@@ -9,21 +9,15 @@
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 	<?php if( $entry_id ) { ?>
 	<meta property="og:url" content="<?php echo $pageURL; ?>" />
-	<meta property="og:title" content="<?php echo htmlspecialchars(strip_tags($entry_name)); ?>" />
-	<meta property="og:description" content="<?php echo htmlspecialchars(strip_tags($entry_description)); ?>" />
+	<meta property="og:title" content="<?php echo htmlspecialchars($entry_name); ?>" />
+	<meta property="og:description" content="<?php echo htmlspecialchars($entry_description); ?>" />
 	<meta property="og:type" content="video.other" />
 	<meta property="og:image" content="<?php echo $entry_thumbnail_url; ?>/width/<?php echo $uiConf->getWidth();?>" />
 	<meta property="og:image:secure_url" content="<?php echo $entry_thumbnail_secure_url; ?>/width/<?php echo $uiConf->getWidth();?>" />
-	
-	<?php if( isset($flavor_asset_id) ) { ?>
-	<meta property="og:video" content="<?php echo $flavorUrl; ?>" />
-	<meta property="og:video:type" content="video/mp4" />
-	<?php } ?>
-	<meta property="og:video:url" content="<?php echo $playerUrl; ?>">
-	<meta property="og:video:secure_url" content="<?php echo $playerUrl; ?>">
-	<meta property="og:video:type" content="text/html">	
+	<meta property="og:video" content="<?php echo $swfSecureUrl; ?>" />
 	<meta property="og:video:width" content="<?php echo $uiConf->getWidth();?>" />
 	<meta property="og:video:height" content="<?php echo $uiConf->getHeight();?>" />	
+	<meta property="og:video:type" content="application/x-shockwave-flash" />
 
 	<meta name="twitter:card" content="player"/>
     <meta name="twitter:site" content="@kaltura"/>
@@ -39,6 +33,12 @@
     <meta name="twitter:player:height" content="<?php echo $uiConf->getHeight();?>" />
     <meta name="twitter:player:width" content="<?php echo $uiConf->getWidth();?>" />
 
+
+	<?php if( isset($flavor_asset_id) ) { ?>
+	<meta property="og:video" content="<?php echo $flavorUrl; ?>" />
+	<meta property="og:video:type" content="video/mp4" />
+
+	<?php } ?>
 	<meta property="og:site_name" content="Kaltura" />
 	<?php } ?>
 	<title><?php echo htmlspecialchars($entry_name); ?></title>

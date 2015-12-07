@@ -107,11 +107,11 @@ class KalturaWebcamTokenResource extends KalturaDataCenterContentResource
 				if($type == 'flv')
 				{
 					$entryFixedFullPath = $entryFullPath . '.fixed.flv';
-			 		KalturaLog::info("Fix webcam full path from [$entryFullPath] to [$entryFixedFullPath]");
+			 		KalturaLog::debug("Fix webcam full path from [$entryFullPath] to [$entryFixedFullPath]");
 					myFlvStaticHandler::fixRed5WebcamFlv($entryFullPath, $entryFixedFullPath);
 							
 					$entryNewFullPath = $entryFullPath . '.clipped.flv';
-			 		KalturaLog::info("Clip webcam full path from [$entryFixedFullPath] to [$entryNewFullPath]");
+			 		KalturaLog::debug("Clip webcam full path from [$entryFixedFullPath] to [$entryNewFullPath]");
 					myFlvStaticHandler::clipToNewFile($entryFixedFullPath, $entryNewFullPath, 0, 0);
 					$entryFullPath = $entryNewFullPath ;
 							

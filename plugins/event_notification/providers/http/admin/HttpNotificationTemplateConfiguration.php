@@ -11,8 +11,12 @@ class Form_HttpNotificationTemplateConfiguration extends Form_EventNotificationT
 	public function getObject($objectType, array $properties, $add_underscore = true, $include_empty_fields = false)
 	{
 		$object = parent::getObject($objectType, $properties, $add_underscore, $include_empty_fields);
+		KalturaLog::debug("Loading object type [" . get_class($object) . "] for type [$objectType]");
+		
 		if($object instanceof Kaltura_Client_HttpNotification_Type_HttpNotificationTemplate)
 		{
+			KalturaLog::debug("Search properties [" . print_r($properties, true) . "]");
+			
 			if(!isset($properties['dataType']) || !$properties['dataType'])
 				return $object;
 			

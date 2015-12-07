@@ -51,12 +51,6 @@ class DistributionFieldConfig
      */
     private $isDefault;
     
-    /**
-     * Flag indicating whether an error on this field should cause the distributed data to be deleted. 
-     * @var bool
-     */
-    private $triggerDeleteOnError;
-    
     
 	/**
      * @return the $fieldName
@@ -171,20 +165,6 @@ class DistributionFieldConfig
 		$this->isDefault = $isDefault;
 	}
 	
-	/**
-	 * @return the $triggerDeleteOnError
-	 */
-	public function getTriggerDeleteOnError() {
-		return $this->triggerDeleteOnError;
-	}
-
-	/**
-	 * @param bool $triggerDeleteOnError
-	 */
-	public function setTriggerDeleteOnError($triggerDeleteOnError) {
-		$this->triggerDeleteOnError = $triggerDeleteOnError;
-	}
-
 	public function __sleep()
 	{
 		$vars = get_class_vars(get_class($this));

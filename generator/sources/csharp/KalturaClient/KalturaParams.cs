@@ -25,40 +25,20 @@
 //
 // @ignore
 // ===================================================================================================
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Web;
 
 namespace Kaltura
 {
-    public class KalturaParams : SortedList<string, IKalturaSerializable>, IKalturaSerializable
+    public class KalturaParams : SortedList<string, string>
     {
-        private bool isArray;
-
-        public string ToJson()
-        {
-            string[] values = new string[this.Count];
-            int index = 0;
-            foreach (KeyValuePair<string, IKalturaSerializable> item in this)
-            {
-                if (isArray)
-                    values[index++] = item.Value.ToJson();
-                else
-                    values[index++] = "\"" + item.Key + "\":" + item.Value.ToJson();
-            }
-
-            if (isArray)
-                return string.Format("[{0}]", string.Join(",", values));
-            else
-                return string.Format("{{{0}}}", string.Join(",", values));
-        }
-
         public string ToQueryString()
         {
             string str = "";
-            foreach (KeyValuePair<string, IKalturaSerializable> item in this)
-                str += (item.Key + "=" + HttpUtility.UrlEncode(item.Value.ToQueryString()) + "&");
+            foreach (KeyValuePair<string, string> item in this)
+                str += (item.Key + "=" + HttpUtility.UrlEncode(item.Value) + "&");
 
             if (str.EndsWith("&"))
                 str = str.Substring(0, str.Length - 1);
@@ -66,113 +46,62 @@ namespace Kaltura
             return str;
         }
 
-        public void Add(KalturaParams properties)
+        public void Add(string objectName, KalturaParams objectProperties)
         {
-            foreach (string key in properties.Keys)
-                Add(key, properties[key]);
-        }
-
-        public void Add(string key, KalturaObjectBase kalturaObject)
-        {
-            KalturaParams objectProperties = kalturaObject.ToParams();
-            Add(key, objectProperties);
-        }
-
-        public void AddIfNotNull(string key, KalturaObjectBase kalturaObject)
-        {
-            if (kalturaObject != null)
+            foreach (KeyValuePair<string, string> item in objectProperties)
             {
-                Add(key, kalturaObject);
+                this.Add(objectName + ":" + item.Key, item.Value);
             }
         }
 
-        public void AddIfNotNull<T>(string key, IList<T> array) where T : KalturaObjectBase
+        public void Add(KalturaParams objectProperties)
         {
-            if (array == null)
-                return;
-
-            KalturaParams arrayParams = new KalturaParams() { isArray = true };
-            if (array.Count == 0)
+            foreach (KeyValuePair<string, string> item in objectProperties)
             {
-                arrayParams.Add("-", "");
+                this.Add(item.Key, item.Value);
             }
-            else
-            {
-                int i = 0;
-                foreach (KalturaObjectBase item in array)
-                {
-                    arrayParams.Add(i.ToString(), item);
-                    i++;
-                }
-            }
-            this.Add(key, arrayParams);
         }
 
-        public void AddIfNotNull<T>(string key, IDictionary<string, T> map) where T : KalturaObjectBase
-        {
-            if (map == null)
-                return;
-
-            KalturaParams arrayParams = new KalturaParams();
-            if (map.Count == 0)
-            {
-                arrayParams.Add("-", "");
-            }
-            else
-            {
-                foreach (string itemKey in map.Keys)
-                {
-                    arrayParams.Add(itemKey, map[itemKey]);
-                }
-            }
-            this.Add(key, arrayParams);
-        }
-
-        public void Add(string key, string value)
-        {
-            this.Add(key, new KalturaParam(value));
-        }
-
-        public void AddIfNotNull(string key, string value)
+        public void AddStringIfNotNull(string key, string value)
         {
             if (value != null)
-                this.Add(key, new KalturaParam(value));
+                this.Add(key, value);
         }
 
-        public void AddIfNotNull(string key, int value)
+        public void AddIntIfNotNull(string key, int value)
         {
             if (value != int.MinValue)
                 this.Add(key, value.ToString());
         }
 
 
-        public void AddIfNotNull(string key, float value)
+        public void AddFloatIfNotNull(string key, float value)
         {
             if (value != Single.MinValue)
                 this.Add(key, value.ToString());
         }
-
-        public void AddIfNotNull(string key, long value)
+        
+        public void AddLongIfNotNull(string key, long value)
         {
             if (value != long.MinValue)
                 this.Add(key, value.ToString());
         }
 
-        public void AddIfNotNull(string key, Enum value)
+        public void AddEnumIfNotNull(string key, Enum value)
         {
-            this.AddIfNotNull(key, value.GetHashCode());
+            this.AddIntIfNotNull(key, value.GetHashCode());
         }
 
-        public void AddIfNotNull(string key, KalturaStringEnum value)
+        public void AddStringEnumIfNotNull(string key, KalturaStringEnum value)
         {
             if (value != null)
-                this.Add(key, value.ToString());
+                this.AddStringIfNotNull(key, value.ToString());
         }
 
-        public void AddIfNotNull(string key, bool? value)
+        public void AddBoolIfNotNull(string key, bool? value)
         {
             if (value.HasValue)
-                this.Add(key, (value.Value) ? "true" : "false");
+                this.Add(key, (value.Value) ? "1" : "0");
         }
 
         public void AddReplace(string key, string value)

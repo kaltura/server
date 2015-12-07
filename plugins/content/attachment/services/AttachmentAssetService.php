@@ -75,19 +75,23 @@ class AttachmentAssetService extends KalturaAssetService
      */
     function addAction($entryId, KalturaAttachmentAsset $attachmentAsset)
     {
-		$dbEntry = entryPeer::retrieveByPK($entryId);
-		if(!$dbEntry || !in_array($dbEntry->getType(), $this->getEnabledMediaTypes()))
-			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
+    	$dbEntry = entryPeer::retrieveByPK($entryId);
+    	if(!$dbEntry || !in_array($dbEntry->getType(), $this->getEnabledMediaTypes()))
+    		throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
+    	
+		
+		
+    	$dbAttachmentAsset = new AttachmentAsset();
+    	$dbAttachmentAsset = $attachmentAsset->toInsertableObject($dbAttachmentAsset);
+    	
+		$dbAttachmentAsset->setEntryId($entryId);
+		$dbAttachmentAsset->setPartnerId($dbEntry->getPartnerId());
+		$dbAttachmentAsset->setStatus(AttachmentAsset::ASSET_STATUS_QUEUED);
+		$dbAttachmentAsset->save();
 
-		$dbAsset = $attachmentAsset->toInsertableObject();
-		$dbAsset->setEntryId($entryId);
-		$dbAsset->setPartnerId($dbEntry->getPartnerId());
-		$dbAsset->setStatus(AttachmentAsset::ASSET_STATUS_QUEUED);
-		$dbAsset->save();
-
-		$asset = KalturaAsset::getInstance($dbAsset);
-		$asset->fromObject($dbAsset, $this->getResponseProfile());
-		return $asset;
+		$attachmentAsset = new KalturaAttachmentAsset();
+		$attachmentAsset->fromObject($dbAttachmentAsset, $this->getResponseProfile());
+		return $attachmentAsset;
     }
     
     /**
@@ -134,7 +138,7 @@ class AttachmentAssetService extends KalturaAssetService
     	if($previousStatus == AttachmentAsset::ASSET_STATUS_QUEUED && in_array($dbAttachmentAsset->getStatus(), $newStatuses))
    			kEventsManager::raiseEvent(new kObjectAddedEvent($dbAttachmentAsset));
    		
-		$attachmentAsset = KalturaAsset::getInstance($dbAttachmentAsset);
+		$attachmentAsset = new KalturaAttachmentAsset();
 		$attachmentAsset->fromObject($dbAttachmentAsset, $this->getResponseProfile());
 		return $attachmentAsset;
     }
@@ -163,7 +167,7 @@ class AttachmentAssetService extends KalturaAssetService
     	$dbAttachmentAsset = $attachmentAsset->toUpdatableObject($dbAttachmentAsset);
     	$dbAttachmentAsset->save();
 		
-		$attachmentAsset = KalturaAsset::getInstance($dbAttachmentAsset);
+		$attachmentAsset = new KalturaAttachmentAsset();
 		$attachmentAsset->fromObject($dbAttachmentAsset, $this->getResponseProfile());
 		return $attachmentAsset;
     }
@@ -484,9 +488,9 @@ class AttachmentAssetService extends KalturaAssetService
 		if (!$attachmentAssetsDb || !($attachmentAssetsDb instanceof AttachmentAsset))
 			throw new KalturaAPIException(KalturaAttachmentErrors::ATTACHMENT_ASSET_ID_NOT_FOUND, $attachmentAssetId);
 		
-		$attachmentAsset = KalturaAsset::getInstance($attachmentAssetsDb);
-		$attachmentAsset->fromObject($attachmentAssetsDb, $this->getResponseProfile());
-		return $attachmentAsset;
+		$attachmentAssets = new KalturaAttachmentAsset();
+		$attachmentAssets->fromObject($attachmentAssetsDb, $this->getResponseProfile());
+		return $attachmentAssets;
 	}
 	
 	/**

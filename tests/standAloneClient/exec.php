@@ -232,8 +232,9 @@ function executeRequest(KalturaClient $client, SimpleXMLElement $request)
 	{
 		if (!is_null($impersonatePartner))
 		{
-		    $configPartnerId = $client->getPartnerId();
-			$client->setPartnerId($impersonatePartner);
+			$config = $client->getConfig();
+			$configPartnerId = $config->partnerId;
+			$config->partnerId = $impersonatePartner;
 		}
 		if ($client->isMultiRequest())
 			$doing = 'Queuing';
@@ -243,7 +244,8 @@ function executeRequest(KalturaClient $client, SimpleXMLElement $request)
 		$result = call_user_func_array(array($service, $actionName), $arguments);
 		if (!is_null($impersonatePartner))
 		{
-			$client->setPartnerId($configPartnerId);
+			$config = $client->getConfig();
+			$config->partnerId = $configPartnerId;
 		}
 	}
 	catch(Exception $e)
@@ -320,12 +322,7 @@ if(isset($inXml->session))
 		{
 			$password = askForUserParameter('Partner password:');
 		}
-		if(!$partnerId)
-		{
-		    $partnerId = askForUserParameter('Partner ID:');
-		}
-		    
-		$ks = $client->user->loginByLoginId($email, $password, $partnerId);
+		$ks = $client->user->loginByLoginId($email, $password);
 	}
 	$client->setKs($ks);
 }
@@ -348,7 +345,7 @@ foreach($inXml->children() as $element)
 			if ($client->isError($response))
 			{
 				echo "Executing failed for request #".($index+1)." with error [" . $response['message'] . "]\n";
-				throw new KalturaException($response["message"], $response["code"],$response['args']);
+				throw new KalturaException($response["message"], $response["code"]);
 			}
 
 			$results[] = $response;

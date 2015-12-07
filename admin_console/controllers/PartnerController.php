@@ -6,7 +6,6 @@
 class PartnerController extends Zend_Controller_Action
 {
 	const PARTNER_PACKAGE_FREE = 1;
-	const PARTNER_PACKAGE_DEVELOPER = 100;
 	
 	public function indexAction()
 	{
@@ -38,7 +37,7 @@ class PartnerController extends Zend_Controller_Action
 		if (!(Infra_AclHelper::isAllowed('partner', 'configure-account-packages-service-paid')))
 		{
 			foreach($packages as $index => $package)
-				if(intval($package->id) != PartnerController::PARTNER_PACKAGE_FREE && intval($package->id) != PartnerController::PARTNER_PACKAGE_DEVELOPER)
+				if(intval($package->id) != PartnerController::PARTNER_PACKAGE_FREE)
 					unset($packages[$index]);
 		}
 		
@@ -65,6 +64,7 @@ class PartnerController extends Zend_Controller_Action
 				$partner->type = Kaltura_Client_Enum_PartnerType::ADMIN_CONSOLE;
 				$templatePartnerId = $form->getValue('partner_template_id');
 				$client->startMultiRequest();
+				KalturaLog::debug("is multi request: ".$client->isMultiRequest());
 				$client->partner->register($partner, null, $templatePartnerId);
 				$config = new Kaltura_Client_SystemPartner_Type_SystemPartnerConfiguration();
 				$config->partnerPackage = $form->getValue('partner_package');
@@ -141,7 +141,7 @@ class PartnerController extends Zend_Controller_Action
 		}
 		else {
 			$this->view->commercialFiltered = true;
-			$partnerFilter->partnerPackageIn = self::PARTNER_PACKAGE_FREE.','.self::PARTNER_PACKAGE_DEVELOPER;
+			$partnerFilter->partnerPackageLessThanOrEqual = self::PARTNER_PACKAGE_FREE;
 		}
 							
 		
@@ -276,6 +276,8 @@ class PartnerController extends Zend_Controller_Action
 		$form = KalturaPluginManager::loadObject('Form_Partner_BaseStorageConfiguration', $type, array($partnerId, $type));
 		/* @var $form Form_StorageConfiguration */
 		
+		KalturaLog::debug("form class: ". get_class($form));
+		
 		if(!$form || !($form instanceof Form_Partner_BaseStorageConfiguration))
 		{
 			if($type == Kaltura_Client_Enum_StorageProfileProtocol::LOCAL)
@@ -387,6 +389,7 @@ class PartnerController extends Zend_Controller_Action
 			}
 		}
 		
+		KalturaLog::debug("storage protocol: $type");
 		$this->view->form = $form;
 		$this->view->protocol = $type;
 	}
@@ -560,35 +563,21 @@ class PartnerController extends Zend_Controller_Action
 		if (!in_array($filterType,array('','none'))) {
 			$_SESSION['partnerLastSearchValue'] = $filterInput;
 		}
-		if($filterType == 'byEntryId')
-		{
-		    $client = Infra_ClientHelper::getClient();
-		    $adminConsolePlugin = Kaltura_Client_AdminConsole_Plugin::get($client);
 		
-		    try {
-		        $entry = $adminConsolePlugin->entryAdmin->get($filterInput);
-		        /* @var $entry Kaltura_Client_Type_MediaEntry */
-		        $filter->idIn = $entry->partnerId;
-		    }
-		    catch(Exception $ex) {
-		        $filter->idIn = "-99";
-		    }
-		
-		}
-		if($filterType == 'byUIConfId')
-		{
-		    $client = Infra_ClientHelper::getClient();
-		    $adminConsolePlugin = Kaltura_Client_AdminConsole_Plugin::get($client);
-		
-		    try {
-		        $uiConf = $adminConsolePlugin->uiConfAdmin->get($filterInput);
-		        /* @var $uiConf Kaltura_Client_Type_UIConf  */
-		        $filter->idIn = $uiConf->partnerId;
-		    }
-		    catch(Exception $ex) {
-		        $filter->idIn = "-99";
-		    }
-		
+		if($filterType == 'byEntryId') {
+			$client = Infra_ClientHelper::getClient();
+			$adminConsolePlugin = Kaltura_Client_AdminConsole_Plugin::get($client);
+			
+			try {
+				$entry = $adminConsolePlugin->entryAdmin->get($filterInput);
+				/* @var $entry Kaltura_Client_Type_MediaEntry */
+				$filterInput = $entry->partnerId;
+			}
+			catch(Exception $ex) {
+				$filterInput = "-99";
+			}
+			$filterType = 'byid';
+			
 		}
 		if ($filterType == 'byid')
 		{

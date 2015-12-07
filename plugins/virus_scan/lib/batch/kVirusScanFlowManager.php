@@ -127,7 +127,7 @@ class kVirusScanFlowManager implements kBatchJobStatusEventConsumer, kObjectAdde
 		}
 		
 		if (!$response) {
-			KalturaLog::info('Stopping consumption of event ['.get_class($object).']');
+			KalturaLog::debug('kVirusScanFlowManager stopping consumption of event ['.get_class($object).']');
 		}
 		return $response;	
 	}
@@ -218,11 +218,11 @@ class kVirusScanFlowManager implements kBatchJobStatusEventConsumer, kObjectAdde
 				{
 					$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 					$filePath = kFileSyncUtils::getLocalFilePathForKey($syncKey);
-					KalturaLog::info('FlavorAsset ['.$flavorAsset->getId().'] marked as deleted');
+					KalturaLog::debug('FlavorAsset ['.$flavorAsset->getId().'] marked as deleted');
 					$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_DELETED);
 					$flavorAsset->setDeletedAt(time());
 					$flavorAsset->save();
-					KalturaLog::info('Physically deleting file ['.$filePath.']');
+					KalturaLog::debug('Physically deleting file ['.$filePath.']');
 					unlink($filePath);
 					if ($entry)	{
 						myEntryUtils::deleteEntry($entry);

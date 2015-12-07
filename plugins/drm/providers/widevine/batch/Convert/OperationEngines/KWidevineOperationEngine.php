@@ -3,6 +3,8 @@
 class KWidevineOperationEngine extends KOperationEngine
 {
 	const PACKAGE_FILE_EXT = '.wvm';
+		
+	const SYNC_FRAME_OFFSET_MATCH_ERROR = 11;
 	
 	/**
 	 * @var array
@@ -43,7 +45,7 @@ class KWidevineOperationEngine extends KOperationEngine
 		$entry = KBatchBase::$kClient->baseEntry->get($this->job->entryId);
 		$this->buildPackageName($entry);
 		
-		KalturaLog::info('start Widevine packaging: '.$this->packageName);
+		KalturaLog::debug('start Widevine packaging: '.$this->packageName);
 		
 		$drmPlugin = KalturaDrmClientPlugin::get(KBatchBase::$kClient);
 		$profile = $drmPlugin->drmProfile->getByProvider(KalturaDrmProviderType::WIDEVINE);
@@ -95,40 +97,19 @@ class KWidevineOperationEngine extends KOperationEngine
 			throw new KOperationEngineException($logMessage);
 		}
 										
-		KalturaLog::info('Widevine asset id: '.$wvAssetId);
+		KalturaLog::debug('Widevine asset id: '.$wvAssetId);
 		
 		return $wvAssetId;
 	}
 	
 	private function encryptPackage($profile)
 	{
-		$inputFiles = $this->getInputFilesList();
-		$this->data->destFileSyncLocalPath = $this->data->destFileSyncLocalPath . self::PACKAGE_FILE_EXT;
-				
-		$returnValue = $this->executeEncryptPackageCmd($profile, $inputFiles);
-		
-		//try to fix source assets sync and re-try encryption
-		if($returnValue == KWidevineBatchHelper::FIX_ASSET_ERROR_RETURN_CODE)
-		{
-			KalturaLog::info("Trying to fix input files due to mismatch error ...");
-			$fixedInputFiles = $this->fixInputAssets($inputFiles);
-			$returnValue = $this->executeEncryptPackageCmd($profile, $fixedInputFiles);
-			if($returnValue != 0)
-			{
-				$this->handleEncryptPackageError($returnValue);
-			}			
-		}
-		else if($returnValue != 0)
-		{
-			$this->handleEncryptPackageError($returnValue);
-		}										
-	}
-	
-	private function executeEncryptPackageCmd($profile, $inputFiles)
-	{
 		$returnValue = 0;
 		$output = array();
 		
+		$inputFiles = $this->getInputFilesList();
+		$this->data->destFileSyncLocalPath = $this->data->destFileSyncLocalPath . self::PACKAGE_FILE_EXT;
+				
 		$cmd = KWidevineBatchHelper::getEncryptPackageCmdLine(
 										$this->params->widevineExe, 
 										$profile->regServerHost, 
@@ -141,31 +122,21 @@ class KWidevineOperationEngine extends KOperationEngine
 										$profile->portal);
 										
 		exec($cmd, $output, $returnValue);
-		KalturaLog::info('Command execution output: '.print_r($output, true));	
-
+		KalturaLog::debug('Command execution output: '.print_r($output));
+		
 		if($returnValue != 0)
 		{
-			if(strstr(implode(" ", $output), KWidevineBatchHelper::FIX_ASSET_ERROR))
-			{
-				return KWidevineBatchHelper::FIX_ASSET_ERROR_RETURN_CODE;
-			}
-		}
-		return $returnValue;
-	}
-	
-	private function handleEncryptPackageError($returnValue)
-	{
-		KBatchBase::unimpersonate();
-		$errorMessage = '';
-		$errorMessage = KWidevineBatchHelper::getEncryptPackageErrorMessage($returnValue);
-		$logMessage = 'Package encryption failed, asset name: '.$this->packageName.' error: '.$errorMessage;
-		KalturaLog::err($logMessage);
-					
-		// in some cases this specific Widevine error needs a simple job retry in order to convert successfully  
-		if ($returnValue == KWidevineBatchHelper::SYNC_FRAME_OFFSET_MATCH_ERROR)
-			throw new kTemporaryException ($logMessage);
+			KBatchBase::unimpersonate();
+			$errorMessage = '';
+			$errorMessage = KWidevineBatchHelper::getEncryptPackageErrorMessage($returnValue);
+			$logMessage = 'Package encryption failed, asset name: '.$this->packageName.' error: '.$errorMessage;
+			KalturaLog::err($logMessage);
 			
-		throw new KOperationEngineException($logMessage);		
+			// in some cases this specific Widevine error needs a simple job retry in order to convert successfully  
+			if ($returnValue == self::SYNC_FRAME_OFFSET_MATCH_ERROR)
+				throw new kTemporaryException ($logMessage);
+			throw new KOperationEngineException($logMessage);
+		}										
 	}
 	
 	private function getAssetIdsWithRedundantBitrates()
@@ -207,7 +178,7 @@ class KWidevineOperationEngine extends KOperationEngine
 		{
 			if(in_array($srcFileSyncDescriptor->assetId, $redundantAssets))
 			{
-				KalturaLog::info('Skipping flavor asset due to redundant bitrate: '.$srcFileSyncDescriptor->assetId);
+				KalturaLog::debug('Skipping flavor asset due to redundant bitrate: '.$srcFileSyncDescriptor->assetId);
 			}
 			else 
 			{
@@ -260,34 +231,6 @@ class KWidevineOperationEngine extends KOperationEngine
 		$updatedFlavorAsset->widevineDistributionStartDate = $wvDistributionStartDate;
 		$updatedFlavorAsset->widevineDistributionEndDate = $wvDistributionEndDate;
 		KBatchBase::$kClient->flavorAsset->update($this->data->flavorAssetId, $updatedFlavorAsset);		
-	}
-	
-	private function fixInputAssets($inputFiles)
-	{
-		$localTmpPath = dirname($this->data->destFileSyncLocalPath);
-		$fixedInputFiles = array();
-		$inputFiles = explode(',', $inputFiles);
-		$returnValue = 0;
-		$output = array();
-		foreach ($inputFiles as $inputFile) 
-		{
-			$fixedInputFile = $localTmpPath.'/'.basename($inputFile);
-			$cmd = KWidevineBatchHelper::getFixAssetCmdLine($this->params->ffmpegCmd, $inputFile, $fixedInputFile);
-			$lastLine = exec($cmd, $output, $returnValue);
-			
-			KalturaLog::info('Command execution output: '.print_r($output, true));
-		
-			if($returnValue != 0)
-			{
-				KBatchBase::unimpersonate();
-				$logMessage = 'Asset fix failed: '.$inputFile.' error: '.$lastLine;
-				KalturaLog::err($logMessage);
-				throw new KOperationEngineException($logMessage);
-			}										
-			$fixedInputFiles[] = $fixedInputFile;
-		}
-		
-		return implode(',', $fixedInputFiles);
 	}
 	
 }

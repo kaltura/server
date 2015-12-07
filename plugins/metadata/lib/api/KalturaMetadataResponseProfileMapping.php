@@ -23,7 +23,7 @@ class KalturaMetadataResponseProfileMapping extends KalturaResponseProfileMappin
 		$filterProperty = $this->filterProperty;
 		$parentProperty = $this->parentProperty;
 
-		KalturaLog::info("Mapping XPath $parentProperty to " . get_class($filter) . "::$filterProperty");
+		KalturaLog::debug("Mapping XPath $parentProperty to " . get_class($filter) . "::$filterProperty");
 	
 		if(!$parentObject instanceof KalturaMetadata)
 		{

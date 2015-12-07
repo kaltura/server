@@ -46,6 +46,8 @@ class KAsyncMailer extends KJobHandlerWorker
 	 */
 	public function run($jobs = null)
 	{
+		KalturaLog::info("Mail batch is running");
+		
 		if(KBatchBase::$taskConfig->isInitOnly())
 			return $this->init();
 		
@@ -95,6 +97,8 @@ class KAsyncMailer extends KJobHandlerWorker
 	 */
 	protected function send(KalturaBatchJob $job, KalturaMailJobData $data)
 	{
+		KalturaLog::debug("send($job->id)");
+		
 		if (!isset($this->texts_array[$data->language]))
 		{
 			$this->initConfig($data->language);	
@@ -139,6 +143,8 @@ class KAsyncMailer extends KJobHandlerWorker
 
 	protected function sendEmail( $recipientemail, $recipientname, $type, $subjectParams, $bodyParams, $fromemail , $fromname, $language = 'en', $isHtml = false  )
 	{
+		KalturaLog::debug(__METHOD__ . "($recipientemail, $recipientname, $type, $subjectParams, $bodyParams, $language, $fromemail , $fromname)");
+		
 		$this->mail = new PHPMailer();
 		$this->mail->CharSet = 'utf-8';
 		$this->mail->Encoding = 'base64';
@@ -195,6 +201,8 @@ class KAsyncMailer extends KJobHandlerWorker
 	
 	protected function getSubjectByType( $type, $language, $subjectParamsArray  )
 	{
+		KalturaLog::debug(__METHOD__ . "($type, $language, $subjectParamsArray)");
+		
 		if ( $type > 0 )
 		{
 			$languageTexts = isset($this->texts_array[$language]) ? $this->texts_array[$language] : reset($this->texts_array);
@@ -212,6 +220,8 @@ class KAsyncMailer extends KJobHandlerWorker
 
 	protected function getBodyByType( $type, $language, $bodyParamsArray, $recipientemail, $isHtml = false  )
 	{
+		KalturaLog::debug(__METHOD__ . "($type, $language, $bodyParamsArray, $recipientemail)");
+
 		// if this does not need the common_header, under common_text should have $type_header =
 		// same with footer
 		$languageTexts = isset($this->texts_array[$language]) ? $this->texts_array[$language] : reset($this->texts_array);
@@ -251,6 +261,7 @@ class KAsyncMailer extends KJobHandlerWorker
 		
 	protected function initConfig ( $language = null)
 	{
+		KalturaLog::debug(__METHOD__ . "()");
 		$languages = array($language ? $language : self::DEFAULT_LANGUAGE );
 
 		// now we read the ini files with the texts
@@ -284,6 +295,7 @@ class KAsyncMailer extends KJobHandlerWorker
 	
 	protected static function createBlockEmailStr ( $email )
 	{
+		KalturaLog::debug(__METHOD__ . "($email)");
 		return  $email . self::SEPARATOR . kString::expiryHash( $email , self::$key , self::EXPIRY_INTERVAL );
 	}
 }

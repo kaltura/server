@@ -13,7 +13,8 @@ class KalturaThumbAssetArray extends KalturaTypedArray
 
 		foreach ($arr as $obj)
 		{
-    		$nObj = KalturaThumbAsset::getInstance($obj, $responseProfile);
+    		$nObj = KalturaThumbAsset::getInstanceByType($obj->getType());
+			$nObj->fromObject($obj, $responseProfile);
 			$newArr[] = $nObj;
 		}
 		

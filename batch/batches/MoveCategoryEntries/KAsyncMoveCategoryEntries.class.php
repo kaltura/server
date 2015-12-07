@@ -65,6 +65,7 @@ class KAsyncMoveCategoryEntries extends KJobHandlerWorker
 	protected function move(KalturaBatchJob $job, KalturaMoveCategoryEntriesJobData $data)
 	{
 	    KBatchBase::impersonate($job->partnerId);
+		KalturaLog::debug("Move category entries job id [$job->id]");
 		
 		if($data->lastMovedCategoryId)
 			$this->startMove = false;

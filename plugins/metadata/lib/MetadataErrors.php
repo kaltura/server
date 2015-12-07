@@ -23,10 +23,6 @@ class MetadataErrors extends KalturaErrors
 	
 	const METADATA_FILE_NOT_FOUND = "METADATA_FILE_NOT_FOUND;FILE_NAME;Metadata file not found [@FILE_NAME@]";
 	
-	const EMPTY_VIEWS_DATA_PROVIDED = "EMPTY_VIEWS_DATA_PROVIDED;FILE_NAME;empty views data file [@FILE_NAME@] provided";
-	
-	const EMPTY_XSLT_DATA_PROVIDED = "EMPTY_XSLT_DATA_PROVIDED;FILE_NAME;empty xslt data file [@FILE_NAME@] provided";
-	
 	const METADATA_TRANSFORMING = "METADATA_TRANSFORMING;;Metadata profile is currently transforming";
 	
 	const METADATA_UNABLE_TO_TRANSFORM = "METADATA_UNABLE_TO_TRANSFORM;ERR_MSG;Unable to transform metadata [@ERR_MSG@]";

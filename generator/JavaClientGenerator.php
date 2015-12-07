@@ -14,7 +14,7 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 	 */
 	private $_doc = null;
 	private $_csprojIncludes = array ();
-	protected $_baseClientPath = "src/main/java/com/kaltura/client";
+	protected $_baseClientPath = "src/com/kaltura/client";
 	protected $_usePrivateAttributes;
 	
 	function __construct($xmlPath, Zend_Config $config, $sourcePath = "sources/java")
@@ -64,7 +64,6 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 		if($propertyNode->hasAttribute ( "description" ))
 		{
 			$desc = $propertyNode->getAttribute ( "description" );
-			$desc = str_replace(array("&", "<", ">"), array("&amp;", "&lt;", "&gt;"), $desc);
 			$formatDesc = wordwrap(str_replace(array("\t", "\n", "\r"), " ", $desc) , 80, "\n" . $prefix . "  ");
 			if($desc)
 				return ( $prefix . "/**  $formatDesc  */" );
@@ -376,7 +375,7 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 	public function generateToParamsMethod($classNode) 
 	{	
 		$type = $classNode->getAttribute ( "name" );
-		$this->appendLine ( "    public KalturaParams toParams() throws KalturaApiException {" );
+		$this->appendLine ( "    public KalturaParams toParams() {" );
 		$this->appendLine ( "        KalturaParams kparams = super.toParams();" );
 		$this->appendLine ( "        kparams.add(\"objectType\", \"$type\");" );
 		
@@ -401,7 +400,8 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 	{	
 		$type = $classNode->getAttribute ( "name" );
 		$this->appendLine ( "    public $type(Element node) throws KalturaApiException {" );
-		$this->appendLine ( "        super(node);" );
+		if ($needsSuperConstructor)
+			$this->appendLine ( "        super(node);" );
 			
 		if ($classNode->childNodes->length) 
 		{
@@ -412,9 +412,6 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 			$this->appendLine ( "        NodeList childNodes = node.getChildNodes();" );
 			$this->appendLine ( "        for (int i = 0; i < childNodes.getLength(); i++) {" );
 			$this->appendLine ( "            Node aNode = childNodes.item(i);" );
-//			$this->appendLine ( "            if(aNode.getChildNodes().getLength() == 0){" );
-//			$this->appendLine ( "            	continue;" );
-//			$this->appendLine ( "            }" );
 			$this->appendLine ( "            String nodeName = aNode.getNodeName();" );
 			$propBlock = "            ";
 			
@@ -462,7 +459,6 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 		switch ($propType) 
 		{
 			case "bigint" :
-			case "time" :
 			case "int" :
 			case "string" :
 			case "bool" :
@@ -470,10 +466,6 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 				if ( $propType == "float" )
 				{
 					$propType = "double";
-				}
-				if ( $propType == "time" )
-				{
-					$propType = "bigint";
 				}
 
 				$txtIsUsed = true;
@@ -767,7 +759,6 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 				$returnCall .= "return ParseUtils.parseMap($arrayType.class, resultXmlElement);";
 				break;
 			case "bigint":
-			case "time":
 			case "int" :
 			case "float" :
 			case "bool" :
@@ -825,13 +816,11 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 			$this->appendLine ( "	" );
 		}
 	
-		$volatileProperties = array();
 		foreach($configurationNodes as $configurationNode)
 		{
 			/* @var $configurationNode DOMElement */
 			$configurationName = $configurationNode->nodeName;
-			$attributeName = lcfirst($configurationName) . "Configuration";
-			$volatileProperties[$attributeName] = array();
+			$methodsName = ucfirst($configurationName) . "Configuration";
 		
 			foreach($configurationNode->childNodes as $configurationPropertyNode)
 			{
@@ -841,12 +830,6 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 					continue;
 			
 				$configurationProperty = $configurationPropertyNode->localName;
-				
-				if($configurationPropertyNode->hasAttribute('volatile') && $configurationPropertyNode->getAttribute('volatile'))
-				{
-					$volatileProperties[$attributeName][] = $configurationProperty;
-				}
-				
 				$type = $configurationPropertyNode->getAttribute("type");
 				if(!$this->isSimpleType($type) && !$this->isArrayType($type))
 				{
@@ -870,20 +853,6 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 			}
 		}
 		
-		$this->appendLine ( "	/**");
-		$this->appendLine ( "	 * Clear all volatile configuration parameters");
-		$this->appendLine ( "	 */");
-		$this->appendLine ( "	protected void resetRequest(){");
-		foreach($volatileProperties as $attributeName => $properties)
-		{
-			foreach($properties as $propertyName)
-			{
-				$this->appendLine("		this.{$attributeName}.remove(\"$propertyName\");");
-			}
-		}
-		$this->appendLine ( "	}");
-	
-		
 		$this->appendLine ( "}" );
 		
 		$imports .= "\n";
@@ -903,7 +872,8 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 		}
 		$this->appendLine("	 * @param $type \${$name}");
 		$this->appendLine("	 */");
-		$this->appendLine("	public void set{$methodsName}($type $name){");
+		$this->appendLine("	public void set{$methodsName}($type $name)");
+		$this->appendLine("	{");
 		$this->appendLine("		this.{$configurationName}Configuration.put(\"$paramName\", $name);");
 		$this->appendLine("	}");
 		$this->appendLine("	");
@@ -917,8 +887,10 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 		}
 		$this->appendLine("	 * @return $type");
 		$this->appendLine("	 */");
-		$this->appendLine("	public $type get{$methodsName}(){");
-		$this->appendLine("		if(this.{$configurationName}Configuration.containsKey(\"{$paramName}\")){");
+		$this->appendLine("	public $type get{$methodsName}()");
+		$this->appendLine("	{");
+		$this->appendLine("		if(this.{$configurationName}Configuration.containsKey(\"{$paramName}\"))");
+		$this->appendLine("		{");
 		$this->appendLine("			return ($type) this.{$configurationName}Configuration.get(\"{$paramName}\");");
 		$this->appendLine("		}");
 		$this->appendLine("		");
@@ -982,6 +954,7 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 		$banner .= "/**\n";
 		$banner .= " * This class was generated using $currentFile\n";
 		$banner .= " * against an XML schema provided by Kaltura.\n";
+		$banner .= " * @date " . date ( DATE_RFC822 ) . "\n";
 		$banner .= " * \n";
 		$banner .= " * MANUAL CHANGES TO THIS CLASS WILL BE OVERWRITTEN.\n";
 		$banner .= " */\n";
@@ -1009,7 +982,6 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 			return "Double.MIN_VALUE";
 			
 		case "bigint" :
-		case "time" :
 			return "Long.MIN_VALUE";
 		case "int" :
 			if ($propertyNode->hasAttribute ("enumType")) 
@@ -1032,7 +1004,6 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 		case "int":
 		case "float":
 		case "bigint":
-		case "time":
 			return '0';
 			
 		case "bool":
@@ -1056,7 +1027,6 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 			else
 				return "\"" . $defaultValue . "\"";
 		case "bigint":
-		case "time":
 			$value = trim ( $defaultValue );
 			if ($value == 'null')
 				$value = "Long.MIN_VALUE";
@@ -1097,11 +1067,7 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 			$serviceImports[] = "com.kaltura.client.types.*";
 				
 			return ("Map<String, " . $arrayType . ">");
-
-		case "bigint" :
-		case "time" :
-			return "long";
-
+			
 		case "bool" :
 			return "boolean";
 			
@@ -1129,7 +1095,6 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 			return $enforceObject ? "Double" : "double";
 
 		case "bigint" :
-		case "time" :
 			return $enforceObject ? "Long" : "long";
 			
 		case "int" :

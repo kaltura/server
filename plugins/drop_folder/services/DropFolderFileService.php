@@ -233,17 +233,18 @@ class DropFolderFileService extends KalturaBaseService
 			if($e->getCause() && $e->getCause()->getCode() == self::MYSQL_CODE_DUPLICATE_KEY) //unique constraint
 			{
 				$existingDropFolderFile = DropFolderFilePeer::retrieveByDropFolderIdAndFileName($dropFolderFile->dropFolderId, $dropFolderFile->fileName);
+				KalturaLog::debug('drop folder file exists ['.$existingDropFolderFile->getId().']');
 				switch($existingDropFolderFile->getStatus())
 				{					
 					case DropFolderFileStatus::PARSED:
-						KalturaLog::info('Exisiting file status is PARSED, updating status to ['.$fileStatus.']');
+						KalturaLog::debug('Exisiting file status is PARSED, updating status to ['.$fileStatus.']');
 						$existingDropFolderFile = $dropFolderFile->toUpdatableObject($existingDropFolderFile);
 						$existingDropFolderFile->setStatus($fileStatus);						
 						$existingDropFolderFile->save();
 						$dbDropFolderFile = $existingDropFolderFile;
 						break;
 					case DropFolderFileStatus::DETECTED:
-						KalturaLog::info('Exisiting file status is DETECTED, updating status to ['.$fileStatus.']');
+						KalturaLog::debug('Exisiting file status is DETECTED, updating status to ['.$fileStatus.']');
 						$existingDropFolderFile = $dropFolderFile->toUpdatableObject($existingDropFolderFile);
 						if($existingDropFolderFile->getStatus() != $fileStatus)
 							$existingDropFolderFile->setStatus($fileStatus);
@@ -253,14 +254,14 @@ class DropFolderFileService extends KalturaBaseService
 					case DropFolderFileStatus::UPLOADING:
 						if($fileStatus == DropFolderFileStatus::UPLOADING)
 						{
-							KalturaLog::log('Exisiting file status is UPLOADING, updating properties');
+							KalturaLog::debug('Exisiting file status is UPLOADING, updating properties');
 							$existingDropFolderFile = $dropFolderFile->toUpdatableObject($existingDropFolderFile);
 							$existingDropFolderFile->save();
 							$dbDropFolderFile = $existingDropFolderFile;
 							break;							
 						}
 					default:
-						KalturaLog::log('Setting current file to PURGED ['.$existingDropFolderFile->getId().']');
+						KalturaLog::debug('Setting current file to PURGED ['.$existingDropFolderFile->getId().']');
 						$existingDropFolderFile->setStatus(DropFolderFileStatus::PURGED);				
 						$existingDropFolderFile->save();
 						
@@ -268,9 +269,10 @@ class DropFolderFileService extends KalturaBaseService
 						if(	$existingDropFolderFile->getLeadDropFolderFileId() && 
 							$existingDropFolderFile->getLeadDropFolderFileId() != $existingDropFolderFile->getId())
 						{
-							KalturaLog::info('Updating lead id ['.$existingDropFolderFile->getLeadDropFolderFileId().']');							
+							KalturaLog::debug('Updating lead id ['.$existingDropFolderFile->getLeadDropFolderFileId().']');							
 							$newDropFolderFile->setLeadDropFolderFileId($existingDropFolderFile->getLeadDropFolderFileId());	
 						}
+						KalturaLog::debug('Creating new drop folder file');
 						$newDropFolderFile->save();
 						$dbDropFolderFile = $newDropFolderFile;
 				}

@@ -79,6 +79,7 @@ class EventNotificationTemplateConfigureAction extends KalturaApplicationPlugin
 			$form = KalturaPluginManager::loadObject('Form_EventNotificationTemplateConfiguration', $type, array($partnerId, $type));
 			/* @var $form Form_EventNotificationTemplateConfiguration */
 			$templateClass = KalturaPluginManager::getObjectClass('Kaltura_Client_EventNotification_Type_EventNotificationTemplate', $type);
+			KalturaLog::debug("template class [$templateClass]");
 			
 			if(!$form || !($form instanceof Form_EventNotificationTemplateConfiguration))
 			{
@@ -157,6 +158,7 @@ class EventNotificationTemplateConfigureAction extends KalturaApplicationPlugin
 		$action->view->templateId = $templateId;
 		
 		$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaApplicationPartialView');
+		KalturaLog::debug("plugin instances [" . count($pluginInstances) . "]");
 		foreach($pluginInstances as $pluginInstance)
 		{
 			$entryInvestigatePlugins = $pluginInstance->getApplicationPartialViews('plugin', get_class($this));

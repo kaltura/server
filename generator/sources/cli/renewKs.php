@@ -32,8 +32,7 @@ require_once(dirname(__file__) . '/lib/KalturaCommandLineParser.php');
 require_once(dirname(__file__) . '/lib/KalturaSession.php');
 
 $commandLineSwitches = array(
-	array(KalturaCommandLineParser::SWITCH_NO_VALUE, 'b', 'bare', 'Print only the KS itself'),
-	array(KalturaCommandLineParser::SWITCH_REQUIRES_VALUE, 'e', 'expiry', 'Session expiry (seconds)'),
+		array(KalturaCommandLineParser::SWITCH_NO_VALUE, 'b', 'bare', 'Print only the KS itself'),
 );
 
 // parse command line
@@ -49,7 +48,6 @@ if (!$arguments)
 
 $input = $arguments[0];
 $ks = $input; 
-$expiry = (isset($options['expiry']) ? $options['expiry'] : 86400);
 
 $patterns = array('/\/ks\/([a-zA-Z0-9+_\-]+=*)/', '/&ks=([a-zA-Z0-9+\/_\-]+=*)/', '/\?ks=([a-zA-Z0-9+\/_\-]+=*)/');
 foreach ($patterns as $pattern)
@@ -67,7 +65,7 @@ KalturaSecretRepository::init();
 if (!isset($options['bare']))
 	echo "ks\t";
 
-echo str_replace($ks, KalturaSession::extendKs($ks, $expiry), $input);
+echo str_replace($ks, KalturaSession::extendKs($ks), $input);
 
 if (!isset($options['bare']))
 	echo "\n";

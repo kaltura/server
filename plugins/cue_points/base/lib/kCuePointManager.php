@@ -153,8 +153,6 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 		} else if (PermissionPeer::isValidForPartner(CuePointPermissionName::REMOVE_CUE_POINTS_WHEN_REPLACING_MEDIA, $object->getPartnerId())) {
 			$this->deleteCuePoints($c);
 		}
-
-		return true;
 	}
 
 	/**
@@ -180,8 +178,7 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 	 */
 	protected function cuePointAdded(CuePoint $cuePoint)
 	{
-		if($cuePoint->shouldReIndexEntry())
-			$this->reIndexCuePointEntry($cuePoint);
+		$this->reIndexCuePointEntry($cuePoint);
 	}
 	
 	/**
@@ -195,8 +192,7 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 		$this->deleteCuePoints($c);
 			
 		//re-index cue point on entry
-		if($cuePoint->shouldReIndexEntry())
-			$this->reIndexCuePointEntry($cuePoint);
+		$this->reIndexCuePointEntry($cuePoint);
 	}
 	
 	/**
@@ -223,11 +219,7 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 		CuePointPeer::setUseCriteriaFilter(true);
 
 		foreach($cuePoints as $cuePoint)
-		{
-			$cuePoint->setStatus(CuePointStatus::DELETED);
-			$cuePoint->indexToSearchIndex();
 			kEventsManager::raiseEvent(new kObjectDeletedEvent($cuePoint));
-		}
 	}
 	
 	/**
@@ -336,6 +328,7 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 		if(!file_exists($xmlPath))
 			throw new kCuePointException("XML file [$xmlPath] not found", kCuePointException::XML_FILE_NOT_FOUND);
 			
+		KalturaLog::debug('xml [' . file_get_contents($xmlPath) . ']');
 		$xml = new KDOMDocument();
 		libxml_use_internal_errors(true);
 		libxml_clear_errors();
@@ -346,6 +339,7 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 		}
 		
 		$xsdPath = SchemaService::getSchemaPath(CuePointPlugin::getApiValue(CuePointSchemaType::INGEST_API));
+		KalturaLog::debug("xsd path [$xsdPath]");
 		libxml_clear_errors();
 		if(!$xml->schemaValidate($xsdPath))
 		{
@@ -369,6 +363,7 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 			
 			if($cuePoint && $cuePoint instanceof CuePoint)
 			{
+				KalturaLog::debug("cue point [" . get_class($cuePoint) . "] created [" . $cuePoint->getId() . "]");
 				$cuePoints[] = $cuePoint;
 			}
 		}
@@ -413,6 +408,7 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 		
 		$xmlContent = $scenes->asXML();
 	
+		KalturaLog::debug("xml [$xmlContent]");
 		$xml = new KDOMDocument();
 		libxml_use_internal_errors(true);
 		libxml_clear_errors();
@@ -423,6 +419,7 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 		}
 		
 		$xsdPath = SchemaService::getSchemaPath($schemaType);
+		KalturaLog::debug("xsd path [$xsdPath]");
 		libxml_clear_errors();
 		if(!$xml->schemaValidate($xsdPath))
 		{
@@ -483,7 +480,7 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 		if ( ($object instanceof entry)
 			&& in_array(entryPeer::CUSTOM_DATA, $modifiedColumns)
 			&& $object->isCustomDataModified('operationAttributes')
-			&& $object->isCustomDataModified('sourceEntryId') )
+			&& $object->isCustomDataModified('rootEntryId') )
 		{
 			return true;
 		}
@@ -514,8 +511,19 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 		if(!($object instanceof CuePoint))
 			return false;
 		
-		/* @var $object CuePoint */
-		return $object->shouldReIndexEntry($modifiedColumns);
+		$indexOnEntryTypes = CuePointPlugin::getIndexOnEntryTypes();
+		if(!count($indexOnEntryTypes))
+			return false;
+			
+		if(!in_array($object->getType(), $indexOnEntryTypes))
+			return false;
+		
+		$fieldsToMonitor = array(CuePointPeer::TEXT, CuePointPeer::TAGS, CuePointPeer::NAME);
+		
+		if(count(array_intersect($fieldsToMonitor, $modifiedColumns)) > 0)
+			return true;
+
+		return false;
 	}
 
 	public static function postProcessCuePoints( $liveEntry, $cuePointsIds = null )
@@ -571,13 +579,12 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 		$liveEntry = entryPeer::retrieveByPK( $liveEntryId );
 		if ( ! $liveEntry || ! $liveEntry instanceof LiveEntry )
 		{
-			KalturaLog::err("Can't find live entry with id [$liveEntryId]");
+			KalturaLog::debug("Can't find live entry with id [$liveEntryId]");
 			return;
 		}
 
 		KalturaLog::log("Saving the live entry [{$liveEntry->getId()}] cue points into the associated VOD entry [{$vodEntry->getId()}]");
 
-		// select up to MAX_CUE_POINTS_TO_COPY_TO_VOD to handle
 		$c = new KalturaCriteria();
 		$c->add( CuePointPeer::ENTRY_ID, $liveEntry->getId() );
 		$c->add( CuePointPeer::START_TIME, $liveEntry->getLengthInMsecs(), KalturaCriteria::LESS_EQUAL ); // Don't copy future cuepoints
@@ -588,35 +595,38 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 		$liveCuePointsToCopy = CuePointPeer::doSelect($c);
 
 		$numLiveCuePointsToCopy = count($liveCuePointsToCopy);
-		KalturaLog::info("About to copy $numLiveCuePointsToCopy cuepoints from live entry [{$liveEntry->getId()}] to VOD entry [{$vodEntry->getId()}]");
+		KalturaLog::debug("About to copy $numLiveCuePointsToCopy cuepoints from live entry [{$liveEntry->getId()}] to VOD entry [{$vodEntry->getId()}]");
 
 		$processedCuePointIds = array();
 
 		if ( $numLiveCuePointsToCopy > 0 )
 		{
 			$recordedSegmentsInfo = $liveEntry->getRecordedSegmentsInfo();
-
 			foreach ( $liveCuePointsToCopy as $liveCuePoint )
 			{
 				$processedCuePointIds[] = $liveCuePoint->getId();
+
 				$startTime = $liveCuePoint->getStartTime();
+
 				$copyMsg = "cuepoint [{$liveCuePoint->getId()}] from live entry [{$liveEntry->getId()}] to VOD entry [{$vodEntry->getId()}] with startTime [$startTime]";
-				KalturaLog::info("Preparing to copy $copyMsg");
+				KalturaLog::debug("Preparing to copy $copyMsg");
+
 				$totalVodOffsetTime = $recordedSegmentsInfo->getTotalVodTimeOffset( $startTime );
+
 				if ( ! is_null( $totalVodOffsetTime ) )
 				{
 					$adjustedStartTime = $startTime - $totalVodOffsetTime;
-					KalturaLog::info("Copying $copyMsg and adjustedStartTime [$adjustedStartTime] (totalVodOffsetTime [$totalVodOffsetTime])" );
+					KalturaLog::debug("Copying $copyMsg and adjustedStartTime [$adjustedStartTime] (totalVodOffsetTime [$totalVodOffsetTime])" );
 					$liveCuePoint->copyFromLiveToVodEntry( $vodEntry, $adjustedStartTime );
 				}
 				else
 				{
-					KalturaLog::info("Not copying $copyMsg" );
-				}
+					KalturaLog::debug("Not copying $copyMsg" );
+				}				
 			}
 		}
 
-		KalturaLog::info("Post processing cuePointIds for live entry [{$liveEntry->getId()}]: " . print_r($processedCuePointIds,true) );
+		KalturaLog::debug("Post processing cuePointIds for live entry [{$liveEntry->getId()}]: " . print_r($processedCuePointIds,true) );
 		if ( count($processedCuePointIds) )
 		{
 			self::postProcessCuePoints( $liveEntry, $processedCuePointIds );
@@ -643,30 +653,14 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 	public static function copyCuePointsToClipEntry( entry $clipEntry ) {
 		$clipAtts =  self::getClipAttributesFromEntry( $clipEntry );
 		if ( !is_null($clipAtts) ) {
-			$sourceEntry = entryPeer::retrieveByPK( $clipEntry->getSourceEntryId() );
-			if ( is_null($sourceEntry) ) {
-				KalturaLog::info("Didn't copy cuePoints for entry [{$clipEntry->getId()}] because source entry [" . $clipEntry->getSourceEntryId() . "] wasn't found");
-				return;
-			}
-			$sourceEntryDuration = $sourceEntry->getLengthInMsecs();
-
 			$clipStartTime = $clipAtts->getOffset();
-			if ( is_null($clipStartTime) )
-				$clipStartTime = 0;
 			$clipDuration = $clipAtts->getDuration();
-			if ( is_null($clipDuration) )
-				$clipDuration = $sourceEntryDuration;
-
 
 			$c = new KalturaCriteria();
-			$c->add( CuePointPeer::ENTRY_ID, $clipEntry->getSourceEntryId() );
-			if ( $clipDuration < $sourceEntryDuration ) {
-				$c->addAnd( CuePointPeer::START_TIME, $clipStartTime + $clipDuration, KalturaCriteria::LESS_EQUAL );
-			}
-			if ( $clipStartTime > 0 ) {
-				$c->addAnd( CuePointPeer::START_TIME, $clipStartTime, KalturaCriteria::GREATER_EQUAL );
-				$c->addOr( CuePointPeer::START_TIME, 0, KalturaCriteria::EQUAL );
-			}
+			$c->add( CuePointPeer::ENTRY_ID, $clipEntry->getRootEntryId() );
+			$c->addAnd( CuePointPeer::START_TIME, $clipStartTime, KalturaCriteria::GREATER_EQUAL );
+			$c->addAnd( CuePointPeer::START_TIME, $clipStartTime + $clipDuration, KalturaCriteria::LESS_EQUAL );
+			$c->addOr( CuePointPeer::START_TIME, 0, KalturaCriteria::EQUAL );
 
 			$c->addAscendingOrderByColumn(CuePointPeer::CREATED_AT);
 			$rootEntryCuePointsToCopy = CuePointPeer::doSelect($c);

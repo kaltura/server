@@ -71,7 +71,7 @@ class kBatchManager
 		{
 			if(!$flavor->IsValid())
 			{
-				KalturaLog::err("Flavor [" . $flavor->getFlavorParamsId() . "] is invalid");
+				KalturaLog::log("Flavor [" . $flavor->getFlavorParamsId() . "] is invalid");
 				$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_ERROR);
 				$flavorAsset->save();	
 				return null;
@@ -85,7 +85,7 @@ class kBatchManager
 			{
 				if($flavor->_isNonComply)
 				{
-					KalturaLog::err("Flavor [" . $flavor->getFlavorParamsId() . "] is none-comply");
+					KalturaLog::log("Flavor [" . $flavor->getFlavorParamsId() . "] is none-comply");
 					$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_NOT_APPLICABLE);
 					$flavorAsset->save();	
 					return null;
@@ -105,7 +105,7 @@ class kBatchManager
 				if(($flavor->_isRedundant) && !isset($vidCodec) && isset($audCodec) 
 				&& !(isset($sourceAssetParamsIds) && strlen($sourceAssetParamsIds)>0))
 				{
-					KalturaLog::err("Flavor [" . $flavor->getFlavorParamsId() . "] is redandant audio-only");
+					KalturaLog::log("Flavor [" . $flavor->getFlavorParamsId() . "] is redandant audio-only");
 					$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_NOT_APPLICABLE);
 					$flavorAsset->save();
 					return null;
@@ -383,7 +383,7 @@ public static function updateEntry($entryId, $status)
 		
 		if(in_array($entry->getStatus(), $unAcceptedStatuses))
 		{
-			KalturaLog::info("Entry status [" . $entry->getStatus() . "] will not be changed");
+			KalturaLog::debug("Entry status [" . $entry->getStatus() . "] will not be changed");
 			return $entry;
 		}
 		

@@ -218,7 +218,7 @@ class DocumentsService extends KalturaEntryService
 	 * @param string $entryId Document entry id
 	 * @param int $conversionProfileId
 	 * @param KalturaConversionAttributeArray $dynamicConversionAttributes
-	 * @return bigint job id
+	 * @return int job id
 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
 	 * @throws KalturaErrors::CONVERSION_PROFILE_ID_NOT_FOUND
 	 * @throws KalturaErrors::FLAVOR_PARAMS_NOT_FOUND

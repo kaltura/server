@@ -8,7 +8,7 @@
  * @package Core
  * @subpackage model
  */ 
-class moderationFlag extends BasemoderationFlag implements IBaseObject
+class moderationFlag extends BasemoderationFlag
 {
 	public function getPuserId()
 	{

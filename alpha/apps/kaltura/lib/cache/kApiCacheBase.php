@@ -12,10 +12,6 @@ class kApiCacheBase
 	const ECF_COUNTRY = 'country';
 	const ECF_IP = 'ip';
 	const ECF_COORDINATES = 'coordinates';
-	
-	// extra cache fields data
-	const ECFD_IP_HTTP_HEADER = 'httpHeader';
-	const ECFD_IP_ACCEPT_INTERNAL_IPS = 'acceptInternalIps';
 
 	// extra cache fields conditions
 	// 	the conditions will be applied on the extra fields when generating the cache key

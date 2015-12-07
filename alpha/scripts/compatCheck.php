@@ -217,7 +217,7 @@ function getSignedIpHeader($ipAddress)
 	$baseHeader = array($ipAddress, $curTime, $uniqId);
 	$headerHash = md5(implode(',', $baseHeader) . ',' . $salt);
 	$ipHeader = implode(',', $baseHeader) . ',' . $headerHash;
-	return array("X-KALTURA-REMOTE-ADDR: $ipHeader");
+	return array("X_KALTURA_REMOTE_ADDR: $ipHeader");
 }
 
 function doCurl($url, $params = array(), $files = array(), $range = null, $requestHeaders = array())
@@ -331,18 +331,6 @@ function xmlToArray($xmlstring)
 		//return null;
 	}
 
-	// strip any namespaces from the xml
-	$matches = null;
-	if (preg_match_all('/<([\w]+):/', $xmlstring, $matches))
-	{
-		$namespaces = array_unique($matches[1]);
-		foreach ($namespaces as $namespace)
-		{
-			$xmlstring = str_replace("<{$namespace}:", "<{$namespace}_", $xmlstring);
-			$xmlstring = str_replace("</{$namespace}:", "</{$namespace}_", $xmlstring);
-		}
-	}
-	
 	// parse the xml
 	$xml = @simplexml_load_string($xmlstring);
 	$json = json_encode($xml);
@@ -728,24 +716,7 @@ function testAction($ipAddress, $fullActionName, $parsedParams, $uri, $postParam
 
 	$range = null;
 	if ($compareMode == CM_BINARY)
-	{
 		$range = '0-262144';		// 256K
-		
-		// use GET
-		if ($postParams)
-		{
-			if (strpos($uri, '?') === false)
-			{
-				$uri .= '?';
-			}
-			else 
-			{
-				$uri .= '&';
-			}
-			$uri .= http_build_query($postParams, null, "&");
-			$postParams = array();
-		}
-	}
 
 	$requestHeaders = array();
 	for ($retries = 0; $retries < 3; $retries++)
@@ -1394,7 +1365,7 @@ function processGZipFile($apiLogPath, LogProcessor $logProcessor)
 	while (!gzeof($handle))
 	{
 		$buffer = gzgets($handle, 16384);
-		if ($buffer === false || $logProcessor->processLine($buffer))
+		if ($logProcessor->processLine($buffer))
 			break;
 	}
 

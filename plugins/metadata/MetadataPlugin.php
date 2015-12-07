@@ -320,6 +320,18 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 	 */
 	private static function parseFormatedDate($str)
 	{
+		KalturaLog::debug("parseFormatedDate($str)");
+		
+//		if(function_exists('strptime'))
+//		{
+//			$ret = strptime($str, self::BULK_UPLOAD_DATE_FORMAT);
+//			if($ret)
+//			{
+//				KalturaLog::debug("Formated Date [$ret] " . date('Y-m-d\TH:i:s', $ret));
+//				return $ret;
+//			}
+//		}
+			
 		$fields = null;
 		$regex = self::getDateFormatRegex($fields);
 		
@@ -373,14 +385,15 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 			}
 		}
 		
+		KalturaLog::debug("gmmktime($hour, $minute, $second, $month, $day, $year)");
 		$ret = gmmktime($hour, $minute, $second, $month, $day, $year);
 		if($ret)
 		{
-			KalturaLog::info("Formated Date [$ret] " . date('Y-m-d\TH:i:s', $ret));
+			KalturaLog::debug("Formated Date [$ret] " . date('Y-m-d\TH:i:s', $ret));
 			return $ret;
 		}
 			
-		KalturaLog::info("Formated Date [null]");
+		KalturaLog::debug("Formated Date [null]");
 		return null;
 	}
 	
@@ -389,7 +402,8 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 	 */
 	public static function handleBulkUploadData(BaseObject $object, array $data)
 	{
-		KalturaLog::info("Handle metadata for objectId ". $object->getId());
+		KalturaLog::debug("Handle metadata bulk upload data:\n" . print_r($data, true));
+		KalturaLog::debug("Handle metadata for objectId ". $object->getId());
 			
 		if(!$object)
 			return;
@@ -435,7 +449,7 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 		{
 			try{
 				$xmlData = file_get_contents($data[self::BULK_UPLOAD_COLUMN_URL]);
-				KalturaLog::info("Metadata downloaded [" . $data[self::BULK_UPLOAD_COLUMN_URL] . "]");
+				KalturaLog::debug("Metadata downloaded [" . $data[self::BULK_UPLOAD_COLUMN_URL] . "]");
 			}
 			catch(Exception $e)
 			{
@@ -459,7 +473,7 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 			foreach($tmpMetadataProfileFields as $metadataProfileField)
 				$metadataProfileFields[$metadataProfileField->getKey()] = $metadataProfileField;
 			
-			KalturaLog::info("Found fields [" . count($metadataProfileFields) . "] for metadata profile [$metadataProfileId]");
+			KalturaLog::debug("Found fields [" . count($metadataProfileFields) . "] for metadata profile [$metadataProfileId]");
 			$xml = new DOMDocument();
 			$dataFound = false;
 			
@@ -481,7 +495,7 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 				}
 				
 				$metadataProfileField = $metadataProfileFields[$key];
-				KalturaLog::info("Found field [" . $metadataProfileField->getXpath() . "] for value [$value]");
+				KalturaLog::debug("Found field [" . $metadataProfileField->getXpath() . "] for value [$value]");
 				
 				$fieldValues = explode(self::BULK_UPLOAD_MULTI_VALUES_DELIMITER, $value);
 				foreach($fieldValues as $fieldValue)
@@ -536,7 +550,7 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 		
 		$dbMetadata = $dbMetadata = self::createOrFindMetadataObject($object, $metadataProfile);
 		
-		KalturaLog::info("Metadata [" . $dbMetadata->getId() . "] saved [$xmlData]");
+		KalturaLog::debug("Metadata [" . $dbMetadata->getId() . "] saved [$xmlData]");
 		
 		$key = $dbMetadata->getSyncKey(Metadata::FILE_SYNC_METADATA_DATA);
 		kFileSyncUtils::file_put_contents($key, $xmlData);
@@ -621,7 +635,7 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
                 }
                 
                 $metadataProfileField = $metadataProfileFields[$fieldSysName];
-				KalturaLog::info("Found field [" . $metadataProfileField->getXpath() . "] for value [$fieldValue]");
+				KalturaLog::debug("Found field [" . $metadataProfileField->getXpath() . "] for value [$fieldValue]");
 				
 				$fieldValues = explode(self::BULK_UPLOAD_MULTI_VALUES_DELIMITER, $fieldValue);
 				foreach($fieldValues as $fieldSingleValue)
@@ -676,7 +690,7 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
     		
     		$dbMetadata = self::createOrFindMetadataObject($object, $metadataProfile);
     		
-    		KalturaLog::info("Metadata [" . $dbMetadata->getId() . "] saved [$xmlData]");
+    		KalturaLog::debug("Metadata [" . $dbMetadata->getId() . "] saved [$xmlData]");
     		
     		$key = $dbMetadata->getSyncKey(Metadata::FILE_SYNC_METADATA_DATA);
     		kFileSyncUtils::file_put_contents($key, $xmlData);
@@ -753,7 +767,7 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 	
 	protected static function addXpath(DOMDocument &$xml, $xPath, $value)
 	{
-		KalturaLog::info("add value [$value] to xPath [$xPath]");
+		KalturaLog::debug("add value [$value] to xPath [$xPath]");
 		$xPaths = explode('/', $xPath);
 		$currentNode = $xml;
 		$currentXPath = '';
@@ -761,6 +775,7 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 		{
 			if(!strlen($xPath))
 			{
+				KalturaLog::debug("xPath [/] already exists");
 				continue;
 			}
 				
@@ -773,7 +788,7 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 				if($nodeList && $nodeList->length)
 				{
 					$currentNode = $nodeList->item(0);
-					KalturaLog::info("xPath [$xPath] already exists");
+					KalturaLog::debug("xPath [$xPath] already exists");
 					continue;
 				}
 			}
@@ -788,15 +803,15 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 			if($index + 1 == count($xPaths))
 			{
 				$value = htmlspecialchars($value,ENT_QUOTES,'UTF-8');
-				KalturaLog::info("Creating node [$nodeName] xPath [$xPath] with value [$value]");
+				KalturaLog::debug("Creating node [$nodeName] xPath [$xPath] with value [$value]");
 				$valueNode = $xml->createElement($nodeName, $value);
 			}
 			else
 			{
-				KalturaLog::info("Creating node [$nodeName] xPath [$xPath]");
+				KalturaLog::debug("Creating node [$nodeName] xPath [$xPath]");
 				$valueNode = $xml->createElement($nodeName);
 			}
-			KalturaLog::info("Appending node [$nodeName] to current node [$currentNode->localName]");
+			KalturaLog::debug("Appending node [$nodeName] to current node [$currentNode->localName]");
 			$currentNode->appendChild($valueNode);
 			$currentNode = $valueNode;
 		}

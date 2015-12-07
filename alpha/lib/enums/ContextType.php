@@ -10,5 +10,4 @@ interface ContextType extends BaseEnum
 	const THUMBNAIL = 3;
 	const METADATA = 4;
 	const EXPORT = 5;
-	const SERVE = 6;
 }

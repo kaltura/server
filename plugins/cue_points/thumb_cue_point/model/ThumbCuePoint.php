@@ -54,7 +54,7 @@ class ThumbCuePoint extends CuePoint implements IMetadataObject
 		$timedThumbAsset = assetPeer::retrieveById($this->getAssetId());
 		if ( ! $timedThumbAsset )
 		{
-			KalturaLog::info("Can't retrieve timedThumbAsset with id: {$this->getAssetId()}");
+			KalturaLog::debug("Can't retrieve timedThumbAsset with id: {$this->getAssetId()}");
 			return;
 		}
 
@@ -114,6 +114,4 @@ class ThumbCuePoint extends CuePoint implements IMetadataObject
 		
 		return $data;
 	}
-	
-	public function getIsPublic()	              {return true;}
 }

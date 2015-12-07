@@ -18,13 +18,21 @@ class kManifestContributorConfig
 	public $storageId;
 	
 	/**
+	 * Delivery code
+	 * @var string
+	 */
+	public $deliveryCode;
+	
+	/**
 	 * Entry Id in light of which the manifest action is called
 	 * @var string
 	 */
 	public $entryId;
-		
+	
 	/**
-	 * @var string
+	 * URL manager
+	 * @var DeliveryProfile
 	 */
-	public $rendererClass;
+	public $urlManager;
+	
 }

@@ -285,10 +285,9 @@ class PlaylistService extends KalturaEntryService
 	 * @param string $detailed
 	 * @param KalturaContext $playlistContext
 	 * @param KalturaMediaEntryFilterForPlaylist $filter
-	 * @param KalturaFilterPager $pager
 	 * @return KalturaBaseEntryArray
 	 */
-	function executeAction( $id , $detailed = false, KalturaContext $playlistContext = null, $filter = null, $pager = null )
+	function executeAction( $id , $detailed = false, KalturaContext $playlistContext = null, $filter = null )
 	{
 		myDbHelper::$use_alternative_con = myDbHelper::DB_HELPER_CONN_PROPEL3;
 
@@ -302,6 +301,12 @@ class PlaylistService extends KalturaEntryService
 		$entryFilter = null;
 		if ($filter)
 		{
+			if ($playlist->getMediaType() == entry::ENTRY_MEDIA_TYPE_TEXT)
+			{
+				$limit = $filter->limit;
+				$filter->limit = null;
+			}
+
 			$coreFilter = new entryFilter();
 			$filter->toObject($coreFilter);
 			$entryFilter = $coreFilter;
@@ -323,12 +328,15 @@ class PlaylistService extends KalturaEntryService
 
 		try
 		{
-			$entryList = myPlaylistUtils::executePlaylist( $this->getPartnerId() , $playlist , $entryFilter , $detailed, $pager);
+			$entryList = myPlaylistUtils::executePlaylist( $this->getPartnerId() , $playlist , $entryFilter , $detailed);
 		}
 		catch (kCoreException $ex)
 		{   		
 			throw $ex;
 		}
+
+		if (isset($limit) && $limit)
+			$entryList = array_slice($entryList , 0 , $limit);
 
 		myEntryUtils::updatePuserIdsForEntries ( $entryList );
 			
@@ -344,21 +352,20 @@ class PlaylistService extends KalturaEntryService
 	 * @param KalturaPlaylistType $playlistType
 	 * @param string $playlistContent
 	 * @param string $detailed
-	 * @param KalturaFilterPager $pager
 	 * @return KalturaBaseEntryArray
 	 */
-	function executeFromContentAction($playlistType, $playlistContent, $detailed = false, $pager = null)
+	function executeFromContentAction($playlistType, $playlistContent, $detailed = false)
 	{
 	    myDbHelper::$use_alternative_con = myDbHelper::DB_HELPER_CONN_PROPEL3;
 	    
 		if ($this->getKs() && is_object($this->getKs()) && $this->getKs()->isAdmin())
 			myPlaylistUtils::setIsAdminKs(true);
-
+			
 		$entryList = array();
 		if ($playlistType == KalturaPlaylistType::DYNAMIC)
-			$entryList = myPlaylistUtils::executeDynamicPlaylist($this->getPartnerId(), $playlistContent, null, true, $pager);
+			$entryList = myPlaylistUtils::executeDynamicPlaylist($this->getPartnerId(), $playlistContent);
 		else if ($playlistType == KalturaPlaylistType::STATIC_LIST)
-			$entryList = myPlaylistUtils::executeStaticPlaylistFromEntryIdsString($playlistContent, null, true, $pager);
+			$entryList = myPlaylistUtils::executeStaticPlaylistFromEntryIdsString($playlistContent);
 			
 		myEntryUtils::updatePuserIdsForEntries($entryList);
 		
@@ -372,10 +379,9 @@ class PlaylistService extends KalturaEntryService
 	 * @param KalturaMediaEntryFilterForPlaylistArray $filters
 	 * @param int $totalResults
 	 * @param string $detailed
-	 * @param KalturaFilterPager $pager
 	 * @return KalturaBaseEntryArray
 	 */
-	function executeFromFiltersAction(KalturaMediaEntryFilterForPlaylistArray $filters, $totalResults, $detailed = true, $pager = null)
+	function executeFromFiltersAction(KalturaMediaEntryFilterForPlaylistArray $filters, $totalResults, $detailed = false)
 	{
 	    myDbHelper::$use_alternative_con = myDbHelper::DB_HELPER_CONN_PROPEL3;
 	    
@@ -384,7 +390,7 @@ class PlaylistService extends KalturaEntryService
 		$tempPlaylist->filters = $filters;
 		$tempPlaylist->totalResults = $totalResults;
 		$tempPlaylist->filtersToPlaylistContentXml();
-		return $this->executeFromContentAction($tempPlaylist->playlistType, $tempPlaylist->playlistContent, true, $pager);
+		return $this->executeFromContentAction($tempPlaylist->playlistType, $tempPlaylist->playlistContent, true);
 	}
 	
 	

@@ -47,6 +47,8 @@ class KAsyncConvertCollection extends KAsyncConvert
 	
 	private function convertCollection(KalturaBatchJob $job, KalturaConvertCollectionJobData $data)
 	{
+		KalturaLog::debug ( "Converting collection job");
+	
 		foreach ($data->srcFileSyncs as $srcFileSyncDescriptor) 
 		{				
 			if(self::$taskConfig->params->isRemoteInput || !strlen(trim($srcFileSyncDescriptor->actualFileSyncLocalPath))) // for distributed conversion
@@ -63,7 +65,7 @@ class KAsyncConvertCollection extends KAsyncConvert
 			
 			if(file_exists($srcFileSyncDescriptor->actualFileSyncLocalPath))
 			{
-				KalturaLog::info("Source file exists [$srcFileSyncDescriptor->actualFileSyncLocalPath]");
+				KalturaLog::debug("Source file exists [$srcFileSyncDescriptor->actualFileSyncLocalPath]");
 			}
 			else
 			{
@@ -77,6 +79,8 @@ class KAsyncConvertCollection extends KAsyncConvert
 		}
 		
 		$data->destDirLocalPath = $this->localTempPath;
+		KalturaLog::debug ( "Destination folder: " . $data->destDirLocalPath);
+		
 		$data->inputXmlLocalPath = $this->translateSharedPath2Local($data->inputXmlLocalPath);
 	
 		if(self::$taskConfig->params->isRemoteInput || !strlen(trim($data->inputXmlLocalPath))) // for distributed conversion
@@ -94,7 +98,7 @@ class KAsyncConvertCollection extends KAsyncConvert
 		
 		if(file_exists($data->inputXmlLocalPath))
 		{
-			KalturaLog::info("XML Configuration file exists [$data->inputXmlLocalPath]");
+			KalturaLog::debug("XML Configuration file exists [$data->inputXmlLocalPath]");
 		}
 		else
 		{
@@ -149,6 +153,8 @@ class KAsyncConvertCollection extends KAsyncConvert
 	
 	private function moveFiles(KalturaBatchJob $job, KalturaConvertCollectionJobData $data)
 	{
+		KalturaLog::debug("moveFiles(destDirLocalPath [$data->destDirLocalPath])");
+		
 		clearstatcache();
 		$files2move = array();
 		

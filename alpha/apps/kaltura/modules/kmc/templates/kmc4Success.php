@@ -92,7 +92,7 @@ var kmc = {
 			</div>
 			<div class="hr"></div>
 			<div show-slide="showAdvancedOptionsStatus">
-				<div class="control-group" ng-hide="true">
+				<div class="control-group" ng-hide="liveBitrates">
 					<label class="control-label">{{ 'DELIVERY_TYPE' | translate }}</label>
 					<div class="controls"><select ng-model="deliveryType" ng-options="d.id as d.label for d in deliveryTypes"></select></div>
 					<small class="help-block">{{ 'DELIVERY_TYPE_HELP' | translate }} <a href="javascript:kmc.utils.openHelp('section_pne_stream');">{{ 'READ_MORE' | translate }}</a></small>

@@ -22,11 +22,8 @@ class ComcastMrssDistributionPlugin extends KalturaPlugin implements IKalturaPer
 			self::CONTENT_DSTRIBUTION_VERSION_MINOR,
 			self::CONTENT_DSTRIBUTION_VERSION_BUILD);
 			
-		$dependencyDistribution = new KalturaDependency(ContentDistributionPlugin::getPluginName(), $contentDistributionVersion);
-		$dependencyCaptions = new KalturaDependency(CaptionPlugin::PLUGIN_NAME);
-		$dependencyCuePoints = new KalturaDependency(CuePointPlugin::PLUGIN_NAME);
-		
-		return array($dependencyDistribution, $dependencyCaptions, $dependencyCuePoints);
+		$dependency = new KalturaDependency(ContentDistributionPlugin::getPluginName(), $contentDistributionVersion);
+		return array($dependency);
 	}
 	
 	public static function isAllowedPartner($partnerId)

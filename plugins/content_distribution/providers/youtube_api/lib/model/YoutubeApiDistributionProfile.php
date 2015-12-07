@@ -6,12 +6,12 @@
 class YoutubeApiDistributionProfile extends ConfigurableDistributionProfile
 {
 	const CUSTOM_DATA_USERNAME = 'username';
+	const CUSTOM_DATA_PASSWORD = 'password';
 	const CUSTOM_DATA_DEFAULT_CATEGORY = 'defaultCategory';
 	const CUSTOM_DATA_ALLOW_COMMENTS = 'allowComments';
 	const CUSTOM_DATA_ALLOW_EMBEDDING = 'allowEmbedding';
 	const CUSTOM_DATA_ALLOW_RATINGS = 'allowRatings';
 	const CUSTOM_DATA_ALLOW_RESPONSES = 'allowResponses';
-	const CUSTOM_DATA_ASSUME_SUCCESS = 'assumeSuccess';
 
 	const METADATA_FIELD_DESCRIPTION = 'YoutubeDescription';
 	const METADATA_FIELD_CATEGORY = 'YoutubeCategory';
@@ -132,20 +132,20 @@ class YoutubeApiDistributionProfile extends ConfigurableDistributionProfile
 	
 
 	public function getUsername()				{return $this->getFromCustomData(self::CUSTOM_DATA_USERNAME);}
+	public function getPassword()				{return $this->getFromCustomData(self::CUSTOM_DATA_PASSWORD);}
 	public function getDefaultCategory()		{return $this->getFromCustomData(self::CUSTOM_DATA_DEFAULT_CATEGORY);}
 	public function getAllowComments()			{return $this->getFromCustomData(self::CUSTOM_DATA_ALLOW_COMMENTS);}
 	public function getAllowEmbedding()			{return $this->getFromCustomData(self::CUSTOM_DATA_ALLOW_EMBEDDING);}
 	public function getAllowRatings()			{return $this->getFromCustomData(self::CUSTOM_DATA_ALLOW_RATINGS);}
 	public function getAllowResponses()			{return $this->getFromCustomData(self::CUSTOM_DATA_ALLOW_RESPONSES);}
-	public function getAssumeSuccess()			{return (bool) $this->getFromCustomData(self::CUSTOM_DATA_ASSUME_SUCCESS);}
 
 	public function setUsername($v)				{$this->putInCustomData(self::CUSTOM_DATA_USERNAME, $v);}
+	public function setPassword($v)				{$this->putInCustomData(self::CUSTOM_DATA_PASSWORD, $v);}
 	public function setDefaultCategory($v)		{$this->putInCustomData(self::CUSTOM_DATA_DEFAULT_CATEGORY, $v);}
 	public function setAllowComments($v)		{$this->putInCustomData(self::CUSTOM_DATA_ALLOW_COMMENTS, $v);}
 	public function setAllowEmbedding($v)		{$this->putInCustomData(self::CUSTOM_DATA_ALLOW_EMBEDDING, $v);}
 	public function setAllowRatings($v)			{$this->putInCustomData(self::CUSTOM_DATA_ALLOW_RATINGS, $v);}
 	public function setAllowResponses($v)		{$this->putInCustomData(self::CUSTOM_DATA_ALLOW_RESPONSES, $v);}
-	public function setAssumeSuccess($v)		{$this->putInCustomData(self::CUSTOM_DATA_ASSUME_SUCCESS, $v);}
 
 	
 	protected function getDefaultFieldConfigArray()
@@ -297,15 +297,13 @@ class YoutubeApiDistributionProfile extends ConfigurableDistributionProfile
 		return null;
 	}
 	
-	public function getApiAuthorizeUrl($enforce = false)
+	public function getApiAuthorizeUrl()
 	{
-		if(!$enforce)
+		$tokenData = $this->getGoogleOAuth2Data();
+		KalturaLog::debug(print_r($tokenData, true));
+		if(!is_null($tokenData))
 		{
-			$tokenData = $this->getGoogleOAuth2Data();
-			if(!is_null($tokenData))
-			{
-				return null;
-			}
+			return null;
 		}
 	
 		$appId = YoutubeApiDistributionPlugin::GOOGLE_APP_ID;
@@ -313,7 +311,6 @@ class YoutubeApiDistributionProfile extends ConfigurableDistributionProfile
 					
 		$url = kConf::get('apphome_url');
 		$url .= "/index.php/extservices/googleoauth2/ytid/$appId/subid/$subId";
-		$url .= "?partnerId=".$this->getPartnerId();
 		return $url;
 	}
 }

@@ -6,13 +6,13 @@ class DeliveryProfileVodPackagerHds extends DeliveryProfileHds {
 	{
 		$url = parent::doGetFlavorAssetUrl($flavorAsset);
 		$url .= '/forceproxy/true';
+
 		if($this->params->getFileExtension())
 			$url .= "/name/a." . $this->params->getFileExtension();
-		$url .= VodPackagerDeliveryUtils::getExtraParams($this->params);
 		return $url;
 	}
 	
-	public function buildServeFlavors()
+	public function serve()
 	{
 		$flavors = $this->buildHttpFlavorsArray();
 		$flavors = $this->sortFlavors($flavors);
@@ -22,24 +22,6 @@ class DeliveryProfileVodPackagerHds extends DeliveryProfileHds {
 				'/manifest.f4m', 
 				$this->params);
 		
-		return array($flavor);
-	}
-
-	/**
-	 * returns whether the delivery profile supports the passed deliveryAttributes such as mediaProtocol, flv support, etc..
-	 * @param DeliveryProfileDynamicAttributes $deliveryAttributes
-	 */
-	public function supportsDeliveryDynamicAttributes(DeliveryProfileDynamicAttributes $deliveryAttributes) {
-		$result = parent::supportsDeliveryDynamicAttributes($deliveryAttributes);
-		
-		if ($result == self::DYNAMIC_ATTRIBUTES_NO_SUPPORT)
-			return $result;
-	
-		foreach($deliveryAttributes->getFlavorAssets() as $flavorAsset) {
-			if (strtolower($flavorAsset->getFileExt()) == 'flv' || strtolower($flavorAsset->getContainerFormat()) == 'flash video')
-				return self::DYNAMIC_ATTRIBUTES_NO_SUPPORT;
-		}
-				
-		return $result;
+		return $this->getRenderer(array($flavor));
 	}
 }

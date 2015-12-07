@@ -63,12 +63,7 @@ class KalturaDrmProfile extends KalturaObject implements IFilterable
 	 * @readonly
 	 */
 	public $updatedAt;
-
-    /**
-     * @var string
-     */
-    public $signingKey;
-
+	
 	/*
 	 * mapping between the field on this object (on the left) and the setter/getter on the entry object (on the right)  
 	 */
@@ -83,7 +78,6 @@ class KalturaDrmProfile extends KalturaObject implements IFilterable
 		'defaultPolicy',
 		'createdAt',
 		'updatedAt',
-		'signingKey',
 	 );
 		 
 	public function getMapBetweenObjects()
@@ -105,11 +99,7 @@ class KalturaDrmProfile extends KalturaObject implements IFilterable
 	 */
 	static function getInstanceByType ($provider)
 	{
-		if ($provider == KalturaDrmProviderType::CENC)
-        {
-            return new KalturaDrmProfile();
-        }
-        $obj = KalturaPluginManager::loadObject('KalturaDrmProfile', $provider);
+		$obj = KalturaPluginManager::loadObject('KalturaDrmProfile', $provider);		
 		return $obj;
 	}
 

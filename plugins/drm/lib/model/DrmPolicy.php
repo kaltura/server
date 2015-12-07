@@ -13,7 +13,7 @@
  * @package plugins.drm
  * @subpackage model
  */
-class DrmPolicy extends BaseDrmPolicy implements IBaseObject
+class DrmPolicy extends BaseDrmPolicy 
 {
 
 } // DrmPolicy

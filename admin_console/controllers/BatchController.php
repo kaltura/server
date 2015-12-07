@@ -992,6 +992,7 @@ class BatchController extends Zend_Controller_Action
 			return;
 			
 		$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaApplicationPartialView');
+		KalturaLog::debug("plugin instances [" . count($pluginInstances) . "]");
 		foreach($pluginInstances as $pluginInstance)
 		{
 			$entryInvestigatePlugins = $pluginInstance->getApplicationPartialViews('batch', 'entryInvestigation');

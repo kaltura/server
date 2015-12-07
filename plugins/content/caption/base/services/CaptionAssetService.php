@@ -178,8 +178,8 @@ class CaptionAssetService extends KalturaAssetService
 		
 		$captionAsset->incrementVersion();
 		if($ext && $ext != kUploadTokenMgr::NO_EXTENSION_IDENTIFIER)
-			$captionAsset->setFileExt($ext);
-
+ +      	$captionAsset->setFileExt($ext);
+		
 		$captionAsset->setSize(filesize($fullPath));
 		$captionAsset->save();
 		
@@ -201,12 +201,7 @@ class CaptionAssetService extends KalturaAssetService
 
 		$finalPath = kFileSyncUtils::getLocalFilePathForKey($syncKey);
 		list($width, $height, $type, $attr) = getimagesize($finalPath);
-
-		if ($captionAsset->getLanguage() == KalturaLanguage::MU)
-		{
-			kCaptionsContentManager::addParseMultiLanguageCaptionAssetJob($captionAsset, $finalPath);
-		}
-
+		
 		$captionAsset->setWidth($width);
 		$captionAsset->setHeight($height);
 		$captionAsset->setSize(filesize($finalPath));
@@ -214,7 +209,7 @@ class CaptionAssetService extends KalturaAssetService
 		$captionAsset->setStatus(CaptionAsset::ASSET_STATUS_READY);
 		$captionAsset->save();
 	}
-
+    
 	/**
 	 * @param CaptionAsset $captionAsset
 	 * @param string $url
@@ -400,7 +395,7 @@ class CaptionAssetService extends KalturaAssetService
 		$securyEntryHelper->validateForDownload();
 		
 		$captionAsset = null;
-		if(!$captionParamId)
+		if(is_null($captionParamId))
 		{
 			$captionAssets = assetPeer::retrieveByEntryId($entryId, array(CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION)));
 			foreach($captionAssets as $checkCaptionAsset)
@@ -417,7 +412,7 @@ class CaptionAssetService extends KalturaAssetService
 			$captionAsset = assetPeer::retrieveByEntryIdAndParams($entryId, $captionParamId);
 		}
 		
-		if(!$captionAsset || !($captionAsset instanceof CaptionAsset))
+		if(!$captionAsset)
 			throw new KalturaAPIException(KalturaCaptionErrors::CAPTION_ASSET_PARAMS_ID_NOT_FOUND, $captionParamId);
 		
 		$fileName = $captionAsset->getId() . '.' . $captionAsset->getFileExt();
@@ -575,9 +570,7 @@ class CaptionAssetService extends KalturaAssetService
 		if (!$segmentIndex)
 		{
 			entryPeer::setUseCriteriaFilter(false);
-			$entry = entryPeer::retrieveByPK($captionAsset->getEntryId());
-			if(!$entry)
-				throw new KalturaAPIException(KalturaCaptionErrors::CAPTION_ASSET_ENTRY_ID_NOT_FOUND, $captionAsset->getEntryId());
+			$entry = entryPeer::retrieveByPK($captionAsset->getEntryId());		// no need to check for null, the entry was already loaded in validateForDownload
 			entryPeer::setUseCriteriaFilter(true);
 
 			return new kRendererString(kWebVTTGenerator::buildWebVTTM3U8File($segmentDuration, (int)$entry->getDuration()), 'application/x-mpegurl');
@@ -622,6 +615,8 @@ class CaptionAssetService extends KalturaAssetService
 		$thisKuserId = $this->getKuser()->getId();
 		$isNotAdmin = !kCurrentContext::$ks_object->isAdmin();
 		
+		KalturaLog::debug("entryKuserId [$entryKuserId], thisKuserId [$thisKuserId], isNotAdmin [$isNotAdmin ]");
+
 		if(!$entry || ($isNotAdmin && !is_null($entryKuserId) && $entryKuserId != $thisKuserId))  
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $captionAsset->getEntryId());
 			

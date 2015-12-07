@@ -85,7 +85,7 @@ abstract class KBulkUploadEngine
 		
 		if(!in_array($value, $constants))
 		{
-			KalturaLog::info("Value [$value] not found in class [$class] constants [" . print_r($constants, true) . "]");
+			KalturaLog::debug("Value [$value] not found in class [$class] constants [" . print_r($constants, true) . "]");
 			return false;
 		}
 		

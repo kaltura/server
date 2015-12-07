@@ -50,7 +50,7 @@ class UserLoginData extends BaseUserLoginData {
 	
 	public function isPasswordValid($password_to_match)
 	{
-		return sha1( $this->getSalt().$password_to_match ) === $this->getSha1Password() ;
+		return sha1( $this->getSalt().$password_to_match ) == $this->getSha1Password() ;
 	}
 	
 	
@@ -215,7 +215,7 @@ class UserLoginData extends BaseUserLoginData {
 		$i = 0;
 		$passToKeep = $this->getNumPrevPassToKeep();
 		while ($i < count($previousPass) && $i < $passToKeep) {
-			if ($previousPass[$i]['sha1'] === sha1($previousPass[$i]['salt'] . $pass)) {
+			if ($previousPass[$i]['sha1'] == sha1($previousPass[$i]['salt'] . $pass)) {
 				return true;
 			}
 			$i++;

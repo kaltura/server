@@ -16,48 +16,23 @@ class ContentDistributionBatchService extends KalturaBaseService
 	 */
 	function updateSunStatusAction()
 	{
-		$updatedEntries = array();
-		
 		// serach all records that their sun status changed to after sunset
 		$criteria = KalturaCriteria::create(EntryDistributionPeer::OM_CLASS);
-		$criteria->add(EntryDistributionPeer::STATUS, EntryDistributionStatus::READY);
 		$criteria->add(EntryDistributionPeer::SUN_STATUS, EntryDistributionSunStatus::AFTER_SUNSET , Criteria::NOT_EQUAL);
 		$crit1 = $criteria->getNewCriterion(EntryDistributionPeer::SUNSET, time(), Criteria::LESS_THAN);
 		$criteria->add($crit1);
 		$entryDistributions = EntryDistributionPeer::doSelect($criteria);
-		foreach($entryDistributions as $entryDistribution)
-		{
-			/* @var $entryDistribution EntryDistribution */
-			$entryId = $entryDistribution->getEntryId();
-			if(isset($updatedEntries[$entryId]))
-				continue;
-				
-			$updatedEntries[$entryId] = true;
-			kEventsManager::raiseEvent(new kObjectUpdatedEvent($entryDistribution)); // raise the updated events to trigger index in search engine (sphinx)
-			kEventsManager::flushEvents(); // save entry changes to sphinx
-			kMemoryManager::clearMemory();
-		}
+		foreach($entryDistributions as $entryDistribution) // raise the updated events to trigger index in search engine (sphinx)
+			kEventsManager::raiseEvent(new kObjectUpdatedEvent($entryDistribution));
 
-		$updatedEntries = array();
 
 		// serach all records that their sun status changed to after sunrise
 		$criteria = KalturaCriteria::create(EntryDistributionPeer::OM_CLASS);
-		$criteria->add(EntryDistributionPeer::STATUS, EntryDistributionStatus::QUEUED);
 		$criteria->add(EntryDistributionPeer::SUN_STATUS, EntryDistributionSunStatus::BEFORE_SUNRISE);
 		$criteria->add(EntryDistributionPeer::SUNRISE, time(), Criteria::LESS_THAN);
 		$entryDistributions = EntryDistributionPeer::doSelect($criteria);
-		foreach($entryDistributions as $entryDistribution)
-		{
-			/* @var $entryDistribution EntryDistribution */
-			$entryId = $entryDistribution->getEntryId();
-			if(isset($updatedEntries[$entryId]))
-				continue;
-				
-			$updatedEntries[$entryId] = true;
-			kEventsManager::raiseEvent(new kObjectUpdatedEvent($entryDistribution)); // raise the updated events to trigger index in search engine (sphinx)
-			kEventsManager::flushEvents(); // save entry changes to sphinx
-			kMemoryManager::clearMemory();
-		}
+		foreach($entryDistributions as $entryDistribution) // raise the updated events to trigger index in search engine (sphinx)
+			kEventsManager::raiseEvent(new kObjectUpdatedEvent($entryDistribution));
 	}
 
 

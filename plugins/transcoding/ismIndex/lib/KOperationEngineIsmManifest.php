@@ -20,6 +20,8 @@ class KOperationEngineIsmManifest extends KSingleOutputOperationEngine
 	 */
 	protected function doOperation()
 	{
+		KalturaLog::debug('start ISM Manifest merge');
+		
 		if(!$this->data->srcFileSyncs)
 			return true;
 		

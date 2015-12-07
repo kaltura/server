@@ -107,6 +107,7 @@ class YahooDistributionProfile extends ConfigurableDistributionProfile
 		$thumbAssets = assetPeer::doSelect($c);		
 		if (!count($thumbAssets)|| count($thumbAssets)<2)
 		{
+			KalturaLog::debug('Two thumbnails are required');
 			$errorMsg = 'two thumbnails are required';			
     		$validationError = $this->createValidationError($action, DistributionErrorType::INVALID_DATA);    		
     		$validationError->setValidationErrorType(DistributionValidationErrorType::CUSTOM_ERROR);
@@ -140,6 +141,7 @@ class YahooDistributionProfile extends ConfigurableDistributionProfile
 				//validate file format
 				if (!in_array($fileExt, $allowedExts))
 				{
+					KalturaLog::debug('flavor asset id ['.$flavorAsset->getId().'] does not have a valid extension ['.$fileExt.']');
 					$errorMsg = 'flavor format must be one of ['.self::VIDEO_STREAM_FORMAT_VALID_VALUES.']';
 		    		$validationError = $this->createValidationError($action, DistributionErrorType::INVALID_DATA);
 		    		$validationError->setValidationErrorType(DistributionValidationErrorType::CUSTOM_ERROR);
@@ -153,6 +155,7 @@ class YahooDistributionProfile extends ConfigurableDistributionProfile
 				$allowedBitrates = explode(',', self::VIDEO_STREAM_BITRATE_VALID_VALUES);
 				if (!in_array($videoBitrate, $allowedBitrates))
 				{
+					KalturaLog::debug('flavor asset id ['.$flavorAsset->getId().'] does not have a valid bitrate ['.$videoBitrate.']');
 					$errorMsg = 'video bitrate must be one of ['.self::VIDEO_STREAM_BITRATE_VALID_VALUES.']';
 		    		$validationError = $this->createValidationError($action, DistributionErrorType::INVALID_DATA);
 		    		$validationError->setValidationErrorType(DistributionValidationErrorType::CUSTOM_ERROR);
@@ -167,6 +170,7 @@ class YahooDistributionProfile extends ConfigurableDistributionProfile
 				$flavorDimension =  array('width' => $fileWidth, 'height' => $fileHeight);
 				if (!in_array($flavorDimension, $this->FLAVOR_ASSET_DIMENSIONS))
 				{
+					KalturaLog::debug('flavor asset id ['.$flavorAsset->getId().'] does not have a valid dimensions. width ['.$fileWidth.']. height ['.$fileHeight.']');
 					$errorMsg = 'video dimensions must be one of ['.$this->FLAVOR_ASSET_DIMENSIONS.']';
 		    		$validationError = $this->createValidationError($action, DistributionErrorType::INVALID_DATA);
 		    		$validationError->setValidationErrorType(DistributionValidationErrorType::CUSTOM_ERROR);
@@ -215,6 +219,7 @@ class YahooDistributionProfile extends ConfigurableDistributionProfile
 					}
 					//other dimensions were choosen
 					else{
+						KalturaLog::debug('Thumb id ['.$thumbAsset->id.'] does not have a valid dimensions. width ['.$width.']. height ['.$height.']');
 						$errorMsg = 'thumbnail dimension must be ['.self::SMALL_THUMB_WIDTH.'] on ['.self::SMALL_THUMB_HEIGHT.'] , or ['.self::LARGE_THUMB_WIDTH.'] on ['.self::LARGE_THUMB_HEIGHT.']';
 			    		$validationError = $this->createValidationError($action, DistributionErrorType::INVALID_DATA);
 			    		$validationError->setValidationErrorType(DistributionValidationErrorType::CUSTOM_ERROR);
@@ -227,6 +232,7 @@ class YahooDistributionProfile extends ConfigurableDistributionProfile
 		}
 		//if there are no thumbnails- fail!
 		else{
+			KalturaLog::debug('No thumbnails were supplied');
 			$errorMsg = 'no thumbnails were supplied';			
     		$validationError = $this->createValidationError($action, DistributionErrorType::INVALID_DATA);    		
     		$validationError->setValidationErrorType(DistributionValidationErrorType::CUSTOM_ERROR);

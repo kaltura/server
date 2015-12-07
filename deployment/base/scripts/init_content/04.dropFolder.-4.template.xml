@@ -17,7 +17,7 @@
 		<privileges></privileges> 
 	</session>
 	<multirequest>
-		<request service="conversionProfile" action="getDefault" partnerId="-4">
+		<request service="conversionProfile" action="getDefault">
 		</request>
 		<request service="dropFolder" action="add" plugin="dropFolder">
 			<dropFolder objectType="KalturaDropFolder">

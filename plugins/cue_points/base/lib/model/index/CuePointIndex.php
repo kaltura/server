@@ -5,8 +5,6 @@
 */
 class CuePointIndex extends BaseIndexObject
 {
-	const PLUGINS_DATA = "plugins_data";
-
 	public static function getObjectName()
 	{
 		return 'cue_point';
@@ -70,7 +68,6 @@ class CuePointIndex extends BaseIndexObject
 				'updated_at' => 'updatedAt',
 				'str_entry_id' => 'entryId',
 				'str_cue_point_id' => 'id',
-				'is_public' => 'isPublic',
 			);
 		}
 		return self::$fieldsMap;
@@ -109,8 +106,6 @@ class CuePointIndex extends BaseIndexObject
 				'updated_at' => IIndexable::FIELD_TYPE_DATETIME,
 				'str_entry_id' => IIndexable::FIELD_TYPE_STRING,
 				'str_cue_point_id' => IIndexable::FIELD_TYPE_STRING,
-				'is_public' => IIndexable::FIELD_TYPE_INTEGER,
-				'plugins_data' => IIndexable::FIELD_TYPE_STRING,
 			);
 		}
 		return self::$typesMap;
@@ -161,8 +156,6 @@ class CuePointIndex extends BaseIndexObject
 				'cue_point.UPDATED_AT' => 'updated_at',
 				'cue_point.STR_ENTRY_ID' => 'str_entry_id',
 				'cue_point.STR_CUE_POINT_ID' => 'str_cue_point_id',
-				'cue_point.IS_PUBLIC' => 'is_public',
-				'cue_point.PLUGINS_DATA' => 'plugins_data',
 			);
 		}
 		return self::$searchableFieldsMap;
@@ -255,30 +248,6 @@ class CuePointIndex extends BaseIndexObject
 			);
 		}
 		return self::$conditionToKeep;
-	}
-
-	protected static $apiCompareAttributesMap;
-
-	public static function getApiCompareAttributesMap()
-	{
-		if (!self::$apiCompareAttributesMap)
-		{
-			self::$apiCompareAttributesMap = array(
-			);
-		}
-		return self::$apiCompareAttributesMap;
-	}
-
-	protected static $apiMatchAttributesMap;
-
-	public static function getApiMatchAttributesMap()
-	{
-		if (!self::$apiMatchAttributesMap)
-		{
-			self::$apiMatchAttributesMap = array(
-			);
-		}
-		return self::$apiMatchAttributesMap;
 	}
 
 	public static function getSphinxOptimizationMap()

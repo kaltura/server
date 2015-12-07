@@ -1576,7 +1576,7 @@ abstract class BaseDropFolderFile extends BaseObject  implements Persistent {
                 if ($affectedRows || !$this->isColumnModified(DropFolderFilePeer::CUSTOM_DATA)) //ask if custom_data wasn't modified to avoid retry with atomic column 
                 	break;
 
-                KalturaLog::info("was unable to save! retrying for the $retries time");
+                KalturaLog::debug("was unable to save! retrying for the $retries time");
                 $criteria = $this->buildPkeyCriteria();
 				$criteria->addSelectColumn(DropFolderFilePeer::CUSTOM_DATA);
                 $stmt = DropFolderFilePeer::doSelectStmt($criteria, $con);

@@ -166,6 +166,7 @@ class KalturaBulkUploadJobData extends KalturaJobData
 		    
 		    if ($this->objectData)
 		    {
+		        KalturaLog::debug("Object data class was found: ". get_class($this->objectData));
 		        $this->objectData->fromObject($source_object->getObjectData());
 		    }
 	    }

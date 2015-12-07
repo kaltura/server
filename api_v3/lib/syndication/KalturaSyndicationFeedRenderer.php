@@ -109,6 +109,7 @@ class KalturaSyndicationFeedRenderer
 		myDbHelper::$use_alternative_con = myDbHelper::DB_HELPER_CONN_PROPEL3;
 
 		$microTimeStart = microtime(true);
+		KalturaLog::info("syndicationFeedRenderer- initialize ");
 				
 		$this->syndicationFeedDb = $syndicationFeedDB = syndicationFeedPeer::retrieveByPK($feedId);
 		if( !$syndicationFeedDB )
@@ -454,8 +455,8 @@ class KalturaSyndicationFeedRenderer
 
 		$e = null;
 		$kalturaFeed = $this->syndicationFeed->type == KalturaSyndicationFeedType::KALTURA || $this->syndicationFeed->type == KalturaSyndicationFeedType::KALTURA_XSLT;
+
 		$nextEntry = $this->getNextEntry();
-		
 		while($nextEntry)
 		{
 			$this->enableApcProcessingFlag();
@@ -544,8 +545,7 @@ class KalturaSyndicationFeedRenderer
 			
 		if($this->syndicationFeedDb->getServePlayManifest())
 		{
-			$deliveryProfile = DeliveryProfilePeer::getRemoteDeliveryByStorageId(
-					DeliveryProfileDynamicAttributes::init($storage->getId(), $flavorAsset->getEntryId(), PlaybackProtocol::HTTP, "https"));
+			$deliveryProfile = DeliveryProfilePeer::getRemoteDeliveryByStorageId($storage->getId(), $flavorAsset->getEntryId(), PlaybackProtocol::HTTP, "https");
 			$clientTag = 'feed:' . $this->syndicationFeedDb->getId();
 		
 			if (is_null($deliveryProfile))
@@ -557,9 +557,8 @@ class KalturaSyndicationFeedRenderer
 		}
 		else
 		{
-			$dpda = new DeliveryProfileDynamicAttributes();
-			$urlManager = DeliveryProfilePeer::getRemoteDeliveryByStorageId(
-					DeliveryProfileDynamicAttributes::init($fileSync->getDc(), $flavorAsset->getEntryId()), null, $flavorAsset);
+			$urlManager = DeliveryProfilePeer::getRemoteDeliveryByStorageId($fileSync->getDc(), $flavorAsset->getEntryId(),
+					PlaybackProtocol::HTTP, null, null, $flavorAsset);
 			$url = ltrim($urlManager->getFileSyncUrl($fileSync),'/');
 			if (strpos($url, "://") === false){
 				$url = rtrim($urlManager->getUrl(), "/") . "/".$url ;
@@ -589,31 +588,15 @@ class KalturaSyndicationFeedRenderer
 		
 		if($this->syndicationFeedDb->getServePlayManifest())
 		{
-			$shouldAddKtToken = false;
-			if($this->syndicationFeed->type == KalturaSyndicationFeedType::ITUNES)
-			{
-				$entry = $flavorAsset->getentry();
-				$accessControl = $entry->getaccessControl();
-				if ($accessControl && $accessControl->hasRules())
-					$shouldAddKtToken = true;
-			}
-
 			$cdnHost = requestUtils::getApiCdnHost();
 			$clientTag = 'feed:' . $this->syndicationFeedDb->getId();
-			$url = $cdnHost . $flavorAsset->getPlayManifestUrl($clientTag, null, PlaybackProtocol::HTTP , $shouldAddKtToken);
+			$url = $cdnHost . $flavorAsset->getPlayManifestUrl($clientTag);
 		}
 		else
 		{
 			$urlManager = DeliveryProfilePeer::getDeliveryProfile($flavorAsset->getEntryId());
 			$urlManager->initDeliveryDynamicAttributes(null, $flavorAsset);
-			$protocol = requestUtils::getProtocol();
-			if(!$urlManager->isProtocolSupported($protocol)){
-				$protocol = ($protocol == 'http' ? 'https' : 'http');
-				if(!$urlManager->isProtocolSupported($protocol)){
-					$protocol = 'http';
-				}
-			}
-			$url = $protocol . '://' . $urlManager->getFullAssetUrl($flavorAsset);
+			$url = "http://" . $urlManager->getFullAssetUrl($flavorAsset);
 		}
 		
 		return $url;

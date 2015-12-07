@@ -317,7 +317,7 @@ class SphinxCriterion extends KalturaCriterion implements IKalturaIndexQuery
 		list($field, $comparison, $value) = $this->criteria->translateSphinxCriterion($this);
 		
 		// Can apply criterion
-		KalturaLog::info("Applies criterion [$field]");
+		KalturaLog::debug("Applies criterion [$field]");
 	
 		if(!$objectClass::hasIndexFieldName($field))
 		{

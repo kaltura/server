@@ -8,7 +8,7 @@
  * @package Core
  * @subpackage model
  */ 
-class PartnerActivity extends BasePartnerActivity implements IBaseObject
+class PartnerActivity extends BasePartnerActivity
 {
 	const PARTNER_ACTIVITY_TRAFFIC = 1;		// KB
 	const PARTNER_ACTIVITY_KDP = 2;

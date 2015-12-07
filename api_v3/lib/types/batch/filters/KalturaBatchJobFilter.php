@@ -89,6 +89,7 @@ class KalturaBatchJobFilter extends KalturaBatchJobBaseFilter
 				
 			default:
 				$data = KalturaPluginManager::loadObject('KalturaJobData', $jobType);
+				KalturaLog::debug("Loaded data type [" . get_class($data) . "] for job type [$jobType]");
 		}
 		
 		if(!$data)
@@ -103,6 +104,7 @@ class KalturaBatchJobFilter extends KalturaBatchJobBaseFilter
 			$dbJobSubTypeArray[] = $data->toSubType($jobSubType);
 			
 		$dbJobSubType = implode(baseObjectFilter::IN_SEPARATOR, $dbJobSubTypeArray);
+		KalturaLog::debug("Filter sub types translated from [$jobSubTypeIn] to [$dbJobSubType]");
 		return $dbJobSubType;
 	}
 

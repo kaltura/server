@@ -12,7 +12,7 @@
  * @package Core
  * @subpackage model
  */
-class FileAsset extends BaseFileAsset implements ISyncableFile, IRelatedObject
+class FileAsset extends BaseFileAsset implements ISyncableFile
 {
 	const FILE_SYNC_ASSET = 1;
 	

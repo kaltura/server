@@ -37,9 +37,12 @@ class KalturaSearchItemArray extends KalturaTypedArray
 	 */
 	public function toObjectsArray()
 	{
+		KalturaLog::debug("To objects array: count [" . count($this) . "]");
+		
 		$ret = array();
 		foreach($this as $item)
 		{
+			KalturaLog::debug('Item type [' . get_class($item) . ']');
 			$ret[] = $item->toObject();
 		}
 			

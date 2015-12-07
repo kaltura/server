@@ -1,5 +1,5 @@
 /*Table structure for table `access_control` */
-SET GLOBAL sql_mode = '';
+
 CREATE TABLE IF NOT EXISTS `access_control` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `partner_id` int(11) NOT NULL,
@@ -588,20 +588,19 @@ CREATE TABLE delivery_profile
         created_at DATETIME,
         updated_at DATETIME,
         name VARCHAR(255),
-	type int(11) DEFAULT NULL,
-	system_name VARCHAR(255),
+		type int(11) DEFAULT NULL,
+		system_name VARCHAR(255),
         description TEXT,
-	url VARCHAR(256),
-	host_name VARCHAR(256),
-	recognizer TEXT,
-	tokenizer TEXT,
-	status INTEGER,
-	media_protocols VARCHAR(255),
-	streamer_type VARCHAR(30),
-	is_default tinyint(4) DEFAULT 0,
-	parent_id bigint(20),
-	custom_data text,
-	priority INTEGER DEFAULT 0,
+		url VARCHAR(256),
+		host_name VARCHAR(256),
+		recognizer TEXT,
+		tokenizer TEXT,
+		status INTEGER,
+		media_protocols VARCHAR(255),
+		streamer_type VARCHAR(30),
+		is_default tinyint(4) DEFAULT 0,
+		parent_id bigint(20),
+		custom_data text,
         PRIMARY KEY (id),
         KEY partner_index(partner_id)
 )Engine=InnoDB DEFAULT CHARSET=utf8;
@@ -1297,7 +1296,7 @@ CREATE TABLE IF NOT EXISTS `kuser` (
   `indexed_partner_data_int` int(11) DEFAULT NULL,
   `indexed_partner_data_string` varchar(64) DEFAULT NULL,
   `custom_data` text,
-  `type` int(11) DEFAULT '0',
+  `type` int(11),
   PRIMARY KEY (`id`),
   KEY `partner_created_at_indes` (`partner_id`,`created_at`),
   KEY `partner_puser_id` (`partner_id`,`puser_id`),
@@ -1325,7 +1324,6 @@ CREATE TABLE IF NOT EXISTS `kvote` (
   `kshow_id` varchar(20) DEFAULT NULL,
   `entry_id` varchar(20) DEFAULT NULL,
   `kuser_id` int(11) DEFAULT NULL,
-  `puser_id` VARCHAR(100),
   `rank` int(11) DEFAULT NULL,
   `created_at` datetime DEFAULT NULL,
   `status` int(11) DEFAULT NULL,
@@ -1438,7 +1436,6 @@ CREATE TABLE IF NOT EXISTS `metadata_profile` (
   `created_at` datetime DEFAULT NULL,
   `updated_at` datetime DEFAULT NULL,
   `version` int(11) DEFAULT NULL,
-  `file_sync_version` int(11) DEFAULT NULL,
   `views_version` int(11) DEFAULT NULL,
   `partner_id` int(11) DEFAULT NULL,
   `name` varchar(31) DEFAULT NULL,
@@ -1466,8 +1463,6 @@ CREATE TABLE IF NOT EXISTS `metadata_profile_field` (
   `type` varchar(127) DEFAULT NULL,
   `xpath` varchar(255) DEFAULT NULL,
   `status` tinyint(4) DEFAULT NULL,
-  `custom_data` TEXT, 
-  `related_metadata_profile_id` INTEGER,
   PRIMARY KEY (`id`),
   KEY `partner_id` (`partner_id`),
   KEY `profile_id_and_version` (`metadata_profile_id`,`metadata_profile_version`)
@@ -1808,7 +1803,7 @@ CREATE TABLE IF NOT EXISTS `scheduler` (
   `updated_at` datetime DEFAULT NULL,
   `updated_by` varchar(20) DEFAULT NULL,
   `configured_id` int(11) NOT NULL,
-  `name` varchar(255) DEFAULT '',
+  `name` varchar(20) DEFAULT '',
   `description` varchar(20) DEFAULT '',
   `statuses` varchar(255) NOT NULL,
   `last_status` datetime NOT NULL,
@@ -1846,7 +1841,7 @@ CREATE TABLE IF NOT EXISTS `scheduler_config` (
 /*Table structure for table `scheduler_status` */
 
 CREATE TABLE IF NOT EXISTS `scheduler_status` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `created_at` datetime DEFAULT NULL,
   `created_by` varchar(20) DEFAULT NULL,
   `updated_at` datetime DEFAULT NULL,
@@ -1930,7 +1925,7 @@ CREATE TABLE IF NOT EXISTS `storage_profile` (
   `max_concurrent_connections` int(11) DEFAULT NULL,
   `custom_data` text,
   `path_manager_class` varchar(127) DEFAULT NULL,
-  `url_manager_class` varchar(127) DEFAULT '' NOT NULL,
+  `url_manager_class` varchar(127) NOT NULL,
   `delivery_priority` int(11) DEFAULT '1',
   `delivery_status` int(11) DEFAULT '1',
   PRIMARY KEY (`id`)
@@ -2044,7 +2039,7 @@ CREATE TABLE IF NOT EXISTS `track_entry` (
   `context` varchar(511) DEFAULT NULL,
   `partner_id` int(11) DEFAULT NULL,
   `entry_id` varchar(20) DEFAULT NULL,
-  `host_name` varchar(255) DEFAULT NULL,
+  `host_name` varchar(20) DEFAULT NULL,
   `uid` varchar(63) DEFAULT NULL,
   `track_event_status_id` smallint(6) DEFAULT NULL,
   `changed_properties` varchar(1023) DEFAULT NULL,
@@ -2250,6 +2245,17 @@ CREATE TABLE `api_server`
 	PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+CREATE TABLE `media_server`
+(
+	`id` INTEGER  NOT NULL AUTO_INCREMENT,
+	`created_at` DATETIME,
+	`updated_at` DATETIME,
+	`hostname` VARCHAR(255),
+	`dc` INTEGER,
+	`custom_data` TEXT,
+	PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 CREATE TABLE `file_asset`
 (
 	`id` BIGINT NOT NULL AUTO_INCREMENT,
@@ -2389,62 +2395,3 @@ CREATE TABLE response_profile
 	PRIMARY KEY (id),
 	KEY partner_status(partner_id, status)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-CREATE TABLE `server_node`
-(
-	`id` INTEGER  NOT NULL AUTO_INCREMENT,
-	`dc` INTEGER,
-	`created_at` DATETIME,
-	`updated_at` DATETIME,
-	`heartbeat_time` DATETIME,
-	`partner_id` INTEGER,
-	`name` VARCHAR(256),
-	`system_name` VARCHAR(256),
-	`description` VARCHAR(256),
-	`status` INTEGER,
-	`type` INTEGER default 0 NOT NULL,
-	`tags` TEXT,
-	`host_name` VARCHAR(256) NOT NULL,
-	`playback_host_name` VARCHAR(256),
-	`parent_id` INTEGER default 0,
-	`custom_data` TEXT,
-	PRIMARY KEY (`id`),
-	KEY partner_id_status_system_name(`partner_id`, `status`, `system_name`),
-	KEY host_name(`host_name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
-
-CREATE TABLE `user_entry`
-(
-	`id` INTEGER  NOT NULL AUTO_INCREMENT,
-	`entry_id` VARCHAR(20)  NOT NULL,
-	`kuser_id` INTEGER  NOT NULL,
-	`partner_id` INTEGER,
-	`created_at` DATETIME,
-	`updated_at` DATETIME,
-	`status` INTEGER,
-	`type` INTEGER,
-	`custom_data` TEXT,
-	PRIMARY KEY (`id`),
-	KEY (`entry_id`, `kuser_id`)
-)ENGINE=InnoDB COMMENT='Describes the relationship between a specific user and a specific entry';
-
-
-CREATE TABLE app_token
-(
-	id VARCHAR(20)  NOT NULL,
-	int_id INTEGER  NOT NULL AUTO_INCREMENT,
-	partner_id INTEGER,
-	created_at DATETIME,
-	updated_at DATETIME,
-	deleted_at DATETIME,
-	STATUS INTEGER,
-	expiry INTEGER,
-	session_type INTEGER,
-	session_user_id VARCHAR(100),
-	session_duration INTEGER,
-	session_privileges TEXT,
-	token TEXT,
-	custom_data TEXT,
-	PRIMARY KEY (id),
-	KEY int_id_index (int_id)
-)ENGINE=INNODB DEFAULT CHARSET=utf8;

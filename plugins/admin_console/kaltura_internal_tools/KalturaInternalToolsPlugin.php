@@ -28,8 +28,8 @@ class KalturaInternalToolsPlugin extends KalturaPlugin implements IKalturaServic
 	 */
 	public static function getApplicationPages()
 	{
-		$KalturaInternalTools = array(new KalturaInternalToolsPluginSystemHelperAction(),new KalturaInternalToolsPluginFlavorParams());
-		return $KalturaInternalTools;
+		$KalturaInternalTools = new KalturaInternalToolsPluginSystemHelperAction();
+		return array($KalturaInternalTools);
 	}
 	
 	public static function isAllowedPartner($partnerId)

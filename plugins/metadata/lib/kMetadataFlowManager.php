@@ -116,9 +116,7 @@ class kMetadataFlowManager implements kBatchJobStatusEventConsumer, kObjectDataC
 		}
 
 		/** @var Metadata $object */
-		if ($object->getObjectType() == MetadataObjectType::DYNAMIC_OBJECT &&
-			!$object->isLikeNew() &&
-			!$object->getMetadataProfile()->getDisableReIndexing())
+		if ($object->getObjectType() == MetadataObjectType::DYNAMIC_OBJECT)
 		{
 			/**
 			 * when dynamic object is modified, we need to reindex the metadata and the objects (users, entries)

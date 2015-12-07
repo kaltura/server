@@ -17,7 +17,7 @@ class WSLiveReportInputPager extends WSBaseObject
 	 **/
 	public $pageIndex;	
 	
-	public function __construct($pageSize, $pageIndex) {
+	public function WSLiveReportInputPager($pageSize, $pageIndex) {
 		$this->pageSize = $pageSize;
 		$this->pageIndex = $pageIndex;
 	}

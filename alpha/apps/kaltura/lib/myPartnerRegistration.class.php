@@ -160,8 +160,8 @@ class myPartnerRegistration
 	 */
 	private function createNewPartner( $partner_name , $contact, $email, $ID_is_for, $SDK_terms_agreement, $description, $website_url , $password = null , $newPartner = null, $templatePartnerId = null )
 	{
-		$secret = md5(mcrypt_create_iv(16,MCRYPT_DEV_URANDOM));
-		$admin_secret = md5(mcrypt_create_iv(16,MCRYPT_DEV_URANDOM));
+		$secret = md5($this->str_makerand(5,10,true, false, true));
+		$admin_secret = md5($this->str_makerand(5,10,true, false, true));
 
 		if (!$newPartner)
 			$newPartner = new Partner();
@@ -348,8 +348,6 @@ class myPartnerRegistration
 			$newPartner->setAccountOwnerKuserId($kuserId);
 			$newPartner->save();
 			
-			$this->configurePartnerByPackage($newPartner);
-					
 			$this->setAllTemplateEntriesToAdminKuser($newPartner->getId(), $kuserId);
 
 			return array($newPartner->getId(), $newSubPartnerId, $newAdminKuserPassword, $newPassHashKey);
@@ -358,31 +356,6 @@ class myPartnerRegistration
 			//TODO: revert all changes, depending where and why we failed
 
 			throw $e;
-		}
-	}
-	
-	private function configurePartnerByPackage($partner)
-	{
-		if(!$partner)
-			return;
-			
-		if($partner->getPartnerPackage() == 100) //Developer partner
-		{
-			$permissionNames = array(PermissionName::FEATURE_LIVE_STREAM, PermissionName::FEATURE_KALTURA_LIVE_STREAM, PermissionName::FEATURE_KALTURA_LIVE_STREAM_TRANSCODE);
-			foreach ($permissionNames as $permissionName) 
-			{
-				$permission = PermissionPeer::getByNameAndPartner ( $permissionName, $partner->getId() );
-				if (!$permission) {
-		
-					$permission = new Permission ();
-					$permission->setType ( PermissionType::SPECIAL_FEATURE );
-					$permission->setPartnerId (  $partner->getId());
-					$permission->setName($permissionName);
-				}
-			
-				$permission->setStatus ( PermissionStatus::ACTIVE );
-				$permission->save ();			
-			}
 		}
 	}
 	

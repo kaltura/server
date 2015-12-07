@@ -16,7 +16,7 @@ class KDropFolderFileTransferEngine extends KDropFolderEngine
 	{
 		$this->dropFolder = $folder;
 		$this->fileTransferMgr =  self::getFileTransferManager($this->dropFolder);
-		KalturaLog::info('Watching folder ['.$this->dropFolder->id.']');
+		KalturaLog::debug('Watching folder ['.$this->dropFolder->id.']');
 						    										
 		$physicalFiles = $this->getDropFolderFilesFromPhysicalFolder();
 		if(count($physicalFiles) > 0)
@@ -25,7 +25,7 @@ class KDropFolderFileTransferEngine extends KDropFolderEngine
 			$dropFolderFilesMap = array();
 
 		$maxModificationTime = 0;
-		foreach ($physicalFiles as &$physicalFile)
+		foreach ($physicalFiles as $physicalFile) 
 		{
 			/* @var $physicalFile FileObject */	
 			$physicalFileName = $physicalFile->filename;
@@ -54,7 +54,7 @@ class KDropFolderFileTransferEngine extends KDropFolderEngine
 			if($this->validatePhysicalFile($physicalFileName))
 			{
 				$maxModificationTime = ($physicalFile->modificationTime > $maxModificationTime) ? $physicalFile->modificationTime : $maxModificationTime;
-				KalturaLog::info('Watch file ['.$physicalFileName.']');
+				KalturaLog::debug('Watch file ['.$physicalFileName.']');
 				if(!array_key_exists($physicalFileName, $dropFolderFilesMap))
 				{
 					try 
@@ -99,6 +99,7 @@ class KDropFolderFileTransferEngine extends KDropFolderEngine
 	
 	protected function handleExistingDropFolderFile (KalturaDropFolderFile $dropFolderFile)
 	{
+		KalturaLog::debug('Handling existing drop folder file with id ['.$dropFolderFile->id.']');
 		try 
 		{
 			$fullPath = $this->dropFolder->path.'/'.$dropFolderFile->fileName;
@@ -131,7 +132,7 @@ class KDropFolderFileTransferEngine extends KDropFolderEngine
 		}
 		else
 		{
-			KalturaLog::info('Last modification time ['.$lastModificationTime.'] known last modification time ['.$dropFolderFile->lastModificationTime.']');
+			KalturaLog::debug('Last modification time ['.$lastModificationTime.'] known last modification time ['.$dropFolderFile->lastModificationTime.']');
 			$isLastModificationTimeUpdated = $dropFolderFile->lastModificationTime && $dropFolderFile->lastModificationTime != '' && ($lastModificationTime > $dropFolderFile->lastModificationTime);
 			
 			if($isLastModificationTimeUpdated) //file is replaced, add new entry
@@ -166,7 +167,7 @@ class KDropFolderFileTransferEngine extends KDropFolderEngine
 			$time = time();
 			$fileSizeLastSetAt = $this->dropFolder->fileSizeCheckInterval + $dropFolderFile->fileSizeLastSetAt;
 			
-			KalturaLog::info("time [$time] fileSizeLastSetAt [$fileSizeLastSetAt]");
+			KalturaLog::debug("time [$time] fileSizeLastSetAt [$fileSizeLastSetAt]");
 			
 			// check if fileSizeCheckInterval time has passed since the last file size update	
 			if ($time > $fileSizeLastSetAt)
@@ -178,6 +179,7 @@ class KDropFolderFileTransferEngine extends KDropFolderEngine
 	
 	protected function handleFileAdded ($fileName, $fileSize, $lastModificationTime)
 	{
+		KalturaLog::debug('Add drop folder file ['.$fileName.'] last modification time ['.$lastModificationTime.'] file size ['.$fileSize.']');
 		try 
 		{
 			$newDropFolderFile = new KalturaDropFolderFile();
@@ -213,7 +215,7 @@ class KDropFolderFileTransferEngine extends KDropFolderEngine
 			$fullPath = $this->dropFolder->path.'/'.$physicalFile;
 			if ($physicalFile === '.' || $physicalFile === '..')
 			{
-				KalturaLog::info("Skipping linux current and parent folder indicators");
+				KalturaLog::debug("Skipping linux current and parent folder indicators");
 				$isValid = false;
 			}
 			else if (empty($physicalFile)) 
@@ -338,6 +340,7 @@ class KDropFolderFileTransferEngine extends KDropFolderEngine
 	 */
 	protected function handleFileUploading($dropFolderFileId, $fileSize, $lastModificationTime, $uploadStartDetectedAt = null)
 	{
+		KalturaLog::debug('Handling drop folder file uploading id ['.$dropFolderFileId.'] fileSize ['.$fileSize.'] last modification time ['.$lastModificationTime.']');
 		try 
 		{
 			$updateDropFolderFile = new KalturaDropFolderFile();
@@ -364,6 +367,7 @@ class KDropFolderFileTransferEngine extends KDropFolderEngine
 	 */
 	protected function handleFileUploaded($dropFolderFileId, $lastModificationTime)
 	{
+		KalturaLog::debug('Handling drop folder file uploaded id ['.$dropFolderFileId.'] last modification time ['.$lastModificationTime.']');
 		try 
 		{
 			$updateDropFolderFile = new KalturaDropFolderFile();
@@ -403,6 +407,8 @@ class KDropFolderFileTransferEngine extends KDropFolderEngine
 	
 	protected function getDropFolderFilesFromPhysicalFolder()
 	{
+		KalturaLog::debug('Retrieving physical files list');
+		
 		if($this->fileTransferMgr->fileExists($this->dropFolder->path))
 		{
 			$physicalFiles = $this->fileTransferMgr->listFileObjects($this->dropFolder->path);
@@ -420,13 +426,8 @@ class KDropFolderFileTransferEngine extends KDropFolderEngine
 		{
 			throw new kFileTransferMgrException('Drop folder path not valid ['.$this->dropFolder->path.']', kFileTransferMgrException::remotePathNotValid);
 		}
-
-		KalturaLog::info("physical files: ");
-		foreach ($physicalFiles as &$currlFile)
-		{
-			KalturaLog::info(print_r($currlFile, true));
-		}
-		
+			
+		KalturaLog::debug("physical files: ".print_r($physicalFiles, true));
 		return $physicalFiles;
 	}
 	
@@ -455,6 +456,7 @@ class KDropFolderFileTransferEngine extends KDropFolderEngine
 					 $this->addAsNewContent($job, $data, $dropFolder);	
 				break;			
 			default:
+				KalturaLog::err('No content match policy is defined for drop folder');
 				throw new kApplicativeException(KalturaDropFolderErrorCode::CONTENT_MATCH_POLICY_UNDEFINED, 'No content match policy is defined for drop folder'); 
 				break;
 		}

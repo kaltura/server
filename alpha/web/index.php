@@ -2,62 +2,28 @@
 
 $start = microtime(true);
 require_once(dirname(__FILE__).'/../config/kConf.php');
-
-function sendCachingHeaders($max_age = 864000, $private = false, $last_modified = null)
-{
-	if ($max_age)
-	{
-		$cache_scope = $private ? "private" : "public";
-		header("Cache-Control: $cache_scope, max-age=$max_age, max-stale=0");
-		header('Expires: ' . gmdate('D, d M Y H:i:s', time() + $max_age) . ' GMT');
-		if ($last_modified)
-			header('Last-modified: ' . gmdate('D, d M Y H:i:s', $last_modified) . ' GMT');
-		else
-			header('Last-Modified: Sun, 19 Nov 2000 08:52:00 GMT');
-	}
-	else
-	{
-		header("Expires: Sun, 19 Nov 2000 08:52:00 GMT");
-		header("Cache-Control: no-store, no-cache, must-revalidate, post-check=0, pre-check=0");
-		header("Pragma: no-cache" );
-	}
-}
-
+ 
 function checkCache()
 {
 	$baseDir = "/tmp/cache_v2";
 
 	$start_time = microtime(true);
 
-	$protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') ? "https" : "http";
-	$host = "";
-	if (isset($_SERVER['HTTP_X_FORWARDED_HOST']))
-		$host =  $_SERVER['HTTP_X_FORWARDED_HOST'];
-	else if (isset($_SERVER['HTTP_HOST']))
-		$host = $_SERVER['HTTP_HOST'];
 	$uri = $_SERVER["REQUEST_URI"];
-	
+	$protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') ? "https" : "http";
+
 	if (function_exists('apc_fetch'))
 	{
-		$url = apc_fetch("redirect-".$protocol.$uri);
+		$url = apc_fetch("redirect-".$protocol.$_SERVER["REQUEST_URI"]);
 		if ($url)
 		{
-			sendCachingHeaders(60, true, time());
+			$max_age = 60;
+			header("Cache-Control: private, max-age=$max_age");
+			header('Expires: ' . gmdate('D, d M Y H:i:s', time() + $max_age) . ' GMT');
+			header('Last-Modified: ' . gmdate('D, d M Y H:i:s', time()) . ' GMT');
 
 			header("X-Kaltura:cached-dispatcher-redirect");
 			header("Location:$url");
-			die;
-		}
-		
-		$errorHeaders = apc_fetch("exterror-$protocol://$host$uri");
-		if ($errorHeaders !== false)
-		{
-			sendCachingHeaders(60, true, time());
-			
-			foreach ($errorHeaders as $header)
-			{
-				header($header);
-			}
 			die;
 		}
 	}
@@ -74,7 +40,10 @@ function checkCache()
 		unset($params['ks']);
 		unset($params['kalsig']);
 		$params['uri'] = $_SERVER['PATH_INFO'];
-		$params['__protocol'] = $protocol;
+		if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on')
+			$params['__protocol'] = 'https';
+		else 	
+			$params['__protocol'] = 'http';
 		ksort($params);
 
 		$keys = array_keys($params);
@@ -103,11 +72,15 @@ function checkCache()
 					if (strpos($uri, "/partnerservices2/executeplaylist") !== false) // for now cache only playlist on cdn
 					{
 						$max_age = 60;
-						sendCachingHeaders($max_age, true, time());
+						header("Cache-Control: private, max-age=$max_age, max-stale=0");
+						header('Expires: ' . gmdate('D, d M Y H:i:s', time() + $max_age) . 'GMT');
+						header('Last-Modified: ' . gmdate('D, d M Y H:i:s', time()) . 'GMT');
 					}
 					else
 					{
-						sendCachingHeaders(0);
+						header("Expires: Sun, 19 Nov 2000 08:52:00 GMT");
+						header("Cache-Control: no-store, no-cache, must-revalidate, post-check=0, pre-check=0");
+						header("Pragma: no-cache" );
 					}
 
 					$processing_time = microtime(true) - $start_time;
@@ -133,7 +106,9 @@ function checkCache()
 				$max_age = 60 * 10;
 				header("X-Kaltura:cached-dispatcher");
 				header("Content-Type: application/x-shockwave-flash");
-				sendCachingHeaders($max_age, true, time());
+				header("Cache-Control: private, max-age=$max_age, max-stale=0");
+				header('Expires: ' . gmdate('D, d M Y H:i:s', time() + $max_age) . 'GMT'); 
+				header('Last-Modified: ' . gmdate('D, d M Y H:i:s', time()) . 'GMT');
 				header("Content-Length: ".strlen($cachedResponse));
 				echo $cachedResponse;
 				die;
@@ -182,27 +157,40 @@ function checkCache()
 		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_PS2);
 		if ($cache)
 		{
-			require_once(dirname(__FILE__) . '/../apps/kaltura/lib/renderers/kRendererDumpFile.php');
-			
-			$cachedResponse = $cache->get("thumb$uri");
-			if ($cachedResponse && is_array($cachedResponse))
+			$file_name = $cache->get("thumb$uri");
+			if ($file_name && file_exists($file_name))
 			{
-				list($renderer, $invalidationKey, $cacheTime) = $cachedResponse;
+				$ext = pathinfo ($file_name, PATHINFO_EXTENSION);
+				if ($ext == "jpg")
+					$content_type ="image/jpeg";
+				else
+					$content_type ="image/$ext";
+		
+				$total_length = filesize($file_name);
+				$max_age = 8640000;
 				
-				$keysStore = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_QUERY_CACHE_KEYS);
-				if ($keysStore)
+				header("X-Kaltura:cached-dispatcher-thumb");
+				header("Cache-Control: public, max-age=$max_age, max-stale=0");
+				header('Expires: ' . gmdate('D, d M Y H:i:s', time() + $max_age) . 'GMT'); 
+				header('Last-Modified: Sun, 19 Nov 2000 08:52:00 GMT');
+				header("Content-Length: $total_length ");
+				header("Pragma:");
+				header("Content-Type: $content_type");
+				
+				$chunk_size = 100000;
+				$fh = fopen($file_name, "rb");
+				if ($fh)
 				{
-					$modifiedTime = $keysStore->get($invalidationKey);
-					if ($modifiedTime && $modifiedTime > $cacheTime)
+					$pos = 0;
+					while ($total_length >= 0)
 					{
-						return;		// entry has changed (not necessarily the thumbnail)
+						$content = fread( $fh , $chunk_size );
+						echo $content;
+						$total_length -= $chunk_size;
 					}
+					fclose($fh);
 				}
 				
-				require_once(dirname(__FILE__) . '/../apps/kaltura/lib/monitor/KalturaMonitorClient.php');
-				KalturaMonitorClient::initApiMonitor(true, 'extwidget.thumbnail', $renderer->partnerId);
-				header("X-Kaltura:cached-dispatcher-thumb");
-				$renderer->output();
 				die;
 			}
 		}
@@ -219,7 +207,9 @@ function checkCache()
 			if ($cachedResponse) // dont use cache if we want to force no caching
 			{
 				header("X-Kaltura:cached-dispatcher");
-				sendCachingHeaders(0);
+				header("Expires: Sun, 19 Nov 2000 08:52:00 GMT");
+				header("Cache-Control: no-store, no-cache, must-revalidate, post-check=0, pre-check=0");
+				header("Pragma: no-cache");
 				header("Location:$cachedResponse");
 				
 				die;

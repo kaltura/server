@@ -133,16 +133,6 @@ class KalturaMonitorClient
 	
 	public static function monitorApiStart($cached, $action, $partnerId, $sessionType, $clientTag, $isInMultiRequest = false)
 	{
-		if ($partnerId == -1)		// cannot use BATCH_PARTNER_ID since this may run before the autoloader
-		{
-			$splittedClientTag = explode(' ', $clientTag);
-			$partnerIdIndex = array_search('partnerId:', $splittedClientTag);
-			if ($partnerIdIndex !== false && isset($splittedClientTag[$partnerIdIndex + 1]))
-			{
-				$partnerId = $splittedClientTag[$partnerIdIndex + 1];
-			}
-		}
-		
 		self::initApiMonitor($cached, $action, $partnerId, $clientTag);
 		
 		if (!self::$stream)

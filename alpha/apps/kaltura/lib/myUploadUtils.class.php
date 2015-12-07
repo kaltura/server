@@ -94,12 +94,14 @@ class myUploadUtils
 			
 			if(myContentStorage::fileExtAccepted ( $extension ))
 			{
+				KalturaLog::log("Generating image thumbnail");
 				myFileConverter::createImageThumbnail($fullPath, $thumbFullPath, "image2" );
 				$thumb_url = self::getThumbnailPath ( $fullUrl , ".jpg" ); 
 				$thumb_created = file_exists( $thumbFullPath );
 			}
 			elseif(myContentStorage::fileExtNeedConversion ( $extension ))
 			{
+				KalturaLog::log("Generating media thumbnail");
 				myFileConverter::captureFrame($fullPath, $thumbFullPath, 1, "image2", -1, -1, 3 );
 				if (!file_exists($thumbFullPath))
 					myFileConverter::captureFrame($fullPath, $thumbFullPath, 1, "image2", -1, -1, 0 );

@@ -42,6 +42,7 @@ class SphinxCategoryCriteria extends SphinxCriteria
 		if($filter->get('_free_text'))
 		{
 			$freeTexts = $filter->get('_free_text');
+			KalturaLog::debug("Attach free text [$freeTexts]");
 			
 			$additionalConditions = array();
 			$advancedSearch = $filter->getAdvancedSearch();
@@ -141,6 +142,8 @@ class SphinxCategoryCriteria extends SphinxCriteria
 		if($filter->get('_likex_name_or_reference_id'))
 		{
 			$names = $filter->get('_likex_name_or_reference_id');
+			KalturaLog::debug("Attach free text [$names]");
+			
 			$this->addFreeTextToMatchClauseByMatchFields($names, categoryFilter::NAME_REFERNCE_ID, null, true);
 		}
 		$filter->unsetByName('_likex_name_or_reference_id');
@@ -161,7 +164,7 @@ class SphinxCategoryCriteria extends SphinxCriteria
 		}
 		
 		if($filter->get('_eq_display_in_search')) {
-			$filter->set('_eq_display_in_search', $filter->get('_eq_display_in_search'));
+			$filter->set('_eq_display_in_search', $filter->get('_eq_display_in_search') . "P" . $partnerId);
 		}
 		
 		return parent::applyFilterFields($filter);

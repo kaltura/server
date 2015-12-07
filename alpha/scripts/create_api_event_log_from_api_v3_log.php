@@ -31,7 +31,7 @@ exception
 class kApiEvent 
 {
 	private $arr;
-	public function __construct (  )
+	public function kApiEvent (  )
 	{
 
 	}

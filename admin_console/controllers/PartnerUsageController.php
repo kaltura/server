@@ -112,12 +112,11 @@ class PartnerUsageController extends Zend_Controller_Action
 				$this->view->translate('partner-usage table mixEntriesCount'), ',',
 				$this->view->translate('partner-usage table bandwidth'), ',',
 				//$this->view->translate('partner-usage table totalStorage'), ',',
-				$this->view->translate('partner-usage table storage'),',',
-				$this->view->translate('partner-usage table deletedStorage'),',',
-				$this->view->translate('partner-usage table peakStorage'),',',
-				$this->view->translate('partner-usage table averageStorage'),',',
-				$this->view->translate('partner-usage table combinedBandwidthStorage'),',',
-				$this->view->translate('partner-usage table transcodingUsage'),
+				$this->view->translate('partner-usage table storage'),
+				$this->view->translate('partner-usage table deletedStorage'),
+				$this->view->translate('partner-usage table peakStorage'),
+				$this->view->translate('partner-usage table averageStorage'),
+				$this->view->translate('partner-usage table combinedBandwidthStorage'),
 				"\r\n";
 
 		// echo the csv data
@@ -139,12 +138,11 @@ class PartnerUsageController extends Zend_Controller_Action
 					(int)$item->mixEntriesCount, ',',
 					(int)$item->bandwidth, ',',
 					//(int)$item->totalStorage, ',',
-					(int)$item->storage, ',',
-					(int)$item->deletedStorage, ',',
-					(int)$item->peakStorage, ',',
-					(int)$item->avgStorage, ',',
-					(int)$item->combinedBandwidthStorage, ',',
-					(int)$item->transcodingUsage,
+					(int)$item->storage,
+					(int)$item->deletedStorage,
+					(int)$item->peakStorage,
+					(int)$item->avgStorage,
+					(int)$item->combinedBandwidthStorage,
 					"\r\n";
 		}
 	}

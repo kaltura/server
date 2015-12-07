@@ -51,11 +51,8 @@ class kJobsManager
 		foreach($dbBatchJobLocks as $dbBatchJobLock) {
 			/* @var $dbBatchJobLock BatchJobLock */
 			$dbBatchJob = $dbBatchJobLock->getBatchJob();
-			if($dbBatchJob!==null)
-			{
-				$dbBatchJob->setMessage("Aborted entry");
-				self::abortDbBatchJob($dbBatchJob);
-			}
+			$dbBatchJob->setMessage("Aborted entry");
+			self::abortDbBatchJob($dbBatchJob);
 		}
 	}
 	
@@ -454,6 +451,8 @@ class kJobsManager
 	public static function addFlavorConvertJob(array $srcSyncKeys, flavorParamsOutput $flavor, $flavorAssetId, $conversionProfileId = null,
 			$mediaInfoId = null, BatchJob $parentJob = null, $lastEngineType = null, $sameRoot = true, $priority = 0)
 	{
+		KalturaLog::debug('Add convert job for ['.$flavorAssetId.']');
+		
 		$flavorAsset = assetPeer::retrieveById($flavorAssetId);
 		if(!$flavorAsset)
 		{
@@ -476,6 +475,8 @@ class kJobsManager
 			$srcFlavorAsset = assetPeer::retrieveById($srcSyncKey->getObjectId());
 			if($addImportJob)
 			{
+				KalturaLog::debug("Creates import job for remote file sync");
+
 				$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_WAIT_FOR_CONVERT);
 				$flavorAsset->setDescription("Source file sync is importing: $srcSyncKey");
 				$flavorAsset->save();
@@ -523,6 +524,7 @@ class kJobsManager
 		if($parentJob)
 		{
 			$dbConvertFlavorJob = $parentJob->createChild( BatchJobType::CONVERT, $dbCurrentConversionEngine, $sameRoot);
+			KalturaLog::log("Created from parent job");
 		}
 		else
 		{
@@ -530,6 +532,7 @@ class kJobsManager
 			$dbConvertFlavorJob->setPartnerId($flavor->getPartnerId());
 			$dbConvertFlavorJob->setJobType(BatchJobType::CONVERT);
 			$dbConvertFlavorJob->setJobSubType($dbCurrentConversionEngine);
+			KalturaLog::log("Created from flavor convert job");
 		}
 		$dbConvertFlavorJob->setEntryId($flavor->getEntryId());
 		KalturaLog::log("Job created with entry id [" . $dbConvertFlavorJob->getEntryId() . "]");
@@ -698,6 +701,7 @@ class kJobsManager
 		$plugin = kPluginableEnumsManager::getPlugin($conversionEngineId);
 		if($plugin && $plugin instanceof IKalturaBatchJobDataContributor)
 		{
+			KalturaLog::log("Setting additional data by plugin");
 			$convertData = $plugin->contributeToConvertJobData(BatchJobType::CONVERT, $conversionEngineId, $convertData);
 		}
 	}
@@ -743,6 +747,8 @@ class kJobsManager
 				$originalAsset = kFileSyncUtils::retrieveObjectForSyncKey($srcSyncKey);
 				if($originalAsset instanceof flavorAsset)
 				{
+					KalturaLog::debug("Creates import job for remote file sync [$url]");
+					
 					if($thumbParams)
 					{
 						$thumbParams->setSourceParamsId($originalAsset->getFlavorParamsId());
@@ -756,6 +762,7 @@ class kJobsManager
 					return kJobsManager::addImportJob($parentJob, $thumbAsset->getEntryId(), $partner->getId(), $url, $originalAsset, null, null, true);
 				}
 				
+				KalturaLog::debug("Downloading remote file sync [$url]");
 				$downloadPath = myContentStorage::getFSUploadsPath() . '/' . $thumbAsset->getId() . '.jpg';
 				if (KCurlWrapper::getDataFromFile($url, $downloadPath))
 				{
@@ -831,7 +838,6 @@ class kJobsManager
 		}
 		
 		$flavorAsset = assetPeer::retrieveById($flavorAssetId);
-		$flavorParamsOutput = null;
 		if($createThumb)
 		{
 			$flavorParamsOutput = assetParamsOutputPeer::retrieveByPK($flavorParamsOutputId);
@@ -1117,50 +1123,6 @@ class kJobsManager
 	
 	/**
 	 * @param int $partnerId
-	 * @param string $protocol http or https
-	 * @param SessionType $ksType
-	 * @param array $userRoles
-	 * @param string $objectType class name
-	 * @param string $objectId
-	 * @param string $startObjectKey
-	 * @param string $endObjectKey
-	 */
-	public static function addRecalculateResponseProfileCacheJob($partnerId, $protocol, $ksType, array $userRoles, $objectType, $objectId = null, $startObjectKey = null, $endObjectKey = null)
-	{
-	    $jobData = new kRecalculateResponseProfileCacheJobData();
- 		$jobData->setProtocol($protocol);
- 		$jobData->setKsType($ksType);
- 		$jobData->setUserRoles($userRoles);
- 		$jobData->setObjectType($objectType);
- 		$jobData->setObjectId($objectId);
- 		$jobData->setStartObjectKey($startObjectKey);
- 		$jobData->setEndObjectKey($endObjectKey);
- 		
-		$batchJob = new BatchJob();
-		$batchJob->setPartnerId($partnerId);
-
-		if(is_subclass_of($objectType, 'entry'))
-		{
-			$batchJob->setObjectId($objectId);
-			$batchJob->setEntryId($objectId);
-			$batchJob->setObjectType(BatchJobObjectType::ENTRY);
-		}
-		elseif(is_subclass_of($objectType, 'category'))
-		{
-			$batchJob->setObjectId($objectId);
-			$batchJob->setObjectType(BatchJobObjectType::CATEGORY);
-		}
-		else
-		{
-			KalturaLog::warning("Object type [$objectType] is not expected to need cache recalculation");
-			return null;
-		}
-
-		return self::addJob($batchJob, $jobData, BatchJobType::RECALCULATE_CACHE, RecalculateCacheType::RESPONSE_PROFILE);
-	}
-	
-	/**
-	 * @param int $partnerId
 	 * @param int $objectType of enum DeleteObjectType
 	 * @param baseObjectFilter $filter The filter should return the list of objects that need to be deleted
 	 * @return BatchJob
@@ -1191,6 +1153,7 @@ class kJobsManager
 		}
 		
 		$chunksOfEntries = array_chunk($entryIds, self::BULK_DOWLOAD_SINGLE_JOB_ENTRIES_AMOUNT);	
+		KalturaLog::debug("about to create " . count($chunksOfEntries) . " jobs");	
 		$jobs = array();
 			
 		foreach($chunksOfEntries as $chunk)
@@ -1217,6 +1180,7 @@ class kJobsManager
 	 */
 	public static function addConvertProfileJob(BatchJob $parentJob = null, entry $entry, $flavorAssetId, $inputFileSyncLocalPath)
 	{	
+		KalturaLog::debug("Parent job [" . ($parentJob ? $parentJob->getId() : 'none') . "] entry [" . $entry->getId() . "] flavor asset [$flavorAssetId] input file [$inputFileSyncLocalPath]");
 		if($entry->getConversionQuality() == conversionProfile2::CONVERSION_PROFILE_NONE)
 		{
 			$entry->setStatus(entryStatus::PENDING);
@@ -1230,7 +1194,7 @@ class kJobsManager
 		// if file size is 0, do not create conversion profile and set entry status as error converting
 		if (!file_exists($inputFileSyncLocalPath) || kFile::fileSize($inputFileSyncLocalPath) == 0)
 		{
-			KalturaLog::info("Input file [$inputFileSyncLocalPath] does not exist");
+			KalturaLog::debug("Input file [$inputFileSyncLocalPath] does not exist");
 			
 			$partner = $entry->getPartner();
 			
@@ -1245,14 +1209,14 @@ class kJobsManager
 			$sourceIncludedInProfile = false;
 			$flavorAsset = assetPeer::retrieveById($flavorAssetId);
 			$flavors = flavorParamsConversionProfilePeer::retrieveByConversionProfile($conversionProfile->getId());
-			KalturaLog::info("Found flavors [" . count($flavors) . "] in conversion profile [" . $conversionProfile->getId() . "]");
+			KalturaLog::debug("Found flavors [" . count($flavors) . "] in conversion profile [" . $conversionProfile->getId() . "]");
 			foreach($flavors as $flavor)
 			{
 				/* @var $flavor flavorParamsConversionProfile */
 				
 				if($flavor->getFlavorParamsId() == $flavorAsset->getFlavorParamsId())
 				{
-					KalturaLog::info("Flavor [" . $flavor->getFlavorParamsId() . "] is ingested source");
+					KalturaLog::debug("Flavor [" . $flavor->getFlavorParamsId() . "] is ingested source");
 					$sourceIncludedInProfile = true;
 					continue;
 				}
@@ -1261,7 +1225,7 @@ class kJobsManager
 				
 				if($flavorParams instanceof liveParams || $flavor->getOrigin() == assetParamsOrigin::INGEST)
 				{
-					KalturaLog::info("Flavor [" . $flavor->getFlavorParamsId() . "] should be ingested");
+					KalturaLog::debug("Flavor [" . $flavor->getFlavorParamsId() . "] should be ingested");
 					continue;
 				}
 			
@@ -1270,7 +1234,7 @@ class kJobsManager
 					$siblingFlavorAsset = assetPeer::retrieveByEntryIdAndParams($entry->getId(), $flavor->getFlavorParamsId());
 					if($siblingFlavorAsset)
 					{
-						KalturaLog::info("Flavor [" . $flavor->getFlavorParamsId() . "] already ingested");
+						KalturaLog::debug("Flavor [" . $flavor->getFlavorParamsId() . "] already ingested");
 						continue;
 					}
 				}
@@ -1291,6 +1255,7 @@ class kJobsManager
 						list($syncFile, $local) = kFileSyncUtils::getReadyFileSyncForKey($key, true, false);
 						if($syncFile && $syncFile->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL && $partner && $partner->getImportRemoteSourceForConvert())
 						{
+							KalturaLog::debug("Creates import job for remote file sync");
 							$url = $syncFile->getExternalUrl($entry->getId());
 							kJobsManager::addImportJob($parentJob, $entry->getId(), $partner->getId(), $url, $flavorAsset, null, null, true);
 							$importingSources = true;
@@ -1387,6 +1352,8 @@ class kJobsManager
 	 */
 	public static function addStorageExportJob(BatchJob $parentJob = null, $entryId, $partnerId, StorageProfile $externalStorage, FileSync $fileSync, $srcFileSyncLocalPath, $force = false, $dc = null)
 	{
+		KalturaLog::debug("entryId[$entryId], partnerId[$partnerId], externalStorage id[" . $externalStorage->getId() . "], fileSync id[" . $fileSync->getId() . "], srcFileSyncLocalPath[$srcFileSyncLocalPath]");
+		
 		$netStorageExportData = kStorageExportJobData::getInstance($externalStorage->getProtocol());
 		$netStorageExportData->setStorageExportJobData($externalStorage, $fileSync, $srcFileSyncLocalPath);
 				
@@ -1522,7 +1489,7 @@ class kJobsManager
 		$profile = null;
 		try{
 			$profile = myPartnerUtils::getConversionProfile2ForEntry($parentJob->getEntryId());
-			KalturaLog::info("profile [" . $profile->getId() . "]");
+			KalturaLog::debug("profile [" . $profile->getId() . "]");
 		}
 		catch(Exception $e)
 		{
@@ -1633,6 +1600,7 @@ class kJobsManager
 	 */
 	public static function addBulkUploadJob(Partner $partner, kBulkUploadJobData $jobData, $bulkUploadType = null, $objectId = null, $objectType = null)
 	{
+		KalturaLog::debug("adding BulkUpload job");
 		$job = new BatchJob();
 		$job->setPartnerId($partner->getId());
 		$job->setJobType(BatchJobType::BULKUPLOAD);
@@ -1715,6 +1683,8 @@ class kJobsManager
 	
 	public static function addExportLiveReportJob($reportType, KalturaLiveReportExportParams $params)
 	{
+		KalturaLog::debug("adding Export Live Report job");
+		
 		// Calculate time offset from server time to UTC
 		$dateTimeZoneServer = new DateTimeZone(kConf::get('date_default_timezone'));
 		$dateTimeZoneUTC = new DateTimeZone("UTC");

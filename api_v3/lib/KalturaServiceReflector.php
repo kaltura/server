@@ -169,6 +169,7 @@ class KalturaServiceReflector extends KalturaReflector
 			
 		$pluginInstance = $pluginInstances[$servicePlugin];
 		$servicesMap = $pluginInstance->getServicesMap();
+		KalturaLog::debug(print_r($servicesMap, true));
 		foreach($servicesMap as $name => $class)
 		{
 			if(strtolower($name) == $serviceName)

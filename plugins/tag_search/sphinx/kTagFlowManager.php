@@ -187,6 +187,7 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
      */
 	public static function addOrIncrementTags ($tagsForUpdate, $partnerId, $objectClass, array $privacyContexts = null)
 	{
+	    KalturaLog::info("In Object Added handler");
 	    $objectTags = self::trimObjectTags($tagsForUpdate);
 	    if (!count($objectTags))
 	    {

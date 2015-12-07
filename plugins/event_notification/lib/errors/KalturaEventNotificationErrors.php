@@ -9,8 +9,6 @@ class KalturaEventNotificationErrors extends KalturaErrors
 	
 	const EVENT_NOTIFICATION_TEMPLATE_NOT_FOUND = "EVENT_NOTIFICATION_TEMPLATE_NOT_FOUND;ID;Event notification template id [@ID@] not found";
 
-	const EVENT_NOTIFICATION_TEMPLATE_SYSTEM_NAME_NOT_FOUND = "EVENT_NOTIFICATION_TEMPLATE_SYSTEM_NAME_NOT_FOUND;NAME;Event notification template with system name [@NAME@] not found";
-	
 	const EVENT_NOTIFICATION_WRONG_TYPE = "EVENT_NOTIFICATION_WRONG_TYPE;ID,TYPE;Event notification template id [@ID@] is of type [@TYPE@]";
 	
 	const EVENT_NOTIFICATION_DISPATCH_DISABLED = "EVENT_NOTIFICATION_DISPATCH_DISABLED;ID;Dispatching event notification template id [@ID@] is not allowed";

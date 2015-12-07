@@ -5,23 +5,6 @@
  */
 abstract class Form_ConfigurableProfileConfiguration extends Form_ProviderProfileConfiguration
 {
-	public function init ()
-	{
-		parent::init();
-		
-		$this->addElement('checkbox', 'use_category_entries', array(
-			'label' => 'Query category entries',
-			'isArray' => true,
-		));
-		
-		$this->addDisplayGroup(array ('use_category_entries'), 
-		'configurable_distribution_profile_general_settings',
-		array(
-				'legend' => 'Configurable Distribution Profile- General Settings',
-				'decorators' => array('FormElements', 'Fieldset', array('HtmlTag', array('class' => "configurable_distribution_profile_general_settings"))),
-			));
-		
-	}
 	
 	public function getObject($objectType, array $properties, $add_underscore = true, $include_empty_fields = false)
 	{
@@ -70,6 +53,7 @@ abstract class Form_ConfigurableProfileConfiguration extends Form_ProviderProfil
 	{
 		parent::populateFromObject($object, $add_underscore);
 		$this->addFieldConfigArray($object->fieldConfigArray);
+		
 		$this->addItemXpathsToExtend($object->itemXpathsToExtend);
 	}	
 	
@@ -106,7 +90,6 @@ abstract class Form_ConfigurableProfileConfiguration extends Form_ProviderProfil
 		$i = 1;
 		$extendCategory = false;
 		$extendParentCategory = false;
-		
 		foreach($itemXpathsToExtend as $itemXPath)
 		{
 			/* @var $itemXPath Kaltura_Client_Type_ExtendingItemMrssParameter */
@@ -165,7 +148,6 @@ abstract class Form_ConfigurableProfileConfiguration extends Form_ProviderProfil
 			'isArray' => true,
 			'value' => $extendParentCategory,
 		));
-		
 		$subForm->getElement('includeCategoryParentInMrss')->getDecorator('Label')->setOption('placement', 'APPEND');
 		$subForm->getElement('includeCategoryParentInMrss')->setChecked($extendParentCategory);
 		$mainSubForm->addSubForm($subForm, 'itemXpathsToExtend_subform_'.$i++,100);

@@ -24,16 +24,16 @@ class KAsyncNotifierSender
 		foreach($params as $param => $value)
 			$inputs .= "<input name=\"$param\" value=\"$value\"/>";
 		
-//		KalturaLog::debug('
-//		<html>
-//			<body>
-//				<form method="post" action="' . $url . '">
-//					' . $inputs . '
-//					<input type="submit" value="test"/>
-//				</form>
-//			</body>
-//		</html>
-//		'); 
+		KalturaLog::debug('
+		<html>
+			<body>
+				<form method="post" action="' . $url . '">
+					' . $inputs . '
+					<input type="submit" value="test"/>
+				</form>
+			</body>
+		</html>
+		'); 
 	}
 	
 	/**
@@ -44,6 +44,8 @@ class KAsyncNotifierSender
 	public static function send($url, $params)
 	{
 		static $close_count = 0;
+		
+		KalturaLog::debug("send($url)"); 
 		
 		self::createDebugHtml($url, $params);
 		
@@ -100,6 +102,7 @@ class KAsyncNotifierSender
 	
 	private static function closeConnection()
 	{
+		KalturaLog::debug("Closing connection");
 		if(self::$curl != null)
 			curl_close(self::$curl);
 		self::$curl = null;

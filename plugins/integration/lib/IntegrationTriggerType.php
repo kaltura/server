@@ -5,5 +5,4 @@
  */
 interface IntegrationTriggerType extends BaseEnum
 {
-	const MANUAL = 1;
 }

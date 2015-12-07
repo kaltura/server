@@ -155,7 +155,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 		
 		$idsCount = count($ids);
 		$this->setFetchedIds($ids);
-		KalturaLog::info("Found $idsCount ids");
+		KalturaLog::debug("Found $idsCount ids");
 		
 		foreach($this->keyToRemove as $key)
 		{
@@ -186,7 +186,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 				{
 					$metaItem = reset($metaItems);
 					$this->recordsCount = (int)$metaItem['Value'];
-					KalturaLog::info('Sphinx query total_found: ' . $this->recordsCount);
+					KalturaLog::debug('Sphinx query total_found: ' . $this->recordsCount);
 				}
 			}
 			
@@ -363,9 +363,12 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 			
 		$this->criteriasLeft = 0;
 		
+		KalturaLog::debug("Applies " . count($this->filters) . " filters");
+		
+		
 		foreach($this->filters as $index => $filter)
 		{
-			KalturaLog::info("Applies filter $index");
+			KalturaLog::debug("Applies filter $index");
 			$this->applyFilter(clone $filter);
 		}
 		
@@ -374,7 +377,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 		
 		if(!$this->hasAdvancedSearchFilter && !count($this->matchClause) && $this->shouldSkipSphinx() && !isset($this->groupByColumn) && !isset($this->selectColumn))
 		{
-			KalturaLog::log('Skip Sphinx');
+			KalturaLog::debug('Skip Sphinx');
 			$this->sphinxSkipped = true;
 			return;
 		}
@@ -780,6 +783,10 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 				
 			$this->hasAdvancedSearchFilter = true;
 		}
+		else
+		{
+			KalturaLog::debug('No advanced filter found');
+		}
 		
 		$this->applyFilterFields($filter);
 		
@@ -1029,7 +1036,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 			$freeText = "^$freeText$";
 			$condition = "@(" . $matchFields . ") $freeText";
 			if($isLikeExpr)
-				$condition .= " | $freeText\\\*";
+				$condition .= "\\\*";
 			$additionalConditions[] = $condition;
 		}
 		else
@@ -1059,7 +1066,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 				{
 					$condition = "@(" . $matchFields . ") $freeText";
 					if($isLikeExpr)
-						$condition .= " | $freeText\\\*";
+						$condition .= "\\\*";
 					$additionalConditions[] = $condition;
 				}
 			}
@@ -1069,7 +1076,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 				$freeTextExpr = implode(baseObjectFilter::AND_SEPARATOR, $freeTextsArr);
 				$condition = "@(" . $matchFields . ") $freeTextExpr";
 				if($isLikeExpr)
-					$condition .= " | $freeTextExpr\\\*";
+					$condition .= "\\\*";
 				$additionalConditions[] = $condition;
 			}
 		}

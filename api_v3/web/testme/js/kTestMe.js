@@ -136,45 +136,25 @@ var kTestMe = {
 	appendDialog: function(dialog) {
 		this.jqObjectsContainer.append(dialog.jqElement);
 	},
-
-	getKSFromTextByFormat: function(responseText, format){
-		const INVALID ="";
-		switch (format)	{
-			case 'xml' :
-				var isThereError = responseText.indexOf('<error>') != -1;
-				if (!isThereError) {
-					var startResult = responseText.indexOf('<result>');
-					var endResult = responseText.indexOf('</result>');
-					if (startResult > -1 && endResult > -1) {
-						return responseText.substring(startResult + 8, endResult);
-					}
-				}
-				break;
-			case 'json' :
-				var isThereError = responseText.indexOf("{") != -1;
-				if (!isThereError) {
-					return responseText.slice(1, -1);
-				}
-				break;
-			default :
-				break;
+	
+	onResponse: function() {
+		if(this.loaded == null){
+			this.loaded = true;
+			return;
 		}
-		return INVALID;
-	},
-
-	onResponse: function(responseText, format) {
 		
 		if ((this.call.getServiceId() == 'session') && (this.call.getActionId() == 'start')) {
-
-			var ksText = this.getKSFromTextByFormat(responseText, format);
+			var iframeDoc = jQuery('#response')[0].contentWindow.document;
+			var xmlDoc = (iframeDoc.XMLDocument) ? iframeDoc.XMLDocument : iframeDoc.documentElement;
+			var response = jQuery(xmlDoc).find('result');
 			var field = jQuery('#ks');
 			if(!field || !field.size()){
 				kTestMe.log.error('KS field not found.');
 				return;
 			}
 			
-			if (ksText.length > 0){
-				field.val(ksText);
+			if (response.size() && !response.find('error').size()){
+				field.val(response.text());
 			}
 			// if not empty, empty it
 			else if (field.val()){

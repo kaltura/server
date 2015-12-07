@@ -53,8 +53,11 @@ class QuickPlayDistributionEngine extends DistributionEngine implements
 	 */
 	public function handleSubmit(KalturaDistributionJobData $data, KalturaQuickPlayDistributionProfile $distributionProfile, KalturaQuickPlayDistributionJobProviderData $providerData)
 	{
+		KalturaLog::debug("Submiting data");
+		
 		$fileName = $data->entryDistribution->entryId . '_' . date('Y-m-d_H-i-s') . '.xml';
-		KalturaLog::info('Sending file '. $fileName);
+		KalturaLog::debug('Sending file '. $fileName);
+		KalturaLog::debug('XML data:'. $providerData->xml);
 		
 		$sftpManager = $this->getSFTPManager($distributionProfile);
 		
@@ -94,6 +97,8 @@ class QuickPlayDistributionEngine extends DistributionEngine implements
 				
 		if ($res === false)
 			throw new Exception('Failed to upload metadata file to sftp');
+			
+		KalturaLog::info('Package was sent successfully');
 			
 		$data->remoteId = $fileName;
 		$data->sentData = $providerData->xml;

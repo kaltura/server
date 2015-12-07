@@ -213,7 +213,7 @@ class kDataCenterMgr
 		{
 			$error = "DC[$current_dc_id]: FileSync with id [$file_sync_id] does not belong to this DC";
 			KalturaLog::err($error); 
-			KExternalErrors::dieError(KExternalErrors::BAD_QUERY);
+			throw new Exception ( $error );
 		}
 		
 		// resolve if file_sync is link
@@ -233,7 +233,7 @@ class kDataCenterMgr
 			$file_name_msg = $file_name ? "file name [$file_name] " : '';
 			$error = "DC[$current_dc_id]: Path for fileSync id [$file_sync_id] ".$file_name_msg."does not exist, resolved path [$resolvedPath]";
 			KalturaLog::err($error); 
-			KExternalErrors::dieError(KExternalErrors::FILE_NOT_FOUND);
+			throw new Exception ( $error );	
 		}
 		
 		// validate the hash
@@ -242,7 +242,7 @@ class kDataCenterMgr
 		{
 			$error = "DC[$current_dc_id]: FileSync with id [$file_sync_id] - invalid hash";
 			KalturaLog::err($error); 
-			KExternalErrors::dieError(KExternalErrors::INVALID_TOKEN);
+			throw new Exception ( $error );			
 		}
 				
 		if ($fileSyncIsDir && is_dir($resolvedPath))
@@ -253,7 +253,7 @@ class kDataCenterMgr
 			$contents = serialize($contents);
 			header("file-sync-type: dir");
 			echo $contents;
-			KExternalErrors::dieGracefully();
+			die();
 		}
 		else
 		{

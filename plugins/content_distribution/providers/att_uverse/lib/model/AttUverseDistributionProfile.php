@@ -61,6 +61,7 @@ class AttUverseDistributionProfile extends ConfigurableDistributionProfile
 		$thumbAssets = assetPeer::doSelect($c);		
 		if (!count($thumbAssets))
 		{
+			KalturaLog::debug('Thumbnail is required');
 			$errorMsg = 'thumbnail is required';			
     		$validationError = $this->createValidationError($action, DistributionErrorType::INVALID_DATA);    		
     		$validationError->setValidationErrorType(DistributionValidationErrorType::CUSTOM_ERROR);

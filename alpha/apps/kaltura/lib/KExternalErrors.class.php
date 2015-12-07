@@ -6,8 +6,6 @@
 class KExternalErrors
 {
 	private static $responseCode = null;
-
-	const CACHE_EXPIRY = 60;
 	
 	const ENTRY_NOT_FOUND = 1;
 	const NOT_SCHEDULED_NOW = 2;
@@ -51,10 +49,6 @@ class KExternalErrors
 	const ACTION_BLOCKED = 40;
 	const INVALID_HASH = 41;
 	const PARENT_ENTRY_ID_NOT_FOUND = 42;
-	const USER_NOT_FOUND = 43;
-	const INTERNAL_SERVER_ERROR = 44;
-	const LIVE_STREAM_CONFIG_NOT_FOUND = 45;
-	const TOO_MANY_PROCESSES = 46;
 	
 	const HTTP_STATUS_NOT_FOUND = 404;
 	
@@ -104,11 +98,7 @@ class KExternalErrors
 			self::INVALID_SETTING_TYPE => "Invalid setting type",
 			self::ACTION_BLOCKED => "The requested action is blocked for this partner",
 			self::INVALID_HASH => "Hash key contains invalid characters",
-			self::PARENT_ENTRY_ID_NOT_FOUND => "Parent entry id provided not found in system",
-			self::USER_NOT_FOUND => "The provided user id was not found",
-			self::INTERNAL_SERVER_ERROR => "Internal server error",
-			self::LIVE_STREAM_CONFIG_NOT_FOUND => "Live stream playback config not found for requested live entry",
-			self::TOO_MANY_PROCESSES => "Too many executed processes",
+			self::PARENT_ENTRY_ID_NOT_FOUND => "Parent entry id provided not found in system"
 	);
 	
 	public static function dieError($errorCode, $message = null)
@@ -124,43 +114,19 @@ class KExternalErrors
 		if($message)
 			$description .= ", $message";
 			
-		if (class_exists('KalturaLog'))
-			KalturaLog::err("exiting on error $errorCode - $description");
+		KalturaLog::err("exiting on error $errorCode - $description");
 		
-		$headers = array();
 		if(self::$responseCode)
-			$headers[] = self::$errorCodeMap[self::$responseCode];
-		
-		$headers[] = "X-Kaltura-App: exiting on error $errorCode - $description";
-		
-		foreach ($headers as $header)
-		{
-			header($header);
-		}
-		header("X-Kaltura:error-$errorCode");
-		
-		$headers[] = "X-Kaltura:cached-error-$errorCode";
+			header(self::$errorCodeMap[self::$responseCode]);
 		
 		self::terminateDispatch();
 		
+		header("X-Kaltura:error-$errorCode");
+		header("X-Kaltura-App: exiting on error $errorCode - $description");
+
 		if ($errorCode != self::ACCESS_CONTROL_RESTRICTED && 
-			$errorCode != self::IP_COUNTRY_BLOCKED && 
-			$_SERVER["REQUEST_METHOD"] == "GET")
-		{
-			infraRequestUtils::sendCachingHeaders(self::CACHE_EXPIRY, true, time());
-			
-			if (function_exists('apc_store'))
-			{
-				$protocol = infraRequestUtils::getProtocol();
-				$host = "";
-				if (isset($_SERVER['HTTP_X_FORWARDED_HOST']))
-					$host =  $_SERVER['HTTP_X_FORWARDED_HOST'];
-				else if (isset($_SERVER['HTTP_HOST']))
-					$host = $_SERVER['HTTP_HOST'];
-				$uri = $_SERVER["REQUEST_URI"];
-				apc_store("exterror-$protocol://$host$uri", $headers, self::CACHE_EXPIRY);
-			}
-		}
+			$errorCode != self::IP_COUNTRY_BLOCKED)
+			requestUtils::sendCachingHeaders(60);
 		
 		die();
 	}

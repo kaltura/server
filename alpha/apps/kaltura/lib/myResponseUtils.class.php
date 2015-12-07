@@ -8,8 +8,8 @@ class myResponseUtils
 	static public function setCacheHeadersNoCache ( $response)
 	{
 		$d = gmdate ( "D, d M Y h:i:s" );
-		$response->setHttpHeader ( "Last-Modified" , $d . " GMT" );
-		$response->setHttpHeader ( "Expires" ,  $d . " GMT" );
+		$response->setHttpHeader ( "Last-Modified" , $d . "GMT" );
+		$response->setHttpHeader ( "Expires" ,  $d . "GMT" );
 		$response->setHttpHeader ( "Cache-Control" , "no-store, no-cache, must-revalidate ");
 		$response->setHttpHeader ( "Cache-Control" , " post-check=0, pre-check=0" );
 		$response->setHttpHeader ( "Pragma" , "no-cache" );
@@ -17,9 +17,9 @@ class myResponseUtils
 	
 	static public function setCacheHeaders ( $response,  $last_modified , $expirey_in_seconds )
 	{
-		$response->setHttpHeader ( "Last-Modified" , gmdate ( "D, d M Y h:i:s" , $last_modified ) . " GMT" );
+		$response->setHttpHeader ( "Last-Modified" , gmdate ( "D, d M Y h:i:s" , $last_modified ) . "GMT" );
 		$expires = time() + $expirey_in_seconds;
-		$response->setHttpHeader ( "Expires" ,  gmdate ( "D, d M Y h:i:s" , $expires ) . " GMT" );
+		$response->setHttpHeader ( "Expires" ,  gmdate ( "D, d M Y h:i:s" , $expires ) . "GMT" );
 		$response->setHttpHeader ( "Cache-Control" , "max-age=" . $expirey_in_seconds);
 		$response->setHttpHeader ( "Pragma" , "" );  // important !! - does not work without this line !
 	}

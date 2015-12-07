@@ -65,16 +65,6 @@ class ParseUtils
 			
 		return $ret;
 	}
-	
-	public static function unmarshalMap(\SimpleXMLElement $xml, $fallbackType = null)
-	{
-		$xmls = $xml->children();
-		$ret = array();
-		foreach($xmls as $xml)
-			$ret[strval($xml->itemKey)] = self::unmarshalObject($xml, $fallbackType);
-			
-		return $ret;
-	}
 
 	public static function checkIfError(\SimpleXMLElement $xml, $throwException = true) 
 	{
@@ -82,11 +72,10 @@ class ParseUtils
 		{
 			$code = "{$xml->error->code}";
 			$message = "{$xml->error->message}";
-			$arguments = self::unmarshalArray($xml->error->args, 'KalturaApiExceptionArg');
 			if($throwException)
-				throw new ApiException($message, $code, $arguments);
+				throw new ApiException($message, $code);
 			else 
-				return new ApiException($message, $code, $arguments);
+				return new ApiException($message, $code);
 		}
 		return null;
 	}

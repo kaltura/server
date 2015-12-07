@@ -10,6 +10,8 @@ class KAsyncNotifierParamsUtils
 {
 	public static function prepareNotificationData($url, $signature_key, KalturaBatchJob $job, KalturaNotificationJobData $data, $prefix = null)
 	{
+		KalturaLog::debug("sendSingleNotification($url, $signature_key, $job->id, data, $prefix)");
+		
 		$params = array("notification_id" => $job->id, "notification_type" => $data->typeAsString, "puser_id" => $data->userId, "partner_id" => $job->partnerId);
 		
 		switch($data->objType)

@@ -13,32 +13,6 @@
  * @package plugins.drm
  * @subpackage model
  */
-class DrmProfile extends BaseDrmProfile implements IBaseObject {
-
-    const CUSTOM_DATA_SIGNING_KEY = 'signing_key';
-
-    const CONFIG_NAME_LICENSE_SERVER_URL = "license_server_url";
-
-    public function getLicenseServerUrl()
-    {
-        if(!parent::getLicenseServerUrl())
-        {
-            return DrmPlugin::getConfigParam(DrmPlugin::getPluginName(), self::CONFIG_NAME_LICENSE_SERVER_URL);
-        }
-        return parent::getLicenseServerUrl();
-    }
-
-    public function getSigningKey()
-    {
-        $key = $this->getFromCustomData(self::CUSTOM_DATA_SIGNING_KEY);
-        if(!$key)
-            $key = DrmPlugin::getConfigParam("drm", "signing_key");
-        return $key;
-    }
-
-    public function setSigningKey($key)
-    {
-        $this->putInCustomData(self::CUSTOM_DATA_SIGNING_KEY, $key);
-    }
+class DrmProfile extends BaseDrmProfile {
 
 } // DrmProfile

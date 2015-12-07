@@ -27,9 +27,9 @@ class DailyMotionImpl
 	}
 	
 	private function call($method, $args = array()) {
-		KalturaLog::info ( "Call [$method] args [" . print_r ( $args, true ) . "]" );
+		KalturaLog::debug ( "Call [$method] args [" . print_r ( $args, true ) . "]" );
 		$result = $this->api->call ( $method, $args );
-		KalturaLog::info ( "Result [" . print_r ( $result, true ) . "]" );
+		KalturaLog::debug ( "Result [" . print_r ( $result, true ) . "]" );
 		
 		return $result;
 	}

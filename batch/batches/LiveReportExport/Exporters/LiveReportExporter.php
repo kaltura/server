@@ -62,7 +62,7 @@ abstract class LiveReportExporter {
 		if (! $fp)
 			throw new KOperationEngineException ( "Failed to open report file : " . $fileName );
 		
-		KalturaLog::info ( "Exporting report to $fileName" );
+		KalturaLog::debug ( "Exporting report to $fileName" );
 		$engines = $this->getEngines ();
 		foreach ( $engines as $engine ) {
 			$engine->run ( $fp, $this->params );

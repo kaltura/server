@@ -54,12 +54,8 @@ class Partner extends BasePartner
 	const PARTNER_TYPE_SAKAI = 108;
 	const PARTNER_TYPE_ADMIN_CONSOLE = 109;
 	
-	const CUSTOM_DATA_USAGE_WARNINGS = 'usageWarnings';
-	
 	public static $s_content_root ;
 	
-	const CDN_HOST_WHITE_LIST = 'CDNHostWhiteList';
-
 	public function save(PropelPDO $con = null)
 	{
 		PartnerPeer::removePartnerFromCache( $this->getId() );
@@ -69,8 +65,8 @@ class Partner extends BasePartner
 	
 	public function validateSecret ( $partner_secret , $partner_key , &$ks_max_expiry_in_seconds , $admin = false )
 	{
-		if ($partner_secret === $this->getAdminSecret() || 
-			(!$admin && $partner_secret === $this->getSecret()))
+		$secret_to_match = $admin ? $this->getAdminSecret() : $this->getSecret() ;
+		if ( $partner_secret == $secret_to_match )
 		{
 			$ks_max_expiry_in_seconds = $this->getKsMaxExpiryInSeconds();
 			return true;
@@ -466,9 +462,6 @@ class Partner extends BasePartner
 	
 	public function getThumbnailHost()	{		return $this->getFromCustomData( "thumbnailHost" , null, false  );	}
 	public function setThumbnailHost( $v )	{		return $this->putInCustomData( "thumbnailHost", $v );	}	
-	
-	public function getThumbnailCacheAge()	{		return $this->getFromCustomData( "thumbnailCacheAge" , null, 0);	}
-	public function setThumbnailCacheAge( $v )	{		return $this->putInCustomData( "thumbnailCacheAge", $v);	}
 		
 	public function getForceCdnHost()	{		return $this->getFromCustomData( "forceCdnHost" , null, false  );	}
 	public function setForceCdnHost( $v )	{		return $this->putInCustomData( "forceCdnHost", $v );	}	
@@ -605,7 +598,7 @@ class Partner extends BasePartner
 	public function getMaxBulkSize() { return $this->getFromCustomData("maxBulk", null, null); }
 	public function setMaxBulkSize( $v ) { $this->putInCustomData("maxBulk", (int)$v); } 
 
-	public function getStorageServePriority() { return $this->getFromCustomData("storageServePriority", null, StorageProfile::STORAGE_SERVE_PRIORITY_KALTURA_ONLY); }
+	public function getStorageServePriority() { return $this->getFromCustomData("storageServePriority", null, 0); }
 	public function setStorageServePriority( $v ) { $this->putInCustomData("storageServePriority", (int)$v); } 
 	
 	public function getStorageDeleteFromKaltura() { return $this->getFromCustomData("storageDeleteFromKaltura", null, 0); }
@@ -838,10 +831,6 @@ class Partner extends BasePartner
 	//strip image profiles and comments when generating the thumbnail
 	public function setStripThumbProfile($v) { $this->putInCustomData('stripThumbProfile', $v);}
 	public function getStripThumbProfile() { return $this->getFromCustomData('stripThumbProfile');}
-	
-	//use time aligned renditions in playManifest for live entries
-	public function setTimeAlignedRenditions($v) { $this->putInCustomData('timeAlignedRenditions', $v);}
-	public function getTimeAlignedRenditions() { return $this->getFromCustomData('timeAlignedRenditions', null); }
 	
 	// additionalParams - key/value array
 	public function getAdditionalParams() 
@@ -1694,67 +1683,5 @@ class Partner extends BasePartner
 		}
 			
 		$this->putInCustomData($customDataKey, $tokenData, 'googleAuth');
-	}
-
-	public function isInCDNWhiteList($host)
-	{
-		KalturaLog::debug("Checking host [$host] is in partner CDN white list");
-		$whiteList = $this->getCdnHostWhiteListArray();
-		foreach ($whiteList as $regEx)
-		{
-			if (preg_match("/".$regEx."/", $host)===1)//Should $regEx be escaped?
-			{
-				return true;
-			}
-		}
-		return false;
-	}
-
-	public function getCdnHostWhiteListArray()
-	{
-		$whiteListStr = $this->getFromCustomData(self::CDN_HOST_WHITE_LIST);
-		$whiteListArr = array();
-		if (!is_null($whiteListStr))
-		{
-			$whiteListArr = unserialize($whiteListStr);
-		}
-		return $whiteListArr;
-	}
-
-	public function getCdnHostWhiteList()
-	{
-		$whiteLiestArr = $this->getCdnHostWhiteListArray();
-		$whiteLiestStr = implode(",",$whiteLiestArr);
-		return $whiteLiestStr;
-	}
-
-	public function setCdnHostWhiteList($whiteListRegEx)
-	{
-		$whiteListArr = explode(',', rtrim($whiteListRegEx, ','));
-		$this->putInCustomData(self::CDN_HOST_WHITE_LIST, serialize($whiteListArr));
-	}
-
-	public function getUsageWarnings() { return $this->getFromCustomData(self::CUSTOM_DATA_USAGE_WARNINGS, null, array()); }
-	public function setUsageWarnings( $v ) { $this->putInCustomData(self::CUSTOM_DATA_USAGE_WARNINGS, $v); }
-
-	public function getUsageWarning($type, $percent){
-		$usageWarnings = $this->getUsageWarnings();
-		$key = $type.'_'.$percent;
-		if(array_key_exists($key, $usageWarnings)){
-			return $usageWarnings[$key];
-		}
-		return null;
-	}
-	
-	public function resetUsageWarning($type, $percent){
-		$usageWarnings = $this->getUsageWarnings();
-		unset($usageWarnings[$type.'_'.$percent]);
-		$this->setUsageWarnings($usageWarnings);
-	}
-	
-	public function setUsageWarning($type, $percent, $value){
-		$usageWarnings = $this->getUsageWarnings();
-		$usageWarnings[$type.'_'.$percent] = $value;
-		$this->setUsageWarnings($usageWarnings);		
 	}
 }

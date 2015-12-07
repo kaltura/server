@@ -7,7 +7,7 @@ class KalturaXmlSerializer extends KalturaSerializer
 {
 	private $_ignoreNull = false;
 	
-	function __construct($ignoreNull)
+	function KalturaXmlSerializer($ignoreNull)
 	{
 		$this->_ignoreNull = (bool)$ignoreNull;
 	}
@@ -62,11 +62,7 @@ class KalturaXmlSerializer extends KalturaSerializer
 				break;
 				
 			case 'object':
-				if ($object instanceof KalturaAssociativeArray)
-				{
-					$this->serializeMap($object);
-				}
-		        elseif ($object instanceof KalturaTypedArray)
+		        if ($object instanceof KalturaTypedArray)
 			    {
     				$this->serializeArray($object);
 			    }
@@ -99,17 +95,6 @@ class KalturaXmlSerializer extends KalturaSerializer
 		}
 	}
 	
-	function serializeMap($object)
-	{
-		foreach($object as $key => $val)
-		{
-			echo '<item>';
-			echo "<itemKey>$key</itemKey>";
-			$this->serializeByType($val);
-			echo '</item>';
-		}
-	}
-	
 	function writeKalturaAPIExceptionArgsTag($object)
 	{
 		if ( $object instanceof KalturaAPIException )
@@ -119,7 +104,7 @@ class KalturaXmlSerializer extends KalturaSerializer
 			foreach ( $object->getArgs() as $name => $value )
 			{
 				echo '<item>';
-				echo '<objectType>KalturaApiExceptionArg</objectType>'; // Hardcoded imaginary type for the client code parsers.
+				echo '<objectType>KalturaAPIExceptionArg</objectType>'; // Hardcoded imaginary type for the client code parsers.
 				echo '<name>' . kString::xmlEncode($name) . '</name>';
 				echo '<value>' . kString::xmlEncode($value) . '</value>';
 				echo '</item>';

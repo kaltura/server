@@ -13,7 +13,6 @@ class KalturaDocCommentParser
     const DOCCOMMENT_REPLACENET_PARAM_NAME = '__NAME__';
     
     const DOCCOMMENT_ALIAS = '/\@alias (\w*)/';
-    const DOCCOMMENT_VOLATILE = "/\\@volatile/i";
     
     const DOCCOMMENT_VAR_TYPE = "/\\@var (\\w*)/";
     const DOCCOMMENT_LINK = "/\\@link (.*)/";
@@ -44,7 +43,7 @@ class KalturaDocCommentParser
     
     const DOCCOMMENT_PERMISSIONS = "/\\@requiresPermission ([\\w\\,\\s]*)/";
     
-    const DOCCOMMENT_VALIDATE_USER = "/\\@validateUser\\s+(\\w+)\\s+(\\w+)\\s+(\\w+)\\s*(\\w*)/";
+    const DOCCOMMENT_VALIDATE_USER = "/\\@validateUser\\s+(\\w+)\\s+(\\w+)\\s*(\\w*)/";
     
     const DOCCOMMENT_ALIAS_ACTION = "/\\@actionAlias\\s(\\w+\\.\\w+)/";
     
@@ -68,11 +67,6 @@ class KalturaDocCommentParser
      * @var bool
      */
     public $writeOnly;
-    
-    /**
-     * @var bool
-     */
-    public $volatile;
     
     /**
      * @var bool
@@ -193,11 +187,6 @@ class KalturaDocCommentParser
      * @var string
      */
     public $validateUserPrivilege = null;
-
-	/**
-     * @var string comma seperated validateUser options
-     */
-    public $validateOptions = null;
     
     /**
      * @var array
@@ -227,7 +216,6 @@ class KalturaDocCommentParser
     	$this->readOnly = preg_match( self::DOCCOMMENT_READONLY, $comment);
         $this->insertOnly = preg_match( self::DOCCOMMENT_INSERTONLY, $comment);
         $this->writeOnly = preg_match( self::DOCCOMMENT_WRITEONLY, $comment);
-        $this->volatile = preg_match( self::DOCCOMMENT_VOLATILE, $comment);
         $this->abstract = preg_match( self::DOCCOMMENT_ABSTRACT, $comment);
         $this->deprecated = preg_match( self::DOCCOMMENT_DEPRECATED, $comment);
         $this->serverOnly = preg_match( self::DOCCOMMENT_SERVER_ONLY, $comment);
@@ -318,12 +306,7 @@ class KalturaDocCommentParser
         	$this->validateUserObjectClass = $result[1];
         	$this->validateUserIdParamName = $result[2];
         	if(isset($result[3]) && strlen($result[3]))
-			{
-				$this->validateUserPrivilege = $result[3];
-				if(isset($result[4]) && strlen($result[4]))
-					$this->validateOptions = $result[4];
-			}
-
+        		$this->validateUserPrivilege = $result[3];
         } 
         
         self::fillConstraint($comment, self::MIN_LENGTH_CONSTRAINT);

@@ -40,7 +40,7 @@ class kEventNotificationObjectCopiedHandler implements kObjectCopiedEventConsume
 		$fromPartnerId = $fromPartner->getId();
 		$toPartnerId = $toPartner->getId();
 		
-		KalturaLog::info("Copy event-notification templates from [$fromPartnerId] to [$toPartnerId]");
+		KalturaLog::debug("Copy event-notification templates from [$fromPartnerId] to [$toPartnerId]");
 		
  		$c = new Criteria();
  		$c->add(EventNotificationTemplatePeer::PARTNER_ID, $fromPartnerId);
@@ -71,6 +71,13 @@ class kEventNotificationObjectCopiedHandler implements kObjectCopiedEventConsume
  			$newEventNotificationTemplate = $eventNotificationTemplate->copy();
  			$newEventNotificationTemplate->setPartnerId($toPartnerId);
  			$newEventNotificationTemplate->save();
+ 			
+ 			if($eventNotificationTemplate instanceof ISyncableFile)
+ 			{
+ 				$key = $eventNotificationTemplate->getSyncKey(1);
+ 				if(kFileSyncUtils::fileSync_exists($key))
+	 				kFileSyncUtils::createSyncFileLinkForKey($newEventNotificationTemplate->getSyncKey(1), $key);
+ 			}
  		}
 	}
 	

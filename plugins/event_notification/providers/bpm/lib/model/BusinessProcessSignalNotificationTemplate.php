@@ -19,6 +19,7 @@ class BusinessProcessSignalNotificationTemplate extends BusinessProcessNotificat
 	 */
 	public function dispatch(kScope $scope)
 	{
+		KalturaLog::debug("Dispatch id [" . $this->getId() . "]");
 		return $this->dispatchPerCase($scope);
 	}
 	

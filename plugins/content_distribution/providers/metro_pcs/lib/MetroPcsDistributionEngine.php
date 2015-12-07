@@ -118,6 +118,7 @@ class MetroPcsDistributionEngine extends DistributionEngine implements
 	 */
 	public function handleSubmit(KalturaDistributionJobData $data, KalturaMetroPcsDistributionProfile $distributionProfile, KalturaMetroPcsDistributionJobProviderData $providerData)
 	{
+		KalturaLog::debug("Submiting data");	
 		$entryDistribution = $data->entryDistribution;
 			
 		//getting first flavor
@@ -145,7 +146,7 @@ class MetroPcsDistributionEngine extends DistributionEngine implements
 		$destXmlFile = "{$path}/{$xmlFileName}";		
 		$xmlString = $feed->getXmlString();
 		
-		KalturaLog::info('result xml - '.PHP_EOL.$xmlString);
+		KalturaLog::debug('result xml - '.PHP_EOL.$xmlString);
 		$tempFile = $this->getTempFileWithContent($xmlString);
 		
 		//load the FTP
@@ -159,6 +160,8 @@ class MetroPcsDistributionEngine extends DistributionEngine implements
 		//upload feed xml file to FTP
 		$ftpManager->putFile($destXmlFile, $tempFile, true);			
 		
+		KalturaLog::info('Files were uploaded successfully');
+	
 		$data->remoteId = $xmlFileName;
 		$data->sentData = $xmlString;
 	}	
@@ -171,6 +174,8 @@ class MetroPcsDistributionEngine extends DistributionEngine implements
 	 */
 	public function handleDelete(KalturaDistributionJobData $data, KalturaMetroPcsDistributionProfile $distributionProfile, KalturaMetroPcsDistributionJobProviderData $providerData)
 	{
+		KalturaLog::debug("Deleting data");
+	
 		$entryDistribution = $data->entryDistribution;
 		$entryDuration = $this->getEntryDuration($entryDistribution);
 		
@@ -188,7 +193,7 @@ class MetroPcsDistributionEngine extends DistributionEngine implements
 		$path = $distributionProfile->ftpPath;
 		$destXmlFile = "{$path}/{$xmlFileName}";		
 		$xmlString = $feed->getXmlString();	
-		KalturaLog::info('result xml - '.PHP_EOL.$xmlString);
+		KalturaLog::debug('result xml - '.PHP_EOL.$xmlString);
 		$tempFile = $this->getTempFileWithContent($xmlString);
 	
 		//load the FTP
@@ -199,6 +204,8 @@ class MetroPcsDistributionEngine extends DistributionEngine implements
 		//upload feed xml file to FTP
 		$ftpManager->putFile($destXmlFile, $tempFile, true);			
 		
+		KalturaLog::info('XML file was deleted successfully');
+	
 		$data->remoteId = $xmlFileName;
 		$data->sentData = $xmlString;
 	}

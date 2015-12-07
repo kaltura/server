@@ -63,6 +63,7 @@ DbManager::setConfig(kConf::getDB());
 DbManager::initialize();
 
 KalturaLog::debug(">------------------------------------- syndicationFeedRenderer -------------------------------------");
+KalturaLog::info("syndicationFeedRenderer-start ");
 KalturaLog::debug("getFeed Params [" . print_r(requestUtils::getRequestParams(), true) . "]");
 
 kCurrentContext::$host = (isset($_SERVER["HOSTNAME"]) ? $_SERVER["HOSTNAME"] : null);

@@ -47,7 +47,7 @@ class DeliveryProfileVelocixLiveHls extends DeliveryProfileLiveAppleHttp
 			KalturaLog::Info("URL [$url] returned no valid data. Exiting.");
 			return false;
 		}
-		KalturaLog::info("url return data:[$data]");
+		KalturaLog::debug("url return data:[$data]");
 		$explodedLine = explode("\n", $data);
 		$flavorsChecked = 0;
 		if (strpos($data,'#EXT-X-STREAM-INF') !== false)

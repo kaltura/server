@@ -10,7 +10,6 @@ class MetadataSearchFilter extends AdvancedSearchFilterOperator
 	const KMC_FIELD_TYPE_DATE = 'dateType';
 	const KMC_FIELD_TYPE_INT = 'intType';
 	const KMC_FIELD_TYPE_OBJECT = 'objectType';
-	const KMC_FIELD_TYPE_USER = 'userType';
 	const KMC_FIELD_TYPE_METADATA_OBJECT = 'metadataObjectType';
 	 
 	/**
@@ -102,11 +101,8 @@ class MetadataSearchFilter extends AdvancedSearchFilterOperator
 							case KalturaSearchConditionComparison::LESS_THAN_OR_EQUAL:
 								$comparison = " <= ";
 								break;
-							case KalturaSearchConditionComparison::NOT_EQUAL:
-								$comparison = " <> ";
-								break;
 							default:
-								KalturaLog::err("Missing comparison type");
+								KalturaLog::ERR("Missing comparison type");
 								continue;
 						}
 											
@@ -150,7 +146,7 @@ class MetadataSearchFilter extends AdvancedSearchFilterOperator
 
 						$newCondition = $metadataField . $comparison . $value;
 
-						if ($item->getComparison() != KalturaSearchConditionComparison::EQUAL && $item->getComparison() != KalturaSearchConditionComparison::NOT_EQUAL)
+						if ($item->getComparison() != KalturaSearchConditionComparison::EQUAL)
 							$newCondition = "($newCondition AND $metadataField <> 0)";
 							
 						$this->addCondition($newCondition);
@@ -175,35 +171,24 @@ class MetadataSearchFilter extends AdvancedSearchFilterOperator
 						}
 						
 						// exact match
-						elseif (in_array($xPaths[$field]->getType(), array(self::KMC_FIELD_TYPE_OBJECT, self::KMC_FIELD_TYPE_USER)))
+						elseif ($xPaths[$field]->getType() == self::KMC_FIELD_TYPE_LIST)
 						{
-							if ($item instanceof AdvancedSearchFilterMatchCondition && $item->not)
-								$dataCondition = "!\"{$pluginName}_{$fieldId} $value " . kMetadataManager::SEARCH_TEXT_SUFFIX . "_{$fieldId}" . "\"";
-							else
-								$dataCondition = "\\\"{$pluginName}_{$fieldId} $value " . kMetadataManager::SEARCH_TEXT_SUFFIX . "_{$fieldId}" . "\\\"";
+							$dataCondition = "\\\"{$pluginName}_{$fieldId} $value " . kMetadataManager::SEARCH_TEXT_SUFFIX . "_{$fieldId}" . "\\\"";
 						}
-
+						
 						// anywhere in the field
 						else 
 						{
-							if ($item instanceof AdvancedSearchFilterMatchCondition && $item->not)
-								$dataCondition = "!\"{$pluginName}_{$fieldId} $value " . kMetadataManager::SEARCH_TEXT_SUFFIX . "_{$fieldId}\"";
-							else
-								$dataCondition = "{$pluginName}_{$fieldId} << ( \"$value\" ) << " . kMetadataManager::SEARCH_TEXT_SUFFIX . "_{$fieldId}";
+							$dataCondition = "{$pluginName}_{$fieldId} << ( $value ) << " . kMetadataManager::SEARCH_TEXT_SUFFIX . "_{$fieldId}";
 						}
-
+						
 						KalturaLog::debug("add $dataCondition");
 						$dataConditions[] = "( $dataCondition )";
 					}
 					elseif($item instanceof MetadataSearchFilter)
 					{
 						$item->applyCondition($this, $xPaths);
-					}
-					elseif ($item instanceof DynamicObjectSearchFilter)
-					{
-						$item->applyCondition($this, $xPaths);
-						$dataConditions = $item->matchClause;
-					}
+					}					
 				}
 			}	
 				
@@ -401,5 +386,17 @@ class MetadataSearchFilter extends AdvancedSearchFilterOperator
 		
 		if(isset($attr['operatorType']))
 			$this->type = (int) $attr['operatorType'];
+			
+		foreach($xmlElement->item as $child)
+		{
+			$attr = $child->attributes();
+			if(!isset($attr['type']))
+				continue;
+				
+			$type = (string) $attr['type'];
+			$item = new $type();
+			$item->fillObjectFromXml($child);
+			$this->items[] = $item;
+		}
 	}
 }

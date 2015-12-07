@@ -84,11 +84,10 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 			$url = str_replace('\\', '/', $url);
 			if ($tokenizeUrl)
 			{
-				$url = rtrim(parse_url($this->getUrl(), PHP_URL_PATH),'/').'/'.ltrim($url,'/');
 				$tokenizer = $this->getTokenizer();
 				if ($tokenizer)
 				{
-					$url = $tokenizer->tokenizeSingleUrl($url, $this->getHostName());
+					$url = $tokenizer->tokenizeSingleUrl($url);
 					kApiCache::disableCache();
 				}
 			}
@@ -163,7 +162,7 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 			$tokenizer = $this->getTokenizer();
 			if ($tokenizer)
 			{
-				$url = $tokenizer->tokenizeSingleUrl($url, $this->getUrlPrefix());
+				$url = $tokenizer->tokenizeSingleUrl($url);
 				kApiCache::disableCache();
 			}
 		}
@@ -183,9 +182,9 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 	/** -------------------
 	 * 		Serve
 	 * --------------------*/
-	public function buildServeFlavors() 
-	{
-		return array();
+	public function serve() {
+		$flavors = $this->buildFlavors();
+		return $this->retrieveRenderer($flavors);
 	}
 	
 	/**
@@ -203,11 +202,6 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 				$flavors[] = $httpUrl;
 		}
 		return $flavors;
-	}
-	
-	protected function getUrlPrefix()
-	{
-		return $this->url;
 	}
 	
 	/**
@@ -233,8 +227,9 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 		{
 			$flavorSizeKB = $flavorAsset->getSize();
 			if ($flavorSizeKB > kConf::get("max_file_size_downloadable_from_cdn_in_KB"))
-				KalturaLog::log("flavor size $flavorSizeKB > max_file_size_downloadable_from_cdn_in_KB, deliveryProfileId=".$this->getId()." url=".$this->getUrl()." flavorId=".$flavorAsset->getId()." flavorExt=".$flavorAsset->getFileExt());
-			$urlPrefix = $this->getUrlPrefix();
+				$urlPrefix = requestUtils::getRequestHost();
+			else
+				$urlPrefix = $this->url;
 		}
 	
 		$urlPrefix = preg_replace('/^https?:\/\//', '', $urlPrefix);
@@ -254,7 +249,7 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 	
 		return $this->getFlavorAssetInfo($url, $urlPrefix, $flavorAsset);
 	}
-		
+	
 	/**
 	 * @param flavorAsset $flavorAsset
 	 * @param FileSyncKey $key
@@ -271,8 +266,7 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 	
 		$urlPrefix = '';
 		if (strpos($url, "://") === false) {
-			$urlPrefix = $this->getUrlPrefix();
-			$url = "/".$url;
+			$urlPrefix = $this->getUrl();
 		}
 	
 		return $this->getFlavorAssetInfo($url, $urlPrefix, $flavorAsset);

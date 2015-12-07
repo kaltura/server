@@ -104,7 +104,10 @@ class EntryCaptionAssetSearchFilter extends AdvancedSearchFilterItem
 	{		
 		if(!is_null($conditionStr))
 		{
-			$query->addMatch("(".$this->createSphinxMatchPhrase($conditionStr).")");
+			$condition = "ca_prefix<<$conditionStr<<ca_sufix";
+			KalturaLog::debug("condition [" . print_r($condition, true) . "]");
+			$key = '@' . CaptionSearchPlugin::getSearchFieldName(CaptionSearchPlugin::SEARCH_FIELD_DATA);
+			$query->addMatch("($key $condition)");			
 		}
 	}
 	
@@ -119,49 +122,7 @@ class EntryCaptionAssetSearchFilter extends AdvancedSearchFilterItem
 			$this->addCondition($this->getContentMultiLikeOr(), $query);
 		}
 	}
-
-	protected function createSphinxMatchPhrase($text)
-	{
-		$condition = "ca_prefix<<$text<<ca_sufix";
-		$prefix = '@' . CaptionSearchPlugin::getSearchFieldName(CaptionSearchPlugin::SEARCH_FIELD_DATA);
-		return $prefix . ' ' . $condition;
-	}
-
-	public function getFreeTextConditions($partnerScope, $freeTexts)
-	{
-		$additionalConditions = array();
-
-		if(strpos($freeTexts, baseObjectFilter::IN_SEPARATOR) > 0)
-		{
-			str_replace(baseObjectFilter::AND_SEPARATOR, baseObjectFilter::IN_SEPARATOR, $freeTexts);
-
-			$freeTextsArr = explode(baseObjectFilter::IN_SEPARATOR, $freeTexts);
-			foreach($freeTextsArr as $valIndex => $valValue)
-				if(!strlen($valValue))
-					unset($freeTextsArr[$valIndex]);
-
-			foreach($freeTextsArr as $freeText)
-			{
-				$freeText = SphinxUtils::escapeString($freeText);
-				$additionalConditions[] = $this->createSphinxMatchPhrase($freeText);
-			}
-
-			return $additionalConditions;
-		}
-
-		$freeTextsArr = explode(baseObjectFilter::AND_SEPARATOR, $freeTexts);
-		foreach($freeTextsArr as $valIndex => $valValue)
-			if(!strlen($valValue))
-				unset($freeTextsArr[$valIndex]);
-
-		$freeTextsArr = array_unique($freeTextsArr);
-		$freeTextExpr = implode(baseObjectFilter::AND_SEPARATOR, $freeTextsArr);
-		$freeTextExpr = SphinxUtils::escapeString($freeTextExpr);
-		$additionalConditions[] =  $this->createSphinxMatchPhrase($freeTextExpr);
-
-		return $additionalConditions;
-	}
-
+	
 	public function addToXml(SimpleXMLElement &$xmlElement)
 	{
 		parent::addToXml($xmlElement);

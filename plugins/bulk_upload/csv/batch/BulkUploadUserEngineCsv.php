@@ -162,7 +162,7 @@ class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
 		foreach($this->bulkUploadResults as $bulkUploadResult)
 		{
 			/* @var $bulkUploadResult KalturaBulkUploadResultUser */
-		    KalturaLog::info("Handling bulk upload result: [". $bulkUploadResult->userId ."]");
+		    KalturaLog::debug("Handling bulk upload result: [". $bulkUploadResult->userId ."]");
 		    switch ($bulkUploadResult->action)
 		    {
 		        case KalturaBulkUploadAction::ADD:

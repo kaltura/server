@@ -10,10 +10,9 @@ class kBitGravityUrlTokenizer extends kUrlTokenizer
 
 	/**
 	 * @param string $url
-	 * @param string $urlPrefix
 	 * @return string
 	 */
-	public function tokenizeSingleUrl($url, $urlPrefix = null)
+	public function tokenizeSingleUrl($url)
 	{
 		return $this->tokenizeUrl($url);
 	}

@@ -17,10 +17,4 @@ class mediaInfo extends BasemediaInfo
 	{
 		return array("mediaInfo:flavorAssetId=".strtolower($this->getFlavorAssetId()));
 	}
-	
-	public function setIsFastStart($v)	{$this->putInCustomData('IsFastStart', $v);}
-	public function getIsFastStart()	{return $this->getFromCustomData('IsFastStart', null, 1);}
-	
-	public function setContentStreams($v)	{$this->putInCustomData('ContentStreams', $v);}
-	public function getContentStreams()	{return $this->getFromCustomData('ContentStreams', null, null);}
 }

@@ -128,6 +128,7 @@ class KProvisionEngineAkamai extends KProvisionEngine
 	 */
 	public function delete( KalturaBatchJob $job, KalturaProvisionJobData $data )
 	{
+		KalturaLog::debug("delete (streamID: $data->streamID)");
 		$returnVal = $this->streamClient->deleteStream($data->streamID, true);
 		
 		if(!$returnVal)

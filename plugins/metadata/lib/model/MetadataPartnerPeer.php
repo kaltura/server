@@ -5,8 +5,4 @@
  */
 class MetadataPartnerPeer extends PartnerPeer implements IMetadataPeer
 {
-    public static function validateMetadataObjects($profileField, $objectIds, &$errorMessage)
-    {
-        return true;
-    }
 }

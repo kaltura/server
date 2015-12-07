@@ -156,7 +156,7 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 	 */
 	public function objectAdded(BaseObject $object, BatchJob $raisedJob = null)
 	{
-		KalturaLog::info("Raising deferred event for object of type: ". get_class($object));
+		KalturaLog::debug("Raising deferred event for object of type: ". get_class($object));
 		/** @var IIndexable $object */
 		$object->indexToSearchIndex();
 		return true;
@@ -316,7 +316,7 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 		
 		foreach($dataTimes as $key => $value)
 		{
-			$data[$key] = is_numeric($value) ? min($value, 0x7fffffff) : 0;
+			$data[$key] = is_numeric($value) ? $value : 0;
 		}
 		
 		foreach($dataJson as $key => $value)
@@ -387,13 +387,6 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 	 */
 	public function execSphinx($sql, IIndexable $object)
 	{
-		$disabledPartnerIds = kConf::get('disable_sphinx_indexing_partners', 'local', array());
-		if (in_array($object->getPartnerId(), $disabledPartnerIds))
-		{
-			KalturaLog::log('skipping sphinx update for partner ' . $object->getPartnerId());
-			return;
-		}
-		
 		// limit the number of large sphinx SQLs to 1/min per object, since they load the sphinx database
 		// and sphinx servers. the upper limit of 'slightly less than 1MB' is because of the max_allowed_packet 
 		// limit in mysql (by default 1MB). the upper limit is here to prevent the addition of too many category 

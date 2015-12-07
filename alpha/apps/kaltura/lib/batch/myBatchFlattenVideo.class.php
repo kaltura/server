@@ -70,7 +70,7 @@ class myBatchFlattenServer extends myBatchBase
 		return $batch_status; 
 	}
 		
-	public function __construct( $script_name )
+	public function myBatchFlattenServer( $script_name )
 	{
 		$this->script_name = $script_name;
 		$this->register( $script_name );

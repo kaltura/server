@@ -19,7 +19,7 @@ class EventNotificationTemplateService extends KalturaBaseService
 	}
 		
 	/**
-	 * This action allows for the creation of new backend event types in the system. This action requires access to the Kaltura server Admin Console. If you're looking to register to existing event types, please use the clone action instead.
+	 * Allows you to add a new event notification template object
 	 * 
 	 * @action add
 	 * @param KalturaEventNotificationTemplate $eventNotificationTemplate
@@ -30,7 +30,6 @@ class EventNotificationTemplateService extends KalturaBaseService
 		$dbEventNotificationTemplate = $eventNotificationTemplate->toInsertableObject();
 		/* @var $dbEventNotificationTemplate EventNotificationTemplate */
 		$dbEventNotificationTemplate->setStatus(EventNotificationTemplateStatus::ACTIVE);
-		//Partner 0 cannot be impersonated, the reasong this work is because null equals to 0.
 		$dbEventNotificationTemplate->setPartnerId($this->impersonatedPartnerId);
 		$dbEventNotificationTemplate->save();
 		
@@ -42,7 +41,7 @@ class EventNotificationTemplateService extends KalturaBaseService
 	}
 		
 	/**
-	 * This action allows registering to various backend event. Use this action to create notifications that will react to events such as new video was uploaded or metadata field was updated. To see the list of available event types, call the listTemplates action.
+	 * Allows you to clone exiting event notification template object and create a new one with similar configuration
 	 * 
 	 * @action clone
 	 * @param int $id source template to clone

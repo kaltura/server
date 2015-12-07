@@ -31,6 +31,7 @@ class KScheduledTaskRunner extends KPeriodicWorker
 	*/
 	public function run($jobs = null)
 	{
+		KalturaLog::info("Scheduled Task Runner");
 		$maxProfiles = $this->getParams('maxProfiles');
 
 		$profiles = $this->getScheduledTaskProfiles($maxProfiles);
@@ -139,7 +140,7 @@ class KScheduledTaskRunner extends KPeriodicWorker
 
 				if ($objectTask->stopProcessingOnError)
 				{
-					KalturaLog::log('Object task is configured to stop processing on error');
+					KalturaLog::info('Object task is configured to stop processing on error');
 					break;
 				}
 			}

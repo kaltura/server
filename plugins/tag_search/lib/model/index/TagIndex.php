@@ -43,7 +43,7 @@ class TagIndex extends BaseIndexObject
 		{
 			self::$fieldsMap = array(
 				'int_id' => 'intId',
-				'tag' => 'tagWithEqual',
+				'tag' => 'tag',
 				'partner_id' => 'partnerId',
 				'object_type' => 'indexObjectType',
 				'created_at' => 'createdAt',
@@ -181,30 +181,6 @@ class TagIndex extends BaseIndexObject
 			);
 		}
 		return self::$conditionToKeep;
-	}
-
-	protected static $apiCompareAttributesMap;
-
-	public static function getApiCompareAttributesMap()
-	{
-		if (!self::$apiCompareAttributesMap)
-		{
-			self::$apiCompareAttributesMap = array(
-			);
-		}
-		return self::$apiCompareAttributesMap;
-	}
-
-	protected static $apiMatchAttributesMap;
-
-	public static function getApiMatchAttributesMap()
-	{
-		if (!self::$apiMatchAttributesMap)
-		{
-			self::$apiMatchAttributesMap = array(
-			);
-		}
-		return self::$apiMatchAttributesMap;
 	}
 
 	public static function getSphinxOptimizationMap()

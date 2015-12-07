@@ -8,21 +8,6 @@
  * @package Core
  * @subpackage model
  */ 
-class TrackEntryPeer extends BaseTrackEntryPeer implements IRelatedObjectPeer
+class TrackEntryPeer extends BaseTrackEntryPeer
 {
-	/* (non-PHPdoc)
-	 * @see IRelatedObjectPeer::getRootObjects()
-	 */
-	public function getRootObjects(IRelatedObject $object)
-	{
-		return array(entryPeer::retrieveByPK($object->getEntryId()));
-	}
-
-	/* (non-PHPdoc)
-	 * @see IRelatedObjectPeer::isReferenced()
-	 */
-	public function isReferenced(IRelatedObject $object)
-	{
-		return false;
-	}
 }

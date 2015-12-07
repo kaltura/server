@@ -11,10 +11,6 @@ $mode = 'execute';
 if ($argc > 2)
 	$mode = $argv[2];
 
-$peerName = 'entryPeer';
-if ($argc > 3)
-	$peerName = $argv[3];
-
 if (!in_array($mode, $availModes))
 	die('Invalid mode, should be one of ' . implode(',', $availModes) . PHP_EOL);
 
@@ -24,8 +20,8 @@ DbManager::initialize();
 
 $sphinx = new kSphinxSearchManager();
 
-call_user_func(array($peerName, 'setUseCriteriaFilter'), false);
-$entry = call_user_func(array($peerName, 'retrieveByPK'), $entryId);
+entryPeer::setUseCriteriaFilter(false);
+$entry = entryPeer::retrieveByPK($entryId);
 if ($entry)
 {
 	if ($mode == 'execute')

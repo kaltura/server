@@ -27,16 +27,16 @@ class DeliveryProfileAkamaiHds extends DeliveryProfileHds {
 		return $url;
 	}
 	
-	public function buildServeFlavors()
+	public function serve()
 	{
 		$flavor = $this->getSecureHdUrl();
 		if (!$flavor)
 		{
-			KalturaLog::log('No flavor found');
+			KalturaLog::debug('No flavor found');
 			return null;
 		}
 		
-		return array($flavor);
+		return $this->getRenderer(array($flavor));
 	}
 	
 	/**
@@ -66,7 +66,7 @@ class DeliveryProfileAkamaiHds extends DeliveryProfileHds {
 		$flavor = AkamaiDeliveryUtils::getHDN2ManifestUrl($flavors, $this->params->getMediaProtocol(), $this->getUrl(), '/manifest.f4m', '/z', $params);
 		if (!$flavor)
 		{
-			KalturaLog::info(get_class() . ' failed to find flavor');
+			KalturaLog::debug(get_class() . ' failed to find flavor');
 			return null;
 		}
 		

@@ -2,8 +2,7 @@
 /**
  * @package plugins.tvinciDistribution
  */
-class TvinciDistributionPlugin extends KalturaParentContributedPlugin implements IKalturaPermissions, IKalturaEnumerator, IKalturaPending, IKalturaObjectLoader,
-				IKalturaContentDistributionProvider, IKalturaConfigurator
+class TvinciDistributionPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaEnumerator, IKalturaPending, IKalturaObjectLoader, IKalturaContentDistributionProvider, IKalturaConfigurator
 {
 	const PLUGIN_NAME = 'tvinciDistribution';
 	const CONTENT_DSTRIBUTION_VERSION_MAJOR = 1;
@@ -41,10 +40,7 @@ class TvinciDistributionPlugin extends KalturaParentContributedPlugin implements
 	public static function getEnums($baseEnumName = null)
 	{
 		if(is_null($baseEnumName))
-			return array('TvinciDistributionProviderType', 'ParentObjectFeatureType');
-
-		if($baseEnumName == 'ObjectFeatureType')
-			return array('ParentObjectFeatureType');
+			return array('TvinciDistributionProviderType');
 
 		if($baseEnumName == 'DistributionProviderType')
 			return array('TvinciDistributionProviderType');
@@ -195,9 +191,7 @@ class TvinciDistributionPlugin extends KalturaParentContributedPlugin implements
 	 */
 	public static function contributeMRSS(EntryDistribution $entryDistribution, SimpleXMLElement $mrss)
 	{
-
 	}
-
 
 	/**
 	 * @return int id of dynamic enum in the DB.
@@ -226,5 +220,4 @@ class TvinciDistributionPlugin extends KalturaParentContributedPlugin implements
 
 		return null;
 	}
-
 }

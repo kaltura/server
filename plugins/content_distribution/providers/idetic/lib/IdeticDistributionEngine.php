@@ -48,6 +48,7 @@ class IdeticDistributionEngine extends DistributionEngine implements
 	 */
 	public function submit(KalturaDistributionSubmitJobData $data)
 	{
+		KalturaLog::debug("idetic: submit");
 		if(!$data->distributionProfile || !($data->distributionProfile instanceof KalturaIdeticDistributionProfile))
 			KalturaLog::err("Distribution profile must be of type KalturaIdeticDistributionProfile");
 	
@@ -73,6 +74,7 @@ class IdeticDistributionEngine extends DistributionEngine implements
 		$password = $distributionProfile->password;
 		$path = $distributionProfile->ftpPath;
 		
+		KalturaLog::debug("idetic: delete");
 		if (!isset($data->remoteId) || $data->remoteId == "")
 		{
 			return false;
@@ -129,6 +131,8 @@ class IdeticDistributionEngine extends DistributionEngine implements
 		//checksum
 		//TODO:add $feedHelper->setChecksum()
 		
+		KalturaLog::debug("idetic: send");
+
 		if (!isset($data->remoteId) || $data->remoteId == "")
 		{
 			$remoteId = uniqid();
@@ -142,7 +146,7 @@ class IdeticDistributionEngine extends DistributionEngine implements
 		$destFile = "{$path}/{$fileName}";
 			
 		file_put_contents($srcFile, $feedHelper->getXmlString());
-		KalturaLog::info("XML written to file [$srcFile]");
+		KalturaLog::debug("XML written to file [$srcFile]");
 		
 		$engineOptions = isset(KBatchBase::$taskConfig->engineOptions) ? KBatchBase::$taskConfig->engineOptions->toArray() : array();
 		$fileTransferMgr = kFileTransferMgr::getInstance(kFileTransferMgrType::FTP, $engineOptions);
@@ -255,7 +259,7 @@ class IdeticDistributionEngine extends DistributionEngine implements
 		$username = $distributionProfile->username;
 		$password = $distributionProfile->password;
 		
-		KalturaLog::info("Listing content for [$this->path]");
+		KalturaLog::debug("Listing content for [$this->path]");
 		
 		$engineOptions = isset(KBatchBase::$taskConfig->engineOptions) ? KBatchBase::$taskConfig->engineOptions->toArray() : array();
 		$fileTransferMgr = kFileTransferMgr::getInstance(kFileTransferMgrType::FTP, $engineOptions);
@@ -397,6 +401,7 @@ class IdeticDistributionEngine extends DistributionEngine implements
 	 */
 	public function update(KalturaDistributionUpdateJobData $data)
 	{
+		KalturaLog::debug("idetic: hooray update");
 		if(!$data->distributionProfile || !($data->distributionProfile instanceof KalturaIdeticDistributionProfile))
 			KalturaLog::err("Distribution profile must be of type KalturaIdeticDistributionProfile");
 	
@@ -470,6 +475,8 @@ class IdeticDistributionEngine extends DistributionEngine implements
 			KalturaLog::info('File doesn\'t exist yet, retry later');
 			return false;
 		}
+		
+		KalturaLog::info('Status file was found');
 		
 		return $statusXml;
 	}

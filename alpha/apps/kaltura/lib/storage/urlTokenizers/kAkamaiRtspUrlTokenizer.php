@@ -454,10 +454,9 @@ class kAkamaiRtspUrlTokenizer extends kUrlTokenizer
 	
 	/**
 	 * @param string $url
-	 * @param string $urlPrefix
 	 * @return string
 	 */
-	public function tokenizeSingleUrl($url, $urlPrefix = null)
+	public function tokenizeSingleUrl($url)
 	{
 		return Akamaizer::generateARL($this->host . $url . "/a.mov", $this->cpcode, 0, 0, true);
 	}

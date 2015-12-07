@@ -47,12 +47,6 @@ class kDistributionValidationError
 	private $metadataProfileId;
 	
 	/**
-	 * Flag indicating whether the validation error is grounds for deleting the distributed item
-	 * @var bool
-	 */
-	private $requiresDelete;
-	
-	/**
 	 * @return the $action
 	 */
 	public function getAction()
@@ -162,19 +156,5 @@ class kDistributionValidationError
 	public function setMetadataProfileId($metadataProfileId)
 	{
 		$this->metadataProfileId = $metadataProfileId;
-	}
-	
-	/**
-	 * @return the $requiresDelete
-	 */
-	public function getRequiresDelete() {
-		return $this->requiresDelete;
-	}
-
-	/**
-	 * @param bool $requiresDelete
-	 */
-	public function setRequiresDelete($requiresDelete) {
-		$this->requiresDelete = $requiresDelete;
 	}
 }

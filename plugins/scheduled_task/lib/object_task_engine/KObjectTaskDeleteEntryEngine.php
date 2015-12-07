@@ -13,7 +13,7 @@ class KObjectTaskDeleteEntryEngine extends KObjectTaskEntryEngineBase
 	{
 		$client = $this->getClient();
 		$entryId = $object->id;
-		KalturaLog::info('Deleting entry '. $entryId);
+		KalturaLog::debug('Deleting entry '. $entryId);
 		$client->baseEntry->delete($entryId);
 	}
 }

@@ -13,7 +13,7 @@ class KalturaRequestDeserializer
 
 	const PREFIX = ":";
 
-	public function __construct($params)
+	public function KalturaRequestDeserializer($params)
 	{
 		$this->params = $params;
 		$this->groupParams();
@@ -201,9 +201,6 @@ class KalturaRequestDeserializer
 			return null;
 		}
 		
-		$partnerId = kCurrentContext::getCurrentPartnerId();
-		myPartnerUtils::addPartnerToCriteria('ResponseProfile', $partnerId, true, "$partnerId,0");
-		
 		$responseProfile = null;
 		if(isset($this->paramsGrouped[$paramName]['id'])){
 			$responseProfile = ResponseProfilePeer::retrieveByPK($this->paramsGrouped[$paramName]['id']);
@@ -322,10 +319,6 @@ class KalturaRequestDeserializer
 			
 			if ($property->isEnum())
 			{
-				if(strtolower($value) == 'true')
-					$value = 1;
-				if(strtolower($value) == 'false')
-					$value = 0;
 				if (!$property->getTypeReflector()->checkEnumValue($value))
 					throw new KalturaAPIException(KalturaErrors::INVALID_ENUM_VALUE, $value, $name, $property->getType());
 			
@@ -358,18 +351,14 @@ class KalturaRequestDeserializer
 				{
 					foreach($value as $arrayItemKey => $arrayItemParams)
 					{
-						if($arrayItemKey === '-')
-							break;
 						$arrayObj[$arrayItemKey] = $this->buildObject($property->getArrayTypeReflector(), $arrayItemParams, "{$objectName}:$name");
 					}
 				}
 				else
 				{
 					ksort($value);
-					foreach($value as $arrayItemKey => $arrayItemParams)
+					foreach($value as $arrayItemParams)
 					{
-						if($arrayItemKey === '-')
-							break;
 						$arrayObj[] = $this->buildObject($property->getArrayTypeReflector(), $arrayItemParams, "{$objectName}:$name");
 					}
 				}

@@ -8,7 +8,7 @@
  * @package Core
  * @subpackage model
  */ 
-class accessControl extends BaseaccessControl implements IBaseObject
+class accessControl extends BaseaccessControl
 {
 	/**
 	 * True when set as partner default (saved on partner object)

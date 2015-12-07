@@ -540,9 +540,6 @@ class BatchService extends KalturaBatchService
 	 */
 	function checkFileExistsAction($localPath, $size)
 	{
-		// need to explicitly disable the cache since this action does not perform any queries
-		kApiCache::disableConditionalCache();
-		
 		$ret = new KalturaFileExistsResponse();
 		$ret->exists = file_exists($localPath);
 		$ret->sizeOk = false;

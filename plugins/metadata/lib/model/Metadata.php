@@ -12,7 +12,7 @@
  * @package plugins.metadata
  * @subpackage model
  */
-class Metadata extends BaseMetadata implements IIndexable, ISyncableFile, IRelatedObject
+class Metadata extends BaseMetadata implements IIndexable, ISyncableFile
 {
 	const FILE_SYNC_METADATA_DATA = 1;
 	
@@ -24,13 +24,6 @@ class Metadata extends BaseMetadata implements IIndexable, ISyncableFile, IRelat
 	 * @var MetadataProfile
 	 */
 	protected $aMetadataProfile;
-
-	/**
-	 * Metadata is counted as new during the metadata.add API
-	 *
-	 * @var bool
-	 */
-	protected $likeNew = false;
 	
 	/* (non-PHPdoc)
 	 * @see metadata/lib/model/om/BaseMetadata#preInsert()
@@ -78,6 +71,7 @@ class Metadata extends BaseMetadata implements IIndexable, ISyncableFile, IRelat
 	public function incrementVersion()
 	{
 		$newVersion = kFileSyncUtils::calcObjectNewVersion($this->getId(), $this->getVersion(), FileSyncObjectType::METADATA, self::FILE_SYNC_METADATA_DATA);
+		
 		$this->setVersion($newVersion);
 	}
 	
@@ -221,21 +215,5 @@ class Metadata extends BaseMetadata implements IIndexable, ISyncableFile, IRelat
 	{
 		if ($this->getObjectType() == MetadataObjectType::DYNAMIC_OBJECT)
 			kEventsManager::raiseEventDeferred(new kObjectReadyForIndexEvent($this));
-	}
-
-	/**
-	 * @return boolean
-	 */
-	public function isLikeNew()
-	{
-		return $this->likeNew;
-	}
-
-	/**
-	 * @param boolean $likeNew
-	 */
-	public function setLikeNew($likeNew)
-	{
-		$this->likeNew = $likeNew;
 	}
 } // Metadata

@@ -69,6 +69,7 @@ class DrmProfileConfigureAction extends KalturaApplicationPlugin
 		
 		$action->view->form = $drmProfileForm;
 		$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaApplicationPartialView');
+		KalturaLog::debug("plugin instances [" . count($pluginInstances) . "]");
 		foreach($pluginInstances as $pluginInstance)
 		{
 			$drmProfilePlugins = $pluginInstance->getApplicationPartialViews('plugin', get_class($this));

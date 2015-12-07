@@ -42,17 +42,11 @@ class SphinxCuePointCriteria extends SphinxCriteria
 		{
 			$this->sphinxSkipped = false;
 			$freeTexts = $filter->get('_free_text');
+			KalturaLog::debug("Attach free text [$freeTexts]");
+			
 			$this->addFreeTextToMatchClauseByMatchFields($freeTexts, CuePointFilter::FREE_TEXT_FIELDS);
 		}
 		$filter->unsetByName('_free_text');
-		
-		if($filter->get('_eq_is_public'))
-		{
-		    $this->sphinxSkipped = false;
-		    $isPublic = $filter->get('_eq_is_public');
-		    $this->addCondition('is_public' . " = " . $isPublic);
-		}
-		$filter->unsetByName('_eq_is_public');
 
 		return parent::applyFilterFields($filter);
 	}

@@ -44,12 +44,6 @@ abstract class BaseMetadataProfile extends BaseObject  implements Persistent {
 	protected $version;
 
 	/**
-	 * The value for the file_sync_version field.
-	 * @var        int
-	 */
-	protected $file_sync_version;
-
-	/**
 	 * The value for the views_version field.
 	 * @var        int
 	 */
@@ -246,16 +240,6 @@ abstract class BaseMetadataProfile extends BaseObject  implements Persistent {
 	public function getVersion()
 	{
 		return $this->version;
-	}
-
-	/**
-	 * Get the [file_sync_version] column value.
-	 * 
-	 * @return     int
-	 */
-	public function getFileSyncVersion()
-	{
-		return $this->file_sync_version;
 	}
 
 	/**
@@ -491,29 +475,6 @@ abstract class BaseMetadataProfile extends BaseObject  implements Persistent {
 
 		return $this;
 	} // setVersion()
-
-	/**
-	 * Set the value of [file_sync_version] column.
-	 * 
-	 * @param      int $v new value
-	 * @return     MetadataProfile The current object (for fluent API support)
-	 */
-	public function setFileSyncVersion($v)
-	{
-		if(!isset($this->oldColumnsValues[MetadataProfilePeer::FILE_SYNC_VERSION]))
-			$this->oldColumnsValues[MetadataProfilePeer::FILE_SYNC_VERSION] = $this->file_sync_version;
-
-		if ($v !== null) {
-			$v = (int) $v;
-		}
-
-		if ($this->file_sync_version !== $v) {
-			$this->file_sync_version = $v;
-			$this->modifiedColumns[] = MetadataProfilePeer::FILE_SYNC_VERSION;
-		}
-
-		return $this;
-	} // setFileSyncVersion()
 
 	/**
 	 * Set the value of [views_version] column.
@@ -755,16 +716,15 @@ abstract class BaseMetadataProfile extends BaseObject  implements Persistent {
 			$this->created_at = ($row[$startcol + 1] !== null) ? (string) $row[$startcol + 1] : null;
 			$this->updated_at = ($row[$startcol + 2] !== null) ? (string) $row[$startcol + 2] : null;
 			$this->version = ($row[$startcol + 3] !== null) ? (int) $row[$startcol + 3] : null;
-			$this->file_sync_version = ($row[$startcol + 4] !== null) ? (int) $row[$startcol + 4] : null;
-			$this->views_version = ($row[$startcol + 5] !== null) ? (int) $row[$startcol + 5] : null;
-			$this->partner_id = ($row[$startcol + 6] !== null) ? (int) $row[$startcol + 6] : null;
-			$this->name = ($row[$startcol + 7] !== null) ? (string) $row[$startcol + 7] : null;
-			$this->system_name = ($row[$startcol + 8] !== null) ? (string) $row[$startcol + 8] : null;
-			$this->description = ($row[$startcol + 9] !== null) ? (string) $row[$startcol + 9] : null;
-			$this->status = ($row[$startcol + 10] !== null) ? (int) $row[$startcol + 10] : null;
-			$this->object_type = ($row[$startcol + 11] !== null) ? (int) $row[$startcol + 11] : null;
-			$this->create_mode = ($row[$startcol + 12] !== null) ? (int) $row[$startcol + 12] : null;
-			$this->custom_data = ($row[$startcol + 13] !== null) ? (string) $row[$startcol + 13] : null;
+			$this->views_version = ($row[$startcol + 4] !== null) ? (int) $row[$startcol + 4] : null;
+			$this->partner_id = ($row[$startcol + 5] !== null) ? (int) $row[$startcol + 5] : null;
+			$this->name = ($row[$startcol + 6] !== null) ? (string) $row[$startcol + 6] : null;
+			$this->system_name = ($row[$startcol + 7] !== null) ? (string) $row[$startcol + 7] : null;
+			$this->description = ($row[$startcol + 8] !== null) ? (string) $row[$startcol + 8] : null;
+			$this->status = ($row[$startcol + 9] !== null) ? (int) $row[$startcol + 9] : null;
+			$this->object_type = ($row[$startcol + 10] !== null) ? (int) $row[$startcol + 10] : null;
+			$this->create_mode = ($row[$startcol + 11] !== null) ? (int) $row[$startcol + 11] : null;
+			$this->custom_data = ($row[$startcol + 12] !== null) ? (string) $row[$startcol + 12] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -774,7 +734,7 @@ abstract class BaseMetadataProfile extends BaseObject  implements Persistent {
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 14; // 14 = MetadataProfilePeer::NUM_COLUMNS - MetadataProfilePeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 13; // 13 = MetadataProfilePeer::NUM_COLUMNS - MetadataProfilePeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating MetadataProfile object", $e);
@@ -923,7 +883,7 @@ abstract class BaseMetadataProfile extends BaseObject  implements Persistent {
                 if ($affectedRows || !$this->isColumnModified(MetadataProfilePeer::CUSTOM_DATA)) //ask if custom_data wasn't modified to avoid retry with atomic column 
                 	break;
 
-                KalturaLog::info("was unable to save! retrying for the $retries time");
+                KalturaLog::debug("was unable to save! retrying for the $retries time");
                 $criteria = $this->buildPkeyCriteria();
 				$criteria->addSelectColumn(MetadataProfilePeer::CUSTOM_DATA);
                 $stmt = BasePeer::doSelect($criteria, $con);
@@ -1282,33 +1242,30 @@ abstract class BaseMetadataProfile extends BaseObject  implements Persistent {
 				return $this->getVersion();
 				break;
 			case 4:
-				return $this->getFileSyncVersion();
-				break;
-			case 5:
 				return $this->getViewsVersion();
 				break;
-			case 6:
+			case 5:
 				return $this->getPartnerId();
 				break;
-			case 7:
+			case 6:
 				return $this->getName();
 				break;
-			case 8:
+			case 7:
 				return $this->getSystemName();
 				break;
-			case 9:
+			case 8:
 				return $this->getDescription();
 				break;
-			case 10:
+			case 9:
 				return $this->getStatus();
 				break;
-			case 11:
+			case 10:
 				return $this->getObjectType();
 				break;
-			case 12:
+			case 11:
 				return $this->getCreateMode();
 				break;
-			case 13:
+			case 12:
 				return $this->getCustomData();
 				break;
 			default:
@@ -1336,16 +1293,15 @@ abstract class BaseMetadataProfile extends BaseObject  implements Persistent {
 			$keys[1] => $this->getCreatedAt(),
 			$keys[2] => $this->getUpdatedAt(),
 			$keys[3] => $this->getVersion(),
-			$keys[4] => $this->getFileSyncVersion(),
-			$keys[5] => $this->getViewsVersion(),
-			$keys[6] => $this->getPartnerId(),
-			$keys[7] => $this->getName(),
-			$keys[8] => $this->getSystemName(),
-			$keys[9] => $this->getDescription(),
-			$keys[10] => $this->getStatus(),
-			$keys[11] => $this->getObjectType(),
-			$keys[12] => $this->getCreateMode(),
-			$keys[13] => $this->getCustomData(),
+			$keys[4] => $this->getViewsVersion(),
+			$keys[5] => $this->getPartnerId(),
+			$keys[6] => $this->getName(),
+			$keys[7] => $this->getSystemName(),
+			$keys[8] => $this->getDescription(),
+			$keys[9] => $this->getStatus(),
+			$keys[10] => $this->getObjectType(),
+			$keys[11] => $this->getCreateMode(),
+			$keys[12] => $this->getCustomData(),
 		);
 		return $result;
 	}
@@ -1390,33 +1346,30 @@ abstract class BaseMetadataProfile extends BaseObject  implements Persistent {
 				$this->setVersion($value);
 				break;
 			case 4:
-				$this->setFileSyncVersion($value);
-				break;
-			case 5:
 				$this->setViewsVersion($value);
 				break;
-			case 6:
+			case 5:
 				$this->setPartnerId($value);
 				break;
-			case 7:
+			case 6:
 				$this->setName($value);
 				break;
-			case 8:
+			case 7:
 				$this->setSystemName($value);
 				break;
-			case 9:
+			case 8:
 				$this->setDescription($value);
 				break;
-			case 10:
+			case 9:
 				$this->setStatus($value);
 				break;
-			case 11:
+			case 10:
 				$this->setObjectType($value);
 				break;
-			case 12:
+			case 11:
 				$this->setCreateMode($value);
 				break;
-			case 13:
+			case 12:
 				$this->setCustomData($value);
 				break;
 		} // switch()
@@ -1447,16 +1400,15 @@ abstract class BaseMetadataProfile extends BaseObject  implements Persistent {
 		if (array_key_exists($keys[1], $arr)) $this->setCreatedAt($arr[$keys[1]]);
 		if (array_key_exists($keys[2], $arr)) $this->setUpdatedAt($arr[$keys[2]]);
 		if (array_key_exists($keys[3], $arr)) $this->setVersion($arr[$keys[3]]);
-		if (array_key_exists($keys[4], $arr)) $this->setFileSyncVersion($arr[$keys[4]]);
-		if (array_key_exists($keys[5], $arr)) $this->setViewsVersion($arr[$keys[5]]);
-		if (array_key_exists($keys[6], $arr)) $this->setPartnerId($arr[$keys[6]]);
-		if (array_key_exists($keys[7], $arr)) $this->setName($arr[$keys[7]]);
-		if (array_key_exists($keys[8], $arr)) $this->setSystemName($arr[$keys[8]]);
-		if (array_key_exists($keys[9], $arr)) $this->setDescription($arr[$keys[9]]);
-		if (array_key_exists($keys[10], $arr)) $this->setStatus($arr[$keys[10]]);
-		if (array_key_exists($keys[11], $arr)) $this->setObjectType($arr[$keys[11]]);
-		if (array_key_exists($keys[12], $arr)) $this->setCreateMode($arr[$keys[12]]);
-		if (array_key_exists($keys[13], $arr)) $this->setCustomData($arr[$keys[13]]);
+		if (array_key_exists($keys[4], $arr)) $this->setViewsVersion($arr[$keys[4]]);
+		if (array_key_exists($keys[5], $arr)) $this->setPartnerId($arr[$keys[5]]);
+		if (array_key_exists($keys[6], $arr)) $this->setName($arr[$keys[6]]);
+		if (array_key_exists($keys[7], $arr)) $this->setSystemName($arr[$keys[7]]);
+		if (array_key_exists($keys[8], $arr)) $this->setDescription($arr[$keys[8]]);
+		if (array_key_exists($keys[9], $arr)) $this->setStatus($arr[$keys[9]]);
+		if (array_key_exists($keys[10], $arr)) $this->setObjectType($arr[$keys[10]]);
+		if (array_key_exists($keys[11], $arr)) $this->setCreateMode($arr[$keys[11]]);
+		if (array_key_exists($keys[12], $arr)) $this->setCustomData($arr[$keys[12]]);
 	}
 
 	/**
@@ -1472,7 +1424,6 @@ abstract class BaseMetadataProfile extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(MetadataProfilePeer::CREATED_AT)) $criteria->add(MetadataProfilePeer::CREATED_AT, $this->created_at);
 		if ($this->isColumnModified(MetadataProfilePeer::UPDATED_AT)) $criteria->add(MetadataProfilePeer::UPDATED_AT, $this->updated_at);
 		if ($this->isColumnModified(MetadataProfilePeer::VERSION)) $criteria->add(MetadataProfilePeer::VERSION, $this->version);
-		if ($this->isColumnModified(MetadataProfilePeer::FILE_SYNC_VERSION)) $criteria->add(MetadataProfilePeer::FILE_SYNC_VERSION, $this->file_sync_version);
 		if ($this->isColumnModified(MetadataProfilePeer::VIEWS_VERSION)) $criteria->add(MetadataProfilePeer::VIEWS_VERSION, $this->views_version);
 		if ($this->isColumnModified(MetadataProfilePeer::PARTNER_ID)) $criteria->add(MetadataProfilePeer::PARTNER_ID, $this->partner_id);
 		if ($this->isColumnModified(MetadataProfilePeer::NAME)) $criteria->add(MetadataProfilePeer::NAME, $this->name);
@@ -1565,8 +1516,6 @@ abstract class BaseMetadataProfile extends BaseObject  implements Persistent {
 		$copyObj->setUpdatedAt($this->updated_at);
 
 		$copyObj->setVersion($this->version);
-
-		$copyObj->setFileSyncVersion($this->file_sync_version);
 
 		$copyObj->setViewsVersion($this->views_version);
 

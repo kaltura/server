@@ -8,7 +8,7 @@
  * @package Core
  * @subpackage model
  */ 
-class assetPeer extends BaseassetPeer implements IRelatedObjectPeer
+class assetPeer extends BaseassetPeer
 {
 	const FLAVOR_OM_CLASS = 'flavorAsset';
 	const THUMBNAIL_OM_CLASS = 'thumbAsset';
@@ -236,17 +236,14 @@ class assetPeer extends BaseassetPeer implements IRelatedObjectPeer
 	/**
 	 * @param string $entryId
 	 * @param array $types
-	 * @param array $statuses
 	 * @return array<flavorAsset>
 	 */
-	public static function retrieveByEntryId($entryId, array $types = null, array $statuses = null)
+	public static function retrieveByEntryId($entryId, array $types = null)
 	{
 		$c = new Criteria();
 		$c->add(self::ENTRY_ID, $entryId);
 		if(count($types))
 			$c->add(self::TYPE, $types, Criteria::IN);
-		if(is_array($statuses) && count($statuses))
-			$c->add(self::STATUS, $statuses, Criteria::IN);
 		
 		return self::doSelect($c);
 	}
@@ -528,41 +525,37 @@ class assetPeer extends BaseassetPeer implements IRelatedObjectPeer
 		return assetPeer::doSelectOne($c);
 	}
 	
-    /**
-     * @param string $entryId
-     * @param string $tag tag filter
-     * @return flavorAsset that has a file_sync in status ready
-     */
-	public static function retrieveHighestBitrateByEntryId($entryId, $tag = null, $excludeTag = null)
-    {
+	/**
+	 * @param string $entryId
+	 * @param string $tag tag filter
+	 * @return flavorAsset
+	 */
+	public static function retrieveHighestBitrateByEntryId($entryId, $tag = null)
+	{
 		$c = new Criteria();
 		$c->add(assetPeer::ENTRY_ID, $entryId);
 		$c->add(assetPeer::STATUS, flavorAsset::FLAVOR_ASSET_STATUS_READY);
 		$flavorTypes = self::retrieveAllFlavorsTypes();
 		$c->add(assetPeer::TYPE, $flavorTypes, Criteria::IN);
+		
 		$flavorAssets = self::doSelect($c);
 		if(!count($flavorAssets))
 			return null;
+			
 		if(!is_null($tag))
 			$flavorAssets = self::filterByTag($flavorAssets, $tag);
-		if (!is_null($excludeTag))
-			$flavorAssets = self::excludeByTag($flavorAssets, $excludeTag);
+		
 		if(!count($flavorAssets))
 			return null;
+			
 		$ret = null;
 		foreach($flavorAssets as $flavorAsset)
-		{
-			if (!$ret || $ret->getBitrate() < $flavorAsset->getBitrate()) {
-				$flavorSyncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-				list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($flavorSyncKey,false,false);
-				if ($fileSync){
-					$ret = $flavorAsset;
-				}
-			}
-		}
+			if(!$ret || $ret->getBitrate() < $flavorAsset->getBitrate())
+				$ret = $flavorAsset;
+				
 		return $ret;
 	}
-
+	
 	/**
 	 * Leaves only the specified tag in the flavor assets array
 	 * 
@@ -583,24 +576,6 @@ class assetPeer extends BaseassetPeer implements IRelatedObjectPeer
 		return $newAssets;
 	}
 	
-	/**
-	 * removes assets with specified tag from flavor assets array
-	 *
-	 * @param array $assets
-	 * @param string $tag
-	 * @return array<assets>
-	 */
-	public static function excludeByTag(array $assets, $excludeTag)
-	{
-		$newAssets = array();
-		foreach($assets as $asset)
-		{
-			if (!$asset->hasTag($excludeTag))
-				$newAssets[] = $asset;
-		}
-		
-		return $newAssets;
-	}
 
 	/**
 	 * @param string $entryId
@@ -652,27 +627,5 @@ class assetPeer extends BaseassetPeer implements IRelatedObjectPeer
 	public static function getAtomicColumns()
 	{
 		return array(assetPeer::STATUS);
-	}
-	
-	/* (non-PHPdoc)
-	 * @see IRelatedObjectPeer::getRootObjects()
-	 */
-	public function getRootObjects(IRelatedObject $object)
-	{
-		/* @var $object asset */
-		
-		$entry = $object->getentry();
-		if($entry)
-			return array($entry);
-			
-		return array();
-	}
-
-	/* (non-PHPdoc)
-	 * @see IRelatedObjectPeer::isReferenced()
-	 */
-	public function isReferenced(IRelatedObject $object)
-	{
-		return false;
 	}
 }

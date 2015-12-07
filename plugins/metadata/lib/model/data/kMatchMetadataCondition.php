@@ -61,7 +61,7 @@ class kMatchMetadataCondition extends kMatchCondition
 		{
 			if(!$this->profileSystemName)
 			{
-				KalturaLog::err("No metadata profile id and system-name supplied");
+				KalturaLog::notice("No metadata profile id and system-name supplied");
 				return null;
 			}
 				

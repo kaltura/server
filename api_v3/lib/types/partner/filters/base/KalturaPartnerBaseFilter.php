@@ -20,7 +20,6 @@ abstract class KalturaPartnerBaseFilter extends KalturaFilter
 		"partnerPackageEqual" => "_eq_partner_package",
 		"partnerPackageGreaterThanOrEqual" => "_gte_partner_package",
 		"partnerPackageLessThanOrEqual" => "_lte_partner_package",
-		"partnerPackageIn" => "_in_partner_package",
 		"partnerGroupTypeEqual" => "_eq_partner_group_type",
 		"partnerNameDescriptionWebsiteAdminNameAdminEmailLike" => "_like_partner_name-description-website-admin_name-admin_email",
 	);
@@ -112,11 +111,6 @@ abstract class KalturaPartnerBaseFilter extends KalturaFilter
 	 * @var int
 	 */
 	public $partnerPackageLessThanOrEqual;
-
-	/**
-	 * @var string
-	 */
-	public $partnerPackageIn;
 
 	/**
 	 * @var KalturaPartnerGroupType

@@ -47,6 +47,7 @@ class kUploadTokenMgr
 	 */
 	public function uploadFileToToken($fileData, $resume = false, $finalChunk = true, $resumeAt = -1)
 	{
+		KalturaLog::debug(__METHOD__ . print_r(func_get_args(), true));
 		$allowedStatuses = array(UploadToken::UPLOAD_TOKEN_PENDING, UploadToken::UPLOAD_TOKEN_PARTIAL_UPLOAD);
 		if (!in_array($this->_uploadToken->getStatus(), $allowedStatuses, true))
 			throw new kUploadTokenException("Invalid upload token status", kUploadTokenException::UPLOAD_TOKEN_INVALID_STATUS);
@@ -189,11 +190,13 @@ class kUploadTokenMgr
 	 */
 	protected function handleResume($fileData, $resumeAt = -1)
 	{
+		KalturaLog::info("Trying to resume the uploaded file");
 		$uploadFilePath = $this->_uploadToken->getUploadTempPath();
 		if (!file_exists($uploadFilePath))
 			throw new kUploadTokenException("Temp file [$uploadFilePath] was not found when trying to resume", kUploadTokenException::UPLOAD_TOKEN_FILE_NOT_FOUND_FOR_RESUME);
 		
 		$this->resumeFile($fileData['tmp_name'], $uploadFilePath, $resumeAt);
+		KalturaLog::info("The file resumed successfully");
 		
 		$fileWasDeleted = unlink($fileData['tmp_name']);
 		if ($fileWasDeleted)
@@ -208,12 +211,14 @@ class kUploadTokenMgr
 	 */
 	protected function handleMoveFile($fileData)
 	{
+		KalturaLog::info("Moving the uploaded file");
+		
 		// get the upload path
 		$extension = strtolower(pathinfo($fileData['name'], PATHINFO_EXTENSION));
 
 		// in firefox html5 upload the extension is missing (file name is "blob") so try fetching the extesion from
 		// the original file name that was passed to the uploadToken
-		if ($extension === "" || ($extension == "tmp" && $this->_uploadToken->getFileName()))
+		if ($extension === "")
 			$extension = strtolower(pathinfo($this->_uploadToken->getFileName(), PATHINFO_EXTENSION));
 
 		$uploadFilePath = $this->getUploadPath($this->_uploadToken->getId(), $extension);
@@ -226,6 +231,10 @@ class kUploadTokenMgr
 			$msg = "Failed to move uploaded file for token id [{$this->_uploadToken->getId()}]";
 			KalturaLog::log($msg . ' ' . print_r($fileData, true));
 			throw new kUploadTokenException($msg, kUploadTokenException::UPLOAD_TOKEN_FAILED_TO_MOVE_UPLOADED_FILE);
+		}
+		else 
+		{
+			KalturaLog::info("The file was moved successfully");
 		}
 		
 		chmod($uploadFilePath, 0600);
@@ -245,6 +254,7 @@ class kUploadTokenMgr
 		{
 			if ($resumeAt > ftell($targetFileResource))
 			{
+				KalturaLog::debug('actual size - ' . ftell($targetFileResource));
 				fclose($targetFileResource);
 				throw new kUploadTokenException("Temp file [$targetFilePath] attempted to resume at invalid position $resumeAt", kUploadTokenException::UPLOAD_TOKEN_RESUMING_INVALID_POSITION);
 			}

@@ -12,7 +12,7 @@ class LiveReportLocation1MinEngine extends LiveReportEngine {
 	protected $dateFormatter;
 	protected $nameFormatter;
 	
-	public function __construct(LiveReportDateFormatter $dateFormatter) {
+	public function LiveReportLocation1MinEngine(LiveReportDateFormatter $dateFormatter) {
 		$this->dateFormatter = $dateFormatter;
 		$this->nameFormatter = new LiveReportStringFormatter();
 	}

@@ -49,6 +49,7 @@ class AttUverseDistributionEngine extends DistributionEngine implements
 	 */
 	protected function handleSubmit(KalturaDistributionJobData $data, KalturaAttUverseDistributionProfile $distributionProfile, KalturaAttUverseDistributionJobProviderData $providerData)
 	{
+		KalturaLog::debug("AttUverse: submit");
 		/* @var $entryDistribution EntryDistribution */
 		$entryDistribution = $data->entryDistribution;	
 

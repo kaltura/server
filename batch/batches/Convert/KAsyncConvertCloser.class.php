@@ -76,6 +76,8 @@ class KAsyncConvertCloser extends KJobCloserWorker
 	
 	private function closeConvert(KalturaBatchJob $job, KalturaConvertJobData $data)
 	{
+		KalturaLog::debug("fetchStatus($job->id)");
+		
 		if(($job->queueTime + self::$taskConfig->params->maxTimeBeforeFail) < time())
 			return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::CLOSER_TIMEOUT, 'Timed out', KalturaBatchJobStatus::FAILED);
 		
@@ -162,6 +164,8 @@ class KAsyncConvertCloser extends KJobCloserWorker
 	
 	private function moveFile(KalturaBatchJob $job, KalturaConvertJobData $data)
 	{
+		KalturaLog::debug("moveFile($job->id, $data->destFileSyncLocalPath)");
+		
 		$uniqid = uniqid('convert_');
 		$sharedFile = $this->sharedTempPath . DIRECTORY_SEPARATOR . $uniqid;
 		
@@ -171,7 +175,7 @@ class KAsyncConvertCloser extends KJobCloserWorker
 		}
 		catch(Exception $ex)
 		{
-			KalturaLog::err($ex);
+			KalturaLog::debug("move log file error: " . $ex->getMessage());
 		}
 		
 		clearstatcache();
@@ -233,6 +237,8 @@ class KAsyncConvertCloser extends KJobCloserWorker
 	 */
 	private function fetchFile($srcFileSyncRemoteUrl, $srcFileSyncLocalPath, &$errDescription = null)
 	{
+		KalturaLog::debug("fetchFile($srcFileSyncRemoteUrl, $srcFileSyncLocalPath)");
+		
 		try
 		{
 			$curlWrapper = new KCurlWrapper();
@@ -253,6 +259,7 @@ class KAsyncConvertCloser extends KJobCloserWorker
 				$fileSize = $curlHeaderResponse->headers['content-length'];
 			$curlWrapper->close();
 				
+			KalturaLog::debug("Executing curl");
 			$curlWrapper = new KCurlWrapper();
 			$res = $curlWrapper->exec($srcFileSyncRemoteUrl, $srcFileSyncLocalPath);
 			KalturaLog::debug("Curl results: $res");

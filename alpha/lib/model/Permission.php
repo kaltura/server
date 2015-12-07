@@ -13,7 +13,7 @@
  * @package Core
  * @subpackage model
  */
-class Permission extends BasePermission implements IRelatedObject
+class Permission extends BasePermission
 {
 	
 	private $permissionItemIds = null;

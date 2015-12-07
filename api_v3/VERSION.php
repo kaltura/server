@@ -1,2 +1,2 @@
 <?php
-define('KALTURA_API_VERSION', '3.3.0');
+define('KALTURA_API_VERSION', '3.2.0');

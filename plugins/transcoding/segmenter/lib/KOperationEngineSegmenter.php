@@ -23,7 +23,10 @@ class KOperationEngineSegmenter  extends KSingleOutputOperationEngine
 	{
 //$this->outFilePath = "k:".$this->outFilePath;
 		KalturaLog::debug("creating directory:".$this->outFilePath);
-		kFile::fullMkfileDir($this->outFilePath, 0777, true);
+		if(kFile::fullMkfileDir($this->outFilePath, 0777, true))
+			KalturaLog::debug("SUCCESS");
+		else 
+			KalturaLog::debug("FAILURE");
 		$res = parent::operate($operator, $inFilePath, $configFilePath);
 		rename("$this->outFilePath//playlist.m3u8", "$this->outFilePath//playlist.tmp");
 		self::parsePlayList("$this->outFilePath//playlist.tmp","$this->outFilePath//playlist.m3u8");

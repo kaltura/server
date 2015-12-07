@@ -14,6 +14,7 @@ class SphinxCategoryKuserCriteria extends SphinxCriteria
 	 */
 	public function getFieldPrefix ($fieldName)
 	{
+		KalturaLog::info('fieldname is: $fieldName');
 		switch ($fieldName)
 		{
 			case 'permission_names':

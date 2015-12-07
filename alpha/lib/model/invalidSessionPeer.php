@@ -47,7 +47,7 @@ class invalidSessionPeer extends BaseinvalidSessionPeer {
 		return $result;
 	}
 	
-	public static function invalidateByKey($key, $type, $validUntil, PropelPDO $con = null) {
+	protected static function invalidateByKey($key, $type, $validUntil, PropelPDO $con = null) {
 		$criteria = new Criteria();
 		$criteria->add(invalidSessionPeer::KS, $key);
 		$criteria->add(invalidSessionPeer::TYPE, $type);

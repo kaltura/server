@@ -3,7 +3,7 @@
  * @package api
  * @subpackage objects
  */
-class KalturaConversionProfileAssetParams extends KalturaObject implements IRelatedFilterable 
+class KalturaConversionProfileAssetParams extends KalturaObject implements IFilterable 
 {
 	/**
 	 * The id of the conversion profile

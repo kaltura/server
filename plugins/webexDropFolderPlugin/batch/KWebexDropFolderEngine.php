@@ -18,7 +18,7 @@ class KWebexDropFolderEngine extends KDropFolderEngine
 		/* @var $dropFolder KalturaWebexDropFolder */
 		$this->dropFolder = $dropFolder;
 		$this->webexClient = $this->initWebexClient();
-		KalturaLog::info('Watching folder ['.$this->dropFolder->id.']');
+		KalturaLog::debug('Watching folder ['.$this->dropFolder->id.']');
 		
 		$startTime = null;
 		$endTime = null;
@@ -154,9 +154,11 @@ class KWebexDropFolderEngine extends KDropFolderEngine
 	 */
 	protected function purgeFiles ($dropFolderFilesMap)
 	{
+		KalturaLog::info('Deleting older files from Webex account');
+		
 		$createTimeEnd = strtotime ("now") - ($this->dropFolder->autoFileDeleteDays*86400);
 		$fileList = $this->listRecordings(self::ZERO_DATE, date('m/j/Y H:i:s',$createTimeEnd));
-		KalturaLog::info("Files to delete: " . count($fileList));
+		KalturaLog::debug("Files to delete: " . count($fileList));
 		
 		foreach ($fileList as $file)
 		{
@@ -195,6 +197,7 @@ class KWebexDropFolderEngine extends KDropFolderEngine
 	
 	protected function handleFileAdded (WebexXmlEpRecordingType $webexFile)
 	{
+		KalturaLog::debug('Add drop folder file ['.$webexFile->getName().'] last modification time ['.$webexFile->getCreateTime().'] file size ['.$webexFile->getSize().']');
 		try 
 		{
 			$newDropFolderFile = new KalturaWebexDropFolderFile();

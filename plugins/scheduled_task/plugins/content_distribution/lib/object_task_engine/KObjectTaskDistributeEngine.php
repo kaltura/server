@@ -22,7 +22,7 @@ class KObjectTaskDistributeEngine extends KObjectTaskEntryEngineBase
 		if (!$distributionProfileId)
 			throw new Exception('Distribution profile id was not configured');
 
-		KalturaLog::info("Trying to distribute entry $entryId with profile $distributionProfileId");
+		KalturaLog::debug("Trying to distribute entry $entryId with profile $distributionProfileId");
 
 		$client = $this->getClient();
 		$contentDistributionPlugin = KalturaContentDistributionClientPlugin::get($client);
@@ -91,6 +91,7 @@ class KObjectTaskDistributeEngine extends KObjectTaskEntryEngineBase
 
 		if ($shouldSubmit)
 		{
+			KalturaLog::debug('Submitting');
 			$contentDistributionPlugin->entryDistribution->submitAdd($entryDistribution->id, true);
 		}
 

@@ -8,21 +8,6 @@ class TvinciDistributionProfile extends ConfigurableDistributionProfile
  	const CUSTOM_DATA_INGEST_URL = 'ingestUrl';
  	const CUSTOM_DATA_USERNAME = 'username';
  	const CUSTOM_DATA_PASSWORD = 'password';
- 	const CUSTOM_DATA_XSLT = 'xsltFile';
-	const CUSTOM_ISM_FILENAME = 'ismFileName';
-	const CUSTOM_ISM_PPV_MODULE = 'ismPpvModule';
-	const CUSTOM_IPADNEW_FILENAME = 'ipadnewFileName';
-	const CUSTOM_IPADNEW_PPV_MODULE = 'ipadnewPpvModule';
-	const CUSTOM_IPHONENEW_FILENAME = 'iphonenewFileName';
-	const CUSTOM_IPHONENEW_PPV_MODULE = 'iphonenewPpvModule';
-	const CUSTOM_MBR_FILENAME = 'mbrFileName';
-	const CUSTOM_MBR_PPV_MODULE = 'mbrPpvModule';
-	const CUSTOM_DASH_FILENAME = 'dashFileName';
-	const CUSTOM_DASH_PPV_MODULE = 'dashPpvModule';
-	const CUSTOM_WIDEVINE_FILENAME = 'widevineFileName';
-	const CUSTOM_WIDEVINE_PPV_MODULE = 'widevinePpvModule';
-	const CUSTOM_WIDEVINE_MBR_FILENAME = 'widevineMbrFileName';
-	const CUSTOM_WIDEVINE_MBR_PPV_MODULE = 'widevineMbrPpvModule';
 
 	/* (non-PHPdoc)
 	 * @see DistributionProfile::getProvider()
@@ -31,34 +16,6 @@ class TvinciDistributionProfile extends ConfigurableDistributionProfile
 	{
 		return TvinciDistributionPlugin::getProvider();
 	}
-
-	protected function getDefaultFieldConfigArray()
-	{
-		$fieldConfigArray = parent::getDefaultFieldConfigArray();
-
-		$fieldConfig = new DistributionFieldConfig();
-		$fieldConfig->setFieldName(TvinciDistributionField::CUSTOM);
-		$fieldConfig->setUserFriendlyFieldName('Custom Data:');
-		$fieldConfig->setUpdateOnChange(true);
-		$fieldConfig->setIsDefault(true);
-		$fieldConfig->setUpdateParams( array( entryPeer::CUSTOM_DATA, entryPeer::DESCRIPTION, entryPeer::NAME));
-		$fieldConfig->setIsRequired(DistributionFieldRequiredStatus::NOT_REQUIRED);
-		$fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
-
-		return $fieldConfigArray;
-
-	}
-
-	public function getUpdateRequiredMetadataXPaths()
-	{
-		$metadataConfigArray = parent::getUpdateRequiredMetadataXPaths();
-		/* we want any change to the metadata to create an update possibility */
-		$metadataConfigArray[] = TvinciDistributionField::META;
-
-		return $metadataConfigArray;
-
-	}
-
 
 
 	public function validateForSubmission(EntryDistribution $entryDistribution, $action)
@@ -70,34 +27,9 @@ class TvinciDistributionProfile extends ConfigurableDistributionProfile
 		    KalturaLog::err('Error getting field values from entry distribution id ['.$entryDistribution->getId().'] profile id ['.$this->getId().']');
 		    return $validationErrors;
 		}
-		$this->validateReferenceId($entryDistribution, $action, $validationErrors);
 
 		return $validationErrors;
 	}
-
-	/**
-	 * @param EntryDistribution $entryDistribution
-	 * @param $action
-	 * @param array $validationErrors
-	 * since entry distribution and entry are validated in the parent of validateForSubmission we will not add an error for them
-	 */
-	private function validateReferenceId(EntryDistribution $entryDistribution, $action, array &$validationErrors)
-	{
-
-		if ($entryDistribution && $entryDistribution->getEntryId() )
-		{
-			$entry = entryPeer::retrieveByPK($entryDistribution->getEntryId());
-			if ($entry && (!$entry->getReferenceID()))
-			{
-				$validationError = $this->createValidationError($action, DistributionErrorType::MISSING_METADATA, "Reference ID" , "is a mandatory field");
-				$validationError->setValidationErrorType(DistributionValidationErrorType::STRING_EMPTY);
-				$validationError->setValidationErrorParam("Reference ID is a mandatory field");
-				$validationErrors[] = $validationError;
-			}
-		}
-	}
-	public function getXsltFile()				{return $this->getFromCustomData(self::CUSTOM_DATA_XSLT);}
-	public function setXsltFile($v)				{$this->putInCustomData(self::CUSTOM_DATA_XSLT, $v);}
 
 	public function getIngestUrl()				{return $this->getFromCustomData(self::CUSTOM_DATA_INGEST_URL);}
 	public function setIngestUrl($v)			{$this->putInCustomData(self::CUSTOM_DATA_INGEST_URL, $v);}
@@ -111,38 +43,143 @@ class TvinciDistributionProfile extends ConfigurableDistributionProfile
 	public function getPublisher()				{return $this->getFromCustomData(self::CUSTOM_DATA_PUBLISHER);}
 	public function setPublisher($v)			{$this->putInCustomData(self::CUSTOM_DATA_PUBLISHER, $v);}
 
-	public function getIsmFileName()			{return $this->getFromCustomData(self::CUSTOM_ISM_FILENAME);}
-	public function setIsmFileName($v)			{$this->putInCustomData(self::CUSTOM_ISM_FILENAME, $v);}
-	public function getIsmPpvModule()			{return $this->getFromCustomData(self::CUSTOM_ISM_PPV_MODULE);}
-	public function setIsmPpvModule($v)			{$this->putInCustomData(self::CUSTOM_ISM_PPV_MODULE, $v);}
+	protected function getDefaultFieldConfigArray()
+	{
+	    $fieldConfigArray = parent::getDefaultFieldConfigArray();
 
-	public function getMbrFileName()			{return $this->getFromCustomData(self::CUSTOM_MBR_FILENAME);}
-	public function setMbrFileName($v)			{$this->putInCustomData(self::CUSTOM_MBR_FILENAME, $v);}
-	public function getMbrPpvModule()			{return $this->getFromCustomData(self::CUSTOM_MBR_PPV_MODULE);}
-	public function setMbrPpvModule($v)			{$this->putInCustomData(self::CUSTOM_MBR_PPV_MODULE, $v);}
+	    // Set the default XSL expression for AUTOMATIC_DISTRIBUTION_CONDITIONS
+	    $fieldConfig = $fieldConfigArray[ConfigurableDistributionField::AUTOMATIC_DISTRIBUTION_CONDITIONS];
+	    if ( $fieldConfig )
+	    {
+			$fieldConfig->setEntryMrssXslt('<xsl:if test="customData/metadata/WorkflowStatus = \'Approved\'">Approved For Automatic Distribution</xsl:if>');
+	    }
 
-	public function getDashFileName()			{return $this->getFromCustomData(self::CUSTOM_DASH_FILENAME);}
-	public function setDashFileName($v)			{$this->putInCustomData(self::CUSTOM_DASH_FILENAME, $v);}
-	public function getDashPpvModule()			{return $this->getFromCustomData(self::CUSTOM_DASH_PPV_MODULE);}
-	public function setDashPpvModule($v)			{$this->putInCustomData(self::CUSTOM_DASH_PPV_MODULE, $v);}
+	    // media fields
+	    $fieldConfig = new DistributionFieldConfig();
+	    $fieldConfig->setFieldName(TvinciDistributionField::METADATA_SCHEMA_ID);
+	    $fieldConfig->setUserFriendlyFieldName('Schema Id');
+	    $fieldConfig->setEntryMrssXslt('2'); // See TvinciDistributionField::METADATA_SCHEMA_ID
+	    $fieldConfig->setUpdateOnChange(false);
+	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 
-	public function getIphonenewFileName()		{return $this->getFromCustomData(self::CUSTOM_IPHONENEW_FILENAME);}
-	public function setIphonenewFileName($v)	{$this->putInCustomData(self::CUSTOM_IPHONENEW_FILENAME, $v);}
-	public function getIphonenewPpvModule()		{return $this->getFromCustomData(self::CUSTOM_IPHONENEW_PPV_MODULE);}
-	public function setIphonenewPpvModule($v)	{$this->putInCustomData(self::CUSTOM_IPHONENEW_PPV_MODULE, $v);}
+	    $fieldConfig = new DistributionFieldConfig();
+	    $fieldConfig->setFieldName(TvinciDistributionField::MEDIA_TITLE);
+	    $fieldConfig->setUserFriendlyFieldName('Entry name');
+	    $fieldConfig->setEntryMrssXslt('<xsl:value-of select="string(title)" />');
+	    $fieldConfig->setUpdateOnChange(true);
+	    $fieldConfig->setUpdateParams(array(entryPeer::NAME));
+	    $fieldConfig->setIsRequired(DistributionFieldRequiredStatus::REQUIRED_BY_PROVIDER);
+	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 
-	public function getIpadnewFileName()		{return $this->getFromCustomData(self::CUSTOM_IPADNEW_FILENAME);}
-	public function setIpadnewFileName($v)		{$this->putInCustomData(self::CUSTOM_IPADNEW_FILENAME, $v);}
-	public function getIpadnewPpvModule()		{return $this->getFromCustomData(self::CUSTOM_IPADNEW_PPV_MODULE);}
-	public function setIpadnewPpvModule($v)		{$this->putInCustomData(self::CUSTOM_IPADNEW_PPV_MODULE, $v);}
+	    $fieldConfig = new DistributionFieldConfig();
+	    $fieldConfig->setFieldName(TvinciDistributionField::MEDIA_DESCRIPTION);
+	    $fieldConfig->setUserFriendlyFieldName('Entry description');
+	    $fieldConfig->setEntryMrssXslt('<xsl:value-of select="string(description)" />');
+	    $fieldConfig->setUpdateOnChange(true);
+	    $fieldConfig->setUpdateParams(array(entryPeer::DESCRIPTION));
+	    $fieldConfig->setIsRequired(DistributionFieldRequiredStatus::REQUIRED_BY_PROVIDER);
+	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 
-	public function getWidevineFileName()		{return $this->getFromCustomData(self::CUSTOM_WIDEVINE_FILENAME);}
-	public function setWidevineFileName($v)		{$this->putInCustomData(self::CUSTOM_WIDEVINE_FILENAME, $v);}
-	public function getWidevinePpvModule()		{return $this->getFromCustomData(self::CUSTOM_WIDEVINE_PPV_MODULE);}
-	public function setWidevinePpvModule($v)	{$this->putInCustomData(self::CUSTOM_WIDEVINE_PPV_MODULE, $v);}
+	    $activatePublishingXSLT = '<xsl:choose>'
+	    							. '<xsl:when test="customData/metadata/Activate = \'Yes\'">true</xsl:when>'
+	    							. '<xsl:otherwise>false</xsl:otherwise>'
+	    						. '</xsl:choose>';
+	    $this->addMetadataDistributionFieldConfig($fieldConfigArray, TvinciDistributionField::ACTIVATE_PUBLISHING, 'Activate Publishing', 'Activate', false, DistributionFieldRequiredStatus::REQUIRED_BY_PROVIDER, $activatePublishingXSLT);
 
-	public function getWidevineMbrFileName()	{return $this->getFromCustomData(self::CUSTOM_WIDEVINE_MBR_FILENAME);}
-	public function setWidevineMbrFileName($v)	{$this->putInCustomData(self::CUSTOM_WIDEVINE_MBR_FILENAME, $v);}
-	public function getWidevineMbrPpvModule()	{return $this->getFromCustomData(self::CUSTOM_WIDEVINE_MBR_PPV_MODULE);}
-	public function setWidevineMbrPpvModule($v)	{$this->putInCustomData(self::CUSTOM_WIDEVINE_MBR_PPV_MODULE, $v);}
+	    $this->addMetadataDistributionFieldConfig($fieldConfigArray, TvinciDistributionField::MEDIA_TYPE, 'Media Type', 'MediaType');
+
+	    $this->addMetadataDistributionFieldConfig($fieldConfigArray, TvinciDistributionField::METADATA_SHORT_TITLE, 'Short Title', 'ShortTitle', false);
+	    $this->addMetadataDistributionFieldConfig($fieldConfigArray, TvinciDistributionField::METADATA_DIMENSION, 'Dimension', 'Dimension', false);
+	    $this->addMetadataDistributionFieldConfig($fieldConfigArray, TvinciDistributionField::METADATA_BILLING_TYPE, 'Billing Type', 'BillingType', false);
+
+	    $this->addMetadataDistributionFieldConfig($fieldConfigArray, TvinciDistributionField::GEO_BLOCK_RULE, 'Geo Block Rule', 'GeoBlockRule');
+	    $this->addMetadataDistributionFieldConfig($fieldConfigArray, TvinciDistributionField::WATCH_PERMISSIONS_RULE, 'Watch Permission Rule', 'WatchPermissionRule');
+
+	    // Language
+	    $languageXSLT =	'<xsl:choose>'
+							. '<xsl:when test="customData/metadata/Language != \'\'">'
+								. '<xsl:value-of select="customData/metadata/Language"/>'
+							. '</xsl:when>'
+							. '<xsl:otherwise><xsl:text>eng</xsl:text></xsl:otherwise>'
+						. '</xsl:choose>';
+	    $this->addMetadataDistributionFieldConfig($fieldConfigArray, TvinciDistributionField::LANGUAGE, 'Language', 'Language', false, DistributionFieldRequiredStatus::NOT_REQUIRED, $languageXSLT);
+
+	    // Dates
+	    $this->addMetadataDistributionFieldConfig($fieldConfigArray, TvinciDistributionField::START_DATE, 'Start Date', 'StartDate', false, DistributionFieldRequiredStatus::REQUIRED_BY_PROVIDER);
+	    $this->addMetadataDistributionFieldConfig($fieldConfigArray, TvinciDistributionField::END_DATE, 'End Date', 'FinalEndDate', false, DistributionFieldRequiredStatus::REQUIRED_BY_PROVIDER);
+	    $this->addMetadataDistributionFieldConfig($fieldConfigArray, TvinciDistributionField::CATALOG_START_DATE, 'Catalog Start Date', 'CatalogStartDate', false, DistributionFieldRequiredStatus::REQUIRED_BY_PROVIDER);
+	    $this->addMetadataDistributionFieldConfig($fieldConfigArray, TvinciDistributionField::CATALOG_END_DATE, 'Catalog End Date', 'CatalogEndDate', false, DistributionFieldRequiredStatus::REQUIRED_BY_PROVIDER);
+
+	    $this->addMetadataDistributionFieldConfig($fieldConfigArray, TvinciDistributionField::METADATA_RUNTIME, 'Runtime', 'Runtime');
+	    $this->addMetadataDistributionFieldConfig($fieldConfigArray, TvinciDistributionField::METADATA_RELEASE_YEAR, 'Release Year', 'ReleaseYear');
+	    $this->addMetadataDistributionFieldConfig($fieldConfigArray, TvinciDistributionField::METADATA_RELEASE_DATE, 'Release Date', 'ReleaseDate');
+	    $this->addMetadataDistributionFieldConfig($fieldConfigArray, TvinciDistributionField::METADATA_GENRE, 'Genre', 'Genre', true);
+ 	    $this->addMetadataDistributionFieldConfig($fieldConfigArray, TvinciDistributionField::METADATA_SUB_GENRE, 'Sub Genre', 'SubGenre', true);
+ 	    $this->addMetadataDistributionFieldConfig($fieldConfigArray, TvinciDistributionField::METADATA_RATING, 'Rating', 'Rating', true);
+ 	    $this->addMetadataDistributionFieldConfig($fieldConfigArray, TvinciDistributionField::METADATA_PARENTAL_RATING, 'Parental Rating', 'ParentalRating', true);
+ 	    $this->addMetadataDistributionFieldConfig($fieldConfigArray, TvinciDistributionField::METADATA_COUNTRY, 'Country', 'Country', true);
+ 	    $this->addMetadataDistributionFieldConfig($fieldConfigArray, TvinciDistributionField::METADATA_CAST, 'Cast', 'Cast', true);
+ 	    $this->addMetadataDistributionFieldConfig($fieldConfigArray, TvinciDistributionField::METADATA_MAIN_CAST, 'Main Cast', 'MainCast', true);
+ 	    $this->addMetadataDistributionFieldConfig($fieldConfigArray, TvinciDistributionField::METADATA_DIRECTOR, 'Director', 'Director', true);
+ 	    $this->addMetadataDistributionFieldConfig($fieldConfigArray, TvinciDistributionField::METADATA_AUDIO_LANGUAGE, 'Audio Language', 'AudioLanguage', true);
+ 	    $this->addMetadataDistributionFieldConfig($fieldConfigArray, TvinciDistributionField::METADATA_STUDIO, 'Studio', 'Studio', true);
+
+	    // Video assets configuration (see KalturaTvinciDistributionJobProviderData::initPlayManifestUrls())
+	    $fieldConfig = new DistributionFieldConfig();
+	    $fieldConfig->setFieldName(TvinciDistributionField::VIDEO_ASSETS_CONFIGURATION);
+	    $fieldConfig->setUserFriendlyFieldName('Video assets configuration');
+	    $fieldConfig->setEntryMrssXslt('');
+	    $fieldConfig->setUpdateOnChange(false);
+	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
+
+	    return $fieldConfigArray;
+	}
+
+	protected function addMetadataDistributionFieldConfig(array &$array, $name, $friendlyName, $metadataName, $multiValue = false, $required = DistributionFieldRequiredStatus::NOT_REQUIRED, $xslt = null)
+	{
+		$metadataPath = "customData/metadata/$metadataName";
+		if ( is_null($xslt) )
+		{
+			if ( ! $multiValue ) // Single value
+			{
+				$xslt = '<xsl:value-of select="string('. $metadataPath . ')" />';
+			}
+			else
+			{
+				$xslt = '<xsl:for-each select="'. $metadataPath . '">'
+							. '<xsl:if test="position() &gt; 1">'
+							. '<xsl:text>,</xsl:text>'
+							. '</xsl:if>'
+							. '<xsl:value-of select="string(.)" />'
+						. '</xsl:for-each>'
+					;
+			}
+		}
+
+		$updateMetadataArray = array( "/*[local-name()='metadata']/*[local-name()='$metadataName']" );
+
+		$this->addDistributionFieldConfig($array, $name, $friendlyName, $xslt, $required, true, $updateMetadataArray);
+	}
+
+	protected function addDistributionFieldConfig(array &$array, $name, $friendlyName, $xslt, $required = DistributionFieldRequiredStatus::NOT_REQUIRED, $updateOnChange = false, $updateOnParams = array())
+	{
+		$fieldConfig = new DistributionFieldConfig();
+		$fieldConfig->setFieldName($name);
+		$fieldConfig->setUserFriendlyFieldName($friendlyName);
+		$fieldConfig->setEntryMrssXslt($xslt);
+		if ($updateOnChange)
+			$fieldConfig->setUpdateOnChange(true);
+		$fieldConfig->setIsRequired($required);
+		$fieldConfig->setUpdateParams($updateOnParams);
+		$array[$name] = $fieldConfig;
+	}
+
+	protected function removeDistributionFieldConfigs(array &$fieldConfigArray, array $fields)
+	{
+		foreach($fields as $field)
+		{
+			if (isset($fieldConfigArray[$field]))
+				unset($fieldConfigArray[$field]);
+		}
+	}
 }

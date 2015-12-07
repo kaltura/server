@@ -5,12 +5,12 @@ class DummyForDocsClientGenerator extends ClientGeneratorFromPhp
 	protected $_enums = array();
 	protected $_classes = array();
 	
-	public function __construct()
+	public function DummyForDocsClientGenerator()
 	{
 	    ini_set("memory_limit", "256M");
 	    set_time_limit(600);
 	    
-		parent::__construct();
+		parent::ClientGeneratorFromPhp();
 	}
 	
 	public function load()

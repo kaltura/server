@@ -14,6 +14,7 @@ class kReportManager
 	public function __construct(Report $report)
 	{
 		$this->_report = $report;
+		KalturaLog::debug('Report #'.$report->getId());
 	}
 	
 	public function execute($params)

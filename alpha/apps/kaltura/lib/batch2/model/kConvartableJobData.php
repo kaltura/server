@@ -102,7 +102,7 @@ class kConvartableJobData extends kJobData
 	 */
 	public function getSrcFileSyncLocalPath()
 	{
-		$srcDescriptor = (is_array($this->srcFileSyncs) && count($this->srcFileSyncs) ? reset($this->srcFileSyncs) : null);
+		$srcDescriptor = reset($this->srcFileSyncs);
 		
 		if(!$srcDescriptor)
 			return null;
@@ -115,7 +115,7 @@ class kConvartableJobData extends kJobData
 	 */
 	public function setSrcFileSyncRemoteUrl($srcFileSyncRemoteUrl)
 	{
-		$srcDescriptor = (is_array($this->srcFileSyncs) && count($this->srcFileSyncs) ? reset($this->srcFileSyncs) : null);
+		$srcDescriptor = reset($this->srcFileSyncs);
 		
 		if(!$srcDescriptor)
 		{
@@ -134,7 +134,7 @@ class kConvartableJobData extends kJobData
 	 */
 	public function getSrcFileSyncRemoteUrl()
 	{
-		$srcDescriptor = (is_array($this->srcFileSyncs) && count($this->srcFileSyncs) ? reset($this->srcFileSyncs) : null);
+		$srcDescriptor = reset($this->srcFileSyncs);
 		
 		if(!$srcDescriptor)
 			return null;
@@ -155,7 +155,7 @@ class kConvartableJobData extends kJobData
 	 */
 	public function setSrcFileSyncLocalPath($srcFileSyncLocalPath)
 	{
-		$srcDescriptor = (is_array($this->srcFileSyncs) && count($this->srcFileSyncs) ? reset($this->srcFileSyncs) : null);
+		$srcDescriptor = reset($this->srcFileSyncs);
 		
 		if(!$srcDescriptor)
 		{
@@ -174,7 +174,7 @@ class kConvartableJobData extends kJobData
 	 */
 	public function getActualSrcFileSyncLocalPath()
 	{
-		$srcDescriptor = (is_array($this->srcFileSyncs) && count($this->srcFileSyncs) ? reset($this->srcFileSyncs) : null);
+		$srcDescriptor = reset($this->srcFileSyncs);
 		
 		if(!$srcDescriptor)
 			return null;
@@ -187,7 +187,7 @@ class kConvartableJobData extends kJobData
 	 */
 	public function setActualSrcFileSyncLocalPath($actualSrcFileSyncLocalPath)
 	{
-		$srcDescriptor = (is_array($this->srcFileSyncs) && count($this->srcFileSyncs) ? reset($this->srcFileSyncs) : null);
+		$srcDescriptor = reset($this->srcFileSyncs);
 		
 		if(!$srcDescriptor)
 		{

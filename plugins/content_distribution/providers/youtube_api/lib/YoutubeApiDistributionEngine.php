@@ -283,7 +283,7 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 		$playlistIds = explode(',', $this->getValueForField(KalturaYouTubeApiDistributionField::MEDIA_PLAYLIST_IDS));
 		$this->syncPlaylistIds($youtube, $data->remoteId, $playlistIds); 
 		
-		return $distributionProfile->assumeSuccess;
+		return false;
 	}
 	
 	protected function doUpdate(KalturaDistributionUpdateJobData $data, KalturaYoutubeApiDistributionProfile $distributionProfile, $enable = true)
@@ -471,6 +471,8 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 		if (!file_exists($captionInfo->filePath ))
 			throw new KalturaDistributionException("The caption file [$captionInfo->filePath] was not found (probably not synced yet), the job will retry");
 			
+		KalturaLog::debug("Submitting caption [$captionInfo->assetId]");
+		
 		$captionSnippet = new Google_Service_YouTube_CaptionSnippet();
 		$captionSnippet->setVideoId($remoteId);
 		$captionSnippet->setLanguage($captionInfo->language);

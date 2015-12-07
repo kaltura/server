@@ -403,10 +403,6 @@ class KalturaBatchJob extends KalturaObject implements IFilterable
 			case 'kLiveReportExportJobData':
 				$this->data = new KalturaLiveReportExportJobData();
 				break;
-			
-			case 'kRecalculateResponseProfileCacheJobData':
-				$this->data = new KalturaRecalculateResponseProfileCacheJobData();
-				break;
 				
 			default:			
 				if($dbData instanceof kBulkUploadJobData)
@@ -619,17 +615,6 @@ class KalturaBatchJob extends KalturaObject implements IFilterable
 				$dbData = new kCopyPartnerJobData();
 				if(is_null($this->data))
 					$this->data = new KalturaCopyPartnerJobData();
-				break;
-					
-			case KalturaBatchJobType::RECALCULATE_CACHE:
-				switch($dbBatchJob->getJobSubType())
-				{
-					case RecalculateCacheType::RESPONSE_PROFILE:
-						$dbData = new kRecalculateResponseProfileCacheJobData();
-						if(is_null($this->data))
-							$this->data = new KalturaRecalculateResponseProfileCacheJobData();
-						break;
-				}
 				break;
 				
 			default:

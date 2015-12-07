@@ -25,6 +25,8 @@ class KAsyncValidateLiveMediaServers extends KPeriodicWorker
 	*/
 	public function run($jobs = null)
 	{
+		KalturaLog::info("Validating live media servers");
+		
 		$filter = new KalturaLiveStreamEntryFilter();
 		$filter->isLive = KalturaNullableBoolean::TRUE_VALUE;
 		$filter->orderBy = KalturaLiveStreamEntryOrderBy::CREATED_AT_ASC;
@@ -45,19 +47,12 @@ class KAsyncValidateLiveMediaServers extends KPeriodicWorker
 		{
 			foreach($entries->objects as $entry)
 			{
-				try
-				{
-					/* @var $entry KalturaLiveEntry */
-					self::impersonate($entry->partnerId);
-					self::$kClient->liveStream->validateRegisteredMediaServers($entry->id);
-					self::unimpersonate();
-					$filter->createdAtGreaterThanOrEqual = $entry->createdAt;
-				}
-				catch (KalturaException $e)
-				{
-					self::unimpersonate();
-					KalturaLog::err("Caught exception with message [" . $e->getMessage()."]");
-				}
+				/* @var $entry KalturaLiveEntry */
+				self::impersonate($entry->partnerId);
+				self::$kClient->liveStream->validateRegisteredMediaServers($entry->id);
+				self::unimpersonate();
+				
+				$filter->createdAtGreaterThanOrEqual = $entry->createdAt;
 			}
 			
 			$pager->pageIndex++;

@@ -181,6 +181,7 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 				return kFlowHelper::handleDeleteFileFinished($dbBatchJob, $data);
 			case BatchJob::BATCHJOB_STATUS_FAILED:
 			case BatchJob::BATCHJOB_STATUS_FATAL:
+				KalturaLog::info("File deletion job failed.");
 			default:
 				return $dbBatchJob;
 		}	
@@ -666,7 +667,7 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 			
 		$entry = entryPeer::retrieveByPKNoFilter($object->getEntryId());
 
-		KalturaLog::info("Asset id [" . $object->getId() . "] isOriginal [" . $object->getIsOriginal() . "] status [" . $object->getStatus() . "]");
+		KalturaLog::debug("Asset id [" . $object->getId() . "] isOriginal [" . $object->getIsOriginal() . "] status [" . $object->getStatus() . "]");
 		if($object->getIsOriginal())
 			return true;
 		

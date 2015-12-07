@@ -96,7 +96,7 @@
 			),
 			KDLTranscoders::FFMPEG => array(
 //				KDLConstants::ContainerIndex=>array("ogg", "ogv"),
-//				KDLConstants::VideoIndex=>array("iv41","iv50"), //"icod","intermediate codec"),
+				KDLConstants::VideoIndex=>array("iv41","iv50"), //"icod","intermediate codec"),
 //				KDLConstants::AudioIndex=>array("vorbis"),
 			),
 			KDLTranscoders::FFMPEG_AUX => array(
@@ -114,18 +114,18 @@
 				 */
 		static $TranscodersTargetBlackList = array(
 			KDLTranscoders::ON2 => array(
-				KDLConstants::ContainerIndex=>array(KDLContainerTarget::WMV, KDLContainerTarget::ISMV, KDLContainerTarget::ISMA),
+				KDLConstants::ContainerIndex=>array(KDLContainerTarget::WMV, KDLContainerTarget::ISMV),
 				KDLConstants::VideoIndex=>array("wvc1", KDLVideoTarget::WMV2,KDLVideoTarget::WMV3)),
 			KDLTranscoders::EE3 => array(
 				KDLConstants::ContainerIndex=>array(KDLContainerTarget::FLV, KDLContainerTarget::MP4)),
 			KDLTranscoders::FFMPEG => array(),
 //				KDLConstants::ContainerIndex=>array(KDLContainerTarget::ISMV)),
 			KDLTranscoders::FFMPEG_AUX => array(
-				KDLConstants::ContainerIndex=>array(KDLContainerTarget::ISMV, KDLContainerTarget::ISMA)),
+				KDLConstants::ContainerIndex=>array(KDLContainerTarget::ISMV)),
 			KDLTranscoders::ENCODING_COM => array(
-				KDLConstants::ContainerIndex=>array(KDLContainerTarget::ISMV, KDLContainerTarget::ISMA)),
+				KDLConstants::ContainerIndex=>array(KDLContainerTarget::ISMV)),
 			KDLTranscoders::MENCODER => array(
-				KDLConstants::ContainerIndex=>array(KDLContainerTarget::ISMV, KDLContainerTarget::ISMA)),
+				KDLConstants::ContainerIndex=>array(KDLContainerTarget::ISMV)),
 		);
 		
 		const MaxFramerate = 30.0;
@@ -257,7 +257,6 @@
 		const WMV = "wmv";
 		const WMA = "wma";
 		const ISMV = "ismv";
-		const ISMA = "isma";
 		const MKV = "mkv";
 		const WEBM = "webm";
 		const MPEG = "mpeg";

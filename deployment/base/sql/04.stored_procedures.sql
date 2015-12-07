@@ -1,4 +1,4 @@
-SET GLOBAL sql_mode = '';
+
 DELIMITER $$
 
 /* Procedure structure for procedure `update_entries` */

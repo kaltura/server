@@ -76,11 +76,13 @@ class KalturaBulkUploadFilterJobData extends KalturaBulkUploadJobData
 	    
 	    if ($this->filter)
 	    {
+	        KalturaLog::debug("Filter class was found: ". get_class($this->filter));
 	        $this->filter->fromObject($source_object->getFilter());
 	    }       
 	    
 	   	$this->templateObject = null;
 	   	
+	   	KalturaLog::debug("template object class: ". get_class($source_object->getTemplateObject()));
 	    switch (get_class($source_object->getTemplateObject()))
 	    {
 	        case 'categoryEntry':
@@ -92,6 +94,7 @@ class KalturaBulkUploadFilterJobData extends KalturaBulkUploadJobData
 	    
 	    if ($this->templateObject)
 	    {
+	        KalturaLog::debug("Template object class was found: ". get_class($this->templateObject));
 	        $this->templateObject->fromObject($source_object->getTemplateObject());
 	    }       
 	}

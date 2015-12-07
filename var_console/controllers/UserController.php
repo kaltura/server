@@ -71,6 +71,7 @@ class UserController extends Zend_Controller_Action
 					Zend_Session::rememberMe(60*60*24*7); // 1 week
 					
 				$nextUri = $this->_getParam('next_uri');
+				KalturaLog::debug("next uri $nextUri");
 				if ($nextUri && strlen($nextUri) > 1)
 					$this->_helper->redirector->gotoUrl($nextUri);
 				else
@@ -153,6 +154,7 @@ class UserController extends Zend_Controller_Action
 	    $form = new Form_AdminLogin();
 	    $this->view->form = $form;
 	    
+	    KalturaLog::debug('creating auth adapter');
 	    $adapter = new Kaltura_VarAuthAdapter();
 	    $adapter->setTimezoneOffset($this->_getParam('timezone_offset'));
 	    $adapter->setKS($this->_getParam('ks'));

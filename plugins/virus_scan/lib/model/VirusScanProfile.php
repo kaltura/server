@@ -13,7 +13,7 @@
  * @package plugins.virusScan
  * @subpackage model
  */
-class VirusScanProfile extends BaseVirusScanProfile implements IBaseObject {
+class VirusScanProfile extends BaseVirusScanProfile {
 	
 	/**
 	 * @param      entryFilter $v

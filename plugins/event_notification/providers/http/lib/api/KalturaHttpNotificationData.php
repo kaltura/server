@@ -13,6 +13,7 @@ abstract class KalturaHttpNotificationData extends KalturaObject
 	public static function getInstance(kHttpNotificationData $coreObject)
 	{
 		$dataType = get_class($coreObject);
+		KalturaLog::debug("Loading KalturaHttpNotificationData from type [$dataType]");
 		$data = null;
 		switch ($dataType)
 		{

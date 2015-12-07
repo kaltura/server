@@ -21,25 +21,25 @@ class WebexPlugin extends KalturaPlugin implements IKalturaImportHandler
 	 * @see IKalturaImportHandler::handleImportData()
 	 */
 	public static function handleImportContent($curlInfo,  $importData, $params) {
+		KalturaLog::debug('content-length [' . $curlInfo->headers['content-length'] . '] content-type [' . $curlInfo->headers['content-type'] . ']');
 		if (!($curlInfo->headers['content-length'] < 16000 && $curlInfo->headers['content-type'] == 'text/html'))
 			return $importData;
-		KalturaLog::debug('content-length [' . $curlInfo->headers['content-length'] . '] content-type [' . $curlInfo->headers['content-type'] . ']');
+		
 		KalturaLog::info('Handle Import data: Webex Plugin');
 		$matches = null;
-		$recordId=null;
-		if(isset($curlInfo->headers['set-cookie']))
+		$recordId = null;
+		$cookiesArr = explode(';', $curlInfo->headers["set-cookie"]);
+		foreach($cookiesArr as $cookie)
 		{
-			$recordId = $curlInfo->getCookieValue($curlInfo->headers['set-cookie'], 'recordId');
-			if ($recordId==null)
-			{
-				throw new Exception('recordId value not found');
-			}
+			list($cookieName, $cookieValue) = explode('=', trim($cookie));
+			if($cookieName == 'recordId')
+				$recordId = $cookieValue;
 		}
-		else
+		if (!$recordId)
 		{
-			throw new Exception('set-cookie was not found in header');
+			throw new Exception('recordId value not found');
 		}
-
+		
 		$data = file_get_contents($importData->destFileLocalPath);
 		KalturaLog::info("data:\n\n$data\n\n");
 		if(!preg_match("/href='([^']+)';/", $data, $matches))

@@ -13,8 +13,9 @@
  * @package plugins.metadata
  * @subpackage model
  */
-class MetadataPeer extends BaseMetadataPeer implements IRelatedObjectPeer
-{
+class MetadataPeer extends BaseMetadataPeer {
+
+
 	public static function setDefaultCriteriaFilter()
 	{
 		if(self::$s_criteria_filter == null)
@@ -150,40 +151,5 @@ class MetadataPeer extends BaseMetadataPeer implements IRelatedObjectPeer
 	public static function getCacheInvalidationKeys()
 	{
 		return array(array("metadata:objectId=%s", self::OBJECT_ID));		
-	}
-
-	/* (non-PHPdoc)
-	 * @see IRelatedObjectPeer::getRootObjects()
-	 */
-	public function getRootObjects(IRelatedObject $object)
-	{
-		$parentObject = kMetadataManager::getObjectFromPeer($object);
-		$roots = array();
-		if($parentObject && $parentObject instanceof IRelatedObjectPeer) 
-		{
-			$parentPeer = $parentObject->getPeer();
-			if($parentPeer instanceof IRelatedObjectPeer)
-			{
-				$roots = $parentPeer->getRootObjects($parentObject);
-			}
-			$roots[] = $parentObject;
-		}
-		return $roots;
-	}
-
-	/* (non-PHPdoc)
-	 * @see IRelatedObjectPeer::isReferenced()
-	 */
-	public function isReferenced(IRelatedObject $object)
-	{
-		/* @var $object Metadata */
-		if($object->getObjectType() == MetadataObjectType::DYNAMIC_OBJECT)
-		{
-			return true;
-		}
-		else
-		{
-			return false;
-		}
 	}
 } // MetadataPeer

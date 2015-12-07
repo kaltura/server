@@ -3,7 +3,7 @@
  * @package api
  * @subpackage objects
  */
-class KalturaAccessControlProfile extends KalturaObject implements IRelatedFilterable 
+class KalturaAccessControlProfile extends KalturaObject implements IFilterable 
 {
 	/**
 	 * The id of the Access Control Profile

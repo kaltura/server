@@ -27,10 +27,18 @@ class myEntryUtils
 	
 	public static function createThumbnailAssetFromFile(entry $entry, $filePath)
 	{	
-		$fileLocation = tempnam(sys_get_temp_dir(), $entry->getId());
-		$res = KCurlWrapper::getDataFromFile($filePath, $fileLocation, kConf::get('thumb_size_limit'));
+		try {
+			$fileLocation = tempnam(sys_get_temp_dir(), $entry->getId());
+			$res = KCurlWrapper::getDataFromFile($filePath, $fileLocation, kConf::get('thumb_size_limit'));
+		}
+		catch(Exception $e) {
+			KalturaLog::debug($e->getMessage());
+			throw new Exception("Data Retrieval Failed");	
+		}
+		
 		if (!$res){
-			throw new Exception("thumbnail cannot be created from $filePath " . error_get_last());
+			KalturaLog::debug("thumbnail cannot be created from $filePath " . error_get_last());
+			throw new Exception("thumbnail file path is not valid");
 		}	
 		
 		$thumbAsset = new thumbAsset();
@@ -319,10 +327,13 @@ class myEntryUtils
 			return ; // don't do this twice !
 			
 		 if ($onlyIfAllJobsDone) {
+			KalturaLog::DEBUG("onlyIfAllJobsDone = ". (int)$onlyIfAllJobsDone);
 			$dbEntryBatchJobLocks = BatchJobLockPeer::retrieveByEntryId($entry->getId());
 			foreach($dbEntryBatchJobLocks as $jobLock) {
 				/* @var $jobLock BatchJobLock */
-				KalturaLog::info("Entry [". $entry->getId() ."] still has an unhandled batchjob [". $jobLock->getId()."] with status [". $jobLock->getStatus()."] - aborting deletion process.");
+				$job = $jobLock->getBatchJob();
+				/* @var $job BatchJob */
+				KalturaLog::DEBUG("Entry [". $entry->getId() ."] still has an unhandled batchjob [". $job->getId()."] with status [". $job->getStatus()."] - aborting deletion process.");
 				//mark entry for later deletion
 				$entry->setMarkedForDeletion(true);
 				$entry->save();
@@ -727,11 +738,6 @@ class myEntryUtils
 				// if we already captured the frame at that second, dont recapture, just use the existing file
 				if (!file_exists($orig_image_path))
 				{
-					// limit creation of more than XX ffmpeg image extraction processes
-					if (kConf::hasParam("resize_thumb_max_processes_ffmpeg") &&
-						trim(exec("ps -e -ocmd|awk '{print $1}'|grep -c ".kConf::get("bin_path_ffmpeg") )) > kConf::get("resize_thumb_max_processes_ffmpeg"))
-						KExternalErrors::dieError(KExternalErrors::TOO_MANY_PROCESSES);
-				    
 					// creating the thumbnail is a very heavy operation
 					// prevent calling it in parallel for the same thubmnail for 5 minutes
 					$cache = new myCache("thumb-processing", 5 * 60); // 5 minutes
@@ -741,29 +747,20 @@ class myEntryUtils
 						
 					$cache->put($orig_image_path, true);
 					
-					$flavorAsset = assetPeer::retrieveHighestBitrateByEntryId($entry->getId(), flavorParams::TAG_THUMBSOURCE);
+				    $flavorAsset = assetPeer::retrieveHighestBitrateByEntryId($entry->getId(), flavorParams::TAG_THUMBSOURCE);
 					if(is_null($flavorAsset))
 					{
-						$flavorAsset = assetPeer::retrieveOriginalReadyByEntryId($entry->getId());
-			                        if($flavorAsset)
-			                        {
-			                            $flavorSyncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-			                            list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($flavorSyncKey,false,false);
-			                            if (!$fileSync)
-			                            {
-			                                $flavorAsset = null;
-			                            }
-			                        }
-		    				if(is_null($flavorAsset) || !($flavorAsset->hasTag(flavorParams::TAG_MBR) || $flavorAsset->hasTag(flavorParams::TAG_WEB)))
-						{
-	    					// try the best playable
-							$flavorAsset = assetPeer::retrieveHighestBitrateByEntryId($entry->getId(), null, flavorParams::TAG_SAVE_SOURCE);
-						}
-						if (is_null($flavorAsset))
-						{
-	    						// if no READY ORIGINAL entry is available, try to retrieve a non-READY ORIGINAL entry
-							$flavorAsset = assetPeer::retrieveOriginalByEntryId($entry->getId());
-						}
+    					$flavorAsset = assetPeer::retrieveOriginalReadyByEntryId($entry->getId());
+	    				if(is_null($flavorAsset) || !($flavorAsset->hasTag(flavorParams::TAG_MBR) || $flavorAsset->hasTag(flavorParams::TAG_WEB)))
+					    {
+    						// try the best playable
+						    $flavorAsset = assetPeer::retrieveHighestBitrateByEntryId($entry->getId());
+					    }
+					    if (is_null($flavorAsset))
+					    {
+    						// if no READY ORIGINAL entry is available, try to retrieve a non-READY ORIGINAL entry
+						    $flavorAsset = assetPeer::retrieveOriginalByEntryId($entry->getId());
+					    }
 					}
 					if (is_null($flavorAsset))
 					{
@@ -782,24 +779,12 @@ class myEntryUtils
 						$cache->remove($orig_image_path);
 						throw new kFileSyncException('no ready filesync on current DC', kFileSyncException::FILE_DOES_NOT_EXIST_ON_CURRENT_DC);
 					}
-					
-					// close db connections as we won't be requiring the database anymore and capturing a thumbnail may take a long time
-					kFile::closeDbConnections();
-					
 					myFileConverter::autoCaptureFrame($entry_data_path, $capturedThumbPath."temp_", $calc_vid_sec, -1, -1);
 					
 					$cache->remove($orig_image_path);
 				}
 			}
 
-			// close db connections as we won't be requiring the database anymore and image manipulation may take a long time
-			kFile::closeDbConnections();
-			
-			// limit creation of more than XX Imagemagick processes
-			if (kConf::hasParam("resize_thumb_max_processes_imagemagick") &&
-				trim(exec("ps -e -ocmd|awk '{print $1}'|grep -c ".kConf::get("bin_path_imagemagick") )) > kConf::get("resize_thumb_max_processes_imagemagick"))
-				KExternalErrors::dieError(KExternalErrors::TOO_MANY_PROCESSES);
-								    
 			// resizing (and editing)) an image file that failes results in a long server waiting time
 			// prevent this waiting time (of future requests) in case the resizeing failes
 			$cache = new myCache("thumb-processing-resize", 5 * 60); // 5 minutes
@@ -1016,86 +1001,6 @@ PuserKuserPeer::getCriteriaFilter()->disable();
  		$entry->setRank(0);
  		$entry->setTotalRank(0);
 	}
-
-	public static function copyEntryData(entry $entry, entry $targetEntry)
-	{
-		// for any type that does not require assets:
-		$shouldCopyDataForNonClip = true;
-		if ($entry->getType() == entryType::MEDIA_CLIP)
-			$shouldCopyDataForNonClip = false;
-		if ($entry->getType() == entryType::PLAYLIST)
-			$shouldCopyDataForNonClip = false;
-
-		$shouldCopyDataForClip = false;
-		// only images get their data copied
-		if($entry->getType() == entryType::MEDIA_CLIP)
-		{
-			if($entry->getMediaType() != entry::ENTRY_MEDIA_TYPE_VIDEO &&
-				$entry->getMediaType() != entry::ENTRY_MEDIA_TYPE_AUDIO)
-			{
-				$shouldCopyDataForClip = true;
-			}
-		}
-
-		if($shouldCopyDataForNonClip || $shouldCopyDataForClip)
-		{
-			// copy the data
-			$from = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA); // replaced__getDataPath
-			$to = $targetEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA); // replaced__getDataPath
-			KalturaLog::log("copyEntriesByType - copying entry data [".$from."] to [".$to."]");
-			kFileSyncUtils::softCopy($from, $to);
-		}
-
-		$ismFrom = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_ISM);
-		if(kFileSyncUtils::fileSync_exists($ismFrom))
-		{
-			$ismTo = $targetEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_ISM);
-			KalturaLog::log("copying entry ism [".$ismFrom."] to [".$ismTo."]");
-			kFileSyncUtils::softCopy($ismFrom, $ismTo);
-		}
-
-		$ismcFrom = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_ISMC);
-		if(kFileSyncUtils::fileSync_exists($ismcFrom))
-		{
-			$ismcTo = $targetEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_ISMC);
-			KalturaLog::log("copying entry ism [".$ismcFrom."] to [".$ismcTo."]");
-			kFileSyncUtils::softCopy($ismcFrom, $ismcTo);
-		}
-
-		$from = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB); // replaced__getThumbnailPath
-		$considerCopyThumb = true;
-		// if entry is image - data is thumbnail, and it was copied
-		if($entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_IMAGE)
-			$considerCopyThumb = false;
-		// if entry is not clip, and there is no file in both DCs - nothing to copy
-		if($entry->getType() != entryType::MEDIA_CLIP && !kFileSyncUtils::file_exists($from, true))
-			$considerCopyThumb = false;
-		if ( $considerCopyThumb )
-		{
-			$skipThumb = false;
-			// don't attempt to copy a thumbnail for images - it's the same as the data which was just created
-			if($entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_AUDIO)
-			{
-				// check if audio entry has real thumb, if not - don't copy thumb.
-				$originalFileSync = kFileSyncUtils::getOriginFileSyncForKey($from, false);
-				if(!$originalFileSync)
-				{
-					$skipThumb = true;
-				}
-			}
-			if(!$skipThumb)
-			{
-				$to = $targetEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB); // replaced__getThumbnailPath
-				KalturaLog::log("copyEntriesByType - copying entry thumbnail [".$from."] to [".$to."]");
-				kFileSyncUtils::softCopy($from, $to);
-			}
-		}
-
-		// added by Tan-Tan 12/01/2010 to support falvors copy
-		$sourceAssets = assetPeer::retrieveByEntryId($entry->getId());
-		foreach($sourceAssets as $sourceAsset)
-			$sourceAsset->copyToEntry($targetEntry->getId(), $targetEntry->getPartnerId());
-	}
 	
 	public static function copyEntry(entry $entry, Partner $toPartner = null, $dontCopyUsers = false)
  	{
@@ -1159,16 +1064,25 @@ PuserKuserPeer::getCriteriaFilter()->disable();
  		$defaultCategoryFilter->addAnd(categoryPeer::PARTNER_ID, $oldPartnerId);
  		
  		KalturaLog::log("copyEntry - New entry [".$newEntry->getId()."] was created");
-
-		if ( $entry->getStatus() != entryStatus::READY ) {
-			$clonePendingEntries = $entry->getClonePendingEntries();
-			$clonePendingEntries[] = $newEntry->getId();
-			$entry->setClonePendingEntries($clonePendingEntries);
-			$entry->save();
-		} else {
-			self::copyEntryData( $entry, $newEntry );
+		
+		// for any type that does not require assets:
+		$shouldCopyDataForNonClip = true;
+		if ($entry->getType() == entryType::MEDIA_CLIP)
+		    $shouldCopyDataForNonClip = false;    
+		if ($entry->getType() == entryType::PLAYLIST)
+		    $shouldCopyDataForNonClip = false;
+		
+		$shouldCopyDataForClip = false;
+		// only images get their data copied
+		if($entry->getType() == entryType::MEDIA_CLIP)
+		{
+			if($entry->getMediaType() != entry::ENTRY_MEDIA_TYPE_VIDEO &&
+			   $entry->getMediaType() != entry::ENTRY_MEDIA_TYPE_AUDIO)
+			   {
+				$shouldCopyDataForClip = true;
+			   }
 		}
-
+		
  	    //if entry is a static playlist, link between it and its new child entries
 		if ($entry->getType() == entryType::PLAYLIST)
 		{
@@ -1233,6 +1147,63 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		            break;
 		    }
 		}
+		
+		if($shouldCopyDataForNonClip || $shouldCopyDataForClip)
+		{
+	 		// copy the data
+			$from = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA); // replaced__getDataPath
+	 		$to = $newEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA); // replaced__getDataPath
+	 		KalturaLog::log("copyEntriesByType - copying entry data [".$from."] to [".$to."]");
+			kFileSyncUtils::softCopy($from, $to);
+		}
+		
+		$ismFrom = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_ISM);		
+		if(kFileSyncUtils::fileSync_exists($ismFrom))
+		{
+			$ismTo = $newEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_ISM);
+			KalturaLog::log("copying entry ism [".$ismFrom."] to [".$ismTo."]");
+			kFileSyncUtils::softCopy($ismFrom, $ismTo);
+		}
+		
+		$ismcFrom = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_ISMC);		
+		if(kFileSyncUtils::fileSync_exists($ismcFrom))
+		{
+			$ismcTo = $newEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_ISMC);
+			KalturaLog::log("copying entry ism [".$ismcFrom."] to [".$ismcTo."]");
+			kFileSyncUtils::softCopy($ismcFrom, $ismcTo);
+		}
+ 		
+		$from = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB); // replaced__getThumbnailPath
+		$considerCopyThumb = true;
+		// if entry is image - data is thumbnail, and it was copied
+		if($entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_IMAGE) $considerCopyThumb = false;
+		// if entry is not clip, and there is no file in both DCs - nothing to copy
+		if($entry->getType() != entryType::MEDIA_CLIP && !kFileSyncUtils::file_exists($from, true)) $considerCopyThumb = false;
+		if ( $considerCopyThumb ) 
+		{
+			$skipThumb = false;
+			// don't attempt to copy a thumbnail for images - it's the same as the data which was just created
+			if($entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_AUDIO)
+			{
+				// check if audio entry has real thumb, if not - don't copy thumb.
+				$originalFileSync = kFileSyncUtils::getOriginFileSyncForKey($from, false);
+				if(!$originalFileSync)
+				{
+					$skipThumb = true;
+				}
+			}
+			if(!$skipThumb)
+			{
+				$to = $newEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB); // replaced__getThumbnailPath
+				KalturaLog::log("copyEntriesByType - copying entry thumbnail [".$from."] to [".$to."]");
+				kFileSyncUtils::softCopy($from, $to);
+			}
+		}
+
+		// added by Tan-Tan 12/01/2010 to support falvors copy
+		$sourceAssets = assetPeer::retrieveByEntryId($entry->getId());
+		foreach($sourceAssets as $sourceAsset)
+			$sourceAsset->copyToEntry($newEntry->getId(), $newEntry->getPartnerId());
  	
 		// copy relationships to categories
 		KalturaLog::debug('Copy relationships to categories from entry [' . $entry->getId() . '] to entry [' . $newEntry->getId() . ']');

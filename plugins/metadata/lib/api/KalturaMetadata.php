@@ -3,7 +3,7 @@
  * @package plugins.metadata
  * @subpackage api.objects
  */
-class KalturaMetadata extends KalturaObject implements IRelatedFilterable 
+class KalturaMetadata extends KalturaObject implements IFilterable 
 {
 	/**
 	 * 

@@ -44,7 +44,7 @@ class categoryKuser extends BasecategoryKuser implements IIndexable{
 	
 	public function setPuserId($puserId)
 	{
-		if ( $this->getPuserId() == $puserId )  // same value - don't set for nothing 
+		if ( self::getPuserId() == $puserId )  // same value - don't set for nothing 
 			return;
 
 		parent::setPuserId($puserId);
@@ -74,7 +74,7 @@ class categoryKuser extends BasecategoryKuser implements IIndexable{
 	 */
 	public function setKuserId($kuserId)
 	{
-		if ( $this->getKuserId() == $kuserId )  // same value - don't set for nothing 
+		if ( self::getKuserId() == $kuserId )  // same value - don't set for nothing 
 			return;
 
 		parent::setKuserId($kuserId);
@@ -410,8 +410,4 @@ class categoryKuser extends BasecategoryKuser implements IIndexable{
 	}
 
 
-	public function getCacheInvalidationKeys()
-	{
-		return array("categoryKuser:categoryId=".strtolower($this->getCategoryId()));
-	}
 } // categoryKuser

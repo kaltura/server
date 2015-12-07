@@ -61,9 +61,8 @@ class KalturaTagFilter extends KalturaFilter
 
 	public function validate()
 	{
-		$this->leaveOnlyOneSpaceOnTheRight(array ('tagStartsWith'));
-		$this->trimStringProperties(array('tagEqual'));
-		$this->validatePropertyMinLength('tagStartsWith', TagSearchPlugin::MIN_TAG_SEARCH_LENGTH, true, false);
+		$this->trimStringProperties(array ('tagStartsWith', 'tagEqual'));
+		$this->validatePropertyMinLength('tagStartsWith', TagSearchPlugin::MIN_TAG_SEARCH_LENGTH, true, true);
 		$this->validatePropertyMinLength('tagEqual', TagSearchPlugin::MIN_TAG_SEARCH_LENGTH, true, true);
 	}
 	
@@ -85,20 +84,5 @@ class KalturaTagFilter extends KalturaFilter
 		$object->set ('_likex_tag', str_replace(kTagFlowManager::$specialCharacters, kTagFlowManager::$specialCharactersReplacement, $this->tagStartsWith));
 		
 		return parent::toObject($object, $props_to_skip);
-	}
-
-	/*
-	 * This method trims the spaces on the left. If there are spaces on the right it trims them and leaves exactly one.
-	 */
-	public function leaveOnlyOneSpaceOnTheRight(array $propertyNames)
-	{
-		foreach ($propertyNames as $propertyName)
-		{
-			if (!$this->isNull($propertyName))
-			{
-				$this->$propertyName = ltrim($this->$propertyName);
-				$this->$propertyName = preg_replace("/\s+$/", " ", $this->$propertyName);
-			}
-		}
 	}
 }

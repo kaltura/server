@@ -13,7 +13,7 @@
  * @package plugins.shortLink
  * @subpackage model
  */
-class ShortLink extends BaseShortLink implements IBaseObject {
+class ShortLink extends BaseShortLink {
 
 	protected $puserId;
 	

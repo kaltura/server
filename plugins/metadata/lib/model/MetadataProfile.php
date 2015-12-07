@@ -14,7 +14,7 @@
  * @subpackage model
  */
 class MetadataProfile extends BaseMetadataProfile implements ISyncableFile
-{   
+{
 	const FILE_SYNC_METADATA_DEFINITION = 1;
 	const FILE_SYNC_METADATA_VIEWS = 2;
 	const FILE_SYNC_METADATA_XSLT = 3;
@@ -24,11 +24,6 @@ class MetadataProfile extends BaseMetadataProfile implements ISyncableFile
 	const STATUS_TRANSFORMING = 3;
 	
 	const CUSTOM_DATA_METADATA_XSLT_VERSION = 'metadata_xslt_version';
-	const CUSTOM_DATA_DISABLE_REINDEXING = 'disable_reindexing';
-	
-	private $xsdData = null;
-	private $viewsData = null;
-	private $xsltData = null;
 	
 	/* (non-PHPdoc)
 	 * @see metadata/lib/model/om/BaseMetadata#preInsert()
@@ -36,6 +31,8 @@ class MetadataProfile extends BaseMetadataProfile implements ISyncableFile
 	public function preInsert(PropelPDO $con = null)
 	{
 		$this->incrementVersion();
+		$this->incrementViewsVersion();
+		$this->incrementXsltVersion();
 		return parent::preInsert($con);
 	}
 
@@ -58,60 +55,12 @@ class MetadataProfile extends BaseMetadataProfile implements ISyncableFile
 			
 		return $ret;
 	}
-	
-		/* (non-PHPdoc)
-	 * @see BaseMetadataProfile::preSave()
-	 */
-	public function preSave(PropelPDO $con = null)
-	{
-	    if($this->xsdData)
-	        $this->incrementFileSyncVersion();
-	    
-	    if($this->viewsData)
-	        $this->incrementViewsVersion();
-	    
-	    if($this->xsltData)
-	        $this->incrementXsltVersion();
-	    
-	    return parent::preSave($con);
-	}
-	
-		/* (non-PHPdoc)
-	 * @see BaseMetadataProfile::postSave()
-	 */
-	public function postSave(PropelPDO $con = null)
-	{
-    	if($this->xsdData)
-    	{
-        	$key = $this->getSyncKey(MetadataProfile::FILE_SYNC_METADATA_DEFINITION);
-            kFileSyncUtils::file_put_contents($key, $this->xsdData);
-                
-            kMetadataManager::parseProfileSearchFields($this->getPartnerId(), $this);
-    	}
-    	         
-        if($this->viewsData)
-    	{
-			$key = $this->getSyncKey(MetadataProfile::FILE_SYNC_METADATA_VIEWS);
-			kFileSyncUtils::file_put_contents($key, $this->viewsData);
-		}
-            
-		if($this->xsltData)
-		{
-			$key = $this->getSyncKey(MetadataProfile::FILE_SYNC_METADATA_XSLT);
-			kFileSyncUtils::file_put_contents($key, $this->xsltData);
-		}
-	
-	    return parent::postSave($con);
-	}
-	
+
 	public function incrementVersion()
 	{
-		$this->setVersion($this->getFileSyncVersion());
-	}
-	
-	public function incrementFileSyncVersion() {
-		$newVersion = kFileSyncUtils::calcObjectNewVersion($this->getId(), $this->getFileSyncVersion(), FileSyncObjectType::METADATA_PROFILE, self::FILE_SYNC_METADATA_DEFINITION);
-		$this->setFileSyncVersion($newVersion);
+		$newVersion = kFileSyncUtils::calcObjectNewVersion($this->getId(), $this->getVersion(), FileSyncObjectType::METADATA_PROFILE, self::FILE_SYNC_METADATA_DEFINITION);
+		
+		$this->setVersion($newVersion);
 	}
 
 	public function incrementViewsVersion()
@@ -136,18 +85,9 @@ class MetadataProfile extends BaseMetadataProfile implements ISyncableFile
     public function getXsltVersion()
 	{
 	    return $this->getFromCustomData(self::CUSTOM_DATA_METADATA_XSLT_VERSION);
-	}
-
-	public function setDisableReIndexing($value)
-	{
-		$this->putInCustomData(self::CUSTOM_DATA_DISABLE_REINDEXING, (bool)$value);
-	}
-
-	public function getDisableReIndexing()
-	{
-		return $this->getFromCustomData(self::CUSTOM_DATA_DISABLE_REINDEXING, null, false);
-	}
-
+	}	
+	
+	
 	/**
 	 * @param int $sub_type
 	 * @throws FileSyncException
@@ -180,7 +120,7 @@ class MetadataProfile extends BaseMetadataProfile implements ISyncableFile
 		switch($sub_type)
 		{
 			case self::FILE_SYNC_METADATA_DEFINITION:
-				return $this->getFileSyncVersion();
+				return $this->getVersion();
 				
 			case self::FILE_SYNC_METADATA_VIEWS:
 				return $this->getViewsVersion();
@@ -271,45 +211,4 @@ class MetadataProfile extends BaseMetadataProfile implements ISyncableFile
 			
 		$this->putInCustomData('requiredCopyTemplatePermissions', $v);
 	}
-	
-	public function getPreviousFileSyncVersion() {
-		$this->getFromCustomData('previousFileSyncVersion');
-	}
-	
-	public function setPreviousFileSyncVersion($v) {
-		$this->putInCustomData('previousFileSyncVersion', $v);
-	}
-	
-	public function setFileSyncVersion($v) {
-		$this->setPreviousFileSyncVersion($this->getFileSyncVersion());
-		parent::setFileSyncVersion($v);
-	}
-	
-	public function setXsdData($xsdData)
-	{
-	    $this->xsdData = $xsdData;
-	}
-	
-	public function setViewesData($viewsData)
-	{
-	    $this->viewsData = $viewsData;
-	}
-	
-	public function setXsltData($xsltData)
-	{
-	    $this->xsltData = $xsltData;
-	}
-
-	public function getFileSyncVersion()
-	{
-		$fileSyncVersion = parent::getFileSyncVersion();
-		if (is_null($fileSyncVersion))
-		{
-			return $this->getVersion();
-		}
-		return $fileSyncVersion;
-
-	}
-
-
 } // MetadataProfile

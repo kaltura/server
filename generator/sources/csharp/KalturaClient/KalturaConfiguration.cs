@@ -25,7 +25,7 @@
 //
 // @ignore
 // ===================================================================================================
-using System;
+﻿using System;
 using System.Text;
 using System.Net;
 
@@ -37,8 +37,10 @@ namespace Kaltura
 
         private string _ServiceUrl = "http://www.kaltura.com/";
         private EKalturaServiceFormat _ServiceFormat = EKalturaServiceFormat.RESPONSE_TYPE_XML;
+        private int _PartnerId;
         private IKalturaLogger _Logger;
         private int _Timeout = 120000;
+        private string _ClientTag = "dotnet:@DATE@";
 		private string _ProxyAddress = "";
 		private string _ProxyUser = null;
         private string _ProxyPassword = null;
@@ -59,6 +61,12 @@ namespace Kaltura
             get { return _ServiceFormat; }
         }
 
+        public int PartnerId
+        {
+            set { _PartnerId = value; }
+            get { return _PartnerId; }
+        }
+
         public IKalturaLogger Logger
         {
             set { _Logger = value;  }
@@ -69,6 +77,12 @@ namespace Kaltura
         {
             set { _Timeout = value; }
             get { return _Timeout; }
+        }
+
+        public string ClientTag
+        {
+            set { _ClientTag = value; }
+            get { return _ClientTag; }
         }
 
 		public string ProxyAddress 
@@ -101,8 +115,9 @@ namespace Kaltura
         /// Constructs new kaltura configuration object, expecting partner id
         /// </summary>
         /// <param name="partnerId"></param>
-        public KalturaConfiguration()
+        public KalturaConfiguration(int partnerId)
         {
+            this._PartnerId = partnerId;
             this._RequestHeaders = new WebHeaderCollection();
         } 
 

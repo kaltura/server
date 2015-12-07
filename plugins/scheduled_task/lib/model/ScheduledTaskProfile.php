@@ -13,7 +13,7 @@
  * @package plugins.scheduledTask
  * @subpackage model
  */
-class ScheduledTaskProfile extends BaseScheduledTaskProfile implements IBaseObject
+class ScheduledTaskProfile extends BaseScheduledTaskProfile
 {
 	public function setObjectFilter($v)
 	{

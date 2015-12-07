@@ -13,7 +13,7 @@
  * @package Core
  * @subpackage model
  */
-class PermissionItemPeer extends BasePermissionItemPeer implements IRelatedObjectPeer
+class PermissionItemPeer extends BasePermissionItemPeer
 {
 
 	public static function checkValidForParther($permissionIdsStr, $partnerId)
@@ -38,19 +38,5 @@ class PermissionItemPeer extends BasePermissionItemPeer implements IRelatedObjec
 		}
 	}
 	
-	/* (non-PHPdoc)
-	 * @see IRelatedObjectPeer::getRootObjects()
-	 */
-	public function getRootObjects(IRelatedObject $object)
-	{
-		return array();
-	}
-
-	/* (non-PHPdoc)
-	 * @see IRelatedObjectPeer::isReferenced()
-	 */
-	public function isReferenced(IRelatedObject $object)
-	{
-		return true;
-	}
+	
 } // PermissionItemPeer

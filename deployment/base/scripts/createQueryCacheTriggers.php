@@ -36,17 +36,12 @@ $INVALIDATION_KEYS = array(
 	array('table' => "permission_to_permission_item", 	'keys' => array(array("'permissionToPermissionItem:permissionId='", '@OBJ@.permission_id'))),
 	array('table' => "delivery_profile", 				'keys' => array(array("'deliveryProfile:id='", '@OBJ@.id'), array("'deliveryProfile:partnerId='", '@OBJ@.partner_id'))),
 	array('table' => "event_notification_template", 	'keys' => array(array("'eventNotificationTemplate:partnerId='", '@OBJ@.partner_id')),													'plugin' => 'event_notification'),
-	array('table' => "category_kuser", 					'keys' => array(array("'categoryKuser:categoryId='", '@OBJ@.category_id'))),
-	array('table' => "kuser_kgroup", 					'keys' => array(array("'kuserKgroup:kuserId='", '@OBJ@.kuser_id'))),
 	);
 
 $TRIGGER_TYPES = array('INSERT', 'UPDATE', 'DELETE');
 
-$SPECIAL_TRIGGERS = array(
-	"invalid_session/INSERT" => "DO memc_set(concat('invalid_session_', IF(NEW.ks IS NULL, '', NEW.ks)), 1, IF(NEW.ks_valid_until IS NULL, 0, UNIX_TIMESTAMP(NEW.ks_valid_until) + 600));",
-	"file_sync/INSERT" => "IF (NEW.original) THEN DO memc_set(concat('fileSyncMaxId-dc', NEW.dc), NEW.id); END IF;",
-);
-
+$SPECIAL_TRIGGERS = array("invalid_session/INSERT" => "DO memc_set(concat('invalid_session_', IF(NEW.ks IS NULL, '', NEW.ks)), 1, IF(NEW.ks_valid_until IS NULL, 0, UNIX_TIMESTAMP(NEW.ks_valid_until) + 600));");
+	
 function generateInvalidationKeyCode($invalidationKey)
 {
 	$objKeys = array();

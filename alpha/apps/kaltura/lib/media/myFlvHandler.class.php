@@ -30,7 +30,7 @@ class myFlvHandler
 	private $fh = null;
 	private $status;
 
-	public function __construct($flv_file_name)
+	public function myFlvHandler($flv_file_name)
 	{
 		$this->flv_file_name = $flv_file_name;
 		

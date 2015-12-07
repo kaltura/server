@@ -5,10 +5,7 @@
  */
 class ComcastMrssFeed
 {
-	const TEXT = 'plain/text';
 
-	const MILLISECONDS = 'milliseconds';
-	
 	/**
 	 * @var DOMDocument
 	 */
@@ -33,16 +30,6 @@ class ComcastMrssFeed
 	 * @var DOMElement
 	 */
 	protected $thumbnail;
-	
-	/**
-	 * @var DOMElement
-	 */
-	protected $caption;
-	
-	/**
-	 * @var DOMElement
-	 */
-	protected $cuePoint;
 	
 	/**
 	 * @var DOMElement
@@ -85,16 +72,6 @@ class ComcastMrssFeed
 		// thumbnail node template
 		$node = $this->xpath->query('media:group/media:thumbnail', $this->item)->item(0);
 		$this->thumbnail = $node->cloneNode(true);
-		$node->parentNode->removeChild($node);
-		
-		// caption node template
-		$node = $this->xpath->query('media:group/media:subTitle', $this->item)->item(0);
-		$this->caption = $node->cloneNode(true);
-		$node->parentNode->removeChild($node);
-		
-		// cue point node template
-		$node = $this->xpath->query('cim:chapter', $this->item)->item(0);
-		$this->cuePoint = $node->cloneNode(true);
 		$node->parentNode->removeChild($node);
 		
 		// category node template
@@ -178,9 +155,9 @@ class ComcastMrssFeed
 		$channelNode->appendChild($importedItem);
 	}
 
-	public function getItemXml(array $values, array $flavorAssets = null, array $thumbAssets = null, array $captions = null, array $cuePoints = null)
+	public function getItemXml(array $values, array $flavorAssets = null, array $thumbAssets = null)
 	{
-		$item = $this->getItem($values, $flavorAssets, $thumbAssets, $captions, $cuePoints);
+		$item = $this->getItem($values, $flavorAssets, $thumbAssets);
 		return $this->doc->saveXML($item);
 	}
 	
@@ -196,7 +173,7 @@ class ComcastMrssFeed
 	 * @param array $flavorAssets
 	 * @param array $thumbAssets
 	 */
-	public function getItem(array $values, array $flavorAssets = null, array $thumbAssets = null, array $captionsAssets = null, array $cuePoints = null)
+	public function getItem(array $values, array $flavorAssets = null, array $thumbAssets = null)
 	{
 		$item = $this->item->cloneNode(true);
 		
@@ -241,12 +218,6 @@ class ComcastMrssFeed
 			
 		if (is_array($thumbAssets))
 			$this->setThumbAssets($item, $thumbAssets);
-			
-		if (is_array($captionsAssets))
-			$this->setCaptionAssets($item, $captionsAssets);
-			
-		if (is_array ($cuePoints))
-			$this->setCuePoints($item, $cuePoints);
 			
 		return $item;
 	}
@@ -328,36 +299,6 @@ class ComcastMrssFeed
 			kXml::setNodeValue($this->xpath,'@height', $thumbAsset->getHeight(), $content);
 		}
 	}
-	
-	public function setCaptionAssets (DOMElement $item, array $captionAssets)
-	{
-		foreach ($captionAssets as $captionAsset)
-		{
-			/* @var $captionAsset captionAsset */
-			$content = $this->caption->cloneNode(true);
-			$mediaGroup = $this->xpath->query('media:group', $item)->item(0);
-			$mediaGroup->appendChild($content);
-			$url = $captionAsset->getDownloadUrl(true);
-			
-			kXml::setNodeValue($this->xpath,'@href', $url, $content);
-			kXml::setNodeValue($this->xpath,'@lang', $captionAsset->getLanguage(), $content);
-			kXml::setNodeValue($this->xpath,'@type', self::TEXT, $content);
-		}
-	}
-	
-	public function setCuePoints (DOMElement $item, array $cuePoints)
-	{
-		foreach ($cuePoints as $cuePoint)
-		{
-			/* @var $cuePoint cuePoint */
-			$content = $this->cuePoint->cloneNode(true);
-			$mediaGroup = $this->xpath->query('.', $item)->item(0);
-			$mediaGroup->appendChild($content);
-			
-			kXml::setNodeValue($this->xpath,'@type', self::MILLISECONDS, $content);
-			kXml::setNodeValue($this->xpath,'@startTime', $cuePoint->getStartTime(), $content);
-		}
-	}		
 	
 	/**
 	 * comcast used Z for UTC timezone in their example (2008-04-11T12:30:00Z)

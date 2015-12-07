@@ -48,34 +48,9 @@ class VodPackagerDeliveryUtils
 			$url = rtrim($urlPrefixPath, '/') . '/' . ltrim($url, '/');
 		}
 	
-		$urlPrefix = trim(preg_replace('#https?://#', '', $urlPrefix), '/');
-		$urlPrefix = $params->getMediaProtocol() . '://' . $urlPrefix;
+		if (strpos($urlPrefix, '://') === false)
+			$urlPrefix = $params->getMediaProtocol() . '://' . $urlPrefix;
 	
 		return array('url' => $url, 'urlPrefix' => $urlPrefix);
-	}
-	
-	public static function getExtraParams(DeliveryProfileDynamicAttributes $params) {
-	
-		$result = '';
-		
-		$seekStart = $params->getSeekFromTime();
-		if($seekStart > 0) 
-		{
-			$result .= '/clipFrom/' . $seekStart;
-		}
-			
-		$seekEnd = $params->getClipTo();
-		if($seekEnd) 
-		{
-			$result .= '/clipTo/' . $seekEnd;
-		}
-		
-		$playbackRate = $params->getPlaybackRate();
-		if($playbackRate) 
-		{
-			$result .= '/speed/' . $playbackRate;
-		}
-	
-		return $result;
 	}
 }

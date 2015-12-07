@@ -8,7 +8,7 @@ class LiveReportConstantStringEngine extends LiveReportEngine
 	protected $constString;
 	protected $params;
 
-	public function __construct($const, $params = array()) {
+	public function LiveReportConstantStringEngine($const, $params = array()) {
 		$this->constString = $const;
 		$this->params = $params;
 	}

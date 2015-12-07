@@ -125,9 +125,6 @@ class CliClientGenerator extends ClientGeneratorFromXml
 		$result = array();
 		foreach ($propertyNodes as $propertyNode)
 		{
-			if ($propertyNode->getAttribute("readOnly"))
-				continue;
-			
 			$curParam = $this->getNodeAttributes($propertyNode, array('name', 'type', 'enumType', 'arrayType'));
 			$result[$curParam['name']] = $curParam;
 		}

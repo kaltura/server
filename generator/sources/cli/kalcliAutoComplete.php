@@ -152,8 +152,7 @@ function getEnumValueList($enumType)
 
 function getActionParameters($serviceId, $actionName)
 {
-	return array_merge(getApiSchemaData("/actions/{$serviceId}/{$actionName}.action", array()), 
-		getTypePropertiesList('KalturaRequestConfiguration'));
+	return getApiSchemaData("/actions/{$serviceId}/{$actionName}.action", array());
 }
 
 function getActionParameterAttribute($serviceId, $actionName, $paramName, $attributeName)

@@ -25,6 +25,8 @@ class KAsyncVirusScan extends KJobHandlerWorker
 	
 	protected function scan(KalturaBatchJob $job, KalturaVirusScanJobData $data)
 	{
+		KalturaLog::debug("scan($job->id)");
+		
 		try
 		{
 			$engine = VirusScanEngine::getEngine($job->jobSubType);

@@ -6,6 +6,8 @@ class kPlayReadyEventsConsumer implements kObjectReplacedEventConsumer
 	 */
 	public function objectReplaced(BaseObject $object, BaseObject $replacingObject, BatchJob $raisedJob = null) 
 	{
+		KalturaLog::debug("check for DRM key replacement");
+		
 		try 
 		{
 			$replacingDrmKey = $this->getDrmKey($replacingObject);
@@ -13,7 +15,7 @@ class kPlayReadyEventsConsumer implements kObjectReplacedEventConsumer
 			{
 				$newKeyId = $replacingDrmKey->getDrmKey();
 				
-				KalturaLog::info("replacing drm key with: ".$newKeyId);
+				KalturaLog::debug("replacing drm key with: ".$newKeyId);
 				
 				$entryDrmKey = $this->getDrmKey($object);
 				if(!$entryDrmKey)

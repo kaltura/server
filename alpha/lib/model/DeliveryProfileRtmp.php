@@ -5,7 +5,6 @@ class DeliveryProfileRtmp extends DeliveryProfileVod {
 	protected $FLV_FILE_EXTENSION = "flv";
 	protected $NON_FLV_FILE_EXTENSION = "mp4";
 	protected $REDUNDANT_EXTENSIONS = array('.mp4','.flv');
-	private $baseUrl = '';
 	
 	function __construct() {
 		parent::__construct();
@@ -65,7 +64,7 @@ class DeliveryProfileRtmp extends DeliveryProfileVod {
 			}
 			$url = $this->getPrefix() . $url;
 		}
-		$url = $this->formatByExtension($url, false); 
+		$url = $this->formatByExtension($url); 
 		
 		$url = str_replace($this->REDUNDANT_EXTENSIONS, '', $url);
 		return $url;
@@ -85,21 +84,15 @@ class DeliveryProfileRtmp extends DeliveryProfileVod {
 	// -----   Serve functionality  --------
 	// -------------------------------------
 	
-	public function buildServeFlavors()
+	public function serve()
 	{
 		$baseUrl = null;
 		$flavors = $this->buildRtmpFlavorsArray($baseUrl);		
 		if(!count($flavors))
 			KExternalErrors::dieError(KExternalErrors::FLAVOR_NOT_FOUND);
 
-		$this->baseUrl = $baseUrl;
-		return $flavors;
-	}
-	
-	public function getRenderer($flavors)
-	{
-		$renderer = parent::getRenderer($flavors);
-		$renderer->baseUrl = $this->baseUrl;
+		$renderer = $this->getRenderer($flavors);
+		$renderer->baseUrl = $baseUrl;
 		return $renderer;
 	}
 	

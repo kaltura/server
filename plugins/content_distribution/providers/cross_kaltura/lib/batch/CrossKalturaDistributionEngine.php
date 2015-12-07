@@ -127,6 +127,7 @@ class CrossKalturaDistributionEngine extends DistributionEngine implements
 	protected function initClients(KalturaCrossKalturaDistributionProfile $distributionProfile)
 	{
 	    // init source client
+	    KalturaLog::debug('Initializing source kaltura client');	    
 	    $sourceClientConfig = new KalturaConfiguration($distributionProfile->partnerId);
         $sourceClientConfig->serviceUrl = KBatchBase::$kClient->getConfig()->serviceUrl; // copy from static batch client
         $sourceClientConfig->setLogger($this);
@@ -134,6 +135,7 @@ class CrossKalturaDistributionEngine extends DistributionEngine implements
         $this->sourceClient->setKs(KBatchBase::$kClient->getKs()); // copy from static batch client
 	    
 	    // init target client
+	    KalturaLog::debug('Initializing target kaltura client');
 	    $targetClientConfig = new KalturaConfiguration($distributionProfile->targetAccountId);
         $targetClientConfig->serviceUrl = $distributionProfile->targetServiceUrl;
 		$targetClientConfig->setLogger($this);
@@ -159,6 +161,7 @@ class CrossKalturaDistributionEngine extends DistributionEngine implements
             }
             else
             {
+                KalturaLog::err('Missing CaptionPlugin');
                 throw new Exception('Missing CaptionPlugin');   
             }
 	    }	    
@@ -173,6 +176,7 @@ class CrossKalturaDistributionEngine extends DistributionEngine implements
             }
 	        else
             {
+                KalturaLog::err('Missing CuePointPlugin');
                 throw new Exception('Missing CuePointPlugin');      
             }
 	    }
@@ -203,10 +207,9 @@ class CrossKalturaDistributionEngine extends DistributionEngine implements
 	 */
 	protected function getSourceObjects(KalturaDistributionJobData $data)
 	{
+	    KalturaLog::debug('Getting source entry objects');
 	    $sourceEntryId = $data->entryDistribution->entryId;
-		KBatchBase::impersonate($this->distributionProfile->partnerId);
-		$sourceObjects = $this->getEntryObjects(KBatchBase::$kClient, $sourceEntryId, $data);
-		KBatchBase::unimpersonate();
+	    $sourceObjects = $this->getEntryObjects($this->sourceClient, $sourceEntryId, $data);	    
 	    return $sourceObjects;   
 	}
 	
@@ -224,6 +227,7 @@ class CrossKalturaDistributionEngine extends DistributionEngine implements
         $remoteCaptionAssetContent = $data->distributionProfile->distributeRemoteCaptionAssetContent;
 	    
 	    // get entry
+	    KalturaLog::debug('Getting entry id ['.$entryId.']');
 	    $entry = $client->baseEntry->get($entryId);
 	    
 	    // get entry's flavor assets chosen for distribution
@@ -234,6 +238,7 @@ class CrossKalturaDistributionEngine extends DistributionEngine implements
     	    $flavorAssetFilter->idIn = $data->entryDistribution->flavorAssetIds;
     	    $flavorAssetFilter->entryIdEqual = $entryId;
     	    try {
+                KalturaLog::debug('Getting entry\'s flavor assets');
                 $flavorAssetsList = $client->flavorAsset->listAction($flavorAssetFilter);
                 foreach ($flavorAssetsList->objects as $asset)
                 {
@@ -247,10 +252,11 @@ class CrossKalturaDistributionEngine extends DistributionEngine implements
 	    }
 	    else
 	    {
-	        KalturaLog::log('No flavor assets set for distribution!');    
+	        KalturaLog::debug('No flavor assets set for distribution!');    
 	    }
 	    
 	    // get flavor assets content
+	    KalturaLog::debug('Getting flavor asset content for ids ['.implode(',', array_keys($flavorAssets)).']');
 	    $flavorAssetsContent = array();
 	    foreach ($flavorAssets as $flavorAsset)
 	    {
@@ -266,6 +272,7 @@ class CrossKalturaDistributionEngine extends DistributionEngine implements
     	    $thumbAssetFilter->idIn = $data->entryDistribution->thumbAssetIds;
     	    $thumbAssetFilter->entryIdEqual = $entryId;
     	    try {
+                KalturaLog::debug('Getting entry\'s thumbnail assets');
                 $thumbAssetsList = $client->thumbAsset->listAction($thumbAssetFilter);
     	        foreach ($thumbAssetsList->objects as $asset)
                 {
@@ -279,10 +286,11 @@ class CrossKalturaDistributionEngine extends DistributionEngine implements
 	    }
 	    else
 	    {
-	        KalturaLog::log('No thumb assets set for distribution!');    
+	        KalturaLog::debug('No thumb assets set for distribution!');    
 	    }
 	    
 	    // get thumb assets content
+	    KalturaLog::debug('Getting thumb asset content for ids ['.implode(',', array_keys($thumbAssets)).']');
 	    $thumbAssetsContent = array();
 	    foreach ($thumbAssets as $thumbAsset)
 	    {
@@ -296,6 +304,7 @@ class CrossKalturaDistributionEngine extends DistributionEngine implements
         $metadataFilter->metadataObjectTypeEqual = KalturaMetadataObjectType::ENTRY;
         $metadataFilter->objectIdEqual = $entryId;
         try {
+            KalturaLog::debug('Getting entry\'s metadata objects');
             $metadataClient = KalturaMetadataClientPlugin::get($client);  
             $metadataObjectsList = $metadataClient->metadata->listAction($metadataFilter);
             foreach ($metadataObjectsList->objects as $metadata)
@@ -316,6 +325,7 @@ class CrossKalturaDistributionEngine extends DistributionEngine implements
             $captionAssetFilter = new KalturaCaptionAssetFilter();
             $captionAssetFilter->entryIdEqual = $entryId;
     	    try {
+                KalturaLog::debug('Getting entry\'s caption assets');
                 $captionAssetsList = $captionAssetClient->captionAsset->listAction($captionAssetFilter);
     	        foreach ($captionAssetsList->objects as $asset)
                 {
@@ -327,10 +337,15 @@ class CrossKalturaDistributionEngine extends DistributionEngine implements
                 throw $e;
             }
         }
+        else
+        {
+            KalturaLog::debug('Caption distribution is turned off');
+        }
         
         
         // get caption assets content
 	    $captionAssetsContent = array();
+	    KalturaLog::debug('Getting caption asset content for ids ['.implode(',', array_keys($captionAssets)).']');
 	    foreach ($captionAssets as $captionAsset)
 	    {
 	        $captionAssetsContent[$captionAsset->id] = $this->getAssetContentResource($captionAsset->id, $captionAssetClient->captionAsset, $remoteCaptionAssetContent);
@@ -344,6 +359,7 @@ class CrossKalturaDistributionEngine extends DistributionEngine implements
             $cuePointFilter = new KalturaCuePointFilter();
             $cuePointFilter->entryIdEqual = $entryId;        
     	    try {
+                KalturaLog::debug('Getting entry\'s cue points');
                 $cuePointClient = KalturaCuePointClientPlugin::get($client);            
                 $cuePointsList = $cuePointClient->cuePoint->listAction($cuePointFilter);
     	        foreach ($cuePointsList->objects as $cuePoint)
@@ -355,6 +371,10 @@ class CrossKalturaDistributionEngine extends DistributionEngine implements
                 KalturaLog::err('Cannot get list of cue points - '.$e->getMessage());
                 throw $e;
             }
+        }
+	    else
+        {
+            KalturaLog::debug('Cue points distribution is turned off');
         }
 		
         $entryObjects = new CrossKalturaEntryObjectsContainer();
@@ -380,6 +400,7 @@ class CrossKalturaDistributionEngine extends DistributionEngine implements
 	 */
 	protected function getAssetContentResource($assetId, KalturaServiceBase $assetService, $remote)
 	{
+	    KalturaLog::debug('Getting content resource for asset id ['.$assetId.'] remote ['.$remote.']');
 	    $contentResource = null;
 	    	    
 	    if ($remote)
@@ -409,9 +430,7 @@ class CrossKalturaDistributionEngine extends DistributionEngine implements
 	    {
 	        // get local resource
 	        $contentResource = new KalturaUrlResource();
-		    $options = new KalturaFlavorAssetUrlOptions();
-		    $options->fileName = $assetId;
-		    $contentResource->url = $assetService->getUrl($assetId, null, false, $options);
+	        $contentResource->url = $assetService->getUrl($assetId);
 	    }
 	    return $contentResource;
 	}
@@ -514,6 +533,7 @@ class CrossKalturaDistributionEngine extends DistributionEngine implements
             $xsltStr = $this->distributionProfile->metadataXslt;
             if (!is_null($xsltStr) && strlen($xsltStr) > 0)
             {
+                KalturaLog::debug('Trying to transform source metadata id ['.$sourceMetadata->id.']...');
                 $targetMetadata->xml = $this->transformXml($sourceMetadata->xml, $xsltStr);
             }
             else
@@ -637,6 +657,7 @@ class CrossKalturaDistributionEngine extends DistributionEngine implements
 	 */
 	protected function transformSourceToTarget(CrossKalturaEntryObjectsContainer $sourceObjects, $forUpdate = false)
 	{
+	    KalturaLog::debug('Transforming source to target objects');
 	    $targetObjects = new CrossKalturaEntryObjectsContainer();
 	    $targetObjects->entry = $this->transformEntry($sourceObjects->entry, $forUpdate); // basic entry object
 		$targetObjects->metadataObjects = $this->transformMetadatas($sourceObjects->metadataObjects); // metadata objects
@@ -712,6 +733,7 @@ class CrossKalturaDistributionEngine extends DistributionEngine implements
 	 */
     protected function getDistributedMap(KalturaDistributionJobData $data, CrossKalturaEntryObjectsContainer $syncedObjects)
     {
+        KalturaLog::debug('Generating map of distributed objects info');
         $data->providerData->distributedFlavorAssets = $this->getDistributedMapForObjects($this->sourceObjects->flavorAssets, $syncedObjects->flavorAssets);
 		$data->providerData->distributedThumbAssets = $this->getDistributedMapForObjects($this->sourceObjects->thumbAssets, $syncedObjects->thumbAssets);
 		$data->providerData->distributedMetadata = $this->getDistributedMapForObjects($this->sourceObjects->metadataObjects, $syncedObjects->metadataObjects);
@@ -765,13 +787,13 @@ class CrossKalturaDistributionEngine extends DistributionEngine implements
 	    // walk through all new target objects and add/update on target as necessary
 	    if (count($newObjects))
 	    {
-	        KalturaLog::info('Syncing target objects for source IDs ['.implode(',', array_keys($newObjects)).']');
+	        KalturaLog::debug('Syncing target objects for source IDs ['.implode(',', array_keys($newObjects)).']');
 	        foreach ($newObjects as $sourceObjectId => $targetObject)
 	        {
 	            if (is_array($distributedMap) && array_key_exists($sourceObjectId, $distributedMap))
 	            {
 	                // this object was previously distributed
-	                KalturaLog::info('Source object id ['.$sourceObjectId.'] was previously distributed');
+	                KalturaLog::debug('Source object id ['.$sourceObjectId.'] was previously distributed');
 	                
 	                $lastDistributedUpdatedAt = isset($distributedMap[$sourceObjectId][self::DISTRIBUTED_INFO_SOURCE_UPDATED_AT]) ? $distributedMap[$sourceObjectId][self::DISTRIBUTED_INFO_SOURCE_UPDATED_AT] : null;
                     $currentSourceUpdatedAt = isset($sourceObjects[$sourceObjectId]->updatedAt)	? $sourceObjects[$sourceObjectId]->updatedAt : null;
@@ -785,13 +807,14 @@ class CrossKalturaDistributionEngine extends DistributionEngine implements
                     if (!is_null($lastDistributedUpdatedAt) && !is_null($currentSourceUpdatedAt) && $currentSourceUpdatedAt <= $lastDistributedUpdatedAt)
                     {
                         // object wasn't updated since last distributed - just return existing info
-                        KalturaLog::info('No need to re-distributed object since it was not updated since last distribution - returning dummy object with target id ['.$targetObjectId.']');
+                        KalturaLog::debug('No need to re-distributed object since it was not updated since last distribution - returning dummy object with target id ['.$targetObjectId.']');
                         $targetObject->id = $targetObjectId;
                         $syncedObjects[$sourceObjectId] = $targetObject;
                     }
                     else
                     {
     	                // should update existing target object
+    	                KalturaLog::debug('Updating object...');
     	                $targetObjectForUpdate = $this->removeInsertOnly($targetObject);
     	                $updateArgs = null;
     	                if (is_null($updateArgsFunc)) {
@@ -808,6 +831,7 @@ class CrossKalturaDistributionEngine extends DistributionEngine implements
 	            else
 	            {
 	                // this object was not previously distributed - should add new target object
+	                KalturaLog::debug('Adding object...');
 	                $addArgs = null;
 	                if (is_null($addArgsFunc)) {
 	                    $addArgs = array($targetEntryId, $targetObject);
@@ -824,12 +848,12 @@ class CrossKalturaDistributionEngine extends DistributionEngine implements
 	    // check if previously distributed objects should be deleted from the target account
 	    if (count($distributedMap))
 	    {
-	        KalturaLog::info('Deleting target objects that were deleted in source with IDs ['.implode(',', array_keys($distributedMap)).']');
+	        KalturaLog::debug('Deleting target objects that were deleted in source with IDs ['.implode(',', array_keys($distributedMap)).']');
 	        foreach ($distributedMap as $sourceId => $objInfo)
 	        {
 	            // delete from target account
 	            $targetId = isset($objInfo[self::DISTRIBUTED_INFO_TARGET_ID]) ? $objInfo[self::DISTRIBUTED_INFO_TARGET_ID] : null;
-	            KalturaLog::info('Deleting previously distributed source object id ['.$sourceId.'] target object id ['.$targetId.']');
+	            KalturaLog::debug('Deleting previously distributed source object id ['.$sourceId.'] target object id ['.$targetId.']');
 	            if (is_null($targetId))
 	            {
 	                throw new Exception('Missing previously distributed target object id for source id ['.$sourceId.']');
@@ -880,11 +904,11 @@ class CrossKalturaDistributionEngine extends DistributionEngine implements
             
             if (!is_null($currentSourceVersion) && !is_null($lastDistributedSourceVersion) && $currentSourceVersion <= $lastDistributedSourceVersion)
             {
-                KalturaLog::info('No need to update content of source asset id ['.$sourceAssetId.'] target id ['.$targetAssetId.'] since it was not updated since last distribution');
+                KalturaLog::debug('No need to update content of source asset id ['.$sourceAssetId.'] target id ['.$targetAssetId.'] since it was not updated since last distribution');
             }
             else
             {
-                KalturaLog::info('Updating content for source asset id ['.$sourceAssetId.'] target id ['.$targetAssetId.']');
+                KalturaLog::debug('Updating content for source asset id ['.$sourceAssetId.'] target id ['.$targetAssetId.']');
                 $targetClientService->setContent($targetAssetId, $targetAssetContent); 
             }           
         }
@@ -905,19 +929,21 @@ class CrossKalturaDistributionEngine extends DistributionEngine implements
         if ($targetEntryId)
         {
             // update entry
-            KalturaLog::info('Updating target entry id ['.$targetEntryId.']');
+            KalturaLog::debug('Updating target entry id ['.$targetEntryId.']');
             $syncedObjects->entry = $this->targetClient->baseEntry->update($targetEntryId, $targetObjects->entry);
         }
         else
         {
             // add entry
+            KalturaLog::debug('Adding new target entry');
     	    $syncedObjects->entry = $this->targetClient->baseEntry->add($targetObjects->entry);
     	    $targetEntryId = $syncedObjects->entry->id;
-    	    KalturaLog::info('New target entry added with id ['.$targetEntryId.']');
+    	    KalturaLog::debug('New target entry added with id ['.$targetEntryId.']');
         }
         $this->targetEntryId = $targetEntryId;
         
         // sync metadata objects
+        KalturaLog::debug('Syncing metadata objects...');
         foreach ($targetObjects->metadataObjects as $metadataObj)
         {
             /* @var $metadataObj KalturaMetadata */
@@ -936,6 +962,7 @@ class CrossKalturaDistributionEngine extends DistributionEngine implements
 	    
 	    
 	    // sync flavor assets
+	    KalturaLog::debug('Syncing flavor assets...');
 	    $syncedObjects->flavorAssets = $this->syncTargetEntryObjects(
 	        $this->targetClient->flavorAsset,
 	        $targetObjects->flavorAssets,
@@ -946,6 +973,7 @@ class CrossKalturaDistributionEngine extends DistributionEngine implements
         
         
         // sync flavor content
+        KalturaLog::debug('Syncing flavor assets content...');
         $this->syncAssetsContent(
             $this->targetClient->flavorAsset,
             $targetObjects->flavorAssetsContent,
@@ -955,6 +983,7 @@ class CrossKalturaDistributionEngine extends DistributionEngine implements
         );
         	    
 	    // sync thumbnail assets
+	    KalturaLog::debug('Syncing thumbnail assets...');
 	    $syncedObjects->thumbAssets = $this->syncTargetEntryObjects(
 	        $this->targetClient->thumbAsset,
 	        $targetObjects->thumbAssets,
@@ -964,6 +993,7 @@ class CrossKalturaDistributionEngine extends DistributionEngine implements
         );
         
         // sync thumbnail content
+        KalturaLog::debug('Syncing thumbnail assets content...');
         $this->syncAssetsContent(
             $this->targetClient->thumbAsset,
             $targetObjects->thumbAssetsContent,
@@ -975,6 +1005,7 @@ class CrossKalturaDistributionEngine extends DistributionEngine implements
         // sync caption assets
         if ($this->distributeCaptions)
         {
+            KalturaLog::debug('Syncing caption assets...');
             $targetCaptionClient = KalturaCaptionClientPlugin::get($this->targetClient);
     	    $syncedObjects->captionAssets = $this->syncTargetEntryObjects(
     	        $targetCaptionClient->captionAsset,
@@ -986,6 +1017,7 @@ class CrossKalturaDistributionEngine extends DistributionEngine implements
             
             
             // sync caption content
+            KalturaLog::debug('Syncing caption assets content...');
             $this->syncAssetsContent(
                 $targetCaptionClient->captionAsset,
                 $targetObjects->captionAssetsContent,
@@ -1004,6 +1036,7 @@ class CrossKalturaDistributionEngine extends DistributionEngine implements
 	            /* @var $cuePoint KalturaCuePoint */
 	            $cuePoint->entryId = $targetEntryId;
 	        }
+            KalturaLog::debug('Syncing cue points...');
             $targetCuePointClient = KalturaCuePointClientPlugin::get($this->targetClient);
     	    $syncedObjects->cuePoints = $this->syncTargetEntryObjects(
     	        $targetCuePointClient->cuePoint,
@@ -1044,13 +1077,14 @@ class CrossKalturaDistributionEngine extends DistributionEngine implements
 			$data = $this->getDistributedMap($data, $addedTargetObjects);
 			
 			// all done - no need for closer
+			KalturaLog::debug('Submit done');
     	}
     	catch (Exception $e)
     	{
     		// if a new target entry was created - delete it before failing distribution
     		if ($this->targetEntryId)
     		{
-    			KalturaLog::info('Deleting partial new target entry ['.$this->targetEntryId.']');
+    			KalturaLog::debug('Deleting partial new target entry ['.$this->targetEntryId.']');
     			// delete entry from target account - may throw an exception
     			try {
 	    		    $deleteResult = $this->targetClient->baseEntry->delete($this->targetEntryId);
@@ -1097,6 +1131,7 @@ class CrossKalturaDistributionEngine extends DistributionEngine implements
 		$data = $this->getDistributedMap($data, $updatedTargetObjects);
         
         // all done - no need for closer
+		KalturaLog::debug('Update done');
         return true;
     }
       
@@ -1120,6 +1155,7 @@ class CrossKalturaDistributionEngine extends DistributionEngine implements
 	    $deleteResult = $this->targetClient->baseEntry->delete($targetEntryId);
         
         // all done - no need for closer
+		KalturaLog::debug('Submit done');
 		return true;
     }
     
@@ -1237,6 +1273,12 @@ class CrossKalturaDistributionEngine extends DistributionEngine implements
 		}
 		
 		$resultXmlStr = $resultXmlObj->saveXML();
+		
+		// DEBUG logs
+		// KalturaLog::debug('source xml = '.$xmlStr);
+		// KalturaLog::debug('xslt = '.$xslStr);
+		// KalturaLog::debug('result xml = '.$$resultXmlStr);
+		
 		return $resultXmlStr;
 	}
 	

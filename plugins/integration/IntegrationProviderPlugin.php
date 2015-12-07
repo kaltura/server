@@ -2,14 +2,21 @@
 /**
  * @package plugins.integration
  */
-abstract class IntegrationProviderPlugin extends KalturaPlugin implements IIntegrationProviderPlugin, IKalturaEnumerator, IKalturaPending, IKalturaObjectLoader
+abstract class IntegrationProviderPlugin extends KalturaPlugin implements IKalturaEnumerator, IKalturaPending, IKalturaObjectLoader
 {
 	const INTEGRATION_PLUGIN_NAME = 'integration';
 	
-	//exteding classes should implement this function to make sure 
-	//there will be an object implementing IIntegrationProvider interface
-	abstract function getProvider();
-
+	/**
+	 * @return KalturaVersion
+	 */
+	abstract protected static function getRequiredIntegrationPluginVersion();
+	
+	/**
+	 * Return class name that expand IntegrationProviderType enum
+	 * @return string
+	 */
+	abstract protected static function getIntegrationProviderClassName();
+	
 	/* (non-PHPdoc)
 	 * @see IKalturaPending::dependsOn()
 	 */

@@ -9,17 +9,17 @@ class kResponseProfileMapping
 	/**
 	 * @var string
 	 */
-	protected $parentProperty;
+	private $parentProperty;
 	
 	/**
 	 * @var string
 	 */
-	protected $filterProperty;
+	private $filterProperty;
 	
 	/**
 	 * @var bool
 	 */
-	protected $allowNull;
+	private $allowNull;
 	
 	/**
 	 * @return the $allowNull

@@ -18,75 +18,64 @@ class myCsvReport
 		$csv->addNewLine( $report_text );
 		$csv->addNewLine( "# ------------------------------------" );
 		$csv->addNewLine( "" );
+		$csv->addNewLine( "# ------------------------------------" );
+		$csv->addNewLine( "# Graph" );
+		$csv->addNewLine( "# ------------------------------------" );
+		$csv->addNewLine( "" );
 		
-		if ($graphs) 
+		if ( $dimension )
 		{
-			$csv->addNewLine( "# ------------------------------------" );
-			$csv->addNewLine( "# Graph" );
-			$csv->addNewLine( "# ------------------------------------" );
-			$csv->addNewLine( "" );
-			
-			if ( $dimension )
-			{
-				$graph = @$graphs[$dimension];
-			}
-			else
-			{
-				$graph = $graphs;
-			}
+			$graph = @$graphs[$dimension];
+		}
+		else
+		{
+			$graph = $graphs;
+		}
 
-					
-			foreach ( $graph as $data => $value )
+				
+		foreach ( $graph as $data => $value )
+		{
+			if ( $report_type == myReportsMgr::REPORT_TYPE_CONTENT_DROPOFF || $report_type == myReportsMgr::REPORT_TYPE_USER_CONTENT_DROPOFF
+				|| $report_type == myReportsMgr::REPORT_TYPE_OPERATION_SYSTEM || $report_type == myReportsMgr::REPORT_TYPE_BROWSERS)
 			{
-				if ( $report_type == myReportsMgr::REPORT_TYPE_CONTENT_DROPOFF || $report_type == myReportsMgr::REPORT_TYPE_USER_CONTENT_DROPOFF
-					|| $report_type == myReportsMgr::REPORT_TYPE_OPERATION_SYSTEM || $report_type == myReportsMgr::REPORT_TYPE_BROWSERS)
-				{
-					$csv->addNewLine( $data , $value );
-				}	
-				else if($dimension)
-				{	
-					$added = false;
-					if (strlen($data) == 6) //foramt is yyyymm 
-					{ 
-						$date = DateTime::createFromFormat("Ym", $data);
-						if($date)
-						{
-							$csv->addNewLine( $date->format("M Y"), $value );
-							$added = true;
-						}
-					}
-					
-					if(!$added)
+				$csv->addNewLine( $data , $value );
+			}	
+			else if($dimension)
+			{	
+				$added = false;
+				if (strlen($data) == 6) //foramt is yyyymm 
+				{ 
+					$date = DateTime::createFromFormat("Ym", $data);
+					if($date)
 					{
-						$csv->addNewLine( $csv->formatDate( myReportsMgr::formatDateFromDateId( $data ) ), $value );
-					}		
+						$csv->addNewLine( $date->format("M Y"), $value );
+						$added = true;
+					}
 				}
 				
+				if(!$added)
+				{
+					$csv->addNewLine( $csv->formatDate( myReportsMgr::formatDateFromDateId( $data ) ), $value );
+				}		
 			}
+			
 		}
 		
-		if ($total_data)
-		{
-			$csv->addNewLine( "" );
-			$csv->addNewLine( "# ------------------------------------" );
-			$csv->addNewLine( "# Total" );
-			$csv->addNewLine( "# ------------------------------------" );		
-			$csv->addNewLine( $total_dictionary /* $total_header */);
-			$csv->addNewLine( $total_data );
-		}
+		$csv->addNewLine( "" );
+		$csv->addNewLine( "# ------------------------------------" );
+		$csv->addNewLine( "# Total" );
+		$csv->addNewLine( "# ------------------------------------" );		
+		$csv->addNewLine( $total_dictionary /* $total_header */);
+		$csv->addNewLine( $total_data );
 		
-		
-		if ($table_data)
+		$csv->addNewLine( "" );
+		$csv->addNewLine( "# ------------------------------------" );
+		$csv->addNewLine( "# Table" , "" , "Total Count" , $table_total_count );
+		$csv->addNewLine( "# ------------------------------------" );		
+		$csv->addNewLine( $table_dictionary /* $table_header */);
+		foreach ( $table_data as $row )
 		{
-			$csv->addNewLine( "" );
-			$csv->addNewLine( "# ------------------------------------" );
-			$csv->addNewLine( "# Table" , "" , "Total Count" , $table_total_count );
-			$csv->addNewLine( "# ------------------------------------" );		
-			$csv->addNewLine( $table_dictionary /* $table_header */);
-			foreach ( $table_data as $row )
-			{
-				$csv->addNewLine( $row );
-			}
+			$csv->addNewLine( $row );
 		}
 		
 		return $csv;

@@ -100,28 +100,13 @@ try
 		}
 		else if($action == UPLOADED)
 		{
-			$file = getFile($folder->id, $fileName, $dropFolderPlugin);
-			$now = time();
-			// In some cases we better sleep before handling the file due to NFS latency
-			// 1. the file doens't exist on the disk - maybe it was a temporary file name (some ftp clients may upload a tmp file and then rename it)
-			// 2. the file wasn't picked up when the upload started
-			// 3. the file started to upload less than $sleepSec seconds ago and may not be synced on another nfs node
-			if (!file_exists($filePath) || !$file || $file->uploadStartDetectedAt > $now - $sleepSec)
-			{
-				// sleep at most sleepSec from start of file upload time
-				$maxSleepTime = $file ? ($file->uploadStartDetectedAt + $sleepSec - $now) : $sleepSec;
-				// restrict sleep time to ignore any date time anomalies
-				$maxSleepTime = max(0, min($maxSleepTime, $sleepSec));
-				writeLog($logPrefix, 'Sleeping for '.$maxSleepTime.' seconds ...');
-				sleep($maxSleepTime);
-				$file = getFile($folder->id, $fileName, $dropFolderPlugin);
-			}
-			
+			writeLog($logPrefix, 'Sleeping for '.$sleepSec.' seconds ...');
+			sleep($sleepSec);
 			writeLog($logPrefix, 'Handle file uploaded');
+			
+			$file = getFile($folder->id, $fileName, $dropFolderPlugin);
 				
 			writeLog($logPrefix, 'Check if file exists on the file system...');
-			
-			clearstatcache();
 			$fileExists = file_exists($filePath);
 			if($fileExists)
 				writeLog($logPrefix, 'file exists on the file system');

@@ -14,9 +14,4 @@ interface IOwnable extends IBaseObject
 	 * @return int
 	 */
 	public function getKuserId();
-
-	/**
-	 * @return boolean
-	 */
-	public function isEntitledKuserEdit( $kuserId );
 }

@@ -289,9 +289,7 @@ class CuePointPlugin extends KalturaPlugin implements IKalturaServices, IKaltura
 			return;
 		
 		$dataByType = array();
-		CuePointPeer::setUseCriteriaFilter(false);
 		$cuePointObjects = CuePointPeer::retrieveByEntryId($entry->getId(), $indexOnEntryTypes);
-		CuePointPeer::setUseCriteriaFilter(true);
 		
 		foreach($cuePointObjects as $cuePoint)
 		{

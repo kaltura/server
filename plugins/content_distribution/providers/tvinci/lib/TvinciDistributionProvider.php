@@ -93,7 +93,7 @@ class TvinciDistributionProvider extends ConfigurableDistributionProvider
 	 */
 	public function isAvailabilityUpdateEnabled()
 	{
-		return true;
+		return false;
 	}
 
 	/* (non-PHPdoc)

@@ -34,8 +34,6 @@ class kEventCuePointConsumer implements kObjectChangedEventConsumer
 		if(count($currentMediaServers) == 0) {
 			$this->addEventCuePoint($object, EventType::BROADCAST_END);
 		}
-		
-		return true;
 	}
 	
 	protected function addEventCuePoint(LiveEntry $liveEntry, $eventType) {
@@ -58,6 +56,7 @@ class kEventCuePointConsumer implements kObjectChangedEventConsumer
 				($object->isCustomDataModified(null, 'mediaServers'))) {
 				return true;
 		}
+		
 		return false;
 	}
 }

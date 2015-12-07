@@ -38,7 +38,7 @@ class ExternalMediaEntry extends entry
 	{
 		$this->putInCustomData(self::CUSTOM_DATA_FIELD_EXTERNAL_SOURCE, $v);
 	}
-	
+
 	/* (non-PHPdoc)
 	 * @see entry::getCreateThumb()
 	 */
@@ -46,20 +46,4 @@ class ExternalMediaEntry extends entry
 	{
 		return false;
 	}
-
-	/* (non-PHPdoc)
-	  * @see entry::Baseentry()
-	  */
-	public function copy($deepCopy = false)
-	{
-		$copyObj = parent::copy($deepCopy);
-		$copyObj->setExternalSourceType($this->getExternalSourceType());
-		$refId = $this->getReferenceID();
-		if ($refId)
-		{
-			$copyObj->setReferenceID($refId);
-		}
-		return $copyObj;
-	}
-	
 }

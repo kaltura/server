@@ -3,7 +3,7 @@
  * @package plugins.audit
  * @subpackage api.objects
  */
-class KalturaAuditTrail extends KalturaObject implements IRelatedFilterable
+class KalturaAuditTrail extends KalturaObject implements IFilterable
 {
 	/**
 	 * @var int

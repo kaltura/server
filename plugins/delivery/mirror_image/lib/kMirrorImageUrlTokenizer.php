@@ -20,10 +20,9 @@ class kMirrorImageUrlTokenizer extends kUrlTokenizer
 	
 	/**
 	 * @param string $url
-	 * @param string $urlPrefix
 	 * @return string
 	 */
-	public function tokenizeSingleUrl($url, $urlPrefix = null)
+	public function tokenizeSingleUrl($url)
 	{
 		// get parameters
 		$startTime = time();	

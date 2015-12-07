@@ -297,11 +297,7 @@ $plannedDur = 0;
 				$prdVid = $product->_video;
 				$trgVid = $this->_video;
 
-					/*
-					 *  On short durations, the 'granulariity' of a single frame dur might cause invalidation. 
-					 *  Don't check for <2sec
-					 */
-				if($plannedDur>2000){
+				if($plannedDur>0){
 					if($prdVid->_duration<$plannedDur*KDLSanityLimits::MinDurationFactor 
 					|| $prdVid->_duration>$plannedDur*KDLSanityLimits::MaxDurationFactor) 
 					{
@@ -338,12 +334,8 @@ $plannedDur = 0;
 			else {
 				$prdAud = $product->_audio;
 				$trgAud = $this->_audio;
-
-					/*
-					 * On short durations, the 'granulariity' of a single frame dur might cause invalidation.
-					 * Don't check for <2sec
-					 */
-				if($plannedDur>2000){ 
+				
+				if($plannedDur){ 
 					if($prdAud->_duration<$plannedDur*KDLSanityLimits::MinDurationFactor 
 					|| $prdAud->_duration>$plannedDur*KDLSanityLimits::MaxDurationFactor) {
 						$product->_errors[KDLConstants::AudioIndex][] = // Invalid product duration 
@@ -480,15 +472,6 @@ $plannedDur = 0;
 			$target->_explicitClipDur = $target->_clipDur;
 			
 			/*
-			 * Fading needs explicit time limitation on the WM image loop. 
-			 * We'll do it with '_explicitClipDur' field 
-			 */
-		if(!isset($target->_explicitClipDur) && isset($target->_video)
-		&& isset($target->_video->_watermarkData) && isset($target->_video->_watermarkData->fade)){
-			$target->_explicitClipDur = $sourceDur;
-		}
-
-			/*
 			 * mpeg2 and theora video formats does not allow reliable 'fastSeekTo' (used on clipping)
 			 */
 		if($source->_video && $source->_video->IsFormatOf(array("mpeg video","theora"))){
@@ -522,16 +505,14 @@ $plannedDur = 0;
 			 */
 		$sourceAnalize = self::analizeSourceContentStreams($source->_contentStreams);
 			/*
-			 * Check analyze realts for
-			 * - 'streamsAsChannels' - process them as sorround streams
-			 * - 'languages - process them as multi-lingual
-			 * - otherwise remove the 'multiStream' object'
+			 * If 'streamsAsChannels' were detected do 'multiStream' processing
+			 * otherwise remove 'multiStream' settings from the target
 			 */
 		if(isset($sourceAnalize->streamsAsChannels)){
-			$target->_multiStream = self::sorroundAudioSurceToTarget($source, $target->_multiStream, $sourceAnalize->streamsAsChannels);
-		}
-		else if(isset($sourceAnalize->languages)){
-			$target->_multiStream = self::multiLingualAudioSurceToTarget($source, $target->_multiStream, $sourceAnalize->languages);
+			if(!isset($target->_multiStream)
+			|| (isset($target->_multiStream->detect) && $target->_multiStream->detect=='auto')){
+				$target->_multiStream = self::sourceMultiStreamToTarget($source, $sourceAnalize);
+			}
 		}
 		else {
 			$target->_multiStream = null;
@@ -625,16 +606,6 @@ $plannedDur = 0;
 		if($this->_audio!=""){
 			if($source->_audio!=""){
 				$target->_audio = $this->evaluateTargetAudio($source->_audio, $target, $source->_contentStreams);
-				/*
-				 * On multi-lingual flavor, 
-				 * if required language does not exist - set NonComply flag 
-				 */
-				if(isset($target->_multiStream) && isset($target->_multiStream->audio) 
-				&& isset($target->_multiStream->audio->languages) && count($target->_multiStream->audio->languages)==0){
-					$target->_flags = $this->_flags | self::MissingContentNonComplyFlagBit;
-					$target->_warnings[KDLConstants::AudioIndex][] = 
-						KDLWarnings::ToString(KDLWarnings::MissingMediaStream);
-				}
 			}
 		}
 		
@@ -781,15 +752,7 @@ $plannedDur = 0;
 		 * the constants theshold.
 		 */
 		$this->evaluateTargetVideoFramerate($sourceVid, $targetVid);
-		
-		/*
-		 * COPY does not require following settings
-		 */
-		if($targetVid->_id==KDLVideoTarget::COPY) {
-			$targetVid->_watermarkData = null;
-			return $targetVid;
-		}
-		
+				
 		/*
 		 * GOP - if gop not set, set it to 2sec according to the required frame rate,
 		 * otherwise if gop param is in sec (_isGopInSec) ==> calculate form framerate,
@@ -812,34 +775,6 @@ $plannedDur = 0;
 			}
 		}
 
-		/*
-		 * Watermark - evaluate scale value in case of 'percentage-of-the-source'
-		 * Sample 'scale' value "x30%" stands for - 
-		 * make the height to be 30% of the source, calculate the width to match the height
-		 */
-		if(isset($targetVid->_watermarkData) && isset($targetVid->_watermarkData->scale)){
-			$scaleArrNew = array();
-			$scaleArr = explode("x",$targetVid->_watermarkData->scale);
-			foreach ($scaleArr as $i=>$val){
-				if(isset($val) && strlen($val)>0) {
-					$percentArr = explode('%', $val);
-					if(count($percentArr)==2){
-						if(isset($sourceVid->_width) && isset($sourceVid->_height)) {
-							// For 'portrait' sources (rotation -90,90,270) - switch the scaled dims
-							if(isset($sourceVid->_rotation) && in_array($sourceVid->_rotation, array(-90,90,270)))
-								$val =($i==0?$sourceVid->_height: $sourceVid->_width);
-							else 
-								$val =($i==0?$sourceVid->_width: $sourceVid->_height);
-							$val = round($val*$percentArr[0]/100);
-						}
-						else $val = "";
-					}
-				}
-				$scaleArrNew[$i] = $val;
-			}
-			$targetVid->_watermarkData->scale = implode('x', $scaleArrNew);
-		}
-		
 		$targetVid->_rotation = $sourceVid->_rotation;
 		$targetVid->_scanType = $sourceVid->_scanType;
 		
@@ -1297,13 +1232,6 @@ $plannedDur = 0;
 			$targetAud->_id=KDLAudioTarget::MP3;
 		}
 
-			/*
-			 * For MP3 w/out target bitrate - use 64Kb as default
-			 */
-		if(isset($target->_container) && $target->_container->_id==KDLContainerTarget::MP3
-				&& $targetAud->_id==KDLAudioTarget::MP3 && $targetAud->_bitRate==0) {
-			$targetAud->_bitRate = 64;
-		}
 				/* -------------
 				 * Adjust target bit depth/resolution if it is set in the source
 				 */
@@ -1519,18 +1447,13 @@ $plannedDur = 0;
 	/**
 	 * 
 	 * @param unknown_type $source
-	 * @param unknown_type $analyzedStreams
+	 * @param unknown_type $sourceAnalize
 	 * @return NULL|stdClass
 	 */
-	private static function sorroundAudioSurceToTarget($source, $multiStreamSettings, $analyzedStreams)
+	private static function sourceMultiStreamToTarget($source, $sourceAnalize)
 	{
-		/*
-		 * If there is manually defined multiStream/sorround preset - use it, 
-		 * don't attempt to figure it out automatically
-		 */
-		if((isset($multiStreamSettings)
-		&& !(isset($multiStreamSettings->detect) && $multiStreamSettings->detect=='auto'))){
-			return $multiStreamSettings;
+		if(!isset($sourceAnalize->streamsAsChannels)){
+			return null;
 		}
 
 		/*
@@ -1556,63 +1479,11 @@ $plannedDur = 0;
 		 */
 		$mappedStreams = KDLAudioLayouts::matchLayouts($source->_contentStreams->audio, KDLAudioLayouts::DOWNMIX);
 		if(count($mappedStreams)==0) {
-			$mappedStreams = KDLAudioLayouts::matchLayouts($analyzedStreams, array(KDLAudioLayouts::FL, KDLAudioLayouts::FR, KDLAudioLayouts::MONO,));
+			$mappedStreams = KDLAudioLayouts::matchLayouts($sourceAnalize->streamsAsChannels, array(KDLAudioLayouts::FL, KDLAudioLayouts::FR, KDLAudioLayouts::MONO,));
 		}
 		foreach ($mappedStreams as $stream){
 			$multiStream->audio->mapping[] = $stream->id;
 		}
-		return $multiStream;
-	}
-	
-	/**
-	 * 
-	 * @param unknown_type $source
-	 * @param unknown_type $languages
-	 * @return - 
-	 * 	null - not applicable for that source (non multi-lingual) or for the required multiStream settings (no multi-lingual requirement)
-	 * 	stdClass obj with set audio-languages array - holding matched languages
-	 * 	stdClass obj with empty audio-languages array - no matched languages
-	 */
-	private static function multiLingualAudioSurceToTarget($source, $multiStreamSettings, $languages)
-	{
-			/*
-			 * Default behavior - avoid multi-lang processing if not asked for 
-			 */
-		if(!(isset($multiStreamSettings) && isset($multiStreamSettings->audio) 
-			 && property_exists($multiStreamSettings->audio,"languages"))){
-			return null;
-		}
-		
-			/*
-			 * If no multi-lingual data in the source, get out
-			 */
-		if(!(is_array($languages) && count($languages)>0)){
-			return null;
-		}
-
-		if(is_array($multiStreamSettings->audio->languages) && count($multiStreamSettings->audio->languages)>0){
-			$settingsLanguages = $multiStreamSettings->audio->languages;
-		}
-		else $settingsLanguages = null;
-		
-		/*
-		 * Sample json string: 
-		 * 		- {"audio":{"languages":["eng","esp"]}}
-		 */
-		$multiStream = new stdClass();
-		$multiStream->audio = new stdClass();
-		$multiStream->audio->languages = array();
-		
-		foreach ($languages as $lang=>$streams){
-			if(isset($settingsLanguages) && !in_array($lang, $settingsLanguages)){
-				continue;
-			}
-			if(count($streams)>1) {
-				return null;
-			}
-			$multiStream->audio->languages[$lang] = $streams[0];
-		}
-		
 		return $multiStream;
 	}
 	

@@ -31,6 +31,8 @@ class kContentDistributionManager
 	
 	protected static function addImportJob($dc, $entryUrl, asset $asset)
 	{
+		KalturaLog::debug("Importing asset [" . $asset->getId() . "] from dc [$dc] with URL [$entryUrl]");
+		
 		$entryUrl = str_replace('//', '/', $entryUrl);
 		$entryUrl = preg_replace('/^((https?)|(ftp)|(scp)|(sftp)):\//', '$1://', $entryUrl);
 	
@@ -85,7 +87,7 @@ class kContentDistributionManager
 
 		if(!$fileSyncs)
   		{
-   			KalturaLog::info("No file syncs to distribute");
+   			KalturaLog::debug("No file syncs to distribute");
    			return true;
   		}
   		
@@ -130,7 +132,7 @@ class kContentDistributionManager
 		
 		if(isset($dcs[$dc]) && count($dcs[$dc]) == count($assets))
 		{
-			KalturaLog::info("All files exist in the preferred dc [$dc]");
+			KalturaLog::debug("All files exist in the preferred dc [$dc]");
 			return true;
 		}
 		
@@ -143,7 +145,7 @@ class kContentDistributionManager
 				continue;
 			
 			$dc = $remoteDcId;
-			KalturaLog::info("All files exist in none-preferred dc [$dc]");
+			KalturaLog::debug("All files exist in none-preferred dc [$dc]");
 			return true;
 		}
 		
@@ -153,7 +155,7 @@ class kContentDistributionManager
 			$entryDistribution->getStatus() == EntryDistributionStatus::IMPORT_UPDATING
 		)
 		{
-			KalturaLog::info("Entry distribution already importing");
+			KalturaLog::debug("Entry distribution already importing");
 			return false;
 		}
 		
@@ -164,7 +166,7 @@ class kContentDistributionManager
 		{
 			if(is_null($assetObject['downloadUrl']))
 			{
-				KalturaLog::info("Download URL not found for asset [$assetId]");
+				KalturaLog::debug("Download URL not found for asset [$assetId]");
 				continue;
 			}
 			
@@ -192,7 +194,7 @@ class kContentDistributionManager
 	{
 		if($entryDistribution->getStatus() == EntryDistributionStatus::SUBMITTING)
 		{
-			KalturaLog::info("Entry distribution [" . $entryDistribution->getId() . "] already submitting");
+			KalturaLog::debug("Entry distribution [" . $entryDistribution->getId() . "] already submitting");
 			return null;
 		}
 		
@@ -644,6 +646,7 @@ class kContentDistributionManager
 	{
 		if($distributionProfile->getStatus() != DistributionProfileStatus::ENABLED || $distributionProfile->getSubmitEnabled() == DistributionProfileActionStatus::DISABLED)
 		{
+			KalturaLog::debug("Submission is not enabled");
 			return null;
 		}
 			
@@ -668,10 +671,12 @@ class kContentDistributionManager
 		$validationErrors = $entryDistribution->getValidationErrors();
 		if(!count($validationErrors))
 		{
+			KalturaLog::debug("No validation errors found");
 		    $returnValue = true;
 			$sunrise = $entryDistribution->getSunrise(null);
 			if($sunrise)
 			{
+				KalturaLog::debug("Applying sunrise [$sunrise]");
 				$distributionProvider = $distributionProfile->getProvider();
 				if(!$distributionProvider->isScheduleUpdateEnabled() && !$distributionProvider->isAvailabilityUpdateEnabled())
 				{
@@ -696,7 +701,7 @@ class kContentDistributionManager
 				$entryDistribution->setStatus(EntryDistributionStatus::QUEUED);
 				$entryDistribution->save();
 			}
-			KalturaLog::info("Will be submitted when ready");
+			KalturaLog::debug("Will be submitted when ready");
 		}
 		
 		if(!count($validationErrors))

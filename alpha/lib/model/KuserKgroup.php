@@ -13,8 +13,8 @@
  * @package Core
  * @subpackage model
  */
-class KuserKgroup extends BaseKuserKgroup implements IRelatedObject
-{
+class KuserKgroup extends BaseKuserKgroup {
+
 	const MAX_NUMBER_OF_GROUPS_PER_USER = 100;
 
 
@@ -52,8 +52,4 @@ class KuserKgroup extends BaseKuserKgroup implements IRelatedObject
 	}
 
 
-	public function getCacheInvalidationKeys()
-	{
-		return array("kuserKgroup:kuserId=".strtolower($this->getKuserId()));
-	}
 } // KuserKgroup

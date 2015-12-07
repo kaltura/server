@@ -29,6 +29,8 @@ class KScheduleHelper extends KPeriodicWorker
 	 */
 	public function run($jobs = null)
 	{
+		KalturaLog::info("Schedule helper batch is running");
+		
 		try
 		{
 			$systemReady = self::$kClient->system->ping();
@@ -87,6 +89,8 @@ class KScheduleHelper extends KPeriodicWorker
 	 */
 	private function sendConfigItems(KalturaScheduler $scheduler, array $configItems)
 	{
+		KalturaLog::debug("sendConfigItems(" . count($configItems) . ")");
+		
 		$configItemsArr = array_chunk($configItems, 100);
 		
 		foreach($configItemsArr as $configItems)
@@ -113,6 +117,8 @@ class KScheduleHelper extends KPeriodicWorker
 	 */
 	private function sendCommandResults(array $commandResults)
 	{
+		KalturaLog::debug("sendCommandResults(" . count($commandResults) . ")");
+		
 		self::$kClient->startMultiRequest();
 		
 		foreach($commandResults as $commandResult)

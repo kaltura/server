@@ -71,6 +71,7 @@ class kAttUverseDistributionEventConsumer implements kBatchJobStatusEventConsume
 		$providerData = $data->getProviderData();
 		if($providerData instanceof kAttUverseDistributionJobProviderData)
 		{
+			KalturaLog::debug('Updating AttUverse job provider data in entry distribution custom data');
 			$entryDistribution->putInCustomData(AttUverseEntryDistributionCustomDataField::REMOTE_ASSET_FILE_URLS, $providerData->getRemoteAssetFileUrls());
 			$entryDistribution->putInCustomData(AttUverseEntryDistributionCustomDataField::REMOTE_THUMBNAIL_FILE_URLS, $providerData->getRemoteThumbnailFileUrls());
 			$entryDistribution->save();

@@ -149,18 +149,6 @@ class MediaService extends KalturaEntryService
 		}
 		else
 		{
-			$kResource = $resource->toObject();
-			if ( ($kResource instanceof kOperationResource ) && ($this->isResourceKClip($kResource)) ) {
-				$internalResource = $kResource->getResource();
-				if ($dbEntry->getIsTrimDisabled()
-					&& $internalResource instanceof kFileSyncResource
-					&& $dbEntry->getId() == $internalResource->getOriginEntryId()
-				)
-				{
-					throw new KalturaAPIException(KalturaErrors::ENTRY_CANNOT_BE_TRIMMED);
-				}
-			}
-
 			$tempMediaEntry = new KalturaMediaEntry();
 			$tempMediaEntry->type = $dbEntry->getType();
 			$tempMediaEntry->mediaType = $dbEntry->getMediaType();
@@ -332,8 +320,8 @@ class MediaService extends KalturaEntryService
 	 */
 	function addFromSearchResultAction(KalturaMediaEntry $mediaEntry = null, KalturaSearchResult $searchResult = null)
 	{
-		if($mediaEntry->conversionQuality && !$mediaEntry->conversionProfileId)
-			$mediaEntry->conversionProfileId = $mediaEntry->conversionQuality;
+    	if($mediaEntry->conversionQuality && !$mediaEntry->conversionProfileId)
+    		$mediaEntry->conversionProfileId = $mediaEntry->conversionQuality;
 
 		if ($mediaEntry === null)
 			$mediaEntry = new KalturaMediaEntry();
@@ -670,7 +658,7 @@ class MediaService extends KalturaEntryService
 	 * @param string $entryId Media entry id
 	 * @param int $conversionProfileId
 	 * @param KalturaConversionAttributeArray $dynamicConversionAttributes
-	 * @return bigint job id
+	 * @return int job id
 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
 	 * @throws KalturaErrors::CONVERSION_PROFILE_ID_NOT_FOUND
 	 * @throws KalturaErrors::FLAVOR_PARAMS_NOT_FOUND
@@ -702,11 +690,10 @@ class MediaService extends KalturaEntryService
      * @action getMrss
      * @param string $entryId Entry id
      * @param KalturaExtendingItemMrssParameterArray $extendingItemsArray
-     * @param string $features
      * @return string
      * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
      */
-    function getMrssAction($entryId, KalturaExtendingItemMrssParameterArray $extendingItemsArray = null, $features = null)
+    function getMrssAction($entryId, KalturaExtendingItemMrssParameterArray $extendingItemsArray = null)
     {
         $dbEntry = entryPeer::retrieveByPKNoFilter($entryId);
 		if (!$dbEntry || $dbEntry->getType() != KalturaEntryType::MEDIA_CLIP)
@@ -718,7 +705,7 @@ class MediaService extends KalturaEntryService
 			$mrssParams->setItemXpathsToExtend($coreExtendingItemArray);
 		}
         /* @var $mrss SimpleXMLElement */
-        $mrss = kMrssManager::getEntryMrssXml($dbEntry, null, $mrssParams, ($features ? explode(',', $features) : null));
+        $mrss = kMrssManager::getEntryMrssXml($dbEntry, null, $mrssParams);
         return $mrss->asXML();
     }
 
@@ -740,7 +727,7 @@ class MediaService extends KalturaEntryService
 			$dcIndex = kDataCenterMgr::getDCByObjectId($entryId, true);
 			if ($dcIndex != kDataCenterMgr::getCurrentDcId())
 			{
-				KalturaLog::info("EntryID [$entryId] wasn't found on current DC. dumping the request to DC id [$dcIndex]");
+				KalturaLog::debug("EntryID [$entryId] wasn't found on current DC. dumping the request to DC id [$dcIndex]");
 				kFileUtils::dumpApiRequest ( kDataCenterMgr::getRemoteDcExternalUrlByDcId ($dcIndex ) );
 			}
 		}
@@ -1090,19 +1077,10 @@ class MediaService extends KalturaEntryService
 		$entry->validatePropertyNotNull("mediaType");
 
 		$conversionQuality = $this->getConversionQuality($entry);
-		if (!is_null($conversionQuality)) {
+		if (!is_null($conversionQuality))
 			$entry->conversionQuality = $conversionQuality;
-			if (!$entry->conversionProfileId) {
-				$entry->conversionProfileId = $entry->conversionQuality;
-			}
-		}
-
-		if ($dbEntry == null){
-			$dbEntry = $this->duplicateTemplateEntry($entry->conversionProfileId);
-		}
 
 		$dbEntry = parent::prepareEntryForInsert($entry, $dbEntry);
-
 		$kshow = $this->createDummyKShow();
         $kshowId = $kshow->getId();
         $dbEntry->setKshowId($kshowId);
@@ -1119,30 +1097,12 @@ class MediaService extends KalturaEntryService
 			return null;
 		$conversionProfile2 = conversionProfile2Peer::retrieveByPK($conversionQuality);
 		if (!$conversionProfile2) {
+			KalturaLog::debug("Maybe old conversion profile");
 			$conversionProfile = ConversionProfilePeer::retrieveByPK($conversionQuality);
 			if ($conversionProfile)
 				$conversionQuality = $conversionProfile->getConversionProfile2Id();
 		}
 		return $conversionQuality;
-	}
-
-	/**
-	 * @param $kResource
-	 * @return bool
-	 */
-	protected function isResourceKClip($kResource)
-	{
-		/**
-		 * @var kOperationResource $kResource
-		 */
-		foreach ($kResource->getOperationAttributes() as $opAttribute)
-		{
-			if ($opAttribute instanceof kClipAttributes)
-			{
-				return true;
-			}
-		}
-		return false;
 	}
 
 }

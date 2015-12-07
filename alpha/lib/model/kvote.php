@@ -7,7 +7,7 @@
  * @package Core
  * @subpackage model
  */
-class kvote extends Basekvote implements IBaseObject
+class kvote extends Basekvote
 {
 	private $statistics_results = null;
 	
@@ -22,6 +22,7 @@ class kvote extends Basekvote implements IBaseObject
 		   $this->statistics_results = myStatisticsMgr::modifyEntryVotesBykVote($this); 
 		}
 		
+		KalturaLog::debug("kvote status before save: ". $this->getStatus());
 		return parent::save( $con );
 	}
 	

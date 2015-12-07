@@ -74,6 +74,7 @@ class genericSyndicationFeed extends syndicationFeed implements ISyncableFile
 		$key->object_id = $this->getId();
 		$key->version = $version;
 		$key->partner_id = $this->getPartnerId();
+		KalturaLog::debug("syndication key version : ".$version);
 		return $key;
 	}
 	

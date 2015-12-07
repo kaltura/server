@@ -34,6 +34,8 @@ class KAsyncBulkDownloadCloser extends KJobCloserWorker
 
 	private function fetchStatus(KalturaBatchJob $job)
 	{
+		KalturaLog::debug("fetchStatus($job->id)");
+		
 		if(($job->queueTime + KBatchBase::$taskConfig->params->maxTimeBeforeFail) < time())
 			return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::CLOSER_TIMEOUT, 'Timed out', KalturaBatchJobStatus::FAILED);
 		

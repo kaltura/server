@@ -48,58 +48,27 @@ class IntegrationService extends KalturaBaseService
 	{
 		$coreType = IntegrationPlugin::getBatchJobTypeCoreValue(IntegrationBatchJobType::INTEGRATION);
 		$batchJob = BatchJobPeer::retrieveByPK($id);
-		$invalidJobId = false;
-		$invalidKs = false;
-		
-		if(!self::validateKs($batchJob))
+		$invalid = false;
+		if(!$batchJob)
 		{
-			$invalidKs = true;
-			KalturaLog::err("ks not valid for notifying job [$id]");
-		}
-		elseif(!$batchJob)
-		{
-			$invalidJobId = true;
+			$invalid = true;
 			KalturaLog::err("Job [$id] not found");
 		}
 		elseif($batchJob->getJobType() != $coreType)
 		{
-			$invalidJobId = true;
+			$invalid = true;
 			KalturaLog::err("Job [$id] wrong type [" . $batchJob->getJobType() . "] expected [" . $coreType . "]");
 		}
 		elseif($batchJob->getStatus() != KalturaBatchJobStatus::ALMOST_DONE)
 		{
-			$invalidJobId = true;
+			$invalid = true;
 			KalturaLog::err("Job [$id] wrong status [" . $batchJob->getStatus() . "] expected [" . KalturaBatchJobStatus::ALMOST_DONE . "]");
 		}
-		elseif($batchJob->getPartnerId() != kCurrentContext::getCurrentPartnerId())
-		{
-			$invalidKs = true;
-			KalturaLog::err("Job [$id] of wrong partner [" . $batchJob->getPartnerId() . "] expected [" . kCurrentContext::getCurrentPartnerId() . "]");
-		}
-
-		if($invalidJobId)
+		if($invalid)
 		{
 			throw new KalturaAPIException(KalturaErrors::INVALID_BATCHJOB_ID, $id);
 		}
-		if($invalidKs)
-		{
-			throw new KalturaAPIException(KalturaIntegrationErrors::INTEGRATION_NOTIFY_FAILED);
-		}
 			
 		kJobsManager::updateBatchJob($batchJob, KalturaBatchJobStatus::FINISHED);
-	}
-
-	public static function validateKs($job)
-	{	
-		$dcParams = kDataCenterMgr::getCurrentDc();
-		$token = $dcParams["secret"];
-		
-		$createdString = md5($job->getId() . $token);
-		
-		$ks = kCurrentContext::$ks_object;
-		if($createdString == $ks->additional_data)
-			return true;
-		
-		return false;
 	}
 }

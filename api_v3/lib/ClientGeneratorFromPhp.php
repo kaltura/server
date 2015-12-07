@@ -46,7 +46,7 @@ abstract class ClientGeneratorFromPhp
 		return $this->_includeList;
 	}
 
-	public function __construct($sourcePath = null)
+	public function ClientGeneratorFromPhp($sourcePath = null)
 	{
 		$this->_sourcePath = realpath($sourcePath);
 		
@@ -157,10 +157,6 @@ abstract class ClientGeneratorFromPhp
 	public function load()
 	{
 		$this->loadServicesInfo();
-		
-		
-		$this->addType(KalturaTypeReflectorCacher::get('KalturaClientConfiguration'));
-		$this->addType(KalturaTypeReflectorCacher::get('KalturaRequestConfiguration'));
 		
 		// load the filter order by string enums
 		foreach($this->_types as $typeReflector)
@@ -280,19 +276,6 @@ abstract class ClientGeneratorFromPhp
 	protected function loadServicesInfo()
 	{
 		$this->initClassMap();
-		
-		$alwaysIncludeList = array(
-			'KalturaApiExceptionArg',
-			'KalturaClientConfiguration',
-			'KalturaRequestConfiguration',
-		);
-		
-		foreach($alwaysIncludeList as $class)
-		{
-			$classTypeReflector = KalturaTypeReflectorCacher::get($class);
-			if($classTypeReflector)
-				$this->loadTypesRecursive($classTypeReflector);
-		}
 		
 		$serviceMap = KalturaServicesMap::getMap();
 		foreach($serviceMap as $serviceId => $serviceActionItem)
@@ -669,6 +652,10 @@ abstract class ClientGeneratorFromPhp
 					$includeList[] = $item;
 		}
 		
+		// Always add these two classes
+		$includeList[] = 'KalturaClientConfiguration';
+		$includeList[] = 'KalturaRequestConfiguration';
+		
 		foreach($includeList as $class)
 		{
 			$classTypeReflector = KalturaTypeReflectorCacher::get($class);
@@ -699,9 +686,5 @@ abstract class ClientGeneratorFromPhp
 	protected function beginsWith($str, $end)
 	{
 		return (substr($str, 0, strlen($end)) === $end);
-	}
-	
-	public function done($outputPath)
-	{
 	}
 }

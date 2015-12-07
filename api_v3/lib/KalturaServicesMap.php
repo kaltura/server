@@ -190,7 +190,7 @@ class KalturaServicesMap
 		
 		if(!isset($serviceMap[$serviceId]))
 		{
-			KalturaLog::crit("Service [$serviceId] does not exist!");
+			KalturaLog::crit("Service does not exist!");
 			throw new KalturaAPIException(KalturaErrors::SERVICE_DOES_NOT_EXISTS, $serviceId);
 		}
 		

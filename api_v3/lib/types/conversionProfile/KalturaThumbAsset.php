@@ -69,4 +69,19 @@ class KalturaThumbAsset extends KalturaAsset
 		return parent::toInsertableObject ($object_to_fill, $props_to_skip);
 	}
 	
+	/**
+	 * @param int $type
+	 * @return KalturaFlavorAsset
+	 */
+	static function getInstanceByType ($type = null)
+	{
+		if($type && $type != KalturaAssetType::THUMBNAIL)
+		{
+			$pluginObj = KalturaPluginManager::loadObject('KalturaThumbAsset', $type);	
+			if($pluginObj)
+				return $pluginObj;	
+		}
+		
+		return new KalturaThumbAsset();
+	}
 }

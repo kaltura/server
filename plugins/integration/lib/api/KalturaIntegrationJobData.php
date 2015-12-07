@@ -7,9 +7,8 @@ class KalturaIntegrationJobData extends KalturaJobData
 {
 	/**
 	 * @var string
-	 * @readonly
 	 */
-	public $callbackNotificationUrl;
+	public $callbackNotificationBaseUrl;
 	
 	/**
 	 * @var KalturaIntegrationProviderType
@@ -35,11 +34,21 @@ class KalturaIntegrationJobData extends KalturaJobData
 	
 	private static $map_between_objects = array
 	(
-		"callbackNotificationUrl",
 		"providerType" ,
 		"triggerType" ,
 	);
 
+	public function __construct($subType = null)
+	{
+		parent::__construct($subType);
+		
+		$baseUrl = 'http://' . kConf::get('cdn_api_host');
+		$baseUrl .= '/api_v3/index.php/service/integration_integration/action/notify';
+		// should add on the batch side : /partnerId/{$job->partnerId}/id/{$job->id}
+		
+		$this->callbackNotificationBaseUrl = $baseUrl;
+	}
+	
 	/* (non-PHPdoc)
 	 * @see KalturaObject::getMapBetweenObjects()
 	 */
@@ -112,9 +121,7 @@ class KalturaIntegrationJobData extends KalturaJobData
 		$this->validatePropertyNotNull('providerType');
 		$this->validatePropertyNotNull('providerData');
 		$this->validatePropertyNotNull('triggerType');
-		
-		if ($this->triggerType != KalturaIntegrationTriggerType::MANUAL)
-			$this->validatePropertyNotNull('triggerData');
+		$this->validatePropertyNotNull('triggerData');
 	}
 	
 	/* (non-PHPdoc)

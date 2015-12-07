@@ -8,7 +8,6 @@ class myDbHelper
 	const DB_HELPER_CONN_PROPEL2 = "propel2";
 	const DB_HELPER_CONN_PROPEL3 = "propel3";
 	const DB_HELPER_CONN_SPHINX_LOG = "sphinx_log";
-	const DB_HELPER_CONN_SPHINX_LOG_READ = "sphinx_log_read";
 	const DB_HELPER_CONN_DWH = "dwh";
 	
 	public static $use_alternative_con = null;

@@ -365,6 +365,7 @@ class SystemPartnerService extends KalturaBaseService
 	 */
 	public function listUserLoginDataAction(KalturaUserLoginDataFilter $filter = null, KalturaFilterPager $pager = null)
 	{
+		KalturaLog::debug("start listUserLoginDataAction");
 		if (is_null($filter))
 			$filter = new KalturaUserLoginDataFilter();
 			

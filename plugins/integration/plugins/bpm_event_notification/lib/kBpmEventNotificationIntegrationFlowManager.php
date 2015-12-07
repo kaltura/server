@@ -19,12 +19,6 @@ class kBpmEventNotificationIntegrationFlowManager implements kBatchJobStatusEven
 		$template = EventNotificationTemplatePeer::retrieveByPK($triggerData->getTemplateId());
 		/* @var $template BusinessProcessNotificationTemplate */
 		
-		if(!$template)
-		{
-			KalturaLog::err("Template id [" . $triggerData->getTemplateId() . "] not found");
-			return true;
-		}
-		
 		$object = $dbBatchJob->getObject();
 		if($object)
 		{

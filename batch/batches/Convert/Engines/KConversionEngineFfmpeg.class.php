@@ -7,11 +7,6 @@ class KConversionEngineFfmpeg  extends KJobConversionEngine
 {
 	const FFMPEG = "ffmpeg";
 	
-	const TAG_VARIANT_A = 'watermark_a';
-	const TAG_VARIANT_B = 'watermark_b';
-	const TAG_VARIANT_PAIR_ID = 'watermark_pair_';
-	const TAG_NGS_STUB = "stub";
-
 	public function getName()
 	{
 		return self::FFMPEG;
@@ -52,31 +47,20 @@ class KConversionEngineFfmpeg  extends KJobConversionEngine
 			 *		stands for duration of 462 seconds, gop size 2 seconds
 			 */
 		foreach($cmdLines as $k=>$cmdLine){
+			$wmCmdLine = null;
 			$exec_cmd = self::experimentalFixing($cmdLine->exec_cmd, $data->flavorParamsOutput, $this->getCmd(), $this->inFilePath, $this->outFilePath);
 			$exec_cmd = self::expandForcedKeyframesParams($exec_cmd);
 			
-			if(strstr($exec_cmd, "ffmpeg")==false) {
-				$cmdLines[$k]->exec_cmd = $exec_cmd;
-				continue;
-			}
+			if(isset($wmData) && strstr($exec_cmd, "ffmpeg")!=false){
 			
 				// impersonite
-			KBatchBase::impersonate($data->flavorParamsOutput->partnerId);
-			
-			$wmCmdLine = null;
-			if(isset($wmData)){
-				$wmCmdLine = self::buildWatermarkedCommandLine($wmData, $data->destFileSyncLocalPath, $exec_cmd, 
-								KBatchBase::$taskConfig->params->ffmpegCmd, KBatchBase::$taskConfig->params->mediaInfoCmd);
-			}
-					/*
-					 * 'watermark_pair_'/TAG_VARIANT_PAIR_ID tag for NGS digital signature watermarking flow
-					 */
-			if(isset($data->flavorParamsOutput->tags) && strstr($data->flavorParamsOutput->tags,KConversionEngineFfmpeg::TAG_VARIANT_PAIR_ID)!=false){
-				$wmCmdLine = self::buildNGSPairedDigitalWatermarkingCommandLine((isset($wmCmdLine)?$wmCmdLine:$exec_cmd), $data);
-			}
-				// un-impersonite
-			KBatchBase::unimpersonate();
+				KBatchBase::impersonate($data->flavorParamsOutput->partnerId); 
 				
+				$wmCmdLine = self::buildWatermarkedCommandLine($wmData, $data->destFileSyncLocalPath, $exec_cmd, 
+									KBatchBase::$taskConfig->params->ffmpegCmd, KBatchBase::$taskConfig->params->mediaInfoCmd);
+				// un-impersonite
+				KBatchBase::unimpersonate();
+			}
 			if(isset($wmCmdLine))
 				$cmdLines[$k]->exec_cmd = $wmCmdLine;
 			else
@@ -301,7 +285,6 @@ $pixFmt = "yuv420p";
 	 */
 	public static function buildWatermarkedCommandLine($wmData, $destFileSyncLocalPath, $cmdLine, $ffmpegBin = "ffmpeg", $mediaInfoBin = "mediainfo")
 	{
-		KalturaLog::log("After:cmdline($cmdLine)");
 		if(!isset($mediaInfoBin) || strlen($mediaInfoBin)==0)
 			$mediaInfoBin = "mediainfo";
 			/*
@@ -437,7 +420,14 @@ $pixFmt = "yuv420p";
 			if($wid>0) $wid -= $wid%2;
 			if($hgt>0) $hgt -= $hgt%2;
 
-			$wmFilePath = $wmTmpFilepath;
+			$wmFilePath = $wmTmpFilepath."scaled.png";
+			$scaleCmd = "$ffmpegBin -i $wmTmpFilepath -vf scale=$wid:$hgt,setsar=$wid/$hgt -y $wmFilePath";
+			KalturaLog::log("scaledCmd - $scaleCmd");
+			exec($scaleCmd,$ouput,$rv);
+			if($rv!=0) {
+				KalturaLog::err("Failed to rescale watermark file ($wmTmpFilepath), rv($rv), cmd($scaleCmd). Carry on without watermark.");
+				return null;
+			}
 		}
 		else{
 			$wmFilePath = $wmTmpFilepath;
@@ -451,82 +441,24 @@ $pixFmt = "yuv420p";
 				array(KDLCmdlinePlaceholders::WaterMarkFileName,KDLCmdlinePlaceholders::WaterMarkWidth,KDLCmdlinePlaceholders::WaterMarkHeight), 
 				array($wmFilePath, $wid, $hgt),
 				$cmdLine);
-		KalturaLog::log("After:cmdline($cmdLine)");
+		KalturaLog::log("cmdline($cmdLine)");
 		return $cmdLine;
 	}
-	
-	/**
-	 * 
-	 */
-	protected static function buildNGSPairedDigitalWatermarkingCommandLine($cmdLine, $data)
-	{
-			/*
-			 * Get source mediainfo for NGS prepprocessor params
-			 * Use default 'NGS_FragmentPreprocessorYUV' if batch config does not contain 'ngsPreprocessorCmd'
-			 */
-		if(count($data->srcFileSyncs)>0 && isset($data->srcFileSyncs[0]->assetId)) { 
-			$mediaInfoFilter = new KalturaMediaInfoFilter();
-			$mediaInfoFilter->flavorAssetIdEqual = $data->srcFileSyncs[0]->assetId;
-			try {
-				$mediaInfoList = KBatchBase::$kClient->mediaInfo->listAction($mediaInfoFilter);
-			}
-			catch (Exception $ex) {
-				$mediaInfoList = null;
-				$errStr = "Exception on retrieval of an mediaInfo List ($mediaInfoFilter->flavorAssetIdEqual),\nexception:".print_r($ex,1);
-			}
+// ffmpeg -i ../avatar_gop150_scenecut.mp4 -vf "movie=/web/content/shared/tmp/qualityTest/wm.png [logo]; [in][logo] overlay=10:10 [out]" -ar 44100 -ac 2 -an -f flv -y output.flv
+// ffmpeg -i input -vf scale=iw/2:-1 output
+/*
+ffmpeg  -i /web//content/entry/data/51/951/0_0jqy2igl_0_9hvzx9im_12.mp41401956172 -i /web/content/shared/logo.png -c:v libx264  -subq 2 -qcomp 0.6 -qmin 10 -qmax 50 -qdiff 4 -coder 0 -vprofile baseline -filter_complex "[1]scale=100:100[logo];[0:v][logo]overlay=main_w/2-overlay_w/2:10 [out]" -map "[out]" -map 0:1 -f mp4 -threads 4 -y /web/content/shared/aaa.mp4
 
-			if(!(isset($mediaInfoList) && isset($mediaInfoList->objects) && count($mediaInfoList->objects)>0)){
-				if(!isset($errStr))
-					$errStr = "Bad source media info object";
-				KalturaLog::err($errStr);
-				return null;
-			}
-			
-			$mediaInfo = $mediaInfoList->objects[0];
-			$ngsBin = isset(KBatchBase::$taskConfig->params->ngsPreprocessorCmd)? KBatchBase::$taskConfig->params->ngsPreprocessorCmd: "NGS_FragmentPreprocessorYUV";
-			$srcWid = $mediaInfo->videoWidth;
-			$srcHgt = $mediaInfo->videoHeight;
-			$srcFps = $mediaInfo->videoFrameRate;
-			if(strstr($data->flavorParamsOutput->tags,KConversionEngineFfmpeg::TAG_VARIANT_A)!=false) 
-				$prepMode='A';
-			else if(strstr($data->flavorParamsOutput->tags,KConversionEngineFfmpeg::TAG_VARIANT_B)!=false)
-				$prepMode='APrime';
-			else
-				return null;
-		}
+ffmpeg  -i /web//content/entry/data/51/951/0_0jqy2igl_0_9hvzx9im_12.mp41401956172 -i /web/content/shared/logo_scaled.png -c:v libx264  -subq 2 -qcomp 0.6 -qmin 10 -qmax 50 -qdiff 4 -coder 0 -vprofile baseline -filter_complex "[0:v]crop=90:90:0:0:keep_aspect=1[cropped1];[1:v]crop=w=90:h=90:x=0:y=0:keep_aspect=1[cropped2];[cropped2][cropped1]blend=all_expr='if(eq(mod(X,2),mod(Y,2)),A,B)'[blended];[0:v][blended]overlay=350:main_h-overlay_h-100 [out]" -map "[out]" -map 0:a -f mp4 -threads 4 -y /web/content/shared/aaa.mp4
 
-$stub=null;
-	if(strstr($data->flavorParamsOutput->tags,KConversionEngineFfmpeg::TAG_NGS_STUB)!=false)
-		$stub="--stub";
-	//$digSignStub = "-f rawvideo -pix_fmt $srcPixFmt - | $ngsBin -w $srcWid -h $srcHgt -f $srcFps $stub --$prepMode| $ffmpegBin -f rawvideo -s $srcWidx$srcHgt -r $srcFps -i - -i $srcFile -map 0:v -map 1:a ";
-$digSignStub = "-f rawvideo -pix_fmt yuv420p - | %s -w %d -h %d -f %s %s --%s| %s -f rawvideo -s %dx%d -r %s -i -";
+ffmpeg  -i /web//content/entry/data/51/951/0_0jqy2igl_0_9hvzx9im_12.mp41401956172 -i /web/content/shared/logo.png -c:v libx264  -subq 2 -qcomp 0.6 -qmin 10 -qmax 50 -qdiff 4 -coder 0 -vprofile baseline -filter_complex "[1]scale=100:100,setsar=100/100[logo];[0:v]crop=100:100:0:0,setsar=100:100[cropped];[cropped][logo]blend=all_expr='if(eq(mod(X,2),mod(Y,2)),A,B)'[blended];[0:v][blended]overlay=350:main_h-overlay_h-100[out]" -map "[out]" -map 0:a -f mp4 -threads 4 -y /web/content/shared/aaa.mp4
 
-		KalturaLog::log("Before:cmdLine($cmdLine)");
-		$cmdLineArr = explode(' ', $cmdLine);
-		$ffmpegBin = $cmdLineArr[0];
-		$kArr = array_keys($cmdLineArr,'-i');
-		$srcFile = $cmdLineArr[$kArr[0]+1];
-		$is2pass=(count($kArr)>1);
-		if($is2pass){
-			$keyId = $kArr[1]+1;
-		}
-		else {
-			$keyId = $kArr[0]+1;
-		}
-		
-		$digSignStr = sprintf($digSignStub, $ngsBin, $srcWid, $srcHgt, $srcFps, $stub, $prepMode, $ffmpegBin, $srcWid, $srcHgt, $srcFps, $srcFile);
-		$kArr = array_keys($cmdLineArr,'-an');
-		if(count($kArr)==0 || ($is2pass && count($kArr)==1)) {
-			$digSignStr.= " -i $srcFile -map 0:v -map 1:a";
-		}
-		KalturaLog::log("Fixed part:$digSignStr");
-		$cmdLineArr[$keyId].= " $digSignStr";
-		$cmdLine = implode(" ", $cmdLineArr);
-		
-		KalturaLog::log("After:cmdLine($cmdLine)");
-		return $cmdLine;
-	}
+ffmpeg  -i /tmp/TestVideo3.mp4 -i /web/content/shared/logo.png -c:v libx264  -subq 2 -qcomp 0.6 -qmin 10 -qmax 50 -qdiff 4 -coder 0 -vprofile baseline -filter_complex "[1]scale=100:100,setsar=100/100[logo];[0:v]crop=100:100:350:300,setsar=100:100[cropped];[cropped][logo]blend=all_expr='if(eq(mod(X,2),mod(Y,2)),A,B)'[blended];[0:v][blended]overlay=350:300[out]" -map "[out]" -map 0:a -f mp4 -threads 4 -y /web/content/shared/aaa.mp4
 
+ffmpeg  -i /tmp/TestVideo3.mp4 -i /web/content/shared/logo.png -c:v libx264  -subq 2 -qcomp 0.6 -qmin 10 -qmax 50 -qdiff 4 -coder 0 -vprofile baseline -filter_complex "[1]scale=100:100,setsar=100/100[logo];[0:v]crop=100:100:iw-ow-10:300,setsar=100/100[cropped];[cropped][logo]blend=all_expr='if(eq(mod(X,2),mod(Y,2)),A,B)'[blended];[0:v][blended]overlay=main_w-overlay_w-10:300[out]" -map "[out]" -map 0:a -f mp4 -threads 4 -y /web/content/shared/aaa1.mp4
+
+ffmpeg  -i /tmp/TestVideo3.mp4 -i /web/content/shared/logo.jpg -c:v libx264  -subq 2 -qcomp 0.6 -qmin 10 -qmax 50 -qdiff 4 -coder 0 -vprofile baseline -filter_complex "[1]scale=100:100,setsar=100/100[logo];[0:v]crop=100:100:iw-ow-10:300,setsar=100/100[cropped];[cropped][logo]blend=all_mode='overlay':all_opacity=0.5[blended];[0:v][blended]overlay=main_w-overlay_w-10:300[out]" -map "[out]" -map 0:a -f mp4 -threads 4 -y /web/content/shared/aaa1.mp4
+*/
 
 }
 

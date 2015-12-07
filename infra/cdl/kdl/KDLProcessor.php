@@ -227,28 +227,6 @@ KalturaLog::log("ARF (Webex) sources don't have proper mediaInfo, therefore turn
 			}
 			
 			/*
-			 * Progressive Segmented WVC1 
-			 */
-			else if(isset($mediaSet->_video) && $mediaSet->_video->IsFormatOf(array("wvc1","wmv3")) 
-				 && isset($mediaSet->_contentStreams) && isset($mediaSet->_contentStreams->video) && count($mediaSet->_contentStreams->video)>0 
-				 && isset($mediaSet->_contentStreams->video[0]->progressiveSegmented) && $mediaSet->_contentStreams->video[0]->progressiveSegmented==true) {
-				foreach($profile->_flavors as $flvr){
-					foreach ($flvr->_transcoders as $trans) {
-						if($trans->_id==KDLTranscoders::FFMPEG){
-							$interSrcProfile = $this->setProfileWithIntermediateSource(KDLContainerTarget::MP4, 
-								KDLVideoTarget::H264H, 4000, 1080, 
-								KDLAudioTarget::AAC, 128, 0, 
-								0, KDLTranscoders::MENCODER);
-							break;
-						}
-					}
-					if(isset($interSrcProfile)){
-						break;
-					}
-				}
-			}
-			
-			/*
 			else if($mediaSet->_video->IsFormatOf(array("tscc","tsc2"))) {
 				$interSrcProfile = $this->setProfileWithIntermediateSource(KDLContainerTarget::MP4, 
 						KDLVideoTarget::H264H, 4000, 1080, 

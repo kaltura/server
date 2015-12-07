@@ -9,16 +9,6 @@ class KalturaCuePointFilter extends KalturaCuePointBaseFilter
 	 * @var string
 	 */
 	public $freeText;
-
-	/**
-	 * @var KalturaNullableBoolean
-	 */
-	public $userIdEqualCurrent;
-	
-	/**
-	 * @var KalturaNullableBoolean
-	 */
-	public $userIdCurrent;
 	
 	static private $map_between_objects = array
 	(
@@ -50,19 +40,6 @@ class KalturaCuePointFilter extends KalturaCuePointBaseFilter
 	
 	protected function translateUserIds()
 	{		
-		if($this->userIdCurrent == KalturaNullableBoolean::TRUE_VALUE)
-		{
-			if(kCurrentContext::$ks_kuser_id)
-			{
-				$this->userIdEqual = kCurrentContext::$ks_kuser_id;
-			}
-			else
-			{
-				$this->isPublicEqual = KalturaNullableBoolean::TRUE_VALUE;
-			}
-			$this->userIdCurrent = null;
-		}
-		
 		if(isset($this->userIdEqual)){
 			$dbKuser = kuserPeer::getKuserByPartnerAndUid(kCurrentContext::$ks_partner_id, $this->userIdEqual);
 			if (! $dbKuser) {
@@ -85,24 +62,12 @@ class KalturaCuePointFilter extends KalturaCuePointBaseFilter
 		}
 	}
 	
-	protected function getCriteria()
-	{
-	    return KalturaCriteria::create(CuePointPeer::OM_CLASS);
-	}
-	
 	protected function doGetListResponse(KalturaFilterPager $pager, $type = null)
 	{
 		$this->validateEntryIdFiltered();
-		if (!is_null($this->userIdEqualCurrent) && $this->userIdEqualCurrent)
-		{
-			$this->userIdEqual = kCurrentContext::getCurrentKsKuserId();
-		}
-		else
-		{
-			$this->translateUserIds();
-		}
+		$this->translateUserIds();
 		
-		$c = $this->getCriteria();
+		$c = KalturaCriteria::create(CuePointPeer::OM_CLASS);
 		if($type)
 		{
 			$c->add(CuePointPeer::TYPE, $type);
@@ -151,26 +116,5 @@ class KalturaCuePointFilter extends KalturaCuePointBaseFilter
 	public function getListResponse(KalturaFilterPager $pager, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		return $this->getTypeListResponse($pager, $responseProfile);
-	}
-
-	/* (non-PHPdoc)
-	 * @see KalturaRelatedFilter::validateForResponseProfile()
-	 */
-	public function validateForResponseProfile()
-	{
-		if(		!kCurrentContext::$is_admin_session
-			&&	!$this->idEqual
-			&&	!$this->idIn
-			&&	!$this->systemNameEqual
-			&&	!$this->systemNameIn)
-		{
-			if(PermissionPeer::isValidForPartner(PermissionName::FEATURE_ENABLE_RESPONSE_PROFILE_USER_CACHE, kCurrentContext::getCurrentPartnerId()))
-			{
-				KalturaResponseProfileCacher::useUserCache();
-				return;
-			}
-			
-			throw new KalturaAPIException(KalturaCuePointErrors::USER_KS_CANNOT_LIST_RELATED_CUE_POINTS, get_class($this));
-		}
 	}
 }

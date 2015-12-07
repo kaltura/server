@@ -384,7 +384,7 @@ class Php53ClientGenerator extends ClientGeneratorFromXml
 			$this->appendLine(' */');
 		}
 		
-	 	$this->appendLine("class {$enumClassInfo->getClassName()} extends \Kaltura\Client\EnumBase");		
+	 	$this->appendLine("class {$enumClassInfo->getClassName()}");		
 		$this->appendLine("{");
 		foreach($enumNode->childNodes as $constNode)
 		{
@@ -475,44 +475,25 @@ class Php53ClientGenerator extends ClientGeneratorFromXml
 					break;
 					
 				case "bool" :
-					$this->appendLine("		if(count(\$xml->{$propName}))");
-					$this->appendLine("		{");
-					$this->appendLine("			if(!empty(\$xml->{$propName}))");
-					$this->appendLine("				\$this->$propName = true;");
-					$this->appendLine("			else");
-					$this->appendLine("				\$this->$propName = false;");
-					$this->appendLine("		}");
+					$this->appendLine("		if(!empty(\$xml->{$propName}))");
+					$this->appendLine("			\$this->$propName = true;");
 					break;
 					
 				case "string" :
-					$this->appendLine("		if(count(\$xml->{$propName}))");
-					$this->appendLine("			\$this->$propName = ($propType)\$xml->$propName;");
+					$this->appendLine("		\$this->$propName = ($propType)\$xml->$propName;");
 					break;
 					
 				case "array" :
-					$arrayType = $propertyNode->getAttribute ( "arrayType" );
-					$this->appendLine("		if(count(\$xml->{$propName}))");
-					$this->appendLine("		{");
-					$this->appendLine("			if(empty(\$xml->{$propName}))");
-					$this->appendLine("				\$this->$propName = array();");
-					$this->appendLine("			else");
-					$this->appendLine("				\$this->$propName = \Kaltura\Client\ParseUtils::unmarshalArray(\$xml->$propName, \"$arrayType\");");
-					$this->appendLine("		}");
-					break;
-					
 				case "map" :
 					$arrayType = $propertyNode->getAttribute ( "arrayType" );
-					$this->appendLine("		if(count(\$xml->{$propName}))");
-					$this->appendLine("		{");
-					$this->appendLine("			if(empty(\$xml->{$propName}))");
-					$this->appendLine("				\$this->$propName = array();");
-					$this->appendLine("			else");
-					$this->appendLine("				\$this->$propName = \Kaltura\Client\ParseUtils::unmarshalMap(\$xml->$propName, \"$arrayType\");");
-					$this->appendLine("		}");
+					$this->appendLine("		if(empty(\$xml->{$propName}))");
+					$this->appendLine("			\$this->$propName = array();");
+					$this->appendLine("		else");
+					$this->appendLine("			\$this->$propName = \Kaltura\Client\ParseUtils::unmarshalArray(\$xml->$propName, \"$arrayType\");");
 					break;
 					
 				default : // sub object
-					$this->appendLine("		if(count(\$xml->{$propName}) && !empty(\$xml->{$propName}))");
+					$this->appendLine("		if(!empty(\$xml->{$propName}))");
 					$this->appendLine("			\$this->$propName = \Kaltura\Client\ParseUtils::unmarshalObject(\$xml->$propName, \"{$propType}\");");
 					break;
 			}
@@ -636,12 +617,6 @@ class Php53ClientGenerator extends ClientGeneratorFromXml
 	    $arrayObjectType = ($resultType == 'array') ? $resultNode->getAttribute ( "arrayType" ) : null;
 		$description = $actionNode->getAttribute("description");
 		
-		$enableInMultiRequest = true;
-		if($actionNode->hasAttribute("enableInMultiRequest"))
-		{
-			$enableInMultiRequest = intval($actionNode->getAttribute("enableInMultiRequest"));
-		}
-		
 		// method signature
 		$signature = "";
 		if (in_array($action, array("list", "clone", "goto"))) // because list & clone are preserved in PHP
@@ -657,28 +632,22 @@ class Php53ClientGenerator extends ClientGeneratorFromXml
 		if ($description)
 			$this->appendLine("	 * " . $this->formatMultiLineComment($description));
 		$this->appendLine("	 * ");			
-		if ($resultType && $resultType != 'null')
+		if (!$resultType)
 		{
-			if ($this->isSimpleType($resultType) || $resultType == 'array' || $resultType == 'file')
-			{
-				$this->appendLine("	 * @return $resultType");
-			}
-			else
-			{
-				$resultTypeClassInfo = $this->getTypeClassInfo($resultType);
-				$this->appendLine("	 * @return {$resultTypeClassInfo->getFullyQualifiedName()}");
-			}
+			$this->appendLine("	 * @return");
+		}
+		elseif ($this->isSimpleType($resultType) || $resultType == 'array' || $resultType == 'file')
+		{
+			$this->appendLine("	 * @return $resultType");
+		}
+		else
+		{
+			$resultTypeClassInfo = $this->getTypeClassInfo($resultType);
+			$this->appendLine("	 * @return {$resultTypeClassInfo->getFullyQualifiedName()}");
 		}
 		$this->appendLine("	 */");
 		$this->appendLine("	$signature");
 		$this->appendLine("	{");
-		
-		if(!$enableInMultiRequest)
-		{
-			$this->appendLine("		if (\$this->client->isMultiRequest())");
-			$this->appendLine("			throw new ClientException(\"Action is not supported as part of multi-request.\", ClientException::ERROR_ACTION_IN_MULTIREQUEST);");
-			$this->appendLine("		");
-		}
 		
 		$this->appendLine("		\$kparams = array();");
 		$haveFiles = false;
@@ -744,29 +713,16 @@ class Php53ClientGenerator extends ClientGeneratorFromXml
 	    {
 	    	$fallbackClass = 'null';
 	    	if($resultType == 'array')
-	    	{
 	    		$fallbackClass = "\"$arrayObjectType\"";
-	    	}
 	    	else if($resultType && !$this->isSimpleType($resultType))
-	    	{
 	    		$fallbackClass = "\"$resultType\"";
-	    	}
 	    	
 			if ($haveFiles)
-			{
 				$this->appendLine("		\$this->client->queueServiceActionCall(\"".strtolower($serviceId)."\", \"$action\", $fallbackClass, \$kparams, \$kfiles);");
-			}
 			else
-			{
 				$this->appendLine("		\$this->client->queueServiceActionCall(\"".strtolower($serviceId)."\", \"$action\", $fallbackClass, \$kparams);");
-			}
-			
-			if($enableInMultiRequest)
-			{
-				$this->appendLine("		if (\$this->client->isMultiRequest())");
-				$this->appendLine("			return \$this->client->getMultiRequestResult();");
-			}
-			
+			$this->appendLine("		if (\$this->client->isMultiRequest())");
+			$this->appendLine("			return \$this->client->getMultiRequestResult();");
 			$this->appendLine("		\$resultXml = \$this->client->doQueue();");
 			$this->appendLine("		\$resultXmlObject = new \\SimpleXMLElement(\$resultXml);");
 			$this->appendLine("		\\Kaltura\\Client\\ParseUtils::checkIfError(\$resultXmlObject->result);");
@@ -798,7 +754,7 @@ class Php53ClientGenerator extends ClientGeneratorFromXml
 			}
 	    }
 			
-	    if($resultType && $resultType != 'null')
+	    if($resultType)
 			$this->appendLine("		return \$resultObject;");
 		$this->appendLine("	}");
 	}
@@ -930,13 +886,11 @@ class Php53ClientGenerator extends ClientGeneratorFromXml
 			$this->appendLine("	}");
 		}
 	
-		$volatileProperties = array();
 		foreach($configurationNodes as $configurationNode)
 		{
 			/* @var $configurationNode DOMElement */
 			$configurationName = $configurationNode->nodeName;
-			$attributeName = lcfirst($configurationName) . "Configuration";
-			$volatileProperties[$attributeName] = array();
+			$methodsName = ucfirst($configurationName) . "Configuration";
 		
 			foreach($configurationNode->childNodes as $configurationPropertyNode)
 			{
@@ -946,15 +900,7 @@ class Php53ClientGenerator extends ClientGeneratorFromXml
 					continue;
 			
 				$configurationProperty = $configurationPropertyNode->localName;
-				
-				if($configurationPropertyNode->hasAttribute('volatile') && $configurationPropertyNode->getAttribute('volatile'))
-				{
-					$volatileProperties[$attributeName][] = $configurationProperty;
-				}
-				
 				$type = $configurationPropertyNode->getAttribute('type');
-				if(!$this->isSimpleType($type))
-					$type = $this->getTypeClassInfo($type)->getFullyQualifiedName();
 				$description = null;
 				
 				if($configurationPropertyNode->hasAttribute('description'))
@@ -970,21 +916,6 @@ class Php53ClientGenerator extends ClientGeneratorFromXml
 				}
 			}
 		}
-		
-		$this->appendLine ( "	/**");
-		$this->appendLine ( "	 * Clear all volatile configuration parameters");
-		$this->appendLine ( "	 */");
-		$this->appendLine ( "	protected function resetRequest()");
-		$this->appendLine ( "	{");
-		$this->appendLine ( "		parent::resetRequest();");
-		foreach($volatileProperties as $attributeName => $properties)
-		{
-			foreach($properties as $propertyName)
-			{
-				$this->appendLine("		unset(\$this->{$attributeName}['{$propertyName}']);");
-			}
-		}
-		$this->appendLine ( "	}");
 		
 		$this->appendLine("}");
 	}

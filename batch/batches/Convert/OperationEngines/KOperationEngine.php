@@ -241,7 +241,7 @@ abstract class KOperationEngine
 		if($returnValue == 0 && preg_match("/^[^:]+: ([^,]+),/", reset($output), $matches))
 		{
 			$type = $matches[1];
-			KalturaLog::info("file [{$this->inFilePath}] type [$type]");
+			KalturaLog::debug("file [{$this->inFilePath}] type [$type]");
 			return $type;
 		}
 		return null;

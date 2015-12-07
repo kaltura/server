@@ -30,8 +30,6 @@ class MetadataProfileFieldPeer extends BaseMetadataProfileFieldPeer {
 	}
 	
 	/**
-	 * Retrieves by STATUS_ACTIVE, will not include STATUS_NONE_SEARCHABLE
-	 *
 	 * @param      int $metadataProfileId
 	 * @param      PropelPDO $con the connection to use
 	 * @return     array<MetadataProfileField>
@@ -41,22 +39,6 @@ class MetadataProfileFieldPeer extends BaseMetadataProfileFieldPeer {
 		$criteria = new Criteria();
 		$criteria->add(MetadataProfileFieldPeer::METADATA_PROFILE_ID, $metadataProfileId);
 		$criteria->add(MetadataProfileFieldPeer::STATUS, MetadataProfileField::STATUS_ACTIVE);
-
-		return MetadataProfileFieldPeer::doSelect($criteria, $con);
-	}
-
-	/**
-	 * Retrieves by STATUS_ACTIVE and STATUS_NONE_SEARCHABLE
-	 *
-	 * @param      int $metadataProfileId
-	 * @param      PropelPDO $con the connection to use
-	 * @return     array<MetadataProfileField>
-	 */
-	public static function retrieveAllActiveByMetadataProfileId($metadataProfileId, PropelPDO $con = null)
-	{
-		$criteria = new Criteria();
-		$criteria->add(MetadataProfileFieldPeer::METADATA_PROFILE_ID, $metadataProfileId);
-		$criteria->add(MetadataProfileFieldPeer::STATUS, array(MetadataProfileField::STATUS_ACTIVE, MetadataProfileField::STATUS_NONE_SEARCHABLE), Criteria::IN);
 
 		return MetadataProfileFieldPeer::doSelect($criteria, $con);
 	}
@@ -75,7 +57,7 @@ class MetadataProfileFieldPeer extends BaseMetadataProfileFieldPeer {
 
 		return MetadataProfileFieldPeer::doSelectOne($criteria, $con);
 	}
-
+	
 	/**
 	 * @param      int $partnerId
 	 * @param      string $key

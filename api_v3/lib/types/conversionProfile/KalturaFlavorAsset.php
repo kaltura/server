@@ -120,4 +120,27 @@ class KalturaFlavorAsset extends KalturaAsset
 		
 		return parent::toInsertableObject ($object_to_fill, $props_to_skip);
 	}
+	
+	/**
+	 * @param int $type
+	 * @return KalturaFlavorAsset
+	 */
+	static function getInstanceByType ($type = null)
+	{
+		if(!$type || $type == KalturaAssetType::FLAVOR)
+		{
+			$obj = new KalturaFlavorAsset();
+		}
+		elseif($type == KalturaAssetType::LIVE)
+		{
+			$obj = new KalturaLiveAsset();
+		}
+		else 
+		{
+			$obj = KalturaPluginManager::loadObject('KalturaFlavorAsset', $type);	
+			if(!$obj)
+				$obj = new KalturaFlavorAsset();	
+		}
+		return $obj;
+	}
 }

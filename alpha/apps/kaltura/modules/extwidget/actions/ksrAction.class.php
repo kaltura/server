@@ -89,7 +89,7 @@ class ksrAction extends sfAction
         }
         catch(Exception $e)
         {
-            KalturaLog::err("malformed uiconf XML - base64 encoded: [".base64_encode(trim($this->uiconfObj->getConfFile()))."]");
+            KalturaLog::debug("malformed uiconf XML - base64 encoded: [".base64_encode(trim($this->uiconfObj->getConfFile()))."]");
         }
         if(!($this->uiconfXmlObj instanceof SimpleXMLElement))
         {

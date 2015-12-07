@@ -11,6 +11,7 @@ class KFileTransferExportEngine extends KExportEngine
 	 * @see KExportEngine::init()
 	 */
 	function __construct($data, $jobSubType) {
+		KalturaLog::debug("initializing export process");
 		parent::__construct($data);
 		
 		$this->protocol = $jobSubType;
@@ -23,6 +24,8 @@ class KFileTransferExportEngine extends KExportEngine
 	 */
 	function export() 
 	{
+		KalturaLog::debug("starting export process");
+		
 		if(!KBatchBase::pollingFileExists($this->srcFile))
 			throw new kTemporaryException("Source file {$this->srcFile} does not exist");
 							

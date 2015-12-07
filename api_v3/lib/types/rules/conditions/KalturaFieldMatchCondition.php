@@ -64,14 +64,6 @@ class KalturaFieldMatchCondition extends KalturaMatchCondition
 			case 'kCoordinatesContextField':
 				$this->field = new KalturaCoordinatesContextField();
 				break;
-
-			case 'kEvalStringField':
-			    $this->field = new KalturaEvalStringField();
-			    break;
-			
-			case 'kObjectIdField':
-			    $this->field = new KalturaObjectIdField();
-			    break;				
 				
 			case 'kEvalStringField':
 				$this->field = new KalturaEvalStringField();

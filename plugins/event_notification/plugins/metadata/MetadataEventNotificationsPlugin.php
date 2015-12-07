@@ -95,6 +95,8 @@ class MetadataEventNotificationsPlugin extends KalturaPlugin implements IKaltura
 	 */
 	public static function editTemplateFields($sweepFieldValues, $scope, $objectType)
 	{
+		KalturaLog::debug ('Field values to sweep: ' . print_r($sweepFieldValues, true));
+		
 		if (! ($scope instanceof kEventScope))
 			return array();
 		

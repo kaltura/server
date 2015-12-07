@@ -37,7 +37,7 @@ class KalturaGroupUserFilter extends KalturaGroupUserBaseFilter
 		
 		if($this->groupIdEqual)
 		{
-			$partnerId = kCurrentContext::getCurrentPartnerId();
+			$partnerId = $this->getPartnerId();
 
 			$c = new Criteria();
 			$c->add(kuserPeer::PARTNER_ID, $partnerId);
@@ -66,7 +66,7 @@ class KalturaGroupUserFilter extends KalturaGroupUserBaseFilter
 
 		if($this->userIdEqual)
 		{
-			$partnerId = kCurrentContext::getCurrentPartnerId();
+			$partnerId = $this->getPartnerId();
 
 			$c = new Criteria();
 			$c->add(kuserPeer::PARTNER_ID, $partnerId);
@@ -89,7 +89,7 @@ class KalturaGroupUserFilter extends KalturaGroupUserBaseFilter
 		if($this->userIdIn)
 		{
 			$usersIds = explode(',', $this->userIdIn);
-			$partnerId = kCurrentContext::getCurrentPartnerId();
+			$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
 
 			$c = new Criteria();
 			$c->add(kuserPeer::PARTNER_ID, $partnerId, Criteria::EQUAL);
@@ -119,7 +119,7 @@ class KalturaGroupUserFilter extends KalturaGroupUserBaseFilter
 		if($this->groupIdIn)
 		{
 			$groupIdIn = explode(',', $this->groupIdIn);
-			$partnerId = kCurrentContext::getCurrentPartnerId();
+			$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
 
 			$c = new Criteria();
 			$c->add(kuserPeer::PARTNER_ID, $partnerId, Criteria::EQUAL);

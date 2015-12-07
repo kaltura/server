@@ -34,6 +34,8 @@ class KAsyncBulkUploadCloser extends KJobCloserWorker
 	
 	private function fetchStatus(KalturaBatchJob $job)
 	{
+		KalturaLog::debug("fetchStatus($job->id)");
+		
 		if(($job->queueTime + self::$taskConfig->params->maxTimeBeforeFail) < time())
 			return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::CLOSER_TIMEOUT, 'Timed out', KalturaBatchJobStatus::FAILED);
 			
@@ -43,7 +45,7 @@ class KAsyncBulkUploadCloser extends KJobCloserWorker
 		{
 		    $numOfObjects = $job->data->numOfObjects;
 		    $numOfErrorObjects = $job->data->numOfErrorObjects;
-		    KalturaLog::info("numOfSuccessObjects: $numOfObjects, numOfErrorObjects: $numOfErrorObjects");
+		    KalturaLog::debug("numOfSuccessObjects: $numOfObjects, numOfErrorObjects: $numOfErrorObjects");
 		    
 		    if ($numOfErrorObjects == 0)
 		    {

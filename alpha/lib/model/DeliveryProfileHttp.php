@@ -20,13 +20,13 @@ class DeliveryProfileHttp extends DeliveryProfileVod {
 	// doGetFileSyncUrl - Inherit from parent
 	
 	/**
-	 * @return array $flavors
+	 * @return kManifestRenderer
 	 */
-	public function buildServeFlavors()
+	public function serve()
 	{
 		$flavors = $this->buildHttpFlavorsArray();
-		
-		return $flavors;
+		$renderer = $this->getRenderer($flavors);
+		return $renderer;
 	}
 	
 }

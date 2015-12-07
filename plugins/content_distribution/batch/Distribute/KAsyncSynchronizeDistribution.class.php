@@ -20,6 +20,8 @@ class KAsyncSynchronizeDistribution extends KPeriodicWorker
 	*/
 	public function run($jobs = null)
 	{
+		KalturaLog::info("Synchronize distribution batch is running");
+		
 		self::$kClient->contentDistributionBatch->updateSunStatus();
 		self::$kClient->contentDistributionBatch->createRequiredJobs();
 	}

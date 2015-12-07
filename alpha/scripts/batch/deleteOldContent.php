@@ -422,6 +422,8 @@ class kOldContentCleaner
 	 */
 	protected static function getDeletedFileSyncs()
 	{
+		KalturaLog::info("Searching deleted file syncs");
+		
 		$criteria = new Criteria();
 		
 		$linkCountCriterion = $criteria->getNewCriterion(FileSyncPeer::LINK_COUNT, 0);
@@ -468,6 +470,8 @@ class kOldContentCleaner
 	
 	protected static function deleteDeletedPartnersFileSyncs()
 	{
+		KalturaLog::info("Deleting file syncs of old blocked partners");
+		
 		$partnersCriteria = new Criteria();
 		$partnersCriteria->add(PartnerPeer::STATUS, array(Partner::PARTNER_STATUS_DELETED, Partner::PARTNER_STATUS_FULL_BLOCK), Criteria::IN);
 		$partnersCriteria->add(PartnerPeer::UPDATED_AT, self::$oldPartnersUpdatedAt, Criteria::LESS_THAN);
@@ -499,6 +503,8 @@ class kOldContentCleaner
 	
 	protected static function deleteErrorEntries()
 	{
+		KalturaLog::info("Deleting file syncs of erroneous entries");
+		
 		$criteria = new Criteria();
 		$criteria->add(entryPeer::STATUS, array(entryStatus::READY, entryStatus::DELETED), Criteria::NOT_IN);
 		$criteria->add(entryPeer::UPDATED_AT, self::$errObjectsUpdatedAt, Criteria::LESS_THAN);
@@ -542,6 +548,8 @@ class kOldContentCleaner
 	
 	protected static function deleteErrorAssets()
 	{
+		KalturaLog::info("Deleting file syncs of erroneous assets");
+		
 		$criteria = new Criteria();
 		$criteria->add(assetPeer::STATUS, array(asset::ASSET_STATUS_READY, asset::ASSET_STATUS_DELETED), Criteria::NOT_IN);
 		$criteria->add(assetPeer::UPDATED_AT, self::$errObjectsUpdatedAt, Criteria::LESS_THAN);
@@ -587,6 +595,8 @@ class kOldContentCleaner
 	
 	protected static function deleteErrorObjects()
 	{
+		KalturaLog::info("Deleting file syncs of erroneous objects");
+		
 		self::deleteErrorEntries();
 		self::deleteErrorAssets();
 	}
@@ -600,6 +610,8 @@ class kOldContentCleaner
 	
 	protected static function deleteOldVersionedFileSyncs($objectType, $objectSubType)
 	{
+		KalturaLog::info("Deleting old versions of file syncs");
+		
 		if(!isset(self::$oldVersionsStartUpdatedAt[$objectType]))
 			self::$oldVersionsStartUpdatedAt[$objectType] = 0;
 					
@@ -672,8 +684,8 @@ class kOldContentCleaner
 				switch($objectSubType)
 				{
 					case MetadataProfile::FILE_SYNC_METADATA_DEFINITION:
-				        $join->addCondition(FileSyncPeer::VERSION, MetadataProfilePeer::FILE_SYNC_VERSION, Criteria::NOT_EQUAL);
-						$criteria->add(MetadataProfilePeer::FILE_SYNC_VERSION, null, Criteria::ISNOTNULL);
+				        $join->addCondition(FileSyncPeer::VERSION, MetadataProfilePeer::VERSION, Criteria::NOT_EQUAL);
+						$criteria->add(MetadataProfilePeer::VERSION, null, Criteria::ISNOTNULL);
 				        break;
 					
 					case MetadataProfile::FILE_SYNC_METADATA_VIEWS:

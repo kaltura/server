@@ -4,7 +4,7 @@
  * @subpackage objects
  * @deprecated use KalturaAccessControlProfile instead
  */
-class KalturaAccessControl extends KalturaObject implements IRelatedFilterable 
+class KalturaAccessControl extends KalturaObject implements IFilterable 
 {
 	/**
 	 * The id of the Access Control Profile

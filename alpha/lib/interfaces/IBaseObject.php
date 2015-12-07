@@ -3,7 +3,7 @@
  * @package Core
  * @subpackage model.interfaces
  */ 
-interface IBaseObject extends Persistent
+interface IBaseObject
 {
 	/**
 	 * Is the id as used and known by Kaltura
@@ -15,9 +15,4 @@ interface IBaseObject extends Persistent
 	 * @return int
 	 */
 	public function getPartnerId();
-	
-	/**
-	 * return instance of object peer class
-	 */
-	public function getPeer();
 }

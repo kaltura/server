@@ -53,12 +53,6 @@ class KalturaDistributionFieldConfig extends KalturaObject
      * @readonly
      */
     public $isDefault;
-    
-    /**
-     * Is an error on this field going to trigger deletion of distributed content?
-     * @var bool
-     */
-    public $triggerDeleteOnError;
 	
 	
 	/*
@@ -71,7 +65,6 @@ class KalturaDistributionFieldConfig extends KalturaObject
 		'isRequired',
 		'updateOnChange',
 		'isDefault',
-		'triggerDeleteOnError',
 	);
 		 
 	public function getMapBetweenObjects()

@@ -11,6 +11,11 @@ class KalturaYoutubeApiDistributionProfile extends KalturaConfigurableDistributi
 	public $username;
 
 	/**
+	 * @var string
+	 */
+	public $password;
+		
+	/**
 	 * 
 	 * @var int
 	 */
@@ -59,11 +64,6 @@ class KalturaYoutubeApiDistributionProfile extends KalturaConfigurableDistributi
 	 * @var string
 	 */
 	public $googleTokenData;
-
-	/**
-	 * @var bool
-	 */
-	public $assumeSuccess;
 	
 	/*
 	 * mapping between the field on this object (on the left) and the setter/getter on the object (on the right)  
@@ -71,13 +71,13 @@ class KalturaYoutubeApiDistributionProfile extends KalturaConfigurableDistributi
 	private static $map_between_objects = array 
 	(
 		'username',
+		'password',
 		'defaultCategory',
 		'allowComments',
 		'allowEmbedding',
 		'allowRatings',
 		'allowResponses',
 		'apiAuthorizeUrl',
-		'assumeSuccess',
 	 );
 		 
 	public function getMapBetweenObjects()

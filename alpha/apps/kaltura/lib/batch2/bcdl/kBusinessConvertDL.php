@@ -8,6 +8,8 @@ class kBusinessConvertDL
 	 */
 	public static function replaceEntry(entry $entry, entry $tempEntry = null)
 	{
+		KalturaLog::debug("in replaceEntry");
+
 		if(!$tempEntry)
 			$tempEntry = entryPeer::retrieveByPK($entry->getReplacingEntryId());
 
@@ -22,6 +24,7 @@ class kBusinessConvertDL
 
 		//Extract all assets of the existing entry
 		$oldAssets = assetPeer::retrieveByEntryId($entry->getId());
+		KalturaLog::debug("num of old assets: ".count($oldAssets));
 		$newAssets = array();
 
 		//Loop which creates a mapping between the new assets' paramsId and their type to the asset itself
@@ -29,7 +32,7 @@ class kBusinessConvertDL
 		{
 			if($newAsset->getStatus() != asset::FLAVOR_ASSET_STATUS_READY)
 			{
-				KalturaLog::info("Do not add new asset [" . $newAsset->getId() . "] to flavor [" . $newAsset->getFlavorParamsId() . "] status [" . $newAsset->getStatus() . "]");
+				KalturaLog::debug("Do not add new asset [" . $newAsset->getId() . "] to flavor [" . $newAsset->getFlavorParamsId() . "] status [" . $newAsset->getStatus() . "]");
 				continue;
 			}
 
@@ -42,12 +45,12 @@ class kBusinessConvertDL
 			if($newAsset->getFlavorParamsId() || $newAsset instanceof flavorAsset)
 			{
 				$newAssets[$newAsset->getType()][$newAsset->getFlavorParamsId()] = $newAsset;
-				KalturaLog::info("Added new asset [" . $newAsset->getId() . "] for asset params [" . $newAsset->getFlavorParamsId() . "]");
+				KalturaLog::debug("Added new asset [" . $newAsset->getId() . "] for asset params [" . $newAsset->getFlavorParamsId() . "]");
 			}
 			else
 			{
 				$newAssets[$newAsset->getType()]['asset_' . count($newAssets[$newAsset->getType()])] = $newAsset;
-				KalturaLog::info("Added new asset [" . $newAsset->getId() . "] with no asset params");
+				KalturaLog::debug("Added new asset [" . $newAsset->getId() . "] with no asset params");
 			}
 		}
 
@@ -68,7 +71,7 @@ class kBusinessConvertDL
 				}
 
 				/* @var $newAsset asset */
-				KalturaLog::info("Create link from new asset [" . $newAsset->getId() . "] to old asset [" . $oldAsset->getId() . "] for flavor [" . $oldAsset->getFlavorParamsId() . "]");
+				KalturaLog::debug("Create link from new asset [" . $newAsset->getId() . "] to old asset [" . $oldAsset->getId() . "] for flavor [" . $oldAsset->getFlavorParamsId() . "]");
 
 				$oldAsset->linkFromAsset($newAsset);
 				$oldAsset->save();
@@ -76,7 +79,6 @@ class kBusinessConvertDL
 				self::createFileSyncLinkFromReplacingAsset($oldAsset, $newAsset, asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 				self::createFileSyncLinkFromReplacingAsset($oldAsset, $newAsset, asset::FILE_SYNC_ASSET_SUB_TYPE_ISM);
 				self::createFileSyncLinkFromReplacingAsset($oldAsset, $newAsset, asset::FILE_SYNC_ASSET_SUB_TYPE_ISMC);
-				self::createFileSyncLinkFromReplacingAsset($oldAsset, $newAsset, asset::FILE_SYNC_ASSET_SUB_TYPE_MPD);
 
 				$newFlavorMediaInfo = mediaInfoPeer::retrieveByFlavorAssetId($newAsset->getId());
 				if($newFlavorMediaInfo)
@@ -91,7 +93,7 @@ class kBusinessConvertDL
 				if ($oldAsset->hasTag(thumbParams::TAG_DEFAULT_THUMB))
 				{
 					$defaultThumbAssetNew = $oldAsset;
-					KalturaLog::info("Nominating ThumbAsset [".$oldAsset->getId()."] as the default ThumbAsset after replacent");
+					KalturaLog::debug("Nominating ThumbAsset [".$oldAsset->getId()."] as the default ThumbAsset after replacent");
 				}
 
 			}
@@ -100,7 +102,7 @@ class kBusinessConvertDL
 			{
 				if($entry->getReplacementOptions()->getKeepManualThumbnails() && $oldAsset instanceof thumbAsset && !$oldAsset->getFlavorParamsId())
 				{
-					KalturaLog::info("KeepManualThumbnails ind is set, manual thumbnail is not deleted [" . $oldAsset->getId() . "]");
+					KalturaLog::debug("KeepManualThumbnails ind is set, manual thumbnail is not deleted [" . $oldAsset->getId() . "]");
 					if($oldAsset->hasTag(thumbParams::TAG_DEFAULT_THUMB))
 					{
 						$defaultThumbAssetOld = $oldAsset;
@@ -108,7 +110,7 @@ class kBusinessConvertDL
 				}
 				else 
 				{
-					KalturaLog::info("Delete old asset [" . $oldAsset->getId() . "] for paramsId [" . $oldAsset->getFlavorParamsId() . "]");
+					KalturaLog::debug("Delete old asset [" . $oldAsset->getId() . "] for paramsId [" . $oldAsset->getFlavorParamsId() . "]");
 	
 					$oldAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_DELETED);
 					$oldAsset->setDeletedAt(time());
@@ -122,12 +124,12 @@ class kBusinessConvertDL
 			foreach ($newAssetsByTypes as $newAsset)
 			{
 				$createdAsset = $newAsset->copyToEntry($entry->getId(), $entry->getPartnerId());
-				KalturaLog::info("Copied from new asset [" . $newAsset->getId() . "] to copied asset [" . $createdAsset->getId() . "] for flavor [" . $newAsset->getFlavorParamsId() . "]");
+				KalturaLog::debug("Copied from new asset [" . $newAsset->getId() . "] to copied asset [" . $createdAsset->getId() . "] for flavor [" . $newAsset->getFlavorParamsId() . "]");
 
 				if ($createdAsset->hasTag(thumbParams::TAG_DEFAULT_THUMB))
 				{
 					$defaultThumbAssetNew = $newAsset;
-					KalturaLog::info("Nominating ThumbAsset [".$newAsset->getId()."] as the default ThumbAsset after replacent");
+					KalturaLog::debug("Nominating ThumbAsset [".$newAsset->getId()."] as the default ThumbAsset after replacent");
 				}
 			}
 		}
@@ -135,16 +137,16 @@ class kBusinessConvertDL
 		
 		if($defaultThumbAssetOld)
 		{
-			KalturaLog::info("Kepping ThumbAsset [". $defaultThumbAssetOld->getId() ."] as the default ThumbAsset");
+			KalturaLog::debug("Kepping ThumbAsset [". $defaultThumbAssetOld->getId() ."] as the default ThumbAsset");
 		}
 		elseif ($defaultThumbAssetNew)
 		{
 			kBusinessConvertDL::setAsDefaultThumbAsset($defaultThumbAssetNew);
-			KalturaLog::info("Setting ThumbAsset [". $defaultThumbAssetNew->getId() ."] as the default ThumbAsset");
+			KalturaLog::debug("Setting ThumbAsset [". $defaultThumbAssetNew->getId() ."] as the default ThumbAsset");
 		}
 		else
 		{
-			KalturaLog::info("No default ThumbAsset found for replacing entry [". $tempEntry->getId() ."]");
+			KalturaLog::debug("No default ThumbAsset found for replacing entry [". $tempEntry->getId() ."]");
 			$entry->setThumbnail(".jpg"); // thumbnailversion++
 			$entry->save();
 			$tempEntrySyncKey = $tempEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB);
@@ -184,14 +186,14 @@ class kBusinessConvertDL
 	{
 		if($entry->getSource() != EntrySourceType::RECORDED_LIVE)
 		{
-			KalturaLog::notice("Entry [" . $entry->getId() . "] is not a recorded live");
+			KalturaLog::debug("Entry [" . $entry->getId() . "] is not a recorded live");
 			return;
 		}
 	
 		$liveEntry = entryPeer::retrieveByPKNoFilter($entry->getRootEntryId());
 		if(!$liveEntry || $liveEntry->getStatus() == entryStatus::DELETED || !($liveEntry instanceof LiveEntry))
 		{
-			KalturaLog::notice("Entry root [" . $entry->getRootEntryId() . "] is not a valid live entry");
+			KalturaLog::debug("Entry root [" . $entry->getRootEntryId() . "] is not a valid live entry");
 			return;
 		}
 		/* @var $liveEntry LiveEntry */
@@ -203,7 +205,7 @@ class kBusinessConvertDL
 			
 			if($pendingMediaEntry->getRequiredDuration() && $pendingMediaEntry->getRequiredDuration() > $entry->getLengthInMsecs())
 			{
-				KalturaLog::info("Pending entry [" . $pendingMediaEntry->getEntryId() . "] required duration [" . $pendingMediaEntry->getRequiredDuration() . "] while entry duration [" . $entry->getLengthInMsecs() . "] is too short");
+				KalturaLog::debug("Pending entry [" . $pendingMediaEntry->getEntryId() . "] required duration [" . $pendingMediaEntry->getRequiredDuration() . "] while entry duration [" . $entry->getLengthInMsecs() . "] is too short");
 				continue;
 			}
 			$liveEntry->dettachPendingMediaEntry($pendingMediaEntry->getEntryId());
@@ -211,7 +213,7 @@ class kBusinessConvertDL
 			$pendingEntry = entryPeer::retrieveByPK($pendingMediaEntry->getEntryId());
 			if(!$pendingEntry)
 			{
-				KalturaLog::info("Pending entry [" . $pendingMediaEntry->getEntryId() . "] not found");
+				KalturaLog::debug("Pending entry [" . $pendingMediaEntry->getEntryId() . "] not found");
 				continue;
 			}
 			
@@ -223,7 +225,7 @@ class kBusinessConvertDL
  			}
 			if(!$sourceAsset)
 			{
-				KalturaLog::info("Pending entry [" . $pendingMediaEntry->getEntryId() . "] source asset not found");
+				KalturaLog::debug("Pending entry [" . $pendingMediaEntry->getEntryId() . "] source asset not found");
 				continue;
 			}
  			/* @var $sourceAsset flavorAsset */
@@ -235,6 +237,7 @@ class kBusinessConvertDL
 			$targetAsset = assetPeer::retrieveOriginalByEntryId($pendingMediaEntry->getEntryId());
 			if(!$targetAsset)
 			{
+	 			KalturaLog::debug("Creating original flavor asset");
 				$targetAsset = kFlowHelper::createOriginalFlavorAsset($entry->getPartnerId(), $pendingMediaEntry->getEntryId());
 			}
 			$targetAsset->setFileExt($sourceAsset->getFileExt());
@@ -284,7 +287,7 @@ class kBusinessConvertDL
 			/* @var $thumbAsset KalturaThumbAsset */
 			$thumbAsset->addTags(array(thumbParams::TAG_DEFAULT_THUMB));
 			$thumbAsset->save();
-			KalturaLog::info("Setting entry [". $thumbAsset->getEntryId() ."] default ThumbAsset to [". $thumbAsset->getId() ."]");
+			KalturaLog::debug("Setting entry [". $thumbAsset->getEntryId() ."] default ThumbAsset to [". $thumbAsset->getId() ."]");
 		}
 
 		$entry->setThumbnail(".jpg");
@@ -412,38 +415,46 @@ class kBusinessConvertDL
 		$isSourceFlavor = self::isSourceFlavor($a, $b);
 		if($isSourceFlavor == 1)
 		{
+			KalturaLog::debug("flavor[$flavorB] before flavor[$flavorA] at line[" . __LINE__ . "]");
 			return 1;
 		}
 		if($isSourceFlavor == -1)
 		{
+			KalturaLog::debug("flavor[$flavorA] before flavor[$flavorB] at line[" . __LINE__ . "]");
 			return -1;
 		}
 
 		if($a->getReadyBehavior() == flavorParamsConversionProfile::READY_BEHAVIOR_NO_IMPACT && $b->getReadyBehavior() > flavorParamsConversionProfile::READY_BEHAVIOR_NO_IMPACT)
 		{
+			KalturaLog::debug("flavor[$flavorB] before flavor[$flavorA] at line[" . __LINE__ . "]");
 			return 1;
 		}
 
 		if($a->getReadyBehavior() > flavorParamsConversionProfile::READY_BEHAVIOR_NO_IMPACT && $b->getReadyBehavior() == flavorParamsConversionProfile::READY_BEHAVIOR_NO_IMPACT)
 		{
+			KalturaLog::debug("flavor[$flavorA] before flavor[$flavorB] at line[" . __LINE__ . "]");
 			return -1;
 		}
 
 		if($a->getReadyBehavior() == flavorParamsConversionProfile::READY_BEHAVIOR_OPTIONAL && $b->getReadyBehavior() == flavorParamsConversionProfile::READY_BEHAVIOR_REQUIRED)
 		{
+			KalturaLog::debug("flavor[$flavorB] before flavor[$flavorA] at line[" . __LINE__ . "]");
 			return 1;
 		}
 
 		if($a->getReadyBehavior() == flavorParamsConversionProfile::READY_BEHAVIOR_REQUIRED && $b->getReadyBehavior() == flavorParamsConversionProfile::READY_BEHAVIOR_OPTIONAL)
 		{
+			KalturaLog::debug("flavor[$flavorA] before flavor[$flavorB] at line[" . __LINE__ . "]");
 			return -1;
 		}
 
 		if($a->getVideoBitrate() > $b->getVideoBitrate())
 		{
+			KalturaLog::debug("flavor[$flavorB] before flavor[$flavorA] at line[" . __LINE__ . "]");
 			return 1;
 		}
 
+		KalturaLog::debug("flavor[$flavorA] before flavor[$flavorB] at line[" . __LINE__ . "]");
 		return -1;
 	}
 
@@ -454,12 +465,12 @@ class kBusinessConvertDL
 
 		if(in_array($a->getFlavorParamsId(), $bSources))
 		{
-			KalturaLog::info('Flavor '.$a->getId().' is source of flavor '.$b->getId());
+			KalturaLog::debug('Flavor '.$a->getId().' is source of flavor '.$b->getId());
 			return -1;
 		}
 		if(in_array($b->getFlavorParamsId(), $aSources))
 		{
-			KalturaLog::info('Flavor '.$b->getId().' is source of flavor '.$a->getId());
+			KalturaLog::debug('Flavor '.$b->getId().' is source of flavor '.$a->getId());
 			return 1;
 		}
 

@@ -6,7 +6,7 @@ class myNewBatchPartnerUsage extends myBatchBase
 {
 	const SLEEP_TIME = 1;
 	
-	public function __construct()
+	public function myNewBatchPartnerUsage()
 	{
 		self::initDb();
 	}

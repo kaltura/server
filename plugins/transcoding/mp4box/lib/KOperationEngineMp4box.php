@@ -23,11 +23,11 @@ class KOperationEngineMp4box  extends KSingleOutputOperationEngine
 			$captionsStr = null;
 			{
 					// impersonite
-				KBatchBase::impersonate($this->job->partnerId);
+				$preImpersoniteId = KBatchBase::$kClient->getConfig()->partnerId;
 				
 				$captionsStr = $this->buildSubTitleCommandParam($this->data);
 					// un-impersonite
-				KBatchBase::unimpersonate();
+				KBatchBase::$kClient->getConfig()->partnerId = $preImpersoniteId;
 			}
 			if(isset($captionsStr)){
 				$exeCmd = str_replace(
@@ -152,6 +152,7 @@ KalturaLog::log("ERROR:".$this->message);
 			KalturaLog::err("Error: output file ($cptFilePath) doesn't exist");
 			return null;
 		}
+		KalturaLog::debug("Finished");
 		return $cptFilePath;
 	}
 }

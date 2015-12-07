@@ -3,7 +3,7 @@
  * @package plugins.contentDistribution
  * @subpackage api.objects
  */
-class KalturaEntryDistribution extends KalturaObject implements IRelatedFilterable
+class KalturaEntryDistribution extends KalturaObject implements IFilterable
 {
 	/**
 	 * Auto generated unique id

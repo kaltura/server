@@ -88,20 +88,6 @@ class KalturaResponseCacher extends kApiCache
 		
 		foreach($this->_params as $key => $value)
 		{
-			if (is_numeric($key) && is_array($value) && array_key_exists('ks', $value))
-			{
-				$curKs = $value['ks'];
-				if (strpos($curKs, ':result') !== false)
-					continue;				// the ks is the result of some sub request
-				
-				if ($ks && $ks != $curKs)
-					return false;			// several different ks's in a multirequest - don't use cache
-				
-				$ks = $curKs;
-				unset($this->_params[$key]['ks']);
-				continue;
-			}
-			
 			if(!preg_match('/[\d]+:ks/', $key))
 				continue;				// not a ks
 
@@ -123,25 +109,20 @@ class KalturaResponseCacher extends kApiCache
 		header("Access-Control-Allow-Origin:*"); // avoid html5 xss issues
 
 		// we should never return caching headers for non widget sessions since the KS can be ended and the CDN won't know
-		$isAnonymous = $this->isAnonymous($this->_ksObj);
-		$partnerId = $this->_ksObj ? $this->_ksObj->partner_id : 0;
+		$isAnonymous = !$this->_ks || ($this->_ksObj && $this->_ksObj->isWidgetSession());
 		
 		$forceCachingHeaders = false;
-		if ($this->_ksObj && kConf::hasParam("force_caching_headers") && in_array($partnerId, kConf::get("force_caching_headers")))
+		if ($this->_ksObj && kConf::hasParam("force_caching_headers") && in_array($this->_ksObj->partner_id, kConf::get("force_caching_headers")))
 			$forceCachingHeaders = true;
 		
 		// for GET requests with kalsig (signature of call params) return cdn/browser caching headers
 		if ($usingCache && $isAnonymous && $_SERVER["REQUEST_METHOD"] == "GET" && isset($_REQUEST["kalsig"]) &&  
 			(!self::hasExtraFields() || $forceCachingHeaders)) 
 		{
-			$v3cacheHeadersExpiry = kConf::get('v3cache_headers_expiry', 'local', array());
-			if(isset($v3cacheHeadersExpiry[$partnerId]))
-				$this->_cacheHeadersExpiry = $v3cacheHeadersExpiry[$partnerId];
-		    		    
 			$max_age = !is_null($this->minCacheTTL) ? min($this->_cacheHeadersExpiry, $this->minCacheTTL) : $this->_cacheHeadersExpiry ;
 			header("Cache-Control: private, max-age=$max_age, max-stale=0");
-			header('Expires: ' . gmdate('D, d M Y H:i:s', time() + $max_age) . ' GMT');
-			header('Last-Modified: ' . gmdate('D, d M Y H:i:s', $lastModified) . ' GMT');
+			header('Expires: ' . gmdate('D, d M Y H:i:s', time() + $max_age) . 'GMT');
+			header('Last-Modified: ' . gmdate('D, d M Y H:i:s', $lastModified) . 'GMT');
 		}
 		else
 		{
@@ -335,9 +316,9 @@ class KalturaResponseCacher extends kApiCache
 			return;			// can't find the secrets of the partner in the cache
 		}
 		list($adminSecret, $userSecret, $ksVersion) = $secrets;				
+		$secretToMatch = $type ? $adminSecret : $userSecret;
 		$paramSecret = $params['secret'];
-		if ($paramSecret !== $adminSecret &&
-			($type || $paramSecret !== $userSecret))
+		if ($paramSecret != $secretToMatch)
 		{
 			return;			// invalid secret
 		}

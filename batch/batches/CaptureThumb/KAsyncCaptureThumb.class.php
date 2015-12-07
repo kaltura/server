@@ -45,6 +45,8 @@ class KAsyncCaptureThumb extends KJobHandlerWorker
 	
 	private function captureThumb(KalturaBatchJob $job, KalturaCaptureThumbJobData $data)
 	{
+		KalturaLog::debug("captureThumb($job->id)");
+		
 		$thumbParamsOutput = self::$kClient->thumbParamsOutput->get($data->thumbParamsOutputId);
 		
 		try
@@ -57,6 +59,7 @@ class KAsyncCaptureThumb extends KJobHandlerWorker
 			if(!is_file($mediaFile))
 				return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::NFS_FILE_DOESNT_EXIST, "Source file $mediaFile is not a file", KalturaBatchJobStatus::FAILED);
 				
+			KalturaLog::debug("mediaFile [$mediaFile]");
 			$this->updateJob($job,"Capturing thumbnail on $mediaFile", KalturaBatchJobStatus::QUEUED);
 		}
 		catch(Exception $ex)
@@ -125,6 +128,10 @@ class KAsyncCaptureThumb extends KJobHandlerWorker
 				
 				$this->updateJob($job, "Thumbnail captured [$capturePath]", KalturaBatchJobStatus::PROCESSING);
 			}
+			else
+			{
+				KalturaLog::info("Source file is already an image");
+			}
 			
 			$uniqid = uniqid('thumb_');
 			$thumbPath = $rootPath . DIRECTORY_SEPARATOR . $uniqid;
@@ -174,6 +181,8 @@ class KAsyncCaptureThumb extends KJobHandlerWorker
 	 */
 	private function moveFile(KalturaBatchJob $job, KalturaCaptureThumbJobData $data)
 	{
+		KalturaLog::debug("moveFile($job->id, $data->thumbPath)");
+		
 		// creates a temp file path
 		$rootPath = self::$taskConfig->params->sharedTempPath;
 		if(! is_dir($rootPath))

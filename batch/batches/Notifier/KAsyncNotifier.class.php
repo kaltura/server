@@ -38,6 +38,8 @@ class KAsyncNotifier extends KJobHandlerWorker
 	*/
 	public function run($jobs = null)
 	{
+		KalturaLog::info("Notification batch is running");
+		
 		if(KBatchBase::$taskConfig->isInitOnly())
 			return $this->init();
 		
@@ -65,12 +67,16 @@ class KAsyncNotifier extends KJobHandlerWorker
 	 */
 	private function sendNotifications(array $notificationJobs)
 	{
+		KalturaLog::debug("sendNotifications(" . count($notificationJobs) . ")");
+		
 		try
 		{
 			// eventually all partners will support multiNotifications 
 			// when so - can remove some of the code
 			// see  which notifications should go to multiNotification and which should stay in single notificaiton
 			list($single_notifications, $multi_notifications) = $this->splitToMulti($notificationJobs);
+			KalturaLog::debug("multi request notifications: " . count($multi_notifications));
+			KalturaLog::debug("single request notifications: " . count($single_notifications));
 			
 			foreach($multi_notifications as $partner_id => $multi_notifications_per_partner)
 			{
@@ -127,6 +133,8 @@ class KAsyncNotifier extends KJobHandlerWorker
 	 */
 	private function sendSingleNotification($url, $signature_key, KalturaBatchJob $not, $prefix = null)
 	{
+		KalturaLog::debug("sendSingleNotification($url, $signature_key, $not->id, $prefix)");
+		
 		$start_time = microtime(true);
 		
 		list($params, $raw_siganture) = KAsyncNotifierParamsUtils::prepareNotificationData($url, $signature_key, $not, $not->data, $prefix);
@@ -164,6 +172,8 @@ class KAsyncNotifier extends KJobHandlerWorker
 	 */
 	private function sendMultiNotifications($url, $signature_key, array $not_list)
 	{
+		KalturaLog::debug("sendMultiNotifications($url, $signature_key, " . count($not_list) . ")");
+		
 		$start_time = microtime(true);
 		
 		$params = array();
@@ -215,6 +225,8 @@ class KAsyncNotifier extends KJobHandlerWorker
 	 */
 	private function updateMultiNotificationStatus(array $not_list, $http_code, $res)
 	{
+		KalturaLog::debug("updateMultiNotificationStatus(" . count($not_list) . ", $http_code, $res)");
+		
 		KBatchBase::$kClient->startMultiRequest();
 		foreach($not_list as $not)
 			$this->updateNotificationStatus($not, $http_code, $res);
@@ -230,6 +242,8 @@ class KAsyncNotifier extends KJobHandlerWorker
 	 */
 	private function updateNotificationStatus(KalturaBatchJob $not, $http_code, $res)
 	{
+		KalturaLog::debug("updateNotificationStatus($not->id, $http_code, $res)");
+		 
 		$not->data->notificationResult = $res;
 		
 		if($http_code == 200 && $res !== false)
@@ -243,9 +257,7 @@ class KAsyncNotifier extends KJobHandlerWorker
 		}
 		
 		$updateData = new KalturaNotificationJobData();
-		//Instead of writing the notification result to th DB, write it to the log only
-		KalturaLog::info("Notification result: [" . $not->data->notificationResult ."]");
-		//$updateData->notificationResult = $not->data->notificationResult;
+		$updateData->notificationResult = $not->data->notificationResult;
 		
 		$updateNot = new KalturaBatchJob();
 		$updateNot->status = $not->status;
@@ -265,6 +277,8 @@ class KAsyncNotifier extends KJobHandlerWorker
 	 */
 	private function splitToMulti(array $notifications)
 	{
+		KalturaLog::debug("sendNotifications(" . count($notifications) . ")");
+		
 		$single_notifications = array();
 		$multi_notifications = array();
 		foreach($notifications as $not)

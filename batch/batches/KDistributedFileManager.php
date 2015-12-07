@@ -69,6 +69,8 @@ class KDistributedFileManager
 	 */
 	private function fetchFile($remotePath, $localPath, &$errDescription)
 	{
+		KalturaLog::debug("Fetch url [$remotePath] to file [$localPath]");
+				
 		try
 		{
 			$folder = substr($localPath, 0, strrpos($localPath, '/'));
@@ -95,6 +97,8 @@ class KDistributedFileManager
 				$fileSize = $curlHeaderResponse->headers['content-length'];
 			$curlWrapper->close();
 				
+			KalturaLog::debug("Executing curl");
+
 			// overcome a 32bit issue with curl fetching >=4gb files
 			if (intval("9223372036854775807") == 2147483647 && $fileSize >= 4 * 1024 * 1024 * 1024)
 			{

@@ -8,7 +8,7 @@
  * @package Core
  * @subpackage model
  */ 
-class ConversionProfile extends BaseConversionProfile implements IBaseObject
+class ConversionProfile extends BaseConversionProfile
 {
 	const GLOBAL_PARTNER_PROFILE = 0; 					// every profile that belongs to partner_id 0 is global and can be shared between partners
 	const CONVERSION_PROFILE_UNKNOWN = -1; 			// kaltura's default conversion profile id

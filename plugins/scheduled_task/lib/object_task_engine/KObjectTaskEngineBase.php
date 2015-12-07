@@ -31,7 +31,7 @@ abstract class KObjectTaskEngineBase
 	 */
 	public function execute($object)
 	{
-		KalturaLog::info('Executing object task '.get_class($this).' for object '.get_class($object));
+		KalturaLog::debug('Executing object task '.get_class($this).' for object '.get_class($object));
 
 		if (is_null($this->_client))
 			throw new Exception('Client must be set before execution');
