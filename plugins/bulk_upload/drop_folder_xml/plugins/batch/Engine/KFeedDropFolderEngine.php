@@ -276,6 +276,10 @@ class KFeedDropFolderEngine extends KDropFolderEngine
 		return max ($bitrates);
 	}
 	
+	/**
+	 * @param string $url
+	 * @return string
+	 */
 	protected function fetchFeedContent ($url)
 	{
 		$user = parse_url ($url, PHP_URL_USER);
@@ -303,7 +307,11 @@ class KFeedDropFolderEngine extends KDropFolderEngine
 		curl_setopt ($ch, CURLOPT_FOLLOWLOCATION, true);
 		curl_setopt ($ch, CURLOPT_RETURNTRANSFER, true);
 		
-		return curl_exec($ch);
+		$res = curl_exec($ch);
+		curl_close ($ch);
+		
+		KalturaLog::info("For URL [$url], the curl result is: " . print_r($res, true));
+		return $res;
 	}
 	
 	
