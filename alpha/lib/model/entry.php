@@ -3227,6 +3227,13 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 		$this->setSource($value);
 	}
 
+	public function addClonePendingEntry($entryId)
+	{
+		$clonePendingEntries = $this->getClonePendingEntries();
+		$clonePendingEntries[] = $entryId;
+		$this->setClonePendingEntries($clonePendingEntries);
+	}
+
 	public function setClonePendingEntries(array $clonePendingEntries)
 	{
 		$this->putInCustomData("clonePendingEntries", $clonePendingEntries);
