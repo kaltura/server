@@ -316,7 +316,7 @@ class kFlowHelper
 			}		
 			$replacingAsset->save();
 			
-			$job = kJobsManager::addConcatJob($dbBatchJob, $replacingAsset, $files, null, null, $data->getAMFs());
+			$job = kJobsManager::addConcatJob($dbBatchJob, $replacingAsset, $files, null, null, $data->getAmfArray());
 		}
 
 		return $dbBatchJob;

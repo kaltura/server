@@ -49,7 +49,7 @@ class KalturaConvertLiveSegmentJobData extends KalturaJobData
 	/**
 	 * @var KalturaKeyValueArray
 	 */
-	public $AMFs;
+	public $amfArray;
 
 	private static $map_between_objects = array
 	(
@@ -60,7 +60,7 @@ class KalturaConvertLiveSegmentJobData extends KalturaJobData
 		'srcFilePath',
 		'destFilePath',
 		'endTime',
-		'AMFs',
+		'amfArray',
 	);
 
 	/* (non-PHPdoc)

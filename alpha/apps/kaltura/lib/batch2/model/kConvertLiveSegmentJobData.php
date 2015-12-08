@@ -43,7 +43,7 @@ class kConvertLiveSegmentJobData extends kJobData
 	/**
 	 * @var array
 	 */
-	private $AMFs;
+	private $amfArray;
 
 	/**
 	 * @return string $entryId
@@ -158,18 +158,18 @@ class kConvertLiveSegmentJobData extends kJobData
 	}
 
 	/**
-	 * @return the $AMFs array
+	 * @return the $amfArray
 	 */
-	public function getAMFs()
+	public function getAmfArray()
 	{
-		return $this->AMFs;
+		return $this->amfArray;
 	}
 
 	/**
-	 * @param KalturaKeyValueArray $AMFs
+	 * @param KalturaKeyValueArray $amfArray
 	 */
-	public function setAMFs($AMFs)
+	public function setAmfArray($amfArray)
 	{
-		$this->AMFs = $AMFs;
+		$this->amfArray = $amfArray;
 	}
 }

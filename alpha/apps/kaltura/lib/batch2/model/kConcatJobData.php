@@ -33,7 +33,7 @@ class kConcatJobData extends kJobData
 	/**
 	 * @var array
 	 */
-	private $AMFs;
+	private $amfArray;
 
 	/**
 	 * @return array $srcFiles
@@ -116,18 +116,18 @@ class kConcatJobData extends kJobData
 	}
 
 	/**
-	 * @return the $AMFs array
+	 * @return the $amfArray
 	 */
-	public function getAMFs()
+	public function getAmfArray()
 	{
-		return $this->AMFs;
+		return $this->amfArray;
 	}
 
 	/**
-	 * @param KalturaKeyValueArray $AMFs
+	 * @param KalturaKeyValueArray $amfArray
 	 */
-	public function setAMFs($AMFs)
+	public function setAmfArray($amfArray)
 	{
-		$this->AMFs = $AMFs;
+		$this->amfArray = $amfArray;
 	}
 }

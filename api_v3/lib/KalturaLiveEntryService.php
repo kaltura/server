@@ -133,9 +133,9 @@ class KalturaLiveEntryService extends KalturaEntryService
 		}
 
 		// Extract AMF data from all data frames in the segment
-		$amfParser = new KAMFMediaInfoParser($filename, kConf::get('bin_path_ffprobeKAMFMediaInfoParser'));
-		$AMFs = $amfParser->getAMFInfo();
-		kJobsManager::addConvertLiveSegmentJob(null, $dbAsset, $mediaServerIndex, $filename, $currentDuration, $AMFs);
+		$amfParser = new KAMFMediaInfoParser($filename);
+		$amfArray = $amfParser->getAMFInfo();
+		kJobsManager::addConvertLiveSegmentJob(null, $dbAsset, $mediaServerIndex, $filename, $currentDuration, $amfArray);
 
 		if($mediaServerIndex == KalturaMediaServerIndex::PRIMARY)
 		{

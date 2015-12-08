@@ -12,9 +12,14 @@ class KAMFMediaInfoParser{
     protected $ffmprobeBin;
     protected $filePath;
 
-    public function __construct($filePath, $ffprobeBin="ffprobeKAMFMediaInfoParser")
+    public function __construct($filePath, $ffprobeBin=null)
     {
-        $this->ffprobeBin = $ffprobeBin;
+        if (is_null($ffprobeBin)) {
+            $this->ffprobeBin = kConf::get('bin_path_ffprobeKAMFMediaInfoParser');
+        }
+        else{
+            $this->ffprobeBin = $ffprobeBin;
+        }
         if (!file_exists($filePath))
             throw new kApplicativeException(KBaseMediaParser::ERROR_NFS_FILE_DOESNT_EXIST, "File not found at [$filePath]");
 
@@ -58,36 +63,15 @@ class KAMFMediaInfoParser{
 
         $amf = array();
 
-        for ($i = 0; $i < count($jsonObj); $i++) {
-            $tmp = $jsonObj[$i];
+        foreach ( $jsonObj as $tmp){
             // the first data packet is of smaller size of 205 chars
             if (strlen($tmp->data) > self::MinAMFSizeToTryParse) {
+                $amfTs = $this->getTimestampFromAMF($tmp->data);
+                $amfPts = $tmp->pts;
 
-                $amfData = $tmp->pts . ';' . $this->getTimestampFromAMF($tmp->data);
-
-                // to save on space, we only want to save an AMF if there is a discontinuance between them
-                if (count($amf) == 0) {
-                    KalturaLog::debug('adding AMF - first in the segment ts= ' . $amfData->ts . ' pts= ' . $tmp->pts);
+                if ($this->shouldSaveAMF($amf, $amfTs, $amfPts)){
+                    $amfData = $amfPts . ';' . $amfTs;
                     array_push($amf, $amfData);
-                }
-                else{
-                    $lastAMF = $amf[count($amf)-1];
-                    $tsDelta = $amfData->ts - $lastAMF->ts;
-                    $ptsDelta = $amfData->pts - $lastAMF->pts;
-
-                    if (abs($tsDelta - $ptsDelta) >=  self::MaxAMFDiscontinuanceMS){
-                        if ($tsDelta > self::MinDistanceBetweenAMFsInMS) {
-                            KalturaLog::debug('got discontinuance - adding AMF. ' . 'tsDelta= ' . $tsDelta . ' ptsDelta= ' . $ptsDelta);
-                            array_push($amf, $amfData);
-                        }
-                        else{
-                            KalturaLog::debug('got discontinuance, but not adding AMF since time from last AMF is less than ' . self::MinDistanceBetweenAMFsInMS . 'ms. tsDelta= ' . $tsDelta . ' ptsDelta= ' . $ptsDelta);
-                        }
-                    }
-                    // @todo - remove the else before commit
-                    else{
-                        KalturaLog::debug('NOT adding AMF. ' . 'tsDelta= ' . $tsDelta . ' ptsDelta= ' . $ptsDelta);
-                    }
                 }
             }
         }
@@ -97,7 +81,35 @@ class KAMFMediaInfoParser{
         return $amf;
     }
 
-     private function getTimestampFromAMF($AMFData){
+    private function shouldSaveAMF($amfArray, $amfTs, $amfPts){
+
+        if (count($amfArray) == 0) {
+            KalturaLog::debug('adding AMF - first in the segment ts= ' . $amfTs . ' pts= ' . $amfPts);
+            return true;
+        }
+
+        $amfParts = explode(';', $amfArray[count($amfArray)-1]);
+        $lastAmfPts = $amfParts[0];
+        $lastAmfTs = $amfParts[1];
+        $tsDelta = $amfTs - $lastAmfTs;
+        $ptsDelta = $amfPts - $lastAmfPts;
+
+        if (abs($tsDelta - $ptsDelta) >=  self::MaxAMFDiscontinuanceMS){
+            if ($tsDelta > self::MinDistanceBetweenAMFsInMS) {
+                KalturaLog::debug('got discontinuance - adding AMF. ' . 'tsDelta= ' . $tsDelta . ' ptsDelta= ' . $ptsDelta);
+                return true;
+            }
+            else{
+                KalturaLog::debug('got discontinuance, but not adding AMF since time from last AMF is less than ' . self::MinDistanceBetweenAMFsInMS . 'ms. tsDelta= ' . $tsDelta . ' ptsDelta= ' . $ptsDelta);
+            }
+        }
+        else{
+            KalturaLog::debug('NOT adding AMF. ' . 'tsDelta= ' . $tsDelta . ' ptsDelta= ' . $ptsDelta);
+        }
+        return false;
+    }
+
+    private function getTimestampFromAMF($AMFData){
         $AMFDataStream = $this->getByteStreamFromFFProbeAMFData($AMFData);
 
         // look for 74696d657374616d70 which is the hex encoding of "timestamp"

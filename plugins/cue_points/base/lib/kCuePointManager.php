@@ -36,12 +36,9 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 	{
 		KalturaLog::debug('in kCuePointManager.handleConvertLiveSegmentJobFinished - file index is ' . $data->getFileIndex());
 		if ($data->getFileIndex() == 0) {
-			KalturaLog::debug('in kCuePointManager.handleConvertLiveSegmentJobFinished - running KMediaInfoMediaParser');
 			$mediaInfoParser = new KMediaInfoMediaParser($data->getDestFilePath(), kConf::get('bin_path_mediainfo'));
 			$recordedVODDurationInMS = $mediaInfoParser->getMediaInfo()->videoDuration;
-			KalturaLog::debug('in kCuePointManager.handleConvertLiveSegmentJobFinished - running KMediaInfoMediaParser - finished ' .
-				$dbBatchJob->getEntry()->getRecordedEntryId() . ' ' . $recordedVODDurationInMS . ' ' . $recordedVODDurationInMS . ' ' . print_r($data->getAMFs(), true));
-			self::copyCuePointsFromLiveToVodEntry($dbBatchJob->getEntry()->getRecordedEntryId(), $recordedVODDurationInMS, $recordedVODDurationInMS, $data->getAMFs());
+			self::copyCuePointsFromLiveToVodEntry($dbBatchJob->getEntry()->getRecordedEntryId(), $recordedVODDurationInMS, $recordedVODDurationInMS, $data->getAmfArray());
 		}
 	}
 
@@ -52,7 +49,6 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 		$mediaInfoParser = new KMediaInfoMediaParser($data->getDestFilePath(), kConf::get('bin_path_mediainfo'));
 		$recordedVODDurationInMS = $mediaInfoParser->getMediaInfo()->videoDuration;
 
-		//kConvertLiveSegmentJobData tmp =
 		$convertJobData = ($dbBatchJob->getParentJob()->getData());
 
 		// get the duration of the new segment file
@@ -62,7 +58,7 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 		$mediaInfoParser2 = new KMediaInfoMediaParser($segmentFiles[$convertJobData->getFileIndex()], kConf::get('bin_path_mediainfo'));
 		$lastSegmentDurationInMS = $mediaInfoParser2->getMediaInfo()->videoDuration;
 
-		self::copyCuePointsFromLiveToVodEntry( $dbBatchJob->getParentJob()->getEntry()->getRecordedEntryId(), $recordedVODDurationInMS, $lastSegmentDurationInMS, $data->getAMFs());
+		self::copyCuePointsFromLiveToVodEntry( $dbBatchJob->getParentJob()->getEntry()->getRecordedEntryId(), $recordedVODDurationInMS, $lastSegmentDurationInMS, $data->getAmfArray());
 	}
 
 	/* (non-PHPdoc)
@@ -584,12 +580,12 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 	/**
 	 * @param string $vodEntryId
 	 */
-	public static function copyCuePointsFromLiveToVodEntry( $vodEntryId, $totalVODDuration, $lastSegmentDuration, $AMFs )
+	public static function copyCuePointsFromLiveToVodEntry( $vodEntryId, $totalVODDuration, $lastSegmentDuration, $amfArray )
 	{
 		KalturaLog::debug("in copyCuePointsFromLiveToVodEntry with VOD entry ID: " . $vodEntryId .
 			" totalVODDuration: " . $totalVODDuration .
 			" lastSegmentDuration " . $lastSegmentDuration .
-			" AMFs: " . print_r($AMFs, true));
+			" AMFs: " . print_r($amfArray, true));
 
 		$vodEntry = entryPeer::retrieveByPK($vodEntryId);
 		if ( ! $vodEntry )
@@ -605,10 +601,10 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 			return;
 		}
 
-		$currentSegmentEndTime = self::getSegmentEndTime($AMFs, $lastSegmentDuration);
-		$currentSegmentStartTime = self::getSegmentStartTime($AMFs);
+		$currentSegmentEndTime = self::getSegmentEndTime($amfArray, $lastSegmentDuration);
+		$currentSegmentStartTime = self::getSegmentStartTime($amfArray);
 
-		$AMFs = self::parseAMFs($AMFs, $totalVODDuration, $lastSegmentDuration);
+		$amfArray = self::parseAMFs($amfArray, $totalVODDuration, $lastSegmentDuration);
 
 		KalturaLog::log("Saving the live entry [{$liveEntry->getId()}] cue points into the associated VOD entry [{$vodEntry->getId()}]");
 
@@ -631,7 +627,7 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 			{
 				$processedCuePointIds[] = $liveCuePoint->getId();
 				$cuePointCreationTime = $liveCuePoint->getCreatedAt(NULL)*1000;
-				$offsetForTS = self::getOffsetForTimestamp($cuePointCreationTime, $AMFs);
+				$offsetForTS = self::getOffsetForTimestamp($cuePointCreationTime, $amfArray);
 				$copyMsg = "cuepoint [{$liveCuePoint->getId()}] from live entry [{$liveEntry->getId()}] to VOD entry [{$vodEntry->getId()}] cuePointCreationTime= $cuePointCreationTime offsetForTS= $offsetForTS";
 				KalturaLog::debug("Preparing to copy $copyMsg");
 				if ( ! is_null( $offsetForTS ) )
@@ -651,40 +647,40 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 		}
 	}
 
-	private static function getOffsetForTimestamp($timestamp, $AMFs){
+	private static function getOffsetForTimestamp($timestamp, $amfArray){
 		KalturaLog::debug('getOffsetForTimestamp ' . $timestamp);
 
-		$minDistanceIndex = self::getClosestAMFIndex($timestamp, $AMFs);
+		$minDistanceAmf = self::getClosestAMF($timestamp, $amfArray);
 
 		$ret = 0;
-		if (is_null($minDistanceIndex)){
-			KalturaLog::debug('minDistanceIndex is null - returning 0');
+		if (is_null($minDistanceAmf)){
+			KalturaLog::debug('minDistanceAmf is null - returning 0');
 		}
-		else if ($AMFs[$minDistanceIndex]->ts > $timestamp){
-			KalturaLog::debug('timestamp is before index #' . $minDistanceIndex);
-			$ret = $AMFs[$minDistanceIndex]->pts - ($AMFs[$minDistanceIndex]->ts - $timestamp);
+		elseif ($minDistanceAmf->ts > $timestamp){
+			KalturaLog::debug('timestamp is before ' . print_r($minDistanceAmf, true));
+			$ret = $minDistanceAmf->pts - ($minDistanceAmf->ts - $timestamp);
 		}
 		else{
-			KalturaLog::debug('timestamp is after index #' . $minDistanceIndex);
-			$ret = $AMFs[$minDistanceIndex]->pts + ($timestamp - $AMFs[$minDistanceIndex]->ts);
+			KalturaLog::debug('timestamp is after ' . print_r($minDistanceAmf, true));
+			$ret = $minDistanceAmf->pts + ($timestamp - $minDistanceAmf->ts);
 		}
 
-		KalturaLog::debug('AMFs array is:' . print_r($AMFs, true) . 'getOffsetForTimestamp returning ' . $ret);
+		KalturaLog::debug('AMFs array is:' . print_r($amfArray, true) . 'getOffsetForTimestamp returning ' . $ret);
 		return $ret;
 	}
 
-	private static function getClosestAMFIndex($timestamp, $AMFs){
-		$len = count($AMFs);
+	private static function getClosestAMF($timestamp, $amfArray){
+		$len = count($amfArray);
 		$ret = null;
 
 		if ($len == 1){
-			$ret = 0;
+			$ret = $amfArray[0];
 		}
-		else if ($timestamp >= $AMFs[$len-1]->ts){
-			$ret = $len-1;
+		else if ($timestamp >= $amfArray[$len-1]->ts){
+			$ret = $amfArray[$len-1];
 		}
-		else if ($timestamp <= $AMFs[0]->ts){
-			$ret = 0;
+		else if ($timestamp <= $amfArray[0]->ts){
+			$ret = $amfArray[0];
 		}
 		else if ($len > 1) {
 			$lo = 0;
@@ -692,59 +688,59 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 
 			while ($hi - $lo > 1) {
 				$mid = round(($lo + $hi) / 2);
-				if ($AMFs[$mid]->ts <= $timestamp) {
+				if ($amfArray[$mid]->ts <= $timestamp) {
 					$lo = $mid;
 				} else {
 					$hi = $mid;
 				}
 			}
 
-			if (abs($AMFs[$hi]->ts - $timestamp) > abs($AMFs[$lo]->ts - $timestamp)) {
-				return $lo;
+			if (abs($amfArray[$hi]->ts - $timestamp) > abs($amfArray[$lo]->ts - $timestamp)) {
+				$ret = $amfArray[$lo];
 			} else {
-				return $hi;
+				$ret = $amfArray[$hi];
 			}
 		}
 
-		KalturaLog::debug('getClosestAMFIndex returning ' . $ret);
+		KalturaLog::debug('getClosestAMF returning ' . print_r($ret, true));
 		return $ret;
 	}
 
 	// Get an array of strings of the form pts;ts and return an array of KAMFData
-	private static function parseAMFs($AMFs, $totalVODDuration, $currentSegmentDuration){
+	private static function parseAMFs($amfArray, $totalVODDuration, $currentSegmentDuration){
 		$retArr = array();
 
-		for($i=0; $i < count($AMFs); ++$i){
+		for($i=0; $i < count($amfArray); ++$i){
 			$amf = new KAMFData();
-			$amfParts = explode(';', $AMFs[$i]);
+			$amfParts = explode(';', $amfArray[$i]);
 			$amf->pts = $amfParts[0] + $totalVODDuration - $currentSegmentDuration;
 			$amf->ts = $amfParts[1];
 
-			KalturaLog::debug('adding AMF to AMFs: ' . print_r($amf, true) . ' extracted from ' . $AMFs[$i]);
+			KalturaLog::debug('adding AMF to AMFs: ' . print_r($amf, true) . ' extracted from ' . $amfArray[$i]);
 			array_push($retArr, $amf);
 		}
 
 		return $retArr;
 	}
 
-	private static function getSegmentEndTime($AMFs, $segmentDuration){
-		if (count($AMFs) == 0){
+	private static function getSegmentEndTime($amfArray, $segmentDuration){
+		if (count($amfArray) == 0){
 			KalturaLog::warning("getSegmentEndTime got an empty AMFs array - returning 0 as segment end time");
 			return 0;
 		}
-		$amfParts = explode(';', $AMFs[0]);
+		$amfParts = explode(';', $amfArray[0]);
 		$ts = $amfParts[0];
 		$pts = $amfParts[1];
 
 		return ($pts - $ts + $segmentDuration)/1000;
 	}
 
-	private static function getSegmentStartTime($AMFs){
-		if (count($AMFs) == 0){
+	private static function getSegmentStartTime($amfArray){
+		if (count($amfArray) == 0){
 			KalturaLog::warning("getSegmentStartTime got an empty AMFs array - returning 0 as segment end time");
 			return 0;
 		}
-		$amfParts = explode(';', $AMFs[0]);
+		$amfParts = explode(';', $amfArray[0]);
 		$ts = $amfParts[0];
 		$pts = $amfParts[1];
 
