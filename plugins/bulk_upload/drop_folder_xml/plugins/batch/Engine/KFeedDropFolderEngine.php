@@ -286,9 +286,6 @@ class KFeedDropFolderEngine extends KDropFolderEngine
 		if (!is_null ($user))
 		{
 			$password = parse_url ($url, PHP_URL_PASS);
-			$user = parse_url($url, PHP_URL_USER);
-			$password = parse_url($url, PHP_URL_PASS);
-			
 			$protocol = parse_url($url, PHP_URL_SCHEME);
 			$hostname = parse_url($url, PHP_URL_HOST);
 			$port = parse_url($url, PHP_URL_PORT);
