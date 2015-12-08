@@ -39,7 +39,12 @@ class kConvertLiveSegmentJobData extends kJobData
 	 * @var float
 	 */
 	private $endTime;
-	
+
+	/**
+	 * @var array
+	 */
+	private $amfArray;
+
 	/**
 	 * @return string $entryId
 	 */
@@ -150,5 +155,21 @@ class kConvertLiveSegmentJobData extends kJobData
 	public function setAssetId($assetId)
 	{
 		$this->assetId = $assetId;
+	}
+
+	/**
+	 * @return the $amfArray
+	 */
+	public function getAmfArray()
+	{
+		return $this->amfArray;
+	}
+
+	/**
+	 * @param KalturaKeyValueArray $amfArray
+	 */
+	public function setAmfArray($amfArray)
+	{
+		$this->amfArray = $amfArray;
 	}
 }

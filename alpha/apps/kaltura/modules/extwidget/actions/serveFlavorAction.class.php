@@ -86,18 +86,9 @@ class serveFlavorAction extends kalturaAction
 				}
 			}
 		
-			if ($pathOnly == 2)			// temporary hack until full migration
-			{
-				$renderer = new kRendererString(
-					'{"sequences":[{"clips":[{"type":"source","path":"' . $path . '"}]}]}', 
-					'application/json');
-			}
-			else 
-			{
-				$renderer = new kRendererString(
-						'<?xml version="1.0" encoding="utf-8"?><xml><result>' . $path . '</result></xml>',
-						'text/xml');
-			}
+			$renderer = new kRendererString(
+				'{"sequences":[{"clips":[{"type":"source","path":"' . $path . '"}]}]}', 
+				'application/json');
 			if ($path)
 			{
 				$this->storeCache($renderer, $flavorAsset->getPartnerId());
