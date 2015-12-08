@@ -240,9 +240,6 @@ abstract class LiveEntry extends entry
 	public function getLastElapsedRecordingTime()		{ return $this->getFromCustomData( "lastElapsedRecordingTime", null, 0 ); }
 	public function setLastElapsedRecordingTime( $v )	{ $this->putInCustomData( "lastElapsedRecordingTime" , $v ); }
 
-	public function setRecordedSegmentsInfo( $v )	{ $this->putInCustomData('recordedSegmentsInfo', $v); }
-	public function getRecordedSegmentsInfo()		{ return $this->getFromCustomData('recordedSegmentsInfo', null, new kRecordedSegmentsInfo()); }
-
 	public function setStreamName ( $v )	{	$this->putInCustomData ( "streamName" , $v );	}
 	public function getStreamName (  )	{	return $this->getFromCustomData( "streamName", null, $this->getId() . '_%i' );	}
 	
