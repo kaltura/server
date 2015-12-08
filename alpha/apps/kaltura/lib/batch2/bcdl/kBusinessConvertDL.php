@@ -106,6 +106,14 @@ class kBusinessConvertDL
 						$defaultThumbAssetOld = $oldAsset;
 					}
 				}
+				else 
+				{
+					KalturaLog::info("Delete old asset [" . $oldAsset->getId() . "] for paramsId [" . $oldAsset->getFlavorParamsId() . "]");
+	
+					$oldAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_DELETED);
+					$oldAsset->setDeletedAt(time());
+					$oldAsset->save();
+				}				
 			}
 		}
 
