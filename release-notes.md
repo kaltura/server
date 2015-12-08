@@ -1,3 +1,32 @@
+# Kajam-11.4.0 #
+
+## Ad stitching - report ##
+
+ - Issue Type: New Feature
+ - Issue ID: PLAT-2502 
+
+#### Installation ####
+
+make sure the following packages are installed:
+	- mutt
+	- enscript
+	- ps2pdf
+	 
+#### Configuration ####
+
+	- Add new module to the admin-console in admin.ini:
+		moduls.enablePlayServerReport.enabled = true
+		moduls.enablePlayServerReport.permissionType = 2
+		moduls.enablePlayServerReport.label = Enable Play-Server Report
+		moduls.enablePlayServerReport.permissionName = PLAY_SERVER_REPORT
+		moduls.enablePlayServerReport.basePermissionType = 2
+		moduls.enablePlayServerReport.basePermissionName = FEATURE_PLAY_SERVER
+		moduls.enablePlayServerReport.group = GROUP_ENABLE_DISABLE_FEATURES
+
+#### Known Issues & Limitations ####
+
+None.
+
 # Kajam-11.2.0 #
 - task: WEBC-631
 #### Configuration ####
