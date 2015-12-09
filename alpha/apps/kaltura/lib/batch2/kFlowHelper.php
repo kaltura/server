@@ -357,11 +357,9 @@ class kFlowHelper
 						$replacingAsset = assetPeer::retrieveByEntryIdAndParams($replacingEntryId, $asset->getFlavorParamsId());
 						if($replacingAsset)
 						{
+								
 								KalturaLog::debug("Entry in replacement, deleting - [".$replacingEntryId."]");
-								myEntryUtils::deleteEntry($replacingEntry);
-								$recordedEntry->setReplacingEntryId(null);
-								$recordedEntry->setReplacementStatus(entryReplacementStatus::NONE);
-								$recordedEntry->save();
+								deleteReplacingEntry($recordedEntry,$replacingEntry);
 								$replacingEntry = null;
 						}
 				}

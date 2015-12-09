@@ -1342,4 +1342,15 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		
 		return $entry->getIntId();
  	}
+
+	/*
+	 * Delete replacing entry for recorded entry
+	 */
+	public static function deleteReplacingEntry(entry $recordedEntry,entry $replacingEntry)
+	{
+		self::deleteEntry($replacingEntry);
+		$recordedEntry->setReplacingEntryId(null);
+		$recordedEntry->setReplacementStatus(entryReplacementStatus::NONE);
+		$recordedEntry->save();
+	}
 }
