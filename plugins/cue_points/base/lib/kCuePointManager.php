@@ -21,8 +21,6 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
  	 */
 	public function updatedJob(BatchJob $dbBatchJob)
 	{
-		KalturaLog::debug('in kCuePointManager.updatedJob - jobID:' . $dbBatchJob->getId() . ' job type: ' . $dbBatchJob->getJobType()  . ' JobStatus= ' . $dbBatchJob->getStatus());
-
 		if ($jobType = $dbBatchJob->getJobType() == BatchJobType::CONCAT){
 			self::handleConcatJobFinished($dbBatchJob, $dbBatchJob->getData());
 		}
@@ -34,18 +32,13 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 
 	private function handleConvertLiveSegmentJobFinished(BatchJob $dbBatchJob, kConvertLiveSegmentJobData $data)
 	{
-		KalturaLog::debug('in kCuePointManager.handleConvertLiveSegmentJobFinished - file index is ' . $data->getFileIndex());
-		if ($data->getFileIndex() == 0) {
-			$mediaInfoParser = new KMediaInfoMediaParser($data->getDestFilePath(), kConf::get('bin_path_mediainfo'));
-			$recordedVODDurationInMS = $mediaInfoParser->getMediaInfo()->videoDuration;
-			self::copyCuePointsFromLiveToVodEntry($dbBatchJob->getEntry()->getRecordedEntryId(), $recordedVODDurationInMS, $recordedVODDurationInMS, $data->getAmfArray());
-		}
+		$mediaInfoParser = new KMediaInfoMediaParser($data->getDestFilePath(), kConf::get('bin_path_mediainfo'));
+		$recordedVODDurationInMS = $mediaInfoParser->getMediaInfo()->videoDuration;
+		self::copyCuePointsFromLiveToVodEntry($dbBatchJob->getEntry()->getRecordedEntryId(), $recordedVODDurationInMS, $recordedVODDurationInMS, $data->getAmfArray());
 	}
 
 	private function handleConcatJobFinished(BatchJob $dbBatchJob, kConcatJobData $data)
 	{
-		KalturaLog::debug('in kCuePointManager.handleConcatJobFinished');
-
 		$mediaInfoParser = new KMediaInfoMediaParser($data->getDestFilePath(), kConf::get('bin_path_mediainfo'));
 		$recordedVODDurationInMS = $mediaInfoParser->getMediaInfo()->videoDuration;
 
@@ -66,13 +59,21 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
  	 */
 	public function shouldConsumeJobStatusEvent(BatchJob $dbBatchJob)
 	{
-		KalturaLog::debug('in kCuePointManager.shouldConsumeJobStatusEvent. JobType= ' . $dbBatchJob->getJobType() . ' JobStatus= ' . $dbBatchJob->getStatus());
 		$jobType = $dbBatchJob->getJobType();
-		if (($jobType == BatchJobType::CONVERT_LIVE_SEGMENT || $jobType == BatchJobType::CONCAT) && $dbBatchJob->getStatus() == BatchJob::BATCHJOB_STATUS_FINISHED){
-			KalturaLog::debug('in kCuePointManager.shouldConsumeJobStatusEvent - returning true');
+		$data = $dbBatchJob->getData();
+
+		// copy cue points only if it's the first file and this is the primary server
+		if ($jobType == BatchJobType::CONVERT_LIVE_SEGMENT &&
+			$dbBatchJob->getStatus() == BatchJob::BATCHJOB_STATUS_FINISHED &&
+			$data->getFileIndex() == 0 &&
+			$data->getMediaServerIndex() == MediaServerIndex::PRIMARY){
 			return true;
 		}
-		KalturaLog::debug('in kCuePointManager.shouldConsumeJobStatusEvent - returning false');
+
+		if ($jobType == BatchJobType::CONCAT && $dbBatchJob->getStatus() == BatchJob::BATCHJOB_STATUS_FINISHED){
+			return true;
+		}
+
 		return false;
 	}
 
@@ -582,7 +583,7 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 	 */
 	public static function copyCuePointsFromLiveToVodEntry( $vodEntryId, $totalVODDuration, $lastSegmentDuration, $amfArray )
 	{
-		KalturaLog::debug("in copyCuePointsFromLiveToVodEntry with VOD entry ID: " . $vodEntryId .
+		KalturaLog::debug("VOD entry ID: " . $vodEntryId .
 			" totalVODDuration: " . $totalVODDuration .
 			" lastSegmentDuration " . $lastSegmentDuration .
 			" AMFs: " . print_r($amfArray, true));
