@@ -9,13 +9,16 @@ class KAMFMediaInfoParser{
     const MaxAMFDiscontinuanceMS = 1000;
     const MinDistanceBetweenAMFsInMS = 60000;
 
-    protected $ffmprobeBin;
+    protected $ffmprobeBin = 'ffprobeKAMFMediaInfoParser';
     protected $filePath;
 
     public function __construct($filePath, $ffprobeBin=null)
     {
         if (is_null($ffprobeBin)) {
-            $this->ffprobeBin = kConf::get('bin_path_ffprobeKAMFMediaInfoParser');
+
+            if (kConf::hasParam('bin_path_ffprobeKAMFMediaInfoParser')) {
+                $this->ffprobeBin = kConf::get('bin_path_ffprobeKAMFMediaInfoParser');
+            }
         }
         else{
             $this->ffprobeBin = $ffprobeBin;
@@ -53,30 +56,33 @@ class KAMFMediaInfoParser{
     // parse the output of the command and return an array of string of the form pts;timestamp
     protected function parseOutput($output)
     {
+        $amf = array();
         $outputLower = strtolower($output);
         $jsonObj = json_decode($outputLower);
 
-        // Check for json decode errors caused by inproper utf8 encoding.
-        if(json_last_error()!=JSON_ERROR_NONE) $jsonObj = json_decode(utf8_encode($outputLower));
+        if (!is_null($jsonObj)) {
+            // Check for json decode errors caused by inproper utf8 encoding.
+            if (json_last_error() != JSON_ERROR_NONE) $jsonObj = json_decode(utf8_encode($outputLower));
 
-        $jsonObj = $jsonObj->packets;
+            $jsonObj = $jsonObj->packets;
 
-        $amf = array();
+            foreach ($jsonObj as $tmp) {
+                // the first data packet is of smaller size of 205 chars
+                if (strlen($tmp->data) > self::MinAMFSizeToTryParse) {
+                    $amfTs = $this->getTimestampFromAMF($tmp->data);
+                    $amfPts = $tmp->pts;
 
-        foreach ( $jsonObj as $tmp){
-            // the first data packet is of smaller size of 205 chars
-            if (strlen($tmp->data) > self::MinAMFSizeToTryParse) {
-                $amfTs = $this->getTimestampFromAMF($tmp->data);
-                $amfPts = $tmp->pts;
-
-                if ($this->shouldSaveAMF($amf, $amfTs, $amfPts)){
-                    $amfData = $amfPts . ';' . $amfTs;
-                    array_push($amf, $amfData);
+                    if ($this->shouldSaveAMF($amf, $amfTs, $amfPts)) {
+                        $amfData = $amfPts . ';' . $amfTs;
+                        array_push($amf, $amfData);
+                    }
                 }
             }
+            KalturaLog::debug('amf array: ' . print_r($amf, true));
         }
-
-        KalturaLog::debug('amf array: ' . print_r($amf, true));
+        else{
+            KalturaLog::warning('failed to json_decode. returning an empty AMF array');
+        }
 
         return $amf;
     }
