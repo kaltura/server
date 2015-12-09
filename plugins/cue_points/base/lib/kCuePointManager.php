@@ -32,7 +32,6 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 
 	private function handleConvertLiveSegmentJobFinished(BatchJob $dbBatchJob, kConvertLiveSegmentJobData $data)
 	{
-		// copy cue points only if it's the first file and this is the primary server
 		$mediaInfoParser = new KMediaInfoMediaParser($data->getDestFilePath(), kConf::get('bin_path_mediainfo'));
 		$recordedVODDurationInMS = $mediaInfoParser->getMediaInfo()->videoDuration;
 		self::copyCuePointsFromLiveToVodEntry($dbBatchJob->getEntry()->getRecordedEntryId(), $recordedVODDurationInMS, $recordedVODDurationInMS, $data->getAmfArray());
@@ -63,6 +62,7 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 		$jobType = $dbBatchJob->getJobType();
 		$data = $dbBatchJob->getData();
 
+		// copy cue points only if it's the first file and this is the primary server
 		if ($jobType == BatchJobType::CONVERT_LIVE_SEGMENT &&
 			$dbBatchJob->getStatus() == BatchJob::BATCHJOB_STATUS_FINISHED &&
 			$data->getFileIndex() == 0 &&
