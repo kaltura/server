@@ -359,7 +359,7 @@ class kFlowHelper
 						{
 								
 								KalturaLog::debug("Entry in replacement, deleting - [".$replacingEntryId."]");
-								deleteReplacingEntry($recordedEntry,$replacingEntry);
+								myEntryUtils::deleteReplacingEntry($recordedEntry,$replacingEntry);
 								$replacingEntry = null;
 						}
 				}
