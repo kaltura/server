@@ -21,8 +21,6 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
  	 */
 	public function updatedJob(BatchJob $dbBatchJob)
 	{
-		KalturaLog::debug('jobID:' . $dbBatchJob->getId() . ' job type: ' . $dbBatchJob->getJobType()  . ' JobStatus= ' . $dbBatchJob->getStatus());
-
 		if ($jobType = $dbBatchJob->getJobType() == BatchJobType::CONCAT){
 			self::handleConcatJobFinished($dbBatchJob, $dbBatchJob->getData());
 		}
@@ -35,17 +33,13 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 	private function handleConvertLiveSegmentJobFinished(BatchJob $dbBatchJob, kConvertLiveSegmentJobData $data)
 	{
 		// copy cue points only if it's the first file and this is the primary server
-		if ($data->getFileIndex() == 0 && $data->getMediaServerIndex() == MediaServerIndex::PRIMARY) {
-			$mediaInfoParser = new KMediaInfoMediaParser($data->getDestFilePath(), kConf::get('bin_path_mediainfo'));
-			$recordedVODDurationInMS = $mediaInfoParser->getMediaInfo()->videoDuration;
-			self::copyCuePointsFromLiveToVodEntry($dbBatchJob->getEntry()->getRecordedEntryId(), $recordedVODDurationInMS, $recordedVODDurationInMS, $data->getAmfArray());
-		}
+		$mediaInfoParser = new KMediaInfoMediaParser($data->getDestFilePath(), kConf::get('bin_path_mediainfo'));
+		$recordedVODDurationInMS = $mediaInfoParser->getMediaInfo()->videoDuration;
+		self::copyCuePointsFromLiveToVodEntry($dbBatchJob->getEntry()->getRecordedEntryId(), $recordedVODDurationInMS, $recordedVODDurationInMS, $data->getAmfArray());
 	}
 
 	private function handleConcatJobFinished(BatchJob $dbBatchJob, kConcatJobData $data)
 	{
-		KalturaLog::debug('in kCuePointManager.handleConcatJobFinished');
-
 		$mediaInfoParser = new KMediaInfoMediaParser($data->getDestFilePath(), kConf::get('bin_path_mediainfo'));
 		$recordedVODDurationInMS = $mediaInfoParser->getMediaInfo()->videoDuration;
 
@@ -67,9 +61,19 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 	public function shouldConsumeJobStatusEvent(BatchJob $dbBatchJob)
 	{
 		$jobType = $dbBatchJob->getJobType();
-		if (($jobType == BatchJobType::CONVERT_LIVE_SEGMENT || $jobType == BatchJobType::CONCAT) && $dbBatchJob->getStatus() == BatchJob::BATCHJOB_STATUS_FINISHED){
+		$data = $dbBatchJob->getData();
+
+		if ($jobType == BatchJobType::CONVERT_LIVE_SEGMENT &&
+			$dbBatchJob->getStatus() == BatchJob::BATCHJOB_STATUS_FINISHED &&
+			$data->getFileIndex() == 0 &&
+			$data->getMediaServerIndex() == MediaServerIndex::PRIMARY){
 			return true;
 		}
+
+		if ($jobType == BatchJobType::CONCAT && $dbBatchJob->getStatus() == BatchJob::BATCHJOB_STATUS_FINISHED){
+			return true;
+		}
+
 		return false;
 	}
 
