@@ -254,7 +254,9 @@ class CrossKalturaDistributionEngine extends DistributionEngine implements
 	    $flavorAssetsContent = array();
 	    foreach ($flavorAssets as $flavorAsset)
 	    {
-	        $flavorAssetsContent[$flavorAsset->id] = $this->getAssetContentResource($flavorAsset->id, $client->flavorAsset, $remoteFlavorAssetContent);
+			$options = new KalturaFlavorAssetUrlOptions();
+			$options->fileName = $flavorAsset->id;
+	        $flavorAssetsContent[$flavorAsset->id] = $this->getAssetContentResource($flavorAsset->id, $client->flavorAsset, $remoteFlavorAssetContent, $options);
 	    }   
 	    
 	    
@@ -377,8 +379,9 @@ class CrossKalturaDistributionEngine extends DistributionEngine implements
 	 * @param string $assetId
 	 * @param KalturaServiceBase $assetService
 	 * @param bool $remote
+	 * @param KalturaFlavorAssetUrlOptions $options
 	 */
-	protected function getAssetContentResource($assetId, KalturaServiceBase $assetService, $remote)
+	protected function getAssetContentResource($assetId, KalturaServiceBase $assetService, $remote, $options = null)
 	{
 	    $contentResource = null;
 	    	    
@@ -409,9 +412,11 @@ class CrossKalturaDistributionEngine extends DistributionEngine implements
 	    {
 	        // get local resource
 	        $contentResource = new KalturaUrlResource();
-		    $options = new KalturaFlavorAssetUrlOptions();
-		    $options->fileName = $assetId;
-		    $contentResource->url = $assetService->getUrl($assetId, null, false, $options);
+			if ( !is_null($options) ) {
+				$contentResource->url = $assetService->getUrl($assetId, null, false, $options);
+			} else {
+				$contentResource->url = $assetService->getUrl($assetId);
+			}
 	    }
 	    return $contentResource;
 	}
