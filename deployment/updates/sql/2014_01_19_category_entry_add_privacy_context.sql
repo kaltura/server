@@ -1,1 +1,0 @@
-ALTER TABLE `category_entry` ADD `privacy_context` VARCHAR(255) AFTER `status`,drop key `entry_id_index`, ADD KEY `entry_id_privacy_context_index`(`entry_id`, `privacy_context`);
