@@ -10,4 +10,15 @@ class DeliveryProfileVodPackagerHls extends DeliveryProfileAppleHttp {
 		$url .= VodPackagerDeliveryUtils::getExtraParams($this->params);
 		return $url . '/index.m3u8';
 	}
+	
+	protected function doGetFileSyncUrl(FileSync $fileSync)
+	{
+		$url = parent::doGetFileSyncUrl($fileSync);
+		
+		if(!$this->params->getEdgeServerIds() || !count($this->params->getEdgeServerIds()))
+			return $url;
+		
+		$url .= VodPackagerDeliveryUtils::getExtraParams($this->params);
+		return $url . '/index.m3u8';
+	}
 }
