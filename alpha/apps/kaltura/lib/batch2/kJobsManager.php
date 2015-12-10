@@ -199,6 +199,7 @@ class kJobsManager
 			//Boost the job by setting priority and urjeny to 1 
 			$job->setPriority(1);
 			$job->setUrgency(1);
+			$job->save();
 		}
 	}
 	
