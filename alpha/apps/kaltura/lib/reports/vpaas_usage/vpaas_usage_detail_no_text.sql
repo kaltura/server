@@ -1,0 +1,1 @@
+CALL kalturadw.calc_vpaas_partner_usage({PARTNER_ID}, {FROM_DATE_ID}, {TO_DATE_ID}, {TIME_SHIFT}, "{SORT_FIELD}");

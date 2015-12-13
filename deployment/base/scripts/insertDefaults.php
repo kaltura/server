@@ -99,7 +99,7 @@ function handleFile($filePath)
 					return $this;
 				}
 				
-				protected function doSave(PropelPDO $con)
+				protected function doSave(PropelPDO $con,$skipReload = false)
 				{
 					$affectedRows = 0; // initialize var to track total num of affected rows
 					if (!$this->alreadyInSave) {

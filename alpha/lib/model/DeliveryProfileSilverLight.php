@@ -7,10 +7,11 @@ class DeliveryProfileSilverLight extends DeliveryProfileVod {
 		$this->DEFAULT_RENDERER_CLASS = 'kSilverLightManifestRenderer';
 	}
 	
-	public function serve()
+	public function buildServeFlavors()
 	{
 		$manifestInfo = $this->getSmoothStreamUrl();
-		return $this->getRenderer(array($manifestInfo));
+		
+		return array($manifestInfo);
 	}
 	
 	/**

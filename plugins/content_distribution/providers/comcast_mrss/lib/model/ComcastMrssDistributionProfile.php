@@ -14,6 +14,8 @@ class ComcastMrssDistributionProfile extends ConfigurableDistributionProfile
 	const CUSTOM_DATA_ITEM_LINK = 'itemLink';
 	const CUSTOM_DATA_C_PLATFORM_TV_SERIES = 'cPlatformTVSeries';
 	const CUSTOM_DATA_C_PLATFORM_TV_SERIES_FIELD = 'cPlatformTVSeriesField';
+	const SHOULD_INCLUDE_CUE_POINTS = 'shouldIncludeCuePoints';
+	const SHOULD_INCLUDE_CAPTIONS = 'shouldIncludeCaptions';
 	
 	protected $maxLengthValidation= array (
 		ComcastMrssDistributionField::TITLE => 38,
@@ -236,4 +238,10 @@ class ComcastMrssDistributionProfile extends ConfigurableDistributionProfile
 	
 	public function getItemLink()					{return $this->getFromCustomData(self::CUSTOM_DATA_ITEM_LINK);}
 	public function setItemLink($v)					{$this->putInCustomData(self::CUSTOM_DATA_ITEM_LINK, $v);}
+	
+	public function getShouldIncludeCuePoints ()	{return $this->getFromCustomData(self::SHOULD_INCLUDE_CUE_POINTS);}
+	public function setShouldIncludeCuePoints ($v)	{$this->putInCustomData(self::SHOULD_INCLUDE_CUE_POINTS, $v);}
+	
+	public function getShouldIncludeCaptions ()	{return $this->getFromCustomData(self::SHOULD_INCLUDE_CAPTIONS);}
+	public function setShouldIncludeCaptions ($v)	{$this->putInCustomData(self::SHOULD_INCLUDE_CAPTIONS, $v);}
 }

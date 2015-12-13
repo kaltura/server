@@ -113,7 +113,7 @@ class kBusinessConvertDL
 					$oldAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_DELETED);
 					$oldAsset->setDeletedAt(time());
 					$oldAsset->save();
-				}
+				}				
 			}
 		}
 

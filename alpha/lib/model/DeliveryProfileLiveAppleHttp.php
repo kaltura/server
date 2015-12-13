@@ -127,7 +127,7 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 		if(!$manifest)
 			return;
 	
-		$this->finalizeUrls($url, $flavors);
+		$domainPrefix = $this->getDeliveryServerNodeUrl(true);
 		$manifestLines = explode("\n", $manifest);
 		$manifestLine = reset($manifestLines);
 		while($manifestLine)
@@ -139,6 +139,7 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 				$flavor = array(
 					'url' => '',
 					'urlPrefix' => requestUtils::resolve(next($manifestLines), $url),
+					'domainPrefix' => $domainPrefix,
 					'ext' => 'm3u8',
 				);
 				
@@ -197,10 +198,10 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 	    return ($a['bitrate'] < $b['bitrate']) ? -1 : 1;
 	}
 
-	public function doServe(kLiveStreamConfiguration $liveStreamConfig) 
+	public function buildServeFlavors() 
 	{	
-		$baseUrl = $liveStreamConfig->getUrl();
-		$backupUrl = $liveStreamConfig->getBackupUrl();
+		$baseUrl = $this->liveStreamConfig->getUrl();
+		$backupUrl = $this->liveStreamConfig->getBackupUrl();
 		
 		$entry = entryPeer::retrieveByPK($this->params->getEntryId());
 		/* @var $entry LiveEntry */
@@ -213,12 +214,12 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 		
 		if($this->params->getUsePlayServer()) {
 			
-			$liveStreamConfig->setUrl($this->getPlayServerUrl($baseUrl));
-			$liveStreamConfig->setBackupUrl(null);
+			$this->liveStreamConfig->setUrl($this->getPlayServerUrl($baseUrl));
+			$this->liveStreamConfig->setBackupUrl(null);
 		}
 				
-		if((!$liveStreamConfig->getBackupUrl() && !$this->getForceProxy()) || $this->params->getUsePlayServer() || $liveStreamConfig->getIsExternalStream()) {
-			return parent::doServe($liveStreamConfig);
+		if((!$this->liveStreamConfig->getBackupUrl() && !$this->getForceProxy()) || $this->params->getUsePlayServer() || $this->liveStreamConfig->getIsExternalStream()) {
+			return parent::buildServeFlavors();
 		}
 				
 		$flavors = array();
@@ -238,8 +239,16 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 			unset($flavors[$index]['index']);
 		}
 		
+		return $flavors;
+	}
+	
+	public function getRenderer($flavors)
+	{
 		$this->DEFAULT_RENDERER_CLASS = 'kM3U8ManifestRenderer';
-		$renderer = $this->getRenderer($flavors);
+		if((!$this->liveStreamConfig->getBackupUrl() && !$this->getForceProxy()) || $this->params->getUsePlayServer() || $this->liveStreamConfig->getIsExternalStream()) {
+			$this->DEFAULT_RENDERER_CLASS = 'kRedirectManifestRenderer';
+		}
+		$renderer = parent::getRenderer($flavors);
 		return $renderer;
 	}
 }

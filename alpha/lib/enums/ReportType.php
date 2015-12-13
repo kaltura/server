@@ -34,4 +34,5 @@ interface ReportType extends BaseEnum
    const BROWSERS = 23;
    const LIVE = 24;
    const TOP_PLAYBACK_CONTEXT = 25;
+   const VPAAS_USAGE = 26;
 }

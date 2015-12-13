@@ -19,8 +19,9 @@ if(!$uiConf)
 	
 $fileSyncs = array();
 
-$fileSync = kFileSyncUtils::getLocalFileSyncForKey($uiConf->getSyncKey(uiConf::FILE_SYNC_UICONF_SUB_TYPE_DATA), true);
-$fileSyncs[] = $fileSync;
+$fileSync = kFileSyncUtils::getLocalFileSyncForKey($uiConf->getSyncKey(uiConf::FILE_SYNC_UICONF_SUB_TYPE_DATA), false);
+if($fileSync)
+        $fileSyncs[] = $fileSync;
 
 $fileSync = kFileSyncUtils::getLocalFileSyncForKey($uiConf->getSyncKey(uiConf::FILE_SYNC_UICONF_SUB_TYPE_CONFIG), false);
 if($fileSync)
@@ -30,6 +31,8 @@ $fileSync = kFileSyncUtils::getLocalFileSyncForKey($uiConf->getSyncKey(uiConf::F
 if($fileSync)
 	$fileSyncs[] = $fileSync;
 	
+if(empty($fileSyncs))
+    die("No file_sync found for UI-Conf ID [" .$uiConfId. "]");
 
 uiConfPeer::setUseCriteriaFilter(true);
 FileSyncPeer::setUseCriteriaFilter(true);

@@ -2,6 +2,8 @@
 
 class DeliveryProfileLiveRtmp extends DeliveryProfileLive {
 	
+	protected $baseUrl = '';
+	
 	function __construct() {
 		parent::__construct();
 		$this->DEFAULT_RENDERER_CLASS = 'kF4MManifestRenderer';
@@ -17,15 +19,21 @@ class DeliveryProfileLiveRtmp extends DeliveryProfileLive {
 		return $this->getFromCustomData("enforceRtmpe");
 	}
 	
-	public function doServe(kLiveStreamConfiguration $liveStreamConfig)
+	public function buildServeFlavors()
 	{
 		$flavors = $this->buildRtmpLiveStreamFlavorsArray();
 
-		$baseUrl = $liveStreamConfig->getUrl();
+		$baseUrl = $this->liveStreamConfig->getUrl();
 		$this->finalizeUrls($baseUrl, $flavors);
+		$this->baseUrl = $baseUrl;
 		
-		$renderer = $this->getRenderer($flavors);
-		$renderer->baseUrl = $baseUrl;
+		return $flavors;
+	}
+	
+	public function getRenderer($flavors)
+	{
+		$renderer = parent::getRenderer($flavors);
+		$renderer->baseUrl = $this->baseUrl;
 		$renderer->streamType = kF4MManifestRenderer::PLAY_STREAM_TYPE_LIVE;
 		return $renderer;
 	}

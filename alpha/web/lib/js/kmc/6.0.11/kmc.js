@@ -1,4 +1,4 @@
-/*! KMC - v6.0.11 - 2015-06-29
+/*! KMC - v6.0.11 - 2015-11-29
 * https://github.com/kaltura/KMC_V2
 * Copyright (c) 2015 Amir Chervinsky; Licensed GNU */
 /**
@@ -3615,9 +3615,9 @@ kmcApp.controller('PreviewCtrl', ['$scope', '$translate', 'previewService', func
 		};
 
 	var setDeliveryTypes = function(player) {
-			if( $scope.liveBitrates && $scope.liveBitrates != false ) {
+			//if( $scope.liveBitrates && $scope.liveBitrates != false ) {
 				previewService.setDeliveryType('auto');
-			}
+			//}
 			var deliveryTypes = Preview.objectToArray(kmc.vars.delivery_types);
 			var defaultType = $scope.deliveryType || Preview.getDefault('deliveryType');
 			var validDeliveryTypes = [];

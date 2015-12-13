@@ -1016,6 +1016,86 @@ PuserKuserPeer::getCriteriaFilter()->disable();
  		$entry->setRank(0);
  		$entry->setTotalRank(0);
 	}
+
+	public static function copyEntryData(entry $entry, entry $targetEntry)
+	{
+		// for any type that does not require assets:
+		$shouldCopyDataForNonClip = true;
+		if ($entry->getType() == entryType::MEDIA_CLIP)
+			$shouldCopyDataForNonClip = false;
+		if ($entry->getType() == entryType::PLAYLIST)
+			$shouldCopyDataForNonClip = false;
+
+		$shouldCopyDataForClip = false;
+		// only images get their data copied
+		if($entry->getType() == entryType::MEDIA_CLIP)
+		{
+			if($entry->getMediaType() != entry::ENTRY_MEDIA_TYPE_VIDEO &&
+				$entry->getMediaType() != entry::ENTRY_MEDIA_TYPE_AUDIO)
+			{
+				$shouldCopyDataForClip = true;
+			}
+		}
+
+		if($shouldCopyDataForNonClip || $shouldCopyDataForClip)
+		{
+			// copy the data
+			$from = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA); // replaced__getDataPath
+			$to = $targetEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA); // replaced__getDataPath
+			KalturaLog::log("copyEntriesByType - copying entry data [".$from."] to [".$to."]");
+			kFileSyncUtils::softCopy($from, $to);
+		}
+
+		$ismFrom = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_ISM);
+		if(kFileSyncUtils::fileSync_exists($ismFrom))
+		{
+			$ismTo = $targetEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_ISM);
+			KalturaLog::log("copying entry ism [".$ismFrom."] to [".$ismTo."]");
+			kFileSyncUtils::softCopy($ismFrom, $ismTo);
+		}
+
+		$ismcFrom = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_ISMC);
+		if(kFileSyncUtils::fileSync_exists($ismcFrom))
+		{
+			$ismcTo = $targetEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_ISMC);
+			KalturaLog::log("copying entry ism [".$ismcFrom."] to [".$ismcTo."]");
+			kFileSyncUtils::softCopy($ismcFrom, $ismcTo);
+		}
+
+		$from = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB); // replaced__getThumbnailPath
+		$considerCopyThumb = true;
+		// if entry is image - data is thumbnail, and it was copied
+		if($entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_IMAGE)
+			$considerCopyThumb = false;
+		// if entry is not clip, and there is no file in both DCs - nothing to copy
+		if($entry->getType() != entryType::MEDIA_CLIP && !kFileSyncUtils::file_exists($from, true))
+			$considerCopyThumb = false;
+		if ( $considerCopyThumb )
+		{
+			$skipThumb = false;
+			// don't attempt to copy a thumbnail for images - it's the same as the data which was just created
+			if($entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_AUDIO)
+			{
+				// check if audio entry has real thumb, if not - don't copy thumb.
+				$originalFileSync = kFileSyncUtils::getOriginFileSyncForKey($from, false);
+				if(!$originalFileSync)
+				{
+					$skipThumb = true;
+				}
+			}
+			if(!$skipThumb)
+			{
+				$to = $targetEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB); // replaced__getThumbnailPath
+				KalturaLog::log("copyEntriesByType - copying entry thumbnail [".$from."] to [".$to."]");
+				kFileSyncUtils::softCopy($from, $to);
+			}
+		}
+
+		// added by Tan-Tan 12/01/2010 to support falvors copy
+		$sourceAssets = assetPeer::retrieveByEntryId($entry->getId());
+		foreach($sourceAssets as $sourceAsset)
+			$sourceAsset->copyToEntry($targetEntry->getId(), $targetEntry->getPartnerId());
+	}
 	
 	public static function copyEntry(entry $entry, Partner $toPartner = null, $dontCopyUsers = false)
  	{
@@ -1079,25 +1159,14 @@ PuserKuserPeer::getCriteriaFilter()->disable();
  		$defaultCategoryFilter->addAnd(categoryPeer::PARTNER_ID, $oldPartnerId);
  		
  		KalturaLog::log("copyEntry - New entry [".$newEntry->getId()."] was created");
-		
-		// for any type that does not require assets:
-		$shouldCopyDataForNonClip = true;
-		if ($entry->getType() == entryType::MEDIA_CLIP)
-		    $shouldCopyDataForNonClip = false;    
-		if ($entry->getType() == entryType::PLAYLIST)
-		    $shouldCopyDataForNonClip = false;
-		
-		$shouldCopyDataForClip = false;
-		// only images get their data copied
-		if($entry->getType() == entryType::MEDIA_CLIP)
-		{
-			if($entry->getMediaType() != entry::ENTRY_MEDIA_TYPE_VIDEO &&
-			   $entry->getMediaType() != entry::ENTRY_MEDIA_TYPE_AUDIO)
-			   {
-				$shouldCopyDataForClip = true;
-			   }
+
+		if ( $entry->getStatus() != entryStatus::READY ) {
+			$entry->addClonePendingEntry($newEntry->getId());
+			$entry->save();
+		} else {
+			self::copyEntryData( $entry, $newEntry );
 		}
-		
+
  	    //if entry is a static playlist, link between it and its new child entries
 		if ($entry->getType() == entryType::PLAYLIST)
 		{
@@ -1162,63 +1231,6 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		            break;
 		    }
 		}
-		
-		if($shouldCopyDataForNonClip || $shouldCopyDataForClip)
-		{
-	 		// copy the data
-			$from = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA); // replaced__getDataPath
-	 		$to = $newEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA); // replaced__getDataPath
-	 		KalturaLog::log("copyEntriesByType - copying entry data [".$from."] to [".$to."]");
-			kFileSyncUtils::softCopy($from, $to);
-		}
-		
-		$ismFrom = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_ISM);		
-		if(kFileSyncUtils::fileSync_exists($ismFrom))
-		{
-			$ismTo = $newEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_ISM);
-			KalturaLog::log("copying entry ism [".$ismFrom."] to [".$ismTo."]");
-			kFileSyncUtils::softCopy($ismFrom, $ismTo);
-		}
-		
-		$ismcFrom = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_ISMC);		
-		if(kFileSyncUtils::fileSync_exists($ismcFrom))
-		{
-			$ismcTo = $newEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_ISMC);
-			KalturaLog::log("copying entry ism [".$ismcFrom."] to [".$ismcTo."]");
-			kFileSyncUtils::softCopy($ismcFrom, $ismcTo);
-		}
- 		
-		$from = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB); // replaced__getThumbnailPath
-		$considerCopyThumb = true;
-		// if entry is image - data is thumbnail, and it was copied
-		if($entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_IMAGE) $considerCopyThumb = false;
-		// if entry is not clip, and there is no file in both DCs - nothing to copy
-		if($entry->getType() != entryType::MEDIA_CLIP && !kFileSyncUtils::file_exists($from, true)) $considerCopyThumb = false;
-		if ( $considerCopyThumb ) 
-		{
-			$skipThumb = false;
-			// don't attempt to copy a thumbnail for images - it's the same as the data which was just created
-			if($entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_AUDIO)
-			{
-				// check if audio entry has real thumb, if not - don't copy thumb.
-				$originalFileSync = kFileSyncUtils::getOriginFileSyncForKey($from, false);
-				if(!$originalFileSync)
-				{
-					$skipThumb = true;
-				}
-			}
-			if(!$skipThumb)
-			{
-				$to = $newEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB); // replaced__getThumbnailPath
-				KalturaLog::log("copyEntriesByType - copying entry thumbnail [".$from."] to [".$to."]");
-				kFileSyncUtils::softCopy($from, $to);
-			}
-		}
-
-		// added by Tan-Tan 12/01/2010 to support falvors copy
-		$sourceAssets = assetPeer::retrieveByEntryId($entry->getId());
-		foreach($sourceAssets as $sourceAsset)
-			$sourceAsset->copyToEntry($newEntry->getId(), $newEntry->getPartnerId());
  	
 		// copy relationships to categories
 		KalturaLog::debug('Copy relationships to categories from entry [' . $entry->getId() . '] to entry [' . $newEntry->getId() . ']');
@@ -1328,4 +1340,15 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		
 		return $entry->getIntId();
  	}
+
+	/*
+	 * Delete replacing entry for recorded entry
+	 */
+	public static function deleteReplacingEntry(entry $recordedEntry,entry $replacingEntry)
+	{
+		self::deleteEntry($replacingEntry);
+		$recordedEntry->setReplacingEntryId(null);
+		$recordedEntry->setReplacementStatus(entryReplacementStatus::NONE);
+		$recordedEntry->save();
+	}
 }

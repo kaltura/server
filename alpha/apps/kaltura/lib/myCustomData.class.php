@@ -1,6 +1,9 @@
 <?php
 class myCustomData
 {
+	// max custom_data size for later storing as a varchar column in the db, leaving a bit of spare space if we will actually hit this limit
+	const MAX_CUSTOM_DATE_SIZE = 65000; 
+	
 	private $data;
 	
 	/**
@@ -57,7 +60,12 @@ class myCustomData
 	{
 		if ( $null_if_empty && ( $this->data == null || count ( $this->data ) == 0 ) )
 			return null;
-		return serialize( $this->data );
+		
+		$s = serialize( $this->data );
+		if (strlen($s) > self::MAX_CUSTOM_DATE_SIZE)
+			throw new kCoreException('Exceeded custom data max size', kCoreException::EXCEEDED_MAX_CUSTOM_DATA_SIZE);
+			
+		return $s; 
 	}
 	
 	/**
