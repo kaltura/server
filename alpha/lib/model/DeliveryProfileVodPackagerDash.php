@@ -21,9 +21,6 @@ class DeliveryProfileVodPackagerDash extends DeliveryProfileDash {
 	{
 		$url = parent::doGetFileSyncUrl($fileSync);
 		
-		if(!$this->params->getEdgeServerIds() || !count($this->params->getEdgeServerIds()))
-			return $url;
-		
 		$url .= VodPackagerDeliveryUtils::getExtraParams($this->params);
 		return $url;
 	}
