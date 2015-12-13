@@ -1001,7 +1001,7 @@ class kJobsManager
 	 * @param float $endTime
 	 * @param array $amfArray
 	 */
-	public static function addConvertLiveSegmentJob(BatchJob $parentJob = null, liveAsset $asset, $mediaServerIndex, $filePath, $endTime, $amfArray)
+	public static function addConvertLiveSegmentJob(BatchJob $parentJob = null, liveAsset $asset, $mediaServerIndex, $filePath, $endTime)
 	{
 		$keyType = liveAsset::FILE_SYNC_ASSET_SUB_TYPE_LIVE_PRIMARY;
 		if($mediaServerIndex == MediaServerIndex::SECONDARY)
@@ -1021,7 +1021,6 @@ class kJobsManager
 		$jobData->setEndTime($endTime);
 		$jobData->setSrcFilePath($filePath);
 		$jobData->setFileIndex(count($files));
-		$jobData->setAmfArray($amfArray);
  			
 		$batchJob = null;
 		if($parentJob)
@@ -1046,14 +1045,13 @@ class kJobsManager
 	 * @param array $files
 	 * @return BatchJob
 	 */
-	public static function addConcatJob(BatchJob $parentJob = null, flavorAsset $asset, array $files, $offset = null, $duration = null, $amfArray = null)
+	public static function addConcatJob(BatchJob $parentJob = null, flavorAsset $asset, array $files, $offset = null, $duration = null)
 	{
 		$jobData = new kConcatJobData();
  		$jobData->setSrcFiles($files);
 		$jobData->setFlavorAssetId($asset->getId());
 		$jobData->setOffset($offset);
 		$jobData->setDuration($duration);
-		$jobData->setAmfArray($amfArray);
 
  		$entry = $asset->getentry();
  		if($entry && $entry->getStatus() != entryStatus::READY)

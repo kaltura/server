@@ -75,6 +75,7 @@ class KAsyncConcat extends KJobHandlerWorker
 		
 		$ffmpegBin = KBatchBase::$taskConfig->params->ffmpegCmd;
 		$ffprobeBin = isset(KBatchBase::$taskConfig->params->ffprobeCmd)? KBatchBase::$taskConfig->params->ffprobeCmd: "ffprobe";
+		$mediaInfoBin = isset(KBatchBase::$taskConfig->params->mediaInfoCmd)? KBatchBase::$taskConfig->params->mediaInfoCmd: "mediainfo";
 		$fileName = "{$job->entryId}_{$data->flavorAssetId}.mp4";
 		$localTempFilePath = $this->localTempPath . DIRECTORY_SEPARATOR . $fileName;
 		$sharedTempFilePath = $this->sharedTempPath . DIRECTORY_SEPARATOR . $fileName;
@@ -89,7 +90,18 @@ class KAsyncConcat extends KJobHandlerWorker
 		$result = $this->concatFiles($ffmpegBin, $ffprobeBin, $srcFiles, $localTempFilePath, $data->offset, $data->duration);
 		if(! $result)
 			return $this->closeJob($job, KalturaBatchJobErrorTypes::RUNTIME, null, "Failed to concat files", KalturaBatchJobStatus::FAILED);
-		
+
+		try
+		{
+			// get the concatenated duration
+			$mediaInfoParser = new KMediaInfoMediaParser($localTempFilePath, $mediaInfoBin);
+			$data->concatenatedDuration = $mediaInfoParser->getMediaInfo()->videoDuration;
+		}
+		catch(Exception $ex)
+		{
+			KalturaLog::warning('failed to get concatenatedDuration ' . print_r($ex));
+		}
+
 		return $this->moveFile($job, $data, $localTempFilePath, $sharedTempFilePath);
 	}
 

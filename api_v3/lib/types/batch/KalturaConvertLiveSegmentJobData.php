@@ -51,6 +51,13 @@ class KalturaConvertLiveSegmentJobData extends KalturaJobData
 	 */
 	public $amfArray;
 
+	/**
+	 * Duration of the live segment.
+	 * filled by the ConvertLiveSegment job
+	 * @var float
+	 */
+	public $duration;
+
 	private static $map_between_objects = array
 	(
 		'entryId',
@@ -61,6 +68,7 @@ class KalturaConvertLiveSegmentJobData extends KalturaJobData
 		'destFilePath',
 		'endTime',
 		'amfArray',
+		'duration',
 	);
 
 	/* (non-PHPdoc)

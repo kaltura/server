@@ -31,9 +31,10 @@ class kConcatJobData extends kJobData
 	private $duration;
 
 	/**
-	 * @var array
+	 * duration of the concated video
+	 * @var float
 	 */
-	private $amfArray;
+	public $concatenatedDuration;
 
 	/**
 	 * @return array $srcFiles
@@ -116,18 +117,18 @@ class kConcatJobData extends kJobData
 	}
 
 	/**
-	 * @return the $amfArray
+	 * @return float $concatenatedDuration
 	 */
-	public function getAmfArray()
+	public function getConcatenatedDuration()
 	{
-		return $this->amfArray;
+		return $this->concatenatedDuration;
 	}
 
 	/**
-	 * @param KalturaKeyValueArray $amfArray
+	 * @param float $concatenatedDuration
 	 */
-	public function setAmfArray($amfArray)
+	public function setConcatenatedDuration($concatenatedDuration)
 	{
-		$this->amfArray = $amfArray;
+		$this->concatenatedDuration = $concatenatedDuration;
 	}
 }

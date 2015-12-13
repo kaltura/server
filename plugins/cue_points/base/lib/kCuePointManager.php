@@ -32,26 +32,14 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 
 	private function handleConvertLiveSegmentJobFinished(BatchJob $dbBatchJob, kConvertLiveSegmentJobData $data)
 	{
-		$mediaInfoParser = new KMediaInfoMediaParser($data->getDestFilePath(), kConf::get('bin_path_mediainfo'));
-		$recordedVODDurationInMS = $mediaInfoParser->getMediaInfo()->videoDuration;
+		$recordedVODDurationInMS = $data->getDuration();
 		self::copyCuePointsFromLiveToVodEntry($dbBatchJob->getEntry()->getRecordedEntryId(), $recordedVODDurationInMS, $recordedVODDurationInMS, $data->getAmfArray());
 	}
 
 	private function handleConcatJobFinished(BatchJob $dbBatchJob, kConcatJobData $data)
 	{
-		$mediaInfoParser = new KMediaInfoMediaParser($data->getDestFilePath(), kConf::get('bin_path_mediainfo'));
-		$recordedVODDurationInMS = $mediaInfoParser->getMediaInfo()->videoDuration;
-
 		$convertJobData = ($dbBatchJob->getParentJob()->getData());
-
-		// get the duration of the new segment file
-		$segmentFiles = $data->getSrcFiles();
-		sort($segmentFiles);
-
-		$mediaInfoParser2 = new KMediaInfoMediaParser($segmentFiles[$convertJobData->getFileIndex()], kConf::get('bin_path_mediainfo'));
-		$lastSegmentDurationInMS = $mediaInfoParser2->getMediaInfo()->videoDuration;
-
-		self::copyCuePointsFromLiveToVodEntry( $dbBatchJob->getParentJob()->getEntry()->getRecordedEntryId(), $recordedVODDurationInMS, $lastSegmentDurationInMS, $data->getAmfArray());
+		self::copyCuePointsFromLiveToVodEntry( $dbBatchJob->getParentJob()->getEntry()->getRecordedEntryId(), $data->getConcatenatedDuration(), $convertJobData->getDuration(), $convertJobData->getAmfArray());
 	}
 
 	/* (non-PHPdoc)
@@ -587,6 +575,10 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 			" totalVODDuration: " . $totalVODDuration .
 			" lastSegmentDuration " . $lastSegmentDuration .
 			" AMFs: " . print_r($amfArray, true));
+
+		if (is_null($vodEntryId) || is_null($totalVODDuration) || is_null($lastSegmentDuration) || is_null($amfArray) || count($amfArray) == 0){
+			KalturaLog::warning('bad arguments passed to function. quiting');
+		}
 
 		$vodEntry = entryPeer::retrieveByPK($vodEntryId);
 		if ( ! $vodEntry )
