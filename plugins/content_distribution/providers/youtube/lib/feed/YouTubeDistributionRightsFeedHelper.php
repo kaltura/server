@@ -51,6 +51,7 @@ class YouTubeDistributionRightsFeedHelper
 
 		$feed = new YouTubeDistributionRightsFeedHelper($distributionProfile);
 		$feed->setNotificationEmail($fieldValues);
+		$feed->setChannel($fieldValues);
 		$feed->setMetadataByFieldValues($fieldValues);
 		$feed->setByXpath('video/@tag', $videoTag);
 		$feed->setByXpath('asset/@tag', $videoTag);
@@ -180,6 +181,11 @@ class YouTubeDistributionRightsFeedHelper
 		$this->setByXpathFieldValueIfHasValue('@notification_email', $fieldValues, KalturaYouTubeDistributionField::NOTIFICATION_EMAIL);
 	}
 
+	public function setChannel(array $fieldValues)
+	{
+		$this->setByXpathFieldValueIfHasValue('@channel', $fieldValues, KalturaYouTubeDistributionField::VIDEO_CHANNEL);
+	}
+	
 	public function setMetadataByFieldValues(array $fieldValues)
 	{
 		$this->setAssetMetadataByFieldValues($fieldValues);
