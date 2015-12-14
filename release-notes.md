@@ -1,5 +1,12 @@
 # Kajam-11.4.0 #
 
+## WEBC-631 - move code to jobs ##
+#### Configuration ####
+	- in batch.ini, add:
+		KAsyncConvertLiveSegment: params.mediaInfoCmd = @BIN_DIR@/mediainfo
+		KAsyncConcat: params.mediaInfoCmd = @BIN_DIR@/mediainfo
+
+
 ## Ad stitching - report ##
 
  - Issue Type: New Feature
