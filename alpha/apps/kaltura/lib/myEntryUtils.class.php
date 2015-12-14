@@ -1101,7 +1101,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 	/**
 	 * @param entry $entry
 	 * @param Partner|null $toPartner
-	 * @param KalturaBaseEntryCloneOptionsArray $arr - an array of enumerator of a subset of entry properties.
+	 * @param KalturaBaseEntryCloneOptionsArray $cloneOptionsArray - an array of enumerator of a subset of entry properties.
 	 * 													For each subset the user sets
 	 * 													whether the subset is included or excluded from the copy.
 	 * 													The default action for each subset is 'include'.
@@ -1114,23 +1114,23 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 	 * @throws kCoreException
      */
 	public static function copyEntry(entry $entry, Partner $toPartner = null,
-									 KalturaBaseEntryCloneOptionsArray $arr)
+									 KalturaBaseEntryCloneOptionsArray $cloneOptionsArray)
  	{
  		KalturaLog::log("copyEntry - Copying entry [".$entry->getId()."] to partner [".$toPartner->getId()."]");
 
 		$copyUsers = true;
 		$copyCategories = true;
-		foreach ($arr as $arrItem)
+		foreach ($cloneOptionsArray as $cloneOption)
 		{
 			/**
 			 * KalturaBaseEntryCloneOptions $currentOption
 			 */
-			$currentOption = $arrItem->option;
+			$currentOption = $cloneOption->option;
 
 			/**
 			 * KalturaResponseProfileType $currentType
 			 */
-			$currentType = $arrItem->type;
+			$currentType = $cloneOption->type;
 
 			if ($currentOption == KalturaBaseEntryCloneOptions::USERS && $currentType == ResponseProfileType::EXCLUDE_FIELDS)
 			{
