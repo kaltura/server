@@ -9,7 +9,7 @@ class KAMFMediaInfoParser{
     const MaxAMFDiscontinuanceMS = 1000;
     const MinDistanceBetweenAMFsInMS = 60000;
 
-    protected $ffmprobeBin = 'ffprobeKAMFMediaInfoParser';
+    protected $ffprobeBin = 'ffprobeKAMFMediaInfoParser';
     protected $filePath;
 
     public function __construct($filePath, $ffprobeBin=null)

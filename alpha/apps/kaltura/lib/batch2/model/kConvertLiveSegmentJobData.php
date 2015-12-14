@@ -46,6 +46,11 @@ class kConvertLiveSegmentJobData extends kJobData
 	private $amfArray;
 
 	/**
+	 * @var float
+	 */
+	private $duration;
+
+	/**
 	 * @return string $entryId
 	 */
 	public function getEntryId()
@@ -171,5 +176,21 @@ class kConvertLiveSegmentJobData extends kJobData
 	public function setAmfArray($amfArray)
 	{
 		$this->amfArray = $amfArray;
+	}
+
+	/**
+	 * @return the $duration
+	 */
+	public function getDuration()
+	{
+		return $this->duration;
+	}
+
+	/**
+	 * @param float $duration
+	 */
+	public function setDuration($duration)
+	{
+		$this->duration = $duration;
 	}
 }
