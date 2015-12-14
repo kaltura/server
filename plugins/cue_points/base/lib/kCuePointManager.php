@@ -578,6 +578,7 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 
 		if (is_null($vodEntryId) || is_null($totalVODDuration) || is_null($lastSegmentDuration) || is_null($amfArray) || count($amfArray) == 0){
 			KalturaLog::warning('bad arguments passed to function. quiting');
+			return;
 		}
 
 		$vodEntry = entryPeer::retrieveByPK($vodEntryId);
