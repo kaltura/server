@@ -50,7 +50,7 @@ class KAMFMediaInfoParser{
 
     protected function getCommand()
     {
-        return "{$this->ffprobeBin} -i {$this->filePath} -select_streams 2:2 -show_streams -show_programs -v quiet -show_data -show_packets -print_format json 2>&1";
+        return "{$this->ffprobeBin} -i {$this->filePath} -select_streams 2:2 -show_streams -show_programs -v quiet -show_data -show_packets -print_format json";
     }
 
     // parse the output of the command and return an array of string of the form pts;timestamp
