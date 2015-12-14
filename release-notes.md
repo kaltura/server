@@ -1,5 +1,21 @@
 # Kajam-11.4.0 #
 
+## run mediainfo from convertLiveSegment/concat jobs ##
+ - Issue Type: New Feature
+ - Issue ID: WEBC-631
+
+#### Installation ####
+None.
+
+#### Configuration ####
+	- in batch.ini, add:
+		KAsyncConvertLiveSegment: params.mediaInfoCmd = @BIN_DIR@/mediainfo
+		KAsyncConcat: params.mediaInfoCmd = @BIN_DIR@/mediainfo
+#### Known Issues & Limitations ####
+None.
+#### Deployment scripts ####
+None.
+
 ## Ad stitching - report ##
 
  - Issue Type: New Feature
