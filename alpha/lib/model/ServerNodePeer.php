@@ -65,6 +65,28 @@ class ServerNodePeer extends BaseServerNodePeer {
 		return $objs;
 	}
 	
+	public static function retrieveRegisteredServerNodesArrayByPKs($pks, $ttl = null, PropelPDO $con = null)
+	{
+		if (empty($pks)) {
+			$objs = array();
+		}
+		else {
+			if(!$ttl)
+				$ttl = ServerNode::SERVER_NODE_TTL_TIME;
+			
+			$criteria = new Criteria(ServerNodePeer::DATABASE_NAME);
+			$criteria->add(ServerNodePeer::ID, $pks, Criteria::IN);
+			$criteria->add(ServerNodePeer::STATUS, ServerNodeStatus::ACTIVE);
+			$criteria->add(ServerNodePeer::HEARTBEAT_TIME, time() - $ttl, Criteria::GREATER_EQUAL);
+			$criteria->addOr(ServerNodePeer::HEARTBEAT_TIME, null);
+			$orderBy = "FIELD (" . self::ID . "," . implode(",", $pks) . ")";  // first take the pattner_id and then the rest
+			$criteria->addAscendingOrderByColumn($orderBy);
+			$objs = ServerNodePeer::doSelect($criteria, $con);
+		}
+	
+		return $objs;
+	}
+	
 	/* (non-PHPdoc)
 	 * @see BaseRemoteServerPeer::getOMClass()
 	 */
