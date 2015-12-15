@@ -5,4 +5,6 @@
 	CustomLog @LOG_DIR@/kaltura_apache_access.log vhost_kalt
 	
 	Include "@APP_DIR@/configurations/apache/conf.d/enabled.*.conf"
+	
+	Header set X-Me "@KALTURA_VIRTUAL_HOST_NAME@"
 </VirtualHost>
