@@ -685,7 +685,10 @@ class PhpZendClientGenerator extends ClientGeneratorFromXml
 					break;
 				case 'array':
 					$this->appendLine("		\$resultObject = Kaltura_Client_ParseUtils::unmarshalArray(\$resultXmlObject->result, \"$arrayObjectType\");");
-					$this->appendLine("		\$this->client->validateObjectType(\$resultObject, \"$resultType\");");
+					$arrayObjectType = $this->getTypeClass($arrayObjectType);
+					$this->appendLine("		foreach(\$resultObject as \$resultObjectItem){");
+					$this->appendLine("			\$this->client->validateObjectType(\$resultObjectItem, \"$arrayObjectType\");");
+					$this->appendLine("		}");
 					break;
 				
 				default:
