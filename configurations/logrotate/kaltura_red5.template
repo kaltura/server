@@ -6,10 +6,7 @@
  compress
  dateext
  notifempty
- sharedscripts
- postrotate
- service red5 restart
- endscript
+ copytruncate
  su root kaltura
 }
 
@@ -20,9 +17,6 @@
  compress
  dateext
  notifempty
- sharedscripts
- postrotate
- service red5 restart
- endscript
+ copytruncate
  su root kaltura
 }

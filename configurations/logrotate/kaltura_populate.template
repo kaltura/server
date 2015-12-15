@@ -1,15 +1,10 @@
-
-@LOG_DIR@/kaltura_populate.log{
+@LOG_DIR@/kaltura_populate.log {
  rotate 5
  daily
  missingok
  compress
  dateext
  notifempty
- sharedscripts
- postrotate
- service kaltura_populate restart
- endscript
+ copytruncate
  su root kaltura
 }
-

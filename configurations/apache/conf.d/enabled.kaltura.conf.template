@@ -268,9 +268,3 @@ Alias /flash "@WEB_DIR@/flash"
     ExpiresByType font/opentype                         "access plus 1 month"
     ExpiresByType image/svg+xml                         "access plus 1 month"
 </IfModule>
-
-#MMapFile @APP_DIR@/alpha/web/crossdomain.xml
-#MMapFile @APP_DIR@/alpha/web/alive.html
-
-Header set X-Me "@KALTURA_VIRTUAL_HOST_NAME@"
-

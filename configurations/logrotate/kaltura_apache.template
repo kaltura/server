@@ -5,10 +5,7 @@
  compress
  dateext
  notifempty
- sharedscripts
- postrotate
- service @APACHE_SERVICE@ reload
- endscript
+ copytruncate
  su root kaltura
 }
 
@@ -19,9 +16,9 @@
  compress
  dateext
  notifempty
+ copytruncate
  lastaction
  mv @LOG_DIR@/kaltura_apache_access.log-`/bin/date +%Y%m%d`.gz @EVENTS_LOGS_DIR@/`hostname`-kaltura_apache_access.log-`/bin/date +%Y%m%d-%H`.gz
- service @APACHE_SERVICE@ reload
  endscript
  su root kaltura
 }
@@ -33,10 +30,7 @@
  compress
  dateext
  notifempty
- sharedscripts
- postrotate
- service @APACHE_SERVICE@ reload
- endscript
+ copytruncate
  su root kaltura
 }
 
@@ -47,9 +41,9 @@
  compress
  dateext
  notifempty
+ copytruncate
  lastaction
  mv @LOG_DIR@/kaltura_apache_access_ssl.log-`/bin/date +%Y%m%d`.gz @EVENTS_LOGS_DIR@/`hostname`-kaltura_apache_access_ssl.log-`/bin/date +%Y%m%d-%H`.gz
- service @APACHE_SERVICE@ reload
  endscript
  su root kaltura
 }
