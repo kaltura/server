@@ -1,4 +1,3 @@
-
 @LOG_DIR@/cron.log {
  rotate 5
  daily
@@ -6,6 +5,7 @@
  compress
  dateext
  notifempty
+ copytruncate
  su root kaltura
 }
 
@@ -16,10 +16,7 @@
  compress
  dateext
  notifempty
- sharedscripts
- postrotate
- service kaltura_monit restart
- endscript
+ copytruncate
  su root kaltura
 }
 
@@ -30,6 +27,7 @@
  compress
  dateext
  notifempty
+ copytruncate
  su root kaltura
 }
 
@@ -40,5 +38,6 @@
  compress
  dateext
  notifempty
+ copytruncate
  su root kaltura
 }

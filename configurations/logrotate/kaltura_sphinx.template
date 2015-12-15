@@ -1,4 +1,3 @@
-
 @LOG_DIR@/sphinx/kaltura_sphinx_query.log{
  rotate 5
  daily
@@ -6,10 +5,7 @@
  compress
  dateext
  notifempty
- sharedscripts
- postrotate
- service kaltura_sphinx restart
- endscript
+ copytruncate
  su root kaltura
 }
 
@@ -20,9 +16,6 @@
  compress
  dateext
  notifempty
- sharedscripts
- postrotate
- service kaltura_sphinx restart
- endscript
+ copytruncate
  su root kaltura
 }

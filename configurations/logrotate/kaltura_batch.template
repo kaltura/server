@@ -5,13 +5,8 @@
     create 644
     missingok
     notifempty
-    prerotate
-        service kaltura_batch stop 2>&1 >/dev/null || true
-    endscript
-    postrotate
-        service kaltura_batch start 2>&1 >/dev/null || true
-    endscript
- su root kaltura
+	copytruncate
+	su root kaltura
 }
 
 @LOG_DIR@/batch/*log {
@@ -21,6 +16,6 @@
     rotate 40
     create 644
     missingok
- su root kaltura
+	su root kaltura
 }
 

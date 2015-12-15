@@ -5,6 +5,7 @@
  compress
  dateext
  notifempty
+ copytruncate
  su root kaltura
 }
 
@@ -15,6 +16,7 @@
  compress
  dateext
  notifempty
+ copytruncate
  su root kaltura
 }
 
@@ -25,5 +27,6 @@
  compress
  dateext
  notifempty
+ copytruncate
  su root kaltura
 }
