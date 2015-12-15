@@ -98,7 +98,7 @@ class kBusinessConvertDL
 			//If the old asset is not set for replacement by its paramsId and type, delete it.
 			elseif($oldAsset instanceof flavorAsset || $oldAsset instanceof thumbAsset)
 			{
-				if($entry->getReplacementOptions()->getKeepManualThumbnails() && $oldAsset instanceof thumbAsset && !$oldAsset->getFlavorParamsId())
+				if($oldAsset instanceof thumbAsset && $oldAsset->keepOnEntryReplacement($entry))
 				{
 					KalturaLog::info("KeepManualThumbnails ind is set, manual thumbnail is not deleted [" . $oldAsset->getId() . "]");
 					if($oldAsset->hasTag(thumbParams::TAG_DEFAULT_THUMB))

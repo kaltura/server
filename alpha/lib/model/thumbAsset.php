@@ -42,4 +42,13 @@ class thumbAsset extends asset
 						
 		return $finalPath;
 	}
+
+	public function keepOnEntryReplacement(entry $entry)
+	{
+		if($entry->getReplacementOptions()->getKeepManualThumbnails() && !$this->getFlavorParamsId()) {
+			return true;
+		}
+
+		return false;
+	}
 }
