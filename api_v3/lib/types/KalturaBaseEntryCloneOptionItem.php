@@ -18,14 +18,6 @@ class KalturaBaseEntryCloneOptionItem extends KalturaObject
      */
     public $type;
 
-    /* (non-PHPdoc)
-     * @see KalturaObject::toObject()
-     */
-    public function toObject($dbObject = null, $skip = array())
-    {
-        return $this->option;
-    }
-
     private static $mapBetweenObjects = array
     (
         'option',
