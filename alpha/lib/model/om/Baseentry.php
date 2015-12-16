@@ -3460,11 +3460,12 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 		{
 			kQueryCache::invalidateQueryCache($this);
 			$modifiedColumns = $this->tempModifiedColumns;
-			$modifiedColumns[kObjectChangedEvent::CUSTOM_DATA_OLD_VALUES] = $this->oldCustomDataValues;
+			$modifiedColumns[kObjectChangedEvent::CUSTOM_DATA_OLD_VALUES] = $this->tempOldCustomDataValues;
 			kEventsManager::raiseEvent(new kObjectChangedEvent($this, $modifiedColumns));
 		}
 			
 		$this->tempModifiedColumns = array();
+		$this->tempOldCustomDataValues = array();
 		
 		parent::postUpdate($con);
 	}
@@ -3473,6 +3474,12 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 	 * @var array
 	 */
 	private $tempModifiedColumns = array();
+
+	/**
+	 * Saves the oldCustomDataValues  temporarily while saving
+	 * @var array
+	 */
+	private $tempOldCustomDataValues = array();
 	
 	/**
 	 * Returns whether the object has been modified.
@@ -3518,6 +3525,7 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 			$this->setUpdatedAt(time());
 		
 		$this->tempModifiedColumns = $this->modifiedColumns;
+		$this->tempOldCustomDataValues = $this->oldCustomDataValues;
 		return parent::preUpdate($con);
 	}
 	
@@ -7526,6 +7534,9 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 	 */
 	public function getCustomDataOldValues()
 	{
+		if ( $this->tempOldCustomDataValues )
+			return $this->tempOldCustomDataValues;
+
 		return $this->oldCustomDataValues;
 	}
 	
@@ -7547,7 +7558,8 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 			$this->oldCustomDataValues[$currentNamespace] = array();
 		if(!isset($this->oldCustomDataValues[$currentNamespace][$name]))
 			$this->oldCustomDataValues[$currentNamespace][$name] = $customData->get($name, $namespace);
-		
+
+		$this->tempOldCustomDataValues = $this->oldCustomDataValues;
 		$customData->put ( $name , $value , $namespace );
 	}
 
