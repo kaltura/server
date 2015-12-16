@@ -29,7 +29,6 @@ class KalturaAnswerCuePoint extends KalturaCuePoint
 	 * @readonly
 	 */
 	public $isCorrect;
-
 	/**
 	 * Array of string
 	 * @var KalturaStringArray
@@ -54,8 +53,8 @@ class KalturaAnswerCuePoint extends KalturaCuePoint
 		"quizUserEntryId",
 		"answerKey",
 		"parentId",
-		"correctAnswerKeys",
 		"isCorrect",
+		"correctAnswerKeys",
 		"explanation"
 	);
 
@@ -88,31 +87,70 @@ class KalturaAnswerCuePoint extends KalturaCuePoint
 		parent::doFromObject($dbObject, $responseProfile);
 
 		$dbEntry = entryPeer::retrieveByPK($dbObject->getEntryId());
-		if ( !kEntitlementUtils::isEntitledForEditEntry($dbEntry) ) {
-			/**
-			 * @var kQuiz $kQuiz
-			 */
-			$kQuiz = QuizPlugin::validateAndGetQuiz( $dbEntry );
+		if ( !kEntitlementUtils::isEntitledForEditEntry($dbEntry))
+		{
+			$this->validateParentId();
+			$dbQuestionCuePoint = CuePointPeer::retrieveByPK($this->parentId);
+			$questCp = new KalturaQuestionCuePoint();
+			$questCp->fromObject($dbQuestionCuePoint);
 
-			$dbUserEntry = UserEntryPeer::retrieveByPK($this->quizUserEntryId);
-			if ($dbUserEntry && $dbUserEntry->getStatus() == QuizPlugin::getCoreValue('UserEntryStatus', QuizUserEntryStatus::QUIZ_SUBMITTED))
+			$this->explanation = $questCp->explanation;
+			$this->setIsCorrectAnswer($dbObject);
+			$this->setCorrectAnswerKeys($dbObject, $responseProfile);
+		}
+	}
+
+	private function setCorrectAnswerKeys($dbObject, KalturaDetachedResponseProfile $responseProfile = null)
+	{
+		$dbEntry = entryPeer::retrieveByPK($dbObject->getEntryId());
+		/**
+		 * @var kQuiz $kQuiz
+		 */
+		$kQuiz = QuizPlugin::validateAndGetQuiz( $dbEntry );
+		$dbQuestionCuePoint = CuePointPeer::retrieveByPK($this->parentId);
+
+		if ($kQuiz->getShowCorrectKey())
+		{
+			$this->correctAnswerKeys = null;
+			foreach ($dbQuestionCuePoint->getOptionalAnswers() as $obj)
 			{
-				if (!$kQuiz->getShowCorrectAfterSubmission())
+				$optAnswer = new KalturaOptionalAnswer();
+				$optAnswer->fromObject($obj, $responseProfile);
+				if ($optAnswer->isCorrect)
 				{
-					$this->isCorrect = KalturaNullableBoolean::NULL_VALUE;
-					$this->correctAnswerKeys = null;
-					$this->explanation = null;
+					if (is_null($this->correctAnswerKeys))
+					{
+						$this->correctAnswerKeys = new KalturaOptionalAnswersArray();
+					}
+					$this->correctAnswerKeys[] = $optAnswer;
 				}
 			}
-			else
-			{
-				if (!$kQuiz->getShowResultOnAnswer())
-					$this->isCorrect = KalturaNullableBoolean::NULL_VALUE;
+		}
+	}
 
-				if (!$kQuiz->getShowCorrectKeyOnAnswer())
+	private function setIsCorrectAnswer($dbObject)
+	{
+		$dbEntry = entryPeer::retrieveByPK($dbObject->getEntryId());
+		/**
+		 * @var kQuiz $kQuiz
+		 */
+		$kQuiz = QuizPlugin::validateAndGetQuiz( $dbEntry );
+		$dbQuestionCuePoint = CuePointPeer::retrieveByPK($this->parentId);
+
+		if ($kQuiz->getShowCorrect())
+		{
+
+			$optionalAnswers = KalturaOptionalAnswersArray::fromDbArray($dbQuestionCuePoint->getOptionalAnswers());
+			$this->isCorrect = false;
+			/**
+			 * @var kOptionalAnswer $optAns
+			 */
+			foreach ($optionalAnswers as $optAnswer)
+			{
+				if ($optAnswer->isCorrect && $this->answerKey == $optAnswer->key)
 				{
-					$this->correctAnswerKeys = null;
-					$this->explanation = null;
+					$this->isCorrect = true;
+					return;
 				}
 			}
 		}
@@ -144,17 +182,15 @@ class KalturaAnswerCuePoint extends KalturaCuePoint
 		$dbUserEntry = UserEntryPeer::retrieveByPK($this->quizUserEntryId);
 		if (!$dbUserEntry)
 			throw new KalturaAPIException(KalturaErrors::USER_ENTRY_NOT_FOUND, $this->quizUserEntryId);
+
 		if ($dbUserEntry->getEntryId() !== $this->entryId)
-		{
 			throw new KalturaAPIException(KalturaCuePointErrors::USER_ENTRY_DOES_NOT_MATCH_ENTRY_ID, $this->quizUserEntryId);
-		}
+
 		if ($dbUserEntry->getStatus() === QuizPlugin::getCoreValue('UserEntryStatus', QuizUserEntryStatus::QUIZ_SUBMITTED))
-		{
 			throw new KalturaAPIException(KalturaQuizErrors::USER_ENTRY_QUIZ_ALREADY_SUBMITTED);
-		}
-		if (!kCurrentContext::$is_admin_session && ($dbUserEntry->getKuserId() != kCurrentContext::getCurrentKsKuserId()) ) {
+
+		if (!kCurrentContext::$is_admin_session && ($dbUserEntry->getKuserId() != kCurrentContext::getCurrentKsKuserId()) )
 		    throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID);
-		}
 	}
 
 	/* (non-PHPdoc)

@@ -37,17 +37,14 @@ class QuizUserEntryService extends KalturaBaseService{
 		$kQuiz = QuizPlugin::getQuizData($entry);
 		if (!$kQuiz)
 			throw new KalturaAPIException(KalturaQuizErrors::PROVIDED_ENTRY_IS_NOT_A_QUIZ, $entryId);
-		
+
+		$userEntry->score = null;
 		list($score, $numOfCorrectAnswers) = $dbUserEntry->calculateScoreAndCorrectAnswers();
 		$dbUserEntry->setScore($score);
 		$dbUserEntry->setNumOfCorrectAnswers($numOfCorrectAnswers);	
 		if ($kQuiz->getShowGradeAfterSubmission()== KalturaNullableBoolean::TRUE_VALUE || $this->getKs()->isAdmin() == true)
 		{
 			$userEntry->score = $score;
-		}
-		else
-		{
-			$userEntry->score = null;
 		}
 
 		$c = new Criteria();

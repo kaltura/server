@@ -12,6 +12,7 @@ class KalturaQuizUserEntry extends KalturaUserEntry{
 	 */
 	public $score;
 
+
 	private static $map_between_objects = array
 	(
 		"score"
