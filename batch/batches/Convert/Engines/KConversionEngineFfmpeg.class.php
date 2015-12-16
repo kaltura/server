@@ -518,6 +518,25 @@ $digSignStub = "-f rawvideo -pix_fmt yuv420p - | %s -w %d -h %d -f %s %s --%s| %
 		$kArr = array_keys($cmdLineArr,'-an');
 		if(count($kArr)==0 || ($is2pass && count($kArr)==1)) {
 			$digSignStr.= " -i $srcFile -map 0:v -map 1:a";
+			/*
+			 * Fix the audio source mapping, to adjust for sepating vidoe and audio sources
+			 * in order to support NGS (video only) piping.
+			 * Audio source mapping changed to 1 (original 0)
+			 */
+			$kArr = array_keys($cmdLineArr,'-filter_complex');
+			if(count($kArr)>0) { 
+				$kArrIdx = end($kArr);
+				$filterStr = $cmdLineArr[$kArrIdx+1];
+				$filterArr = explode(';', $filterStr);
+				foreach($filterArr as $idx=>$filterStr){
+					/*
+					 * Only audio filters should be fixed (pan,amix,amerge)
+					 */
+					if(preg_match("/\b(pan|amix|amerge)\b/", $filterStr)==1)
+						$filterArr[$idx] = str_replace ('[0:','[1:',$filterStr);
+				}
+				$cmdLineArr[$kArrIdx+1] = implode(';', $filterArr);
+			}
 		}
 		KalturaLog::log("Fixed part:$digSignStr");
 		$cmdLineArr[$keyId].= " $digSignStr";
