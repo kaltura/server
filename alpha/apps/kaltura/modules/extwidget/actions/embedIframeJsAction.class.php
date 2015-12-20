@@ -100,7 +100,9 @@ class embedIframeJsAction extends sfAction
 			if ($relativeUrl)
 			{
 				header('Content-Type: application/javascript');
-				kFileUtils::dumpUrl($url, true, false, array("X-Forwarded-For" =>  requestUtils::getRemoteAddress()));
+				$partner = PartnerPeer::retrieveByPK( $partner_id );
+				kFileUtils::dumpUrl($url, true, false, array("X-Forwarded-For" =>  requestUtils::getRemoteAddress(),
+					"X_FORWARDED_HOST" => myPartnerUtils::getWhiteListHost($partner)));
 			}
 		}
 
