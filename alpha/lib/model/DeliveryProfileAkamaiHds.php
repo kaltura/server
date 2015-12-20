@@ -70,6 +70,11 @@ class DeliveryProfileAkamaiHds extends DeliveryProfileHds {
 			return null;
 		}
 		
+		if ($this->getExtraParams())
+		{
+			$flavor['url'] = kDeliveryUtils::addQueryParameter($flavor['url'], $this->getExtraParams());
+		}	 
+		
 		return $flavor;
 	}
 	
