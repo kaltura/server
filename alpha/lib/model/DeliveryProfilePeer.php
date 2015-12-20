@@ -199,7 +199,11 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 			
 			self::filterDeliveryProfilesArray($deliveryIds, $deliveryAttributes);
 			
-			$deliveries = DeliveryProfilePeer::retrieveByPKs($deliveryIds);
+			$c = new Criteria();
+			$c->add(DeliveryProfilePeer::PARTNER_ID, $partnerId);
+			$c->add(DeliveryProfilePeer::ID, $deliveryIds, Criteria::IN);
+			$c->add(DeliveryProfilePeer::TYPE, self::getAllLiveDeliveryProfileTypes(), Criteria::NOT_IN);
+			$deliveries = DeliveryProfilePeer::doSelect($c);
 			
 			$cmp = new DeliveryProfileComparator($isSecured, $cdnHost);
 			array_walk($deliveries, "DeliveryProfileComparator::decorateWithUserOrder", $deliveryIds);
