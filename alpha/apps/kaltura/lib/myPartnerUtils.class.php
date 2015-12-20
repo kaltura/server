@@ -1792,7 +1792,6 @@ class myPartnerUtils
 	 */
 	public static function getWhiteListHost(Partner $partner)
 	{
-		$whiteListHost = null;
 		if (isset($_SERVER['HTTP_X_FORWARDED_HOST']))
 		{
 			$xForwardedHosts = explode(',', $_SERVER['HTTP_X_FORWARDED_HOST']);
@@ -1805,8 +1804,11 @@ class myPartnerUtils
 		}
 		else if (isset($_SERVER['HTTP_HOST']))
 		{
-			return $_SERVER['HTTP_HOST'];
+			if ($partner->isInCDNWhiteList($_SERVER['HTTP_HOST']))
+			{
+				return $_SERVER['HTTP_HOST'];
+			}
 		}
-		return $whiteListHost;
+		return null;
 	}
 }
