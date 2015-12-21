@@ -259,7 +259,7 @@ if (strpos($serviceUrl, '://') === false)
 		$serviceUrl = 'http://' . $serviceUrl;
 }
 
-$url = $serviceUrl . "/api_v3/index.php?service={$service}&action={$action}";
+$url = $serviceUrl . "/api_v3/service/{$service}/action/{$action}";
 
 if (isset($options['curl']))
 {
@@ -287,7 +287,7 @@ if (isset($options['curl']))
 	}
 	else if ($params)
 	{
-		$url .= '&' . http_build_query($params);
+		$url .= '?' . http_build_query($params);
 	}
 	$commandLine .= ' "'.$url.'"';
 	

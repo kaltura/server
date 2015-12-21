@@ -458,7 +458,7 @@ class BaseEntryService extends KalturaEntryService
 	 *
 	 * @action delete
 	 * @param string $entryId Entry id to delete
-	 * @validateUser entry entryId edit
+	 * @validateUser entry entryId edit ownerOnly
 	 */
 	function deleteAction($entryId)
 	{
@@ -485,9 +485,20 @@ class BaseEntryService extends KalturaEntryService
 			$pager = new KalturaFilterPager();
 		}
 
+		$result = $filter->getListResponse($pager, $this->getResponseProfile());
+		
+		if ($result->totalCount == 1 && 
+			count($result->objects) == 1 && 
+			$result->objects[0]->status != KalturaEntryStatus::READY)
+		{
+			// the purpose of this is to solve a case in which a player attempts to play a non-ready entry, 
+			// and the request becomes cached for a long time, preventing playback even after the entry
+			// becomes ready
+			kApiCache::setExpiry(60);
+		}
+		
 		// NOTE: The following is a hack in order to make sure all responses are of type KalturaBaseEntryListResponse.
 		//       The reason is that baseentry::list() is not being extended by derived classes.
-		$result = $filter->getListResponse($pager, $this->getResponseProfile());
 		$response = new KalturaBaseEntryListResponse();
 		$response->objects = $result->objects;
 		$response->totalCount = $result->totalCount;
@@ -701,6 +712,14 @@ class BaseEntryService extends KalturaEntryService
 		if (!$dbEntry)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 		
+		if ($dbEntry->getStatus() != entryStatus::READY)
+		{
+			// the purpose of this is to solve a case in which a player attempts to play a non-ready entry,
+			// and the request becomes cached for a long time, preventing playback even after the entry
+			// becomes ready
+			kApiCache::setExpiry(60);
+		}
+		
 		$asset = null;
 		if($contextDataParams->flavorAssetId)
 		{
@@ -738,6 +757,13 @@ class BaseEntryService extends KalturaEntryService
 		}
 		
 		$result->isScheduledNow = $dbEntry->isScheduledNow($contextDataParams->time);
+		if (!($result->isScheduledNow) && $this->getKs() ){
+			// in case the sview is defined in the ks simulate schedule now true to allow player to pass verification
+			if ( $this->getKs()->verifyPrivileges(ks::PRIVILEGE_VIEW, ks::PRIVILEGE_WILDCARD) ||
+				$this->getKs()->verifyPrivileges(ks::PRIVILEGE_VIEW, $entryId)) {
+				$result->isScheduledNow = true;
+			}
+		}
 
         $result->pluginData = new KalturaPluginDataArray();
         $pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaEntryContextDataContributor');
@@ -849,8 +875,8 @@ class BaseEntryService extends KalturaEntryService
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 		}
 
-		// Copy the entry into a new one based on the given partner data. 
-		$clonedEntry = myEntryUtils::copyEntry( $coreEntry, $this->getPartner() );
+		// Copy the entry into a new one based on the given partner data.
+		$clonedEntry = myEntryUtils::copyEntry($coreEntry, $this->getPartner());
 
 		return $this->getEntry($clonedEntry->getId());
 	}

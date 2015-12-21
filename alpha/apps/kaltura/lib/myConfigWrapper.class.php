@@ -7,7 +7,7 @@ class myConfigWrapper
 {
 	private $m_path_prefix = "";
 	
-	public function myConfigWrapper ( $path_prefix )
+	public function __construct ( $path_prefix )
 	{
 		$this->m_path_prefix = $path_prefix;
 	}

@@ -702,7 +702,7 @@ class kFileData
 	public $content = NULL;
 	public $raw_timestamp = NULL;
 	
-	public function kFileData($full_file_path, $add_content = false)
+	public function __construct($full_file_path, $add_content = false)
 	{
 		//debugUtils::st();
 		$this->full_path = realpath($full_file_path);

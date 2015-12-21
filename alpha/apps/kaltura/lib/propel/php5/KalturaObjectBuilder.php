@@ -244,6 +244,7 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 			return parent::addSaveBody($script);
 		$reloadOnUpdate = $table->isReloadOnUpdate();
 		$reloadOnInsert = $table->isReloadOnInsert();
+		$customDataColumn = $table->getColumn(self::KALTURA_COLUMN_CUSTOM_DATA);
 
 		$script .= "
 		if (\$this->isDeleted()) {

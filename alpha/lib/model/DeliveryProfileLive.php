@@ -2,9 +2,19 @@
 
 abstract class DeliveryProfileLive extends DeliveryProfile {
 	
+	/**
+	 * @var kLiveStreamConfiguration
+	 */
+	protected $liveStreamConfig;
+	
 	function __construct() {
 		parent::__construct();
 		$this->DEFAULT_RENDERER_CLASS = 'kRedirectManifestRenderer';
+	}
+	
+	public function setLiveStreamConfig(kLiveStreamConfiguration $liveStreamConfig)
+	{
+		$this->liveStreamConfig = $liveStreamConfig;
 	}
 	
 	/**
@@ -73,26 +83,13 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 		return $urlToCheck;
 	}
 	
-	public final function serve(kLiveStreamConfiguration $liveStreamConfig) 
-	{
-		return $this->doServe($liveStreamConfig);
-	}
-	
-	public function doServe(kLiveStreamConfiguration $liveStreamConfig) 
+	public function buildServeFlavors() 
 	{
 		$flavors = array();
-		$baseUrl = $liveStreamConfig->getUrl();
-		$this->finalizeUrls($baseUrl, $flavors);
-	
+		$baseUrl = $this->liveStreamConfig->getUrl();
 		$flavors[] = $this->getFlavorAssetInfo('', $baseUrl);		// passing the url as urlPrefix so that only the path will be tokenized
-		$renderer = $this->getRenderer($flavors);
-		return $renderer;
-	}
-	
-	public function finalizeUrls(&$baseUrl, &$flavorsUrls)
-	{
-		if($this->params->getEdgeServerIds())
-			$baseUrl = $this->getEdgeServerUrls($baseUrl);
+		
+		return $flavors;
 	}
 	
 	public function isLive ($url) {
@@ -113,29 +110,6 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 	
 	protected function checkIsLive($url) {
 		throw new Exception('Status cannot be determined for live stream protocol. Delivery Profile ID: '.$this->getId());
-	}
-	
-	public function getEdgeServerUrls($url)
-	{
-		if(!$url)
-        	return null;
-		
-		$edgeServerIds = $this->params->getEdgeServerIds();
-		$edgeServers = EdgeServerPeer::retrieveOrderedEdgeServersArrayByPKs($edgeServerIds);
-		
-		if(!count($edgeServers))
-		{
-		        KalturaLog::info("No active edge servers found to handle [$url]");
-		        return null;
-		}
-		
-		$edgeServer = array_shift($edgeServers);
-		$url = $edgeServer->buildEdgePlaybackUrl($url);
-		
-		if(count($edgeServers))
-		        $this->params->setEdgeServerIds(array_diff($edgeServerIds, array($edgeServer->getId())));
-		
-		return $url;
 	}
 }
 

@@ -1,0 +1,1 @@
+RENAME TABLE `edge_server` to `server_node`;

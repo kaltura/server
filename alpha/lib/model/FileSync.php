@@ -197,7 +197,7 @@ class FileSyncKey
 
 class FileSyncException extends Exception
 {
-	public function FileSyncException ( $type , $sub_type , $allowed_sub_types )
+	public function __construct ( $type , $sub_type , $allowed_sub_types )
 	{
 		parent::__construct( "For FileSync type [$type], unknown sub_type [$sub_type]" );
 	}

@@ -40,7 +40,7 @@ class mySmartPager
 	private static $s_pager_count_cache;
 	private $m_count_came_from_cache = false;
 	
-	public function mySmartPager ( /*sfAction*/ $action , $criteria_class , $default_page_size , $prefix = NULL )
+	public function __construct ( /*sfAction*/ $action , $criteria_class , $default_page_size , $prefix = NULL )
 	{
 		self::initCache();
 		

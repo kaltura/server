@@ -137,7 +137,7 @@ namespace Kaltura
             }
             kparams.AddIfNotNull("format", this._Config.ServiceFormat.GetHashCode());
 
-            string url = this._Config.ServiceUrl + "/api";
+            string url = this._Config.ServiceUrl + "/api_v3";
 
             if (_MultiRequestReturnType != null)
             {

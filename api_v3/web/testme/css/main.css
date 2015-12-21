@@ -10,8 +10,9 @@ a:hover { color: #505050; }
 .left { height: 100%; float: left; margin: 0 15px; width: 280px; overflow: auto; }
 .left .left-content { padding: 10px; }
 
-.right { height: 100%; float: left; border: 0; }
-.right iframe { width: 100%; height: 100%; border: 0; }
+.right { height: 100%; float: left; border: 0; overflow: auto;}
+.right .right-content { width: 100%; height: 100%; border: 15px; font-size: 13px;}
+#hiddenResponse {display: none;}
 
 #action-params, .param, .attr, .object { margin-bottom: 15px; }
 
@@ -28,7 +29,7 @@ button, input.button { background-color: #A0A0A0; border-color: #DEDEDE #202020 
 
 .object-name { cursor: pointer; }
 .object-type {font-size: 9px}
-.object-properties { display: none; overflow: scroll; position: absolute; top: 0; padding: 0 10px; background-color: #F7F7F7;  }
+.object-properties { display: none; overflow: scroll; position: absolute; top: 0; padding: 0 10px; background-color: #F7F7F7; z-index: 99; }
 .body-bg .object-properties { top: 62px; }
 
 

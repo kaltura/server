@@ -53,7 +53,7 @@ class kuserTableMap extends TableMap {
 		$this->addColumn('CITY', 'City', 'VARCHAR', false, 30, null);
 		$this->addColumn('ZIP', 'Zip', 'VARCHAR', false, 10, null);
 		$this->addColumn('URL_LIST', 'UrlList', 'VARCHAR', false, 256, null);
-		$this->addColumn('PICTURE', 'Picture', 'VARCHAR', false, 48, null);
+		$this->addColumn('PICTURE', 'Picture', 'VARCHAR', false, 1024, null);
 		$this->addColumn('ICON', 'Icon', 'TINYINT', false, null, null);
 		$this->addColumn('ABOUT_ME', 'AboutMe', 'VARCHAR', false, 4096, null);
 		$this->addColumn('TAGS', 'Tags', 'LONGVARCHAR', false, null, null);
@@ -83,7 +83,7 @@ class kuserTableMap extends TableMap {
 		$this->addColumn('INDEXED_PARTNER_DATA_INT', 'IndexedPartnerDataInt', 'INTEGER', false, null, null);
 		$this->addColumn('INDEXED_PARTNER_DATA_STRING', 'IndexedPartnerDataString', 'VARCHAR', false, 64, null);
 		$this->addColumn('CUSTOM_DATA', 'CustomData', 'LONGVARCHAR', false, null, null);
-		$this->addColumn('TYPE', 'Type', 'INTEGER', false, null, null);
+		$this->addColumn('TYPE', 'Type', 'INTEGER', false, null, 0);
 		// validators
 	} // initialize()
 
@@ -108,6 +108,7 @@ class kuserTableMap extends TableMap {
     $this->addRelation('KuserToUserRole', 'KuserToUserRole', RelationMap::ONE_TO_MANY, array('id' => 'kuser_id', ), null, null);
     $this->addRelation('KuserKgroupRelatedByKgroupId', 'KuserKgroup', RelationMap::ONE_TO_MANY, array('id' => 'kgroup_id', ), null, null);
     $this->addRelation('KuserKgroupRelatedByKuserId', 'KuserKgroup', RelationMap::ONE_TO_MANY, array('id' => 'kuser_id', ), null, null);
+    $this->addRelation('UserEntry', 'UserEntry', RelationMap::ONE_TO_MANY, array('id' => 'kuser_id', ), null, null);
 	} // buildRelations()
 
 } // kuserTableMap

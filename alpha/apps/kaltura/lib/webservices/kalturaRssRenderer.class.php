@@ -4,7 +4,7 @@ class kalturaRssRenderer
 	const TYPE_YAHOO = 1;
 	const TYPE_TABOOLA = 2;
 	
-	public function kalturaRssRenderer ( $type = self::TYPE_YAHOO )
+	public function __construct ( $type = self::TYPE_YAHOO )
 	{
 		$this->type = $type;
 	}

@@ -72,7 +72,8 @@ class QuizService extends KalturaBaseService
 	 */
 	private function validateAndUpdateQuizData( entry $dbEntry, KalturaQuiz $quiz, $currentVersion = 0, kQuiz $newQuiz = null )
 	{
-		if ( !QuizPlugin::validateUserEntitledForQuizEdit($dbEntry) ) {
+		if ( !kEntitlementUtils::isEntitledForEditEntry($dbEntry) ) {
+			KalturaLog::debug('Update quiz allowed only with admin KS or entry owner or co-editor');
 			throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID);
 		}
 		$quizData = $quiz->toObject($newQuiz);
@@ -91,7 +92,7 @@ class QuizService extends KalturaBaseService
 	 * @param string $entryId
 	 * @return KalturaQuiz
 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
-	 * @throws KalturaQuizErrors::PROVIDED_ENTRY_IS_NOT_A_QUIZ
+	 *
 	 */
 	public function getAction( $entryId )
 	{
@@ -129,17 +130,57 @@ class QuizService extends KalturaBaseService
 
 	/**
 	 * creates a pdf from quiz object
-	 *
-	 * @action servePdf
+	 * The Output type defines the file format in which the quiz will be generated
+	 * Currently only PDF files are supported
+	 * @action serve
 	 * @param string $entryId
+	 * @param KalturaQuizOutputType $quizOutputType
 	 * @return file
 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
 	 * @throws KalturaQuizErrors::PROVIDED_ENTRY_IS_NOT_A_QUIZ
 	 */
-	public function servePdfAction($entryId)
+	public function serveAction($entryId, $quizOutputType)
 	{
+		KalturaLog::debug("Create a PDF Document for entry id [ " .$entryId. " ]");
 		$dbEntry = entryPeer::retrieveByPK($entryId);
 
+		//validity check
+		if (!$dbEntry)
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
+
+		//validity check
+		$kQuiz = QuizPlugin::getQuizData($dbEntry);
+		if ( is_null( $kQuiz ) )
+			throw new KalturaAPIException(KalturaQuizErrors::PROVIDED_ENTRY_IS_NOT_A_QUIZ, $entryId);
+
+		//validity check
+		if (!$kQuiz->getAllowDownload())
+		{
+			throw new KalturaAPIException(KalturaQuizErrors::QUIZ_CANNOT_BE_DOWNLOAD);
+		}
+		//create a pdf
+		$kp = new kQuizPdf($entryId);
+		$kp->createQuestionPdf();
+		return $kp->submitDocument();
+	}
+
+
+	/**
+	 * sends a with an api request for pdf from quiz object
+	 *
+	 * @action getUrl
+	 * @param string $entryId
+	 * @param KalturaQuizOutputType $quizOutputType
+	 * @return string
+	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
+	 * @throws KalturaQuizErrors::PROVIDED_ENTRY_IS_NOT_A_QUIZ
+	 * @throws KalturaQuizErrors::QUIZ_CANNOT_BE_DOWNLOAD
+	 */
+	public function getUrlAction($entryId, $quizOutputType)
+	{
+		KalturaLog::debug("Create a URL PDF Document download for entry id [ " .$entryId. " ]");
+
+		$dbEntry = entryPeer::retrieveByPK($entryId);
 		if (!$dbEntry)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 
@@ -147,8 +188,24 @@ class QuizService extends KalturaBaseService
 		if ( is_null( $kQuiz ) )
 			throw new KalturaAPIException(KalturaQuizErrors::PROVIDED_ENTRY_IS_NOT_A_QUIZ, $entryId);
 
-		$kp = new kQuizPdf($entryId);
-		$kp->createQuestionPdf();
-		return $kp->submitDocument();
+		//validity check
+		if (!$kQuiz->getAllowDownload())
+		{
+			throw new KalturaAPIException(KalturaQuizErrors::QUIZ_CANNOT_BE_DOWNLOAD);
+		}
+
+		$finalPath ='/api_v3/service/quiz_quiz/action/serve/quizOutputType/';
+
+		$finalPath .="$quizOutputType";
+		$finalPath .= '/entryId/';
+		$finalPath .="$entryId";
+		$ksObj = $this->getKs();
+		$ksStr = ($ksObj) ? $ksObj->getOriginalString() : null;
+		$finalPath .= "/ks/".$ksStr;
+
+		$partnerId = $this->getPartnerId();
+		$downloadUrl = myPartnerUtils::getCdnHost($partnerId) . $finalPath;
+
+		return $downloadUrl;
 	}
 }

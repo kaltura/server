@@ -3,9 +3,9 @@
 class DeliveryProfileGenericHdsManifest extends DeliveryProfileGenericHds {
 
 	/**
-	 * @return kManifestRenderer
+	 * @return array $manifestInfo
 	 */
-	public function serve()
+	public function buildServeFlavors()
 	{
 		if ($this->params->getManifestFileSync())
 		{
@@ -26,7 +26,8 @@ class DeliveryProfileGenericHdsManifest extends DeliveryProfileGenericHds {
 				$url = $this->getFileSyncUrl($manifestFileSync, false);
 			}
 			$manifestInfo = $this->getFlavorAssetInfo($url);
-			return $this->getRenderer(array($manifestInfo));
+			
+			return array($manifestInfo);
 		} else {
 			KalturaLog::log("No manifest file was found");
 			return null;

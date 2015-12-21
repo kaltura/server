@@ -781,7 +781,15 @@ $plannedDur = 0;
 		 * the constants theshold.
 		 */
 		$this->evaluateTargetVideoFramerate($sourceVid, $targetVid);
-				
+		
+		/*
+		 * COPY does not require following settings
+		 */
+		if($targetVid->_id==KDLVideoTarget::COPY) {
+			$targetVid->_watermarkData = null;
+			return $targetVid;
+		}
+		
 		/*
 		 * GOP - if gop not set, set it to 2sec according to the required frame rate,
 		 * otherwise if gop param is in sec (_isGopInSec) ==> calculate form framerate,
@@ -814,10 +822,15 @@ $plannedDur = 0;
 			$scaleArr = explode("x",$targetVid->_watermarkData->scale);
 			foreach ($scaleArr as $i=>$val){
 				if(isset($val) && strlen($val)>0) {
-					$arr = explode('%', $val);
-					if(count($arr)==2){
+					$percentArr = explode('%', $val);
+					if(count($percentArr)==2){
 						if(isset($sourceVid->_width) && isset($sourceVid->_height)) {
-							$val = round(($i==0?$sourceVid->_width: $sourceVid->_height)*$arr[0]/100);
+							// For 'portrait' sources (rotation -90,90,270) - switch the scaled dims
+							if(isset($sourceVid->_rotation) && in_array($sourceVid->_rotation, array(-90,90,270)))
+								$val =($i==0?$sourceVid->_height: $sourceVid->_width);
+							else 
+								$val =($i==0?$sourceVid->_width: $sourceVid->_height);
+							$val = round($val*$percentArr[0]/100);
 						}
 						else $val = "";
 					}

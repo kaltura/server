@@ -425,7 +425,7 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 	 * Returns all live delivery profile types
 	 * @return array supported live types
 	 */
-	protected static function getAllLiveDeliveryProfileTypes()
+	public static function getAllLiveDeliveryProfileTypes()
 	{
 		$deliveryProfileTypes = KalturaPluginManager::getExtendedTypes(self::OM_CLASS, self::LIVE_DELIVERY_PROFILE);
 		$deliveryProfileTypes = array_merge($deliveryProfileTypes, self::$LIVE_DELIVERY_PROFILES);
@@ -455,6 +455,18 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 		$c->addAnd(DeliveryProfilePeer::STATUS, array(DeliveryStatus::ACTIVE, DeliveryStatus::STAGING_OUT), Criteria::IN);
 		
 		self::$s_criteria_filter->setFilter ( $c );
+	}
+	
+	public static function retrieveByTypeAndPks($pks, $type)
+	{
+		if(!count($pks))
+			return array();
+		
+		$criteria = new Criteria();
+		$criteria->add(DeliveryProfilePeer::ID, $pks, Criteria::IN);
+		$criteria->add(DeliveryProfilePeer::TYPE, $type);
+		
+		return DeliveryProfilePeer::doSelect($criteria);
 	}
 	
 } // DeliveryProfilePeer

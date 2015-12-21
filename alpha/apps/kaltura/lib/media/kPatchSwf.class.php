@@ -78,7 +78,7 @@ class kPatchSwf
 	private $swfdata;
 	private $pos;
 	
-	public function kPatchSwf($swf, $signature = self::KALTURA_EMBED_SIGNATURE)
+	public function __construct($swf, $signature = self::KALTURA_EMBED_SIGNATURE)
 	{
 		$this->header = substr($swf, 0, 8);
 		$zdata = substr($swf, 8, strlen($swf) - 8);

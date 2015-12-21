@@ -125,15 +125,20 @@ public class MediaServiceTest extends BaseTest {
 		try {
 			InputStream fileData = TestUtils.getTestVideo();
 			int fileSize = fileData.available();
+			String uniqueTag = "test_" + getUniqueString();
+
+			KalturaMediaEntryFilter filter = new KalturaMediaEntryFilter();
+			filter.tagsLike = uniqueTag;
 			
 			startUserSession();
-			int sz = client.getMediaService().count();
+			int sz = client.getMediaService().count(filter);
 			
 			// Create entry
 			KalturaMediaEntry entry = new KalturaMediaEntry();
 			entry.name =  "test (" + new Date() + ")";
 			entry.type = KalturaEntryType.MEDIA_CLIP;
 			entry.mediaType = KalturaMediaType.VIDEO;
+			entry.tags = uniqueTag;
 			
 			entry = client.getMediaService().add(entry);
 			assertNotNull(entry);
@@ -167,7 +172,7 @@ public class MediaServiceTest extends BaseTest {
 			assertTrue(listFlavors.size() >= 1); // Should contain at least the source
 			
 			// Test count
-			int sz2 = client.getMediaService().count();
+			int sz2 = client.getMediaService().count(filter);
 			assertTrue(sz + 1 == sz2);
 			
 		} catch (Exception e) {

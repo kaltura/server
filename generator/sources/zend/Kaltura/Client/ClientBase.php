@@ -159,7 +159,7 @@ class Kaltura_Client_ClientBase
 		$signature = $this->signature($params);
 		$this->addParam($params, "kalsig", $signature);
 
-		$url = $this->config->serviceUrl . "/api_v3/index.php?service={$call->service}&action={$call->action}";
+		$url = $this->config->serviceUrl . "/api_v3/service/{$call->service}/action/{$call->action}";
 		$url .= '&' . http_build_query($params);
 		$this->log("Returned url [$url]");
 		return $url;
@@ -212,10 +212,10 @@ class Kaltura_Client_ClientBase
 			$this->addParam($params, $param, $value);
 		}
 
-		$url = $this->config->serviceUrl."/api_v3/index.php?service=";
+		$url = $this->config->serviceUrl."/api_v3/index.php/service";
 		if (!is_null($this->multiRequestReturnType))
 		{
-			$url .= "multirequest";
+			$url .= "/multirequest";
 			$i = 0;
 			foreach ($this->callsQueue as $call)
 			{
@@ -229,7 +229,7 @@ class Kaltura_Client_ClientBase
 		else
 		{
 			$call = $this->callsQueue[0];
-			$url .= $call->service."&action=".$call->action;
+			$url .= "/{$call->service}/action/{$call->action}";
 			$params = array_merge($params, $call->params);
 			$files = $call->files;
 		}
@@ -557,7 +557,7 @@ class Kaltura_Client_ClientBase
 		if(is_object($paramValue) && $paramValue instanceof Kaltura_Client_ObjectBase)
 		{
 			$params[$paramName] = array(
-				'objectType' => get_class($paramValue)
+				'objectType' => $paramValue->getKalturaObjectType()
 			);
 			
 			foreach($paramValue as $prop => $val)
@@ -568,7 +568,7 @@ class Kaltura_Client_ClientBase
 
 		if(is_bool($paramValue))
 		{
-			$params[$paramName] = $paramValue ? 'true' : 'false';
+			$params[$paramName] = $paramValue;
 			return;
 		}
 
@@ -674,8 +674,8 @@ class Kaltura_Client_ClientBase
 			}
 		}
 
-		if(is_object($object))
-			$array['objectType'] = get_class($object);
+		if(is_object($object) && $object instanceof Kaltura_Client_ObjectBase)
+			$array['objectType'] = $object->getKalturaObjectType();
 			
 		return $array;
 	}

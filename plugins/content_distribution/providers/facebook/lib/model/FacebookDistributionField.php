@@ -2,16 +2,19 @@
 /**
  * @package plugins.facebookDistribution
  * @subpackage model.enum
- */ 
+ */
 interface FacebookDistributionField extends BaseEnum
 {
-    const TITLE  = 'title';
-	const DESCRIPTION  = 'description';
-	const SCHEDULE_PUBLISHING_TIME  = 'scheduled_publishing_time';
-    const CALL_TO_ACTION_TYPE  = 'call_to_action_type';
-    const CALL_TO_ACTION_VALUE  = 'call_to_action_value';  
-    const PLACE  = 'place';
-	const TAGS  = 'tags';	  
-	const TARGETING  = 'targeting';
-	const FEED_TARGETING  = 'feed_targeting';
+	const TITLE = 'TITLE';
+	const DESCRIPTION = 'DESCRIPTION';
+	const TRIGGER_BASIC_FIELDS = 'BASIC_TRIGGER_FIELDS';
+	const CALL_TO_ACTION_TYPE = 'CALL_TO_ACTION_TYPE';
+	const CALL_TO_ACTION_LINK = 'CALL_TO_ACTION_LINK';
+	const CALL_TO_ACTION_LINK_CAPTION = 'CALL_TO_ACTION_LINK_CAPTION';
+	const CALL_TO_ACTION_TYPE_VALID_VALUES = 'CALL_TO_ACTION_TYPE_VALID_VALUES';
+	const PLACE = 'PLACE';
+	const TAGS = 'TAGS';
+	const TARGETING	= 'TARGETING';
+	const FEED_TARGETING = 'FEED_TARGETING';
+	const SCHEDULE_PUBLISHING_TIME = 'SCHEDULE_PUBLISHING_TIME';
 }

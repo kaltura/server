@@ -25,12 +25,12 @@ class kQuiz {
 	/**
 	 * @var boolean
 	 */
-	protected $showResultOnAnswer;
+	protected $showCorrect;
 
 	/**
 	 * @var boolean
 	 */
-	protected $showCorrectKeyOnAnswer;
+	protected $showCorrectKey;
 
 	/**
 	 * @var boolean
@@ -45,6 +45,11 @@ class kQuiz {
 	 * @var boolean
 	 */
 	protected $allowDownload;
+
+	/**
+	 * @var boolean
+	 */
+	protected $showGradeAfterSubmission;
 
 	/**
 	 * @return int
@@ -81,33 +86,33 @@ class kQuiz {
 	/**
 	 * @return boolean
 	 */
-	public function getShowResultOnAnswer()
+	public function getShowCorrect()
 	{
-		return $this->showResultOnAnswer;
+		return $this->showCorrect;
 	}
 
 	/**
-	 * @param boolean $showResultOnAnswer
+	 * @param boolean $showCorrect
 	 */
-	public function setShowResultOnAnswer($showResultOnAnswer)
+	public function setShowCorrect($showCorrect)
 	{
-		$this->showResultOnAnswer = $showResultOnAnswer;
+		$this->showCorrect = $showCorrect;
 	}
 
 	/**
 	 * @return boolean
 	 */
-	public function getShowCorrectKeyOnAnswer()
+	public function getShowCorrectKey()
 	{
-		return $this->showCorrectKeyOnAnswer;
+		return $this->showCorrectKey;
 	}
 
 	/**
-	 * @param boolean $showCorrectKeyOnAnswer
+	 * @param boolean $showCorrectKey
 	 */
-	public function setShowCorrectKeyOnAnswer($showCorrectKeyOnAnswer)
+	public function setShowCorrectKey($showCorrectKey)
 	{
-		$this->showCorrectKeyOnAnswer = $showCorrectKeyOnAnswer;
+		$this->showCorrectKey = $showCorrectKey;
 	}
 
 	/**
@@ -158,7 +163,19 @@ class kQuiz {
 		$this->allowDownload = $allowDownload;
 	}
 
+	/**
+	 * @return boolean
+	 */
+	public function getShowGradeAfterSubmission()
+	{
+		return $this->showGradeAfterSubmission;
+	}
 
-
-
+	/**
+	 * @param boolean $showAfterSubmit
+	 */
+	public function setShowGradeAfterSubmission($showAfterSubmit)
+	{
+		$this->showGradeAfterSubmission = $showAfterSubmit;
+	}
 }

@@ -31,6 +31,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 
+import java.io.Serializable;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONArray;
@@ -45,7 +47,7 @@ import com.kaltura.client.enums.KalturaEnumAsString;
  * @author jpotts
  * 
  */
-public class KalturaParams extends JSONObject {
+public class KalturaParams extends JSONObject implements Serializable  {
 
 	public String toQueryString() throws KalturaApiException {
 		return toQueryString(null);

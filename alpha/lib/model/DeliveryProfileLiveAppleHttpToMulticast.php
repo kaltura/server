@@ -7,10 +7,13 @@ class DeliveryProfileLiveAppleHttpToMulticast extends DeliveryProfileLiveAppleHt
 		$this->DEFAULT_RENDERER_CLASS = 'kF4MManifestRenderer';
 	}
 	
-	public function finalizeUrls(&$baseUrl, &$flavorsUrls)
+	public function getDeliveryServerNodeUrl($removeAfterUse = false)
 	{
-		parent::finalizeUrls($baseUrl, $flavorsUrls);
+		$deliveryUrl = parent::getDeliveryServerNodeUrl($removeAfterUse);
 		
-		$baseUrl = preg_replace('/' . EdgeServer::EDGE_SERVER_DEFAULT_LIVE_CACHE_APPLICATION_NAME . '/', EdgeServer::EDGE_SERVER_DEFAULT_LIVE_UNICAST_TO_MC_APPLICATION_NAME , $baseUrl, 1);
+		if($deliveryUrl)
+			$deliveryUrl = preg_replace('/' . EdgeServerNode::EDGE_SERVER_DEFAULT_LIVE_CACHE_APPLICATION_NAME . '/', EdgeServerNode::EDGE_SERVER_DEFAULT_LIVE_UNICAST_TO_MC_APPLICATION_NAME , $deliveryUrl, 1);
+		
+		return $deliveryUrl;
 	}
 }

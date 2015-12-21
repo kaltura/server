@@ -24,7 +24,8 @@ class requestUtils extends infraRequestUtils
 	
 	    /* parse base URL and convert to local variables:
 	       $scheme, $host, $path */
-	    extract(parse_url($referenceUrl));
+	    $parsed_url = parse_url($referenceUrl);
+        extract($parsed_url);
 	
 	    /* remove non-directory element from path */
 	    $path = preg_replace('#/[^/]*$#', '', $path);
@@ -33,8 +34,10 @@ class requestUtils extends infraRequestUtils
 	    if ($targetUrl[0] == '/') 
 	    	$path = '';
 	
+	    $port = isset($parsed_url['port']) && $parsed_url['port'] !== 80 && $parsed_url['port'] !== 443  ? ':' . $parsed_url['port'] : '';
+
 	    /* dirty absolute URL */
-	    $abs = "$host$path/$targetUrl";
+	    $abs = "$host$port$path/$targetUrl";
 	
 	    /* replace '//' or '/./' or '/foo/../' with '/' */
 	    $re = array('#(/\.?/)#', '#/(?!\.\.)[^/]+/\.\./#');

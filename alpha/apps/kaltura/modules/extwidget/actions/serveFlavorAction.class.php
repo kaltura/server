@@ -87,8 +87,8 @@ class serveFlavorAction extends kalturaAction
 			}
 		
 			$renderer = new kRendererString(
-				'<?xml version="1.0" encoding="utf-8"?><xml><result>' . $path . '</result></xml>', 
-				'text/xml');
+				'{"sequences":[{"clips":[{"type":"source","path":"' . $path . '"}]}]}', 
+				'application/json');
 			if ($path)
 			{
 				$this->storeCache($renderer, $flavorAsset->getPartnerId());

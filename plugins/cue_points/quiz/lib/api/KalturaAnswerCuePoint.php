@@ -88,7 +88,8 @@ class KalturaAnswerCuePoint extends KalturaCuePoint
 		parent::doFromObject($dbObject, $responseProfile);
 
 		$dbEntry = entryPeer::retrieveByPK($dbObject->getEntryId());
-		if ( !QuizPlugin::validateUserEntitledForQuizEdit($dbEntry) ) {
+		if ( !kEntitlementUtils::isEntitledForEditEntry($dbEntry))
+		{
 			/**
 			 * @var kQuiz $kQuiz
 			 */
@@ -99,17 +100,17 @@ class KalturaAnswerCuePoint extends KalturaCuePoint
 			{
 				if (!$kQuiz->getShowCorrectAfterSubmission())
 				{
-					$this->isCorrect = KalturaNullableBoolean::NULL_VALUE;
+					$this->isCorrect = null;
 					$this->correctAnswerKeys = null;
 					$this->explanation = null;
 				}
 			}
 			else
 			{
-				if (!$kQuiz->getShowResultOnAnswer())
-					$this->isCorrect = KalturaNullableBoolean::NULL_VALUE;
-
-				if (!$kQuiz->getShowCorrectKeyOnAnswer())
+				if (!$kQuiz->getShowCorrect()) {
+					$this->isCorrect = null;
+				}
+				if (!$kQuiz->getShowCorrectKey())
 				{
 					$this->correctAnswerKeys = null;
 					$this->explanation = null;
