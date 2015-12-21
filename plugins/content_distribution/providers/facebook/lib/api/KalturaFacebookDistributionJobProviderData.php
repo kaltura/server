@@ -24,18 +24,20 @@ class KalturaFacebookDistributionJobProviderData extends KalturaConfigurableDist
 	{
 		parent::__construct($distributionJobData);
 	    
-		if(!$distributionJobData)
+		if( (!$distributionJobData) ||
+			!($distributionJobData->distributionProfile instanceof KalturaFacebookDistributionProfile) ){
+			KalturaLog::info("Distribution data given did not exist or was not facebook related, given: ".print_r($distributionJobData, true));
 			return;
-		
-		if(!($distributionJobData->distributionProfile instanceof KalturaFacebookDistributionProfile))
-			return;
-			
+		}
 
 		$this->videoAssetFilePath = $this->getValidVideoPath($distributionJobData);
-		
-		if(!$this->videoAssetFilePath)
+
+		if(!$this->videoAssetFilePath){
+			KalturaLog::err("Could not find a valid video asset");
 			return;
-		
+		}
+
+
 		$thumbAssets = assetPeer::retrieveByIds(explode(',', $distributionJobData->entryDistribution->thumbAssetIds));
 		if(count($thumbAssets))
 		{
@@ -43,15 +45,17 @@ class KalturaFacebookDistributionJobProviderData extends KalturaConfigurableDist
 			if(kFileSyncUtils::fileSync_exists($syncKey))
 				$this->thumbAssetFilePath = kFileSyncUtils::getLocalFilePathForKey($syncKey, false);
 		}
-		
-		$this->addCaptionsData($distributionJobData);
+
+//		TODO add the captions
+//		$this->addCaptionsData($distributionJobData);
+
 	}
 	
 	private static $map_between_objects = array
 	(
 		"videoAssetFilePath",
 		"thumbAssetFilePath",
-		"captionsInfo",
+		"captionsInfo"
 	);
 
 	public function getMapBetweenObjects ( )
@@ -179,7 +183,7 @@ class KalturaFacebookDistributionJobProviderData extends KalturaConfigurableDist
 				{
 					try
 					{
-						FacebookGraphSdkUtils::isValidVideo($videoAssetFilePath, $mediaInfo->getFileSize(), $mediaInfo->getVideoDuration(), $mediaInfo->getVideoWidth(), $mediaInfo->getVideoHeight());
+						FacebookGraphSdkUtils::validateVideoAttributes($videoAssetFilePath, $mediaInfo->getFileSize(), $mediaInfo->getVideoDuration(), $mediaInfo->getVideoWidth(), $mediaInfo->getVideoHeight());
 						$isValidVideo = true;
 					}
 					catch(Exception $e)
@@ -193,4 +197,5 @@ class KalturaFacebookDistributionJobProviderData extends KalturaConfigurableDist
 		}		
 		return $videoAssetFilePath;
 	}
+
 }

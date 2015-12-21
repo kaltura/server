@@ -10,13 +10,23 @@ class FacebookDistributionProfile extends ConfigurableDistributionProfile
 	const CUSTOM_DATA_PAGE_ID = 'pageId';
 	const CUSTOM_DATA_PAGE_ACCESS_TOKEN = 'pageAccessToken';
 	const CUSTOM_DATA_USER_ACCESS_TOKEN = 'userAccessToken';
-	const CUSTOM_DATA_PERMISSIONS = 'permissions';
+	const CUSTOM_DATA_FACEBOOK_PERMISSIONS = 'facebookPermissions';
 	const CUSTOM_DATA_RE_REQUEST_PERMISSIONS = 'reRequestPermissions';
-		
+	const CUSTOM_DATA_CALL_TO_ACTION_TYPE = 'callToActionType';
+	const CUSTOM_DATA_CALL_TO_ACTION_LINK = 'callToActionLink';
+	const CUSTOM_DATA_CALL_TO_ACTION_LINK_CAPTION = 'callToActionLinkCaption';
+	const CUSTOM_DATA_PLACE= 'place';
+	const CUSTOM_DATA_TAGS= 'tags';
+	const CUSTOM_DATA_TARGETING= 'targeting';
+	const CUSTOM_DATA_FEED_TARGETING= 'feedTargeting';
+	// this list is the available one when uploading a video to a page
 	const CALL_TO_ACTION_TYPE_VALID_VALUES = 'SHOP_NOW,BOOK_TRAVEL,LEARN_MORE,SIGN_UP,DOWNLOAD,WATCH_MORE';
 	const DEFAULT_RE_REQUEST_PERMISSIONS = 'false';
-	private static $DEFAULT_PERMISSIONS = array('manage_pages', 'publish_actions', 'user_videos');
+	// needed permission in order to be able to publish the video to a facebook page
+	const DEFAULT_FACEBOOK_PERMISSIONS = 'manage_pages,publish_actions,user_videos,publish_pages,user_actions.video';
 
+	const SIX_MINUTES_IN_SECONDS = 360;
+	const SIX_MONTHS_IN_SECONDS = 15552000;
 
 	/* (non-PHPdoc)
 	 * @see DistributionProfile::getProvider()
@@ -32,33 +42,30 @@ class FacebookDistributionProfile extends ConfigurableDistributionProfile
 	public function validateForSubmission(EntryDistribution $entryDistribution, $action)
 	{
 		$validationErrors = parent::validateForSubmission($entryDistribution, $action);
-		
+
 		$inListOrNullFields = array (
 		    FacebookDistributionField::CALL_TO_ACTION_TYPE_VALID_VALUES => explode(',', self::CALL_TO_ACTION_TYPE_VALID_VALUES),
 		);
-		
-		$flavorAssets = array();
+
 		if(count($entryDistribution->getFlavorAssetIds()))
-		{
 			$flavorAssets = assetPeer::retrieveByIds(explode(',', $entryDistribution->getFlavorAssetIds()));
-		}
-		else 
-		{
+		else
 			$flavorAssets = assetPeer::retrieveReadyFlavorsByEntryId($entryDistribution->getEntryId());
-		}
-		
+
 		$validVideo = false;
-		foreach ($flavorAssets as $flavorAsset) 
+		foreach ($flavorAssets as $flavorAsset)
 		{
 			$validVideo = $this->validateVideo($flavorAsset);
-			if($validVideo)
+			if($validVideo) {
+				// even one valid video is enough
 				break;
+			}
 		}
 
 		if(!$validVideo)
 		{
 			KalturaLog::err("No valid video found for entry [" . $entryDistribution->getEntryId() . "]");
-			$validationErrors[] = $this->createValidationError($action, DistributionErrorType::INVALID_DATA, 'flavorAsset', 'no valid flavor found');			
+			$validationErrors[] = $this->createCustomValidationError($action, DistributionErrorType::INVALID_DATA, 'flavorAsset', ' No valid flavor found');
 		}
 		
 		$allFieldValues = $this->getAllFieldValues($entryDistribution);
@@ -66,101 +73,121 @@ class FacebookDistributionProfile extends ConfigurableDistributionProfile
 		    KalturaLog::err('Error getting field values from entry distribution id ['.$entryDistribution->getId().'] profile id ['.$this->getId().']');
 		    return $validationErrors;
 		}
+		if ($allFieldValues[FacebookDistributionField::SCHEDULE_PUBLISHING_TIME] &&
+			!dateUtils::isWithinLimitsFromNow($allFieldValues[FacebookDistributionField::SCHEDULE_PUBLISHING_TIME], self::SIX_MINUTES_IN_SECONDS, self::SIX_MONTHS_IN_SECONDS))
+		{
+			KalturaLog::err("Scheduled time to publish defies the facebook restriction of six minute to six months from now ");
+			$validationErrors[] = $this->createCustomValidationError($action, DistributionErrorType::INVALID_DATA, 'sunrise', 'Distribution sunrise is invalid (should be 6 minutes to 6 months from now)');
+		}
 	    $validationErrors = array_merge($validationErrors, $this->validateInListOrNull($inListOrNullFields, $allFieldValues, $action));
-					
 		return $validationErrors;
 	}
 
-	public function getPageId()				    {return $this->getFromCustomData(self::CUSTOM_DATA_PAGE_ID);}
-	public function setPageId($v)			    {$this->putInCustomData(self::CUSTOM_DATA_PAGE_ID, $v);}
-	public function getPageAccessToken()	    {return $this->getFromCustomData(self::CUSTOM_DATA_PAGE_ACCESS_TOKEN);}
-	public function setPageAccessToken($v)	    {$this->putInCustomData(self::CUSTOM_DATA_PAGE_ACCESS_TOKEN, $v);}
-	public function getUserAccessToken()	    {return $this->getFromCustomData(self::CUSTOM_DATA_USER_ACCESS_TOKEN);}
-	public function setUserAccessToken($v)	    {$this->putInCustomData(self::CUSTOM_DATA_USER_ACCESS_TOKEN, $v);}
-	public function getPermissions()	        {return $this->getFromCustomData(self::CUSTOM_DATA_PERMISSIONS, null, self::$DEFAULT_PERMISSIONS);}
-	public function setPermissions($v)	        {$this->putInCustomData(self::CUSTOM_DATA_PERMISSIONS, $v);}
-	public function getReRequestPermissions()	{return $this->getFromCustomData(self::CUSTOM_DATA_RE_REQUEST_PERMISSIONS, null , self::DEFAULT_RE_REQUEST_PERMISSIONS);}
-	public function setReRequestPermissions($v)	{$this->putInCustomData(self::CUSTOM_DATA_RE_REQUEST_PERMISSIONS, $v);}
-	
+	public function getPageId()				    	{return $this->getFromCustomData(self::CUSTOM_DATA_PAGE_ID);}
+	public function getPageAccessToken()	    	{return $this->getFromCustomData(self::CUSTOM_DATA_PAGE_ACCESS_TOKEN);}
+	public function getUserAccessToken()	    	{return $this->getFromCustomData(self::CUSTOM_DATA_USER_ACCESS_TOKEN);}
+	public function getFacebookPermissions()		{return $this->getFromCustomData(self::CUSTOM_DATA_FACEBOOK_PERMISSIONS, null, self::DEFAULT_FACEBOOK_PERMISSIONS);}
+	public function getReRequestPermissions()		{return $this->getFromCustomData(self::CUSTOM_DATA_RE_REQUEST_PERMISSIONS, null , self::DEFAULT_RE_REQUEST_PERMISSIONS);}
+	public function getCallToActionType()	    	{return $this->getFromCustomData(self::CUSTOM_DATA_CALL_TO_ACTION_TYPE);}
+	public function getCallToActionLink()	    	{return $this->getFromCustomData(self::CUSTOM_DATA_CALL_TO_ACTION_LINK);}
+	public function getCallToActionLinkCaption()	{return $this->getFromCustomData(self::CUSTOM_DATA_CALL_TO_ACTION_LINK_CAPTION);}
+	public function getPlace()				   		{return $this->getFromCustomData(self::CUSTOM_DATA_PLACE);}
+	public function getTags()				   		{return $this->getFromCustomData(self::CUSTOM_DATA_TAGS);}
+	public function getTargeting()					{return $this->getFromCustomData(self::CUSTOM_DATA_TARGETING);}
+	public function getFeedTargeting()				{return $this->getFromCustomData(self::CUSTOM_DATA_FEED_TARGETING);}
+
+	public function setPageId($v)			    	{$this->putInCustomData(self::CUSTOM_DATA_PAGE_ID, $v);}
+	public function setPageAccessToken($v)	    	{$this->putInCustomData(self::CUSTOM_DATA_PAGE_ACCESS_TOKEN, $v);}
+	public function setUserAccessToken($v)	    	{$this->putInCustomData(self::CUSTOM_DATA_USER_ACCESS_TOKEN, $v);}
+	public function setFacebookPermissions($v)		{$this->putInCustomData(self::CUSTOM_DATA_FACEBOOK_PERMISSIONS, $v);}
+	public function setReRequestPermissions($v)		{$this->putInCustomData(self::CUSTOM_DATA_RE_REQUEST_PERMISSIONS, $v);}
+	public function setCallToActionType($v)	    	{$this->putInCustomData(self::CUSTOM_DATA_CALL_TO_ACTION_TYPE, $v);}
+	public function setCallToActionLink($v)			{$this->putInCustomData(self::CUSTOM_DATA_CALL_TO_ACTION_LINK, $v);}
+	public function setCallToActionLinkCaption($v)	{$this->putInCustomData(self::CUSTOM_DATA_CALL_TO_ACTION_LINK_CAPTION, $v);}
+	public function setPlace($v)					{$this->putInCustomData(self::CUSTOM_DATA_PLACE, $v);}
+	public function setTags($v)				    	{$this->putInCustomData(self::CUSTOM_DATA_TAGS, $v);}
+	public function setTargeting($v)				{$this->putInCustomData(self::CUSTOM_DATA_TARGETING, $v);}
+	public function setFeedTargeting($v)			{$this->putInCustomData(self::CUSTOM_DATA_FEED_TARGETING, $v);}
+
+
 	protected function getDefaultFieldConfigArray()
 	{	    
 	    $fieldConfigArray = parent::getDefaultFieldConfigArray();
 	    
 	    $fieldConfig = new DistributionFieldConfig();
-	    $fieldConfig->setFieldName(FacebookDistributionField::TITLE);
-	    $fieldConfig->setUserFriendlyFieldName('Entry name');
-	    $fieldConfig->setEntryMrssXslt('<xsl:value-of select="string(title)" />');
-	    $fieldConfig->setUpdateOnChange(true);
-	    $fieldConfig->setUpdateParams(array(entryPeer::NAME));
-	    $fieldConfig->setIsRequired(DistributionFieldRequiredStatus::REQUIRED_BY_PROVIDER);
-	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 
-	    $fieldConfig = new DistributionFieldConfig();
-	    $fieldConfig->setFieldName(FacebookDistributionField::DESCRIPTION);
-	    $fieldConfig->setUserFriendlyFieldName('Entry description');
-	    /*$fieldConfig->setEntryMrssXslt('
-        			<xsl:choose>
-                    	<xsl:when test="customData/metadata/'.self::METADATA_FIELD_DESCRIPTION.' != \'\'">
-                    		<xsl:value-of select="customData/metadata/'.self::METADATA_FIELD_DESCRIPTION.'" />
-                    	</xsl:when>
-                    	<xsl:otherwise>
-                    		<xsl:value-of select="string(description)" />
-                    	</xsl:otherwise>
-                    </xsl:choose>');*/
+		$fieldConfig = new DistributionFieldConfig();
+		$fieldConfig->setFieldName(FacebookDistributionField::TITLE);
+		$fieldConfig->setUserFriendlyFieldName('Video title');
+		$fieldConfig->setEntryMrssXslt('<xsl:value-of select="string(title)" />');
+		$fieldConfig->setUpdateOnChange(true);
+		$fieldConfig->setUpdateParams(array(entryPeer::NAME));
+		$fieldConfig->setIsRequired(DistributionFieldRequiredStatus::REQUIRED_BY_PROVIDER);
+		$fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 
-	    $fieldConfig->setUpdateOnChange(true);
-	    //$fieldConfig->setUpdateParams(array(entryPeer::DESCRIPTION,"/*[local-name()='metadata']/*[local-name()='".self::METADATA_FIELD_DESCRIPTION."']"));
-	    $fieldConfig->setIsRequired(DistributionFieldRequiredStatus::REQUIRED_BY_PROVIDER);
-	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
+		$fieldConfig = new DistributionFieldConfig();
+		$fieldConfig->setFieldName(FacebookDistributionField::DESCRIPTION);
+		$fieldConfig->setUserFriendlyFieldName('Video description');
+		$fieldConfig->setEntryMrssXslt('<xsl:value-of select="string(description)" />');
+		$fieldConfig->setUpdateOnChange(true);
+		$fieldConfig->setUpdateParams(array(entryPeer::DESCRIPTION));
+		$fieldConfig->setIsRequired(DistributionFieldRequiredStatus::REQUIRED_BY_PROVIDER);
+		$fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 
 	    $fieldConfig = new DistributionFieldConfig();
 	    $fieldConfig->setFieldName(FacebookDistributionField::SCHEDULE_PUBLISHING_TIME);
-	    $fieldConfig->setUserFriendlyFieldName('Schedule Publishing Time');
+	    $fieldConfig->setUserFriendlyFieldName('Schedule Sunrise Time');
 	    $fieldConfig->setEntryMrssXslt('<xsl:value-of select="distribution[@entryDistributionId=$entryDistributionId]/sunrise" />');
 	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;	   
 
 	    $fieldConfig = new DistributionFieldConfig();
 	    $fieldConfig->setFieldName(FacebookDistributionField::CALL_TO_ACTION_TYPE);
 	    $fieldConfig->setUserFriendlyFieldName('Call To Action Type');
-	    $fieldConfig->setEntryMrssXslt('<xsl:value-of select="distribution[@entryDistributionId=$entryDistributionId]/call_to_action_type" />');
+	    $fieldConfig->setEntryMrssXslt('<xsl:value-of select="customData/metadata/CallToActionType" />');
 	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 	    
 	   	$fieldConfig = new DistributionFieldConfig();
-	    $fieldConfig->setFieldName(FacebookDistributionField::CALL_TO_ACTION_VALUE);
-	    $fieldConfig->setUserFriendlyFieldName('Call To Action Value');
-	    $fieldConfig->setEntryMrssXslt('<xsl:value-of select="distribution[@entryDistributionId=$entryDistributionId]/call_to_action_value" />');
+	    $fieldConfig->setFieldName(FacebookDistributionField::CALL_TO_ACTION_LINK);
+	    $fieldConfig->setUserFriendlyFieldName('Call To Action Link');
+	    $fieldConfig->setEntryMrssXslt('<xsl:value-of select="customData/metadata/CallToActionLink" />');
 	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
-	    
-	   	$fieldConfig = new DistributionFieldConfig();
-	    $fieldConfig->setFieldName(FacebookDistributionField::PLACE);
-	    $fieldConfig->setUserFriendlyFieldName('ID of location to tag in video');
-	    $fieldConfig->setEntryMrssXslt('<xsl:value-of select="distribution[@entryDistributionId=$entryDistributionId]/place" />');
+
+		$fieldConfig = new DistributionFieldConfig();
+	    $fieldConfig->setFieldName(FacebookDistributionField::CALL_TO_ACTION_LINK_CAPTION);
+	    $fieldConfig->setUserFriendlyFieldName('Call To Action Link Caption');
+	    $fieldConfig->setEntryMrssXslt('<xsl:value-of select="customData/metadata/CallToActionLinkCaption" />');
 	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
-	    	    
-	    $fieldConfig = new DistributionFieldConfig();
-	    $fieldConfig->setFieldName(FacebookDistributionField::TAGS);
-	    $fieldConfig->setUserFriendlyFieldName('IDs (comma separated) of persons to tag in video');
-	    $fieldConfig->setEntryMrssXslt('<xsl:value-of select="distribution[@entryDistributionId=$entryDistributionId]/tags" />');
-	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
-	    
-	   	$fieldConfig = new DistributionFieldConfig();
-	    $fieldConfig->setFieldName(FacebookDistributionField::TARGETING);
-	    $fieldConfig->setUserFriendlyFieldName('Key IDs for ad targeting objects used to limit the audience of the video');
-	    $fieldConfig->setEntryMrssXslt('<xsl:value-of select="distribution[@entryDistributionId=$entryDistributionId]/targeting" />');
-	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
-	    
-	   	$fieldConfig = new DistributionFieldConfig();
-	    $fieldConfig->setFieldName(FacebookDistributionField::FEED_TARGETING);
-	    $fieldConfig->setUserFriendlyFieldName('Key IDs for ad targeting objects used to promote the video in specific audience feeds');
-	    $fieldConfig->setEntryMrssXslt('<xsl:value-of select="distribution[@entryDistributionId=$entryDistributionId]/feed_targeting" />');
-	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
+
+//	   	$fieldConfig = new DistributionFieldConfig();
+//	    $fieldConfig->setFieldName(FacebookDistributionField::PLACE);
+//	    $fieldConfig->setUserFriendlyFieldName('ID of location to tag in video');
+//	    $fieldConfig->setEntryMrssXslt('<xsl:value-of select="customData/metadata/Place" />');
+//	    $fieldConfigArray[] = $fieldConfig;
+//
+//	    $fieldConfig = new DistributionFieldConfig();
+//	    $fieldConfig->setFieldName(FacebookDistributionField::TAGS);
+//	    $fieldConfig->setUserFriendlyFieldName('IDs (comma separated) of persons to tag in video');
+//	    $fieldConfig->setEntryMrssXslt('<xsl:value-of select="customData/metadata/Tags" />');
+//	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
+//
+//	   	$fieldConfig = new DistributionFieldConfig();
+//	    $fieldConfig->setFieldName(FacebookDistributionField::TARGETING);
+//	    $fieldConfig->setUserFriendlyFieldName('Key IDs for ad targeting objects used to limit the audience of the video');
+//	    $fieldConfig->setEntryMrssXslt('<xsl:value-of select="distribution[@entryDistributionId=$entryDistributionId]/Targeting" />');
+//	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
+//
+//	   	$fieldConfig = new DistributionFieldConfig();
+//	    $fieldConfig->setFieldName(FacebookDistributionField::FEED_TARGETING);
+//	    $fieldConfig->setUserFriendlyFieldName('Key IDs for ad targeting objects used to promote the video in specific audience feeds');
+//	    $fieldConfig->setEntryMrssXslt('<xsl:value-of select="distribution[@entryDistributionId=$entryDistributionId]/FeedTargeting" />');
+//	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 	      
 	    return $fieldConfigArray;
 	}
 
 	public function getApiAuthorizeUrl()
 	{
-		$permissions = implode(',', $this->getPermissions());
+		$permissions = $this->getFacebookPermissions();
 		$url = kConf::get('apphome_url');
 		$url .= "/index.php/extservices/facebookoauth2".
             "/".FacebookRequestParameters::FACEBOOK_PROVIDER_ID_REQUEST_PARAM."/".base64_encode($this->getId()).
@@ -183,7 +210,7 @@ class FacebookDistributionProfile extends ConfigurableDistributionProfile
 				return false;
 			try
 			{
-				FacebookGraphSdkUtils::isValidVideo($videoAssetFilePath, $mediaInfo->getFileSize(), $mediaInfo->getVideoDuration(), $mediaInfo->getVideoWidth(), $mediaInfo->getVideoHeight());
+				FacebookGraphSdkUtils::validateVideoAttributes($videoAssetFilePath, $mediaInfo->getFileSize(), $mediaInfo->getVideoDuration(), $mediaInfo->getVideoWidth(), $mediaInfo->getVideoHeight());
 				return true;
 			}
 			catch(Exception $e)
@@ -193,4 +220,5 @@ class FacebookDistributionProfile extends ConfigurableDistributionProfile
 		}				
 		return false;
 	}
+
 }

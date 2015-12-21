@@ -1,23 +1,20 @@
 <?php
 
-require_once KALTURA_ROOT_PATH.'/vendor/facebook-sdk-php-v5-customed/autoload.php';
+require_once KALTURA_ROOT_PATH.'/vendor/facebook-sdk-php-v5-customized/autoload.php';
 
 /**
+ *  This class is a helper class for the use of Facebook's PHP client (see location in the require php file)
+ *
  *  @package infra
  *  @subpackage general
  */
 class FacebookGraphSdkUtils
 {
-	const MAX_VIDEO_SIZE = 1750000000; //bytes
-	const MAX_VIDEO_DURATION = 2700; //seconds
-
 	/**
-	 *
 	 * Returns facebook long-lived access token (valid for 60 days)
-	 *
 	 * @param string $appId
 	 * @param string $appSecret
-	 * @param $dataHandler can be string (memory/session) or implementation of PersistentDataInterface
+	 * @param Facebook\PersistentData\PersistentDataInterface|string $dataHandler
 	 * @param array $permissions - required permissions to be granted by the user to the app
 	 * @return null|string the access token created
 	 * @throws Facebook\Exceptions\FacebookResponseException, Facebook\Exceptions\FacebookSDKException, Exception
@@ -35,11 +32,11 @@ class FacebookGraphSdkUtils
 		if (!$userAccessToken->isLongLived())
 		{
 			// Exchanges a short-lived access token for a long-lived one
-			KalturaLog::debug('getting long lived access token for '.$accessTokenValue);
+			KalturaLog::debug('Getting long lived access token for '.$accessTokenValue);
 			$oAuth2Client = $fb->getOAuth2Client();
-			$longLivedaccessToken = $oAuth2Client->getLongLivedAccessToken($userAccessToken);
-			if(isset($longLivedaccessToken))
-				$accessTokenValue = $longLivedaccessToken->getValue();
+			$longLivedAccessToken = $oAuth2Client->getLongLivedAccessToken($userAccessToken);
+			if(isset($longLivedAccessToken))
+				$accessTokenValue = $longLivedAccessToken->getValue();
 			else
 				$accessTokenValue = null;
 		}
@@ -47,11 +44,10 @@ class FacebookGraphSdkUtils
 	}
 
 	/**
-	 *
 	 * Get user access token
 	 * @param string $appId
 	 * @param string $appSecret
-	 * @param $dataHandler can be string or implementation of PersistentDataInterface
+	 * @param Facebook\PersistentData\PersistentDataInterface|string $dataHandler
 	 * @param array $permissions
 	 * @return null
 	 * @throws Facebook\Exceptions\FacebookResponseException, Facebook\Exceptions\FacebookSDKException, Exception
@@ -85,11 +81,11 @@ class FacebookGraphSdkUtils
 	/**
 	 *
 	 * get page access token
-	 * @param unknown_type $appId
-	 * @param unknown_type $appSecret
-	 * @param unknown_type $userAccessToken
-	 * @param unknown_type $pageId
-	 * @param Facebook\PersistentData\PersistentDataInterface can be string or implementation of PersistentDataInterface
+	 * @param string $appId
+	 * @param string $appSecret
+	 * @param string $userAccessToken
+	 * @param string $pageId
+	 * @param Facebook\PersistentData\PersistentDataInterface|string
 	 * @throws Facebook\Exceptions\FacebookResponseException, Facebook\Exceptions\FacebookSDKException, Exception
 	 */
 	public static function getPageAccessToken($appId, $appSecret, $userAccessToken, $pageId, $dataHandler)
@@ -119,8 +115,8 @@ class FacebookGraphSdkUtils
 	 * @param string $appSecret
 	 * @param string $redirectUrl
 	 * @param string $permissions
-	 * @param $dataHandler can be string or implementation of PersistentDataInterface
-	 * @param bool|unknown_type $reRequestPermissions
+	 * @param Facebook\PersistentData\PersistentDataInterface|string $dataHandler
+	 * @param bool $reRequestPermissions
 	 * @return null|string
 	 */
 	public static function getLoginUrl($appId, $appSecret, $redirectUrl, $permissions, $dataHandler, $reRequestPermissions = false)
@@ -129,80 +125,116 @@ class FacebookGraphSdkUtils
 		$loginHelper = $fb->getRedirectLoginHelper();
 		$loginUrl = null;
 		if($reRequestPermissions) {
-			KalturaLog::debug("Generating facebook re authenticate URL ".print_r($permissions, true));
 			$loginUrl = $loginHelper->getReRequestUrl($redirectUrl, $permissions);
 		} else {
-			KalturaLog::debug("Generating facebook login URL");
 			$loginUrl = $loginHelper->getLoginUrl($redirectUrl, $permissions);
 		}
-
-		KalturaLog::debug('facebook login URL: '.$loginUrl);
-
 		return $loginUrl;
 	}
 
 	/**
 	 *
-	 * Upload video to facebook using resumable API
-	 * @param unknown_type $appId
-	 * @param unknown_type $appSecret
-	 * @param unknown_type $entityId
-	 * @param unknown_type $accessToken
-	 * @param unknown_type $filePath
-	 * @param unknown_type $fileSize
-	 * @param unknown_type $baseWorkingDir
-	 * @throws Facebook\Exceptions\FacebookResponseException, Facebook\Exceptions\FacebookSDKException, Exception
+	 * Upload video to facebook using transfer video chunks API
+	 * @param string $appId
+	 * @param string $appSecret
+	 * @param string $pageId
+	 * @param string $accessToken
+	 * @param string $videoFilePath
+	 * @param string $thumbFilePath
+	 * @param int $videoFileSize
+	 * @param string $baseWorkingDir
+	 * @param array $metadata
+	 * @return videoId created or throws exception in case of failure
+	 * @throws Exception
 	 */
-	public static function uploadVideo($appId, $appSecret, $entityId, $accessToken, $filePath, $fileSize, $baseWorkingDir, $metadata = array())
+	public static function uploadVideo($appId, $appSecret, $pageId, $accessToken, $videoFilePath, $thumbFilePath ,$videoFileSize, $baseWorkingDir, $metadata = array())
 	{
+		if ($thumbFilePath)
+			if ($metadata)
+				$metadata['thumb'] = new \Facebook\FileUpload\FacebookFile($thumbFilePath);
+			else
+				$metadata = array('thumb' => new \Facebook\FileUpload\FacebookFile($thumbFilePath));
 		$fb = self::createFacebookInstance($appId, $appSecret);
-		$dirName = basename($filePath, '.'.pathinfo($filePath, PATHINFO_EXTENSION));
-		$workingDir = $baseWorkingDir.DIRECTORY_SEPARATOR.$dirName;
-		try
-		{
+		$dirName = basename($videoFilePath, '.' . pathinfo($videoFilePath, PATHINFO_EXTENSION));
+		$workingDir = $baseWorkingDir . DIRECTORY_SEPARATOR . $dirName;
+		try {
 
-			$uploadStartData = self::startVideoUploadSession($fb, $accessToken, $entityId, $fileSize);
+			$uploadStartData = self::startVideoUploadSession($fb, $pageId, $accessToken, $videoFileSize);
 			$startOffset = $uploadStartData['start_offset'];
 			$endOffset = $uploadStartData['end_offset'];
 
-			while($startOffset < $endOffset)
-			{
-				$transferData = self::transferVideoChunk($fb, $accessToken, $uploadStartData['upload_session_id'], $startOffset, $endOffset, $filePath, $workingDir);
+			while ($startOffset < $endOffset) {
+				$transferData = self::transferVideoChunk($fb, $accessToken, $uploadStartData['upload_session_id'], $startOffset, $endOffset, $videoFilePath, $workingDir, $pageId);
 				$startOffset = $transferData['start_offset'];
 				$endOffset = $transferData['end_offset'];
 			}
 
-			self::finishVideoUpload($fb, $accessToken, $uploadStartData['upload_session_id'], $metadata);
+			$uploadFinishData = self::finishVideoUpload($fb, $accessToken, $uploadStartData['upload_session_id'], $metadata, $pageId);
+			if ($uploadFinishData['success'] != 1) {
+				$failureReason = "Graph success status was not 1 but ".$uploadFinishData['success'];
+			} else {
+				return $uploadStartData['video_id'];
+			}
+		} catch (Facebook\Exceptions\FacebookResponseException $e) {
+			$failureReason = 'Graph returned an error: ' . $e->getMessage();
+		} catch (Facebook\Exceptions\FacebookSDKException $e) {
+			$failureReason = 'Facebook SDK returned an error: ' . $e->getMessage();
+		}
+		throw new Exception("Failed to upload video to facebook due to : ".$failureReason);
 
-			return $uploadStartData['video_id '];
-		}
-		catch(Facebook\Exceptions\FacebookResponseException $e)
-		{
-			KalturaLog::err('Graph returned an error: ' . $e->getMessage());
-		}
-		catch(Facebook\Exceptions\FacebookSDKException $e)
-		{
-			KalturaLog::err('Facebook SDK returned an error: ' . $e->getMessage());
-		}
-
-		return null;
 	}
 
-	public static function uploadCaptions($appId, $appSecret, $accessToken, $videoId, $filePath, $locale, $baseWorkingDir)
+	/**
+	 * Uploads an image to facebook from URL
+	 * @param string $appId
+	 * @param string $appSecret
+	 * @param string $accessToken
+	 * @param string $pageId
+	 * @param string $url of the image
+	 * @return mixed
+	 * @throws Exception
+	 */
+	public static function uploadPhoto($appId, $appSecret, $accessToken, $pageId, $url)
 	{
+		try{
+			$fb = self::createFacebookInstance($appId, $appSecret);
+
+			$data = array(
+				'url' => $url
+			);
+
+			$response = $fb->post("/".$pageId."/photos", $data, $accessToken);
+			$graphNode = $response->getGraphNode();
+			if (array_key_exists('id', $graphNode->asArray()) ){
+				$photoCreatedId = $graphNode['id'];
+				return $photoCreatedId;
+			} else {
+				$failureReason = "Failed to upload image - response from server was: ".print_r($response, true);
+			}
+		} catch (Facebook\Exceptions\FacebookResponseException $e) {
+			$failureReason = 'Graph returned an error: ' . $e->getMessage();
+		} catch (Facebook\Exceptions\FacebookSDKException $e) {
+			$failureReason = 'Facebook SDK returned an error: ' . $e->getMessage();
+		}
+		throw new Exception("Failed to upload photo to facebook due to : ".$failureReason);
+	}
+
+	// Not working
+	public static function uploadCaptions($appId, $appSecret, $accessToken, $videoId, $filePath, $locale)
+	{
+		return; // TODO support this functionality
 		$fb = self::createFacebookInstance($appId, $appSecret);
 
 		//create file name in format: filename.locale.srt
 		$newFilePath = basename($filePath, '.'.pathinfo($filePath, PATHINFO_EXTENSION)).'.'.$locale.'.srt';
 		copy($filePath, $newFilePath);
-
-		$data = array(
+		$videoCaptionsMimeType = "application/octet-stream";
+		$data = array (
 			'id' => $videoId,
 			'default_locale' => 'none',
-			'video_file_chunk' => $fb->videoToUpload($newFilePath),
+			'captions_file' => "@$newFilePath;filename=".basename($newFilePath).";type=$videoCaptionsMimeType"//self::getCurlValue($newFilePath, $videoCaptionsMimeType)
 		);
-
-		$response = $fb->post('/me/captions', $data, $accessToken);
+		$response = $fb->post("/".$videoId."/captions", $data, $accessToken);
 		$graphNode = $response->getGraphNode();
 		$success = $graphNode['success'];
 		if($success)
@@ -212,6 +244,7 @@ class FacebookGraphSdkUtils
 		return $success;
 	}
 
+	// Not tested
 	public static function deleteCaptions($appId, $appSecret, $accessToken, $videoId, $locale)
 	{
 		$fb = self::createFacebookInstance($appId, $appSecret);
@@ -231,33 +264,39 @@ class FacebookGraphSdkUtils
 		return $success;
 	}
 
-	public static function isValidVideo($filePath, $fileSize, $duration, $width, $heigth)
+	/**
+	 * @param string $filePath on disk
+	 * @param int $fileSize
+	 * @param int $duration
+	 * @param int $width
+	 * @param int $height
+	 * @throws Exception
+	 */
+	public static function validateVideoAttributes($filePath, $fileSize, $duration, $width, $height)
 	{
-		if($fileSize > self::MAX_VIDEO_SIZE)
-		{
-			throw new Exception('File size too large');
-		}
-		if($duration > self::MAX_VIDEO_DURATION)
-		{
-			throw new Exception('File duration is too long');
-		}
+		if($fileSize > FacebookConstants::MAX_VIDEO_SIZE)
+			throw new Exception("File size too large - got ".$fileSize." MAX defined is: ".FacebookConstants::MAX_VIDEO_SIZE);
+		if($duration > FacebookConstants::MAX_VIDEO_DURATION)
+			throw new Exception("File duration is too long - got ".$duration." MAX defined is: ".FacebookConstants::MAX_VIDEO_DURATION);
+
 		$mimetypes = Facebook\FileUpload\Mimetypes::getInstance();
 		$type = $mimetypes->fromFilename(basename($filePath));
 		if(!$type)
-		{
 			throw new Exception('Invalid file format');
-		}
 
-		//TODO validate aspect ratio
+		if ($width === 0 || $height === 0)
+			throw new Exception("Invalid argument - got zero as video width[{$width}] or height[{$height}]");
+		if ($width/$height != 16/9 && $width/$height != 9/16)
+			throw new Exception("Invalid aspect ratio - facebook only supports 16:9 and 9:16 , got: width[{$width}] or height[{$height}]");
 	}
 
 	/**
-	 *
 	 * Get user access token
-	 * @param unknown_type $fb
-	 * @param unknown_type $appId
-	 * @param unknown_type $permissions
-	 * @throws Facebook\Exceptions\FacebookResponseException, Facebook\Exceptions\FacebookSDKException, Exception
+	 * @param Facebook/Facebook $fb facebook client
+	 * @param string $appId
+	 * @param array $permissions
+	 * @return accessToken
+	 * @throws Exception
 	 */
 	private static function doGetUserAccessToken($fb, $appId, $permissions = array())
 	{
@@ -268,8 +307,8 @@ class FacebookGraphSdkUtils
 			$errorMessage = 'Failed to get access token';
 			if ($loginHelper->getError())
 			{
-				$errorMessage = "Error: " . $loginHelper->getError() . " Error Code: " . $loginHelper->getErrorCode() .
-					" Error Reason: " . $loginHelper->getErrorReason() .  " Error Description: " . $loginHelper->getErrorDescription();
+				$errorMessage = "Error: ".$loginHelper->getError()." Error Code: ".$loginHelper->getErrorCode() .
+					" Error Reason: ".$loginHelper->getErrorReason()." Error Description: ".$loginHelper->getErrorDescription();
 				KalturaLog::err($errorMessage);
 				throw new Exception($errorMessage);
 			}
@@ -279,23 +318,19 @@ class FacebookGraphSdkUtils
 				throw new Exception($errorMessage);
 			}
 		}
-
-		KalturaLog::debug('User access token: ' . $accessToken->getValue(). ' expiration: '.print_r($accessToken->getExpiresAt(),true));
-
+		KalturaLog::debug('User access token: '.$accessToken->getValue().' expiration: '.print_r($accessToken->getExpiresAt(),true));
 		self::doValidateAccessToken($fb, $appId, $accessToken, $permissions);
 		return $accessToken;
 	}
 
 	/**
-	 *
 	 * Validate the token has the required permissions
-	 *
 	 * @param string $fb
 	 * @param string $appId
 	 * @param string $accessToken
 	 * @param array $permissions
 	 * @return bool|null
-	 * @throws Facebook\Exceptions\FacebookResponseException, Facebook\Exceptions\FacebookSDKException, Exception
+	 * @throws Exception
 	 */
 	private static function doValidateAccessToken($fb, $appId, $accessToken, $permissions = array())
 	{
@@ -320,21 +355,19 @@ class FacebookGraphSdkUtils
 		return true;
 	}
 
-	private static function startVideoUploadSession($fb, $accessToken, $entityId, $fileSize)
+	private static function startVideoUploadSession($fb, $pageId, $accessToken, $fileSizeInBytes)
 	{
 		$data = array(
-			'id' => $entityId,
 			'upload_phase' => 'start',
-			'file_size' => $fileSize,
+			'file_size' => $fileSizeInBytes,
 		);
 
-		$response = $fb->post('/me/videos', $data, $accessToken);
+		$response = $fb->post("/".$pageId."/videos", $data, $accessToken);
 		$graphNode = $response->getGraphNode();
-		KalturaLog::debug(print_r($graphNode, true));
 		return $graphNode;
 	}
 
-	private static function transferVideoChunk($fb, $accessToken, $sessionId, $startOffset, $endOffset, $filePath, $workingDir)
+	private static function transferVideoChunk($fb, $accessToken, $sessionId, $startOffset, $endOffset, $filePath, $workingDir, $pageId)
 	{
 		$chunkContent = kFile::getFileContent($filePath, $startOffset, $endOffset);
 		$chunkFilePath = $workingDir.DIRECTORY_SEPARATOR.'file_'.$startOffset;
@@ -347,28 +380,63 @@ class FacebookGraphSdkUtils
 			'upload_session_id' => $sessionId,
 		);
 
-		$response = $fb->post('/me/videos', $data, $accessToken);
+		$response = $fb->post("/".$pageId."/videos", $data, $accessToken);
 		$graphNode = $response->getGraphNode();
-		KalturaLog::debug(print_r($graphNode, true));
 		return $graphNode;
 	}
 
-	private static function finishVideoUpload($fb, $accessToken, $sessionId, $data)
+	private static function finishVideoUpload($fb, $accessToken, $sessionId, $data, $pageId)
 	{
 		$data['upload_phase'] = 'finish';
 		$data['upload_session_id'] = $sessionId;
-
-		$response = $fb->post('/me/videos', $data, $accessToken);
+		$response = $fb->post("/".$pageId."/videos", $data, $accessToken);
 		$graphNode = $response->getGraphNode();
-		KalturaLog::debug(print_r($graphNode, true));
 		return $graphNode;
 	}
 
 	/**
-	 * Retuns a new Facebook client using teh facebook sdk using the arguments
+	 * Deletes the video ID from facebook
 	 * @param $appId
 	 * @param $appSecret
-	 * @param string $dataHandler
+	 * @param $accessToken
+	 * @param $videoId
+	 * @return bool on success of the operation
+	 */
+	public static function deleteUploadedVideo($appId, $appSecret, $accessToken, $videoId)
+	{
+		return self::helperUpdateDelete($appId, $appSecret, $accessToken, array(), $videoId, true);
+	}
+
+	/**
+	 * Updates the given video (by id) with the given data
+	 * @param string $appId
+	 * @param string $appSecret
+	 * @param string $accessToken
+	 * @param array $data metadata to update
+	 * @param string $videoId video to update
+	 * @return bool on success of the operation
+	 */
+	public static function updateUploadedVideo($appId, $appSecret, $accessToken, $data, $videoId)
+	{
+		return self::helperUpdateDelete($appId, $appSecret, $accessToken, $data, $videoId, false);
+	}
+
+	private static function helperUpdateDelete($appId, $appSecret, $accessToken, $data, $videoId, $isDelete)
+	{
+		$fb = self::createFacebookInstance($appId, $appSecret);
+		if ($isDelete)
+			$response = $fb->delete("/".$videoId , $data, $accessToken);
+		else
+			$response = $fb->post("/".$videoId , $data, $accessToken);
+		$graphNode = $response->getGraphNode();
+		return ($graphNode['success'] == 1);
+	}
+
+	/**
+	 * Retuns a new Facebook client using teh facebook sdk using the arguments
+	 * @param string $appId
+	 * @param string $appSecret
+	 * @param Facebook\PersistentData\PersistentDataInterface|string $dataHandler
 	 * @return \Facebook\Facebook
 	 */
 	public static function createFacebookInstance($appId, $appSecret, $dataHandler = "session"){
@@ -376,10 +444,16 @@ class FacebookGraphSdkUtils
 			array (
 				'app_id' => $appId,
 				'app_secret' => $appSecret,
-				'default_graph_version' => 'v2.4',
+				'default_graph_version' => FacebookConstants::FACEBOOK_SDK_VERSION,
 				'default_access_token' => 'APP-ID|APP-SECRET',
 				'persistent_data_handler' => $dataHandler,
 			));
 	}
+}
 
+class FacebookConstants
+{
+	const MAX_VIDEO_SIZE = 1750000000; //bytes
+	const MAX_VIDEO_DURATION = 2700000; //milliseconds
+	const FACEBOOK_SDK_VERSION = 'v2.4';
 }

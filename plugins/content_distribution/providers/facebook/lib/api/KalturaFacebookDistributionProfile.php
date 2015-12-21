@@ -8,6 +8,17 @@ class KalturaFacebookDistributionProfile extends KalturaConfigurableDistribution
 	/**
 	 * @var string
 	 */
+	public $apiAuthorizeUrl;
+
+	/**
+	 *
+	 * @var string
+	 */
+	public $pageId;
+
+	/**
+	 * @var string
+	 */
 	public $pageAccessToken;
 
 	/**
@@ -24,21 +35,10 @@ class KalturaFacebookDistributionProfile extends KalturaConfigurableDistribution
 	
 	/**
 	 * 
-	 * @var string
-	 */
-	public $pageId;
-	
-	/**
-	 * 
 	 * @var int
 	 */
 	public $reRequestPermissions;
-	
-	/**
-	 * @var string
-	 */
-	public $apiAuthorizeUrl;
-	
+
 	/*
 	 * mapping between the field on this object (on the left) and the setter/getter on the object (on the right)  
 	 */
@@ -46,6 +46,10 @@ class KalturaFacebookDistributionProfile extends KalturaConfigurableDistribution
 	(
         'apiAuthorizeUrl',
         'pageId',
+		'pageAccessToken',
+		'userAccessToken',
+		'permissions',
+		'reRequestPermissions'
 
 	 );
 		 

@@ -102,5 +102,22 @@ class dateUtils
 			( $seconds > 10 ? $seconds : "0$seconds" ) . ".$decimal";
 		return $str ;
 	}
+
+	/**
+	 * Checks if the given time is between x seconds to y seconds from now
+	 * @param $time_in_sec
+	 * @param $close_seconds_from_now
+	 * @param $far_seconds_from_now
+	 * @return bool
+	 */
+	public static function isWithinLimitsFromNow($time_in_sec, $close_seconds_from_now, $far_seconds_from_now)
+	{
+		$now = self::now();
+		$lowThreshold = $now + $close_seconds_from_now;
+		$highThreshold = $now + $far_seconds_from_now;
+		return $time_in_sec < $highThreshold &&  $time_in_sec > $lowThreshold;
+
+
+	}
 }
 ?>

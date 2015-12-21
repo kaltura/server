@@ -5,9 +5,9 @@
 class FacebookDistributionPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaEnumerator, IKalturaPending, IKalturaObjectLoader, IKalturaContentDistributionProvider, IKalturaConfigurator
 {
 	const PLUGIN_NAME = 'facebookDistribution';
-	const CONTENT_DSTRIBUTION_VERSION_MAJOR = 2;
-	const CONTENT_DSTRIBUTION_VERSION_MINOR = 0;
-	const CONTENT_DSTRIBUTION_VERSION_BUILD = 0;
+	const CONTENT_DISTRIBUTION_VERSION_MAJOR = 2;
+	const CONTENT_DISTRIBUTION_VERSION_MINOR = 0;
+	const CONTENT_DISTRIBUTION_VERSION_BUILD = 0;
 	
 	public static function getPluginName()
 	{
@@ -17,9 +17,9 @@ class FacebookDistributionPlugin extends KalturaPlugin implements IKalturaPermis
 	public static function dependsOn()
 	{
 		$contentDistributionVersion = new KalturaVersion(
-			self::CONTENT_DSTRIBUTION_VERSION_MAJOR,
-			self::CONTENT_DSTRIBUTION_VERSION_MINOR,
-			self::CONTENT_DSTRIBUTION_VERSION_BUILD);
+			self::CONTENT_DISTRIBUTION_VERSION_MAJOR,
+			self::CONTENT_DISTRIBUTION_VERSION_MINOR,
+			self::CONTENT_DISTRIBUTION_VERSION_BUILD);
 			
 		$dependency = new KalturaDependency(ContentDistributionPlugin::getPluginName(), $contentDistributionVersion);
 		return array($dependency);
@@ -59,15 +59,10 @@ class FacebookDistributionPlugin extends KalturaPlugin implements IKalturaPermis
 		// client side apps like batch and admin console
 		if (class_exists('KalturaClient') && $enumValue == KalturaDistributionProviderType::FACEBOOK)
 		{
-			if($baseClass == 'IDistributionEngineCloseSubmit')
+			if(in_array($baseClass, array('IDistributionEngineSubmit', 'IDistributionEngineDelete', 'IDistributionEngineUpdate'))){
 				return new FacebookDistributionEngine();
-					
-			if($baseClass == 'IDistributionEngineSubmit')
-				return new FacebookDistributionEngine();
-					
-			if($baseClass == 'IDistributionEngineUpdate')
-				return new FacebookDistributionEngine();
-		
+			}
+
 			if($baseClass == 'KalturaDistributionProfile')
 				return new KalturaFacebookDistributionProfile();
 		
@@ -116,14 +111,9 @@ class FacebookDistributionPlugin extends KalturaPlugin implements IKalturaPermis
 		if (class_exists('KalturaClient') && $enumValue == KalturaDistributionProviderType::FACEBOOK)
 		{
 
-			if($baseClass == 'IDistributionEngineCloseSubmit')
+			if(in_array($baseClass, array('IDistributionEngineSubmit', 'IDistributionEngineDelete', 'IDistributionEngineUpdate'))) {
 				return 'FacebookDistributionEngine';
-					
-			if($baseClass == 'IDistributionEngineSubmit')
-				return 'FacebookDistributionEngine';
-					
-			if($baseClass == 'IDistributionEngineUpdate')
-				return 'FacebookDistributionEngine';
+			}
 					
 			if($baseClass == 'KalturaDistributionProfile')
 				return 'KalturaFacebookDistributionProfile';
@@ -187,12 +177,16 @@ class FacebookDistributionPlugin extends KalturaPlugin implements IKalturaPermis
 	public static function contributeMRSS(EntryDistribution $entryDistribution, SimpleXMLElement $mrss)
 	{
 	    $distributionProfile = DistributionProfilePeer::retrieveByPK($entryDistribution->getDistributionProfileId());
-	    $mrss->addChild(FacebookDistributionField::CALL_TO_ACTION_TYPE, $distributionProfile->getCallToActionType());
-		$mrss->addChild(FacebookDistributionField::CALL_TO_ACTION_VALUE, $distributionProfile->getCallToActionValue());
-		$mrss->addChild(FacebookDistributionField::PLACE, $distributionProfile->getPlace());
-		$mrss->addChild(FacebookDistributionField::TAGS, $distributionProfile->getTags());	
-		$mrss->addChild(FacebookDistributionField::TARGETING, $distributionProfile->getTargeting());
-		$mrss->addChild(FacebookDistributionField::FEED_TARGETING, $distributionProfile->getFeedTargeting());
+		if ($distributionProfile && $distributionProfile instanceof KalturaFacebookDistributionProfile)
+		{
+			$mrss->addChild(FacebookDistributionField::CALL_TO_ACTION_TYPE, $distributionProfile->getCallToActionType());
+			$mrss->addChild(FacebookDistributionField::CALL_TO_ACTION_LINK, $distributionProfile->getCallToActionLink());
+			$mrss->addChild(FacebookDistributionField::CALL_TO_ACTION_LINK_CAPTION, $distributionProfile->getCallToActionLinkCaption());
+			$mrss->addChild(FacebookDistributionField::PLACE, $distributionProfile->getPlace());
+			$mrss->addChild(FacebookDistributionField::TAGS, $distributionProfile->getTags());
+			$mrss->addChild(FacebookDistributionField::TARGETING, $distributionProfile->getTargeting());
+			$mrss->addChild(FacebookDistributionField::FEED_TARGETING, $distributionProfile->getFeedTargeting());
+		}
 	}
 	
 	/**

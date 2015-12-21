@@ -1,5 +1,5 @@
 <?php
-require_once KALTURA_ROOT_PATH.'/vendor/facebook-sdk-php-v5-customed/autoload.php';
+require_once KALTURA_ROOT_PATH.'/vendor/facebook-sdk-php-v5-customized/autoload.php';
   
 /**
  * @package plugins.facebookDistribution

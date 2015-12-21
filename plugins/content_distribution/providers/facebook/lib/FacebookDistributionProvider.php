@@ -46,7 +46,7 @@ class FacebookDistributionProvider extends ConfigurableDistributionProvider
 	 */
 	public function isDeleteEnabled()
 	{
-		return false;
+		return true;
 	}
 
 	/* (non-PHPdoc)
@@ -70,7 +70,7 @@ class FacebookDistributionProvider extends ConfigurableDistributionProvider
 	 */
 	public function isReportsEnabled()
 	{
-		return false; // TODO - check if reports supported
+		return false;
 	}
 
 	/* (non-PHPdoc)
@@ -78,7 +78,7 @@ class FacebookDistributionProvider extends ConfigurableDistributionProvider
 	 */
 	public function isScheduleUpdateEnabled()
 	{
-		return false;
+		return true;
 	}
 
 	/* (non-PHPdoc)
@@ -94,7 +94,7 @@ class FacebookDistributionProvider extends ConfigurableDistributionProvider
 	 */
 	public function isAvailabilityUpdateEnabled()
 	{
-		return true;
+		return false;
 	}
 	
 	/* (non-PHPdoc)
