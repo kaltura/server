@@ -34,7 +34,13 @@ class KalturaConcatJobData extends KalturaJobData
 	 * @var float
 	 */
 	public $duration;
-	
+
+	/**
+	 * duration of the concated video
+	 * @var float
+	 */
+	public $concatenatedDuration;
+
 	private static $map_between_objects = array
 	(
 		'srcFiles',
@@ -42,6 +48,7 @@ class KalturaConcatJobData extends KalturaJobData
 		'flavorAssetId',
 		'offset',
 		'duration',
+		'concatenatedDuration',
 	);
 
 	/* (non-PHPdoc)

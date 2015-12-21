@@ -1,25 +1,28 @@
 <?php
 
-class KAMFData
-{
-    public $pts;
-    public $timestamp;
-
-};
-
 class KAMFMediaInfoParser{
 
     const timestampHexVal = "74696d657374616d70";
     const AMFNumberDataTypePrefix ="00";
     const IEEE754DoubleFloatInHexLength = 16;
     const MinAMFSizeToTryParse = 205;
+    const MaxAMFDiscontinuanceMS = 1000;
+    const MinDistanceBetweenAMFsInMS = 60000;
 
-    protected $ffmprobeBin;
+    protected $ffprobeBin = 'ffprobeKAMFMediaInfoParser';
     protected $filePath;
 
-    public function __construct($filePath, $ffprobeBin="ffprobeKAMFMediaInfoParser")
+    public function __construct($filePath, $ffprobeBin=null)
     {
-        $this->ffprobeBin = $ffprobeBin;
+        if (is_null($ffprobeBin)) {
+
+            if (kConf::hasParam('bin_path_ffprobeKAMFMediaInfoParser')) {
+                $this->ffprobeBin = kConf::get('bin_path_ffprobeKAMFMediaInfoParser');
+            }
+        }
+        else{
+            $this->ffprobeBin = $ffprobeBin;
+        }
         if (!file_exists($filePath))
             throw new kApplicativeException(KBaseMediaParser::ERROR_NFS_FILE_DOESNT_EXIST, "File not found at [$filePath]");
 
@@ -47,41 +50,72 @@ class KAMFMediaInfoParser{
 
     protected function getCommand()
     {
-        return "{$this->ffprobeBin} -i {$this->filePath} -select_streams 2:2 -show_streams -show_programs -v quiet -show_data -show_packets -print_format json 2>&1";
+        return "{$this->ffprobeBin} -i {$this->filePath} -select_streams 2:2 -show_streams -show_programs -v quiet -show_data -show_packets -print_format json";
     }
 
-    // parse the output of the command and return an array of AMFData objects
+    // parse the output of the command and return an array of string of the form pts;timestamp
     protected function parseOutput($output)
     {
+        $amf = array();
         $outputLower = strtolower($output);
         $jsonObj = json_decode($outputLower);
 
-        // Check for json decode errors caused by inproper utf8 encoding.
-        if(json_last_error()!=JSON_ERROR_NONE) $jsonObj = json_decode(utf8_encode($outputLower));
+        if (!is_null($jsonObj)) {
+            // Check for json decode errors caused by inproper utf8 encoding.
+            if (json_last_error() != JSON_ERROR_NONE) $jsonObj = json_decode(utf8_encode($outputLower));
 
-        $jsonObj = $jsonObj->packets;
+            $jsonObj = $jsonObj->packets;
 
-        $amf = array();
+            foreach ($jsonObj as $tmp) {
+                // the first data packet is of smaller size of 205 chars
+                if (strlen($tmp->data) > self::MinAMFSizeToTryParse) {
+                    $amfTs = $this->getTimestampFromAMF($tmp->data);
+                    $amfPts = $tmp->pts;
 
-        for ($i = 0; $i < count($jsonObj); $i++) {
-            $tmp = $jsonObj[$i];
-            // the first data packet is of smaller size of 205 chars
-            if (strlen($tmp->data) > self::MinAMFSizeToTryParse) {
-
-                $amfData = new KAMFData();
-                $amfData->pts = $tmp->pts;
-                $amfData->timestamp = $this->getTimestampFromAMF($tmp->data);
-
-                array_push($amf, $amfData);
+                    if ($this->shouldSaveAMF($amf, $amfTs, $amfPts)) {
+                        $amfData = $amfPts . ';' . $amfTs;
+                        array_push($amf, $amfData);
+                    }
+                }
             }
+            KalturaLog::debug('amf array: ' . print_r($amf, true));
         }
-
-        KalturaLog::debug('amf array: ' . print_r($amf, true));
+        else{
+            KalturaLog::warning('failed to json_decode. returning an empty AMF array');
+        }
 
         return $amf;
     }
 
-     private function getTimestampFromAMF($AMFData){
+    private function shouldSaveAMF($amfArray, $amfTs, $amfPts){
+
+        if (count($amfArray) == 0) {
+            KalturaLog::debug('adding AMF - first in the segment ts= ' . $amfTs . ' pts= ' . $amfPts);
+            return true;
+        }
+
+        $amfParts = explode(';', $amfArray[count($amfArray)-1]);
+        $lastAmfPts = $amfParts[0];
+        $lastAmfTs = $amfParts[1];
+        $tsDelta = $amfTs - $lastAmfTs;
+        $ptsDelta = $amfPts - $lastAmfPts;
+
+        if (abs($tsDelta - $ptsDelta) >=  self::MaxAMFDiscontinuanceMS){
+            if ($tsDelta > self::MinDistanceBetweenAMFsInMS) {
+                KalturaLog::debug('got discontinuance - adding AMF. ' . 'tsDelta= ' . $tsDelta . ' ptsDelta= ' . $ptsDelta);
+                return true;
+            }
+            else{
+                KalturaLog::debug('got discontinuance, but not adding AMF since time from last AMF is less than ' . self::MinDistanceBetweenAMFsInMS . 'ms. tsDelta= ' . $tsDelta . ' ptsDelta= ' . $ptsDelta);
+            }
+        }
+        else{
+            KalturaLog::debug('NOT adding AMF. ' . 'tsDelta= ' . $tsDelta . ' ptsDelta= ' . $ptsDelta);
+        }
+        return false;
+    }
+
+    private function getTimestampFromAMF($AMFData){
         $AMFDataStream = $this->getByteStreamFromFFProbeAMFData($AMFData);
 
         // look for 74696d657374616d70 which is the hex encoding of "timestamp"

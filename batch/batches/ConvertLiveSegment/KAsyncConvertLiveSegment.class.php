@@ -69,17 +69,46 @@ class KAsyncConvertLiveSegment extends KJobHandlerWorker
 	{
 		$this->updateJob($job, "File conversion started", KalturaBatchJobStatus::PROCESSING);
 		$jobData = $job->data;
-		
+
 		$ffmpegBin = KBatchBase::$taskConfig->params->ffmpegCmd;
 		$ffprobeBin = isset(KBatchBase::$taskConfig->params->ffprobeCmd)? KBatchBase::$taskConfig->params->ffprobeCmd: "ffprobe";
+		$mediaInfoBin = isset(KBatchBase::$taskConfig->params->mediaInfoCmd)? KBatchBase::$taskConfig->params->mediaInfoCmd: "mediainfo";
+
 		$fileName = "{$job->entryId}_{$jobData->assetId}_{$data->mediaServerIndex}.{$job->id}.ts";
 		$localTempFilePath = $this->localTempPath . DIRECTORY_SEPARATOR . $fileName;
 		$sharedTempFilePath = $this->sharedTempPath . DIRECTORY_SEPARATOR . $fileName;
-		
+
 		$result = $this->convertRecordedToMPEGTS($ffmpegBin, $ffprobeBin, $data->srcFilePath, $localTempFilePath);
 		if(! $result)
 			return $this->closeJob($job, KalturaBatchJobErrorTypes::RUNTIME, null, "Failed to convert file", KalturaBatchJobStatus::FAILED);
-		
+
+		// only extract the data if it's the primary server since we don't use this data in the secondary
+		if ($data->mediaServerIndex == KalturaMediaServerIndex::PRIMARY) {
+			try {
+				// Extract AMF data from all data frames in the segment
+				$amfParser = new KAMFMediaInfoParser($data->srcFilePath);
+				$amfArray = $amfParser->getAMFInfo();
+
+				$keyValueArray = array();
+
+				foreach ($amfArray as $key => $value) {
+					$tmp = new KalturaKeyValue();
+					$tmp->key = $key;
+					$tmp->value = $value;
+					$keyValueArray[] = $tmp;
+				}
+
+				$data->amfArray = $keyValueArray;
+
+				// run mediaInfo on $localTempFilePath to get it's duration, and store it in the job data
+				$mediaInfoParser = new KMediaInfoMediaParser($localTempFilePath, $mediaInfoBin);
+				$data->duration = $mediaInfoParser->getMediaInfo()->videoDuration;
+			}
+			catch(Exception $ex) {
+				KalturaLog::warning('failed to extract AMF data or duration data ' . print_r($ex));
+			}
+		}
+
 		return $this->moveFile($job, $data, $localTempFilePath, $sharedTempFilePath);
 	}
 	

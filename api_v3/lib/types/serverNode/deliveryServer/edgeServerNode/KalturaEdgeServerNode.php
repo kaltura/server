@@ -11,9 +11,16 @@ class KalturaEdgeServerNode extends KalturaDeliveryServerNode
 	 */
 	public $deliveryProfileIds;
 	
+	/**
+	 * Overdie edge server default configuration - json format
+	 * @var string
+	 */
+	public $config;
+	
 	private static $map_between_objects = array
 	(
 		"deliveryProfileIds",
+		"config",
 	);
 	
 	/* (non-PHPdoc)

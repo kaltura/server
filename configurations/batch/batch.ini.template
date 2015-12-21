@@ -642,14 +642,14 @@ id													= 490
 type												= KAsyncConvertLiveSegment
 scriptPath											= batches/ConvertLiveSegment/KAsyncConvertLiveSegmentExe.php
 params.ffprobeCmd									= @BIN_DIR@/ffprobe
-
+params.mediaInfoCmd									= @BIN_DIR@/mediainfo
 
 [KAsyncConcat : KAsyncConvertWorker]
 id													= 500
 type												= KAsyncConcat
 scriptPath											= batches/Concat/KAsyncConcatExe.php
 params.ffprobeCmd									= @BIN_DIR@/ffprobe
-
+params.mediaInfoCmd									= @BIN_DIR@/mediainfo
 
 [KAsyncValidateLiveMediaServers : PeriodicWorker]
 id													= 510

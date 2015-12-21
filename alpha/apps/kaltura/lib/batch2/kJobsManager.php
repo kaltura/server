@@ -199,6 +199,7 @@ class kJobsManager
 			//Boost the job by setting priority and urjeny to 1 
 			$job->setPriority(1);
 			$job->setUrgency(1);
+			$job->save();
 		}
 	}
 	
@@ -998,6 +999,7 @@ class kJobsManager
 	 * @param int $mediaServerIndex
 	 * @param string $filePath
 	 * @param float $endTime
+	 * @param array $amfArray
 	 */
 	public static function addConvertLiveSegmentJob(BatchJob $parentJob = null, liveAsset $asset, $mediaServerIndex, $filePath, $endTime)
 	{
@@ -1050,7 +1052,7 @@ class kJobsManager
 		$jobData->setFlavorAssetId($asset->getId());
 		$jobData->setOffset($offset);
 		$jobData->setDuration($duration);
- 			
+
  		$entry = $asset->getentry();
  		if($entry && $entry->getStatus() != entryStatus::READY)
 		{
@@ -1216,7 +1218,7 @@ class kJobsManager
 	 * @return BatchJob
 	 */
 	public static function addConvertProfileJob(BatchJob $parentJob = null, entry $entry, $flavorAssetId, $inputFileSyncLocalPath)
-	{	
+	{
 		if($entry->getConversionQuality() == conversionProfile2::CONVERSION_PROFILE_NONE)
 		{
 			$entry->setStatus(entryStatus::PENDING);

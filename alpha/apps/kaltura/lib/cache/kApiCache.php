@@ -579,6 +579,9 @@ class kApiCache extends kApiCacheBase
 					
 					// in case of multirequest, limit the cache time of the multirequest according to this request
 					$this->setExpiry($expiryInterval);
+					
+					//In case of anonymous request take the cacheTTL to be the min form expiryInterval and the previously calculated cache expiry
+					$this->minCacheTTL = min($this->minCacheTTL, $expiryInterval);
 				}
 				
 				if (count(self::$_activeInstances) > 1)

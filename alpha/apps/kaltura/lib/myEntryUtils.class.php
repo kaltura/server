@@ -1161,9 +1161,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
  		KalturaLog::log("copyEntry - New entry [".$newEntry->getId()."] was created");
 
 		if ( $entry->getStatus() != entryStatus::READY ) {
-			$clonePendingEntries = $entry->getClonePendingEntries();
-			$clonePendingEntries[] = $newEntry->getId();
-			$entry->setClonePendingEntries($clonePendingEntries);
+			$entry->addClonePendingEntry($newEntry->getId());
 			$entry->save();
 		} else {
 			self::copyEntryData( $entry, $newEntry );
@@ -1342,4 +1340,15 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		
 		return $entry->getIntId();
  	}
+
+	/*
+	 * Delete replacing entry for recorded entry
+	 */
+	public static function deleteReplacingEntry(entry $recordedEntry,entry $replacingEntry)
+	{
+		self::deleteEntry($replacingEntry);
+		$recordedEntry->setReplacingEntryId(null);
+		$recordedEntry->setReplacementStatus(entryReplacementStatus::NONE);
+		$recordedEntry->save();
+	}
 }

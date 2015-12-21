@@ -29,7 +29,13 @@ class kConcatJobData extends kJobData
 	 * @var float
 	 */
 	private $duration;
-	
+
+	/**
+	 * duration of the concated video
+	 * @var float
+	 */
+	public $concatenatedDuration;
+
 	/**
 	 * @return array $srcFiles
 	 */
@@ -108,5 +114,21 @@ class kConcatJobData extends kJobData
 	public function setDuration($duration)
 	{
 		$this->duration = $duration;
+	}
+
+	/**
+	 * @return float $concatenatedDuration
+	 */
+	public function getConcatenatedDuration()
+	{
+		return $this->concatenatedDuration;
+	}
+
+	/**
+	 * @param float $concatenatedDuration
+	 */
+	public function setConcatenatedDuration($concatenatedDuration)
+	{
+		$this->concatenatedDuration = $concatenatedDuration;
 	}
 }
