@@ -33,7 +33,7 @@ class ServerNodePeer extends BaseServerNodePeer {
 		self::$s_criteria_filter->setFilter($c);
 	}
 	
-	public static function retrieveActiveServerNodes($hostName = null, $partnerId = null)
+	public function buildCriteriaByHostAndPartnerId($hostName = null, $partnerId = null)
 	{
 		$c = new Criteria();
 		
@@ -45,7 +45,29 @@ class ServerNodePeer extends BaseServerNodePeer {
 		
 		$c->add(ServerNodePeer::STATUS, ServerNodeStatus::DISABLED, Criteria::NOT_EQUAL);
 		
+		return $c;
+	}
+	
+	public static function retrieveActiveServerNodes($hostName = null, $partnerId = null)
+	{
+		$c = $this->buildCriteriaByHostAndPartnerId($hostName, $partnerId);
+		
 		return ServerNodePeer::doSelectOne($c);
+	}
+	
+	public static function retrieveActiveMediaServerNode($hostName = null, $partnerId = null)
+	{
+		$c = $this->buildCriteriaByHostAndPartnerId($hostName, $partnerId);
+		
+		$nodes = ServerNodePeer::doSelect($c);
+		
+		foreach ($nodes as $node)
+		{
+			if($node instanceof MediaServerNode)
+				return $node;
+		}
+		
+		return null;
 	}
 	
 	public static function retrieveOrderedServerNodesArrayByPKs($pks, PropelPDO $con = null)
