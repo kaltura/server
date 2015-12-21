@@ -384,4 +384,13 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 		return $deliveryUrl;
 	}
 	
+	public function setExtraParams($v)
+	{
+		$this->putInCustomData("extraParams", $v);
+	}
+	
+	public function getExtraParams()
+	{
+		return $this->getFromCustomData("extraParams");
+	}
 } 

@@ -123,15 +123,6 @@ class KalturaLiveEntryService extends KalturaEntryService
 		{
 			$dbEntry->setLengthInMsecs($currentDuration);
 
-			// Extract the exact video segment duration from the recorded file
-			$mediaInfoParser = new KMediaInfoMediaParser($filename, kConf::get('bin_path_mediainfo'));
-			$recordedSegmentDurationInMsec = $mediaInfoParser->getMediaInfo()->videoDuration;
-
-			$currentSegmentVodToLiveDeltaTime = $liveSegmentDurationInMsec - $recordedSegmentDurationInMsec;
-			$recordedSegmentsInfo = $dbEntry->getRecordedSegmentsInfo();
-			$recordedSegmentsInfo->addSegment( $lastDuration, $recordedSegmentDurationInMsec, $currentSegmentVodToLiveDeltaTime );
-			$dbEntry->setRecordedSegmentsInfo( $recordedSegmentsInfo );
-
 			if ( $isLastChunk )
 			{
 				// Save last elapsed recording time
