@@ -105,7 +105,7 @@ class embedIframeJsAction extends sfAction
 				$whiteListHost = myPartnerUtils::getWhiteListHost( $partner );
 				if ($whiteListHost)
 				{
-					$headers["X_FORWARDED_HOST"] = $whiteListHost;
+					$headers["X-Forwarded-Host"] = $whiteListHost;
 				}
 				kFileUtils::dumpUrl($url, true, false, $headers);
 			}
