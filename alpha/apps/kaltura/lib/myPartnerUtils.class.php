@@ -1802,12 +1802,9 @@ class myPartnerUtils
 				}
 			}
 		}
-		else if (isset($_SERVER['HTTP_HOST']))
+		elseif (isset($_SERVER['HTTP_HOST']) && $partner->isInCDNWhiteList($_SERVER['HTTP_HOST']))
 		{
-			if ($partner->isInCDNWhiteList($_SERVER['HTTP_HOST']))
-			{
-				return $_SERVER['HTTP_HOST'];
-			}
+			return $_SERVER['HTTP_HOST'];
 		}
 		return null;
 	}
