@@ -1122,55 +1122,23 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		$entry->setClonedOption($coreFormatClonedOptionsArray);
 		$copyUsers = true;
 		$copyCategories = true;
-//		foreach ($cloneOptionsArray as $cloneOption)
-//		{
-//			/**
-//			 * KalturaBaseEntryCloneOptions $currentOption
-//			 */
-//			$currentOption = $cloneOption->itemType;
-//
-//			/**
-//			 * KalturaResponseProfileType $currentType
-//			 */
-//			$currentType = $cloneOption->rule;
-//
-//			if ($currentOption == KalturaBaseEntryCloneOptions::USERS && $currentType == ResponseProfileType::EXCLUDE_FIELDS)
-//			{
-//				$copyUsers = false;
-//			}
-//
-//			if ($currentOption == KalturaBaseEntryCloneOptions::CATEGORIES && $currentType == ResponseProfileType::EXCLUDE_FIELDS)
-//			{
-//				$copyCategories = false;
-//			}
-//		}
-		/**
-		 * kBaseEntryCloneOptionComponent $cloneOption
-		 */
+
+		/* @var kBaseEntryCloneOptionComponent $cloneOption */
 		foreach ($coreFormatClonedOptionsArray as $cloneOption)
 		{
-			$currentOption = $cloneOption->itemType;
-
-			$currentType = $cloneOption->rule;
+			$currentOption = $cloneOption->getItemType();
+			$currentType = $cloneOption->isRule();
 
 			if ($currentOption == BaseEntryCloneOptions::USERS && $currentType == false)
 			{
 				$copyUsers = false;
-				KalturaLog::debug("CLONE::: do NOT copy users");
 			}
 
 			if ($currentOption == BaseEntryCloneOptions::CATEGORIES && $currentType == false)
 			{
 				$copyCategories = false;
-				KalturaLog::debug("CLONE::: do NOT copy categories");
 			}
 		}
-
-		if ($copyCategories == true)
-			KalturaLog::debug("CLONE::: do copy categories");
-
-		if ($copyUsers == true)
-			KalturaLog::debug("CLONE::: do copy users");
 
  		$newEntry = $entry->copy();
  		$newEntry->setIntId(null);

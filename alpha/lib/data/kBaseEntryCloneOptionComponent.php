@@ -50,6 +50,16 @@ class kBaseEntryCloneOptionComponent extends kBaseEntryCloneOptionItem
      */
     public function setRule($rule)
     {
-        $this->rule = $rule;
+        switch ($rule)
+        {
+            case ResponseProfileType::INCLUDE_FIELDS:
+                $this->rule = true;
+                break;
+            case ResponseProfileType::EXCLUDE_FIELDS:
+                $this->rule = false;
+                break;
+            default:
+                $this->rule = true;
+        }
     }
 }
