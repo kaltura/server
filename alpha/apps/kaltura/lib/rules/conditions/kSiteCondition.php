@@ -70,6 +70,6 @@ class kSiteCondition extends kMatchCondition
 	 */
 	public function shouldFieldDisableCache($scope)
 	{
-		return false;
+		return true;
 	}
 }
