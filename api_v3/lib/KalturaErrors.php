@@ -609,4 +609,9 @@ class KalturaErrors extends APIErrors
 	 */
 	const HOST_NAME_ALREADY_EXISTS = "HOST_NAME_ALREADY_EXISTS;HOST_NAME;Host Name [@HOST_NAME@] already exists";
 	const SERVER_NODE_NOT_FOUND = "SERVER_NODE_NOT_FOUND;HOST_NAME;server node with host name [@HOST_NAME@] not found";
+
+	/***
+	 * EntryAdmin Service
+	 */
+	const ENTRY_ASSETS_WRONG_STATUS_FOR_RESTORE = "ENTRY_ASSETS_WRONG_STATUS_FOR_RESTORE;ENTRY_ID; Entry [@ENTRY_ID@] or one of its assets are not in status \"DELETED\"";
 }
