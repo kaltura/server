@@ -1511,24 +1511,7 @@ class myPartnerUtils
  		}
  	}
  	
- 	public static function copyEntriesByType(Partner $fromPartner, Partner $toPartner, $entryType, $dontCopyUsers = false)
- 	{
- 		KalturaLog::log("Copying entries from partner [".$fromPartner->getId()."] to partner [".$toPartner->getId()."] with type [".$entryType."]");
- 		entryPeer::setUseCriteriaFilter ( false );
- 		$c = new Criteria();
- 		$c->addAnd(entryPeer::PARTNER_ID, $fromPartner->getId());
- 		$c->addAnd(entryPeer::TYPE, $entryType);
- 		$c->addAnd(entryPeer::STATUS, entryStatus::READY);
- 		$c->addDescendingOrderByColumn(entryPeer::CREATED_AT);
- 		
- 		$entries = entryPeer::doSelect($c);
- 		entryPeer::setUseCriteriaFilter ( true );
- 		foreach($entries as $entry)
- 		{
- 			myEntryUtils::copyEntry($entry, $toPartner, $dontCopyUsers);
- 		}
- 	}
- 	
+
  	public static function copyUiConfsByType(Partner $fromPartner, Partner $toPartner, $uiConfType)
  	{
  		KalturaLog::log("Copying uiconfs from partner [".$fromPartner->getId()."] to partner [".$toPartner->getId()."] with type [".$uiConfType."]");

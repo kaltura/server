@@ -1096,10 +1096,54 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		foreach($sourceAssets as $sourceAsset)
 			$sourceAsset->copyToEntry($targetEntry->getId(), $targetEntry->getPartnerId());
 	}
-	
-	public static function copyEntry(entry $entry, Partner $toPartner = null, $dontCopyUsers = false)
+
+
+	/**
+	 * @param entry $entry
+	 * @param Partner|null $toPartner
+	 * @param KalturaBaseEntryCloneOptionsArray $cloneOptionsArray - an array of enumerator of a subset of entry properties.
+	 * 													For each subset the user sets
+	 * 													whether the subset is included or excluded from the copy.
+	 * 													The default action for each subset is 'include'.
+	 * 													In case an subset was not set by the user at all; i.e. it was
+	 * 													not included or excluded, than it is treated as if it is
+	 * 													included in the copy
+	 * @return entry
+	 * @throws Exception
+	 * @throws PropelException
+	 * @throws kCoreException
+     */
+	public static function copyEntry(entry $entry, Partner $toPartner = null,
+									 KalturaBaseEntryCloneOptionsArray $cloneOptionsArray)
  	{
  		KalturaLog::log("copyEntry - Copying entry [".$entry->getId()."] to partner [".$toPartner->getId()."]");
+
+		$copyUsers = true;
+		$copyCategories = true;
+		foreach ($cloneOptionsArray as $cloneOption)
+		{
+			/**
+			 * KalturaBaseEntryCloneOptions $currentOption
+			 */
+			$currentOption = $cloneOption->option;
+
+			/**
+			 * KalturaResponseProfileType $currentType
+			 */
+			$currentType = $cloneOption->type;
+
+			if ($currentOption == KalturaBaseEntryCloneOptions::USERS && $currentType == ResponseProfileType::EXCLUDE_FIELDS)
+			{
+				$copyUsers = false;
+			}
+
+			if ($currentOption == KalturaBaseEntryCloneOptions::CATEGORIES && $currentType == ResponseProfileType::EXCLUDE_FIELDS)
+			{
+				$copyCategories = false;
+			}
+		}
+
+
  		$newEntry = $entry->copy();
  		$newEntry->setIntId(null);
 		$newEntry->setCategories(null);
@@ -1113,7 +1157,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
  		}
  		
  		$newKuser = null;
- 		if (!$dontCopyUsers)
+		if ($copyUsers)
  		{
  			// copy the kuser (if the same puser id exists its kuser will be used)
  			kuserPeer::setUseCriteriaFilter(false);
@@ -1192,37 +1236,31 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		            foreach ($fromFiltersList as $filterXML)
 		            {
 		                $entryFilter = new entryFilter();
-			            $entryFilter->fillObjectFromXml($filterXML, "_"); 
-			            if (isset($entryFilter->fields["_matchand_categories_ids"]))
-			            {
-			                $categoriesIds = explode(",", $entryFilter->fields["_matchand_categories_ids"]);
-			                $newCategoriesIds = array();
-			                foreach ($categoriesIds as $categoryId)
-			                {
-			                    $newCategoriesIds[] = kObjectCopyHandler::getMappedId(categoryPeer::OM_CLASS, $categoryId);
-			                }
-			                $entryFilter->fields["_matchand_categories_ids"] = implode (",", $newCategoriesIds);
-			            }
-		                if (isset($entryFilter->fields["_matchor_categories_ids"]))
-			            {
-			                $categoriesIds = explode(",", $entryFilter->fields["_matchor_categories_ids"]);
-			                $newCategoriesIds = array();
-			                foreach ($categoriesIds as $categoryId)
-			                {
-			                    $newCategoriesIds[] = kObjectCopyHandler::getMappedId(categoryPeer::OM_CLASS, $categoryId);
-			                }
-			                $entryFilter->fields["_matchor_categories_ids"] = implode (",", $newCategoriesIds);
-			            }
-		                if (isset($entryFilter->fields["_in_category_ancestor_id"]))
-			            {
-			                $categoriesIds = explode(",", $entryFilter->fields["_in_category_ancestor_id"]);
-			                $newCategoriesIds = array();
-			                foreach ($categoriesIds as $categoryId)
-			                {
-			                    $newCategoriesIds[] = kObjectCopyHandler::getMappedId(categoryPeer::OM_CLASS, $categoryId);
-			                }
-			                $entryFilter->fields["_in_category_ancestor_id"] = implode (",", $newCategoriesIds);
-			            }
+			            $entryFilter->fillObjectFromXml($filterXML, "_");
+						if (isset($entryFilter->fields["_matchand_categories_ids"])) {
+							$categoriesIds = explode(",", $entryFilter->fields["_matchand_categories_ids"]);
+							$newCategoriesIds = array();
+							foreach ($categoriesIds as $categoryId) {
+								$newCategoriesIds[] = kObjectCopyHandler::getMappedId(categoryPeer::OM_CLASS, $categoryId);
+							}
+							$entryFilter->fields["_matchand_categories_ids"] = implode(",", $newCategoriesIds);
+						}
+						if (isset($entryFilter->fields["_matchor_categories_ids"])) {
+							$categoriesIds = explode(",", $entryFilter->fields["_matchor_categories_ids"]);
+							$newCategoriesIds = array();
+							foreach ($categoriesIds as $categoryId) {
+								$newCategoriesIds[] = kObjectCopyHandler::getMappedId(categoryPeer::OM_CLASS, $categoryId);
+							}
+							$entryFilter->fields["_matchor_categories_ids"] = implode(",", $newCategoriesIds);
+						}
+						if (isset($entryFilter->fields["_in_category_ancestor_id"])) {
+							$categoriesIds = explode(",", $entryFilter->fields["_in_category_ancestor_id"]);
+							$newCategoriesIds = array();
+							foreach ($categoriesIds as $categoryId) {
+								$newCategoriesIds[] = kObjectCopyHandler::getMappedId(categoryPeer::OM_CLASS, $categoryId);
+							}
+							$entryFilter->fields["_in_category_ancestor_id"] = implode(",", $newCategoriesIds);
+						}
 			            $toEntryFilterXML = $toFiltersXml->addChild("filter");
 			            $toEntryFilterXML = $entryFilter->toXml($toEntryFilterXML);
 		            }
@@ -1231,88 +1269,84 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		            break;
 		    }
 		}
- 	
-		// copy relationships to categories
-		KalturaLog::debug('Copy relationships to categories from entry [' . $entry->getId() . '] to entry [' . $newEntry->getId() . ']');
-		$c = KalturaCriteria::create(categoryEntryPeer::OM_CLASS);
-		$c->addAnd(categoryEntryPeer::ENTRY_ID, $entry->getId());
-		$c->addAnd(categoryEntryPeer::STATUS, CategoryEntryStatus::ACTIVE, Criteria::EQUAL);
-		$c->addAnd(categoryEntryPeer::PARTNER_ID, $entry->getPartnerId());
-		
- 		categoryEntryPeer::setUseCriteriaFilter(false);
-		$categoryEntries = categoryEntryPeer::doSelect($c);
-		categoryEntryPeer::setUseCriteriaFilter(true);
-		
-		// Create srcCategoryIdToDstCategoryIdMap - a map of source partner category ids -> dst. partner category ids
-		//
-		// Build src category IDs set
-		$srcCategoryIdSet = array();
-		foreach($categoryEntries as $categoryEntry)
+
+		if ($copyCategories)
 		{
-			$srcCategoryIdSet[] = $categoryEntry->getCategoryId();
-		}
+			// copy relationships to categories
+			KalturaLog::debug('Copy relationships to categories from entry [' . $entry->getId() . '] to entry [' . $newEntry->getId() . ']');
+			$c = KalturaCriteria::create(categoryEntryPeer::OM_CLASS);
+			$c->addAnd(categoryEntryPeer::ENTRY_ID, $entry->getId());
+			$c->addAnd(categoryEntryPeer::STATUS, CategoryEntryStatus::ACTIVE, Criteria::EQUAL);
+			$c->addAnd(categoryEntryPeer::PARTNER_ID, $entry->getPartnerId());
 
-		$illegalCategoryStatus = array( CategoryStatus::DELETED, CategoryStatus::PURGED );
+			categoryEntryPeer::setUseCriteriaFilter(false);
+			$categoryEntries = categoryEntryPeer::doSelect($c);
+			categoryEntryPeer::setUseCriteriaFilter(true);
 
-		// Get src category objects
-		$c = KalturaCriteria::create(categoryPeer::OM_CLASS);
-		$c->add(categoryPeer::ID, $srcCategoryIdSet, Criteria::IN);
-		$c->addAnd(categoryPeer::PARTNER_ID, $entry->getPartnerId());
-		$c->addAnd(categoryPeer::STATUS, $illegalCategoryStatus, Criteria::NOT_IN);
-		categoryPeer::setUseCriteriaFilter(false);
-		$srcCategories = categoryPeer::doSelect($c);
-		categoryPeer::setUseCriteriaFilter(true);
-		
-		// Map the category names to their IDs
-		$fullNamesToSrcCategoryIdMap = array();
-		foreach ( $srcCategories as $category )
-		{
-			$fullNamesToSrcCategoryIdMap[ $category->getFullName() ] = $category->getId();
-		}
-
-		// Get dst. partner categories based on src. category full-names
-		$c = KalturaCriteria::create(categoryPeer::OM_CLASS);
-		$c->add(categoryPeer::FULL_NAME, array_keys( $fullNamesToSrcCategoryIdMap ), KalturaCriteria::IN);
-		$c->addAnd(categoryPeer::PARTNER_ID, $newEntry->getPartnerId());
-		$c->addAnd(categoryPeer::STATUS, $illegalCategoryStatus, Criteria::NOT_IN);
-		categoryPeer::setUseCriteriaFilter(false);
-		$dstCategories = categoryPeer::doSelect($c);
-		categoryPeer::setUseCriteriaFilter(true);
-
-		$srcCategoryIdToDstCategoryIdMap = array();
-		foreach ( $dstCategories as $dstCategory )
-		{
-			$fullName = $dstCategory->getFullName();
-			if ( array_key_exists( $fullName, $fullNamesToSrcCategoryIdMap ) )
-			{
-				$srcCategoryId = $fullNamesToSrcCategoryIdMap[ $fullName ];
-				$srcCategoryIdToDstCategoryIdMap[ $srcCategoryId ] = $dstCategory->getId();
-			}
-		}
-
-		foreach($categoryEntries as $categoryEntry)
-		{
-			/* @var $categoryEntry categoryEntry */
-			$newCategoryEntry = $categoryEntry->copy();
-			$newCategoryEntry->setPartnerId($newEntry->getPartnerId());
-			$newCategoryEntry->setEntryId($newEntry->getId());
-		
-			$srcCategoryId = $categoryEntry->getCategoryId();
-			if ( ! array_key_exists( $srcCategoryId, $srcCategoryIdToDstCategoryIdMap ) )
-			{
-				continue; // Skip the category_entry's creation
+			// Create srcCategoryIdToDstCategoryIdMap - a map of source partner category ids -> dst. partner category ids
+			//
+			// Build src category IDs set
+			$srcCategoryIdSet = array();
+			foreach ($categoryEntries as $categoryEntry) {
+				$srcCategoryIdSet[] = $categoryEntry->getCategoryId();
 			}
 
-			$dstCategoryId = $srcCategoryIdToDstCategoryIdMap[ $srcCategoryId ];
-			$newCategoryEntry->setCategoryId( $dstCategoryId );
+			$illegalCategoryStatus = array(CategoryStatus::DELETED, CategoryStatus::PURGED);
 
+			// Get src category objects
+			$c = KalturaCriteria::create(categoryPeer::OM_CLASS);
+			$c->add(categoryPeer::ID, $srcCategoryIdSet, Criteria::IN);
+			$c->addAnd(categoryPeer::PARTNER_ID, $entry->getPartnerId());
+			$c->addAnd(categoryPeer::STATUS, $illegalCategoryStatus, Criteria::NOT_IN);
 			categoryPeer::setUseCriteriaFilter(false);
-			entryPeer::setUseCriteriaFilter(false);
-			$newCategoryEntry->save();
-			entryPeer::setUseCriteriaFilter(true);
+			$srcCategories = categoryPeer::doSelect($c);
 			categoryPeer::setUseCriteriaFilter(true);
+
+			// Map the category names to their IDs
+			$fullNamesToSrcCategoryIdMap = array();
+			foreach ($srcCategories as $category) {
+				$fullNamesToSrcCategoryIdMap[$category->getFullName()] = $category->getId();
+			}
+
+			// Get dst. partner categories based on src. category full-names
+			$c = KalturaCriteria::create(categoryPeer::OM_CLASS);
+			$c->add(categoryPeer::FULL_NAME, array_keys($fullNamesToSrcCategoryIdMap), KalturaCriteria::IN);
+			$c->addAnd(categoryPeer::PARTNER_ID, $newEntry->getPartnerId());
+			$c->addAnd(categoryPeer::STATUS, $illegalCategoryStatus, Criteria::NOT_IN);
+			categoryPeer::setUseCriteriaFilter(false);
+			$dstCategories = categoryPeer::doSelect($c);
+			categoryPeer::setUseCriteriaFilter(true);
+
+			$srcCategoryIdToDstCategoryIdMap = array();
+			foreach ($dstCategories as $dstCategory) {
+				$fullName = $dstCategory->getFullName();
+				if (array_key_exists($fullName, $fullNamesToSrcCategoryIdMap)) {
+					$srcCategoryId = $fullNamesToSrcCategoryIdMap[$fullName];
+					$srcCategoryIdToDstCategoryIdMap[$srcCategoryId] = $dstCategory->getId();
+				}
+			}
+
+			foreach ($categoryEntries as $categoryEntry) {
+				/* @var $categoryEntry categoryEntry */
+				$newCategoryEntry = $categoryEntry->copy();
+				$newCategoryEntry->setPartnerId($newEntry->getPartnerId());
+				$newCategoryEntry->setEntryId($newEntry->getId());
+
+				$srcCategoryId = $categoryEntry->getCategoryId();
+				if (!array_key_exists($srcCategoryId, $srcCategoryIdToDstCategoryIdMap)) {
+					continue; // Skip the category_entry's creation
+				}
+
+				$dstCategoryId = $srcCategoryIdToDstCategoryIdMap[$srcCategoryId];
+				$newCategoryEntry->setCategoryId($dstCategoryId);
+
+				categoryPeer::setUseCriteriaFilter(false);
+				entryPeer::setUseCriteriaFilter(false);
+				$newCategoryEntry->save();
+				entryPeer::setUseCriteriaFilter(true);
+				categoryPeer::setUseCriteriaFilter(true);
+			}
 		}
-		
 		return $newEntry;
  	} 	
  	
