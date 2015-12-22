@@ -149,7 +149,11 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	private $data_content = null;
 	
 	private $desired_version = null;
-	
+
+	//An attribute that contains the rules by which this entry was created, only in case it was created
+	// via clone operation
+	private $cloned_options = array();
+
 	private $archive_extension = null;
 	
 	private static $mediaTypeNames = array(
@@ -908,7 +912,38 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	{
 		return $this->archive_extension;
 	}
-	
+
+	/**
+	 * The method returns the var_dumpd_options, in case the entry was created via clone operation.
+	 * Otherwise; it returns null
+	 * @return null
+     */
+	public function getClonedOptions()
+	{
+		return $this->cloned_options;
+	}
+
+
+	/**
+	 * The method sets the options by which the current entry was cloned.
+	 * In case the current entry was not cloned,the $cloneOptionsArray is empty
+	 * @param array $cloneOptionsArray
+     */
+	public function setClonedOption(array $cloneOptionsArray)
+	{
+		if (! is_array ( $cloneOptionsArray ) || (is_null($cloneOptionsArray)))
+		{
+			//in case the array is not empty due to former call, empty the array
+			unset($this->cloned_options);
+			$this->cloned_options = array();
+			return;
+		}
+
+		foreach ($cloneOptionsArray as $item)
+		{
+			$this->cloned_options[] = $item;
+		}
+	}
 	// will work only for types that the data can be served as an a response to the service
 	public function getDataContent ( $from_cache = false )
 	{
