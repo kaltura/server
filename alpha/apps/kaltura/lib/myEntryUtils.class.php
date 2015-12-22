@@ -1114,16 +1114,10 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 	 * @throws kCoreException
      */
 	public static function copyEntry(entry $entry, Partner $toPartner = null,
-									 KalturaBaseEntryCloneOptionsArray $cloneOptionsArray)
+									 array $coreFormatClonedOptionsArray)
  	{
  		KalturaLog::log("copyEntry - Copying entry [".$entry->getId()."] to partner [".$toPartner->getId().
-			" ] with clone options [ ".print_r($cloneOptionsArray, true)." ]");
-
-		$coreFormatClonedOptionsArray = array();
-		foreach ($cloneOptionsArray as $item)
-		{
-			$coreFormatClonedOptionsArray[] = $item->toObject();
-		}
+			" ] with clone options [ ".print_r($coreFormatClonedOptionsArray, true)." ]");
 
 		$entry->setClonedOption($coreFormatClonedOptionsArray);
 		$copyUsers = true;
@@ -1159,17 +1153,24 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 
 			$currentType = $cloneOption->rule;
 
-			if ($currentOption == KalturaBaseEntryCloneOptions::USERS && $currentType == false)
+			if ($currentOption == BaseEntryCloneOptions::USERS && $currentType == false)
 			{
 				$copyUsers = false;
+				KalturaLog::debug("CLONE::: do NOT copy users");
 			}
 
-			if ($currentOption == KalturaBaseEntryCloneOptions::CATEGORIES && $currentType == false)
+			if ($currentOption == BaseEntryCloneOptions::CATEGORIES && $currentType == false)
 			{
 				$copyCategories = false;
+				KalturaLog::debug("CLONE::: do NOT copy categories");
 			}
 		}
 
+		if ($copyCategories == true)
+			KalturaLog::debug("CLONE::: do copy categories");
+
+		if ($copyUsers == true)
+			KalturaLog::debug("CLONE::: do copy users");
 
  		$newEntry = $entry->copy();
  		$newEntry->setIntId(null);

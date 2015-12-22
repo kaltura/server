@@ -875,9 +875,15 @@ class BaseEntryService extends KalturaEntryService
 		{
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 		}
+		$coreFormatClonedOptionsArray = array();
+		foreach ($cloneOptions as $item)
+		{
+			$coreFormatClonedOptionsArray[] = $item->toObject();
+		}
+
 
 		// Copy the entry into a new one based on the given partner data.
-		$clonedEntry = myEntryUtils::copyEntry($coreEntry, $this->getPartner(), $cloneOptions);
+		$clonedEntry = myEntryUtils::copyEntry($coreEntry, $this->getPartner(), $coreFormatClonedOptionsArray);
 		return $this->getEntry($clonedEntry->getId());
 	}
 }
