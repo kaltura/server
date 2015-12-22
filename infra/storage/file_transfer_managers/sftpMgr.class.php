@@ -533,10 +533,7 @@ class sftpMgr extends kFileTransferMgr
 		if($this->privKeyFile)
 			$cliCommand .= " -oIdentityFile={$this->privKeyFile}";
 		else
-		{
-		        $fixedPassword = str_replace("'","'\''",$this->password);
-			$cliCommand = "{$this->sshpassCmd} -p '$fixedPassword' $cliCommand";
-		}
+			$cliCommand = "{$this->sshpassCmd} -p '{$this->password}' $cliCommand";
 			
 		$cliCommand .= " {$this->username}@{$this->host}";
 		
