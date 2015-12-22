@@ -326,19 +326,18 @@ class myPartnerUtils
 			$protocol='http';
 
 		$partner = PartnerPeer::retrieveByPK( $partner_id );
-		$whiteListHost = null;
 		if ($partner)
 		{
 			$whiteListHost = self::getWhiteListHost($partner);
-		}
-		if (!is_null($whiteListHost))
-		{
-			$cdnHost = $protocol.'://'.$whiteListHost;
-			if (isset($_SERVER['SERVER_PORT']))
+			if (!is_null($whiteListHost))
 			{
-				$cdnHost .= ":".$_SERVER['SERVER_PORT'];
+				$cdnHost = $protocol.'://'.$whiteListHost;
+				if (isset($_SERVER['SERVER_PORT']))
+				{
+					$cdnHost .= ":".$_SERVER['SERVER_PORT'];
+				}
+				return $cdnHost;
 			}
-			return $cdnHost;
 		}
 
 		switch ($hostType)
