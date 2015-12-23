@@ -25,8 +25,7 @@ class FacebookDistributionProfile extends ConfigurableDistributionProfile
 	// needed permission in order to be able to publish the video to a facebook page
 	const DEFAULT_FACEBOOK_PERMISSIONS = 'manage_pages,publish_actions,user_videos,publish_pages,user_actions.video';
 
-	const SIX_MINUTES_IN_SECONDS = 360;
-	const SIX_MONTHS_IN_SECONDS = 15552000;
+
 
 	/* (non-PHPdoc)
 	 * @see DistributionProfile::getProvider()
@@ -74,7 +73,9 @@ class FacebookDistributionProfile extends ConfigurableDistributionProfile
 		    return $validationErrors;
 		}
 		if ($allFieldValues[FacebookDistributionField::SCHEDULE_PUBLISHING_TIME] &&
-			!dateUtils::isWithinLimitsFromNow($allFieldValues[FacebookDistributionField::SCHEDULE_PUBLISHING_TIME], self::SIX_MINUTES_IN_SECONDS, self::SIX_MONTHS_IN_SECONDS))
+			!dateUtils::isWithinLimitsFromNow($allFieldValues[FacebookDistributionField::SCHEDULE_PUBLISHING_TIME],
+				FacebookConstants::FACEBOOK_MIN_POSTPONE_POST_IN_SECONDS,
+				FacebookConstants::FACEBOOK_MAX_POSTPONE_POST_IN_SECONDS))
 		{
 			KalturaLog::err("Scheduled time to publish defies the facebook restriction of six minute to six months from now ");
 			$validationErrors[] = $this->createCustomValidationError($action, DistributionErrorType::INVALID_DATA, 'sunrise', 'Distribution sunrise is invalid (should be 6 minutes to 6 months from now)');

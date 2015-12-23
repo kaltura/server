@@ -105,17 +105,17 @@ class dateUtils
 
 	/**
 	 * Checks if the given time is between x seconds to y seconds from now
-	 * @param $time_in_sec
-	 * @param $close_seconds_from_now
-	 * @param $far_seconds_from_now
+	 * @param int $absolute_time_in_sec
+	 * @param int $relative_start_from_now
+	 * @param int $relative_end_from_now
 	 * @return bool
 	 */
-	public static function isWithinLimitsFromNow($time_in_sec, $close_seconds_from_now, $far_seconds_from_now)
+	public static function isWithinTimeFrame($absolute_time_in_sec, $relative_start_from_now, $relative_end_from_now)
 	{
 		$now = self::now();
-		$lowThreshold = $now + $close_seconds_from_now;
-		$highThreshold = $now + $far_seconds_from_now;
-		return $time_in_sec < $highThreshold &&  $time_in_sec > $lowThreshold;
+		$lowThreshold = $now + $relative_start_from_now;
+		$highThreshold = $now + $relative_end_from_now;
+		return $absolute_time_in_sec < $highThreshold &&  $absolute_time_in_sec > $lowThreshold;
 
 
 	}

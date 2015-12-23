@@ -1,6 +1,6 @@
 <?php
 require_once KALTURA_ROOT_PATH.'/vendor/facebook-sdk-php-v5-customized/autoload.php';
-  
+
 /**
  * @package plugins.facebookDistribution
  * @subpackage admin
@@ -16,11 +16,11 @@ class Form_FacebookProfileConfiguration extends Form_ConfigurableProfileConfigur
 			'placement' => 'APPEND'
 		));
 	}
-	
+
 	protected function addProviderElements()
 	{
-	    $this->setDescription(null);
-	    
+		$this->setDescription(null);
+
 		$element = new Zend_Form_Element_Hidden('providerElements');
 		$element->setLabel('Facebook Specific Configuration');
 		$element->setDecorators(array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'b'))));
@@ -33,7 +33,7 @@ class Form_FacebookProfileConfiguration extends Form_ConfigurableProfileConfigur
 
 			)))
 		));
-		
+
 		// General
 		$this->addElement('text', 'page_id', array(
 			'label'			=> 'Facebook Page ID:',
@@ -43,11 +43,11 @@ class Form_FacebookProfileConfiguration extends Form_ConfigurableProfileConfigur
 
 		$this->addDisplayGroup(
 			array('page_id'),
-			'general', 
+			'general',
 			array('legend' => 'General', 'decorators' => array('FormElements', 'Fieldset'))
 		);
 
 	}
-	
+
 
 }

@@ -59,9 +59,8 @@ class FacebookDistributionPlugin extends KalturaPlugin implements IKalturaPermis
 		// client side apps like batch and admin console
 		if (class_exists('KalturaClient') && $enumValue == KalturaDistributionProviderType::FACEBOOK)
 		{
-			if(in_array($baseClass, array('IDistributionEngineSubmit', 'IDistributionEngineDelete', 'IDistributionEngineUpdate'))){
+			if(in_array($baseClass, array('IDistributionEngineSubmit', 'IDistributionEngineDelete', 'IDistributionEngineUpdate')))
 				return new FacebookDistributionEngine();
-			}
 
 			if($baseClass == 'KalturaDistributionProfile')
 				return new KalturaFacebookDistributionProfile();

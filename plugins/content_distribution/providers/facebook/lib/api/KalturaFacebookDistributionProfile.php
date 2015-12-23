@@ -22,19 +22,19 @@ class KalturaFacebookDistributionProfile extends KalturaConfigurableDistribution
 	public $pageAccessToken;
 
 	/**
-	 * 
+	 *
 	 * @var string
 	 */
 	public $userAccessToken;
-		
+
 	/**
-	 * 
+	 *
 	 * @var string
 	 */
 	public $permissions;
-	
+
 	/**
-	 * 
+	 *
 	 * @var int
 	 */
 	public $reRequestPermissions;
@@ -42,17 +42,17 @@ class KalturaFacebookDistributionProfile extends KalturaConfigurableDistribution
 	/*
 	 * mapping between the field on this object (on the left) and the setter/getter on the object (on the right)  
 	 */
-	private static $map_between_objects = array 
+	private static $map_between_objects = array
 	(
-        'apiAuthorizeUrl',
-        'pageId',
+		'apiAuthorizeUrl',
+		'pageId',
 		'pageAccessToken',
 		'userAccessToken',
 		'permissions',
 		'reRequestPermissions'
 
-	 );
-		 
+	);
+
 	public function getMapBetweenObjects()
 	{
 		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);

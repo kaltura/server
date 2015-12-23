@@ -1,7 +1,7 @@
 <?php
 
 require_once(KALTURA_ROOT_PATH.'/alpha/apps/kaltura/lib/cache/kCacheManager.php');
-require_once KALTURA_ROOT_PATH.'/vendor/facebook-sdk-php-v5-customed/autoload.php';
+require_once(KALTURA_ROOT_PATH.'/vendor/facebook-sdk-php-v5-customized/autoload.php');
 
 /**
  * Saves key/value in the custom data of the provider given
@@ -40,7 +40,7 @@ class KalturaFacebookPersistentDataHandler implements \Facebook\PersistentData\P
     public function set($key, $value)
     {
         if (!$this->facebookDistributionProfile->putInCustomData($key, $value)){
-            KalturaLog::notice("Failed to set facebook session key in custom data");
+            throw new Exception("Failed to set value {$value} for key {$key} in custom data for provider {$this->facebookDistributionProfile->getId()}");
         }
         $this->facebookDistributionProfile->save();
     }

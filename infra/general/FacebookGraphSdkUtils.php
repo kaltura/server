@@ -86,14 +86,13 @@ class FacebookGraphSdkUtils
 	 * @param string $userAccessToken
 	 * @param string $pageId
 	 * @param Facebook\PersistentData\PersistentDataInterface|string
-	 * @throws Facebook\Exceptions\FacebookResponseException, Facebook\Exceptions\FacebookSDKException, Exception
+	 * @return string access_token
+	 * @throws Exception
 	 */
 	public static function getPageAccessToken($appId, $appSecret, $userAccessToken, $pageId, $dataHandler)
 	{
 		$fb = self::createFacebookInstance($appId, $appSecret, $dataHandler);
-		KalturaLog::debug('Getting page access token');
 
-		// Returns a `Facebook\FacebookResponse` object
 		$response = $fb->get('/me/accounts?fields=id,access_token', $userAccessToken);
 		KalturaLog::debug("page token response:".print_r($response, true));
 
@@ -106,6 +105,7 @@ class FacebookGraphSdkUtils
 				return $page['access_token'];
 			}
 		}
+		throw new Exception("Failed to find access token for given page id :".$pageId);
 	}
 
 	/**
@@ -150,10 +150,7 @@ class FacebookGraphSdkUtils
 	public static function uploadVideo($appId, $appSecret, $pageId, $accessToken, $videoFilePath, $thumbFilePath ,$videoFileSize, $baseWorkingDir, $metadata = array())
 	{
 		if ($thumbFilePath)
-			if ($metadata)
-				$metadata['thumb'] = new \Facebook\FileUpload\FacebookFile($thumbFilePath);
-			else
-				$metadata = array('thumb' => new \Facebook\FileUpload\FacebookFile($thumbFilePath));
+			$metadata['thumb'] = new \Facebook\FileUpload\FacebookFile($thumbFilePath);
 		$fb = self::createFacebookInstance($appId, $appSecret);
 		$dirName = basename($videoFilePath, '.' . pathinfo($videoFilePath, PATHINFO_EXTENSION));
 		$workingDir = $baseWorkingDir . DIRECTORY_SEPARATOR . $dirName;
@@ -209,7 +206,7 @@ class FacebookGraphSdkUtils
 				$photoCreatedId = $graphNode['id'];
 				return $photoCreatedId;
 			} else {
-				$failureReason = "Failed to upload image - response from server was: ".print_r($response, true);
+				$failureReason = "Failed to upload photo - response from server was: ".print_r($response, true);
 			}
 		} catch (Facebook\Exceptions\FacebookResponseException $e) {
 			$failureReason = 'Graph returned an error: ' . $e->getMessage();
@@ -219,49 +216,45 @@ class FacebookGraphSdkUtils
 		throw new Exception("Failed to upload photo to facebook due to : ".$failureReason);
 	}
 
-	// Not working
+	/**
+	 * @param $appId
+	 * @param $appSecret
+	 * @param $accessToken
+	 * @param $videoId
+	 * @param $filePath
+	 * @param $locale
+	 * @return mixed
+	 * @throws Exception
+	 */
 	public static function uploadCaptions($appId, $appSecret, $accessToken, $videoId, $filePath, $locale)
 	{
-		return; // TODO support this functionality
-		$fb = self::createFacebookInstance($appId, $appSecret);
+		if (file_exists($filePath))
+			throw new Exception("Captions file given does not exist: ".$filePath);
 
 		//create file name in format: filename.locale.srt
 		$newFilePath = basename($filePath, '.'.pathinfo($filePath, PATHINFO_EXTENSION)).'.'.$locale.'.srt';
 		copy($filePath, $newFilePath);
-		$videoCaptionsMimeType = "application/octet-stream";
 		$data = array (
-			'id' => $videoId,
-			'default_locale' => 'none',
-			'captions_file' => "@$newFilePath;filename=".basename($newFilePath).";type=$videoCaptionsMimeType"//self::getCurlValue($newFilePath, $videoCaptionsMimeType)
+			'captions_file' => new FacebookCaptionsFile($newFilePath),
 		);
-		$response = $fb->post("/".$videoId."/captions", $data, $accessToken);
-		$graphNode = $response->getGraphNode();
-		$success = $graphNode['success'];
-		if($success)
-			KalturaLog::debug('Captions file ['. $filePath. '] uploaded successfully');
-		else
-			KalturaLog::debug('Captions file ['. $filePath. '] upload failed');
-		return $success;
+		self::helperChangeVideo($appId, $appSecret, $accessToken, $data, $videoId, false, "/captions" );
 	}
 
-	// Not tested
+	/**
+	 * @param string $appId
+	 * @param string $appSecret
+	 * @param string $accessToken
+	 * @param string $videoId
+	 * @param string $locale
+	 * @throws Exception
+	 */
 	public static function deleteCaptions($appId, $appSecret, $accessToken, $videoId, $locale)
 	{
-		$fb = self::createFacebookInstance($appId, $appSecret);
-
 		$data = array(
 			'id' => $videoId,
 			'locale' => $locale,
 		);
-
-		$response = $fb->delete('/me/captions', $data, $accessToken);
-		$graphNode = $response->getGraphNode();
-		$success = $graphNode['success'];
-		if($success)
-			KalturaLog::debug('Captions file deleted successfully');
-		else
-			KalturaLog::debug('Captions file delete failed');
-		return $success;
+		self::helperChangeVideo($appId, $appSecret, $accessToken, $data, $videoId, true, "/captions" );
 	}
 
 	/**
@@ -284,9 +277,14 @@ class FacebookGraphSdkUtils
 		if(!$type)
 			throw new Exception('Invalid file format');
 
+		self::validateAspectRatio($width, $height);
+	}
+
+	private static function validateAspectRatio($width, $height)
+	{
 		if ($width === 0 || $height === 0)
 			throw new Exception("Invalid argument - got zero as video width[{$width}] or height[{$height}]");
-		if ($width/$height != 16/9 && $width/$height != 9/16)
+		if (abs($width/$height - 16/9) > 0.1 && abs($width/$height - 9/16) > 0.1)
 			throw new Exception("Invalid aspect ratio - facebook only supports 16:9 and 9:16 , got: width[{$width}] or height[{$height}]");
 	}
 
@@ -404,7 +402,7 @@ class FacebookGraphSdkUtils
 	 */
 	public static function deleteUploadedVideo($appId, $appSecret, $accessToken, $videoId)
 	{
-		return self::helperUpdateDelete($appId, $appSecret, $accessToken, array(), $videoId, true);
+		return self::helperChangeVideo($appId, $appSecret, $accessToken, array(), $videoId, true);
 	}
 
 	/**
@@ -418,18 +416,19 @@ class FacebookGraphSdkUtils
 	 */
 	public static function updateUploadedVideo($appId, $appSecret, $accessToken, $data, $videoId)
 	{
-		return self::helperUpdateDelete($appId, $appSecret, $accessToken, $data, $videoId, false);
+		return self::helperChangeVideo($appId, $appSecret, $accessToken, $data, $videoId, false);
 	}
 
-	private static function helperUpdateDelete($appId, $appSecret, $accessToken, $data, $videoId, $isDelete)
+	private static function helperChangeVideo($appId, $appSecret, $accessToken, $data, $videoId, $isDelete, $subCategory=null)
 	{
 		$fb = self::createFacebookInstance($appId, $appSecret);
 		if ($isDelete)
-			$response = $fb->delete("/".$videoId , $data, $accessToken);
+			$response = $fb->delete("/".$videoId.$subCategory , $data, $accessToken);
 		else
-			$response = $fb->post("/".$videoId , $data, $accessToken);
+			$response = $fb->post("/".$videoId.$subCategory , $data, $accessToken);
 		$graphNode = $response->getGraphNode();
-		return ($graphNode['success'] == 1);
+		if ($graphNode['success'] != 1)
+			throw new Exception("Failed to ".($isDelete? "delete " : "update ").$subCategory." video ".$videoId);
 	}
 
 	/**
@@ -456,4 +455,18 @@ class FacebookConstants
 	const MAX_VIDEO_SIZE = 1750000000; //bytes
 	const MAX_VIDEO_DURATION = 2700000; //milliseconds
 	const FACEBOOK_SDK_VERSION = 'v2.4';
+	const FACEBOOK_MIN_POSTPONE_POST_IN_SECONDS = 360; // 6 minutes
+	const FACEBOOK_MAX_POSTPONE_POST_IN_SECONDS = 15552000; // 6 months
+}
+
+class FacebookCaptionsFile extends \Facebook\FileUpload\FacebookFile
+{
+
+	/**
+	 * override the original method since srt is not amongst the known file types in the facebook Mimetypes
+	 */
+	public function getMimetype()
+	{
+		return 'application/octet-stream';
+	}
 }

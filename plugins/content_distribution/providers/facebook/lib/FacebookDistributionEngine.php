@@ -143,7 +143,9 @@ class FacebookDistributionEngine extends DistributionEngine implements
 					$this->appSecret,
 					$data->distributionProfile->pageAccessToken,
 					$data->entryDistribution->remoteId);
-			}
+			} else
+				throw new Exception(" Remote id is empty - nothing to delete");
+
 		} catch (Exception $e) {
 			throw new Exception("Failed to delete facebook video , reason:".$e->getMessage());
 		}
