@@ -189,12 +189,12 @@ class KalturaEntryResource extends KalturaContentResource
 					$srcFlavorAsset = assetPeer::retrieveHighestBitrateByEntryId($this->entryId);
 			}
 			else
-			$srcFlavorAsset = assetPeer::retrieveByEntryIdAndParams($this->entryId, $this->flavorParamsId);
+				$srcFlavorAsset = assetPeer::retrieveByEntryIdAndParams($this->entryId, $this->flavorParamsId);
 				
 			if($srcFlavorAsset)
 			{
-	    		$dbEntry->setDimensions($srcFlavorAsset->getWidth(), $srcFlavorAsset->getHeight());
-	    		$dbEntry->save();
+	    			$dbEntry->setDimensions($srcFlavorAsset->getWidth(), $srcFlavorAsset->getHeight());
+	    			$dbEntry->save();
 			}
     		}
     	}
