@@ -134,23 +134,37 @@ class EntryAdminService extends KalturaBaseService
 		if (!$this->validateEntryForRestoreDelete($deletedEntry, $fileSyncs, $deletedAssets))
 			throw new KalturaAPIException(KalturaAdminConsoleErrors::ENTRY_ASSETS_WRONG_STATUS_FOR_RESTORE, $entryId);
 
-		$deletedEntry->setStatusReady();
-		$deletedEntry->setThumbnail($deletedEntry->getFromCustomData("deleted_original_thumb"), true);
-		$deletedEntry->setData($deletedEntry->getFromCustomData("deleted_original_data"),true); //data should be resotred even if it's NULL
-		$deletedEntry->save();
+		$this->restoreFileSyncs($fileSyncs);
 
+		//restore assets
 		foreach($deletedAssets as $deletedAsset)
 		{
 			$deletedAsset->setStatus(asset::ASSET_STATUS_READY);
 			$deletedAsset->save();
 		}
 
+		//restore entry
+		$deletedEntry->setStatusReady();
+		$deletedEntry->setThumbnail($deletedEntry->getFromCustomData("deleted_original_thumb"), true);
+		$deletedEntry->setData($deletedEntry->getFromCustomData("deleted_original_data"),true); //data should be resotred even if it's NULL
+		$deletedEntry->save();
+
+		kEventsManager::flushEvents();
+		kMemoryManager::clearMemory();
+
+		$entry = KalturaEntryFactory::getInstanceByType($deletedEntry->getType(), true);
+		$entry->fromObject($deletedEntry, $this->getResponseProfile());
+		return $entry;
+	}
+
+	protected function restoreFileSyncs( array $fileSyncs )
+	{
 		foreach ($fileSyncs as $fileSync)
 		{
 			$shouldUnDelete = false;
 			if (($fileSync->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_FILE && file_exists($fileSync->getFullPath()))
 				|| ($fileSync->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL)){
-					$shouldUnDelete = true;
+				$shouldUnDelete = true;
 			}
 			else if ($fileSync->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_LINK){
 				$linkedId = $fileSync->getLinkedId();
@@ -160,9 +174,6 @@ class EntryAdminService extends KalturaBaseService
 				if ($linkedFileSync->getStatus() == FileSync::FILE_SYNC_STATUS_READY && file_exists($linkedFileSync->getFullPath()))
 					$shouldUnDelete = true;
 			}
-			else if ($fileSync->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_CACHE){
-				$shouldUnDelete = false;
-			}
 
 			if ($shouldUnDelete)
 				$fileSync->setStatus(FileSync::FILE_SYNC_STATUS_READY);
@@ -170,13 +181,6 @@ class EntryAdminService extends KalturaBaseService
 				$fileSync->setStatus(FileSync::FILE_SYNC_STATUS_ERROR);
 			$fileSync->save();
 		}
-
-		kEventsManager::flushEvents();
-		kMemoryManager::clearMemory();
-
-		$entry = KalturaEntryFactory::getInstanceByType($deletedEntry->getType(), true);
-		$entry->fromObject($deletedEntry, $this->getResponseProfile());
-		return $entry;
 	}
 
 	protected function validateEntryForRestoreDelete(entry $entry, array $fileSyncs, array $assets)
