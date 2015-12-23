@@ -203,7 +203,7 @@ abstract class objectWrapperBase implements Iterator
 		return $this->objs_cache;
 	}
 
-	protected  function objectWrapperBase ( $object , $recursive_wrapping = false ,
+	protected  function __construct ( $object , $recursive_wrapping = false ,
 		$detail_level = self::DETAIL_LEVEL_REGULAR , $recursion_depth = 0 , $detail_policy_velocity = -1 )
 	{
 		if ( $object == null || $detail_level <= 0 ) return $this;
