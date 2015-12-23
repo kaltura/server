@@ -40,6 +40,9 @@ class KalturaEntryResource extends KalturaContentResource
 		{
 			$srcFlavorAsset = assetPeer::retrieveOriginalByEntryId($this->entryId);
 			if (!$srcFlavorAsset)
+				$srcFlavorAsset = assetPeer::retrieveHighestBitrateByEntryId($this->entryId);
+
+			if (!$srcFlavorAsset)
 				throw new KalturaAPIException(KalturaErrors::ORIGINAL_FLAVOR_ASSET_IS_MISSING);
 		}
 		else
@@ -134,6 +137,9 @@ class KalturaEntryResource extends KalturaContentResource
     	if(is_null($this->flavorParamsId))
     	{
 			$srcFlavorAsset = assetPeer::retrieveOriginalByEntryId($this->entryId);
+			if (!$srcFlavorAsset)
+				$srcFlavorAsset = assetPeer::retrieveHighestBitrateByEntryId($this->entryId);
+
 	    	if(!$srcFlavorAsset)
 	    		throw new KalturaAPIException(KalturaErrors::ORIGINAL_FLAVOR_ASSET_IS_MISSING);
     	}
@@ -177,7 +183,11 @@ class KalturaEntryResource extends KalturaContentResource
     		{
 		    	$srcFlavorAsset = null;
 		    	if(is_null($this->flavorParamsId))
+				{
 					$srcFlavorAsset = assetPeer::retrieveOriginalByEntryId($this->entryId);
+					if (!$srcFlavorAsset)
+						$srcFlavorAsset = assetPeer::retrieveHighestBitrateByEntryId($this->entryId);
+				}
 				else
 					$srcFlavorAsset = assetPeer::retrieveByEntryIdAndParams($this->entryId, $this->flavorParamsId);
 				
