@@ -132,7 +132,7 @@ class EntryAdminService extends KalturaBaseService
 		FileSyncPeer::setUseCriteriaFilter(true);
 
 		if (!$this->validateEntryForRestoreDelete($deletedEntry, $fileSyncs, $deletedAssets))
-			throw new KalturaAPIException(KalturaErrors::ENTRY_ASSETS_WRONG_STATUS_FOR_RESTORE, $entryId);
+			throw new KalturaAPIException(KalturaAdminConsoleErrors::ENTRY_ASSETS_WRONG_STATUS_FOR_RESTORE, $entryId);
 
 		$deletedEntry->setStatusReady();
 		$deletedEntry->setThumbnail($deletedEntry->getFromCustomData("deleted_original_thumb"), true);
