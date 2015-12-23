@@ -1446,6 +1446,13 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 				kJobsManager::updateBatchJob($convertProfileJob, BatchJob::BATCHJOB_STATUS_FAILED);
 				return false;
 			}
+			/*
+			 * If the conversion profile contains source flavor and the source is tagged with 'save_source' ==> 
+			 * save the original source asset in another asset, in order 
+			 * to prevent its liquidated by the inter-source asset.
+			 */
+			if(isset($sourceFlavor) && strstr($sourceFlavor->getTagsArray(),assetParams::TAG_SAVE_SOURCE)!==false)
+				self::saveOriginalSource($mediaInfo);
 		}
 		elseif($mediaInfo) 
 		{
@@ -1464,26 +1471,8 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 			 * to prevent its liquidated by the inter-source asset.
 			 * But, do it only if the conversion profile contains source flavor
 			 */
-			if($sourceFlavor) 
-			{
-				$sourceAsset = assetPeer::retrieveById($mediaInfo->getFlavorAssetId());
-				$copyFlavorParams = assetParamsPeer::retrieveBySystemName(self::SAVE_ORIGINAL_SOURCE_FLAVOR_PARAM_SYS_NAME);
-				if (!$copyFlavorParams)
-					throw new APIException(APIErrors::OBJECT_NOT_FOUND);
-				
-				$asset = $sourceAsset->copy();
-				$asset->setFlavorParamsId($copyFlavorParams->getId());
-				$asset->setFromAssetParams($copyFlavorParams);
-				$asset->setStatus(flavorAsset::ASSET_STATUS_READY);
-				$asset->setIsOriginal(0);
-				$asset->setTags($copyFlavorParams->getTags());
-				$asset->incrementVersion();
-				$asset->save();
-				kFileSyncUtils::createSyncFileLinkForKey($asset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET), $sourceAsset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET));
-				$origFileSync = kFileSyncUtils::getLocalFileSyncForKey($sourceAsset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET));
-				$asset->setSize(intval($origFileSync->getFileSize()/1000));		
-				$asset->save();
-			}
+			if(isset($sourceFlavor))
+				self::saveOriginalSource($mediaInfo);
 		}
 		
 			/*
@@ -1537,7 +1526,12 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 				
 		$originalFlavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_CONVERTING);
 		if(isset($sourceFlavor)) {
-			$originalFlavorAsset->addTags($sourceFlavor->getTagsArray());
+			$tagsArr = $sourceFlavor->getTagsArray();
+				// No need for 'save_source' tag on the inter-src asset, remove it.
+			if(($key=array_search(assetParams::TAG_SAVE_SOURCE, $tagsArr))!==false) {
+				unset($tagsArr[$key]);
+			}
+			$originalFlavorAsset->addTags($tagsArr);
 			$originalFlavorAsset->setFileExt($sourceFlavorOutput->getFileExt());
 			$originalFlavorAsset->save();
 		}
@@ -1552,7 +1546,32 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 		kJobsManager::addFlavorConvertJob(array($srcSyncKey), $sourceFlavorOutput, $originalFlavorAsset->getId(), $conversionProfileId, $mediaInfoId, $parentJob);
 		return false;
 	}
-
+	
+		/*
+		 * Save the original source asset in another asset, in order 
+		 * to prevent its liquidation by the inter-source asset.
+		 */
+	private static function saveOriginalSource($mediaInfo)
+	{
+		$sourceAsset = assetPeer::retrieveById($mediaInfo->getFlavorAssetId());
+		$copyFlavorParams = assetParamsPeer::retrieveBySystemName(self::SAVE_ORIGINAL_SOURCE_FLAVOR_PARAM_SYS_NAME);
+		if (!$copyFlavorParams)
+			throw new APIException(APIErrors::OBJECT_NOT_FOUND);
+		
+		$asset = $sourceAsset->copy();
+		$asset->setFlavorParamsId($copyFlavorParams->getId());
+		$asset->setFromAssetParams($copyFlavorParams);
+		$asset->setStatus(flavorAsset::ASSET_STATUS_READY);
+		$asset->setIsOriginal(0);
+		$asset->setTags($copyFlavorParams->getTags());
+		$asset->incrementVersion();
+		$asset->save();
+		kFileSyncUtils::createSyncFileLinkForKey($asset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET), $sourceAsset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET));
+		$origFileSync = kFileSyncUtils::getLocalFileSyncForKey($sourceAsset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET));
+		$asset->setSize(intval($origFileSync->getFileSize()/1000));		
+		$asset->save();
+	}
+	
 	private static function setError($errDescription, BatchJob $batchJob, $batchJobType, $entryId)
 	{
 		$batchJob = kJobsManager::failBatchJob($batchJob, $errDescription, $batchJobType);
