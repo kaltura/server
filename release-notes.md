@@ -4,9 +4,9 @@
  - Issue Type: New Feature
  - Issue ID: WEBC-631
 #### Installation ####
-None.
+ - php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
 #### Configuration ####
-None.
+ - Validate facebook.ini exists in the configuration directory
 #### Known Issues & Limitations ####
 None.
 #### Deployment scripts ####
