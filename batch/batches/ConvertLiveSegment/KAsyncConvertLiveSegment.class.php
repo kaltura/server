@@ -100,7 +100,6 @@ class KAsyncConvertLiveSegment extends KJobHandlerWorker
 				KBatchBase::impersonate($job->partnerId);
 				$asset = KBatchBase::$kClient->flavorAsset->get($data->assetId);
 				KBatchBase::unimpersonate();
-				KalturaLog::debug('asset is: ' . print_r($asset, true));
 				if (strpos($asset->tags,'recording_anchor') == false) {
 					return;
 				}
