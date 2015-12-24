@@ -1050,7 +1050,7 @@ abstract class FlvInfo
 	protected $info_file_name;
 	protected $fh; // file handle
 	
-	public function FlvInfo($flv_file_name)
+	public function __construct($flv_file_name)
 	{
 		$this->flv_file_name = $flv_file_name;
 		$this->info_file_name = $flv_file_name.$this->FILE_SUFFIX;
