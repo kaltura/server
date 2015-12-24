@@ -285,7 +285,14 @@ class kFlowHelper
 			return $dbBatchJob;
 			
 		$files = kFileSyncUtils::dir_get_files($key, false);
-		
+
+		// If we have less files on disk than what we should have it means the output file will be missing segments.
+		// don't generate it, and the next concat will do the work for us.
+		if (count($files) != $data->getFileIndex()+1){
+			KalturaLog::warning('number of segments on disk ' . count($files) . ' is not equal to segment index ' . $data->getFileIndex() . ' - not running the concat job');
+			return $dbBatchJob;
+		}
+
 		if(count($files) > 1)
 		{
 			// find replacing entry id

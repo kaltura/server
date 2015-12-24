@@ -12,6 +12,14 @@ class DeliveryProfileVodPackagerHds extends DeliveryProfileHds {
 		return $url;
 	}
 	
+	protected function doGetFileSyncUrl(FileSync $fileSync)
+	{
+		$url = parent::doGetFileSyncUrl($fileSync);
+		
+		$url .= VodPackagerDeliveryUtils::getExtraParams($this->params);
+		return $url;
+	}
+	
 	public function buildServeFlavors()
 	{
 		$flavors = $this->buildHttpFlavorsArray();

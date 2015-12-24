@@ -366,7 +366,7 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 		$deliveryUrl = null;
 	
 		$deliveryNodeIds = $this->params->getEdgeServerIds();
-		$deliveryNodes = ServerNodePeer::retrieveOrderedServerNodesArrayByPKs($deliveryNodeIds);
+		$deliveryNodes = ServerNodePeer::retrieveRegisteredServerNodesArrayByPKs($deliveryNodeIds);
 	
 		if(!count($deliveryNodes))
 		{
@@ -384,4 +384,13 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 		return $deliveryUrl;
 	}
 	
+	public function setExtraParams($v)
+	{
+		$this->putInCustomData("extraParams", $v);
+	}
+	
+	public function getExtraParams()
+	{
+		return $this->getFromCustomData("extraParams");
+	}
 } 

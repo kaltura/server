@@ -157,7 +157,7 @@ class ZendClientTester
     	
     	// execute playlist from filters
     	$playlistFilter = new Kaltura_Client_Type_MediaEntryFilterForPlaylist();
-    	$playlistFilter->idEqual = $imageEntry->id;
+    	$playlistFilter->tagsLike = $imageEntry->tags;
     	$filterArray = array();
     	$filterArray[] = $playlistFilter;
     	$playlistExecute = $this->_client->playlist->executeFromFilters($filterArray, 10);
@@ -173,6 +173,7 @@ class ZendClientTester
 		$entry = new Kaltura_Client_Type_MediaEntry();
     	$entry->name = self::ENTRY_NAME;
     	$entry->mediaType = Kaltura_Client_Enum_MediaType::IMAGE;
+    	$entry->tags = uniqid('test_');
     	$entry = $this->_client->media->add($entry);
     	
     	$uploadToken = new Kaltura_Client_Type_UploadToken();
