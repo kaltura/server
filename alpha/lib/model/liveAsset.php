@@ -53,8 +53,9 @@ class liveAsset extends flavorAsset
 	protected static function validateFileSyncSubType($sub_type)
 	{
 		if(	$sub_type == self::FILE_SYNC_ASSET_SUB_TYPE_LIVE_PRIMARY || 
-			$sub_type == self::FILE_SYNC_ASSET_SUB_TYPE_LIVE_SECONDARY||
-			$sub_type == self::FILE_SYNC_ASSET_SUB_TYPE_LIVE_PRIMARY_DATA)
+			$sub_type == self::FILE_SYNC_ASSET_SUB_TYPE_LIVE_SECONDARY ||
+			$sub_type == self::FILE_SYNC_ASSET_SUB_TYPE_LIVE_PRIMARY_DATA ||
+			$sub_type == self::FILE_SYNC_ASSET_SUB_TYPE_LIVE_SECONDARY_DATA)
 		{
 			return true;
 		}
