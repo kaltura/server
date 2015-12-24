@@ -33,7 +33,7 @@ class kAccessControlServeRemoteEdgeServerAction extends kRuleAction
 	
 	public function applyDeliveryProfileDynamicAttributes(DeliveryProfileDynamicAttributes $deliveryAttributes)
 	{	
-		$edgeServers = ServerNodePeer::retrieveOrderedServerNodesArrayByPKs($this->edgeServerIds);
+		$edgeServers = ServerNodePeer::retrieveRegisteredServerNodesArrayByPKs($this->edgeServerIds);
 		if(!count($edgeServers))
 			return false;
 		

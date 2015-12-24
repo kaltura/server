@@ -48,23 +48,6 @@ class ServerNodePeer extends BaseServerNodePeer {
 		return ServerNodePeer::doSelectOne($c);
 	}
 	
-	public static function retrieveOrderedServerNodesArrayByPKs($pks, PropelPDO $con = null)
-	{
-		if (empty($pks)) {
-			$objs = array();
-		}
-		else {
-			$criteria = new Criteria(ServerNodePeer::DATABASE_NAME);
-			$criteria->add(ServerNodePeer::ID, $pks, Criteria::IN);
-			$criteria->add(ServerNodePeer::STATUS, ServerNodeStatus::ACTIVE);
-			$orderBy = "FIELD (" . self::ID . "," . implode(",", $pks) . ")";  // first take the pattner_id and then the rest
-			$criteria->addAscendingOrderByColumn($orderBy);
-			$objs = ServerNodePeer::doSelect($criteria, $con);
-		}
-	
-		return $objs;
-	}
-	
 	public static function retrieveRegisteredServerNodesArrayByPKs($pks, $ttl = null, PropelPDO $con = null)
 	{
 		if (empty($pks)) {
