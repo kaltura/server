@@ -32,14 +32,76 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 
 	private function handleConvertLiveSegmentJobFinished(BatchJob $dbBatchJob, kConvertLiveSegmentJobData $data)
 	{
-		$recordedVODDurationInMS = $data->getDuration();
-		self::copyCuePointsFromLiveToVodEntry($dbBatchJob->getEntry()->getRecordedEntryId(), $recordedVODDurationInMS, $recordedVODDurationInMS, $data->getAmfArray());
+		$files = self::getAssetDataFilesArray($data);
+
+		$amfArray = unserialize(file_get_contents($files[0]));
+		$recordedVODDurationInMS = $amfArray[0];
+		array_shift($amfArray);
+		if (!unlink($files[0]))
+			KalturaLog::warning("failed to delete file " . $files[0]);
+
+		$amfArray = self::parseAmfArrayAndShift($amfArray, 0);
+		self::copyCuePointsFromLiveToVodEntry($dbBatchJob->getEntry()->getRecordedEntryId(), $recordedVODDurationInMS, $recordedVODDurationInMS, $amfArray);
 	}
 
 	private function handleConcatJobFinished(BatchJob $dbBatchJob, kConcatJobData $data)
 	{
 		$convertJobData = ($dbBatchJob->getParentJob()->getData());
-		self::copyCuePointsFromLiveToVodEntry( $dbBatchJob->getParentJob()->getEntry()->getRecordedEntryId(), $data->getConcatenatedDuration(), $convertJobData->getDuration(), $convertJobData->getAmfArray());
+		$files = self::getAssetDataFilesArray($convertJobData);
+		$lastFileIndex = $convertJobData->getFileIndex();
+		$segmentDuration = 0;
+		$amfArray = array();
+
+		foreach($files as $file){
+			KalturaLog::debug('file is: ' . $file);
+
+			if (self::getSegmentIndexFromFileName($file) <= $lastFileIndex){
+				$arr = unserialize(file_get_contents($files[0]));
+				$currentSegmentDuration = $arr[0];
+				array_shift($arr);
+
+				$amfArray = array_merge($amfArray, self::parseAmfArrayAndShift($arr, $segmentDuration));
+				$segmentDuration += $currentSegmentDuration;
+				if (!unlink($file))
+					KalturaLog::warning("failed to delete file " . $file);
+			}
+		}
+		self::copyCuePointsFromLiveToVodEntry( $dbBatchJob->getParentJob()->getEntry()->getRecordedEntryId(), $data->getConcatenatedDuration(), $segmentDuration, $amfArray);
+	}
+
+
+	// Get an array of strings of the form pts;ts and return an array of KAMFData
+	private static function parseAmfArrayAndShift($amfArray, $shift){
+		$retArr = array();
+
+		for($i=0; $i < count($amfArray); ++$i){
+			$amf = new KAMFData();
+			$amfParts = explode(';', $amfArray[$i]);
+			$amf->pts = $amfParts[0] + $shift;
+			$amf->ts = $amfParts[1];
+
+			KalturaLog::debug('adding AMF to AMFs: ' . print_r($amf, true) . ' extracted from ' . $amfArray[$i]);
+			array_push($retArr, $amf);
+		}
+		return $retArr;
+	}
+
+	private function getAssetDataFilesArray(kConvertLiveSegmentJobData $data){
+
+		$amfFilesDir = dirname($data->getDestDataFilePath());
+		$pattern = "/{$data->getEntryId()}_{$data->getAssetId()}_{$data->getMediaServerIndex()}_[0-9]*.data/";
+		$files = kFile::recursiveDirList($amfFilesDir, true, false, $pattern);
+		KalturaLog::debug('getAssetDataFilesArray - files: ' . print_r($files, true));
+		natsort($files);
+		KalturaLog::debug('getAssetDataFilesArray2 - files: ' . print_r($files, true));
+		return $files;
+	}
+
+	private function getSegmentIndexFromFileName($filePath)
+	{
+		$lastUnderscore = strrpos($filePath, '_');
+		$lastDot = strrpos($filePath, '.');
+		return substr($filePath, $lastUnderscore+1, $lastUnderscore-$lastDot-2);
 	}
 
 	/* (non-PHPdoc)
@@ -55,11 +117,16 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 			$dbBatchJob->getStatus() == BatchJob::BATCHJOB_STATUS_FINISHED &&
 			$data->getFileIndex() == 0 &&
 			$data->getMediaServerIndex() == MediaServerIndex::PRIMARY){
-			return true;
+			$asset = assetPeer::retrieveByIdNoFilter($data->getAssetId());
+			if ($asset->hasTag(assetParams::TAG_RECORDING_ANCHOR))
+				return true;
 		}
 
-		if ($jobType == BatchJobType::CONCAT && $dbBatchJob->getStatus() == BatchJob::BATCHJOB_STATUS_FINISHED){
-			return true;
+		elseif ($jobType == BatchJobType::CONCAT && $dbBatchJob->getStatus() == BatchJob::BATCHJOB_STATUS_FINISHED){
+			$convertLiveSegmentJobData = $dbBatchJob->getParentJob()->getData();
+			$asset = assetPeer::retrieveByIdNoFilter($convertLiveSegmentJobData->getAssetId());
+			if ($asset->hasTag(assetParams::TAG_RECORDING_ANCHOR))
+				return true;
 		}
 
 		return false;
@@ -598,7 +665,7 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 		$currentSegmentEndTime = self::getSegmentEndTime($amfArray, $lastSegmentDuration);
 		$currentSegmentStartTime = self::getSegmentStartTime($amfArray);
 
-		$amfArray = self::parseAMFs($amfArray, $totalVODDuration, $lastSegmentDuration);
+		self::normalizeAMFTimes($amfArray, $totalVODDuration, $lastSegmentDuration);
 
 		KalturaLog::log("Saving the live entry [{$liveEntry->getId()}] cue points into the associated VOD entry [{$vodEntry->getId()}]");
 
@@ -643,6 +710,7 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 
 	private static function getOffsetForTimestamp($timestamp, $amfArray){
 		KalturaLog::debug('getOffsetForTimestamp ' . $timestamp);
+		KalturaLog::debug('amfArray ' . print_r($amfArray, true));
 
 		$minDistanceAmf = self::getClosestAMF($timestamp, $amfArray);
 
@@ -658,6 +726,9 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 			KalturaLog::debug('timestamp is after ' . print_r($minDistanceAmf, true));
 			$ret = $minDistanceAmf->pts + ($timestamp - $minDistanceAmf->ts);
 		}
+
+		// make sure we don't get a negative time
+		$ret = max($ret,0);
 
 		KalturaLog::debug('AMFs array is:' . print_r($amfArray, true) . 'getOffsetForTimestamp returning ' . $ret);
 		return $ret;
@@ -700,21 +771,11 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 		return $ret;
 	}
 
-	// Get an array of strings of the form pts;ts and return an array of KAMFData
-	private static function parseAMFs($amfArray, $totalVODDuration, $currentSegmentDuration){
-		$retArr = array();
-
-		for($i=0; $i < count($amfArray); ++$i){
-			$amf = new KAMFData();
-			$amfParts = explode(';', $amfArray[$i]);
-			$amf->pts = $amfParts[0] + $totalVODDuration - $currentSegmentDuration;
-			$amf->ts = $amfParts[1];
-
-			KalturaLog::debug('adding AMF to AMFs: ' . print_r($amf, true) . ' extracted from ' . $amfArray[$i]);
-			array_push($retArr, $amf);
+	// change the PTS of every amf to be relative to the beginning of the recording, and not to the beginning of the segment
+	private static function normalizeAMFTimes(&$amfArray, $totalVODDuration, $currentSegmentDuration){
+		foreach($amfArray as $key=>$amf){
+			$amfArray[$key]->pts = $amfArray[$key]->pts  + $totalVODDuration - $currentSegmentDuration;
 		}
-
-		return $retArr;
 	}
 
 	private static function getSegmentEndTime($amfArray, $segmentDuration){
@@ -722,11 +783,7 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 			KalturaLog::warning("getSegmentEndTime got an empty AMFs array - returning 0 as segment end time");
 			return 0;
 		}
-		$amfParts = explode(';', $amfArray[0]);
-		$ts = $amfParts[0];
-		$pts = $amfParts[1];
-
-		return ($pts - $ts + $segmentDuration)/1000;
+		return ($amfArray[0]->ts - $amfArray[0]->pts + $segmentDuration) / 1000;
 	}
 
 	private static function getSegmentStartTime($amfArray){
@@ -734,11 +791,7 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 			KalturaLog::warning("getSegmentStartTime got an empty AMFs array - returning 0 as segment end time");
 			return 0;
 		}
-		$amfParts = explode(';', $amfArray[0]);
-		$ts = $amfParts[0];
-		$pts = $amfParts[1];
-
-		return ($pts - $ts)/1000;
+		return ($amfArray[0]->ts - $amfArray[0]->pts) / 1000;
 	}
 
 	protected function reIndexCuePointEntry(CuePoint $cuePoint)

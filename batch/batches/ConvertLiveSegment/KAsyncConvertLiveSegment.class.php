@@ -72,7 +72,6 @@ class KAsyncConvertLiveSegment extends KJobHandlerWorker
 
 		$ffmpegBin = KBatchBase::$taskConfig->params->ffmpegCmd;
 		$ffprobeBin = isset(KBatchBase::$taskConfig->params->ffprobeCmd)? KBatchBase::$taskConfig->params->ffprobeCmd: "ffprobe";
-		$mediaInfoBin = isset(KBatchBase::$taskConfig->params->mediaInfoCmd)? KBatchBase::$taskConfig->params->mediaInfoCmd: "mediainfo";
 
 		$fileName = "{$job->entryId}_{$jobData->assetId}_{$data->mediaServerIndex}.{$job->id}.ts";
 		$localTempFilePath = $this->localTempPath . DIRECTORY_SEPARATOR . $fileName;
@@ -82,36 +81,55 @@ class KAsyncConvertLiveSegment extends KJobHandlerWorker
 		if(! $result)
 			return $this->closeJob($job, KalturaBatchJobErrorTypes::RUNTIME, null, "Failed to convert file", KalturaBatchJobStatus::FAILED);
 
+		// write AMF data to a file in shared storage
+		self::generateAmfData($job, $data, $localTempFilePath);
+
+		return $this->moveFile($job, $data, $localTempFilePath, $sharedTempFilePath);
+	}
+
+	protected function generateAmfData(KalturaBatchJob $job, KalturaConvertLiveSegmentJobData $data, $localTempFilePath)
+	{
+		$mediaInfoBin = isset(KBatchBase::$taskConfig->params->mediaInfoCmd)? KBatchBase::$taskConfig->params->mediaInfoCmd: "mediainfo";
+
 		// only extract the data if it's the primary server since we don't use this data in the secondary
 		if ($data->mediaServerIndex == KalturaMediaServerIndex::PRIMARY) {
 			try {
+
+				// get the asset to check if it has a assetParams::TAG_RECORDING_ANCHOR tag.
+				// note that assetParams::TAG_RECORDING_ANCHOR is not exposed in the API so I use it's string value.
+				KBatchBase::impersonate($job->partnerId);
+				$asset = KBatchBase::$kClient->flavorAsset->get($data->assetId);
+				KBatchBase::unimpersonate();
+				KalturaLog::debug('asset is: ' . print_r($asset, true));
+				if (strpos($asset->tags,'recording_anchor') == false) {
+					return;
+				}
+
 				// Extract AMF data from all data frames in the segment
 				$amfParser = new KAMFMediaInfoParser($data->srcFilePath);
 				$amfArray = $amfParser->getAMFInfo();
 
-				$keyValueArray = array();
-
-				foreach ($amfArray as $key => $value) {
-					$tmp = new KalturaKeyValue();
-					$tmp->key = $key;
-					$tmp->value = $value;
-					$keyValueArray[] = $tmp;
-				}
-
-				$data->amfArray = $keyValueArray;
-
 				// run mediaInfo on $localTempFilePath to get it's duration, and store it in the job data
 				$mediaInfoParser = new KMediaInfoMediaParser($localTempFilePath, $mediaInfoBin);
-				$data->duration = $mediaInfoParser->getMediaInfo()->videoDuration;
+				$duration = $mediaInfoParser->getMediaInfo()->videoDuration;
+
+				array_unshift($amfArray, $duration);
+
+				$amfFileName = "{$data->entryId}_{$data->assetId}_{$data->mediaServerIndex}_{$data->fileIndex}.data";
+				$localTempAmfFilePath = $this->localTempPath . DIRECTORY_SEPARATOR . $amfFileName;
+				$sharedTempAmfFilePath = $this->sharedTempPath . DIRECTORY_SEPARATOR . $amfFileName;
+
+				file_put_contents($localTempAmfFilePath, serialize($amfArray));
+
+				self::moveDataFile($data, $localTempAmfFilePath, $sharedTempAmfFilePath);
 			}
 			catch(Exception $ex) {
+				KBatchBase::unimpersonate();
 				KalturaLog::warning('failed to extract AMF data or duration data ' . print_r($ex));
 			}
 		}
-
-		return $this->moveFile($job, $data, $localTempFilePath, $sharedTempFilePath);
 	}
-	
+
 	/**
 	 * @param KalturaBatchJob $job
 	 * @param KalturaConcatJobData $data
@@ -134,6 +152,19 @@ class KAsyncConvertLiveSegment extends KJobHandlerWorker
 		
 		$data->destFilePath = $sharedTempFilePath;
 		return $this->closeJob($job, null, null, 'Succesfully moved file', KalturaBatchJobStatus::FINISHED, $data);
+	}
+
+	protected function moveDataFile(KalturaConvertLiveSegmentJobData $data, $localTempAmfFilePath, $sharedTempAmfFilePath)
+	{
+		KalturaLog::debug('moving file from ' . $localTempAmfFilePath . ' to ' . $sharedTempAmfFilePath);
+		kFile::moveFile($localTempAmfFilePath, $sharedTempAmfFilePath, true);
+		clearstatcache();
+		$fileSize = kFile::fileSize($sharedTempAmfFilePath);
+		$this->setFilePermissions($sharedTempAmfFilePath);
+		if(! $this->checkFileExists($sharedTempAmfFilePath, $fileSize))
+			KalturaLog::warning('failed to move file to ' . $sharedTempAmfFilePath);
+		else
+			$data->destDataFilePath = $sharedTempAmfFilePath;
 	}
 	
 	protected function convertRecordedToMPEGTS($ffmpegBin, $ffprobeBin, $inFilename, $outFilename)

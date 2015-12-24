@@ -41,14 +41,9 @@ class kConvertLiveSegmentJobData extends kJobData
 	private $endTime;
 
 	/**
-	 * @var array
+	 * @var string
 	 */
-	private $amfArray;
-
-	/**
-	 * @var float
-	 */
-	private $duration;
+	private $destDataFilePath;
 
 	/**
 	 * @return string $entryId
@@ -80,6 +75,14 @@ class kConvertLiveSegmentJobData extends kJobData
 	public function getDestFilePath()
 	{
 		return $this->destFilePath;
+	}
+
+	/**
+	 * @return string $destDataFilePath
+	 */
+	public function getDestDataFilePath()
+	{
+		return $this->destDataFilePath;
 	}
 
 	/**
@@ -123,6 +126,14 @@ class kConvertLiveSegmentJobData extends kJobData
 	}
 
 	/**
+	 * @param string $destDataFilePath
+	 */
+	public function setDestDataFilePath($destDataFilePath)
+	{
+		$this->destDataFilePath = $destDataFilePath;
+	}
+
+	/**
 	 * @param float $endTime
 	 */
 	public function setEndTime($endTime)
@@ -160,37 +171,5 @@ class kConvertLiveSegmentJobData extends kJobData
 	public function setAssetId($assetId)
 	{
 		$this->assetId = $assetId;
-	}
-
-	/**
-	 * @return the $amfArray
-	 */
-	public function getAmfArray()
-	{
-		return $this->amfArray;
-	}
-
-	/**
-	 * @param KalturaKeyValueArray $amfArray
-	 */
-	public function setAmfArray($amfArray)
-	{
-		$this->amfArray = $amfArray;
-	}
-
-	/**
-	 * @return the $duration
-	 */
-	public function getDuration()
-	{
-		return $this->duration;
-	}
-
-	/**
-	 * @param float $duration
-	 */
-	public function setDuration($duration)
-	{
-		$this->duration = $duration;
 	}
 }

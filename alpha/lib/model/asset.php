@@ -93,6 +93,9 @@ class asset extends Baseasset implements ISyncableFile, IRelatedObject
 
 	const FILE_SYNC_ASSET_SUB_TYPE_MPD = 7;
 
+	const FILE_SYNC_ASSET_SUB_TYPE_LIVE_PRIMARY_DATA = 8;
+	const FILE_SYNC_ASSET_SUB_TYPE_LIVE_SECONDARY_DATA = 9;
+
 	const CUSTOM_DATA_FIELD_PARTNER_DESCRIPTION = "partnerDescription";
 	const CUSTOM_DATA_FIELD_PARTNER_DATA = "partnerData";
 	const CUSTOM_DATA_FIELD_ACTUAL_SOURCE_ASSET_PARAMS_IDS = "actualSourceParamsIds";
