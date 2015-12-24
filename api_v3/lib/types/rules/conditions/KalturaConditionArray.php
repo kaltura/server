@@ -56,6 +56,8 @@ class KalturaConditionArray extends KalturaTypedArray
 			    return new KalturaHashCondition();
 			case ConditionType::DELIVERY_PROFILE:
 				return new KalturaDeliveryProfileCondition();
+			case ConditionType::ACTIVE_EDGE_VALIDATE:
+				return new KalturaValidateActiveEdgeCondition();
 			default:
 			     return KalturaPluginManager::loadObject('KalturaCondition', $dbObject->getType());
 		}
