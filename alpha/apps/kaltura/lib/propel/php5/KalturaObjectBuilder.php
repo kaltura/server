@@ -715,7 +715,7 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 			
 			if($customDataColumn) {
 				$script .= "
-			\$modifiedColumns[kObjectChangedEvent::CUSTOM_DATA_OLD_VALUES] = \$this->oldCustomDataValues;";
+			\$modifiedColumns[kObjectChangedEvent::CUSTOM_DATA_OLD_VALUES] = \$this->tempOldCustomDataValues;";
 			}
 			
 			$script .= "
@@ -723,6 +723,7 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 		}
 			
 		\$this->tempModifiedColumns = array();
+		\$this->tempOldCustomDataValues = array();
 		";
 		}
 		else
@@ -764,6 +765,12 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 	 * @var array
 	 */
 	private \$tempModifiedColumns = array();
+
+	/**
+	 * Saves the old custom data values  temporarily while saving
+	 * @var array
+	 */
+	private \$tempOldCustomDataValues = array();
 	
 	/**
 	 * Returns whether the object has been modified.
@@ -814,6 +821,7 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 		$script .= "
 		
 		\$this->tempModifiedColumns = \$this->modifiedColumns;
+		\$this->tempOldCustomDataValues = \$this->oldCustomDataValues;
 		return parent::preUpdate(\$con);
 	}
 	";
@@ -1025,6 +1033,9 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 	 */
 	public function getCustomDataOldValues()
 	{
+		if(\$this->tempOldCustomDataValues)
+			return \$this->tempOldCustomDataValues;
+
 		return \$this->oldCustomDataValues;
 	}
 	
@@ -1046,7 +1057,8 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 			\$this->oldCustomDataValues[\$currentNamespace] = array();
 		if(!isset(\$this->oldCustomDataValues[\$currentNamespace][\$name]))
 			\$this->oldCustomDataValues[\$currentNamespace][\$name] = \$customData->get(\$name, \$namespace);
-		
+
+		\$this->tempOldCustomDataValues = \$this->oldCustomDataValues;
 		\$customData->put ( \$name , \$value , \$namespace );
 	}
 
