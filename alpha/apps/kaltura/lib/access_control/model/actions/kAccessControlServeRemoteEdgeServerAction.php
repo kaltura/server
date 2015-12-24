@@ -6,9 +6,9 @@
 class kAccessControlServeRemoteEdgeServerAction extends kRuleAction 
 {
 	/**
-	 * @var array
+	 * @var string
 	 */
-	protected $edgeServerIds = array();
+	protected $edgeServerIds;
 	
 	
 	public function __construct() 
@@ -21,19 +21,21 @@ class kAccessControlServeRemoteEdgeServerAction extends kRuleAction
 	 */
 	public function getEdgeServerIds() 
 	{
-		return implode(',', $this->edgeServerIds);
+		return $this->edgeServerIds;
 	}
 	/**
 	 * @param array $edgeServerIds
 	 */
 	public function setEdgeServerIds($edgeServerIds) 
 	{
-		$this->edgeServerIds = explode(',', $edgeServerIds);
+		$this->edgeServerIds = $edgeServerIds;
 	}
 	
 	public function applyDeliveryProfileDynamicAttributes(DeliveryProfileDynamicAttributes $deliveryAttributes)
 	{	
-		$edgeServers = ServerNodePeer::retrieveRegisteredServerNodesArrayByPKs($this->edgeServerIds);
+		$edgeServerIds = explode(',', $this->getEdgeServerIds());
+		
+		$edgeServers = ServerNodePeer::retrieveRegisteredServerNodesArrayByPKs($edgeServerIds);
 		if(!count($edgeServers))
 			return false;
 		
