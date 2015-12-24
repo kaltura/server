@@ -8,6 +8,11 @@
 class KAsyncConvertLiveSegment extends KJobHandlerWorker
 {
 	/**
+	 * constants duplicated from assetParams.php
+	 */
+	const TAG_RECORDING_ANCHOR = 'recording_anchor';
+
+	/**
 	 * @var string
 	 */
 	protected $localTempPath;
@@ -100,7 +105,7 @@ class KAsyncConvertLiveSegment extends KJobHandlerWorker
 				KBatchBase::impersonate($job->partnerId);
 				$asset = KBatchBase::$kClient->flavorAsset->get($data->assetId);
 				KBatchBase::unimpersonate();
-				if (strpos($asset->tags,'recording_anchor') == false) {
+				if (strpos($asset->tags,self::TAG_RECORDING_ANCHOR) == false) {
 					return;
 				}
 
