@@ -7,6 +7,7 @@
  - php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
 #### Configuration ####
  - Validate facebook.ini exists in the configuration directory
+ - Added FacebookDistribution to plugins.ini
 #### Known Issues & Limitations ####
 None.
 #### Deployment scripts ####
