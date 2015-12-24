@@ -366,7 +366,7 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 		$deliveryUrl = null;
 	
 		$deliveryNodeIds = $this->params->getEdgeServerIds();
-		$deliveryNodes = ServerNodePeer::retrieveOrderedServerNodesArrayByPKs($deliveryNodeIds);
+		$deliveryNodes = ServerNodePeer::retrieveRegisteredServerNodesArrayByPKs($deliveryNodeIds);
 	
 		if(!count($deliveryNodes))
 		{
