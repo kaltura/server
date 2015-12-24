@@ -12,17 +12,9 @@ class KalturaValidateActiveEdgeCondition extends KalturaCondition
 	 */
 	public $edgeServerIds;
 	
-	/**
-	 * Time limit since last heartbeat in seconds
-	 *
-	 * @var int
-	 */
-	public $ttl;
-	
 	private static $mapBetweenObjects = array
 	(
 		'edgeServerIds',
-		'ttl',
 	);
 	
 	/**

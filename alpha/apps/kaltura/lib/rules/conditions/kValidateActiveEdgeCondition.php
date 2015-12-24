@@ -22,13 +22,6 @@ class kValidateActiveEdgeCondition extends kCondition
 	protected $edgeServerIds = array();
 	
 	/**
-	 * Time limit since last heartbeat in seconds
-	 *
-	 * @var int
-	 */
-	protected $ttl;
-	
-	/**
 	 * @param string $edgeServerIds
 	 */
 	public function setEdgeServerIds($edgeServerIds)
@@ -44,29 +37,13 @@ class kValidateActiveEdgeCondition extends kCondition
 		return implode(',', $this->edgeServerIds);
 	}
 	
-	/**
-	 * @param int $ttl
-	 */
-	public function setTtl($ttl)
-	{
-		$this->ttl = $ttl;
-	}
-	
-	/**
-	 * @return array
-	 */
-	function getTtl()
-	{
-		return $this->ttl;
-	}
-	
 	/* (non-PHPdoc)
 	 * @see kCondition::internalFulfilled()
 	 */
 	protected function internalFulfilled(kScope $scope)
 	{
 		KalturaLog::debug("Validating edge server [{$this->getEdgeServerIds()}] are active");
-		$edgeServers = ServerNodePeer::retrieveRegisteredServerNodesArrayByPKs($this->edgeServerIds, $this->ttl);
+		$edgeServers = ServerNodePeer::retrieveRegisteredServerNodesArrayByPKs($this->edgeServerIds);
 		
 		if(!count($edgeServers)) 
 		{
