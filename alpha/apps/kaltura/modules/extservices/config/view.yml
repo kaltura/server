@@ -3,3 +3,9 @@ googleoauth2Success:
   layout:         helplayout
   javascripts:    [ -*, /lib/js/jquery-1.8.3.min.js, /lib/js/googleoauth2 ]
   stylesheets:  [ -*, /lib/css/googleoauth2 ]
+  
+facebookoauth2Success:
+  has_layout:     on
+  layout:         helplayout
+  javascripts:    [ -*, /lib/js/jquery-1.8.3.min.js, /lib/js/facebookoauth2 ]
+  stylesheets:  [ -*, /lib/css/facebookoauth2 ]
