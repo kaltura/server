@@ -73,11 +73,12 @@ class FacebookDistributionProfile extends ConfigurableDistributionProfile
 		    return $validationErrors;
 		}
 		if ($allFieldValues[FacebookDistributionField::SCHEDULE_PUBLISHING_TIME] &&
-			!dateUtils::isWithinLimitsFromNow($allFieldValues[FacebookDistributionField::SCHEDULE_PUBLISHING_TIME],
+			$allFieldValues[FacebookDistributionField::SCHEDULE_PUBLISHING_TIME] > time() &&
+			!dateUtils::isWithinTimeFrame($allFieldValues[FacebookDistributionField::SCHEDULE_PUBLISHING_TIME],
 				FacebookConstants::FACEBOOK_MIN_POSTPONE_POST_IN_SECONDS,
 				FacebookConstants::FACEBOOK_MAX_POSTPONE_POST_IN_SECONDS))
 		{
-			KalturaLog::err("Scheduled time to publish defies the facebook restriction of six minute to six months from now ");
+			KalturaLog::err("Scheduled time to publish defies the facebook restriction of six minute to six months from now got".$allFieldValues[FacebookDistributionField::SCHEDULE_PUBLISHING_TIME]);
 			$validationErrors[] = $this->createCustomValidationError($action, DistributionErrorType::INVALID_DATA, 'sunrise', 'Distribution sunrise is invalid (should be 6 minutes to 6 months from now)');
 		}
 	    $validationErrors = array_merge($validationErrors, $this->validateInListOrNull($inListOrNullFields, $allFieldValues, $action));

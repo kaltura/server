@@ -7,7 +7,8 @@
 class FacebookDistributionEngine extends DistributionEngine implements
 	IDistributionEngineSubmit,
 	IDistributionEngineDelete,
-	IDistributionEngineUpdate
+	IDistributionEngineUpdate,
+	IDistributionEngineCloseSubmit
 {
 	protected $appId;
 	protected $appSecret;
@@ -73,13 +74,21 @@ class FacebookDistributionEngine extends DistributionEngine implements
 			throw new Exception("Failed to submit facebook video , reason:".$e->getMessage());
 		}
 		return true;
+	}
+
+	/**
+	 * check for submission closure in case the submission is asynchronous.
+	 * @param KalturaDistributionSubmitJobData $data
+	 * @return bool true if finished, false if will be finished asynchronously
+	 */
+	public function closeSubmit(KalturaDistributionSubmitJobData $data)
+	{
+//		// we need a valid video in order to upload captions
 //		foreach ($data->providerData->captionsInfo as $captionInfo)
 //		{
-//			if ($captionInfo->action == KalturaDistributionAction::SUBMIT)
-//			{
-//				$this->submitCaption($captionInfo, $data->remoteId);
-//			}
+//			$this->submitCaption($data->distributionProfile, $captionInfo, $data->remoteId);
 //		}
+		return true;
 	}
 
 	/* (non-PHPdoc)
@@ -108,29 +117,30 @@ class FacebookDistributionEngine extends DistributionEngine implements
 //		foreach ($data->providerData->captionsInfo as $captionInfo) {
 //			switch ($captionInfo->action) {
 //				case KalturaDistributionAction::SUBMIT:
-//					$data->mediaFiles[] = $this->submitCaption($distributionProfile, $captionInfo, $data->entryDistribution->remoteId);
+//					$data->mediaFiles[] = $this->submitCaption($data->distributionProfile, $captionInfo, $data->entryDistribution->remoteId);
 //					break;
 //				case KalturaDistributionAction::DELETE:
-//					$this->deleteCaption($distributionProfile, $captionInfo, $data->entryDistribution->remoteId);
+//					$this->deleteCaption($data->distributionProfile, $captionInfo, $data->entryDistribution->remoteId);
 //					break;
 //			}
 //		}
 		return true;
 	}
 
-//	private function submitCaption(KalturaFacebookDistributionProfile $distributionProfile, KalturaCaptionDistributionInfo $captionInfo, $remoteId)
-//	{
-//		$status = FacebookGraphSdkUtils::uploadCaptions(
-//			$this->appId,
-//			$this->appSecret,
-//			$distributionProfile->getPageAccessToken(),
-//			$remoteId,
-//			$captionInfo->filePath,
-//			$captionInfo->language,
-//			$this->tempDirectory);
-//		return $status;
-//	}
-//
+	private function submitCaption(KalturaFacebookDistributionProfile $distributionProfile, KalturaCaptionDistributionInfo $captionInfo, $remoteId)
+	{
+		if (!$captionInfo->label)
+			throw new Exception("Captions must have a label according to Facebook's acceptable values (i.e. en_US), found ".$captionInfo->label);
+		$status = FacebookGraphSdkUtils::uploadCaptions(
+			$this->appId,
+			$this->appSecret,
+			$distributionProfile->getPageAccessToken(),
+			$remoteId,
+			$captionInfo->filePath,
+			$captionInfo->label,
+			$this->tempDirectory);
+		return $status;
+	}
 	/* (non-PHPdoc)
 	 * @see IDistributionEngineDelete::delete()
 	*/
@@ -197,7 +207,8 @@ class FacebookDistributionEngine extends DistributionEngine implements
 		}
 		if ($isSubmit) // these fields should not update
 		{
-			if ($fieldValues[FacebookDistributionField::SCHEDULE_PUBLISHING_TIME])
+			if ($fieldValues[FacebookDistributionField::SCHEDULE_PUBLISHING_TIME] &&
+				$fieldValues[FacebookDistributionField::SCHEDULE_PUBLISHING_TIME] > time())
 			{
 				$facebookMetadata['scheduled_publish_time'] = $fieldValues[FacebookDistributionField::SCHEDULE_PUBLISHING_TIME];
 				$facebookMetadata['published'] = 'false';
@@ -205,6 +216,5 @@ class FacebookDistributionEngine extends DistributionEngine implements
 		}
 		return $facebookMetadata;
 	}
-
 
 }
