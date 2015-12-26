@@ -1114,27 +1114,27 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 	 * @throws kCoreException
      */
 	public static function copyEntry(entry $entry, Partner $toPartner = null,
-									 array $coreFormatClonedOptionsArray)
+									 array $cloneOptions)
  	{
  		KalturaLog::log("copyEntry - Copying entry [".$entry->getId()."] to partner [".$toPartner->getId().
-			" ] with clone options [ ".print_r($coreFormatClonedOptionsArray, true)." ]");
+			" ] with clone options [ ".print_r($cloneOptions, true)." ]");
 
-		$entry->setClonedOption($coreFormatClonedOptionsArray);
+		$entry->setClonedOption($cloneOptions);
 		$copyUsers = true;
 		$copyCategories = true;
 
 		/* @var kBaseEntryCloneOptionComponent $cloneOption */
-		foreach ($coreFormatClonedOptionsArray as $cloneOption)
+		foreach ($cloneOptions as $cloneOption)
 		{
 			$currentOption = $cloneOption->getItemType();
-			$currentType = $cloneOption->isRule();
+			$currentType = $cloneOption->getRule();
 
-			if ($currentOption == BaseEntryCloneOptions::USERS && $currentType == false)
+			if ($currentOption == BaseEntryCloneOptions::USERS && $currentType == CloneComponentSelectorType::EXCLUDE_COMPONENT)
 			{
 				$copyUsers = false;
 			}
 
-			if ($currentOption == BaseEntryCloneOptions::CATEGORIES && $currentType == false)
+			if ($currentOption == BaseEntryCloneOptions::CATEGORIES && $currentType == CloneComponentSelectorType::EXCLUDE_COMPONENT)
 			{
 				$copyCategories = false;
 			}

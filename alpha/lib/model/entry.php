@@ -152,7 +152,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 
 	//An attribute that contains the rules by which this entry was created, only in case it was created
 	// via clone operation
-	private $cloned_options = array();
+	private $cloned_options = null;
 
 	private $archive_extension = null;
 	
@@ -928,7 +928,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	 * The method sets the options by which the current entry was cloned.
 	 * @param array $cloneOptionsArray
      */
-	public function setClonedOption(array $cloneOptionsArray=array())
+	public function setClonedOption(array $cloneOptionsArray)
 	{
 		$this->cloned_options = $cloneOptionsArray;
 	}

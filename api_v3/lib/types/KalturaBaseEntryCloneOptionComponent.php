@@ -14,7 +14,7 @@ class KalturaBaseEntryCloneOptionComponent extends KalturaBaseEntryCloneOptionIt
     /**
      * condition rule (include/exclude)
      *
-     * @var KalturaResponseProfileType
+     * @var KalturaCloneComponentSelectorType
      */
     public $rule;
 

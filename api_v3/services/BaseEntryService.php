@@ -863,7 +863,7 @@ class BaseEntryService extends KalturaEntryService
 	 * @return KalturaBaseEntry The cloned entry
 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
 	 */
-	public function cloneAction( $entryId, $cloneOptions)
+	public function cloneAction( $entryId, $cloneOptions=null)
 	{
 		// Reset criteria filters such that it will be
 		entryPeer::setUseCriteriaFilter(false);
@@ -875,15 +875,16 @@ class BaseEntryService extends KalturaEntryService
 		{
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 		}
-		$coreFormatClonedOptionsArray = array();
-		foreach ($cloneOptions as $item)
-		{
-			$coreFormatClonedOptionsArray[] = $item->toObject();
-		}
+//		$coreClonedOptionsArray = array();
+//		foreach ($cloneOptions as $item)
+//		{
+//			$coreClonedOptionsArray[] = $item->toObject();
+//		}
 
+		$coreClonedOptionsArray = $cloneOptions->toObjectsArray();
 
 		// Copy the entry into a new one based on the given partner data.
-		$clonedEntry = myEntryUtils::copyEntry($coreEntry, $this->getPartner(), $coreFormatClonedOptionsArray);
+		$clonedEntry = myEntryUtils::copyEntry($coreEntry, $this->getPartner(), $coreClonedOptionsArray);
 		return $this->getEntry($clonedEntry->getId());
 	}
 }

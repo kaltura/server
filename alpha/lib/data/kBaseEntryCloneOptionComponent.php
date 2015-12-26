@@ -5,16 +5,16 @@
  */
 class kBaseEntryCloneOptionComponent extends kBaseEntryCloneOptionItem
 {
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
     /**
      * @var int itemType - critera is a collection of properties of the entry. The list of properties of the same
      *                      criteria are not always copied during the clone operation
      */
     protected $itemType;
+
+    /**
+     * @var CloneComponentSelectorType - rule properties should be cloned yes/no
+     */
+    protected $rule = CloneComponentSelectorType::INCLUDE_COMPONENT;
 
     /**
      * @return int
@@ -33,33 +33,18 @@ class kBaseEntryCloneOptionComponent extends kBaseEntryCloneOptionItem
     }
 
     /**
-     * @var bool - rule properties should be cloned yes/no
+     * @return CloneComponentSelectorType
      */
-    protected $rule = true;
-
-    /**
-     * @return boolean
-     */
-    public function isRule()
+    public function getRule()
     {
         return $this->rule;
     }
 
     /**
-     * @param boolean $rule
+     * @param CloneComponentSelectorType $rule
      */
     public function setRule($rule)
     {
-        switch ($rule)
-        {
-            case ResponseProfileType::INCLUDE_FIELDS:
-                $this->rule = true;
-                break;
-            case ResponseProfileType::EXCLUDE_FIELDS:
-                $this->rule = false;
-                break;
-            default:
-                $this->rule = true;
-        }
+        $this->rule = $rule;
     }
 }
