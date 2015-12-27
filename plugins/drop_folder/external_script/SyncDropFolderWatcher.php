@@ -55,12 +55,13 @@ writeLog($logPrefix, 'file name:'.$fileName);
 writeLog($logPrefix, 'file size:'.$fileSize);
 
 
-$kClientConfig = new KalturaConfiguration(-1);
+$kClientConfig = new KalturaConfiguration();
 $kClientConfig->serviceUrl = $serviceUrl;
 $kClientConfig->curlTimeout = 180;
 $kClientConfig->setLogger(new SyncDropFolderWatcherLogger($logPrefix));
 
 $kClient = new KalturaClient($kClientConfig);
+$kClient->setPartnerId(-1);
 $dropFolderPlugin = KalturaDropFolderClientPlugin::get($kClient);
 
 try 
