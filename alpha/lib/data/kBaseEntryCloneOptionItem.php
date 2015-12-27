@@ -7,8 +7,4 @@
 abstract class kBaseEntryCloneOptionItem
 {
 
-    public function __construct()
-    {
-    }
-
 }
