@@ -64,7 +64,7 @@ class VisualRecognitionPlugin extends IntegrationProviderPlugin
 	
 		if($baseClass == 'KIntegrationEngine' || $baseClass == 'KIntegrationCloserEngine')
 		{
-			if($enumValue == VisualRecognitionProviderType::VISUAL_RECOGNITION)
+			if($enumValue == KalturaIntegrationProviderType::VISUAL_RECOGNITION)
 				return 'KVisualRecognitionEngine';
 		}
 		if($baseClass == 'IIntegrationProvider' && $enumValue == self::getIntegrationProviderCoreValue(VisualRecognitionProviderType::VISUAL_RECOGNITION))

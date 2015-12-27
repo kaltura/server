@@ -5,15 +5,21 @@
  */
 class KalturaVisualRecognitionJobProviderData extends KalturaIntegrationJobProviderData
 {
+
 	/**
-	 *
-	 * @var string
-	 */
-	public $recognizeElementURL;
-	
+         * @var int
+         */
+        public $thumbInterval;
+
+        /**
+         * list of job IDs from external service. These are auto populated, no need to send them
+         * @var KalturaKeyValueArray
+         */
+        public $externalJobs;
+
 	private static $map_between_objects = array
 	(
-		"recognizeElementURL" ,
+		"thumbInterval" , "externalJobs",
 	);
 
 	/* (non-PHPdoc)

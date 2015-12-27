@@ -3,26 +3,48 @@
  * @package plugins.visualRecognition
  * @subpackage model.data
  */
-class VisualRecognitionJobProviderData extends kIntegrationJobProviderData
+class kVisualRecognitionJobProviderData extends kIntegrationJobProviderData
 {
 	/**
-	 * @var string
+	 * @var int
 	 */
-	private  $recognizeElementURL;
-	
+	private  $thumbInterval;
+
+        /**
+         * @var KalturaKeyValueArray
+         */
+        private $externalJobs;
+
 	/**
-	 * @return string
+	 * @return int
 	 */
-	public function getExampleUrl()
+	public function getThumbInterval()
 	{
-		return $this->recognizeElementURL;
+		return $this->thumbInterval;
 	}
 
 	/**
-	 * @param string $recognizeElementURL
+	 * @param int $thumbInterval
 	 */
-	public function setRecognizeElementUrl($recognizeElementURL)
+	public function setThumbInterval($thumbInterval)
 	{
-		$this->recognizeElementURL = $recognizeElementURL;
+		$this->thumbInterval = $thumbInterval;
 	}
+
+        /**
+         * @return KalturaKeyValueArray
+       	 */
+	public function getExternalJobs()
+        {
+                return $this->externalJobs;
+        }
+
+       /**
+         * @var KalturaKeyValueArray
+       	 */
+       public function	setExternalJobs($externalJobs = array())
+       {
+              $this->externalJobs = $externalJobs;
+       }
+
 }
