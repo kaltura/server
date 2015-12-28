@@ -47,6 +47,29 @@ class KVisualRecognitionEngine implements KIntegrationCloserEngine
 		// To wait for closer, return false
 		// To fail, throw exception
 
+
+		// suppose here we call the nudity detector, and we call the function that says whether the entry is inappropriate or not, with the result and poviderData config we can do:
+                if(WhateverClassNameNudityDetector->isInappropriate())
+                {
+	                KBatchBase::impersonate($job->partnerId);
+	                switch($providerData->adultContentPolicy)
+	                {
+		                case KalturaVisualRecognitionAdultContentPolicy::AUTO_REJECT:
+			                KBatchBase::$kClient->baseEntry->reject($job->entryId);
+			                break;
+		                case KalturaVisualRecognitionAdultContentPolicy::AUTO_FLAG:
+			                $flag = new KalturaModerationFlag();
+			                $flag->flaggedEntryId = $job->entryId;
+			                $flag->flagType = KalturaModerationFlagType::SEXUAL_CONTENT'
+			                KBatchBase::$kClient->baseEntry->flag($flag);
+			                break;
+		                case KalturaVisualRecognitionAdultContentPolicy::IGNORE:
+		                default:
+			                // do nothing
+			                break;
+                	}
+                }
+
 		return false;
 	}
 
