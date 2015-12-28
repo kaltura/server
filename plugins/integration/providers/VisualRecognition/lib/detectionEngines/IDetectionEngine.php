@@ -16,7 +16,7 @@ interface IDetectionEngine
 	/*
 	 * method that will call 3rd party service and return external token / job ID
 	 */
-	public function initiateRecognition($thumbnailUrl);
+	public function initiateRecognition(array $thumbnailUrls);
 
 	/*
 	 * method that gets a token / job ID of previous call to the 3rd party,

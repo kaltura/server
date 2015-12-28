@@ -32,20 +32,21 @@ class ClarifaiDetectionEngine extends BaseDetectionEngine
 	/*
 	 * method that will call 3rd party service and return external token / job ID or false if not received one.
 	 */
-	public function initiateRecognition($thumbnailUrl)
+	public function initiateRecognition(array $thumbnailUrls)
 	{
 		$headersArray = array('Authorization: Bearer ' . self::$token);
-		$handle = $this->getCurlHandle(self::RECOGNIZE_URL, $headersArray);
-		$result = $this->execCurl($handle);
-		if (isset($result['status_code']) && $result['status_code'] == 'OK' && isset($result['results']) &&
-			isset($result['results'][0]) &&	isset($result['results'][0]['result']) &&
-			isset($result['results'][0]['result']['tag']) &&
-			isset($result['results'][0]['result']['tag']['classes']) &&
-			is_array($result['results'][0]['result']['tag']['classes'])) {
-			$this->currentResults = $result['results'][0]['result']['tag']['classes'];
-		} else {
-			return false;
+		foreach ($thumbnailUrls as $second => $thumbnailUrl) {
+			$handle = $this->getCurlHandle(self::RECOGNIZE_URL, $headersArray);
+			$result = $this->execCurl($handle);
+			if (isset($result['status_code']) && $result['status_code'] == 'OK' && isset($result['results']) &&
+				isset($result['results'][0]) &&	isset($result['results'][0]['result']) &&
+				isset($result['results'][0]['result']['tag']) &&
+				isset($result['results'][0]['result']['tag']['classes']) &&
+				is_array($result['results'][0]['result']['tag']['classes'])) {
+				$this->currentResults[$second] = $result['results'][0]['result']['tag']['classes'];
+			}
 		}
+
 		return true;
 	}
 
