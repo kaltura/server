@@ -51,7 +51,7 @@ class CloudsapiDetectionEngine extends BaseDetectionEngine
             $handle = $this->getCurlHandle(self::CHECK_URL . $token, $headersArray);
             $result = $this->execCurl($handle);
             if (!isset($result['status']) || $result['status'] == "not completed") {
-                KalturaLog::crit("BUGA returning false because not done in sec $second and token $token");
+                KalturaLog::info("BUGA returning false because not done in sec $second and token $token");
                 return false;
             } else {
                 if ($result['status'] == "completed") {

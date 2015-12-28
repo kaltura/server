@@ -47,7 +47,7 @@ class ClarifaiDetectionEngine extends BaseDetectionEngine
 			}
 		}
 
-		return true;
+		return $this->currentResults;
 	}
 
 	/*
