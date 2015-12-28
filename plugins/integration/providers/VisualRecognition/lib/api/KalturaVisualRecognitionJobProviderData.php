@@ -17,9 +17,15 @@ class KalturaVisualRecognitionJobProviderData extends KalturaIntegrationJobProvi
          */
         public $externalJobs;
 
+        /**
+         * adult content policy - auto-reject, flag, ignore
+         * @var KalturaVisualRecognitionAdultContentPolicy
+         */
+        public $adultContentPolicy;
+
 	private static $map_between_objects = array
 	(
-		"thumbInterval" , "externalJobs",
+		"thumbInterval" , "externalJobs", "adultContentPolicy",
 	);
 
 	/* (non-PHPdoc)

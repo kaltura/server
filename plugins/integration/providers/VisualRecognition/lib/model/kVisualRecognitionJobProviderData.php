@@ -16,6 +16,11 @@ class kVisualRecognitionJobProviderData extends kIntegrationJobProviderData
         private $externalJobs;
 
 	/**
+	 * @var bool
+	 */
+	private $adultContentPolicy;
+
+	/**
 	 * @return int
 	 */
 	public function getThumbInterval()
@@ -39,12 +44,27 @@ class kVisualRecognitionJobProviderData extends kIntegrationJobProviderData
                 return $this->externalJobs;
         }
 
-       /**
+        /**
          * @var KalturaKeyValueArray
        	 */
-       public function	setExternalJobs($externalJobs = array())
-       {
-              $this->externalJobs = $externalJobs;
-       }
+        public function	setExternalJobs($externalJobs = array())
+        {
+               $this->externalJobs = $externalJobs;
+        }
 
+	/**
+         * @return bool
+	 */
+	public function getAdultContentPolicy()
+	{
+		return $this->adultContentPolicy;
+	}
+
+	/**
+	 * @param bool $adultContentPolicy
+	 */
+	public function setAdultContentPolicy($adultContentPolicy)
+	{
+		$this->adultContentPolicy = $adultContentPolicy;
+	}
 }
