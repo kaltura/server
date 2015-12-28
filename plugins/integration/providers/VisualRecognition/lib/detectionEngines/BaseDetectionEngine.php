@@ -18,7 +18,7 @@ abstract class BaseDetectionEngine implements IDetectionEngine
 			$result[] = $thumbnailUrl;
 		} else {
 			for ($sec=0; $sec < $duration; $sec+=$interval) {
-				$result[$sec] = $thumbnailUrl . "/vid_sec/" . $sec;
+				$result[$sec] = $thumbnailUrl . "/width/0/vid_sec/" . $sec;
 			}
 		}
 

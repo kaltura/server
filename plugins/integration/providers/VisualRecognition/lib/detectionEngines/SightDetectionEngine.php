@@ -24,7 +24,7 @@ class SightDetectionEngine extends BaseDetectionEngine
 	 */
 	public function initiateRecognition(array $thumbnailUrls)
 	{
-		foreach ($thumbnailUrls as $second=>$thumbnailUrl) {
+		foreach ($thumbnailUrls as $second => $thumbnailUrl) {
 			$fullUrl = self::RECOGNIZE_URL . '?api_user=' . self::CLIENT_USER .'&api_secret=' . self::CLIENT_SECRET . '&url='
 				. $thumbnailUrl;
 			$handle = $this->getCurlHandle($fullUrl);
