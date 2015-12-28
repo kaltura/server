@@ -74,7 +74,7 @@ class kDistributionPersistentDataHandler implements \Facebook\PersistentData\Per
 		if($xml->xpath('result/'.$key)){
 			return ''.$xml->result->$key;
 		}
-		throw new Excpetion("Could not find the key {$key} using the handler no such mapping as result/{$key}");
+		throw new Exception("Could not find the key {$key} using the handler no such mapping as result/{$key}");
 
 	}
 
