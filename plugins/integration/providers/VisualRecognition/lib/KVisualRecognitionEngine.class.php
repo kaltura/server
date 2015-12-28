@@ -66,14 +66,16 @@ class KVisualRecognitionEngine implements KIntegrationCloserEngine
         
         
         
-        
+        KalturaLog::info("adult policy is ".$providerData->adultContentPolicy );
         // auto moderation work
         if($providerData->adultContentPolicy != KalturaVisualRecognitionAdultContentPolicy::IGNORE)
         {
+            KalturaLog::info(" so checking content with sight");
             $sightEngine = new SightDetectionEngine();
             $isInappropriate = $sightEngine->initiateRecognition($thumbnailURLs);
             if($isInappropriate)
             {
+                KalturaLog::info("sight says content is inappropriate");
                 switch($providerData->adultContentPolicy)
                 {
                     case KalturaVisualRecognitionAdultContentPolicy::AUTO_REJECT:
@@ -87,9 +89,14 @@ class KVisualRecognitionEngine implements KIntegrationCloserEngine
                         break;
                     case KalturaVisualRecognitionAdultContentPolicy::IGNORE:
                     default:
+                        KalturaLog::info("could not match any adult content policy, so not doing anything");
                         // do nothing
                         break;
                 }
+            }
+            else
+            {
+                KalturaLog::info("sight says content is fine");
             }
         }
         KBatchBase::unimpersonate();
