@@ -26,9 +26,8 @@ class KVisualRecognitionEngine implements KIntegrationCloserEngine
 
 	protected function doDispatch(KalturaBatchJob $job, KalturaIntegrationJobData &$data, KalturaVisualRecognitionJobProviderData $providerData)
 	{
-		KalturaLog::info("BUGA " . __FUNCTION__ . " dispatching Recognotion");
+		KalturaLog::info("BUGA " . __FUNCTION__ . " Dispatching Visual Recognition");
 
-		//KalturaLog::crit("Thumbnail interval [$providerData->thumbInterval]");
 		if (!empty($job->entryId)) {
 			KBatchBase::impersonate($job->partnerId);
 			$entry = KBatchBase::$kClient->baseEntry->get($job->entryId);
@@ -37,39 +36,30 @@ class KVisualRecognitionEngine implements KIntegrationCloserEngine
 				throw new Exception("Invalid data type expected media");
 		}
 
-		$tumbnailsURLs = BaseDetectionEngine::getThumbnailUrls($entry->thumbnailUrl, $entry->duration, $providerData->thumbInterval);
+		$thumbnailURLs = BaseDetectionEngine::getThumbnailUrls($entry->thumbnailUrl, $entry->duration, $providerData->thumbInterval);
+		// first run all the async detectors
 		$cloudEngine = new CloudsapiDetectionEngine();
-		$cloudEngine->init();
-//		$clarifaiEngine = new ClarifaiDetectionEngine();
-//		$clarifaiEngine->init();
+		$clarifaiEngine = new ClarifaiDetectionEngine();
 
-		$externalJobs = array();
-
-		foreach ($tumbnailsURLs as $thumbnailUrl)
-		{
-			KalturaLog::info("BUGA " . __FUNCTION__ . " thumbnail url = ".$thumbnailUrl);
-			$returnValue = $cloudEngine->initiateRecognition($thumbnailUrl);
-			if ($returnValue){
-				$val = new KalturaKeyValue();
-				$val->key = $thumbnailUrl;
-				$val->value = $returnValue;
-				$externalJobs[] = $val;
-			}
-			KalturaLog::info("BUGA " . __FUNCTION__ . " return value  = ".$returnValue);
-			//$remoteJobIds[] = $returnValue;
-//			$clarifaiEngine->initiateRecognition($thumbnailUrl);
-
-		}
+		$externalJobs = array_merge(
+			$this->runAsyncDetection($cloudEngine, $thumbnailURLs),
+			$this->runAsyncDetection($clarifaiEngine, $thumbnailURLs)
+			);
 
 		$data->providerData->externalJobs = $externalJobs;
-		KalturaLog::crit(print_r($data, true));
+
+		// run the sync detectors
+		$sightEngine = new SightDetectionEngine();
+		$isThereNudity = $this->runSyncDetection($sightEngine, $thumbnailURLs);
+
+		KalturaLog::info("BUGA Nudity status for found as : ".$isThereNudity);
 		// To finish, return true
 		// To wait for closer, return false
 		// To fail, throw exception
 
 
 		// suppose here we call the nudity detector, and we call the function that says whether the entry is inappropriate or not, with the result and poviderData config we can do:
-                if(WhateverClassNameNudityDetector->isInappropriate())
+                /*if(WhateverClassNameNudityDetector->isInappropriate())
                 {
 	                KBatchBase::impersonate($job->partnerId);
 	                switch($providerData->adultContentPolicy)
@@ -80,7 +70,7 @@ class KVisualRecognitionEngine implements KIntegrationCloserEngine
 		                case KalturaVisualRecognitionAdultContentPolicy::AUTO_FLAG:
 			                $flag = new KalturaModerationFlag();
 			                $flag->flaggedEntryId = $job->entryId;
-			                $flag->flagType = KalturaModerationFlagType::SEXUAL_CONTENT'
+			                $flag->flagType = KalturaModerationFlagType::SEXUAL_CONTENT;
 			                KBatchBase::$kClient->baseEntry->flag($flag);
 			                break;
 		                case KalturaVisualRecognitionAdultContentPolicy::IGNORE:
@@ -88,9 +78,34 @@ class KVisualRecognitionEngine implements KIntegrationCloserEngine
 			                // do nothing
 			                break;
                 	}
-                }
+                }*/
 
 		return false;
+	}
+
+	private function runSyncDetection(IDetectionEngine $detectionEngine, $thumbnailURLs)
+	{
+		$detectionEngine->init();
+		$returnValue = $detectionEngine->initiateRecognition($thumbnailURLs);
+		return $returnValue;
+	}
+
+	private function runAsyncDetection(IDetectionEngine $detectionEngine, $thumbnailURLs)
+	{
+		$remoteIDs = array();
+		$detectionEngine->init();
+
+		$returnValues = $detectionEngine->initiateRecognition($thumbnailURLs);
+
+		foreach ($returnValues as $sec=>$remoteId)
+		{
+			$val = new RemoteEntityData();
+			$val->sec = $sec;
+			$val->detectorType = get_class($detectionEngine);
+			$val->remoteId = $remoteId;
+			$remoteIDs[] = $val;
+		}
+		return $remoteIDs;
 	}
 
 	protected function doClose(KalturaBatchJob $job, KalturaIntegrationJobData &$data, KalturaVisualRecognitionJobProviderData $providerData)
@@ -99,24 +114,53 @@ class KVisualRecognitionEngine implements KIntegrationCloserEngine
 
 		$cloudEngine = new CloudsapiDetectionEngine();
 		$cloudEngine->init();
+		$clarifaiEngine = new ClarifaiDetectionEngine();
+		$clarifaiEngine->init();
 
 		// To finish, return true
 		// To keep open for future closer, return false
 		// To fail, throw exception
 		$externalJobs = array();
-		foreach($data->providerData->externalJobs as $thumb=>$externalJob)
+		foreach($data->providerData->externalJobs as $remoteJob)
 		{
-			KalturaLog::info("BUGA ".__FUNCTION__." checking job ".$externalJob);
-			$farresult = $cloudEngine->checkRecognitionStatus($externalJob);
-			if ($farresult !== false )
-			{
-				KalturaLog::info("SUSU ".print_r($farresult, true));
-
+			// we care only about the async detector - should be implemented with separate interface
+			if ($remoteJob->detectorType == 'CloudsapiDetectionEngine')
+				$detector = $cloudEngine;
+			else if ($remoteJob->detectorType == 'ClarifaiDetectionEngine')
+				$detector = $clarifaiEngine;
+			else
+				throw new Exception("Failed to find relevant Detection Engine for given detector type given : ".$remoteJob->detectorType);
+			$detectorResult = $detector->checkRecognitionStatus($remoteJob->remoteId);
+			if ($detectorResult !== false )	{
+				KalturaLog::info("BUGA detection on remote detector succeeded ".print_r($detectorResult, true));
 			} else {
-				$externalJobs[$thumb] = $externalJob;
+				$externalJobs[] = $remoteJob;
 			}
 		}
 		$data->providerData->externalJobs = $externalJobs;
 		return empty($externalJobs);
 	}
+
+
+	public function createThumbCuePoint(array $thumbCuePointsInitData) {
+		if (!empty($thumbCuePointsInitData)) {
+			KBatchBase::$kClient->startMultiRequest();
+			foreach ($thumbCuePointsInitData as $thumbCuePointInitData) {
+				$cuePoint = new KalturaThumbCuePoint();
+				$cuePoint->assetId = $thumbCuePointInitData->entryId;
+				$cuePoint->description = $thumbCuePointInitData->data;
+				$cuePoint->startTime = $thumbCuePointInitData->startTime;
+				$cuePoint->subType = ThumbCuePointSubType::SLIDE;
+				$cuePoint->tags = 'origin_visual_recognition';
+				KBatchBase::$kClient->cuePoint->add($cuePoint);
+			}
+			KBatchBase::$kClient->doMultiRequest();
+		}
+	}
+}
+
+class RemoteEntityData {
+	public $sec;
+	public $detectorType;
+	public $remoteId;
 }
