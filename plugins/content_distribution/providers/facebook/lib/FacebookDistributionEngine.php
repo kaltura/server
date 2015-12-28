@@ -19,8 +19,8 @@ class FacebookDistributionEngine extends DistributionEngine implements
 	public function configure()
 	{
 		parent::configure();
-		$this->appId = kConf::get(FacebookRequestParameters::FACEBOOK_APP_ID_REQUEST_PARAM, 'facebook', null);
-		$this->appSecret = kConf::get(FacebookRequestParameters::FACEBOOK_APP_SECRET_REQUEST_PARAM, 'facebook', null);
+		$this->appId = kConf::get(FacebookConstants::FACEBOOK_APP_ID_REQUEST_PARAM, 'facebook', null);
+		$this->appSecret = kConf::get(FacebookConstants::FACEBOOK_APP_SECRET_REQUEST_PARAM, 'facebook', null);
 
 	}
 

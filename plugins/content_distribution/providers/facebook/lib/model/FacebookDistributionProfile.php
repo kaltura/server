@@ -10,6 +10,8 @@ class FacebookDistributionProfile extends ConfigurableDistributionProfile
 	const CUSTOM_DATA_PAGE_ID = 'pageId';
 	const CUSTOM_DATA_PAGE_ACCESS_TOKEN = 'pageAccessToken';
 	const CUSTOM_DATA_USER_ACCESS_TOKEN = 'userAccessToken';
+	// state is the keyword that facebook uses to save a session token
+	const CUSTOM_DATA_STATE = 'state';
 	const CUSTOM_DATA_FACEBOOK_PERMISSIONS = 'facebookPermissions';
 	const CUSTOM_DATA_RE_REQUEST_PERMISSIONS = 'reRequestPermissions';
 	const CUSTOM_DATA_CALL_TO_ACTION_TYPE = 'callToActionType';
@@ -88,6 +90,7 @@ class FacebookDistributionProfile extends ConfigurableDistributionProfile
 	public function getPageId()				    	{return $this->getFromCustomData(self::CUSTOM_DATA_PAGE_ID);}
 	public function getPageAccessToken()	    	{return $this->getFromCustomData(self::CUSTOM_DATA_PAGE_ACCESS_TOKEN);}
 	public function getUserAccessToken()	    	{return $this->getFromCustomData(self::CUSTOM_DATA_USER_ACCESS_TOKEN);}
+	public function getState()			    		{return $this->getFromCustomData(self::CUSTOM_DATA_STATE);}
 	public function getFacebookPermissions()		{return $this->getFromCustomData(self::CUSTOM_DATA_FACEBOOK_PERMISSIONS, null, self::DEFAULT_FACEBOOK_PERMISSIONS);}
 	public function getReRequestPermissions()		{return $this->getFromCustomData(self::CUSTOM_DATA_RE_REQUEST_PERMISSIONS, null , self::DEFAULT_RE_REQUEST_PERMISSIONS);}
 	public function getCallToActionType()	    	{return $this->getFromCustomData(self::CUSTOM_DATA_CALL_TO_ACTION_TYPE);}
@@ -101,6 +104,7 @@ class FacebookDistributionProfile extends ConfigurableDistributionProfile
 	public function setPageId($v)			    	{$this->putInCustomData(self::CUSTOM_DATA_PAGE_ID, $v);}
 	public function setPageAccessToken($v)	    	{$this->putInCustomData(self::CUSTOM_DATA_PAGE_ACCESS_TOKEN, $v);}
 	public function setUserAccessToken($v)	    	{$this->putInCustomData(self::CUSTOM_DATA_USER_ACCESS_TOKEN, $v);}
+	public function setState($v)		  	 	 	{$this->putInCustomData(self::CUSTOM_DATA_STATE, $v);}
 	public function setFacebookPermissions($v)		{$this->putInCustomData(self::CUSTOM_DATA_FACEBOOK_PERMISSIONS, $v);}
 	public function setReRequestPermissions($v)		{$this->putInCustomData(self::CUSTOM_DATA_RE_REQUEST_PERMISSIONS, $v);}
 	public function setCallToActionType($v)	    	{$this->putInCustomData(self::CUSTOM_DATA_CALL_TO_ACTION_TYPE, $v);}
@@ -192,10 +196,10 @@ class FacebookDistributionProfile extends ConfigurableDistributionProfile
 		$permissions = $this->getFacebookPermissions();
 		$url = kConf::get('apphome_url');
 		$url .= "/index.php/extservices/facebookoauth2".
-            "/".FacebookRequestParameters::FACEBOOK_PROVIDER_ID_REQUEST_PARAM."/".base64_encode($this->getId()).
-            "/".FacebookRequestParameters::FACEBOOK_PAGE_ID_REQUEST_PARAM."/".base64_encode($this->getPageId()).
-            "/".FacebookRequestParameters::FACEBOOK_PERMISSIONS_REQUEST_PARAM."/".base64_encode($permissions).
-            "/".FacebookRequestParameters::FACEBOOK_RE_REQUEST_PERMISSIONS_REQUEST_PARAM."/".base64_encode($this->getReRequestPermissions())
+            "/".FacebookConstants::FACEBOOK_PROVIDER_ID_REQUEST_PARAM."/".base64_encode($this->getId()).
+            "/".FacebookConstants::FACEBOOK_PAGE_ID_REQUEST_PARAM."/".base64_encode($this->getPageId()).
+            "/".FacebookConstants::FACEBOOK_PERMISSIONS_REQUEST_PARAM."/".base64_encode($permissions).
+            "/".FacebookConstants::FACEBOOK_RE_REQUEST_PERMISSIONS_REQUEST_PARAM."/".base64_encode($this->getReRequestPermissions())
         ;
 
 		return $url;
