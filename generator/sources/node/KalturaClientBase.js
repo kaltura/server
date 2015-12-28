@@ -411,6 +411,7 @@ KalturaClientBase.prototype.doHttpRequest = function (callCompletedCallback, req
 
 	var that = this;
 	var requestIndex = KalturaClientBase.requestIndex++;
+	var data = http_build_query(params);
 	var debugUrl = requestUrl + '?' + data;
 	var urlInfo = url.parse(debugUrl);
 	this.log('Request [' + requestIndex + ']: ' + debugUrl);
@@ -446,7 +447,6 @@ KalturaClientBase.prototype.doHttpRequest = function (callCompletedCallback, req
 		sendRequestHelper(that, options, multipartBody, requestIndex, callCompletedCallback, this.config.timeout);
 
 	} else {
-		var data = http_build_query(params);
 		options.headers = {
 			'Content-Type' : 'application/x-www-form-urlencoded',
 			'Content-Length' : Buffer.byteLength(data)
