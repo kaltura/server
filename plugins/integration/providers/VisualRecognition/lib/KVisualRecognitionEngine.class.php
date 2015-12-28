@@ -26,9 +26,8 @@ class KVisualRecognitionEngine implements KIntegrationCloserEngine
 
 	protected function doDispatch(KalturaBatchJob $job, KalturaIntegrationJobData &$data, KalturaVisualRecognitionJobProviderData $providerData)
 	{
-		KalturaLog::info("BUGA " . __FUNCTION__ . " dispatching Recognotion");
+		KalturaLog::info("BUGA " . __FUNCTION__ . " Dispatching Visual Recognition");
 
-		//KalturaLog::crit("Thumbnail interval [$providerData->thumbInterval]");
 		if (!empty($job->entryId)) {
 			KBatchBase::impersonate($job->partnerId);
 			$entry = KBatchBase::$kClient->baseEntry->get($job->entryId);
@@ -39,11 +38,10 @@ class KVisualRecognitionEngine implements KIntegrationCloserEngine
             }
 		}
 
-		$tumbnailsURLs = BaseDetectionEngine::getThumbnailUrls($entry->thumbnailUrl, $entry->duration, $providerData->thumbInterval);
+		$thumbnailURLs = BaseDetectionEngine::getThumbnailUrls($entry->thumbnailUrl, $entry->duration, $providerData->thumbInterval);
+		// first run all the async detectors
 		$cloudEngine = new CloudsapiDetectionEngine();
-		$cloudEngine->init();
-//		$clarifaiEngine = new ClarifaiDetectionEngine();
-//		$clarifaiEngine->init();
+		$clarifaiEngine = new ClarifaiDetectionEngine();
 
 		$jobs = array();
         if($cloudEngine->asyncCall())
@@ -68,7 +66,7 @@ class KVisualRecognitionEngine implements KIntegrationCloserEngine
 
 /*
 		// suppose here we call the nudity detector, and we call the function that says whether the entry is inappropriate or not, with the result and poviderData config we can do:
-                if(WhateverClassNameNudityDetector->isInappropriate())
+                /*if(WhateverClassNameNudityDetector->isInappropriate())
                 {
 	                KBatchBase::impersonate($job->partnerId);
 	                switch($providerData->adultContentPolicy)
@@ -79,7 +77,7 @@ class KVisualRecognitionEngine implements KIntegrationCloserEngine
 		                case KalturaVisualRecognitionAdultContentPolicy::AUTO_FLAG:
 			                $flag = new KalturaModerationFlag();
 			                $flag->flaggedEntryId = $job->entryId;
-			                $flag->flagType = KalturaModerationFlagType::SEXUAL_CONTENT'
+			                $flag->flagType = KalturaModerationFlagType::SEXUAL_CONTENT;
 			                KBatchBase::$kClient->baseEntry->flag($flag);
 			                break;
 		                case KalturaVisualRecognitionAdultContentPolicy::IGNORE:
@@ -94,12 +92,39 @@ class KVisualRecognitionEngine implements KIntegrationCloserEngine
 		return false;
 	}
 
+	private function runSyncDetection(IDetectionEngine $detectionEngine, $thumbnailURLs)
+	{
+		$detectionEngine->init();
+		$returnValue = $detectionEngine->initiateRecognition($thumbnailURLs);
+		return $returnValue;
+	}
+
+	private function runAsyncDetection(IDetectionEngine $detectionEngine, $thumbnailURLs)
+	{
+		$remoteIDs = array();
+		$detectionEngine->init();
+
+		$returnValues = $detectionEngine->initiateRecognition($thumbnailURLs);
+
+		foreach ($returnValues as $sec=>$remoteId)
+		{
+			$val = new RemoteEntityData();
+			$val->sec = $sec;
+			$val->detectorType = get_class($detectionEngine);
+			$val->remoteId = $remoteId;
+			$remoteIDs[] = $val;
+		}
+		return $remoteIDs;
+	}
+
 	protected function doClose(KalturaBatchJob $job, KalturaIntegrationJobData &$data, KalturaVisualRecognitionJobProviderData $providerData)
 	{
 		KalturaLog::info("BUGA ".__FUNCTION__." Thumbnail interval [$providerData->thumbInterval]");
 
 		$cloudEngine = new CloudsapiDetectionEngine();
 		$cloudEngine->init();
+		$clarifaiEngine = new ClarifaiDetectionEngine();
+		$clarifaiEngine->init();
 
 		// To finish, return true
 		// To keep open for future closer, return false
