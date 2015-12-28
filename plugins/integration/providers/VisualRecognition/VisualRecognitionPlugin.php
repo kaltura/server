@@ -50,8 +50,12 @@ class VisualRecognitionPlugin extends IntegrationProviderPlugin
 	 */
 	public static function getObjectClass($baseClass, $enumValue)
 	{
+
+		KalturaLog::info("BUGA ".__FUNCTION__." trying to find the relevant class with ".$baseClass ) ;
 		if($baseClass == 'kIntegrationJobProviderData' && $enumValue == self::getApiValue(VisualRecognitionProviderType::VISUAL_RECOGNITION))
 		{
+			KalturaLog::info("BUGA ".__FUNCTION__." returning kVisualRecognitionJobProviderData");
+
 			return 'kVisualRecognitionJobProviderData';
 		}
 	
@@ -69,6 +73,7 @@ class VisualRecognitionPlugin extends IntegrationProviderPlugin
 		}
 		if($baseClass == 'IIntegrationProvider' && $enumValue == self::getIntegrationProviderCoreValue(VisualRecognitionProviderType::VISUAL_RECOGNITION))
 		{
+			KalturaLog::info("BUGA ".__FUNCTION__." returning VisualRecognitionProvider");
 			return 'VisualRecognitionProvider';
 		}
 	}

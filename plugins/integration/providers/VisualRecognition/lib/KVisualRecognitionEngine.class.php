@@ -10,6 +10,7 @@ class KVisualRecognitionEngine implements KIntegrationCloserEngine
 	 */
 	public function dispatch(KalturaBatchJob $job, KalturaIntegrationJobData &$data)
 	{
+		KalturaLog::info("BUGA ".__FUNCTION__." dispatching Recognotion");
 		return $this->doDispatch($job, $data, $data->providerData);
 	}
 
@@ -18,30 +19,49 @@ class KVisualRecognitionEngine implements KIntegrationCloserEngine
 	 */
 	public function close(KalturaBatchJob $job, KalturaIntegrationJobData &$data)
 	{
+		KalturaLog::info("BUGA ".__FUNCTION__." visual Recognotion");
+
 		return $this->doClose($job, $data, $data->providerData);
 	}
 
 	protected function doDispatch(KalturaBatchJob $job, KalturaIntegrationJobData &$data, KalturaVisualRecognitionJobProviderData $providerData)
 	{
-		KalturaLog::crit("Thumbnail interval [$providerData->thumbInterval]");
-		if(!empty($job->entryId))
-		{
+		KalturaLog::info("BUGA " . __FUNCTION__ . " dispatching Recognotion");
+
+		//KalturaLog::crit("Thumbnail interval [$providerData->thumbInterval]");
+		if (!empty($job->entryId)) {
 			KBatchBase::impersonate($job->partnerId);
 			$entry = KBatchBase::$kClient->baseEntry->get($job->entryId);
 			KBatchBase::unimpersonate();
-			if($entry instanceof KalturaMediaEntry)
-			{
-				KalturaLog::crit("gonen: entry is media, has duration of ".$entry->duration);
-				KalturaLog::crit("gonen: thumbmail URL is ".$entry->thumbnailUrl);
-			}
+			if (!($entry instanceof KalturaMediaEntry))
+				throw new Exception("Invalid data type expected media");
 		}
 
-		KalturaLog::crit("gonen priting the job data");
-		KalturaLog::crit(print_r($data, true));
-		$val = new KalturaKeyValue();
-		$val->key = "vid_sec_4";
-		$val->value = "job_id_97872";
-		$data->providerData->externalJobs = array($val);
+		$tumbnailsURLs = BaseDetectionEngine::getThumbnailUrls($entry->thumbnailUrl, $entry->duration, $providerData->thumbInterval);
+		$cloudEngine = new CloudsapiDetectionEngine();
+		$cloudEngine->init();
+//		$clarifaiEngine = new ClarifaiDetectionEngine();
+//		$clarifaiEngine->init();
+
+		$externalJobs = array();
+
+		foreach ($tumbnailsURLs as $thumbnailUrl)
+		{
+			KalturaLog::info("BUGA " . __FUNCTION__ . " thumbnail url = ".$thumbnailUrl);
+			$returnValue = $cloudEngine->initiateRecognition($thumbnailUrl);
+			if ($returnValue){
+				$val = new KalturaKeyValue();
+				$val->key = $thumbnailUrl;
+				$val->value = $returnValue;
+				$externalJobs[] = $val;
+			}
+			KalturaLog::info("BUGA " . __FUNCTION__ . " return value  = ".$returnValue);
+			//$remoteJobIds[] = $returnValue;
+//			$clarifaiEngine->initiateRecognition($thumbnailUrl);
+
+		}
+
+		$data->providerData->externalJobs = $externalJobs;
 		KalturaLog::crit(print_r($data, true));
 		// To finish, return true
 		// To wait for closer, return false
@@ -52,15 +72,28 @@ class KVisualRecognitionEngine implements KIntegrationCloserEngine
 
 	protected function doClose(KalturaBatchJob $job, KalturaIntegrationJobData &$data, KalturaVisualRecognitionJobProviderData $providerData)
 	{
-		KalturaLog::debug("Thumbnail interval [$providerData->thumbInterval]");
+		KalturaLog::info("BUGA ".__FUNCTION__." Thumbnail interval [$providerData->thumbInterval]");
 
-		KalturaLog::crit("gonen priting the job data");
-		KalturaLog::crit(print_r($data, true));
+		$cloudEngine = new CloudsapiDetectionEngine();
+		$cloudEngine->init();
 
 		// To finish, return true
 		// To keep open for future closer, return false
 		// To fail, throw exception
+		$externalJobs = array();
+		foreach($data->providerData->externalJobs as $thumb=>$externalJob)
+		{
+			KalturaLog::info("BUGA ".__FUNCTION__." checking job ".$externalJob);
+			$farresult = $cloudEngine->checkRecognitionStatus($externalJob);
+			if ($farresult !== false )
+			{
+				KalturaLog::info("SUSU ".print_r($farresult, true));
 
-		return true;
+			} else {
+				$externalJobs[$thumb] = $externalJob;
+			}
+		}
+		$data->providerData->externalJobs = $externalJobs;
+		return empty($externalJobs);
 	}
 }

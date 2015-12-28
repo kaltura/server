@@ -30,6 +30,8 @@ class IntegrationService extends KalturaBaseService
 	 */		
 	public function dispatchAction(KalturaIntegrationJobData $data, $objectType, $objectId)
 	{
+		KalturaLog::info("BUGA ".__FUNCTION__." called with object type ".$objectType);
+
 		$jobData = $data->toObject();
 		$coreObjectType = kPluginableEnumsManager::apiToCore('BatchJobObjectType', $objectType);
 		$job = kIntegrationFlowManager::addintegrationJob($coreObjectType, $objectId, $jobData);

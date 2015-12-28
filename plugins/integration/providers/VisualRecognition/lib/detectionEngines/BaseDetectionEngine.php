@@ -9,7 +9,7 @@ abstract class BaseDetectionEngine implements IDetectionEngine
 	 * $duration - duration of the video in seconds
 	 * $interval - the sampling interval for the video in seconds
 	 */
-	function getThumbnailUrls($thumbnailUrl, $duration, $interval)
+	static function getThumbnailUrls($thumbnailUrl, $duration, $interval)
 	{
 		$result = array();
 		$interval = round($interval);
@@ -18,7 +18,7 @@ abstract class BaseDetectionEngine implements IDetectionEngine
 			$result[] = $thumbnailUrl;
 		} else {
 			for ($sec=0; $sec < $duration; $sec+=$interval) {
-				$result[] = $thumbnailUrl . "/vid_sec/" . $sec;
+				$result[$sec] = $thumbnailUrl . "/vid_sec/" . $sec;
 			}
 		}
 
@@ -54,12 +54,12 @@ abstract class BaseDetectionEngine implements IDetectionEngine
 		return $result;
 	}
 
-	public abstract function init();
+	public function init(){}
 
 	/*
 	 * method that will call 3rd party service and return external token / job ID
 	 */
-	public abstract function initiateRecognition($thumbnailUrl);
+	public function initiateRecognition($thumbnailUrl){}
 
 	/*
 	 * method that gets a token / job ID of previous call to the 3rd party,
@@ -67,5 +67,5 @@ abstract class BaseDetectionEngine implements IDetectionEngine
 	 *
 	 * @return array of words or false if job not done
 	 */
-	public abstract function checkRecognitionStatus($jobId);
+	public function checkRecognitionStatus($jobId){}
 }
