@@ -457,6 +457,15 @@ class FacebookConstants
 	const FACEBOOK_SDK_VERSION = 'v2.4';
 	const FACEBOOK_MIN_POSTPONE_POST_IN_SECONDS = 360; // 6 minutes
 	const FACEBOOK_MAX_POSTPONE_POST_IN_SECONDS = 15552000; // 6 months
+
+	const FACEBOOK_APP_ID_REQUEST_PARAM = 'app_id';
+	const FACEBOOK_APP_SECRET_REQUEST_PARAM = 'app_secret';
+	const FACEBOOK_PAGE_ID_REQUEST_PARAM = 'page_id';
+	const FACEBOOK_RE_REQUEST_PERMISSIONS_REQUEST_PARAM = 're_request_permissions';
+	const FACEBOOK_PERMISSIONS_REQUEST_PARAM = 'permissions';
+	const FACEBOOK_PROVIDER_ID_REQUEST_PARAM = 'provider_id';
+	const FACEBOOK_NEXT_ACTION_REQUEST_PARAM = 'next_action';
+	const FACEBOOK_KS_REQUEST_PARAM = 'ks';
 }
 
 class FacebookCaptionsFile extends \Facebook\FileUpload\FacebookFile

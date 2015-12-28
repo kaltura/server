@@ -3,7 +3,7 @@
  * @package Core
  * @subpackage externalServices
  */
-class googleoauth2Action extends sfAction
+class googleoauth2Action extends oauth2Action
 {
 	const SUB_ACTION_REDIRECT_SCREEN = 'redirect-screen';
 	const SUB_ACTION_PROCESS_OAUTH2_RESPONSE = 'process-oauth2-response';
@@ -254,68 +254,5 @@ class googleoauth2Action extends sfAction
 		return $client;
 	}
 
-	protected function generateLimitedKs($partnerId, $stateData)
-	{
-		$partner = $this->getPartner($partnerId);
-		$limitedKs = '';
-		$expiry = 30 * 60; // 30 minutes
-		$privileges = kSessionBase::PRIVILEGE_ACTIONS_LIMIT.':0';
-		$additionalData = json_encode($stateData);
-		$result = kSessionUtils::startKSession($partnerId, $partner->getAdminSecret(), '', $limitedKs, $expiry, kSessionBase::SESSION_TYPE_ADMIN, '', $privileges, null, $additionalData);
-		if ($result < 0)
-			throw new Exception('Failed to create limited session for partner '.$partnerId);
 
-		return $limitedKs;
-	}
-
-	protected function getPartner($partnerId)
-	{
-		$partner = PartnerPeer::retrieveByPK($partnerId);
-		if (is_null($partner))
-			throw new Exception('Partner id '. $partnerId.' not found');
-
-		return $partner;
-	}
-
-	protected function processKs($ksStr, $requiredPermission = null)
-	{
-		try
-		{
-			kCurrentContext::initKsPartnerUser($ksStr);
-		}
-		catch(Exception $ex)
-		{
-			KalturaLog::err($ex);
-			return false;
-		}
-
-		if (kCurrentContext::$ks_object->type != ks::SESSION_TYPE_ADMIN)
-		{
-			KalturaLog::err('Ks is not admin');
-			return false;
-		}
-
-		try
-		{
-			kPermissionManager::init(kConf::get('enable_cache'));
-		}
-		catch(Exception $ex)
-		{
-			if (strpos($ex->getCode(), 'INVALID_ACTIONS_LIMIT') === false) // allow using limited ks
-			{
-				KalturaLog::err($ex);
-				return false;
-			}
-		}
-		if ($requiredPermission)
-		{
-			if (!kPermissionManager::isPermitted(PermissionName::ADMIN_PUBLISHER_MANAGE))
-			{
-				KalturaLog::err('Ks is missing "ADMIN_PUBLISHER_MANAGE" permission');
-				return false;
-			}
-		}
-
-		return true;
-	}
 }
