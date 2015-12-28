@@ -18,6 +18,7 @@ class ClarifaiDetectionEngine extends BaseDetectionEngine
 		$handle = $this->getCurlHandle(self::GET_TOKEN_URL, null, $formData);
 		$result = $this->execCurl($handle);
 		if (isset($result['access_token'])) {
+            KalturaLog::info("clarifi: got access token of ".$result['access_token']. " from init");
 			self::$token = $result['access_token'];
 			return true;
 		} else {
@@ -36,7 +37,8 @@ class ClarifaiDetectionEngine extends BaseDetectionEngine
 	{
 		$headersArray = array('Authorization: Bearer ' . self::$token);
 		foreach ($thumbnailUrls as $second => $thumbnailUrl) {
-			$handle = $this->getCurlHandle(self::RECOGNIZE_URL, $headersArray);
+            $callUrl = self::RECOGNIZE_URL.$thumbnailUrl;
+			$handle = $this->getCurlHandle($callUrl, $headersArray);
 			$result = $this->execCurl($handle);
 			if (isset($result['status_code']) && $result['status_code'] == 'OK' && isset($result['results']) &&
 				isset($result['results'][0]) &&	isset($result['results'][0]['result']) &&

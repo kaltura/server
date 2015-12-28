@@ -53,10 +53,18 @@ class KVisualRecognitionEngine implements KIntegrationCloserEngine
         $data->providerData->externalJobs = $this->arrayToKeyValArray($jobs);
         
         $clarifaiEngine = new ClarifaiDetectionEngine();
-        $clarifaiEngine->init();
-        $timelineMetadata = $clarifaiEngine->initiateRecognition($thumbnailURLs);
-        KalturaLog::info("results from ClarifaiDetectionEngine " .print_r($timelineMetadata, true));
-        $this->createThumbCuePoint($job->partnerId, $timelineMetadata, $job->entryId);
+        $initResult = $clarifaiEngine->init();
+        if ($initResult == true) {
+            KalturaLog::info("got valid result on auth initiation from clarifi");
+
+            $timelineMetadata = $clarifaiEngine->initiateRecognition($thumbnailURLs);
+             KalturaLog::info("results from ClarifaiDetectionEngine " .print_r($timelineMetadata, true));
+            $this->createThumbCuePoint($job->partnerId, $timelineMetadata, $job->entryId);
+        } else {
+            KalturaLog::info("got BAD result on auth initiation from clarifi");
+        }
+        
+        
         
         
         // auto moderation work
