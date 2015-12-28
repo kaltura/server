@@ -24,7 +24,7 @@ interface IDetectionEngine
 	 *
 	 * @return array of words or false if job not done
 	 */
-	public function checkRecognitionStatus($jobId);
+	public function checkRecognitionStatus(array $jobIds);
 
 	/*
 	 * This api provider results are to understand if the entry answers some critiria, hence,

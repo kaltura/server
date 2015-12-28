@@ -46,7 +46,7 @@ class SightDetectionEngine extends BaseDetectionEngine
 	 *
 	 * @return array of words or false if job not done
 	 */
-	public function checkRecognitionStatus($jobId)
+	public function checkRecognitionStatus(array $jobIds)
 	{
 		return $this->currentResults;
 	}

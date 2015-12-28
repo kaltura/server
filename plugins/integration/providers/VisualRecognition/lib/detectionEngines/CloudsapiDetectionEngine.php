@@ -29,11 +29,11 @@ class CloudsapiDetectionEngine extends BaseDetectionEngine
 			$handle = $this->getCurlHandle(self::RECOGNIZE_URI, $headersArray, $formData);
 			$result = $this->execCurl($handle);
 			if (isset($result['token'])) {
-				$this->currentResults['$second'] = array('token'=>$result['token'], 'completed'=> false);
+				$this->currentResults[$second] = $result['token'];
 			}
 		}
 
-		return true;
+		return $this->currentResults;
 	}
 
 	/*
@@ -42,40 +42,36 @@ class CloudsapiDetectionEngine extends BaseDetectionEngine
 	 *
 	 * @return array of words or false if job not done
 	 */
-	public function checkRecognitionStatus($jobId)
+	public function checkRecognitionStatus(array $jobIds)
 	{
 		$headersArray = array('Authorization: ' . self::KEY);
+        $finalResults = array();
 		$gotAllResults = true;
-		foreach($this->currentResults as $second=>$result) {
-			if ($result['completed'] == false) {
-				$handle = getCurlHandle(self::CHECK_URL . $result['token'], $headersArray);
-				$result = execCurl($handle);
-				if (!isset($result['status']) || $result['status'] == "not completed") {
-					$gotAllResults = false;
-				} else {
-					if ($result['status'] == "completed") {
-						$result['completed'] = true;
-						$categories = array();
-						if (isset($result['categories'])) {
-							$categories = $result['categories'];
-						}
-						$names = $result['name'];
-						if (!is_array($names)) {
-							$names = array($names);
-						}
+		foreach($jobIds as $second => $token) {
+            $handle = $this->getCurlHandle(self::CHECK_URL . $token, $headersArray);
+            $result = $this->execCurl($handle);
+            if (!isset($result['status']) || $result['status'] == "not completed") {
+                KalturaLog::crit("BUGA returning false because not done in sec $second and token $token");
+                return false;
+            } else {
+                if ($result['status'] == "completed") {
+                    $categories = array();
+                    if (isset($result['categories'])) {
+                        $categories = $result['categories'];
+                    }
+                    $names = $result['name'];
+                    if (!is_array($names)) {
+                        $names = array($names);
+                    }
 
-						$this->finalResults[$second] = array_merge($names, $categories);
-					}
-				}
-			}
+                    $finalResults[$second] = array_merge($names, $categories);
+                }
+            }
 		}
 
-		if ($gotAllResults) {
-			return $this->finalResults;
-		}
-
-		return false;
+		return $finalResults;
 	}
+    
 
 	public function asyncCall() {
 		return true;

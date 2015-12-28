@@ -34,7 +34,9 @@ class KVisualRecognitionEngine implements KIntegrationCloserEngine
 			$entry = KBatchBase::$kClient->baseEntry->get($job->entryId);
 			KBatchBase::unimpersonate();
 			if (!($entry instanceof KalturaMediaEntry))
+            {
 				throw new Exception("Invalid data type expected media");
+            }
 		}
 
 		$tumbnailsURLs = BaseDetectionEngine::getThumbnailUrls($entry->thumbnailUrl, $entry->duration, $providerData->thumbInterval);
@@ -43,31 +45,28 @@ class KVisualRecognitionEngine implements KIntegrationCloserEngine
 //		$clarifaiEngine = new ClarifaiDetectionEngine();
 //		$clarifaiEngine->init();
 
-		$externalJobs = array();
+		$jobs = array();
+        if($cloudEngine->asyncCall())
+        {
+            KalturaLog::info("BUGA " . __FUNCTION__ . " thumbnail url = ".print_r($tumbnailsURLs, true));
+            $jobs = $cloudEngine->initiateRecognition($tumbnailsURLs);
+            KalturaLog::info("BUGA " . __FUNCTION__ . " return value  = ".print_r($jobs, true));
+            $externalJobs = array();
+            foreach($jobs as $sec => $token)
+            {
+                $keyVal = new KalturaKeyValue();
+                $keyVal->key = $sec;
+                $keyVal->value = $token;
+                $externalJobs[] = $keyVal;
+            }
+            $data->providerData->externalJobs = $externalJobs;
+        }
 
-		foreach ($tumbnailsURLs as $thumbnailUrl)
-		{
-			KalturaLog::info("BUGA " . __FUNCTION__ . " thumbnail url = ".$thumbnailUrl);
-			$returnValue = $cloudEngine->initiateRecognition($thumbnailUrl);
-			if ($returnValue){
-				$val = new KalturaKeyValue();
-				$val->key = $thumbnailUrl;
-				$val->value = $returnValue;
-				$externalJobs[] = $val;
-			}
-			KalturaLog::info("BUGA " . __FUNCTION__ . " return value  = ".$returnValue);
-			//$remoteJobIds[] = $returnValue;
-//			$clarifaiEngine->initiateRecognition($thumbnailUrl);
-
-		}
-
-		$data->providerData->externalJobs = $externalJobs;
-		KalturaLog::crit(print_r($data, true));
 		// To finish, return true
 		// To wait for closer, return false
 		// To fail, throw exception
 
-
+/*
 		// suppose here we call the nudity detector, and we call the function that says whether the entry is inappropriate or not, with the result and poviderData config we can do:
                 if(WhateverClassNameNudityDetector->isInappropriate())
                 {
@@ -89,6 +88,8 @@ class KVisualRecognitionEngine implements KIntegrationCloserEngine
 			                break;
                 	}
                 }
+ * 
+ */
 
 		return false;
 	}
@@ -103,20 +104,44 @@ class KVisualRecognitionEngine implements KIntegrationCloserEngine
 		// To finish, return true
 		// To keep open for future closer, return false
 		// To fail, throw exception
-		$externalJobs = array();
-		foreach($data->providerData->externalJobs as $thumb=>$externalJob)
-		{
-			KalturaLog::info("BUGA ".__FUNCTION__." checking job ".$externalJob);
-			$farresult = $cloudEngine->checkRecognitionStatus($externalJob);
-			if ($farresult !== false )
-			{
-				KalturaLog::info("SUSU ".print_r($farresult, true));
+        
+        $jobIds = array();
+        foreach($providerData->externalJobs as $keyVal)
+        {
+            $jobIds[$keyVal->key] = $keyVal->value;
+        }
 
-			} else {
-				$externalJobs[$thumb] = $externalJob;
-			}
-		}
-		$data->providerData->externalJobs = $externalJobs;
-		return empty($externalJobs);
+        KalturaLog::info("BUGA ".__FUNCTION__." checking job ".$providerData->externalJobs);
+        $results = $cloudEngine->checkRecognitionStatus($jobIds);
+        if ($results === false )
+        {
+            // job not closed, wait for another closer
+            KalturaLog::info("SUSU ".print_r($results, true));
+            return false;
+        } else {
+            // return true to close the job
+            
+            // create cuepoints from array of results
+            $this->createThumbCuePoint($job->partnerId, $results, $job->entryId);
+            return true;
+        }
 	}
+    
+    public function createThumbCuePoint($partnerId, array $thumbCuePointsInitData, $entryId) {
+        if (!empty($thumbCuePointsInitData)) {
+            KBatchBase::impersonate($partnerId);
+            KBatchBase::$kClient->startMultiRequest();
+            foreach ($thumbCuePointsInitData as $sec => $thumbCuePointInitData) {
+                $cuePoint = new KalturaThumbCuePoint();
+                $cuePoint->entryId = $entryId;
+                $cuePoint->description = implode(' ', $thumbCuePointInitData);
+                $cuePoint->startTime = $sec*1000;
+                $cuePoint->subType = ThumbCuePointSubType::SLIDE;
+                $cuePoint->tags = 'origin_visual_recognition';
+                KBatchBase::$kClient->cuePoint->add($cuePoint);
+            }
+            KBatchBase::$kClient->doMultiRequest();
+            KBatchBase::unimpersonate();
+        }
+    }
 }

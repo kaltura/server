@@ -67,5 +67,5 @@ abstract class BaseDetectionEngine implements IDetectionEngine
 	 *
 	 * @return array of words or false if job not done
 	 */
-	public function checkRecognitionStatus($jobId){}
+	public function checkRecognitionStatus(array $jobIds){}
 }
