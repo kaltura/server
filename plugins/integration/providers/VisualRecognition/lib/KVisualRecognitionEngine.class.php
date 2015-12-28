@@ -128,6 +128,7 @@ class KVisualRecognitionEngine implements KIntegrationCloserEngine
             $filter = new KalturaThumbCuePointFilter();
             $filter->tagsLike = self::AUTOMATIC_VISUAL_RECOGNITION_TAG;
             $filter->subTypeEqual = ThumbCuePointSubType::SLIDE;
+            $filter->entryIdEqual = $entryId;
             $pager = new KalturaFilterPager();
             $pager->pageSize = 500;
             $cuepoints = KBatchBase::$kClient->cuePoint->listAction($filter, $pager);
