@@ -49,6 +49,8 @@ abstract class BaseDetectionEngine implements IDetectionEngine
 		$curlErrorCode = curl_getinfo($handle, CURLINFO_HTTP_CODE);
 		if ($curlErrorCode != '200') {
 			KalturaLog::log('VisualRecognitionEngineAbstract call error: ' . print_r($curlError, true));
+            KalturaLog::info("VisualRecognitionEngineAbstract HTTP response code is $curlErrorCode");
+            KalturaLog::info("VisualRecognitionEngineAbstract HTTP response body is $result");
 		}
 		curl_close($handle);
 		return $result;
