@@ -64,6 +64,9 @@ class Form_PushNotificationTemplateConfiguration extends Form_EventNotificationT
                 'KalturaUserRole' => 'User Role',
                 'KalturaWidget' => 'Widget',
                 'KalturaCategoryEntry' => 'Category - Entry',
+                'KalturaScheduleEvent' => 'Schedule Event',
+                'KalturaScheduleResource' => 'Schedule Resource',
+                'KalturaScheduleEventResource' => 'Schedule Event-Resource',
             ),
         ));
     

@@ -24,5 +24,17 @@ class ScheduleEventResource extends BaseScheduleEventResource implements IRelate
     	
 		return parent::preInsert($con);
 	}
+
+	/* (non-PHPdoc)
+	 * @see BaseScheduleEvent::postSave()
+	 */
+	public function postSave(PropelPDO $con = null)
+	{
+		$event = ScheduleEventPeer::retrieveByPK($this->getEventId());
+		$event->setUpdatedAt(time());
+		$event->save();
+    	
+		parent::postSave($con);
+	}
 	
 } // ScheduleEventResource

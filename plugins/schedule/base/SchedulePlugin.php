@@ -2,9 +2,12 @@
 /**
  * @package plugins.schedule
  */
-class SchedulePlugin extends KalturaPlugin implements IKalturaServices, IKalturaEventConsumers
+class SchedulePlugin extends KalturaPlugin implements IKalturaServices, IKalturaEventConsumers, IKalturaVersion
 {
 	const PLUGIN_NAME = 'schedule';
+	const PLUGIN_VERSION_MAJOR = 1;
+	const PLUGIN_VERSION_MINOR = 0;
+	const PLUGIN_VERSION_BUILD = 0;
 	const SCHEDULE_EVENTS_CONSUMER = 'kScheduleEventsConsumer';
 	
 	public static function dependsOn()
@@ -19,8 +22,20 @@ class SchedulePlugin extends KalturaPlugin implements IKalturaServices, IKaltura
 		return self::PLUGIN_NAME;
 	}
 	
-	/**
-	 * @return array<string,string> in the form array[serviceName] = serviceClass
+	/* (non-PHPdoc)
+	 * @see IKalturaVersion::getVersion()
+	 */
+	public static function getVersion()
+	{
+		return new KalturaVersion(
+			self::PLUGIN_VERSION_MAJOR,
+			self::PLUGIN_VERSION_MINOR,
+			self::PLUGIN_VERSION_BUILD
+		);		
+	}
+	
+	/* (non-PHPdoc)
+	 * @see IKalturaServices::getServicesMap()
 	 */
 	public static function getServicesMap()
 	{
@@ -32,8 +47,8 @@ class SchedulePlugin extends KalturaPlugin implements IKalturaServices, IKaltura
 		return $map;
 	}
 	
-	/**
-	 * @return array
+	/* (non-PHPdoc)
+	 * @see IKalturaEventConsumers::getEventConsumers()
 	 */
 	public static function getEventConsumers()
 	{
