@@ -153,15 +153,16 @@ class KVisualRecognitionEngine implements KIntegrationCloserEngine
                 $existingCuePoints[$cuepoint->startTime] = array('id' => $cuepoint->id, 'desc' => $cuepoint->description);
             }
             
+            
             KBatchBase::$kClient->startMultiRequest();
             foreach ($thumbCuePointsInitData as $sec => $thumbCuePointInitData) {
                 $startTime = $sec*1000;
                 KalturaLog::info("adding cuepoint in sec $sec");
-                $cuePoint = new KalturaThumbCuePoint();
+                $cuePointTmp = new KalturaThumbCuePoint();
                 
                 if(is_array($thumbCuePointInitData))
                 {
-                    $cuePoint->description = implode(' ', $thumbCuePointInitData);
+                    $cuePointTmp->description = implode(' ', $thumbCuePointInitData);
                 }
                 else
                 {
@@ -171,17 +172,17 @@ class KVisualRecognitionEngine implements KIntegrationCloserEngine
                 // if there is already a cuepoint from another engine - concat results
                 if(isset($existingCuePoints[$startTime]))
                 {
-                    $cuePoint->description = $cuePoint->description . ' ' . $existingCuePoints[$cuepoint->startTime]['desc'];
-                    KBatchBase::$kClient->cuePoint->update($existingCuePoints[$cuepoint->startTime]['id'], $cuePoint);
+                    $cuePointTmp->description = $cuePointTmp->description . ' ' . $existingCuePoints[$startTime]['desc'];
+                    KBatchBase::$kClient->cuePoint->update($existingCuePoints[$startTime]['id'], $cuePointTmp);
                 }
                 else
                 {
                     // create cuepoint as one does not exist on startTime
-                    $cuePoint->entryId = $entryId;
-                    $cuePoint->startTime = $startTime;
-                    $cuePoint->subType = KalturaThumbCuePointSubType::SLIDE;
-                    $cuePoint->tags = self::AUTOMATIC_VISUAL_RECOGNITION_TAG;
-                    KBatchBase::$kClient->cuePoint->add($cuePoint);
+                    $cuePointTmp->entryId = $entryId;
+                    $cuePointTmp->startTime = $startTime;
+                    $cuePointTmp->subType = KalturaThumbCuePointSubType::SLIDE;
+                    $cuePointTmp->tags = self::AUTOMATIC_VISUAL_RECOGNITION_TAG;
+                    KBatchBase::$kClient->cuePoint->add($cuePointTmp);
                 }
             }
             KBatchBase::$kClient->doMultiRequest();
