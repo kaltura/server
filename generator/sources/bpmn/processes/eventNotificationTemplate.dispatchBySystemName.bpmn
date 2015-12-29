@@ -46,7 +46,7 @@ println("Scope defined");
     <dataObject id="systemName" name="systemName" itemSubjectRef="xsd:string"></dataObject>
     <dataObject id="objectType" name="objectType" itemSubjectRef="xsd:string"></dataObject>
     <dataObject id="objectId" name="objectId" itemSubjectRef="xsd:string"></dataObject>
-    <scriptTask id="getTemplateId" name="Get Template Id" activiti:autoStoreVariables="false">
+    <scriptTask id="getTemplateId" name="Get Template Id" scriptFormat="javascript" activiti:autoStoreVariables="false">
       <script>
 var eventNotificationTemplate = eventNotificationTemplateList.objects.get(0);
 var eventNotificationTemplateId = eventNotificationTemplate.id;
