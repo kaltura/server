@@ -141,6 +141,7 @@ class KVisualRecognitionEngine implements KIntegrationCloserEngine
             KBatchBase::impersonate($partnerId);
             
             $filter = new KalturaThumbCuePointFilter();
+            $filter->orderBy = KalturaCuePointOrderBy::START_TIME_ASC;
             $filter->tagsLike = self::AUTOMATIC_VISUAL_RECOGNITION_TAG;
             $filter->subTypeEqual = ThumbCuePointSubType::SLIDE;
             $filter->entryIdEqual = $entryId;
@@ -153,11 +154,13 @@ class KVisualRecognitionEngine implements KIntegrationCloserEngine
                 $existingCuePoints[$cuepoint->startTime] = array('id' => $cuepoint->id, 'desc' => $cuepoint->description);
             }
             
+            KalturaLog::info(print_r($existingCuePoints, true));
+            
             
             KBatchBase::$kClient->startMultiRequest();
             foreach ($thumbCuePointsInitData as $sec => $thumbCuePointInitData) {
                 $startTime = $sec*1000;
-                KalturaLog::info("adding cuepoint in sec $sec");
+                KalturaLog::info("starttime is set to $startTime");
                 $cuePointTmp = new KalturaThumbCuePoint();
                 
                 if(is_array($thumbCuePointInitData))
@@ -172,11 +175,14 @@ class KVisualRecognitionEngine implements KIntegrationCloserEngine
                 // if there is already a cuepoint from another engine - concat results
                 if(isset($existingCuePoints[$startTime]))
                 {
+                    KalturaLog::info("fonud existing cuepoint at position $startTime with ID ".$existingCuePoints[$startTime]['id']);
+                    KalturaLog::info("updating cuepoint ".$existingCuePoints[$startTime]['id']." in sec $sec");
                     $cuePointTmp->description = $cuePointTmp->description . ' ' . $existingCuePoints[$startTime]['desc'];
                     KBatchBase::$kClient->cuePoint->update($existingCuePoints[$startTime]['id'], $cuePointTmp);
                 }
                 else
                 {
+                    KalturaLog::info("adding cuepoint in sec $sec");
                     // create cuepoint as one does not exist on startTime
                     $cuePointTmp->entryId = $entryId;
                     $cuePointTmp->startTime = $startTime;
