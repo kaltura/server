@@ -64,6 +64,7 @@ class facebookoauth2Action extends oauth2Action
 		$appSecret = $this->getFromConfig(FacebookConstants::FACEBOOK_APP_SECRET_REQUEST_PARAM);
 		$permissions = explode(',',base64_decode($this->getRequestParameter(FacebookConstants::FACEBOOK_PERMISSIONS_REQUEST_PARAM)));
 		$providerId = base64_decode($this->getRequestParameter(FacebookConstants::FACEBOOK_PROVIDER_ID_REQUEST_PARAM));
+		$requestPartnerId = base64_decode($this->getRequestParameter(FacebookConstants::FACEBOOK_PARTNER_ID_REQUEST_PARAM));
 
 		$ksStr = $this->getRequestParameter(FacebookConstants::FACEBOOK_KS_REQUEST_PARAM);
 		$this->ksError = null;
@@ -74,8 +75,13 @@ class facebookoauth2Action extends oauth2Action
 			return;
 		}
 		$ks = kCurrentContext::$ks_object;
-		$partnerId = $ks->partner_id;
-		$ks = $this->generateTimeLimitedAdminKs($partnerId);
+		$contextPartnerId = $ks->partner_id;
+		if ( empty($requestPartnerId) || $contextPartnerId != $requestPartnerId)
+		{
+			$this->partnerError = true;
+			return;
+		}
+		$ks = $this->generateTimeLimitedAdminKs($contextPartnerId);
 		$params = $this->getForwardParameters();
 		$params[FacebookConstants::FACEBOOK_KS_REQUEST_PARAM] = $ks;
 		$params[FacebookConstants::FACEBOOK_NEXT_ACTION_REQUEST_PARAM] = base64_encode(self::SUB_ACTION_PROCESS_OAUTH2_RESPONSE);
@@ -140,6 +146,8 @@ class facebookoauth2Action extends oauth2Action
 				$this->getRequestParameter(FacebookConstants::FACEBOOK_RE_REQUEST_PERMISSIONS_REQUEST_PARAM),
 			FacebookConstants::FACEBOOK_PROVIDER_ID_REQUEST_PARAM =>
 				$this->getRequestParameter(FacebookConstants::FACEBOOK_PROVIDER_ID_REQUEST_PARAM),
+			FacebookConstants::FACEBOOK_PARTNER_ID_REQUEST_PARAM =>
+				$this->getRequestParameter(FacebookConstants::FACEBOOK_PARTNER_ID_REQUEST_PARAM),
 			FacebookConstants::FACEBOOK_KS_REQUEST_PARAM =>
 				$this->getRequestParameter(FacebookConstants::FACEBOOK_KS_REQUEST_PARAM)
 		);

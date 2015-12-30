@@ -464,6 +464,7 @@ class FacebookConstants
 	const FACEBOOK_RE_REQUEST_PERMISSIONS_REQUEST_PARAM = 're_request_permissions';
 	const FACEBOOK_PERMISSIONS_REQUEST_PARAM = 'permissions';
 	const FACEBOOK_PROVIDER_ID_REQUEST_PARAM = 'provider_id';
+	const FACEBOOK_PARTNER_ID_REQUEST_PARAM = 'partner_id';
 	const FACEBOOK_NEXT_ACTION_REQUEST_PARAM = 'next_action';
 	const FACEBOOK_KS_REQUEST_PARAM = 'ks';
 }

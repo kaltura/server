@@ -196,6 +196,7 @@ class FacebookDistributionProfile extends ConfigurableDistributionProfile
 		$permissions = $this->getFacebookPermissions();
 		$url = kConf::get('apphome_url');
 		$url .= "/index.php/extservices/facebookoauth2".
+            "/".FacebookConstants::FACEBOOK_PARTNER_ID_REQUEST_PARAM."/".base64_encode($this->getPartnerId()).
             "/".FacebookConstants::FACEBOOK_PROVIDER_ID_REQUEST_PARAM."/".base64_encode($this->getId()).
             "/".FacebookConstants::FACEBOOK_PAGE_ID_REQUEST_PARAM."/".base64_encode($this->getPageId()).
             "/".FacebookConstants::FACEBOOK_PERMISSIONS_REQUEST_PARAM."/".base64_encode($permissions).
