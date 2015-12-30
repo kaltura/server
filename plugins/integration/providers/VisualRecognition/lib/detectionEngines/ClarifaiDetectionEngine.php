@@ -6,8 +6,8 @@
 class ClarifaiDetectionEngine extends BaseDetectionEngine
 {
 	const GET_TOKEN_URL = 'https://api.clarifai.com/v1/token/';
-	const CLIENT_ID = 'A6uzUk5JZEHD36ApI7EdvXe3oGvHDMHE0249CR_E';
-	const CLIENT_SECRET = 'qZvbJsNZFyjverGO_IHEw0AfhmonqCiSt1SZm3lp';
+	const CLIENT_ID = 'A6uzUk5JZEHD36ApI7EdgXe3oGvHDMHE0249CR_E';
+	const CLIENT_SECRET = 'qZvbJsNZDyjverGO_IHEw0AfhmonqCiSt1SZm3lp';
 	const RECOGNIZE_URL = 'https://api.clarifai.com/v1/tag/?url=';
 	private static $token;
 	private $currentResults = array();

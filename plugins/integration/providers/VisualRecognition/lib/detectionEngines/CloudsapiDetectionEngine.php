@@ -5,7 +5,7 @@
 class CloudsapiDetectionEngine extends BaseDetectionEngine
 {
 	const RECOGNIZE_URI = 'http://api.cloudsightapi.com/image_requests';
-	const KEY = 'CloudSight zYF_TIv3zFjEWPHGNfl4Cw';
+	const KEY = 'CloudSight zYF_TIv3zTjEWPHGNfl4Cw';
 	const CHECK_URL = 'http://api.cloudsightapi.com/image_responses/';
 	private $currentResults = array();
 	private $finalResults = array();

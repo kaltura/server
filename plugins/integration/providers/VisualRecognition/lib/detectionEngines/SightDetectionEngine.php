@@ -5,8 +5,8 @@
  */
 class SightDetectionEngine extends BaseDetectionEngine
 {
-	const CLIENT_USER = '1421663145';
-	const CLIENT_SECRET = '7WSWXFfPX83WmMgR';
+	const CLIENT_USER = '1421653145';
+	const CLIENT_SECRET = '7WSWXFfPX85WmMgR';
 	const RECOGNIZE_URL = 'https://api.sightengine.com/1.0/nudity.json';
 	private $currentResults = array();
 
