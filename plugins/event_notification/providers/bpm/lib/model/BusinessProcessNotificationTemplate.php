@@ -18,7 +18,6 @@ abstract class BusinessProcessNotificationTemplate extends BatchEventNotificatio
 		$jobData = new kBusinessProcessNotificationDispatchJobData();
 		$jobData->setTemplateId($this->getId());
 		$jobData->setServerId($this->getServerId());
-		
 		$jobData->setContentParameters($this->getParameters($scope));
 		
 		if($scope instanceof kEventScope)
