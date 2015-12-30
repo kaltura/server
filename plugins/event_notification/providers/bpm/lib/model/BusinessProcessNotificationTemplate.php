@@ -19,7 +19,20 @@ abstract class BusinessProcessNotificationTemplate extends BatchEventNotificatio
 		$jobData->setTemplateId($this->getId());
 		$jobData->setServerId($this->getServerId());
 		
-		$contentParametersValues = array();
+		$jobData->setContentParameters($this->getParameters($scope));
+		
+		if($scope instanceof kEventScope)
+		{
+			$object = $scope->getObject();
+			$jobData->setObject($object);
+		}
+		
+		return $jobData;
+	}
+
+	protected function getParameters(kScope $scope)
+	{
+		$parametersValues = array();
 		$contentParameters = $this->getContentParameters();
 		foreach($contentParameters as $contentParameter)
 		{
@@ -28,7 +41,7 @@ abstract class BusinessProcessNotificationTemplate extends BatchEventNotificatio
 			if($scope && $value instanceof kStringField)
 				$value->setScope($scope);
 				
-			$contentParametersValues[$contentParameter->getKey()] = $value->getValue();
+			$parametersValues[$contentParameter->getKey()] = $value->getValue();
 		}
 		$userParameters = $this->getUserParameters();
 		foreach($userParameters as $userParameter)
@@ -38,17 +51,10 @@ abstract class BusinessProcessNotificationTemplate extends BatchEventNotificatio
 			if($scope && $value instanceof kStringField)
 				$value->setScope($scope);
 				
-			$contentParametersValues[$userParameter->getKey()] = $value->getValue();
-		}
-		$jobData->setContentParameters($contentParametersValues);
-		
-		if($scope instanceof kEventScope)
-		{
-			$object = $scope->getObject();
-			$jobData->setObject($object);
+			$parametersValues[$userParameter->getKey()] = $value->getValue();
 		}
 		
-		return $jobData;
+		return $parametersValues;
 	}
 
 	protected function dispatchPerCase(kScope $scope, $eventNotificationType = null)
