@@ -38,6 +38,7 @@ class Form_FacebookProfileConfiguration extends Form_ConfigurableProfileConfigur
 		$this->addElement('text', 'page_id', array(
 			'label'			=> 'Facebook Page ID:',
 			'filters'		=> array('StringTrim'),
+			'required'		=> true,
 		));
 
 
@@ -48,6 +49,5 @@ class Form_FacebookProfileConfiguration extends Form_ConfigurableProfileConfigur
 		);
 
 	}
-
 
 }
