@@ -39,8 +39,12 @@ abstract class ScheduleEvent extends BaseScheduleEvent implements IRelatedObject
 	{
 		$this->setStatus(ScheduleEventStatus::ACTIVE);
 		$this->setPartnerId(kCurrentContext::getCurrentPartnerId());
-		$this->setOrganizerPuserId(kCurrentContext::$ks_uid);
-		$this->incrementSequence();
+		
+		if(!$this->getParentId())
+		{
+			$this->setOrganizerPuserId(kCurrentContext::$ks_uid);
+			$this->incrementSequence();
+		}
 		
 		if($this->getRecuranceType() != ScheduleEventRecuranceType::RECURRENCE)
 		{

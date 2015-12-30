@@ -301,6 +301,51 @@ abstract class KalturaScheduleEvent extends KalturaObject implements IRelatedFil
 		
 		parent::validateForUpdate($sourceObject, $propertiesToSkip);
 	}
+
+	/* (non-PHPdoc)
+	 * @see KalturaObject::doFromObject()
+	 */
+	protected function doFromObject($srcObj, KalturaDetachedResponseProfile $responseProfile= null)
+	{
+		/* @var $srcObj ScheduleEvent */
+		if($srcObj->getParentId())
+		{
+			$attributes = $this->getMapBetweenObjects();
+			$skipAttributes = array();
+			
+			foreach($attributes as $apiPropName => $dbPropName)
+			{
+				if (is_numeric($apiPropName))
+					$apiPropName = $dbPropName;
+					
+				if(!is_null($this->$apiPropName)){
+					$skipAttributes[] = $apiPropName;
+				}
+			}
+			if(count($skipAttributes) < count($attributes))
+			{
+				if(is_null($responseProfile))
+				{
+					$responseProfile = new KalturaDetachedResponseProfile();
+					$responseProfile->type = KalturaResponseProfileType::EXCLUDE_FIELDS;
+					$responseProfile->fields = implode(',', $skipAttributes);
+				}
+				elseif($responseProfile->type == KalturaResponseProfileType::EXCLUDE_FIELDS)
+				{
+					$responseProfile->fields = implode(',', array_intersect(explode(',', $responseProfile->fields), $skipAttributes));
+				}
+				elseif($responseProfile->type == KalturaResponseProfileType::INCLUDE_FIELDS)
+				{
+					$responseProfile->fields = implode(',', array_diff(explode(',', $responseProfile->fields), $skipAttributes));
+				}
+				
+				$parentObj = ScheduleEventPeer::retrieveByPK($srcObj->getParentId());
+				$this->fromObject($parentObj, $responseProfile);
+			}
+		}
+		
+		parent::doFromObject($srcObj, $responseProfile);
+	}
 	
 	/* (non-PHPdoc)
 	 * @see IApiObjectFactory::getInstance($sourceObject, KalturaDetachedResponseProfile $responseProfile)

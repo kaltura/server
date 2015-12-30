@@ -11,6 +11,21 @@ class KalturaScheduleEventArray extends KalturaTypedArray
 		if ($arr == null)
 			return $newArr;
 
+		// preload all parents in order to have them in the instance pool
+		$parentIds = array();
+		foreach ($arr as $obj)
+		{
+			/* @var $obj ScheduleEvent */
+			if($obj->getParentId())
+			{
+				$parentIds[$obj->getParentId()] = true;
+			} 
+		}
+		if(count($parentIds))
+		{
+			ScheduleEventPeer::retrieveByPKs(array_keys($parentIds));
+		}
+		
 		foreach ($arr as $obj)
 		{
 			$newArr[] = KalturaScheduleEvent::getInstance($obj, $responseProfile);
