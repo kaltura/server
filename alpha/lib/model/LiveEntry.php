@@ -654,9 +654,9 @@ abstract class LiveEntry extends entry
 			$this->setLastBroadcastEndTime(kApiCache::getTime());
 		}
 		
-		if(!$this->hasMediaServer()) {
-			$this->setLiveStatus(LiveEntryStatus::STOPPED, $index);
-		}
+		// Set media server with index #index to be stopped
+		// the entry->liveStatus() is calculated from the state of both servers
+		$this->setLiveStatus(LiveEntryStatus::STOPPED, $index);
 	}
 	
 	/**
