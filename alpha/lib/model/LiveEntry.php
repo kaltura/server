@@ -631,7 +631,7 @@ abstract class LiveEntry extends entry
 		$this->setLastBroadcast(kApiCache::getTime());
 		$server = new kLiveMediaServer($index, $hostname, $mediaServerNode->getDc(), $mediaServerNode->getId(), $applicationName ? $applicationName : $mediaServerNode->getApplicationName());
 		$this->putInCustomData("server-$index", $server, LiveEntry::CUSTOM_DATA_NAMESPACE_MEDIA_SERVERS);
-		$this->setLiveStatus(LiveEntryStatus::PLAYABLE);
+		$this->setLiveStatus(LiveEntryStatus::PLAYABLE, $index);
 	}
 	
 	protected function isMediaServerRegistered($index, $hostname)
@@ -655,7 +655,7 @@ abstract class LiveEntry extends entry
 		}
 		
 		if(!$this->hasMediaServer()) {
-			$this->setLiveStatus(LiveEntryStatus::STOPPED);
+			$this->setLiveStatus(LiveEntryStatus::STOPPED, $index);
 		}
 	}
 	
@@ -679,14 +679,22 @@ abstract class LiveEntry extends entry
 		return $listChanged;
 	}
 	
-	public function getLiveStatus ()
+	public function getLiveStatus ($mediaServerIndex = null)
 	{
-		return $this->getFromCustomData('live_status', null, LiveEntryStatus::STOPPED);
+		if ($mediaServerIndex != null){
+			return $this->getLiveStatusInternal($mediaServerIndex);
+		}
+		return LiveEntryStatusHelper::maxLiveEntryStatusStatus($this->getLiveStatusInternal(MediaServerIndex::PRIMARY), $this->getLiveStatusInternal(MediaServerIndex::SECONDARY));
 	}
-	
-	public function setLiveStatus ($v)
+
+	private function getLiveStatusInternal ($mediaServerIndex)
 	{
-		$this->putInCustomData('live_status', $v);
+		return $this->getFromCustomData('live_status_'.$mediaServerIndex, null, LiveEntryStatus::STOPPED);
+	}
+
+	public function setLiveStatus ($v, $mediaServerIndex)
+	{
+		$this->putInCustomData('live_status_'.$mediaServerIndex, $v);
 	}
 	
 	/**

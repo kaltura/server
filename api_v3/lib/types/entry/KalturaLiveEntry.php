@@ -90,13 +90,19 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 	 * @var float
 	 */
 	public $currentBroadcastStartTime;
-	
+
 	/**
 	 * @var KalturaLiveEntryRecordingOptions
 	 * @insertonly
 	 */
 	public $recordingOptions;
-	
+
+	/**
+	 * the status of the entry of type LiveEntryStatus
+	 * @var KalturaLiveEntryStatus
+	 */
+	public $liveStatus;
+
 	private static $map_between_objects = array
 	(
 		"offlineMessage",
@@ -112,6 +118,7 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 		"publishConfigurations",
 		"currentBroadcastStartTime",
 		"recordingOptions",
+		"liveStatus"
 	);
 	
 	/* (non-PHPdoc)
