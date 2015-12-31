@@ -227,7 +227,6 @@ class KalturaLiveEntryService extends KalturaEntryService
 			}
 			else {
 				$dbEntry->setMediaServer($mediaServerIndex, $hostname, $applicationName);
-				$dbEntry->setRedirectEntryId(null);
 			}
 		}
 		catch(kCoreException $ex)
@@ -241,6 +240,9 @@ class KalturaLiveEntryService extends KalturaEntryService
 					throw $ex;
 			}
 		}
+		
+		// setRedirectEntryId to null in all cases, even for broadcasting...
+		$dbEntry->setRedirectEntryId(null);
 
 		if($dbEntry->save())
 		{
