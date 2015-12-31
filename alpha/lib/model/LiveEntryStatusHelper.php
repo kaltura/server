@@ -2,7 +2,7 @@
 
 class LiveEntryStatusHelper
 {
-    public static function maxLiveEntryStatusStatus($primaryMediaServerStatus, $secondaryMediaServerStatus)
+    public static function maxLiveEntryStatus($primaryMediaServerStatus, $secondaryMediaServerStatus)
     {
         if ($primaryMediaServerStatus == LiveEntryStatus::PLAYABLE || $secondaryMediaServerStatus == LiveEntryStatus::PLAYABLE)
             return LiveEntryStatus::PLAYABLE;

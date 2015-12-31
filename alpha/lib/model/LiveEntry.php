@@ -684,7 +684,7 @@ abstract class LiveEntry extends entry
 		if ($mediaServerIndex != null){
 			return $this->getLiveStatusInternal($mediaServerIndex);
 		}
-		return LiveEntryStatusHelper::maxLiveEntryStatusStatus($this->getLiveStatusInternal(MediaServerIndex::PRIMARY), $this->getLiveStatusInternal(MediaServerIndex::SECONDARY));
+		return LiveEntryStatusHelper::maxLiveEntryStatus($this->getLiveStatusInternal(MediaServerIndex::PRIMARY), $this->getLiveStatusInternal(MediaServerIndex::SECONDARY));
 	}
 
 	private function getLiveStatusInternal ($mediaServerIndex)
