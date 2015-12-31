@@ -240,7 +240,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 					throw $ex;
 			}
 		}
-		
+
 		// setRedirectEntryId to null in all cases, even for broadcasting...
 		$dbEntry->setRedirectEntryId(null);
 
@@ -377,6 +377,14 @@ class KalturaLiveEntryService extends KalturaEntryService
 		if(!$dbEntry->hasMediaServer() && $dbEntry->getRecordedEntryId())
 		{
 			$dbEntry->setRedirectEntryId($dbEntry->getRecordedEntryId());
+		}
+
+		if ( count( $dbEntry->getMediaServers() ) == 0 )
+		{
+			if ( $dbEntry->getCurrentBroadcastStartTime() )
+			{
+				$dbEntry->setCurrentBroadcastStartTime( 0 );
+			}
 		}
 
 		$dbEntry->save();
