@@ -1,3 +1,17 @@
+# Kajam-11.6.0 #
+
+## Expose liveStatus in the API for use in the WebCasting app + add BROADCASTING state to LiveEntryStatus##
+ - Issue Type: New Feature
+ - Issue ID: WEBC-629
+#### Installation ####
+ - deploy new jars to Wowza - new jars can be found in the ticket https://kaltura.atlassian.net/browse/WEBC-629
+#### Configuration ####
+None.
+#### Known Issues & Limitations ####
+None.
+#### Deployment scripts ####
+None.
+
 # Kajam-11.5.0 #
 
 ## pass AMF data on shared storage instead of in job data ##
