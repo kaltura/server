@@ -55,6 +55,8 @@ class PlaylistService extends KalturaEntryService
 	 * @param KalturaPlaylist $playlist
 	 * @param bool $updateStats indicates that the playlist statistics attributes should be updated synchronously now
 	 * @return KalturaPlaylist
+	 *
+	 * @disableRelativeTime $playlist
 	 */
 	function addAction( KalturaPlaylist $playlist , $updateStats = false)
 	{
@@ -132,6 +134,8 @@ class PlaylistService extends KalturaEntryService
 	 * @throws APIErrors::INVALID_ENTRY_ID
 	 * @throws APIErrors::INVALID_PLAYLIST_TYPE
 	 * @validateUser entry id edit
+	 *
+	 * @disableRelativeTime $playlist
 	 */
 	function updateAction( $id , KalturaPlaylist $playlist , $updateStats = false )
 	{
