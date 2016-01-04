@@ -81,7 +81,7 @@ class facebookoauth2Action extends oauth2Action
 			$this->partnerError = true;
 			return;
 		}
-		$ks = $this->generateTimeLimitedAdminKs($contextPartnerId);
+		$ks = $this->generateTimeLimitedKs($contextPartnerId);
 		$params = $this->getForwardParameters();
 		$params[FacebookConstants::FACEBOOK_KS_REQUEST_PARAM] = $ks;
 		$params[FacebookConstants::FACEBOOK_NEXT_ACTION_REQUEST_PARAM] = base64_encode(self::SUB_ACTION_PROCESS_OAUTH2_RESPONSE);
