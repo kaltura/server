@@ -684,7 +684,7 @@ abstract class LiveEntry extends entry
 		if ($mediaServerIndex != null){
 			return $this->getLiveStatusInternal($mediaServerIndex);
 		}
-		return LiveEntryStatusHelper::maxLiveEntryStatus($this->getLiveStatusInternal(MediaServerIndex::PRIMARY), $this->getLiveStatusInternal(MediaServerIndex::SECONDARY));
+		return LiveEntry::maxLiveEntryStatus($this->getLiveStatusInternal(MediaServerIndex::PRIMARY), $this->getLiveStatusInternal(MediaServerIndex::SECONDARY));
 	}
 
 	private function getLiveStatusInternal ($mediaServerIndex)
@@ -834,5 +834,15 @@ abstract class LiveEntry extends entry
 			$recordingOptions = unserialize($recordingOptions);
 		
 		return $recordingOptions; 
+	}
+
+	public static function maxLiveEntryStatus($primaryMediaServerStatus, $secondaryMediaServerStatus)
+	{
+		if ($primaryMediaServerStatus == LiveEntryStatus::PLAYABLE || $secondaryMediaServerStatus == LiveEntryStatus::PLAYABLE)
+			return LiveEntryStatus::PLAYABLE;
+		elseif ($primaryMediaServerStatus == LiveEntryStatus::BROADCASTING || $secondaryMediaServerStatus == LiveEntryStatus::BROADCASTING)
+			return LiveEntryStatus::BROADCASTING;
+		else
+			return LiveEntryStatus::STOPPED;
 	}
 }
