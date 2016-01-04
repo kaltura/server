@@ -127,9 +127,10 @@ class KMediaInfoMediaParser extends KBaseMediaParser
 			}
 			
 			/*
-			 * On off-sanity dar - use ffprobe object dar
+			 * On off-sanity dar or if the is AR ambiguity, due to 'original dar'
+			 * - use ffprobe object dar
 			 */
-			if(isset($kMi->videoDar) && ($kMi->videoDar>KDLSanityLimits::MaxDAR || $kMi->videoDar<KDLSanityLimits::MinDAR)){
+			if(isset($kMi->videoDar) && ($kMi->videoDar>KDLSanityLimits::MaxDAR || $kMi->videoDar<KDLSanityLimits::MinDAR || isset($kMi->originalDar))){
 				if(isset($ffMi->videoDar) && !($ffMi->videoDar>KDLSanityLimits::MaxDAR || $ffMi->videoDar<KDLSanityLimits::MinDAR)){
 					$kMi->videoDar=$ffMi->videoDar;
 				}
@@ -350,8 +351,11 @@ class KMediaInfoMediaParser extends KBaseMediaParser
 				if(isset($mediaInfo->videoDar) && $mediaInfo->videoDar>0){
 					break;
 				}
+				$mediaInfo->videoDar = self::calcDar($val);
+				break;
 			case "original display aspect ratio":
 				$mediaInfo->videoDar = self::calcDar($val);
+				$mediaInfo->originalDar = $mediaInfo->videoDar;
 				break;
 			case "rotation":
 				$mediaInfo->videoRotation = (int)self::trima($val);

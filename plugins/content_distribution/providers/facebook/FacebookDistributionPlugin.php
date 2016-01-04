@@ -5,7 +5,7 @@
 class FacebookDistributionPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaEnumerator, IKalturaPending, IKalturaObjectLoader, IKalturaContentDistributionProvider, IKalturaConfigurator
 {
 	const PLUGIN_NAME = 'facebookDistribution';
-	const CONTENT_DISTRIBUTION_VERSION_MAJOR = 2;
+	const CONTENT_DISTRIBUTION_VERSION_MAJOR = 1;
 	const CONTENT_DISTRIBUTION_VERSION_MINOR = 0;
 	const CONTENT_DISTRIBUTION_VERSION_BUILD = 0;
 	
@@ -59,7 +59,7 @@ class FacebookDistributionPlugin extends KalturaPlugin implements IKalturaPermis
 		// client side apps like batch and admin console
 		if (class_exists('KalturaClient') && $enumValue == KalturaDistributionProviderType::FACEBOOK)
 		{
-			if(in_array($baseClass, array('IDistributionEngineSubmit', 'IDistributionEngineDelete', 'IDistributionEngineUpdate', 'IDistributionEngineCloseSubmit')))
+			if(in_array($baseClass, array('IDistributionEngineSubmit', 'IDistributionEngineDelete', 'IDistributionEngineUpdate')))
 				return new FacebookDistributionEngine();
 
 			if($baseClass == 'KalturaDistributionProfile')
@@ -110,7 +110,7 @@ class FacebookDistributionPlugin extends KalturaPlugin implements IKalturaPermis
 		if (class_exists('KalturaClient') && $enumValue == KalturaDistributionProviderType::FACEBOOK)
 		{
 
-			if(in_array($baseClass, array('IDistributionEngineSubmit', 'IDistributionEngineDelete', 'IDistributionEngineUpdate', 'IDistributionEngineCloseSubmit'))) {
+			if(in_array($baseClass, array('IDistributionEngineSubmit', 'IDistributionEngineDelete', 'IDistributionEngineUpdate'))) {
 				return 'FacebookDistributionEngine';
 			}
 					

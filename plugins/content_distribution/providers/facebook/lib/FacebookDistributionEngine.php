@@ -1,5 +1,6 @@
 <?php
 
+require_once(__DIR__."/KalturaFacebookLanguageMatch.php");
 /**
  * @package plugins.facebookDistribution
  * @subpackage lib
@@ -7,8 +8,7 @@
 class FacebookDistributionEngine extends DistributionEngine implements
 	IDistributionEngineSubmit,
 	IDistributionEngineDelete,
-	IDistributionEngineUpdate,
-	IDistributionEngineCloseSubmit
+	IDistributionEngineUpdate
 {
 	protected $appId;
 	protected $appSecret;
@@ -73,21 +73,14 @@ class FacebookDistributionEngine extends DistributionEngine implements
 		} catch (Exception $e) {
 			throw new Exception("Failed to submit facebook video , reason:".$e->getMessage());
 		}
-		return true;
-	}
 
-	/**
-	 * check for submission closure in case the submission is asynchronous.
-	 * @param KalturaDistributionSubmitJobData $data
-	 * @return bool true if finished, false if will be finished asynchronously
-	 */
-	public function closeSubmit(KalturaDistributionSubmitJobData $data)
-	{
-//		// we need a valid video in order to upload captions
-//		foreach ($data->providerData->captionsInfo as $captionInfo)
-//		{
-//			$this->submitCaption($data->distributionProfile, $captionInfo, $data->remoteId);
-//		}
+		if ($data->providerData->captionsInfo)
+		{
+			foreach ($data->providerData->captionsInfo as $captionInfo)
+			{
+				$this->submitCaption($data->distributionProfile, $captionInfo, $data->remoteId);
+			}
+		}
 		return true;
 	}
 
@@ -114,30 +107,36 @@ class FacebookDistributionEngine extends DistributionEngine implements
 			throw new Exception("Failed to update facebook video , reason:".$e->getMessage());
 		}
 
-//		foreach ($data->providerData->captionsInfo as $captionInfo) {
-//			switch ($captionInfo->action) {
-//				case KalturaDistributionAction::SUBMIT:
-//					$data->mediaFiles[] = $this->submitCaption($data->distributionProfile, $captionInfo, $data->entryDistribution->remoteId);
-//					break;
-//				case KalturaDistributionAction::DELETE:
-//					$this->deleteCaption($data->distributionProfile, $captionInfo, $data->entryDistribution->remoteId);
-//					break;
-//			}
-//		}
+		foreach ($data->providerData->captionsInfo as $captionInfo) {
+			switch ($captionInfo->action) {
+				case KalturaDistributionAction::SUBMIT:
+					$data->mediaFiles[] = $this->submitCaption($data->distributionProfile, $captionInfo, $data->entryDistribution->remoteId);
+					break;
+				case KalturaDistributionAction::DELETE:
+					$this->deleteCaption($data->distributionProfile, $captionInfo, $data->entryDistribution->remoteId);
+					break;
+			}
+		}
 		return true;
 	}
 
 	private function submitCaption(KalturaFacebookDistributionProfile $distributionProfile, KalturaCaptionDistributionInfo $captionInfo, $remoteId)
 	{
-		if (!$captionInfo->label)
-			throw new Exception("Captions must have a label according to Facebook's acceptable values (i.e. en_US), found ".$captionInfo->label);
+		if (!$captionInfo->label && !$captionInfo->language)
+			throw new Exception("No label/language were configured for this caption aborting");
+		if ($captionInfo->language)
+			$locale = KalturaFacebookLanguageMatch::getFacebookCodeForKalturaLanguage($captionInfo->language);
+		if (!$locale && $captionInfo->label)
+			$locale = $captionInfo->label;
+		if (!$locale)
+			throw new Exception("Failed to find matching language for language ".$captionInfo->language." and there was no label available");
 		$status = FacebookGraphSdkUtils::uploadCaptions(
 			$this->appId,
 			$this->appSecret,
-			$distributionProfile->getPageAccessToken(),
+			$distributionProfile->pageAccessToken,
 			$remoteId,
 			$captionInfo->filePath,
-			$captionInfo->label,
+			$locale,
 			$this->tempDirectory);
 		return $status;
 	}
