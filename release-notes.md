@@ -1,3 +1,28 @@
+# Kajam-11.6.0 #
+
+## Usage dashboard ##
+
+ - Issue Type: New Feature
+ - Issue ID: PLAT-3962 
+
+#### Installation ####
+
+- Download latest Usage Dashboard package from https://github.com/kaltura/usage-dashboard/releases/
+- Extract the zip to `/opt/kaltura/apps/usage-dashboard/`
+- If the app version is v1.0.0, make sure that `/opt/kaltura/apps/usage-dashboard/v0.9.0/index.html` exists
+
+#### Configuration ####
+
+- Add new permission to admin.ini:
+
+		moduls.enableUsageDashboard.enabled = true
+		moduls.enableUsageDashboard.permissionType = 2
+		moduls.enableUsageDashboard.label = Enable Usage Dashboard
+		moduls.enableUsageDashboard.permissionName = FEATURE_ENABLE_USAGE_DASHBOARD
+		moduls.enableUsageDashboard.basePermissionType =
+		moduls.enableUsageDashboard.basePermissionName =
+		moduls.enableUsageDashboard.group = GROUP_ENABLE_DISABLE_FEATURES
+
 # Kajam-11.5.0 #
 
 ## pass AMF data on shared storage instead of in job data ##
