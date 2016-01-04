@@ -129,25 +129,9 @@ usort($services, "compareServicesByName");
 				text = doc;
 				format = 'txt';
 			}
-			setAceEditorWithText(text, format);
-		}
-
-		function setAceEditorWithText(text, format){
-			var presentationFrame = document.getElementById('response');
-			var doc = ( presentationFrame.contentDocument || presentationFrame.contentWindow.document);
-			var editor = ace.edit(doc.getElementById('editorDiv'));
-			editor.setTheme("ace/theme/eclipse");
-			var session = editor.getSession();
-			session.setMode("ace/mode/" + format);
-			session.setTabSize(4);
-			session.setUseWrapMode(true);
-			editor.setShowPrintMargin(false);
-			editor.setValue(text);
-			editor.setReadOnly(true);
+			document.getElementById("response").contentWindow.setAceEditorWithText(text, format);
 			kTestMe.onResponse(text, format);
 		}
-
-
 
 	</script>
 </head>
@@ -282,7 +266,7 @@ else
 	</form>
 </div>
 <div class="right">
-	<iframe class="right-content" id="response" name="response" src="./testme.result.php"></iframe>
+	<iframe class="right-content" id="response" name="response" src="./testme.result.php" scrolling="no"></iframe>
 	<iframe id="hiddenResponse" name="hiddenResponse" src=""></iframe>
 </div>
 <ul id="codeSubMenu">

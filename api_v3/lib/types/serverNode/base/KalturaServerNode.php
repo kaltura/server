@@ -202,7 +202,7 @@ abstract class KalturaServerNode extends KalturaObject implements IFilterable, I
 		parent::doFromObject($source_object, $responseProfile);
 		
 		if($this->shouldGet('status', $responseProfile) && !is_null($source_object->getHeartbeatTime())
-				&& $source_object->getHeartbeatTime(null) < (time() - 120) && $this->status !== ServerNodeStatus::DISABLED)
+				&& $source_object->getHeartbeatTime(null) < (time() - ServerNode::SERVER_NODE_TTL_TIME) && $this->status !== ServerNodeStatus::DISABLED)
 			$this->status = ServerNodeStatus::NOT_REGISTERED;
 	}
 	

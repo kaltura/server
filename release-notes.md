@@ -1,3 +1,18 @@
+# Kajam-11.5.0 #
+
+## pass AMF data on shared storage instead of in job data ##
+ - Issue Type: New Feature
+ - Issue ID: WEBC-631
+#### Installation ####
+ - php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+#### Configuration ####
+ - Validate facebook.ini exists in the configuration directory
+ - Added FacebookDistribution to plugins.ini
+#### Known Issues & Limitations ####
+None.
+#### Deployment scripts ####
+None.
+
 # Kajam-11.4.0 #
 
 ## run mediainfo from convertLiveSegment/concat jobs ##

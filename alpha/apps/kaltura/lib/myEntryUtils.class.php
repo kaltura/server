@@ -1096,10 +1096,50 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		foreach($sourceAssets as $sourceAsset)
 			$sourceAsset->copyToEntry($targetEntry->getId(), $targetEntry->getPartnerId());
 	}
-	
-	public static function copyEntry(entry $entry, Partner $toPartner = null, $dontCopyUsers = false)
+
+
+	/**
+	 * @param entry $entry
+	 * @param Partner|null $toPartner
+	 * @param KalturaBaseEntryCloneOptionsArray $cloneOptionsArray - an array of enumerator of a subset of entry properties.
+	 * 													For each subset the user sets
+	 * 													whether the subset is included or excluded from the copy.
+	 * 													The default action for each subset is 'include'.
+	 * 													In case an subset was not set by the user at all; i.e. it was
+	 * 													not included or excluded, than it is treated as if it is
+	 * 													included in the copy
+	 * @return entry
+	 * @throws Exception
+	 * @throws PropelException
+	 * @throws kCoreException
+     */
+	public static function copyEntry(entry $entry, Partner $toPartner = null,
+									 array $cloneOptions)
  	{
- 		KalturaLog::log("copyEntry - Copying entry [".$entry->getId()."] to partner [".$toPartner->getId()."]");
+ 		KalturaLog::log("copyEntry - Copying entry [".$entry->getId()."] to partner [".$toPartner->getId().
+			" ] with clone options [ ".print_r($cloneOptions, true)." ]");
+
+		$entry->setClonedOption($cloneOptions);
+		$copyUsers = true;
+		$copyCategories = true;
+
+		/* @var kBaseEntryCloneOptionComponent $cloneOption */
+		foreach ($cloneOptions as $cloneOption)
+		{
+			$currentOption = $cloneOption->getItemType();
+			$currentType = $cloneOption->getRule();
+
+			if ($currentOption == BaseEntryCloneOptions::USERS && $currentType == CloneComponentSelectorType::EXCLUDE_COMPONENT)
+			{
+				$copyUsers = false;
+			}
+
+			if ($currentOption == BaseEntryCloneOptions::CATEGORIES && $currentType == CloneComponentSelectorType::EXCLUDE_COMPONENT)
+			{
+				$copyCategories = false;
+			}
+		}
+
  		$newEntry = $entry->copy();
  		$newEntry->setIntId(null);
 		$newEntry->setCategories(null);
@@ -1113,7 +1153,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
  		}
  		
  		$newKuser = null;
- 		if (!$dontCopyUsers)
+		if ($copyUsers)
  		{
  			// copy the kuser (if the same puser id exists its kuser will be used)
  			kuserPeer::setUseCriteriaFilter(false);
@@ -1231,7 +1271,9 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		            break;
 		    }
 		}
- 	
+
+		if ($copyCategories)
+		{
 		// copy relationships to categories
 		KalturaLog::debug('Copy relationships to categories from entry [' . $entry->getId() . '] to entry [' . $newEntry->getId() . ']');
 		$c = KalturaCriteria::create(categoryEntryPeer::OM_CLASS);
@@ -1312,7 +1354,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 			entryPeer::setUseCriteriaFilter(true);
 			categoryPeer::setUseCriteriaFilter(true);
 		}
-		
+		}
 		return $newEntry;
  	} 	
  	
