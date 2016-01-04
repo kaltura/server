@@ -219,7 +219,7 @@ class FacebookDistributionProfile extends ConfigurableDistributionProfile
 				return false;
 			try
 			{
-				FacebookGraphSdkUtils::validateVideoAttributes($videoAssetFilePath, $mediaInfo->getFileSize(), $mediaInfo->getVideoDuration(), $mediaInfo->getVideoWidth(), $mediaInfo->getVideoHeight());
+				FacebookGraphSdkUtils::validateVideoAttributes($videoAssetFilePath, $mediaInfo->getFileSize(), $mediaInfo->getVideoDuration());
 				return true;
 			}
 			catch(Exception $e)
