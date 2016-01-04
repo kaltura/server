@@ -3989,6 +3989,11 @@ kmc.functions = {
 			'contentHeight' : '94%'
 		} );
     },
+	openUsageDashboard: function(){
+		kmc.utils.hideFlash(true);
+		kmc.utils.openIframe(kmc.vars.base_url + '/apps/usage-dashboard/' + kmc.vars.usagedashboard.version + '/index.html');
+		return false;
+	},
 	flashVarsToUrl: function( flashVarsObject ){
 		 var params = '';
 		 for( var i in flashVarsObject ){
