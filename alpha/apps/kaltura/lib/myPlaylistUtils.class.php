@@ -15,8 +15,6 @@ class myPlaylistUtils
 	
 	private static $playlistContext;
 	
-	private static $relative_time_fields = array("gte_created_at","lte_created_at","gte_updated_at","lte_updated_at","gte_last_played_at","lte_last_played_at","gte_media_date","lte_media_date","lteornull_start_date","gteornull_start_date","lte_start_date","gte_start_date","lteornull_end_date","gteornull_end_date","lte_end_date","gte_end_date");
-
 	public static function setIsAdminKs($v)
 	{
 		self::$isAdminKs = $v;
@@ -494,7 +492,7 @@ class myPlaylistUtils
 			// TODO - optimize - maybe create them only when needed. - For now it's safer to compile all even if not needed.
 			$entry_filter = new entryFilter();
 			// add the desired prefix "_" because the XML is not expected to have it while the entryFilter class expects it
-			$entry_filter->fillObjectFromXml( $entry_filter_xml , "_", null, self::$relative_time_fields);
+			$entry_filter->fillObjectFromXml( $entry_filter_xml , "_");
 			// make sure there is alway a limit for each filter - if not an explicit one - the system limit should be used
 			if( $entry_filter->getLimit() == null || $entry_filter->getLimit() < 1 )
 			{
