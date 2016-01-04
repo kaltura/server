@@ -492,7 +492,7 @@ class myPlaylistUtils
 			// TODO - optimize - maybe create them only when needed. - For now it's safer to compile all even if not needed.
 			$entry_filter = new entryFilter();
 			// add the desired prefix "_" because the XML is not expected to have it while the entryFilter class expects it
-			$entry_filter->fillObjectFromXml( $entry_filter_xml , "_" );
+			$entry_filter->fillObjectFromXml( $entry_filter_xml , "_" ); 
 			// make sure there is alway a limit for each filter - if not an explicit one - the system limit should be used
 			if( $entry_filter->getLimit() == null || $entry_filter->getLimit() < 1 )
 			{

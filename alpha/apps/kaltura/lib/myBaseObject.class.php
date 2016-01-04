@@ -12,6 +12,8 @@ abstract class myBaseObject implements Iterator
 	const FIELD_SEPARATOR  = "&";
 	const ENCODE_FIELD_SEPARATOR  = "_@AMP@_";
 
+	const TEN_YEARS_IN_SECONDS = 315569260;
+
 	protected $fields;
 
 	abstract protected function init();
@@ -210,7 +212,7 @@ abstract class myBaseObject implements Iterator
 	 * WARNING - this method's params are different from fillObjectFromRequest due to the structure of the xml 
 	 * The second parameter $prefix_to_add represents the string to append as prefix to each of the elements names.
 	 */
-	public function fillObjectFromXml ( SimpleXMLElement $simple_xml_node , $prefix_to_add , $exclude_params=null )
+	public function fillObjectFromXml ( SimpleXMLElement $simple_xml_node , $prefix_to_add , $exclude_params=null , $time_params_to_relative = array())
 	{
 
 		$set_field_count = 0;
@@ -218,6 +220,9 @@ abstract class myBaseObject implements Iterator
 		// iterate over all the paramters of the request
 		foreach ( $simple_xml_node as $param => $value )
 		{
+			if(in_array($param, $time_params_to_relative))
+				$value = kTime::getRelativeTime($value);
+
 			// ignore empty strings in the filter !
 			if ( $value ==NULL || strlen ($value) == 0 ) continue;
 
