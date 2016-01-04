@@ -92,7 +92,7 @@ var kmc = {
 			</div>
 			<div class="hr"></div>
 			<div show-slide="showAdvancedOptionsStatus">
-				<div class="control-group" ng-hide="liveBitrates">
+				<div class="control-group" ng-hide="true">
 					<label class="control-label">{{ 'DELIVERY_TYPE' | translate }}</label>
 					<div class="controls"><select ng-model="deliveryType" ng-options="d.id as d.label for d in deliveryTypes"></select></div>
 					<small class="help-block">{{ 'DELIVERY_TYPE_HELP' | translate }} <a href="javascript:kmc.utils.openHelp('section_pne_stream');">{{ 'READ_MORE' | translate }}</a></small>
@@ -102,6 +102,7 @@ var kmc = {
 					<label class="control-label">{{ 'EMBED_TYPE' | translate }}</label>
 					<div class="controls"><select ng-model="embedType" ng-options="e.id as e.label for e in embedTypes"></select></div>
 					<small class="help-block">{{ 'EMBED_TYPE_HELP' | translate }} <a href="javascript:kmc.utils.openHelp('section_pne_embed');">{{ 'READ_MORE' | translate }}</a> {{ 'EMBED_TYPE_HELP2' | translate }}</small>
+                    <small class="help-block">{{ 'DELIVERY_TYPE_HELP' | translate }} <a href="http://knowledge.kaltura.com/how-enforce-delivery-type-each-player-using-ui-variables" target="_blank">{{ 'DELIVERY_TYPE_HELP2' | translate }}</a></small>
 				</div>
 				<div class="hr"></div>
 				<div class="control-group">

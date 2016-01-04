@@ -17,7 +17,15 @@ class DeliveryProfileVodPackagerMss extends DeliveryProfileSilverLight {
 		return $url;
 	}
 	
-	public function serve()
+	protected function doGetFileSyncUrl(FileSync $fileSync)
+	{
+		$url = parent::doGetFileSyncUrl($fileSync);
+		
+		$url .= VodPackagerDeliveryUtils::getExtraParams($this->params);
+		return $url;
+	}
+	
+	public function buildServeFlavors()
 	{
 		$flavors = $this->buildHttpFlavorsArray();
 		$flavors = $this->sortFlavors($flavors);
@@ -27,6 +35,6 @@ class DeliveryProfileVodPackagerMss extends DeliveryProfileSilverLight {
 				'/manifest', 
 				$this->params);
 		
-		return $this->getRenderer(array($flavor));
+		return array($flavor);
 	}
 }

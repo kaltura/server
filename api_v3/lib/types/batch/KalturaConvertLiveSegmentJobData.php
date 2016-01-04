@@ -45,7 +45,14 @@ class KalturaConvertLiveSegmentJobData extends KalturaJobData
 	 * @var float
 	 */
 	public $endTime;
-	
+
+	/**
+	 * The data output file
+	 * @var string
+	 */
+	public $destDataFilePath;
+
+
 	private static $map_between_objects = array
 	(
 		'entryId',
@@ -55,6 +62,7 @@ class KalturaConvertLiveSegmentJobData extends KalturaJobData
 		'srcFilePath',
 		'destFilePath',
 		'endTime',
+		'destDataFilePath',
 	);
 
 	/* (non-PHPdoc)

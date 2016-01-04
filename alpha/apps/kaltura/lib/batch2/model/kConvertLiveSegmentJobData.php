@@ -39,7 +39,12 @@ class kConvertLiveSegmentJobData extends kJobData
 	 * @var float
 	 */
 	private $endTime;
-	
+
+	/**
+	 * @var string
+	 */
+	private $destDataFilePath;
+
 	/**
 	 * @return string $entryId
 	 */
@@ -70,6 +75,14 @@ class kConvertLiveSegmentJobData extends kJobData
 	public function getDestFilePath()
 	{
 		return $this->destFilePath;
+	}
+
+	/**
+	 * @return string $destDataFilePath
+	 */
+	public function getDestDataFilePath()
+	{
+		return $this->destDataFilePath;
 	}
 
 	/**
@@ -110,6 +123,14 @@ class kConvertLiveSegmentJobData extends kJobData
 	public function setDestFilePath($destFilePath)
 	{
 		$this->destFilePath = $destFilePath;
+	}
+
+	/**
+	 * @param string $destDataFilePath
+	 */
+	public function setDestDataFilePath($destDataFilePath)
+	{
+		$this->destDataFilePath = $destDataFilePath;
 	}
 
 	/**

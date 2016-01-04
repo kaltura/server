@@ -5,6 +5,32 @@
  */
 class KalturaEdgeServerNode extends KalturaDeliveryServerNode
 {
+	/**
+	 * Delivery profile ids
+	 * @var KalturaKeyValueArray
+	 */
+	public $deliveryProfileIds;
+	
+	/**
+	 * Overdie edge server default configuration - json format
+	 * @var string
+	 */
+	public $config;
+	
+	private static $map_between_objects = array
+	(
+		"deliveryProfileIds",
+		"config",
+	);
+	
+	/* (non-PHPdoc)
+	 * @see KalturaObject::getMapBetweenObjects()
+	 */
+	public function getMapBetweenObjects ( )
+	{
+		return array_merge ( parent::getMapBetweenObjects() , self::$map_between_objects );
+	}
+	
 	/* (non-PHPdoc)
 	 * @see KalturaObject::validateForInsert()
 	 */

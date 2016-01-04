@@ -27,7 +27,7 @@ class DeliveryProfileAkamaiHds extends DeliveryProfileHds {
 		return $url;
 	}
 	
-	public function serve()
+	public function buildServeFlavors()
 	{
 		$flavor = $this->getSecureHdUrl();
 		if (!$flavor)
@@ -36,7 +36,7 @@ class DeliveryProfileAkamaiHds extends DeliveryProfileHds {
 			return null;
 		}
 		
-		return $this->getRenderer(array($flavor));
+		return array($flavor);
 	}
 	
 	/**
@@ -69,6 +69,11 @@ class DeliveryProfileAkamaiHds extends DeliveryProfileHds {
 			KalturaLog::info(get_class() . ' failed to find flavor');
 			return null;
 		}
+		
+		if ($this->getExtraParams())
+		{
+			$flavor['url'] = kDeliveryUtils::addQueryParameter($flavor['url'], $this->getExtraParams());
+		}	 
 		
 		return $flavor;
 	}

@@ -240,10 +240,15 @@ module Kaltura
 						end
 					end
 				end
-			elsif return_type != nil
-					return nil 
+			elsif return_type == nil
+				return nil 
 			else # simple type
-				return xml_element.text
+				value = xml_element.text
+				if return_type == "int"
+					return value.to_i
+				end
+				
+				return value
 			end
 
 			return instance;
@@ -319,10 +324,11 @@ module Kaltura
 					end
 				end
 			elsif value.is_a? Array
-				params[name] = Array.new(value.size)
 				if value.empty?
+					params[name] = {}
 					add_param(params[name], "-", "");
 				else
+					params[name] = Array.new(value.size)
 					value.each_with_index do |ele, i|
 						if ele.is_a? KalturaObjectBase
 							add_param(params[name], i, ele.to_params)

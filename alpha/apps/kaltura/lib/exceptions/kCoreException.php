@@ -100,4 +100,5 @@ class kCoreException extends Exception
 	
 	const MEDIA_SERVER_NOT_FOUND = "MEDIA_SERVER_NOT_FOUND";
 
+	const EXCEEDED_MAX_CUSTOM_DATA_SIZE = "EXCEEDED_MAX_CUSTOM_DATA_SIZE";
 }

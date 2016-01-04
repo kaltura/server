@@ -17,7 +17,15 @@ class DeliveryProfileVodPackagerDash extends DeliveryProfileDash {
 		return $url;
 	}
 	
-	public function serve()
+	protected function doGetFileSyncUrl(FileSync $fileSync)
+	{
+		$url = parent::doGetFileSyncUrl($fileSync);
+		
+		$url .= VodPackagerDeliveryUtils::getExtraParams($this->params);
+		return $url;
+	}
+	
+	public function buildServeFlavors()
 	{
 		$flavors = $this->buildHttpFlavorsArray();
 		
@@ -27,6 +35,6 @@ class DeliveryProfileVodPackagerDash extends DeliveryProfileDash {
 				'/manifest.mpd', 
 				$this->params);
 		
-		return $this->getRenderer(array($flavor));
+		return array($flavor);
 	}
 }

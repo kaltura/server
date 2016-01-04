@@ -41,6 +41,7 @@ class myReportsMgr
 	const REPORT_TYPE_BROWSERS = 23;
 	const REPORT_TYPE_LIVE = 24;
 	const REPORT_TYPE_TOP_PLAYBACK_CONTEXT = 25;
+	const REPORT_TYPE_VPAAS_USAGE = 26;
 
 	const REPORTS_TABLE_MAX_QUERY_SIZE = 20000;
 	const REPORTS_CSV_MAX_QUERY_SIZE = 130000;
@@ -50,6 +51,12 @@ class myReportsMgr
 	const COUNT_PLAYS_HEADER = "count_plays";
 	const UNIQUE_USERS = "unique_known_users";
 	const UNIQUE_VIDEOS = "unique_videos";
+	
+	const OBJECT_IDS_PLACE_HOLDER = "{OBJ_ID_CLAUSE}";
+	const APPLICATION_NAME_PLACE_HOLDER = "{APPLICATION_NAME}";
+	const PUSERS_PLACE_HOLDER = "{PUSER_ID}";
+	const UNKNOWN_PUSER_ID_CLAUSE = "'0'";
+	const UNKNOWN_NAME_CLAUSE = "'Unknown'";
 
 	static $unique_total_reports = array (self::REPORT_TYPE_USER_ENGAGEMENT,
 										self::REPORT_TYPE_SPEFICIC_USER_ENGAGEMENT, 
@@ -62,6 +69,16 @@ class myReportsMgr
 										self::REPORT_TYPE_BROWSERS,
 										self::REPORT_TYPE_TOP_CONTENT,
 										self::REPORT_TYPE_TOP_PLAYBACK_CONTEXT);
+										
+	static $escaped_params = array(self::OBJECT_IDS_PLACE_HOLDER,
+								   self::APPLICATION_NAME_PLACE_HOLDER,
+								   self::PUSERS_PLACE_HOLDER);
+								   
+	static $reports_without_graph = array(self::REPORT_TYPE_VPAAS_USAGE);
+	
+	static $reports_without_totals = array(self::REPORT_TYPE_VPAAS_USAGE);
+	
+	static $reports_without_table = array();
 										
 										
 	
@@ -431,30 +448,43 @@ class myReportsMgr
 			return $url;
 		}
 	*/	
-		$arr = self::getGraph( $partner_id , 
-			$report_type , 
-			$input_filter ,
-			$dimension , 
-			$object_ids );
-
-		list ( $total_header , $total_data ) = self::getTotal( $partner_id , 
-			$report_type , 
-			$input_filter , $object_ids );			
 		$csv = new myCsvWrapper ();
+		
+		$arr = array();
+		
+		if (!in_array($report_type, self::$reports_without_graph))
+		{
+			$arr = self::getGraph( $partner_id , 
+				$report_type , 
+				$input_filter ,
+				$dimension , 
+				$object_ids );
+		}
+		
+		
+		if (!in_array($report_type, self::$reports_without_totals))
+			list ( $total_header , $total_data ) = self::getTotal( $partner_id , 
+				$report_type , 
+				$input_filter , $object_ids );			
+		
 	
 		if ($page_size < self::REPORTS_TABLE_RESULTS_SINGLE_ITERATION_SIZE)
 		{
-			list ( $table_header , $table_data , $table_total_count ) = self::getTable( $partner_id ,
-				$report_type ,
-				$input_filter ,
-				$page_size , $page_index ,
-				$order_by ,  $object_ids );
-	
-			if ($input_filter instanceof endUserReportsInputFilter)
+			if (!in_array($report_type, self::$reports_without_table))
 			{
-					$table_total_count =  self::getTotalTableCount($partner_id, $report_type, $input_filter, $page_size, $page_index, $order_by, $object_ids);
-			}
-	
+				list ( $table_header , $table_data , $table_total_count ) = self::getTable( $partner_id ,
+					$report_type ,
+					$input_filter ,
+					$page_size , $page_index ,
+					$order_by ,  $object_ids );
+					
+					if ($input_filter instanceof endUserReportsInputFilter)
+					{
+						$table_total_count =  self::getTotalTableCount($partner_id, $report_type, $input_filter, $page_size, $page_index, $order_by, $object_ids);
+					}
+					
+			} 
+			
 			$csv = myCsvReport::createReport( $report_title , $report_text , $headers ,
 				$report_type , $input_filter , $dimension ,
 				$arr , $total_header , $total_data , $table_header , $table_data , $table_total_count, $csv);
@@ -722,6 +752,17 @@ class myReportsMgr
 							
 					$category_ids_clause = "ev.context_id in ( $categoryIds )";
 				}
+				
+				if ($input_filter->application) {
+					$input_filter->extra_map[self::APPLICATION_NAME_PLACE_HOLDER] = "'" . mysqli_real_escape_string($link, $input_filter->application) . "'";
+				} 
+				if ($input_filter->userIds != null) {
+					$escapedobjectIds = self::explodeAndEscape($input_filter->userIds, $link);
+					$puserIds = "('" . implode("','", $escapedobjectIds) . "')";
+					// replace puser_id '0' with 'Unknown' as it saved on dwh pusers table
+					$puserIds = str_replace(self::UNKNOWN_PUSER_ID_CLAUSE, self::UNKNOWN_NAME_CLAUSE, $puserIds);
+					$input_filter->extra_map[self::PUSERS_PLACE_HOLDER] = $puserIds;
+				}
 			}
 			
 			if ($input_filter->categories) 
@@ -761,10 +802,8 @@ class myReportsMgr
 			
 			if($object_ids)
 			{
-				//the object ids are not supposed to include single quotes - if they do have them - remove them
-				$object_ids = str_replace ( "'" , '' , $object_ids ) ; 
-				// quote all the objects with SINGLE-QUOTES			
-				$object_ids_str = "'" . str_replace ( "," , "','" , $object_ids ) . "'";
+				$escapedobjectIds = self::explodeAndEscape($object_ids, $link);
+				$object_ids_str = "'" . implode("','" , $escapedobjectIds) . "'";
 				
 				if ( $report_type == self::REPORT_TYPE_CONTENT_CONTRIBUTIONS )
 				{
@@ -792,8 +831,7 @@ class myReportsMgr
 				}
 				else
 				{
-					$objectIds = explode(',', $object_ids);
-					$entryIds = "'" . implode("','", array_merge($objectIds, $entryIdsFromDB)) . "'";
+					$entryIds = "'" . implode("','", array_merge($escapedobjectIds, $entryIdsFromDB)) . "'";
 					$obj_ids_clause = "ev.entry_id in ( $entryIds )";
 				}
 			}
@@ -890,6 +928,7 @@ class myReportsMgr
 		self::REPORT_TYPE_BROWSERS => 'browsers',
 		self::REPORT_TYPE_LIVE => "live",
 		self::REPORT_TYPE_TOP_PLAYBACK_CONTEXT => "top_playback_context",
+		self::REPORT_TYPE_VPAAS_USAGE => "vpaas_usage",
 	
 	);
 	
@@ -1094,6 +1133,15 @@ class myReportsMgr
 				"count_loads" ,
 				"avg_view_drop_off",
 				"load_play_ratio" ,		
+			),
+			"vpaas_usage" => array (
+				"month_id",
+				"total_plays",
+				"bandwidth_gb",
+				"avg_storage_gb",
+				"transcoding_gb",
+				"total_media_entries",
+				"total_end_users", 
 			)
 		);
 		
@@ -1240,6 +1288,12 @@ class myReportsMgr
 				$values[] = $value;				
 			}
 		}
+		
+		foreach ($values as $key => &$value) {
+			if (!in_array($names[$key], self::$escaped_params))
+				$value = mysqli_real_escape_string($link, $value);
+		}
+
 		
 		$replaced_sql = str_replace ( $names , $values , $sql_content );	
 
@@ -1400,6 +1454,17 @@ class myReportsMgr
 		
 		return $link;
 	}	
+	
+	private static function explodeAndEscape($ids, $link) {
+		$escapedobjectIds = array();
+		$objectIds = explode(',', $ids);
+		foreach ($objectIds as $objectId) {
+			$escapedobjectId = trim($objectId, "'");
+			$escapedobjectId = mysqli_real_escape_string($link, $escapedobjectId);
+			$escapedobjectIds[] = $escapedobjectId;
+		}
+		return $escapedobjectIds;
+	}
 
 }
 

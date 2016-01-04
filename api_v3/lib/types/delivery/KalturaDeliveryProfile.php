@@ -128,6 +128,12 @@ class KalturaDeliveryProfile extends KalturaObject implements IFilterable
 	 */
 	public $priority;
 
+	/**
+	 * Extra query string parameters that should be added to the url
+	 * @var string
+	 */
+	public $extraParams;
+	
  	private static $map_between_objects = array
 	(
 			"createdAt",
@@ -148,6 +154,7 @@ class KalturaDeliveryProfile extends KalturaObject implements IFilterable
 			"type",
 			"mediaProtocols",
 			"priority",
+			"extraParams",
 	);
 	
 	public function getMapBetweenObjects ( )

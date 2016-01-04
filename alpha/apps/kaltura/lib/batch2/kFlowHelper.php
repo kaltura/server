@@ -285,17 +285,21 @@ class kFlowHelper
 			return $dbBatchJob;
 			
 		$files = kFileSyncUtils::dir_get_files($key, false);
-		
+
+		// If we have less files on disk than what we should have it means the output file will be missing segments.
+		// don't generate it, and the next concat will do the work for us.
+		if (count($files) != $data->getFileIndex()+1){
+			KalturaLog::warning('number of segments on disk ' . count($files) . ' is not equal to segment index ' . $data->getFileIndex() . ' - not running the concat job');
+			return $dbBatchJob;
+		}
+
 		if(count($files) > 1)
 		{
 			// find replacing entry id
-			
-			$replacingEntry = kFlowHelper::getReplacingEntry($recordedEntry, $asset);
-			if(is_null($replacingEntry)) {
-				KalturaLog::err('Failed to retrieve replacing entry');
-				return $dbBatchJob;
-			}
-			
+			$replacingEntry = self::getReplacingEntry($recordedEntry, $asset);
+			if(is_null($replacingEntry))
+				KalturaLog::err("Failed to get replacing entry");
+		
 			$flavorParams = assetParamsPeer::retrieveByPKNoFilter($asset->getFlavorParamsId());
 			if(is_null($flavorParams)) { 
 				KalturaLog::err('Failed to retrieve asset params');
@@ -315,68 +319,65 @@ class kFlowHelper
 				$replacingAsset->setIsOriginal(true);
 			}		
 			$replacingAsset->save();
-
+			
 			$job = kJobsManager::addConcatJob($dbBatchJob, $replacingAsset, $files);
 		}
-		
+
 		return $dbBatchJob;
 	}
-	
-	protected static function getReplacingEntry($recordedEntry, $asset, $retries = 1) {
-		$replacingEntryId = $recordedEntry->getReplacingEntryId();
-		$replacingEntry = null;
-		// in replacement
-		if($replacingEntryId)
-		{
-			$replacingEntry = entryPeer::retrieveByPKNoFilter($replacingEntryId);
-		
-			// check if asset already ingested
-			$replacingAsset = assetPeer::retrieveByEntryIdAndParams($replacingEntryId, $asset->getFlavorParamsId());
-			if($replacingAsset)
-			{
-				KalturaLog::err('Asset with params [' . $asset->getFlavorParamsId() . '] already replaced');
-				return null;
-			}
-		}
-		// not in replacement
-		else
-		{
-			$advancedOptions = new kEntryReplacementOptions();
-			$advancedOptions->setKeepManualThumbnails(true);
-			$recordedEntry->setReplacementOptions($advancedOptions);
-		
-			$replacingEntry = new entry();
-			$replacingEntry->setType(entryType::MEDIA_CLIP);
-			$replacingEntry->setMediaType(entry::ENTRY_MEDIA_TYPE_VIDEO);
-			$replacingEntry->setConversionProfileId($recordedEntry->getConversionProfileId());
-			$replacingEntry->setName($recordedEntry->getPartnerId().'_'.time());
-			$replacingEntry->setKuserId($recordedEntry->getKuserId());
-			$replacingEntry->setAccessControlId($recordedEntry->getAccessControlId());
-			$replacingEntry->setPartnerId($recordedEntry->getPartnerId());
-			$replacingEntry->setSubpId($recordedEntry->getPartnerId() * 100);
-			$replacingEntry->setDefaultModerationStatus();
-			$replacingEntry->setDisplayInSearch(mySearchUtils::DISPLAY_IN_SEARCH_SYSTEM);
-			$replacingEntry->setReplacedEntryId($recordedEntry->getId());
-			$replacingEntry->save();
-		
-			$recordedEntry->setReplacingEntryId($replacingEntry->getId());
-			$recordedEntry->setReplacementStatus(entryReplacementStatus::APPROVED_BUT_NOT_READY);
-			$affectedRows = $recordedEntry->save();
-			if(!$affectedRows) {
-				$replacingEntry->delete();
-				$replacingEntry = null;
-				if($retries) {
-					sleep(10);
-					$recordedEntry = entryPeer::retrieveByPKNoFilter($recordedEntry->getId());
-					return kFlowHelper::getReplacingEntry($recordedEntry, $asset, 0);
-				} else {
-					KalturaLog::err("Failed to update replacing entry");
-					return null;
-				}
-			}
-		}
+
+	private static function createReplacigEntry($recordedEntry)
+	{
+		$advancedOptions = new kEntryReplacementOptions();
+		$advancedOptions->setKeepManualThumbnails(true);
+		$recordedEntry->setReplacementOptions($advancedOptions);
+
+		$replacingEntry = new entry();
+		$replacingEntry->setType(entryType::MEDIA_CLIP);
+		$replacingEntry->setMediaType(entry::ENTRY_MEDIA_TYPE_VIDEO);
+		$replacingEntry->setConversionProfileId($recordedEntry->getConversionProfileId());
+		$replacingEntry->setName($recordedEntry->getPartnerId().'_'.time());
+		$replacingEntry->setKuserId($recordedEntry->getKuserId());
+		$replacingEntry->setAccessControlId($recordedEntry->getAccessControlId());
+		$replacingEntry->setPartnerId($recordedEntry->getPartnerId());
+		$replacingEntry->setSubpId($recordedEntry->getPartnerId() * 100);
+		$replacingEntry->setDefaultModerationStatus();
+		$replacingEntry->setDisplayInSearch(mySearchUtils::DISPLAY_IN_SEARCH_SYSTEM);
+		$replacingEntry->setReplacedEntryId($recordedEntry->getId());
+		$replacingEntry->save();
+
+		$recordedEntry->setReplacingEntryId($replacingEntry->getId());
+		$recordedEntry->setReplacementStatus(entryReplacementStatus::APPROVED_BUT_NOT_READY);
+		$affectedRows = $recordedEntry->save();
 		return $replacingEntry;
 	}
+
+	protected static function getReplacingEntry($recordedEntry, $asset) 
+	{
+		$replacingEntryId = $recordedEntry->getReplacingEntryId();
+		$replacingEntry = null;
+		if(!is_null($replacingEntryId))
+		{
+				$replacingEntry = entryPeer::retrieveByPKNoFilter($replacingEntryId);
+				if ($replacingEntry)
+				{
+						$replacingAsset = assetPeer::retrieveByEntryIdAndParams($replacingEntryId, $asset->getFlavorParamsId());
+						if($replacingAsset)
+						{
+								
+								KalturaLog::debug("Entry in replacement, deleting - [".$replacingEntryId."]");
+								myEntryUtils::deleteReplacingEntry($recordedEntry,$replacingEntry);
+								$replacingEntry = null;
+						}
+				}
+		}
+		
+		if(is_null($replacingEntry))
+		{
+			$replacingEntry = self::createReplacigEntry($recordedEntry);
+		}
+		return $replacingEntry;
+	}	
 
 	/**
 	 * @param BatchJob $dbBatchJob
@@ -2031,6 +2032,21 @@ class kFlowHelper
 		if($entry)
 		{
 			kBusinessConvertDL::checkForPendingLiveClips($entry);
+
+			$clonePendingEntriesArray = $entry->getClonePendingEntries();
+			foreach ($clonePendingEntriesArray as $pendingEntryId)
+			{
+				$pendingEntry = entryPeer::retrieveByPK($pendingEntryId);
+				if ( $pendingEntry ) {
+					myEntryUtils::copyEntryData($entry, $pendingEntry);
+					$pendingEntry->setStatus($entry->getStatus());
+					$pendingEntry->setLengthInMsecs($entry->getLengthInMsecs());
+					$pendingEntry->save();
+
+				}
+			}
+			$entry->setClonePendingEntries(array());
+			$entry->save();
 		}
 		
 		return $dbBatchJob;
