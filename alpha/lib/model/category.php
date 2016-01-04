@@ -899,29 +899,26 @@ class category extends Basecategory implements IIndexable, IRelatedObject
 		$members = categoryKuserPeer::retrieveActiveKusersByCategoryId($categoryIdToGetAllMembers);
 		if (!$members)
 			return '';
-		
+
 		$membersIdsByPermission = array();
-		foreach ($members as $member)
+		$permissionNamesByMembers = array();
+
+		/* @var $member categoryKuser */
+		while ($member = array_pop($members))
 		{
 			if(isset($membersIdsByPermission[$member->getPermissionLevel()]))
 				$membersIdsByPermission[$member->getPermissionLevel()][] = $member->getKuserId();
 			else
 				$membersIdsByPermission[$member->getPermissionLevel()] = array ($member->getKuserId());
-		}
-		
-		//Add indexed permission_names
-		$permissionNamesByMembers = array();
-		foreach ($members as $member)
-		{
-			/* @var $member categoryKuser */
+
 			$permissionNames = explode(",", $member->getPermissionNames());
 			foreach ($permissionNames as &$permissionName)
 			{
-				$permissionName = str_replace('_', '', $permissionName);				
+				$permissionName = str_replace('_', '', $permissionName);
 			}
 			$permissionNamesByMembers[] = $member->getKuserId().implode(" ".$member->getKuserId(), $permissionNames);
 		}
-		
+
 		$membersIds = array();
 		foreach ($membersIdsByPermission as $permissionLevel => $membersIdByPermission)
 		{
@@ -930,7 +927,7 @@ class category extends Basecategory implements IIndexable, IRelatedObject
 			$membersIds[] = implode(' ', $membersIdByPermission);
 			$membersIds[] = implode(' ', $permissionNamesByMembers);
 		}
-		
+
 		return implode(' ', $membersIds);
 	}
 
