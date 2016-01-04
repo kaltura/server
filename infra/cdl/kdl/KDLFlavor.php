@@ -1000,11 +1000,22 @@ $plannedDur = 0;
 			 * Fixed target frame size
 			 */
 		else if($shrinkToSource) {
-			if($target->_width>$widSrc) {
-				$target->_width=$widSrc;
-			}
+			$darTrg = $target->_width/$target->_height;
 			if($target->_height>$hgtSrc) {
 				$target->_height=$hgtSrc;
+			}
+				/*
+				 * If the target AR is similar/close (up to 10%) to the src AR,
+				 * just trim to the source dims.
+				 * Otherwise (src AR != trg AR) - calc the trg wid from trg AR and hgt.
+				 */
+			if(abs(1-$darTrg/$darSrcFrame)<0.1) {
+				if($target->_width>$widSrc) {
+					$target->_width=$widSrc;
+				}
+			}
+			else {
+				$target->_width = $target->_height*$darTrg;
 			}
 		}
 
