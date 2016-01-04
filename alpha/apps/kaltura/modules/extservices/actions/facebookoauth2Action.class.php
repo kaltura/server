@@ -49,6 +49,7 @@ class facebookoauth2Action extends oauth2Action
 	protected function executeLoginScreen()
 	{
 		$this->loginError = null;
+		$this->partnerError = null;
 		$this->serviceUrl = requestUtils::getHost();
 		$params = $this->getForwardParameters();
 		$params[FacebookConstants::FACEBOOK_NEXT_ACTION_REQUEST_PARAM] = base64_encode(self::SUB_ACTION_REDIRECT_SCREEN);
@@ -68,6 +69,7 @@ class facebookoauth2Action extends oauth2Action
 
 		$ksStr = $this->getRequestParameter(FacebookConstants::FACEBOOK_KS_REQUEST_PARAM);
 		$this->ksError = null;
+		$this->partnerError = null;
 		$ksValid = $this->processKs($ksStr);
 		if (!$ksValid)
 		{
