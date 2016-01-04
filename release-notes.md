@@ -9,7 +9,7 @@
 
 - Download latest Usage Dashboard package from https://github.com/kaltura/usage-dashboard/releases/
 - Extract the zip to `/opt/kaltura/apps/usage-dashboard/`
-- If the app version is v1.0.0, make sure that `/opt/kaltura/apps/usage-dashboard/v0.9.0/index.html` exists
+- If the app version is v1.0.0, make sure that `/opt/kaltura/apps/usage-dashboard/v1.0.0/index.html` exists
 
 #### Configuration ####
 
