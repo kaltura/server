@@ -19,13 +19,17 @@
 <?php elseif ($subAction == facebookoauth2Action::SUB_ACTION_REDIRECT_SCREEN): ?>
 	<?php if ($ksError): ?>
 		Invalid parameter(s)
+	<?php elseif ($partnerError): ?>
+		Using wrong partner for login
 	<?php else: ?>
 		<a href="<?php echo $oauth2Url; ?>">Proceed to Facebook for authorization</a>
 	<?php endif; ?>
 <?php elseif ($subAction == facebookoauth2Action::SUB_ACTION_PROCESS_OAUTH2_RESPONSE): ?>
 	<?php if ($tokenError): ?>
-		<?php echo $errorMessage; ?> 
+		<?php echo $errorMessage; ?>
 	<?php else: ?>
 		Access token generated successfully
 	<?php endif; ?>
+<?php else: ?>
+	Something went wrong. Please retry.
 <?php endif; ?>

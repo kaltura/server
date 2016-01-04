@@ -46,8 +46,7 @@ class KalturaFacebookDistributionJobProviderData extends KalturaConfigurableDist
 				$this->thumbAssetFilePath = kFileSyncUtils::getLocalFilePathForKey($syncKey, false);
 		}
 
-//		TODO add the captions
-//		$this->addCaptionsData($distributionJobData);
+		$this->addCaptionsData($distributionJobData);
 
 	}
 	
@@ -77,7 +76,7 @@ class KalturaFacebookDistributionJobProviderData extends KalturaConfigurableDist
 				KalturaLog::err("Asset [$assetId] not found");
 				continue;
 			}
-			if($asset->getType() != CaptionPlugin::getAssetTypeCoreValue ( CaptionAssetType::CAPTION )) //TODO - check format is srt
+			if($asset->getType() != CaptionPlugin::getAssetTypeCoreValue ( CaptionAssetType::CAPTION ))
 			{
 				KalturaLog::debug("Asset [$assetId] is not a caption");
 				continue;				
@@ -110,29 +109,17 @@ class KalturaFacebookDistributionJobProviderData extends KalturaConfigurableDist
 		}
 	}
 	
-	private function getLanguageCode($language = null)
-	{
-		$languageReflector = KalturaTypeReflectorCacher::get('KalturaLanguage');
-		$languageCodeReflector = KalturaTypeReflectorCacher::get('KalturaLanguageCode');
-		if($languageReflector && $languageCodeReflector)
-		{
-			$languageCode = $languageReflector->getConstantName($language);
-			if($languageCode)
-				return $languageCodeReflector->getConstantValue($languageCode);
-		}
-		return null;
-	}
-	
-	private function getCaptionInfo($asset, KalturaDistributionJobData $distributionJobData, $action) 
+	private function getCaptionInfo($asset, KalturaDistributionJobData $distributionJobData, $action)
 	{
 		$captionInfo = new KalturaCaptionDistributionInfo ();		
 		$captionInfo->assetId = $asset->getId();
 		$captionInfo->version = $asset->getVersion();
-		$captionInfo->language = $this->getLanguageCode($asset->getLanguage());
+		$captionInfo->label = $asset->getLabel();
+		$captionInfo->language = $asset->getLanguage();
 		
-		if(!$captionInfo->language)
+		if(!$captionInfo->label && !$captionInfo->language)
 		{
-			KalturaLog::err('The caption ['.$asset->getId().'] has unrecognized language ['.$asset->getLanguage().']');
+			KalturaLog::err('The caption ['.$asset->getId().'] has unrecognized language ['.$asset->getLanguage().'] and label ['.$asset->getLabel().']');
 			return null;
 		}
 		
@@ -183,7 +170,7 @@ class KalturaFacebookDistributionJobProviderData extends KalturaConfigurableDist
 				{
 					try
 					{
-						FacebookGraphSdkUtils::validateVideoAttributes($videoAssetFilePath, $mediaInfo->getFileSize(), $mediaInfo->getVideoDuration(), $mediaInfo->getVideoWidth(), $mediaInfo->getVideoHeight());
+						FacebookGraphSdkUtils::validateVideoAttributes($videoAssetFilePath, $mediaInfo->getFileSize(), $mediaInfo->getVideoDuration());
 						$isValidVideo = true;
 					}
 					catch(Exception $e)
