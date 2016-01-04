@@ -12,8 +12,6 @@ abstract class myBaseObject implements Iterator
 	const FIELD_SEPARATOR  = "&";
 	const ENCODE_FIELD_SEPARATOR  = "_@AMP@_";
 
-	const TEN_YEARS_IN_SECONDS = 315569260;
-
 	protected $fields;
 
 	abstract protected function init();
