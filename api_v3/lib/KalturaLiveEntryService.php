@@ -214,8 +214,8 @@ class KalturaLiveEntryService extends KalturaEntryService
 	 */
 	function registerMediaServerAction($entryId, $hostname, $mediaServerIndex, $applicationName = null, $liveEntryStatus = KalturaLiveEntryStatus::PLAYABLE)
 	{
-		KalturaLog::debug("in registerMediaServerAction for entry $entryId from mediaServer #$mediaServerIndex with liveEntryStatus= $liveEntryStatus");
 		$this->dumpApiRequest($entryId);
+		KalturaLog::debug("Entry [$entryId] from mediaServerIndex [$mediaServerIndex] with liveEntryStatus [$liveEntryStatus]");
 
 		$dbEntry = entryPeer::retrieveByPK($entryId);
 		if (!$dbEntry || !($dbEntry instanceof LiveEntry))
@@ -365,8 +365,8 @@ class KalturaLiveEntryService extends KalturaEntryService
 	 */
 	function unregisterMediaServerAction($entryId, $hostname, $mediaServerIndex)
 	{
-		KalturaLog::debug("in unregisterMediaServerAction for entry $entryId from mediaServer #$mediaServerIndex with hostname= $hostname");
 		$this->dumpApiRequest($entryId);
+		KalturaLog::debug("Entry [$entryId] from mediaServerIndex [$mediaServerIndex] with hostname [$hostname]");
 
 		$dbEntry = entryPeer::retrieveByPK($entryId);
 		if (!$dbEntry || !($dbEntry instanceof LiveEntry))
