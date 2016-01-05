@@ -66,7 +66,6 @@ class conversionProfile2TableMap extends TableMap {
 	 */
 	public function buildRelations()
 	{
-    $this->addRelation('entry', 'entry', RelationMap::ONE_TO_MANY, array('id' => 'conversion_profile_id', ), null, null);
     $this->addRelation('flavorParamsConversionProfile', 'flavorParamsConversionProfile', RelationMap::ONE_TO_MANY, array('id' => 'conversion_profile_id', ), null, null);
 	} // buildRelations()
 

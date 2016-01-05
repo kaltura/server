@@ -172,7 +172,6 @@ abstract class BasekuserPeer {
 	/** the column name for the TYPE field */
 	const TYPE = 'kuser.TYPE';
 
-
 	/**
 	 * An identiy map to hold any loaded instances of kuser objects.
 	 * This must be public so that other peer classes can access this when hydrating from JOIN
@@ -1019,6 +1018,15 @@ abstract class BasekuserPeer {
 	 * @return array
 	 */
 	public static function getAtomicColumns()
+	{
+		return array();
+	}
+	
+	/**
+	 * Return array of custom-data fields that shouldn't be auto-updated.
+	 * @return array
+	 */
+	public static function getAtomicCustomDataFields()
 	{
 		return array();
 	}

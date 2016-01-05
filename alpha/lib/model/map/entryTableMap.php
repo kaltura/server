@@ -38,7 +38,7 @@ class entryTableMap extends TableMap {
 		$this->setUseIdGenerator(true);
 		// columns
 		$this->addPrimaryKey('ID', 'Id', 'VARCHAR', true, 20, null);
-		$this->addForeignKey('KSHOW_ID', 'KshowId', 'VARCHAR', 'kshow', 'ID', false, 20, null);
+		$this->addColumn('KSHOW_ID', 'KshowId', 'VARCHAR', false, 20, null);
 		$this->addForeignKey('KUSER_ID', 'KuserId', 'INTEGER', 'kuser', 'ID', false, null, null);
 		$this->addColumn('NAME', 'Name', 'VARCHAR', false, 60, null);
 		$this->addColumn('TYPE', 'Type', 'SMALLINT', false, null, null);
@@ -81,8 +81,8 @@ class entryTableMap extends TableMap {
 		$this->addColumn('MODERATION_COUNT', 'ModerationCount', 'INTEGER', false, null, null);
 		$this->addColumn('MODIFIED_AT', 'ModifiedAt', 'TIMESTAMP', false, null, null);
 		$this->addColumn('PUSER_ID', 'PuserId', 'VARCHAR', false, 64, null);
-		$this->addForeignKey('ACCESS_CONTROL_ID', 'AccessControlId', 'INTEGER', 'access_control', 'ID', false, null, null);
-		$this->addForeignKey('CONVERSION_PROFILE_ID', 'ConversionProfileId', 'INTEGER', 'conversion_profile_2', 'ID', false, null, null);
+		$this->addColumn('ACCESS_CONTROL_ID', 'AccessControlId', 'INTEGER', false, null, null);
+		$this->addColumn('CONVERSION_PROFILE_ID', 'ConversionProfileId', 'INTEGER', false, null, null);
 		$this->addColumn('CATEGORIES', 'Categories', 'VARCHAR', false, 4096, null);
 		$this->addColumn('CATEGORIES_IDS', 'CategoriesIds', 'VARCHAR', false, 1024, null);
 		$this->addColumn('START_DATE', 'StartDate', 'TIMESTAMP', false, null, null);
@@ -98,10 +98,7 @@ class entryTableMap extends TableMap {
 	 */
 	public function buildRelations()
 	{
-    $this->addRelation('kshow', 'kshow', RelationMap::MANY_TO_ONE, array('kshow_id' => 'id', ), null, null);
     $this->addRelation('kuser', 'kuser', RelationMap::MANY_TO_ONE, array('kuser_id' => 'id', ), null, null);
-    $this->addRelation('accessControl', 'accessControl', RelationMap::MANY_TO_ONE, array('access_control_id' => 'id', ), null, null);
-    $this->addRelation('conversionProfile2', 'conversionProfile2', RelationMap::MANY_TO_ONE, array('conversion_profile_id' => 'id', ), null, null);
     $this->addRelation('LiveChannelSegmentRelatedByChannelId', 'LiveChannelSegment', RelationMap::ONE_TO_MANY, array('id' => 'channel_id', ), null, null);
     $this->addRelation('LiveChannelSegmentRelatedByEntryId', 'LiveChannelSegment', RelationMap::ONE_TO_MANY, array('id' => 'entry_id', ), null, null);
     $this->addRelation('kvote', 'kvote', RelationMap::ONE_TO_MANY, array('id' => 'entry_id', ), null, null);
@@ -112,7 +109,6 @@ class entryTableMap extends TableMap {
     $this->addRelation('roughcutEntryRelatedByEntryId', 'roughcutEntry', RelationMap::ONE_TO_MANY, array('id' => 'entry_id', ), null, null);
     $this->addRelation('widget', 'widget', RelationMap::ONE_TO_MANY, array('id' => 'entry_id', ), null, null);
     $this->addRelation('assetParamsOutput', 'assetParamsOutput', RelationMap::ONE_TO_MANY, array('id' => 'entry_id', ), null, null);
-    $this->addRelation('asset', 'asset', RelationMap::ONE_TO_MANY, array('id' => 'entry_id', ), null, null);
     $this->addRelation('UserEntry', 'UserEntry', RelationMap::ONE_TO_MANY, array('id' => 'entry_id', ), null, null);
 	} // buildRelations()
 
