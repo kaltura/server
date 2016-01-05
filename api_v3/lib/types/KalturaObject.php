@@ -386,15 +386,13 @@ abstract class KalturaObject implements IApiObject
 				$cacheDir = dirname($cacheFileName);
 				if (!is_dir($cacheDir))
 				{
-					mkdir($cacheDir);
-					chmod($cacheDir, 0755);
+					mkdir($cacheDir, 0755);
 				}
 				kFile::safeFilePutContents($cacheFileName, $fromObjectClassCode);
 			}
-			if(!max_retries)
+			if (!class_exists($fromObjectClass))
 			{
-				KalturaLog::err("Could not load File {$cacheFileName}");
-				return;
+				throw new Exception("Could not include cached code file - {$cacheFileName}");
 			}
 		}
 	
