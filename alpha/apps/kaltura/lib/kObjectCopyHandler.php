@@ -121,7 +121,7 @@ class kObjectCopyHandler implements kObjectCopiedEventConsumer
 			/**
 			 * @var entry $toObject
 			 */
-			if ( ($toObject->getPartnerId() == $fromObject->getPartnerId()) && ($toObject->shouldCloneCategories() === true) ){  
+			if ( ($toObject->getPartnerId() == $fromObject->getPartnerId()) && ($toObject->shouldCloneByProperty(BaseEntryCloneOptions::CATEGORIES) === true) ){  
 				$categoryEntriesObjects = categoryEntryPeer::retrieveActiveByEntryId($fromObject->getId());
 				$categoryIds = array();
 				foreach ($categoryEntriesObjects as $categoryEntryObject)

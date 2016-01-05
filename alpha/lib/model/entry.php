@@ -3473,7 +3473,11 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 		return conversionProfile2Peer::retrieveByPK($this->conversion_profile_id, $con);
 	}
 
-	public function shouldCloneCategories()
+	/**
+	 * @param BaseEntryCloneOptions $property
+	 * @return bool
+	 */
+	public function shouldCloneByProperty($property)
 	{
 		$cloneCategories = true;
 		if (!is_null($this->clone_options))
@@ -3483,7 +3487,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 				$currentOption = $cloneOption->getItemType();
 				$currentType = $cloneOption->getRule();
 
-				if ($currentOption == BaseEntryCloneOptions::CATEGORIES && $currentType == CloneComponentSelectorType::EXCLUDE_COMPONENT)
+				if ($currentOption ==  $property && $currentType == CloneComponentSelectorType::EXCLUDE_COMPONENT)
 				{
 					$cloneCategories = false;
 				}
