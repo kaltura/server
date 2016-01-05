@@ -3490,6 +3490,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 				if ($currentOption ==  $property && $currentType == CloneComponentSelectorType::EXCLUDE_COMPONENT)
 				{
 					$cloneCategories = false;
+					break;
 				}
 			}
 		}
