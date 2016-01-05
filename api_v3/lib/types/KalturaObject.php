@@ -371,13 +371,18 @@ abstract class KalturaObject implements IApiObject
 		$fromObjectClass = "Map_{$thisClass}_{$srcObjClass}";
 		if (!class_exists($fromObjectClass))
 		{
-			$fromObjectClassCode = $this->generateFromObjectClass($srcObj, $fromObjectClass);
-			if (!$fromObjectClassCode)
-				return;
-
 			$cacheFileName = kConf::get("cache_root_path") . "api_v3/fromObject/{$fromObjectClass}.php";
-			while(!@include_once($cacheFileName))
+			$max_include_retries=10;
+			$fromObjectClassCode=null;
+			while((!@include_once($cacheFileName)) and $max_include_retries--)
 			{
+				if(!$fromObjectClassCode)
+				{
+					$fromObjectClassCode = $this->generateFromObjectClass($srcObj, $fromObjectClass);
+					if (!$fromObjectClassCode)
+						return;
+				}
+
 				$cacheDir = dirname($cacheFileName);
 				if (!is_dir($cacheDir))
 				{
@@ -385,9 +390,12 @@ abstract class KalturaObject implements IApiObject
 					chmod($cacheDir, 0755);
 				}
 				kFile::safeFilePutContents($cacheFileName, $fromObjectClassCode);
-				KalturaLog::debug("Creating cached source file - {$cacheFileName}");
 			}
-			KalturaLog::debug("File {$cacheFileName} included successfully");
+			if(!max_retries)
+			{
+				KalturaLog::err("Could not load File {$cacheFileName}");
+				return;
+			}
 		}
 	
 		$fromObjectClass::fromObject($this, $srcObj, $responseProfile);
