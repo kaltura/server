@@ -292,7 +292,7 @@ class KFeedDropFolderEngine extends KDropFolderEngine
 			$port = $urlComponents['port'];
 			$params = $urlComponents['path'];
 			$queryArgs = $urlComponents['query'];
-			$fragment = $urlComponents [];
+			$fragment = $urlComponents ['fragment'];
 
 			$url =  "$protocol://$hostname" .  ($port? ":$port" : "") . "$params?$queryArgs" . ($fragment ? "#$fragment" : "");
 		}
