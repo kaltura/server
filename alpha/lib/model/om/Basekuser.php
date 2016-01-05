@@ -2582,8 +2582,6 @@ abstract class Basekuser extends BaseObject  implements Persistent {
 				return 0;
 			}
 			
-			$this->setCustomDataObj();
-			
 			for ($retries = 1; $retries < KalturaPDO::SAVE_MAX_RETRIES; $retries++)
 			{
                $affectedRows = $this->doSave($con);
@@ -2596,8 +2594,8 @@ abstract class Basekuser extends BaseObject  implements Persistent {
                 $stmt = BasePeer::doSelect($criteria, $con);
                 $cutsomDataArr = $stmt->fetchAll(PDO::FETCH_COLUMN);
                 $newCustomData = $cutsomDataArr[0];
-                
-                $this->custom_data_md5 = md5($newCustomData);
+
+                $this->custom_data_md5 = is_null($newCustomData) ? null : md5($newCustomData);
 
                 $valuesToChangeTo = $this->m_custom_data->toArray();
 				$this->m_custom_data = myCustomData::fromString($newCustomData); 
