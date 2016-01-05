@@ -511,6 +511,8 @@ class KalturaErrors extends APIErrors
 
 	const CATEGORY_IS_LOCKED = "CATEGORY_IS_LOCKED;;Category is locked - cannot delete or change parent id";
 
+	const CATEGORY_MAX_USER_REACHED = "CATEGORY_MAX_USER_REACHED;MAX;Max amount of users per category @MAX@ has been reached";
+
 	/**
 	 * Entitlement
 	 */

@@ -20,8 +20,15 @@ class CategoryUserService extends KalturaBaseService
 		/* @var $dbCategoryKuser categoryKuser */
 		$category = categoryPeer::retrieveByPK($categoryUser->categoryId);
 		if (!$category)
-			throw new KalturaAPIException(KalturaErrors::CATEGORY_NOT_FOUND, $categoryUser->categoryId);						
-		
+			throw new KalturaAPIException(KalturaErrors::CATEGORY_NOT_FOUND, $categoryUser->categoryId);
+
+		$max_user_per_category=kConf::get('max_user_per_category');
+		$criteria = KalturaCriteria::create(categoryKuserPeer::OM_CLASS);
+		$criteria->addAnd(categoryKuserPeer::CATEGORY_ID, $categoryUser->categoryId, Criteria::EQUAL);
+		$users_per_category=categoryKuserPeer::doCount($criteria);
+		if( $users_per_category >=$max_user_per_category)
+			throw new KalturaAPIException(KalturaErrors::CATEGORY_MAX_USER_REACHED,$max_user_per_category);
+
 		$currentKuserCategoryKuser = categoryKuserPeer::retrievePermittedKuserInCategory($categoryUser->categoryId, kCurrentContext::getCurrentKsKuserId());
 		if (!kEntitlementUtils::getEntitlementEnforcement())
 		{
