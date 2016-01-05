@@ -520,24 +520,25 @@ $plannedDur = 0;
 			 * In case it does and the flavor has 'multiStream' set to 'auto-detect' (default action) -
 			 * try to define a multiStream processing setup
 			 */
-		$sourceAnalize = self::analizeSourceContentStreams($source->_contentStreams);
-			/*
-			 * Check analyze realts for
-			 * - 'streamsAsChannels' - process them as sorround streams
-			 * - 'languages - process them as multi-lingual
-			 * - otherwise remove the 'multiStream' object'
-			 */
-		if(isset($sourceAnalize->streamsAsChannels)){
-			$target->_multiStream = self::sorroundAudioSurceToTarget($source, $target->_multiStream, $sourceAnalize->streamsAsChannels);
-		}
-		else if(isset($sourceAnalize->languages)){
-			$target->_multiStream = self::multiLingualAudioSurceToTarget($source, $target->_multiStream, $sourceAnalize->languages);
-		}
-		else {
-			$target->_multiStream = null;
-		}
+		if (isset($source->_contentStreams)){
+		    $sourceAnalize = self::analizeSourceContentStreams($source->_contentStreams);
+			    /*
+			    * Check analyze realts for
+			    * - 'streamsAsChannels' - process them as sorround streams
+			    * - 'languages - process them as multi-lingual
+			    * - otherwise remove the 'multiStream' object'
+			    */
+		    if(isset($sourceAnalize->streamsAsChannels)){
+			    $target->_multiStream = self::sorroundAudioSurceToTarget($source, $target->_multiStream, $sourceAnalize->streamsAsChannels);
+		    }
+		    else if(isset($sourceAnalize->languages)){
+			    $target->_multiStream = self::multiLingualAudioSurceToTarget($source, $target->_multiStream, $sourceAnalize->languages);
+		    }
+		    else {
+			    $target->_multiStream = null;
+		    }
 				
-		
+		}
 		if($target->_container->_id==KDLContainerTarget::COPY){
 			$target->_container->_id=self::EvaluateCopyContainer($source->_container);
 		}

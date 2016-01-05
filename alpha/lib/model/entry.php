@@ -1872,7 +1872,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	public function getaccessControl(PropelPDO $con = null)
 	{
 		if(!$this->getParentEntryId())
-			return parent::getaccessControl($con);
+			return accessControlPeer::retrieveByPK($this->access_control_id, $con);
 			
 		$parentEntry = $this->getParentEntry();
 		if($parentEntry)
@@ -3461,6 +3461,16 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 		parent::copyInto($copyObj,$deepCopy);
 		$copyObj->setEntitledPusersEdit($this->getEntitledPusersEdit());
 		$copyObj->setEntitledPusersPublish($this->getEntitledPusersPublish());
+	}
+	
+	public function getkshow(PropelPDO $con = null)
+	{
+		return kshowPeer::retrieveByPK($this->kshow_id, $con);
+	}
+	
+	public function getconversionProfile2(PropelPDO $con = null)
+	{
+		return conversionProfile2Peer::retrieveByPK($this->conversion_profile_id, $con);
 	}
 
 	public function shouldCloneCategories()

@@ -746,5 +746,14 @@ class asset extends Baseasset implements ISyncableFile, IRelatedObject
 		
 		$this->putInCustomData(self::CUSTOM_DATA_FILE_SYNC_VERSIONS_TO_DELETE, $v);
 	}
+
+	public function getentry(PropelPDO $con = null)
+	{
+		return entryPeer::retrieveByPk($this->entry_id);
+	}
 	
+	public function getassetParams(PropelPDO $con = null)
+	{
+		return assetParamsPeer::retrieveByPk($this->flavor_params_id);
+	}	
 }

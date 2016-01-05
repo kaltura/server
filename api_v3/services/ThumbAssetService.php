@@ -968,20 +968,13 @@ class ThumbAssetService extends KalturaAssetService
 
 		if ($assetDb->getStatus() != asset::ASSET_STATUS_READY)
 			throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_IS_NOT_READY);
-	
-	if ($thumbParams)
-		{
-			$assetUrl = $assetDb->getDownloadUrlWithExpiry(84600);
-			$assetParameters = KalturaRequestParameterSerializer::serialize($thumbParams, "thumbParams");
-			return $assetUrl . "?thumbParams:objectType=KalturaThumbParams&".implode("&", $assetParameters);
-		}
-			
-		if($storageId)
-			return $assetDb->getExternalUrl($storageId);
-			
-		return $assetDb->getDownloadUrl(true);
+		
+		$securyEntryHelper = new KSecureEntryHelper($entry, kCurrentContext::$ks, null, ContextType::THUMBNAIL);
+		$securyEntryHelper->validateAccessControl();
+		
+		return $assetDb->getThumbnailUrl($securyEntryHelper, $storageId, $thumbParams);
 	}
-	
+		
 	/**
 	 * Get remote storage existing paths for the asset
 	 * 

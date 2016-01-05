@@ -239,6 +239,22 @@ class KSecureEntryHelper
 		return $this->getActionList(RuleActionType::BLOCK);		
 	}
 	
+	public function shouldServeFromServerNode()
+	{
+		$actionsList = $this->getActionList(RuleActionType::SERVE_FROM_REMOTE_SERVER);
+		if(!$actionsList)
+			return null;
+		
+		/* @var $action kAccessControlServeRemoteEdgeServerAction */
+		$action = reset($actionsList);
+		$activeServerNodes =  $action->getRegiteredNodeServers();
+		
+		if(!count($activeServerNodes))
+			return null;
+		
+		return $activeServerNodes[0];
+	}
+	
 	protected function isFlavorParamsAllowed($flavorParamsId)
 	{
 		$actionList = $this->getActionList(RuleActionType::LIMIT_FLAVORS);
