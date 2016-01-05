@@ -48,6 +48,18 @@ class ServerNodePeer extends BaseServerNodePeer {
 		return ServerNodePeer::doSelectOne($c);
 	}
 	
+	public static function retrieveRegisteredServerNodeByPk($pk, PropelPDO $con = null)
+	{
+		$criteria = new Criteria(ServerNodePeer::DATABASE_NAME);
+		$criteria->add(ServerNodePeer::ID, $pk);
+		$criteria->add(ServerNodePeer::STATUS, ServerNodeStatus::ACTIVE);
+		$criteria->add(ServerNodePeer::HEARTBEAT_TIME, time() - ServerNode::SERVER_NODE_TTL_TIME, Criteria::GREATER_EQUAL);
+		$criteria->addOr(ServerNodePeer::HEARTBEAT_TIME, null);
+		
+		return ServerNodePeer::doSelectOne($criteria, $con);
+		
+	}
+	
 	public static function retrieveRegisteredServerNodesArrayByPKs($pks, PropelPDO $con = null)
 	{
 		if (empty($pks)) {

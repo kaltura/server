@@ -117,4 +117,24 @@ class EdgeServerNode extends DeliveryServerNode {
 	
 		return self::EDGE_SERVER_DEFAULT_LIVE_CACHE_APPLICATION_NAME;
 	}
+	
+	public function validateEdgeTreeRegistered()
+	{
+		/* @var $edgeServer EdgeServerNode */
+		$parentId = $this->getParentId();
+		if($parentId)
+		{
+			$parentEdge = ServerNodePeer::retrieveRegisteredServerNodeByPk($parentId);
+				
+			if(!$parentEdge)
+			{
+				return false;
+			}
+				
+			return $parentEdge->validateEdgeTreeRegistered();
+		}
+	
+		return true;
+	}
+	
 } // EdgeServer
