@@ -617,7 +617,7 @@ abstract class LiveEntry extends entry
 		if(is_null($this->getFirstBroadcast())) 
 			$this->setFirstBroadcast(kApiCache::getTime());
 				
-		$mediaServerNode = ServerNodePeer::retrieveActiveServerNodes($hostname);
+		$mediaServerNode = ServerNodePeer::retrieveActiveMediaServerNode($hostname);
 		if (!$mediaServerNode)
 			throw new kCoreException("Media server with host name [$hostname] not found", kCoreException::MEDIA_SERVER_NOT_FOUND);
 		
