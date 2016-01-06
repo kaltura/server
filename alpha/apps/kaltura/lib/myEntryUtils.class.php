@@ -1101,7 +1101,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 	/**
 	 * @param entry $entry
 	 * @param Partner|null $toPartner
-	 * @param KalturaBaseEntryCloneOptionsArray $cloneOptionsArray - an array of enumerator of a subset of entry properties.
+	 * @param array kBaseEntryCloneOptionItem $cloneOptions Array - an array of enumerator of a subset of entry properties.
 	 * 													For each subset the user sets
 	 * 													whether the subset is included or excluded from the copy.
 	 * 													The default action for each subset is 'include'.
@@ -1119,7 +1119,6 @@ PuserKuserPeer::getCriteriaFilter()->disable();
  		KalturaLog::log("copyEntry - Copying entry [".$entry->getId()."] to partner [".$toPartner->getId().
 			" ] with clone options [ ".print_r($cloneOptions, true)." ]");
 
-		$entry->setClonedOption($cloneOptions);
 		$copyUsers = true;
 		$copyCategories = true;
 
@@ -1141,6 +1140,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		}
 
  		$newEntry = $entry->copy();
+	    $newEntry->setCloneOptions($cloneOptions);
  		$newEntry->setIntId(null);
 		$newEntry->setCategories(null);
 		$newEntry->setCategoriesIds(null);
