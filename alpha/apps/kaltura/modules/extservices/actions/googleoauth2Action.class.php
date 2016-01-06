@@ -1,4 +1,7 @@
 <?php
+
+require_once 'oauth2Action.class.php';
+
 /**
  * @package Core
  * @subpackage externalServices
