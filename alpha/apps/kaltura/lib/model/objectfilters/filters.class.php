@@ -13,8 +13,6 @@ abstract class baseObjectFilter extends myBaseObject
 	
 	protected static $maxInValues = 500;
 
-	private static $relative_time_fields = array("gte_created_at","lte_created_at","gte_updated_at","lte_updated_at","gte_last_played_at","lte_last_played_at","gte_media_date","lte_media_date","lteornull_start_date","gteornull_start_date","lte_start_date","gte_start_date","lteornull_end_date","gteornull_end_date","lte_end_date","gte_end_date");
-	
 	/**
 	 * @var AdvancedSearchFilterItem
 	 */
@@ -1015,13 +1013,13 @@ abstract class baseObjectFilter extends myBaseObject
 	/* (non-PHPdoc)
 	 * @see apps/kaltura/lib/myBaseObject#fillObjectFromXml()
 	 */
-	public function fillObjectFromXml ( SimpleXMLElement $simple_xml_node , $prefix_to_add , $exclude_params=null)
+	public function fillObjectFromXml ( SimpleXMLElement $simple_xml_node , $prefix_to_add , $exclude_params=null, $relative_time_fields = array())
 	{
 		if(!is_array($exclude_params))
 			$exclude_params = array();
 			
 		$exclude_params[] = 'advancedSearch';
-		$set_field_count = parent::fillObjectFromXml($simple_xml_node, $prefix_to_add, $exclude_params, self::$relative_time_fields);
+		$set_field_count = parent::fillObjectFromXml($simple_xml_node, $prefix_to_add, $exclude_params, $relative_time_fields);
 
 		if(isset($simple_xml_node->advancedSearch))
 		{

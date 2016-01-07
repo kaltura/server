@@ -10,6 +10,8 @@ class entryFilter extends baseObjectFilter
 	// allow only 256 charaters when creation a MATCH-AGAINST caluse
 	const MAX_SAERCH_TEXT_SIZE = 256;
 	
+	private static $relative_time_fields = array("gte_created_at","lte_created_at","gte_updated_at","lte_updated_at","gte_last_played_at","lte_last_played_at","gte_media_date","lte_media_date","lteornull_start_date","gteornull_start_date","lte_start_date","gte_start_date","lteornull_end_date","gteornull_end_date","lte_end_date","gte_end_date");
+	
 	// this flag will indicate if the uiser_id set in the _eq_user_id field shouyld be translated to kuser_id or not.
 	// if $user_id_is_kuser_id is true, the switch was already done   
 	public $user_id_is_kuser_id = false;
@@ -579,7 +581,12 @@ class entryFilter extends baseObjectFilter
 		
 		$this->attachToCriteria($criteria);
 	}
-	
+
+	public function fillObjectFromXml ( SimpleXMLElement $simple_xml_node , $prefix_to_add , $exclude_params=null)
+	{
+		return parent::fillObjectFromXml($simple_xml_node, $prefix_to_add, $exclude_params, self::$relative_time_fields);
+	}
+
 	public function setIdEquel($v)
 	{
 		$this->set('_eq_id', $v);
