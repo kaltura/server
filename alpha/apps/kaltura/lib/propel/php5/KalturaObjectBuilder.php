@@ -292,8 +292,8 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
                 \$stmt = BasePeer::doSelect(\$criteria, \$con);
                 \$cutsomDataArr = \$stmt->fetchAll(PDO::FETCH_COLUMN);
                 \$newCustomData = \$cutsomDataArr[0];
-                
-                \$this->custom_data_md5 = md5(\$newCustomData);
+
+                \$this->custom_data_md5 = is_null(\$newCustomData) ? null : md5(\$newCustomData);
 
                 \$valuesToChangeTo = \$this->m_custom_data->toArray();
 				\$this->m_custom_data = myCustomData::fromString(\$newCustomData); 

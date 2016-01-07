@@ -631,7 +631,7 @@ abstract class LiveEntry extends entry
 		$this->setLastBroadcast(kApiCache::getTime());
 		$server = new kLiveMediaServer($index, $hostname, $mediaServerNode->getDc(), $mediaServerNode->getId(), $applicationName ? $applicationName : $mediaServerNode->getApplicationName());
 		$this->putInCustomData("server-$index", $server, LiveEntry::CUSTOM_DATA_NAMESPACE_MEDIA_SERVERS);
-		$this->setLiveStatus(LiveEntryStatus::PLAYABLE);
+		$this->setLiveStatus(LiveEntryStatus::PLAYABLE, $index);
 	}
 	
 	protected function isMediaServerRegistered($index, $hostname)
@@ -654,9 +654,9 @@ abstract class LiveEntry extends entry
 			$this->setLastBroadcastEndTime(kApiCache::getTime());
 		}
 		
-		if(!$this->hasMediaServer()) {
-			$this->setLiveStatus(LiveEntryStatus::STOPPED);
-		}
+		// Set media server with index #index to be stopped
+		// the entry->liveStatus() is calculated from the state of both servers
+		$this->setLiveStatus(LiveEntryStatus::STOPPED, $index);
 	}
 	
 	/**
@@ -679,14 +679,22 @@ abstract class LiveEntry extends entry
 		return $listChanged;
 	}
 	
-	public function getLiveStatus ()
+	public function getLiveStatus ($mediaServerIndex = null)
 	{
-		return $this->getFromCustomData('live_status', null, LiveEntryStatus::STOPPED);
+		if ($mediaServerIndex != null){
+			return $this->getLiveStatusInternal($mediaServerIndex);
+		}
+		return LiveEntry::maxLiveEntryStatus($this->getLiveStatusInternal(MediaServerIndex::PRIMARY), $this->getLiveStatusInternal(MediaServerIndex::SECONDARY));
 	}
-	
-	public function setLiveStatus ($v)
+
+	private function getLiveStatusInternal ($mediaServerIndex)
 	{
-		$this->putInCustomData('live_status', $v);
+		return $this->getFromCustomData('live_status_'.$mediaServerIndex, null, LiveEntryStatus::STOPPED);
+	}
+
+	public function setLiveStatus ($v, $mediaServerIndex)
+	{
+		$this->putInCustomData('live_status_'.$mediaServerIndex, $v);
 	}
 	
 	/**
@@ -826,5 +834,15 @@ abstract class LiveEntry extends entry
 			$recordingOptions = unserialize($recordingOptions);
 		
 		return $recordingOptions; 
+	}
+
+	public static function maxLiveEntryStatus($primaryMediaServerStatus, $secondaryMediaServerStatus)
+	{
+		if ($primaryMediaServerStatus == LiveEntryStatus::PLAYABLE || $secondaryMediaServerStatus == LiveEntryStatus::PLAYABLE)
+			return LiveEntryStatus::PLAYABLE;
+		elseif ($primaryMediaServerStatus == LiveEntryStatus::BROADCASTING || $secondaryMediaServerStatus == LiveEntryStatus::BROADCASTING)
+			return LiveEntryStatus::BROADCASTING;
+		else
+			return LiveEntryStatus::STOPPED;
 	}
 }

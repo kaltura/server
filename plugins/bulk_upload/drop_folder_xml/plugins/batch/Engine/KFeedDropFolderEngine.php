@@ -287,14 +287,14 @@ class KFeedDropFolderEngine extends KDropFolderEngine
 		{
 			$password = parse_url ($url, PHP_URL_PASS);
 			$urlComponents = parse_url ($url); 
-			$protocol = $urlComponents['scheme'];
-			$hostname = $urlComponents ['host'];
-			$port = $urlComponents['port'];
-			$params = $urlComponents['path'];
-			$queryArgs = $urlComponents['query'];
-			$fragment = $urlComponents [];
+			$protocol = isset ($urlComponents['scheme']) ? $urlComponents['scheme'] : null;
+			$hostname = isset($urlComponents ['host']) ? $urlComponents ['host'] : null;
+			$port = isset ($urlComponents['port']) ? $urlComponents['port'] : null;
+			$params = isset ($urlComponents['path']) ? $urlComponents['path'] : null;
+			$queryArgs = isset ($urlComponents['query']) ? $urlComponents['query'] : null;
+			$fragment = isset ($urlComponents ['fragment']) ? $urlComponents ['fragment'] : null;
 
-			$url =  "$protocol://$hostname" .  ($port? ":$port" : "") . "$params?$queryArgs" . ($fragment ? "#$fragment" : "");
+			$url =  "$protocol://$hostname" .  ($port? ":$port" : "") . ($params ? $params : "") . ($queryArgs ? "?$queryArgs" : "") . ($fragment ? "#$fragment" : "");
 		}
 		
 		$ch = curl_init ($url);

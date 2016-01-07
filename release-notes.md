@@ -1,5 +1,17 @@
 # Kajam-11.6.0 #
 
+## Expose liveStatus in the API for use in the WebCasting app + add BROADCASTING state to LiveEntryStatus##
+ - Issue Type: New Feature
+ - Issue ID: WEBC-629
+#### Installation ####
+ - deploy new jars to Wowza - new jars can be found in the ticket https://kaltura.atlassian.net/browse/WEBC-629
+#### Configuration ####
+None.
+#### Known Issues & Limitations ####
+None.
+#### Deployment scripts ####
+None.
+
 ## Usage dashboard ##
 
  - Issue Type: New Feature
@@ -9,7 +21,7 @@
 
 - Download latest Usage Dashboard package from https://github.com/kaltura/usage-dashboard/releases/
 - Extract the zip to `/opt/kaltura/apps/usage-dashboard/`
-- If the app version is v1.0.0, make sure that `/opt/kaltura/apps/usage-dashboard/v0.9.0/index.html` exists
+- If the app version is v1.0.0, make sure that `/opt/kaltura/apps/usage-dashboard/v1.0.0/index.html` exists
 
 #### Configuration ####
 
