@@ -109,8 +109,6 @@ class UploadTokenService extends KalturaBaseService
 					throw new KalturaAPIException(KalturaErrors::UPLOAD_TOKEN_CANNOT_RESUME);
 				case kUploadTokenException::UPLOAD_TOKEN_RESUMING_NOT_ALLOWED:
 					throw new KalturaAPIException(KalturaErrors::UPLOAD_TOKEN_RESUMING_NOT_ALLOWED);
-				case kUploadTokenException::UPLOAD_TOKEN_RESUMING_INVALID_POSITION:
-					throw new KalturaAPIException(KalturaErrors::UPLOAD_TOKEN_RESUMING_INVALID_POSITION);
 				default:
 					throw $ex;
 			}

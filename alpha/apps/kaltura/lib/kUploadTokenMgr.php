@@ -67,7 +67,7 @@ class kUploadTokenMgr
 		}
 		
 		if ($resume)
-			$this->handleResume($fileData, $resumeAt);
+			$this->handleResume($fileData, $finalChunk, $resumeAt);
 		else
 			$this->handleMoveFile($fileData);
 		
@@ -185,21 +185,42 @@ class kUploadTokenMgr
 	/**
 	 * Resume the upload token with the uploaded file optionally at a given offset
 	 * @param file $fileData
+	 * @param bool $finalChunk
 	 * @param float $resumeAt
 	 */
-	protected function handleResume($fileData, $resumeAt = -1)
+	protected function handleResume($fileData, $finalChunk, $resumeAt)
 	{
 		$uploadFilePath = $this->_uploadToken->getUploadTempPath();
 		if (!file_exists($uploadFilePath))
 			throw new kUploadTokenException("Temp file [$uploadFilePath] was not found when trying to resume", kUploadTokenException::UPLOAD_TOKEN_FILE_NOT_FOUND_FOR_RESUME);
 		
-		$this->resumeFile($fileData['tmp_name'], $uploadFilePath, $resumeAt);
+		$sourceFilePath = $fileData['tmp_name'];
 		
-		$fileWasDeleted = unlink($fileData['tmp_name']);
-		if ($fileWasDeleted)
-			KalturaLog::info("Temp file was deleted successfully");
+		if ($resumeAt != -1) // this may not be a sequential chunk added at the end of the file
+		{
+		    rename($sourceFilePath, "chunk.$uploadFilePath.$resumeAt");
+		    
+		    $fileSize = $this->_uploadToken->getFileSize();
+
+		    // if finalChunk, try appending chunks till reaching expected file size for up to 30 seconds while sleeping for 1 second each iteration 
+		    $count = 0;
+		    do {
+		        if ($count++)
+		            Sleep(1);
+		        
+                $currentFileSize = self::appendAvailableChunks($uploadFilePath);
+                KalturaLog::log("handleResume finalChunk:$finalChunk filesize:$currentFileSize");
+		    } while($finalChunk && $currentFileSize != $fileSize && $count < 30);
+		}
 		else
-			KalturaLog::err("Failed to delete temp file [{$fileData['tmp_name']}");
+		{
+		    $uploadFileResource = fopen($uploadFilePath, 'r+b');
+		    fseek($uploadFileResource, 0, SEEK_END);
+		
+		    self::appendChunk($sourceFilePath, $uploadFileResource);
+		
+		    fclose($uploadFileResource);
+		}
 	}
 	
 	/**
@@ -231,26 +252,8 @@ class kUploadTokenMgr
 		chmod($uploadFilePath, 0600);
 	}
 	
-	/**
-	 * Resumes the target file using the data from source file
-	 * @param resource $sourceFilePath
-	 * @param resource $targetFilePath
-	 */
-	protected function resumeFile($sourceFilePath, $targetFilePath, $resumeAt = -1)
+	static protected function appendChunk($sourceFilePath, $targetFileResource)
 	{
-		$targetFileResource = fopen($targetFilePath, 'r+b');
-
-		fseek($targetFileResource, 0, SEEK_END);
-		if ($resumeAt != -1)
-		{
-			if ($resumeAt > ftell($targetFileResource))
-			{
-				fclose($targetFileResource);
-				throw new kUploadTokenException("Temp file [$targetFilePath] attempted to resume at invalid position $resumeAt", kUploadTokenException::UPLOAD_TOKEN_RESUMING_INVALID_POSITION);
-			}
-			fseek($targetFileResource, $resumeAt, SEEK_SET);
-		}
-
 		$sourceFileResource = fopen($sourceFilePath, 'rb');
 
 		while(!feof($sourceFileResource))
@@ -258,9 +261,37 @@ class kUploadTokenMgr
 			$data = fread($sourceFileResource, 1024*100);
 			fwrite($targetFileResource, $data);
 		}
-		
+
 		fclose($sourceFileResource);
+	    unlink($sourceFileResource);
+	}
+	
+	static protected function appendAvailableChunks($targetFilePath)
+	{
+	    $targetFileResource = fopen($targetFilePath, 'r+b');
+
+		fseek($targetFileResource, 0, SEEK_END);
+		
+	    // check for a chunk with the name "chunk.{filename}.{filesize}"
+	    // if such a file exists try locking it by renaming it into "chunk.{filename}.{filesize}.locked"
+	    // if successful append to target file and loop again
+	    while(1)
+	    {
+            $currentFileSize = ftell($targetFileResource); 
+            $nextChunk = "chunk.$targetFilePath.$currentFileSize";
+			if (!file_exists($nextChunk)) // probably a parellel upload and the next chunk didn't arrive yet
+                break;
+			    
+			$lockedFile = "$nextChunk.locked";
+		    if (!rename($nextChunk, $lockedFile)) // another process is already appending this file
+                break;
+		        
+		    self::appendChunk($lockedFile, $targetFileResource);
+        }
+        
 		fclose($targetFileResource);
+		
+		return $currentFileSize;
 	}
 	
 	/**
