@@ -624,7 +624,7 @@ class myPlaylistUtils
 		$entry_list = array();
 		foreach ( $entry_ids_list as $entryId )
 		{
-			if isset($entry_map[$entryId])
+			if(isset($entry_map[$entryId]))
 				$entry_list[] = $entry_map[$entryId];
 		}
 
