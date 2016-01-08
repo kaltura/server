@@ -236,7 +236,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		    $fileowner=fileowner($filePath);
 		    $myuid=posix_getuid();
 		    if ($myuid !== 0 && $fileowner !== $myuid){
-			KalturaLog::notice('The file ' .$filePath .' is owned by '. $fileowner. ' and cannot be changed by '.$myuid);
+			KalturaLog::notice('The file ' .$filePath .' is owned by user ID:'. $fileowner. ' and cannot be changed by user ID: '.$myuid);
 			return;
 		    }
 		}
