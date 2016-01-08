@@ -232,6 +232,15 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 
 	protected static function setPermissions($filePath)
 	{
+		if (function_exists('posix_getuid')){
+		    $fileowner=fileowner($filePath);
+		    $myuid=posix_getuid();
+		    if ($myuid !== 0 && $fileowner !== $myuid){
+			KalturaLog::notice('The file ' .$filePath .' is owned by '. $fileowner. ' and cannot be changed by '.$myuid);
+			return;
+		    }
+		}
+
 		$contentGroup = kConf::get('content_group');
 		if(is_numeric($contentGroup))
 			$contentGroup = intval($contentGroup);
