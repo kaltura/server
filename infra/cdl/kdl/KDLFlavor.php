@@ -625,7 +625,11 @@ $plannedDur = 0;
 		$target->_audio = null;
 		if($this->_audio!=""){
 			if($source->_audio!=""){
-				$target->_audio = $this->evaluateTargetAudio($source->_audio, $target, $source->_contentStreams);
+				if (isset($source->_contentStreams)){
+					$target->_audio = $this->evaluateTargetAudio($source->_audio, $target, $source->_contentStreams);
+				}else{
+					$target->_audio = $this->evaluateTargetAudio($source->_audio, $target, null);
+				}
 				/*
 				 * On multi-lingual flavor, 
 				 * if required language does not exist - set NonComply flag 
@@ -1235,10 +1239,13 @@ $plannedDur = 0;
 		/*
 		 * Adjust source channnels count to match the mapping settings
 		 */
-		$multiStream = $target->_multiStream;
+		if (isset($target->_multiStream)){
+			$multiStream = $target->_multiStream;
+		}else{
+			$multiStream = null;
+		}
 		$multiStreamChannels = null;
-		if(isset($multiStream) && isset($multiStream->audio)
-		&& isset($multiStream->audio->mapping) && count($multiStream->audio->mapping)>0) {
+		if(isset($multiStream->audio->mapping) && count($multiStream->audio->mapping)>0) {
 			if(count($multiStream->audio->mapping)>1){
 				$multiStreamChannels = 2;
 			}
