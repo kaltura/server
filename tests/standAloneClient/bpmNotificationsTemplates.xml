@@ -60,15 +60,6 @@
 						</value>
 					</item>
 				</contentParameters>
-				<userParameters objectType="array">
-					<item objectType="KalturaEventNotificationParameter">
-						<key>templateId</key>
-						<description>ID of the integration job finished template to be passed to the process</description>
-						<value objectType="KalturaStringValue">
-							<value></value>
-						</value>
-					</item>
-				</userParameters>
 			</template>
 		</request>
 		<request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
@@ -168,13 +159,6 @@
 					</item>
 				</contentParameters>
 				<userParameters objectType="array">
-					<item objectType="KalturaEventNotificationParameter">
-						<key>templateId</key>
-						<description>ID of the template to be passed to the process</description>
-						<value objectType="KalturaStringValue">
-							<value></value>
-						</value>
-					</item>
 					<item objectType="KalturaEventNotificationParameter">
 						<key>trigger_status</key>
 						<description>Flavor-asset status that triggers the event, See:KalturaFlavorAssetStatus:/api_v3/testmeDoc/?object=KalturaFlavorAssetStatus</description>
