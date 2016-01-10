@@ -1259,7 +1259,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 	 * @param FileSync $fileSync
 	 * @return void
 	 */
-	private static function incrementLinkCountForFileSync(FileSync $fileSync)
+	public static function incrementLinkCountForFileSync(FileSync $fileSync)
 	{
 		$current_count = (((int)$fileSync->getLinkCount())? $fileSync->getLinkCount(): 0) + 1;
 		$fileSync->setLinkCount($current_count);
@@ -1272,7 +1272,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 	 * @param FileSync $fileSync
 	 * @return void
 	 */
-	private static function decrementLinkCountForFileSync(FileSync $fileSync = null)
+	public static function decrementLinkCountForFileSync(FileSync $fileSync = null)
 	{
 		if(!$fileSync)
 			return;
