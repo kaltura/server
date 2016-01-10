@@ -207,10 +207,9 @@ class ScriptsRunner
 		
 		$db_selected = mysqli_select_db($link,$this->dbParams['dbname']);
 		$result = mysqli_query($link,'select filename from version_management');
+		$res = array();
 		if($result)
 		{
-			$res = array();
-			
 			while($row = mysqli_fetch_assoc($result))
 			{
 				$res[$row['filename']] = true;
