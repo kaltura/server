@@ -162,8 +162,9 @@ class EntryAdminService extends KalturaBaseService
 		foreach ($fileSyncs as $fileSync)
 		{
 			$shouldUnDelete = false;
-			if (($fileSync->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_FILE && file_exists($fileSync->getFullPath()))
-				|| ($fileSync->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL)){
+			if ($fileSync->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_FILE
+				|| $fileSync->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL)
+			{
 				$shouldUnDelete = true;
 			}
 			else if ($fileSync->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_LINK){
@@ -171,8 +172,10 @@ class EntryAdminService extends KalturaBaseService
 				FileSyncPeer::setUseCriteriaFilter(false);
 				$linkedFileSync = FileSyncPeer::retrieveByPK($linkedId);
 				FileSyncPeer::setUseCriteriaFilter(true);
-				if ($linkedFileSync->getStatus() == FileSync::FILE_SYNC_STATUS_READY && file_exists($linkedFileSync->getFullPath()))
+				if ($linkedFileSync->getStatus() == FileSync::FILE_SYNC_STATUS_READY) {
 					$shouldUnDelete = true;
+					kFileSyncUtils::incrementLinkCountForFileSync($linkedFileSync);
+				}
 			}
 
 			if ($shouldUnDelete)
