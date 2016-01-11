@@ -72,6 +72,6 @@ class thumbAsset extends asset
 			return $thumbnailUrl;
 		
 		$urlParts = explode("://", $thumbnailUrl);
-		return $urlParts[0] . "://" . $serverNode->buildEdgeFullPath('http', null, null, $this->getType()) . $urlParts[1];
+		return $urlParts[0] . "://" . $serverNode->buildEdgeFullPath('http', null, null, assetType::THUMBNAIL) . $urlParts[1];
 	}
 }
