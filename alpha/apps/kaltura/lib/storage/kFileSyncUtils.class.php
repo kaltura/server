@@ -232,15 +232,16 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 
 	protected static function setPermissions($filePath)
 	{
+
 		$contentGroup = kConf::get('content_group');
 		if(is_numeric($contentGroup))
 			$contentGroup = intval($contentGroup);
 			
-		chgrp($filePath, $contentGroup);
+		@chgrp($filePath, $contentGroup);
 		
 		if(is_dir($filePath))
 		{
-			chmod($filePath, 0770);
+			@chmod($filePath, 0770);
 			$dir = dir($filePath);
 			while (false !== ($file = $dir->read()))
 			{
@@ -251,7 +252,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		}
 		else
 		{
-			chmod($filePath, 0640);
+			@chmod($filePath, 0640);
 		}
 	}
 
