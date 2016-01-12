@@ -192,6 +192,7 @@ class FacebookDistributionEngine extends DistributionEngine implements
 		$fieldValues = unserialize($fieldValues);
 		$facebookMetadata = array();
 		$facebookMetadata['title'] = $fieldValues[FacebookDistributionField::TITLE];
+		$facebookMetadata['name'] = $fieldValues[FacebookDistributionField::TITLE];
 		$facebookMetadata['description'] = $fieldValues[FacebookDistributionField::DESCRIPTION];
 		$callToActionType = $fieldValues[FacebookDistributionField::CALL_TO_ACTION_TYPE];
 		if ($callToActionType)
