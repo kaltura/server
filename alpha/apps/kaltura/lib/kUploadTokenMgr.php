@@ -198,10 +198,11 @@ class kUploadTokenMgr
 		
 		if ($resumeAt != -1) // this may not be a sequential chunk added at the end of the file
 		{
-		    rename($sourceFilePath, "chunk.$uploadFilePath.$resumeAt");
+			// if this is the final chunk the expected file size would be the resume position + the last chunk size
+		    $expectedFileSize = finalChunk ? ($resumeAt + filesize($sourceFilePath)) : 0;
 		    
-		    $fileSize = $this->_uploadToken->getFileSize();
-
+			rename($sourceFilePath, "chunk.$uploadFilePath.$resumeAt");
+		    
 		    // if finalChunk, try appending chunks till reaching expected file size for up to 30 seconds while sleeping for 1 second each iteration 
 		    $count = 0;
 		    do {
@@ -210,7 +211,10 @@ class kUploadTokenMgr
 		        
                 $currentFileSize = self::appendAvailableChunks($uploadFilePath);
                 KalturaLog::log("handleResume finalChunk:$finalChunk filesize:$currentFileSize");
-		    } while($finalChunk && $currentFileSize != $fileSize && $count < 30);
+		    } while($finalChunk && $currentFileSize != $expectedFileSize && $count < 30);
+		    
+		    if ($finalChunk && $currentFileSize != $expectedFileSize)
+		    	throw new kUploadTokenException("final size $currentFileSize failed to match expected size $expectedFileSize", kUploadTokenException::UPLOAD_TOKEN_CANNOT_MATCH_EXPECTED_SIZE);
 		}
 		else
 		{
@@ -251,44 +255,42 @@ class kUploadTokenMgr
 		
 		chmod($uploadFilePath, 0600);
 	}
-	
+
 	static protected function appendChunk($sourceFilePath, $targetFileResource)
 	{
 		$sourceFileResource = fopen($sourceFilePath, 'rb');
-
-		while(!feof($sourceFileResource))
-		{
-			$data = fread($sourceFileResource, 1024*100);
+		
+		while (! feof($sourceFileResource)) {
+			$data = fread($sourceFileResource, 1024 * 100);
 			fwrite($targetFileResource, $data);
 		}
-
+		
 		fclose($sourceFileResource);
-	    unlink($sourceFileResource);
+		unlink($sourceFileResource);
 	}
-	
+
 	static protected function appendAvailableChunks($targetFilePath)
 	{
-	    $targetFileResource = fopen($targetFilePath, 'r+b');
-
+		$targetFileResource = fopen($targetFilePath, 'r+b');
+		
 		fseek($targetFileResource, 0, SEEK_END);
 		
-	    // check for a chunk with the name "chunk.{filename}.{filesize}"
-	    // if such a file exists try locking it by renaming it into "chunk.{filename}.{filesize}.locked"
-	    // if successful append to target file and loop again
-	    while(1)
-	    {
-            $currentFileSize = ftell($targetFileResource); 
-            $nextChunk = "chunk.$targetFilePath.$currentFileSize";
-			if (!file_exists($nextChunk)) // probably a parellel upload and the next chunk didn't arrive yet
-                break;
-			    
+		// check for a chunk with the name "chunk.{filename}.{filesize}"
+		// if such a file exists try locking it by renaming it into "chunk.{filename}.{filesize}.locked"
+		// if successful append to target file and loop again
+		while (1) {
+			$currentFileSize = ftell($targetFileResource);
+			$nextChunk = "chunk.$targetFilePath.$currentFileSize";
+			if (! file_exists($nextChunk)) // probably a parellel upload and the next chunk didn't arrive yet
+				break;
+			
 			$lockedFile = "$nextChunk.locked";
-		    if (!rename($nextChunk, $lockedFile)) // another process is already appending this file
-                break;
-		        
-		    self::appendChunk($lockedFile, $targetFileResource);
-        }
-        
+			if (! rename($nextChunk, $lockedFile)) // another process is already appending this file
+				break;
+			
+			self::appendChunk($lockedFile, $targetFileResource);
+		}
+		
 		fclose($targetFileResource);
 		
 		return $currentFileSize;

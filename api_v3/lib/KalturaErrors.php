@@ -370,6 +370,8 @@ class KalturaErrors extends APIErrors
 
 	const UPLOAD_TOKEN_CANNOT_RESUME = "UPLOAD_TOKEN_CANNOT_RESUME;;Cannot resume the upload, original file was not found";
 
+	const UPLOAD_TOKEN_CANNOT_MATCH_EXPECTED_SIZE = "UPLOAD_TOKEN_CANNOT_MATCH_EXPECTED_SIZE;;Failed to match expected file size";
+
 	/*
 	 * Partenrs service
 	 * PID - the parent partner_id
