@@ -211,7 +211,7 @@ class kUploadTokenMgr
 					Sleep(1);
 				
 				$currentFileSize = self::appendAvailableChunks($uploadFilePath);
-				KalturaLog::log("handleResume finalChunk:$finalChunk filesize:$currentFileSize");
+				KalturaLog::log("handleResume iteration: $count finalChunk: $finalChunk filesize: $currentFileSize");
 			} while ($finalChunk && $currentFileSize != $expectedFileSize && $count < 30);
 			
 			if ($finalChunk && $currentFileSize != $expectedFileSize)
