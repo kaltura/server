@@ -204,8 +204,6 @@ class kUploadTokenMgr
 			
 			rename($sourceFilePath, "chunk.$uploadFilePath.$resumeAt");
 			
-			$uploadFinalChunkMaxAppendTime = kConf::get('upload_final_chunk_max_append_time', 'local', 30);
-				
 			// if finalChunk, try appending chunks till reaching expected file size for up to 30 seconds while sleeping for 1 second each iteration
 			$count = 0;
 			do {
@@ -214,7 +212,7 @@ class kUploadTokenMgr
 				
 				$currentFileSize = self::appendAvailableChunks($uploadFilePath);
 				KalturaLog::log("handleResume finalChunk:$finalChunk filesize:$currentFileSize");
-			} while ($finalChunk && $currentFileSize != $expectedFileSize && $count < $uploadFinalChunkMaxAppendTime);
+			} while ($finalChunk && $currentFileSize != $expectedFileSize && $count < 30);
 			
 			if ($finalChunk && $currentFileSize != $expectedFileSize)
 				throw new kUploadTokenException("final size $currentFileSize failed to match expected size $expectedFileSize", kUploadTokenException::UPLOAD_TOKEN_CANNOT_MATCH_EXPECTED_SIZE);
