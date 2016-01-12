@@ -371,7 +371,16 @@ abstract class KalturaObject implements IApiObject
 		$fromObjectClass = "Map_{$thisClass}_{$srcObjClass}";
 		if (!class_exists($fromObjectClass))
 		{
-			$cacheFileName = kConf::get("cache_root_path") . "/api_v3/fromObject/{$fromObjectClass}.php";
+            if(function_exists('posix_geteuid'))
+            {
+                    $processUser = posix_getpwuid(posix_geteuid());
+                    $usernameExt = $processUser['name']."/";
+            }
+            else
+            {
+                    $usernameExt = "";
+            }			
+			$cacheFileName = kConf::get("cache_root_path") . "/api_v3/fromObject/".$usernameExt."{$fromObjectClass}.php";
 			$max_include_retries=10;
 			$fromObjectClassCode=null;
 			while((!@include_once($cacheFileName)) and $max_include_retries--)
