@@ -386,7 +386,7 @@ abstract class KalturaObject implements IApiObject
 				$cacheDir = dirname($cacheFileName);
 				if (!is_dir($cacheDir))
 				{
-					mkdir($cacheDir, 0755);
+					mkdir($cacheDir, 0775);
 				}
 				kFile::safeFilePutContents($cacheFileName, $fromObjectClassCode);
 				chmod ($cacheFileName, 0755);
