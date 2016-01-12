@@ -181,49 +181,48 @@ class kUploadTokenMgr
 			rename($fileData['tmp_name'], $errorFilePath);
 		}
 	}
-	
+
 	/**
 	 * Resume the upload token with the uploaded file optionally at a given offset
-	 * @param file $fileData
-	 * @param bool $finalChunk
-	 * @param float $resumeAt
+	 * 
+	 * @param file $fileData        	
+	 * @param bool $finalChunk        	
+	 * @param float $resumeAt        	
 	 */
 	protected function handleResume($fileData, $finalChunk, $resumeAt)
 	{
 		$uploadFilePath = $this->_uploadToken->getUploadTempPath();
-		if (!file_exists($uploadFilePath))
+		if (! file_exists($uploadFilePath))
 			throw new kUploadTokenException("Temp file [$uploadFilePath] was not found when trying to resume", kUploadTokenException::UPLOAD_TOKEN_FILE_NOT_FOUND_FOR_RESUME);
 		
 		$sourceFilePath = $fileData['tmp_name'];
 		
-		if ($resumeAt != -1) // this may not be a sequential chunk added at the end of the file
-		{
+		if ($resumeAt != - 1) // this may not be a sequential chunk added at the end of the file
+{
 			// if this is the final chunk the expected file size would be the resume position + the last chunk size
-		    $expectedFileSize = finalChunk ? ($resumeAt + filesize($sourceFilePath)) : 0;
-		    
+			$expectedFileSize = finalChunk ? ($resumeAt + filesize($sourceFilePath)) : 0;
+			
 			rename($sourceFilePath, "chunk.$uploadFilePath.$resumeAt");
-		    
-		    // if finalChunk, try appending chunks till reaching expected file size for up to 30 seconds while sleeping for 1 second each iteration 
-		    $count = 0;
-		    do {
-		        if ($count++)
-		            Sleep(1);
-		        
-                $currentFileSize = self::appendAvailableChunks($uploadFilePath);
-                KalturaLog::log("handleResume finalChunk:$finalChunk filesize:$currentFileSize");
-		    } while($finalChunk && $currentFileSize != $expectedFileSize && $count < 30);
-		    
-		    if ($finalChunk && $currentFileSize != $expectedFileSize)
-		    	throw new kUploadTokenException("final size $currentFileSize failed to match expected size $expectedFileSize", kUploadTokenException::UPLOAD_TOKEN_CANNOT_MATCH_EXPECTED_SIZE);
-		}
-		else
-		{
-		    $uploadFileResource = fopen($uploadFilePath, 'r+b');
-		    fseek($uploadFileResource, 0, SEEK_END);
-		
-		    self::appendChunk($sourceFilePath, $uploadFileResource);
-		
-		    fclose($uploadFileResource);
+			
+			// if finalChunk, try appending chunks till reaching expected file size for up to 30 seconds while sleeping for 1 second each iteration
+			$count = 0;
+			do {
+				if ($count ++)
+					Sleep(1);
+				
+				$currentFileSize = self::appendAvailableChunks($uploadFilePath);
+				KalturaLog::log("handleResume finalChunk:$finalChunk filesize:$currentFileSize");
+			} while ($finalChunk && $currentFileSize != $expectedFileSize && $count < 30);
+			
+			if ($finalChunk && $currentFileSize != $expectedFileSize)
+				throw new kUploadTokenException("final size $currentFileSize failed to match expected size $expectedFileSize", kUploadTokenException::UPLOAD_TOKEN_CANNOT_MATCH_EXPECTED_SIZE);
+		} else {
+			$uploadFileResource = fopen($uploadFilePath, 'r+b');
+			fseek($uploadFileResource, 0, SEEK_END);
+			
+			self::appendChunk($sourceFilePath, $uploadFileResource);
+			
+			fclose($uploadFileResource);
 		}
 	}
 	
