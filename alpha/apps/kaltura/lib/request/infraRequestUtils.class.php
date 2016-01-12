@@ -485,7 +485,18 @@ class infraRequestUtils
 		}
 		
 		self::$requestParams = array_replace_recursive($post, $_FILES, $_GET, $params);
-		
+
+		$v3cacheTruncateParams = kConf::get('v3cache_truncate_time_params', 'local', array());
+		foreach($v3cacheTruncateParams as $paramName)
+		{
+			if (isset(self::$requestParams[$paramName]))
+			{
+				$value = self::$requestParams[$paramName];
+				if ($value > 0)
+					self::$requestParams[$paramName] = $value - ($value % 60);
+			}
+		}
+
 		return self::$requestParams;
 	}
 
