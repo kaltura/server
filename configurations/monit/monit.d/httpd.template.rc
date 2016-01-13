@@ -6,8 +6,6 @@ check process apache
     if failed host localhost port @KALTURA_VIRTUAL_HOST_PORT@ protocol @PROTOCOL@ then restart
     if 5 restarts within 5 cycles then timeout
 
-    set alert @ADMIN_CONSOLE_ADMIN_MAIL@ only on { timeout, nonexist, connection }
-
     group kaltura
     depends on httpd.conf, httpd
    
