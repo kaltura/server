@@ -4,9 +4,7 @@ check process wowza with pidfile /var/run/WowzaStreamingEngine.pid
     
     if 5 restarts within 5 cycles then timeout
     if failed port 1935 protocol http then restart
-    
-    set alert @ADMIN_CONSOLE_ADMIN_MAIL@ only on { timeout, nonexist, connection }
-    
+        
     depends on wowza.conf, wowzabin
 
 check file wowza.conf

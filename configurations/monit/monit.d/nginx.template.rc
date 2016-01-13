@@ -6,8 +6,6 @@ check process nginx
     if failed host localhost port @VOD_PACKAGER_PORT@ protocol http then restart
     if 5 restarts within 5 cycles then timeout
 
-    set alert @ADMIN_CONSOLE_ADMIN_MAIL@ only on { timeout, nonexist, connection }
-
     group kaltura
     depends on nginxbin, nginx.conf
 

@@ -5,8 +5,6 @@ check process batch
 
     if 5 restarts within 5 cycles then timeout
 
-    set alert @ADMIN_CONSOLE_ADMIN_MAIL@ only on { timeout, nonexist, connection }
-
     group kaltura
     depends on batchbin, batch.ini
 
