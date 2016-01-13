@@ -107,6 +107,7 @@ class kFileUtils extends kFile
 		if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on' && kConf::hasParam('https_param_salt'))
 			$post_params['apiProtocol'] = 'https_' . kConf::get('https_param_salt');
 		
+		$httpHeader = array();
 		if(isset($_SERVER['CONTENT_TYPE']))
 		{
 			if(strtolower($_SERVER['CONTENT_TYPE']) == 'application/json' || (strpos(strtolower($_SERVER['CONTENT_TYPE']), 'multipart/form-data') === 0 && isset($_POST['json'])))
@@ -114,14 +115,14 @@ class kFileUtils extends kFile
 				$post_params = array_merge($post_params, infraRequestUtils::getRequestParams());
 			}
 		}
-			
-		$httpHeader = array("X-Kaltura-Proxy: dumpApiRequest");
 		
-	  	$ipHeader = infraRequestUtils::getSignedIpAddressHeader();
-	  	if ($ipHeader){
-	  		list($headerName, $headerValue) = $ipHeader;
-	  		$httpHeader[] = ($headerName . ": ". $headerValue);
-	  	}
+		$httpHeader[] = "X-Kaltura-Proxy: dumpApiRequest";
+		
+		$ipHeader = infraRequestUtils::getSignedIpAddressHeader();
+		if ($ipHeader){
+			list($headerName, $headerValue) = $ipHeader;
+			$httpHeader[] = ($headerName . ": ". $headerValue);
+		}
 	  	
 		$ch = curl_init();
 		// set URL and other appropriate options
@@ -130,7 +131,7 @@ class kFileUtils extends kFile
 		curl_setopt($ch, CURLOPT_USERAGENT, "curl/7.11.1");
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
 		curl_setopt($ch, CURLOPT_POST, TRUE);
-		curl_setopt($ch, CURLOPT_POSTFIELDS, $post_params);
+		curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($post_params));
 		// Set callback function for body
 		curl_setopt($ch, CURLOPT_WRITEFUNCTION, 'kFileUtils::read_body');
 		// Set callback function for headers
