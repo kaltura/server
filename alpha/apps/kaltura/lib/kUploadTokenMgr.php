@@ -276,16 +276,41 @@ class kUploadTokenMgr
 		
 		fseek($targetFileResource, 0, SEEK_END);
 		
-		// check for a chunk with the name "chunk.{filename}.{filesize}"
-		// if such a file exists try locking it by renaming it into "chunk.{filename}.{filesize}.locked"
-		// if successful append to target file and loop again
+		// use glob to find existing chunks and append ones which start within or at the end of the file and will increase its size
+		// in order to prevent race conditions, rename the chunk to "{chunkname}.{random}.locked" before appending it   
+		// the code should handle the following rare scenarios:
+		// 1. parallel procesess trying to add the same chunk
+		// 2. append failing half way and recovered by the client resneding the same chunk. The random part in the locked file name
+		// will prevent the re-uploaded chunk from coliding with the failed one
 		while (1) {
 			$currentFileSize = ftell($targetFileResource);
-			$nextChunk = "$targetFilePath.chunk.$currentFileSize";
-			if (! file_exists($nextChunk)) // probably a parellel upload and the next chunk didn't arrive yet
+			
+			$validChunk = false;
+			
+			$chunks = glob("$targetFilePath.chunk.*", GLOB_NOSORT);
+			foreach($chunks as $nextChunk)
+			{
+				$parts = explode(".", $nextChunk);
+				if (count($parts))
+				{
+					$chunkOffset = $parts[count($parts) - 1];
+					if ($chunkOffset == "locked") // don't touch chunks that were locked and may have failed appending half way
+						continue;
+					
+					// dismiss chunks which won't enlarge the file or which are starting after the end of the file
+					if ($chunkOffset <= $currentFileSize && $chunkOffset + filesize($nextChunk) > $currentFileSize)
+					{
+						fseek($targetFileResource, $chunkOffset, SEEK_SET);
+						$validChunk = true;
+						break; 
+					}
+				}
+			}
+			
+			if (!$validChunk)
 				break;
 			
-			$lockedFile = "$nextChunk.locked";
+			$lockedFile = "$nextChunk.".microtime(true).".locked";
 			if (! rename($nextChunk, $lockedFile)) // another process is already appending this file
 				break;
 			
