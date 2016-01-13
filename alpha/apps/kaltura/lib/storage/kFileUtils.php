@@ -130,7 +130,7 @@ class kFileUtils extends kFile
 		curl_setopt($ch, CURLOPT_USERAGENT, "curl/7.11.1");
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
 		curl_setopt($ch, CURLOPT_POST, TRUE);
-		curl_setopt($ch, CURLOPT_POSTFIELDS, $post_params);
+		curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($post_params));
 		// Set callback function for body
 		curl_setopt($ch, CURLOPT_WRITEFUNCTION, 'kFileUtils::read_body');
 		// Set callback function for headers
