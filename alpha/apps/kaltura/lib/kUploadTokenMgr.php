@@ -197,12 +197,12 @@ class kUploadTokenMgr
 		
 		$sourceFilePath = $fileData['tmp_name'];
 		
-		if ($resumeAt != - 1) // this may not be a sequential chunk added at the end of the file
-{
+		if ($resumeAt != -1) // this may not be a sequential chunk added at the end of the file
+		{
 			// if this is the final chunk the expected file size would be the resume position + the last chunk size
-			$expectedFileSize = finalChunk ? ($resumeAt + filesize($sourceFilePath)) : 0;
+			$expectedFileSize = $finalChunk ? ($resumeAt + filesize($sourceFilePath)) : 0;
 			
-			rename($sourceFilePath, "chunk.$uploadFilePath.$resumeAt");
+			rename($sourceFilePath, "$uploadFilePath.chunk.$resumeAt");
 			
 			$uploadFinalChunkMaxAppendTime = kConf::get('upload_final_chunk_max_append_time', 'local', 30);
 			
@@ -213,7 +213,7 @@ class kUploadTokenMgr
 					Sleep(1);
 				
 				$currentFileSize = self::appendAvailableChunks($uploadFilePath);
-				KalturaLog::log("handleResume finalChunk:$finalChunk filesize:$currentFileSize");
+				KalturaLog::log("handleResume iteration: $count finalChunk: $finalChunk filesize: $currentFileSize");
 			} while ($finalChunk && $currentFileSize != $expectedFileSize && $count < $uploadFinalChunkMaxAppendTime);
 			
 			if ($finalChunk && $currentFileSize != $expectedFileSize)
@@ -267,7 +267,7 @@ class kUploadTokenMgr
 		}
 		
 		fclose($sourceFileResource);
-		unlink($sourceFileResource);
+		unlink($sourceFilePath);
 	}
 
 	static protected function appendAvailableChunks($targetFilePath)
@@ -281,7 +281,7 @@ class kUploadTokenMgr
 		// if successful append to target file and loop again
 		while (1) {
 			$currentFileSize = ftell($targetFileResource);
-			$nextChunk = "chunk.$targetFilePath.$currentFileSize";
+			$nextChunk = "$targetFilePath.chunk.$currentFileSize";
 			if (! file_exists($nextChunk)) // probably a parellel upload and the next chunk didn't arrive yet
 				break;
 			
