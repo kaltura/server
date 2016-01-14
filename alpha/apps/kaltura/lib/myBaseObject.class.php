@@ -210,17 +210,16 @@ abstract class myBaseObject implements Iterator
 	 * WARNING - this method's params are different from fillObjectFromRequest due to the structure of the xml 
 	 * The second parameter $prefix_to_add represents the string to append as prefix to each of the elements names.
 	 */
-	public function fillObjectFromXml ( SimpleXMLElement $simple_xml_node , $prefix_to_add , $exclude_params=null , $time_params_to_relative = array())
+	public function fillObjectFromXml ( SimpleXMLElement $simple_xml_node , $prefix_to_add , $exclude_params=null )
 	{
 
 		$set_field_count = 0;
 
+		$time_params_to_relative = $this->getRelativeTimeFields();
+
 		// iterate over all the paramters of the request
 		foreach ( $simple_xml_node as $param => $value )
 		{
-			if(in_array($param, $time_params_to_relative))
-				$value = kTime::getRelativeTime($value);
-
 			// ignore empty strings in the filter !
 			if ( $value ==NULL || strlen ($value) == 0 ) continue;
 
@@ -228,7 +227,10 @@ abstract class myBaseObject implements Iterator
 			{
 				continue;
 			}
-		
+			
+			if(in_array($param, $time_params_to_relative))
+				$value = kTime::getRelativeTime($value);
+
 			// the field name is the rest of the string coming after the prefix
 			$param_name = $prefix_to_add . $param;
 
@@ -246,6 +248,11 @@ abstract class myBaseObject implements Iterator
 		return $set_field_count;
 	}
 		
+	protected function getRelativeTimeFields()
+	{
+		return array();
+	}
+
 	public function getFields()
 	{
 		return $this->fields;
