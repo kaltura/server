@@ -106,7 +106,7 @@ class kFileUtils extends kFile
 		$url = $_SERVER['REQUEST_URI'];
 		if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on' && kConf::hasParam('https_param_salt'))
 		{
-			$concatStr = strpos($url, "?") ? '&' : '?';
+			$concatStr = strpos($url, "?") !== false ? "&" : "?";
 			$url = $url . $concatStr . 'https_' . kConf::get('https_param_salt');
 		}
 			
