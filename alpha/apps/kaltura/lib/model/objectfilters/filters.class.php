@@ -12,7 +12,7 @@ abstract class baseObjectFilter extends myBaseObject
 	public $fields;
 	
 	protected static $maxInValues = 500;
-
+	
 	/**
 	 * @var AdvancedSearchFilterItem
 	 */
@@ -1013,13 +1013,13 @@ abstract class baseObjectFilter extends myBaseObject
 	/* (non-PHPdoc)
 	 * @see apps/kaltura/lib/myBaseObject#fillObjectFromXml()
 	 */
-	public function fillObjectFromXml ( SimpleXMLElement $simple_xml_node , $prefix_to_add , $exclude_params=null, $relative_time_fields = array())
+	public function fillObjectFromXml ( SimpleXMLElement $simple_xml_node , $prefix_to_add , $exclude_params=null )
 	{
 		if(!is_array($exclude_params))
 			$exclude_params = array();
 			
 		$exclude_params[] = 'advancedSearch';
-		$set_field_count = parent::fillObjectFromXml($simple_xml_node, $prefix_to_add, $exclude_params, $relative_time_fields);
+		$set_field_count = parent::fillObjectFromXml($simple_xml_node, $prefix_to_add, $exclude_params);
 
 		if(isset($simple_xml_node->advancedSearch))
 		{
