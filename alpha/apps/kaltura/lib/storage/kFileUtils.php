@@ -105,20 +105,29 @@ class kFileUtils extends kFile
 		
 		$url = $_SERVER['REQUEST_URI'];
 		if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on' && kConf::hasParam('https_param_salt'))
-		{
-			$concatStr = strpos($url, "?") !== false ? "&" : "?";
-			$url = $url . $concatStr . 'apiProtocol=https_' . kConf::get('https_param_salt');
-		}
-			
-		$httpHeader = array("X-Kaltura-Proxy: dumpApiRequest");
+			$post_params['apiProtocol'] = 'https_' . kConf::get('https_param_salt');
 		
 		if(isset($_SERVER['CONTENT_TYPE']))
 		{
-			$httpHeader[] = "Content-Type: " . $_SERVER['CONTENT_TYPE'];
-				
-			if(strtolower($_SERVER['CONTENT_TYPE']) == 'application/json')
-				$post_params = infraRequestUtils::$phpInputStream;
+			if(strtolower($_SERVER['CONTENT_TYPE']) == 'application/json' || (strpos(strtolower($_SERVER['CONTENT_TYPE']), 'multipart/form-data') === 0 && isset($_POST['json'])))
+			{
+				$post_params = array_merge($post_params, infraRequestUtils::getRequestParams());
+			}
 		}
+		
+		foreach($post_params as $key => $value)
+		{
+			if(is_array($value))
+			{
+				foreach($value as $valueKey => $valueVal)
+				{
+					$post_params["$key:$valueKey"] = $valueVal;
+				}
+				unset($post_params[$key]);
+			}
+		}
+			
+		$httpHeader = array("X-Kaltura-Proxy: dumpApiRequest");
 		
 	  	$ipHeader = infraRequestUtils::getSignedIpAddressHeader();
 	  	if ($ipHeader){
