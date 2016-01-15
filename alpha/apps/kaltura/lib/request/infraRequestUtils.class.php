@@ -471,12 +471,12 @@ class infraRequestUtils
 				$requestBody = file_get_contents("php://input");
 				if(preg_match('/^\{.*\}$/', $requestBody))
 				{
+					self::$phpInputStream = $requestBody;
 					$post = json_decode($requestBody, true);
 				}
 			}
 			elseif(strpos(strtolower($_SERVER['CONTENT_TYPE']), 'multipart/form-data') === 0 && isset($_POST['json']))
 			{
-				self::$phpInputStream = $requestBody;
 				$post = json_decode($_POST['json'], true);
 			}
 		}
