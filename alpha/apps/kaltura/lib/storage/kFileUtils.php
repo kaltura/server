@@ -114,6 +114,18 @@ class kFileUtils extends kFile
 				$post_params = array_merge($post_params, infraRequestUtils::getRequestParams());
 			}
 		}
+		
+		foreach($post_params as $key => $value)
+		{
+			if(is_array($value))
+			{
+				foreach($value as $valueKey => $valueVal)
+				{
+					$post_params["$key:$valueKey"] = $valueVal;
+				}
+				unset($post_params[$key]);
+			}
+		}
 			
 		$httpHeader = array("X-Kaltura-Proxy: dumpApiRequest");
 		
