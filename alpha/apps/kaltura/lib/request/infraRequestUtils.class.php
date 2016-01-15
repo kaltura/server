@@ -18,8 +18,6 @@ class infraRequestUtils
 	protected static $remoteAddress = null;
 	protected static $requestParams = null;
 	protected static $hostname = null;
-	
-	public static $phpInputStream = null;
 
 	//
 	// the function check the http range header and sets http response headers accordingly
@@ -472,7 +470,6 @@ class infraRequestUtils
 				$requestBody = file_get_contents("php://input");
 				if(preg_match('/^\{.*\}$/', $requestBody))
 				{
-					self::$phpInputStream = $requestBody;
 					$post = json_decode($requestBody, true);
 				}
 			}
