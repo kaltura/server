@@ -107,7 +107,7 @@ class kFileUtils extends kFile
 		if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on' && kConf::hasParam('https_param_salt'))
 		{
 			$concatStr = strpos($url, "?") !== false ? "&" : "?";
-			$url = $url . $concatStr . 'https_' . kConf::get('https_param_salt');
+			$url = $url . $concatStr . 'apiProtocol=https_' . kConf::get('https_param_salt');
 		}
 			
 		$httpHeader = array("X-Kaltura-Proxy: dumpApiRequest");
