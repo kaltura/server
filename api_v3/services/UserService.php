@@ -8,7 +8,9 @@
  * @subpackage services
  */
 class UserService extends KalturaBaseUserService 
-{   
+{
+	const ADD_USER_LOCK_GRAB_TIMEOUT = 0.1;
+	const ADD_USER_LOCK_HOLD_TIMEOUT = 30;
 
 	/**
 	 * Adds a new user to an existing account in the Kaltura database.
@@ -42,7 +44,20 @@ class UserService extends KalturaBaseUserService
 		$dbUser = $user->toObject($dbUser);
 		
 		try {
-			$dbUser = kuserPeer::addUser($dbUser, $user->password);
+			$lockKey = $this->getPartnerId() + $user->id;
+			$lock = kLock::create($lockKey);
+
+			if ($lock && !$lock->lock(self::ADD_USER_LOCK_GRAB_TIMEOUT, self::ADD_USER_LOCK_HOLD_TIMEOUT))
+				throw new KalturaAPIException(KalturaErrors::DUPLICATE_USER_BY_ID, $user->id);
+			try{
+				$dbUser = kuserPeer::addUser($dbUser, $user->password);
+			}
+			catch(Exception $e){
+				if($lock){
+					$lock->unlock();
+				}
+				throw $e;
+			}
 		}
 		catch (kUserException $e) {
 			$code = $e->getCode();
@@ -86,8 +101,10 @@ class UserService extends KalturaBaseUserService
 				throw new KalturaAPIException(KalturaErrors::USER_ROLE_NOT_FOUND);
 			}
 			throw $e;
-		}	
-			
+		}
+		if($lock){
+			$lock->unlock();
+		}
 		$newUser = new KalturaUser();
 		$newUser->fromObject($dbUser, $this->getResponseProfile());
 		
