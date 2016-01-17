@@ -474,4 +474,9 @@ abstract class CuePoint extends BaseCuePoint implements IIndexable, IRelatedObje
 
 		return false;
 	}
+
+	public function shouldCloneByProperty(entry $entry)
+	{
+		return false;
+	}
 } // CuePoint

@@ -41,4 +41,9 @@ class AdCuePoint extends CuePoint implements IMetadataObject
 	}
 	
 	public function getIsPublic()	              {return true;}
+
+	public function shouldCloneByProperty(entry $entry)
+	{
+		return $entry->shouldCloneByProperty(AdCuePointPlugin::getBaseEntryCloneOptionsCoreValue( BaseEntryAdCuePointCloneOptions::AD_CUE_POINTS), false);
+	}
 }

@@ -32,4 +32,9 @@ class CodeCuePoint extends CuePoint implements IMetadataObject
 	}
 	
 	public function getIsPublic()	              {return true;}
+
+	public function shouldCloneByProperty(entry $entry)
+	{
+		return $entry->shouldCloneByProperty(CodeCuePointPlugin::getBaseEntryCloneOptionsCoreValue( BaseEntryCodeCuePointCloneOptions::CODE_CUE_POINTS), false);
+	}
 }
