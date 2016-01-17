@@ -36,7 +36,10 @@ None.
 		moduls.enableUsageDashboard.group = GROUP_ENABLE_DISABLE_FEATURES
 
 # Kajam-11.5.0 #
-
+#### Installation ####
+None
+#### Configuration ####
+None
 ## pass AMF data on shared storage instead of in job data ##
  - Issue Type: New Feature
  - Issue ID: WEBC-631
