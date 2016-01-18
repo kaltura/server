@@ -1358,8 +1358,6 @@ abstract class BaseconversionProfile2 extends BaseObject  implements Persistent 
 				return 0;
 			}
 			
-			$this->setCustomDataObj();
-			
 			for ($retries = 1; $retries < KalturaPDO::SAVE_MAX_RETRIES; $retries++)
 			{
                $affectedRows = $this->doSave($con);
