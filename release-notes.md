@@ -1,16 +1,16 @@
 # Kajam-11.6.0 #
-
 ## Expose liveStatus in the API for use in the WebCasting app + add BROADCASTING state to LiveEntryStatus##
  - Issue Type: New Feature
  - Issue ID: WEBC-629
 #### Installation ####
  - deploy new jars to Wowza - new jars can be found in the ticket https://kaltura.atlassian.net/browse/WEBC-629
 #### Configuration ####
-None.
+ - Validate facebook.ini exists in the configuration directory
+ - Added FacebookDistribution to plugins.ini
 #### Known Issues & Limitations ####
 None.
 #### Deployment scripts ####
-None.
+ - php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
 
 ## Usage dashboard ##
 
@@ -36,15 +36,13 @@ None.
 		moduls.enableUsageDashboard.group = GROUP_ENABLE_DISABLE_FEATURES
 
 # Kajam-11.5.0 #
-
+#### Installation ####
+None
+#### Configuration ####
+None
 ## pass AMF data on shared storage instead of in job data ##
  - Issue Type: New Feature
  - Issue ID: WEBC-631
-#### Installation ####
- - php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
-#### Configuration ####
- - Validate facebook.ini exists in the configuration directory
- - Added FacebookDistribution to plugins.ini
 #### Known Issues & Limitations ####
 None.
 #### Deployment scripts ####
