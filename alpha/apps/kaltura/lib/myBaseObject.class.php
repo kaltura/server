@@ -506,4 +506,3 @@ abstract class myBaseObject implements Iterator
 	}
 
 }
-?>
