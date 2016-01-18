@@ -18,6 +18,7 @@ class infraRequestUtils
 	protected static $remoteAddress = null;
 	protected static $requestParams = null;
 	protected static $hostname = null;
+	public static $jsonData = null;
 
 	//
 	// the function check the http range header and sets http response headers accordingly
@@ -471,11 +472,15 @@ class infraRequestUtils
 				if(preg_match('/^\{.*\}$/', $requestBody))
 				{
 					$post = json_decode($requestBody, true);
+					if($post)
+						self::$jsonData = $requestBody;
 				}
 			}
 			elseif(strpos(strtolower($_SERVER['CONTENT_TYPE']), 'multipart/form-data') === 0 && isset($_POST['json']))
 			{
 				$post = json_decode($_POST['json'], true);
+				if($post)
+					self::$jsonData = $_POST['json'];
 			}
 		}
 		
@@ -485,7 +490,19 @@ class infraRequestUtils
 		}
 		
 		self::$requestParams = array_replace_recursive($post, $_FILES, $_GET, $params);
-		
+
+		$v3cacheTruncateParams = kConf::get('v3cache_truncate_time_params', 'local', array());
+		$v3cacheTruncateValue = kConf::get('v3cache_truncate_time_value', 'local', 60);
+		foreach($v3cacheTruncateParams as $paramName)
+		{
+			if (isset(self::$requestParams[$paramName]))
+			{
+				$value = self::$requestParams[$paramName];
+				if ($value > $v3cacheTruncateValue) // don't zero small values which may mean relative time
+					self::$requestParams[$paramName] = $value - ($value % $v3cacheTruncateValue);
+			}
+		}
+
 		return self::$requestParams;
 	}
 

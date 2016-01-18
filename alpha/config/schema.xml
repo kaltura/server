@@ -222,17 +222,8 @@
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="flavor_params_ids" type="varchar" size="512" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="available_from" type="timestamp" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="last_played_at" type="timestamp" />
-		<foreign-key onDelete="none" onUpdate="none" foreignTable="kshow">
-			<reference local="kshow_id" foreign="id" />
-		</foreign-key>
 		<foreign-key onDelete="none" onUpdate="none" foreignTable="kuser">
 			<reference local="kuser_id" foreign="id" />
-		</foreign-key>
-		<foreign-key onDelete="none" onUpdate="none" foreignTable="access_control">
-			<reference local="access_control_id" foreign="id" />
-		</foreign-key>
-		<foreign-key onDelete="none" onUpdate="none" foreignTable="conversion_profile_2">
-			<reference local="conversion_profile_id" foreign="id" />
 		</foreign-key>
 		<index name="kshow_rank_index">
 			<index-column name="kshow_id" />
@@ -1447,12 +1438,6 @@
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="video_codec_id" type="varchar" size="127" />
 		<column primaryKey="false" lazyLoad="false" name="type" type="integer" required="true" inheritance="single" default="0" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="custom_data" type="longvarchar" />
-		<foreign-key onDelete="none" onUpdate="none" onLoad="validate" foreignTable="entry">
-			<reference local="entry_id" foreign="id" />
-		</foreign-key>
-		<foreign-key onDelete="none" onUpdate="none" foreignTable="flavor_params">
-			<reference local="flavor_params_id" foreign="id" />
-		</foreign-key>
 	</table>
 	<table skipSql="false" abstract="false" name="conversion_profile_2" phpName="conversionProfile2">
 		<column lazyLoad="false" name="id" type="integer" required="true" primaryKey="true" autoIncrement="true" />

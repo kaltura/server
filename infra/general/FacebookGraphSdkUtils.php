@@ -228,9 +228,8 @@ class FacebookGraphSdkUtils
 	 */
 	public static function uploadCaptions($appId, $appSecret, $accessToken, $videoId, $filePath, $locale)
 	{
-		if (file_exists($filePath))
+		if (!file_exists($filePath))
 			throw new Exception("Captions file given does not exist: ".$filePath);
-
 		//create file name in format: filename.locale.srt
 		$newFilePath = basename($filePath, '.'.pathinfo($filePath, PATHINFO_EXTENSION)).'.'.$locale.'.srt';
 		copy($filePath, $newFilePath);
@@ -261,11 +260,9 @@ class FacebookGraphSdkUtils
 	 * @param string $filePath on disk
 	 * @param int $fileSize
 	 * @param int $duration
-	 * @param int $width
-	 * @param int $height
 	 * @throws Exception
 	 */
-	public static function validateVideoAttributes($filePath, $fileSize, $duration, $width, $height)
+	public static function validateVideoAttributes($filePath, $fileSize, $duration)
 	{
 		if($fileSize > FacebookConstants::MAX_VIDEO_SIZE)
 			throw new Exception("File size too large - got ".$fileSize." MAX defined is: ".FacebookConstants::MAX_VIDEO_SIZE);
@@ -277,15 +274,6 @@ class FacebookGraphSdkUtils
 		if(!$type)
 			throw new Exception('Invalid file format');
 
-		self::validateAspectRatio($width, $height);
-	}
-
-	private static function validateAspectRatio($width, $height)
-	{
-		if ($width === 0 || $height === 0)
-			throw new Exception("Invalid argument - got zero as video width[{$width}] or height[{$height}]");
-		if (abs($width/$height - 16/9) > 0.1 && abs($width/$height - 9/16) > 0.1)
-			throw new Exception("Invalid aspect ratio - facebook only supports 16:9 and 9:16 , got: width[{$width}] or height[{$height}]");
 	}
 
 	/**
@@ -464,6 +452,7 @@ class FacebookConstants
 	const FACEBOOK_RE_REQUEST_PERMISSIONS_REQUEST_PARAM = 're_request_permissions';
 	const FACEBOOK_PERMISSIONS_REQUEST_PARAM = 'permissions';
 	const FACEBOOK_PROVIDER_ID_REQUEST_PARAM = 'provider_id';
+	const FACEBOOK_PARTNER_ID_REQUEST_PARAM = 'partner_id';
 	const FACEBOOK_NEXT_ACTION_REQUEST_PARAM = 'next_action';
 	const FACEBOOK_KS_REQUEST_PARAM = 'ks';
 }

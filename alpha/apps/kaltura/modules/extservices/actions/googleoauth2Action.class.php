@@ -1,4 +1,7 @@
 <?php
+
+require_once 'oauth2Action.class.php';
+
 /**
  * @package Core
  * @subpackage externalServices
@@ -107,7 +110,7 @@ class googleoauth2Action extends oauth2Action
 		);
 
  		// let's create a limited ks and pass it as a state parameter to google
-		$limitedKs = $this->generateLimitedKs($partnerId, $state);
+		$limitedKs = $this->generateTimeLimitedKsWithData($partnerId, $state);
 
 		$state = $limitedKs;
 		$redirect = $this->getController()->genUrl('extservices/googleoauth2', true);

@@ -31,11 +31,18 @@ class kAccessControlServeRemoteEdgeServerAction extends kRuleAction
 		$this->edgeServerIds = $edgeServerIds;
 	}
 	
+	public function getRegiteredNodeServers()
+	{
+		$edgeServerIds = explode(',', $this->getEdgeServerIds());
+		$edgeServers = ServerNodePeer::retrieveRegisteredServerNodesArrayByPKs($edgeServerIds);
+		
+		return $edgeServers;
+	}
+	
 	public function applyDeliveryProfileDynamicAttributes(DeliveryProfileDynamicAttributes $deliveryAttributes)
 	{	
-		$edgeServerIds = explode(',', $this->getEdgeServerIds());
+		$edgeServers = $this->getRegiteredNodeServers();
 		
-		$edgeServers = ServerNodePeer::retrieveRegisteredServerNodesArrayByPKs($edgeServerIds);
 		if(!count($edgeServers))
 			return false;
 		

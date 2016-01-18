@@ -105,17 +105,18 @@ class kFileUtils extends kFile
 		
 		$url = $_SERVER['REQUEST_URI'];
 		if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on' && kConf::hasParam('https_param_salt'))
-			$post_params['apiProtocol'] = 'https_' . kConf::get('https_param_salt');
-		
-		if(isset($_SERVER['CONTENT_TYPE']))
 		{
-			if(strtolower($_SERVER['CONTENT_TYPE']) == 'application/json' || (strpos(strtolower($_SERVER['CONTENT_TYPE']), 'multipart/form-data') === 0 && isset($_POST['json'])))
-			{
-				$post_params = array_merge($post_params, infraRequestUtils::getRequestParams());
-			}
+			$concatStr = strpos($url, "?") !== false ? "&" : "?";
+			$url = $url . $concatStr . 'apiProtocol=https_' . kConf::get('https_param_salt');
 		}
 			
 		$httpHeader = array("X-Kaltura-Proxy: dumpApiRequest");
+		
+		if(isset(infraRequestUtils::$jsonData))
+		{
+			$post_params['json'] = infraRequestUtils::$jsonData;
+			$httpHeader[] = "Content-Type: multipart/form-data";
+		}
 		
 	  	$ipHeader = infraRequestUtils::getSignedIpAddressHeader();
 	  	if ($ipHeader){

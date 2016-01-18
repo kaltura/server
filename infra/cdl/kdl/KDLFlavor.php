@@ -520,24 +520,25 @@ $plannedDur = 0;
 			 * In case it does and the flavor has 'multiStream' set to 'auto-detect' (default action) -
 			 * try to define a multiStream processing setup
 			 */
-		$sourceAnalize = self::analizeSourceContentStreams($source->_contentStreams);
-			/*
-			 * Check analyze realts for
-			 * - 'streamsAsChannels' - process them as sorround streams
-			 * - 'languages - process them as multi-lingual
-			 * - otherwise remove the 'multiStream' object'
-			 */
-		if(isset($sourceAnalize->streamsAsChannels)){
-			$target->_multiStream = self::sorroundAudioSurceToTarget($source, $target->_multiStream, $sourceAnalize->streamsAsChannels);
-		}
-		else if(isset($sourceAnalize->languages)){
-			$target->_multiStream = self::multiLingualAudioSurceToTarget($source, $target->_multiStream, $sourceAnalize->languages);
-		}
-		else {
-			$target->_multiStream = null;
-		}
+		if (isset($source->_contentStreams)){
+		    $sourceAnalize = self::analizeSourceContentStreams($source->_contentStreams);
+			    /*
+			    * Check analyze realts for
+			    * - 'streamsAsChannels' - process them as sorround streams
+			    * - 'languages - process them as multi-lingual
+			    * - otherwise remove the 'multiStream' object'
+			    */
+		    if(isset($sourceAnalize->streamsAsChannels)){
+			    $target->_multiStream = self::sorroundAudioSurceToTarget($source, $target->_multiStream, $sourceAnalize->streamsAsChannels);
+		    }
+		    else if(isset($sourceAnalize->languages)){
+			    $target->_multiStream = self::multiLingualAudioSurceToTarget($source, $target->_multiStream, $sourceAnalize->languages);
+		    }
+		    else {
+			    $target->_multiStream = null;
+		    }
 				
-		
+		}
 		if($target->_container->_id==KDLContainerTarget::COPY){
 			$target->_container->_id=self::EvaluateCopyContainer($source->_container);
 		}
@@ -624,7 +625,11 @@ $plannedDur = 0;
 		$target->_audio = null;
 		if($this->_audio!=""){
 			if($source->_audio!=""){
-				$target->_audio = $this->evaluateTargetAudio($source->_audio, $target, $source->_contentStreams);
+				if (isset($source->_contentStreams)){
+					$target->_audio = $this->evaluateTargetAudio($source->_audio, $target, $source->_contentStreams);
+				}else{
+					$target->_audio = $this->evaluateTargetAudio($source->_audio, $target, null);
+				}
 				/*
 				 * On multi-lingual flavor, 
 				 * if required language does not exist - set NonComply flag 
@@ -1000,11 +1005,22 @@ $plannedDur = 0;
 			 * Fixed target frame size
 			 */
 		else if($shrinkToSource) {
-			if($target->_width>$widSrc) {
-				$target->_width=$widSrc;
-			}
+			$darTrg = $target->_width/$target->_height;
 			if($target->_height>$hgtSrc) {
 				$target->_height=$hgtSrc;
+			}
+				/*
+				 * If the target AR is similar/close (up to 10%) to the src AR,
+				 * just trim to the source dims.
+				 * Otherwise (src AR != trg AR) - calc the trg wid from trg AR and hgt.
+				 */
+			if(abs(1-$darTrg/$darSrcFrame)<0.1) {
+				if($target->_width>$widSrc) {
+					$target->_width=$widSrc;
+				}
+			}
+			else {
+				$target->_width = $target->_height*$darTrg;
 			}
 		}
 
@@ -1223,10 +1239,13 @@ $plannedDur = 0;
 		/*
 		 * Adjust source channnels count to match the mapping settings
 		 */
-		$multiStream = $target->_multiStream;
+		if (isset($target->_multiStream)){
+			$multiStream = $target->_multiStream;
+		}else{
+			$multiStream = null;
+		}
 		$multiStreamChannels = null;
-		if(isset($multiStream) && isset($multiStream->audio)
-		&& isset($multiStream->audio->mapping) && count($multiStream->audio->mapping)>0) {
+		if(isset($multiStream->audio->mapping) && count($multiStream->audio->mapping)>0) {
 			if(count($multiStream->audio->mapping)>1){
 				$multiStreamChannels = 2;
 			}

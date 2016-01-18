@@ -8,13 +8,10 @@ abstract class oauth2Action extends sfAction{
 
 	const EXPIRY_SECONDS = 1800; // 30 minutes
 
-
-	protected function generateLimitedKs($partnerId, $stateData)
+	private function generateKs($partnerId, $additionalData, $privileges)
 	{
 		$partner = $this->getPartner($partnerId);
 		$limitedKs = '';
-		$privileges = kSessionBase::PRIVILEGE_ACTIONS_LIMIT.':0';
-		$additionalData =  json_encode($stateData);
 		$result = kSessionUtils::startKSession($partnerId, $partner->getAdminSecret(), '', $limitedKs, self::EXPIRY_SECONDS, kSessionBase::SESSION_TYPE_ADMIN, '', $privileges, null, $additionalData);
 		if ($result < 0)
 			throw new Exception('Failed to create limited session for partner '.$partnerId);
@@ -22,15 +19,16 @@ abstract class oauth2Action extends sfAction{
 		return $limitedKs;
 	}
 
-	protected function generateTimeLimitedAdminKs($partnerId)
+	protected function generateTimeLimitedKsWithData($partnerId, $stateData)
 	{
-		$partner = $this->getPartner($partnerId);
-		$limitedKs = '';
-		$result = kSessionUtils::startKSession($partnerId, $partner->getAdminSecret(), '', $limitedKs, self::EXPIRY_SECONDS, kSessionBase::SESSION_TYPE_ADMIN, '', null, null, null);
-		if ($result < 0)
-			throw new Exception('Failed to create limited session for partner '.$partnerId);
+		$privileges = kSessionBase::PRIVILEGE_ACTIONS_LIMIT.':0';
+		$additionalData =  json_encode($stateData);
+		return $this->generateKs($partnerId, $additionalData, $privileges);
+	}
 
-		return $limitedKs;
+	protected function generateTimeLimitedKs($partnerId)
+	{
+		return $this->generateKs($partnerId, null, null);
 	}
 
 	protected function getPartner($partnerId)

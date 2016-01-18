@@ -51,4 +51,27 @@ class thumbAsset extends asset
 
 		return false;
 	}
+	
+	public function getThumbnailUrl(KSecureEntryHelper $securyEntryHelper, $storageId = null, KalturaThumbParams $thumbParams = null)
+	{
+		if ($thumbParams)
+		{
+			$assetUrl = $this->getDownloadUrlWithExpiry(84600);
+			$assetParameters = KalturaRequestParameterSerializer::serialize($thumbParams, "thumbParams");
+			$thumbnailUrl = $assetUrl . "?thumbParams:objectType=KalturaThumbParams&".implode("&", $assetParameters);
+		}
+			
+		if($storageId)
+			$thumbnailUrl = $this->getExternalUrl($storageId);
+			
+		$thumbnailUrl = $this->getDownloadUrl(true);
+		
+		/* @var $serverNode EdgeServerNode */
+		$serverNode = $securyEntryHelper->shouldServeFromServerNode();
+		if(!$serverNode)
+			return $thumbnailUrl;
+		
+		$urlParts = explode("://", $thumbnailUrl);
+		return $urlParts[0] . "://" . $serverNode->buildEdgeFullPath('http', null, null, assetType::THUMBNAIL) . $urlParts[1];
+	}
 }

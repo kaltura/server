@@ -1,13 +1,48 @@
-# Kajam-11.5.0 #
-
-## pass AMF data on shared storage instead of in job data ##
+# Kajam-11.6.0 #
+## Expose liveStatus in the API for use in the WebCasting app + add BROADCASTING state to LiveEntryStatus##
  - Issue Type: New Feature
- - Issue ID: WEBC-631
+ - Issue ID: WEBC-629
 #### Installation ####
- - php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+ - deploy new jars to Wowza - new jars can be found in the ticket https://kaltura.atlassian.net/browse/WEBC-629
 #### Configuration ####
  - Validate facebook.ini exists in the configuration directory
  - Added FacebookDistribution to plugins.ini
+#### Known Issues & Limitations ####
+None.
+#### Deployment scripts ####
+ - php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+
+## Usage dashboard ##
+
+ - Issue Type: New Feature
+ - Issue ID: PLAT-3962 
+
+#### Installation ####
+
+- Download latest Usage Dashboard package from https://github.com/kaltura/usage-dashboard/releases/
+- Extract the zip to `/opt/kaltura/apps/usage-dashboard/`
+- If the app version is v1.0.0, make sure that `/opt/kaltura/apps/usage-dashboard/v1.0.0/index.html` exists
+
+#### Configuration ####
+
+- Add new permission to admin.ini:
+
+		moduls.enableUsageDashboard.enabled = true
+		moduls.enableUsageDashboard.permissionType = 2
+		moduls.enableUsageDashboard.label = Enable Usage Dashboard
+		moduls.enableUsageDashboard.permissionName = FEATURE_ENABLE_USAGE_DASHBOARD
+		moduls.enableUsageDashboard.basePermissionType =
+		moduls.enableUsageDashboard.basePermissionName =
+		moduls.enableUsageDashboard.group = GROUP_ENABLE_DISABLE_FEATURES
+
+# Kajam-11.5.0 #
+#### Installation ####
+None
+#### Configuration ####
+None
+## pass AMF data on shared storage instead of in job data ##
+ - Issue Type: New Feature
+ - Issue ID: WEBC-631
 #### Known Issues & Limitations ####
 None.
 #### Deployment scripts ####
