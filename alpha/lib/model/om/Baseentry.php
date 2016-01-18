@@ -3105,17 +3105,6 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 			 	foreach ($this->oldCustomDataValues as $namespace => $namespaceValues){
                 	foreach($namespaceValues as $name => $oldValue)
 					{
-						$newValue = null;
-						if ($namespace)
-						{
-							if (isset ($valuesToChangeTo[$namespace][$name]))
-								$newValue = $valuesToChangeTo[$namespace][$name];
-						}
-						else
-						{ 
-							$newValue = $valuesToChangeTo[$name];
-						}
-		
 						$atomicField = false;
 						if($namespace) {
 							$atomicField = array_key_exists($namespace, $atomicCustomDataFields) && in_array($name, $atomicCustomDataFields[$namespace]);
@@ -3129,7 +3118,18 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 								break;
 							}
 						}
-						
+					
+						$newValue = null;
+						if ($namespace)
+						{
+							if (isset ($valuesToChangeTo[$namespace][$name]))
+								$newValue = $valuesToChangeTo[$namespace][$name];
+						}
+						else
+						{ 
+							$newValue = $valuesToChangeTo[$name];
+						}
+			
 						if (!is_null($newValue)) {
 							$this->putInCustomData($name, $newValue, $namespace);
 						}
