@@ -107,10 +107,8 @@ class UploadTokenService extends KalturaBaseService
 				 	throw new KalturaAPIException(KalturaErrors::UPLOAD_ERROR);
 				case kUploadTokenException::UPLOAD_TOKEN_FILE_NOT_FOUND_FOR_RESUME:
 					throw new KalturaAPIException(KalturaErrors::UPLOAD_TOKEN_CANNOT_RESUME);
-				case kUploadTokenException::UPLOAD_TOKEN_RESUMING_NOT_ALLOWED:
-					throw new KalturaAPIException(KalturaErrors::UPLOAD_TOKEN_RESUMING_NOT_ALLOWED);
-				case kUploadTokenException::UPLOAD_TOKEN_RESUMING_INVALID_POSITION:
-					throw new KalturaAPIException(KalturaErrors::UPLOAD_TOKEN_RESUMING_INVALID_POSITION);
+				case kUploadTokenException::UPLOAD_TOKEN_CANNOT_MATCH_EXPECTED_SIZE:
+					throw new KalturaAPIException(KalturaErrors::UPLOAD_TOKEN_CANNOT_MATCH_EXPECTED_SIZE);
 				default:
 					throw $ex;
 			}
