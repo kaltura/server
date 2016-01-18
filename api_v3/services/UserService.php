@@ -47,17 +47,21 @@ class UserService extends KalturaBaseUserService
 			$lockKey = $this->getPartnerId() + $user->id;
 			$lock = kLock::create($lockKey);
 
-			if ($lock && !$lock->lock(self::ADD_USER_LOCK_GRAB_TIMEOUT, self::ADD_USER_LOCK_HOLD_TIMEOUT))
-				throw new KalturaAPIException(KalturaErrors::DUPLICATE_USER_BY_ID, $user->id);
-			try{
+			if ($lock && $lock->lock(self::ADD_USER_LOCK_GRAB_TIMEOUT, self::ADD_USER_LOCK_HOLD_TIMEOUT))
+			{
 				$dbUser = kuserPeer::addUser($dbUser, $user->password);
 			}
-			catch(Exception $e){
-				if($lock){
-					$lock->unlock();
-				}
-				throw $e;
+			else
+			{
+				KalturaLog::debug("Could not grab usesr lock, user is already being added");
 			}
+		}
+		
+		catch(Exception $e){
+			if($lock){
+				$lock->unlock();
+			}
+			throw $e;
 		}
 		catch (kUserException $e) {
 			$code = $e->getCode();
@@ -102,9 +106,7 @@ class UserService extends KalturaBaseUserService
 			}
 			throw $e;
 		}
-		if($lock){
-			$lock->unlock();
-		}
+
 		$newUser = new KalturaUser();
 		$newUser->fromObject($dbUser, $this->getResponseProfile());
 		
