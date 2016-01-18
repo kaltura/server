@@ -2606,6 +2606,20 @@ abstract class Basekuser extends BaseObject  implements Persistent {
 			 	foreach ($this->oldCustomDataValues as $namespace => $namespaceValues){
                 	foreach($namespaceValues as $name => $oldValue)
 					{
+						$atomicField = false;
+						if($namespace) {
+							$atomicField = array_key_exists($namespace, $atomicCustomDataFields) && in_array($name, $atomicCustomDataFields[$namespace]);
+						} else {
+							$atomicField = in_array($name, $atomicCustomDataFields);
+						}
+						if($atomicField) {
+							$dbValue = $this->m_custom_data->get($name, $namespace);
+							if($oldValue != $dbValue) {
+								$validUpdate = false;
+								break;
+							}
+						}
+						
 						$newValue = null;
 						if ($namespace)
 						{
@@ -2621,19 +2635,6 @@ abstract class Basekuser extends BaseObject  implements Persistent {
 							$this->removeFromCustomData($name, $namespace);
 						}
 						else {
-							$atomicField = false;
-							if($namespace) {
-								$atomicField = array_key_exists($namespace, $atomicCustomDataFields) && in_array($name, $atomicCustomDataFields[$namespace]);
-							} else {
-								$atomicField = in_array($name, $atomicCustomDataFields);
-							}
-							if($atomicField) {
-								$dbValue = $this->m_custom_data->get($name, $namespace);
-								if($oldValue != $dbValue) {
-									$validUpdate = false;
-									break;
-								}
-							}
 							$this->putInCustomData($name, $newValue, $namespace);
 						}
 					}
