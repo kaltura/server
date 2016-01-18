@@ -51,7 +51,19 @@ class kValidateActiveEdgeCondition extends kCondition
 			return false;
 		}
 		
+		$isFulfilled = false;
+		foreach ($edgeServers as $edgeServer)
+		{
+			/* @var $edgeServer EdgeServerNode */
+			if($edgeServer->validateEdgeTreeRegistered())
+			{
+				$isFulfilled = true;
+				break;
+			}
+			
+		}
+		
 		KalturaLog::debug("Found active edge in list, condition is true");
-		return true;
+		return $isFulfilled;
 	}
 }

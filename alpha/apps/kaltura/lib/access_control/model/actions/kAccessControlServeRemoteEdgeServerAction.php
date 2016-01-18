@@ -46,8 +46,16 @@ class kAccessControlServeRemoteEdgeServerAction extends kRuleAction
 		if(!count($edgeServers))
 			return false;
 		
-		foreach ($edgeServers as $edgeServer) 
-			$activeEdgeServerIds[] = $edgeServer->getId();
+		$activeEdgeServerIds = array();
+		foreach ($edgeServers as $edgeServer)
+		{
+			/* @var $edgeServer EdgeServerNode */
+			if($edgeServer->validateEdgeTreeRegistered()) 
+				$activeEdgeServerIds[] = $edgeServer->getId();
+		}
+		
+		if(!count($activeEdgeServerIds))
+			return false;
 		
 		$deliveryAttributes->setEdgeServerIds($activeEdgeServerIds);
 		return true;
