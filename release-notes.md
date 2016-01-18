@@ -1,3 +1,18 @@
+# Kajam-11.7.0 #
+
+## Allow uploadToken resumeAt to upload chunk to any position ##
+* The uploadToken upload service supported the resumeAt parameter however it allowed the resumeAt to be a position which is smaller or equal to the already uploaded size. Each uploaded chunk was added at the resumeAt position.
+* Now the code allows uploading a chunk to whatever resumeAt position you would like however it appends the chunks one by one each time using only a chunk which starts at a position smaller or equal than the current size and 
+* which will end (after the appending) after the end of the current file - in other words only a chunk which will start before or at the end of the current file and will increase the file size is appended. 
+* The code handles race conditions as different servers may try to append the chunks.
+
+#### Installation ####
+None.
+#### Configuration ####
+None.
+#### Known Issues & Limitations ####
+None.
+
 # Kajam-11.6.0 #
 
 ## Expose liveStatus in the API for use in the WebCasting app + add BROADCASTING state to LiveEntryStatus##
