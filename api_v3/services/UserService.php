@@ -9,8 +9,6 @@
  */
 class UserService extends KalturaBaseUserService 
 {
-	const ADD_USER_LOCK_GRAB_TIMEOUT = 0.1;
-	const ADD_USER_LOCK_HOLD_TIMEOUT = 30;
 
 	/**
 	 * Adds a new user to an existing account in the Kaltura database.
