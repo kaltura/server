@@ -134,16 +134,16 @@ abstract class BaseFileSync extends BaseObject  implements Persistent {
 	protected $file_size;
 
 	/**
-	 * The value for the deleted_id field.
-	 * @var        string
-	 */
-	protected $deleted_id;
-
-	/**
 	 * The value for the custom_data field.
 	 * @var        string
 	 */
 	protected $custom_data;
+
+	/**
+	 * The value for the deleted_id field.
+	 * @var        string
+	 */
+	protected $deleted_id;
 
 	/**
 	 * Flag to prevent endless save loop, if this object is referenced
@@ -471,16 +471,6 @@ abstract class BaseFileSync extends BaseObject  implements Persistent {
 	}
 
 	/**
-	 * Get the [deleted_id] column value.
-	 * 
-	 * @return     string
-	 */
-	public function getDeletedId()
-	{
-		return $this->deleted_id;
-	}
-
-	/**
 	 * Get the [custom_data] column value.
 	 * 
 	 * @return     string
@@ -488,6 +478,16 @@ abstract class BaseFileSync extends BaseObject  implements Persistent {
 	public function getCustomData()
 	{
 		return $this->custom_data;
+	}
+
+	/**
+	 * Get the [deleted_id] column value.
+	 * 
+	 * @return     string
+	 */
+	public function getDeletedId()
+	{
+		return $this->deleted_id;
 	}
 
 	/**
@@ -1009,6 +1009,26 @@ abstract class BaseFileSync extends BaseObject  implements Persistent {
 	} // setFileSize()
 
 	/**
+	 * Set the value of [custom_data] column.
+	 * 
+	 * @param      string $v new value
+	 * @return     FileSync The current object (for fluent API support)
+	 */
+	public function setCustomData($v)
+	{
+		if ($v !== null) {
+			$v = (string) $v;
+		}
+
+		if ($this->custom_data !== $v) {
+			$this->custom_data = $v;
+			$this->modifiedColumns[] = FileSyncPeer::CUSTOM_DATA;
+		}
+
+		return $this;
+	} // setCustomData()
+
+	/**
 	 * Set the value of [deleted_id] column.
 	 * 
 	 * @param      string $v new value
@@ -1030,26 +1050,6 @@ abstract class BaseFileSync extends BaseObject  implements Persistent {
 
 		return $this;
 	} // setDeletedId()
-
-	/**
-	 * Set the value of [custom_data] column.
-	 * 
-	 * @param      string $v new value
-	 * @return     FileSync The current object (for fluent API support)
-	 */
-	public function setCustomData($v)
-	{
-		if ($v !== null) {
-			$v = (string) $v;
-		}
-
-		if ($this->custom_data !== $v) {
-			$this->custom_data = $v;
-			$this->modifiedColumns[] = FileSyncPeer::CUSTOM_DATA;
-		}
-
-		return $this;
-	} // setCustomData()
 
 	/**
 	 * Indicates whether the columns in this object are only set to default values.
@@ -1081,6 +1081,9 @@ abstract class BaseFileSync extends BaseObject  implements Persistent {
 	 */
 	public function hydrate($row, $startcol = 0, $rehydrate = false)
 	{
+		// Nullify cached objects
+		$this->m_custom_data = null;
+		
 		try {
 
 			$this->id = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
@@ -1102,8 +1105,8 @@ abstract class BaseFileSync extends BaseObject  implements Persistent {
 			$this->file_root = ($row[$startcol + 16] !== null) ? (string) $row[$startcol + 16] : null;
 			$this->file_path = ($row[$startcol + 17] !== null) ? (string) $row[$startcol + 17] : null;
 			$this->file_size = ($row[$startcol + 18] !== null) ? (string) $row[$startcol + 18] : null;
-			$this->deleted_id = ($row[$startcol + 19] !== null) ? (string) $row[$startcol + 19] : null;
-			$this->custom_data = ($row[$startcol + 20] !== null) ? (string) $row[$startcol + 20] : null;
+			$this->custom_data = ($row[$startcol + 19] !== null) ? (string) $row[$startcol + 19] : null;
+			$this->deleted_id = ($row[$startcol + 20] !== null) ? (string) $row[$startcol + 20] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -1268,8 +1271,8 @@ abstract class BaseFileSync extends BaseObject  implements Persistent {
                 $stmt = BasePeer::doSelect($criteria, $con);
                 $cutsomDataArr = $stmt->fetchAll(PDO::FETCH_COLUMN);
                 $newCustomData = $cutsomDataArr[0];
-                
-                $this->custom_data_md5 = md5($newCustomData);
+
+                $this->custom_data_md5 = is_null($newCustomData) ? null : md5($newCustomData);
 
                 $valuesToChangeTo = $this->m_custom_data->toArray();
 				$this->m_custom_data = myCustomData::fromString($newCustomData); 
@@ -1280,6 +1283,20 @@ abstract class BaseFileSync extends BaseObject  implements Persistent {
 			 	foreach ($this->oldCustomDataValues as $namespace => $namespaceValues){
                 	foreach($namespaceValues as $name => $oldValue)
 					{
+						$atomicField = false;
+						if($namespace) {
+							$atomicField = array_key_exists($namespace, $atomicCustomDataFields) && in_array($name, $atomicCustomDataFields[$namespace]);
+						} else {
+							$atomicField = in_array($name, $atomicCustomDataFields);
+						}
+						if($atomicField) {
+							$dbValue = $this->m_custom_data->get($name, $namespace);
+							if($oldValue != $dbValue) {
+								$validUpdate = false;
+								break;
+							}
+						}
+						
 						$newValue = null;
 						if ($namespace)
 						{
@@ -1290,25 +1307,15 @@ abstract class BaseFileSync extends BaseObject  implements Persistent {
 						{ 
 							$newValue = $valuesToChangeTo[$name];
 						}
-					 
-						if (!is_null($newValue)) {
-							$atomicField = false;
-							if($namespace) {
-								$atomicField = array_key_exists($namespace, $atomicCustomDataFields) && in_array($name, $atomicCustomDataFields[$namespace]);
-							} else {
-								$atomicField = in_array($name, $atomicCustomDataFields);
-							}
-							if($atomicField) {
-								$dbValue = $this->m_custom_data->get($name, $namespace);
-								if($oldValue != $dbValue) {
-									$validUpdate = false;
-									break;
-								}
-							}
+		
+						if (is_null($newValue)) {
+							$this->removeFromCustomData($name, $namespace);
+						}
+						else {
 							$this->putInCustomData($name, $newValue, $namespace);
 						}
 					}
-                   }
+				}
                    
 				if(!$validUpdate) 
 					break;
@@ -1469,7 +1476,9 @@ abstract class BaseFileSync extends BaseObject  implements Persistent {
 		if($this->isModified())
 		{
 			kQueryCache::invalidateQueryCache($this);
-			kEventsManager::raiseEvent(new kObjectChangedEvent($this, $this->tempModifiedColumns));
+			$modifiedColumns = $this->tempModifiedColumns;
+			$modifiedColumns[kObjectChangedEvent::CUSTOM_DATA_OLD_VALUES] = $this->oldCustomDataValues;
+			kEventsManager::raiseEvent(new kObjectChangedEvent($this, $modifiedColumns));
 		}
 			
 		$this->tempModifiedColumns = array();
@@ -1685,10 +1694,10 @@ abstract class BaseFileSync extends BaseObject  implements Persistent {
 				return $this->getFileSize();
 				break;
 			case 19:
-				return $this->getDeletedId();
+				return $this->getCustomData();
 				break;
 			case 20:
-				return $this->getCustomData();
+				return $this->getDeletedId();
 				break;
 			default:
 				return null;
@@ -1730,8 +1739,8 @@ abstract class BaseFileSync extends BaseObject  implements Persistent {
 			$keys[16] => $this->getFileRoot(),
 			$keys[17] => $this->getFilePath(),
 			$keys[18] => $this->getFileSize(),
-			$keys[19] => $this->getDeletedId(),
-			$keys[20] => $this->getCustomData(),
+			$keys[19] => $this->getCustomData(),
+			$keys[20] => $this->getDeletedId(),
 		);
 		return $result;
 	}
@@ -1821,10 +1830,10 @@ abstract class BaseFileSync extends BaseObject  implements Persistent {
 				$this->setFileSize($value);
 				break;
 			case 19:
-				$this->setDeletedId($value);
+				$this->setCustomData($value);
 				break;
 			case 20:
-				$this->setCustomData($value);
+				$this->setDeletedId($value);
 				break;
 		} // switch()
 	}
@@ -1869,8 +1878,8 @@ abstract class BaseFileSync extends BaseObject  implements Persistent {
 		if (array_key_exists($keys[16], $arr)) $this->setFileRoot($arr[$keys[16]]);
 		if (array_key_exists($keys[17], $arr)) $this->setFilePath($arr[$keys[17]]);
 		if (array_key_exists($keys[18], $arr)) $this->setFileSize($arr[$keys[18]]);
-		if (array_key_exists($keys[19], $arr)) $this->setDeletedId($arr[$keys[19]]);
-		if (array_key_exists($keys[20], $arr)) $this->setCustomData($arr[$keys[20]]);
+		if (array_key_exists($keys[19], $arr)) $this->setCustomData($arr[$keys[19]]);
+		if (array_key_exists($keys[20], $arr)) $this->setDeletedId($arr[$keys[20]]);
 	}
 
 	/**
@@ -1901,8 +1910,8 @@ abstract class BaseFileSync extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(FileSyncPeer::FILE_ROOT)) $criteria->add(FileSyncPeer::FILE_ROOT, $this->file_root);
 		if ($this->isColumnModified(FileSyncPeer::FILE_PATH)) $criteria->add(FileSyncPeer::FILE_PATH, $this->file_path);
 		if ($this->isColumnModified(FileSyncPeer::FILE_SIZE)) $criteria->add(FileSyncPeer::FILE_SIZE, $this->file_size);
-		if ($this->isColumnModified(FileSyncPeer::DELETED_ID)) $criteria->add(FileSyncPeer::DELETED_ID, $this->deleted_id);
 		if ($this->isColumnModified(FileSyncPeer::CUSTOM_DATA)) $criteria->add(FileSyncPeer::CUSTOM_DATA, $this->custom_data);
+		if ($this->isColumnModified(FileSyncPeer::DELETED_ID)) $criteria->add(FileSyncPeer::DELETED_ID, $this->deleted_id);
 
 		return $criteria;
 	}
@@ -2017,9 +2026,9 @@ abstract class BaseFileSync extends BaseObject  implements Persistent {
 
 		$copyObj->setFileSize($this->file_size);
 
-		$copyObj->setDeletedId($this->deleted_id);
-
 		$copyObj->setCustomData($this->custom_data);
+
+		$copyObj->setDeletedId($this->deleted_id);
 
 
 		$copyObj->setNew(true);
@@ -2192,6 +2201,16 @@ abstract class BaseFileSync extends BaseObject  implements Persistent {
 	public function incInCustomData ( $name , $delta = 1, $namespace = null)
 	{
 		$customData = $this->getCustomDataObj( );
+		
+		$currentNamespace = '';
+		if($namespace)
+			$currentNamespace = $namespace;
+			
+		if(!isset($this->oldCustomDataValues[$currentNamespace]))
+			$this->oldCustomDataValues[$currentNamespace] = array();
+		if(!isset($this->oldCustomDataValues[$currentNamespace][$name]))
+			$this->oldCustomDataValues[$currentNamespace][$name] = $customData->get($name, $namespace);
+		
 		return $customData->inc ( $name , $delta , $namespace  );
 	}
 
