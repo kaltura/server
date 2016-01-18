@@ -66,7 +66,7 @@ class UploadTokenService extends KalturaBaseService
 	}
 	
 	/**
-c	 * Upload a file using the upload token id, returns an error on failure (an exception will be thrown when using one of the Kaltura clients)
+	 * Upload a file using the upload token id, returns an error on failure (an exception will be thrown when using one of the Kaltura clients)
 	 * Chunks can be uploaded in parallel and they will be appended according to their resumeAt position.
 	 * 
 	 * A parallel upload session should have three stages:
