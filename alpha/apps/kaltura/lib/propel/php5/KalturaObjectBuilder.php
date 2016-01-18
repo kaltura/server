@@ -314,8 +314,11 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 						{ 
 							\$newValue = \$valuesToChangeTo[\$name];
 						}
-					 
-						if (!is_null(\$newValue)) {
+		
+						if (is_null(\$newValue)) {
+							\$this->removeFromCustomData(\$name, \$namespace);
+						}
+						else {
 							\$atomicField = false;
 							if(\$namespace) {
 								\$atomicField = array_key_exists(\$namespace, \$atomicCustomDataFields) && in_array(\$name, \$atomicCustomDataFields[\$namespace]);
@@ -332,7 +335,7 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 							\$this->putInCustomData(\$name, \$newValue, \$namespace);
 						}
 					}
-                   }
+				}
                    
 				if(!\$validUpdate) 
 					break;

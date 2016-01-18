@@ -1103,8 +1103,8 @@ abstract class BaseServerNode extends BaseObject  implements Persistent {
                 $stmt = BasePeer::doSelect($criteria, $con);
                 $cutsomDataArr = $stmt->fetchAll(PDO::FETCH_COLUMN);
                 $newCustomData = $cutsomDataArr[0];
-                
-                $this->custom_data_md5 = md5($newCustomData);
+
+                $this->custom_data_md5 = is_null($newCustomData) ? null : md5($newCustomData);
 
                 $valuesToChangeTo = $this->m_custom_data->toArray();
 				$this->m_custom_data = myCustomData::fromString($newCustomData); 
@@ -1125,8 +1125,11 @@ abstract class BaseServerNode extends BaseObject  implements Persistent {
 						{ 
 							$newValue = $valuesToChangeTo[$name];
 						}
-					 
-						if (!is_null($newValue)) {
+		
+						if (is_null($newValue)) {
+							$this->removeFromCustomData($name, $namespace);
+						}
+						else {
 							$atomicField = false;
 							if($namespace) {
 								$atomicField = array_key_exists($namespace, $atomicCustomDataFields) && in_array($name, $atomicCustomDataFields[$namespace]);
@@ -1143,7 +1146,7 @@ abstract class BaseServerNode extends BaseObject  implements Persistent {
 							$this->putInCustomData($name, $newValue, $namespace);
 						}
 					}
-                   }
+				}
                    
 				if(!$validUpdate) 
 					break;

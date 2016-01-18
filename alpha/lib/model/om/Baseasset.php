@@ -1461,8 +1461,11 @@ abstract class Baseasset extends BaseObject  implements Persistent {
 						{ 
 							$newValue = $valuesToChangeTo[$name];
 						}
-					 
-						if (!is_null($newValue)) {
+		
+						if (is_null($newValue)) {
+							$this->removeFromCustomData($name, $namespace);
+						}
+						else {
 							$atomicField = false;
 							if($namespace) {
 								$atomicField = array_key_exists($namespace, $atomicCustomDataFields) && in_array($name, $atomicCustomDataFields[$namespace]);
@@ -1479,7 +1482,7 @@ abstract class Baseasset extends BaseObject  implements Persistent {
 							$this->putInCustomData($name, $newValue, $namespace);
 						}
 					}
-                   }
+				}
                    
 				if(!$validUpdate) 
 					break;
