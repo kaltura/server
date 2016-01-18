@@ -30,41 +30,29 @@ class UserService extends KalturaBaseUserService
 	 * @throws KalturaErrors::USER_ROLE_NOT_FOUND
 	 */
 	function addAction(KalturaUser $user)
-	{				
-		if(!preg_match(kuser::PUSER_ID_REGEXP, $user->id)) {
+	{
+		if (!preg_match(kuser::PUSER_ID_REGEXP, $user->id))
+		{
 			throw new KalturaAPIException(KalturaErrors::INVALID_FIELD_VALUE, 'id');
-		} 
-		
-		if ($user instanceof KalturaAdminUser) {
+		}
+
+		if ($user instanceof KalturaAdminUser)
+		{
 			$user->isAdmin = true;
 		}
 		$user->partnerId = $this->getPartnerId();
-				
+
+
+		$lockKey = "user_add_" . $this->getPartnerId() . $user->id;
+		return kLock::runLocked($lockKey, array($this, 'adduserImpl'), array($user));
+	}
+	
+	function addUserImpl($user)
+	{
 		$dbUser = null;
 		$dbUser = $user->toObject($dbUser);
-		
 		try {
-			$lockKey = $this->getPartnerId() + $user->id;
-			$lock = kLock::create($lockKey);
-
-			try
-			{
-				if ($lock && $lock->lock(self::ADD_USER_LOCK_GRAB_TIMEOUT, self::ADD_USER_LOCK_HOLD_TIMEOUT))
-				{
-					$dbUser = kuserPeer::addUser($dbUser, $user->password);
-				} else
-				{
-					KalturaLog::debug("Could not grab usesr lock, user is already being added");
-				}
-			}
-			catch(Exception $e){
-				KalturaLog::debug("@@NA got exception with code [".$e->getCode()."]");
-				if($lock){
-					$lock->unlock();
-				}
-				throw $e;
-			}
-
+			$dbUser = kuserPeer::addUser($dbUser, $user->password);
 		}
 		
 		catch (kUserException $e) {
