@@ -363,6 +363,11 @@ class kContextDataHelper
 			if($this->entry->getSource() == EntrySourceType::AKAMAI_UNIVERSAL_LIVE)
 				$this->streamerType = PlaybackProtocol::AKAMAI_HDS;
 		}
+		elseif ($this->entry->getType() == entryType::PLAYLIST)
+		{
+			$this->streamerType = PlaybackProtocol::AKAMAI_HDS;
+			$this->mediaProtocol = infraRequestUtils::getProtocol();
+		}
 		else
 		{
 			$this->isSecured = $this->isSecured || PermissionPeer::isValidForPartner(PermissionName::FEATURE_ENTITLEMENT_USED, $this->entry->getPartnerId());
