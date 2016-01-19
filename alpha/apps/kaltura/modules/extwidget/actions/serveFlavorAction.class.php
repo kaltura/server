@@ -8,6 +8,8 @@ class serveFlavorAction extends kalturaAction
 	const CHUNK_SIZE = 1048576; // 1024 X 1024
 	const NO_CLIP_TO = 2147483647;
 	
+	const JSON_CONTENT_TYPE = 'application/json';
+	
 	protected function storeCache($renderer, $partnerId)
 	{
 		if (!function_exists('apc_store') || $_SERVER["REQUEST_METHOD"] != "GET")
@@ -22,6 +24,147 @@ class serveFlavorAction extends kalturaAction
 		header("X-Kaltura:cache-key");
 	}
 	
+	protected function getSimpleMappingRenderer($path)
+	{
+		return new kRendererString(
+				'{"sequences":[{"clips":[{"type":"source","path":"' . $path . '"}]}]}',
+				self::JSON_CONTENT_TYPE);
+		
+	}
+	
+	protected function servePlaylist($entry)
+	{
+		// allow only manual playlist
+		if ($entry->getMediaType() != entry::ENTRY_MEDIA_TYPE_TEXT)
+		{
+			KExternalErrors::dieError(KExternalErrors::INVALID_ENTRY_TYPE);
+		}
+
+		// get request parameters
+		$flavorParamIds = $this->getRequestParameter("flavorParamIds");
+		if ($flavorParamIds)
+		{
+			$flavorParamIds = explode(',', $flavorParamIds);
+		}
+		$version = $this->getRequestParameter("v");
+			
+		// execute the playlist
+		if ($version)
+		{
+			$entry->setDesiredVersion($version);
+		}
+		
+		list($entryIds, $durations, $referenceEntry) =
+			myPlaylistUtils::executeStitchedPlaylist($entry);
+		
+		// load the flavor assets
+		// Note: not filtering by $flavorParamIds here, so that in case some flavor is missing
+		//		we can fill in the gap using some other flavor params
+		$c = new Criteria();
+		$c->add(assetPeer::ENTRY_ID, $entryIds, Criteria::IN);
+		$c->add(assetPeer::STATUS, flavorAsset::FLAVOR_ASSET_STATUS_READY);
+		$flavorTypes = assetPeer::retrieveAllFlavorsTypes();
+		$c->add(assetPeer::TYPE, $flavorTypes, Criteria::IN);
+		$flavorAssets = assetPeer::doSelect($c);
+		
+		// group the flavors by entry and flavor params
+		$groupedFlavors = array();
+		foreach ($flavorAssets as $flavor)
+		{
+			if (!isset($groupedFlavors[$flavor->getEntryId()]))
+			{
+				$groupedFlavors[$flavor->getEntryId()] = array();
+			}
+			$groupedFlavors[$flavor->getEntryId()][$flavor->getFlavorParamsId()] = $flavor;
+		}
+		
+		// remove entries that don't have flavors
+		for ($i = count($entryIds) - 1; $i >= 0; $i--)
+		{
+			$entryId = $entryIds[$i];
+			if (isset($groupedFlavors[$entryId]))
+			{
+				continue;
+			}
+			
+			unset($entryIds[$i]);
+			unset($durations[$i]);
+		}
+
+		// get the flavor params of the reference entry that should be returned
+		$referenceEntryFlavorParamsIds = array_keys($groupedFlavors[$referenceEntry->getId()]);
+		if ($flavorParamIds)
+		{
+			$flavorParamIds = array_intersect($referenceEntryFlavorParamsIds, $flavorParamIds);
+		}
+		else 
+		{
+			$flavorParamIds = $referenceEntryFlavorParamsIds;
+		}
+		
+		if (!$flavorParamIds)
+		{
+			KExternalErrors::dieError(KExternalErrors::FLAVOR_NOT_FOUND);
+		}
+		
+		// build the sequences
+		$sequences = array();
+		foreach ($flavorParamIds as $flavorParamsId)
+		{
+			$referenceFlavor = $groupedFlavors[$referenceEntry->getId()][$flavorParamsId]; 
+			
+			// build the clips of the current sequence
+			$clips = array();
+			foreach ($entryIds as $entryId)
+			{
+				if (isset($groupedFlavors[$entryId][$flavorParamsId]))
+				{
+					$flavor = $groupedFlavors[$entryId][$flavorParamsId];
+				}
+				else
+				{
+					// don't have a flavor for this entry in the desired flavor params, 
+					// choose the one with the closest bitrate
+					$flavor = null;
+					foreach ($groupedFlavors[$entryId] as $curFlavor)
+					{
+						if (!$flavor ||
+							abs($curFlavor->getBitrate() - $referenceFlavor->getBitrate()) <
+							abs($flavor->getBitrate() - $referenceFlavor->getBitrate()))
+						{
+							$flavor = $curFlavor;
+						}
+					}
+				}
+								
+				// get the file path of the flavor 
+				$syncKey = $flavor->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+				list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($syncKey , false, false);
+				if (!$fileSync)
+				{
+					$renderer = $this->getSimpleMappingRenderer('');
+					$renderer->output();
+					KExternalErrors::dieGracefully();
+				}
+				
+				$resolvedFileSync = kFileSyncUtils::resolve($fileSync);
+					
+				$clips[] = array('type' => 'source', 'path' => $resolvedFileSync->getFullPath());
+			}
+		
+			$sequences[] = array('clips' => $clips);
+		}
+			
+		// build the json
+		$mediaSet = array('durations' => $durations, 'sequences' => $sequences);
+		$json = json_encode($mediaSet);
+		$renderer = new kRendererString($json, self::JSON_CONTENT_TYPE);
+		$this->storeCache($renderer, $entry->getPartnerId());
+			
+		$renderer->output();
+		KExternalErrors::dieGracefully();
+	}
+	
 	public function execute()
 	{
 		//entitlement should be disabled to serveFlavor action as we do not get ks on this action.
@@ -30,6 +173,23 @@ class serveFlavorAction extends kalturaAction
 		requestUtils::handleConditionalGet();
 
 		$flavorId = $this->getRequestParameter("flavorId");
+		$entryId = $this->getRequestParameter("entryId");
+		
+		if ($entryId)
+		{
+			$entry = entryPeer::retrieveByPK($entryId);
+			if (!$entry)
+			{
+				KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_FOUND);
+			}
+			
+			if ($entry->getType() == entryType::PLAYLIST &&
+				kIpAddressUtils::isInternalIp($_SERVER['REMOTE_ADDR']))
+			{
+				$this->servePlaylist($entry);
+			}
+		}
+		
 		$shouldProxy = $this->getRequestParameter("forceproxy", false);
 		$fileName = $this->getRequestParameter( "fileName" );
 		$fileParam = $this->getRequestParameter( "file" );
@@ -38,12 +198,11 @@ class serveFlavorAction extends kalturaAction
 		$referrer = base64_decode($this->getRequestParameter("referrer"));
 		if (!is_string($referrer)) // base64_decode can return binary data
 			$referrer = '';
-
+		
 		$flavorAsset = assetPeer::retrieveById($flavorId);	
 		if (is_null($flavorAsset))
 			KExternalErrors::dieError(KExternalErrors::FLAVOR_NOT_FOUND);
 
-		$entryId = $this->getRequestParameter("entryId");
 		if (!is_null($entryId) && $flavorAsset->getEntryId() != $entryId)
 			KExternalErrors::dieError(KExternalErrors::FLAVOR_NOT_FOUND);
 
@@ -86,9 +245,7 @@ class serveFlavorAction extends kalturaAction
 				}
 			}
 		
-			$renderer = new kRendererString(
-				'{"sequences":[{"clips":[{"type":"source","path":"' . $path . '"}]}]}', 
-				'application/json');
+			$renderer = $this->getSimpleMappingRenderer($path);
 			if ($path)
 			{
 				$this->storeCache($renderer, $flavorAsset->getPartnerId());

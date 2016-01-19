@@ -6,6 +6,8 @@ class myPlaylistUtils
 {
 	// change the total results to 30 for performance reasons
 	const TOTAL_RESULTS = 200;
+	
+	const MAX_STITCHED_PLAYLIST_ENTRY_COUNT = 100;
 
 	const CONTEXT_DELIMITER = "context";
 	
@@ -1030,5 +1032,41 @@ HTML;
                         
 	        }
 	    }
+	}
+	
+	public static function executeStitchedPlaylist(entry $playlist)
+	{
+		$pager = new kFilterPager();
+		$pager->setPageIndex(1);
+		$pager->setPageSize(self::MAX_STITCHED_PLAYLIST_ENTRY_COUNT);
+		$entries = self::executePlaylist(
+				$playlist->getPartnerId(),
+				$playlist,
+				null,
+				false);
+		
+		$entryIds = array();
+		$durations = array();
+		$mediaEntry = null;
+		$maxFlavorCount = 0;
+		foreach ($entries as $entry)
+		{
+			$entryIds[] = $entry->getId();
+			$durations[] = $entry->getLengthInMsecs();
+
+			// Note: choosing a reference entry that has max(flavor count) and min(int id)
+			//	the reason for the int id condition is to avoid frequent changes to the 
+			//	reference entry in case the playlist content changes 
+			$flavorCount = count(explode(',', $entry->getFlavorParamsIds()));
+			if (!$mediaEntry ||
+				$flavorCount > $maxFlavorCount ||
+				($flavorCount == $maxFlavorCount && $entry->getIntId() < $mediaEntry->getIntId()))
+			{
+				$mediaEntry = $entry;
+				$maxFlavorCount = $flavorCount;
+			}
+		}
+
+		return array($entryIds, $durations, $mediaEntry);
 	}
 }

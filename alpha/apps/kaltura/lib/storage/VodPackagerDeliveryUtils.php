@@ -18,17 +18,37 @@ class VodPackagerDeliveryUtils
 		}
 	
 		$prefix = kString::getCommonPrefix($urls);
-		$prefixLen = strlen($prefix);
 		$postfix = kString::getCommonPostfix($urls);
+		
+		if (strpos($prefix, '/flavorParamIds/') !== false)
+		{
+			// in case of playlist, need to merge the flavor params of the urls
+			//	instead of using a urlset, nginx-vod does not support urlsets of 
+			//	non-trivial mapping mapping responses   
+			$prefix = substr($prefix, 0, strrpos($prefix, '/') + 1);
+			$postfix = substr($postfix, strpos($postfix, '/'));
+		}
+		
+		$prefixLen = strlen($prefix);
 		$postfixLen = strlen($postfix);
 		$middlePart = ',';
 		foreach ($urls as $url)
 		{
 			$middlePart .= substr($url, $prefixLen, strlen($url) - $prefixLen - $postfixLen) . ',';
 		}
-		$baseUrl = $prefix . $middlePart . $postfix;
+		
+		if (strpos($prefix, '/flavorParamIds/') !== false &&
+			strpos($middlePart, '/') === false)
+		{
+			$middlePart = rtrim(ltrim($middlePart, ','), ',');
+			$result = $prefix . $middlePart . $postfix;
+		}
+		else
+		{
+			$result = $prefix . $middlePart . $postfix . '.urlset';
+		}
 	
-		return '/' . ltrim($baseUrl, '/') . '.urlset';
+		return '/' . ltrim($result, '/');
 	}
 	
 	public static function getVodPackagerUrl($flavors, $urlPrefix, $urlSuffix, DeliveryProfileDynamicAttributes $params)
