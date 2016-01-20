@@ -14,6 +14,8 @@ class WebexDropFolderFile extends DropFolderFile
 	const WEBEX_CONF_IF = 'webex_conf_id';
 	
 	const CONTENT_URL = 'content_url';
+
+	const FILE_FORMAT = 'file_format';
 	
 	/**
 	 * @var int
@@ -135,5 +137,15 @@ class WebexDropFolderFile extends DropFolderFile
 	{
 		$v .= '_'.$this->getRecordingId();
 		parent::setParsedSlug($v);
+	}
+	
+	public function getFileFormat()
+	{
+		return $this->getFromCustomData(self::FILE_FORMAT);
+	}
+	
+	public function setFileFormat($v)
+	{
+		$this->putInCustomData(self::FILE_FORMAT, $v);		
 	}
 }
