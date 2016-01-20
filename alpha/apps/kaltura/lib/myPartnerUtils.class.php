@@ -124,6 +124,25 @@ class myPartnerUtils
 		unset(self::$partnerCriteriaParams[$objectName]);
 	}
 
+	// will reset all the filters used in the applyPartnerFilters and will re-apply them
+	public static function reapplyPartnerFilters($new_partner_id = null)
+	{
+		foreach ( self::$s_filterred_peer_list as $peerName )
+		{
+			call_user_func(array($peerName, 'setDefaultCriteriaFilter'));
+		}
+		self::$s_filterred_peer_list = array();
+		foreach(self::$partnerCriteriaParams as $objectName => $partnerCriteriaParams)
+		{
+			list($partner_id, $private_partner_data, $partner_group, $kaltura_network) = $partnerCriteriaParams;
+			if(!is_null($new_partner_id))
+			{
+				$partner_id = $new_partner_id;
+			}
+			self::addPartnerToCriteria($objectName, $partner_id, $private_partner_data, $partner_group, $kaltura_network);
+		}
+	}
+
 	// will reset all the filters used in the applyPartnerFilters
 	public static function resetAllFilters()
 	{

@@ -44,6 +44,111 @@ class KDLWrap
 	}
 	
 	/* ------------------------------
+	 * function CDLGenerateTargetLiveFlavors
+	 */
+	public static function CDLGenerateTargetLiveFlavors($cdlFlavorList)
+	{
+		$liveParams = array();
+		$ingestedParams = array();
+		$transcodedParams = array();
+		
+		foreach($cdlFlavorList as $liveParam)
+		{
+			/* @var $liveParam liveParams */
+			if(is_null($liveParam->getVideoCodec()))
+			{
+				$liveParam->setVideoCodec(flavorParams::VIDEO_CODEC_COPY);
+			}
+			if($liveParam->hasTag(assetParams::TAG_SOURCE))
+			{
+				$ingestedParams[] = $liveParam->getId();
+			}
+			else 
+			{
+				$transcodedParams[] = $liveParam->getId();				
+			}
+			$liveParams[$liveParam->getId()] = $liveParam;
+		}
+		if(count($transcodedParams) && count($ingestedParams))
+		{
+			foreach($ingestedParams as $ingestedParamId)
+			{
+				unset($liveParams[$ingestedParamId]);
+			}
+		}
+		
+		$kdlWrap = new KDLWrap();
+		$kdlWrap->generateTargetFlavors(null, $liveParams);
+	
+		/* @var $cdl KDLWrap */
+	
+		if(count($kdlWrap->_errors))
+		{
+			foreach($kdlWrap->_errors as $section => $errors)
+			{
+				foreach($errors as $error)
+				{
+					if (strpos($error, 'Invalid File - No media content' !== false))
+					{
+						throw new kCoreException($error , KDLErrors::NoValidMediaStream);
+					}
+					else if (strpos($error,'Invalid frame dimensions') !== false)
+					{
+						throw new kCoreException($error , KDLErrors::SanityInvalidFrameDim);
+					}
+					else 
+					{
+						KalturaLog::err($error);
+					}
+				}
+			}
+		}
+		
+		if(count($kdlWrap->_warnings))
+		{
+			foreach($kdlWrap->_warnings as $section => $errors)
+			{
+				KalturaLog::warning($error);
+			}
+		}
+			
+		// rv - returned value from the decision layer
+		if(!$kdlWrap->_rv)
+		{
+			throw new Exception("Decision layer returned false");
+		}
+	
+		$finalCommand = "-re -i '" . KDLCmdlinePlaceholders::InFileName . "'";
+		foreach($kdlWrap->_targetList as $flavor)
+		{
+			/*  @var $flavor flavorParamsOutput */
+			if(!$flavor->IsValid())
+			{
+				KalturaLog::log("Flavor [" . $flavor->getFlavorParamsId() . "] is invalid");
+				
+				// if required - failing the profile
+				if($flavor->getReadyBehavior() == flavorParamsConversionProfile::READY_BEHAVIOR_REQUIRED)
+				{
+					throw new Exception("Invalid required flavor [" . $flavor->getId . "]");
+				}
+				continue;
+			}
+			
+			$liveParam = $liveParams[$flavor->getFlavorParamsId()];
+			/* @var $liveParam liveParams */
+			
+			$flavorCommandLinesStr = $flavor->getCommandLines();
+			$flavorCommandLines = explode(kConvertJobData::CONVERSION_MILTI_COMMAND_LINE_SEPERATOR, reset($flavorCommandLinesStr));
+			$flavorCommandLine = reset($flavorCommandLines);
+			$flavorCommandLine = str_replace('-i ' . KDLCmdlinePlaceholders::InFileName, '', $flavorCommandLine);
+			$flavorCommandLine = str_replace(KDLCmdlinePlaceholders::OutFileName, "'" . KDLCmdlinePlaceholders::OutFileName . '_' . $liveParam->getStreamSuffix() . "'", $flavorCommandLine);
+			$finalCommand .= $flavorCommandLine;
+		}
+		
+		return $finalCommand;
+	}
+	
+	/* ------------------------------
 	 * function CDLGenerateTargetFlavorsCmdLinesOnly
 	 */
 	public static function CDLGenerateTargetFlavorsCmdLinesOnly($fileSizeKb, $cdlFlavorList)

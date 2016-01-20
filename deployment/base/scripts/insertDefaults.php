@@ -208,8 +208,7 @@ function handleFile($filePath)
 		
 		if($existingObject)
 		{
-			KalturaLog::info ('existing objects will not be re-written');
-			continue;
+			$object = $existingObject;
 		}
 
 		foreach($setters as $setter => $value)

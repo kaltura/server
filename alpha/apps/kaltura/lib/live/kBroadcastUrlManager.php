@@ -132,10 +132,10 @@ class kBroadcastUrlManager
 		$streamName = '';
 		if($concatStreamName)
 		{
-			$streamName = $entry->getId() . '_%i';
+			$streamName = '/' . $entry->getId() . '_%i';
 		}
 		
-		return "$url/$streamName?$paramsStr"; 
+		return "{$url}{$streamName}?{$paramsStr}"; 
 	}
 	
 }
