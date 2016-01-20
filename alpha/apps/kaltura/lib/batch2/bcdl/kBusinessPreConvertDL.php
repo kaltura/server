@@ -1451,7 +1451,7 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 			 * save the original source asset in another asset, in order 
 			 * to prevent its liquidated by the inter-source asset.
 			 */
-			if(isset($sourceFlavor) && strstr($sourceFlavor->getTagsArray(),assetParams::TAG_SAVE_SOURCE)!==false)
+			if(isset($sourceFlavor) && array_search(assetParams::TAG_SAVE_SOURCE,$sourceFlavor->getTagsArray())!==false)
 				self::saveOriginalSource($mediaInfo);
 		}
 		elseif($mediaInfo) 
@@ -1568,6 +1568,7 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 		$asset->save();
 		kFileSyncUtils::createSyncFileLinkForKey($asset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET), $sourceAsset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET));
 		$origFileSync = kFileSyncUtils::getLocalFileSyncForKey($sourceAsset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET));
+		$origFileSync = kFileSyncUtils::resolve($origFileSync);
 		$asset->setSize(intval($origFileSync->getFileSize()/1000));		
 		$asset->save();
 	}
