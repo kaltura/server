@@ -1,0 +1,176 @@
+
+#user  nobody;
+worker_processes  1;
+
+error_log  @LOG_DIR@/kaltura_live_error.log;
+#error_log  logs/error.log  notice;
+#error_log  logs/error.log  info;
+
+#pid        logs/nginx.pid;
+
+error_log @LOG_DIR@/kaltura_live.log info;
+
+events {
+    worker_connections  1024;
+}
+
+
+http {
+    include       mime.types;
+    default_type  application/octet-stream;
+
+    log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+                      '$status $body_bytes_sent "$http_referer" '
+                      '"$http_user_agent" "$http_x_forwarded_for"';
+
+    access_log  @LOG_DIR@/kaltura_live_access.log  main;
+
+    sendfile        on;
+    #tcp_nopush     on;
+
+    #keepalive_timeout  0;
+    keepalive_timeout  65;
+
+    #gzip  on;
+
+    server {
+        listen       80;
+        server_name  localhost;
+
+        #charset koi8-r;
+
+        #access_log  logs/host.access.log  main;
+
+        location / {
+            root   @APP_DIR@/start;
+            index  index.php;
+        }
+
+        #error_page  404              /404.html;
+
+        # redirect server error pages to the static page /50x.html
+        #
+        #error_page   500 502 503 504  /50x.html;
+        #location = /50x.html {
+        #    root   html;
+        #}
+
+        # proxy the PHP scripts to Apache listening on 127.0.0.1:80
+        #
+        #location ~ \.php$ {
+        #    proxy_pass   http://127.0.0.1;
+        #}
+
+        # pass the PHP scripts to FastCGI server listening on 127.0.0.1:9000
+        #
+        #location ~ \.php$ {
+        #    root           html;
+        #    fastcgi_pass   127.0.0.1:9000;
+        #    fastcgi_index  index.php;
+        #    fastcgi_param  SCRIPT_FILENAME  /scripts$fastcgi_script_name;
+        #    include        fastcgi_params;
+        #}
+
+        # deny access to .htaccess files, if Apache's document root
+        # concurs with nginx's one
+        #
+        #location ~ /\.ht {
+        #    deny  all;
+        
+		location /hls {
+            root @WEB_DIR@/content/recorded;			
+			error_page   405   =200 $uri;
+        }
+    }
+
+
+    # another virtual host using mix of IP-, name-, and port-based configuration
+    #
+    #server {
+    #    listen       8000;
+    #    listen       somename:8080;
+    #    server_name  somename  alias  another.alias;
+
+    #    location / {
+    #        root   html;
+    #        index  index.html index.htm;
+    #    }
+    #}
+
+
+    # HTTPS server
+    #
+    #server {
+    #    listen       443 ssl;
+    #    server_name  localhost;
+
+    #    ssl_certificate      cert.pem;
+    #    ssl_certificate_key  cert.key;
+
+    #    ssl_session_cache    shared:SSL:1m;
+    #    ssl_session_timeout  5m;
+
+    #    ssl_ciphers  HIGH:!aNULL:!MD5;
+    #    ssl_prefer_server_ciphers  on;
+
+    #    location / {
+    #        root   html;
+    #        index  index.html index.htm;
+    #    }
+    #}
+
+}
+
+rtmp {	
+		
+	server {
+		listen 1935;
+		
+		on_connect @SERVICE_URL@/api_v3/service/nginxLive_liveInternal/action/authenticate/hostname/@HOSTNAME@;
+		notify_method post;
+		publish_notify on;
+		
+        application kLive {
+            live on;
+			record off;
+			meta copy;
+			allow play @IP_RANGE@;
+			allow publish all;
+			
+			on_publish @SERVICE_URL@/api_v3/service/nginxLive_liveInternal/action/transcode/hostname/@HOSTNAME@;
+			on_update @SERVICE_URL@/api_v3/service/nginxLive_liveInternal/action/shouldKeepAlive;
+			notify_update_timeout 60s;
+			notify_update_strict off;
+        }
+        
+		application kPublish {
+			live on;
+			record off;
+			meta copy;
+			deny play all;
+			allow publish @IP_RANGE@;
+			
+			hls on;
+			hls_path @WEB_DIR@/content/recorded/hls;
+			hls_playlist_length 100s;
+			hls_fragment 10s;
+			hls_fragment_slicing aligned;
+			hls_continuous on;
+			hls_nested on;
+			hls_cleanup on;
+			hls_fragment_naming system;
+						
+			hls_variant _src BANDWIDTH=1000000;
+			hls_variant _low BANDWIDTH=400000;
+			hls_variant _mid BANDWIDTH=600000;
+			hls_variant _hi  BANDWIDTH=900000;
+			
+			on_update @SERVICE_URL@/api_v3/service/nginxLive_liveInternal/action/registerPlayback/hostname/@HOSTNAME@;
+			on_publish_done @SERVICE_URL@/api_v3/service/nginxLive_liveInternal/action/unregister/hostname/@HOSTNAME@;
+			on_record_done @SERVICE_URL@/api_v3/service/nginxLive_liveInternal/action/appendRecording;
+			notify_update_timeout 10s;
+			notify_update_strict off;
+		}
+	}
+}
+

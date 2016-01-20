@@ -48,6 +48,139 @@ class KalturaLiveEntryService extends KalturaEntryService
 		}
 	}
 
+	protected function authenticate($entryId, $token)
+	{
+		$dbEntry = entryPeer::retrieveByPK($entryId);
+		if (!$dbEntry || $dbEntry->getType() != entryType::LIVE_STREAM)
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
+	
+			/* @var $dbEntry LiveStreamEntry */
+			if ($dbEntry->getStreamPassword() != $token)
+				throw new KalturaAPIException(KalturaErrors::LIVE_STREAM_INVALID_TOKEN, $entryId);
+	
+				$mediaServer = $dbEntry->getMediaServer(true);
+				if($mediaServer)
+				{
+					$url = null;
+					$protocol = null;
+					foreach (array(KalturaPlaybackProtocol::HLS, KalturaPlaybackProtocol::APPLE_HTTP) as $hlsProtocol)
+					{
+						$config = $dbEntry->getLiveStreamConfigurationByProtocol($hlsProtocol, requestUtils::PROTOCOL_HTTP, null, true);
+						if ($config)
+						{
+							$url = $config->getUrl();
+							$protocol = $hlsProtocol;
+							break;
+						}
+					}
+						
+					if($url)
+					{
+						KalturaLog::info('Determining status of live stream URL [' .$url. ']');
+						$dpda= new DeliveryProfileDynamicAttributes();
+						$dpda->setEntryId($entryId);
+						$dpda->setFormat($protocol);
+						$deliveryProfile = DeliveryProfilePeer::getLiveDeliveryProfileByHostName(parse_url($url, PHP_URL_HOST), $dpda);
+						if($deliveryProfile && $deliveryProfile->isLive($url))
+						{
+							throw new KalturaAPIException(KalturaErrors::LIVE_STREAM_ALREADY_BROADCASTING, $entryId, $mediaServer->getHostname());
+						}
+					}
+				}
+	
+				// fetch current stream live params
+				$liveParamsIds = flavorParamsConversionProfilePeer::getFlavorIdsByProfileId($dbEntry->getConversionProfileId());
+				$usedLiveParamsIds = array();
+				foreach($liveParamsIds as $liveParamsId)
+				{
+					$usedLiveParamsIds[$liveParamsId] = array($entryId);
+				}
+					
+				// fetch all live entries that currently are live
+				$baseCriteria = KalturaCriteria::create(entryPeer::OM_CLASS);
+				$filter = new entryFilter();
+				$filter->setIsLive(true);
+				$filter->setIdNotIn(array($entryId));
+				$filter->setPartnerSearchScope(baseObjectFilter::MATCH_KALTURA_NETWORK_AND_PRIVATE);
+				$filter->attachToCriteria($baseCriteria);
+	
+				$entries = entryPeer::doSelect($baseCriteria);
+	
+				$maxInputStreams = $this->getPartner()->getMaxLiveStreamInputs();
+				if(!$maxInputStreams)
+					$maxInputStreams = kConf::get('partner_max_live_stream_inputs', 'local', 10);
+					KalturaLog::debug("Max live stream inputs [$maxInputStreams]");
+						
+					$maxTranscodedStreams = 0;
+					if(PermissionPeer::isValidForPartner(PermissionName::FEATURE_KALTURA_LIVE_STREAM_TRANSCODE, $this->getPartnerId()))
+					{
+						$maxTranscodedStreams = $this->getPartner()->getMaxLiveStreamOutputs();
+						if(!$maxTranscodedStreams)
+							$maxTranscodedStreams = kConf::get('partner_max_live_stream_outputs', 'local', 10);
+					}
+					KalturaLog::debug("Max live stream outputs [$maxTranscodedStreams]");
+	
+					$totalInputStreams = count($entries) + 1;
+					if($totalInputStreams > ($maxInputStreams + $maxTranscodedStreams))
+					{
+						KalturaLog::debug("Live input stream [$totalInputStreams]");
+						throw new KalturaAPIException(KalturaErrors::LIVE_STREAM_EXCEEDED_MAX_PASSTHRU, $entryId);
+					}
+	
+					$entryIds = array($entryId);
+					foreach($entries as $liveEntry)
+					{
+						/* @var $liveEntry LiveEntry */
+						$entryIds[] = $liveEntry->getId();
+						$liveParamsIds = array_map('intval', explode(',', $liveEntry->getFlavorParamsIds()));
+							
+						foreach($liveParamsIds as $liveParamsId)
+						{
+							if(isset($usedLiveParamsIds[$liveParamsId]))
+							{
+								$usedLiveParamsIds[$liveParamsId][] = $liveEntry->getId();
+							}
+							else
+							{
+								$usedLiveParamsIds[$liveParamsId] = array($liveEntry->getId());
+							}
+						}
+					}
+						
+					$liveParams = assetParamsPeer::retrieveByPKs(array_keys($usedLiveParamsIds));
+					$passthruEntries = null;
+					$transcodedEntries = null;
+					foreach($liveParams as $liveParamsItem)
+					{
+						/* @var $liveParamsItem LiveParams */
+						if($liveParamsItem->hasTag(liveParams::TAG_INGEST))
+						{
+							$passthruEntries = array_intersect(is_array($passthruEntries) ? $passthruEntries : $entryIds, $usedLiveParamsIds[$liveParamsItem->getId()]);
+						}
+						else
+						{
+							$transcodedEntries = array_intersect(is_array($transcodedEntries) ? $transcodedEntries : $entryIds, $usedLiveParamsIds[$liveParamsItem->getId()]);
+						}
+					}
+					$passthruEntries = array_diff($passthruEntries, $transcodedEntries);
+	
+					$passthruEntriesCount = count($passthruEntries);
+					$transcodedEntriesCount = count($transcodedEntries);
+	
+					KalturaLog::debug("Live transcoded entries [$transcodedEntriesCount], max live transcoded streams [$maxTranscodedStreams]");
+					if($transcodedEntriesCount > $maxTranscodedStreams)
+						throw new KalturaAPIException(KalturaErrors::LIVE_STREAM_EXCEEDED_MAX_TRANSCODED, $entryId);
+	
+						$maxInputStreams += ($maxTranscodedStreams - $transcodedEntriesCount);
+						KalturaLog::debug("Live params inputs [$passthruEntriesCount], max live stream inputs [$maxInputStreams]");
+						if($passthruEntriesCount > $maxInputStreams)
+							throw new KalturaAPIException(KalturaErrors::LIVE_STREAM_EXCEEDED_MAX_PASSTHRU, $entryId);
+	
+							$entry = KalturaEntryFactory::getInstanceByType($dbEntry->getType());
+							$entry->fromObject($dbEntry, $this->getResponseProfile());
+							return $entry;
+	}
+	
 	/**
 	 * Append recorded video to live entry
 	 *
