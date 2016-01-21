@@ -153,7 +153,12 @@ class KalturaDropFolderFile extends KalturaObject implements IFilterable
 	 */
 	public $batchJobId;
 
-	
+	/**
+	 * @var string
+	 */
+	public $fileFormat;
+
+
 	/*
 	 * mapping between the field on this object (on the left) and the setter/getter on the entry object (on the right)  
 	 */
@@ -182,6 +187,7 @@ class KalturaDropFolderFile extends KalturaObject implements IFilterable
 		'importEndedAt',
 		'batchJobId',
 		'parsedUserId',
+		'fileFormat',
 	 );
 		 
 	public function getMapBetweenObjects()

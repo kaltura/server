@@ -29,11 +29,6 @@ class KalturaWebexDropFolderFile extends KalturaDropFolderFile
 	 * @var string
 	 */
 	public $contentUrl;
-
-	/**
-	 * @var string
-	 */
-	public $fileFormat;
 	
 	/*
 	 * mapping between the field on this object (on the left) and the setter/getter on the entry object (on the right)  
@@ -44,7 +39,6 @@ class KalturaWebexDropFolderFile extends KalturaDropFolderFile
 		'description',
 		'confId',
 		'contentUrl',
-		'fileFormat',
 	 );
 		 
 	public function getMapBetweenObjects()

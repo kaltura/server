@@ -60,7 +60,10 @@ class kDropFolderFileResource extends kLocalFileResource
 	    
     	    $jobData = $dropFolder->getImportJobData();
 			if ($jobData)
-    	    	$jobData->setDropFolderFileId($this->getDropFolderFileId());
+			{
+				$jobData->setDropFolderFileId($this->getDropFolderFileId());
+				$jobData->setFileFormat($dropFolderFile->getFileFormat());
+			}
     	    
     	    // add job
     	    kJobsManager::addImportJob(

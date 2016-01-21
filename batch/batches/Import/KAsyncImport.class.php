@@ -197,18 +197,10 @@ class KAsyncImport extends KJobHandlerWorker
 				
 				KalturaLog::info("headers " . print_r($curlHeaderResponse, true));
 				$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaImportHandler');
-
-				$dropFolderFile = null;
-				if ($data instanceof KalturaDropFolderImportJobData)
-				{
-					$dropFolderPlugin = KalturaDropFolderClientPlugin::get(self::$kClient);
-					$dropFolderFile = $dropFolderPlugin->dropFolderFile->get($data->dropFolderFileId);
-				}
-				
 				foreach ($pluginInstances as $pluginInstance)
 				{
 					/* @var $pluginInstance IKalturaImportHandler */
-					$data = $pluginInstance->handleImportContent($curlHeaderResponse, $data, KBatchBase::$taskConfig->params, $dropFolderFile);
+					$data = $pluginInstance->handleImportContent($curlHeaderResponse, $data, KBatchBase::$taskConfig->params);
 				}
 			}
 

@@ -11,7 +11,6 @@ interface IKalturaImportHandler extends IKalturaBase
 	 * @param KCurlHeaderResponse $curlInfo
 	 * @param KalturaImportJobData $importData
 	 * @param Object $params
-	 * @param $dropFolderFile $dropFolderFile
 	 */
-	public static function handleImportContent($curlInfo, $importData, $params, $dropFolderFile);	
+	public static function handleImportContent($curlInfo, $importData, $params);	
 }
