@@ -20,7 +20,7 @@ class WebexPlugin extends KalturaPlugin implements IKalturaImportHandler
 	/* (non-PHPdoc)
 	 * @see IKalturaImportHandler::handleImportData()
 	 */
-	public static function handleImportContent($curlInfo,  $importData, $params) {
+	public static function handleImportContent($curlInfo,  $importData, $params, $dropFolderFile) {
 		if (!($curlInfo->headers['content-length'] < 16000 && $curlInfo->headers['content-type'] == 'text/html'))
 			return $importData;
 		KalturaLog::debug('content-length [' . $curlInfo->headers['content-length'] . '] content-type [' . $curlInfo->headers['content-type'] . ']');
@@ -108,10 +108,9 @@ class WebexPlugin extends KalturaPlugin implements IKalturaImportHandler
 		$curlWrapper->setOpt(CURLOPT_RETURNTRANSFER, false);
 		$fileName = pathinfo($importData->destFileLocalPath, PATHINFO_FILENAME);
 		
-		if ($importData instanceof KalturaDropFolderImportJobData)
+		if (!is_null($dropFolderFile))
 		{
-			$dropFolderFile = DropFolderFilePeer::retrieveByPK($importData->dropFolderFileId);//should be an API call?
-			$destFileLocalPath = preg_replace("/$fileName\.[\w\d]+/", $fileName.".".$dropFolderFile->getFileFormat(), $importData->destFileLocalPath);
+			$destFileLocalPath = preg_replace("/$fileName\.[\w\d]+/", $fileName.".".$dropFolderFile->fileFormat, $importData->destFileLocalPath);
 		}
 		else
 		{
