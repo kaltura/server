@@ -95,7 +95,7 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 		if (!$kuser)
 		{
 			$lockKey = "user_add_" . $partner_id . $puser_id;
-			return kLock::runLocked($lockKey, 'createNewUser', array($partner_id, $puser_id, $is_admin));
+			return kLock::runLocked($lockKey, 'kuserPeer::createNewUser', array($partner_id, $puser_id, $is_admin));
 		}
 		return $kuser;
 	}
