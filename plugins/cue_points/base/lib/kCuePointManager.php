@@ -260,23 +260,23 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 		return true;
 	}
 
-    /**
-     * @param entry $entry
-     * @return array
-     */
-    private static function getCuePointTypeToClone($entry)
-    {
-        $listOfEnumIds = array();
-        $cue_point_plugin_map = kPluginableEnumsManager::getCoreMap('CuePointType');
-        foreach ($cue_point_plugin_map as $dynamic_enum_id => $plugin_name)
-        {
-            $plugin = kPluginableEnumsManager::getPlugin($plugin_name);
-            if($plugin::shouldCloneByProperty($entry)==true) {
-                $listOfEnumIds[] = $dynamic_enum_id;
-            }
-        }
-        return $listOfEnumIds;
-    }
+	/**
+	 * @param entry $entry
+	 * @return array
+	 */
+	private static function getCuePointTypeToClone($entry)
+	{
+		$listOfEnumIds = array();
+		$cue_point_plugin_map = kPluginableEnumsManager::getCoreMap('CuePointType');
+		foreach ($cue_point_plugin_map as $dynamic_enum_id => $plugin_name)
+		{
+			$plugin = kPluginableEnumsManager::getPlugin($plugin_name);
+			if($plugin::shouldCloneByProperty($entry)==true) {
+				$listOfEnumIds[] = $dynamic_enum_id;
+			}
+		}
+		return $listOfEnumIds;
+	}
 
 	/* (non-PHPdoc)
 	 * @see kObjectCopiedEventConsumer::objectCopied()
@@ -284,11 +284,11 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 	public function objectCopied(BaseObject $fromObject, BaseObject $toObject)
 	{
 		if($fromObject instanceof entry) {
-            $c = new KalturaCriteria();
-            $c->add(CuePointPeer::ENTRY_ID, $fromObject->getId());
-            $c->addAscendingOrderByColumn(CuePointPeer::CREATED_AT);
-            $c->setLimit(self::MAX_CUE_POINTS_TO_COPY);
-            $cuePointTypes = self::getCuePointTypeToClone($toObject);
+			$c = new KalturaCriteria();
+			$c->add(CuePointPeer::ENTRY_ID, $fromObject->getId());
+			$c->addAscendingOrderByColumn(CuePointPeer::CREATED_AT);
+			$c->setLimit(self::MAX_CUE_POINTS_TO_COPY);
+			$cuePointTypes = self::getCuePointTypeToClone($toObject);
 			$c->add(CuePointPeer::TYPE,$cuePointTypes,Criteria::IN);
 			$cuePoints = CuePointPeer::doSelect($c);
 			foreach( $cuePoints as $cuePoint ) {

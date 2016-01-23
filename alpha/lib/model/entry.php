@@ -3486,7 +3486,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 			{
 				if ($cloneOption->getItemType() == $property)
 				{
-                    $currentRule = $cloneOption->getRule();
+					$currentRule = $cloneOption->getRule();
 					if ($currentRule == CloneComponentSelectorType::EXCLUDE_COMPONENT)
 						$shouldClone = false;
 					else if ($currentRule == CloneComponentSelectorType::INCLUDE_COMPONENT)
