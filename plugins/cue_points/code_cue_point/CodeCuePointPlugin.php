@@ -244,4 +244,9 @@ class CodeCuePointPlugin extends KalturaPlugin implements IKalturaCuePoint, IKal
 		$value = self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
 		return kPluginableEnumsManager::apiToCore('BaseEntryCloneOptions', $value);
 	}
+
+	public static function shouldCloneByProperty(entry $entry)
+	{
+		return $entry->shouldCloneByProperty(self::getBaseEntryCloneOptionsCoreValue( BaseEntryCodeCuePointCloneOptions::CODE_CUE_POINTS), false);
+	}
 }

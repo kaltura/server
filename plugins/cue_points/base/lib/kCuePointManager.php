@@ -260,28 +260,40 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 		return true;
 	}
 
+    /**
+     * @param entry $entry
+     * @return array
+     */
+    private static function getCuePointTypeToClone($entry)
+    {
+        $listOfEnumIds = array();
+        $cue_point_plugin_map = kPluginableEnumsManager::getCoreMap('CuePointType');
+        foreach ($cue_point_plugin_map as $dynamic_enum_id => $plugin_name)
+        {
+            $plugin = kPluginableEnumsManager::getPlugin($plugin_name);
+            if($plugin::shouldCloneByProperty($entry)==true) {
+                $listOfEnumIds[] = $dynamic_enum_id;
+            }
+        }
+        return $listOfEnumIds;
+    }
+
 	/* (non-PHPdoc)
 	 * @see kObjectCopiedEventConsumer::objectCopied()
 	 */
 	public function objectCopied(BaseObject $fromObject, BaseObject $toObject)
 	{
-		if($fromObject instanceof entry)
-		{
-			$c = new KalturaCriteria();
-			$c->add( CuePointPeer::ENTRY_ID, $fromObject->getId() );
-			$c->addAscendingOrderByColumn(CuePointPeer::CREATED_AT);
-			$cpToCopy = CuePointPeer::doSelect($c);
-			if ( count( $cpToCopy ) <= self::MAX_CUE_POINTS_TO_COPY )
-			{
-				foreach( $cpToCopy as $cuePoint ) {
-					if ( $cuePoint->shouldCloneByProperty( $toObject ) )
-					{
-						$clonedCuePoint = $cuePoint->copyToEntry( $toObject );
-						$clonedCuePoint->save();
-					}
-				}
-			} else {
-				KalturaLog::alert("Can't copy cuePoints to cloned entry [{$toObject->getId()}] because cuePoints count exceeded max limit of [" . self::MAX_CUE_POINTS_TO_COPY . "]");
+		if($fromObject instanceof entry) {
+            $c = new KalturaCriteria();
+            $c->add(CuePointPeer::ENTRY_ID, $fromObject->getId());
+            $c->addAscendingOrderByColumn(CuePointPeer::CREATED_AT);
+            $c->setLimit(self::MAX_CUE_POINTS_TO_COPY);
+            $cuePointTypes = self::getCuePointTypeToClone($toObject);
+			$c->add(CuePointPeer::TYPE,$cuePointTypes,Criteria::IN);
+			$cuePoints = CuePointPeer::doSelect($c);
+			foreach( $cuePoints as $cuePoint ) {
+				$clonedCuePoint = $cuePoint->copyToEntry( $toObject );
+				$clonedCuePoint->save();
 			}
 		}
 	}

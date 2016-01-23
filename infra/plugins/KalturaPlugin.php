@@ -12,4 +12,8 @@ abstract class KalturaPlugin implements IKalturaPlugin
 			
 		return null;
 	}
+    public static function shouldCloneByProperty(entry $entry)
+    {
+        return false;
+    }
 }

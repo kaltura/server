@@ -116,9 +116,4 @@ class ThumbCuePoint extends CuePoint implements IMetadataObject
 	}
 	
 	public function getIsPublic()	              {return true;}
-
-	public function shouldCloneByProperty(entry $entry)
-	{
-		return $entry->shouldCloneByProperty(ThumbCuePointPlugin::getBaseEntryCloneOptionsCoreValue( BaseEntryThumbCuePointCloneOptions::THUMB_CUE_POINTS), false);
-	}
 }

@@ -372,4 +372,10 @@ class AnnotationPlugin extends KalturaPlugin implements IKalturaServices, IKaltu
 		$value = self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
 		return kPluginableEnumsManager::apiToCore('BaseEntryCloneOptions', $value);
 	}
+
+	public static function shouldCloneByProperty(entry $entry)
+	{
+		return $entry->shouldCloneByProperty(self::getBaseEntryCloneOptionsCoreValue( BaseEntryAnnotationCuePointCloneOptions::ANNOTATION_CUE_POINTS), false);
+	}
+
 }
