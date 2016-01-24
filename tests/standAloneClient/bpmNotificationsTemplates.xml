@@ -10,8 +10,18 @@
 	<session>
 		<!-- script will ask for username / password interactively -->
 	</session>
-	<multirequest>
+	<multirequest continueOnError="1">
 		<!-- Entry Created -->
+		<request service="eventNotificationTemplate" action="listAction" plugin="eventNotification" partnerId="0">
+			<filter objectType="KalturaEventNotificationTemplateFilter">
+				<typeEqual>{php:return KalturaEventNotificationTemplateType::BPM_START;}</typeEqual>
+				<partnerId>0</partnerId>
+				<systemNameEqual>entry_created</systemNameEqual>
+			</filter>
+		</request>
+		<request service="eventNotificationTemplate" action="delete" plugin="eventNotification" partnerId="0">
+			<id>{1:result:objects:0:id}</id>
+		</request>
 		<request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
 			<template objectType="KalturaBusinessProcessStartNotificationTemplate">
 				<name>Entry Created</name>
@@ -50,25 +60,27 @@
 						</value>
 					</item>
 				</contentParameters>
-				<userParameters objectType="array">
-					<item objectType="KalturaEventNotificationParameter">
-						<key>templateId</key>
-						<description>ID of the integration job finished template to be passed to the process</description>
-						<value objectType="KalturaStringValue">
-							<value></value>
-						</value>
-					</item>
-				</userParameters>
 			</template>
 		</request>
 		<request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
-			<id>{1:result:id}</id>
+			<id>{3:result:id}</id>
 			<status>1</status><!-- EventNotificationTemplateStatus::DISABLED -->
 		</request>
 	</multirequest>
-	
-	<multirequest>
+
+
+	<multirequest continueOnError="1">
 		<!-- Flavor Created -->
+		<request service="eventNotificationTemplate" action="listAction" plugin="eventNotification" partnerId="0">
+			<filter objectType="KalturaEventNotificationTemplateFilter">
+				<typeEqual>{php:return KalturaEventNotificationTemplateType::BPM_START;}</typeEqual>
+				<partnerId>0</partnerId>
+				<systemNameEqual>flavor_status_equals</systemNameEqual>
+			</filter>
+		</request>
+		<request service="eventNotificationTemplate" action="delete" plugin="eventNotification" partnerId="0">
+			<id>{1:result:objects:0:id}</id>
+		</request>
 		<request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
 			<template objectType="KalturaBusinessProcessStartNotificationTemplate">
 				<name>Flavor Status Equals</name>
@@ -148,13 +160,6 @@
 				</contentParameters>
 				<userParameters objectType="array">
 					<item objectType="KalturaEventNotificationParameter">
-						<key>templateId</key>
-						<description>ID of the template to be passed to the process</description>
-						<value objectType="KalturaStringValue">
-							<value></value>
-						</value>
-					</item>
-					<item objectType="KalturaEventNotificationParameter">
 						<key>trigger_status</key>
 						<description>Flavor-asset status that triggers the event, See:KalturaFlavorAssetStatus:/api_v3/testmeDoc/?object=KalturaFlavorAssetStatus</description>
 						<value objectType="KalturaStringValue">
@@ -174,13 +179,24 @@
 			</template>
 		</request>
 		<request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
-			<id>{1:result:id}</id>
+			<id>{3:result:id}</id>
 			<status>1</status><!-- EventNotificationTemplateStatus::DISABLED -->
 		</request>
 	</multirequest>
-	
-	<multirequest>
+
+
+	<multirequest continueOnError="1">
 		<!-- Entry Updated -->
+		<request service="eventNotificationTemplate" action="listAction" plugin="eventNotification" partnerId="0">
+			<filter objectType="KalturaEventNotificationTemplateFilter">
+				<typeEqual>{php:return KalturaEventNotificationTemplateType::BPM_SIGNAL;}</typeEqual>
+				<partnerId>0</partnerId>
+				<systemNameEqual>entry_updated</systemNameEqual>
+			</filter>
+		</request>
+		<request service="eventNotificationTemplate" action="delete" plugin="eventNotification" partnerId="0">
+			<id>{1:result:objects:0:id}</id>
+		</request>
 		<request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
 			<template objectType="KalturaBusinessProcessSignalNotificationTemplate">
 				<name>Entry Updated</name>
@@ -192,13 +208,24 @@
 			</template>
 		</request>
 		<request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
-			<id>{1:result:id}</id>
+			<id>{3:result:id}</id>
 			<status>1</status><!-- EventNotificationTemplateStatus::DISABLED -->
 		</request>
 	</multirequest>
-	
-	<multirequest>
+
+
+	<multirequest continueOnError="1">
 		<!-- Caption-Asset Status Equals -->
+		<request service="eventNotificationTemplate" action="listAction" plugin="eventNotification" partnerId="0">
+			<filter objectType="KalturaEventNotificationTemplateFilter">
+				<typeEqual>{php:return KalturaEventNotificationTemplateType::BPM_SIGNAL;}</typeEqual>
+				<partnerId>0</partnerId>
+				<systemNameEqual>caption_asset_status_equals</systemNameEqual>
+			</filter>
+		</request>
+		<request service="eventNotificationTemplate" action="delete" plugin="eventNotification" partnerId="0">
+			<id>{1:result:objects:0:id}</id>
+		</request>
 		<request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
 			<template objectType="KalturaBusinessProcessSignalNotificationTemplate">
 				<name>Caption-Asset Status Equals</name>
@@ -278,14 +305,24 @@
 			</template>
 		</request>
 		<request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
-			<id>{1:result:id}</id>
+			<id>{3:result:id}</id>
 			<status>1</status><!-- EventNotificationTemplateStatus::DISABLED -->
 		</request>
 	</multirequest>
-	
-	
-	<multirequest>
+
+
+	<multirequest continueOnError="1">
 		<!-- Entry Integration Job Finished -->
+		<request service="eventNotificationTemplate" action="listAction" plugin="eventNotification" partnerId="0">
+			<filter objectType="KalturaEventNotificationTemplateFilter">
+				<typeEqual>{php:return KalturaEventNotificationTemplateType::BPM_SIGNAL;}</typeEqual>
+				<partnerId>0</partnerId>
+				<systemNameEqual>entry_integration_job_finished</systemNameEqual>
+			</filter>
+		</request>
+		<request service="eventNotificationTemplate" action="delete" plugin="eventNotification" partnerId="0">
+			<id>{1:result:objects:0:id}</id>
+		</request>
 		<request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
 			<template objectType="KalturaBusinessProcessSignalNotificationTemplate">
 				<name>Entry Integration Job Finished</name>
@@ -308,14 +345,24 @@
 			</template>
 		</request>
 		<request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
-			<id>{1:result:id}</id>
+			<id>{3:result:id}</id>
 			<status>1</status><!-- EventNotificationTemplateStatus::DISABLED -->
 		</request>
 	</multirequest>
-	
-	
-	<multirequest>
+
+
+	<multirequest continueOnError="1">
 		<!-- Category Integration Job Finished -->
+		<request service="eventNotificationTemplate" action="listAction" plugin="eventNotification" partnerId="0">
+			<filter objectType="KalturaEventNotificationTemplateFilter">
+				<typeEqual>{php:return KalturaEventNotificationTemplateType::BPM_SIGNAL;}</typeEqual>
+				<partnerId>0</partnerId>
+				<systemNameEqual>category_integration_job_finished</systemNameEqual>
+			</filter>
+		</request>
+		<request service="eventNotificationTemplate" action="delete" plugin="eventNotification" partnerId="0">
+			<id>{1:result:objects:0:id}</id>
+		</request>
 		<request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
 			<template objectType="KalturaBusinessProcessSignalNotificationTemplate">
 				<name>Category Integration Job Finished</name>
@@ -338,14 +385,24 @@
 			</template>
 		</request>
 		<request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
-			<id>{1:result:id}</id>
+			<id>{3:result:id}</id>
 			<status>1</status><!-- EventNotificationTemplateStatus::DISABLED -->
 		</request>
 	</multirequest>
-	
-	
-	<multirequest>
+
+
+	<multirequest continueOnError="1">
 		<!-- Asset Integration Job Finished -->
+		<request service="eventNotificationTemplate" action="listAction" plugin="eventNotification" partnerId="0">
+			<filter objectType="KalturaEventNotificationTemplateFilter">
+				<typeEqual>{php:return KalturaEventNotificationTemplateType::BPM_SIGNAL;}</typeEqual>
+				<partnerId>0</partnerId>
+				<systemNameEqual>asset_integration_job_finished</systemNameEqual>
+			</filter>
+		</request>
+		<request service="eventNotificationTemplate" action="delete" plugin="eventNotification" partnerId="0">
+			<id>{1:result:objects:0:id}</id>
+		</request>
 		<request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
 			<template objectType="KalturaBusinessProcessSignalNotificationTemplate">
 				<name>Asset Integration Job Finished</name>
@@ -368,14 +425,24 @@
 			</template>
 		</request>
 		<request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
-			<id>{1:result:id}</id>
+			<id>{3:result:id}</id>
 			<status>1</status><!-- EventNotificationTemplateStatus::DISABLED -->
 		</request>
 	</multirequest>
-	
-	
-	<multirequest>
+
+
+	<multirequest continueOnError="1">
 		<!-- Metadata equals -->
+		<request service="eventNotificationTemplate" action="listAction" plugin="eventNotification" partnerId="0">
+			<filter objectType="KalturaEventNotificationTemplateFilter">
+				<typeEqual>{php:return KalturaEventNotificationTemplateType::BPM_SIGNAL;}</typeEqual>
+				<partnerId>0</partnerId>
+				<systemNameEqual>metadata_equals</systemNameEqual>
+			</filter>
+		</request>
+		<request service="eventNotificationTemplate" action="delete" plugin="eventNotification" partnerId="0">
+			<id>{1:result:objects:0:id}</id>
+		</request>
 		<request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
 			<template objectType="KalturaBusinessProcessSignalNotificationTemplate">
 				<name>Metadata equals</name>
@@ -469,14 +536,24 @@
 			</template>
 		</request>
 		<request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
-			<id>{1:result:id}</id>
+			<id>{3:result:id}</id>
 			<status>1</status><!-- EventNotificationTemplateStatus::DISABLED -->
 		</request>
 	</multirequest>
-	
-	
-	<multirequest>
+
+
+	<multirequest continueOnError="1">
 		<!-- Caption Asset Added -->
+		<request service="eventNotificationTemplate" action="listAction" plugin="eventNotification" partnerId="0">
+			<filter objectType="KalturaEventNotificationTemplateFilter">
+				<typeEqual>{php:return KalturaEventNotificationTemplateType::BPM_SIGNAL;}</typeEqual>
+				<partnerId>0</partnerId>
+				<systemNameEqual>HTTP_New_Caption_Asset_Added_To_Entry</systemNameEqual>
+			</filter>
+		</request>
+		<request service="eventNotificationTemplate" action="delete" plugin="eventNotification" partnerId="0">
+			<id>{1:result:objects:0:id}</id>
+		</request>
 		<request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
 			<template objectType="KalturaBusinessProcessSignalNotificationTemplate">
 				<name>New Caption Asset Added To Entry</name>
@@ -539,7 +616,7 @@
 							</item>
 						</conditions>
 					</item>
-				</eventConditions>		
+				</eventConditions>
 				<userParameters objectType="array">
 					<item objectType="KalturaEventNotificationParameter">
 						<key>trigger_language</key>
@@ -561,7 +638,84 @@
 			</template>
 		</request>
 		<request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
-			<id>{1:result:id}</id>
+			<id>{3:result:id}</id>
+			<status>1</status><!-- EventNotificationTemplateStatus::DISABLED -->
+		</request>
+	</multirequest>
+
+
+	<multirequest continueOnError="1">
+		<!-- Transcript Asset Data Changed -->
+		<request service="eventNotificationTemplate" action="listAction" plugin="eventNotification" partnerId="0">
+			<filter objectType="KalturaEventNotificationTemplateFilter">
+				<typeEqual>{php:return KalturaEventNotificationTemplateType::BPM_START;}</typeEqual>
+				<partnerId>0</partnerId>
+				<systemNameEqual>Transcript_Asset_Data_Changed</systemNameEqual>
+			</filter>
+		</request>
+		<request service="eventNotificationTemplate" action="delete" plugin="eventNotification" partnerId="0">
+			<id>{1:result:objects:0:id}</id>
+		</request>
+		<request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
+			<template objectType="KalturaBusinessProcessStartNotificationTemplate">
+				<name>Transcript Asset Data Changed</name>
+				<systemName>Transcript_Asset_Data_Changed</systemName>
+				<description>Transcript Asset life-cycle</description>
+				<automaticDispatchEnabled>1</automaticDispatchEnabled>
+				<eventType>{php:return KalturaEventNotificationEventType::OBJECT_DATA_CHANGED;}</eventType>
+				<eventObjectType>{php:return KalturaEventNotificationEventObjectType::TRANSCRIPT_ASSET;}</eventObjectType>
+				<abortOnDeletion>true</abortOnDeletion>
+				<mainObjectCode>$object->getentry()</mainObjectCode>
+				<contentParameters objectType="array">
+					<item objectType="KalturaEventNotificationParameter">
+						<key>endPoint</key>
+						<description>Server Host</description>
+						<value objectType="KalturaEvalStringField">
+							<code>kConf::get('apphome_url')</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>partnerId</key>
+						<description>Partner ID</description>
+						<value objectType="KalturaEvalStringField">
+							<code>$scope->getEvent()->getObject()->getPartnerId()</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>adminSecret</key>
+						<description>Partner Administrator Secret</description>
+						<value objectType="KalturaEvalStringField">
+							<code>PartnerPeer::retrieveByPK($scope->getEvent()->getObject()->getPartnerId())->getAdminSecret()</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>entryId</key>
+						<description>Entry ID</description>
+						<value objectType="KalturaEvalStringField">
+							<code>$scope->getEvent()->getObject()->getEntryId()</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>transcriptAssetId</key>
+						<description>Transcript Asset ID</description>
+						<value objectType="KalturaEvalStringField">
+							<code>$scope->getEvent()->getObject()->getId()</code>
+						</value>
+					</item>
+				</contentParameters>
+				<userParameters objectType="array">
+					<item objectType="KalturaEventNotificationParameter">
+						<key>templateId</key>
+						<description>ID of the template to be passed to the process</description>
+						<value objectType="KalturaStringValue">
+							<value />
+						</value>
+					</item>
+				</userParameters>
+			</template>
+		</request>
+		<request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
+			<id>{3:result:id}</id>
 			<status>1</status><!-- EventNotificationTemplateStatus::DISABLED -->
 		</request>
 	</multirequest>

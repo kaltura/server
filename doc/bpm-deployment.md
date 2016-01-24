@@ -47,6 +47,8 @@ params.maxTimeBeforeFail							= 1000000
  - Reload configuration: `touch cache/base.reload` or, on a none production ENV, reload your Apache.
  - Clear cache: `rm -rf cache/*`.
  - Install plugins: `php deployment/base/scripts/installPlugins.php`.
+ - Copy Activiti config: `cp generator/sources/bpmn/deploy/src/activiti.cfg.template.xml generator/sources/bpmn/deploy/src/activiti.cfg.xml`
+ - Replace tokens in `generator/sources/bpmn/deploy/src/activiti.cfg.xml` 
  - Generate clients: 
    
 ```
