@@ -45,10 +45,13 @@ class AnnotationPlugin extends KalturaPlugin implements IKalturaServices, IKaltu
 	public static function getEnums($baseEnumName = null)
 	{
 		if(is_null($baseEnumName))
-			return array('AnnotationCuePointType');
+			return array('AnnotationCuePointType', 'BaseEntryAnnotationCuePointCloneOptions');
 	
 		if($baseEnumName == 'CuePointType')
 			return array('AnnotationCuePointType');
+
+		if($baseEnumName == 'BaseEntryCloneOptions')
+			return array('BaseEntryAnnotationCuePointCloneOptions');
 			
 		return array();
 	}
@@ -360,4 +363,19 @@ class AnnotationPlugin extends KalturaPlugin implements IKalturaServices, IKaltu
 	{
 		return array(self::getCuePointTypeCoreValue(AnnotationCuePointType::ANNOTATION));
 	}
+
+	/**
+	 * @return int id of dynamic enum in the DB.
+	 */
+	public static function getBaseEntryCloneOptionsCoreValue($valueName)
+	{
+		$value = self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
+		return kPluginableEnumsManager::apiToCore('BaseEntryCloneOptions', $value);
+	}
+
+	public static function shouldCloneByProperty(entry $entry)
+	{
+		return $entry->shouldCloneByProperty(self::getBaseEntryCloneOptionsCoreValue( BaseEntryAnnotationCuePointCloneOptions::ANNOTATION_CUE_POINTS), false);
+	}
+
 }

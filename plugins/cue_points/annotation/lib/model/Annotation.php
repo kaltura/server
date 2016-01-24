@@ -103,5 +103,4 @@ class Annotation extends CuePoint implements IMetadataObject
 	
 	public function getSearchableOnEntry()	      		{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_SEARCHABLE_ON_ENTRY, null, false);}
 	public function setSearchableOnEntry($v)        	{return $this->putInCustomData(self::CUSTOM_DATA_FIELD_SEARCHABLE_ON_ENTRY, (bool)$v);}
-	
 }

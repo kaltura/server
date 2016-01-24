@@ -31,13 +31,16 @@ class ThumbCuePointPlugin extends KalturaPlugin implements IKalturaCuePoint, IKa
 	public static function getEnums($baseEnumName = null)
 	{
 		if(is_null($baseEnumName))
-			return array('timedThumbAssetType', 'ThumbCuePointType');
+			return array('timedThumbAssetType', 'ThumbCuePointType', 'BaseEntryThumbCuePointCloneOptions');
 	
 		if($baseEnumName == 'assetType')
 			return array('timedThumbAssetType');
 			
 		if($baseEnumName == 'CuePointType')
-			return array('ThumbCuePointType');	
+			return array('ThumbCuePointType');
+
+		if($baseEnumName == 'BaseEntryCloneOptions')
+			return array('BaseEntryThumbCuePointCloneOptions');
 			
 		return array();
 	}
@@ -183,6 +186,15 @@ class ThumbCuePointPlugin extends KalturaPlugin implements IKalturaCuePoint, IKa
 		$value = self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
 		return kPluginableEnumsManager::apiToCore('assetType', $value);
 	}
+
+	/**
+	 * @return int id of dynamic enum in the DB.
+	 */
+	public static function getBaseEntryCloneOptionsCoreValue($valueName)
+	{
+		$value = self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
+		return kPluginableEnumsManager::apiToCore('BaseEntryCloneOptions', $value);
+	}
 	
 	/**
 	 * @return string external API value of dynamic enum.
@@ -250,5 +262,10 @@ class ThumbCuePointPlugin extends KalturaPlugin implements IKalturaCuePoint, IKa
 	public static function getTypesToIndexOnEntry()
 	{
 		return array(self::getCuePointTypeCoreValue(ThumbCuePointType::THUMB));
+	}
+
+	public static function shouldCloneByProperty(entry $entry)
+	{
+		return $entry->shouldCloneByProperty(self::getBaseEntryCloneOptionsCoreValue( BaseEntryThumbCuePointCloneOptions::THUMB_CUE_POINTS), false);
 	}
 }

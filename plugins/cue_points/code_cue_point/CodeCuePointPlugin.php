@@ -34,10 +34,13 @@ class CodeCuePointPlugin extends KalturaPlugin implements IKalturaCuePoint, IKal
 	public static function getEnums($baseEnumName = null)
 	{
 		if(is_null($baseEnumName))
-			return array('CodeCuePointType');
+			return array('CodeCuePointType', 'BaseEntryCodeCuePointCloneOptions');
 	
 		if($baseEnumName == 'CuePointType')
 			return array('CodeCuePointType');
+
+		if($baseEnumName == 'BaseEntryCloneOptions')
+			return array('BaseEntryCodeCuePointCloneOptions');
 			
 		return array();
 	}
@@ -231,5 +234,19 @@ class CodeCuePointPlugin extends KalturaPlugin implements IKalturaCuePoint, IKal
 	public static function getTypesToIndexOnEntry()
 	{
 		return array();
+	}
+
+	/**
+	 * @return int id of dynamic enum in the DB.
+	 */
+	public static function getBaseEntryCloneOptionsCoreValue($valueName)
+	{
+		$value = self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
+		return kPluginableEnumsManager::apiToCore('BaseEntryCloneOptions', $value);
+	}
+
+	public static function shouldCloneByProperty(entry $entry)
+	{
+		return $entry->shouldCloneByProperty(self::getBaseEntryCloneOptionsCoreValue( BaseEntryCodeCuePointCloneOptions::CODE_CUE_POINTS), false);
 	}
 }
