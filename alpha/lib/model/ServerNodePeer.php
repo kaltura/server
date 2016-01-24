@@ -50,14 +50,14 @@ class ServerNodePeer extends BaseServerNodePeer {
 	
 	public static function retrieveActiveServerNode($hostName = null, $partnerId = null)
 	{
-		$c = $this->buildCriteriaByHostAndPartnerId($hostName, $partnerId);
+		$c = ServerNodePeer::buildCriteriaByHostAndPartnerId($hostName, $partnerId);
 		
 		return ServerNodePeer::doSelectOne($c);
 	}
 	
 	public static function retrieveActiveMediaServerNode($hostName = null, $partnerId = null)
 	{
-		$c = $this->buildCriteriaByHostAndPartnerId($hostName, $partnerId);
+		$c = ServerNodePeer::buildCriteriaByHostAndPartnerId($hostName, $partnerId);
 		
 		$node = ServerNodePeer::doSelectOne($c);
 		
