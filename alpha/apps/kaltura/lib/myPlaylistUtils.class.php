@@ -1043,7 +1043,8 @@ HTML;
 				$playlist->getPartnerId(),
 				$playlist,
 				null,
-				false);
+				false, 
+				$pager);
 		
 		$entryIds = array();
 		$durations = array();
