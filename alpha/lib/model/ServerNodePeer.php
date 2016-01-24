@@ -33,7 +33,7 @@ class ServerNodePeer extends BaseServerNodePeer {
 		self::$s_criteria_filter->setFilter($c);
 	}
 	
-	private function buildCriteriaByHostAndPartnerId($hostName = null, $partnerId = null)
+	private static function buildCriteriaByHostAndPartnerId($hostName = null, $partnerId = null)
 	{
 		$c = new Criteria();
 		
