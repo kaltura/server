@@ -2,7 +2,7 @@
 
 class VodPackagerDeliveryUtils
 {
-	protected static function generateMultiUrl(array $flavors)
+	protected static function generateMultiUrl(array $flavors, entry $entry)
 	{
 		$urls = array();
 		foreach ($flavors as $flavor)
@@ -20,11 +20,16 @@ class VodPackagerDeliveryUtils
 		$prefix = kString::getCommonPrefix($urls);
 		$postfix = kString::getCommonPostfix($urls);
 		
-		if (strpos($prefix, '/flavorParamIds/') !== false)
+		if ($entry->getType() == entryType::PLAYLIST)
 		{
-			// in case of playlist, need to merge the flavor params of the urls
-			//	instead of using a urlset, nginx-vod does not support urlsets of 
-			//	non-trivial mapping mapping responses   
+			// in case of a playlist, need to merge the flavor params of the urls
+			// instead of using a urlset, since nginx-vod does not support urlsets of 
+			// non-trivial mapping responses.
+			 
+			// so instead of building:
+			//		/p/123/serveFlavor/entryId/0_abc/flavorParamIds/100,1,2,3,/forceproxy/true/name/a.mp4.urlset
+			// we build:
+			//		/p/123/serveFlavor/entryId/0_abc/flavorParamIds/1001,1002,1003/forceproxy/true/name/a.mp4.urlset
 			$prefix = substr($prefix, 0, strrpos($prefix, '/') + 1);
 			$postfix = substr($postfix, strpos($postfix, '/'));
 		}
@@ -37,7 +42,7 @@ class VodPackagerDeliveryUtils
 			$middlePart .= substr($url, $prefixLen, strlen($url) - $prefixLen - $postfixLen) . ',';
 		}
 		
-		if (strpos($prefix, '/flavorParamIds/') !== false &&
+		if ($entry->getType() == entryType::PLAYLIST &&
 			strpos($middlePart, '/') === false)
 		{
 			$middlePart = rtrim(ltrim($middlePart, ','), ',');
@@ -53,7 +58,9 @@ class VodPackagerDeliveryUtils
 	
 	public static function getVodPackagerUrl($flavors, $urlPrefix, $urlSuffix, DeliveryProfileDynamicAttributes $params)
 	{
-		$url = self::generateMultiUrl($flavors);
+		$entry = entryPeer::retrieveByPK($params->getEntryId());
+		
+		$url = self::generateMultiUrl($flavors, $entry);
 		$url .= $urlSuffix;
 	
 		// move any folders on the url prefix to the url part, so that the protocol folder will always be first

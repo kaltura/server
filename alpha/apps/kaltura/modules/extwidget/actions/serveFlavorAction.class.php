@@ -29,7 +29,6 @@ class serveFlavorAction extends kalturaAction
 		return new kRendererString(
 				'{"sequences":[{"clips":[{"type":"source","path":"' . $path . '"}]}]}',
 				self::JSON_CONTENT_TYPE);
-		
 	}
 	
 	protected function servePlaylist($entry)
@@ -108,6 +107,7 @@ class serveFlavorAction extends kalturaAction
 		}
 		
 		// build the sequences
+		$storeCache = true;
 		$sequences = array();
 		foreach ($flavorParamIds as $flavorParamsId)
 		{
@@ -140,16 +140,19 @@ class serveFlavorAction extends kalturaAction
 				// get the file path of the flavor 
 				$syncKey = $flavor->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 				list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($syncKey , false, false);
-				if (!$fileSync)
+				if ($fileSync)
 				{
-					$renderer = $this->getSimpleMappingRenderer('');
-					$renderer->output();
-					KExternalErrors::dieGracefully();
+					$resolvedFileSync = kFileSyncUtils::resolve($fileSync);
+					$path = $resolvedFileSync->getFullPath();
 				}
-				
-				$resolvedFileSync = kFileSyncUtils::resolve($fileSync);
-					
-				$clips[] = array('type' => 'source', 'path' => $resolvedFileSync->getFullPath());
+				else 
+				{
+					error_log('missing file sync for flavor ' . $flavor->getId() . ' version ' . $flavor->getVersion());
+					$path = '';
+					$storeCache = false;
+				}
+									
+				$clips[] = array('type' => 'source', 'path' => $path);
 			}
 		
 			$sequences[] = array('clips' => $clips);
@@ -159,7 +162,10 @@ class serveFlavorAction extends kalturaAction
 		$mediaSet = array('durations' => $durations, 'sequences' => $sequences);
 		$json = json_encode($mediaSet);
 		$renderer = new kRendererString($json, self::JSON_CONTENT_TYPE);
-		$this->storeCache($renderer, $entry->getPartnerId());
+		if ($storeCache)
+		{
+			$this->storeCache($renderer, $entry->getPartnerId());
+		}
 			
 		$renderer->output();
 		KExternalErrors::dieGracefully();
