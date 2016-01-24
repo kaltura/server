@@ -861,6 +861,10 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 	        'plugins_data' => QuizPlugin::PLUGIN_NAME . ' ' . $data . $answerCuePoint->getPartnerId() . QuizPlugin::SEARCH_TEXT_SUFFIX
 	    );
 	}
+    public static function shouldCloneByProperty(entry $entry)
+    {
+        return false;
+    }
 
 }
 
