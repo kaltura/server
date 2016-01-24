@@ -5,11 +5,10 @@
  */
 class KalturaQuizUserEntryFilter extends KalturaQuizUserEntryBaseFilter
 {
-    /**
-     * @var KalturaNullableBoolean
-     */
-    public $isAnonymous;
-
+	/**
+	 * @var KalturaNullableBoolean
+	 */
+	public $isAnonymous;
 
 	public function getListResponse(KalturaFilterPager $pager, KalturaDetachedResponseProfile $responseProfile = null)
 	{
