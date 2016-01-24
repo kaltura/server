@@ -89,7 +89,14 @@ class KalturaEntryContextDataResult extends KalturaContextDataResult
 	 */
 	public $flavorAssets;
 
-    /**
+	/**
+	 * The duration of the entry in milliseconds
+	 * 
+	 * @var int
+	 */
+	public $msDuration;
+	
+	/**
      * Array of allowed flavor assets according to access control limitations and requested tags
      *
      * @var KalturaPluginDataArray
@@ -106,6 +113,7 @@ class KalturaEntryContextDataResult extends KalturaContextDataResult
 		'previewLength',
 		'accessControlMessages' => 'messages',
 		'accessControlActions' => 'actions',
+		'msDuration',
 	);
 	
 	/* (non-PHPdoc)

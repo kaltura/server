@@ -743,6 +743,7 @@ class BaseEntryService extends KalturaEntryService
 		$result = new KalturaEntryContextDataResult();
 		$result->fromObject($contextDataHelper->getContextDataResult());
 		$result->flavorAssets = KalturaFlavorAssetArray::fromDbArray($contextDataHelper->getAllowedFlavorAssets());
+		$result->msDuration = $contextDataHelper->getMsDuration();
 		$result->streamerType = $contextDataHelper->getStreamerType();
 		$result->mediaProtocol = $contextDataHelper->getMediaProtocol();
 		$result->storageProfilesXML = $contextDataHelper->getStorageProfilesXML();
