@@ -48,7 +48,7 @@ class ServerNodePeer extends BaseServerNodePeer {
 		return $c;
 	}
 	
-	public static function retrieveActiveServerNodes($hostName = null, $partnerId = null)
+	public static function retrieveActiveServerNode($hostName = null, $partnerId = null)
 	{
 		$c = $this->buildCriteriaByHostAndPartnerId($hostName, $partnerId);
 		
