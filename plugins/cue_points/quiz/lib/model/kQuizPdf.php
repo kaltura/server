@@ -70,6 +70,7 @@ class kQuizPdf
         $title = "Here are the questions from  [".$dbEntry->getName()."]";
         KalturaLog::debug("Questions from  [".$dbEntry->getName()."]");
         $this->pdf->addTitle($title, $this->titleStyle);
+        $this->pdf->setOutFileName($dbEntry->getName());
         $questionType = QuizPlugin::getCuePointTypeCoreValue(QuizCuePointType::QUIZ_QUESTION);
         $questions = CuePointPeer::retrieveByEntryId($this->entryId, array($questionType));
         $questNum = 0;
