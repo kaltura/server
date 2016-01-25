@@ -101,7 +101,8 @@ $html5Version = $_GET['playerVersion'];
                     "flashvars": {
                             "streamerType": "auto",
                             "autoPlay": true,
-                            "LeadWithHLSOnFlash": true
+                            "LeadWithHLSOnFlash": true,
+							"Kaltura.Protocol":"http"
                     },
                     "cache_st": 1410340114,
                     "entry_id": entryId
