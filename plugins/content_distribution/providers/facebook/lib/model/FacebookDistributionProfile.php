@@ -19,13 +19,26 @@ class FacebookDistributionProfile extends ConfigurableDistributionProfile
 	const CUSTOM_DATA_CALL_TO_ACTION_LINK_CAPTION = 'callToActionLinkCaption';
 	const CUSTOM_DATA_PLACE= 'place';
 	const CUSTOM_DATA_TAGS= 'tags';
-	const CUSTOM_DATA_TARGETING= 'targeting';
 	const CUSTOM_DATA_FEED_TARGETING= 'feedTargeting';
 	// this list is the available one when uploading a video to a page
 	const CALL_TO_ACTION_TYPE_VALID_VALUES = 'SHOP_NOW,BOOK_TRAVEL,LEARN_MORE,SIGN_UP,DOWNLOAD,WATCH_MORE';
 	const DEFAULT_RE_REQUEST_PERMISSIONS = 'false';
 	// needed permission in order to be able to publish the video to a facebook page
 	const DEFAULT_FACEBOOK_PERMISSIONS = 'manage_pages,publish_actions,user_videos,publish_pages,user_actions.video';
+	// targeting
+	const CUSTOM_DATA_TARGETING_COUNTRIES = 'targetingCountries'; //list
+	const CUSTOM_DATA_TARGETING_REGIONS = 'targetingRegions'; //list
+	const CUSTOM_DATA_TARGETING_CITIES = 'targetingCities'; //list
+	const CUSTOM_DATA_TARGETING_ZIP_CODES = 'targetingZipCodes'; //list
+	const CUSTOM_DATA_TARGETING_EXCLUDED_COUNTRIES = 'targetingExcludedCountries';//list
+	const CUSTOM_DATA_TARGETING_EXCLUDED_REGIONS = 'targetingExcludedRegions';//list
+	const CUSTOM_DATA_TARGETING_EXCLUDED_CITIES = 'targetingExcludedCities';//list
+	const CUSTOM_DATA_TARGETING_EXCLUDED_ZIPCODES = 'targetingExcludedZipCodes';//list
+	const CUSTOM_DATA_TARGETING_TIMEZONES = 'targetingTimezones';//list
+	const CUSTOM_DATA_TARGETING_AGE_MIN = 'targetingAgeMin';
+	const CUSTOM_DATA_TARGETING_AGE_MAX = 'targetingAgeMax';
+	const CUSTOM_DATA_TARGETING_GENDERS = 'targetingGenders';//list
+	const CUSTOM_DATA_TARGETING_LOCALES = 'targetingLocales';//list
 
 
 
@@ -36,7 +49,7 @@ class FacebookDistributionProfile extends ConfigurableDistributionProfile
 	{
 		return FacebookDistributionPlugin::getProvider();
 	}
-			
+
 	/* (non-PHPdoc)
 	 * @see DistributionProfile::validateForSubmission()
 	 */
@@ -45,7 +58,7 @@ class FacebookDistributionProfile extends ConfigurableDistributionProfile
 		$validationErrors = parent::validateForSubmission($entryDistribution, $action);
 
 		$inListOrNullFields = array (
-		    FacebookDistributionField::CALL_TO_ACTION_TYPE_VALID_VALUES => explode(',', self::CALL_TO_ACTION_TYPE_VALID_VALUES),
+			FacebookDistributionField::CALL_TO_ACTION_TYPE_VALID_VALUES => explode(',', self::CALL_TO_ACTION_TYPE_VALID_VALUES),
 		);
 
 		if(count($entryDistribution->getFlavorAssetIds()))
@@ -68,11 +81,11 @@ class FacebookDistributionProfile extends ConfigurableDistributionProfile
 			KalturaLog::err("No valid video found for entry [" . $entryDistribution->getEntryId() . "]");
 			$validationErrors[] = $this->createCustomValidationError($action, DistributionErrorType::INVALID_DATA, 'flavorAsset', ' No valid flavor found');
 		}
-		
+
 		$allFieldValues = $this->getAllFieldValues($entryDistribution);
 		if (!$allFieldValues || !is_array($allFieldValues)) {
-		    KalturaLog::err('Error getting field values from entry distribution id ['.$entryDistribution->getId().'] profile id ['.$this->getId().']');
-		    return $validationErrors;
+			KalturaLog::err('Error getting field values from entry distribution id ['.$entryDistribution->getId().'] profile id ['.$this->getId().']');
+			return $validationErrors;
 		}
 		if ($allFieldValues[FacebookDistributionField::SCHEDULE_PUBLISHING_TIME] &&
 			$allFieldValues[FacebookDistributionField::SCHEDULE_PUBLISHING_TIME] > time() &&
@@ -83,7 +96,7 @@ class FacebookDistributionProfile extends ConfigurableDistributionProfile
 			KalturaLog::err("Scheduled time to publish defies the facebook restriction of six minute to six months from now got".$allFieldValues[FacebookDistributionField::SCHEDULE_PUBLISHING_TIME]);
 			$validationErrors[] = $this->createCustomValidationError($action, DistributionErrorType::INVALID_DATA, 'sunrise', 'Distribution sunrise is invalid (should be 6 minutes to 6 months from now)');
 		}
-	    $validationErrors = array_merge($validationErrors, $this->validateInListOrNull($inListOrNullFields, $allFieldValues, $action));
+		$validationErrors = array_merge($validationErrors, $this->validateInListOrNull($inListOrNullFields, $allFieldValues, $action));
 		return $validationErrors;
 	}
 
@@ -98,7 +111,6 @@ class FacebookDistributionProfile extends ConfigurableDistributionProfile
 	public function getCallToActionLinkCaption()	{return $this->getFromCustomData(self::CUSTOM_DATA_CALL_TO_ACTION_LINK_CAPTION);}
 	public function getPlace()				   		{return $this->getFromCustomData(self::CUSTOM_DATA_PLACE);}
 	public function getTags()				   		{return $this->getFromCustomData(self::CUSTOM_DATA_TAGS);}
-	public function getTargeting()					{return $this->getFromCustomData(self::CUSTOM_DATA_TARGETING);}
 	public function getFeedTargeting()				{return $this->getFromCustomData(self::CUSTOM_DATA_FEED_TARGETING);}
 
 	public function setPageId($v)			    	{$this->putInCustomData(self::CUSTOM_DATA_PAGE_ID, $v);}
@@ -112,14 +124,41 @@ class FacebookDistributionProfile extends ConfigurableDistributionProfile
 	public function setCallToActionLinkCaption($v)	{$this->putInCustomData(self::CUSTOM_DATA_CALL_TO_ACTION_LINK_CAPTION, $v);}
 	public function setPlace($v)					{$this->putInCustomData(self::CUSTOM_DATA_PLACE, $v);}
 	public function setTags($v)				    	{$this->putInCustomData(self::CUSTOM_DATA_TAGS, $v);}
-	public function setTargeting($v)				{$this->putInCustomData(self::CUSTOM_DATA_TARGETING, $v);}
 	public function setFeedTargeting($v)			{$this->putInCustomData(self::CUSTOM_DATA_FEED_TARGETING, $v);}
+
+	public function getTargetingCountries()			{return $this->getFromCustomData(self::CUSTOM_DATA_TARGETING_COUNTRIES);}
+	public function getTargetingRegions()			{return $this->getFromCustomData(self::CUSTOM_DATA_TARGETING_REGIONS );}
+	public function getTargetingCities()			{return $this->getFromCustomData(self::CUSTOM_DATA_TARGETING_CITIES);}
+	public function getTargetingZipCodes()			{return $this->getFromCustomData(self::CUSTOM_DATA_TARGETING_ZIP_CODES);}
+	public function getTargetingExcludedCountries()	{return $this->getFromCustomData(self::CUSTOM_DATA_TARGETING_EXCLUDED_COUNTRIES);}
+	public function getTargetingExcludedRegions()	{return $this->getFromCustomData(self::CUSTOM_DATA_TARGETING_EXCLUDED_REGIONS);}
+	public function getTargetingExcludedCities()	{return $this->getFromCustomData(self::CUSTOM_DATA_TARGETING_EXCLUDED_CITIES);}
+	public function getTargetingExcludedZipCodes()	{return $this->getFromCustomData(self::CUSTOM_DATA_TARGETING_EXCLUDED_ZIPCODES);}
+	public function getTargetingTimezones()			{return $this->getFromCustomData(self::CUSTOM_DATA_TARGETING_TIMEZONES);}
+	public function getTargetingAgeMax()			{return $this->getFromCustomData(self::CUSTOM_DATA_TARGETING_AGE_MAX);}
+	public function getTargetingAgeMin()			{return $this->getFromCustomData(self::CUSTOM_DATA_TARGETING_AGE_MIN);}
+	public function getTargetingGenders()			{return $this->getFromCustomData(self::CUSTOM_DATA_TARGETING_GENDERS);}
+	public function getTargetingLocales()			{return $this->getFromCustomData(self::CUSTOM_DATA_TARGETING_LOCALES);}
+
+	public function setTargetingCountries($v)			{return $this->putInCustomData(self::CUSTOM_DATA_TARGETING_COUNTRIES, $v);}
+	public function setTargetingRegions($v)				{return $this->putInCustomData(self::CUSTOM_DATA_TARGETING_REGIONS, $v);}
+	public function setTargetingCities($v)				{return $this->putInCustomData(self::CUSTOM_DATA_TARGETING_CITIES, $v);}
+	public function setTargetingZipCodes($v)			{return $this->putInCustomData(self::CUSTOM_DATA_TARGETING_ZIP_CODES, $v);}
+	public function setTargetingExcludedCountries($v)	{return $this->putInCustomData(self::CUSTOM_DATA_TARGETING_EXCLUDED_COUNTRIES, $v);}
+	public function setTargetingExcludedRegions($v)		{return $this->putInCustomData(self::CUSTOM_DATA_TARGETING_EXCLUDED_REGIONS, $v);}
+	public function setTargetingExcludedCities($v)		{return $this->putInCustomData(self::CUSTOM_DATA_TARGETING_EXCLUDED_CITIES, $v);}
+	public function setTargetingExcludedZipCodes($v)	{return $this->putInCustomData(self::CUSTOM_DATA_TARGETING_EXCLUDED_ZIPCODES, $v);}
+	public function setTargetingTimezones($v)			{return $this->putInCustomData(self::CUSTOM_DATA_TARGETING_TIMEZONES, $v);}
+	public function setTargetingAgeMax($v)				{return $this->putInCustomData(self::CUSTOM_DATA_TARGETING_AGE_MAX, $v);}
+	public function setTargetingAgeMin($v)				{return $this->putInCustomData(self::CUSTOM_DATA_TARGETING_AGE_MIN, $v);}
+	public function setTargetingGenders($v)				{return $this->putInCustomData(self::CUSTOM_DATA_TARGETING_GENDERS, $v);}
+	public function setTargetingLocales($v)				{return $this->putInCustomData(self::CUSTOM_DATA_TARGETING_LOCALES, $v);}
 
 
 	protected function getDefaultFieldConfigArray()
-	{	    
-	    $fieldConfigArray = parent::getDefaultFieldConfigArray();
-	    
+	{
+		$fieldConfigArray = parent::getDefaultFieldConfigArray();
+
 		$fieldConfig = new DistributionFieldConfig();
 		$fieldConfig->setFieldName(FacebookDistributionField::TITLE);
 		$fieldConfig->setUserFriendlyFieldName('Video title');
@@ -138,29 +177,111 @@ class FacebookDistributionProfile extends ConfigurableDistributionProfile
 		$fieldConfig->setIsRequired(DistributionFieldRequiredStatus::REQUIRED_BY_PROVIDER);
 		$fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 
-	    $fieldConfig = new DistributionFieldConfig();
-	    $fieldConfig->setFieldName(FacebookDistributionField::SCHEDULE_PUBLISHING_TIME);
-	    $fieldConfig->setUserFriendlyFieldName('Schedule Sunrise Time');
-	    $fieldConfig->setEntryMrssXslt('<xsl:value-of select="distribution[@entryDistributionId=$entryDistributionId]/sunrise" />');
-	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;	   
-
-	    $fieldConfig = new DistributionFieldConfig();
-	    $fieldConfig->setFieldName(FacebookDistributionField::CALL_TO_ACTION_TYPE);
-	    $fieldConfig->setUserFriendlyFieldName('Call To Action Type');
-	    $fieldConfig->setEntryMrssXslt('<xsl:value-of select="customData/metadata/CallToActionType" />');
-	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
-	    
-	   	$fieldConfig = new DistributionFieldConfig();
-	    $fieldConfig->setFieldName(FacebookDistributionField::CALL_TO_ACTION_LINK);
-	    $fieldConfig->setUserFriendlyFieldName('Call To Action Link');
-	    $fieldConfig->setEntryMrssXslt('<xsl:value-of select="customData/metadata/CallToActionLink" />');
-	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
+		$fieldConfig = new DistributionFieldConfig();
+		$fieldConfig->setFieldName(FacebookDistributionField::SCHEDULE_PUBLISHING_TIME);
+		$fieldConfig->setUserFriendlyFieldName('Schedule Sunrise Time');
+		$fieldConfig->setEntryMrssXslt('<xsl:value-of select="distribution[@entryDistributionId=$entryDistributionId]/sunrise" />');
+		$fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 
 		$fieldConfig = new DistributionFieldConfig();
-	    $fieldConfig->setFieldName(FacebookDistributionField::CALL_TO_ACTION_LINK_CAPTION);
-	    $fieldConfig->setUserFriendlyFieldName('Call To Action Link Caption');
-	    $fieldConfig->setEntryMrssXslt('<xsl:value-of select="customData/metadata/CallToActionLinkCaption" />');
-	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
+		$fieldConfig->setFieldName(FacebookDistributionField::CALL_TO_ACTION_TYPE);
+		$fieldConfig->setUserFriendlyFieldName('Call To Action Type');
+		$fieldConfig->setEntryMrssXslt('<xsl:value-of select="customData/metadata/CallToActionType" />');
+		$fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
+
+		$fieldConfig = new DistributionFieldConfig();
+		$fieldConfig->setFieldName(FacebookDistributionField::CALL_TO_ACTION_LINK);
+		$fieldConfig->setUserFriendlyFieldName('Call To Action Link');
+		$fieldConfig->setEntryMrssXslt('<xsl:value-of select="customData/metadata/CallToActionLink" />');
+		$fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
+
+		$fieldConfig = new DistributionFieldConfig();
+		$fieldConfig->setFieldName(FacebookDistributionField::CALL_TO_ACTION_LINK_CAPTION);
+		$fieldConfig->setUserFriendlyFieldName('Call To Action Link Caption');
+		$fieldConfig->setEntryMrssXslt('<xsl:value-of select="customData/metadata/CallToActionLinkCaption" />');
+		$fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
+
+		$fieldConfig = new DistributionFieldConfig();
+		$fieldConfig->setFieldName(FacebookDistributionField::TARGETING_COUNTRIES);
+		$fieldConfig->setUserFriendlyFieldName('Key IDs for ad targeting objects used to limit the audience of the video');
+		$fieldConfig->setEntryMrssXslt('<xsl:value-of select="customData/metadata/TargetingCountries" />');
+		$fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
+
+		$fieldConfig = new DistributionFieldConfig();
+		$fieldConfig->setFieldName(FacebookDistributionField::TARGETING_CITIES);
+		$fieldConfig->setUserFriendlyFieldName('Key IDs for ad targeting objects used to limit the audience of the video');
+		$fieldConfig->setEntryMrssXslt('<xsl:value-of select="customData/metadata/TargetingCities" />');
+		$fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
+
+		$fieldConfig = new DistributionFieldConfig();
+		$fieldConfig->setFieldName(FacebookDistributionField::TARGETING_REGIONS);
+		$fieldConfig->setUserFriendlyFieldName('Key IDs for ad targeting objects used to limit the audience of the video');
+		$fieldConfig->setEntryMrssXslt('<xsl:value-of select="customData/metadata/TargetingRegions" />');
+		$fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
+
+		$fieldConfig = new DistributionFieldConfig();
+		$fieldConfig->setFieldName(FacebookDistributionField::TARGETING_ZIP_CODES);
+		$fieldConfig->setUserFriendlyFieldName('Key IDs for ad targeting objects used to limit the audience of the video');
+		$fieldConfig->setEntryMrssXslt('<xsl:value-of select="customData/metadata/TargetingZipCodes" />');
+		$fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
+
+		$fieldConfig = new DistributionFieldConfig();
+		$fieldConfig->setFieldName(FacebookDistributionField::TARGETING_EXCLUDED_COUNTRIES);
+		$fieldConfig->setUserFriendlyFieldName('Key IDs for ad targeting objects used to limit the audience of the video');
+		$fieldConfig->setEntryMrssXslt('<xsl:value-of select="customData/metadata/TargetingExcludedCountries" />');
+		$fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
+
+		$fieldConfig = new DistributionFieldConfig();
+		$fieldConfig->setFieldName(FacebookDistributionField::TARGETING_EXCLUDED_CITIES);
+		$fieldConfig->setUserFriendlyFieldName('Key IDs for ad targeting objects used to limit the audience of the video');
+		$fieldConfig->setEntryMrssXslt('<xsl:value-of select="customData/metadata/TargetingExcludedCities" />');
+		$fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
+
+		$fieldConfig = new DistributionFieldConfig();
+		$fieldConfig->setFieldName(FacebookDistributionField::TARGETING_EXCLUDED_REGIONS);
+		$fieldConfig->setUserFriendlyFieldName('Key IDs for ad targeting objects used to limit the audience of the video');
+		$fieldConfig->setEntryMrssXslt('<xsl:value-of select="customData/metadata/TargetingExcludedRegions" />');
+		$fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
+
+		$fieldConfig = new DistributionFieldConfig();
+		$fieldConfig->setFieldName(FacebookDistributionField::TARGETING_EXCLUDED_ZIPCODES);
+		$fieldConfig->setUserFriendlyFieldName('Key IDs for ad targeting objects used to limit the audience of the video');
+		$fieldConfig->setEntryMrssXslt('<xsl:value-of select="customData/metadata/TargetingExcludedZipCodes" />');
+		$fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
+
+
+		$fieldConfig = new DistributionFieldConfig();
+		$fieldConfig->setFieldName(FacebookDistributionField::TARGETING_TIMEZONES);
+		$fieldConfig->setUserFriendlyFieldName('Key IDs for ad targeting objects used to limit the audience of the video');
+		$fieldConfig->setEntryMrssXslt('<xsl:value-of select="customData/metadata/TargetingTimezones" />');
+		$fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
+
+
+		$fieldConfig = new DistributionFieldConfig();
+		$fieldConfig->setFieldName(FacebookDistributionField::TARGETING_AGE_MAX);
+		$fieldConfig->setUserFriendlyFieldName('Key IDs for ad targeting objects used to limit the audience of the video');
+		$fieldConfig->setEntryMrssXslt('<xsl:value-of select="customData/metadata/TargetingAgeMax" />');
+		$fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
+
+		$fieldConfig = new DistributionFieldConfig();
+		$fieldConfig->setFieldName(FacebookDistributionField::TARGETING_AGE_MIN);
+		$fieldConfig->setUserFriendlyFieldName('Key IDs for ad targeting objects used to limit the audience of the video');
+		$fieldConfig->setEntryMrssXslt('<xsl:value-of select="customData/metadata/TargetingAgeMin" />');
+		$fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
+
+		$fieldConfig = new DistributionFieldConfig();
+		$fieldConfig->setFieldName(FacebookDistributionField::TARGETING_GENDERS);
+		$fieldConfig->setUserFriendlyFieldName('Key IDs for ad targeting objects used to limit the audience of the video');
+		$fieldConfig->setEntryMrssXslt('<xsl:value-of select="customData/metadata/TargetingGenders" />');
+		$fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
+
+		$fieldConfig = new DistributionFieldConfig();
+		$fieldConfig->setFieldName(FacebookDistributionField::TARGETING_LOCALES);
+		$fieldConfig->setUserFriendlyFieldName('Key IDs for ad targeting objects used to limit the audience of the video');
+		$fieldConfig->setEntryMrssXslt('<xsl:value-of select="customData/metadata/TargetingLocale" />');
+		$fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
+
+
 
 //	   	$fieldConfig = new DistributionFieldConfig();
 //	    $fieldConfig->setFieldName(FacebookDistributionField::PLACE);
@@ -174,19 +295,14 @@ class FacebookDistributionProfile extends ConfigurableDistributionProfile
 //	    $fieldConfig->setEntryMrssXslt('<xsl:value-of select="customData/metadata/Tags" />');
 //	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 //
-//	   	$fieldConfig = new DistributionFieldConfig();
-//	    $fieldConfig->setFieldName(FacebookDistributionField::TARGETING);
-//	    $fieldConfig->setUserFriendlyFieldName('Key IDs for ad targeting objects used to limit the audience of the video');
-//	    $fieldConfig->setEntryMrssXslt('<xsl:value-of select="distribution[@entryDistributionId=$entryDistributionId]/Targeting" />');
-//	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 //
 //	   	$fieldConfig = new DistributionFieldConfig();
 //	    $fieldConfig->setFieldName(FacebookDistributionField::FEED_TARGETING);
 //	    $fieldConfig->setUserFriendlyFieldName('Key IDs for ad targeting objects used to promote the video in specific audience feeds');
 //	    $fieldConfig->setEntryMrssXslt('<xsl:value-of select="distribution[@entryDistributionId=$entryDistributionId]/FeedTargeting" />');
 //	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
-	      
-	    return $fieldConfigArray;
+
+		return $fieldConfigArray;
 	}
 
 	public function getApiAuthorizeUrl()
@@ -207,7 +323,7 @@ class FacebookDistributionProfile extends ConfigurableDistributionProfile
 		return null;
 
 	}
-	
+
 	private function validateVideo(flavorAsset $flavorAsset)
 	{
 		$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
@@ -225,8 +341,8 @@ class FacebookDistributionProfile extends ConfigurableDistributionProfile
 			catch(Exception $e)
 			{
 				KalturaLog::debug('Asset ['.$flavorAsset->getId().'] not valid for distribution: '.$e->getMessage());
-			}			
-		}				
+			}
+		}
 		return false;
 	}
 

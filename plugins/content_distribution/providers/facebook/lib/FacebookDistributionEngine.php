@@ -13,6 +13,8 @@ class FacebookDistributionEngine extends DistributionEngine implements
 	protected $appId;
 	protected $appSecret;
 
+	const FACEBOOK_CUSTOM_DATA_DELIMITER = ';';
+
 	/* (non-PHPdoc)
 	 * @see DistributionEngine::configure()
 	 */
@@ -213,8 +215,43 @@ class FacebookDistributionEngine extends DistributionEngine implements
 				$facebookMetadata['scheduled_publish_time'] = $fieldValues[FacebookDistributionField::SCHEDULE_PUBLISHING_TIME];
 				$facebookMetadata['published'] = 'false';
 			}
+			$targetingMetadata = array();
+			$this->insertTargetingFacebookMetadata($targetingMetadata, 'countries', $fieldValues[FacebookDistributionField::TARGETING_COUNTRIES], true);
+			$this->insertTargetingFacebookMetadata($targetingMetadata, 'regions', $fieldValues[FacebookDistributionField::TARGETING_REGIONS], true);
+			$this->insertTargetingFacebookMetadata($targetingMetadata, 'cities', $fieldValues[FacebookDistributionField::TARGETING_CITIES], true);
+			$this->insertTargetingFacebookMetadata($targetingMetadata, 'zipcodes', $fieldValues[FacebookDistributionField::TARGETING_ZIP_CODES], true);
+			$this->insertTargetingFacebookMetadata($targetingMetadata, 'excluded_countries', $fieldValues[FacebookDistributionField::TARGETING_EXCLUDED_COUNTRIES], true);
+			$this->insertTargetingFacebookMetadata($targetingMetadata, 'excluded_regions', $fieldValues[FacebookDistributionField::TARGETING_EXCLUDED_REGIONS], true);
+			$this->insertTargetingFacebookMetadata($targetingMetadata, 'excluded_cities', $fieldValues[FacebookDistributionField::TARGETING_EXCLUDED_CITIES], true);
+			$this->insertTargetingFacebookMetadata($targetingMetadata, 'excluded_zipcodes', $fieldValues[FacebookDistributionField::TARGETING_EXCLUDED_ZIPCODES], true);
+			$this->insertTargetingFacebookMetadata($targetingMetadata, 'timezones', $fieldValues[FacebookDistributionField::TARGETING_TIMEZONES], true);
+			$this->insertTargetingFacebookMetadata($targetingMetadata, 'age_min', $fieldValues[FacebookDistributionField::TARGETING_AGE_MIN], false);
+			$this->insertTargetingFacebookMetadata($targetingMetadata, 'age_max', $fieldValues[FacebookDistributionField::TARGETING_AGE_MAX], false);
+			$this->insertTargetingFacebookMetadata($targetingMetadata, 'genders', $fieldValues[FacebookDistributionField::TARGETING_GENDERS], true);
+			$this->insertTargetingFacebookMetadata($targetingMetadata, 'locales', $fieldValues[FacebookDistributionField::TARGETING_LOCALES], true);
+			if (!empty($targetingMetadata))
+				$facebookMetadata['targeting'] = json_encode($targetingMetadata);
 		}
+
 		return $facebookMetadata;
+	}
+
+	private function insertTargetingFacebookMetadata(&$targetingArray, $key, $value, $isArray)
+	{
+		if ($value)
+		{
+			if($isArray)
+			{
+				if (strpos($value, self::FACEBOOK_CUSTOM_DATA_DELIMITER) !== false)
+				{
+					$targetingArray[$key] = explode(self::FACEBOOK_CUSTOM_DATA_DELIMITER, $value);
+				} else {
+					$targetingArray[$key] = array($value);
+				}
+			} else {
+				$targetingArray[$key] = $value;
+			}
+		}
 	}
 
 }
