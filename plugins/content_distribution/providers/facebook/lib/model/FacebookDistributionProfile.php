@@ -49,7 +49,7 @@ class FacebookDistributionProfile extends ConfigurableDistributionProfile
 	{
 		return FacebookDistributionPlugin::getProvider();
 	}
-			
+
 	/* (non-PHPdoc)
 	 * @see DistributionProfile::validateForSubmission()
 	 */
@@ -58,7 +58,7 @@ class FacebookDistributionProfile extends ConfigurableDistributionProfile
 		$validationErrors = parent::validateForSubmission($entryDistribution, $action);
 
 		$inListOrNullFields = array (
-		    FacebookDistributionField::CALL_TO_ACTION_TYPE_VALID_VALUES => explode(',', self::CALL_TO_ACTION_TYPE_VALID_VALUES),
+			FacebookDistributionField::CALL_TO_ACTION_TYPE_VALID_VALUES => explode(',', self::CALL_TO_ACTION_TYPE_VALID_VALUES),
 		);
 
 		if(count($entryDistribution->getFlavorAssetIds()))
@@ -81,11 +81,11 @@ class FacebookDistributionProfile extends ConfigurableDistributionProfile
 			KalturaLog::err("No valid video found for entry [" . $entryDistribution->getEntryId() . "]");
 			$validationErrors[] = $this->createCustomValidationError($action, DistributionErrorType::INVALID_DATA, 'flavorAsset', ' No valid flavor found');
 		}
-		
+
 		$allFieldValues = $this->getAllFieldValues($entryDistribution);
 		if (!$allFieldValues || !is_array($allFieldValues)) {
-		    KalturaLog::err('Error getting field values from entry distribution id ['.$entryDistribution->getId().'] profile id ['.$this->getId().']');
-		    return $validationErrors;
+			KalturaLog::err('Error getting field values from entry distribution id ['.$entryDistribution->getId().'] profile id ['.$this->getId().']');
+			return $validationErrors;
 		}
 		if ($allFieldValues[FacebookDistributionField::SCHEDULE_PUBLISHING_TIME] &&
 			$allFieldValues[FacebookDistributionField::SCHEDULE_PUBLISHING_TIME] > time() &&
@@ -96,7 +96,7 @@ class FacebookDistributionProfile extends ConfigurableDistributionProfile
 			KalturaLog::err("Scheduled time to publish defies the facebook restriction of six minute to six months from now got".$allFieldValues[FacebookDistributionField::SCHEDULE_PUBLISHING_TIME]);
 			$validationErrors[] = $this->createCustomValidationError($action, DistributionErrorType::INVALID_DATA, 'sunrise', 'Distribution sunrise is invalid (should be 6 minutes to 6 months from now)');
 		}
-	    $validationErrors = array_merge($validationErrors, $this->validateInListOrNull($inListOrNullFields, $allFieldValues, $action));
+		$validationErrors = array_merge($validationErrors, $this->validateInListOrNull($inListOrNullFields, $allFieldValues, $action));
 		return $validationErrors;
 	}
 
@@ -156,9 +156,9 @@ class FacebookDistributionProfile extends ConfigurableDistributionProfile
 
 
 	protected function getDefaultFieldConfigArray()
-	{	    
-	    $fieldConfigArray = parent::getDefaultFieldConfigArray();
-	    
+	{
+		$fieldConfigArray = parent::getDefaultFieldConfigArray();
+
 		$fieldConfig = new DistributionFieldConfig();
 		$fieldConfig->setFieldName(FacebookDistributionField::TITLE);
 		$fieldConfig->setUserFriendlyFieldName('Video title');
@@ -177,29 +177,29 @@ class FacebookDistributionProfile extends ConfigurableDistributionProfile
 		$fieldConfig->setIsRequired(DistributionFieldRequiredStatus::REQUIRED_BY_PROVIDER);
 		$fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 
-	    $fieldConfig = new DistributionFieldConfig();
-	    $fieldConfig->setFieldName(FacebookDistributionField::SCHEDULE_PUBLISHING_TIME);
-	    $fieldConfig->setUserFriendlyFieldName('Schedule Sunrise Time');
-	    $fieldConfig->setEntryMrssXslt('<xsl:value-of select="distribution[@entryDistributionId=$entryDistributionId]/sunrise" />');
-	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;	   
-
-	    $fieldConfig = new DistributionFieldConfig();
-	    $fieldConfig->setFieldName(FacebookDistributionField::CALL_TO_ACTION_TYPE);
-	    $fieldConfig->setUserFriendlyFieldName('Call To Action Type');
-	    $fieldConfig->setEntryMrssXslt('<xsl:value-of select="customData/metadata/CallToActionType" />');
-	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
-	    
-	   	$fieldConfig = new DistributionFieldConfig();
-	    $fieldConfig->setFieldName(FacebookDistributionField::CALL_TO_ACTION_LINK);
-	    $fieldConfig->setUserFriendlyFieldName('Call To Action Link');
-	    $fieldConfig->setEntryMrssXslt('<xsl:value-of select="customData/metadata/CallToActionLink" />');
-	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
+		$fieldConfig = new DistributionFieldConfig();
+		$fieldConfig->setFieldName(FacebookDistributionField::SCHEDULE_PUBLISHING_TIME);
+		$fieldConfig->setUserFriendlyFieldName('Schedule Sunrise Time');
+		$fieldConfig->setEntryMrssXslt('<xsl:value-of select="distribution[@entryDistributionId=$entryDistributionId]/sunrise" />');
+		$fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 
 		$fieldConfig = new DistributionFieldConfig();
-	    $fieldConfig->setFieldName(FacebookDistributionField::CALL_TO_ACTION_LINK_CAPTION);
-	    $fieldConfig->setUserFriendlyFieldName('Call To Action Link Caption');
-	    $fieldConfig->setEntryMrssXslt('<xsl:value-of select="customData/metadata/CallToActionLinkCaption" />');
-	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
+		$fieldConfig->setFieldName(FacebookDistributionField::CALL_TO_ACTION_TYPE);
+		$fieldConfig->setUserFriendlyFieldName('Call To Action Type');
+		$fieldConfig->setEntryMrssXslt('<xsl:value-of select="customData/metadata/CallToActionType" />');
+		$fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
+
+		$fieldConfig = new DistributionFieldConfig();
+		$fieldConfig->setFieldName(FacebookDistributionField::CALL_TO_ACTION_LINK);
+		$fieldConfig->setUserFriendlyFieldName('Call To Action Link');
+		$fieldConfig->setEntryMrssXslt('<xsl:value-of select="customData/metadata/CallToActionLink" />');
+		$fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
+
+		$fieldConfig = new DistributionFieldConfig();
+		$fieldConfig->setFieldName(FacebookDistributionField::CALL_TO_ACTION_LINK_CAPTION);
+		$fieldConfig->setUserFriendlyFieldName('Call To Action Link Caption');
+		$fieldConfig->setEntryMrssXslt('<xsl:value-of select="customData/metadata/CallToActionLinkCaption" />');
+		$fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 
 		$fieldConfig = new DistributionFieldConfig();
 		$fieldConfig->setFieldName(FacebookDistributionField::TARGETING_COUNTRIES);
@@ -301,8 +301,8 @@ class FacebookDistributionProfile extends ConfigurableDistributionProfile
 //	    $fieldConfig->setUserFriendlyFieldName('Key IDs for ad targeting objects used to promote the video in specific audience feeds');
 //	    $fieldConfig->setEntryMrssXslt('<xsl:value-of select="distribution[@entryDistributionId=$entryDistributionId]/FeedTargeting" />');
 //	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
-	      
-	    return $fieldConfigArray;
+
+		return $fieldConfigArray;
 	}
 
 	public function getApiAuthorizeUrl()
@@ -323,7 +323,7 @@ class FacebookDistributionProfile extends ConfigurableDistributionProfile
 		return null;
 
 	}
-	
+
 	private function validateVideo(flavorAsset $flavorAsset)
 	{
 		$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
@@ -341,8 +341,8 @@ class FacebookDistributionProfile extends ConfigurableDistributionProfile
 			catch(Exception $e)
 			{
 				KalturaLog::debug('Asset ['.$flavorAsset->getId().'] not valid for distribution: '.$e->getMessage());
-			}			
-		}				
+			}
+		}
 		return false;
 	}
 
