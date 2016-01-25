@@ -10,6 +10,11 @@ class KalturaUserEntryFilter extends KalturaUserEntryBaseFilter
 	 * @var KalturaNullableBoolean
 	 */
 	public $userIdEqualCurrent;
+
+	/**
+	 * @var KalturaNullableBoolean
+	 */
+	public $isAnonymous;
 	
 	/**
 	 * @return baseObjectFilter
@@ -33,6 +38,7 @@ class KalturaUserEntryFilter extends KalturaUserEntryBaseFilter
 			$response->totalCount = 0;
 			return $response;
 		}
+
 
 		$c = new Criteria();
 		if (!is_null($this->userIdEqualCurrent) && $this->userIdEqualCurrent)
@@ -103,6 +109,23 @@ class KalturaUserEntryFilter extends KalturaUserEntryBaseFilter
 			$this->userIdIn = $this->preparePusersToKusersFilter( $this->userIdIn );
 		}
 
+		if(!is_null($this->isAnonymous))
+		{
+			if(KalturaNullableBoolean::toBoolean($this->isAnonymous)===false)
+				$this->userIdNotIn .= self::getListOfAnonymousUsers();
+
+			elseif(KalturaNullableBoolean::toBoolean($this->isAnonymous)===true)
+				$this->userIdIn .= self::getListOfAnonymousUsers();
+		}
 	}
-	
+
+	public static function getListOfAnonymousUsers()
+	{
+		$anonKuserIds = "";
+		$anonKusers = kuserPeer::getKuserByPartnerAndUids(kCurrentContext::getCurrentPartnerId(), array('',null,0));
+		foreach ($anonKusers as $anonKuser) {
+			$anonKuserIds .= ",".$anonKuser->getKuserId();
+		}
+		return $anonKuserIds;
+	}
 }
