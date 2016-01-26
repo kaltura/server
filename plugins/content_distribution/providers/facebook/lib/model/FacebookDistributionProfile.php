@@ -320,7 +320,7 @@ class FacebookDistributionProfile extends ConfigurableDistributionProfile
 		$fieldConfig->setUserFriendlyFieldName('Key IDs for ad targeting objects used to limit the audience of the video');
 		$fieldConfig->setEntryMrssXslt('<xsl:value-of select="customData/metadata/TargetingLocale" />');
 		$fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
-////////
+
 		$fieldConfig = new DistributionFieldConfig();
 		$fieldConfig->setFieldName(FacebookDistributionField::FEED_TARGETING_COUNTRIES);
 		$fieldConfig->setUserFriendlyFieldName('Key IDs for ad targeting objects used to limit the audience of the video');
