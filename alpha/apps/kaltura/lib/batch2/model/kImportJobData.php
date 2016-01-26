@@ -24,6 +24,11 @@ class kImportJobData extends kJobData
 	 * @var int
 	 */
 	private $fileSize;
+
+	/**
+	 * @var string
+	 */
+	private $fileFormat;
 	
 	/**
 	 * @var bool
@@ -107,4 +112,22 @@ class kImportJobData extends kJobData
 	public function setFileSize($fileSize) {
 		$this->fileSize = $fileSize;
 	}
+
+	/**
+	 * @return string
+	 */
+	public function getFileFormat()
+	{
+		return $this->fileFormat;
+	}
+
+	/**
+	 * @param string $fileFormat
+	 */
+	public function setFileFormat($fileFormat)
+	{
+		$this->fileFormat = $fileFormat;
+	}
+	
+	
 }

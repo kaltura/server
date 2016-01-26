@@ -19,6 +19,7 @@ class DropFolderFile extends BaseDropFolderFile implements IRelatedObject
 	const CUSTOM_DATA_LAST_MODIFICATION_TIME = 'last_modification_time';
 	const CUSTOM_DATA_BATCH_JOB_ID = 'batch_job_id';
 	const CUSTOM_DATA_USER_ID = 'user_id';
+	const FILE_FORMAT = 'file_format';
 	
 	public function setFileSize($size)
 	{
@@ -119,5 +120,16 @@ class DropFolderFile extends BaseDropFolderFile implements IRelatedObject
 	{
 		return $this->getFileName();
 	}
-	
+
+	public function getFileFormat()
+	{
+		return $this->getFromCustomData(self::FILE_FORMAT);
+	}
+
+	public function setFileFormat($v)
+	{
+		$this->putInCustomData(self::FILE_FORMAT, $v);
+	}
+
+
 } // DropFolderFile
