@@ -196,6 +196,7 @@ class FacebookDistributionEngine extends DistributionEngine implements
 		$facebookMetadata['title'] = $fieldValues[FacebookDistributionField::TITLE];
 		$facebookMetadata['name'] = $fieldValues[FacebookDistributionField::TITLE];
 		$facebookMetadata['description'] = $fieldValues[FacebookDistributionField::DESCRIPTION];
+		$facebookMetadata['tags'] = $fieldValues[FacebookDistributionField::TAGS];
 		$callToActionType = $fieldValues[FacebookDistributionField::CALL_TO_ACTION_TYPE];
 		if ($callToActionType)
 		{
