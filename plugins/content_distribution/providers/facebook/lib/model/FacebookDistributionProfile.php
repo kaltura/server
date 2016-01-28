@@ -283,12 +283,12 @@ class FacebookDistributionProfile extends ConfigurableDistributionProfile
 
 
 
-//	   	$fieldConfig = new DistributionFieldConfig();
-//	    $fieldConfig->setFieldName(FacebookDistributionField::PLACE);
-//	    $fieldConfig->setUserFriendlyFieldName('ID of location to tag in video');
-//	    $fieldConfig->setEntryMrssXslt('<xsl:value-of select="customData/metadata/Place" />');
-//	    $fieldConfigArray[] = $fieldConfig;
-//
+		$fieldConfig = new DistributionFieldConfig();
+		$fieldConfig->setFieldName(FacebookDistributionField::PLACE);
+		$fieldConfig->setUserFriendlyFieldName('ID of location to tag in video');
+		$fieldConfig->setEntryMrssXslt('<xsl:value-of select="customData/metadata/Place" />');
+		$fieldConfigArray[] = $fieldConfig;
+
 //	    $fieldConfig = new DistributionFieldConfig();
 //	    $fieldConfig->setFieldName(FacebookDistributionField::TAGS);
 //	    $fieldConfig->setUserFriendlyFieldName('IDs (comma separated) of persons to tag in video');
