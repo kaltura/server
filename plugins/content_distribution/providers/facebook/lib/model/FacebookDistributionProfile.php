@@ -154,19 +154,19 @@ class FacebookDistributionProfile extends ConfigurableDistributionProfile
 	public function getTargetingGenders()			{return $this->getFromCustomData(self::CUSTOM_DATA_TARGETING_GENDERS);}
 	public function getTargetingLocales()			{return $this->getFromCustomData(self::CUSTOM_DATA_TARGETING_LOCALES);}
 
-	public function setTargetingCountries($v)			{return $this->putInCustomData(self::CUSTOM_DATA_TARGETING_COUNTRIES, $v);}
-	public function setTargetingRegions($v)				{return $this->putInCustomData(self::CUSTOM_DATA_TARGETING_REGIONS, $v);}
-	public function setTargetingCities($v)				{return $this->putInCustomData(self::CUSTOM_DATA_TARGETING_CITIES, $v);}
-	public function setTargetingZipCodes($v)			{return $this->putInCustomData(self::CUSTOM_DATA_TARGETING_ZIP_CODES, $v);}
-	public function setTargetingExcludedCountries($v)	{return $this->putInCustomData(self::CUSTOM_DATA_TARGETING_EXCLUDED_COUNTRIES, $v);}
-	public function setTargetingExcludedRegions($v)		{return $this->putInCustomData(self::CUSTOM_DATA_TARGETING_EXCLUDED_REGIONS, $v);}
-	public function setTargetingExcludedCities($v)		{return $this->putInCustomData(self::CUSTOM_DATA_TARGETING_EXCLUDED_CITIES, $v);}
-	public function setTargetingExcludedZipCodes($v)	{return $this->putInCustomData(self::CUSTOM_DATA_TARGETING_EXCLUDED_ZIPCODES, $v);}
-	public function setTargetingTimezones($v)			{return $this->putInCustomData(self::CUSTOM_DATA_TARGETING_TIMEZONES, $v);}
-	public function setTargetingAgeMax($v)				{return $this->putInCustomData(self::CUSTOM_DATA_TARGETING_AGE_MAX, $v);}
-	public function setTargetingAgeMin($v)				{return $this->putInCustomData(self::CUSTOM_DATA_TARGETING_AGE_MIN, $v);}
-	public function setTargetingGenders($v)				{return $this->putInCustomData(self::CUSTOM_DATA_TARGETING_GENDERS, $v);}
-	public function setTargetingLocales($v)				{return $this->putInCustomData(self::CUSTOM_DATA_TARGETING_LOCALES, $v);}
+	public function setTargetingCountries($v)			{$this->putInCustomData(self::CUSTOM_DATA_TARGETING_COUNTRIES, $v);}
+	public function setTargetingRegions($v)				{$this->putInCustomData(self::CUSTOM_DATA_TARGETING_REGIONS, $v);}
+	public function setTargetingCities($v)				{$this->putInCustomData(self::CUSTOM_DATA_TARGETING_CITIES, $v);}
+	public function setTargetingZipCodes($v)			{$this->putInCustomData(self::CUSTOM_DATA_TARGETING_ZIP_CODES, $v);}
+	public function setTargetingExcludedCountries($v)	{$this->putInCustomData(self::CUSTOM_DATA_TARGETING_EXCLUDED_COUNTRIES, $v);}
+	public function setTargetingExcludedRegions($v)		{$this->putInCustomData(self::CUSTOM_DATA_TARGETING_EXCLUDED_REGIONS, $v);}
+	public function setTargetingExcludedCities($v)		{$this->putInCustomData(self::CUSTOM_DATA_TARGETING_EXCLUDED_CITIES, $v);}
+	public function setTargetingExcludedZipCodes($v)	{$this->putInCustomData(self::CUSTOM_DATA_TARGETING_EXCLUDED_ZIPCODES, $v);}
+	public function setTargetingTimezones($v)			{$this->putInCustomData(self::CUSTOM_DATA_TARGETING_TIMEZONES, $v);}
+	public function setTargetingAgeMax($v)				{$this->putInCustomData(self::CUSTOM_DATA_TARGETING_AGE_MAX, $v);}
+	public function setTargetingAgeMin($v)				{$this->putInCustomData(self::CUSTOM_DATA_TARGETING_AGE_MIN, $v);}
+	public function setTargetingGenders($v)				{$this->putInCustomData(self::CUSTOM_DATA_TARGETING_GENDERS, $v);}
+	public function setTargetingLocales($v)				{$this->putInCustomData(self::CUSTOM_DATA_TARGETING_LOCALES, $v);}
 
 	public function getFeedTargetingCountries()				{return $this->getFromCustomData(self::CUSTOM_DATA_FEED_TARGETING_COUNTRIES);}
 	public function getFeedTargetingRegions()				{return $this->getFromCustomData(self::CUSTOM_DATA_FEED_TARGETING_REGIONS );}
@@ -182,19 +182,19 @@ class FacebookDistributionProfile extends ConfigurableDistributionProfile
 	public function getFeedTargetingInterests()				{return $this->getFromCustomData(self::CUSTOM_DATA_FEED_TARGETING_INTERESTS);}
 	public function getFeedTargetingRelevantUntil()			{return $this->getFromCustomData(self::CUSTOM_DATA_FEED_TARGETING_RELEVANT_UNTIL);}
 
-	public function setFeedTargetingCountries($v)			{return $this->putInCustomData(self::CUSTOM_DATA_FEED_TARGETING_COUNTRIES, $v);}
-	public function setFeedTargetingRegions($v)				{return $this->putInCustomData(self::CUSTOM_DATA_FEED_TARGETING_REGIONS, $v);}
-	public function setFeedTargetingCities($v)				{return $this->putInCustomData(self::CUSTOM_DATA_FEED_TARGETING_CITIES, $v);}
-	public function setFeedTargetingAgeMax($v)				{return $this->putInCustomData(self::CUSTOM_DATA_FEED_TARGETING_AGE_MAX, $v);}
-	public function setFeedTargetingAgeMin($v)				{return $this->putInCustomData(self::CUSTOM_DATA_FEED_TARGETING_AGE_MIN, $v);}
-	public function setFeedTargetingGenders($v)				{return $this->putInCustomData(self::CUSTOM_DATA_FEED_TARGETING_GENDERS, $v);}
-	public function setFeedTargetingLocales($v)				{return $this->putInCustomData(self::CUSTOM_DATA_FEED_TARGETING_LOCALES, $v);}
-	public function setFeedTargetingRelationshipStatuses($v){return $this->putInCustomData(self::CUSTOM_DATA_FEED_TARGETING_RELATIONSHIP_STATUSES, $v);}
-	public function setFeedTargetingInterestedIn($v)		{return $this->putInCustomData(self::CUSTOM_DATA_FEED_TARGETING_INTERESTED_IN, $v);}
-	public function setFeedTargetingEducationalStatuses($v)	{return $this->putInCustomData(self::CUSTOM_DATA_FEED_TARGETING_EDUCATION_STATUSES, $v);}
-	public function setFeedTargetingCollegeYears($v)		{return $this->putInCustomData(self::CUSTOM_DATA_FEED_TARGETING_COLLEGE_YEARS, $v);}
-	public function setFeedTargetingInterests($v)			{return $this->putInCustomData(self::CUSTOM_DATA_FEED_TARGETING_INTERESTS, $v);}
-	public function setFeedTargetingRelevantUntil($v)		{return $this->putInCustomData(self::CUSTOM_DATA_FEED_TARGETING_RELEVANT_UNTIL, $v);}
+	public function setFeedTargetingCountries($v)			{$this->putInCustomData(self::CUSTOM_DATA_FEED_TARGETING_COUNTRIES, $v);}
+	public function setFeedTargetingRegions($v)				{$this->putInCustomData(self::CUSTOM_DATA_FEED_TARGETING_REGIONS, $v);}
+	public function setFeedTargetingCities($v)				{$this->putInCustomData(self::CUSTOM_DATA_FEED_TARGETING_CITIES, $v);}
+	public function setFeedTargetingAgeMax($v)				{$this->putInCustomData(self::CUSTOM_DATA_FEED_TARGETING_AGE_MAX, $v);}
+	public function setFeedTargetingAgeMin($v)				{$this->putInCustomData(self::CUSTOM_DATA_FEED_TARGETING_AGE_MIN, $v);}
+	public function setFeedTargetingGenders($v)				{$this->putInCustomData(self::CUSTOM_DATA_FEED_TARGETING_GENDERS, $v);}
+	public function setFeedTargetingLocales($v)				{$this->putInCustomData(self::CUSTOM_DATA_FEED_TARGETING_LOCALES, $v);}
+	public function setFeedTargetingRelationshipStatuses($v){$this->putInCustomData(self::CUSTOM_DATA_FEED_TARGETING_RELATIONSHIP_STATUSES, $v);}
+	public function setFeedTargetingInterestedIn($v)		{$this->putInCustomData(self::CUSTOM_DATA_FEED_TARGETING_INTERESTED_IN, $v);}
+	public function setFeedTargetingEducationalStatuses($v)	{$this->putInCustomData(self::CUSTOM_DATA_FEED_TARGETING_EDUCATION_STATUSES, $v);}
+	public function setFeedTargetingCollegeYears($v)		{$this->putInCustomData(self::CUSTOM_DATA_FEED_TARGETING_COLLEGE_YEARS, $v);}
+	public function setFeedTargetingInterests($v)			{$this->putInCustomData(self::CUSTOM_DATA_FEED_TARGETING_INTERESTS, $v);}
+	public function setFeedTargetingRelevantUntil($v)		{$this->putInCustomData(self::CUSTOM_DATA_FEED_TARGETING_RELEVANT_UNTIL, $v);}
 
 
 	protected function getDefaultFieldConfigArray()
@@ -405,11 +405,11 @@ class FacebookDistributionProfile extends ConfigurableDistributionProfile
 		$fieldConfig->setEntryMrssXslt('<xsl:value-of select="customData/metadata/Place" />');
 		$fieldConfigArray[] = $fieldConfig;
 
-//	    $fieldConfig = new DistributionFieldConfig();
-//	    $fieldConfig->setFieldName(FacebookDistributionField::TAGS);
-//	    $fieldConfig->setUserFriendlyFieldName('IDs (comma separated) of persons to tag in video');
-//	    $fieldConfig->setEntryMrssXslt('<xsl:value-of select="customData/metadata/Tags" />');
-//	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
+	    $fieldConfig = new DistributionFieldConfig();
+	    $fieldConfig->setFieldName(FacebookDistributionField::TAGS);
+	    $fieldConfig->setUserFriendlyFieldName('IDs (semicolon separated) of persons to tag in video');
+	    $fieldConfig->setEntryMrssXslt('<xsl:value-of select="customData/metadata/Tags" />');
+	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 
 		return $fieldConfigArray;
 	}

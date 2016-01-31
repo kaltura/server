@@ -195,6 +195,7 @@ class FacebookDistributionEngine extends DistributionEngine implements
 		$facebookMetadata = array();
 		$this->insertToFacebookMetadata($facebookMetadata, 'description', $fieldValues[FacebookDistributionField::DESCRIPTION], false);
 		$this->insertToFacebookMetadata($facebookMetadata, 'place', $fieldValues[FacebookDistributionField::PLACE], false);
+		$this->insertToFacebookMetadata($facebookMetadata, 'tags', $fieldValues[FacebookDistributionField::TAGS], true);
 
 		if ($isSubmit) // these fields should not update
 		{
