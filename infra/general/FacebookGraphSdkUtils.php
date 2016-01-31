@@ -443,7 +443,7 @@ class FacebookConstants
 	const MAX_VIDEO_SIZE = 1750000000; //bytes
 	const MAX_VIDEO_DURATION = 2700000; //milliseconds
 	const FACEBOOK_SDK_VERSION = 'v2.4';
-	const FACEBOOK_MIN_POSTPONE_POST_IN_SECONDS = 360; // 6 minutes
+	const FACEBOOK_MIN_POSTPONE_POST_IN_SECONDS = 600; // 10 minutes
 	const FACEBOOK_MAX_POSTPONE_POST_IN_SECONDS = 15552000; // 6 months
 
 	const FACEBOOK_APP_ID_REQUEST_PARAM = 'app_id';
