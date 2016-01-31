@@ -231,8 +231,25 @@ class FacebookDistributionEngine extends DistributionEngine implements
 			$this->insertTargetingFacebookMetadata($targetingMetadata, 'locales', $fieldValues[FacebookDistributionField::TARGETING_LOCALES], true);
 			if (!empty($targetingMetadata))
 				$facebookMetadata['targeting'] = json_encode($targetingMetadata);
-		}
 
+			$feedTargetingMetadata = array();
+			$this->insertTargetingFacebookMetadata($feedTargetingMetadata, 'countries', $fieldValues[FacebookDistributionField::FEED_TARGETING_COUNTRIES], true);
+			$this->insertTargetingFacebookMetadata($feedTargetingMetadata, 'regions', $fieldValues[FacebookDistributionField::FEED_TARGETING_REGIONS], true);
+			$this->insertTargetingFacebookMetadata($feedTargetingMetadata, 'cities', $fieldValues[FacebookDistributionField::FEED_TARGETING_CITIES], true);
+			$this->insertTargetingFacebookMetadata($feedTargetingMetadata, 'age_min', $fieldValues[FacebookDistributionField::FEED_TARGETING_AGE_MIN], false);
+			$this->insertTargetingFacebookMetadata($feedTargetingMetadata, 'age_max', $fieldValues[FacebookDistributionField::FEED_TARGETING_AGE_MAX], false);
+			$this->insertTargetingFacebookMetadata($feedTargetingMetadata, 'genders', $fieldValues[FacebookDistributionField::FEED_TARGETING_GENDERS], true);
+			$this->insertTargetingFacebookMetadata($feedTargetingMetadata, 'interested_in', $fieldValues[FacebookDistributionField::FEED_TARGETING_INTERESTED_IN], true);
+			$this->insertTargetingFacebookMetadata($feedTargetingMetadata, 'education_statuses', $fieldValues[FacebookDistributionField::FEED_TARGETING_EDUCATION_STATUSES], true);
+			$this->insertTargetingFacebookMetadata($feedTargetingMetadata, 'relationship_statuses', $fieldValues[FacebookDistributionField::FEED_TARGETING_RELATIONSHIP_STATUSES], true);
+			$this->insertTargetingFacebookMetadata($feedTargetingMetadata, 'college_years', $fieldValues[FacebookDistributionField::FEED_TARGETING_COLLEGE_YEARS], true);
+			$this->insertTargetingFacebookMetadata($feedTargetingMetadata, 'interests', $fieldValues[FacebookDistributionField::FEED_TARGETING_INTERESTS], true);
+			$this->insertTargetingFacebookMetadata($feedTargetingMetadata, 'relevant_until', $fieldValues[FacebookDistributionField::FEED_TARGETING_RELEVANT_UNTIL], false);
+			$this->insertTargetingFacebookMetadata($feedTargetingMetadata, 'locales', $fieldValues[FacebookDistributionField::FEED_TARGETING_LOCALES], true);
+			if (!empty($feedTargetingMetadata))
+				$facebookMetadata['feed_targeting'] = json_encode($feedTargetingMetadata);
+		}
+		KalturaLog::info("Facebook metadata constructed as : ".print_r($facebookMetadata, true));
 		return $facebookMetadata;
 	}
 
