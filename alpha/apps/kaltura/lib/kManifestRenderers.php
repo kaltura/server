@@ -889,6 +889,35 @@ class kRedirectManifestRenderer extends kSingleUrlManifestRenderer
 	}
 }
 
+class kJSONManifestRenderer extends kMultiFlavorManifestRenderer
+{
+	/**
+	 * @return array<string>
+	 */
+	protected function getHeaders()
+	{
+		return array(
+				header("Content-Type: application/json"),
+		);
+	}
+
+
+	/* (non-PHPdoc)
+	 * @see kManifestRenderer::getManifestFlavors()
+	 */
+	protected function getManifestFlavors()
+	{
+		$result = array(
+				'entryId' => $this->entryId,
+				'duration' => $this->duration,
+				'baseUrl' => $this->baseUrl,
+				'flavors' => $this->flavors,
+		);
+
+		return array(json_encode($result));
+	}
+}
+
 class kJSONPManifestRenderer extends kMultiFlavorManifestRenderer
 {
 	/**
