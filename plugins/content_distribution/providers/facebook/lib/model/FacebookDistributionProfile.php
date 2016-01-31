@@ -40,19 +40,19 @@ class FacebookDistributionProfile extends ConfigurableDistributionProfile
 	const CUSTOM_DATA_TARGETING_GENDERS = 'targetingGenders';//list
 	const CUSTOM_DATA_TARGETING_LOCALES = 'targetingLocales';//list
 
-	const CUSTOM_DATA_FEED_TARGETING_COUNTRIES = 'targetingCountries'; //list
-	const CUSTOM_DATA_FEED_TARGETING_REGIONS = 'targetingRegions'; //list
-	const CUSTOM_DATA_FEED_TARGETING_CITIES = 'targetingCities'; //list
-	const CUSTOM_DATA_FEED_TARGETING_AGE_MIN = 'targetingAgeMin';
-	const CUSTOM_DATA_FEED_TARGETING_AGE_MAX = 'targetingAgeMax';
-	const CUSTOM_DATA_FEED_TARGETING_GENDERS = 'targetingGenders';//list
-	const CUSTOM_DATA_FEED_TARGETING_LOCALES = 'targetingLocales';//list
-	const CUSTOM_DATA_FEED_TARGETING_RELATIONSHIP_STATUSES = 'relationshipStatuses';//list
-	const CUSTOM_DATA_FEED_TARGETING_INTERESTED_IN = 'interestedIn';//list
-	const CUSTOM_DATA_FEED_TARGETING_EDUCATION_STATUSES = 'educationStatuses';//list
-	const CUSTOM_DATA_FEED_TARGETING_COLLEGE_YEARS = 'collegeYears';//list
-	const CUSTOM_DATA_FEED_TARGETING_INTERESTS = 'interests';//list
-	const CUSTOM_DATA_FEED_TARGETING_RELEVANT_UNTIL = 'relevantUntil';
+	const CUSTOM_DATA_FEED_TARGETING_COUNTRIES = 'feedTargetingCountries'; //list
+	const CUSTOM_DATA_FEED_TARGETING_REGIONS = 'feedTargetingRegions'; //list
+	const CUSTOM_DATA_FEED_TARGETING_CITIES = 'feedTargetingCities'; //list
+	const CUSTOM_DATA_FEED_TARGETING_AGE_MIN = 'feedTargetingAgeMin';
+	const CUSTOM_DATA_FEED_TARGETING_AGE_MAX = 'feedTargetingAgeMax';
+	const CUSTOM_DATA_FEED_TARGETING_GENDERS = 'feedTargetingGenders';//list
+	const CUSTOM_DATA_FEED_TARGETING_LOCALES = 'feedTargetingLocales';//list
+	const CUSTOM_DATA_FEED_TARGETING_RELATIONSHIP_STATUSES = 'feedTargetingRelationshipStatuses';//list
+	const CUSTOM_DATA_FEED_TARGETING_INTERESTED_IN = 'feedTargetingInterestedIn';//list
+	const CUSTOM_DATA_FEED_TARGETING_EDUCATION_STATUSES = 'feedTargetingEducationStatuses';//list
+	const CUSTOM_DATA_FEED_TARGETING_COLLEGE_YEARS = 'feedTargetingCollegeYears';//list
+	const CUSTOM_DATA_FEED_TARGETING_INTERESTS = 'feedTargetingInterests';//list
+	const CUSTOM_DATA_FEED_TARGETING_RELEVANT_UNTIL = 'feedTargetingRelevantUntil';
 
 
 
