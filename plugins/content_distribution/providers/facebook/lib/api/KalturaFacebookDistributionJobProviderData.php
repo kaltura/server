@@ -47,7 +47,6 @@ class KalturaFacebookDistributionJobProviderData extends KalturaConfigurableDist
 		}
 
 		$this->addCaptionsData($distributionJobData);
-
 	}
 	
 	private static $map_between_objects = array
@@ -86,7 +85,7 @@ class KalturaFacebookDistributionJobProviderData extends KalturaConfigurableDist
 				$syncKey = $asset->getSyncKey ( asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET );
 				if (kFileSyncUtils::fileSync_exists ( $syncKey )) 
 				{
-					$captionInfo = $this->getCaptionInfo($asset, $distributionJobData, KalturaFacebookDistributionCaptionAction::SUBMIT_ACTION);
+					$captionInfo = $this->getCaptionInfo($asset);
 					if($captionInfo)
 					{
 						$captionInfo->filePath = kFileSyncUtils::getLocalFilePathForKey ( $syncKey, false );
@@ -101,9 +100,9 @@ class KalturaFacebookDistributionJobProviderData extends KalturaConfigurableDist
 		}
 	}
 	
-	private function getCaptionInfo($asset, KalturaDistributionJobData $distributionJobData, $action)
+	private function getCaptionInfo($asset)
 	{
-		$captionInfo = new KalturaFacebookCaptionDistributionInfo ();
+		$captionInfo = new KalturaFacebookCaptionDistributionInfo();
 		$captionInfo->assetId = $asset->getId();
 		$captionInfo->version = $asset->getVersion();
 		$captionInfo->label = $asset->getLabel();
@@ -114,25 +113,7 @@ class KalturaFacebookDistributionJobProviderData extends KalturaConfigurableDist
 			KalturaLog::err('The caption ['.$asset->getId().'] has unrecognized language ['.$asset->getLanguage().'] and label ['.$asset->getLabel().']');
 			return null;
 		}
-		
-		$distributed = false;
-		foreach ( $distributionJobData->mediaFiles as $mediaFile ) 
-		{
-			if ($mediaFile->assetId == $asset->getId ()) {
-				$distributed = true;
-				break;
-			}
-		}
-		if ($distributed && $action == KalturaFacebookDistributionCaptionAction::DELETE_ACTION||
-			!$distributed && $action == KalturaFacebookDistributionCaptionAction::SUBMIT_ACTION)
-		{
-			$captionInfo->action = $action;
-		}
-		else 
-		{
-			return null;
-		}
-			
+
 		return $captionInfo;
 	}
 	

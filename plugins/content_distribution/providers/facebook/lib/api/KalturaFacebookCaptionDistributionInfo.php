@@ -27,11 +27,6 @@ class KalturaFacebookCaptionDistributionInfo extends KalturaObject{
 	public $remoteId;
 	
 	/**
-	 * @var KalturaFacebookDistributionCaptionAction
-	 */
-	public $action;	
-	
-	/**
 	 * @var string
 	 */
 	public $version;

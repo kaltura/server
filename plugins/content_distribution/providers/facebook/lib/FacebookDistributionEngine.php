@@ -76,9 +76,10 @@ class FacebookDistributionEngine extends DistributionEngine implements
 
 		if ($data->providerData->captionsInfo)
 		{
+			/* @var $captionInfo KalturaFacebookCaptionDistributionInfo */
 			foreach ($data->providerData->captionsInfo as $captionInfo)
 			{
-				$this->submitCaption($data->distributionProfile, $captionInfo, $data->remoteId);
+				$data->mediaFiles[] = $this->submitCaption($data->distributionProfile, $captionInfo, $data->remoteId);
 			}
 		}
 		return true;
@@ -115,8 +116,8 @@ class FacebookDistributionEngine extends DistributionEngine implements
 		// last add all the captions available
 		foreach ($data->providerData->captionsInfo as $captionInfo)
 		{
-			if($captionInfo->action == KalturaDistributionAction::SUBMIT)
-					$data->mediaFiles[] = $this->submitCaption($data->distributionProfile, $captionInfo, $data->entryDistribution->remoteId);
+			/* @var $captionInfo KalturaFacebookCaptionDistributionInfo */
+			$data->mediaFiles[] = $this->submitCaption($data->distributionProfile, $captionInfo, $data->entryDistribution->remoteId);
 		}
 		return true;
 	}
