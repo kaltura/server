@@ -55,6 +55,10 @@ class serveFlavorAction extends kalturaAction
 		
 		list($entryIds, $durations, $referenceEntry) =
 			myPlaylistUtils::executeStitchedPlaylist($entry);
+		if (!$referenceEntry)
+		{
+			KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_FOUND);
+		}
 		
 		// load the flavor assets
 		// Note: not filtering by $flavorParamIds here, so that in case some flavor is missing
