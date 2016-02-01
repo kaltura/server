@@ -10,11 +10,10 @@ class KAMFData
 /**
  * @package plugins.cuePoint
  */
-class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEventConsumer, kObjectChangedEventConsumer, kObjectAddedEventConsumer, kObjectReplacedEventConsumer
+class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEventConsumer, kObjectChangedEventConsumer, kObjectAddedEventConsumer, kObjectReplacedEventConsumer, kObjectCopiedEventConsumer
 {
 	const MAX_CUE_POINTS_TO_COPY_TO_VOD = 100;
-	const MAX_CUE_POINTS_TO_COPY_TO_CLIP = 1000;
-	const CUE_POINT_TIME_EPSILON = 1;
+	const MAX_CUE_POINTS_TO_COPY = 1000;
 
 	/* (non-PHPdoc)
  	 * @see kBatchJobStatusEventConsumer::updatedJob()
@@ -91,9 +90,7 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 		$amfFilesDir = dirname($data->getDestDataFilePath());
 		$pattern = "/{$data->getEntryId()}_{$data->getAssetId()}_{$data->getMediaServerIndex()}_[0-9]*.data/";
 		$files = kFile::recursiveDirList($amfFilesDir, true, false, $pattern);
-		KalturaLog::debug('getAssetDataFilesArray - files: ' . print_r($files, true));
 		natsort($files);
-		KalturaLog::debug('getAssetDataFilesArray2 - files: ' . print_r($files, true));
 		return $files;
 	}
 
@@ -167,6 +164,17 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 		return false;
 	}
 
+	/* (non-PHPdoc)
+	 * @see kObjectCopiedEventConsumer::shouldConsumeCopiedEvent()
+	 */
+	public function shouldConsumeCopiedEvent(BaseObject $fromObject, BaseObject $toObject)
+	{
+		if($fromObject instanceof entry) {
+			return true;
+		}
+		return false;
+	}
+
 	/**
 	 * Return a VOD entry (sourceType = RECORDED_LIVE) based on the flavorAsset that is
 	 * associated with the given mediaInfo object
@@ -227,8 +235,8 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 		}
 		$c = new Criteria();
 		$c->add(CuePointPeer::ENTRY_ID, $object->getId());
-		if ( CuePointPeer::doCount($c) > self::MAX_CUE_POINTS_TO_COPY_TO_CLIP ) {
-			KalturaLog::alert("Can't handle cuePoints after replacement for entry [{$object->getId()}] because cuePoints count exceeded max limit of [" . self::MAX_CUE_POINTS_TO_COPY_TO_CLIP . "]");
+		if ( CuePointPeer::doCount($c) > self::MAX_CUE_POINTS_TO_COPY ) {
+			KalturaLog::alert("Can't handle cuePoints after replacement for entry [{$object->getId()}] because cuePoints count exceeded max limit of [" . self::MAX_CUE_POINTS_TO_COPY . "]");
 			return true;
 		}
 		$clipAttributes = self::getClipAttributesFromEntry( $replacingObject );
@@ -247,6 +255,44 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 			$this->deleteCuePoints($c);
 		}
 		return true;
+	}
+
+	/**
+	 * @param entry $entry
+	 * @return array
+	 */
+	private static function getCuePointTypeToClone($entry)
+	{
+		$listOfEnumIds = array();
+		$cue_point_plugin_map = kPluginableEnumsManager::getCoreMap('CuePointType');
+		foreach ($cue_point_plugin_map as $dynamic_enum_id => $plugin_name)
+		{
+			$plugin = kPluginableEnumsManager::getPlugin($plugin_name);
+			if($plugin::shouldCloneByProperty($entry)==true) {
+				$listOfEnumIds[] = $dynamic_enum_id;
+			}
+		}
+		return $listOfEnumIds;
+	}
+
+	/* (non-PHPdoc)
+	 * @see kObjectCopiedEventConsumer::objectCopied()
+	 */
+	public function objectCopied(BaseObject $fromObject, BaseObject $toObject)
+	{
+		if($fromObject instanceof entry) {
+			$c = new KalturaCriteria();
+			$c->add(CuePointPeer::ENTRY_ID, $fromObject->getId());
+			$c->addAscendingOrderByColumn(CuePointPeer::CREATED_AT);
+			$c->setLimit(self::MAX_CUE_POINTS_TO_COPY);
+			$cuePointTypes = self::getCuePointTypeToClone($toObject);
+			$c->add(CuePointPeer::TYPE,$cuePointTypes,Criteria::IN);
+			$cuePoints = CuePointPeer::doSelect($c);
+			foreach( $cuePoints as $cuePoint ) {
+				$clonedCuePoint = $cuePoint->copyToEntry( $toObject );
+				$clonedCuePoint->save();
+			}
+		}
 	}
 
 	/**
@@ -673,7 +719,6 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 		$c = new KalturaCriteria();
 		$c->add( CuePointPeer::ENTRY_ID, $liveEntry->getId() );
 		$c->add( CuePointPeer::CREATED_AT, $currentSegmentEndTime, KalturaCriteria::LESS_EQUAL ); // Don't copy future cuepoints
-		$c->addAnd( CuePointPeer::CREATED_AT, $currentSegmentStartTime - self::CUE_POINT_TIME_EPSILON, KalturaCriteria::GREATER_EQUAL ); // Don't copy cuepoints before segment begining
 		$c->add( CuePointPeer::STATUS, CuePointStatus::READY ); // READY, but not yet HANDLED
 		$c->addAscendingOrderByColumn(CuePointPeer::CREATED_AT);
 		$c->setLimit( self::MAX_CUE_POINTS_TO_COPY_TO_VOD );
@@ -836,13 +881,13 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 			}
 			$c->addAscendingOrderByColumn(CuePointPeer::CREATED_AT);
 			$rootEntryCuePointsToCopy = CuePointPeer::doSelect($c);
-			if ( count( $rootEntryCuePointsToCopy ) <= self::MAX_CUE_POINTS_TO_COPY_TO_CLIP )
+			if ( count( $rootEntryCuePointsToCopy ) <= self::MAX_CUE_POINTS_TO_COPY )
 			{
 				foreach( $rootEntryCuePointsToCopy as $cuePoint ) {
 					$cuePoint->copyToClipEntry( $clipEntry, $clipStartTime, $clipDuration );
 				}
 			} else {
-				KalturaLog::alert("Can't copy cuePoints for entry [{$clipEntry->getId()}] because cuePoints count exceeded max limit of [" . self::MAX_CUE_POINTS_TO_COPY_TO_CLIP . "]");
+				KalturaLog::alert("Can't copy cuePoints for entry [{$clipEntry->getId()}] because cuePoints count exceeded max limit of [" . self::MAX_CUE_POINTS_TO_COPY . "]");
 			}
 		}
 	}

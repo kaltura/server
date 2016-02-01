@@ -20,4 +20,10 @@ interface IKalturaCuePoint extends IKalturaPermissions, IKalturaEnumerator, IKal
 	 * @return array of core cue point types to index on entry.
 	 */
 	public static function getTypesToIndexOnEntry();
+
+   /**
+	 * @param entry $entry the cloned entry
+	 * @return boolean that indicates if clone is needed
+	 */
+	public static function shouldCloneByProperty(entry $entry);
 }

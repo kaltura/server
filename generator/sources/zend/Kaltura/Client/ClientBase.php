@@ -160,7 +160,7 @@ class Kaltura_Client_ClientBase
 		$this->addParam($params, "kalsig", $signature);
 
 		$url = $this->config->serviceUrl . "/api_v3/service/{$call->service}/action/{$call->action}";
-		$url .= '&' . http_build_query($params);
+		$url .= '?' . http_build_query($params);
 		$this->log("Returned url [$url]");
 		return $url;
 	}

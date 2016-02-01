@@ -3474,27 +3474,28 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	}
 
 	/**
-	 * @param BaseEntryCloneOptions $property
+	 * @param int $property
+	 * @param bool $shouldClone
 	 * @return bool
 	 */
-	public function shouldCloneByProperty($property)
+	public function shouldCloneByProperty($property, $shouldClone = true)
 	{
-		$cloneCategories = true;
 		if (!is_null($this->clone_options))
 		{
 			foreach ($this->clone_options as $cloneOption)
 			{
-				$currentOption = $cloneOption->getItemType();
-				$currentType = $cloneOption->getRule();
-
-				if ($currentOption ==  $property && $currentType == CloneComponentSelectorType::EXCLUDE_COMPONENT)
+				if ($cloneOption->getItemType() == $property)
 				{
-					$cloneCategories = false;
+					$currentRule = $cloneOption->getRule();
+					if ($currentRule == CloneComponentSelectorType::EXCLUDE_COMPONENT)
+						$shouldClone = false;
+					else if ($currentRule == CloneComponentSelectorType::INCLUDE_COMPONENT)
+						$shouldClone = true;
 					break;
 				}
 			}
 		}
-		return $cloneCategories;
+		return $shouldClone;
 	}
 	
 }

@@ -30,6 +30,7 @@ class KalturaMonitorClient
 	const FIELD_TABLE = 			't';
 	const FIELD_QUERY_TYPE = 		'q';
 	const FIELD_FILE_PATH = 		'f';
+	const FIELD_LENGTH =			'n';
 	
 	protected static $queryTypes = array(
 			'SELECT ' 		=> 'SELECT',
@@ -231,6 +232,7 @@ class KalturaMonitorClient
 			self::FIELD_TABLE			=> $tableName,
 			self::FIELD_QUERY_TYPE		=> $queryType,
 			self::FIELD_EXECUTION_TIME	=> $sqlTook,			
+			self::FIELD_LENGTH			=> strlen($sql),
 		));
 		
 		self::writeDeferredEvent($data);

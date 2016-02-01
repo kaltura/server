@@ -111,4 +111,9 @@ class EventCuePointPlugin extends KalturaPlugin implements IKalturaCuePoint, IKa
 	{
 		return array();
 	}
+
+	public static function shouldCloneByProperty(entry $entry)
+	{
+		return false;
+	}
 }

@@ -507,7 +507,7 @@ $plannedDur = 0;
 			&& isset($source->_container) && $source->_container->IsFormatOf(array("mxf")) 
 			&& isset($source->_video) && $source->_video->IsFormatOf(array("mpeg video","mpeg2video")) 
 			&& isset($source->_video->_width) && $source->_video->_width==720
-			&& isset($source->_video->_height) && ($source->_video->_height==608 || $source->_video->_height==576)){
+			&& isset($source->_video->_height) && ($source->_video->_height==608 || $source->_video->_height==576 || $source->_video->_height==486)){
 				$this->_video->_isCropIMX=true;
 			}
 			else {

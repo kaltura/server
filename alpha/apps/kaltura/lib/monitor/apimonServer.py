@@ -2,6 +2,7 @@ from optparse import OptionParser
 from threading import Thread
 from math import isnan
 import SocketServer
+import operator
 import socket
 import time
 import json
@@ -42,7 +43,7 @@ def safeFloat(num):
         return float('nan')
                 
 class CommandHandler(SocketServer.BaseRequestHandler):
-    FIELD_EXECUTION_TIME = 'x'
+    AGGREGATED_FIELDS = 'xn'
     
     @staticmethod
     def getRowBuilder(groupColumns, selectColumns):
@@ -61,23 +62,29 @@ class CommandHandler(SocketServer.BaseRequestHandler):
                     selectValues.append(str(obj[column]))
                 else:
                     selectValues.append('Missing')
-            # get execution time
-            executionTime = float('nan')
-            if obj.has_key(CommandHandler.FIELD_EXECUTION_TIME):
-                executionTime = obj[CommandHandler.FIELD_EXECUTION_TIME]
-            if type(executionTime) == str:
-                if '.' in executionTime:
-                    executionTime = float(executionTime)
-                else:
-                    executionTime = int(executionTime)
-            return ('\t'.join(groupValues), '\t'.join(selectValues), executionTime)
+            # get aggregated fields
+            aggregatedFields = []
+            for fieldName in CommandHandler.AGGREGATED_FIELDS:
+                value = float('nan')
+                if obj.has_key(fieldName):
+                    value = obj[fieldName]
+                if type(value) == str:
+                    if '.' in value:
+                        value = float(value)
+                    else:
+                        value = int(value)
+                aggregatedFields.append(value)
+            return ('\t'.join(groupValues), '\t'.join(selectValues), tuple(aggregatedFields))
         return result
 
     @staticmethod
-    def dictIncrement(theDict, (groupByValues, selectValues, executionTime)):
-        theDict.setdefault(groupByValues, [selectValues, executionTime, 0, 0])      # maxSelect, maxExecTime, totalCount, totalTime
-        theDict[groupByValues][2] += 1
-        theDict[groupByValues][3] += executionTime
+    def dictIncrement(theDict, (groupByValues, selectValues, aggregatedFields)):
+        executionTime = aggregatedFields[0]
+        theDict.setdefault(groupByValues, [selectValues, executionTime, 0, (0,) * len(CommandHandler.AGGREGATED_FIELDS)])      # maxSelect, maxTime, totalCount, aggregatedFields
+        row = theDict[groupByValues]
+        row[2] += 1
+        row[3] = tuple(map(sum, zip(row[3], aggregatedFields)))
+
         if not isnan(executionTime) and (isnan(theDict[groupByValues][1]) or theDict[groupByValues][1] < executionTime):
             theDict[groupByValues][0] = selectValues
             theDict[groupByValues][1] = executionTime
@@ -138,7 +145,7 @@ class CommandHandler(SocketServer.BaseRequestHandler):
         filterFunction = self.getFilterFunction(cmdFilter)
 
         # init group by
-        cmdGroupBy = cmdGroupBy.replace(CommandHandler.FIELD_EXECUTION_TIME, '').strip()
+        cmdGroupBy = filter(lambda x: x not in CommandHandler.AGGREGATED_FIELDS, cmdGroupBy).strip()
         getGroupByColumns = self.getRowBuilder(cmdGroupBy, cmdSelect)
 
         # process the events
@@ -151,20 +158,30 @@ class CommandHandler(SocketServer.BaseRequestHandler):
             result = reduce(self.dictIncrement, curSlot, result)
 
         # format the result
-        execTimeFormat = ''
-        for _, _, _, execTime in result.values():
-            if not isnan(execTime):
-                if type(execTime) == float:
-                    execTimeFormat = '%.3f'
-                elif len(execTimeFormat) == 0:
-                    execTimeFormat = '%d'
-                break
+        aggrFieldsFormat = ''
+        aggrFieldsIndexes = []
+        for fieldIndex in xrange(len(CommandHandler.AGGREGATED_FIELDS)):
+            fieldFormat = ''
+            for _, _, _, aggrFields in result.values():
+                fieldValue = aggrFields[fieldIndex]
+                if isnan(fieldValue):
+                    continue                
+                if type(fieldValue) == float:
+                    fieldFormat = '%.3f\t'
+                    break
+                fieldFormat = '%d\t'
+            if fieldFormat == '':
+                continue
+            aggrFieldsFormat += fieldFormat
+            aggrFieldsIndexes.append(fieldIndex)
 
         resultText = ''
-        if len(execTimeFormat) > 0:
-            formatString = '%s\t' + execTimeFormat + '\t%s\t%s\n'
-            for groupByValues, (selectValues, _, count, execTime) in result.items():
-                resultText += formatString % (count, execTime, groupByValues, selectValues)
+        if len(aggrFieldsFormat) > 0:
+            aggrFieldGetter = operator.itemgetter(*aggrFieldsIndexes)
+            for groupByValues, (selectValues, _, count, aggrFields) in result.items():
+                resultText += ('%s\t' % count + 
+                    aggrFieldsFormat % aggrFieldGetter(aggrFields) +
+                    '%s\t%s\n' % (groupByValues, selectValues))
         else:
             for groupByValues, (selectValues, _, count, _) in result.items():
                 resultText += '%s\t%s\t%s\n' % (count, groupByValues, selectValues)
