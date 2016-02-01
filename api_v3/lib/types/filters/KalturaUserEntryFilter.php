@@ -108,6 +108,10 @@ class KalturaUserEntryFilter extends KalturaUserEntryBaseFilter
 		{
 			$this->userIdIn = $this->preparePusersToKusersFilter( $this->userIdIn );
 		}
+		if(!empty($this->userIdNotIn))
+		{
+			$this->userIdNotIn = $this->preparePusersToKusersFilter( $this->userIdNotIn );
+		}
 
 		if(!is_null($this->isAnonymous))
 		{
@@ -122,7 +126,7 @@ class KalturaUserEntryFilter extends KalturaUserEntryBaseFilter
 	public static function getListOfAnonymousUsers()
 	{
 		$anonKuserIds = "";
-		$anonKusers = kuserPeer::getKuserByPartnerAndUids(kCurrentContext::getCurrentPartnerId(), array('',null,0));
+		$anonKusers = kuserPeer::getKuserByPartnerAndUids(kCurrentContext::getCurrentPartnerId(), array(0,''));
 		foreach ($anonKusers as $anonKuser) {
 			$anonKuserIds .= ",".$anonKuser->getKuserId();
 		}
