@@ -337,8 +337,8 @@ class kFlowHelper
 
 		for ($i = 0 ; $i < count($files); $i++) {
 			if (!isset($filesArr[$i])) {
-				return false;
 				KalturaLog::info("got ts file discontinuity for " . $i);
+				return false;
 			}
 		}
 
