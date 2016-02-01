@@ -286,10 +286,8 @@ class kFlowHelper
 			
 		$files = kFileSyncUtils::dir_get_files($key, false);
 
-		// If we have less files on disk than what we should have it means the output file will be missing segments.
-		// don't generate it, and the next concat will do the work for us.
-		if (count($files) != $data->getFileIndex()+1){
-			KalturaLog::warning('number of segments on disk ' . count($files) . ' is not equal to segment index ' . $data->getFileIndex() . ' - not running the concat job');
+		if (!self::hasFileDiscontinuity($files)) {
+			KalturaLog::warning('we have a discontinuity with ts files - not running the concat job for entry [ ' . $dbBatchJob->getEntryId() . ']' );
 			return $dbBatchJob;
 		}
 
@@ -324,6 +322,35 @@ class kFlowHelper
 		}
 
 		return $dbBatchJob;
+	}
+
+	// get the indexes of all files on disk (form file names)
+	// if we have all from 0 to count($files) - return true
+	// otherwise return false;
+	private static function hasFileDiscontinuity($files)
+	{
+		$filesArr = array();
+
+		foreach($files as $file){
+			$filesArr[intval(self::getFileNumber($file))] = true;
+		}
+
+		for ($i = 0 ; $i < count($files); $i++) {
+			if (!isset($filesArr[$i])) {
+				return false;
+				KalturaLog::info("got ts file discontinuity for " . $i);
+			}
+		}
+
+		return true;
+	}
+
+	private static function getFileNumber($file)
+	{
+		$lastSlash = strrpos($file, '/');
+		$firstDotAfterSlash = strpos($file, '.', $lastSlash);
+		$fileIndex = substr($file, $lastSlash+1, $firstDotAfterSlash - $lastSlash-1);
+		return $fileIndex;
 	}
 
 	private static function createReplacigEntry($recordedEntry)
