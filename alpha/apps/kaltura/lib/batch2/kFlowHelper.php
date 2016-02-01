@@ -286,7 +286,7 @@ class kFlowHelper
 			
 		$files = kFileSyncUtils::dir_get_files($key, false);
 
-		if (!self::hasFileDiscontinuity($files)) {
+		if (self::hasFileDiscontinuity($files)) {
 			KalturaLog::warning('we have a discontinuity with ts files - not running the concat job for entry [ ' . $dbBatchJob->getEntryId() . ']' );
 			return $dbBatchJob;
 		}
@@ -338,11 +338,11 @@ class kFlowHelper
 		for ($i = 0 ; $i < count($files); $i++) {
 			if (!isset($filesArr[$i])) {
 				KalturaLog::info("got ts file discontinuity for " . $i);
-				return false;
+				return true;
 			}
 		}
 
-		return true;
+		return false;
 	}
 
 	private static function getFileNumber($file)
