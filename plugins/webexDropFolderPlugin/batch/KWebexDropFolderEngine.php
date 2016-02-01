@@ -7,6 +7,9 @@ class KWebexDropFolderEngine extends KDropFolderEngine
 	const ZERO_DATE = '12/31/1971 00:00:01';
 	
 	const ARF_FORMAT = 'ARF';
+
+	private static $unsupported_file_formats = array('WARF');
+	
 	/**
 	 * Webex XML API client
 	 * @var WebexXmlClient
@@ -41,7 +44,7 @@ class KWebexDropFolderEngine extends KDropFolderEngine
 		foreach ($physicalFiles as $physicalFile)
 		{
 			/* @var $physicalFile WebexXmlEpRecordingType */
-			if ($physicalFile->getFormat() != self::ARF_FORMAT)
+			if (in_array($physicalFile->getFormat(),self::$unsupported_file_formats))
 			{
 				KalturaLog::info('Recording with id [' . $physicalFile->getRecordingID() . '] format [' . $physicalFile->getFormat() . '] is incompatible with the Kaltura conversion processes. Ignoring.');
 				continue;
