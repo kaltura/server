@@ -13,6 +13,9 @@ class KDLFlavor extends KDLMediaDataSet {
 	const MissingContentNonComplyFlagBit = 4;
 	const ForceCommandLineFlagBit = 8;
 	const FrameSizeNonComplyFlagBit = 16;
+	
+	const ENCRYPTION_KEY_PLACEHOLDER = "__ENCRYPTION_KEY__";
+	const ENCRYPTION_KEY_ID_PLACEHOLDER = "__ENCRYPTION_KEY_ID__";
 
 	/* ---------------------
 	 * Data
@@ -40,6 +43,8 @@ class KDLFlavor extends KDLMediaDataSet {
 	public 	$_fastSeekTo = true;
 	
 	public $_optimizationPolicy = KDLOptimizationPolicy::BitrateFlagBit;
+	
+	public $_isEncrypted = false; // CENC encryption
 	
 	public	$_transcoders = array();
 
@@ -537,8 +542,8 @@ $plannedDur = 0;
 		    else {
 			    $target->_multiStream = null;
 		    }
-				
 		}
+
 		if($target->_container->_id==KDLContainerTarget::COPY){
 			$target->_container->_id=self::EvaluateCopyContainer($source->_container);
 		}

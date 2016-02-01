@@ -141,6 +141,12 @@ $aud = $target->_audio;
 			return true;
 		}
 
+				// Encryption unsupported by On2
+		if($target->_isEncrypted==true){
+			$warnings[KDLConstants::ContainerIndex][] = 
+				KDLWarnings::ToString(KDLWarnings::TranscoderLimitation, $this->_id)."(encryption)";
+			return true;
+		}
 		return false;
 	}
 }
