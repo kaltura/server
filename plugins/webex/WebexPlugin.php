@@ -123,7 +123,6 @@ class WebexPlugin extends KalturaPlugin implements IKalturaImportHandler
 		$mediaInfoBin = isset($params->mediaInfoCmd)? $params->mediaInfoCmd: "mediainfo";
 		$mediaInfoParser = new KMediaInfoMediaParser($tmpPath, $mediaInfoBin);
 		$mediaInfo = $mediaInfoParser->getMediaInfo();
-		KalturaLog::debug("@@NA mediaInfo is [".print_r($mediaInfo,true)."]");
 		if (isset(self::$container_formats_to_file_extensions[$mediaInfo->containerFormat]) )
 		{
 			$fileExtension = self::$container_formats_to_file_extensions[$mediaInfo->containerFormat];
