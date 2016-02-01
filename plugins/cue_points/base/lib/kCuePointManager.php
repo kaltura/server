@@ -14,7 +14,6 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 {
 	const MAX_CUE_POINTS_TO_COPY_TO_VOD = 100;
 	const MAX_CUE_POINTS_TO_COPY = 1000;
-	const CUE_POINT_TIME_EPSILON = 1;
 
 	/* (non-PHPdoc)
  	 * @see kBatchJobStatusEventConsumer::updatedJob()
@@ -91,9 +90,7 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 		$amfFilesDir = dirname($data->getDestDataFilePath());
 		$pattern = "/{$data->getEntryId()}_{$data->getAssetId()}_{$data->getMediaServerIndex()}_[0-9]*.data/";
 		$files = kFile::recursiveDirList($amfFilesDir, true, false, $pattern);
-		KalturaLog::debug('getAssetDataFilesArray - files: ' . print_r($files, true));
 		natsort($files);
-		KalturaLog::debug('getAssetDataFilesArray2 - files: ' . print_r($files, true));
 		return $files;
 	}
 
@@ -722,7 +719,6 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 		$c = new KalturaCriteria();
 		$c->add( CuePointPeer::ENTRY_ID, $liveEntry->getId() );
 		$c->add( CuePointPeer::CREATED_AT, $currentSegmentEndTime, KalturaCriteria::LESS_EQUAL ); // Don't copy future cuepoints
-		$c->addAnd( CuePointPeer::CREATED_AT, $currentSegmentStartTime - self::CUE_POINT_TIME_EPSILON, KalturaCriteria::GREATER_EQUAL ); // Don't copy cuepoints before segment begining
 		$c->add( CuePointPeer::STATUS, CuePointStatus::READY ); // READY, but not yet HANDLED
 		$c->addAscendingOrderByColumn(CuePointPeer::CREATED_AT);
 		$c->setLimit( self::MAX_CUE_POINTS_TO_COPY_TO_VOD );
