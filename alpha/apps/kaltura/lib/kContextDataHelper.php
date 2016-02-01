@@ -194,6 +194,10 @@ class kContextDataHelper
 		{
 			list($entryIds, $durations, $mediaEntry) = 
 				myPlaylistUtils::executeStitchedPlaylist($this->entry);
+			if (!$mediaEntry)
+			{
+				return;
+			}
 
 			$mediaEntryId = $mediaEntry->getId();
 			$this->msDuration = array_sum($durations);

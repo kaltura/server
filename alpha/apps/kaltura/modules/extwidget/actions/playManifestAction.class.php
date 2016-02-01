@@ -508,6 +508,10 @@ class playManifestAction extends kalturaAction
 	{
 		list($entryIds, $durations, $mediaEntry) =
 			myPlaylistUtils::executeStitchedPlaylist($this->entry);
+		if (!$mediaEntry)
+		{
+			KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_FOUND);
+		}
 		
 		$this->duration = array_sum($durations) / 1000;
 
