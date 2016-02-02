@@ -166,9 +166,11 @@ class myContentStorage
 		}
 		
 		if (strlen($parts[0])) // a previous UGC found, increment version
-			$version = kDataCenterMgr::incrementVersion(pathinfo($parts[0], PATHINFO_BASENAME));
+			$version = pathinfo($parts[0], PATHINFO_BASENAME);
 		else
 			$version = rand(myContentStorage::MIN_OBFUSCATOR_VALUE, myContentStorage::MAX_OBFUSCATOR_VALUE);
+		
+		$version = kDataCenterMgr::incrementVersion($version);
 			
 		return $version.'.'.strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
 	}
