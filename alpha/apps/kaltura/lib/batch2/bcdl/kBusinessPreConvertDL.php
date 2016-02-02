@@ -1740,24 +1740,20 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 			 * UDRM 'signing_key' and 'internal_encryption_url' should be stored in the drm.ini
 			 * If not exist - exception 
 			 */
-		try {
-			$config = kConf::getMap('drm');
-		}
-		catch(Exception $e) {
-			$errMsg = "Encryption: Missing drm.ini";
+		$licenseServerUrl = kConf::get('internal_encryption_url', 'drm', null);
+		if(!(isset($licenseServerUrl))) {
+			$errMsg = "Encryption: Missing 'internal_encryption_url' ";
 			KalturaLog::err($errMsg);
 			throw new kCoreException($errMsg , KDLErrors::Encryption);
 		}
-		if(!(array_key_exists('internal_encryption_url', $config) && array_key_exists('signing_key', $config))) {
-			$errMsg = "Encryption: Missing 'internal_encryption_url' or 'signing_key' params";
+		$signingKey = kConf::get('signing_key', 'drm', null);
+		if(!(isset($signingKey))) {
+			$errMsg = "Encryption: Missing 'signing_key' ";
 			KalturaLog::err($errMsg);
 			throw new kCoreException($errMsg , KDLErrors::Encryption);
 		}
 		KalturaLog::log("Successfully retrieved UDRM 'internal_encryption_url' and 'signing_key' vals");
 
-		$signingKey = $config['signing_key'];
-		$licenseServerUrl = $config['internal_encryption_url'];
-		
 			/*
 			 * Prepare data for the UDRM service curl call
 			 */
