@@ -115,13 +115,6 @@ class KalturaAsset extends KalturaObject implements IRelatedFilterable, IApiObje
 	 */
 	public $actualSourceAssetParamsIds;
 	
-	/**
-	 * Encryption key, if used
-	 * @var string
-	 */
-	public $encryptionKey;
-	
-		
 	private static $map_between_objects = array
 	(
 		"id",
@@ -138,7 +131,6 @@ class KalturaAsset extends KalturaObject implements IRelatedFilterable, IApiObje
 		"partnerData",
 		"partnerDescription",
 		"actualSourceAssetParamsIds",
-		"encryptionKey",
 	);
 	
 	public function getMapBetweenObjects ( )
