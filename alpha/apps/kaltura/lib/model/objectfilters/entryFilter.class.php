@@ -131,6 +131,8 @@ class entryFilter extends baseObjectFilter
 			"_eq_parent_entry_id",
 			"_matchand_entitled_kusers_edit",
 			"_matchand_entitled_kusers_publish",
+			"_matchor_entitled_kusers_edit",
+			"_matchor_entitled_kusers_publish",
 			"_is_root",
 			"_matchand_roots",
 			"_notin_roots",

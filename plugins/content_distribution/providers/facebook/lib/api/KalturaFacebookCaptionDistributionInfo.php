@@ -1,10 +1,10 @@
 <?php
 /**
- * @package plugins.contentDistribution
+ * @package plugins.facebookDistribution
  * @subpackage api.objects
  *
  */
-class KalturaCaptionDistributionInfo extends KalturaObject{
+class KalturaFacebookCaptionDistributionInfo extends KalturaObject{
 
 	/**
 	 * @var string
@@ -25,11 +25,6 @@ class KalturaCaptionDistributionInfo extends KalturaObject{
 	 * @var string
 	 */
 	public $remoteId;
-	
-	/**
-	 * @var KalturaDistributionAction
-	 */
-	public $action;	
 	
 	/**
 	 * @var string
