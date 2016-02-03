@@ -1,7 +1,8 @@
 # Kajam-11.8.0 #
 
 ## Default drm duration is not set##
-A default drm duration is not set
+ - Issue Type: Bug
+ - Issue ID: SUP-7174
 #### Installation ####
 None
 #### Configuration ####
