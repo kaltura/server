@@ -291,35 +291,32 @@ class kFlowHelper
 			return $dbBatchJob;
 		}
 
-		if(count($files) > 1)
-		{
-			// find replacing entry id
-			$replacingEntry = self::getReplacingEntry($recordedEntry, $asset);
-			if(is_null($replacingEntry))
-				KalturaLog::err("Failed to get replacing entry");
-		
-			$flavorParams = assetParamsPeer::retrieveByPKNoFilter($asset->getFlavorParamsId());
-			if(is_null($flavorParams)) { 
-				KalturaLog::err('Failed to retrieve asset params');
-				return $dbBatchJob;
-			}
-		
-			// create asset
-			$replacingAsset = assetPeer::getNewAsset(assetType::FLAVOR);
-			$replacingAsset->setPartnerId($replacingEntry->getPartnerId());
-			$replacingAsset->setEntryId($replacingEntry->getId());
-			$replacingAsset->setStatus(asset::FLAVOR_ASSET_STATUS_QUEUED);
-			$replacingAsset->setFlavorParamsId($flavorParams->getId());
-			$replacingAsset->setFromAssetParams($flavorParams);
-			
-			if($flavorParams->hasTag(assetParams::TAG_SOURCE))
-			{
-				$replacingAsset->setIsOriginal(true);
-			}		
-			$replacingAsset->save();
-			
-			$job = kJobsManager::addConcatJob($dbBatchJob, $replacingAsset, $files);
+		// find replacing entry id
+		$replacingEntry = self::getReplacingEntry($recordedEntry, $asset);
+		if(is_null($replacingEntry))
+			KalturaLog::err("Failed to get replacing entry");
+
+		$flavorParams = assetParamsPeer::retrieveByPKNoFilter($asset->getFlavorParamsId());
+		if(is_null($flavorParams)) {
+			KalturaLog::err('Failed to retrieve asset params');
+			return $dbBatchJob;
 		}
+
+		// create asset
+		$replacingAsset = assetPeer::getNewAsset(assetType::FLAVOR);
+		$replacingAsset->setPartnerId($replacingEntry->getPartnerId());
+		$replacingAsset->setEntryId($replacingEntry->getId());
+		$replacingAsset->setStatus(asset::FLAVOR_ASSET_STATUS_QUEUED);
+		$replacingAsset->setFlavorParamsId($flavorParams->getId());
+		$replacingAsset->setFromAssetParams($flavorParams);
+
+		if($flavorParams->hasTag(assetParams::TAG_SOURCE))
+		{
+			$replacingAsset->setIsOriginal(true);
+		}
+		$replacingAsset->save();
+
+		$job = kJobsManager::addConcatJob($dbBatchJob, $replacingAsset, $files);
 
 		return $dbBatchJob;
 	}
