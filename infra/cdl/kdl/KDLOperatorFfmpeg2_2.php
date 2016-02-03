@@ -59,8 +59,8 @@ class KDLOperatorFfmpeg2_7_2 extends KDLOperatorFfmpeg2_2 {
 		if($target->_isEncrypted==true) {
 				// Add key & key_if placeholder. To be replaced by real values after asset creation
 			$str = " -encryption_scheme cenc-aes-ctr";
-			$str.= " -encryption_key KDLFlavor::ENCRYPTION_KEY_PLACEHOLDER";
-			$str.= " -encryption_kid KDLFlavor::ENCRYPTION_KEY_ID_PLACEHOLDER -y ";
+			$str.= " -encryption_key ".KDLFlavor::ENCRYPTION_KEY_PLACEHOLDER;
+			$str.= " -encryption_kid ".KDLFlavor::ENCRYPTION_KEY_ID_PLACEHOLDER." -y ";
 			$cmdStr = str_replace(" -y ", $str, $cmdStr);
 			KalturaLog::log("On Encryption: $cmdStr");
 		}
