@@ -20,9 +20,7 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
  	 */
 	public function updatedJob(BatchJob $dbBatchJob)
 	{
-		if ($jobType = $dbBatchJob->getJobType() == BatchJobType::CONCAT){
-			self::handleConcatJobFinished($dbBatchJob, $dbBatchJob->getData());
-		}
+		self::handleConcatJobFinished($dbBatchJob, $dbBatchJob->getData());
 		return true;
 	}
 
