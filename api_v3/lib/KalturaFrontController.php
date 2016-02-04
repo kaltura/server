@@ -216,6 +216,15 @@ class KalturaFrontController
 		// process the requests
 		$results = array();
 		kCurrentContext::$multiRequest_index = 0;
+		if (isset($commonParams['ks']))
+		{
+			kEventsManager::enableMultiDeferredEvents(true);
+		}
+		else
+		{
+			kEventsManager::enableMultiDeferredEvents(false);
+		}
+
 		for($i = $requestStartIndex; $i <= $requestEndIndex; $i++)
 		{
 			$currentParams = $listOfRequests[$i];  
@@ -296,7 +305,8 @@ class KalturaFrontController
 			if ($currentResult instanceof kRendererBase)
 				return $currentResult;
 		}
-		
+
+		kEventsManager::flushEvents(true);
 		return $results;
 	}
 	
