@@ -900,6 +900,16 @@ class kJSONManifestRenderer extends kMultiFlavorManifestRenderer
 				header("Content-Type: application/json"),
 		);
 	}
+	
+	protected function buildFlavorsArray()
+	{
+		return array(
+				'entryId' => $this->entryId,
+				'duration' => $this->duration,
+				'baseUrl' => $this->baseUrl,
+				'flavors' => $this->flavors,
+		);
+	}
 
 
 	/* (non-PHPdoc)
@@ -907,30 +917,13 @@ class kJSONManifestRenderer extends kMultiFlavorManifestRenderer
 	 */
 	protected function getManifestFlavors()
 	{
-		$result = array(
-				'entryId' => $this->entryId,
-				'duration' => $this->duration,
-				'baseUrl' => $this->baseUrl,
-				'flavors' => $this->flavors,
-		);
-
+		$result = $this->buildFlavorsArray();
 		return array(json_encode($result));
 	}
 }
 
-class kJSONPManifestRenderer extends kMultiFlavorManifestRenderer
+class kJSONPManifestRenderer extends kJSONManifestRenderer
 {
-	/**
-	 * @return array<string>
-	 */
-	protected function getHeaders()
-	{
-		return array(
-			header("Content-Type: application/javascript"),
-		);
-	}
-
-
 	/* (non-PHPdoc)
 	 * @see kManifestRenderer::getManifestFlavors()
 	 */
@@ -940,13 +933,7 @@ class kJSONPManifestRenderer extends kMultiFlavorManifestRenderer
 		if (is_null($callback))
 			die("Expecting \"callback\" parameter for jsonp format");
 		
-		$result = array(
-			'entryId' => $this->entryId,
-			'duration' => $this->duration,
-			'baseUrl' => $this->baseUrl,
-			'flavors' => $this->flavors,
-		);
-		
+		$result = $this->buildFlavorsArray();
 		return array($callback . '(' . json_encode($result) . ')');
 	}
 }
