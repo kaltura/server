@@ -2,7 +2,6 @@ check process wowza with pidfile /var/run/WowzaStreamingEngine.pid
     start program = "/sbin/service WowzaStreamingEngine start" with timeout 60 seconds
     stop program = "/sbin/service WowzaStreamingEngine stop" 
     
-    if 5 restarts within 5 cycles then timeout
     if failed port 1935 protocol http then restart
         
     depends on wowza.conf, wowzabin
