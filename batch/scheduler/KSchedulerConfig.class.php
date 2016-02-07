@@ -292,6 +292,11 @@ class KSchedulerConfig extends Zend_Config_Ini
 		return $this->logDir;
 	}
 
+	public function getPidFileDir()
+	{
+		return $this->pidFileDir;
+	}
+	
 	public function getPartnerId()
 	{
 		return $this->partnerId;
