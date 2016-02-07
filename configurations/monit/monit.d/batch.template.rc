@@ -3,7 +3,6 @@ check process batch
     start program = "/etc/init.d/kaltura-batch start" with timeout 60 seconds
     stop program = "/etc/init.d/kaltura-batch stop"
 
-    if 5 restarts within 5 cycles then timeout
 
     group kaltura
     depends on batchbin, batch.ini
