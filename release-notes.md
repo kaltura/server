@@ -1,3 +1,18 @@
+# Kajam-11.8.0 #
+
+## Default drm duration is not set##
+ - Issue Type: Bug
+ - Issue ID: SUP-7174
+#### Installation ####
+None
+#### Configuration ####
+None.
+#### Known Issues & Limitations ####
+None.
+#### Deployment scripts ####
+ - mysql -h@db_host@ -u@db_user@ -p@db_pass@ -P3306 kaltura < /opt/kaltura/app/deployment/updates/sql/2016_02_03_add_default_duration_to_drm_policies.sql
+
+
 # Kajam-11.7.0 #
 
 ## Add support for cue points in baseentry clone cloneOptions PLAT-4189##
