@@ -493,10 +493,17 @@ class KalturaEntryService extends KalturaBaseService
 					$dbEntry->setMediaDate($mediaDate);
 				}
 			}
-			
+
+			$ext = pathinfo($entryFullPath, PATHINFO_EXTENSION);
+			$allowedImageTypes = kConf::get("image_file_ext");
+
+			if (in_array($ext, $allowedImageTypes))
+				$dbEntry->setData("." . $ext);
+			else
+				$dbEntry->setData(".jpg");
+
 			list($width, $height, $type, $attr) = getimagesize($entryFullPath);
 			$dbEntry->setDimensions($width, $height);
-			$dbEntry->setData(".jpg"); // this will increase the data version
 			$dbEntry->save();
 			$syncKey = $dbEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA);
 			try
@@ -530,8 +537,7 @@ class KalturaEntryService extends KalturaBaseService
 			$dbEntry->setStatus(entryStatus::ERROR_CONVERTING);
 			$dbEntry->save();
 		}
-		
-		$ext = pathinfo($entryFullPath, PATHINFO_EXTENSION);
+
 		$dbAsset->setFileExt($ext);
 		$dbAsset->save();
 		
@@ -799,10 +805,11 @@ class KalturaEntryService extends KalturaBaseService
 		
 		if (!$resource->getForceAsyncDownload())
 		{
+			$ext = pathinfo($url, PATHINFO_EXTENSION);
 			// TODO - move image handling to media service
     		if($dbEntry->getMediaType() == KalturaMediaType::IMAGE)
     		{
-    			$entryFullPath = myContentStorage::getFSUploadsPath() . '/' . $dbEntry->getId() . '.jpg';
+				$entryFullPath = myContentStorage::getFSUploadsPath() . '/' . $dbEntry->getId() . '.' . $ext;
     			if (KCurlWrapper::getDataFromFile($url, $entryFullPath))
     				return $this->attachFile($entryFullPath, $dbEntry, $dbAsset);
     			
@@ -815,7 +822,6 @@ class KalturaEntryService extends KalturaBaseService
     	
     		if($dbAsset && !($dbAsset instanceof flavorAsset))
     		{
-    			$ext = pathinfo($url, PATHINFO_EXTENSION);
     			$entryFullPath = myContentStorage::getFSUploadsPath() . '/' . $dbEntry->getId() . '.' . $ext;
     			if (KCurlWrapper::getDataFromFile($url, $entryFullPath))
     			{
