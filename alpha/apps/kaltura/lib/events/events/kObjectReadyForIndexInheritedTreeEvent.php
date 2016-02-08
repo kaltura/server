@@ -2,7 +2,7 @@
 /**
  * Applicative event that raised by the developer when indexed object is ready for indexing inherited tree in the index server
  */
-class kObjectReadyForIndexInheritedTreeEvent extends kApplicativeEvent
+class kObjectReadyForIndexInheritedTreeEvent extends kApplicativeEvent implements IKalturaMultiDeferredEvent
 {
 	const EVENT_CONSUMER = 'kObjectReadyForIndexInheritedTreeEventConsumer';
 
@@ -13,19 +13,12 @@ class kObjectReadyForIndexInheritedTreeEvent extends kApplicativeEvent
 		return self::EVENT_CONSUMER;
 	}
 
-	/**
-	 * @param BaseObject $object
-	 * @param array $partnerCriteriaParams
+	/* (non-PHPdoc)
+	 * @see IKalturaMultiDeferredEvent::setPartnerCriteriaParams()
 	 */
-	public function __construct( BaseObject $object, array $partnerCriteriaParams, BatchJob $raisedJob = null)
+	public function setPartnerCriteriaParams(array $partnerCriteriaParams)
 	{
-		parent::__construct($object, $raisedJob);
 		$this->partnerCriteriaParams = $partnerCriteriaParams;
-	}
-
-	public function getPartnerCriteriaParams()
-	{
-		return $this->partnerCriteriaParams;
 	}
 
 	/**

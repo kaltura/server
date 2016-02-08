@@ -246,6 +246,10 @@ class KalturaFrontController
 			{
 				$currentParams['ks'] = $commonParams['ks'];
 			}
+			else if ( isset($currentParams['ks']) && isset($commonParams['ks']) && $commonParams['ks']!=$currentParams['ks'] )
+			{
+				kEventsManager::enableMultiDeferredEvents(false);
+			}
 
 			if (isset($commonParams['partnerId']) && !isset($currentParams['partnerId']))
 			{

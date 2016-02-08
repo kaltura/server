@@ -200,7 +200,7 @@ class kEventsManager
 		return $deferredEvent;
 	}
 	
-	public static function raiseEventDeferred(KalturaEvent $event, $isMultiDeferred = false )
+	public static function raiseEventDeferred(KalturaEvent $event)
 	{
 		$eventKey = $event->getKey();
 		
@@ -208,8 +208,11 @@ class kEventsManager
 			return self::raiseEvent($event);
 
 		$deferredEventsArray = &self::$deferredEvents;
-		if ( self::$deferredEventsEnabled && $isMultiDeferred )
+		if ( self::$deferredEventsEnabled && ($event instanceof IKalturaMultiDeferredEvent) )
+		{
+			$event->setPartnerCriteriaParams(myPartnerUtils::getAllPartnerCriteriaParams());
 			$deferredEventsArray = &self::$multiDeferredEvents;
+		}
 
 		if (!is_null($eventKey))
 			$deferredEventsArray[$eventKey] = $event;
