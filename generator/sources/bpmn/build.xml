@@ -88,7 +88,7 @@
 		</copy>
 	</target>
 	
-	<target name="deploy" depends="verify-version, replace-tokens, bar, compile, set-home">
+	<target name="deploy" depends="verify-version, replace-tokens, jar, bar, compile, set-home">
 		<copy todir="${catalina.home}/lib">
 			<fileset dir="${jar.lib.path}" />
 			<fileset dir="${jar.lib.path}/dependency" />
