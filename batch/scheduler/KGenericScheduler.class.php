@@ -88,7 +88,7 @@ class KGenericScheduler
 			$this->schedulerConfig = new KSchedulerConfig($configFileName);
 			date_default_timezone_set($this->schedulerConfig->getTimezone());
 
-			$pid = $this->schedulerConfig->getLogDir() . '/batch.pid';
+			$pid = $this->schedulerConfig->getPidFileDir() . '/batch.pid';
 			if(file_exists($pid))
 			{
 				KalturaLog::err("Scheduler already running - pid[" . file_get_contents($pid) . "]");
