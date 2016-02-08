@@ -1,10 +1,22 @@
 # Kajam-11.8.0 #
 
+## Sometimes there is more than one batch scheduler running ##
+ - Issue Type: Bug
+ - Issue ID: PLAT-4714
+ 
+### Installation ###
+None.
+### Configuration ###
+On windows machines create directory C:\var\run
+#### Known Issues & Limitations ####
+None.
+#### Deployment scripts ####
+
 ## Default drm duration is not set##
  - Issue Type: Bug
  - Issue ID: SUP-7174
 #### Installation ####
-None
+None.
 #### Configuration ####
 None.
 #### Known Issues & Limitations ####
