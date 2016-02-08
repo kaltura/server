@@ -116,6 +116,7 @@ $html5Version = $_GET['playerVersion'];
 			if(t > 0){
 				currentTime = t*1000;
 				$('#btnSendAd').removeAttr('disabled');
+				document.getElementById("adminTime").innerHTML = currentTime;
 			}
 		}
 
@@ -183,6 +184,7 @@ $html5Version = $_GET['playerVersion'];
               <div id="adminPlayerContainer" class="video-content">
                </div>
             </div>
+			<p><strong>Admin</strong> <span id="adminTime"> </span></p>
           </div>
           <div class="col col-sm-6 video-col">
             <div class="video">
