@@ -15,7 +15,8 @@
 		<request service="eventNotificationTemplate" action="listAction" plugin="eventNotification" partnerId="0">
 			<filter objectType="KalturaEventNotificationTemplateFilter">
 				<typeEqual>{php:return KalturaEventNotificationTemplateType::BPM_START;}</typeEqual>
-				<partnerId>0</partnerId>
+				<partnerIdEqual>0</partnerIdEqual>
+				<statusEqual>1</statusEqual>
 				<systemNameEqual>entry_created</systemNameEqual>
 			</filter>
 		</request>
@@ -74,7 +75,8 @@
 		<request service="eventNotificationTemplate" action="listAction" plugin="eventNotification" partnerId="0">
 			<filter objectType="KalturaEventNotificationTemplateFilter">
 				<typeEqual>{php:return KalturaEventNotificationTemplateType::BPM_START;}</typeEqual>
-				<partnerId>0</partnerId>
+				<partnerIdEqual>0</partnerIdEqual>
+				<statusEqual>1</statusEqual>
 				<systemNameEqual>flavor_status_equals</systemNameEqual>
 			</filter>
 		</request>
@@ -190,7 +192,8 @@
 		<request service="eventNotificationTemplate" action="listAction" plugin="eventNotification" partnerId="0">
 			<filter objectType="KalturaEventNotificationTemplateFilter">
 				<typeEqual>{php:return KalturaEventNotificationTemplateType::BPM_SIGNAL;}</typeEqual>
-				<partnerId>0</partnerId>
+				<partnerIdEqual>0</partnerIdEqual>
+				<statusEqual>1</statusEqual>
 				<systemNameEqual>entry_updated</systemNameEqual>
 			</filter>
 		</request>
@@ -215,11 +218,101 @@
 
 
 	<multirequest continueOnError="1">
+		<!-- Entry Status Equal -->
+		<request service="eventNotificationTemplate" action="listAction" plugin="eventNotification" partnerId="0">
+			<filter objectType="KalturaEventNotificationTemplateFilter">
+				<typeEqual>{php:return KalturaEventNotificationTemplateType::BPM_START;}</typeEqual>
+				<partnerIdEqual>0</partnerIdEqual>
+				<statusEqual>1</statusEqual>
+				<systemNameEqual>entry_status_equal</systemNameEqual>
+			</filter>
+		</request>
+		<request service="eventNotificationTemplate" action="delete" plugin="eventNotification" partnerId="0">
+			<id>{1:result:objects:0:id}</id>
+		</request>
+		<request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
+			<template objectType="KalturaBusinessProcessStartNotificationTemplate">
+				<name>Entry Status Equal</name>
+				<systemName>entry_status_equal</systemName>
+				<description>Entry status equal</description>
+				<automaticDispatchEnabled>1</automaticDispatchEnabled>
+				<eventType>3</eventType> <!-- EventNotificationEventType::OBJECT_CHANGED -->
+				<eventObjectType>1</eventObjectType> <!-- EventNotificationEventObjectType::ENTRY -->
+				<eventConditions objectType="array">
+					<item objectType="KalturaEventFieldCondition">
+						<description>Status field modified</description>
+						<field objectType="KalturaEvalBooleanField">
+							<code>in_array(entryPeer::STATUS, $scope->getEvent()->getModifiedColumns())</code>
+						</field>
+					</item>
+					<item objectType="KalturaFieldMatchCondition">
+						<description>Status equals</description>
+						<field objectType="KalturaEvalStringField">
+							<code>$scope->getObject()->getStatus()</code>
+						</field>
+						<values objectType="array">
+							<item objectType="KalturaStringValue">
+								<value>{trigger_status}</value>
+							</item>
+						</values>
+					</item>
+				</eventConditions>
+				<contentParameters objectType="array">
+					<item objectType="KalturaEventNotificationParameter">
+						<key>endPoint</key>
+						<description>Server Host</description>
+						<value objectType="KalturaEvalStringField">
+							<code>kConf::get('apphome_url')</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>partnerId</key>
+						<description>Partner ID</description>
+						<value objectType="KalturaEvalStringField">
+							<code>$scope->getObject()->getPartnerId()</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>adminSecret</key>
+						<description>Partner Administrator Secret</description>
+						<value objectType="KalturaEvalStringField">
+							<code>PartnerPeer::retrieveByPK($scope->getObject()->getPartnerId())->getAdminSecret()</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>entryId</key>
+						<description>Entry ID</description>
+						<value objectType="KalturaEvalStringField">
+							<code>$scope->getObject()->getEntryId()</code>
+						</value>
+					</item>
+				</contentParameters>
+				<userParameters objectType="array">
+					<item objectType="KalturaEventNotificationParameter">
+						<key>trigger_status</key>
+						<description>Entry status that triggers the event, See:KalturaEntryStatus:/api_v3/testmeDoc/?object=KalturaEntryStatus</description>
+						<value objectType="KalturaStringValue">
+							<description>Ready</description>
+							<value>2</value>
+						</value>
+					</item>
+				</userParameters>
+			</template>
+		</request>
+		<request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
+			<id>{3:result:id}</id>
+			<status>1</status><!-- EventNotificationTemplateStatus::DISABLED -->
+		</request>
+	</multirequest>
+
+
+	<multirequest continueOnError="1">
 		<!-- Caption-Asset Status Equals -->
 		<request service="eventNotificationTemplate" action="listAction" plugin="eventNotification" partnerId="0">
 			<filter objectType="KalturaEventNotificationTemplateFilter">
 				<typeEqual>{php:return KalturaEventNotificationTemplateType::BPM_SIGNAL;}</typeEqual>
-				<partnerId>0</partnerId>
+				<partnerIdEqual>0</partnerIdEqual>
+				<statusEqual>1</statusEqual>
 				<systemNameEqual>caption_asset_status_equals</systemNameEqual>
 			</filter>
 		</request>
@@ -316,7 +409,8 @@
 		<request service="eventNotificationTemplate" action="listAction" plugin="eventNotification" partnerId="0">
 			<filter objectType="KalturaEventNotificationTemplateFilter">
 				<typeEqual>{php:return KalturaEventNotificationTemplateType::BPM_SIGNAL;}</typeEqual>
-				<partnerId>0</partnerId>
+				<partnerIdEqual>0</partnerIdEqual>
+				<statusEqual>1</statusEqual>
 				<systemNameEqual>entry_integration_job_finished</systemNameEqual>
 			</filter>
 		</request>
@@ -356,7 +450,8 @@
 		<request service="eventNotificationTemplate" action="listAction" plugin="eventNotification" partnerId="0">
 			<filter objectType="KalturaEventNotificationTemplateFilter">
 				<typeEqual>{php:return KalturaEventNotificationTemplateType::BPM_SIGNAL;}</typeEqual>
-				<partnerId>0</partnerId>
+				<partnerIdEqual>0</partnerIdEqual>
+				<statusEqual>1</statusEqual>
 				<systemNameEqual>category_integration_job_finished</systemNameEqual>
 			</filter>
 		</request>
@@ -396,7 +491,8 @@
 		<request service="eventNotificationTemplate" action="listAction" plugin="eventNotification" partnerId="0">
 			<filter objectType="KalturaEventNotificationTemplateFilter">
 				<typeEqual>{php:return KalturaEventNotificationTemplateType::BPM_SIGNAL;}</typeEqual>
-				<partnerId>0</partnerId>
+				<partnerIdEqual>0</partnerIdEqual>
+				<statusEqual>1</statusEqual>
 				<systemNameEqual>asset_integration_job_finished</systemNameEqual>
 			</filter>
 		</request>
@@ -436,7 +532,8 @@
 		<request service="eventNotificationTemplate" action="listAction" plugin="eventNotification" partnerId="0">
 			<filter objectType="KalturaEventNotificationTemplateFilter">
 				<typeEqual>{php:return KalturaEventNotificationTemplateType::BPM_SIGNAL;}</typeEqual>
-				<partnerId>0</partnerId>
+				<partnerIdEqual>0</partnerIdEqual>
+				<statusEqual>1</statusEqual>
 				<systemNameEqual>metadata_equals</systemNameEqual>
 			</filter>
 		</request>
@@ -547,7 +644,8 @@
 		<request service="eventNotificationTemplate" action="listAction" plugin="eventNotification" partnerId="0">
 			<filter objectType="KalturaEventNotificationTemplateFilter">
 				<typeEqual>{php:return KalturaEventNotificationTemplateType::BPM_SIGNAL;}</typeEqual>
-				<partnerId>0</partnerId>
+				<partnerIdEqual>0</partnerIdEqual>
+				<statusEqual>1</statusEqual>
 				<systemNameEqual>HTTP_New_Caption_Asset_Added_To_Entry</systemNameEqual>
 			</filter>
 		</request>
@@ -649,7 +747,8 @@
 		<request service="eventNotificationTemplate" action="listAction" plugin="eventNotification" partnerId="0">
 			<filter objectType="KalturaEventNotificationTemplateFilter">
 				<typeEqual>{php:return KalturaEventNotificationTemplateType::BPM_START;}</typeEqual>
-				<partnerId>0</partnerId>
+				<partnerIdEqual>0</partnerIdEqual>
+				<statusEqual>1</statusEqual>
 				<systemNameEqual>Transcript_Asset_Data_Changed</systemNameEqual>
 			</filter>
 		</request>
@@ -703,15 +802,6 @@
 						</value>
 					</item>
 				</contentParameters>
-				<userParameters objectType="array">
-					<item objectType="KalturaEventNotificationParameter">
-						<key>templateId</key>
-						<description>ID of the template to be passed to the process</description>
-						<value objectType="KalturaStringValue">
-							<value />
-						</value>
-					</item>
-				</userParameters>
 			</template>
 		</request>
 		<request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
