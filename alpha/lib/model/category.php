@@ -1753,6 +1753,6 @@ class category extends Basecategory implements IIndexable, IRelatedObject
 
 	public function indexCategoryInheritedTree()
 	{
-		kEventsManager::raiseEventDeferred(new kObjectReadyForIndexInheritedTreeEvent($this), true);
+		kEventsManager::raiseEventDeferred(new kObjectReadyForIndexInheritedTreeEvent($this,myPartnerUtils::getAllPartnerCriteriaParams()), true);
 	}
 }
