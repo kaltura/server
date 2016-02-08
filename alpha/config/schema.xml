@@ -2140,5 +2140,9 @@
         <column name="status" type="integer" />
         <column name="server_type" type="integer" />
         <column name="custom_data" type="longvarchar" />
+        <index name="entry_server_type">
+            <index-column name="entry_id" />
+            <index-column name="server_type" />
+        </index>
     </table>
 </database>
