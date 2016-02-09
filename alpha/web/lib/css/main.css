@@ -1068,7 +1068,7 @@ html {
   -webkit-tap-highlight-color: transparent; }
 
 body {
-  font-family: "proxima_nova";
+  font-family: "Lato";
   font-size: 14px;
   line-height: 1.42857;
   color: #fff;
@@ -5185,7 +5185,7 @@ button.close {
   position: absolute;
   z-index: 1070;
   display: block;
-  font-family: "proxima_nova";
+  font-family: "Lato";
   font-style: normal;
   font-weight: normal;
   letter-spacing: normal;
@@ -5291,7 +5291,7 @@ button.close {
   display: none;
   max-width: 276px;
   padding: 1px;
-  font-family: "proxima_nova";
+  font-family: "Lato";
   font-style: normal;
   font-weight: normal;
   letter-spacing: normal;
@@ -5810,21 +5810,15 @@ button.close {
   .hidden-print {
     display: none !important; } }
 @font-face {
-  font-family: 'proxima_nova';
-  src: url("../fonts/proximanova-light-webfont.eot");
-  src: url("../fonts/proximanova-light-webfont.eot?#iefix") format("embedded-opentype"), url("../fonts/proximanova-light-webfont.woff2") format("woff2"), url("../fonts/proximanova-light-webfont.woff") format("woff"), url("../fonts/proximanova-light-webfont.ttf") format("truetype"), url("../fonts/proximanova-light-webfont.svg#proxima_novalight") format("svg");
+  font-family: 'Lato';
   font-weight: 300;
   font-style: normal; }
 @font-face {
-  font-family: 'proxima_nova';
-  src: url("../fonts/proximanova-reg-webfont.eot");
-  src: url("../fonts/proximanova-reg-webfont.eot?#iefix") format("embedded-opentype"), url("../fonts/proximanova-reg-webfont.woff2") format("woff2"), url("../fonts/proximanova-reg-webfont.woff") format("woff"), url("../fonts/proximanova-reg-webfont.ttf") format("truetype"), url("../fonts/proximanova-reg-webfont.svg#proxima_nova_rgregular") format("svg");
+  font-family: 'Lato';
   font-weight: 400;
   font-style: normal; }
 @font-face {
-  font-family: 'proxima_nova';
-  src: url("../fonts/proximanova-semibold-webfont.eot");
-  src: url("../fonts/proximanova-semibold-webfont.eot?#iefix") format("embedded-opentype"), url("../fonts/proximanova-semibold-webfont.woff2") format("woff2"), url("../fonts/proximanova-semibold-webfont.woff") format("woff"), url("../fonts/proximanova-semibold-webfont.ttf") format("truetype"), url("../fonts/proximanova-semibold-webfont.svg#proxima_novasemibold") format("svg");
+  font-family: 'Lato';
   font-weight: 700;
   font-style: normal; }
 .navbar-default {
