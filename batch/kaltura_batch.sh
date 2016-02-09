@@ -46,7 +46,12 @@ echo_status() {
 
 get_pids() {
     KP=`ps axf | awk '!/\\_ / {b=0} /php [K]GenericBatchMgr.class.php/ {b=1} b{print $1}'|xargs`
-    KP_PARENT=`cat $LOCKFILE 2>/dev/null`
+    if [ -s "$LOCKFILE" ]; then
+        KP_PARENT=`cat $LOCKFILE 2>/dev/null`
+    else
+        KP_PARENT=`pgrep -P 1 -f [K]GenericBatchMgr.class.php|xargs 2>/dev/null`
+        echo_status "No pid file found at $LOCKFILE getting pid by pgrep [$KP_PARENT]" 0
+    fi
 }
 
 start() {
@@ -123,7 +128,9 @@ stop() {
             echo_status "Killing Batch Manager with PID $KP_PARENT and related workers" 0
             kill -s $SIGNAL $KP > /dev/null
         fi
-        rm $LOCKFILE
+        if [ -e "$LOCKFILE" ]; then
+            rm $LOCKFILE
+        fi
         RC=$?
     else
         echo_status "Service Batch Manager not running" 1
