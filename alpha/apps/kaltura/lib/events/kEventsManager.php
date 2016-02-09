@@ -208,7 +208,7 @@ class kEventsManager
 			return self::raiseEvent($event);
 
 		$deferredEventsArray = &self::$deferredEvents;
-		if ( self::$deferredEventsEnabled && ($event instanceof IKalturaMultiDeferredEvent) )
+		if ( self::$multiDeferredEventsEnabled && ($event instanceof IKalturaMultiDeferredEvent) )
 		{
 			$event->setPartnerCriteriaParams(myPartnerUtils::getAllPartnerCriteriaParams());
 			$deferredEventsArray = &self::$multiDeferredEvents;

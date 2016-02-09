@@ -212,18 +212,32 @@ class KalturaFrontController
 		}
 		
 		$multiRequestResultsPaths = $this->getMultiRequestResultsPaths($listOfRequests);
-		
+
 		// process the requests
 		$results = array();
 		kCurrentContext::$multiRequest_index = 0;
-		if (isset($commonParams['ks']))
+
+		//enable multiDeferredEvents only if all requests have identical KS
+		$commonKs = isset($commonParams['ks']) ? $commonParams['ks'] : null;
+		$shouldDisableMultiDeferred = false;
+		for($i = $requestStartIndex; $i <= $requestEndIndex; $i++)
 		{
-			kEventsManager::enableMultiDeferredEvents(true);
+			if (isset($listOfRequests[$i]['ks']))
+			{
+				$currentKs = $listOfRequests[$i]['ks'];
+				if ( $commonKs && ($currentKs != $commonKs) )
+				{
+					$shouldDisableMultiDeferred = true;
+					break;
+				} else if ( !$commonKs ) {
+					$commonKs = $currentKs;
+				}
+			}
 		}
-		else
-		{
+		if ( !$commonKs || $shouldDisableMultiDeferred )
 			kEventsManager::enableMultiDeferredEvents(false);
-		}
+		else
+			kEventsManager::enableMultiDeferredEvents(true);
 
 		for($i = $requestStartIndex; $i <= $requestEndIndex; $i++)
 		{
@@ -245,10 +259,6 @@ class KalturaFrontController
 			if (isset($commonParams['ks']) && !isset($currentParams['ks']))
 			{
 				$currentParams['ks'] = $commonParams['ks'];
-			}
-			else if ( isset($currentParams['ks']) && isset($commonParams['ks']) && $commonParams['ks']!=$currentParams['ks'] )
-			{
-				kEventsManager::enableMultiDeferredEvents(false);
 			}
 
 			if (isset($commonParams['partnerId']) && !isset($currentParams['partnerId']))

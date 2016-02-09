@@ -10,7 +10,7 @@ interface kObjectReadyForIndexInheritedTreeEventConsumer extends KalturaEventCon
 	 * @param BatchJob $raisedJob
 	 * @return bool true if should continue to the next consumer
 	 */
-	public function objectReadyForIndexInheritedTreeEvent(BaseObject $object, array $partnerCriteriaParams, BatchJob $raisedJob = null);
+	public function objectReadyForIndexInheritedTreeEvent(BaseObject $object, $partnerCriteriaParams, BatchJob $raisedJob = null);
 	
 	/**
 	 * @param BaseObject $object

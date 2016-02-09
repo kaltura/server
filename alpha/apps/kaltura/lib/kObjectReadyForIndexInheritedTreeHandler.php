@@ -19,7 +19,7 @@ class kObjectReadyForIndexInheritedTreeHandler implements kObjectReadyForIndexIn
 	/* (non-PHPdoc)
 	 * @see kObjectReadyForIndexInheritedTreeEventConsumer::objectReadyForIndexInheritedTreeEvent()
 	 */
-	public function objectReadyForIndexInheritedTreeEvent(BaseObject $object, array $partnerCriteriaParams, BatchJob $raisedJob = null)
+	public function objectReadyForIndexInheritedTreeEvent(BaseObject $object, $partnerCriteriaParams, BatchJob $raisedJob = null)
 	{
 		if ( $object instanceof category )
 		{
