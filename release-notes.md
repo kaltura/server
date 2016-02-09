@@ -1,3 +1,25 @@
+# Kajam-11.8.0 #
+
+## Index cateogry inherited tree once per multirequest ##
+- Issue Type: Bug
+- Issue ID: PLAT-4968
+
+#### Configuration ####
+
+*base.ini*
+
+Add the following line to the the event_consumers[] list
+
+		event_consumers[] = kObjectReadyForIndexInheritedTreeHandler
+
+#### Deployment Scripts ####
+
+None.
+
+#### Known Issues & Limitations ####
+
+None.
+
 # Kajam-11.7.0 #
 
 ## Add support for cue points in baseentry clone cloneOptions PLAT-4189##
