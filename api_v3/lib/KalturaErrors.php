@@ -609,4 +609,9 @@ class KalturaErrors extends APIErrors
 	 */
 	const HOST_NAME_ALREADY_EXISTS = "HOST_NAME_ALREADY_EXISTS;HOST_NAME;Host Name [@HOST_NAME@] already exists";
 	const SERVER_NODE_NOT_FOUND = "SERVER_NODE_NOT_FOUND;HOST_NAME;server node with host name [@HOST_NAME@] not found";
+
+	/*
+	 * EntryServerNode service
+	 */
+	const ENTRY_SERVER_NODE_NOT_FOUND = "ENTRY_SERVER_NODE_NOT_FOUND;ENTRY_ID;SERVER_TYPE;entry server node with entry id [@ENTRY_ID@] and server type [@SERVER_TYPE@] not found";
 }
