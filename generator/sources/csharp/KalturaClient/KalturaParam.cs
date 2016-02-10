@@ -38,6 +38,19 @@ namespace Kaltura
         #region Private Fields
 
         private string _Value;
+        private Nullable<bool> _BoolValue = null;
+        private long _LongValue;
+        private int _IntValue;
+        private float _FloatValue;
+
+
+        private string _ParamType;
+        private const string PARAM_TYPE_STRING = "string";
+        private const string PARAM_TYPE_BOOL = "bool";
+        private const string PARAM_TYPE_LONG = "long";
+        private const string PARAM_TYPE_INT = "int";
+        private const string PARAM_TYPE_FLOAT = "float";
+
 
         #endregion
 
@@ -47,13 +60,47 @@ namespace Kaltura
         public KalturaParam(string value)
         {
             _Value = value;
+            _ParamType = PARAM_TYPE_STRING;
+        }
+        public KalturaParam(bool value)
+        {
+            _BoolValue = value;
+            _ParamType = PARAM_TYPE_BOOL;
+        }
+        public KalturaParam(long value)
+        {
+            _LongValue = value;
+            _ParamType = PARAM_TYPE_LONG;
+        }
+        public KalturaParam(int value)
+        {
+            _IntValue = value;
+            _ParamType = PARAM_TYPE_INT;
+        }
+        public KalturaParam(float value)
+        {
+            _FloatValue = value;
+            _ParamType = PARAM_TYPE_FLOAT;
         }
 
         #endregion
 
         public string ToJson()
         {
-            return "\"" + _Value.Replace("\"", "\\\"").Replace("\r", "").Replace("\t", "\\t").Replace("\n", "\\n") + "\"";
+            switch(_ParamType)
+            {
+                case PARAM_TYPE_BOOL:
+                    return _BoolValue.Value ? "true" : "false";
+                case PARAM_TYPE_INT:
+                    return _IntValue.ToString();
+                case PARAM_TYPE_LONG:
+                    return _LongValue.ToString();
+                case PARAM_TYPE_FLOAT:
+                    return String.Format("{0:F20}", _FloatValue);
+                case PARAM_TYPE_STRING:
+                default:
+                    return "\"" + _Value.Replace("\"", "\\\"").Replace("\r", "").Replace("\t", "\\t").Replace("\n", "\\n") + "\"";
+            }
         }
 
         public string ToQueryString()

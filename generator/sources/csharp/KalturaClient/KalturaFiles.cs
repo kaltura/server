@@ -33,11 +33,11 @@ using System.IO;
 
 namespace Kaltura
 {
-    public class KalturaFiles : SortedList<string, FileStream>
+    public class KalturaFiles : SortedList<string, Stream>
     {
         public void Add(KalturaFiles files)
         {
-            foreach (KeyValuePair<string, FileStream> item in files)
+            foreach (KeyValuePair<string, Stream> item in files)
             {
                 this.Add(item.Key, item.Value);
             }
