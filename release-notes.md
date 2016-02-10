@@ -2,6 +2,20 @@
 
 ## Sometimes there is more than one batch scheduler running ##
  - Issue Type: Bug
+ - Issue ID: SUP-6997
+ 
+### Installation ###
+None.
+### Configuration ###
+On windows machines create directory C:\var\run
+#### Known Issues & Limitations ####
+None.
+#### Deployment scripts ####
+ - php deployment\updates\scripts\add_permissions\2014_01_22_live_stream_entry_broadcast_url.php
+ 
+
+## Sometimes there is more than one batch scheduler running ##
+ - Issue Type: Bug
  - Issue ID: PLAT-4714
  
 ### Installation ###
