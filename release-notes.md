@@ -1,13 +1,13 @@
 # Kajam-11.8.0 #
 
-## Sometimes there is more than one batch scheduler running ##
+## Server returning all stream information when loading the player ##
  - Issue Type: Bug
  - Issue ID: SUP-6997
  
 ### Installation ###
 None.
 ### Configuration ###
-On windows machines create directory C:\var\run
+None. 
 #### Known Issues & Limitations ####
 None.
 #### Deployment scripts ####
