@@ -1,0 +1,11 @@
+        check process batch 
+           with pidfile "/var/run/kaltura/batch.pid"
+           start program = "/etc/init.d/kaltura-batch restart" with timeout 60 seconds
+           stop program = "/etc/init.d/kaltura-batch stop"
+           #if 10 restarts within 10 cycles then timeout
+           group kaltura
+           depends on batch_script
+
+        check file batch_script
+            with path "/opt/kaltura/app/batch/KGenericBatchMgr.class.php"
+            
