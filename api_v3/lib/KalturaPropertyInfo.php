@@ -524,10 +524,10 @@ class KalturaPropertyInfo
 	 */
 	public function requiresReadPermission()
 	{
-		if ($this->requiresUsagePermission())
-		{
-			return true;
-		}
+//		if ($this->requiresUsagePermission())
+//		{
+//			return true;
+//		}
 		return in_array(self::READ_PERMISSION_NAME, $this->_permissions);
 	}
 	
@@ -536,10 +536,10 @@ class KalturaPropertyInfo
 	 */
 	public function requiresUpdatePermission()
 	{
-		if ($this->requiresUsagePermission())
-		{
-			return true;
-		}
+//		if ($this->requiresUsagePermission())
+//		{
+//			return true;
+//		}
 		return in_array(self::UPDATE_PERMISSION_NAME, $this->_permissions);
 	}
 	
@@ -548,10 +548,10 @@ class KalturaPropertyInfo
 	 */
 	public function requiresInsertPermission()
 	{
-		if ($this->requiresUsagePermission())
-		{
-			return true;
-		}
+//		if ($this->requiresUsagePermission())
+//		{
+//			return true;
+//		}
 		return in_array(self::INSERT_PERMISSION_NAME, $this->_permissions);
 	}
 	
