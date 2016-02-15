@@ -212,10 +212,33 @@ class KalturaFrontController
 		}
 		
 		$multiRequestResultsPaths = $this->getMultiRequestResultsPaths($listOfRequests);
-		
+
 		// process the requests
 		$results = array();
 		kCurrentContext::$multiRequest_index = 0;
+
+		//enable multiDeferredEvents only if all requests have identical KS
+		$commonKs = isset($commonParams['ks']) ? $commonParams['ks'] : null;
+		$shouldDisableMultiDeferred = false;
+		for($i = $requestStartIndex; $i <= $requestEndIndex; $i++)
+		{
+			if (isset($listOfRequests[$i]['ks']))
+			{
+				$currentKs = $listOfRequests[$i]['ks'];
+				if ( $commonKs && ($currentKs != $commonKs) )
+				{
+					$shouldDisableMultiDeferred = true;
+					break;
+				} else if ( !$commonKs ) {
+					$commonKs = $currentKs;
+				}
+			}
+		}
+		if ( !$commonKs || $shouldDisableMultiDeferred )
+			kEventsManager::enableMultiDeferredEvents(false);
+		else
+			kEventsManager::enableMultiDeferredEvents(true);
+
 		for($i = $requestStartIndex; $i <= $requestEndIndex; $i++)
 		{
 			$currentParams = $listOfRequests[$i];  
@@ -296,7 +319,8 @@ class KalturaFrontController
 			if ($currentResult instanceof kRendererBase)
 				return $currentResult;
 		}
-		
+
+		kEventsManager::flushEvents(true);
 		return $results;
 	}
 	
