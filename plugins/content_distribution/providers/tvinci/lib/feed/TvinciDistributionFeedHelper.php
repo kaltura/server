@@ -9,6 +9,7 @@ class TvinciDistributionFeedHelper
 	const ACTION_UPDATE = 'update';
 	const ACTION_DELETE = 'delete';
 
+	const DELETE_XML = "<feed><export><media co_guid=\"COGUID\" entry_id=\"ENTRYID\" action=\"delete\" is_active=\"true\" erase=\"true\"/></export></feed>";
 
 	/**
 	 * var KalturaTvinciDistributionProfile
@@ -88,7 +89,7 @@ class TvinciDistributionFeedHelper
 		return $arguments;
 	}
 
-	private function createXml()
+	private function createXml( $action )
 	{
 		// Init the document
 		$this->_doc = new DOMDocument();
@@ -97,14 +98,25 @@ class TvinciDistributionFeedHelper
 
 		$feedAsXml = kMrssManager::getEntryMrssXml($this->entry);
 
-		if ($this->distributionProfile->xsltFile &&
-			(strlen($this->distributionProfile->xsltFile) !== 0) ) {
-			// custom non empty xslt
-			$xslt = $this->distributionProfile->xsltFile;
-		} else {
-			$xslt = file_get_contents(__DIR__."/../xml/tvinci_default.xslt");
+		if ( $action != self::ACTION_DELETE )
+		{
+			if ($this->distributionProfile->xsltFile &&
+				(strlen($this->distributionProfile->xsltFile) !== 0) ) {
+				// custom non empty xslt
+				$xslt = $this->distributionProfile->xsltFile;
+			} else {
+				$xslt = file_get_contents(__DIR__."/../xml/tvinci_default.xslt");
+			}
+			$feedAsString = kXml::transformXmlUsingXslt($feedAsXml->saveXML(), $xslt, $this->createArgumentsForXSLT());
 		}
-		$feedAsString = kXml::transformXmlUsingXslt($feedAsXml->saveXML(), $xslt, $this->createArgumentsForXSLT());
+		else {
+			$coguid = $this->entry->getReferenceID();
+			if ( !$coguid )
+				$coguid = $this->entry->getId();
+
+			$feedAsString = str_replace("COGUID", $coguid, self::DELETE_XML);
+			$feedAsString = str_replace("ENTRYID", $this->entry->getId(), $feedAsString);
+		}
 
 		$data = $this->_doc->createElement('data');
 		$data->appendChild($this->_doc->createCDATASection($feedAsString));
