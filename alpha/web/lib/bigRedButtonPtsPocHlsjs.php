@@ -27,7 +27,8 @@ $html5Version = $_GET['playerVersion'];
 	<link href='https://fonts.googleapis.com/css?family=Lato:400,700,300' rel='stylesheet' type='text/css'>
 	
 	<script src="/lib/js/jquery-1.8.3.min.js"></script>
-	<script type="text/javascript" src="/html5/html5lib/<?php echo $html5Version; ?>/mwEmbedLoader.php"></script>
+	<!--script type="text/javascript" src="/html5/html5lib/<?php echo $html5Version; ?>/mwEmbedLoader.php"></script-->
+	<script type="text/javascript" src="https://kgit.html5video.org/pulls/2500/mwEmbedLoader.php"></script>
 	<script type="text/javascript" src="swfobject.js"></script>
 	<script>
 		var partnerId = <?php echo $partnerId; ?>;
@@ -87,9 +88,10 @@ $html5Version = $_GET['playerVersion'];
                     wid: '_' + partnerId,
                     "uiconf_id": uiConfId,
                     "flashvars": {
-                            "streamerType": "auto",
+                             "hlsjs": {
+								"plugin": true
+							},
                             "autoPlay": true,
-                            "LeadWithHLSOnFlash": true,
 							"Kaltura.Protocol":"http"
                     },
                     "cache_st": 1410340114,

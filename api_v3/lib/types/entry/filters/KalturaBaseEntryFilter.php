@@ -14,6 +14,8 @@ class KalturaBaseEntryFilter extends KalturaBaseEntryBaseFilter
 		"redirectFromEntryId" => "_eq_redirect_from_entry_id",
 		"entitledUsersEditMatchAnd" => "_matchand_entitled_kusers_edit",
 		"entitledUsersPublishMatchAnd" => "_matchand_entitled_kusers_publish",
+		"entitledUsersEditMatchOr" => "_matchor_entitled_kusers_edit",
+		"entitledUsersPublishMatchOr" => "_matchor_entitled_kusers_publish",
 	);
 	
 	static private $order_by_map = array
@@ -143,6 +145,16 @@ class KalturaBaseEntryFilter extends KalturaBaseEntryBaseFilter
 		if(!empty($this->entitledUsersPublishMatchAnd))
 		{
 			$this->entitledUsersPublishMatchAnd = $this->preparePusersToKusersFilter( $this->entitledUsersPublishMatchAnd );
+		}
+		
+		if(!empty($this->entitledUsersEditMatchOr))
+		{
+			$this->entitledUsersEditMatchOr = $this->preparePusersToKusersFilter( $this->entitledUsersEditMatchOr );
+		}
+
+		if(!empty($this->entitledUsersPublishMatchOr))
+		{
+			$this->entitledUsersPublishMatchOr = $this->preparePusersToKusersFilter( $this->entitledUsersPublishMatchOr );
 		}
 	}
 	

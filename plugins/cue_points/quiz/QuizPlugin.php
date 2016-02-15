@@ -32,8 +32,7 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 	 */
 	public static function isAllowedPartner($partnerId)
 	{
-		$partner = PartnerPeer::retrieveByPK($partnerId);
-		return $partner->getPluginEnabled(self::PLUGIN_NAME);
+		return true;
 	}
 
 	/* (non-PHPdoc)

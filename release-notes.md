@@ -1,24 +1,43 @@
 # Kajam-11.8.0 #
 
-## Index cateogry inherited tree once per multirequest ##
-- Issue Type: Bug
-- Issue ID: PLAT-4968
-
-#### Configuration ####
-
-*base.ini*
-
-Add the following line to the the event_consumers[] list
-
-		event_consumers[] = kObjectReadyForIndexInheritedTreeHandler
-
-#### Deployment Scripts ####
-
+## Server returning all stream information when loading the player ##
+ - Issue Type: Bug
+ - Issue ID: SUP-6997
+ 
+### Installation ###
 None.
-
+### Configuration ###
+None. 
 #### Known Issues & Limitations ####
-
 None.
+#### Deployment scripts ####
+ - php deployment\updates\scripts\add_permissions\2014_01_22_live_stream_entry_broadcast_url.php
+ 
+
+## Sometimes there is more than one batch scheduler running ##
+ - Issue Type: Bug
+ - Issue ID: PLAT-4714
+ 
+### Installation ###
+None.
+### Configuration ###
+On windows machines create directory C:\var\run
+#### Known Issues & Limitations ####
+None.
+#### Deployment scripts ####
+
+## Default drm duration is not set##
+ - Issue Type: Bug
+ - Issue ID: SUP-7174
+#### Installation ####
+None.
+#### Configuration ####
+None.
+#### Known Issues & Limitations ####
+None.
+#### Deployment scripts ####
+ - mysql -h@db_host@ -u@db_user@ -p@db_pass@ -P3306 kaltura < /opt/kaltura/app/deployment/updates/sql/2016_02_03_add_default_duration_to_drm_policies.sql
+
 
 # Kajam-11.7.0 #
 

@@ -3,7 +3,6 @@ check process sphinx-populate
     start program = "/etc/init.d/kaltura-populate start" with timeout 60 seconds
     stop program = "/etc/init.d/kaltura-populate stop"
     
-    if 5 restarts within 5 cycles then timeout
 
     group kaltura
     depends on populate.conf, populate_script

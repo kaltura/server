@@ -67,4 +67,8 @@ class ResponseProfile extends BaseResponseProfile implements IResponseProfile, I
 	{
 		return $this->getId() . '_' . $this->getVersion();
 	}
+	public function getCacheInvalidationKeys()
+	{
+		return array("responseProfile:systemName=".strtolower($this->getSystemName()));
+	}
 } // ResponseProfile

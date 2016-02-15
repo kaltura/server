@@ -24,7 +24,7 @@ class FacebookDistributionProfile extends ConfigurableDistributionProfile
 	const CALL_TO_ACTION_TYPE_VALID_VALUES = 'SHOP_NOW,BOOK_TRAVEL,LEARN_MORE,SIGN_UP,DOWNLOAD,WATCH_MORE';
 	const DEFAULT_RE_REQUEST_PERMISSIONS = 'false';
 	// needed permission in order to be able to publish the video to a facebook page
-	const DEFAULT_FACEBOOK_PERMISSIONS = 'manage_pages,publish_actions,publish_pages,user_actions.video';
+	const DEFAULT_FACEBOOK_PERMISSIONS = 'manage_pages,publish_actions,publish_pages';
 	// targeting
 	const CUSTOM_DATA_TARGETING_COUNTRIES = 'targetingCountries'; //list
 	const CUSTOM_DATA_TARGETING_REGIONS = 'targetingRegions'; //list
@@ -108,7 +108,7 @@ class FacebookDistributionProfile extends ConfigurableDistributionProfile
 				FacebookConstants::FACEBOOK_MAX_POSTPONE_POST_IN_SECONDS))
 		{
 			KalturaLog::err("Scheduled time to publish defies the facebook restriction of six minute to six months from now got".$allFieldValues[FacebookDistributionField::SCHEDULE_PUBLISHING_TIME]);
-			$validationErrors[] = $this->createCustomValidationError($action, DistributionErrorType::INVALID_DATA, 'sunrise', 'Distribution sunrise is invalid (should be 6 minutes to 6 months from now)');
+			$validationErrors[] = $this->createCustomValidationError($action, DistributionErrorType::INVALID_DATA, 'sunrise', 'Distribution sunrise is invalid (should be 10 minutes to 6 months from now)');
 		}
 		$validationErrors = array_merge($validationErrors, $this->validateInListOrNull($inListOrNullFields, $allFieldValues, $action));
 		return $validationErrors;
