@@ -205,6 +205,11 @@ class KalturaFlavorParams extends KalturaAssetParams
 	 * @var string;
 	 */
 	public $watermarkData;
+
+	/**
+	 * @var int
+	 */
+	public $isEncrypted;
 	
 	/**
 	 * @var int
@@ -251,6 +256,7 @@ class KalturaFlavorParams extends KalturaAssetParams
 		"videoConstantBitrate",
 		"videoBitrateTolerance",
 		"watermarkData",
+		"isEncrypted",
 		"clipOffset",
 		"clipDuration",
 	);

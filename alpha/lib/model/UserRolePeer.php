@@ -120,6 +120,6 @@ class UserRolePeer extends BaseUserRolePeer
 		
 	public static function getCacheInvalidationKeys()
 	{
-		return array(array("userRole:id=%s", self::ID));		
+		return array(array("userRole:id=%s", self::ID), array("userRole:systemName=%s", self::SYSTEM_NAME));		
 	}
 } // UserRolePeer

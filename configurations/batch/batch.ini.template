@@ -7,6 +7,7 @@
 
 [template]
 logDir												= @LOG_DIR@/batch/
+pidFileDir                                          = /var/run/kaltura/
 statusInterval										= 300
 serviceUrl											= @SERVICE_URL@
 remoteServerUrl										= @BATCH_URL@
@@ -479,7 +480,7 @@ id													= 260
 friendlyName										= Distribute Submit
 type												= KAsyncDistributeSubmit
 scriptPath											= ../plugins/content_distribution/batch/Distribute/KAsyncDistributeSubmitExe.php
-
+maximumExecutionTime								= 5400
 
 [KAsyncDistributeUpdate : KAsyncDistribute]
 id													= 270

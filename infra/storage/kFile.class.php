@@ -591,7 +591,7 @@ class kFile
 		$length = strlen($string);
 
 		// we shouldnt return a chunked encoded header as we read the whole response and echo it after curl extracts it
-		if (strpos($string, "Transfer-Encoding: chunked") === FALSE)
+		if (stripos($string, "Transfer-Encoding: chunked") === FALSE)
 		{
 			header($string);
 		}

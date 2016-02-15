@@ -115,7 +115,6 @@ class KalturaAsset extends KalturaObject implements IRelatedFilterable, IApiObje
 	 */
 	public $actualSourceAssetParamsIds;
 	
-		
 	private static $map_between_objects = array
 	(
 		"id",

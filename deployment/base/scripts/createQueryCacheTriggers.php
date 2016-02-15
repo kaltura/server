@@ -26,7 +26,7 @@ $INVALIDATION_KEYS = array(
 	array('table' => "entry_distribution", 				'keys' => array(array("'entryDistribution:entryId='", '@OBJ@.entry_id')),																'plugin' => 'content_distribution'),
 	array('table' => "flavor_params", 					'keys' => array(array("'flavorParams:id='", '@OBJ@.id'), array("'flavorParams:partnerId='", '@OBJ@.partner_id')),						'class' => 'assetParams'),
 	array('table' => "flavor_params_conversion_profile",'keys' => array(array("'flavorParamsConversionProfile:flavorParamsId='", '@OBJ@.flavor_params_id', "',conversionProfileId='", '@OBJ@.conversion_profile_id'), array("'flavorParamsConversionProfile:conversionProfileId='", '@OBJ@.conversion_profile_id'))),
-	array('table' => "user_role", 						'keys' => array(array("'userRole:id='", '@OBJ@.id'))),
+	array('table' => "user_role", 						'keys' => array(array("'userRole:id='", '@OBJ@.id'), array("'userRole:systemName='", '@OBJ@.system_name'))),
 	array('table' => "invalid_session", 				'keys' => array(array("'invalidSession:ks='", '@OBJ@.ks'))),
 	array('table' => "upload_token", 					'keys' => array(array("'uploadToken:id='", '@OBJ@.id'))),
 	array('table' => "conversion_profile_2", 			'keys' => array(array("'conversionProfile2:partnerId='", '@OBJ@.partner_id'))),
@@ -38,6 +38,7 @@ $INVALIDATION_KEYS = array(
 	array('table' => "event_notification_template", 	'keys' => array(array("'eventNotificationTemplate:partnerId='", '@OBJ@.partner_id')),													'plugin' => 'event_notification'),
 	array('table' => "category_kuser", 					'keys' => array(array("'categoryKuser:categoryId='", '@OBJ@.category_id'))),
 	array('table' => "kuser_kgroup", 					'keys' => array(array("'kuserKgroup:kuserId='", '@OBJ@.kuser_id'))),
+	array('table' => "response_profile", 				'keys' => array(array("'responseProfile:systemName='", '@OBJ@.system_name'))),
 	);
 
 $TRIGGER_TYPES = array('INSERT', 'UPDATE', 'DELETE');

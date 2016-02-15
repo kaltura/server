@@ -733,6 +733,9 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 			{
 				$processedCuePointIds[] = $liveCuePoint->getId();
 				$cuePointCreationTime = $liveCuePoint->getCreatedAt(NULL)*1000;
+
+				// if the cp was before the segment start time - move it to the beginning of the segment.
+				$cuePointCreationTime = max($cuePointCreationTime, $currentSegmentStartTime * 1000);
 				$offsetForTS = self::getOffsetForTimestamp($cuePointCreationTime, $amfArray);
 				$copyMsg = "cuepoint [{$liveCuePoint->getId()}] from live entry [{$liveEntry->getId()}] to VOD entry [{$vodEntry->getId()}] cuePointCreationTime= $cuePointCreationTime offsetForTS= $offsetForTS";
 				KalturaLog::debug("Preparing to copy $copyMsg");

@@ -45,4 +45,8 @@ class ResponseProfilePeer extends BaseResponseProfilePeer {
 		return ResponseProfilePeer::doSelectOne($criteria);
 	}
 	
+	public static function getCacheInvalidationKeys()
+	{
+		return array(array("responseProfile:systemName=%s", self::SYSTEM_NAME));		
+	}
 } // ResponseProfilePeer

@@ -415,6 +415,7 @@
 		const DnxhdUnsupportedParams = 1107;
 		const InvalidRequest = 1108;
 		const InvalidFlavorParamConfiguration = 1109;
+		const Encryption = 1110;
 		const Other = 1500;
 		
 		public static function ToString($err, $param1=null, $param2=null){

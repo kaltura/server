@@ -48,6 +48,25 @@ class KDLOperatorFfmpeg2_2 extends KDLOperatorFfmpeg2_1_3 {
 	 */
 class KDLOperatorFfmpeg2_7_2 extends KDLOperatorFfmpeg2_2 {
 	
+	/* ---------------------------
+	 * generateSinglePassCommandLine
+	 */
+	public function generateSinglePassCommandLine(KDLFlavor $design, KDLFlavor $target, $extra=null)
+	{
+		$cmdStr = parent::generateSinglePassCommandLine($design, $target, $extra);
+		if(!isset($cmdStr)) 
+			return null;
+		if($target->_isEncrypted==true) {
+				// Add key & key_if placeholder. To be replaced by real values after asset creation
+			$str = " -encryption_scheme cenc-aes-ctr";
+			$str.= " -encryption_key ".KDLFlavor::ENCRYPTION_KEY_PLACEHOLDER;
+			$str.= " -encryption_kid ".KDLFlavor::ENCRYPTION_KEY_ID_PLACEHOLDER." -y ";
+			$cmdStr = str_replace(" -y ", $str, $cmdStr);
+			KalturaLog::log("On Encryption: $cmdStr");
+		}
+		return $cmdStr;
+	}
+		
 	/**
 	 * generateVideoFilters
 	 * @param $vid
@@ -59,7 +78,7 @@ class KDLOperatorFfmpeg2_7_2 extends KDLOperatorFfmpeg2_2 {
 		 * FFMpeg 2.7 automatically rotates the output 
 		 * into 'non-rotated' orientation. No need to do it explicitly 
 		 */
-	$rotation = null;
+		$rotation = null;
 		if(isset($vid->_rotation)) {
 			$rotation = $vid->_rotation;
 			$vid->_rotation = null;
@@ -84,7 +103,7 @@ class KDLOperatorFfmpeg2_7_2 extends KDLOperatorFfmpeg2_2 {
 		}
 		return $vidCodecSpecStr;
 	}
-	
+
 	/**
 	 *
 	 * @param unknown_type $targetVid
@@ -107,5 +126,20 @@ $rotation = null;
 		$targetVid->_rotation = $rotation;
 		return $watermarkStr;
 	}
+
+	/* ---------------------------
+	 * CheckConstraints
+	 */
+	public function CheckConstraints(KDLMediaDataSet $source, KDLFlavor $target, array &$errors=null, array &$warnings=null)
+	{
+		$isEncrypted = $target->_isEncrypted;
+		if($target->_isEncrypted==true) {
+			$target->_isEncrypted = false;
+		}
+		$rv = parent::CheckConstraints($source, $target, $errors, $warnings);
+		$target->_isEncrypted = $isEncrypted;
+		return $rv;
+	}
+	
 }
 
