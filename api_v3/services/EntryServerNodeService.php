@@ -24,12 +24,28 @@ class EntryServerNodeService extends KalturaBaseService
 	 */
 	public function addAction(KalturaEntryServerNode $entryServerNode)
 	{
-		$dbUserEntry = $entryServerNode->toInsertableObject(null, null);
-		$dbUserEntry->save();
+		$dbEntryServerNode = $this->addNewEntryServerNode($entryServerNode);
 
-		$entryServerNode->fromObject($dbUserEntry, $this->getResponseProfile());
+		$te = new TrackEntry();
+		$te->setEntryId($dbEntryServerNode->getEntryId());
+		$te->setTrackEventTypeId(TrackEntry::TRACK_ENTRY_EVENT_TYPE_ADD_ENTRY);
+		$te->setDescription(__METHOD__ . ":" . __LINE__ . "::" . $dbEntryServerNode->getServerType().":".$dbEntryServerNode->getServerNodeId());
+		TrackEntry::addTrackEntry($te);
 
+		$entryServerNode = EntryServerNodePeer::getInstanceByType($dbEntryServerNode, $this->getResponseProfile());
 		return $entryServerNode;
+
+	}
+
+	private function addNewEntryServerNode(KalturaEntryServerNode $entryServerNode)
+	{
+		$dbEntryServerNode = $entryServerNode->toInsertableObject();
+		/* @var $dbEntryServerNode EntryServerNode */
+		$dbEntryServerNode->setPartnerId($this->getPartnerId());
+		$dbEntryServerNode->setStatus(EntryServerNodeStatus::STOPPED);
+		$dbEntryServerNode->save();
+
+		return $dbEntryServerNode;
 	}
 
 	/**
@@ -37,16 +53,20 @@ class EntryServerNodeService extends KalturaBaseService
 	 * @action update
 	 * @param int $id
 	 * @param KalturaEntryServerNode $entryServerNode
+	 * @return KalturaEntryServerNode|null|object
 	 * @throws KalturaAPIException
 	 */
 	public function updateAction($id, KalturaEntryServerNode $entryServerNode)
 	{
-		$dbUserEntry = EntryServerNodePeer::retrieveByPK($id);
-		if (!$dbUserEntry)
+		$dbEntryServerNode = EntryServerNodePeer::retrieveByPK($id);
+		if (!$dbEntryServerNode)
 			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $id);
 
-		$dbUserEntry = $entryServerNode->toUpdatableObject($dbUserEntry);
-		$dbUserEntry->save();
+		$dbEntryServerNode = $entryServerNode->toUpdatableObject($dbEntryServerNode);
+		$dbEntryServerNode->save();
+
+		$entryServerNode = EntryServerNodePeer::getInstanceByType($dbEntryServerNode, $this->getResponseProfile());
+		return $entryServerNode;
 	}
 
 	/**
@@ -73,17 +93,10 @@ class EntryServerNodeService extends KalturaBaseService
 	public function listAction(KalturaEntryServerNodeFilter $filter, KalturaFilterPager $pager = null)
 	{
 		if (!$filter)
-		{
 			$filter = new KalturaEntryServerNodeFilter();
-		}
 		if (!$pager)
-		{
 			$pager = new KalturaFilterPager();
-		}
-		// return empty list when userId was not given
-		if ( $this->getKs() && !$this->getKs()->isAdmin() && !kCurrentContext::$ks_uid ) {
-			return new KalturaEntryServerNodeListResponse();
-		}
+
 		return $filter->getListResponse($pager, $this->getResponseProfile());
 	}
 
@@ -95,12 +108,11 @@ class EntryServerNodeService extends KalturaBaseService
 	 */
 	public function getAction($id)
 	{
-		// TODO - I think this function needs change
 		$dbEntryServerNode = EntryServerNodePeer::retrieveByPK( $id );
 		if(!$dbEntryServerNode)
-			throw new KalturaAPIException(KalturaErrors::USER_ENTRY_NOT_FOUND, $id);
+			throw new KalturaAPIException(KalturaErrors::ENTRY_SERVER_NODE_NOT_FOUND, $id);
 
-		$entryServerNode = EntryServerNodePeer::getInstanceByType($dbEntryServerNode->getType());
+		$entryServerNode = EntryServerNodePeer::getInstanceByType($dbEntryServerNode);
 		if (!$entryServerNode)
 			return null;
 		$entryServerNode->fromObject($dbEntryServerNode);

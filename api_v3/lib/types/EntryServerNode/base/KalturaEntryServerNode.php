@@ -10,21 +10,20 @@ abstract class KalturaEntryServerNode extends KalturaObject implements IRelatedF
 	 * unique auto-generated identifier
 	 * @var int
 	 * @readonly
-	 * @filter eq,in,notin
+	 * @filter eq,in
 	 */
 	public $id;
 
 	/**
 	 * @var string
 	 * @insertonly
-	 * @filter eq,in,notin
+	 * @filter eq,in
 	 */
 	public $entryId;
 
 	/**
 	 * @var int
-	 * @insertonly
-	 * @filter eq,in,notin
+	 * @filter eq,in
 	 */
 	public $serverNodeId;
 
@@ -57,7 +56,7 @@ abstract class KalturaEntryServerNode extends KalturaObject implements IRelatedF
 
 	/**
 	 * @var KalturaEntryServerNodeType
-	 * @readonly
+	 * @insertonly
 	 * @filter eq
 	 */
 	public $serverType;
@@ -77,24 +76,6 @@ abstract class KalturaEntryServerNode extends KalturaObject implements IRelatedF
 	public function getMapBetweenObjects ( )
 	{
 		return array_merge ( parent::getMapBetweenObjects() , self::$map_between_objects );
-	}
-
-
-	/**
-	 * Function returns KalturaEntryServerNode sub-type according to protocol
-	 * @var string $type
-	 * @return KalturaEntryServerNode
-	 *
-	 */
-	public static function getInstanceByType ($type)
-	{
-		// TODO once there is a LiveEntryServerNode we should examine this function again
-		$obj = KalturaPluginManager::loadObject("KalturaEntryServerNode",$type);
-		if (is_null($obj))
-		{
-			KalturaLog::err("The type '$type' is unknown");
-		}
-		return $obj;
 	}
 
 	/* (non-PHPdoc)

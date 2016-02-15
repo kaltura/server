@@ -718,8 +718,6 @@ abstract class BaseEntryServerNodePeer {
 	{
 		$results = array();
 	
-		// set the class once to avoid overhead in the loop
-		$cls = EntryServerNodePeer::getOMClass(false);
 		// populate the object(s)
 		while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
 			$key = EntryServerNodePeer::getPrimaryKeyHashFromRow($row, 0);
@@ -729,6 +727,7 @@ abstract class BaseEntryServerNodePeer {
 				// $obj->hydrate($row, 0, true); // rehydrate
 				$results[] = $obj;
 			} else {
+				$cls = EntryServerNodePeer::getOMClass($row, 0);
 				$obj = new $cls();
 				$obj->hydrate($row);
 				$results[] = $obj;
@@ -765,11 +764,11 @@ abstract class BaseEntryServerNodePeer {
 	 * The class that the Peer will make instances of.
 	 *
 	 * If $withPrefix is true, the returned path
-	 * uses a dot-path notation which is tranalted into a path
+	 * uses a dot-path notation which is translated into a path
 	 * relative to a location on the PHP include_path.
 	 * (e.g. path.to.MyClass -> 'path/to/MyClass.php')
 	 *
-	 * @param      boolean  Whether or not to return the path wit hthe class name 
+	 * @param      boolean  Whether or not to return the path with the class name
 	 * @return     string path.to.ClassName
 	 */
 	public static function getOMClass($withPrefix = true)

@@ -38,13 +38,13 @@ class EntryServerNodeTableMap extends TableMap {
 		$this->setUseIdGenerator(true);
 		// columns
 		$this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
-		$this->addColumn('ENTRY_ID', 'EntryId', 'VARCHAR', false, 20, null);
+		$this->addColumn('ENTRY_ID', 'EntryId', 'VARCHAR', true, 20, null);
 		$this->addColumn('SERVER_NODE_ID', 'ServerNodeId', 'INTEGER', false, null, null);
 		$this->addColumn('PARTNER_ID', 'PartnerId', 'INTEGER', false, null, null);
 		$this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
 		$this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
 		$this->addColumn('STATUS', 'Status', 'INTEGER', false, null, null);
-		$this->addColumn('SERVER_TYPE', 'ServerType', 'INTEGER', false, null, null);
+		$this->addColumn('SERVER_TYPE', 'ServerType', 'INTEGER', true, null, null);
 		$this->addColumn('CUSTOM_DATA', 'CustomData', 'LONGVARCHAR', false, null, null);
 		// validators
 	} // initialize()
