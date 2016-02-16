@@ -256,7 +256,7 @@ class ComcastMrssFeed
 		$urlManager = DeliveryProfilePeer::getDeliveryProfile($asset->getEntryId());
 		if($asset instanceof flavorAsset)
 			$urlManager->initDeliveryDynamicAttributes(null, $asset);
-		$url = $urlManager->getFullAssetUrl($asset, null, $this->distributionProfile->addThumbExtension);
+		$url = $urlManager->getFullAssetUrl($asset, null, $this->distributionProfile->getShouldAddThumbExtension());
 		$url = preg_replace('/^https?:\/\//', '', $url);
 		return 'http://' . $url;
 	}

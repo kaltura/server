@@ -32,6 +32,7 @@ class Form_ComcastMrssProfileConfiguration extends Form_ConfigurableProfileConfi
 		$object->cPlatformTvSeriesField = $this->getValue('c_platform_tv_series_field'); // because parent::getObject doesn't include empty fields 
 		$object->shouldIncludeCaptions = $this->getValue('should_include_captions');
 		$object->shouldIncludeCuePoints = $this->getValue('should_include_cue_points');
+		$object->shouldAddThumbExtension = $this->getValue('should_add_thumb_extension');
 		$object->feedLink = $this->getValue('feed_link'); // because parent::getObject doesn't include empty fields 
 			
 		return $object;
