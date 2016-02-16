@@ -159,6 +159,10 @@ class Form_ComcastMrssProfileConfiguration extends Form_ConfigurableProfileConfi
 			'label' => 'Include Entry Ad Cue Points',
 		));
 		
+		$this->addElement('checkbox', 'should_add_thumb_extension', array(
+			'label' => 'Include Thumbnail Extension',
+		));
+		
 		$this->addElement('textarea', 'cplatform_xml', array(
 			'label'	  =>  'cPlatform TV Series XML',
 			'rows' => 8
@@ -167,7 +171,7 @@ class Form_ComcastMrssProfileConfiguration extends Form_ConfigurableProfileConfi
 		$this->addMetadataFieldsAsValues('c_platform_tv_series_field');
 		
 		$this->addDisplayGroup(
-			array('feed_title', 'feed_link', 'feed_description', 'feed_last_build_date', 'cplatform_xml', 'c_platform_tv_series_field', 'should_include_captions', 'should_include_cue_points'), 
+			array('feed_title', 'feed_link', 'feed_description', 'feed_last_build_date', 'cplatform_xml', 'c_platform_tv_series_field', 'should_include_captions', 'should_include_cue_points', 'should_add_thumb_extension'), 
 			'feed', 
 			array('legend' => 'Feed Configuration', 'decorators' => array('FormElements', 'Fieldset'))
 		);
