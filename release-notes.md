@@ -11,7 +11,7 @@
 
 #### Deployment Scripts ####
 
-		php /opt/kaltura/app/tests/standAloneClient/exec.php /opt/kaltura/app/tests/standAloneClient/emailFlavorAssetChangedNotificationTemplate.xml
+		php /opt/kaltura/app/tests/standAloneClient/exec.php /opt/kaltura/app/tests/standAloneClient/flavorAssetChangedHttpNotificationTemplate.xml
 
 #### Known Issues & Limitations ####
 
