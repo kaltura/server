@@ -215,7 +215,7 @@ class kConvertJobData extends kConvartableJobData
 		// 2. There are no required flavors and this is the flavor is optional with the minimal bitrate
 		// 3. all flavors are set as READY_BEHAVIOR_NO_IMPACT.
 		
-		$allFlavorParamsIds = array();
+		$optionalFlavorParamsIds = array();
 		$hasRequired = false;
 		$allNoImpact = true;
 		
@@ -228,7 +228,7 @@ class kConvertJobData extends kConvartableJobData
 			if($fpcp->getReadyBehavior() == flavorParamsConversionProfile::READY_BEHAVIOR_REQUIRED) // Case 2
 				$hasRequired = true;
 			else if ($fpcp->getReadyBehavior() == flavorParamsConversionProfile::READY_BEHAVIOR_OPTIONAL)
-				$allFlavorParamsIds[] = $fpcp->getFlavorParamsId();
+				$optionalFlavorParamsIds[] = $fpcp->getFlavorParamsId();
 
 			if($fpcp->getReadyBehavior() != flavorParamsConversionProfile::READY_BEHAVIOR_NO_IMPACT) // Case 3
 				$allNoImpact = false;
@@ -236,7 +236,7 @@ class kConvertJobData extends kConvartableJobData
 		// Case 2
 		if((!$hasRequired) && ($readiness == flavorParamsConversionProfile::READY_BEHAVIOR_OPTIONAL)) {
 			//retrieve minimal bitrate out of "optional" flavorParams
-			$flvParamsMinBitrate = assetParamsPeer::retrieveMinimalBitrate($allFlavorParamsIds);
+			$flvParamsMinBitrate = assetParamsPeer::retrieveMinimalBitrate($optionalFlavorParamsIds);
 			if(!is_null($flvParamsMinBitrate) && $flvParamsMinBitrate->getId() == $flavorParamsId)
 				$readiness = flavorParamsConversionProfile::READY_BEHAVIOR_REQUIRED;
 		}
