@@ -173,7 +173,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 		$recordedAsset->setStatus(asset::FLAVOR_ASSET_STATUS_QUEUED);
 		$recordedAsset->setFlavorParamsId($flavorParams->getId());
 		$recordedAsset->setFromAssetParams($flavorParams);
-		$recordedAsset->setVersion(0);
+		$recordedAsset->incrementVersion();
 		if ( $dbAsset->hasTag(assetParams::TAG_RECORDING_ANCHOR) )
 		{
 			$recordedAsset->addTags(array(assetParams::TAG_RECORDING_ANCHOR));
