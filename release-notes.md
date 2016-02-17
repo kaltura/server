@@ -1,3 +1,22 @@
+# Kajam-11.9.0 #
+
+## new Http notifcation - Flavor Asset Status Changed ##
+
+- Issue Type: New Feature
+- Issue ID: PLAT-5097
+
+#### Configuration ####
+ 
+- None.
+
+#### Deployment Scripts ####
+
+		php /opt/kaltura/app/tests/standAloneClient/exec.php /opt/kaltura/app/tests/standAloneClient/emailFlavorAssetChangedNotificationTemplate.xml
+
+#### Known Issues & Limitations ####
+
+None.
+
 # Kajam-11.8.0 #
 
 ## Server returning all stream information when loading the player ##
