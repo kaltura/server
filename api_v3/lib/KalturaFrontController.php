@@ -182,6 +182,8 @@ class KalturaFrontController
 		$listOfRequests = array();
 		$requestStartIndex = 1;
 		$requestEndIndex = 1;
+		$ksArray = array();
+
 		foreach ($this->params as $paramName => $paramValue)
 		{
 			if(is_numeric($paramName))
@@ -190,6 +192,10 @@ class KalturaFrontController
 				$requestStartIndex = min($requestStartIndex, $paramName);
 				$requestEndIndex = max($requestEndIndex, $paramName);
 				$listOfRequests[$paramName] = $paramValue;
+				if (isset($paramValue['ks'])) {
+					$ksArray[$paramValue['ks']] = true;
+				}
+
 				continue;
 			}
 			
@@ -197,18 +203,30 @@ class KalturaFrontController
 			if (count($explodedName) <= 1 || !is_numeric($explodedName[0]))
 			{
 				$commonParams[$paramName] = $paramValue;
-				continue;
 			}
-		
-			$requestIndex = (int)$explodedName[0];
-			$requestStartIndex = min($requestStartIndex, $requestIndex);
-			$requestEndIndex = max($requestEndIndex, $requestIndex);
-			$paramName = $explodedName[1];
-			if (!array_key_exists($requestIndex, $listOfRequests))
+			else
 			{
-				$listOfRequests[$requestIndex] = array();
+				$requestIndex = (int)$explodedName[0];
+				$requestStartIndex = min($requestStartIndex, $requestIndex);
+				$requestEndIndex = max($requestEndIndex, $requestIndex);
+				$paramName = $explodedName[1];
+				if (!array_key_exists($requestIndex, $listOfRequests))
+				{
+					$listOfRequests[$requestIndex] = array();
+				}
+				$listOfRequests[$requestIndex][$paramName] = $paramValue;
 			}
-			$listOfRequests[$requestIndex][$paramName] = $paramValue;
+
+			if ($paramName == 'ks') {
+				$ksArray[$paramValue] = true;
+			}
+		}
+
+		//enable multi deferred events only if all ks's are the same
+		if ( count($ksArray)==1 ) {
+			kEventsManager::enableMultiDeferredEvents(true);
+		} else {
+			kEventsManager::enableMultiDeferredEvents(false);
 		}
 		
 		$multiRequestResultsPaths = $this->getMultiRequestResultsPaths($listOfRequests);
@@ -216,28 +234,6 @@ class KalturaFrontController
 		// process the requests
 		$results = array();
 		kCurrentContext::$multiRequest_index = 0;
-
-		//enable multiDeferredEvents only if all requests have identical KS
-		$commonKs = isset($commonParams['ks']) ? $commonParams['ks'] : null;
-		$shouldDisableMultiDeferred = false;
-		for($i = $requestStartIndex; $i <= $requestEndIndex; $i++)
-		{
-			if (isset($listOfRequests[$i]['ks']))
-			{
-				$currentKs = $listOfRequests[$i]['ks'];
-				if ( $commonKs && ($currentKs != $commonKs) )
-				{
-					$shouldDisableMultiDeferred = true;
-					break;
-				} else if ( !$commonKs ) {
-					$commonKs = $currentKs;
-				}
-			}
-		}
-		if ( !$commonKs || $shouldDisableMultiDeferred )
-			kEventsManager::enableMultiDeferredEvents(false);
-		else
-			kEventsManager::enableMultiDeferredEvents(true);
 
 		for($i = $requestStartIndex; $i <= $requestEndIndex; $i++)
 		{
