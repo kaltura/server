@@ -1,5 +1,21 @@
 # Kajam-11.9.0 #
 
+## Remove quiz permission ##
+
+- Issue Type: Bug
+
+#### Configuration ####
+
+- Remove the following lines from admin.ini:
+
+		moduls.quizCuePoint.enabled = true
+		moduls.quizCuePoint.permissionType = 3
+		moduls.quizCuePoint.label = Quiz - Cue Points
+		moduls.quizCuePoint.permissionName = QUIZ_PLUGIN_PERMISSION
+		moduls.quizCuePoint.basePermissionType = 3
+		moduls.quizCuePoint.basePermissionName = CUEPOINT_PLUGIN_PERMISSION
+		moduls.quizCuePoint.group = GROUP_ENABLE_DISABLE_FEATURES
+
 ## new Http notifcation - Flavor Asset Status Changed ##
 
 - Issue Type: New Feature
