@@ -1,3 +1,18 @@
+# Kajam-11.9.0 #
+
+## Sometimes there is more than one batch scheduler running ##
+ - Issue Type: Bug
+ - Issue ID: PLAT-4714
+ 
+### Installation ###
+None.
+### Configuration ###
+Copy the file '/opt/kaltura/app/batch/kaltura_batch.sh' to /etc/init.d/kaltura-batch and overwrite. 
+#### Known Issues & Limitations ####
+None.
+#### Deployment scripts ####
+ 
+
 # Kajam-11.8.0 #
 
 ## Server returning all stream information when loading the player ##
