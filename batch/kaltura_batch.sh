@@ -129,7 +129,7 @@ stop() {
             kill -s $SIGNAL $KP > /dev/null
         fi
         if [ -e "$LOCKFILE" ]; then
-            rm $LOCKFILE
+            rm -f $LOCKFILE
         fi
         RC=$?
     else

@@ -123,6 +123,12 @@ class PartnerService extends KalturaBaseService
 	 */	
 	public function updateAction( KalturaPartner $partner, $allowEmpty = false)
 	{
+		$vars_arr=get_object_vars($partner);
+		foreach ($vars_arr as $key => $val){
+		    if (is_string($partner->$key)){
+                        $partner->$key=strip_tags($partner->$key);
+                    }    
+                }   
 		$dbPartner = PartnerPeer::retrieveByPK( $this->getPartnerId() );
 		
 		if ( ! $dbPartner )
