@@ -15,7 +15,7 @@ private static function shouldDeleteOldAsset($oldAsset,$entry)
 				return true;
 		}
 	}
-	if ($oldAsset instanceof thumbAsset)
+	elseif ($oldAsset instanceof thumbAsset)
 		return true;
 
 	return false;
