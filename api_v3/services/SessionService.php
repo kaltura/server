@@ -273,11 +273,8 @@ class SessionService extends KalturaBaseService
 	 */	
 	function startWidgetSession ( $widgetId , $expiry = 86400 )
 	{
-		KalturaLog::debug("in startWidgetSession with widgetId " . $widgetId);
-
 		// make sure the secret fits the one in the partner's table
 		$ksStr = "";
-
 		$widget = widgetPeer::retrieveByPK( $widgetId );
 		if ( !$widget )
 		{
