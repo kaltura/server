@@ -1,3 +1,18 @@
+# Kajam-11.9.0 #
+
+## add roles field on widget and set permissions accordingly ##
+ - Issue Type: Bug
+ - Issue ID: PLAT-3728
+### Installation ###
+None.
+### Configuration ###
+None.
+#### Known Issues & Limitations ####
+None.
+#### Deployment scripts ####
+ - php deployment/updates/scripts/add_permissions/2016_02_11_add_qna_user_role_and_permissions.php
+
+
 # Kajam-11.8.0 #
 
 ## Server returning all stream information when loading the player ##
