@@ -16,6 +16,9 @@ Add the following line to the the event_consumers[] list
 
 None.
 
+#### Known Issues & Limitations ####
+None.
+
 ## Sometimes there is more than one batch scheduler running ##
  - Issue Type: Bug
  - Issue ID: PLAT-4714
