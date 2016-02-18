@@ -484,7 +484,7 @@ abstract class BaseEntryServerNode extends BaseObject  implements Persistent {
 	/**
 	 * Set the value of [server_type] column.
 	 * 
-	 * @param      int $v new value
+	 * @param      EntryServerNodeType $v new value
 	 * @return     EntryServerNode The current object (for fluent API support)
 	 */
 	public function setServerType($v)

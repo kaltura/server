@@ -14,7 +14,7 @@ abstract class LiveEntry extends entry
 	const DEFAULT_CACHE_EXPIRY = 120;
 	
 	const CUSTOM_DATA_NAMESPACE_MEDIA_SERVERS = 'mediaServers';
-	
+
 	static $kalturaLiveSourceTypes = array(EntrySourceType::LIVE_STREAM, EntrySourceType::LIVE_CHANNEL, EntrySourceType::LIVE_STREAM_ONTEXTDATA_CAPTIONS);
 	
 	/* (non-PHPdoc)
@@ -252,7 +252,7 @@ abstract class LiveEntry extends entry
 	public function setLastBroadcast ( $v )	{	$this->putInCustomData ( "last_broadcast" , $v );	}
 	public function getLastBroadcast (  )	{	return $this->getFromCustomData( "last_broadcast");	}
 	
-	protected function setLastBroadcastEndTime ( $v )	{	$this->putInCustomData ( "last_broadcast_end_time" , $v );	}
+	public function setLastBroadcastEndTime ( $v )	{	$this->putInCustomData ( "last_broadcast_end_time" , $v );	}
 	public function getLastBroadcastEndTime (  )	{	return (int) $this->getFromCustomData( "last_broadcast_end_time", null, 0);	}
 	
 	public function getPushPublishEnabled()
@@ -313,21 +313,23 @@ abstract class LiveEntry extends entry
 		$primaryApplicationName = null;
 		$backupApplicationName = null;
 		$isExternalMediaServerStream = false;
-		
-		$kMediaServers = $this->getMediaServers();
-		if(count($kMediaServers))
+		/* @var $liveEntryServerNode LiveEntryServerNode */
+		$liveEntryServerNode = null;
+		/* @var $serverNode WowzaMediaServerNode */
+		$serverNode = null;
+
+		$liveEntryServerNodes = $this->getLiveEntryServerNodes();
+		if(count($liveEntryServerNodes))
 		{
-			foreach($kMediaServers as $key => $kMediaServer)
+			foreach($liveEntryServerNodes as $key => $liveEntryServerNode)
 			{
-				if($kMediaServer && $kMediaServer instanceof kLiveMediaServer)
+				$serverNode = ServerNodePeer::retrieveByPK($liveEntryServerNode->getServerNodeId());
+				KalturaLog::debug("mediaServer->getDc [" . $serverNode->getDc() . "] == kDataCenterMgr::getCurrentDcId [" . kDataCenterMgr::getCurrentDcId() . "]");
+				if($serverNode->getDc() == kDataCenterMgr::getCurrentDcId())
 				{
-					KalturaLog::debug("mediaServer->getDc [" . $kMediaServer->getDc() . "] == kDataCenterMgr::getCurrentDcId [" . kDataCenterMgr::getCurrentDcId() . "]");
-					if($kMediaServer->getDc() == kDataCenterMgr::getCurrentDcId())
-					{
-						$primaryMediaServer = $kMediaServer->getMediaServer();
-						$primaryApplicationName = $kMediaServer->getApplicationName();
-						unset($kMediaServers[$key]);
-					}
+					$primaryMediaServer = $serverNode;
+					$primaryApplicationName = $serverNode->getApplicationName();
+					unset($liveEntryServerNodes[$key]);
 				}
 			}
 			
@@ -335,28 +337,24 @@ abstract class LiveEntry extends entry
 			{
 				if($currentDcOnly)
 					return array();
-					
-				$kMediaServer = array_shift($kMediaServers);
-				if($kMediaServer && $kMediaServer instanceof kLiveMediaServer)
-				{
-					$primaryMediaServer = $kMediaServer->getMediaServer();
-					$primaryApplicationName = $kMediaServer->getApplicationName();
-					
-					if($primaryMediaServer)
-						$isExternalMediaServerStream = $primaryMediaServer->getIsExternalMediaServer();
-					else 
-						KalturaLog::debug("Cannot retrrive extra information for un-registered media server with host name [" . $kMediaServer->getHostname() . "]");
-				}
+
+				$liveEntryServerNode = array_shift($liveEntryServerNodes);
+				$serverNode = ServerNodePeer::retrieveByPK($liveEntryServerNode->getServerNodeId());
+				$primaryMediaServer = $serverNode;
+				$primaryApplicationName = $serverNode->getApplicationName();
+
+				if($primaryMediaServer)
+					$isExternalMediaServerStream = $primaryMediaServer->getIsExternalMediaServer();
+				else
+					KalturaLog::debug("Cannot retrrive extra information for un-registered media server with host name [" . $liveEntryServerNode->getHostname() . "]");
 			}
 			
-			if(!$currentDcOnly && count($kMediaServers))
+			if(!$currentDcOnly && count($liveEntryServerNodes))
 			{
-				$kMediaServer = reset($kMediaServers);
-				if($kMediaServer && $kMediaServer instanceof kLiveMediaServer)
-				{
-					$backupMediaServer = $kMediaServer->getMediaServer();
-					$backupApplicationName = $kMediaServer->getApplicationName();
-				}
+				$liveEntryServerNode = reset($liveEntryServerNodes);
+				$serverNode = ServerNodePeer::retrieveByPK($liveEntryServerNode->getServerNodeId());
+				$backupMediaServer = $serverNode;
+				$backupApplicationName = $serverNode->getApplicationName();
 			}
 		}
 		
@@ -511,26 +509,25 @@ abstract class LiveEntry extends entry
 	 */
 	public function getMediaServer($currentDcOnly = false)
 	{
-		$kMediaServers = $this->getMediaServers();
-		if(! count($kMediaServers))
+		$liveEntryServerNodes = $this->getLiveEntryServerNodes();
+		if(! count($liveEntryServerNodes))
 			return null;
-		
-		foreach($kMediaServers as $kMediaServer)
+		/* @var LiveEntryServerNode $liveEntryServerNode*/
+		foreach($liveEntryServerNodes as $liveEntryServerNode)
 		{
-			if($kMediaServer && $kMediaServer instanceof kLiveMediaServer)
-			{
-				KalturaLog::debug("mediaServer->getDc [" . $kMediaServer->getDc() . "] == kDataCenterMgr::getCurrentDcId [" . kDataCenterMgr::getCurrentDcId() . "]");
-				if($kMediaServer->getDc() == kDataCenterMgr::getCurrentDcId())
-					return $kMediaServer->getMediaServer();
-			}
+			/* @var WowzaMediaServerNode $serverNode */
+			$serverNode = ServerNodePeer::retrieveByPK($liveEntryServerNode->getServerNodeId());
+			KalturaLog::debug("mediaServer->getDc [" . $serverNode->getDc() . "] == kDataCenterMgr::getCurrentDcId [" . kDataCenterMgr::getCurrentDcId() . "]");
+			if($serverNode->getDc() == kDataCenterMgr::getCurrentDcId())
+				return $serverNode;
 		}
 		if($currentDcOnly)
 			return null;
 		
-		$kMediaServer = reset($kMediaServers);
-		if($kMediaServer && $kMediaServer instanceof kLiveMediaServer)
-			return $kMediaServer->getMediaServer();
-			
+		$liveEntryServerNode = reset($liveEntryServerNodes);
+		if ($liveEntryServerNode)
+			return ServerNodePeer::retrieveByPK($liveEntryServerNode->getServerNodeId());
+
 		KalturaLog::info("No Valid Media Servers Were Found For Current Live Entry [" . $this->getEntryId() . "]" );
 		return null;
 	}
@@ -538,14 +535,14 @@ abstract class LiveEntry extends entry
 	protected function getMediaServersHostnames()
 	{
 		$hostnames = array();
-		$kMediaServers = $this->getMediaServers();
+		$liveEntryServerNodes = $this->getLiveEntryServerNodes();
 
-		foreach($kMediaServers as $kMediaServer)
+		/* @var LiveEntryServerNode $liveEntryServerNode*/
+		foreach($liveEntryServerNodes as $liveEntryServerNode)
 		{
-			if($kMediaServer instanceof kLiveMediaServer)
-			{
-				$hostnames[$kMediaServer->getIndex()] = $kMediaServer->getHostname();
-			}
+			/* @var WowzaMediaServerNode $serverNode*/
+			$serverNode = ServerNodePeer::retrieveByPK($liveEntryServerNode->getServerNodeId());
+			$hostnames[$serverNode->getType()] = $serverNode->getHostname();
 		}
 		KalturaLog::info("media servers hostnames: " . print_r($hostnames,true));
 		return $hostnames;
@@ -556,18 +553,17 @@ abstract class LiveEntry extends entry
 	 */
 	public function hasMediaServer($currentDcOnly = false)
 	{
-		$kMediaServers = $this->getMediaServers();
-		if(! count($kMediaServers))
+		$liveEntryServerNodes = $this->getLiveEntryServerNodes();
+		if(! count($liveEntryServerNodes))
 			return false;
-		
-		foreach($kMediaServers as $kMediaServer)
+
+		/* @var LiveEntryServerNode $liveEntryServerNode*/
+		foreach($liveEntryServerNodes as $liveEntryServerNode)
 		{
-			if($kMediaServer instanceof kLiveMediaServer)
-			{
-				/* @var $kMediaServer kLiveMediaServer */
-				if($kMediaServer->getDc() == kDataCenterMgr::getCurrentDcId())
-					return true;
-			}
+			/* @var WowzaMediaServerNode $serverNode*/
+			$serverNode = ServerNodePeer::retrieveByPK($liveEntryServerNode->getServerNodeId());
+			if($serverNode->getDc() == kDataCenterMgr::getCurrentDcId())
+				return true;
 		}
 		
 		return !$currentDcOnly;
@@ -577,21 +573,26 @@ abstract class LiveEntry extends entry
 	{
 		return kCacheManager::CACHE_TYPE_LIVE_MEDIA_SERVER . '_' . kDataCenterMgr::getCurrentDcId();
 	}
-	
-	private function isCacheValid(kLiveMediaServer $kMediaServer)
+
+	/**
+	 * @param LiveEntryServerNode $liveEntryServerNode
+	 * @return bool|mixed
+	 * @throws Exception
+	 */
+	private function isCacheValid($liveEntryServerNode)
 	{
 		$cacheType = self::getCacheType();
 		$cacheStore = kCacheManager::getSingleLayerCache($cacheType);
 		if(! $cacheStore)
 		{
 			KalturaLog::warning("Cache store [$cacheType] not found");
-			$lastUpdate = time() - $kMediaServer->getTime();
+			$lastUpdate = time() - $liveEntryServerNode->getUpdatedAt(null);
 			$expiry = kConf::get('media_server_cache_expiry', 'local', self::DEFAULT_CACHE_EXPIRY);
 			
 			return $lastUpdate <= $expiry;
 		}
 		
-		$key = $this->getId() . '_' . $kMediaServer->getHostname() . '_' . $kMediaServer->getIndex();
+		$key = $this->getEntryServerNodeCacheKey($liveEntryServerNode);
 		KalturaLog::debug("Get cache key [$key] from store [$cacheType]");
 		return $cacheStore->get($key);
 	}
@@ -612,16 +613,20 @@ abstract class LiveEntry extends entry
 		return $cacheStore->set($key, true, kConf::get('media_server_cache_expiry', 'local', self::DEFAULT_CACHE_EXPIRY));
 	}
 	
-	public function setMediaServer($index, $hostname, $applicationName = null)
+	public function setMediaServer($index, $hostname)
 	{
 		if(is_null($this->getFirstBroadcast())) 
 			$this->setFirstBroadcast(kApiCache::getTime());
-				
+
+		/* @var $mediaServerNode MediaServerNode*/
 		$mediaServerNode = ServerNodePeer::retrieveActiveMediaServerNode($hostname);
 		if (!$mediaServerNode)
 			throw new kCoreException("Media server with host name [$hostname] not found", kCoreException::MEDIA_SERVER_NOT_FOUND);
-		
-		$key = $this->getId() . "_{$hostname}_{$index}";
+
+		/* @var $dbLiveEntryServerNode LiveEntryServerNode*/
+		$dbLiveEntryServerNode = EntryServerNodePeer::retrieveByEntryIdAndServerType($this->getId(), $index);
+
+		$key = $this->getEntryServerNodeCacheKey($dbLiveEntryServerNode);
 		if($this->storeInCache($key) && $this->isMediaServerRegistered($index, $hostname)) {
 			KalturaLog::debug("cached and registered - index: $index, hostname: $hostname");
 			return;
@@ -629,34 +634,25 @@ abstract class LiveEntry extends entry
 
 		KalturaLog::debug("about to setMediaServer. index: $index, hostname: $hostname");
 		$this->setLastBroadcast(kApiCache::getTime());
-		$server = new kLiveMediaServer($index, $hostname, $mediaServerNode->getDc(), $mediaServerNode->getId(), $applicationName ? $applicationName : $mediaServerNode->getApplicationName());
-		$this->putInCustomData("server-$index", $server, LiveEntry::CUSTOM_DATA_NAMESPACE_MEDIA_SERVERS);
-		$this->setLiveStatus(LiveEntryStatus::PLAYABLE, $index);
+		$dbLiveEntryServerNode->setStatus(EntryServerNodeStatus::PLAYABLE);
+		$dbLiveEntryServerNode->setServerType($index);
+		$dbLiveEntryServerNode->setServerNodeId($mediaServerNode->getId());
+		$dbLiveEntryServerNode->save();
 	}
-	
+
+	private function getEntryServerNodeCacheKey(EntryServerNode $entryServerNode)
+	{
+		return $entryServerNode->getId()."_".$entryServerNode->getServerType()."_".$entryServerNode->getServerNodeId();
+	}
+
 	protected function isMediaServerRegistered($index, $hostname)
 	{
-		$server = $this->getFromCustomData("server-$index", LiveEntry::CUSTOM_DATA_NAMESPACE_MEDIA_SERVERS);
-		/* @var $server kLiveMediaServer */
-		if($server && $server->getHostname() == $hostname)
+		/* @var $dbLiveEntryServerNode LiveEntryServerNode*/
+		$dbLiveEntryServerNode = EntryServerNodePeer::retrieveByEntryIdAndServerType($this->getId(), $index);
+		if ($dbLiveEntryServerNode)
 			return true;
-
-		KalturaLog::info("mediaServer is not registered. hostname: $hostname , index: $index , server: " . print_r($server,true));
+		KalturaLog::info("mediaServer is not registered. hostname: $hostname , index: $index ");
 		return false;
-	}
-	
-	public function unsetMediaServer($index, $hostname)
-	{	
-		$server = $this->getFromCustomData("server-$index", LiveEntry::CUSTOM_DATA_NAMESPACE_MEDIA_SERVERS);
-		if($server && $server->getHostname() == $hostname)
-		{
-			$server = $this->removeFromCustomData("server-$index", LiveEntry::CUSTOM_DATA_NAMESPACE_MEDIA_SERVERS);
-			$this->setLastBroadcastEndTime(kApiCache::getTime());
-		}
-		
-		// Set media server with index #index to be stopped
-		// the entry->liveStatus() is calculated from the state of both servers
-		$this->setLiveStatus(LiveEntryStatus::STOPPED, $index);
 	}
 	
 	/**
@@ -665,17 +661,17 @@ abstract class LiveEntry extends entry
 	public function validateMediaServers()
 	{
 		$listChanged = false;
-		$kMediaServers = $this->getFromCustomData(null, LiveEntry::CUSTOM_DATA_NAMESPACE_MEDIA_SERVERS, array());
-		foreach($kMediaServers as $key => $kMediaServer)
+		$dbLiveEntryServerNodes = EntryServerNodePeer::retrieveByEntryId($this->id);
+		/* @var $dbLiveEntryServerNode LiveEntryServerNode */
+		foreach($dbLiveEntryServerNodes as $dbLiveEntryServerNode)
 		{
-			if(!$kMediaServer || ! $this->isCacheValid($kMediaServer))
+			if (! $this->isCacheValid($dbLiveEntryServerNode))
 			{
 				$listChanged = true;
-				KalturaLog::info("Removing media server [" . ($kMediaServer ? $kMediaServer->getHostname() : $key) . "]");
-				$this->removeFromCustomData($key, LiveEntry::CUSTOM_DATA_NAMESPACE_MEDIA_SERVERS);
+				KalturaLog::info("Removing media server id".$dbLiveEntryServerNode->getServerNodeId());
+				$dbLiveEntryServerNode->delete();
 			}
 		}
-		
 		return $listChanged;
 	}
 	
@@ -684,25 +680,37 @@ abstract class LiveEntry extends entry
 		if ($mediaServerIndex != null){
 			return $this->getLiveStatusInternal($mediaServerIndex);
 		}
-		return LiveEntry::maxLiveEntryStatus($this->getLiveStatusInternal(MediaServerIndex::PRIMARY), $this->getLiveStatusInternal(MediaServerIndex::SECONDARY));
+		return LiveEntry::maxLiveEntryStatus($this->getLiveStatusInternal(EntryServerNodeType::LIVE_PRIMARY), $this->getLiveStatusInternal(EntryServerNodeType::LIVE_PRIMARY));
 	}
 
 	private function getLiveStatusInternal ($mediaServerIndex)
 	{
-		return $this->getFromCustomData('live_status_'.$mediaServerIndex, null, LiveEntryStatus::STOPPED);
+		/* @var $dbEntrySeverNode LiveEntryServerNode */
+		$dbEntrySeverNode = EntryServerNodePeer::retrieveByEntryIdAndServerType($this->id, $mediaServerIndex);
+		if (!$dbEntrySeverNode)
+			return EntryServerNodeStatus::STOPPED;
+		return $dbEntrySeverNode->getStatus();
 	}
 
 	public function setLiveStatus ($v, $mediaServerIndex)
 	{
-		$this->putInCustomData('live_status_'.$mediaServerIndex, $v);
+		/* @var $dbEntrySeverNode LiveEntryServerNode */
+		$dbEntrySeverNode = EntryServerNodePeer::retrieveByEntryIdAndServerType($this->id, $mediaServerIndex);
+		if (!$dbEntrySeverNode)
+			throw new KalturaAPIException(KalturaErrors::ENTRY_SERVER_NODE_NOT_FOUND, $this->id, $mediaServerIndex);
+		if ($v instanceof EntryServerNodeStatus)
+		{
+			$dbEntrySeverNode->status = $v;
+			$dbEntrySeverNode->save();
+		}
 	}
 	
 	/**
-	 * @return array<kLiveMediaServer>
+	 * @return array<LiveEntryServerNode>
 	 */
-	public function getMediaServers()
+	public function getLiveEntryServerNodes()
 	{
-		return $this->getFromCustomData(null, LiveEntry::CUSTOM_DATA_NAMESPACE_MEDIA_SERVERS, array());
+		return EntryServerNodePeer::retrieveByEntryId($this->getId());
 	}
 	
 	/* (non-PHPdoc)
@@ -716,12 +724,12 @@ abstract class LiveEntry extends entry
 				LiveEntry::RECORDED_ENTRY_ID => $this->getRecordedEntryId(),
 
 		);
-		$mediaServers = $this->getMediaServersHostnames();
-		if (isset($mediaServers[MediaServerIndex::PRIMARY])) {
-			$dynamicAttributes[LiveEntry::PRIMARY_HOSTNAME] = $mediaServers[MediaServerIndex::PRIMARY];
+		$mediaServersHostnames = $this->getMediaServersHostnames();
+		if (isset($mediaServersHostnames[EntryServerNodeType::LIVE_PRIMARY])) {
+			$dynamicAttributes[LiveEntry::PRIMARY_HOSTNAME] = $mediaServersHostnames[EntryServerNodeType::LIVE_PRIMARY];
 		}
-		if (isset($mediaServers[MediaServerIndex::SECONDARY])) {
-			$dynamicAttributes[LiveEntry::SECONDARY_HOSTNAME] = $mediaServers[MediaServerIndex::SECONDARY];
+		if (isset($mediaServersHostnames[EntryServerNodeType::LIVE_BACKUP])) {
+			$dynamicAttributes[LiveEntry::SECONDARY_HOSTNAME] = $mediaServersHostnames[EntryServerNodeType::LIVE_BACKUP];
 		}
 		return array_merge( $dynamicAttributes, parent::getDynamicAttributes() );
 	}
@@ -803,24 +811,6 @@ abstract class LiveEntry extends entry
 		return false;
 	}
 	
-	protected function getTrackColumns ()
-	{
-		$basicColumns = parent::getTrackColumns();
-		return array_merge($basicColumns, array ('mediaServers' => array('server-0'),));
-	}
-	
-	/**
-	 * 
-	 * This function returns the tracking object's string value
-	 */
-	protected function getTrackEntryString ($namespace, $customDataColumn, $value)
-	{
-		if ($namespace == 'mediaServers' && $value instanceof kLiveMediaServer)
-		{
-			return $value->getHostname();
-		}
-	}
-	
 	public function setRecordingOptions(kLiveEntryRecordingOptions $recordingOptions)
 	{
 		$this->putInCustomData("recording_options", serialize($recordingOptions));
@@ -838,11 +828,13 @@ abstract class LiveEntry extends entry
 
 	public static function maxLiveEntryStatus($primaryMediaServerStatus, $secondaryMediaServerStatus)
 	{
-		if ($primaryMediaServerStatus == LiveEntryStatus::PLAYABLE || $secondaryMediaServerStatus == LiveEntryStatus::PLAYABLE)
-			return LiveEntryStatus::PLAYABLE;
-		elseif ($primaryMediaServerStatus == LiveEntryStatus::BROADCASTING || $secondaryMediaServerStatus == LiveEntryStatus::BROADCASTING)
+		if ($primaryMediaServerStatus == EntryServerNodeStatus::PLAYABLE || $secondaryMediaServerStatus == EntryServerNodeStatus::PLAYABLE)
+			return EntryServerNodeStatus::PLAYABLE;
+		elseif ($primaryMediaServerStatus == EntryServerNodeStatus::BROADCASTING || $secondaryMediaServerStatus == EntryServerNodeStatus::BROADCASTING)
 			return LiveEntryStatus::BROADCASTING;
+		elseif ($primaryMediaServerStatus == EntryServerNodeStatus::BROADCASTING || $secondaryMediaServerStatus == EntryServerNodeStatus::BROADCASTING)
+			return EntryServerNodeStatus::BROADCASTING;
 		else
-			return LiveEntryStatus::STOPPED;
+			return EntryServerNodeStatus::STOPPED;
 	}
 }

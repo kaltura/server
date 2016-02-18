@@ -38,7 +38,7 @@ class liveAsset extends flavorAsset
 	public function incLiveSegmentVersion($index)
 	{
 		$subType = self::FILE_SYNC_ASSET_SUB_TYPE_LIVE_PRIMARY;
-		if($index == MediaServerIndex::SECONDARY)
+		if($index == EntryServerNodeType::LIVE_BACKUP)
 		{
 			$subType = self::FILE_SYNC_ASSET_SUB_TYPE_LIVE_SECONDARY;
 		}
@@ -68,12 +68,12 @@ class liveAsset extends flavorAsset
 	{
 		if($sub_type == self::FILE_SYNC_ASSET_SUB_TYPE_LIVE_PRIMARY)
 		{
-			return $this->getLiveSegmentVersion(MediaServerIndex::PRIMARY);
+			return $this->getLiveSegmentVersion(EntryServerNodeType::LIVE_PRIMARY);
 		}
 		
 		if($sub_type == self::FILE_SYNC_ASSET_SUB_TYPE_LIVE_SECONDARY)
 		{
-			return $this->getLiveSegmentVersion(MediaServerIndex::SECONDARY);
+			return $this->getLiveSegmentVersion(EntryServerNodeType::LIVE_BACKUP);
 		}
 			
 		return parent::getVersionForSubType($sub_type, $version);

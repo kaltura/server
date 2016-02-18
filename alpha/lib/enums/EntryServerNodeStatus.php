@@ -5,10 +5,10 @@
  */
 interface EntryServerNodeStatus extends BaseEnum{
 
+	const STOPPED = 0;
 	const PLAYABLE = 1;
-	const AUTHENTICATED = 2;
-	const BROADCASTING = 3;
-	const STOPPED = 4;
+	const BROADCASTING = 2;
+	const AUTHENTICATED = 3;
 
 
 }

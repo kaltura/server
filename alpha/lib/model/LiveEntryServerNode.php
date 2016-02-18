@@ -25,4 +25,7 @@ class LiveEntryServerNode extends EntryServerNode{
 	public function setPattern($v){ $this->putInCustomData("Pattern", $v);}
 	public function getPattern(){ return $this->getFromCustomData("Pattern");}
 
+	public function setCurrentBroadcastingStartTime($v){ $this->putInCustomData("CurrentBroadcastingStartTime", $v);}
+	public function getCurrentBroadcastingStartTime(){ return $this->getFromCustomData("CurrentBroadcastingStartTime");}
+
 }

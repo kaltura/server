@@ -5,7 +5,7 @@
  */
 interface EntryServerNodeType extends BaseEnum
 {
-	const LIVE_PRIMARY = 1;
-	const LIVE_BACKUP = 2;
+	const LIVE_PRIMARY = 0;
+	const LIVE_BACKUP = 1;
 
 }

@@ -84,4 +84,48 @@ class EntryServerNodePeer extends BaseEntryServerNodePeer {
 		return self::$class_types_cache[$entryServerNodeServerType];
 	}
 
+	/**
+	 * Retrieve an array of a single object by EntryId and EntryServerNodeType.
+	 *
+	 * @param      string $entryId .
+	 * @param      EntryServerNodeType $serverType .
+	 * @param      PropelPDO $con the connection to use
+	 * @return 	   array Array of matching EntryServerNodes
+	 * @throws     kCoreException
+	 */
+	public static function retrieveByEntryIdAndServerType($entryId, $serverType, PropelPDO $con = null)
+	{
+		$criteria = new Criteria();
+		$criteria->add(EntryServerNodePeer::ENTRY_ID, $entryId);
+		$criteria->add(EntryServerNodePeer::SERVER_TYPE, $serverType);
+
+		$v = EntryServerNodePeer::doSelect($criteria, $con);
+
+		if (!$v || count($v) == 0 )
+			return null;
+
+		if (count($v) !== 1)
+			throw new kCoreException("EntryServerNode table should have unique match for keys entryId and serverType , yet got :".count($v));
+		return $v[0];
+	}
+
+	/**
+	 * Retrieve an array of a objects by EntryId
+	 *
+	 * @param      string $entryId.
+	 * @param      PropelPDO $con the connection to use
+	 * @return     array Array of matching EntryServerNodes
+	 */
+	public static function retrieveByEntryId($entryId, PropelPDO $con = null)
+	{
+		$criteria = new Criteria();
+		$criteria->add(EntryServerNodePeer::ENTRY_ID, $entryId);
+
+		$v = EntryServerNodePeer::doSelect($criteria, $con);
+
+		if (!$v || count($v) == 0 )
+			return null;
+		return $v;
+	}
+
 } // EntryServerNodePeer
