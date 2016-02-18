@@ -305,8 +305,11 @@ class SessionService extends KalturaBaseService
 		$userId = 0;
 
 		// if the widget has a role, pass it in $privileges so it will be embedded in the KS
-		if ($widget->getRole() != null){
-			$privileges .= ',' . kSessionBase::PRIVILEGE_SET_ROLE . ":" . $widget->getRole();
+		if ($widget->getRoles() != null){
+			$roles = explode(",", $widget->getRoles());
+			foreach($roles as $role) {
+				$privileges .= ',' . kSessionBase::PRIVILEGE_SET_ROLE . ":" . $role;
+			}
 		}
 
 		/*if ( $widget->getSecurityType() == widget::WIDGET_SECURITY_TYPE_FORCE_KS )
