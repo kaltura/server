@@ -16,6 +16,23 @@
 		moduls.quizCuePoint.basePermissionName = CUEPOINT_PLUGIN_PERMISSION
 		moduls.quizCuePoint.group = GROUP_ENABLE_DISABLE_FEATURES
 
+## new Http notifcation - Flavor Asset Status Changed ##
+
+- Issue Type: New Feature
+- Issue ID: PLAT-5097
+
+#### Configuration ####
+ 
+- None.
+
+#### Deployment Scripts ####
+
+		php /opt/kaltura/app/tests/standAloneClient/exec.php /opt/kaltura/app/tests/standAloneClient/flavorAssetChangedHttpNotificationTemplate.xml
+
+#### Known Issues & Limitations ####
+
+None.
+
 # Kajam-11.8.0 #
 
 ## Server returning all stream information when loading the player ##
