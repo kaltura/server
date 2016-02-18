@@ -273,9 +273,11 @@ class SessionService extends KalturaBaseService
 	 */	
 	function startWidgetSession ( $widgetId , $expiry = 86400 )
 	{
+		KalturaLog::debug("in startWidgetSession with widgetId " . $widgetId);
+
 		// make sure the secret fits the one in the partner's table
 		$ksStr = "";
-		
+
 		$widget = widgetPeer::retrieveByPK( $widgetId );
 		if ( !$widget )
 		{
@@ -299,8 +301,11 @@ class SessionService extends KalturaBaseService
 		if(PermissionPeer::isValidForPartner(PermissionName::FEATURE_ENTITLEMENT, $partnerId) &&
 			!is_null($widget->getPrivacyContext()) && $widget->getPrivacyContext() != '' )
 			$privileges .= ','. kSessionBase::PRIVILEGE_PRIVACY_CONTEXT . ':' . $widget->getPrivacyContext();
-		
+
 		$userId = 0;
+
+		$privileges .= ',' . kSessionBase::PRIVILEGE_SET_ROLE . ":QNA_WIDGET_SESSION_ROLE";
+
 		/*if ( $widget->getSecurityType() == widget::WIDGET_SECURITY_TYPE_FORCE_KS )
 		{
 			$user = $this->getKuser();
