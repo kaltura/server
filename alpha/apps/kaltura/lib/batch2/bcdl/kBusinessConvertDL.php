@@ -2,6 +2,25 @@
 
 class kBusinessConvertDL
 {
+
+
+private static function shouldDeleteOldAsset($oldAsset,$entry)
+{
+	if ($oldAsset instanceof flavorAsset) {
+		// In case of live entry Don't drop the old asset
+		$rootEntryId = $entry->getRootEntryId();
+		if ($rootEntryId) {
+			$rootEntry = entryPeer::retrieveByPK($rootEntryId);
+			if ($rootEntry->getType() != entryType::LIVE_STREAM)
+				return true;
+		}
+	}
+	if ($oldAsset instanceof thumbAsset)
+		return true;
+
+	return false;
+}
+
 	/**
 	 * @param entry $entry
 	 * @param entry $tempEntry
@@ -95,7 +114,6 @@ class kBusinessConvertDL
 				}
 
 			}
-			//If the old asset is not set for replacement by its paramsId and type, delete it.
 			elseif($oldAsset instanceof flavorAsset || $oldAsset instanceof thumbAsset)
 			{
 				if($oldAsset instanceof thumbAsset && $oldAsset->keepOnEntryReplacement())
@@ -106,14 +124,13 @@ class kBusinessConvertDL
 						$defaultThumbAssetOld = $oldAsset;
 					}
 				}
-				else 
+				elseif(self::shouldDeleteOldAsset($oldAsset,$entry))
 				{
 					KalturaLog::info("Delete old asset [" . $oldAsset->getId() . "] for paramsId [" . $oldAsset->getFlavorParamsId() . "]");
-	
 					$oldAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_DELETED);
 					$oldAsset->setDeletedAt(time());
 					$oldAsset->save();
-				}				
+				}
 			}
 		}
 
