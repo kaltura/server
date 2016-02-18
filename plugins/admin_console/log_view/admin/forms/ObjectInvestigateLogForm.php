@@ -28,7 +28,7 @@ class Form_ObjectInvestigateLogForm extends Infra_Form
 			$logViewUrl = $settings->logViewUrl;
 		}
 	
-		$url = "$logViewUrl/api_v3/_search";
+		$url = "$logViewUrl/*/_search";
 	
 		$ch = curl_init($url);
 		curl_setopt($ch, CURLOPT_HEADER, false);
