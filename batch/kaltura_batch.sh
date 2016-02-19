@@ -25,7 +25,7 @@
 BATCHDIR=$APP_DIR/batch
 BATCHEXE=KGenericBatchMgr.class.php
 CONFIG_FILE=$APP_DIR/configurations/batch
-LOCKFILE="/var/run/kaltura/batch.pid"
+LOCKFILE="@BASE_DIR@/var/run/batch.pid"
 GREEN='\e[1;32m'
 RED='\e[1;31m'
 NORMAL='\e[0m'
@@ -87,8 +87,8 @@ start_scheduler() {
     echo -n "Starting Batch Manager."
     cd $BATCHDIR
     echo -n "."
-    mkdir -p /var/run/kaltura
-    chown $OS_KALTURA_USER:$OS_KALTURA_USER /var/run/kaltura
+    mkdir -p @BASE_DIR@/var/run
+    chown $OS_KALTURA_USER:$OS_KALTURA_USER @BASE_DIR@/var/run
     su $OS_KALTURA_USER -c "nohup $PHP_BIN $BATCHEXE $PHP_BIN $CONFIG_FILE >> $LOG_DIR/kaltura_batch.log 2>&1 &"
     echo -n "."
     if [ "$?" -eq 0 ]; then
