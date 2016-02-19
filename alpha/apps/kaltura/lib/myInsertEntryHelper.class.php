@@ -191,7 +191,9 @@ class myInsertEntryHelper
 			// if the url ends with .ext, we'll extract it this way
 			$urlext = strrchr($entry_url, '.');
 			// TODO: fix this patch
-			if( strlen( $urlext ) > 4 ) $urlext = '.jpg'; // if we got something wierd, assume we're downloading a jpg
+			if (!in_array($urlext, kConf::get("video_file_ext")) && !in_array($urlext, kConf::get("image_file_ext")) && !in_array($urlext, kConf::get("audio_file_ext"))){
+			    $urlext = '.jpg';
+			}
 			$entry_fileName = $entry_data_prefix.$urlext;
 			
 			KalturaLog::debug("handleEntry: media_type: $media_type");
