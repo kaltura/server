@@ -25,11 +25,15 @@ None.
  
 ### Installation ###
 None.
-### Configuration ###
-Copy the file '/opt/kaltura/app/batch/kaltura_batch.sh' to /etc/init.d/kaltura-batch and overwrite. 
+#### Configuration ####
+Copy the file '/opt/kaltura/app/batch/kaltura_batch.sh' to /etc/init.d/kaltura-batch and overwrite. Replace all @BASE_DIR@ in the file with '/opt/kaltura'
+Edit file '/opt/kaltura/app/configurations/monit/monit.avail/batch.rc'. Set the value 'with pidfile "/opt/kaltura/var/run/batch.pid"'
+Edit file '/opt/kaltura/app/configurations/batch/batch.ini' and set 'pidFileDir = /opt/kaltura/var/run/'
 #### Known Issues & Limitations ####
 None.
 #### Deployment scripts ####
+None.
+
  
 ## Remove quiz permission ##
 
