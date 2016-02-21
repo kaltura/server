@@ -3,8 +3,7 @@
 
 	<property environment="env" />
 	<property name="java.lib.path" value="${basedir}/../pojo" />
-	<property name="jar.lib.path" value="${basedir}/lib" />
-	<property name="jar.filename" value="${jar.lib.path}/KalturaClientLib.jar" />
+	<property name="jar.lib.path" value="${basedir}/../pojo/target" />
 	<property name="bar.filename" value="${basedir}/KalturaClientLib.bar" />
 
 	<target name="set-home" depends="install-contrib">
@@ -25,6 +24,8 @@
 				<not><equals arg1="${ant.java.version}" arg2="1.7" /></not>
 			</condition>
 		</fail>
+		<input message="Please enter Kaltura client lib version" addproperty="kaltura.client.version" defaultvalue="3.3.1" />
+		<property name="jar.filename" value="${jar.lib.path}/KalturaClient-${kaltura.client.version}.jar" /><!-- change JAR name -->
 	</target>
 		
 	<target name="install-contrib">
@@ -36,43 +37,38 @@
 			</classpath>
 		</taskdef>
 	</target>
-
-	<target name="jar" depends="install-contrib">
+	
+	<!-- replace with an task - replace -->
+	<target name="replace-tokens">
 		<if>
-			<available file="${jar.filename}" />
+			<available file="${basedir}/deploy/src/activiti.cfg.xml"/>
 			<then>
-				<delete file="${jar.filename}" />
-			</then>
-		</if>
-		<if>
-			<available file="${java.lib.path}" />
-			<then>
-				<mkdir dir="${jar.lib.path}" />
-				<copy todir="${jar.lib.path}">
-					<fileset dir="${java.lib.path}/lib"/>
-				</copy>
-				
-				<tempfile property="temp.classes" prefix="classes_" />
-				<mkdir dir="${temp.classes}" />
-				<javac srcdir="${java.lib.path}/src" encoding="UTF-8" destdir="${temp.classes}">
-					<classpath>
-						<fileset dir="${java.lib.path}/lib">
-							<include name="*.jar" />
-						</fileset>
-					</classpath>
-				</javac>
-				<copy todir="${temp.classes}">
-					<fileset dir="${java.lib.path}/src" excludes="**/*.java" />
-				</copy>
-				<jar jarfile="${jar.filename}">
-					<fileset dir="${temp.classes}" />
-				</jar>
-				<delete dir="${temp.classes}" />
+				<echo message="File ${basedir}/deploy/src/activiti.cfg.xml already exists in target dir"/>
 			</then>
 			<else>
-				<fail message="Java client library not found in ${java.lib.path}."/>
-			</else>
-		</if>
+			 	<input message="Please enter activiti database hostname" addproperty="activiti.db.hostname" />
+			 	<input message="Please enter activiti database port" addproperty="activiti.db.port" />
+			 	<input message="Please enter activiti database username" addproperty="activiti.db.username" />
+			 	<input message="Please enter activiti database password" addproperty="activiti.db.password" />
+			 	<copy file="${basedir}/deploy/src/activiti.cfg.template.xml" tofile="${basedir}/deploy/src/activiti.cfg.xml"/>
+			 	<replace file="${basedir}/deploy/src/activiti.cfg.xml">
+			 		<replacefilter token="@DB1_HOST@" value="${activiti.db.hostname}" />
+			 		<replacefilter token="@DB1_PORT@" value="${activiti.db.port}" />
+			 		<replacefilter token="@DB1_USER@" value="${activiti.db.username}" />
+			 		<replacefilter token="@DB1_PASS@" value="${activiti.db.password}" /> 
+			 	</replace>
+		 	</else>
+		 </if>
+	</target>
+
+	<!-- replace with exec task for mvn - skip tests -->
+	<target name="jar" depends="install-contrib">
+		<exec executable="mvn" dir="${java.lib.path}">
+		    <arg value="clean"/>
+		    <arg value="dependency:copy-dependencies"/>
+		    <arg value="-Dmaven.test.skip=true"/>
+		    <arg value="install"/>
+		</exec>
 	</target>
 	
 	<target name="bar">
@@ -95,9 +91,10 @@
 		</copy>
 	</target>
 	
-	<target name="deploy" depends="verify-version, jar, bar, compile, set-home">
+	<target name="deploy" depends="verify-version, replace-tokens, jar, bar, compile, set-home">
 		<copy todir="${catalina.home}/lib">
 			<fileset dir="${jar.lib.path}" />
+			<fileset dir="${jar.lib.path}/dependency" />
 		</copy>
 		<java classname="com.kaltura.bpmn.deploy.DeployAllProcesses" failonerror="true">
 			<classpath path="${basedir}/deploy/bin">

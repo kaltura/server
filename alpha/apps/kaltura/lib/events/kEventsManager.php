@@ -11,7 +11,9 @@ class kEventsManager
 	protected static $consumers = array();
 	
 	protected static $deferredEvents = array();
-	
+
+	protected static $multiDeferredEvents = array();
+
 	/**
 	 * When this flag is false, deferred events are raised synchronously.
 	 * 
@@ -24,6 +26,13 @@ class kEventsManager
 	 * @var bool
 	 */
 	protected static $forceDeferredEvents = false;
+
+	/**
+	 * When this flag is false, multiDeferred events are raised as deferred
+	 *
+	 * @var bool
+	 */
+	protected static $multiDeferredEventsEnabled = false;
 	
 	protected static function loadConsumers()
 	{
@@ -135,31 +144,50 @@ class kEventsManager
 	{
 		self::$forceDeferredEvents = $force;
 	}
+
+	/**
+	 * Enable or disable multi deferred events
+	 *
+	 * @param bool $enable
+	 */
+	public static function enableMultiDeferredEvents($enable)
+	{
+		self::$multiDeferredEventsEnabled = $enable;
+	}
 	
-	public static function flushEvents()
+	public static function flushEvents( $flushMultiDeferred = false )
 	{
 		self::$forceDeferredEvents = false;
 
-		if (!self::$deferredEvents)
+		if (!self::$deferredEvents && !$flushMultiDeferred)
 			return;
 		
 		KalturaLog::log("started flushing deferred events");
 
 		while (count(self::$deferredEvents))
 		{
-			$deferredEvent = self::popNextDeferredEvent();
+			$deferredEvent = self::popNextDeferredEvent(self::$deferredEvents);
 			self::raiseEvent($deferredEvent);
+		}
+		if ( $flushMultiDeferred )
+		{
+			self::$multiDeferredEventsEnabled = false;
+			while (count(self::$multiDeferredEvents))
+			{
+				$multiDeferredEvent = self::popNextDeferredEvent(self::$multiDeferredEvents);
+				self::raiseEvent($multiDeferredEvent);
+			}
 		}
 		
 		KalturaLog::log("finished flushing deferred events");
 	}
 	
-	private static function popNextDeferredEvent()
+	private static function popNextDeferredEvent(&$events)
 	{
 		$deferredEvent = null;
 		$deferredEventKey = null;
 		
-		foreach(self::$deferredEvents as $key => $event)
+		foreach($events as $key => $event)
 		{
 			if (!$deferredEvent || $deferredEvent->getPriority() > $event->getPriority())
 			{
@@ -168,7 +196,7 @@ class kEventsManager
 			}
 		}
 		
-		unset(self::$deferredEvents[$deferredEventKey]);
+		unset($events[$deferredEventKey]);
 		return $deferredEvent;
 	}
 	
@@ -178,11 +206,18 @@ class kEventsManager
 		
 		if(!self::$deferredEventsEnabled)
 			return self::raiseEvent($event);
-			
+
+		$deferredEventsArray = &self::$deferredEvents;
+		if ( self::$multiDeferredEventsEnabled && ($event instanceof IKalturaMultiDeferredEvent) )
+		{
+			$event->setPartnerCriteriaParams(myPartnerUtils::getAllPartnerCriteriaParams());
+			$deferredEventsArray = &self::$multiDeferredEvents;
+		}
+
 		if (!is_null($eventKey))
-			self::$deferredEvents[$eventKey] = $event;
+			$deferredEventsArray[$eventKey] = $event;
 		else
-			self::$deferredEvents['unkeyed_'.count(self::$deferredEvents)] = $event;
+			$deferredEventsArray['unkeyed_'.count($deferredEventsArray)] = $event;
 	}
 	
 	public static function raiseEvent(KalturaEvent $event)
