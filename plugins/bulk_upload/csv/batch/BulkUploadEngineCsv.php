@@ -23,6 +23,16 @@ abstract class BulkUploadEngineCsv extends KBulkUploadEngine
 	 */
 	protected $csvVersion = KalturaBulkUploadCsvVersion::V1;
 
+
+	private static function isCsvLineEmpty($csvLine)
+	{
+		if(strlen(str_replace(',','',str_replace(' ','',$csvLine))))
+		{
+			return false;
+		}
+		return true;
+	}
+
 	/* (non-PHPdoc)
 	 * @see KBulkUploadEngine::handleBulkUpload()
 	 */
@@ -46,6 +56,11 @@ abstract class BulkUploadEngineCsv extends KBulkUploadEngine
                 $values = fgetcsv($fileHandle);
                 continue;
             }
+			if(self::isCsvLineEmpty(implode($values)))
+			{
+				$values = fgetcsv($fileHandle);
+				continue;
+			}
 			//removing UTF-8 BOM if exists
 			if(substr($values[0], 0,3) == pack('CCC',0xef,0xbb,0xbf)) {
        			 $values[0]=substr($values[0], 3);
