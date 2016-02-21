@@ -300,11 +300,19 @@ class kFlowHelper
 
 		if(count($files) > 1)
 		{
-			// find replacing entry id
-			$replacingEntry = self::getReplacingEntry($recordedEntry, $asset);
-			if(is_null($replacingEntry))
-				KalturaLog::err("Failed to get replacing entry");
-		
+			$retryCounter=5;
+			while(!$replacingEntry = self::getReplacingEntry($recordedEntry, $asset))
+			{
+				sleep(5);
+				if(!$retryCounter--)
+				{
+					kJobsManager::updateBatchJob($dbBatchJob, BatchJob::BATCHJOB_STATUS_FAILED);
+					KalturaLog::err('Failed to allocate replacing entry');
+					return $dbBatchJob;
+				}
+				KalturaLog::log("Failed to get replacing entry {$recordedEntry->getId()} asset {$asset->getId()} retrying .. {$retryCounter}");
+			}
+
 			$flavorParams = assetParamsPeer::retrieveByPKNoFilter($asset->getFlavorParamsId());
 			if(is_null($flavorParams)) { 
 				KalturaLog::err('Failed to retrieve asset params');
@@ -398,10 +406,8 @@ class kFlowHelper
 						$replacingAsset = assetPeer::retrieveByEntryIdAndParams($replacingEntryId, $asset->getFlavorParamsId());
 						if($replacingAsset)
 						{
-								
-								KalturaLog::debug("Entry in replacement, deleting - [".$replacingEntryId."]");
-								myEntryUtils::deleteReplacingEntry($recordedEntry,$replacingEntry);
-								$replacingEntry = null;
+								KalturaLog::debug("Entry in replacement with this asset type {$asset->getFlavorParamsId()}");
+								return null;
 						}
 				}
 		}
