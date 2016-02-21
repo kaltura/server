@@ -330,7 +330,7 @@ class myInsertEntryHelper
 						$media_date = $exif_data["DateTimeOriginal"];
 						$ts = strtotime($media_date);
 						// handle invalid dates either due to bad format or out of range
-						if ($ts === -1 || $ts === false || $ts < strtotime('2000-01-01') || $ts > strtotime('2015-01-01'))
+						if ($ts === -1 || $ts === false || $ts < strtotime('2000-01-01') || $ts > strtotime(date('Y-m-d'))
 						{
 							$media_date = null;
 						}
