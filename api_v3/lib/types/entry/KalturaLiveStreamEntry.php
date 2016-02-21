@@ -151,23 +151,14 @@ class KalturaLiveStreamEntry extends KalturaLiveEntry
 		/**
 		 * @var LiveStreamEntry @dbObject
 		 */
-		if ( kCurrentContext::$is_admin_session || kCurrentContext::getCurrentKsKuserId() == $dbObject->getKuserId()
-				|| kCurrentContext::$ks_object->verifyPrivileges(ks::PRIVILEGE_EDIT, $this->id) )
-		{
-			$this->primaryBroadcastingUrl = $dbObject->getPrimaryBroadcastingUrl();
-			$this->secondaryBroadcastingUrl = $dbObject->getSecondaryBroadcastingUrl();
-			$this->primaryRtspBroadcastingUrl = $dbObject->getPrimaryRtspBroadcastingUrl();
-			$this->secondaryRtspBroadcastingUrl = $dbObject->getSecondaryRtspBroadcastingUrl();
-		}
-		else
+		if ( !kCurrentContext::$is_admin_session && !(kCurrentContext::getCurrentKsKuserId() == $dbObject->getKuserId())
+				&& !kCurrentContext::$ks_object->verifyPrivileges(ks::PRIVILEGE_EDIT, $this->id) )
 		{
 			$this->primaryBroadcastingUrl = null;
 			$this->secondaryBroadcastingUrl = null;
 			$this->primaryRtspBroadcastingUrl = null;
 			$this->secondaryRtspBroadcastingUrl = null;
 		}
-		
-		
 		parent::doFromObject($dbObject, $responseProfile);
 	}
 	
