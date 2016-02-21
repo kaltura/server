@@ -68,6 +68,17 @@ None.
 
 None.
 
+## Attachement Asset & Transcript Asset Event Notifications ##
+
+#### Configuration ####
+
+*plugins.ini*
+
+Enable the following plugins:
+
+		AttachmentAssetEventNotifications
+		TranscriptAssetEventNotifications
+
 
 # Kajam-11.8.0 #
 
