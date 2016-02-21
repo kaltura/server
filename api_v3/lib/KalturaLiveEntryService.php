@@ -372,6 +372,8 @@ class KalturaLiveEntryService extends KalturaEntryService
 		if (!$dbLiveEntry || !($dbLiveEntry instanceof LiveEntry))
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 
+		$dbLiveEntry->unsetMediaServer($mediaServerIndex);
+
 		/* @var $dbLiveEntryServerNode LiveEntryServerNode */
 		$dbLiveEntrySeverNode = EntryServerNodePeer::retrieveByEntryIdAndServerType($entryId, $mediaServerIndex);
 

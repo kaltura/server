@@ -638,7 +638,16 @@ abstract class LiveEntry extends entry
 		$dbLiveEntryServerNode->setServerType($index);
 		$dbLiveEntryServerNode->setServerNodeId($mediaServerNode->getId());
 		$dbLiveEntryServerNode->save();
+		$this->setLiveStatus(EntryServerNodeStatus::PLAYABLE, $index);
 	}
+
+	public function unsetMediaServer($index)
+	{
+		// Set media server with index #index to be stopped
+		// the entry->liveStatus() is calculated from the state of both servers
+		$this->setLiveStatus(EntryServerNodeStatus::STOPPED, $index);
+	}
+
 
 	private function getEntryServerNodeCacheKey(EntryServerNode $entryServerNode)
 	{
@@ -668,43 +677,31 @@ abstract class LiveEntry extends entry
 			if (! $this->isCacheValid($dbLiveEntryServerNode))
 			{
 				$listChanged = true;
+				// we need to set its live_status field if the supported line is deleted
+				$this->setLiveStatus(EntryServerNodeStatus::STOPPED, $dbLiveEntryServerNode->getServerType());
 				KalturaLog::info("Removing media server id".$dbLiveEntryServerNode->getServerNodeId());
 				$dbLiveEntryServerNode->delete();
 			}
 		}
 		return $listChanged;
 	}
-	
+
 	public function getLiveStatus ($mediaServerIndex = null)
 	{
 		if ($mediaServerIndex != null){
 			return $this->getLiveStatusInternal($mediaServerIndex);
 		}
-		return LiveEntry::maxLiveEntryStatus($this->getLiveStatusInternal(EntryServerNodeType::LIVE_PRIMARY), $this->getLiveStatusInternal(EntryServerNodeType::LIVE_PRIMARY));
+		return LiveEntry::maxLiveEntryStatus($this->getLiveStatusInternal(EntryServerNodeType::LIVE_PRIMARY), $this->getLiveStatusInternal(EntryServerNodeType::LIVE_BACKUP));
 	}
-
 	private function getLiveStatusInternal ($mediaServerIndex)
 	{
-		/* @var $dbEntrySeverNode LiveEntryServerNode */
-		$dbEntrySeverNode = EntryServerNodePeer::retrieveByEntryIdAndServerType($this->id, $mediaServerIndex);
-		if (!$dbEntrySeverNode)
-			return EntryServerNodeStatus::STOPPED;
-		return $dbEntrySeverNode->getStatus();
+		return $this->getFromCustomData('live_status_'.$mediaServerIndex, null, EntryServerNodeStatus::STOPPED);
 	}
-
 	public function setLiveStatus ($v, $mediaServerIndex)
 	{
-		/* @var $dbEntrySeverNode LiveEntryServerNode */
-		$dbEntrySeverNode = EntryServerNodePeer::retrieveByEntryIdAndServerType($this->id, $mediaServerIndex);
-		if (!$dbEntrySeverNode)
-			throw new KalturaAPIException(KalturaErrors::ENTRY_SERVER_NODE_NOT_FOUND, $this->id, $mediaServerIndex);
-		if ($v instanceof EntryServerNodeStatus)
-		{
-			$dbEntrySeverNode->status = $v;
-			$dbEntrySeverNode->save();
-		}
+		$this->putInCustomData('live_status_'.$mediaServerIndex, $v);
 	}
-	
+
 	/**
 	 * @return array<LiveEntryServerNode>
 	 */
