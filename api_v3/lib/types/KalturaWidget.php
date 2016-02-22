@@ -119,13 +119,20 @@ class KalturaWidget extends KalturaObject implements IFilterable
 		return array_merge ( parent::getMapBetweenObjects() , self::$map_between_objects );
 	}
 
-	public function toWidget () 
+	public function toInsertableWidget ()
 	{
 		$user = new widget();
 		$skip_props = array ( "widgetHTML" );
-		return parent::toObject( $user , $skip_props );
+		return parent::toInsertableObject( $user , $skip_props );
 	}
-	
+
+	public function toUpdatableWidget ()
+	{
+		$user = new widget();
+		$skip_props = array ( "widgetHTML" );
+		return parent::toUpdatableObject( $user , $skip_props );
+	}
+
 	public function getExtraFilters()
 	{ 
 		return array();		
