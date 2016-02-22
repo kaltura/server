@@ -255,6 +255,10 @@ class kConvertJobData extends kConvartableJobData
 	}
 	
 	function calculateEstimatedEffort(BatchJob $batchJob) {
+		$clipDuration = $this->getFlavorParamsOutput()->getClipDuration();
+		if ( isset($clipDuration) ) {
+			return $clipDuration;
+		}
 		$mediaInfo = mediaInfoPeer::retrieveByPK($this->getMediaInfoId());
 		if(is_null($mediaInfo)) {
 			$sumEffort = 0;
