@@ -80,8 +80,8 @@ class Base
 	private $callsQueue = array();
 
 	/**
-	* @var Array of response headers
-	*/
+	 * @var Array of response headers
+	 */
 	private $responseHeaders = array();
 
 	/**
@@ -222,7 +222,7 @@ class Base
 		{
 			$error .= ". RC : $errorCode";
 			$this->resetRequest();
-			throw new ClientException($error, ClientException::ERROR_GENERIC);
+			throw $this->getClientException( $error, ClientException::ERROR_GENERIC);
 		}
 		else
 		{
@@ -245,10 +245,10 @@ class Base
 			if ($this->config->getFormat() != self::KALTURA_SERVICE_FORMAT_XML)
 			{
 				$this->resetRequest();
-				throw new ClientException("unsupported format: $postResult", ClientException::ERROR_FORMAT_NOT_SUPPORTED);
+				throw $this->getClientException( "unsupported format: $postResult", ClientException::ERROR_FORMAT_NOT_SUPPORTED);
 			}
 		}
-		
+
 		$this->resetRequest();
 
 		$endTime = microtime (true);
@@ -265,7 +265,7 @@ class Base
 	 * @param int $flags
 	 * @return boolean
 	 */
-	protected function ksortRecursive(&$array, $flags = null) 
+	protected function ksortRecursive(&$array, $flags = null)
 	{
 		ksort($array, $flags);
 		foreach($array as &$arr) {
@@ -297,7 +297,7 @@ class Base
 	private function doHttpRequest($url, $params = array(), $files = array())
 	{
 		if (!function_exists('curl_init'))
-			throw new ClientException("Curl extension must be enabled", ClientException::ERROR_CURL_MUST_BE_ENABLED);
+			throw $this->getClientException( "Curl extension must be enabled", ClientException::ERROR_CURL_MUST_BE_ENABLED);
 
 		return $this->doCurl($url, $params, $files);
 	}
@@ -313,7 +313,7 @@ class Base
 	{
 		$this->responseHeaders = array();
 		$requestHeaders = $this->config->getRequestHeaders();
-		
+
 		$params = $this->jsonEncode($params);
 		$this->log("curl: $url");
 		$this->log("post: $params");
@@ -321,7 +321,7 @@ class Base
 		{
 			$requestHeaders[] = 'Accept: application/json';
 		}
-		
+
 		$cookies = array();
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_URL, $url);
@@ -481,7 +481,7 @@ class Base
 			$params[$paramName] = array(
 				'objectType' => $paramValue->getKalturaObjectType()
 			);
-			
+
 			foreach($paramValue as $prop => $val)
 				$this->addParam($params[$paramName], $prop, $val);
 
@@ -525,7 +525,7 @@ class Base
 				$item = $this->jsObjectToClientObject($item);
 			}
 		}
-		
+
 		if(is_object($value))
 		{
 			if(isset($value->message) && isset($value->code))
@@ -538,14 +538,14 @@ class Base
 					}
 					return (array) $value;
 				}
-				throw new KalturaException($value->message, $value->code, $value->args);
+				throw $this->getAPIException($value->message, $value->code, $value->args);
 			}
-			
+
 			if(!isset($value->objectType))
 			{
-				throw new ClientException("Response format not supported - objectType is required for all objects", ClientException::ERROR_FORMAT_NOT_SUPPORTED);
+				throw $this->getClientException("Response format not supported - objectType is required for all objects", ClientException::ERROR_FORMAT_NOT_SUPPORTED);
 			}
-			
+
 			$objectType = $value->objectType;
 			$object = new $objectType();
 			$attributes = get_object_vars($value);
@@ -555,13 +555,13 @@ class Base
 				{
 					continue;
 				}
-				
+
 				$object->$attribute = $this->jsObjectToClientObject($attributeValue);
 			}
-			
+
 			$value = $object;
 		}
-		
+
 		return $value;
 	}
 
@@ -579,10 +579,10 @@ class Base
 	{
 		if(!is_array($object) && !is_object($object))
 			return $object;
-		
+
 		if(is_object($object) && $object instanceof MultiRequestSubResult)
 			return "$object";
-		
+
 		$array = (array) $object;
 		foreach($array as $key => $value)
 		{
@@ -598,7 +598,7 @@ class Base
 
 		if(is_object($object) && $object instanceof ObjectBase)
 			$array['objectType'] = $object->getKalturaObjectType();
-			
+
 		return $array;
 	}
 
@@ -613,7 +613,7 @@ class Base
 		$knownNativeTypes = array("boolean", "integer", "double", "string");
 		if (is_null($resultObject) ||
 			( in_array(gettype($resultObject) ,$knownNativeTypes) &&
-			  in_array($objectType, $knownNativeTypes) ) )
+				in_array($objectType, $knownNativeTypes) ) )
 		{
 			return;// we do not check native simple types
 		}
@@ -621,7 +621,7 @@ class Base
 		{
 			if (!($resultObject instanceof $objectType))
 			{
-				throw new ClientException("Invalid object type - not instance of $objectType", ClientException::ERROR_INVALID_OBJECT_TYPE);
+				throw $this->getClientException("Invalid object type - not instance of $objectType", ClientException::ERROR_INVALID_OBJECT_TYPE);
 			}
 		}
 		else if(class_exists($objectType) && is_subclass_of($objectType, 'EnumBase'))
@@ -630,12 +630,12 @@ class Base
 			$values = array_map('strval', $enum->getConstants());
 			if(!in_array($resultObject, $values))
 			{
-				throw new ClientException("Invalid enum value", ClientException::ERROR_INVALID_ENUM_VALUE);
+				throw $this->getClientException("Invalid enum value", ClientException::ERROR_INVALID_ENUM_VALUE);
 			}
 		}
 		else if(gettype($resultObject) !== $objectType)
 		{
-			throw new ClientException("Invalid object type", ClientException::ERROR_INVALID_OBJECT_TYPE);
+			throw $this->getClientException("Invalid object type", ClientException::ERROR_INVALID_OBJECT_TYPE);
 		}
 	}
 
@@ -811,5 +811,30 @@ class Base
 		$getter = 'get'.ucfirst($prop).'Service';
 		if (method_exists($this, $getter))
 			return $this->$getter();
+	}
+
+	public function getClientException( $error, $errorCode)
+	{
+		return new ClientException($error, $errorCode);
+	}
+
+	public function getAPIException( $message, $code, $arguments)
+	{
+		return new ApiException($message, $code, $arguments);
+	}
+
+	public function checkIfError(\SimpleXMLElement $xml, $throwException = true)
+	{
+		if(($xml->error) && (count($xml->children()) == 1))
+		{
+			$code = "{$xml->error->code}";
+			$message = "{$xml->error->message}";
+			$arguments = ParseUtils::unmarshalArray($xml->error->args, 'KalturaApiExceptionArg');
+			if($throwException)
+				throw $this->getAPIException($message, $code, $arguments);
+			else
+				return $this->getAPIException($message, $code, $arguments);
+		}
+		return null;
 	}
 }
