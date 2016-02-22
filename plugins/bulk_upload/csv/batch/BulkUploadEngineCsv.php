@@ -24,9 +24,13 @@ abstract class BulkUploadEngineCsv extends KBulkUploadEngine
 	protected $csvVersion = KalturaBulkUploadCsvVersion::V1;
 
 
+	/**
+	 *
+	 * return true is CSV line has not valid info but ',' or tabs/spaces
+	 */
 	private static function isCsvLineEmpty($csvLine)
 	{
-		if(strlen(str_replace(',','',str_replace(' ','',$csvLine))))
+		if(strlen(trim(str_replace(',','',$csvLine))))
 		{
 			return false;
 		}
@@ -51,16 +55,11 @@ abstract class BulkUploadEngineCsv extends KBulkUploadEngine
 		$values = fgetcsv($fileHandle);
 		while($values)
 		{
-            if(is_null(reset($values)))
+            if(is_null(reset($values)) || self::isCsvLineEmpty(implode($values)))
             {
                 $values = fgetcsv($fileHandle);
                 continue;
             }
-			if(self::isCsvLineEmpty(implode($values)))
-			{
-				$values = fgetcsv($fileHandle);
-				continue;
-			}
 			//removing UTF-8 BOM if exists
 			if(substr($values[0], 0,3) == pack('CCC',0xef,0xbb,0xbf)) {
        			 $values[0]=substr($values[0], 3);
