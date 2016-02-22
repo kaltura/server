@@ -24,10 +24,30 @@ class serveFlavorAction extends kalturaAction
 		header("X-Kaltura:cache-key");
 	}
 	
-	protected function getSimpleMappingRenderer($path)
+	protected function getSimpleMappingRenderer($path, $encryptionKey)
 	{
+		$source = array(
+			'type' => 'source',
+			'path' => $path,
+		);
+
+		if ($encryptionKey)
+		{
+			$source['encryptionKey'] = $encryptionKey;
+		}
+
+		$sequence = array(
+			'clips' => array($source)
+		);
+
+		$result = array(
+			'sequences' => array($sequence)
+		);
+
+		$json = str_replace('\/', '/', json_encode($result));
+
 		return new kRendererString(
-				'{"sequences":[{"clips":[{"type":"source","path":"' . $path . '"}]}]}',
+				$json,
 				self::JSON_CONTENT_TYPE);
 	}
 	
@@ -243,7 +263,7 @@ class serveFlavorAction extends kalturaAction
 
 		if ($pathOnly && kIpAddressUtils::isInternalIp($_SERVER['REMOTE_ADDR']))
 		{
-			$path = null;
+			$path = '';
 			list ( $file_sync , $local )= kFileSyncUtils::getReadyFileSyncForKey( $syncKey , false, false );
 			if ( $file_sync )
 			{
@@ -255,7 +275,7 @@ class serveFlavorAction extends kalturaAction
 				}
 			}
 		
-			$renderer = $this->getSimpleMappingRenderer($path);
+			$renderer = $this->getSimpleMappingRenderer($path, $flavorAsset->getEncryptionKey());
 			if ($path)
 			{
 				$this->storeCache($renderer, $flavorAsset->getPartnerId());
