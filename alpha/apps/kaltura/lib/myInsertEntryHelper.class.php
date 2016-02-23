@@ -328,7 +328,9 @@ class myInsertEntryHelper
 					if ($exif_data && isset($exif_data["DateTimeOriginal"]) && $exif_data["DateTimeOriginal"])
 					{
 						$media_date = $exif_data["DateTimeOriginal"];
-						$media_date = (strtotime($media_date) ? strtotime($media_date) : null);
+						if (!strtotime($media_date)){
+						     $media_date=null;
+						}
 					}
 				}
 				
