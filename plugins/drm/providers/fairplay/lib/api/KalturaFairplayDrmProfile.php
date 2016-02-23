@@ -31,7 +31,7 @@ class KalturaFairplayDrmProfile extends KalturaDrmProfile
 	
 	public function validateForInsert($propertiesToSkip = array())
 	{
-		if (!PlayReadyPlugin::isAllowedPartner(kCurrentContext::getCurrentPartnerId()) || !PlayReadyPlugin::isAllowedPartner($this->partnerId))
+		if (!DrmPlugin::isAllowedPartner(kCurrentContext::getCurrentPartnerId()) || !DrmPlugin::isAllowedPartner($this->partnerId))
 		{
 			throw new KalturaAPIException (KalturaErrors::PERMISSION_NOT_FOUND, 'Permission not found to use the PlayReady feature.');
 		}
@@ -40,7 +40,7 @@ class KalturaFairplayDrmProfile extends KalturaDrmProfile
 	
 	public function validateForUpdate ($sourceObject, $propertiesToSkip = array())
 	{
-		if (!PlayReadyPlugin::isAllowedPartner(kCurrentContext::getCurrentPartnerId()) || !PlayReadyPlugin::isAllowedPartner($sourceObject->getPartnerId()))
+		if (!DrmPlugin::isAllowedPartner(kCurrentContext::getCurrentPartnerId()) || !DrmPlugin::isAllowedPartner($sourceObject->getPartnerId()))
 		{
 			throw new KalturaAPIException (KalturaErrors::PERMISSION_NOT_FOUND, 'Permission not found to use the PlayReady feature.');
 		}
