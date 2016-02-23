@@ -4,7 +4,7 @@
 * @package plugins.fairplay
 * @subpackage model
 */
-class FairplayProfile extends DrmProfile
+class FairplayDrmProfile extends DrmProfile
 {	
 	// ------------------------------------------
 	// -- Custom data columns -------------------

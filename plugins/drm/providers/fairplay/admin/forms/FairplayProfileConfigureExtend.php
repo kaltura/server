@@ -8,11 +8,6 @@ class Form_FairplayProfileConfigureExtend_SubForm extends Form_DrmProfileConfigu
 {
 	public function init()
 	{
-		/*
-        $this->addElement('textarea', 'publicCertificate', array(
-			'label'			=> 'Public Certificate:',
-			'filters'		=> array(),
-		));*/
 		$this->addElement('file', 'publicCertificate', array(
 			'label'			=> 'Public Certificate:',
 			'filters'		=> array(),

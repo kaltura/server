@@ -33,9 +33,9 @@ class FairplayPlugin extends KalturaPlugin implements IKalturaEnumerator, IKaltu
 	public static function loadObject($baseClass, $enumValue, array $constructorArgs = null)
 	{
 		if ($baseClass == 'KalturaDrmProfile' && $enumValue == FairplayPlugin::getFairplayProviderCoreValue() )
-			return new KalturaFairplayProfile();
+			return new KalturaFairplayDrmProfile();
 		if ($baseClass == 'DrmProfile' && $enumValue ==  FairplayPlugin::getFairplayProviderCoreValue())
-			return new FairplayProfile();
+			return new FairplayDrmProfile();
 
 		if (class_exists('Kaltura_Client_Client'))
 		{
@@ -58,9 +58,9 @@ class FairplayPlugin extends KalturaPlugin implements IKalturaEnumerator, IKaltu
 	public static function getObjectClass($baseClass, $enumValue)
 	{
 		if ($baseClass == 'KalturaDrmProfile' && $enumValue == FairplayPlugin::getFairplayProviderCoreValue() )
-			return 'KalturaFairplayProfile';
+			return 'KalturaFairplayDrmProfile';
 		if ($baseClass == 'DrmProfile' && $enumValue ==  FairplayPlugin::getFairplayProviderCoreValue())
-			return 'FairplayProfile';
+			return 'FairplayDrmProfile';
 
 		if (class_exists('Kaltura_Client_Client'))
 		{
@@ -108,7 +108,7 @@ class FairplayPlugin extends KalturaPlugin implements IKalturaEnumerator, IKaltu
 			if (!is_null($fairplayProfile))
 			{
 				/**
-				 * @var FairplayProfile $fairplayProfile
+				 * @var FairplayDrmProfile $fairplayProfile
 				 */
 				$fairplayContextData->publicCertificate = $fairplayProfile->getPublicCertificate();
 				$result->pluginData[get_class($fairplayContextData)] = $fairplayContextData;

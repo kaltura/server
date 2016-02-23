@@ -3,7 +3,7 @@
  * @package plugins.fairplay
  * @subpackage api.objects
  */
-class KalturaFairplayProfile extends KalturaDrmProfile
+class KalturaFairplayDrmProfile extends KalturaDrmProfile
 {
     /**
      * @var string
