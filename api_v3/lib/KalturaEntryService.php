@@ -486,8 +486,8 @@ class KalturaEntryService extends KalturaBaseService
 					$mediaDate = $exifData["DateTimeOriginal"];
 					
 					// handle invalid dates either due to bad format or out of range
-					if (!strtotime($media_date)){
-						$media_date=null;
+					if (!strtotime($mediaDate)){
+						$mediaDate=null;
 					}
 					$dbEntry->setMediaDate($mediaDate);
 				}
