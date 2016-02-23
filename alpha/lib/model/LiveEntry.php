@@ -324,9 +324,9 @@ abstract class LiveEntry extends entry
 			foreach($liveEntryServerNodes as $key => $liveEntryServerNode)
 			{
 				$serverNode = ServerNodePeer::retrieveByPK($liveEntryServerNode->getServerNodeId());
-				KalturaLog::debug("mediaServer->getDc [" . $serverNode->getDc() . "] == kDataCenterMgr::getCurrentDcId [" . kDataCenterMgr::getCurrentDcId() . "]");
-				if($serverNode->getDc() == kDataCenterMgr::getCurrentDcId())
+				if($serverNode && $serverNode->getDc() == kDataCenterMgr::getCurrentDcId())
 				{
+					KalturaLog::debug("mediaServer->getDc [" . $serverNode->getDc() . "] == kDataCenterMgr::getCurrentDcId [" . kDataCenterMgr::getCurrentDcId() . "]");
 					$primaryMediaServer = $serverNode;
 					$primaryApplicationName = $serverNode->getApplicationName();
 					unset($liveEntryServerNodes[$key]);
@@ -341,12 +341,13 @@ abstract class LiveEntry extends entry
 				$liveEntryServerNode = array_shift($liveEntryServerNodes);
 				$serverNode = ServerNodePeer::retrieveByPK($liveEntryServerNode->getServerNodeId());
 				$primaryMediaServer = $serverNode;
-				$primaryApplicationName = $serverNode->getApplicationName();
+				if ($serverNode)
+					$primaryApplicationName = $serverNode->getApplicationName();
 
 				if($primaryMediaServer)
 					$isExternalMediaServerStream = $primaryMediaServer->getIsExternalMediaServer();
 				else
-					KalturaLog::debug("Cannot retrrive extra information for un-registered media server with host name [" . $liveEntryServerNode->getHostname() . "]");
+					KalturaLog::debug("Cannot retrieve extra information for un-registered media server node id  [" . $liveEntryServerNode->getServerNodeId() . "]");
 			}
 			
 			if(!$currentDcOnly && count($liveEntryServerNodes))
@@ -354,7 +355,8 @@ abstract class LiveEntry extends entry
 				$liveEntryServerNode = reset($liveEntryServerNodes);
 				$serverNode = ServerNodePeer::retrieveByPK($liveEntryServerNode->getServerNodeId());
 				$backupMediaServer = $serverNode;
-				$backupApplicationName = $serverNode->getApplicationName();
+				if ($serverNode)
+					$backupApplicationName = $serverNode->getApplicationName();
 			}
 		}
 		

@@ -138,6 +138,15 @@ class kObjectDeleteHandler implements kObjectDeletedEventConsumer
 		}
 		
 		kJobsManager::addDeleteJob($entry->getPartnerId(), DeleteObjectType::CATEGORY_ENTRY, $filter);
+
+		$c = new Criteria();
+		$c->add(EntryServerNodePeer::ENTRY_ID, $entry->getId());
+		$entryServerNodes = EntryServerNodePeer::doSelect($c);
+		foreach($entryServerNodes as $entryServerNode)
+		{
+			/* @var EntryServerNode $entryServerNode */
+			$entryServerNode->delete();
+		}
 	}
 	
 	protected function kuserDelete(kuser $kuser)
