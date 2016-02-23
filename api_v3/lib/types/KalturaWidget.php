@@ -108,10 +108,30 @@ class KalturaWidget extends KalturaObject implements IFilterable
 	 */
 	public $roles;
 
+	/**
+	 * @var string
+	 */
+	public $limitEntry;
+
 	private static $map_between_objects = array
 	(
-		"id" , "sourceWidgetId" , "rootWidgetId" , "partnerId" , "entryId" , "uiConfId" , "widgetHTML" , 
-		"securityType" , "securityPolicy" , "createdAt" , "updatedAt" , "partnerData", "enforceEntitlement", "privacyContext", "addEmbedHtml5Support", "roles"
+		"id",
+		"sourceWidgetId",
+		"rootWidgetId",
+		"partnerId",
+		"entryId",
+		"uiConfId",
+		"widgetHTML",
+		"securityType",
+		"securityPolicy",
+		"createdAt",
+		"updatedAt",
+		"partnerData",
+		"enforceEntitlement",
+		"privacyContext",
+		"addEmbedHtml5Support",
+		"roles",
+		"limitEntry"
 	);
 
 	public function getMapBetweenObjects ( )

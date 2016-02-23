@@ -574,6 +574,21 @@ class ks extends kSessionBase
 		return null;
 	}
 	
+	public function getSetLimitEntry()
+	{
+		$allPrivileges = explode(',', $this->privileges);
+		foreach($allPrivileges as $priv)
+		{
+			// extract playlist ID from pair
+			$exPrivileges = explode(':', $priv);
+			if ($exPrivileges[0] == self::PRIVILEGE_LIMIT_ENTRY)
+			{
+				return $exPrivileges[1];
+			}
+		}
+		return null;
+	}
+
 	public function getSetRole()
 	{
 		// break all privileges to their pairs - this is to support same "multi-priv" method expected for

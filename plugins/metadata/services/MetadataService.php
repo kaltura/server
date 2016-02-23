@@ -63,6 +63,16 @@ class MetadataService extends KalturaBaseService
 	 */
 	function addAction($metadataProfileId, $objectType, $objectId, $xmlData)
 	{
+		$limitEntry = $this->getKs()->getSetLimitEntry();
+		if ($limitEntry && $objectType == "annotationMetadata.Annotation")
+		{
+			$cuePoint = CuePointPeer::retrieveByPK($objectId);
+			$cuePointId = $cuePoint->getEntryId();
+			if ($cuePointId != $limitEntry) {
+				throw new KalturaAPIException(MetadataErrors::METADATA_NO_PERMISSION_ON_ENTRY, $cuePointId);
+			}
+		}
+
 	    $metadataProfile = MetadataProfilePeer::retrieveByPK($metadataProfileId);
 		if(!$metadataProfile)
 		    throw new KalturaAPIException(MetadataErrors::METADATA_PROFILE_NOT_FOUND, $metadataProfileId);
