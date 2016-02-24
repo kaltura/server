@@ -90,12 +90,7 @@ class FairplayPlugin extends KalturaPlugin implements IKalturaEnumerator, IKaltu
 	 * @see IKalturaPermissions::isAllowedPartner()
 	 */
 	public static function isAllowedPartner($partnerId) {
-		if (in_array($partnerId, array(Partner::ADMIN_CONSOLE_PARTNER_ID, Partner::BATCH_PARTNER_ID)))
-			return true;
-		$partner = PartnerPeer::retrieveByPK($partnerId);
-		if(!$partner)
-			return false;
-		return $partner->getPluginEnabled(self::PLUGIN_NAME);
+		return DrmPlugin::isAllowedPartner($partnerId);
 	}
 
 	public function contributeToEntryContextDataResult(entry $entry, KalturaEntryContextDataParams $contextDataParams, KalturaEntryContextDataResult $result)
