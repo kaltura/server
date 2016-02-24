@@ -220,7 +220,7 @@ class CSharpClientGenerator extends ClientGeneratorFromXml
 					$property["default"] = "null";
 					break;
 				case "bool":
-					$property["default"] = "false";
+					$property["default"] = "null";
 					break;
 				case "float":
 					$property["default"] = "Single.MinValue";
