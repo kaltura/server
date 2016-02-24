@@ -63,8 +63,6 @@ class MetadataService extends KalturaBaseService
 	 */
 	function addAction($metadataProfileId, $objectType, $objectId, $xmlData)
 	{
-		$limitEntry = $this->getKs()->getSetLimitEntry();
-
 	    $metadataProfile = MetadataProfilePeer::retrieveByPK($metadataProfileId);
 		if(!$metadataProfile)
 		    throw new KalturaAPIException(MetadataErrors::METADATA_PROFILE_NOT_FOUND, $metadataProfileId);
@@ -81,6 +79,7 @@ class MetadataService extends KalturaBaseService
 		
 		$objectType = kPluginableEnumsManager::apiToCore('MetadataObjectType', $objectType);
 
+		$limitEntry = $this->getKs()->getSetLimitEntry();
 		$peer = kMetadataManager::getObjectPeer($objectType);
 		$entry = $peer->getEntry($objectId);
 		if ($limitEntry && $entry && $entry->getId() != $limitEntry)
