@@ -9,4 +9,9 @@ class MetadataCategoryPeer extends categoryPeer implements IMetadataPeer
     {
         return true;
     }
+
+    public static function getEntry($objectId)
+    {
+        return null;
+    }
 }

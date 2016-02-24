@@ -29,7 +29,7 @@ class kMetadataManager
 	 *
 	 * @return IMetadataPeer
 	 */
-	protected static function getObjectPeer($objectType)
+	public static function getObjectPeer($objectType)
 	{
 		switch ($objectType)
 		{

@@ -241,6 +241,12 @@ class CuePointService extends KalturaBaseService
 	{
 		$dbCuePoint = CuePointPeer::retrieveByPK($id);
 
+		if (!$dbCuePoint)
+			throw new KalturaAPIException(KalturaCuePointErrors::INVALID_CUE_POINT_ID, $id);
+
+		if($this->getCuePointType() && $dbCuePoint->getType() != $this->getCuePointType())
+			throw new KalturaAPIException(KalturaCuePointErrors::INVALID_CUE_POINT_ID, $id);
+
 		// check if we have a limitEntry set on the KS, and if so verify that it is the same entry we work on
 		$limitEntry = $this->getKs()->getSetLimitEntry();
 		if ($limitEntry && $limitEntry != $dbCuePoint->getEntryId())
@@ -248,12 +254,6 @@ class CuePointService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaCuePointErrors::NO_PERMISSION_ON_ENTRY, $dbCuePoint->getEntryId());
 		}
 
-		if (!$dbCuePoint)
-			throw new KalturaAPIException(KalturaCuePointErrors::INVALID_CUE_POINT_ID, $id);
-			
-		if($this->getCuePointType() && $dbCuePoint->getType() != $this->getCuePointType())
-			throw new KalturaAPIException(KalturaCuePointErrors::INVALID_CUE_POINT_ID, $id);
-		
 		if($cuePoint->systemName)
 		{
 			$existingCuePoint = CuePointPeer::retrieveBySystemName($dbCuePoint->getEntryId(), $cuePoint->systemName);

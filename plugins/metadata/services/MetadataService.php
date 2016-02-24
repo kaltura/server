@@ -64,14 +64,6 @@ class MetadataService extends KalturaBaseService
 	function addAction($metadataProfileId, $objectType, $objectId, $xmlData)
 	{
 		$limitEntry = $this->getKs()->getSetLimitEntry();
-		if ($limitEntry && $objectType == "annotationMetadata.Annotation")
-		{
-			$cuePoint = CuePointPeer::retrieveByPK($objectId);
-			$cuePointId = $cuePoint->getEntryId();
-			if ($cuePointId != $limitEntry) {
-				throw new KalturaAPIException(MetadataErrors::METADATA_NO_PERMISSION_ON_ENTRY, $cuePointId);
-			}
-		}
 
 	    $metadataProfile = MetadataProfilePeer::retrieveByPK($metadataProfileId);
 		if(!$metadataProfile)
@@ -88,6 +80,14 @@ class MetadataService extends KalturaBaseService
 		}
 		
 		$objectType = kPluginableEnumsManager::apiToCore('MetadataObjectType', $objectType);
+
+		$peer = kMetadataManager::getObjectPeer($objectType);
+		$entry = $peer->getEntry($objectId);
+		if ($limitEntry && $entry && $entry->getId() != $limitEntry)
+		{
+			throw new KalturaAPIException(MetadataErrors::METADATA_NO_PERMISSION_ON_ENTRY, $entry->getId());
+		}
+
 		$check = MetadataPeer::retrieveByObject($metadataProfileId, $objectType, $objectId);
 		if($check)
 			throw new KalturaAPIException(MetadataErrors::METADATA_ALREADY_EXISTS, $check->getId());

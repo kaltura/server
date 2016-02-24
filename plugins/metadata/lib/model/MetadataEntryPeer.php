@@ -22,4 +22,9 @@ class MetadataEntryPeer extends entryPeer implements IMetadataPeer
     
         return true;
     }
+
+    public static function getEntry($objectId)
+    {
+        return self::retrieveByPKNoFilter($objectId);
+    }
 }
