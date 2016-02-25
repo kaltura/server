@@ -576,7 +576,7 @@ class ks extends kSessionBase
 	
 	public function getSetLimitEntry()
 	{
-		$allPrivileges = explode(',', $this->privileges);
+		$allPrivileges = explode(',', $this->getPrivilegeValue());
 		foreach($allPrivileges as $priv)
 		{
 			// extract playlist ID from pair

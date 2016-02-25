@@ -141,16 +141,16 @@ class KalturaWidget extends KalturaObject implements IFilterable
 
 	public function toInsertableWidget ()
 	{
-		$user = new widget();
+		$object = new widget();
 		$skip_props = array ( "widgetHTML" );
-		return parent::toInsertableObject( $user , $skip_props );
+		return parent::toInsertableObject( $object , $skip_props );
 	}
 
 	public function toUpdatableWidget ()
 	{
-		$user = new widget();
+		$object = new widget();
 		$skip_props = array ( "widgetHTML" );
-		return parent::toUpdatableObject( $user , $skip_props );
+		return parent::toUpdatableObject( $object , $skip_props );
 	}
 
 	public function getExtraFilters()
