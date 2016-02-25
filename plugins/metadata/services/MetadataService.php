@@ -79,7 +79,7 @@ class MetadataService extends KalturaBaseService
 		
 		$objectType = kPluginableEnumsManager::apiToCore('MetadataObjectType', $objectType);
 
-		$limitEntry = $this->getKs()->getSetLimitEntry();
+		$limitEntry = $this->getKs()->getLimitEntry();
 		if ($limitEntry) {
 			$peer = kMetadataManager::getObjectPeer($objectType);
 			$entry = $peer->getEntry($objectId);

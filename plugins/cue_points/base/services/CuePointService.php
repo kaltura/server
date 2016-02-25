@@ -60,7 +60,7 @@ class CuePointService extends KalturaBaseService
 		$dbCuePoint = $cuePoint->toInsertableObject();
 
 		// check if we have a limitEntry set on the KS, and if so verify that it is the same entry we work on
-		$limitEntry = $this->getKs()->getSetLimitEntry();
+		$limitEntry = $this->getKs()->getLimitEntry();
 		if ($limitEntry && $limitEntry != $cuePoint->entryId)
 		{
 			throw new KalturaAPIException(KalturaCuePointErrors::NO_PERMISSION_ON_ENTRY, $cuePoint->entryId);
@@ -248,7 +248,7 @@ class CuePointService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaCuePointErrors::INVALID_CUE_POINT_ID, $id);
 
 		// check if we have a limitEntry set on the KS, and if so verify that it is the same entry we work on
-		$limitEntry = $this->getKs()->getSetLimitEntry();
+		$limitEntry = $this->getKs()->getLimitEntry();
 		if ($limitEntry && $limitEntry != $dbCuePoint->getEntryId())
 		{
 			throw new KalturaAPIException(KalturaCuePointErrors::NO_PERMISSION_ON_ENTRY, $dbCuePoint->getEntryId());
