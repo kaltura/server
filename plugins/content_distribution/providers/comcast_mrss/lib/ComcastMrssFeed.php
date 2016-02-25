@@ -258,7 +258,7 @@ class ComcastMrssFeed
 		if ($asset instanceof thumbAsset && $this->distributionProfile->getShouldAddThumbExtension())
 		{
 			$dynamicAttributes = $urlManager->getDynamicAttributes();
-			$dynamicAttributes->setAddThumbExtension (true);
+			$dynamicAttributes->setAddThumbnailExtension (true);
 			$urlManager->setDynamicAttributes($dynamicAttributes);
 		}
 		
