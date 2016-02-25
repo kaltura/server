@@ -82,9 +82,11 @@ class MetadataService extends KalturaBaseService
 		$limitEntry = $this->getKs()->getLimitEntry();
 		if ($limitEntry) {
 			$peer = kMetadataManager::getObjectPeer($objectType);
-			$entry = $peer->getEntry($objectId);
-			if ($limitEntry && $entry && $entry->getId() != $limitEntry) {
-				throw new KalturaAPIException(MetadataErrors::METADATA_NO_PERMISSION_ON_ENTRY, $entry->getId());
+			if ($peer) {
+				$entry = $peer->getEntry($objectId);
+				if (!$entry || $entry->getId() != $limitEntry) {
+					throw new KalturaAPIException(MetadataErrors::METADATA_NO_PERMISSION_ON_ENTRY, $objectId);
+				}
 			}
 		}
 

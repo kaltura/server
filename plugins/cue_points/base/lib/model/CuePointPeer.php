@@ -231,7 +231,9 @@ class CuePointPeer extends BaseCuePointPeer implements IMetadataPeer, IRelatedOb
 
 	public static function getEntry($objectId)
 	{
-		$cuePoint = self::retrieveByPKNoFilter($objectId);
+		$cuePoint = self::retrieveByPK($objectId);
+		if (!$cuePoint)
+			return null;
 		return $cuePoint ? entryPeer::retrieveByPK($cuePoint->getEntryId()) : null;
 	}
 
