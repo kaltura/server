@@ -75,21 +75,28 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 	 * @param thumbAsset $thumbAsset
 	 * @return string
 	 */
-	protected function doGetThumbnailAssetUrl(thumbAsset $thumbAsset, $addExtension = false)
+	protected function doGetThumbnailAssetUrl(thumbAsset $thumbAsset)
 	{
 		$thumbAssetId = $thumbAsset->getId();
 		$partnerId = $thumbAsset->getPartnerId();
+		
+		$addExtension = false;
+		if ($this->getDynamicAttributes()->getAddThumbnailExtension())
+		{
+			$addExtension = true;
+		}
+		
 		$url = "/api_v3/service/thumbAsset/action/serve/partnerId/$partnerId/thumbAssetId/$thumbAssetId" . ($addExtension ?  "/$thumbAssetId." . $thumbAsset->getFileExt() : "");
 	
 		return $url;
 	}
 	
-	public function getAssetUrl(asset $asset, $tokenizeUrl = true, $addThumbExtension = false)
+	public function getAssetUrl(asset $asset, $tokenizeUrl = true)
 	{
 		$url = null;
 	
 		if($asset instanceof thumbAsset)
-			$url = $this->doGetThumbnailAssetUrl($asset, $addThumbExtension);
+			$url = $this->doGetThumbnailAssetUrl($asset);
 	
 		if($asset instanceof flavorAsset)
 		{
@@ -112,8 +119,8 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 		return $url;
 	}
 	
-	public function getFullAssetUrl(asset $asset, $tokenizeUrl = true, $addThumbExtension = false) {
-		$assetUrl = $this->getAssetUrl($asset, $tokenizeUrl, $addThumbExtension);
+	public function getFullAssetUrl(asset $asset, $tokenizeUrl = true) {
+		$assetUrl = $this->getAssetUrl($asset, $tokenizeUrl);
 		$hostName = $this->getHostName();
 		
 		$partner = PartnerPeer::retrieveByPK($asset->getPartnerId());

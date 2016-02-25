@@ -122,6 +122,25 @@ class DeliveryProfileDynamicAttributes {
 	 * @var array
 	 */
 	protected $edgeServerIds;
+	
+	/**
+	 * @var bool
+	 */
+	protected $addThumbnailExtension;
+
+	/**
+	 * @return the $addThumbnailExtension
+	 */
+	public function getAddThumbnailExtension() {
+		return $this->addThumbnailExtension;
+	}
+
+	/**
+	 * @param bool $addThumbnailExtension
+	 */
+	public function setAddThumbnailExtension($addThumbnailExtension) {
+		$this->addThumbnailExtension = $addThumbnailExtension;
+	}
 
 	/**
 	 * @return the $deliveryProfileIds
