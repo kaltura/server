@@ -43,7 +43,7 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 		$entry = $dbBatchJob->getEntry();
 		if (!isset($entry))
 		{
-			KalturaLog::warning("entry was deleted. not calling copyCuePointsFromLiveToVodEntry");
+			KalturaLog::warning("failed to get entry, not calling copyCuePointsFromLiveToVodEntry");
 			return;
 		}
 		self::copyCuePointsFromLiveToVodEntry($entry->getRecordedEntryId(), $recordedVODDurationInMS, $recordedVODDurationInMS, $amfArray);
@@ -51,7 +51,13 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 
 	private function handleConcatJobFinished(BatchJob $dbBatchJob, kConcatJobData $data)
 	{
+		if (!$dbBatchJob->getParentJob() || !$dbBatchJob->getParentJob()->getData())
+		{
+			KalturaLog::warning("failed to get parent job data, not calling copyCuePointsFromLiveToVodEntry");
+			return;
+		}
 		$convertJobData = ($dbBatchJob->getParentJob()->getData());
+
 		$files = self::getAssetDataFilesArray($convertJobData);
 		$lastFileIndex = $convertJobData->getFileIndex();
 		$segmentDuration = 0;
@@ -75,7 +81,7 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 		$entry = $dbBatchJob->getParentJob()->getEntry();
 		if (!isset($entry))
 		{
-			KalturaLog::warning("entry was deleted. not calling copyCuePointsFromLiveToVodEntry");
+			KalturaLog::warning("failed to get entry, not calling copyCuePointsFromLiveToVodEntry");
 			return;
 		}
 
