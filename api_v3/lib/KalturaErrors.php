@@ -541,7 +541,7 @@ class KalturaErrors extends APIErrors
 	
 	const LIVE_STREAM_ALREADY_BROADCASTING = "LIVE_STREAM_ALREADY_BROADCASTING;ENTRY_ID,MEDIA_SERVER;Entry [@ENTRY_ID@] already broadcasting to server [@MEDIA_SERVER@]";
 	
-	const CANNOT_UPDATE_FIELDS_WHILE_ENTRY_LIVE = "CANNOT_UPDATE_FIELDS_WHILE_ENTRY_LIVE;FIELD;Cannot updtae [@FIELD@] while entry is broadcasting";
+	const CANNOT_UPDATE_FIELDS_WHILE_ENTRY_BROADCASTING = "CANNOT_UPDATE_FIELDS_WHILE_ENTRY_BROADCASTING;FIELD;Cannot updtae [@FIELD@] while entry is broadcasting";
 	
 	/*
 	 * BaseEntry Service
