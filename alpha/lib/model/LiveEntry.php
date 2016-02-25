@@ -595,8 +595,9 @@ abstract class LiveEntry extends entry
 		}
 		
 		$key = $this->getEntryServerNodeCacheKey($liveEntryServerNode);
-		KalturaLog::debug("Get cache key [$key] from store [$cacheType]");
-		return $cacheStore->get($key);
+		$ans = $cacheStore->get($key);
+		KalturaLog::debug("Get cache key [$key] from store [$cacheType] returned [$ans]");
+		return $ans;
 	}
 	
 	/**
@@ -612,7 +613,10 @@ abstract class LiveEntry extends entry
 			KalturaLog::debug("cacheStore is null. cacheType: $cacheType . returning false");
 			return false;
 		}
-		return $cacheStore->set($key, true, kConf::get('media_server_cache_expiry', 'local', self::DEFAULT_CACHE_EXPIRY));
+		KalturaLog::debug("Set cache key [$key] from store [$cacheType] ");
+		$returnValue =  $cacheStore->set($key, true, kConf::get('media_server_cache_expiry', 'local', self::DEFAULT_CACHE_EXPIRY));
+		$ans = $cacheStore->get($key);
+		KalturaLog::debug("Get cache key [$key] from store [$cacheType] returned [$ans] and reurn value was [$returnValue]");
 	}
 	
 	public function setMediaServer($index, $hostname)
@@ -627,6 +631,8 @@ abstract class LiveEntry extends entry
 
 		/* @var $dbLiveEntryServerNode LiveEntryServerNode*/
 		$dbLiveEntryServerNode = EntryServerNodePeer::retrieveByEntryIdAndServerType($this->getId(), $index);
+		if (!$dbLiveEntryServerNode)
+			throw new KalturaAPIException("Failed to find valid entry server node ", KalturaErrors::ENTRY_SERVER_NODE_NOT_FOUND);
 
 		$key = $this->getEntryServerNodeCacheKey($dbLiveEntryServerNode);
 		if($this->storeInCache($key) && $this->isMediaServerRegistered($index, $hostname)) {

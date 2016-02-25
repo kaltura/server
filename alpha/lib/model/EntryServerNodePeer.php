@@ -64,7 +64,7 @@ class EntryServerNodePeer extends BaseEntryServerNodePeer {
 		if(isset(self::$class_types_cache[$entryServerNodeServerType]))
 			return self::$class_types_cache[$entryServerNodeServerType];
 
-		$extendedCls = KalturaPluginManager::getObjectClass(parent::OM_CLASS, $entryServerNodeServerType);
+		$extendedCls = KalturaPluginManager::getObjectClass(parent::getOMClass($row, $column), $entryServerNodeServerType);
 		if($extendedCls)
 		{
 			self::$class_types_cache[$entryServerNodeServerType] = $extendedCls;
@@ -73,12 +73,12 @@ class EntryServerNodePeer extends BaseEntryServerNodePeer {
 
 		switch($entryServerNodeServerType)
 		{
-			case KalturaEntryServerNodeType::LIVE_BACKUP:
-			case KalturaEntryServerNodeType::LIVE_PRIMARY:
+			case EntryServerNodeType::LIVE_BACKUP:
+			case EntryServerNodeType::LIVE_PRIMARY:
 				self::$class_types_cache[$entryServerNodeServerType] = LiveEntryServerNode::OM_CLASS;
 				break;
 			default:
-				self::$class_types_cache[$entryServerNodeServerType] = parent::OM_CLASS;
+				self::$class_types_cache[$entryServerNodeServerType] = parent::getOMClass($row, $column);
 				break;
 		}
 		return self::$class_types_cache[$entryServerNodeServerType];

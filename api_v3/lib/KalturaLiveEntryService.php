@@ -223,7 +223,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 
 		$dbEntryServerNode = EntryServerNodePeer::retrieveByEntryIdAndServerType($entryId, $mediaServerIndex);
 
-		$dbServerNode = ServerNodePeer::retrieveActiveMediaServerNode($hostname, $this->getPartnerId());
+		$dbServerNode = ServerNodePeer::retrieveActiveMediaServerNode($hostname);
 		if (!$dbServerNode)
 			throw new KalturaAPIException(KalturaErrors::SERVER_NODE_NOT_FOUND, $hostname);
 
@@ -234,14 +234,20 @@ class KalturaLiveEntryService extends KalturaEntryService
 			$dbLiveEntryServerNode->setEntryId($entryId);
 			$dbLiveEntryServerNode->setServerType($mediaServerIndex);
 			$dbLiveEntryServerNode->setPartnerId($this->getPartnerId());
+		} else {
+			$dbLiveEntryServerNode = $dbEntryServerNode;
 		}
+
 		/* @var $dbLiveEntryServerNode LiveEntryServerNode */
 		$dbLiveEntryServerNode->setServerNodeId($dbServerNode->getId());
 		$dbLiveEntryServerNode->setStatus($liveEntryStatus);
+		$dbLiveEntryServerNode->setUpdatedAt(time());
+
 		// setRedirectEntryId to null in all cases, even for broadcasting...
 		$dbEntry->setRedirectEntryId(null);
 
-		if($dbLiveEntryServerNode->save() && $dbEntry->save())
+		if($dbLiveEntryServerNode->save() && $dbEntry->save()
+			&& $this->setLiveStatusOrMediaServer($liveEntryStatus, $dbEntry ,$mediaServerIndex, $hostname, $applicationName))
 		{
 			if($mediaServerIndex == EntryServerNodeType::LIVE_PRIMARY && $liveEntryStatus == EntryServerNodeStatus::PLAYABLE && $dbEntry->getRecordStatus())
 			{
@@ -282,6 +288,30 @@ class KalturaLiveEntryService extends KalturaEntryService
 		$entry->fromObject($dbEntry, $this->getResponseProfile());
 		return $entry;
 	}
+
+	private function setLiveStatusOrMediaServer($liveEntryStatus, &$dbEntry ,$mediaServerIndex, $hostname, $applicationName)
+	{
+		try {
+			if ($liveEntryStatus == KalturaLiveEntryStatus::BROADCASTING){
+				$dbEntry->setLiveStatus(KalturaLiveEntryStatus::BROADCASTING, $mediaServerIndex);
+			}
+			else {
+				$dbEntry->setMediaServer($mediaServerIndex, $hostname, $applicationName);
+			}
+		}
+		catch(kCoreException $ex)
+		{
+			$code = $ex->getCode();
+			switch($code)
+			{
+				case kCoreException::MEDIA_SERVER_NOT_FOUND :
+					throw new KalturaAPIException(KalturaErrors::MEDIA_SERVER_NOT_FOUND, $hostname);
+				default:
+					throw $ex;
+			}
+		}
+	}
+
 
 	/**
 	 * @param LiveEntry $dbEntry

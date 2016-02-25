@@ -761,19 +761,25 @@ abstract class BaseEntryServerNodePeer {
 	}
 
 	/**
-	 * The class that the Peer will make instances of.
+	 * The returned Class will contain objects of the default type or
+	 * objects that inherit from the default.
 	 *
-	 * If $withPrefix is true, the returned path
-	 * uses a dot-path notation which is translated into a path
-	 * relative to a location on the PHP include_path.
-	 * (e.g. path.to.MyClass -> 'path/to/MyClass.php')
-	 *
-	 * @param      boolean  Whether or not to return the path with the class name
-	 * @return     string path.to.ClassName
+	 * @param      array $row PropelPDO result row.
+	 * @param      int $colnum Column to examine for OM class information (first is 0).
+	 * @throws     PropelException Any exceptions caught during processing will be
+	 *		 rethrown wrapped into a PropelException.
 	 */
-	public static function getOMClass($withPrefix = true)
+	public static function getOMClass($row, $colnum)
 	{
-		return $withPrefix ? EntryServerNodePeer::CLASS_DEFAULT : EntryServerNodePeer::OM_CLASS;
+		try {
+
+			$omClass = $row[$colnum + 7];
+			$omClass = substr('.'.$omClass, strrpos('.'.$omClass, '.') + 1);
+
+		} catch (Exception $e) {
+			throw new PropelException('Unable to get OM class.', $e);
+		}
+		return $omClass;
 	}
 
 	/**
