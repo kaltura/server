@@ -1,3 +1,85 @@
+# Kajam-11.9.0 #
+
+## Index cateogry inherited tree once per multirequest ##
+- Issue Type: Bug
+- Issue ID: PLAT-4968
+
+#### Configuration ####
+
+*base.ini*
+
+Add the following line to the the event_consumers[] list
+
+		event_consumers[] = kObjectReadyForIndexInheritedTreeHandler
+
+#### Deployment Scripts ####
+
+None.
+
+#### Known Issues & Limitations ####
+None.
+
+## Sometimes there is more than one batch scheduler running ##
+ - Issue Type: Bug
+ - Issue ID: PLAT-4714
+ 
+### Installation ###
+None.
+#### Configuration ####
+Copy the file '/opt/kaltura/app/batch/kaltura_batch.sh' to /etc/init.d/kaltura-batch and overwrite.
+Edit file '/opt/kaltura/app/configurations/monit/monit.avail/batch.rc'. Set the value 'with pidfile "/opt/kaltura/var/run/batch.pid"'
+Edit file '/opt/kaltura/app/configurations/batch/batch.ini' and set 'pidFileDir = /opt/kaltura/var/run/'
+#### Known Issues & Limitations ####
+None.
+#### Deployment scripts ####
+None.
+
+ 
+## Remove quiz permission ##
+
+- Issue Type: Bug
+
+#### Configuration ####
+
+- Remove the following lines from admin.ini:
+
+		moduls.quizCuePoint.enabled = true
+		moduls.quizCuePoint.permissionType = 3
+		moduls.quizCuePoint.label = Quiz - Cue Points
+		moduls.quizCuePoint.permissionName = QUIZ_PLUGIN_PERMISSION
+		moduls.quizCuePoint.basePermissionType = 3
+		moduls.quizCuePoint.basePermissionName = CUEPOINT_PLUGIN_PERMISSION
+		moduls.quizCuePoint.group = GROUP_ENABLE_DISABLE_FEATURES
+
+## new Http notifcation - Flavor Asset Status Changed ##
+
+- Issue Type: New Feature
+- Issue ID: PLAT-5097
+
+#### Configuration ####
+ 
+- None.
+
+#### Deployment Scripts ####
+
+		php /opt/kaltura/app/tests/standAloneClient/exec.php /opt/kaltura/app/tests/standAloneClient/flavorAssetChangedHttpNotificationTemplate.xml
+
+#### Known Issues & Limitations ####
+
+None.
+
+## Attachement Asset & Transcript Asset Event Notifications ##
+
+#### Configuration ####
+
+*plugins.ini*
+
+Enable the following plugins:
+
+		AttachmentAssetEventNotifications
+		TranscriptAssetEventNotifications
+
+
 # Kajam-11.8.0 #
 
 ## Server returning all stream information when loading the player ##
