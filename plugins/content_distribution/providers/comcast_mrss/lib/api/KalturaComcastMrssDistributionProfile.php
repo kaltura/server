@@ -61,11 +61,6 @@ class KalturaComcastMrssDistributionProfile extends KalturaConfigurableDistribut
 	 */
 	public $shouldIncludeCaptions;
 	
-	/**
-	 * @var bool
-	 */
-	public $shouldAddThumbExtension;
-	
 	/*
 	 * mapping between the field on this object (on the left) and the setter/getter on the object (on the right)  
 	 */
@@ -82,7 +77,6 @@ class KalturaComcastMrssDistributionProfile extends KalturaConfigurableDistribut
 		'cPlatformTvSeriesField',
 		'shouldIncludeCuePoints',
 		'shouldIncludeCaptions',
-		'shouldAddThumbExtension',
 	);
 	
 	public function getMapBetweenObjects()
