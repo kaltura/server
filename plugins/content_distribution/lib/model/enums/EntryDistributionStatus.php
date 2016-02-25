@@ -18,4 +18,5 @@ interface EntryDistributionStatus extends BaseEnum
 	const REMOVED = 10;
 	const IMPORT_SUBMITTING = 11;
 	const IMPORT_UPDATING = 12;
+	const VALIDATION_ERROR = 13;
 }
