@@ -105,13 +105,9 @@ class KalturaWidget extends KalturaObject implements IFilterable
 
 	/**
 	 * @var string
+	 * @requiresPermission insert,update
 	 */
 	public $roles;
-
-	/**
-	 * @var string
-	 */
-	public $limitEntry;
 
 	private static $map_between_objects = array
 	(
@@ -130,8 +126,7 @@ class KalturaWidget extends KalturaObject implements IFilterable
 		"enforceEntitlement",
 		"privacyContext",
 		"addEmbedHtml5Support",
-		"roles",
-		"limitEntry"
+		"roles"
 	);
 
 	public function getMapBetweenObjects ( )

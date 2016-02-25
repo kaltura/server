@@ -280,9 +280,4 @@ class widget extends Basewidget implements IBaseObject
 	// set a widget role to allow a specific widget to have extra privileges
 	public function setRoles ( $v )	{	$this->putInCustomData ( "roles" , $v );	}
 	public function getRoles (  )	{	return $this->getFromCustomData( "roles" );	}
-
-	// limit operations done with a session generated with this Widget to a specific entry
-	public function setLimitEntry ( $v )	{	$this->putInCustomData ( "limitEntry" , $v );	}
-	public function getLimitEntry (  )	{	return $this->getFromCustomData( "limitEntry" );	}
-
 }
