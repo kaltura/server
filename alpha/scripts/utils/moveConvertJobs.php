@@ -9,10 +9,12 @@ define('TEMP_JOB_STATUS', 5000);
 define('CHUNK_SIZE', 100);
 
 // auto mode constants
-define('MAX_PARTNER_JOB_COUNT', 50);		// partners who have more than this number of jobs will not be moved
+define('MAX_PARTNER_JOB_COUNT', 100);		// partners who have more than this number of jobs will not be moved
 define('MIN_JOB_AGE', 300);
 define('MAX_JOB_AGE', 604800);				// 7 days
-define('MIN_PARTNER_COUNT', 5);				// if there are less than this number of partners matching the criteria, no jobs will be push
+define('AVAIL_DC_MAX_PARTNER_COUNT', 4);				// if there are less than this number of partners matching the criteria, the dc will accept jobs
+define('BUSY_DC_MIN_PARTNER_COUNT', 10);			// if there are more than this number of partners matching the criteria, jobs will be pushed out
+define('IDLE_DC_MAX_JOB_COUNT', 225);
 
 function getAllReadyInternalFileSyncsForKey(FileSyncKey $key)
 {
@@ -117,8 +119,6 @@ function moveJobs($c, $maxMovedJobs, $sourceDc, $targetDc, $jobType, $jobSubType
 {
 	global $jobStatus;
 	
-	KalturaLog::log("called with max=$maxMovedJobs, source=$sourceDc, target=$targetDc, type=$jobType, subType=$jobSubType");
-	
 	// get candidates for move
 	$c->add(BatchJobLockPeer::DC, $sourceDc);
 	$c->add(BatchJobLockPeer::JOB_TYPE, $jobType);
@@ -174,28 +174,20 @@ function moveJobs($c, $maxMovedJobs, $sourceDc, $targetDc, $jobType, $jobSubType
 	return $movedJobsCount;
 }
 
-function autoMoveJobs($jobType, $jobSubType)
+function getRunningJobsCount($jobType, $jobSubType)
 {
-	global $jobStatus;
-	
-	/* build a query of this form:
-	 * 
-	 * SELECT DC, PARTNER_ID, COUNT(1) FROM `batch_job_lock` WHERE 
-	 * 		SCHEDULER_ID IS NULL AND WORKER_ID IS NULL AND BATCH_INDEX IS NULL AND STATUS = '0' AND 
-	 * 		DC IN ('0', '1') AND 
-	 * 		JOB_TYPE = '0' AND JOB_SUB_TYPE = '2' AND 
-	 * 		(CREATED_AT >= '2016-02-17 04:23:42' AND CREATED_AT <= '2016-02-24 04:18:42') 
-	 * 		GROUP BY DC, PARTNER_ID 
-	 * 		HAVING COUNT(1) < 50
+	/*
+	 * SELECT DC, COUNT(ID) FROM `batch_job_lock` WHERE 
+	 * 		STATUS='1' AND 
+	 * 		DC IN ('0','1') AND 
+	 * 		JOB_TYPE='0' AND JOB_SUB_TYPE='2' AND 
+	 * 		(CREATED_AT>='2016-02-19 05:24:43' AND CREATED_AT<='2016-02-26 05:19:43') 
+	 * 		GROUP BY DC
 	 */
-
 	$c = new Criteria();
 	
-	// not locked
-	$c->add(BatchJobLockPeer::SCHEDULER_ID, null, Criteria::ISNULL);
-	$c->add(BatchJobLockPeer::WORKER_ID, null, Criteria::ISNULL);
-	$c->add(BatchJobLockPeer::BATCH_INDEX, null, Criteria::ISNULL);
-	$c->add(BatchJobLockPeer::STATUS, $jobStatus);
+	// running
+	$c->add(BatchJobLockPeer::STATUS, BatchJob::BATCHJOB_STATUS_QUEUED);
 	// job type + sub type
 	$c->add(BatchJobLockPeer::DC, kDataCenterMgr::getDcIds(), Criteria::IN);
 	$c->add(BatchJobLockPeer::JOB_TYPE, $jobType);
@@ -204,14 +196,73 @@ function autoMoveJobs($jobType, $jobSubType)
 		$c->add(BatchJobLockPeer::JOB_SUB_TYPE, $jobSubType);
 	}
 	// not too new / too old
-	$createdAtCriterion = $c->getNewCriterion(BatchJobLockPeer::CREATED_AT, time() - MAX_JOB_AGE, Criteria::GREATER_EQUAL); 
+	$createdAtCriterion = $c->getNewCriterion(BatchJobLockPeer::CREATED_AT, time() - MAX_JOB_AGE, Criteria::GREATER_EQUAL);
+	$createdAtCriterion->addAnd($c->getNewCriterion(BatchJobLockPeer::CREATED_AT, time() - MIN_JOB_AGE, Criteria::LESS_EQUAL));
+	$c->addAnd($createdAtCriterion);
+	// group by dc + partner
+	$c->addGroupByColumn(BatchJobLockPeer::DC);
+	// select count, partner, dc
+	$c->addSelectColumn(BatchJobLockPeer::COUNT);
+	$c->addSelectColumn(BatchJobLockPeer::DC);
+	
+	$stmt = BatchJobLockPeer::doSelectStmt($c);
+	$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+	
+	$countByDc = array();
+	foreach (kDataCenterMgr::getDcIds() as $dc)
+	{
+		$countByDc[$dc] = array();
+	}
+	
+	foreach ($rows as $row)
+	{
+		$dc = $row['DC'];
+		$count = $row[BatchJobLockPeer::COUNT];
+		$countByDc[$dc] = $count;
+	}
+	
+	return $countByDc;
+}
+
+function getPendingJobsCount($jobType, $jobSubType, $maxJobsPerPartner)
+{
+	/* 
+	* SELECT DC, PARTNER_ID, COUNT(1) FROM `batch_job_lock` WHERE
+	* 		SCHEDULER_ID IS NULL AND WORKER_ID IS NULL AND BATCH_INDEX IS NULL AND STATUS = '0' AND
+	* 		DC IN ('0', '1') AND
+	* 		JOB_TYPE = '0' AND JOB_SUB_TYPE = '2' AND
+	* 		(CREATED_AT >= '2016-02-17 04:23:42' AND CREATED_AT <= '2016-02-24 04:18:42')
+	* 		GROUP BY DC, PARTNER_ID
+	* 		HAVING COUNT(1) < 50
+	*/
+	
+	$c = new Criteria();
+	
+	// not locked
+	$c->add(BatchJobLockPeer::SCHEDULER_ID, null, Criteria::ISNULL);
+	$c->add(BatchJobLockPeer::WORKER_ID, null, Criteria::ISNULL);
+	$c->add(BatchJobLockPeer::BATCH_INDEX, null, Criteria::ISNULL);
+	$c->add(BatchJobLockPeer::STATUS, BatchJob::BATCHJOB_STATUS_PENDING);
+	// job type + sub type
+	$c->add(BatchJobLockPeer::DC, kDataCenterMgr::getDcIds(), Criteria::IN);
+	$c->add(BatchJobLockPeer::JOB_TYPE, $jobType);
+	if (!is_null($jobSubType))
+	{
+		$c->add(BatchJobLockPeer::JOB_SUB_TYPE, $jobSubType);
+	}
+	// not too new / too old
+	$createdAtCriterion = $c->getNewCriterion(BatchJobLockPeer::CREATED_AT, time() - MAX_JOB_AGE, Criteria::GREATER_EQUAL);
 	$createdAtCriterion->addAnd($c->getNewCriterion(BatchJobLockPeer::CREATED_AT, time() - MIN_JOB_AGE, Criteria::LESS_EQUAL));
 	$c->addAnd($createdAtCriterion);
 	// group by dc + partner
 	$c->addGroupByColumn(BatchJobLockPeer::DC);
 	$c->addGroupByColumn(BatchJobLockPeer::PARTNER_ID);
-	// not having too many jobs
-	$c->addHaving($c->getNewCriterion(BatchJobLockPeer::ID, BatchJobLockPeer::COUNT . '<' . MAX_PARTNER_JOB_COUNT, Criteria::CUSTOM));
+	
+	if ($maxJobsPerPartner)
+	{
+		// not having too many jobs
+		$c->addHaving($c->getNewCriterion(BatchJobLockPeer::ID, BatchJobLockPeer::COUNT . '<' . $maxJobsPerPartner, Criteria::CUSTOM));
+	}
 	// select count, partner, dc
 	$c->addSelectColumn(BatchJobLockPeer::COUNT);
 	foreach($c->getGroupByColumns() as $column)
@@ -221,7 +272,7 @@ function autoMoveJobs($jobType, $jobSubType)
 	
 	$stmt = BatchJobLockPeer::doSelectStmt($c);
 	$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
-		
+	
 	// build a map of dc, partner => job count
 	$countByDcPartner = array();
 	foreach (kDataCenterMgr::getDcIds() as $dc)
@@ -229,7 +280,7 @@ function autoMoveJobs($jobType, $jobSubType)
 		$countByDcPartner[$dc] = array();
 	}
 	
-	foreach ($rows as $row) 
+	foreach ($rows as $row)
 	{
 		$dc = $row['DC'];
 		$partnerId = $row['PARTNER_ID'];
@@ -237,41 +288,74 @@ function autoMoveJobs($jobType, $jobSubType)
 		$countByDcPartner[$dc][$partnerId] = $count;
 	}
 	
-	KalturaLog::log('queue status '.print_r($countByDcPartner, true));
+	return $countByDcPartner;
+}
+
+function autoMoveJobs($jobType, $jobSubType)
+{
+	// get running jobs count and look for idle dcs
+	$idleDcs = array();
+	$runningJobs = getRunningJobsCount($jobType, $jobSubType);
+	foreach ($runningJobs as $dc => $count)
+	{
+		if ($dc != kDataCenterMgr::getCurrentDcId() && $count < IDLE_DC_MAX_JOB_COUNT)
+		{
+			$idleDcs[] = $dc;
+		}
+	}
+
+	KalturaLog::log('running jobs status '.print_r($runningJobs, true));
+	KalturaLog::log('idle dcs ' . implode(',', $idleDcs));
+	
+	// get the pending jobs count
+	$countByDcPartner = getPendingJobsCount(
+			$jobType, $jobSubType, !$idleDcs ? MAX_PARTNER_JOB_COUNT : 0);
+	
+	KalturaLog::log('pending jobs status '.print_r($countByDcPartner, true));
 	
 	// Note: only move jobs away from current DC - can't safely lock a job belonging
 	//		to another DC - a worker may lock the job at the same time on the master DB
 	//		of the remote DC. the lock is atomic only when working with a single master
 	$sourceDc = kDataCenterMgr::getCurrentDcId();
-	if (count($countByDcPartner[$sourceDc]) < MIN_PARTNER_COUNT)
+	if (!$idleDcs && count($countByDcPartner[$sourceDc]) < BUSY_DC_MIN_PARTNER_COUNT)
 	{
 		KalturaLog::log('current dc has only '.count($countByDcPartner[$sourceDc]).' partners waiting');
 		return 0;
 	}
 
 	// find a target DC to push the jobs to
-	$emptyDcs = array();
+	$availDcs = array();
 	foreach ($countByDcPartner as $dc => $countByPartner)
 	{
-		if (!$countByPartner)
+		if (count($countByPartner) < AVAIL_DC_MAX_PARTNER_COUNT)
 		{
-			$emptyDcs[] = $dc;
+			$availDcs[] = $dc;
 		}
 	}
 	
-	if (!$emptyDcs)
+	if (!$idleDcs && !$availDcs)
 	{
-		KalturaLog::log('no empty dcs to push the jobs to');
+		KalturaLog::log('no available dcs to push jobs to');
 		return 0;
 	}
 	
-	$targetDc = reset($emptyDcs);
+	$targetDc = $idleDcs ? reset($idleDcs) : reset($availDcs);
 	
 	// push the jobs
 	$movedJobsCount = 0;
-	foreach ($countByDcPartner[$sourceDc] as $partnerId => $count)
+	foreach ($countByDcPartner[$sourceDc] as $partnerId => $srcCount)
 	{
-		$maxMovedJobs = ceil($count / 2);
+		$targetCount = isset($countByDcPartner[$targetDc][$partnerId]) ?
+			$countByDcPartner[$targetDc][$partnerId] : 0;
+		
+		if ($targetCount >= $srcCount || $targetCount >= MAX_PARTNER_JOB_COUNT)
+		{
+			continue;
+		}
+		
+		$maxMovedJobs = min(
+				floor(($srcCount - $targetCount) / 2), 
+				MAX_PARTNER_JOB_COUNT - $targetCount);
 		
 		$c = new Criteria();
 		// partner
@@ -282,6 +366,8 @@ function autoMoveJobs($jobType, $jobSubType)
 		$createdAtCriterion->addAnd($c->getNewCriterion(BatchJobLockPeer::CREATED_AT, time() - MIN_JOB_AGE, Criteria::LESS_EQUAL));
 		$c->addAnd($createdAtCriterion);
 		
+		KalturaLog::log("moving jobs: partnerId=$partnerId max=$maxMovedJobs, source=$sourceDc, target=$targetDc, type=$jobType, subType=$jobSubType");
+	
 		$movedJobsCount += moveJobs($c, $maxMovedJobs, $sourceDc, $targetDc, $jobType, $jobSubType);
 	}
 	
@@ -329,6 +415,8 @@ if ($argv[1] == 'manual')
 			$c->add(BatchJobLockPeer::PARTNER_ID, explode(',', $partnerId), Criteria::IN);
 		}
 	}
+
+	KalturaLog::log("moving jobs: partnerId=$partnerId max=$maxMovedJobs, source=$sourceDc, target=$targetDc, type=$jobType, subType=$jobSubType");
 	
 	$movedJobsCount = moveJobs($c, $maxMovedJobs, $sourceDc, $targetDc, $jobType, $jobSubType);
 }
@@ -338,4 +426,4 @@ else
 	$movedJobsCount = autoMoveJobs($jobType, $jobSubType);
 }
 
-KalturaLog::log("Moved {$movedJobsCount} jobs\n");
+KalturaLog::log("Moved {$movedJobsCount} jobs");
