@@ -293,6 +293,23 @@ function getPendingJobsCount($jobType, $jobSubType, $maxJobsPerPartner)
 
 function autoMoveJobs($jobType, $jobSubType)
 {
+	/*
+	 * Automatic balancing logic
+	 * 
+	 * The balancing logic is meant to optimize two scenarios:
+	 * 1. One of the DCs if idle (=the number of running jobs is significantly lower 
+	 * 		than the number of workers) - In this case, we want to balance all the jobs
+	 * 		without any limitation so that the queue will be processed as fast as 
+	 * 		possible. Since the situation can change, and the remote DC may start
+	 * 		accumulating more jobs, we do not move any jobs that would raise the number
+	 * 		of partner jobs above 100 in the target DC.
+	 * 2. One DC is loaded (=many different partners waiting in queue) while the other
+	 * 		DC is not (=few partners waiting in queue). In this case, we balance only
+	 * 		the jobs of partners that don't have more than X jobs. If some partner
+	 * 		has 1K jobs in queue, they are not likely to complete soon anyway, so it's
+	 * 		better not to move its jobs and keep the remote DC focused on other partners.
+	 */
+	
 	// get running jobs count and look for idle dcs
 	$idleDcs = array();
 	$runningJobs = getRunningJobsCount($jobType, $jobSubType);
@@ -317,29 +334,37 @@ function autoMoveJobs($jobType, $jobSubType)
 	//		to another DC - a worker may lock the job at the same time on the master DB
 	//		of the remote DC. the lock is atomic only when working with a single master
 	$sourceDc = kDataCenterMgr::getCurrentDcId();
-	if (!$idleDcs && count($countByDcPartner[$sourceDc]) < BUSY_DC_MIN_PARTNER_COUNT)
-	{
-		KalturaLog::log('current dc has only '.count($countByDcPartner[$sourceDc]).' partners waiting');
-		return 0;
-	}
 
 	// find a target DC to push the jobs to
-	$availDcs = array();
-	foreach ($countByDcPartner as $dc => $countByPartner)
+	if ($idleDcs)
 	{
-		if (count($countByPartner) < AVAIL_DC_MAX_PARTNER_COUNT)
+		$targetDc = reset($idleDcs);
+	}
+	else
+	{
+		if (count($countByDcPartner[$sourceDc]) < BUSY_DC_MIN_PARTNER_COUNT)
 		{
-			$availDcs[] = $dc;
+			KalturaLog::log('current dc has only '.count($countByDcPartner[$sourceDc]).' partners waiting');
+			return 0;
 		}
+		
+		$availDcs = array();
+		foreach ($countByDcPartner as $dc => $countByPartner)
+		{
+			if (count($countByPartner) < AVAIL_DC_MAX_PARTNER_COUNT)
+			{
+				$availDcs[] = $dc;
+			}
+		}
+		
+		if (!$availDcs)
+		{
+			KalturaLog::log('no available dcs to push jobs to');
+			return 0;
+		}
+		
+		$targetDc = reset($availDcs);
 	}
-	
-	if (!$idleDcs && !$availDcs)
-	{
-		KalturaLog::log('no available dcs to push jobs to');
-		return 0;
-	}
-	
-	$targetDc = $idleDcs ? reset($idleDcs) : reset($availDcs);
 	
 	// push the jobs
 	$movedJobsCount = 0;
