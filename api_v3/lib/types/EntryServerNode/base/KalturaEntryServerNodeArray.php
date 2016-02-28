@@ -10,8 +10,8 @@ class KalturaEntryServerNodeArray extends KalturaTypedArray
 		$newArr = new KalturaEntryServerNodeArray();
 		foreach($arr as $obj)
 		{
-			/* @var $obj EntryServerNode */
-			$nObj = EntryServerNodePeer::getInstanceByType($obj);
+			/* @var $obj KalturaEntryServerNode */
+			$nObj = KalturaEntryServerNode::getInstance($obj);
 			if (!$nObj)
 			{
 				throw new KalturaAPIException(KalturaErrors::ENTRY_SERVER_NODE_OBJECT_TYPE_ERROR, $obj->getServerType(), $obj->getId());
@@ -27,4 +27,5 @@ class KalturaEntryServerNodeArray extends KalturaTypedArray
 	{
 		return parent::__construct("KalturaEntryServerNode");
 	}
+
 }

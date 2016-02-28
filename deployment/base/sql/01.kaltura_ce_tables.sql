@@ -2451,7 +2451,7 @@ CREATE TABLE app_token
 
 CREATE TABLE entry_server_node
 (
-	id INTEGER  NOT NULL AUTO_INCREMENT,
+	id BIGINT(20) NOT NULL AUTO_INCREMENT,
 	entry_id VARCHAR(20),
 	server_node_id INTEGER,
 	partner_id INTEGER,
@@ -2462,4 +2462,4 @@ CREATE TABLE entry_server_node
 	custom_data TEXT,
 	PRIMARY KEY (id),
 	KEY (entry_id, server_type)
-)Type=InnoDB;
+)ENGINE=InnoDB;

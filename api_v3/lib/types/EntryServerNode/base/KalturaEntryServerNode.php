@@ -4,13 +4,12 @@
  * @subpackage objects
  * @abstract
  */
-abstract class KalturaEntryServerNode extends KalturaObject implements IRelatedFilterable
+abstract class KalturaEntryServerNode extends KalturaObject implements IRelatedFilterable, IApiObjectFactory
 {
 	/**
 	 * unique auto-generated identifier
 	 * @var int
 	 * @readonly
-	 * @filter eq,in
 	 */
 	public $id;
 
@@ -23,6 +22,7 @@ abstract class KalturaEntryServerNode extends KalturaObject implements IRelatedF
 
 	/**
 	 * @var int
+	 * @readonly
 	 * @filter eq,in
 	 */
 	public $serverNodeId;
@@ -108,6 +108,32 @@ abstract class KalturaEntryServerNode extends KalturaObject implements IRelatedF
 		return array();
 	}
 
+	/**
+	 * Function returns EntryServerNode sub-type according to protocol
+	 * @param $sourceObject
+	 * @param KalturaDetachedResponseProfile $responseProfile
+	 * @return KalturaEntryServerNode
+	 */
+	public static function getInstance ($sourceObject, KalturaDetachedResponseProfile $responseProfile = null)
+	{
+		$type = $sourceObject->getServerType();
 
+		switch ($type)
+		{
+			case KalturaEntryServerNodeType::LIVE_BACKUP:
+			case KalturaEntryServerNodeType::LIVE_PRIMARY:
+				$object = new LiveEntryServerNode();
+				break;
+
+			default:
+				KalturaLog::err("Did not expect source object to be of type ".$type);
+		}
+
+		if (!$object)
+			return null;
+
+		$object->fromObject($sourceObject, $responseProfile);
+		return $object;
+	}
 
 }

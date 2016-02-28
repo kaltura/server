@@ -32,7 +32,7 @@ class EntryServerNodeService extends KalturaBaseService
 		$te->setDescription(__METHOD__ . ":" . __LINE__ . "::" . $dbEntryServerNode->getServerType().":".$dbEntryServerNode->getServerNodeId());
 		TrackEntry::addTrackEntry($te);
 
-		$entryServerNode = EntryServerNodePeer::getInstanceByType($dbEntryServerNode, $this->getResponseProfile());
+		$entryServerNode = KalturaEntryServerNode::getInstance($dbEntryServerNode, $this->getResponseProfile());
 		return $entryServerNode;
 
 	}
@@ -65,7 +65,7 @@ class EntryServerNodeService extends KalturaBaseService
 		$dbEntryServerNode = $entryServerNode->toUpdatableObject($dbEntryServerNode);
 		$dbEntryServerNode->save();
 
-		$entryServerNode = EntryServerNodePeer::getInstanceByType($dbEntryServerNode, $this->getResponseProfile());
+		$entryServerNode = KalturaEntryServerNode::getInstance($dbEntryServerNode, $this->getResponseProfile());
 		return $entryServerNode;
 	}
 
@@ -112,7 +112,7 @@ class EntryServerNodeService extends KalturaBaseService
 		if(!$dbEntryServerNode)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_SERVER_NODE_NOT_FOUND, $id);
 
-		$entryServerNode = EntryServerNodePeer::getInstanceByType($dbEntryServerNode);
+		$entryServerNode = KalturaEntryServerNode::getInstance($dbEntryServerNode);
 		if (!$entryServerNode)
 			return null;
 		$entryServerNode->fromObject($dbEntryServerNode);
