@@ -575,7 +575,7 @@ class PhpZendClientGenerator extends ClientGeneratorFromXml
 		if(!$enableInMultiRequest)
 		{
 			$this->appendLine("		if (\$this->client->isMultiRequest())");
-			$this->appendLine("			throw \$this->client->getKaltura_Client_ClientException(\"Action is not supported as part of multi-request.\", Kaltura_Client_ClientException::ERROR_ACTION_IN_MULTIREQUEST);");
+			$this->appendLine("			throw \$this->client->getKalturaClientException(\"Action is not supported as part of multi-request.\", Kaltura_Client_ClientException::ERROR_ACTION_IN_MULTIREQUEST);");
 			$this->appendLine("		");
 		}
 		

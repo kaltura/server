@@ -246,7 +246,7 @@ class Kaltura_Client_ClientBase
 		{
 			$error .= ". RC : $errorCode";
 			$this->resetRequest();
-			throw $this->getKaltura_Client_ClientException($error, Kaltura_Client_ClientException::ERROR_GENERIC);
+			throw $this->getKalturaClientException($error, Kaltura_Client_ClientException::ERROR_GENERIC);
 		}
 		else
 		{
@@ -269,7 +269,7 @@ class Kaltura_Client_ClientBase
 			if ($this->config->format != self::KALTURA_SERVICE_FORMAT_XML)
 			{
 				$this->resetRequest();
-				throw $this->getKaltura_Client_ClientException("unsupported format: $postResult", Kaltura_Client_ClientException::ERROR_FORMAT_NOT_SUPPORTED);
+				throw $this->getKalturaClientException("unsupported format: $postResult", Kaltura_Client_ClientException::ERROR_FORMAT_NOT_SUPPORTED);
 			}
 		}
 
@@ -437,7 +437,7 @@ class Kaltura_Client_ClientBase
 	private function doPostRequest($url, $params = array(), $files = array())
 	{
 		if (count($files) > 0)
-			throw $this->getKaltura_Client_ClientException("Uploading files is not supported with stream context http request, please use curl", Kaltura_Client_ClientException::ERROR_UPLOAD_NOT_SUPPORTED);
+			throw $this->getKalturaClientException("Uploading files is not supported with stream context http request, please use curl", Kaltura_Client_ClientException::ERROR_UPLOAD_NOT_SUPPORTED);
 
 		$formattedData = http_build_query($params , "", "&");
 		$params = array('http' => array(
@@ -449,7 +449,7 @@ class Kaltura_Client_ClientBase
 		));
 
 		if (isset($this->config->proxyType) && $this->config->proxyType === 'SOCKS5') {
-			throw $this->getKaltura_Client_ClientException("Cannot use SOCKS5 without curl installed.", Kaltura_Client_ClientException::ERROR_CONNECTION_FAILED);
+			throw $this->getKalturaClientException("Cannot use SOCKS5 without curl installed.", Kaltura_Client_ClientException::ERROR_CONNECTION_FAILED);
 		}
 		if (isset($this->config->proxyHost)) {
 			$proxyhost = 'tcp://' . $this->config->proxyHost;
@@ -468,11 +468,11 @@ class Kaltura_Client_ClientBase
 		$fp = @fopen($url, 'rb', false, $ctx);
 		if (!$fp) {
 			$phpErrorMsg = "";
-			throw $this->getKaltura_Client_ClientException("Problem with $url, $phpErrorMsg", Kaltura_Client_ClientException::ERROR_CONNECTION_FAILED);
+			throw $this->getKalturaClientException("Problem with $url, $phpErrorMsg", Kaltura_Client_ClientException::ERROR_CONNECTION_FAILED);
 		}
 		$response = @stream_get_contents($fp);
 		if ($response === false) {
-			throw $this->getKaltura_Client_ClientException("Problem reading data from $url, $phpErrorMsg", Kaltura_Client_ClientException::ERROR_READ_FAILED);
+			throw $this->getKalturaClientException("Problem reading data from $url, $phpErrorMsg", Kaltura_Client_ClientException::ERROR_READ_FAILED);
 		}
 		return array($response, 200, '');
 	}
@@ -616,12 +616,12 @@ class Kaltura_Client_ClientBase
 					}
 					return (array) $value;
 				}
-				throw $this->getKaltura_Client_Exception($value->message, $value->code, $value->args);
+				throw $this->getKalturaAPIException($value->message, $value->code, $value->args);
 			}
 
 			if(!isset($value->objectType))
 			{
-				throw $this->getKaltura_Client_ClientException("Response format not supported - objectType is required for all objects", Kaltura_Client_ClientException::ERROR_FORMAT_NOT_SUPPORTED);
+				throw $this->getKalturaClientException("Response format not supported - objectType is required for all objects", Kaltura_Client_ClientException::ERROR_FORMAT_NOT_SUPPORTED);
 			}
 
 			$objectType = $value->objectType;
@@ -689,7 +689,7 @@ class Kaltura_Client_ClientBase
 	{
 		if ($this->isError($resultObject))
 		{
-			throw $this->getKaltura_Client_Exception($resultObject["message"], $resultObject["code"], $resultObject["args"]);
+			throw $this->getKalturaAPIException($resultObject["message"], $resultObject["code"], $resultObject["args"]);
 		}
 	}
 
@@ -722,7 +722,7 @@ class Kaltura_Client_ClientBase
 		{
 			if (!($resultObject instanceof $objectType))
 			{
-				throw $this->getKaltura_Client_ClientException("Invalid object type - not instance of $objectType", Kaltura_Client_ClientException::ERROR_INVALID_OBJECT_TYPE);
+				throw $this->getKalturaClientException("Invalid object type - not instance of $objectType", Kaltura_Client_ClientException::ERROR_INVALID_OBJECT_TYPE);
 			}
 		}
 		else if(class_exists($objectType) && is_subclass_of($objectType, 'Kaltura_Client_EnumBase'))
@@ -731,12 +731,12 @@ class Kaltura_Client_ClientBase
 			$values = array_map('strval', $enum->getConstants());
 			if(!in_array($resultObject, $values))
 			{
-				throw $this->getKaltura_Client_ClientException("Invalid enum value", Kaltura_Client_ClientException::ERROR_INVALID_ENUM_VALUE);
+				throw $this->getKalturaClientException("Invalid enum value", Kaltura_Client_ClientException::ERROR_INVALID_ENUM_VALUE);
 			}
 		}
 		else if(gettype($resultObject) !== $objectType)
 		{
-			throw $this->getKaltura_Client_ClientException("Invalid object type", Kaltura_Client_ClientException::ERROR_INVALID_OBJECT_TYPE);
+			throw $this->getKalturaClientException("Invalid object type", Kaltura_Client_ClientException::ERROR_INVALID_OBJECT_TYPE);
 		}
 	}
 
@@ -909,12 +909,12 @@ class Kaltura_Client_ClientBase
 	}
 
 
-	public function getKaltura_Client_Exception($errorMsg, $errorCode, $args)
+	public function getKalturaAPIException($errorMsg, $errorCode, $args)
 	{
 		return new Kaltura_Client_Exception($errorMsg, $errorCode, $args);
 	}
 
-	public function getKaltura_Client_ClientException( $error, $errorCode)
+	public function getKalturaClientException( $error, $errorCode)
 	{
 		return new Kaltura_Client_ClientException($error, $errorCode);
 	}
@@ -927,9 +927,9 @@ class Kaltura_Client_ClientBase
 			$message = "{$xml->error->message}";
 			$arguments = Kaltura_Client_ParseUtils::unmarshalArray($xml->error->args, 'KalturaApiExceptionArg');
 			if($throwException)
-				throw $this->getKaltura_Client_Exception($message, $code, $arguments);
+				throw $this->getKalturaAPIException($message, $code, $arguments);
 			else
-				return $this->getKaltura_Client_Exception($message, $code, $arguments);
+				return $this->getKalturaAPIException($message, $code, $arguments);
 		}
 	}
 }
