@@ -57,13 +57,13 @@ class AMQPWriter extends AbstractClient
             throw new AMQPInvalidArgumentException('Only integer and numeric string values are supported');
         }
         if ($isNeg) {
-            $x = bcadd($x, -1);
+            $x--;
         } //in negative domain starting point is -1, not 0
 
         $res = array();
         for ($b = 0; $b < $bytes; $b += 2) {
-            $chnk = (int) bcmod($x, 65536);
-            $x = bcdiv($x, 65536, 0);
+            $chnk = (int) ($x % 65536);
+            $x = intval($x / 65536);
             $res[] = pack('n', $isNeg ? ~$chnk : $chnk);
         }
         if ($x || ($isNeg && ($chnk & 0x8000))) {
@@ -260,7 +260,7 @@ class AMQPWriter extends AbstractClient
 
         // if PHP_INT_MAX is big enough for that
         // direct $n<=PHP_INT_MAX check is unreliable on 64bit (values close to max) due to limited float precision
-        if (bcadd($n, -PHP_INT_MAX) <= 0) {
+        if (($n - PHP_INT_MAX) <= 0) {
             // trick explained in http://www.php.net/manual/fr/function.pack.php#109328
             if ($this->is64bits) {
                 list($hi, $lo) = $this->splitIntoQuads($n);
@@ -282,7 +282,7 @@ class AMQPWriter extends AbstractClient
 
     public function write_signed_longlong($n)
     {
-        if ((bcadd($n, PHP_INT_MAX) >= -1) && (bcadd($n, -PHP_INT_MAX) <= 0)) {
+        if ((($n + PHP_INT_MAX) >= -1) && (($n - PHP_INT_MAX) <= 0)) {
             if ($this->is64bits) {
                 list($hi, $lo) = $this->splitIntoQuads($n);
             } else {
@@ -293,7 +293,7 @@ class AMQPWriter extends AbstractClient
         } elseif ($this->is64bits) {
             throw new AMQPInvalidArgumentException('Signed longlong out of range: ' . $n);
         } else {
-            if (bcadd($n, '-9223372036854775807') > 0) {
+            if (($n - 9223372036854775807) > 0) {
                 throw new AMQPInvalidArgumentException('Signed longlong out of range: ' . $n);
             }
             try {
