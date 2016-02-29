@@ -484,26 +484,18 @@ class KalturaEntryService extends KalturaBaseService
 				if ($exifData && isset($exifData["DateTimeOriginal"]) && $exifData["DateTimeOriginal"])
 				{
 					$mediaDate = $exifData["DateTimeOriginal"];
-					$ts = strtotime($mediaDate);
 					
 					// handle invalid dates either due to bad format or out of range
-					if ($ts === -1 || $ts === false || $ts < strtotime('2000-01-01') || $ts > strtotime('2015-01-01'))
-						$mediaDate = null;
-					
+					if (!strtotime($mediaDate)){
+						$mediaDate=null;
+					}
 					$dbEntry->setMediaDate($mediaDate);
 				}
 			}
 
-			$ext = pathinfo($entryFullPath, PATHINFO_EXTENSION);
-			$allowedImageTypes = kConf::get("image_file_ext");
-
-			if (in_array($ext, $allowedImageTypes))
-				$dbEntry->setData("." . $ext);
-			else
-				$dbEntry->setData(".jpg");
-
 			list($width, $height, $type, $attr) = getimagesize($entryFullPath);
 			$dbEntry->setDimensions($width, $height);
+			$dbEntry->setData(".jpg"); // this will increase the data version
 			$dbEntry->save();
 			$syncKey = $dbEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA);
 			try
@@ -537,7 +529,8 @@ class KalturaEntryService extends KalturaBaseService
 			$dbEntry->setStatus(entryStatus::ERROR_CONVERTING);
 			$dbEntry->save();
 		}
-
+		
+		$ext = pathinfo($entryFullPath, PATHINFO_EXTENSION);
 		$dbAsset->setFileExt($ext);
 		$dbAsset->save();
 		
@@ -805,11 +798,10 @@ class KalturaEntryService extends KalturaBaseService
 		
 		if (!$resource->getForceAsyncDownload())
 		{
-			$ext = pathinfo($url, PATHINFO_EXTENSION);
 			// TODO - move image handling to media service
     		if($dbEntry->getMediaType() == KalturaMediaType::IMAGE)
     		{
-				$entryFullPath = myContentStorage::getFSUploadsPath() . '/' . $dbEntry->getId() . '.' . $ext;
+    			$entryFullPath = myContentStorage::getFSUploadsPath() . '/' . $dbEntry->getId() . '.jpg';
     			if (KCurlWrapper::getDataFromFile($url, $entryFullPath))
     				return $this->attachFile($entryFullPath, $dbEntry, $dbAsset);
     			
@@ -822,6 +814,7 @@ class KalturaEntryService extends KalturaBaseService
     	
     		if($dbAsset && !($dbAsset instanceof flavorAsset))
     		{
+    			$ext = pathinfo($url, PATHINFO_EXTENSION);
     			$entryFullPath = myContentStorage::getFSUploadsPath() . '/' . $dbEntry->getId() . '.' . $ext;
     			if (KCurlWrapper::getDataFromFile($url, $entryFullPath))
     			{

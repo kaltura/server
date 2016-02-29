@@ -125,17 +125,10 @@ class kFlowHelper
 		// IMAGE media entries
 		if ($dbEntry->getType() == entryType::MEDIA_CLIP && $dbEntry->getMediaType() == entry::ENTRY_MEDIA_TYPE_IMAGE)
 		{
-			$url = $data->getSrcFileUrl();
-			$ext = pathinfo($url, PATHINFO_EXTENSION);
-			$allowedImageTypes = kConf::get("image_file_ext");
-
 			//setting the entry's data so it can be used for creating file-syncs' file-path version & extension - in kFileSyncUtils::moveFromFile
 			//without saving - the updated entry object exists in the instance pool
-			if (in_array($ext, $allowedImageTypes))
-				$dbEntry->setData("." . $ext);
-			else
-				$dbEntry->setData(".jpg");
-
+			$dbEntry->setData(".jpg");
+			
 			$syncKey = $dbEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA);
 
 			try
@@ -300,11 +293,19 @@ class kFlowHelper
 
 		if(count($files) > 1)
 		{
-			// find replacing entry id
-			$replacingEntry = self::getReplacingEntry($recordedEntry, $asset);
-			if(is_null($replacingEntry))
-				KalturaLog::err("Failed to get replacing entry");
-		
+			$retryCounter=5;
+			while(!$replacingEntry = self::getReplacingEntry($recordedEntry, $asset))
+			{
+				sleep(5);
+				if(!$retryCounter--)
+				{
+					kJobsManager::updateBatchJob($dbBatchJob, BatchJob::BATCHJOB_STATUS_FAILED);
+					KalturaLog::err('Failed to allocate replacing entry');
+					return $dbBatchJob;
+				}
+				KalturaLog::log("Failed to get replacing entry {$recordedEntry->getId()} asset {$asset->getId()} retrying .. {$retryCounter}");
+			}
+
 			$flavorParams = assetParamsPeer::retrieveByPKNoFilter($asset->getFlavorParamsId());
 			if(is_null($flavorParams)) { 
 				KalturaLog::err('Failed to retrieve asset params');
@@ -398,10 +399,8 @@ class kFlowHelper
 						$replacingAsset = assetPeer::retrieveByEntryIdAndParams($replacingEntryId, $asset->getFlavorParamsId());
 						if($replacingAsset)
 						{
-								
-								KalturaLog::debug("Entry in replacement, deleting - [".$replacingEntryId."]");
-								myEntryUtils::deleteReplacingEntry($recordedEntry,$replacingEntry);
-								$replacingEntry = null;
+								KalturaLog::debug("Entry in replacement with this asset type {$asset->getFlavorParamsId()}");
+								return null;
 						}
 				}
 		}
