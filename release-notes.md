@@ -1,4 +1,4 @@
-# Kajam-11.9.0 #
+# Kajam-11.10.0 #
 
 ## add roles field on widget and set permissions accordingly ##
  - Issue Type: feature
