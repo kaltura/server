@@ -191,7 +191,9 @@ class myInsertEntryHelper
 			// if the url ends with .ext, we'll extract it this way
 			$urlext = strrchr($entry_url, '.');
 			// TODO: fix this patch
-			if( strlen( $urlext ) > 4 ) $urlext = '.jpg'; // if we got something wierd, assume we're downloading a jpg
+			if (!in_array($urlext, kConf::get("video_file_ext")) && !in_array($urlext, kConf::get("image_file_ext")) && !in_array($urlext, kConf::get("audio_file_ext"))){
+			    $urlext = '.jpg';
+			}
 			$entry_fileName = $entry_data_prefix.$urlext;
 			
 			KalturaLog::debug("handleEntry: media_type: $media_type");
@@ -326,11 +328,8 @@ class myInsertEntryHelper
 					if ($exif_data && isset($exif_data["DateTimeOriginal"]) && $exif_data["DateTimeOriginal"])
 					{
 						$media_date = $exif_data["DateTimeOriginal"];
-						$ts = strtotime($media_date);
-						// handle invalid dates either due to bad format or out of range
-						if ($ts === -1 || $ts === false || $ts < strtotime('2000-01-01') || $ts > strtotime('2015-01-01'))
-						{
-							$media_date = null;
+						if (!strtotime($media_date)){
+						     $media_date=null;
 						}
 					}
 				}

@@ -22,14 +22,12 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 	/**
 	 * DVR Status Enabled/Disabled
 	 * @var KalturaDVRStatus
-	 * @insertonly
 	 */
 	public $dvrStatus;
 	
 	/**
 	 * Window of time which the DVR allows for backwards scrubbing (in minutes)
 	 * @var int
-	 * @insertonly
 	 */
 	public $dvrWindow;
 	
@@ -172,4 +170,29 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 				throw new KalturaAPIException(KalturaErrors::CONVERSION_PROFILE_ID_NOT_FOUND, $this->conversionProfileId);
 		}
 	}
+	
+	/* (non-PHPdoc)
+	 * @see KalturaObject::validateForUpdate($source_object)
+	 */
+	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
+	{
+		/* @var $sourceObject LiveEntry */
+		if(isset($this->dvrStatus))
+		{
+			if($sourceObject->getDvrStatus() !== $this->dvrStatus && $sourceObject->getLiveStatus() !== LiveEntryStatus::STOPPED)
+			{
+				throw new KalturaAPIException(KalturaErrors::CANNOT_UPDATE_FIELDS_WHILE_ENTRY_BROADCASTING, "dvrStatus");
+			}
+		}
+		
+		if(isset($this->dvrWindow))
+		{
+			if($sourceObject->getDvrWindow() !== $this->dvrWindow && $sourceObject->getLiveStatus() !== LiveEntryStatus::STOPPED)
+			{
+				throw new KalturaAPIException(KalturaErrors::CANNOT_UPDATE_FIELDS_WHILE_ENTRY_BROADCASTING, "dvrWindow");
+			}
+		}
+		
+		parent::validateForUpdate($sourceObject, $propertiesToSkip);
+	}	
 }

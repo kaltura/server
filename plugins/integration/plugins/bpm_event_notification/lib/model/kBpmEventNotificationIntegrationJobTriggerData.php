@@ -23,7 +23,7 @@ class kBpmEventNotificationIntegrationJobTriggerData extends kIntegrationJobTrig
 	private $caseId;
 	
 	/**
-	 * @return the $businessProcessId
+	 * @return string
 	 */
 	public function getBusinessProcessId()
 	{
@@ -39,7 +39,7 @@ class kBpmEventNotificationIntegrationJobTriggerData extends kIntegrationJobTrig
 	}
 
 	/**
-	 * @return the $templateId
+	 * @return int
 	 */
 	public function getTemplateId()
 	{
@@ -47,7 +47,7 @@ class kBpmEventNotificationIntegrationJobTriggerData extends kIntegrationJobTrig
 	}
 
 	/**
-	 * @return the $caseId
+	 * @return int
 	 */
 	public function getCaseId()
 	{

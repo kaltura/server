@@ -865,6 +865,11 @@ class myEntryUtils
 		$sub_type = $entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_IMAGE ? entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA : entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB;
 		$entry_image_key = $entry->getSyncKey($sub_type, $version);
 		$entry_image_path = kFileSyncUtils::getReadyLocalFilePathForKey($entry_image_key);
+		if (!$entry_image_path && $version == 100000)
+		{
+			$entry_image_key = $entry->getSyncKey($sub_type);
+			$entry_image_path = kFileSyncUtils::getReadyLocalFilePathForKey($entry_image_key);
+		}
 		
 		return $entry_image_path;
 	} 

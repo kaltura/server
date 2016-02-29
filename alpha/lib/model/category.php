@@ -1725,4 +1725,34 @@ class category extends Basecategory implements IIndexable, IRelatedObject
 		}
 		return true;
 	}
+
+	public function addIndexCategoryInheritedTreeJob()
+	{
+		$featureStatusToRemoveIndex = new kFeatureStatus();
+		$featureStatusToRemoveIndex->setType(IndexObjectType::CATEGORY);
+
+		$featureStatusesToRemove = array();
+		$featureStatusesToRemove[] = $featureStatusToRemoveIndex;
+
+		$filter = new categoryFilter();
+		$filter->setFullIdsStartsWith($this->getFullIds());
+		$filter->setInheritanceTypeEqual(InheritanceType::INHERIT);
+
+		$c = KalturaCriteria::create(categoryPeer::OM_CLASS);
+		$filter->attachToCriteria($c);
+		KalturaCriterion::disableTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
+		$categories = categoryPeer::doSelect($c);
+		KalturaCriterion::restoreTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
+
+		if(count($categories))
+		{
+			kJobsManager::addIndexJob($this->getPartnerId(), IndexObjectType::CATEGORY, $filter, true, $featureStatusesToRemove);
+		}
+
+	}
+
+	public function indexCategoryInheritedTree()
+	{
+		kEventsManager::raiseEventDeferred(new kObjectReadyForIndexInheritedTreeEvent($this));
+	}
 }
