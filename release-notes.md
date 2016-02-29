@@ -1,5 +1,19 @@
 # Kajam-11.10.0 #
 
+## Add Fairplay DRM Profile ##
+ - Issue Type: Feature
+ - Issue ID: PLAT-5117
+ 
+### Installation ###
+Need to run the following script deployment/base/scripts/installPlugins.php
+#### Configuration ####
+Make sure configurations/plugins.ini has a line for "Fairplay" plugin
+#### Known Issues & Limitations ####
+None.
+#### Deployment scripts ####
+None.
+
+
 ## add roles field on widget and set permissions accordingly ##
  - Issue Type: feature
  - Issue ID: PLAT-3728
