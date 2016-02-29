@@ -9,4 +9,9 @@ class MetadataPartnerPeer extends PartnerPeer implements IMetadataPeer
     {
         return true;
     }
+
+    public static function getEntry($objectId)
+    {
+        return null;
+    }
 }

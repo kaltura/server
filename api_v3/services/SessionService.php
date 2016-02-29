@@ -275,7 +275,6 @@ class SessionService extends KalturaBaseService
 	{
 		// make sure the secret fits the one in the partner's table
 		$ksStr = "";
-		
 		$widget = widgetPeer::retrieveByPK( $widgetId );
 		if ( !$widget )
 		{
@@ -299,8 +298,24 @@ class SessionService extends KalturaBaseService
 		if(PermissionPeer::isValidForPartner(PermissionName::FEATURE_ENTITLEMENT, $partnerId) &&
 			!is_null($widget->getPrivacyContext()) && $widget->getPrivacyContext() != '' )
 			$privileges .= ','. kSessionBase::PRIVILEGE_PRIVACY_CONTEXT . ':' . $widget->getPrivacyContext();
-		
+
 		$userId = 0;
+
+		// if the widget has a role, pass it in $privileges so it will be embedded in the KS
+		// only if we also have an entry to limit the role operations to
+		if ($widget->getRoles() != null)
+		{
+			$roles = explode(",", $widget->getRoles());
+			foreach($roles as $role) {
+				$privileges .= ',' . kSessionBase::PRIVILEGE_SET_ROLE . ':' . $role;
+			}
+		}
+
+		if ($widget->getEntryId() != null)
+		{
+			$privileges .= ',' . kSessionBase::PRIVILEGE_LIMIT_ENTRY . ':' . $widget->getEntryId();
+		}
+
 		/*if ( $widget->getSecurityType() == widget::WIDGET_SECURITY_TYPE_FORCE_KS )
 		{
 			$user = $this->getKuser();
