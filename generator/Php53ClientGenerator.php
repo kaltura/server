@@ -676,7 +676,7 @@ class Php53ClientGenerator extends ClientGeneratorFromXml
 		if(!$enableInMultiRequest)
 		{
 			$this->appendLine("		if (\$this->client->isMultiRequest())");
-			$this->appendLine("			throw new ClientException(\"Action is not supported as part of multi-request.\", ClientException::ERROR_ACTION_IN_MULTIREQUEST);");
+			$this->appendLine("			throw \$this->client->getClientException(\"Action is not supported as part of multi-request.\", ClientException::ERROR_ACTION_IN_MULTIREQUEST);");
 			$this->appendLine("		");
 		}
 		
@@ -769,7 +769,7 @@ class Php53ClientGenerator extends ClientGeneratorFromXml
 			
 			$this->appendLine("		\$resultXml = \$this->client->doQueue();");
 			$this->appendLine("		\$resultXmlObject = new \\SimpleXMLElement(\$resultXml);");
-			$this->appendLine("		\\Kaltura\\Client\\ParseUtils::checkIfError(\$resultXmlObject->result);");
+			$this->appendLine("		\$this->client->checkIfError(\$resultXmlObject->result);");
 			switch($resultType)
 			{
 				
