@@ -45,9 +45,10 @@ class UserService extends KalturaBaseUserService
 		return kLock::runLocked($lockKey, array($this, 'adduserImpl'), array($user));
 	}
 	
-	function addUserImpl($user)
+	function addUserImpl(KalturaUser $user)
 	{
 		$dbUser = null;
+		$user->validateForInsert();
 		$dbUser = $user->toObject($dbUser);
 		try {
 			$dbUser = kuserPeer::addUser($dbUser, $user->password);
