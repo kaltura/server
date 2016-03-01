@@ -1004,7 +1004,7 @@ class kJobsManager
 	public static function addConvertLiveSegmentJob(BatchJob $parentJob = null, liveAsset $asset, $mediaServerIndex, $filePath, $endTime)
 	{
 		$keyType = liveAsset::FILE_SYNC_ASSET_SUB_TYPE_LIVE_PRIMARY;
-		if($mediaServerIndex == MediaServerIndex::SECONDARY)
+		if($mediaServerIndex == EntryServerNodeType::LIVE_BACKUP)
 			$keyType = liveAsset::FILE_SYNC_ASSET_SUB_TYPE_LIVE_SECONDARY;
 			
 		$key = $asset->getSyncKey($keyType);

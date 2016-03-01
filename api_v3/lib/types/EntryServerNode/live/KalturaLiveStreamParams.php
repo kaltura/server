@@ -7,7 +7,7 @@ class KalturaLiveStreamParams extends KalturaObject {
 
 	/**
 	 * Bit rate of the stream. (i.e. 900)
-	 * @var string
+	 * @var int
 	 */
 	public $bitrate;
 
@@ -35,9 +35,4 @@ class KalturaLiveStreamParams extends KalturaObject {
 	 */
 	public $codec;
 
-	/**
-	 * // TODO what is this field about
-	 * @var string
-	 */
-	public $pattern;
 }

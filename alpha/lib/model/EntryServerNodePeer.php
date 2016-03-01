@@ -16,31 +16,28 @@
 class EntryServerNodePeer extends BaseEntryServerNodePeer {
 
 	// cache classes by their type
-	protected static $class_types_cache = array();
+	protected static $class_types_cache = array(
+		EntryServerNodeType::LIVE_BACKUP => LiveEntryServerNode::OM_CLASS,
+		EntryServerNodeType::LIVE_BACKUP => LiveEntryServerNode::OM_CLASS,
+	);
 
 	public static function getOMClass($row, $column)
 	{
-		$typeField = self::translateFieldName(EntryServerNodePeer::SERVER_TYPE, BasePeer::TYPE_COLNAME, BasePeer::TYPE_NUM);
-		$entryServerNodeServerType = $row[$typeField];
-		if(isset(self::$class_types_cache[$entryServerNodeServerType]))
-			return self::$class_types_cache[$entryServerNodeServerType];
-
-		$extendedCls = KalturaPluginManager::getObjectClass(parent::getOMClass($row, $column), $entryServerNodeServerType);
-		if($extendedCls)
+		if ($row)
 		{
-			self::$class_types_cache[$entryServerNodeServerType] = $extendedCls;
-			return $extendedCls;
-		}
+			$typeField = self::translateFieldName(EntryServerNodePeer::SERVER_TYPE, BasePeer::TYPE_COLNAME, BasePeer::TYPE_NUM);
+			$entryServerNodeServerType = $row[$typeField];
+			if(isset(self::$class_types_cache[$entryServerNodeServerType]))
+				return self::$class_types_cache[$entryServerNodeServerType];
 
-		switch($entryServerNodeServerType)
-		{
-			case EntryServerNodeType::LIVE_BACKUP:
-			case EntryServerNodeType::LIVE_PRIMARY:
-				self::$class_types_cache[$entryServerNodeServerType] = LiveEntryServerNode::OM_CLASS;
-				break;
-			default:
-				self::$class_types_cache[$entryServerNodeServerType] = parent::getOMClass($row, $column);
-				break;
+			$extendedCls = KalturaPluginManager::getObjectClass(parent::OM_CLASS, $entryServerNodeServerType);
+			if($extendedCls)
+			{
+				self::$class_types_cache[$entryServerNodeServerType] = $extendedCls;
+				return $extendedCls;
+			}
+
+			self::$class_types_cache[$entryServerNodeServerType] = parent::OM_CLASS;
 		}
 		return self::$class_types_cache[$entryServerNodeServerType];
 	}
@@ -77,6 +74,20 @@ class EntryServerNodePeer extends BaseEntryServerNodePeer {
 
 		return EntryServerNodePeer::doSelect($criteria, $con);
 
+	}
+
+	/**
+	 * Deleted all db instances matching the EntryId
+	 *
+	 * @param      string $entryId.
+	 * @param      PropelPDO $con the connection to use
+	 * @return     array Array of effected rows
+	 */
+	public static function deleteByEntryId($entryId, PropelPDO $con = null)
+	{
+		$criteria = new Criteria();
+		$criteria->add(EntryServerNodePeer::ENTRY_ID, $entryId);
+		return EntryServerNodePeer::doDelete($criteria, $con);
 	}
 
 } // EntryServerNodePeer

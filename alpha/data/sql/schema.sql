@@ -2455,7 +2455,7 @@ DROP TABLE IF EXISTS entry_server_node;
 
 CREATE TABLE entry_server_node
 (
-	id INTEGER  NOT NULL AUTO_INCREMENT,
+	id BIGINT(20)  NOT NULL AUTO_INCREMENT,
 	entry_id VARCHAR(20)  NOT NULL,
 	server_node_id INTEGER,
 	partner_id INTEGER,

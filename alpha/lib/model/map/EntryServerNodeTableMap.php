@@ -37,7 +37,7 @@ class EntryServerNodeTableMap extends TableMap {
 		$this->setPackage('Core');
 		$this->setUseIdGenerator(true);
 		// columns
-		$this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
+		$this->addPrimaryKey('ID', 'Id', 'BIGINT', true, 20, null);
 		$this->addColumn('ENTRY_ID', 'EntryId', 'VARCHAR', true, 20, null);
 		$this->addColumn('SERVER_NODE_ID', 'ServerNodeId', 'INTEGER', false, null, null);
 		$this->addColumn('PARTNER_ID', 'PartnerId', 'INTEGER', false, null, null);

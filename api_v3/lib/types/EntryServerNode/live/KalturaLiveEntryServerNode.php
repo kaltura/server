@@ -9,11 +9,11 @@ class KalturaLiveEntryServerNode extends KalturaEntryServerNode {
 	 * parameters of the stream we got
 	 * @var KalturaLiveStreamParamsArray
 	 */
-	public $parameters;
+	public $streams;
 
 	private static $map_between_objects = array
 	(
-		"parameters"
+		"streams"
 	);
 
 	/* (non-PHPdoc)

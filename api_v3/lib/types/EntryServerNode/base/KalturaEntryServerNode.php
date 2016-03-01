@@ -15,8 +15,8 @@ abstract class KalturaEntryServerNode extends KalturaObject implements IRelatedF
 
 	/**
 	 * @var string
-	 * @insertonly
-	 * @filter eq,in
+	 * @readonly
+	 * @filter eq
 	 */
 	public $entryId;
 
@@ -36,27 +36,27 @@ abstract class KalturaEntryServerNode extends KalturaObject implements IRelatedF
 	/**
 	 * @var time
 	 * @readonly
-	 * @filter lte,gte,order
+	 * @filter order
 	 */
 	public $createdAt;
 
 	/**
 	 * @var time
 	 * @readonly
-	 * @filter lte,gte,order
+	 * @filter gte,lte,order
 	 */
 	public $updatedAt;
 
 	/**
 	 * @var KalturaEntryServerNodeStatus
 	 * @readonly
-	 * @filter eq
+	 * @filter eq, in
 	 */
 	public $status;
 
 	/**
 	 * @var KalturaEntryServerNodeType
-	 * @insertonly
+	 * @readonly
 	 * @filter eq
 	 */
 	public $serverType;
@@ -69,6 +69,7 @@ abstract class KalturaEntryServerNode extends KalturaObject implements IRelatedF
 		"partnerId",
 		"createdAt",
 		"updatedAt",
+		"heartbeatTime",
 		"status",
 		"serverType"
 	);

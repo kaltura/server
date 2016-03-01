@@ -22,7 +22,7 @@ class EntryServerNodeService extends KalturaBaseService
 	 * @param KalturaEntryServerNode $entryServerNode
 	 * @return KalturaEntryServerNode
 	 */
-	public function addAction(KalturaEntryServerNode $entryServerNode)
+	private function addAction(KalturaEntryServerNode $entryServerNode)
 	{
 		$dbEntryServerNode = $this->addNewEntryServerNode($entryServerNode);
 
@@ -56,7 +56,7 @@ class EntryServerNodeService extends KalturaBaseService
 	 * @return KalturaEntryServerNode|null|object
 	 * @throws KalturaAPIException
 	 */
-	public function updateAction($id, KalturaEntryServerNode $entryServerNode)
+	private function updateAction($id, KalturaEntryServerNode $entryServerNode)
 	{
 		$dbEntryServerNode = EntryServerNodePeer::retrieveByPK($id);
 		if (!$dbEntryServerNode)
@@ -75,7 +75,7 @@ class EntryServerNodeService extends KalturaBaseService
 	 * @param int $id
 	 * @throws KalturaAPIException
 	 */
-	public function deleteAction($id)
+	private function deleteAction($id)
 	{
 		$dbEntryServerNode = EntryServerNodePeer::retrieveByPK($id);
 		if (!$dbEntryServerNode)

@@ -21,8 +21,7 @@ class KalturaEntryServerNodeFilter extends KalturaEntryServerNodeBaseFilter
 	 */
 	public function getListResponse(KalturaFilterPager $pager, KalturaDetachedResponseProfile $responseProfile = null)
 	{
-		if ($this->entryIdEqual == null && $this->entryIdNotIn == null && $this->entryIdIn == null &&
-			$this->idEqual == null && $this->idNotIn == null && $this->idIn == null &&
+		if ($this->entryIdEqual == null && $this->entryIdIn == null &&
 			$this->serverTypeEqual == null )
 		{
 			throw new KalturaAPIException(KalturaErrors::MUST_FILTER_ON_ENTRY_AND_SERVER_TYPE);
@@ -35,32 +34,18 @@ class KalturaEntryServerNodeFilter extends KalturaEntryServerNodeBaseFilter
 				throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $this->entryIdEqual);
 		}
 
-		if($this->entryIdIn != null)
-		{
-			$entryArray = entryPeer::retrieveByPKs($this->entryIdIn);
-			if(!$entryArray)
-				throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $this->entryIdIn);
-		}
-
 		$entryServerNodeFilter = $this->toObject();
 
 		$c = KalturaCriteria::create(EntryServerNodePeer::OM_CLASS);
 		$entryServerNodeFilter->attachToCriteria($c);
 		$dbEntryServerNodes = EntryServerNodePeer::doSelect($c);
 
-		$resultCount = count($dbEntryServerNodes);
-		if ($resultCount && $resultCount < $pager->pageSize)
-			$totalCount = ($pager->pageIndex - 1) * $pager->pageSize + $resultCount;
-		else
-		{
-			KalturaFilterPager::detachFromCriteria($c);
-			$totalCount = categoryEntryPeer::doCount($c);
-		}
+		$pager->attachToCriteria($c);
 
 		$entryServerNodeList = KalturaEntryServerNodeArray::fromDbArray($dbEntryServerNodes, $responseProfile);
 		$response = new KalturaEntryServerNodeListResponse();
 		$response->objects = $entryServerNodeList;
-		$response->totalCount = $totalCount;
+		$response->totalCount = $c->getRecordsCount();
 		return $response;
 	}
 }
