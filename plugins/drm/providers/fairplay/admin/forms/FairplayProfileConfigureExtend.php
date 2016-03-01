@@ -18,7 +18,7 @@ class Form_FairplayProfileConfigureExtend_SubForm extends Form_DrmProfileConfigu
 	{
 		$object = parent::getObject($object, $objectType, $properties, $add_underscore, $include_empty_fields);
 
-		if($object instanceof Kaltura_Client_Fairplay_Type_FairplayProfile)
+		if($object instanceof Kaltura_Client_Fairplay_Type_FairplayDrmProfile)
 		{
 			$upload = new Zend_File_Transfer_Adapter_Http();
 			$files = $upload->getFileInfo();
