@@ -79,14 +79,7 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 	{
 		$thumbAssetId = $thumbAsset->getId();
 		$partnerId = $thumbAsset->getPartnerId();
-		
-		$addExtension = false;
-		if ($this->getDynamicAttributes()->getAddThumbnailExtension())
-		{
-			$addExtension = true;
-		}
-		
-		$url = "/api_v3/service/thumbAsset/action/serve/partnerId/$partnerId/thumbAssetId/$thumbAssetId" . ($addExtension ?  "/$thumbAssetId." . $thumbAsset->getFileExt() : "");
+		$url = "/api_v3/service/thumbAsset/action/serve/partnerId/$partnerId/thumbAssetId/$thumbAssetId";
 	
 		return $url;
 	}
