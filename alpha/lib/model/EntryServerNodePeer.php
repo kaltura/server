@@ -17,7 +17,7 @@ class EntryServerNodePeer extends BaseEntryServerNodePeer {
 
 	// cache classes by their type
 	protected static $class_types_cache = array(
-		EntryServerNodeType::LIVE_BACKUP => LiveEntryServerNode::OM_CLASS,
+		EntryServerNodeType::LIVE_PRIMARY => LiveEntryServerNode::OM_CLASS,
 		EntryServerNodeType::LIVE_BACKUP => LiveEntryServerNode::OM_CLASS,
 	);
 

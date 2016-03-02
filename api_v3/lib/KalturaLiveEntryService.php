@@ -222,7 +222,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 		if (!$dbLiveEntry || !($dbLiveEntry instanceof LiveEntry))
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 
-		$liveEntryServerNode = $this->getLiveEntryServerNode($entryId, $hostname, $mediaServerIndex);
+		$liveEntryServerNode = $this->getLiveEntryServerNode($dbLiveEntry, $hostname, $mediaServerIndex);
 
 		if ($liveEntryStatus != KalturaEntryServerNodeStatus::BROADCASTING){
 			$this->setMediaServerWrapper($dbLiveEntry, $mediaServerIndex, $hostname, $liveEntryStatus);
@@ -234,7 +234,6 @@ class KalturaLiveEntryService extends KalturaEntryService
 			$liveEntryServerNode->setStatus($liveEntryStatus);
 			$liveEntryServerNode->setServerType($mediaServerIndex);
 		}
-		$liveEntryServerNode->setUpdatedAt(time());
 		// setRedirectEntryId to null in all cases, even for broadcasting...
 		$dbLiveEntry->setRedirectEntryId(null);
 
@@ -312,7 +311,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 	}
 
 	/**
-	 * @param $entryId
+	 * @param LiveEntry $dbLiveEntry
 	 * @param $hostname
 	 * @param EntryServerNodeType $mediaServerIndex
 	 * @return LiveEntryServerNode
@@ -320,10 +319,10 @@ class KalturaLiveEntryService extends KalturaEntryService
 	 * @throws KalturaAPIException
 	 * @throws PropelException
 	 */
-	private function getLiveEntryServerNode($entryId, $hostname, $mediaServerIndex)
+	private function getLiveEntryServerNode($dbLiveEntry, $hostname, $mediaServerIndex)
 	{
 		/* @var LiveEntryServerNode $dbLiveEntryServerNode */
-		$dbLiveEntryServerNode = EntryServerNodePeer::retrieveByEntryIdAndServerType($entryId, $mediaServerIndex);
+		$dbLiveEntryServerNode = EntryServerNodePeer::retrieveByEntryIdAndServerType($dbLiveEntry->getId(), $mediaServerIndex);
 		if (!$dbLiveEntryServerNode)
 		{
 			$dbServerNode = ServerNodePeer::retrieveActiveMediaServerNode($hostname);
@@ -331,10 +330,10 @@ class KalturaLiveEntryService extends KalturaEntryService
 				throw new KalturaAPIException(KalturaErrors::SERVER_NODE_NOT_FOUND, $hostname);
 
 			$dbLiveEntryServerNode = new LiveEntryServerNode();
-			$dbLiveEntryServerNode->setEntryId($this->getId());
+			$dbLiveEntryServerNode->setEntryId($dbLiveEntry->getId());
 			$dbLiveEntryServerNode->setServerType($mediaServerIndex);
 			$dbLiveEntryServerNode->setServerNodeId($dbServerNode->getId());
-			$dbLiveEntryServerNode->setPartnerId($this->getPartnerId());
+			$dbLiveEntryServerNode->setPartnerId($dbLiveEntry->getPartnerId());
 		}
 		return $dbLiveEntryServerNode;
 	}
