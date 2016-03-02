@@ -162,12 +162,10 @@ abstract class LiveEntry extends entry
 	{
 		return $this->getFromCustomData("offlineMessage");
 	}
-	//TODO should refactor this function
 	public function setStreamBitrates(array $v)
 	{
 		$this->putInCustomData("streamBitrates", $v);
 	}
-	//TODO should refactor this function
 	public function getStreamBitrates()
 	{
 		$streamBitrates = $this->getFromCustomData("streamBitrates");
@@ -506,7 +504,15 @@ abstract class LiveEntry extends entry
 		
 		return $configurations;
 	}
-	
+
+	/**
+	 * @return array<kLiveMediaServer>
+	 */
+	public function getDeprecatedMediaServers()
+	{
+		return $this->getFromCustomData(null, LiveEntry::CUSTOM_DATA_NAMESPACE_MEDIA_SERVERS, array());
+	}
+
 	/**
 	 * @return MediaServerNode
 	 */
