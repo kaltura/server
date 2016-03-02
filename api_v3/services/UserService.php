@@ -40,7 +40,6 @@ class UserService extends KalturaBaseUserService
 		}
 		$user->partnerId = $this->getPartnerId();
 
-
 		$lockKey = "user_add_" . $this->getPartnerId() . $user->id;
 		return kLock::runLocked($lockKey, array($this, 'adduserImpl'), array($user));
 	}
@@ -48,7 +47,7 @@ class UserService extends KalturaBaseUserService
 	function addUserImpl(KalturaUser $user)
 	{
 		$dbUser = null;
-		$user->validateForInsert();
+		$user->validateForInsert(array('partnerId'));
 		$dbUser = $user->toObject($dbUser);
 		try {
 			$dbUser = kuserPeer::addUser($dbUser, $user->password);
