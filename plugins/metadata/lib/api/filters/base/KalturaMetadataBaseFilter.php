@@ -10,6 +10,7 @@ abstract class KalturaMetadataBaseFilter extends KalturaRelatedFilter
 	(
 		"partnerIdEqual" => "_eq_partner_id",
 		"metadataProfileIdEqual" => "_eq_metadata_profile_id",
+		"metadataProfileIdIn" => "_in_metadata_profile_id",
 		"metadataProfileVersionEqual" => "_eq_metadata_profile_version",
 		"metadataProfileVersionGreaterThanOrEqual" => "_gte_metadata_profile_version",
 		"metadataProfileVersionLessThanOrEqual" => "_lte_metadata_profile_version",
@@ -58,6 +59,11 @@ abstract class KalturaMetadataBaseFilter extends KalturaRelatedFilter
 	 * @var int
 	 */
 	public $metadataProfileIdEqual;
+
+	/**
+	 * @var string
+	 */
+	public $metadataProfileIdIn;
 
 	/**
 	 * @var int

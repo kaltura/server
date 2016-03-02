@@ -12,6 +12,7 @@ class MetadataFilter extends baseObjectFilter
 		$this->fields = kArray::makeAssociativeDefaultValue ( array (
 			"_eq_partner_id",
 			"_eq_metadata_profile_id",
+			"_in_metadata_profile_id",
 			"_eq_metadata_profile_version",
 			"_gte_metadata_profile_version",
 			"_lte_metadata_profile_version",
