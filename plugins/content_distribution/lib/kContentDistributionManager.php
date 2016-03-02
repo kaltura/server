@@ -452,8 +452,6 @@ class kContentDistributionManager
 			
 		$validStatus = array(
 			EntryDistributionStatus::ERROR_DELETING,
-			EntryDistributionStatus::ERROR_SUBMITTING,
-			EntryDistributionStatus::VALIDATION_ERROR,
 			EntryDistributionStatus::ERROR_UPDATING,
 			EntryDistributionStatus::READY,
 		);
