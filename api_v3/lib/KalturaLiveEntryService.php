@@ -240,6 +240,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 		// setMediaServerWrapper
 		if($liveEntryServerNode->save() && $dbLiveEntry->save())
 		{
+			$this->addTrackEntryData($liveEntryServerNode, __FUNCTION__);
 			if($mediaServerIndex == EntryServerNodeType::LIVE_PRIMARY && $liveEntryStatus == EntryServerNodeStatus::PLAYABLE && $dbLiveEntry->getRecordStatus())
 			{
 				KalturaLog::info("Checking if recorded entry needs to be created for entry $entryId");
@@ -338,7 +339,19 @@ class KalturaLiveEntryService extends KalturaEntryService
 		return $dbLiveEntryServerNode;
 	}
 
-
+	/**
+	 * Adds update line at the tracking information
+	 * @param EntryServerNode $dbEntryServerNode
+	 * @param string $functionName
+	 */
+	private function addTrackEntryData(EntryServerNode $dbEntryServerNode, $functionName)
+	{
+		$te = new TrackEntry();
+		$te->setEntryId($dbEntryServerNode->getEntryId());
+		$te->setTrackEventTypeId(TrackEntry::TRACK_ENTRY_EVENT_TYPE_UPDATE_ENTRY);
+		$te->setDescription($functionName."::".$dbEntryServerNode->getServerType().":".$dbEntryServerNode->getServerNodeId());
+		TrackEntry::addTrackEntry($te);
+	}
 	/**
 	 * @param LiveEntry $dbEntry
 	 * @param EntryServerNodeType $mediaServerIndex
@@ -440,6 +453,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 		{
 			if ($dbLiveEntryServerNode->getServerNodeId() == $dbServerNode->getId())
 			{
+				$this->addTrackEntryData($dbLiveEntryServerNode, __FUNCTION__);
 				$dbLiveEntryServerNode->delete();
 				$dbLiveEntry->setLastBroadcastEndTime(kApiCache::getTime());
 			} else {
