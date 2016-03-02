@@ -406,7 +406,7 @@ class kContentDistributionManager
 	 * @param DistributionProfile $distributionProfile
 	 * @return BatchJob
 	 */
-	protected static function addSubmitDeleteJob(EntryDistribution $entryDistribution, DistributionProfile $distributionProfile)
+	protected static function addSubmitDeleteJob(EntryDistribution $entryDistribution, DistributionProfile $distributionProfile, $shouldKeepDistributionItem = false)
 	{
 		$entryDistribution->setStatus(EntryDistributionStatus::DELETING);
 		
@@ -426,6 +426,7 @@ class kContentDistributionManager
  		$jobData->setProviderType($distributionProfile->getProviderType());
  		$jobData->setRemoteId($entryDistribution->getRemoteId());
  		$jobData->setMediaFiles($entryDistribution->getMediaFiles());
+ 		$jobData->setKeepDistributionItem($shouldKeepDistributionItem);
  		
 		$batchJob = new BatchJob();
 		$batchJob->setEntryId($entryDistribution->getEntryId());
@@ -444,7 +445,7 @@ class kContentDistributionManager
 	 * @param DistributionProfile $distributionProfile
 	 * @return BatchJob
 	 */
-	public static function submitDeleteEntryDistribution(EntryDistribution $entryDistribution, DistributionProfile $distributionProfile)
+	public static function submitDeleteEntryDistribution(EntryDistribution $entryDistribution, DistributionProfile $distributionProfile, $shouldKeepDistributionItem = false)
 	{
 		if($distributionProfile->getStatus() != DistributionProfileStatus::ENABLED || $distributionProfile->getDeleteEnabled() == DistributionProfileActionStatus::DISABLED)
 			return null;
@@ -463,7 +464,7 @@ class kContentDistributionManager
 		
 		$distributionProvider = $distributionProfile->getProvider();
 		if($distributionProvider->isDeleteEnabled())
-			return self::addSubmitDeleteJob($entryDistribution, $distributionProfile);
+			return self::addSubmitDeleteJob($entryDistribution, $distributionProfile, $shouldKeepDistributionItem);
 			
 		if($distributionProvider->isAvailabilityUpdateEnabled())
 			return self::addSubmitDisableJob($entryDistribution, $distributionProfile);
