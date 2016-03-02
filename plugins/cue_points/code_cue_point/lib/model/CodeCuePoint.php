@@ -30,6 +30,15 @@ class CodeCuePoint extends CuePoint implements IMetadataObject
 	{
 		return CodeCuePointMetadataPlugin::getMetadataObjectTypeCoreValue(CodeCuePointMetadataObjectType::CODE_CUE_POINT);
 	}
-	
+
+	public function copyFromLiveToVodEntry( $vodEntry, $adjustedStartTime )
+	{
+		// Clone the cue point to the destination entry
+		$vodThumbCuePoint = parent::copyToEntry( $vodEntry );
+		$vodThumbCuePoint->setStartTime( $adjustedStartTime );
+		$vodThumbCuePoint->save();
+		return $vodThumbCuePoint;
+	}
+
 	public function getIsPublic()	              {return true;}
 }
