@@ -26,7 +26,7 @@ class KalturaAnswerCuePointFilter extends KalturaAnswerCuePointBaseFilter
 	 */
 	protected function getCoreFilter()
 	{
-		kApiCache::disableCache();
+        kApiCache::disableCache();
 	    return new AnswerCuePointFilter();
 	}	
 }
