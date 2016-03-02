@@ -42,26 +42,21 @@ while(!empty($liveEntries))
 				$liveEntryServerNode->setServerNodeId($mediaServer->getMediaServerId());
 				$liveEntryServerNode->setPartnerId($liveEntry->getPartnerId());
 				$liveEntryServerNode->setStatus($liveEntry->getLiveStatus());
+				/* @var EntryServerNodeType $entryServerNodeType*/
 				$entryServerNodeType = EntryServerNodeType::LIVE_PRIMARY;
 				if ($mediaServer->getIndex() == 1)
 				{
 					$entryServerNodeType = EntryServerNodeType::LIVE_BACKUP;
 				}
+				$liveEntryServerNode->setServerType($entryServerNodeType);
 //				$liveEntryServerNode->save();
-				KalturaLog::debug("I would like to save live-entry-server-node for entryId ["+$liveEntryServerNode->getEntryId()."] and server-node [".$liveEntryServerNode->getServerNodeId()."] ");
+				KalturaLog::debug("entryId [".$liveEntryServerNode->getEntryId()."] server-node [".$liveEntryServerNode->getServerNodeId()."] server-type [".$liveEntryServerNode->getServerType()."] ");
 			}
 		}
-		$entryServerNodeCrit = new Criteria();
-		$entryServerNodeCrit->add(EntryServerNodePeer::ENTRY_ID, $liveEntry->getId());
-		if (count($mediaServerIds))
-		{
-			$entryServerNodeCrit->add(EntryServerNodePeer::SERVER_NODE_ID, $mediaServerIds, Criteria::NOT_IN );
-		}
-		EntryServerNodePeer::doDelete($entryServerNodeCrit);
 
 	}
 	$updatedAtValue = $liveEntry->getUpdatedAt();
 }
-
+KalturaLog::debug("last updated at was ".$updatedAtValue);
 
 ?>
