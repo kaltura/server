@@ -32,7 +32,6 @@ class Form_ComcastMrssProfileConfiguration extends Form_ConfigurableProfileConfi
 		$object->cPlatformTvSeriesField = $this->getValue('c_platform_tv_series_field'); // because parent::getObject doesn't include empty fields 
 		$object->shouldIncludeCaptions = $this->getValue('should_include_captions');
 		$object->shouldIncludeCuePoints = $this->getValue('should_include_cue_points');
-		$object->shouldAddThumbExtension = $this->getValue('should_add_thumb_extension');
 		$object->feedLink = $this->getValue('feed_link'); // because parent::getObject doesn't include empty fields 
 			
 		return $object;
@@ -159,10 +158,6 @@ class Form_ComcastMrssProfileConfiguration extends Form_ConfigurableProfileConfi
 		$this->addElement('checkbox', 'should_include_cue_points', array(
 			'label' => 'Include Entry Ad Cue Points',
 		));
-
-		$this->addElement('checkbox', 'should_add_thumb_extension', array(
- 			'label' => 'Include Thumbnail Extension',
- 		));
 		
 		$this->addElement('textarea', 'cplatform_xml', array(
 			'label'	  =>  'cPlatform TV Series XML',
@@ -172,7 +167,7 @@ class Form_ComcastMrssProfileConfiguration extends Form_ConfigurableProfileConfi
 		$this->addMetadataFieldsAsValues('c_platform_tv_series_field');
 		
 		$this->addDisplayGroup(
-			array('feed_title', 'feed_link', 'feed_description', 'feed_last_build_date', 'cplatform_xml', 'c_platform_tv_series_field', 'should_include_captions', 'should_include_cue_points', 'should_add_thumb_extension'), 
+			array('feed_title', 'feed_link', 'feed_description', 'feed_last_build_date', 'cplatform_xml', 'c_platform_tv_series_field', 'should_include_captions', 'should_include_cue_points'), 
 			'feed', 
 			array('legend' => 'Feed Configuration', 'decorators' => array('FormElements', 'Fieldset'))
 		);
