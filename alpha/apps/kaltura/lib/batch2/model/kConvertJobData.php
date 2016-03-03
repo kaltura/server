@@ -214,6 +214,7 @@ class kConvertJobData extends kConvartableJobData
 		// 1. The flavor is required
 		// 2. There are no required flavors and this is the flavor is optional with the minimal bitrate
 		// 3. all flavors are set as READY_BEHAVIOR_NO_IMPACT.
+		// 4. if conversion job is for replacing an existing entry
 		
 		$optionalFlavorParamsIds = array();
 		$hasRequired = false;
@@ -244,6 +245,15 @@ class kConvertJobData extends kConvartableJobData
 		// Case 3
 		if($allNoImpact)
 			$readiness = flavorParamsConversionProfile::READY_BEHAVIOR_REQUIRED;
+
+		// Case 4
+		$entry = $batchJob->getEntry();
+		if ($entry)
+		{
+			$replacedEntryId = $entry->getReplacedEntryId();
+			if ($replacedEntryId)
+				$readiness = flavorParamsConversionProfile::READY_BEHAVIOR_REQUIRED;
+		}
 
 		// Decide on the urgency by the readiness and the upload method
 		if($readiness == flavorParamsConversionProfile::READY_BEHAVIOR_REQUIRED)
