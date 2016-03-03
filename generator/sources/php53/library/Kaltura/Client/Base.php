@@ -655,7 +655,7 @@ class Base
 		$ret = array();
 		$i = 0;
 		foreach($items as $item) {
-			$error = ParseUtils::checkIfError($item, false);
+			$error = $this->checkIfError($item, false);
 			if($error)
 				$ret[] = $error;
 			else if($item->objectType)
