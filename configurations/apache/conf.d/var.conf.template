@@ -6,5 +6,8 @@ Alias /ma_console "@APP_DIR@/var_console/web"
     AllowOverride All
     Order allow,deny
     Allow from all
+    <IfVersion >= 2.4>
+	Require all granted
+    </IfVersion>
 </Directory>
 
