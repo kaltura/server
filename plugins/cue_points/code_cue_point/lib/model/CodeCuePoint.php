@@ -34,10 +34,10 @@ class CodeCuePoint extends CuePoint implements IMetadataObject
 	public function copyFromLiveToVodEntry( $vodEntry, $adjustedStartTime )
 	{
 		// Clone the cue point to the destination entry
-		$vodThumbCuePoint = parent::copyToEntry( $vodEntry );
-		$vodThumbCuePoint->setStartTime( $adjustedStartTime );
-		$vodThumbCuePoint->save();
-		return $vodThumbCuePoint;
+		$vodCodeCuePoint = parent::copyToEntry( $vodEntry );
+		$vodCodeCuePoint->setStartTime( $adjustedStartTime );
+		$vodCodeCuePoint->save();
+		return $vodCodeCuePoint;
 	}
 
 	public function getIsPublic()	              {return true;}
