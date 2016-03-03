@@ -132,6 +132,16 @@ class flvclipperAction extends kalturaAction
 			
 			kFileUtils::dumpFile($tempThumbPath, null, strpos($tempThumbPath, "_NOCACHE_") === false ? null : 0);
 		}
+
+		$securyEntryHelper = new KSecureEntryHelper($entry, $ks_str, $referrer, ContextType::PLAY);
+		if ($securyEntryHelper->shouldPreview())
+		{
+			$this->checkForPreview($securyEntryHelper, $clip_to);
+		}
+		else
+		{
+			$securyEntryHelper->validateForPlay($entry, $ks_str);
+		}
 		
 		$audio_only = $this->getRequestParameter ( "audio_only" ); // milliseconds
 		$flavor = $this->getRequestParameter ( "flavor", 1 ); // 
