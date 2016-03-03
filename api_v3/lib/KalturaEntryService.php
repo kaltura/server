@@ -466,6 +466,7 @@ class KalturaEntryService extends KalturaBaseService
 	 */
 	protected function attachFile($entryFullPath, entry $dbEntry, asset $dbAsset = null, $copyOnly = false)
 	{
+		$ext = pathinfo($entryFullPath, PATHINFO_EXTENSION);
 		// TODO - move image handling to media service
 		if($dbEntry->getMediaType() == KalturaMediaType::IMAGE)
 		{
