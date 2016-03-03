@@ -463,8 +463,12 @@ class ThumbAssetService extends KalturaAssetService
 			//we will throw thumb asset not found, as the user is not entitled, and should not know that the entry exists.
 			throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_ID_NOT_FOUND, $thumbAssetId);
 		}
-		
-		$securyEntryHelper = new KSecureEntryHelper($entry, kCurrentContext::$ks, null, ContextType::THUMBNAIL);
+
+		$referrer = null;
+		if($options && $options->referrer)
+			$referrer = $options->referrer;
+
+		$securyEntryHelper = new KSecureEntryHelper($entry, kCurrentContext::$ks, $referrer, ContextType::THUMBNAIL);
 		$securyEntryHelper->validateAccessControl();
 
 		$ext = $thumbAsset->getFileExt();
