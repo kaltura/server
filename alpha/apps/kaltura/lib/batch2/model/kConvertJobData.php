@@ -250,7 +250,7 @@ class kConvertJobData extends kConvartableJobData
 		$entry = $batchJob->getEntry();
 		if ($entry)
 		{
-			$replacedEntryId = $jobEntry->getReplacedEntryId();
+			$replacedEntryId = $entry->getReplacedEntryId();
 			if ($replacedEntryId)
 				$readiness = flavorParamsConversionProfile::READY_BEHAVIOR_REQUIRED;
 		}
