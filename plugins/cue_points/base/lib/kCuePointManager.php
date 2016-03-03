@@ -20,27 +20,8 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
  	 */
 	public function updatedJob(BatchJob $dbBatchJob)
 	{
-		if ($jobType = $dbBatchJob->getJobType() == BatchJobType::CONCAT){
-			self::handleConcatJobFinished($dbBatchJob, $dbBatchJob->getData());
-		}
-		else if ($jobType = $dbBatchJob->getJobType() == BatchJobType::CONVERT_LIVE_SEGMENT) {
-			self::handleConvertLiveSegmentJobFinished($dbBatchJob, $dbBatchJob->getData());
-		}
+		self::handleConcatJobFinished($dbBatchJob, $dbBatchJob->getData());
 		return true;
-	}
-
-	private function handleConvertLiveSegmentJobFinished(BatchJob $dbBatchJob, kConvertLiveSegmentJobData $data)
-	{
-		$files = self::getAssetDataFilesArray($data);
-
-		$amfArray = unserialize(file_get_contents($files[0]));
-		$recordedVODDurationInMS = $amfArray[0];
-		array_shift($amfArray);
-		if (!unlink($files[0]))
-			KalturaLog::warning("failed to delete file " . $files[0]);
-
-		$amfArray = self::parseAmfArrayAndShift($amfArray, 0);
-		self::copyCuePointsFromLiveToVodEntry($dbBatchJob->getEntry()->getRecordedEntryId(), $recordedVODDurationInMS, $recordedVODDurationInMS, $amfArray);
 	}
 
 	private function handleConcatJobFinished(BatchJob $dbBatchJob, kConcatJobData $data)
@@ -106,20 +87,7 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
  	 */
 	public function shouldConsumeJobStatusEvent(BatchJob $dbBatchJob)
 	{
-		$jobType = $dbBatchJob->getJobType();
-		$data = $dbBatchJob->getData();
-
-		// copy cue points only if it's the first file and this is the primary server
-		if ($jobType == BatchJobType::CONVERT_LIVE_SEGMENT &&
-			$dbBatchJob->getStatus() == BatchJob::BATCHJOB_STATUS_FINISHED &&
-			$data->getFileIndex() == 0 &&
-			$data->getMediaServerIndex() == MediaServerIndex::PRIMARY){
-			$asset = assetPeer::retrieveByIdNoFilter($data->getAssetId());
-			if ($asset->hasTag(assetParams::TAG_RECORDING_ANCHOR))
-				return true;
-		}
-
-		elseif ($jobType == BatchJobType::CONCAT && $dbBatchJob->getStatus() == BatchJob::BATCHJOB_STATUS_FINISHED){
+		if ($dbBatchJob->getJobType() == BatchJobType::CONCAT && $dbBatchJob->getStatus() == BatchJob::BATCHJOB_STATUS_FINISHED){
 			$convertLiveSegmentJobData = $dbBatchJob->getParentJob()->getData();
 			$asset = assetPeer::retrieveByIdNoFilter($convertLiveSegmentJobData->getAssetId());
 			if ($asset->hasTag(assetParams::TAG_RECORDING_ANCHOR))
