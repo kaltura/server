@@ -72,9 +72,6 @@ class WidgetService extends KalturaBaseService
 
 		$dbWidget->setId($widgetId);
 
-		if ($widget->userId !== null)
-			$dbWidget->setUserId($widget->userId);
-		
 		if ($entry && $entry->getType() == entryType::PLAYLIST)
 			$dbWidget->setIsPlayList(true);
 			

@@ -282,5 +282,5 @@ class widget extends Basewidget implements IBaseObject
 	public function getRoles (  )	{	return $this->getFromCustomData( "roles" );	}
 
 	public function setUserId ( $v )	{	$this->putInCustomData ( "userId" , $v );	}
-	public function getUserId (  )	{	return $this->getFromCustomData( "userId" );	}
+	public function getUserId (  )	{	return $this->getFromCustomData( "userId" , null ,0);	}
 }

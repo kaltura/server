@@ -113,7 +113,6 @@ class KalturaWidget extends KalturaObject implements IFilterable
 	 * User ID for widget
 	 *
 	 * @var string
-	 * $filter eq
 	 */
 	public $userId;
 
