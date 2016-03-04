@@ -301,6 +301,9 @@ class SessionService extends KalturaBaseService
 
 		$userId = 0;
 
+		if($widget->getUserId())
+			$userId = $widget->getUserId();
+
 		// if the widget has a role, pass it in $privileges so it will be embedded in the KS
 		// only if we also have an entry to limit the role operations to
 		if ($widget->getRoles() != null)
