@@ -910,6 +910,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		$entryDistribution->setErrorDescription(null);
 		if ($data->getKeepDistributionItem())
 		{
+			$entryDistribution->setRemoteId(null);
 			$entryDistribution->setStatus(EntryDistributionStatus::QUEUED);
 		}
 		else 
