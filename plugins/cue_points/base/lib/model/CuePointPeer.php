@@ -35,6 +35,13 @@ class CuePointPeer extends BaseCuePointPeer implements IMetadataPeer, IRelatedOb
 	{
 		self::$userContentOnly = $contentOnly;
 	}
+
+	private static $showOnlyPublic = true;
+
+	public static function setShowOnlyPublic($showOwnlyPublic)
+	{
+		self::$showOnlyPublic = $showOwnlyPublic;
+	}
 	
 	/* (non-PHPdoc)
 	 * @see BaseCuePointPeer::setDefaultCriteriaFilter()
@@ -46,7 +53,7 @@ class CuePointPeer extends BaseCuePointPeer implements IMetadataPeer, IRelatedOb
 		
 		$c = KalturaCriteria::create(CuePointPeer::OM_CLASS);
 		$c->addAnd(CuePointPeer::STATUS, CuePointStatus::DELETED, Criteria::NOT_EQUAL);
-		
+
 		if(self::$userContentOnly)
 		{
 			$puserId = kCurrentContext::$ks_uid;
@@ -78,6 +85,14 @@ class CuePointPeer extends BaseCuePointPeer implements IMetadataPeer, IRelatedOb
 				);
 			
 				$c->addAnd($criterionUserOrPublic);
+			}
+			else if (!$puserId)
+			{
+				if (self::$showOnlyPublic)
+				{
+					$criterionIsPublic = $c->getNewCriterion(self::IS_PUBLIC, true, Criteria::EQUAL);
+					$c->addAnd($criterionIsPublic);
+				}
 			}
 		}
 		

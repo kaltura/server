@@ -444,11 +444,15 @@ if ($argv[1] == 'manual')
 	KalturaLog::log("moving jobs: partnerId=$partnerId max=$maxMovedJobs, source=$sourceDc, target=$targetDc, type=$jobType, subType=$jobSubType");
 	
 	$movedJobsCount = moveJobs($c, $maxMovedJobs, $sourceDc, $targetDc, $jobType, $jobSubType);
+
+	KalturaLog::log("Moved {$movedJobsCount} jobs");
 }
 else
 {
-	$jobSubType = $argv[2];
-	$movedJobsCount = autoMoveJobs($jobType, $jobSubType);
+	$jobSubTypes = $argv[2];
+	foreach (explode(',', $jobSubTypes) as $jobSubType)
+	{
+		$movedJobsCount = autoMoveJobs($jobType, $jobSubType);
+		KalturaLog::log("Moved jobs, subtype=$jobSubType count={$movedJobsCount}");
+	}
 }
-
-KalturaLog::log("Moved {$movedJobsCount} jobs");
