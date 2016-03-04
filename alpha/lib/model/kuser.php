@@ -25,6 +25,10 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject
 	const KUSER_KALTURA = 0;
 	
 	const KUSER_ID_THAT_DOES_NOT_EXIST = 0;
+
+	const ANONYMOUS_USER_ID='0';
+	const ANONYMOUS_USER_ID_NO_CACHE=' ';
+
 	
 	// different sort orders for browsing kswhos
 	const KUSER_SORT_MOST_VIEWED = 1;  
