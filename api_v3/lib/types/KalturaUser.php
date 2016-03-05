@@ -190,7 +190,6 @@ class KalturaUser extends KalturaObject implements IRelatedFilterable
 	
 	/**
 	 * @var bool
-	 * @readonly
 	 */
 	public $loginEnabled;
 	
@@ -208,7 +207,6 @@ class KalturaUser extends KalturaObject implements IRelatedFilterable
 	
 	/**
 	 * @var bool
-	 * @readonly
 	 */
 	public $isAccountOwner;
 
