@@ -46,6 +46,8 @@ class KAsyncClearCuePoints extends KPeriodicWorker
 		{
 			foreach($entries->objects as $entry)
 			{
+				//When entry has recording on the cue poitns are copied from the live entry to the vod entry
+				//The copy process allready markes the live entry cue points as handled
 				/* @var $entry KalturaLiveEntry */
 				if($entry->recordStatus !== KalturaRecordStatus::DISABLED)
 					continue;
@@ -62,11 +64,7 @@ class KAsyncClearCuePoints extends KPeriodicWorker
 	{
 		$cuePointPlugin = KalturaCuePointClientPlugin::get(self::$kClient);
 		
-		$cuePointFilter = new KalturaCuePointFilter();
-		$cuePointFilter->cuePointTypeIn = $this->getAdditionalParams("cuePointTypeIn");
-		$cuePointFilter->statusEqual = KalturaCuePointStatus::READY;
-		$cuePointFilter->orderBy = KalturaCuePointOrderBy::CREATED_AT_ASC;
-		$cuePointFilter->createdAtLessThanOrEqual = time() - $this->getAdditionalParams("cuePointCreatedAtLessThanOrEqual");
+		$cuePointFilter = $this->getFilter("KalturaCuePointFilter");
 		$cuePointFilter->entryIdEqual = $entry->id;
 		
 		$pager = new KalturaFilterPager();
@@ -80,7 +78,7 @@ class KAsyncClearCuePoints extends KPeriodicWorker
 			self::$kClient->startMultiRequest();
 			foreach ($cuePoints->objects as $cuePoint)
 			{
-				$cuePointPlugin->cuePoint->updateStatusAction($cuePoint->id, KalturaCuePointStatus::HANDLED);
+				$cuePointPlugin->cuePoint->updateStatus($cuePoint->id, KalturaCuePointStatus::HANDLED);
 			}
 			self::$kClient->doMultiRequest();
 		}
