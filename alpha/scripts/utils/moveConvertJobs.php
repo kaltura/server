@@ -211,7 +211,7 @@ function getRunningJobsCount($jobType, $jobSubType)
 	$countByDc = array();
 	foreach (kDataCenterMgr::getDcIds() as $dc)
 	{
-		$countByDc[$dc] = array();
+		$countByDc[$dc] = 0;
 	}
 	
 	foreach ($rows as $row)
