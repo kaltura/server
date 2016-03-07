@@ -588,8 +588,12 @@ $plannedDur = 0;
 					$flvrVid= $this->_video;
 					$param1=null;
 					$param2=null;
-					if(isset($flvrVid->_bitRate) && $flvrVid->_bitRate>0 && isset($srcVid->_bitRate) && $srcVid->_bitRate>0
-					&& $flvrVid->_bitRate/KDLConstants::FlavorBitrateComplianceFactor<$srcVid->_bitRate) 
+					/*
+					 * The BitrateCompliance condition prevented some of flavors to be signed as  'Framesize-non-comply'.
+					 * Therefore it was removed.
+					 */
+		//			if(isset($flvrVid->_bitRate) && $flvrVid->_bitRate>0 && isset($srcVid->_bitRate) && $srcVid->_bitRate>0
+		//			&& $flvrVid->_bitRate/KDLConstants::FlavorBitrateComplianceFactor<$srcVid->_bitRate) 
 					{
 						if(isset($flvrVid->_width) && $flvrVid->_width>0 && isset($trgVid->_width) && $trgVid->_width 
 						&& $flvrVid->_width>$trgVid->_width/KDLConstants::FlavorFrameSizeComplianceFactor) {
