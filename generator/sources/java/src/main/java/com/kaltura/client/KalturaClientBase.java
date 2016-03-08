@@ -304,7 +304,7 @@ abstract public class KalturaClientBase implements Serializable {
         {
         	out.write(buf,0,len);
         }
-        return new String(out.toByteArray());
+        return new String(out.toByteArray(), UTF8_CHARSET);
     }
 
 	protected String executeMethod(HttpClient client, PostMethod method) throws KalturaApiException {
@@ -352,7 +352,7 @@ abstract public class KalturaClientBase implements Serializable {
 
 			// Deal with the response.
 			// Use caution: ensure correct character encoding and is not binary data
-			responseString = new String (responseBody.getBytes(), UTF8_CHARSET); // Unicon: this MUST be set to UTF-8 charset -AZ
+			responseString = new String (responseBody.getBytes(UTF8_CHARSET), UTF8_CHARSET); // Unicon: this MUST be set to UTF-8 charset -AZ
 			if (logger.isEnabled())
 			{
 				if(responseString.length() < MAX_DEBUG_RESPONSE_STRING_LENGTH) {
