@@ -299,7 +299,10 @@ class SessionService extends KalturaBaseService
 			!is_null($widget->getPrivacyContext()) && $widget->getPrivacyContext() != '' )
 			$privileges .= ','. kSessionBase::PRIVILEGE_PRIVACY_CONTEXT . ':' . $widget->getPrivacyContext();
 
-		$userId = 0;
+		if($widget->getAvoidAnonymousCache())
+			$userId = kuser::ANONYMOUS_USER_ID_NO_CACHE;
+		else
+			$userId = kuser::ANONYMOUS_USER_ID;
 
 		// if the widget has a role, pass it in $privileges so it will be embedded in the KS
 		// only if we also have an entry to limit the role operations to

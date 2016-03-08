@@ -50,7 +50,7 @@ class WidgetService extends KalturaBaseService
 			if (!$uiConf)
 				throw new KalturaAPIException(KalturaErrors::UICONF_ID_NOT_FOUND, $widget->uiConfId);
 		}
-		
+
 		if(!is_null($widget->enforceEntitlement) && $widget->enforceEntitlement == false && kEntitlementUtils::getEntitlementEnforcement())
 			throw new KalturaAPIException(KalturaErrors::CANNOT_DISABLE_ENTITLEMENT_FOR_WIDGET_WHEN_ENTITLEMENT_ENFORCEMENT_ENABLE);
 		
@@ -69,6 +69,8 @@ class WidgetService extends KalturaBaseService
 		$dbWidget->setPartnerId($this->getPartnerId());
 		$dbWidget->setSubpId($this->getPartnerId() * 100);
 		$widgetId = $dbWidget->calculateId($dbWidget);
+		if ($widget->avoidAnonymousCache !== null)
+			$dbWidget->setAvoidAnonymousCache($widget->avoidAnonymousCache);
 
 		$dbWidget->setId($widgetId);
 		
