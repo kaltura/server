@@ -15,7 +15,6 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 	/**
 	 * Recording Status Enabled/Disabled
 	 * @var KalturaRecordStatus
-	 * @insertonly
 	 */
 	public $recordStatus;
 	
@@ -190,6 +189,14 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 			if($sourceObject->getDvrWindow() !== $this->dvrWindow && $sourceObject->getLiveStatus() !== LiveEntryStatus::STOPPED)
 			{
 				throw new KalturaAPIException(KalturaErrors::CANNOT_UPDATE_FIELDS_WHILE_ENTRY_BROADCASTING, "dvrWindow");
+			}
+		}
+		
+		if(isset($this->recordStatus))
+		{
+			if($sourceObject->getRecordStatus() !== $this->recordStatus && $sourceObject->getLiveStatus() !== LiveEntryStatus::STOPPED)
+			{
+				throw new KalturaAPIException(KalturaErrors::CANNOT_UPDATE_FIELDS_WHILE_ENTRY_BROADCASTING, "recordStatus");
 			}
 		}
 		
