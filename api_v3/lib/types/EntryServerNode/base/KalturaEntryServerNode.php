@@ -123,7 +123,7 @@ abstract class KalturaEntryServerNode extends KalturaObject implements IRelatedF
 		{
 			case KalturaEntryServerNodeType::LIVE_BACKUP:
 			case KalturaEntryServerNodeType::LIVE_PRIMARY:
-				$object = new LiveEntryServerNode();
+				$object = new KalturaLiveEntryServerNode();
 				break;
 
 			default:
