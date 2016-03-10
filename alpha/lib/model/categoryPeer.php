@@ -347,7 +347,7 @@ class categoryPeer extends BasecategoryPeer implements IRelatedObjectPeer
 	 * @param int $limit
 	 * @return array<category>
 	 */
-	public static function retrieveEntitledAndNonIndexedByKuser($kuserId, $limit)
+	public static function retrieveEntitledAndNonIndexedByKuser($limit)
 	{
 		$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
 		$partner = PartnerPeer::retrieveByPK($partnerId);
@@ -358,7 +358,7 @@ class categoryPeer extends BasecategoryPeer implements IRelatedObjectPeer
 
 		$c = KalturaCriteria::create(categoryPeer::OM_CLASS);
 		
-		$filteredCategoriesIds = entryPeer::getFilterdCategoriesIds();
+		$filteredCategoriesIds = entryPeer::getFilteredCategoriesIds();
 		
 		if(count($filteredCategoriesIds))
 			$c->addAnd(categoryPeer::ID, $filteredCategoriesIds, Criteria::IN);

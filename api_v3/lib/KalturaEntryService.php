@@ -85,7 +85,7 @@ class KalturaEntryService extends KalturaBaseService
 			}
 			
 			if(count($categoriesIds))
-				entryPeer::setFilterdCategoriesIds($categoriesIds);
+				entryPeer::setFilteredCategoriesIds($categoriesIds);
 		}*/
 		
 		parent::initService($serviceId, $serviceName, $actionName);

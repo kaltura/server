@@ -24,7 +24,7 @@ class entryPeer extends BaseentryPeer
 
 	private static $accessControlScope;
 
-	private static $kuserBlongToMoreThanMaxCategoriesForSearch = false;
+	private static $kuserBelongToMoreThanMaxCategoriesForSearch = false;
 	
 	private static $lastInitializedContext = null; // last initialized security context (ks + partner id)
 	private static $validatedEntries = array();
@@ -346,14 +346,17 @@ class entryPeer extends BaseentryPeer
 		return self::doSelect($c);
 	}
 
-	public static function setFilterdCategoriesIds($filteredCategoriesIds)
+	public static function setFilteredCategoriesIds($filteredCategoriesIds)
 	{
 		self::$filteredCategoriesIds = $filteredCategoriesIds;
 	}
 
-	public static function getFilterdCategoriesIds()
+	public static function getFilteredCategoriesIds()
 	{
-		return self::$filteredCategoriesIds;
+		if (self::$kuserBelongToMoreThanMaxCategoriesForSearch)
+			return self::$filteredCategoriesIds;
+			
+		return array ();
 	}
 
 	public static function setDefaultCriteriaFilter ()
@@ -386,10 +389,13 @@ class entryPeer extends BaseentryPeer
 				$critEntitledKusers->addTag(KalturaCriterion::TAG_ENTITLEMENT_ENTRY);
 
 				$categoriesIds = array();
-				$categoriesIds = categoryPeer::retrieveEntitledAndNonIndexedByKuser(kCurrentContext::getCurrentKsKuserId(), kConf::get('category_search_limit'));
+				$categoriesIds = categoryPeer::retrieveEntitledAndNonIndexedByKuser(kConf::get('category_search_limit'));
 				if(count($categoriesIds) >= kConf::get('category_search_limit'))
-					self::$kuserBlongToMoreThanMaxCategoriesForSearch = true;
-
+				{
+					self::$kuserBelongToMoreThanMaxCategoriesForSearch = true;
+					//Re-run the previous retrieval again. This time, it will match the filtered categories to the entitlement criteria.
+					$categoriesIds = categoryPeer::retrieveEntitledAndNonIndexedByKuser(kConf::get('category_search_limit'));
+				}
 				if (count($categoriesIds))
 				{
 					$critCategories = $c->getNewCriterion(self::CATEGORIES_IDS, $categoriesIds, KalturaCriteria::IN_LIKE);
@@ -617,7 +623,7 @@ class entryPeer extends BaseentryPeer
 
 		if(	kEntitlementUtils::getEntitlementEnforcement() &&
 			KalturaCriterion::isTagEnable(KalturaCriterion::TAG_ENTITLEMENT_ENTRY) &&
-			self::$kuserBlongToMoreThanMaxCategoriesForSearch &&
+			self::$kuserBelongToMoreThanMaxCategoriesForSearch &&
 			!$c->getOffset())
 		{
 			KalturaCriterion::disableTag(KalturaCriterion::TAG_ENTITLEMENT_ENTRY);
