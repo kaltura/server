@@ -613,8 +613,8 @@ class KalturaErrors extends APIErrors
 	/*
 	 * EntryServerNode service
 	 */
-	const ENTRY_SERVER_NODE_NOT_FOUND = "ENTRY_SERVER_NODE_NOT_FOUND;ENTRY_ID;SERVER_TYPE;Entry server node with entry id [@ENTRY_ID@] and server type [@SERVER_TYPE@] not found";
-	const ENTRY_SERVER_NODE_MULTI_RESULT = "ENTRY_SERVER_NODE_NOT_FOUND;ENTRY_ID;SERVER_TYPE;There were several results for entry server node with entry id [@ENTRY_ID@] and server type [@SERVER_TYPE@]";
+	const ENTRY_SERVER_NODE_NOT_FOUND = "ENTRY_SERVER_NODE_NOT_FOUND;ENTRY_ID,SERVER_TYPE;Entry server node with entry id [@ENTRY_ID@] and server type [@SERVER_TYPE@] not found";
+	const ENTRY_SERVER_NODE_MULTI_RESULT = "ENTRY_SERVER_NODE_NOT_FOUND;ENTRY_ID,SERVER_TYPE;There were several results for entry server node with entry id [@ENTRY_ID@] and server type [@SERVER_TYPE@]";
 	const MUST_FILTER_ON_ENTRY_AND_SERVER_TYPE = "MUST_FILTER_ON_ENTRY_AND_SERVER_TYPE;Must filter on entry id and server type or id";
-	const ENTRY_SERVER_NODE_OBJECT_TYPE_ERROR = "ENTRY_SERVER_NODE_OBJECT_TYPE_ERROR;OBJ_TYPE;ENTRY_SERVER_NODE_ID;There is an error in the DB, object type [@OBJ_TYPE@] of EntryServerNode id [@ENTRY_SERVER_NODE_ID@] is unknown";
+	const ENTRY_SERVER_NODE_OBJECT_TYPE_ERROR = "ENTRY_SERVER_NODE_OBJECT_TYPE_ERROR;OBJ_TYPE,ENTRY_SERVER_NODE_ID;There is an error in the DB, object type [@OBJ_TYPE@] of EntryServerNode id [@ENTRY_SERVER_NODE_ID@] is unknown";
 }
