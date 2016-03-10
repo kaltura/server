@@ -217,14 +217,14 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 			{
 				$validEntryStatuses = array(KalturaEntryStatus::READY, KalturaEntryStatus::ERROR_CONVERTING, KalturaEntryStatus::ERROR_IMPORTING);
 				if( !in_array($recordedEntry->getStatus(), $validUpdateStatuses) )
-					throw new KalturaAPIException(KalturaErrors::CANNOT_UPDATE_FIELDS_WHILE_ENTRY_BROADCASTING, $attr);
+					throw new KalturaAPIException(KalturaErrors::CANNOT_UPDATE_FIELDS_RECORDED_ENTRY_STILL_NOT_READY, $attr);
 				
 				$noneReadyAssets = assetPeer::retrieveByEntryId($recordedEntry->getId(), 
 						array(KalturaAssetType::FLAVOR), 
 						array(KalturaFlavorAssetStatus::CONVERTING, KalturaFlavorAssetStatus::QUEUED, KalturaFlavorAssetStatus::WAIT_FOR_CONVERT, KalturaFlavorAssetStatus::VALIDATING));
 				
 				if(count($noneReadyAssets))
-					throw new KalturaAPIException(KalturaErrors::CANNOT_UPDATE_FIELDS_WHILE_ENTRY_BROADCASTING, $attr);
+					throw new KalturaAPIException(KalturaErrors::CANNOT_UPDATE_FIELDS_RECORDED_ENTRY_STILL_NOT_READY, $attr);
 			}
 		}
 	}
