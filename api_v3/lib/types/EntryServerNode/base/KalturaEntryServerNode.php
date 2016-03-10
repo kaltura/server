@@ -16,14 +16,14 @@ abstract class KalturaEntryServerNode extends KalturaObject implements IRelatedF
 	/**
 	 * @var string
 	 * @readonly
-	 * @filter eq
+	 * @filter eq,in
 	 */
 	public $entryId;
 
 	/**
 	 * @var int
 	 * @readonly
-	 * @filter eq,in
+	 * @filter eq
 	 */
 	public $serverNodeId;
 
@@ -50,7 +50,7 @@ abstract class KalturaEntryServerNode extends KalturaObject implements IRelatedF
 	/**
 	 * @var KalturaEntryServerNodeStatus
 	 * @readonly
-	 * @filter eq, in
+	 * @filter eq
 	 */
 	public $status;
 

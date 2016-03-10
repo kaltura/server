@@ -21,31 +21,36 @@ class KalturaEntryServerNodeFilter extends KalturaEntryServerNodeBaseFilter
 	 */
 	public function getListResponse(KalturaFilterPager $pager, KalturaDetachedResponseProfile $responseProfile = null)
 	{
-		if ($this->entryIdEqual == null && $this->entryIdIn == null &&
+		if ($this->entryIdEqual == null &&
 			$this->serverTypeEqual == null )
 		{
-			throw new KalturaAPIException(KalturaErrors::MUST_FILTER_ON_ENTRY_AND_SERVER_TYPE);
+			throw new KalturaAPIException(KalturaErrors::MUST_FILTER_ON_ENTRY_OR_SERVER_TYPE);
 		}
 
-		if($this->entryIdEqual != null)
+		if($this->entryIdEqual)
 		{
 			$entry = entryPeer::retrieveByPK($this->entryIdEqual);
 			if(!$entry)
 				throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $this->entryIdEqual);
+		} else if ($this->entryIdIn)
+		{
+			$entryIds = explode(',', $this->entryIdIn);
+			$entryIds = entryPeer::retrieveByPKs($entryIds);
+			$entryIds = implode($entryIds, ',');
+			$this->entryIdIn = $entryIds;
 		}
 
+		$c = new Criteria();
 		$entryServerNodeFilter = $this->toObject();
-
-		$c = KalturaCriteria::create(EntryServerNodePeer::OM_CLASS);
 		$entryServerNodeFilter->attachToCriteria($c);
-		$dbEntryServerNodes = EntryServerNodePeer::doSelect($c);
-
 		$pager->attachToCriteria($c);
+
+		$dbEntryServerNodes = EntryServerNodePeer::doSelect($c);
 
 		$entryServerNodeList = KalturaEntryServerNodeArray::fromDbArray($dbEntryServerNodes, $responseProfile);
 		$response = new KalturaEntryServerNodeListResponse();
 		$response->objects = $entryServerNodeList;
-		$response->totalCount = $c->getRecordsCount();
+		$response->totalCount = count($dbEntryServerNodes);
 		return $response;
 	}
 }
