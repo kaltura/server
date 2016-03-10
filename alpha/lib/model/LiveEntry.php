@@ -17,6 +17,8 @@ abstract class LiveEntry extends entry
 	
 	static $kalturaLiveSourceTypes = array(EntrySourceType::LIVE_STREAM, EntrySourceType::LIVE_CHANNEL, EntrySourceType::LIVE_STREAM_ONTEXTDATA_CAPTIONS);
 	
+	protected $decidingLiveProfile = false;
+	
 	/* (non-PHPdoc)
 	 * @see entry::getLocalThumbFilePath()
 	 */
@@ -121,7 +123,22 @@ abstract class LiveEntry extends entry
 		return parent::generateFileName($sub_type, $version);
 	}
 	
-	protected $decidingLiveProfile = false;
+	/**
+	 * Code to be run before updating the object in database
+	 * @param PropelPDO $con
+	 * @return bloolean
+	 */
+	public function preUpdate(PropelPDO $con = null)
+	{
+		if($this->isColumnModified(entryPeer::CONVERSION_PROFILE_ID))
+		{
+			$this->setRecordedEntryId(null);
+			$this->setRedirectEntryId(null);
+			$this->setCustomDataObj();
+		}
+		
+		return parent::preUpdate($con);
+	}
 	
 	/* (non-PHPdoc)
 	 * @see Baseentry::postUpdate()
@@ -131,7 +148,7 @@ abstract class LiveEntry extends entry
 		if ($this->alreadyInSave)
 			return parent::postUpdate($con);
 			
-		if(!$this->decidingLiveProfile && $this->conversion_profile_id && isset($this->oldCustomDataValues[LiveEntry::CUSTOM_DATA_NAMESPACE_MEDIA_SERVERS]))
+		if((!$this->decidingLiveProfile && $this->conversion_profile_id && isset($this->oldCustomDataValues[LiveEntry::CUSTOM_DATA_NAMESPACE_MEDIA_SERVERS])) || $this->isColumnModified(entryPeer::CONVERSION_PROFILE_ID))
 		{
 			$this->decidingLiveProfile = true;
 			kBusinessConvertDL::decideLiveProfile($this);
