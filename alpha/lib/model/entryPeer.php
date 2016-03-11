@@ -393,8 +393,13 @@ class entryPeer extends BaseentryPeer
 				if(count($categoriesIds) >= kConf::get('category_search_limit'))
 				{
 					self::$kuserBelongToMoreThanMaxCategoriesForSearch = true;
-					//Re-run the previous retrieval again. This time, it will match the filtered categories to the entitlement criteria.
-					$categoriesIds = categoryPeer::retrieveEntitledAndNonIndexedByKuser(kConf::get('category_search_limit'));
+					
+					//If the category ids according to which we filtered are already contained in the categoriesIds array, no need to re-run the query
+					if (count (array_intersect (self::$filteredCategoriesIds, $categoriesIds)) != count (self::$filteredCategoriesIds))
+					{
+						//Re-run the previous retrieval again. This time, it will match the filtered categories to the entitlement criteria.
+						$categoriesIds = categoryPeer::retrieveEntitledAndNonIndexedByKuser(kConf::get('category_search_limit'));
+					}
 				}
 				if (count($categoriesIds))
 				{
