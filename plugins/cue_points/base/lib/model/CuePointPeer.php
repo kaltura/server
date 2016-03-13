@@ -88,12 +88,9 @@ class CuePointPeer extends BaseCuePointPeer implements IMetadataPeer, IRelatedOb
 			}
 			else if (!$puserId)
 			{
-				if (self::$showOnlyPublic)
-				{
-					$criterionIsPublic = $c->getNewCriterion (self::IS_PUBLIC, true, Criteria::EQUAL);
-					$criterionIsPublic->addTag(KalturaCriterion::TAG_USER_SESSION);
-					$c->add($criterionIsPublic);					
-				}		
+				$criterionIsPublic = $c->getNewCriterion (self::IS_PUBLIC, true, Criteria::EQUAL);
+				$criterionIsPublic->addTag(KalturaCriterion::TAG_USER_SESSION);
+				$c->add($criterionIsPublic);					
  			}
 		}
 		
@@ -170,7 +167,7 @@ class CuePointPeer extends BaseCuePointPeer implements IMetadataPeer, IRelatedOb
 	public static function doSelect(Criteria $criteria, PropelPDO $con = null)
 	{
 		$c = clone $criteria;
-		
+
 		if($c instanceof KalturaCriteria)
 		{
 			$c->applyFilters();
@@ -272,5 +269,22 @@ class CuePointPeer extends BaseCuePointPeer implements IMetadataPeer, IRelatedOb
 	public function isReferenced(IRelatedObject $object)
 	{
 		return false;
+	}
+
+	/**
+	 * Returns the default criteria filter
+	 *
+	 * @return     criteriaFilter The default criteria filter.
+	 */
+	public static function &getCriteriaFilter()
+	{
+		$c = parent::getCriteriaFilter();
+		if (!self::$showOnlyPublic)
+		{
+			$criteria = $c->getFilter();
+			$criteria->remove(self::IS_PUBLIC);
+			$c->setFilter($criteria);
+		}
+		return $c;
 	}
 }
