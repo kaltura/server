@@ -90,7 +90,6 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 
 	/**
 	 * @var KalturaLiveEntryRecordingOptions
-	 * @insertonly
 	 */
 	public $recordingOptions;
 
@@ -175,14 +174,15 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 	 */
 	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
 	{
-		$stopedOnlyUpdateAttributes = array(
+		$updateValidateAttributes = array(
 				"dvrStatus" => array("validatePropertyChanged"), 
 				"dvrWindow" => array("validatePropertyChanged"), 
+				"recordingOptions" => array("validateRecordingOptionsChanged"),
 				"recordStatus" => array("validatePropertyChanged","validateRecordedEntryId"), 
 				"conversionProfileId" => array("validatePropertyChanged","validateRecordedEntryId")
 		);
 		
-		foreach ($stopedOnlyUpdateAttributes as $attr => $validateFucntions)
+		foreach ($updateValidateAttributes as $attr => $validateFucntions)
 		{
 			if(isset($this->$attr))
 			{
@@ -220,20 +220,48 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 		$getter = "get" . ucfirst($attr);
 		if($sourceObject->$getter() !== $this->$attr)
 		{
-			$recordedEntry = $sourceObject->getRecordedEntryId() ? entryPeer::retrieveByPK($sourceObject->getRecordedEntryId()) : null;
-			if($recordedEntry)
-			{
-				$validEntryStatuses = array(KalturaEntryStatus::READY, KalturaEntryStatus::ERROR_CONVERTING, KalturaEntryStatus::ERROR_IMPORTING);
-				if( !in_array($recordedEntry->getStatus(), $validUpdateStatuses) )
-					throw new KalturaAPIException(KalturaErrors::CANNOT_UPDATE_FIELDS_RECORDED_ENTRY_STILL_NOT_READY, $attr);
-				
-				$noneReadyAssets = assetPeer::retrieveByEntryId($recordedEntry->getId(), 
-						array(KalturaAssetType::FLAVOR), 
-						array(KalturaFlavorAssetStatus::CONVERTING, KalturaFlavorAssetStatus::QUEUED, KalturaFlavorAssetStatus::WAIT_FOR_CONVERT, KalturaFlavorAssetStatus::VALIDATING));
-				
-				if(count($noneReadyAssets))
-					throw new KalturaAPIException(KalturaErrors::CANNOT_UPDATE_FIELDS_RECORDED_ENTRY_STILL_NOT_READY, $attr);
-			}
+			$this->validateRecordingDone($sourceObject, $attr);
+		}
+	}
+	
+	private function validateRecordingDone($sourceObject, $attr)
+	{
+		/* @var $sourceObject LiveEntry */
+		$recordedEntry = $sourceObject->getRecordedEntryId() ? entryPeer::retrieveByPK($sourceObject->getRecordedEntryId()) : null;
+		if($recordedEntry)
+		{
+			$validEntryStatuses = array(KalturaEntryStatus::READY, KalturaEntryStatus::ERROR_CONVERTING, KalturaEntryStatus::ERROR_IMPORTING);
+			if( !in_array($recordedEntry->getStatus(), $validUpdateStatuses) )
+				throw new KalturaAPIException(KalturaErrors::CANNOT_UPDATE_FIELDS_RECORDED_ENTRY_STILL_NOT_READY, $attr);
+			
+			$noneReadyAssets = assetPeer::retrieveByEntryId($recordedEntry->getId(),
+					array(KalturaAssetType::FLAVOR),
+					array(KalturaFlavorAssetStatus::CONVERTING, KalturaFlavorAssetStatus::QUEUED, KalturaFlavorAssetStatus::WAIT_FOR_CONVERT, KalturaFlavorAssetStatus::VALIDATING));
+			
+			if(count($noneReadyAssets))
+				throw new KalturaAPIException(KalturaErrors::CANNOT_UPDATE_FIELDS_RECORDED_ENTRY_STILL_NOT_READY, $attr);
+		}
+	}
+	
+	protected function validateRecordingOptionsChanged($sourceObject, $attr)
+	{
+		if(!isset($this->recordingOptions))
+			return;
+		
+		if(!isset($this->recordingOptions->shouldCopyEntitlement))
+			return;
+		
+		/* @var $sourceObject LiveEntry */
+		$hasObjectChanged = false;
+		if( !$sourceObject->getRecordingOptions() || ($sourceObject->getRecordingOptions() && $sourceObject->getRecordingOptions()->getShouldCopyEntitlement() !== $this->recordingOptions->shouldCopyEntitlement) )
+			$hasObjectChanged = true;
+		
+		if($hasObjectChanged)
+		{
+			$this->validateRecordingDone($sourceObject, "recordingOptions");
+			
+			if( $sourceObject->getLiveStatus() !== LiveEntryStatus::STOPPED )
+				throw new KalturaAPIException(KalturaErrors::CANNOT_UPDATE_FIELDS_WHILE_ENTRY_BROADCASTING, "recordingOptions");
 		}
 	}
 }

@@ -15,6 +15,7 @@ abstract class LiveEntry extends entry
 	
 	const CUSTOM_DATA_NAMESPACE_MEDIA_SERVERS = 'mediaServers';
 	const CUSTOM_DATA_RECORD_STATUS = 'record_status';
+	const CUSTOM_DATA_RECORD_OPTIONS = 'recording_options';
 	
 	static $kalturaLiveSourceTypes = array(EntrySourceType::LIVE_STREAM, EntrySourceType::LIVE_CHANNEL, EntrySourceType::LIVE_STREAM_ONTEXTDATA_CAPTIONS);
 	
@@ -131,7 +132,8 @@ abstract class LiveEntry extends entry
 	 */
 	public function preUpdate(PropelPDO $con = null)
 	{
-		if($this->isColumnModified(entryPeer::CONVERSION_PROFILE_ID) || $this->isCustomDataModified(LiveEntry::CUSTOM_DATA_RECORD_STATUS))
+		if($this->isColumnModified(entryPeer::CONVERSION_PROFILE_ID) || $this->isCustomDataModified(LiveEntry::CUSTOM_DATA_RECORD_STATUS)
+				|| $this->isCustomDataModified(LiveEntry::CUSTOM_DATA_RECORD_OPTIONS))
 		{
 			$this->setRecordedEntryId(null);
 			$this->setRedirectEntryId(null);
@@ -842,12 +844,12 @@ abstract class LiveEntry extends entry
 	
 	public function setRecordingOptions(kLiveEntryRecordingOptions $recordingOptions)
 	{
-		$this->putInCustomData("recording_options", serialize($recordingOptions));
+		$this->putInCustomData(LiveEntry::CUSTOM_DATA_RECORD_OPTIONS, serialize($recordingOptions));
 	}
 	
 	public function getRecordingOptions()
 	{
-		$recordingOptions = $this->getFromCustomData("recording_options");
+		$recordingOptions = $this->getFromCustomData(LiveEntry::CUSTOM_DATA_RECORD_OPTIONS);
 		
 		if($recordingOptions)
 			$recordingOptions = unserialize($recordingOptions);
