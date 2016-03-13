@@ -40,12 +40,24 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 			KalturaLog::warning("failed to delete file " . $files[0]);
 
 		$amfArray = self::parseAmfArrayAndShift($amfArray, 0);
-		self::copyCuePointsFromLiveToVodEntry($dbBatchJob->getEntry()->getRecordedEntryId(), $recordedVODDurationInMS, $recordedVODDurationInMS, $amfArray);
+		$entry = $dbBatchJob->getEntry();
+		if (!isset($entry))
+		{
+			KalturaLog::warning("failed to get entry, not calling copyCuePointsFromLiveToVodEntry");
+			return;
+		}
+		self::copyCuePointsFromLiveToVodEntry($entry->getRecordedEntryId(), $recordedVODDurationInMS, $recordedVODDurationInMS, $amfArray);
 	}
 
 	private function handleConcatJobFinished(BatchJob $dbBatchJob, kConcatJobData $data)
 	{
+		if (!$dbBatchJob->getParentJob() || !$dbBatchJob->getParentJob()->getData())
+		{
+			KalturaLog::warning("failed to get parent job data, not calling copyCuePointsFromLiveToVodEntry");
+			return;
+		}
 		$convertJobData = ($dbBatchJob->getParentJob()->getData());
+
 		$files = self::getAssetDataFilesArray($convertJobData);
 		$lastFileIndex = $convertJobData->getFileIndex();
 		$segmentDuration = 0;
@@ -65,7 +77,15 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 					KalturaLog::warning("failed to delete file " . $file);
 			}
 		}
-		self::copyCuePointsFromLiveToVodEntry( $dbBatchJob->getParentJob()->getEntry()->getRecordedEntryId(), $data->getConcatenatedDuration(), $segmentDuration, $amfArray);
+
+		$entry = $dbBatchJob->getParentJob()->getEntry();
+		if (!isset($entry))
+		{
+			KalturaLog::warning("failed to get entry, not calling copyCuePointsFromLiveToVodEntry");
+			return;
+		}
+
+		self::copyCuePointsFromLiveToVodEntry( $entry->getRecordedEntryId(), $data->getConcatenatedDuration(), $segmentDuration, $amfArray);
 	}
 
 

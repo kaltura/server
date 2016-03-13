@@ -254,6 +254,14 @@ class ComcastMrssFeed
 	public function getAssetUrl(asset $asset)
 	{
 		$urlManager = DeliveryProfilePeer::getDeliveryProfile($asset->getEntryId());
+		
+		if ($asset instanceof thumbAsset && $this->distributionProfile->getShouldAddThumbExtension())
+		{
+			$dynamicAttributes = $urlManager->getDynamicAttributes();
+			$dynamicAttributes->setAddThumbnailExtension (true);
+			$urlManager->setDynamicAttributes($dynamicAttributes);
+		}
+		
 		if($asset instanceof flavorAsset)
 			$urlManager->initDeliveryDynamicAttributes(null, $asset);
 		$url = $urlManager->getFullAssetUrl($asset);

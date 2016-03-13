@@ -424,7 +424,7 @@ namespace Kaltura
             byte[] paramsBuffer = BuildMultiPartParamsBuffer(json, boundary);
 
             SortedList<string, MultiPartFileDescriptor> filesDescriptions = new SortedList<string, MultiPartFileDescriptor>();
-            foreach (KeyValuePair<string, FileStream> file in kfiles)
+            foreach (KeyValuePair<string, Stream> file in kfiles)
                 filesDescriptions.Add(file.Key, BuildMultiPartFileDescriptor(file, boundary));
 
             // Set content's length
@@ -479,15 +479,23 @@ namespace Kaltura
         /// <returns>
         /// A description containing the file's stream and the part's header and footer.
         /// </returns>
-        private MultiPartFileDescriptor BuildMultiPartFileDescriptor(KeyValuePair<string, FileStream> fileEntry, string boundary)
+        private MultiPartFileDescriptor BuildMultiPartFileDescriptor(KeyValuePair<string, Stream> fileEntry, string boundary)
         {
             MultiPartFileDescriptor result = new MultiPartFileDescriptor();
             result._Stream = fileEntry.Value;
 
             // Build header
             StringBuilder sb = new StringBuilder();
-            FileStream fileStream = fileEntry.Value;
-            sb.Append("Content-Disposition: form-data; name=\"" + fileEntry.Key + "\"; filename=\"" + Path.GetFileName(fileStream.Name) + "\"" + "\r\n");
+            Stream fileStream = fileEntry.Value;
+            if(fileStream is FileStream)
+            {
+                FileStream fs = (FileStream)fileStream;
+                sb.Append("Content-Disposition: form-data; name=\"" + fileEntry.Key + "\"; filename=\"" + Path.GetFileName(fs.Name) + "\"" + "\r\n");
+            }
+            else if(fileStream is MemoryStream)
+            {
+                sb.Append("Content-Disposition: form-data; name=\"" + fileEntry.Key + "\"; filename=\"Memory-Stream-Upload\"" + "\r\n");
+            }
             sb.Append("Content-Type: application/octet-stream" + "\r\n");
             sb.Append("\r\n");
             result._Header = Encoding.UTF8.GetBytes(sb.ToString());
@@ -539,7 +547,7 @@ namespace Kaltura
 
         private struct MultiPartFileDescriptor
         {
-            public FileStream _Stream;
+            public Stream _Stream;
             public byte[] _Header;
             public byte[] _Footer;
 

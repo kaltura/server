@@ -16,8 +16,15 @@ class KalturaPushNotificationTemplate extends KalturaEventNotificationTemplate
      * @var KalturaResponseType
      */    
     public $objectFormat;
+    
+    /**
+     * Kaltura response-profile id
+     * @var int
+     */    
+    public $responseProfileId;
+    
 
-    private static $map_between_objects = array('apiObjectType', 'objectFormat');
+    private static $map_between_objects = array('apiObjectType', 'objectFormat', 'responseProfileId');
     
     public function __construct()
     {

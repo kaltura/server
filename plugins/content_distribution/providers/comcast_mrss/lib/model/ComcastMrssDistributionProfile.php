@@ -16,6 +16,7 @@ class ComcastMrssDistributionProfile extends ConfigurableDistributionProfile
 	const CUSTOM_DATA_C_PLATFORM_TV_SERIES_FIELD = 'cPlatformTVSeriesField';
 	const SHOULD_INCLUDE_CUE_POINTS = 'shouldIncludeCuePoints';
 	const SHOULD_INCLUDE_CAPTIONS = 'shouldIncludeCaptions';
+	const SHOULD_ADD_THUMB_EXTENSION = 'shouldAddThumbExtension';
 	
 	protected $maxLengthValidation= array (
 		ComcastMrssDistributionField::TITLE => 38,
@@ -244,4 +245,7 @@ class ComcastMrssDistributionProfile extends ConfigurableDistributionProfile
 	
 	public function getShouldIncludeCaptions ()	{return $this->getFromCustomData(self::SHOULD_INCLUDE_CAPTIONS);}
 	public function setShouldIncludeCaptions ($v)	{$this->putInCustomData(self::SHOULD_INCLUDE_CAPTIONS, $v);}
+	
+	public function getShouldAddThumbExtension ()	{return $this->getFromCustomData(self::SHOULD_ADD_THUMB_EXTENSION);}
+ 	public function setShouldAddThumbExtension ($v)	{$this->putInCustomData(self::SHOULD_ADD_THUMB_EXTENSION, $v);}
 }

@@ -1,4 +1,30 @@
-# Kajam-11.9.0 #
+# Kajam-11.10.0 #
+
+## Add Fairplay DRM Profile ##
+ - Issue Type: Feature
+ - Issue ID: PLAT-5117
+ 
+### Installation ###
+Need to run the following script deployment/base/scripts/installPlugins.php
+#### Configuration ####
+Make sure configurations/plugins.ini has a line for "Fairplay" plugin
+#### Known Issues & Limitations ####
+None.
+#### Deployment scripts ####
+None.
+
+
+## add roles field on widget and set permissions accordingly ##
+ - Issue Type: feature
+ - Issue ID: PLAT-3728
+### Installation ###
+None.
+### Configuration ###
+None.
+#### Known Issues & Limitations ####
+ - we currently do not support passing multiple roles on the Widget object (system wide)
+#### Deployment scripts ####
+ - php deployment/updates/scripts/add_permissions/2016_02_11_add_qna_user_role_and_permissions.php
 
 ## Index cateogry inherited tree once per multirequest ##
 - Issue Type: Bug

@@ -266,7 +266,14 @@ class KalturaFrontController
 			// as part of multirequest - the cached data is a serialized php object
 			// when not part of multirequest - the cached data is the actual response
 			$currentParams['multirequest'] = true;
-			unset($currentParams['format']);
+			if (is_array($currentParams))
+			{
+				unset($currentParams['format']);
+			}
+			else
+			{
+				throw new KalturaAPIException(APIErrors::INTERNAL_SERVERL_ERROR, "Malformed request");
+			}
 							
 			$cache = new KalturaResponseCacher($currentParams);
 			
@@ -629,7 +636,7 @@ class KalturaFrontController
 		}
 	}
 
-	public function serialize($object, $className, $serializerType)
+	public function serialize($object, $className, $serializerType, IResponseProfile $coreResponseProfile = null)
 	{
 		if (!class_exists($className)) {
 			KalturaLog::err("Class [$className] was not found!");
@@ -637,17 +644,24 @@ class KalturaFrontController
 		}
 		
 		$apiObject = null;
+		$responseProfile = null;
+		
+		if($coreResponseProfile)
+		{
+			$responseProfile = KalturaBaseResponseProfile::getInstance($coreResponseProfile);
+		}
+			
 		// if KalturaBaseEntry, KalturaCuePoint, KalturaAsset
 		if (is_subclass_of($className, 'IApiObjectFactory')) 
 		{
-			$apiObject = $className::getInstance($object);
+			$apiObject = $className::getInstance($object, $responseProfile);
 		}		
 
 		// if KalturaObject
 		elseif (is_subclass_of($className, 'IApiObject')) 
 		{
 			$apiObject = new $className();
-			$apiObject->fromObject($object);
+			$apiObject->fromObject($object, $responseProfile);
 		}
 		
 		// return serialized object according to required type

@@ -101,13 +101,32 @@ class KalturaWidget extends KalturaObject implements IFilterable
 	 * Addes the HTML5 script line to the widget's embed code
 	 * @var bool
 	 */
-	
 	public $addEmbedHtml5Support = false;
-	
+
+	/**
+	 * @var string
+	 * @requiresPermission insert,update
+	 */
+	public $roles;
+
 	private static $map_between_objects = array
 	(
-		"id" , "sourceWidgetId" , "rootWidgetId" , "partnerId" , "entryId" , "uiConfId" , "widgetHTML" , 
-		"securityType" , "securityPolicy" , "createdAt" , "updatedAt" , "partnerData", "enforceEntitlement", "privacyContext", "addEmbedHtml5Support",
+		"id",
+		"sourceWidgetId",
+		"rootWidgetId",
+		"partnerId",
+		"entryId",
+		"uiConfId",
+		"widgetHTML",
+		"securityType",
+		"securityPolicy",
+		"createdAt",
+		"updatedAt",
+		"partnerData",
+		"enforceEntitlement",
+		"privacyContext",
+		"addEmbedHtml5Support",
+		"roles"
 	);
 
 	public function getMapBetweenObjects ( )
@@ -115,13 +134,20 @@ class KalturaWidget extends KalturaObject implements IFilterable
 		return array_merge ( parent::getMapBetweenObjects() , self::$map_between_objects );
 	}
 
-	public function toWidget () 
+	public function toInsertableWidget ()
 	{
-		$user = new widget();
+		$widget = new widget();
 		$skip_props = array ( "widgetHTML" );
-		return parent::toObject( $user , $skip_props );
+		return parent::toInsertableObject( $widget , $skip_props );
 	}
-	
+
+	public function toUpdatableWidget ()
+	{
+		$widget = new widget();
+		$skip_props = array ( "widgetHTML" );
+		return parent::toUpdatableObject( $widget , $skip_props );
+	}
+
 	public function getExtraFilters()
 	{ 
 		return array();		

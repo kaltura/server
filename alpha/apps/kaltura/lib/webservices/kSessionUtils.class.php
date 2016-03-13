@@ -574,7 +574,12 @@ class ks extends kSessionBase
 		return null;
 	}
 	
-	public function getSetRole()
+	public function getLimitEntry()
+	{
+		return $this->getPrivilegeValue(self::PRIVILEGE_LIMIT_ENTRY, null);
+	}
+
+	public function getRole()
 	{
 		// break all privileges to their pairs - this is to support same "multi-priv" method expected for
 		// edit privilege (edit:XX,edit:YYY,...)

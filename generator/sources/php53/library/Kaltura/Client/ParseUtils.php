@@ -76,19 +76,4 @@ class ParseUtils
 		return $ret;
 	}
 
-	public static function checkIfError(\SimpleXMLElement $xml, $throwException = true) 
-	{
-		if(($xml->error) && (count($xml->children()) == 1))
-		{
-			$code = "{$xml->error->code}";
-			$message = "{$xml->error->message}";
-			$arguments = self::unmarshalArray($xml->error->args, 'KalturaApiExceptionArg');
-			if($throwException)
-				throw new ApiException($message, $code, $arguments);
-			else 
-				return new ApiException($message, $code, $arguments);
-		}
-		return null;
-	}
-	
 }

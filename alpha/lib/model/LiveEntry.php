@@ -327,6 +327,7 @@ abstract class LiveEntry extends entry
 						$primaryMediaServer = $kMediaServer->getMediaServer();
 						$primaryApplicationName = $kMediaServer->getApplicationName();
 						unset($kMediaServers[$key]);
+						break;
 					}
 				}
 			}
