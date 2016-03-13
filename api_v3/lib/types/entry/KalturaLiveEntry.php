@@ -198,6 +198,10 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 	
 	protected function validatePropertyChanged($sourceObject, $attr)
 	{
+		$attr = $this->getObjectPropertyName($attr);
+		if(!$attr)
+			throw new KalturaAPIException(KalturaErrors::PROPERTY_IS_NOT_DEFINED, $attr, get_class($this));
+		
 		/* @var $sourceObject LiveEntry */
 		$getter = "get" . ucfirst($attr);
 		if($sourceObject->$getter() !== $this->$attr && $sourceObject->getLiveStatus() !== LiveEntryStatus::STOPPED)
