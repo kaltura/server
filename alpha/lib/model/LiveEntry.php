@@ -14,6 +14,7 @@ abstract class LiveEntry extends entry
 	const DEFAULT_CACHE_EXPIRY = 120;
 	
 	const CUSTOM_DATA_NAMESPACE_MEDIA_SERVERS = 'mediaServers';
+	const CUSTOM_DATA_RECORD_STATUS = 'record_status';
 	
 	static $kalturaLiveSourceTypes = array(EntrySourceType::LIVE_STREAM, EntrySourceType::LIVE_CHANNEL, EntrySourceType::LIVE_STREAM_ONTEXTDATA_CAPTIONS);
 	
@@ -130,7 +131,7 @@ abstract class LiveEntry extends entry
 	 */
 	public function preUpdate(PropelPDO $con = null)
 	{
-		if($this->isColumnModified(entryPeer::CONVERSION_PROFILE_ID))
+		if($this->isColumnModified(entryPeer::CONVERSION_PROFILE_ID) || $this->isCustomDataModified(LiveEntry::CUSTOM_DATA_RECORD_STATUS))
 		{
 			$this->setRecordedEntryId(null);
 			$this->setRedirectEntryId(null);
@@ -226,12 +227,12 @@ abstract class LiveEntry extends entry
 	
 	public function getRecordStatus()
 	{
-		return $this->getFromCustomData("record_status");
+		return $this->getFromCustomData(LiveEntry::CUSTOM_DATA_RECORD_STATUS);
 	}
 	
 	public function setRecordStatus($v)
 	{
-		$this->putInCustomData("record_status", $v);
+		$this->putInCustomData(LiveEntry::CUSTOM_DATA_RECORD_STATUS, $v);
 	}
 	
 	public function getDvrStatus()
