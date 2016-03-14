@@ -543,6 +543,8 @@ class KalturaErrors extends APIErrors
 	
 	const CANNOT_UPDATE_FIELDS_WHILE_ENTRY_BROADCASTING = "CANNOT_UPDATE_FIELDS_WHILE_ENTRY_BROADCASTING;FIELD;Cannot update [@FIELD@] while entry is broadcasting";
 	
+	const CANNOT_UPDATE_FIELDS_RECORDED_ENTRY_STILL_NOT_READY = "CANNOT_UPDATE_FIELDS_RECORDED_ENTRY_STILL_NOT_READY;FIELD;Cannot update [@FIELD@] while all vod entry flavors are not ready";
+	
 	/*
 	 * BaseEntry Service
 	 */
