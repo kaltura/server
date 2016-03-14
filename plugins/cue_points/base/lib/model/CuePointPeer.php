@@ -36,13 +36,6 @@ class CuePointPeer extends BaseCuePointPeer implements IMetadataPeer, IRelatedOb
 		self::$userContentOnly = $contentOnly;
 	}
 
-	private static $showOnlyPublic = true;
-
-	public static function setShowOnlyPublic($showOwnlyPublic)		
-	{		
-		self::$showOnlyPublic = $showOwnlyPublic;		
-	}
-	
 	/* (non-PHPdoc)
 	 * @see BaseCuePointPeer::setDefaultCriteriaFilter()
 	 */
@@ -88,12 +81,9 @@ class CuePointPeer extends BaseCuePointPeer implements IMetadataPeer, IRelatedOb
 			}
 			else if (!$puserId)
 			{
-				if (self::$showOnlyPublic)
-				{
-					$criterionIsPublic = $c->getNewCriterion (self::IS_PUBLIC, true, Criteria::EQUAL);
-					$criterionIsPublic->addTag(KalturaCriterion::TAG_USER_SESSION);
-					$c->add($criterionIsPublic);					
-				}		
+				$criterionIsPublic = $c->getNewCriterion (self::IS_PUBLIC, true, Criteria::EQUAL);
+				$criterionIsPublic->addTag(KalturaCriterion::TAG_WIDGET_SESSION);
+				$c->add($criterionIsPublic);					
  			}
 		}
 		
