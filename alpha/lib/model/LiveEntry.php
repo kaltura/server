@@ -14,8 +14,12 @@ abstract class LiveEntry extends entry
 	const DEFAULT_CACHE_EXPIRY = 120;
 	
 	const CUSTOM_DATA_NAMESPACE_MEDIA_SERVERS = 'mediaServers';
+	const CUSTOM_DATA_RECORD_STATUS = 'record_status';
+	const CUSTOM_DATA_RECORD_OPTIONS = 'recording_options';
 	
 	static $kalturaLiveSourceTypes = array(EntrySourceType::LIVE_STREAM, EntrySourceType::LIVE_CHANNEL, EntrySourceType::LIVE_STREAM_ONTEXTDATA_CAPTIONS);
+	
+	protected $decidingLiveProfile = false;
 	
 	/* (non-PHPdoc)
 	 * @see entry::getLocalThumbFilePath()
@@ -121,7 +125,23 @@ abstract class LiveEntry extends entry
 		return parent::generateFileName($sub_type, $version);
 	}
 	
-	protected $decidingLiveProfile = false;
+	/**
+	 * Code to be run before updating the object in database
+	 * @param PropelPDO $con
+	 * @return bloolean
+	 */
+	public function preUpdate(PropelPDO $con = null)
+	{
+		if($this->isColumnModified(entryPeer::CONVERSION_PROFILE_ID) || $this->isCustomDataModified(LiveEntry::CUSTOM_DATA_RECORD_STATUS)
+				|| $this->isCustomDataModified(LiveEntry::CUSTOM_DATA_RECORD_OPTIONS))
+		{
+			$this->setRecordedEntryId(null);
+			$this->setRedirectEntryId(null);
+			$this->setCustomDataObj();
+		}
+		
+		return parent::preUpdate($con);
+	}
 	
 	/* (non-PHPdoc)
 	 * @see Baseentry::postUpdate()
@@ -131,7 +151,7 @@ abstract class LiveEntry extends entry
 		if ($this->alreadyInSave)
 			return parent::postUpdate($con);
 			
-		if(!$this->decidingLiveProfile && $this->conversion_profile_id && isset($this->oldCustomDataValues[LiveEntry::CUSTOM_DATA_NAMESPACE_MEDIA_SERVERS]))
+		if((!$this->decidingLiveProfile && $this->conversion_profile_id && isset($this->oldCustomDataValues[LiveEntry::CUSTOM_DATA_NAMESPACE_MEDIA_SERVERS])) || $this->isColumnModified(entryPeer::CONVERSION_PROFILE_ID))
 		{
 			$this->decidingLiveProfile = true;
 			kBusinessConvertDL::decideLiveProfile($this);
@@ -209,12 +229,12 @@ abstract class LiveEntry extends entry
 	
 	public function getRecordStatus()
 	{
-		return $this->getFromCustomData("record_status");
+		return $this->getFromCustomData(LiveEntry::CUSTOM_DATA_RECORD_STATUS);
 	}
 	
 	public function setRecordStatus($v)
 	{
-		$this->putInCustomData("record_status", $v);
+		$this->putInCustomData(LiveEntry::CUSTOM_DATA_RECORD_STATUS, $v);
 	}
 	
 	public function getDvrStatus()
@@ -824,12 +844,12 @@ abstract class LiveEntry extends entry
 	
 	public function setRecordingOptions(kLiveEntryRecordingOptions $recordingOptions)
 	{
-		$this->putInCustomData("recording_options", serialize($recordingOptions));
+		$this->putInCustomData(LiveEntry::CUSTOM_DATA_RECORD_OPTIONS, serialize($recordingOptions));
 	}
 	
 	public function getRecordingOptions()
 	{
-		$recordingOptions = $this->getFromCustomData("recording_options");
+		$recordingOptions = $this->getFromCustomData(LiveEntry::CUSTOM_DATA_RECORD_OPTIONS);
 		
 		if($recordingOptions)
 			$recordingOptions = unserialize($recordingOptions);
