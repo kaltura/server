@@ -72,16 +72,20 @@ class KAsyncClearCuePoints extends KPeriodicWorker
 		
 		$cuePoints = $cuePointPlugin->cuePoint->listAction($cuePointFilter, $pager);
 
-		self::impersonate($entry->partnerId);
-		while (count($cuePoints->objects))
+		if(!$cuePoints->objects)
 		{
-			self::$kClient->startMultiRequest();
-			foreach ($cuePoints->objects as $cuePoint)
-			{
-				$cuePointPlugin->cuePoint->updateStatus($cuePoint->id, KalturaCuePointStatus::HANDLED);
-			}
-			self::$kClient->doMultiRequest();
+			KalturaLog::debug("No cue points found for entry [{$entry->id}] continue to next live entry");
+			return;
 		}
+
+		//Clear Max 100 cue points each run on each live entry to avoid massive old cue points updates
+		self::impersonate($entry->partnerId);
+		self::$kClient->startMultiRequest();
+		foreach ($cuePoints->objects as $cuePoint)
+		{
+			$cuePointPlugin->cuePoint->updateStatus($cuePoint->id, KalturaCuePointStatus::HANDLED);
+		}
+		self::$kClient->doMultiRequest();
 		self::unimpersonate();
 	}
 }

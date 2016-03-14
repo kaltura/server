@@ -53,7 +53,8 @@ class kEventCuePointConsumer implements kObjectChangedEventConsumer
 	*/
 	public function shouldConsumeChangedEvent(BaseObject $object, array $modifiedColumns)
 	{
-		//These cue point are not used by any of our applications or by our internal logic so until we are sure it is safe to remove the entrie class I will return false to not consum these event
+		//These cue point are not used by any of our applications or by our internal logic 
+		// so until we are sure it is safe to remove the entrie class I will return false to not consum these event
 		return false;
 		
 		if(($object instanceof LiveEntry) && 

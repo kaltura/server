@@ -328,9 +328,7 @@ class CuePointService extends KalturaBaseService
 	 * @action updateStatus
 	 * @param string $id
 	 * @param KalturaCuePointStatus $status
-	 * @return KalturaCuePoint
-	 *
-	 * @throws KalturaErrors::C
+	 * @throws KalturaCuePointErrors::INVALID_CUE_POINT_ID
 	 */
 	function updateStatusAction($id, $status)
 	{
