@@ -1,4 +1,4 @@
-/*! KMC - v6.0.11 - 2016-02-29
+/*! KMC - v6.0.11 - 2016-03-14
 * https://github.com/kaltura/KMC_V2
 * Copyright (c) 2016 Amir Chervinsky; Licensed GNU */
 /**
@@ -4484,6 +4484,9 @@ kmc.preview_embed = {
 					// sort players list by HTML5 lib version (descending)
 					for (var i = 0; i < data.length; i++){
 						var player = data[i];
+						if (!player.html5Url){
+							continue;
+						}
 						var version = player.html5Url.substr(player.html5Url.indexOf("/v")+2,5);
 						var major = parseInt(version[0]);
 						var minor = parseInt(version.split(".")[1]);
