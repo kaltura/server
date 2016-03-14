@@ -1,3 +1,33 @@
+# Kajam-11.11.0 #
+
+## Clear live entry old cue-points ##
+ - Issue Type: Bug
+ - Issue ID: PLAT-5161
+ 
+### Installation ###
+None.
+ 
+### Configuration ###
+		Added the following to batch.ini file:
+		- enabledWorkers.KAsyncClearCuePoints = 1
+		
+		- [KAsyncClearCuePoints : PeriodicWorker]
+		  id = LAST_USED_ID + 10
+		  friendlyName = Clear old cue points from live entry
+		  type = KAsyncClearCuePoints
+		  scriptPath = ../plugins/cue_points/base/batch/clearCuePonts/KAsyncClearCuePointsExe.php
+		  filter.KalturaCuePointFilter.cuePointTypeIn = "thumbCuePoint.Thumb,adCuePoint.Ad,codeCuePoint.Code"
+		  filter.KalturaCuePointFilter.orderBy = "+createdAt"
+		  filter.KalturaCuePointFilter.createdAtLessThanOrEqual = "-86400"
+		  filter.KalturaCuePointFilter.statusEqual = 1
+
+#### Known Issues & Limitations ####
+- None.
+
+#### Deployment scripts ####
+ - php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2016_02_29_batch_cue_point.php
+
+
 # Kajam-11.10.0 #
 
 ## Add Fairplay DRM Profile ##
