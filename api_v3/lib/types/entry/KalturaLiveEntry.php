@@ -258,10 +258,10 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 		
 		if($hasObjectChanged)
 		{
-			$this->validateRecordingDone($sourceObject, "recordingOptions");
-			
 			if( $sourceObject->getLiveStatus() !== LiveEntryStatus::STOPPED )
 				throw new KalturaAPIException(KalturaErrors::CANNOT_UPDATE_FIELDS_WHILE_ENTRY_BROADCASTING, "recordingOptions");
+			
+			$this->validateRecordingDone($sourceObject, "recordingOptions");
 		}
 	}
 }
