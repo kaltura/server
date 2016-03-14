@@ -807,7 +807,7 @@ class myReportsMgr
 				
 				if ( $report_type == self::REPORT_TYPE_CONTENT_CONTRIBUTIONS )
 				{
-					$obj_ids_clause = "en.entry_media_source_id in ( $object_ids_str)";
+					$obj_ids_clause = "ev.entry_media_source_id in ( $object_ids_str)";
 				}
 				else if ( $report_type == self::REPORT_TYPE_TOP_SYNDICATION )
 				{
