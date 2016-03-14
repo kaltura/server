@@ -21,6 +21,7 @@ class UserEntryService extends KalturaBaseService {
 	 */
 	public function addAction(KalturaUserEntry $userEntry)
 	{
+		kApiCache::disableCache();
 		$dbUserEntry = $userEntry->toInsertableObject(null, array('type'));
 		$dbUserEntry->save();
 
