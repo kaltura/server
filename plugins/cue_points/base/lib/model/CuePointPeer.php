@@ -147,13 +147,10 @@ class CuePointPeer extends BaseCuePointPeer implements IMetadataPeer, IRelatedOb
 	
 	public static function retrieveByPK($pk, PropelPDO $con = null)
 	{
-		KalturaCriterion::disableTags(array(KalturaCriterion::TAG_USER_SESSION));
-		KalturaCriterion::disableTags(array(KalturaCriterion::TAG_WIDGET_SESSION));
+		KalturaCriterion::disableTags(array(KalturaCriterion::TAG_USER_SESSION,KalturaCriterion::TAG_WIDGET_SESSION));
 		$res = parent::retrieveByPK($pk, $con);
-		KalturaCriterion::restoreTags(array(KalturaCriterion::TAG_USER_SESSION));
-		KalturaCriterion::restoreTags(array(KalturaCriterion::TAG_WIDGET_SESSION));
-		
-	
+		KalturaCriterion::restoreTags(array(KalturaCriterion::TAG_USER_SESSION,KalturaCriterion::TAG_WIDGET_SESSION));
+
 		return $res;
 	}
 	
