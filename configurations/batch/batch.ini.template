@@ -62,6 +62,7 @@ enabledWorkers.KAsyncSyncCategoryPrivacyContext		= 1
 enabledWorkers.KAsyncTagIndex						= 1
 enabledWorkers.KAsyncIntegrate						= 1
 enabledWorkers.KAsyncIntegrateCloser				= 1
+enabledWorkers.KAsyncClearCuePoints					= 1
 
 
 [mainTemplate : template]
@@ -747,4 +748,13 @@ friendlyName										= Recalculate Cache
 type												= KAsyncRecalculateCache
 scriptPath											= batches/Cache/KAsyncRecalculateCacheExe.php
 
+[KAsyncClearCuePoints : PeriodicWorker]
+id																	= 620
+friendlyName                                        				= Clear old cue points from live entry
+type                                                				= KAsyncClearCuePoints
+scriptPath                                          				= ../plugins/cue_points/base/batch/clearCuePonts/KAsyncClearCuePointsExe.php
+filter.KalturaCuePointFilter.cuePointTypeIn							= "thumbCuePoint.Thumb,adCuePoint.Ad,codeCuePoint.Code"
+filter.KalturaCuePointFilter.orderBy								= "+createdAt"
+filter.KalturaCuePointFilter.createdAtLessThanOrEqual				= "-86400"
+filter.KalturaCuePointFilter.statusEqual							= 1
 
