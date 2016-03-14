@@ -6,19 +6,24 @@
 class KOperationEngineThumbAssetsGenerator extends KOperationEngineDocument
 {
 	const IMAGES_LIST_XML_NAME = 'imagesList.xml';
+	private $realInFilePath;
 
 	public function operate(kOperator $operator = null, $inFilePath, $configFilePath = null)
 	{
-		KalturaLog::info('In KOperationEngineGenerateThumbs');
+		$this->realInFilePath = realpath($inFilePath);
 		$this->generateThumbAssets($this->parseImagesListXML());
+
+		if ( $this->data ) { //no output files to copy
+			$this->data->destFileSyncLocalPath = null;
+			$this->data->logFileSyncLocalPath = null;
+		}
 
 		return true;
 	}
 
 	private function parseImagesListXML(){
 		$imagesList = array();
-		$imagesXml = simplexml_load_file($this->inFilePath . DIRECTORY_SEPARATOR . self::IMAGES_LIST_XML_NAME);
-
+		$imagesXml = new SimpleXMLElement(file_get_contents($this->realInFilePath . DIRECTORY_SEPARATOR . self::IMAGES_LIST_XML_NAME));
 		foreach ($imagesXml->item as $item) {
 			$imagesList[] = (string)$item->name;
 		}
@@ -28,14 +33,21 @@ class KOperationEngineThumbAssetsGenerator extends KOperationEngineDocument
 
 	private function generateThumbAssets($imagesList)
 	{
+		if ( !$imagesList || count($imagesList)==0 )
+		{
+			KalturaLog::info('no slides, cannot generate thumb cue points');
+			return;
+		}
+
 		KBatchBase::impersonate($this->job->partnerId);
 		$entry = KBatchBase::$kClient->baseEntry->get($this->job->entryId);
 		KBatchBase::unimpersonate();
 		if ( !$entry || !$entry->parentEntryId ) {
-			KalturaLog::info('no parentEntryId, cannot generate thumbAssets');
+			KalturaLog::info('no parentEntryId, cannot generate thumb cue points');
 			return;
 		}
-		KalturaLog::debug("start generate thumbassets");
+
+		KBatchBase::impersonate($this->job->partnerId);
 		KBatchBase::$kClient->startMultiRequest();
 		$index = 0;
 		foreach ($imagesList as $image) {
@@ -51,10 +63,11 @@ class KOperationEngineThumbAssetsGenerator extends KOperationEngineDocument
 			$index++;
 
 			$resource = new KalturaServerFileResource();
-			$resource->localFilePath = $this->inFilePath . DIRECTORY_SEPARATOR . $image;
+			$resource->localFilePath = $this->realInFilePath . DIRECTORY_SEPARATOR . $image;
 			KBatchBase::$kClient->thumbAsset->setContent("{" . $index . ":result:id}", $resource);
 			$index++;
 		}
 		KBatchBase::$kClient->doMultiRequest();
+		KBatchBase::unimpersonate();
 	}
 }
