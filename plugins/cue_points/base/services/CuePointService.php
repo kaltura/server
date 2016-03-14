@@ -44,6 +44,12 @@ class CuePointService extends KalturaBaseService
 			CuePointPeer::setUserContentOnly(true);
 		}
 		
+//		if (!kCurrentContext::$ks_uid)
+		if (!$this->getKs() || $this->getKs()->isAnonymousSession())
+		{
+			KalturaCriterion::enableTag(KalturaCriterion::TAG_WIDGET_SESSION);
+		}
+		
 		if(!CuePointPlugin::isAllowedPartner($this->getPartnerId()))
 			throw new KalturaAPIException(KalturaErrors::FEATURE_FORBIDDEN, CuePointPlugin::PLUGIN_NAME);
 	}

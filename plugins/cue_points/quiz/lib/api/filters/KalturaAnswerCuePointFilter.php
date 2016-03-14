@@ -18,10 +18,6 @@ class KalturaAnswerCuePointFilter extends KalturaAnswerCuePointBaseFilter
 	 */
 	public function getTypeListResponse(KalturaFilterPager $pager, KalturaDetachedResponseProfile $responseProfile = null, $type = null)
 	{
-		if (!kCurrentContext::$ks_uid)
-		{
-			KalturaCriterion::enableTag(KalturaCriterion::TAG_WIDGET_SESSION);
-		}
 		if ($this->quizUserEntryIdIn || $this->quizUserEntryIdEqual)
 		{
 			KalturaCriterion::disableTag(KalturaCriterion::TAG_WIDGET_SESSION);
