@@ -783,21 +783,21 @@ class kApiCache extends kApiCacheBase
 
 		if(!$ks->isAdmin() && ($ks->user === "0" || $ks->user === null ))
 		{
-			if (!$ks->getPrivileges())
-			{
+			$privileges = $ks->getParsedPrivileges();
+			if (!$privileges)
 				return true;
-			}
+
 			if (kConf::hasParam('anonymous_roles_to_cache'))
 			{
-				$privileges = kSessionBase::parsePrivileges($ks->getPrivileges());
-				$ksRoles=$privileges[kSessionBase::PRIVILEGE_SET_ROLE];
+				$ksRoles = $privileges[kSessionBase::PRIVILEGE_SET_ROLE];
 				$rolesToCacheList = kConf::get('anonymous_roles_to_cache');
-				foreach ($rolesToCacheList as $roleKey=>$roleValue)
+				foreach ($rolesToCacheList as $roleKey => $roleValue)
 				{
 					if (in_array($roleKey, $ksRoles))
 						return true;
 				}
 			}
+
 			return false;
 		}
 
