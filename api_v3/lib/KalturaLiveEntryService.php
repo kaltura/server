@@ -456,13 +456,17 @@ class KalturaLiveEntryService extends KalturaEntryService
 				$this->addTrackEntryData($dbLiveEntryServerNode, __FUNCTION__);
 				$dbLiveEntryServerNode->delete();
 				$dbLiveEntry->setLastBroadcastEndTime(kApiCache::getTime());
-			} else {
+			} 
+			else 
+			{
 				$allDeleted = false;
 			}
-
 		}
-		if ($allDeleted)
+		
+		if ($allDeleted) 
+		{
 			$dbLiveEntry->unsetMediaServer();
+		}
 
 		$dbLiveEntry->save();
 

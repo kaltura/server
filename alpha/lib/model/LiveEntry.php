@@ -136,7 +136,12 @@ abstract class LiveEntry extends entry
 			$this->decidingLiveProfile = true;
 			kBusinessConvertDL::decideLiveProfile($this);
 		}
-			
+		
+		if($this->isColumnModified(entryPeer::STATUS) && $this->getStatus() == entryStatus::DELETED && $this->getLiveStatus() !== EntryServerNodeStatus::STOPPED)
+		{
+			EntryServerNodePeer::deleteByEntryId($this->getId());
+		}
+		
 		return parent::postUpdate($con);
 	}
 	
@@ -700,7 +705,7 @@ abstract class LiveEntry extends entry
 		/* @var $dbLiveEntryServerNode LiveEntryServerNode */
 		foreach($dbLiveEntryServerNodes as $dbLiveEntryServerNode)
 		{
-			if (! $this->isCacheValid($dbLiveEntryServerNode))
+			if (!$this->isCacheValid($dbLiveEntryServerNode))
 			{
 				KalturaLog::info("Removing media server id".$dbLiveEntryServerNode->getServerNodeId());
 				$dbLiveEntryServerNode->delete();
@@ -708,23 +713,18 @@ abstract class LiveEntry extends entry
 		}
 	}
 
-	public function getLiveStatus ($mediaServerIndex = null)
+	public function getLiveStatus()
 	{
-		if (!$mediaServerIndex){
-			/* @var $entryServerNode EntryServerNode */
-			$entryServerNode = EntryServerNodePeer::retrieveByEntryIdAndServerType($this->getId(), $mediaServerIndex);
-			if ($entryServerNode)
-				return $entryServerNode->getStatus();
-		}
-
-		$maxStatus = EntryServerNodeStatus::STOPPED;
 		$entryServerNodes = EntryServerNodePeer::retrieveByEntryId($this->getId());
+		
+		$status = EntryServerNodeStatus::STOPPED;
 		foreach ($entryServerNodes as $entryServerNode)
 		{
 			/* @var $entryServerNode EntryServerNode */
-			$maxStatus = self::maxLiveEntryStatus($maxStatus, $entryServerNode->getStatus());
+			$status = self::maxLiveEntryStatus($status, $entryServerNode->getStatus());
 		}
-		return $maxStatus;
+		
+		return $status;
 	}
 
 	public function setLiveStatus ($v, $mediaServerIndex)
