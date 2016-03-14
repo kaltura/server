@@ -204,7 +204,7 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 		
 		/* @var $sourceObject LiveEntry */
 		$getter = "get" . ucfirst($attr);
-		if($sourceObject->$getter() !== $this->$attr && $sourceObject->getLiveStatus() !== LiveEntryStatus::STOPPED)
+		if($sourceObject->$getter() !== $this->$attr && $sourceObject->getLiveStatus() !== KalturaLiveEntryStatus::STOPPED)
 		{
 			throw new KalturaAPIException(KalturaErrors::CANNOT_UPDATE_FIELDS_WHILE_ENTRY_BROADCASTING, $attr);
 		}
@@ -258,7 +258,7 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 		
 		if($hasObjectChanged)
 		{
-			if( $sourceObject->getLiveStatus() !== LiveEntryStatus::STOPPED )
+			if( $sourceObject->getLiveStatus() !== KalturaLiveEntryStatus::STOPPED)
 				throw new KalturaAPIException(KalturaErrors::CANNOT_UPDATE_FIELDS_WHILE_ENTRY_BROADCASTING, "recordingOptions");
 			
 			$this->validateRecordingDone($sourceObject, "recordingOptions");
