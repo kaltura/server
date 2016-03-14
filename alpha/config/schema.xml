@@ -2130,4 +2130,19 @@
 		<column name="token" type="longvarchar"/>
 		<column name="custom_data" type="longvarchar"/>
 	</table>
+    <table skipSql="false" abstract="false" name="entry_server_node">
+        <column primaryKey="true" required="true" autoIncrement="true" lazyLoad="false" name="id" type="bigint" size="20"/>
+        <column name="entry_id" type="varchar" size="20" required="true" />
+        <column name="server_node_id" type="integer" />
+        <column name="partner_id" type="integer" />
+        <column name="created_at" type="timestamp" />
+        <column name="updated_at" type="timestamp" />
+        <column name="status" type="integer" />
+        <column name="server_type" type="integer" required="true" />
+        <column name="custom_data" type="longvarchar" />
+        <index name="entry_server_type">
+            <index-column name="entry_id" />
+            <index-column name="server_type" />
+        </index>
+    </table>
 </database>

@@ -54,7 +54,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 	 * @action appendRecording
 	 * @param string $entryId Live entry id
 	 * @param string $assetId Live asset id
-	 * @param KalturaMediaServerIndex $mediaServerIndex
+	 * @param KalturaEntryServerNodeType $mediaServerIndex
 	 * @param KalturaDataCenterContentResource $resource
 	 * @param float $duration in seconds
 	 * @param bool $isLastChunk Is this the last recorded chunk in the current session (i.e. following a stream stop event)
@@ -119,7 +119,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 			chmod($filename, 0640);
 		}
 
-		if($dbAsset->hasTag(assetParams::TAG_RECORDING_ANCHOR) && $mediaServerIndex == KalturaMediaServerIndex::PRIMARY)
+		if($dbAsset->hasTag(assetParams::TAG_RECORDING_ANCHOR) && $mediaServerIndex == EntryServerNodeType::LIVE_PRIMARY)
 		{
 			$dbEntry->setLengthInMsecs($currentDuration);
 
@@ -134,7 +134,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 
 		kJobsManager::addConvertLiveSegmentJob(null, $dbAsset, $mediaServerIndex, $filename, $currentDuration);
 
-		if($mediaServerIndex == KalturaMediaServerIndex::PRIMARY)
+		if($mediaServerIndex ==EntryServerNodeType::LIVE_PRIMARY)
 		{
 			if(!$dbEntry->getRecordedEntryId())
 			{
@@ -205,69 +205,64 @@ class KalturaLiveEntryService extends KalturaEntryService
 	 * @action registerMediaServer
 	 * @param string $entryId Live entry id
 	 * @param string $hostname Media server host name
-	 * @param KalturaMediaServerIndex $mediaServerIndex Media server index primary / secondary
+	 * @param KalturaEntryServerNodeType $mediaServerIndex Media server index primary / secondary
 	 * @param string $applicationName the application to which entry is being broadcast
-	 * @param KalturaLiveEntryStatus $liveEntryStatus the new status KalturaLiveEntryStatus::PLAYABLE | KalturaLiveEntryStatus::BROADCASTING
+	 * @param KalturaEntryServerNodeStatus $liveEntryStatus the status KalturaEntryServerNodeStatus::PLAYABLE | KalturaEntryServerNodeStatus::BROADCASTING
 	 * @return KalturaLiveEntry The updated live entry
 	 *
 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
-	 * @throws KalturaErrors::MEDIA_SERVER_NOT_FOUND
+	 * @throws KalturaErrors::SERVER_NODE_NOT_FOUND
+	 * @throws KalturaErrors::ENTRY_SERVER_NODE_MULTI_RESULT
 	 */
-	function registerMediaServerAction($entryId, $hostname, $mediaServerIndex, $applicationName = null, $liveEntryStatus = KalturaLiveEntryStatus::PLAYABLE)
+	function registerMediaServerAction($entryId, $hostname, $mediaServerIndex, $applicationName = null, $liveEntryStatus = KalturaEntryServerNodeStatus::PLAYABLE)
 	{
-		$this->dumpApiRequest($entryId);
 		KalturaLog::debug("Entry [$entryId] from mediaServerIndex [$mediaServerIndex] with liveEntryStatus [$liveEntryStatus]");
 
-		$dbEntry = entryPeer::retrieveByPK($entryId);
-		if (!$dbEntry || !($dbEntry instanceof LiveEntry))
+		/* @var $dbLiveEntry LiveEntry*/
+		$dbLiveEntry = entryPeer::retrieveByPK($entryId);
+		if (!$dbLiveEntry || !($dbLiveEntry instanceof LiveEntry))
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 
-		try {
-			if ($liveEntryStatus == KalturaLiveEntryStatus::BROADCASTING){
-				$dbEntry->setLiveStatus(KalturaLiveEntryStatus::BROADCASTING, $mediaServerIndex);
-			}
-			else {
-				$dbEntry->setMediaServer($mediaServerIndex, $hostname, $applicationName);
-			}
-		}
-		catch(kCoreException $ex)
-		{
-			$code = $ex->getCode();
-			switch($code)
-			{
-				case kCoreException::MEDIA_SERVER_NOT_FOUND :
-					throw new KalturaAPIException(KalturaErrors::MEDIA_SERVER_NOT_FOUND, $hostname);
-				default:
-					throw $ex;
-			}
+		$liveEntryServerNode = $this->getLiveEntryServerNode($dbLiveEntry, $hostname, $mediaServerIndex);
+
+		if ($liveEntryStatus != KalturaEntryServerNodeStatus::BROADCASTING){
+			$this->setMediaServerWrapper($dbLiveEntry, $mediaServerIndex, $hostname, $liveEntryStatus);
 		}
 
+		if ($liveEntryServerNode->getStatus() != $liveEntryStatus ||
+			$liveEntryServerNode->getServerType() != $mediaServerIndex)
+		{
+			$liveEntryServerNode->setStatus($liveEntryStatus);
+			$liveEntryServerNode->setServerType($mediaServerIndex);
+		}
 		// setRedirectEntryId to null in all cases, even for broadcasting...
-		$dbEntry->setRedirectEntryId(null);
+		$dbLiveEntry->setRedirectEntryId(null);
 
-		if($dbEntry->save())
+		// setMediaServerWrapper
+		if($liveEntryServerNode->save() && $dbLiveEntry->save())
 		{
-			if($mediaServerIndex == MediaServerIndex::PRIMARY && $liveEntryStatus == KalturaLiveEntryStatus::PLAYABLE && $dbEntry->getRecordStatus())
+			$this->addTrackEntryData($liveEntryServerNode, __FUNCTION__);
+			if($mediaServerIndex == EntryServerNodeType::LIVE_PRIMARY && $liveEntryStatus == EntryServerNodeStatus::PLAYABLE && $dbLiveEntry->getRecordStatus())
 			{
 				KalturaLog::info("Checking if recorded entry needs to be created for entry $entryId");
 				$createRecordedEntry = false;
-				if(!$dbEntry->getRecordedEntryId())
+				if(!$dbLiveEntry->getRecordedEntryId())
 				{
 					$createRecordedEntry = true;
 					KalturaLog::info("Creating a new recorded entry for $entryId ");
 				}
 				else {
-					$dbRecordedEntry = entryPeer::retrieveByPK($dbEntry->getRecordedEntryId());
+					$dbRecordedEntry = entryPeer::retrieveByPK($dbLiveEntry->getRecordedEntryId());
 					if (!$dbRecordedEntry) {
 						$createRecordedEntry = true;
 					}
 					else{
 						$recordedEntryCreationTime = $dbRecordedEntry->getCreatedAt(null);
 
-						$isNewSession = $dbEntry->getLastBroadcastEndTime() + kConf::get('live_session_reconnect_timeout', 'local', 180) < $dbEntry->getCurrentBroadcastStartTime();
-						$recordedEntryNotYetCreatedForCurrentSession = $recordedEntryCreationTime < $dbEntry->getCurrentBroadcastStartTime();
+						$isNewSession = $dbLiveEntry->getLastBroadcastEndTime() + kConf::get('live_session_reconnect_timeout', 'local', 180) < $liveEntryServerNode->getCurrentBroadcastingStartTime();
+						$recordedEntryNotYetCreatedForCurrentSession = $recordedEntryCreationTime < $liveEntryServerNode->getCurrentBroadcastingStartTime();
 
-						if ($dbEntry->getRecordStatus() == RecordStatus::PER_SESSION) {
+						if ($dbLiveEntry->getRecordStatus() == RecordStatus::PER_SESSION) {
 							if ($isNewSession && $recordedEntryNotYetCreatedForCurrentSession)
 							{
 								KalturaLog::info("Creating a recorded entry for $entryId ");
@@ -278,18 +273,92 @@ class KalturaLiveEntryService extends KalturaEntryService
 				}
 				
 				if($createRecordedEntry)
-					$this->createRecordedEntry($dbEntry, $mediaServerIndex);
+					$this->createRecordedEntry($dbLiveEntry, $mediaServerIndex);
 			}
 		}
 
-		$entry = KalturaEntryFactory::getInstanceByType($dbEntry->getType());
-		$entry->fromObject($dbEntry, $this->getResponseProfile());
+		$entry = KalturaEntryFactory::getInstanceByType($dbLiveEntry->getType());
+		$entry->fromObject($dbLiveEntry, $this->getResponseProfile());
 		return $entry;
 	}
 
+
+	/**
+	 * Wrapper function for the setMediaServer to handle the exception thrown
+	 * @param LiveEntry $dbEntry
+	 * @param $mediaServerIndex
+	 * @param $hostname
+	 * @throws Exception
+	 * @throws KalturaAPIException
+	 * @throws kCoreException
+	 */
+	private function setMediaServerWrapper($dbEntry ,$mediaServerIndex, $hostname)
+	{
+		try {
+			$dbEntry->setMediaServer($mediaServerIndex, $hostname);
+		}
+		catch(kCoreException $ex)
+		{
+			$code = $ex->getCode();
+			switch($code)
+			{
+				case kCoreException::MEDIA_SERVER_NOT_FOUND :
+					throw new KalturaAPIException(KalturaErrors::MEDIA_SERVER_NOT_FOUND, $hostname);
+				case kCoreException::ENTRY_SERVER_NODE_NOT_FOUND:
+					throw new KalturaAPIException(KalturaErrors::ENTRY_SERVER_NODE_NOT_FOUND, $hostname);
+				default:
+					throw $ex;
+			}
+		}
+	}
+
+	/**
+	 * @param LiveEntry $dbLiveEntry
+	 * @param $hostname
+	 * @param EntryServerNodeType $mediaServerIndex
+	 * @return LiveEntryServerNode
+	 * @throws Exception
+	 * @throws KalturaAPIException
+	 * @throws PropelException
+	 */
+	private function getLiveEntryServerNode($dbLiveEntry, $hostname, $mediaServerIndex)
+	{
+		/* @var LiveEntryServerNode $dbLiveEntryServerNode */
+		$dbLiveEntryServerNode = EntryServerNodePeer::retrieveByEntryIdAndServerType($dbLiveEntry->getId(), $mediaServerIndex);
+		if (!$dbLiveEntryServerNode)
+		{
+			$dbServerNode = ServerNodePeer::retrieveActiveMediaServerNode($hostname);
+			if (!$dbServerNode)
+				throw new KalturaAPIException(KalturaErrors::SERVER_NODE_NOT_FOUND, $hostname);
+
+			$dbLiveEntryServerNode = new LiveEntryServerNode();
+			$dbLiveEntryServerNode->setEntryId($dbLiveEntry->getId());
+			$dbLiveEntryServerNode->setServerType($mediaServerIndex);
+			$dbLiveEntryServerNode->setServerNodeId($dbServerNode->getId());
+			$dbLiveEntryServerNode->setPartnerId($dbLiveEntry->getPartnerId());
+		}
+		return $dbLiveEntryServerNode;
+	}
+
+	/**
+	 * Adds update line at the tracking information
+	 * @param EntryServerNode $dbEntryServerNode
+	 * @param string $functionName
+	 */
+	private function addTrackEntryData(EntryServerNode $dbEntryServerNode, $functionName)
+	{
+		$te = new TrackEntry();
+		$te->setEntryId($dbEntryServerNode->getEntryId());
+		$te->setTrackEventTypeId(TrackEntry::TRACK_ENTRY_EVENT_TYPE_UPDATE_ENTRY);
+		$te->setDescription($functionName."::".$dbEntryServerNode->getServerType().":".$dbEntryServerNode->getServerNodeId());
+		TrackEntry::addTrackEntry($te);
+	}
 	/**
 	 * @param LiveEntry $dbEntry
+	 * @param EntryServerNodeType $mediaServerIndex
 	 * @return entry
+	 * @throws Exception
+	 * @throws PropelException
 	 */
 	private function createRecordedEntry(LiveEntry $dbEntry, $mediaServerIndex)
 	{
@@ -358,40 +427,52 @@ class KalturaLiveEntryService extends KalturaEntryService
 	 * @action unregisterMediaServer
 	 * @param string $entryId Live entry id
 	 * @param string $hostname Media server host name
-	 * @param KalturaMediaServerIndex $mediaServerIndex Media server index primary / secondary
+	 * @param KalturaEntryServerNodeType $mediaServerIndex Media server index primary / secondary
 	 * @return KalturaLiveEntry The updated live entry
 	 *
 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
-	 * @throws KalturaErrors::MEDIA_SERVER_NOT_FOUND
+	 * @throws KalturaErrors::SERVER_NODE_NOT_FOUND
+	 * @throws KalturaErrors::ENTRY_SERVER_NODE_MULTI_RESULT
 	 */
 	function unregisterMediaServerAction($entryId, $hostname, $mediaServerIndex)
 	{
-		$this->dumpApiRequest($entryId);
 		KalturaLog::debug("Entry [$entryId] from mediaServerIndex [$mediaServerIndex] with hostname [$hostname]");
-
-		$dbEntry = entryPeer::retrieveByPK($entryId);
-		if (!$dbEntry || !($dbEntry instanceof LiveEntry))
+		/* @var $dbLiveEntry LiveEntry */
+		$dbLiveEntry = entryPeer::retrieveByPK($entryId);
+		if (!$dbLiveEntry || !($dbLiveEntry instanceof LiveEntry))
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 
-		$dbEntry->unsetMediaServer($mediaServerIndex, $hostname);
+		$dbServerNode = ServerNodePeer::retrieveActiveMediaServerNode($hostname);
+		if (!$dbServerNode)
+			throw new KalturaAPIException(KalturaErrors::SERVER_NODE_NOT_FOUND, $hostname);
 
-		if(!$dbEntry->hasMediaServer() && $dbEntry->getRecordedEntryId())
-		{
-			$dbEntry->setRedirectEntryId($dbEntry->getRecordedEntryId());
-		}
+		$dbLiveEntryServerNodes = EntryServerNodePeer::retrieveByEntryId($entryId);
 
-		if ( count( $dbEntry->getMediaServers() ) == 0 )
+		$allDeleted = true;
+		/* @var $dbLiveEntryServerNode LiveEntryServerNode */
+		foreach ($dbLiveEntryServerNodes as $dbLiveEntryServerNode)
 		{
-			if ( $dbEntry->getCurrentBroadcastStartTime() )
+			if ($dbLiveEntryServerNode->getServerNodeId() == $dbServerNode->getId())
 			{
-				$dbEntry->setCurrentBroadcastStartTime( 0 );
+				$this->addTrackEntryData($dbLiveEntryServerNode, __FUNCTION__);
+				$dbLiveEntryServerNode->delete();
+				$dbLiveEntry->setLastBroadcastEndTime(kApiCache::getTime());
+			} 
+			else 
+			{
+				$allDeleted = false;
 			}
 		}
+		
+		if ($allDeleted) 
+		{
+			$dbLiveEntry->unsetMediaServer();
+		}
 
-		$dbEntry->save();
+		$dbLiveEntry->save();
 
-		$entry = KalturaEntryFactory::getInstanceByType($dbEntry->getType());
-		$entry->fromObject($dbEntry, $this->getResponseProfile());
+		$entry = KalturaEntryFactory::getInstanceByType($dbLiveEntry->getType());
+		$entry->fromObject($dbLiveEntry, $this->getResponseProfile());
 		return $entry;
 	}
 
@@ -401,19 +482,17 @@ class KalturaLiveEntryService extends KalturaEntryService
 	 * @action validateRegisteredMediaServers
 	 * @param string $entryId Live entry id
 	 *
-	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
+	 * @throws KalturaAPIException
 	 */
 	function validateRegisteredMediaServersAction($entryId)
 	{
 		KalturaResponseCacher::disableCache();
-		$this->dumpApiRequest($entryId, false);
 
 		$dbEntry = entryPeer::retrieveByPK($entryId);
 		if (!$dbEntry || !($dbEntry instanceof LiveEntry))
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 
 		/* @var $dbEntry LiveEntry */
-		if($dbEntry->validateMediaServers())
-			$dbEntry->save();
+		$dbEntry->validateMediaServers();
 	}
 }

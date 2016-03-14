@@ -18,7 +18,7 @@ class KalturaConvertLiveSegmentJobData extends KalturaJobData
 	
 	/**
 	 * Primary or secondary media server
-	 * @var KalturaMediaServerIndex
+	 * @var KalturaEntryServerNodeType
 	 */
 	public $mediaServerIndex;
 	
