@@ -783,7 +783,7 @@ class kApiCache extends kApiCacheBase
 
 		if(!$ks->isAdmin() && ($ks->user === "0" || $ks->user === null ))
 		{
-			if (empty($ks->privileges))
+			if (!$ks->getPrivileges())
 			{
 				return true;
 			}
