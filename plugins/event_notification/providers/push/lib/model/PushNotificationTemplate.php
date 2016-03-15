@@ -7,6 +7,7 @@ class PushNotificationTemplate extends EventNotificationTemplate
 {
     const CUSTOM_DATA_API_OBJECT_TYPE = 'apiObjectType';
     const CUSTOM_DATA_OBJECT_FORMAT = 'objectFormat';
+    const CUSTOM_DATA_RESPONSE_PROFILE_ID = 'responseProfileId';
     
     public function __construct()
     {
@@ -54,6 +55,16 @@ class PushNotificationTemplate extends EventNotificationTemplate
         return $this->getFromCustomData(self::CUSTOM_DATA_OBJECT_FORMAT);
     }    
     
+    public function setResponseProfileId($value)
+    {
+        return $this->putInCustomData(self::CUSTOM_DATA_RESPONSE_PROFILE_ID, $value);
+    }
+    
+    public function getResponseProfileId()
+    {
+        return $this->getFromCustomData(self::CUSTOM_DATA_RESPONSE_PROFILE_ID);
+    }    
+    
     public function getQueueKey($contentParameters, $partnerId = null, kScope $scope = null)
     {
         $templateId = $this->getId();
@@ -89,8 +100,14 @@ class PushNotificationTemplate extends EventNotificationTemplate
         // prepare vars as configured by user in admin console
         $objectType = $this->getApiObjectType();
         $format = $this->getObjectFormat();
+        $responseProfile = null;
         
-        return call_user_func(kCurrentContext::$serializeCallback, $object, $objectType, $format);
+        if($this->getResponseProfileId())
+        {
+        	$responseProfile = ResponseProfilePeer::retrieveByPK($this->getResponseProfileId());
+        }
+        
+        return call_user_func(kCurrentContext::$serializeCallback, $object, $objectType, $format, $responseProfile);
     }
     
     public function dispatch(kScope $scope) 

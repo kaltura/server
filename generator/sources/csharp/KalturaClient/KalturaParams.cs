@@ -133,6 +133,23 @@ namespace Kaltura
             this.Add(key, new KalturaParam(value));
         }
 
+        public void Add(string key, bool value)
+        {
+            this.Add(key, new KalturaParam(value));
+        }
+        public void Add(string key, int value)
+        {
+            this.Add(key, new KalturaParam(value));
+        }
+        public void Add(string key, long value)
+        {
+            this.Add(key, new KalturaParam(value));
+        }
+        public void Add(string key, float value)
+        {
+            this.Add(key, new KalturaParam(value));
+        }
+
         public void AddIfNotNull(string key, string value)
         {
             if (value != null)
@@ -142,14 +159,14 @@ namespace Kaltura
         public void AddIfNotNull(string key, int value)
         {
             if (value != int.MinValue)
-                this.Add(key, value.ToString());
+                this.Add(key, value);
         }
 
 
         public void AddIfNotNull(string key, float value)
         {
             if (value != Single.MinValue)
-                this.Add(key, value.ToString());
+                this.Add(key, value);
         }
 
         public void AddIfNotNull(string key, long value)
@@ -172,7 +189,7 @@ namespace Kaltura
         public void AddIfNotNull(string key, bool? value)
         {
             if (value.HasValue)
-                this.Add(key, (value.Value) ? "true" : "false");
+                this.Add(key, value.Value);
         }
 
         public void AddReplace(string key, string value)

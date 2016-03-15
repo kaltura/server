@@ -183,7 +183,7 @@ class Kaltura_Client_ClientBase
 		$this->multiRequestReturnType = null;
 		$this->callsQueue = array();
 	}
-	
+
 	/**
 	 * Call all API service that are in queue
 	 *
@@ -246,7 +246,7 @@ class Kaltura_Client_ClientBase
 		{
 			$error .= ". RC : $errorCode";
 			$this->resetRequest();
-			throw new Kaltura_Client_ClientException($error, Kaltura_Client_ClientException::ERROR_GENERIC);
+			throw $this->getKalturaClientException($error, Kaltura_Client_ClientException::ERROR_GENERIC);
 		}
 		else
 		{
@@ -269,12 +269,12 @@ class Kaltura_Client_ClientBase
 			if ($this->config->format != self::KALTURA_SERVICE_FORMAT_XML)
 			{
 				$this->resetRequest();
-				throw new Kaltura_Client_ClientException("unsupported format: $postResult", Kaltura_Client_ClientException::ERROR_FORMAT_NOT_SUPPORTED);
+				throw $this->getKalturaClientException("unsupported format: $postResult", Kaltura_Client_ClientException::ERROR_FORMAT_NOT_SUPPORTED);
 			}
 		}
 
 		$this->resetRequest();
-		
+
 		$endTime = microtime (true);
 
 		$this->log("execution time for [".$url."]: [" . ($endTime - $startTime) . "]");
@@ -289,7 +289,7 @@ class Kaltura_Client_ClientBase
 	 * @param int $flags
 	 * @return boolean
 	 */
-	protected function ksortRecursive(&$array, $flags = null) 
+	protected function ksortRecursive(&$array, $flags = null)
 	{
 		ksort($array, $flags);
 		foreach($array as &$arr) {
@@ -337,7 +337,7 @@ class Kaltura_Client_ClientBase
 	{
 		$this->responseHeaders = array();
 		$requestHeaders = $this->config->requestHeaders;
-		
+
 		$params = $this->jsonEncode($params);
 		$this->log("curl: $url");
 		$this->log("post: $params");
@@ -345,7 +345,7 @@ class Kaltura_Client_ClientBase
 		{
 			$requestHeaders[] = 'Accept: application/json';
 		}
-		
+
 		$cookies = array();
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_URL, $url);
@@ -380,7 +380,7 @@ class Kaltura_Client_ClientBase
 		if ($this->config->startZendDebuggerSession === true)
 		{
 			$zendDebuggerParams = $this->getZendDebuggerParams($url);
-		 	$cookies = array_merge($cookies, $zendDebuggerParams);
+			$cookies = array_merge($cookies, $zendDebuggerParams);
 		}
 
 		if (count($cookies) > 0)
@@ -437,19 +437,19 @@ class Kaltura_Client_ClientBase
 	private function doPostRequest($url, $params = array(), $files = array())
 	{
 		if (count($files) > 0)
-			throw new Kaltura_Client_ClientException("Uploading files is not supported with stream context http request, please use curl", Kaltura_Client_ClientException::ERROR_UPLOAD_NOT_SUPPORTED);
+			throw $this->getKalturaClientException("Uploading files is not supported with stream context http request, please use curl", Kaltura_Client_ClientException::ERROR_UPLOAD_NOT_SUPPORTED);
 
 		$formattedData = http_build_query($params , "", "&");
 		$params = array('http' => array(
-					"method" => "POST",
-					"User-Agent: " . $this->config->userAgent . "\r\n".
-					"Accept-language: en\r\n".
-					"Content-type: application/x-www-form-urlencoded\r\n",
-					"content" => $formattedData
-				  ));
+			"method" => "POST",
+			"User-Agent: " . $this->config->userAgent . "\r\n".
+			"Accept-language: en\r\n".
+			"Content-type: application/x-www-form-urlencoded\r\n",
+			"content" => $formattedData
+		));
 
 		if (isset($this->config->proxyType) && $this->config->proxyType === 'SOCKS5') {
-			throw new Kaltura_Client_ClientException("Cannot use SOCKS5 without curl installed.", Kaltura_Client_ClientException::ERROR_CONNECTION_FAILED);
+			throw $this->getKalturaClientException("Cannot use SOCKS5 without curl installed.", Kaltura_Client_ClientException::ERROR_CONNECTION_FAILED);
 		}
 		if (isset($this->config->proxyHost)) {
 			$proxyhost = 'tcp://' . $this->config->proxyHost;
@@ -468,11 +468,11 @@ class Kaltura_Client_ClientBase
 		$fp = @fopen($url, 'rb', false, $ctx);
 		if (!$fp) {
 			$phpErrorMsg = "";
-			throw new Kaltura_Client_ClientException("Problem with $url, $phpErrorMsg", Kaltura_Client_ClientException::ERROR_CONNECTION_FAILED);
+			throw $this->getKalturaClientException("Problem with $url, $phpErrorMsg", Kaltura_Client_ClientException::ERROR_CONNECTION_FAILED);
 		}
 		$response = @stream_get_contents($fp);
 		if ($response === false) {
-		   throw new Kaltura_Client_ClientException("Problem reading data from $url, $phpErrorMsg", Kaltura_Client_ClientException::ERROR_READ_FAILED);
+			throw $this->getKalturaClientException("Problem reading data from $url, $phpErrorMsg", Kaltura_Client_ClientException::ERROR_READ_FAILED);
 		}
 		return array($response, 200, '');
 	}
@@ -559,7 +559,7 @@ class Kaltura_Client_ClientBase
 			$params[$paramName] = array(
 				'objectType' => $paramValue->getKalturaObjectType()
 			);
-			
+
 			foreach($paramValue as $prop => $val)
 				$this->addParam($params[$paramName], $prop, $val);
 
@@ -603,7 +603,7 @@ class Kaltura_Client_ClientBase
 				$item = $this->jsObjectToClientObject($item);
 			}
 		}
-		
+
 		if(is_object($value))
 		{
 			if(isset($value->message) && isset($value->code))
@@ -616,14 +616,14 @@ class Kaltura_Client_ClientBase
 					}
 					return (array) $value;
 				}
-				throw new KalturaException($value->message, $value->code, $value->args);
+				throw $this->getKalturaAPIException($value->message, $value->code, $value->args);
 			}
-			
+
 			if(!isset($value->objectType))
 			{
-				throw new Kaltura_Client_ClientException("Response format not supported - objectType is required for all objects", Kaltura_Client_ClientException::ERROR_FORMAT_NOT_SUPPORTED);
+				throw $this->getKalturaClientException("Response format not supported - objectType is required for all objects", Kaltura_Client_ClientException::ERROR_FORMAT_NOT_SUPPORTED);
 			}
-			
+
 			$objectType = $value->objectType;
 			$object = new $objectType();
 			$attributes = get_object_vars($value);
@@ -633,13 +633,13 @@ class Kaltura_Client_ClientBase
 				{
 					continue;
 				}
-				
+
 				$object->$attribute = $this->jsObjectToClientObject($attributeValue);
 			}
-			
+
 			$value = $object;
 		}
-		
+
 		return $value;
 	}
 
@@ -657,10 +657,10 @@ class Kaltura_Client_ClientBase
 	{
 		if(!is_array($object) && !is_object($object))
 			return $object;
-		
+
 		if(is_object($object) && $object instanceof MultiRequestSubResult)
 			return "$object";
-		
+
 		$array = (array) $object;
 		foreach($array as $key => $value)
 		{
@@ -676,10 +676,10 @@ class Kaltura_Client_ClientBase
 
 		if(is_object($object) && $object instanceof Kaltura_Client_ObjectBase)
 			$array['objectType'] = $object->getKalturaObjectType();
-			
+
 		return $array;
 	}
-	
+
 	/**
 	 * Validate the result object and throw exception if its an error
 	 *
@@ -689,10 +689,10 @@ class Kaltura_Client_ClientBase
 	{
 		if ($this->isError($resultObject))
 		{
-			throw new Kaltura_Client_Exception($resultObject["message"], $resultObject["code"], $resultObject["args"]);
+			throw $this->getKalturaAPIException($resultObject["message"], $resultObject["code"], $resultObject["args"]);
 		}
 	}
-	
+
 	/**
 	 * Checks whether the result object is an error
 	 *
@@ -714,7 +714,7 @@ class Kaltura_Client_ClientBase
 		$knownNativeTypes = array("boolean", "integer", "double", "string");
 		if (is_null($resultObject) ||
 			( in_array(gettype($resultObject) ,$knownNativeTypes) &&
-			  in_array($objectType, $knownNativeTypes) ) )
+				in_array($objectType, $knownNativeTypes) ) )
 		{
 			return;// we do not check native simple types
 		}
@@ -722,7 +722,7 @@ class Kaltura_Client_ClientBase
 		{
 			if (!($resultObject instanceof $objectType))
 			{
-				throw new Kaltura_Client_ClientException("Invalid object type - not instance of $objectType", Kaltura_Client_ClientException::ERROR_INVALID_OBJECT_TYPE);
+				throw $this->getKalturaClientException("Invalid object type - not instance of $objectType", Kaltura_Client_ClientException::ERROR_INVALID_OBJECT_TYPE);
 			}
 		}
 		else if(class_exists($objectType) && is_subclass_of($objectType, 'Kaltura_Client_EnumBase'))
@@ -731,12 +731,12 @@ class Kaltura_Client_ClientBase
 			$values = array_map('strval', $enum->getConstants());
 			if(!in_array($resultObject, $values))
 			{
-				throw new Kaltura_Client_ClientException("Invalid enum value", Kaltura_Client_ClientException::ERROR_INVALID_ENUM_VALUE);
+				throw $this->getKalturaClientException("Invalid enum value", Kaltura_Client_ClientException::ERROR_INVALID_ENUM_VALUE);
 			}
 		}
 		else if(gettype($resultObject) !== $objectType)
 		{
-			throw new Kaltura_Client_ClientException("Invalid object type", Kaltura_Client_ClientException::ERROR_INVALID_OBJECT_TYPE);
+			throw $this->getKalturaClientException("Invalid object type", Kaltura_Client_ClientException::ERROR_INVALID_OBJECT_TYPE);
 		}
 	}
 
@@ -757,7 +757,7 @@ class Kaltura_Client_ClientBase
 		$ret = array();
 		$i = 0;
 		foreach($items as $item) {
-			$error = Kaltura_Client_ParseUtils::checkIfError($item, false);
+			$error = $this->checkIfError($item, false);
 			if($error)
 				$ret[] = $error;
 			else if($item->objectType)
@@ -906,5 +906,30 @@ class Kaltura_Client_ClientBase
 	public static function getKalturaNullValue()
 	{
 		return KalturaNull::getInstance();
+	}
+
+
+	public function getKalturaAPIException($errorMsg, $errorCode, $args)
+	{
+		return new Kaltura_Client_Exception($errorMsg, $errorCode, $args);
+	}
+
+	public function getKalturaClientException( $error, $errorCode)
+	{
+		return new Kaltura_Client_ClientException($error, $errorCode);
+	}
+
+	public function checkIfError(\SimpleXMLElement $xml, $throwException = true)
+	{
+		if(($xml->error) && (count($xml->children()) == 1))
+		{
+			$code = "{$xml->error->code}";
+			$message = "{$xml->error->message}";
+			$arguments = Kaltura_Client_ParseUtils::unmarshalArray($xml->error->args, 'KalturaApiExceptionArg');
+			if($throwException)
+				throw $this->getKalturaAPIException($message, $code, $arguments);
+			else
+				return $this->getKalturaAPIException($message, $code, $arguments);
+		}
 	}
 }

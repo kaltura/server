@@ -181,20 +181,25 @@ class kConvertJobData extends kConvartableJobData
 	}
 	
 	function calculateUrgency(BatchJob $batchJob) {
-		
+
 		$flavorParamsId = $this->getFlavorParamsOutput()->getFlavorParamsId();
 		$isBulkupload = ($batchJob->getBulkJobId() !== null);
 		$readiness = null;
-		
+
 		if($this->priority == 0)
 			self::calculatePriority($batchJob);
-		
+
 		if($this->priority == self::MIGRATION_FLAVOR_PRIORITY) 
 			return BatchJobUrgencyType::MIGRATION_URGENCY;
-		
-		// If you have no conversion profile, there is no poinr in this calculation
-		if(is_null($this->conversionProfileId)) 
+
+		// If you have no conversion profile, there is no point in this calculation
+		if(is_null($this->conversionProfileId))
+		{
+			if ( $this->getFlavorParamsOutput()->getFlavorParamsId() == -1 ) //intermediate source flow
+				return ($isBulkupload? BatchJobUrgencyType::REQUIRED_BULK_UPLOAD : BatchJobUrgencyType::REQUIRED_REGULAR_UPLOAD);
+
 			return BatchJobUrgencyType::DEFAULT_URGENCY;
+		}
 
 		if($batchJob->getObjectId() && $batchJob->getObjectType()) {
 			$batchJobs = BatchJobPeer::retrieveByJobTypeAndObject($batchJob->getObjectId(), $batchJob->getObjectType(), 
@@ -204,32 +209,35 @@ class kConvertJobData extends kConvartableJobData
 				return $batchJobs[0]->getLockInfo()->getUrgency() + 1;
 			}
 		}
-		
-		
+
 		// a conversion job will be considered as required in one of the following cases:
 		// 1. The flavor is required
 		// 2. There are no required flavors and this is the flavor is optional with the minimal bitrate
 		// 3. all flavors are set as READY_BEHAVIOR_NO_IMPACT.
+		// 4. if conversion job is for replacing an existing entry
 		
-		$allFlavorParamsIds = array();
+		$optionalFlavorParamsIds = array();
 		$hasRequired = false;
 		$allNoImpact = true;
 		
 		// Go over all flavors and decide on cases 1-3
 		$fpcps = flavorParamsConversionProfilePeer::retrieveByConversionProfile($this->conversionProfileId);
 		foreach($fpcps as $fpcp) {
-			$allFlavorParamsIds[] = $fpcp->getFlavorParamsId();
+
 			if($fpcp->getFlavorParamsId() == $flavorParamsId)	// Case 1
 				$readiness = $fpcp->getReadyBehavior();
 			if($fpcp->getReadyBehavior() == flavorParamsConversionProfile::READY_BEHAVIOR_REQUIRED) // Case 2
 				$hasRequired = true;
+			else if ($fpcp->getReadyBehavior() == flavorParamsConversionProfile::READY_BEHAVIOR_OPTIONAL)
+				$optionalFlavorParamsIds[] = $fpcp->getFlavorParamsId();
+
 			if($fpcp->getReadyBehavior() != flavorParamsConversionProfile::READY_BEHAVIOR_NO_IMPACT) // Case 3
 				$allNoImpact = false;
 		}
-			
 		// Case 2
 		if((!$hasRequired) && ($readiness == flavorParamsConversionProfile::READY_BEHAVIOR_OPTIONAL)) {
-			$flvParamsMinBitrate = assetParamsPeer::retrieveMinimalBitrate($allFlavorParamsIds);
+			//retrieve minimal bitrate out of "optional" flavorParams
+			$flvParamsMinBitrate = assetParamsPeer::retrieveMinimalBitrate($optionalFlavorParamsIds);
 			if(!is_null($flvParamsMinBitrate) && $flvParamsMinBitrate->getId() == $flavorParamsId)
 				$readiness = flavorParamsConversionProfile::READY_BEHAVIOR_REQUIRED;
 		}
@@ -237,7 +245,16 @@ class kConvertJobData extends kConvartableJobData
 		// Case 3
 		if($allNoImpact)
 			$readiness = flavorParamsConversionProfile::READY_BEHAVIOR_REQUIRED;
-			
+
+		// Case 4
+		$entry = $batchJob->getEntry();
+		if ($entry)
+		{
+			$replacedEntryId = $entry->getReplacedEntryId();
+			if ($replacedEntryId)
+				$readiness = flavorParamsConversionProfile::READY_BEHAVIOR_REQUIRED;
+		}
+
 		// Decide on the urgency by the readiness and the upload method
 		if($readiness == flavorParamsConversionProfile::READY_BEHAVIOR_REQUIRED)
 			return ($isBulkupload? BatchJobUrgencyType::REQUIRED_BULK_UPLOAD : BatchJobUrgencyType::REQUIRED_REGULAR_UPLOAD);
@@ -248,6 +265,10 @@ class kConvertJobData extends kConvartableJobData
 	}
 	
 	function calculateEstimatedEffort(BatchJob $batchJob) {
+		$clipDuration = $this->getFlavorParamsOutput()->getClipDuration();
+		if ( isset($clipDuration) ) {
+			return $clipDuration;
+		}
 		$mediaInfo = mediaInfoPeer::retrieveByPK($this->getMediaInfoId());
 		if(is_null($mediaInfo)) {
 			$sumEffort = 0;

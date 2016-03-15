@@ -35,7 +35,10 @@ class LogViewPlugin extends KalturaPlugin implements IKalturaApplicationPartialV
 	 */
 	public static function getApplicationPages()
 	{
-		$KalturaInternalTools = array(new KalturaEntryInvestigateLogAction());
+		$KalturaInternalTools = array(
+			new KalturaLogViewAction(),
+			new KalturaObjectInvestigateLogAction(),
+		);
 		return $KalturaInternalTools;
 	}
 }

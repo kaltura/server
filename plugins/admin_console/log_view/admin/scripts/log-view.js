@@ -11,6 +11,7 @@ function LogView(name, container, field, id, options) {
     
     if(options && options.table){
         this.table = options.table;
+        this.table.empty();
         this.load();
     }
     else{
@@ -41,6 +42,11 @@ LogView.prototype = {
 
         if(this.options && this.options.type){
         	url += '/type/' + this.options.type;
+        }
+
+        if(this.options && this.options.conditions){
+        	for(var field in this.options.conditions)
+        		url += '/' + field + '/' + this.options.conditions[field];
         }
         
         return url;
@@ -168,32 +174,3 @@ LogView.prototype = {
     }
 };
 
-$(function() {
-	var entryIdInput = jQuery('#entryId');
-	if(entryIdInput.size()){
-		var entryId = entryIdInput.val();
-	    new LogView('entry-' + entryId, jQuery('body'), 'object', entryId);
-	}
-	
-	var additionalDataContainers = jQuery('.additionalData');
-	additionalDataContainers.each(function(index, element){
-	    var idParts = element.id.split('_', 5);
-	    var type = idParts[1];
-	    var id = idParts[3];
-	    if(idParts[4]){
-	        id += '_' + idParts[4];
-	    }
-	    var container = jQuery(this).find('TD').first();
-	    switch(type){
-	        case 'flavor':
-	        	container.attr('id', 'container-flavor-' + id);
-	            new LogView('flavor-' + id, container, 'object', id);
-	            break;
-	            
-	        case 'job':
-	        	container.attr('id', 'container-job-' + id);
-	            new LogView('job-' + id, container, 'job', id);
-	            break;
-	    }
-	});
-});

@@ -40,6 +40,17 @@ class BusinessProcessStartNotificationTemplate extends BusinessProcessNotificati
 	}
 	
 	/* (non-PHPdoc)
+	 * @see BusinessProcessNotificationTemplate::getParameters()
+	 */
+	protected function getParameters(kScope $scope)
+	{
+		$parametersValues = parent::getParameters($scope);
+		$parametersValues['templateId'] = $this->getId();
+		
+		return $parametersValues;
+	}
+	
+	/* (non-PHPdoc)
 	 * @see BatchEventNotificationTemplate::dispatch()
 	 */
 	public function abort($scope)

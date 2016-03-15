@@ -67,11 +67,12 @@ class kUploadTokenMgr
 		}
 		
 		if ($resume)
-			$this->handleResume($fileData, $finalChunk, $resumeAt);
+			$fileSize = $this->handleResume($fileData, $finalChunk, $resumeAt);
 		else
+		{
 			$this->handleMoveFile($fileData);
-		
-		$fileSize = kFile::fileSize($this->_uploadToken->getUploadTempPath());
+			$fileSize = kFile::fileSize($this->_uploadToken->getUploadTempPath());
+		}
 		
 		if ($finalChunk)
 		{
@@ -170,7 +171,7 @@ class kUploadTokenMgr
 		if (!$extension)
 			$extension = self::NO_EXTENSION_IDENTIFIER;
 			
-		return myContentStorage::getFSUploadsPath().$uploadTokenId.'.'.$extension;
+		return myContentStorage::getFSUploadsPath().substr($uploadTokenId, -2).'/'.$uploadTokenId.'.'.$extension;
 	}
 	
 	protected function tryMoveToErrors($fileData)
@@ -199,10 +200,15 @@ class kUploadTokenMgr
 		
 		if ($resumeAt != -1) // this may not be a sequential chunk added at the end of the file
 		{
-			// if this is the final chunk the expected file size would be the resume position + the last chunk size
-			$expectedFileSize = $finalChunk ? ($resumeAt + filesize($sourceFilePath)) : 0;
+			// support backwards compatiblity of overriding a final chunk at the offset zero  
+			$verifyFinalChunk = $finalChunk && $resumeAt > 0;
 			
-			rename($sourceFilePath, "$uploadFilePath.chunk.$resumeAt");
+			// if this is the final chunk the expected file size would be the resume position + the last chunk size
+			$chunkSize = filesize($sourceFilePath);
+			$expectedFileSize = $verifyFinalChunk ? ($resumeAt + $chunkSize) : 0;
+
+			$chunkFilePath = "$uploadFilePath.chunk.$resumeAt";
+			rename($sourceFilePath, $chunkFilePath);
 			
 			$uploadFinalChunkMaxAppendTime = kConf::get('upload_final_chunk_max_append_time', 'local', 30);
 			
@@ -213,10 +219,10 @@ class kUploadTokenMgr
 					Sleep(1);
 				
 				$currentFileSize = self::appendAvailableChunks($uploadFilePath);
-				KalturaLog::log("handleResume iteration: $count finalChunk: $finalChunk filesize: $currentFileSize");
-			} while ($finalChunk && $currentFileSize != $expectedFileSize && $count < $uploadFinalChunkMaxAppendTime);
-			
-			if ($finalChunk && $currentFileSize != $expectedFileSize)
+				KalturaLog::log("handleResume iteration: $count chunk: $chunkFilePath size: $chunkSize finalChunk: $finalChunk filesize: $currentFileSize expected: $expectedFileSize");
+			} while ($verifyFinalChunk && $currentFileSize != $expectedFileSize && $count < $uploadFinalChunkMaxAppendTime);
+
+			if ($verifyFinalChunk && $currentFileSize != $expectedFileSize)
 				throw new kUploadTokenException("final size $currentFileSize failed to match expected size $expectedFileSize", kUploadTokenException::UPLOAD_TOKEN_CANNOT_MATCH_EXPECTED_SIZE);
 		} else {
 			$uploadFileResource = fopen($uploadFilePath, 'r+b');
@@ -224,8 +230,11 @@ class kUploadTokenMgr
 			
 			self::appendChunk($sourceFilePath, $uploadFileResource);
 			
+			$currentFileSize = ftell($uploadFileResource);
 			fclose($uploadFileResource);
 		}
+		
+		return $currentFileSize; 
 	}
 	
 	/**
@@ -287,7 +296,11 @@ class kUploadTokenMgr
 			
 			$validChunk = false;
 			
+			$globStart = microtime(true);
 			$chunks = glob("$targetFilePath.chunk.*", GLOB_NOSORT);
+			$globTook = (microtime(true) - $globStart);
+			KalturaLog::debug("glob took - " . $globTook . " seconds");
+						
 			foreach($chunks as $nextChunk)
 			{
 				$parts = explode(".", $nextChunk);
@@ -298,11 +311,16 @@ class kUploadTokenMgr
 						continue;
 					
 					// dismiss chunks which won't enlarge the file or which are starting after the end of the file
-					if ($chunkOffset <= $currentFileSize && $chunkOffset + filesize($nextChunk) > $currentFileSize)
+					// support backwards compatiblity of overriding a final chunk at the offset zero
+					if ($chunkOffset == 0 || ($chunkOffset <= $currentFileSize && $chunkOffset + filesize($nextChunk) > $currentFileSize))
 					{
 						fseek($targetFileResource, $chunkOffset, SEEK_SET);
 						$validChunk = true;
 						break; 
+					}
+					else
+					{
+						KalturaLog::log("ignoring chunk: $nextChunk offset: $chunkOffset fileSize: $currentFileSize");
 					}
 				}
 			}
@@ -312,7 +330,10 @@ class kUploadTokenMgr
 			
 			$lockedFile = "$nextChunk.".microtime(true).".locked";
 			if (! rename($nextChunk, $lockedFile)) // another process is already appending this file
+			{
+				KalturaLog::log("rename($nextChunk, $lockedFile) failed");
 				break;
+			}
 			
 			self::appendChunk($lockedFile, $targetFileResource);
 		}

@@ -182,6 +182,8 @@ class KalturaFrontController
 		$listOfRequests = array();
 		$requestStartIndex = 1;
 		$requestEndIndex = 1;
+		$ksArray = array();
+
 		foreach ($this->params as $paramName => $paramValue)
 		{
 			if(is_numeric($paramName))
@@ -190,6 +192,10 @@ class KalturaFrontController
 				$requestStartIndex = min($requestStartIndex, $paramName);
 				$requestEndIndex = max($requestEndIndex, $paramName);
 				$listOfRequests[$paramName] = $paramValue;
+				if (isset($paramValue['ks'])) {
+					$ksArray[$paramValue['ks']] = true;
+				}
+
 				continue;
 			}
 			
@@ -197,25 +203,38 @@ class KalturaFrontController
 			if (count($explodedName) <= 1 || !is_numeric($explodedName[0]))
 			{
 				$commonParams[$paramName] = $paramValue;
-				continue;
 			}
-		
-			$requestIndex = (int)$explodedName[0];
-			$requestStartIndex = min($requestStartIndex, $requestIndex);
-			$requestEndIndex = max($requestEndIndex, $requestIndex);
-			$paramName = $explodedName[1];
-			if (!array_key_exists($requestIndex, $listOfRequests))
+			else
 			{
-				$listOfRequests[$requestIndex] = array();
+				$requestIndex = (int)$explodedName[0];
+				$requestStartIndex = min($requestStartIndex, $requestIndex);
+				$requestEndIndex = max($requestEndIndex, $requestIndex);
+				$paramName = $explodedName[1];
+				if (!array_key_exists($requestIndex, $listOfRequests))
+				{
+					$listOfRequests[$requestIndex] = array();
+				}
+				$listOfRequests[$requestIndex][$paramName] = $paramValue;
 			}
-			$listOfRequests[$requestIndex][$paramName] = $paramValue;
+
+			if ($paramName == 'ks') {
+				$ksArray[$paramValue] = true;
+			}
+		}
+
+		//enable multi deferred events only if all ks's are the same
+		if ( count($ksArray)==1 ) {
+			kEventsManager::enableMultiDeferredEvents(true);
+		} else {
+			kEventsManager::enableMultiDeferredEvents(false);
 		}
 		
 		$multiRequestResultsPaths = $this->getMultiRequestResultsPaths($listOfRequests);
-		
+
 		// process the requests
 		$results = array();
 		kCurrentContext::$multiRequest_index = 0;
+
 		for($i = $requestStartIndex; $i <= $requestEndIndex; $i++)
 		{
 			$currentParams = $listOfRequests[$i];  
@@ -247,7 +266,14 @@ class KalturaFrontController
 			// as part of multirequest - the cached data is a serialized php object
 			// when not part of multirequest - the cached data is the actual response
 			$currentParams['multirequest'] = true;
-			unset($currentParams['format']);
+			if (is_array($currentParams))
+			{
+				unset($currentParams['format']);
+			}
+			else
+			{
+				throw new KalturaAPIException(APIErrors::INTERNAL_SERVERL_ERROR, "Malformed request");
+			}
 							
 			$cache = new KalturaResponseCacher($currentParams);
 			
@@ -296,7 +322,8 @@ class KalturaFrontController
 			if ($currentResult instanceof kRendererBase)
 				return $currentResult;
 		}
-		
+
+		kEventsManager::flushEvents(true);
 		return $results;
 	}
 	
@@ -609,7 +636,7 @@ class KalturaFrontController
 		}
 	}
 
-	public function serialize($object, $className, $serializerType)
+	public function serialize($object, $className, $serializerType, IResponseProfile $coreResponseProfile = null)
 	{
 		if (!class_exists($className)) {
 			KalturaLog::err("Class [$className] was not found!");
@@ -617,17 +644,24 @@ class KalturaFrontController
 		}
 		
 		$apiObject = null;
+		$responseProfile = null;
+		
+		if($coreResponseProfile)
+		{
+			$responseProfile = KalturaBaseResponseProfile::getInstance($coreResponseProfile);
+		}
+			
 		// if KalturaBaseEntry, KalturaCuePoint, KalturaAsset
 		if (is_subclass_of($className, 'IApiObjectFactory')) 
 		{
-			$apiObject = $className::getInstance($object);
+			$apiObject = $className::getInstance($object, $responseProfile);
 		}		
 
 		// if KalturaObject
 		elseif (is_subclass_of($className, 'IApiObject')) 
 		{
 			$apiObject = new $className();
-			$apiObject->fromObject($object);
+			$apiObject->fromObject($object, $responseProfile);
 		}
 		
 		// return serialized object according to required type

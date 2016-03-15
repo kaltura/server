@@ -27,6 +27,7 @@ class CuePointService extends KalturaBaseService
 		$allowedSystemPartners = array(
 			Partner::MEDIA_SERVER_PARTNER_ID,
 			Partner::PLAY_SERVER_PARTNER_ID,
+			Partner::BATCH_PARTNER_ID,
 		);
 		
 		if(in_array($this->getPartnerId(), $allowedSystemPartners) && $actionName == 'list')
@@ -44,6 +45,11 @@ class CuePointService extends KalturaBaseService
 			CuePointPeer::setUserContentOnly(true);
 		}
 		
+		if (!$this->getKs() || $this->getKs()->isAnonymousSession())
+		{
+			KalturaCriterion::enableTag(KalturaCriterion::TAG_WIDGET_SESSION);
+		}
+		
 		if(!CuePointPlugin::isAllowedPartner($this->getPartnerId()))
 			throw new KalturaAPIException(KalturaErrors::FEATURE_FORBIDDEN, CuePointPlugin::PLUGIN_NAME);
 	}
@@ -58,7 +64,14 @@ class CuePointService extends KalturaBaseService
 	function addAction(KalturaCuePoint $cuePoint)
 	{
 		$dbCuePoint = $cuePoint->toInsertableObject();
-		
+
+		// check if we have a limitEntry set on the KS, and if so verify that it is the same entry we work on
+		$limitEntry = $this->getKs()->getLimitEntry();
+		if ($limitEntry && $limitEntry != $cuePoint->entryId)
+		{
+			throw new KalturaAPIException(KalturaCuePointErrors::NO_PERMISSION_ON_ENTRY, $cuePoint->entryId);
+		}
+
 		if($cuePoint->systemName)
 		{
 			$existingCuePoint = CuePointPeer::retrieveBySystemName($cuePoint->entryId, $cuePoint->systemName);
@@ -233,13 +246,20 @@ class CuePointService extends KalturaBaseService
 	function updateAction($id, KalturaCuePoint $cuePoint)
 	{
 		$dbCuePoint = CuePointPeer::retrieveByPK($id);
-		
+
 		if (!$dbCuePoint)
 			throw new KalturaAPIException(KalturaCuePointErrors::INVALID_CUE_POINT_ID, $id);
-			
+
 		if($this->getCuePointType() && $dbCuePoint->getType() != $this->getCuePointType())
 			throw new KalturaAPIException(KalturaCuePointErrors::INVALID_CUE_POINT_ID, $id);
-		
+
+		// check if we have a limitEntry set on the KS, and if so verify that it is the same entry we work on
+		$limitEntry = $this->getKs()->getLimitEntry();
+		if ($limitEntry && $limitEntry != $dbCuePoint->getEntryId())
+		{
+			throw new KalturaAPIException(KalturaCuePointErrors::NO_PERMISSION_ON_ENTRY, $dbCuePoint->getEntryId());
+		}
+
 		if($cuePoint->systemName)
 		{
 			$existingCuePoint = CuePointPeer::retrieveBySystemName($dbCuePoint->getEntryId(), $cuePoint->systemName);
@@ -305,5 +325,29 @@ class CuePointService extends KalturaBaseService
 			$log = $log.'Error: User not an owner ';
 			KalturaLog::err($log);
 		}
+	}
+	
+	/**
+	 * Update cuePoint status by id
+	 *
+	 * @action updateStatus
+	 * @param string $id
+	 * @param KalturaCuePointStatus $status
+	 * @throws KalturaCuePointErrors::INVALID_CUE_POINT_ID
+	 */
+	function updateStatusAction($id, $status)
+	{
+		$dbCuePoint = CuePointPeer::retrieveByPK($id);
+		
+		if (!$dbCuePoint)
+			throw new KalturaAPIException(KalturaCuePointErrors::INVALID_CUE_POINT_ID, $id);
+			
+		if($this->getCuePointType() && $dbCuePoint->getType() != $this->getCuePointType())
+			throw new KalturaAPIException(KalturaCuePointErrors::INVALID_CUE_POINT_ID, $id);
+	
+		$this->validateUserLog($dbCuePoint);
+		
+		$dbCuePoint->setStatus($status);
+		$dbCuePoint->save();
 	}
 }

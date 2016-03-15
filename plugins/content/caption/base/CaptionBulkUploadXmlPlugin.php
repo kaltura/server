@@ -322,7 +322,7 @@ class CaptionBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPendin
 
 	private function getCurrentCaptionAssets($entryId)
 	{
-		$filter = new KalturaCaptionAssetItemFilter();
+		$filter = new KalturaCaptionAssetFilter();
 		$filter->entryIdEqual = $entryId;
 		
 		$pager = new KalturaFilterPager();

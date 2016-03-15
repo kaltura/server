@@ -19,7 +19,14 @@ class myPartnerUtils
 
 	private static $s_filterred_peer_list = array();
 	private static $partnerCriteriaParams = array();
-	 
+	//contains all partnerCriteriaParams, including params that were already retrieved
+	private static $allPartnerCriteriaParams = array();
+
+	public static function getAllPartnerCriteriaParams()
+	{
+		return self::$allPartnerCriteriaParams;
+	}
+
 	public static function getUrlForPartner ( $partner_id , $subp_id  )
 	{
 		return "/p/$partner_id/sp/$subp_id";	
@@ -122,6 +129,7 @@ class myPartnerUtils
 		call_user_func(array($peerName, 'setDefaultCriteriaFilter'));
 		unset(self::$s_filterred_peer_list[$peerName]); 
 		unset(self::$partnerCriteriaParams[$objectName]);
+		unset(self::$allPartnerCriteriaParams[$objectName]);
 	}
 
 	// will reset all the filters used in the applyPartnerFilters
@@ -134,6 +142,24 @@ class myPartnerUtils
 		
 		self::$s_filterred_peer_list = array();
 		self::$partnerCriteriaParams = array();
+		self::$allPartnerCriteriaParams = array();
+	}
+
+	// will reset all the filters used in the applyPartnerFilters and will re-apply them
+	public static function reApplyPartnerFilters($allPartnerCriteriaParams)
+	{
+		if (!$allPartnerCriteriaParams)
+		{
+			KalturaLog::debug("could not re-apply filters, empty partnerCriteriaParams array was sent");
+			return;
+		}
+
+		self::resetAllFilters();
+		foreach($allPartnerCriteriaParams as $objectName => $partnerCriteriaParams)
+		{
+			list($partner_id, $private_partner_data, $partner_group, $kaltura_network) = $partnerCriteriaParams;
+			self::addPartnerToCriteria($objectName, $partner_id, $private_partner_data, $partner_group, $kaltura_network);
+		}
 	}
 	
 	/**
@@ -184,6 +210,7 @@ class myPartnerUtils
 	{
 		$objectName = strtolower($objectName);
 		self::$partnerCriteriaParams[$objectName] = array($partner_id, $private_partner_data, $partner_group, $kaltura_network);
+		self::$allPartnerCriteriaParams[$objectName] = self::$partnerCriteriaParams[$objectName];
 	}
 
 

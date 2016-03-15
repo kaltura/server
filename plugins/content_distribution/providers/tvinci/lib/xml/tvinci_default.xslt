@@ -446,8 +446,8 @@
             <xsl:if test="not(count(exsl:node-set($filteredItems)/contentItem) = 0)">
                 <xsl:variable name="coGuid">
                     <xsl:for-each select="exsl:node-set($filteredItems)/contentItem">
-                        <xsl:variable name="flavorParamId" select="./@flavorParamsId"/>
-                        <xsl:value-of select="concat($relevantEntryId, '_' , $flavorParamId)"/>
+                        <xsl:variable name="flavorAssetId" select="./@flavorAssetId"/>
+                        <xsl:value-of select="concat($relevantEntryId, '_' , $flavorAssetId)"/>
                         <xsl:if test="not(position() = last())">,</xsl:if>
                     </xsl:for-each>
                 </xsl:variable>

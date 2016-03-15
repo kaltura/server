@@ -24,6 +24,7 @@ $html5Version = $_GET['playerVersion'];
 
     <!-- Bootstrap -->
     <link href="css/main.css" rel="stylesheet">	
+	<link href='https://fonts.googleapis.com/css?family=Lato:400,700,300' rel='stylesheet' type='text/css'>
 	
 	<script src="/lib/js/jquery-1.8.3.min.js"></script>
 	<script type="text/javascript" src="/html5/html5lib/<?php echo $html5Version; ?>/mwEmbedLoader.php"></script>

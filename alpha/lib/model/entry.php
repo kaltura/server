@@ -2647,6 +2647,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 				$flavorParamIdsArray[] = $flavorAsset->getFlavorParamsId();
 			}
 			asort($flavorParamIdsArray);
+			$flavorParamIdsArray = array_unique($flavorParamIdsArray);
 			$flavorParamIds = implode(",", $flavorParamIdsArray);
 			$this->setFlavorParamsIds($flavorParamIds);
 		}

@@ -345,7 +345,7 @@ foreach($inXml->children() as $element)
 		$multiResponse = $client->doMultiRequest();
 		foreach($multiResponse as $index => $response)
 		{
-			if ($client->isError($response))
+			if (!(bool)(string)$element['continueOnError'] && $client->isError($response))
 			{
 				echo "Executing failed for request #".($index+1)." with error [" . $response['message'] . "]\n";
 				throw new KalturaException($response["message"], $response["code"],$response['args']);

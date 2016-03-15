@@ -541,6 +541,10 @@ class KalturaErrors extends APIErrors
 	
 	const LIVE_STREAM_ALREADY_BROADCASTING = "LIVE_STREAM_ALREADY_BROADCASTING;ENTRY_ID,MEDIA_SERVER;Entry [@ENTRY_ID@] already broadcasting to server [@MEDIA_SERVER@]";
 	
+	const CANNOT_UPDATE_FIELDS_WHILE_ENTRY_BROADCASTING = "CANNOT_UPDATE_FIELDS_WHILE_ENTRY_BROADCASTING;FIELD;Cannot update [@FIELD@] while entry is broadcasting";
+	
+	const CANNOT_UPDATE_FIELDS_RECORDED_ENTRY_STILL_NOT_READY = "CANNOT_UPDATE_FIELDS_RECORDED_ENTRY_STILL_NOT_READY;FIELD;Cannot update [@FIELD@] while all vod entry flavors are not ready";
+	
 	/*
 	 * BaseEntry Service
 	 */

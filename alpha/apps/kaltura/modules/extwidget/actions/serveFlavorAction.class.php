@@ -24,11 +24,74 @@ class serveFlavorAction extends kalturaAction
 		header("X-Kaltura:cache-key");
 	}
 	
-	protected function getSimpleMappingRenderer($path)
+	protected function getSimpleMappingRenderer($path, $encryptionKey)
 	{
+		$source = array(
+			'type' => 'source',
+			'path' => $path,
+		);
+
+		if ($encryptionKey)
+		{
+			$source['encryptionKey'] = $encryptionKey;
+		}
+
+		$sequence = array(
+			'clips' => array($source)
+		);
+
+		$result = array(
+			'sequences' => array($sequence)
+		);
+
+		$json = str_replace('\/', '/', json_encode($result));
+
 		return new kRendererString(
-				'{"sequences":[{"clips":[{"type":"source","path":"' . $path . '"}]}]}',
+				$json,
 				self::JSON_CONTENT_TYPE);
+	}
+	
+	protected function serveLivePlaylist($durations, $sequences)
+	{
+		$referenceTime = 1451624400000;	// 2016-01-01
+		$segmentDuration = 10000;
+		$segmentCount = 10;
+		$timeMargin = 10000;			// a safety margin to compensate for clock differences
+					
+		// find the duration of each cycle
+		$cycleDuration = array_sum($durations);
+		$dvrWindowSize = $segmentDuration * $segmentCount;
+		
+		// if the cycle is too small to cover the DVR window, duplicate it
+		while ($cycleDuration <= $dvrWindowSize + $timeMargin)
+		{
+			foreach ($sequences as &$sequence)
+			{
+				$sequence['clips'] = array_merge($sequence['clips'], $sequence['clips']);
+			}
+			$durations = array_merge($durations, $durations);
+			$cycleDuration *= 2;
+		}
+			
+		$currentTime = time() * 1000 - $timeMargin - $dvrWindowSize;
+			
+		$mediaSet['playlistType'] = 'live';
+		$mediaSet['segmentBaseTime'] = $referenceTime;
+		$mediaSet['firstClipTime'] = floor($currentTime / $cycleDuration) * $cycleDuration;
+		$mediaSet['discontinuity'] = false;
+		
+		// duplicate the clips, this is required so that we won't run out of segments
+		// close to the end of a cycle
+		foreach ($sequences as &$sequence)
+		{
+			$sequence['clips'] = array_merge($sequence['clips'], $sequence['clips']);
+		}
+		$durations = array_merge($durations, $durations);
+		
+		$mediaSet['durations'] = $durations;
+		$mediaSet['sequences'] = $sequences;
+		
+		return $mediaSet;
 	}
 	
 	protected function servePlaylist($entry)
@@ -46,7 +109,8 @@ class serveFlavorAction extends kalturaAction
 			$flavorParamIds = explode(',', $flavorParamIds);
 		}
 		$version = $this->getRequestParameter("v");
-			
+		$isLive = $this->getRequestParameter("live");
+		
 		// execute the playlist
 		if ($version)
 		{
@@ -162,11 +226,20 @@ class serveFlavorAction extends kalturaAction
 			$sequences[] = array('clips' => $clips);
 		}
 			
+		// build the media set
+		if ($isLive)
+		{
+			$mediaSet = $this->serveLivePlaylist($durations, $sequences);
+		}
+		else
+		{
+			$mediaSet = array('durations' => $durations, 'sequences' => $sequences);
+		}
+		
 		// build the json
-		$mediaSet = array('durations' => $durations, 'sequences' => $sequences);
 		$json = json_encode($mediaSet);
 		$renderer = new kRendererString($json, self::JSON_CONTENT_TYPE);
-		if ($storeCache)
+		if ($storeCache && !$isLive)
 		{
 			$this->storeCache($renderer, $entry->getPartnerId());
 		}
@@ -243,7 +316,7 @@ class serveFlavorAction extends kalturaAction
 
 		if ($pathOnly && kIpAddressUtils::isInternalIp($_SERVER['REMOTE_ADDR']))
 		{
-			$path = null;
+			$path = '';
 			list ( $file_sync , $local )= kFileSyncUtils::getReadyFileSyncForKey( $syncKey , false, false );
 			if ( $file_sync )
 			{
@@ -255,7 +328,7 @@ class serveFlavorAction extends kalturaAction
 				}
 			}
 		
-			$renderer = $this->getSimpleMappingRenderer($path);
+			$renderer = $this->getSimpleMappingRenderer($path, $flavorAsset->getEncryptionKey());
 			if ($path)
 			{
 				$this->storeCache($renderer, $flavorAsset->getPartnerId());

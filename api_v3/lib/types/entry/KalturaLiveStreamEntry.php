@@ -29,25 +29,21 @@ class KalturaLiveStreamEntry extends KalturaLiveEntry
 	public $bitrates;
 	
 	/**
-	 * @requiresPermission all
 	 * @var string
 	 */
 	public $primaryBroadcastingUrl;
 	
 	/**
-	 * @requiresPermission all
 	 * @var string
 	 */
 	public $secondaryBroadcastingUrl;
 	
 	/**
-	 * @requiresPermission all
 	 * @var string
 	 */
 	public $primaryRtspBroadcastingUrl;
 	
 	/**
-	 * @requiresPermission all
 	 * @var string
 	 */
 	public $secondaryRtspBroadcastingUrl;
@@ -151,7 +147,18 @@ class KalturaLiveStreamEntry extends KalturaLiveEntry
 	{
 		if(!($dbObject instanceof LiveStreamEntry))
 			return;
-			
+
+		/**
+		 * @var LiveStreamEntry @dbObject
+		 */
+		if ( !kCurrentContext::$is_admin_session && !(kCurrentContext::getCurrentKsKuserId() == $dbObject->getKuserId())
+				&& !kCurrentContext::$ks_object->verifyPrivileges(ks::PRIVILEGE_EDIT, $this->id) )
+		{
+			$this->primaryBroadcastingUrl = null;
+			$this->secondaryBroadcastingUrl = null;
+			$this->primaryRtspBroadcastingUrl = null;
+			$this->secondaryRtspBroadcastingUrl = null;
+		}
 		parent::doFromObject($dbObject, $responseProfile);
 	}
 	
