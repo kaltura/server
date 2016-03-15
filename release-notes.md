@@ -1,5 +1,32 @@
 # Kajam-11.11.0 #
 
+##Added thumb cue points generator operator on flavor params##
+- Issue Type: Feature Request
+- Issue ID: PLAT-4991
+
+#### Configuration ####
+	In order to use, requires adding a new "document.thumbAssets" operator to ppt2img flavor params.
+	Operators field should look like this:
+	[[{"id":"document.ppt2Img","extra":null,"command":null},{"id":"document.thumbAssets","extra":null,"command":null}]]
+
+	Requires adding a new worker to batch.ini:
+	- enabledWorkers.KAsyncConvertThumbAssetsGenerator = 1
+
+	- [KAsyncConvertThumbAssetsGenerator : KAsyncConvertWorker]
+	  id                                      = XXXX
+	  friendlyName                            = Convert Thumb Assets
+	  maximumExecutionTime                    = 36000
+	  maxJobsEachRun                          = 1
+	  filter.jobSubTypeIn                     = document.thumbAssets
+	  params.skipSourceValidation             = 1
+
+#### Deployment Scripts ####
+- php deployment/base/scripts/installPlugins.php
+
+#### Known Issues & Limitations ####
+- None.
+
+
 ## Clear live entry old cue-points ##
  - Issue Type: Bug
  - Issue ID: PLAT-5161
