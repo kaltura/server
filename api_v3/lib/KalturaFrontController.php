@@ -266,7 +266,14 @@ class KalturaFrontController
 			// as part of multirequest - the cached data is a serialized php object
 			// when not part of multirequest - the cached data is the actual response
 			$currentParams['multirequest'] = true;
-			unset($currentParams['format']);
+			if (is_array($currentParams))
+			{
+				unset($currentParams['format']);
+			}
+			else
+			{
+				throw new KalturaAPIException(APIErrors::INTERNAL_SERVERL_ERROR, "Malformed request");
+			}
 							
 			$cache = new KalturaResponseCacher($currentParams);
 			

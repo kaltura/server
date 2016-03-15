@@ -125,9 +125,17 @@ class kFlowHelper
 		// IMAGE media entries
 		if ($dbEntry->getType() == entryType::MEDIA_CLIP && $dbEntry->getMediaType() == entry::ENTRY_MEDIA_TYPE_IMAGE)
 		{
+			$url = $data->getSrcFileUrl();
+			$ext = pathinfo($url, PATHINFO_EXTENSION);
+			$allowedImageTypes = kConf::get("image_file_ext");
 			//setting the entry's data so it can be used for creating file-syncs' file-path version & extension - in kFileSyncUtils::moveFromFile
 			//without saving - the updated entry object exists in the instance pool
 			$dbEntry->setData(".jpg");
+			if (in_array($ext, $allowedImageTypes))
+				$dbEntry->setData("." . $ext);
+			else				
+				$dbEntry->setData(".jpg");
+			
 			
 			$syncKey = $dbEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA);
 

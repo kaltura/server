@@ -7,7 +7,7 @@ SELECT
 	IFNULL(COUNT(IF(entry_media_type_id = 5, 1,NULL)),0) count_audio ,
 	IFNULL(COUNT(IF(entry_media_type_id = 2, 1,NULL)),0) count_image ,
 	IFNULL(COUNT(IF(entry_media_type_id = 6, 1,NULL)),0) count_mix
-FROM dwh_dim_entries en
+FROM dwh_dim_entries ev
 WHERE
 {OBJ_ID_CLAUSE}
 AND entry_media_type_id IN (1,2,5,6)

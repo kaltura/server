@@ -35,7 +35,7 @@ class CuePointPeer extends BaseCuePointPeer implements IMetadataPeer, IRelatedOb
 	{
 		self::$userContentOnly = $contentOnly;
 	}
-	
+
 	/* (non-PHPdoc)
 	 * @see BaseCuePointPeer::setDefaultCriteriaFilter()
 	 */
@@ -79,6 +79,12 @@ class CuePointPeer extends BaseCuePointPeer implements IMetadataPeer, IRelatedOb
 			
 				$c->addAnd($criterionUserOrPublic);
 			}
+			else if (!$puserId)
+			{
+				$criterionIsPublic = $c->getNewCriterion (self::IS_PUBLIC, true, Criteria::EQUAL);
+				$criterionIsPublic->addTag(KalturaCriterion::TAG_WIDGET_SESSION);
+				$c->add($criterionIsPublic);					
+ 			}
 		}
 		
 		self::$s_criteria_filter->setFilter($c);
@@ -141,10 +147,10 @@ class CuePointPeer extends BaseCuePointPeer implements IMetadataPeer, IRelatedOb
 	
 	public static function retrieveByPK($pk, PropelPDO $con = null)
 	{
-		KalturaCriterion::disableTags(array(KalturaCriterion::TAG_USER_SESSION));
+		KalturaCriterion::disableTags(array(KalturaCriterion::TAG_USER_SESSION,KalturaCriterion::TAG_WIDGET_SESSION));
 		$res = parent::retrieveByPK($pk, $con);
-		KalturaCriterion::restoreTags(array(KalturaCriterion::TAG_USER_SESSION));
-	
+		KalturaCriterion::restoreTags(array(KalturaCriterion::TAG_USER_SESSION,KalturaCriterion::TAG_WIDGET_SESSION));
+
 		return $res;
 	}
 	
