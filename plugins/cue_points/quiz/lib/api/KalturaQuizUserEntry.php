@@ -40,14 +40,6 @@ class KalturaQuizUserEntry extends KalturaUserEntry{
 	}
 
 	/* (non-PHPdoc)
-	 * @see KalturaObject::validateForInsert()
-	 */
-	public function validateForInsert($propertiesToSkip = array())
-	{
-		KalturaLog::debug("@@NA");
-	}
-	
-	/* (non-PHPdoc)
 	 * @see KalturaObject::toInsertableObject()
 	 */
 	public function toInsertableObject ( $object_to_fill = null , $props_to_skip = array() )
