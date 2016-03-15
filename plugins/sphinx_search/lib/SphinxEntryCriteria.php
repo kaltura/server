@@ -226,6 +226,16 @@ class SphinxEntryCriteria extends SphinxCriteria
 				
 			$filter->unsetByName('_is_root');
 		}
+
+		if($filter->is_set('_eq_reference_id'))
+		{
+			$refId = $filter->get('_eq_reference_id');
+			if( $refId!=null && $refId!='' ) {
+				$filter->set('_eq_md5_reference_id', md5($refId));
+				$filter->unsetByName('_eq_reference_id');
+			}
+		}
+
 		if(count($matchOrRoots))
 			$filter->set('_matchand_roots', $matchOrRoots);
 			
