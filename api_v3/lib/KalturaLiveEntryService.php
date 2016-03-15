@@ -217,28 +217,33 @@ class KalturaLiveEntryService extends KalturaEntryService
 	{
 		KalturaLog::debug("Entry [$entryId] from mediaServerIndex [$mediaServerIndex] with liveEntryStatus [$liveEntryStatus]");
 
-		/* @var $dbLiveEntry LiveEntry*/
+		/* @var $dbLiveEntry LiveEntry */
 		$dbLiveEntry = entryPeer::retrieveByPK($entryId);
 		if (!$dbLiveEntry || !($dbLiveEntry instanceof LiveEntry))
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
-
-		$liveEntryServerNode = $this->getLiveEntryServerNode($dbLiveEntry, $hostname, $mediaServerIndex);
-
-		if ($liveEntryStatus != KalturaEntryServerNodeStatus::BROADCASTING){
-			$this->setMediaServerWrapper($dbLiveEntry, $mediaServerIndex, $hostname, $liveEntryStatus);
-		}
-
-		if ($liveEntryServerNode->getStatus() != $liveEntryStatus ||
-			$liveEntryServerNode->getServerType() != $mediaServerIndex)
+		
+		try 
 		{
-			$liveEntryServerNode->setStatus($liveEntryStatus);
-			$liveEntryServerNode->setServerType($mediaServerIndex);
+			$dbLiveEntry->setMediaServer($mediaServerIndex, $hostname, $liveEntryStatus, $applicationName);
 		}
+		catch(kCoreException $ex)
+		{
+			$code = $ex->getCode();
+			switch($code)
+			{
+				case kCoreException::MEDIA_SERVER_NOT_FOUND :
+					throw new KalturaAPIException(KalturaErrors::MEDIA_SERVER_NOT_FOUND, $hostname);
+				case kCoreException::ENTRY_SERVER_NODE_NOT_FOUND:
+					throw new KalturaAPIException(KalturaErrors::ENTRY_SERVER_NODE_NOT_FOUND, $hostname);
+				default:
+					throw $ex;
+			}
+		}
+
 		// setRedirectEntryId to null in all cases, even for broadcasting...
 		$dbLiveEntry->setRedirectEntryId(null);
-
-		// setMediaServerWrapper
-		if($liveEntryServerNode->save() && $dbLiveEntry->save())
+		
+		if($dbLiveEntry->save())
 		{
 			$this->addTrackEntryData($liveEntryServerNode, __FUNCTION__);
 			if($mediaServerIndex == EntryServerNodeType::LIVE_PRIMARY && $liveEntryStatus == EntryServerNodeStatus::PLAYABLE && $dbLiveEntry->getRecordStatus())
@@ -279,64 +284,6 @@ class KalturaLiveEntryService extends KalturaEntryService
 		$entry = KalturaEntryFactory::getInstanceByType($dbLiveEntry->getType());
 		$entry->fromObject($dbLiveEntry, $this->getResponseProfile());
 		return $entry;
-	}
-
-
-	/**
-	 * Wrapper function for the setMediaServer to handle the exception thrown
-	 * @param LiveEntry $dbEntry
-	 * @param $mediaServerIndex
-	 * @param $hostname
-	 * @throws Exception
-	 * @throws KalturaAPIException
-	 * @throws kCoreException
-	 */
-	private function setMediaServerWrapper($dbEntry ,$mediaServerIndex, $hostname)
-	{
-		try {
-			$dbEntry->setMediaServer($mediaServerIndex, $hostname);
-		}
-		catch(kCoreException $ex)
-		{
-			$code = $ex->getCode();
-			switch($code)
-			{
-				case kCoreException::MEDIA_SERVER_NOT_FOUND :
-					throw new KalturaAPIException(KalturaErrors::MEDIA_SERVER_NOT_FOUND, $hostname);
-				case kCoreException::ENTRY_SERVER_NODE_NOT_FOUND:
-					throw new KalturaAPIException(KalturaErrors::ENTRY_SERVER_NODE_NOT_FOUND, $hostname);
-				default:
-					throw $ex;
-			}
-		}
-	}
-
-	/**
-	 * @param LiveEntry $dbLiveEntry
-	 * @param $hostname
-	 * @param EntryServerNodeType $mediaServerIndex
-	 * @return LiveEntryServerNode
-	 * @throws Exception
-	 * @throws KalturaAPIException
-	 * @throws PropelException
-	 */
-	private function getLiveEntryServerNode($dbLiveEntry, $hostname, $mediaServerIndex)
-	{
-		/* @var LiveEntryServerNode $dbLiveEntryServerNode */
-		$dbLiveEntryServerNode = EntryServerNodePeer::retrieveByEntryIdAndServerType($dbLiveEntry->getId(), $mediaServerIndex);
-		if (!$dbLiveEntryServerNode)
-		{
-			$dbServerNode = ServerNodePeer::retrieveActiveMediaServerNode($hostname);
-			if (!$dbServerNode)
-				throw new KalturaAPIException(KalturaErrors::SERVER_NODE_NOT_FOUND, $hostname);
-
-			$dbLiveEntryServerNode = new LiveEntryServerNode();
-			$dbLiveEntryServerNode->setEntryId($dbLiveEntry->getId());
-			$dbLiveEntryServerNode->setServerType($mediaServerIndex);
-			$dbLiveEntryServerNode->setServerNodeId($dbServerNode->getId());
-			$dbLiveEntryServerNode->setPartnerId($dbLiveEntry->getPartnerId());
-		}
-		return $dbLiveEntryServerNode;
 	}
 
 	/**
