@@ -6,6 +6,8 @@
 class KOperationEngineThumbAssetsGenerator extends KOperationEngineDocument
 {
 	const IMAGES_LIST_XML_NAME = 'imagesList.xml';
+	const MAX_MULTI_REQUEST_INDEX = 20;
+
 	private $realInFilePath;
 
 	public function operate(kOperator $operator = null, $inFilePath, $configFilePath = null)
@@ -48,18 +50,29 @@ class KOperationEngineThumbAssetsGenerator extends KOperationEngineDocument
 		}
 
 		KBatchBase::impersonate($this->job->partnerId);
+		$j = 0;
+		while( $j < count($imagesList) )
+		{
+			$this->addThumbCuePoints(array_slice($imagesList, $j, self::MAX_MULTI_REQUEST_INDEX), $entry->parentEntryId ); //no need to validate array out of bounds, no error is thrown
+			$j+=self::MAX_MULTI_REQUEST_INDEX;
+		}
+		KBatchBase::unimpersonate();
+	}
+
+	private function addThumbCuePoints( array $images, $cpEntryId )
+	{
 		KBatchBase::$kClient->startMultiRequest();
 		$index = 0;
-		foreach ($imagesList as $image) {
+		foreach ($images as $image) {
 			$thumbCuePoint = new KalturaThumbCuePoint();
-			$thumbCuePoint->entryId = $entry->parentEntryId;
+			$thumbCuePoint->entryId = $cpEntryId;
 			KBatchBase::$kClient->cuePoint->add( $thumbCuePoint ) ;
 			$index++;
 
 			$thumbAsset = new KalturaTimedThumbAsset();
 			$thumbAsset->tags = $this->job->entryId;
 			$thumbAsset->cuePointId = "{" . $index . ":result:id}";
-			KBatchBase::$kClient->thumbAsset->add( $entry->parentEntryId, $thumbAsset) ;
+			KBatchBase::$kClient->thumbAsset->add( $cpEntryId, $thumbAsset) ;
 			$index++;
 
 			$resource = new KalturaServerFileResource();
@@ -68,6 +81,5 @@ class KOperationEngineThumbAssetsGenerator extends KOperationEngineDocument
 			$index++;
 		}
 		KBatchBase::$kClient->doMultiRequest();
-		KBatchBase::unimpersonate();
 	}
 }
