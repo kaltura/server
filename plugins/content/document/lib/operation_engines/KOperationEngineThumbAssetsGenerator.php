@@ -50,11 +50,10 @@ class KOperationEngineThumbAssetsGenerator extends KOperationEngineDocument
 		}
 
 		KBatchBase::impersonate($this->job->partnerId);
-		$j = 0;
-		while( $j < count($imagesList) )
+		$imagesArray = array_chunk($imagesList, self::MAX_MULTI_REQUEST_INDEX);
+		for ($j=0; $j < count($imagesArray); $j++)
 		{
-			$this->addThumbCuePoints(array_slice($imagesList, $j, self::MAX_MULTI_REQUEST_INDEX), $entry->parentEntryId ); //no need to validate array out of bounds, no error is thrown
-			$j+=self::MAX_MULTI_REQUEST_INDEX;
+			$this->addThumbCuePoints($imagesArray[$j], $entry->parentEntryId );
 		}
 		KBatchBase::unimpersonate();
 	}
