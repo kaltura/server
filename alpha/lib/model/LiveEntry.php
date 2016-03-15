@@ -137,11 +137,6 @@ abstract class LiveEntry extends entry
 			kBusinessConvertDL::decideLiveProfile($this);
 		}
 		
-		if($this->isColumnModified(entryPeer::STATUS) && $this->getStatus() == entryStatus::DELETED && $this->getLiveStatus() !== EntryServerNodeStatus::STOPPED)
-		{
-			EntryServerNodePeer::deleteByEntryId($this->getId());
-		}
-		
 		return parent::postUpdate($con);
 	}
 	

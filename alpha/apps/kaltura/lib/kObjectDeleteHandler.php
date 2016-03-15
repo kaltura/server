@@ -128,6 +128,8 @@ class kObjectDeleteHandler implements kObjectDeletedEventConsumer
 			$flavorParamsOutput->save();
 		}
 		
+		EntryServerNodePeer::deleteByEntryId($entry->getId());
+		
 		$filter = new categoryEntryFilter();
 		$filter->setEntryIdEqual($entry->getId());
 		
@@ -138,9 +140,6 @@ class kObjectDeleteHandler implements kObjectDeletedEventConsumer
 		}
 		
 		kJobsManager::addDeleteJob($entry->getPartnerId(), DeleteObjectType::CATEGORY_ENTRY, $filter);
-
-		EntryServerNodePeer::deleteByEntryId($entry->getId());
-
 	}
 	
 	protected function kuserDelete(kuser $kuser)
