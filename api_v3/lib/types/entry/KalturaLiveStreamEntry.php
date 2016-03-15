@@ -151,8 +151,9 @@ class KalturaLiveStreamEntry extends KalturaLiveEntry
 		/**
 		 * @var LiveStreamEntry @dbObject
 		 */
+		$ksObject = kCurrentContext::$ks_object;
 		if ( !kCurrentContext::$is_admin_session && !(kCurrentContext::getCurrentKsKuserId() == $dbObject->getKuserId())
-				&& !kCurrentContext::$ks_object->verifyPrivileges(ks::PRIVILEGE_EDIT, $this->id) )
+				&& (!$ksObject || !$ksObject->verifyPrivileges(ks::PRIVILEGE_EDIT, $this->id)) )
 		{
 			$this->primaryBroadcastingUrl = null;
 			$this->secondaryBroadcastingUrl = null;
