@@ -7,12 +7,14 @@ class DocumentConversionEngineType implements IKalturaPluginEnum, conversionEngi
 {	
 	const IMAGEMAGICK_ENGINE = 'ImageMagick';
 	const PPT2IMG_ENGINE = 'ppt2Img';
-	
+	const THUMB_ASSETS_ENGINE = 'thumbAssets';
+
 	public static function getAdditionalValues()
 	{
 		return array(
 			'IMAGEMAGICK' => self::IMAGEMAGICK_ENGINE,
 			'PPT2IMG' => self::PPT2IMG_ENGINE,
+			'THUMB_ASSETS' => self::THUMB_ASSETS_ENGINE,
 		);
 	}
 	

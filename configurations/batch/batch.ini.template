@@ -63,6 +63,7 @@ enabledWorkers.KAsyncTagIndex						= 1
 enabledWorkers.KAsyncIntegrate						= 1
 enabledWorkers.KAsyncIntegrateCloser				= 1
 enabledWorkers.KAsyncClearCuePoints					= 1
+enabledWorkers.KAsyncConvertThumbAssetsGenerator	= 1
 
 
 [mainTemplate : template]
@@ -757,4 +758,12 @@ filter.KalturaCuePointFilter.cuePointTypeIn							= "thumbCuePoint.Thumb,adCuePo
 filter.KalturaCuePointFilter.orderBy								= "+createdAt"
 filter.KalturaCuePointFilter.createdAtLessThanOrEqual				= "-86400"
 filter.KalturaCuePointFilter.statusEqual							= 1
+
+[KAsyncConvertThumbAssetsGenerator : KAsyncConvertWorker]
+id                                      = 630
+friendlyName                            = Convert Thumb Assets
+maximumExecutionTime                    = 36000
+maxJobsEachRun                          = 1
+filter.jobSubTypeIn                     = document.thumbAssets
+params.skipSourceValidation             = 1
 
