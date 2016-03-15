@@ -773,10 +773,10 @@ class kApiCache extends kApiCacheBase
 	// cache write functions
 	protected function isAnonymous($ks)					// overridable
 	{
-		if(kIpAddressUtils::isInternalIp())
+		/*if(kIpAddressUtils::isInternalIp())
 		{
 			return false;
-		}
+		}*/
 
 		if (!$ks)
 			return true;
@@ -784,10 +784,10 @@ class kApiCache extends kApiCacheBase
 		if(!$ks->isAdmin() && ($ks->user === "0" || $ks->user === null ))
 		{
 			$privileges = $ks->getParsedPrivileges();
-			if (!$privileges)
+			if (!$privileges || !array_key_exists (kSessionBase::PRIVILEGE_SET_ROLE,$privileges))
 				return true;
 
-			if (isset($privileges[kSessionBase::PRIVILEGE_SET_ROLE]) && kConf::hasParam('anonymous_roles_to_cache'))
+			if (kConf::hasParam('anonymous_roles_to_cache'))
 			{
 				$ksRoles = $privileges[kSessionBase::PRIVILEGE_SET_ROLE];
 				$rolesToCacheList = kConf::get('anonymous_roles_to_cache');
