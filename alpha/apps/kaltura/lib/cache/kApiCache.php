@@ -773,10 +773,10 @@ class kApiCache extends kApiCacheBase
 	// cache write functions
 	protected function isAnonymous($ks)					// overridable
 	{
-		/*if(kIpAddressUtils::isInternalIp())
+		if(kIpAddressUtils::isInternalIp())
 		{
 			return false;
-		}*/
+		}
 
 		if (!$ks)
 			return true;
