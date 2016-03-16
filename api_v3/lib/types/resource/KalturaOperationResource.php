@@ -71,6 +71,8 @@ class KalturaOperationResource extends KalturaContentResource
 	 */
 	public function toObject($object_to_fill = null, $props_to_skip = array())
 	{
+		$this->validateForUsage($object_to_fill, $props_to_skip);
+		
 		if(is_null($this->operationAttributes) || !count($this->operationAttributes))
 			return $this->resource->toObject();
 		
