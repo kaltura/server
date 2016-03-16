@@ -32,11 +32,6 @@ class CuePointIndex extends BaseIndexObject
 		return CuePointPeer::ID;
 	}
 
-	public static function getTypeField()
-	{
-		return null;
-	}
-
 	public static function getDefaultCriteriaFilter()
 	{
 		return CuePointPeer::getCriteriaFilter();

@@ -30,11 +30,6 @@ class categoryKuserIndex extends BaseIndexObject
 		return null;
 	}
 
-	public static function getTypeField()
-	{
-		return null;
-	}
-
 	public static function getDefaultCriteriaFilter()
 	{
 		return categoryKuserPeer::getCriteriaFilter();

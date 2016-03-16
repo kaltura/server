@@ -38,11 +38,6 @@ class entryIndex extends BaseIndexObject
 		return entryPeer::ID;
 	}
 
-	public static function getTypeField()
-	{
-		return null;
-	}
-
 	public static function getDefaultCriteriaFilter()
 	{
 		return entryPeer::getCriteriaFilter();
