@@ -116,6 +116,7 @@ class entryFilter extends baseObjectFilter
 			"_in_access_control_id",
 			"_free_text",
 			"_eq_reference_id",
+			"_eq_md5_reference_id",
 			"_in_reference_id",
 			"_eq_replacing_entry_id",
 			"_in_replacing_entry_id",
