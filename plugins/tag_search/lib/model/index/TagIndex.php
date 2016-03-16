@@ -30,6 +30,11 @@ class TagIndex extends BaseIndexObject
 		return null;
 	}
 
+	public static function getTypeField()
+	{
+		return null;
+	}
+
 	public static function getDefaultCriteriaFilter()
 	{
 		return TagPeer::getCriteriaFilter();
@@ -61,12 +66,12 @@ class TagIndex extends BaseIndexObject
 		if (!self::$typesMap)
 		{
 			self::$typesMap = array(
-				'int_id' => IIndexable::FIELD_TYPE_INTEGER,
+				'int_id' => IIndexable::FIELD_TYPE_UINT,
 				'tag' => IIndexable::FIELD_TYPE_STRING,
 				'partner_id' => IIndexable::FIELD_TYPE_STRING,
 				'object_type' => IIndexable::FIELD_TYPE_STRING,
 				'created_at' => IIndexable::FIELD_TYPE_DATETIME,
-				'instance_count' => IIndexable::FIELD_TYPE_INTEGER,
+				'instance_count' => IIndexable::FIELD_TYPE_UINT,
 				'privacy_context' => IIndexable::FIELD_TYPE_STRING,
 			);
 		}
