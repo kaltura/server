@@ -74,6 +74,17 @@ None.
 #### Deployment scripts ####
  - php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2016_02_29_batch_cue_point.php
 
+## Avoid API caching of anonymous users base on widget role unless found in blacklist ##
+ - Issue Type:bug\feature
+ - Issue ID : PLAT-5226
+### Installation ###
+None.
+### Configuration ###
+Need to add PLAYBACK_BASE_ROLE to section anonymous_roles_to_cache
+#### Known Issues & Limitations ####
+ - None
+#### Deployment scripts ####
+ - php deployment/updates/scripts/add_permissions/2016_02_11_add_qna_user_role_and_permissions.php
 
 # Kajam-11.10.0 #
 
