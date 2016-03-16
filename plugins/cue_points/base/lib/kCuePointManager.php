@@ -133,7 +133,7 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 		if ($jobType == BatchJobType::CONVERT_LIVE_SEGMENT &&
 			$dbBatchJob->getStatus() == BatchJob::BATCHJOB_STATUS_FINISHED &&
 			$data->getFileIndex() == 0 &&
-			$data->getMediaServerIndex() == MediaServerIndex::PRIMARY){
+			$data->getMediaServerIndex() == EntryServerNodeType::LIVE_PRIMARY){
 			$asset = assetPeer::retrieveByIdNoFilter($data->getAssetId());
 			if ($asset->hasTag(assetParams::TAG_RECORDING_ANCHOR))
 				return true;

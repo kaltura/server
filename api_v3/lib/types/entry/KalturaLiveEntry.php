@@ -95,7 +95,9 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 
 	/**
 	 * the status of the entry of type LiveEntryStatus
-	 * @var KalturaLiveEntryStatus
+	 * @var KalturaEntryServerNodeStatus
+	 * @readonly
+	 * @deprecated use KalturaLiveStreamService.isLive instead
 	 */
 	public $liveStatus;
 
