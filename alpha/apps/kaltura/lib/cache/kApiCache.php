@@ -787,7 +787,7 @@ class kApiCache extends kApiCacheBase
 			if (!$privileges)
 				return true;
 
-			if (kConf::hasParam('anonymous_roles_to_cache'))
+			if (isset($privileges[kSessionBase::PRIVILEGE_SET_ROLE]) && kConf::hasParam('anonymous_roles_to_cache'))
 			{
 				$ksRoles = $privileges[kSessionBase::PRIVILEGE_SET_ROLE];
 				$rolesToCacheList = kConf::get('anonymous_roles_to_cache');
