@@ -218,14 +218,14 @@ class KalturaLiveEntryService extends KalturaEntryService
 	{
 		KalturaLog::debug("Entry [$entryId] from mediaServerIndex [$mediaServerIndex] with liveEntryStatus [$liveEntryStatus]");
 
-		/* @var $dbLiveEntry LiveEntry */
 		$dbLiveEntry = entryPeer::retrieveByPK($entryId);
 		if (!$dbLiveEntry || !($dbLiveEntry instanceof LiveEntry))
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 		
+		/* @var $dbLiveEntry LiveEntry */
 		try 
 		{
-			$dbLiveEntry->setMediaServer($mediaServerIndex, $hostname, $liveEntryStatus, $applicationName);
+			$liveEntryServerNode = $dbLiveEntry->setMediaServer($mediaServerIndex, $hostname, $liveEntryStatus, $applicationName);
 		}
 		catch(kCoreException $ex)
 		{
@@ -246,7 +246,9 @@ class KalturaLiveEntryService extends KalturaEntryService
 		
 		if($dbLiveEntry->save())
 		{
-			$this->addTrackEntryData($liveEntryServerNode, __FUNCTION__);
+			if($liveEntryServerNode)
+				$this->addTrackEntryData($liveEntryServerNode, __FUNCTION__);
+			
 			if($mediaServerIndex == EntryServerNodeType::LIVE_PRIMARY && $liveEntryStatus == EntryServerNodeStatus::PLAYABLE && $dbLiveEntry->getRecordStatus())
 			{
 				KalturaLog::info("Checking if recorded entry needs to be created for entry $entryId");
@@ -264,8 +266,8 @@ class KalturaLiveEntryService extends KalturaEntryService
 					else{
 						$recordedEntryCreationTime = $dbRecordedEntry->getCreatedAt(null);
 
-						$isNewSession = $dbLiveEntry->getLastBroadcastEndTime() + kConf::get('live_session_reconnect_timeout', 'local', 180) < $liveEntryServerNode->getCurrentBroadcastingStartTime();
-						$recordedEntryNotYetCreatedForCurrentSession = $recordedEntryCreationTime < $liveEntryServerNode->getCurrentBroadcastingStartTime();
+						$isNewSession = $dbLiveEntry->getLastBroadcastEndTime() + kConf::get('live_session_reconnect_timeout', 'local', 180) < $dbLiveEntry->getCurrentBroadcastStartTime();
+						$recordedEntryNotYetCreatedForCurrentSession = $recordedEntryCreationTime < $dbLiveEntry->getCurrentBroadcastStartTime();
 
 						if ($dbLiveEntry->getRecordStatus() == RecordStatus::PER_SESSION) {
 							if ($isNewSession && $recordedEntryNotYetCreatedForCurrentSession)

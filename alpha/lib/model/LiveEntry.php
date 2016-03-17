@@ -685,6 +685,8 @@ abstract class LiveEntry extends entry
 			
 			$this->setLastBroadcast(kApiCache::getTime());
 		}
+		
+		return $dbLiveEntryServerNode;
 	}
 	
 	private function getLiveEntryServerNode($hostname, $mediaServerIndex, $liveEntryStatus, $serverNodeId, $applicationName = null)
