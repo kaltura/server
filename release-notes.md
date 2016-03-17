@@ -12,7 +12,7 @@
 		php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2016_02_10_entry_server_node_service.php
 	
 	Create new entry_server_node table:
-		mysql -h@db_host@ -u@db_user@ -p@db_pass@ -P3306 kaltura < /opt/kaltura/app/deployment/updates/scripts/add_permissions/2016_02_10_entry_server_node_service.php
+		mysql -h@db_host@ -u@db_user@ -p@db_pass@ -P3306 kaltura < /opt/kaltura/app/deployment/updates/sql/2016_02_10_create_entry_server_node_table.sql
 		
 	Import all live entries to the new table:
 		php /opt/kaltura/app/deployment/updates/scripts/2016_02_17_move_live_entry_to_entry_server_node.php
