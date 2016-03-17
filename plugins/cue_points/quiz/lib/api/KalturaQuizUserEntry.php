@@ -46,7 +46,9 @@ class KalturaQuizUserEntry extends KalturaUserEntry{
 	{
 		$object_to_fill = parent::toInsertableObject($object_to_fill, $props_to_skip);
 		$isAnonymous = false;
-		$anonKusers = kuserPeer::getKuserByPartnerAndUids(kCurrentContext::$partner_id, array('', 0));
+		$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
+		$anonKusers = kuserPeer::getKuserByPartnerAndUids($partnerId, array('', 0));
+		KalturaLog::debug("@@NA anonkusers [".print_r($anonKusers,true)."] kuserId [".$object_to_fill->getKuserId()."] current partner id [".kCurrentContext::$partner_id."]");
 		foreach ($anonKusers as $anonKuser)
 		{
 			if ($anonKuser->getKuserId() == $object_to_fill->getKuserId())
