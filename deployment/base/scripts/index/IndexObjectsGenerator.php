@@ -137,6 +137,9 @@ class IndexObjectsGenerator extends IndexGeneratorBase
 			case "bint":
 				$type = "IIndexable::FIELD_TYPE_INTEGER";
 				break;
+			case "float":
+				$type = "IIndexable::FIELD_TYPE_FLOAT";
+				break;
 			case "datetime":
 				$type = "IIndexable::FIELD_TYPE_DATETIME";
 				break;
@@ -227,7 +230,7 @@ class IndexObjectsGenerator extends IndexGeneratorBase
 	}
 
 	private function getApiCompareAttributesMap($fp, IndexableObject $object, $key, IndexableField $value) {
-		if($value->apiName && in_array($value->type, array('int', 'bint', 'datetime')))
+		if($value->apiName && in_array($value->type, array('int', 'bint', 'float', 'datetime')))
 			$this->printToFile($fp, "'" .  $value->apiName . "' => '" . $value->indexName . "',",4);
 	}
 
@@ -326,6 +329,8 @@ class IndexObjectsGenerator extends IndexGeneratorBase
 				return array("rt_attr_uint");
 			case "bint":
 				return array("rt_attr_bigint");
+			case "float":
+				return array("rt_attr_float");
 			case "datetime":
 				return array("rt_attr_timestamp");
 			case "json":
