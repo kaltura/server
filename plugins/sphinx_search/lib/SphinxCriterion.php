@@ -358,25 +358,31 @@ class SphinxCriterion extends KalturaCriterion implements IKalturaIndexQuery
 		
 		if($objectClass::getFieldType($sphinxField, true) == IIndexable::FIELD_TYPE_UINT)
 		{
-			if(gettype($value) == 'string')
-				$value = explode(",", $value);
-			
-			//if one value was given
-			if(count($value) == 1)
+			switch (gettype($value))
 			{
-				$value = (int)$value[0];
-				if($value < 0)
+				case 'int':
+					if($value < 0)
 					$value = self::MAX_UINT_VAL + $value;
-			
-				$value = (string)$value;
-			}
-			else
-			{
-				foreach($value as $index => $arrVal)
-				{
-					if($arrVal < 0)
-						$value[$index] = self::MAX_UINT_VAL + $arrVal;
-				}
+					break;
+				case 'string':
+					$value = explode(",", $value);
+				case 'array':
+					if(count($value) == 1)
+					{
+						$value = (int)$value[0];
+						if($value < 0)
+							$value = self::MAX_UINT_VAL + $value;
+						$value = (string)$value;
+					}
+					else
+					{
+						foreach($value as $index => $arrVal)
+						{
+							if($arrVal < 0)
+								$value[$index] = self::MAX_UINT_VAL + $arrVal;
+						}
+					}
+					break;
 			}
 		}
 	

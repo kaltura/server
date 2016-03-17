@@ -62,6 +62,7 @@ class CaptionAssetItemIndex extends BaseIndexObject
 				'created_at' => 'createdAt',
 				'updated_at' => 'updatedAt',
 				'str_entry_id' => 'entryId',
+				'str_caption_asset_id' => 'id',
 			);
 		}
 		return self::$fieldsMap;
@@ -139,6 +140,7 @@ class CaptionAssetItemIndex extends BaseIndexObject
 				'caption_asset_item.CREATED_AT' => 'created_at',
 				'caption_asset_item.UPDATED_AT' => 'updated_at',
 				'caption_asset_item.STR_ENTRY_ID' => 'str_entry_id',
+				'caption_asset_item.STR_CAPTION_ASSET_ID' => 'str_caption_asset_id',
 			);
 		}
 		return self::$searchableFieldsMap;
