@@ -282,7 +282,7 @@ class kFlowHelper
 		}
 		
 		$keyType = liveAsset::FILE_SYNC_ASSET_SUB_TYPE_LIVE_PRIMARY;
-		if($data->getMediaServerIndex() == EntryServerType::LIVE_BACKUP)
+		if($data->getMediaServerIndex() == EntryServerNodeType::LIVE_BACKUP)
 			$keyType = liveAsset::FILE_SYNC_ASSET_SUB_TYPE_LIVE_SECONDARY;
 			
 		$key = $asset->getSyncKey($keyType);
