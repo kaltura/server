@@ -11,10 +11,6 @@ class Form_FacebookProfileConfiguration extends Form_ConfigurableProfileConfigur
 	{
 		parent::init();
 		$this->getView()->addBasePath(realpath(dirname(__FILE__)));
-		$this->addDecorator('ViewScript', array(
-			'viewScript' => 'facebook-distribution.phtml',
-			'placement' => 'APPEND'
-		));
 	}
 
 	protected function addProviderElements()
@@ -28,9 +24,10 @@ class Form_FacebookProfileConfiguration extends Form_ConfigurableProfileConfigur
 
 		$this->addElement('text', 'api_authorize_url', array(
 			'label'			=> 'Authorize API Access:',
-			'decorators' => array(array('ViewScript', array(
-				'viewScript' => 'facebook-distribution-api-authorize-field.phtml',
-
+			'decorators' => array(
+				array('ViewScript',
+					array(
+						'viewScript' => 'facebook-distribution-api-authorize-field.phtml',
 			)))
 		));
 
@@ -38,6 +35,7 @@ class Form_FacebookProfileConfiguration extends Form_ConfigurableProfileConfigur
 		$this->addElement('text', 'page_id', array(
 			'label'			=> 'Facebook Page ID:',
 			'filters'		=> array('StringTrim'),
+			'required'		=> true,
 		));
 
 
@@ -48,6 +46,5 @@ class Form_FacebookProfileConfiguration extends Form_ConfigurableProfileConfigur
 		);
 
 	}
-
 
 }

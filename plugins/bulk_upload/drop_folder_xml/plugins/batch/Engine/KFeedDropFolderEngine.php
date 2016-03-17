@@ -23,7 +23,7 @@ class KFeedDropFolderEngine extends KDropFolderEngine
 		
 		//Get Drop Folder feed and import it into a SimpleXMLElement
 		
-		$feed = new SimpleXMLElement (file_get_contents($dropFolder->path));
+		$feed = new SimpleXMLElement ($this->fetchFeedContent($dropFolder->path));
 		$this->feedNamespaces = $feed->getNamespaces(true);
 		
 		//get items
@@ -275,4 +275,43 @@ class KFeedDropFolderEngine extends KDropFolderEngine
 		
 		return max ($bitrates);
 	}
+	
+	/**
+	 * @param string $url
+	 * @return string
+	 */
+	protected function fetchFeedContent ($url)
+	{
+		$user = parse_url ($url, PHP_URL_USER);
+		if (!is_null ($user))
+		{
+			$password = parse_url ($url, PHP_URL_PASS);
+			$urlComponents = parse_url ($url); 
+			$protocol = isset ($urlComponents['scheme']) ? $urlComponents['scheme'] : null;
+			$hostname = isset($urlComponents ['host']) ? $urlComponents ['host'] : null;
+			$port = isset ($urlComponents['port']) ? $urlComponents['port'] : null;
+			$params = isset ($urlComponents['path']) ? $urlComponents['path'] : null;
+			$queryArgs = isset ($urlComponents['query']) ? $urlComponents['query'] : null;
+			$fragment = isset ($urlComponents ['fragment']) ? $urlComponents ['fragment'] : null;
+
+			$url =  "$protocol://$hostname" .  ($port? ":$port" : "") . ($params ? $params : "") . ($queryArgs ? "?$queryArgs" : "") . ($fragment ? "#$fragment" : "");
+		}
+		
+		$ch = curl_init ($url);
+		if (!is_null ($user))
+		{
+			curl_setopt($ch, CURLOPT_USERPWD, "$user:$password");
+			curl_setopt ($ch, CURLOPT_HTTPAUTH, CURLAUTH_ANY);
+		}
+		curl_setopt ($ch, CURLOPT_FOLLOWLOCATION, true);
+		curl_setopt ($ch, CURLOPT_RETURNTRANSFER, true);
+		
+		$res = curl_exec($ch);
+		curl_close ($ch);
+		
+		KalturaLog::info("For URL [$url], the curl result is: " . print_r($res, true));
+		return $res;
+	}
+	
+	
 }

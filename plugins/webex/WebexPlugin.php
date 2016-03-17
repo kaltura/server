@@ -8,6 +8,7 @@ class WebexPlugin extends KalturaPlugin implements IKalturaImportHandler
 	
 	const WEBEX_FLAVOR_PARAM_SYS_NAME = 'webex_flavor_params';
 
+	private static $container_formats_to_file_extensions = array("arf"=>"arf", "mpeg-4" => "mp4");
 
 	/* (non-PHPdoc)
 	 * @see IKalturaPlugin::getPluginName()
@@ -107,10 +108,10 @@ class WebexPlugin extends KalturaPlugin implements IKalturaImportHandler
 		
 		$curlWrapper->setOpt(CURLOPT_RETURNTRANSFER, false);
 		$fileName = pathinfo($importData->destFileLocalPath, PATHINFO_FILENAME);
-		$destFileLocalPath = preg_replace("/$fileName\.[\w\d]+/", "$fileName.arf", $importData->destFileLocalPath);
-		$importData->destFileLocalPath = $destFileLocalPath;
+		
 		KalturaLog::info('destination: ' . $importData->destFileLocalPath);
-		$result = $curlWrapper->exec($url4, $importData->destFileLocalPath);
+		$tmpPath = tempnam(sys_get_temp_dir(), "webex");
+		$result = $curlWrapper->exec($url4, $tmpPath);
 		
 		if (!$result)
 		{	
@@ -118,6 +119,21 @@ class WebexPlugin extends KalturaPlugin implements IKalturaImportHandler
 			$message = $curlWrapper->getError();
 			throw new Exception($message, $code);
 		}
+
+		$mediaInfoBin = isset($params->mediaInfoCmd)? $params->mediaInfoCmd: "mediainfo";
+		$mediaInfoParser = new KMediaInfoMediaParser($tmpPath, $mediaInfoBin);
+		$mediaInfo = $mediaInfoParser->getMediaInfo();
+		if (isset(self::$container_formats_to_file_extensions[$mediaInfo->containerFormat]) )
+		{
+			$fileExtension = self::$container_formats_to_file_extensions[$mediaInfo->containerFormat];
+			$destFileLocalPath = preg_replace("/$fileName\.[\w\d]+/", $fileName.".".$fileExtension, $importData->destFileLocalPath);
+		}
+		else
+		{
+			$destFileLocalPath = preg_replace("/$fileName\.[\w\d]+/", "$fileName.arf", $importData->destFileLocalPath);
+		}
+		$importData->destFileLocalPath = $destFileLocalPath;
+		rename($tmpPath, $importData->destFileLocalPath);
 		
 		$curlWrapper->close();
 		$importData->fileSize = kFile::fileSize($importData->destFileLocalPath);

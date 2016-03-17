@@ -1904,6 +1904,9 @@ abstract class BasePartner extends BaseObject  implements Persistent {
 	 */
 	public function hydrate($row, $startcol = 0, $rehydrate = false)
 	{
+		// Nullify cached objects
+		$this->m_custom_data = null;
+		
 		try {
 
 			$this->id = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
@@ -2012,7 +2015,7 @@ abstract class BasePartner extends BaseObject  implements Persistent {
 
 		PartnerPeer::setUseCriteriaFilter(false);
 		$criteria = $this->buildPkeyCriteria();
-		entryPeer::addSelectColumns($criteria);
+		PartnerPeer::addSelectColumns($criteria);
 		$stmt = BasePeer::doSelect($criteria, $con);
 		PartnerPeer::setUseCriteriaFilter(true);
 		$row = $stmt->fetch(PDO::FETCH_NUM);
@@ -2117,29 +2120,55 @@ abstract class BasePartner extends BaseObject  implements Persistent {
                 $stmt = BasePeer::doSelect($criteria, $con);
                 $cutsomDataArr = $stmt->fetchAll(PDO::FETCH_COLUMN);
                 $newCustomData = $cutsomDataArr[0];
-                
-                $this->custom_data_md5 = md5($newCustomData);
+
+                $this->custom_data_md5 = is_null($newCustomData) ? null : md5($newCustomData);
 
                 $valuesToChangeTo = $this->m_custom_data->toArray();
 				$this->m_custom_data = myCustomData::fromString($newCustomData); 
 
 				//set custom data column values we wanted to change to
+				$validUpdate = true;
+				$atomicCustomDataFields = PartnerPeer::getAtomicCustomDataFields();
 			 	foreach ($this->oldCustomDataValues as $namespace => $namespaceValues){
                 	foreach($namespaceValues as $name => $oldValue)
 					{
+						$atomicField = false;
+						if($namespace) {
+							$atomicField = array_key_exists($namespace, $atomicCustomDataFields) && in_array($name, $atomicCustomDataFields[$namespace]);
+						} else {
+							$atomicField = in_array($name, $atomicCustomDataFields);
+						}
+						if($atomicField) {
+							$dbValue = $this->m_custom_data->get($name, $namespace);
+							if($oldValue != $dbValue) {
+								$validUpdate = false;
+								break;
+							}
+						}
+						
+						$newValue = null;
 						if ($namespace)
 						{
-							$newValue = $valuesToChangeTo[$namespace][$name];
+							if (isset ($valuesToChangeTo[$namespace][$name]))
+								$newValue = $valuesToChangeTo[$namespace][$name];
 						}
 						else
 						{ 
 							$newValue = $valuesToChangeTo[$name];
 						}
-					 
-						$this->putInCustomData($name, $newValue, $namespace);
+		
+						if (is_null($newValue)) {
+							$this->removeFromCustomData($name, $namespace);
+						}
+						else {
+							$this->putInCustomData($name, $newValue, $namespace);
+						}
 					}
-                   }
+				}
                    
+				if(!$validUpdate) 
+					break;
+					                   
 				$this->setCustomData($this->m_custom_data->toString());
 			}
 
@@ -2252,7 +2281,7 @@ abstract class BasePartner extends BaseObject  implements Persistent {
 	/**
 	 * Code to be run before persisting the object
 	 * @param PropelPDO $con
-	 * @return bloolean
+	 * @return boolean
 	 */
 	public function preSave(PropelPDO $con = null)
 	{
@@ -2316,7 +2345,9 @@ abstract class BasePartner extends BaseObject  implements Persistent {
 		if($this->isModified())
 		{
 			kQueryCache::invalidateQueryCache($this);
-			kEventsManager::raiseEvent(new kObjectChangedEvent($this, $this->tempModifiedColumns));
+			$modifiedColumns = $this->tempModifiedColumns;
+			$modifiedColumns[kObjectChangedEvent::CUSTOM_DATA_OLD_VALUES] = $this->oldCustomDataValues;
+			kEventsManager::raiseEvent(new kObjectChangedEvent($this, $modifiedColumns));
 		}
 			
 		$this->tempModifiedColumns = array();
@@ -3633,6 +3664,16 @@ abstract class BasePartner extends BaseObject  implements Persistent {
 	public function incInCustomData ( $name , $delta = 1, $namespace = null)
 	{
 		$customData = $this->getCustomDataObj( );
+		
+		$currentNamespace = '';
+		if($namespace)
+			$currentNamespace = $namespace;
+			
+		if(!isset($this->oldCustomDataValues[$currentNamespace]))
+			$this->oldCustomDataValues[$currentNamespace] = array();
+		if(!isset($this->oldCustomDataValues[$currentNamespace][$name]))
+			$this->oldCustomDataValues[$currentNamespace][$name] = $customData->get($name, $namespace);
+		
 		return $customData->inc ( $name , $delta , $namespace  );
 	}
 

@@ -15,6 +15,7 @@ class UserEntryFilter extends baseObjectFilter
 			"_in_entry_id",
 			"_eq_user_id",
 			"_in_user_id",
+			"_notin_user_id",
 			"_gte_created_at",
 			"_lte_created_at",
 			"_gte_updated_at",

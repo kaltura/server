@@ -88,17 +88,7 @@ class flavorAsset extends asset
 	 */
 	public function getFlavorParams(PropelPDO $con = null)
 	{
-		if ($this->aassetParams === null && ($this->flavor_params_id !== null)) {
-			$this->aassetParams = assetParamsPeer::retrieveByPk($this->flavor_params_id);
-			/* The following can be used additionally to
-			   guarantee the related object contains a reference
-			   to this object.  This level of coupling may, however, be
-			   undesirable since it could result in an only partially populated collection
-			   in the referenced object.
-			   $this->aassetParams->addassets($this);
-			 */
-		}
-		return $this->aassetParams;
+		return assetParamsPeer::retrieveByPk($this->flavor_params_id);
 	}
 	
 	public function getIsWeb()

@@ -1,13 +1,295 @@
-# Kajam-11.5.0 #
+# Kajam-11.11.0 #
 
-## pass AMF data on shared storage instead of in job data ##
- - Issue Type: New Feature
- - Issue ID: WEBC-631
+## new entry--server_node relations model ##
+- Issue Type: Feature Request
+- Issue ID: PLAT-5018
+
+#### Configuration ####
+- None.
+
+#### Deployment Scripts ####
+	Update permissions: 
+		php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2016_02_10_entry_server_node_service.php
+	
+	Create new entry_server_node table:
+		mysql -h@db_host@ -u@db_user@ -p@db_pass@ -P3306 kaltura < /opt/kaltura/app/deployment/updates/scripts/add_permissions/2016_02_10_entry_server_node_service.php
+		
+	Import all live entries to the new table:
+		php /opt/kaltura/app/deployment/updates/scripts/2016_02_17_move_live_entry_to_entry_server_node.php
+
+#### Known Issues & Limitations ####
+- None.
+
+##Added thumb cue points generator operator on flavor params##
+- Issue Type: Feature Request
+- Issue ID: PLAT-4991
+
+#### Configuration ####
+	In order to use, requires adding a new "document.thumbAssets" operator to ppt2img flavor params.
+	Operators field should look like this:
+	[[{"id":"document.ppt2Img","extra":null,"command":null},{"id":"document.thumbAssets","extra":null,"command":null}]]
+
+	Requires adding a new worker to batch.ini:
+	- enabledWorkers.KAsyncConvertThumbAssetsGenerator = 1
+
+	- [KAsyncConvertThumbAssetsGenerator : KAsyncConvertWorker]
+	  id                                      = XXXX
+	  friendlyName                            = Convert Thumb Assets
+	  maximumExecutionTime                    = 36000
+	  maxJobsEachRun                          = 1
+	  filter.jobSubTypeIn                     = document.thumbAssets
+	  params.skipSourceValidation             = 1
+
+#### Deployment Scripts ####
+- php deployment/base/scripts/installPlugins.php
+
+#### Known Issues & Limitations ####
+- None.
+
+
+## Clear live entry old cue-points ##
+ - Issue Type: Bug
+ - Issue ID: PLAT-5161
+ 
+### Installation ###
+None.
+ 
+### Configuration ###
+		Added the following to batch.ini file:
+		- enabledWorkers.KAsyncClearCuePoints = 1
+		
+		- [KAsyncClearCuePoints : PeriodicWorker]
+		  id = LAST_USED_ID + 10
+		  friendlyName = Clear old cue points from live entry
+		  type = KAsyncClearCuePoints
+		  scriptPath = ../plugins/cue_points/base/batch/clearCuePonts/KAsyncClearCuePointsExe.php
+		  filter.KalturaCuePointFilter.cuePointTypeIn = "thumbCuePoint.Thumb,adCuePoint.Ad,codeCuePoint.Code"
+		  filter.KalturaCuePointFilter.orderBy = "+createdAt"
+		  filter.KalturaCuePointFilter.createdAtLessThanOrEqual = "-86400"
+		  filter.KalturaCuePointFilter.statusEqual = 1
+
+#### Known Issues & Limitations ####
+- None.
+
+#### Deployment scripts ####
+ - php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2016_02_29_batch_cue_point.php
+
+
+# Kajam-11.10.0 #
+
+## Add Fairplay DRM Profile ##
+ - Issue Type: Feature
+ - Issue ID: PLAT-5117
+ 
+### Installation ###
+Need to run the following script deployment/base/scripts/installPlugins.php
+#### Configuration ####
+Make sure configurations/plugins.ini has a line for "Fairplay" plugin
+#### Known Issues & Limitations ####
+None.
+#### Deployment scripts ####
+None.
+
+
+## add roles field on widget and set permissions accordingly ##
+ - Issue Type: feature
+ - Issue ID: PLAT-3728
+### Installation ###
+None.
+### Configuration ###
+None.
+#### Known Issues & Limitations ####
+ - we currently do not support passing multiple roles on the Widget object (system wide)
+#### Deployment scripts ####
+ - php deployment/updates/scripts/add_permissions/2016_02_11_add_qna_user_role_and_permissions.php
+
+## Index cateogry inherited tree once per multirequest ##
+- Issue Type: Bug
+- Issue ID: PLAT-4968
+
+#### Configuration ####
+
+*base.ini*
+
+Add the following line to the the event_consumers[] list
+
+		event_consumers[] = kObjectReadyForIndexInheritedTreeHandler
+
+#### Deployment Scripts ####
+
+None.
+
+#### Known Issues & Limitations ####
+None.
+
+## Sometimes there is more than one batch scheduler running ##
+ - Issue Type: Bug
+ - Issue ID: PLAT-4714
+ 
+### Installation ###
+None.
+#### Configuration ####
+Copy the file '/opt/kaltura/app/batch/kaltura_batch.sh' to /etc/init.d/kaltura-batch and overwrite.
+Edit file '/opt/kaltura/app/configurations/monit/monit.avail/batch.rc'. Set the value 'with pidfile "/opt/kaltura/var/run/batch.pid"'
+Edit file '/opt/kaltura/app/configurations/batch/batch.ini' and set 'pidFileDir = /opt/kaltura/var/run/'
+#### Known Issues & Limitations ####
+None.
+#### Deployment scripts ####
+None.
+
+ 
+## Remove quiz permission ##
+
+- Issue Type: Bug
+
+#### Configuration ####
+
+- Remove the following lines from admin.ini:
+
+		moduls.quizCuePoint.enabled = true
+		moduls.quizCuePoint.permissionType = 3
+		moduls.quizCuePoint.label = Quiz - Cue Points
+		moduls.quizCuePoint.permissionName = QUIZ_PLUGIN_PERMISSION
+		moduls.quizCuePoint.basePermissionType = 3
+		moduls.quizCuePoint.basePermissionName = CUEPOINT_PLUGIN_PERMISSION
+		moduls.quizCuePoint.group = GROUP_ENABLE_DISABLE_FEATURES
+
+## new Http notifcation - Flavor Asset Status Changed ##
+
+- Issue Type: New Feature
+- Issue ID: PLAT-5097
+
+#### Configuration ####
+ 
+- None.
+
+#### Deployment Scripts ####
+
+		php /opt/kaltura/app/tests/standAloneClient/exec.php /opt/kaltura/app/tests/standAloneClient/flavorAssetChangedHttpNotificationTemplate.xml
+
+#### Known Issues & Limitations ####
+
+None.
+
+## Attachement Asset & Transcript Asset Event Notifications ##
+
+#### Configuration ####
+
+*plugins.ini*
+
+Enable the following plugins:
+
+		AttachmentAssetEventNotifications
+		TranscriptAssetEventNotifications
+
+
+# Kajam-11.8.0 #
+
+## Server returning all stream information when loading the player ##
+ - Issue Type: Bug
+ - Issue ID: SUP-6997
+ 
+### Installation ###
+None.
+### Configuration ###
+None. 
+#### Known Issues & Limitations ####
+None.
+#### Deployment scripts ####
+ - php deployment\updates\scripts\add_permissions\2014_01_22_live_stream_entry_broadcast_url.php
+ 
+
+## Sometimes there is more than one batch scheduler running ##
+ - Issue Type: Bug
+ - Issue ID: PLAT-4714
+ 
+### Installation ###
+None.
+### Configuration ###
+On windows machines create directory C:\var\run
+#### Known Issues & Limitations ####
+None.
+#### Deployment scripts ####
+
+## Default drm duration is not set##
+ - Issue Type: Bug
+ - Issue ID: SUP-7174
 #### Installation ####
- - php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+None.
+#### Configuration ####
+None.
+#### Known Issues & Limitations ####
+None.
+#### Deployment scripts ####
+ - mysql -h@db_host@ -u@db_user@ -p@db_pass@ -P3306 kaltura < /opt/kaltura/app/deployment/updates/sql/2016_02_03_add_default_duration_to_drm_policies.sql
+
+
+# Kajam-11.7.0 #
+
+## Add support for cue points in baseentry clone cloneOptions PLAT-4189##
+New enums were added to clone options
+#### Installation ####
+Need to run the following script deployment/base/scripts/installPlugins.php
+#### Configuration ####
+None.
+#### Known Issues & Limitations ####
+None.
+
+## Allow uploadToken resumeAt to upload chunk to any position ##
+The uploadToken upload service supported the resumeAt parameter however it allowed the resumeAt to be a position which is smaller or equal to the already uploaded size. Each uploaded chunk was added at the resumeAt position. Now the code allows uploading a chunk to whatever resumeAt position you would like however it appends the chunks one by one each time using only a chunk which starts at a position smaller or equal than the current size and which will end (after the appending) after the end of the current file - in other words only a chunk which will start before or at the end of the current file and will increase the file size is appended. The code handles race conditions as different servers may try to append the chunks.
+
+#### Installation ####
+None.
+#### Configuration ####
+None.
+#### Known Issues & Limitations ####
+None.
+
+# Kajam-11.6.0 #
+## Expose liveStatus in the API for use in the WebCasting app + add BROADCASTING state to LiveEntryStatus##
+ - Issue Type: New Feature
+ - Issue ID: WEBC-629
+#### Installation ####
+ - deploy new jars to Wowza - new jars can be found in the ticket https://kaltura.atlassian.net/browse/WEBC-629
 #### Configuration ####
  - Validate facebook.ini exists in the configuration directory
  - Added FacebookDistribution to plugins.ini
+#### Known Issues & Limitations ####
+None.
+#### Deployment scripts ####
+ - php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+
+## Usage dashboard ##
+
+ - Issue Type: New Feature
+ - Issue ID: PLAT-3962 
+
+#### Installation ####
+
+- Download latest Usage Dashboard package from https://github.com/kaltura/usage-dashboard/releases/
+- Extract the zip to `/opt/kaltura/apps/usage-dashboard/`
+- If the app version is v1.0.0, make sure that `/opt/kaltura/apps/usage-dashboard/v1.0.0/index.html` exists
+
+#### Configuration ####
+
+- Add new permission to admin.ini:
+
+		moduls.enableUsageDashboard.enabled = true
+		moduls.enableUsageDashboard.permissionType = 2
+		moduls.enableUsageDashboard.label = Enable Usage Dashboard
+		moduls.enableUsageDashboard.permissionName = FEATURE_ENABLE_USAGE_DASHBOARD
+		moduls.enableUsageDashboard.basePermissionType =
+		moduls.enableUsageDashboard.basePermissionName =
+		moduls.enableUsageDashboard.group = GROUP_ENABLE_DISABLE_FEATURES
+
+# Kajam-11.5.0 #
+#### Installation ####
+None
+#### Configuration ####
+None
+## pass AMF data on shared storage instead of in job data ##
+ - Issue Type: New Feature
+ - Issue ID: WEBC-631
 #### Known Issues & Limitations ####
 None.
 #### Deployment scripts ####

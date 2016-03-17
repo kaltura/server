@@ -16,6 +16,12 @@ class kContextDataHelper
 	
 	/**
 	 * 
+	 * @var int
+	 */
+	private $msDuration = 0;
+	
+	/**
+	 * 
 	 * @var bool
 	 */
 	private $isSecured = false;
@@ -86,6 +92,13 @@ class kContextDataHelper
 	 */
 	public function getAllowedFlavorAssets() {
 		return $this->allowedFlavorAssets;
+	}
+	
+	/**
+	 * @return int $msDuration
+	 */
+	public function getMsDuration() {
+		return $this->msDuration;
 	}
 
 	/**
@@ -176,6 +189,25 @@ class kContextDataHelper
 	
 	private function setContextDataFlavorAssets($flavorTags)
 	{
+		if ($this->entry->getType() == entryType::PLAYLIST &&
+			$this->entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_TEXT)
+		{
+			list($entryIds, $durations, $mediaEntry) = 
+				myPlaylistUtils::executeStitchedPlaylist($this->entry);
+			if (!$mediaEntry)
+			{
+				return;
+			}
+
+			$mediaEntryId = $mediaEntry->getId();
+			$this->msDuration = array_sum($durations);
+		}
+		else
+		{
+			$mediaEntryId = $this->entry->getId();
+			$this->msDuration = $this->entry->getLengthInMsecs();
+		}
+
 		$flavorParamsIds = null;
 		$flavorParamsNotIn = false;
 		if(!$this->isAdmin)
@@ -199,9 +231,19 @@ class kContextDataHelper
 		if (is_null($this->asset))
 		{
 			if(count($flavorParamsIds))
-				$flavorAssets = assetPeer::retrieveReadyByEntryIdAndFlavorParams($this->entry->getId(), $flavorParamsIds, $flavorParamsNotIn);
+				$flavorAssets = assetPeer::retrieveReadyByEntryIdAndFlavorParams($mediaEntryId, $flavorParamsIds, $flavorParamsNotIn);
 			else 
-				$flavorAssets = assetPeer::retrieveFlavorsByEntryIdAndStatus($this->entry->getId(), null, array(flavorAsset::ASSET_STATUS_READY));			
+				$flavorAssets = assetPeer::retrieveFlavorsByEntryIdAndStatus($mediaEntryId, null, array(flavorAsset::ASSET_STATUS_READY));
+			
+			if ($mediaEntryId != $this->entry->getId())
+			{
+				// hack: setting the entry id of the flavors to the original playlist id
+				//		since the player uses it in the playManifest url 
+				foreach($flavorAssets as $flavorAsset)
+				{
+					$flavorAsset->setEntryId($this->entry->getId());
+				}
+			}
 		}
 		else
 		{
@@ -210,7 +252,7 @@ class kContextDataHelper
 				$flavorAllowed = $this->isFlavorAllowed($this->asset->getFlavorParamsId(), $flavorParamsIds, $flavorParamsNotIn); 	
 			if($flavorAllowed)
 				$flavorAssets[] = $this->asset;
-		}			
+		}
 		$this->filterFlavorAssetsByTags($flavorAssets, $flavorTags);
 	}
 	
@@ -324,6 +366,11 @@ class kContextDataHelper
 				$this->streamerType = PlaybackProtocol::RTMP;
 			if($this->entry->getSource() == EntrySourceType::AKAMAI_UNIVERSAL_LIVE)
 				$this->streamerType = PlaybackProtocol::AKAMAI_HDS;
+		}
+		elseif ($this->entry->getType() == entryType::PLAYLIST)
+		{
+			$this->streamerType = PlaybackProtocol::AKAMAI_HDS;
+			$this->mediaProtocol = infraRequestUtils::getProtocol();
 		}
 		else
 		{

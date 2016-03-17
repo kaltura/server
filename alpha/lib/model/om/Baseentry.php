@@ -349,24 +349,9 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 	protected $last_played_at;
 
 	/**
-	 * @var        kshow
-	 */
-	protected $akshow;
-
-	/**
 	 * @var        kuser
 	 */
 	protected $akuser;
-
-	/**
-	 * @var        accessControl
-	 */
-	protected $aaccessControl;
-
-	/**
-	 * @var        conversionProfile2
-	 */
-	protected $aconversionProfile2;
 
 	/**
 	 * @var        array LiveChannelSegment[] Collection to store aggregation of LiveChannelSegment objects.
@@ -469,14 +454,14 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 	private $lastassetParamsOutputCriteria = null;
 
 	/**
-	 * @var        array asset[] Collection to store aggregation of asset objects.
+	 * @var        array UserEntry[] Collection to store aggregation of UserEntry objects.
 	 */
-	protected $collassets;
+	protected $collUserEntrys;
 
 	/**
-	 * @var        Criteria The criteria used to select the current contents of collassets.
+	 * @var        Criteria The criteria used to select the current contents of collUserEntrys.
 	 */
-	private $lastassetCriteria = null;
+	private $lastUserEntryCriteria = null;
 
 	/**
 	 * Flag to prevent endless save loop, if this object is referenced
@@ -1365,10 +1350,6 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 		if ($this->kshow_id !== $v) {
 			$this->kshow_id = $v;
 			$this->modifiedColumns[] = entryPeer::KSHOW_ID;
-		}
-
-		if ($this->akshow !== null && $this->akshow->getId() !== $v) {
-			$this->akshow = null;
 		}
 
 		return $this;
@@ -2471,10 +2452,6 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 			$this->modifiedColumns[] = entryPeer::ACCESS_CONTROL_ID;
 		}
 
-		if ($this->aaccessControl !== null && $this->aaccessControl->getId() !== $v) {
-			$this->aaccessControl = null;
-		}
-
 		return $this;
 	} // setAccessControlId()
 
@@ -2496,10 +2473,6 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 		if ($this->conversion_profile_id !== $v) {
 			$this->conversion_profile_id = $v;
 			$this->modifiedColumns[] = entryPeer::CONVERSION_PROFILE_ID;
-		}
-
-		if ($this->aconversionProfile2 !== null && $this->aconversionProfile2->getId() !== $v) {
-			$this->aconversionProfile2 = null;
 		}
 
 		return $this;
@@ -2946,17 +2919,8 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 	public function ensureConsistency()
 	{
 
-		if ($this->akshow !== null && $this->kshow_id !== $this->akshow->getId()) {
-			$this->akshow = null;
-		}
 		if ($this->akuser !== null && $this->kuser_id !== $this->akuser->getId()) {
 			$this->akuser = null;
-		}
-		if ($this->aaccessControl !== null && $this->access_control_id !== $this->aaccessControl->getId()) {
-			$this->aaccessControl = null;
-		}
-		if ($this->aconversionProfile2 !== null && $this->conversion_profile_id !== $this->aconversionProfile2->getId()) {
-			$this->aconversionProfile2 = null;
 		}
 	} // ensureConsistency
 
@@ -3001,10 +2965,7 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 
 		if ($deep) {  // also de-associate any related objects?
 
-			$this->akshow = null;
 			$this->akuser = null;
-			$this->aaccessControl = null;
-			$this->aconversionProfile2 = null;
 			$this->collLiveChannelSegmentsRelatedByChannelId = null;
 			$this->lastLiveChannelSegmentRelatedByChannelIdCriteria = null;
 
@@ -3035,8 +2996,8 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 			$this->collassetParamsOutputs = null;
 			$this->lastassetParamsOutputCriteria = null;
 
-			$this->collassets = null;
-			$this->lastassetCriteria = null;
+			$this->collUserEntrys = null;
+			$this->lastUserEntryCriteria = null;
 
 		} // if (deep)
 	}
@@ -3132,8 +3093,8 @@ abstract class Baseentry extends BaseObject  implements Persistent {
                 $stmt = BasePeer::doSelect($criteria, $con);
                 $cutsomDataArr = $stmt->fetchAll(PDO::FETCH_COLUMN);
                 $newCustomData = $cutsomDataArr[0];
-                
-                $this->custom_data_md5 = md5($newCustomData);
+
+                $this->custom_data_md5 = is_null($newCustomData) ? null : md5($newCustomData);
 
                 $valuesToChangeTo = $this->m_custom_data->toArray();
 				$this->m_custom_data = myCustomData::fromString($newCustomData); 
@@ -3154,8 +3115,11 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 						{ 
 							$newValue = $valuesToChangeTo[$name];
 						}
-					 
-						if (!is_null($newValue)) {
+		
+						if (is_null($newValue)) {
+							$this->removeFromCustomData($name, $namespace);
+						}
+						else {
 							$atomicField = false;
 							if($namespace) {
 								$atomicField = array_key_exists($namespace, $atomicCustomDataFields) && in_array($name, $atomicCustomDataFields[$namespace]);
@@ -3172,7 +3136,7 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 							$this->putInCustomData($name, $newValue, $namespace);
 						}
 					}
-                   }
+				}
                    
 				if(!$validUpdate) 
 					break;
@@ -3226,32 +3190,11 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 			// method.  This object relates to these object(s) by a
 			// foreign key reference.
 
-			if ($this->akshow !== null) {
-				if ($this->akshow->isModified() || $this->akshow->isNew()) {
-					$affectedRows += $this->akshow->save($con);
-				}
-				$this->setkshow($this->akshow);
-			}
-
 			if ($this->akuser !== null) {
 				if ($this->akuser->isModified() || $this->akuser->isNew()) {
 					$affectedRows += $this->akuser->save($con);
 				}
 				$this->setkuser($this->akuser);
-			}
-
-			if ($this->aaccessControl !== null) {
-				if ($this->aaccessControl->isModified() || $this->aaccessControl->isNew()) {
-					$affectedRows += $this->aaccessControl->save($con);
-				}
-				$this->setaccessControl($this->aaccessControl);
-			}
-
-			if ($this->aconversionProfile2 !== null) {
-				if ($this->aconversionProfile2->isModified() || $this->aconversionProfile2->isNew()) {
-					$affectedRows += $this->aconversionProfile2->save($con);
-				}
-				$this->setconversionProfile2($this->aconversionProfile2);
 			}
 
 
@@ -3360,8 +3303,8 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 				}
 			}
 
-			if ($this->collassets !== null) {
-				foreach ($this->collassets as $referrerFK) {
+			if ($this->collUserEntrys !== null) {
+				foreach ($this->collUserEntrys as $referrerFK) {
 					if (!$referrerFK->isDeleted()) {
 						$affectedRows += $referrerFK->save($con);
 					}
@@ -3586,27 +3529,9 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 			// method.  This object relates to these object(s) by a
 			// foreign key reference.
 
-			if ($this->akshow !== null) {
-				if (!$this->akshow->validate($columns)) {
-					$failureMap = array_merge($failureMap, $this->akshow->getValidationFailures());
-				}
-			}
-
 			if ($this->akuser !== null) {
 				if (!$this->akuser->validate($columns)) {
 					$failureMap = array_merge($failureMap, $this->akuser->getValidationFailures());
-				}
-			}
-
-			if ($this->aaccessControl !== null) {
-				if (!$this->aaccessControl->validate($columns)) {
-					$failureMap = array_merge($failureMap, $this->aaccessControl->getValidationFailures());
-				}
-			}
-
-			if ($this->aconversionProfile2 !== null) {
-				if (!$this->aconversionProfile2->validate($columns)) {
-					$failureMap = array_merge($failureMap, $this->aconversionProfile2->getValidationFailures());
 				}
 			}
 
@@ -3696,8 +3621,8 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 					}
 				}
 
-				if ($this->collassets !== null) {
-					foreach ($this->collassets as $referrerFK) {
+				if ($this->collUserEntrys !== null) {
+					foreach ($this->collUserEntrys as $referrerFK) {
 						if (!$referrerFK->validate($columns)) {
 							$failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
 						}
@@ -4549,9 +4474,9 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 				}
 			}
 
-			foreach ($this->getassets() as $relObj) {
+			foreach ($this->getUserEntrys() as $relObj) {
 				if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-					$copyObj->addasset($relObj->copy($deepCopy));
+					$copyObj->addUserEntry($relObj->copy($deepCopy));
 				}
 			}
 
@@ -4621,55 +4546,6 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 	}
 
 	/**
-	 * Declares an association between this object and a kshow object.
-	 *
-	 * @param      kshow $v
-	 * @return     entry The current object (for fluent API support)
-	 * @throws     PropelException
-	 */
-	public function setkshow(kshow $v = null)
-	{
-		if ($v === null) {
-			$this->setKshowId(NULL);
-		} else {
-			$this->setKshowId($v->getId());
-		}
-
-		$this->akshow = $v;
-
-		// Add binding for other direction of this n:n relationship.
-		// If this object has already been added to the kshow object, it will not be re-added.
-		if ($v !== null) {
-			$v->addentry($this);
-		}
-
-		return $this;
-	}
-
-
-	/**
-	 * Get the associated kshow object
-	 *
-	 * @param      PropelPDO Optional Connection object.
-	 * @return     kshow The associated kshow object.
-	 * @throws     PropelException
-	 */
-	public function getkshow(PropelPDO $con = null)
-	{
-		if ($this->akshow === null && (($this->kshow_id !== "" && $this->kshow_id !== null))) {
-			$this->akshow = kshowPeer::retrieveByPk($this->kshow_id);
-			/* The following can be used additionally to
-			   guarantee the related object contains a reference
-			   to this object.  This level of coupling may, however, be
-			   undesirable since it could result in an only partially populated collection
-			   in the referenced object.
-			   $this->akshow->addentrys($this);
-			 */
-		}
-		return $this->akshow;
-	}
-
-	/**
 	 * Declares an association between this object and a kuser object.
 	 *
 	 * @param      kuser $v
@@ -4716,104 +4592,6 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 			 */
 		}
 		return $this->akuser;
-	}
-
-	/**
-	 * Declares an association between this object and a accessControl object.
-	 *
-	 * @param      accessControl $v
-	 * @return     entry The current object (for fluent API support)
-	 * @throws     PropelException
-	 */
-	public function setaccessControl(accessControl $v = null)
-	{
-		if ($v === null) {
-			$this->setAccessControlId(NULL);
-		} else {
-			$this->setAccessControlId($v->getId());
-		}
-
-		$this->aaccessControl = $v;
-
-		// Add binding for other direction of this n:n relationship.
-		// If this object has already been added to the accessControl object, it will not be re-added.
-		if ($v !== null) {
-			$v->addentry($this);
-		}
-
-		return $this;
-	}
-
-
-	/**
-	 * Get the associated accessControl object
-	 *
-	 * @param      PropelPDO Optional Connection object.
-	 * @return     accessControl The associated accessControl object.
-	 * @throws     PropelException
-	 */
-	public function getaccessControl(PropelPDO $con = null)
-	{
-		if ($this->aaccessControl === null && ($this->access_control_id !== null)) {
-			$this->aaccessControl = accessControlPeer::retrieveByPk($this->access_control_id);
-			/* The following can be used additionally to
-			   guarantee the related object contains a reference
-			   to this object.  This level of coupling may, however, be
-			   undesirable since it could result in an only partially populated collection
-			   in the referenced object.
-			   $this->aaccessControl->addentrys($this);
-			 */
-		}
-		return $this->aaccessControl;
-	}
-
-	/**
-	 * Declares an association between this object and a conversionProfile2 object.
-	 *
-	 * @param      conversionProfile2 $v
-	 * @return     entry The current object (for fluent API support)
-	 * @throws     PropelException
-	 */
-	public function setconversionProfile2(conversionProfile2 $v = null)
-	{
-		if ($v === null) {
-			$this->setConversionProfileId(NULL);
-		} else {
-			$this->setConversionProfileId($v->getId());
-		}
-
-		$this->aconversionProfile2 = $v;
-
-		// Add binding for other direction of this n:n relationship.
-		// If this object has already been added to the conversionProfile2 object, it will not be re-added.
-		if ($v !== null) {
-			$v->addentry($this);
-		}
-
-		return $this;
-	}
-
-
-	/**
-	 * Get the associated conversionProfile2 object
-	 *
-	 * @param      PropelPDO Optional Connection object.
-	 * @return     conversionProfile2 The associated conversionProfile2 object.
-	 * @throws     PropelException
-	 */
-	public function getconversionProfile2(PropelPDO $con = null)
-	{
-		if ($this->aconversionProfile2 === null && ($this->conversion_profile_id !== null)) {
-			$this->aconversionProfile2 = conversionProfile2Peer::retrieveByPk($this->conversion_profile_id);
-			/* The following can be used additionally to
-			   guarantee the related object contains a reference
-			   to this object.  This level of coupling may, however, be
-			   undesirable since it could result in an only partially populated collection
-			   in the referenced object.
-			   $this->aconversionProfile2->addentrys($this);
-			 */
-		}
-		return $this->aconversionProfile2;
 	}
 
 	/**
@@ -7015,207 +6793,6 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 	}
 
 	/**
-	 * Clears out the collassets collection (array).
-	 *
-	 * This does not modify the database; however, it will remove any associated objects, causing
-	 * them to be refetched by subsequent calls to accessor method.
-	 *
-	 * @return     void
-	 * @see        addassets()
-	 */
-	public function clearassets()
-	{
-		$this->collassets = null; // important to set this to NULL since that means it is uninitialized
-	}
-
-	/**
-	 * Initializes the collassets collection (array).
-	 *
-	 * By default this just sets the collassets collection to an empty array (like clearcollassets());
-	 * however, you may wish to override this method in your stub class to provide setting appropriate
-	 * to your application -- for example, setting the initial array to the values stored in database.
-	 *
-	 * @return     void
-	 */
-	public function initassets()
-	{
-		$this->collassets = array();
-	}
-
-	/**
-	 * Gets an array of asset objects which contain a foreign key that references this object.
-	 *
-	 * If this collection has already been initialized with an identical Criteria, it returns the collection.
-	 * Otherwise if this entry has previously been saved, it will retrieve
-	 * related assets from storage. If this entry is new, it will return
-	 * an empty collection or the current collection, the criteria is ignored on a new object.
-	 *
-	 * @param      PropelPDO $con
-	 * @param      Criteria $criteria
-	 * @return     array asset[]
-	 * @throws     PropelException
-	 */
-	public function getassets($criteria = null, PropelPDO $con = null)
-	{
-		if ($criteria === null) {
-			$criteria = new Criteria(entryPeer::DATABASE_NAME);
-		}
-		elseif ($criteria instanceof Criteria)
-		{
-			$criteria = clone $criteria;
-		}
-
-		if ($this->collassets === null) {
-			if ($this->isNew()) {
-			   $this->collassets = array();
-			} else {
-
-				$criteria->add(assetPeer::ENTRY_ID, $this->id);
-
-				assetPeer::addSelectColumns($criteria);
-				$this->collassets = assetPeer::doSelect($criteria, $con);
-			}
-		} else {
-			// criteria has no effect for a new object
-			if (!$this->isNew()) {
-				// the following code is to determine if a new query is
-				// called for.  If the criteria is the same as the last
-				// one, just return the collection.
-
-
-				$criteria->add(assetPeer::ENTRY_ID, $this->id);
-
-				assetPeer::addSelectColumns($criteria);
-				if (!isset($this->lastassetCriteria) || !$this->lastassetCriteria->equals($criteria)) {
-					$this->collassets = assetPeer::doSelect($criteria, $con);
-				}
-			}
-		}
-		$this->lastassetCriteria = $criteria;
-		return $this->collassets;
-	}
-
-	/**
-	 * Returns the number of related asset objects.
-	 *
-	 * @param      Criteria $criteria
-	 * @param      boolean $distinct
-	 * @param      PropelPDO $con
-	 * @return     int Count of related asset objects.
-	 * @throws     PropelException
-	 */
-	public function countassets(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
-	{
-		if ($criteria === null) {
-			$criteria = new Criteria(entryPeer::DATABASE_NAME);
-		} else {
-			$criteria = clone $criteria;
-		}
-
-		if ($distinct) {
-			$criteria->setDistinct();
-		}
-
-		$count = null;
-
-		if ($this->collassets === null) {
-			if ($this->isNew()) {
-				$count = 0;
-			} else {
-
-				$criteria->add(assetPeer::ENTRY_ID, $this->id);
-
-				$count = assetPeer::doCount($criteria, false, $con);
-			}
-		} else {
-			// criteria has no effect for a new object
-			if (!$this->isNew()) {
-				// the following code is to determine if a new query is
-				// called for.  If the criteria is the same as the last
-				// one, just return count of the collection.
-
-
-				$criteria->add(assetPeer::ENTRY_ID, $this->id);
-
-				if (!isset($this->lastassetCriteria) || !$this->lastassetCriteria->equals($criteria)) {
-					$count = assetPeer::doCount($criteria, false, $con);
-				} else {
-					$count = count($this->collassets);
-				}
-			} else {
-				$count = count($this->collassets);
-			}
-		}
-		return $count;
-	}
-
-	/**
-	 * Method called to associate a asset object to this object
-	 * through the asset foreign key attribute.
-	 *
-	 * @param      asset $l asset
-	 * @return     void
-	 * @throws     PropelException
-	 */
-	public function addasset(asset $l)
-	{
-		if ($this->collassets === null) {
-			$this->initassets();
-		}
-		if (!in_array($l, $this->collassets, true)) { // only add it if the **same** object is not already associated
-			array_push($this->collassets, $l);
-			$l->setentry($this);
-		}
-	}
-
-
-	/**
-	 * If this collection has already been initialized with
-	 * an identical criteria, it returns the collection.
-	 * Otherwise if this entry is new, it will return
-	 * an empty collection; or if this entry has previously
-	 * been saved, it will retrieve related assets from storage.
-	 *
-	 * This method is protected by default in order to keep the public
-	 * api reasonable.  You can provide public methods for those you
-	 * actually need in entry.
-	 */
-	public function getassetsJoinassetParams($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
-	{
-		if ($criteria === null) {
-			$criteria = new Criteria(entryPeer::DATABASE_NAME);
-		}
-		elseif ($criteria instanceof Criteria)
-		{
-			$criteria = clone $criteria;
-		}
-
-		if ($this->collassets === null) {
-			if ($this->isNew()) {
-				$this->collassets = array();
-			} else {
-
-				$criteria->add(assetPeer::ENTRY_ID, $this->id);
-
-				$this->collassets = assetPeer::doSelectJoinassetParams($criteria, $con, $join_behavior);
-			}
-		} else {
-			// the following code is to determine if a new query is
-			// called for.  If the criteria is the same as the last
-			// one, just return the collection.
-
-			$criteria->add(assetPeer::ENTRY_ID, $this->id);
-
-			if (!isset($this->lastassetCriteria) || !$this->lastassetCriteria->equals($criteria)) {
-				$this->collassets = assetPeer::doSelectJoinassetParams($criteria, $con, $join_behavior);
-			}
-		}
-		$this->lastassetCriteria = $criteria;
-
-		return $this->collassets;
-	}
-
-	/**
 	 * Clears out the collUserEntrys collection (array).
 	 *
 	 * This does not modify the database; however, it will remove any associated objects, causing
@@ -7478,8 +7055,8 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 					$o->clearAllReferences($deep);
 				}
 			}
-			if ($this->collassets) {
-				foreach ((array) $this->collassets as $o) {
+			if ($this->collUserEntrys) {
+				foreach ((array) $this->collUserEntrys as $o) {
 					$o->clearAllReferences($deep);
 				}
 			}
@@ -7495,11 +7072,8 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 		$this->collroughcutEntrysRelatedByEntryId = null;
 		$this->collwidgets = null;
 		$this->collassetParamsOutputs = null;
-		$this->collassets = null;
-			$this->akshow = null;
+		$this->collUserEntrys = null;
 			$this->akuser = null;
-			$this->aaccessControl = null;
-			$this->aconversionProfile2 = null;
 	}
 
 	/* ---------------------- CustomData functions ------------------------- */

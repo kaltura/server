@@ -25,7 +25,7 @@ class KalturaMetadata extends KalturaObject implements IRelatedFilterable
 	/**
 	 * 
 	 * @var int
-	 * @filter eq
+	 * @filter eq,in
 	 * @readonly
 	 */
 	public $metadataProfileId;

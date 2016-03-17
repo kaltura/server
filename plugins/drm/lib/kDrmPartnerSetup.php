@@ -23,6 +23,7 @@ class kDrmPartnerSetup
 		$defaultPolicy = self::createPolicy(	$partnerId,
 							"default_".$partnerId,
 							"",
+							1,
 							1);
 		KalturaLog::info("Default policy id:".$defaultPolicy->getId());
 

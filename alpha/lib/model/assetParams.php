@@ -220,4 +220,24 @@ class assetParams extends BaseassetParams implements IBaseObject
 	{
 		return $this->getFromCustomData('sourceAssetParamsIds');
 	}
+	
+	public function getassets($criteria = null, PropelPDO $con = null)
+	{
+		if ($this->isNew()) {
+		   return array();
+		} 
+		
+		if ($criteria === null) {
+			$criteria = new Criteria(assetParamsPeer::DATABASE_NAME);
+		}
+		elseif ($criteria instanceof Criteria)
+		{
+			$criteria = clone $criteria;
+		}
+
+		$criteria->add(assetPeer::FLAVOR_PARAMS_ID, $this->id);
+
+		assetPeer::addSelectColumns($criteria);
+		return assetPeer::doSelect($criteria, $con);
+	}
 }

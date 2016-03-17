@@ -157,16 +157,6 @@ abstract class BaseconversionProfile2 extends BaseObject  implements Persistent 
 	protected $custom_data;
 
 	/**
-	 * @var        array entry[] Collection to store aggregation of entry objects.
-	 */
-	protected $collentrys;
-
-	/**
-	 * @var        Criteria The criteria used to select the current contents of collentrys.
-	 */
-	private $lastentryCriteria = null;
-
-	/**
 	 * @var        array flavorParamsConversionProfile[] Collection to store aggregation of flavorParamsConversionProfile objects.
 	 */
 	protected $collflavorParamsConversionProfiles;
@@ -1187,6 +1177,9 @@ abstract class BaseconversionProfile2 extends BaseObject  implements Persistent 
 	 */
 	public function hydrate($row, $startcol = 0, $rehydrate = false)
 	{
+		// Nullify cached objects
+		$this->m_custom_data = null;
+		
 		try {
 
 			$this->id = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
@@ -1272,7 +1265,9 @@ abstract class BaseconversionProfile2 extends BaseObject  implements Persistent 
 		// already in the pool.
 
 		conversionProfile2Peer::setUseCriteriaFilter(false);
-		$stmt = conversionProfile2Peer::doSelectStmt($this->buildPkeyCriteria(), $con);
+		$criteria = $this->buildPkeyCriteria();
+		conversionProfile2Peer::addSelectColumns($criteria);
+		$stmt = BasePeer::doSelect($criteria, $con);
 		conversionProfile2Peer::setUseCriteriaFilter(true);
 		$row = $stmt->fetch(PDO::FETCH_NUM);
 		$stmt->closeCursor();
@@ -1282,9 +1277,6 @@ abstract class BaseconversionProfile2 extends BaseObject  implements Persistent 
 		$this->hydrate($row, 0, true); // rehydrate
 
 		if ($deep) {  // also de-associate any related objects?
-
-			$this->collentrys = null;
-			$this->lastentryCriteria = null;
 
 			$this->collflavorParamsConversionProfiles = null;
 			$this->lastflavorParamsConversionProfileCriteria = null;
@@ -1375,32 +1367,58 @@ abstract class BaseconversionProfile2 extends BaseObject  implements Persistent 
                 KalturaLog::debug("was unable to save! retrying for the $retries time");
                 $criteria = $this->buildPkeyCriteria();
 				$criteria->addSelectColumn(conversionProfile2Peer::CUSTOM_DATA);
-                $stmt = conversionProfile2Peer::doSelectStmt($criteria, $con);
+                $stmt = BasePeer::doSelect($criteria, $con);
                 $cutsomDataArr = $stmt->fetchAll(PDO::FETCH_COLUMN);
                 $newCustomData = $cutsomDataArr[0];
-                
-                $this->custom_data_md5 = md5($newCustomData);
+
+                $this->custom_data_md5 = is_null($newCustomData) ? null : md5($newCustomData);
 
                 $valuesToChangeTo = $this->m_custom_data->toArray();
 				$this->m_custom_data = myCustomData::fromString($newCustomData); 
 
 				//set custom data column values we wanted to change to
+				$validUpdate = true;
+				$atomicCustomDataFields = conversionProfile2Peer::getAtomicCustomDataFields();
 			 	foreach ($this->oldCustomDataValues as $namespace => $namespaceValues){
                 	foreach($namespaceValues as $name => $oldValue)
 					{
+						$atomicField = false;
+						if($namespace) {
+							$atomicField = array_key_exists($namespace, $atomicCustomDataFields) && in_array($name, $atomicCustomDataFields[$namespace]);
+						} else {
+							$atomicField = in_array($name, $atomicCustomDataFields);
+						}
+						if($atomicField) {
+							$dbValue = $this->m_custom_data->get($name, $namespace);
+							if($oldValue != $dbValue) {
+								$validUpdate = false;
+								break;
+							}
+						}
+						
+						$newValue = null;
 						if ($namespace)
 						{
-							$newValue = $valuesToChangeTo[$namespace][$name];
+							if (isset ($valuesToChangeTo[$namespace][$name]))
+								$newValue = $valuesToChangeTo[$namespace][$name];
 						}
 						else
 						{ 
 							$newValue = $valuesToChangeTo[$name];
 						}
-					 
-						$this->putInCustomData($name, $newValue, $namespace);
+		
+						if (is_null($newValue)) {
+							$this->removeFromCustomData($name, $namespace);
+						}
+						else {
+							$this->putInCustomData($name, $newValue, $namespace);
+						}
 					}
-                   }
+				}
                    
+				if(!$validUpdate) 
+					break;
+					                   
 				$this->setCustomData($this->m_custom_data->toString());
 			}
 
@@ -1470,14 +1488,6 @@ abstract class BaseconversionProfile2 extends BaseObject  implements Persistent 
 				$this->resetModified(); // [HL] After being saved an object is no longer 'modified'
 			}
 
-			if ($this->collentrys !== null) {
-				foreach ($this->collentrys as $referrerFK) {
-					if (!$referrerFK->isDeleted()) {
-						$affectedRows += $referrerFK->save($con);
-					}
-				}
-			}
-
 			if ($this->collflavorParamsConversionProfiles !== null) {
 				foreach ($this->collflavorParamsConversionProfiles as $referrerFK) {
 					if (!$referrerFK->isDeleted()) {
@@ -1509,7 +1519,7 @@ abstract class BaseconversionProfile2 extends BaseObject  implements Persistent 
 	/**
 	 * Code to be run before persisting the object
 	 * @param PropelPDO $con
-	 * @return bloolean
+	 * @return boolean
 	 */
 	public function preSave(PropelPDO $con = null)
 	{
@@ -1538,8 +1548,7 @@ abstract class BaseconversionProfile2 extends BaseObject  implements Persistent 
 	 */
 	public function preInsert(PropelPDO $con = null)
 	{
-    	$this->setCreatedAt(time());
-    	
+		$this->setCreatedAt(time());
 		$this->setUpdatedAt(time());
 		return parent::preInsert($con);
 	}
@@ -1574,7 +1583,9 @@ abstract class BaseconversionProfile2 extends BaseObject  implements Persistent 
 		if($this->isModified())
 		{
 			kQueryCache::invalidateQueryCache($this);
-			kEventsManager::raiseEvent(new kObjectChangedEvent($this, $this->tempModifiedColumns));
+			$modifiedColumns = $this->tempModifiedColumns;
+			$modifiedColumns[kObjectChangedEvent::CUSTOM_DATA_OLD_VALUES] = $this->oldCustomDataValues;
+			kEventsManager::raiseEvent(new kObjectChangedEvent($this, $modifiedColumns));
 		}
 			
 		$this->tempModifiedColumns = array();
@@ -1586,7 +1597,7 @@ abstract class BaseconversionProfile2 extends BaseObject  implements Persistent 
 	 * @var array
 	 */
 	private $tempModifiedColumns = array();
-		
+	
 	/**
 	 * Returns whether the object has been modified.
 	 *
@@ -1698,14 +1709,6 @@ abstract class BaseconversionProfile2 extends BaseObject  implements Persistent 
 				$failureMap = array_merge($failureMap, $retval);
 			}
 
-
-				if ($this->collentrys !== null) {
-					foreach ($this->collentrys as $referrerFK) {
-						if (!$referrerFK->validate($columns)) {
-							$failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
-						}
-					}
-				}
 
 				if ($this->collflavorParamsConversionProfiles !== null) {
 					foreach ($this->collflavorParamsConversionProfiles as $referrerFK) {
@@ -2148,12 +2151,6 @@ abstract class BaseconversionProfile2 extends BaseObject  implements Persistent 
 			// the getter/setter methods for fkey referrer objects.
 			$copyObj->setNew(false);
 
-			foreach ($this->getentrys() as $relObj) {
-				if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-					$copyObj->addentry($relObj->copy($deepCopy));
-				}
-			}
-
 			foreach ($this->getflavorParamsConversionProfiles() as $relObj) {
 				if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
 					$copyObj->addflavorParamsConversionProfile($relObj->copy($deepCopy));
@@ -2223,301 +2220,6 @@ abstract class BaseconversionProfile2 extends BaseObject  implements Persistent 
 			self::$peer = new conversionProfile2Peer();
 		}
 		return self::$peer;
-	}
-
-	/**
-	 * Clears out the collentrys collection (array).
-	 *
-	 * This does not modify the database; however, it will remove any associated objects, causing
-	 * them to be refetched by subsequent calls to accessor method.
-	 *
-	 * @return     void
-	 * @see        addentrys()
-	 */
-	public function clearentrys()
-	{
-		$this->collentrys = null; // important to set this to NULL since that means it is uninitialized
-	}
-
-	/**
-	 * Initializes the collentrys collection (array).
-	 *
-	 * By default this just sets the collentrys collection to an empty array (like clearcollentrys());
-	 * however, you may wish to override this method in your stub class to provide setting appropriate
-	 * to your application -- for example, setting the initial array to the values stored in database.
-	 *
-	 * @return     void
-	 */
-	public function initentrys()
-	{
-		$this->collentrys = array();
-	}
-
-	/**
-	 * Gets an array of entry objects which contain a foreign key that references this object.
-	 *
-	 * If this collection has already been initialized with an identical Criteria, it returns the collection.
-	 * Otherwise if this conversionProfile2 has previously been saved, it will retrieve
-	 * related entrys from storage. If this conversionProfile2 is new, it will return
-	 * an empty collection or the current collection, the criteria is ignored on a new object.
-	 *
-	 * @param      PropelPDO $con
-	 * @param      Criteria $criteria
-	 * @return     array entry[]
-	 * @throws     PropelException
-	 */
-	public function getentrys($criteria = null, PropelPDO $con = null)
-	{
-		if ($criteria === null) {
-			$criteria = new Criteria(conversionProfile2Peer::DATABASE_NAME);
-		}
-		elseif ($criteria instanceof Criteria)
-		{
-			$criteria = clone $criteria;
-		}
-
-		if ($this->collentrys === null) {
-			if ($this->isNew()) {
-			   $this->collentrys = array();
-			} else {
-
-				$criteria->add(entryPeer::CONVERSION_PROFILE_ID, $this->id);
-
-				entryPeer::addSelectColumns($criteria);
-				$this->collentrys = entryPeer::doSelect($criteria, $con);
-			}
-		} else {
-			// criteria has no effect for a new object
-			if (!$this->isNew()) {
-				// the following code is to determine if a new query is
-				// called for.  If the criteria is the same as the last
-				// one, just return the collection.
-
-
-				$criteria->add(entryPeer::CONVERSION_PROFILE_ID, $this->id);
-
-				entryPeer::addSelectColumns($criteria);
-				if (!isset($this->lastentryCriteria) || !$this->lastentryCriteria->equals($criteria)) {
-					$this->collentrys = entryPeer::doSelect($criteria, $con);
-				}
-			}
-		}
-		$this->lastentryCriteria = $criteria;
-		return $this->collentrys;
-	}
-
-	/**
-	 * Returns the number of related entry objects.
-	 *
-	 * @param      Criteria $criteria
-	 * @param      boolean $distinct
-	 * @param      PropelPDO $con
-	 * @return     int Count of related entry objects.
-	 * @throws     PropelException
-	 */
-	public function countentrys(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
-	{
-		if ($criteria === null) {
-			$criteria = new Criteria(conversionProfile2Peer::DATABASE_NAME);
-		} else {
-			$criteria = clone $criteria;
-		}
-
-		if ($distinct) {
-			$criteria->setDistinct();
-		}
-
-		$count = null;
-
-		if ($this->collentrys === null) {
-			if ($this->isNew()) {
-				$count = 0;
-			} else {
-
-				$criteria->add(entryPeer::CONVERSION_PROFILE_ID, $this->id);
-
-				$count = entryPeer::doCount($criteria, false, $con);
-			}
-		} else {
-			// criteria has no effect for a new object
-			if (!$this->isNew()) {
-				// the following code is to determine if a new query is
-				// called for.  If the criteria is the same as the last
-				// one, just return count of the collection.
-
-
-				$criteria->add(entryPeer::CONVERSION_PROFILE_ID, $this->id);
-
-				if (!isset($this->lastentryCriteria) || !$this->lastentryCriteria->equals($criteria)) {
-					$count = entryPeer::doCount($criteria, false, $con);
-				} else {
-					$count = count($this->collentrys);
-				}
-			} else {
-				$count = count($this->collentrys);
-			}
-		}
-		return $count;
-	}
-
-	/**
-	 * Method called to associate a entry object to this object
-	 * through the entry foreign key attribute.
-	 *
-	 * @param      entry $l entry
-	 * @return     void
-	 * @throws     PropelException
-	 */
-	public function addentry(entry $l)
-	{
-		if ($this->collentrys === null) {
-			$this->initentrys();
-		}
-		if (!in_array($l, $this->collentrys, true)) { // only add it if the **same** object is not already associated
-			array_push($this->collentrys, $l);
-			$l->setconversionProfile2($this);
-		}
-	}
-
-
-	/**
-	 * If this collection has already been initialized with
-	 * an identical criteria, it returns the collection.
-	 * Otherwise if this conversionProfile2 is new, it will return
-	 * an empty collection; or if this conversionProfile2 has previously
-	 * been saved, it will retrieve related entrys from storage.
-	 *
-	 * This method is protected by default in order to keep the public
-	 * api reasonable.  You can provide public methods for those you
-	 * actually need in conversionProfile2.
-	 */
-	public function getentrysJoinkshow($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
-	{
-		if ($criteria === null) {
-			$criteria = new Criteria(conversionProfile2Peer::DATABASE_NAME);
-		}
-		elseif ($criteria instanceof Criteria)
-		{
-			$criteria = clone $criteria;
-		}
-
-		if ($this->collentrys === null) {
-			if ($this->isNew()) {
-				$this->collentrys = array();
-			} else {
-
-				$criteria->add(entryPeer::CONVERSION_PROFILE_ID, $this->id);
-
-				$this->collentrys = entryPeer::doSelectJoinkshow($criteria, $con, $join_behavior);
-			}
-		} else {
-			// the following code is to determine if a new query is
-			// called for.  If the criteria is the same as the last
-			// one, just return the collection.
-
-			$criteria->add(entryPeer::CONVERSION_PROFILE_ID, $this->id);
-
-			if (!isset($this->lastentryCriteria) || !$this->lastentryCriteria->equals($criteria)) {
-				$this->collentrys = entryPeer::doSelectJoinkshow($criteria, $con, $join_behavior);
-			}
-		}
-		$this->lastentryCriteria = $criteria;
-
-		return $this->collentrys;
-	}
-
-
-	/**
-	 * If this collection has already been initialized with
-	 * an identical criteria, it returns the collection.
-	 * Otherwise if this conversionProfile2 is new, it will return
-	 * an empty collection; or if this conversionProfile2 has previously
-	 * been saved, it will retrieve related entrys from storage.
-	 *
-	 * This method is protected by default in order to keep the public
-	 * api reasonable.  You can provide public methods for those you
-	 * actually need in conversionProfile2.
-	 */
-	public function getentrysJoinkuser($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
-	{
-		if ($criteria === null) {
-			$criteria = new Criteria(conversionProfile2Peer::DATABASE_NAME);
-		}
-		elseif ($criteria instanceof Criteria)
-		{
-			$criteria = clone $criteria;
-		}
-
-		if ($this->collentrys === null) {
-			if ($this->isNew()) {
-				$this->collentrys = array();
-			} else {
-
-				$criteria->add(entryPeer::CONVERSION_PROFILE_ID, $this->id);
-
-				$this->collentrys = entryPeer::doSelectJoinkuser($criteria, $con, $join_behavior);
-			}
-		} else {
-			// the following code is to determine if a new query is
-			// called for.  If the criteria is the same as the last
-			// one, just return the collection.
-
-			$criteria->add(entryPeer::CONVERSION_PROFILE_ID, $this->id);
-
-			if (!isset($this->lastentryCriteria) || !$this->lastentryCriteria->equals($criteria)) {
-				$this->collentrys = entryPeer::doSelectJoinkuser($criteria, $con, $join_behavior);
-			}
-		}
-		$this->lastentryCriteria = $criteria;
-
-		return $this->collentrys;
-	}
-
-
-	/**
-	 * If this collection has already been initialized with
-	 * an identical criteria, it returns the collection.
-	 * Otherwise if this conversionProfile2 is new, it will return
-	 * an empty collection; or if this conversionProfile2 has previously
-	 * been saved, it will retrieve related entrys from storage.
-	 *
-	 * This method is protected by default in order to keep the public
-	 * api reasonable.  You can provide public methods for those you
-	 * actually need in conversionProfile2.
-	 */
-	public function getentrysJoinaccessControl($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
-	{
-		if ($criteria === null) {
-			$criteria = new Criteria(conversionProfile2Peer::DATABASE_NAME);
-		}
-		elseif ($criteria instanceof Criteria)
-		{
-			$criteria = clone $criteria;
-		}
-
-		if ($this->collentrys === null) {
-			if ($this->isNew()) {
-				$this->collentrys = array();
-			} else {
-
-				$criteria->add(entryPeer::CONVERSION_PROFILE_ID, $this->id);
-
-				$this->collentrys = entryPeer::doSelectJoinaccessControl($criteria, $con, $join_behavior);
-			}
-		} else {
-			// the following code is to determine if a new query is
-			// called for.  If the criteria is the same as the last
-			// one, just return the collection.
-
-			$criteria->add(entryPeer::CONVERSION_PROFILE_ID, $this->id);
-
-			if (!isset($this->lastentryCriteria) || !$this->lastentryCriteria->equals($criteria)) {
-				$this->collentrys = entryPeer::doSelectJoinaccessControl($criteria, $con, $join_behavior);
-			}
-		}
-		$this->lastentryCriteria = $criteria;
-
-		return $this->collentrys;
 	}
 
 	/**
@@ -2733,11 +2435,6 @@ abstract class BaseconversionProfile2 extends BaseObject  implements Persistent 
 	public function clearAllReferences($deep = false)
 	{
 		if ($deep) {
-			if ($this->collentrys) {
-				foreach ((array) $this->collentrys as $o) {
-					$o->clearAllReferences($deep);
-				}
-			}
 			if ($this->collflavorParamsConversionProfiles) {
 				foreach ((array) $this->collflavorParamsConversionProfiles as $o) {
 					$o->clearAllReferences($deep);
@@ -2745,7 +2442,6 @@ abstract class BaseconversionProfile2 extends BaseObject  implements Persistent 
 			}
 		} // if ($deep)
 
-		$this->collentrys = null;
 		$this->collflavorParamsConversionProfiles = null;
 	}
 
@@ -2841,6 +2537,16 @@ abstract class BaseconversionProfile2 extends BaseObject  implements Persistent 
 	public function incInCustomData ( $name , $delta = 1, $namespace = null)
 	{
 		$customData = $this->getCustomDataObj( );
+		
+		$currentNamespace = '';
+		if($namespace)
+			$currentNamespace = $namespace;
+			
+		if(!isset($this->oldCustomDataValues[$currentNamespace]))
+			$this->oldCustomDataValues[$currentNamespace] = array();
+		if(!isset($this->oldCustomDataValues[$currentNamespace][$name]))
+			$this->oldCustomDataValues[$currentNamespace][$name] = $customData->get($name, $namespace);
+		
 		return $customData->inc ( $name , $delta , $namespace  );
 	}
 

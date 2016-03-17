@@ -101,7 +101,8 @@ $html5Version = $_GET['playerVersion'];
                     "flashvars": {
                             "streamerType": "auto",
                             "autoPlay": true,
-                            "LeadWithHLSOnFlash": true
+                            "LeadWithHLSOnFlash": true,
+							"Kaltura.Protocol":"http"
                     },
                     "cache_st": 1410340114,
                     "entry_id": entryId
@@ -130,11 +131,10 @@ $html5Version = $_GET['playerVersion'];
 
 		function onSyncPoint(metadata){
 			if ( metadata && metadata.objectType == "KalturaSyncPoint") {
-				if(lastSyncPointOffset && lastSyncPointOffset >= metadata.offset)
+				if(lastSyncPointTimestamp && lastSyncPointTimestamp >= metadata.timestamp)
 					return;
 				var date = new Date();
 				lastSyncPointTime = date.getTime();
-				lastSyncPointOffset = metadata.offset;
 				lastSyncPointTimestamp = metadata.timestamp;
 				$('#last_cue_point_time').html(new Date(lastSyncPointTimestamp).toUTCString());
 

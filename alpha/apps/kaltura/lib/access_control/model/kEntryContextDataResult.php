@@ -42,6 +42,11 @@ class kEntryContextDataResult extends kContextDataResult
 	private $previewLength = -1; //changed to -1 for backward compatibility
 	
 	/**
+	 * @var int
+	 */
+	private $msDuration = 0;
+	
+	/**
 	 * @return bool
 	 * @deprecated
 	 */
@@ -90,6 +95,13 @@ class kEntryContextDataResult extends kContextDataResult
 	}
 
 	/**
+	 * @return int
+	 */
+	public function getMsDuration() {
+		return $this->msDuration;
+	}
+	
+	/**
 	 * @param bool $isSiteRestricted
 	 * @deprecated
 	 */
@@ -135,5 +147,12 @@ class kEntryContextDataResult extends kContextDataResult
 	 */
 	public function setPreviewLength($previewLength) {
 		$this->previewLength = $previewLength;
+	}
+
+	/**
+	 * @param int $msDuration
+	 */
+	public function setMsDuration($msDuration) {
+		$this->msDuration = $msDuration;
 	}
 }

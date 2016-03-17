@@ -243,20 +243,39 @@ function serveAction($id)
 	 */
 	public function abortAction($id)
 	{
-	    $c = new Criteria();
-	    $c->addAnd(BatchJobPeer::ID, $id);
+		$c = new Criteria();
+		$c->addAnd(BatchJobPeer::ID, $id);
 		$c->addAnd(BatchJobPeer::PARTNER_ID, $this->getPartnerId());
 		$c->addAnd(BatchJobPeer::JOB_TYPE, BatchJobType::BULKUPLOAD);
 		$batchJob = BatchJobPeer::doSelectOne($c);
-		
-	    if (!$batchJob)
-		    throw new KalturaAPIException(KalturaErrors::BULK_UPLOAD_NOT_FOUND, $id);
-		
-		kJobsManager::abortJob($id, BatchJobType::BULKUPLOAD, true);
-		
+
+		if (!$batchJob) {
+			$c = new Criteria();
+			$c->addAnd(BatchJobLogPeer::JOB_ID, $id);
+			$c->addAnd(BatchJobLogPeer::PARTNER_ID, $this->getPartnerId());
+			$c->addAnd(BatchJobLogPeer::JOB_TYPE, BatchJobType::BULKUPLOAD);
+
+			$crit = $c->getNewCriterion(BatchJobLogPeer::ABORT, null);
+			$critOr = $c->getNewCriterion(BatchJobLogPeer::ABORT, 0);
+			$crit->addOr($critOr);
+			$c->add($crit);
+
+			$batchJobLog = BatchJobLogPeer::doSelectOne($c);
+
+			if(!$batchJobLog)
+				throw new KalturaAPIException(KalturaErrors::BULK_UPLOAD_NOT_FOUND, $id);
+
+			$batchJobLog->setAbort(BatchJobExecutionStatus::ABORTED);
+			$batchJobLog->save();
+		}
+		else {
+			kJobsManager::abortJob($id, BatchJobType::BULKUPLOAD, true);
+		}
+
 		$batchJobLog = BatchJobLogPeer::retrieveByBatchJobId($id);
 		$ret = new KalturaBulkUpload();
 		$ret->fromObject($batchJobLog, $this->getResponseProfile());
 		return $ret;
+
 	}
 }

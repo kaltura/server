@@ -33,7 +33,7 @@ class ServerNodePeer extends BaseServerNodePeer {
 		self::$s_criteria_filter->setFilter($c);
 	}
 	
-	public static function retrieveActiveServerNodes($hostName = null, $partnerId = null)
+	private static function buildCriteriaByHostAndPartnerId($hostName = null, $partnerId = null)
 	{
 		$c = new Criteria();
 		
@@ -45,7 +45,40 @@ class ServerNodePeer extends BaseServerNodePeer {
 		
 		$c->add(ServerNodePeer::STATUS, ServerNodeStatus::DISABLED, Criteria::NOT_EQUAL);
 		
+		return $c;
+	}
+	
+	public static function retrieveActiveServerNode($hostName = null, $partnerId = null)
+	{
+		$c = ServerNodePeer::buildCriteriaByHostAndPartnerId($hostName, $partnerId);
+		
 		return ServerNodePeer::doSelectOne($c);
+	}
+	
+	public static function retrieveActiveMediaServerNode($hostName = null, $serverNodeIndex = null, $partnerId = null)
+	{
+		$c = ServerNodePeer::buildCriteriaByHostAndPartnerId($hostName, $partnerId);
+		if ($serverNodeIndex)
+			$c->add(ServerNodePeer::ID, $serverNodeIndex);
+		
+		$node = ServerNodePeer::doSelectOne($c);
+		
+		if($node instanceof MediaServerNode)
+			return $node;
+		
+		return null;
+	}
+	
+	public static function retrieveRegisteredServerNodeByPk($pk, PropelPDO $con = null)
+	{
+		$criteria = new Criteria(ServerNodePeer::DATABASE_NAME);
+		$criteria->add(ServerNodePeer::ID, $pk);
+		$criteria->add(ServerNodePeer::STATUS, ServerNodeStatus::ACTIVE);
+		$criteria->add(ServerNodePeer::HEARTBEAT_TIME, time() - ServerNode::SERVER_NODE_TTL_TIME, Criteria::GREATER_EQUAL);
+		$criteria->addOr(ServerNodePeer::HEARTBEAT_TIME, null);
+	
+		return ServerNodePeer::doSelectOne($criteria, $con);
+	
 	}
 	
 	public static function retrieveRegisteredServerNodesArrayByPKs($pks, PropelPDO $con = null)

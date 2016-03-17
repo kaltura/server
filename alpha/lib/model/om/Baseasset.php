@@ -165,16 +165,6 @@ abstract class Baseasset extends BaseObject  implements Persistent {
 	protected $custom_data;
 
 	/**
-	 * @var        entry
-	 */
-	protected $aentry;
-
-	/**
-	 * @var        assetParams
-	 */
-	protected $aassetParams;
-
-	/**
 	 * @var        array mediaInfo[] Collection to store aggregation of mediaInfo objects.
 	 */
 	protected $collmediaInfos;
@@ -848,10 +838,6 @@ abstract class Baseasset extends BaseObject  implements Persistent {
 			$this->modifiedColumns[] = assetPeer::ENTRY_ID;
 		}
 
-		if ($this->aentry !== null && $this->aentry->getId() !== $v) {
-			$this->aentry = null;
-		}
-
 		return $this;
 	} // setEntryId()
 
@@ -873,10 +859,6 @@ abstract class Baseasset extends BaseObject  implements Persistent {
 		if ($this->flavor_params_id !== $v) {
 			$this->flavor_params_id = $v;
 			$this->modifiedColumns[] = assetPeer::FLAVOR_PARAMS_ID;
-		}
-
-		if ($this->aassetParams !== null && $this->aassetParams->getId() !== $v) {
-			$this->aassetParams = null;
 		}
 
 		return $this;
@@ -1259,6 +1241,9 @@ abstract class Baseasset extends BaseObject  implements Persistent {
 	 */
 	public function hydrate($row, $startcol = 0, $rehydrate = false)
 	{
+		// Nullify cached objects
+		$this->m_custom_data = null;
+		
 		try {
 
 			$this->id = ($row[$startcol + 0] !== null) ? (string) $row[$startcol + 0] : null;
@@ -1316,12 +1301,6 @@ abstract class Baseasset extends BaseObject  implements Persistent {
 	public function ensureConsistency()
 	{
 
-		if ($this->aentry !== null && $this->entry_id !== $this->aentry->getId()) {
-			$this->aentry = null;
-		}
-		if ($this->aassetParams !== null && $this->flavor_params_id !== $this->aassetParams->getId()) {
-			$this->aassetParams = null;
-		}
 	} // ensureConsistency
 
 	/**
@@ -1352,7 +1331,9 @@ abstract class Baseasset extends BaseObject  implements Persistent {
 		// already in the pool.
 
 		assetPeer::setUseCriteriaFilter(false);
-		$stmt = assetPeer::doSelectStmt($this->buildPkeyCriteria(), $con);
+		$criteria = $this->buildPkeyCriteria();
+		assetPeer::addSelectColumns($criteria);
+		$stmt = BasePeer::doSelect($criteria, $con);
 		assetPeer::setUseCriteriaFilter(true);
 		$row = $stmt->fetch(PDO::FETCH_NUM);
 		$stmt->closeCursor();
@@ -1363,8 +1344,6 @@ abstract class Baseasset extends BaseObject  implements Persistent {
 
 		if ($deep) {  // also de-associate any related objects?
 
-			$this->aentry = null;
-			$this->aassetParams = null;
 			$this->collmediaInfos = null;
 			$this->lastmediaInfoCriteria = null;
 
@@ -1442,18 +1421,84 @@ abstract class Baseasset extends BaseObject  implements Persistent {
 			} else {
 				$ret = $ret && $this->preUpdate($con);
 			}
-			if ($ret) {
-				$affectedRows = $this->doSave($con);
-				if ($isInsert) {
-					$this->postInsert($con);
-				} else {
-					$this->postUpdate($con);
-				}
-				$this->postSave($con);
-				assetPeer::addInstanceToPool($this);
-			} else {
-				$affectedRows = 0;
+			
+			if (!$ret || !$this->isModified()) {
+				$con->commit();
+				return 0;
 			}
+			
+			for ($retries = 1; $retries < KalturaPDO::SAVE_MAX_RETRIES; $retries++)
+			{
+               $affectedRows = $this->doSave($con);
+                if ($affectedRows || !$this->isColumnModified(assetPeer::CUSTOM_DATA)) //ask if custom_data wasn't modified to avoid retry with atomic column 
+                	break;
+
+                KalturaLog::debug("was unable to save! retrying for the $retries time");
+                $criteria = $this->buildPkeyCriteria();
+				$criteria->addSelectColumn(assetPeer::CUSTOM_DATA);
+                $stmt = BasePeer::doSelect($criteria, $con);
+                $cutsomDataArr = $stmt->fetchAll(PDO::FETCH_COLUMN);
+                $newCustomData = $cutsomDataArr[0];
+
+                $this->custom_data_md5 = is_null($newCustomData) ? null : md5($newCustomData);
+
+                $valuesToChangeTo = $this->m_custom_data->toArray();
+				$this->m_custom_data = myCustomData::fromString($newCustomData); 
+
+				//set custom data column values we wanted to change to
+				$validUpdate = true;
+				$atomicCustomDataFields = assetPeer::getAtomicCustomDataFields();
+			 	foreach ($this->oldCustomDataValues as $namespace => $namespaceValues){
+                	foreach($namespaceValues as $name => $oldValue)
+					{
+						$atomicField = false;
+						if($namespace) {
+							$atomicField = array_key_exists($namespace, $atomicCustomDataFields) && in_array($name, $atomicCustomDataFields[$namespace]);
+						} else {
+							$atomicField = in_array($name, $atomicCustomDataFields);
+						}
+						if($atomicField) {
+							$dbValue = $this->m_custom_data->get($name, $namespace);
+							if($oldValue != $dbValue) {
+								$validUpdate = false;
+								break;
+							}
+						}
+						
+						$newValue = null;
+						if ($namespace)
+						{
+							if (isset ($valuesToChangeTo[$namespace][$name]))
+								$newValue = $valuesToChangeTo[$namespace][$name];
+						}
+						else
+						{ 
+							$newValue = $valuesToChangeTo[$name];
+						}
+		
+						if (is_null($newValue)) {
+							$this->removeFromCustomData($name, $namespace);
+						}
+						else {
+							$this->putInCustomData($name, $newValue, $namespace);
+						}
+					}
+				}
+                   
+				if(!$validUpdate) 
+					break;
+					                   
+				$this->setCustomData($this->m_custom_data->toString());
+			}
+
+			if ($isInsert) {
+				$this->postInsert($con);
+			} else {
+				$this->postUpdate($con);
+			}
+			$this->postSave($con);
+			assetPeer::addInstanceToPool($this);
+			
 			$con->commit();
 			return $affectedRows;
 		} catch (PropelException $e) {
@@ -1483,25 +1528,6 @@ abstract class Baseasset extends BaseObject  implements Persistent {
 		$affectedRows = 0; // initialize var to track total num of affected rows
 		if (!$this->alreadyInSave) {
 			$this->alreadyInSave = true;
-
-			// We call the save method on the following object(s) if they
-			// were passed to this object by their coresponding set
-			// method.  This object relates to these object(s) by a
-			// foreign key reference.
-
-			if ($this->aentry !== null) {
-				if ($this->aentry->isModified() || $this->aentry->isNew()) {
-					$affectedRows += $this->aentry->save($con);
-				}
-				$this->setentry($this->aentry);
-			}
-
-			if ($this->aassetParams !== null) {
-				if ($this->aassetParams->isModified() || $this->aassetParams->isNew()) {
-					$affectedRows += $this->aassetParams->save($con);
-				}
-				$this->setassetParams($this->aassetParams);
-			}
 
 			if ($this->isNew() ) {
 				$this->modifiedColumns[] = assetPeer::INT_ID;
@@ -1570,7 +1596,7 @@ abstract class Baseasset extends BaseObject  implements Persistent {
 	/**
 	 * Code to be run before persisting the object
 	 * @param PropelPDO $con
-	 * @return bloolean
+	 * @return boolean
 	 */
 	public function preSave(PropelPDO $con = null)
 	{
@@ -1634,7 +1660,9 @@ abstract class Baseasset extends BaseObject  implements Persistent {
 		if($this->isModified())
 		{
 			kQueryCache::invalidateQueryCache($this);
-			kEventsManager::raiseEvent(new kObjectChangedEvent($this, $this->tempModifiedColumns));
+			$modifiedColumns = $this->tempModifiedColumns;
+			$modifiedColumns[kObjectChangedEvent::CUSTOM_DATA_OLD_VALUES] = $this->oldCustomDataValues;
+			kEventsManager::raiseEvent(new kObjectChangedEvent($this, $modifiedColumns));
 		}
 			
 		$this->tempModifiedColumns = array();
@@ -1752,24 +1780,6 @@ abstract class Baseasset extends BaseObject  implements Persistent {
 			$retval = null;
 
 			$failureMap = array();
-
-
-			// We call the validate method on the following object(s) if they
-			// were passed to this object by their coresponding set
-			// method.  This object relates to these object(s) by a
-			// foreign key reference.
-
-			if ($this->aentry !== null) {
-				if (!$this->aentry->validate($columns)) {
-					$failureMap = array_merge($failureMap, $this->aentry->getValidationFailures());
-				}
-			}
-
-			if ($this->aassetParams !== null) {
-				if (!$this->aassetParams->validate($columns)) {
-					$failureMap = array_merge($failureMap, $this->aassetParams->getValidationFailures());
-				}
-			}
 
 
 			if (($retval = assetPeer::doValidate($this, $columns)) !== true) {
@@ -2138,17 +2148,29 @@ abstract class Baseasset extends BaseObject  implements Persistent {
 
 		$criteria->add(assetPeer::INT_ID, $this->int_id);
 		
-		if($this->alreadyInSave && count($this->modifiedColumns) == 2 && $this->isColumnModified(assetPeer::UPDATED_AT))
+		if($this->alreadyInSave)
 		{
-			$theModifiedColumn = null;
-			foreach($this->modifiedColumns as $modifiedColumn)
-				if($modifiedColumn != assetPeer::UPDATED_AT)
-					$theModifiedColumn = $modifiedColumn;
-					
-			$atomicColumns = assetPeer::getAtomicColumns();
-			if(in_array($theModifiedColumn, $atomicColumns))
-				$criteria->add($theModifiedColumn, $this->getByName($theModifiedColumn, BasePeer::TYPE_COLNAME), Criteria::NOT_EQUAL);
-		}
+			if ($this->isColumnModified(assetPeer::CUSTOM_DATA))
+			{
+				if (!is_null($this->custom_data_md5))
+					$criteria->add(assetPeer::CUSTOM_DATA, "MD5(cast(" . assetPeer::CUSTOM_DATA . " as char character set latin1)) = '$this->custom_data_md5'", Criteria::CUSTOM);
+					//casting to latin char set to avoid mysql and php md5 difference
+				else 
+					$criteria->add(assetPeer::CUSTOM_DATA, NULL, Criteria::ISNULL);
+			}
+			
+			if (count($this->modifiedColumns) == 2 && $this->isColumnModified(assetPeer::UPDATED_AT))
+			{
+				$theModifiedColumn = null;
+				foreach($this->modifiedColumns as $modifiedColumn)
+					if($modifiedColumn != assetPeer::UPDATED_AT)
+						$theModifiedColumn = $modifiedColumn;
+						
+				$atomicColumns = assetPeer::getAtomicColumns();
+				if(in_array($theModifiedColumn, $atomicColumns))
+					$criteria->add($theModifiedColumn, $this->getByName($theModifiedColumn, BasePeer::TYPE_COLNAME), Criteria::NOT_EQUAL);
+			}
+		}		
 
 		return $criteria;
 	}
@@ -2311,104 +2333,6 @@ abstract class Baseasset extends BaseObject  implements Persistent {
 			self::$peer = new assetPeer();
 		}
 		return self::$peer;
-	}
-
-	/**
-	 * Declares an association between this object and a entry object.
-	 *
-	 * @param      entry $v
-	 * @return     asset The current object (for fluent API support)
-	 * @throws     PropelException
-	 */
-	public function setentry(entry $v = null)
-	{
-		if ($v === null) {
-			$this->setEntryId(NULL);
-		} else {
-			$this->setEntryId($v->getId());
-		}
-
-		$this->aentry = $v;
-
-		// Add binding for other direction of this n:n relationship.
-		// If this object has already been added to the entry object, it will not be re-added.
-		if ($v !== null) {
-			$v->addasset($this);
-		}
-
-		return $this;
-	}
-
-
-	/**
-	 * Get the associated entry object
-	 *
-	 * @param      PropelPDO Optional Connection object.
-	 * @return     entry The associated entry object.
-	 * @throws     PropelException
-	 */
-	public function getentry(PropelPDO $con = null)
-	{
-		if ($this->aentry === null && (($this->entry_id !== "" && $this->entry_id !== null))) {
-			$this->aentry = entryPeer::retrieveByPk($this->entry_id);
-			/* The following can be used additionally to
-			   guarantee the related object contains a reference
-			   to this object.  This level of coupling may, however, be
-			   undesirable since it could result in an only partially populated collection
-			   in the referenced object.
-			   $this->aentry->addassets($this);
-			 */
-		}
-		return $this->aentry;
-	}
-
-	/**
-	 * Declares an association between this object and a assetParams object.
-	 *
-	 * @param      assetParams $v
-	 * @return     asset The current object (for fluent API support)
-	 * @throws     PropelException
-	 */
-	public function setassetParams(assetParams $v = null)
-	{
-		if ($v === null) {
-			$this->setFlavorParamsId(NULL);
-		} else {
-			$this->setFlavorParamsId($v->getId());
-		}
-
-		$this->aassetParams = $v;
-
-		// Add binding for other direction of this n:n relationship.
-		// If this object has already been added to the assetParams object, it will not be re-added.
-		if ($v !== null) {
-			$v->addasset($this);
-		}
-
-		return $this;
-	}
-
-
-	/**
-	 * Get the associated assetParams object
-	 *
-	 * @param      PropelPDO Optional Connection object.
-	 * @return     assetParams The associated assetParams object.
-	 * @throws     PropelException
-	 */
-	public function getassetParams(PropelPDO $con = null)
-	{
-		if ($this->aassetParams === null && ($this->flavor_params_id !== null)) {
-			$this->aassetParams = assetParamsPeer::retrieveByPk($this->flavor_params_id);
-			/* The following can be used additionally to
-			   guarantee the related object contains a reference
-			   to this object.  This level of coupling may, however, be
-			   undesirable since it could result in an only partially populated collection
-			   in the referenced object.
-			   $this->aassetParams->addassets($this);
-			 */
-		}
-		return $this->aassetParams;
 	}
 
 	/**
@@ -2839,8 +2763,6 @@ abstract class Baseasset extends BaseObject  implements Persistent {
 
 		$this->collmediaInfos = null;
 		$this->collassetParamsOutputs = null;
-			$this->aentry = null;
-			$this->aassetParams = null;
 	}
 
 	/* ---------------------- CustomData functions ------------------------- */
@@ -2849,6 +2771,12 @@ abstract class Baseasset extends BaseObject  implements Persistent {
 	 * @var myCustomData
 	 */
 	protected $m_custom_data = null;
+	
+	/**
+	 * The md5 value for the custom_data field.
+	 * @var        string
+	 */
+	protected $custom_data_md5;
 
 	/**
 	 * Store custom data old values before the changes
@@ -2906,8 +2834,17 @@ abstract class Baseasset extends BaseObject  implements Persistent {
 	 */
 	public function removeFromCustomData ( $name , $namespace = null)
 	{
-
-		$customData = $this->getCustomDataObj( );
+		$customData = $this->getCustomDataObj();
+		
+		$currentNamespace = '';
+		if($namespace)
+			$currentNamespace = $namespace;
+			
+		if(!isset($this->oldCustomDataValues[$currentNamespace]))
+			$this->oldCustomDataValues[$currentNamespace] = array();
+		if(!isset($this->oldCustomDataValues[$currentNamespace][$name]))
+			$this->oldCustomDataValues[$currentNamespace][$name] = $customData->get($name, $namespace);
+		
 		return $customData->remove ( $name , $namespace );
 	}
 
@@ -2920,6 +2857,16 @@ abstract class Baseasset extends BaseObject  implements Persistent {
 	public function incInCustomData ( $name , $delta = 1, $namespace = null)
 	{
 		$customData = $this->getCustomDataObj( );
+		
+		$currentNamespace = '';
+		if($namespace)
+			$currentNamespace = $namespace;
+			
+		if(!isset($this->oldCustomDataValues[$currentNamespace]))
+			$this->oldCustomDataValues[$currentNamespace] = array();
+		if(!isset($this->oldCustomDataValues[$currentNamespace][$name]))
+			$this->oldCustomDataValues[$currentNamespace][$name] = $customData->get($name, $namespace);
+		
 		return $customData->inc ( $name , $delta , $namespace  );
 	}
 
@@ -2954,6 +2901,7 @@ abstract class Baseasset extends BaseObject  implements Persistent {
 	{
 		if ( $this->m_custom_data != null )
 		{
+			$this->custom_data_md5 = is_null($this->custom_data) ? null : md5($this->custom_data);
 			$this->setCustomData( $this->m_custom_data->toString() );
 		}
 	}

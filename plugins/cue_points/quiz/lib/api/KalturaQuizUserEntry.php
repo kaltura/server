@@ -7,7 +7,7 @@
 class KalturaQuizUserEntry extends KalturaUserEntry{
 
 	/**
-	 * @var int
+	 * @var float
 	 * @readonly
 	 */
 	public $score;

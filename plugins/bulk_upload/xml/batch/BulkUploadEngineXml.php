@@ -124,7 +124,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		libxml_clear_errors();
 		if(!$xdoc->loadXML($this->xslTransformedContent)){
 			$errorMessage = kXml::getLibXmlErrorDescription($this->xslTransformedContent);
-			throw new KalturaBatchException("Could not load xml [{$this->job->id}], $errorMessage", KalturaBatchJobAppErrors::BULK_VALIDATION_FAILED);
+			throw new KalturaBatchException("Could not load xml [{$this->job->id}], $errorMessage", KalturaBatchJobAppErrors::BULK_VALIDATION_FAILED, null);
 		}
 		//Validate the XML file against the schema
 		libxml_clear_errors();
@@ -860,7 +860,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			}
 		}
 
-		$createdEntry = $this->sendItemAddData($entry, $resource, $noParamsFlavorAssets, $noParamsFlavorResources, $noParamsThumbAssets, $noParamsThumbResources);
+		$createdEntry = $this->sendItemAddData($entry, $resource, $noParamsFlavorAssets, $noParamsFlavorResources, $noParamsThumbAssets, $noParamsThumbResources, $flavorAssets);
 			
 		if (isset ($item->categories))
 	        $createdEntryBulkUploadResult = $this->createCategoryAssociations($createdEntry->id, $this->implodeChildElements($item->categories), $createdEntryBulkUploadResult);
@@ -902,7 +902,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 * @param array $noParamsThumbResources
 	 * @return $requestResults - the multi request result
 	 */
-	protected function sendItemAddData(KalturaBaseEntry $entry ,KalturaResource $resource = null, array $noParamsFlavorAssets, array $noParamsFlavorResources, array $noParamsThumbAssets, array $noParamsThumbResources)
+	protected function sendItemAddData(KalturaBaseEntry $entry ,KalturaResource $resource = null, array $noParamsFlavorAssets, array $noParamsFlavorResources, array $noParamsThumbAssets, array $noParamsThumbResources, array $flavorAssets)
 	{
 		KBatchBase::impersonate($this->currentPartnerId);;
 		KBatchBase::$kClient->startMultiRequest();
@@ -911,6 +911,12 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		
 		KBatchBase::$kClient->baseEntry->add($entry); //Adds the entry
 		$newEntryId = KBatchBase::$kClient->getMultiRequestResult()->id;							// TODO: use the return value of add instead of getMultiRequestResult
+		
+		foreach ($flavorAssets as $currFlavorAsset)
+		{
+			KBatchBase::$kClient->flavorAsset->add($newEntryId, $currFlavorAsset);
+		}
+		
 		
 		if($resource)
 			KBatchBase::$kClient->baseEntry->addContent($newEntryId, $resource); // adds the entry resources
@@ -1097,7 +1103,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 				KBatchBase::$kClient->thumbAsset->setContent($existingthumbAssets[$thumbParamsId], $thumbAssetsResource);
 			}
 			if (strpos($thumbAssetsResource->tags, self::DEFAULT_THUMB_TAG) !== false)
-				KBatchBase::$kClient->thumbAsset->setAsDefault($thumAsset->id);
+				KBatchBase::$kClient->thumbAsset->setAsDefault($thumbsAsset->id);
 		}
 		
 		$requestResults = KBatchBase::$kClient->doMultiRequest();

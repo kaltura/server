@@ -88,11 +88,11 @@ abstract class BaseFileSyncPeer {
 	/** the column name for the FILE_SIZE field */
 	const FILE_SIZE = 'file_sync.FILE_SIZE';
 
-	/** the column name for the DELETED_ID field */
-	const DELETED_ID = 'file_sync.DELETED_ID';
-
 	/** the column name for the CUSTOM_DATA field */
 	const CUSTOM_DATA = 'file_sync.CUSTOM_DATA';
+
+	/** the column name for the DELETED_ID field */
+	const DELETED_ID = 'file_sync.DELETED_ID';
 
 	/**
 	 * An identiy map to hold any loaded instances of FileSync objects.
@@ -110,10 +110,10 @@ abstract class BaseFileSyncPeer {
 	 * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
 	 */
 	private static $fieldNames = array (
-		BasePeer::TYPE_PHPNAME => array ('Id', 'PartnerId', 'ObjectType', 'ObjectId', 'Version', 'ObjectSubType', 'Dc', 'Original', 'CreatedAt', 'UpdatedAt', 'ReadyAt', 'SyncTime', 'Status', 'FileType', 'LinkedId', 'LinkCount', 'FileRoot', 'FilePath', 'FileSize', 'DeletedId', 'CustomData', ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'partnerId', 'objectType', 'objectId', 'version', 'objectSubType', 'dc', 'original', 'createdAt', 'updatedAt', 'readyAt', 'syncTime', 'status', 'fileType', 'linkedId', 'linkCount', 'fileRoot', 'filePath', 'fileSize', 'deletedId', 'customData', ),
-		BasePeer::TYPE_COLNAME => array (self::ID, self::PARTNER_ID, self::OBJECT_TYPE, self::OBJECT_ID, self::VERSION, self::OBJECT_SUB_TYPE, self::DC, self::ORIGINAL, self::CREATED_AT, self::UPDATED_AT, self::READY_AT, self::SYNC_TIME, self::STATUS, self::FILE_TYPE, self::LINKED_ID, self::LINK_COUNT, self::FILE_ROOT, self::FILE_PATH, self::FILE_SIZE, self::DELETED_ID, self::CUSTOM_DATA, ),
-		BasePeer::TYPE_FIELDNAME => array ('id', 'partner_id', 'object_type', 'object_id', 'version', 'object_sub_type', 'dc', 'original', 'created_at', 'updated_at', 'ready_at', 'sync_time', 'status', 'file_type', 'linked_id', 'link_count', 'file_root', 'file_path', 'file_size', 'deleted_id', 'custom_data', ),
+		BasePeer::TYPE_PHPNAME => array ('Id', 'PartnerId', 'ObjectType', 'ObjectId', 'Version', 'ObjectSubType', 'Dc', 'Original', 'CreatedAt', 'UpdatedAt', 'ReadyAt', 'SyncTime', 'Status', 'FileType', 'LinkedId', 'LinkCount', 'FileRoot', 'FilePath', 'FileSize', 'CustomData', 'DeletedId', ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'partnerId', 'objectType', 'objectId', 'version', 'objectSubType', 'dc', 'original', 'createdAt', 'updatedAt', 'readyAt', 'syncTime', 'status', 'fileType', 'linkedId', 'linkCount', 'fileRoot', 'filePath', 'fileSize', 'customData', 'deletedId', ),
+		BasePeer::TYPE_COLNAME => array (self::ID, self::PARTNER_ID, self::OBJECT_TYPE, self::OBJECT_ID, self::VERSION, self::OBJECT_SUB_TYPE, self::DC, self::ORIGINAL, self::CREATED_AT, self::UPDATED_AT, self::READY_AT, self::SYNC_TIME, self::STATUS, self::FILE_TYPE, self::LINKED_ID, self::LINK_COUNT, self::FILE_ROOT, self::FILE_PATH, self::FILE_SIZE, self::CUSTOM_DATA, self::DELETED_ID, ),
+		BasePeer::TYPE_FIELDNAME => array ('id', 'partner_id', 'object_type', 'object_id', 'version', 'object_sub_type', 'dc', 'original', 'created_at', 'updated_at', 'ready_at', 'sync_time', 'status', 'file_type', 'linked_id', 'link_count', 'file_root', 'file_path', 'file_size', 'custom_data', 'deleted_id', ),
 		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, )
 	);
 
@@ -124,10 +124,10 @@ abstract class BaseFileSyncPeer {
 	 * e.g. self::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
 	 */
 	private static $fieldKeys = array (
-		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'PartnerId' => 1, 'ObjectType' => 2, 'ObjectId' => 3, 'Version' => 4, 'ObjectSubType' => 5, 'Dc' => 6, 'Original' => 7, 'CreatedAt' => 8, 'UpdatedAt' => 9, 'ReadyAt' => 10, 'SyncTime' => 11, 'Status' => 12, 'FileType' => 13, 'LinkedId' => 14, 'LinkCount' => 15, 'FileRoot' => 16, 'FilePath' => 17, 'FileSize' => 18, 'DeletedId' => 19, 'CustomData' => 20, ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'partnerId' => 1, 'objectType' => 2, 'objectId' => 3, 'version' => 4, 'objectSubType' => 5, 'dc' => 6, 'original' => 7, 'createdAt' => 8, 'updatedAt' => 9, 'readyAt' => 10, 'syncTime' => 11, 'status' => 12, 'fileType' => 13, 'linkedId' => 14, 'linkCount' => 15, 'fileRoot' => 16, 'filePath' => 17, 'fileSize' => 18, 'deletedId' => 19, 'customData' => 20, ),
-		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::PARTNER_ID => 1, self::OBJECT_TYPE => 2, self::OBJECT_ID => 3, self::VERSION => 4, self::OBJECT_SUB_TYPE => 5, self::DC => 6, self::ORIGINAL => 7, self::CREATED_AT => 8, self::UPDATED_AT => 9, self::READY_AT => 10, self::SYNC_TIME => 11, self::STATUS => 12, self::FILE_TYPE => 13, self::LINKED_ID => 14, self::LINK_COUNT => 15, self::FILE_ROOT => 16, self::FILE_PATH => 17, self::FILE_SIZE => 18, self::DELETED_ID => 19, self::CUSTOM_DATA => 20, ),
-		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'partner_id' => 1, 'object_type' => 2, 'object_id' => 3, 'version' => 4, 'object_sub_type' => 5, 'dc' => 6, 'original' => 7, 'created_at' => 8, 'updated_at' => 9, 'ready_at' => 10, 'sync_time' => 11, 'status' => 12, 'file_type' => 13, 'linked_id' => 14, 'link_count' => 15, 'file_root' => 16, 'file_path' => 17, 'file_size' => 18, 'deleted_id' => 19, 'custom_data' => 20, ),
+		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'PartnerId' => 1, 'ObjectType' => 2, 'ObjectId' => 3, 'Version' => 4, 'ObjectSubType' => 5, 'Dc' => 6, 'Original' => 7, 'CreatedAt' => 8, 'UpdatedAt' => 9, 'ReadyAt' => 10, 'SyncTime' => 11, 'Status' => 12, 'FileType' => 13, 'LinkedId' => 14, 'LinkCount' => 15, 'FileRoot' => 16, 'FilePath' => 17, 'FileSize' => 18, 'CustomData' => 19, 'DeletedId' => 20, ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'partnerId' => 1, 'objectType' => 2, 'objectId' => 3, 'version' => 4, 'objectSubType' => 5, 'dc' => 6, 'original' => 7, 'createdAt' => 8, 'updatedAt' => 9, 'readyAt' => 10, 'syncTime' => 11, 'status' => 12, 'fileType' => 13, 'linkedId' => 14, 'linkCount' => 15, 'fileRoot' => 16, 'filePath' => 17, 'fileSize' => 18, 'customData' => 19, 'deletedId' => 20, ),
+		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::PARTNER_ID => 1, self::OBJECT_TYPE => 2, self::OBJECT_ID => 3, self::VERSION => 4, self::OBJECT_SUB_TYPE => 5, self::DC => 6, self::ORIGINAL => 7, self::CREATED_AT => 8, self::UPDATED_AT => 9, self::READY_AT => 10, self::SYNC_TIME => 11, self::STATUS => 12, self::FILE_TYPE => 13, self::LINKED_ID => 14, self::LINK_COUNT => 15, self::FILE_ROOT => 16, self::FILE_PATH => 17, self::FILE_SIZE => 18, self::CUSTOM_DATA => 19, self::DELETED_ID => 20, ),
+		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'partner_id' => 1, 'object_type' => 2, 'object_id' => 3, 'version' => 4, 'object_sub_type' => 5, 'dc' => 6, 'original' => 7, 'created_at' => 8, 'updated_at' => 9, 'ready_at' => 10, 'sync_time' => 11, 'status' => 12, 'file_type' => 13, 'linked_id' => 14, 'link_count' => 15, 'file_root' => 16, 'file_path' => 17, 'file_size' => 18, 'custom_data' => 19, 'deleted_id' => 20, ),
 		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, )
 	);
 
@@ -217,8 +217,8 @@ abstract class BaseFileSyncPeer {
 		$criteria->addSelectColumn(FileSyncPeer::FILE_ROOT);
 		$criteria->addSelectColumn(FileSyncPeer::FILE_PATH);
 		$criteria->addSelectColumn(FileSyncPeer::FILE_SIZE);
-		$criteria->addSelectColumn(FileSyncPeer::DELETED_ID);
 		$criteria->addSelectColumn(FileSyncPeer::CUSTOM_DATA);
+		$criteria->addSelectColumn(FileSyncPeer::DELETED_ID);
 	}
 
 	/**

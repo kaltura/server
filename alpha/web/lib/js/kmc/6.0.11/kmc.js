@@ -1,6 +1,6 @@
-/*! KMC - v6.0.11 - 2015-11-29
+/*! KMC - v6.0.11 - 2016-03-14
 * https://github.com/kaltura/KMC_V2
-* Copyright (c) 2015 Amir Chervinsky; Licensed GNU */
+* Copyright (c) 2016 Amir Chervinsky; Licensed GNU */
 /**
  * angular-translate - v1.1.1 - 2013-11-24
  * http://github.com/PascalPrecht/angular-translate
@@ -3989,6 +3989,11 @@ kmc.functions = {
 			'contentHeight' : '94%'
 		} );
     },
+	openUsageDashboard: function(){
+		kmc.utils.hideFlash(true);
+		kmc.utils.openIframe(kmc.vars.base_url + '/apps/usage-dashboard/' + kmc.vars.usagedashboard.version + '/index.html');
+		return false;
+	},
 	flashVarsToUrl: function( flashVarsObject ){
 		 var params = '';
 		 for( var i in flashVarsObject ){
@@ -4476,6 +4481,25 @@ kmc.preview_embed = {
 			dataType: "json",
 			success: function(data) {
 				if (data && data.length) {
+					// sort players list by HTML5 lib version (descending)
+					for (var i = 0; i < data.length; i++){
+						var player = data[i];
+						if (!player.html5Url){
+							continue;
+						}
+						var version = player.html5Url.substr(player.html5Url.indexOf("/v")+2,5);
+						var major = parseInt(version[0]);
+						var minor = parseInt(version.split(".")[1]);
+						player["version"] = major * 100 + minor;
+					}
+					data.sort(function(a,b){
+						if (a.version > b.version)
+							return -1;
+						else if (a.version < b.version)
+							return 1;
+						else
+							return 0;
+					});
 					if(is_playlist) {
 						kmc.vars.playlists_list = data;
 					}

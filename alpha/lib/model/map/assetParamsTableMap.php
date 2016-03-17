@@ -81,7 +81,6 @@ class assetParamsTableMap extends TableMap {
 	public function buildRelations()
 	{
     $this->addRelation('assetParamsOutput', 'assetParamsOutput', RelationMap::ONE_TO_MANY, array('id' => 'flavor_params_id', ), null, null);
-    $this->addRelation('asset', 'asset', RelationMap::ONE_TO_MANY, array('id' => 'flavor_params_id', ), null, null);
     $this->addRelation('flavorParamsConversionProfile', 'flavorParamsConversionProfile', RelationMap::ONE_TO_MANY, array('id' => 'flavor_params_id', ), null, null);
 	} // buildRelations()
 

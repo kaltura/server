@@ -1,27 +1,27 @@
 <?php
 
-require_once(KALTURA_ROOT_PATH.'/plugins/content_distribution/providers/facebook/lib/KalturaFacebookPersistentDataHandler.php');
-require_once(KALTURA_ROOT_PATH.'/plugins/content_distribution/providers/facebook/lib/model/FacebookRequestParameters.php');
-
+require_once 'oauth2Action.class.php';
 
 /**
  * @package Core
  * @subpackage externalServices
  */
-class facebookoauth2Action extends sfAction
+class facebookoauth2Action extends oauth2Action
 {
 	const SUB_ACTION_REDIRECT_SCREEN = 'redirect-screen';
 	const SUB_ACTION_PROCESS_OAUTH2_RESPONSE = 'process-oauth2-response';
 	const SUB_ACTION_LOGIN_SCREEN = 'login-screen';
 
+	const FACEBOOK_DISTRIBUTION_ACCESS_URL = "/api_v3/index.php?service=contentdistribution_distributionprofile&distributionProfile%3AobjectType=KalturaFacebookDistributionProfile";
 
 
 	public function execute()
 	{
 		set_include_path(get_include_path().PATH_SEPARATOR.KALTURA_ROOT_PATH.'/infra/general/');
 		require_once 'FacebookGraphSdkUtils.php';
+		require_once 'kDistributionPersistentDataHandler.php';
 
-		$nextAction = base64_decode($this->getRequestParameter(FacebookRequestParameters::FACEBOOK_NEXT_ACTION_REQUEST_PARAM));
+		$nextAction = base64_decode($this->getRequestParameter(FacebookConstants::FACEBOOK_NEXT_ACTION_REQUEST_PARAM));
 
 		// understand the sub action based on our url parameters
 		if ($nextAction == self::SUB_ACTION_REDIRECT_SCREEN)
@@ -49,9 +49,10 @@ class facebookoauth2Action extends sfAction
 	protected function executeLoginScreen()
 	{
 		$this->loginError = null;
+		$this->partnerError = null;
 		$this->serviceUrl = requestUtils::getHost();
 		$params = $this->getForwardParameters();
-		$params[FacebookRequestParameters::FACEBOOK_NEXT_ACTION_REQUEST_PARAM] = base64_encode(self::SUB_ACTION_REDIRECT_SCREEN);
+		$params[FacebookConstants::FACEBOOK_NEXT_ACTION_REQUEST_PARAM] = base64_encode(self::SUB_ACTION_REDIRECT_SCREEN);
 		$this->nextUrl = $this->getController()->genUrl('extservices/facebookoauth2?'.http_build_query($params, null, '&')).'?ks=';
 	}
 
@@ -60,24 +61,36 @@ class facebookoauth2Action extends sfAction
 	 */
 	protected function executeRedirectScreen()
 	{
-		$appId = $this->getFromConfig(FacebookRequestParameters::FACEBOOK_APP_ID_REQUEST_PARAM);
-		$appSecret = $this->getFromConfig(FacebookRequestParameters::FACEBOOK_APP_SECRET_REQUEST_PARAM);
-		$permissions = explode(',',base64_decode($this->getRequestParameter(FacebookRequestParameters::FACEBOOK_PERMISSIONS_REQUEST_PARAM)));
-		$providerId = base64_decode($this->getRequestParameter(FacebookRequestParameters::FACEBOOK_PROVIDER_ID_REQUEST_PARAM));
+		$appId = $this->getFromConfig(FacebookConstants::FACEBOOK_APP_ID_REQUEST_PARAM);
+		$appSecret = $this->getFromConfig(FacebookConstants::FACEBOOK_APP_SECRET_REQUEST_PARAM);
+		$permissions = explode(',',base64_decode($this->getRequestParameter(FacebookConstants::FACEBOOK_PERMISSIONS_REQUEST_PARAM)));
+		$providerId = base64_decode($this->getRequestParameter(FacebookConstants::FACEBOOK_PROVIDER_ID_REQUEST_PARAM));
+		$requestPartnerId = base64_decode($this->getRequestParameter(FacebookConstants::FACEBOOK_PARTNER_ID_REQUEST_PARAM));
+
+		$ksStr = $this->getRequestParameter(FacebookConstants::FACEBOOK_KS_REQUEST_PARAM);
 		$this->ksError = null;
-		$ksValid = $this->processKs($this->getRequestParameter('ks'));
+		$this->partnerError = null;
+		$ksValid = $this->processKs($ksStr);
 		if (!$ksValid)
 		{
 			$this->ksError = true;
 			return;
 		}
-
+		$ks = kCurrentContext::$ks_object;
+		$contextPartnerId = $ks->partner_id;
+		if ( empty($requestPartnerId) || $contextPartnerId != $requestPartnerId)
+		{
+			$this->partnerError = true;
+			return;
+		}
+		$ks = $this->generateTimeLimitedKs($contextPartnerId);
 		$params = $this->getForwardParameters();
-		$params[FacebookRequestParameters::FACEBOOK_NEXT_ACTION_REQUEST_PARAM] = base64_encode(self::SUB_ACTION_PROCESS_OAUTH2_RESPONSE);
-		$provider = DistributionProfilePeer::retrieveByPK($providerId);
-		$dataHandler = new KalturaFacebookPersistentDataHandler($provider);
+		$params[FacebookConstants::FACEBOOK_KS_REQUEST_PARAM] = $ks;
+		$params[FacebookConstants::FACEBOOK_NEXT_ACTION_REQUEST_PARAM] = base64_encode(self::SUB_ACTION_PROCESS_OAUTH2_RESPONSE);
+		$accessURL = $this->getFacebookDistributionAccessURL($providerId, $ks);
+		$dataHandler = new kDistributionPersistentDataHandler($accessURL);
 		$redirectUrl = $this->getController()->genUrl('extservices/facebookoauth2?'.http_build_query($params, null, '&'), true);
-		$reRequestPermissions = base64_decode($this->getRequestParameter(FacebookRequestParameters::FACEBOOK_RE_REQUEST_PERMISSIONS_REQUEST_PARAM));
+		$reRequestPermissions = base64_decode($this->getRequestParameter(FacebookConstants::FACEBOOK_RE_REQUEST_PERMISSIONS_REQUEST_PARAM));
 		$this->oauth2Url = FacebookGraphSdkUtils::getLoginUrl($appId, $appSecret, $redirectUrl, $permissions, $dataHandler, $reRequestPermissions);
 	}
 
@@ -87,19 +100,17 @@ class facebookoauth2Action extends sfAction
 	protected function executeProcessOAuth2Response()
 	{
 		$this->tokenError = null;
-		$appId = $this->getFromConfig(FacebookRequestParameters::FACEBOOK_APP_ID_REQUEST_PARAM);
-		$appSecret = $this->getFromConfig(FacebookRequestParameters::FACEBOOK_APP_SECRET_REQUEST_PARAM);
-		$pageId = base64_decode($this->getRequestParameter(FacebookRequestParameters::FACEBOOK_PAGE_ID_REQUEST_PARAM));
-		$providerId = base64_decode($this->getRequestParameter(FacebookRequestParameters::FACEBOOK_PROVIDER_ID_REQUEST_PARAM));
-		$permissions = explode(',',base64_decode($this->getRequestParameter(FacebookRequestParameters::FACEBOOK_PERMISSIONS_REQUEST_PARAM)));
+		$appId = $this->getFromConfig(FacebookConstants::FACEBOOK_APP_ID_REQUEST_PARAM);
+		$appSecret = $this->getFromConfig(FacebookConstants::FACEBOOK_APP_SECRET_REQUEST_PARAM);
+		$pageId = base64_decode($this->getRequestParameter(FacebookConstants::FACEBOOK_PAGE_ID_REQUEST_PARAM));
+		$providerId = base64_decode($this->getRequestParameter(FacebookConstants::FACEBOOK_PROVIDER_ID_REQUEST_PARAM));
+		$ks = $this->getRequestParameter(FacebookConstants::FACEBOOK_KS_REQUEST_PARAM);
+		$permissions = explode(',',base64_decode($this->getRequestParameter(FacebookConstants::FACEBOOK_PERMISSIONS_REQUEST_PARAM)));
 
 		try
 		{
-			/**
-			 * @var FacebookDistributionProfile facebookProfile
-			 */
-			$facebookProfile = DistributionProfilePeer::retrieveByPK($providerId);
-			$dataHandler = new KalturaFacebookPersistentDataHandler($facebookProfile);
+			$accessURL = $this->getFacebookDistributionAccessURL($providerId, $ks);
+			$dataHandler = new kDistributionPersistentDataHandler($accessURL);
 
 			$userAccessToken = FacebookGraphSdkUtils::getLongLivedUserAccessToken($appId, $appSecret, $dataHandler, $permissions);
 
@@ -108,10 +119,8 @@ class facebookoauth2Action extends sfAction
 				$pageAccessToken = FacebookGraphSdkUtils::getPageAccessToken($appId, $appSecret, $userAccessToken, $pageId, $dataHandler);
 				if($pageAccessToken)
 				{
-					$facebookProfile->setReRequestPermissions(true);
-					$facebookProfile->setPageAccessToken($pageAccessToken);
-					$facebookProfile->setUserAccessToken($userAccessToken);
-					$facebookProfile->save();
+					$dataHandler->set('userAccessToken', $userAccessToken);
+					$dataHandler->set('pageAccessToken', $pageAccessToken);
 				}
 			}
 		}
@@ -127,62 +136,32 @@ class facebookoauth2Action extends sfAction
 		return kConf::get($paramName, 'facebook', $default);
 	}
 
-	protected function processKs($ksStr, $requiredPermission = null)
-	{
-		try
-		{
-			kCurrentContext::initKsPartnerUser($ksStr);
-		}
-		catch(Exception $ex)
-		{
-			KalturaLog::err($ex);
-			return false;
-		}
-
-		if (kCurrentContext::$ks_object->type != ks::SESSION_TYPE_ADMIN)
-		{
-			KalturaLog::err('Ks is not admin');
-			return false;
-		}
-
-		try
-		{
-			kPermissionManager::init(kConf::get('enable_cache'));
-		}
-		catch(Exception $ex)
-		{
-			if (strpos($ex->getCode(), 'INVALID_ACTIONS_LIMIT') === false) // allow using limited ks
-			{
-				KalturaLog::err($ex);
-				return false;
-			}
-		}
-		if ($requiredPermission)
-		{
-			if (!kPermissionManager::isPermitted(PermissionName::ADMIN_PUBLISHER_MANAGE))
-			{
-				KalturaLog::err('Ks is missing "ADMIN_PUBLISHER_MANAGE" permission');
-				return false;
-			}
-		}
-
-		return true;
-	}
 
 	protected function getForwardParameters()
 	{
 		$params = array(
-			FacebookRequestParameters::FACEBOOK_PERMISSIONS_REQUEST_PARAM =>
-				$this->getRequestParameter(FacebookRequestParameters::FACEBOOK_PERMISSIONS_REQUEST_PARAM),
-			FacebookRequestParameters::FACEBOOK_PAGE_ID_REQUEST_PARAM =>
-				$this->getRequestParameter(FacebookRequestParameters::FACEBOOK_PAGE_ID_REQUEST_PARAM),
-			FacebookRequestParameters::FACEBOOK_RE_REQUEST_PERMISSIONS_REQUEST_PARAM =>
-				$this->getRequestParameter(FacebookRequestParameters::FACEBOOK_RE_REQUEST_PERMISSIONS_REQUEST_PARAM),
-			FacebookRequestParameters::FACEBOOK_PROVIDER_ID_REQUEST_PARAM =>
-				$this->getRequestParameter(FacebookRequestParameters::FACEBOOK_PROVIDER_ID_REQUEST_PARAM)
+			FacebookConstants::FACEBOOK_PERMISSIONS_REQUEST_PARAM =>
+				$this->getRequestParameter(FacebookConstants::FACEBOOK_PERMISSIONS_REQUEST_PARAM),
+			FacebookConstants::FACEBOOK_PAGE_ID_REQUEST_PARAM =>
+				$this->getRequestParameter(FacebookConstants::FACEBOOK_PAGE_ID_REQUEST_PARAM),
+			FacebookConstants::FACEBOOK_RE_REQUEST_PERMISSIONS_REQUEST_PARAM =>
+				$this->getRequestParameter(FacebookConstants::FACEBOOK_RE_REQUEST_PERMISSIONS_REQUEST_PARAM),
+			FacebookConstants::FACEBOOK_PROVIDER_ID_REQUEST_PARAM =>
+				$this->getRequestParameter(FacebookConstants::FACEBOOK_PROVIDER_ID_REQUEST_PARAM),
+			FacebookConstants::FACEBOOK_PARTNER_ID_REQUEST_PARAM =>
+				$this->getRequestParameter(FacebookConstants::FACEBOOK_PARTNER_ID_REQUEST_PARAM),
+			FacebookConstants::FACEBOOK_KS_REQUEST_PARAM =>
+				$this->getRequestParameter(FacebookConstants::FACEBOOK_KS_REQUEST_PARAM)
 		);
 
 		return $params;
 	}
+
+	private function getFacebookDistributionAccessURL($providerId, $ks)
+	{
+		$host = requestUtils::getHost();
+		return $host.self::FACEBOOK_DISTRIBUTION_ACCESS_URL."&id=".$providerId."&ks=".$ks;
+	}
+
 
 }

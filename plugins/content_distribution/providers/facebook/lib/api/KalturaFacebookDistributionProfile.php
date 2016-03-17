@@ -31,6 +31,12 @@ class KalturaFacebookDistributionProfile extends KalturaConfigurableDistribution
 	 *
 	 * @var string
 	 */
+	public $state;
+
+	/**
+	 *
+	 * @var string
+	 */
 	public $permissions;
 
 	/**
@@ -48,6 +54,7 @@ class KalturaFacebookDistributionProfile extends KalturaConfigurableDistribution
 		'pageId',
 		'pageAccessToken',
 		'userAccessToken',
+		'state',
 		'permissions',
 		'reRequestPermissions'
 

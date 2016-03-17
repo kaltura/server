@@ -728,16 +728,28 @@ class KalturaTypeReflector
 	
 	public function requiresReadPermission()
 	{
+		if ($this->requiresUsagePermission())
+		{
+			return true;
+		}
 		return in_array(KalturaPropertyInfo::READ_PERMISSION_NAME, $this->_permissions);
 	}
 	
 	public function requiresUpdatePermission()
 	{
+		if ($this->requiresUsagePermission())
+		{
+			return true;
+		}
 		return in_array(KalturaPropertyInfo::UPDATE_PERMISSION_NAME, $this->_permissions);
 	}
 	
 	public function requiresInsertPermission()
 	{
+		if ($this->requiresUsagePermission())
+		{
+			return true;
+		}
 		return in_array(KalturaPropertyInfo::INSERT_PERMISSION_NAME, $this->_permissions);
 	}
 	

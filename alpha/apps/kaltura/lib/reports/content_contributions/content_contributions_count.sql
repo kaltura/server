@@ -1,5 +1,5 @@
-SELECT 	COUNT( DISTINCT en.entry_media_source_id) count_all
-FROM dwh_dim_entries en
+SELECT 	COUNT( DISTINCT ev.entry_media_source_id) count_all
+FROM dwh_dim_entries ev
 WHERE
 {OBJ_ID_CLAUSE}
 AND entry_media_type_id IN (1,2,5,6)

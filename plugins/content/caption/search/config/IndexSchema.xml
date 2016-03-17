@@ -21,6 +21,5 @@
 	        <field name="created_at" indexName="created_at" type="datetime" orderable="yes" />
 	        <field name="updated_at" indexName="updated_at" type="datetime" orderable="yes" />
 	        <field name="str_entry_id" indexName="str_entry_id" getter="entryId" type="string" sphinxStringAttribute="string" />
-	        <field name="str_caption_asset_id" indexName="str_caption_asset_id" getter="id" type="string" sphinxStringAttribute="string" />
 	</object>
 </schema>

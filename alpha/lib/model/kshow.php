@@ -809,6 +809,24 @@ class kshow extends Basekshow implements IBaseObject
 	
 	// this will make sure that the extra data set in the search_text won't leak out 
 	public function getSearchText()	{	return '';	}
-
+		
+	public function getentrys($criteria = null, PropelPDO $con = null)		
+	{		
+		if ($this->isNew()) {		
+		   return array();		
+		}		
+	
+		if ($criteria === null) {		
+			$criteria = new Criteria(kshowPeer::DATABASE_NAME);		
+		}		
+		elseif ($criteria instanceof Criteria)		
+		{		
+			$criteria = clone $criteria;		
+		}		
+		
+		$criteria->add(entryPeer::KSHOW_ID, $this->id);		
+		entryPeer::addSelectColumns($criteria);		
+		return entryPeer::doSelect($criteria, $con);		
+	}
 	
 }

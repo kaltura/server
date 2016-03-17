@@ -463,8 +463,12 @@ class ThumbAssetService extends KalturaAssetService
 			//we will throw thumb asset not found, as the user is not entitled, and should not know that the entry exists.
 			throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_ID_NOT_FOUND, $thumbAssetId);
 		}
-		
-		$securyEntryHelper = new KSecureEntryHelper($entry, kCurrentContext::$ks, null, ContextType::THUMBNAIL);
+
+		$referrer = null;
+		if($options && $options->referrer)
+			$referrer = $options->referrer;
+
+		$securyEntryHelper = new KSecureEntryHelper($entry, kCurrentContext::$ks, $referrer, ContextType::THUMBNAIL);
 		$securyEntryHelper->validateAccessControl();
 
 		$ext = $thumbAsset->getFileExt();
@@ -955,33 +959,23 @@ class ThumbAssetService extends KalturaAssetService
 		$assetDb = assetPeer::retrieveById($id);
 		if (!$assetDb || !($assetDb instanceof thumbAsset))
 			throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_ID_NOT_FOUND, $id);
-			
-		if(kEntitlementUtils::getEntitlementEnforcement())
+
+		$entry = entryPeer::retrieveByPK($assetDb->getEntryId());
+		if(!$entry)
 		{
-			$entry = entryPeer::retrieveByPK($assetDb->getEntryId());
-			if(!$entry)
-			{
-				//we will throw thumb asset not found, as the user is not entitled, and should not know that the entry exists.
-				throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_ID_NOT_FOUND, $id);
-			}	
+			//we will throw thumb asset not found, as the user is not entitled, and should not know that the entry exists or entry does not exist.
+			throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_ID_NOT_FOUND, $id);
 		}
 
 		if ($assetDb->getStatus() != asset::ASSET_STATUS_READY)
 			throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_IS_NOT_READY);
-	
-	if ($thumbParams)
-		{
-			$assetUrl = $assetDb->getDownloadUrlWithExpiry(84600);
-			$assetParameters = KalturaRequestParameterSerializer::serialize($thumbParams, "thumbParams");
-			return $assetUrl . "?thumbParams:objectType=KalturaThumbParams&".implode("&", $assetParameters);
-		}
-			
-		if($storageId)
-			return $assetDb->getExternalUrl($storageId);
-			
-		return $assetDb->getDownloadUrl(true);
+		
+		$securyEntryHelper = new KSecureEntryHelper($entry, kCurrentContext::$ks, null, ContextType::THUMBNAIL);
+		$securyEntryHelper->validateAccessControl();
+		
+		return $assetDb->getThumbnailUrl($securyEntryHelper, $storageId, $thumbParams);
 	}
-	
+		
 	/**
 	 * Get remote storage existing paths for the asset
 	 * 

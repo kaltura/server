@@ -132,6 +132,16 @@ class flvclipperAction extends kalturaAction
 			
 			kFileUtils::dumpFile($tempThumbPath, null, strpos($tempThumbPath, "_NOCACHE_") === false ? null : 0);
 		}
+
+		$securyEntryHelper = new KSecureEntryHelper($entry, $ks_str, $referrer, ContextType::PLAY);
+		if ($securyEntryHelper->shouldPreview())
+		{
+			$this->checkForPreview($securyEntryHelper, $clip_to);
+		}
+		else
+		{
+			$securyEntryHelper->validateForPlay($entry, $ks_str);
+		}
 		
 		$audio_only = $this->getRequestParameter ( "audio_only" ); // milliseconds
 		$flavor = $this->getRequestParameter ( "flavor", 1 ); // 
@@ -307,26 +317,6 @@ class flvclipperAction extends kalturaAction
 		}
 		$flv_extension = ($streamer == "rtmp") ? "?" : "/a.$ext?novar=0";
 			
-		// dont check for rtmp / and for an already redirect url
-		if ($streamer != "rtmp" && strpos($request, $flv_extension) === false)
-		{
-			// check security using ks
-			$securyEntryHelper = new KSecureEntryHelper($entry, $ks_str, $referrer, ContextType::PLAY);
-			if ($securyEntryHelper->shouldPreview())
-			{
-				$this->checkForPreview($securyEntryHelper, $clip_to);
-			}
-			else
-			{
-				$securyEntryHelper->validateForPlay($entry, $ks_str);
-			}
-		}
-		else
-		{
-			// if needs security check using cdn authentication mechanism
-			// for now assume this is a cdn request and don't check for security
-		}
-
 		// use limelight mediavault if either security policy requires it or if we're trying to seek within the video
 		if ($entry->getSecurityPolicy() || $seek_from_bytes !== -1)
 		{

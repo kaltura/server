@@ -1,6 +1,21 @@
 ## Kaltura node.js API Client Library.
 Compatible with Kaltura server version 10.20.0 and above.
 
+## Very Basic sanity
+- Edit test.js and set partner_id, secret and service_url to match your ENV
+- Run node test.js
+
+## Code contributions
+
+We are happy to accept pull requests, please look at https://github.com/kaltura/platform-install-packages/blob/master/doc/Contributing-to-the-Kaltura-Platform.md
+
+The contents of this package are auto generated from https://github.com/kaltura/server
+
+Relevant files are:
+- generator/sources/node
+- generator/NodeClientGenerator.php
+
+
 ## Creating a new NPM package
 - Install latest npm [old versions have issues logging into the npmjs repo
 - Edit package.json and inc the version to the latest API schema

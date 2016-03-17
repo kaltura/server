@@ -6,6 +6,20 @@
 class KalturaRule extends KalturaObject
 {
 	/**
+	 * Short Rule Description
+	 *
+	 * @var string
+	 */
+	public $description;
+	
+	/**
+	 * Rule Custom Data to allow saving rule specific information 
+	 *
+	 * @var string
+	 */
+	public $ruleData;
+	
+	/**
 	 * Message to be thrown to the player in case the rule is fulfilled
 	 * 
 	 * @var string
@@ -42,6 +56,8 @@ class KalturaRule extends KalturaObject
 
 	private static $mapBetweenObjects = array
 	(
+		'description',
+		'ruleData',
 		'message',
 		'actions',
 		'conditions',

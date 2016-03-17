@@ -1,5 +1,6 @@
 <?php
 
+require_once(__DIR__."/KalturaFacebookLanguageMatch.php");
 /**
  * @package plugins.facebookDistribution
  * @subpackage lib
@@ -7,11 +8,12 @@
 class FacebookDistributionEngine extends DistributionEngine implements
 	IDistributionEngineSubmit,
 	IDistributionEngineDelete,
-	IDistributionEngineUpdate,
-	IDistributionEngineCloseSubmit
+	IDistributionEngineUpdate
 {
 	protected $appId;
 	protected $appSecret;
+
+	const FACEBOOK_CUSTOM_DATA_DELIMITER = ';';
 
 	/* (non-PHPdoc)
 	 * @see DistributionEngine::configure()
@@ -19,8 +21,8 @@ class FacebookDistributionEngine extends DistributionEngine implements
 	public function configure()
 	{
 		parent::configure();
-		$this->appId = kConf::get(FacebookRequestParameters::FACEBOOK_APP_ID_REQUEST_PARAM, 'facebook', null);
-		$this->appSecret = kConf::get(FacebookRequestParameters::FACEBOOK_APP_SECRET_REQUEST_PARAM, 'facebook', null);
+		$this->appId = kConf::get(FacebookConstants::FACEBOOK_APP_ID_REQUEST_PARAM, 'facebook', null);
+		$this->appSecret = kConf::get(FacebookConstants::FACEBOOK_APP_SECRET_REQUEST_PARAM, 'facebook', null);
 
 	}
 
@@ -73,21 +75,15 @@ class FacebookDistributionEngine extends DistributionEngine implements
 		} catch (Exception $e) {
 			throw new Exception("Failed to submit facebook video , reason:".$e->getMessage());
 		}
-		return true;
-	}
 
-	/**
-	 * check for submission closure in case the submission is asynchronous.
-	 * @param KalturaDistributionSubmitJobData $data
-	 * @return bool true if finished, false if will be finished asynchronously
-	 */
-	public function closeSubmit(KalturaDistributionSubmitJobData $data)
-	{
-//		// we need a valid video in order to upload captions
-//		foreach ($data->providerData->captionsInfo as $captionInfo)
-//		{
-//			$this->submitCaption($data->distributionProfile, $captionInfo, $data->remoteId);
-//		}
+		if ($data->providerData->captionsInfo)
+		{
+			/* @var $captionInfo KalturaFacebookCaptionDistributionInfo */
+			foreach ($data->providerData->captionsInfo as $captionInfo)
+			{
+				$data->mediaFiles[] = $this->submitCaption($data->distributionProfile, $captionInfo, $data->remoteId);
+			}
+		}
 		return true;
 	}
 
@@ -114,32 +110,44 @@ class FacebookDistributionEngine extends DistributionEngine implements
 			throw new Exception("Failed to update facebook video , reason:".$e->getMessage());
 		}
 
-//		foreach ($data->providerData->captionsInfo as $captionInfo) {
-//			switch ($captionInfo->action) {
-//				case KalturaDistributionAction::SUBMIT:
-//					$data->mediaFiles[] = $this->submitCaption($data->distributionProfile, $captionInfo, $data->entryDistribution->remoteId);
-//					break;
-//				case KalturaDistributionAction::DELETE:
-//					$this->deleteCaption($data->distributionProfile, $captionInfo, $data->entryDistribution->remoteId);
-//					break;
-//			}
-//		}
+		// first delete the captions that were already distributed
+		while ($mediaFile = array_pop($data->mediaFiles))
+		{
+			$this->deleteCaption($data->distributionProfile, $mediaFile->remoteId, $data->entryDistribution->remoteId);
+		}
+		// last add all the captions available
+		foreach ($data->providerData->captionsInfo as $captionInfo)
+		{
+			/* @var $captionInfo KalturaFacebookCaptionDistributionInfo */
+			$data->mediaFiles[] = $this->submitCaption($data->distributionProfile, $captionInfo, $data->entryDistribution->remoteId);
+		}
 		return true;
 	}
 
-	private function submitCaption(KalturaFacebookDistributionProfile $distributionProfile, KalturaCaptionDistributionInfo $captionInfo, $remoteId)
+	private function submitCaption(KalturaFacebookDistributionProfile $distributionProfile, KalturaFacebookCaptionDistributionInfo $captionInfo, $remoteId)
 	{
-		if (!$captionInfo->label)
-			throw new Exception("Captions must have a label according to Facebook's acceptable values (i.e. en_US), found ".$captionInfo->label);
-		$status = FacebookGraphSdkUtils::uploadCaptions(
+		if (!$captionInfo->label && !$captionInfo->language)
+			throw new Exception("No label/language were configured for this caption aborting");
+		if ($captionInfo->language)
+			$locale = KalturaFacebookLanguageMatch::getFacebookCodeForKalturaLanguage($captionInfo->language);
+		if (!$locale && $captionInfo->label)
+			$locale = $captionInfo->label;
+		if (!$locale)
+			throw new Exception("Failed to find matching language for language ".$captionInfo->language." and there was no label available");
+		FacebookGraphSdkUtils::uploadCaptions(
 			$this->appId,
 			$this->appSecret,
-			$distributionProfile->getPageAccessToken(),
+			$distributionProfile->pageAccessToken,
 			$remoteId,
 			$captionInfo->filePath,
-			$captionInfo->label,
+			$locale,
 			$this->tempDirectory);
-		return $status;
+
+		$mediaFile = new KalturaDistributionRemoteMediaFile();
+		$mediaFile->assetId = $captionInfo->assetId;
+		$mediaFile->version = $captionInfo->version;
+		$mediaFile->remoteId = $locale;
+		return $mediaFile;
 	}
 	/* (non-PHPdoc)
 	 * @see IDistributionEngineDelete::delete()
@@ -163,16 +171,16 @@ class FacebookDistributionEngine extends DistributionEngine implements
 		return true;
 	}
 
-	private function deleteCaption(KalturaFacebookDistributionProfile $distributionProfile, KalturaCaptionDistributionInfo $captionInfo, $remoteId)
+	private function deleteCaption(KalturaFacebookDistributionProfile $distributionProfile, $locale, $remoteId)
 	{
-		$status = FacebookGraphSdkUtils::deleteCaptions(
+		FacebookGraphSdkUtils::deleteCaptions(
 			$this->appId,
 			$this->appSecret,
-			$distributionProfile->getPageAccessToken(),
+			$distributionProfile->pageAccessToken,
 			$remoteId,
-			$captionInfo->language);
+			$locale);
 
-		return $status;
+		return true;
 	}
 
 	private function validate(KalturaDistributionJobData $data)
@@ -192,29 +200,87 @@ class FacebookDistributionEngine extends DistributionEngine implements
 	{
 		$fieldValues = unserialize($fieldValues);
 		$facebookMetadata = array();
-		$facebookMetadata['title'] = $fieldValues[FacebookDistributionField::TITLE];
-		$facebookMetadata['description'] = $fieldValues[FacebookDistributionField::DESCRIPTION];
-		$callToActionType = $fieldValues[FacebookDistributionField::CALL_TO_ACTION_TYPE];
-		if ($callToActionType)
-		{
-			$facebookMetadata['call_to_action'] =
-			json_encode(
-				array('type' => $callToActionType,
-					'value' => array(
-						'link' => $fieldValues[FacebookDistributionField::CALL_TO_ACTION_LINK],
-						'link_caption' => $fieldValues[FacebookDistributionField::CALL_TO_ACTION_LINK_CAPTION]
-					)));
-		}
+		$this->insertToFacebookMetadata($facebookMetadata, 'description', $fieldValues[FacebookDistributionField::DESCRIPTION], false);
+		$this->insertToFacebookMetadata($facebookMetadata, 'place', $fieldValues[FacebookDistributionField::PLACE], false);
+		$this->insertToFacebookMetadata($facebookMetadata, 'tags', $fieldValues[FacebookDistributionField::TAGS], true);
+
 		if ($isSubmit) // these fields should not update
 		{
+			$callToActionType = $fieldValues[FacebookDistributionField::CALL_TO_ACTION_TYPE];
+			if ($callToActionType)
+			{
+				$facebookMetadata['call_to_action'] =
+					json_encode(
+						array('type' => $callToActionType,
+							'value' => array(
+								'link' => $fieldValues[FacebookDistributionField::CALL_TO_ACTION_LINK],
+								'link_caption' => $fieldValues[FacebookDistributionField::CALL_TO_ACTION_LINK_CAPTION]
+							)));
+			}
+			$this->insertToFacebookMetadata($facebookMetadata, 'title', $fieldValues[FacebookDistributionField::TITLE], false);
 			if ($fieldValues[FacebookDistributionField::SCHEDULE_PUBLISHING_TIME] &&
 				$fieldValues[FacebookDistributionField::SCHEDULE_PUBLISHING_TIME] > time())
 			{
 				$facebookMetadata['scheduled_publish_time'] = $fieldValues[FacebookDistributionField::SCHEDULE_PUBLISHING_TIME];
 				$facebookMetadata['published'] = 'false';
 			}
+			$targetingMetadata = array();
+			$this->insertToFacebookMetadata($targetingMetadata, 'countries', $fieldValues[FacebookDistributionField::TARGETING_COUNTRIES], true);
+			$this->insertToFacebookMetadata($targetingMetadata, 'regions', $fieldValues[FacebookDistributionField::TARGETING_REGIONS], true);
+			$this->insertToFacebookMetadata($targetingMetadata, 'cities', $fieldValues[FacebookDistributionField::TARGETING_CITIES], true);
+			$this->insertToFacebookMetadata($targetingMetadata, 'zipcodes', $fieldValues[FacebookDistributionField::TARGETING_ZIP_CODES], true);
+			$this->insertToFacebookMetadata($targetingMetadata, 'excluded_countries', $fieldValues[FacebookDistributionField::TARGETING_EXCLUDED_COUNTRIES], true);
+			$this->insertToFacebookMetadata($targetingMetadata, 'excluded_regions', $fieldValues[FacebookDistributionField::TARGETING_EXCLUDED_REGIONS], true);
+			$this->insertToFacebookMetadata($targetingMetadata, 'excluded_cities', $fieldValues[FacebookDistributionField::TARGETING_EXCLUDED_CITIES], true);
+			$this->insertToFacebookMetadata($targetingMetadata, 'excluded_zipcodes', $fieldValues[FacebookDistributionField::TARGETING_EXCLUDED_ZIPCODES], true);
+			$this->insertToFacebookMetadata($targetingMetadata, 'timezones', $fieldValues[FacebookDistributionField::TARGETING_TIMEZONES], true);
+			$this->insertToFacebookMetadata($targetingMetadata, 'age_min', $fieldValues[FacebookDistributionField::TARGETING_AGE_MIN], false);
+			$this->insertToFacebookMetadata($targetingMetadata, 'age_max', $fieldValues[FacebookDistributionField::TARGETING_AGE_MAX], false);
+			$this->insertToFacebookMetadata($targetingMetadata, 'genders', $fieldValues[FacebookDistributionField::TARGETING_GENDERS], true);
+			$this->insertToFacebookMetadata($targetingMetadata, 'locales', $fieldValues[FacebookDistributionField::TARGETING_LOCALES], true);
+			if (!empty($targetingMetadata))
+				$facebookMetadata['targeting'] = json_encode($targetingMetadata);
+			$feedTargetingMetadata = array();
+			$this->insertToFacebookMetadata($feedTargetingMetadata, 'countries', $fieldValues[FacebookDistributionField::FEED_TARGETING_COUNTRIES], true);
+			$this->insertToFacebookMetadata($feedTargetingMetadata, 'regions', $fieldValues[FacebookDistributionField::FEED_TARGETING_REGIONS], true);
+			$this->insertToFacebookMetadata($feedTargetingMetadata, 'cities', $fieldValues[FacebookDistributionField::FEED_TARGETING_CITIES], true);
+			$this->insertToFacebookMetadata($feedTargetingMetadata, 'age_min', $fieldValues[FacebookDistributionField::FEED_TARGETING_AGE_MIN], false);
+			$this->insertToFacebookMetadata($feedTargetingMetadata, 'age_max', $fieldValues[FacebookDistributionField::FEED_TARGETING_AGE_MAX], false);
+			$this->insertToFacebookMetadata($feedTargetingMetadata, 'genders', $fieldValues[FacebookDistributionField::FEED_TARGETING_GENDERS], true);
+			$this->insertToFacebookMetadata($feedTargetingMetadata, 'interested_in', $fieldValues[FacebookDistributionField::FEED_TARGETING_INTERESTED_IN], true);
+			$this->insertToFacebookMetadata($feedTargetingMetadata, 'education_statuses', $fieldValues[FacebookDistributionField::FEED_TARGETING_EDUCATION_STATUSES], true);
+			$this->insertToFacebookMetadata($feedTargetingMetadata, 'relationship_statuses', $fieldValues[FacebookDistributionField::FEED_TARGETING_RELATIONSHIP_STATUSES], true);
+			$this->insertToFacebookMetadata($feedTargetingMetadata, 'college_years', $fieldValues[FacebookDistributionField::FEED_TARGETING_COLLEGE_YEARS], true);
+			$this->insertToFacebookMetadata($feedTargetingMetadata, 'interests', $fieldValues[FacebookDistributionField::FEED_TARGETING_INTERESTS], true);
+			$this->insertToFacebookMetadata($feedTargetingMetadata, 'relevant_until', $fieldValues[FacebookDistributionField::FEED_TARGETING_RELEVANT_UNTIL], false);
+			$this->insertToFacebookMetadata($feedTargetingMetadata, 'locales', $fieldValues[FacebookDistributionField::FEED_TARGETING_LOCALES], true);
+			if (!empty($feedTargetingMetadata))
+				$facebookMetadata['feed_targeting'] = json_encode($feedTargetingMetadata);
+
+		} else {
+			$this->insertToFacebookMetadata($facebookMetadata, 'name', $fieldValues[FacebookDistributionField::TITLE], false);
 		}
+
+		KalturaLog::info("Facebook metadata constructed as : ".print_r($facebookMetadata, true));
 		return $facebookMetadata;
+	}
+
+	private function insertToFacebookMetadata(&$metadataArray, $key, $value, $isArray)
+	{
+		if ($value)
+		{
+			if($isArray)
+			{
+				if (strpos($value, self::FACEBOOK_CUSTOM_DATA_DELIMITER) !== false)
+				{
+					$metadataArray[$key] = explode(self::FACEBOOK_CUSTOM_DATA_DELIMITER, $value);
+				} else {
+					$metadataArray[$key] = array($value);
+				}
+			} else {
+				$metadataArray[$key] = $value;
+			}
+		}
 	}
 
 }

@@ -19,14 +19,29 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 	 * @return string representing the basic url.
 	 */
 	protected function getBaseUrl(flavorAsset $flavorAsset) {
+		$entry = entryPeer::retrieveByPK($this->params->getEntryId());
 		$partnerId = $flavorAsset->getPartnerId();
-		$subpId = $flavorAsset->getentry()->getSubpId();
+		$subpId = $entry->getSubpId();
 		$partnerPath = myPartnerUtils::getUrlForPartner($partnerId, $subpId);
-		$flavorAssetId = $flavorAsset->getId();
-		$versionString = $this->getFlavorVersionString($flavorAsset);
-		$urlParams = $this->params->getUrlParams();
 		
-		$url = "$partnerPath/serveFlavor/entryId/".$flavorAsset->getEntryId()."{$versionString}/flavorId/$flavorAssetId" . $urlParams;
+		$url = "$partnerPath/serveFlavor/entryId/".$entry->getId();
+		if ($entry->getType() == entryType::PLAYLIST)
+		{
+			$partner = $entry->getPartner();
+			$entryVersion = $entry->getVersion();
+			$partnerFlavorVersion = $partner->getCacheFlavorVersion();
+			
+			$url .= ($entryVersion ? "/v/$entryVersion" : '') .
+				($partnerFlavorVersion ? "/pv/$partnerFlavorVersion" : '');
+			$url .= '/flavorParamIds/' . $flavorAsset->getFlavorParamsId();
+		}
+		else
+		{
+			$url .= $this->getFlavorVersionString($flavorAsset);
+			$url .= '/flavorId/' . $flavorAsset->getId();
+		}
+
+		$url .= $this->params->getUrlParams();
 		return $url;
 	}
 	
@@ -64,7 +79,14 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 	{
 		$thumbAssetId = $thumbAsset->getId();
 		$partnerId = $thumbAsset->getPartnerId();
-		$url = "/api_v3/service/thumbAsset/action/serve/partnerId/$partnerId/thumbAssetId/$thumbAssetId";
+		
+		$addExtension = false;
+		if ($this->getDynamicAttributes()->getAddThumbnailExtension())
+		{
+			$addExtension = true;
+		}
+		
+		$url = "/api_v3/service/thumbAsset/action/serve/partnerId/$partnerId/thumbAssetId/$thumbAssetId" . ($addExtension ?  "/$thumbAssetId." . $thumbAsset->getFileExt() : "");
 	
 		return $url;
 	}

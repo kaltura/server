@@ -98,6 +98,6 @@ class UserRole extends BaseUserRole implements IRelatedObject
 	
 	public function getCacheInvalidationKeys()
 	{
-		return array("userRole:id=".strtolower($this->getId()));
+		return array("userRole:id=".strtolower($this->getId()), "userRole:systemName=".strtolower($this->getSystemName()));
 	}
 } // UserRole

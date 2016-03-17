@@ -29,15 +29,17 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
+using System.Threading;
 
 namespace Kaltura
 {
     class KalturaClientTester : IKalturaLogger
     {
-		private const int PARTNER_ID = @YOUR_PARTNER_ID@; //enter your partner id
-		private const string ADMIN_SECRET = "@YOUR_ADMIN_SECRET@"; //enter your admin secret
-		private const string SERVICE_URL = "@SERVICE_URL@";
-		private const string USER_ID = "testUser";
+        private const int PARTNER_ID = @YOUR_PARTNER_ID@; //enter your partner id
+        private const string ADMIN_SECRET = "@YOUR_ADMIN_SECRET@"; //enter your admin secret
+        private const string SERVICE_URL = "@SERVICE_URL@";
+        private const string USER_ID = "testUser";
+
         
         private static string uniqueTag;
 
@@ -51,7 +53,18 @@ namespace Kaltura
             Console.WriteLine("Starting C# Kaltura API Client Library");
             int code = 0;
             uniqueTag = Guid.NewGuid().ToString().Replace("-", "").Substring(0, 20);
-
+            try
+            {
+                if(args.Length > 0 && args[0].Equals("--with-threads"))
+                {
+                    SampleThreadedChunkUpload();
+                }
+            }
+            catch (KalturaAPIException e0)
+            {
+                Console.WriteLine("failed chunk upload: " + e0.Message);
+            }
+            
             try
             {
                 ResponseProfileExample();
@@ -110,12 +123,123 @@ namespace Kaltura
             if (code == 0)
             {
                 Console.WriteLine("Finished running client library tests");
+                Console.ReadLine();
             }
 
             Environment.Exit(code);
         }
 
-        static KalturaConfiguration GetConfig()
+        // setting chunk size to a small chunk, because demo file is 500k size.
+        // in actual implementation, a chunk size of 10MB is good practice.
+        const int CHUNK_SIZE = 10240;
+        static void SampleThreadedChunkUpload()
+        {
+            KalturaClient client = new KalturaClient(GetConfig());
+            client.KS = client.GenerateSession(ADMIN_SECRET, USER_ID, KalturaSessionType.ADMIN, PARTNER_ID, 86400, "");
+
+            string fname = "DemoVideo.flv";
+            FileStream fileStream = new FileStream(fname, FileMode.Open, FileAccess.Read, FileShare.Read);
+            KalturaUploadToken myToken = new KalturaUploadToken();
+            myToken.FileName = fname;
+            FileInfo f = new FileInfo(fname);
+            myToken.FileSize = f.Length;
+
+            string mediaName = "C# Media Entry Uploaded in chunks using threads";
+
+            KalturaUploadToken uploadToken = client.UploadTokenService.Add(myToken);
+
+            chunkThreaded(client.KS, fileStream, uploadToken.Id);
+            
+            KalturaUploadedFileTokenResource mediaResource = new KalturaUploadedFileTokenResource();
+            mediaResource.Token = uploadToken.Id;
+            KalturaMediaEntry mediaEntry = new KalturaMediaEntry();
+            mediaEntry.Name = mediaName;
+            mediaEntry.MediaType = KalturaMediaType.VIDEO;
+            mediaEntry = client.MediaService.Add(mediaEntry);
+            mediaEntry = client.MediaService.AddContent(mediaEntry.Id, mediaResource);
+        }
+
+        static int maxUploadThreads = 4;
+        static public int workingThreads = 0;
+
+        static void chunkThreaded(string ks, FileStream fileStream, string uploadTokenId)
+        {
+            KalturaClient client = new KalturaClient(GetConfig());
+            client.KS = ks;
+
+            LinkedList<int> ranges = new LinkedList<int>();
+            int chunkSize = CHUNK_SIZE;
+
+            long fileSize = fileStream.Length - (fileStream.Length % chunkSize);
+            int lastPosition = unchecked((int)fileSize);
+            for (int i = chunkSize; i < fileSize; i = i + chunkSize)
+            {
+                LinkedListNode<int> pos = new LinkedListNode<int>(i);
+                ranges.AddFirst(pos);
+            }
+            KalturaUploadThread uploader = new KalturaUploadThread(ks, fileStream, chunkSize, ranges, uploadTokenId);
+
+            try
+            {
+                byte[] chunk = new byte[chunkSize];
+                fileStream.Seek(0, SeekOrigin.Begin);
+                int bytesRead = fileStream.Read(chunk, 0, chunkSize);
+                Stream chunkFile = new MemoryStream(chunk);
+                client.UploadTokenService.Upload(uploadTokenId, chunkFile, false, false);
+                chunkFile.Close();
+            }
+            catch (KalturaAPIException ex)
+            {
+                Console.WriteLine("failed uploading first chunk " + ex.Message);
+                throw ex;
+            }
+
+            int counter = 0;
+            Dictionary<int, Thread> threadList = new Dictionary<int, Thread>();
+            try
+            {
+                while (!ranges.Count.Equals(0))
+                {
+                    // this will open all threads allowed
+                    while (workingThreads < maxUploadThreads && !ranges.Count.Equals(0))
+                    {
+                        int threadID = workingThreads + 1;
+                        if (threadList.ContainsKey(threadID))
+                        {
+                            threadList.Remove(threadID);
+                        }
+                        threadList.Add(threadID, new Thread(new ThreadStart(uploader.upload)));
+                        threadList[threadID].Start();
+                        counter++;
+                        workingThreads += 1;
+                    }
+                }
+
+                while (workingThreads > 0)
+                {
+                    Thread.Sleep(100);
+                }
+
+                // threads have finished at this point. upload last chunk
+
+            }
+            catch (ThreadStateException e)
+            {
+                Console.WriteLine("thread exploded with " + e.Message);
+                throw e;
+            }
+
+            byte[] lastChunk = new byte[chunkSize];
+            long lengthLong = fileStream.Length - lastPosition;
+            int length = unchecked((int)lengthLong);
+            fileStream.Seek(lastPosition, SeekOrigin.Begin);
+            int lastBytesRead = fileStream.Read(lastChunk, 0, length);
+            Stream lastChunkFile = new MemoryStream(lastChunk);
+            client.UploadTokenService.Upload(uploadTokenId, lastChunkFile, true, true, lastPosition);
+            lastChunkFile.Close();
+        }
+
+        public static KalturaConfiguration GetConfig()
         {
             KalturaConfiguration config = new KalturaConfiguration();
             config.ServiceUrl = SERVICE_URL;

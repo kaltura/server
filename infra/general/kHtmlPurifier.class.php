@@ -76,7 +76,7 @@ class kHtmlPurifier
 		if ( ! self::$purifier )
 		{
 			$config = HTMLPurifier_Config::createDefault();
-			$config->set('Cache.DefinitionImpl', false);
+			$config->set('Cache.DefinitionImpl', null);
 			self::$purifier = new HTMLPurifier($config);
 			if ( $cacheKey )
 			{

@@ -25,4 +25,9 @@ class MetadataDynamicObjectPeer extends MetadataPeer implements IMetadataPeer
 		
 		return true;
     }
+
+	public static function getEntry($objectId)
+	{
+		return null;
+	}
 }

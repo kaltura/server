@@ -19,7 +19,14 @@ class myPartnerUtils
 
 	private static $s_filterred_peer_list = array();
 	private static $partnerCriteriaParams = array();
-	 
+	//contains all partnerCriteriaParams, including params that were already retrieved
+	private static $allPartnerCriteriaParams = array();
+
+	public static function getAllPartnerCriteriaParams()
+	{
+		return self::$allPartnerCriteriaParams;
+	}
+
 	public static function getUrlForPartner ( $partner_id , $subp_id  )
 	{
 		return "/p/$partner_id/sp/$subp_id";	
@@ -122,6 +129,7 @@ class myPartnerUtils
 		call_user_func(array($peerName, 'setDefaultCriteriaFilter'));
 		unset(self::$s_filterred_peer_list[$peerName]); 
 		unset(self::$partnerCriteriaParams[$objectName]);
+		unset(self::$allPartnerCriteriaParams[$objectName]);
 	}
 
 	// will reset all the filters used in the applyPartnerFilters
@@ -134,6 +142,24 @@ class myPartnerUtils
 		
 		self::$s_filterred_peer_list = array();
 		self::$partnerCriteriaParams = array();
+		self::$allPartnerCriteriaParams = array();
+	}
+
+	// will reset all the filters used in the applyPartnerFilters and will re-apply them
+	public static function reApplyPartnerFilters($allPartnerCriteriaParams)
+	{
+		if (!$allPartnerCriteriaParams)
+		{
+			KalturaLog::debug("could not re-apply filters, empty partnerCriteriaParams array was sent");
+			return;
+		}
+
+		self::resetAllFilters();
+		foreach($allPartnerCriteriaParams as $objectName => $partnerCriteriaParams)
+		{
+			list($partner_id, $private_partner_data, $partner_group, $kaltura_network) = $partnerCriteriaParams;
+			self::addPartnerToCriteria($objectName, $partner_id, $private_partner_data, $partner_group, $kaltura_network);
+		}
 	}
 	
 	/**
@@ -184,6 +210,7 @@ class myPartnerUtils
 	{
 		$objectName = strtolower($objectName);
 		self::$partnerCriteriaParams[$objectName] = array($partner_id, $private_partner_data, $partner_group, $kaltura_network);
+		self::$allPartnerCriteriaParams[$objectName] = self::$partnerCriteriaParams[$objectName];
 	}
 
 
@@ -326,15 +353,18 @@ class myPartnerUtils
 			$protocol='http';
 
 		$partner = PartnerPeer::retrieveByPK( $partner_id );
-		$hostToTest = self::getHostForWhiteList();
-		if ($partner && !is_null($hostToTest) && $partner->isInCDNWhiteList($hostToTest))
+		if ($partner)
 		{
-			$cdnHost = $protocol.'://'.$hostToTest;
-			if (isset($_SERVER['SERVER_PORT']))
+			$whiteListHost = self::getWhiteListHost($partner);
+			if (!is_null($whiteListHost))
 			{
-				$cdnHost .= ":".$_SERVER['SERVER_PORT'];
+				$cdnHost = $protocol.'://'.$whiteListHost;
+				if (isset($_SERVER['SERVER_PORT']))
+				{
+					$cdnHost .= ":".$_SERVER['SERVER_PORT'];
+				}
+				return $cdnHost;
 			}
-			return $cdnHost;
 		}
 
 		switch ($hostType)
@@ -1787,20 +1817,25 @@ class myPartnerUtils
 	}
 
 	/**
+	 * @param Partner $partner
 	 * @return null
 	 */
-	public static function getHostForWhiteList()
+	public static function getWhiteListHost(Partner $partner)
 	{
-		$hostToTest = null;
 		if (isset($_SERVER['HTTP_X_FORWARDED_HOST']))
 		{
 			$xForwardedHosts = explode(',', $_SERVER['HTTP_X_FORWARDED_HOST']);
-			$hostToTest = $xForwardedHosts[0];
-			return $hostToTest;
-		} else if (isset($_SERVER['HTTP_HOST']))
+			foreach($xForwardedHosts as $xForwardedHost){
+				if ($partner->isInCDNWhiteList($xForwardedHost))
+				{
+					return $xForwardedHost;
+				}
+			}
+		}
+		elseif (isset($_SERVER['HTTP_HOST']) && $partner->isInCDNWhiteList($_SERVER['HTTP_HOST']))
 		{
-			$hostToTest = $_SERVER['HTTP_HOST'];
-			return $hostToTest;
-		}return $hostToTest;
+			return $_SERVER['HTTP_HOST'];
+		}
+		return null;
 	}
 }

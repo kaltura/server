@@ -215,6 +215,8 @@ abstract class myBaseObject implements Iterator
 
 		$set_field_count = 0;
 
+		$time_params_to_relative = $this->getRelativeTimeFields();
+
 		// iterate over all the paramters of the request
 		foreach ( $simple_xml_node as $param => $value )
 		{
@@ -225,7 +227,10 @@ abstract class myBaseObject implements Iterator
 			{
 				continue;
 			}
-		
+			
+			if(in_array($param, $time_params_to_relative))
+				$value = kTime::getRelativeTime($value);
+
 			// the field name is the rest of the string coming after the prefix
 			$param_name = $prefix_to_add . $param;
 
@@ -243,6 +248,11 @@ abstract class myBaseObject implements Iterator
 		return $set_field_count;
 	}
 		
+	protected function getRelativeTimeFields()
+	{
+		return array();
+	}
+
 	public function getFields()
 	{
 		return $this->fields;
@@ -496,4 +506,3 @@ abstract class myBaseObject implements Iterator
 	}
 
 }
-?>

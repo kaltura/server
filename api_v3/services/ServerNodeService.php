@@ -158,7 +158,7 @@ class ServerNodeService extends KalturaBaseService
 	 */
 	function reportStatusAction($hostName, KalturaServerNode $serverNode = null)
 	{
-		$dbServerNode = ServerNodePeer::retrieveActiveServerNodes($hostName, $this->getPartnerId());
+		$dbServerNode = ServerNodePeer::retrieveActiveServerNode($hostName, $this->getPartnerId());
 		
 		//Allow serverNodes auto registration without calling add
 		if (!$dbServerNode)

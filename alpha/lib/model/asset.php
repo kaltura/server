@@ -98,6 +98,7 @@ class asset extends Baseasset implements ISyncableFile, IRelatedObject
 	const CUSTOM_DATA_FIELD_ACTUAL_SOURCE_ASSET_PARAMS_IDS = "actualSourceParamsIds";
 	const CUSTOM_DATA_FILE_SYNC_VERSIONS_TO_DELETE = "fileSyncVersionsToDelete";
 	const CUSTOM_DATA_PREVIOUS_VERSION = "previousVersion";
+	const CUSTOM_DATA_ENCRYPTION_KEY = "encryptionKey";
 	
 	const MAX_ASSETS_PER_ENTRY = 500;
 	
@@ -734,6 +735,9 @@ class asset extends Baseasset implements ISyncableFile, IRelatedObject
 	
 	public function getActualSourceAssetParamsIds()		{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_ACTUAL_SOURCE_ASSET_PARAMS_IDS);}
 	public function setActualSourceAssetParamsIds($v)	{$this->putInCustomData(self::CUSTOM_DATA_FIELD_ACTUAL_SOURCE_ASSET_PARAMS_IDS, $v);}
+
+	public function getEncryptionKey()			{return $this->getFromCustomData(self::CUSTOM_DATA_ENCRYPTION_KEY);}
+	public function setEncryptionKey($v)			{$this->putInCustomData(self::CUSTOM_DATA_ENCRYPTION_KEY, $v);}
 	
 	public function resetFileSyncVersionsToDelete() 	{$this->putInCustomData(self::CUSTOM_DATA_FILE_SYNC_VERSIONS_TO_DELETE, null);}
 	public function getFileSyncVersionsToDelete()		{return $this->getFromCustomData(self::CUSTOM_DATA_FILE_SYNC_VERSIONS_TO_DELETE);}
@@ -746,5 +750,14 @@ class asset extends Baseasset implements ISyncableFile, IRelatedObject
 		
 		$this->putInCustomData(self::CUSTOM_DATA_FILE_SYNC_VERSIONS_TO_DELETE, $v);
 	}
+
+	public function getentry(PropelPDO $con = null)
+	{
+		return entryPeer::retrieveByPk($this->entry_id);
+	}
 	
+	public function getassetParams(PropelPDO $con = null)
+	{
+		return assetParamsPeer::retrieveByPk($this->flavor_params_id);
+	}	
 }

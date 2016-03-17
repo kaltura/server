@@ -899,29 +899,26 @@ class category extends Basecategory implements IIndexable, IRelatedObject
 		$members = categoryKuserPeer::retrieveActiveKusersByCategoryId($categoryIdToGetAllMembers);
 		if (!$members)
 			return '';
-		
+
 		$membersIdsByPermission = array();
-		foreach ($members as $member)
+		$permissionNamesByMembers = array();
+
+		/* @var $member categoryKuser */
+		while ($member = array_pop($members))
 		{
 			if(isset($membersIdsByPermission[$member->getPermissionLevel()]))
 				$membersIdsByPermission[$member->getPermissionLevel()][] = $member->getKuserId();
 			else
 				$membersIdsByPermission[$member->getPermissionLevel()] = array ($member->getKuserId());
-		}
-		
-		//Add indexed permission_names
-		$permissionNamesByMembers = array();
-		foreach ($members as $member)
-		{
-			/* @var $member categoryKuser */
+
 			$permissionNames = explode(",", $member->getPermissionNames());
 			foreach ($permissionNames as &$permissionName)
 			{
-				$permissionName = str_replace('_', '', $permissionName);				
+				$permissionName = str_replace('_', '', $permissionName);
 			}
 			$permissionNamesByMembers[] = $member->getKuserId().implode(" ".$member->getKuserId(), $permissionNames);
 		}
-		
+
 		$membersIds = array();
 		foreach ($membersIdsByPermission as $permissionLevel => $membersIdByPermission)
 		{
@@ -930,7 +927,7 @@ class category extends Basecategory implements IIndexable, IRelatedObject
 			$membersIds[] = implode(' ', $membersIdByPermission);
 			$membersIds[] = implode(' ', $permissionNamesByMembers);
 		}
-		
+
 		return implode(' ', $membersIds);
 	}
 
@@ -1727,5 +1724,35 @@ class category extends Basecategory implements IIndexable, IRelatedObject
 			}
 		}
 		return true;
+	}
+
+	public function addIndexCategoryInheritedTreeJob()
+	{
+		$featureStatusToRemoveIndex = new kFeatureStatus();
+		$featureStatusToRemoveIndex->setType(IndexObjectType::CATEGORY);
+
+		$featureStatusesToRemove = array();
+		$featureStatusesToRemove[] = $featureStatusToRemoveIndex;
+
+		$filter = new categoryFilter();
+		$filter->setFullIdsStartsWith($this->getFullIds());
+		$filter->setInheritanceTypeEqual(InheritanceType::INHERIT);
+
+		$c = KalturaCriteria::create(categoryPeer::OM_CLASS);
+		$filter->attachToCriteria($c);
+		KalturaCriterion::disableTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
+		$categories = categoryPeer::doSelect($c);
+		KalturaCriterion::restoreTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
+
+		if(count($categories))
+		{
+			kJobsManager::addIndexJob($this->getPartnerId(), IndexObjectType::CATEGORY, $filter, true, $featureStatusesToRemove);
+		}
+
+	}
+
+	public function indexCategoryInheritedTree()
+	{
+		kEventsManager::raiseEventDeferred(new kObjectReadyForIndexInheritedTreeEvent($this));
 	}
 }

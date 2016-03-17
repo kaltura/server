@@ -13,6 +13,9 @@ class KDLFlavor extends KDLMediaDataSet {
 	const MissingContentNonComplyFlagBit = 4;
 	const ForceCommandLineFlagBit = 8;
 	const FrameSizeNonComplyFlagBit = 16;
+	
+	const ENCRYPTION_KEY_PLACEHOLDER = "__ENCRYPTION_KEY__";
+	const ENCRYPTION_KEY_ID_PLACEHOLDER = "__ENCRYPTION_KEY_ID__";
 
 	/* ---------------------
 	 * Data
@@ -40,6 +43,8 @@ class KDLFlavor extends KDLMediaDataSet {
 	public 	$_fastSeekTo = true;
 	
 	public $_optimizationPolicy = KDLOptimizationPolicy::BitrateFlagBit;
+	
+	public $_isEncrypted = false; // CENC encryption
 	
 	public	$_transcoders = array();
 
@@ -507,7 +512,7 @@ $plannedDur = 0;
 			&& isset($source->_container) && $source->_container->IsFormatOf(array("mxf")) 
 			&& isset($source->_video) && $source->_video->IsFormatOf(array("mpeg video","mpeg2video")) 
 			&& isset($source->_video->_width) && $source->_video->_width==720
-			&& isset($source->_video->_height) && ($source->_video->_height==608 || $source->_video->_height==576)){
+			&& isset($source->_video->_height) && ($source->_video->_height==608 || $source->_video->_height==576 || $source->_video->_height==486)){
 				$this->_video->_isCropIMX=true;
 			}
 			else {
@@ -520,24 +525,25 @@ $plannedDur = 0;
 			 * In case it does and the flavor has 'multiStream' set to 'auto-detect' (default action) -
 			 * try to define a multiStream processing setup
 			 */
-		$sourceAnalize = self::analizeSourceContentStreams($source->_contentStreams);
-			/*
-			 * Check analyze realts for
-			 * - 'streamsAsChannels' - process them as sorround streams
-			 * - 'languages - process them as multi-lingual
-			 * - otherwise remove the 'multiStream' object'
-			 */
-		if(isset($sourceAnalize->streamsAsChannels)){
-			$target->_multiStream = self::sorroundAudioSurceToTarget($source, $target->_multiStream, $sourceAnalize->streamsAsChannels);
+		if (isset($source->_contentStreams)){
+		    $sourceAnalize = self::analizeSourceContentStreams($source->_contentStreams);
+			    /*
+			    * Check analyze realts for
+			    * - 'streamsAsChannels' - process them as sorround streams
+			    * - 'languages - process them as multi-lingual
+			    * - otherwise remove the 'multiStream' object'
+			    */
+		    if(isset($sourceAnalize->streamsAsChannels)){
+			    $target->_multiStream = self::sorroundAudioSurceToTarget($source, $target->_multiStream, $sourceAnalize->streamsAsChannels);
+		    }
+		    else if(isset($sourceAnalize->languages)){
+			    $target->_multiStream = self::multiLingualAudioSurceToTarget($source, $target->_multiStream, $sourceAnalize->languages);
+		    }
+		    else {
+			    $target->_multiStream = null;
+		    }
 		}
-		else if(isset($sourceAnalize->languages)){
-			$target->_multiStream = self::multiLingualAudioSurceToTarget($source, $target->_multiStream, $sourceAnalize->languages);
-		}
-		else {
-			$target->_multiStream = null;
-		}
-				
-		
+
 		if($target->_container->_id==KDLContainerTarget::COPY){
 			$target->_container->_id=self::EvaluateCopyContainer($source->_container);
 		}
@@ -582,8 +588,12 @@ $plannedDur = 0;
 					$flvrVid= $this->_video;
 					$param1=null;
 					$param2=null;
-					if(isset($flvrVid->_bitRate) && $flvrVid->_bitRate>0 && isset($srcVid->_bitRate) && $srcVid->_bitRate>0
-					&& $flvrVid->_bitRate/KDLConstants::FlavorBitrateComplianceFactor<$srcVid->_bitRate) 
+					/*
+					 * The BitrateCompliance condition prevented some of flavors to be signed as  'Framesize-non-comply'.
+					 * Therefore it was removed.
+					 */
+		//			if(isset($flvrVid->_bitRate) && $flvrVid->_bitRate>0 && isset($srcVid->_bitRate) && $srcVid->_bitRate>0
+		//			&& $flvrVid->_bitRate/KDLConstants::FlavorBitrateComplianceFactor<$srcVid->_bitRate) 
 					{
 						if(isset($flvrVid->_width) && $flvrVid->_width>0 && isset($trgVid->_width) && $trgVid->_width 
 						&& $flvrVid->_width>$trgVid->_width/KDLConstants::FlavorFrameSizeComplianceFactor) {
@@ -624,7 +634,11 @@ $plannedDur = 0;
 		$target->_audio = null;
 		if($this->_audio!=""){
 			if($source->_audio!=""){
-				$target->_audio = $this->evaluateTargetAudio($source->_audio, $target, $source->_contentStreams);
+				if (isset($source->_contentStreams)){
+					$target->_audio = $this->evaluateTargetAudio($source->_audio, $target, $source->_contentStreams);
+				}else{
+					$target->_audio = $this->evaluateTargetAudio($source->_audio, $target, null);
+				}
 				/*
 				 * On multi-lingual flavor, 
 				 * if required language does not exist - set NonComply flag 
@@ -1000,11 +1014,22 @@ $plannedDur = 0;
 			 * Fixed target frame size
 			 */
 		else if($shrinkToSource) {
-			if($target->_width>$widSrc) {
-				$target->_width=$widSrc;
-			}
+			$darTrg = $target->_width/$target->_height;
 			if($target->_height>$hgtSrc) {
 				$target->_height=$hgtSrc;
+			}
+				/*
+				 * If the target AR is similar/close (up to 10%) to the src AR,
+				 * just trim to the source dims.
+				 * Otherwise (src AR != trg AR) - calc the trg wid from trg AR and hgt.
+				 */
+			if(abs(1-$darTrg/$darSrcFrame)<0.1) {
+				if($target->_width>$widSrc) {
+					$target->_width=$widSrc;
+				}
+			}
+			else {
+				$target->_width = $target->_height*$darTrg;
 			}
 		}
 
@@ -1223,10 +1248,13 @@ $plannedDur = 0;
 		/*
 		 * Adjust source channnels count to match the mapping settings
 		 */
-		$multiStream = $target->_multiStream;
+		if (isset($target->_multiStream)){
+			$multiStream = $target->_multiStream;
+		}else{
+			$multiStream = null;
+		}
 		$multiStreamChannels = null;
-		if(isset($multiStream) && isset($multiStream->audio)
-		&& isset($multiStream->audio->mapping) && count($multiStream->audio->mapping)>0) {
+		if(isset($multiStream->audio->mapping) && count($multiStream->audio->mapping)>0) {
 			if(count($multiStream->audio->mapping)>1){
 				$multiStreamChannels = 2;
 			}

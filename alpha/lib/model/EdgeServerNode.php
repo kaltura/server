@@ -3,6 +3,7 @@
 class EdgeServerNode extends DeliveryServerNode {
 
 	const EDGE_SERVER_DEFAULT_LIVE_CACHE_APPLICATION_NAME = "kCache";
+	const EDGE_SERVER_DEFAULT_THUMBNAIL_CACHE_APPLICATION_NAME = "kThumbnail";
 	const EDGE_SERVER_DEFAULT_VOD_CACHE_APPLICATION_NAME = "kVOD";
 	const EDGE_SERVER_DEFAULT_LIVE_UNICAST_TO_MC_APPLICATION_NAME = "kMulticast";
 	const CUSTOM_DATA_DELIVERY_IDS = "delivery_profile_ids";
@@ -54,27 +55,27 @@ class EdgeServerNode extends DeliveryServerNode {
 		return $this->buildEdgeFullPath($protocol, $format, $deliveryType);
 	}
 	
-	public function buildEdgeFullPath($protocol = 'http', $format = null, $deliveryType = null)
+	public function buildEdgeFullPath($protocol = 'http', $format = null, $deliveryType = null, $assetType = null)
 	{
-		$edgeFullPath = rtrim($this->getedgePath($format, $deliveryType), "/") . "/";
+		$edgeFullPath = rtrim($this->getedgePath($format, $deliveryType, $assetType), "/") . "/";
 		
 		if($this->parent_id)
 		{
 			$parentEdge = ServerNodePeer::retrieveByPK($this->parent_id);
 			if($parentEdge)
-				$edgeFullPath = $edgeFullPath . $parentEdge->buildEdgeFullPath($protocol, $format, $deliveryType);
+				$edgeFullPath = $edgeFullPath . $parentEdge->buildEdgeFullPath($protocol, $format, $deliveryType, $assetType);
 		}
 		
 		return $edgeFullPath;
 	}
 	
-	public function getedgePath($format, $deliveryType = null)
+	public function getedgePath($format, $deliveryType = null, $assetType = null)
 	{
 		$edgePath = $this->getPlaybackDomain();
 		
 		$edgeSpecificDeliveryProfileByType = $this->getEdgeSpecificDeliveryProfileByType($format, $deliveryType);
 		if(!$edgeSpecificDeliveryProfileByType)
-			return $edgePath . "/" . $this->getCacheLocationByDeliveryType($deliveryType);
+			return $edgePath . "/" . $this->getCacheLocation($deliveryType, $assetType);
 	
 		/* @var $deliveryProfile DeliveryProfile */
 		$deliveryUrl = $edgeSpecificDeliveryProfileByType->getUrl();
@@ -102,9 +103,12 @@ class EdgeServerNode extends DeliveryServerNode {
 		return reset($deliveryProfiles);
 	}
 	
-	private function getCacheLocationByDeliveryType($deliveryType = null)
+	private function getCacheLocation($deliveryType = null, $assetType = null)
 	{
-		if(!$deliveryType)
+		if($assetType && $assetType == assetType::THUMBNAIL)
+			return self::EDGE_SERVER_DEFAULT_THUMBNAIL_CACHE_APPLICATION_NAME;
+		
+		if( ($assetType && $assetType == assetType::LIVE) || !$deliveryType)
 			return self::EDGE_SERVER_DEFAULT_LIVE_CACHE_APPLICATION_NAME;
 		
 		$liveDeliveryTypes = DeliveryProfilePeer::getAllLiveDeliveryProfileTypes();
@@ -112,5 +116,24 @@ class EdgeServerNode extends DeliveryServerNode {
 			return self::EDGE_SERVER_DEFAULT_VOD_CACHE_APPLICATION_NAME;
 	
 		return self::EDGE_SERVER_DEFAULT_LIVE_CACHE_APPLICATION_NAME;
+	}
+	
+	public function validateEdgeTreeRegistered()
+	{
+		/* @var $edgeServer EdgeServerNode */
+		$parentId = $this->getParentId();
+		if($parentId)
+		{
+			$parentEdge = ServerNodePeer::retrieveRegisteredServerNodeByPk($parentId);
+	
+			if(!$parentEdge)
+			{
+				return false;
+			}
+	
+			return $parentEdge->validateEdgeTreeRegistered();
+		}
+	
+		return true;
 	}
 } // EdgeServer

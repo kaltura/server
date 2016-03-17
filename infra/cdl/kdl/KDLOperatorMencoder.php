@@ -270,6 +270,12 @@ bad  mencoder32 ~/Media/Canon.Rotated.0_qaqsufbl.avi -of lavf -lavfopts format=m
 			return true;
 		}
 
+			// Encryption unsupported by Mencoder
+		if($target->_isEncrypted==true){
+			$warnings[KDLConstants::ContainerIndex][] = 
+				KDLWarnings::ToString(KDLWarnings::TranscoderLimitation, $this->_id)."(encryption)";
+			return true;
+		}
 		return false;
 	}
 }

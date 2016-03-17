@@ -20,4 +20,6 @@ class KalturaCuePointErrors extends KalturaErrors implements kCuePointErrors
 	const PARENT_CUE_POINT_DO_NOT_BELONG_TO_THE_SAME_ENTRY = "PARENT_CUE_POINT_DO_NOT_BELONG_TO_THE_SAME_ENTRY;Parent cue point does not belong to the same entry";
 	
 	const USER_KS_CANNOT_LIST_RELATED_CUE_POINTS = "USER_KS_CANNOT_LIST_RELATED_CUE_POINTS;FILTER;Cue-points should not be listed [@FILTER@] as related-objects with unprivileged user ks";
+
+	const NO_PERMISSION_ON_ENTRY = "NO_PERMISSION_ON_ENTRY;ID;No permissions to insert or update cue points for entry [@ID@]";
 }

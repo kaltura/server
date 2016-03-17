@@ -253,6 +253,7 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 					'smil' => 	'kSmilManifestRenderer',
 					'm3u8' => 	'kM3U8ManifestRenderer',
 					'jsonp' => 	'kJSONPManifestRenderer',
+					'json' => 	'kJSONManifestRenderer',
 					'redirect' => 'kRedirectManifestRenderer',
 			);
 	
@@ -373,9 +374,24 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 			KalturaLog::debug("No active delivery nodes found among the requested edge list: " . print_r($deliveryNodeIds, true));
 			return null;
 		}
-	
-		/* @var $deliveryNode EdgeServerNode */
-		$deliveryNode = array_shift($deliveryNodes);
+		
+		$deliveryNode = null;
+		foreach ($deliveryNodes as $node)
+		{
+			/* @var $node EdgeServerNode */
+			if($node->validateEdgeTreeRegistered())
+			{
+				$deliveryNode = $node;
+				break;
+			}
+		}
+		
+		if(!$deliveryNode)
+		{
+			KalturaLog::debug("Active edges were found but non of them is active, Failed to build valid serving route");
+			return null;
+		}
+		
 		$deliveryUrl = $deliveryNode->getPlaybackHost($this->params->getMediaProtocol(), $this->params->getFormat(), $this->getType());
 	
 		if(count($deliveryNodes) && $removeAfterUse)

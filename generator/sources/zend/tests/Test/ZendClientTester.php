@@ -15,6 +15,12 @@ class ZendClientTester
 	 * @var int
 	 */
 	protected $_partnerId;
+
+	/**
+	 *
+	 * @var array
+	 */
+	protected $_responseHeaders;
 	
 	public function __construct(Kaltura_Client_Client $client, $partnerId)
 	{
@@ -167,6 +173,36 @@ class ZendClientTester
     	
     	$this->_client->media->delete($imageEntry->id);
 	}
+
+	public function testServeUrl()
+	{
+		$imageEntry = $this->addImageEntry();
+
+		$newThumbAsset = $this->_client->thumbAsset->addFromUrl($imageEntry->id, $imageEntry->thumbnailUrl);
+
+		$thumbAssetFilter = new Kaltura_Client_Type_ThumbAssetFilter();
+		$thumbAssetFilter->entryIdEqual = $imageEntry->id;
+
+		$thumbAssets = $this->_client->thumbAsset->listAction($thumbAssetFilter);
+
+		// check we have assets
+		$this->assertTrue(!(count($thumbAssets->objects) == 0));
+
+		$asset = $thumbAssets->objects[0];
+
+		$serveUrl = $this->_client->thumbAsset->serve($asset->id);
+
+		// fecth using CURL and test headers
+		$res = $this->doCurl($serveUrl);
+
+		$this->assertEqual($res[1], 200);
+
+		$contentType = $this->getResponseContentType();
+		$this->assertEqual(strtolower($contentType), 'image/jpeg');
+
+		// delete media entry
+		$this->_client->media->delete($imageEntry->id);
+	}
 	
 	public function addImageEntry()
 	{
@@ -214,4 +250,68 @@ class ZendClientTester
 			throw new Exception($msg);
 		}
 	}
+
+	/**
+	 * Curl HTTP POST Request
+	 *
+	 * @param string $url
+	 * @param array $params
+	 * @return array of result and error
+	 */
+	private function doCurl($url, $params = array(), $files = array()) {
+		$this->_responseHeaders = array();
+		$ch = curl_init();
+		curl_setopt($ch, CURLOPT_URL, $url);
+		curl_setopt($ch, CURLOPT_POST, 1);
+		if (count($files) > 0) {
+			foreach ($files as &$file) {
+				// The usage of the @filename API for file uploading is
+				// deprecated since PHP 5.5. CURLFile must be used instead.
+				if (PHP_VERSION_ID >= 50500) {
+					$file = new \CURLFile($file);
+				} else {
+					$file = "@" . $file; // let curl know its a file
+				}
+			}
+			curl_setopt($ch, CURLOPT_POSTFIELDS, array_merge($params, $files));
+		} else {
+			$opt = http_build_query($params, null, "&");
+			curl_setopt($ch, CURLOPT_POSTFIELDS, $opt);
+		}
+		curl_setopt($ch, CURLOPT_ENCODING, 'gzip,deflate');
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		if (count($files) > 0)
+			curl_setopt($ch, CURLOPT_TIMEOUT, 0);
+
+		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
+
+		// Save response headers
+		curl_setopt($ch, CURLOPT_HEADERFUNCTION, array($this, 'readHeader'));
+
+		$result = curl_exec($ch);
+		$curlError = curl_error($ch);
+		$curlErrorCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+		curl_close($ch);
+		return array($result, $curlErrorCode, $curlError);
+	}
+
+	/* Store response headers into array */
+
+	public function readHeader($ch, $string) {
+		array_push($this->_responseHeaders, $string);
+		return strlen($string);
+	}
+
+	private function getResponseContentType() {
+		foreach ($this->_responseHeaders as $header) {
+			$pair = explode(':', $header);
+			if (isset($pair[0]) && strtolower($pair[0]) == 'content-type' && isset($pair[1])) {
+				return trim($pair[1]);
+			}
+		}
+
+		return null;
+	}
+
 }

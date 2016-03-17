@@ -6,6 +6,8 @@
  */
 class kFilterPager
 {
+	const MIN_PAGE_INDEX = 1;
+	
 	/**
 	 * The number of objects to retrieve. (Default is 30, maximum page size is 500).
 	 * 
@@ -50,5 +52,21 @@ class kFilterPager
 	public function setPageIndex($pageIndex)
 	{
 		$this->pageIndex = $pageIndex;
+	}
+
+	
+	public function calcPageSize()
+	{
+		return max(min($this->pageSize, baseObjectFilter::getMaxInValues()), 0);
+	}
+
+	public function calcPageIndex()
+	{
+		return max(self::MIN_PAGE_INDEX, $this->pageIndex);
+	}
+
+	public function calcOffset()
+	{
+		return ($this->calcPageIndex() - 1) * $this->calcPageSize();
 	}
 }

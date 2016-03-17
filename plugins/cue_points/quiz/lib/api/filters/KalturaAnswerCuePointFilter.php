@@ -18,6 +18,10 @@ class KalturaAnswerCuePointFilter extends KalturaAnswerCuePointBaseFilter
 	 */
 	public function getTypeListResponse(KalturaFilterPager $pager, KalturaDetachedResponseProfile $responseProfile = null, $type = null)
 	{
+		if ($this->quizUserEntryIdIn || $this->quizUserEntryIdEqual)
+		{
+			KalturaCriterion::disableTag(KalturaCriterion::TAG_WIDGET_SESSION);
+		}
 		return parent::getTypeListResponse($pager, $responseProfile, QuizPlugin::getCoreValue('CuePointType',QuizCuePointType::QUIZ_ANSWER));
 	}
 	
@@ -26,6 +30,7 @@ class KalturaAnswerCuePointFilter extends KalturaAnswerCuePointBaseFilter
 	 */
 	protected function getCoreFilter()
 	{
-	    return new AnswerCuePointFilter();
+		kApiCache::disableCache();
+		return new AnswerCuePointFilter();
 	}	
 }

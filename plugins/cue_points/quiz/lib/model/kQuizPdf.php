@@ -70,20 +70,11 @@ class kQuizPdf
         $title = "Here are the questions from  [".$dbEntry->getName()."]";
         KalturaLog::debug("Questions from  [".$dbEntry->getName()."]");
         $this->pdf->addTitle($title, $this->titleStyle);
+        $this->pdf->setOutFileName($dbEntry->getName());
         $questionType = QuizPlugin::getCuePointTypeCoreValue(QuizCuePointType::QUIZ_QUESTION);
         $questions = CuePointPeer::retrieveByEntryId($this->entryId, array($questionType));
-
-        //arange the array so that the questions will be the key for the array
-        $questArray = array();
-        foreach ($questions as $question)
-        {
-            $questArray[$question->getName()] = $question;
-        }
-        //sort the array alphabetically according to its key; i.e. the question
-        ksort($questArray, SORT_LOCALE_STRING );
-
         $questNum = 0;
-        foreach ($questArray as $question)
+        foreach ($questions as $question)
         {
             $questNum +=1;
             $this->pdf->addList($questNum, $question->getName(), $this->listWithAddLineBeforeStyle);

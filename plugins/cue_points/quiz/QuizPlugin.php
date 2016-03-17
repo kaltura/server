@@ -32,8 +32,7 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 	 */
 	public static function isAllowedPartner($partnerId)
 	{
-		$partner = PartnerPeer::retrieveByPK($partnerId);
-		return $partner->getPluginEnabled(self::PLUGIN_NAME);
+		return true;
 	}
 
 	/* (non-PHPdoc)
@@ -861,6 +860,10 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 	        'plugins_data' => QuizPlugin::PLUGIN_NAME . ' ' . $data . $answerCuePoint->getPartnerId() . QuizPlugin::SEARCH_TEXT_SUFFIX
 	    );
 	}
+    public static function shouldCloneByProperty(entry $entry)
+    {
+        return false;
+    }
 
 }
 

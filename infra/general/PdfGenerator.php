@@ -21,6 +21,7 @@ class PdfGenerator extends FPDF
     private $minSkipSize = 10;
     private $pageHieght = 260;
     private $docHeightThreshold = 200;
+    private $outputFileName="outQuizToBrowse";
 
     /**
      * @param
@@ -70,6 +71,11 @@ class PdfGenerator extends FPDF
         {
             $this->SetSubject($this->subj);
         }
+    }
+
+    public function setOutFileName($name)
+    {
+        $this->outputFileName=$name;
     }
 
     public function Header()
@@ -223,7 +229,7 @@ class PdfGenerator extends FPDF
         {
             $this->addSignature();
         }
-        return ($this->Output('outQuizToBrowser.pdf','D'));
+        return ($this->Output($this->outputFileName.'.pdf','D'));
     }
 
 }

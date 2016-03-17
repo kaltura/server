@@ -1269,6 +1269,7 @@ package="lib.model">
     <column primaryKey="false" required="false"
     autoIncrement="false" lazyLoad="false" name="err_number"
     type="integer" />
+    <index>
       <index-column name="status" />
       <index-column name="job_type" />
     </index>
@@ -1282,7 +1283,6 @@ package="lib.model">
     <index name="work_group_id_index_priority">
       <index-column name="work_group_id" />
       <index-column name="priority" />
-    </index>
     </index>
     <index name="bulk_job_id_index">
       <index-column name="bulk_job_id" />
@@ -3804,6 +3804,30 @@ package="lib.model">
     </index>
     <index name="creatd_at">
       <index-column name="created_at" />
+    </index>
+  </table>
+  <table skipSql="false" abstract="false" name="entry_server_node">
+    <column primaryKey="true" required="true"
+            autoIncrement="true" lazyLoad="false" name="id" type="integer"/>
+    <column primaryKey="false" required="false"
+            autoIncrement="false" lazyLoad="false" name="entry_id" type="varchar" size="20"/>
+    <column primaryKey="false" required="false"
+            autoIncrement="false" lazyLoad="false" name="server_node_id" type="integer"/>
+    <column primaryKey="false" required="false"
+            autoIncrement="false" lazyLoad="false" name="partner_id" type="integer"/>
+    <column primaryKey="false" required="false"
+            autoIncrement="false" lazyLoad="false" name="created_at" type="timestamp"/>
+    <column primaryKey="false" required="false"
+            autoIncrement="false" lazyLoad="false" name="updated_at" type="timestamp"/>
+    <column primaryKey="false" required="false"
+            autoIncrement="false" lazyLoad="false" name="status" type="integer"/>
+    <column primaryKey="false" required="false"
+            autoIncrement="false" lazyLoad="false" name="server_type" type="integer"/>
+    <column primaryKey="false" required="false"
+            autoIncrement="false" lazyLoad="false" name="custom_data" type="longvarchar"/>
+    <index name="entry_server_type">
+      <index-column name="entry_id"/>
+      <index-column name="server_type"/>
     </index>
   </table>
 </database>

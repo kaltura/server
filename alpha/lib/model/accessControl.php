@@ -25,6 +25,7 @@ class accessControl extends BaseaccessControl implements IBaseObject
 	
 	const IP_ADDRESS_RESTRICTION_COLUMN_NAME = 'ip_address_restriction';
 	const USER_AGENT_RESTRICTION_COLUMN_NAME = 'user_agent_restriction';
+	const CUSTOM_DATA_RULES_ARRAY_COMPRESSED = 'rules_array_compressed';
 
 	/* (non-PHPdoc)
 	 * @see BaseaccessControl::preSave()
@@ -189,7 +190,34 @@ class accessControl extends BaseaccessControl implements IBaseObject
 	 */
 	public function setRulesArray(array $rules)
 	{
-		$this->setRules(serialize($rules));
+		$serializedRulesArray = serialize($rules);
+		
+		if(strlen($serializedRulesArray) > myCustomData::MAX_TEXT_FIELD_SIZE)
+		{
+			$this->setRulesArrayCompressed(true);
+			$serializedRulesArray = gzcompress($serializedRulesArray);
+		}
+		else 
+		{
+			$this->setRulesArrayCompressed(false);
+		}
+		
+		if(strlen($serializedRulesArray) > myCustomData::MAX_TEXT_FIELD_SIZE)
+		{
+			throw new kCoreException('Exceeded max size allowed for access control', kCoreException::EXCEEDED_MAX_CUSTOM_DATA_SIZE);
+		}
+		
+		$this->setRules($serializedRulesArray);
+	}
+	
+	public function setRulesArrayCompressed($v)
+	{
+		$this->putInCustomData(self::CUSTOM_DATA_RULES_ARRAY_COMPRESSED, $v);
+	}
+	
+	public function getRulesArrayCompressed()
+	{
+		return $this->getFromCustomData(self::CUSTOM_DATA_RULES_ARRAY_COMPRESSED, null, false);
 	}
 	
 	/**
@@ -203,6 +231,9 @@ class accessControl extends BaseaccessControl implements IBaseObject
 		{
 			try
 			{
+				if($this->getRulesArrayCompressed())
+					$rulesString = gzuncompress($rulesString);
+				
 				$rules = unserialize($rulesString);
 			}
 			catch(Exception $e)

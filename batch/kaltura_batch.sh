@@ -25,7 +25,7 @@
 BATCHDIR=$APP_DIR/batch
 BATCHEXE=KGenericBatchMgr.class.php
 CONFIG_FILE=$APP_DIR/configurations/batch
-LOCKFILE="$LOG_DIR/batch/batch.pid"
+LOCKFILE="$BASE_DIR/var/run/batch.pid"
 GREEN='\e[1;32m'
 RED='\e[1;31m'
 NORMAL='\e[0m'
@@ -46,7 +46,12 @@ echo_status() {
 
 get_pids() {
     KP=`ps axf | awk '!/\\_ / {b=0} /php [K]GenericBatchMgr.class.php/ {b=1} b{print $1}'|xargs`
-    KP_PARENT=`cat $LOCKFILE 2>/dev/null`
+    if [ -s "$LOCKFILE" ]; then
+        KP_PARENT=`cat $LOCKFILE 2>/dev/null`
+    else
+        KP_PARENT=`pgrep -P 1 -f [K]GenericBatchMgr.class.php|xargs 2>/dev/null`
+        echo_status "No pid file found at $LOCKFILE getting pid by pgrep [$KP_PARENT]" 0
+    fi
 }
 
 start() {
@@ -82,6 +87,8 @@ start_scheduler() {
     echo -n "Starting Batch Manager."
     cd $BATCHDIR
     echo -n "."
+    mkdir -p $BASE_DIR/var/run
+    chown $OS_KALTURA_USER:$OS_KALTURA_USER $BASE_DIR/var/run
     su $OS_KALTURA_USER -c "nohup $PHP_BIN $BATCHEXE $PHP_BIN $CONFIG_FILE >> $LOG_DIR/kaltura_batch.log 2>&1 &"
     echo -n "."
     if [ "$?" -eq 0 ]; then
@@ -121,7 +128,9 @@ stop() {
             echo_status "Killing Batch Manager with PID $KP_PARENT and related workers" 0
             kill -s $SIGNAL $KP > /dev/null
         fi
-        rm $LOCKFILE
+        if [ -e "$LOCKFILE" ]; then
+            rm -f $LOCKFILE
+        fi
         RC=$?
     else
         echo_status "Service Batch Manager not running" 1

@@ -167,7 +167,7 @@ class HuluDistributionEngine extends DistributionEngine implements
 		$res = $this->executeCmd($cmd);
 		if (!$res){
 			$last_error = error_get_last();
-			throw new kFileTransferMgrException("Can't put file [$remoteFilePath] - " . $last_error['message'], kFileTransferMgrException::otherError);
+			throw new KalturaDistributionException("Can't put file [$remoteFilePath] - " . $last_error['message'], kFileTransferMgrException::otherError);
 		}
 	}
 	

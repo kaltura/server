@@ -8,7 +8,7 @@ class QuizUserEntry extends UserEntry{
 
 	const QUIZ_OM_CLASS = 'QuizUserEntry';
 	/**
-	 * @var int
+	 * @var float
 	 */
 	protected $score;
 

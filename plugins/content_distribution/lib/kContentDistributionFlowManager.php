@@ -908,7 +908,15 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		$entryDistribution->setErrorType(null);
 		$entryDistribution->setErrorNumber(null);
 		$entryDistribution->setErrorDescription(null);
-		$entryDistribution->setStatus(EntryDistributionStatus::REMOVED);
+		if ($data->getKeepDistributionItem())
+		{
+			$entryDistribution->setRemoteId(null);
+			$entryDistribution->setStatus(EntryDistributionStatus::QUEUED);
+		}
+		else 
+		{
+			$entryDistribution->setStatus(EntryDistributionStatus::REMOVED);
+		}
 		$entryDistribution->setDirtyStatus(null);
 		$entryDistribution->save();
 		
@@ -1512,7 +1520,8 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 								KalturaLog::log("Entry distribution [" . $entryDistribution->getId() . "] has a validation error that should trigger its deletion");
 								if ($distributionProfile->getDeleteEnabled() == DistributionProfileActionStatus::AUTOMATIC)
 								{
-									self::submitDeleteEntryDistribution($entryDistribution, $distributionProfile);
+									KalturaLog::info("Entry distribution item should not be deleted, but moved back to QUEUED status");
+									self::submitDeleteEntryDistribution($entryDistribution, $distributionProfile, true);
 									continue;
 								}
 								else

@@ -575,7 +575,7 @@ class PhpZendClientGenerator extends ClientGeneratorFromXml
 		if(!$enableInMultiRequest)
 		{
 			$this->appendLine("		if (\$this->client->isMultiRequest())");
-			$this->appendLine("			throw new Kaltura_Client_ClientException(\"Action is not supported as part of multi-request.\", Kaltura_Client_ClientException::ERROR_ACTION_IN_MULTIREQUEST);");
+			$this->appendLine("			throw \$this->client->getKalturaClientException(\"Action is not supported as part of multi-request.\", Kaltura_Client_ClientException::ERROR_ACTION_IN_MULTIREQUEST);");
 			$this->appendLine("		");
 		}
 		
@@ -668,7 +668,7 @@ class PhpZendClientGenerator extends ClientGeneratorFromXml
 			
 			$this->appendLine("		\$resultXml = \$this->client->doQueue();");
 			$this->appendLine("		\$resultXmlObject = new \\SimpleXMLElement(\$resultXml);");
-			$this->appendLine("		Kaltura_Client_ParseUtils::checkIfError(\$resultXmlObject->result);");
+			$this->appendLine("		\$this->client->checkIfError(\$resultXmlObject->result);");
 			
 			switch($resultType)
 			{

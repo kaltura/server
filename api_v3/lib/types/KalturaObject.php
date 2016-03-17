@@ -372,22 +372,29 @@ abstract class KalturaObject implements IApiObject
 		if (!class_exists($fromObjectClass))
 		{
 			$cacheFileName = kConf::get("cache_root_path") . "/api_v3/fromObject/{$fromObjectClass}.php";
-			if (!file_exists($cacheFileName))
+			$max_include_retries=10;
+			$fromObjectClassCode=null;
+			while((!@include_once($cacheFileName)) and $max_include_retries--)
 			{
+				if(!$fromObjectClassCode)
+				{
+					$fromObjectClassCode = $this->generateFromObjectClass($srcObj, $fromObjectClass);
+					if (!$fromObjectClassCode)
+						return;
+				}
+
 				$cacheDir = dirname($cacheFileName);
 				if (!is_dir($cacheDir))
 				{
 					mkdir($cacheDir);
-					chmod($cacheDir, 0755);
+					chmod($cacheDir, 0775);
 				}
-	
-				$fromObjectClassCode = $this->generateFromObjectClass($srcObj, $fromObjectClass);
-				if (!$fromObjectClassCode)
-					return;
-				kFile::safeFilePutContents($cacheFileName, $fromObjectClassCode);
+				kFile::safeFilePutContents($cacheFileName, $fromObjectClassCode,0644);
 			}
-	
-			require_once($cacheFileName);
+			if (!class_exists($fromObjectClass))
+			{
+				throw new Exception("Could not include cached code file - {$cacheFileName}");
+			}
 		}
 	
 		$fromObjectClass::fromObject($this, $srcObj, $responseProfile);

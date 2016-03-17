@@ -7,6 +7,20 @@
 class kRule 
 {
 	/**
+	 * Short Rule Description
+	 *
+	 * @var string
+	 */
+	public $description;
+	
+	/**
+	 * Rule Custom Data to allow saving rule specific information
+	 *
+	 * @var string
+	 */
+	public $ruleData;
+	
+	/**
 	 * Conditions to validate the rule
 	 * No conditions means always apply
 	 * 
@@ -170,6 +184,22 @@ class kRule
 	}
 	
 	/**
+	 * @return string Description
+	 */
+	public function getDescription()
+	{
+		return $this->description;
+	}
+	
+	/**
+	 * @return string ruleData
+	 */
+	public function getRuleData()
+	{
+		return $this->ruleData;
+	}
+	
+	/**
 	 * @return string message
 	 */
 	public function getMessage() 
@@ -199,6 +229,22 @@ class kRule
 	public function getStopProcessing() 
 	{
 		return $this->stopProcessing;
+	}
+	
+	/**
+	 * @return string Description
+	 */
+	public function setDescription($description)
+	{
+		$this->description = $description;
+	}
+	
+	/**
+	 * @return string ruleData
+	 */
+	public function setRuleData($ruleData)
+	{
+		$this->ruleData = $ruleData;
 	}
 
 	/**

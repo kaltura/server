@@ -151,11 +151,15 @@ class flavorParams extends assetParams
 		 * When set, IMX sources (mxf/mpeg2/720x608) the top 32 lines will be cropped
 		 */
 	public function setIsCropIMX($v){ $this->putInCustomData('IsCropIMX', $v);}
-	public function getIsCropIMX(){return $this->getFromCustomData('IsCropIMX', null, 0);}
+	public function getIsCropIMX(){return $this->getFromCustomData('IsCropIMX', null, 1);}
 	
 	public function setMaxFrameRate($v){ $this->putInCustomData('MaxFrameRate', $v);}
 	public function getMaxFrameRate(){return $this->getFromCustomData('MaxFrameRate', null, 0);}
 	
 	public function setWatermarkData($v){ $this->putInCustomData('WatermarkData', $v);}
 	public function getWatermarkData(){return $this->getFromCustomData('WatermarkData', null, null);}
+
+	public function setIsEncrypted($v){ $this->putInCustomData('IsEncrypted', $v);}
+	public function getIsEncrypted(){return $this->getFromCustomData('IsEncrypted', null, 0);}
+
 }

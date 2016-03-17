@@ -46,4 +46,6 @@ class MetadataErrors extends KalturaErrors
 	const METADATA_PROFILE_FILE_NOT_FOUND = "METADATA_PROFILE_FILE_NOT_FOUND;FILE_NAME;Metadata profile file not found [@FILE_NAME@]";
 
 	const METADATA_PROFILE_REFERENCE_EXISTS = "METADATA_PROFILE_REFERENCE_EXISTS;ID,FIELD;Metadata profile reference exists in profile [@ID@] on field [@FIELD@]";
+
+	const METADATA_NO_PERMISSION_ON_ENTRY = "METADATA_NO_PERMISSION_ON_ENTRY;ID;No permissions to add metadata for entry [@ID@]";
 }

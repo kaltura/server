@@ -63,7 +63,6 @@ class accessControlTableMap extends TableMap {
 	 */
 	public function buildRelations()
 	{
-    $this->addRelation('entry', 'entry', RelationMap::ONE_TO_MANY, array('id' => 'access_control_id', ), null, null);
 	} // buildRelations()
 
 } // accessControlTableMap

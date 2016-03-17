@@ -216,6 +216,9 @@ class kmc4Action extends kalturaAction
 				'map_zoom_levels' => kConf::hasParam ("map_zoom_levels") ? kConf::get ("map_zoom_levels") : '',
 			    'map_urls' => kConf::hasParam ("cdn_static_hosts") ? array_map(function($s) {return "$s/content/static/maps/v1";}, kConf::get ("cdn_static_hosts")) : '',
             ),
+			'usagedashboard'			=> array(
+				'version'				=> kConf::get("usagedashboard_version"),
+			),
 			'disable_analytics'			=> (bool) kConf::get("kmc_disable_analytics"),
 			'google_analytics_account'	=> kConf::get("ga_account"),
 			'language'					=> $language,

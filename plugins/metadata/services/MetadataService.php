@@ -78,6 +78,18 @@ class MetadataService extends KalturaBaseService
 		}
 		
 		$objectType = kPluginableEnumsManager::apiToCore('MetadataObjectType', $objectType);
+
+		$limitEntry = $this->getKs()->getLimitEntry();
+		if ($limitEntry) {
+			$peer = kMetadataManager::getObjectPeer($objectType);
+			if ($peer) {
+				$entry = $peer->getEntry($objectId);
+				if (!$entry || $entry->getId() != $limitEntry) {
+					throw new KalturaAPIException(MetadataErrors::METADATA_NO_PERMISSION_ON_ENTRY, $objectId);
+				}
+			}
+		}
+
 		$check = MetadataPeer::retrieveByObject($metadataProfileId, $objectType, $objectId);
 		if($check)
 			throw new KalturaAPIException(MetadataErrors::METADATA_ALREADY_EXISTS, $check->getId());

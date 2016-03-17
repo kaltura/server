@@ -44,8 +44,8 @@ class assetTableMap extends TableMap {
 		$this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
 		$this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
 		$this->addColumn('DELETED_AT', 'DeletedAt', 'TIMESTAMP', false, null, null);
-		$this->addForeignKey('ENTRY_ID', 'EntryId', 'VARCHAR', 'entry', 'ID', true, 20, null);
-		$this->addForeignKey('FLAVOR_PARAMS_ID', 'FlavorParamsId', 'INTEGER', 'flavor_params', 'ID', true, null, null);
+		$this->addColumn('ENTRY_ID', 'EntryId', 'VARCHAR', true, 20, null);
+		$this->addColumn('FLAVOR_PARAMS_ID', 'FlavorParamsId', 'INTEGER', true, null, null);
 		$this->addColumn('STATUS', 'Status', 'TINYINT', false, null, null);
 		$this->addColumn('VERSION', 'Version', 'VARCHAR', false, 20, null);
 		$this->addColumn('DESCRIPTION', 'Description', 'VARCHAR', false, 255, null);
@@ -68,8 +68,6 @@ class assetTableMap extends TableMap {
 	 */
 	public function buildRelations()
 	{
-    $this->addRelation('entry', 'entry', RelationMap::MANY_TO_ONE, array('entry_id' => 'id', ), null, null);
-    $this->addRelation('assetParams', 'assetParams', RelationMap::MANY_TO_ONE, array('flavor_params_id' => 'id', ), null, null);
     $this->addRelation('mediaInfo', 'mediaInfo', RelationMap::ONE_TO_MANY, array('id' => 'flavor_asset_id', ), null, null);
     $this->addRelation('assetParamsOutput', 'assetParamsOutput', RelationMap::ONE_TO_MANY, array('id' => 'flavor_asset_id', ), null, null);
 	} // buildRelations()

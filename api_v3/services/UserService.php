@@ -8,7 +8,7 @@
  * @subpackage services
  */
 class UserService extends KalturaBaseUserService 
-{   
+{
 
 	/**
 	 * Adds a new user to an existing account in the Kaltura database.
@@ -28,22 +28,31 @@ class UserService extends KalturaBaseUserService
 	 * @throws KalturaErrors::USER_ROLE_NOT_FOUND
 	 */
 	function addAction(KalturaUser $user)
-	{				
-		if(!preg_match(kuser::PUSER_ID_REGEXP, $user->id)) {
+	{
+		if (!preg_match(kuser::PUSER_ID_REGEXP, $user->id))
+		{
 			throw new KalturaAPIException(KalturaErrors::INVALID_FIELD_VALUE, 'id');
-		} 
-		
-		if ($user instanceof KalturaAdminUser) {
+		}
+
+		if ($user instanceof KalturaAdminUser)
+		{
 			$user->isAdmin = true;
 		}
 		$user->partnerId = $this->getPartnerId();
-				
+
+
+		$lockKey = "user_add_" . $this->getPartnerId() . $user->id;
+		return kLock::runLocked($lockKey, array($this, 'adduserImpl'), array($user));
+	}
+	
+	function addUserImpl($user)
+	{
 		$dbUser = null;
 		$dbUser = $user->toObject($dbUser);
-		
 		try {
 			$dbUser = kuserPeer::addUser($dbUser, $user->password);
 		}
+		
 		catch (kUserException $e) {
 			$code = $e->getCode();
 			if ($code == kUserException::USER_ALREADY_EXISTS) {
@@ -86,8 +95,8 @@ class UserService extends KalturaBaseUserService
 				throw new KalturaAPIException(KalturaErrors::USER_ROLE_NOT_FOUND);
 			}
 			throw $e;
-		}	
-			
+		}
+
 		$newUser = new KalturaUser();
 		$newUser->fromObject($dbUser, $this->getResponseProfile());
 		

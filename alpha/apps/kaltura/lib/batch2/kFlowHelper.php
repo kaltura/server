@@ -125,9 +125,17 @@ class kFlowHelper
 		// IMAGE media entries
 		if ($dbEntry->getType() == entryType::MEDIA_CLIP && $dbEntry->getMediaType() == entry::ENTRY_MEDIA_TYPE_IMAGE)
 		{
+			$url = $data->getSrcFileUrl();
+			$ext = pathinfo($url, PATHINFO_EXTENSION);
+			$allowedImageTypes = kConf::get("image_file_ext");
 			//setting the entry's data so it can be used for creating file-syncs' file-path version & extension - in kFileSyncUtils::moveFromFile
 			//without saving - the updated entry object exists in the instance pool
 			$dbEntry->setData(".jpg");
+			if (in_array($ext, $allowedImageTypes))
+				$dbEntry->setData("." . $ext);
+			else				
+				$dbEntry->setData(".jpg");
+			
 			
 			$syncKey = $dbEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA);
 
@@ -274,32 +282,38 @@ class kFlowHelper
 		}
 		
 		$keyType = liveAsset::FILE_SYNC_ASSET_SUB_TYPE_LIVE_PRIMARY;
-		if($data->getMediaServerIndex() == MediaServerIndex::SECONDARY)
+		if($data->getMediaServerIndex() == EntryServerType::LIVE_BACKUP)
 			$keyType = liveAsset::FILE_SYNC_ASSET_SUB_TYPE_LIVE_SECONDARY;
 			
 		$key = $asset->getSyncKey($keyType);
 		$baseName = $asset->getEntryId() . '_' . $asset->getId() . '.ts';
 		kFileSyncUtils::moveFromFileToDirectory($key, $data->getDestFilePath(), $baseName);
 		
-		if($data->getMediaServerIndex() == MediaServerIndex::SECONDARY)
+		if($data->getMediaServerIndex() == EntryServerType::LIVE_BACKUP)
 			return $dbBatchJob;
 			
 		$files = kFileSyncUtils::dir_get_files($key, false);
 
-		// If we have less files on disk than what we should have it means the output file will be missing segments.
-		// don't generate it, and the next concat will do the work for us.
-		if (count($files) != $data->getFileIndex()+1){
-			KalturaLog::warning('number of segments on disk ' . count($files) . ' is not equal to segment index ' . $data->getFileIndex() . ' - not running the concat job');
+		if (self::hasFileDiscontinuity($files)) {
+			KalturaLog::warning('we have a discontinuity with ts files - not running the concat job for entry [ ' . $dbBatchJob->getEntryId() . ']' );
 			return $dbBatchJob;
 		}
 
 		if(count($files) > 1)
 		{
-			// find replacing entry id
-			$replacingEntry = self::getReplacingEntry($recordedEntry, $asset);
-			if(is_null($replacingEntry))
-				KalturaLog::err("Failed to get replacing entry");
-		
+			$retryCounter=5;
+			while(!$replacingEntry = self::getReplacingEntry($recordedEntry, $asset))
+			{
+				sleep(5);
+				if(!$retryCounter--)
+				{
+					kJobsManager::updateBatchJob($dbBatchJob, BatchJob::BATCHJOB_STATUS_FAILED);
+					KalturaLog::err('Failed to allocate replacing entry');
+					return $dbBatchJob;
+				}
+				KalturaLog::log("Failed to get replacing entry {$recordedEntry->getId()} asset {$asset->getId()} retrying .. {$retryCounter}");
+			}
+
 			$flavorParams = assetParamsPeer::retrieveByPKNoFilter($asset->getFlavorParamsId());
 			if(is_null($flavorParams)) { 
 				KalturaLog::err('Failed to retrieve asset params');
@@ -324,6 +338,35 @@ class kFlowHelper
 		}
 
 		return $dbBatchJob;
+	}
+
+	// get the indexes of all files on disk (form file names)
+	// if we have all from 0 to count($files) - return true
+	// otherwise return false;
+	private static function hasFileDiscontinuity($files)
+	{
+		$filesArr = array();
+
+		foreach($files as $file){
+			$filesArr[intval(self::getFileNumber($file))] = true;
+		}
+
+		for ($i = 0 ; $i < count($files); $i++) {
+			if (!isset($filesArr[$i])) {
+				KalturaLog::info("got ts file discontinuity for " . $i);
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	private static function getFileNumber($file)
+	{
+		$lastSlash = strrpos($file, '/');
+		$firstDotAfterSlash = strpos($file, '.', $lastSlash);
+		$fileIndex = substr($file, $lastSlash+1, $firstDotAfterSlash - $lastSlash-1);
+		return $fileIndex;
 	}
 
 	private static function createReplacigEntry($recordedEntry)
@@ -364,10 +407,8 @@ class kFlowHelper
 						$replacingAsset = assetPeer::retrieveByEntryIdAndParams($replacingEntryId, $asset->getFlavorParamsId());
 						if($replacingAsset)
 						{
-								
-								KalturaLog::debug("Entry in replacement, deleting - [".$replacingEntryId."]");
-								myEntryUtils::deleteReplacingEntry($recordedEntry,$replacingEntry);
-								$replacingEntry = null;
+								KalturaLog::debug("Entry in replacement with this asset type {$asset->getFlavorParamsId()}");
+								return null;
 						}
 				}
 		}

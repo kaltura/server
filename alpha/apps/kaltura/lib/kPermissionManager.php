@@ -523,7 +523,7 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 		}
 
 		$ks = ks::fromSecureString($ksString);
-		$ksSetRoleId = $ks->getSetRole();
+		$ksSetRoleId = $ks->getRole();
 
 		if ($ksSetRoleId)
 		{
@@ -825,7 +825,7 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 		if (isset(self::$map[self::API_PARAMETERS_ARRAY_NAME][$array_name][$objectName][kApiParameterPermissionItem::ALL_VALUES_IDENTIFIER])) {
 			return true;
 		}
-		return isset(self::$map[self::API_PARAMETERS_ARRAY_NAME][$array_name][$objectName][$paramName]);
+		return isset(self::$map[self::API_PARAMETERS_ARRAY_NAME][$array_name][$objectName][$paramName]) || isset(self::$map[self::API_PARAMETERS_ARRAY_NAME]['all'][$objectName][$paramName]);
 		
 	}
 	

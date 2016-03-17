@@ -29,7 +29,7 @@ SCRIPTDIR=$APP_DIR/plugins/sphinx_search/scripts
 SCRIPTEXE=populateFromLog.php
 
 if [ $# -ne 1 ]; then
-	echo "Usage: $0 [start|stop|restart|status]"
+	echo "Usage: $0 [start|stop|restart|status|forcestart]"
 	exit 1 	
 fi
 
@@ -59,7 +59,7 @@ echo_failure() {
 
 
 start() {
-	if [ -f $BASE_DIR/maintenance ]; then
+	if [ -f $BASE_DIR/maintenance ] && [ "X$FORCESTART" == "X" ]; then
 		echo "Server is on maintenance mode - populateMgr will not start!"
 		exit 1
 	fi
@@ -149,8 +149,13 @@ case "$1" in
 		stop
 		start
 		;;
+	forcestart)
+		FORCESTART=1
+		echo "Running in force start mode!!!"
+		start
+		;;
 	*)
-		echo "Usage: [start|stop|restart|status]"
+		echo "Usage: [start|stop|restart|status|forcestart]"
 		exit 0
 		;;
 esac

@@ -280,6 +280,8 @@ class KDLWrap
 		if($target->_clipDur)
 			$flavor->setClipDuration($target->_clipDur);
 /**/
+		$flavor->_isEncrypted = $target->_isEncrypted;
+
 		if(isset($target->_multiStream))
 		{
 			$toJson = json_encode($target->_multiStream);
@@ -407,6 +409,9 @@ class KDLWrap
 				$kdlFlavor->_multiStream = isset($fromJson)? $fromJson: null;
 			}
 			$kdlFlavor->_optimizationPolicy = $cdlFlavor->getOptimizationPolicy();
+			if($cdlFlavor->getIsEncrypted()){
+				$kdlFlavor->_isEncrypted = true;
+			}
 		}
 		else if($cdlFlavor instanceof flavorParamsOutput){
 			$kdlFlavor->_clipStart = $cdlFlavor->getClipOffset();

@@ -47,6 +47,27 @@ class KalturaCaptionAssetItemFilter extends KalturaCaptionAssetFilter
 	{
 		// do nothing, just overwrite parent validations
 	}
+
+	/* (non-PHPdoc)
+	 * @see KalturaAssetFilter::getTypeListResponse()
+	 */
+	public function getTypeListResponse(KalturaFilterPager $pager, KalturaDetachedResponseProfile $responseProfile = null, array $types = null)
+	{
+		$captionAssetItemFilter = new CaptionAssetItemFilter();
+		$this->toObject($captionAssetItemFilter);
+
+		$c = KalturaCriteria::create(CaptionAssetItemPeer::OM_CLASS);
+		if($pager)
+			$pager->attachToCriteria($c);
+
+		$captionAssetItemFilter->attachToCriteria($c);
+		$list = CaptionAssetItemPeer::doSelect($c);
+
+		$response = new KalturaCaptionAssetItemListResponse();
+		$response->objects = KalturaCaptionAssetItemArray::fromDbArray($list, $responseProfile);
+		$response->totalCount = $c->getRecordsCount();
+		return $response;
+	}
 	
 	/**
 	 * @var string

@@ -242,5 +242,8 @@ return array (
     'AppTokenTableMap' => 'lib/model/map/AppTokenTableMap.php',
     'AppTokenPeer' => 'lib/model/AppTokenPeer.php',
     'AppToken' => 'lib/model/AppToken.php',
+    'EntryServerNodeTableMap' => 'lib/model/map/EntryServerNodeTableMap.php',
+    'EntryServerNodePeer' => 'lib/model/EntryServerNodePeer.php',
+    'EntryServerNode' => 'lib/model/EntryServerNode.php',
   ),
 );

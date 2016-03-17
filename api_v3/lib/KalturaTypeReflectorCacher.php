@@ -33,7 +33,7 @@ class KalturaTypeReflectorCacher
 			if (!is_dir($cachedDir))
 			{
 				mkdir($cachedDir);
-				chmod($cachedDir, 0755);
+				chmod($cachedDir, 0775);
 			}
 			
 			$cachedFilePath = $cachedDir.DIRECTORY_SEPARATOR.$type.".cache";
@@ -49,7 +49,7 @@ class KalturaTypeReflectorCacher
 			{
 				$typeReflector = new KalturaTypeReflector($type);
 				$cachedData = serialize($typeReflector);
-				$bytesWritten = kFile::safeFilePutContents($cachedFilePath, $cachedData);
+				$bytesWritten = kFile::safeFilePutContents($cachedFilePath, $cachedData,0644);
 				if(!$bytesWritten)
 				{
 					$folderPermission = substr(decoct(fileperms(dirname($cachedFilePath))), 2);

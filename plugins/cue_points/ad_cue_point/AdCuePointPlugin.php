@@ -34,10 +34,13 @@ class AdCuePointPlugin extends KalturaPlugin implements IKalturaCuePoint, IKaltu
 	public static function getEnums($baseEnumName = null)
 	{
 		if(is_null($baseEnumName))
-			return array('AdCuePointType');
+			return array('AdCuePointType', 'BaseEntryAdCuePointCloneOptions');
 	
 		if($baseEnumName == 'CuePointType')
 			return array('AdCuePointType');
+
+		if($baseEnumName == 'BaseEntryCloneOptions')
+			return array('BaseEntryAdCuePointCloneOptions');
 			
 		return array();
 	}
@@ -167,6 +170,15 @@ class AdCuePointPlugin extends KalturaPlugin implements IKalturaCuePoint, IKaltu
 		$value = self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
 		return kPluginableEnumsManager::apiToCore('CuePointType', $value);
 	}
+
+	/**
+	 * @return int id of dynamic enum in the DB.
+	 */
+	public static function getBaseEntryCloneOptionsCoreValue($valueName)
+	{
+		$value = self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
+		return kPluginableEnumsManager::apiToCore('BaseEntryCloneOptions', $value);
+	}
 	
 	/* (non-PHPdoc)
 	 * @see IKalturaCuePoint::getApiValue()
@@ -254,5 +266,10 @@ class AdCuePointPlugin extends KalturaPlugin implements IKalturaCuePoint, IKaltu
 	public static function getTypesToIndexOnEntry()
 	{
 		return array();
+	}
+
+	public static function shouldCloneByProperty(entry $entry)
+	{
+		return $entry->shouldCloneByProperty(self::getBaseEntryCloneOptionsCoreValue( BaseEntryAdCuePointCloneOptions::AD_CUE_POINTS), false);
 	}
 }

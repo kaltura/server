@@ -65,7 +65,7 @@ class WidgetService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::CANNOT_DISABLE_ENTITLEMENT_WITH_NO_ENTRY_ID);
 		}
 		
-		$dbWidget = $widget->toWidget();
+		$dbWidget = $widget->toInsertableWidget();
 		$dbWidget->setPartnerId($this->getPartnerId());
 		$dbWidget->setSubpId($this->getPartnerId() * 100);
 		$widgetId = $dbWidget->calculateId($dbWidget);
@@ -113,7 +113,7 @@ class WidgetService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::CANNOT_DISABLE_ENTITLEMENT_WITH_NO_ENTRY_ID);
 		}
 			
-		$widgetUpdate = $widget->toWidget();
+		$widgetUpdate = $widget->toUpdatableWidget();
 		
 		if ($entry && $entry->getType() == entryType::PLAYLIST)
 		{

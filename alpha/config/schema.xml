@@ -222,17 +222,8 @@
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="flavor_params_ids" type="varchar" size="512" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="available_from" type="timestamp" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="last_played_at" type="timestamp" />
-		<foreign-key onDelete="none" onUpdate="none" foreignTable="kshow">
-			<reference local="kshow_id" foreign="id" />
-		</foreign-key>
 		<foreign-key onDelete="none" onUpdate="none" foreignTable="kuser">
 			<reference local="kuser_id" foreign="id" />
-		</foreign-key>
-		<foreign-key onDelete="none" onUpdate="none" foreignTable="access_control">
-			<reference local="access_control_id" foreign="id" />
-		</foreign-key>
-		<foreign-key onDelete="none" onUpdate="none" foreignTable="conversion_profile_2">
-			<reference local="conversion_profile_id" foreign="id" />
 		</foreign-key>
 		<index name="kshow_rank_index">
 			<index-column name="kshow_id" />
@@ -1447,12 +1438,6 @@
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="video_codec_id" type="varchar" size="127" />
 		<column primaryKey="false" lazyLoad="false" name="type" type="integer" required="true" inheritance="single" default="0" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="custom_data" type="longvarchar" />
-		<foreign-key onDelete="none" onUpdate="none" onLoad="validate" foreignTable="entry">
-			<reference local="entry_id" foreign="id" />
-		</foreign-key>
-		<foreign-key onDelete="none" onUpdate="none" foreignTable="flavor_params">
-			<reference local="flavor_params_id" foreign="id" />
-		</foreign-key>
 	</table>
 	<table skipSql="false" abstract="false" name="conversion_profile_2" phpName="conversionProfile2">
 		<column lazyLoad="false" name="id" type="integer" required="true" primaryKey="true" autoIncrement="true" />
@@ -2145,4 +2130,19 @@
 		<column name="token" type="longvarchar"/>
 		<column name="custom_data" type="longvarchar"/>
 	</table>
+    <table skipSql="false" abstract="false" name="entry_server_node">
+        <column primaryKey="true" required="true" autoIncrement="true" lazyLoad="false" name="id" type="bigint" size="20"/>
+        <column name="entry_id" type="varchar" size="20" required="true" />
+        <column name="server_node_id" type="integer" />
+        <column name="partner_id" type="integer" />
+        <column name="created_at" type="timestamp" />
+        <column name="updated_at" type="timestamp" />
+        <column name="status" type="integer" />
+        <column name="server_type" type="integer" required="true" />
+        <column name="custom_data" type="longvarchar" />
+        <index name="entry_server_type">
+            <index-column name="entry_id" />
+            <index-column name="server_type" />
+        </index>
+    </table>
 </database>

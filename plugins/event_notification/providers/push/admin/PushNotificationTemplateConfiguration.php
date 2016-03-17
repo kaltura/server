@@ -83,5 +83,14 @@ class Form_PushNotificationTemplateConfiguration extends Form_EventNotificationT
                 Kaltura_Client_Enum_ResponseType::RESPONSE_TYPE_PHP => 'PHP',
             ),
         ));
+
+        $responseProfile = new Kaltura_Form_Element_ObjectSelect('response_profile_id', array(
+        	'label' => 'Response Profile:',
+        	'nameAttribute' => 'name',
+        	'service' => 'responseProfile',
+        	'pageSize' => 500,
+        	'impersonate' => $eventNotificationTemplate->partnerId,
+        ));
+        $this->addElements(array($responseProfile));
     }    
 }

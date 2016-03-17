@@ -3,9 +3,13 @@
  * Enable transcript assets management for entry objects
  * @package plugins.transcript
  */
-class TranscriptPlugin extends KalturaPlugin implements IKalturaEnumerator, IKalturaObjectLoader, IKalturaPending, IKalturaTypeExtender
+class TranscriptPlugin extends KalturaPlugin implements IKalturaEnumerator, IKalturaObjectLoader, IKalturaPending, IKalturaTypeExtender, IKalturaSearchDataContributor
 {
 	const PLUGIN_NAME = 'transcript';
+	const ENTRY_TRANSCRIPT_PREFIX = 'tr_pref';
+	const ENTRY_TRANSCRIPT_SUFFIX = 'tr_suf';
+	const SEARCH_TEXT_SUFFIX = 'trend';
+	const PLUGINS_DATA = 'plugins_data';
 	
 	/* (non-PHPdoc)
 	 * @see IKalturaPlugin::getPluginName()
@@ -90,6 +94,47 @@ class TranscriptPlugin extends KalturaPlugin implements IKalturaEnumerator, IKal
 	public static function getApiValue($valueName)
 	{
 		return self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
+	}
+
+	/* (non-PHPdoc)
+ * @see IKalturaSearchDataContributor::getSearchData()
+ */
+	public static function getSearchData(BaseObject $object)
+	{
+		if($object instanceof entry)
+			return self::getTranscriptSearchData($object);
+
+		return null;
+	}
+
+	public static function getTranscriptSearchData(entry $entry)
+	{
+		$transcriptAssets = assetPeer::retrieveByEntryId($entry->getId(), array(TranscriptPlugin::getAssetTypeCoreValue(TranscriptAssetType::TRANSCRIPT)));
+		if(!$transcriptAssets || !count($transcriptAssets))
+			return null;
+
+		$data = array();
+		foreach($transcriptAssets as $transcriptAsset)
+		{
+			/* @var $transcriptAsset TranscriptAsset */
+
+			$syncKey = $transcriptAsset->getSyncKey(asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+			$content = kFileSyncUtils::file_get_contents($syncKey, true, false);
+			if(!$content)
+				continue;
+
+			$content = trim(preg_replace('/\s+/', ' ', $content));
+			if(!$content)
+				continue;
+
+			$data[] = $transcriptAsset->getId() . ' ' . self::ENTRY_TRANSCRIPT_PREFIX  . ' ' . $content . ' ' . self::ENTRY_TRANSCRIPT_SUFFIX;
+		}
+
+		$searchValues = array(
+			self::PLUGINS_DATA => self::PLUGIN_NAME . ' ' . implode(' ', $data) . ' ' . self::SEARCH_TEXT_SUFFIX
+		);
+
+		return $searchValues;
 	}
 	
 }

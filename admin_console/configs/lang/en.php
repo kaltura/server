@@ -1220,6 +1220,7 @@ return array(
 	'Kaltura_Client_Drm_Enum_DrmProviderType::WIDEVINE' => 'Widevine',
 	'Kaltura_Client_Drm_Enum_DrmProviderType::PLAY_READY' => 'Play Ready',
 	'Kaltura_Client_Drm_Enum_DrmProviderType::CENC' => 'CENC',
+	'Kaltura_Client_Drm_Enum_DrmProviderType::FAIRPLAY' => 'Fairplay',
 		
 	// Delivery profiles
 	'delivery-profiles-configuration intro text' => "Here you can configure your delivery profiles",

@@ -865,6 +865,11 @@ class myEntryUtils
 		$sub_type = $entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_IMAGE ? entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA : entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB;
 		$entry_image_key = $entry->getSyncKey($sub_type, $version);
 		$entry_image_path = kFileSyncUtils::getReadyLocalFilePathForKey($entry_image_key);
+		if (!$entry_image_path && $version == 100000)
+		{
+			$entry_image_key = $entry->getSyncKey($sub_type);
+			$entry_image_path = kFileSyncUtils::getReadyLocalFilePathForKey($entry_image_key);
+		}
 		
 		return $entry_image_path;
 	} 
@@ -1101,7 +1106,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 	/**
 	 * @param entry $entry
 	 * @param Partner|null $toPartner
-	 * @param KalturaBaseEntryCloneOptionsArray $cloneOptionsArray - an array of enumerator of a subset of entry properties.
+	 * @param array kBaseEntryCloneOptionItem $cloneOptions Array - an array of enumerator of a subset of entry properties.
 	 * 													For each subset the user sets
 	 * 													whether the subset is included or excluded from the copy.
 	 * 													The default action for each subset is 'include'.
@@ -1119,7 +1124,6 @@ PuserKuserPeer::getCriteriaFilter()->disable();
  		KalturaLog::log("copyEntry - Copying entry [".$entry->getId()."] to partner [".$toPartner->getId().
 			" ] with clone options [ ".print_r($cloneOptions, true)." ]");
 
-		$entry->setClonedOption($cloneOptions);
 		$copyUsers = true;
 		$copyCategories = true;
 
@@ -1141,6 +1145,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		}
 
  		$newEntry = $entry->copy();
+	    $newEntry->setCloneOptions($cloneOptions);
  		$newEntry->setIntId(null);
 		$newEntry->setCategories(null);
 		$newEntry->setCategoriesIds(null);
