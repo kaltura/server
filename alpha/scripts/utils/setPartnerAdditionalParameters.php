@@ -7,8 +7,8 @@ if (count($argv) !== 3)
 {
         die('wrong usage, please provide  <partnerId> <mailingList>');
 }
-$partnerId = @$argv[1];
-$mailingList = @$argv[2];
+$partnerId = $argv[1];
+$mailingList = $argv[2];
 
 $partner = PartnerPeer::retrieveByPK($partnerId);
 if(!$partner)
@@ -19,15 +19,3 @@ $additionalParams = $partner->getAdditionalParams();
 $additionalParams['mailingList'] = $mailingList;
 $partner->setAdditionalParams($additionalParams);
 $partner->save();
-
-// validating that the mailing list was updated
-$partner = PartnerPeer::retrieveByPK($partnerId);
-$additionalParams = $partner->getAdditionalParams();
-if (array_key_exists('mailingList', $additionalParams))
-{
-	echo $additionalParams['mailingList'];
-} else {
-	echo "Failed";
-} 
-
-
