@@ -5,9 +5,7 @@ require_once(dirname(__FILE__) . '/../bootstrap.php');
 
 if (count($argv) !== 3)
 {
-        die('please provide a partner id and a mailing list ' . PHP_EOL .
-                'to run script: ' . basename(__FILE__) . ' X' . PHP_EOL .
-                'whereas X is partner id' . PHP_EOL);
+        die('wrong usage, please provide  <partnerId> <mailingList>');
 }
 $partnerId = @$argv[1];
 $mailingList = @$argv[2];
