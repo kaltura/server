@@ -231,8 +231,7 @@ class SphinxEntryCriteria extends SphinxCriteria
 		{
 			$refId = $filter->get('_eq_reference_id');
 			if( $refId!=null && $refId!='' ) {
-				$md5RedId = md5($refId);
-				$this->addMatch("@reference_id $md5RedId");
+				$this->addMatch("@reference_id " . $this->buildReferenceIdMatchString($refId));
 				$filter->unsetByName('_eq_reference_id');
 			}
 		}
@@ -242,7 +241,7 @@ class SphinxEntryCriteria extends SphinxCriteria
 			$refIds = explode(",",$filter->get('_in_reference_id'));
 			$condition = "";
 			for ($i=0; $i< count($refIds); $i++ ) {
-				$condition .= "(" . md5($refIds[$i]) . ")";
+				$condition .= "(" . $this->buildReferenceIdMatchString($refIds[$i]) . ")";
 				if ( $i < count($refIds) - 1 )
 					$condition .= " | ";
 			}
@@ -295,6 +294,12 @@ class SphinxEntryCriteria extends SphinxCriteria
 		$filter->unsetByName('_free_text');
 		
 		return parent::applyFilterFields($filter);
+	}
+
+	private function buildReferenceIdMatchString( $refId )
+	{
+		$notEmpty = kSphinxSearchManager::HAS_VALUE . kCurrentContext::getCurrentPartnerId();
+		return "\\\" " . md5( $refId ) . " $notEmpty$\\\"";
 	}
 	
 	/**
