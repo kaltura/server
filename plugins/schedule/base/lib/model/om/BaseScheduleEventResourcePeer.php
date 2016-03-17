@@ -26,7 +26,7 @@ abstract class BaseScheduleEventResourcePeer {
 	const TM_CLASS = 'ScheduleEventResourceTableMap';
 	
 	/** The total number of columns. */
-	const NUM_COLUMNS = 8;
+	const NUM_COLUMNS = 7;
 
 	/** The number of lazy-loaded columns. */
 	const NUM_LAZY_LOAD_COLUMNS = 0;
@@ -42,9 +42,6 @@ abstract class BaseScheduleEventResourcePeer {
 
 	/** the column name for the PARTNER_ID field */
 	const PARTNER_ID = 'schedule_event_resource.PARTNER_ID';
-
-	/** the column name for the ENTRY_ID field */
-	const ENTRY_ID = 'schedule_event_resource.ENTRY_ID';
 
 	/** the column name for the CREATED_AT field */
 	const CREATED_AT = 'schedule_event_resource.CREATED_AT';
@@ -71,11 +68,11 @@ abstract class BaseScheduleEventResourcePeer {
 	 * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
 	 */
 	private static $fieldNames = array (
-		BasePeer::TYPE_PHPNAME => array ('Id', 'EventId', 'ResourceId', 'PartnerId', 'EntryId', 'CreatedAt', 'UpdatedAt', 'CustomData', ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'eventId', 'resourceId', 'partnerId', 'entryId', 'createdAt', 'updatedAt', 'customData', ),
-		BasePeer::TYPE_COLNAME => array (self::ID, self::EVENT_ID, self::RESOURCE_ID, self::PARTNER_ID, self::ENTRY_ID, self::CREATED_AT, self::UPDATED_AT, self::CUSTOM_DATA, ),
-		BasePeer::TYPE_FIELDNAME => array ('id', 'event_id', 'resource_id', 'partner_id', 'entry_id', 'created_at', 'updated_at', 'custom_data', ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, )
+		BasePeer::TYPE_PHPNAME => array ('Id', 'EventId', 'ResourceId', 'PartnerId', 'CreatedAt', 'UpdatedAt', 'CustomData', ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'eventId', 'resourceId', 'partnerId', 'createdAt', 'updatedAt', 'customData', ),
+		BasePeer::TYPE_COLNAME => array (self::ID, self::EVENT_ID, self::RESOURCE_ID, self::PARTNER_ID, self::CREATED_AT, self::UPDATED_AT, self::CUSTOM_DATA, ),
+		BasePeer::TYPE_FIELDNAME => array ('id', 'event_id', 'resource_id', 'partner_id', 'created_at', 'updated_at', 'custom_data', ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, )
 	);
 
 	/**
@@ -85,11 +82,11 @@ abstract class BaseScheduleEventResourcePeer {
 	 * e.g. self::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
 	 */
 	private static $fieldKeys = array (
-		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'EventId' => 1, 'ResourceId' => 2, 'PartnerId' => 3, 'EntryId' => 4, 'CreatedAt' => 5, 'UpdatedAt' => 6, 'CustomData' => 7, ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'eventId' => 1, 'resourceId' => 2, 'partnerId' => 3, 'entryId' => 4, 'createdAt' => 5, 'updatedAt' => 6, 'customData' => 7, ),
-		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::EVENT_ID => 1, self::RESOURCE_ID => 2, self::PARTNER_ID => 3, self::ENTRY_ID => 4, self::CREATED_AT => 5, self::UPDATED_AT => 6, self::CUSTOM_DATA => 7, ),
-		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'event_id' => 1, 'resource_id' => 2, 'partner_id' => 3, 'entry_id' => 4, 'created_at' => 5, 'updated_at' => 6, 'custom_data' => 7, ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, )
+		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'EventId' => 1, 'ResourceId' => 2, 'PartnerId' => 3, 'CreatedAt' => 4, 'UpdatedAt' => 5, 'CustomData' => 6, ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'eventId' => 1, 'resourceId' => 2, 'partnerId' => 3, 'createdAt' => 4, 'updatedAt' => 5, 'customData' => 6, ),
+		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::EVENT_ID => 1, self::RESOURCE_ID => 2, self::PARTNER_ID => 3, self::CREATED_AT => 4, self::UPDATED_AT => 5, self::CUSTOM_DATA => 6, ),
+		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'event_id' => 1, 'resource_id' => 2, 'partner_id' => 3, 'created_at' => 4, 'updated_at' => 5, 'custom_data' => 6, ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, )
 	);
 
 	/**
@@ -163,7 +160,6 @@ abstract class BaseScheduleEventResourcePeer {
 		$criteria->addSelectColumn(ScheduleEventResourcePeer::EVENT_ID);
 		$criteria->addSelectColumn(ScheduleEventResourcePeer::RESOURCE_ID);
 		$criteria->addSelectColumn(ScheduleEventResourcePeer::PARTNER_ID);
-		$criteria->addSelectColumn(ScheduleEventResourcePeer::ENTRY_ID);
 		$criteria->addSelectColumn(ScheduleEventResourcePeer::CREATED_AT);
 		$criteria->addSelectColumn(ScheduleEventResourcePeer::UPDATED_AT);
 		$criteria->addSelectColumn(ScheduleEventResourcePeer::CUSTOM_DATA);

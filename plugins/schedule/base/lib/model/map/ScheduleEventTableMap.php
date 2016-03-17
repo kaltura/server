@@ -57,7 +57,6 @@ class ScheduleEventTableMap extends TableMap {
 		$this->addColumn('SEQUENCE', 'Sequence', 'INTEGER', true, null, null);
 		$this->addColumn('RECURANCE_TYPE', 'RecuranceType', 'INTEGER', true, null, null);
 		$this->addColumn('DURATION', 'Duration', 'INTEGER', true, null, null);
-		$this->addColumn('CATEGORIES_IDS', 'CategoriesIds', 'VARCHAR', true, 1024, null);
 		$this->addColumn('CONTACT', 'Contact', 'VARCHAR', true, 1024, null);
 		$this->addColumn('COMMENT', 'Comment', 'LONGVARCHAR', true, null, null);
 		$this->addColumn('TAGS', 'Tags', 'LONGVARCHAR', false, null, null);

@@ -55,6 +55,22 @@ class ScheduleEventPeer extends BaseScheduleEventPeer implements IRelatedObjectP
 		return parent::OM_CLASS;
 	}
 	
+	/* (non-PHPdoc)
+	 * @see BaseScheduleEventPeer::doSelect()
+	 */
+	public static function doSelect(Criteria $criteria, PropelPDO $con = null)
+	{
+		$c = clone $criteria;
+		
+		if($c instanceof KalturaCriteria)
+		{
+			$c->applyFilters();
+			$criteria->setRecordsCount($c->getRecordsCount());
+		}
+			
+		return parent::doSelect($c, $con);
+	}
+	
 	/**
 	 * Deletes entirely from the DB all occurences of event from now on
 	 * @param int $parentId

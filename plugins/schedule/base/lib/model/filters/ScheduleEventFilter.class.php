@@ -5,6 +5,8 @@
  */
 class ScheduleEventFilter extends baseObjectFilter
 {
+	const FREE_TEXT_FIELDS = 'summary,description,tags,reference_id,location,contact,comment';
+	
 	public function init ()
 	{
 		$this->fields = kArray::makeAssociativeDefaultValue ( array (

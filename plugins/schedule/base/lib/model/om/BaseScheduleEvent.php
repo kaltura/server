@@ -140,12 +140,6 @@ abstract class BaseScheduleEvent extends BaseObject  implements Persistent {
 	protected $duration;
 
 	/**
-	 * The value for the categories_ids field.
-	 * @var        string
-	 */
-	protected $categories_ids;
-
-	/**
 	 * The value for the contact field.
 	 * @var        string
 	 */
@@ -514,16 +508,6 @@ abstract class BaseScheduleEvent extends BaseObject  implements Persistent {
 	public function getDuration()
 	{
 		return $this->duration;
-	}
-
-	/**
-	 * Get the [categories_ids] column value.
-	 * 
-	 * @return     string
-	 */
-	public function getCategoriesIds()
-	{
-		return $this->categories_ids;
 	}
 
 	/**
@@ -1194,29 +1178,6 @@ abstract class BaseScheduleEvent extends BaseObject  implements Persistent {
 	} // setDuration()
 
 	/**
-	 * Set the value of [categories_ids] column.
-	 * 
-	 * @param      string $v new value
-	 * @return     ScheduleEvent The current object (for fluent API support)
-	 */
-	public function setCategoriesIds($v)
-	{
-		if(!isset($this->oldColumnsValues[ScheduleEventPeer::CATEGORIES_IDS]))
-			$this->oldColumnsValues[ScheduleEventPeer::CATEGORIES_IDS] = $this->categories_ids;
-
-		if ($v !== null) {
-			$v = (string) $v;
-		}
-
-		if ($this->categories_ids !== $v) {
-			$this->categories_ids = $v;
-			$this->modifiedColumns[] = ScheduleEventPeer::CATEGORIES_IDS;
-		}
-
-		return $this;
-	} // setCategoriesIds()
-
-	/**
 	 * Set the value of [contact] column.
 	 * 
 	 * @param      string $v new value
@@ -1458,13 +1419,12 @@ abstract class BaseScheduleEvent extends BaseObject  implements Persistent {
 			$this->sequence = ($row[$startcol + 17] !== null) ? (int) $row[$startcol + 17] : null;
 			$this->recurance_type = ($row[$startcol + 18] !== null) ? (int) $row[$startcol + 18] : null;
 			$this->duration = ($row[$startcol + 19] !== null) ? (int) $row[$startcol + 19] : null;
-			$this->categories_ids = ($row[$startcol + 20] !== null) ? (string) $row[$startcol + 20] : null;
-			$this->contact = ($row[$startcol + 21] !== null) ? (string) $row[$startcol + 21] : null;
-			$this->comment = ($row[$startcol + 22] !== null) ? (string) $row[$startcol + 22] : null;
-			$this->tags = ($row[$startcol + 23] !== null) ? (string) $row[$startcol + 23] : null;
-			$this->created_at = ($row[$startcol + 24] !== null) ? (string) $row[$startcol + 24] : null;
-			$this->updated_at = ($row[$startcol + 25] !== null) ? (string) $row[$startcol + 25] : null;
-			$this->custom_data = ($row[$startcol + 26] !== null) ? (string) $row[$startcol + 26] : null;
+			$this->contact = ($row[$startcol + 20] !== null) ? (string) $row[$startcol + 20] : null;
+			$this->comment = ($row[$startcol + 21] !== null) ? (string) $row[$startcol + 21] : null;
+			$this->tags = ($row[$startcol + 22] !== null) ? (string) $row[$startcol + 22] : null;
+			$this->created_at = ($row[$startcol + 23] !== null) ? (string) $row[$startcol + 23] : null;
+			$this->updated_at = ($row[$startcol + 24] !== null) ? (string) $row[$startcol + 24] : null;
+			$this->custom_data = ($row[$startcol + 25] !== null) ? (string) $row[$startcol + 25] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -1474,7 +1434,7 @@ abstract class BaseScheduleEvent extends BaseObject  implements Persistent {
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 27; // 27 = ScheduleEventPeer::NUM_COLUMNS - ScheduleEventPeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 26; // 26 = ScheduleEventPeer::NUM_COLUMNS - ScheduleEventPeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating ScheduleEvent object", $e);
@@ -1629,8 +1589,8 @@ abstract class BaseScheduleEvent extends BaseObject  implements Persistent {
                 $stmt = BasePeer::doSelect($criteria, $con);
                 $cutsomDataArr = $stmt->fetchAll(PDO::FETCH_COLUMN);
                 $newCustomData = $cutsomDataArr[0];
-                
-                $this->custom_data_md5 = md5($newCustomData);
+
+                $this->custom_data_md5 = is_null($newCustomData) ? null : md5($newCustomData);
 
                 $valuesToChangeTo = $this->m_custom_data->toArray();
 				$this->m_custom_data = myCustomData::fromString($newCustomData); 
@@ -1641,6 +1601,20 @@ abstract class BaseScheduleEvent extends BaseObject  implements Persistent {
 			 	foreach ($this->oldCustomDataValues as $namespace => $namespaceValues){
                 	foreach($namespaceValues as $name => $oldValue)
 					{
+						$atomicField = false;
+						if($namespace) {
+							$atomicField = array_key_exists($namespace, $atomicCustomDataFields) && in_array($name, $atomicCustomDataFields[$namespace]);
+						} else {
+							$atomicField = in_array($name, $atomicCustomDataFields);
+						}
+						if($atomicField) {
+							$dbValue = $this->m_custom_data->get($name, $namespace);
+							if($oldValue != $dbValue) {
+								$validUpdate = false;
+								break;
+							}
+						}
+						
 						$newValue = null;
 						if ($namespace)
 						{
@@ -1651,25 +1625,15 @@ abstract class BaseScheduleEvent extends BaseObject  implements Persistent {
 						{ 
 							$newValue = $valuesToChangeTo[$name];
 						}
-					 
-						if (!is_null($newValue)) {
-							$atomicField = false;
-							if($namespace) {
-								$atomicField = array_key_exists($namespace, $atomicCustomDataFields) && in_array($name, $atomicCustomDataFields[$namespace]);
-							} else {
-								$atomicField = in_array($name, $atomicCustomDataFields);
-							}
-							if($atomicField) {
-								$dbValue = $this->m_custom_data->get($name, $namespace);
-								if($oldValue != $dbValue) {
-									$validUpdate = false;
-									break;
-								}
-							}
+		
+						if (is_null($newValue)) {
+							$this->removeFromCustomData($name, $namespace);
+						}
+						else {
 							$this->putInCustomData($name, $newValue, $namespace);
 						}
 					}
-                   }
+				}
                    
 				if(!$validUpdate) 
 					break;
@@ -2051,24 +2015,21 @@ abstract class BaseScheduleEvent extends BaseObject  implements Persistent {
 				return $this->getDuration();
 				break;
 			case 20:
-				return $this->getCategoriesIds();
-				break;
-			case 21:
 				return $this->getContact();
 				break;
-			case 22:
+			case 21:
 				return $this->getComment();
 				break;
-			case 23:
+			case 22:
 				return $this->getTags();
 				break;
-			case 24:
+			case 23:
 				return $this->getCreatedAt();
 				break;
-			case 25:
+			case 24:
 				return $this->getUpdatedAt();
 				break;
-			case 26:
+			case 25:
 				return $this->getCustomData();
 				break;
 			default:
@@ -2112,13 +2073,12 @@ abstract class BaseScheduleEvent extends BaseObject  implements Persistent {
 			$keys[17] => $this->getSequence(),
 			$keys[18] => $this->getRecuranceType(),
 			$keys[19] => $this->getDuration(),
-			$keys[20] => $this->getCategoriesIds(),
-			$keys[21] => $this->getContact(),
-			$keys[22] => $this->getComment(),
-			$keys[23] => $this->getTags(),
-			$keys[24] => $this->getCreatedAt(),
-			$keys[25] => $this->getUpdatedAt(),
-			$keys[26] => $this->getCustomData(),
+			$keys[20] => $this->getContact(),
+			$keys[21] => $this->getComment(),
+			$keys[22] => $this->getTags(),
+			$keys[23] => $this->getCreatedAt(),
+			$keys[24] => $this->getUpdatedAt(),
+			$keys[25] => $this->getCustomData(),
 		);
 		return $result;
 	}
@@ -2211,24 +2171,21 @@ abstract class BaseScheduleEvent extends BaseObject  implements Persistent {
 				$this->setDuration($value);
 				break;
 			case 20:
-				$this->setCategoriesIds($value);
-				break;
-			case 21:
 				$this->setContact($value);
 				break;
-			case 22:
+			case 21:
 				$this->setComment($value);
 				break;
-			case 23:
+			case 22:
 				$this->setTags($value);
 				break;
-			case 24:
+			case 23:
 				$this->setCreatedAt($value);
 				break;
-			case 25:
+			case 24:
 				$this->setUpdatedAt($value);
 				break;
-			case 26:
+			case 25:
 				$this->setCustomData($value);
 				break;
 		} // switch()
@@ -2275,13 +2232,12 @@ abstract class BaseScheduleEvent extends BaseObject  implements Persistent {
 		if (array_key_exists($keys[17], $arr)) $this->setSequence($arr[$keys[17]]);
 		if (array_key_exists($keys[18], $arr)) $this->setRecuranceType($arr[$keys[18]]);
 		if (array_key_exists($keys[19], $arr)) $this->setDuration($arr[$keys[19]]);
-		if (array_key_exists($keys[20], $arr)) $this->setCategoriesIds($arr[$keys[20]]);
-		if (array_key_exists($keys[21], $arr)) $this->setContact($arr[$keys[21]]);
-		if (array_key_exists($keys[22], $arr)) $this->setComment($arr[$keys[22]]);
-		if (array_key_exists($keys[23], $arr)) $this->setTags($arr[$keys[23]]);
-		if (array_key_exists($keys[24], $arr)) $this->setCreatedAt($arr[$keys[24]]);
-		if (array_key_exists($keys[25], $arr)) $this->setUpdatedAt($arr[$keys[25]]);
-		if (array_key_exists($keys[26], $arr)) $this->setCustomData($arr[$keys[26]]);
+		if (array_key_exists($keys[20], $arr)) $this->setContact($arr[$keys[20]]);
+		if (array_key_exists($keys[21], $arr)) $this->setComment($arr[$keys[21]]);
+		if (array_key_exists($keys[22], $arr)) $this->setTags($arr[$keys[22]]);
+		if (array_key_exists($keys[23], $arr)) $this->setCreatedAt($arr[$keys[23]]);
+		if (array_key_exists($keys[24], $arr)) $this->setUpdatedAt($arr[$keys[24]]);
+		if (array_key_exists($keys[25], $arr)) $this->setCustomData($arr[$keys[25]]);
 	}
 
 	/**
@@ -2313,7 +2269,6 @@ abstract class BaseScheduleEvent extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(ScheduleEventPeer::SEQUENCE)) $criteria->add(ScheduleEventPeer::SEQUENCE, $this->sequence);
 		if ($this->isColumnModified(ScheduleEventPeer::RECURANCE_TYPE)) $criteria->add(ScheduleEventPeer::RECURANCE_TYPE, $this->recurance_type);
 		if ($this->isColumnModified(ScheduleEventPeer::DURATION)) $criteria->add(ScheduleEventPeer::DURATION, $this->duration);
-		if ($this->isColumnModified(ScheduleEventPeer::CATEGORIES_IDS)) $criteria->add(ScheduleEventPeer::CATEGORIES_IDS, $this->categories_ids);
 		if ($this->isColumnModified(ScheduleEventPeer::CONTACT)) $criteria->add(ScheduleEventPeer::CONTACT, $this->contact);
 		if ($this->isColumnModified(ScheduleEventPeer::COMMENT)) $criteria->add(ScheduleEventPeer::COMMENT, $this->comment);
 		if ($this->isColumnModified(ScheduleEventPeer::TAGS)) $criteria->add(ScheduleEventPeer::TAGS, $this->tags);
@@ -2435,8 +2390,6 @@ abstract class BaseScheduleEvent extends BaseObject  implements Persistent {
 		$copyObj->setRecuranceType($this->recurance_type);
 
 		$copyObj->setDuration($this->duration);
-
-		$copyObj->setCategoriesIds($this->categories_ids);
 
 		$copyObj->setContact($this->contact);
 

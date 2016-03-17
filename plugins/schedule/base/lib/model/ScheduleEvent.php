@@ -12,7 +12,7 @@
  * @package plugins.schedule
  * @subpackage model
  */
-abstract class ScheduleEvent extends BaseScheduleEvent implements IRelatedObject
+abstract class ScheduleEvent extends BaseScheduleEvent implements IRelatedObject, IIndexable
 {
 	const CUSTOM_DATA_FIELD_RECURANCE = 'recurance';
 	const CUSTOM_DATA_FIELD_ORGANIZER_PUSER_ID = 'organizerPuserId';
@@ -153,4 +153,41 @@ abstract class ScheduleEvent extends BaseScheduleEvent implements IRelatedObject
 		return $dates;
 	}
 
+
+	/**
+	 * {@inheritDoc}
+	 * @see IIndexable::getIntId()
+	 */
+	public function getIntId()
+	{
+		return $this->getId();
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 * @see IIndexable::getEntryId()
+	 */
+	public function getEntryId()
+	{
+		return null;
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 * @see IIndexable::getIndexObjectName()
+	 */
+	public function getIndexObjectName()
+	{
+		return 'ScheduleEventIndex';
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 * @see IIndexable::indexToSearchIndex()
+	 */
+	public function indexToSearchIndex()
+	{
+		kEventsManager::raiseEventDeferred(new kObjectReadyForIndexEvent($this));
+	}
+	
 } // ScheduleEvent

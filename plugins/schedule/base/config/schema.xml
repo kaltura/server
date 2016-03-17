@@ -21,7 +21,6 @@
 		<column primaryKey="false" required="true" autoIncrement="false" lazyLoad="false" name="sequence" type="integer" />
 		<column primaryKey="false" required="true" autoIncrement="false" lazyLoad="false" name="recurance_type" type="integer" />
 		<column primaryKey="false" required="true" autoIncrement="false" lazyLoad="false" name="duration" type="integer" />
-		<column primaryKey="false" required="true" autoIncrement="false" lazyLoad="false" name="categories_ids" type="varchar" size="1024" />
 		<column primaryKey="false" required="true" autoIncrement="false" lazyLoad="false" name="contact" type="varchar" size="1024" />
 		<column primaryKey="false" required="true" autoIncrement="false" lazyLoad="false" name="comment" type="longvarchar" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="tags" type="longvarchar" />
@@ -39,7 +38,6 @@
 		<column primaryKey="false" required="true" autoIncrement="false" lazyLoad="false" name="event_id" type="integer" />
 		<column primaryKey="false" required="true" autoIncrement="false" lazyLoad="false" name="resource_id" type="integer" />
 		<column primaryKey="false" required="true" autoIncrement="false" lazyLoad="false" name="partner_id" type="integer" />
-		<column primaryKey="false" required="true" autoIncrement="false" lazyLoad="false" name="entry_id" type="varchar" size="10" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="created_at" type="timestamp" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="updated_at" type="timestamp" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="custom_data" type="longvarchar" />	

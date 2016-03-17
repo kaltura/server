@@ -44,12 +44,6 @@ abstract class BaseScheduleEventResource extends BaseObject  implements Persiste
 	protected $partner_id;
 
 	/**
-	 * The value for the entry_id field.
-	 * @var        string
-	 */
-	protected $entry_id;
-
-	/**
 	 * The value for the created_at field.
 	 * @var        string
 	 */
@@ -150,16 +144,6 @@ abstract class BaseScheduleEventResource extends BaseObject  implements Persiste
 	public function getPartnerId()
 	{
 		return $this->partner_id;
-	}
-
-	/**
-	 * Get the [entry_id] column value.
-	 * 
-	 * @return     string
-	 */
-	public function getEntryId()
-	{
-		return $this->entry_id;
 	}
 
 	/**
@@ -345,29 +329,6 @@ abstract class BaseScheduleEventResource extends BaseObject  implements Persiste
 	} // setPartnerId()
 
 	/**
-	 * Set the value of [entry_id] column.
-	 * 
-	 * @param      string $v new value
-	 * @return     ScheduleEventResource The current object (for fluent API support)
-	 */
-	public function setEntryId($v)
-	{
-		if(!isset($this->oldColumnsValues[ScheduleEventResourcePeer::ENTRY_ID]))
-			$this->oldColumnsValues[ScheduleEventResourcePeer::ENTRY_ID] = $this->entry_id;
-
-		if ($v !== null) {
-			$v = (string) $v;
-		}
-
-		if ($this->entry_id !== $v) {
-			$this->entry_id = $v;
-			$this->modifiedColumns[] = ScheduleEventResourcePeer::ENTRY_ID;
-		}
-
-		return $this;
-	} // setEntryId()
-
-	/**
 	 * Sets the value of [created_at] column to a normalized version of the date/time value specified.
 	 * 
 	 * @param      mixed $v string, integer (timestamp), or DateTime value.  Empty string will
@@ -524,10 +485,9 @@ abstract class BaseScheduleEventResource extends BaseObject  implements Persiste
 			$this->event_id = ($row[$startcol + 1] !== null) ? (int) $row[$startcol + 1] : null;
 			$this->resource_id = ($row[$startcol + 2] !== null) ? (int) $row[$startcol + 2] : null;
 			$this->partner_id = ($row[$startcol + 3] !== null) ? (int) $row[$startcol + 3] : null;
-			$this->entry_id = ($row[$startcol + 4] !== null) ? (string) $row[$startcol + 4] : null;
-			$this->created_at = ($row[$startcol + 5] !== null) ? (string) $row[$startcol + 5] : null;
-			$this->updated_at = ($row[$startcol + 6] !== null) ? (string) $row[$startcol + 6] : null;
-			$this->custom_data = ($row[$startcol + 7] !== null) ? (string) $row[$startcol + 7] : null;
+			$this->created_at = ($row[$startcol + 4] !== null) ? (string) $row[$startcol + 4] : null;
+			$this->updated_at = ($row[$startcol + 5] !== null) ? (string) $row[$startcol + 5] : null;
+			$this->custom_data = ($row[$startcol + 6] !== null) ? (string) $row[$startcol + 6] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -537,7 +497,7 @@ abstract class BaseScheduleEventResource extends BaseObject  implements Persiste
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 8; // 8 = ScheduleEventResourcePeer::NUM_COLUMNS - ScheduleEventResourcePeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 7; // 7 = ScheduleEventResourcePeer::NUM_COLUMNS - ScheduleEventResourcePeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating ScheduleEventResource object", $e);
@@ -692,8 +652,8 @@ abstract class BaseScheduleEventResource extends BaseObject  implements Persiste
                 $stmt = BasePeer::doSelect($criteria, $con);
                 $cutsomDataArr = $stmt->fetchAll(PDO::FETCH_COLUMN);
                 $newCustomData = $cutsomDataArr[0];
-                
-                $this->custom_data_md5 = md5($newCustomData);
+
+                $this->custom_data_md5 = is_null($newCustomData) ? null : md5($newCustomData);
 
                 $valuesToChangeTo = $this->m_custom_data->toArray();
 				$this->m_custom_data = myCustomData::fromString($newCustomData); 
@@ -704,6 +664,20 @@ abstract class BaseScheduleEventResource extends BaseObject  implements Persiste
 			 	foreach ($this->oldCustomDataValues as $namespace => $namespaceValues){
                 	foreach($namespaceValues as $name => $oldValue)
 					{
+						$atomicField = false;
+						if($namespace) {
+							$atomicField = array_key_exists($namespace, $atomicCustomDataFields) && in_array($name, $atomicCustomDataFields[$namespace]);
+						} else {
+							$atomicField = in_array($name, $atomicCustomDataFields);
+						}
+						if($atomicField) {
+							$dbValue = $this->m_custom_data->get($name, $namespace);
+							if($oldValue != $dbValue) {
+								$validUpdate = false;
+								break;
+							}
+						}
+						
 						$newValue = null;
 						if ($namespace)
 						{
@@ -714,25 +688,15 @@ abstract class BaseScheduleEventResource extends BaseObject  implements Persiste
 						{ 
 							$newValue = $valuesToChangeTo[$name];
 						}
-					 
-						if (!is_null($newValue)) {
-							$atomicField = false;
-							if($namespace) {
-								$atomicField = array_key_exists($namespace, $atomicCustomDataFields) && in_array($name, $atomicCustomDataFields[$namespace]);
-							} else {
-								$atomicField = in_array($name, $atomicCustomDataFields);
-							}
-							if($atomicField) {
-								$dbValue = $this->m_custom_data->get($name, $namespace);
-								if($oldValue != $dbValue) {
-									$validUpdate = false;
-									break;
-								}
-							}
+		
+						if (is_null($newValue)) {
+							$this->removeFromCustomData($name, $namespace);
+						}
+						else {
 							$this->putInCustomData($name, $newValue, $namespace);
 						}
 					}
-                   }
+				}
                    
 				if(!$validUpdate) 
 					break;
@@ -1066,15 +1030,12 @@ abstract class BaseScheduleEventResource extends BaseObject  implements Persiste
 				return $this->getPartnerId();
 				break;
 			case 4:
-				return $this->getEntryId();
-				break;
-			case 5:
 				return $this->getCreatedAt();
 				break;
-			case 6:
+			case 5:
 				return $this->getUpdatedAt();
 				break;
-			case 7:
+			case 6:
 				return $this->getCustomData();
 				break;
 			default:
@@ -1102,10 +1063,9 @@ abstract class BaseScheduleEventResource extends BaseObject  implements Persiste
 			$keys[1] => $this->getEventId(),
 			$keys[2] => $this->getResourceId(),
 			$keys[3] => $this->getPartnerId(),
-			$keys[4] => $this->getEntryId(),
-			$keys[5] => $this->getCreatedAt(),
-			$keys[6] => $this->getUpdatedAt(),
-			$keys[7] => $this->getCustomData(),
+			$keys[4] => $this->getCreatedAt(),
+			$keys[5] => $this->getUpdatedAt(),
+			$keys[6] => $this->getCustomData(),
 		);
 		return $result;
 	}
@@ -1150,15 +1110,12 @@ abstract class BaseScheduleEventResource extends BaseObject  implements Persiste
 				$this->setPartnerId($value);
 				break;
 			case 4:
-				$this->setEntryId($value);
-				break;
-			case 5:
 				$this->setCreatedAt($value);
 				break;
-			case 6:
+			case 5:
 				$this->setUpdatedAt($value);
 				break;
-			case 7:
+			case 6:
 				$this->setCustomData($value);
 				break;
 		} // switch()
@@ -1189,10 +1146,9 @@ abstract class BaseScheduleEventResource extends BaseObject  implements Persiste
 		if (array_key_exists($keys[1], $arr)) $this->setEventId($arr[$keys[1]]);
 		if (array_key_exists($keys[2], $arr)) $this->setResourceId($arr[$keys[2]]);
 		if (array_key_exists($keys[3], $arr)) $this->setPartnerId($arr[$keys[3]]);
-		if (array_key_exists($keys[4], $arr)) $this->setEntryId($arr[$keys[4]]);
-		if (array_key_exists($keys[5], $arr)) $this->setCreatedAt($arr[$keys[5]]);
-		if (array_key_exists($keys[6], $arr)) $this->setUpdatedAt($arr[$keys[6]]);
-		if (array_key_exists($keys[7], $arr)) $this->setCustomData($arr[$keys[7]]);
+		if (array_key_exists($keys[4], $arr)) $this->setCreatedAt($arr[$keys[4]]);
+		if (array_key_exists($keys[5], $arr)) $this->setUpdatedAt($arr[$keys[5]]);
+		if (array_key_exists($keys[6], $arr)) $this->setCustomData($arr[$keys[6]]);
 	}
 
 	/**
@@ -1208,7 +1164,6 @@ abstract class BaseScheduleEventResource extends BaseObject  implements Persiste
 		if ($this->isColumnModified(ScheduleEventResourcePeer::EVENT_ID)) $criteria->add(ScheduleEventResourcePeer::EVENT_ID, $this->event_id);
 		if ($this->isColumnModified(ScheduleEventResourcePeer::RESOURCE_ID)) $criteria->add(ScheduleEventResourcePeer::RESOURCE_ID, $this->resource_id);
 		if ($this->isColumnModified(ScheduleEventResourcePeer::PARTNER_ID)) $criteria->add(ScheduleEventResourcePeer::PARTNER_ID, $this->partner_id);
-		if ($this->isColumnModified(ScheduleEventResourcePeer::ENTRY_ID)) $criteria->add(ScheduleEventResourcePeer::ENTRY_ID, $this->entry_id);
 		if ($this->isColumnModified(ScheduleEventResourcePeer::CREATED_AT)) $criteria->add(ScheduleEventResourcePeer::CREATED_AT, $this->created_at);
 		if ($this->isColumnModified(ScheduleEventResourcePeer::UPDATED_AT)) $criteria->add(ScheduleEventResourcePeer::UPDATED_AT, $this->updated_at);
 		if ($this->isColumnModified(ScheduleEventResourcePeer::CUSTOM_DATA)) $criteria->add(ScheduleEventResourcePeer::CUSTOM_DATA, $this->custom_data);
@@ -1295,8 +1250,6 @@ abstract class BaseScheduleEventResource extends BaseObject  implements Persiste
 		$copyObj->setResourceId($this->resource_id);
 
 		$copyObj->setPartnerId($this->partner_id);
-
-		$copyObj->setEntryId($this->entry_id);
 
 		$copyObj->setCreatedAt($this->created_at);
 

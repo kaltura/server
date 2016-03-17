@@ -41,7 +41,6 @@ class ScheduleEventResourceTableMap extends TableMap {
 		$this->addColumn('EVENT_ID', 'EventId', 'INTEGER', true, null, null);
 		$this->addColumn('RESOURCE_ID', 'ResourceId', 'INTEGER', true, null, null);
 		$this->addColumn('PARTNER_ID', 'PartnerId', 'INTEGER', true, null, null);
-		$this->addColumn('ENTRY_ID', 'EntryId', 'VARCHAR', true, 10, null);
 		$this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
 		$this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
 		$this->addColumn('CUSTOM_DATA', 'CustomData', 'LONGVARCHAR', false, null, null);
