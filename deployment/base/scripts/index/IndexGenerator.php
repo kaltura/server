@@ -6,7 +6,11 @@ function getIndexSchemas($dirname)
 	$it = new RecursiveDirectoryIterator($dirname);
 	foreach (new RecursiveIteratorIterator($it) as $file) {
 		if(basename($file) == "IndexSchema.xml") { 
-			$indexSchemas[realpath($file)] =  realpath(dirname($file) . "/../lib/model/index/" );
+			$path = dirname($file) . "/../lib/model/index/";
+			if(!file_exists($path)) {
+				mkdir($path, null, true);
+			}
+			$indexSchemas[realpath($file)] = $path;
 		}
 	}
 	return $indexSchemas;
