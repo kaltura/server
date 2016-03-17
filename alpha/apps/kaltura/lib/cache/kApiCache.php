@@ -793,7 +793,7 @@ class kApiCache extends kApiCacheBase
 				$rolesToCacheList = kConf::get('anonymous_roles_to_cache');
 				foreach ($rolesToCacheList as $roleKey => $roleValue)
 				{
-					if (in_array($roleKey, $ksRoles))
+					if (is_array($ksRoles) && in_array($roleKey, $ksRoles))
 						return true;
 				}
 			}
