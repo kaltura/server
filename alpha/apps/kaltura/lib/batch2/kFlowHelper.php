@@ -289,7 +289,7 @@ class kFlowHelper
 		$baseName = $asset->getEntryId() . '_' . $asset->getId() . '.ts';
 		kFileSyncUtils::moveFromFileToDirectory($key, $data->getDestFilePath(), $baseName);
 		
-		if($data->getMediaServerIndex() == EntryServerType::LIVE_BACKUP)
+		if($data->getMediaServerIndex() == EntryServerNodeType::LIVE_BACKUP)
 			return $dbBatchJob;
 			
 		$files = kFileSyncUtils::dir_get_files($key, false);
