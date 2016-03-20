@@ -367,7 +367,7 @@ class SphinxCriterion extends KalturaCriterion implements IKalturaIndexQuery
 				case 'string':
 					$value = explode(",", $value);
 				case 'array':
-					if(count($value) == 1)
+					if(count($value) == 1 && isset($value[0]))
 					{
 						$value = (int)$value[0];
 						if($value < 0)
