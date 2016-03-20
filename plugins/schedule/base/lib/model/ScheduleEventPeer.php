@@ -111,9 +111,16 @@ class ScheduleEventPeer extends BaseScheduleEventPeer implements IRelatedObjectP
 	 */
 	public function getRootObjects(IRelatedObject $object)
 	{
-		/* @var $object ScheduleEvent */
+		$roots = array();
+		if($object instanceof EntryScheduleEvent)
+		{
+			$categories =  categoryPeer::retrieveByPKs(explode(',', $object->getCategoryIds()));
+			$entries =  entryPeer::retrieveByPKs(explode(',', $object->getEntryIds()));
+			
+			$roots = array_merge($categories, $entries);
+		}
 		
-		return categoryPeer::retrieveByPKs(explode(',', $object->getCategoriesIds()));
+		return $roots;
 	}
 
 	/* (non-PHPdoc)
