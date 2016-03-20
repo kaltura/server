@@ -12,9 +12,7 @@
 	        <field name="start_date" indexName="start_date" type="int" orderable="yes" />
 	        <field name="end_date" indexName="end_date" type="int" orderable="yes" />
 	        <field name="reference_id" indexName="reference_id" type="string" matchable="yes" />
-	        <field name="classification_type" indexName="classification_type" type="int" />
-	        <field name="geo_lat" indexName="geo_lat" type="float" />
-	        <field name="geo_long" indexName="geo_long" type="float" />	        
+	        <field name="classification_type" indexName="classification_type" type="int" />        
 	        <field name="location" indexName="location" type="string" matchable="yes" />
 	        <field name="organizer_kuser_id" indexName="organizer_kuser_id" type="int" orderable="yes" />
 	        <field name="priority" indexName="priority" type="int" orderable="yes" />
@@ -29,5 +27,10 @@
 	        <field name="entry_ids" indexName="entry_ids" type="string" matchable="yes" />	         
 	        <field name="category_ids" indexName="category_ids" type="string" matchable="yes" />	   
 	        <field name="plugins_data" indexName="plugins_data" type="string" searchableonly="yes" />
+	        <!--
+	        float is support in sphinx 2.2.10, we don't use that version yet. 
+	        <field name="geo_lat" indexName="geo_lat" type="float" />
+	        <field name="geo_long" indexName="geo_long" type="float" />
+	         -->	
 	</object>
 </schema>

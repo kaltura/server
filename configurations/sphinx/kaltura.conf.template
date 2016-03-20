@@ -494,36 +494,38 @@ index kaltura_metadata:kaltura_base
 index kaltura_schedule_event:kaltura_base
 {
 	path	 = @BASE_DIR@/sphinx/kaltura_schedule_event_rt
+	rt_attr_uint = int_id
+	rt_field = parent_id
+	rt_attr_bigint = partner_id
 	rt_field = summary
 	rt_field = description
-	rt_field = reference_id
-	rt_field = location
-	rt_field = contact
-	rt_field = comment
-	rt_field = tags
-	rt_field = entry_ids
-	rt_field = category_ids
-	rt_attr_uint = int_id
-	rt_attr_uint = parent_id
-	rt_attr_bigint = partner_id
 	rt_attr_uint = schedule_event_type
 	rt_attr_uint = schedule_event_status
 	rt_attr_uint = original_start_date
 	rt_attr_uint = start_date
 	rt_attr_uint = end_date
+	rt_field = reference_id
 	rt_attr_uint = classification_type
-	rt_attr_uint = kuser_id
-	sql_attr_float = geo_lat
-	sql_attr_float = geo_long
-	rt_attr_bigint = organizer_kuser_id
+	rt_field = location
+	rt_attr_uint = organizer_kuser_id
 	rt_attr_uint = priority
 	rt_attr_uint = sequence
 	rt_attr_uint = recurance_type
 	rt_attr_uint = duration
+	rt_field = contact
+	rt_field = comment
+	rt_field = tags
 	rt_attr_timestamp = created_at
 	rt_attr_timestamp = updated_at
+	rt_field = entry_ids
+	rt_field = category_ids
 	rt_field = plugins_data
+	
+#	float is support in sphinx 2.2.10, we don't use that version yet.
+#	rt_attr_float = geo_lat
+#	rt_attr_float = geo_long
 }
+
 
 searchd
 {

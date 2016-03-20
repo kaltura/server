@@ -137,15 +137,17 @@ class IndexObjectsGenerator extends IndexGeneratorBase
 			case "bint":
 				$type = "IIndexable::FIELD_TYPE_INTEGER";
 				break;
-			case "float":
-				$type = "IIndexable::FIELD_TYPE_FLOAT";
-				break;
 			case "datetime":
 				$type = "IIndexable::FIELD_TYPE_DATETIME";
 				break;
 			case "json":
 				$type = "IIndexable::FIELD_TYPE_JSON";
 				break;
+
+// 			float is support in sphinx 2.2.10, we don't use that version yet.
+// 			case "float":
+// 				$type = "IIndexable::FIELD_TYPE_FLOAT";
+// 				break;
 		}
 		
 		if(!is_null($type))
@@ -230,7 +232,15 @@ class IndexObjectsGenerator extends IndexGeneratorBase
 	}
 
 	private function getApiCompareAttributesMap($fp, IndexableObject $object, $key, IndexableField $value) {
-		if($value->apiName && in_array($value->type, array('int', 'bint', 'float', 'datetime')))
+		$numericTypes = array(
+			'int', 
+			'bint',
+			'datetime',
+				
+// 			float is support in sphinx 2.2.10, we don't use that version yet.
+// 			'float',
+		);
+		if($value->apiName && in_array($value->type, $numericTypes))
 			$this->printToFile($fp, "'" .  $value->apiName . "' => '" . $value->indexName . "',",4);
 	}
 
@@ -329,12 +339,14 @@ class IndexObjectsGenerator extends IndexGeneratorBase
 				return array("rt_attr_uint");
 			case "bint":
 				return array("rt_attr_bigint");
-			case "float":
-				return array("rt_attr_float");
 			case "datetime":
 				return array("rt_attr_timestamp");
 			case "json":
 				return array("rt_attr_json");
+
+// 			float is support in sphinx 2.2.10, we don't use that version yet.
+// 			case "float":
+// 				return array("rt_attr_float");
 		}
 		return array();
 	}
