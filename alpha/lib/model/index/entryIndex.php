@@ -62,7 +62,7 @@ class entryIndex extends BaseIndexObject
 				'description' => 'description',
 				'admin_tags' => 'adminTags',
 				'duration_type' => 'durationType',
-				'reference_id' => 'referenceId',
+				'reference_id' => 'referenceIdWithMd5',
 				'replacing_entry_id' => 'replacingEntryId',
 				'replaced_entry_id' => 'replacedEntryId',
 				'roots' => 'roots',

@@ -68,7 +68,7 @@
 	<field name="description" indexName="@name" apiName="@name" type="string" nullable="yes" matchable="yes" />
 	<field name="admin_tags" indexName="@name" apiName="@name" type="string" nullable="yes" matchable="yes" />
 	<field name="duration_type" indexName="@name" apiName="@name" type="string" matchable="yes" />
-	<field name="reference_id" indexName="@name" apiName="@name" type="string" nullable="yes" matchable="yes" />
+	<field name="reference_id" indexName="@name" apiName="@name" type="string" getter="referenceIdWithMd5" nullable="yes" matchable="yes" />
 	<field name="replacing_entry_id" indexName="@name" apiName="@name" type="string" nullable="yes" matchable="yes" />
 	<field name="replaced_entry_id" indexName="@name" apiName="@name" type="string" nullable="yes" matchable="yes" />
 	<field name="roots" indexName="@name" type="string" nullable="yes" matchable="yes" />
