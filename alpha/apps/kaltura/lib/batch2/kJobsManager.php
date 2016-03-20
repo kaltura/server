@@ -1419,16 +1419,15 @@ class kJobsManager
 	 * @param int $destCategoryId the destination category id
 	 * @param bool $moveFromChildren indicates that all entries from all child categories should be moved as well
 	 * @param bool $copyOnly indicates that the entries shouldn't be deleted from the source entry
+	 * @param $fallback
 	 * @return BatchJob
 	 */
-	public static function addMoveCategoryEntriesJob(BatchJob $parentJob = null, $partnerId, $srcCategoryId, $destCategoryId, $moveFromChildren = false, $copyOnly = false,
-			$fallback = null)
+	public static function addMoveCategoryEntriesJob(BatchJob $parentJob = null, $partnerId, $srcCategoryId, $destCategoryId, $moveFromChildren = false, $fallback = null)
 	{
 		$moveCategoryEntriesData = new kMoveCategoryEntriesJobData();
 	    $moveCategoryEntriesData->setSrcCategoryId($srcCategoryId);
 	    $moveCategoryEntriesData->setDestCategoryId($destCategoryId);
 	    $moveCategoryEntriesData->setMoveFromChildren($moveFromChildren);
-	    $moveCategoryEntriesData->setCopyOnly($copyOnly);
 	    $moveCategoryEntriesData->setDestCategoryFullIds($fallback);
 		
 		$batchJob = null;

@@ -119,28 +119,12 @@ class category extends Basecategory implements IIndexable, IRelatedObject
 		}
 		
 		
-		// save the childs for action category->delete - delete category is not done by async batch.
 
-		foreach($this->childs_for_save as $child)
-		{
-			$child->save();
-		}
 		$this->childs_for_save = array();
 		
 		if ($this->isColumnModified(categoryPeer::DELETED_AT) && $this->getDeletedAt() !== null)
 		{
-			// delete all categoryKuser objects for this category
-			if($this->getInheritanceType() == InheritanceType::MANUAL)
-			$this->addDeleteCategoryKuserJob($this->getId());
-
-			if($this->move_entries_to_parent_category)
-			{
-				$this->addMoveEntriesToCategoryJob($this->move_entries_to_parent_category);
-			}
-			elseif($this->move_entries_to_parent_category === 0)
-			{
-				$this->addDeleteCategoryEntryJob($this->getId());
-			}
+			$this->deleteChildCategories();
 		}
 		
 		$kuserChanged = false;
@@ -501,31 +485,34 @@ class category extends Basecategory implements IIndexable, IRelatedObject
 		return true;
 	}
 
+	public function setDeletedAt($v, $moveEntriesToParentCategory = false)
+	{
+		parent::setDeletedAt($v);
+		$this->setStatus(CategoryStatus::DELETED);
+		$this->move_entries_to_parent_category = $moveEntriesToParentCategory;
+	}
+
 	// instead of deleting a category and its sub-categories recursively this method
 	// will update all the deleted info in the db at once and will iterate through all of the sub-categories and invoke delete actions.
 	//1. get all category childes ids for sub-categories from db in one call
 	//2. update all retrieved category childes ids to be deleted in one call
 	//3. iterate on categories one by one and invoke the delete event
 	//4. delete sub-categories-entries and move all to parent category / also delete sub-categories kusers
-
-	public function setDeletedAt($v, $moveEntriesToParentCategory = null)
+	public function deleteChildCategories()
 	{
-		parent::setDeletedAt($v);
-		$this->setStatus(CategoryStatus::DELETED);
-
 		$fullIds = $this->getFullIds();
-		$categoriesIds = self::getCategoriesStartWithIds($fullIds);
+		$categoriesIds = self::getCategoriesStartWithIds($fullIds.'>');
 		self::updateDeletedCategoriesInDB($categoriesIds);
 		$categories = self::getCategories($categoriesIds);
 
 		foreach ($categories as $categoryToDelete) {
-				kEventsManager::raiseEvent(new kObjectDeletedEvent($categoryToDelete));
-				kEventsManager::raiseEventDeferred(new kObjectReadyForIndexEvent($categoryToDelete));
+			kEventsManager::raiseEvent(new kObjectDeletedEvent($categoryToDelete));
+			kEventsManager::raiseEventDeferred(new kObjectReadyForIndexEvent($categoryToDelete));
 		}
 
 		if ($this->getInheritanceType() == InheritanceType::MANUAL)
 			$this->addDeleteCategoryTreeKuserJob($this->getId(), false, $fullIds);
-		if (self::shouldMoveEntriesToParentCategory($moveEntriesToParentCategory))
+		if ($this->move_entries_to_parent_category)
 			$this->addMoveEntriesToCategoryJob($this->parent_id);
 		else
 			$this->addDeleteCategoryTreeEntryJob($this->getId(), $fullIds);
@@ -605,8 +592,7 @@ class category extends Basecategory implements IIndexable, IRelatedObject
 	{
 		$filter = new categoryKuserFilter();
 		$filter->setCategoryIdEqual($categoryId);
-		$filter->set('_category_direct_members', $deleteCategoryDirectMembersOnly);
-		
+
 		$c = new Criteria();
 		$c->add(categoryKuserPeer::CATEGORY_ID, $categoryId);
 		if(!categoryKuserPeer::doSelectOne($c)) {
@@ -684,7 +670,7 @@ class category extends Basecategory implements IIndexable, IRelatedObject
 	
 	protected function addMoveEntriesToCategoryJob($destCategoryId)
 	{
-		kJobsManager::addMoveCategoryEntriesJob(null, $this->getPartnerId(), $this->getId(), $destCategoryId, true, false, $this->getFullIds());
+		kJobsManager::addMoveCategoryEntriesJob(null, $this->getPartnerId(), $this->getId(), $destCategoryId, true, $this->getFullIds());
 	}
 	
 	protected function addSyncCategoryPrivacyContextJob()
@@ -1811,6 +1797,9 @@ class category extends Basecategory implements IIndexable, IRelatedObject
 	 */
 	private static function getCategoriesStartWithIds($fullIds)
 	{
+		if (!isset($fullIds) || empty($fullIds))
+			return array();
+
 		$filter = new categoryFilter();
 		$filter->setFullIdsStartsWith($fullIds);
 		$c = KalturaCriteria::create(categoryPeer::OM_CLASS);
@@ -1825,8 +1814,12 @@ class category extends Basecategory implements IIndexable, IRelatedObject
 	 */
 	private static function updateDeletedCategoriesInDB($categoriesIds)
 	{
+		if (!isset($categoriesIds) || empty($categoriesIds))
+			return;
+
 		$update = KalturaCriteria::create(categoryPeer::OM_CLASS);
 		$update->add(categoryPeer::DELETED_AT, time());
+		$update->add(categoryPeer::UPDATED_AT, time());
 		$update->add(categoryPeer::STATUS, CategoryStatus::DELETED);
 		$update->add(categoryPeer::ID, $categoriesIds, KalturaCriteria::IN);
 		categoryPeer::doUpdate($update);
@@ -1838,10 +1831,9 @@ class category extends Basecategory implements IIndexable, IRelatedObject
 	 */
 	private static function getCategories($categoriesIds)
 	{
-		$selectCriteria = KalturaCriteria::create(categoryPeer::OM_CLASS);
-		$selectCriteria->add(categoryPeer::ID, $categoriesIds, KalturaCriteria::IN);
 		categoryPeer::setUseCriteriaFilter(false);
-		$categories = categoryPeer::doSelect($selectCriteria);
+		$categories = categoryPeer::retrieveByPKs($categoriesIds);
+		categoryPeer::setUseCriteriaFilter(false);
 		return $categories;
 	}
 }

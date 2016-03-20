@@ -16,11 +16,6 @@ class KAsyncMoveCategoryEntries extends KJobHandlerWorker
 	const INVALID_ENTRY_ID = 'INVALID_ENTRY_ID';
 	const CATEGORY_NOT_FOUND = 'CATEGORY_NOT_FOUND';
 	
-	/**
-	 * list of known ancestors for deleted categories
-	 */
-	private $ancestors = array();
-	
 	/* (non-PHPdoc)
 	 * @see KBatchBase::getType()
 	 */
@@ -88,34 +83,6 @@ class KAsyncMoveCategoryEntries extends KJobHandlerWorker
 		return $job;
 	}
 	
-	/**
-	 * Gets the first existing category ancestor according to the fallback list
-	 * @param string $category
-	 * @param string $fallback
-	 */
-	public function getDeepestLiveAncestor($categoryId, $fallback)
-	{
-		$this->ancestors[$categoryId] = 0;
-		
-		if($fallback == $categoryId) {
-			return $this->ancestors[$categoryId];
-		}
-			
-		$fallbacks = explode(">", $fallback);
-		for($i = count($fallbacks) - 2; $i >= 0 ; $i -= 1) {
-			$filter = new KalturaCategoryFilter();
-			$filter->idEqual = $fallbacks[$i];
-			$result = KBatchBase::$kClient->category->listAction($filter,null);
-			if($result->totalCount) {
-				$parent = $result->objects[0];
-				$this->ancestors[$categoryId] = $parent->id;
-				break;
-			}
-		}
-			
-		return $this->ancestors[$categoryId];
-	}
-	
 	private function addCategoryEntries($categoryEntriesList, $destCategoryId, &$entryIds, &$categoryIds)
 	{
 		KBatchBase::$kClient->startMultiRequest();
@@ -146,32 +113,23 @@ class KAsyncMoveCategoryEntries extends KJobHandlerWorker
 
 		$categoryEntryPager = new KalturaFilterPager();
 		$categoryEntryPager->pageSize = 100;
+		$categoryEntryPager->pageIndex = 1;
+
 		if(KBatchBase::$taskConfig->params->pageSize)
 			$categoryEntryPager->pageSize = KBatchBase::$taskConfig->params->pageSize;
 			
 		$movedEntries = 0;
 		$categoryEntriesList = KBatchBase::$kClient->categoryEntry->listAction($categoryEntryFilter, $categoryEntryPager);
-		while(count($categoryEntriesList->objects))
-		{
+		do {
 			$entryIds = array();
 			$categoryIds = array();
-			$ancestor = $data->destCategoryId;
-			if (array_key_exists($ancestor, $this->ancestors))
-				$ancestor = $this->ancestors[$ancestor];
 
-			$addedCategoryEntriesResults = $this->addCategoryEntries($categoryEntriesList, $ancestor, $entryIds, $categoryIds);
+			$addedCategoryEntriesResults = $this->addCategoryEntries($categoryEntriesList, $data->destCategoryId, $entryIds, $categoryIds);
 
-			$categoryDeleted = false;
 			if (is_array($addedCategoryEntriesResults[0]) && isset($addedCategoryEntriesResults[0]['code']) && ($addedCategoryEntriesResults[0]['code'] == self::CATEGORY_NOT_FOUND))
-				$categoryDeleted = true;
-
-			if ($categoryDeleted) {
-				$ancestor = $this->getDeepestLiveAncestor($data->destCategoryId, $data->destCategoryFullIds, true);
-				// In case the category isn't found since it was just deleted, recall with the matching ancestor
-				if ($ancestor) {
-					$data->destCategoryId = $ancestor;
-					continue;
-				}
+			{
+				KalturaLog::err('error: ' . $addedCategoryEntriesResults[0]['code']);
+				throw new KalturaException( "Trying to move entries to a deleted category" );
 			}
 
 			KBatchBase::$kClient->startMultiRequest();
@@ -180,13 +138,11 @@ class KAsyncMoveCategoryEntries extends KJobHandlerWorker
 				if (is_array($addedCategoryEntryResult) && isset($addedCategoryEntryResult['code'])) {
 					$code = $addedCategoryEntryResult['code'];
 				}
-				if (!is_null($code) && !in_array($code, array(self::CATEGORY_ENTRY_ALREADY_EXISTS, self::INVALID_ENTRY_ID, self::CATEGORY_NOT_FOUND))) {
+				if (!is_null($code) && !in_array($code, array(self::CATEGORY_ENTRY_ALREADY_EXISTS, self::INVALID_ENTRY_ID)) {
+					KalturaLog::err('error: ' . $code);
 					continue;
 				}
 
-				if ($data->copyOnly) {
-					continue;
-				}
 				KBatchBase::$kClient->categoryEntry->delete($entryIds[$index], $categoryIds[$index]);
 			}
 
@@ -202,15 +158,9 @@ class KAsyncMoveCategoryEntries extends KJobHandlerWorker
 			}
 
 			$movedEntries += count($deletedCategoryEntriesResults);
-			if ($data->copyOnly) {
-				$categoryEntryPager->pageIndex++;
-
-				$data->lastMovedCategoryEntryPageIndex = $categoryEntryPager->pageIndex;
-				$this->updateJob($job, null, KalturaBatchJobStatus::PROCESSING, $data);
-			}
 			$categoryEntriesList = KBatchBase::$kClient->categoryEntry->listAction($categoryEntryFilter, $categoryEntryPager);
-		}
-		
+		} while(count($categoryEntriesList->objects) == $categoryEntryPager->pageSize);
+
 		KBatchBase::$kClient->category->index($data->destCategoryId);
 		
 		return $movedEntries;
