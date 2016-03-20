@@ -9,6 +9,7 @@ class LiveEntryServerNode extends EntryServerNode{
 	
 	const CUSTOM_DATA_STREAMS = "streams";
 	const CUSTOM_DATA_APPLICATION_NAME = "application_name";
+	const CUSTOM_DATA_DC = "dc";
 
 	public function setStreams(KalturaLiveStreamParamsArray $v) 
 	{ 
@@ -28,5 +29,15 @@ class LiveEntryServerNode extends EntryServerNode{
 	public function getApplicationName()
 	{
 		return $this->getFromCustomData(self::CUSTOM_DATA_APPLICATION_NAME);
+	}
+	
+	public function setDc($v)
+	{
+		$this->putInCustomData(self::CUSTOM_DATA_DC, $v);
+	}
+	
+	public function getDc()
+	{
+		return $this->getFromCustomData(self::CUSTOM_DATA_DC);
 	}
 }

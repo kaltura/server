@@ -705,6 +705,7 @@ abstract class LiveEntry extends entry
 			$dbLiveEntryServerNode->setServerNodeId($serverNodeId);
 			$dbLiveEntryServerNode->setPartnerId($this->getPartnerId());
 			$dbLiveEntryServerNode->setStatus($liveEntryStatus);
+			$dbLiveEntryServerNode->setDC(kDataCenterMgr::getCurrentDcId());
 			
 			if($applicationName)
 				$dbLiveEntryServerNode->setApplicationName($applicationName);
@@ -714,6 +715,12 @@ abstract class LiveEntry extends entry
 		{
 			$shouldSave = true;
 			$dbLiveEntryServerNode->setStatus($liveEntryStatus);	
+		}
+		
+		if (kDataCenterMgr::getCurrentDcId() !== $dbLiveEntryServerNode->getDc())
+		{
+			$shouldSave = true;
+			$dbLiveEntryServerNode->setDc(kDataCenterMgr::getCurrentDcId());
 		}
 		
 		if ($dbLiveEntryServerNode->getServerNodeId() !== $serverNodeId)
@@ -770,9 +777,9 @@ abstract class LiveEntry extends entry
 		/* @var $dbLiveEntryServerNode LiveEntryServerNode */
 		foreach($dbLiveEntryServerNodes as $dbLiveEntryServerNode)
 		{
-			if (!$this->isCacheValid($dbLiveEntryServerNode))
+			if ($dbLiveEntryServerNode->getDc() === kDataCenterMgr::getCurrentDcId() && !$this->isCacheValid($dbLiveEntryServerNode))
 			{
-				KalturaLog::info("Removing media server id".$dbLiveEntryServerNode->getServerNodeId());
+				KalturaLog::info("Removing media server id [" . $dbLiveEntryServerNode->getServerNodeId() . "]");
 				$dbLiveEntryServerNode->delete();
 			}
 		}
