@@ -68,13 +68,13 @@ class MetadataIndex extends BaseIndexObject
 			self::$typesMap = array(
 				'created_at' => IIndexable::FIELD_TYPE_DATETIME,
 				'updated_at' => IIndexable::FIELD_TYPE_DATETIME,
-				'version' => IIndexable::FIELD_TYPE_INTEGER,
-				'metadata_profile_id' => IIndexable::FIELD_TYPE_INTEGER,
-				'metadata_profile_version' => IIndexable::FIELD_TYPE_INTEGER,
+				'version' => IIndexable::FIELD_TYPE_UINT,
+				'metadata_profile_id' => IIndexable::FIELD_TYPE_UINT,
+				'metadata_profile_version' => IIndexable::FIELD_TYPE_UINT,
 				'partner_id' => IIndexable::FIELD_TYPE_INTEGER,
 				'object_id' => IIndexable::FIELD_TYPE_STRING,
-				'object_type' => IIndexable::FIELD_TYPE_INTEGER,
-				'metadata_status' => IIndexable::FIELD_TYPE_INTEGER,
+				'object_type' => IIndexable::FIELD_TYPE_UINT,
+				'metadata_status' => IIndexable::FIELD_TYPE_UINT,
 				'plugins_data' => IIndexable::FIELD_TYPE_STRING,
 				'sphinx_match_optimizations' => IIndexable::FIELD_TYPE_STRING,
 			);
