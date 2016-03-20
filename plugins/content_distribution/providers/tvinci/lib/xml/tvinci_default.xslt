@@ -36,7 +36,7 @@
     <xsl:variable name="CONST_WIDEVINE_MANIFEST_SUFFIX" select="'/format/url/tags/widevine/protocol/http/f/a.wvm'"/>
     <xsl:variable name="CONST_WIDEVINE_MBR_MANIFEST_SUFFIX" select="'/format/url/tags/widevine_mbr/protocol/http/f/a.wvm'"/>
     <!-- media element -->
-    <xsl:variable name="refernceID" select="item/referenceID"/>
+    <xsl:variable name="referenceID" select="item/referenceID"/>
     <xsl:variable name="entryID" select="item/entryId"/>
     <!-- basic element -->
     <xsl:variable name="mediaType" select="item/customData/metadata/MediaType"/>
@@ -103,9 +103,19 @@
             <xsl:element name="export">
                 <xsl:element name="media">
                     <!--media attributes -->
-                    <xsl:attribute name="co_guid">
-                        <xsl:value-of select="$refernceID"/>
-                    </xsl:attribute>
+                    <xsl:choose>
+                        <xsl:when test="not(string($referenceID))">
+                            <xsl:attribute name="co_guid">
+                                <xsl:value-of select="$entryID"/>
+                            </xsl:attribute>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="co_guid">
+                                <xsl:value-of select="$referenceID"/>
+                            </xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+
                     <xsl:attribute name="entry_id">
                         <xsl:value-of select="$entryID"/>
                     </xsl:attribute>
