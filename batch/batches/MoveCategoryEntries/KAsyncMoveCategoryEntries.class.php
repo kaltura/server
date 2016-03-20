@@ -138,7 +138,7 @@ class KAsyncMoveCategoryEntries extends KJobHandlerWorker
 				if (is_array($addedCategoryEntryResult) && isset($addedCategoryEntryResult['code'])) {
 					$code = $addedCategoryEntryResult['code'];
 				}
-				if (!is_null($code) && !in_array($code, array(self::CATEGORY_ENTRY_ALREADY_EXISTS, self::INVALID_ENTRY_ID)) {
+				if (!is_null($code) && !in_array($code, array(self::CATEGORY_ENTRY_ALREADY_EXISTS, self::INVALID_ENTRY_ID))) {
 					KalturaLog::err('error: ' . $code);
 					continue;
 				}
