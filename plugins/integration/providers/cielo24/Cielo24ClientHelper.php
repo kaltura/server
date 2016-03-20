@@ -63,7 +63,7 @@ class Cielo24ClientHelper
 			$jobId = $jobAdditionResult->JobId;
 		else
 			return false;
-
+		
 		// attaching media to the job
 		$addMediaParams = array("job_id" => $jobId, "media_url" => $flavorUrl);
 		$addMediaAPIUrl = $this->createAPIUrl("job/add_media", $addMediaParams);
