@@ -2446,5 +2446,27 @@ CREATE TABLE app_token
 	PRIMARY KEY (id)
 )Type=InnoDB;
 
+#-----------------------------------------------------------------------------
+#-- entry_server_node
+#-----------------------------------------------------------------------------
+
+DROP TABLE IF EXISTS entry_server_node;
+
+
+CREATE TABLE entry_server_node
+(
+	id BIGINT(20)  NOT NULL AUTO_INCREMENT,
+	entry_id VARCHAR(20)  NOT NULL,
+	server_node_id INTEGER,
+	partner_id INTEGER,
+	created_at DATETIME,
+	updated_at DATETIME,
+	status INTEGER,
+	server_type INTEGER  NOT NULL,
+	custom_data TEXT,
+	PRIMARY KEY (id),
+	KEY entry_server_type(entry_id, server_type)
+)Type=InnoDB;
+
 # This restores the fkey checks, after having unset them earlier
 SET FOREIGN_KEY_CHECKS = 1;

@@ -2448,3 +2448,18 @@ CREATE TABLE app_token
 	PRIMARY KEY (id),
 	KEY int_id_index (int_id)
 )ENGINE=INNODB DEFAULT CHARSET=utf8;
+
+CREATE TABLE entry_server_node
+(
+	id BIGINT(20) NOT NULL AUTO_INCREMENT,
+	entry_id VARCHAR(20),
+	server_node_id INTEGER,
+	partner_id INTEGER,
+	created_at DATETIME,
+	updated_at DATETIME,
+	status INTEGER,
+	server_type INTEGER,
+	custom_data TEXT,
+	PRIMARY KEY (id),
+	KEY (entry_id, server_type)
+)ENGINE=InnoDB;

@@ -133,7 +133,7 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 		if ($jobType == BatchJobType::CONVERT_LIVE_SEGMENT &&
 			$dbBatchJob->getStatus() == BatchJob::BATCHJOB_STATUS_FINISHED &&
 			$data->getFileIndex() == 0 &&
-			$data->getMediaServerIndex() == MediaServerIndex::PRIMARY){
+			$data->getMediaServerIndex() == EntryServerNodeType::LIVE_PRIMARY){
 			$asset = assetPeer::retrieveByIdNoFilter($data->getAssetId());
 			if ($asset->hasTag(assetParams::TAG_RECORDING_ANCHOR))
 				return true;
@@ -689,6 +689,8 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 		}
 		$update = new Criteria();
 		$update->add(CuePointPeer::STATUS, CuePointStatus::HANDLED);
+		$update->add(CuePointPeer::UPDATED_AT, time());
+
 		$con = Propel::getConnection(MetadataPeer::DATABASE_NAME);
 		BasePeer::doUpdate($select, $update, $con);
 		$cuePoints = CuePointPeer::retrieveByPKs($cuePointsIds);

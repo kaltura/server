@@ -140,7 +140,12 @@ class DocumentPlugin extends KalturaPlugin implements IKalturaPlugin, IKalturaSe
 				return null;
 			return new KOperationEnginePpt2Image($constructorArgs['params']->ppt2ImgCmd, $constructorArgs['outFilePath']);
 		}
-		
+
+		if($baseClass == 'KOperationEngine' && $enumValue == KalturaConversionEngineType::THUMB_ASSETS)
+		{
+			return new KOperationEngineThumbAssetsGenerator(null, null);
+		}
+
 		
 		// KDL ENGINES
 		
@@ -162,6 +167,11 @@ class DocumentPlugin extends KalturaPlugin implements IKalturaPlugin, IKalturaSe
 		if($baseClass == 'KDLOperatorBase' && $enumValue == self::getApiValue(DocumentConversionEngineType::PPT2IMG_ENGINE))
 		{
 			return new KDLTranscoderPpt2Img($enumValue);
+		}
+
+		if($baseClass == 'KDLOperatorBase' && $enumValue == self::getApiValue(DocumentConversionEngineType::THUMB_ASSETS_ENGINE))
+		{
+			return new KDLTranscoderThumbAssetsGenerator($enumValue);
 		}
 		
 		return null;
