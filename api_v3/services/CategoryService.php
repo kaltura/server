@@ -180,8 +180,6 @@ class CategoryService extends KalturaBaseService
 				$categoryDb->setDeletedAt(time());
 			else 
 				$categoryDb->setDeletedAt(time(), 0);
-				
-			$categoryDb->save();	
 			$this->getPartner()->removeFeaturesStatus(IndexObjectType::LOCK_CATEGORY);
 		}
 		catch(Exception $ex)

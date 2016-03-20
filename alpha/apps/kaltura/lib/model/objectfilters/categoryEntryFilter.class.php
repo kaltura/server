@@ -59,4 +59,9 @@ class categoryEntryFilter extends baseObjectFilter
 	{
 		$this->set('_eq_entry_id', $v);
 	}
+
+	public function setFullIdsStartsWith($v)
+	{
+		$this->set('_likex_category_full_ids', $v);
+	}
 }

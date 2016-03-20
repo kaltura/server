@@ -17,15 +17,6 @@ class KAsyncMoveCategoryEntries extends KJobHandlerWorker
 	const CATEGORY_NOT_FOUND = 'CATEGORY_NOT_FOUND';
 	
 	/**
-	 * Indicates that the moving of the entries could be started
-	 * Used when the batch crash during the recursion
-	 * and the move should start from the last crash point
-	 * 
-	 * @var bool
-	 */
-	private $startMove = true;
-	
-	/**
 	 * list of known ancestors for deleted categories
 	 */
 	private $ancestors = array();
@@ -66,9 +57,6 @@ class KAsyncMoveCategoryEntries extends KJobHandlerWorker
 	{
 	    KBatchBase::impersonate($job->partnerId);
 		
-		if($data->lastMovedCategoryId)
-			$this->startMove = false;
-			
 		$job = $this->moveCategory($job, $data);
 		KBatchBase::unimpersonate();
 		$job = $this->closeJob($job, null, null, null, KalturaBatchJobStatus::FINISHED);
@@ -90,46 +78,9 @@ class KAsyncMoveCategoryEntries extends KJobHandlerWorker
 	    
 		if(is_null($srcCategoryId))
 			$srcCategoryId = $data->srcCategoryId;
-		
-		if(!$this->startMove && $data->lastMovedCategoryId == $srcCategoryId)
-			$this->startMove = true;
-		
-		if($this->startMove)
-			$movedEntries = $this->moveEntries($job, $data, $srcCategoryId);
-		
-		if($data->moveFromChildren)
-		{
-			$categoryFilter = new KalturaCategoryFilter();
-			$categoryFilter->parentIdEqual = $srcCategoryId;
-			
-			$categoryPager = new KalturaFilterPager();
-			$categoryPager->pageSize = 100;
-			if(KBatchBase::$taskConfig->params->pageSize)
-				$categoryPager->pageSize = KBatchBase::$taskConfig->params->pageSize;
-				
-			if($data->lastMovedCategoryId == $srcCategoryId)
-				$categoryPager->pageIndex = $data->lastMovedCategoryPageIndex;
-				
-			$categoriesList = KBatchBase::$kClient->category->listAction($categoryFilter, $categoryPager);
-			while(count($categoriesList->objects))
-			{
-				foreach($categoriesList->objects as $category)
-				{
-					/* @var $category KalturaCategory */
-					$movedEntries += $this->moveCategory($job, $data, $category->id);
-				}
-				
-				$categoryPager->pageIndex++;
-				
-				$data->lastMovedCategoryPageIndex = $categoryPager->pageIndex;
-				$this->updateJob($job, null, KalturaBatchJobStatus::PROCESSING, $data);
-				
-				$categoriesList = KBatchBase::$kClient->category->listAction($categoryFilter, $categoryPager);
-			}
-		}
-		
-		$data->lastMovedCategoryId = $srcCategoryId;
-		
+
+		$movedEntries = $this->moveEntries($job, $data, $srcCategoryId);
+
 		KBatchBase::unimpersonate();
 		$this->updateJob($job, "Moved [$movedEntries] entries", KalturaBatchJobStatus::PROCESSING, $data);
 		KBatchBase::impersonate($job->partnerId);
@@ -165,7 +116,7 @@ class KAsyncMoveCategoryEntries extends KJobHandlerWorker
 		return $this->ancestors[$categoryId];
 	}
 	
-	private function addCategoryEntries($categoryEntriesList, $destCategoryId, &$entryIds) 
+	private function addCategoryEntries($categoryEntriesList, $destCategoryId, &$entryIds, &$categoryIds)
 	{
 		KBatchBase::$kClient->startMultiRequest();
 		foreach($categoryEntriesList->objects as $oldCategoryEntry)
@@ -176,6 +127,7 @@ class KAsyncMoveCategoryEntries extends KJobHandlerWorker
 			$newCategoryEntry->categoryId = $destCategoryId;
 			KBatchBase::$kClient->categoryEntry->add($newCategoryEntry);
 			$entryIds[] = $oldCategoryEntry->entryId;
+			$categoryIds[] = $oldCategoryEntry->categoryId;
 		}
 		return KBatchBase::$kClient->doMultiRequest();
 	}
@@ -187,79 +139,75 @@ class KAsyncMoveCategoryEntries extends KJobHandlerWorker
 	{
 		$categoryEntryFilter = new KalturaCategoryEntryFilter();
 		$categoryEntryFilter->orderBy = KalturaCategoryEntryOrderBy::CREATED_AT_ASC;
-		$categoryEntryFilter->categoryIdEqual = $srcCategoryId;
-		
+		if($data->moveFromChildren) {
+			$categoryEntryFilter->categoryFullIdsStartsWith = $data->destCategoryFullIds;
+		} else {
+			$categoryEntryFilter->categoryIdEqual = $srcCategoryId;
+		}
+
 		$categoryEntryPager = new KalturaFilterPager();
 		$categoryEntryPager->pageSize = 100;
 		if(KBatchBase::$taskConfig->params->pageSize)
 			$categoryEntryPager->pageSize = KBatchBase::$taskConfig->params->pageSize;
 			
-		if($data->lastMovedCategoryId == $srcCategoryId)
-			$categoryPager->pageIndex = $data->lastMovedCategoryEntryPageIndex;
-			
 		$movedEntries = 0;
 		$categoryEntriesList = KBatchBase::$kClient->categoryEntry->listAction($categoryEntryFilter, $categoryEntryPager);
-		while(count($categoryEntriesList->objects))
-		{
-			$entryIds = array();
-			$ancestor = $data->destCategoryId;
-			if(array_key_exists($ancestor, $this->ancestors))
-				$ancestor = $this->ancestors[$ancestor];
-			
-			$addedCategoryEntriesResults = $this->addCategoryEntries($categoryEntriesList, $ancestor, $entryIds);
-			
-			$categoryDeleted = false;
-			if(	is_array($addedCategoryEntriesResults[0]) && isset($addedCategoryEntriesResults[0]['code']) && ($addedCategoryEntriesResults[0]['code'] == self::CATEGORY_NOT_FOUND))
-				$categoryDeleted = true;
-			
-			
-			if($categoryDeleted) {
-				$ancestor = $this->getDeepestLiveAncestor($data->destCategoryId, $data->destCategoryFullIds, true);
-				// In case the category isn't found since it was just deleted, recall with the matching ancestor
-				if($ancestor) {
-					$data->destCategoryId = $ancestor;
-					continue;
+		while(count($categoryEntriesList->objects)) {
+				$entryIds = array();
+				$categoryIds = array();
+				$ancestor = $data->destCategoryId;
+				if (array_key_exists($ancestor, $this->ancestors)) {
+					$ancestor = $this->ancestors[$ancestor];
 				}
-			}
-			
-			KBatchBase::$kClient->startMultiRequest();
-			foreach($addedCategoryEntriesResults as $index => $addedCategoryEntryResult)
-			{
-				$code = null;
-				if(	is_array($addedCategoryEntryResult) && isset($addedCategoryEntryResult['code']))
-					$code = $addedCategoryEntryResult['code'];
-						
-				if(!is_null($code) && !in_array($code, array(self::CATEGORY_ENTRY_ALREADY_EXISTS, self::INVALID_ENTRY_ID, self::CATEGORY_NOT_FOUND)))
-					continue;
-					
-				if($data->copyOnly)
-					continue;
-					
-				KBatchBase::$kClient->categoryEntry->delete($entryIds[$index], $srcCategoryId);
-			}
-			$deletedCategoryEntriesResults = KBatchBase::$kClient->doMultiRequest();
-			if(is_null($deletedCategoryEntriesResults))
-				$deletedCategoryEntriesResults = array();
-			
-			foreach($deletedCategoryEntriesResults as $index => $deletedCategoryEntryResult)
-			{
-				if(is_array($deletedCategoryEntryResult) && isset($deletedCategoryEntryResult['code']))
-				{
-					KalturaLog::err('error: ' . $deletedCategoryEntryResult['code']);
-					unset($deletedCategoryEntriesResults[$index]);
+				$addedCategoryEntriesResults = $this->addCategoryEntries($categoryEntriesList, $ancestor, $entryIds, $categoryIds);
+
+				$categoryDeleted = false;
+				if (is_array($addedCategoryEntriesResults[0]) && isset($addedCategoryEntriesResults[0]['code']) && ($addedCategoryEntriesResults[0]['code'] == self::CATEGORY_NOT_FOUND)) {
+					$categoryDeleted = true;
 				}
-			}
-			
-			$movedEntries += count($deletedCategoryEntriesResults);
-			
-			if($data->copyOnly)
-			{
-				$categoryEntryPager->pageIndex++;
-				
-				$data->lastMovedCategoryEntryPageIndex = $categoryEntryPager->pageIndex;
-				$this->updateJob($job, null, KalturaBatchJobStatus::PROCESSING, $data);
-			}
-				
+
+				if ($categoryDeleted) {
+					$ancestor = $this->getDeepestLiveAncestor($data->destCategoryId, $data->destCategoryFullIds, true);
+					// In case the category isn't found since it was just deleted, recall with the matching ancestor
+					if ($ancestor) {
+						$data->destCategoryId = $ancestor;
+						continue;
+					}
+				}
+
+				KBatchBase::$kClient->startMultiRequest();
+				foreach ($addedCategoryEntriesResults as $index => $addedCategoryEntryResult) {
+					$code = null;
+					if (is_array($addedCategoryEntryResult) && isset($addedCategoryEntryResult['code'])) {
+						$code = $addedCategoryEntryResult['code'];
+					}
+					if (!is_null($code) && !in_array($code, array(self::CATEGORY_ENTRY_ALREADY_EXISTS, self::INVALID_ENTRY_ID, self::CATEGORY_NOT_FOUND))) {
+						continue;
+					}
+
+					if ($data->copyOnly) {
+						continue;
+					}
+					KBatchBase::$kClient->categoryEntry->delete($entryIds[$index], $categoryIds[$index]);
+				}
+				$deletedCategoryEntriesResults = KBatchBase::$kClient->doMultiRequest();
+				if (is_null($deletedCategoryEntriesResults))
+					$deletedCategoryEntriesResults = array();
+
+				foreach ($deletedCategoryEntriesResults as $index => $deletedCategoryEntryResult) {
+					if (is_array($deletedCategoryEntryResult) && isset($deletedCategoryEntryResult['code'])) {
+						KalturaLog::err('error: ' . $deletedCategoryEntryResult['code']);
+						unset($deletedCategoryEntriesResults[$index]);
+					}
+				}
+
+				$movedEntries += count($deletedCategoryEntriesResults);
+				if ($data->copyOnly) {
+					$categoryEntryPager->pageIndex++;
+
+					$data->lastMovedCategoryEntryPageIndex = $categoryEntryPager->pageIndex;
+					$this->updateJob($job, null, KalturaBatchJobStatus::PROCESSING, $data);
+				}
 			$categoryEntriesList = KBatchBase::$kClient->categoryEntry->listAction($categoryEntryFilter, $categoryEntryPager);
 		}
 		
