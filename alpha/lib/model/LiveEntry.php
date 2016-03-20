@@ -782,10 +782,6 @@ abstract class LiveEntry extends entry
 				KalturaLog::info("Removing media server id [" . $dbLiveEntryServerNode->getServerNodeId() . "]");
 				$dbLiveEntryServerNode->delete();
 			}
-			else 
-			{
-				KalturaLog::debug("live status could not be validated for media server [".$dbLiveEntryServerNode->getServerNodeId()."] running on dc [". $dbLiveEntryServerNode->getDc()."] current dc [".kDataCenterMgr::getCurrentDcId()."]");
-			}
 		}
 	}
 
