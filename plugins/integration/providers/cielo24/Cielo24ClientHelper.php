@@ -63,8 +63,6 @@ class Cielo24ClientHelper
 			$jobId = $jobAdditionResult->JobId;
 		else
 			return false;
-		
-		$callBackUrl .= "&externalJobId=$jobId";
 
 		// attaching media to the job
 		$addMediaParams = array("job_id" => $jobId, "media_url" => $flavorUrl);
