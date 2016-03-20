@@ -109,6 +109,13 @@ class KalturaWidget extends KalturaObject implements IFilterable
 	 */
 	public $roles;
 
+	/**
+	 * User ID for widget
+	 *
+	 * @var string
+	 */
+	public $userId;
+
 	private static $map_between_objects = array
 	(
 		"id",
@@ -126,7 +133,8 @@ class KalturaWidget extends KalturaObject implements IFilterable
 		"enforceEntitlement",
 		"privacyContext",
 		"addEmbedHtml5Support",
-		"roles"
+		"roles",
+		"userId"
 	);
 
 	public function getMapBetweenObjects ( )

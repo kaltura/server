@@ -299,7 +299,7 @@ class SessionService extends KalturaBaseService
 			!is_null($widget->getPrivacyContext()) && $widget->getPrivacyContext() != '' )
 			$privileges .= ','. kSessionBase::PRIVILEGE_PRIVACY_CONTEXT . ':' . $widget->getPrivacyContext();
 
-		$userId = 0;
+		$userId =  $widget->getUserId();;
 
 		// if the widget has a role, pass it in $privileges so it will be embedded in the KS
 		// only if we also have an entry to limit the role operations to
