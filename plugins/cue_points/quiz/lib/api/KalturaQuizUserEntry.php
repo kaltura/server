@@ -59,7 +59,7 @@ class KalturaQuizUserEntry extends KalturaUserEntry{
 			$c = new Criteria();
 			$c->add(UserEntryPeer::KUSER_ID, $object_to_fill->getKuserId());
 			$c->add(UserEntryPeer::ENTRY_ID, $this->entryId);
-			$c->add(UserEntryPeer::TYPE, QuizPlugin::getCoreValue('UserEntryType', QuizUserEntryType::QUIZ););
+			$c->add(UserEntryPeer::TYPE, QuizPlugin::getCoreValue('UserEntryType', QuizUserEntryType::QUIZ));
 			$userEntry = UserEntryPeer::doSelect($c);
 			if (count($userEntry) > 0)
 			{
