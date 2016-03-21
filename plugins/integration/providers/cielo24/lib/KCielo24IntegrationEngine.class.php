@@ -48,17 +48,19 @@ class KCielo24IntegrationEngine implements KIntegrationCloserEngine
 		$nameOptions->fileName = self::GET_URL_FILE_NAME;	
 		$flavorUrl = KBatchBase::$kClient->flavorAsset->getUrl($flavorAssetId, null, null, $nameOptions);
 	
+		$jobName = $entryId."_".$spokenLanguage;
+		
 		$remoteJobId = $this->clientHelper->getRemoteFinishedJobId($entryId);
 		if (!$remoteJobId)
 		{
-			$uploadSuccess = $this->clientHelper->uploadMedia($flavorUrl, $entryId, $callBackUrl, $spokenLanguage, $priority, $fidelity);
+			$uploadSuccess = $this->clientHelper->uploadMedia($flavorUrl, $entryId, $callBackUrl, $spokenLanguage, $priority, $fidelity, $jobName);
 			if(!$uploadSuccess)
 				throw new Exception("upload failed");
 		}
 		elseif($shouldReplaceRemoteMedia == true)
 		{
 			$this->clientHelper->deleteRemoteFile($remoteJobId);
-			$uploadSuccess = $this->clientHelper->uploadMedia($flavorUrl, $entryId, $callBackUrl, $spokenLanguage, $priority, $fidelity);
+			$uploadSuccess = $this->clientHelper->uploadMedia($flavorUrl, $entryId, $callBackUrl, $spokenLanguage, $priority, $fidelity, $jobName);
 			if(!$uploadSuccess)
 				throw new Exception("upload failed");
 		}	
