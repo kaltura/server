@@ -1,9 +1,9 @@
 # Kajam-11.11.0 #
 
-## new entry--server_node relations model ##
-- Issue Type: Feature Request
-- Issue ID: PLAT-5018
-
+## update permission CONTENT_INGEST_UPLOAD in service.document.documents ##
+- Issue Type: Task
+- Issue ID: PLAT-5199
+- 
 #### Configuration ####
 - None.
 
@@ -14,13 +14,12 @@
 #### Known Issues & Limitations ####
 - None.
 
-##Update document service permissions ##
-- Issue Type: Task
-- Issue ID: PLAT-5199
+## new entry--server_node relations model ##
+- Issue Type: Feature Request
+- Issue ID: PLAT-5018
 
 #### Configuration ####
 - None.
-
 
 #### Deployment Scripts ####
 	Update permissions: 
