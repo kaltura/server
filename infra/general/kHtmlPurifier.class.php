@@ -48,8 +48,7 @@ class kHtmlPurifier
 	public static function isMarkupAllowed( $className, $propertyName )
 	{
 		// Is it an excluded property?
-		if ( array_key_exists($className, self::$AllowedProperties)
-				&& array_key_exists($propertyName, self::$AllowedProperties[$className]) )
+		if ( array_key_exists($className . ":" . $propertyName, self::$AllowedProperties) )
 		{
 			return true;
 		}
@@ -93,6 +92,7 @@ class kHtmlPurifier
 			$cacheKey = 'kHtmlPurifierAllowedProperties-' . kConf::getCachedVersionId();
 			self::$AllowedProperties = apc_fetch($cacheKey);
 		}
+
 		
 		if ( ! self::$AllowedProperties )
 		{
