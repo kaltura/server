@@ -55,15 +55,15 @@ class Cielo24ClientHelper
 		{
 			return $exitingJobsResult->ActiveJobs[0]->JobId;
 		}
-			return false;
+		return false;
 	}
 	
-	public function uploadMedia($flavorUrl, $entryId, $callBackUrl, $spokenLanguage, $priority, $fidelity)
+	public function uploadMedia($flavorUrl, $entryId, $callBackUrl, $spokenLanguage, $priority, $fidelity, $jobName)
 	{
 		$languageExternalServiceParam = $this->supportedLanguages[$spokenLanguage];
 		
 		//adding a job
-		$jobCreationParams = array("language" => $languageExternalServiceParam,"external_id" => $entryId);
+		$jobCreationParams = array("language" => $languageExternalServiceParam,"external_id" => $entryId, "job_name" => $jobName);
 		$createJobAPIUrl = $this->createAPIUrl("job/new", $jobCreationParams);
 		$jobAdditionResult = $this->sendAPICall($createJobAPIUrl);
 		if($jobAdditionResult && isset($jobAdditionResult->JobId))
