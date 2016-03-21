@@ -126,20 +126,20 @@ class KAsyncMoveCategoryEntries extends KJobHandlerWorker
 
 			$addedCategoryEntriesResults = $this->addCategoryEntries($categoryEntriesList, $data->destCategoryId, $entryIds, $categoryIds);
 
-			if (is_array($addedCategoryEntriesResults[0]) && isset($addedCategoryEntriesResults[0]['code']) && ($addedCategoryEntriesResults[0]['code'] == self::CATEGORY_NOT_FOUND))
+			if(is_array($addedCategoryEntriesResults[0]) && isset($addedCategoryEntriesResults[0]['code']) && ($addedCategoryEntriesResults[0]['code'] == self::CATEGORY_NOT_FOUND))
 			{
 				KalturaLog::err('error: ' . $addedCategoryEntriesResults[0]['code']);
 				throw new KalturaException( "Trying to move entries to a deleted category" );
 			}
 
 			KBatchBase::$kClient->startMultiRequest();
-			foreach ($addedCategoryEntriesResults as $index => $addedCategoryEntryResult)
+			foreach($addedCategoryEntriesResults as $index => $addedCategoryEntryResult)
 			{
 				$code = null;
-				if (is_array($addedCategoryEntryResult) && isset($addedCategoryEntryResult['code'])) {
+				if(is_array($addedCategoryEntryResult) && isset($addedCategoryEntryResult['code'])) {
 					$code = $addedCategoryEntryResult['code'];
 				}
-				if (!is_null($code) && !in_array($code, array(self::CATEGORY_ENTRY_ALREADY_EXISTS, self::INVALID_ENTRY_ID)))
+				if(!is_null($code) && !in_array($code, array(self::CATEGORY_ENTRY_ALREADY_EXISTS, self::INVALID_ENTRY_ID)))
 				{
 					KalturaLog::err('error: ' . $code);
 					continue;
@@ -149,12 +149,12 @@ class KAsyncMoveCategoryEntries extends KJobHandlerWorker
 			}
 
 			$deletedCategoryEntriesResults = KBatchBase::$kClient->doMultiRequest();
-			if (is_null($deletedCategoryEntriesResults))
+			if(is_null($deletedCategoryEntriesResults))
 				$deletedCategoryEntriesResults = array();
 
-			foreach ($deletedCategoryEntriesResults as $index => $deletedCategoryEntryResult)
+			foreach($deletedCategoryEntriesResults as $index => $deletedCategoryEntryResult)
 			{
-				if (is_array($deletedCategoryEntryResult) && isset($deletedCategoryEntryResult['code']))
+				if(is_array($deletedCategoryEntryResult) && isset($deletedCategoryEntryResult['code']))
 				{
 					KalturaLog::err('error: ' . $deletedCategoryEntryResult['code']);
 					unset($deletedCategoryEntriesResults[$index]);
