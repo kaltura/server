@@ -34,13 +34,28 @@ class Cielo24ClientHelper
 	public function getRemoteFinishedJobId($entryId)
 	{
 		$listParams = array("ExternalID" => $entryId, "JobStatus" => "Complete");
+		return $this->getRemoteJobId($listParams);	
+	}			
+		
+	public function getRemoteJobIdByName($entryId, $jobName, $fidelity = null, $priority = null)			
+	{			
+		$listParams = array("ExternalID" => $entryId, "JobName" => $jobName);			
+		if(!is_null($fidelity))			
+			$listParams["Fidelity"] = $fidelity;			
+		if(!is_null($priority))			
+			$listParams["Priority"] = $priority;			
+		return $this->getRemoteJobId($listParams);			
+	}			
+		
+	public function getRemoteJobId($listParams)			
+	{
 		$remoteJobsListAPIUrl = $this->createAPIUrl("job/list", $listParams);
 		$exitingJobsResult = $this->sendAPICall($remoteJobsListAPIUrl);
 		if($exitingJobsResult && isset($exitingJobsResult->ActiveJobs) && count($exitingJobsResult->ActiveJobs))
 		{
 			return $exitingJobsResult->ActiveJobs[0]->JobId;
 		}
-		return false;
+			return false;
 	}
 	
 	public function uploadMedia($flavorUrl, $entryId, $callBackUrl, $spokenLanguage, $priority, $fidelity)
