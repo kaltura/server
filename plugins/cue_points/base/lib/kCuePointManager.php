@@ -697,6 +697,7 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 		foreach($cuePoints as $cuePoint)
 		{
 			/* @var $cuePoint CuePoint */
+			$cuePoint->reload();
 			$cuePoint->indexToSearchIndex();
 		}
 	}
