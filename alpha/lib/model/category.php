@@ -475,16 +475,6 @@ class category extends Basecategory implements IIndexable, IRelatedObject
 			throw new kCoreException("Duplicate category: $fullName", kCoreException::DUPLICATE_CATEGORY);
 	}
 
-	private static function shouldMoveEntriesToParentCategory($moveEntriesToParentCategory)
-	{
-		if($moveEntriesToParentCategory === null)
-			return true;
-		if($moveEntriesToParentCategory === 0)
-			return false;
-
-		return true;
-	}
-
 	public function setDeletedAt($v, $moveEntriesToParentCategory = false)
 	{
 		parent::setDeletedAt($v);
