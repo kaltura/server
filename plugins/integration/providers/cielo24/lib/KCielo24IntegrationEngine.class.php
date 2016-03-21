@@ -41,7 +41,7 @@ class KCielo24IntegrationEngine implements KIntegrationCloserEngine
 		$callBackUrl = $data->callbackNotificationUrl;
 		KalturaLog::debug('callback is - ' . $callBackUrl);	
 	
-		$this->clientHelper = Cielo24Plugin::getClientHelper($providerData->username, $providerData->password);
+		$this->clientHelper = Cielo24Plugin::getClientHelper($providerData->username, $providerData->password, $providerData->baseUrl);
 		
 		//setting a pre-defined name to prevent the flavor-url to contain chars that will break the curl url syntax
 		$nameOptions = new KalturaFlavorAssetUrlOptions();

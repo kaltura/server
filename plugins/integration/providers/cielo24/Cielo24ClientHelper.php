@@ -8,10 +8,17 @@ class Cielo24ClientHelper
 	private $baseEndpointUrl = null;
 	private $apiCredentialsStr = null;
 	
-	public function __construct($username, $password)
+	public function __construct($username, $password, $baseUrl = null)
 	{
 		$cielo24ParamsMap = kConf::get('cielo24','integration');
-		$this->baseEndpointUrl = $cielo24ParamsMap['base_url'];
+		if(!is_null($baseUrl))
+		{
+			$this->baseEndpointUrl = $baseUrl;
+		}
+		else
+		{
+			$this->baseEndpointUrl = $cielo24ParamsMap['base_url'];
+		}
 		$this->apiCredentialsStr = "v=" . $cielo24ParamsMap['version'];
 		
 		$loginParams = array("username" => $username, "password" => $password);	
