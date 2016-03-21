@@ -9,6 +9,21 @@
 
 #### Deployment Scripts ####
 	Update permissions: 
+		php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2013_03_24_update_content_docs_action.php
+	
+#### Known Issues & Limitations ####
+- None.
+
+##Update document service permissions ##
+- Issue Type: Task
+- Issue ID: PLAT-5199
+
+#### Configuration ####
+- None.
+
+
+#### Deployment Scripts ####
+	Update permissions: 
 		php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2016_02_10_entry_server_node_service.php
 	
 	Create new entry_server_node table:
