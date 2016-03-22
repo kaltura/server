@@ -34,12 +34,7 @@ class kHtmlPurifier
 				;
 
 			KalturaLog::err( $msg );
-
-			// We're currently in monitoring mode so we won't perform any action.
-			// Real code should:
-			//		throw an exception if we do not allow unknown tags in input
-			// or
-			//		return $modifiedString; ==> if we will force-remove unknown tags
+			throw new KalturaAPIException(KalturaErrors::UNSAFE_HTML_TAGS, $className, $propertyName);
 		}
 
 		return $value;
