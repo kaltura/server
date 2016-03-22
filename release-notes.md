@@ -1,5 +1,19 @@
 # Kajam-11.11.0 #
 
+## Allow media servre partner to list live entries ##
+- Issue Type: Task
+- Issue ID: PLAT-5268
+
+#### Configuration ####
+- None.
+
+#### Deployment Scripts ####
+	Update permissions: 
+		php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2016_03_22_media_server_live_stream_list.php
+	
+#### Known Issues & Limitations ####
+- None.
+
 ## update permission CONTENT_INGEST_UPLOAD in service.document.documents ##
 - Issue Type: Task
 - Issue ID: PLAT-5199
