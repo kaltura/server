@@ -18,9 +18,14 @@ class KalturaLiveEntryService extends KalturaEntryService
 	public function initService($serviceId, $serviceName, $actionName)
 	{
 		parent::initService($serviceId, $serviceName, $actionName);
+		
+		$allowedSystemPartners = array(
+				Partner::BATCH_PARTNER_ID,
+				Partner::MEDIA_SERVER_PARTNER_ID,
+		);
 
-		// KAsyncValidateLiveMediaServers lists all live entries of all partners
-		if($this->getPartnerId() == Partner::BATCH_PARTNER_ID && $actionName == 'list')
+		// Allow bacth and media server partner to list all partner entries
+		if(in_array($this->getPartnerId(), $allowedSystemPartners) && $actionName == 'list')
 			myPartnerUtils::resetPartnerFilter('entry');
 
 		if (in_array($this->getPartner()->getStatus(), array (Partner::PARTNER_STATUS_CONTENT_BLOCK, Partner::PARTNER_STATUS_FULL_BLOCK)))
