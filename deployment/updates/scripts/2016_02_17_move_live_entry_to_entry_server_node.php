@@ -13,6 +13,7 @@ if ($argc == 2)
 
 $c = new SphinxEntryCriteria();
 $c->addCondition(entryIndex::DYNAMIC_ATTRIBUTES . '.' . LiveEntry::IS_LIVE . ' = 1');
+$c->add(entryPeer::UPDATED_AT, $updatedAtValue, Criteria::GREATER_THAN);
 $c->add(entryPeer::TYPE, entryType::LIVE_STREAM);
 $c->addOrderBy('updated_at');
 $c->setLimit(LIMIT);
@@ -21,7 +22,7 @@ $liveEntries = entryPeer::doSelect($c);
 foreach($liveEntries as $liveEntry)
 {
 	/* @var $liveEntry LiveEntry */
-	$mediaServers = $liveEntry->getDeprecatedMediaServers();
+	$mediaServers = $liveEntry->getFromCustomData(null, LiveEntry::CUSTOM_DATA_NAMESPACE_MEDIA_SERVERS, array());
 	if(count($mediaServers))
 	{
 		foreach ($mediaServers as $key => $mediaServer)
