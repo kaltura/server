@@ -503,9 +503,13 @@ class category extends Basecategory implements IIndexable, IRelatedObject
 		if ($this->getInheritanceType() == InheritanceType::MANUAL)
 			$this->addDeleteCategoryTreeKuserJob($this->getId(), false, $fullIds);
 		if ($this->move_entries_to_parent_category)
+		{
 			$this->addMoveEntriesToCategoryJob($this->parent_id);
+		}
 		else
+		{
 			$this->addDeleteCategoryTreeEntryJob($this->getId(), $fullIds);
+		}
 	}
 
 
@@ -567,7 +571,6 @@ class category extends Basecategory implements IIndexable, IRelatedObject
 	{
 		$filter = new categoryKuserFilter();
 		$filter->setFullIdsStartsWith($fullIds);
-		$filter->set('_category_direct_members', $deleteCategoryDirectMembersOnly);
 
 		$c = new Criteria();
 		$c->add(categoryKuserPeer::CATEGORY_ID, $categoryId);
