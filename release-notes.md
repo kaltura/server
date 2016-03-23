@@ -1,5 +1,18 @@
 # Kajam-11.11.0 #
 
+## fix baseEntryFilter->referenceIdEqueal,referenceIdIn ##
+- Issue Type: Bug
+- Issue ID: SUP-6162
+
+#### Configuration ####
+- None.
+
+#### Deployment Scripts ####
+- Repopulate sphinx entries
+
+#### Known Issues & Limitations ####
+- None.
+
 ## Allow media servre partner to list live entries ##
 - Issue Type: Task
 - Issue ID: PLAT-5268
