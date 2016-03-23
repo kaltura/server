@@ -11,14 +11,12 @@ class LiveEntryServerNode extends EntryServerNode
 	const CUSTOM_DATA_APPLICATION_NAME = "application_name";
 	const CUSTOM_DATA_DC = "dc";
 	
-	private $statusChanged = false;
-	
 	/* (non-PHPdoc)
-	 * @see BaseEntryServerNode::postSave()
+	 * @see BaseEntryServerNode::preSave()
 	 */
-	public function postSave(PropelPDO $con = null)
+	public function preSave(PropelPDO $con = null)
 	{
-		if($this->statusChanged)
+		if ($this->isColumnModified(EntryServerNodePeer::STATUS))
 		{
 			$liveEntry = entryPeer::retrieveByPK($this->getEntryId());
 			if($liveEntry)
@@ -32,8 +30,7 @@ class LiveEntryServerNode extends EntryServerNode
 			}
 		}
 			
-		$this->statusChanged = false;
-		parent::postSave($con);
+		parent::preSave($con);
 	}
 	
 	/* (non-PHPdoc)
@@ -83,13 +80,5 @@ class LiveEntryServerNode extends EntryServerNode
 	public function getDc()
 	{
 		return $this->getFromCustomData(self::CUSTOM_DATA_DC);
-	}
-	
-	public function setStatus($v)
-	{
-		if($this->getStatus() !== $v)
-			$this->statusChanged = true;
-		
-		return parent::setStatus($v);
 	}
 }
