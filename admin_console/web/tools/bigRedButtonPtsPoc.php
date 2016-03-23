@@ -87,6 +87,7 @@ $html5Version = $_GET['playerVersion'];
                     wid: '_' + partnerId,
                     "uiconf_id": uiConfId,
                     "flashvars": {
+                    	    "LeadWithHLSOnJS": true,
                             "streamerType": "auto",
                             "autoPlay": true,
                             "LeadWithHLSOnFlash": true,
