@@ -567,7 +567,6 @@ class category extends Basecategory implements IIndexable, IRelatedObject
 	{
 		$filter = new categoryKuserFilter();
 		$filter->setFullIdsStartsWith($fullIds);
-		$filter->set('_category_direct_members', $deleteCategoryDirectMembersOnly);
 
 		$c = new Criteria();
 		$c->add(categoryKuserPeer::CATEGORY_ID, $categoryId);
