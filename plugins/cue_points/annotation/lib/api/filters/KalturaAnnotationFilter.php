@@ -5,6 +5,8 @@
  */
 class KalturaAnnotationFilter extends KalturaAnnotationBaseFilter
 {
+	const CHAPTERS_PUBLIC_TAG = 'chaptering';
+
 	/* (non-PHPdoc)
 	 * @see KalturaRelatedFilter::validateForResponseProfile()
 	 */
