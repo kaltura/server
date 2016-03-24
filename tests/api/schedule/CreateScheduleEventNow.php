@@ -5,10 +5,10 @@ require_once __DIR__ . '/../../lib/KalturaPlugins/KalturaScheduleClientPlugin.ph
 
 $config = new KalturaConfiguration();
 $config->curlTimeout = 1000;
-$config->serviceUrl = 'http://dev-hudson10.dev.kaltura.com/';
+$config->serviceUrl = 'http://dev-backend21.dev.kaltura.com/';
 
 $partnerId = 101;
-$adminSecret = 'b56ec0a34bdec808a8e77abc9a8b13f6';
+$adminSecret = 'a3f89e2b8516c3036e0b2a4966d62a51';
 $userId = 'tan-tan';
 $type = KalturaSessionType::ADMIN;
 $expiry = 86400;

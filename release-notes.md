@@ -1,5 +1,23 @@
 # Kajam-11.11.0 #
 
+## Automated Recording Schedule ##
+- Issue Type: Feature Request
+- Issue ID: PLAT-5245
+
+#### Configuration ####
+- None.
+
+#### Deployment Scripts ####
+	Update permissions: 
+		php deployment/updates/scripts/add_permissions/2015_12_27_add_schedule_permissions.php
+	
+	Create new tables:
+		mysql -ukaltura -p -P3306 kaltura < deployment/updates/sql/2016_03_17_create_schedule_tables.sql
+		
+
+#### Known Issues & Limitations ####
+- None.
+
 ## new entry--server_node relations model ##
 - Issue Type: Feature Request
 - Issue ID: PLAT-5018
