@@ -31,8 +31,8 @@ foreach($liveEntries as $liveEntry)
 				continue;
 			
 			/* @var $mediaServer kLiveMediaServer */
-			$liveStatus = $liveEntry->getFromCustomData('live_status_'.$mediaServer->getIndex(), null, LiveEntryStatus::STOPPED);
-			if($liveStatus === LiveEntryStatus::STOPPED)
+			$liveStatus = $liveEntry->getFromCustomData('live_status_'.$mediaServer->getIndex(), null, EntryServerNodeStatus::STOPPED);
+			if($liveStatus === EntryServerNodeStatus::STOPPED)
 				continue;
 			
 			$liveEntryServerNode = EntryServerNodePeer::retrieveByEntryIdAndServerType($liveEntry->getId(), $mediaServer->getIndex());
