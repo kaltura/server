@@ -7,24 +7,24 @@
 abstract class KalturaEntryScheduleEvent extends KalturaScheduleEvent
 {
 	/**
-	 * Entry id to be used
+	 * Entries that associated with this event
 	 * @var string
 	 */
-	public $entryId;
+	public $entryIds;
 	
 	/**
-	 * Entry template to be used to create a new entry
-	 * @var KalturaBaseEntry
+	 * Categories that associated with this event
+	 * @var string
 	 */
-	public $entryTemplate;
+	public $categoryIds;
 	
 	/*
 	 * Mapping between the field on this object (on the left) and the setter/getter on the entry object (on the right)  
 	 */
 	private static $map_between_objects = array 
 	 (	
-	 	'entryId',
-		'entryTemplate',
+		'entryIds',
+		'categoryIds',
 	 );
 		 
 	/* (non-PHPdoc)
@@ -33,56 +33,5 @@ abstract class KalturaEntryScheduleEvent extends KalturaScheduleEvent
 	public function getMapBetweenObjects()
 	{
 		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
-	}
-	
-	/* (non-PHPdoc)
-	 * @see KalturaObject::validateForInsert($propertiesToSkip)
-	 */
-	public function validateForInsert($propertiesToSkip = array())
-	{
-		$notNulls = 0;
-		
-		if(!$this->isNull('entryId'))
-		{
-			$notNulls++;
-		}
-		
-		if(!$this->isNull('entryTemplate'))
-		{
-			$notNulls++;
-		}
-		
-		if($notNulls > 1)
-		{
-			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_ALL_MUST_BE_NULL_BUT_ONE, 'entryId / entryTemplate');
-		}
-		
-		parent::validateForInsert($propertiesToSkip);
-	}
-	
-	/* (non-PHPdoc)
-	 * @see KalturaObject::validateForUpdate($sourceObject, $propertiesToSkip)
-	 */
-	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
-	{
-		/* @var $sourceObject EntryScheduleEvent */
-		$notNulls = 0;
-		
-		if(!$this->isNull('entryId') || $sourceObject->getEntryId())
-		{
-			$notNulls++;
-		}
-		
-		if(!$this->isNull('entryTemplate') || $sourceObject->getEntry())
-		{
-			$notNulls++;
-		}
-		
-		if($notNulls > 1)
-		{
-			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_ALL_MUST_BE_NULL_BUT_ONE, 'entryId / entryTemplate');
-		}
-		
-		parent::validateForUpdate($sourceObject, $propertiesToSkip);
 	}
 }
