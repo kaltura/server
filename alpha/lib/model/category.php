@@ -568,12 +568,6 @@ class category extends Basecategory implements IIndexable, IRelatedObject
 		$filter = new categoryKuserFilter();
 		$filter->setFullIdsStartsWith($fullIds);
 
-		$c = new Criteria();
-		$c->add(categoryKuserPeer::CATEGORY_ID, $categoryId);
-		if(!categoryKuserPeer::doSelectOne($c)) {
-			return;
-		}
-
 		kJobsManager::addDeleteJob($this->getPartnerId(), DeleteObjectType::CATEGORY_USER, $filter);
 	}
 
@@ -606,12 +600,6 @@ class category extends Basecategory implements IIndexable, IRelatedObject
 	{
 		$filter = new categoryEntryFilter();
 		$filter->setFullIdsStartsWith($fullIds);
-
-		$c = new Criteria();
-		$c->add(categoryEntryPeer::CATEGORY_ID, $categoryId);
-		if(!categoryEntryPeer::doSelectOne($c)) {
-			return;
-		}
 
 		kJobsManager::addDeleteJob($this->getPartnerId(), DeleteObjectType::CATEGORY_ENTRY, $filter);
 	}
