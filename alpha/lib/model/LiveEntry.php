@@ -528,14 +528,6 @@ abstract class LiveEntry extends entry
 	}
 
 	/**
-	 * @return array<kLiveMediaServer>
-	 */
-	public function getDeprecatedMediaServers()
-	{
-		return $this->getFromCustomData(null, LiveEntry::CUSTOM_DATA_NAMESPACE_MEDIA_SERVERS, array());
-	}
-
-	/**
 	 * @return MediaServerNode
 	 */
 	public function getMediaServer($currentDcOnly = false)
