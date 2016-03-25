@@ -164,6 +164,22 @@ class KalturaBaseEntryFilter extends KalturaBaseEntryBaseFilter
 	 */
 	public function prepareEntriesCriteriaFilter(KalturaFilterPager $pager = null)
 	{
+		//	If at this point we are filtering by categories matches and the entitled user is associated with more than 100 categories
+		//	we want the specific filtered categories to make it into the entitlement criteria, if the user is associated with them as well 
+		if (!is_null ($this->categoriesIdsMatchOr) || !is_null($this->categoriesIdsMatchAnd) || !is_null($this->categoriesMatchAnd) || !is_null($this->categoriesMatchOr))
+		{
+			$categoriesIdsMatchOr = $this->categoriesIdsMatchOr ? explode(',', $this->categoriesIdsMatchOr) : array ();
+			$categoriesIdsMatchAnd = $this->categoriesIdsMatchAnd ? explode(',', $this->categoriesIdsMatchAnd) : array ();
+			$categoriesMatchAnd = $this->categoriesMatchAnd ? explode (',' , entryFilter::categoryFullNamesToIds($this->categoriesMatchAnd)) : array();
+			$categoriesMatchOr = $this->categoriesMatchOr ? explode (',' , entryFilter::categoryFullNamesToIds($this->categoriesMatchOr)) : array();
+			$catsToCheckEntitlement = array_merge($categoriesIdsMatchOr, $categoriesIdsMatchAnd, $categoriesMatchOr, $categoriesMatchAnd);
+			array_walk($catsToCheckEntitlement, create_function('&$val', '$val = trim($val);'));
+			$catsToCheckEntitlement = array_unique($catsToCheckEntitlement);
+			
+			KalturaLog::info("If possible, add the following categories to criteria: " . implode(',', $catsToCheckEntitlement));
+			entryPeer::setFilteredCategoriesIds($catsToCheckEntitlement);
+		}
+		
 		// because by default we will display only READY entries, and when deleted status is requested, we don't want this to disturb
 		entryPeer::allowDeletedInCriteriaFilter(); 
 		
