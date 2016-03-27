@@ -3503,7 +3503,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	{
 		$refId = $this->getReferenceID();
 		if ( $refId != null )
-			$refId .= " " . md5($refId);
+			$refId .= " " . md5(trim($refId));
 
 		return $refId;
 	}

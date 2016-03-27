@@ -299,7 +299,7 @@ class SphinxEntryCriteria extends SphinxCriteria
 	private function buildReferenceIdMatchString( $refId )
 	{
 		$notEmpty = kSphinxSearchManager::HAS_VALUE . kCurrentContext::getCurrentPartnerId();
-		return "\\\" " . md5( $refId ) . " $notEmpty$\\\"";
+		return "\\\" " . md5( trim($refId) ) . " $notEmpty$\\\"";
 	}
 	
 	/**
