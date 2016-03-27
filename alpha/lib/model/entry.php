@@ -3498,13 +3498,5 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 		}
 		return $shouldClone;
 	}
-
-	public function getReferenceIdWithMd5()
-	{
-		$refId = $this->getReferenceID();
-		if ( $refId != null )
-			$refId .= " " . md5($refId);
-
-		return $refId;
-	}
+	
 }
