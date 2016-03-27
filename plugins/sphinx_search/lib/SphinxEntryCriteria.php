@@ -226,29 +226,6 @@ class SphinxEntryCriteria extends SphinxCriteria
 				
 			$filter->unsetByName('_is_root');
 		}
-
-		if($filter->is_set('_eq_reference_id'))
-		{
-			$refId = $filter->get('_eq_reference_id');
-			if( $refId!=null && $refId!='' ) {
-				$this->addMatch("@reference_id " . $this->buildReferenceIdMatchString($refId));
-				$filter->unsetByName('_eq_reference_id');
-			}
-		}
-
-		if ($filter->is_set('_in_reference_id'))
-		{
-			$refIds = explode(",",$filter->get('_in_reference_id'));
-			$condition = "";
-			for ($i=0; $i< count($refIds); $i++ ) {
-				$condition .= "(" . $this->buildReferenceIdMatchString($refIds[$i]) . ")";
-				if ( $i < count($refIds) - 1 )
-					$condition .= " | ";
-			}
-			$this->addMatch("@reference_id $condition");
-			$filter->unsetByName('_in_reference_id');
-		}
-
 		if(count($matchOrRoots))
 			$filter->set('_matchand_roots', $matchOrRoots);
 			
@@ -294,12 +271,6 @@ class SphinxEntryCriteria extends SphinxCriteria
 		$filter->unsetByName('_free_text');
 		
 		return parent::applyFilterFields($filter);
-	}
-
-	private function buildReferenceIdMatchString( $refId )
-	{
-		$notEmpty = kSphinxSearchManager::HAS_VALUE . kCurrentContext::getCurrentPartnerId();
-		return "\\\" " . md5( $refId ) . " $notEmpty$\\\"";
 	}
 	
 	/**
