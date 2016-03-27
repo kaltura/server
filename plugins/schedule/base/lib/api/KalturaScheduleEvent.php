@@ -282,6 +282,11 @@ abstract class KalturaScheduleEvent extends KalturaObject implements IRelatedFil
 			$endDate = $this->endDate;
 			
 		$this->validate($startDate, $endDate);
+
+		if($this->isNull('sequence') || $this->sequence <= $sourceObject->getSequence())
+		{
+			$sourceObject->incrementSequence();
+		}
 		
 		if(!$this->isNull('duration'))
 		{
