@@ -693,11 +693,12 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 
 		$con = Propel::getConnection(MetadataPeer::DATABASE_NAME);
 		BasePeer::doUpdate($select, $update, $con);
+		CuePointPeer::setUseKQueryCache(false);
 		$cuePoints = CuePointPeer::retrieveByPKs($cuePointsIds);
+		CuePointPeer::setUseKQueryCache(true);
 		foreach($cuePoints as $cuePoint)
 		{
 			/* @var $cuePoint CuePoint */
-			$cuePoint->reload();
 			$cuePoint->indexToSearchIndex();
 		}
 	}

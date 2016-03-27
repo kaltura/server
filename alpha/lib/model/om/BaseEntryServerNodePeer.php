@@ -344,7 +344,7 @@ abstract class BaseEntryServerNodePeer {
 			'EntryServerNodePeer', 
 			$cacheKey, 
 			$queryDB);
-		if ($cachedResult !== null)
+		if ($cachedResult !== null && self::$useKQueryCache)
 		{
 			$cacheKey = null;
 			EntryServerNodePeer::filterSelectResults($cachedResult, $criteriaForSelect);
@@ -617,6 +617,16 @@ abstract class BaseEntryServerNodePeer {
 				kMemoryManager::registerPeer('EntryServerNodePeer');
 			}
 		}
+	}
+	
+	/**
+	 * @var useKQueryCache define if kQueryCache should be used by criteria
+	 */
+	protected static $useKQueryCache = true;
+	
+	public static function  setUseKQueryCache ( $useKQueryCache )
+	{
+		self::$useKQueryCache =  $useKQueryCache;
 	}
 
 	/**
