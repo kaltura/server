@@ -77,4 +77,13 @@ class PartnerPeer extends BasePartnerPeer
 	
 		return $priorityGroup->getPriority();
 	}
+	
+	public static function retrieveActiveByPK($pk)
+	{
+		$c = new Criteria();
+		$c->add(PartnerPeer::ID, $pk);
+		$c->add(PartnerPeer::STATUS, Partner::PARTNER_STATUS_ACTIVE);
+		
+		return PartnerPeer::doSelectOne($c);
+	}
 }
