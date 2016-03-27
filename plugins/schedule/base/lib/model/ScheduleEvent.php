@@ -30,6 +30,7 @@ abstract class ScheduleEvent extends BaseScheduleEvent implements IRelatedObject
 	 */
 	public function applyDefaultValues()
 	{
+		$this->setSequence(1);
 	}
 	
 	/* (non-PHPdoc)
