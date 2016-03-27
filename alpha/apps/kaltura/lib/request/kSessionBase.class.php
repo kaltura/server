@@ -106,7 +106,12 @@ class kSessionBase
 	 * @var array
 	 */
 	protected $parsedPrivileges = null;
-	
+
+	public function getParsedPrivileges()
+	{
+		return $this->parsedPrivileges;
+	}
+
 	/**
 	 * @param string $encoded_str
 	 * @return kSessionBase

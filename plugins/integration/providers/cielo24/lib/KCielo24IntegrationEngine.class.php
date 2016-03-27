@@ -41,24 +41,26 @@ class KCielo24IntegrationEngine implements KIntegrationCloserEngine
 		$callBackUrl = $data->callbackNotificationUrl;
 		KalturaLog::debug('callback is - ' . $callBackUrl);	
 	
-		$this->clientHelper = Cielo24Plugin::getClientHelper($providerData->username, $providerData->password);
+		$this->clientHelper = Cielo24Plugin::getClientHelper($providerData->username, $providerData->password, $providerData->baseUrl);
 		
 		//setting a pre-defined name to prevent the flavor-url to contain chars that will break the curl url syntax
 		$nameOptions = new KalturaFlavorAssetUrlOptions();
 		$nameOptions->fileName = self::GET_URL_FILE_NAME;	
 		$flavorUrl = KBatchBase::$kClient->flavorAsset->getUrl($flavorAssetId, null, null, $nameOptions);
 	
+		$jobName = $entryId."_".$spokenLanguage;
+		
 		$remoteJobId = $this->clientHelper->getRemoteFinishedJobId($entryId);
 		if (!$remoteJobId)
 		{
-			$uploadSuccess = $this->clientHelper->uploadMedia($flavorUrl, $entryId, $callBackUrl, $spokenLanguage, $priority, $fidelity);
+			$uploadSuccess = $this->clientHelper->uploadMedia($flavorUrl, $entryId, $callBackUrl, $spokenLanguage, $priority, $fidelity, $jobName);
 			if(!$uploadSuccess)
 				throw new Exception("upload failed");
 		}
 		elseif($shouldReplaceRemoteMedia == true)
 		{
 			$this->clientHelper->deleteRemoteFile($remoteJobId);
-			$uploadSuccess = $this->clientHelper->uploadMedia($flavorUrl, $entryId, $callBackUrl, $spokenLanguage, $priority, $fidelity);
+			$uploadSuccess = $this->clientHelper->uploadMedia($flavorUrl, $entryId, $callBackUrl, $spokenLanguage, $priority, $fidelity, $jobName);
 			if(!$uploadSuccess)
 				throw new Exception("upload failed");
 		}	

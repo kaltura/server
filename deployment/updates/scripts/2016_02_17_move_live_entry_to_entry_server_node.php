@@ -1,7 +1,8 @@
 <?php
 require_once (__DIR__ . '/../../bootstrap.php');
 
-CONST LIMIT = 500;
+CONST LIMIT = 1000;
+
 $updatedAtValue = '2000-01-01 00:00:00';
 
 //Script doesn't have to start at the beginning of time, just call it with the initial time you want.
@@ -10,52 +11,58 @@ if ($argc == 2)
 	$updatedAtValue = $argv[1];
 }
 
-$c = new Criteria();
+$c = new SphinxEntryCriteria();
+$c->addCondition(entryIndex::DYNAMIC_ATTRIBUTES . '.' . LiveEntry::IS_LIVE . ' = 1');
+$c->add(entryPeer::UPDATED_AT, $updatedAtValue, Criteria::GREATER_THAN);
 $c->add(entryPeer::TYPE, entryType::LIVE_STREAM);
-$c->addAscendingOrderByColumn(entryPeer::UPDATED_AT);
+$c->addOrderBy('updated_at');
 $c->setLimit(LIMIT);
 
-$liveEntries = array(1);
-while(!empty($liveEntries))
+$liveEntries = entryPeer::doSelect($c);
+foreach($liveEntries as $liveEntry)
 {
-	$c->add(entryPeer::UPDATED_AT, $updatedAtValue, Criteria::GREATER_THAN);
-	$liveEntries = entryPeer::doSelect($c);
-	foreach($liveEntries as $liveEntry)
+	/* @var $liveEntry LiveEntry */
+	$mediaServers = $liveEntry->getFromCustomData(null, LiveEntry::CUSTOM_DATA_NAMESPACE_MEDIA_SERVERS, array());
+	if(count($mediaServers))
 	{
-		
-		/**
-		 * @var LiveStreamEntry $liveEntry
-		 */
-		$mediaServerIds = array();
-		$mediaServers = $liveEntry->getDeprecatedMediaServers();
-		if(count($mediaServers))
+		foreach ($mediaServers as $key => $mediaServer)
 		{
-			foreach ($mediaServers as $key => $mediaServer)
+			if(!$mediaServer instanceof kLiveMediaServer)
+				continue;
+			
+			/* @var $mediaServer kLiveMediaServer */
+			$liveStatus = $liveEntry->getFromCustomData('live_status_'.$mediaServer->getIndex(), null, EntryServerNodeStatus::STOPPED);
+			if($liveStatus === EntryServerNodeStatus::STOPPED)
+				continue;
+			
+			$liveEntryServerNode = EntryServerNodePeer::retrieveByEntryIdAndServerType($liveEntry->getId(), $mediaServer->getIndex());
+			if($liveEntryServerNode)
 			{
-				$mediaServerIds[] = $mediaServer->getMediaServerId();
-				/**
-				 * @var kLiveMediaServer $mediaServer
-				 */
-				$liveEntryServerNode = new LiveEntryServerNode();
-				$liveEntryServerNode->setEntryId($liveEntry->getId());
-				$liveEntryServerNode->setServerNodeId($mediaServer->getMediaServerId());
-				$liveEntryServerNode->setPartnerId($liveEntry->getPartnerId());
-				$liveEntryServerNode->setStatus($liveEntry->getLiveStatus());
-				/* @var EntryServerNodeType $entryServerNodeType*/
-				$entryServerNodeType = EntryServerNodeType::LIVE_PRIMARY;
-				if ($mediaServer->getIndex() == 1)
+				if($liveEntryServerNode->getStatus() !== $liveStatus)
 				{
-					$entryServerNodeType = EntryServerNodeType::LIVE_BACKUP;
+					$liveEntryServerNode->setStatus($liveStatus);
+					$liveEntryServerNode->save();
 				}
-				$liveEntryServerNode->setServerType($entryServerNodeType);
-				$liveEntryServerNode->save();
-				KalturaLog::debug("entryId [".$liveEntryServerNode->getEntryId()."] server-node [".$liveEntryServerNode->getServerNodeId()."] server-type [".$liveEntryServerNode->getServerType()."] ");
+				
+				continue;
 			}
+			
+			$liveEntryServerNode = new LiveEntryServerNode();
+			$liveEntryServerNode->setStatus($liveStatus);
+			$liveEntryServerNode->setEntryId($liveEntry->getId());
+			$liveEntryServerNode->setPartnerId($liveEntry->getPartnerId());
+			
+			$liveEntryServerNode->setDc($mediaServer->getDc());
+			$liveEntryServerNode->setServerNodeId($mediaServer->getMediaServerId());
+			$liveEntryServerNode->setServerType($mediaServer->getIndex());
+			$liveEntryServerNode->save();
+			
+			KalturaLog::debug("entryId [".$liveEntryServerNode->getEntryId()."] server-node [".$liveEntryServerNode->getServerNodeId()."] server-type [".$liveEntryServerNode->getServerType()."] ");
 		}
-
 	}
-	$updatedAtValue = $liveEntry->getUpdatedAt();
 }
-KalturaLog::debug("last updated at was ".$updatedAtValue);
+
+if(count($liveEntries) === LIMIT && $liveEntry)
+	KalturaLog::warning("Live entries count equals script limit, please run script again with latest updated at value = ", $liveEntry->getUpdatedAt());
 
 ?>

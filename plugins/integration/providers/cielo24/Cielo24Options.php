@@ -14,9 +14,16 @@ class Cielo24Options
 	 */
 	public $password;
 	
-	function __construct($username, $password)
+	/**
+	 * cielo24 base url
+	 */
+        public $baseUrl;
+
+	function __construct($username, $password, $baseUrl = null)
 	{
 		$this->username = $username;
 		$this->password = $password;
+		if(isset($baseUrl))
+			$this->baseUrl = $baseUrl;
 	}
 }

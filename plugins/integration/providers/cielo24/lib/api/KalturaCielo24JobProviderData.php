@@ -46,6 +46,13 @@ class KalturaCielo24JobProviderData extends KalturaIntegrationJobProviderData
 	 * @readonly
 	 */
 	public $password;
+
+	/**
+	 * Base url for service provider
+	 * @var string
+	 * @readonly
+	 */
+	public $baseUrl;
 	
 	/**
 	 * Transcript content language
@@ -68,6 +75,7 @@ class KalturaCielo24JobProviderData extends KalturaIntegrationJobProviderData
 		"fidelity",
 		"username",
 		"password",
+		"baseUrl",
 		"spokenLanguage",
 		"replaceMediaContent",
 	);
@@ -117,6 +125,7 @@ class KalturaCielo24JobProviderData extends KalturaIntegrationJobProviderData
 		$cielo24OptionsObj = Cielo24Plugin::getPartnerCielo24Options($partnerId);
 		$object->setUsername($cielo24OptionsObj->username);
 		$object->setPassword($cielo24OptionsObj->password);
+		$object->setBaseUrl($cielo24OptionsObj->baseUrl);
 		
 		if(!$object->getFlavorAssetId())
 		{

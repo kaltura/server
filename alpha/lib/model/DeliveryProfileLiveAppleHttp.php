@@ -218,7 +218,7 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 			$this->liveStreamConfig->setBackupUrl(null);
 		}
 				
-		if((!$this->liveStreamConfig->getBackupUrl() && !$this->getForceProxy()) || $this->params->getUsePlayServer() || $this->liveStreamConfig->getIsExternalStream()) {
+		if(!$this->getForceProxy() || $this->params->getUsePlayServer() || $this->liveStreamConfig->getIsExternalStream()) {
 			return parent::buildServeFlavors();
 		}
 				
@@ -245,7 +245,7 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 	public function getRenderer($flavors)
 	{
 		$this->DEFAULT_RENDERER_CLASS = 'kM3U8ManifestRenderer';
-		if((!$this->liveStreamConfig->getBackupUrl() && !$this->getForceProxy()) || $this->params->getUsePlayServer() || $this->liveStreamConfig->getIsExternalStream()) {
+		if(!$this->getForceProxy() || $this->params->getUsePlayServer() || $this->liveStreamConfig->getIsExternalStream()) {
 			$this->DEFAULT_RENDERER_CLASS = 'kRedirectManifestRenderer';
 		}
 		$renderer = parent::getRenderer($flavors);

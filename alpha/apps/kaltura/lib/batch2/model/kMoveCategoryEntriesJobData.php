@@ -92,14 +92,6 @@ class kMoveCategoryEntriesJobData extends kJobData
 	}
 
 	/**
-	 * @param bool $copyOnly
-	 */
-	public function setCopyOnly($copyOnly)
-	{
-		$this->copyOnly = $copyOnly;
-	}
-	
-	/**
 	 * @return the $destCategoryFullIds
 	 */
 	public function getDestCategoryFullIds() {

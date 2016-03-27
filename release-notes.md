@@ -13,8 +13,48 @@
 	
 	Create new tables:
 		mysql -ukaltura -p -P3306 kaltura < deployment/updates/sql/2016_03_17_create_schedule_tables.sql
-		
 
+#### Known Issues & Limitations ####
+- None.
+
+## fix baseEntryFilter->referenceIdEqueal,referenceIdIn ##
+- Issue Type: Bug
+- Issue ID: SUP-6162
+
+#### Configuration ####
+- None.
+
+#### Deployment Scripts ####
+- Repopulate sphinx entries
+
+#### Known Issues & Limitations ####
+- None.
+
+## Allow media server partner to list live entries ##
+- Issue Type: Task
+- Issue ID: PLAT-5268
+
+#### Configuration ####
+- None.
+
+#### Deployment Scripts ####
+	Update permissions: 
+		php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2016_03_22_media_server_live_stream_list.php
+	
+#### Known Issues & Limitations ####
+- None.
+
+## update permission CONTENT_INGEST_UPLOAD in service.document.documents ##
+- Issue Type: Task
+- Issue ID: PLAT-5199
+- 
+#### Configuration ####
+- None.
+
+#### Deployment Scripts ####
+	Update permissions: 
+		php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2013_03_24_update_content_docs_action.php
+	
 #### Known Issues & Limitations ####
 - None.
 
@@ -30,7 +70,7 @@
 		php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2016_02_10_entry_server_node_service.php
 	
 	Create new entry_server_node table:
-		mysql -h@db_host@ -u@db_user@ -p@db_pass@ -P3306 kaltura < /opt/kaltura/app/deployment/updates/scripts/add_permissions/2016_02_10_entry_server_node_service.php
+		mysql -h@db_host@ -u@db_user@ -p@db_pass@ -P3306 kaltura < /opt/kaltura/app/deployment/updates/sql/2016_02_10_create_entry_server_node_table.sql
 		
 	Import all live entries to the new table:
 		php /opt/kaltura/app/deployment/updates/scripts/2016_02_17_move_live_entry_to_entry_server_node.php
@@ -92,6 +132,17 @@ None.
 #### Deployment scripts ####
  - php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2016_02_29_batch_cue_point.php
 
+## Avoid API caching of anonymous users base on widget role unless found in blacklist ##
+ - Issue Type:bug\feature
+ - Issue ID : PLAT-5226
+### Installation ###
+None.
+### Configuration ###
+Need to add PLAYBACK_BASE_ROLE to section anonymous_roles_to_cache
+#### Known Issues & Limitations ####
+ - None
+#### Deployment scripts ####
+ - php deployment/updates/scripts/add_permissions/2016_02_11_add_qna_user_role_and_permissions.php
 
 # Kajam-11.10.0 #
 

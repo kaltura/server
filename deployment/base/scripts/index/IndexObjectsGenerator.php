@@ -134,6 +134,8 @@ class IndexObjectsGenerator extends IndexGeneratorBase
 				$type = "IIndexable::FIELD_TYPE_STRING";
 				break;
 			case "int":
+				$type = "IIndexable::FIELD_TYPE_UINT";
+				break;				
 			case "bint":
 				$type = "IIndexable::FIELD_TYPE_INTEGER";
 				break;

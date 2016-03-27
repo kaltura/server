@@ -6,6 +6,7 @@
 class SphinxCriterion extends KalturaCriterion implements IKalturaIndexQuery
 {
 	const MAX_IN_VALUES = 150;
+	const MAX_UINT_VAL = 4294967296;
 	const SPHINX_OR = '| ';
 	const SPHINX_AND = '';
 	
@@ -355,6 +356,36 @@ class SphinxCriterion extends KalturaCriterion implements IKalturaIndexQuery
 			$this->criteria->setIds($comparison, $ids);
 		}
 		
+		if($objectClass::getFieldType($sphinxField, true) == IIndexable::FIELD_TYPE_UINT)
+		{
+			switch (gettype($value))
+			{
+				case 'int':
+					if($value < 0)
+					$value = self::MAX_UINT_VAL + $value;
+					break;
+				case 'string':
+					$value = explode(",", $value);
+				case 'array':
+					if(count($value) == 1 && isset($value[0]))
+					{
+						$value = (int)$value[0];
+						if($value < 0)
+							$value = self::MAX_UINT_VAL + $value;
+						$value = (string)$value;
+					}
+					else
+					{
+						foreach($value as $index => $arrVal)
+						{
+							if($arrVal < 0)
+								$value[$index] = self::MAX_UINT_VAL + $arrVal;
+						}
+					}
+					break;
+			}
+		}
+	
 		$valStr = print_r($value, true);
 		KalturaLog::debug("Attach criterion[$field] as sphinx field[$sphinxField] of type [$type] and comparison[$comparison] for value[$valStr]");
 		

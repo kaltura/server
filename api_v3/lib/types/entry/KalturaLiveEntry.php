@@ -94,7 +94,7 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 	public $recordingOptions;
 
 	/**
-	 * the status of the entry of type LiveEntryStatus
+	 * the status of the entry of type EntryServerNodeStatus
 	 * @var KalturaEntryServerNodeStatus
 	 * @readonly
 	 * @deprecated use KalturaLiveStreamService.isLive instead
@@ -206,7 +206,7 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 		
 		/* @var $sourceObject LiveEntry */
 		$getter = "get" . ucfirst($attr);
-		if($sourceObject->$getter() !== $this->$attr && $sourceObject->getLiveStatus() !== KalturaLiveEntryStatus::STOPPED)
+		if($sourceObject->$getter() !== $this->$attr && $sourceObject->getLiveStatus() !== KalturaEntryServerNodeStatus::STOPPED)
 		{
 			throw new KalturaAPIException(KalturaErrors::CANNOT_UPDATE_FIELDS_WHILE_ENTRY_BROADCASTING, $attr);
 		}
@@ -260,7 +260,7 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 		
 		if($hasObjectChanged)
 		{
-			if( $sourceObject->getLiveStatus() !== KalturaLiveEntryStatus::STOPPED)
+			if( $sourceObject->getLiveStatus() !== KalturaEntryServerNodeStatus::STOPPED)
 				throw new KalturaAPIException(KalturaErrors::CANNOT_UPDATE_FIELDS_WHILE_ENTRY_BROADCASTING, "recordingOptions");
 			
 			$this->validateRecordingDone($sourceObject, "recordingOptions");

@@ -45,12 +45,6 @@ class KalturaMoveCategoryEntriesJobData extends KalturaJobData
     public $moveFromChildren;
     
     /**
-     * Entries won't be deleted from the source entry
-     * @var bool
-     */
-    public $copyOnly;
-	
-    /**
      * Destination categories fallback ids
      * @var string
      */
@@ -64,7 +58,6 @@ class KalturaMoveCategoryEntriesJobData extends KalturaJobData
 	    'lastMovedCategoryPageIndex',
 	    'lastMovedCategoryEntryPageIndex',
 	    'moveFromChildren',
-	    'copyOnly',
 		'destCategoryFullIds',
 	);
 
