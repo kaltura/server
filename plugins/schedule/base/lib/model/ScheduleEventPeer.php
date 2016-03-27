@@ -87,8 +87,54 @@ class ScheduleEventPeer extends BaseScheduleEventPeer implements IRelatedObjectP
 		{
 			$criteria->add(ScheduleEventPeer::ORIGINAL_START_DATE, $exceptForDates, Criteria::NOT_IN);
 		}
+
+		ScheduleEventPeer::doDelete($criteria);
 		
-		$scheduleEvents = ScheduleEventPeer::doDelete($criteria);
+		CuePointPeer::setUseKQueryCache(false);
+		ScheduleEventPeer::setUseCriteriaFilter(false);
+		$scheduleEvents = ScheduleEventPeer::doSelect($criteria);
+		ScheduleEventPeer::setUseCriteriaFilter(true);
+		CuePointPeer::setUseKQueryCache(true);
+
+		foreach($scheduleEvents as $scheduleEvent)
+		{
+			/* @var $scheduleEvent ScheduleEvent */
+			$scheduleEvent->indexToSearchIndex();
+		}
+	}
+	
+	/**
+	 * Updates the status of all occurrences to cancelled
+	 * @param int $parentId
+	 * @param array $exceptForDates
+	 */
+	public static function cancelByParentId($parentId, array $exceptForDates = null)
+	{
+		$criteria = new Criteria();
+		$criteria->add(ScheduleEventPeer::PARENT_ID, $parentId);
+		$criteria->add(ScheduleEventPeer::RECURANCE_TYPE, ScheduleEventRecuranceType::RECURRENCE);
+		$criteria->add(ScheduleEventPeer::START_DATE, kApiCache::getTime(), Criteria::GREATER_THAN);
+
+		if($exceptForDates)
+		{
+			$criteria->add(ScheduleEventPeer::ORIGINAL_START_DATE, $exceptForDates, Criteria::NOT_IN);
+		}
+		
+		$update = new Criteria();
+		$update->add(ScheduleEventPeer::STATUS, ScheduleEventStatus::CANCELLED);
+		$update->add(ScheduleEventPeer::UPDATED_AT, time());
+		
+		$con = Propel::getConnection(ScheduleEventPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
+		BasePeer::doUpdate($criteria, $update, $con);
+
+		CuePointPeer::setUseKQueryCache(false);
+		$scheduleEvents = ScheduleEventPeer::doSelect($criteria);
+		CuePointPeer::setUseKQueryCache(true);
+		foreach($scheduleEvents as $scheduleEvent)
+		{
+			/* @var $scheduleEvent ScheduleEvent */
+			$scheduleEvent->indexToSearchIndex();
+		}
 	}
 	
 	/**

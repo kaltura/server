@@ -88,7 +88,6 @@ class ScheduleEventService extends KalturaBaseService
 		}
 		
 		$dbScheduleEvent = $scheduleEvent->toUpdatableObject($dbScheduleEvent);
-		$dbScheduleEvent->incrementSequence();
 		/* @var $dbScheduleEvent ScheduleEvent */
 		$dbScheduleEvent->save();
 		
@@ -121,6 +120,37 @@ class ScheduleEventService extends KalturaBaseService
 		}
 		
 		$dbScheduleEvent->setStatus(ScheduleEventStatus::DELETED);
+		$dbScheduleEvent->save();
+		
+		if($dbScheduleEvent->getRecuranceType() == ScheduleEventRecuranceType::RECURRING)
+		{
+			ScheduleEventPeer::deleteByParentId($scheduleEventId);
+		}
+		
+		$scheduleEvent = KalturaScheduleEvent::getInstance($dbScheduleEvent, $this->getResponseProfile());
+		$scheduleEvent->fromObject($dbScheduleEvent, $this->getResponseProfile());
+		
+		return $scheduleEvent;
+	}
+	
+	/**
+	 * Mark the KalturaScheduleEvent object as cancelled
+	 * 
+	 * @action cancel
+	 * @param int $scheduleEventId 
+	 * @return KalturaScheduleEvent
+	 *
+	 * @throws KalturaErrors::INVALID_OBJECT_ID
+	 */
+	public function cancelAction($scheduleEventId)
+	{
+		$dbScheduleEvent = ScheduleEventPeer::retrieveByPK($scheduleEventId);
+		if(!$dbScheduleEvent)
+		{
+			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $scheduleEventId);
+		}
+		
+		$dbScheduleEvent->setStatus(ScheduleEventStatus::CANCELLED);
 		$dbScheduleEvent->save();
 		
 		if($dbScheduleEvent->getRecuranceType() == ScheduleEventRecuranceType::RECURRING)
