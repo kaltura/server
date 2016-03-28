@@ -130,6 +130,21 @@ class playManifestAction extends kalturaAction
 		return $calcToken == $urlToken;
 	}
 
+	protected function addAudioOnlyFlavors()
+	{
+		$extraFlavors = assetPeer::retrieveReadyByEntryIdAndTag($this->entryId, "audio_only");
+		foreach ($extraFlavors as $extraFlavor)
+		{
+			/**
+			 * @var asset $extraFlavor
+			 */
+			if (!in_array($extraFlavor->getId(), $this->flavorIds))
+			{
+				$this->flavorIds[] = $extraFlavor->getId();
+			}
+		}
+	}
+
 	/**
 	 * @param array $params
 	 * @return array
@@ -267,8 +282,13 @@ class playManifestAction extends kalturaAction
 			$this->flavorIds = array($flavorId);
 						
 		if (!is_null($this->flavorIds))
+		{
+			if ($this->deliveryAttributes->getFormat() == PlaybackProtocol::APPLE_HTTP)
+			{
+				$this->addAudioOnlyFlavors();
+			}
 			return;
-
+		}
 		$flavorParamIds = $this->getRequestParameter ( "flavorParamIds", null );
 		if (!is_null($flavorParamIds))
 			$this->flavorParamsIds = explode(',', $flavorParamIds);
@@ -285,8 +305,12 @@ class playManifestAction extends kalturaAction
 		
 		if(is_null($this->flavorParamsIds))
 			return;
-			
-		$this->flavorIds = assetPeer::retrieveReadyFlavorsIdsByEntryId($this->entryId, $this->flavorParamsIds);
+
+		if ($this->deliveryAttributes->getFormat() == PlaybackProtocol::APPLE_HTTP)
+		{
+			$this->flavorIds = assetPeer::retrieveReadyFlavorsIdsByEntryId($this->entryId, $this->flavorParamsIds);
+		}
+		$this->addAudioOnlyFlavors();
 	}
 	
 	protected function initFlavorParamsIds()
