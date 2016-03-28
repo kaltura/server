@@ -97,7 +97,7 @@ class KAsyncConvertLiveSegment extends KJobHandlerWorker
 		$mediaInfoBin = isset(KBatchBase::$taskConfig->params->mediaInfoCmd)? KBatchBase::$taskConfig->params->mediaInfoCmd: "mediainfo";
 
 		// only extract the data if it's the primary server since we don't use this data in the secondary
-		if ($data->mediaServerIndex == KalturaMediaServerIndex::PRIMARY) {
+		if ($data->mediaServerIndex == KalturaEntryServerNodeType::LIVE_PRIMARY) {
 			try {
 
 				// get the asset to check if it has a assetParams::TAG_RECORDING_ANCHOR tag.

@@ -71,4 +71,13 @@ class categoryKuserFilter extends baseObjectFilter
 	{
 		$this->set('_eq_user_id', $v);
 	}
+
+	public function setFullIdsStartsWith($v)
+	{
+		$this->set('_likex_category_full_ids', $v);
+	}
+
+
+
+
 }

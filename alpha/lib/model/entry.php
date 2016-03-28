@@ -2647,6 +2647,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 				$flavorParamIdsArray[] = $flavorAsset->getFlavorParamsId();
 			}
 			asort($flavorParamIdsArray);
+			$flavorParamIdsArray = array_unique($flavorParamIdsArray);
 			$flavorParamIds = implode(",", $flavorParamIdsArray);
 			$this->setFlavorParamsIds($flavorParamIds);
 		}
@@ -3497,5 +3498,13 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 		}
 		return $shouldClone;
 	}
-	
+
+	public function getReferenceIdWithMd5()
+	{
+		$refId = $this->getReferenceID();
+		if ( $refId != null )
+			$refId .= " " . md5(trim($refId));
+
+		return $refId;
+	}
 }

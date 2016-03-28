@@ -62,7 +62,6 @@ class CaptionAssetItemIndex extends BaseIndexObject
 				'created_at' => 'createdAt',
 				'updated_at' => 'updatedAt',
 				'str_entry_id' => 'entryId',
-				'str_caption_asset_id' => 'id',
 			);
 		}
 		return self::$fieldsMap;
@@ -83,19 +82,18 @@ class CaptionAssetItemIndex extends BaseIndexObject
 				'language' => IIndexable::FIELD_TYPE_STRING,
 				'label' => IIndexable::FIELD_TYPE_STRING,
 				'format' => IIndexable::FIELD_TYPE_STRING,
-				'int_id' => IIndexable::FIELD_TYPE_INTEGER,
-				'caption_params_id' => IIndexable::FIELD_TYPE_INTEGER,
+				'int_id' => IIndexable::FIELD_TYPE_UINT,
+				'caption_params_id' => IIndexable::FIELD_TYPE_UINT,
 				'partner_id' => IIndexable::FIELD_TYPE_INTEGER,
-				'version' => IIndexable::FIELD_TYPE_INTEGER,
+				'version' => IIndexable::FIELD_TYPE_UINT,
 				'caption_asset_status' => IIndexable::FIELD_TYPE_INTEGER,
-				'size' => IIndexable::FIELD_TYPE_INTEGER,
-				'is_default' => IIndexable::FIELD_TYPE_INTEGER,
-				'start_time' => IIndexable::FIELD_TYPE_INTEGER,
-				'end_time' => IIndexable::FIELD_TYPE_INTEGER,
+				'size' => IIndexable::FIELD_TYPE_UINT,
+				'is_default' => IIndexable::FIELD_TYPE_UINT,
+				'start_time' => IIndexable::FIELD_TYPE_UINT,
+				'end_time' => IIndexable::FIELD_TYPE_UINT,
 				'created_at' => IIndexable::FIELD_TYPE_DATETIME,
 				'updated_at' => IIndexable::FIELD_TYPE_DATETIME,
 				'str_entry_id' => IIndexable::FIELD_TYPE_STRING,
-				'str_caption_asset_id' => IIndexable::FIELD_TYPE_STRING,
 			);
 		}
 		return self::$typesMap;
@@ -140,7 +138,6 @@ class CaptionAssetItemIndex extends BaseIndexObject
 				'caption_asset_item.CREATED_AT' => 'created_at',
 				'caption_asset_item.UPDATED_AT' => 'updated_at',
 				'caption_asset_item.STR_ENTRY_ID' => 'str_entry_id',
-				'caption_asset_item.STR_CAPTION_ASSET_ID' => 'str_caption_asset_id',
 			);
 		}
 		return self::$searchableFieldsMap;

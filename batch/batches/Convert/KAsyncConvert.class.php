@@ -178,7 +178,7 @@ class KAsyncConvert extends KJobHandlerWorker
 				if(!file_exists($srcFileSyncDescriptor->actualFileSyncLocalPath))
 					return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::NFS_FILE_DOESNT_EXIST, "Source file $srcFileSyncDescriptor->actualFileSyncLocalPath does not exist", KalturaBatchJobStatus::RETRY);
 				
-				if(!is_file($srcFileSyncDescriptor->actualFileSyncLocalPath))
+				if(!self::$taskConfig->params->skipSourceValidation && !is_file($srcFileSyncDescriptor->actualFileSyncLocalPath))
 					return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::NFS_FILE_DOESNT_EXIST, "Source file $srcFileSyncDescriptor->actualFileSyncLocalPath is not a file", KalturaBatchJobStatus::FAILED);
 			}
 			

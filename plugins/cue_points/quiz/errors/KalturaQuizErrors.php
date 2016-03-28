@@ -15,4 +15,5 @@ class KalturaQuizErrors extends KalturaErrors
 	const ENTRY_ID_NOT_GIVEN = 'ENTRY_ID_NOT_GIVEN; No entry id given';
 	const NO_SUCH_FILE_TYPE = 'NO_SUCH_FILE_TYPE; Document cannot be provided. No such file type';
 	const QUIZ_CANNOT_BE_DOWNLOAD = 'QUIZ_CANNOT_BE_DOWNLOAD; Quiz cannot be download';
+	const QUIZ_USER_ENTRY_ALREADY_EXISTS = 'QUIZ_USER_ENTRY_ALREADY_EXISTS;ENTRY_ID;A quiz user-entry for the given user-id and entry-id [@ENTRY_ID@] already exists, cannot create duplicate';
 }

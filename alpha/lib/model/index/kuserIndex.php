@@ -85,8 +85,8 @@ class kuserIndex extends BaseIndexObject
 		if (!self::$typesMap)
 		{
 			self::$typesMap = array(
-				'login_data_id' => IIndexable::FIELD_TYPE_INTEGER,
-				'is_admin' => IIndexable::FIELD_TYPE_INTEGER,
+				'login_data_id' => IIndexable::FIELD_TYPE_UINT,
+				'is_admin' => IIndexable::FIELD_TYPE_UINT,
 				'screen_name' => IIndexable::FIELD_TYPE_STRING,
 				'full_name' => IIndexable::FIELD_TYPE_STRING,
 				'first_name' => IIndexable::FIELD_TYPE_STRING,
@@ -94,9 +94,9 @@ class kuserIndex extends BaseIndexObject
 				'email' => IIndexable::FIELD_TYPE_STRING,
 				'about_me' => IIndexable::FIELD_TYPE_STRING,
 				'tags' => IIndexable::FIELD_TYPE_STRING,
-				'entries' => IIndexable::FIELD_TYPE_INTEGER,
-				'storage_size' => IIndexable::FIELD_TYPE_INTEGER,
-				'kuser_status' => IIndexable::FIELD_TYPE_INTEGER,
+				'entries' => IIndexable::FIELD_TYPE_UINT,
+				'storage_size' => IIndexable::FIELD_TYPE_UINT,
+				'kuser_status' => IIndexable::FIELD_TYPE_UINT,
 				'created_at' => IIndexable::FIELD_TYPE_DATETIME,
 				'updated_at' => IIndexable::FIELD_TYPE_DATETIME,
 				'partner_id' => IIndexable::FIELD_TYPE_INTEGER,
@@ -109,7 +109,7 @@ class kuserIndex extends BaseIndexObject
 				'role_ids' => IIndexable::FIELD_TYPE_STRING,
 				'dynamic_attributes' => IIndexable::FIELD_TYPE_JSON,
 				'plugins_data' => IIndexable::FIELD_TYPE_STRING,
-				'type' => IIndexable::FIELD_TYPE_INTEGER,
+				'type' => IIndexable::FIELD_TYPE_UINT,
 			);
 		}
 		return self::$typesMap;

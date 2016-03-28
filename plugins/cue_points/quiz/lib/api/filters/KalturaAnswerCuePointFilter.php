@@ -20,7 +20,7 @@ class KalturaAnswerCuePointFilter extends KalturaAnswerCuePointBaseFilter
 	{
 		if ($this->quizUserEntryIdIn || $this->quizUserEntryIdEqual)
 		{
-			CuePointPeer::setShowOnlyPublic(false);
+			KalturaCriterion::disableTag(KalturaCriterion::TAG_WIDGET_SESSION);
 		}
 		return parent::getTypeListResponse($pager, $responseProfile, QuizPlugin::getCoreValue('CuePointType',QuizCuePointType::QUIZ_ANSWER));
 	}

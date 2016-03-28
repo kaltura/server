@@ -1,3 +1,132 @@
+# Kajam-11.11.0 #
+
+## fix baseEntryFilter->referenceIdEqueal,referenceIdIn ##
+- Issue Type: Bug
+- Issue ID: SUP-6162
+
+#### Configuration ####
+- None.
+
+#### Deployment Scripts ####
+- Repopulate sphinx entries
+
+#### Known Issues & Limitations ####
+- None.
+
+## Allow media servre partner to list live entries ##
+- Issue Type: Task
+- Issue ID: PLAT-5268
+
+#### Configuration ####
+- None.
+
+#### Deployment Scripts ####
+	Update permissions: 
+		php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2016_03_22_media_server_live_stream_list.php
+	
+#### Known Issues & Limitations ####
+- None.
+
+## update permission CONTENT_INGEST_UPLOAD in service.document.documents ##
+- Issue Type: Task
+- Issue ID: PLAT-5199
+- 
+#### Configuration ####
+- None.
+
+#### Deployment Scripts ####
+	Update permissions: 
+		php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2013_03_24_update_content_docs_action.php
+	
+#### Known Issues & Limitations ####
+- None.
+
+## new entry--server_node relations model ##
+- Issue Type: Feature Request
+- Issue ID: PLAT-5018
+
+#### Configuration ####
+- None.
+
+#### Deployment Scripts ####
+	Update permissions: 
+		php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2016_02_10_entry_server_node_service.php
+	
+	Create new entry_server_node table:
+		mysql -h@db_host@ -u@db_user@ -p@db_pass@ -P3306 kaltura < /opt/kaltura/app/deployment/updates/sql/2016_02_10_create_entry_server_node_table.sql
+		
+	Import all live entries to the new table:
+		php /opt/kaltura/app/deployment/updates/scripts/2016_02_17_move_live_entry_to_entry_server_node.php
+
+#### Known Issues & Limitations ####
+- None.
+
+##Added thumb cue points generator operator on flavor params##
+- Issue Type: Feature Request
+- Issue ID: PLAT-4991
+
+#### Configuration ####
+	In order to use, requires adding a new "document.thumbAssets" operator to ppt2img flavor params.
+	Operators field should look like this:
+	[[{"id":"document.ppt2Img","extra":null,"command":null},{"id":"document.thumbAssets","extra":null,"command":null}]]
+
+	Requires adding a new worker to batch.ini:
+	- enabledWorkers.KAsyncConvertThumbAssetsGenerator = 1
+
+	- [KAsyncConvertThumbAssetsGenerator : KAsyncConvertWorker]
+	  id                                      = XXXX
+	  friendlyName                            = Convert Thumb Assets
+	  maximumExecutionTime                    = 36000
+	  maxJobsEachRun                          = 1
+	  filter.jobSubTypeIn                     = document.thumbAssets
+	  params.skipSourceValidation             = 1
+
+#### Deployment Scripts ####
+- php deployment/base/scripts/installPlugins.php
+
+#### Known Issues & Limitations ####
+- None.
+
+
+## Clear live entry old cue-points ##
+ - Issue Type: Bug
+ - Issue ID: PLAT-5161
+ 
+### Installation ###
+None.
+ 
+### Configuration ###
+		Added the following to batch.ini file:
+		- enabledWorkers.KAsyncClearCuePoints = 1
+		
+		- [KAsyncClearCuePoints : PeriodicWorker]
+		  id = LAST_USED_ID + 10
+		  friendlyName = Clear old cue points from live entry
+		  type = KAsyncClearCuePoints
+		  scriptPath = ../plugins/cue_points/base/batch/clearCuePonts/KAsyncClearCuePointsExe.php
+		  filter.KalturaCuePointFilter.cuePointTypeIn = "thumbCuePoint.Thumb,adCuePoint.Ad,codeCuePoint.Code"
+		  filter.KalturaCuePointFilter.orderBy = "+createdAt"
+		  filter.KalturaCuePointFilter.createdAtLessThanOrEqual = "-86400"
+		  filter.KalturaCuePointFilter.statusEqual = 1
+
+#### Known Issues & Limitations ####
+- None.
+
+#### Deployment scripts ####
+ - php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2016_02_29_batch_cue_point.php
+
+## Avoid API caching of anonymous users base on widget role unless found in blacklist ##
+ - Issue Type:bug\feature
+ - Issue ID : PLAT-5226
+### Installation ###
+None.
+### Configuration ###
+Need to add PLAYBACK_BASE_ROLE to section anonymous_roles_to_cache
+#### Known Issues & Limitations ####
+ - None
+#### Deployment scripts ####
+ - php deployment/updates/scripts/add_permissions/2016_02_11_add_qna_user_role_and_permissions.php
+
 # Kajam-11.10.0 #
 
 ## Add Fairplay DRM Profile ##

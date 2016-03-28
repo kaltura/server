@@ -39,4 +39,34 @@ class KalturaQuizUserEntry extends KalturaUserEntry{
 		return parent::toObject($object_to_fill, $props_to_skip);
 	}
 
+	/* (non-PHPdoc)
+	 * @see KalturaObject::toInsertableObject()
+	 */
+	public function toInsertableObject ( $object_to_fill = null , $props_to_skip = array() )
+	{
+		$object_to_fill = parent::toInsertableObject($object_to_fill, $props_to_skip);
+		$isAnonymous = false;
+		$anonKusers = kuserPeer::getKuserByPartnerAndUids(kCurrentContext::getCurrentPartnerId(), array('', 0));
+		foreach ($anonKusers as $anonKuser)
+		{
+			if ($anonKuser->getKuserId() == $object_to_fill->getKuserId())
+			{
+				$isAnonymous = true;
+			}
+		}
+		if (!$isAnonymous)
+		{
+			$c = new Criteria();
+			$c->add(UserEntryPeer::KUSER_ID, $object_to_fill->getKuserId());
+			$c->add(UserEntryPeer::ENTRY_ID, $this->entryId);
+			$c->add(UserEntryPeer::TYPE, QuizPlugin::getCoreValue('UserEntryType', QuizUserEntryType::QUIZ));
+			$userEntry = UserEntryPeer::doSelect($c);
+			if (count($userEntry) > 0)
+			{
+				throw new KalturaAPIException(KalturaQuizErrors::QUIZ_USER_ENTRY_ALREADY_EXISTS, $this->entryId);
+			}
+		}
+		return $object_to_fill;
+	}
+
 }

@@ -67,7 +67,6 @@ class CaptionSphinxPlugin extends KalturaPlugin implements IKalturaPending, IKal
 			'updated_at' => SphinxFieldType::RT_ATTR_TIMESTAMP,
 			
 			'str_entry_id' => SphinxFieldType::RT_ATTR_STRING,
-			'str_caption_asset_id' => SphinxFieldType::RT_ATTR_STRING,
 		);
 	}
 	

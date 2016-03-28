@@ -79,8 +79,11 @@ abstract class BaseIndexObject
 	 * Returns the field type by name
 	 * @param string $fieldName
 	 */
-	public static function getFieldType($fieldName) {
+	public static function getFieldType($fieldName, $returnDetailedType = false) {
 		$fieldTypes = static::getIndexFieldTypesMap();
+		if(!$returnDetailedType && $fieldTypes[$fieldName] == IIndexable::FIELD_TYPE_UINT)
+			return IIndexable::FIELD_TYPE_INTEGER;
+		
 		return $fieldTypes[$fieldName];
 	}
 	

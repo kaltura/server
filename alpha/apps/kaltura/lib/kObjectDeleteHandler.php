@@ -128,6 +128,8 @@ class kObjectDeleteHandler implements kObjectDeletedEventConsumer
 			$flavorParamsOutput->save();
 		}
 		
+		EntryServerNodePeer::deleteByEntryId($entry->getId());
+		
 		$filter = new categoryEntryFilter();
 		$filter->setEntryIdEqual($entry->getId());
 		

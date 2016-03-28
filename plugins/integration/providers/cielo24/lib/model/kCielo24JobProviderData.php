@@ -41,6 +41,11 @@ class kCielo24JobProviderData extends kIntegrationJobProviderData
 	 * @var string
 	 */
 	private $password;
+
+	/**
+	 * @var string
+	 */
+	private $baseUrl;
 	
 	/**
 	 * @var string
@@ -164,7 +169,23 @@ class kCielo24JobProviderData extends kIntegrationJobProviderData
 	{
 		$this->password = $password;
 	}
+
+	/**
+	 * @return string
+	 */
+	public function getBaseUrl()
+	{
+		return $this->baseUrl;
+	}
 	
+	/**
+         * @param string $baseUrl
+         */
+        public function setBaseUrl($baseUrl)
+        {
+                $this->baseUrl = $baseUrl;
+        }
+
 	/**
 	 * @return string
 	 */

@@ -460,7 +460,6 @@ index kaltura_caption_item:kaltura_base
 	rt_attr_timestamp = created_at
 	rt_attr_timestamp = updated_at
 	rt_attr_string = str_entry_id
-	rt_attr_string = str_caption_asset_id
 }
 
 index kaltura_tag:kaltura_kuser_base
