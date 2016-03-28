@@ -669,17 +669,29 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 
 	public static function postProcessCuePoints( $liveEntry, $cuePointsIds = null )
 	{
+		if(!$cuePointsIds)
+		{
+			$cuePointsIds = array();
+			
+			$c = new Criteria();
+			$c->add(CuePointPeer::ENTRY_ID, $liveEntry->getId());
+			$c->add(CuePointPeer::STATUS, CuePointStatus::READY);
+			$cuePoints = CuePointPeer::doSelect($c);
+			foreach($cuePoints as $cuePoint)
+			{
+				/* @var $cuePoint CuePoint */
+				$cuePointsIds[] = $cuePoint->getId();
+			}
+		}
+		
+		if(!is_array($cuePointsIds) || !count($cuePointsIds))
+		{
+			KalturaLog::debug("No cue point to post process for entry [" . $liveEntry->getId() . "]");
+			return;
+		}
+		
 		$selectCriteria = new Criteria();
-		if ( $cuePointsIds )
-		{
-			$selectCriteria->add(CuePointPeer::ID, $cuePointsIds, Criteria::IN);
-		}
-		else
-		{
-			/* @var $liveEntry LiveEntry */
-			$selectCriteria->add(CuePointPeer::ENTRY_ID, $liveEntry->getId());
-			$selectCriteria->add(CuePointPeer::STATUS, CuePointStatus::READY);
-		}
+		$selectCriteria->add(CuePointPeer::ID, $cuePointsIds, Criteria::IN);
 		
 		$updatedAtTime = time();
 		$updateCriteria = new Criteria();
