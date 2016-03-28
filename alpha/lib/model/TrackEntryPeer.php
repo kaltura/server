@@ -10,6 +10,8 @@
  */ 
 class TrackEntryPeer extends BaseTrackEntryPeer implements IRelatedObjectPeer
 {
+	const PEER_GET_LIMIT = 30;
+	
 	/* (non-PHPdoc)
 	 * @see IRelatedObjectPeer::getRootObjects()
 	 */

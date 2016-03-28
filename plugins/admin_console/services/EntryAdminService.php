@@ -84,6 +84,8 @@ class EntryAdminService extends KalturaBaseService
 	{
 		$c = new Criteria();
 		$c->add(TrackEntryPeer::ENTRY_ID, $entryId);
+		$c->setLimit(TrackEntryPeer::PEER_GET_LIMIT);
+		$c->addAscendingOrderByColumn(TrackEntryPeer::CREATED_AT);
 		
 		$dbList = TrackEntryPeer::doSelect($c);
 		
