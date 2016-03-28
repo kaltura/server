@@ -80,10 +80,11 @@ class PartnerPeer extends BasePartnerPeer
 	
 	public static function retrieveActiveByPK($pk)
 	{
-		$c = new Criteria();
-		$c->add(PartnerPeer::ID, $pk);
-		$c->add(PartnerPeer::STATUS, Partner::PARTNER_STATUS_ACTIVE);
+		$partner = PartnerPeer::retrieveByPK($pk);
 		
-		return PartnerPeer::doSelectOne($c);
+		if(!$partner || $partner->getState() !== Partner::PARTNER_STATUS_ACTIVE)
+			return null;
+		
+		return $partner;
 	}
 }
