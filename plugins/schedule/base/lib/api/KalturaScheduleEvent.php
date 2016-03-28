@@ -128,13 +128,6 @@ abstract class KalturaScheduleEvent extends KalturaObject implements IRelatedFil
 	public $duration;
 
 	/**
-	 * Comma separated categories ids.
-	 * @var string
-	 * @filter matchand, matchor
-	 */
-	public $categoriesIds;
-
-	/**
 	 * Used to represent contact information or alternately a reference to contact information.
 	 * @var string
 	 */
@@ -196,7 +189,6 @@ abstract class KalturaScheduleEvent extends KalturaObject implements IRelatedFil
 		'sequence',
 		'recuranceType',
 		'duration',
-		'categoriesIds',
 		'contact',
 		'comment',
 		'tags',
@@ -351,33 +343,34 @@ abstract class KalturaScheduleEvent extends KalturaObject implements IRelatedFil
 		
 		parent::doFromObject($srcObj, $responseProfile);
 	}
-	
-	/* (non-PHPdoc)
+		
+	/*
+	 * (non-PHPdoc)
 	 * @see IApiObjectFactory::getInstance($sourceObject, KalturaDetachedResponseProfile $responseProfile)
 	 */
 	public static function getInstance($sourceObject, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		$object = null;
-	    switch($sourceObject->getType())
-	    {
-	    	case ScheduleEventType::RECORD:
-	    		$object = new KalturaRecordScheduleEvent();
-	    		break;
-	    		
-	    	case ScheduleEventType::LIVE_STREAM:
-	    		$object = new KalturaLiveStreamScheduleEvent();
-	    		break;
-	    		
-	    	default:
+		switch($sourceObject->getType())
+		{
+			case ScheduleEventType::RECORD:
+				$object = new KalturaRecordScheduleEvent();
+				break;
+			
+			case ScheduleEventType::LIVE_STREAM:
+				$object = new KalturaLiveStreamScheduleEvent();
+				break;
+			
+			default:
 				$object = KalturaPluginManager::loadObject('KalturaScheduleEvent', $sourceObject->getType());
 				if(!$object)
 				{
-	    			return null;
+					return null;
 				}
-	    }
-	    
-	    /* @var $object KalturaScheduleEvent */
-	    $object->fromObject($sourceObject, $responseProfile);
-	    return $object;
+		}
+		
+		/* @var $object KalturaScheduleEvent */
+		$object->fromObject($sourceObject, $responseProfile);
+		return $object;
 	}
 }
