@@ -669,36 +669,36 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 
 	public static function postProcessCuePoints( $liveEntry, $cuePointsIds = null )
 	{
-		$select = new Criteria();
+		$selectCriteria = new Criteria();
 		if ( $cuePointsIds )
 		{
-			$select->add(CuePointPeer::ID, $cuePointsIds, Criteria::IN);
+			$selectCriteria->add(CuePointPeer::ID, $cuePointsIds, Criteria::IN);
 		}
 		else
 		{
 			/* @var $liveEntry LiveEntry */
-			$select->add(CuePointPeer::ENTRY_ID, $liveEntry->getId());
-			$select->add(CuePointPeer::STATUS, CuePointStatus::READY);
-			$cuePoints = CuePointPeer::doSelect($select);
-			$cuePointsIds = array();
+			$selectCriteria->add(CuePointPeer::ENTRY_ID, $liveEntry->getId());
+			$selectCriteria->add(CuePointPeer::STATUS, CuePointStatus::READY);
+		}
+		
+		$updatedAtTime = time();
+		$updateCriteria = new Criteria();
+		$updateCriteria->add(CuePointPeer::STATUS, CuePointStatus::HANDLED);
+		$updateCriteria->add(CuePointPeer::UPDATED_AT, $updatedAtTime);
+		
+		$con = Propel::getConnection(MetadataPeer::DATABASE_NAME);
+		$affectedRows = BasePeer::doUpdate($selectCriteria, $updateCriteria, $con);
+		
+		if($affectedRows > 0)
+		{
+			$cuePoints = CuePointPeer::doSelect($selectCriteria);
 			foreach($cuePoints as $cuePoint)
 			{
 				/* @var $cuePoint CuePoint */
-				$cuePointsIds[] = $cuePoint->getId();
+				$cuePoint->setUpdatedAt($updatedAtTime);
+				$cuePoint->setStatus(CuePointStatus::HANDLED);
+				$cuePoint->indexToSearchIndex();
 			}
-		}
-		$update = new Criteria();
-		$update->add(CuePointPeer::STATUS, CuePointStatus::HANDLED);
-		$update->add(CuePointPeer::UPDATED_AT, time());
-
-		$con = Propel::getConnection(MetadataPeer::DATABASE_NAME);
-		BasePeer::doUpdate($select, $update, $con);
-		$cuePoints = CuePointPeer::retrieveByPKs($cuePointsIds);
-		foreach($cuePoints as $cuePoint)
-		{
-			/* @var $cuePoint CuePoint */
-			$cuePoint->reload();
-			$cuePoint->indexToSearchIndex();
 		}
 	}
 
