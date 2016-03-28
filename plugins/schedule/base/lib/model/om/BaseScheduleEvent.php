@@ -128,10 +128,10 @@ abstract class BaseScheduleEvent extends BaseObject  implements Persistent {
 	protected $sequence;
 
 	/**
-	 * The value for the recurance_type field.
+	 * The value for the recurrence_type field.
 	 * @var        int
 	 */
-	protected $recurance_type;
+	protected $recurrence_type;
 
 	/**
 	 * The value for the duration field.
@@ -491,13 +491,13 @@ abstract class BaseScheduleEvent extends BaseObject  implements Persistent {
 	}
 
 	/**
-	 * Get the [recurance_type] column value.
+	 * Get the [recurrence_type] column value.
 	 * 
 	 * @return     int
 	 */
-	public function getRecuranceType()
+	public function getRecurrenceType()
 	{
-		return $this->recurance_type;
+		return $this->recurrence_type;
 	}
 
 	/**
@@ -1132,27 +1132,27 @@ abstract class BaseScheduleEvent extends BaseObject  implements Persistent {
 	} // setSequence()
 
 	/**
-	 * Set the value of [recurance_type] column.
+	 * Set the value of [recurrence_type] column.
 	 * 
 	 * @param      int $v new value
 	 * @return     ScheduleEvent The current object (for fluent API support)
 	 */
-	public function setRecuranceType($v)
+	public function setRecurrenceType($v)
 	{
-		if(!isset($this->oldColumnsValues[ScheduleEventPeer::RECURANCE_TYPE]))
-			$this->oldColumnsValues[ScheduleEventPeer::RECURANCE_TYPE] = $this->recurance_type;
+		if(!isset($this->oldColumnsValues[ScheduleEventPeer::RECURRENCE_TYPE]))
+			$this->oldColumnsValues[ScheduleEventPeer::RECURRENCE_TYPE] = $this->recurrence_type;
 
 		if ($v !== null) {
 			$v = (int) $v;
 		}
 
-		if ($this->recurance_type !== $v) {
-			$this->recurance_type = $v;
-			$this->modifiedColumns[] = ScheduleEventPeer::RECURANCE_TYPE;
+		if ($this->recurrence_type !== $v) {
+			$this->recurrence_type = $v;
+			$this->modifiedColumns[] = ScheduleEventPeer::RECURRENCE_TYPE;
 		}
 
 		return $this;
-	} // setRecuranceType()
+	} // setRecurrenceType()
 
 	/**
 	 * Set the value of [duration] column.
@@ -1417,7 +1417,7 @@ abstract class BaseScheduleEvent extends BaseObject  implements Persistent {
 			$this->organizer_kuser_id = ($row[$startcol + 15] !== null) ? (int) $row[$startcol + 15] : null;
 			$this->priority = ($row[$startcol + 16] !== null) ? (int) $row[$startcol + 16] : null;
 			$this->sequence = ($row[$startcol + 17] !== null) ? (int) $row[$startcol + 17] : null;
-			$this->recurance_type = ($row[$startcol + 18] !== null) ? (int) $row[$startcol + 18] : null;
+			$this->recurrence_type = ($row[$startcol + 18] !== null) ? (int) $row[$startcol + 18] : null;
 			$this->duration = ($row[$startcol + 19] !== null) ? (int) $row[$startcol + 19] : null;
 			$this->contact = ($row[$startcol + 20] !== null) ? (string) $row[$startcol + 20] : null;
 			$this->comment = ($row[$startcol + 21] !== null) ? (string) $row[$startcol + 21] : null;
@@ -2009,7 +2009,7 @@ abstract class BaseScheduleEvent extends BaseObject  implements Persistent {
 				return $this->getSequence();
 				break;
 			case 18:
-				return $this->getRecuranceType();
+				return $this->getRecurrenceType();
 				break;
 			case 19:
 				return $this->getDuration();
@@ -2071,7 +2071,7 @@ abstract class BaseScheduleEvent extends BaseObject  implements Persistent {
 			$keys[15] => $this->getOrganizerKuserId(),
 			$keys[16] => $this->getPriority(),
 			$keys[17] => $this->getSequence(),
-			$keys[18] => $this->getRecuranceType(),
+			$keys[18] => $this->getRecurrenceType(),
 			$keys[19] => $this->getDuration(),
 			$keys[20] => $this->getContact(),
 			$keys[21] => $this->getComment(),
@@ -2165,7 +2165,7 @@ abstract class BaseScheduleEvent extends BaseObject  implements Persistent {
 				$this->setSequence($value);
 				break;
 			case 18:
-				$this->setRecuranceType($value);
+				$this->setRecurrenceType($value);
 				break;
 			case 19:
 				$this->setDuration($value);
@@ -2230,7 +2230,7 @@ abstract class BaseScheduleEvent extends BaseObject  implements Persistent {
 		if (array_key_exists($keys[15], $arr)) $this->setOrganizerKuserId($arr[$keys[15]]);
 		if (array_key_exists($keys[16], $arr)) $this->setPriority($arr[$keys[16]]);
 		if (array_key_exists($keys[17], $arr)) $this->setSequence($arr[$keys[17]]);
-		if (array_key_exists($keys[18], $arr)) $this->setRecuranceType($arr[$keys[18]]);
+		if (array_key_exists($keys[18], $arr)) $this->setRecurrenceType($arr[$keys[18]]);
 		if (array_key_exists($keys[19], $arr)) $this->setDuration($arr[$keys[19]]);
 		if (array_key_exists($keys[20], $arr)) $this->setContact($arr[$keys[20]]);
 		if (array_key_exists($keys[21], $arr)) $this->setComment($arr[$keys[21]]);
@@ -2267,7 +2267,7 @@ abstract class BaseScheduleEvent extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(ScheduleEventPeer::ORGANIZER_KUSER_ID)) $criteria->add(ScheduleEventPeer::ORGANIZER_KUSER_ID, $this->organizer_kuser_id);
 		if ($this->isColumnModified(ScheduleEventPeer::PRIORITY)) $criteria->add(ScheduleEventPeer::PRIORITY, $this->priority);
 		if ($this->isColumnModified(ScheduleEventPeer::SEQUENCE)) $criteria->add(ScheduleEventPeer::SEQUENCE, $this->sequence);
-		if ($this->isColumnModified(ScheduleEventPeer::RECURANCE_TYPE)) $criteria->add(ScheduleEventPeer::RECURANCE_TYPE, $this->recurance_type);
+		if ($this->isColumnModified(ScheduleEventPeer::RECURRENCE_TYPE)) $criteria->add(ScheduleEventPeer::RECURRENCE_TYPE, $this->recurrence_type);
 		if ($this->isColumnModified(ScheduleEventPeer::DURATION)) $criteria->add(ScheduleEventPeer::DURATION, $this->duration);
 		if ($this->isColumnModified(ScheduleEventPeer::CONTACT)) $criteria->add(ScheduleEventPeer::CONTACT, $this->contact);
 		if ($this->isColumnModified(ScheduleEventPeer::COMMENT)) $criteria->add(ScheduleEventPeer::COMMENT, $this->comment);
@@ -2387,7 +2387,7 @@ abstract class BaseScheduleEvent extends BaseObject  implements Persistent {
 
 		$copyObj->setSequence($this->sequence);
 
-		$copyObj->setRecuranceType($this->recurance_type);
+		$copyObj->setRecurrenceType($this->recurrence_type);
 
 		$copyObj->setDuration($this->duration);
 

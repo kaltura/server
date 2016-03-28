@@ -3,7 +3,7 @@
  * @package plugins.schedule
  * @subpackage model.enum
  */
-interface ScheduleEventRecuranceDay extends BaseEnum
+interface ScheduleEventRecurrenceDay extends BaseEnum
 {
 	const MONDAY = 'MO';
 	const TUESDAY = 'TU';

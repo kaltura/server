@@ -114,11 +114,11 @@ abstract class KalturaScheduleEvent extends KalturaObject implements IRelatedFil
 	public $sequence;
 
 	/**
-	 * @var KalturaScheduleEventRecuranceType
+	 * @var KalturaScheduleEventRecurrenceType
 	 * @filter eq,in
 	 * @insertonly
 	 */
-	public $recuranceType;
+	public $recurrenceType;
 
 	/**
 	 * Duration in seconds
@@ -162,9 +162,9 @@ abstract class KalturaScheduleEvent extends KalturaObject implements IRelatedFil
 	public $updatedAt;
 
 	/**
-	 * @var KalturaScheduleEventRecuranceArray
+	 * @var KalturaScheduleEventRecurrenceArray
 	 */
-	public $recurances;
+	public $recurrences;
 	
 	/*
 	 * Mapping between the field on this object (on the left) and the setter/getter on the entry object (on the right)  
@@ -187,14 +187,14 @@ abstract class KalturaScheduleEvent extends KalturaObject implements IRelatedFil
 		'organizerUserId' => 'organizerPuserId',
 		'priority',
 		'sequence',
-		'recuranceType',
+		'recurrenceType',
 		'duration',
 		'contact',
 		'comment',
 		'tags',
 		'createdAt',
 		'updatedAt',
-		'recurances',
+		'recurrences',
 	 );
 		 
 	/* (non-PHPdoc)
@@ -223,9 +223,9 @@ abstract class KalturaScheduleEvent extends KalturaObject implements IRelatedFil
 	
 	public function validate($startDate, $endDate)
 	{
-		if($this->recuranceType === ScheduleEventRecuranceType::RECURRENCE)
+		if($this->recurrenceType === ScheduleEventRecurrenceType::RECURRENCE)
 		{
-			throw new KalturaAPIException(KalturaErrors::INVALID_ENUM_VALUE, $this->recuranceType, 'recuranceType', 'KalturaScheduleEventRecuranceType');
+			throw new KalturaAPIException(KalturaErrors::INVALID_ENUM_VALUE, $this->recurrenceType, 'recurrenceType', 'KalturaScheduleEventRecurrenceType');
 		}
 		
 		if($startDate > $endDate)
@@ -245,7 +245,7 @@ abstract class KalturaScheduleEvent extends KalturaObject implements IRelatedFil
 	 */
 	public function validateForInsert($propertiesToSkip = array())
 	{
-		$this->validatePropertyNotNull('recuranceType');
+		$this->validatePropertyNotNull('recurrenceType');
 		$this->validatePropertyNotNull('summary');
 		$this->validatePropertyNotNull('startDate');
 		$this->validatePropertyNotNull('endDate');

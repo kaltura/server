@@ -80,7 +80,7 @@ class ScheduleEventPeer extends BaseScheduleEventPeer implements IRelatedObjectP
 	{
 		$criteria = new Criteria();
 		$criteria->add(ScheduleEventPeer::PARENT_ID, $parentId);
-		$criteria->add(ScheduleEventPeer::RECURANCE_TYPE, ScheduleEventRecuranceType::RECURRENCE);
+		$criteria->add(ScheduleEventPeer::RECURRENCE_TYPE, ScheduleEventRecurrenceType::RECURRENCE);
 		$criteria->add(ScheduleEventPeer::START_DATE, kApiCache::getTime(), Criteria::GREATER_THAN);
 		
 		if($exceptForDates)
@@ -113,7 +113,7 @@ class ScheduleEventPeer extends BaseScheduleEventPeer implements IRelatedObjectP
 	{
 		$criteria = new Criteria();
 		$criteria->add(ScheduleEventPeer::PARENT_ID, $parentId);
-		$criteria->add(ScheduleEventPeer::RECURANCE_TYPE, ScheduleEventRecuranceType::RECURRENCE);
+		$criteria->add(ScheduleEventPeer::RECURRENCE_TYPE, ScheduleEventRecurrenceType::RECURRENCE);
 		$criteria->add(ScheduleEventPeer::START_DATE, kApiCache::getTime(), Criteria::GREATER_THAN);
 
 		if($exceptForDates)
@@ -141,6 +141,19 @@ class ScheduleEventPeer extends BaseScheduleEventPeer implements IRelatedObjectP
 	}
 	
 	/**
+	 * @param int $pk
+	 * @return ScheduleEvent
+	 */
+	public static function retrieveByPKNoFilter($pk)
+	{
+		self::setUseCriteriaFilter(false);
+		$scheduleEvent = self::retrieveByPK($pk);
+		self::setUseCriteriaFilter(true);
+		
+		return $scheduleEvent;
+	}
+	
+	/**
 	 * @param int $parentId
 	 * @param array $dates
 	 * @return array<ScheduleEvent>
@@ -149,7 +162,7 @@ class ScheduleEventPeer extends BaseScheduleEventPeer implements IRelatedObjectP
 	{
 		$criteria = new Criteria();
 		$criteria->add(ScheduleEventPeer::PARENT_ID, $parentId);
-		$criteria->add(ScheduleEventPeer::RECURANCE_TYPE, ScheduleEventRecuranceType::RECURRENCE);
+		$criteria->add(ScheduleEventPeer::RECURRENCE_TYPE, ScheduleEventRecurrenceType::RECURRENCE);
 		$criteria->add(ScheduleEventPeer::ORIGINAL_START_DATE, $dates, Criteria::IN);
 		
 		return ScheduleEventPeer::doSelect($criteria);

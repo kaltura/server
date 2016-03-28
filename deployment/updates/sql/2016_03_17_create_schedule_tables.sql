@@ -19,7 +19,7 @@ CREATE TABLE schedule_event
 	organizer_kuser_id INTEGER,
 	priority INTEGER,
 	sequence INTEGER,
-	recurance_type INTEGER  NOT NULL,
+	recurrence_type INTEGER  NOT NULL,
 	duration INTEGER,
 	contact VARCHAR(1024),
 	comment TEXT,
@@ -28,7 +28,7 @@ CREATE TABLE schedule_event
 	updated_at DATETIME,
 	custom_data TEXT,
 	PRIMARY KEY (id),
-	KEY partner_status_recurance_index(partner_id, status, recurance_type)
+	KEY partner_status_recurrence_index(partner_id, status, recurrence_type)
 )ENGINE=INNODB DEFAULT CHARSET=utf8;
 
 CREATE TABLE schedule_resource

@@ -17,7 +17,7 @@
 	        <field name="organizer_kuser_id" indexName="organizer_kuser_id" type="int" orderable="yes" />
 	        <field name="priority" indexName="priority" type="int" orderable="yes" />
 	        <field name="sequence" indexName="sequence" type="int" orderable="yes" />
-	        <field name="recurance_type" indexName="recurance_type" type="int" orderable="yes" />
+	        <field name="recurrence_type" indexName="recurrence_type" type="int" orderable="yes" />
 	        <field name="duration" indexName="duration" type="int" orderable="yes" />	        	        
 	        <field name="contact" indexName="contact" type="string" matchable="yes" />	        
 	        <field name="comment" indexName="comment" type="string" matchable="yes" />	        

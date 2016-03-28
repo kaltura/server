@@ -28,8 +28,8 @@ abstract class KalturaScheduleEventBaseFilter extends KalturaRelatedFilter
 		"priorityIn" => "_in_priority",
 		"priorityGreaterThanOrEqual" => "_gte_priority",
 		"priorityLessThanOrEqual" => "_lte_priority",
-		"recuranceTypeEqual" => "_eq_recurance_type",
-		"recuranceTypeIn" => "_in_recurance_type",
+		"recurrenceTypeEqual" => "_eq_recurrence_type",
+		"recurrenceTypeIn" => "_in_recurrence_type",
 		"categoriesIdsMatchAnd" => "_matchand_categories_ids",
 		"categoriesIdsMatchOr" => "_matchor_categories_ids",
 		"tagsLike" => "_like_tags",
@@ -166,14 +166,14 @@ abstract class KalturaScheduleEventBaseFilter extends KalturaRelatedFilter
 	public $priorityLessThanOrEqual;
 
 	/**
-	 * @var KalturaScheduleEventRecuranceType
+	 * @var KalturaScheduleEventRecurrenceType
 	 */
-	public $recuranceTypeEqual;
+	public $recurrenceTypeEqual;
 
 	/**
 	 * @var string
 	 */
-	public $recuranceTypeIn;
+	public $recurrenceTypeIn;
 
 	/**
 	 * @var string

@@ -3,7 +3,7 @@
  * @package plugins.schedule
  * @subpackage model.data
  */
-class kScheduleEventRecurance
+class kScheduleEventRecurrence
 {
 	/**
 	 * @var string
@@ -11,7 +11,7 @@ class kScheduleEventRecurance
 	private $name;
 	
 	/**
-	 * @var ScheduleEventRecuranceFrequency
+	 * @var ScheduleEventRecurrenceFrequency
 	 */
 	private $frequency;
 	
@@ -46,7 +46,7 @@ class kScheduleEventRecurance
 	private $byHour;
 	
 	/**
-	 * @var string comma separated of ScheduleEventRecuranceDay
+	 * @var string comma separated of ScheduleEventRecurrenceDay
 	 * Each byDay value can also be preceded by a positive (+n) or negative (-n) integer.
 	 * If present, this indicates the nth occurrence of the specific day within the MONTHLY or YEARLY RRULE.
 	 * For example, within a MONTHLY rule, +1MO (or simply 1MO) represents the first Monday within the month, whereas -1MO represents the last Monday of the month.
@@ -93,7 +93,7 @@ class kScheduleEventRecurance
 	private $byOffset;
 	
 	/**
-	 * @var ScheduleEventRecuranceDay
+	 * @var ScheduleEventRecurrenceDay
 	 * Specifies the day on which the workweek starts.
 	 * This is significant when a WEEKLY frequency has an interval greater than 1, and a byDay rule part is specified.
 	 * This is also significant when in a YEARLY frequency when a byWeekNumber rule part is specified.
@@ -230,7 +230,7 @@ class kScheduleEventRecurance
 	}
 	
 	/**
-	 * @param ScheduleEventRecuranceFrequency $frequency
+	 * @param ScheduleEventRecurrenceFrequency $frequency
 	 */
 	public function setFrequency($frequency)
 	{
@@ -334,7 +334,7 @@ class kScheduleEventRecurance
 	}
 	
 	/**
-	 * @param ScheduleEventRecuranceFrequency $weekStartDay
+	 * @param ScheduleEventRecurrenceFrequency $weekStartDay
 	 */
 	public function setWeekStartDay($weekStartDay)
 	{
@@ -440,7 +440,7 @@ class kScheduleEventRecurance
 			$d = getdate($cal);
 			switch($this->frequency)
 			{
-				case ScheduleEventRecuranceFrequency::MONTHLY:
+				case ScheduleEventRecurrenceFrequency::MONTHLY:
 					$cal = mktime(0, 0, 0, $d['mon'] + 1, 1, $d['year']);
 					break;
 					
@@ -504,7 +504,7 @@ class kScheduleEventRecurance
 			}
 			elseif($offset < 0 && $offset >= -$size)
 			{
-				$offsetDates[] = $dates($size + $offset);
+				$offsetDates[] = $dates[$size + $offset];
 			}
 		}
 		return $offsetDates;
@@ -714,7 +714,7 @@ class kScheduleEventRecurance
 				if($this->byYearDay || $this->byMonthDay)
 				{
 					$currentDayOfWeek = date('l', $date);
-					if($weekDay->getDayName() == $currentDayOfWeek)
+					if($this->getDayName($weekDay) == $currentDayOfWeek)
 					{
 						$weekDayDates[] = $date;
 					}
@@ -760,7 +760,7 @@ class kScheduleEventRecurance
 	 * with the frequency specified by this recurrence rule.
 	 *
 	 * @param int $date timestamp
-	 * @param ScheduleEventRecuranceDay $weekDay
+	 * @param ScheduleEventRecurrenceDay $weekDay
 	 * @return array An array of timestamps
 	 */
 	private function getAbsWeekDays($date, $weekDay)
@@ -768,7 +768,7 @@ class kScheduleEventRecurance
 		$cal = $date;
     	$days = array();
 		$calDay = $this->getDayName($weekDay);
-		if($this->frequency == ScheduleEventRecuranceFrequency::DAILY)
+		if($this->frequency == ScheduleEventRecurrenceFrequency::DAILY)
 		{
 			$current = getdate($cal);
 			if($current['weekday'] == $calDay)
@@ -776,7 +776,7 @@ class kScheduleEventRecurance
 				$days[] = $cal;
 			}
 		}
-		elseif($this->frequency == ScheduleEventRecuranceFrequency::WEEKLY || $this->byWeekNumber)
+		elseif($this->frequency == ScheduleEventRecurrenceFrequency::WEEKLY || $this->byWeekNumber)
 		{
 			// Find the target day in the current week
 			$t = $cal;
@@ -795,7 +795,7 @@ class kScheduleEventRecurance
 			}
 			$days[] = $t;
 		}
-		elseif($this->frequency == ScheduleEventRecuranceFrequency::MONTHLY || $this->byMonth)
+		elseif($this->frequency == ScheduleEventRecurrenceFrequency::MONTHLY || $this->byMonth)
 		{
 			// Add all of this weekDay's dates for the current month
 			$currentMonth = date('n', $cal);
@@ -815,7 +815,7 @@ class kScheduleEventRecurance
 				$cal = mktime($t['hours'], $t['minutes'], $t['seconds'], $target['mon'], $target['mday'], $target['year']);
 			}
 		}
-		elseif($this->frequency == ScheduleEventRecuranceFrequency::YEARLY)
+		elseif($this->frequency == ScheduleEventRecurrenceFrequency::YEARLY)
 		{
 			// Add all of this weekDays dates for the current year
 			$current = getdate($cal);

@@ -3,7 +3,7 @@
  * @package plugins.schedule
  * @subpackage api.objects
  */
-class KalturaScheduleEventRecurance extends KalturaObject
+class KalturaScheduleEventRecurrence extends KalturaObject
 {
 	/**
 	 * @var string
@@ -11,7 +11,7 @@ class KalturaScheduleEventRecurance extends KalturaObject
 	public $name;
 	
 	/**
-	 * @var KalturaScheduleEventRecuranceFrequency
+	 * @var KalturaScheduleEventRecurrenceFrequency
 	 */
 	public $frequency;
 	
@@ -49,7 +49,7 @@ class KalturaScheduleEventRecurance extends KalturaObject
 	public $byHour;
 	
 	/**
-	 * Comma separated of KalturaScheduleEventRecuranceDay
+	 * Comma separated of KalturaScheduleEventRecurrenceDay
 	 * Each byDay value can also be preceded by a positive (+n) or negative (-n) integer.
 	 * If present, this indicates the nth occurrence of the specific day within the MONTHLY or YEARLY RRULE.
 	 * For example, within a MONTHLY rule, +1MO (or simply 1MO) represents the first Monday within the month, whereas -1MO represents the last Monday of the month.
@@ -102,7 +102,7 @@ class KalturaScheduleEventRecurance extends KalturaObject
 	public $byOffset;
 	
 	/**
-	 * @var KalturaScheduleEventRecuranceDay
+	 * @var KalturaScheduleEventRecurrenceDay
 	 * Specifies the day on which the workweek starts.
 	 * This is significant when a WEEKLY frequency has an interval greater than 1, and a byDay rule part is specified.
 	 * This is also significant when in a YEARLY frequency when a byWeekNumber rule part is specified.
@@ -159,7 +159,7 @@ class KalturaScheduleEventRecurance extends KalturaObject
 	{
 		if(!$sourceObject)
 		{
-			$sourceObject = new kScheduleEventRecurance();
+			$sourceObject = new kScheduleEventRecurrence();
 		}
 		
 		return parent::toObject($sourceObject, $propertiesToSkip);

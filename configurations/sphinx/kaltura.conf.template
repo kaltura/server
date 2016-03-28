@@ -510,7 +510,7 @@ index kaltura_schedule_event:kaltura_base
 	rt_attr_uint = organizer_kuser_id
 	rt_attr_uint = priority
 	rt_attr_uint = sequence
-	rt_attr_uint = recurance_type
+	rt_attr_uint = recurrence_type
 	rt_attr_uint = duration
 	rt_field = contact
 	rt_field = comment

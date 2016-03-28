@@ -16,7 +16,7 @@ abstract class ScheduleEvent extends BaseScheduleEvent implements IRelatedObject
 {
 	const MAX_RECURRENCES = 1000;
 	
-	const CUSTOM_DATA_FIELD_RECURANCE = 'recurance';
+	const CUSTOM_DATA_FIELD_RECURRENCE = 'recurrence';
 	const CUSTOM_DATA_FIELD_ORGANIZER_PUSER_ID = 'organizerPuserId';
 
 	public function __construct() 
@@ -49,7 +49,7 @@ abstract class ScheduleEvent extends BaseScheduleEvent implements IRelatedObject
 			$this->incrementSequence();
 		}
 		
-		if($this->getRecuranceType() != ScheduleEventRecuranceType::RECURRENCE)
+		if($this->getRecurrenceType() != ScheduleEventRecurrenceType::RECURRENCE)
 		{
 			if(is_null($this->getClassificationType()))
 			{
@@ -66,7 +66,7 @@ abstract class ScheduleEvent extends BaseScheduleEvent implements IRelatedObject
 	 */
 	public function preSave(PropelPDO $con = null)
 	{
-		if($this->getRecuranceType() != ScheduleEventRecuranceType::RECURRING && $this->getDuration() != $this->getEndDate(null) - $this->getStartDate(null))
+		if($this->getRecurrenceType() != ScheduleEventRecurrenceType::RECURRING && $this->getDuration() != $this->getEndDate(null) - $this->getStartDate(null))
 		{
 			$this->setDuration($this->getEndDate(null) - $this->getStartDate(null));
 		}
@@ -98,19 +98,19 @@ abstract class ScheduleEvent extends BaseScheduleEvent implements IRelatedObject
 	}
 	
 	/**
-	 * @param array<kScheduleEventRecurance> $v
+	 * @param array<kScheduleEventRecurrence> $v
 	 */
-	public function setRecurances(array $v)
+	public function setRecurrences(array $v)
 	{
-		$this->putInCustomData(self::CUSTOM_DATA_FIELD_RECURANCE, $v);
+		$this->putInCustomData(self::CUSTOM_DATA_FIELD_RECURRENCE, $v);
 	}
 	
 	/**
-	 * @return array<kScheduleEventRecurance>
+	 * @return array<kScheduleEventRecurrence>
 	 */
-	public function getRecurances()
+	public function getRecurrences()
 	{
-		return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_RECURANCE);
+		return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_RECURRENCE);
 	}
 	
 	/**
@@ -121,7 +121,7 @@ abstract class ScheduleEvent extends BaseScheduleEvent implements IRelatedObject
 	 */
 	public function getDates($periodStart = null, $periodEnd = null, $limit = null)
 	{
-		if($this->getRecuranceType() == ScheduleEventRecuranceType::NONE)
+		if($this->getRecurrenceType() == ScheduleEventRecurrenceType::NONE)
 		{
 			return array($this->getStartDate(null));
 		}
@@ -139,12 +139,12 @@ abstract class ScheduleEvent extends BaseScheduleEvent implements IRelatedObject
 			$limit = self::MAX_RECURRENCES;
 		}
 		
-		$recurances = $this->getRecurances();
+		$recurrences = $this->getRecurrences();
 		$dates = array();
-		foreach($recurances as $recurance)
+		foreach($recurrences as $recurrence)
 		{
-			/* @var $recurance kScheduleEventRecurance */
-			$dates = array_merge($dates, $recurance->getDates($periodStart, $periodEnd, $this->getStartDate(null), $limit));
+			/* @var $recurrence kScheduleEventRecurrence */
+			$dates = array_merge($dates, $recurrence->getDates($periodStart, $periodEnd, $this->getStartDate(null), $limit));
 		}
 		
 		sort($dates);

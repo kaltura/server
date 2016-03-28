@@ -34,7 +34,7 @@ class ScheduleEventService extends KalturaBaseService
 		/* @var $dbScheduleEvent ScheduleEvent */
 		$dbScheduleEvent->save();
 		
-		if($dbScheduleEvent->getRecuranceType() === ScheduleEventRecuranceType::RECURRING)
+		if($dbScheduleEvent->getRecurrenceType() === ScheduleEventRecurrenceType::RECURRING)
 		{
 			$this->createRecurrences($dbScheduleEvent);
 		}
@@ -91,7 +91,7 @@ class ScheduleEventService extends KalturaBaseService
 		/* @var $dbScheduleEvent ScheduleEvent */
 		$dbScheduleEvent->save();
 		
-		if($dbScheduleEvent->getRecuranceType() === ScheduleEventRecuranceType::RECURRING)
+		if($dbScheduleEvent->getRecurrenceType() === ScheduleEventRecurrenceType::RECURRING)
 		{
 			$this->createRecurrences($dbScheduleEvent);
 		}
@@ -122,7 +122,7 @@ class ScheduleEventService extends KalturaBaseService
 		$dbScheduleEvent->setStatus(ScheduleEventStatus::DELETED);
 		$dbScheduleEvent->save();
 		
-		if($dbScheduleEvent->getRecuranceType() == ScheduleEventRecuranceType::RECURRING)
+		if($dbScheduleEvent->getRecurrenceType() == ScheduleEventRecurrenceType::RECURRING)
 		{
 			ScheduleEventPeer::deleteByParentId($scheduleEventId);
 		}
@@ -153,7 +153,7 @@ class ScheduleEventService extends KalturaBaseService
 		$dbScheduleEvent->setStatus(ScheduleEventStatus::CANCELLED);
 		$dbScheduleEvent->save();
 		
-		if($dbScheduleEvent->getRecuranceType() == ScheduleEventRecuranceType::RECURRING)
+		if($dbScheduleEvent->getRecurrenceType() == ScheduleEventRecurrenceType::RECURRING)
 		{
 			ScheduleEventPeer::deleteByParentId($scheduleEventId);
 		}
@@ -217,7 +217,7 @@ class ScheduleEventService extends KalturaBaseService
 		foreach($dates as $date)
 		{
 			$scheduleEvent = new $class();
-			$scheduleEvent->setRecuranceType(ScheduleEventRecuranceType::RECURRENCE);
+			$scheduleEvent->setRecurrenceType(ScheduleEventRecurrenceType::RECURRENCE);
 			$scheduleEvent->setParentId($dbScheduleEvent->getId());
 			$scheduleEvent->setStartDate($date);
 			$scheduleEvent->setOriginalStartDate($date);

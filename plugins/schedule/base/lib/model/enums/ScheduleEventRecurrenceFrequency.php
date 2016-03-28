@@ -3,7 +3,7 @@
  * @package plugins.schedule
  * @subpackage model.enum
  */
-interface ScheduleEventRecuranceFrequency extends BaseEnum
+interface ScheduleEventRecurrenceFrequency extends BaseEnum
 {
 	const SECONDLY = 'seconds';
 	const MINUTELY = 'minutes';
