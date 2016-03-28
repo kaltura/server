@@ -82,7 +82,7 @@ class PartnerPeer extends BasePartnerPeer
 	{
 		$partner = PartnerPeer::retrieveByPK($pk);
 		
-		if(!$partner || $partner->getState() !== Partner::PARTNER_STATUS_ACTIVE)
+		if(!$partner || $partner->getStatus() !== Partner::PARTNER_STATUS_ACTIVE)
 			return null;
 		
 		return $partner;
