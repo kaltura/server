@@ -68,7 +68,7 @@ abstract class BaseEntryServerNodePeer {
 
 
 	/**
-	 * holds an array of fieldnames
+	 * holds an array of fieldnameskCuePointManager
 	 *
 	 * first dimension keys are the type constants
 	 * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
@@ -344,7 +344,7 @@ abstract class BaseEntryServerNodePeer {
 			'EntryServerNodePeer', 
 			$cacheKey, 
 			$queryDB);
-		if ($cachedResult !== null && self::$useKQueryCache)
+		if ($cachedResult !== null)
 		{
 			$cacheKey = null;
 			EntryServerNodePeer::filterSelectResults($cachedResult, $criteriaForSelect);
@@ -617,16 +617,6 @@ abstract class BaseEntryServerNodePeer {
 				kMemoryManager::registerPeer('EntryServerNodePeer');
 			}
 		}
-	}
-	
-	/**
-	 * @var useKQueryCache define if kQueryCache should be used by criteria
-	 */
-	protected static $useKQueryCache = true;
-	
-	public static function  setUseKQueryCache ( $useKQueryCache )
-	{
-		self::$useKQueryCache =  $useKQueryCache;
 	}
 
 	/**

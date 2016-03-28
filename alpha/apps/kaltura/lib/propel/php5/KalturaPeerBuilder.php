@@ -281,7 +281,7 @@ abstract class ".$this->getClassname(). $extendingPeerClass . " {
 			'".$this->getPeerClassname()."', 
 			\$cacheKey, 
 			\$queryDB);
-		if (\$cachedResult !== null && self::\$useKQueryCache)
+		if (\$cachedResult !== null)
 		{
 			\$cacheKey = null;
 			".$this->getPeerClassname()."::filterSelectResults(\$cachedResult, \$criteriaForSelect);
@@ -507,7 +507,7 @@ abstract class ".$this->getClassname(). $extendingPeerClass . " {
 				// the default case
 				\$criteria->addAnd(self::PARTNER_ID, \$partnerId);
 			}
-			elseif (\$partnerGroup == myPartnerUtils::ALL_PARTNERS_WILD_CHAR)
+			elseif (\$partnerGroup === myPartnerUtils::ALL_PARTNERS_WILD_CHAR)
 			{
 				// all is allowed - don't add anything to the criteria
 			}
@@ -1406,16 +1406,6 @@ abstract class ".$this->getClassname(). $extendingPeerClass . " {
 				kMemoryManager::registerPeer('".$this->getPeerClassname()."');
 			}
 		}
-	}
-	
-	/**
-	 * @var useKQueryCache define if kQueryCache should be used by criteria
-	 */
-	protected static \$useKQueryCache = true;
-	
-	public static function  setUseKQueryCache ( \$useKQueryCache )
-	{
-		self::\$useKQueryCache =  \$useKQueryCache;
 	}
 ";
 	} // addAddInstanceToPool()

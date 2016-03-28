@@ -404,7 +404,7 @@ abstract class BaseCuePointPeer {
 			'CuePointPeer', 
 			$cacheKey, 
 			$queryDB);
-		if ($cachedResult !== null && self::$useKQueryCache)
+		if ($cachedResult !== null)
 		{
 			$cacheKey = null;
 			CuePointPeer::filterSelectResults($cachedResult, $criteriaForSelect);
@@ -677,16 +677,6 @@ abstract class BaseCuePointPeer {
 				kMemoryManager::registerPeer('CuePointPeer');
 			}
 		}
-	}
-	
-	/**
-	 * @var useKQueryCache define if kQueryCache should be used by criteria
-	 */
-	protected static $useKQueryCache = true;
-	
-	public static function  setUseKQueryCache ( $useKQueryCache )
-	{
-		self::$useKQueryCache =  $useKQueryCache;
 	}
 
 	/**
