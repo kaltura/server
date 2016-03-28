@@ -9,7 +9,7 @@
 
 #### Deployment Scripts ####
 	Update permissions: 
-		php deployment/updates/scripts/add_permissions/2015_12_27_add_schedule_permissions.php
+		php deployment/updates/scripts/add_permissions/2016_03_28_add_schedule_permissions.php
 	
 	Create new tables:
 		mysql -ukaltura -p -P3306 kaltura < deployment/updates/sql/2016_03_17_create_schedule_tables.sql

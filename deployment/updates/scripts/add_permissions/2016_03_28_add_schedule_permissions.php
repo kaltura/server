@@ -14,7 +14,9 @@ passthru("php $script $config");
  
 $config = realpath(dirname(__FILE__)) . '/../../../permissions/service.schedule.scheduleEvent.ini';
 passthru("php $script $config");
- 
+
 $config = realpath(dirname(__FILE__)) . '/../../../permissions/service.schedule.scheduleEventResource.ini';
 passthru("php $script $config");
- 
+
+$config = realpath(dirname(__FILE__)) . '/../../../permissions/service.scheduleBulkUpload.scheduleBulk.ini';
+passthru("php $script $config");
