@@ -90,15 +90,16 @@ class ScheduleEventPeer extends BaseScheduleEventPeer implements IRelatedObjectP
 
 		ScheduleEventPeer::doDelete($criteria);
 		
-		CuePointPeer::setUseKQueryCache(false);
 		ScheduleEventPeer::setUseCriteriaFilter(false);
 		$scheduleEvents = ScheduleEventPeer::doSelect($criteria);
 		ScheduleEventPeer::setUseCriteriaFilter(true);
-		CuePointPeer::setUseKQueryCache(true);
 
+		$now = time();
 		foreach($scheduleEvents as $scheduleEvent)
 		{
 			/* @var $scheduleEvent ScheduleEvent */
+			$scheduleEvent->setStatus(ScheduleEventStatus::DELETED);
+			$scheduleEvent->setUpdatedAt($now);
 			$scheduleEvent->indexToSearchIndex();
 		}
 	}
@@ -119,20 +120,22 @@ class ScheduleEventPeer extends BaseScheduleEventPeer implements IRelatedObjectP
 		{
 			$criteria->add(ScheduleEventPeer::ORIGINAL_START_DATE, $exceptForDates, Criteria::NOT_IN);
 		}
+
+		$now = time();
 		
 		$update = new Criteria();
 		$update->add(ScheduleEventPeer::STATUS, ScheduleEventStatus::CANCELLED);
-		$update->add(ScheduleEventPeer::UPDATED_AT, time());
+		$update->add(ScheduleEventPeer::UPDATED_AT, $now);
 		
 		$con = Propel::getConnection(ScheduleEventPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
 		BasePeer::doUpdate($criteria, $update, $con);
 
-		CuePointPeer::setUseKQueryCache(false);
 		$scheduleEvents = ScheduleEventPeer::doSelect($criteria);
-		CuePointPeer::setUseKQueryCache(true);
 		foreach($scheduleEvents as $scheduleEvent)
 		{
 			/* @var $scheduleEvent ScheduleEvent */
+			$scheduleEvent->setStatus(ScheduleEventStatus::CANCELLED);
+			$scheduleEvent->setUpdatedAt($now);
 			$scheduleEvent->indexToSearchIndex();
 		}
 	}
