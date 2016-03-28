@@ -14,6 +14,8 @@
  */
 abstract class ScheduleEvent extends BaseScheduleEvent implements IRelatedObject, IIndexable
 {
+	const MAX_RECURRENCES = 1000;
+	
 	const CUSTOM_DATA_FIELD_RECURANCE = 'recurance';
 	const CUSTOM_DATA_FIELD_ORGANIZER_PUSER_ID = 'organizerPuserId';
 
@@ -134,7 +136,7 @@ abstract class ScheduleEvent extends BaseScheduleEvent implements IRelatedObject
 		}
 		if(!$limit)
 		{
-			$limit = 1000;
+			$limit = self::MAX_RECURRENCES;
 		}
 		
 		$recurances = $this->getRecurances();
