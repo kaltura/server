@@ -644,19 +644,19 @@ class FlavorAssetService extends KalturaAssetService
 		if($options && $options->referrer)
 			$referrer = $options->referrer;
 
-		$securityEntryHelper = new KSecureEntryHelper($entryDb, $ks, $referrer, ContextType::DOWNLOAD);
+		$secureEntryHelper = new KSecureEntryHelper($entryDb, $ks, $referrer, ContextType::DOWNLOAD);
 
-		if ($securityEntryHelper->shouldPreview())
+		if ($secureEntryHelper->shouldPreview())
 		{ 
 			if ($shouldServeFlavor)
-				$preview = $securityEntryHelper->getPreviewLength() * 1000;
+				$preview = $secureEntryHelper->getPreviewLength() * 1000;
 			else
-				$previewFileSize = $assetDb->estimateFileSize($entryDb, $securityEntryHelper->getPreviewLength());
+				$previewFileSize = $assetDb->estimateFileSize($entryDb, $secureEntryHelper->getPreviewLength());
 		}
 		else
-			$securityEntryHelper->validateForDownload();
+			$secureEntryHelper->validateForDownload();
 		
-		if (!$securityEntryHelper->isAssetAllowed($assetDb))
+		if (!$secureEntryHelper->isAssetAllowed($assetDb))
 			throw new KalturaAPIException(KalturaErrors::ASSET_NOT_ALLOWED, $id);
  
 		if ($shouldServeFlavor)
@@ -727,11 +727,11 @@ class FlavorAssetService extends KalturaAssetService
 		$preview = null;
 		$ksObj = $this->getKs();
 		$ks = ($ksObj) ? $ksObj->getOriginalString() : null;
-		$securityEntryHelper = new KSecureEntryHelper($entryDb, $ks, null, ContextType::DOWNLOAD);
-		if ($securityEntryHelper->shouldPreview()) {
-			$preview = $flavorAssetDb->estimateFileSize($entryDb, $securityEntryHelper->getPreviewLength());
+		$secureEntryHelper = new KSecureEntryHelper($entryDb, $ks, null, ContextType::DOWNLOAD);
+		if ($secureEntryHelper->shouldPreview()) {
+			$preview = $flavorAssetDb->estimateFileSize($entryDb, $secureEntryHelper->getPreviewLength());
 		} else {
-			$securityEntryHelper->validateForDownload();
+			$secureEntryHelper->validateForDownload();
 		}
 		
 		return $flavorAssetDb->getDownloadUrl($useCdn, false, $preview);
