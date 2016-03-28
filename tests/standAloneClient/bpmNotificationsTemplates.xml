@@ -307,6 +307,74 @@
 
 
 	<multirequest continueOnError="1">
+		<!-- Entry Name/Description Updated -->
+		<request service="eventNotificationTemplate" action="listAction" plugin="eventNotification" partnerId="0">
+			<filter objectType="KalturaEventNotificationTemplateFilter">
+				<typeEqual>{php:return KalturaEventNotificationTemplateType::BPM_START;}</typeEqual>
+				<partnerIdEqual>0</partnerIdEqual>
+				<statusEqual>1</statusEqual>
+				<systemNameEqual>entry_name_description_updated</systemNameEqual>
+			</filter>
+		</request>
+		<request service="eventNotificationTemplate" action="delete" plugin="eventNotification" partnerId="0">
+			<id>{1:result:objects:0:id}</id>
+		</request>
+		<request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
+			<template objectType="KalturaBusinessProcessStartNotificationTemplate">
+				<name>Entry Name / Description Updated</name>
+				<systemName>entry_name_description_updated</systemName>
+				<description>Entry name / description updated</description>
+				<automaticDispatchEnabled>1</automaticDispatchEnabled>
+				<eventType>3</eventType> <!-- EventNotificationEventType::OBJECT_CHANGED -->
+				<eventObjectType>1</eventObjectType> <!-- EventNotificationEventObjectType::ENTRY -->
+				<eventConditions objectType="array">
+					<item objectType="KalturaEventFieldCondition">
+						<description>Name or description modified</description>
+						<field objectType="KalturaEvalBooleanField">
+							<code>in_array(entryPeer::NAME, $scope->getEvent()->getModifiedColumns()) || in_array(entryPeer::DESCRIPTION, $scope->getEvent()->getModifiedColumns())</code>
+						</field>
+					</item>
+				</eventConditions>
+				<contentParameters objectType="array">
+					<item objectType="KalturaEventNotificationParameter">
+						<key>endPoint</key>
+						<description>Server Host</description>
+						<value objectType="KalturaEvalStringField">
+							<code>kConf::get('apphome_url')</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>partnerId</key>
+						<description>Partner ID</description>
+						<value objectType="KalturaEvalStringField">
+							<code>$scope->getObject()->getPartnerId()</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>adminSecret</key>
+						<description>Partner Administrator Secret</description>
+						<value objectType="KalturaEvalStringField">
+							<code>PartnerPeer::retrieveByPK($scope->getObject()->getPartnerId())->getAdminSecret()</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>entryId</key>
+						<description>Entry ID</description>
+						<value objectType="KalturaEvalStringField">
+							<code>$scope->getObject()->getEntryId()</code>
+						</value>
+					</item>
+				</contentParameters>
+			</template>
+		</request>
+		<request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
+			<id>{3:result:id}</id>
+			<status>1</status><!-- EventNotificationTemplateStatus::DISABLED -->
+		</request>
+	</multirequest>
+
+
+	<multirequest continueOnError="1">
 		<!-- Caption-Asset Status Equals -->
 		<request service="eventNotificationTemplate" action="listAction" plugin="eventNotification" partnerId="0">
 			<filter objectType="KalturaEventNotificationTemplateFilter">
