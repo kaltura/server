@@ -21,12 +21,6 @@ class KalturaScheduleEventResource extends KalturaObject implements IRelatedFilt
 	public $resourceId;
 
 	/**
-	 * @var string
-	 * @filter eq,in
-	 */
-	public $entryId;
-
-	/**
 	 * @var int
 	 * @readonly
 	 */
@@ -55,7 +49,6 @@ class KalturaScheduleEventResource extends KalturaObject implements IRelatedFilt
 	 (	
 		'eventId',
 		'resourceId',
-		'entryId',
 		'partnerId',
 		'createdAt',
 		'updatedAt',

@@ -4,7 +4,7 @@
  * @subpackage api.filters.base
  * @abstract
  */
-abstract class KalturaScheduleEventResourceBaseFilter extends KalturaRelatedFilter
+abstract class KalturaScheduleEventResourceBaseFilter extends KalturaFilter
 {
 	static private $map_between_objects = array
 	(
@@ -12,8 +12,6 @@ abstract class KalturaScheduleEventResourceBaseFilter extends KalturaRelatedFilt
 		"eventIdIn" => "_in_event_id",
 		"resourceIdEqual" => "_eq_resource_id",
 		"resourceIdIn" => "_in_resource_id",
-		"entryIdEqual" => "_eq_entry_id",
-		"entryIdIn" => "_in_entry_id",
 		"createdAtGreaterThanOrEqual" => "_gte_created_at",
 		"createdAtLessThanOrEqual" => "_lte_created_at",
 		"updatedAtGreaterThanOrEqual" => "_gte_updated_at",
@@ -57,16 +55,6 @@ abstract class KalturaScheduleEventResourceBaseFilter extends KalturaRelatedFilt
 	 * @var string
 	 */
 	public $resourceIdIn;
-
-	/**
-	 * @var string
-	 */
-	public $entryIdEqual;
-
-	/**
-	 * @var string
-	 */
-	public $entryIdIn;
 
 	/**
 	 * @var time

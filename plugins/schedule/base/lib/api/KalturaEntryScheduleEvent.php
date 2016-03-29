@@ -9,12 +9,14 @@ abstract class KalturaEntryScheduleEvent extends KalturaScheduleEvent
 	/**
 	 * Entries that associated with this event
 	 * @var string
+	 * @filter like,mlikeor,mlikeand
 	 */
 	public $entryIds;
 	
 	/**
 	 * Categories that associated with this event
 	 * @var string
+	 * @filter like,mlikeor,mlikeand
 	 */
 	public $categoryIds;
 	

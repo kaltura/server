@@ -8,6 +8,12 @@ abstract class KalturaEntryScheduleEventBaseFilter extends KalturaScheduleEventF
 {
 	static private $map_between_objects = array
 	(
+		"entryIdsLike" => "_like_entry_ids",
+		"entryIdsMultiLikeOr" => "_mlikeor_entry_ids",
+		"entryIdsMultiLikeAnd" => "_mlikeand_entry_ids",
+		"categoryIdsLike" => "_like_category_ids",
+		"categoryIdsMultiLikeOr" => "_mlikeor_category_ids",
+		"categoryIdsMultiLikeAnd" => "_mlikeand_category_ids",
 	);
 
 	static private $order_by_map = array
@@ -23,4 +29,34 @@ abstract class KalturaEntryScheduleEventBaseFilter extends KalturaScheduleEventF
 	{
 		return array_merge(parent::getOrderByMap(), self::$order_by_map);
 	}
+
+	/**
+	 * @var string
+	 */
+	public $entryIdsLike;
+
+	/**
+	 * @var string
+	 */
+	public $entryIdsMultiLikeOr;
+
+	/**
+	 * @var string
+	 */
+	public $entryIdsMultiLikeAnd;
+
+	/**
+	 * @var string
+	 */
+	public $categoryIdsLike;
+
+	/**
+	 * @var string
+	 */
+	public $categoryIdsMultiLikeOr;
+
+	/**
+	 * @var string
+	 */
+	public $categoryIdsMultiLikeAnd;
 }

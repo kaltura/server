@@ -4,7 +4,7 @@
  * @subpackage api.filters.base
  * @abstract
  */
-abstract class KalturaScheduleEventBaseFilter extends KalturaRelatedFilter
+abstract class KalturaScheduleEventBaseFilter extends KalturaFilter
 {
 	static private $map_between_objects = array
 	(
@@ -30,8 +30,6 @@ abstract class KalturaScheduleEventBaseFilter extends KalturaRelatedFilter
 		"priorityLessThanOrEqual" => "_lte_priority",
 		"recurrenceTypeEqual" => "_eq_recurrence_type",
 		"recurrenceTypeIn" => "_in_recurrence_type",
-		"categoriesIdsMatchAnd" => "_matchand_categories_ids",
-		"categoriesIdsMatchOr" => "_matchor_categories_ids",
 		"tagsLike" => "_like_tags",
 		"tagsMultiLikeOr" => "_mlikeor_tags",
 		"tagsMultiLikeAnd" => "_mlikeand_tags",
@@ -174,16 +172,6 @@ abstract class KalturaScheduleEventBaseFilter extends KalturaRelatedFilter
 	 * @var string
 	 */
 	public $recurrenceTypeIn;
-
-	/**
-	 * @var string
-	 */
-	public $categoriesIdsMatchAnd;
-
-	/**
-	 * @var string
-	 */
-	public $categoriesIdsMatchOr;
 
 	/**
 	 * @var string
