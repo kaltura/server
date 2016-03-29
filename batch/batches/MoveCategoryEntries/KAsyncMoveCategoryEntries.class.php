@@ -126,25 +126,18 @@ class KAsyncMoveCategoryEntries extends KJobHandlerWorker
 
 			$addedCategoryEntriesResults = $this->addCategoryEntries($categoryEntriesList, $data->destCategoryId, $entryIds, $categoryIds);
 
-			if(is_array($addedCategoryEntriesResults[0]) && isset($addedCategoryEntriesResults[0]['code']) && ($addedCategoryEntriesResults[0]['code'] == self::CATEGORY_NOT_FOUND))
-			{
-				KalturaLog::err('error: ' . $addedCategoryEntriesResults[0]['code']);
-				throw new KalturaException( "Trying to move entries to a deleted category" );
-			}
-
 			KBatchBase::$kClient->startMultiRequest();
 			foreach($addedCategoryEntriesResults as $index => $addedCategoryEntryResult)
 			{
 				$code = null;
-				if(is_array($addedCategoryEntryResult) && isset($addedCategoryEntryResult['code'])) {
-					$code = $addedCategoryEntryResult['code'];
-				}
-				if(!is_null($code) && !in_array($code, array(self::CATEGORY_ENTRY_ALREADY_EXISTS, self::INVALID_ENTRY_ID)))
+				if(KBatchBase::$kClient->isError($addedCategoryEntryResult))
 				{
-					KalturaLog::err('error: ' . $code);
-					continue;
+					$code = $addedCategoryEntryResult['code'];
+					if (!in_array($code, array(self::CATEGORY_ENTRY_ALREADY_EXISTS, self::INVALID_ENTRY_ID)))
+					{
+						throw new KalturaException($addedCategoryEntryResult['message'], $addedCategoryEntryResult['code'], $addedCategoryEntryResult['args']);
+					}
 				}
-
 				KBatchBase::$kClient->categoryEntry->delete($entryIds[$index], $categoryIds[$index]);
 			}
 
