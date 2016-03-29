@@ -187,7 +187,7 @@ class BulkUploadEntryEngineCsv extends BulkUploadEngineCsv
 	    if (!$bulkUploadResult)
 	    	return;
 
-		$bulkUploadResult->bulkUploadResultObjectType = KalturaBulkUploadResultObjectType::ENTRY;
+		$bulkUploadResult->bulkUploadResultObjectType = KalturaBulkUploadObjectType::ENTRY;
 
 		// Check variables count
 		if($this->csvVersion != KalturaBulkUploadCsvVersion::V3)
