@@ -73,6 +73,7 @@ $feedId = getRequestParameter('feedId');
 $entryId = getRequestParameter('entryId');
 $limit = getRequestParameter('limit');
 $ks = getRequestParameter('ks');
+$playerUrlType = getRequestParameter('playerUrlType');
 
 $feedProcessingKey = "feedProcessing_{$feedId}_{$entryId}_{$limit}";
 if (function_exists('apc_fetch'))
@@ -92,7 +93,10 @@ try
 	
 	if (isset($entryId))
 		$syndicationFeedRenderer->addEntryAttachedFilter($entryId);
-		
+
+	if (isset($playerUrlType))
+		$syndicationFeedRenderer->syndicationFeed->playerUrlType = $playerUrlType;
+
 	$syndicationFeedRenderer->execute($limit);
 }
 catch(PropelException $pex)
