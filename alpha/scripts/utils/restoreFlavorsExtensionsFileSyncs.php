@@ -13,7 +13,7 @@ $fromDate = $argv[2];
 $realRun = isset($argv[3]) && ($argv[3] == 'true');
 
 $assets = getSourceFlavorAssetsWithNoExtensionPerPartner($partnerId,$fromDate);
-updateFlavorAssetExtension($assets,$realRun);
+updateFlavorsFileSyncOnCurrentDC($assets,$realRun);
 
 
 function getSourceFlavorAssetsWithNoExtensionPerPartner($partnerId,$fromDate)
@@ -47,7 +47,7 @@ function getExtensionByContainerFormat($containerFormat)
     }
 }
 
-function updateFlavorAssetExtension($assets,$realRun)
+function updateFlavorsFileSyncOnCurrentDC($assets,$realRun)
 {
 
     if(!count($assets))
@@ -72,16 +72,39 @@ function updateFlavorAssetExtension($assets,$realRun)
             continue;
         }
 
-        KalturaLog::debug('Going to set flavor [' . $flavorId . '] with extension [' . $ext . ']');
+        $fileSyncKey = $dbAsset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
+        FileSyncPeer::setUseCriteriaFilter(false);
+        $fileSyncs = FileSyncPeer::retrieveAllByFileSyncKey($fileSyncKey,true);
+        FileSyncPeer::setUseCriteriaFilter(true);
 
-        if ($realRun) {
-            try {
-                $dbAsset->setFileExt($ext);
-                $dbAsset->save();
-            } catch (Exception $e) {
-                KalturaLog::debug('ERROR: couldn\'t set flavor [' . $flavorId . '] with extension [' . $ext . ']');
-                KalturaLog::err($e);
-                continue;
+        foreach ($fileSyncs as $fileSync) {
+            $oldFileSyncFilePath = str_replace("//","/",$fileSync->getFullPath());
+            $newFileSyncFilePath = $oldFileSyncFilePath . "." . $ext;
+            $fileSyncFilePath = $fileSync->getFilePath();
+
+            KalturaLog::debug('Going to move file from [' . $oldFileSyncFilePath . '] to [' . $newFileSyncFilePath . ']');
+
+            if ($realRun)
+            {
+                if(!rename($oldFileSyncFilePath, $newFileSyncFilePath))
+                {
+                    KalturaLog::debug('ERROR: couldn\'t move file from [' . $oldFileSyncFilePath . '] to [' . $newFileSyncFilePath . ']');
+                    print_r(error_get_last());
+                    continue;
+                }
+            }
+
+            KalturaLog::debug('Going to set file_sync [' . $fileSync->getId() . '] with file_path [' . $fileSyncFilePath . '.' . $ext . ']');
+
+            if ($realRun) {
+                try {
+                    $fileSync->setFilePath($fileSyncFilePath . "." . $ext);
+                    $fileSync->save();
+                } catch (Exception $e) {
+                    KalturaLog::debug('ERROR: couldn\'t move file from [' . $fileSyncFilePath . '] to [' . $fileSyncFilePath . '.' . $ext . ']');
+                    KalturaLog::err($e);
+                    continue;
+                }
             }
         }
 
