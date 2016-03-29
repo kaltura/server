@@ -3,7 +3,7 @@ ini_set("memory_limit","1024M");
 chdir(__DIR__.'/../');
 require_once(__DIR__ . '/../bootstrap.php');
 
-if ($argc < 2)
+if ($argc < 3)
 {
     die ('Partner ID and From Date are REQUIRED.\n');
 }
