@@ -79,11 +79,11 @@ class CommandHandler(SocketServer.BaseRequestHandler):
 
     @staticmethod
     def dictIncrement(theDict, (groupByValues, selectValues, aggregatedFields)):
-        executionTime = aggregatedFields[0]
+        executionTime = float(aggregatedFields[0])
         theDict.setdefault(groupByValues, [selectValues, executionTime, 0, (0,) * len(CommandHandler.AGGREGATED_FIELDS)])      # maxSelect, maxTime, totalCount, aggregatedFields
         row = theDict[groupByValues]
         row[2] += 1
-        row[3] = tuple(map(sum, zip(row[3], aggregatedFields)))
+        row[3] = tuple(map(sum, zip(row[3], map(float, aggregatedFields))))
 
         if not isnan(executionTime) and (isnan(theDict[groupByValues][1]) or theDict[groupByValues][1] < executionTime):
             theDict[groupByValues][0] = selectValues
