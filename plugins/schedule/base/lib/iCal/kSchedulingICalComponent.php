@@ -21,6 +21,11 @@ abstract class kSchedulingICalComponent
 	 * @var KalturaScheduleEventType
 	 */
 	private $eventsType = null;
+	
+	/**
+	 * @var resource
+	 */
+	private $stdout = null;
 
 	abstract protected function getType();
 
@@ -159,5 +164,43 @@ abstract class kSchedulingICalComponent
 			return $this->parent->getKalturaType();
 		
 		return null;
+	}
+	
+	public function setStdOut($stdout)
+	{
+		$this->stdout = $stdout;
+	}
+	
+	protected function writeField($field, $value)
+	{
+		fwrite($this->stdout, $field . $this->getFieldDelimiter() . $value . $this->getLineDelimiter());
+	}
+	
+	protected function writeBody()
+	{
+		foreach($this->fields as $field => $value)
+			$this->writeField($field, $value);
+	}
+	
+	public function begin()
+	{
+		if(!$this->stdout)
+		{
+			$this->stdout = fopen('php://stdout', 'w');
+		}
+		
+		$this->writeField('BEGIN', $this->getType());
+	}
+	
+	public function end()
+	{
+		$this->writeField('END', $this->getType());
+	}
+	
+	public function write()
+	{
+		$this->begin();
+		$this->writeBody();
+		$this->end();
 	}
 }

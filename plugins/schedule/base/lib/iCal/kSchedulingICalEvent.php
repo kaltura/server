@@ -2,7 +2,29 @@
 
 class kSchedulingICalEvent extends kSchedulingICalComponent
 {
-	private $rules = array();
+	/**
+	 * @var kSchedulingICalRule
+	 */
+	private $rule = null;
+
+	private static $stringFields = array(
+		'summary',
+		'description',
+		'status',
+		'geoLatitude',
+		'geoLongitude',
+		'location',
+		'priority',
+		'sequence',
+		'duration',
+		'contact',
+		'comment',
+	);
+	
+	private static $dateFields = array(
+		'startDate' => 'dtstart',
+		'endDate' => 'dtend',
+	);
 	
 	/**
 	 * {@inheritDoc}
@@ -25,12 +47,32 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 	
 	public function setRRule($rrule)
 	{
-		$this->rules = array(new kSchedulingICalRule($rrule));
+		$this->rule = new kSchedulingICalRule($rrule);
 	}
 	
-	public function getRules()
+	/**
+	 * @return kSchedulingICalRule
+	 */
+	public function getRule()
 	{
-		return $this->rules;
+		return $this->rule;
+	}
+	
+	public function setRule(kSchedulingICalRule $rule)
+	{
+		$this->rule = $rule;
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 * @see kSchedulingICalComponent::writeBody()
+	 */
+	protected function writeBody()
+	{
+		parent::writeBody();
+		
+		if($this->rule)
+			$this->writeField('RRULE', $this->rule->getBody());
 	}
 	
 	/**
@@ -58,29 +100,12 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 		$event->referenceId = $this->getUid();
 		$event->organizerUserId = $this->getField('organizer');
 
-		$strings = array(
-			'summary',
-			'description',
-			'status',
-			'geoLatitude',
-			'geoLongitude',
-			'location',
-			'priority',
-			'sequence',
-			'duration',
-			'contact',
-			'comment',
-		);
-		foreach($strings as $string)
+		foreach(self::$stringFields as $string)
 		{
 			$event->$string = $this->getField($string);
 		}
 
-		$dates = array(
-			'startDate' => 'dtstart',
-			'endDate' => 'dtend',
-		);
-		foreach($dates as $date => $field)
+		foreach(self::$dateFields as $date => $field)
 		{
 			$event->$date = kSchedulingICal::parseDate($this->getField($field));
 		}
@@ -95,16 +120,11 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 		if(isset($classificationTypes[$classificationType]))
 			$event->classificationType = $classificationTypes[$classificationType];
 
-		$rules = $this->getRules();
-		if($rules)
+		$rule = $this->getRule();
+		if($rule)
 		{
 			$event->recurrenceType = KalturaScheduleEventRecurrenceType::RECURRING;
-			$event->recurrences = array();
-			foreach($rules as $rule)
-			{
-				/* @var $rule kSchedulingICalRule */
-				$event->recurrences[] = $rule->toObject();
-			}
+			$event->recurrences = array($rule->toObject());
 		}
 		else
 		{
@@ -112,5 +132,51 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 		}
 						
 		return $event;
+	}
+	
+	/**
+	 * @param KalturaScheduleEvent $event
+	 * @return kSchedulingICalEvent
+	 */
+	public static function fromObject(KalturaScheduleEvent $event)
+	{
+		$object = new kSchedulingICalEvent();
+
+		if($event->referenceId)
+			$object->setField('uid', $event->referenceId);
+
+		if($event->organizerUserId)
+			$object->setField('organizer', $event->organizerUserId);
+		
+		foreach(self::$stringFields as $string)
+		{
+			if($event->$string)
+				$object->setField($string, $event->$string);
+		}
+		
+		foreach(self::$dateFields as $date => $field)
+		{
+			if($event->$date)
+				$object->setField($field, kSchedulingICal::formatDate($event->$date));
+		}
+		
+		$classificationTypes = array(
+			KalturaScheduleEventClassificationType::PUBLIC_EVENT => 'PUBLIC',
+			KalturaScheduleEventClassificationType::PRIVATE_EVENT => 'PRIVATE',
+			KalturaScheduleEventClassificationType::CONFIDENTIAL_EVENT => 'CONFIDENTIAL'
+		);
+
+		if($event->classificationType && isset($classificationTypes[$event->classificationType]))
+			$classificationType = $object->setField('class', $classificationTypes[$event->classificationType]);
+			
+		if($event->recurrences && count($event->recurrences))
+		{
+			$recurrence = reset($event->recurrences);
+			/* @var $recurrence KalturaScheduleEventRecurrence */
+			$rule = kSchedulingICalRule::fromObject($recurrence);
+			$object->setRule($rule);
+		}
+		
+		return $object;
 	}
 }
