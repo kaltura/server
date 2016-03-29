@@ -110,13 +110,19 @@ class Form_TvinciProfileConfiguration extends Form_ConfigurableProfileConfigurat
 		);
 
 		// tag specific configuration
-		$this->addTagItems("ism");
-		$this->addTagItems("ipadnew");
-		$this->addTagItems("iphonenew");
-		$this->addTagItems("mbr");
-		$this->addTagItems("dash");
-		$this->addTagItems("widevine");
-		$this->addTagItems("widevine_mbr");
+//		$this->addTagItems("ism");
+//		$this->addTagItems("ipadnew");
+//		$this->addTagItems("iphonenew");
+//		$this->addTagItems("mbr");
+//		$this->addTagItems("dash");
+//		$this->addTagItems("widevine");
+//		$this->addTagItems("widevine_mbr");
+
+		$tvinciDistributionTagsSubForm = new Zend_Form_SubForm(array('DisableLoadDefaultDecorators' => true));
+		$tvinciDistributionTagsSubForm->addDecorator('ViewScript', array(
+			'viewScript' => 'tvinci-distribution-tags-sub-form.phtml',
+		));
+		$this->addSubForm($tvinciDistributionTagsSubForm, 'tvinci_distribution_tags');
 
 		// xslt configuration
 		$this->addElement('file', 'xsltFile', array(
