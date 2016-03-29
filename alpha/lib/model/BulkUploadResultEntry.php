@@ -127,7 +127,7 @@ class BulkUploadResultEntry extends BulkUploadResult
 	
 	public function getEntryId()
 	{
-		if($this->getObjectType() == BulkUploadResultObjectType::ENTRY)
+		if($this->getObjectType() == BulkUploadObjectType::ENTRY)
 			return $this->getObjectId();
 			
 		return null;
@@ -136,7 +136,7 @@ class BulkUploadResultEntry extends BulkUploadResult
 	
 	public function setEntryId($v)
 	{
-		$this->setObjectType(BulkUploadResultObjectType::ENTRY);
+		$this->setObjectType(BulkUploadObjectType::ENTRY);
 		return $this->setObjectId($v);
 	}
     

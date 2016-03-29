@@ -11,10 +11,10 @@
 class BulkUploadResultPeer extends BaseBulkUploadResultPeer
 {
     protected static $class_types_cache = array(
-        BulkUploadResultObjectType::ENTRY => 'BulkUploadResultEntry',
-        BulkUploadResultObjectType::CATEGORY => 'BulkUploadResultCategory',
-        BulkUploadResultObjectType::USER => 'BulkUploadResultKuser',
-        BulkUploadResultObjectType::CATEGORY_USER => 'BulkUploadResultCategoryKuser',
+        BulkUploadObjectType::ENTRY => 'BulkUploadResultEntry',
+        BulkUploadObjectType::CATEGORY => 'BulkUploadResultCategory',
+        BulkUploadObjectType::USER => 'BulkUploadResultKuser',
+        BulkUploadObjectType::CATEGORY_USER => 'BulkUploadResultCategoryKuser',
     );
     
 	/**
@@ -72,7 +72,7 @@ class BulkUploadResultPeer extends BaseBulkUploadResultPeer
 		$criteria = new Criteria();
 		$criteria->add(BulkUploadResultPeer::BULK_UPLOAD_JOB_ID, $bulkUploadId);
 		$criteria->add(BulkUploadResultPeer::OBJECT_ID, null, Criteria::ISNOTNULL);
-		$criteria->add(BulkUploadResultPeer::OBJECT_TYPE, BulkUploadResultObjectType::ENTRY);
+		$criteria->add(BulkUploadResultPeer::OBJECT_TYPE, BulkUploadObjectType::ENTRY);
 		
 		return self::doCount($criteria);
 	}
@@ -120,7 +120,7 @@ class BulkUploadResultPeer extends BaseBulkUploadResultPeer
 		$criteria = new Criteria();
 		$criteria->add(BulkUploadResultPeer::BULK_UPLOAD_JOB_ID, $bulkUploadId);
 		$criteria->add(BulkUploadResultPeer::OBJECT_ID, null, Criteria::ISNOTNULL);
-		$criteria->add(BulkUploadResultPeer::OBJECT_TYPE, BulkUploadResultObjectType::ENTRY);
+		$criteria->add(BulkUploadResultPeer::OBJECT_TYPE, BulkUploadObjectType::ENTRY);
 		$criteria->addAscendingOrderByColumn(BulkUploadResultPeer::LINE_INDEX);
 		
 		return self::doSelect($criteria);
