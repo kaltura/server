@@ -515,9 +515,7 @@ class category extends Basecategory implements IIndexable, IRelatedObject
 		if ($this->move_entries_to_parent_category && $this->parent_id!=0)
 			$this->addMoveEntriesToCategoryJob($this->parent_id);
 		else
-		{
 			$this->addDeleteCategoryTreeEntryJob($fullIds);
-		}
 	}
 
 
