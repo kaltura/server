@@ -39,6 +39,8 @@ $INVALIDATION_KEYS = array(
 	array('table' => "category_kuser", 					'keys' => array(array("'categoryKuser:categoryId='", '@OBJ@.category_id'))),
 	array('table' => "kuser_kgroup", 					'keys' => array(array("'kuserKgroup:kuserId='", '@OBJ@.kuser_id'))),
 	array('table' => "response_profile", 				'keys' => array(array("'responseProfile:systemName='", '@OBJ@.system_name'))),
+	array('table' => "entry_server_node", 				'keys' => array(array("'entryServerNode:entryId'", '@OBJ@.entry_id'))),
+	array('table' => "server_node", 					'keys' => array(array("'serverNode:id'", '@OBJ@.id'))),
 	);
 
 $TRIGGER_TYPES = array('INSERT', 'UPDATE', 'DELETE');
