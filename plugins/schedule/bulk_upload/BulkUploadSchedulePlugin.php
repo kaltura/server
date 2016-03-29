@@ -140,13 +140,13 @@ class BulkUploadSchedulePlugin extends KalturaPlugin implements IKalturaBulkUplo
 				);
 				if($scheduleEvent)
 				{
-					$event = new kSchedulingICalEvent($bulkUploadResult->getRowData());
+					$scheduleEventObject = KalturaScheduleEvent::getInstance($scheduleEvent);
+					/* @var $scheduleEventObject KalturaScheduleEvent */
+					$event = kSchedulingICalEvent::fromObject($scheduleEventObject);
 				}
 				else
 				{
-					$scheduleEventObject = KalturaScheduleEvent::getInstance($event);
-					/* @var $scheduleEventObject KalturaScheduleEvent */
-					$event = kSchedulingICalEvent::fromObject($scheduleEventObject);
+					$event = new kSchedulingICalEvent($bulkUploadResult->getRowData());
 				}
 				$event->addFields($extraAttributes, 'x-kaltura');
 				$event->write();
