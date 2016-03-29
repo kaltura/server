@@ -124,4 +124,8 @@ class ServerNodePeer extends BaseServerNodePeer {
 		throw new Exception("Can't instantiate un-typed [$serverNodeType] remoteServer [" . print_r($row, true) . "]");
 	}
 	
+	public static function getCacheInvalidationKeys()
+	{
+		return array(array("serverNode:id%s", self::ID));		
+	}
 } // ServerNodePeer
