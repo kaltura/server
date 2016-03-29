@@ -122,9 +122,10 @@ class BulkUploadEngineICal extends KBulkUploadEngine
     	KBatchBase::$kClient->doMultiRequest();
     }
     
-    protected function createObjects()
+    protected function getExistingEvents()
     {
     	$schedulePlugin = KalturaScheduleClientPlugin::get(KBatchBase::$kClient);
+
     	$pager = new KalturaFilterPager();
     	$pager->pageSize = self::MAX_IN_FILTER;
     	
@@ -170,7 +171,18 @@ class BulkUploadEngineICal extends KBulkUploadEngine
 				$existingEvents[$scheduleEvent->referenceId] = $scheduleEvent->id;
 			}
 		}
+		
+		return $existingEvents;
+    }
+    
+    protected function createObjects()
+    {
+    	$schedulePlugin = KalturaScheduleClientPlugin::get(KBatchBase::$kClient);
+		
+		$existingEvents = $this->getExistingEvents();
 
+		KBatchBase::$kClient->startMultiRequest();
+		
 		$bulkUploadResultChunk = array();
 		foreach($this->bulkUploadResults as $bulkUploadResult)
 		{
