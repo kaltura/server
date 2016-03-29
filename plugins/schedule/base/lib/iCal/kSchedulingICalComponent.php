@@ -173,7 +173,11 @@ abstract class kSchedulingICalComponent
 	
 	protected function writeField($field, $value)
 	{
-		fwrite($this->stdout, $field . $this->getFieldDelimiter() . $value . $this->getLineDelimiter());
+		$str = $field . $this->getFieldDelimiter() . $value . $this->getLineDelimiter();
+		if($this->stdout)
+			fwrite($this->stdout, $str);
+		else
+			echo $str;
 	}
 	
 	protected function writeBody()
@@ -183,12 +187,7 @@ abstract class kSchedulingICalComponent
 	}
 	
 	public function begin()
-	{
-		if(!$this->stdout)
-		{
-			$this->stdout = fopen('php://stdout', 'w');
-		}
-		
+	{	
 		$this->writeField('BEGIN', $this->getType());
 	}
 	

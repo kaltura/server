@@ -133,11 +133,18 @@ class BulkUploadSchedulePlugin extends KalturaPlugin implements IKalturaBulkUplo
 				$extraAttributes = array(
 					'index' => $bulkUploadResult->getLineIndex(), 
 					'ingest-status' => $bulkUploadResult->getStatus(), 
-					'ingest-action' => $bulkUploadResult->getAction(), 
-					'error-description' => $bulkUploadResult->getErrorDescription(), 
-					'error-type' => $bulkUploadResult->getErrorType(), 
-					'error-code' => $bulkUploadResult->getErrorCode()
+					'ingest-action' => $bulkUploadResult->getAction(),
 				);
+
+				if($bulkUploadResult->getErrorDescription())
+					$extraAttributes['error-description'] = $bulkUploadResult->getErrorDescription();
+
+				if($bulkUploadResult->getErrorType())
+					$extraAttributes['error-type'] = $bulkUploadResult->getErrorType();
+
+				if($bulkUploadResult->getErrorCode())
+					$extraAttributes['error-code'] = $bulkUploadResult->getErrorCode();
+					
 				if($scheduleEvent)
 				{
 					$scheduleEventObject = KalturaScheduleEvent::getInstance($scheduleEvent);
