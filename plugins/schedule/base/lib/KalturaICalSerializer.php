@@ -38,6 +38,21 @@ class KalturaICalSerializer extends KalturaSerializer
 			$event = kSchedulingICalEvent::fromObject($object);
 			return $event->write();
 		}
+		elseif($object instanceof KalturaScheduleEventArray)
+		{
+			$ret = '';
+			foreach($object as $item)
+			{
+				$ret .= $this->serialize($item);
+			}
+			return $ret;
+		}
+		elseif($object instanceof KalturaScheduleEventListResponse)
+		{
+			$ret = $this->serialize($object->objects);
+			$ret .= $this->calendar->writeField('X-KALTURA-TOTAL-COUNT', $object->totalCount);
+			return $ret;
+		}
 		else
 		{
 			$ret = $this->calendar->writeField('BEGIN', get_class($object));
