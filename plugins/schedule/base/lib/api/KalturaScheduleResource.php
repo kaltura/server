@@ -140,8 +140,6 @@ abstract class KalturaScheduleResource extends KalturaObject implements IRelated
 	 */
 	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
 	{
-		$this->validatePropertyNotNull('name');
-
 		if(!$this->isNull('systemName'))
 		{
 			$c = new Criteria();
