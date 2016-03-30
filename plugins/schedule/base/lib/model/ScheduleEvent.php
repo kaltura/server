@@ -96,17 +96,17 @@ abstract class ScheduleEvent extends BaseScheduleEvent implements IRelatedObject
 	}
 	
 	/**
-	 * @param array<kScheduleEventRecurrence> $v
+	 * @param kScheduleEventRecurrence $v
 	 */
-	public function setRecurrences(array $v)
+	public function setRecurrence(array $v)
 	{
 		$this->putInCustomData(self::CUSTOM_DATA_FIELD_RECURRENCE, $v);
 	}
 	
 	/**
-	 * @return array<kScheduleEventRecurrence>
+	 * @return kScheduleEventRecurrence
 	 */
-	public function getRecurrences()
+	public function getRecurrence()
 	{
 		return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_RECURRENCE);
 	}
@@ -137,13 +137,8 @@ abstract class ScheduleEvent extends BaseScheduleEvent implements IRelatedObject
 			$limit = SchedulePlugin::getScheduleEventmaxRecurrences();
 		}
 		
-		$recurrences = $this->getRecurrences();
-		$dates = array();
-		foreach($recurrences as $recurrence)
-		{
-			/* @var $recurrence kScheduleEventRecurrence */
-			$dates = array_merge($dates, $recurrence->getDates($periodStart, $periodEnd, $this->getStartDate(null), $limit));
-		}
+		$recurrence = $this->getRecurrence();
+		$dates = $recurrence->getDates($periodStart, $periodEnd, $this->getStartDate(null), $limit);
 		
 		sort($dates);
 		if(count($dates) > $limit)

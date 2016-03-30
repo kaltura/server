@@ -162,9 +162,9 @@ abstract class KalturaScheduleEvent extends KalturaObject implements IRelatedFil
 	public $updatedAt;
 
 	/**
-	 * @var KalturaScheduleEventRecurrenceArray
+	 * @var KalturaScheduleEventRecurrence
 	 */
-	public $recurrences;
+	public $recurrence;
 	
 	/*
 	 * Mapping between the field on this object (on the left) and the setter/getter on the entry object (on the right)  
@@ -194,7 +194,7 @@ abstract class KalturaScheduleEvent extends KalturaObject implements IRelatedFil
 		'tags',
 		'createdAt',
 		'updatedAt',
-		'recurrences',
+		'recurrence',
 	 );
 		 
 	/* (non-PHPdoc)

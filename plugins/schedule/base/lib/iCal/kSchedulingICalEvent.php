@@ -126,7 +126,7 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 		if($rule)
 		{
 			$event->recurrenceType = KalturaScheduleEventRecurrenceType::RECURRING;
-			$event->recurrences = array($rule->toObject());
+			$event->recurrence = $rule->toObject();
 		}
 		else
 		{
@@ -171,11 +171,9 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 		if($event->classificationType && isset($classificationTypes[$event->classificationType]))
 			$classificationType = $object->setField('class', $classificationTypes[$event->classificationType]);
 			
-		if($event->recurrences && count($event->recurrences))
+		if($event->recurrence)
 		{
-			$recurrence = reset($event->recurrences);
-			/* @var $recurrence KalturaScheduleEventRecurrence */
-			$rule = kSchedulingICalRule::fromObject($recurrence);
+			$rule = kSchedulingICalRule::fromObject($event->recurrence);
 			$object->setRule($rule);
 		}
 
