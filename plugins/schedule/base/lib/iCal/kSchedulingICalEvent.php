@@ -176,6 +176,49 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 			$rule = kSchedulingICalRule::fromObject($recurrence);
 			$object->setRule($rule);
 		}
+
+		$object->setField('x-kaltura-id', $event->id);
+		$object->setField('x-kaltura-partner-id', $event->partnerId);
+		$object->setField('x-kaltura-status', $event->status);
+
+		if($event->parentId)
+			$object->setField('x-kaltura-parent-id', $event->parentId);
+
+		if($event->tags)
+			$object->setField('x-kaltura-tags', $event->tags);
+		
+		if($event instanceof KalturaEntryScheduleEvent)
+		{
+			if($event->entryIds)
+				$object->setField('x-kaltura-entry-ids', $event->entryIds);
+			
+			if($event->categoryIds)
+			{
+				$object->setField('x-kaltura-category-ids', $event->categoryIds);
+				
+				// hack, to be removed after x-kaltura-category-ids will be fully supported by other partners
+				$pks = explode(',', $event->categoryIds);
+				$categories = categoryPeer::retrieveByPKs($pks);
+				$fullIds = array();
+				foreach($categories as $category)
+				{
+					/* @var $category category */
+					$fullIds[] = $category->getFullIds();
+				}
+				if(count($fullIds))
+					$object->setField('related-to', implode(';', $fullIds));
+			}
+		}
+
+		$resources = ScheduleEventResourcePeer::retrieveByEventId($event->id);
+		$resourceIds = array();
+		foreach($resources as $resource)
+		{
+			/* @var $resource ScheduleEventResource */
+			$resourceIds[] = $resource->getResourceId();
+		}
+		if(count($resourceIds))
+			$object->setField('x-kaltura-resource-ids', implode(',', $resourceIds));
 		
 		return $object;
 	}
