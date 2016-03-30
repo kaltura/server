@@ -23,7 +23,7 @@ class KalturaICalSerializer extends KalturaSerializer
 	 */
 	public function getHeader() 
 	{
-		$this->calendar->begin();
+		return $this->calendar->begin();
 	}
 
 
@@ -36,12 +36,14 @@ class KalturaICalSerializer extends KalturaSerializer
 		if($object instanceof KalturaScheduleEvent)
 		{
 			$event = kSchedulingICalEvent::fromObject($object);
-			$event->write();
+			return $event->write();
 		}
 		else
 		{
-			$this->calendar->writeField('BEGIN', get_class($object));
-			$this->calendar->writeField('END', get_class($object));
+			$ret = $this->calendar->writeField('BEGIN', get_class($object));
+			$ret .= $this->calendar->writeField('END', get_class($object));
+			
+			return $ret;
 		}
 	}
 	
@@ -54,6 +56,6 @@ class KalturaICalSerializer extends KalturaSerializer
 		if($execTime)
 			$this->calendar->writeField('x-kaltura-execution-time', $execTime);
 		
-		$this->calendar->end();
+		return $this->calendar->end();
 	}
 }
