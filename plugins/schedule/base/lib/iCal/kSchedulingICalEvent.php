@@ -69,10 +69,12 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 	 */
 	protected function writeBody()
 	{
-		parent::writeBody();
+		$ret = parent::writeBody();
 		
 		if($this->rule)
-			$this->writeField('RRULE', $this->rule->getBody());
+			$ret .= $this->writeField('RRULE', $this->rule->getBody());
+		
+		return $ret;
 	}
 	
 	/**

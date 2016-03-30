@@ -119,6 +119,7 @@ class BulkUploadSchedulePlugin extends KalturaPlugin implements IKalturaBulkUplo
 		if(!count($bulkUploadResults))
 			die("Log file is not ready");
 		
+		kSchedulingICalComponent::setWriteToStdout(true);
 		$calendar = new kSchedulingICalCalendar();
 		$calendar->begin();
 		

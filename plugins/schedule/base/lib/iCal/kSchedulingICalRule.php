@@ -132,6 +132,6 @@ class kSchedulingICalRule extends kSchedulingICalComponent
 	 */
 	public function write()
 	{
-		$this->writeBody();
+		return $this->writeBody();
 	}
 }

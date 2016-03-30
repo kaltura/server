@@ -23,9 +23,9 @@ abstract class kSchedulingICalComponent
 	private $eventsType = null;
 	
 	/**
-	 * @var resource
+	 * @var boolean
 	 */
-	private $stdout = null;
+	private static $writeToStdout = false;
 
 	abstract protected function getType();
 
@@ -36,6 +36,11 @@ abstract class kSchedulingICalComponent
 			$lines = explode($this->getLineDelimiter(), $data);
 			$this->parseLines($lines);
 		}
+	}
+	
+	public static function setWriteToStdout($write)
+	{
+		self::$writeToStdout = $write;
 	}
 
 	protected function getLineDelimiter()
@@ -166,40 +171,42 @@ abstract class kSchedulingICalComponent
 		return null;
 	}
 	
-	public function setStdOut($stdout)
-	{
-		$this->stdout = $stdout;
-	}
-	
-	protected function writeField($field, $value)
+	public function writeField($field, $value)
 	{
 		$str = $field . $this->getFieldDelimiter() . $value . $this->getLineDelimiter();
-		if($this->stdout)
-			fwrite($this->stdout, $str);
-		else
+		if(self::$writeToStdout)
 			echo $str;
+		
+		return $str;
 	}
 	
 	protected function writeBody()
 	{
+		$ret = '';
 		foreach($this->fields as $field => $value)
-			$this->writeField($field, $value);
+			$ret .= $this->writeField($field, $value);
+		
+		return $ret;
 	}
 	
 	public function begin()
 	{	
-		$this->writeField('BEGIN', $this->getType());
+		return $this->writeField('BEGIN', $this->getType());
 	}
 	
 	public function end()
 	{
-		$this->writeField('END', $this->getType());
+		return $this->writeField('END', $this->getType());
 	}
 	
 	public function write()
 	{
-		$this->begin();
-		$this->writeBody();
-		$this->end();
+		$ret = '';
+		
+		$ret .= $this->begin();
+		$ret .= $this->writeBody();
+		$ret .= $this->end();
+		
+		return $ret;
 	}
 }
