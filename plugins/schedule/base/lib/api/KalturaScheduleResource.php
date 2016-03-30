@@ -116,6 +116,8 @@ abstract class KalturaScheduleResource extends KalturaObject implements IRelated
 	{
 		return array();
 	}
+	
+	abstract protected function getScheduleResourceType();
 		 
 	/* (non-PHPdoc)
 	 * @see KalturaObject::validateForInsert($propertiesToSkip)
@@ -128,6 +130,7 @@ abstract class KalturaScheduleResource extends KalturaObject implements IRelated
 		{
 			$c = new Criteria();
 			$c->add(ScheduleResourcePeer::SYSTEM_NAME, $this->systemName);
+			$c->add(ScheduleResourcePeer::TYPE, $this->getScheduleResourceType());
 			if(ScheduleResourcePeer::doCount($c))
 				throw new KalturaAPIException(KalturaErrors::SYSTEM_NAME_ALREADY_EXISTS, $this->systemName);
 		}
@@ -144,6 +147,7 @@ abstract class KalturaScheduleResource extends KalturaObject implements IRelated
 		{
 			$c = new Criteria();
 			$c->add(ScheduleResourcePeer::SYSTEM_NAME, $this->systemName);
+			$c->add(ScheduleResourcePeer::TYPE, $this->getScheduleResourceType());
 			$c->add(ScheduleResourcePeer::ID, $sourceObject->getId(), Criteria::NOT_EQUAL);
 			if(ScheduleResourcePeer::doCount($c))
 				throw new KalturaAPIException(KalturaErrors::SYSTEM_NAME_ALREADY_EXISTS, $this->systemName);

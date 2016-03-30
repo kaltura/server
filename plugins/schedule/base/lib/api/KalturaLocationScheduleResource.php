@@ -5,6 +5,15 @@
  */
 class KalturaLocationScheduleResource extends KalturaScheduleResource
 {
+	/**
+	 * {@inheritDoc}
+	 * @see KalturaScheduleResource::getScheduleResourceType()
+	 */
+	protected function getScheduleResourceType()
+	{
+		return ScheduleResourceType::LOCATION;
+	}
+	
 	/* (non-PHPdoc)
 	 * @see KalturaObject::toObject($object_to_fill, $props_to_skip)
 	 */

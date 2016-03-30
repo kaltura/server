@@ -28,6 +28,15 @@ class KalturaCameraScheduleResource extends KalturaScheduleResource
 	{
 		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
 	}
+	
+	/**
+	 * {@inheritDoc}
+	 * @see KalturaScheduleResource::getScheduleResourceType()
+	 */
+	protected function getScheduleResourceType()
+	{
+		return ScheduleResourceType::CAMERA;
+	}
 		 
 	/* (non-PHPdoc)
 	 * @see KalturaObject::validateForInsert($propertiesToSkip)
