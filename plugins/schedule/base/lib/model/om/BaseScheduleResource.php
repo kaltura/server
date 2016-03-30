@@ -44,6 +44,12 @@ abstract class BaseScheduleResource extends BaseObject  implements Persistent {
 	protected $name;
 
 	/**
+	 * The value for the system_name field.
+	 * @var        string
+	 */
+	protected $system_name;
+
+	/**
 	 * The value for the description field.
 	 * @var        string
 	 */
@@ -168,6 +174,16 @@ abstract class BaseScheduleResource extends BaseObject  implements Persistent {
 	public function getName()
 	{
 		return $this->name;
+	}
+
+	/**
+	 * Get the [system_name] column value.
+	 * 
+	 * @return     string
+	 */
+	public function getSystemName()
+	{
+		return $this->system_name;
 	}
 
 	/**
@@ -391,6 +407,29 @@ abstract class BaseScheduleResource extends BaseObject  implements Persistent {
 
 		return $this;
 	} // setName()
+
+	/**
+	 * Set the value of [system_name] column.
+	 * 
+	 * @param      string $v new value
+	 * @return     ScheduleResource The current object (for fluent API support)
+	 */
+	public function setSystemName($v)
+	{
+		if(!isset($this->oldColumnsValues[ScheduleResourcePeer::SYSTEM_NAME]))
+			$this->oldColumnsValues[ScheduleResourcePeer::SYSTEM_NAME] = $this->system_name;
+
+		if ($v !== null) {
+			$v = (string) $v;
+		}
+
+		if ($this->system_name !== $v) {
+			$this->system_name = $v;
+			$this->modifiedColumns[] = ScheduleResourcePeer::SYSTEM_NAME;
+		}
+
+		return $this;
+	} // setSystemName()
 
 	/**
 	 * Set the value of [description] column.
@@ -641,13 +680,14 @@ abstract class BaseScheduleResource extends BaseObject  implements Persistent {
 			$this->parent_id = ($row[$startcol + 1] !== null) ? (int) $row[$startcol + 1] : null;
 			$this->partner_id = ($row[$startcol + 2] !== null) ? (int) $row[$startcol + 2] : null;
 			$this->name = ($row[$startcol + 3] !== null) ? (string) $row[$startcol + 3] : null;
-			$this->description = ($row[$startcol + 4] !== null) ? (string) $row[$startcol + 4] : null;
-			$this->tags = ($row[$startcol + 5] !== null) ? (string) $row[$startcol + 5] : null;
-			$this->type = ($row[$startcol + 6] !== null) ? (int) $row[$startcol + 6] : null;
-			$this->status = ($row[$startcol + 7] !== null) ? (int) $row[$startcol + 7] : null;
-			$this->created_at = ($row[$startcol + 8] !== null) ? (string) $row[$startcol + 8] : null;
-			$this->updated_at = ($row[$startcol + 9] !== null) ? (string) $row[$startcol + 9] : null;
-			$this->custom_data = ($row[$startcol + 10] !== null) ? (string) $row[$startcol + 10] : null;
+			$this->system_name = ($row[$startcol + 4] !== null) ? (string) $row[$startcol + 4] : null;
+			$this->description = ($row[$startcol + 5] !== null) ? (string) $row[$startcol + 5] : null;
+			$this->tags = ($row[$startcol + 6] !== null) ? (string) $row[$startcol + 6] : null;
+			$this->type = ($row[$startcol + 7] !== null) ? (int) $row[$startcol + 7] : null;
+			$this->status = ($row[$startcol + 8] !== null) ? (int) $row[$startcol + 8] : null;
+			$this->created_at = ($row[$startcol + 9] !== null) ? (string) $row[$startcol + 9] : null;
+			$this->updated_at = ($row[$startcol + 10] !== null) ? (string) $row[$startcol + 10] : null;
+			$this->custom_data = ($row[$startcol + 11] !== null) ? (string) $row[$startcol + 11] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -657,7 +697,7 @@ abstract class BaseScheduleResource extends BaseObject  implements Persistent {
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 11; // 11 = ScheduleResourcePeer::NUM_COLUMNS - ScheduleResourcePeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 12; // 12 = ScheduleResourcePeer::NUM_COLUMNS - ScheduleResourcePeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating ScheduleResource object", $e);
@@ -1190,24 +1230,27 @@ abstract class BaseScheduleResource extends BaseObject  implements Persistent {
 				return $this->getName();
 				break;
 			case 4:
-				return $this->getDescription();
+				return $this->getSystemName();
 				break;
 			case 5:
-				return $this->getTags();
+				return $this->getDescription();
 				break;
 			case 6:
-				return $this->getType();
+				return $this->getTags();
 				break;
 			case 7:
-				return $this->getStatus();
+				return $this->getType();
 				break;
 			case 8:
-				return $this->getCreatedAt();
+				return $this->getStatus();
 				break;
 			case 9:
-				return $this->getUpdatedAt();
+				return $this->getCreatedAt();
 				break;
 			case 10:
+				return $this->getUpdatedAt();
+				break;
+			case 11:
 				return $this->getCustomData();
 				break;
 			default:
@@ -1235,13 +1278,14 @@ abstract class BaseScheduleResource extends BaseObject  implements Persistent {
 			$keys[1] => $this->getParentId(),
 			$keys[2] => $this->getPartnerId(),
 			$keys[3] => $this->getName(),
-			$keys[4] => $this->getDescription(),
-			$keys[5] => $this->getTags(),
-			$keys[6] => $this->getType(),
-			$keys[7] => $this->getStatus(),
-			$keys[8] => $this->getCreatedAt(),
-			$keys[9] => $this->getUpdatedAt(),
-			$keys[10] => $this->getCustomData(),
+			$keys[4] => $this->getSystemName(),
+			$keys[5] => $this->getDescription(),
+			$keys[6] => $this->getTags(),
+			$keys[7] => $this->getType(),
+			$keys[8] => $this->getStatus(),
+			$keys[9] => $this->getCreatedAt(),
+			$keys[10] => $this->getUpdatedAt(),
+			$keys[11] => $this->getCustomData(),
 		);
 		return $result;
 	}
@@ -1286,24 +1330,27 @@ abstract class BaseScheduleResource extends BaseObject  implements Persistent {
 				$this->setName($value);
 				break;
 			case 4:
-				$this->setDescription($value);
+				$this->setSystemName($value);
 				break;
 			case 5:
-				$this->setTags($value);
+				$this->setDescription($value);
 				break;
 			case 6:
-				$this->setType($value);
+				$this->setTags($value);
 				break;
 			case 7:
-				$this->setStatus($value);
+				$this->setType($value);
 				break;
 			case 8:
-				$this->setCreatedAt($value);
+				$this->setStatus($value);
 				break;
 			case 9:
-				$this->setUpdatedAt($value);
+				$this->setCreatedAt($value);
 				break;
 			case 10:
+				$this->setUpdatedAt($value);
+				break;
+			case 11:
 				$this->setCustomData($value);
 				break;
 		} // switch()
@@ -1334,13 +1381,14 @@ abstract class BaseScheduleResource extends BaseObject  implements Persistent {
 		if (array_key_exists($keys[1], $arr)) $this->setParentId($arr[$keys[1]]);
 		if (array_key_exists($keys[2], $arr)) $this->setPartnerId($arr[$keys[2]]);
 		if (array_key_exists($keys[3], $arr)) $this->setName($arr[$keys[3]]);
-		if (array_key_exists($keys[4], $arr)) $this->setDescription($arr[$keys[4]]);
-		if (array_key_exists($keys[5], $arr)) $this->setTags($arr[$keys[5]]);
-		if (array_key_exists($keys[6], $arr)) $this->setType($arr[$keys[6]]);
-		if (array_key_exists($keys[7], $arr)) $this->setStatus($arr[$keys[7]]);
-		if (array_key_exists($keys[8], $arr)) $this->setCreatedAt($arr[$keys[8]]);
-		if (array_key_exists($keys[9], $arr)) $this->setUpdatedAt($arr[$keys[9]]);
-		if (array_key_exists($keys[10], $arr)) $this->setCustomData($arr[$keys[10]]);
+		if (array_key_exists($keys[4], $arr)) $this->setSystemName($arr[$keys[4]]);
+		if (array_key_exists($keys[5], $arr)) $this->setDescription($arr[$keys[5]]);
+		if (array_key_exists($keys[6], $arr)) $this->setTags($arr[$keys[6]]);
+		if (array_key_exists($keys[7], $arr)) $this->setType($arr[$keys[7]]);
+		if (array_key_exists($keys[8], $arr)) $this->setStatus($arr[$keys[8]]);
+		if (array_key_exists($keys[9], $arr)) $this->setCreatedAt($arr[$keys[9]]);
+		if (array_key_exists($keys[10], $arr)) $this->setUpdatedAt($arr[$keys[10]]);
+		if (array_key_exists($keys[11], $arr)) $this->setCustomData($arr[$keys[11]]);
 	}
 
 	/**
@@ -1356,6 +1404,7 @@ abstract class BaseScheduleResource extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(ScheduleResourcePeer::PARENT_ID)) $criteria->add(ScheduleResourcePeer::PARENT_ID, $this->parent_id);
 		if ($this->isColumnModified(ScheduleResourcePeer::PARTNER_ID)) $criteria->add(ScheduleResourcePeer::PARTNER_ID, $this->partner_id);
 		if ($this->isColumnModified(ScheduleResourcePeer::NAME)) $criteria->add(ScheduleResourcePeer::NAME, $this->name);
+		if ($this->isColumnModified(ScheduleResourcePeer::SYSTEM_NAME)) $criteria->add(ScheduleResourcePeer::SYSTEM_NAME, $this->system_name);
 		if ($this->isColumnModified(ScheduleResourcePeer::DESCRIPTION)) $criteria->add(ScheduleResourcePeer::DESCRIPTION, $this->description);
 		if ($this->isColumnModified(ScheduleResourcePeer::TAGS)) $criteria->add(ScheduleResourcePeer::TAGS, $this->tags);
 		if ($this->isColumnModified(ScheduleResourcePeer::TYPE)) $criteria->add(ScheduleResourcePeer::TYPE, $this->type);
@@ -1446,6 +1495,8 @@ abstract class BaseScheduleResource extends BaseObject  implements Persistent {
 		$copyObj->setPartnerId($this->partner_id);
 
 		$copyObj->setName($this->name);
+
+		$copyObj->setSystemName($this->system_name);
 
 		$copyObj->setDescription($this->description);
 

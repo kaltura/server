@@ -35,6 +35,14 @@ abstract class KalturaScheduleResource extends KalturaObject implements IRelated
 	public $name;
 
 	/**
+	 * Defines a unique system-name
+	 * @var string
+	 * @minLength 1
+	 * @maxLength 256
+	 */
+	public $systemName;
+
+	/**
 	 * @var string
 	 */
 	public $description;
@@ -77,6 +85,7 @@ abstract class KalturaScheduleResource extends KalturaObject implements IRelated
 		'parentId',
 		'partnerId',
 		'name',
+		'systemName',
 		'description',
 		'status',
 		'tags',
