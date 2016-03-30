@@ -123,6 +123,15 @@ abstract class KalturaScheduleResource extends KalturaObject implements IRelated
 	public function validateForInsert($propertiesToSkip = array())
 	{
 		$this->validatePropertyNotNull('name');
+
+		if(!$this->isNull('systemName'))
+		{
+			$c = new Criteria();
+			$c->add(ScheduleResourcePeer::SYSTEM_NAME, $this->systemName);
+			if(ScheduleResourcePeer::doCount($c))
+				throw new KalturaAPIException(KalturaErrors::SYSTEM_NAME_ALREADY_EXISTS, $this->systemName);
+		}
+		
 		return parent::validateForInsert($propertiesToSkip);
 	}
 		 
@@ -132,6 +141,16 @@ abstract class KalturaScheduleResource extends KalturaObject implements IRelated
 	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
 	{
 		$this->validatePropertyNotNull('name');
+
+		if(!$this->isNull('systemName'))
+		{
+			$c = new Criteria();
+			$c->add(ScheduleResourcePeer::SYSTEM_NAME, $this->systemName);
+			$c->add(ScheduleResourcePeer::ID, $sourceObject->getId(), Criteria::NOT_EQUAL);
+			if(ScheduleResourcePeer::doCount($c))
+				throw new KalturaAPIException(KalturaErrors::SYSTEM_NAME_ALREADY_EXISTS, $this->systemName);
+		}
+		
 		return parent::validateForUpdate($sourceObject, $propertiesToSkip);
 	}
 	
