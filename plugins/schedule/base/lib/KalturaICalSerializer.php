@@ -53,6 +53,15 @@ class KalturaICalSerializer extends KalturaSerializer
 			$ret .= $this->calendar->writeField('X-KALTURA-TOTAL-COUNT', $object->totalCount);
 			return $ret;
 		}
+		elseif($object instanceof KalturaAPIException)
+		{
+			$ret = $this->calendar->writeField('BEGIN', 'VERROR');
+			$ret .= $this->calendar->writeField('X-KALTURA-CODE', $object->getCode());
+			$ret .= $this->calendar->writeField('X-KALTURA-MESSAGE', $object->getMessage());
+			$ret .= $this->calendar->writeField('X-KALTURA-ARGUMENTS', implode(';', $object->getArgs()));
+			$ret .= $this->calendar->writeField('END', 'VERROR');
+			return $ret;
+		}
 		else
 		{
 			$ret = $this->calendar->writeField('BEGIN', get_class($object));
