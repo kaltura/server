@@ -98,7 +98,7 @@ abstract class ScheduleEvent extends BaseScheduleEvent implements IRelatedObject
 	/**
 	 * @param kScheduleEventRecurrence $v
 	 */
-	public function setRecurrence(array $v)
+	public function setRecurrence(kScheduleEventRecurrence $v)
 	{
 		$this->putInCustomData(self::CUSTOM_DATA_FIELD_RECURRENCE, $v);
 	}
