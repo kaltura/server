@@ -491,11 +491,12 @@ class category extends Basecategory implements IIndexable, IRelatedObject
 		$fullIds = $this->getFullIds();
 		$categoriesIds = $this->getDescendantCategoriesIds();
 
+		$now = time();
 		if (isset($categoriesIds) && !empty($categoriesIds))
 		{
 			$update = KalturaCriteria::create(categoryPeer::OM_CLASS);
-			$update->add(categoryPeer::DELETED_AT, time());
-			$update->add(categoryPeer::UPDATED_AT, time());
+			$update->add(categoryPeer::DELETED_AT, $now);
+			$update->add(categoryPeer::UPDATED_AT, $now);
 			$update->add(categoryPeer::STATUS, CategoryStatus::DELETED);
 			$update->add(categoryPeer::ID, $categoriesIds, KalturaCriteria::IN);
 			categoryPeer::doUpdate($update);
@@ -506,6 +507,9 @@ class category extends Basecategory implements IIndexable, IRelatedObject
 		categoryPeer::setUseCriteriaFilter(false);
 
 		foreach ($categories as $categoryToDelete) {
+			$categoryToDelete->status=CategoryStatus::DELETED;
+			$categoryToDelete->deleted_at=$now;
+			$categoryToDelete->updated_at=$now;
 			kEventsManager::raiseEvent(new kObjectDeletedEvent($categoryToDelete));
 			kEventsManager::raiseEventDeferred(new kObjectReadyForIndexEvent($categoryToDelete));
 		}
@@ -1786,8 +1790,6 @@ class category extends Basecategory implements IIndexable, IRelatedObject
 	{
 		$fullIds = $this->getFullIds();
 		$fullIds = $fullIds.'>';
-		if (!isset($fullIds) || empty($fullIds))
-			return array();
 
 		$filter = new categoryFilter();
 		$filter->setFullIdsStartsWith($fullIds);
