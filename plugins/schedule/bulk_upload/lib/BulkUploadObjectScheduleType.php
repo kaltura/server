@@ -6,6 +6,7 @@
 class BulkUploadObjectScheduleType implements IKalturaPluginEnum, BulkUploadObjectType
 {
 	const SCHEDULE_EVENT = 'SCHEDULE_EVENT';
+	const SCHEDULE_RESOURCE = 'SCHEDULE_RESOURCE';
 	
 	/**
 	 * 
@@ -15,6 +16,7 @@ class BulkUploadObjectScheduleType implements IKalturaPluginEnum, BulkUploadObje
 	{
 		return array(
 			'SCHEDULE_EVENT' => self::SCHEDULE_EVENT,
+			'SCHEDULE_RESOURCE' => self::SCHEDULE_RESOURCE,
 		);
 	}
 	

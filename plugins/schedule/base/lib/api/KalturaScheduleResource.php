@@ -39,6 +39,7 @@ abstract class KalturaScheduleResource extends KalturaObject implements IRelated
 	 * @var string
 	 * @minLength 1
 	 * @maxLength 256
+	 * @filter eq,in
 	 */
 	public $systemName;
 

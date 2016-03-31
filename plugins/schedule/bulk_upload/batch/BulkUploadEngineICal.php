@@ -75,6 +75,8 @@ class BulkUploadEngineICal extends KBulkUploadEngine
     	$bulkUploadResult->referenceId = $iCal->getUid();
     	$bulkUploadResult->bulkUploadResultObjectType = KalturaBulkUploadObjectType::SCHEDULE_EVENT;
     	$bulkUploadResult->rowData = $iCal->getRaw();
+		$bulkUploadResult->objectStatus = KalturaScheduleEventStatus::ACTIVE;
+		$bulkUploadResult->status = KalturaBulkUploadResultStatus::IN_PROGRESS;
 
     	if($iCal->getMethod() == kSchedulingICal::METHOD_CANCEL)
     	{
