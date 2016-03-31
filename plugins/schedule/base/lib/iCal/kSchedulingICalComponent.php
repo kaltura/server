@@ -5,27 +5,27 @@ abstract class kSchedulingICalComponent
 	/**
 	 * @var array
 	 */
-	private $fields = array();
+	protected $fields = array();
 	
 	/**
 	 * @var array
 	 */
-	private $components = array();
+	protected $components = array();
 	
 	/**
 	 * @var kSchedulingICalComponent
 	 */
-	private $parent = null;
+	protected $parent = null;
 	
 	/**
 	 * @var KalturaScheduleEventType
 	 */
-	private $eventsType = null;
+	protected $eventsType = null;
 	
 	/**
 	 * @var boolean
 	 */
-	private static $writeToStdout = false;
+	protected static $writeToStdout = false;
 
 	abstract protected function getType();
 
