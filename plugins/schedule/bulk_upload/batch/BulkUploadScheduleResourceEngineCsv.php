@@ -159,7 +159,7 @@ class BulkUploadScheduleResourceEngineCsv extends BulkUploadEngineCsv
 				if(!isset($filterSystemNames[$bulkUploadResult->type]))
 					$filterSystemNames[$bulkUploadResult->type] = array();
 				
-				$filterSystemNames[$bulkUploadResult->type] = $bulkUploadResult->systemName;
+				$filterSystemNames[$bulkUploadResult->type][] = $bulkUploadResult->systemName;
 				if(count($filterSystemNames[$bulkUploadResult->type] >= self::MAX_IN_FILTER))
 				{
 					$this->validateSystemNames($bulkUploadResult->type, $filterSystemNames[$bulkUploadResult->type]);
@@ -172,7 +172,7 @@ class BulkUploadScheduleResourceEngineCsv extends BulkUploadEngineCsv
 				if(!isset($filterSystemNames[$bulkUploadResult->parentType]))
 					$filterSystemNames[$bulkUploadResult->parentType] = array();
 				
-				$filterSystemNames[$bulkUploadResult->parentType] = $bulkUploadResult->parentSystemName;
+				$filterSystemNames[$bulkUploadResult->parentType][] = $bulkUploadResult->parentSystemName;
 				if(count($filterSystemNames[$bulkUploadResult->parentType] >= self::MAX_IN_FILTER))
 				{
 					$this->validateSystemNames($bulkUploadResult->parentType, $filterSystemNames[$bulkUploadResult->parentType]);
