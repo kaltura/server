@@ -63,10 +63,18 @@ class BulkUploadSchedulePlugin extends KalturaPlugin implements IKalturaBulkUplo
 			return new KalturaBulkUploadICalJobData();
 			
 			// Gets the engine (only for clients)
-		if($baseClass == 'KBulkUploadEngine' && class_exists('KalturaClient') && $enumValue == KalturaBulkUploadType::ICAL)
-		{
-			list($job) = $constructorArgs;
-			return new BulkUploadEngineICal($job);
+		if($baseClass == 'KBulkUploadEngine' && class_exists('KalturaClient'))
+		{	
+			if($enumValue == KalturaBulkUploadType::ICAL)
+			{
+				list($job) = $constructorArgs;
+				return new BulkUploadEngineICal($job);
+			}
+			elseif((!$enumValue || $enumValue == KalturaBulkUploadType::CSV) && $job->data->bulkUploadObjectType == self::getBulkUploadObjectTypeCoreValue(BulkUploadObjectScheduleType::SCHEDULE_RESOURCE))
+			{
+				list($job) = $constructorArgs;	
+				return new BulkUploadScheduleResourceEngineCsv($job);
+			}
 		}
 		
 		return null;
