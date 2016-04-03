@@ -152,7 +152,7 @@ class BulkUploadScheduleResourceEngineCsv extends BulkUploadEngineCsv
 		$schedulePlugin = KalturaScheduleClientPlugin::get(KBatchBase::$kClient);
 		
 		$filterSystemNames = array();
-		foreach($this->bulkUploadResults as &$bulkUploadResult)
+		foreach($this->bulkUploadResults as $bulkUploadResult)
 		{
 			if($bulkUploadResult->systemName && !$bulkUploadResult->resourceId && ($bulkUploadResult->action == KalturaBulkUploadAction::ADD_OR_UPDATE || $bulkUploadResult->action == KalturaBulkUploadAction::UPDATE))
 			{
