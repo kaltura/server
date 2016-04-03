@@ -22,6 +22,7 @@ abstract class KalturaEntryServerNodeBaseFilter extends KalturaRelatedFilter
 		"updatedAtLessThanOrEqual" => "_lte_updated_at",
 		"updatedAtGreaterThanOrEqual" => "_gte_updated_at",
 		"statusEqual" => "_eq_status",
+		"statusIn" => "_in_status",
 		"serverTypeEqual" => "_eq_server_type",
 	);
 
@@ -112,6 +113,11 @@ abstract class KalturaEntryServerNodeBaseFilter extends KalturaRelatedFilter
 	 * @var KalturaEntryServerNodeStatus
 	 */
 	public $statusEqual;
+	
+	/**
+	 * @var KalturaEntryServerNodeStatus
+	 */
+	public $statusIn;
 
 	/**
 	 * @var KalturaEntryServerNodeType
