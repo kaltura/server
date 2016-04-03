@@ -79,7 +79,7 @@ class BulkUploadScheduleResourceEngineCsv extends BulkUploadEngineCsv
 		}
 		if(!$bulkUploadResult->type)
 		{
-			$bulkUploadResult->type = KalturaScheduleResourceType::LOCATION;
+			$bulkUploadResult->type = 'location';
 		}
 		
 		if($bulkUploadResult->parentType && !in_array($bulkUploadResult->parentType, self::$validTypes))
@@ -90,7 +90,7 @@ class BulkUploadScheduleResourceEngineCsv extends BulkUploadEngineCsv
 		}
 		if(!$bulkUploadResult->parentType)
 		{
-			$bulkUploadResult->parentType = KalturaScheduleResourceType::LOCATION;
+			$bulkUploadResult->parentType = 'location';
 		}
 		
 		if($this->maxRecords && $this->lineNumber > $this->maxRecords) // check max records
