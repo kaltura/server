@@ -17,4 +17,13 @@ class KalturaRecordScheduleEvent extends KalturaEntryScheduleEvent
 		
 		return parent::toObject($sourceObject, $propertiesToSkip);
 	}
+	
+	/**
+	 * {@inheritDoc}
+	 * @see KalturaScheduleEvent::getScheduleEventType()
+	 */
+	public function getScheduleEventType()
+	{
+		return ScheduleEventType::RECORD;
+	}
 }

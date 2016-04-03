@@ -178,6 +178,7 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 		}
 
 		$object->setField('x-kaltura-id', $event->id);
+		$object->setField('x-kaltura-type', $event->getScheduleEventType());
 		$object->setField('x-kaltura-partner-id', $event->partnerId);
 		$object->setField('x-kaltura-status', $event->status);
 

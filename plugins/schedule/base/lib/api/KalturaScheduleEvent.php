@@ -221,6 +221,11 @@ abstract class KalturaScheduleEvent extends KalturaObject implements IRelatedFil
 		return array();
 	}
 	
+	/**
+	 * @return ScheduleEventType
+	 */
+	abstract public function getScheduleEventType();
+	
 	public function validate($startDate, $endDate)
 	{
 		if($this->recurrenceType === ScheduleEventRecurrenceType::RECURRENCE)

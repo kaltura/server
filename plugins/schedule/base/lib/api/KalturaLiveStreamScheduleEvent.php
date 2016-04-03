@@ -17,4 +17,13 @@ class KalturaLiveStreamScheduleEvent extends KalturaEntryScheduleEvent
 		
 		return parent::toObject($sourceObject, $propertiesToSkip);
 	}
+	
+	/**
+	 * {@inheritDoc}
+	 * @see KalturaScheduleEvent::getScheduleEventType()
+	 */
+	public function getScheduleEventType()
+	{
+		return ScheduleEventType::LIVE_STREAM;
+	}
 }
