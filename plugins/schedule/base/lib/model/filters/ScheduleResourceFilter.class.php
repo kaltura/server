@@ -22,6 +22,8 @@ class ScheduleResourceFilter extends baseObjectFilter
 				"_lte_created_at",
 				"_gte_updated_at",
 				"_lte_updated_at",
+				"_eq_system_name",
+				"_in_system_name",
 			) , NULL );
 
 		$this->allowed_order_fields = array (
