@@ -188,13 +188,13 @@ class BulkUploadScheduleResourceEngineCsv extends BulkUploadEngineCsv
 		// start a multi request for add entries
 		KBatchBase::$kClient->startMultiRequest();
 		
-		KalturaLog::info("job[{$this->job->id}] start creating users");
+		KalturaLog::info("job[{$this->job->id}] start creating resources");
 		$bulkUploadResultChunk = array(); // store the results of the created entries
 		
 		foreach($this->bulkUploadResults as $bulkUploadResult)
 		{
 			/* @var $bulkUploadResult KalturaBulkUploadResultScheduleResource */
-			KalturaLog::info("Handling bulk upload result: [" . $bulkUploadResult->userId . "]");
+			KalturaLog::info("Handling bulk upload result: [" . ($bulkUploadResult->resourceId ? $bulkUploadResult->resourceId : $bulkUploadResult->systemName) . "]");
 			
 			if($bulkUploadResult->action == KalturaBulkUploadAction::ADD_OR_UPDATE && $bulkUploadResult->systemName && isset($this->existingSystemNames[$bulkUploadResult->type]))
 			{
@@ -281,7 +281,7 @@ class BulkUploadScheduleResourceEngineCsv extends BulkUploadEngineCsv
 	 */
 	protected function createScheduleResourceFromResultAndJobData(KalturaBulkUploadResultScheduleResource $bulkUploadResult)
 	{
-		switch($$bulkUploadResult->type)
+		switch($bulkUploadResult->type)
 		{
 			case 'location':
 				$scheduleResource = new KalturaLocationScheduleResource();
