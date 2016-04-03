@@ -43,7 +43,6 @@ class KalturaCameraScheduleResource extends KalturaScheduleResource
 	 */
 	public function validateForInsert($propertiesToSkip = array())
 	{
-		$this->validatePropertyNotNull('streamUrl');
 		return parent::validateForInsert($propertiesToSkip);
 	}
 		 
