@@ -62,7 +62,6 @@ class ScheduleBulkService extends KalturaBaseService
 	       $bulkUploadData = KalturaPluginManager::loadObject('KalturaBulkUploadJobData', null);
 	    }
 	    
-	    $bulkUploadCoreType = kPluginableEnumsManager::apiToCore("BulkUploadType", $bulkUploadData->type);
 		$bulkUploadObjectCoreType = BulkUploadSchedulePlugin::getBulkUploadObjectTypeCoreValue(BulkUploadObjectScheduleType::SCHEDULE_RESOURCE);
 		
 		if(!$bulkUploadData->fileName)
@@ -70,6 +69,8 @@ class ScheduleBulkService extends KalturaBaseService
 		
 		$dbBulkUploadJobData = $bulkUploadData->toInsertableObject();
 		/* @var $dbBulkUploadJobData kBulkUploadJobData */
+
+		$bulkUploadCoreType = kPluginableEnumsManager::apiToCore("BulkUploadType", $bulkUploadData->type);
 		
 		$dbBulkUploadJobData->setBulkUploadObjectType($bulkUploadObjectCoreType);
 		$dbBulkUploadJobData->setUserId($this->getKuser()->getPuserId());
