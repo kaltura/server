@@ -64,7 +64,7 @@ class BulkUploadScheduleResourceEngineCsv extends BulkUploadEngineCsv
 	protected function validateBulkUploadResult(KalturaBulkUploadResult $bulkUploadResult)
 	{
 		/* @var $bulkUploadResult KalturaBulkUploadResultScheduleResource */
-		if(!$bulkUploadResult->resourceId && !$bulkUploadResult->systemName)
+		if(!$bulkUploadResult->resourceId && !$bulkUploadResult->systemName && ($bulkUploadResult->action == KalturaBulkUploadAction::UPDATE || $bulkUploadResult->action == KalturaBulkUploadAction::DELETE))
 		{
 			$bulkUploadResult->status = KalturaBulkUploadResultStatus::ERROR;
 			$bulkUploadResult->errorType = KalturaBatchJobErrorTypes::APP;
