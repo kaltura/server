@@ -182,7 +182,8 @@ class BulkUploadScheduleResourceEngineCsv extends BulkUploadEngineCsv
 		}
 		foreach($filterSystemNames as $type => $names)
 		{
-			$this->validateSystemNames($type, $names);
+			if(count($names))
+				$this->validateSystemNames($type, $names);
 		}
 		
 		// start a multi request for add entries
