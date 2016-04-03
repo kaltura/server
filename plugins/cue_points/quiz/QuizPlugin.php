@@ -19,6 +19,23 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 	
 	const SEARCH_TEXT_SUFFIX = 'qend';
 
+
+	/**
+	 * @return true is the entry id is quiz
+	 */
+	public static function isQuiz($entryId)
+	{
+		$dbEntry = entryPeer::retrieveByPK($entryId);
+		if ($dbEntry)
+		{
+			$kQuiz = self::getQuizData($dbEntry);
+			if (!is_null($kQuiz))
+				return true;
+		}
+
+		return false;
+	}
+
 	/* (non-PHPdoc)
 	 * @see IKalturaPlugin::getPluginName()
 	 */
