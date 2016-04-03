@@ -375,13 +375,19 @@ class BulkUploadScheduleResourceEngineCsv extends BulkUploadEngineCsv
 				continue;
 			}
 			
-			if($requestResults instanceof KalturaScheduleResource && $requestResults->systemName && isset($this->parentSystemNames[$bulkUploadResult->type]) && isset($this->parentSystemNames[$bulkUploadResult->type][$requestResults->systemName]))
+			if($requestResult instanceof KalturaScheduleResource)
 			{
-				if(!isset($this->existingSystemNames[$bulkUploadResult->type]))
-					$this->existingSystemNames[$bulkUploadResult->type] = array();
-				
-				$this->existingSystemNames[$bulkUploadResult->type][$requestResults->systemName] = $requestResults->id;
-				unset($this->parentSystemNames[$bulkUploadResult->type][$requestResults->systemName]);
+				if ($requestResult->id)
+				    $bulkUploadResult->objectId = $requestResult->id;
+
+				if($requestResult->systemName && isset($this->parentSystemNames[$bulkUploadResult->type]) && isset($this->parentSystemNames[$bulkUploadResult->type][$requestResult->systemName]))
+				{
+					if(!isset($this->existingSystemNames[$bulkUploadResult->type]))
+						$this->existingSystemNames[$bulkUploadResult->type] = array();
+					
+					$this->existingSystemNames[$bulkUploadResult->type][$requestResult->systemName] = $requestResult->id;
+					unset($this->parentSystemNames[$bulkUploadResult->type][$requestResult->systemName]);
+				}
 			}
 			
 			$this->addBulkUploadResult($bulkUploadResult);
