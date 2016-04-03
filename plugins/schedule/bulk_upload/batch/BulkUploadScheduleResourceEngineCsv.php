@@ -132,7 +132,7 @@ class BulkUploadScheduleResourceEngineCsv extends BulkUploadEngineCsv
 				break;
 						
 		}
-		$filter->systemNameIn = implode($filterSystemNames);
+		$filter->systemNameIn = implode(',', $filterSystemNames);
 		$response = $schedulePlugin->scheduleResource->listAction($filter);
 		foreach($response->objects as $scheduleResource)
 		{
@@ -276,7 +276,7 @@ class BulkUploadScheduleResourceEngineCsv extends BulkUploadEngineCsv
 		if(count($requestResults))
 			$this->updateObjectsResults($requestResults, $bulkUploadResultChunk);
 		
-		KalturaLog::info("job[{$this->job->id}] finish modifying users");
+		KalturaLog::info("job[{$this->job->id}] finish modifying resources");
 	}
 	
 	/**
