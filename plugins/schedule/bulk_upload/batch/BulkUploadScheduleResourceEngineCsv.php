@@ -217,26 +217,32 @@ class BulkUploadScheduleResourceEngineCsv extends BulkUploadEngineCsv
 				case KalturaBulkUploadAction::ADD:
 					$scheduleResource = $this->createScheduleResourceFromResultAndJobData($bulkUploadResult);
 					$bulkUploadResultChunk[] = $bulkUploadResult;
-					$createdResource = $schedulePlugin->scheduleResource->add($scheduleResource);
-					if($bulkUploadResult->systemName)
+					if($scheduleResource)
 					{
-						if(!isset($this->parentSystemNames[$bulkUploadResult->type]))
-							$this->parentSystemNames[$bulkUploadResult->type] = array();
-						
-						$this->parentSystemNames[$bulkUploadResult->type][$bulkUploadResult->systemName] = "{$createdResource->id}";
+						$createdResource = $schedulePlugin->scheduleResource->add($scheduleResource);
+						if($bulkUploadResult->systemName)
+						{
+							if(!isset($this->parentSystemNames[$bulkUploadResult->type]))
+								$this->parentSystemNames[$bulkUploadResult->type] = array();
+							
+							$this->parentSystemNames[$bulkUploadResult->type][$bulkUploadResult->systemName] = "{$createdResource->id}";
+						}
 					}
 					break;
 				
 				case KalturaBulkUploadAction::UPDATE:
 					$scheduleResource = $this->createScheduleResourceFromResultAndJobData($bulkUploadResult);
 					$bulkUploadResultChunk[] = $bulkUploadResult;
-					$schedulePlugin->scheduleResource->update($bulkUploadResult->resourceId, $scheduleResource);
-					if($bulkUploadResult->resourceId && $bulkUploadResult->systemName)
+					if($scheduleResource)
 					{
-						if(!isset($this->existingSystemNames[$bulkUploadResult->type]))
-							$this->existingSystemNames[$bulkUploadResult->type] = array();
-						
-						$this->existingSystemNames[$bulkUploadResult->type][$bulkUploadResult->systemName] = $bulkUploadResult->resourceId;
+						$schedulePlugin->scheduleResource->update($bulkUploadResult->resourceId, $scheduleResource);
+						if($bulkUploadResult->resourceId && $bulkUploadResult->systemName)
+						{
+							if(!isset($this->existingSystemNames[$bulkUploadResult->type]))
+								$this->existingSystemNames[$bulkUploadResult->type] = array();
+							
+							$this->existingSystemNames[$bulkUploadResult->type][$bulkUploadResult->systemName] = $bulkUploadResult->resourceId;
+						}
 					}
 					break;
 				
@@ -279,7 +285,7 @@ class BulkUploadScheduleResourceEngineCsv extends BulkUploadEngineCsv
 	 * @param KalturaBulkUploadResultScheduleResource $bulkUploadResult   
 	 * @return KalturaScheduleResource
 	 */
-	protected function createScheduleResourceFromResultAndJobData(KalturaBulkUploadResultScheduleResource $bulkUploadResult)
+	protected function createScheduleResourceFromResultAndJobData(KalturaBulkUploadResultScheduleResource &$bulkUploadResult)
 	{
 		switch($bulkUploadResult->type)
 		{
@@ -318,6 +324,13 @@ class BulkUploadScheduleResourceEngineCsv extends BulkUploadEngineCsv
 			elseif(isset($this->parentSystemNames[$bulkUploadResult->parentType]) && isset($this->parentSystemNames[$bulkUploadResult->parentType][$bulkUploadResult->parentSystemName]))
 			{
 				$scheduleResource->parentId = $this->parentSystemNames[$bulkUploadResult->parentType][$bulkUploadResult->parentSystemName];
+			}
+			else
+			{
+				$bulkUploadResult->status = KalturaBulkUploadResultStatus::ERROR;
+				$bulkUploadResult->errorType = KalturaBatchJobErrorTypes::APP;
+				$bulkUploadResult->errorDescription = "Unable to find parent {$bulkUploadResult->parentType} resource [$bulkUploadResult->parentSystemName]";
+				return null;
 			}
 		}
 			
