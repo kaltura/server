@@ -70,7 +70,7 @@ class BulkUploadSchedulePlugin extends KalturaPlugin implements IKalturaBulkUplo
 			{
 				return new BulkUploadEngineICal($job);
 			}
-			elseif((!$enumValue || $enumValue == KalturaBulkUploadType::CSV) && $job->data->bulkUploadObjectType == self::getBulkUploadObjectTypeCoreValue(BulkUploadObjectScheduleType::SCHEDULE_RESOURCE))
+			elseif((!$enumValue || $enumValue == KalturaBulkUploadType::CSV) && $job->data->bulkUploadObjectType == KalturaBulkUploadObjectType::SCHEDULE_RESOURCE)
 			{
 				return new BulkUploadScheduleResourceEngineCsv($job);
 			}
