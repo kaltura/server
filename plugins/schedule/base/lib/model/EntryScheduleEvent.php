@@ -22,7 +22,7 @@ abstract class EntryScheduleEvent extends ScheduleEvent
 	 */
 	public function getTemplateEntryId()
 	{
-		$this->getFromCustomData(self::CUSTOM_DATA_FIELD_TEMPLATE_ENTRY_ID);
+		return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_TEMPLATE_ENTRY_ID);
 	}
 	
 	/**
@@ -38,7 +38,7 @@ abstract class EntryScheduleEvent extends ScheduleEvent
 	 */
 	public function getEntryIds()
 	{
-		$this->getFromCustomData(self::CUSTOM_DATA_FIELD_ENTRY_IDS);
+		return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_ENTRY_IDS);
 	}
 	
 	/**
@@ -54,6 +54,6 @@ abstract class EntryScheduleEvent extends ScheduleEvent
 	 */
 	public function getCategoryIds()
 	{
-		$this->getFromCustomData(self::CUSTOM_DATA_FIELD_CATEGORY_IDS);
+		return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_CATEGORY_IDS);
 	}
 }
