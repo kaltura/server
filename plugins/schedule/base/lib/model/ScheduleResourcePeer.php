@@ -27,6 +27,20 @@ class ScheduleResourcePeer extends BaseScheduleResourcePeer implements IRelatedO
 		ScheduleResourceType::LOCATION => self::LOCATION_OM_CLASS,
 	);
 	
+	/*
+	 * (non-PHPdoc)
+	 * @see BaseScheduleResourcePeer::setDefaultCriteriaFilter()
+	 */
+	public static function setDefaultCriteriaFilter()
+	{
+		if(self::$s_criteria_filter == null)
+			self::$s_criteria_filter = new criteriaFilter();
+		
+		$c = new Criteria();
+		$c->addAnd(ScheduleResourcePeer::STATUS, ScheduleResourceStatus::DELETED, Criteria::NOT_EQUAL);
+		self::$s_criteria_filter->setFilter($c);
+	}
+	
 	/**
 	 * The returned Class will contain objects of the default type or
 	 * objects that inherit from the default.
