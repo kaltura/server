@@ -154,7 +154,7 @@ class BulkUploadScheduleResourceEngineCsv extends BulkUploadEngineCsv
 		$filterSystemNames = array();
 		foreach($this->bulkUploadResults as $bulkUploadResult)
 		{
-			if($bulkUploadResult->systemName && !$bulkUploadResult->resourceId && ($bulkUploadResult->action == KalturaBulkUploadAction::ADD_OR_UPDATE || $bulkUploadResult->action == KalturaBulkUploadAction::UPDATE))
+			if($bulkUploadResult->systemName && !$bulkUploadResult->resourceId && $bulkUploadResult->action != KalturaBulkUploadAction::ADD)
 			{
 				if(!isset($filterSystemNames[$bulkUploadResult->type]))
 					$filterSystemNames[$bulkUploadResult->type] = array();
@@ -196,22 +196,22 @@ class BulkUploadScheduleResourceEngineCsv extends BulkUploadEngineCsv
 		{
 			/* @var $bulkUploadResult KalturaBulkUploadResultScheduleResource */
 			KalturaLog::info("Handling bulk upload result: [" . ($bulkUploadResult->resourceId ? $bulkUploadResult->resourceId : $bulkUploadResult->systemName) . "]");
-			
-			if($bulkUploadResult->action == KalturaBulkUploadAction::ADD_OR_UPDATE && $bulkUploadResult->systemName && isset($this->existingSystemNames[$bulkUploadResult->type]))
+
+			if(!$bulkUploadResult->resourceId && $bulkUploadResult->systemName && isset($this->existingSystemNames[$bulkUploadResult->type]))
 			{
 				$existingSystemNames = $this->existingSystemNames[$bulkUploadResult->type];
-				if(!$bulkUploadResult->resourceId && isset($existingSystemNames[$bulkUploadResult->systemName]))
+				if(isset($existingSystemNames[$bulkUploadResult->systemName]))
 				{
 					$bulkUploadResult->resourceId = $existingSystemNames[$bulkUploadResult->systemName];
-					unset($bulkUploadResult->systemName);
-					$bulkUploadResult->action = KalturaBulkUploadAction::UPDATE;
-				}
-				else 
-				{
-					$bulkUploadResult->action = KalturaBulkUploadAction::ADD;
 				}
 			}
-
+			
+			if($bulkUploadResult->action == KalturaBulkUploadAction::ADD_OR_UPDATE)
+			{
+				$bulkUploadResult->action = $bulkUploadResult->resourceId ? KalturaBulkUploadAction::UPDATE : KalturaBulkUploadAction::ADD;
+			}
+			
+			
 			KBatchBase::impersonate($this->currentPartnerId);
 			switch($bulkUploadResult->action)
 			{
@@ -229,10 +229,25 @@ class BulkUploadScheduleResourceEngineCsv extends BulkUploadEngineCsv
 							$this->parentSystemNames[$bulkUploadResult->type][$bulkUploadResult->systemName] = "{$createdResource->id}";
 						}
 					}
+					else 
+					{
+						KBatchBase::$kClient->system->ping(); // just to increment the multi-request index
+					}
 					break;
 				
 				case KalturaBulkUploadAction::UPDATE:
-					$scheduleResource = $this->createScheduleResourceFromResultAndJobData($bulkUploadResult);
+				
+					$scheduleResource = null;
+					if(!$bulkUploadResult->resourceId)
+					{
+						$bulkUploadResult->status = KalturaBulkUploadResultStatus::ERROR;
+						$bulkUploadResult->errorType = KalturaBatchJobErrorTypes::APP;
+						$bulkUploadResult->errorDescription = "Unable to find {$bulkUploadResult->type} resource [$bulkUploadResult->systemName]";
+					}
+					else
+					{
+						$scheduleResource = $this->createScheduleResourceFromResultAndJobData($bulkUploadResult);
+					}
 					$bulkUploadResultChunk[] = $bulkUploadResult;
 					if($scheduleResource)
 					{
@@ -245,11 +260,28 @@ class BulkUploadScheduleResourceEngineCsv extends BulkUploadEngineCsv
 							$this->existingSystemNames[$bulkUploadResult->type][$bulkUploadResult->systemName] = $bulkUploadResult->resourceId;
 						}
 					}
+					else 
+					{
+						KBatchBase::$kClient->system->ping(); // just to increment the multi-request index
+					}
 					break;
 				
 				case KalturaBulkUploadAction::DELETE:
+					if(!$bulkUploadResult->resourceId)
+					{
+						$bulkUploadResult->status = KalturaBulkUploadResultStatus::ERROR;
+						$bulkUploadResult->errorType = KalturaBatchJobErrorTypes::APP;
+						$bulkUploadResult->errorDescription = "Unable to find {$bulkUploadResult->type} resource [$bulkUploadResult->systemName]";
+					}
 					$bulkUploadResultChunk[] = $bulkUploadResult;
-					$schedulePlugin->scheduleResource->delete($bulkUploadResult->resourceId);
+					if($bulkUploadResult->resourceId)
+					{
+						$schedulePlugin->scheduleResource->delete($bulkUploadResult->resourceId);
+					}
+					else 
+					{
+						KBatchBase::$kClient->system->ping(); // just to increment the multi-request index
+					}
 					break;
 				
 				default:
