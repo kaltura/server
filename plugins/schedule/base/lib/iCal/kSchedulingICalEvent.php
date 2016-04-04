@@ -187,6 +187,7 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 			$object->setRule($rule);
 		}
 
+		$object->setField('dtstamp', kSchedulingICal::formatDate($event->updatedAt));
 		$object->setField('x-kaltura-id', $event->id);
 		$object->setField('x-kaltura-type', $event->getScheduleEventType());
 		$object->setField('x-kaltura-partner-id', $event->partnerId);
