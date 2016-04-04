@@ -7,6 +7,12 @@
 abstract class KalturaEntryScheduleEvent extends KalturaScheduleEvent
 {
 	/**
+	 * Entry to be used as template during content ingestion
+	 * @var string
+	 */
+	public $templateEntryId;
+
+	/**
 	 * Entries that associated with this event
 	 * @var string
 	 * @filter like,mlikeor,mlikeand
@@ -25,6 +31,7 @@ abstract class KalturaEntryScheduleEvent extends KalturaScheduleEvent
 	 */
 	private static $map_between_objects = array 
 	 (	
+		'templateEntryId',
 		'entryIds',
 		'categoryIds',
 	 );
