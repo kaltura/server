@@ -80,7 +80,11 @@ class ScheduleResourcePeer extends BaseScheduleResourcePeer implements IRelatedO
 		
 		$roots = array();
 		if($object->getParentId())
-			$roots[] = ScheduleResourcePeer::retrieveByPK($object->getParentId());
+		{
+			$parent = ScheduleResourcePeer::retrieveByPK($object->getParentId());
+			if($parent)
+				$roots[] = $parent;
+		}
 			
 		return $roots;
 	}
