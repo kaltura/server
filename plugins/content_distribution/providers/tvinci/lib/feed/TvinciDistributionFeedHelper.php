@@ -57,34 +57,52 @@ class TvinciDistributionFeedHelper
 		$arguments = array(
 			"distributionProfileId" => $this->distributionProfile->id,
 			"playManifestPrefix" => $prefix);
-		if($this->distributionProfile->ipadnewPpvModule)
-			$arguments["ipadnewPpvModule"] = $this->distributionProfile->ipadnewPpvModule;
-		if($this->distributionProfile->ipadnewFileName)
-			$arguments["ipadnewTypeName"] = $this->distributionProfile->ipadnewFileName;
-		if($this->distributionProfile->ismPpvModule)
-			$arguments["ismPpvModule"] = $this->distributionProfile->ismPpvModule;
-		if($this->distributionProfile->ismFileName)
-			$arguments["ismTypeName"] = $this->distributionProfile->ismFileName;
-		if($this->distributionProfile->iphonenewPpvModule)
-			$arguments["iphonenewPpvModule"] = $this->distributionProfile->iphonenewPpvModule;
-		if($this->distributionProfile->iphonenewFileName)
-			$arguments["iphonenewTypeName"] = $this->distributionProfile->iphonenewFileName;
-		if($this->distributionProfile->mbrPpvModule)
-			$arguments["mbrPpvModule"] = $this->distributionProfile->mbrPpvModule;
-		if($this->distributionProfile->mbrFileName)
-			$arguments["mbrTypeName"] = $this->distributionProfile->mbrFileName;
-		if($this->distributionProfile->dashPpvModule)
-			$arguments["dashPpvModule"] = $this->distributionProfile->dashPpvModule;
-		if($this->distributionProfile->dashFileName)
-			$arguments["dashTypeName"] = $this->distributionProfile->dashFileName;
-		if($this->distributionProfile->widevinePpvModule)
-			$arguments["widevinePpvModule"] = $this->distributionProfile->widevinePpvModule;
-		if($this->distributionProfile->widevineFileName)
-			$arguments["widevineTypeName"] = $this->distributionProfile->widevineFileName;
-		if($this->distributionProfile->widevineMbrPpvModule)
-			$arguments["widevineMbrPpvModule"] = $this->distributionProfile->widevineMbrPpvModule;
-		if($this->distributionProfile->widevineMbrFileName)
-			$arguments["widevineMbrTypeName"] = $this->distributionProfile->widevineMbrFileName;
+
+		$tagsDoc = new DOMDocument();
+		$tagsConfiguration = $tagsDoc->createElement('tagsconfiguration');
+		foreach($this->distributionProfile->tags as $tag)
+		{
+			/**
+			 * @var KalturaTvinciDistributionTag $tag
+			 */
+			$tagXML = $tagsDoc->createElement('tag');
+
+			$tagname = $tagsDoc->createElement('tagname');
+			$tagnameText = $tagsDoc->createTextNode($tag->tagname);
+			$tagname->appendChild($tagnameText);
+			$tagXML->appendChild($tagname);
+
+			$extension = $tagsDoc->createElement('extension');
+			$extensionText = $tagsDoc->createTextNode($tag->extension);
+			$extension->appendChild($extensionText);
+			$tagXML->appendChild($extension);
+
+			$protocol = $tagsDoc->createElement('protocol');
+			$protocolText = $tagsDoc->createTextNode($tag->protocol);
+			$extension->appendChild($protocolText);
+			$tagXML->appendChild($protocol);
+
+			$format = $tagsDoc->createElement('format');
+			$formatText = $tagsDoc->createTextNode($tag->format);
+			$format->appendChild($formatText);
+			$tagXML->appendChild($format);
+
+			$filename = $tagsDoc->createElement('filename');
+			$filenameText = $tagsDoc->createTextNode($tag->filename);
+			$filename->appendChild($filenameText);
+			$tagXML->appendChild($filename);
+
+			$ppvmodule = $tagsDoc->createElement('ppvmodule');
+			$ppvmoduleText = $tagsDoc->createTextNode($tag->ppvmodule);
+			$ppvmodule->appendChild($ppvmoduleText);
+			$tagXML->appendChild($ppvmodule);
+			
+			$tagsConfiguration->appendChild($tagXML);
+		}
+		$tagsDoc->appendChild($tagsConfiguration);
+		$arguments['tagsparam'] = $tagsDoc->saveXML();
+		KalturaLog::debug("@@NA arguments [".print_r($arguments,true)."]");
+
 		return $arguments;
 	}
 
