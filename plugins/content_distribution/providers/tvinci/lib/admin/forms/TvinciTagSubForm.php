@@ -55,14 +55,12 @@ class Form_TvinciTagSubForm extends Zend_Form_SubForm
 
 	public function populateFromObject($object, $add_underscore = true)
 	{
-		/** @var $object KalturaAssetDistributionRule */
-//		parent::populateFromObject($object, $add_underscore);
-//		foreach($object->assetDistributionConditions as $assetDistributionCondition)
-//		{
-//			$assetDistributionConditionSubForm = new Form_AssetDistributionPropertyConditionSubForm();
-//			$assetDistributionConditionSubForm->populateFromObject($assetDistributionCondition);
-//			$this->addSubForm($assetDistributionConditionSubForm, 'asset_distribution_property_condition_'.spl_object_hash($assetDistributionCondition));
-//		}
+		$this->getElement('tag_name')->setValue($object->tagname);
+		$this->getElement('tag_extension')->setValue($object->extension);
+		$this->getElement('tag_protocol')->setValue($object->protocol);
+		$this->getElement('tag_format')->setValue($object->format);
+		$this->getElement('tag_file_name')->setValue($object->filename);
+		$this->getElement('tag_ippvmodule')->setValue($object->ppvmodule);
 	}
 
 	public function getObject($objectType, array $properties, $add_underscore = true, $include_empty_fields = false)
