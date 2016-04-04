@@ -133,7 +133,7 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 			$event->recurrenceType = KalturaScheduleEventRecurrenceType::NONE;
 		}
 
-		$event->parentId = $this->getField('x-kaltura-parent-id');		
+		$event->parentId = $this->getField('x-kaltura-parent-id');
 		$event->tags = $this->getField('x-kaltura-tags');
 		
 		if($event instanceof KalturaEntryScheduleEvent)
@@ -193,7 +193,15 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 		$object->setField('x-kaltura-status', $event->status);
 
 		if($event->parentId)
-			$object->setField('x-kaltura-parent-id', $event->parentId);
+		{
+			$parent = ScheduleEventPeer::retrieveByPK($event->parentId);
+			if($parent)
+			{
+				$object->setField('x-kaltura-parent-id', $event->parentId);
+				if($parent->getReferenceId())
+					$object->setField('x-kaltura-parent-uid', $parent->getReferenceId());
+			}
+		}
 
 		if($event->tags)
 			$object->setField('x-kaltura-tags', $event->tags);
