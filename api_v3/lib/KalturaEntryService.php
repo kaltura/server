@@ -953,7 +953,7 @@ class KalturaEntryService extends KalturaBaseService
 	 */
 	protected function add(KalturaBaseEntry $entry, $conversionProfileId = null)
 	{
-		$dbEntry = $this->duplicateTemplateEntry($conversionProfileId);
+		$dbEntry = $this->duplicateTemplateEntry($conversionProfileId, $entry->templateEntryId);
 		if ($dbEntry)
 		{
 			$dbEntry->save();
@@ -961,19 +961,24 @@ class KalturaEntryService extends KalturaBaseService
 		return $this->prepareEntryForInsert($entry, $dbEntry);
 	}
 	
-	protected function duplicateTemplateEntry($conversionProfileId)
+	protected function duplicateTemplateEntry($conversionProfileId, $templateEntryId)
 	{
-		$dbEntry = null;
-		$conversionProfile = myPartnerUtils::getConversionProfile2ForPartner($this->getPartnerId(), $conversionProfileId);
-		if($conversionProfile && $conversionProfile->getDefaultEntryId())
+		if(!$templateEntryId)
 		{
-			$templateEntry = entryPeer::retrieveByPKNoFilter($conversionProfile->getDefaultEntryId(), null, false);
+			$conversionProfile = myPartnerUtils::getConversionProfile2ForPartner($this->getPartnerId(), $conversionProfileId);
+			$templateEntryId = $conversionProfile->getDefaultEntryId();
+		}
+		
+		if($templateEntryId)
+		{
+			$templateEntry = entryPeer::retrieveByPKNoFilter($templateEntryId, null, false);
 			if ($templateEntry)
 			{
-				$dbEntry = $templateEntry->copyTemplate(true);
+				return $templateEntry->copyTemplate(true);
 			}
 		}
-		return $dbEntry;
+		
+		return null;
 	}
 	
 	/**

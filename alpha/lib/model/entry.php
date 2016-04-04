@@ -141,6 +141,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	const DEFAULT_IMAGE_WIDTH = 640;
 
 	const CAPABILITIES = "capabilities";
+	const TEMPLATE_ENTRY_ID = "templateEntryId";
 
 	private $appears_in = null;
 
@@ -3046,7 +3047,8 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 		$clazz = get_class($this);
 		$copyObj = new $clazz();
 		/* @var $copyObj entry */
-		
+
+		$copyObj->setTemplateEntryId($this->id);
 		$copyObj->setKuserId($this->kuser_id);
 		$copyObj->setName($this->name);
 		$copyObj->setTags($this->tags);
@@ -3506,5 +3508,15 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 			$refId .= " " . md5(trim($refId));
 
 		return $refId;
+	}
+
+	public function getTemplateEntryId()
+	{
+		return $this->getFromCustomData(self::TEMPLATE_ENTRY_ID);
+	}
+	
+	public function setTemplateEntryId($v)
+	{
+		$this->putInCustomData(self::TEMPLATE_ENTRY_ID, $v);
 	}
 }
