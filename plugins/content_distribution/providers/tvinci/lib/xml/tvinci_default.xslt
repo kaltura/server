@@ -70,7 +70,6 @@
                     <xsl:value-of select="normalize-space($currentTag/typename)"/>
                 </xsl:element>
                 <xsl:element name="ppvmodule">
-                    <!--<xsl:value-of select="translate(translate($currentTag/ppvmodule,'&#xa;',''),' ','')"/>-->
                     <xsl:value-of select="normalize-space($currentTag/ppvmodule)"/>
                 </xsl:element>
             </xsl:element>

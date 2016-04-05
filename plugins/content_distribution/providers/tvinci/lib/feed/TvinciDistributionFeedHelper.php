@@ -79,7 +79,7 @@ class TvinciDistributionFeedHelper
 
 			$protocol = $tagsDoc->createElement('protocol');
 			$protocolText = $tagsDoc->createTextNode($tag->protocol);
-			$extension->appendChild($protocolText);
+			$protocol->appendChild($protocolText);
 			$tagXML->appendChild($protocol);
 
 			$format = $tagsDoc->createElement('format');
@@ -87,10 +87,10 @@ class TvinciDistributionFeedHelper
 			$format->appendChild($formatText);
 			$tagXML->appendChild($format);
 
-			$filename = $tagsDoc->createElement('filename');
-			$filenameText = $tagsDoc->createTextNode($tag->filename);
-			$filename->appendChild($filenameText);
-			$tagXML->appendChild($filename);
+			$typename = $tagsDoc->createElement('typename');
+			$typenameText = $tagsDoc->createTextNode($tag->filename);
+			$typename->appendChild($typenameText);
+			$tagXML->appendChild($typename);
 
 			$ppvmodule = $tagsDoc->createElement('ppvmodule');
 			$ppvmoduleText = $tagsDoc->createTextNode($tag->ppvmodule);
@@ -101,7 +101,7 @@ class TvinciDistributionFeedHelper
 		}
 		$tagsDoc->appendChild($tagsConfiguration);
 		$arguments['tagsparam'] = $tagsDoc->saveXML();
-		KalturaLog::debug("@@NA arguments [".print_r($arguments,true)."]");
+		KalturaLog::err("@@NA arguments [".print_r($arguments,true)."]");
 
 		return $arguments;
 	}

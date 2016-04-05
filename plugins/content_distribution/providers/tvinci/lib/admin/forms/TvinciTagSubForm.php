@@ -14,37 +14,31 @@ class Form_TvinciTagSubForm extends Zend_Form_SubForm
 		$this->addElement('text', 'tag_name', array(
 			'filters' 		=> array('StringTrim'),
 			'label'			=> 'Tag Name:',
-			'decorators'	=> array('ViewHelper'),
 		));
 
 		$this->addElement('text', 'tag_extension', array(
 			'filters' 		=> array('StringTrim'),
 			'label'			=> 'Extension:',
-			'decorators'	=> array('ViewHelper'),
 		));
 
 		$this->addElement('text', 'tag_protocol', array(
 			'filters' 		=> array('StringTrim'),
 			'label'			=> 'Protocol:',
-			'decorators'	=> array('ViewHelper'),
 		));
 
 		$this->addElement('text', 'tag_format', array(
 			'filters' 		=> array('StringTrim'),
 			'label'			=> 'Format:',
-			'decorators'	=> array('ViewHelper'),
 		));
 
 		$this->addElement('text', 'tag_file_name', array(
 			'filters' 		=> array('StringTrim'),
 			'label'			=> 'File Name:',
-			'decorators'	=> array('ViewHelper'),
 		));
 
 		$this->addElement('text', 'tag_ippvmodule', array(
 			'filters' 		=> array('StringTrim'),
 			'label'			=> 'IppvModule:',
-			'decorators'	=> array('ViewHelper'),
 		));
 
 		$this->addElement('hidden', 'belongs', array(

@@ -1,15 +1,11 @@
 <fieldset >
 	<legend>Tag</legend>
-	<label>Tag name: <?php echo $this->element->getElement('tag_name'); ?></label><br/>
-	<label>Extension: <?php echo $this->element->getElement('tag_extension'); ?></label><br/>
-	<label>Protocol: <?php echo $this->element->getElement('tag_protocol'); ?></label><br/>
-	<label>Format: <?php echo $this->element->getElement('tag_format'); ?></label><br/>
-	<label>File Name: <?php echo $this->element->getElement('tag_file_name'); ?></label><br/>
-	<label>File IppvModule: <?php echo $this->element->getElement('tag_ippvmodule'); ?></label><br/>
+	<?php echo $this->element->getElement('tag_name'); ?></br>
+	<?php echo $this->element->getElement('tag_extension'); ?><br/>
+	<?php echo $this->element->getElement('tag_protocol'); ?><br/>
+	<?php echo $this->element->getElement('tag_format'); ?><br/>
+	<?php echo $this->element->getElement('tag_file_name'); ?><br/>
+	<?php echo $this->element->getElement('tag_ippvmodule'); ?><br/>
 	<input type="hidden" name="belongs" value="<?php echo $this->element->getElementsBelongTo(); ?>" />
-	<?php foreach($this->element->getSubForms() as $subForm): ?>
-		<?php $subForm->setElementsBelongTo($this->element->getElementsBelongTo().'['.$subForm->getName().']'); ?>
-		<?php echo $subForm; ?>
-	<?php endforeach; ?>
 	<a class="remove-condition" href="javascript:;" onclick="$(this).parent().remove(); ">Remove</a>
 </fieldset>
