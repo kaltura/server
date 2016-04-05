@@ -1871,6 +1871,16 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			$entry->conversionProfileId = $this->getConversionProfileId($item);
 		if(($entry instanceof KalturaPlayableEntry) && isset($item->msDuration))
 			$entry->msDuration = (int)$item->msDuration;
+		if(isset($item->templateEntryId))
+			$entry->templateEntryId = $item->templateEntryId;
+		if(isset($item->templateEntry))
+		{
+			$templateEntryId = $this->getEntryIdFromReference("{$item->templateEntry}");
+			if($templateEntryId)
+				$entry->templateEntryId = $templateEntryId;
+			else 
+				throw new KalturaBulkUploadXmlException("Template entry id with reference id [$item->templateEntry] not found ", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
+		}
 		if(isset($item->parentReferenceId))
 		{
 			$parentEntryId = $this->getEntryIdFromReference("{$item->parentReferenceId}");
