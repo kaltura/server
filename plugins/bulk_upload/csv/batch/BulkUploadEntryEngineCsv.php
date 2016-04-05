@@ -154,6 +154,12 @@ class BulkUploadEntryEngineCsv extends BulkUploadEngineCsv
 
 		    if($bulkUploadResult->entitledUsersPublish)
 		    	$mediaEntry->entitledUsersPublish = $bulkUploadResult->entitledUsersPublish;
+
+		    if($bulkUploadResult->referenceId)
+		    	$mediaEntry->referenceId = $bulkUploadResult->referenceId;
+		    	
+		    if($bulkUploadResult->templateEntryId)
+		    	$mediaEntry->templateEntryId = $bulkUploadResult->templateEntryId;
 		}
 
 		//Set the content type
@@ -380,6 +386,8 @@ class BulkUploadEntryEngineCsv extends BulkUploadEngineCsv
 	    $ret[] = 'ownerId';
 	    $ret[] = 'entitledUsersEdit';
 	    $ret[] = 'entitledUsersPublish';
+	    $ret[] = 'referenceId';
+	    $ret[] = 'templateEntryId';
 
 	    return $ret;
 	}
