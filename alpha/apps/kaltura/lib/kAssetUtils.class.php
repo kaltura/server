@@ -93,14 +93,15 @@ class kAssetUtils
 			$profileAttributes = $urlManager->getDynamicAttributes();
 			$profileAttributes->setUrlParams($urlParameters);
 
-			$url = $urlManager->getFullAssetUrl($asset);
-
-			$url = preg_replace('/^https?:\/\//', '', $url);
-
 			$protocol = infraRequestUtils::getProtocol();
 			$deliveryProfileProtocols = $urlManager->getMediaProtocols();
 			if (!is_null($deliveryProfileProtocols) && !in_array($protocol, explode(',',$deliveryProfileProtocols)))
 				$protocol = infraRequestUtils::PROTOCOL_HTTP;
+
+			$url = $urlManager->getFullAssetUrl($asset, true, $protocol. "://");
+
+			$url = preg_replace('/^https?:\/\//', '', $url);
+
 			$url = $protocol . "://" . $url;
 		}
 		
