@@ -8,11 +8,6 @@
 #### Deployment scripts####
 
 	php /opt/kaltura/app/tests/standAloneClient/exec.php /opt/kaltura/app/deployment/updates/scripts/xml/updateCommentWasAddedToEntryEmailNotificationTemplateCode.xml
-	Input:
-	- Service URL: www.kaltura.com
-	- Partner email address: admin console admin user
-	- Partner password: user's password
-	- Partner ID: -2
 
 # Kajam-11.11.0 #
 
