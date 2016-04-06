@@ -5,9 +5,15 @@
  - Issue Type: Bug
  - Issue ID: SUP-7709
 
+#### Configuration ####
+- None.
+
 #### Deployment scripts####
 
 	php /opt/kaltura/app/tests/standAloneClient/exec.php /opt/kaltura/app/deployment/updates/scripts/xml/updateCommentWasAddedToEntryEmailNotificationTemplateCode.xml
+
+#### Known Issues & Limitations ####
+- None.
 
 # Kajam-11.11.0 #
 
