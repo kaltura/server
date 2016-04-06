@@ -1,3 +1,19 @@
+# Kajam-11.13.0 #
+
+## Update comment_was_added_to_entry email notification ##
+
+ - Issue Type: Bug
+ - Issue ID: SUP-7709
+
+#### Deployment scripts####
+
+	php /opt/kaltura/app/tests/standAloneClient/exec.php /opt/kaltura/app/deployment/updates/scripts/xml/updateCommentWasAddedToEntryEmailNotificationTemplateCode.xml
+	Input:
+	- Service URL: www.kaltura.com
+	- Partner email address: admin console admin user
+	- Partner password: user's password
+	- Partner ID: -2
+
 # Kajam-11.11.0 #
 
 ## fix baseEntryFilter->referenceIdEqueal,referenceIdIn ##
