@@ -96,8 +96,44 @@ class TvinciDistributionFeedHelper
 			$ppvmoduleText = $tagsDoc->createTextNode($tag->ppvmodule);
 			$ppvmodule->appendChild($ppvmoduleText);
 			$tagXML->appendChild($ppvmodule);
-			
+
 			$tagsConfiguration->appendChild($tagXML);
+
+			if ($tag->tagname == 'ism')
+			{
+				$arguments["ismPpvModule"] = $tag->ppvmodule;
+				$arguments["ismTypeName"] = $tag->filename;
+			}
+			if ($tag->tagname == 'ipadnew')
+			{
+				$arguments["ipadnewPpvModule"] = $tag->ppvmodule;
+				$arguments["ipadnewTypeName"] = $tag->filename;
+			}
+			if ($tag->tagname == 'iphonenew')
+			{
+				$arguments["iphonenewPpvModule"] = $tag->ppvmodule;
+				$arguments["iphonenewTypeName"] = $tag->filename;
+			}
+			if ($tag->tagname == 'mbr')
+			{
+				$arguments["mbrPpvModule"] = $tag->ppvmodule;
+				$arguments["mbrTypeName"] = $tag->filename;
+			}
+			if ($tag->tagname == 'dash')
+			{
+				$arguments["dashPpvModule"] = $tag->ppvmodule;
+				$arguments["dashTypeName"] = $tag->filename;
+			}
+			if ($tag->tagname == 'widevine')
+			{
+				$arguments["widevinePpvModule"] = $tag->ppvmodule;
+				$arguments["widevineTypeName"] = $tag->filename;
+			}
+			if ($tag->tagname == 'widevineMbrFileName')
+			{
+				$arguments["widevineMbrPpvModule"] = $tag->ppvmodule;
+				$arguments["widevineMbrTypeName"] = $tag->filename;
+			}
 		}
 		$tagsDoc->appendChild($tagsConfiguration);
 		$arguments['tagsparam'] = $tagsDoc->saveXML();
