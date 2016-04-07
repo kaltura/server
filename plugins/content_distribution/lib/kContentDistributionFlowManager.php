@@ -1626,7 +1626,14 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 				continue;
 			}
 				
-			self::submitDeleteEntryDistribution($entryDistribution, $distributionProfile);
+			$res = self::submitDeleteEntryDistribution($entryDistribution, $distributionProfile);
+			if (is_null ($res))
+			{
+				$entryDistribution->setStatus(EntryDistributionStatus::DELETED);
+				$entryDistribution->setDirtyStatus(EntryDistributionDirtyStatus::NONE);
+				$entryDistribution->save ();
+			}
+			
 		}
 		
 		return true;
