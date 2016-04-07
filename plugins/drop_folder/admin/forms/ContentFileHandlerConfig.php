@@ -18,16 +18,16 @@ class Form_ContentFileHandlerConfig extends Form_BaseFileHandlerConfig
 	 * {@inheritDoc}
 	 * @see Form_BaseFileHandlerConfig::applyObjectAttributes()
 	 */
-	public function applyObjectAttributes(Kaltura_Client_DropFolder_Type_DropFolder $object)
+	public function applyObjectAttributes(Kaltura_Client_DropFolder_Type_DropFolder &$object)
 	{
-		if (isset ($object->fileHandlerConfig->metadataProfileId))
-			$object->metadataProfileId = $object->fileHandlerConfig->metadataProfileId;
+		if (isset ($object->fileHandlerConfig1['metadataProfileId']))
+			$object->metadataProfileId = $object->fileHandlerConfig1['metadataProfileId'];
 			
-		if (isset ($object->fileHandlerConfig->categoriesMetadataFieldName))
-			$object->categoriesMetadataFieldName = $object->fileHandlerConfig->categoriesMetadataFieldName;
+		if (isset ($object->fileHandlerConfig1['categoriesMetadataFieldName']))
+			$object->categoriesMetadataFieldName = $object->fileHandlerConfig1['categoriesMetadataFieldName'];
 			
-		if (isset ($object->fileHandlerConfig->enforceEntitlement))
-			$object->enforceEntitlement = $object->fileHandlerConfig->enforceEntitlement;
+		if (isset ($object->fileHandlerConfig1['enforceEntitlement']))
+			$object->enforceEntitlement = $object->fileHandlerConfig1['enforceEntitlement'];
 	}
 	
 	/**

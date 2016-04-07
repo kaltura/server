@@ -18,10 +18,12 @@ class Form_ICalFileHandlerConfig extends Form_BaseFileHandlerConfig
 	 * {@inheritDoc}
 	 * @see Form_BaseFileHandlerConfig::applyObjectAttributes()
 	 */
-	public function applyObjectAttributes(Kaltura_Client_DropFolder_Type_DropFolder $object)
+	public function applyObjectAttributes(Kaltura_Client_DropFolder_Type_DropFolder &$object)
 	{
-		if (isset ($object->fileHandlerConfig->eventsType))
-			$object->eventsType = $object->fileHandlerConfig->eventsType;
+		KalturaLog::debug('object: ' . print_r($object, true));
+		if (isset ($object->fileHandlerConfigscheduleDropFolderICAL['eventsType']))
+			$object->fileHandlerConfig->eventsType = $object->fileHandlerConfigscheduleDropFolderICAL['eventsType'];
+		KalturaLog::debug('fileHandlerConfig: ' . print_r($object->fileHandlerConfig, true));
 	}
 	
 	/**

@@ -10,7 +10,7 @@ abstract class Form_BaseFileHandlerConfig extends Zend_Form_SubForm
 	/**
 	 * @param Kaltura_Client_DropFolder_Type_DropFolder $object
 	 */
-	public function applyObjectAttributes(Kaltura_Client_DropFolder_Type_DropFolder $object)
+	public function applyObjectAttributes(Kaltura_Client_DropFolder_Type_DropFolder &$object)
 	{
 	}
 	
