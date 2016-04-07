@@ -28,12 +28,19 @@ $html5Version = $_GET['playerVersion'];
 	
 	<script src="/lib/js/jquery-1.8.3.min.js"></script>
 	<!--script type="text/javascript" src="/html5/html5lib/<?php echo $html5Version; ?>/mwEmbedLoader.php"></script-->
-	<script type="text/javascript" src="https://kgit.html5video.org/pulls/2500/mwEmbedLoader.php"></script>
+	<script type="text/javascript" src="http://kgit.html5video.org/tags/v2.42.rc10/mwEmbedLoader.php"></script>
 	<script type="text/javascript" src="swfobject.js"></script>
 	<script>
 		var partnerId = <?php echo $partnerId; ?>;
 		var ks = null;
 		var currentTime = null;
+		var userTime = null;
+		var queuedArray = [];
+
+		var second = 1000;
+		var minute = second * 60;
+		var hour = minute * 60;
+		var day = hour *24;
 
 		function loadPlayer(){
 			var entryId = $('#txtEntryId').val();
@@ -91,11 +98,18 @@ $html5Version = $_GET['playerVersion'];
                              "hlsjs": {
 								"plugin": true
 							},
+							"LeadWithHLSOnJs": true,
                             "autoPlay": true,
 							"Kaltura.Protocol":"http"
                     },
                     "cache_st": 1410340114,
-                    "entry_id": entryId
+                    "entry_id": entryId,
+					"readyCallback": function( ) {
+						var userVideo = $("#userPlayerContainer_ifp").contents().find(".persistentNativePlayer")[0];
+						setInterval( function() {
+							onUserTime(userVideo.currentTime);
+						}, 500);
+					}
             });
 		}
 
@@ -108,19 +122,64 @@ $html5Version = $_GET['playerVersion'];
 							 "streamerType": "auto",
 							 "autoPlay": true,
 							 "hlsLogs": true,
-							 "LeadWithHLSOnFlash": true
+							 "hlsjs": {
+								 "plugin": true
+							 },
+						 	"LeadWithHLSOnJs": true
 					 },
 					 "cache_st": 1410340114,
-					 "entry_id": entryId
+					 "entry_id": entryId,
+					 "readyCallback": function( ) {
+						 var adminVideo = $("#adminPlayerContainer_ifp").contents().find(".persistentNativePlayer")[0];
+						 setInterval( function() {
+							 onAdminTime(adminVideo.currentTime);
+						 }, 500);
+					 }
 			 });
 		}
 		
-		function onCurrentTime(t, isAbsolute){
+		function onAdminTime(t){
 			if(t > 0){
 				currentTime = t*1000;
+
 				$('#btnSendAd').removeAttr('disabled');
 				document.getElementById("adminTime").innerHTML = currentTime;
 			}
+		}
+
+		function onUserTime(t) {
+			if(t > 0){
+				userTime = t*1000;
+				document.getElementById("userTime").innerHTML = userTime;
+
+				var timeDiff = -1;
+				var historyList = document.getElementById("historyList");
+
+				for (var i=queuedArray.length;i>0; i--) {
+					var nextAdStartTime = queuedArray[i-1];
+					timeDiff = nextAdStartTime - userTime;
+					if ( timeDiff < 0 ) {
+						queuedArray.pop();
+						//move to history list
+						historyList.appendChild(document.getElementById(nextAdStartTime));
+					} else {
+						var timeDiffInMS = Math.round(timeDiff) * 90;
+						document.getElementById("nextAdTime").innerHTML = getCountdownString(timeDiffInMS)
+						break;
+					}
+				}
+				if ( timeDiff < 0 )
+					document.getElementById("nextAdTime").innerHTML = "..."
+			}
+		}
+
+		function getCountdownString(millisecs)
+		{
+			var hours = Math.floor( (millisecs % day ) / hour );
+			var minutes = Math.floor( (millisecs % hour) / minute );
+			var seconds = Math.floor( (millisecs % minute) / second );
+
+			return hours + ":" + minutes + ":" + seconds;
 		}
 
 		function sendAd(){	
@@ -153,13 +212,16 @@ $html5Version = $_GET['playerVersion'];
 						return;
 					}
 
-					var ul = document.getElementById("cpList");
+					var ul = document.getElementById("queueList");
 					var li = document.createElement("li");
+					li.id = startTime;
 					var timeSpan = document.createElement('span')
 					timeSpan.innerHTML = "Start time " + startTime;
 					li.appendChild(document.createTextNode("Cue point created"));
 					li.appendChild(timeSpan);
 					ul.appendChild(li);
+
+					queuedArray.unshift(startTime);
 				}
 			})
 		}
@@ -171,7 +233,7 @@ $html5Version = $_GET['playerVersion'];
       <div class="container">
         <div class="row">
           <div class="col col-xs-8">
-            <span class="navbar-brand">BIG RED BUTTON</span>
+            <span class="navbar-brand">SERVER SIDE AD INSERTION DEMO</span>
           </div>
           <div class="col col-xs-4 text-right">
             <img class="logo" src="images/kaltura.png">
@@ -187,27 +249,44 @@ $html5Version = $_GET['playerVersion'];
               <div id="adminPlayerContainer" class="video-content">
                </div>
             </div>
-			<p><strong>Admin</strong> <span id="adminTime"> </span></p>
+			<p><strong>Admin</strong> <span>PTS </span><span id="adminTime"> </span></p>
           </div>
           <div class="col col-sm-6 video-col">
             <div class="video">
               <div id="userPlayerContainer" class="video-content">
               </div>
             </div>
+			  <p><strong>Audience</strong> <span>PTS </span><span id="userTime"> </span></p>
           </div>
         </div>
       </div>
-      <a class="btn btn-primary btn-rounded btn-lg" id="btnSendAd" disabled="disabled" onclick="sendAd()">+ Insert Ad</a>
+
+
+		<div class="row buttons-row">
+			<div class="col-xs-6">
+				<a class="btn btn-primary btn-rounded btn-lg" id="btnSendAd" disabled="disabled" onclick="sendAd()">+ Insert Ad</a>
+			</div>
+			<div class="col-xs-6">
+				<span class="btn btn-default btn-rounded next-ad-label btn-lg">Next ad in <span id="nextAdTime"> ... </span></span>
+			</div>
+		</div>
+
     </div>
-    <div class="container">
-      <div class="row">
-        <div class="col col-sm-offset-2 col-sm-8">
-          <p class="section-title">History</p>
-          <ul id="cpList" class="history-list">
-          </ul>
-        </div>
-      </div>
-    </div>
+
+   <div class="container">
+	   <div class="row">
+		   <div class="col col-sm-offset-1 col-sm-5">
+			   <p class="section-title">Queue</p>
+			   <ul id="queueList" class="list">
+			   </ul>
+		   </div>
+		   <div class="col col-sm-5">
+			   <p class="section-title">History</p>
+			   <ul id="historyList" class="list">
+			   </ul>
+		   </div>
+	   </div>
+   </div>
 <div id="main" style="position: static;">
 	  	<table>
 		<tr style="display: none; ">
