@@ -49,7 +49,7 @@ function handlerTypeChanged()
 	validateKS = jQuery('#shouldValidateKS');
 	validateKSLbl = jQuery("[for='shouldValidateKS']");
 	allFileHandlers = jQuery(".contentFileHandler");
-	currentFileHandler = jQuery("#frmContentFileHandlerConfig" + curValue);
+	currentFileHandler = jQuery("#frmContentFileHandlerConfig" + curValue.replace('.', '_'));
 
 	allFileHandlers.css("display","none");
 	currentFileHandler.css("display","inline");

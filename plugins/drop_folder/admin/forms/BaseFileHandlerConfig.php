@@ -26,7 +26,7 @@ abstract class Form_BaseFileHandlerConfig extends Zend_Form_SubForm
 	 */
 	public function init()
 	{
-		$formName = 'frmContentFileHandlerConfig' . $this->getFileHandlerType();
+		$formName = 'frmContentFileHandlerConfig' . str_replace('.', '_', $this->getFileHandlerType());
 		$this->setDecorators(array(
 	        'FormElements',
 	        array('HtmlTag', array('tag' => 'span', 'id' => $formName, 'class' => 'contentFileHandler')),

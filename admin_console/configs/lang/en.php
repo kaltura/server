@@ -1089,6 +1089,10 @@ return array(
 
 	'Kaltura_Client_DropFolder_Enum_DropFolderFileHandlerType::CONTENT' => 'Content',
 	'Kaltura_Client_DropFolder_Enum_DropFolderFileHandlerType::XML' => 'XML',
+	'Kaltura_Client_DropFolder_Enum_DropFolderFileHandlerType::ICAL' => 'ICAL',
+
+	'Kaltura_Client_Schedule_Enum_ScheduleEventType::LIVE_STREAM' => 'Live-Stream',
+	'Kaltura_Client_Schedule_Enum_ScheduleEventType::RECORD' => 'Recording',
 
 	'Kaltura_Client_DropFolder_Enum_DropFolderFileDeletePolicy::AUTO_DELETE_WHEN_ENTRY_IS_READY' => 'Automatic deletion when entry is ready',
 	'Kaltura_Client_DropFolder_Enum_DropFolderFileDeletePolicy::AUTO_DELETE' => 'Automatic deletion after import',
