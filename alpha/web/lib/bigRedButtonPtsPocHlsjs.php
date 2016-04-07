@@ -163,7 +163,8 @@ $html5Version = $_GET['playerVersion'];
 						//move to history list
 						historyList.appendChild(document.getElementById(nextAdStartTime));
 					} else {
-						var timeDiffInMS = Math.round(timeDiff) * 90;
+						//TODO we might need to multiply by 90 if player fix the PTS time
+						var timeDiffInMS = Math.floor(timeDiff) ;
 						document.getElementById("nextAdTime").innerHTML = getCountdownString(timeDiffInMS)
 						break;
 					}
