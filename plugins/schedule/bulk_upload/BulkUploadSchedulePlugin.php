@@ -87,7 +87,7 @@ class BulkUploadSchedulePlugin extends KalturaPlugin implements IKalturaBulkUplo
 	 */
 	public static function getObjectClass($baseClass, $enumValue)
 	{
-		if($baseClass == BulkUploadResult && $enumValue == self::getBulkUploadObjectTypeCoreValue(BulkUploadObjectScheduleType::SCHEDULE_EVENT))
+		if($baseClass == 'BulkUploadResult' && $enumValue == self::getBulkUploadObjectTypeCoreValue(BulkUploadObjectScheduleType::SCHEDULE_EVENT))
 		{
 			return 'BulkUploadResultScheduleEvent';
 		}

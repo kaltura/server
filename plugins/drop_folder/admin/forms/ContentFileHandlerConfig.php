@@ -3,8 +3,37 @@
  * @package plugins.dropFolder
  * @subpackage Admin
  */
-class Form_ContentFileHandlerConfig extends Zend_Form_SubForm
+class Form_ContentFileHandlerConfig extends Form_BaseFileHandlerConfig
 {
+	/**
+	 * {@inheritDoc}
+	 * @see Form_BaseFileHandlerConfig::getFileHandlerType()
+	 */
+	protected function getFileHandlerType()
+	{
+		return Kaltura_Client_DropFolder_Enum_DropFolderFileHandlerType::CONTENT;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * @see Form_BaseFileHandlerConfig::applyObjectAttributes()
+	 */
+	public function applyObjectAttributes(Kaltura_Client_DropFolder_Type_DropFolder $object)
+	{
+		if (isset ($object->fileHandlerConfig->metadataProfileId))
+			$object->metadataProfileId = $object->fileHandlerConfig->metadataProfileId;
+			
+		if (isset ($object->fileHandlerConfig->categoriesMetadataFieldName))
+			$object->categoriesMetadataFieldName = $object->fileHandlerConfig->categoriesMetadataFieldName;
+			
+		if (isset ($object->fileHandlerConfig->enforceEntitlement))
+			$object->enforceEntitlement = $object->fileHandlerConfig->enforceEntitlement;
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 * @see Form_BaseFileHandlerConfig::init()
+	 */
 	public function init()
 	{
 		$fileDeletePolicies = new Kaltura_Form_Element_EnumSelect('contentMatchPolicy', array('enum' => 'Kaltura_Client_DropFolder_Enum_DropFolderContentFileHandlerMatchPolicy'));
@@ -33,10 +62,7 @@ class Form_ContentFileHandlerConfig extends Zend_Form_SubForm
 			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'div', 'class' => 'rememeber')))
 		));
 		
-		$this->setDecorators(array(
-	        'FormElements',
-	        array('HtmlTag', array('tag' => 'span', 'id' => 'frmContentFileHandlerConfig')),
-        ));
+		parent::init();
 	}
 
 	/**

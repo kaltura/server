@@ -254,6 +254,11 @@ class DropFolderPlugin extends KalturaPlugin implements IKalturaPending, IKaltur
 		);
 	}
 	
+	public static function getBatchJobObjectTypeCoreValue($valueName)
+	{
+		return self::getCoreValue('BatchJobObjectType', $valueName);
+	}
+	
 	/**
 	 * @return int id of dynamic enum in the DB.
 	 */

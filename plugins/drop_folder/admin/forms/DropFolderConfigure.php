@@ -94,19 +94,38 @@ class Form_DropFolderConfigure extends Infra_Form
 
 		$this->addConversionProfiles();
 
-		$fileHandlerTypes = new Kaltura_Form_Element_EnumSelect('fileHandlerType', array('enum' => 'Kaltura_Client_DropFolder_Enum_DropFolderFileHandlerType'));
-		$fileHandlerTypes->setLabel('Ingestion Workflow:');
-		$fileHandlerTypes->setRequired(true);
-		$fileHandlerTypes->setAttrib('onchange', 'handlerTypeChanged()');
-		$this->addElement($fileHandlerTypes);
+		$fileHandlerType = new Kaltura_Form_Element_EnumSelect('fileHandlerType', array('enum' => 'Kaltura_Client_DropFolder_Enum_DropFolderFileHandlerType'));
+		$fileHandlerType->setLabel('Ingestion Workflow:');
+		$fileHandlerType->setRequired(true);
+		$fileHandlerType->setAttrib('onchange', 'handlerTypeChanged()');
+		$this->addElement($fileHandlerType);
 
 		$fileHandlerTypeForView = new Kaltura_Form_Element_EnumSelect('fileHandlerTypeForView', array('enum' => 'Kaltura_Client_DropFolder_Enum_DropFolderFileHandlerType'));
 		$fileHandlerTypeForView->setAttrib('disabled', 'disabled');
 		$fileHandlerTypeForView->setAttrib('style', 'display:none');
 		$this->addElement($fileHandlerTypeForView);
+		
+		$fileHandlerTypes = Form_BaseFileHandlerConfig::getFileHandlerTypes();
+		foreach($fileHandlerTypes as $type)
+		{
+			switch($type)
+			{
+				case Kaltura_Client_DropFolder_Enum_DropFolderFileHandlerType::CONTENT:
+					$handlerConfigForm = new Form_ContentFileHandlerConfig();
+					$this->addSubForm($handlerConfigForm, 'fileHandlerConfig' . $type);
+					break;
 
-		$handlerConfigForm = new Form_ContentFileHandlerConfig();
-		$this->addSubForm($handlerConfigForm, 'fileHandlerConfig');
+				case Kaltura_Client_DropFolder_Enum_DropFolderFileHandlerType::XML:
+					$handlerConfigForm = new Form_XmlFileHandlerConfig();
+					$this->addSubForm($handlerConfigForm, 'fileHandlerConfig' . $type);
+					break;
+					
+				default:
+					$handlerConfigForm = KalturaPluginManager::loadObject('Form_BaseFileHandlerConfig', $type);
+					if($handlerConfigForm)
+						$this->addSubForm($handlerConfigForm, 'fileHandlerConfig' . $type);
+			}
+		}
 
 		$this->addElement('text', 'fileNamePatterns', array(
 			'label' 		=> 'Source File Name Patterns (to handle):',
@@ -206,9 +225,9 @@ class Form_DropFolderConfigure extends Infra_Form
 	{
 		parent::populateFromObject($object, $add_underscore);
 
-		if ($object->fileHandlerType === Kaltura_Client_DropFolder_Enum_DropFolderFileHandlerType::CONTENT) {
-			$this->getSubForm('fileHandlerConfig')->populateFromObject($object->fileHandlerConfig, $object, false);
-		}
+		$fileHandlerConfig = $this->getSubForm('fileHandlerConfig' . $object->fileHandlerType);
+		/* @var $fileHandlerConfig Form_BaseFileHandlerConfig */
+		$fileHandlerConfig->populateFromObject($object->fileHandlerConfig, $object, false);
 
 		//add troubleshoot form only to existing object
 		$troubleshootForm = new Form_TroubleshootConfig();
@@ -248,11 +267,21 @@ class Form_DropFolderConfigure extends Infra_Form
 	    $object = KalturaPluginManager::loadObject('Kaltura_Client_DropFolder_Type_DropFolder', $properties['type']);
 
 		$fileHandlerType = $properties['fileHandlerType'];
-		if ($fileHandlerType == Kaltura_Client_DropFolder_Enum_DropFolderFileHandlerType::CONTENT) {
-			$object->fileHandlerConfig = new Kaltura_Client_DropFolder_Type_DropFolderContentFileHandlerConfig();
-		}
-		else if ($fileHandlerType == Kaltura_Client_DropFolder_Enum_DropFolderFileHandlerType::XML){
-			$object->fileHandlerConfig = new Kaltura_Client_DropFolderXmlBulkUpload_Type_DropFolderXmlBulkUploadFileHandlerConfig();
+		switch($fileHandlerType)
+		{
+			case Kaltura_Client_DropFolder_Enum_DropFolderFileHandlerType::CONTENT:
+				$object->fileHandlerConfig = new Kaltura_Client_DropFolder_Type_DropFolderContentFileHandlerConfig();
+				$handlerConfigForm = new Form_ContentFileHandlerConfig();
+				break;
+
+			case Kaltura_Client_DropFolder_Enum_DropFolderFileHandlerType::XML:
+				$object->fileHandlerConfig = new Kaltura_Client_DropFolderXmlBulkUpload_Type_DropFolderXmlBulkUploadFileHandlerConfig();
+				$handlerConfigForm = new Form_XmlFileHandlerConfig();
+				break;
+				
+			default:
+				$object->fileHandlerConfig = KalturaPluginManager::loadObject('Kaltura_Client_DropFolder_Type_DropFolderFileHandlerConfig', $fileHandlerType);
+				$handlerConfigForm = KalturaPluginManager::loadObject('Form_BaseFileHandlerConfig', $fileHandlerType);
 		}
 	    $object = parent::loadObject($object, $properties, $add_underscore, $include_empty_fields);
 
@@ -261,17 +290,9 @@ class Form_DropFolderConfigure extends Infra_Form
 		    $object =  $extendTypeSubForm->getObject($object, $objectType, $properties, $add_underscore, $include_empty_fields);
 		}
 		
-		if ($fileHandlerType == Kaltura_Client_DropFolder_Enum_DropFolderFileHandlerType::CONTENT)
-		{
-			if (isset ($object->fileHandlerConfig->metadataProfileId))
-				$object->metadataProfileId = $object->fileHandlerConfig->metadataProfileId;
-				
-			if (isset ($object->fileHandlerConfig->categoriesMetadataFieldName))
-				$object->categoriesMetadataFieldName = $object->fileHandlerConfig->categoriesMetadataFieldName;
-				
-			if (isset ($object->fileHandlerConfig->enforceEntitlement))
-				$object->enforceEntitlement = $object->fileHandlerConfig->enforceEntitlement;
-		}
+		/* @var $handlerConfigForm Form_BaseFileHandlerConfig */
+		if($handlerConfigForm)
+			$handlerConfigForm->applyObjectAttributes($object);
 		
 		return $object;
 	}
