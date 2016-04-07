@@ -57,6 +57,11 @@ class DropFolderSchedulePlugin extends KalturaPlugin implements IKalturaEnumerat
 		{
 			return new Form_ICalFileHandlerConfig();
 		}
+		
+		if($baseClass == 'KalturaDropFolderFileHandlerConfig' && $enumValue == self::getFileHandlerTypeCoreValue(DropFolderFileHandlerScheduleType::ICAL))
+		{
+			return new KalturaDropFolderICalBulkUploadFileHandlerConfig();
+		}
 	}
 
 	/**
