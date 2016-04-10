@@ -24,8 +24,8 @@ class ScheduleEventFilter extends baseObjectFilter
 				"_lte_end_data",
 				"_eq_reference_id",
 				"_in_reference_id",
-				"_eq_organizer_user_id",
-				"_in_organizer_user_id",
+				"_eq_owner_id",
+				"_in_owner_id",
 				"_eq_priority",
 				"_in_priority",
 				"_gte_priority",
@@ -55,7 +55,7 @@ class ScheduleEventFilter extends baseObjectFilter
 		);
 			
 		$this->aliases = array ( 
-			"organizer_user_id" => "organizer_kuser_id",
+			"owner_id" => "organizer_kuser_id",
 		);
 	}
 

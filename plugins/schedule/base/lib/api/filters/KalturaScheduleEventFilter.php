@@ -25,16 +25,16 @@ class KalturaScheduleEventFilter extends KalturaScheduleEventBaseFilter
 	{
 		$type = $this->getListResponseType();
 		
-		if ($this->organizerUserIdEqual)
+		if ($this->ownerIdEqual)
 		{
-			$dbKuser = kuserPeer::getKuserByPartnerAndUid(kCurrentContext::$ks_partner_id, $this->organizerUserIdEqual);
+			$dbKuser = kuserPeer::getKuserByPartnerAndUid(kCurrentContext::$ks_partner_id, $this->ownerIdEqual);
 			if (! $dbKuser) {
 				throw new KalturaAPIException ( KalturaErrors::INVALID_USER_ID );
 			}
-			$this->organizerUserIdEqual = $dbKuser->getId();
+			$this->ownerIdEqual = $dbKuser->getId();
 		}
-		if($this->organizerUserIdIn){
-			$userIds = explode(",", $this->organizerUserIdIn);
+		if($this->ownerIdIn){
+			$userIds = explode(",", $this->ownerIdIn);
 			$dbKusers = kuserPeer::getKuserByPartnerAndUids(kCurrentContext::$ks_partner_id, $userIds);
 			if (count($dbKusers) < count($userIds)) {
 			    throw new KalturaAPIException ( KalturaErrors::INVALID_USER_ID );
@@ -44,7 +44,7 @@ class KalturaScheduleEventFilter extends KalturaScheduleEventBaseFilter
 				$kuserIds[] = $dbKuser->getId();
 			}
 			
-			$this->organizerUserIdIn = implode(',', $kuserIds);
+			$this->ownerIdIn = implode(',', $kuserIds);
 		}
 		
 		$c = new Criteria();

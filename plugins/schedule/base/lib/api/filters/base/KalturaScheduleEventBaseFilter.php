@@ -22,8 +22,8 @@ abstract class KalturaScheduleEventBaseFilter extends KalturaFilter
 		"endDateLessThanOrEqual" => "_lte_end_date",
 		"referenceIdEqual" => "_eq_reference_id",
 		"referenceIdIn" => "_in_reference_id",
-		"organizerUserIdEqual" => "_eq_organizer_user_id",
-		"organizerUserIdIn" => "_in_organizer_user_id",
+		"ownerIdEqual" => "_eq_owner_id",
+		"ownerIdIn" => "_in_owner_id",
 		"priorityEqual" => "_eq_priority",
 		"priorityIn" => "_in_priority",
 		"priorityGreaterThanOrEqual" => "_gte_priority",
@@ -136,12 +136,12 @@ abstract class KalturaScheduleEventBaseFilter extends KalturaFilter
 	/**
 	 * @var string
 	 */
-	public $organizerUserIdEqual;
+	public $ownerIdEqual;
 
 	/**
 	 * @var string
 	 */
-	public $organizerUserIdIn;
+	public $ownerIdIn;
 
 	/**
 	 * @var int

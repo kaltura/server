@@ -15,7 +15,7 @@
 abstract class ScheduleEvent extends BaseScheduleEvent implements IRelatedObject, IIndexable
 {
 	const CUSTOM_DATA_FIELD_RECURRENCE = 'recurrence';
-	const CUSTOM_DATA_FIELD_ORGANIZER_PUSER_ID = 'organizerPuserId';
+	const CUSTOM_DATA_FIELD_OWNER_ID = 'ownerId';
 
 	public function __construct() 
 	{
@@ -43,7 +43,7 @@ abstract class ScheduleEvent extends BaseScheduleEvent implements IRelatedObject
 		
 		if(!$this->getParentId())
 		{
-			$this->setOrganizerPuserId(kCurrentContext::$ks_uid);
+			$this->setOwnerId(kCurrentContext::$ks_uid);
 			$this->incrementSequence();
 		}
 		
@@ -80,19 +80,19 @@ abstract class ScheduleEvent extends BaseScheduleEvent implements IRelatedObject
 	/**
 	 * @param string $v
 	 */
-	protected function setOrganizerPuserId($puserId)
+	protected function setOwnerId($puserId)
 	{
 		$kuser = kuserPeer::createKuserForPartner(kCurrentContext::getCurrentPartnerId(), $puserId, kCurrentContext::$is_admin_session);
-		$this->setOrganizerKuserId($kuser->getId());
-		$this->putInCustomData(self::CUSTOM_DATA_FIELD_ORGANIZER_PUSER_ID, $puserId);
+		$this->setOwnerKuserId($kuser->getId());
+		$this->putInCustomData(self::CUSTOM_DATA_FIELD_OWNER_ID, $puserId);
 	}
 	
 	/**
 	 * @return string
 	 */
-	public function getOrganizerPuserId()
+	public function getOwnerId()
 	{
-		return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_ORGANIZER_PUSER_ID);
+		return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_OWNER_ID);
 	}
 	
 	/**

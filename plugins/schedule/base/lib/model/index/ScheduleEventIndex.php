@@ -56,10 +56,9 @@ class ScheduleEventIndex extends BaseIndexObject
 				'end_date' => 'endDate',
 				'reference_id' => 'referenceId',
 				'classification_type' => 'classificationType',
-				'geo_lat' => 'geoLat',
-				'geo_long' => 'geoLong',
 				'location' => 'location',
-				'organizer_kuser_id' => 'organizerKuserId',
+				'organizer' => 'organizer',
+				'owner_kuser_id' => 'ownerKuserId',
 				'priority' => 'priority',
 				'sequence' => 'sequence',
 				'recurrence_type' => 'recurrenceType',
@@ -71,6 +70,7 @@ class ScheduleEventIndex extends BaseIndexObject
 				'updated_at' => 'updatedAt',
 				'entry_ids' => 'entryIds',
 				'category_ids' => 'categoryIds',
+				'resource_ids' => 'resourceIds',
 			);
 		}
 		return self::$fieldsMap;
@@ -83,26 +83,25 @@ class ScheduleEventIndex extends BaseIndexObject
 		if (!self::$typesMap)
 		{
 			self::$typesMap = array(
-				'int_id' => IIndexable::FIELD_TYPE_INTEGER,
+				'int_id' => IIndexable::FIELD_TYPE_UINT,
 				'parent_id' => IIndexable::FIELD_TYPE_STRING,
 				'partner_id' => IIndexable::FIELD_TYPE_INTEGER,
 				'summary' => IIndexable::FIELD_TYPE_STRING,
 				'description' => IIndexable::FIELD_TYPE_STRING,
-				'schedule_event_type' => IIndexable::FIELD_TYPE_INTEGER,
-				'schedule_event_status' => IIndexable::FIELD_TYPE_INTEGER,
-				'original_start_date' => IIndexable::FIELD_TYPE_INTEGER,
-				'start_date' => IIndexable::FIELD_TYPE_INTEGER,
-				'end_date' => IIndexable::FIELD_TYPE_INTEGER,
+				'schedule_event_type' => IIndexable::FIELD_TYPE_UINT,
+				'schedule_event_status' => IIndexable::FIELD_TYPE_UINT,
+				'original_start_date' => IIndexable::FIELD_TYPE_UINT,
+				'start_date' => IIndexable::FIELD_TYPE_UINT,
+				'end_date' => IIndexable::FIELD_TYPE_UINT,
 				'reference_id' => IIndexable::FIELD_TYPE_STRING,
-				'classification_type' => IIndexable::FIELD_TYPE_INTEGER,
-				'geo_lat' => IIndexable::FIELD_TYPE_FLOAT,
-				'geo_long' => IIndexable::FIELD_TYPE_FLOAT,
+				'classification_type' => IIndexable::FIELD_TYPE_UINT,
 				'location' => IIndexable::FIELD_TYPE_STRING,
-				'organizer_kuser_id' => IIndexable::FIELD_TYPE_INTEGER,
-				'priority' => IIndexable::FIELD_TYPE_INTEGER,
-				'sequence' => IIndexable::FIELD_TYPE_INTEGER,
-				'recurrence_type' => IIndexable::FIELD_TYPE_INTEGER,
-				'duration' => IIndexable::FIELD_TYPE_INTEGER,
+				'organizer' => IIndexable::FIELD_TYPE_STRING,
+				'owner_kuser_id' => IIndexable::FIELD_TYPE_UINT,
+				'priority' => IIndexable::FIELD_TYPE_UINT,
+				'sequence' => IIndexable::FIELD_TYPE_UINT,
+				'recurrence_type' => IIndexable::FIELD_TYPE_UINT,
+				'duration' => IIndexable::FIELD_TYPE_UINT,
 				'contact' => IIndexable::FIELD_TYPE_STRING,
 				'comment' => IIndexable::FIELD_TYPE_STRING,
 				'tags' => IIndexable::FIELD_TYPE_STRING,
@@ -110,6 +109,7 @@ class ScheduleEventIndex extends BaseIndexObject
 				'updated_at' => IIndexable::FIELD_TYPE_DATETIME,
 				'entry_ids' => IIndexable::FIELD_TYPE_STRING,
 				'category_ids' => IIndexable::FIELD_TYPE_STRING,
+				'resource_ids' => IIndexable::FIELD_TYPE_STRING,
 				'plugins_data' => IIndexable::FIELD_TYPE_STRING,
 			);
 		}
@@ -147,10 +147,9 @@ class ScheduleEventIndex extends BaseIndexObject
 				'schedule_event.END_DATE' => 'end_date',
 				'schedule_event.REFERENCE_ID' => 'reference_id',
 				'schedule_event.CLASSIFICATION_TYPE' => 'classification_type',
-				'schedule_event.GEO_LAT' => 'geo_lat',
-				'schedule_event.GEO_LONG' => 'geo_long',
 				'schedule_event.LOCATION' => 'location',
-				'schedule_event.ORGANIZER_KUSER_ID' => 'organizer_kuser_id',
+				'schedule_event.ORGANIZER' => 'organizer',
+				'schedule_event.OWNER_KUSER_ID' => 'owner_kuser_id',
 				'schedule_event.PRIORITY' => 'priority',
 				'schedule_event.SEQUENCE' => 'sequence',
 				'schedule_event.RECURRENCE_TYPE' => 'recurrence_type',
@@ -162,6 +161,7 @@ class ScheduleEventIndex extends BaseIndexObject
 				'schedule_event.UPDATED_AT' => 'updated_at',
 				'schedule_event.ENTRY_IDS' => 'entry_ids',
 				'schedule_event.CATEGORY_IDS' => 'category_ids',
+				'schedule_event.RESOURCE_IDS' => 'resource_ids',
 				'schedule_event.PLUGINS_DATA' => 'plugins_data',
 			);
 		}
@@ -209,6 +209,7 @@ class ScheduleEventIndex extends BaseIndexObject
 				"tags",
 				"entry_ids",
 				"category_ids",
+				"resource_ids",
 			);
 		}
 		return self::$matchableFields;
@@ -224,7 +225,8 @@ class ScheduleEventIndex extends BaseIndexObject
 				'schedule_event.ORIGINAL_START_DATE' => 'original_start_date',
 				'schedule_event.START_DATE' => 'start_date',
 				'schedule_event.END_DATE' => 'end_date',
-				'schedule_event.ORGANIZER_KUSER_ID' => 'organizer_kuser_id',
+				'schedule_event.ORGANIZER' => 'organizer',
+				'schedule_event.OWNER_KUSER_ID' => 'owner_kuser_id',
 				'schedule_event.PRIORITY' => 'priority',
 				'schedule_event.SEQUENCE' => 'sequence',
 				'schedule_event.RECURRENCE_TYPE' => 'recurrence_type',

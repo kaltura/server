@@ -52,7 +52,8 @@ class ScheduleEventTableMap extends TableMap {
 		$this->addColumn('GEO_LAT', 'GeoLat', 'FLOAT', false, null, null);
 		$this->addColumn('GEO_LONG', 'GeoLong', 'FLOAT', false, null, null);
 		$this->addColumn('LOCATION', 'Location', 'VARCHAR', false, 256, null);
-		$this->addColumn('ORGANIZER_KUSER_ID', 'OrganizerKuserId', 'INTEGER', false, null, null);
+		$this->addColumn('ORGANIZER', 'Organizer', 'VARCHAR', false, 256, null);
+		$this->addColumn('OWNER_KUSER_ID', 'OwnerKuserId', 'INTEGER', false, null, null);
 		$this->addColumn('PRIORITY', 'Priority', 'INTEGER', false, null, null);
 		$this->addColumn('SEQUENCE', 'Sequence', 'INTEGER', false, null, null);
 		$this->addColumn('RECURRENCE_TYPE', 'RecurrenceType', 'INTEGER', true, null, null);

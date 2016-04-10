@@ -92,10 +92,14 @@ abstract class KalturaScheduleEvent extends KalturaObject implements IRelatedFil
 
 	/**
 	 * @var string
-	 * @readonly
+	 */
+	public $organizer;
+
+	/**
+	 * @var string
 	 * @filter eq,in
 	 */
-	public $organizerUserId;
+	public $ownerId;
 
 	/**
 	 * The value for the priority field.
@@ -184,7 +188,8 @@ abstract class KalturaScheduleEvent extends KalturaObject implements IRelatedFil
 		'geoLatitude',
 		'geoLongitude',
 		'location',
-		'organizerUserId' => 'organizerPuserId',
+		'organizer',
+		'ownerId' => 'ownerPuserId',
 		'priority',
 		'sequence',
 		'recurrenceType',
