@@ -29,7 +29,7 @@ while(count($entries))
 	foreach($entries as $entry)
 	{
 	    /* @var $entry ScheduleEvent */
-		KalturaLog::log('cue point id ' . $entry->getId() . ' updated at '. $entry->getUpdatedAt(null));
+		KalturaLog::log('Schedule-event id ' . $entry->getId() . ' updated at '. $entry->getUpdatedAt(null));
 		
 		try {
 			$ret = $sphinx->saveToSphinx($entry, true);
