@@ -115,11 +115,21 @@ class BulkUploadSchedulePlugin extends KalturaPlugin implements IKalturaBulkUplo
 	 */
 	public static function writeBulkUploadLogFile($batchJob)
 	{
-		if($batchJob->getJobSubType() && ($batchJob->getJobSubType() != self::getBulkUploadTypeCoreValue(BulkUploadScheduleType::ICAL)))
+		if($batchJob->getJobSubType() != self::getBulkUploadTypeCoreValue(BulkUploadScheduleType::ICAL))
 		{
 			return;
 		}
 		
+		self::writeICalBulkUploadLogFile($batchJob);
+	}
+	
+	/**
+	 * Returns the log file for bulk upload job
+	 *
+	 * @param BatchJob $batchJob bulk upload batchjob
+	 */
+	public static function writeICalBulkUploadLogFile($batchJob)
+	{
 		header("Content-Type: text/calendar; charset=UTF-8");
 		
 		$criteria = new Criteria();

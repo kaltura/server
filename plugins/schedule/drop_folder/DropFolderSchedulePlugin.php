@@ -2,7 +2,7 @@
 /**
  * @package plugins.scheduleDropFolder
  */
-class DropFolderSchedulePlugin extends KalturaPlugin implements IKalturaEnumerator, IKalturaObjectLoader, IKalturaEventConsumers
+class DropFolderSchedulePlugin extends KalturaPlugin implements IKalturaEnumerator, IKalturaObjectLoader, IKalturaEventConsumers, IKalturaBulkUpload
 {
 	const PLUGIN_NAME = 'scheduleDropFolder';
 	const DROP_FOLDER_EVENTS_CONSUMER = 'kDropFolderICalEventsConsumer';
@@ -65,7 +65,17 @@ class DropFolderSchedulePlugin extends KalturaPlugin implements IKalturaEnumerat
 		{
 			return new KalturaDropFolderICalBulkUploadFileHandlerConfig();
 		}
+
+		if($baseClass == 'kBulkUploadJobData' && $enumValue == self::getBulkUploadTypeCoreValue(DropFolderScheduleType::DROP_FOLDER_ICAL))
+		{
+			return new kBulkUploadICalJobData();
+		}
 		
+		if($baseClass == 'KalturaBulkUploadJobData' && $enumValue == self::getBulkUploadTypeCoreValue(DropFolderScheduleType::DROP_FOLDER_ICAL))
+		{
+			return new KalturaBulkUploadICalJobData();
+		}
+				
 		if($baseClass == 'KBulkUploadEngine' && class_exists('KalturaClient'))
 		{	
 			list($job) = $constructorArgs;
@@ -94,6 +104,32 @@ class DropFolderSchedulePlugin extends KalturaPlugin implements IKalturaEnumerat
 		return array(
 			self::DROP_FOLDER_EVENTS_CONSUMER,
 		);
+	}
+	
+	/**
+	 * Returns the correct file extension for bulk upload type
+	 *
+	 * @param int $enumValue code API value
+	 */
+	public static function getFileExtension($enumValue)
+	{
+		if($enumValue == self::getBulkUploadTypeCoreValue(DropFolderScheduleType::DROP_FOLDER_ICAL))
+			return 'ical';
+	}
+	
+	/**
+	 * Returns the log file for bulk upload job
+	 *
+	 * @param BatchJob $batchJob bulk upload batchjob
+	 */
+	public static function writeBulkUploadLogFile($batchJob)
+	{
+		if($batchJob->getJobSubType() != self::getBulkUploadTypeCoreValue(DropFolderScheduleType::DROP_FOLDER_ICAL))
+		{
+			return;
+		}
+		
+		BulkUploadSchedulePlugin::writeICalBulkUploadLogFile($batchJob);
 	}
 	
 	/**
