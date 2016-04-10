@@ -81,7 +81,7 @@ class kDropFolderICalEventsConsumer implements kBatchJobStatusEventConsumer, kOb
 					break;
 				
 				$dropFolder = DropFolderPeer::retrieveByPK($dropFolderFile->getDropFolderId());
-				if(!$dropFolder)
+				if(!$dropFolder || $dropFolder->getType() != DropFolderType::LOCAL)
 					break;
 					
 				$filePath = $dropFolder->getPath() . '/' . $dropFolderFile->getFileName();
@@ -151,7 +151,7 @@ class kDropFolderICalEventsConsumer implements kBatchJobStatusEventConsumer, kOb
 		/* @var $fileHandlerConfig DropFolderICalBulkUploadFileHandlerConfig */
 		
 		$objectType = DropFolderPlugin::getBatchJobObjectTypeCoreValue(DropFolderBatchJobObjectType::DROP_FOLDER_FILE);
-		$coreBulkUploadType = BulkUploadSchedulePlugin::getBulkUploadTypeCoreValue(BulkUploadScheduleType::ICAL);
+		$coreBulkUploadType = DropFolderSchedulePlugin::getBulkUploadTypeCoreValue(DropFolderScheduleType::DROP_FOLDER_ICAL);
 		$bulkUploadObjectType = BulkUploadSchedulePlugin::getBulkUploadObjectTypeCoreValue(BulkUploadObjectScheduleType::SCHEDULE_EVENT);
 				
 		$objectId = $file->getId();

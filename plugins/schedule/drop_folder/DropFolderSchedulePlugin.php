@@ -34,10 +34,13 @@ class DropFolderSchedulePlugin extends KalturaPlugin implements IKalturaEnumerat
 	public static function getEnums($baseEnumName = null)
 	{
 		if(is_null($baseEnumName))
-			return array('DropFolderFileHandlerScheduleType');
-		
+			return array('DropFolderFileHandlerScheduleType', 'DropFolderScheduleType');
+
 		if($baseEnumName == 'DropFolderFileHandlerType')
 			return array('DropFolderFileHandlerScheduleType');
+
+		if($baseEnumName == 'BulkUploadType')
+			return array('DropFolderScheduleType');
 		
 		return array();
 	}
@@ -61,6 +64,15 @@ class DropFolderSchedulePlugin extends KalturaPlugin implements IKalturaEnumerat
 		if($baseClass == 'KalturaDropFolderFileHandlerConfig' && $enumValue == self::getFileHandlerTypeCoreValue(DropFolderFileHandlerScheduleType::ICAL))
 		{
 			return new KalturaDropFolderICalBulkUploadFileHandlerConfig();
+		}
+		
+		if($baseClass == 'KBulkUploadEngine' && class_exists('KalturaClient'))
+		{	
+			list($job) = $constructorArgs;
+			if($enumValue == KalturaBulkUploadType::DROP_FOLDER_ICAL)
+			{
+				return new BulkUploadEngineDropFolderICal($job);
+			}
 		}
 	}
 
@@ -92,6 +104,16 @@ class DropFolderSchedulePlugin extends KalturaPlugin implements IKalturaEnumerat
 	{
 		$value = self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
 		return kPluginableEnumsManager::apiToCore('DropFolderFileHandlerType', $value);
+	}
+	
+	/**
+	 *
+	 * @return int id of dynamic enum in the DB.
+	 */
+	public static function getBulkUploadTypeCoreValue($valueName)
+	{
+		$value = self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
+		return kPluginableEnumsManager::apiToCore('BulkUploadType', $value);
 	}
 	
 	/**
