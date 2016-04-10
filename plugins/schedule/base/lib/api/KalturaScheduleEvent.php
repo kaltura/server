@@ -256,6 +256,9 @@ abstract class KalturaScheduleEvent extends KalturaObject implements IRelatedFil
 		$this->validatePropertyNotNull('endDate');
 		$this->validate($this->startDate, $this->endDate);
 		
+		if($this->recurrenceType == KalturaScheduleEventRecurrenceType::RECURRING)
+			$this->validatePropertyNotNull('recurrence');
+		
 		parent::validateForInsert($propertiesToSkip);
 	}
 	
