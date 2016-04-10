@@ -104,7 +104,7 @@ class BulkUploadSchedulePlugin extends KalturaPlugin implements IKalturaBulkUplo
 	public static function getFileExtension($enumValue)
 	{
 		if($enumValue == self::getBulkUploadTypeCoreValue(BulkUploadScheduleType::ICAL))
-			return 'ical';
+			return 'ics';
 	}
 	
 	/**

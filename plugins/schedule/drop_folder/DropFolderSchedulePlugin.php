@@ -114,7 +114,7 @@ class DropFolderSchedulePlugin extends KalturaPlugin implements IKalturaEnumerat
 	public static function getFileExtension($enumValue)
 	{
 		if($enumValue == self::getBulkUploadTypeCoreValue(DropFolderScheduleType::DROP_FOLDER_ICAL))
-			return 'ical';
+			return 'ics';
 	}
 	
 	/**
