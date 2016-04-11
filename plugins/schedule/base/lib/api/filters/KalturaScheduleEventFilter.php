@@ -5,6 +5,33 @@
  */
 class KalturaScheduleEventFilter extends KalturaScheduleEventBaseFilter
 {
+	static private $map_between_objects = array
+	(
+		"resourceIdsLike" => "_like_resource_ids",
+		"resourceIdsMultiLikeOr" => "_mlikeor_resource_ids",
+		"resourceIdsMultiLikeAnd" => "_mlikeand_resource_ids",
+	);
+
+	public function getMapBetweenObjects()
+	{
+		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
+	}
+
+	/**
+	 * @var string
+	 */
+	public $resourceIdsLike;
+
+	/**
+	 * @var string
+	 */
+	public $resourceIdsMultiLikeOr;
+
+	/**
+	 * @var string
+	 */
+	public $resourceIdsMultiLikeAnd;
+	
 	/* (non-PHPdoc)
 	 * @see KalturaFilter::getCoreFilter()
 	 */
