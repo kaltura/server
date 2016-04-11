@@ -915,7 +915,7 @@ class KalturaEntryService extends KalturaBaseService
 	protected function prepareEntryForInsert(KalturaBaseEntry $entry, entry $dbEntry = null)
 	{
 		// create a default name if none was given
-		if (!$entry->name)
+		if (!$entry->name && !($dbEntry && $dbEntry->getName()))
 			$entry->name = $this->getPartnerId().'_'.time();
 			
 		if ($entry->licenseType === null)
@@ -1255,10 +1255,13 @@ class KalturaEntryService extends KalturaBaseService
    	 * @param entry $dbEntry
    	 */
 	protected function checkAndSetValidUserInsert(KalturaBaseEntry $entry, entry $dbEntry)
-	{
+	{	
 		// for new entry, puser ID is null - set it from service scope
 		if ($entry->userId === null)
 		{
+			if($dbEntry->getKuserId())
+				return;
+		
 			KalturaLog::debug("Set kuser id [" . $this->getKuser()->getId() . "] line [" . __LINE__ . "]");
 			$dbEntry->setPuserId($this->getKuser()->getPuserId());
 			$dbEntry->setKuserId($this->getKuser()->getId());
