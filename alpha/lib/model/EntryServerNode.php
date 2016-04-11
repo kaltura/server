@@ -15,4 +15,8 @@
  */
 class EntryServerNode extends BaseEntryServerNode {
 
+	public function getCacheInvalidationKeys()
+	{
+		return array("entryServerNode:entryId".strtolower($this->getEntryId()));
+	}
 } // EntryServerNode

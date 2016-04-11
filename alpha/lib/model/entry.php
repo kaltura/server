@@ -3505,7 +3505,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	{
 		$refId = $this->getReferenceID();
 		if ( $refId != null )
-			$refId .= " " . md5(trim($refId));
+			$refId .= " " . mySearchUtils::getMd5EncodedString($refId);
 
 		return $refId;
 	}
