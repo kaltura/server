@@ -17,4 +17,8 @@ class ServerNode extends BaseServerNode {
 
 	const SERVER_NODE_TTL_TIME = 90;
 
+	public function getCacheInvalidationKeys()
+	{
+		return array("serverNode:id".strtolower($this->getId()));
+	}
 } // ServerNode

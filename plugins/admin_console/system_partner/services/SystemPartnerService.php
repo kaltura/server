@@ -172,20 +172,20 @@ class SystemPartnerService extends KalturaBaseService
 	
 	/**
 	 * @action updateStatus
-	 * @param int $partnerId
+	 * @param int $id
 	 * @param KalturaPartnerStatus $status
 	 * @param string $reason
 	 */
-	public function updateStatusAction($partnerId, $status, $reason)
+	public function updateStatusAction($id, $status, $reason)
 	{
-		$dbPartner = PartnerPeer::retrieveByPK($partnerId);
+		$dbPartner = PartnerPeer::retrieveByPK($id);
 		if (!$dbPartner)
-			throw new KalturaAPIException(KalturaErrors::UNKNOWN_PARTNER_ID, $partnerId);
+			throw new KalturaAPIException(KalturaErrors::UNKNOWN_PARTNER_ID, $id);
 			
 		$dbPartner->setStatus($status);
 		$dbPartner->setStatusChangeReason( $reason );
 		$dbPartner->save();
-		PartnerPeer::removePartnerFromCache($partnerId);
+		PartnerPeer::removePartnerFromCache($id);
 	}
 	
 	/**

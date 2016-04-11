@@ -10,7 +10,13 @@ class KalturaFlavorAssetUrlOptions extends KalturaObject
 	 * 
 	 * @var string
 	 */
-	public $fileName;	
+	public $fileName;
+
+	/**
+	 *
+	 * @var string
+	 */
+	public $referrer;
 		
 	private static $map_between_objects = array
 	(

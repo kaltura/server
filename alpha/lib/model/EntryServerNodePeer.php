@@ -90,4 +90,8 @@ class EntryServerNodePeer extends BaseEntryServerNodePeer {
 		return EntryServerNodePeer::doDelete($criteria, $con);
 	}
 
+	public static function getCacheInvalidationKeys()
+	{
+		return array(array("entryServerNode:entryId%s", self::ENTRY_ID));		
+	}
 } // EntryServerNodePeer

@@ -41,10 +41,18 @@ abstract class SyndicationFeedRenderer {
 	
 	protected function getPlayerUrl($entryId)
 	{
-		$uiconfId = ($this->syndicationFeed->playerUiconfId)? '/ui_conf_id/'.$this->syndicationFeed->playerUiconfId: '';
-		$url = requestUtils::getProtocol() . '://' . kConf::get('www_host').
-		'/kwidget/wid/_'.$this->syndicationFeed->partnerId.
-		'/entry_id/'.$entryId.$uiconfId;
+		$url = requestUtils::getProtocol() . '://' . kConf::get('www_host');
+		$partnerId = $this->syndicationFeed->partnerId;
+		if ( $this->syndicationFeedDB->getPlayerType() == PlayerType::HTML5Player )
+		{
+			$uiconfId = ($this->syndicationFeed->playerUiconfId)? '/uiconf_id/'.$this->syndicationFeed->playerUiconfId: '';
+			$url .= '/p/' .$partnerId. '/sp/' .$partnerId. '00/embedIframeJs'.$uiconfId. '/partner_id/' .$partnerId.'?iframeembed=true&entry_id='.$entryId;
+		}
+		else
+		{
+			$uiconfId = ($this->syndicationFeed->playerUiconfId)? '/ui_conf_id/'.$this->syndicationFeed->playerUiconfId: '';
+			$url .= '/kwidget/wid/_'.$partnerId. '/entry_id/'.$entryId.$uiconfId;
+		}
 		return $url;
 	}
 	
