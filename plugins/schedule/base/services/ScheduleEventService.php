@@ -110,6 +110,7 @@ class ScheduleEventService extends KalturaBaseService
 	 * @return KalturaScheduleEvent
 	 *
 	 * @throws KalturaErrors::INVALID_OBJECT_ID
+	 * @throws KalturaScheduleErrors::RECURRENCE_CANT_BE_DELETE
 	 */
 	public function deleteAction($scheduleEventId)
 	{
@@ -117,6 +118,11 @@ class ScheduleEventService extends KalturaBaseService
 		if(!$dbScheduleEvent)
 		{
 			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $scheduleEventId);
+		}
+		
+		if($dbScheduleEvent->getRecurrenceType() == ScheduleEventRecurrenceType::RECURRENCE)
+		{
+			throw new KalturaAPIException(KalturaScheduleErrors::RECURRENCE_CANT_BE_DELETE, $scheduleEventId, $dbScheduleEvent->getParentId());
 		}
 		
 		$dbScheduleEvent->setStatus(ScheduleEventStatus::DELETED);
