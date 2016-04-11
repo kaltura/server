@@ -146,9 +146,6 @@ class BulkUploadEntryEngineCsv extends BulkUploadEngineCsv
 		    if($bulkUploadResult->partnerData)
 		    	$mediaEntry->partnerData = $bulkUploadResult->partnerData;
 
-		    if($bulkUploadResult->ownerId)
-		    	$mediaEntry->userId = $bulkUploadResult->ownerId;
-
 		    if($bulkUploadResult->entitledUsersEdit)
 		    	$mediaEntry->entitledUsersEdit = $bulkUploadResult->entitledUsersEdit;
 
@@ -159,7 +156,13 @@ class BulkUploadEntryEngineCsv extends BulkUploadEngineCsv
 		    	$mediaEntry->referenceId = $bulkUploadResult->referenceId;
 		    	
 		    if($bulkUploadResult->templateEntryId)
+		    {
 		    	$mediaEntry->templateEntryId = $bulkUploadResult->templateEntryId;
+		    	$mediaEntry->userId = null;
+		    }
+		    
+		    if($bulkUploadResult->ownerId)
+		    	$mediaEntry->userId = $bulkUploadResult->ownerId;
 		}
 
 		//Set the content type

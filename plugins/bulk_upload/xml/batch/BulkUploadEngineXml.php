@@ -1853,8 +1853,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			$entry->tags = $this->implodeChildElements($item->tags);
 //		if(isset($item->categories))
 //			$entry->categories = $this->implodeChildElements($item->categories);
-		if(isset($item->userId))
-			$entry->userId = (string)$item->userId;
 		if(isset($item->licenseType))
 			$entry->licenseType = (string)$item->licenseType;
 		if(isset($item->partnerData))
@@ -1881,6 +1879,13 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			else 
 				throw new KalturaBulkUploadXmlException("Template entry id with reference id [$item->templateEntry] not found ", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
 		}
+
+		if($entry->templateEntryId)
+			$entry->userId = null;
+		
+		if(isset($item->userId))
+			$entry->userId = (string)$item->userId;
+		
 		if(isset($item->parentReferenceId))
 		{
 			$parentEntryId = $this->getEntryIdFromReference("{$item->parentReferenceId}");
