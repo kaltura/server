@@ -65,6 +65,7 @@ class KOperationEngineThumbAssetsGenerator extends KOperationEngineDocument
 		foreach ($images as $image) {
 			$thumbCuePoint = new KalturaThumbCuePoint();
 			$thumbCuePoint->entryId = $cpEntryId;
+			$thumbCuePoint->partnerSortValue = $index;
 			KBatchBase::$kClient->cuePoint->add( $thumbCuePoint ) ;
 			$index++;
 
