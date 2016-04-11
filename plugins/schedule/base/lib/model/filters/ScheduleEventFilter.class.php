@@ -20,12 +20,12 @@ class ScheduleEventFilter extends baseObjectFilter
 				"_in_status",
 				"_gte_start_date",
 				"_lte_start_date",
-				"_gte_end_data",
-				"_lte_end_data",
+				"_gte_end_date",
+				"_lte_end_date",
 				"_eq_reference_id",
 				"_in_reference_id",
-				"_eq_organizer_user_id",
-				"_in_organizer_user_id",
+				"_eq_owner_id",
+				"_in_owner_id",
 				"_eq_priority",
 				"_in_priority",
 				"_gte_priority",
@@ -44,18 +44,33 @@ class ScheduleEventFilter extends baseObjectFilter
 				"_lte_created_at",
 				"_gte_updated_at",
 				"_lte_updated_at",
+				"_like_entry_ids",
+				"_mlikeor_entry_ids",
+				"_mlikeand_entry_ids",
+				"_like_category_ids",
+				"_mlikeor_category_ids",
+				"_mlikeand_category_ids",
+				"_like_resource_ids",
+				"_mlikeor_resource_ids",
+				"_mlikeand_resource_ids",
+				"_like_parent_category_ids",
+				"_mlikeor_parent_category_ids",
+				"_mlikeand_parent_category_ids",
+				"_like_parent_resource_ids",
+				"_mlikeor_parent_resource_ids",
+				"_mlikeand_parent_resource_ids",
 			) , NULL );
 
 		$this->allowed_order_fields = array (
 			"created_at", 
 			"updated_at", 
 			"start_date", 
-			"end_data", 
+			"end_date", 
 			"priority", 
 		);
 			
 		$this->aliases = array ( 
-			"organizer_user_id" => "organizer_kuser_id",
+			"owner_id" => "owner_kuser_id",
 		);
 	}
 

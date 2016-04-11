@@ -15,8 +15,11 @@
 abstract class ScheduleEvent extends BaseScheduleEvent implements IRelatedObject, IIndexable
 {
 	const CUSTOM_DATA_FIELD_RECURRENCE = 'recurrence';
-	const CUSTOM_DATA_FIELD_ORGANIZER_PUSER_ID = 'organizerPuserId';
+	const CUSTOM_DATA_FIELD_OWNER_ID = 'ownerId';
 
+	const RESOURCE_PARENT_SEARCH_PERFIX = 'r';
+	const RESOURCES_INDEXED_FIELD_PREFIX = 'pid';
+	
 	public function __construct() 
 	{
 		parent::__construct();
@@ -43,7 +46,7 @@ abstract class ScheduleEvent extends BaseScheduleEvent implements IRelatedObject
 		
 		if(!$this->getParentId())
 		{
-			$this->setOrganizerPuserId(kCurrentContext::$ks_uid);
+			$this->setOwnerId(kCurrentContext::$ks_uid);
 			$this->incrementSequence();
 		}
 		
@@ -58,6 +61,49 @@ abstract class ScheduleEvent extends BaseScheduleEvent implements IRelatedObject
     	
 		return parent::preInsert($con);
 	}
+	
+	/**
+	 * {@inheritDoc}
+	 * @see BaseScheduleEvent::postInsert()
+	 */
+	public function postInsert(PropelPDO $con = null)
+	{
+		parent::postInsert($con);
+	
+		if (!$this->alreadyInSave)
+			kEventsManager::raiseEvent(new kObjectAddedEvent($this));
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 * @see BaseScheduleEvent::postUpdate()
+	 */
+	public function postUpdate(PropelPDO $con = null)
+	{
+		if ($this->alreadyInSave)
+			return parent::postUpdate($con);
+		
+		$objectUpdated = $this->isModified();
+		$objectDeleted = false;
+		if($this->isColumnModified(ScheduleEventPeer::STATUS) && $this->getStatus() == ScheduleEventStatus::DELETED) {
+			$objectDeleted = true;
+		}
+			
+		$ret = parent::postUpdate($con);
+		
+		if ($objectDeleted)
+		{
+			kEventsManager::raiseEvent(new kObjectDeletedEvent($this));
+		}
+
+		if($objectUpdated)
+		{
+		    kEventsManager::raiseEvent(new kObjectUpdatedEvent($this));
+		}
+			
+		return $ret;
+	}
+	
 	
 	/* (non-PHPdoc)
 	 * @see BaseScheduleEvent::preSave()
@@ -80,19 +126,19 @@ abstract class ScheduleEvent extends BaseScheduleEvent implements IRelatedObject
 	/**
 	 * @param string $v
 	 */
-	protected function setOrganizerPuserId($puserId)
+	protected function setOwnerId($puserId)
 	{
 		$kuser = kuserPeer::createKuserForPartner(kCurrentContext::getCurrentPartnerId(), $puserId, kCurrentContext::$is_admin_session);
-		$this->setOrganizerKuserId($kuser->getId());
-		$this->putInCustomData(self::CUSTOM_DATA_FIELD_ORGANIZER_PUSER_ID, $puserId);
+		$this->setOwnerKuserId($kuser->getId());
+		$this->putInCustomData(self::CUSTOM_DATA_FIELD_OWNER_ID, $puserId);
 	}
 	
 	/**
 	 * @return string
 	 */
-	public function getOrganizerPuserId()
+	public function getOwnerId()
 	{
-		return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_ORGANIZER_PUSER_ID);
+		return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_OWNER_ID);
 	}
 	
 	/**
@@ -184,6 +230,39 @@ abstract class ScheduleEvent extends BaseScheduleEvent implements IRelatedObject
 	public function indexToSearchIndex()
 	{
 		kEventsManager::raiseEventDeferred(new kObjectReadyForIndexEvent($this));
+	}
+	
+	public function getEntryIds()
+	{
+		return '';
+	}
+	
+	public function getCategoryIdsForIndex()
+	{
+		return '';
+	}
+	
+	public function getResourceIdsForIndex()
+	{
+		$resources = ScheduleEventResourcePeer::retrieveByEventId($this->getId());
+	
+		$index = array();
+		foreach($resources as $resource)
+		{
+			/* @var $resource ScheduleEventResource */
+				
+			$index[] = $resource->getResourceId();
+				
+			$fullParentIds = $resource->getFullParentIds();
+			foreach($fullParentIds as $parentId)
+			{
+				$index[] = self::RESOURCE_PARENT_SEARCH_PERFIX . $parentId;
+			}
+		}
+	
+		$index = array_unique($index);
+	
+		return self::RESOURCES_INDEXED_FIELD_PREFIX . $this->getPartnerId() . " " .  implode(' ', $index);
 	}
 	
 } // ScheduleEvent

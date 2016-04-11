@@ -289,6 +289,11 @@ class mySearchUtils
 	{
 		return "_NONE_";
 	}
+
+	public static function getMd5EncodedString ( $str )
+	{
+		return md5(strtolower(trim($str)));
+	}
 	
 }
 ?>

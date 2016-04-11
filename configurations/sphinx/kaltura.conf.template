@@ -501,13 +501,14 @@ index kaltura_schedule_event:kaltura_base
 	rt_field = description
 	rt_attr_uint = schedule_event_type
 	rt_attr_uint = schedule_event_status
-	rt_attr_uint = original_start_date
-	rt_attr_uint = start_date
-	rt_attr_uint = end_date
+	rt_attr_timestamp = original_start_date
+	rt_attr_timestamp = start_date
+	rt_attr_timestamp = end_date
 	rt_field = reference_id
 	rt_attr_uint = classification_type
 	rt_field = location
-	rt_attr_uint = organizer_kuser_id
+	rt_field = organizer
+	rt_attr_uint = owner_kuser_id
 	rt_attr_uint = priority
 	rt_attr_uint = sequence
 	rt_attr_uint = recurrence_type
@@ -519,11 +520,8 @@ index kaltura_schedule_event:kaltura_base
 	rt_attr_timestamp = updated_at
 	rt_field = entry_ids
 	rt_field = category_ids
+	rt_field = resource_ids
 	rt_field = plugins_data
-	
-#	float is support in sphinx 2.2.10, we don't use that version yet.
-#	rt_attr_float = geo_lat
-#	rt_attr_float = geo_long
 }
 
 

@@ -639,18 +639,24 @@ class FlavorAssetService extends KalturaAssetService
 			$previewFileSize = null;
 		$ksObj = $this->getKs();
 		$ks = ($ksObj) ? $ksObj->getOriginalString() : null;
-		$securyEntryHelper = new KSecureEntryHelper($entryDb, $ks, null, ContextType::DOWNLOAD);
-		if ($securyEntryHelper->shouldPreview()) 
+
+		$referrer = null;
+		if($options && $options->referrer)
+			$referrer = $options->referrer;
+
+		$secureEntryHelper = new KSecureEntryHelper($entryDb, $ks, $referrer, ContextType::DOWNLOAD);
+
+		if ($secureEntryHelper->shouldPreview())
 		{ 
 			if ($shouldServeFlavor)
-				$preview = $securyEntryHelper->getPreviewLength() * 1000;
+				$preview = $secureEntryHelper->getPreviewLength() * 1000;
 			else
-				$previewFileSize = $assetDb->estimateFileSize($entryDb, $securyEntryHelper->getPreviewLength());
+				$previewFileSize = $assetDb->estimateFileSize($entryDb, $secureEntryHelper->getPreviewLength());
 		}
 		else
-			$securyEntryHelper->validateForDownload();
+			$secureEntryHelper->validateForDownload();
 		
-		if (!$securyEntryHelper->isAssetAllowed($assetDb))
+		if (!$secureEntryHelper->isAssetAllowed($assetDb))
 			throw new KalturaAPIException(KalturaErrors::ASSET_NOT_ALLOWED, $id);
  
 		if ($shouldServeFlavor)
@@ -721,11 +727,11 @@ class FlavorAssetService extends KalturaAssetService
 		$preview = null;
 		$ksObj = $this->getKs();
 		$ks = ($ksObj) ? $ksObj->getOriginalString() : null;
-		$securyEntryHelper = new KSecureEntryHelper($entryDb, $ks, null, ContextType::DOWNLOAD);
-		if ($securyEntryHelper->shouldPreview()) {
-			$preview = $flavorAssetDb->estimateFileSize($entryDb, $securyEntryHelper->getPreviewLength());
+		$secureEntryHelper = new KSecureEntryHelper($entryDb, $ks, null, ContextType::DOWNLOAD);
+		if ($secureEntryHelper->shouldPreview()) {
+			$preview = $flavorAssetDb->estimateFileSize($entryDb, $secureEntryHelper->getPreviewLength());
 		} else {
-			$securyEntryHelper->validateForDownload();
+			$secureEntryHelper->validateForDownload();
 		}
 		
 		return $flavorAssetDb->getDownloadUrl($useCdn, false, $preview);

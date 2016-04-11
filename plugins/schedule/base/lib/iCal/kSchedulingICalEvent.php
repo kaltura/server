@@ -19,6 +19,7 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 		'duration',
 		'contact',
 		'comment',
+		'organizer',
 	);
 	
 	private static $dateFields = array(
@@ -100,7 +101,6 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 		}
 
 		$event->referenceId = $this->getUid();
-		$event->organizerUserId = $this->getField('organizer');
 
 		foreach(self::$stringFields as $string)
 		{
@@ -135,6 +135,7 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 
 		$event->parentId = $this->getField('x-kaltura-parent-id');
 		$event->tags = $this->getField('x-kaltura-tags');
+		$event->ownerId = $this->getField('x-kaltura-owner-id');
 		
 		if($event instanceof KalturaEntryScheduleEvent)
 		{
@@ -156,9 +157,6 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 
 		if($event->referenceId)
 			$object->setField('uid', $event->referenceId);
-
-		if($event->organizerUserId)
-			$object->setField('organizer', $event->organizerUserId);
 		
 		foreach(self::$stringFields as $string)
 		{
@@ -192,6 +190,8 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 		$object->setField('x-kaltura-type', $event->getScheduleEventType());
 		$object->setField('x-kaltura-partner-id', $event->partnerId);
 		$object->setField('x-kaltura-status', $event->status);
+		$object->setField('x-kaltura-owner-id', $event->ownerId);
+		
 
 		if($event->parentId)
 		{

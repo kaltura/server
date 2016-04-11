@@ -15,6 +15,8 @@
  */
 class ScheduleEventResource extends BaseScheduleEventResource implements IRelatedObject {
 
+	const CUSTOM_DATA_FIELD_FULL_PARENT_IDS = 'full_parent_ids';
+	
 	/* (non-PHPdoc)
 	 * @see BaseScheduleEvent::preInsert()
 	 */
@@ -51,6 +53,42 @@ class ScheduleEventResource extends BaseScheduleEventResource implements IRelate
 		$this->updateScheduleEvent();
     	
 		parent::postDelete($con);
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 * @see BaseScheduleEventResource::setEventId()
+	 */
+	public function setResourceId($v)
+	{
+		if($v)
+		{
+			$fullParentIds = array();
+			$resource = ScheduleResourcePeer::retrieveByPK($v);
+			if($resource)
+			{
+				$fullParentIds = $resource->getFullParentIds();
+			}
+			
+			$this->setFullParentIds($fullParentIds);
+		}
+		return parent::setResourceId($v);
+	}
+	
+	/**
+	 * @param array $v
+	 */
+	protected function setFullParentIds(array $v)
+	{
+		$this->putInCustomData(self::CUSTOM_DATA_FIELD_FULL_PARENT_IDS, $v);
+	}
+	
+	/**
+	 * @return array
+	 */
+	public function getFullParentIds()
+	{
+		return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_FULL_PARENT_IDS, null, array());
 	}
 	
 } // ScheduleEventResource

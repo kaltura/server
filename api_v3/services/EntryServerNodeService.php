@@ -90,7 +90,7 @@ class EntryServerNodeService extends KalturaBaseService
 	 * @param KalturaFilterPager $pager
 	 * @return KalturaEntryServerNodeListResponse
 	 */
-	public function listAction(KalturaEntryServerNodeFilter $filter, KalturaFilterPager $pager = null)
+	public function listAction(KalturaEntryServerNodeFilter $filter = null, KalturaFilterPager $pager = null)
 	{
 		if (!$filter)
 			$filter = new KalturaEntryServerNodeFilter();
