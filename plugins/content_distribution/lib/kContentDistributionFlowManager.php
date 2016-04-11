@@ -1603,6 +1603,12 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		if(!ContentDistributionPlugin::isAllowedPartner($entry->getPartnerId()))
 			return true;
 			
+		$validStatuses = array(
+			EntryDistributionStatus::ERROR_DELETING,
+			EntryDistributionStatus::ERROR_UPDATING,
+			EntryDistributionStatus::READY,
+		);
+		
 		$entryDistributions = EntryDistributionPeer::retrieveByEntryId($entry->getId());
 		foreach($entryDistributions as $entryDistribution)
 		{
@@ -1617,6 +1623,13 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 				KalturaLog::log("Entry distribution [" . $entryDistribution->getId() . "] already flagged for deletion");
 				continue;
 			}
+			
+			if (!in_array ($entryDistribution->getStatus(), $validStatus))
+			{
+				$entryDistribution->setStatus(EntryDistributionStatus::DELETED);
+				$entryDistribution->setDirtyStatus(EntryDistributionDirtyStatus::NONE);
+				$entryDistribution->save ();
+			}
 				
 			$distributionProfileId = $entryDistribution->getDistributionProfileId();
 			$distributionProfile = DistributionProfilePeer::retrieveByPK($distributionProfileId);
@@ -1626,13 +1639,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 				continue;
 			}
 				
-			$res = self::submitDeleteEntryDistribution($entryDistribution, $distributionProfile);
-			if (is_null ($res))
-			{
-				$entryDistribution->setStatus(EntryDistributionStatus::DELETED);
-				$entryDistribution->setDirtyStatus(EntryDistributionDirtyStatus::NONE);
-				$entryDistribution->save ();
-			}
+			self::submitDeleteEntryDistribution($entryDistribution, $distributionProfile);
 			
 		}
 		
