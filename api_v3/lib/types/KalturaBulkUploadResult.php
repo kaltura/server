@@ -55,7 +55,7 @@ class KalturaBulkUploadResult extends KalturaObject
 
 
 	/**
-     * @var KalturaBulkUploadResultObjectType
+     * @var KalturaBulkUploadObjectType
      */
     public $bulkUploadResultObjectType;
 

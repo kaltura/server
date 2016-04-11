@@ -231,6 +231,32 @@
 					</xs:documentation>
 				</xs:annotation>
 			</xs:element>
+			<xs:choice maxOccurs="1" minOccurs="0">
+				<xs:element maxOccurs="1" minOccurs="1" name="templateEntryId">
+					<xs:annotation>
+						<xs:documentation>
+							Template entry reference ID.
+						</xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:maxLength value="20"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element maxOccurs="1" minOccurs="1" name="templateEntry">
+					<xs:annotation>
+						<xs:documentation>
+							Template entry reference ID.
+						</xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:maxLength value="2000"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+			</xs:choice>
 
 			<xs:choice maxOccurs="1" minOccurs="0">
 				<xs:element maxOccurs="1" minOccurs="1" ref="media">

@@ -272,7 +272,7 @@ class BaseEntryService extends KalturaEntryService
 		    $entry->name = $this->getPartnerId().'_'.time();
 
 	    // first copy all the properties to the db entry, then we'll check for security stuff
-	    $dbEntry = $this->duplicateTemplateEntry($entry->conversionProfileId);
+	    $dbEntry = $this->duplicateTemplateEntry($entry->conversionProfileId, $entry->templateEntryId);
 	    $dbEntry = $entry->toInsertableObject($dbEntry);
 	    
 

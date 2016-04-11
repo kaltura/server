@@ -111,6 +111,16 @@ class KalturaBulkUploadResultEntry extends KalturaBulkUploadResult
 	 */
 	public $ownerId;
 	
+	/**
+	 * @var string
+	 */
+	public $referenceId;
+	
+	/**
+	 * @var string
+	 */
+	public $templateEntryId;
+	
     
     private static $mapBetweenObjects = array
 	(
@@ -136,6 +146,8 @@ class KalturaBulkUploadResultEntry extends KalturaBulkUploadResult
 		"entitledUsersEdit",
 		"entitledUsersPublish",
 		"ownerId",
+		"referenceId",
+		"templateEntryId",
 	);
 	
     public function getMapBetweenObjects()

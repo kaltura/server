@@ -144,6 +144,9 @@ class KalturaServicesMap
 			
 			$extServiceClass = $serviceClasses[$sourceService];
 			
+			if(!isset($serviceMap[$aliasService]))
+				throw new Exception("Alias service [$aliasService] not found");
+			
 			$serviceMap[$aliasService]->actionMap[strtolower($aliasAction)] = 
 				array ("serviceClass" => $extServiceClass, "actionMethodName" => $sourceAction, "serviceId" => $sourceService, "actionName" => $aliasAction);
 		}

@@ -31,6 +31,8 @@ class BulkUploadResultEntry extends BulkUploadResult
     const OWNER_ID = "owner_id";
     const ENTITLED_USERS_PUBLISH = "entitled_users_publish";
     const ENTITLED_USERS_EDIT = "entitled_users_edit";
+    const REFERENCE_ID = "reference_id";
+    const TEMPLATE_ENTRY_ID = "template_entry_id";
     
     
     
@@ -127,7 +129,7 @@ class BulkUploadResultEntry extends BulkUploadResult
 	
 	public function getEntryId()
 	{
-		if($this->getObjectType() == BulkUploadResultObjectType::ENTRY)
+		if($this->getObjectType() == BulkUploadObjectType::ENTRY)
 			return $this->getObjectId();
 			
 		return null;
@@ -136,7 +138,7 @@ class BulkUploadResultEntry extends BulkUploadResult
 	
 	public function setEntryId($v)
 	{
-		$this->setObjectType(BulkUploadResultObjectType::ENTRY);
+		$this->setObjectType(BulkUploadObjectType::ENTRY);
 		return $this->setObjectId($v);
 	}
     
@@ -194,9 +196,15 @@ class BulkUploadResultEntry extends BulkUploadResult
 	
 	public function getEntitledUsersPublish()	{return $this->getFromCustomData(self::ENTITLED_USERS_PUBLISH, null);}
 	public function setEntitledUsersPublish($v)	{$this->putInCustomData(self::ENTITLED_USERS_PUBLISH, $v);}
-	
+
 	public function getOwnerId()	{return $this->getFromCustomData(self::OWNER_ID, null);}
 	public function setOwnerId($v)	{$this->putInCustomData(self::OWNER_ID, $v);}
+
+	public function getReferenceId()	{return $this->getFromCustomData(self::REFERENCE_ID, null);}
+	public function setReferenceId($v)	{$this->putInCustomData(self::REFERENCE_ID, $v);}
+
+	public function getTemplateEntryId()	{return $this->getFromCustomData(self::TEMPLATE_ENTRY_ID, null);}
+	public function setTemplateEntryId($v)	{$this->putInCustomData(self::TEMPLATE_ENTRY_ID, $v);}
 	
     public function getEntryStatus()	
     {
