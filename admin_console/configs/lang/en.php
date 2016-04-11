@@ -1203,6 +1203,9 @@ return array(
 	'Kaltura_Client_EventNotification_Enum_EventNotificationEventObjectType::CATEGORYENTRY' => 'Category - Entry',
 	'Kaltura_Client_EventNotification_Enum_EventNotificationEventObjectType::DISTRIBUTION_PROFILE' => 'Distribution profile',
 	'Kaltura_Client_EventNotification_Enum_EventNotificationEventObjectType::ENTRY_DISTRIBUTION' => 'Entry distribution',
+	'Kaltura_Client_EventNotification_Enum_EventNotificationEventObjectType::SCHEDULE_EVENT' => 'ScheduleEvent',
+	'Kaltura_Client_EventNotification_Enum_EventNotificationEventObjectType::SCHEDULE_RESOURCE' => 'ScheduleResource',
+	'Kaltura_Client_EventNotification_Enum_EventNotificationEventObjectType::SCHEDULE_EVENT_RESOURCE' => 'ScheduleEventResource',
 
 	
 	'Kaltura_Client_EmailNotification_Enum_EmailNotificationFormat::HTML' => 'HTML',

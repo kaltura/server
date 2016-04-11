@@ -107,8 +107,9 @@ class BatchService extends KalturaBatchService
 	 */
 	function countBulkUploadEntriesAction($bulkUploadJobId, $bulkUploadObjectType = KalturaBulkUploadObjectType::ENTRY)
 	{
-		$createdRecordsCount = BulkUploadResultPeer::countWithObjectTypeByBulkUploadId($bulkUploadJobId, $bulkUploadObjectType);
-		$errorRecordsCount = BulkUploadResultPeer::countErrorWithObjectTypeByBulkUploadId($bulkUploadJobId, $bulkUploadObjectType);
+		$coreBulkUploadObjectType = kPluginableEnumsManager::apiToCore('BulkUploadObjectType', $bulkUploadObjectType);
+		$createdRecordsCount = BulkUploadResultPeer::countWithObjectTypeByBulkUploadId($bulkUploadJobId, $coreBulkUploadObjectType);
+		$errorRecordsCount = BulkUploadResultPeer::countErrorWithObjectTypeByBulkUploadId($bulkUploadJobId, $coreBulkUploadObjectType);
 		
 		$res = array();
 		$created = new KalturaKeyValue();
