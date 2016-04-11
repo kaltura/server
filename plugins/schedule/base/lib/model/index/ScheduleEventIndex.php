@@ -69,8 +69,8 @@ class ScheduleEventIndex extends BaseIndexObject
 				'created_at' => 'createdAt',
 				'updated_at' => 'updatedAt',
 				'entry_ids' => 'entryIds',
-				'category_ids' => 'categoryIds',
-				'resource_ids' => 'resourceIds',
+				'category_ids' => 'categoryIdsForIndex',
+				'resource_ids' => 'resourceIdsForIndex',
 			);
 		}
 		return self::$fieldsMap;
@@ -90,9 +90,9 @@ class ScheduleEventIndex extends BaseIndexObject
 				'description' => IIndexable::FIELD_TYPE_STRING,
 				'schedule_event_type' => IIndexable::FIELD_TYPE_UINT,
 				'schedule_event_status' => IIndexable::FIELD_TYPE_UINT,
-				'original_start_date' => IIndexable::FIELD_TYPE_UINT,
-				'start_date' => IIndexable::FIELD_TYPE_UINT,
-				'end_date' => IIndexable::FIELD_TYPE_UINT,
+				'original_start_date' => IIndexable::FIELD_TYPE_DATETIME,
+				'start_date' => IIndexable::FIELD_TYPE_DATETIME,
+				'end_date' => IIndexable::FIELD_TYPE_DATETIME,
 				'reference_id' => IIndexable::FIELD_TYPE_STRING,
 				'classification_type' => IIndexable::FIELD_TYPE_UINT,
 				'location' => IIndexable::FIELD_TYPE_STRING,

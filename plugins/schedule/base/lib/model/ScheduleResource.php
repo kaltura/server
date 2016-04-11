@@ -15,6 +15,8 @@
  */
 class ScheduleResource extends BaseScheduleResource implements IRelatedObject {
 
+	const CUSTOM_DATA_FIELD_FULL_PARENT_IDS = 'full_parent_ids';
+	
 	public function __construct() 
 	{
 		parent::__construct();
@@ -39,6 +41,43 @@ class ScheduleResource extends BaseScheduleResource implements IRelatedObject {
 		$this->setPartnerId(kCurrentContext::getCurrentPartnerId());
     	
 		return parent::preInsert($con);
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 * @see BaseScheduleResource::setParentId()
+	 */
+	public function setParentId($v)
+	{
+		if($v)
+		{
+			$fullParentIds = array();
+			$parent = ScheduleResourcePeer::retrieveByPK($v);
+			if($parent)
+			{
+				$fullParentIds = $parent->getFullParentIds();
+			}
+			
+			$fullParentIds[] = $v;
+			$this->setFullParentIds($fullParentIds);
+		}
+		return parent::setParentId($v);
+	}
+	
+	/**
+	 * @param array $v
+	 */
+	protected function setFullParentIds(array $v)
+	{
+		$this->putInCustomData(self::CUSTOM_DATA_FIELD_FULL_PARENT_IDS, $v);
+	}
+	
+	/**
+	 * @return array
+	 */
+	public function getFullParentIds()
+	{
+		return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_FULL_PARENT_IDS, null, array());
 	}
 	
 } // ScheduleResource

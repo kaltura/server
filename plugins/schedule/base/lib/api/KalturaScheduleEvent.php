@@ -189,7 +189,7 @@ abstract class KalturaScheduleEvent extends KalturaObject implements IRelatedFil
 		'geoLongitude',
 		'location',
 		'organizer',
-		'ownerId' => 'ownerPuserId',
+		'ownerId',
 		'priority',
 		'sequence',
 		'recurrenceType',

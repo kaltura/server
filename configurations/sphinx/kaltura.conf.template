@@ -501,9 +501,9 @@ index kaltura_schedule_event:kaltura_base
 	rt_field = description
 	rt_attr_uint = schedule_event_type
 	rt_attr_uint = schedule_event_status
-	rt_attr_uint = original_start_date
-	rt_attr_uint = start_date
-	rt_attr_uint = end_date
+	rt_attr_timestamp = original_start_date
+	rt_attr_timestamp = start_date
+	rt_attr_timestamp = end_date
 	rt_field = reference_id
 	rt_attr_uint = classification_type
 	rt_field = location

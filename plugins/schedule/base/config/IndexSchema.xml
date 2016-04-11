@@ -8,9 +8,9 @@
 	        <field name="description" indexName="description" type="string" matchable="yes" />
 	        <field name="type" indexName="schedule_event_type" getter="type" type="int" />
 	        <field name="status" indexName="schedule_event_status" getter="status" type="int" />
-	        <field name="original_start_date" indexName="original_start_date" type="int" orderable="yes" />
-	        <field name="start_date" indexName="start_date" type="int" orderable="yes" />
-	        <field name="end_date" indexName="end_date" type="int" orderable="yes" />
+	        <field name="original_start_date" indexName="original_start_date" type="datetime" orderable="yes" />
+	        <field name="start_date" indexName="start_date" type="datetime" orderable="yes" />
+	        <field name="end_date" indexName="end_date" type="datetime" orderable="yes" />
 	        <field name="reference_id" indexName="reference_id" type="string" matchable="yes" />
 	        <field name="classification_type" indexName="classification_type" type="int" />        
 	        <field name="location" indexName="location" type="string" matchable="yes" />
@@ -26,8 +26,8 @@
 	        <field name="created_at" indexName="created_at" type="datetime" orderable="yes" />
 	        <field name="updated_at" indexName="updated_at" type="datetime" orderable="yes" />      
 	        <field name="entry_ids" indexName="entry_ids" type="string" matchable="yes" />
-	        <field name="category_ids" indexName="category_ids" type="string" matchable="yes" />
-	        <field name="resource_ids" indexName="resource_ids" type="string" matchable="yes" />
+	        <field name="category_ids" indexName="category_ids" getter="categoryIdsForIndex" type="string" matchable="yes" />
+	        <field name="resource_ids" indexName="resource_ids" getter="resourceIdsForIndex" type="string" matchable="yes" />
 	        <field name="plugins_data" indexName="plugins_data" type="string" searchableonly="yes" />
 	        <!--
 	        float is support in sphinx 2.2.10, we don't use that version yet. 

@@ -47,7 +47,7 @@ class KalturaScheduleEventFilter extends KalturaScheduleEventBaseFilter
 			$this->ownerIdIn = implode(',', $kuserIds);
 		}
 		
-		$c = new Criteria();
+		$c = KalturaCriteria::create(ScheduleEventPeer::OM_CLASS);
 		if($type)
 		{
 			$c->add(ScheduleEventPeer::TYPE, $type);
@@ -58,19 +58,10 @@ class KalturaScheduleEventFilter extends KalturaScheduleEventBaseFilter
 		$pager->attachToCriteria($c);
 			
 		$list = ScheduleEventPeer::doSelect($c);
-	
-		$resultCount = count($list);
-		if ($resultCount && $resultCount < $pager->pageSize)
-			$totalCount = ($pager->pageIndex - 1) * $pager->pageSize + $resultCount;
-		else
-		{
-			KalturaFilterPager::detachFromCriteria($c);
-			$totalCount = ScheduleEventPeer::doCount($c);
-		}
 		
 		$response = new KalturaScheduleEventListResponse();
 		$response->objects = KalturaScheduleEventArray::fromDbArray($list, $responseProfile);
-		$response->totalCount = $totalCount;
+		$response->totalCount = $c->getRecordsCount();
 		return $response;
 	}
 }
