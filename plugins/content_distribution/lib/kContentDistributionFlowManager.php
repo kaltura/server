@@ -1603,6 +1603,12 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		if(!ContentDistributionPlugin::isAllowedPartner($entry->getPartnerId()))
 			return true;
 			
+		$validStatuses = array(
+			EntryDistributionStatus::ERROR_DELETING,
+			EntryDistributionStatus::ERROR_UPDATING,
+			EntryDistributionStatus::READY,
+		);
+		
 		$entryDistributions = EntryDistributionPeer::retrieveByEntryId($entry->getId());
 		foreach($entryDistributions as $entryDistribution)
 		{
@@ -1617,6 +1623,14 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 				KalturaLog::log("Entry distribution [" . $entryDistribution->getId() . "] already flagged for deletion");
 				continue;
 			}
+			
+			if (!in_array ($entryDistribution->getStatus(), $validStatuses))
+			{
+				KalturaLog::info("Entry distribution object [" .  $entryDistribution->getId() . "] to be deleted.");
+				$entryDistribution->setStatus(EntryDistributionStatus::DELETED);
+				$entryDistribution->setDirtyStatus(EntryDistributionDirtyStatus::NONE);
+				$entryDistribution->save ();
+			}
 				
 			$distributionProfileId = $entryDistribution->getDistributionProfileId();
 			$distributionProfile = DistributionProfilePeer::retrieveByPK($distributionProfileId);
@@ -1627,6 +1641,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 			}
 				
 			self::submitDeleteEntryDistribution($entryDistribution, $distributionProfile);
+			
 		}
 		
 		return true;
