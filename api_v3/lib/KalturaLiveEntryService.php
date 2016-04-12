@@ -354,7 +354,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 			$recordedEntry->setIsRecordedEntry(true);
 			$recordedEntry->setTags($dbEntry->getTags());
 			
-			if ($dbEntry->getRecordingOptions()->getShouldCopyScheduling())
+			if ($dbEntry->getRecordingOptions() && $dbEntry->getRecordingOptions()->getShouldCopyScheduling())
 			{
 				$recordedEntry->setStartDate($dbEntry->getStartDate());
 				$recordedEntry->setEndDate($dbEntry->getEndDate());
