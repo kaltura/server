@@ -14,12 +14,12 @@ class KalturaLiveEntryRecordingOptions extends KalturaObject
 	public $shouldCopyEntitlement;
 
 	/**
-	 * @var boolean
+	 * @var KalturaNullableBoolean
 	 */
 	public $shouldCopyScheduling;
 	
 	/**
-	 * @var boolean
+	 * @var KalturaNullableBoolean
 	 */
 	public $shouldCopyThumbnail;
 	
