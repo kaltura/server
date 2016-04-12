@@ -1,36 +1,3 @@
-# Kajam-11.13.0 #
-
-## Mediaprep Tvinci distribution profile use dynamic tags ##
-
- - Issue Type: Story
- - Issue ID: PLAT-4617
-
-#### Configuration ####
-- None.
-
-#### Deployment scripts####
-
-	php /opt/kaltura/app/deployment/updates/scripts/2016_04_05_migrate_tvinci_distribution_tags_to_be_dynamic.php <partner_id>
-
-#### Known Issues & Limitations ####
-- None.
-
-
-## Update comment_was_added_to_entry email notification ##
-
- - Issue Type: Bug
- - Issue ID: SUP-7709
-
-#### Configuration ####
-- None.
-
-#### Deployment scripts####
-
-	php /opt/kaltura/app/tests/standAloneClient/exec.php /opt/kaltura/app/deployment/updates/scripts/xml/updateCommentWasAddedToEntryEmailNotificationTemplateCode.xml
-
-#### Known Issues & Limitations ####
-- None.
-
 # Kajam-11.11.0 #
 
 ## fix baseEntryFilter->referenceIdEqueal,referenceIdIn ##
