@@ -69,4 +69,11 @@ class KalturaQuizUserEntry extends KalturaUserEntry{
 		return $object_to_fill;
 	}
 
+	public function validateForInsert($propertiesToSkip = array())
+	{
+		if(!QuizPlugin::isQuiz($this->entryId))
+			throw new KalturaAPIException(KalturaQuizErrors::PROVIDED_ENTRY_IS_NOT_A_QUIZ, $this->entryId);
+		parent::validateForInsert($propertiesToSkip);
+	}
+
 }

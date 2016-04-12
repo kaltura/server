@@ -21,12 +21,6 @@ class KalturaEntryServerNodeFilter extends KalturaEntryServerNodeBaseFilter
 	 */
 	public function getListResponse(KalturaFilterPager $pager, KalturaDetachedResponseProfile $responseProfile = null)
 	{
-		if ($this->entryIdEqual == null &&
-			$this->serverTypeEqual == null )
-		{
-			throw new KalturaAPIException(KalturaErrors::MUST_FILTER_ON_ENTRY_OR_SERVER_TYPE);
-		}
-
 		if($this->entryIdEqual)
 		{
 			$entry = entryPeer::retrieveByPK($this->entryIdEqual);

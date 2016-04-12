@@ -164,6 +164,9 @@ class LiveStreamService extends KalturaLiveEntryService
 				}
 			}
 			
+			/*
+			Patch for autenticate error while performing an immidiate stop/start. Checkup for duplicate streams moved to 
+			media-server for the moment.
 			if($url)
 			{
 				KalturaLog::info('Determining status of live stream URL [' .$url. ']');
@@ -175,7 +178,7 @@ class LiveStreamService extends KalturaLiveEntryService
 				{
 					throw new KalturaAPIException(KalturaErrors::LIVE_STREAM_ALREADY_BROADCASTING, $entryId, $mediaServer->getHostname());
 				}
-			}
+			} */
 		}
 		
 		// fetch current stream live params

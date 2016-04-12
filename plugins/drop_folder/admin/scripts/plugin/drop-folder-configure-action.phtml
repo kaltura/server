@@ -48,16 +48,19 @@ function handlerTypeChanged()
 	patternsLbl = jQuery('#fileNamePatterns-label');
 	validateKS = jQuery('#shouldValidateKS');
 	validateKSLbl = jQuery("[for='shouldValidateKS']");
+	allFileHandlers = jQuery(".contentFileHandler");
+	currentFileHandler = jQuery("#frmContentFileHandlerConfig" + curValue.replace('.', '_'));
+
+	allFileHandlers.css("display","none");
+	currentFileHandler.css("display","inline");
 	
 	if (curValue == <?php echo Kaltura_Client_DropFolder_Enum_DropFolderFileHandlerType::CONTENT; ?>) {
-		jQuery('#frmDropFolderConfigure #frmContentFileHandlerConfig').css("display","inline");
 		patterns.hide();
 		patternsLbl.hide();
 		validateKS.hide();
 		validateKSLbl.hide();
 	}
 	else {
-		jQuery('#frmDropFolderConfigure #frmContentFileHandlerConfig').css("display","none");
 		patterns.show();
 		patternsLbl.show();
 		validateKS.show();
