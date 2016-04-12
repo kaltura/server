@@ -36,11 +36,11 @@ class kBroadcastUrlManager
 		
 		return new kBroadcastUrlManager($partnerId);
 	}
-	
+
 	public function setEntryBroadcastingUrls (LiveStreamEntry $dbEntry)
 	{
 		$currentDc = kDataCenterMgr::getCurrentDcId();
-		$hostname = $this->getHostname($currentDc, $dbEntry->getSource());
+		$hostname = $this->getHostname($currentDc, true, $dbEntry);
 		
 		$dbEntry->setPrimaryBroadcastingUrl($this->getBroadcastUrl($dbEntry, kBroadcastUrlManager::PROTOCOL_RTMP, $hostname, kBroadcastUrlManager::PRIMARY_MEDIA_SERVER_INDEX));		
 		$dbEntry->setPrimaryRtspBroadcastingUrl($this->getBroadcastUrl($dbEntry, kBroadcastUrlManager::PROTOCOL_RTSP, $hostname, kBroadcastUrlManager::PRIMARY_MEDIA_SERVER_INDEX, true));
@@ -51,7 +51,7 @@ class kBroadcastUrlManager
 			if(!is_numeric($dc) || $dc == $currentDc)
 				continue;
 				
-			$hostname = $this->getHostname($dc, $dbEntry->getSource());
+			$hostname = $this->getHostname($dc, false, $dbEntry);
 			
 			$dbEntry->setSecondaryBroadcastingUrl($this->getBroadcastUrl($dbEntry, kBroadcastUrlManager::PROTOCOL_RTMP, $hostname, kBroadcastUrlManager::SECONDARY_MEDIA_SERVER_INDEX));
 			$dbEntry->setSecondaryRtspBroadcastingUrl($this->getBroadcastUrl($dbEntry, kBroadcastUrlManager::PROTOCOL_RTSP, $hostname, kBroadcastUrlManager::SECONDARY_MEDIA_SERVER_INDEX, true));
@@ -76,11 +76,13 @@ class kBroadcastUrlManager
 		return $partner->getLiveStreamBroadcastUrlConfigurations($dc);
 	}
 	
-	protected function getHostname ($dc, $sourceType)
+	protected function getHostname ($dc, $primary, $entry)
 	{
+		$sourceType = $entry->getSource();
 		$applicationSuffix = $this->getPostfixValue($sourceType);
 		$mediaServerConfig = $this->getConfiguration($dc);
 		$url = $mediaServerConfig['domain'];
+		$url = str_replace(array("{entryId}", "{primary}"), array($entry->getId(), $primary ? "p" : "b"), $url);
 		$port = $this->getPort($dc);
 		
 		if (isset ($mediaServerConfig['application'][$applicationSuffix]))
