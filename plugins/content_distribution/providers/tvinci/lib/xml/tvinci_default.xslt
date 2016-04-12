@@ -458,17 +458,10 @@
                 </xsl:variable>
 
                 <xsl:variable name="nameSuffix">
-                    <xsl:if test="$isChild">
-                        <xsl:variable name="trailerSuffix">
-                            <xsl:value-of select="concat(' ',$CONST_TRAILER_NAME)"/>
-                        </xsl:variable>
-                        <xsl:variable name="trailerIdxSuffix">
-                            <xsl:if test="(($childIdx > 1))">
-                                <xsl:value-of select="concat(' ',$childIdx)"/>
-                            </xsl:if>
-                        </xsl:variable>
-                        <xsl:value-of select="concat($trailerSuffix, $trailerIdxSuffix)"/>
-                    </xsl:if>
+                    <xsl:call-template name="get-name-suffix">
+                        <xsl:with-param name="isChild" select="$isChild" />
+                        <xsl:with-param name="childIdx" select="$childIdx" />
+                    </xsl:call-template>
                 </xsl:variable>
                 <xsl:variable name="typeName">
                     <xsl:value-of select="concat($tag/typename, $nameSuffix)" />
@@ -582,4 +575,19 @@
         </xsl:element>
     </xsl:template>
 
+    <xsl:template name="get-name-suffix">
+        <xsl:param name="isChild" select="false()"/>
+        <xsl:param name="childIdx" select="0"/>
+        <xsl:if test="$isChild">
+            <xsl:variable name="trailerSuffix">
+                <xsl:value-of select="concat(' ',$CONST_TRAILER_NAME)"/>
+            </xsl:variable>
+            <xsl:variable name="trailerIdxSuffix">
+                <xsl:if test="(($childIdx > 1))">
+                    <xsl:value-of select="concat(' ',$childIdx)"/>
+                </xsl:if>
+            </xsl:variable>
+            <xsl:value-of select="concat($trailerSuffix, $trailerIdxSuffix)"/>
+        </xsl:if>
+    </xsl:template>
 </xsl:stylesheet>

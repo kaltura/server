@@ -67,35 +67,12 @@ class TvinciDistributionFeedHelper
 			 */
 			$tagXML = $tagsDoc->createElement('tag');
 
-			$tagname = $tagsDoc->createElement('tagname');
-			$tagnameText = $tagsDoc->createTextNode($tag->tagname);
-			$tagname->appendChild($tagnameText);
-			$tagXML->appendChild($tagname);
-
-			$extension = $tagsDoc->createElement('extension');
-			$extensionText = $tagsDoc->createTextNode($tag->extension);
-			$extension->appendChild($extensionText);
-			$tagXML->appendChild($extension);
-
-			$protocol = $tagsDoc->createElement('protocol');
-			$protocolText = $tagsDoc->createTextNode($tag->protocol);
-			$protocol->appendChild($protocolText);
-			$tagXML->appendChild($protocol);
-
-			$format = $tagsDoc->createElement('format');
-			$formatText = $tagsDoc->createTextNode($tag->format);
-			$format->appendChild($formatText);
-			$tagXML->appendChild($format);
-
-			$typename = $tagsDoc->createElement('typename');
-			$typenameText = $tagsDoc->createTextNode($tag->filename);
-			$typename->appendChild($typenameText);
-			$tagXML->appendChild($typename);
-
-			$ppvmodule = $tagsDoc->createElement('ppvmodule');
-			$ppvmoduleText = $tagsDoc->createTextNode($tag->ppvmodule);
-			$ppvmodule->appendChild($ppvmoduleText);
-			$tagXML->appendChild($ppvmodule);
+			$tagXML->appendChild($this->createAppendXml($tag, $tagsDoc, 'tagname', 'tagname'));
+			$tagXML->appendChild($this->createAppendXml($tag, $tagsDoc, 'extension', 'extension'));
+			$tagXML->appendChild($this->createAppendXml($tag, $tagsDoc, 'protocol', 'protocol'));
+			$tagXML->appendChild($this->createAppendXml($tag, $tagsDoc, 'format', 'format'));
+			$tagXML->appendChild($this->createAppendXml($tag, $tagsDoc, 'typename', 'filename'));
+			$tagXML->appendChild($this->createAppendXml($tag, $tagsDoc, 'ppvmodule', 'ppvmodule'));
 
 			$tagsConfiguration->appendChild($tagXML);
 
@@ -137,7 +114,6 @@ class TvinciDistributionFeedHelper
 		}
 		$tagsDoc->appendChild($tagsConfiguration);
 		$arguments['tagsparam'] = $tagsDoc->saveXML();
-		KalturaLog::err("@@NA arguments [".print_r($arguments,true)."]");
 
 		return $arguments;
 	}
@@ -207,6 +183,14 @@ class TvinciDistributionFeedHelper
 	public function getXml()
 	{
 		return $this->_doc->saveXML();
+	}
+	
+	private function createAppendXml($tag, $tagsDoc, $xmlNodeName, $propertyName)
+	{
+		$nameNode = $tagsDoc->createElement($xmlNodeName);
+		$nodeText = $tagsDoc->createTextNode($tag->{$propertyName});
+		$nameNode->appendChild($nodeText);
+		return $nameNode;
 	}
 
 }

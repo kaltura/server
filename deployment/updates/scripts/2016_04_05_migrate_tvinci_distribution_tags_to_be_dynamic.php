@@ -24,62 +24,34 @@ foreach ($distributionProfiles as $distributionProfile)
 	 * @var TvinciDistributionProfile $distributionProfile
 	 */
 	$tags = array();
-	$ismFileName = $distributionProfile->getFromCustomData('ismFileName', null, '');
-	$ismPpvmodule = $distributionProfile->getFromCustomData('ismPpvModule', null, '');
-	if ( $ismFileName != '' || $ismPpvmodule != '' )
-	{
-		$tag = createTvinciTag("ism", $ismFileName, $ismPpvmodule);
+	$tag = createTvinciTag("ism", 'ismFileName', 'ismPpvModule', $distributionProfile);
+	if (!is_null($tag))
 		$tags[] = $tag;
-	}
 
-	$ipadnewFileName = $distributionProfile->getFromCustomData('ipadnewFileName', null, '');
-	$ipadnewPpvmodule = $distributionProfile->getFromCustomData('ipadnewPpvModule', null, '');
-	if ( $ipadnewFileName != '' || $ipadnewPpvmodule != '' )
-	{
-		$tag = createTvinciTag("ipadnew", $ipadnewFileName, $ipadnewPpvmodule);
+	$tag = createTvinciTag("ipadnew", 'ipadnewFileName', 'ipadnewPpvModule', $distributionProfile);
+	if (!is_null($tag))
 		$tags[] = $tag;
-	}
 
-	$iphonenewFileName = $distributionProfile->getFromCustomData('iphonenewFileName', null, '');
-	$iphonenewPpvmodule = $distributionProfile->getFromCustomData('iphonenewPpvModule', null, '');
-	if ( $iphonenewFileName != '' || $iphonenewPpvmodule != '' )
-	{
-		$tag = createTvinciTag("iphonenew", $iphonenewFileName, $iphonenewPpvmodule);
+	$tag = createTvinciTag("iphonenew", 'iphonenewFileName', 'iphonenewPpvModule', $distributionProfile);
+	if (!is_null($tag))
 		$tags[] = $tag;
-	}
 
-	$mbrFileName = $distributionProfile->getFromCustomData('mbrFileName', null, '');
-	$mbrPpvmodule = $distributionProfile->getFromCustomData('mbrPpvModule', null, '');
-	if ( $mbrFileName != '' || $mbrPpvmodule != '' )
-	{
-		$tag = createTvinciTag("mbr", $mbrFileName, $mbrPpvmodule);
+	$tag = createTvinciTag("mbr", 'mbrFileName', 'mbrPpvModule', $distributionProfile);
+	if (!is_null($tag))
 		$tags[] = $tag;
-	}
 
-	$dashFileName = $distributionProfile->getFromCustomData('dashFileName', null, '');
-	$dashPpvmodule = $distributionProfile->getFromCustomData('dashPpvModule', null, '');
-	if ( $dashFileName != '' || $dashPpvmodule != '' )
-	{
-		$tag = createTvinciTag("dash", $dashFileName, $dashPpvmodule);
+	$tag = createTvinciTag("dash", 'dashFileName', 'dashPpvModule', $distributionProfile);
+	if (!is_null($tag))
 		$tags[] = $tag;
-	}
 
-	$widevineFileName = $distributionProfile->getFromCustomData('widevineFileName', null, '');
-	$widevinePpvmodule = $distributionProfile->getFromCustomData('widevinePpvModule', null, '');
-	if ( $widevineFileName != '' || $widevinePpvmodule != '' )
-	{
-		$tag = createTvinciTag("widevine", $widevineFileName, $widevinePpvmodule);
+	$tag = createTvinciTag("widevine", 'widevineFileName', 'widevinePpvModule', $distributionProfile);
+	if (!is_null($tag))
 		$tags[] = $tag;
-	}
 
-	$widevine_mbrFileName = $distributionProfile->getFromCustomData('widevineMbrFileName', null, '');
-	$widevine_mbrPpvmodule = $distributionProfile->getFromCustomData('widevineMbrPpvModule', null, '');
-	if ( $widevine_mbrFileName != '' || $widevine_mbrPpvmodule != '' )
-	{
-		$tag = createTvinciTag("widevine_mbr", $widevine_mbrFileName, $widevine_mbrPpvmodule);
+	$tag = createTvinciTag("widevine_mbr", 'widevineMbrFileName', 'widevineMbrPpvModule', $distributionProfile);
+	if (!is_null($tag))
 		$tags[] = $tag;
-	}
-	
+
 	$distributionProfile->putInCustomData('tags',$tags);
 	KalturaLog::debug("noam [".print_r($distributionProfile,true)."]");
 	if ($realrun)
@@ -89,8 +61,15 @@ foreach ($distributionProfiles as $distributionProfile)
 }
 
 
-function createTvinciTag($tagname, $filename, $ppvModuleName)
+function createTvinciTag($tagname, $customDataFileName, $customDataPpvModule, $distributionProfile)
 {
+	$filename = trim($distributionProfile->getFromCustomData($customDataFileName, null, ''));
+	$ppvModuleName = trim($distributionProfile->getFromCustomData($customDataPpvModule, null, ''));
+	if ( $filename == '' && $ppvModuleName == '' )
+	{
+		return null;
+	}
+	
 	$newTag = new TvinciDistributionTag();
 	$newTag->setTagname($tagname);
 	$newTag->setFilename($filename);
@@ -104,10 +83,6 @@ function createTvinciTag($tagname, $filename, $ppvModuleName)
 			$newTag->setExtension('ism');
 			break;
 		case 'ipadnew':
-			$newTag->setFormat('applehttp');
-			$newTag->setProtocol('http');
-			$newTag->setExtension('m3u8');
-			break;
 		case 'iphonenew':
 			$newTag->setFormat('applehttp');
 			$newTag->setProtocol('http');
@@ -124,10 +99,6 @@ function createTvinciTag($tagname, $filename, $ppvModuleName)
 			$newTag->setExtension('mpd');
 			break;
 		case 'widevine':
-			$newTag->setFormat('url');
-			$newTag->setProtocol('http');
-			$newTag->setExtension('wvm');
-			break;
 		case 'widevine_mbr':
 			$newTag->setFormat('url');
 			$newTag->setProtocol('http');
