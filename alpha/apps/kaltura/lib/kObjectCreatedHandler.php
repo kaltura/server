@@ -89,7 +89,7 @@ class kObjectCreatedHandler implements kObjectCreatedEventConsumer
 	{
 		//Get live entry thumbnails
 		$criteria = new Criteria();
-		$criteria->add (assetPeer::ENTRY_ID, $liveEntry->id);
+		$criteria->add (assetPeer::ENTRY_ID, $liveEntry->getId());
 		$criteria->add(assetPeer::STATUS, asset::ASSET_STATUS_READY);
 		$criteria->add(assetPeer::TYPE, assetType::THUMBNAIL);
 		$thumbAssetList = assetPeer::doSelect($criteria);
