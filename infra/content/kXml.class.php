@@ -27,6 +27,12 @@ class XSLTErrorCollector
 	}
 }
 
+function xml_load_for_xslt($xmlStr)
+{
+	$dom = DOMDocument::loadXML($xmlStr);
+	return $dom->documentElement;
+}
+
 /** 
  * @package infra
  * @subpackage utils
@@ -35,7 +41,7 @@ class kXml
 {
 	public static function getXslEnabledPhpFunctions()
 	{
-		return array('date', 'gmdate', 'strtotime','urlencode');
+		return array('date', 'gmdate', 'strtotime','urlencode','xml_load_for_xslt');
 	}
 	
 	//check if the prop's value is valid for xml encoding.
