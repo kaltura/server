@@ -1624,8 +1624,9 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 				continue;
 			}
 			
-			if (!in_array ($entryDistribution->getStatus(), $validStatus))
+			if (!in_array ($entryDistribution->getStatus(), $validStatuses))
 			{
+				KalturaLog::info("Entry distribution object [" .  $entryDistribution->getId() . "] to be deleted.");
 				$entryDistribution->setStatus(EntryDistributionStatus::DELETED);
 				$entryDistribution->setDirtyStatus(EntryDistributionDirtyStatus::NONE);
 				$entryDistribution->save ();

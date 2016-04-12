@@ -13,21 +13,10 @@ class KalturaLiveEntryRecordingOptions extends KalturaObject
 	 */
 	public $shouldCopyEntitlement;
 
-	/**
-	 * @var boolean
-	 */
-	public $shouldCopyScheduling;
-	
-	/**
-	 * @var boolean
-	 */
-	public $shouldCopyThumbnail;
 	
 	private static $mapBetweenObjects = array
 	(
 		"shouldCopyEntitlement",
-		"shouldCopyScheduling",
-		"shouldCopyThumbnail",
 	);
 	
 	/* (non-PHPdoc)
