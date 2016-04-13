@@ -62,10 +62,12 @@ class KOperationEngineThumbAssetsGenerator extends KOperationEngineDocument
 	{
 		KBatchBase::$kClient->startMultiRequest();
 		$index = 0;
+		$sortIndex = 0;
 		foreach ($images as $image) {
 			$thumbCuePoint = new KalturaThumbCuePoint();
 			$thumbCuePoint->entryId = $cpEntryId;
-			$thumbCuePoint->partnerSortValue = $pageIndex*self::MAX_MULTI_REQUEST_INDEX+$index;
+			$thumbCuePoint->partnerSortValue = $pageIndex*self::MAX_MULTI_REQUEST_INDEX+$sortIndex;
+			$sortIndex++;
 			KBatchBase::$kClient->cuePoint->add( $thumbCuePoint ) ;
 			$index++;
 
