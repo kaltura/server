@@ -507,7 +507,7 @@ class category extends Basecategory implements IIndexable, IRelatedObject
 		categoryPeer::setUseCriteriaFilter(true);
 
 		foreach ($categories as $categoryToDelete) {
-			$categoryToDelete->setAsDeleted($now);
+			$categoryToDelete->setDeletedAtInternally($now);
 			$categoryToDelete->setUpdatedAt($now);
 			$categoryToDelete->setStatus(CategoryStatus::DELETED);
 			kEventsManager::raiseEvent(new kObjectDeletedEvent($categoryToDelete));
@@ -522,7 +522,7 @@ class category extends Basecategory implements IIndexable, IRelatedObject
 			$this->addDeleteCategoryTreeEntryJob($fullIds);
 	}
 
-	private function setDeletedAtInternally($v)
+	public function setDeletedAtInternally($v)
 	{
 		parent::setDeletedAt($v);
 	}
