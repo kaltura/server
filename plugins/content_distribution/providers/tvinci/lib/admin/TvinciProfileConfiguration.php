@@ -19,26 +19,7 @@ class Form_TvinciProfileConfiguration extends Form_ConfigurableProfileConfigurat
 	public function getObject($objectType, array $properties, $add_underscore = true, $include_empty_fields = false)
 	{
 		$object = parent::getObject($objectType, $properties, $add_underscore, $include_empty_fields);
-		/**
-		 * @var Kaltura_Client_TvinciDistribution_Type_TvinciDistributionProfile $object
-		 */
-		$tagsArr = array();
-		foreach($properties as $key => $value)
-		{
-			if (strpos($key, 'tvinci_distribution_tags_') === 0)
-			{
-				$tvinciDistributionTag = new Kaltura_Client_TvinciDistribution_Type_TvinciDistributionTag();
-				$tvinciDistributionTag->tagname = $value['tag_name'];
-				$tvinciDistributionTag->extension = $value['tag_extension'];
-				$tvinciDistributionTag->protocol = $value['tag_protocol'];
-				$tvinciDistributionTag->format = $value['tag_format'];
-				$tvinciDistributionTag->filename = $value['tag_file_name'];
-				$tvinciDistributionTag->ppvmodule = $value['tag_ippvmodule'];
-				$tagsArr[] = $tvinciDistributionTag;
-			}
-		}
-		$object->tags = $tagsArr;
-		
+
 		if($object instanceof Kaltura_Client_TvinciDistribution_Type_TvinciDistributionProfile) {
 			$upload = new Zend_File_Transfer_Adapter_Http();
 			$files = $upload->getFileInfo();
@@ -72,23 +53,34 @@ class Form_TvinciProfileConfiguration extends Form_ConfigurableProfileConfigurat
 
 		parent::populateFromObject($object, $add_underscore);
 
-		$tvinciDistributionTagsSubForm = new Zend_Form_SubForm(array('DisableLoadDefaultDecorators' => true));
-		$tvinciDistributionTagsSubForm->addDecorator('ViewScript', array(
-			'viewScript' => 'tvinci-distribution-tags-sub-form.phtml',
-		));
-		foreach($object->tags as $tag)
-		{
-			$distributionTag = new Form_TvinciTagSubForm();
-			$distributionTag->populateFromObject($tag);
-			$tvinciDistributionTagsSubForm->addSubForm($distributionTag, 'tvinci_distribution_tags_'.spl_object_hash($tag));
-		}
-		$this->addSubForm($tvinciDistributionTagsSubForm, 'tvinci_distribution_tags');
-		
 		if ($object->xsltFile) {
 			$this->getElement('xsltFileText')->setValue(json_encode($object->xsltFile));
 		}
 
 	}
+
+	private function addTagItems($tagName){
+		$this->addElement('text', "{$tagName}_file_name", array(
+			'label'			=> "{$tagName} file name:",
+			'filters'		=> array('StringTrim'),
+		));
+
+		$this->addElement('text', "{$tagName}_ppv_module", array(
+			'label'			=> "{$tagName} PPv Module:",
+			'filters'		=> array('StringTrim'),
+		));
+
+		$this->addDisplayGroup(
+			array("{$tagName}_file_name","{$tagName}_ppv_module" ),
+			"{$tagName}",
+			array(
+				'legend' => "{$tagName} Configuration",
+				'decorators' => array('FormElements', 'Fieldset'),
+			)
+		);
+	}
+
+
 
 	protected function tvinciElements()
 	{
@@ -118,11 +110,13 @@ class Form_TvinciProfileConfiguration extends Form_ConfigurableProfileConfigurat
 		);
 
 		// tag specific configuration
-		$tvinciDistributionTagsSubForm = new Zend_Form_SubForm(array('DisableLoadDefaultDecorators' => true));
-		$tvinciDistributionTagsSubForm->addDecorator('ViewScript', array(
-			'viewScript' => 'tvinci-distribution-tags-sub-form.phtml',
-		));
-		$this->addSubForm($tvinciDistributionTagsSubForm, 'tvinci_distribution_tags');
+		$this->addTagItems("ism");
+		$this->addTagItems("ipadnew");
+		$this->addTagItems("iphonenew");
+		$this->addTagItems("mbr");
+		$this->addTagItems("dash");
+		$this->addTagItems("widevine");
+		$this->addTagItems("widevine_mbr");
 
 		// xslt configuration
 		$this->addElement('file', 'xsltFile', array(
