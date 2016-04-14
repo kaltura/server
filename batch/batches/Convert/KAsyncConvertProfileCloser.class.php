@@ -31,6 +31,7 @@ class KAsyncConvertProfileCloser extends KJobCloserWorker
 	 */
 	protected function exec(KalturaBatchJob $job)
 	{
+		$this->checkConvertDone($job);
 		return $this->checkTimeout($job);
 	}
 
@@ -41,5 +42,13 @@ class KAsyncConvertProfileCloser extends KJobCloserWorker
 			return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::CLOSER_TIMEOUT, 'Timed out', KalturaBatchJobStatus::FAILED);
 			
 		return $this->closeJob($job, null, null, null, KalturaBatchJobStatus::ALMOST_DONE);
+	}
+	
+	private function checkConvertDone(KalturaBatchJob $job)
+	{
+		/**
+		 * @var KalturaConvertProfileJobData $data
+		 */
+		self::$kClient->batch->checkEntryIsDone($job->id);
 	}
 }

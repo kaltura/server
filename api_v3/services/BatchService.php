@@ -560,4 +560,36 @@ class BatchService extends KalturaBatchService
 
 // --------------------------------- generic functions 	--------------------------------- //
 
+
+	/**
+	 * batch checkEntryIsDone Check weather a specified entry is done converting and changes it to ready.
+	 *
+	 * @action checkEntryIsDone
+	 * @param string $batchJobId The entry to check
+	 * @return KalturaBatchJob
+	 * @throws KalturaAPIException
+	 */
+	function checkEntryIsDone($batchJobId)
+	{
+		$dbBatchJob = BatchJobPeer::retrieveByPK($batchJobId);
+		if (!$dbBatchJob)
+		{
+			throw new KalturaAPIException("batch job [$batchJobId] not found");//TODO: see if there is already a message defined if not define it.
+		}
+		$entry = $dbBatchJob->getEntry();
+		if (!$entry)
+		{
+			throw new KalturaAPIException("Job does not contain valid entry-id");
+		}
+		if ($entry->getStatus() == entryStatus::PRECONVERT)
+		{
+			$flavorAssets = assetPeer::retrieveReadyFlavorsByEntryId($entry->getId());
+			if (!$flavorAssets || count($flavorAssets) == 0)
+			{
+				throw new KalturaAPIException("No flavor assets found for entry");
+			}
+			kBusinessPostConvertDL::handleConvertFinished($dbBatchJob, $flavorAssets[0]);
+		}
+	}
+
 }
