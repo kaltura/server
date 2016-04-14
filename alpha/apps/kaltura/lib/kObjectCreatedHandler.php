@@ -88,7 +88,7 @@ class kObjectCreatedHandler implements kObjectCreatedEventConsumer
 	protected function syncLiveEntryThumbnail (entry $object, LiveEntry $liveEntry)
 	{
 		//Get live entry thumbnails
-		$thumbAssetList = assetPeer::retrieveThumbnailsByEntryId($liveEntry->getId());
+		$thumbAssetList = assetPeer::retrieveReadyThumbnailsByEntryId($liveEntry->getId());
 		
 		foreach ($thumbAssetList as $thumbAsset)
 		{
