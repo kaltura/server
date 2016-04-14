@@ -151,13 +151,28 @@ class kBusinessPostConvertDL
 		
 		return $currentFlavorAsset;
 	}
+
+
+	public static function handleConvertFinished(BatchJob $dbBatchJob = null, flavorAsset $currentFlavorAsset)
+	{
+		try
+		{
+			$lockKey = "handle_convert_finished_" . $currentFlavorAsset->getEntryId();
+			return kLock::runLocked($lockKey, array('kBusinessPostConvertDL', 'handleConvertFinishedImpl'), array($dbBatchJob, $currentFlavorAsset));
+		}
+		catch(Exception $e)
+		{
+			KalturaLog::err($e->getMessage());
+		}
+		return $dbBatchJob;
+	}
 	
 	/**
 	 * @param BatchJob $dbBatchJob
 	 * @param flavorAsset $currentFlavorAsset
 	 * @return BatchJob
 	 */
-	public static function handleConvertFinished(BatchJob $dbBatchJob = null, flavorAsset $currentFlavorAsset)
+	public static function handleConvertFinishedImpl(BatchJob $dbBatchJob = null, flavorAsset $currentFlavorAsset)
 	{
 		$profile = null;
 		try{
