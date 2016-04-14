@@ -1630,6 +1630,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 				$entryDistribution->setStatus(EntryDistributionStatus::DELETED);
 				$entryDistribution->setDirtyStatus(EntryDistributionDirtyStatus::NONE);
 				$entryDistribution->save ();
+				continue;
 			}
 				
 			$distributionProfileId = $entryDistribution->getDistributionProfileId();
