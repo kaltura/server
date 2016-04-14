@@ -172,7 +172,7 @@ class kBusinessPostConvertDL
 	 * @param flavorAsset $currentFlavorAsset
 	 * @return BatchJob
 	 */
-	private static function handleConvertFinishedImpl(BatchJob $dbBatchJob = null, flavorAsset $currentFlavorAsset)
+	public static function handleConvertFinishedImpl(BatchJob $dbBatchJob = null, flavorAsset $currentFlavorAsset)
 	{
 		$profile = null;
 		try{
