@@ -44,6 +44,7 @@ class VoicebaseClientHelper
 			$spokenLanguage = $this->supportedLanguages[$spokenLanguage];
 		
 		$params = array("action" => "uploadMedia",
+						"title" => $entryId,
 						"externalID" => $entryId, 
 						"lang" => $spokenLanguage
 						);
@@ -113,7 +114,7 @@ class VoicebaseClientHelper
 		$updateTranscriptUrl = $this->addUrlParams($this->baseEndpointUrl, $params);
 	
 		$transcriptContent = "@" . $transcriptContent;
-		$postFields = array("transcript" => $transcriptContent, "machineReadyCallback" => $callBack);
+		$postFields = array("transcript" => $transcriptContent, "humanReadyCallback" => $callBack);
 		$options = array(CURLOPT_POST => 1, CURLOPT_POSTFIELDS => $postFields);
 	
 		$this->sendAPICall($updateTranscriptUrl, $options);
