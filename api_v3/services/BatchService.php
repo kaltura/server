@@ -566,11 +566,12 @@ class BatchService extends KalturaBatchService
 	 *
 	 * @action checkEntryIsDone
 	 * @param string $batchJobId The entry to check
-	 * @return KalturaBatchJob
+	 * @return bool
 	 * @throws KalturaAPIException
 	 */
 	function checkEntryIsDone($batchJobId)
 	{
+		$ret_val = false;
 		$dbBatchJob = BatchJobPeer::retrieveByPK($batchJobId);
 		if (!$dbBatchJob)
 		{
@@ -589,7 +590,13 @@ class BatchService extends KalturaBatchService
 				throw new KalturaAPIException("No flavor assets found for entry");
 			}
 			kBusinessPostConvertDL::handleConvertFinished($dbBatchJob, $flavorAssets[0]);
+			$entry = entryPeer::retrieveByPK($entry->getId());
+			if ($entry->getStatus() != entryStatus::PRECONVERT)
+			{
+				$ret_val = true;
+			}
 		}
+		return $ret_val;
 	}
 
 }
