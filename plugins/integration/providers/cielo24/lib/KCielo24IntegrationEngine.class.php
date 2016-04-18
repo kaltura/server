@@ -49,9 +49,6 @@ class KCielo24IntegrationEngine implements KIntegrationCloserEngine
 		$flavorUrl = KBatchBase::$kClient->flavorAsset->getUrl($flavorAssetId, null, null, $nameOptions);
 
 		$languageName = $this->clientHelper->getLanguageConstantName($spokenLanguage);
-		if($languageName == '')
-			KalturaLog::err("language not found");
-
 		$jobNameForSearch = $entryId . "_$languageName";
 
 		if($shouldReplaceRemoteMedia == true)

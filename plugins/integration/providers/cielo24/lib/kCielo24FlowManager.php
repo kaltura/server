@@ -67,8 +67,6 @@ class kCielo24FlowManager implements kBatchJobStatusEventConsumer
 			$clientHelper = Cielo24Plugin::getClientHelper($providerData->getUsername(), $providerData->getPassword(), $providerData->getBaseUrl());
 		
 			$languageName = $clientHelper->getLanguageConstantName($spokenLanguage);
-			if(!$languageName)
-				KalturaLog::err("language not found");
 			$jobId = $dbBatchJob->getId();
 			$jobNameForSearch = "$entryId" . "_$languageName" . "_$jobId";
 
