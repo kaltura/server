@@ -105,7 +105,7 @@ class BulkUploadCategoryEntryEngineFilter extends BulkUploadEngineFilter
 
 	protected function getBulkUploadResultObjectType()
 	{
-		return KalturaBulkUploadResultObjectType::CATEGORY_ENTRY;
+		return KalturaBulkUploadObjectType::CATEGORY_ENTRY;
 	}
 	
 	protected function isErrorResult($requestResult){

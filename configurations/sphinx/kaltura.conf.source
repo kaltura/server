@@ -283,6 +283,12 @@ index kaltura_metadata:kaltura_base
 	@FIELDS_PLACEHOLDER-kaltura_metadata@
 }
 
+index kaltura_schedule_event:kaltura_base
+{
+	path	 = @BASE_DIR@/sphinx/kaltura_schedule_event_rt
+	@FIELDS_PLACEHOLDER-kaltura_schedule_event@
+}
+
 
 searchd
 {

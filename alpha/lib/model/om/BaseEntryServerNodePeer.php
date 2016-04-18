@@ -68,7 +68,7 @@ abstract class BaseEntryServerNodePeer {
 
 
 	/**
-	 * holds an array of fieldnames
+	 * holds an array of fieldnameskCuePointManager
 	 *
 	 * first dimension keys are the type constants
 	 * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'

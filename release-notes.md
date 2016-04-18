@@ -1,4 +1,41 @@
+# Kajam-11.13.0 #
+
+## Update comment_was_added_to_entry email notification ##
+
+ - Issue Type: Bug
+ - Issue ID: SUP-7709
+
+#### Configuration ####
+- None.
+
+#### Deployment scripts####
+
+	php /opt/kaltura/app/tests/standAloneClient/exec.php /opt/kaltura/app/deployment/updates/scripts/xml/updateCommentWasAddedToEntryEmailNotificationTemplateCode.xml
+
+#### Known Issues & Limitations ####
+- None.
+
 # Kajam-11.11.0 #
+
+## Automated Recording Schedule ##
+- Issue Type: Feature Request
+- Issue ID: PLAT-5245
+
+#### Configuration ####
+- None.
+
+#### Deployment Scripts ####
+	Update permissions: 
+		php deployment/updates/scripts/add_permissions/2016_03_28_add_schedule_permissions.php
+	
+	Install plugins:
+		php deployment/base/scripts/installPlugins.php
+	
+	Create new tables:
+		mysql -ukaltura -p -P3306 kaltura < deployment/updates/sql/2016_03_17_create_schedule_tables.sql
+
+#### Known Issues & Limitations ####
+- None.
 
 ## fix baseEntryFilter->referenceIdEqueal,referenceIdIn ##
 - Issue Type: Bug
@@ -13,7 +50,7 @@
 #### Known Issues & Limitations ####
 - None.
 
-## Allow media servre partner to list live entries ##
+## Allow media server partner to list live entries ##
 - Issue Type: Task
 - Issue ID: PLAT-5268
 

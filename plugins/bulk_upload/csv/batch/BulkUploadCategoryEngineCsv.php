@@ -40,7 +40,7 @@ class BulkUploadCategoryEngineCsv extends BulkUploadEngineCsv
 		if (!$bulkUploadResult)
 			return;
 			
-		$bulkUploadResult->bulkUploadResultObjectType = KalturaBulkUploadResultObjectType::CATEGORY;
+		$bulkUploadResult->bulkUploadResultObjectType = KalturaBulkUploadObjectType::CATEGORY;
 			 
 		// trim the values
 		array_walk($values, array('BulkUploadCategoryEngineCsv', 'trimArray'));

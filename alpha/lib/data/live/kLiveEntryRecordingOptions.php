@@ -15,6 +15,46 @@ class kLiveEntryRecordingOptions
 	protected $shouldCopyEntitlement;
 	
 	/**
+	 * @var boolean
+	 */
+	protected $shouldCopyScheduling;
+	
+	/**
+	 * @var boolean
+	 */
+	protected $shouldCopyThumbnail;
+	
+	/**
+	 * @return the $shouldCopyThumbnail
+	 */
+	public function getShouldCopyThumbnail() {
+		return $this->shouldCopyThumbnail;
+	}
+
+	/**
+	 * @param boolean $shouldCopyThumbnail
+	 */
+	public function setShouldCopyThumbnail($shouldCopyThumbnail) {
+		$this->shouldCopyThumbnail = $shouldCopyThumbnail;
+	}
+
+	/**
+	 * @return boolean $shouldCopyScheduling
+	 */
+	public function getShouldCopyScheduling() 
+	{
+		return $this->shouldCopyScheduling;
+	}
+
+	/**
+	 * @param boolean $shouldCopyScheduling
+	 */
+	public function setShouldCopyScheduling($shouldCopyScheduling) 
+	{
+		$this->shouldCopyScheduling = $shouldCopyScheduling;
+	}
+
+	/**
 	 * @param boolean $shouldCopyEntitlement
 	 */
 	public function setShouldCopyEntitlement($shouldCopyEntitlement)

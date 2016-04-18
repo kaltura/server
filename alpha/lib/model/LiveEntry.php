@@ -917,6 +917,9 @@ abstract class LiveEntry extends entry
 		$this->putInCustomData(LiveEntry::CUSTOM_DATA_RECORD_OPTIONS, serialize($recordingOptions));
 	}
 	
+	/**
+	 * @return kLiveEntryRecordingOptions
+	 */
 	public function getRecordingOptions()
 	{
 		$recordingOptions = $this->getFromCustomData(LiveEntry::CUSTOM_DATA_RECORD_OPTIONS);
