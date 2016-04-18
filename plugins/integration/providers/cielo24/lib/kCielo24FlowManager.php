@@ -66,14 +66,18 @@ class kCielo24FlowManager implements kBatchJobStatusEventConsumer
 		{
 			$clientHelper = Cielo24Plugin::getClientHelper($providerData->getUsername(), $providerData->getPassword(), $providerData->getBaseUrl());
 		
-			$jobName = $entryId."_".$spokenLanguage;
- 
- 			$fidelity = $providerData->getFidelity();
- 			$priority = $providerData->getPriority();
- 			$remoteJobId = $clientHelper->getRemoteJobIdByName($entryId, $jobName, $fidelity, $priority);
+			$languageName = $clientHelper->getLanguageConstantName($spokenLanguage);
+			if(!$languageName)
+				KalturaLog::err("language not found");
+			$jobId = $dbBatchJob->getId();
+			$jobNameForSearch = "$entryId" . "_$languageName" . "_$jobId";
+
+			$remoteJobId = $clientHelper->getRemoteJobIdByName($entryId, $jobNameForSearch);
 			if (!$remoteJobId)
 			{
 				KalturaLog::err('remote content does not exist');
+				$transcript->setStatus(AttachmentAsset::FLAVOR_ASSET_STATUS_ERROR);
+				$transcript->save();
 				return true;     	
 			}
 	
