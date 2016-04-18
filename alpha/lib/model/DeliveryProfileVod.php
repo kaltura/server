@@ -91,7 +91,7 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 		return $url;
 	}
 	
-	public function getAssetUrl(asset $asset, $tokenizeUrl = true)
+	public function getAssetUrl(asset $asset, $tokenizeUrl = true , $scheme = '')
 	{
 		$url = null;
 	
@@ -110,7 +110,7 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 				$tokenizer = $this->getTokenizer();
 				if ($tokenizer)
 				{
-					$url = $tokenizer->tokenizeSingleUrl($url, $this->getHostName());
+					$url = $tokenizer->tokenizeSingleUrl($url, $scheme.$this->getHostName());
 					kApiCache::disableCache();
 				}
 			}
@@ -119,8 +119,8 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 		return $url;
 	}
 	
-	public function getFullAssetUrl(asset $asset, $tokenizeUrl = true) {
-		$assetUrl = $this->getAssetUrl($asset, $tokenizeUrl);
+	public function getFullAssetUrl(asset $asset, $tokenizeUrl = true, $scheme = '') {
+		$assetUrl = $this->getAssetUrl($asset, $tokenizeUrl,$scheme);
 		$hostName = $this->getHostName();
 		
 		$partner = PartnerPeer::retrieveByPK($asset->getPartnerId());
