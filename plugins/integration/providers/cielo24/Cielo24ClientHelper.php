@@ -29,31 +29,28 @@ class Cielo24ClientHelper
 		
 		$this->supportedLanguages = $cielo24ParamsMap['languages'];
 	}
-	
-	
-	public function getRemoteFinishedJobId($entryId)
+
+	public function getRemoteJobIdByName($entryId, $jobName, $multiple = false)
 	{
-		$listParams = array("ExternalID" => $entryId, "JobStatus" => "Complete");
-		return $this->getRemoteJobId($listParams);	
-	}			
-		
-	public function getRemoteJobIdByName($entryId, $jobName, $fidelity = null, $priority = null)			
-	{			
-		$listParams = array("ExternalID" => $entryId, "JobName" => $jobName);			
-		if(!is_null($fidelity))			
-			$listParams["Fidelity"] = $fidelity;			
-		if(!is_null($priority))			
-			$listParams["Priority"] = $priority;			
-		return $this->getRemoteJobId($listParams);			
-	}			
-		
-	public function getRemoteJobId($listParams)			
+		$listParams = array("ExternalID" => $entryId, "JobName" => $jobName);
+		return $this->getRemoteJobId($listParams, $multiple);
+	}
+
+	public function getRemoteJobId($listParams, $multiple = false)
 	{
 		$remoteJobsListAPIUrl = $this->createAPIUrl("job/list", $listParams);
 		$exitingJobsResult = $this->sendAPICall($remoteJobsListAPIUrl);
 		if($exitingJobsResult && isset($exitingJobsResult->ActiveJobs) && count($exitingJobsResult->ActiveJobs))
 		{
-			return $exitingJobsResult->ActiveJobs[0]->JobId;
+			if(!$multiple)
+				return $exitingJobsResult->ActiveJobs[0]->JobId;
+			else
+			{
+				$jobIds = array();
+				foreach($exitingJobsResult->ActiveJobs as $activeJob)
+					$jobIds[] = $activeJob->JobId;
+				return $jobIds;		
+			}
 		}
 		return false;
 	}
@@ -70,7 +67,7 @@ class Cielo24ClientHelper
 			$jobId = $jobAdditionResult->JobId;
 		else
 			return false;
-		
+
 		// attaching media to the job
 		$addMediaParams = array("job_id" => $jobId, "media_url" => $flavorUrl);
 		$addMediaAPIUrl = $this->createAPIUrl("job/add_media", $addMediaParams);
@@ -173,4 +170,14 @@ class Cielo24ClientHelper
 	{
 		return $url . "&" . http_build_query($params);
 	}
+
+	public function getLanguageConstantName($language)
+	{
+		$languagesReflectionClass = new ReflectionClass('KalturaLanguage');
+		$languageNames = $languagesReflectionClass->getConstants();
+		$languageName = array_search($language, $languageNames);
+
+		return $languageName !== false ? $languageName : '';
+	}
+
 }
