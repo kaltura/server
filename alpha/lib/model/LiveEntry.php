@@ -939,7 +939,7 @@ abstract class LiveEntry extends entry
 			return EntryServerNodeStatus::STOPPED;
 	}
 	
-	public function isStremaAlreadyBroadcasting()
+	public function isStreamAlreadyBroadcasting()
 	{
 		$mediaServer = $this->getMediaServer(true);
 		if($mediaServer)
