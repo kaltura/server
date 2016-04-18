@@ -19,4 +19,14 @@ class EntryServerNode extends BaseEntryServerNode {
 	{
 		return array("entryServerNode:entryId".strtolower($this->getEntryId()));
 	}
+	
+	protected function addTrackEntryInfo($trackEventType, $description)
+	{
+		$te = new TrackEntry();
+		$te->setEntryId($this->getEntryId());
+		$te->setTrackEventTypeId($trackEventType);
+		$te->setDescription($description);
+	
+		TrackEntry::addTrackEntry($te);
+	}
 } // EntryServerNode
