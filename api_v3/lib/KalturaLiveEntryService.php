@@ -249,10 +249,10 @@ class KalturaLiveEntryService extends KalturaEntryService
 				}
 				else{
 					$recordedEntryCreationTime = $dbRecordedEntry->getCreatedAt(null);
-		
+
 					$isNewSession = $dbLiveEntry->getLastBroadcastEndTime() + kConf::get('live_session_reconnect_timeout', 'local', 180) < $dbLiveEntry->getCurrentBroadcastStartTime();
 					$recordedEntryNotYetCreatedForCurrentSession = $recordedEntryCreationTime < $dbLiveEntry->getCurrentBroadcastStartTime();
-		
+
 					if ($dbLiveEntry->getRecordStatus() == RecordStatus::PER_SESSION) {
 						if ($isNewSession && $recordedEntryNotYetCreatedForCurrentSession)
 						{
@@ -262,7 +262,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 					}
 				}
 			}
-		
+
 			if($createRecordedEntry)
 				$this->createRecordedEntry($dbLiveEntry, $mediaServerIndex);
 		}
