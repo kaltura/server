@@ -1,5 +1,14 @@
 # Kajam-11.13.0 #
 
+## Sphinx Recording Schedule indexes ##
+- Issue Type: Feature Request
+- Issue ID: PLAT-5245
+
+#### Configuration ####
+- copy "index kaltura_schedule_event:kaltura_base" section from /opt/kaltura/app/configurations/sphinx/kaltura.conf.template
+to /opt/kaltura/app/configurations/sphinx/kaltura.conf
+- restart sphinx service
+
 ## Update comment_was_added_to_entry email notification ##
 
  - Issue Type: Bug
