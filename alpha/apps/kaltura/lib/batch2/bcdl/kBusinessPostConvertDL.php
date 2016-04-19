@@ -342,8 +342,7 @@ class kBusinessPostConvertDL
 		
 		if(count($childJobs) > 1 && count($waitingFlavorAssets) < 1)
 		{
-			$entry = $currentFlavorAsset->getentry();
-			$allDone = $entry->getStatus() != entryStatus::PRECONVERT;
+			$allDone = true;
 			foreach($childJobs as $childJob)
 			{
 				if($childJob->getId() != $rootBatchJob->getId() && $childJob->getStatus() != BatchJob::BATCHJOB_STATUS_FINISHED)

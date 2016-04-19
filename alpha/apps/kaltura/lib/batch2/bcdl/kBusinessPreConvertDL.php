@@ -1125,7 +1125,10 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 		{
 			if($ingestedNeeded)
 			{
-				kJobsManager::updateBatchJob($convertProfileJob, BatchJob::BATCHJOB_STATUS_FINISHED);
+				if ($entry->getStatus() != entryStatus::PRECONVERT)
+				{
+					kJobsManager::updateBatchJob($convertProfileJob, BatchJob::BATCHJOB_STATUS_FINISHED);
+				}
 				return false;
 			}
 			else
