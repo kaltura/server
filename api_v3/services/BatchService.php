@@ -569,7 +569,7 @@ class BatchService extends KalturaBatchService
 	 * @return bool
 	 * @throws KalturaAPIException
 	 */
-	function checkEntryIsDone($batchJobId)
+	function checkEntryIsDoneAction($batchJobId)
 	{
 		$ret_val = false;
 		$dbBatchJob = BatchJobPeer::retrieveByPK($batchJobId);
