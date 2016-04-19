@@ -3,7 +3,7 @@
 ## Entries are never ready ##
 
  - Issue Type: Bug
- - Issue ID: PLAT-7477
+ - Issue ID: SUP-7477
 
 #### Configuration ####
 - None.
