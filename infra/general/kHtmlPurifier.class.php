@@ -34,12 +34,7 @@ class kHtmlPurifier
 				;
 
 			KalturaLog::err( $msg );
-
-			// We're currently in monitoring mode so we won't perform any action.
-			// Real code should:
-			//		throw an exception if we do not allow unknown tags in input
-			// or
-			//		return $modifiedString; ==> if we will force-remove unknown tags
+			//throw new KalturaAPIException(KalturaErrors::UNSAFE_HTML_TAGS, $className, $propertyName);
 		}
 
 		return $value;
@@ -48,8 +43,7 @@ class kHtmlPurifier
 	public static function isMarkupAllowed( $className, $propertyName )
 	{
 		// Is it an excluded property?
-		if ( array_key_exists($className, self::$AllowedProperties)
-				&& array_key_exists($propertyName, self::$AllowedProperties[$className]) )
+		if ( array_key_exists($className . ":" . $propertyName, self::$AllowedProperties) )
 		{
 			return true;
 		}
@@ -93,6 +87,7 @@ class kHtmlPurifier
 			$cacheKey = 'kHtmlPurifierAllowedProperties-' . kConf::getCachedVersionId();
 			self::$AllowedProperties = apc_fetch($cacheKey);
 		}
+
 		
 		if ( ! self::$AllowedProperties )
 		{
