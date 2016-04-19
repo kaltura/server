@@ -573,21 +573,22 @@ class BatchService extends KalturaBatchService
 	{
 		$ret_val = false;
 		$dbBatchJob = BatchJobPeer::retrieveByPK($batchJobId);
+
 		if (!$dbBatchJob)
 		{
-			throw new KalturaAPIException("batch job [$batchJobId] not found");//TODO: see if there is already a message defined if not define it.
+			throw new KalturaAPIException(KalturaErrors::INVALID_BATCHJOB_ID, $batchJobId);
 		}
 		$entry = $dbBatchJob->getEntry();
 		if (!$entry)
 		{
-			throw new KalturaAPIException("Job does not contain valid entry-id");
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $dbBatchJob->getEntryId());
 		}
 		if ($entry->getStatus() == entryStatus::PRECONVERT)
 		{
 			$flavorAssets = assetPeer::retrieveReadyFlavorsByEntryId($entry->getId());
 			if (!$flavorAssets || count($flavorAssets) == 0)
 			{
-				throw new KalturaAPIException("No flavor assets found for entry");
+				throw new KalturaAPIException(KalturaErrors::NO_FLAVORS_FOUND);
 			}
 			kBusinessPostConvertDL::handleConvertFinished($dbBatchJob, $flavorAssets[0]);
 			$entry = entryPeer::retrieveByPK($entry->getId());
