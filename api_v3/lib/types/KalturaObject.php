@@ -465,9 +465,10 @@ abstract class KalturaObject implements IApiObject
 		}
 	}
 	
-	public function toObject($object_to_fill = null, $props_to_skip = array())
+	public function toObject($object_to_fill = null, $props_to_skip = array(),$purifyHtml=false)
 	{
 		$this->validateForUsage($object_to_fill, $props_to_skip); // will check that not useable properties are not set 
+
 		$class = get_class($this);
 		
 		// enables extension with default empty object
@@ -527,9 +528,12 @@ abstract class KalturaObject implements IApiObject
 					$finalValues[] = kPluginableEnumsManager::apiToCore($enumType, $val);
 				$value = implode(',', $finalValues);
 			}
-			elseif (is_string($value) && ! kXml::isXMLValidContent($value) )
+			elseif (is_string($value))
 			{
-				throw new KalturaAPIException ( KalturaErrors::INVALID_PARAMETER_CHAR, $this_prop );
+				if (! kXml::isXMLValidContent($value))
+					throw new KalturaAPIException ( KalturaErrors::INVALID_PARAMETER_CHAR, $this_prop );
+				elseif($purifyHtml)
+					kHtmlPurifier::purify(get_class($object_to_fill), $object_prop, $value);
 			}
 			
 			$setter_callback = array ( $object_to_fill ,"set{$object_prop}");
@@ -545,14 +549,14 @@ abstract class KalturaObject implements IApiObject
 	{
 		$this->validateForUpdate($object_to_fill, $props_to_skip); // will check that not updatable properties are not set 
 		
-		return $this->toObject($object_to_fill, $props_to_skip);
+		return $this->toObject($object_to_fill, $props_to_skip,true);
 	}
 	
 	public function toInsertableObject ( $object_to_fill = null , $props_to_skip = array() )
 	{
 		$this->validateForInsert($props_to_skip); // will check that not insertable properties are not set 
 		
-		return $this->toObject($object_to_fill, $props_to_skip);
+		return $this->toObject($object_to_fill, $props_to_skip,true);
 	}
 	
 	public function validatePropertyNotNull($propertiesNames, $xor = false)
@@ -725,7 +729,6 @@ abstract class KalturaObject implements IApiObject
 					}
 				}
 
-				$this->validateHtmlTags($className, $property);
 			}
 		}
 	}
@@ -780,27 +783,10 @@ abstract class KalturaObject implements IApiObject
 						header($this->getDeclaringClassName($propertyName).'-'.$propertyName.' error: '.$e->getMessage());
 					}
 				}
-
-				$this->validateHtmlTags($className, $property);
 			}
 		}
 		
 		return $updatableProperties;
-	}
-	
-	/**
-	 * @param KalturaPropertyInfo $property
-	 */
-	public function validateHtmlTags( $className, $property )
-	{
-		if ( $property->getType() != 'string' )
-		{
-			return;
-		}
-
-		$propName = $property->getName();
-		$value = $this->$propName;
-		return kHtmlPurifier::purify($className, $propName, $value);
 	}
 
 	public function validateForUsage($sourceObject, $propertiesToSkip = array())

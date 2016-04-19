@@ -232,7 +232,7 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 		$recordedEntry = $sourceObject->getRecordedEntryId() ? entryPeer::retrieveByPK($sourceObject->getRecordedEntryId()) : null;
 		if($recordedEntry)
 		{
-			$validEntryStatuses = array(KalturaEntryStatus::READY, KalturaEntryStatus::ERROR_CONVERTING, KalturaEntryStatus::ERROR_IMPORTING);
+			$validUpdateStatuses = array(KalturaEntryStatus::READY, KalturaEntryStatus::ERROR_CONVERTING, KalturaEntryStatus::ERROR_IMPORTING);
 			if( !in_array($recordedEntry->getStatus(), $validUpdateStatuses) )
 				throw new KalturaAPIException(KalturaErrors::CANNOT_UPDATE_FIELDS_RECORDED_ENTRY_STILL_NOT_READY, $attr);
 			

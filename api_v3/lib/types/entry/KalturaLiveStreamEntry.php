@@ -105,7 +105,13 @@ class KalturaLiveStreamEntry extends KalturaLiveEntry
 	 */
 	public $streamUsername;
 	
-	
+	/**
+	 * The Streams primary server node id 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $primaryServerNodeId;
 	
 	private static $map_between_objects = array
 	(
@@ -123,6 +129,7 @@ class KalturaLiveStreamEntry extends KalturaLiveEntry
 		"streamPassword",
 		"streamUsername",
 		"bitrates" => "streamBitrates",
+		"primaryServerNodeId",
 	);
 
 	public function __construct()
