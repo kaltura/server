@@ -1,5 +1,20 @@
 # Kajam-11.13.0 #
 
+## Entries are never ready ##
+
+ - Issue Type: Bug
+ - Issue ID: PLAT-7477
+
+#### Configuration ####
+- None.
+
+#### Deployment scripts####
+
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2016_04_14_update_batch_service.php
+
+#### Known Issues & Limitations ####
+- None.
+
 ## Sphinx Recording Schedule indexes ##
 - Issue Type: Feature Request
 - Issue ID: PLAT-5245

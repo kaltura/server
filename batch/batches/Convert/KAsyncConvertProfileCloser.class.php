@@ -39,7 +39,19 @@ class KAsyncConvertProfileCloser extends KJobCloserWorker
 		
 		if($job->queueTime && ($job->queueTime + self::$taskConfig->params->maxTimeBeforeFail) < time())
 			return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::CLOSER_TIMEOUT, 'Timed out', KalturaBatchJobStatus::FAILED);
+		else if ($this->checkConvertDone($job))
+		{
+			return $this->closeJob($job, null, null, null, KalturaBatchJobStatus::FINISHED);
+		}
 			
 		return $this->closeJob($job, null, null, null, KalturaBatchJobStatus::ALMOST_DONE);
+	}
+	
+	private function checkConvertDone(KalturaBatchJob $job)
+	{
+		/**
+		 * @var KalturaConvertProfileJobData $data
+		 */
+		return self::$kClient->batch->checkEntryIsDone($job->id);
 	}
 }
