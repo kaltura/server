@@ -11,29 +11,33 @@ class LiveEntryServerNode extends EntryServerNode
 	const CUSTOM_DATA_APPLICATION_NAME = "application_name";
 	const CUSTOM_DATA_DC = "dc";
 	
-	private $statusChanged = false;
+	/* (non-PHPdoc)
+	 * @see BaseEntryServerNode::postInsert()
+	 */
+	public function postInsert(PropelPDO $con = null)
+	{
+		$this->addTrackEntryInfo(TrackEntry::TRACK_ENTRY_EVENT_TYPE_ADD_MEDIA_SERVER, __METHOD__.":: serverType=".$this->getServerType().":serverNodeId=".$this->getServerNodeId().":status=".$this->getStatus().":dc=".$this->getDc());
+		
+		$this->updateLiveEntryData($this->getServerNodeId());
+		
+		parent::postInsert($con);
+	}
 	
 	/* (non-PHPdoc)
-	 * @see BaseEntryServerNode::postSave()
+	 * @see BaseEntryServerNode::postUpdate()
 	 */
-	public function postSave(PropelPDO $con = null)
+	public function postUpdate(PropelPDO $con = null)
 	{
-		if($this->statusChanged)
-		{
-			$liveEntry = entryPeer::retrieveByPK($this->getEntryId());
-			if($liveEntry)
-			{
-				KalturaLog::debug("Live Status for entry [" . $this->getEntryId() . "] updated to [" . $this->getStatus() . "] re-indexing entry with new live status");
-				$liveEntry->indexToSearchIndex();
-			}
-			else 
-			{
-				KalturaLog::debug("Live entry with id [" . $this->getEntryId() . "] not found, live entry will not be re-indexed to sphinx with new status [" . $this->getStatus() . "]");
-			}
-		}
-			
-		$this->statusChanged = false;
-		parent::postSave($con);
+		$this->addTrackEntryInfo(TrackEntry::TRACK_ENTRY_EVENT_TYPE_UPDATE_MEDIA_SERVER, __METHOD__.":: serverType=".$this->getServerType().":serverNodeId=".$this->getServerNodeId().":status=".$this->getStatus().":dc=".$this->getDc());
+		
+		$entrySaved = false;
+		if($this->isColumnModified(EntryServerNodePeer::SERVER_NODE_ID))
+			$entrySaved = $this->updateLiveEntryData($this->getServerNodeId());
+		
+		if($this->isColumnModified(EntryServerNodePeer::STATUS) && !$entrySaved)
+			$this->indexLiveEntry();
+
+		parent::postUpdate($con);
 	}
 	
 	/* (non-PHPdoc)
@@ -41,17 +45,12 @@ class LiveEntryServerNode extends EntryServerNode
 	 */
 	public function postDelete(PropelPDO $con = null)
 	{
-		$liveEntry = entryPeer::retrieveByPK($this->getEntryId());
-		if($liveEntry)
-		{
-			KalturaLog::debug("Live Entry server node for entry [" . $this->getEntryId() . "] has been deleted, re-indexing entry with new live status");
-			$liveEntry->indexToSearchIndex();
-		}
-		else
-		{
-			KalturaLog::debug("Live Entry server node for entry [" . $this->getEntryId() . "] has been deleted, but live entry was not found, will not be re-indexed to sphinx with new status");
-		}
-			
+		$this->addTrackEntryInfo(TrackEntry::TRACK_ENTRY_EVENT_TYPE_DELETE_MEDIA_SERVER, __METHOD__);
+		
+		$entrySaved = $this->updateLiveEntryData(null);
+		if (!$entrySaved)
+			$this->indexLiveEntry();
+		
 		parent::postDelete($con);
 	}
 
@@ -85,11 +84,38 @@ class LiveEntryServerNode extends EntryServerNode
 		return $this->getFromCustomData(self::CUSTOM_DATA_DC);
 	}
 	
-	public function setStatus($v)
+	private function indexLiveEntry()
 	{
-		if($this->getStatus() !== $v)
-			$this->statusChanged = true;
+		$liveEntry = entryPeer::retrieveByPK($this->getEntryId());
+		if(!$liveEntry)
+		{
+			KalturaLog::debug("Live Entry server node for entry [" . $this->getEntryId() . "] has been deleted, but live entry was not found, will not be re-indexed to sphinx with new status");
+			return;
+		}
 		
-		return parent::setStatus($v);
+		KalturaLog::debug("Live Entry server node for entry [" . $this->getEntryId() . "] has been deleted, re-indexing entry with new live status");
+		$liveEntry->indexToSearchIndex();
+	}
+	
+	private function updateLiveEntryData($serverNodeId)
+	{
+		if($this->getServerType() === EntryServerNodeType::LIVE_PRIMARY)
+		{	
+			$liveEntry = entryPeer::retrieveByPK($this->getEntryId());
+			if(!$liveEntry)
+			{
+				KalturaLog::debug("Live entry with id [" . $this->getEntryId() . "] not found, live entry data will not be updated");
+				return false;
+			}
+			
+			if($liveEntry->getPrimaryServerNodeId() !== $serverNodeId)
+			{
+				$liveEntry->setPrimaryServerNodeId($serverNodeId);
+				$liveEntry->save();
+				return true;
+			}
+		}
+		
+		return false;
 	}
 }

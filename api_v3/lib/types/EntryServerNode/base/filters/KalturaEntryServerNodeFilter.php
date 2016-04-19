@@ -26,11 +26,22 @@ class KalturaEntryServerNodeFilter extends KalturaEntryServerNodeBaseFilter
 			$entry = entryPeer::retrieveByPK($this->entryIdEqual);
 			if(!$entry)
 				throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $this->entryIdEqual);
-		} else if ($this->entryIdIn)
+		} 
+		else if ($this->entryIdIn)
 		{
 			$entryIds = explode(',', $this->entryIdIn);
-			$entryIds = entryPeer::retrieveByPKs($entryIds);
-			$entryIds = implode($entryIds, ',');
+			$entries = entryPeer::retrieveByPKs($entryIds);
+			
+			$validEntryIds = array();
+			foreach ($entries as $entry)
+				$validEntryIds[] = $entry->getId();
+			
+			if (!count($validEntryIds))
+			{
+				return array(array(), 0);
+			}
+			
+			$entryIds = implode($validEntryIds, ',');
 			$this->entryIdIn = $entryIds;
 		}
 

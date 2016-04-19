@@ -215,7 +215,9 @@ abstract class LiveEntry extends entry
 	
 	public function setRecordedEntryId($v)
 	{
-		$this->incInCustomData("recorded_entry_index");
+		if($v)
+			$this->incInCustomData("recorded_entry_index");
+		
 		$this->putInCustomData("recorded_entry_id", $v);
 	}
 	
@@ -938,5 +940,40 @@ abstract class LiveEntry extends entry
 			return EntryServerNodeStatus::BROADCASTING;
 		else
 			return EntryServerNodeStatus::STOPPED;
+	}
+	
+	public function isStreamAlreadyBroadcasting()
+	{
+		$mediaServer = $this->getMediaServer(true);
+		if($mediaServer)
+		{
+			$url = null;
+			$protocol = null;
+			foreach (array(KalturaPlaybackProtocol::HLS, KalturaPlaybackProtocol::APPLE_HTTP) as $hlsProtocol)
+			{
+				$config = $dbEntry->getLiveStreamConfigurationByProtocol($hlsProtocol, requestUtils::PROTOCOL_HTTP, null, true);
+				if ($config)
+				{
+					$url = $config->getUrl();
+					$protocol = $hlsProtocol;
+					break;
+				}
+			}
+				
+			if($url)
+			{
+				KalturaLog::info('Determining status of live stream URL [' .$url. ']');
+				$dpda= new DeliveryProfileDynamicAttributes();
+				$dpda->setEntryId($entryId);
+				$dpda->setFormat($protocol);
+				$deliveryProfile = DeliveryProfilePeer::getLiveDeliveryProfileByHostName(parse_url($url, PHP_URL_HOST), $dpda);
+				if($deliveryProfile && $deliveryProfile->isLive($url))
+				{
+					return true;
+				}
+			}
+		}
+		
+		return false;
 	}
 }
