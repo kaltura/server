@@ -24,6 +24,7 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 				DeliveryProfileType::LIVE_DASH, 
 				DeliveryProfileType::LIVE_RTMP,
 				DeliveryProfileType::LIVE_HLS_TO_MULTICAST,
+				DeliveryProfileType::SILVER_LIGHT_LIVE,
 		);
 	
 	/**
@@ -39,6 +40,7 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 			DeliveryProfileType::RTMP => 'DeliveryProfileRtmp',
 			DeliveryProfileType::RTSP => 'DeliveryProfileRtsp',
 			DeliveryProfileType::SILVER_LIGHT => 'DeliveryProfileSilverLight',
+			DeliveryProfileType::SILVER_LIGHT_LIVE => 'DeliveryProfileLiveSilverLight',
 					
 			DeliveryProfileType::AKAMAI_HLS_DIRECT => 'DeliveryProfileAkamaiAppleHttpDirect',
 			DeliveryProfileType::AKAMAI_HLS_MANIFEST => 'DeliveryProfileAkamaiAppleHttpManifest',

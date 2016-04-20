@@ -53,4 +53,6 @@ interface DeliveryProfileType extends BaseEnum
 	const LIVE_HLS_TO_MULTICAST = 1006;
 	
 	const LIVE_AKAMAI_HDS = 1013;
+
+	const SILVER_LIGHT_LIVE = 1014;
 }
