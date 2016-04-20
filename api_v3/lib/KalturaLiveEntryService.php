@@ -384,7 +384,10 @@ class KalturaLiveEntryService extends KalturaEntryService
 	 */
 	function unregisterMediaServerAction($entryId, $hostname, $mediaServerIndex)
 	{
+		$this->dumpApiRequest($entryId);
+
 		KalturaLog::debug("Entry [$entryId] from mediaServerIndex [$mediaServerIndex] with hostname [$hostname]");
+
 		/* @var $dbLiveEntry LiveEntry */
 		$dbLiveEntry = entryPeer::retrieveByPK($entryId);
 		if (!$dbLiveEntry || !($dbLiveEntry instanceof LiveEntry))
@@ -394,27 +397,16 @@ class KalturaLiveEntryService extends KalturaEntryService
 		if (!$dbServerNode)
 			throw new KalturaAPIException(KalturaErrors::SERVER_NODE_NOT_FOUND, $hostname);
 
-		$dbLiveEntryServerNodes = EntryServerNodePeer::retrieveByEntryId($entryId);
+		$dbLiveEntryServerNode = EntryServerNodePeer::retrieveByEntryIdAndServerType($entryId, $mediaServerIndex);
+		if(!$dbLiveEntryServerNode)
+			throw new KalturaAPIException(KalturaErrors::ENTRY_SERVER_NODE_NOT_FOUND, $entryId, $mediaServerIndex);
 
-		$allDeleted = true;
-		/* @var $dbLiveEntryServerNode LiveEntryServerNode */
-		foreach ($dbLiveEntryServerNodes as $dbLiveEntryServerNode)
-		{
-			if ($dbLiveEntryServerNode->getServerNodeId() == $dbServerNode->getId())
-			{
-				$dbLiveEntryServerNode->delete();
-				$dbLiveEntry->setLastBroadcastEndTime(kApiCache::getTime());
-			} 
-			else 
-			{
-				$allDeleted = false;
-			}
-		}
-		
-		if ($allDeleted) 
-		{
+		$dbLiveEntryServerNode->delete();
+		$dbLiveEntry->setLastBroadcastEndTime(kApiCache::getTime());
+
+		$dbLiveEntryServerNodes = EntryServerNodePeer::retrieveByEntryId($entryId);
+		if(!count($dbLiveEntryServerNodes))
 			$dbLiveEntry->unsetMediaServer();
-		}
 
 		$dbLiveEntry->save();
 
