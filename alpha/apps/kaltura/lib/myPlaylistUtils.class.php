@@ -139,7 +139,7 @@ class myPlaylistUtils
 		if ( $playlist->getMediaType() == entry::ENTRY_MEDIA_TYPE_XML )
 		{
 			// dynamix playlist
-		 	// the content is a valid xml that hods the list
+		 	// the content is a valid xml that holds the list
 			$filter_list_content = $playlist->getDataContent();
 			if ( ! $filter_list_content )
 			{
@@ -527,30 +527,24 @@ class myPlaylistUtils
 			$entry_filters[] = $entry_filter;
 		}
 		
+		$startOffset = 0;
+		$pageSize = $total_results;
 		if ( $pager )
 		{
 			$startOffset = $pager->calcOffset();
 			$pageSize = $pager->calcPageSize();
-
-			if ( $startOffset > $total_results )
-			{
-				return array();
-			}
-
-			$total_results = min( $total_results, $startOffset + $pageSize);
+			$total_results = max( $total_results, $startOffset + $pageSize);
 		}
 
 		$entry_ids_list = array();
 		foreach ( $entry_filters as $entry_filter )
 		{
-			$current_limit = max ( 0 , $total_results - count($entry_ids_list) ); // if the current_limit is < 0 - set it to be 0
+			$current_limit = min(max ( 0 , $total_results - count($entry_ids_list) ), $pageSize); // if the current_limit is < 0 - set it to be 0
 
 			// no need to fetch any more results
 			if ( $current_limit <= 0 ) break;
 
 			$c = KalturaCriteria::create(entryPeer::OM_CLASS);
-			
-			
 			// don't fetch the same entries twice - filter out all the entries that were already fetched
 			if( $entry_ids_list ) $c->add ( entryPeer::ID , $entry_ids_list , Criteria::NOT_IN );
 			
@@ -575,6 +569,7 @@ class myPlaylistUtils
 			$c->addAnd ( entryPeer::TYPE , array ( entryType::MEDIA_CLIP , entryType::MIX , entryType::LIVE_STREAM ) , Criteria::IN ); // search only for clips or roughcuts
 			$c->addAnd ( entryPeer::STATUS , entryStatus::READY ); // search only for READY entries 
 			$c->addAnd ( entryPeer::DISPLAY_IN_SEARCH , mySearchUtils::DISPLAY_IN_SEARCH_SYSTEM, Criteria::NOT_EQUAL);
+			$c->setOffset($startOffset);
 
 			if ( $display_in_search >= 2 )
 			{
@@ -599,12 +594,6 @@ class myPlaylistUtils
 			
 			// update total count and merge current result with the global list
 			$entry_ids_list = array_merge ( $entry_ids_list , $entry_ids_list_for_filter );
-		}
-
-		if ( $pager )
-		{
-			// Keep the paged entries only
-			$entry_ids_list = array_slice($entry_ids_list, $startOffset, $pageSize);
 		}
 
 		// Disable entitlement, which was already applied in entryPeer::prepareEntitlementCriteriaAndFilters()
