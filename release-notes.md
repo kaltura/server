@@ -22,6 +22,7 @@
 #### Configuration ####
 - copy "index kaltura_schedule_event:kaltura_base" section from /opt/kaltura/app/configurations/sphinx/kaltura.conf.template
 to /opt/kaltura/app/configurations/sphinx/kaltura.conf
+modifiy path to appropriate directory.
 - restart sphinx service
 
 ## Update comment_was_added_to_entry email notification ##
