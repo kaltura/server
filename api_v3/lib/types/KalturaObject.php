@@ -470,7 +470,7 @@ abstract class KalturaObject implements IApiObject
 		return $this->toObjectInternal($object_to_fill, $props_to_skip, false);		
 	}
 	
-	public function toObjectInternal($object_to_fill = null, $props_to_skip = array(),$purifyHtml=false)
+	protected function toObjectInternal($object_to_fill = null, $props_to_skip = array(),$purifyHtml=false)
 	{
 		$this->validateForUsage($object_to_fill, $props_to_skip); // will check that not useable properties are not set 
 
