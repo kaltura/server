@@ -547,14 +547,14 @@ abstract class KalturaObject implements IApiObject
 	{
 		$this->validateForUpdate($object_to_fill, $props_to_skip); // will check that not updatable properties are not set 
 		
-		return $this->toObject($object_to_fill, $props_to_skip,true);
+		return $this->toObject($object_to_fill, $props_to_skip);
 	}
 	
 	public function toInsertableObject ( $object_to_fill = null , $props_to_skip = array() )
 	{
 		$this->validateForInsert($props_to_skip); // will check that not insertable properties are not set 
 		
-		return $this->toObject($object_to_fill, $props_to_skip,true);
+		return $this->toObject($object_to_fill, $props_to_skip);
 	}
 	
 	public function validatePropertyNotNull($propertiesNames, $xor = false)
