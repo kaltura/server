@@ -86,7 +86,9 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject
 					}
 				}
 			}
-			
+
+			$this->setUpdatedAt(time());
+
 			if ($this->getIsAccountOwner())
 			{
 				$adminRoleId = $this->getPartner()->getAdminSessionRoleId();
