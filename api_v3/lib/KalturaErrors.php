@@ -582,6 +582,12 @@ class KalturaErrors extends APIErrors
 	 * Live reports Service
 	 */
 	const LIVE_REPORTS_WS_FAILURE = 'LIVE_REPORTS_WS_FAILURE;;failed to retrieve live analytics';
+	
+	/*
+	 * Analytics Service
+	 */
+	const ANALYTICS_QUERY_FAILURE = 'REPORTS_QUERY_FAILURE;ERROR_MSG;failed to retrieve analytics data - [@ERROR_MSG@]';
+	const ANALYTICS_FORBIDDEN_FILTER = 'REPORTS_FORBIDDEN_FILTER;Forbidden filter for dimension "partner" - queries are implicitly performed for the current partner';
 		
 	
 	/*
