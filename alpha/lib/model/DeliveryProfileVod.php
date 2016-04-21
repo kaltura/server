@@ -110,6 +110,7 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 				$tokenizer = $this->getTokenizer();
 				if ($tokenizer)
 				{
+					$scheme = '';
 					if(!is_null($this->getDynamicAttributes()->getMediaProtocol()))
 						$scheme = $this->getDynamicAttributes()->getMediaProtocol()."://";
 
