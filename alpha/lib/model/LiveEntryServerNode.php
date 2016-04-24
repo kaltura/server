@@ -106,7 +106,7 @@ class LiveEntryServerNode extends EntryServerNode
 			return $shouldSave;
 		}
 		
-		if($this->isColumnModified(EntryServerNodePeer::SERVER_NODE_ID) && $this->getServerType() === EntryServerNodeType::LIVE_PRIMARY && $liveEntry->getPrimaryServerNodeId() !== $serverNodeId)
+		if($this->getServerType() === EntryServerNodeType::LIVE_PRIMARY && $liveEntry->getPrimaryServerNodeId() !== $serverNodeId)
 		{
 			$liveEntry->setPrimaryServerNodeId($serverNodeId);
 			$shouldSave = true;
@@ -117,6 +117,9 @@ class LiveEntryServerNode extends EntryServerNode
 			$liveEntry->setLastBroadcast(kApiCache::getTime());
 			$shouldSave = true;
 		}
+		
+		if($shouldSave)
+			$liveEntry->save();
 		
 		return $shouldSave;
 	}
