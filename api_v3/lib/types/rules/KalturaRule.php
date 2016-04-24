@@ -53,6 +53,13 @@ class KalturaRule extends KalturaObject
 	 * @var bool
 	 */
 	public $stopProcessing;
+	
+	/**
+	 * Indicates if we should force ks validation for admin ks users as well
+	 *
+	 * @var KalturaNullableBoolean
+	 */
+	public $forceAdminValidation;
 
 	private static $mapBetweenObjects = array
 	(
@@ -63,6 +70,7 @@ class KalturaRule extends KalturaObject
 		'conditions',
 		'contexts',
 		'stopProcessing',
+		'forceAdminValidation',
 	);
 	
 	public function getMapBetweenObjects()
@@ -76,5 +84,13 @@ class KalturaRule extends KalturaObject
 			$dbObject = new kRule();
 			
 		return parent::toObject($dbObject, $skip);
+	}
+	
+	public function toInsertableObject($sourceObject = null, $propsToSkip = array())
+	{
+		if(is_null($this->forceAdminValidation))
+			$this->forceAdminValidation = false;
+
+		return parent::toInsertableObject($sourceObject, $propsToSkip);
 	}
 }

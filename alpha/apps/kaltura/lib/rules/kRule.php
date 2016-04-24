@@ -59,6 +59,13 @@ class kRule
 	protected $stopProcessing;
 	
 	/**
+	 * Indicates if we should force ks validation for admin ks users as well
+	 *
+	 * @var bool
+	 */
+	protected $forceAdminValidation;
+	
+	/**
 	 * Indicates the scope on which the rule is applied
 	 * 
 	 * @var kScope
@@ -277,6 +284,25 @@ class kRule
 	public function setStopProcessing($stopProcessing) 
 	{
 		$this->stopProcessing = $stopProcessing;
+	}
+	
+	/**
+	 * @param bool $forceAdminValidation
+	 */
+	public function setForceAdminValidation($forceAdminValidation)
+	{
+		$this->forceAdminValidation = $forceAdminValidation;
+	}
+	
+	/**
+	 * @return bool for validation while using Admin KS
+	 */
+	public function getForceAdminValidation()
+	{
+		if(isset($this->forceAdminValidation))
+			return $this->forceAdminValidation;
+		
+		return false;
 	}
 	
 	/**

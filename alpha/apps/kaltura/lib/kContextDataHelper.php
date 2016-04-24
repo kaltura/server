@@ -147,8 +147,7 @@ class kContextDataHelper
 	{
 		$this->streamerType = $streamerType;
 		$this->mediaProtocol = $mediaProtocol;
-		if($scope->getKs())
-			$this->isAdmin = $scope->getKs()->isAdmin();
+		$this->isAdmin = $scope->getKs() ? $scope->getKs()->isAdmin() : false;
 		$this->contextDataResult = new kEntryContextDataResult();
 		
 		$this->applyAccessControlOnContextData($scope);
@@ -160,8 +159,6 @@ class kContextDataHelper
 	
 	private function applyAccessControlOnContextData(accessControlScope $accessControlScope)
 	{
-		if($this->isAdmin)
-			return;
 		$accessControl = $this->entry->getAccessControl();		
 		/* @var $accessControl accessControl */
 		if ($accessControl && $accessControl->hasRules())
@@ -181,9 +178,7 @@ class kContextDataHelper
 			}		
 
 			$accessControlScope->setEntryId($this->entry->getId());
-			$this->isAdmin = ($accessControlScope->getKs() && $accessControlScope->getKs()->isAdmin());
-            
-			$this->disableCache = $accessControl->applyContext($this->contextDataResult); 
+			$this->disableCache = $accessControl->applyContext($this->contextDataResult, $accessControlScope); 
 		}
 	}
 	
@@ -210,23 +205,22 @@ class kContextDataHelper
 
 		$flavorParamsIds = null;
 		$flavorParamsNotIn = false;
-		if(!$this->isAdmin)
-		{
-			foreach ($this->contextDataResult->getActions() as $action) 
-			{	
-				if($action->getType() == RuleActionType::BLOCK)
-				{
-					//in case of block action do not set the list of flavors
-					return;
-				}
-				if($action->getType() == RuleActionType::LIMIT_FLAVORS)
-				{
-					/* @var $action kAccessControlLimitFlavorsAction */
-					$flavorParamsIds = explode(',', $action->getFlavorParamsIds());
-					$flavorParamsNotIn = $action->getIsBlockedList();
-				}
-			}	
-		}
+		
+		foreach ($this->contextDataResult->getActions() as $action) 
+		{	
+			if($action->getType() == RuleActionType::BLOCK)
+			{
+				//in case of block action do not set the list of flavors
+				return;
+			}
+			if($action->getType() == RuleActionType::LIMIT_FLAVORS)
+			{
+				/* @var $action kAccessControlLimitFlavorsAction */
+				$flavorParamsIds = explode(',', $action->getFlavorParamsIds());
+				$flavorParamsNotIn = $action->getIsBlockedList();
+			}
+		}	
+		
 		$flavorAssets = array();
 		if (is_null($this->asset))
 		{
