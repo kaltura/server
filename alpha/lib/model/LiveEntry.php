@@ -676,8 +676,6 @@ abstract class LiveEntry extends entry
 				KalturaLog::debug("cached and registered - index: $mediaServerIndex, hostname: $hostname");
 				return;
 			}
-			
-			$this->setLastBroadcast(kApiCache::getTime());
 		}
 		
 		return $dbLiveEntryServerNode;
