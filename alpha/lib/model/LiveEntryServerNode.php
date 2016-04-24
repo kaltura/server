@@ -30,10 +30,7 @@ class LiveEntryServerNode extends EntryServerNode
 	{
 		$this->addTrackEntryInfo(TrackEntry::TRACK_ENTRY_EVENT_TYPE_UPDATE_MEDIA_SERVER, __METHOD__.":: serverType=".$this->getServerType().":serverNodeId=".$this->getServerNodeId().":status=".$this->getStatus().":dc=".$this->getDc());
 		
-		$entrySaved = false;
-		if($this->isColumnModified(EntryServerNodePeer::SERVER_NODE_ID))
-			$entrySaved = $this->updateLiveEntryData($this->getServerNodeId());
-		
+		$entrySaved = $this->updateLiveEntryData($this->getServerNodeId());		
 		if($this->isColumnModified(EntryServerNodePeer::STATUS) && !$entrySaved)
 			$this->indexLiveEntry();
 
@@ -99,23 +96,31 @@ class LiveEntryServerNode extends EntryServerNode
 	
 	private function updateLiveEntryData($serverNodeId)
 	{
-		if($this->getServerType() === EntryServerNodeType::LIVE_PRIMARY)
-		{	
-			$liveEntry = entryPeer::retrieveByPK($this->getEntryId());
-			if(!$liveEntry)
-			{
-				KalturaLog::debug("Live entry with id [" . $this->getEntryId() . "] not found, live entry data will not be updated");
-				return false;
-			}
-			
-			if($liveEntry->getPrimaryServerNodeId() !== $serverNodeId)
-			{
-				$liveEntry->setPrimaryServerNodeId($serverNodeId);
-				$liveEntry->save();
-				return true;
-			}
+		$shouldSave = false;
+		
+		$liveEntry = entryPeer::retrieveByPK($this->getEntryId());
+		/* @var $liveEntry LiveEntry */
+		if(!$liveEntry)
+		{
+			KalturaLog::debug("Live entry with id [" . $this->getEntryId() . "] not found, live entry data will not be updated");
+			return $shouldSave;
 		}
 		
-		return false;
+		if($this->getServerType() === EntryServerNodeType::LIVE_PRIMARY && $liveEntry->getPrimaryServerNodeId() !== $serverNodeId)
+		{
+			$liveEntry->setPrimaryServerNodeId($serverNodeId);
+			$shouldSave = true;
+		}
+		
+		if($this->isColumnModified(EntryServerNodePeer::STATUS) && $this->getStatus() === EntryServerNodeStatus::PLAYABLE)
+		{
+			$liveEntry->setLastBroadcast(kApiCache::getTime());
+			$shouldSave = true;
+		}
+		
+		if($shouldSave)
+			$liveEntry->save();
+		
+		return $shouldSave;
 	}
 }
