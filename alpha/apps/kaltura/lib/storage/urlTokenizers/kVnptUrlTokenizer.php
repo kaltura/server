@@ -4,15 +4,8 @@ require_once(dirname(__file__) . '/../../../../../../vendor/akamai/token/StreamT
 
 class kVnptUrlTokenizer extends kUrlTokenizer
 {
-	/**
-	 * @var string
-	 */
-	protected $tokenKey;
-
-	/**
-	 * @var int
-	 */
-	protected $expiryTimeFrame;
+	const HTTP_VOD_TOKEN_FORMAT = 0;
+	const VOD_LIVE_TOKEN_FORMAT = 1;
 
 	/**
 	 * @var int
@@ -25,8 +18,8 @@ class kVnptUrlTokenizer extends kUrlTokenizer
 	 */
 	public function tokenizeSingleUrl($url, $urlPrefix = null)
 	{
-		$tokenKey = $this->tokenKey;
-		$expiryTimeFrame = $this->expiryTimeFrame;
+		$tokenKey = $this->key;
+		$expiryTimeFrame = $this->window;
 		$tokenizationFormat = $this->tokenizationFormat;
 		
 
@@ -40,10 +33,10 @@ class kVnptUrlTokenizer extends kUrlTokenizer
 		$tokenizationSuffix = '';
 		switch($tokenizationFormat)
 		{
-			case 0:
+			case self::HTTP_VOD_TOKEN_FORMAT:
 				$tokenizationSuffix = $url;
 				break;
-			case 1:
+			case self::VOD_LIVE_TOKEN_FORMAT:
 				preg_match_all('/\//', $url,$matches, PREG_OFFSET_CAPTURE);
 				$lastSlashLocationIndex = end($matches[0]);
 				$tokenizationSuffix = substr($url, 0, $lastSlashLocationIndex[1]);
@@ -51,34 +44,6 @@ class kVnptUrlTokenizer extends kUrlTokenizer
 		}
 		$url = md5($clientIp . ":$tokenKey" . ":$expiredTime" . ":$tokenizationSuffix") . $expiredTime . $url;
 		return $url;
-	}
-
-	/**
-	 * @return the Token key
-	 */
-	public function getTokenKey() {
-		return $this->tokenKey;
-	}
-
-	/**
-	 * @param string $tokenKey
-	 */
-	public function setTokenKey($tokenKey) {
-		$this->tokenKey = $tokenKey;
-	}
-
-	/**
-	 * return the Expiry time frame
-	 */
-	public function getExpiryTimeFrame() {
-		return $this->expiryTimeFrame;
-	}
-
-	/**
-	 * @param int $expiryTimeFrame
-	 */
-	public function setExpiryTimeFrame($expiryTimeFrame) {
-		$this->expiryTimeFrame = $expiryTimeFrame;
 	}
 
 	/**

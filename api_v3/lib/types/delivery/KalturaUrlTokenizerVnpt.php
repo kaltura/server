@@ -6,24 +6,12 @@
 class KalturaUrlTokenizerVnpt extends KalturaUrlTokenizer {
 
 	/**
-	 * @var string
-	 */
-	public $tokenKey;
-
-	/**
-	 * @var int
-	 */
-	public $expiryTimeFrame;
-	
-	/**
 	 * @var int
 	 */
 	public $tokenizationFormat;
 
 	private static $map_between_objects = array
 	(
-			"tokenKey",
-			"expiryTimeFrame",
 			"tokenizationFormat",
 	);
 	
