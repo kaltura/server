@@ -259,14 +259,13 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 			while (!$ingestedVideo && !feof($handle)) 
 			{
 				$chunk = fread($handle, $chunkSizeBytes);
-				$success = false;
 				$numOfTries = 0;
-				while (!$success && ($numOfTries < self::MAXIMUM_NUMBER_OF_UPLOAD_CHUNK_RETRY) )
+				while (true) 
 				{
 					try
 					{
 						$ingestedVideo = $media->nextChunk($chunk);
-						$success = true;
+						break;
 					} catch (Google_IO_Exception $e)
 					{
 						KalturaLog::info("Uploading chunk to youtube failed with the message '".$e->getMessage()."' number of retries ".$numOfTries);
