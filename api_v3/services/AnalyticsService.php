@@ -11,14 +11,15 @@ class AnalyticsService extends KalturaBaseService
 	 * report query action allows to get a analytics data for specific query dimensions, metrics and filters.
 	 *
 	 * @action query
-	 * @param int $from query start time (in unix time)
-	 * @param int $to query end time (in unix time)
+	 * @param string $from query start time (in local time)
+	 * @param string $to query end time (in local time)
+	 * @param float $utcOffset timezone offset from UTC (in minutes)
 	 * @param string $metrics comma separated metrics list
 	 * @param string $dimensions comma separated dimensions list
 	 * @param KalturaReportFilterArray $filters array of filters
 	 * @return KalturaReportResponse
 	 */
-	public function queryAction($from, $to, $metrics, $dimensions = null, $filters = null)
+	public function queryAction($from, $to, $metrics, $utcOffset = 0, $dimensions = null, $filters = null)
 	{
 		$dimensionsArr = $this->extractDimensions($dimensions);
 		KalturaLog::info('analytics query - extracted dimensions: ' . var_export($dimensionsArr, true));
@@ -27,7 +28,7 @@ class AnalyticsService extends KalturaBaseService
 		$filtersArr = $this->extractFilters($filters);
 		KalturaLog::info('analytics query - extracted filters: ' . var_export($filtersArr, true));
 
-		$internalApiRequest = $this->constructInternalRequest($from, $to, $metricsArr, $dimensionsArr, $filtersArr);
+		$internalApiRequest = $this->constructInternalRequest($from, $to, $metricsArr, $utcOffset, $dimensionsArr, $filtersArr);
 		KalturaLog::info('analytics query - constructed request: ' . var_export($internalApiRequest, true));
 
 		$internalApiServer = kConf::get('analytics_internal_API_url');
@@ -116,10 +117,10 @@ class AnalyticsService extends KalturaBaseService
 		return array_map('trim', explode(",",$arr));
 	}
 
-	private function constructInternalRequest($from, $to, $metricsArr, $dimensionsArr, $filters)
+	private function constructInternalRequest($from, $to, $metricsArr, $utcOffset, $dimensionsArr, $filters)
 	{
-		$data = array("from" => $from, "to" => $to, "dimensions" => $dimensionsArr, "filters" => $filters, "metrics" => $metricsArr);
-		//e.g. {"from":"1","to":"2","dimensions":["partner"], "filters":[{"dimension":"partner","values":["1"]}], "metrics":["play"]}
+		$data = array("from" => $from, "to" => $to, "dimensions" => $dimensionsArr, "filters" => $filters, "metrics" => $metricsArr, "utcOffset" => $utcOffset);
+		//e.g. {"from":"1","to":"2","dimensions":["partner"], "filters":[{"dimension":"partner","values":["1"]}], "metrics":["play"], "utcOffset":"240"}
 		return json_encode($data);
 	}
 
