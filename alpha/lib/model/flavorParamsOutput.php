@@ -78,4 +78,7 @@ class flavorParamsOutput extends assetParamsOutput
 	public function setWatermarkData($v){ $this->putInCustomData('WatermarkData', $v);}
 	public function getWatermarkData(){return $this->getFromCustomData('WatermarkData', null, null);}
 
+	public function setSubtitlesData($v){ $this->putInCustomData('SubtitlesData', $v);}
+	public function getSubtitlesData(){return $this->getFromCustomData('SubtitlesData', null, null);}
+
 }
