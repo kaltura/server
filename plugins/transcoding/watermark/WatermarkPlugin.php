@@ -48,7 +48,7 @@ class WatermarkPlugin extends KalturaPlugin implements IKalturaPending, IKaltura
 			KalturaLog::warning("Bad entry id ($entryId).");
 			return;
 		}
-		
+
 		$partnerId = $entry->getPartnerId();
 		$profile = MetadataProfilePeer::retrieveBySystemName(self::TRANSCODING_METADATA_PROF_SYSNAME,$partnerId);
 		if(!isset($profile)){
@@ -78,46 +78,75 @@ class WatermarkPlugin extends KalturaPlugin implements IKalturaPending, IKaltura
 		
 		KalturaLog::log("Adjusting: entry($entryId),metadata profile(".self::TRANSCODING_METADATA_PROF_SYSNAME."),xml==>$xmlStr");
 
-		$watermarkSettingsStr = null;
-		$imageEntry = null;
-		$imageUrl = null;
-		
 		// Retrieve the custom metadata fields from the asocieted XML
-		$xml = new SimpleXMLElement($xmlStr);
-		$fldName = self::TRANSCODING_METADATA_WATERMMARK_SETTINGS;
-		if(isset($xml->$fldName)) {
-			$watermarkSettingsStr =(string)$xml->$fldName;
-			KalturaLog::log("Found metadata - $fldName($watermarkSettingsStr)");
-		}
 		
-		$fldName = self::TRANSCODING_METADATA_WATERMMARK_IMAGE_ENTRY;
-		if(isset($xml->$fldName)) {
-			$imageEntry =(string)$xml->$fldName;
-			KalturaLog::log("Found metadata - $fldName($imageEntry)");
-		}
-		$fldName = self::TRANSCODING_METADATA_WATERMMARK_IMAGE_URL;
-		if(isset($xml->$fldName)) {
-			$imageUrl =(string)$xml->$fldName;
-			KalturaLog::log("Found metadata - $fldName($imageUrl)");
-		}
 		
 		/*
-		 * The imageEntry is preffered if both imageEntry and url are set,
-		 * in such case - remove the url
-		 */
-		if(isset($imageEntry) && isset($imageUrl)) {
-			KalturaLog::log("Found both ".self::TRANSCODING_METADATA_WATERMMARK_IMAGE_URL."($imageEntry) and $fldName($imageUrl). Removing $fldName");
-			$imageUrl = null; // 
-		}
-		
-		/*
-		 * If custom-metadate contains 'full' WM settings ('watermarkSettingsStr' is set), 
+		 * Acquire the optional 'full' WM settings (TRANSCODING_METADATA_WATERMMARK_SETTINGS) 
 		 * adjust it to custom meta imageEntry/imageUrl values,
 		 * if those provided.
 		 */
-		if(isset($watermarkSettingsStr)) {
-			$watermarkSettings = json_decode($watermarkSettingsStr);
-			$this->adjustWatermarSettings($watermarkSettings, $imageEntry, $imageUrl);
+		$watermarkSettings = array();
+		$xml = new SimpleXMLElement($xmlStr);
+		$fldName = self::TRANSCODING_METADATA_WATERMMARK_SETTINGS;
+
+		if(isset($xml->$fldName)) {
+			$watermarkSettingsStr =(string)$xml->$fldName;
+			KalturaLog::log("Found custom metadata - $fldName($watermarkSettingsStr)");
+			if(isset($watermarkSettingsStr)) {
+				$watermarkSettings = json_decode($watermarkSettingsStr);
+				if(!is_array($watermarkSettings)) {
+					$watermarkSettings = array($watermarkSettings);
+				}
+				KalturaLog::log("WM($fldName) object:".serialize($watermarkSettings));
+			}
+		}
+		else
+			KalturaLog::log("No custom metadata - $fldName");
+
+		/*
+		 * Acquire the optional partial WM settings ('imageEntry'/'url') 
+		 * Prefer the 'imageEntry' in case when both 'imageEntr' and 'url' are previded ('url' ignored).
+		 */
+		$wmTmp = null;
+		$fldName = self::TRANSCODING_METADATA_WATERMMARK_IMAGE_ENTRY;
+		if(isset($xml->$fldName)) {
+			$wmTmp->imageEntry =(string)$xml->$fldName;
+			KalturaLog::log("Found custom metadata - $fldName($wmTmp->imageEntry)");
+		}
+		else {
+			KalturaLog::log("No custom metadata - $fldName");
+			$fldName = self::TRANSCODING_METADATA_WATERMMARK_IMAGE_URL;
+			if(isset($xml->$fldName)) {
+				$fldVal = (string)$xml->$fldName;
+				$wmTmp->url =(string)$xml->$fldName;
+				KalturaLog::log("Found custom metadata - $fldName($wmTmp->url)");
+			}
+			else 
+				KalturaLog::log("No custom metadata - $fldName");
+		}
+		
+		/*
+		 * Merge the imageEntry/imageUrl values into previously aquired 'full' WM settings (if provided).
+		 */
+		if(isset($wmTmp))
+			$watermarkSettings = self::adjustWatermarSettings($watermarkSettings, $wmTmp);
+		KalturaLog::log("Custom meta data WM settings:".serialize($watermarkSettings));
+
+		/*
+		 * Check for valuable WM custom data.
+		 * If none - leave
+		 */
+		{
+			foreach($watermarkSettings as $wmI=>$wmTmp){
+				if(isset($wmTmp)){
+					$fldCnt+= count((array)$wmTmp);
+				}
+			}
+			if($fldCnt==0){
+				KalturaLog::log("No WM custom data to merge");
+				return;
+			}
 		}
 		
 		/*
@@ -126,59 +155,70 @@ class WatermarkPlugin extends KalturaPlugin implements IKalturaPending, IKaltura
 		 */
 		foreach($flavors as $k=>$flavor) {
 			KalturaLog::log("Processing flavor id:".$flavor->getId());
-			$wmDataObj = null;
-			
+			$wmDataFixed = null;
+			$wmPredefined = null;
+			$wmPredefinedStr = $flavor->getWatermarkData();
+			if(!(isset($wmPredefinedStr) && ($wmPredefined=json_decode($wmPredefinedStr))!=null)){
+				KalturaLog::log("No WM data for flavor:".$flavor->getId());
+				continue;
+			}
+			KalturaLog::log("wmPredefined : count(".count($wmPredefined).")-".serialize($wmPredefined));
+
+			$wmDataFixed = self::adjustWatermarSettings($wmPredefined, $watermarkSettings);
+
 			/*
 			 * The 'full' WM settings in the custom metadata overides any exitings WM settings 
 			 */
-			if(isset($watermarkSettings)) {
-				$wmDataObj = clone $watermarkSettings;
-			}
-			else {
-				/*
-				 * No 'full' settings.
-				 * Adjust the existing flavor WM data with custom metadata imageEntry/imageUrl
-				 */
-				$wmDataStr = $flavor->getWatermarkData();
-				if(isset($wmDataStr)){
-					$wmDataObj = json_decode($wmDataStr);
-					if($this->adjustWatermarSettings($wmDataObj, $imageEntry, $imageUrl)==false){
-						continue;
-					}
-				}
-			}
-			
-			if(isset($wmDataObj)) {
-				$toJson = json_encode($wmDataObj);
-				$flavor->setWatermarkData($toJson);
-				$flavors[$k]= $flavor;
-				KalturaLog::log("Set flavor (".$flavor->getId().") WM to $toJson");
-			}
+			$wmJsonStr = json_encode($wmDataFixed);
+			$flavor->setWatermarkData($wmJsonStr);
+			$flavors[$k]= $flavor;
+			KalturaLog::log("Update flavor (".$flavor->getId().") WM to: $wmJsonStr");
 		}
 	}
 
 	/**
 	 * 
-	 * @param unknown_type $watermarkSettings
-	 * @param unknown_type $imageEntry
-	 * @param unknown_type $imageUrl
+	 * @param unknown_type $watermarkData
+	 * @param unknown_type $watermarkToMerge
 	 */
-	protected function adjustWatermarSettings($watermarkSettings, $imageEntry, $imageUrl)
+	protected static function adjustWatermarSettings($watermarkData, $watermarkToMerge)
 	{
-		if(isset($imageEntry)) {
-			$watermarkSettings->imageEntry = $imageEntry;
-			if(isset($watermarkSettings->url)){
-				unset($watermarkSettings->url);
+		KalturaLog::log("Merge WM (".serialize($watermarkToMerge).") into (".serialize($watermarkData).")");
+		if(is_array($watermarkData))
+			$watermarkDataArr = $watermarkData;
+		else 
+			$watermarkDataArr = array($watermarkData);
+		
+		if(is_array($watermarkToMerge))
+			$watermarkToMergeArr = $watermarkToMerge;
+		else 
+			$watermarkToMergeArr = array($watermarkToMerge);
+		
+		foreach($watermarkToMergeArr as $wmI=>$watermarkToMerge){
+			KalturaLog::log("Merging WM:$wmI");
+			if(!array_key_exists($wmI, $watermarkDataArr)){
+				$watermarkDataArr[$wmI] = $watermarkToMerge;
+				KalturaLog::log("Added object ($wmI)-".serialize($watermarkToMerge));
+				continue;
+			}
+
+			foreach($watermarkToMerge as $fieldName=>$fieldValue){
+				$watermarkDataArr[$wmI]->$fieldName = $fieldValue;
+				KalturaLog::log("set($fieldName):".$fieldValue);
+				switch($fieldName){
+				case "imageEntry":
+					KalturaLog::log("unset(url):".$watermarkDataArr[$wmI]->url);
+					unset($watermarkDataArr[$wmI]->url);
+					break;
+				case  "url":
+					KalturaLog::log("unset(imageEntry):".$watermarkDataArr[$wmI]->imageEntry);
+					unset($watermarkDataArr[$wmI]->imageEntry);
+					break;
+				}
 			}
 		}
-		else if(isset($imageUrl)) {
-			$watermarkSettings->imageUrl = $imageUrl;
-			if(isset($watermarkSettings->imageEntry)){
-				unset($watermarkSettings->imageEntry);
-			}
-		}
-		else
-			return false;
-		return true;
+		
+		KalturaLog::log("Merged WM (".serialize($watermarkDataArr).")");
+		return $watermarkDataArr;
 	}
 }
