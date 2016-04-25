@@ -9,7 +9,6 @@ abstract class KalturaLikeBaseFilter extends KalturaRelatedFilter
 	static private $map_between_objects = array
 	(
 		"entryIdEqual" => "_eq_entry_id",
-		"entryIdIn" => "_in_entry_id",
 		"userIdEqual" => "_eq_user_id",
 		"createdAtGreaterThanOrEqual" => "_gte_created_at",
 		"createdAtLessThanOrEqual" => "_lte_created_at",
@@ -33,11 +32,6 @@ abstract class KalturaLikeBaseFilter extends KalturaRelatedFilter
 	 * @var string
 	 */
 	public $entryIdEqual;
-
-	/**
-	 * @var string
-	 */
-	public $entryIdIn;
 
 	/**
 	 * @var string
