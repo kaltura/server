@@ -16,7 +16,7 @@
 // published by the Free Software Foundation, either version 3 of the
 // License, or (at your option) any later version.
 //
-// This program is distributed in the hope that it will be useful,re
+// This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	See the
 // GNU Affero General Public License for more details.
@@ -371,8 +371,7 @@ KalturaClientBase.prototype.encodeFile = function(boundary, type, name, filename
 	return returnPart;
 };
 
-KalturaClientBase.prototype.sendRequestHelper = function (options, body, requestIndex, onCompleteCallback, timeout) {
-	var This = this;
+function sendRequestHelper(that, options, body, requestIndex, onCompleteCallback, timeout) {
 	var request = http.request(options, function(response) {
 		response.setEncoding('utf8');
 
@@ -385,29 +384,13 @@ KalturaClientBase.prototype.sendRequestHelper = function (options, body, request
 			for ( var header in response.headers) {
 				headers.push(header + ': ' + response.headers[header]);
 			}
-			This.debug('Headers [' + requestIndex + ']: \n\t' + headers.join('\n\t'));
-			This.debug('Response [' + requestIndex + ']: ' + data);
-			if (This.config.format != KalturaClientBase.KALTURA_SERVICE_FORMAT_JSON){
-				onCompleteCallback(data);
-			}else {
-				var obj = JSON.parse(data);
-				if (obj && This.isError(obj)) {
-					if (!onCompleteCallback) {
-						throw obj.code + ": " + obj.message;
-					}
-					onCompleteCallback(null, obj);
-				}
-				else {
-					onCompleteCallback(obj);
-				}
-			}
+			that.debug('Headers [' + requestIndex + ']: \n\t' + headers.join('\n\t'));
+			that.debug('Response [' + requestIndex + ']: ' + data);
+			onCompleteCallback(JSON.parse(data));
 		});
 	});
 	request.on('error', function(err) {
 		console.log(err);
-		if(!onCompleteCallback){
-			throw err;
-		}
 		onCompleteCallback(null, err);
 	});
 
@@ -418,16 +401,6 @@ KalturaClientBase.prototype.sendRequestHelper = function (options, body, request
 	request.end();
 }
 
-KalturaClientBase.prototype.isError = function(object) {
-	if (object){
-		if( object.hasOwnProperty("objectType") && object.objectType == 'KalturaAPIException' ) {
-			return true;
-		}
-		else
-			return false;
-	}
-}
-
 /**
  * send the http request.
  * @param string url						the url to call.
@@ -436,6 +409,7 @@ KalturaClientBase.prototype.isError = function(object) {
  */
 KalturaClientBase.prototype.doHttpRequest = function (callCompletedCallback, requestUrl, params, files) {
 
+	var that = this;
 	var requestIndex = KalturaClientBase.requestIndex++;
 	var data = http_build_query(params);
 	var debugUrl = requestUrl + '?' + data;
@@ -470,14 +444,14 @@ KalturaClientBase.prototype.doHttpRequest = function (callCompletedCallback, req
 			'Content-Type': 'multipart/form-data; boundary=' + boundary,
 			'Content-Length': multipartBody.length
 		};
-		this.sendRequestHelper(options, multipartBody, requestIndex, callCompletedCallback, this.config.timeout);
+		sendRequestHelper(that, options, multipartBody, requestIndex, callCompletedCallback, this.config.timeout);
 
 	} else {
 		options.headers = {
 			'Content-Type' : 'application/x-www-form-urlencoded',
 			'Content-Length' : Buffer.byteLength(data)
 		};
-		this.sendRequestHelper(options, data, requestIndex, callCompletedCallback);
+		sendRequestHelper(that, options, data, requestIndex, callCompletedCallback);
 	}
 };
 
