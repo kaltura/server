@@ -54,45 +54,20 @@ class KOperationEngineMp4box  extends KSingleOutputOperationEngine
 	 */
 	private function buildSubTitleCommandParam(KalturaConvartableJobData $data)
 	{//		$cmdStr.= " -add ".KDLCmdlinePlaceholders::OutFileName.".temp.srt:hdlr=sbtl:lang=$lang:group=0:layer=-1";
-	
-		try {
-			KBatchBase::$kClient->getConfig()->partnerId = $data->flavorParamsOutput->partnerId;
-			
-			$flrAsst = KBatchBase::$kClient->flavorAsset->get($data->flavorAssetId);
-			if(!isset($flrAsst)){
-				$this->message = ("Failed to retrieve the flavor asset object (".$data->flavorAssetId.")");
-KalturaLog::log("ERROR:".$this->message);
-				return null;
-			}
-			$filter = new KalturaAssetFilter();
-			$filter->entryIdEqual = $flrAsst->entryId;
-			$captionsList = KBatchBase::$kClient->captionAsset->listAction($filter, null); 
-			if(!isset($captionsList) || count($captionsList->objects)==0){
-				$this->message = ("No caption assets for entry (".$flrAsst->entryId.")");
-KalturaLog::log("ERROR:".$this->message);
-				return null;
-			}
-		}
-		catch( Exception $ex ){
-			$this->message = ("Exception on captions list retrieval  (".print_r($ex,1).")");
+		$jobMsg = null;
+		$captionsArr = KConversionEngineFfmpeg::fetchEntryCaptionList($data, $jobMsg);
+		if(!isset($captionsArr) || count($captionsArr)==0){
+			KalturaLog::log($jobMsg);
+			$this->message = $jobMsg;
 			return null;
 		}
+		
 		$captionsStr = null;
 		$addedSubs=0;
-		foreach($captionsList->objects as $captionObj) {
-			try{
-				$cptUrl = KBatchBase::$kClient->captionAsset->getUrl($captionObj->id, null);
-			}
-			catch ( Exception $ex ) {
-				$cptUrl = null;
-				KalturaLog::err("Exception on retrieve caption asset url retrieval (".$captionObj->id."),\nexception:".print_r($ex,1));
-			}		
-			if(!isset($cptUrl)){
-				KalturaLog::err("Failed to retrieve caption asset url (".$captionObj->id.")");
-				continue;
-			}
-			$cptFilePath = self::retrieveCaptionFile($captionObj, $cptUrl, $data->destFileSyncLocalPath);
-			if(!isset($cptFilePath)){
+		foreach($captionsArr as $lang=>$captionFileUrl){
+			$captionFilePath = KConversionEngineFfmpeg::fetchCaptionFile($captionFileUrl, $data->destFileSyncLocalPath.".temp.$lang.srt");
+
+			if(!isset($captionFilePath)){
 				continue;
 			}
 			/*
@@ -108,7 +83,7 @@ KalturaLog::log("ERROR:".$this->message);
 			 *	0 is the normal value, and -1 would be in front of track 0, and so on."
 			 *	layer=-1, closest to the viewer
 			 */
-			$captionsStr.= " -add ".$cptFilePath.":hdlr=sbtl:lang=".$captionObj->languageCode.":group=1:layer=-1";
+			$captionsStr.= " -add ".$captionFilePath.":hdlr=sbtl:lang=".$lang.":group=1:layer=-1";
 			if($addedSubs>0) {
 				$captionsStr.= ":disabled";
 			}
@@ -122,36 +97,5 @@ KalturaLog::log("ERROR:".$this->message);
 		}
 		return $captionsStr;
 	}
-
-	/***************************
-	 * retrieveCaptionFile
-	 *
-	 * @param $captionObj
-	 * @param $destFolder
-	 * @return $localCaptionFilePath
-	 */
-	private static function retrieveCaptionFile($captionObj, $captionUrl, $destFolder)
-	{
-		KalturaLog::debug("Caption object:\n".print_r($captionObj, 1));
-		KalturaLog::debug("Executing curl to retrieve caption asset file from - $captionUrl");
-		$curlWrapper = new KCurlWrapper();
-		$cptFilePath = $destFolder.".temp.".$captionObj->languageCode.".srt";
-		$res = $curlWrapper->exec($captionUrl, $cptFilePath);
-		KalturaLog::debug("Curl results: $res");
-		if(!$res || $curlWrapper->getError())
-		{
-			$errDescription = "Error: " . $curlWrapper->getError();
-			$curlWrapper->close();
-			KalturaLog::err("Failed to curl the caption file url($captionUrl). Error ($errDescription)");
-			return null;
-		}
-		$curlWrapper->close();
-		
-		if(!file_exists($cptFilePath))
-		{
-			KalturaLog::err("Error: output file ($cptFilePath) doesn't exist");
-			return null;
-		}
-		return $cptFilePath;
-	}
+	
 }

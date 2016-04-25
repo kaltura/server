@@ -145,6 +145,13 @@ class KDLWrap
 			*/
 		foreach ($trgList as $trg){
 			KalturaLog::log("...T-->".$trg->ToString());
+				/*
+				 *  NOT COMMITED, to check with KDLFalvor
+				 *
+			if($trg->IsValid()==false && ($trg->_flags & KDLFlavor::MissingContentNonComplyFlagBit)) {
+				continue;
+			}
+			*/
 			$cdlFlvrOut = self::ConvertFlavorKdl2Cdl($trg);
 			
 			/*
@@ -314,10 +321,22 @@ class KDLWrap
 				$flavor->setAspectRatioProcessingMode($target->_video->_arProcessingMode);
 			if($target->_video->_forceMult16)
 				$flavor->setForceFrameToMultiplication16($target->_video->_forceMult16);
+			/*
+			 * Watermark
+			 */
 			if(isset($target->_video->_watermarkData))
 			{
 				$toJson = json_encode($target->_video->_watermarkData);
 				$flavor->setWatermarkData($toJson);
+			}
+			
+			/*
+			 * Subtitled
+			 */
+			if(isset($target->_video->_subtitlesData))
+			{
+				$toJson = json_encode($target->_video->_subtitlesData);
+				$flavor->setSubtitlesData($toJson);
 			}
 		}
 
@@ -458,13 +477,40 @@ class KDLWrap
 				$kdlFlavor->_video->_maxFrameRate = $cdlFlavor->getMaxFrameRate();
 				$kdlFlavor->_video->_isForcedKeyFrames = !$cdlFlavor->getIsAvoidForcedKeyFrames();
 				$kdlFlavor->_video->_isCropIMX = $cdlFlavor->getIsCropIMX();
+					/*
+					 * Due to multiple WM support,
+					 * the single WM settings is turned into array as well
+					 */
 				$watermarkData = $cdlFlavor->getWatermarkData();
 				if(isset($watermarkData)) {
 					$fromJson = json_decode($watermarkData);
-					$kdlFlavor->_video->_watermarkData = isset($fromJson)? $fromJson: null;
+					if(isset($fromJson)){
+						if(!is_array($fromJson)){
+							$kdlFlavor->_video->_watermarkData = array($fromJson);
+						}
+						else {
+							$kdlFlavor->_video->_watermarkData = $fromJson;
+						}
+					}
+					else
+						$kdlFlavor->_video->_watermarkData = null;
+				}
+				
+					/*
+					 * Subtitles
+					 */
+				$subtitlesData = $cdlFlavor->getSubtitlesData();
+				if(isset($subtitlesData)) {
+					$fromJson = json_decode($subtitlesData);
+					if(isset($fromJson)){
+						$kdlFlavor->_video->_subtitlesData = $fromJson;
+					}
+					else{
+						$kdlFlavor->_video->_subtitlesData = null;
+					}
 				}
 			}
-			//		$flavor->_video->_dar = $api->getVideoDar();
+			
 			if($kdlFlavor->_video->IsDataSet()==false)
 				$kdlFlavor->_video = null;
 		}

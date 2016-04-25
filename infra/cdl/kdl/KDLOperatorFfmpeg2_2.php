@@ -107,11 +107,9 @@ class KDLOperatorFfmpeg2_7_2 extends KDLOperatorFfmpeg2_2 {
 	/**
 	 *
 	 * @param unknown_type $targetVid
-	 * @param unknown_type $wmWid
-	 * @param unknown_type $wmHgt
 	 * @return string
 	 */
-	protected static function generateWatermarkParams($targetVid, $wmWid=KDLCmdlinePlaceholders::WaterMarkWidth, $wmHgt=KDLCmdlinePlaceholders::WaterMarkHeight)
+	protected static function generateWatermarkParams($targetVid, $vidIn)
 	{
 		/*
 		 * FFMpeg 2.7 automatically rotates the output 
@@ -122,7 +120,7 @@ $rotation = null;
 			$rotation = $targetVid->_rotation;
 			$targetVid->_rotation = null;
 		}
-		$watermarkStr = parent::generateWatermarkParams($targetVid, $wmWid, $wmHgt);
+		$watermarkStr = parent::generateWatermarkParams($targetVid, $vidIn);
 		$targetVid->_rotation = $rotation;
 		return $watermarkStr;
 	}
