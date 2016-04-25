@@ -310,8 +310,10 @@ class kDropFolderXmlFileHandler
 			$partner = PartnerPeer::retrieveByPK($folder->getPartnerId());
 			
 			$data = KalturaPluginManager::loadObject('kBulkUploadJobData', $coreBulkUploadType);
+			/* @var $data kBulkUploadJobData */
 			$data->setUploadedBy(kDropFolderXmlEventsConsumer::UPLOADED_BY);
 			$data->setFileName($leadDropFolderFile->getFileName());
+			$data->setBulkUploadObjectType(BulkUploadObjectType::ENTRY);
 						
 			$objectData = new kBulkUploadEntryData();
 			$objectData->setConversionProfileId($folder->getConversionProfileId());

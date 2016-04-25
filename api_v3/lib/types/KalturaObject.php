@@ -464,10 +464,11 @@ abstract class KalturaObject implements IApiObject
 			$this->$this_prop = isset($source_array[$object_prop]) ? $source_array[$object_prop] : null;
 		}
 	}
-	
+
 	public function toObject($object_to_fill = null, $props_to_skip = array())
 	{
 		$this->validateForUsage($object_to_fill, $props_to_skip); // will check that not useable properties are not set 
+
 		$class = get_class($this);
 		
 		// enables extension with default empty object
@@ -527,9 +528,10 @@ abstract class KalturaObject implements IApiObject
 					$finalValues[] = kPluginableEnumsManager::apiToCore($enumType, $val);
 				$value = implode(',', $finalValues);
 			}
-			elseif (is_string($value) && ! kXml::isXMLValidContent($value) )
+			elseif (is_string($value))
 			{
-				throw new KalturaAPIException ( KalturaErrors::INVALID_PARAMETER_CHAR, $this_prop );
+				if (! kXml::isXMLValidContent($value))
+					throw new KalturaAPIException ( KalturaErrors::INVALID_PARAMETER_CHAR, $this_prop );
 			}
 			
 			$setter_callback = array ( $object_to_fill ,"set{$object_prop}");
@@ -724,8 +726,8 @@ abstract class KalturaObject implements IApiObject
 						header($this->getDeclaringClassName($propertyName).'-'.$propertyName.' error: '.$e->getMessage());
 					}
 				}
-
 				$this->validateHtmlTags($className, $property);
+
 			}
 		}
 	}
@@ -780,14 +782,13 @@ abstract class KalturaObject implements IApiObject
 						header($this->getDeclaringClassName($propertyName).'-'.$propertyName.' error: '.$e->getMessage());
 					}
 				}
-
 				$this->validateHtmlTags($className, $property);
 			}
 		}
 		
 		return $updatableProperties;
 	}
-	
+
 	/**
 	 * @param KalturaPropertyInfo $property
 	 */
@@ -797,12 +798,11 @@ abstract class KalturaObject implements IApiObject
 		{
 			return;
 		}
-
 		$propName = $property->getName();
 		$value = $this->$propName;
 		return kHtmlPurifier::purify($className, $propName, $value);
 	}
-
+	
 	public function validateForUsage($sourceObject, $propertiesToSkip = array())
 	{
 		$useableProperties = array();

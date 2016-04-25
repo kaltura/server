@@ -1089,6 +1089,10 @@ return array(
 
 	'Kaltura_Client_DropFolder_Enum_DropFolderFileHandlerType::CONTENT' => 'Content',
 	'Kaltura_Client_DropFolder_Enum_DropFolderFileHandlerType::XML' => 'XML',
+	'Kaltura_Client_DropFolder_Enum_DropFolderFileHandlerType::ICAL' => 'ICAL',
+
+	'Kaltura_Client_Schedule_Enum_ScheduleEventType::LIVE_STREAM' => 'Live-Stream',
+	'Kaltura_Client_Schedule_Enum_ScheduleEventType::RECORD' => 'Recording',
 
 	'Kaltura_Client_DropFolder_Enum_DropFolderFileDeletePolicy::AUTO_DELETE_WHEN_ENTRY_IS_READY' => 'Automatic deletion when entry is ready',
 	'Kaltura_Client_DropFolder_Enum_DropFolderFileDeletePolicy::AUTO_DELETE' => 'Automatic deletion after import',
@@ -1203,6 +1207,9 @@ return array(
 	'Kaltura_Client_EventNotification_Enum_EventNotificationEventObjectType::CATEGORYENTRY' => 'Category - Entry',
 	'Kaltura_Client_EventNotification_Enum_EventNotificationEventObjectType::DISTRIBUTION_PROFILE' => 'Distribution profile',
 	'Kaltura_Client_EventNotification_Enum_EventNotificationEventObjectType::ENTRY_DISTRIBUTION' => 'Entry distribution',
+	'Kaltura_Client_EventNotification_Enum_EventNotificationEventObjectType::SCHEDULE_EVENT' => 'ScheduleEvent',
+	'Kaltura_Client_EventNotification_Enum_EventNotificationEventObjectType::SCHEDULE_RESOURCE' => 'ScheduleResource',
+	'Kaltura_Client_EventNotification_Enum_EventNotificationEventObjectType::SCHEDULE_EVENT_RESOURCE' => 'ScheduleEventResource',
 
 	
 	'Kaltura_Client_EmailNotification_Enum_EmailNotificationFormat::HTML' => 'HTML',

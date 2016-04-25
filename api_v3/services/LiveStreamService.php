@@ -133,12 +133,15 @@ class LiveStreamService extends KalturaLiveEntryService
 	 * @action authenticate
 	 * @param string $entryId Live stream entry id
 	 * @param string $token Live stream broadcasting token
+	 * @param string $hostname Media server host name
+	 * @param KalturaEntryServerNodeType $mediaServerIndex Media server index primary / secondary
+	 * @param string $applicationName the application to which entry is being broadcast
 	 * @return KalturaLiveStreamEntry The authenticated live stream entry
 	 * 
 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
 	 * @throws KalturaErrors::LIVE_STREAM_INVALID_TOKEN
 	 */
-	function authenticateAction($entryId, $token)
+	function authenticateAction($entryId, $token, $hostname = null, $mediaServerIndex = null, $applicationName = null)
 	{
 		$dbEntry = entryPeer::retrieveByPK($entryId);
 		if (!$dbEntry || $dbEntry->getType() != entryType::LIVE_STREAM)
@@ -148,35 +151,15 @@ class LiveStreamService extends KalturaLiveEntryService
 		if ($dbEntry->getStreamPassword() != $token)
 			throw new KalturaAPIException(KalturaErrors::LIVE_STREAM_INVALID_TOKEN, $entryId);
 
-		$mediaServer = $dbEntry->getMediaServer(true);
-		if($mediaServer)
-		{
-			$url = null;
-			$protocol = null;
-			foreach (array(KalturaPlaybackProtocol::HLS, KalturaPlaybackProtocol::APPLE_HTTP) as $hlsProtocol)
-			{
-				$config = $dbEntry->getLiveStreamConfigurationByProtocol($hlsProtocol, requestUtils::PROTOCOL_HTTP, null, true);
-				if ($config)
-				{
-					$url = $config->getUrl();
-					$protocol = $hlsProtocol;
-					break;
-				}
-			}
-			
-			if($url)
-			{
-				KalturaLog::info('Determining status of live stream URL [' .$url. ']');
-				$dpda= new DeliveryProfileDynamicAttributes();
-				$dpda->setEntryId($entryId);
-				$dpda->setFormat($protocol);
-				$deliveryProfile = DeliveryProfilePeer::getLiveDeliveryProfileByHostName(parse_url($url, PHP_URL_HOST), $dpda);
-				if($deliveryProfile && $deliveryProfile->isLive($url))
-				{
-					throw new KalturaAPIException(KalturaErrors::LIVE_STREAM_ALREADY_BROADCASTING, $entryId, $mediaServer->getHostname());
-				}
-			}
-		}
+		/*
+		Patch for autenticate error while performing an immidiate stop/start. Checkup for duplicate streams moved to
+		media-server for the moment. 
+		if($dbEntry->isStreamAlreadyBroadcasting())
+			throw new KalturaAPIException(KalturaErrors::LIVE_STREAM_ALREADY_BROADCASTING, $entryId, $mediaServer->getHostname());
+		*/
+		
+		if($hostname && isset($mediaServerIndex))
+			$this->setMediaServerWrapper($dbEntry, $mediaServerIndex, $hostname, KalturaEntryServerNodeStatus::AUTHENTICATED, $applicationName);
 		
 		// fetch current stream live params
 		$liveParamsIds = flavorParamsConversionProfilePeer::getFlavorIdsByProfileId($dbEntry->getConversionProfileId());

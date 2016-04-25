@@ -507,7 +507,7 @@ abstract class ".$this->getClassname(). $extendingPeerClass . " {
 				// the default case
 				\$criteria->addAnd(self::PARTNER_ID, \$partnerId);
 			}
-			elseif (\$partnerGroup == myPartnerUtils::ALL_PARTNERS_WILD_CHAR)
+			elseif (\$partnerGroup === myPartnerUtils::ALL_PARTNERS_WILD_CHAR)
 			{
 				// all is allowed - don't add anything to the criteria
 			}

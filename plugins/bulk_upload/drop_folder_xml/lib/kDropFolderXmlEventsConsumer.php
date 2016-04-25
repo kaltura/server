@@ -73,10 +73,14 @@ class kDropFolderXmlEventsConsumer implements kBatchJobStatusEventConsumer, kObj
 		{
 			$jobObjectType = DropFolderXmlBulkUploadPlugin::getBatchJobObjectTypeCoreValue(DropFolderBatchJobObjectType::DROP_FOLDER_FILE);
 			$jobStatuses = array(BatchJob::BATCHJOB_STATUS_FINISHED, BatchJob::BATCHJOB_STATUS_FINISHED_PARTIALLY, BatchJob::BATCHJOB_STATUS_FAILED, BatchJob::BATCHJOB_STATUS_FATAL, BatchJob::BATCHJOB_STATUS_QUEUED,);
-			$isMatch =  $dbBatchJob->getJobType() == BatchJobType::BULKUPLOAD && 
+			if($dbBatchJob->getJobType() == BatchJobType::BULKUPLOAD && 
 						$dbBatchJob->getObjectType() == $jobObjectType &&
-						in_array($dbBatchJob->getStatus(), $jobStatuses);
-			return $isMatch;	
+						in_array($dbBatchJob->getStatus(), $jobStatuses))
+			{
+				$data = $dbBatchJob->getData();
+				if($data instanceof kBulkUploadJobData && $data->getBulkUploadObjectType() == BulkUploadObjectType::ENTRY)
+					return true;
+			}	
 		}
 		catch(Exception $e)
 		{
