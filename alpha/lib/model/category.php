@@ -118,8 +118,15 @@ class category extends Basecategory implements IIndexable, IRelatedObject
 			$this->addSyncCategoryPrivacyContextJob();
 		}
 		
-		$this->childs_for_save = array();
+		
 
+		$this->childs_for_save = array();
+		
+		if ($this->isColumnModified(categoryPeer::DELETED_AT) && $this->getDeletedAt() !== null)
+		{
+			$this->deleteChildCategories();
+		}
+		
 		$kuserChanged = false;
 		if (!$this->isNew() &&
 			$this->isColumnModified(categoryPeer::INHERITANCE_TYPE))
@@ -303,14 +310,9 @@ class category extends Basecategory implements IIndexable, IRelatedObject
 				$parentCategory->save();
 			}
 		}
-
+		
 		$ret = parent::postUpdate($con);
-
-		if ($objectDeleted)
-		{
-			$this->deleteChildCategories();
-		}
-
+		
 		if($objectDeleted)
 			kEventsManager::raiseEvent(new kObjectDeletedEvent($this));
 			
@@ -489,42 +491,21 @@ class category extends Basecategory implements IIndexable, IRelatedObject
 	public function deleteChildCategories()
 	{
 		$fullIds = $this->getFullIds();
-		$categoriesIds = $this->getDescendantCategoriesIds();
-
-		$now = time();
-		if (isset($categoriesIds) && !empty($categoriesIds))
-		{
-			$update = KalturaCriteria::create(categoryPeer::OM_CLASS);
-			$update->add(categoryPeer::DELETED_AT, $now);
-			$update->add(categoryPeer::UPDATED_AT, $now);
-			$update->add(categoryPeer::STATUS, CategoryStatus::DELETED);
-			$update->add(categoryPeer::ID, $categoriesIds, KalturaCriteria::IN);
-			categoryPeer::doUpdate($update);
-		}
-
-		categoryPeer::setUseCriteriaFilter(false);
-		$categories = categoryPeer::retrieveByPKs($categoriesIds);
-		categoryPeer::setUseCriteriaFilter(true);
+		$categoriesIds = self::getCategoriesStartWithIds($fullIds.'>');
+		self::updateDeletedCategoriesInDB($categoriesIds);
+		$categories = self::getCategories($categoriesIds);
 
 		foreach ($categories as $categoryToDelete) {
-			$categoryToDelete->setDeletedAtInternally($now);
-			$categoryToDelete->setUpdatedAt($now);
-			$categoryToDelete->setStatus(CategoryStatus::DELETED);
 			kEventsManager::raiseEvent(new kObjectDeletedEvent($categoryToDelete));
 			kEventsManager::raiseEventDeferred(new kObjectReadyForIndexEvent($categoryToDelete));
 		}
 
 		if ($this->getInheritanceType() == InheritanceType::MANUAL)
-			$this->addDeleteCategoryTreeKuserJob($fullIds);
+			$this->addDeleteCategoryTreeKuserJob($this->getId(), false, $fullIds);
 		if ($this->move_entries_to_parent_category && $this->parent_id!=0)
 			$this->addMoveEntriesToCategoryJob($this->parent_id);
 		else
-			$this->addDeleteCategoryTreeEntryJob($fullIds);
-	}
-
-	public function setDeletedAtInternally($v)
-	{
-		parent::setDeletedAt($v);
+			$this->addDeleteCategoryTreeEntryJob($this->getId(), $fullIds);
 	}
 
 
@@ -582,7 +563,7 @@ class category extends Basecategory implements IIndexable, IRelatedObject
 		}
 	}
 
-	protected function addDeleteCategoryTreeKuserJob($fullIds)
+	protected function addDeleteCategoryTreeKuserJob($categoryId, $deleteCategoryDirectMembersOnly = false, $fullIds)
 	{
 		$filter = new categoryKuserFilter();
 		$filter->setFullIdsStartsWith($fullIds);
@@ -615,7 +596,7 @@ class category extends Basecategory implements IIndexable, IRelatedObject
 		kJobsManager::addCopyJob($this->getPartnerId(), CopyObjectType::CATEGORY_USER, $filter, $templateCategory);
 	}
 
-	protected function addDeleteCategoryTreeEntryJob($fullIds)
+	protected function addDeleteCategoryTreeEntryJob($categoryId, $fullIds)
 	{
 		$filter = new categoryEntryFilter();
 		$filter->setFullIdsStartsWith($fullIds);
@@ -1791,10 +1772,10 @@ class category extends Basecategory implements IIndexable, IRelatedObject
 	 * @param $fullIds
 	 * @return array
 	 */
-	private function getDescendantCategoriesIds()
+	private static function getCategoriesStartWithIds($fullIds)
 	{
-		$fullIds = $this->getFullIds();
-		$fullIds = $fullIds.'>';
+		if (!isset($fullIds) || empty($fullIds))
+			return array();
 
 		$filter = new categoryFilter();
 		$filter->setFullIdsStartsWith($fullIds);
@@ -1803,5 +1784,33 @@ class category extends Basecategory implements IIndexable, IRelatedObject
 		$c->applyFilters();
 		$categoryIds = $c->getFetchedIds();
 		return $categoryIds;
+	}
+
+	/**
+	 * @param $categoriesIds
+	 */
+	private static function updateDeletedCategoriesInDB($categoriesIds)
+	{
+		if (!isset($categoriesIds) || empty($categoriesIds))
+			return;
+
+		$update = KalturaCriteria::create(categoryPeer::OM_CLASS);
+		$update->add(categoryPeer::DELETED_AT, time());
+		$update->add(categoryPeer::UPDATED_AT, time());
+		$update->add(categoryPeer::STATUS, CategoryStatus::DELETED);
+		$update->add(categoryPeer::ID, $categoriesIds, KalturaCriteria::IN);
+		categoryPeer::doUpdate($update);
+	}
+
+	/**
+	 * @param $categoriesIds
+	 * @return array
+	 */
+	private static function getCategories($categoriesIds)
+	{
+		categoryPeer::setUseCriteriaFilter(false);
+		$categories = categoryPeer::retrieveByPKs($categoriesIds);
+		categoryPeer::setUseCriteriaFilter(false);
+		return $categories;
 	}
 }
