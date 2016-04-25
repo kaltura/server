@@ -46,36 +46,41 @@
     <!-- rules -->
     <xsl:variable name="geoBlockRule" select="item/customData/metadata/GEOBlockRule"/>
     <xsl:variable name="watchPermissionRule" select="item/customData/metadata/WatchPermissionRule"/>
-    <!--tags as a nodeset -->
+    <!--tags as a xml string -->
+    <xsl:param name="tagsparam" select="''" />
+    
+    <xsl:variable name="tagsNodeSet" select="php:function('xml_load_for_xslt' ,string($tagsparam))" />
     <xsl:variable name="tags">
-        <xsl:element name="tag">
-            <xsl:value-of select="$MBR_TAG"/>
-        </xsl:element>
-        <xsl:element name="tag">
-            <xsl:value-of select="$ISM_TAG"/>
-        </xsl:element>
-        <xsl:element name="tag">
-            <xsl:value-of select="$IPHONE_TAG"/>
-        </xsl:element>
-        <xsl:element name="tag">
-            <xsl:value-of select="$IPAD_TAG"/>
-        </xsl:element>
-        <xsl:element name="tag">
-            <xsl:value-of select="$DASH_TAG"/>
-        </xsl:element>
-        <xsl:element name="tag">
-            <xsl:value-of select="$WIDEVINE_TAG"/>
-        </xsl:element>
-        <xsl:element name="tag">
-            <xsl:value-of select="$WIDEVINE_MBR_TAG"/>
-        </xsl:element>
+        <xsl:for-each select="exsl:node-set($tagsNodeSet)/tag">
+            <xsl:variable name="currentTag" select="." />
+            <xsl:element name="tag">
+                <xsl:element name="tagname">
+                    <xsl:value-of select="normalize-space($currentTag/tagname)"/>
+                </xsl:element>
+                <xsl:element name="extension">
+                    <xsl:value-of select="normalize-space($currentTag/extension)"/>
+                </xsl:element>
+                <xsl:element name="protocol">
+                    <xsl:value-of select="normalize-space($currentTag/protocol)"/>
+                </xsl:element>
+                <xsl:element name="format">
+                    <xsl:value-of select="normalize-space($currentTag/format)"/>
+                </xsl:element>
+                <xsl:element name="typename">
+                    <xsl:value-of select="normalize-space($currentTag/typename)"/>
+                </xsl:element>
+                <xsl:element name="ppvmodule">
+                    <xsl:value-of select="normalize-space($currentTag/ppvmodule)"/>
+                </xsl:element>
+            </xsl:element>
+        </xsl:for-each>
     </xsl:variable>
 
-
     <!-- Parameters for this xslt file -->
-    <xsl:param name="playManifestPrefix"/>
+    <xsl:param name="playManifestPrefix" />
     <xsl:param name="distributionProfileId"/>
 
+    
     <!--ipadnew -->
     <xsl:param name="ipadnewPpvModule" select="''"/>
     <xsl:param name="ipadnewTypeName" select="'iPad Main'"/>
@@ -432,7 +437,7 @@
         <!--find all the content elements that have hte specific tag -->
         <xsl:variable name="tagMatchingContents">
             <xsl:call-template name="get-matching-contents">
-                <xsl:with-param name="tag" select="$tag"/>
+                <xsl:with-param name="tag" select="$tag/tagname"/>
                 <xsl:with-param name="contents" select="$contents"/>
             </xsl:call-template>
         </xsl:variable>
@@ -452,31 +457,21 @@
                     </xsl:for-each>
                 </xsl:variable>
 
-                <xsl:variable name="suffix">
-                    <xsl:call-template name="suffix-matching-tag">
-                        <xsl:with-param name="tag" select="$tag"/>
+                <xsl:variable name="nameSuffix">
+                    <xsl:call-template name="get-name-suffix">
+                        <xsl:with-param name="isChild" select="$isChild" />
+                        <xsl:with-param name="childIdx" select="$childIdx" />
                     </xsl:call-template>
                 </xsl:variable>
-
                 <xsl:variable name="typeName">
-                    <xsl:call-template name="type-name-matching-tag">
-                        <xsl:with-param name="tag" select="$tag"/>
-                        <xsl:with-param name="isChild" select="$isChild"/>
-                        <xsl:with-param name="childNumber" select="$childIdx"/>
-                    </xsl:call-template>
-                </xsl:variable>
-
-                <xsl:variable name="ppvModule">
-                    <xsl:call-template name="ppvModule-matching-tag">
-                        <xsl:with-param name="tag" select="$tag"/>
-                    </xsl:call-template>
+                    <xsl:value-of select="concat($tag/typename, $nameSuffix)" />
                 </xsl:variable>
 
                 <xsl:call-template name="create-file-element">
-                    <xsl:with-param name="cdnCode" select="concat($playManifestPrefix, $relevantEntryId, $suffix)"/>
+                    <xsl:with-param name="cdnCode" select="concat($playManifestPrefix, $relevantEntryId, '/format/',$tag/format, '/tags/', $tag/tagname, '/protocol/',$tag/protocol,'/f/a.',$tag/extension)"/>
                     <xsl:with-param name="coGuid" select="$coGuid"/>
                     <xsl:with-param name="duration" select="$duration"/>
-                    <xsl:with-param name="ppvModule" select="$ppvModule"/>
+                    <xsl:with-param name="ppvModule" select="$tag/ppvmodule"/>
                     <xsl:with-param name="type" select="$typeName"/>
                 </xsl:call-template>
             </xsl:if>
@@ -579,104 +574,20 @@
             </xsl:attribute>
         </xsl:element>
     </xsl:template>
-    <!-- get the matching tag suffix - which is given as argument to this code -->
-    <xsl:template name="suffix-matching-tag">
-        <xsl:param name="tag"/>
-        <xsl:choose>
-            <xsl:when test="$tag = $ISM_TAG">
-                <xsl:value-of select="$CONST_ISM_MANIFEST_SUFFIX"/>
-            </xsl:when>
-            <xsl:when test="$tag = $MBR_TAG">
-                <xsl:value-of select="$CONST_MBR_MANIFEST_SUFFIX"/>
-            </xsl:when>
-            <xsl:when test="$tag = $IPHONE_TAG">
-                <xsl:value-of select="$CONST_IPHONENEW_MANIFEST_SUFFIX"/>
-            </xsl:when>
-            <xsl:when test="$tag = $IPAD_TAG">
-                <xsl:value-of select="$CONST_IPADNEW_MANIFEST_SUFFIX"/>
-            </xsl:when>
-            <xsl:when test="$tag = $DASH_TAG">
-                <xsl:value-of select="$CONST_DASH_MANIFEST_SUFFIX"/>
-            </xsl:when>
-            <xsl:when test="$tag = $WIDEVINE_TAG">
-                <xsl:value-of select="$CONST_WIDEVINE_MANIFEST_SUFFIX"/>
-            </xsl:when>
-            <xsl:when test="$tag = $WIDEVINE_MBR_TAG">
-                <xsl:value-of select="$CONST_WIDEVINE_MBR_MANIFEST_SUFFIX"/>
-            </xsl:when>
-        </xsl:choose>
-    </xsl:template>
-    <!-- get the matching tag ppvModule - which is given as argument to this code -->
-    <xsl:template name="ppvModule-matching-tag">
-        <xsl:param name="tag"/>
-        <xsl:choose>
-            <xsl:when test="$tag = $ISM_TAG">
-                <xsl:value-of select="$ismPpvModule"/>
-            </xsl:when>
-            <xsl:when test="$tag = $MBR_TAG">
-                <xsl:value-of select="$mbrPpvModule"/>
-            </xsl:when>
-            <xsl:when test="$tag = $IPHONE_TAG">
-                <xsl:value-of select="$iphonenewPpvModule"/>
-            </xsl:when>
-            <xsl:when test="$tag = $IPAD_TAG">
-                <xsl:value-of select="$ipadnewPpvModule"/>
-            </xsl:when>
-            <xsl:when test="$tag = $DASH_TAG">
-                <xsl:value-of select="$dashPpvModule"/>
-            </xsl:when>
-            <xsl:when test="$tag = $WIDEVINE_TAG">
-                <xsl:value-of select="$widevinePpvModule"/>
-            </xsl:when>
-            <xsl:when test="$tag = $WIDEVINE_MBR_TAG">
-                <xsl:value-of select="$widevineMbrPpvModule"/>
-            </xsl:when>
-        </xsl:choose>
-    </xsl:template>
-    <!-- get the matching tag file name - which is given as argument to this code -->
-    <xsl:template name="type-name-matching-tag">
-        <xsl:param name="tag"/>
-        <xsl:param name="isChild"/>
-        <xsl:param name="childNumber"/>
-        <xsl:variable name="configuredName">
-            <xsl:choose>
-                <xsl:when test="$tag = $ISM_TAG">
-                    <xsl:value-of select="$ismTypeName"/>
-                </xsl:when>
-                <xsl:when test="$tag = $MBR_TAG">
-                    <xsl:value-of select="$mbrTypeName"/>
-                </xsl:when>
-                <xsl:when test="$tag = $IPHONE_TAG">
-                    <xsl:value-of select="$iphonenewTypeName"/>
-                </xsl:when>
-                <xsl:when test="$tag = $IPAD_TAG">
-                    <xsl:value-of select="$ipadnewTypeName"/>
-                </xsl:when>
-                <xsl:when test="$tag = $DASH_TAG">
-                    <xsl:value-of select="$dashTypeName"/>
-                </xsl:when>
-                <xsl:when test="$tag = $WIDEVINE_TAG">
-                    <xsl:value-of select="$widevineTypeName"/>
-                </xsl:when>
-                <xsl:when test="$tag = $WIDEVINE_MBR_TAG">
-                    <xsl:value-of select="$widevineMbrTypeName"/>
-                </xsl:when>
-            </xsl:choose>
-        </xsl:variable>
-        <xsl:variable name="nameSuffix">
-            <xsl:if test="$isChild">
-                <xsl:variable name="trailerSuffix">
-                    <xsl:value-of select="concat(' ',$CONST_TRAILER_NAME)"/>
-                </xsl:variable>
-                <xsl:variable name="trailerIdxSuffix">
-                    <xsl:if test="(($childNumber > 1))">
-                        <xsl:value-of select="concat(' ',$childNumber)"/>
-                    </xsl:if>
-                </xsl:variable>
-                <xsl:value-of select="concat($trailerSuffix, $trailerIdxSuffix)"/>
-            </xsl:if>
-        </xsl:variable>
-        <xsl:value-of select="concat($configuredName, $nameSuffix)"/>
-    </xsl:template>
 
+    <xsl:template name="get-name-suffix">
+        <xsl:param name="isChild" select="false()"/>
+        <xsl:param name="childIdx" select="0"/>
+        <xsl:if test="$isChild">
+            <xsl:variable name="trailerSuffix">
+                <xsl:value-of select="concat(' ',$CONST_TRAILER_NAME)"/>
+            </xsl:variable>
+            <xsl:variable name="trailerIdxSuffix">
+                <xsl:if test="(($childIdx > 1))">
+                    <xsl:value-of select="concat(' ',$childIdx)"/>
+                </xsl:if>
+            </xsl:variable>
+            <xsl:value-of select="concat($trailerSuffix, $trailerIdxSuffix)"/>
+        </xsl:if>
+    </xsl:template>
 </xsl:stylesheet>
