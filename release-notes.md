@@ -1,4 +1,66 @@
+# Kajam-11.13.0 #
+
+## Entries are never ready ##
+
+ - Issue Type: Bug
+ - Issue ID: SUP-7477
+
+#### Configuration ####
+- None.
+
+#### Deployment scripts####
+
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2016_04_14_update_batch_service.php
+
+#### Known Issues & Limitations ####
+- None.
+
+## Sphinx Recording Schedule indexes ##
+- Issue Type: Feature Request
+- Issue ID: PLAT-5245
+
+#### Configuration ####
+- copy "index kaltura_schedule_event:kaltura_base" section from /opt/kaltura/app/configurations/sphinx/kaltura.conf.template
+to /opt/kaltura/app/configurations/sphinx/kaltura.conf
+modifiy path to appropriate directory.
+- restart sphinx service
+
+## Update comment_was_added_to_entry email notification ##
+
+ - Issue Type: Bug
+ - Issue ID: SUP-7709
+
+#### Configuration ####
+- None.
+
+#### Deployment scripts####
+
+	php /opt/kaltura/app/tests/standAloneClient/exec.php /opt/kaltura/app/deployment/updates/scripts/xml/updateCommentWasAddedToEntryEmailNotificationTemplateCode.xml
+
+#### Known Issues & Limitations ####
+- None.
+
 # Kajam-11.11.0 #
+
+## Automated Recording Schedule ##
+- Issue Type: Feature Request
+- Issue ID: PLAT-5245
+
+#### Configuration ####
+- None.
+
+#### Deployment Scripts ####
+	Update permissions: 
+		php deployment/updates/scripts/add_permissions/2016_03_28_add_schedule_permissions.php
+	
+	Install plugins:
+		php deployment/base/scripts/installPlugins.php
+	
+	Create new tables:
+		mysql -ukaltura -p -P3306 kaltura < deployment/updates/sql/2016_03_17_create_schedule_tables.sql
+
+#### Known Issues & Limitations ####
+- None.
 
 ## fix baseEntryFilter->referenceIdEqueal,referenceIdIn ##
 - Issue Type: Bug
@@ -13,7 +75,7 @@
 #### Known Issues & Limitations ####
 - None.
 
-## Allow media servre partner to list live entries ##
+## Allow media server partner to list live entries ##
 - Issue Type: Task
 - Issue ID: PLAT-5268
 

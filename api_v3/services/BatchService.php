@@ -107,8 +107,9 @@ class BatchService extends KalturaBatchService
 	 */
 	function countBulkUploadEntriesAction($bulkUploadJobId, $bulkUploadObjectType = KalturaBulkUploadObjectType::ENTRY)
 	{
-		$createdRecordsCount = BulkUploadResultPeer::countWithObjectTypeByBulkUploadId($bulkUploadJobId, $bulkUploadObjectType);
-		$errorRecordsCount = BulkUploadResultPeer::countErrorWithObjectTypeByBulkUploadId($bulkUploadJobId, $bulkUploadObjectType);
+		$coreBulkUploadObjectType = kPluginableEnumsManager::apiToCore('BulkUploadObjectType', $bulkUploadObjectType);
+		$createdRecordsCount = BulkUploadResultPeer::countWithObjectTypeByBulkUploadId($bulkUploadJobId, $coreBulkUploadObjectType);
+		$errorRecordsCount = BulkUploadResultPeer::countErrorWithObjectTypeByBulkUploadId($bulkUploadJobId, $coreBulkUploadObjectType);
 		
 		$res = array();
 		$created = new KalturaKeyValue();
@@ -558,5 +559,45 @@ class BatchService extends KalturaBatchService
 
 
 // --------------------------------- generic functions 	--------------------------------- //
+
+
+	/**
+	 * batch checkEntryIsDone Check weather a specified entry is done converting and changes it to ready.
+	 *
+	 * @action checkEntryIsDone
+	 * @param string $batchJobId The entry to check
+	 * @return bool
+	 * @throws KalturaAPIException
+	 */
+	function checkEntryIsDoneAction($batchJobId)
+	{
+		$ret_val = false;
+		$dbBatchJob = BatchJobPeer::retrieveByPK($batchJobId);
+
+		if (!$dbBatchJob)
+		{
+			throw new KalturaAPIException(KalturaErrors::INVALID_BATCHJOB_ID, $batchJobId);
+		}
+		$entry = $dbBatchJob->getEntry();
+		if (!$entry)
+		{
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $dbBatchJob->getEntryId());
+		}
+		if ($entry->getStatus() == entryStatus::PRECONVERT)
+		{
+			$flavorAssets = assetPeer::retrieveReadyFlavorsByEntryId($entry->getId());
+			if (!$flavorAssets || count($flavorAssets) == 0)
+			{
+				throw new KalturaAPIException(KalturaErrors::NO_FLAVORS_FOUND);
+			}
+			kBusinessPostConvertDL::handleConvertFinished($dbBatchJob, $flavorAssets[0]);
+			$entry = entryPeer::retrieveByPK($entry->getId());
+			if ($entry->getStatus() != entryStatus::PRECONVERT)
+			{
+				$ret_val = true;
+			}
+		}
+		return $ret_val;
+	}
 
 }

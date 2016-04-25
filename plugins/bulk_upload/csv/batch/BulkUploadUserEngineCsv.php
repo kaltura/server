@@ -20,7 +20,7 @@ class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
 		if (!$bulkUploadResult)
 			return;
 		
-		$bulkUploadResult->bulkUploadResultObjectType = KalturaBulkUploadResultObjectType::USER;		 
+		$bulkUploadResult->bulkUploadResultObjectType = KalturaBulkUploadObjectType::USER;		 
 				
 		// trim the values
 		array_walk($values, array('BulkUploadUserEngineCsv', 'trimArray'));

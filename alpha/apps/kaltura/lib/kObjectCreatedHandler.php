@@ -44,6 +44,10 @@ class kObjectCreatedHandler implements kObjectCreatedEventConsumer
 			$this->syncEntryEntitlementInfo($object, $liveEntry);
 			$this->syncCategoryEntries($object, $liveEntry);
 		}
+		if ($recordingOptions->getShouldCopyThumbnail())
+		{
+			$this->syncLiveEntryThumbnail ($object, $liveEntry);
+		}
 		
 		return true;
 	}
@@ -79,5 +83,17 @@ class kObjectCreatedHandler implements kObjectCreatedEventConsumer
 			$vodEntry->setEntitledPusersPublish($entitledPusersPublish);
 			
 		$vodEntry->save();
+	}
+	
+	protected function syncLiveEntryThumbnail (entry $object, LiveEntry $liveEntry)
+	{
+		//Get live entry thumbnails
+		$thumbAssetList = assetPeer::retrieveReadyThumbnailsByEntryId($liveEntry->getId());
+		
+		foreach ($thumbAssetList as $thumbAsset)
+		{
+			/* @var $thumbAsset thumbAsset */
+			$newThumbAsset = $thumbAsset->copyToEntry($object->getEntryId(), $liveEntry->getPartnerId());
+		}
 	}
 }

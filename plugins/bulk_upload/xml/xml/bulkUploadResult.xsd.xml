@@ -171,6 +171,16 @@
 					<xs:documentation>Entry scheduling end date.<br/>If not specified the entry will be available forever</xs:documentation>
 				</xs:annotation>
 			</xs:element>
+			<xs:element maxOccurs="1" minOccurs="0" name="templateEntryId" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>Template entry ID</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element maxOccurs="1" minOccurs="0" name="templateEntry" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>Template entry reference ID</xs:documentation>
+				</xs:annotation>
+			</xs:element>
 			<xs:choice maxOccurs="1" minOccurs="0">
 				<xs:element maxOccurs="1" minOccurs="1" ref="media">
 					<xs:annotation>
