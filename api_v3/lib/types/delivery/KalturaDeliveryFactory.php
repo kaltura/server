@@ -63,6 +63,8 @@ class KalturaDeliveryProfileFactory {
 				return new KalturaUrlTokenizerCloudFront();
 			case 'kBitGravityUrlTokenizer':
 				return new KalturaUrlTokenizerBitGravity();
+			case 'kVnptUrlTokenizer':
+				return new KalturaUrlTokenizerVnpt();
 			// Add other tokenizers here
 			default:
 				$apiObject = KalturaPluginManager::loadObject('KalturaTokenizer', $type);
