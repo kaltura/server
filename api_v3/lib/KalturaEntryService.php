@@ -1259,9 +1259,6 @@ class KalturaEntryService extends KalturaBaseService
 		// for new entry, puser ID is null - set it from service scope
 		if ($entry->userId === null)
 		{
-			if($dbEntry->getKuserId())
-				return;
-		
 			KalturaLog::debug("Set kuser id [" . $this->getKuser()->getId() . "] line [" . __LINE__ . "]");
 			$dbEntry->setPuserId($this->getKuser()->getPuserId());
 			$dbEntry->setKuserId($this->getKuser()->getId());
