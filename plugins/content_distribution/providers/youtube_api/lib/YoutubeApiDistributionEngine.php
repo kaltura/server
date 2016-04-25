@@ -272,7 +272,7 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 						$numOfTries++;
 						if ($numOfTries >= self::MAXIMUM_NUMBER_OF_UPLOAD_CHUNK_RETRY)
 						{
-							throw $e;
+							throw new kTemporaryException($e->getMessage(), $e->getCode());
 						}
 					}
 				}
