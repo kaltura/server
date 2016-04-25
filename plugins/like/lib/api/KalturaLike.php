@@ -8,8 +8,7 @@ class KalturaLike extends KalturaObject implements IRelatedFilterable
 	/**
 	 * The id of the entry that the like belongs to
 	 * @var string
-	 * @filter eq,in
-	 *
+	 * @filter eq
 	 */
 	public $entryId;
 	
