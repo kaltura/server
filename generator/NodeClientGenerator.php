@@ -443,6 +443,11 @@ class NodeClientGenerator extends ClientGeneratorFromXml
 			$serviceClassName = 'kaltura.services.Kaltura' . $this->upperCaseFirstLetter($serviceName) . 'Service';
 			$this->echoLine($this->mainClass, "	this.$serviceName = new $serviceClassName(this);");
 		}
+		foreach($configurationNodes as $configurationName => $configurationNode)
+		{
+			$attributeName = lcfirst($configurationName) . "Configuration";
+			$this->echoLine($this->mainClass, "	this.$attributeName = {};");
+		}
 		$this->echoLine($this->mainClass, "};");
 		
 		$volatileProperties = array();
