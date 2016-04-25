@@ -9,7 +9,8 @@ class LikeFilter extends baseObjectFilter
 	{
 		$this->fields = kArray::makeAssociativeDefaultValue ( array (
 			"_eq_entry_id",
-			"_eq_user_id"
+			"_eq_user_id",
+			"_in_entry_id",
 			) , NULL );
 
 		$this->allowed_order_fields = array (
