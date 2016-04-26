@@ -9,7 +9,7 @@
 - None.
  
 #### Deployment scripts####
-	php /opt/kaltura/app/deployment/updates/scripts/2016_04_05_migrate_tvinci_distribution_tags_to_be_dynamic.php <partner_id>
+	php /opt/kaltura/app/deployment/updates/scripts/2016_04_05_migrate_tvinci_distribution_tags_to_be_dynamic.php <partner_id> realrun
  
 #### Known Issues & Limitations ####
  - None.

@@ -10,6 +10,7 @@ if($argc != 2)
 }
 require_once (__DIR__ . '/../../bootstrap.php');
 $partnerId = $argv[1];
+$realRun = isset($argv[2]) && $argv[2] == 'realrun';
 
 
 $c = new Criteria();
