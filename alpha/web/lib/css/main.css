@@ -5840,15 +5840,28 @@ button.close {
   left: calc(50% - 65px);
   bottom: -22px;
   font-size: 16px;
-  padding: 10px 26px;
-  width: 130px; }
+  padding: 10px 26px; }
+  .btn-rounded.next-ad-label, .btn-rounded.next-ad-label:hover, .btn-rounded.next-ad-label:hover {
+    width: 200px;
+    left: calc(50% - 100px);
+    cursor: default;
+    background-color: #414141;
+    border-color: #414141;
+    color: #cccccc; }
+  .btn-rounded.insert-ad-btn {
+    width: 130px;
+    left: calc(50% - 65px); }
+
+.buttons-row {
+  bottom: -50px;
+  position: relative; }
 
 .videos-wrapper {
   background-color: #222;
   position: relative;
   padding-bottom: 50px;
   padding-top: 20px;
-  margin-bottom: 40px; }
+  margin-bottom: 60px; }
 
 .video-col {
   font-size: 18px; }
@@ -5880,16 +5893,18 @@ button.close {
   color: #999;
   margin-bottom: 25px; }
 
-.history-list {
+.list {
   margin: 0;
   padding: 0;
   margin-bottom: 50px;
   list-style: none; }
-  .history-list li {
+  .list li {
     padding: 16px 0;
     line-height: 24px;
     border-top: solid 2px #424242; }
-    .history-list li span {
+    .list li:last-child {
+      border-bottom: solid 2px #424242; }
+    .list li span {
       font-size: 15px;
       color: #999;
       margin-left: 20px; }
