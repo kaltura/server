@@ -20,7 +20,7 @@ class kVnptUrlTokenizer extends kUrlTokenizer
 	{
 		$tokenKey = $this->key;
 		$expiryTimeFrame = $this->window;
-		$tokenizationFormat = $this->tokenizationFormat;
+		$tokenizationFormat = $this->getTokenizationFormat();
 		
 
 		$clientIp = infraRequestUtils::getIpFromHttpHeader('HTTP_X_FORWARDED_FOR',false);
@@ -34,6 +34,7 @@ class kVnptUrlTokenizer extends kUrlTokenizer
 		switch($tokenizationFormat)
 		{
 			case self::HTTP_VOD_TOKEN_FORMAT:
+			default:
 				$tokenizationSuffix = $url;
 				break;
 			case self::VOD_LIVE_TOKEN_FORMAT:
