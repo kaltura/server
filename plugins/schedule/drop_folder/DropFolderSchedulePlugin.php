@@ -2,7 +2,7 @@
 /**
  * @package plugins.scheduleDropFolder
  */
-class DropFolderSchedulePlugin extends KalturaPlugin implements IKalturaEnumerator, IKalturaObjectLoader, IKalturaEventConsumers, IKalturaBulkUpload
+class DropFolderSchedulePlugin extends KalturaPlugin implements IKalturaEnumerator, IKalturaObjectLoader, IKalturaEventConsumers, IKalturaBulkUpload, IKalturaPending
 {
 	const PLUGIN_NAME = 'scheduleDropFolder';
 	const DROP_FOLDER_EVENTS_CONSUMER = 'kDropFolderICalEventsConsumer';
