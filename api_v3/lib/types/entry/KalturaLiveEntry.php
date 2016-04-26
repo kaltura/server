@@ -214,7 +214,7 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 	
 	protected function validateRecordedEntryId($sourceObject, $attr)
 	{
-		$resolvedAttrName = $this->getObjectPropertyName($resolvedAttrName);
+		$resolvedAttrName = $this->getObjectPropertyName($attr);
 		if(!$resolvedAttrName)
 			throw new KalturaAPIException(KalturaErrors::PROPERTY_IS_NOT_DEFINED, $attr, get_class($this));
 		
