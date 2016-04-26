@@ -57,32 +57,10 @@ class TvinciDistributionProfile extends ConfigurableDistributionProfile
 		    KalturaLog::err('Error getting field values from entry distribution id ['.$entryDistribution->getId().'] profile id ['.$this->getId().']');
 		    return $validationErrors;
 		}
-		$this->validateReferenceId($entryDistribution, $action, $validationErrors);
 
 		return $validationErrors;
 	}
 
-	/**
-	 * @param EntryDistribution $entryDistribution
-	 * @param $action
-	 * @param array $validationErrors
-	 * since entry distribution and entry are validated in the parent of validateForSubmission we will not add an error for them
-	 */
-	private function validateReferenceId(EntryDistribution $entryDistribution, $action, array &$validationErrors)
-	{
-
-		if ($entryDistribution && $entryDistribution->getEntryId() )
-		{
-			$entry = entryPeer::retrieveByPK($entryDistribution->getEntryId());
-			if ($entry && (!$entry->getReferenceID()))
-			{
-				$validationError = $this->createValidationError($action, DistributionErrorType::MISSING_METADATA, "Reference ID" , "is a mandatory field");
-				$validationError->setValidationErrorType(DistributionValidationErrorType::STRING_EMPTY);
-				$validationError->setValidationErrorParam("Reference ID is a mandatory field");
-				$validationErrors[] = $validationError;
-			}
-		}
-	}
 	public function getXsltFile()				{return $this->getFromCustomData(self::CUSTOM_DATA_XSLT);}
 	public function setXsltFile($v)				{$this->putInCustomData(self::CUSTOM_DATA_XSLT, $v);}
 
