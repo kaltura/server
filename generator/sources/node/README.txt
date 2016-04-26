@@ -2,8 +2,8 @@
 Compatible with Kaltura server version 10.20.0 and above.
 
 ## Very Basic sanity
-- Edit test.js and set partner_id, secret and service_url to match your ENV
-- Run node test.js
+- Edit tests/config.js and set partner_id, secret and service_url to match your ENV
+- Run node /tests/testme.js
 
 ## Code contributions
 
