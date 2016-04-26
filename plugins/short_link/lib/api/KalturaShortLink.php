@@ -6,7 +6,7 @@
 class KalturaShortLink extends KalturaObject implements IFilterable
 {
 	/**
-	 * @var int
+	 * @var string
 	 * @readonly
 	 * @filter eq,in
 	 */
