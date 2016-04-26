@@ -2,7 +2,7 @@
 
 $realrun = false;
 
-if($argc != 2)
+if($argc < 2)
 {
 	echo "Arguments missing.\n\n";
 	echo "Usage: php 2016_04_05_migrate_tvinci_distribution_tags_to_be_dynamic.php {partner id}\n";
@@ -10,8 +10,7 @@ if($argc != 2)
 }
 require_once (__DIR__ . '/../../bootstrap.php');
 $partnerId = $argv[1];
-$realRun = isset($argv[2]) && $argv[2] == 'realrun';
-
+$realrun = isset($argv[2]) && $argv[2] == 'realrun';
 
 $c = new Criteria();
 $c->add(DistributionProfilePeer::PARTNER_ID, $partnerId);
