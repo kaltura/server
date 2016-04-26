@@ -110,7 +110,13 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 				$tokenizer = $this->getTokenizer();
 				if ($tokenizer)
 				{
-					$url = $tokenizer->tokenizeSingleUrl($url, $this->getHostName());
+					$scheme = '';
+					if(!is_null($this->getDynamicAttributes()->getMediaProtocol()))
+						$scheme = $this->getDynamicAttributes()->getMediaProtocol()."://";
+
+					$hostName = $scheme.$this->getHostName();
+
+					$url = $tokenizer->tokenizeSingleUrl($url, $hostName);
 					kApiCache::disableCache();
 				}
 			}
