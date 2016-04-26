@@ -36,7 +36,7 @@ abstract class KalturaEntryServerNode extends KalturaObject implements IRelatedF
 	/**
 	 * @var time
 	 * @readonly
-	 * @filter order
+	 * @filter lte,gte,order
 	 */
 	public $createdAt;
 
