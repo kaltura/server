@@ -1,10 +1,10 @@
- var minus2_partner_id = -2;
- var minus2_secret = 'a16c33ec08a992f49996a611ddcd24ac';
- var minus2_admin_secret = 'a7feada5ebfaddc0494648b7f79ed3aa';
- var partner_id = 101;
- var secret = '9c9f8d1cbb6bab63f3ac8450fcdb33f7';
- var admin_secret = 'e068809c752fb5f311217eb3da3bc74d';
- var service_url = 'http://54.159.220.35/' ;
+ var minus2_partner_id = @MINUS_2_PARTNER_ID@;
+ var minus2_secret = @MINUS_2_PARTNER_SECRET@;
+ var minus2_admin_secret = @MINUS_2_PARTNER_ADMIN_SECRET@;
+ var partner_id = @TEST_PARTNER_ID@;
+ var secret = @TEST_PARTNER_SECRET@;
+ var admin_secret = @TEST_PARTNER_ADMIN_SECRET@;
+ var service_url = @HOST_URL@;
  var user_id = null;
 
  exports.minus2_partner_id = minus2_partner_id;
