@@ -11,6 +11,8 @@ abstract class KalturaObject implements IApiObject
 	 */
 	public $relatedObjects;
 	
+	private $purifyHtml = false;
+	
 	static protected $sourceFilesCache = array();
 	static protected $classPrivatesCache = array();
 	
@@ -532,6 +534,8 @@ abstract class KalturaObject implements IApiObject
 			{
 				if (! kXml::isXMLValidContent($value))
 					throw new KalturaAPIException ( KalturaErrors::INVALID_PARAMETER_CHAR, $this_prop );
+				else if($this->purifyHtml)
+					kHtmlPurifier::purify(get_class($object_to_fill), $object_prop, $value);
 			}
 			
 			$setter_callback = array ( $object_to_fill ,"set{$object_prop}");
@@ -546,15 +550,20 @@ abstract class KalturaObject implements IApiObject
 	public function toUpdatableObject ( $object_to_fill , $props_to_skip = array() )
 	{
 		$this->validateForUpdate($object_to_fill, $props_to_skip); // will check that not updatable properties are not set 
-		
-		return $this->toObject($object_to_fill, $props_to_skip);
+		$this->purifyHtml = true;
+		$retObj = $this->toObject($object_to_fill, $props_to_skip);
+		$this->purifyHtml = false;
+		return $retObj;
 	}
 	
 	public function toInsertableObject ( $object_to_fill = null , $props_to_skip = array() )
 	{
 		$this->validateForInsert($props_to_skip); // will check that not insertable properties are not set 
-		
-		return $this->toObject($object_to_fill, $props_to_skip);
+
+		$this->purifyHtml = true;
+		$retObj = $this->toObject($object_to_fill, $props_to_skip);
+		$this->purifyHtml = false;
+		return $retObj;
 	}
 	
 	public function validatePropertyNotNull($propertiesNames, $xor = false)
@@ -726,7 +735,6 @@ abstract class KalturaObject implements IApiObject
 						header($this->getDeclaringClassName($propertyName).'-'.$propertyName.' error: '.$e->getMessage());
 					}
 				}
-				$this->validateHtmlTags($className, $property);
 
 			}
 		}
@@ -758,7 +766,8 @@ abstract class KalturaObject implements IApiObject
 				if (is_callable($getter_callback))
             	{
                 	$value = call_user_func($getter_callback);
-                	if ($value === $this->$propertyName ||
+//                	if ($value === $this->$propertyName ||
+                	if (false && 
                 		// since propel instansiates database boolean values as integer
                 		// a casting shoud be done for values arriving as bool from the api  
                 		(is_bool($this->$propertyName) && $value === (int)$this->$propertyName)) {
@@ -782,27 +791,12 @@ abstract class KalturaObject implements IApiObject
 						header($this->getDeclaringClassName($propertyName).'-'.$propertyName.' error: '.$e->getMessage());
 					}
 				}
-				$this->validateHtmlTags($className, $property);
 			}
 		}
 		
 		return $updatableProperties;
 	}
-
-	/**
-	 * @param KalturaPropertyInfo $property
-	 */
-	public function validateHtmlTags( $className, $property )
-	{
-		if ( $property->getType() != 'string' )
-		{
-			return;
-		}
-		$propName = $property->getName();
-		$value = $this->$propName;
-		return kHtmlPurifier::purify($className, $propName, $value);
-	}
-	
+		
 	public function validateForUsage($sourceObject, $propertiesToSkip = array())
 	{
 		$useableProperties = array();
