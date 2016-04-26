@@ -1,0 +1,202 @@
+0 info it worked if it ends with ok
+1 verbose cli [ '/usr/bin/nodejs',
+1 verbose cli   '/usr/bin/npm',
+1 verbose cli   'install',
+1 verbose cli   'learnyounode',
+1 verbose cli   '-g' ]
+2 info using npm@1.4.21
+3 info using node@v0.10.29
+4 verbose cache add [ 'learnyounode', null ]
+5 verbose cache add name=undefined spec="learnyounode" args=["learnyounode",null]
+6 verbose parsed url { protocol: null,
+6 verbose parsed url   slashes: null,
+6 verbose parsed url   auth: null,
+6 verbose parsed url   host: null,
+6 verbose parsed url   port: null,
+6 verbose parsed url   hostname: null,
+6 verbose parsed url   hash: null,
+6 verbose parsed url   search: null,
+6 verbose parsed url   query: null,
+6 verbose parsed url   pathname: 'learnyounode',
+6 verbose parsed url   path: 'learnyounode',
+6 verbose parsed url   href: 'learnyounode' }
+7 silly lockFile 8d456d9f-learnyounode learnyounode
+8 verbose lock learnyounode /home/jess/.npm/8d456d9f-learnyounode.lock
+9 silly lockFile 8d456d9f-learnyounode learnyounode
+10 silly lockFile 8d456d9f-learnyounode learnyounode
+11 verbose addNamed [ 'learnyounode', '' ]
+12 verbose addNamed [ null, '*' ]
+13 silly lockFile a353de34-learnyounode learnyounode@
+14 verbose lock learnyounode@ /home/jess/.npm/a353de34-learnyounode.lock
+15 silly addNameRange { name: 'learnyounode', range: '*', hasData: false }
+16 verbose request where is /learnyounode
+17 verbose request registry https://registry.npmjs.org/
+18 verbose request id ab42981205dae939
+19 verbose url raw /learnyounode
+20 verbose url resolving [ 'https://registry.npmjs.org/', './learnyounode' ]
+21 verbose url resolved https://registry.npmjs.org/learnyounode
+22 verbose request where is https://registry.npmjs.org/learnyounode
+23 info trying registry request attempt 1 at 18:24:40
+24 verbose etag "3XX4PBZ60JPOWN5XNZQE41G2Y"
+25 http GET https://registry.npmjs.org/learnyounode
+26 http 304 https://registry.npmjs.org/learnyounode
+27 silly registry.get cb [ 304,
+27 silly registry.get   { date: 'Tue, 20 Jan 2015 16:24:40 GMT',
+27 silly registry.get     server: 'Apache',
+27 silly registry.get     via: '1.1 varnish',
+27 silly registry.get     'last-modified': 'Tue, 20 Jan 2015 16:24:41 GMT',
+27 silly registry.get     'cache-control': 'max-age=60',
+27 silly registry.get     etag: '"3XX4PBZ60JPOWN5XNZQE41G2Y"',
+27 silly registry.get     age: '0',
+27 silly registry.get     'x-served-by': 'cache-lhr6320-LHR',
+27 silly registry.get     'x-cache': 'HIT',
+27 silly registry.get     'x-cache-hits': '1',
+27 silly registry.get     'x-timer': 'S1421771080.717244,VS0,VE320',
+27 silly registry.get     vary: 'Accept',
+27 silly registry.get     'content-length': '0',
+27 silly registry.get     'keep-alive': 'timeout=10, max=50',
+27 silly registry.get     connection: 'Keep-Alive' } ]
+28 verbose etag https://registry.npmjs.org/learnyounode from cache
+29 silly addNameRange number 2 { name: 'learnyounode', range: '*', hasData: true }
+30 silly addNameRange versions [ 'learnyounode',
+30 silly addNameRange   [ '0.0.0',
+30 silly addNameRange     '0.0.1',
+30 silly addNameRange     '0.0.2',
+30 silly addNameRange     '0.0.3',
+30 silly addNameRange     '0.0.4',
+30 silly addNameRange     '0.0.5',
+30 silly addNameRange     '0.0.6',
+30 silly addNameRange     '0.0.7',
+30 silly addNameRange     '0.0.8',
+30 silly addNameRange     '0.0.9',
+30 silly addNameRange     '0.1.0',
+30 silly addNameRange     '0.1.1',
+30 silly addNameRange     '0.2.0',
+30 silly addNameRange     '0.2.1',
+30 silly addNameRange     '0.2.2',
+30 silly addNameRange     '0.2.3',
+30 silly addNameRange     '0.2.4',
+30 silly addNameRange     '0.2.5',
+30 silly addNameRange     '0.2.6',
+30 silly addNameRange     '0.2.7',
+30 silly addNameRange     '0.2.8',
+30 silly addNameRange     '0.2.9',
+30 silly addNameRange     '0.2.10',
+30 silly addNameRange     '0.2.11',
+30 silly addNameRange     '0.2.12',
+30 silly addNameRange     '0.2.13',
+30 silly addNameRange     '0.2.14',
+30 silly addNameRange     '0.2.15',
+30 silly addNameRange     '0.2.16',
+30 silly addNameRange     '0.2.16-mimbug',
+30 silly addNameRange     '0.3.0',
+30 silly addNameRange     '0.3.1',
+30 silly addNameRange     '0.3.2',
+30 silly addNameRange     '0.3.3',
+30 silly addNameRange     '0.4.0',
+30 silly addNameRange     '0.4.1',
+30 silly addNameRange     '1.0.0-alpha01',
+30 silly addNameRange     '1.0.0',
+30 silly addNameRange     '1.0.1',
+30 silly addNameRange     '1.0.2',
+30 silly addNameRange     '1.0.3',
+30 silly addNameRange     '1.0.4',
+30 silly addNameRange     '1.0.5',
+30 silly addNameRange     '1.0.6',
+30 silly addNameRange     '1.0.7',
+30 silly addNameRange     '2.0.0',
+30 silly addNameRange     '2.0.1',
+30 silly addNameRange     '2.1.0' ] ]
+31 verbose addNamed [ 'learnyounode', '2.1.0' ]
+32 verbose addNamed [ '2.1.0', '2.1.0' ]
+33 silly lockFile a126d75e-learnyounode-2-1-0 learnyounode@2.1.0
+34 verbose lock learnyounode@2.1.0 /home/jess/.npm/a126d75e-learnyounode-2-1-0.lock
+35 silly lockFile a126d75e-learnyounode-2-1-0 learnyounode@2.1.0
+36 silly lockFile a126d75e-learnyounode-2-1-0 learnyounode@2.1.0
+37 silly lockFile a353de34-learnyounode learnyounode@
+38 silly lockFile a353de34-learnyounode learnyounode@
+39 silly resolved [ { name: 'learnyounode',
+39 silly resolved     version: '2.1.0',
+39 silly resolved     description: 'Learn You The Node.js For Much Win! An intro to Node.js via a set of self-guided workshops.',
+39 silly resolved     author:
+39 silly resolved      { name: 'Rod Vagg',
+39 silly resolved        email: 'rod@vagg.org',
+39 silly resolved        url: 'https://github.com/rvagg' },
+39 silly resolved     contributors:
+39 silly resolved      [ [Object],
+39 silly resolved        [Object],
+39 silly resolved        [Object],
+39 silly resolved        [Object],
+39 silly resolved        [Object],
+39 silly resolved        [Object],
+39 silly resolved        [Object],
+39 silly resolved        [Object],
+39 silly resolved        [Object] ],
+39 silly resolved     repository:
+39 silly resolved      { type: 'git',
+39 silly resolved        url: 'https://github.com/cfsghost/learnyounode.git#tanslation-zh-tw' },
+39 silly resolved     license: 'MIT',
+39 silly resolved     dependencies:
+39 silly resolved      { after: '~0.8.1',
+39 silly resolved        bl: '~0.7.0',
+39 silly resolved        boganipsum: '~0.1.0',
+39 silly resolved        chalk: '~0.4.0',
+39 silly resolved        'colors-tmpl': '~0.1.0',
+39 silly resolved        'combined-stream': '~0.0.7',
+39 silly resolved        'concat-stream': '~1.4.1',
+39 silly resolved        duplexer: '~0.1.1',
+39 silly resolved        hyperquest: '~0.2.0',
+39 silly resolved        rimraf: '~2.2.6',
+39 silly resolved        through: '~2.3.4',
+39 silly resolved        through2: '~0.4.1',
+39 silly resolved        'through2-map': '~1.2.1',
+39 silly resolved        workshopper: '~2.1.1',
+39 silly resolved        'workshopper-boilerplate': '~0.0.1',
+39 silly resolved        'workshopper-exercise': '~2.1.0',
+39 silly resolved        'workshopper-wrappedexec': '~0.1.1' },
+39 silly resolved     bin: { learnyounode: './learnyounode.js' },
+39 silly resolved     preferGlobal: true,
+39 silly resolved     gitHead: '0228aa2699c2fbbdae0e41976606440879844024',
+39 silly resolved     bugs: { url: 'https://github.com/cfsghost/learnyounode/issues' },
+39 silly resolved     homepage: 'https://github.com/cfsghost/learnyounode',
+39 silly resolved     _id: 'learnyounode@2.1.0',
+39 silly resolved     scripts: {},
+39 silly resolved     _shasum: '52d5877f3b2382dc31dceffd081af415d8f3fcee',
+39 silly resolved     _from: 'learnyounode@',
+39 silly resolved     _npmVersion: '2.1.6',
+39 silly resolved     _nodeVersion: '0.10.33',
+39 silly resolved     _npmUser: { name: 'rvagg', email: 'rod@vagg.org' },
+39 silly resolved     maintainers: [ [Object] ],
+39 silly resolved     dist:
+39 silly resolved      { shasum: '52d5877f3b2382dc31dceffd081af415d8f3fcee',
+39 silly resolved        tarball: 'http://registry.npmjs.org/learnyounode/-/learnyounode-2.1.0.tgz' },
+39 silly resolved     directories: {},
+39 silly resolved     _resolved: 'https://registry.npmjs.org/learnyounode/-/learnyounode-2.1.0.tgz',
+39 silly resolved     readme: 'ERROR: No README data found!' } ]
+40 info install learnyounode@2.1.0 into /usr/local/lib
+41 info installOne learnyounode@2.1.0
+42 verbose lib/node_modules/learnyounode unbuild
+43 info preuninstall learnyounode@2.1.0
+44 info uninstall learnyounode@2.1.0
+45 verbose true,/usr/local/lib/node_modules,/usr/local/lib/node_modules unbuild learnyounode@2.1.0
+46 verbose /usr/local/bin,[object Object] binRoot
+47 verbose lib/node_modules/learnyounode unbuild
+48 info preuninstall learnyounode@2.1.0
+49 info uninstall learnyounode@2.1.0
+50 verbose true,/usr/local/lib/node_modules,/usr/local/lib/node_modules unbuild learnyounode@2.1.0
+51 verbose /usr/local/bin,[object Object] binRoot
+52 error error rolling back Error: EACCES, unlink '/usr/local/bin/learnyounode'
+52 error error rolling back  learnyounode@2.1.0 { [Error: EACCES, unlink '/usr/local/bin/learnyounode'] errno: 3, code: 'EACCES', path: '/usr/local/bin/learnyounode' }
+53 error Error: EACCES, unlink '/usr/local/bin/learnyounode'
+53 error  { [Error: EACCES, unlink '/usr/local/bin/learnyounode'] errno: 3, code: 'EACCES', path: '/usr/local/bin/learnyounode' }
+54 error Please try running this command again as root/Administrator.
+55 error System Linux 3.16.0-4-amd64
+56 error command "/usr/bin/nodejs" "/usr/bin/npm" "install" "learnyounode" "-g"
+57 error cwd /home/jess/projects/kaltura-generated-client-libs/KalturaGeneratedAPIClientsNodeJS/node/tests
+58 error node -v v0.10.29
+59 error npm -v 1.4.21
+60 error path /usr/local/bin/learnyounode
+61 error code EACCES
+62 error errno 3
+63 error stack Error: EACCES, unlink '/usr/local/bin/learnyounode'
+64 verbose exit [ 3, true ]
