@@ -21,8 +21,8 @@ class kCategoryEventHandler implements kObjectDeletedEventConsumer, kObjectCreat
 	protected function handleCategoryChanged (category $object, array $modifiedColumns)
 	{
 		$oldCustomDataValues = $object->getCustomDataOldValues();
-		$oldAggregationCategories = isset ($oldCustomDataValues[category::AGGREGATION_CATEGORIES]) ? explode ($oldCustomDataValues[category::AGGREGATION_CATEGORIES]): array();
-		$currentAggregationCategories = explode ($object->getAggregationCategories());
+		$oldAggregationCategories = isset ($oldCustomDataValues[category::AGGREGATION_CATEGORIES]) ? explode (',', $oldCustomDataValues[category::AGGREGATION_CATEGORIES]): array();
+		$currentAggregationCategories = explode (',', $object->getAggregationCategories());
 		
 		$aggregationCategoriesToAdd = array_diff($currentAggregationCategories, $oldCustomDataValues);
 		$this->addToAggregationCategories($object->getId(), $aggregationCategoriesToAdd);
