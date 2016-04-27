@@ -2,20 +2,15 @@
 ini_set("memory_limit","1024M");
 chdir(__DIR__.'/../');
 require_once(__DIR__ . '/../bootstrap.php');
-
 if ($argc < 3)
 {
     die ('Partner ID and From Date are REQUIRED.\n');
 }
-
 $partnerId = $argv[1];
 $fromDate = $argv[2];
 $realRun = isset($argv[3]) && ($argv[3] == 'true');
-
 $assets = getSourceFlavorAssetsWithNoExtensionPerPartner($partnerId,$fromDate);
 updateFlavorsFileSyncOnCurrentDC($assets,$realRun);
-
-
 function getSourceFlavorAssetsWithNoExtensionPerPartner($partnerId,$fromDate)
 {
     $c = new Criteria();
@@ -25,6 +20,20 @@ function getSourceFlavorAssetsWithNoExtensionPerPartner($partnerId,$fromDate)
     $c->add(assetPeer::IS_ORIGINAL, 1);
     $c->add(assetPeer::CREATED_AT, $fromDate,Criteria::GREATER_THAN);
     return assetPeer::doSelect($c);
+}
+
+function retrieveAllByFileSyncKey(FileSyncKey $key,$current_dc_only = false)
+{
+    $c = new Criteria();
+    $c->addAnd ( fileSyncPeer::OBJECT_ID , $key->object_id );
+    $c->addAnd ( fileSyncPeer::OBJECT_TYPE , $key->object_type );
+    $c->addAnd ( fileSyncPeer::OBJECT_SUB_TYPE , $key->object_sub_type );
+    $c->addAnd ( fileSyncPeer::VERSION , $key->version );
+
+    if($current_dc_only)
+        $c->add(fileSyncPeer::DC, kDataCenterMgr::getCurrentDcId());
+
+    return fileSyncPeer::doSelect($c);
 }
 
 function getExtensionByContainerFormat($containerFormat)
@@ -46,44 +55,33 @@ function getExtensionByContainerFormat($containerFormat)
             return null;
     }
 }
-
 function updateFlavorsFileSyncOnCurrentDC($assets,$realRun)
 {
-
     if(!count($assets))
     {
         KalturaLog::debug('ERROR: Could not find flavors with no extensions for partner');
         return;
     }
-
     KalturaLog::debug('Going to update '.count($assets).' flavor assets');
-
     $updatedSuccessfully = 0;
-
     foreach ($assets as $dbAsset) {
-
         $flavorId = $dbAsset->getID();
         $flavorContainerFormat = $dbAsset->getContainerFormat();
-
         $ext = getExtensionByContainerFormat($flavorContainerFormat);
         if (is_null($ext))
         {
             KalturaLog::debug('ERROR: Cannot update flavor [' . $flavorId . '], Please update container_format [' . $flavorContainerFormat . '] matching extension in script');
             continue;
         }
-
         $fileSyncKey = $dbAsset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
         FileSyncPeer::setUseCriteriaFilter(false);
-        $fileSyncs = FileSyncPeer::retrieveAllByFileSyncKey($fileSyncKey,true);
+        $fileSyncs = retrieveAllByFileSyncKey($fileSyncKey,true);
         FileSyncPeer::setUseCriteriaFilter(true);
-
         foreach ($fileSyncs as $fileSync) {
             $oldFileSyncFilePath = str_replace("//","/",$fileSync->getFullPath());
             $newFileSyncFilePath = $oldFileSyncFilePath . "." . $ext;
             $fileSyncFilePath = $fileSync->getFilePath();
-
             KalturaLog::debug('Going to move file from [' . $oldFileSyncFilePath . '] to [' . $newFileSyncFilePath . ']');
-
             if ($realRun)
             {
                 if(!rename($oldFileSyncFilePath, $newFileSyncFilePath))
@@ -93,9 +91,7 @@ function updateFlavorsFileSyncOnCurrentDC($assets,$realRun)
                     continue;
                 }
             }
-
             KalturaLog::debug('Going to set file_sync [' . $fileSync->getId() . '] with file_path [' . $fileSyncFilePath . '.' . $ext . ']');
-
             if ($realRun) {
                 try {
                     $fileSync->setFilePath($fileSyncFilePath . "." . $ext);
@@ -107,11 +103,7 @@ function updateFlavorsFileSyncOnCurrentDC($assets,$realRun)
                 }
             }
         }
-
         $updatedSuccessfully++;
     }
-
     KalturaLog::debug('DONE - updated successfully '.$updatedSuccessfully.' flavor assets');
 }
-
-
