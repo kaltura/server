@@ -91,7 +91,7 @@ class KalturaScheduleEventResource extends KalturaObject implements IRelatedFilt
 	/* (non-PHPdoc)
 	 * @see KalturaObject::toObject($object_to_fill, $props_to_skip)
 	 */
-	public function toObject($sourceObject, $propertiesToSkip = array())
+	public function toObject($sourceObject = null, $propertiesToSkip = array())
 	{
 		if(!$sourceObject)
 		{
