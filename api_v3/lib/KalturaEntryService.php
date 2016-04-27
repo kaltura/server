@@ -966,7 +966,8 @@ class KalturaEntryService extends KalturaBaseService
 		if(!$templateEntryId)
 		{
 			$conversionProfile = myPartnerUtils::getConversionProfile2ForPartner($this->getPartnerId(), $conversionProfileId);
-			$templateEntryId = $conversionProfile->getDefaultEntryId();
+			if($conversionProfile)
+				$templateEntryId = $conversionProfile->getDefaultEntryId();
 		}
 		
 		if($templateEntryId)
