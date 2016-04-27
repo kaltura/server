@@ -278,15 +278,27 @@ class KDLOperatorFfmpeg2_1_3 extends KDLOperatorFfmpeg1_1_1 {
 			 * Scan for preset fields
 			 */
 			$params = array();
-			foreach($vid->_subtitlesData as $k=>$v) {
+			foreach($vid->_subtitlesData as $k=>$fld) {
+				if(!isset($fld))
+					continue;
 				switch($k){
 					case "filename":
 					case "original_size":
 					case "fontsdir":
 					case "charenc":
+						$params[] = "$k=$fld";
+						break;
 					case "force_style":
-						if(isset($v))
-							$params[] = "$k=$v";
+							/*
+							 * Style fields require backslash separator to avoid ffmpeg filter detection ambiguity
+							 * It might be fixed in the future ffmpeg versions.
+							 * Sample style json - {"Alignment":1,"FontSize":20,"MarginL":65}}
+							 */ 
+						$styleArr = array();
+						foreach ($fld as $kStl=>$style){
+							$styleArr[] = "$kStl=$style";
+						}
+						$params[] = "$k=".implode('\,', $styleArr);
 						break;
 				}
 			}
