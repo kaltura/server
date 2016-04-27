@@ -31,6 +31,8 @@ class category extends Basecategory implements IIndexable, IRelatedObject
 	
 	const AGGREGATION_CATEGORIES = 'aggregationCategories';
 	
+	const PUBLISHING_CATEGORIES = 'publishingCategories';
+	
 	const FULL_NAME_EQUAL_MATCH_STRING = 'fullnameequalmatchstring';
 	
 	const FULL_IDS_EQUAL_MATCH_STRING = 'fullidsequalmatchstring';
@@ -67,6 +69,13 @@ class category extends Basecategory implements IIndexable, IRelatedObject
 	public function getAggregationCategories() {
 		return $this->getFromCustomData(self::AGGREGATION_CATEGORIES, null, "");
 	}
+	
+	/**
+	 * @return string
+	 */
+	public function getPublishingCategories () {
+		return $this->getFromCustomData(self::PUBLISHING_CATEGORIES, null, "");
+	}
 
 	/**
 	 * @param bool $v
@@ -80,6 +89,10 @@ class category extends Basecategory implements IIndexable, IRelatedObject
 	 */
 	public function setAggregationCategories($value) {
 		$this->putInCustomData(self::AGGREGATION_CATEGORIES, $value);
+	}
+	
+	public function setPublishingCategories ($value) {
+		$this->putInCustomData(self::PUBLISHING_CATEGORIES, $value);
 	}
 
 	public function save(PropelPDO $con = null)

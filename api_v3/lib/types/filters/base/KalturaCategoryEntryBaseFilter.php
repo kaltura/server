@@ -10,7 +10,6 @@ abstract class KalturaCategoryEntryBaseFilter extends KalturaRelatedFilter
 	(
 		"categoryIdEqual" => "_eq_category_id",
 		"categoryIdIn" => "_in_category_id",
-		"categoryIdNotIn" => "_notin_category_id",
 		"entryIdEqual" => "_eq_entry_id",
 		"entryIdIn" => "_in_entry_id",
 		"createdAtGreaterThanOrEqual" => "_gte_created_at",
@@ -45,11 +44,6 @@ abstract class KalturaCategoryEntryBaseFilter extends KalturaRelatedFilter
 	 * @var string
 	 */
 	public $categoryIdIn;
-
-	/**
-	 * @var string
-	 */
-	public $categoryIdNotIn;
 
 	/**
 	 * @var string

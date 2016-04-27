@@ -8,7 +8,7 @@ class KalturaCategoryEntry extends KalturaObject implements IRelatedFilterable
 	/**
 	 * 
 	 * @var int
-	 * @filter eq,in,notin
+	 * @filter eq,in
 	 */
 	public $categoryId;
 	

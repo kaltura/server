@@ -12,10 +12,48 @@ class kCategoryEventHandler implements kObjectDeletedEventConsumer, kObjectCreat
 		
 		if ($object instanceof category)
 		{
-			
+			$this->handleCategoryChanged($object, $modifiedColumns);
 		}
 		
 		return true;
+	}
+	
+	protected function handleCategoryChanged (category $object, array $modifiedColumns)
+	{
+		$oldCustomDataValues = $object->getCustomDataOldValues();
+		$oldAggregationCategories = explode ($oldCustomDataValues[category::AGGREGATION_CATEGORIES]);
+		$currentAggregationCategories = explode ($object->getAggregationCategories());
+		
+		$aggregationCategoriesToAdd = array_diff($currentAggregationCategories, $oldCustomDataValues);
+		$this->addToAggregationCategories($object->getId(), $aggregationCategoriesToAdd);
+		
+		KalturaLog::info ("Copying entries from category ID [" . $object->getId() . "] to aggregation channels: " . print_r($aggregationCategoriesToAdd, true));
+		foreach ($aggregationCategoriesToAdd as $aggregationCategoryIdToAdd)
+		{
+			$this->addCopyJobToAggregationChannel($object, $aggregationCategoryIdToAdd);
+		}
+		
+		$aggregationCategoriesToRemove = array_diff ($oldCustomDataValues, $currentAggregationCategories);
+		
+		$this->deleteFromAggregationChannels ($object->getId(), $aggregationCategoriesToRemove);
+		KalturaLog::info ("Removing entries from category ID [" . $object->getId() . "] to aggregation channels: " . print_r($aggregationCategoriesToRemove, true));
+		foreach ($aggregationCategoriesToRemove as $aggregationCategoryIdToRemove)
+		{
+			$this->addDeleteJobFromAggregationChannel($object, $aggregationCategoryIdToAdd);
+		}
+	}
+	
+	protected function deleteFromAggregationChannels ($categoryId, array $aggregationCatIds)
+	{
+		$aggregationCategories = categoryPeer::retrieveByPKs($aggregationCatIds);
+		foreach ($aggregationCategories as $aggregationCategory)
+		{
+			/* @var $aggregationCategory category */
+			$currentPublishingCategories = explode (',', $aggregationCategory->getPublishingCategories());
+			$currentPublishingCategories = array_diff($currentPublishingCategories, array ($categoryId));
+			$aggregationCategory->setPublishingCategories(implode(',', $currentPublishingCategories));
+			$aggregationCategory->save();
+		}
 	}
 
 	/* (non-PHPdoc)
@@ -61,7 +99,43 @@ class kCategoryEventHandler implements kObjectDeletedEventConsumer, kObjectCreat
 	
 	protected function handleCategoryCreated (category $object)
 	{
-		//Start Job
+		if (!$object->getAggregationCategories())
+		{
+			KalturaLog::info ("Category [" . $object->getId() . "] has no aggregation channels" );
+			return true;
+		}
+		
+		$this->addToAggregationCategories($object->getId(), explode (',', $object->getAggregationCategories()));
+		
+		$aggregationCategories = explode (',', $object->getAggregationCategories());
+		foreach ($aggregationCategories as $aggregationCategoryId)
+		{
+			$this->addCopyJobToAggregationChannel($object, $aggregationCategoryId);
+		}
+	}
+	
+	protected function addCopyJobToAggregationChannel (category $object, $aggregationCategoryId)
+	{
+		$templateObject = new categoryEntry();
+		$templateObject->setCategoryId($aggregationCategoryId);
+		
+		$filter = new categoryEntryFilter();
+		$filter->set("_eq_category_id", $object->getId());
+		kJobsManager::addCopyJob($object->getPartnerId(), CopyObjectType::CATEGORY_ENTRY, $filter, $templateObject);
+	}
+	
+	protected function addToAggregationCategories ($categoryId, array $aggregationCatIds)
+	{
+		$aggregationCategories = categoryPeer::retrieveByPKs($aggregationCatIds);
+		foreach ($aggregationCategories as $aggregationCategory)
+		{
+			/* @var $aggregationCategory category */
+			$currentPublishingCategories = explode (',', $aggregationCategory->getPublishingCategories());
+			$currentPublishingCategories[] = $categoryId;
+			$currentPublishingCategories = array_unique($currentPublishingCategories);
+			$aggregationCategory->setPublishingCategories(implode(',', $currentPublishingCategories));
+			$aggregationCategory->save();
+		}
 	}
 	
 	protected function handleCategoryEntryCreated (categoryEntry $object)
@@ -126,7 +200,17 @@ class kCategoryEventHandler implements kObjectDeletedEventConsumer, kObjectCreat
 			$this->handleCategoryEntryDeleted ($object);
 		}
 		
+		if ($object instanceof category)
+		{
+			$this->handleCategoryDeleted($object);
+		}
+		
 		return true;
+	}
+	
+	protected function handleCategoryDeleted (category $object)
+	{
+		//START JOB
 	}
 	
 	protected function handleCategoryEntryDeleted (categoryEntry $object)
