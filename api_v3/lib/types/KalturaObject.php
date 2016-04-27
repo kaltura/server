@@ -766,8 +766,7 @@ abstract class KalturaObject implements IApiObject
 				if (is_callable($getter_callback))
             	{
                 	$value = call_user_func($getter_callback);
-//                	if ($value === $this->$propertyName ||
-                	if (false && 
+                	if ($value === $this->$propertyName ||
                 		// since propel instansiates database boolean values as integer
                 		// a casting shoud be done for values arriving as bool from the api  
                 		(is_bool($this->$propertyName) && $value === (int)$this->$propertyName)) {
