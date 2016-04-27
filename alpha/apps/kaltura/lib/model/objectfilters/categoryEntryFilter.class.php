@@ -12,6 +12,7 @@ class categoryEntryFilter extends baseObjectFilter
 		$this->fields = kArray::makeAssociativeDefaultValue ( array (
 			"_eq_category_id",
 			"_in_category_id",
+			"_notin_category_id",
 			"_eq_entry_id",
 			"_in_entry_id",
 			"_gte_created_at",
