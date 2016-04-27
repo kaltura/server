@@ -144,7 +144,7 @@ class kCategoryEventHandler implements kObjectDeletedEventConsumer, kObjectCreat
 			return true;
 		}
 		
-		$aggregationCategories = explode (',', $aggregationCategories);
+		$aggregationCategories = explode (',', $category->getAggregationCategories());
 		
 		//List all entry's ACTIVE categoryEntry objects
 		$activeCategoryEntries = categoryEntryPeer::retrieveActiveByEntryId($object->getEntryId());
