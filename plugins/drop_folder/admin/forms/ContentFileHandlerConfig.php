@@ -28,6 +28,12 @@ class Form_ContentFileHandlerConfig extends Form_BaseFileHandlerConfig
 			
 		if (isset ($object->fileHandlerConfig1['enforceEntitlement']))
 			$object->enforceEntitlement = $object->fileHandlerConfig1['enforceEntitlement'];
+
+		if (isset ($object->fileHandlerConfig1['contentMatchPolicy']))
+			$object->fileHandlerConfig->contentMatchPolicy = $object->fileHandlerConfig1['contentMatchPolicy'];
+
+		if (isset ($object->fileHandlerConfig1['slugRegex']))
+			$object->fileHandlerConfig->slugRegex = $object->fileHandlerConfig1['slugRegex'];
 	}
 	
 	/**
