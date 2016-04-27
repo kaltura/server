@@ -281,6 +281,20 @@ class KalturaCategory extends KalturaObject implements IRelatedFilterable
 	 */
 	public $pendingEntriesCount;
 	
+	/**
+	 * Flag indicating that the category is an aggregation category 
+	 *  @var KalturaNullableBoolean
+	  * @requiresPermission all
+	 */
+	public $isAggregationCategory;
+	
+	/**
+	 * List of aggregation channels the category belongs to
+	 * @var string
+	 * @requiresPermission all
+	 */
+	public $aggregationChannels;
+	
 	private static $mapBetweenObjects = array
 	(
 		"id",
@@ -316,6 +330,8 @@ class KalturaCategory extends KalturaObject implements IRelatedFilterable
 		"directSubCategoriesCount",
 		"moderation",
 		"pendingEntriesCount",
+		"isAggregationCategory",
+		"aggregationChannels",
 	);
 	
 	/* (non-PHPdoc)
