@@ -3,7 +3,7 @@
  * Enable caption assets management for entry objects
  * @package plugins.caption
  */
-class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPermissions, IKalturaEnumerator, IKalturaObjectLoader, IKalturaApplicationPartialView, IKalturaConfigurator, IKalturaSchemaContributor, IKalturaMrssContributor, IKalturaPlayManifestContributor, IKalturaEventConsumers
+class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPermissions, IKalturaEnumerator, IKalturaObjectLoader, IKalturaApplicationPartialView, IKalturaConfigurator, IKalturaSchemaContributor, IKalturaMrssContributor, IKalturaPlayManifestContributor, IKalturaEventConsumers,IKalturaTypeExtender
 {
 	const PLUGIN_NAME = 'caption';
 	const KS_PRIVILEGE_CAPTION = 'caption';
@@ -528,4 +528,25 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 		
 		return $contributors;
 	}
+
+	/* (non-PHPdoc)
+	 * @see IKalturaTypeExtender::getExtendedTypes()
+	 */
+	public static function getExtendedTypes($baseClass, $enumValue) {
+		$supportedBaseClasses = array(
+			assetPeer::OM_CLASS,
+			assetParamsPeer::OM_CLASS,
+			assetParamsOutputPeer::OM_CLASS,
+		);
+
+		if(in_array($baseClass, $supportedBaseClasses) && $enumValue == assetType::FLAVOR)
+		{
+			return array(
+				CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION),
+			);
+		}
+
+		return null;
+	}
+
 }
