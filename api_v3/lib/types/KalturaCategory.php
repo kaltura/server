@@ -526,6 +526,20 @@ class KalturaCategory extends KalturaObject implements IRelatedFilterable
 			{
 				throw new KalturaAPIException(KalturaErrors::AGGREGATION_CATEGORY_CANNOT_BE_ASSOCIATED_WITH_OTHER_AGGREGATION_CATEGORIES);
 			}
+			
+		if ($this->aggregationCategories)
+		{
+			$aggrCatIdsToCheck = explode (',' , $this->aggregationCategories);
+			$agrrCatsToCheck = categoryPeer::retrieveByPKs($aggrCatIdsToCheck);
+			foreach ($agrrCatsToCheck as $aggrCat)
+			{
+				/* @var $aggrCat category */
+				if (!$aggrCat->getIsAggregationCategory())
+				{
+					throw new KalturaAPIException(KalturaErrors::AGGREGATION_CATEGORY_CANNOT_BE_ASSOCIATED_WITH_OTHER_AGGREGATION_CATEGORIES);
+				}
+			}
+		}
 		
 	}
 	
