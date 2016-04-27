@@ -326,6 +326,8 @@ class KalturaErrors extends APIErrors
 	
 	const CANNOT_SET_MULTI_PRIVACY_CONTEXT = "CANNOT_SET_MULTI_PRIVACY_CONTEXT;; Cannot set multiple privacy context when Disable Category Limit feature is turned on";
 
+	const AGGREGATION_CATEGORY_CANNOT_BE_ASSOCIATED_WITH_OTHER_AGGREGATION_CATEGORIES = "AGGREGATION_CATEGORY_CANNOT_BE_ASSOCIATED_WITH_OTHER_AGGREGATION_CATEGORIES;; Cannot set the aggregationCategories property when category is aggregation category";
+	
 	/**
 	 * Batch Service
 	 */

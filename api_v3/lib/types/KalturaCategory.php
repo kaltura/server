@@ -520,6 +520,13 @@ class KalturaCategory extends KalturaObject implements IRelatedFilterable
 			kuserPeer::createKuserForPartner($partnerId, $this->owner);
 		}
 		
+		if (($this->isAggregationCategory && $this->aggregationCategories) ||
+			($this->isAggregationCategory && $sourceObject && $sourceObject->getAggregationCategories()) ||
+			($this->aggregationCategories && $sourceObject && $sourceObject->getIsAggregationCategory()))
+			{
+				throw new KalturaAPIException(KalturaErrors::AGGREGATION_CATEGORY_CANNOT_BE_ASSOCIATED_WITH_OTHER_AGGREGATION_CATEGORIES);
+			}
+		
 	}
 	
 	/* (non-PHPdoc)
@@ -560,7 +567,6 @@ class KalturaCategory extends KalturaObject implements IRelatedFilterable
 	public function toObject($object_to_fill = null, $props_to_skip = array())
 	{
 		$this->trimStringProperties(array("name"));
-		
 		return parent::toObject($object_to_fill, $props_to_skip);
 	}	
 }
