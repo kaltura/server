@@ -284,14 +284,12 @@ class KalturaCategory extends KalturaObject implements IRelatedFilterable
 	/**
 	 * Flag indicating that the category is an aggregation category 
 	 *  @var KalturaNullableBoolean
-	  * @requiresPermission all
 	 */
 	public $isAggregationCategory;
 	
 	/**
 	 * List of aggregation channels the category belongs to
 	 * @var string
-	 * @requiresPermission all
 	 */
 	public $aggregationChannels;
 	
