@@ -524,19 +524,18 @@ class KalturaCategory extends KalturaObject implements IRelatedFilterable
 			($this->isAggregationCategory && $sourceObject && $sourceObject->getAggregationCategories()) ||
 			($this->aggregationCategories && $sourceObject && $sourceObject->getIsAggregationCategory()))
 			{
-				throw new KalturaAPIException(KalturaErrors::AGGREGATION_CATEGORY_CANNOT_BE_ASSOCIATED_WITH_OTHER_AGGREGATION_CATEGORIES);
+				throw new KalturaAPIException(KalturaErrors::AGGREGATION_CATEGORY_WRONG_ASSOCIATION);
 			}
 			
 		if ($this->aggregationCategories)
 		{
 			$aggrCatIdsToCheck = explode (',' , $this->aggregationCategories);
-			$agrrCatsToCheck = categoryPeer::retrieveByPKs($aggrCatIdsToCheck);
-			foreach ($agrrCatsToCheck as $aggrCat)
+			foreach ($aggrCatIdsToCheck as $aggrCatIdToCheck)
 			{
-				/* @var $aggrCat category */
-				if (!$aggrCat->getIsAggregationCategory())
+				$agrrCat = categoryPeer::retrieveByPK($aggrCatIdToCheck);
+				if (!$agrrCat || !$agrrCat->getIsAggregationCategory())
 				{
-					throw new KalturaAPIException(KalturaErrors::AGGREGATION_CATEGORY_CANNOT_BE_ASSOCIATED_WITH_OTHER_AGGREGATION_CATEGORIES);
+					throw new KalturaAPIException(KalturaErrors::AGGREGATION_CATEGORY_WRONG_ASSOCIATION);
 				}
 			}
 		}
