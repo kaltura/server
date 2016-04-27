@@ -291,7 +291,7 @@ class KalturaCategory extends KalturaObject implements IRelatedFilterable
 	 * List of aggregation channels the category belongs to
 	 * @var string
 	 */
-	public $aggregationChannels;
+	public $aggregationCategories;
 	
 	private static $mapBetweenObjects = array
 	(
@@ -329,7 +329,7 @@ class KalturaCategory extends KalturaObject implements IRelatedFilterable
 		"moderation",
 		"pendingEntriesCount",
 		"isAggregationCategory",
-		"aggregationChannels",
+		"aggregationCategories",
 	);
 	
 	/* (non-PHPdoc)
