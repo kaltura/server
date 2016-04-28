@@ -31,21 +31,31 @@ class kCategoryEventHandler implements kObjectDeletedEventConsumer, kObjectCreat
 		$aggregationCategoriesToRemove = array_diff ($oldAggregationCategories, $currentAggregationCategories);
 		
 		KalturaLog::info ("Removing entries from category ID [" . $object->getId() . "] to aggregation channels: " . print_r($aggregationCategoriesToRemove, true));
-		$this->deleteFromAggregationChannels ($object->getId(), $aggregationCategoriesToRemove);
+		$this->deleteFromAggregationChannels ($object, $aggregationCategoriesToRemove);
 		
 	}
 	
-	protected function deleteFromAggregationChannels ($categoryId, array $aggregationCatIds)
+	protected function deleteFromAggregationChannels (category $object, array $aggregationCatIds)
 	{
 		$aggregationCategories = categoryPeer::retrieveByPKs($aggregationCatIds);
 		foreach ($aggregationCategories as $aggregationCategory)
 		{
 			/* @var $aggregationCategory category */
 			$currentPublishingCategories = explode (',', $aggregationCategory->getPublishingCategories());
-			$currentPublishingCategories = array_diff($currentPublishingCategories, array ($categoryId));
+			$currentPublishingCategories = array_diff($currentPublishingCategories, array ($object->getId()));
 			$aggregationCategory->setPublishingCategories(implode(',', $currentPublishingCategories));
 			$aggregationCategory->save();
+			
+			$this->addDeleteAggregationCategoryEntryJob ($object, $aggregationCategory);
 		}
+	}
+	
+	protected function addDeleteAggregationCategoryEntryJob (category $object, category $aggregationCategory)
+	{
+		$filter = new entryFilter();
+		$filter->set("_matchand_categories_ids", $object->getId().','.$aggregationCategory->getId());
+		$filter->set ("_notcontains_categories_ids", $aggregationCategory->getPublishingCategories());
+		kJobsManager::addDeleteJob($object->getPartnerId(), DeleteObjectType::CATEGORY_ENTRY_AGGREGATION, $filter);
 	}
 
 	/* (non-PHPdoc)
@@ -200,7 +210,13 @@ class kCategoryEventHandler implements kObjectDeletedEventConsumer, kObjectCreat
 	
 	protected function handleCategoryDeleted (category $object)
 	{
-		//START JOB
+		if (!$object->getAggregationCategories())
+		{
+			KalturaLog::info ("Category [" . $object->getId() . "] has no aggregation channels" );
+			return true;
+		}
+		
+		$this->deleteFromAggregationChannels($object, explode (',', $object->getAggregationCategories()));
 	}
 	
 	protected function handleCategoryEntryDeleted (categoryEntry $object)
