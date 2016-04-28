@@ -26,7 +26,7 @@ class kCategoryEventHandler implements kObjectDeletedEventConsumer, kObjectCreat
 		
 		$aggregationCategoriesToAdd = array_diff($currentAggregationCategories, $oldAggregationCategories);
 		KalturaLog::info ("Copying entries from category ID [" . $object->getId() . "] to aggregation channels: " . print_r($aggregationCategoriesToAdd, true));
-		$this->addToAggregationCategories($object->getId(), $aggregationCategoriesToAdd);
+		$this->addToAggregationCategories($object, $aggregationCategoriesToAdd);
 		
 		$aggregationCategoriesToRemove = array_diff ($oldAggregationCategories, $currentAggregationCategories);
 		
@@ -99,7 +99,7 @@ class kCategoryEventHandler implements kObjectDeletedEventConsumer, kObjectCreat
 			return true;
 		}
 		
-		$this->addToAggregationCategories($object->getId(), explode (',', $object->getAggregationCategories()));
+		$this->addToAggregationCategories($object, explode (',', $object->getAggregationCategories()));
 	}
 	
 	protected function addCopyJobToAggregationChannel (category $object, $aggregationCategoryId)
