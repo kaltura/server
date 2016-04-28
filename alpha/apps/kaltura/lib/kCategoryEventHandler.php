@@ -21,26 +21,18 @@ class kCategoryEventHandler implements kObjectDeletedEventConsumer, kObjectCreat
 	protected function handleCategoryChanged (category $object, array $modifiedColumns)
 	{
 		$oldCustomDataValues = $object->getCustomDataOldValues();
-		$oldAggregationCategories = isset ($oldCustomDataValues[category::AGGREGATION_CATEGORIES]) ? explode (',', $oldCustomDataValues[category::AGGREGATION_CATEGORIES]): array();
+		$oldAggregationCategories = isset ($oldCustomDataValues[''][category::AGGREGATION_CATEGORIES]) ? explode (',', $oldCustomDataValues[''][category::AGGREGATION_CATEGORIES]): array();
 		$currentAggregationCategories = explode (',', $object->getAggregationCategories());
 		
-		$aggregationCategoriesToAdd = array_diff($currentAggregationCategories, $oldCustomDataValues);
+		$aggregationCategoriesToAdd = array_diff($currentAggregationCategories, $oldAggregationCategories);
+		KalturaLog::info ("Copying entries from category ID [" . $object->getId() . "] to aggregation channels: " . print_r($aggregationCategoriesToAdd, true));
 		$this->addToAggregationCategories($object->getId(), $aggregationCategoriesToAdd);
 		
-		KalturaLog::info ("Copying entries from category ID [" . $object->getId() . "] to aggregation channels: " . print_r($aggregationCategoriesToAdd, true));
-		foreach ($aggregationCategoriesToAdd as $aggregationCategoryIdToAdd)
-		{
-			$this->addCopyJobToAggregationChannel($object, $aggregationCategoryIdToAdd);
-		}
+		$aggregationCategoriesToRemove = array_diff ($oldAggregationCategories, $currentAggregationCategories);
 		
-		$aggregationCategoriesToRemove = array_diff ($oldCustomDataValues, $currentAggregationCategories);
-		
-		$this->deleteFromAggregationChannels ($object->getId(), $aggregationCategoriesToRemove);
 		KalturaLog::info ("Removing entries from category ID [" . $object->getId() . "] to aggregation channels: " . print_r($aggregationCategoriesToRemove, true));
-		foreach ($aggregationCategoriesToRemove as $aggregationCategoryIdToRemove)
-		{
-			$this->addDeleteJobFromAggregationChannel($object, $aggregationCategoryIdToRemove);
-		}
+		$this->deleteFromAggregationChannels ($object->getId(), $aggregationCategoriesToRemove);
+		
 	}
 	
 	protected function deleteFromAggregationChannels ($categoryId, array $aggregationCatIds)
@@ -70,8 +62,9 @@ class kCategoryEventHandler implements kObjectDeletedEventConsumer, kObjectCreat
 		if ($object instanceof category)
 		{
 			$oldCustomDataValues = $object->getCustomDataOldValues();
-			if ((!isset ($oldCustomDataValues[category::AGGREGATION_CATEGORIES]) && $object->getAggregationCategories()) ||
-				$oldCustomDataValues[category::AGGREGATION_CATEGORIES] != $object->getAggregationCategories())
+			$oldAggregationChannels = isset ($oldCustomDataValues[''][category::AGGREGATION_CATEGORIES]) ? $oldCustomDataValues[''][category::AGGREGATION_CATEGORIES] : '';
+			
+			if ($oldAggregationChannels != $object->getAggregationCategories())
 			{
 				return true;
 			}
@@ -107,12 +100,6 @@ class kCategoryEventHandler implements kObjectDeletedEventConsumer, kObjectCreat
 		}
 		
 		$this->addToAggregationCategories($object->getId(), explode (',', $object->getAggregationCategories()));
-		
-		$aggregationCategories = explode (',', $object->getAggregationCategories());
-		foreach ($aggregationCategories as $aggregationCategoryId)
-		{
-			$this->addCopyJobToAggregationChannel($object, $aggregationCategoryId);
-		}
 	}
 	
 	protected function addCopyJobToAggregationChannel (category $object, $aggregationCategoryId)
@@ -125,17 +112,19 @@ class kCategoryEventHandler implements kObjectDeletedEventConsumer, kObjectCreat
 		kJobsManager::addCopyJob($object->getPartnerId(), CopyObjectType::CATEGORY_ENTRY, $filter, $templateObject);
 	}
 	
-	protected function addToAggregationCategories ($categoryId, array $aggregationCatIds)
+	protected function addToAggregationCategories (category $object, array $aggregationCatIds)
 	{
 		$aggregationCategories = categoryPeer::retrieveByPKs($aggregationCatIds);
 		foreach ($aggregationCategories as $aggregationCategory)
 		{
 			/* @var $aggregationCategory category */
 			$currentPublishingCategories = explode (',', $aggregationCategory->getPublishingCategories());
-			$currentPublishingCategories[] = $categoryId;
+			$currentPublishingCategories[] = $object->getId();
 			$currentPublishingCategories = array_unique($currentPublishingCategories);
 			$aggregationCategory->setPublishingCategories(implode(',', $currentPublishingCategories));
 			$aggregationCategory->save();
+			
+			$this->addCopyJobToAggregationChannel ($object, $aggregationCategory->getId());
 		}
 	}
 	
