@@ -9,7 +9,7 @@ class kCopyingCategoryEntryEngine extends kCopyingEngine
 	 * @see KCopyingEngine::copy()
 	 */
 	protected function copy(KalturaFilter $filter, KalturaObjectBase $templateObject) {
-		$this->copyCategoryEntries ();
+		$this->copyCategoryEntries ($filter, $templateObject);
 		
 	}
 

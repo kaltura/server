@@ -39,7 +39,7 @@ class kCategoryEventHandler implements kObjectDeletedEventConsumer, kObjectCreat
 		KalturaLog::info ("Removing entries from category ID [" . $object->getId() . "] to aggregation channels: " . print_r($aggregationCategoriesToRemove, true));
 		foreach ($aggregationCategoriesToRemove as $aggregationCategoryIdToRemove)
 		{
-			$this->addDeleteJobFromAggregationChannel($object, $aggregationCategoryIdToAdd);
+			$this->addDeleteJobFromAggregationChannel($object, $aggregationCategoryIdToRemove);
 		}
 	}
 	
