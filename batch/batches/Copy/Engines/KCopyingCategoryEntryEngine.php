@@ -3,7 +3,7 @@
  * @package Scheduler
  * @subpackage Copy
  */
-class kCopyingCategoryEntryEngine extends kCopyingEngine
+class KCopyingCategoryEntryEngine extends KCopyingEngine
 {
 	/* (non-PHPdoc)
 	 * @see KCopyingEngine::copy()
@@ -48,9 +48,9 @@ class kCopyingCategoryEntryEngine extends kCopyingEngine
 		$class = get_class($sourceObject);
 		$newObject = new $class();
 		
-		/* @var $newObject KalturaCategoryUser */
-		/* @var $sourceObject KalturaCategoryUser */
-		/* @var $templateObject KalturaCategoryUser */
+		/* @var $newObject KalturaCategoryEntry */
+		/* @var $sourceObject KalturaCategoryEntry */
+		/* @var $templateObject KalturaCategoryEntry */
 		
 		$newObject->categoryId = $sourceObject->categoryId;
 		$newObject->entryId = $sourceObject->entryId;

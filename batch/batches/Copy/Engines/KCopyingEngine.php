@@ -44,7 +44,7 @@ abstract class KCopyingEngine
 				return new KCopyingCategoryUserEngine();
 				
 			case KalturaCopyObjectType::CATEGORY_ENTRY:
-				return new kCopyingCategoryEntryEngine();
+				return new KCopyingCategoryEntryEngine();
 				
 			default:
 				return KalturaPluginManager::loadObject('KCopyingEngine', $objectType);
