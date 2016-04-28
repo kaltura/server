@@ -22,6 +22,7 @@ class KDeletingAggregationChannelEngine extends  KDeletingEngine
 			$filter->createdAtGreaterThanOrEqual = $this->lastCreatedAt;
 		}
 		
+		$filter->statusIn (KalturaEntryStatus::ERROR_CONVERTING, KalturaEntryStatus::ERROR_IMPORTING, KalturaEntryStatus::IMPORT, KalturaEntryStatus::NO_CONTENT, KalturaEntryStatus::READY);
 		$entriesList = KBatchBase::$kClient->baseEntry->listAction($filter, $this->pager);
 		if(!count($entriesList->objects))
 			return 0;
@@ -30,7 +31,7 @@ class KDeletingAggregationChannelEngine extends  KDeletingEngine
 		KBatchBase::$kClient->startMultiRequest();
 		foreach($entriesList->objects as $entry)
 		{
-			$catsMatchAnd = explode(',', $filter->categoriesMatchAnd);
+			$catsMatchAnd = explode(',', $filter->categoriesIdsMatchAnd);
 			/* @var $entry KalturaBaseEntry */
 			KBatchBase::$kClient->categoryEntry->delete($entry->id, $catsMatchAnd[1]);
 		}
