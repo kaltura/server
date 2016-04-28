@@ -239,6 +239,12 @@ class kCategoryEventHandler implements kObjectDeletedEventConsumer, kObjectCreat
 			KalturaLog::info("No aggregation categories found for category [" . $category->getId() . "]");
 			return true;
 		}
+		//If this categoryEntry was deleted because its category was deleted, this will be handled later on.
+		if ($category->getStatus() == CategoryStatus::DELETED || $category->getStatus() == CategoryStatus::PURGED)
+		{
+			KalturaLog::info("Category ID [" . $category->getId() . "] is deleted, its deleted entries will be handled separately");
+			return true;
+		}
 		
 		$aggregationCategories = explode (',', $category->getAggregationCategories());
 		
