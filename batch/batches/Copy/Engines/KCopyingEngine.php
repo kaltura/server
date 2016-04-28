@@ -21,6 +21,11 @@ abstract class KCopyingEngine
 	private $lastCopyId;
 	
 	/**
+	 * @var int
+	 */
+	private $lastCreatedAt;
+	
+	/**
 	 * The partner that owns the objects
 	 * @var int
 	 */
@@ -114,6 +119,20 @@ abstract class KCopyingEngine
 		$this->lastCopyId = $lastCopyId;
 	}
 
-	
+	/**
+	 * @return int $lastCopyId
+	 */
+	public function getLastCreatedAt()
+	{
+		return $this->lastCreatedAt;
+	}
+
+	/**
+	 * @param int $lastCopyId
+	 */
+	protected function setLastCreatedAt($createdAt)
+	{
+		$this->lastCreatedAt = $createdAt;
+	}
 	
 }
