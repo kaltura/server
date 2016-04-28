@@ -6,6 +6,23 @@
 class KDeletingAggregationChannelEngine extends  KDeletingEngine
 {
 	protected $lastCreatedAt;
+	
+	protected $publicAggregationChannel;
+	
+	public function configure($partnerId, $jobData)
+	{
+		/* @var $jobData KalturaDeleteJobData */
+		parent::configure($partnerId, $jobData);
+		
+		foreach ($jobData->additionalParameters as $keyValuePair)
+		{
+			if ($keyValuePair->key == "publicAggregationCategory")
+			{
+				$this->publicAggregationChannel = $keyValuePair->value;
+			}
+		}
+	}
+	
 	/* (non-PHPdoc)
 	 * @see KDeletingEngine::delete()
 	 */
@@ -31,9 +48,8 @@ class KDeletingAggregationChannelEngine extends  KDeletingEngine
 		KBatchBase::$kClient->startMultiRequest();
 		foreach($entriesList->objects as $entry)
 		{
-			$catsMatchAnd = explode(',', $filter->categoriesIdsMatchAnd);
 			/* @var $entry KalturaBaseEntry */
-			KBatchBase::$kClient->categoryEntry->delete($entry->id, $catsMatchAnd[1]);
+			KBatchBase::$kClient->categoryEntry->delete($entry->id, $this->publicAggregationChannel);
 		}
 		$results = KBatchBase::$kClient->doMultiRequest();
 		foreach($results as $index => $result)

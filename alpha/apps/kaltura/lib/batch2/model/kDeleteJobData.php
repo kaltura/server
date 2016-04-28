@@ -12,6 +12,25 @@ class kDeleteJobData extends kJobData
 	private $filter;
 	
 	/**
+	 * @var array
+	 */
+	private $additionalParameters;
+	
+	/**
+	 * @return the $additionalParameters
+	 */
+	public function getAdditionalParameters() {
+		return $this->additionalParameters;
+	}
+
+	/**
+	 * @param array $additionalParameters
+	 */
+	public function setAdditionalParameters($additionalParameters) {
+		$this->additionalParameters = $additionalParameters;
+	}
+
+	/**
 	 * @return baseObjectFilter $filter
 	 */
 	public function getFilter()

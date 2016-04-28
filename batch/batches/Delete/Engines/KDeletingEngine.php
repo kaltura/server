@@ -54,10 +54,10 @@ abstract class KDeletingEngine
 	
 	/**
 	 * @param int $partnerId
+	 * @param KalturaDeleteJobData $jobData
 	 * @param KalturaClient $client
-	 * @param KSchedularTaskConfig $taskConfig
 	 */
-	public function configure($partnerId)
+	public function configure($partnerId, $jobData)
 	{
 		$this->partnerId = $partnerId;
 		$this->batchPartnerId = KBatchBase::$taskConfig->getPartnerId();
