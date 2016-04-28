@@ -16,7 +16,7 @@ class KDeletingAggregationChannelEngine extends  KDeletingEngine
 		
 		foreach ($jobData->additionalParameters as $keyValuePair)
 		{
-			if ($keyValuePair->key == "publicAggregationCategory")
+			if ($keyValuePair->key == "0.publicAggregationCategory")
 			{
 				$this->publicAggregationChannel = $keyValuePair->value;
 			}
@@ -39,7 +39,7 @@ class KDeletingAggregationChannelEngine extends  KDeletingEngine
 			$filter->createdAtGreaterThanOrEqual = $this->lastCreatedAt;
 		}
 		
-		$filter->statusIn (KalturaEntryStatus::ERROR_CONVERTING, KalturaEntryStatus::ERROR_IMPORTING, KalturaEntryStatus::IMPORT, KalturaEntryStatus::NO_CONTENT, KalturaEntryStatus::READY);
+		$filter->statusIn = implode (',', array (KalturaEntryStatus::ERROR_CONVERTING, KalturaEntryStatus::ERROR_IMPORTING, KalturaEntryStatus::IMPORT, KalturaEntryStatus::NO_CONTENT, KalturaEntryStatus::READY));
 		$entriesList = KBatchBase::$kClient->baseEntry->listAction($filter, $this->pager);
 		if(!count($entriesList->objects))
 			return 0;
