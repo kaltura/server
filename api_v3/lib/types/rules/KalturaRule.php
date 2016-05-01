@@ -85,12 +85,4 @@ class KalturaRule extends KalturaObject
 			
 		return parent::toObject($dbObject, $skip);
 	}
-	
-	public function toInsertableObject($sourceObject = null, $propsToSkip = array())
-	{
-		if(is_null($this->forceAdminValidation))
-			$this->forceAdminValidation = false;
-
-		return parent::toInsertableObject($sourceObject, $propsToSkip);
-	}
 }
