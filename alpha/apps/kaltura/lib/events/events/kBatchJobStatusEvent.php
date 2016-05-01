@@ -4,7 +4,7 @@
  * @package Core
  * @subpackage events
  */
-class kBatchJobStatusEvent extends KalturaEvent implements IKalturaContinualEvent, IKalturaObjectRelatedEvent
+class kBatchJobStatusEvent extends KalturaEvent implements IKalturaContinualEvent, IKalturaObjectRelatedEvent, IKalturaBatchJobRelatedEvent
 {
 	const EVENT_CONSUMER = 'kBatchJobStatusEventConsumer';
 	

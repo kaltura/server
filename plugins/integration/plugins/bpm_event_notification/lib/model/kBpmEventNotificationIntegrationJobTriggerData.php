@@ -3,7 +3,7 @@
  * @package plugins.bpmEventNotificationIntegration
  * @subpackage model.data
  */
-class kBpmEventNotificationIntegrationJobTriggerData extends kIntegrationJobTriggerData
+class kBpmEventNotificationIntegrationJobTriggerBusinessProcess extends kIntegrationJobTriggerData implements IBusinessProcessCaseIdRelated
 {
 	/**
 	 * KalturaBusinessProcessNotificationTemplate id

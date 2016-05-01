@@ -64,7 +64,7 @@ abstract class BusinessProcessNotificationTemplate extends BatchEventNotificatio
 		{
 			return null;
 		}
-		
+
 		$caseIds = $this->getCaseIds($jobData->getObject());
 		$jobId = null;
 		foreach($caseIds as $caseId)
@@ -97,30 +97,45 @@ abstract class BusinessProcessNotificationTemplate extends BatchEventNotificatio
 		}
 		return array();
 	}
-	
-	public function getCaseIds(BaseObject $object, $applyMainObject = true)
+
+	public function getCaseValues(BaseObject $object, $applyMainObject = true, $processId = null)
 	{
 		if($applyMainObject)
 		{
 			$object = $this->getMainObject($object);
 		}
-		
+
 		if(method_exists($object, 'getFromCustomData'))
 		{
-			$values = $object->getFromCustomData($this->getServerId() . '_' . $this->getProcessId(), 'businessProcessCases', array());
+			if(is_null($processId))
+			{
+				$processId = $this->getProcessId();
+			}
+			$customDataKey = $this->getServerId() . '_' . $processId;
+			$values = $object->getFromCustomData($customDataKey, 'businessProcessCases', array());
 			if(!$values || !count($values))
 			{
 				KalturaLog::info('Object [' . get_class($object) . '][' . $object->getPrimaryKey() . '] case id not found in custom-data');
 			}
-			$caseIds = array();
-			foreach($values as $value)
+			else
 			{
-				$caseIds[] = $value['caseId'];
+				KalturaLog::debug('Case values for [' . $customDataKey . ']: ' . json_encode($values));
 			}
-			return $caseIds;
+			return $values;
 		}
 		KalturaLog::err('Object [' . get_class($object) . '] does not support custom-data');
 		return array();
+	}
+
+	public function getCaseIds(BaseObject $object, $applyMainObject = true)
+	{
+		$values = $this->getCaseValues($object, $applyMainObject);
+		$caseIds = array();
+		foreach($values as $value)
+		{
+			$caseIds[] = $value['caseId'];
+		}
+		return $caseIds;
 	}
 	
 	public function addCaseId(BaseObject $object, $caseId, $processId = null)
@@ -133,7 +148,7 @@ abstract class BusinessProcessNotificationTemplate extends BatchEventNotificatio
 				$processId = $this->getProcessId();
 			}
 			
-			$values = $this->getCaseIds($object);
+			$values = $this->getCaseValues($object, true, $processId);
 			$values[] = array(
 				'caseId' => $caseId,
 				'processId' => $processId,
