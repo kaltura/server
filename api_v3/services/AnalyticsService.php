@@ -7,45 +7,46 @@
  */
 class AnalyticsService extends KalturaBaseService
 {
+
+	const PARTNER_DIMENSION = "partner";
+
 	/**
 	 * report query action allows to get a analytics data for specific query dimensions, metrics and filters.
 	 *
 	 * @action query
-	 * @param string $from query start time (in local time)
-	 * @param string $to query end time (in local time)
-	 * @param float $utcOffset timezone offset from UTC (in minutes)
-	 * @param string $metrics comma separated metrics list
-	 * @param string $dimensions comma separated dimensions list
-	 * @param KalturaReportFilterArray $filters array of filters
+	 * @param KalturaAnalyticsFilter $filter the analytics query filter
 	 * @return KalturaReportResponse
 	 */
-	public function queryAction($from, $to, $metrics, $utcOffset = 0, $dimensions = null, $filters = null)
+	public function queryAction($filter)
 	{
-		$dimensionsArr = $this->extractDimensions($dimensions);
-		KalturaLog::info('analytics query - extracted dimensions: ' . var_export($dimensionsArr, true));
-		$metricsArr = $this->extractMetrics($metrics);
-		KalturaLog::info('analytics query - extracted metrics: ' . var_export($metricsArr, true));
-		$filtersArr = $this->extractFilters($filters);
-		KalturaLog::info('analytics query - extracted filters: ' . var_export($filtersArr, true));
 
-		$internalApiRequest = $this->constructInternalRequest($from, $to, $metricsArr, $utcOffset, $dimensionsArr, $filtersArr);
-		KalturaLog::info('analytics query - constructed request: ' . var_export($internalApiRequest, true));
+		$filter->validateForUsage($filter);
+		
+		$dimensionsArr = $this->extractDimensions($filter->dimensions);
+		KalturaLog::debug('Extracted dimensions: ' . var_export($dimensionsArr, true));
+		$metricsArr = $this->extractMetrics($filter->metrics);
+		KalturaLog::debug('Extracted metrics: ' . var_export($metricsArr, true));
+		$filtersArr = $this->extractFilters($filter->filters);
+		KalturaLog::debug('Extracted filters: ' . var_export($filtersArr, true));
+
+		$internalApiRequest = $this->constructInternalRequest($filter->from, $filter->to, $dimensionsArr, $metricsArr, $filtersArr, $filter->utcOffset);
+		KalturaLog::info('Constructed request: ' . var_export($internalApiRequest, true));
 
 		$internalApiServer = kConf::get('analytics_internal_API_url');
-		KalturaLog::info('analytics query - querying against: ' . var_export($internalApiServer, true));
+		KalturaLog::debug('Querying against: ' . var_export($internalApiServer, true));
 
 		$apiCallResponse = $this->callAPI("POST", $internalApiServer, $internalApiRequest);
-		KalturaLog::info('analytics query - API call response: ' . var_export($apiCallResponse, true));
+		KalturaLog::info('API call response: ' . var_export($apiCallResponse, true));
 
 		$jsonResponse = json_decode($apiCallResponse);
-		KalturaLog::info('analytics query - response as json: ' . var_export($jsonResponse, true));
+		KalturaLog::debug('Response as json: ' . var_export($jsonResponse, true));
 
 		$res = new KalturaReportResponse();
 		$res->columns = implode(",", $jsonResponse->headers);
 		$tempResult = array_map(array($this, 'implodeWithComma'), $jsonResponse->data);
 		$res->results = array_map(array($this, 'createKalturaString'), $tempResult);
 
-		KalturaLog::info('analytics query - response: ' . var_export($res, true));
+		KalturaLog::info('Response: ' . var_export($res, true));
 
 		return $res;
 	}
@@ -67,7 +68,7 @@ class AnalyticsService extends KalturaBaseService
 
 		// Add a filter for the current partner
 		$partnerFilter = array();
-		$partnerFilter['dimension'] = "partner";
+		$partnerFilter['dimension'] = self::PARTNER_DIMENSION;
 		$partnerFilter['values'] = array($this->getPartnerId());
 
 		$res[] = $partnerFilter;
@@ -76,18 +77,18 @@ class AnalyticsService extends KalturaBaseService
 
 	private function extractFilter($filter)
 	{
-		if (strtolower($filter->dimension) == "partner")
+		if (strtolower($filter->dimension) == self::PARTNER_DIMENSION)
 		{
 			throw new APIException(KalturaErrors::ANALYTICS_FORBIDDEN_FILTER);
 		}
 
-		KalturaLog::info('analytics query - extracting filter: ' . var_export($filter, true));
+		KalturaLog::debug('Extracting filter: ' . var_export($filter, true));
 
 		$res = array();
 		$res['dimension'] = $filter->dimension;
 		$res['values'] = $this->explodeAndTrim($filter->values);
 
-		KalturaLog::info('analytics query - extracted filter: ' . var_export($res, true));
+		KalturaLog::debug('Extracted filter: ' . var_export($res, true));
 
 		return $res;
 	}
@@ -117,9 +118,9 @@ class AnalyticsService extends KalturaBaseService
 		return array_map('trim', explode(",",$arr));
 	}
 
-	private function constructInternalRequest($from, $to, $metricsArr, $utcOffset, $dimensionsArr, $filters)
+	private function constructInternalRequest($from, $to, $dimensionsArr, $metricsArr, $filtersArr, $utcOffset)
 	{
-		$data = array("from" => $from, "to" => $to, "dimensions" => $dimensionsArr, "filters" => $filters, "metrics" => $metricsArr, "utcOffset" => $utcOffset);
+		$data = array("from" => $from, "to" => $to, "dimensions" => $dimensionsArr, "filters" => $filtersArr, "metrics" => $metricsArr, "utcOffset" => $utcOffset);
 		//e.g. {"from":"1","to":"2","dimensions":["partner"], "filters":[{"dimension":"partner","values":["1"]}], "metrics":["play"], "utcOffset":"240"}
 		return json_encode($data);
 	}
