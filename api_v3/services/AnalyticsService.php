@@ -138,10 +138,6 @@ class AnalyticsService extends KalturaBaseService
 		{
 			case "POST":
 				curl_setopt($curl, CURLOPT_POST, 1);
-
-				$debug = var_export(json_encode($data), true);
-				KalturaLog::info('DATA ***** ' . $debug);
-
 				if ($data)
 					curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
 				break;
