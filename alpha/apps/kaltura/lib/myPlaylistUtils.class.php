@@ -533,7 +533,7 @@ class myPlaylistUtils
 		{
 			$startOffset = $pager->calcOffset();
 			$pageSize = $pager->calcPageSize();
-			$total_results = max( $total_results, $startOffset + $pageSize);
+			$total_results = $startOffset + $pageSize;
 		}
 
 		$entry_ids_list = array();
