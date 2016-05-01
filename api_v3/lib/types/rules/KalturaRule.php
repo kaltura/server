@@ -53,6 +53,13 @@ class KalturaRule extends KalturaObject
 	 * @var bool
 	 */
 	public $stopProcessing;
+	
+	/**
+	 * Indicates if we should force ks validation for admin ks users as well
+	 *
+	 * @var KalturaNullableBoolean
+	 */
+	public $forceAdminValidation;
 
 	private static $mapBetweenObjects = array
 	(
@@ -63,6 +70,7 @@ class KalturaRule extends KalturaObject
 		'conditions',
 		'contexts',
 		'stopProcessing',
+		'forceAdminValidation',
 	);
 	
 	public function getMapBetweenObjects()
