@@ -191,6 +191,8 @@ class DeliveryController extends Zend_Controller_Action
 				return new Form_Delivery_UrlTokenizerBitGravity();
 			case 'Kaltura_Client_Type_UrlTokenizerCloudFront':
 					return new Form_Delivery_UrlTokenizerCloudFront();
+			case 'Kaltura_Client_Type_UrlTokenizerVnpt':
+					return new Form_Delivery_UrlTokenizerVnpt();
 			default:
 				return KalturaPluginManager::loadObject('Form_Delivery_DeliveryProfileTokenizer', $type, array());
 		}
@@ -217,6 +219,7 @@ class DeliveryController extends Zend_Controller_Action
 		$tokenizer['Kaltura_Client_Type_UrlTokenizerBitGravity'] = $this->view->translate('Kaltura_Client_Type_UrlTokenizerBitGravity');
 		$tokenizer['Kaltura_Client_Type_UrlTokenizerAkamaiSecureHd'] = $this->view->translate('Kaltura_Client_Type_UrlTokenizerAkamaiSecureHd');
 		$tokenizer['Kaltura_Client_Type_UrlTokenizerCloudFront'] = $this->view->translate('Kaltura_Client_Type_UrlTokenizerCloudFront');
+		$tokenizer['Kaltura_Client_Type_UrlTokenizerVnpt'] = $this->view->translate('Kaltura_Client_Type_UrlTokenizerVnpt');
 		
 		// Plugins
 		$tokenizer['Kaltura_Client_Type_UrlTokenizerUplynk'] = $this->view->translate('Kaltura_Client_Type_UrlTokenizerUplynk');
