@@ -12,6 +12,19 @@ Added the following to batch.ini file under KAsyncValidateLiveMediaServers:
  
 #### Deployment scripts####
 	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2016_04_26_add_batch_to_entryServerNode.php
+	
+## Added the new analytics service ##
+ 
+ - Issue Type: EPIC
+ - Issue ID: PLAT-4685
+
+#### Configuration ####
+Added the following to local.ini in server-saas-config:
+ 
+ - analytics_internal_API_url = http://dataretrieval-access-stg-491967709.us-west-2.elb.amazonaws.com:9000/query 
+
+#### Deployment scripts####
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2016_04_17_analytics.php
  
 #### Known Issues & Limitations ####
  - None.
