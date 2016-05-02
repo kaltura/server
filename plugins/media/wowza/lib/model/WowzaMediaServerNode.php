@@ -134,7 +134,7 @@ class WowzaMediaServerNode extends MediaServerNode {
 
 		$appPrefix = $this->getValueByField($mediaServerConfig, 'appPrefix', $appPrefix);
 		
-		if(is_null($this->getAppPrefix()))
+		if(!is_null($this->getAppPrefix()))
 			$appPrefix = $this->getAppPrefix();
 		
 		return $appPrefix;
