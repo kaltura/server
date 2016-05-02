@@ -156,14 +156,35 @@ class AnalyticsService extends KalturaBaseService
 
 		if (!$result)
 		{
-			throw new APIException(KalturaErrors::ANALYTICS_QUERY_FAILURE, curl_error($curl));
+			KalturaLog::err('Error querying internal API server: ' . curl_error($curl));
+			throw new APIException(KalturaErrors::ANALYTICS_QUERY_FAILURE);
 		}
 
 		$code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
 
-		if ($code < 200 || $code > 300)
+		if ($code >= 400)
 		{
-			throw new APIException(KalturaErrors::ANALYTICS_QUERY_FAILURE, $result);
+			KalturaLog::info('Erroneous response from internal API server: ' . $result);
+			$errorData = json_decode($result);
+			if (!$errorData)
+			{
+				throw new APIException(KalturaErrors::ANALYTICS_QUERY_FAILURE);
+			}
+			else
+			{
+				switch ($errorData->kind) {
+					case "incorrectContentType":
+						throw new APIException(KalturaErrors::ANALYTICS_INCORRECT_INPUT_TYPE);
+					case "invalidInput":
+						throw new APIException(KalturaErrors::ANALYTICS_INCORRECT_INPUT, $errorData->data);
+					case "generalError":
+						throw new APIException(KalturaErrors::ANALYTICS_QUERY_FAILURE);
+					case "unsupportedDimension":
+						throw new APIException(KalturaErrors::ANALYTICS_UNSUPPORTED_DIMENSION, $errorData->data);
+					case "unsupportedQuery":
+						throw new APIException(KalturaErrors::ANALYTICS_UNSUPPORTED_QUERY);
+				}
+			}
 		}
 
 		curl_close($curl);
