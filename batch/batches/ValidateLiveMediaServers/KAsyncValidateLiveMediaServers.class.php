@@ -12,6 +12,10 @@
  */
 class KAsyncValidateLiveMediaServers extends KPeriodicWorker
 {
+	const ENTRY_SERVER_NODE_MIN_CREATION_TIMEE = 120;
+	const ENTRY_ID_FIELD = "entry_id";
+	const PARTNER_ID_FIELD = "entry_id";
+	
 	/* (non-PHPdoc)
 	 * @see KBatchBase::getType()
 	 */
@@ -25,33 +29,42 @@ class KAsyncValidateLiveMediaServers extends KPeriodicWorker
 	*/
 	public function run($jobs = null)
 	{
-		$filter = new KalturaLiveStreamEntryFilter();
-		$filter->isLive = KalturaNullableBoolean::TRUE_VALUE;
-		$filter->orderBy = KalturaLiveStreamEntryOrderBy::CREATED_AT_ASC;
+		$entryServerNodeMinCreationTime = $this->getAdditionalParams("minCreationTime");
+		if(!$entryServerNodeMinCreationTime)
+			$entryServerNodeMinCreationTime = self::ENTRY_SERVER_NODE_MIN_CREATION_TIMEE;
 		
-		$filter->moderationStatusIn = 
-			KalturaEntryModerationStatus::PENDING_MODERATION . ',' .
-			KalturaEntryModerationStatus::APPROVED . ',' .
-			KalturaEntryModerationStatus::REJECTED . ',' .
-			KalturaEntryModerationStatus::FLAGGED_FOR_REVIEW . ',' .
-			KalturaEntryModerationStatus::AUTO_APPROVED;
+		$entryServerNodeFilter = new KalturaEntryServerNodeFilter();
+		$entryServerNodeFilter->orderBy = KalturaEntryServerNodeOrderBy::CREATED_AT_ASC;
+		$entryServerNodeFilter->createdAtLessThanOrEqual = time() - $entryServerNodeMinCreationTime;
 		
-		$pager = new KalturaFilterPager();
-		$pager->pageSize = 500;
-		$pager->pageIndex = 1;
+		$entryServerNodeFilter->statusIn = KalturaEntryServerNodeStatus::PLAYABLE . ',' . 
+				KalturaEntryServerNodeStatus::BROADCASTING . ',' .
+				KalturaEntryServerNodeStatus::AUTHENTICATED;
 		
-		$entries = self::$kClient->liveStream->listAction($filter, $pager);
-		while(count($entries->objects))
+		$entryServerNodePager = new KalturaFilterPager();
+		$entryServerNodePager->pageSize = 500;
+		$entryServerNodePager->pageIndex = 1;
+		
+		$entryServerNodes = self::$kClient->entryServerNode->listAction($entryServerNodeFilter, $entryServerNodePager);
+		while(count($entryServerNodes->objects))
 		{
-			foreach($entries->objects as $entry)
+			$entryInfo = array();
+			for($i=0; $i<count($entryServerNodes->objects); $i++)
+			{
+				$entryInfo[$i] = array();
+				$entryInfo[$i][self::ENTRY_ID_FIELD] = $entryServerNode->entryId;
+				$entryInfo[$i][self::PARTNER_ID_FIELD] = $entryServerNode->partnerId;
+			}
+			$uniqueEntryInfo = array_unique($entryInfo, SORT_REGULAR);
+			
+			foreach($uniqueEntryInfo as $entryInfo)
 			{
 				try
 				{
-					/* @var $entry KalturaLiveEntry */
-					self::impersonate($entry->partnerId);
-					self::$kClient->liveStream->validateRegisteredMediaServers($entry->id);
+					/* @var $entryServerNode KalturaEntryServerNode */
+					self::impersonate($entryInfo[self::PARTNER_ID_FIELD]);
+					self::$kClient->liveStream->validateRegisteredMediaServers($entryInfo[self::ENTRY_ID_FIELD]);
 					self::unimpersonate();
-					$filter->createdAtGreaterThanOrEqual = $entry->createdAt;
 				}
 				catch (KalturaException $e)
 				{
@@ -60,8 +73,8 @@ class KAsyncValidateLiveMediaServers extends KPeriodicWorker
 				}
 			}
 			
-			$pager->pageIndex++;
-			$entries = self::$kClient->liveStream->listAction($filter, $pager);
+			$entryServerNodePager->pageIndex++;
+			$entryServerNodes = self::$kClient->entryServerNode->listAction($entryServerNodeFilter, $entryServerNodePager);
 		}
 	}
 }

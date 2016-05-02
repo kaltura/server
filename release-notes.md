@@ -1,5 +1,21 @@
 # Kajam 11.14.0 #
 
+## Use EntryServerNode Table when validating phantom live entries ##
+
+ - Issue Type: BUG
+ - Issue ID: PLAT-5401
+ 
+#### Configuration ####
+Added the following to batch.ini file under KAsyncValidateLiveMediaServers:
+ 
+ - params.minCreationTime = 120
+ 
+#### Deployment scripts####
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2016_04_26_add_batch_to_entryServerNode.php
+ 
+#### Known Issues & Limitations ####
+ - None.
+
 ## Mediaprep Tvinci distribution profile use dynamic tags ##
 
  - Issue Type: Story
