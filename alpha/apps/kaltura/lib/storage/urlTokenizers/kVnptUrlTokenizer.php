@@ -28,6 +28,7 @@ class kVnptUrlTokenizer extends kUrlTokenizer
 		{
 			$clientIp = $_SERVER['REMOTE_ADDR'];
 		}
+
 		$expiredTime = time() + $expiryTimeFrame;
 
 		$tokenizationSuffix = '';
@@ -35,15 +36,15 @@ class kVnptUrlTokenizer extends kUrlTokenizer
 		{
 			case self::HTTP_VOD_TOKEN_FORMAT:
 			default:
-				$tokenizationSuffix = $url;
+				$tokenizationSuffix = "/" . $url;
 				break;
 			case self::VOD_LIVE_TOKEN_FORMAT:
 				preg_match_all('/\//', $url,$matches, PREG_OFFSET_CAPTURE);
 				$lastSlashLocationIndex = end($matches[0]);
-				$tokenizationSuffix = substr($url, 0, $lastSlashLocationIndex[1]);
+				$tokenizationSuffix = "/" . substr($url, 0, $lastSlashLocationIndex[1]);
 				break;
 		}
-		$url = md5($clientIp . ":$tokenKey" . ":$expiredTime" . ":$tokenizationSuffix") . $expiredTime . $url;
+		$url = md5($clientIp . ":$tokenKey" . ":$expiredTime" . ":$tokenizationSuffix") . $expiredTime . "/" . $url;
 		return $url;
 	}
 
