@@ -14,7 +14,7 @@ class KAsyncValidateLiveMediaServers extends KPeriodicWorker
 {
 	const ENTRY_SERVER_NODE_MIN_CREATION_TIMEE = 120;
 	const ENTRY_ID_FIELD = "entry_id";
-	const PARTNER_ID_FIELD = "entry_id";
+	const PARTNER_ID_FIELD = "partner_id";
 	
 	/* (non-PHPdoc)
 	 * @see KBatchBase::getType()
@@ -52,8 +52,8 @@ class KAsyncValidateLiveMediaServers extends KPeriodicWorker
 			for($i=0; $i<count($entryServerNodes->objects); $i++)
 			{
 				$entryInfo[$i] = array();
-				$entryInfo[$i][self::ENTRY_ID_FIELD] = $entryServerNode->entryId;
-				$entryInfo[$i][self::PARTNER_ID_FIELD] = $entryServerNode->partnerId;
+				$entryInfo[$i][self::ENTRY_ID_FIELD] = $entryServerNodes->objects[$i]->entryId;
+				$entryInfo[$i][self::PARTNER_ID_FIELD] = $entryServerNodes->objects[$i]->partnerId;
 			}
 			$uniqueEntryInfo = array_unique($entryInfo, SORT_REGULAR);
 			
