@@ -9,13 +9,13 @@ class KalturaAnalyticsFilter extends KalturaObject
 	 * Query start time (in local time)
 	 * @var string
 	 */
-	public $from;
+	public $from_time;
 
 	/**
 	 * Query end time (in local time)
 	 * @var string
 	 */
-	public $to;
+	public $to_time;
 
 	/**
 	 * Comma separated metrics list
@@ -47,8 +47,8 @@ class KalturaAnalyticsFilter extends KalturaObject
 
 	public function validateForUsage($sourceObject, $propertiesToSkip = array())
 	{
-		$sourceObject->validatePropertyNotNull("from");
-		$sourceObject->validatePropertyNotNull("to");
+		$sourceObject->validatePropertyNotNull("from_time");
+		$sourceObject->validatePropertyNotNull("to_time");
 		$sourceObject->validatePropertyNotNull("metrics");
 		return parent::validateForUsage($sourceObject, $propertiesToSkip);
 	}
