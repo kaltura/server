@@ -371,32 +371,35 @@ abstract class kFileTransferMgr
 
 		$remote_file = $this->fixPathString($remote_file);
 
-		// delete existing file if overwrite == true
-		$res = true;
-		if ($overwrite) {
-			if ($this->fileExists($remote_file)) {
-				$res = @($this->delFile($remote_file));
+		if($this->shouldCheckExistingRemoteFile())
+		{
+			// delete existing file if overwrite == true
+			$res = true;
+			if ($overwrite) {
+				if ($this->fileExists($remote_file)) {
+					$res = @($this->delFile($remote_file));
+				}
+				// check if deletion was done succesfully
+				if (!$res) {
+					$last_error = error_get_last();
+					throw new kFileTransferMgrException("Can't delete existing file [$remote_file] - " . $last_error['message'], kFileTransferMgrException::otherError);
+					return self::FILETRANSFERMGR_RES_ERR;
+				}
 			}
-			// check if deletion was done succesfully
-			if (!$res) {
-				$last_error = error_get_last();
-				throw new kFileTransferMgrException("Can't delete existing file [$remote_file] - " . $last_error['message'], kFileTransferMgrException::otherError);
-				return self::FILETRANSFERMGR_RES_ERR;
+			else { // $overwrite == false
+				if ($this->fileExists($remote_file)) {
+					throw new kFileTransferMgrException("Remote file [$remote_file] already exists.", kFileTransferMgrException::remoteFileExists);
+				}
 			}
-		}
-		else { // $overwrite == false
-			if ($this->fileExists($remote_file)) {
-				throw new kFileTransferMgrException("Remote file [$remote_file] already exists.", kFileTransferMgrException::remoteFileExists);
-			}
-		}
 
-		// create remote directory if necessary
-		if (!$this->fileExists(dirname($remote_file))) {
-			try {
-			    @$this->mkDir(dirname($remote_file));
-			}
-			catch (Exception $e) {
-			    KalturaLog::log('Error creating directory ['.dirname($remote_file).'] - ['.$e->getMessage().'] - proceeding anyway');
+			// create remote directory if necessary
+			if (!$this->fileExists(dirname($remote_file))) {
+				try {
+				    @$this->mkDir(dirname($remote_file));
+				}
+				catch (Exception $e) {
+				    KalturaLog::log('Error creating directory ['.dirname($remote_file).'] - ['.$e->getMessage().'] - proceeding anyway');
+				}
 			}
 		}
 
@@ -838,6 +841,11 @@ abstract class kFileTransferMgr
 			return true;
 			
 		return $allContent;
+	}
+	
+	protected function shouldCheckExistingRemoteFile()
+	{
+		return true;
 	}
 }
 

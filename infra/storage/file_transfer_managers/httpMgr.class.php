@@ -72,7 +72,7 @@ class httpMgr extends kFileTransferMgr
 		if (!$http_port || $http_port == 0)
 			$http_port = 80;
 			
-		$http_server .= $http_server . ':' . $http_port;
+		$http_server .= ':' . $http_port;
 		try
 		{
 			$url_parts = parse_url($http_server);
@@ -276,6 +276,11 @@ class httpMgr extends kFileTransferMgr
 	    return false; // not supported
 	}
 
+	protected function shouldCheckExistingRemoteFile()
+	{
+		return false;
+	}
+	
 	/*******************/
 	/* Other functions */
 	/*******************/
