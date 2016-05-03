@@ -29,7 +29,7 @@ class AnalyticsService extends KalturaBaseService
 		$filtersArr = $this->extractFilters($filter->filters);
 		KalturaLog::debug('Extracted filters: ' . var_export($filtersArr, true));
 
-		$internalApiRequest = $this->constructInternalRequest($filter->from, $filter->to, $dimensionsArr, $metricsArr, $filtersArr, $filter->utcOffset);
+		$internalApiRequest = $this->constructInternalRequest($filter->from_time, $filter->to_time, $dimensionsArr, $metricsArr, $filtersArr, $filter->utcOffset);
 		KalturaLog::info('Constructed request: ' . var_export($internalApiRequest, true));
 
 		$internalApiServer = kConf::get('analytics_internal_API_url');
