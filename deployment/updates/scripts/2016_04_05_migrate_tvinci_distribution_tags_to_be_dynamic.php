@@ -24,6 +24,10 @@ foreach ($distributionProfiles as $distributionProfile)
 	 * @var TvinciDistributionProfile $distributionProfile
 	 */
 	$tags = array();
+	$tag = createTvinciTag("mbr", 'mbrFileName', 'mbrPpvModule', $distributionProfile);
+	if (!is_null($tag))
+		$tags[] = $tag;
+	
 	$tag = createTvinciTag("ism", 'ismFileName', 'ismPpvModule', $distributionProfile);
 	if (!is_null($tag))
 		$tags[] = $tag;
@@ -33,10 +37,6 @@ foreach ($distributionProfiles as $distributionProfile)
 		$tags[] = $tag;
 
 	$tag = createTvinciTag("iphonenew", 'iphonenewFileName', 'iphonenewPpvModule', $distributionProfile);
-	if (!is_null($tag))
-		$tags[] = $tag;
-
-	$tag = createTvinciTag("mbr", 'mbrFileName', 'mbrPpvModule', $distributionProfile);
 	if (!is_null($tag))
 		$tags[] = $tag;
 
