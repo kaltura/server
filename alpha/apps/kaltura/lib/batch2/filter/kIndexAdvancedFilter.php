@@ -10,6 +10,16 @@ class kIndexAdvancedFilter extends AdvancedSearchFilterItem
 	 */
 	protected $indexIdGreaterThan = null;
 
+	/**
+	 * @var string
+	 */
+	protected $depthGreaterThan = null;
+
+	/**
+	 * @var string
+	 */
+	protected $depthEquals = null;
+
 	/* (non-PHPdoc)
 	 * @see AdvancedSearchFilterItem::applyCondition()
 	 */
@@ -38,6 +48,38 @@ class kIndexAdvancedFilter extends AdvancedSearchFilterItem
 	public function setIndexIdGreaterThan($indexIdGreaterThan)
 	{
 		$this->indexIdGreaterThan = $indexIdGreaterThan;
+	}
+
+	/**
+	 * @return string $depthGreaterThan
+	 */
+	public function getDepthGreaterThan()
+	{
+		return $this->depthGreaterThan;
+	}
+
+	/**
+	 * @param string $depthGreaterThan
+	 */
+	public function setDepthGreaterThan($depthGreaterThan)
+	{
+		$this->depthGreaterThan = $depthGreaterThan;
+	}
+
+	/**
+	 * @return string $depthEquals
+	 */
+	public function getDepthEquals()
+	{
+		return $this->depthEquals;
+	}
+
+	/**
+	 * @param string $depthEquals
+	 */
+	public function setIndexDepthEquals($depthEquals)
+	{
+		$this->depthEquals = $depthEquals;
 	}
 
 	

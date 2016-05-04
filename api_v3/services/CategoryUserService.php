@@ -55,11 +55,6 @@ class CategoryUserService extends KalturaBaseService
 		$dbCategoryKuser->setCategoryFullIds($category->getFullIds());
 		$dbCategoryKuser->setPartnerId($this->getPartnerId());
 		$dbCategoryKuser->save();
-
-		//update and reindex the category as well
-		$category->setUpdatedAt(time());
-		$category->save();
-		$category->indexToSearchIndex();
 		
 		$categoryUser->fromObject($dbCategoryKuser, $this->getResponseProfile());
 		return $categoryUser;
