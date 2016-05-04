@@ -54,6 +54,9 @@ class Xml2As3ClientGenerator extends ClientGeneratorFromXml
 	/////////////////////////////////////////////////////////////
 	private function createTypeClass( $xml )
 	{
+		if(!$this->shouldInclude($xml->include, $xml->exclude))
+			return;
+			
 		$str = "package com.kaltura.types\n";
 		$str .= "{\n";
 		$str .= "	public class " . $xml->attributes()->name . "\n";
@@ -75,6 +78,9 @@ class Xml2As3ClientGenerator extends ClientGeneratorFromXml
 
 	private function createVoClass( $xml )
 	{
+		if(!$this->shouldInclude($xml->include, $xml->exclude))
+			return;
+			
 		$str = "package com.kaltura.vo\n";
 		$str .= "{\n";
 
@@ -299,6 +305,9 @@ class Xml2As3ClientGenerator extends ClientGeneratorFromXml
 
 	private function createCommands ( $xml )
 	{
+		if(!$this->shouldInclude($xml->include, $xml->exclude))
+			return;
+			
 		foreach($xml->children() as $child)
 		{
 			if($child->result->attributes()->type == 'file') {
@@ -555,6 +564,9 @@ class Xml2As3ClientGenerator extends ClientGeneratorFromXml
 
 	private function createServices( $xml )
 	{
+		if(!$this->shouldInclude($xml->include, $xml->exclude))
+			return;
+			
 		foreach($xml->children() as $child)
 		{
 			$fileAttributesNames = array();

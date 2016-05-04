@@ -52,9 +52,10 @@ require_once(dirname(__FILE__) . "/bootstrap.php");
 $summaryFileName = 'summary.kinf';
 $tmpXmlFileName = tempnam(sys_get_temp_dir(), 'kaltura.generator.');
 
-$options = getopt('hx:', array(
+$options = getopt('hx:r:', array(
 	'help',
 	'xml:',
+	'root:',
 ));
 
 function showHelpAndExit()
@@ -64,11 +65,13 @@ function showHelpAndExit()
 	echo "\tOptions:\n";
 	echo "\t\t-h, --help:   \tShow this help.\n";
 	echo "\t\t-x, --xml:    \tUse XML path or URL as source XML.\n";
+	echo "\t\t-r, --root:   \tRoot path, default is /opt/kaltura.\n";
 	
 	exit;
 }
 
 $schemaXmlPath = null;
+$rootPath = realpath('/opt/kaltura');
 foreach($options as $option => $value)
 {
 	if($option == 'h' || $option == 'help')
@@ -78,6 +81,10 @@ foreach($options as $option => $value)
 	elseif($option == 'x' || $option == 'xml')
 	{
 		$schemaXmlPath = $value;
+	}
+	elseif($option == 'r' || $option == 'root')
+	{
+		$rootPath = $value;
 	}
 	array_shift($argv);
 }	 
@@ -94,15 +101,24 @@ if (isset($argv[2]))
 }
 else
 {
-	$root = myContentStorage::getFSContentRootPath();
-	$outputPathBase = "$root/content/clientlibs";
+	$outputPathBase = fixPath("$rootPath/web/content/clientlibs");
 }
 
-kFile::fullMkdir($outputPathBase);
+if(file_exists($outputPathBase))
+{
+	if(!$schemaXmlPath && file_exists("$outputPathBase/KalturaClient.xml"))
+		$schemaXmlPath = fixPath("$outputPathBase/KalturaClient.xml");
+}
+else
+{
+	mkdir($outputPathBase, 0755, true);
+}
+
+if(!file_exists($schemaXmlPath))
+	die("XML file [$schemaXmlPath] not found\n");
 
 //pull the generator config ini
-$config = new Zend_Config_Ini(__DIR__ . '/../configurations/generator.ini', null, array('allowModifications' => true));
-$config = KalturaPluginManager::mergeConfigs($config, 'generator', false);
+$config = new Zend_Config_Ini(__DIR__ . '/config/generator.ini', null, array('allowModifications' => true));
 
 $libsToGenerate = null;
 if (strtolower($generateSingle) == 'all')
@@ -111,7 +127,7 @@ if (strtolower($generateSingle) == 'all')
 }
 elseif(!$generateSingle)
 {
-	$libsToGenerate = file(__DIR__ . '/../configurations/generator.defaults.ini');
+	$libsToGenerate = file(__DIR__ . '/config/generator.defaults.ini');
 	foreach($libsToGenerate as $key => &$default)
 		$default = strtolower(trim($default, " \t\r\n"));
 }
@@ -122,11 +138,17 @@ if ($generateSingle != null)
 	$libsToGenerate = array_map('strtolower', array_intersect(explode(',', $generateSingle), array_keys($config->toArray())));
 }
 
-//get the API version
-$apiVersion = KALTURA_API_VERSION;
-//get the generation date in string (we'll use that for the client tgz file name)
-$generatedDate = date('d-m-Y', time());
-$schemaGenDateOverride = null;
+KalturaLog::info("Downloading ready-made schema from: $schemaXmlPath");
+$contents = file_get_contents($schemaXmlPath);
+file_put_contents($tmpXmlFileName, $contents);
+
+$xml = new DOMDocument();
+$xml->load($schemaXmlPath);
+
+$documentElement = $xml->documentElement;
+$apiVersion = $documentElement->getAttribute("apiVersion");
+$generatedDate = date('d-m-Y', $documentElement->getAttribute("generatedDate"));
+KalturaLog::info("Generating from api version: $apiVersion, generated at: $generatedDate");
 
 $generatedClients = array(
 	'generatedDate' => $generatedDate,
@@ -136,11 +158,10 @@ $generatedClients = array(
 // Loop through the config.ini and generate the client libraries -
 foreach($config as $name => $item)
 {
-	// check if we need to introspect code to create schema or use the ready schema from a given url
-	$useReadySchema = $schemaXmlPath;
-	if(is_null($useReadySchema)){
-		$useReadySchema = $item->get("schemaxml");
-	}
+	/* @var $item Zend_Config */
+
+	if(!$item->tags)
+		$item->tags = $name;
 	
 	//get the generator class name
 	$generator = $item->get("generator");
@@ -154,6 +175,7 @@ foreach($config as $name => $item)
 	// check if generator is valid (not null and there is a class by this name)
 	if ($generator === null)
 		continue;
+	
 	if (!class_exists($generator))
 		throw new Exception("Generator [".$generator."] not found");
 	
@@ -161,9 +183,7 @@ foreach($config as $name => $item)
 		continue;
 
 	//check if this client should be internal or public (on the UI)
-	$isInternal = $item->get("internal");
-	
-	if ($isInternal === null || ($useReadySchema != null && $useReadySchema != ''))
+	if (!$item->get("internal"))
 	{
 		$params = array(
 			'linkhref' => $item->get('linkhref'),
@@ -173,112 +193,37 @@ foreach($config as $name => $item)
 	
 	KalturaLog::info("Now generating: $name using $generator");
 	
-	// get the API list to include in this client generate
-	$include = $item->get("include");
-	$exclude = $item->get("exclude");
-	$excludePaths = $item->get("excludepaths");
-	// can only do either include or exclude
-	if ($include !== null)
-		$exclude = null;
-
-	// get the list of Objects to include in this client generate	
-	$additional = $item->get("additional");
-
-	// get the list of Objects to ignore	
-	$ignore = $item->get("ignore");
-	
-	// get the list of Plugins to include in this client generate
-	$pluginList = explode(',', $item->get("plugins"));
-	
-	// include the plugins requested for this package
-	foreach($pluginList as $plugin)
-	{
-		$pluginName = trim($plugin);
-		if(!$pluginName) continue;
-		KalturaPluginManager::addPlugin($pluginName);
-	}
-	
 	// create the API schema to be used by the generator
 	$reflectionClass = new ReflectionClass($generator);
-	$fromXml = $reflectionClass->isSubclassOf("ClientGeneratorFromXml");
-	$fromPhp = $reflectionClass->isSubclassOf("ClientGeneratorFromPhp");
 	
-	// if it's an XML schema based generator -
-	if ($fromXml)
+	$instance = $reflectionClass->newInstance($tmpXmlFileName, $item);
+	/* @var $instance ClientGeneratorFromXml */
+	
+	if($item->get("generateDocs"))
+		$instance->setGenerateDocs($item->get("generateDocs"));
+		
+	if($item->get("package"))
+		$instance->setPackage($item->get("package"));
+		
+	if($item->get("subpackage"))
+		$instance->setSubpackage($item->get("subpackage"));
+	
+	if (isset($item->params))
 	{
-		KalturaLog::info("Using XmlSchemaGenerator to generate the api schema");
-		if ($useReadySchema == null || $useReadySchema == '')
+		foreach($item->params as $key => $val)
 		{
-			KalturaLog::info("Using code introspection to generate XML schema");
-			$xmlGenerator = new XmlClientGenerator();
-			$xmlGenerator->setIncludeOrExcludeList($include, $exclude, $excludePaths);
-			$xmlGenerator->setIgnoreList($ignore);
-			$xmlGenerator->setAdditionalList($additional);
-			$xmlGenerator->generate();
-
-			$files = $xmlGenerator->getOutputFiles();
-			//save a temp schema to the disk to be used by the xml generator
-			file_put_contents($tmpXmlFileName, $files["KalturaClient.xml"]);
-		} else {
-			KalturaLog::info("Downloading ready-made schema from: ".$useReadySchema);
-			$contents = file_get_contents($useReadySchema);
-			file_put_contents($tmpXmlFileName, $contents);
-			//Get the schema version and last generated date -
-			$schemaXml = new SimpleXMLElement(file_get_contents($tmpXmlFileName));
-			$apiVersionOverride = $schemaXml->attributes()->apiVersion;
-			$schemaGenDate = (int)$schemaXml->attributes()->generatedDate;
-			$schemaGenDateOverride = date('d-m-Y', $schemaGenDate);
-			KalturaLog::info('Generating from api version: '.$apiVersionOverride.', generated at: '.strftime("%a %d %b %H:%M:%S %Y", $schemaGenDate));
-		}
-		
-		$instance = $reflectionClass->newInstance($tmpXmlFileName, $item);
-		/* @var $instance ClientGeneratorFromXml */
-		
-		if($item->get("generateDocs"))
-			$instance->setGenerateDocs($item->get("generateDocs"));
-			
-		if($item->get("package"))
-			$instance->setPackage($item->get("package"));
-			
-		if($item->get("subpackage"))
-			$instance->setSubpackage($item->get("subpackage"));
-		
-		if (isset($item->params))
-		{
-			foreach($item->params as $key => $val)
-			{
-				$instance->setParam($key, $val);
-			}
-		}
-		
-		if (isset ($item->excludeSourcePaths))
-		{
-			$instance->setExcludeSourcePaths ($item->excludeSourcePaths);
+			$instance->setParam($key, $val);
 		}
 	}
-	//if it's a native php based schema generator
-	else if ($fromPhp)
+	
+	if (isset ($item->excludeSourcePaths))
 	{
-		$instance = $reflectionClass->newInstance();
-		/* @var $instance ClientGeneratorFromPhp */
-		$instance->setIncludeOrExcludeList($include, $exclude, $excludePaths);
-		$instance->setIgnoreList($ignore);
-		$instance->setAdditionalList($additional);
-		
-		if($item->get("package"))
-			$instance->setPackage($item->get("package"));
-			
-		if($item->get("subpackage"))
-			$instance->setSubpackage($item->get("subpackage"));
-	}
-	else
-	{
-		throw new Exception("Invalid generator [$generator], can't determine if this is XML or PHP based");
+		$instance->setExcludeSourcePaths ($item->excludeSourcePaths);
 	}
 	
 	$copyPath = null;
 	if($item->get("copyPath"))
-		$copyPath = KALTURA_ROOT_PATH . '/' . $item->get("copyPath");
+		$copyPath = fixPath("$rootPath/app/" . $item->get("copyPath"));
 	
 	if ($mainOutput)
 	{ 
@@ -286,10 +231,10 @@ foreach($config as $name => $item)
 	}
 	else
 	{
-		$outputPath = "$outputPathBase/$name";
+		$outputPath = fixPath("$outputPathBase/$name");
 		$clearPath = null;
 		if($item->get("clearPath"))
-			$clearPath = KALTURA_ROOT_PATH . '/' . $item->get("clearPath");
+			$clearPath = fixPath("$rootPath/app/" . $item->get("clearPath"));
 		else
 			$clearPath = $copyPath;
 		
@@ -352,10 +297,6 @@ foreach($config as $name => $item)
 	$instance->done($outputPath);
 	umask($oldMask);
 	
-	//delete the api services xml schema file
-	if ($fromXml && file_exists($tmpXmlFileName))
-		unlink($tmpXmlFileName);
-
 	if (count($files) == 0)
 	{
 		//something went wrong in this generator?
@@ -365,24 +306,32 @@ foreach($config as $name => $item)
 	{
 		//tar gzip the client library
 		if (!$shouldNotPackage) 
-			createPackage($outputPath, $name, $generatedDate, $schemaGenDateOverride);
+			createPackage($outputPath, $name, $generatedDate);
 	}
 		
 	KalturaLog::info("$name generated successfully");
 }
+
+//delete the api services xml schema file
+if (file_exists($tmpXmlFileName))
+	unlink($tmpXmlFileName);
 
 //write the summary file (will be used by the generator UI)
 file_put_contents($outputPathBase."/".$summaryFileName, serialize($generatedClients));
 
 exit(0);
 
+function fixPath($path)
+{
+	return str_replace('/', DIRECTORY_SEPARATOR, $path);
+}
 
 /**
  * Build a packaged tarball for the client library.
  * @param $outputPath 		The path the client library files are located at.
  * @param $generatorName	The name of the client library.
  */
-function createPackage($outputPath, $generatorName, $generatedDate, $overrideGenDate = null)
+function createPackage($outputPath, $generatorName, $generatedDate)
 {
 	KalturaLog::info("Trying to package");
 	$output = shell_exec("tar --version");
@@ -392,8 +341,7 @@ function createPackage($outputPath, $generatorName, $generatedDate, $overrideGen
 	}
 	else
 	{
-		if ($overrideGenDate == null) $overrideGenDate = $generatedDate;
-		$fileName = "{$generatorName}_{$overrideGenDate}.tar.gz";
+		$fileName = "{$generatorName}_{$generatedDate}.tar.gz";
 		$gzipOutputPath = "../".$fileName;
 		$cmd = "tar -czf \"$gzipOutputPath\" ../".$generatorName;
 		$oldDir = getcwd();

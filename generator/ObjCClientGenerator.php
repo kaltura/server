@@ -16,7 +16,7 @@ class ObjCClientGenerator extends ClientGeneratorFromXml
 	function __construct($xmlPath, Zend_Config $config, $sourcePath = "sources/objc")
 	{
 		parent::__construct($xmlPath, $sourcePath, $config);
-		$this->_doc = new KDOMDocument();
+		$this->_doc = new DOMDocument();
 		$this->_doc->load($this->_xmlFile);
 	}
 	
@@ -136,8 +136,8 @@ class ObjCClientGenerator extends ClientGeneratorFromXml
 
 	function renameReservedProperties($propertyName)
 	{
-		if (kString::beginsWith($propertyName, 'new') ||
-			kString::beginsWith($propertyName, 'copy'))
+		if ($this->beginsWith($propertyName, 'new') ||
+			$this->beginsWith($propertyName, 'copy'))
 			return "a$propertyName";		// prefixing with _ still produces the warning, need to use a real letter
 		return $propertyName;
 	}
@@ -235,6 +235,9 @@ class ObjCClientGenerator extends ClientGeneratorFromXml
 	// enums generation
 	function writeEnum(DOMElement $enumNode)
 	{
+		if(!$this->shouldInclude($enumNode->getAttribute('include'), $enumNode->getAttribute('exclude')))
+			return;
+				
 		$enumName = $enumNode->getAttribute("name");
 		
 		if($this->generateDocs)
@@ -280,6 +283,9 @@ class ObjCClientGenerator extends ClientGeneratorFromXml
 	// classes generation
 	function writeClass(DOMElement $classNode)
 	{
+		if(!$this->shouldInclude($classNode->getAttribute('include'), $classNode->getAttribute('exclude')))
+			return;
+				
 		$type = $classNode->getAttribute("name");
 		
 		if($this->generateDocs)
@@ -541,6 +547,9 @@ class ObjCClientGenerator extends ClientGeneratorFromXml
 	// services generation
 	function writeService(DOMElement $serviceNode)
 	{
+		if(!$this->shouldInclude($serviceNode->getAttribute('include'), $serviceNode->getAttribute('exclude')))
+			return;
+				
 		$serviceName = $serviceNode->getAttribute("name");
 		$serviceId = $serviceNode->getAttribute("id");
 		
@@ -573,6 +582,9 @@ class ObjCClientGenerator extends ClientGeneratorFromXml
 	// actions generation
 	function writeAction($serviceId, DOMElement $actionNode)
 	{
+		if(!$this->shouldInclude($actionNode->getAttribute('include'), $actionNode->getAttribute('exclude')))
+			return;
+				
 		$actionName = $actionNode->getAttribute("name");
 	    $resultNode = $actionNode->getElementsByTagName("result")->item(0);
 	    $resultType = $resultNode->getAttribute("type");

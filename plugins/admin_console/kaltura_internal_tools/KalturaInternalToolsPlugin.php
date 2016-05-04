@@ -48,9 +48,6 @@ class KalturaInternalToolsPlugin extends KalturaPlugin implements IKalturaServic
 		if($configName == 'testme')
 			return new Zend_Config_Ini(dirname(__FILE__) . '/config/testme.ini');
 			
-		if($configName == 'generator')
-			return new Zend_Config_Ini(dirname(__FILE__) . '/config/generator.ini');
-			
 		return null;
 	}
 }

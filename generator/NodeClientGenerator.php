@@ -122,6 +122,9 @@ class NodeClientGenerator extends ClientGeneratorFromXml
 	 */
 	protected function writeEnum(SimpleXMLElement $enumNode)
 	{
+		if(!$this->shouldInclude($enumNode->include, $enumNode->exclude))
+			return;
+				
 		$className = $enumNode->attributes()->name;
 		$this->echoLine($this->enumTypes, "\nvar $className = module.exports.$className = {");
 		//parse the constants
@@ -146,6 +149,9 @@ class NodeClientGenerator extends ClientGeneratorFromXml
 	 */
 	protected function writeObjectClass(SimpleXMLElement $classNode)
 	{
+		if(!$this->shouldInclude($classNode->include, $classNode->exclude))
+			return;
+				
 		$classDesc = "/**\n";
 		$classCode = "";
 		$clasName = $classNode->attributes()->name;
@@ -193,6 +199,9 @@ class NodeClientGenerator extends ClientGeneratorFromXml
 	 */
 	protected function writeService(SimpleXMLElement $serviceNodes)
 	{
+		if(!$this->shouldInclude($serviceNodes->include, $serviceNodes->exclude))
+			return;
+				
 		$serviceName = $serviceNodes->attributes()->name;
 		$serviceId = $serviceNodes->attributes()->id;
 		$serviceClassName = 'Kaltura' . $this->upperCaseFirstLetter($serviceName) . 'Service';
@@ -416,6 +425,9 @@ class NodeClientGenerator extends ClientGeneratorFromXml
 		
 		foreach($servicesNodes as $serviceNode)
 		{
+			if(!$this->shouldInclude($serviceNode->include, $serviceNode->exclude))
+				return;
+					
 			$serviceName = $serviceNode->attributes()->name;
 			$serviceClassName = 'kaltura.services.Kaltura' . $this->upperCaseFirstLetter($serviceName) . 'Service';
 			$this->echoLine($this->mainClass, "/**");

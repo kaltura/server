@@ -11,7 +11,7 @@ class PhpZendClientGenerator extends ClientGeneratorFromXml
 	function __construct($xmlPath, Zend_Config $config, $sourcePath = "sources/zend")
 	{
 		parent::__construct($xmlPath, $sourcePath, $config);
-		$this->_doc = new KDOMDocument();
+		$this->_doc = new DOMDocument();
 		$this->_doc->load($this->_xmlFile);
 	}
 	
@@ -319,6 +319,9 @@ class PhpZendClientGenerator extends ClientGeneratorFromXml
 	
 	function writeEnum(DOMElement $enumNode)
 	{
+		if(!$this->shouldInclude($enumNode->getAttribute('include'), $enumNode->getAttribute('exclude')))
+			return;
+			
 		$enumName = $this->getEnumClass($enumNode->getAttribute('name'));
 		
 		if($this->generateDocs)
@@ -349,6 +352,9 @@ class PhpZendClientGenerator extends ClientGeneratorFromXml
 	
 	function writeClass(DOMElement $classNode)
 	{
+		if(!$this->shouldInclude($classNode->getAttribute('include'), $classNode->getAttribute('exclude')))
+			return;
+			
 		$kalturaType = $classNode->getAttribute('name');
 		$type = $this->getTypeClass($kalturaType);
 		
@@ -508,6 +514,9 @@ class PhpZendClientGenerator extends ClientGeneratorFromXml
 	
 	function writeService(DOMElement $serviceNode)
 	{
+		if(!$this->shouldInclude($serviceNode->getAttribute('include'), $serviceNode->getAttribute('exclude')))
+			return;
+			
 		$plugin = null;
 		if($serviceNode->hasAttribute('plugin'))
 			$plugin = $serviceNode->getAttribute('plugin');
@@ -546,6 +555,9 @@ class PhpZendClientGenerator extends ClientGeneratorFromXml
 	
 	function writeAction($serviceId, $serviceName, DOMElement $actionNode, $plugin = null)
 	{
+		if(!$this->shouldInclude($actionNode->getAttribute('include'), $actionNode->getAttribute('exclude')))
+			return;
+			
 		$action = $actionNode->getAttribute("name");
 	    $resultNode = $actionNode->getElementsByTagName("result")->item(0);
 	    $resultType = $resultNode->getAttribute("type");
@@ -785,6 +797,9 @@ class PhpZendClientGenerator extends ClientGeneratorFromXml
 	
 		foreach($serviceNodes as $serviceNode)
 		{
+			if(!$this->shouldInclude($serviceNode->getAttribute('include'), $serviceNode->getAttribute('exclude')))
+				return;
+				
 			if($serviceNode->hasAttribute("plugin"))
 				continue;
 				
