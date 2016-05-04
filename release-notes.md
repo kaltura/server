@@ -1,5 +1,16 @@
 # Kajam 11.14.0 #
 
+## Schecule event plugins ##
+ - Issue Type: missing configuration in plugins.ini for scheduling plugins.
+ - Issue ID: NO-PLAT
+ 
+#### Configuration ####
+Added schedule plugins to plugins.ini
+ 
+#### Deployment scripts####
+Install plugins:
+    php deployment/base/scripts/installPlugins.php
+    
 ## Use EntryServerNode Table when validating phantom live entries ##
 
  - Issue Type: BUG
