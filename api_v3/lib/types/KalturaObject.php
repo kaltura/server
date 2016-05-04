@@ -11,8 +11,6 @@ abstract class KalturaObject implements IApiObject
 	 */
 	public $relatedObjects;
 	
-	private $purifyHtml = false;
-	
 	static protected $sourceFilesCache = array();
 	static protected $classPrivatesCache = array();
 	
@@ -534,7 +532,7 @@ abstract class KalturaObject implements IApiObject
 			{
 				if (! kXml::isXMLValidContent($value))
 					throw new KalturaAPIException ( KalturaErrors::INVALID_PARAMETER_CHAR, $this_prop );
-				else if($this->purifyHtml)
+				else if($this->shouldPurify())
 					kHtmlPurifier::purify(get_class($object_to_fill), $object_prop, $value);
 			}
 			
@@ -550,9 +548,9 @@ abstract class KalturaObject implements IApiObject
 	public function toUpdatableObject ( $object_to_fill , $props_to_skip = array() )
 	{
 		$this->validateForUpdate($object_to_fill, $props_to_skip); // will check that not updatable properties are not set 
-		$this->purifyHtml = true;
+		$this->enablePurify();
 		$retObj = $this->toObject($object_to_fill, $props_to_skip);
-		$this->purifyHtml = false;
+		$this->disablePurify();
 		return $retObj;
 	}
 	
@@ -560,9 +558,9 @@ abstract class KalturaObject implements IApiObject
 	{
 		$this->validateForInsert($props_to_skip); // will check that not insertable properties are not set 
 
-		$this->purifyHtml = true;
+		$this->enablePurify();
 		$retObj = $this->toObject($object_to_fill, $props_to_skip);
-		$this->purifyHtml = false;
+		$this->disablePurify();
 		return $retObj;
 	}
 	
@@ -890,5 +888,24 @@ abstract class KalturaObject implements IApiObject
 	        $className,
 	        strstr(strstr(serialize($this), '"'), ':')
 	    ));
+	}
+
+	/**
+	 * @return bool
+	 */
+	protected function shouldPurify()
+	{
+		return isset($this->purifyHtml) && $this->purifyHtml;
+	}
+
+	protected function disablePurify()
+	{
+		$this->purifyHtml = false;
+		unset($this->purifyHtml);
+	}
+
+	protected function enablePurify()
+	{
+		$this->purifyHtml = true;
 	}
 }
