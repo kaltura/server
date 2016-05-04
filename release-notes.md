@@ -1,6 +1,6 @@
 # Kajam 11.14.0 #
 
-## Schecule event plugins ##
+## Scheduling plugins ##
  - Issue Type: missing configuration in plugins.ini for scheduling plugins.
  - Issue ID: PLAT-5451
  
