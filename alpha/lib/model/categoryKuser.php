@@ -103,7 +103,7 @@ class categoryKuser extends BasecategoryKuser implements IIndexable{
 	 */
 	public function preUpdate(PropelPDO $con = null)
 	{
-		$this->updateCategroy();
+		$this->updateCategory();
 		
 		return parent::preUpdate($con);
 	}
@@ -113,12 +113,12 @@ class categoryKuser extends BasecategoryKuser implements IIndexable{
 	 */
 	public function preDelete(PropelPDO $con = null)
 	{
-		$this->updateCategroy(true);
+		$this->updateCategory(true);
 		
 		return parent::preDelete();	
 	}		
 	
-	private function updateCategroy($isDelete = false)
+	private function updateCategory($isDelete = false)
 	{
 		categoryPeer::setUseCriteriaFilter(false);
 		$category = categoryPeer::retrieveByPK($this->category_id);
@@ -311,9 +311,10 @@ class categoryKuser extends BasecategoryKuser implements IIndexable{
 			$category = $this->getcategory();
 			if($category && $category->getPrivacyContexts() && !PermissionPeer::isValidForPartner(PermissionName::FEATURE_ENTITLEMENT_USED, $category->getPartnerId()))
 				PermissionPeer::enableForPartner(PermissionName::FEATURE_ENTITLEMENT_USED, PermissionType::SPECIAL_FEATURE, $category->getPartnerId());
+
+			$this->updateCategory();
 		}
 
-		$this->updateCategroy();
 	}
 	
 	/* (non-PHPdoc)
