@@ -2,7 +2,7 @@
 
 ## Scheduling plugins ##
  - Issue Type: missing configuration in plugins.ini for scheduling plugins.
- - Issue ID: PLAT-5451
+ - Issue ID: PLAT-5245
  
 #### Configuration ####
 Added schedule plugins to plugins.ini
