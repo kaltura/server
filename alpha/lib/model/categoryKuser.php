@@ -116,7 +116,18 @@ class categoryKuser extends BasecategoryKuser implements IIndexable{
 		$this->updateCategroy(true);
 		
 		return parent::preDelete();	
-	}		
+	}	
+	
+	
+	/* (non-PHPdoc)
+	 * @see BasecategoryKuser::preInsert()
+	 */
+	public function preInsert(PropelPDO $con = null)
+	{
+		$this->updateCategroy();
+		
+		return parent::preInsert($con);
+	}
 	
 	private function updateCategroy($isDelete = false)
 	{
@@ -134,7 +145,8 @@ class categoryKuser extends BasecategoryKuser implements IIndexable{
 			
 			if($this->status == CategoryKuserStatus::ACTIVE)
 				$category->setMembersCount($category->getMembersCount() + 1);
-
+				
+			$category->save();
 		}
 		elseif($this->isColumnModified(categoryKuserPeer::STATUS))
 		{
@@ -150,6 +162,7 @@ class categoryKuser extends BasecategoryKuser implements IIndexable{
 			if($this->old_status == CategoryKuserStatus::ACTIVE)
 				$category->setMembersCount($category->getMembersCount() - 1);
 				
+			$category->save();
 		}
 		
 		if($isDelete)
@@ -160,10 +173,9 @@ class categoryKuser extends BasecategoryKuser implements IIndexable{
 			if($this->status == CategoryKuserStatus::ACTIVE)
 				$category->setMembersCount($category->getMembersCount() - 1);
 				
+			$category->save();
 		}
 
-		$category->setUpdatedAt(time());
-		$category->save();
 		$category->indexCategoryInheritedTree();
 	}
 
@@ -312,8 +324,6 @@ class categoryKuser extends BasecategoryKuser implements IIndexable{
 			if($category && $category->getPrivacyContexts() && !PermissionPeer::isValidForPartner(PermissionName::FEATURE_ENTITLEMENT_USED, $category->getPartnerId()))
 				PermissionPeer::enableForPartner(PermissionName::FEATURE_ENTITLEMENT_USED, PermissionType::SPECIAL_FEATURE, $category->getPartnerId());
 		}
-
-		$this->updateCategroy();
 	}
 	
 	/* (non-PHPdoc)

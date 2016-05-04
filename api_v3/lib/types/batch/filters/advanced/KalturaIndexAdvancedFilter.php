@@ -9,22 +9,10 @@ class KalturaIndexAdvancedFilter extends KalturaSearchItem
 	 * @var int
 	 */
 	public $indexIdGreaterThan;
-
-	/**
-	 * @var int
-	 */
-	public $depthGreaterThan;
-
-	/**
-	 * @var int
-	 */
-	public $depthEquals;
 	
 	private static $map_between_objects = array
 	(
 		"indexIdGreaterThan",
-		"depthGreaterThan",
-		"depthGreaterThan"
 	);
 
 	public function getMapBetweenObjects ( )
