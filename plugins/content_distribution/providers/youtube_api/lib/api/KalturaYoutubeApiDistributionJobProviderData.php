@@ -68,7 +68,7 @@ class KalturaYoutubeApiDistributionJobProviderData extends KalturaConfigurableDi
 	
 	private function addCaptionsData(KalturaDistributionJobData $distributionJobData) {
 		/* @var $mediaFile KalturaDistributionRemoteMediaFile */
-		$assetIdsArray = explode ( ',', $distributionJobData->entryDistribution->flavorAssetIds );
+		$assetIdsArray = explode ( ',', $distributionJobData->entryDistribution->assetIds );
 		if (empty($assetIdsArray)) return;
 		$assets = array ();
 		$this->captionsInfo = new KalturaYouTubeApiCaptionDistributionInfoArray();

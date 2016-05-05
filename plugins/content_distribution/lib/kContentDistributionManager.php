@@ -512,6 +512,10 @@ class kContentDistributionManager
 			return null;
 		}
 		
+		if (is_null(self::addAssetIdsToEntryDistribution($entryDistribution, $distributionProfile)) )
+		{
+			return null;
+		}
 		$distributionProvider = $distributionProfile->getProvider();
 		if($distributionProvider->isUpdateEnabled())
 			return self::addSubmitUpdateJob($entryDistribution, $distributionProfile);
@@ -710,7 +714,12 @@ class kContentDistributionManager
 			KalturaLog::err("Entry [" . $entryDistribution->getEntryId() . "] not found");
 			return null;
 		}
-			
+
+		if (is_null(self::addAssetIdsToEntryDistribution($entryDistribution, $distributionProfile)) )
+		{
+			return null;
+		}
+		
 		$autoCreateFlavors = $distributionProfile->getAutoCreateFlavorsArray();
 		$autoCreateThumbs = $distributionProfile->getAutoCreateThumbArray();
 		foreach($validationErrors as $validationError)
@@ -1105,5 +1114,16 @@ class kContentDistributionManager
 				$searchValues[] = self::getSearchStringDistributionValidationError($validationError->getErrorType(), $distributionProfileId, true);
 		}
 		return implode(' ', $searchValues);
+	}
+	
+	public static function addAssetIdsToEntryDistribution($entryDistribution, $distributionProfile)
+	{
+		$dbEntry = entryPeer::retrieveByPK($entryDistribution->getEntryId());
+		if (!$dbEntry)
+		{
+			KalturaLog::log("EntryId not found [".$entryDistribution->getEntryId()."]");
+			return null;
+		}
+		self::assignAssets($entryDistribution,  $dbEntry, $distributionProfile);
 	}
 }
