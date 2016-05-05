@@ -574,11 +574,8 @@ kCall.prototype.onServiceChange = function(actionId){
 	this.jqActionInput.append('<option>Loading...</option>');
 
 	jQuery.ajax({
-		url: 'ajax-get-actions.php', 
+		url: 'json/' + serviceId + '-actions.json', 
 		dataType: 'json',
-		data: {
-			service: serviceId 
-		}, 
 		success: delegate(this, this.onActionsListLoad),
 		error: delegate(this, this.onActionsListFail)
 	});
@@ -643,11 +640,7 @@ kCall.prototype.onActionChange = function(){
 	this.jqParamsContainer.append('<span>Loading...</span>');
 
 	jQuery.getJSON(
-		'ajax-get-action-info.php',
-		{
-			service: serviceId, 
-			action: actionId 
-		},
+		'json/' + serviceId + '-' + actionId +'-action-info.json',
 		delegate(this, this.onActionParamsLoad)
 	);
 };

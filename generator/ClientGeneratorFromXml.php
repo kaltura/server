@@ -54,6 +54,10 @@ abstract class ClientGeneratorFromXml
 		if (!file_exists($sourcePath))
 			throw new Exception("Source path was not found [$sourcePath]");
 
+		$singleLineCommentMarker = $this->getSingleLineCommentMarker();
+		if($singleLineCommentMarker === null)
+			$singleLineCommentMarker = '';
+		
 		$this->_licenseBuffer = file_get_contents(dirname(__FILE__).'/sources/license.txt');
 		$this->_licenseBuffer = str_replace('//', $this->getSingleLineCommentMarker(), $this->_licenseBuffer);
 		$this->_licenseBuffer = str_replace("\r\n", "\n", $this->_licenseBuffer);
@@ -203,6 +207,11 @@ abstract class ClientGeneratorFromXml
 		return in_array($type, array("int","string","bool","float","bigint"));
 	}
 	
+	protected function isComplexType($type)
+	{
+		return !$this->isSimpleType($type) && $type != 'file';
+	}
+	
 	protected function startNewTextBlock()
 	{
 		$this->_txt = "";
@@ -228,7 +237,10 @@ abstract class ClientGeneratorFromXml
 	 * 
 	 * @return string 
 	 */
-	protected abstract function getSingleLineCommentMarker();
+	protected function getSingleLineCommentMarker()
+	{
+		return '//';
+	}
 	
 	public function done($outputPath)
 	{

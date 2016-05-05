@@ -374,6 +374,7 @@ class XmlClientGenerator extends ClientGeneratorFromPhp
 			
 			$propertyElement->setAttribute("readOnly", $property->isReadOnly() ? "1" : "0");
 			$propertyElement->setAttribute("insertOnly", $property->isInsertOnly() ? "1" : "0");
+			$propertyElement->setAttribute("writeOnly", $property->isWriteOnly() ? "1" : "0");
 			
 			$description = $property->getDescription();
 			$description = $this->fixDescription($description);
@@ -502,8 +503,7 @@ class XmlClientGenerator extends ClientGeneratorFromPhp
 	
 	private function fixDescription($description)
 	{
-		$description = str_replace("\n\r", "\n", $description);
-		$description = str_replace("\r\n", "\n", $description);
+		$description = str_replace("\r", '', trim($description, " \t\r\n"));
 		//$description = substr($description, 0, strlen($description) - 1);
 		return $description;
 	}

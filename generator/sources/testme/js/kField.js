@@ -303,10 +303,7 @@ function kObjectField(param, jqParentContainer, level){
 	}
 	
 	jQuery.getJSON(
-		'ajax-get-type-subclasses.php',
-		{ 
-			type: param.type 
-		},
+		'json/' + param.type + '-subclasses.json',
 		delegate(this, this.onSubClassesLoad)
 	);
 }
