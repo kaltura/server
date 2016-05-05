@@ -511,7 +511,7 @@ class kContentDistributionManager
 			KalturaLog::log("Validation errors found");
 			return null;
 		}
-		
+		KalturaLog::debug("@@NA about to add asset Ids");
 		if (is_null(self::addAssetIdsToEntryDistribution($entryDistribution, $distributionProfile)) )
 		{
 			return null;
@@ -948,7 +948,9 @@ class kContentDistributionManager
 		$originalList = $entryDistribution->getAssetIds();
 		
 		$entryAssets = assetPeer::retrieveReadyByEntryId($entryDistribution->getEntryId());
-		
+		KalturaLog::debug("@@NA entryAssets [".print_r($entryAssets,true)."]");
+		KalturaLog::debug("@@NA assetDistributionRules [".print_r($assetDistributionRules,true)."]");
+
 		foreach ($assetDistributionRules as $assetDistributionRule)
 		{
 			/* @var $assetDistributionRule kAssetDistributionRule */
@@ -1125,5 +1127,6 @@ class kContentDistributionManager
 			return null;
 		}
 		self::assignAssets($entryDistribution,  $dbEntry, $distributionProfile);
+		$entryDistribution->save();
 	}
 }

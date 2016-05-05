@@ -291,12 +291,15 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 				unlink($videoPath);
 			}
 			
+			$startCheckingReadyTime = time();
 			while (!$this->isVideoReady($youtube, $data->remoteId))
 			{
 				sleep(self::TIME_TO_WAIT_FOR_YOUTUBE_TRANSCODING);
+				if ( (time() - $startCheckingReadyTime) > $this->timeout )
+				{
+					throw Exception("Video transcoding on youtube has timed out");
+				}
 			}
-			
-			
 		}
 		
 		foreach ($data->providerData->captionsInfo as $captionInfo){
@@ -594,6 +597,9 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 				case "rejected":
 					throw new Exception("Video was rejected by youtube, reason [".$videoStatus['rejectionReason']."]");
 					break;
+				case "failed":
+					throw new Exception("Video has failed on youtube, reason [".$videoStatus['failureReason']."]");
+					break;					
 				default:
 					return false;
 					break;
