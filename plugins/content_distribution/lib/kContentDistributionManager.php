@@ -512,7 +512,7 @@ class kContentDistributionManager
 			return null;
 		}
 		KalturaLog::debug("@@NA about to add asset Ids");
-		if (is_null(self::addAssetIdsToEntryDistribution($entryDistribution, $distributionProfile)) )
+		if (!(self::addAssetIdsToEntryDistribution($entryDistribution, $distributionProfile)) )
 		{
 			return null;
 		}
@@ -715,7 +715,7 @@ class kContentDistributionManager
 			return null;
 		}
 
-		if (is_null(self::addAssetIdsToEntryDistribution($entryDistribution, $distributionProfile)) )
+		if (!(self::addAssetIdsToEntryDistribution($entryDistribution, $distributionProfile)) )
 		{
 			return null;
 		}
@@ -1124,9 +1124,10 @@ class kContentDistributionManager
 		if (!$dbEntry)
 		{
 			KalturaLog::log("EntryId not found [".$entryDistribution->getEntryId()."]");
-			return null;
+			return false;
 		}
-		self::assignAssets($entryDistribution,  $dbEntry, $distributionProfile);
+		$ret_val = self::assignAssets($entryDistribution,  $dbEntry, $distributionProfile);
 		$entryDistribution->save();
+		return $ret_val;
 	}
 }
