@@ -511,11 +511,7 @@ class kContentDistributionManager
 			KalturaLog::log("Validation errors found");
 			return null;
 		}
-		KalturaLog::debug("@@NA about to add asset Ids");
-		if (!(self::addAssetIdsToEntryDistribution($entryDistribution, $distributionProfile)) )
-		{
-			return null;
-		}
+		self::addAssetIdsToEntryDistribution($entryDistribution, $distributionProfile);
 		$distributionProvider = $distributionProfile->getProvider();
 		if($distributionProvider->isUpdateEnabled())
 			return self::addSubmitUpdateJob($entryDistribution, $distributionProfile);
@@ -715,10 +711,7 @@ class kContentDistributionManager
 			return null;
 		}
 
-		if (!(self::addAssetIdsToEntryDistribution($entryDistribution, $distributionProfile)) )
-		{
-			return null;
-		}
+		self::addAssetIdsToEntryDistribution($entryDistribution, $distributionProfile);
 		
 		$autoCreateFlavors = $distributionProfile->getAutoCreateFlavorsArray();
 		$autoCreateThumbs = $distributionProfile->getAutoCreateThumbArray();
@@ -948,8 +941,6 @@ class kContentDistributionManager
 		$originalList = $entryDistribution->getAssetIds();
 		
 		$entryAssets = assetPeer::retrieveReadyByEntryId($entryDistribution->getEntryId());
-		KalturaLog::debug("@@NA entryAssets [".print_r($entryAssets,true)."]");
-		KalturaLog::debug("@@NA assetDistributionRules [".print_r($assetDistributionRules,true)."]");
 
 		foreach ($assetDistributionRules as $assetDistributionRule)
 		{
