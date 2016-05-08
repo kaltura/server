@@ -41,6 +41,8 @@ class myPartnerRegistration
 	const KALTURAS_EXISTING_USER_REGISTRATION_CONFIRMATION = 55;
 	const KALTURAS_DEFAULT_EXISTING_USER_REGISTRATION_CONFIRMATION = 56;
 	const KALTURAS_BLACKBOARD_DEFAULT_REGISTRATION_CONFIRMATION = 57;
+	const KALTURAS_DEVELOPER_REGISTRATION_CONFIRMATION = 220;
+	const KALTURAS_DEVELOPER_EXISTING_USER_REGISTRATION_CONFIRMATION = 221;
 	
 	public function sendRegistrationInformationForPartner ($partner, $skip_emails, $existingUser, $silent = false )
 	{
@@ -97,6 +99,19 @@ class myPartnerRegistration
 	 	if(kConf::get('kaltura_installation_type') == 'CE')	{
 			$partner_type = 1;
 		}
+
+		if ($partner->getPartnerPackage() == PartnerPackages::PARTNER_PACKAGE_DEVELOPER)
+		{
+			if ($existingUser) {
+				$mailType = self::KALTURAS_DEVELOPER_EXISTING_USER_REGISTRATION_CONFIRMATION;
+				$bodyParams = array($loginEmail, $partnerId);
+			}
+			else {
+				$mailType = self::KALTURAS_DEVELOPER_REGISTRATION_CONFIRMATION;
+				$bodyParams = array($resetPasswordLink, $resetPasswordLink);
+			}
+		}
+		else {
 		
 		switch($partner_type) { // send different email for different partner types
 			case Partner::PARTNER_TYPE_KMC: // KMC signup
@@ -130,6 +145,7 @@ class myPartnerRegistration
 					$bodyParams = array($userName, $loginEmail, $partnerId, $resetPasswordLink, $kmcLink, $contactLink, $contactPhone, $beginnersGuideLink, $quickStartGuideLink);
 				}
 				break;
+		}
 		}
 		
 		kJobsManager::addMailJob(
@@ -351,6 +367,8 @@ class myPartnerRegistration
 			$this->configurePartnerByPackage($newPartner);
 					
 			$this->setAllTemplateEntriesToAdminKuser($newPartner->getId(), $kuserId);
+
+			kEventsManager::raiseEvent(new kObjectAddedEvent($newPartner));
 
 			return array($newPartner->getId(), $newSubPartnerId, $newAdminKuserPassword, $newPassHashKey);
 		}
