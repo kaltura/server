@@ -112,40 +112,39 @@ class myPartnerRegistration
 			}
 		}
 		else {
-		
-		switch($partner_type) { // send different email for different partner types
-			case Partner::PARTNER_TYPE_KMC: // KMC signup
-				if ($existingUser) {
-					$mailType = self::KALTURAS_EXISTING_USER_REGISTRATION_CONFIRMATION;
-					$bodyParams = array($userName, $loginEmail, $partnerId, $contactLink, $contactPhone, $beginnersGuideLink, $quickStartGuideLink);
-				}
-				else {
-					$mailType = self::KALTURAS_CMS_REGISTRATION_CONFIRMATION;
-					$bodyParams = array($userName, $loginEmail, $resetPasswordLink, $partnerId, $kmcLink, $quickStartGuideLink, $uploadMediaVideoLink, $howToPublishVideoLink, $contactLink, $contactPhone);
-				}
-				break;
-			//blackboard
-			case Partner::PARTNER_TYPE_BLACKBOARD:
-				if ($existingUser) {
-					$mailType = self::KALTURAS_DEFAULT_EXISTING_USER_REGISTRATION_CONFIRMATION;
-					$bodyParams = array($userName, $loginEmail, $partnerId, $contactLink, $contactPhone, $beginnersGuideLink, $quickStartGuideLink);
-				}
-				else {
-					$mailType = self::KALTURAS_BLACKBOARD_DEFAULT_REGISTRATION_CONFIRMATION;
-					$bodyParams = array($resetPasswordLink, $loginEmail, $partnerId, $kmcLink);
-				}
-				break;	
-			default: // all others
-			 	if ($existingUser) {
-					$mailType = self::KALTURAS_DEFAULT_EXISTING_USER_REGISTRATION_CONFIRMATION;
-					$bodyParams = array($userName, $loginEmail, $partnerId, $contactLink, $contactPhone, $beginnersGuideLink, $quickStartGuideLink);
-				}
-				else {
-					$mailType = self::KALTURAS_DEFAULT_REGISTRATION_CONFIRMATION;
-					$bodyParams = array($userName, $loginEmail, $partnerId, $resetPasswordLink, $kmcLink, $contactLink, $contactPhone, $beginnersGuideLink, $quickStartGuideLink);
-				}
-				break;
-		}
+			switch($partner_type) { // send different email for different partner types
+				case Partner::PARTNER_TYPE_KMC: // KMC signup
+					if ($existingUser) {
+						$mailType = self::KALTURAS_EXISTING_USER_REGISTRATION_CONFIRMATION;
+						$bodyParams = array($userName, $loginEmail, $partnerId, $contactLink, $contactPhone, $beginnersGuideLink, $quickStartGuideLink);
+					}
+					else {
+						$mailType = self::KALTURAS_CMS_REGISTRATION_CONFIRMATION;
+						$bodyParams = array($userName, $loginEmail, $resetPasswordLink, $partnerId, $kmcLink, $quickStartGuideLink, $uploadMediaVideoLink, $howToPublishVideoLink, $contactLink, $contactPhone);
+					}
+					break;
+				//blackboard
+				case Partner::PARTNER_TYPE_BLACKBOARD:
+					if ($existingUser) {
+						$mailType = self::KALTURAS_DEFAULT_EXISTING_USER_REGISTRATION_CONFIRMATION;
+						$bodyParams = array($userName, $loginEmail, $partnerId, $contactLink, $contactPhone, $beginnersGuideLink, $quickStartGuideLink);
+					}
+					else {
+						$mailType = self::KALTURAS_BLACKBOARD_DEFAULT_REGISTRATION_CONFIRMATION;
+						$bodyParams = array($resetPasswordLink, $loginEmail, $partnerId, $kmcLink);
+					}
+					break;	
+				default: // all others
+				 	if ($existingUser) {
+						$mailType = self::KALTURAS_DEFAULT_EXISTING_USER_REGISTRATION_CONFIRMATION;
+						$bodyParams = array($userName, $loginEmail, $partnerId, $contactLink, $contactPhone, $beginnersGuideLink, $quickStartGuideLink);
+					}
+					else {
+						$mailType = self::KALTURAS_DEFAULT_REGISTRATION_CONFIRMATION;
+						$bodyParams = array($userName, $loginEmail, $partnerId, $resetPasswordLink, $kmcLink, $contactLink, $contactPhone, $beginnersGuideLink, $quickStartGuideLink);
+					}
+					break;
+			}
 		}
 		
 		kJobsManager::addMailJob(
