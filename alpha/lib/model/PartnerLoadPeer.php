@@ -177,6 +177,8 @@ class PartnerLoadPeer extends BasePartnerLoadPeer {
 	private static function getMaxQuotaForPartner($partnerLoadRecord) {
 		// Insert
 		$partner = PartnerPeer::retrieveByPK($partnerLoadRecord->getPartnerId());
+		if (!$partner)
+			return 0;
 		$maxQuota = $partner->getJobTypeQuota($partnerLoadRecord->getJobType(), $partnerLoadRecord->getJobSubType());
 		if(!$maxQuota)
 			$maxQuota = BatchJobLockPeer::getMaxJobsForPartner($partnerLoadRecord->getJobType());
