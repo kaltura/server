@@ -527,19 +527,20 @@ class myPlaylistUtils
 			$entry_filters[] = $entry_filter;
 		}
 		
-		$startOffset = 0;
-		$pageSize = $total_results;
 		if ( $pager )
 		{
 			$startOffset = $pager->calcOffset();
 			$pageSize = $pager->calcPageSize();
-			$total_results = $startOffset + $pageSize;
+			
+			//If pager is configured limit the total_reults to be the page size + start offset to overcome the 200 limit
+			if($startOffset + $pageSize > $total_results)
+				$total_results = $startOffset + $pageSize;
 		}
 
 		$entry_ids_list = array();
 		foreach ( $entry_filters as $entry_filter )
 		{
-			$current_limit = min(max ( 0 , $total_results - count($entry_ids_list) ), $pageSize); // if the current_limit is < 0 - set it to be 0
+			$current_limit = max ( 0 , $total_results - count($entry_ids_list) );
 
 			// no need to fetch any more results
 			if ( $current_limit <= 0 ) break;
@@ -569,7 +570,6 @@ class myPlaylistUtils
 			$c->addAnd ( entryPeer::TYPE , array ( entryType::MEDIA_CLIP , entryType::MIX , entryType::LIVE_STREAM ) , Criteria::IN ); // search only for clips or roughcuts
 			$c->addAnd ( entryPeer::STATUS , entryStatus::READY ); // search only for READY entries 
 			$c->addAnd ( entryPeer::DISPLAY_IN_SEARCH , mySearchUtils::DISPLAY_IN_SEARCH_SYSTEM, Criteria::NOT_EQUAL);
-			$c->setOffset($startOffset);
 
 			if ( $display_in_search >= 2 )
 			{
@@ -594,6 +594,11 @@ class myPlaylistUtils
 			
 			// update total count and merge current result with the global list
 			$entry_ids_list = array_merge ( $entry_ids_list , $entry_ids_list_for_filter );
+		}
+		
+		if($pager)
+		{
+			$entry_ids_list = array_slice($entry_ids_list, $startOffset, $pageSize);
 		}
 
 		// Disable entitlement, which was already applied in entryPeer::prepareEntitlementCriteriaAndFilters()
