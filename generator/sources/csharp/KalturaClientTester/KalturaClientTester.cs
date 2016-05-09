@@ -123,7 +123,6 @@ namespace Kaltura
             if (code == 0)
             {
                 Console.WriteLine("Finished running client library tests");
-                Console.ReadLine();
             }
 
             Environment.Exit(code);

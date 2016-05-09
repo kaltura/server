@@ -423,5 +423,146 @@ bad  mencoder32 ~/Media/Canon.Rotated.0_qaqsufbl.avi -of lavf -lavfopts format=m
 		}
 		return $params;
 	}
+	
+	/**
+	 * 
+	 */
+	public static function AdjustCmdlineWithWatermarkData($cmdLine, $wmData, $wmFilePath, $wmImgIdx)
+	{
+		KalturaLog::log("cmdLine($cmdLine),wmFilePath($wmFilePath), wmImgIdx($wmImgIdx),wmData:".json_encode($wmData));
+			/*
+			 * evaluate WM scale and margins, if any
+			 */
+		if(isset($wmData->scale) && is_string($wmData->scale)) {
+			$wmData->scale = explode("x",$wmData->scale);
+		}
+		if(isset($wmData->margins) && is_string($wmData->margins)) {
+			$wmData->margins = explode("x",$wmData->margins);
+		}
+	
+		KalturaLog::log("Updated Watermark data:\n".print_r($wmData,1));
+
+			/*
+			 * Evaluate WM scaling params and scale it accordingly
+			 */
+		$wid=null; $hgt=null;
+		if(!isset($wmData->scale) && ($wmData->width%2!=0 || $wmData->height%2!=0)){
+			$wmData->scale = array();
+			$wmData->width -= $wmData->width%2;
+			$wmData->height -= $wmData->height%2;
+			$wmData->scale[0] = $wmData->width;
+			$wmData->scale[1] = $wmData->height;
+		}
+		if(isset($wmData->scale)){
+			$wid = in_array($wmData->scale[0],array(null,0,-1))? -1: $wmData->scale[0];
+			$hgt = in_array($wmData->scale[1],array(null,0,-1))? -1: $wmData->scale[1];
+			if($wid<=0) {
+				$wid = round($hgt*$wmData->width/$wmData->height);
+			}
+			if($hgt<=0) {
+				$hgt = round($wid*$wmData->height/$wmData->width);
+			}
+			if(!($wid>0 && $hgt>0)) {
+				$wid = $wmData->width; $hgt = $wmData->height;
+			}
+			if($wid>0) $wid -= $wid%2;
+			if($hgt>0) $hgt -= $hgt%2;
+
+		}
+		else{
+			$wid = $wmData->width; $hgt = $wmData->height;
+		}
+/* Samples - 
+"[1]scale=100:100,setsar=100/100[logo];[0:v]crop=100:100:iw-ow-10:300,setsar=100/100[cropped];[cropped][logo]blend=all_expr='if(eq(mod(X,2),mod(Y,2)),A,B)'[blended];[0:v][blended]overlay=main_w-overlay_w-10:300[out]"
+"[1]scale=100:100,setsar=100/100[logo];[0:v][logo]overlay=main_w-overlay_w-10:300[out]" -map "[out]"
+*/
+		$cmdLine = str_replace(
+				array(KDLCmdlinePlaceholders::WaterMarkFileName."_$wmImgIdx",KDLCmdlinePlaceholders::WaterMarkWidth."_$wmImgIdx",KDLCmdlinePlaceholders::WaterMarkHeight."_$wmImgIdx"), 
+				array($wmFilePath, $wid, $hgt),
+				$cmdLine);
+		KalturaLog::log("After:cmdline($cmdLine)");
+		return $cmdLine;
+	}
+	
+	/**
+	 * 
+	 */
+	public static function RemoveFilter($cmdLine, $filterName)
+	{
+		$cmdValsArr = explode(' ', $cmdLine);
+			
+		$keys=array_keys($cmdValsArr, "-filter_complex");
+		if(!isset($keys) || count($keys)==0)
+			return $cmdLine;
+		
+		$toRemove= null;
+		foreach ($keys as $key)
+		{
+			if(!array_key_exists($key+1,$cmdValsArr))
+				continue;
+			$toRemove=strstr($cmdValsArr[$key+1], $filterName);
+			if($toRemove!=false)
+				break;
+		}
+		if(!isset($toRemove) || $toRemove==false)
+			return $cmdLine;
+		
+		$filtersArr = explode(';', $cmdValsArr[$key+1]);
+		if(count($filtersArr)==1){
+			unset($cmdValsArr[$key+1]);
+			unset($cmdValsArr[$key]);
+			$cmdLine = implode(' ', $cmdValsArr);
+			return $cmdLine;
+		}
+		foreach($filtersArr as $kFlt=>$filter){
+			$toRemove=strstr($filter, $filterName);
+			if($toRemove!=false)
+				break;
+		}
+		
+		$pipeName = str_replace($toRemove, '', $filter);
+		unset($filtersArr[$key+1]);
+		unset($filtersArr[$kFlt]);
+		$lastChar = substr($toRemove,-1);
+		if($lastChar!='\'' && $lastChar!='\"')
+			$lastChar = null;
+		$filtersArr[$kFlt-1] = str_replace($pipeName, $lastChar, $filtersArr[$kFlt-1]);
+		
+		$cmdValsArr[$key+1] = implode(';', $filtersArr);
+		$cmdLine = implode(' ', $cmdValsArr);
+		return $cmdLine;
+	}
+
+	/**
+	 * 
+	 * @param unknown_type $execCmd
+	 * @return unknown|mixed
+	 */
+	public static function ExpandForcedKeyframesParams($execCmd)
+	{
+		$cmdLineWithKeyframes = strstr($execCmd, KDLCmdlinePlaceholders::ForceKeyframes);
+		if($cmdLineWithKeyframes==false){
+			return $execCmd;
+		}
+		
+		$cmdLineWithKeyframes = explode(" ",$cmdLineWithKeyframes);	// 
+		$cmdLineWithKeyframes = $cmdLineWithKeyframes[0];
+		$kfPrms = substr($cmdLineWithKeyframes,strlen(KDLCmdlinePlaceholders::ForceKeyframes));
+		$kfPrms = explode("_",$kfPrms);
+		$forcedKF=null;
+		for($t=0,$tr=0;$t<=$kfPrms[0]; $t+=$kfPrms[1], $tr+=round($kfPrms[1])){
+			// The check bellow is to prevent 'dripping' of the kf timing
+			if($tr && round($t)>$tr) {
+				$t=$tr;
+			}
+			$forcedKF.=",".round($t,4);
+		}
+		$forcedKF[0] = ' ';
+		$execCmd = str_replace ( 
+				array($cmdLineWithKeyframes), 
+				array($forcedKF),
+				$execCmd);
+		return $execCmd;
+	}
 }
 	

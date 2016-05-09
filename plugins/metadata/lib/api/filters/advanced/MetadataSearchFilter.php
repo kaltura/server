@@ -175,7 +175,7 @@ class MetadataSearchFilter extends AdvancedSearchFilterOperator
 						}
 						
 						// exact match
-						elseif (in_array($xPaths[$field]->getType(), array(self::KMC_FIELD_TYPE_OBJECT, self::KMC_FIELD_TYPE_USER)))
+						elseif (in_array($xPaths[$field]->getType(), array(self::KMC_FIELD_TYPE_OBJECT, self::KMC_FIELD_TYPE_USER, self::KMC_FIELD_TYPE_LIST)))
 						{
 							if ($item instanceof AdvancedSearchFilterMatchCondition && $item->not)
 								$dataCondition = "!\"{$pluginName}_{$fieldId} $value " . kMetadataManager::SEARCH_TEXT_SUFFIX . "_{$fieldId}" . "\"";

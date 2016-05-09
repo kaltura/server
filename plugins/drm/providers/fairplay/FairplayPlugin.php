@@ -2,7 +2,7 @@
 /**
  * @package plugins.fairplay
  */
-class FairplayPlugin extends KalturaPlugin implements IKalturaEnumerator, IKalturaObjectLoader, IKalturaEntryContextDataContributor
+class FairplayPlugin extends KalturaPlugin implements IKalturaEnumerator, IKalturaObjectLoader, IKalturaEntryContextDataContributor, IKalturaPending
 {
 	const PLUGIN_NAME = 'fairplay';
 	const SEARCH_DATA_SUFFIX = 's';
@@ -138,5 +138,18 @@ class FairplayPlugin extends KalturaPlugin implements IKalturaEnumerator, IKaltu
 		}
 		return false;
 	}
+
+	/**
+	 * Returns a Kaltura dependency object that defines the relationship between two plugins.
+	 *
+	 * @return array<KalturaDependency> The Kaltura dependency object
+	 */
+	public static function dependsOn()
+	{
+		$drmDependency = new KalturaDependency(DrmPlugin::getPluginName());
+
+		return array($drmDependency);
+	}
 	
+
 }

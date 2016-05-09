@@ -72,8 +72,12 @@ if ($editFlavorParam)
 			<label for="text">AnamorphicPixels </label>
 			<input type="text" id="anamorphicPixels" name="anamorphicPixels" value="<?php echo $editFlavorParam->getAnamorphicPixels(); ?>" size="5" <?php echo $disabled; ?>/>
 			<br />
-			<label for="watermarkData">Watermark:</label><br />
-			<textarea id="watermarkData" name="watermarkData" cols="40" rows="1" <?php echo $disabled; ?>><?php echo $editFlavorParam->getWatermarkData(); ?></textarea><br/>
+			<label for="watermarkData">Watermark:</label>
+			<span style="color: white; background:white;><label for="name">............................................................</label><span style="color: black; background:white;>
+			<label for="subtitleData">Subtitle:</label><br />
+			<textarea id="watermarkData" name="watermarkData" cols="40" rows="1" <?php echo $disabled; ?>><?php echo $editFlavorParam->getWatermarkData(); ?></textarea>
+			<textarea id="subtitlesData" name="subtitlesData" cols="40" rows="1" <?php echo $disabled; ?>><?php echo $editFlavorParam->getSubtitlesData(); ?></textarea>
+			<br/>
 			<br />
 
 

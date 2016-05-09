@@ -31,7 +31,9 @@ class KalturaLikeFilter extends KalturaLikeBaseFilter
 			$c->add(kvotePeer::CREATED_AT,$this->createdAtGreaterThanOrEqual, Criteria::GREATER_EQUAL);
 		if($this->createdAtLessThanOrEqual)
 			$c->addAnd(kvotePeer::CREATED_AT,$this->createdAtLessThanOrEqual, Criteria::LESS_EQUAL);
-		
+		if($this->entryIdIn)
+			$c->add(kvotePeer::ENTRY_ID,explode(',',$this->entryIdIn),Criteria::IN);
+
 		$pager->attachToCriteria($c);
 	
 		$list = kvotePeer::doSelect($c);

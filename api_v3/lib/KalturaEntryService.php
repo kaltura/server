@@ -966,7 +966,8 @@ class KalturaEntryService extends KalturaBaseService
 		if(!$templateEntryId)
 		{
 			$conversionProfile = myPartnerUtils::getConversionProfile2ForPartner($this->getPartnerId(), $conversionProfileId);
-			$templateEntryId = $conversionProfile->getDefaultEntryId();
+			if($conversionProfile)
+				$templateEntryId = $conversionProfile->getDefaultEntryId();
 		}
 		
 		if($templateEntryId)
@@ -1259,14 +1260,15 @@ class KalturaEntryService extends KalturaBaseService
 		// for new entry, puser ID is null - set it from service scope
 		if ($entry->userId === null)
 		{
+			KalturaLog::debug("Set kuser id [" . $this->getKuser()->getId() . "] line [" . __LINE__ . "]");
+			$dbEntry->setCreatorKuserId($this->getKuser()->getId());
+			$dbEntry->setCreatorPuserId($this->getKuser()->getPuserId());
+			
 			if($dbEntry->getKuserId())
 				return;
 		
-			KalturaLog::debug("Set kuser id [" . $this->getKuser()->getId() . "] line [" . __LINE__ . "]");
 			$dbEntry->setPuserId($this->getKuser()->getPuserId());
 			$dbEntry->setKuserId($this->getKuser()->getId());
-			$dbEntry->setCreatorKuserId($this->getKuser()->getId());
-			$dbEntry->setCreatorPuserId($this->getKuser()->getPuserId());
 			return;
 		}
 		

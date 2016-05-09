@@ -8,19 +8,13 @@ abstract class KalturaEntryServerNodeBaseFilter extends KalturaRelatedFilter
 {
 	static private $map_between_objects = array
 	(
-		"idEqual" => "_eq_id",
-		"idIn" => "_in_id",
-		"idNotIn" => "_notin_id",
 		"entryIdEqual" => "_eq_entry_id",
 		"entryIdIn" => "_in_entry_id",
-		"entryIdNotIn" => "_notin_entry_id",
 		"serverNodeIdEqual" => "_eq_server_node_id",
-		"serverNodeIdIn" => "_in_server_node_id",
-		"serverNodeIdNotIn" => "_notin_server_node_id",
-		"createdAtLessThanOrEqual" => "_lte_created_at",
 		"createdAtGreaterThanOrEqual" => "_gte_created_at",
-		"updatedAtLessThanOrEqual" => "_lte_updated_at",
+		"createdAtLessThanOrEqual" => "_lte_created_at",
 		"updatedAtGreaterThanOrEqual" => "_gte_updated_at",
+		"updatedAtLessThanOrEqual" => "_lte_updated_at",
 		"statusEqual" => "_eq_status",
 		"statusIn" => "_in_status",
 		"serverTypeEqual" => "_eq_server_type",
@@ -45,21 +39,6 @@ abstract class KalturaEntryServerNodeBaseFilter extends KalturaRelatedFilter
 	}
 
 	/**
-	 * @var int
-	 */
-	public $idEqual;
-
-	/**
-	 * @var string
-	 */
-	public $idIn;
-
-	/**
-	 * @var string
-	 */
-	public $idNotIn;
-
-	/**
 	 * @var string
 	 */
 	public $entryIdEqual;
@@ -70,29 +49,9 @@ abstract class KalturaEntryServerNodeBaseFilter extends KalturaRelatedFilter
 	public $entryIdIn;
 
 	/**
-	 * @var string
-	 */
-	public $entryIdNotIn;
-
-	/**
 	 * @var int
 	 */
 	public $serverNodeIdEqual;
-
-	/**
-	 * @var string
-	 */
-	public $serverNodeIdIn;
-
-	/**
-	 * @var string
-	 */
-	public $serverNodeIdNotIn;
-
-	/**
-	 * @var time
-	 */
-	public $createdAtLessThanOrEqual;
 
 	/**
 	 * @var time
@@ -102,7 +61,7 @@ abstract class KalturaEntryServerNodeBaseFilter extends KalturaRelatedFilter
 	/**
 	 * @var time
 	 */
-	public $updatedAtLessThanOrEqual;
+	public $createdAtLessThanOrEqual;
 
 	/**
 	 * @var time
@@ -110,12 +69,17 @@ abstract class KalturaEntryServerNodeBaseFilter extends KalturaRelatedFilter
 	public $updatedAtGreaterThanOrEqual;
 
 	/**
+	 * @var time
+	 */
+	public $updatedAtLessThanOrEqual;
+	
+	/**
 	 * @var KalturaEntryServerNodeStatus
 	 */
 	public $statusEqual;
 	
 	/**
-	 * @var KalturaEntryServerNodeStatus
+	 * @var string
 	 */
 	public $statusIn;
 

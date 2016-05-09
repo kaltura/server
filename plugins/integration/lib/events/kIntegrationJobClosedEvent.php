@@ -3,7 +3,7 @@
  * @package plugins.integration
  * @subpackage lib.events
  */
-class kIntegrationJobClosedEvent extends KalturaEvent implements IKalturaObjectRelatedEvent, IKalturaContinualEvent
+class kIntegrationJobClosedEvent extends KalturaEvent implements IKalturaObjectRelatedEvent, IKalturaBatchJobRelatedEvent, IKalturaContinualEvent
 {
 	const EVENT_CONSUMER = 'kIntegrationJobClosedEventConsumer';
 

@@ -236,7 +236,7 @@ $html5Version = $_GET['playerVersion'];
 		</tr>
 		<tr style="display: none; ">
 			<td>Ad URL:</td>
-			<td><input type="text" id="txtAdUrl" value="http://projects.kaltura.com/vast/vast11.xml" />
+			<td><input type="text" id="txtAdUrl" value="http://projects.kaltura.com/vast/getVast.php" />
 		</td>
 		<tr style="display: none; ">
 			<td>Ad Duration (milliseconds):</td>

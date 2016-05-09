@@ -86,7 +86,7 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject
 					}
 				}
 			}
-			
+
 			if ($this->getIsAccountOwner())
 			{
 				$adminRoleId = $this->getPartner()->getAdminSessionRoleId();
@@ -95,6 +95,7 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject
 				 	throw new kPermissionException('Account owner must be set with a partner administrator role', kPermissionException::ACCOUNT_OWNER_NEEDS_PARTNER_ADMIN_ROLE);	
 				}
 			}
+		$this->setUpdatedAt(time());
 		}
 		return parent::preSave($con);
 	}

@@ -486,7 +486,7 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 		$c->add(CuePointPeer::ENTRY_ID, $objectIds);
 		$c->add(CuePointPeer::TYPE, QuizPlugin::getCoreValue('CuePointType',QuizCuePointType::QUIZ_QUESTION));
 		$questions = CuePointPeer::doSelect($c);
-		return $this->getAggregateDataForQuestions($questions, $orderBy);
+		return $this->getAggregateDataForQuestions($questions, $orderBy,false);
 	}
 
 	
@@ -739,7 +739,7 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 	 * @param $ans
 	 * @return array
 	 */
-	protected function getAggregateDataForQuestions($questions, $orderBy)
+	protected function getAggregateDataForQuestions($questions, $orderBy,$avoidAnonymous=true)
 	{
 		$ans = array();
 		foreach ($questions as $question)
@@ -752,10 +752,12 @@ class QuizPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaServ
 			$c->add(CuePointPeer::ENTRY_ID, $question->getEntryId());
 			$c->add(CuePointPeer::TYPE, QuizPlugin::getCoreValue('CuePointType', QuizCuePointType::QUIZ_ANSWER));
 			$c->add(CuePointPeer::PARENT_ID, $question->getId());
-			$anonKuserIds = $this->getAnonymousKuserIds($question->getPartnerId());
-			if (!empty($anonKuserIds))
+			if($avoidAnonymous)
 			{
-				$c->add(CuePointPeer::KUSER_ID, $anonKuserIds, Criteria::NOT_IN);
+				$anonKuserIds = $this->getAnonymousKuserIds($question->getPartnerId());
+				if (!empty($anonKuserIds)) {
+					$c->add(CuePointPeer::KUSER_ID, $anonKuserIds, Criteria::NOT_IN);
+				}
 			}
 			$answers = CuePointPeer::doSelect($c);
 			$numOfAnswers = 0;

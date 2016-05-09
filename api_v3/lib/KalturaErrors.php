@@ -582,7 +582,17 @@ class KalturaErrors extends APIErrors
 	 * Live reports Service
 	 */
 	const LIVE_REPORTS_WS_FAILURE = 'LIVE_REPORTS_WS_FAILURE;;failed to retrieve live analytics';
-		
+	
+	/*
+	 * Analytics Service
+	 */
+	const ANALYTICS_QUERY_FAILURE = 'REPORTS_QUERY_FAILURE;ERROR_MSG;Failed to retrieve analytics data';
+	const ANALYTICS_FORBIDDEN_FILTER = 'REPORTS_FORBIDDEN_FILTER;Forbidden filter for dimension "partner" - queries are implicitly performed for the current partner';
+	const ANALYTICS_INCORRECT_INPUT_TYPE = 'ANALYTICS_INCORRECT_INPUT_TYPE;Ensure Content-Type is set to application/json';
+	const ANALYTICS_INCORRECT_INPUT = 'ANALYTICS_INCORRECT_INPUT;ERRONOUS_FIELD;Error parsing field - [@ERRONOUS_FIELD@]';
+	const ANALYTICS_UNSUPPORTED_DIMENSION = 'ANALYTICS_UNSUPPORTED_DIMENSION;DIMENSION;Dimension [@DIMENSION@] is not supported';
+	const ANALYTICS_UNSUPPORTED_QUERY = 'ANALYTICS_UNSUPPORTED_QUERY;Query for the given dimensions and metrics is currently not supported';
+
 	
 	/*
 	 * Response Profiles

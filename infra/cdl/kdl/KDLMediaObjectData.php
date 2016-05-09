@@ -222,6 +222,7 @@
 		public $_isCropIMX = false;				// For IMX sources, apply cropping of the top 32 pixs
 		public $_maxFrameRate=0;
 		public $_watermarkData;
+		public $_subtitlesData = null;
 		
 		public function GetSectionEnum() { return KDLConstants::VideoIndex; }
 		

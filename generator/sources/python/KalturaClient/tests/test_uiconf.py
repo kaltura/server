@@ -34,7 +34,7 @@ class UiConfTests(KalturaBaseTest):
         for o in objs:
             self.assertIn(o.objType.getValue(), players)
         
-    def test_get_playlist_players(self):
+    '''def test_get_playlist_players(self):
         """Until I find a better way... this gets all uiconfs that are 'playlist players'
            not sure if this is the right way"""
         filt = KalturaUiConfFilter()
@@ -57,7 +57,7 @@ class UiConfTests(KalturaBaseTest):
             self.assertIsNotNone(match, "isPlaylist not found in confFile")
             
             value = match.group(1)
-            self.assertIn(value, ["true", "multi"])
+            self.assertIn(value, ["true", "multi"])'''
             
     def test_get_video_players(self):
         """Until I find a better way... this gets all uiconfs that are 'single video' players
