@@ -36,6 +36,8 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 	 */
 	const MAXIMUM_NUMBER_OF_UPLOAD_CHUNK_RETRY = 3;
 
+	const TIME_TO_WAIT_FOR_YOUTUBE_TRANSCODING = 5;
+
 	public function configure()
 	{
 		parent::configure();
@@ -287,6 +289,16 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 			if ($needDel == true)
 			{
 				unlink($videoPath);
+			}
+			
+			$startCheckingReadyTime = time();
+			while (!$this->isVideoReady($youtube, $data->remoteId))
+			{
+				sleep(self::TIME_TO_WAIT_FOR_YOUTUBE_TRANSCODING);
+				if ( (time() - $startCheckingReadyTime) > $this->timeout )
+				{
+					throw Exception("Video transcoding on youtube has timed out");
+				}
 			}
 		}
 		
@@ -567,4 +579,32 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 			$youtube->playlistItems->insert('snippet', $playlistItem);
 		}
 	}
+
+	protected function isVideoReady($youtube, $remoteId)
+	{
+		$listResponse = $youtube->videos->listVideos("status",	array('id' => $remoteId));
+		if (empty($listResponse)) {
+			throw new Exception("Video with remotedId ".$remoteId." not found at google");
+		} else {
+			// Since the request specified a video ID, the response only contains one video resource.
+			$video = $listResponse[0];
+			$videoStatus = $video['status'];
+			switch($videoStatus['uploadStatus'])
+			{
+				case "processed":
+					return true;
+					break;
+				case "rejected":
+					throw new Exception("Video was rejected by youtube, reason [".$videoStatus['rejectionReason']."]");
+					break;
+				case "failed":
+					throw new Exception("Video has failed on youtube, reason [".$videoStatus['failureReason']."]");
+					break;					
+				default:
+					return false;
+					break;
+			}
+		}
+	}
+	
 }

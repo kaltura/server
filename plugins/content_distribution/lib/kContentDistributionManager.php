@@ -511,7 +511,7 @@ class kContentDistributionManager
 			KalturaLog::log("Validation errors found");
 			return null;
 		}
-		
+		self::addAssetIdsToEntryDistribution($entryDistribution, $distributionProfile);
 		$distributionProvider = $distributionProfile->getProvider();
 		if($distributionProvider->isUpdateEnabled())
 			return self::addSubmitUpdateJob($entryDistribution, $distributionProfile);
@@ -710,7 +710,9 @@ class kContentDistributionManager
 			KalturaLog::err("Entry [" . $entryDistribution->getEntryId() . "] not found");
 			return null;
 		}
-			
+
+		self::addAssetIdsToEntryDistribution($entryDistribution, $distributionProfile);
+		
 		$autoCreateFlavors = $distributionProfile->getAutoCreateFlavorsArray();
 		$autoCreateThumbs = $distributionProfile->getAutoCreateThumbArray();
 		foreach($validationErrors as $validationError)
@@ -939,7 +941,7 @@ class kContentDistributionManager
 		$originalList = $entryDistribution->getAssetIds();
 		
 		$entryAssets = assetPeer::retrieveReadyByEntryId($entryDistribution->getEntryId());
-		
+
 		foreach ($assetDistributionRules as $assetDistributionRule)
 		{
 			/* @var $assetDistributionRule kAssetDistributionRule */
@@ -1105,5 +1107,18 @@ class kContentDistributionManager
 				$searchValues[] = self::getSearchStringDistributionValidationError($validationError->getErrorType(), $distributionProfileId, true);
 		}
 		return implode(' ', $searchValues);
+	}
+	
+	public static function addAssetIdsToEntryDistribution($entryDistribution, $distributionProfile)
+	{
+		$dbEntry = entryPeer::retrieveByPK($entryDistribution->getEntryId());
+		if (!$dbEntry)
+		{
+			KalturaLog::log("EntryId not found [".$entryDistribution->getEntryId()."]");
+			return false;
+		}
+		$ret_val = self::assignAssets($entryDistribution,  $dbEntry, $distributionProfile);
+		$entryDistribution->save();
+		return $ret_val;
 	}
 }
