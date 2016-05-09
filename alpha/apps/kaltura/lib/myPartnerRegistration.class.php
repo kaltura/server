@@ -107,8 +107,9 @@ class myPartnerRegistration
 				$bodyParams = array($loginEmail, $partnerId);
 			}
 			else {
-				$mailType = self::KALTURAS_DEVELOPER_REGISTRATION_CONFIRMATION;
-				$bodyParams = array($resetPasswordLink, $resetPasswordLink);
+				return; // emails will be sent via external system
+				//$mailType = self::KALTURAS_DEVELOPER_REGISTRATION_CONFIRMATION;
+				//$bodyParams = array($resetPasswordLink, $resetPasswordLink);
 			}
 		}
 		else {
