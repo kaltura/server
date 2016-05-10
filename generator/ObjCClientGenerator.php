@@ -594,7 +594,6 @@ class ObjCClientGenerator extends ClientGeneratorFromXml
 			if(is_null($actionNode->getElementsByTagName("alias")->item(0)))
 				continue;
 
-			//if we are here we have actionAlias
 			$resultNode = $actionNode->getElementsByTagName('result')->item(0);
 			$resultType = $resultNode->getAttribute('type');
 			if(!empty($resultType) && ($this->getTypeName($resultType)== 'Object') )
