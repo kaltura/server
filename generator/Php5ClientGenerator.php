@@ -9,7 +9,7 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 	function __construct($xmlPath, Zend_Config $config, $sourcePath = "sources/php5")
 	{
 		parent::__construct($xmlPath, $sourcePath, $config);
-		$this->_doc = new KDOMDocument();
+		$this->_doc = new DOMDocument();
 		$this->_doc->load($this->_xmlFile);
 	}
 	
@@ -103,19 +103,21 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
     	$this->addFile("KalturaClient.php", $this->getTextBlock());
     	
 		// plugins
-    	$plugins = KalturaPluginManager::getPluginInstances();
-		foreach($plugins as $plugin)
-		    $this->writePlugin($plugin);
+		$pluginNodes = $xpath->query("/xml/plugins/plugin");
+		foreach($pluginNodes as $pluginNode)
+		{
+		    $this->writePlugin($pluginNode);
+		}
 	}
 	
 	function getPluginClassName($pluginName)
 	{
 		return "Kaltura" . ucfirst($pluginName) . "ClientPlugin";
 	}
-	
-	function writePlugin(KalturaPlugin $plugin)
+
+	function writePlugin(DOMElement $pluginNode)
 	{
-		$pluginName = $plugin->getPluginName();
+		$pluginName = $pluginNode->getAttribute("name");
 		
 		$xpath = new DOMXPath($this->_doc);
 		$pluginClassName = $this->getPluginClassName($pluginName);
@@ -237,6 +239,9 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 	
 	function writeEnum(DOMElement $enumNode)
 	{
+		if(!$this->shouldInclude($enumNode->getAttribute('include'), $enumNode->getAttribute('exclude')))
+			return;
+			
 		$enumName = $enumNode->getAttribute("name");
 		
 		if($this->generateDocs)
@@ -267,6 +272,9 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 	
 	function writeClass(DOMElement $classNode)
 	{
+		if(!$this->shouldInclude($classNode->getAttribute('include'), $classNode->getAttribute('exclude')))
+			return;
+			
 		$type = $classNode->getAttribute("name");;
 		
 		$abstract = '';
@@ -339,6 +347,9 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 	
 	function writeService(DOMElement $serviceNode, $serviceName = null, $serviceId = null, $actionPrefix = "", $extends = "KalturaServiceBase")
 	{
+		if(!$this->shouldInclude($serviceNode->getAttribute('include'), $serviceNode->getAttribute('exclude')))
+			return;
+			
 		$serviceName = $serviceName ? $serviceName : $serviceNode->getAttribute("name");
 		$serviceId = $serviceId ? $serviceId : $serviceNode->getAttribute("id");
 		
@@ -394,6 +405,9 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 	
 	function writeAction($serviceId, DOMElement $actionNode, $actionPrefix = "")
 	{
+		if(!$this->shouldInclude($actionNode->getAttribute('include'), $actionNode->getAttribute('exclude')))
+			return;
+			
 		$action = $actionNode->getAttribute("name");
 		$method = $action;
 		if (in_array($action, array("list", "clone", "goto"))) // because list & clone are preserved in PHP
@@ -677,6 +691,9 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 	
 		foreach($serviceNodes as $serviceNode)
 		{
+			if(!$this->shouldInclude($serviceNode->getAttribute('include'), $serviceNode->getAttribute('exclude')))
+				return;
+				
 			if($serviceNode->hasAttribute("plugin"))
 				continue;
 				

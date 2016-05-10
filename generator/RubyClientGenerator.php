@@ -6,7 +6,7 @@ class RubyClientGenerator extends ClientGeneratorFromXml
 	function __construct($xmlPath, Zend_Config $config, $sourcePath = "sources/ruby")
 	{
 		parent::__construct($xmlPath, $sourcePath, $config);
-		$this->_doc = new KDOMDocument();
+		$this->_doc = new DOMDocument();
 		$this->_doc->load($this->_xmlFile);
 	}
 	
@@ -126,6 +126,9 @@ class RubyClientGenerator extends ClientGeneratorFromXml
 	
 	function writeEnum(DOMElement $enumNode)
 	{
+		if(!$this->shouldInclude($enumNode->getAttribute('include'), $enumNode->getAttribute('exclude')))
+			return;
+			
 		$enumName = $enumNode->getAttribute("name");
 	 	$this->appendLine("	class $enumName");		
 		
@@ -148,6 +151,9 @@ class RubyClientGenerator extends ClientGeneratorFromXml
 	
 	function writeClass(DOMElement $classNode)
 	{
+		if(!$this->shouldInclude($classNode->getAttribute('include'), $classNode->getAttribute('exclude')))
+			return;
+			
 		$type = $classNode->getAttribute("name");
 		
 		// comments
@@ -234,6 +240,9 @@ class RubyClientGenerator extends ClientGeneratorFromXml
 	
 	function writeService(DOMElement $serviceNode)
 	{
+		if(!$this->shouldInclude($serviceNode->getAttribute('include'), $serviceNode->getAttribute('exclude')))
+			return;
+			
 		$serviceName = $serviceNode->getAttribute("name");
 		$serviceId = $serviceNode->getAttribute("id");
 		$serviceClassName = "Kaltura".$this->upperCaseFirstLetter($serviceName)."Service";
@@ -261,6 +270,9 @@ class RubyClientGenerator extends ClientGeneratorFromXml
 	
 	function writeAction($serviceId, DOMElement $actionNode)
 	{
+		if(!$this->shouldInclude($actionNode->getAttribute('include'), $actionNode->getAttribute('exclude')))
+			return;
+			
 		$action = $actionNode->getAttribute("name");
 		$resultNode = $actionNode->getElementsByTagName("result")->item(0);
 		$resultType = $resultNode->getAttribute("type");
@@ -374,6 +386,9 @@ class RubyClientGenerator extends ClientGeneratorFromXml
 		$this->appendLine("	class KalturaClient < KalturaClientBase");
 		foreach($serviceNodes as $serviceNode)
 		{
+			if(!$this->shouldInclude($serviceNode->getAttribute('include'), $serviceNode->getAttribute('exclude')))
+				return;
+				
 			$serviceName = $serviceNode->getAttribute("name");
 			$rubyServiceName = $this->camelCaseToUnderscoreAndLower($serviceName."Service");
 			$serviceClass = "Kaltura".$this->upperCaseFirstLetter($serviceName)."Service";

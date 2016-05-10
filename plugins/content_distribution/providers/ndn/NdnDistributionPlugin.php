@@ -2,7 +2,7 @@
 /**
  * @package plugins.ndnDistribution
  */
-class NdnDistributionPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaEnumerator, IKalturaPending, IKalturaObjectLoader, IKalturaContentDistributionProvider, IKalturaEventConsumers, IKalturaServices, IKalturaConfigurator
+class NdnDistributionPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaEnumerator, IKalturaPending, IKalturaObjectLoader, IKalturaContentDistributionProvider, IKalturaEventConsumers, IKalturaServices
 {
 	const PLUGIN_NAME = 'ndnDistribution';
 	const NDN_EVENT_CONSUMER = "kNdnFlowManager";
@@ -186,16 +186,5 @@ class NdnDistributionPlugin extends KalturaPlugin implements IKalturaPermissions
 		return array(
 			'ndn' => 'NdnService'
 		);
-	}
-
-	/* (non-PHPdoc)
-	 * @see IKalturaConfigurator::getConfig()
-	 */
-	public static function getConfig($configName)
-	{
-		if($configName == 'testme')
-			return new Zend_Config_Ini(dirname(__FILE__) . '/config/testme.ini');
-			
-		return null;
 	}
 }

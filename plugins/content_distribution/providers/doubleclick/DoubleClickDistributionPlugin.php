@@ -2,7 +2,7 @@
 /**
  * @package plugins.doubleClickDistribution
  */
-class DoubleClickDistributionPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaEnumerator, IKalturaPending, IKalturaObjectLoader, IKalturaContentDistributionProvider, IKalturaEventConsumers, IKalturaServices, IKalturaConfigurator
+class DoubleClickDistributionPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaEnumerator, IKalturaPending, IKalturaObjectLoader, IKalturaContentDistributionProvider, IKalturaEventConsumers, IKalturaServices
 {
 	const PLUGIN_NAME = 'doubleClickDistribution';
 	const COMCAST_MRSS_EVENT_CONSUMER = "kDoubleClickFlowManager";
@@ -237,19 +237,5 @@ class DoubleClickDistributionPlugin extends KalturaPlugin implements IKalturaPer
 		return array(
 			'doubleClick' => 'DoubleClickService'
 		);
-	}
-	
-	/* (non-PHPdoc)
-	 * @see IKalturaConfigurator::getConfig()
-	 */
-	public static function getConfig($configName)
-	{
-		if($configName == 'generator')
-			return new Zend_Config_Ini(dirname(__FILE__) . '/config/generator.ini');
-			
-		if($configName == 'testme')
-			return new Zend_Config_Ini(dirname(__FILE__) . '/config/testme.ini');
-			
-		return null;
 	}
 }

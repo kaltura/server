@@ -2,7 +2,7 @@
 /**
  * @package plugins.eventNotification
  */
-class EventNotificationPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaPermissions, IKalturaEventConsumers, IKalturaServices, IKalturaAdminConsolePages, IKalturaConfigurator, IKalturaEnumerator, IKalturaObjectLoader
+class EventNotificationPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaPermissions, IKalturaEventConsumers, IKalturaServices, IKalturaAdminConsolePages, IKalturaEnumerator, IKalturaObjectLoader
 {
 	const PLUGIN_NAME = 'eventNotification';
 	const PLUGIN_VERSION_MAJOR = 1;
@@ -75,20 +75,6 @@ class EventNotificationPlugin extends KalturaPlugin implements IKalturaVersion, 
 		return array(self::EVENT_NOTIFICATION_FLOW_MANAGER, self::EVENT_NOTIFICATION_OBJECT_COPIED_HANDLER);
 	}
 
-	/* (non-PHPdoc)
-	 * @see IKalturaConfigurator::getConfig()
-	 */
-	public static function getConfig($configName) 
-	{
-		if($configName == 'generator')
-			return new Zend_Config_Ini(dirname(__FILE__) . '/config/generator.ini');
-	
-		if($configName == 'testme')
-			return new Zend_Config_Ini(dirname(__FILE__) . '/config/testme.ini');
-			
-		return null;
-	}
-	
 	/* (non-PHPdoc)
 	 * @see IKalturaAdminConsolePages::getApplicationPages()
 	 */

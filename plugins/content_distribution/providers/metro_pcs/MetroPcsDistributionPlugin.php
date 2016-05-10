@@ -2,7 +2,7 @@
 /**
  * @package plugins.metroPcsDistribution
  */
-class MetroPcsDistributionPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaEnumerator, IKalturaPending, IKalturaObjectLoader, IKalturaContentDistributionProvider, IKalturaConfigurator
+class MetroPcsDistributionPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaEnumerator, IKalturaPending, IKalturaObjectLoader, IKalturaContentDistributionProvider
 {
 	const PLUGIN_NAME = 'metroPcsDistribution';
 	const CONTENT_DSTRIBUTION_VERSION_MAJOR = 2;
@@ -236,17 +236,5 @@ class MetroPcsDistributionPlugin extends KalturaPlugin implements IKalturaPermis
 	public static function getApiValue($valueName)
 	{
 		return self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
-	}
-
-	
-	/* (non-PHPdoc)
-	 * @see IKalturaConfigurator::getConfig()
-	 */
-	public static function getConfig($configName)
-	{
-		if($configName == 'generator')
-			return new Zend_Config_Ini(dirname(__FILE__) . '/config/generator.ini');
-			
-		return null;
 	}
 }
