@@ -555,6 +555,9 @@ class ObjCClientGenerator extends ClientGeneratorFromXml
 		$description = self::buildMultilineComment($serviceNode->getAttribute("description"));
 		if ($description)
 			$this->appendHLine($description);
+
+		$this->handleAliasAction($serviceNode->childNodes);
+
 		$this->appendHLine("@interface $serviceClassName : KalturaServiceBase");
 		$this->appendMLine("@implementation $serviceClassName");
 					
@@ -568,7 +571,40 @@ class ObjCClientGenerator extends ClientGeneratorFromXml
 		}
 		$this->appendHLine("@end\n");
 		$this->appendMLine("@end\n");
+
 	}
+
+	private function handleAliasAction($actionNodes)
+	{
+		foreach($actionNodes as $actionNode)
+		{
+			if ($actionNode->nodeType != XML_ELEMENT_NODE)
+				continue;
+
+			/** @var  $actionNode DOMElement */
+			if(is_null($actionNode->getElementsByTagName("alias")->item(0)))
+				continue;
+
+			//if we are here we have actionAlias
+			$resultNode = $actionNode->getElementsByTagName('result')->item(0);
+			$resultType = $resultNode->getAttribute('type');
+			if(!empty($resultType) && ($this->getTypeName($resultType)== 'Object') )
+			{
+				$this->appendHLine("@class $resultType;");
+			}
+
+			$paramNodes = $actionNode->getElementsByTagName('param');
+			foreach($paramNodes as $paramNode)
+			{
+				$paramType = $paramNode->getAttribute('type');
+				if($this->getTypeName($paramType)== 'Object')
+				{
+					$this->appendHLine("@class $paramType;");
+				}
+			}
+		}
+	}
+
 	
 	// actions generation
 	function writeAction($serviceId, DOMElement $actionNode)

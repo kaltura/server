@@ -500,7 +500,13 @@ class XmlClientGenerator extends ClientGeneratorFromPhp
 		$actionElement->setAttribute("enableInMultiRequest", ($outputType === 'file' ? "0" : "1"));
 		
 		$actionElement->appendChild($resultElement);
-		
+		if(!empty($actionInfo->actionAlias))
+		{
+			$aliasElement=$this->_doc->createElement('alias');
+			$aliasElement->setAttribute('actionAlias', $actionInfo->actionAlias);
+			$actionElement->appendChild($aliasElement);
+		}
+
 		return $actionElement;
 	}
 	
