@@ -516,12 +516,11 @@ class XmlClientGenerator extends ClientGeneratorFromPhp
 			}
 		}
 
-
 		$description = $actionInfo->description;
 		$description = $this->fixDescription($description);
 		$actionElement->setAttribute("description", kString::stripUtf8InvalidChars($description));
 		$actionElement->setAttribute("enableInMultiRequest", ($outputType === 'file' ? "0" : "1"));
-		
+
 		$actionElement->appendChild($resultElement);
 
 		if(!empty($actionInfo->actionAlias))
