@@ -277,11 +277,11 @@ class XmlClientGenerator extends ClientGeneratorFromPhp
 		if($typeReflector->isDeprecated())
 			$enumElement->setAttribute("deprecated", "1");
 
-		if(isset($typeReflector->include))
-			$enumElement->setAttribute("include", implode(',', $typeReflector->include));
+// 		if(isset($typeReflector->include))
+// 			$enumElement->setAttribute("include", implode(',', $typeReflector->include));
 
-		if(isset($typeReflector->exclude))
-			$enumElement->setAttribute("exclude", implode(',', $typeReflector->exclude));
+// 		if(isset($typeReflector->exclude))
+// 			$enumElement->setAttribute("exclude", implode(',', $typeReflector->exclude));
 		
 		$constants = array();
 		foreach($typeReflector->getConstants() as $contant)
@@ -335,11 +335,11 @@ class XmlClientGenerator extends ClientGeneratorFromPhp
 		if($typeReflector->isDeprecated())
 			$classElement->setAttribute("deprecated", "1");
 		
-		if(isset($typeReflector->include))
-			$classElement->setAttribute("include", implode(',', $typeReflector->include));
+// 		if(isset($typeReflector->include))
+// 			$classElement->setAttribute("include", implode(',', $typeReflector->include));
 
-		if(isset($typeReflector->exclude))
-			$classElement->setAttribute("exclude", implode(',', $typeReflector->exclude));
+// 		if(isset($typeReflector->exclude))
+// 			$classElement->setAttribute("exclude", implode(',', $typeReflector->exclude));
 			
 		$properties = $typeReflector->getCurrentProperties();
 		foreach($properties as $property)
