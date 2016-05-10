@@ -309,7 +309,7 @@ abstract class ClientGeneratorFromPhp
 				{
 					foreach($dependencies as &$dependency)
 						if(isset($dependency->include))
-							$dependency->include = array_unique($dependency->include, $typeReflector->include);
+							$dependency->include = array_unique(array_merge($dependency->include, $typeReflector->include));
 				}
 				else
 				{

@@ -167,8 +167,8 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 		}
 		if(!$classsAdded)
 			return;
-		
-		$serviceNodes = $xpath->query("/xml/plugins/plugin[@name = '$pluginName']/pluginService");
+
+		$serviceNodes = $xpath->query("/xml/services/service[@plugin = '$pluginName']");
 		$services = array();
 		foreach($serviceNodes as $serviceNode)
 			$services[] = $serviceNode->getAttribute("name");
