@@ -1263,10 +1263,6 @@ class KalturaEntryService extends KalturaBaseService
 			KalturaLog::debug("Set kuser id [" . $this->getKuser()->getId() . "] line [" . __LINE__ . "]");
 			$dbEntry->setCreatorKuserId($this->getKuser()->getId());
 			$dbEntry->setCreatorPuserId($this->getKuser()->getPuserId());
-			
-			if($dbEntry->getKuserId())
-				return;
-		
 			$dbEntry->setPuserId($this->getKuser()->getPuserId());
 			$dbEntry->setKuserId($this->getKuser()->getId());
 			return;
