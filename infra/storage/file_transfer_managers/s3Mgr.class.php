@@ -20,6 +20,8 @@ class s3Mgr extends kFileTransferMgr
 		
 	protected $filesAcl = CannedAcl::PRIVATE_ACCESS;
 	protected $s3Region = '';
+	protected $sseType = '';
+	protected $sseKmsKeyId = '';
 	
 	// instances of this class should be created usign the 'getInstance' of the 'kFileTransferMgr' class
 	protected function __construct(array $options = null)
@@ -31,7 +33,13 @@ class s3Mgr extends kFileTransferMgr
 			
 		if($options && isset($options['s3Region']))
 			$this->s3Region = $options['s3Region'];
-			
+		
+		if($options && isset($options['sseType']))
+			$this->sseType = $options['sseType'];
+		
+		if($options && isset($options['sseKmsKeyId']))
+			$this->sseKmsKeyId = $options['sseKmsKeyId'];
+		
 		// do nothing
 		$this->connection_id = 1; //SIMULATING!
 	}
@@ -55,6 +63,9 @@ class s3Mgr extends kFileTransferMgr
 
 
 	// login to an existing connection with given user/pass (ftp_passive_mode is irrelevant)
+	//
+	// S3 Signature is required to be V4 for SSE-KMS support. Newer S3 regions also require V4.
+	//
 	protected function doLogin($sftp_user, $sftp_pass)
 	{
 		if(!class_exists('Aws\S3\S3Client')) {
@@ -69,6 +80,7 @@ class s3Mgr extends kFileTransferMgr
 								'secret' => $sftp_pass,
 						),
 						'region' => $this->s3Region,
+						'signature' => 'v4',
 				)
 		);
 		
@@ -97,12 +109,26 @@ class s3Mgr extends kFileTransferMgr
 		
 		try
 		{
-			$res = $this->s3->putObject(array(
+			
+			$params = array(
 					'Bucket'       => $bucket,
 					'Key'          => $remote_file,
 					'SourceFile'   => $local_file,
 					'ACL'          => $this->filesAcl,
-			));
+			);
+			
+			if($this->sseType === "KMS")
+			{
+				$params['ServerSideEncryption'] = "aws:kms";
+				$params['SSEKMSKeyId'] = $this->sseKmsKeyId;
+			}
+			
+			if($this->sseType === "AES256")
+			{
+				$params['ServerSideEncryption'] = "AES256";
+			}
+			
+			$res = $this->s3->putObject($params);
 
 			KalturaLog::debug("File uploaded to Amazon, info: " . print_r($res, true));
 			return true;

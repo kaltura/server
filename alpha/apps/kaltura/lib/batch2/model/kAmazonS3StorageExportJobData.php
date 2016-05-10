@@ -14,12 +14,24 @@ class kAmazonS3StorageExportJobData extends kStorageExportJobData
 	 * @var string
 	 */   	
     private $s3Region;
+	
+	/**
+	* $var string
+	*/
+	private $sseType;
+	
+	/**
+	* $var string
+	*/
+	private $sseKmsKeyId;
     
 	public function setStorageExportJobData(StorageProfile $externalStorage, FileSync $fileSync, $srcFileSyncLocalPath, $force = false)
 	{
 		parent::setStorageExportJobData($externalStorage, $fileSync, $srcFileSyncLocalPath);
 		$this->setFilesPermissionInS3($externalStorage->getFilesPermissionInS3());
 		$this->setS3Region($externalStorage->getS3Region());
+		$this->setSseType($externalStorage->getSseType());
+		$this->setSseKmsKeyId($externalStorage->getSseKmsKeyId());
 	}
 
 	/**
@@ -52,5 +64,37 @@ class kAmazonS3StorageExportJobData extends kStorageExportJobData
 	public function setS3Region($s3Region)
 	{
 		$this->s3Region = $s3Region;	
+	}	
+	
+	/**
+	 * @return the $sseType
+	 */
+	public function getSseType()
+	{
+		return $this->sseType;
+	}
+	
+	/**
+	 * @param $sseType the $sseType to set
+	 */
+	public function setSseType($sseType)
+	{
+		$this->sseType = $sseType;	
+	}	
+	
+	/**
+	 * @return the $sseKmsKeyId
+	 */
+	public function getSseKmsKeyId()
+	{
+		return $this->sseKmsKeyId;
+	}
+	
+	/**
+	 * @param $sseKmsKeyId the $sseKmsKeyId to set
+	 */
+	public function setSseKmsKeyId($sseKmsKeyId)
+	{
+		$this->sseKmsKeyId = $sseKmsKeyId;	
 	}	
 }
