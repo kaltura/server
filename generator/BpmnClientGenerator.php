@@ -18,7 +18,7 @@ class BpmnClientGenerator extends ClientGeneratorFromXml
 		$this->template = file_get_contents("$sourcePath/action.template.bpmn");
 		$this->excludeSourcePaths[] = 'action.template.bpmn';
 		
-		$this->_doc = new KDOMDocument();
+		$this->_doc = new DOMDocument();
 		$this->_doc->load($this->_xmlFile);
 	}
 	
@@ -42,6 +42,9 @@ class BpmnClientGenerator extends ClientGeneratorFromXml
 	
 	function writeService(DOMElement $serviceNode, $serviceName = null, $serviceId = null, $actionPrefix = "", $extends = "KalturaServiceBase")
 	{
+		if(!$this->shouldInclude($serviceNode->getAttribute('include'), $serviceNode->getAttribute('exclude')))
+			return;
+		
 		$serviceName = $serviceNode->getAttribute('name');
 		$actionNodes = $serviceNode->getElementsByTagName("action");
 		foreach($actionNodes as $actionNode)
@@ -64,6 +67,9 @@ class BpmnClientGenerator extends ClientGeneratorFromXml
 	
 	function writeAction($serviceName, DOMElement $actionNode, $actionPrefix = "")
 	{
+		if(!$this->shouldInclude($actionNode->getAttribute('include'), $actionNode->getAttribute('exclude')))
+			return;
+	
 		$action = $actionNode->getAttribute("name");
 		$method = $this->replaceReservedWords($action);
 		$serviceUName = ucfirst($serviceName);

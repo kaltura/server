@@ -21,7 +21,7 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 	{
 		parent::__construct($xmlPath, $sourcePath, $config);
 		$this->_usePrivateAttributes = isset($config->usePrivateAttributes) ? $config->usePrivateAttributes : false;
-		$this->_doc = new KDOMDocument ();
+		$this->_doc = new DOMDocument ();
 		$this->_doc->load ( $this->_xmlFile );
 	}
 	
@@ -74,6 +74,9 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 	
 	function writeEnum(DOMElement $enumNode) 
 	{
+		if(!$this->shouldInclude($enumNode->getAttribute('include'), $enumNode->getAttribute('exclude')))
+			return;
+	
 		$enumName = $enumNode->getAttribute ( "name" );
 		$enumType = $enumNode->getAttribute ( "enumType" );
 		$baseInterface = ($enumType == "string") ? "KalturaEnumAsString" : "KalturaEnumAsInt";
@@ -237,6 +240,9 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 	
 	function writeClass(DOMElement $classNode) 
 	{
+		if(!$this->shouldInclude($classNode->getAttribute('include'), $classNode->getAttribute('exclude')))
+			return;
+	
 		$type = $classNode->getAttribute ( "name" );
 		
 		// File name
@@ -507,6 +513,9 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 
 	function writeService(DOMElement $serviceNode) 
 	{
+		if(!$this->shouldInclude($serviceNode->getAttribute('include'), $serviceNode->getAttribute('exclude')))
+			return;
+
 		$imports = "";
 		$imports .= "package com.kaltura.client.services;\n\n";
 		$imports .= "import com.kaltura.client.KalturaClient;\n";
@@ -553,6 +562,9 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 	
 	function writeAction($serviceId, DOMElement $actionNode, &$serviceImports) 
 	{
+		if(!$this->shouldInclude($actionNode->getAttribute('include'), $actionNode->getAttribute('exclude')))
+			return;
+	
 		$action = $actionNode->getAttribute ( "name" );
 		$action = $this->replaceReservedWords($action);
 		
@@ -810,6 +822,9 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 		
 		foreach ( $serviceNodes as $serviceNode ) 
 		{
+			if(!$this->shouldInclude($serviceNode->getAttribute('include'), $serviceNode->getAttribute('exclude')))
+				return;
+	
 			$serviceName = $serviceNode->getAttribute ( "name" );
 			$javaServiceName = $serviceName . "Service";
 			$javaServiceType = "Kaltura" . $this->upperCaseFirstLetter ( $javaServiceName );

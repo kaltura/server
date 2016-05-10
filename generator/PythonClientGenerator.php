@@ -9,7 +9,7 @@ class PythonClientGenerator extends ClientGeneratorFromXml
 	function __construct($xmlPath, Zend_Config $config, $sourcePath = "sources/python")
 	{
 		parent::__construct($xmlPath, $sourcePath, $config);
-		$this->_doc = new KDOMDocument();
+		$this->_doc = new DOMDocument();
 		$this->_doc->load($this->_xmlFile);
 	}
 	
@@ -118,6 +118,9 @@ class PythonClientGenerator extends ClientGeneratorFromXml
 		$services = array();
 		foreach($serviceNamesNodes as $serviceNode)
 		{
+			if(!$this->shouldInclude($serviceNode->getAttribute('include'), $serviceNode->getAttribute('exclude')))
+				return;
+				
 			if($serviceNode->hasAttribute('plugin') && $pluginName == '')
 				continue;
 				
@@ -174,6 +177,9 @@ class PythonClientGenerator extends ClientGeneratorFromXml
 	
 	function writeEnum(DOMElement $enumNode)
 	{
+		if(!$this->shouldInclude($enumNode->getAttribute('include'), $enumNode->getAttribute('exclude')))
+			return;
+			
 		$enumName = $enumNode->getAttribute("name");
 		$enumBase = "object";
 		
@@ -217,7 +223,7 @@ class PythonClientGenerator extends ClientGeneratorFromXml
 		return "$indent# " . $description;
 	}
 	
-	static function buildMultilineString($description, $indent = "")
+	protected function buildMultilineString($description, $indent = "")
 	{
 		$description = trim($description);
 		if (!$description)
@@ -228,11 +234,11 @@ class PythonClientGenerator extends ClientGeneratorFromXml
 		$description = str_replace("\n", "\n$indent", $description);
 		
 		# make sure the description does not start or end with '"'
-		if (kString::beginsWith($description, '"'))
+		if ($this->beginsWith($description, '"'))
 		{
 			$description = " " . $description;
 		}
-		if (kString::endsWith($description, '"'))
+		if ($this->endsWith($description, '"'))
 		{
 			$description .= " ";
 		}
@@ -242,6 +248,9 @@ class PythonClientGenerator extends ClientGeneratorFromXml
 	
 	function writeClass(DOMElement $classNode)
 	{
+		if(!$this->shouldInclude($classNode->getAttribute('include'), $classNode->getAttribute('exclude')))
+			return;
+			
 		$type = $classNode->getAttribute("name");
 		
 		if($this->generateDocs)
@@ -256,7 +265,7 @@ class PythonClientGenerator extends ClientGeneratorFromXml
 		else
 			$this->appendLine("class $type(KalturaObjectBase):");
 			
-		$description = self::buildMultilineString($classNode->getAttribute("description"), "    ");
+		$description = $this->buildMultilineString($classNode->getAttribute("description"), "    ");
 		if ($description)
 			$this->appendLine($description . "\n");
 			
@@ -532,6 +541,9 @@ class PythonClientGenerator extends ClientGeneratorFromXml
 	
 	function writeService(DOMElement $serviceNode)
 	{
+		if(!$this->shouldInclude($serviceNode->getAttribute('include'), $serviceNode->getAttribute('exclude')))
+			return;
+			
 		$serviceName = $serviceNode->getAttribute("name");
 		$serviceId = $serviceNode->getAttribute("id");
 		
@@ -546,7 +558,7 @@ class PythonClientGenerator extends ClientGeneratorFromXml
 		
 		$this->appendLine("class $serviceClassName(KalturaServiceBase):");
 		
-		$description = self::buildMultilineString($serviceNode->getAttribute("description"), "    ");
+		$description = $this->buildMultilineString($serviceNode->getAttribute("description"), "    ");
 		if ($description)
 			$this->appendLine($description . "\n");
 			
@@ -566,6 +578,9 @@ class PythonClientGenerator extends ClientGeneratorFromXml
 	
 	function writeAction($serviceId, $serviceName, DOMElement $actionNode)
 	{
+		if(!$this->shouldInclude($actionNode->getAttribute('include'), $actionNode->getAttribute('exclude')))
+			return;
+			
 		$action = $actionNode->getAttribute("name");
 	    $resultNode = $actionNode->getElementsByTagName("result")->item(0);
 	    $resultType = $resultNode->getAttribute("type");
@@ -581,7 +596,7 @@ class PythonClientGenerator extends ClientGeneratorFromXml
 		$this->appendLine();	
 		$this->appendLine("    $signature");
 		
-		$description = self::buildMultilineString($actionNode->getAttribute("description"), "        ");
+		$description = $this->buildMultilineString($actionNode->getAttribute("description"), "        ");
 		if ($description)
 			$this->appendLine($description . "\n");
 			

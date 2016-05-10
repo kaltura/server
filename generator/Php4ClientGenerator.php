@@ -9,7 +9,7 @@ class Php4ClientGenerator extends ClientGeneratorFromXml
 	function __construct($xmlPath, Zend_Config $config, $sourcePath = "sources/php4")
 	{
 		parent::__construct($xmlPath, $sourcePath, $config);
-		$this->_doc = new KDOMDocument();
+		$this->_doc = new DOMDocument();
 		$this->_doc->load($this->_xmlFile);
 	}
 	
@@ -57,6 +57,9 @@ class Php4ClientGenerator extends ClientGeneratorFromXml
 	
 	function writeEnum(DOMElement $enumNode)
 	{
+		if(!$this->shouldInclude($enumNode->getAttribute('include'), $enumNode->getAttribute('exclude')))
+			return;
+				
 		$enumName = $enumNode->getAttribute("name");
 		foreach($enumNode->childNodes as $constNode)
 		{
@@ -75,6 +78,9 @@ class Php4ClientGenerator extends ClientGeneratorFromXml
 	
 	function writeClass(DOMElement $classNode)
 	{
+		if(!$this->shouldInclude($classNode->getAttribute('include'), $classNode->getAttribute('exclude')))
+			return;
+				
 		$type = $classNode->getAttribute("name");
 		
 		// class definition
@@ -135,6 +141,9 @@ class Php4ClientGenerator extends ClientGeneratorFromXml
 	
 	function writeService(DOMElement $serviceNode)
 	{
+		if(!$this->shouldInclude($serviceNode->getAttribute('include'), $serviceNode->getAttribute('exclude')))
+			return;
+			
 		$serviceName = $serviceNode->getAttribute("name");
 		
 		$serviceClassName = "Kaltura".$this->upperCaseFirstLetter($serviceName)."Service";
@@ -159,6 +168,9 @@ class Php4ClientGenerator extends ClientGeneratorFromXml
 	
 	function writeAction($serviceName, DOMElement $actionNode)
 	{
+		if(!$this->shouldInclude($actionNode->getAttribute('include'), $actionNode->getAttribute('exclude')))
+			return;
+				
 		$action = $actionNode->getAttribute("name");
 	    $resultNode = $actionNode->getElementsByTagName("result")->item(0);
 	    $resultType = $resultNode->getAttribute("type");
@@ -298,6 +310,9 @@ class Php4ClientGenerator extends ClientGeneratorFromXml
 		
 		foreach($serviceNodes as $serviceNode)
 		{
+			if(!$this->shouldInclude($serviceNode->getAttribute('include'), $serviceNode->getAttribute('exclude')))
+				return;
+				
 			$serviceName = $serviceNode->getAttribute("name");
 			$description = $serviceNode->getAttribute("description");
 			$serviceClassName = "Kaltura".$this->upperCaseFirstLetter($serviceName)."Service";

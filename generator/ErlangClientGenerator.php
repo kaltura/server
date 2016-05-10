@@ -11,7 +11,7 @@ class ErlangClientGenerator extends ClientGeneratorFromXml
 	function __construct($xmlPath, Zend_Config $config, $sourcePath = "sources/erlang")
 	{
 		parent::__construct($xmlPath, $sourcePath, $config);
-		$this->_doc = new KDOMDocument();
+		$this->_doc = new DOMDocument();
 		$this->_doc->load($this->_xmlFile);
 	}
 	
@@ -103,6 +103,9 @@ class ErlangClientGenerator extends ClientGeneratorFromXml
 	
 	function writeEnum(DOMElement $enumNode)
 	{
+		if(!$this->shouldInclude($enumNode->getAttribute('include'), $enumNode->getAttribute('exclude')))
+			return;
+		
 		if(!$enumNode->childNodes->length)
 			return;
 			
@@ -170,6 +173,9 @@ class ErlangClientGenerator extends ClientGeneratorFromXml
 	
 	function writeRecordProperties(DOMElement $classNode)
 	{
+		if(!$this->shouldInclude($classNode->getAttribute('include'), $classNode->getAttribute('exclude')))
+			return;
+	
 		$isFirst = true;
 		if ($classNode->hasAttribute("base"))
 		{
@@ -228,6 +234,9 @@ class ErlangClientGenerator extends ClientGeneratorFromXml
 	
 	function writeRecord(DOMElement $classNode)
 	{
+		if(!$this->shouldInclude($classNode->getAttribute('include'), $classNode->getAttribute('exclude')))
+			return;
+	
 		$type = $classNode->getAttribute("name");
 		$erlangName = $this->camelCaseToUnderscoreAndLower($type);
 		
@@ -244,6 +253,9 @@ class ErlangClientGenerator extends ClientGeneratorFromXml
 	
 	function writeCastToProplist(DOMElement $classNode, $isFirst)
 	{
+		if(!$this->shouldInclude($classNode->getAttribute('include'), $classNode->getAttribute('exclude')))
+			return;
+		
 		if(!$isFirst)
 			$this->appendLine(';');
 	
@@ -261,6 +273,9 @@ class ErlangClientGenerator extends ClientGeneratorFromXml
 	
 	function writeService(DOMElement $serviceNode, $serviceName = null, $serviceId = null, $actionPrefix = "", $extends = "KalturaServiceBase")
 	{
+		if(!$this->shouldInclude($serviceNode->getAttribute('include'), $serviceNode->getAttribute('exclude')))
+			return;
+	
     	$this->startNewTextBlock();
     	
 		$serviceName = $serviceName ? $serviceName : $serviceNode->getAttribute("name");
@@ -297,6 +312,9 @@ class ErlangClientGenerator extends ClientGeneratorFromXml
 	
 	function writeActionExport(DOMElement $actionNode)
 	{
+		if(!$this->shouldInclude($actionNode->getAttribute('include'), $actionNode->getAttribute('exclude')))
+			return;
+		
 		$actionName = $actionNode->getAttribute("name");
 		
 		if(in_array($actionName, $this->reservedActionNames))
@@ -343,6 +361,9 @@ class ErlangClientGenerator extends ClientGeneratorFromXml
 	
 	function writeAction($serviceId, DOMElement $actionNode)
 	{
+		if(!$this->shouldInclude($actionNode->getAttribute('include'), $actionNode->getAttribute('exclude')))
+			return;
+		
 		$actionId = $actionNode->getAttribute("name");
 		$actionName = $actionId;
 		

@@ -2,7 +2,7 @@
 /**
  * @package plugins.attUverseDistribution
  */
-class AttUverseDistributionPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaEnumerator, IKalturaPending, IKalturaObjectLoader, IKalturaContentDistributionProvider, IKalturaConfigurator, IKalturaEventConsumers, IKalturaServices
+class AttUverseDistributionPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaEnumerator, IKalturaPending, IKalturaObjectLoader, IKalturaContentDistributionProvider, IKalturaEventConsumers, IKalturaServices
 {
 	const PLUGIN_NAME = 'attUverseDistribution';
 	const ATT_UVERSE_EVENT_CONSUMER = 'kAttUverseDistributionEventConsumer';
@@ -178,17 +178,6 @@ class AttUverseDistributionPlugin extends KalturaPlugin implements IKalturaPermi
 	public static function getApiValue($valueName)
 	{
 		return self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
-	}
-	
-	/* (non-PHPdoc)
-	 * @see IKalturaConfigurator::getConfig()
-	 */
-	public static function getConfig($configName)
-	{
-		if($configName == 'generator')
-			return new Zend_Config_Ini(dirname(__FILE__) . '/config/generator.ini');
-			
-		return null;
 	}
 	
 	/* (non-PHPdoc)

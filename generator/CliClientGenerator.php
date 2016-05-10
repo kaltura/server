@@ -9,7 +9,7 @@ class CliClientGenerator extends ClientGeneratorFromXml
 	function __construct($xmlPath, Zend_Config $config, $sourcePath = "sources/cli")
 	{
 		parent::__construct($xmlPath, $sourcePath, $config);
-		$this->_doc = new KDOMDocument();
+		$this->_doc = new DOMDocument();
 		$this->_doc->load($this->_xmlFile);
 	}
 	

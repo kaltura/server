@@ -12,6 +12,16 @@ abstract class ClientGeneratorFromXml
 	protected $subpackage = 'Kaltura';
 	protected $excludeSourcePaths = array();
 	
+	/**
+	 * @var array
+	 */
+	private $_config = array();
+	
+	/**
+	 * @var array
+	 */
+	private $_tags = array();
+	
 	public function setGenerateDocs($generateDocs)
 	{
 		$this->generateDocs = $generateDocs;
@@ -34,6 +44,7 @@ abstract class ClientGeneratorFromXml
 
 	public function __construct($xmlFile, $sourcePath, Zend_Config $config)
 	{
+		$this->_tags = explode(',', $config->tags);
 		$this->_xmlFile = realpath($xmlFile);
 		$this->_sourcePath = realpath($sourcePath);
 		
@@ -43,11 +54,32 @@ abstract class ClientGeneratorFromXml
 		if (!file_exists($sourcePath))
 			throw new Exception("Source path was not found [$sourcePath]");
 
+		$singleLineCommentMarker = $this->getSingleLineCommentMarker();
+		if($singleLineCommentMarker === null)
+			$singleLineCommentMarker = '';
+		
 		$this->_licenseBuffer = file_get_contents(dirname(__FILE__).'/sources/license.txt');
 		$this->_licenseBuffer = str_replace('//', $this->getSingleLineCommentMarker(), $this->_licenseBuffer);
 		$this->_licenseBuffer = str_replace("\r\n", "\n", $this->_licenseBuffer);
 		
 		$this->addFile('agpl.txt', file_get_contents(dirname(__FILE__).'/sources/agpl.txt'), false);
+	}
+	
+	protected function shouldInclude($include, $exclude)
+	{
+		if($exclude)
+		{
+			$tags = explode(',', str_replace(' ', '', $exclude));
+			return (count(array_intersect($tags, $this->_tags)) == 0);
+		}
+		
+		if($include)
+		{
+			$tags = explode(',', str_replace(' ', '', $include));
+			return count(array_intersect($tags, $this->_tags));
+		}
+		
+		return true;
 	}
 	
 	public function generate()
@@ -175,6 +207,11 @@ abstract class ClientGeneratorFromXml
 		return in_array($type, array("int","string","bool","float","bigint"));
 	}
 	
+	protected function isComplexType($type)
+	{
+		return !$this->isSimpleType($type) && $type != 'file';
+	}
+	
 	protected function startNewTextBlock()
 	{
 		$this->_txt = "";
@@ -200,7 +237,10 @@ abstract class ClientGeneratorFromXml
 	 * 
 	 * @return string 
 	 */
-	protected abstract function getSingleLineCommentMarker();
+	protected function getSingleLineCommentMarker()
+	{
+		return '//';
+	}
 	
 	public function done($outputPath)
 	{

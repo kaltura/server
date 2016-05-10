@@ -2,7 +2,7 @@
 /**
  * @package plugins.tagSearch
  */
-class TagSearchPlugin extends KalturaPlugin implements  IKalturaCriteriaFactory, IKalturaSphinxConfiguration, IKalturaEventConsumers, IKalturaServices, IKalturaConfigurator, IKalturaEnumerator, IKalturaObjectLoader
+class TagSearchPlugin extends KalturaPlugin implements  IKalturaCriteriaFactory, IKalturaSphinxConfiguration, IKalturaEventConsumers, IKalturaServices, IKalturaEnumerator, IKalturaObjectLoader
 {
     const PLUGIN_NAME = "tagSearch";
     
@@ -63,22 +63,6 @@ class TagSearchPlugin extends KalturaPlugin implements  IKalturaCriteriaFactory,
 		return $map;
 	}
 	
-
-	/* (non-PHPdoc)
-	 * @see IKalturaConfigurator::getConfig()
-	 */
-	public static function getConfig($configName)
-	{
-		if($configName == 'generator')
-			return new Zend_Config_Ini(dirname(__FILE__) . '/config/generator.ini');
-			
-		if($configName == 'testme')
-			return new Zend_Config_Ini(dirname(__FILE__) . '/config/testme.ini');
-			
-		return null;
-	}
-	
-
 	/* (non-PHPdoc)
 	 * @see IKalturaEnumerator::getEnums()
 	 */
