@@ -422,4 +422,59 @@ class kXml
 			$node->nodeValue = htmlspecialchars($value,ENT_QUOTES,'UTF-8');
 		}
 	}	
+	
+/**
+	 * Reutrns XML containing the fields in $base that are different from the fields in $compare
+	 * @param string $base
+	 * @param st $compare
+	 */
+	public static function getDiff ($base, $compare = null)
+	{
+		$baseValues = self::getAllValueNodes($base);
+		$compareValues = self::getAllValueNodes($compare);
+		
+		$diffArray = array();
+		foreach ($baseValues as $xpath => $values)
+		{
+			foreach ($values as $value)
+			{
+				if (!isset ($compareValues [$xpath]) || !in_array ($value, $compareValues [$xpath]))
+				{
+					$diffArray[$xpath][] = $value;
+				}
+			}
+		}
+		
+		//Some values may have been removed, and exist in compare and not in base - these are also changes
+		$missingKeys = array_diff(array_keys($compareValues), array_keys($baseValues));
+		foreach ($missingKeys as $missingXpath)
+		{
+			$diffArray[$missingXpath] = "null";
+		}
+		
+		return $diffArray;
+	}
+	
+	protected static function getAllValueNodes($xmlData)
+	{
+		$doc = new KDOMDocument(); 
+		$doc->loadXML($xmlData);
+		$domXPath = new DOMXPath($doc);
+		$allNodes = $domXPath->query("//*[not(*)]");
+		
+		$arrayLeafNodes = array();
+		for ($i = 0; $i < $allNodes->length; $i++)
+		{
+			$currNode = $allNodes->item($i);
+			
+			$xpath = $currNode->getNodePath();
+			if (preg_match('/\[\d+\]/', $xpath))
+			{
+				$xpath = preg_replace('/\[\d+\]/', '', $xpath);
+			}
+			$arrayLeafNodes[$xpath][] = $currNode->nodeValue;
+		}
+		
+		return $arrayLeafNodes;
+	}
 }

@@ -702,4 +702,22 @@ class kMetadataManager
 		return kJobsManager::addJob($job, $data, BatchJobType::METADATA_TRANSFORM);
 	}
 	
+	public static function retrieveChangedFieldsAndValues ($metadataObjectId, $previousVersion)
+	{
+		if (!$previousVersion)
+		{
+			//On creation of the metadata object, the previous version would be null, and therefore function should exit here.
+			KalturaLog::info("No previous version - exiting.");
+			return;
+		}
+		
+		$metadataObject = MetadataPeer::retrieveByPK($metadataObjectId);
+		$metadataCurrentData = kFileSyncUtils::file_get_contents($metadataObject->getSyncKey(Metadata::FILE_SYNC_METADATA_DATA));
+		$metadataPreviousData = kFileSyncUtils::file_get_contents($metadataObject->getSyncKey(Metadata::FILE_SYNC_METADATA_DATA, $previousVersion));	
+		
+		$diff = kXml::getDiff ($metadataCurrentData, $metadataPreviousData);
+		return $diff;
+		
+	}
+	
 }
