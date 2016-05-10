@@ -305,6 +305,18 @@ abstract class ClientGeneratorFromPhp
 			if (!$typeReflector->isEnum() && !$typeReflector->isStringEnum())
 			{
 				$dependencies = $this->getTypeDependencies($typeReflector);
+				if(isset($typeReflector->include) && count($typeReflector->include))
+				{
+					foreach($dependencies as &$dependency)
+						if(isset($dependency->include))
+							$dependency->include = array_unique($dependency->include, $typeReflector->include);
+				}
+				else
+				{
+					foreach($dependencies as &$dependency)
+						if(isset($dependency->include))
+							unset($dependency->include);
+				}
 				$this->fixTypeDependencies($dependencies, $output, $added);
 			}
 			
