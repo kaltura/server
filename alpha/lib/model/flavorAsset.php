@@ -13,8 +13,7 @@ class flavorAsset extends asset
 
 	const KALTURA_TOKEN_MARKER = '{kt}';
 	const KALTURA_TOKEN_PARAM_NAME = '/kt/';
-	const CUSTOM_DATA_FIELD_LANGUAGE = "language";
-	
+
 	/**
 	 * Applies default values to this object.
 	 * This method should be called from the object's constructor (or
@@ -237,9 +236,7 @@ class flavorAsset extends asset
 	public function getInterFlowCount() { return $this->getFromCustomData("interFlowCount"); }
 	public function incrementInterFlowCount() { $this->putInCustomData("interFlowCount", $this->getInterFlowCount() ? $this->getInterFlowCount()+1 : 1); }
 	public function removeInterFlowCount() { $this->removeFromCustomData("interFlowCount"); }
-	public function getLanguage()	{ return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_LANGUAGE); }
-	public function setLanguage($v)	{ $this->putInCustomData(self::CUSTOM_DATA_FIELD_LANGUAGE, $v); }
-
+	
 	/**
 	 * @param int $type
 	 * @return flavorAsset
