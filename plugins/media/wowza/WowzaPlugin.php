@@ -3,7 +3,7 @@
  * Enable serving live conversion profile to the Wowza servers as XML
  * @package plugins.wowza
  */
-class WowzaPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaServices, IKalturaConfigurator, IKalturaObjectLoader, IKalturaEnumerator
+class WowzaPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaServices, IKalturaObjectLoader, IKalturaEnumerator
 {
 	const PLUGIN_NAME = 'wowza';
 	
@@ -40,17 +40,6 @@ class WowzaPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaServ
 			'liveConversionProfile' => 'LiveConversionProfileService',
 		);
 		return $map;
-	}
-	
-	/* (non-PHPdoc)
-	 * @see IKalturaConfigurator::getConfig()
-	 */
-	public static function getConfig($configName)
-	{
-		if($configName == 'testme')
-			return new Zend_Config_Ini(dirname(__FILE__) . '/config/testme.ini');
-			
-		return null;
 	}
 	
 	/* (non-PHPdoc)

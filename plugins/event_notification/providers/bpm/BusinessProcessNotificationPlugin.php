@@ -2,7 +2,7 @@
 /**
  * @package plugins.businessProcessNotification
  */
-class BusinessProcessNotificationPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaPending, IKalturaObjectLoader, IKalturaEnumerator, IKalturaServices, IKalturaApplicationPartialView, IKalturaAdminConsolePages, IKalturaEventConsumers, IKalturaConfigurator, IKalturaApplicationTranslations
+class BusinessProcessNotificationPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaPending, IKalturaObjectLoader, IKalturaEnumerator, IKalturaServices, IKalturaApplicationPartialView, IKalturaAdminConsolePages, IKalturaEventConsumers, IKalturaApplicationTranslations
 {
 	const PLUGIN_NAME = 'businessProcessNotification';
 	const PLUGIN_VERSION_MAJOR = 1;
@@ -197,17 +197,6 @@ class BusinessProcessNotificationPlugin extends KalturaPlugin implements IKaltur
 		return array(
 			new BusinessProcessNotificationTemplatesListProcessesAction(),
 		);
-	}
-	
-	/* (non-PHPdoc)
-	 * @see IKalturaConfigurator::getConfig()
-	 */
-	public static function getConfig($configName)
-	{
-		if($configName == 'testme')
-			return new Zend_Config_Ini(dirname(__FILE__) . '/config/testme.ini');
-			
-		return null;
 	}
 
 	/**

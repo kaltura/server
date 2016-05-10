@@ -75,8 +75,15 @@ class XmlClientGenerator extends ClientGeneratorFromPhp
 			$description = $serviceActionItem->serviceInfo->description;
 			$description = $this->fixDescription($description);
 			$serviceElement->setAttribute("description", $description);
+
+			if($serviceActionItem->serviceInfo->deprecated)
+				$serviceElement->setAttribute("deprecated", "1");
+			
 			if(isset($serviceActionItem->include))
 				$serviceElement->setAttribute("include", implode(',', $serviceActionItem->include));
+			
+			if(isset($serviceActionItem->exclude))
+				$serviceElement->setAttribute("exclude", implode(',', $serviceActionItem->exclude));
 		
 			$plugin = $this->extractPluginNameFromPackage($serviceActionItem->serviceInfo->package);
 			if($plugin)
@@ -267,6 +274,9 @@ class XmlClientGenerator extends ClientGeneratorFromPhp
 			$enumElement->setAttribute("plugin", $plugin);
 		}
 
+		if($typeReflector->isDeprecated())
+			$enumElement->setAttribute("deprecated", "1");
+
 		if(isset($typeReflector->include))
 			$enumElement->setAttribute("include", implode(',', $typeReflector->include));
 
@@ -321,6 +331,9 @@ class XmlClientGenerator extends ClientGeneratorFromPhp
 		$description = $typeReflector->getDescription();
 		$description = $this->fixDescription($description);
 		$classElement->setAttribute("description", $description);
+
+		if($typeReflector->isDeprecated())
+			$classElement->setAttribute("deprecated", "1");
 		
 		if(isset($typeReflector->include))
 			$classElement->setAttribute("include", implode(',', $typeReflector->include));
@@ -379,7 +392,13 @@ class XmlClientGenerator extends ClientGeneratorFromPhp
 			$description = $property->getDescription();
 			$description = $this->fixDescription($description);
 			$propertyElement->setAttribute("description", $description);
-			
+
+			foreach($property->getConstraints() as $constraint => $value)
+				$propertyElement->setAttribute($constraint, $value);
+
+			if($property->isDeprecated())
+				$propertyElement->setAttribute("deprecated", "1");
+					
 			$classElement->appendChild($propertyElement);
 		}
 		
@@ -398,8 +417,15 @@ class XmlClientGenerator extends ClientGeneratorFromPhp
 		
 		$actionElement = $this->_doc->createElement("action");
 		$actionElement->setAttribute("name", $actionReflector->getActionName());
+
+		if($actionInfo->deprecated)
+			$actionElement->setAttribute("deprecated", "1");
+		
 		if(isset($actionReflector->include))
 			$actionElement->setAttribute("include", implode(',', $actionReflector->include));
+		
+		if(isset($actionReflector->exclude))
+			$actionElement->setAttribute("exclude", implode(',', $actionReflector->exclude));
 		
 		foreach($actionParams as $actionParam)
 		{

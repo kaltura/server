@@ -3,7 +3,7 @@
  * Enable indexing and searching caption asset objects
  * @package plugins.captionSearch
  */
-class CaptionSearchPlugin extends KalturaPlugin implements IKalturaPending, IKalturaPermissions, IKalturaServices, IKalturaEventConsumers, IKalturaEnumerator, IKalturaObjectLoader, IKalturaConfigurator, IKalturaSearchDataContributor
+class CaptionSearchPlugin extends KalturaPlugin implements IKalturaPending, IKalturaPermissions, IKalturaServices, IKalturaEventConsumers, IKalturaEnumerator, IKalturaObjectLoader, IKalturaSearchDataContributor
 {
 	const PLUGIN_NAME = 'captionSearch';
 	const INDEX_NAME = 'caption_item';
@@ -102,17 +102,6 @@ class CaptionSearchPlugin extends KalturaPlugin implements IKalturaPending, IKal
 		if($baseClass == 'KalturaJobData' && $enumValue == self::getApiValue(CaptionSearchBatchJobType::PARSE_CAPTION_ASSET))
 			return 'KalturaParseCaptionAssetJobData';
 		
-		return null;
-	}
-	
-	/* (non-PHPdoc)
-	 * @see IKalturaConfigurator::getConfig()
-	 */
-	public static function getConfig($configName)
-	{
-		if($configName == 'testme')
-			return new Zend_Config_Ini(dirname(__FILE__) . '/config/testme.ini');
-			
 		return null;
 	}
 	

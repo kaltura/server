@@ -39,14 +39,12 @@
  * 			either create a Nullable Boolean type, or keep a map of changed parameters, then only send the variables in that map.
  */
 error_reporting(E_ALL);
-ini_set( "memory_limit","512M" );
-
 //the name of the output folder for the generators -
 
-chdir(__DIR__);
+set_include_path(get_include_path() . PATH_SEPARATOR . realpath(__DIR__ . '/../infra'));
 
 //bootstrap connects the generator to the rest of Kaltura system
-require_once(dirname(__FILE__) . "/bootstrap.php");
+require_once(dirname(__FILE__) . "/../bootstrap.php");
 
 //the name of the summary file that will be used by the UI -
 $summaryFileName = 'summary.kinf';
@@ -106,8 +104,13 @@ else
 
 if(file_exists($outputPathBase))
 {
-	if(!$schemaXmlPath && file_exists("$outputPathBase/KalturaClient.xml"))
-		$schemaXmlPath = fixPath("$outputPathBase/KalturaClient.xml");
+	if(!$schemaXmlPath)
+	{
+		if(file_exists('KalturaClient.xml'))
+			$schemaXmlPath = realpath('KalturaClient.xml');
+		elseif(file_exists("$outputPathBase/KalturaClient.xml"))
+			$schemaXmlPath = fixPath("$outputPathBase/KalturaClient.xml");
+	}
 }
 else
 {
@@ -118,7 +121,7 @@ if(!file_exists($schemaXmlPath))
 	die("XML file [$schemaXmlPath] not found\n");
 
 //pull the generator config ini
-$config = new Zend_Config_Ini(__DIR__ . '/config/generator.ini', null, array('allowModifications' => true));
+$config = new Zend_Config_Ini(__DIR__ . '/../config/generator.ini', null, array('allowModifications' => true));
 
 $libsToGenerate = null;
 if (strtolower($generateSingle) == 'all')
@@ -127,7 +130,7 @@ if (strtolower($generateSingle) == 'all')
 }
 elseif(!$generateSingle)
 {
-	$libsToGenerate = file(__DIR__ . '/config/generator.defaults.ini');
+	$libsToGenerate = file(__DIR__ . '/../config/generator.defaults.ini');
 	foreach($libsToGenerate as $key => &$default)
 		$default = strtolower(trim($default, " \t\r\n"));
 }
@@ -208,7 +211,7 @@ foreach($config as $name => $item)
 	if($item->get("subpackage"))
 		$instance->setSubpackage($item->get("subpackage"));
 	
-	if (isset($item->params))
+	if (isset($item->params) && $item->params)
 	{
 		foreach($item->params as $key => $val)
 		{

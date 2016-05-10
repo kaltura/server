@@ -2,21 +2,9 @@
 /**
  * @package plugins.varConsole
  */
-class VarConsolePlugin extends KalturaPlugin implements IKalturaConfigurator, IKalturaServices, IKalturaPermissions
+class VarConsolePlugin extends KalturaPlugin implements IKalturaServices, IKalturaPermissions
 {
     const PLUGIN_NAME = "varConsole";
-    
-	/* (non-PHPdoc)
-     * @see IKalturaConfigurator::getConfig()
-     */
-    public static function getConfig ($configName)
-    {
-        if($configName == 'testme')
-			return new Zend_Config_Ini(dirname(__FILE__) . '/config/testme.ini');
-			
-		return null;
-        
-    }
 
 	/* (non-PHPdoc)
      * @see IKalturaPlugin::getPluginName()

@@ -34,12 +34,8 @@ class TestmeGenerator extends ClientGeneratorFromXml
 		}
 		
 		$configurationNodes = $xpath->query("/xml/configurations/*");
-	    $this->writeIndex($serviceNodes, $configurationNodes);
-	}
-	
-	function getPluginClassName($pluginName)
-	{
-		return "Kaltura" . ucfirst($pluginName) . "ClientPlugin";
+	    $this->writeIndex($serviceNodes, $configurationNodes, 'index.html', true);
+	    $this->writeIndex($serviceNodes, $configurationNodes, 'no-menu.html', false);
 	}
 	
 	/**
@@ -281,7 +277,7 @@ class TestmeGenerator extends ClientGeneratorFromXml
 		$this->addFile("json/$serviceId-$actionId-action-info.json", json_encode($json), false);
 	}
 	
-	function writeIndex(DOMNodeList $serviceNodes, DOMNodeList $configurationNodes)
+	function writeIndex(DOMNodeList $serviceNodes, DOMNodeList $configurationNodes, $fileName, $includeMenu)
 	{
 		$this->startNewTextBlock();
 		
@@ -368,13 +364,22 @@ class TestmeGenerator extends ClientGeneratorFromXml
 		$this->appendLine('');
 		$this->appendLine('	</script>');
 		$this->appendLine('</head>');
-		$this->appendLine('<body class="body-bg">');
-		$this->appendLine('	<ul id="kmcSubMenu">');
-		$this->appendLine('		<li class="active"><a href="#">Test Console</a></li>');
-		$this->appendLine('		<li><a href="../testmeDoc/index.php">API Documentation</a></li>');
-		$this->appendLine('		<li><a href="../xsdDoc/index.php">XML Schema</a></li>');
-		$this->appendLine('		<li><a href="client-libs.php">API Client Libraries</a></li>');
-		$this->appendLine('	</ul>');
+		
+		if($includeMenu)
+		{
+			$this->appendLine('<body class="body-bg">');
+			$this->appendLine('	<ul id="kmcSubMenu">');
+			$this->appendLine('		<li class="active"><a href="#">Test Console</a></li>');
+			$this->appendLine('		<li><a href="../testmeDoc/index.php">API Documentation</a></li>');
+			$this->appendLine('		<li><a href="../xsdDoc/index.php">XML Schema</a></li>');
+			$this->appendLine('		<li><a href="client-libs.php">API Client Libraries</a></li>');
+			$this->appendLine('	</ul>');
+		}
+		else 
+		{
+			$this->appendLine('<body>');
+		}
+		
 		$this->appendLine('	<div class="left">');
 		$this->appendLine('		<form id="request" action="../" method="post" target="hiddenResponse" enctype="multipart/form-data">');
 		$this->appendLine('			<div class="left-content">');
@@ -506,6 +511,6 @@ class TestmeGenerator extends ClientGeneratorFromXml
 		$this->appendLine('</body>');
 		$this->appendLine('</html>');
 		
-		$this->addFile('index.html', $this->getTextBlock(), false);
+		$this->addFile($fileName, $this->getTextBlock(), false);
 	}
 }

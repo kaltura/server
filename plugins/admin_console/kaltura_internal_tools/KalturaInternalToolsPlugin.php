@@ -2,7 +2,7 @@
 /**
  * @package plugins.KalturaInternalTools
  */
-class KalturaInternalToolsPlugin extends KalturaPlugin implements IKalturaServices, IKalturaAdminConsolePages, IKalturaConfigurator
+class KalturaInternalToolsPlugin extends KalturaPlugin implements IKalturaServices, IKalturaAdminConsolePages
 {
 	const PLUGIN_NAME = 'KalturaInternalTools';
 	
@@ -38,16 +38,5 @@ class KalturaInternalToolsPlugin extends KalturaPlugin implements IKalturaServic
 			return true;
 		
 		return false;
-	}
-	
-	/* (non-PHPdoc)
-	 * @see IKalturaConfigurator::getConfig()
-	 */
-	public static function getConfig($configName)
-	{
-		if($configName == 'testme')
-			return new Zend_Config_Ini(dirname(__FILE__) . '/config/testme.ini');
-			
-		return null;
 	}
 }

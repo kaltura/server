@@ -2,7 +2,7 @@
 /**
  * @package plugins.fileSync
  */
-class FileSyncPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaServices, IKalturaConfigurator
+class FileSyncPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaServices
 {
 	const PLUGIN_NAME = 'fileSync';
 	
@@ -25,16 +25,5 @@ class FileSyncPlugin extends KalturaPlugin implements IKalturaPermissions, IKalt
 			return true;
 		
 		return false;
-	}
-	
-	/* (non-PHPdoc)
-	 * @see IKalturaConfigurator::getConfig()
-	 */
-	public static function getConfig($configName)
-	{
-		if($configName == 'testme')
-			return new Zend_Config_Ini(dirname(__FILE__) . '/config/testme.ini');
-			
-		return null;
 	}
 }
