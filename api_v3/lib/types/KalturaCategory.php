@@ -533,7 +533,11 @@ class KalturaCategory extends KalturaObject implements IRelatedFilterable
 			foreach ($aggrCatIdsToCheck as $aggrCatIdToCheck)
 			{
 				$agrrCat = categoryPeer::retrieveByPK($aggrCatIdToCheck);
-				if (!$agrrCat || !$agrrCat->getIsAggregationCategory())
+				if (!$agrrCat)
+				{
+					throw new KalturaAPIException(KalturaErrors::CATEGORY_NOT_FOUND, $aggrCatIdToCheck);
+				}
+				if (!$agrrCat->getIsAggregationCategory())
 				{
 					throw new KalturaAPIException(KalturaErrors::AGGREGATION_CATEGORY_WRONG_ASSOCIATION);
 				}
