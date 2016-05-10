@@ -934,8 +934,8 @@ abstract class LiveEntry extends entry
 			return EntryServerNodeStatus::PLAYABLE;
 		elseif ($primaryMediaServerStatus == EntryServerNodeStatus::BROADCASTING || $secondaryMediaServerStatus == EntryServerNodeStatus::BROADCASTING)
 			return EntryServerNodeStatus::BROADCASTING;
-		elseif ($primaryMediaServerStatus == EntryServerNodeStatus::BROADCASTING || $secondaryMediaServerStatus == EntryServerNodeStatus::BROADCASTING)
-			return EntryServerNodeStatus::BROADCASTING;
+		elseif ($primaryMediaServerStatus == EntryServerNodeStatus::AUTHENTICATED || $secondaryMediaServerStatus == EntryServerNodeStatus::AUTHENTICATED)
+			return EntryServerNodeStatus::AUTHENTICATED;
 		else
 			return EntryServerNodeStatus::STOPPED;
 	}

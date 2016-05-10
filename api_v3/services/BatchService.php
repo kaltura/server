@@ -588,7 +588,7 @@ class BatchService extends KalturaBatchService
 			$flavorAssets = assetPeer::retrieveReadyFlavorsByEntryId($entry->getId());
 			if (!$flavorAssets || count($flavorAssets) == 0)
 			{
-				throw new KalturaAPIException(KalturaErrors::NO_FLAVORS_FOUND);
+				return $ret_val;
 			}
 			kBusinessPostConvertDL::handleConvertFinished($dbBatchJob, $flavorAssets[0]);
 			$entry = entryPeer::retrieveByPK($entry->getId());

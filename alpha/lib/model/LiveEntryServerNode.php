@@ -18,7 +18,19 @@ class LiveEntryServerNode extends EntryServerNode
 	{
 		$this->addTrackEntryInfo(TrackEntry::TRACK_ENTRY_EVENT_TYPE_ADD_MEDIA_SERVER, __METHOD__.":: serverType=".$this->getServerType().":serverNodeId=".$this->getServerNodeId().":status=".$this->getStatus().":dc=".$this->getDc());
 		
-		$this->updateLiveEntryData($this->getServerNodeId());
+		if($this->getServerType() === EntryServerNodeType::LIVE_PRIMARY)
+		{
+			$liveEntry = $this->getLiveEntry();
+			if($liveEntry)
+			{
+					$liveEntry->setPrimaryServerNodeId($this->getServerNodeId());
+					
+					if(!$liveEntry->getCurrentBroadcastStartTime() && $this->getStatus() === EntryServerNodeStatus::AUTHENTICATED)
+						$liveEntry->setCurrentBroadcastStartTime(time());
+					
+					$liveEntry->save();
+			}	
+		}
 		
 		parent::postInsert($con);
 	}
@@ -30,9 +42,18 @@ class LiveEntryServerNode extends EntryServerNode
 	{
 		$this->addTrackEntryInfo(TrackEntry::TRACK_ENTRY_EVENT_TYPE_UPDATE_MEDIA_SERVER, __METHOD__.":: serverType=".$this->getServerType().":serverNodeId=".$this->getServerNodeId().":status=".$this->getStatus().":dc=".$this->getDc());
 		
-		$entrySaved = $this->updateLiveEntryData($this->getServerNodeId());		
-		if($this->isColumnModified(EntryServerNodePeer::STATUS) && !$entrySaved)
-			$this->indexLiveEntry();
+		$liveEntry = $this->getLiveEntry();
+		if($liveEntry)
+		{
+			if($this->isColumnModified(EntryServerNodePeer::SERVER_NODE_ID) && $this->getServerType() === EntryServerNodeType::LIVE_PRIMARY && $liveEntry->getPrimaryServerNodeId() !== $this->getServerNodeId())
+				$liveEntry->setPrimaryServerNodeId($this->getServerNodeId());
+			
+			if($this->isColumnModified(EntryServerNodePeer::STATUS) && $this->getStatus() === EntryServerNodeStatus::PLAYABLE)
+				$liveEntry->setLastBroadcast(time());
+			
+			if(!$liveEntry->save())
+				$liveEntry->indexToSearchIndex();
+		}
 
 		parent::postUpdate($con);
 	}
@@ -44,9 +65,18 @@ class LiveEntryServerNode extends EntryServerNode
 	{
 		$this->addTrackEntryInfo(TrackEntry::TRACK_ENTRY_EVENT_TYPE_DELETE_MEDIA_SERVER, __METHOD__);
 		
-		$entrySaved = $this->updateLiveEntryData(null);
-		if (!$entrySaved)
-			$this->indexLiveEntry();
+		$liveEntry = $this->getLiveEntry();
+		if($liveEntry)
+		{
+			if($this->getServerType() === EntryServerNodeType::LIVE_PRIMARY)
+			{
+				if($liveEntry->getCurrentBroadcastStartTime())
+					$liveEntry->setCurrentBroadcastStartTime(0);
+			}
+			
+			if(!$liveEntry->save())
+				$liveEntry->indexToSearchIndex();
+		}
 		
 		parent::postDelete($con);
 	}
@@ -81,46 +111,15 @@ class LiveEntryServerNode extends EntryServerNode
 		return $this->getFromCustomData(self::CUSTOM_DATA_DC);
 	}
 	
-	private function indexLiveEntry()
+	private function getLiveEntry()
 	{
 		$liveEntry = entryPeer::retrieveByPK($this->getEntryId());
-		if(!$liveEntry)
-		{
-			KalturaLog::debug("Live Entry server node for entry [" . $this->getEntryId() . "] has been deleted, but live entry was not found, will not be re-indexed to sphinx with new status");
-			return;
-		}
-		
-		KalturaLog::debug("Live Entry server node for entry [" . $this->getEntryId() . "] has been deleted, re-indexing entry with new live status");
-		$liveEntry->indexToSearchIndex();
-	}
-	
-	private function updateLiveEntryData($serverNodeId)
-	{
-		$shouldSave = false;
-		
-		$liveEntry = entryPeer::retrieveByPK($this->getEntryId());
-		/* @var $liveEntry LiveEntry */
 		if(!$liveEntry)
 		{
 			KalturaLog::debug("Live entry with id [" . $this->getEntryId() . "] not found, live entry data will not be updated");
-			return $shouldSave;
+			return null;
 		}
 		
-		if($this->getServerType() === EntryServerNodeType::LIVE_PRIMARY && $liveEntry->getPrimaryServerNodeId() !== $serverNodeId)
-		{
-			$liveEntry->setPrimaryServerNodeId($serverNodeId);
-			$shouldSave = true;
-		}
-		
-		if($this->isColumnModified(EntryServerNodePeer::STATUS) && $this->getStatus() === EntryServerNodeStatus::PLAYABLE)
-		{
-			$liveEntry->setLastBroadcast(kApiCache::getTime());
-			$shouldSave = true;
-		}
-		
-		if($shouldSave)
-			$liveEntry->save();
-		
-		return $shouldSave;
+		return $liveEntry;
 	}
 }

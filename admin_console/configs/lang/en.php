@@ -1308,6 +1308,7 @@ return array(
 	'Kaltura_Client_Type_UrlTokenizerUplynk'	=> 'Uplynk Tokenizer',
 	'Kaltura_Client_Type_UrlTokenizerVelocix'	=> 'Velocix Tokenizer',
 	'Kaltura_Client_Type_UrlTokenizerCloudFront'	=> 'CloudFront Tokenizer',
+	'Kaltura_Client_Type_UrlTokenizerVnpt'        => 'Vnpt Tokenizer',
 	
 	'Kaltura_Client_Type_UrlRecognizer' => "default recognizer",
     

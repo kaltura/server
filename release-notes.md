@@ -1,5 +1,45 @@
 # Kajam 11.14.0 #
 
+## Scheduling plugins ##
+ - Issue Type: missing configuration in plugins.ini for scheduling plugins.
+ - Issue ID: PLAT-5245
+ 
+#### Configuration ####
+Added schedule plugins to plugins.ini
+ 
+#### Deployment scripts####
+Install plugins:
+    php deployment/base/scripts/installPlugins.php
+    
+## Use EntryServerNode Table when validating phantom live entries ##
+
+ - Issue Type: BUG
+ - Issue ID: PLAT-5401
+ 
+#### Configuration ####
+Added the following to batch.ini file under KAsyncValidateLiveMediaServers:
+ 
+ - params.minCreationTime = 120
+ 
+#### Deployment scripts####
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2016_04_26_add_batch_to_entryServerNode.php
+	
+## Added the new analytics service ##
+ 
+ - Issue Type: EPIC
+ - Issue ID: PLAT-4685
+
+#### Configuration ####
+Added the following to local.ini in server-saas-config:
+ 
+ - analytics_internal_API_url = http://dataretrieval-access-stg-491967709.us-west-2.elb.amazonaws.com:9000/query 
+
+#### Deployment scripts####
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2016_04_17_analytics.php
+ 
+#### Known Issues & Limitations ####
+ - None.
+
 ## Mediaprep Tvinci distribution profile use dynamic tags ##
 
  - Issue Type: Story
