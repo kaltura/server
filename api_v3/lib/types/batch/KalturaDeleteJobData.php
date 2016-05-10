@@ -15,11 +15,11 @@ class KalturaDeleteJobData extends KalturaJobData
 	 * Additional parameters passed to the delete job in the form of key-value pairs
 	 * @var KalturaKeyValueArray
 	 */
-	public $additionalParameters;
+	public $aggregationCategory;
 	
 	private static $mapBetweenObjects = array
 	(
-		'additionalParameters',
+		'aggregationCategory',
 	);
 	
 	/* (non-PHPdoc)

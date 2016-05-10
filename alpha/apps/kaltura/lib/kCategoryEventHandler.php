@@ -146,38 +146,40 @@ class kCategoryEventHandler implements kObjectDeletedEventConsumer, kObjectCreat
 	
 	protected function handleCategoryEntryCreated (categoryEntry $object)
 	{
-			$category = categoryPeer::retrieveByPK($object->getCategoryId());
-			if (!$category)
-			{
-				KalturaLog::info("category [" . $object->getCategoryId() . "] does not exist in the system.");
-				return true;
-			}
+		$category = categoryPeer::retrieveByPK($object->getCategoryId());
+		if (!$category)
+		{
+			KalturaLog::info("category [" . $object->getCategoryId() . "] does not exist in the system.");
+			return;
+		}
+		
+		if (!$category->getAggregationCategories())
+		{
+			KalturaLog::info("No aggregation categories found for category [" . $category->getId() . "]");
+			return;
+		}
+		
+		$aggregationCategories = explode(',', $category->getAggregationCategories());
+		$aggregationCategoryEntries = categoryEntryPeer::retrieveActiveByEntryIdAndCategoryIds($object->getEntryId(), $aggregationCategories); 
+		
+		//$aggregationCategories contains all the aggregation categories from the category the entry was added to. 
+		//Now we will eliminate from it all the category IDs that are already associated with the entry.
+		foreach ($aggregationCategoryEntries as $aggregationCategoryEntry)
+		{
+			$aggregationCategories = array_diff($aggregationCategories, array($aggregationCategoryEntry->getCategoryId()));
+		}
+		
+		foreach ($aggregationCategories as $categoryIdToAdd)
+		{
+			$aggregationCategory = categoryPeer::retrieveByPK($categoryIdToAdd);
+			if (!$aggregationCategory)
+				continue;
 			
-			if (!$category->getAggregationCategories())
-			{
-				KalturaLog::info("No aggregation categories found for category [" . $category->getId() . "]");
-				return true;
-			}
-			
-			$aggregationCategories = explode(',', $category->getAggregationCategories());
-			$aggregationCategoryEntries = categoryEntryPeer::retrieveActiveByEntryIdAndCategoryIds($object->getEntryId(), $aggregationCategories); 
-			
-			foreach ($aggregationCategoryEntries as $aggregationCategoryEntry)
-			{
-				$aggregationCategories = array_diff($aggregationCategories, array($aggregationCategoryEntry->getCategoryId()));
-			}
-			
-			foreach ($aggregationCategories as $categoryIdToAdd)
-			{
-				$aggregationCategory = categoryPeer::retrieveByPK($categoryIdToAdd);
-				if (!$aggregationCategory)
-					continue;
-				
-				$categoryEntry = $object->copy();
-				$categoryEntry->setCategoryId($categoryIdToAdd);
-				$categoryEntry->setCategoryFullIds($aggregationCategory->getFullIds());
-				$categoryEntry->save();
-			}
+			$categoryEntry = $object->copy();
+			$categoryEntry->setCategoryId($categoryIdToAdd);
+			$categoryEntry->setCategoryFullIds($aggregationCategory->getFullIds());
+			$categoryEntry->save();
+		}
 	}
 
 	/* (non-PHPdoc)

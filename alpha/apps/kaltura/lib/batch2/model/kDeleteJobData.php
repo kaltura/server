@@ -14,20 +14,20 @@ class kDeleteJobData extends kJobData
 	/**
 	 * @var array
 	 */
-	private $additionalParameters;
+	private $aggregationCategory;
 	
 	/**
 	 * @return the $additionalParameters
 	 */
-	public function getAdditionalParameters() {
-		return $this->additionalParameters;
+	public function getAggregationCategory() {
+		return $this->aggregationCategory;
 	}
 
 	/**
 	 * @param array $additionalParameters
 	 */
-	public function setAdditionalParameters($additionalParameters) {
-		$this->additionalParameters = $additionalParameters;
+	public function setAggregationCategory($aggregationCategory) {
+		$this->aggregationCategory = $aggregationCategory;
 	}
 
 	/**

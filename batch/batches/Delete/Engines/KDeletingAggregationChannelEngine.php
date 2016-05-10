@@ -13,14 +13,8 @@ class KDeletingAggregationChannelEngine extends  KDeletingEngine
 	{
 		/* @var $jobData KalturaDeleteJobData */
 		parent::configure($partnerId, $jobData);
-		
-		foreach ($jobData->additionalParameters as $keyValuePair)
-		{
-			if ($keyValuePair->key == "0.publicAggregationCategory")
-			{
-				$this->publicAggregationChannel = $keyValuePair->value;
-			}
-		}
+
+		$this->publicAggregationChannel = $jobData->aggregationCategory;
 	}
 	
 	/* (non-PHPdoc)
