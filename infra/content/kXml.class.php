@@ -424,9 +424,11 @@ class kXml
 	}	
 	
 /**
-	 * Reutrns XML containing the fields in $base that are different from the fields in $compare
+	 * Reutrns array mapping the xpaths of changed fields to their new values
 	 * @param string $base
-	 * @param st $compare
+	 * @param string $compare
+	 * 
+	 * @return array
 	 */
 	public static function getDiff ($base, $compare = null)
 	{
@@ -455,6 +457,12 @@ class kXml
 		return $diffArray;
 	}
 	
+	
+	/**
+	 * Returns all leaf nodes of an XML
+	 * @param string $xmlData
+	 * @return array
+	 */
 	protected static function getAllValueNodes($xmlData)
 	{
 		$doc = new KDOMDocument(); 

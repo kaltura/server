@@ -702,6 +702,14 @@ class kMetadataManager
 		return kJobsManager::addJob($job, $data, BatchJobType::METADATA_TRANSFORM);
 	}
 	
+	/**
+	 * Receives metadata object ID and a previous version, and returns an array mapping the xpaths of fields changed from version $previousVersion 
+	 * to their new values in the current version
+	 * 
+	 * @param int $metadataObjectId
+	 * @param int $previousVersion
+	 * @return array
+	 */
 	public static function retrieveChangedFieldsAndValues ($metadataObjectId, $previousVersion)
 	{
 		if (!$previousVersion)
