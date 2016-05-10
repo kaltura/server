@@ -433,7 +433,7 @@ class TestmeGenerator extends ClientGeneratorFromXml
 	
 				$this->appendLine('				<div class="param">');
 				$this->appendLine("					<label for=\"{$configurationPropertyNode->localName}\">$title ($type):</label>");
-				$this->appendLine('					<input type="text" name="apiVersion" size="30" class="" value="' . $value . '" />');
+				$this->appendLine("					<input type=\"text\" name=\"{$configurationPropertyNode->localName}\" size=\"30\" class=\"\" value=\"$value\" />");
 				$this->appendLine("					<input id=\"chk-{$configurationPropertyNode->localName}\" type=\"checkbox\" $checked />");
 				$this->appendLine('				</div>');
 			}
