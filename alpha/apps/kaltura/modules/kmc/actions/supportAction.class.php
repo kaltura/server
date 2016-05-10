@@ -55,7 +55,7 @@ class supportAction extends kalturaAction
             // Send support ticket to salesforce
             $post_items = array();
             foreach ($_POST as $key => $value) {
-                $post_items[] = $key . '=' . urlencode($value);
+                $post_items[] = $key . '=' . $value;
             }
             $post_string = implode ('&', $post_items);
             $ch = curl_init("https://www.salesforce.com/servlet/servlet.WebToCase?encoding=UTF-8");
