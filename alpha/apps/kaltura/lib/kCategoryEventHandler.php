@@ -58,10 +58,7 @@ class kCategoryEventHandler implements kObjectDeletedEventConsumer, kObjectCreat
 		$filter->set("_matchand_categories_ids", $object->getId().','.$aggregationCategory->getId());
 		$filter->set ("_notcontains_categories_ids", $aggregationCategory->getPublishingCategories());
 		
-		$additionalParameters = array();
-		$pair[self::PUBLIC_AGGREGATION_CATEGORY] = $aggregationCategory->getId();
-		$additionalParameters[] = $pair;
-		kJobsManager::addDeleteJob($object->getPartnerId(), DeleteObjectType::CATEGORY_ENTRY_AGGREGATION, $filter, $additionalParameters);
+		kJobsManager::addDeleteJob($object->getPartnerId(), DeleteObjectType::CATEGORY_ENTRY_AGGREGATION, $filter, $aggregationCategory->getId());
 	}
 
 	/* (non-PHPdoc)
