@@ -5,7 +5,8 @@ require_once(dirname(__file__) . '/../../../../../../vendor/akamai/token/StreamT
 class kVnptUrlTokenizer extends kUrlTokenizer
 {
 	const HTTP_VOD_TOKEN_FORMAT = 0;
-	const VOD_LIVE_TOKEN_FORMAT = 1;
+	const VOD_TOKEN_FORMAT = 1;
+	const LIVE_TOKEN_FORMAT = 2;
 
 	/**
 	 * @var int
@@ -38,13 +39,17 @@ class kVnptUrlTokenizer extends kUrlTokenizer
 			default:
 				$tokenizationSuffix = $url;
 				break;
-			case self::VOD_LIVE_TOKEN_FORMAT:
+			case self::VOD_TOKEN_FORMAT:
+			case self::LIVE_TOKEN_FORMAT:
 				preg_match_all('/\//', $url,$matches, PREG_OFFSET_CAPTURE);
 				$lastSlashLocationIndex = end($matches[0]);
 				$tokenizationSuffix = substr($url, 0, $lastSlashLocationIndex[1]);
 				break;
 		}
 		$url = md5($clientIp . ":$tokenKey" . ":$expiredTime" . ":$tokenizationSuffix") . $expiredTime . $url;
+		if($tokenizationFormat == self::LIVE_TOKEN_FORMAT)
+			$url = "/" . $url;
+		
 		return $url;
 	}
 
