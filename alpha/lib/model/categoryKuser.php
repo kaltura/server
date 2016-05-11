@@ -16,7 +16,9 @@
 class categoryKuser extends BasecategoryKuser implements IIndexable{
 	
 	private $old_status = null;
-	
+
+	private $isNew = false;
+
 	const BULK_UPLOAD_ID = "bulk_upload_id";
 	
 	const PARTNER_INDEX_PREFIX = 'p';
@@ -116,7 +118,17 @@ class categoryKuser extends BasecategoryKuser implements IIndexable{
 		$this->updateCategory(true);
 		
 		return parent::preDelete();	
-	}		
+	}
+
+	/* (non-PHPdoc)
+	 * @see BasecategoryKuser::preInsert()
+	 */
+	public function preInsert(PropelPDO $con = null)
+	{
+		$this->isNew = true;
+
+		return parent::preInsert($con);
+	}
 	
 	private function updateCategory($isDelete = false)
 	{
@@ -127,7 +139,7 @@ class categoryKuser extends BasecategoryKuser implements IIndexable{
 		if(!$category)
 			throw new kCoreException('category not found');
 			
-		if ($this->isNew())
+		if ($this->isNew)
 		{
 			if($this->status == CategoryKuserStatus::PENDING)
 				$category->setPendingMembersCount($category->getPendingMembersCount() + 1);
@@ -315,6 +327,7 @@ class categoryKuser extends BasecategoryKuser implements IIndexable{
 			$this->updateCategory();
 		}
 
+		$this->isNew = false;
 	}
 	
 	/* (non-PHPdoc)
