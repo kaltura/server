@@ -18,7 +18,7 @@ class categoryKuser extends BasecategoryKuser implements IIndexable{
 	private $old_status = null;
 
 	private $isNew = false;
-
+	
 	const BULK_UPLOAD_ID = "bulk_upload_id";
 	
 	const PARTNER_INDEX_PREFIX = 'p';
@@ -116,7 +116,7 @@ class categoryKuser extends BasecategoryKuser implements IIndexable{
 	public function preDelete(PropelPDO $con = null)
 	{
 		$this->updateCategory(true);
-		
+
 		return parent::preDelete();	
 	}
 
@@ -174,7 +174,6 @@ class categoryKuser extends BasecategoryKuser implements IIndexable{
 				
 		}
 
-		$category->setUpdatedAt(time());
 		$category->save();
 		$category->indexCategoryInheritedTree();
 	}
