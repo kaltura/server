@@ -524,11 +524,7 @@ class XmlClientGenerator extends ClientGeneratorFromPhp
 		$actionElement->appendChild($resultElement);
 
 		if(!empty($actionInfo->actionAlias))
-		{
-			$aliasElement=$this->_doc->createElement('alias');
-			$aliasElement->setAttribute('actionAlias', $actionInfo->actionAlias);
-			$actionElement->appendChild($aliasElement);
-		}
+			$actionElement->setAttribute('actionAlias', $actionInfo->actionAlias);
 		
 		return $actionElement;
 	}
