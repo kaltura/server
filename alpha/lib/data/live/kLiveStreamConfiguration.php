@@ -35,9 +35,14 @@ class kLiveStreamConfiguration
 	protected $streamName;
 	
 	/**
-	 * @var boolean
+	 * @var LiveEntryServerNode
 	 */
-	protected $isExternalStream = false;
+	protected $primaryLiveEntryServerNode = null;
+	
+	/**
+	 * @var LiveEntryServerNode
+	 */
+	protected $backupLiveEntryServerNode = null;
 	
 	/**
 	 * @return the $streamName
@@ -111,11 +116,19 @@ class kLiveStreamConfiguration
 		$this->publishUrl = $publishUrl;
 	}
 	
-	public function setIsExternalStream($v) {
-		$this->isExternalStream = $v;
+	public function setPrimaryLiveEntryServerNode($v) {
+		$this->primaryLiveEntryServerNode = $v;
 	}
 	
-	public function getIsExternalStream() {
-		return $this->isExternalStream;
+	public function getPrimaryLiveEntryServerNode() {
+		return $this->primaryLiveEntryServerNode;
+	}
+	
+	public function setBackupLiveEntryServerNode($v) {
+		$this->backupLiveEntryServerNode = $v;
+	}
+	
+	public function getBackupLiveEntryServerNode() {
+		return $this->backupLiveEntryServerNode;
 	}
 }

@@ -63,16 +63,13 @@ class LiveEntryServerNode extends EntryServerNode
 	 */
 	public function postDelete(PropelPDO $con = null)
 	{
-		$this->addTrackEntryInfo(TrackEntry::TRACK_ENTRY_EVENT_TYPE_DELETE_MEDIA_SERVER, __METHOD__);
+		$this->addTrackEntryInfo(TrackEntry::TRACK_ENTRY_EVENT_TYPE_DELETE_MEDIA_SERVER, __METHOD__.":: serverType=".$this->getServerType().":serverNodeId=".$this->getServerNodeId().":dc=".$this->getDc());
 		
 		$liveEntry = $this->getLiveEntry();
 		if($liveEntry)
 		{
 			if($this->getServerType() === EntryServerNodeType::LIVE_PRIMARY)
 			{
-				$liveEntry->setPrimaryServerNodeId(null);
-				
-				$entryServerNodes = EntryServerNodePeer::retrieveByEntryId($this->getEntryId());
 				if($liveEntry->getCurrentBroadcastStartTime())
 					$liveEntry->setCurrentBroadcastStartTime(0);
 			}
@@ -84,7 +81,7 @@ class LiveEntryServerNode extends EntryServerNode
 		parent::postDelete($con);
 	}
 
-	public function setStreams(KalturaLiveStreamParamsArray $v) 
+	public function setStreams(array $v) 
 	{ 
 		$this->putInCustomData(self::CUSTOM_DATA_STREAMS, serialize($v));
 	}
