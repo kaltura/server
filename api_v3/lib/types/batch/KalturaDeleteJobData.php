@@ -11,6 +11,25 @@ class KalturaDeleteJobData extends KalturaJobData
 	 */
 	public $filter;
 	
+	/**
+	 * Additional parameters passed to the delete job in the form of key-value pairs
+	 * @var KalturaKeyValueArray
+	 */
+	public $aggregationCategory;
+	
+	private static $mapBetweenObjects = array
+	(
+		'aggregationCategory',
+	);
+	
+	/* (non-PHPdoc)
+	 * @see KalturaObject::getMapBetweenObjects()
+	 */
+	public function getMapBetweenObjects()
+	{
+		return array_merge(parent::getMapBetweenObjects(), self::$mapBetweenObjects);
+	}
+	
 	/* (non-PHPdoc)
 	 * @see KalturaObject::toObject()
 	 */
@@ -39,6 +58,10 @@ class KalturaDeleteJobData extends KalturaJobData
 
 			case 'KuserKgroupFilter':
 				$this->filter = new KalturaGroupUserFilter();
+				break;
+				
+			case 'entryFilter':
+				$this->filter = new KalturaBaseEntryFilter();
 				break;
 				
 			default:

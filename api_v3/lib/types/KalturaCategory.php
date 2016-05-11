@@ -281,6 +281,18 @@ class KalturaCategory extends KalturaObject implements IRelatedFilterable
 	 */
 	public $pendingEntriesCount;
 	
+	/**
+	 * Flag indicating that the category is an aggregation category 
+	 *  @var KalturaNullableBoolean
+	 */
+	public $isAggregationCategory;
+	
+	/**
+	 * List of aggregation channels the category belongs to
+	 * @var string
+	 */
+	public $aggregationCategories;
+	
 	private static $mapBetweenObjects = array
 	(
 		"id",
@@ -316,6 +328,8 @@ class KalturaCategory extends KalturaObject implements IRelatedFilterable
 		"directSubCategoriesCount",
 		"moderation",
 		"pendingEntriesCount",
+		"isAggregationCategory",
+		"aggregationCategories",
 	);
 	
 	/* (non-PHPdoc)
@@ -506,6 +520,30 @@ class KalturaCategory extends KalturaObject implements IRelatedFilterable
 			kuserPeer::createKuserForPartner($partnerId, $this->owner);
 		}
 		
+		if (($this->isAggregationCategory && $this->aggregationCategories) ||
+			($this->isAggregationCategory && $sourceObject && $sourceObject->getAggregationCategories()) ||
+			($this->aggregationCategories && $sourceObject && $sourceObject->getIsAggregationCategory()))
+			{
+				throw new KalturaAPIException(KalturaErrors::AGGREGATION_CATEGORY_WRONG_ASSOCIATION);
+			}
+			
+		if ($this->aggregationCategories)
+		{
+			$aggrCatIdsToCheck = explode (',' , $this->aggregationCategories);
+			foreach ($aggrCatIdsToCheck as $aggrCatIdToCheck)
+			{
+				$agrrCat = categoryPeer::retrieveByPK($aggrCatIdToCheck);
+				if (!$agrrCat)
+				{
+					throw new KalturaAPIException(KalturaErrors::CATEGORY_NOT_FOUND, $aggrCatIdToCheck);
+				}
+				if (!$agrrCat->getIsAggregationCategory())
+				{
+					throw new KalturaAPIException(KalturaErrors::AGGREGATION_CATEGORY_WRONG_ASSOCIATION);
+				}
+			}
+		}
+		
 	}
 	
 	/* (non-PHPdoc)
@@ -546,7 +584,6 @@ class KalturaCategory extends KalturaObject implements IRelatedFilterable
 	public function toObject($object_to_fill = null, $props_to_skip = array())
 	{
 		$this->trimStringProperties(array("name"));
-		
 		return parent::toObject($object_to_fill, $props_to_skip);
 	}	
 }

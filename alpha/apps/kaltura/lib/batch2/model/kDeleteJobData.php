@@ -12,6 +12,25 @@ class kDeleteJobData extends kJobData
 	private $filter;
 	
 	/**
+	 * @var array
+	 */
+	private $aggregationCategory;
+	
+	/**
+	 * @return the $additionalParameters
+	 */
+	public function getAggregationCategory() {
+		return $this->aggregationCategory;
+	}
+
+	/**
+	 * @param array $additionalParameters
+	 */
+	public function setAggregationCategory($aggregationCategory) {
+		$this->aggregationCategory = $aggregationCategory;
+	}
+
+	/**
 	 * @return baseObjectFilter $filter
 	 */
 	public function getFilter()
