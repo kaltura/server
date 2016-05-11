@@ -424,7 +424,7 @@ class kXml
 	}	
 	
 /**
-	 * Reutrns array mapping the xpaths of changed fields to their new values
+	 * Reutrns array mapping the changed field names to their new values
 	 * @param string $base
 	 * @param string $compare
 	 * 
@@ -432,57 +432,36 @@ class kXml
 	 */
 	public static function getDiff ($base, $compare = null)
 	{
-		$baseValues = self::getAllValueNodes($base);
-		$compareValues = self::getAllValueNodes($compare);
+		$baseXml = new SimpleXMLElement($base);
+		$compareXml = new SimpleXMLElement($compare);
 		
-		$diffArray = array();
-		foreach ($baseValues as $xpath => $values)
-		{
-			foreach ($values as $value)
-			{
-				if (!isset ($compareValues [$xpath]) || !in_array ($value, $compareValues [$xpath]))
-				{
-					$diffArray[$xpath][] = $value;
-				}
-			}
-		}
+		$baseJson = json_encode($baseXml);
+		$baseArray = json_decode($baseJson, true);
+		
+		$compareJson = json_encode($compareXml);
+		$compareArray = json_decode($compareJson, true);
+		
+		$added = array_udiff_assoc($baseArray, $compareArray, array ('kXml', 'compareValues'));
+		$removed = array_udiff_assoc ($compareArray, $baseArray, array ('kXml', 'compareValues'));
 		
 		//Some values may have been removed, and exist in compare and not in base - these are also changes
-		$missingKeys = array_diff(array_keys($compareValues), array_keys($baseValues));
-		foreach ($missingKeys as $missingXpath)
+		$diffKeys = array_diff(array_keys($removed), array_keys($added));
+		foreach ($diffKeys as $diffKey)
 		{
-			$diffArray[$missingXpath] = "null";
+			$added [$diffKey] = "null";
 		}
 		
-		return $diffArray;
+		return $added;
 	}
 	
-	
-	/**
-	 * Returns all leaf nodes of an XML
-	 * @param string $xmlData
-	 * @return array
-	 */
-	protected static function getAllValueNodes($xmlData)
+	public static function compareValues ($val1, $val2)
 	{
-		$doc = new KDOMDocument(); 
-		$doc->loadXML($xmlData);
-		$domXPath = new DOMXPath($doc);
-		$allNodes = $domXPath->query("//*[not(*)]");
-		
-		$arrayLeafNodes = array();
-		for ($i = 0; $i < $allNodes->length; $i++)
+		if ($val1 === $val2)
 		{
-			$currNode = $allNodes->item($i);
-			
-			$xpath = $currNode->getNodePath();
-			if (preg_match('/\[\d+\]/', $xpath))
-			{
-				$xpath = preg_replace('/\[\d+\]/', '', $xpath);
-			}
-			$arrayLeafNodes[$xpath][] = $currNode->nodeValue;
+			return 0;
 		}
 		
-		return $arrayLeafNodes;
+		return 1;
 	}
+	
 }
