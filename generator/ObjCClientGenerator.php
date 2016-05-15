@@ -591,7 +591,7 @@ class ObjCClientGenerator extends ClientGeneratorFromXml
 				continue;
 
 			/** @var  $actionNode DOMElement */
-			if(is_null($actionNode->getAttribute('actionAlias')))
+			if($actionNode->getAttribute('actionAlias') == '')
 				continue;
 
 			$resultNode = $actionNode->getElementsByTagName('result')->item(0);
