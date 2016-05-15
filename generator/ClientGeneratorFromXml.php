@@ -80,13 +80,40 @@ abstract class ClientGeneratorFromXml
 		$this->addFile('agpl.txt', file_get_contents(dirname(__FILE__).'/sources/agpl.txt'), false);
 	}
 	
+	protected function shouldIncludeType($type)
+	{
+		return !count($this->_includeTypes) || isset($this->_includeTypes[$type]);
+	}
+	
+	protected function shouldIncludeAction($serviceId, $actionId)
+	{
+		$serviceId = strtolower($serviceId);
+		$actionId = strtolower($actionId);
+		
+		if(!count($this->_includeServices))
+			return true;
+
+		if(!isset($this->_includeServices[$serviceId]))
+			return false;
+
+		if($this->_includeServices[$serviceId] === 'all')
+			return true;
+				
+		return isset($this->_includeServices[$serviceId][$actionId]);
+	}
+	
+	protected function shouldIncludeService($serviceId)
+	{
+		return !count($this->_includeServices) || isset($this->_includeServices[strtolower($serviceId)]);
+	}
+	
 	protected function loadExcludeList()
 	{
 		$xpath = new DOMXPath($this->_doc);
 		
 		if($this->_config->include)
 		{
-			$includes = explode(',', str_replace(' ', '', $this->_config->include));
+			$includes = explode(',', str_replace(' ', '', strtolower($this->_config->include)));
 			foreach($includes as $include)
 			{
 				list($serviceId, $actionId) = explode('.', $include);
@@ -109,18 +136,18 @@ abstract class ClientGeneratorFromXml
 			$serviceNodes = $xpath->query("/xml/services/service");
 			foreach($serviceNodes as $serviceNode)
 			{
-				$serviceId = $serviceNode->getAttribute("id");
+				$serviceId = strtolower($serviceNode->getAttribute("id"));
 				$this->_includeServices[$serviceId] = array();
 
 				$actionNodes = $serviceNode->getElementsByTagName("action");
 				foreach($actionNodes as $actionNode)
 				{
-					$actionId = $actionNode->getAttribute("name");
+					$actionId = strtolower($actionNode->getAttribute("name"));
 					$this->_includeServices[$serviceId][$actionId] = $actionId;
 				}
 			}
 
-			$excludes = explode(',', str_replace(' ', '', $this->_config->exclude));
+			$excludes = explode(',', str_replace(' ', '', strtolower($this->_config->exclude)));
 			foreach($excludes as $exclude)
 			{
 				list($serviceId, $actionId) = explode('.', $exclude);
