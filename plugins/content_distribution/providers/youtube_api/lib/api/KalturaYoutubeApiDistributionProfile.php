@@ -64,6 +64,11 @@ class KalturaYoutubeApiDistributionProfile extends KalturaConfigurableDistributi
 	 * @var bool
 	 */
 	public $assumeSuccess;
+
+	/**
+	 * @var string
+	 */
+	public $privacyStatus;
 	
 	/*
 	 * mapping between the field on this object (on the left) and the setter/getter on the object (on the right)  
@@ -78,6 +83,7 @@ class KalturaYoutubeApiDistributionProfile extends KalturaConfigurableDistributi
 		'allowResponses',
 		'apiAuthorizeUrl',
 		'assumeSuccess',
+		'privacyStatus',
 	 );
 		 
 	public function getMapBetweenObjects()
