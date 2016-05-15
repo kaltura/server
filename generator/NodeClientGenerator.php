@@ -122,10 +122,10 @@ class NodeClientGenerator extends ClientGeneratorFromXml
 	 */
 	protected function writeEnum(SimpleXMLElement $enumNode)
 	{
-		if(!$this->shouldInclude($enumNode->include, $enumNode->exclude))
-			return;
-				
 		$className = $enumNode->attributes()->name;
+		if(!$this->shouldIncludeType($className))
+			return;
+		
 		$this->echoLine($this->enumTypes, "\nvar $className = module.exports.$className = {");
 		//parse the constants
 		foreach($enumNode->children() as $child)
@@ -149,12 +149,12 @@ class NodeClientGenerator extends ClientGeneratorFromXml
 	 */
 	protected function writeObjectClass(SimpleXMLElement $classNode)
 	{
-		if(!$this->shouldInclude($classNode->include, $classNode->exclude))
+		$clasName = $classNode->attributes()->name;
+		if(!$this->shouldIncludeType($clasName))
 			return;
 				
 		$classDesc = "/**\n";
 		$classCode = "";
-		$clasName = $classNode->attributes()->name;
 		$this->echoLine($classCode, "function $clasName(){");
 		$this->echoLine($classCode, "	$clasName.super_.call(this);");
 		//parse the class properties
@@ -199,11 +199,11 @@ class NodeClientGenerator extends ClientGeneratorFromXml
 	 */
 	protected function writeService(SimpleXMLElement $serviceNodes)
 	{
-		if(!$this->shouldInclude($serviceNodes->include, $serviceNodes->exclude))
+		$serviceId = $serviceNodes->attributes()->id;
+		if(!$this->shouldIncludeService($serviceId))
 			return;
 				
 		$serviceName = $serviceNodes->attributes()->name;
-		$serviceId = $serviceNodes->attributes()->id;
 		$serviceClassName = 'Kaltura' . $this->upperCaseFirstLetter($serviceName) . 'Service';
 		$serviceClass = "function $serviceClassName(client){\n";
 		$serviceClass .= "	$serviceClassName.super_.call(this);\n";
@@ -425,8 +425,8 @@ class NodeClientGenerator extends ClientGeneratorFromXml
 		
 		foreach($servicesNodes as $serviceNode)
 		{
-			if(!$this->shouldInclude($serviceNode->include, $serviceNode->exclude))
-				return;
+			if(!$this->shouldIncludeService($serviceNode->attributes()->id))
+				continue;
 					
 			$serviceName = $serviceNode->attributes()->name;
 			$serviceClassName = 'kaltura.services.Kaltura' . $this->upperCaseFirstLetter($serviceName) . 'Service';

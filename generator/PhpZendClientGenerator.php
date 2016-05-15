@@ -3,16 +3,9 @@ class PhpZendClientGenerator extends ClientGeneratorFromXml
 {
 	private $cacheTypes = array();
 	
-	/**
-	 * @var DOMDocument
-	 */
-	protected $_doc = null;
-	
 	function __construct($xmlPath, Zend_Config $config, $sourcePath = "sources/zend")
 	{
 		parent::__construct($xmlPath, $sourcePath, $config);
-		$this->_doc = new DOMDocument();
-		$this->_doc->load($this->_xmlFile);
 	}
 	
 	function getSingleLineCommentMarker()
@@ -319,10 +312,9 @@ class PhpZendClientGenerator extends ClientGeneratorFromXml
 	
 	function writeEnum(DOMElement $enumNode)
 	{
-		if(!$this->shouldInclude($enumNode->getAttribute('include'), $enumNode->getAttribute('exclude')))
-			return;
-			
 		$enumName = $this->getEnumClass($enumNode->getAttribute('name'));
+		if(!$this->shouldIncludeType($enumName))
+			return;
 		
 		if($this->generateDocs)
 		{
@@ -352,10 +344,10 @@ class PhpZendClientGenerator extends ClientGeneratorFromXml
 	
 	function writeClass(DOMElement $classNode)
 	{
-		if(!$this->shouldInclude($classNode->getAttribute('include'), $classNode->getAttribute('exclude')))
-			return;
-			
 		$kalturaType = $classNode->getAttribute('name');
+		if(!$this->shouldIncludeType($kalturaType))
+			return;
+		
 		$type = $this->getTypeClass($kalturaType);
 		
 		$abstract = '';
@@ -514,7 +506,8 @@ class PhpZendClientGenerator extends ClientGeneratorFromXml
 	
 	function writeService(DOMElement $serviceNode)
 	{
-		if(!$this->shouldInclude($serviceNode->getAttribute('include'), $serviceNode->getAttribute('exclude')))
+		$serviceId = $serviceNode->getAttribute("id");
+		if(!$this->shouldIncludeService($serviceId))
 			return;
 			
 		$plugin = null;
@@ -522,7 +515,6 @@ class PhpZendClientGenerator extends ClientGeneratorFromXml
 			$plugin = $serviceNode->getAttribute('plugin');
 			
 		$serviceName = $serviceNode->getAttribute("name");
-		$serviceId = $serviceNode->getAttribute("id");
 					
 		$serviceClassName = $this->getServiceClass($serviceNode, $plugin);
 		$this->appendLine();
@@ -555,10 +547,10 @@ class PhpZendClientGenerator extends ClientGeneratorFromXml
 	
 	function writeAction($serviceId, $serviceName, DOMElement $actionNode, $plugin = null)
 	{
-		if(!$this->shouldInclude($actionNode->getAttribute('include'), $actionNode->getAttribute('exclude')))
-			return;
-			
 		$action = $actionNode->getAttribute("name");
+		if(!$this->shouldIncludeAction($serviceId, $action))
+			return;
+		
 	    $resultNode = $actionNode->getElementsByTagName("result")->item(0);
 	    $resultType = $resultNode->getAttribute("type");
 	    $arrayObjectType = ($resultType == 'array') ? $resultNode->getAttribute ( "arrayType" ) : null;
@@ -797,8 +789,8 @@ class PhpZendClientGenerator extends ClientGeneratorFromXml
 	
 		foreach($serviceNodes as $serviceNode)
 		{
-			if(!$this->shouldInclude($serviceNode->getAttribute('include'), $serviceNode->getAttribute('exclude')))
-				return;
+			if(!$this->shouldIncludeService($serviceNode->getAttribute("id")))
+				continue;
 				
 			if($serviceNode->hasAttribute("plugin"))
 				continue;

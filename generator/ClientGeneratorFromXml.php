@@ -18,9 +18,19 @@ abstract class ClientGeneratorFromXml
 	private $_config = array();
 	
 	/**
+	 * @var DOMDocument
+	 */
+	protected $_doc = null;
+	
+	/**
 	 * @var array
 	 */
-	private $_tags = array();
+	protected $_includeTypes = null;
+	
+	/**
+	 * @var array
+	 */
+	protected $_includeServices = array();
 	
 	public function setGenerateDocs($generateDocs)
 	{
@@ -44,8 +54,8 @@ abstract class ClientGeneratorFromXml
 
 	public function __construct($xmlFile, $sourcePath, Zend_Config $config)
 	{
-		$this->_tags = explode(',', $config->tags);
 		$this->_xmlFile = realpath($xmlFile);
+		$this->_config = $config;
 		$this->_sourcePath = realpath($sourcePath);
 		
 		if (!file_exists($this->_xmlFile))
@@ -54,6 +64,11 @@ abstract class ClientGeneratorFromXml
 		if (!file_exists($sourcePath))
 			throw new Exception("Source path was not found [$sourcePath]");
 
+		$this->_doc = new DOMDocument();
+		$this->_doc->load($this->_xmlFile);
+		
+		$this->loadExcludeList();
+		
 		$singleLineCommentMarker = $this->getSingleLineCommentMarker();
 		if($singleLineCommentMarker === null)
 			$singleLineCommentMarker = '';
@@ -65,21 +80,175 @@ abstract class ClientGeneratorFromXml
 		$this->addFile('agpl.txt', file_get_contents(dirname(__FILE__).'/sources/agpl.txt'), false);
 	}
 	
-	protected function shouldInclude($include, $exclude)
+	protected function shouldIncludeType($type)
 	{
-		if($exclude)
+		return !count($this->_includeTypes) || isset($this->_includeTypes[$type]);
+	}
+	
+	protected function shouldIncludeAction($serviceId, $actionId)
+	{
+		$serviceId = strtolower($serviceId);
+		$actionId = strtolower($actionId);
+		
+		if(!count($this->_includeServices))
+			return true;
+
+		if(!isset($this->_includeServices[$serviceId]))
+			return false;
+
+		if($this->_includeServices[$serviceId] === 'all')
+			return true;
+				
+		return isset($this->_includeServices[$serviceId][$actionId]);
+	}
+	
+	protected function shouldIncludeService($serviceId)
+	{
+		return !count($this->_includeServices) || isset($this->_includeServices[strtolower($serviceId)]);
+	}
+	
+	protected function loadExcludeList()
+	{
+		$xpath = new DOMXPath($this->_doc);
+		
+		if($this->_config->include)
 		{
-			$tags = explode(',', str_replace(' ', '', $exclude));
-			return (count(array_intersect($tags, $this->_tags)) == 0);
+			$includes = explode(',', str_replace(' ', '', strtolower($this->_config->include)));
+			foreach($includes as $include)
+			{
+				list($serviceId, $actionId) = explode('.', $include);
+				if($actionId === '*')
+				{
+					$this->_includeServices[$serviceId] = 'all';
+				}
+				elseif(isset($services[$serviceId]))
+				{
+					$this->_includeServices[$serviceId][$actionId] = $actionId;
+				}
+				else
+				{
+					$this->_includeServices[$serviceId] = array($actionId => $actionId);
+				}
+			}
+		}
+		elseif($this->_config->exclude)
+		{
+			$serviceNodes = $xpath->query("/xml/services/service");
+			foreach($serviceNodes as $serviceNode)
+			{
+				$serviceId = strtolower($serviceNode->getAttribute("id"));
+				$this->_includeServices[$serviceId] = array();
+
+				$actionNodes = $serviceNode->getElementsByTagName("action");
+				foreach($actionNodes as $actionNode)
+				{
+					$actionId = strtolower($actionNode->getAttribute("name"));
+					$this->_includeServices[$serviceId][$actionId] = $actionId;
+				}
+			}
+
+			$excludes = explode(',', str_replace(' ', '', strtolower($this->_config->exclude)));
+			foreach($excludes as $exclude)
+			{
+				list($serviceId, $actionId) = explode('.', $exclude);
+				if($actionId === '*')
+				{
+					unset($this->_includeServices[$serviceId]);
+				}
+				else
+				{
+					unset($this->_includeServices[$serviceId][$actionId]);
+				}
+			}
+		}
+		else
+		{
+			return;
 		}
 		
-		if($include)
+		foreach($this->_includeServices as $serviceId => $actions)
 		{
-			$tags = explode(',', str_replace(' ', '', $include));
-			return count(array_intersect($tags, $this->_tags));
+			$serviceNodes = $xpath->query("/xml/services/service[@id = '$serviceId']");
+			$serviceNode = $serviceNodes->item(0);
+
+			$actionNodes = $serviceNode->getElementsByTagName("action");
+			foreach($actionNodes as $actionNode)
+			{
+				$actionId = $actionNode->getAttribute("name");
+				if($actions === 'all' || in_array($actionId, $actions))
+					$this->loadActionTypes($actionNode);
+			}
 		}
+	}
+	
+	protected function loadTypesRecursive($type)
+	{
+		if(!$this->isComplexType($type))
+			return;
+
+		$xpath = new DOMXPath($this->_doc);
+		$enumNodes = $xpath->query("/xml/enums/enum[@name = '$type']");
+		$enumNode = $enumNodes->item(0);
+		if($enumNode)
+		{
+			$this->_includeTypes[$type] = $type;
+			return;
+		}
+
+		$classNodes = $xpath->query("/xml/classes/class[@name = '$type']");
+		$classNode = $classNodes->item(0);
+		/* @var $classNode DOMElement */
+		if(!$classNode)
+		{
+			throw new Exception("Missing type [$type]");
+		}
+
+		$this->_includeTypes[$type] = $type;
+		if($classNode->hasAttribute("base"))
+			$this->loadTypesRecursive($classNode->getAttribute("base"));
 		
-		return true;
+		foreach($classNode->childNodes as $propertyNode)
+		{
+			if ($propertyNode->nodeType != XML_ELEMENT_NODE)
+				continue;
+			
+			$propertyType = $propertyNode->getAttribute("type");
+			if ($propertyNode->hasAttribute("enumType"))
+				$propertyType = $propertyNode->getAttribute("enumType");
+			if ($propertyNode->hasAttribute("arrayType"))
+				$propertyType = $propertyNode->getAttribute("arrayType");
+			
+			$this->loadTypesRecursive($propertyType);
+		}
+	}
+	
+	protected function loadActionTypes(DOMElement $actionNode)
+	{
+		$resultNode = $actionNode->getElementsByTagName("result")->item(0);
+		$resultType = $resultNode->getAttribute("type");
+
+		if($resultNode->hasAttribute("enumType"))
+			$resultType = $resultNode->getAttribute("enumType");
+
+		if($resultNode->hasAttribute("arrayType"))
+			$resultType = $resultNode->getAttribute("arrayType");
+		
+		if($resultType)
+			$this->loadTypesRecursive($resultType);
+			
+		$paramNodes = $actionNode->getElementsByTagName("param");
+		foreach($paramNodes as $paramNode)
+		{
+			$paramType = $paramNode->getAttribute("type");
+
+			if($paramNode->hasAttribute("enumType"))
+				$paramType = $paramNode->getAttribute("enumType");
+			
+			if($paramNode->hasAttribute("arrayType"))
+				$paramType = $paramNode->getAttribute("arrayType");
+		
+			$this->loadTypesRecursive($paramType);
+		}
 	}
 	
 	public function generate()

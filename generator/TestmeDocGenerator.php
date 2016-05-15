@@ -1,16 +1,9 @@
 <?php
 class TestmeDocGenerator extends ClientGeneratorFromXml
 {
-	/**
-	 * @var DOMDocument
-	 */
-	protected $_doc = null;
-	
 	function __construct($xmlPath, Zend_Config $config, $sourcePath = "sources/testmeDoc")
 	{
 		parent::__construct($xmlPath, $sourcePath, $config);
-		$this->_doc = new DOMDocument();
-		$this->_doc->load($this->_xmlFile);
 	}
 	
 	function generate()
@@ -95,10 +88,10 @@ class TestmeDocGenerator extends ClientGeneratorFromXml
 	
 	function writeEnum(DOMElement $enumNode)
 	{
-		if(!$this->shouldInclude($enumNode->getAttribute('include'), $enumNode->getAttribute('exclude')))
-			return;
-
 		$type = $enumNode->getAttribute("name");
+		if(!$this->shouldIncludeType($type))
+			return;
+		
 		$enumType = $enumNode->getAttribute("enumType");
 
 		$this->startNewTextBlock();
@@ -313,11 +306,9 @@ class TestmeDocGenerator extends ClientGeneratorFromXml
 	
 	function writeClass(DOMElement $classNode)
 	{
-		if(!$this->shouldInclude($classNode->getAttribute('include'), $classNode->getAttribute('exclude')))
-			return;
-
-		
 		$type = $classNode->getAttribute("name");
+		if(!$this->shouldIncludeType($type))
+			return;
 
 		$this->startNewTextBlock();
 
@@ -407,10 +398,10 @@ class TestmeDocGenerator extends ClientGeneratorFromXml
 	
 	function writeService(DOMElement $serviceNode)
 	{
-		if(!$this->shouldInclude($serviceNode->getAttribute('include'), $serviceNode->getAttribute('exclude')))
-			return;
-
 		$serviceId = $serviceNode->getAttribute("id");
+		if(!$this->shouldIncludeService($serviceId))
+			return;
+		
 		$description = $serviceNode->getAttribute("description");
 		
 		$actionNodes = $serviceNode->getElementsByTagName("action");
@@ -445,10 +436,10 @@ class TestmeDocGenerator extends ClientGeneratorFromXml
 		
 		foreach($actionNodes as $actionNode)
 		{
-			if(!$this->shouldInclude($actionNode->getAttribute('include'), $actionNode->getAttribute('exclude')))
-				return;
-
 			$actionId = $actionNode->getAttribute('name');
+			if(!$this->shouldIncludeAction($serviceId, $actionId))
+				continue;
+			
 			$actionDescription = $actionNode->getAttribute('description');
 			
 			$this->appendLine('						<tr>');
@@ -537,10 +528,10 @@ class TestmeDocGenerator extends ClientGeneratorFromXml
 	
 	function writeAction($serviceId, DOMElement $actionNode)
 	{
-		if(!$this->shouldInclude($actionNode->getAttribute('include'), $actionNode->getAttribute('exclude')))
-			return;
-
 		$actionId = $actionNode->getAttribute('name');
+		if(!$this->shouldIncludeAction($serviceId, $actionId))
+			return;
+		
 		$description = $actionNode->getAttribute('description');
 		$resultNode = $actionNode->getElementsByTagName("result")->item(0);
 		$resultType = $resultNode->getAttribute("type");
@@ -653,26 +644,28 @@ class TestmeDocGenerator extends ClientGeneratorFromXml
 
 		foreach($serviceNodes as $serviceNode)
 		{
-			if(!$this->shouldInclude($serviceNode->getAttribute('include'), $serviceNode->getAttribute('exclude')))
-				continue;
+			if(!$this->shouldIncludeService($serviceNode->getAttribute('id')))
+				return;
 					
 			$services[] = $serviceNode->getAttribute('name');
 		}
 
 		foreach($enumNodes as $enumNode)
 		{
-			if(!$this->shouldInclude($enumNode->getAttribute('include'), $enumNode->getAttribute('exclude')))
+			$type = $enumNode->getAttribute('name');
+			if(!$this->shouldIncludeType($type))
 				continue;
 					
-			$enums[] = $enumNode->getAttribute('name');
+			$enums[] = $type;
 		}
 
 		foreach($classNodes as $classNode)
 		{
-			if(!$this->shouldInclude($classNode->getAttribute('include'), $classNode->getAttribute('exclude')))
+			$type = $enumNode->getAttribute('name');
+			if(!$this->shouldIncludeType($type))
 				continue;
 					
-			$classes[] = $classNode->getAttribute('name');
+			$classes[] = $type;
 		}
 
 		sort($services);

@@ -1,11 +1,6 @@
 <?php
 class ObjCClientGenerator extends ClientGeneratorFromXml
 {
-	/**
-	 * @var DOMDocument
-	 */
-	protected $_doc = null;
-	
 	protected $_mFileData = '';
 	protected $_hFileData = '';
 	
@@ -16,8 +11,6 @@ class ObjCClientGenerator extends ClientGeneratorFromXml
 	function __construct($xmlPath, Zend_Config $config, $sourcePath = "sources/objc")
 	{
 		parent::__construct($xmlPath, $sourcePath, $config);
-		$this->_doc = new DOMDocument();
-		$this->_doc->load($this->_xmlFile);
 	}
 	
 	function getSingleLineCommentMarker()
@@ -235,10 +228,9 @@ class ObjCClientGenerator extends ClientGeneratorFromXml
 	// enums generation
 	function writeEnum(DOMElement $enumNode)
 	{
-		if(!$this->shouldInclude($enumNode->getAttribute('include'), $enumNode->getAttribute('exclude')))
-			return;
-				
 		$enumName = $enumNode->getAttribute("name");
+		if(!$this->shouldIncludeType($enumName))
+			return;
 		
 		if($this->generateDocs)
 		{
@@ -283,10 +275,9 @@ class ObjCClientGenerator extends ClientGeneratorFromXml
 	// classes generation
 	function writeClass(DOMElement $classNode)
 	{
-		if(!$this->shouldInclude($classNode->getAttribute('include'), $classNode->getAttribute('exclude')))
-			return;
-				
 		$type = $classNode->getAttribute("name");
+		if(!$this->shouldIncludeType($type))
+			return;
 		
 		if($this->generateDocs)
 		{
@@ -547,11 +538,11 @@ class ObjCClientGenerator extends ClientGeneratorFromXml
 	// services generation
 	function writeService(DOMElement $serviceNode)
 	{
-		if(!$this->shouldInclude($serviceNode->getAttribute('include'), $serviceNode->getAttribute('exclude')))
+		$serviceId = $serviceNode->getAttribute("id");
+		if(!$this->shouldIncludeService($serviceId))
 			return;
 				
 		$serviceName = $serviceNode->getAttribute("name");
-		$serviceId = $serviceNode->getAttribute("id");
 		
 		$serviceClassName = "Kaltura".$this->upperCaseFirstLetter($serviceName)."Service";
 		
@@ -582,11 +573,11 @@ class ObjCClientGenerator extends ClientGeneratorFromXml
 	// actions generation
 	function writeAction($serviceId, DOMElement $actionNode)
 	{
-		if(!$this->shouldInclude($actionNode->getAttribute('include'), $actionNode->getAttribute('exclude')))
+		$actionName = $actionNode->getAttribute("name");
+	    if(!$this->shouldIncludeAction($serviceId, $actionName))
 			return;
 				
-		$actionName = $actionNode->getAttribute("name");
-	    $resultNode = $actionNode->getElementsByTagName("result")->item(0);
+		$resultNode = $actionNode->getElementsByTagName("result")->item(0);
 	    $resultType = $resultNode->getAttribute("type");
 		$paramNodes = $actionNode->getElementsByTagName("param");
 		
