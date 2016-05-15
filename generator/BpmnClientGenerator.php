@@ -2,11 +2,6 @@
 class BpmnClientGenerator extends ClientGeneratorFromXml
 {
 	/**
-	 * @var DOMDocument
-	 */
-	protected $_doc = null;
-	
-	/**
 	 * @var string
 	 */
 	protected $template = null;
@@ -17,9 +12,6 @@ class BpmnClientGenerator extends ClientGeneratorFromXml
 		
 		$this->template = file_get_contents("$sourcePath/action.template.bpmn");
 		$this->excludeSourcePaths[] = 'action.template.bpmn';
-		
-		$this->_doc = new DOMDocument();
-		$this->_doc->load($this->_xmlFile);
 	}
 	
 	function getSingleLineCommentMarker()
@@ -42,7 +34,7 @@ class BpmnClientGenerator extends ClientGeneratorFromXml
 	
 	function writeService(DOMElement $serviceNode, $serviceName = null, $serviceId = null, $actionPrefix = "", $extends = "KalturaServiceBase")
 	{
-		if(!$this->shouldInclude($serviceNode->getAttribute('include'), $serviceNode->getAttribute('exclude')))
+		if(!$this->shouldIncludeService($serviceNode->getAttribute('id')))
 			return;
 		
 		$serviceName = $serviceNode->getAttribute('name');
@@ -67,10 +59,10 @@ class BpmnClientGenerator extends ClientGeneratorFromXml
 	
 	function writeAction($serviceName, DOMElement $actionNode, $actionPrefix = "")
 	{
-		if(!$this->shouldInclude($actionNode->getAttribute('include'), $actionNode->getAttribute('exclude')))
+		$action = $actionNode->getAttribute("name");
+		if(!$this->shouldIncludeAction($serviceName, $action))
 			return;
 	
-		$action = $actionNode->getAttribute("name");
 		$method = $this->replaceReservedWords($action);
 		$serviceUName = ucfirst($serviceName);
 		

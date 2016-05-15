@@ -757,4 +757,9 @@ class KalturaTypeReflector
 	{
 		return in_array(KalturaPropertyInfo::ALL_PERMISSION_NAME, $this->_permissions);
 	}
+	
+	public function getRequiredPermissions()
+	{
+		return $this->_permissions;
+	}
 }

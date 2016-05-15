@@ -54,12 +54,13 @@ class Xml2As3ClientGenerator extends ClientGeneratorFromXml
 	/////////////////////////////////////////////////////////////
 	private function createTypeClass( $xml )
 	{
-		if(!$this->shouldInclude($xml->include, $xml->exclude))
+		$type = $xml->attributes()->name;
+		if(!$this->shouldIncludeType($type))
 			return;
-			
+		
 		$str = "package com.kaltura.types\n";
 		$str .= "{\n";
-		$str .= "	public class " . $xml->attributes()->name . "\n";
+		$str .= "	public class $type\n";
 		$str .= "	{\n";
 		$enumType = $xml->attributes()->enumType;
 		foreach($xml->children() as $child)
@@ -78,9 +79,10 @@ class Xml2As3ClientGenerator extends ClientGeneratorFromXml
 
 	private function createVoClass( $xml )
 	{
-		if(!$this->shouldInclude($xml->include, $xml->exclude))
+		$type = $xml->attributes()->name;
+		if(!$this->shouldIncludeType($type))
 			return;
-			
+		
 		$str = "package com.kaltura.vo\n";
 		$str .= "{\n";
 
@@ -98,7 +100,7 @@ class Xml2As3ClientGenerator extends ClientGeneratorFromXml
 		if( $this->base_client_dir == "flex_client" )
 			$str .= "	[Bindable]\n";
 
-		$str .= "	public dynamic class " . $xml->attributes()->name;
+		$str .= "	public dynamic class $type";
 
 		if($xml->attributes()->base)
 			$str .= " extends " . $xml->attributes()->base;
@@ -290,7 +292,7 @@ class Xml2As3ClientGenerator extends ClientGeneratorFromXml
 
 		////////////////////////////////////////////////
 
-		if($xml->attributes()->name == "KalturaBaseEntry")
+		if($type == "KalturaBaseEntry")
 		{
 			$str .= "		// required for backwards compatibility with an old, un-optimized client\n";
 			$str .= "		public function getParamKeys():Array { trace('backward incompatible'); throw new Error('backward incompatible');}\n";
@@ -300,12 +302,13 @@ class Xml2As3ClientGenerator extends ClientGeneratorFromXml
 
 		$str .= "	}\n";
 		$str .= "}\n";
-		$this->write2File( "com/kaltura/vo/" . $xml->attributes()->name . ".as" , $str );
+		$this->write2File( "com/kaltura/vo/$type.as" , $str );
 	}
 
 	private function createCommands ( $xml )
 	{
-		if(!$this->shouldInclude($xml->include, $xml->exclude))
+		$type = $xml->attributes()->name;
+		if(!$this->shouldIncludeType($type))
 			return;
 			
 		foreach($xml->children() as $child)
@@ -480,14 +483,14 @@ class Xml2As3ClientGenerator extends ClientGeneratorFromXml
 			}
 
 			if(count($fileAttributesNames) > 1)
-			continue;
+				continue;
 
 			$const_props = substr($const_props , 0 , -1);
 
-			$str = "package com.kaltura.commands." . $xml->attributes()->name . "\n";
+			$str = "package com.kaltura.commands.$type\n";
 			$str .= "{\n";
 			$str .= $imports;
-			$str .= "	import com.kaltura.delegates." . $xml->attributes()->name . "." . $this->toUpperCamaleCase($xml->attributes()->name) . $this->toUpperCamaleCase( $child->attributes()->name ) . "Delegate;\n";
+			$str .= "	import com.kaltura.delegates.$type." . $this->toUpperCamaleCase($type) . $this->toUpperCamaleCase( $child->attributes()->name ) . "Delegate;\n";
 
 			if(!count($fileAttributesNames))
 			$str .= "	import com.kaltura.net.KalturaCall;\n";
@@ -511,7 +514,7 @@ class Xml2As3ClientGenerator extends ClientGeneratorFromXml
 				$str .= "	**/\n";
 			}
 
-			$str .= "	public class " . $this->toUpperCamaleCase($xml->attributes()->name) . $this->toUpperCamaleCase( $child->attributes()->name ) . " " ;
+			$str .= "	public class " . $this->toUpperCamaleCase($type) . $this->toUpperCamaleCase( $child->attributes()->name ) . " " ;
 
 			if(count($fileAttributesNames))
 			$str .= "extends KalturaFileCall\n" ;
@@ -539,7 +542,7 @@ class Xml2As3ClientGenerator extends ClientGeneratorFromXml
 				$str .= "		**/\n";
 			}
 
-			$str .= "		public function " . $this->toUpperCamaleCase($xml->attributes()->name) . $this->toUpperCamaleCase( $child->attributes()->name ) . "( " . $const_props . " )\n";
+			$str .= "		public function " . $this->toUpperCamaleCase($type) . $this->toUpperCamaleCase( $child->attributes()->name ) . "( " . $const_props . " )\n";
 			$str .= "		{\n";
 			if($add_check_init)
 				$str .= $check_init;
@@ -553,18 +556,19 @@ class Xml2As3ClientGenerator extends ClientGeneratorFromXml
 			$str .= "		override public function execute() : void\n";
 			$str .= "		{\n";
 			$str .= "			setRequestArgument('filterFields', filterFields);\n";
-			$str .= "			delegate = new " . $this->toUpperCamaleCase($xml->attributes()->name) . $this->toUpperCamaleCase($child->attributes()->name) . "Delegate( this , config );\n";
+			$str .= "			delegate = new " . $this->toUpperCamaleCase($type) . $this->toUpperCamaleCase($child->attributes()->name) . "Delegate( this , config );\n";
 			$str .= "		}\n";
 			$str .= "	}\n";
 			$str .= "}\n";
 
-			$this->write2File( "com/kaltura/commands/" . $xml->attributes()->name . "/" . $this->toUpperCamaleCase($xml->attributes()->name) . $this->toUpperCamaleCase($child->attributes()->name) . ".as" , $str );
+			$this->write2File( "com/kaltura/commands/$type/" . $this->toUpperCamaleCase($type) . $this->toUpperCamaleCase($child->attributes()->name) . ".as" , $str );
 		}
 	}
 
 	private function createServices( $xml )
 	{
-		if(!$this->shouldInclude($xml->include, $xml->exclude))
+		$serviceId = $xml->attributes()->id;
+		if(!$this->shouldIncludeService($serviceId))
 			return;
 			
 		foreach($xml->children() as $child)

@@ -38,7 +38,6 @@ abstract class ClientGeneratorFromPhp
 
 	public function __construct($sourcePath = null)
 	{
-		$this->_config = kConf::getMap('generator');
 		$this->_sourcePath = realpath($sourcePath);
 		
 		if (($sourcePath !== null) && !(is_dir($sourcePath)))
@@ -147,143 +146,26 @@ abstract class ClientGeneratorFromPhp
 	
 	public function load()
 	{
+		$this->loadTypes();
+		
 		$this->loadServicesInfo();
-		
-		
-		$this->addType(KalturaTypeReflectorCacher::get('KalturaClientConfiguration'));
-		$this->addType(KalturaTypeReflectorCacher::get('KalturaRequestConfiguration'));
 		
 		// load the filter order by string enums
 		foreach($this->_types as $typeReflector)
 		{
-			$include = null;
-			if(isset($typeReflector->include))
-				$include = $typeReflector->include;
-			
 			if (strpos($typeReflector->getType(), "Filter", strlen($typeReflector->getType()) - 6))
 			{
 				$filterOrderByStringEnumTypeName = str_replace("Filter", "OrderBy", $typeReflector->getType());
 				if (class_exists($filterOrderByStringEnumTypeName))
-					$this->addType(KalturaTypeReflectorCacher::get($filterOrderByStringEnumTypeName), $include);
+					$this->addType(KalturaTypeReflectorCacher::get($filterOrderByStringEnumTypeName));
 			}
 		}
 
-		foreach($this->_config as $sectionName => $section)
-		{
-			if(isset($section['additional']))
-			{
-				$additionals = explode(',', str_replace(' ', '', $section['additional']));
-				foreach($additionals as $additional)
-				{
-					$this->addType(KalturaTypeReflectorCacher::get($additional), array($sectionName));
-				}
-			}
-		}
-
-		foreach($this->_config as $sectionName => $section)
-		{
-			if(isset($section['ignore']))
-			{
-				$ignores = explode(',', str_replace(' ', '', $section['ignore']));
-				foreach($ignores as $ignore)
-				{
-					if(isset($this->_types[$ignore]))
-					{
-						if(isset($this->_types[$ignore]->exclude))
-						{
-							$this->_types[$ignore]->exclude[] = $sectionName;
-						}
-						else
-						{
-							$this->_types[$ignore]->exclude = array($sectionName);
-						}
-					}
-				}
-			}
-		}
-		
 		uasort($this->_types, array($this, 'compareTypes'));
 		
 		$sortedTypes = array();
 		$this->fixTypeDependencies($this->_types, $sortedTypes);
 		$this->_types = $sortedTypes;
-	}
-	
-	protected function getServiceTags($service)
-	{
-		$tags = array();
-
-		foreach($this->_config as $sectionName => $section)
-		{
-			if(isset($section['include']))
-			{
-				$includes = explode(',', str_replace(' ', '', $section['include']));
-				if(in_array("$service.*", $includes))
-				{
-					$tags[] = $sectionName;
-					continue;
-				}
-				
-				foreach($includes as $include)
-				{
-					if(strpos($include, "$service.") === 0)
-					{
-						$tags[] = $sectionName;
-						break;
-					}
-				}
-				continue;
-			}
-
-			$add = true;
-			if(isset($section['exclude']))
-			{
-				$excludes = explode(',', str_replace(' ', '', $section['exclude']));
-				if(in_array("$service.*", $excludes))
-					continue;
-				
-				foreach($excludes as $exclude)
-				{
-					if(strpos($exclude, "$service.") === 0)
-					{
-						$add = false;
-						break;
-					}
-				}
-			}
-			
-			if($add)
-				$tags[] = $sectionName;
-		}
-		
-		return $tags;
-	}
-	
-	protected function getActionTags($service, $action)
-	{
-		$tags = array();
-		
-		foreach($this->_config as $sectionName => $section)
-		{
-			if(isset($section['include']))
-			{
-				$includes = explode(',', str_replace(' ', '', $section['include']));
-				if(in_array("$service.*", $includes) || in_array("$service.$action", $includes))
-					$tags[] = $sectionName;
-			}
-			elseif(isset($section['exclude']))
-			{
-				$excludes = explode(',', str_replace(' ', '', $section['exclude']));
-				if(!in_array("$service.*", $excludes) && !in_array("$service.$action", $excludes))
-					$tags[] = $sectionName;
-			}
-			else 
-			{
-				$tags[] = $sectionName;
-			}
-		}
-		
-		return $tags;
 	}
 	
 	/**
@@ -387,65 +269,17 @@ abstract class ClientGeneratorFromPhp
 	{
 		$this->initClassMap();
 		
-		$alwaysIncludeList = array(
-			'KalturaApiExceptionArg',
-			'KalturaClientConfiguration',
-			'KalturaRequestConfiguration',
-		);
-		
-		foreach($alwaysIncludeList as $class)
-		{
-			$classTypeReflector = KalturaTypeReflectorCacher::get($class);
-			if($classTypeReflector)
-				$this->loadTypesRecursive($classTypeReflector);
-		}
-		
 		$serviceMap = KalturaServicesMap::getMap();
 		foreach($serviceMap as $serviceId => $serviceActionItem)
 		{
 		    /* @var $serviceActionItem KalturaServiceActionItem */
 			
-			$serviceActionItem->include = $this->getServiceTags($serviceId);
   			$serviceActionItemToAdd = KalturaServiceActionItem::cloneItem($serviceActionItem);
 		    foreach ($serviceActionItem->actionMap as $actionId => $actionCallback)
 		    {
-		        list ( $serviceClassName, $actionMethodName) = array_values($actionCallback);
-		        
-		        //Check if the service path for the current action is excluded
-		        $servicePath = $this->_classMap[$serviceClassName];
-      			
       			$actionReflector = new KalturaActionReflector($serviceId, $actionId, $actionCallback);
-      			if (!$this->shouldUseServiceAction($actionReflector))
-      			{
-      			    continue;
-      			}
-      			$actionReflector->include = $this->getActionTags($serviceId, $actionId);
-      			
-      			$serviceActionItemToAdd->actionMap[$actionId] = $actionReflector;
-      			
-      			$actionParams = $actionReflector->getActionParams();
-      			
-      			foreach ($actionParams as $actionParam)
-      			{
-      			    if ($actionParam->isComplexType())
-					{
-						$typeReflector = KalturaTypeReflectorCacher::get($actionParam->getType());
-						if(!$typeReflector)
-							throw new Exception("Couldn't load type reflector for service [$serviceId] action [$actionId] param type[" . $actionParam->getType() . "]");
-						
-						$this->loadTypesRecursive($typeReflector, array(), $actionReflector->include);
-					}
-      			}
-      			
-		        $outputInfo = $actionReflector->getActionOutputType();
-				if ($outputInfo && $outputInfo->isComplexType())
-				{
-					$typeReflector = $outputInfo->getTypeReflector();
-					if(!$typeReflector)
-						throw new Exception("Couldn't load type reflector for service [$serviceId] action [$actionId] output type[" . $outputInfo->getType() . "]");
-						
-					$this->loadTypesRecursive($typeReflector, array(), $actionReflector->include);
-				}
+      			if ($this->shouldUseServiceAction($actionReflector))      			
+      				$serviceActionItemToAdd->actionMap[$actionId] = $actionReflector;
 		    }
 		    
 		    if ( count($serviceActionItem->actionMap) )
@@ -483,30 +317,6 @@ abstract class ClientGeneratorFromPhp
 		return $result;
 	}
 
-	private function loadTypesRecursive(KalturaTypeReflector $typeReflector, $loaded = array(), $include = null)
-	{
-		if (isset($this->_types[$typeReflector->getType()]))
-		{
-			$this->addType($typeReflector, $include);
-			return;
-		}
-		
-		if(isset($loaded[$typeReflector->getType()]))
-			return;
-		
-		$loaded[$typeReflector->getType()] = true;
-			
-		$this->initClassMap();
-			
-		foreach ($this->getTypeDependencies($typeReflector) as $subTypeReflector)
-		{
-			$this->loadTypesRecursive($subTypeReflector, $loaded, $include);
-		}
-		
-		if ($typeReflector->getType() != 'KalturaObject')
-			$this->loadChildTypes($typeReflector, $include);
-	}
-	
 	protected function getTypesClassMapPath()
 	{
 		$class = get_class($this);
@@ -517,16 +327,8 @@ abstract class ClientGeneratorFromPhp
 		return "$dir/$class.typeClassMap.cache";
 	}
 	
-	private function loadChildTypes(KalturaTypeReflector $typeReflector, $include)
+	private function loadTypes()
 	{
-		if (isset($this->_types[$typeReflector->getType()]))
-		{
-			$this->addType($typeReflector, $include);
-			return;
-		}
-	
-		$this->addType($typeReflector, $include);
-		
 		$cacheTypesClassMap = false;
 		if(!$this->_typesClassMap)
 		{
@@ -539,7 +341,7 @@ abstract class ClientGeneratorFromPhp
 			if (strpos($class, 'Kaltura') === 0 && strpos($class, '_') === false && strpos($path, 'api') !== false) // make sure the class is api object
 			{
 				$reflector = new ReflectionClass($class);
-				if ($reflector->isSubclassOf('KalturaObject') && $reflector->isSubclassOf($typeReflector->getType()))
+				if ($reflector->isSubclassOf('KalturaObject') || $reflector->isSubclassOf('KalturaEnum') || $reflector->isSubclassOf('KalturaStringEnum'))
 				{
 					$classTypeReflector = KalturaTypeReflectorCacher::get($class);
 					if(!$classTypeReflector)
@@ -552,8 +354,7 @@ abstract class ClientGeneratorFromPhp
 						continue;
 					}
 					
-					if($classTypeReflector)
-						$this->loadTypesRecursive($classTypeReflector, $include);
+					$this->addType($classTypeReflector);
 				}
 			}
 			else
@@ -595,23 +396,12 @@ abstract class ClientGeneratorFromPhp
 	}
 	
 	
-	protected function addType(KalturaTypeReflector $objectReflector, $include = null)
+	protected function addType(KalturaTypeReflector $objectReflector)
 	{
 		$type = $objectReflector->getType();
 	
 		if (isset($this->_types[$type]))
 		{
-			if($include)
-			{
-				if(isset($this->_types[$type]->include))
-				{
-					$this->_types[$type]->include = array_unique(array_merge($this->_types[$type]->include, $include));
-				}
-				else
-				{
-					$this->_types[$type]->include = $include;
-				}	
-			}
 			return;
 		}
 		
@@ -621,34 +411,7 @@ abstract class ClientGeneratorFromPhp
 			return;
 		}
 			
-		$objectReflector->include = $include;
 		$this->_types[$type] = $objectReflector;
-	}
-	
-	public function setAdditionalList($list)
-	{
-		if ($list === null)
-			return;
-	
-		$includeList = array();
-		if(is_array($list))
-		{
-			$includeList = $list;
-		}
-		else
-		{
-			$tempList = explode(",", str_replace(" ", "", $list));
-			foreach($tempList as $item)
-				if(class_exists($item))
-					$includeList[] = $item;
-		}
-		
-		foreach($includeList as $class)
-		{
-			$classTypeReflector = KalturaTypeReflectorCacher::get($class);
-			if($classTypeReflector)
-				$this->loadTypesRecursive($classTypeReflector);
-		}
 	}
 	
 	/**

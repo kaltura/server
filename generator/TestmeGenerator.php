@@ -1,16 +1,9 @@
 <?php
 class TestmeGenerator extends ClientGeneratorFromXml
 {
-	/**
-	 * @var DOMDocument
-	 */
-	protected $_doc = null;
-	
 	function __construct($xmlPath, Zend_Config $config, $sourcePath = "sources/testme")
 	{
 		parent::__construct($xmlPath, $sourcePath, $config);
-		$this->_doc = new DOMDocument();
-		$this->_doc->load($this->_xmlFile);
 	}
 	
 	function generate()
@@ -179,10 +172,9 @@ class TestmeGenerator extends ClientGeneratorFromXml
 	
 	function writeClass(DOMElement $classNode)
 	{
-		if(!$this->shouldInclude($classNode->getAttribute('include'), $classNode->getAttribute('exclude')))
-			return;
-
 		$type = $classNode->getAttribute("name");
+		if(!$this->shouldIncludeType($type))
+			return;
 
 		$subClasses = $this->getExtendingClasses($type);
 		$json = array();
@@ -197,10 +189,9 @@ class TestmeGenerator extends ClientGeneratorFromXml
 	
 	function writeService(DOMElement $serviceNode)
 	{
-		if(!$this->shouldInclude($serviceNode->getAttribute('include'), $serviceNode->getAttribute('exclude')))
-			return;
-			
 		$serviceId = $serviceNode->getAttribute("id");
+		if(!$this->shouldIncludeService($serviceId))
+			return;
 		
 		$json = array();
 		$actionNodes = $serviceNode->getElementsByTagName("action");
@@ -225,10 +216,9 @@ class TestmeGenerator extends ClientGeneratorFromXml
 	
 	function writeAction($serviceId, DOMElement $actionNode)
 	{
-		if(!$this->shouldInclude($actionNode->getAttribute('include'), $actionNode->getAttribute('exclude')))
-			return;
-
 		$actionId = $actionNode->getAttribute('name');
+		if(!$this->shouldIncludeAction($serviceId, $actionId))
+			return;
 		
 		$json = array(
 			'actionParams' => array(),

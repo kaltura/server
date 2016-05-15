@@ -9,10 +9,6 @@
 
 class JavaClientGenerator extends ClientGeneratorFromXml 
 {
-	/**
-	 * @var DOMDocument
-	 */
-	private $_doc = null;
 	private $_csprojIncludes = array ();
 	protected $_baseClientPath = "src/main/java/com/kaltura/client";
 	protected $_usePrivateAttributes;
@@ -21,8 +17,6 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 	{
 		parent::__construct($xmlPath, $sourcePath, $config);
 		$this->_usePrivateAttributes = isset($config->usePrivateAttributes) ? $config->usePrivateAttributes : false;
-		$this->_doc = new DOMDocument ();
-		$this->_doc->load ( $this->_xmlFile );
 	}
 	
 	function getSingleLineCommentMarker()
@@ -74,10 +68,10 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 	
 	function writeEnum(DOMElement $enumNode) 
 	{
-		if(!$this->shouldInclude($enumNode->getAttribute('include'), $enumNode->getAttribute('exclude')))
-			return;
-	
 		$enumName = $enumNode->getAttribute ( "name" );
+		if(!$this->shouldIncludeType($enumName))
+			return;
+		
 		$enumType = $enumNode->getAttribute ( "enumType" );
 		$baseInterface = ($enumType == "string") ? "KalturaEnumAsString" : "KalturaEnumAsInt";
 		
@@ -240,10 +234,9 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 	
 	function writeClass(DOMElement $classNode) 
 	{
-		if(!$this->shouldInclude($classNode->getAttribute('include'), $classNode->getAttribute('exclude')))
-			return;
-	
 		$type = $classNode->getAttribute ( "name" );
+		if(!$this->shouldIncludeType($type))
+			return;
 		
 		// File name
 		$file = $this->_baseClientPath . "/types/$type.java";
@@ -513,14 +506,14 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 
 	function writeService(DOMElement $serviceNode) 
 	{
-		if(!$this->shouldInclude($serviceNode->getAttribute('include'), $serviceNode->getAttribute('exclude')))
+		$serviceId = $serviceNode->getAttribute ( "id" );
+		if(!$this->shouldIncludeService($serviceId))
 			return;
 
 		$imports = "";
 		$imports .= "package com.kaltura.client.services;\n\n";
 		$imports .= "import com.kaltura.client.KalturaClient;\n";
 		$imports .= "import com.kaltura.client.KalturaServiceBase;\n";
-		$serviceId = $serviceNode->getAttribute ( "id" );
 		$serviceName = $serviceNode->getAttribute ( "name" );
 		
 		$javaServiceName = $this->upperCaseFirstLetter ( $serviceName ) . "Service";
@@ -562,10 +555,10 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 	
 	function writeAction($serviceId, DOMElement $actionNode, &$serviceImports) 
 	{
-		if(!$this->shouldInclude($actionNode->getAttribute('include'), $actionNode->getAttribute('exclude')))
-			return;
-	
 		$action = $actionNode->getAttribute ( "name" );
+		if(!$this->shouldIncludeAction($serviceId, $action))
+			return;
+		
 		$action = $this->replaceReservedWords($action);
 		
 		$resultNode = $actionNode->getElementsByTagName ( "result" )->item ( 0 );
@@ -822,8 +815,9 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 		
 		foreach ( $serviceNodes as $serviceNode ) 
 		{
-			if(!$this->shouldInclude($serviceNode->getAttribute('include'), $serviceNode->getAttribute('exclude')))
-				return;
+			$serviceId = $serviceNode->getAttribute ( "id" );
+			if(!$this->shouldIncludeService($serviceId))
+				continue;
 	
 			$serviceName = $serviceNode->getAttribute ( "name" );
 			$javaServiceName = $serviceName . "Service";

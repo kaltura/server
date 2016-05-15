@@ -1,16 +1,9 @@
 <?php
 class Php4ClientGenerator extends ClientGeneratorFromXml
 {
-	/**
-	 * @var DOMDocument
-	 */
-	private $_doc = null;
-	
 	function __construct($xmlPath, Zend_Config $config, $sourcePath = "sources/php4")
 	{
 		parent::__construct($xmlPath, $sourcePath, $config);
-		$this->_doc = new DOMDocument();
-		$this->_doc->load($this->_xmlFile);
 	}
 	
 	function getSingleLineCommentMarker()
@@ -57,10 +50,10 @@ class Php4ClientGenerator extends ClientGeneratorFromXml
 	
 	function writeEnum(DOMElement $enumNode)
 	{
-		if(!$this->shouldInclude($enumNode->getAttribute('include'), $enumNode->getAttribute('exclude')))
-			return;
-				
 		$enumName = $enumNode->getAttribute("name");
+		if(!$this->shouldIncludeType($enumName))
+			return;
+		
 		foreach($enumNode->childNodes as $constNode)
 		{
 			if ($constNode->nodeType != XML_ELEMENT_NODE)
@@ -78,10 +71,9 @@ class Php4ClientGenerator extends ClientGeneratorFromXml
 	
 	function writeClass(DOMElement $classNode)
 	{
-		if(!$this->shouldInclude($classNode->getAttribute('include'), $classNode->getAttribute('exclude')))
-			return;
-				
 		$type = $classNode->getAttribute("name");
+		if(!$this->shouldIncludeType($type))
+			return;
 		
 		// class definition
 		if ($classNode->hasAttribute("base"))
@@ -141,7 +133,7 @@ class Php4ClientGenerator extends ClientGeneratorFromXml
 	
 	function writeService(DOMElement $serviceNode)
 	{
-		if(!$this->shouldInclude($serviceNode->getAttribute('include'), $serviceNode->getAttribute('exclude')))
+		if(!$this->shouldIncludeService($serviceNode->getAttribute("id")))
 			return;
 			
 		$serviceName = $serviceNode->getAttribute("name");
@@ -168,11 +160,11 @@ class Php4ClientGenerator extends ClientGeneratorFromXml
 	
 	function writeAction($serviceName, DOMElement $actionNode)
 	{
-		if(!$this->shouldInclude($actionNode->getAttribute('include'), $actionNode->getAttribute('exclude')))
+	    $action = $actionNode->getAttribute("name");
+	    if(!$this->shouldIncludeAction($serviceId, $action))
 			return;
 				
-		$action = $actionNode->getAttribute("name");
-	    $resultNode = $actionNode->getElementsByTagName("result")->item(0);
+		$resultNode = $actionNode->getElementsByTagName("result")->item(0);
 	    $resultType = $resultNode->getAttribute("type");
 	    
 	    if($resultType == 'file')
@@ -310,8 +302,8 @@ class Php4ClientGenerator extends ClientGeneratorFromXml
 		
 		foreach($serviceNodes as $serviceNode)
 		{
-			if(!$this->shouldInclude($serviceNode->getAttribute('include'), $serviceNode->getAttribute('exclude')))
-				return;
+			if(!$this->shouldIncludeService($serviceNode->getAttribute("id")))
+				continue;
 				
 			$serviceName = $serviceNode->getAttribute("name");
 			$description = $serviceNode->getAttribute("description");

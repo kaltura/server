@@ -79,12 +79,6 @@ class XmlClientGenerator extends ClientGeneratorFromPhp
 			if($serviceActionItem->serviceInfo->deprecated)
 				$serviceElement->setAttribute("deprecated", "1");
 			
-			if(isset($serviceActionItem->include))
-				$serviceElement->setAttribute("include", implode(',', $serviceActionItem->include));
-			
-			if(isset($serviceActionItem->exclude))
-				$serviceElement->setAttribute("exclude", implode(',', $serviceActionItem->exclude));
-		
 			$plugin = $this->extractPluginNameFromPackage($serviceActionItem->serviceInfo->package);
 			if($plugin)
 			{
@@ -277,12 +271,6 @@ class XmlClientGenerator extends ClientGeneratorFromPhp
 		if($typeReflector->isDeprecated())
 			$enumElement->setAttribute("deprecated", "1");
 
-// 		if(isset($typeReflector->include))
-// 			$enumElement->setAttribute("include", implode(',', $typeReflector->include));
-
-// 		if(isset($typeReflector->exclude))
-// 			$enumElement->setAttribute("exclude", implode(',', $typeReflector->exclude));
-		
 		$constants = array();
 		foreach($typeReflector->getConstants() as $contant)
 		{
@@ -334,13 +322,10 @@ class XmlClientGenerator extends ClientGeneratorFromPhp
 
 		if($typeReflector->isDeprecated())
 			$classElement->setAttribute("deprecated", "1");
-		
-// 		if(isset($typeReflector->include))
-// 			$classElement->setAttribute("include", implode(',', $typeReflector->include));
 
-// 		if(isset($typeReflector->exclude))
-// 			$classElement->setAttribute("exclude", implode(',', $typeReflector->exclude));
-			
+		if($typeReflector->getRequiredPermissions())
+			$classElement->setAttribute("requiresPermissions", implode(',', $typeReflector->getRequiredPermissions()));
+		
 		$properties = $typeReflector->getCurrentProperties();
 		foreach($properties as $property)
 		{
@@ -388,7 +373,13 @@ class XmlClientGenerator extends ClientGeneratorFromPhp
 			$propertyElement->setAttribute("readOnly", $property->isReadOnly() ? "1" : "0");
 			$propertyElement->setAttribute("insertOnly", $property->isInsertOnly() ? "1" : "0");
 			$propertyElement->setAttribute("writeOnly", $property->isWriteOnly() ? "1" : "0");
-			
+
+			if($property->getDynamicType())
+				$propertyElement->setAttribute("valuesEnumType", $property->getDynamicType());
+
+			if($property->getPermissions())
+				$propertyElement->setAttribute("requiresPermissions", implode(',', $property->getPermissions()));
+						
 			$description = $property->getDescription();
 			$description = $this->fixDescription($description);
 			$propertyElement->setAttribute("description", $description);
@@ -420,12 +411,6 @@ class XmlClientGenerator extends ClientGeneratorFromPhp
 
 		if($actionInfo->deprecated)
 			$actionElement->setAttribute("deprecated", "1");
-		
-		if(isset($actionReflector->include))
-			$actionElement->setAttribute("include", implode(',', $actionReflector->include));
-		
-		if(isset($actionReflector->exclude))
-			$actionElement->setAttribute("exclude", implode(',', $actionReflector->exclude));
 		
 		foreach($actionParams as $actionParam)
 		{
