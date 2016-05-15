@@ -70,9 +70,6 @@ class LiveEntryServerNode extends EntryServerNode
 		{
 			if($this->getServerType() === EntryServerNodeType::LIVE_PRIMARY)
 			{
-				$liveEntry->setPrimaryServerNodeId(null);
-				
-				$entryServerNodes = EntryServerNodePeer::retrieveByEntryId($this->getEntryId());
 				if($liveEntry->getCurrentBroadcastStartTime())
 					$liveEntry->setCurrentBroadcastStartTime(0);
 			}
