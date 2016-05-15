@@ -228,10 +228,10 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 			
 			$snippet = new Google_Service_YouTube_VideoSnippet();
 			$snippet->setTitle($this->getValueForField(KalturaYouTubeApiDistributionField::MEDIA_TITLE));
-			$snippet->setDescription($this->getValueForField(KalturaYouTubeApiDistributionField::MEDIA_DESCRIPTION));		
+			$snippet->setDescription(self::sanitizeFromHtmlTags($this->getValueForField(KalturaYouTubeApiDistributionField::MEDIA_DESCRIPTION)));
 			$snippet->setTags(explode(',', $this->getValueForField(KalturaYouTubeApiDistributionField::MEDIA_KEYWORDS)));
 			$snippet->setCategoryId($this->translateCategory($youtube, $distributionProfile, $this->getValueForField(KalturaYouTubeApiDistributionField::MEDIA_CATEGORY)));
-	
+
 			$status = new Google_Service_YouTube_VideoStatus();
 			$status->setPrivacyStatus('private');
 			$status->setEmbeddable(false);
@@ -315,7 +315,12 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 		
 		return $distributionProfile->assumeSuccess;
 	}
-	
+
+	private static function sanitizeFromHtmlTags($filed)
+	{
+		return strip_tags(html_entity_decode($filed));
+	}
+
 	protected function doUpdate(KalturaDistributionUpdateJobData $data, KalturaYoutubeApiDistributionProfile $distributionProfile, $enable = true)
 	{
 		$this->fieldValues = unserialize($data->providerData->fieldValues);
