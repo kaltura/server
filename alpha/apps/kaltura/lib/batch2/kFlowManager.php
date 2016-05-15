@@ -721,7 +721,7 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 	 * @throws Exception
 	 * @throws kCoreException
 	 */
-	protected function doObjectAddedOrDataAdded(BaseObject $object, BatchJob $raisedJob)
+	protected function doObjectAddedOrDataAdded(BaseObject $object, BatchJob $raisedJob = null)
 	{
 		$entry = $object->getentry();
 
