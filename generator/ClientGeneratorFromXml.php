@@ -183,7 +183,10 @@ abstract class ClientGeneratorFromXml
 			$serviceNodes = $xpath->query("/xml/services/service[@id = '$serviceId']");
 			$serviceNode = $serviceNodes->item(0);
 			if(!$serviceNode)
-				throw new Exception("Service [$serviceId] no found");
+			{
+				KalturaLog::warning("Service [$serviceId] not found");
+				continue;
+			}
 
 			$actionNodes = $serviceNode->getElementsByTagName("action");
 			foreach($actionNodes as $actionNode)
