@@ -110,15 +110,19 @@ class TestmeGenerator extends ClientGeneratorFromXml
 	{
 		$json = array();
 
+		$type = $classNode->getAttribute('name');
 		if($classNode->getAttribute('base'))
 		{
 			$baseType = $classNode->getAttribute('base');
 			$xpath = new DOMXPath($this->_doc);
 			$baseNodes = $xpath->query("/xml/classes/class[@name='$baseType']");
 			$baseNode = $baseNodes->item(0);
-			$baseProperties = $this->getPropertiesJson($baseNode, $loaded);
-			foreach($baseProperties as $baseProperty)
-				$json[] = $baseProperty;
+			if(!$baseNode)
+				throw new Exception("Base object [$baseType] not found for type [$type]");
+		
+				$baseProperties = $this->getPropertiesJson($baseNode, $loaded);
+				foreach($baseProperties as $baseProperty)
+					$json[] = $baseProperty;
 		}
 		
 		foreach($classNode->childNodes as $propertyNode)

@@ -193,9 +193,12 @@ abstract class ClientGeneratorFromXml
 	
 	protected function loadTypesRecursive($type)
 	{
-		if(!$this->isComplexType($type))
+		if($type == 'KalturaObjectBase')
 			return;
 
+		if(!$this->isComplexType($type))
+			return;
+				
 		if(isset($this->_includeTypes[$type]))
 			return;
 		
@@ -232,6 +235,12 @@ abstract class ClientGeneratorFromXml
 				$propertyType = $propertyNode->getAttribute("arrayType");
 			
 			$this->loadTypesRecursive($propertyType);
+		}
+
+		$classNodes = $xpath->query("/xml/classes/class[@base = '$type']");
+		foreach($classNodes as $classNode)
+		{
+			$this->loadTypesRecursive($classNode->getAttribute("name"));
 		}
 	}
 	
