@@ -201,11 +201,11 @@ abstract class ClientGeneratorFromXml
 		{
 			$additionals = explode(',', str_replace(' ', '', $this->_config->additional));
 			foreach($additionals as $additional)
-				$this->loadTypesRecursive($additional);
+				$this->loadTypesRecursive($additional, false);
 		}
 	}
 	
-	protected function loadTypesRecursive($type)
+	protected function loadTypesRecursive($type, $strict = true)
 	{
 		if($type == 'KalturaObjectBase')
 			return;
@@ -230,7 +230,11 @@ abstract class ClientGeneratorFromXml
 		/* @var $classNode DOMElement */
 		if(!$classNode)
 		{
-			throw new Exception("Missing type [$type]");
+			if($strict)
+				throw new Exception("Missing type [$type]");
+			
+			KalturaLog::warning("Missing type [$type]");
+			return;
 		}
 
 		$this->_includeTypes[$type] = $type;
