@@ -140,7 +140,7 @@ class YoutubeApiDistributionProfile extends ConfigurableDistributionProfile
 	public function getAllowRatings()			{return $this->getFromCustomData(self::CUSTOM_DATA_ALLOW_RATINGS);}
 	public function getAllowResponses()			{return $this->getFromCustomData(self::CUSTOM_DATA_ALLOW_RESPONSES);}
 	public function getAssumeSuccess()			{return (bool) $this->getFromCustomData(self::CUSTOM_DATA_ASSUME_SUCCESS);}
-	public function getPrivacyStatus()			{return (bool) $this->getFromCustomData(self::CUSTOM_DATA_PRIVACY_STATUS);}
+	public function getPrivacyStatus()			{return $this->getFromCustomData(self::CUSTOM_DATA_PRIVACY_STATUS, null, 'public');}
 
 	public function setUsername($v)				{$this->putInCustomData(self::CUSTOM_DATA_USERNAME, $v);}
 	public function setDefaultCategory($v)		{$this->putInCustomData(self::CUSTOM_DATA_DEFAULT_CATEGORY, $v);}

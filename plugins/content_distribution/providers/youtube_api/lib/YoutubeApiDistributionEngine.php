@@ -236,10 +236,16 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 			$status->setPrivacyStatus('private');
 			$status->setEmbeddable(false);
 			
+			KalturaLog::debug("@@NA privacy status [".$this->getValueForField(KalturaYouTubeApiDistributionField::ENTRY_PRIVACY_STATUS)."]");
+			KalturaLog::debug("@@NA distribution privacy status [".$distributionProfile->privacyStatus."]");
 			if($data->entryDistribution->sunStatus == KalturaEntryDistributionSunStatus::AFTER_SUNRISE)
 			{
-//				$status->setPrivacyStatus('public');
-				$status->setPrivacyStatus($this->getValueForField(KalturaYouTubeApiDistributionField::ENTRY_PRIVACY_STATUS));
+				$privacyStatus = $this->getValueForField(KalturaYouTubeApiDistributionField::ENTRY_PRIVACY_STATUS);
+				if ($privacyStatus == "" || is_null($privacyStatus))
+				{
+					$privacyStatus = $distributionProfile->privacyStatus;
+				}
+				$status->setPrivacyStatus($privacyStatus);
 			}
 			if($this->getValueForField(KalturaYouTubeApiDistributionField::ALLOW_EMBEDDING) == 'allowed')
 			{
