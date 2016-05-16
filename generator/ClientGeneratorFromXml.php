@@ -116,6 +116,9 @@ abstract class ClientGeneratorFromXml
 			$includes = explode(',', str_replace(' ', '', strtolower($this->_config->include)));
 			foreach($includes as $include)
 			{
+				if(!strpos($include, '.'))
+					continue;
+				
 				list($serviceId, $actionId) = explode('.', $include);
 				if($actionId === '*')
 				{
@@ -150,12 +153,19 @@ abstract class ClientGeneratorFromXml
 			$excludes = explode(',', str_replace(' ', '', strtolower($this->_config->exclude)));
 			foreach($excludes as $exclude)
 			{
+				if(!strpos($exclude, '.'))
+					continue;
+				
 				list($serviceId, $actionId) = explode('.', $exclude);
+				
+				if(!isset($this->_includeServices[$serviceId]))
+					continue;
+				
 				if($actionId === '*')
 				{
 					unset($this->_includeServices[$serviceId]);
 				}
-				else
+				elseif(isset($this->_includeServices[$serviceId][$actionId]))
 				{
 					unset($this->_includeServices[$serviceId][$actionId]);
 				}
