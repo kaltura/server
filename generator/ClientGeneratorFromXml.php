@@ -186,6 +186,9 @@ abstract class ClientGeneratorFromXml
 		if(!$this->isComplexType($type))
 			return;
 
+		if(isset($this->_includeTypes[$type]))
+			return;
+		
 		$xpath = new DOMXPath($this->_doc);
 		$enumNodes = $xpath->query("/xml/enums/enum[@name = '$type']");
 		$enumNode = $enumNodes->item(0);
