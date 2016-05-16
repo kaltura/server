@@ -180,6 +180,8 @@ abstract class ClientGeneratorFromXml
 		{
 			$serviceNodes = $xpath->query("/xml/services/service[@id = '$serviceId']");
 			$serviceNode = $serviceNodes->item(0);
+			if(!$serviceNode)
+				throw new Exception("Service [$serviceId] no found");
 
 			$actionNodes = $serviceNode->getElementsByTagName("action");
 			foreach($actionNodes as $actionNode)
@@ -188,6 +190,13 @@ abstract class ClientGeneratorFromXml
 				if($actions === 'all' || in_array($actionId, $actions))
 					$this->loadActionTypes($actionNode);
 			}
+		}
+		
+		if($this->_config->additional)
+		{
+			$additionals = explode(',', str_replace(' ', '', $this->_config->additional));
+			foreach($additionals as $additional)
+				$this->loadTypesRecursive($additional);
 		}
 	}
 	
@@ -241,6 +250,15 @@ abstract class ClientGeneratorFromXml
 		foreach($classNodes as $classNode)
 		{
 			$this->loadTypesRecursive($classNode->getAttribute("name"));
+		}
+		
+		if($this->endsWith($type, 'Filter'))
+		{
+			$orderBy = preg_replace('/Filter$/', 'OrderBy', $type);
+			$classNodes = $xpath->query("/xml/enums/enum[@name = '$orderBy']");
+			$classNode = $classNodes->item(0);
+			if($classNode)
+				$this->_includeTypes[$orderBy] = $orderBy;
 		}
 	}
 	
