@@ -164,7 +164,10 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 		$serviceNodes = $xpath->query("/xml/services/service[@plugin = '$pluginName']");
 		$services = array();
 		foreach($serviceNodes as $serviceNode)
-			$services[] = $serviceNode->getAttribute("name");
+		{
+			if($this->shouldIncludeService($serviceNode->getAttribute("id")))
+				$services[] = $serviceNode->getAttribute("name");
+		}
 			
 		if($this->generateDocs)
 		{
@@ -579,6 +582,9 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 	    {
 	        if ($serviceNode->nodeName == "service")
 	        {
+				if(!$this->shouldIncludeService($serviceNode->getAttribute("id")))
+					continue;
+			
 	            $this->appendLine("	/**");
 	            $this->appendLine("	* @param Kaltura". $this->upperCaseFirstLetter($serviceNode->getAttribute("name")) ."ExtendedService");
 	            $this->appendLine("	*/");
@@ -593,6 +599,9 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 	    
 	    foreach ($serviceNodes as $serviceNode)
 	    {
+			if(!$this->shouldIncludeService($serviceNode->getAttribute("id")))
+				continue;
+			
 	        $extendingServiceName = $serviceNode->getAttribute("name");
 	        $this->appendLine("		$".$extendingServiceName." = new Kaltura".$this->upperCaseFirstLetter($extendingServiceName)."ExtendedService();");
 	    }
