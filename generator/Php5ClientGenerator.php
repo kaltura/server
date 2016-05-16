@@ -726,7 +726,10 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 		{
 			if($serviceNode->hasAttribute("plugin"))
 				continue;
-				
+
+			if(!$this->shouldIncludeService($serviceNode->getAttribute("id")))
+				continue;
+			
 			$serviceName = $serviceNode->getAttribute("name");
 			$serviceClassName = "Kaltura".$this->upperCaseFirstLetter($serviceName)."Service";
 			$this->appendLine("		\$this->$serviceName = new $serviceClassName(\$this);");
