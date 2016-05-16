@@ -88,7 +88,6 @@ abstract class ClientGeneratorFromXml
 	protected function shouldIncludeAction($serviceId, $actionId)
 	{
 		$serviceId = strtolower($serviceId);
-		$actionId = strtolower($actionId);
 		
 		if(!count($this->_includeServices))
 			return true;
@@ -104,7 +103,7 @@ abstract class ClientGeneratorFromXml
 	
 	protected function shouldIncludeService($serviceId)
 	{
-		return !count($this->_includeServices) || isset($this->_includeServices[strtolower($serviceId)]);
+		return !count($this->_includeServices) || isset($this->_includeServices[$serviceId]);
 	}
 	
 	protected function loadExcludeList()
@@ -113,20 +112,22 @@ abstract class ClientGeneratorFromXml
 		
 		if($this->_config->include)
 		{
-			$includes = explode(',', str_replace(' ', '', strtolower($this->_config->include)));
+			$includes = explode(',', str_replace(' ', '', $this->_config->include));
 			foreach($includes as $include)
 			{
 				if(!strpos($include, '.'))
 					continue;
 				
 				list($serviceId, $actionId) = explode('.', $include);
+				$serviceId = strtolower($serviceId);
 				if($actionId === '*')
 				{
 					$this->_includeServices[$serviceId] = 'all';
 				}
-				elseif(isset($services[$serviceId]))
+				elseif(isset($this->_includeServices[$serviceId]))
 				{
-					$this->_includeServices[$serviceId][$actionId] = $actionId;
+					if($this->_includeServices[$serviceId] != 'all')
+						$this->_includeServices[$serviceId][$actionId] = $actionId;
 				}
 				else
 				{
@@ -139,24 +140,25 @@ abstract class ClientGeneratorFromXml
 			$serviceNodes = $xpath->query("/xml/services/service");
 			foreach($serviceNodes as $serviceNode)
 			{
-				$serviceId = strtolower($serviceNode->getAttribute("id"));
+				$serviceId = $serviceNode->getAttribute("id");
 				$this->_includeServices[$serviceId] = array();
 
 				$actionNodes = $serviceNode->getElementsByTagName("action");
 				foreach($actionNodes as $actionNode)
 				{
-					$actionId = strtolower($actionNode->getAttribute("name"));
+					$actionId = $actionNode->getAttribute("name");
 					$this->_includeServices[$serviceId][$actionId] = $actionId;
 				}
 			}
 
-			$excludes = explode(',', str_replace(' ', '', strtolower($this->_config->exclude)));
+			$excludes = explode(',', str_replace(' ', '', $this->_config->exclude));
 			foreach($excludes as $exclude)
 			{
 				if(!strpos($exclude, '.'))
 					continue;
 				
 				list($serviceId, $actionId) = explode('.', $exclude);
+				$serviceId = strtolower($serviceId);
 				
 				if(!isset($this->_includeServices[$serviceId]))
 					continue;
