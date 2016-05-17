@@ -645,7 +645,7 @@ class TestmeDocGenerator extends ClientGeneratorFromXml
 		foreach($serviceNodes as $serviceNode)
 		{
 			if(!$this->shouldIncludeService($serviceNode->getAttribute('id')))
-				return;
+				continue;
 					
 			$services[] = $serviceNode->getAttribute('name');
 		}
@@ -661,7 +661,7 @@ class TestmeDocGenerator extends ClientGeneratorFromXml
 
 		foreach($classNodes as $classNode)
 		{
-			$type = $enumNode->getAttribute('name');
+			$type = $classNode->getAttribute('name');
 			if(!$this->shouldIncludeType($type))
 				continue;
 					
