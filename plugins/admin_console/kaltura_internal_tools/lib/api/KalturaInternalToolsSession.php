@@ -58,5 +58,5 @@ class KalturaInternalToolsSession extends KalturaObject
 		$this->rand = $source_object->rand;
 		$this->user = $source_object->user;
 		$this->privileges = $source_object->privileges;
-	}
+}
 }
