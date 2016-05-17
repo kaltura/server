@@ -1,3 +1,23 @@
+# Kajam 11.15.0 #
+
+## new email notifications ##
+
+- Issue Type: New Feature
+- Issue ID: PLAT-5479
+
+#### Configuration ####
+ 
+- None.
+
+#### Deployment Scripts ####
+
+		php /opt/kaltura/app/tests/standAloneClient/exec.php /opt/kaltura/app/tests/standAloneClient/contentUpdateNotifications.xml
+
+#### Known Issues & Limitations ####
+
+None.
+
+
 # Kajam 11.14.0 #
 
 ## Scheduling plugins ##
