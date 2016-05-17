@@ -593,7 +593,7 @@
 						<key>channel_tags</key>
 						<description>Channel tags</description>
 						<value objectType="KalturaEvalStringField">
-							<code>$scope->getObject()->geTags()</code>
+							<code>$scope->getObject()->getTags()</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
@@ -666,7 +666,7 @@
 						<key>channel_tags</key>
 						<description>Channel tags</description>
 						<value objectType="KalturaEvalStringField">
-							<code>$scope->getObject()->geTags()</code>
+							<code>$scope->getObject()->getTags()</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
