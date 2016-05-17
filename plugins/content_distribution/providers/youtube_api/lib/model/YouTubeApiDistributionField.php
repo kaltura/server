@@ -18,6 +18,7 @@ interface YouTubeApiDistributionField extends BaseEnum
 	const ALLOW_RESPONSES  = 'ALLOW_RESPONSES';
 	const ALLOW_RATINGS  = 'ALLOW_RATINGS';
 	const ALLOW_EMBEDDING  = 'ALLOW_EMBEDDING';
+	const ENTRY_PRIVACY_STATUS  = 'ENTRY_PRIVACY_STATUS';
 
     const ALT_RAW_FILENAME  = 'ALT_RAW_FILENAME'; // Alternative raw filename
 }

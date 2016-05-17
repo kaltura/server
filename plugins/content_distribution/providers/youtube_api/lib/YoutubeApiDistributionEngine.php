@@ -238,7 +238,13 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 			
 			if($data->entryDistribution->sunStatus == KalturaEntryDistributionSunStatus::AFTER_SUNRISE)
 			{
-				$status->setPrivacyStatus('public');
+				$privacyStatus = $this->getValueForField(KalturaYouTubeApiDistributionField::ENTRY_PRIVACY_STATUS);
+				if ($privacyStatus == "" || is_null($privacyStatus))
+				{
+					$privacyStatus = $distributionProfile->privacyStatus;
+				}
+				KalturaLog::debug("Setting privacy status to [$privacyStatus]");
+				$status->setPrivacyStatus($privacyStatus);
 			}
 			if($this->getValueForField(KalturaYouTubeApiDistributionField::ALLOW_EMBEDDING) == 'allowed')
 			{
