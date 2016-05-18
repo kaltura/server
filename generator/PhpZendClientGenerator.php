@@ -822,6 +822,9 @@ class PhpZendClientGenerator extends ClientGeneratorFromXml
 		
 		foreach($serviceNodes as $serviceNode)
 		{
+			if(!$this->shouldIncludeService($serviceNode->getAttribute("id")))
+				continue;
+				
 			if($serviceNode->hasAttribute("plugin"))
 				continue;
 				
