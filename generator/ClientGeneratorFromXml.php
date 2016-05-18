@@ -209,7 +209,7 @@ abstract class ClientGeneratorFromXml
 		);
 		
 		foreach($alwaysAdd as $additional)
-			$this->loadTypesRecursive($additional);
+			$this->loadTypesRecursive($additional, false);
 	}
 	
 	protected function loadTypesRecursive($type, $strict = true)
