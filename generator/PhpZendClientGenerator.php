@@ -103,6 +103,9 @@ class PhpZendClientGenerator extends ClientGeneratorFromXml
 		$enumNodes = $xpath->query("/xml/enums/enum");
 		foreach($enumNodes as $enumNode)
 		{
+			if(!$this->shouldIncludeType($enumNode->getAttribute('name')))
+				continue;
+			
     		$this->startNewTextBlock();
 			$this->appendLine('<?php');
 			$this->writeEnum($enumNode);
@@ -113,6 +116,9 @@ class PhpZendClientGenerator extends ClientGeneratorFromXml
 		$classNodes = $xpath->query("/xml/classes/class");
 		foreach($classNodes as $classNode)
 		{
+			if(!$this->shouldIncludeType($classNode->getAttribute('name')))
+				continue;
+			
 	    	$this->startNewTextBlock();
 			$this->appendLine('<?php');
 			$this->writeClass($classNode);
@@ -123,6 +129,9 @@ class PhpZendClientGenerator extends ClientGeneratorFromXml
 		$serviceNodes = $xpath->query("/xml/services/service");
 		foreach($serviceNodes as $serviceNode)
 		{
+			if(!$this->shouldIncludeService($serviceNode->getAttribute("id")))
+				continue;
+				
 	    	$this->startNewTextBlock();
 			$this->appendLine('<?php');
 		    $this->writeService($serviceNode);
@@ -313,8 +322,6 @@ class PhpZendClientGenerator extends ClientGeneratorFromXml
 	function writeEnum(DOMElement $enumNode)
 	{
 		$enumName = $this->getEnumClass($enumNode->getAttribute('name'));
-		if(!$this->shouldIncludeType($enumName))
-			return;
 		
 		if($this->generateDocs)
 		{
@@ -345,9 +352,6 @@ class PhpZendClientGenerator extends ClientGeneratorFromXml
 	function writeClass(DOMElement $classNode)
 	{
 		$kalturaType = $classNode->getAttribute('name');
-		if(!$this->shouldIncludeType($kalturaType))
-			return;
-		
 		$type = $this->getTypeClass($kalturaType);
 		
 		$abstract = '';
@@ -506,14 +510,11 @@ class PhpZendClientGenerator extends ClientGeneratorFromXml
 	
 	function writeService(DOMElement $serviceNode)
 	{
-		$serviceId = $serviceNode->getAttribute("id");
-		if(!$this->shouldIncludeService($serviceId))
-			return;
-			
 		$plugin = null;
 		if($serviceNode->hasAttribute('plugin'))
 			$plugin = $serviceNode->getAttribute('plugin');
-			
+
+		$serviceId = $serviceNode->getAttribute("id");
 		$serviceName = $serviceNode->getAttribute("name");
 					
 		$serviceClassName = $this->getServiceClass($serviceNode, $plugin);
