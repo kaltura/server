@@ -230,7 +230,6 @@ class YouTubeDistributionPlugin extends KalturaPlugin implements IKalturaPermiss
 		$mrss->addChild('allow_post_roll_ads', $distributionProfile->getAllowPostRollAds());		
 		$mrss->addChild('claim_type', $distributionProfile->getClaimType());
 		$mrss->addChild('instream_standard', $distributionProfile->getInstreamStandard());
-		$mrss->addChild('privacy_status', $distributionProfile->getPrivacyStatus());
 	}
 	
 	/**
