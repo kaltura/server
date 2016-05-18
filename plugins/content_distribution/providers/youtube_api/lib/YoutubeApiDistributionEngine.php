@@ -238,11 +238,7 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 			
 			if($data->entryDistribution->sunStatus == KalturaEntryDistributionSunStatus::AFTER_SUNRISE)
 			{
-				$privacyStatus = $this->getValueForField(KalturaYouTubeApiDistributionField::ENTRY_PRIVACY_STATUS);
-				if ($privacyStatus == "" || is_null($privacyStatus))
-				{
-					$privacyStatus = $distributionProfile->privacyStatus;
-				}
+				$privacyStatus = $this->getPrivacyStatus($distributionProfile);
 				KalturaLog::debug("Setting privacy status to [$privacyStatus]");
 				$status->setPrivacyStatus($privacyStatus);
 			}
@@ -352,7 +348,9 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 		
 		if($enable && $data->entryDistribution->sunStatus == KalturaEntryDistributionSunStatus::AFTER_SUNRISE)
 		{
-			$status['privacyStatus'] = 'public';
+			$privacyStatus = $this->getPrivacyStatus($distributionProfile);
+			KalturaLog::debug("Setting privacy status to [$privacyStatus]");
+			$status['privacyStatus'] = $privacyStatus;
 		}
 		if($this->getValueForField(KalturaYouTubeApiDistributionField::ALLOW_EMBEDDING) == 'allowed')
 		{
@@ -454,7 +452,21 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 		}
 		return null;
 	}
-	
+
+	/**
+	 * @param KalturaYoutubeApiDistributionProfile $distributionProfile
+	 * @return null|string
+	 */
+	protected function getPrivacyStatus(KalturaYoutubeApiDistributionProfile $distributionProfile)
+	{
+		$privacyStatus = $this->getValueForField(KalturaYouTubeApiDistributionField::ENTRY_PRIVACY_STATUS);
+		if ($privacyStatus == "" || is_null($privacyStatus))
+		{
+			$privacyStatus = $distributionProfile->privacyStatus;
+		}
+		return $privacyStatus;
+	}
+
 	private function updateRemoteMediaFileVersion(KalturaDistributionRemoteMediaFileArray &$remoteMediaFiles, KalturaYouTubeApiCaptionDistributionInfo $captionInfo){
 		/* @var $mediaFile KalturaDistributionRemoteMediaFile */
 		foreach ($remoteMediaFiles as $remoteMediaFile){
