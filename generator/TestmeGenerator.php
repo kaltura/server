@@ -137,17 +137,19 @@ class TestmeGenerator extends ClientGeneratorFromXml
 				'isSimpleType' => $this->isSimpleType($type),
 				'isComplexType' => $this->isComplexType($type),
 				'isFile' => ($type == 'file'),
-				'isEnum' => ($propertyNode->hasAttribute("enumType") != null),
-				'isStringEnum' => ($type == 'string'),
-				'isArray' => ($propertyNode->getAttribute("arrayType") != null),
+				'isEnum' => false,
+				'isStringEnum' => false,
+				'isArray' => false,
 				'isReadOnly' => ($propertyNode->getAttribute("readOnly") == 1),
 				'isInsertOnly' => ($propertyNode->getAttribute("insertOnly") == 1),
 				'isWriteOnly' => ($propertyNode->getAttribute("writeOnly") == 1),
 				'description' => $propertyNode->getAttribute("description"),
 			);
 			
-			if($propertyNode->getAttribute("arrayType"))
+			if($propertyNode->hasAttribute("arrayType"))
 			{
+				$propertyJson['isArray'] = true;
+				
 				$arrayType = $propertyNode->getAttribute("arrayType");
 				$xpath = new DOMXPath($this->_doc);
 				$classNodes = $xpath->query("/xml/classes/class[@name='$arrayType']");
@@ -157,8 +159,12 @@ class TestmeGenerator extends ClientGeneratorFromXml
 				$propertyJson['arrayType'] = $this->getClassJson($classNode, $loaded);
 			}
 			
-			if($propertyNode->getAttribute("enumType"))
+			if($propertyNode->hasAttribute("enumType"))
 			{
+				$propertyJson['isComplexType'] = true;
+				$propertyJson['isEnum'] = true;
+				$propertyJson['isStringEnum'] = ($type == 'string');
+				
 				$enumType = $propertyNode->getAttribute("enumType");
 				$xpath = new DOMXPath($this->_doc);
 				$enumNodes = $xpath->query("/xml/enums/enum[@name='$enumType']");
