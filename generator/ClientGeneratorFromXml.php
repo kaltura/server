@@ -109,7 +109,7 @@ abstract class ClientGeneratorFromXml
 	protected function loadExcludeList()
 	{
 		$xpath = new DOMXPath($this->_doc);
-		
+
 		if($this->_config->include)
 		{
 			$includes = explode(',', str_replace(' ', '', $this->_config->include));
@@ -203,6 +203,13 @@ abstract class ClientGeneratorFromXml
 			foreach($additionals as $additional)
 				$this->loadTypesRecursive($additional, false);
 		}
+
+		$alwaysAdd = array(
+				'KalturaApiExceptionArg',
+		);
+		
+		foreach($alwaysAdd as $additional)
+			$this->loadTypesRecursive($additional);
 	}
 	
 	protected function loadTypesRecursive($type, $strict = true)
