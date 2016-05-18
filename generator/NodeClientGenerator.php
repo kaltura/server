@@ -451,6 +451,9 @@ class NodeClientGenerator extends ClientGeneratorFromXml
 		$this->echoLine($this->mainClass, "	//initialize client services:");
 		foreach($servicesNodes as $serviceNode)
 		{
+			if(!$this->shouldIncludeService($serviceNode->attributes()->id))
+				continue;
+		
 			$serviceName = $serviceNode->attributes()->name;
 			$serviceClassName = 'kaltura.services.Kaltura' . $this->upperCaseFirstLetter($serviceName) . 'Service';
 			$this->echoLine($this->mainClass, "	this.$serviceName = new $serviceClassName(this);");

@@ -82,12 +82,13 @@ abstract class ClientGeneratorFromXml
 	
 	protected function shouldIncludeType($type)
 	{
+		$type = strval($type);
 		return !count($this->_includeTypes) || isset($this->_includeTypes[$type]);
 	}
 	
 	protected function shouldIncludeAction($serviceId, $actionId)
 	{
-		$serviceId = strtolower($serviceId);
+		$serviceId = strtolower(strval($serviceId));
 		
 		if(!count($this->_includeServices))
 			return true;
@@ -103,6 +104,7 @@ abstract class ClientGeneratorFromXml
 	
 	protected function shouldIncludeService($serviceId)
 	{
+		$serviceId = strval($serviceId);
 		return !count($this->_includeServices) || isset($this->_includeServices[$serviceId]);
 	}
 	
