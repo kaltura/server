@@ -230,7 +230,8 @@ class YoutubeApiDistributionPlugin extends KalturaPlugin implements IKalturaPerm
 	    $mrss->addChild('allow_comments', $distributionProfile->getAllowComments());
 		$mrss->addChild('allow_responses', $distributionProfile->getAllowResponses());
 		$mrss->addChild('allow_ratings', $distributionProfile->getAllowRatings());
-		$mrss->addChild('allow_embedding', $distributionProfile->getAllowEmbedding());	
+		$mrss->addChild('allow_embedding', $distributionProfile->getAllowEmbedding());
+		$mrss->addChild('privacy_status', $distributionProfile->getPrivacyStatus());
 	}
 	
 	/**
