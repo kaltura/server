@@ -25,6 +25,11 @@ abstract class ClientGeneratorFromXml
 	/**
 	 * @var array
 	 */
+	protected $_ignoreTypes = null;
+	
+	/**
+	 * @var array
+	 */
 	protected $_includeTypes = null;
 	
 	/**
@@ -82,6 +87,9 @@ abstract class ClientGeneratorFromXml
 	
 	protected function shouldIncludeType($type)
 	{
+		if(in_array($type, $this->_ignoreTypes))
+			return false;
+		
 		$type = strval($type);
 		return !count($this->_includeTypes) || isset($this->_includeTypes[$type]);
 	}
@@ -112,6 +120,9 @@ abstract class ClientGeneratorFromXml
 	{
 		$xpath = new DOMXPath($this->_doc);
 
+		if($this->_config->ignore)
+			$this->_ignoreTypes = explode(',', str_replace(' ', '', $this->_config->ignore));
+		
 		if($this->_config->include)
 		{
 			$includes = explode(',', str_replace(' ', '', $this->_config->include));
@@ -219,6 +230,9 @@ abstract class ClientGeneratorFromXml
 		if($type == 'KalturaObjectBase')
 			return;
 
+		if(in_array($type, $this->_ignoreTypes))
+			return;
+		
 		if(!$this->isComplexType($type))
 			return;
 				
