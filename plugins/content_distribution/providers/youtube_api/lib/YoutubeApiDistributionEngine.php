@@ -37,6 +37,7 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 	const MAXIMUM_NUMBER_OF_UPLOAD_CHUNK_RETRY = 3;
 
 	const TIME_TO_WAIT_FOR_YOUTUBE_TRANSCODING = 5;
+	const YOUTUBE_API_UPLOAD_READY_TIMEOUT = 300;
 
 	public function configure()
 	{
@@ -297,9 +298,9 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 			while (!$this->isVideoReady($youtube, $data->remoteId))
 			{
 				sleep(self::TIME_TO_WAIT_FOR_YOUTUBE_TRANSCODING);
-				if ( (time() - $startCheckingReadyTime) > $this->timeout )
+				if ( (time() - $startCheckingReadyTime) > self::YOUTUBE_API_UPLOAD_READY_TIMEOUT )
 				{
-					throw Exception("Video transcoding on youtube has timed out");
+					throw new Exception("Video transcoding on youtube has timed out");
 				}
 			}
 		}
