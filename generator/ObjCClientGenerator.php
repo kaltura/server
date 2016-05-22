@@ -45,6 +45,12 @@ class ObjCClientGenerator extends ClientGeneratorFromXml
 		}
 	}
 	
+	protected function loadTypesRecursive($type, $strict = true)
+	{
+		if($type != 'string')
+			parent::loadTypesRecursive($type, $strict);
+	}
+	
 	function isSimpleType($propType)
 	{
 		switch ($propType)
