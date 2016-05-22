@@ -55,7 +55,31 @@ class TestmeGenerator extends ClientGeneratorFromXml
 		return $subClasses;
 	}
 	
-	function getClassJson(DOMElement $classNode, &$loaded = array())
+	function getEnumJson(DOMElement $enumNode)
+	{
+		$type = $enumNode->getAttribute("name");
+		$enumType = $enumNode->getAttribute("enumType");
+		
+		$json = array(
+			'type' => $type,
+			'description' => $enumNode->getAttribute('description'),
+			'isSimpleType' => false,
+			'isComplexType' => true,
+			'isFile' => false,
+			'isEnum' => true,
+			'isStringEnum' => ($enumType == 'string'),
+			'isArray' => false,
+			'isReadOnly' => false,
+			'isInsertOnly' => false,
+			'isWriteOnly' => false,
+		);
+
+		$json['constants'] = $this->getEnumConstantsJson($enumNode);
+		
+		return $json;
+	}
+	
+	function getClassJson(DOMElement $classNode, &$loaded = array(), $recursionLevel = 10)
 	{
 		$type = $classNode->getAttribute("name");
 		if(in_array($type, $loaded))
@@ -78,7 +102,7 @@ class TestmeGenerator extends ClientGeneratorFromXml
 			'isWriteOnly' => false,
 		);
 		
-		$json['properties'] = $this->getPropertiesJson($classNode, $loaded);
+		$json['properties'] = $this->getPropertiesJson($classNode, $loaded, $recursionLevel);
 		
 		return $json;
 	}
@@ -106,7 +130,7 @@ class TestmeGenerator extends ClientGeneratorFromXml
 		return $json;
 	}
 	
-	function getPropertiesJson(DOMElement $classNode, &$loaded = array())
+	function getPropertiesJson(DOMElement $classNode, &$loaded, $recursionLevel)
 	{
 		$json = array();
 
@@ -120,7 +144,7 @@ class TestmeGenerator extends ClientGeneratorFromXml
 			if(!$baseNode)
 				throw new Exception("Base object [$baseType] not found for type [$type]");
 		
-				$baseProperties = $this->getPropertiesJson($baseNode, $loaded);
+				$baseProperties = $this->getPropertiesJson($baseNode, $loaded, $recursionLevel - 1);
 				foreach($baseProperties as $baseProperty)
 					$json[] = $baseProperty;
 		}
@@ -146,6 +170,15 @@ class TestmeGenerator extends ClientGeneratorFromXml
 				'description' => $propertyNode->getAttribute("description"),
 			);
 			
+			if($this->isComplexType($type) && $recursionLevel > 0)
+			{
+				$xpath = new DOMXPath($this->_doc);
+				$classNodes = $xpath->query("/xml/classes/class[@name='$type']");
+				$classNode = $classNodes->item(0);
+				if($classNode)
+					$propertyJson['properties'] = $this->getPropertiesJson($classNode, $loaded, $recursionLevel - 1);
+			}
+			
 			if($propertyNode->hasAttribute("arrayType"))
 			{
 				$propertyJson['isArray'] = true;
@@ -156,7 +189,7 @@ class TestmeGenerator extends ClientGeneratorFromXml
 				$classNode = $classNodes->item(0);
 				if(!$classNode)
 					throw new Exception("Class [$arrayType] not found");
-				$propertyJson['arrayType'] = $this->getClassJson($classNode, $loaded);
+				$propertyJson['arrayType'] = $this->getClassJson($classNode, $loaded, $recursionLevel - 1);
 			}
 			
 			if($propertyNode->hasAttribute("enumType"))
@@ -240,7 +273,7 @@ class TestmeGenerator extends ClientGeneratorFromXml
 		{
 			$paramType = $paramNode->getAttribute('type');
 			$paramName = $paramNode->getAttribute('name');
-			$enumType = $paramNode->hasAttribute('enumType');
+			$enumType = $paramNode->getAttribute('enumType');
 			$isOptional = $paramNode->getAttribute('optional');
 					
 			if($enumType)
@@ -255,16 +288,25 @@ class TestmeGenerator extends ClientGeneratorFromXml
 			}
 			else 
 			{
-				$paramData = array(
-					'type' => $paramType,
-					'isSimpleType' => $this->isSimpleType($paramType),
-					'isComplexType' => false,
-					'isFile' => ($paramType == 'file'),
-					'isEnum' => false,
-					'isStringEnum' => false,
-					'isArray' => false,
-					'isAbstract' => false,
-				);
+				$enumNodes = $xpath->query("/xml/enums/enum[@name='$paramType']");
+				$enumNode = $enumNodes->item(0);
+				if($enumNode)
+				{
+					$paramData = $this->getEnumJson($enumNode);
+				}
+				else 
+				{
+					$paramData = array(
+						'type' => $paramType,
+						'isSimpleType' => $this->isSimpleType($paramType),
+						'isComplexType' => false,
+						'isFile' => ($paramType == 'file'),
+						'isEnum' => false,
+						'isStringEnum' => false,
+						'isArray' => false,
+						'isAbstract' => false,
+					);
+				}
 			}
 
 			$paramData['description'] = $paramNode->getAttribute('description');
@@ -370,8 +412,8 @@ class TestmeGenerator extends ClientGeneratorFromXml
 			$this->appendLine('<body class="body-bg">');
 			$this->appendLine('	<ul id="kmcSubMenu">');
 			$this->appendLine('		<li class="active"><a href="#">Test Console</a></li>');
-			$this->appendLine('		<li><a href="../testmeDoc/index.php">API Documentation</a></li>');
-			$this->appendLine('		<li><a href="../xsdDoc/index.php">XML Schema</a></li>');
+			$this->appendLine('		<li><a href="../testmeDoc/">API Documentation</a></li>');
+			$this->appendLine('		<li><a href="../xsdDoc/">XML Schema</a></li>');
 			$this->appendLine('		<li><a href="client-libs.php">API Client Libraries</a></li>');
 			$this->appendLine('	</ul>');
 		}
