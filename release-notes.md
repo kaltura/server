@@ -11,7 +11,7 @@
 
 #### Deployment Scripts ####
 
-		php /opt/kaltura/app/updates/scripts/add_permissions/2016_05_05_add_additional_actions_to_entryServerNode.php
+		php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2016_05_05_add_additional_actions_to_entryServerNode.php
 
 #### Known Issues & Limitations ####
 
