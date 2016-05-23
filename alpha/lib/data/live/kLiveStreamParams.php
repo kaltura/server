@@ -76,10 +76,10 @@ class kLiveStreamParams
 	/**
 	 * @return the $codec
 	 */
-	public function getCode() { return $this->codec; }
+	public function getCodec() { return $this->codec; }
 
 	/**
 	 * @param string $codec
 	 */
-	public function setCode($codec) { $this->codec = $codec; }
+	public function setCodec($codec) { $this->codec = $codec; }
 }

@@ -215,7 +215,7 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 		$this->buildM3u8Flavors($baseUrl, $flavors, $primaryServerStreams);
 		if($backupUrl)
 		{
-			//Until a full solution will be made om the mediaServer side we need for bitratesBetween prinary and backup to be identical both on primary and backup
+			//Until a full solution will be made on the mediaServer side we need to manually sync bitrates Between primay and backup streams
 			$priamryFlavorBitrateInfo = $this->buildFlavorBitrateInfoArray($primaryServerStreams);
 			$this->buildM3u8Flavors($backupUrl, $flavors, $backupServerStreams, $priamryFlavorBitrateInfo);
 		}
