@@ -394,7 +394,12 @@ class BaseEntryService extends KalturaEntryService
 		if (!$dbEntry)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 	
-		
+	 	if($dbEntry->getType() == KalturaEntryType::AUTOMATIC || is_null($dbEntry->getType()))
+        {
+        	$kResource = $resource->toObject();
+        	$this->setEntryTypeByResource($dbEntry, $kResource);
+        	$dbEntry->save();
+        }
 		
 		$baseEntry = new KalturaBaseEntry();
 		$baseEntry->fromObject($dbEntry, $this->getResponseProfile());
@@ -407,7 +412,6 @@ class BaseEntryService extends KalturaEntryService
 				$service->replaceResource($resource, $dbEntry, $conversionProfileId, $advancedOptions);
 		    	$baseEntry->fromObject($dbEntry, $this->getResponseProfile());
     			return $baseEntry;
-				
 			case entryType::MIX:
 			case entryType::PLAYLIST:
 			case entryType::DATA:

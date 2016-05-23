@@ -56,7 +56,7 @@ class EntryServerNodeService extends KalturaBaseService
 	 * @return KalturaEntryServerNode|null|object
 	 * @throws KalturaAPIException
 	 */
-	private function updateAction($id, KalturaEntryServerNode $entryServerNode)
+	public function updateAction($id, KalturaEntryServerNode $entryServerNode)
 	{
 		$dbEntryServerNode = EntryServerNodePeer::retrieveByPK($id);
 		if (!$dbEntryServerNode)

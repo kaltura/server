@@ -1,3 +1,22 @@
+# Kajam 11.16.0 #
+
+## Support Live HLS seamless failover when streamInfo is known ##
+
+- Issue Type: New Feature
+- Issue ID: PLAT-5295
+
+#### Configuration ####
+ 
+- None.
+
+#### Deployment Scripts ####
+
+		php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2016_05_05_add_additional_actions_to_entryServerNode.php
+
+#### Known Issues & Limitations ####
+
+None.
+
 # Kajam 11.15.0 #
 
 ## new email notifications ##
