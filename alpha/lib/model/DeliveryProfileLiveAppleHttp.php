@@ -123,7 +123,7 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 	 * Build all streaming flavors array
 	 * @param string $url
 	 */
-	private function buildM3u8Flavors($url, array &$flavors, array $kLiveStreamParamsArray)
+	private function buildM3u8Flavors($url, array &$flavors, array $kLiveStreamParamsArray, $flavorBitrateInfo = array())
 	{
 		$domainPrefix = $this->getDeliveryServerNodeUrl(true);
 		
@@ -138,7 +138,7 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 					'ext' => 'm3u8',
 			);
 			
-			$flavor['bitrate'] = $kLiveStreamParams->getBitrate();
+			$flavor['bitrate'] = isset($flavorBitrateInfo[$kLiveStreamParams->getFlavorId()]) ? $flavorBitrateInfo[$kLiveStreamParams->getFlavorId()] : $kLiveStreamParams->getBitrate();
 			$flavor['width'] = $kLiveStreamParams->getWidth();
 			$flavor['height'] = $kLiveStreamParams->getHeight();
 			
@@ -187,7 +187,7 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 		$primaryServerStreams = $this->liveStreamConfig->getPrimaryLiveEntryServerNode() ? $this->liveStreamConfig->getPrimaryLiveEntryServerNode()->getStreams() : array();
 		$backupServerStreams = $this->liveStreamConfig->getBackupLiveEntryServerNode() ? $this->liveStreamConfig->getBackupLiveEntryServerNode()->getStreams() : array();
 		
-		if(!$this->getForceProxy() || $this->params->getUsePlayServer() || !count($primaryServerStreams) || !count($backupServerStreams))
+		if(!$this->getForceProxy() || $this->params->getUsePlayServer() || (!count($primaryServerStreams) && !count($backupServerStreams)))
 		{
 			$this->shouldRedirect = true;
 		}
@@ -214,7 +214,11 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 		$flavors = array();
 		$this->buildM3u8Flavors($baseUrl, $flavors, $primaryServerStreams);
 		if($backupUrl)
-			$this->buildM3u8Flavors($backupUrl, $flavors, $backupServerStreams);
+		{
+			//Until a full solution will be made om the mediaServer side we need for bitratesBetween prinary and backup to be identical both on primary and backup
+			$priamryFlavorBitrateInfo = $this->buildFlavorBitrateInfoArray($primaryServerStreams);
+			$this->buildM3u8Flavors($backupUrl, $flavors, $backupServerStreams, $priamryFlavorBitrateInfo);
+		}
 		
 		foreach ($flavors as $index => $flavor)
 		{
@@ -239,6 +243,16 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 		}
 		$renderer = parent::getRenderer($flavors);
 		return $renderer;
+	}
+	
+	private function buildFlavorBitrateInfoArray($primaryServerStreams)
+	{
+		$flavorBitrateInfo = array();
+		foreach ($primaryServerStreams as $stream)
+		{
+			$flavorBitrateInfo[$stream->getFlavorId()] = $stream->getBitrate();
+		}
+		return $flavorBitrateInfo;
 	}
 }
 
