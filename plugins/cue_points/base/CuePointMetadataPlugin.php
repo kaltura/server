@@ -341,7 +341,7 @@ class CuePointMetadataPlugin extends KalturaPlugin implements IKalturaPending, I
 		if($object instanceof CuePoint)
 		{
 			$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaCuePoint');
-			$cuePointCalssName = lcfirst(get_class($object));
+			$cuePointCalssName = strtolower(get_class($object));
 		
 			if(MetadataPlugin::isAllowedPartner($object->getPartnerId()) && isset($pluginInstances[$cuePointCalssName]))
 			{
