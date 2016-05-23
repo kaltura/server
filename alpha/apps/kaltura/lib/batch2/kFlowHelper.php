@@ -397,6 +397,8 @@ class kFlowHelper
 
 	protected static function getReplacingEntry($recordedEntry, $asset) 
 	{
+		//Reload entry before tryign to get the replacing entry id from it to avoid creating 2 different replacing entries for different flavors
+		$recordedEntry->reload();
 		$replacingEntryId = $recordedEntry->getReplacingEntryId();
 		$replacingEntry = null;
 		if(!is_null($replacingEntryId))
