@@ -31,6 +31,11 @@ abstract class ClientGeneratorFromXml
 	 * @var array
 	 */
 	protected $_includeTypes = null;
+
+	/**
+	 * @var array
+	 */
+	protected $_excludesServices = null;
 	
 	/**
 	 * @var array
@@ -57,6 +62,31 @@ abstract class ClientGeneratorFromXml
 		$this->excludeSourcePaths = explode(',', $excludeSourcePaths);
 	}
 
+	private function loadExcludeServiceList()
+	{
+		if($this->_config->exclude)
+		{
+			$this->_excludesServices = array();
+			$serviceList = explode(',', str_replace(' ', '', $this->_config->exclude));
+			foreach ($serviceList as $service)
+			{
+				$serviceName = explode('.', $service);
+				if($serviceName)
+					$this->_excludesServices[$serviceName[0]] = 1;
+			}
+		}
+	}
+
+	protected function shouldExcludeService($serviceName)
+	{
+		if($this->_excludesServices)
+		{
+			if (array_key_exists($serviceName, $this->_excludesServices))
+				return true;
+		}
+		return false;
+	}
+
 	public function __construct($xmlFile, $sourcePath, Zend_Config $config)
 	{
 		$this->_xmlFile = realpath($xmlFile);
@@ -73,7 +103,8 @@ abstract class ClientGeneratorFromXml
 		$this->_doc->load($this->_xmlFile);
 		
 		$this->loadExcludeList();
-		
+		$this->loadExcludeServiceList();
+
 		$singleLineCommentMarker = $this->getSingleLineCommentMarker();
 		if($singleLineCommentMarker === null)
 			$singleLineCommentMarker = '';
@@ -172,7 +203,7 @@ abstract class ClientGeneratorFromXml
 				
 				list($serviceId, $actionId) = explode('.', $exclude);
 				$serviceId = strtolower($serviceId);
-				
+
 				if(!isset($this->_includeServices[$serviceId]))
 					continue;
 				
