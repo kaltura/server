@@ -3,7 +3,7 @@
  * Enable adding custom metadata objects that releate to core objects
  * @package plugins.metadata
  */
-class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaPermissions, IKalturaServices, IKalturaEventConsumers, IKalturaObjectLoader, IKalturaBulkUploadHandler, IKalturaSearchDataContributor, IKalturaConfigurator, IKalturaSchemaContributor, IKalturaSphinxConfiguration, IKalturaEnumerator, IKalturaObjectValidator
+class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaPermissions, IKalturaServices, IKalturaEventConsumers, IKalturaObjectLoader, IKalturaBulkUploadHandler, IKalturaSearchDataContributor, IKalturaSchemaContributor, IKalturaSphinxConfiguration, IKalturaEnumerator, IKalturaObjectValidator
 {
 
 	const SPHINX_DEFAULT_NUMBER_OF_DATE_FIELDS = 10;
@@ -848,20 +848,6 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 		return array();
 	}
 
-	/* (non-PHPdoc)
-	 * @see IKalturaConfigurator::getConfig()
-	 */
-	public static function getConfig($configName)
-	{
-		if($configName == 'generator')
-			return new Zend_Config_Ini(dirname(__FILE__) . '/config/generator.ini');
-			
-		if($configName == 'testme')
-			return new Zend_Config_Ini(dirname(__FILE__) . '/config/testme.ini');
-			
-		return null;
-	}
-	
 	/* (non-PHPdoc)
 	 * @see IKalturaSchemaContributor::contributeToSchema()
 	 */

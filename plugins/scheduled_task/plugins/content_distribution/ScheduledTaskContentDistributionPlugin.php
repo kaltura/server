@@ -4,7 +4,7 @@
  *
  * @package plugins.scheduledTaskEventNotification
  */
-class ScheduledTaskContentDistributionPlugin extends KalturaPlugin implements IKalturaPending, IKalturaEnumerator, IKalturaObjectLoader, IKalturaConfigurator
+class ScheduledTaskContentDistributionPlugin extends KalturaPlugin implements IKalturaPending, IKalturaEnumerator, IKalturaObjectLoader
 {
 	const PLUGIN_NAME = 'scheduledTaskContentDistribution';
 	
@@ -91,16 +91,5 @@ class ScheduledTaskContentDistributionPlugin extends KalturaPlugin implements IK
 	public static function getApiValue($valueName)
 	{
 		return self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
-	}
-
-	/* (non-PHPdoc)
-	 * @see IKalturaConfigurator::getConfig()
-	 */
-	public static function getConfig($configName)
-	{
-		if($configName == 'generator')
-			return new Zend_Config_Ini(dirname(__FILE__) . '/config/generator.ini');
-
-		return null;
 	}
 }

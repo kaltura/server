@@ -1,16 +1,9 @@
 <?php
 class Php5ClientGenerator extends ClientGeneratorFromXml
 {
-	/**
-	 * @var DOMDocument
-	 */
-	protected $_doc = null;
-	
 	function __construct($xmlPath, Zend_Config $config, $sourcePath = "sources/php5")
 	{
 		parent::__construct($xmlPath, $sourcePath, $config);
-		$this->_doc = new KDOMDocument();
-		$this->_doc->load($this->_xmlFile);
 	}
 	
 	function getSingleLineCommentMarker()
@@ -103,19 +96,21 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
     	$this->addFile("KalturaClient.php", $this->getTextBlock());
     	
 		// plugins
-    	$plugins = KalturaPluginManager::getPluginInstances();
-		foreach($plugins as $plugin)
-		    $this->writePlugin($plugin);
+		$pluginNodes = $xpath->query("/xml/plugins/plugin");
+		foreach($pluginNodes as $pluginNode)
+		{
+		    $this->writePlugin($pluginNode);
+		}
 	}
 	
 	function getPluginClassName($pluginName)
 	{
 		return "Kaltura" . ucfirst($pluginName) . "ClientPlugin";
 	}
-	
-	function writePlugin(KalturaPlugin $plugin)
+
+	function writePlugin(DOMElement $pluginNode)
 	{
-		$pluginName = $plugin->getPluginName();
+		$pluginName = $pluginNode->getAttribute("name");
 		
 		$xpath = new DOMXPath($this->_doc);
 		$pluginClassName = $this->getPluginClassName($pluginName);
@@ -165,11 +160,14 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 		}
 		if(!$classsAdded)
 			return;
-		
-		$serviceNodes = $xpath->query("/xml/plugins/plugin[@name = '$pluginName']/pluginService");
+
+		$serviceNodes = $xpath->query("/xml/services/service[@plugin = '$pluginName']");
 		$services = array();
 		foreach($serviceNodes as $serviceNode)
-			$services[] = $serviceNode->getAttribute("name");
+		{
+			if($this->shouldIncludeService($serviceNode->getAttribute("id")))
+				$services[] = $serviceNode->getAttribute("name");
+		}
 			
 		if($this->generateDocs)
 		{
@@ -238,6 +236,8 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 	function writeEnum(DOMElement $enumNode)
 	{
 		$enumName = $enumNode->getAttribute("name");
+		if(!$this->shouldIncludeType($enumName))
+			return;
 		
 		if($this->generateDocs)
 		{
@@ -266,8 +266,10 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 	}
 	
 	function writeClass(DOMElement $classNode)
-	{
+	{		
 		$type = $classNode->getAttribute("name");;
+		if(!$this->shouldIncludeType($type))
+			return;
 		
 		$abstract = '';
 		if ($classNode->hasAttribute("abstract"))
@@ -339,8 +341,11 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 	
 	function writeService(DOMElement $serviceNode, $serviceName = null, $serviceId = null, $actionPrefix = "", $extends = "KalturaServiceBase")
 	{
-		$serviceName = $serviceName ? $serviceName : $serviceNode->getAttribute("name");
 		$serviceId = $serviceId ? $serviceId : $serviceNode->getAttribute("id");
+		if(!$this->shouldIncludeService($serviceId))
+			return;
+			
+		$serviceName = $serviceName ? $serviceName : $serviceNode->getAttribute("name");
 		
 		
 		$servicePlugins = $serviceNode->getElementsByTagName("servicePlugin");
@@ -394,7 +399,10 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 	
 	function writeAction($serviceId, DOMElement $actionNode, $actionPrefix = "")
 	{
-		$action = $actionNode->getAttribute("name");
+	    $action = $actionNode->getAttribute("name");
+		if(!$this->shouldIncludeAction($serviceId, $action))
+			return;
+			
 		$method = $action;
 		if (in_array($action, array("list", "clone", "goto"))) // because list & clone are preserved in PHP
 			$method .= 'Action';
@@ -574,6 +582,9 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 	    {
 	        if ($serviceNode->nodeName == "service")
 	        {
+				if(!$this->shouldIncludeService($serviceNode->getAttribute("id")))
+					continue;
+			
 	            $this->appendLine("	/**");
 	            $this->appendLine("	* @param Kaltura". $this->upperCaseFirstLetter($serviceNode->getAttribute("name")) ."ExtendedService");
 	            $this->appendLine("	*/");
@@ -588,6 +599,9 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 	    
 	    foreach ($serviceNodes as $serviceNode)
 	    {
+			if(!$this->shouldIncludeService($serviceNode->getAttribute("id")))
+				continue;
+			
 	        $extendingServiceName = $serviceNode->getAttribute("name");
 	        $this->appendLine("		$".$extendingServiceName." = new Kaltura".$this->upperCaseFirstLetter($extendingServiceName)."ExtendedService();");
 	    }
@@ -677,6 +691,9 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 	
 		foreach($serviceNodes as $serviceNode)
 		{
+			if(!$this->shouldIncludeService($serviceNode->getAttribute("id")))
+				continue;
+				
 			if($serviceNode->hasAttribute("plugin"))
 				continue;
 				
@@ -709,7 +726,10 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 		{
 			if($serviceNode->hasAttribute("plugin"))
 				continue;
-				
+
+			if(!$this->shouldIncludeService($serviceNode->getAttribute("id")))
+				continue;
+			
 			$serviceName = $serviceNode->getAttribute("name");
 			$serviceClassName = "Kaltura".$this->upperCaseFirstLetter($serviceName)."Service";
 			$this->appendLine("		\$this->$serviceName = new $serviceClassName(\$this);");

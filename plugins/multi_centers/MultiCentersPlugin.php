@@ -2,7 +2,7 @@
 /**
  * @package plugins.multiCenters
  */
-class MultiCentersPlugin extends KalturaPlugin implements IKalturaServices, IKalturaConfigurator
+class MultiCentersPlugin extends KalturaPlugin implements IKalturaServices
 {
 	const PLUGIN_NAME = 'multiCenters';
 	
@@ -20,19 +20,5 @@ class MultiCentersPlugin extends KalturaPlugin implements IKalturaServices, IKal
 			'filesyncImportBatch' => 'FileSyncImportBatchService',
 		);
 		return $map;
-	}
-		
-	/* (non-PHPdoc)
-	 * @see IKalturaConfigurator::getConfig()
-	 */
-	public static function getConfig($configName)
-	{
-		if($configName == 'generator')
-			return new Zend_Config_Ini(dirname(__FILE__) . '/config/generator.ini');
-	
-		if($configName == 'testme')
-			return new Zend_Config_Ini(dirname(__FILE__) . '/config/testme.ini');
-			
-		return null;
 	}
 }

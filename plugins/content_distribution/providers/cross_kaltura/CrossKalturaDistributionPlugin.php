@@ -2,7 +2,7 @@
 /**
  * @package plugins.crossKalturaDistribution
  */
-class CrossKalturaDistributionPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaEnumerator, IKalturaPending, IKalturaObjectLoader, IKalturaContentDistributionProvider, IKalturaConfigurator, IKalturaEventConsumers
+class CrossKalturaDistributionPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaEnumerator, IKalturaPending, IKalturaObjectLoader, IKalturaContentDistributionProvider, IKalturaEventConsumers
 {
     
 	const PLUGIN_NAME = 'crossKalturaDistribution';
@@ -172,17 +172,6 @@ class CrossKalturaDistributionPlugin extends KalturaPlugin implements IKalturaPe
 	public static function getApiValue($valueName)
 	{
 		return self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
-	}
-	
-	/* (non-PHPdoc)
-	 * @see IKalturaConfigurator::getConfig()
-	 */
-	public static function getConfig($configName)
-	{
-		if($configName == 'generator')
-			return new Zend_Config_Ini(dirname(__FILE__) . '/config/generator.ini');
-			
-		return null;
 	}
 	
 	/* (non-PHPdoc)

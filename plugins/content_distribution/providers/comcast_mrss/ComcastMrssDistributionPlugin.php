@@ -2,7 +2,7 @@
 /**
  * @package plugins.comcastMrssDistribution
  */
-class ComcastMrssDistributionPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaEnumerator, IKalturaPending, IKalturaObjectLoader, IKalturaContentDistributionProvider, IKalturaEventConsumers, IKalturaServices, IKalturaConfigurator
+class ComcastMrssDistributionPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaEnumerator, IKalturaPending, IKalturaObjectLoader, IKalturaContentDistributionProvider, IKalturaEventConsumers, IKalturaServices
 {
 	const PLUGIN_NAME = 'comcastMrssDistribution';
 	const COMCAST_MRSS_EVENT_CONSUMER = "kComcastMrssFlowManager";
@@ -189,19 +189,5 @@ class ComcastMrssDistributionPlugin extends KalturaPlugin implements IKalturaPer
 		return array(
 			'comcastMrss' => 'ComcastMrssService'
 		);
-	}
-
-	/* (non-PHPdoc)
-	 * @see IKalturaConfigurator::getConfig()
-	 */
-	public static function getConfig($configName)
-	{
-		if($configName == 'generator')
-			return new Zend_Config_Ini(dirname(__FILE__) . '/config/generator.ini');
-	
-		if($configName == 'testme')
-			return new Zend_Config_Ini(dirname(__FILE__) . '/config/testme.ini');
-			
-		return null;
 	}
 }

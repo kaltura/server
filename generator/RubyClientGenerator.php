@@ -1,13 +1,9 @@
 <?php
 class RubyClientGenerator extends ClientGeneratorFromXml
 {
-	private $_doc = null;
-	
 	function __construct($xmlPath, Zend_Config $config, $sourcePath = "sources/ruby")
 	{
 		parent::__construct($xmlPath, $sourcePath, $config);
-		$this->_doc = new KDOMDocument();
-		$this->_doc->load($this->_xmlFile);
 	}
 	
 	function getSingleLineCommentMarker()
@@ -127,6 +123,9 @@ class RubyClientGenerator extends ClientGeneratorFromXml
 	function writeEnum(DOMElement $enumNode)
 	{
 		$enumName = $enumNode->getAttribute("name");
+		if(!$this->shouldIncludeType($enumName))
+			return;
+		
 	 	$this->appendLine("	class $enumName");		
 		
 		foreach($enumNode->childNodes as $constNode)
@@ -149,6 +148,8 @@ class RubyClientGenerator extends ClientGeneratorFromXml
 	function writeClass(DOMElement $classNode)
 	{
 		$type = $classNode->getAttribute("name");
+		if(!$this->shouldIncludeType($type))
+			return;
 		
 		// comments
 		$this->writeComments("	# ", $classNode);
@@ -234,8 +235,11 @@ class RubyClientGenerator extends ClientGeneratorFromXml
 	
 	function writeService(DOMElement $serviceNode)
 	{
-		$serviceName = $serviceNode->getAttribute("name");
 		$serviceId = $serviceNode->getAttribute("id");
+		if(!$this->shouldIncludeService($serviceId))
+			return;
+			
+		$serviceName = $serviceNode->getAttribute("name");
 		$serviceClassName = "Kaltura".$this->upperCaseFirstLetter($serviceName)."Service";
 		
 		$this->appendLine();
@@ -262,6 +266,9 @@ class RubyClientGenerator extends ClientGeneratorFromXml
 	function writeAction($serviceId, DOMElement $actionNode)
 	{
 		$action = $actionNode->getAttribute("name");
+		if(!$this->shouldIncludeAction($serviceId, $action))
+			return;
+		
 		$resultNode = $actionNode->getElementsByTagName("result")->item(0);
 		$resultType = $resultNode->getAttribute("type");
 		
@@ -374,6 +381,9 @@ class RubyClientGenerator extends ClientGeneratorFromXml
 		$this->appendLine("	class KalturaClient < KalturaClientBase");
 		foreach($serviceNodes as $serviceNode)
 		{
+			if(!$this->shouldIncludeService($serviceNode->getAttribute("id")))
+				continue;
+				
 			$serviceName = $serviceNode->getAttribute("name");
 			$rubyServiceName = $this->camelCaseToUnderscoreAndLower($serviceName."Service");
 			$serviceClass = "Kaltura".$this->upperCaseFirstLetter($serviceName)."Service";

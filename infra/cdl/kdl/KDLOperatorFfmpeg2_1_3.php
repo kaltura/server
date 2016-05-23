@@ -11,27 +11,33 @@ class KDLOperatorFfmpeg2_1_3 extends KDLOperatorFfmpeg1_1_1 {
     public function generateSinglePassCommandLine(KDLFlavor $design, KDLFlavor $target, $extra=null)
 	{
 		$cmdStr = parent::generateSinglePassCommandLine($design, $target, $extra);
+		$cmdValsArr = explode(' ', $cmdStr);
+		
 		/*
 		 * On multi-lingual, add:
-		* - explicit mapping for video (if required)
-		* - the required audio channels
-		*/
+		 * - explicit mapping for video (if required)
+		 * - the required audio channels
+		 */
 		if(isset($target->_audio) && isset($target->_multiStream->audio->languages)
 				&& count($target->_multiStream->audio->languages)>0){
+			$auxArr = array();
 			if(isset($target->_video)) {
-				$cmdStr.= " -map v";
+				$auxArr[] = "-map v";
 			}
 			// Add language prop to the mapped output audio streams
 			$langIdx = 0;
 			foreach ($target->_multiStream->audio->languages as $lang){
-				$cmdStr.= " -map 0:".$lang->id;
-				$cmdStr.= " -metadata:s:a:$langIdx language=$lang->audioLanguage";
+				$auxArr[] = "-map 0:".$lang->id;
+				$auxArr[] = "-metadata:s:a:$langIdx language=$lang->audioLanguage";
 				$langIdx++;
 			}
+			$insertHere = array_search('-y', $cmdValsArr);
+			array_splice ($cmdValsArr, $insertHere, 0, $auxArr);
 		}
 		
-		$cmdValsArr = explode(' ', $cmdStr);
-		
+		/*
+		 * Watermarking ...
+		 */
 		if(isset($target->_video->_watermarkData)) {
 				
 				// Fading requires looping of the WM image
@@ -71,6 +77,7 @@ class KDLOperatorFfmpeg2_1_3 extends KDLOperatorFfmpeg1_1_1 {
 		 */
 		if(isset($target->_video->_subtitlesData->action) && $target->_video->_subtitlesData->action=='embed'){
 			$subsData = $target->_video->_subtitlesData;
+			$auxArr = array();
 			$auxArr[] = '-i';
 			$insertHere = end(array_keys($cmdValsArr, '-i'))+2;
 			if(isset($subsData->filename))

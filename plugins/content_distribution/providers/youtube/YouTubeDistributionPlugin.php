@@ -2,7 +2,7 @@
 /**
  * @package plugins.youTubeDistribution
  */
-class YouTubeDistributionPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaEnumerator, IKalturaPending, IKalturaObjectLoader, IKalturaContentDistributionProvider, IKalturaEventConsumers, IKalturaConfigurator
+class YouTubeDistributionPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaEnumerator, IKalturaPending, IKalturaObjectLoader, IKalturaContentDistributionProvider, IKalturaEventConsumers
 {
 	const PLUGIN_NAME = 'youTubeDistribution';
 	const CONTENT_DSTRIBUTION_VERSION_MAJOR = 2;
@@ -257,16 +257,5 @@ class YouTubeDistributionPlugin extends KalturaPlugin implements IKalturaPermiss
 	public static function getApiValue($valueName)
 	{
 		return self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
-	}
-	
-	/* (non-PHPdoc)
-	 * @see IKalturaConfigurator::getConfig()
-	 */
-	public static function getConfig($configName)
-	{
-		if($configName == 'generator')
-			return new Zend_Config_Ini(dirname(__FILE__) . '/config/generator.ini');
-			
-		return null;
 	}
 }

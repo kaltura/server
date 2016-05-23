@@ -102,6 +102,9 @@ class JsClientGenerator extends ClientGeneratorFromXml
 	protected function writeEnum(SimpleXMLElement $enumNode)
 	{
 		$className = $enumNode->attributes()->name;
+		if(!$this->shouldIncludeType($className))
+			return;
+		
 		$this->echoLine ($this->enumTypes, "\r\nfunction " . $className . "(){");
 		$this->echoLine ($this->enumTypes, "}");
 		//parse the constants
@@ -124,9 +127,12 @@ class JsClientGenerator extends ClientGeneratorFromXml
 	*/
 	protected function writeObjectClass(SimpleXMLElement $classNode)
 	{
+		$clasName = $classNode->attributes()->name;
+		if(!$this->shouldIncludeType($clasName))
+			return;
+				
 		$classDesc = "/**\r\n";
 		$classCode = "";
-		$clasName = $classNode->attributes()->name;
 		$this->echoLine ($classCode, "function $clasName(){");
 		//parse the class properties
 		foreach($classNode->children() as $classProperty) {
@@ -165,8 +171,11 @@ class JsClientGenerator extends ClientGeneratorFromXml
 	*/
 	protected function writeService(SimpleXMLElement $serviceNodes)
 	{
-		$serviceName = $serviceNodes->attributes()->name;
 		$serviceId = $serviceNodes->attributes()->id;
+		if(!$this->shouldIncludeService($serviceId))
+			continue;
+				
+		$serviceName = $serviceNodes->attributes()->name;
 		$serviceClassName = "Kaltura".$this->upperCaseFirstLetter($serviceName)."Service";
 		$serviceClass = "function $serviceClassName(client){\r\n";
 		$serviceClass .= "\tthis.init(client);\r\n";
@@ -353,6 +362,9 @@ class JsClientGenerator extends ClientGeneratorFromXml
 		
 		foreach($servicesNodes as $service_node)
 		{
+			if(!$this->shouldIncludeService($service_node->attributes()->id))
+				continue;
+				
 			$serviceName = $service_node->attributes()->name;
 			$serviceClassName = "Kaltura".$this->upperCaseFirstLetter($serviceName)."Service";
 			$this->echoLine($this->mainClass, "/**");

@@ -12,11 +12,13 @@ class YoutubeApiDistributionProfile extends ConfigurableDistributionProfile
 	const CUSTOM_DATA_ALLOW_RATINGS = 'allowRatings';
 	const CUSTOM_DATA_ALLOW_RESPONSES = 'allowResponses';
 	const CUSTOM_DATA_ASSUME_SUCCESS = 'assumeSuccess';
+	const CUSTOM_DATA_PRIVACY_STATUS = 'privacyStatus';
 
 	const METADATA_FIELD_DESCRIPTION = 'YoutubeDescription';
 	const METADATA_FIELD_CATEGORY = 'YoutubeCategory';
 	const METADATA_FIELD_TAGS = 'YoutubeKeywords';
 	const METADATA_FIELD_PLAYLIST_IDS = 'YoutubePlaylistIds';
+	const METADATA_FIELD_PRIVACY_STATUS = 'YoutubePrivacyStatus';
 	
 	const MEDIA_TITLE_MAXIMUM_LENGTH = 100;
 	const MEDIA_DESCRIPTION_MAXIMUM_LENGTH = 5000;
@@ -138,6 +140,7 @@ class YoutubeApiDistributionProfile extends ConfigurableDistributionProfile
 	public function getAllowRatings()			{return $this->getFromCustomData(self::CUSTOM_DATA_ALLOW_RATINGS);}
 	public function getAllowResponses()			{return $this->getFromCustomData(self::CUSTOM_DATA_ALLOW_RESPONSES);}
 	public function getAssumeSuccess()			{return (bool) $this->getFromCustomData(self::CUSTOM_DATA_ASSUME_SUCCESS);}
+	public function getPrivacyStatus()			{return $this->getFromCustomData(self::CUSTOM_DATA_PRIVACY_STATUS, null, 'public');}
 
 	public function setUsername($v)				{$this->putInCustomData(self::CUSTOM_DATA_USERNAME, $v);}
 	public function setDefaultCategory($v)		{$this->putInCustomData(self::CUSTOM_DATA_DEFAULT_CATEGORY, $v);}
@@ -146,6 +149,7 @@ class YoutubeApiDistributionProfile extends ConfigurableDistributionProfile
 	public function setAllowRatings($v)			{$this->putInCustomData(self::CUSTOM_DATA_ALLOW_RATINGS, $v);}
 	public function setAllowResponses($v)		{$this->putInCustomData(self::CUSTOM_DATA_ALLOW_RESPONSES, $v);}
 	public function setAssumeSuccess($v)		{$this->putInCustomData(self::CUSTOM_DATA_ASSUME_SUCCESS, $v);}
+	public function setPrivacyStatus($v)		{$this->putInCustomData(self::CUSTOM_DATA_PRIVACY_STATUS, $v);}
 
 	
 	protected function getDefaultFieldConfigArray()
@@ -276,7 +280,23 @@ class YoutubeApiDistributionProfile extends ConfigurableDistributionProfile
 	    $fieldConfig->setUserFriendlyFieldName('Alternative Raw File Name ');
 	    $fieldConfig->setEntryMrssXslt(''); // Empty by default to indicate that the feature is switched off.
 	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
-	    
+
+		$fieldConfig = new DistributionFieldConfig();
+		$fieldConfig->setFieldName(YouTubeApiDistributionField::ENTRY_PRIVACY_STATUS);
+		$fieldConfig->setUserFriendlyFieldName('Entry Privacy Status');
+		$fieldConfig->setEntryMrssXslt(
+					'<xsl:choose>
+                    	<xsl:when test="customData/metadata/'.self::METADATA_FIELD_PRIVACY_STATUS.' != \'\'">
+                    		<xsl:value-of select="customData/metadata/'.self::METADATA_FIELD_PRIVACY_STATUS.'" />
+                    	</xsl:when>
+                    	<xsl:otherwise>
+                    		<xsl:value-of select="distribution[@entryDistributionId=$entryDistributionId]/privacy_status" />
+                    	</xsl:otherwise>
+                    </xsl:choose>'
+		);
+		$fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
+		
+		
 	    return $fieldConfigArray;
 	}
 	
@@ -316,4 +336,24 @@ class YoutubeApiDistributionProfile extends ConfigurableDistributionProfile
 		$url .= "?partnerId=".$this->getPartnerId();
 		return $url;
 	}
+
+	public function getOptionalAssetDistributionRules()
+	{
+		$ret = parent::getOptionalAssetDistributionRules();
+		if(!class_exists('CaptionPlugin') || !CaptionPlugin::isAllowedPartner($this->getPartnerId()))
+		{
+			return $ret;
+		}
+
+		$isCaptionCondition = new kAssetDistributionPropertyCondition();
+		$isCaptionCondition->setPropertyName(assetPeer::translateFieldName(assetPeer::TYPE, BasePeer::TYPE_COLNAME, BasePeer::TYPE_PHPNAME));
+		$isCaptionCondition->setPropertyValue(CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION));
+
+		$captionDistributionRule = new kAssetDistributionRule();
+		$captionDistributionRule->setAssetDistributionConditions(array($isCaptionCondition));
+		$ret[] = $captionDistributionRule;
+
+		return $ret;
+	}
+	
 }

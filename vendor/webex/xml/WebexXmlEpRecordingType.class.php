@@ -134,6 +134,12 @@ class WebexXmlEpRecordingType extends WebexXmlRequestType
 	 * @var long
 	 */
 	protected $confID;
+
+	/**
+	 *
+	 * @var string
+	 */
+	protected $password;
 	
 	/* (non-PHPdoc)
 	 * @see WebexXmlObject::getAttributeType()
@@ -207,6 +213,9 @@ class WebexXmlEpRecordingType extends WebexXmlRequestType
 	
 			case 'confID':
 				return 'long';
+
+			case 'password':
+				return 'string';
 	
 		}
 		
@@ -241,6 +250,7 @@ class WebexXmlEpRecordingType extends WebexXmlRequestType
 			'panelist',
 			'postRecordingSurvey',
 			'confID',
+			'password',
 		);
 	}
 	
@@ -623,6 +633,22 @@ class WebexXmlEpRecordingType extends WebexXmlRequestType
 	public function getConfID()
 	{
 		return $this->confID;
+	}
+
+	/**
+	 * @param string $password
+	 */
+	public function setPassword($password)
+	{
+		$this->password = $password;
+	}
+
+	/**
+	 * @return string $password
+	 */
+	public function getPassword()
+	{
+		return $this->password;
 	}
 	
 }

@@ -18,18 +18,19 @@ class LiveEntryServerNode extends EntryServerNode
 	{
 		$this->addTrackEntryInfo(TrackEntry::TRACK_ENTRY_EVENT_TYPE_ADD_MEDIA_SERVER, __METHOD__.":: serverType=".$this->getServerType().":serverNodeId=".$this->getServerNodeId().":status=".$this->getStatus().":dc=".$this->getDc());
 		
-		if($this->getServerType() === EntryServerNodeType::LIVE_PRIMARY)
+		$liveEntry = $this->getLiveEntry();
+		if($liveEntry)
 		{
-			$liveEntry = $this->getLiveEntry();
-			if($liveEntry)
+			if($this->getServerType() === EntryServerNodeType::LIVE_PRIMARY)
 			{
-					$liveEntry->setPrimaryServerNodeId($this->getServerNodeId());
-					
-					if(!$liveEntry->getCurrentBroadcastStartTime() && $this->getStatus() === EntryServerNodeStatus::AUTHENTICATED)
-						$liveEntry->setCurrentBroadcastStartTime(time());
-					
-					$liveEntry->save();
-			}	
+				$liveEntry->setPrimaryServerNodeId($this->getServerNodeId());
+				
+				if(!$liveEntry->getCurrentBroadcastStartTime() && $this->getStatus() === EntryServerNodeStatus::AUTHENTICATED)
+					$liveEntry->setCurrentBroadcastStartTime(time());
+			}
+			
+			if(!$liveEntry->save())
+				$liveEntry->indexToSearchIndex();
 		}
 		
 		parent::postInsert($con);
@@ -63,16 +64,13 @@ class LiveEntryServerNode extends EntryServerNode
 	 */
 	public function postDelete(PropelPDO $con = null)
 	{
-		$this->addTrackEntryInfo(TrackEntry::TRACK_ENTRY_EVENT_TYPE_DELETE_MEDIA_SERVER, __METHOD__);
+		$this->addTrackEntryInfo(TrackEntry::TRACK_ENTRY_EVENT_TYPE_DELETE_MEDIA_SERVER, __METHOD__.":: serverType=".$this->getServerType().":serverNodeId=".$this->getServerNodeId().":dc=".$this->getDc());
 		
 		$liveEntry = $this->getLiveEntry();
 		if($liveEntry)
 		{
 			if($this->getServerType() === EntryServerNodeType::LIVE_PRIMARY)
 			{
-				$liveEntry->setPrimaryServerNodeId(null);
-				
-				$entryServerNodes = EntryServerNodePeer::retrieveByEntryId($this->getEntryId());
 				if($liveEntry->getCurrentBroadcastStartTime())
 					$liveEntry->setCurrentBroadcastStartTime(0);
 			}
