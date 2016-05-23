@@ -69,7 +69,6 @@ abstract class KalturaEntryServerNode extends KalturaObject implements IRelatedF
 		"partnerId",
 		"createdAt",
 		"updatedAt",
-		"heartbeatTime",
 		"status",
 		"serverType"
 	);

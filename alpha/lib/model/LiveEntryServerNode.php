@@ -82,14 +82,19 @@ class LiveEntryServerNode extends EntryServerNode
 		parent::postDelete($con);
 	}
 
-	public function setStreams(KalturaLiveStreamParamsArray $v) 
+	public function setStreams(array $v) 
 	{ 
-		$this->putInCustomData(self::CUSTOM_DATA_STREAMS, $v); 
+		$this->putInCustomData(self::CUSTOM_DATA_STREAMS, serialize($v));
 	}
 	
 	public function getStreams()
 	{
-		return $this->getFromCustomData(self::CUSTOM_DATA_STREAMS);
+		$streams = $this->getFromCustomData(self::CUSTOM_DATA_STREAMS, null, array());
+		
+		if(count($streams))
+			$streams = unserialize($streams);
+		
+		return $streams;
 	}
 	
 	public function setApplicationName($v)
