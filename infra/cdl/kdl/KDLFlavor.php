@@ -516,9 +516,10 @@ $plannedDur = 0;
 			/*
 			 * For IMX sources, apply cropping of the top 32 pixs, if the flavor has the ImxCrop flag
 			 * 'IMX' ==> mxf/mpeg2 video/ 720x608
+			 * Turn off this flag for 'COPY' cases ('cropping' needs transcoding, it does not work for 'copy'
 			 */
 		if(isset($this->_video)){
-			if($this->_video->_isCropIMX==true
+			if($this->_video->_isCropIMX==true && $this->_video->_id!=KDLVideoTarget::COPY
 			&& isset($source->_container) && $source->_container->IsFormatOf(array("mxf")) 
 			&& isset($source->_video) && $source->_video->IsFormatOf(array("mpeg video","mpeg2video")) 
 			&& isset($source->_video->_width) && $source->_video->_width==720

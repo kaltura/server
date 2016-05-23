@@ -1,9 +1,4 @@
 <?php 
-	$config = new Zend_Config_Ini("../../config/testme.ini", null, array('allowModifications' => true));
-	$config = KalturaPluginManager::mergeConfigs($config, 'xsddoc', false);
-	$indexConfig = $config->get('xsddoc');
-	
-	$exclude = explode(',', $indexConfig->get("exclude"));
 	$schemaReflector = KalturaTypeReflectorCacher::get('KalturaSchemaType');
 	$schemas = $schemaReflector->getConstants();
 ?>

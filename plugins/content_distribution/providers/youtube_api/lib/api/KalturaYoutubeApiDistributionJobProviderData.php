@@ -99,7 +99,7 @@ class KalturaYoutubeApiDistributionJobProviderData extends KalturaConfigurableDi
 				KalturaLog::err("Asset [$assetId] has status [".$asset->getStatus()."]. not added to provider data");
 			}
 		}
-		
+
 		foreach ( $assets as $asset ) {
 			$assetType = $asset->getType ();
 			switch ($assetType) {

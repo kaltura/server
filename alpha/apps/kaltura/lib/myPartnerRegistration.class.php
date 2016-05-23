@@ -103,8 +103,9 @@ class myPartnerRegistration
 		if ($partner->getPartnerPackage() == PartnerPackages::PARTNER_PACKAGE_DEVELOPER)
 		{
 			if ($existingUser) {
-				$mailType = self::KALTURAS_DEVELOPER_EXISTING_USER_REGISTRATION_CONFIRMATION;
-				$bodyParams = array($loginEmail, $partnerId);
+				return; // emails will be sent via external system 
+				//$mailType = self::KALTURAS_DEVELOPER_EXISTING_USER_REGISTRATION_CONFIRMATION;
+				//$bodyParams = array($loginEmail, $partnerId);
 			}
 			else {
 				return; // emails will be sent via external system

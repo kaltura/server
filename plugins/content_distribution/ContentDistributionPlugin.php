@@ -2,7 +2,7 @@
 /**
  * @package plugins.contentDistribution
  */
-class ContentDistributionPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaServices, IKalturaEventConsumers, IKalturaEnumerator, IKalturaVersion, IKalturaSearchDataContributor, IKalturaObjectLoader, IKalturaAdminConsolePages, IKalturaApplicationPartialView, IKalturaPending, IKalturaConfigurator, IKalturaSchemaContributor
+class ContentDistributionPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaServices, IKalturaEventConsumers, IKalturaEnumerator, IKalturaVersion, IKalturaSearchDataContributor, IKalturaObjectLoader, IKalturaAdminConsolePages, IKalturaApplicationPartialView, IKalturaPending, IKalturaSchemaContributor
 {
 	const PLUGIN_NAME = 'contentDistribution';
 	const PLUGIN_VERSION_MAJOR = 2;
@@ -340,20 +340,6 @@ class ContentDistributionPlugin extends KalturaPlugin implements IKalturaPermiss
 	public static function getApiValue($valueName)
 	{
 		return self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
-	}
-
-	/* (non-PHPdoc)
-	 * @see IKalturaConfigurator::getConfig()
-	 */
-	public static function getConfig($configName)
-	{
-		if($configName == 'generator')
-			return new Zend_Config_Ini(dirname(__FILE__) . '/config/generator.ini');
-	
-		if($configName == 'testme')
-			return new Zend_Config_Ini(dirname(__FILE__) . '/config/testme.ini');
-			
-		return null;
 	}
 	
 	/* (non-PHPdoc)

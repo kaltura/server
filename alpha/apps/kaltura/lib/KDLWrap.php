@@ -674,10 +674,10 @@ class KDLWrap
 	 */
 	public static function ConvertMediainfoCdl2FlavorAsset(mediaInfo $cdlMediaInfo, flavorAsset &$fla)
 	{
-		KalturaLog::log("\nCDL mediaInfo==>\n".print_r($cdlMediaInfo,true));
+		KalturaLog::log("CDL mediaInfo==>\n".print_r($cdlMediaInfo,true));
 	  	$medSet = new KDLMediaDataSet();
 		self::ConvertMediainfoCdl2Mediadataset($cdlMediaInfo, $medSet);
-		KalturaLog::log("\nKDL mediaDataSet==>\n".print_r($medSet,true));
+		KalturaLog::log("KDL mediaDataSet==>\n".print_r($medSet,true));
 
 		$contBr = 0;
 		if(isset($medSet->_container)){
@@ -705,7 +705,16 @@ class KDLWrap
 		$assetBr = max($contBr,$vidBr+$audBr);
 		$fla->setBitrate($assetBr);
 
-		KalturaLog::log("\nCDL fl.Asset==>\n".print_r($fla,true));
+		/*
+		 * Set flavorAsset language to mediaInfo first audio language
+		 */
+		if(isset($medSet->_contentStreams->audio) && isset($medSet->_contentStreams->audio[0]->audioLanguage)){
+			$lang = $medSet->_contentStreams->audio[0]->audioLanguage;
+			KalturaLog::log("Flavor asset(".$fla->getId().") language updated to ($lang)");
+			$fla->setLanguage($lang);
+		}
+		
+		KalturaLog::log("CDL fl.Asset==>\n".print_r($fla,true));
 		return $fla;
 	}
 

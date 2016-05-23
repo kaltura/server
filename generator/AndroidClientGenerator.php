@@ -17,7 +17,7 @@ class AndroidClientGenerator extends JavaClientGenerator
 		$namePrefix = $this->normalizeSlashes($namePrefix);
 		foreach ($this->_files as $name => $data)
 		{
-			if (kString::beginsWith($name, $namePrefix))
+			if ($this->beginsWith($name, $namePrefix))
 				unset($this->_files[$name]);
 		}
 	}

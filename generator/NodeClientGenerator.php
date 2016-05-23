@@ -123,6 +123,9 @@ class NodeClientGenerator extends ClientGeneratorFromXml
 	protected function writeEnum(SimpleXMLElement $enumNode)
 	{
 		$className = $enumNode->attributes()->name;
+		if(!$this->shouldIncludeType($className))
+			return;
+		
 		$this->echoLine($this->enumTypes, "\nvar $className = module.exports.$className = {");
 		//parse the constants
 		foreach($enumNode->children() as $child)
@@ -146,9 +149,12 @@ class NodeClientGenerator extends ClientGeneratorFromXml
 	 */
 	protected function writeObjectClass(SimpleXMLElement $classNode)
 	{
+		$clasName = $classNode->attributes()->name;
+		if(!$this->shouldIncludeType($clasName))
+			return;
+				
 		$classDesc = "/**\n";
 		$classCode = "";
-		$clasName = $classNode->attributes()->name;
 		$this->echoLine($classCode, "function $clasName(){");
 		$this->echoLine($classCode, "	$clasName.super_.call(this);");
 		//parse the class properties
@@ -193,8 +199,11 @@ class NodeClientGenerator extends ClientGeneratorFromXml
 	 */
 	protected function writeService(SimpleXMLElement $serviceNodes)
 	{
-		$serviceName = $serviceNodes->attributes()->name;
 		$serviceId = $serviceNodes->attributes()->id;
+		if(!$this->shouldIncludeService($serviceId))
+			return;
+				
+		$serviceName = $serviceNodes->attributes()->name;
 		$serviceClassName = 'Kaltura' . $this->upperCaseFirstLetter($serviceName) . 'Service';
 		$serviceClass = "function $serviceClassName(client){\n";
 		$serviceClass .= "	$serviceClassName.super_.call(this);\n";
@@ -416,6 +425,9 @@ class NodeClientGenerator extends ClientGeneratorFromXml
 		
 		foreach($servicesNodes as $serviceNode)
 		{
+			if(!$this->shouldIncludeService($serviceNode->attributes()->id))
+				continue;
+					
 			$serviceName = $serviceNode->attributes()->name;
 			$serviceClassName = 'kaltura.services.Kaltura' . $this->upperCaseFirstLetter($serviceName) . 'Service';
 			$this->echoLine($this->mainClass, "/**");
@@ -439,6 +451,9 @@ class NodeClientGenerator extends ClientGeneratorFromXml
 		$this->echoLine($this->mainClass, "	//initialize client services:");
 		foreach($servicesNodes as $serviceNode)
 		{
+			if(!$this->shouldIncludeService($serviceNode->attributes()->id))
+				continue;
+		
 			$serviceName = $serviceNode->attributes()->name;
 			$serviceClassName = 'kaltura.services.Kaltura' . $this->upperCaseFirstLetter($serviceName) . 'Service';
 			$this->echoLine($this->mainClass, "	this.$serviceName = new $serviceClassName(this);");

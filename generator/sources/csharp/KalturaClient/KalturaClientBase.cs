@@ -440,7 +440,7 @@ namespace Kaltura
             {
                 requestStream.Write(fileDesc.Value._Header, 0, fileDesc.Value._Header.Length);
 
-                byte[] buffer = new Byte[checked(Math.Min((uint)4096, fileDesc.Value._Stream.Length))];
+                byte[] buffer = new Byte[checked(Math.Min((uint)1048576, fileDesc.Value._Stream.Length))];
                 int bytesRead = 0;
                 while ((bytesRead = fileDesc.Value._Stream.Read(buffer, 0, buffer.Length)) != 0)
                     requestStream.Write(buffer, 0, bytesRead);

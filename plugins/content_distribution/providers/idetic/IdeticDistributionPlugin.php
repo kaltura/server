@@ -2,7 +2,7 @@
 /**
  * @package plugins.ideticDistribution
  */
-class IdeticDistributionPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaEnumerator, IKalturaPending, IKalturaObjectLoader, IKalturaContentDistributionProvider, IKalturaEventConsumers, IKalturaConfigurator
+class IdeticDistributionPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaEnumerator, IKalturaPending, IKalturaObjectLoader, IKalturaContentDistributionProvider, IKalturaEventConsumers
 {
 	const PLUGIN_NAME = 'ideticDistribution';
 	const CONTENT_DSTRIBUTION_VERSION_MAJOR = 2;
@@ -242,16 +242,4 @@ class IdeticDistributionPlugin extends KalturaPlugin implements IKalturaPermissi
 	{
 		return self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
 	}
-	
-	/* (non-PHPdoc)
-	 * @see IKalturaConfigurator::getConfig()
-	 */
-	public static function getConfig($configName)
-	{
-		if($configName == 'generator')
-			return new Zend_Config_Ini(dirname(__FILE__) . '/config/generator.ini');
-			
-		return null;
-	}
-	
 }
