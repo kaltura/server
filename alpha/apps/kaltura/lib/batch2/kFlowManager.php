@@ -711,7 +711,7 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 	 */
 	public function objectDataChanged(BaseObject $object, $previousVersion = null, BatchJob $raisedJob = null)
 	{
-		return $this->doObjectAddedOrDataAdded($object, $raisedJob);	
+		return $this->doObjectAddedOrDataAdded($object, $raisedJob, false);	
 	}
 
 	/**
@@ -721,7 +721,7 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 	 * @throws Exception
 	 * @throws kCoreException
 	 */
-	protected function doObjectAddedOrDataAdded(BaseObject $object, BatchJob $raisedJob = null)
+	protected function doObjectAddedOrDataAdded(BaseObject $object, BatchJob $raisedJob = null, $createConvertJob = true)
 	{
 		$entry = $object->getentry();
 
@@ -752,7 +752,10 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 						{
 							$path = kFileSyncUtils::getLocalFilePathForKey($syncKey);
 						}
-						kJobsManager::addConvertProfileJob($raisedJob, $entry, $object->getId(), $path);
+						if ($createConvertJob)
+						{
+							kJobsManager::addConvertProfileJob($raisedJob, $entry, $object->getId(), $path);
+						}
 					}
 				}
 			} else
