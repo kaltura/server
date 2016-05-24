@@ -35,7 +35,7 @@ class DocumentServiceTest < Test::Unit::TestCase
     document_entry_filter = Kaltura::KalturaDocumentEntryFilter.new
     filter_pager = Kaltura::KalturaFilterPager.new      
     
-    document_list = @client.document_service.list(document_entry_filter, filter_pager) 
+    document_list = @client.documents_service.list(document_entry_filter, filter_pager) 
     assert_not_nil document_list.total_count   
   end
 end
