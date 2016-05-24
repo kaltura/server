@@ -118,21 +118,4 @@ abstract class KCopyingEngine
 	{
 		$this->lastCopyId = $lastCopyId;
 	}
-
-	/**
- 	 * @return int $lastCopyId
- 	 */
- 	public function getLastCreatedAt()
- 	{
- 		return $this->lastCreatedAt;
- 	}
- 
- 	/**
- 	 * @param int $lastCopyId
- 	 */
- 	protected function setLastCreatedAt($createdAt)
- 	{
- 		$this->lastCreatedAt = $createdAt;
- 	}	
-	
 }

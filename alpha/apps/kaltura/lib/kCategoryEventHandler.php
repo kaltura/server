@@ -39,11 +39,10 @@ class kCategoryEventHandler implements kObjectDeletedEventConsumer, kObjectCreat
 	
 	protected function deleteFromAggregationChannels (category $object, array $aggregationCatIds)
 	{
-		$aggregationCategories = categoryPeer::retrieveByPKs($aggregationCatIds);
-		foreach ($aggregationCategories as $aggregationCategory)
+		foreach ($aggregationCatIds as $aggregationCatId)
 		{
 			/* @var $aggregationCategory category */
-			$this->addDeleteAggregationCategoryEntryJob ($object, $aggregationCategory->getId());
+			$this->addDeleteAggregationCategoryEntryJob ($object, $aggregationCatId);
 		}
 	}
 	
@@ -61,7 +60,7 @@ class kCategoryEventHandler implements kObjectDeletedEventConsumer, kObjectCreat
 	public function shouldConsumeChangedEvent(BaseObject $object, array $modifiedColumns) {
 		if ($object instanceof categoryEntry && in_array(categoryEntryPeer::STATUS, $modifiedColumns)
 			&& $object->getStatus() == CategoryEntryStatus::ACTIVE
-			&& $object->getColumnsOldValue(categoryEntryPeer::STATUS) == CategoryEntryStatus::PENDING)
+			&& $object->getColumnsOldValue(categoryEntryPeer::STATUS) != CategoryEntryStatus::ACTIVE)
 		{
 			return true;
 		}
@@ -121,10 +120,9 @@ class kCategoryEventHandler implements kObjectDeletedEventConsumer, kObjectCreat
 	
 	protected function addToAggregationCategories (category $object, array $aggregationCatIds)
 	{
-		$aggregationCategories = categoryPeer::retrieveByPKs($aggregationCatIds);
-		foreach ($aggregationCategories as $aggregationCategory)
+		foreach ($aggregationCatIds as $aggregationCategoryId)
 		{
-			$this->addCopyJobToAggregationChannel ($object, $aggregationCategory->getId());
+			$this->addCopyJobToAggregationChannel ($object, $aggregationCategoryId);
 		}
 	}
 	

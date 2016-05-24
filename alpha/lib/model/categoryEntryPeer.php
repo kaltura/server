@@ -91,7 +91,7 @@ class categoryEntryPeer extends BasecategoryEntryPeer implements IRelatedObjectP
  		$c = new Criteria();
  		$c->addAnd(categoryEntryPeer::ENTRY_ID, $entryId);
  		$c->addAnd(categoryEntryPeer::CATEGORY_ID, $categoryIds, Criteria::IN);
- 		$c->addAnd(categoryEntryPeer::STATUS, CategoryEntryStatus::ACTIVE, Criteria::EQUAL);
+ 		$c->addAnd(categoryEntryPeer::STATUS, CategoryEntryStatus::ACTIVE);
  		
  		return categoryEntryPeer::doSelect($c);
  	}

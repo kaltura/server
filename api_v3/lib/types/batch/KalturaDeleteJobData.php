@@ -11,16 +11,6 @@ class KalturaDeleteJobData extends KalturaJobData
 	 */
 	public $filter;
 	
-	/**
- 	 * Additional parameters passed to the delete job in the form of key-value pairs
- 	 * @var KalturaKeyValueArray
- 	 */
- 	public $aggregationCategory;
- 	
- 	private static $mapBetweenObjects = array
- 	(
- 		'aggregationCategory',
- 	);
  	
  	/* (non-PHPdoc)
  	 * @see KalturaObject::getMapBetweenObjects()

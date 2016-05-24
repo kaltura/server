@@ -15,7 +15,7 @@ class KDeletingAggregationChannelEngine extends  KDeletingEngine
 		/* @var $jobData KalturaDeleteJobData */
 		parent::configure($partnerId, $jobData);
 
-		$this->publicAggregationChannel = $jobData->aggregationCategory;
+		$this->publicAggregationChannel = $jobData->filter->aggregationCategoriesMultiLikeAnd;
 		$this->excludedCategories = $this->retrievePublishingCategories ($jobData->filter);
 	}
 	

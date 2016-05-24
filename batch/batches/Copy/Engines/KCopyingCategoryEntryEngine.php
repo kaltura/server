@@ -17,8 +17,6 @@ class KCopyingCategoryEntryEngine extends KCopyingEngine
 	{
 		/* @var $filter KalturaCategoryEntryFilter */
 		$filter->orderBy = KalturaCategoryEntryOrderBy::CREATED_AT_ASC;
-		if ($this->getLastCreatedAt())
-			$filter->createdAtGreaterThanOrEqual = $this->getLastCreatedAt();
 		
 		$categoryEntryList = KBatchBase::$kClient->categoryEntry->listAction($filter, $this->pager);
 		if(!count($categoryEntryList->objects))
@@ -41,7 +39,6 @@ class KCopyingCategoryEntryEngine extends KCopyingEngine
 			
 		$lastCopyId = end($results);
 		$this->setLastCopyId($lastCopyId);
-		$this->setLastCreatedAt($results[count($results)-1]);
 		
 		return count($results);
 	}

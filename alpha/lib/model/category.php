@@ -72,7 +72,7 @@ class category extends Basecategory implements IIndexable, IRelatedObject
 	 * @return string
 	 */
 	public function getAggregationCategoriesIndexEngine () {
-		$categories = implode (' ', explode(',', $this->getAggregationCategories()));
+		$categories = str_replace(",", " ", $this->getAggregationCategories());
 		return $categories;
 	}
 
