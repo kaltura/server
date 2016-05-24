@@ -61,7 +61,7 @@ class KalturaConversionProfileAssetParams extends KalturaObject implements IRela
 	public $deletePolicy;
 	
 	/**
-	 * @var int
+	 * @var KalturaNullableBoolean
 	 */
 	public $isEncrypted;
 
