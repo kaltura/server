@@ -30,39 +30,62 @@ require 'uri'
 
 class AccessControlServiceTest < Test::Unit::TestCase
 
-	# this test create a access control object and reset the restrictions using and empty array.
+	# this test create a access control object and reset the rules using and empty array.
 	should "be able to send empty array to the api and reset the values" do
 
 		# cleaning up the list
-		access_control = Kaltura::KalturaAccessControl.new
+
+		country_uk = Kaltura::KalturaStringValue.new
+		country_uk.value = 'UK'
+
+		country_lk = Kaltura::KalturaStringValue.new
+		country_lk.value = 'LK'
+		
+		country_condition = Kaltura::KalturaCountryCondition.new
+		country_condition.values = []
+		country_condition.values << country_uk
+		country_condition.values << country_lk
+		
+		country_rule = Kaltura::KalturaRule.new
+		country_rule.actions = []
+		country_rule.actions << Kaltura::KalturaAccessControlBlockAction.new
+		country_rule.conditions = []
+		country_rule.conditions << country_condition
+
+		site = Kaltura::KalturaStringValue.new
+		site.value = 'http://www.kaltura.com'
+		
+		site_condition = Kaltura::KalturaSiteCondition.new
+		site_condition.values = []
+		site_condition.values << site
+		
+		site_rule = Kaltura::KalturaRule.new
+		site_rule.actions = []
+		site_rule.actions << Kaltura::KalturaAccessControlBlockAction.new
+		site_rule.conditions = []
+		site_rule.conditions << site_condition
+
+		access_control = Kaltura::KalturaAccessControlProfile.new
 		access_control.name = "kaltura_test"
 		access_control.is_default = Kaltura::KalturaNullableBoolean::FALSE_VALUE
 
-		access_control.restrictions = []
-
-		restriction1 = Kaltura::KalturaCountryRestriction.new
-		restriction1.country_restriction_type = Kaltura::KalturaCountryRestrictionType::RESTRICT_COUNTRY_LIST
-		restriction1.country_list = 'UK,LK'
-		access_control.restrictions << restriction1
-
-		restriction2 = Kaltura::KalturaSiteRestriction.new
-		restriction2.site_restriction_type = Kaltura::KalturaSiteRestrictionType::RESTRICT_SITE_LIST
-		restriction2.site_list = 'http://www.kaltura.com'
-		access_control.restrictions << restriction2
-
-		created_access_control = @client.access_control_service.add(access_control)
+		access_control.rules = []
+		access_control.rules << country_rule
+		access_control.rules << site_rule
+		
+		created_access_control = @client.access_control_profile_service.add(access_control)
 
 		assert_not_nil created_access_control.id
-		assert_equal created_access_control.restrictions.size, 2
+		assert_equal created_access_control.rules.size, 2
 
 		# edited access control
-		edited_access_control = Kaltura::KalturaAccessControl.new
+		edited_access_control = Kaltura::KalturaAccessControlProfile.new
 		edited_access_control.name = access_control.name
-		edited_access_control.restrictions = []
+		edited_access_control.rules = []
 
-		updated_access_control = @client.access_control_service.update(created_access_control.id, edited_access_control)
+		updated_access_control = @client.access_control_profile_service.update(created_access_control.id, edited_access_control)
 
-		assert_equal updated_access_control.restrictions, nil
-		assert_nil @client.access_control_service.delete(updated_access_control.id)
+		assert_equal updated_access_control.rules, nil
+		assert_nil @client.access_control_profile_service.delete(updated_access_control.id)
 	end
 end

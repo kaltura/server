@@ -30,6 +30,7 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 {
 	protected $tempXmlPath;
 	protected $timeout = 90;
+	protected  $processedTimeout = 300;
 	
 	/* (non-PHPdoc)
 	 * @see DistributionEngine::configure()
@@ -58,6 +59,9 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 		{
 			if (isset(KBatchBase::$taskConfig->params->youtubeApi->timeout))
 				$this->timeout = KBatchBase::$taskConfig->params->youtubeApi->timeout;
+
+			if (isset(KBatchBase::$taskConfig->params->youtubeApi->processedTimeout))
+				$this->processedTimeout = KBatchBase::$taskConfig->params->youtubeApi->processedTimeout;
 		}
 		
 		KalturaLog::info('Request timeout was set to ' . $this->timeout . ' seconds');
@@ -297,9 +301,9 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 			while (!$this->isVideoReady($youtube, $data->remoteId))
 			{
 				sleep(self::TIME_TO_WAIT_FOR_YOUTUBE_TRANSCODING);
-				if ( (time() - $startCheckingReadyTime) > $this->timeout )
+				if ( (time() - $startCheckingReadyTime) > $this->processedTimeout )
 				{
-					throw Exception("Video transcoding on youtube has timed out");
+					throw new Exception("Video transcoding on youtube has timed out");
 				}
 			}
 		}
@@ -623,7 +627,7 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 				case "failed":
 					throw new Exception("Video has failed on youtube, reason [".$videoStatus['failureReason']."]");
 					break;					
-				default:
+				default: 
 					return false;
 					break;
 			}

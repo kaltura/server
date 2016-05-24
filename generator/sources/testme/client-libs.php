@@ -51,8 +51,9 @@
 			?>
 			<body class="body-bg">
 				<ul id="kmcSubMenu">
-					<li><a href="index.php">Test Console</a></li>
-					<li><a href="../testmeDoc/index.php">API Documentation</a></li>
+					<li><a href="index.html">Test Console</a></li>
+					<li><a href="../testmeDoc/">API Documentation</a></li>
+					<li><a href="../xsdDoc/">XML Schema</a></li>
 					<li class="active"><a href="#">API Client Libraries</a></li>
 				</ul>	
 			<?php
