@@ -22,8 +22,8 @@ if(!isset($_REQUEST['hideMenu']) || !$_REQUEST['hideMenu'])
 	?>
 		<body class="body-bg">
 		<ul id="kmcSubMenu">
-			<li><a href="../testme/index.php">Test Console</a></li>
-			<li><a href="../testmeDoc/index.php">API Documentation</a></li>
+			<li><a href="../testme/">Test Console</a></li>
+			<li><a href="../testmeDoc/">API Documentation</a></li>
 			<li class="active"><a href="#">XML Schema</a></li>
 			<li><a href="../testme/client-libs.php">API Client Libraries</a></li>
 		</ul>
