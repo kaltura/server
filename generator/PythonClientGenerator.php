@@ -81,27 +81,38 @@ class PythonClientGenerator extends ClientGeneratorFromXml
 		$enums = array();
 		foreach($enumNodes as $enumNode)
 		{
+			$type = $enumNode->getAttribute("name");
+			if(!$this->shouldIncludeType($type))
+				continue;
+			
 			if($enumNode->hasAttribute('plugin') && $pluginName == '')
 				continue;
 				
 			$this->writeEnum($enumNode);
-			$enums[] = $enumNode->getAttribute("name");
+			$enums[] = $type;
 		}
 	
 		$this->appendLine('########## classes ##########');
 		$classes = array();
 		foreach($classNodes as $classNode)
 		{
+			$type = $classNode->getAttribute("name");
+			if(!$this->shouldIncludeType($type))
+				continue;
+			
 			if($classNode->hasAttribute('plugin') && $pluginName == '')
 				continue;
 				
 			$this->writeClass($classNode);
-			$classes[] = $classNode->getAttribute("name");
+			$classes[] = $type;
 		}
 	
 		$this->appendLine('########## services ##########');
 		foreach($serviceNodes as $serviceNode)
 		{
+			if(!$this->shouldIncludeService($serviceNode->getAttribute("id")))
+				continue;
+			
 			if($serviceNode->hasAttribute('plugin') && $pluginName == '')
 				continue;
 				
@@ -171,9 +182,6 @@ class PythonClientGenerator extends ClientGeneratorFromXml
 	function writeEnum(DOMElement $enumNode)
 	{
 		$enumName = $enumNode->getAttribute("name");
-		if(!$this->shouldIncludeType($enumName))
-			return;
-		
 		$enumBase = "object";
 		
 		if($this->generateDocs)
@@ -242,8 +250,6 @@ class PythonClientGenerator extends ClientGeneratorFromXml
 	function writeClass(DOMElement $classNode)
 	{
 		$type = $classNode->getAttribute("name");
-		if(!$this->shouldIncludeType($type))
-			return;
 		
 		if($this->generateDocs)
 		{
