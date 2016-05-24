@@ -954,7 +954,7 @@ class ObjCClientGenerator extends ClientGeneratorFromXml
 		$services = array();
 		foreach($serviceNamesNodes as $serviceNode)
 		{
-			if($serviceNode->hasAttribute('plugin') && $pluginName == '')
+			if($serviceNode->hasAttribute('plugin') && $pluginName == '' || !$this->shouldIncludeService(strtolower($serviceNode->getAttribute("name"))) )
 				continue;
 				
 			$services[] = $serviceNode->getAttribute("name");
