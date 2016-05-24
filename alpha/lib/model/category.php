@@ -24,7 +24,12 @@ class category extends Basecategory implements IIndexable, IRelatedObject
 	
 	protected $move_entries_to_parent_category = null;
 	
+	
 	const CATEGORY_ID_THAT_DOES_NOT_EXIST = 0;
+	
+	const IS_AGGREGATION_CATEGORY = 'isAggregationCategory';
+	
+	const AGGREGATION_CATEGORIES = 'aggregationCategories';
 	
 	const FULL_NAME_EQUAL_MATCH_STRING = 'fullnameequalmatchstring';
 	
@@ -49,6 +54,42 @@ class category extends Basecategory implements IIndexable, IRelatedObject
 	 */
 	protected static $incrementedEntryIds = array();
 	
+	/**
+	 * @return bool
+	 */
+	public function getIsAggregationCategory() {
+		return $this->getFromCustomData(self::IS_AGGREGATION_CATEGORY, null, false);
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getAggregationCategories() {
+		return $this->getFromCustomData(self::AGGREGATION_CATEGORIES, null, "");
+	}
+	
+	/**
+	 * @return string
+	 */
+	public function getAggregationCategoriesIndexEngine () {
+		$categories = str_replace(",", " ", $this->getAggregationCategories());
+		return $categories;
+	}
+
+	/**
+	 * @param bool $v
+	 */
+	public function setIsAggregationCategory($v) {
+		$this->putInCustomData(self::IS_AGGREGATION_CATEGORY, $v);
+	}
+
+	/**
+	 * @param string $value
+	 */
+	public function setAggregationCategories($value) {
+		$this->putInCustomData(self::AGGREGATION_CATEGORIES, $value);
+	}
+
 	public function save(PropelPDO $con = null)
 	{
 		if ($this->isNew())
@@ -1353,6 +1394,8 @@ class category extends Basecategory implements IIndexable, IRelatedObject
 	{
 		return $this->getFromCustomData("defaultOrderBy");
 	}
+	
+	
 	
 	/**
 	 * reset category's Depth by calculate it.
