@@ -767,18 +767,15 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 	 */
 	public function objectDataChanged(BaseObject $object, $previousVersion = null, BatchJob $raisedJob = null)
 	{
-		$entry = $object->getentry();
-
-		if ($object->getStatus() == asset::FLAVOR_ASSET_STATUS_QUEUED)
+		if ($object instanceof flavorAsset)
 		{
-			if (!($object instanceof flavorAsset))
+			if ($object->getStatus() == asset::FLAVOR_ASSET_STATUS_QUEUED)
 			{
-				$object->setStatus(asset::FLAVOR_ASSET_STATUS_READY);
-				$object->save();
-			} elseif (!$object->getIsOriginal())
-			{
-				$object->setStatus(asset::FLAVOR_ASSET_STATUS_VALIDATING);
-				$object->save();
+				if (!$object->getIsOriginal())
+				{
+					$object->setStatus(asset::FLAVOR_ASSET_STATUS_VALIDATING);
+					$object->save();
+				}
 			}
 		}
 		return true;
