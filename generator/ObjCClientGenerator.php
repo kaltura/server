@@ -947,14 +947,14 @@ class ObjCClientGenerator extends ClientGeneratorFromXml
 		{
 			if($serviceNode->hasAttribute('plugin') && $pluginName == '')
 				continue;
-
+				
 			$this->writeService($serviceNode);
 		}
 		
 		$services = array();
 		foreach($serviceNamesNodes as $serviceNode)
 		{
-			if($serviceNode->hasAttribute('plugin') && $pluginName == '' || ($this->shouldExcludeService($serviceNode->getAttribute("name")) ))
+			if($serviceNode->hasAttribute('plugin') && $pluginName == '')
 				continue;
 				
 			$services[] = $serviceNode->getAttribute("name");
@@ -1041,12 +1041,12 @@ class ObjCClientGenerator extends ClientGeneratorFromXml
 		parent::generate();
 	
 		$xpath = new DOMXPath($this->_doc);
-
+				
 		$enumNodes = $xpath->query("/xml/enums/enum");
 		$classNodes = $xpath->query("/xml/classes/class");
 		$serviceNodes = $xpath->query("/xml/services/service");
 		$this->writePlugin('', $enumNodes, $classNodes, $serviceNodes, $serviceNodes);
-
+		
 		// plugins
 		$pluginNodes = $xpath->query("/xml/plugins/plugin");
 		foreach($pluginNodes as $pluginNode)
@@ -1058,7 +1058,7 @@ class ObjCClientGenerator extends ClientGeneratorFromXml
 			$serviceNamesNodes = $xpath->query("/xml/plugins/plugin[@name = '$pluginName']/pluginService");
 			$this->writePlugin($pluginName, $enumNodes, $classNodes, $serviceNodes, $serviceNamesNodes);
 		}
-
+		
 		$this->writeProjectFile();
 	}		
 }
