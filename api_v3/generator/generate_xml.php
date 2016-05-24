@@ -43,7 +43,9 @@ else
 	$outputPathBase = "$root/content/clientlibs";
 }
 
-kFile::fullMkdir($outputPathBase);
+if(!file_exists($outputPathBase))
+	mkdir($outputPathBase, 0777, true);
+
 $xmlFileName = "$outputPathBase/KalturaClient.xml";
 
 KalturaLog::info("Using code introspection to generate XML schema");
