@@ -62,6 +62,6 @@ class flavorParamsConversionProfile extends BaseflavorParamsConversionProfile
 		}
 	}
 	public function setIsEncrypted($v)	{$this->putInCustomData('IsEncrypted', $v);}
-	public function getIsEncrypted()	{return $this->getFromCustomData('IsEncrypted', null, 0);}
+	public function getIsEncrypted()	{return $this->getFromCustomData('IsEncrypted', null, null);}
 
 }
