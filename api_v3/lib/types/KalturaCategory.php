@@ -10,7 +10,7 @@ class KalturaCategory extends KalturaObject implements IRelatedFilterable
 	 * 
 	 * @var int
 	 * @readonly
-	 * @filter eq,in
+	 * @filter eq,in,notin
 	 */
 	public $id;
 	
