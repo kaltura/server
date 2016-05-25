@@ -83,7 +83,6 @@ class categoryIndex extends BaseIndexObject
 				'deleted_at' => 'deletedAt',
 				'partner_sort_value' => 'partnerSortValue',
 				'sphinx_match_optimizations' => 'sphinxMatchOptimizations',
-				'aggregation_categories' => 'aggregationCategoriesIndexEngine',
 			);
 		}
 		return self::$fieldsMap;
@@ -131,7 +130,6 @@ class categoryIndex extends BaseIndexObject
 				'partner_sort_value' => IIndexable::FIELD_TYPE_INTEGER,
 				'dynamic_attributes' => IIndexable::FIELD_TYPE_JSON,
 				'sphinx_match_optimizations' => IIndexable::FIELD_TYPE_STRING,
-				'aggregation_categories' => IIndexable::FIELD_TYPE_STRING,
 			);
 		}
 		return self::$typesMap;
@@ -198,7 +196,6 @@ class categoryIndex extends BaseIndexObject
 				'category.PARTNER_SORT_VALUE' => 'partner_sort_value',
 				'category.DYNAMIC_ATTRIBUTES' => 'dynamic_attributes',
 				'category.SPHINX_MATCH_OPTIMIZATIONS' => 'sphinx_match_optimizations',
-				'category.AGGREGATION_CATEGORIES' => 'aggregation_categories',
 			);
 		}
 		return self::$searchableFieldsMap;
@@ -246,7 +243,6 @@ class categoryIndex extends BaseIndexObject
 				"free_text",
 				"members",
 				"privacy_context",
-				"aggregation_categories",
 			);
 		}
 		return self::$matchableFields;
