@@ -326,7 +326,8 @@ index kaltura_category
 	rt_attr_timestamp = deleted_at
 	rt_attr_bigint = partner_sort_value
 	rt_attr_json = dynamic_attributes
-	rt_field = sphinx_match_optimizations	
+	rt_field = sphinx_match_optimizations
+	rt_field = aggregation_categories	
 }
 
 index kaltura_kuser:kaltura_kuser_base
