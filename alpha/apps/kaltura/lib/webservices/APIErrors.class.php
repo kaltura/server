@@ -56,7 +56,7 @@ class APIErrors
 			{
 				// Map the arg's name to its value
 				// NOTE: N/A means there was a mismatch in the number of supplied arguments (i.e. a bug in the calling code)
-				$argsDictionary[ $paramNames[$i] ] = isset( $errorArgsArray[$i] ) ? $errorArgsArray[$i] : "N/A";
+				$argsDictionary[ $paramNames[$i] ] = isset( $errorArgsArray[$i] ) ? strip_tags($errorArgsArray[$i]) : "N/A";
 	
 				// Replace the arg's placeholder with its value in the destination string
 				$message = str_replace("@{$paramNames[$i]}@", $argsDictionary[ $paramNames[$i] ], $message);

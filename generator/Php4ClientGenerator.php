@@ -133,7 +133,8 @@ class Php4ClientGenerator extends ClientGeneratorFromXml
 	
 	function writeService(DOMElement $serviceNode)
 	{
-		if(!$this->shouldIncludeService($serviceNode->getAttribute("id")))
+		$serviceId = $serviceNode->getAttribute("id");
+		if(!$this->shouldIncludeService($serviceId))
 			return;
 			
 		$serviceName = $serviceNode->getAttribute("name");
@@ -153,12 +154,12 @@ class Php4ClientGenerator extends ClientGeneratorFromXml
 		    if ($actionNode->nodeType != XML_ELEMENT_NODE)
 				continue;
 				
-		    $this->writeAction($serviceName, $actionNode);
+		    $this->writeAction($serviceId, $serviceName, $actionNode);
 		}
 		$this->appendLine("}");
 	}
 	
-	function writeAction($serviceName, DOMElement $actionNode)
+	function writeAction($serviceId, $serviceName, DOMElement $actionNode)
 	{
 	    $action = $actionNode->getAttribute("name");
 	    if(!$this->shouldIncludeAction($serviceId, $action))
