@@ -10,6 +10,7 @@ abstract class KalturaCategoryBaseFilter extends KalturaRelatedFilter
 	(
 		"idEqual" => "_eq_id",
 		"idIn" => "_in_id",
+		"idNotIn" => "_notin_id",
 		"parentIdEqual" => "_eq_parent_id",
 		"parentIdIn" => "_in_parent_id",
 		"depthEqual" => "_eq_depth",
@@ -92,6 +93,11 @@ abstract class KalturaCategoryBaseFilter extends KalturaRelatedFilter
 	 * @var string
 	 */
 	public $idIn;
+
+	/**
+	 * @var string
+	 */
+	public $idNotIn;
 
 	/**
 	 * @var int

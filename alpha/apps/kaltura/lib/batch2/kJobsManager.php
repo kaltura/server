@@ -1167,14 +1167,10 @@ class kJobsManager
 	 * @param baseObjectFilter $filter The filter should return the list of objects that need to be deleted
 	 * @return BatchJob
 	 */
-	public static function addDeleteJob($partnerId, $objectType, baseObjectFilter $filter, $aggregationCategory = null)
+	public static function addDeleteJob($partnerId, $objectType, baseObjectFilter $filter)
 	{
 	    $jobData = new kDeleteJobData();
- 		$jobData->setFilter($filter);
-		if ($aggregationCategory)
-  		{
-  			$jobData->setAggregationCategory($aggregationCategory);
-  		}	
+ 		$jobData->setFilter($filter);	
  		
 		$batchJob = new BatchJob();
 		$batchJob->setPartnerId($partnerId);

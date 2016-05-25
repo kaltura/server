@@ -31,7 +31,7 @@ class KDeletingAggregationChannelEngine extends  KDeletingEngine
 	{
 		$entryFilter = new KalturaBaseEntryFilter();
 		$entryFilter->categoriesIdsNotContains = $this->excludedCategories;
-		$entryFilter->categoriesIdsMatchAnd = $this->publicAggregationChannel;
+		$entryFilter->categoriesIdsMatchAnd = $this->publicAggregationChannel . "," . $filter->idNotIn;
 		
 		$entryFilter->orderBy = KalturaBaseEntryOrderBy::CREATED_AT_ASC;
 		if ($this->lastCreatedAt)

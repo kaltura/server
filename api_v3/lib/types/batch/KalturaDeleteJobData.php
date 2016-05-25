@@ -11,15 +11,6 @@ class KalturaDeleteJobData extends KalturaJobData
 	 */
 	public $filter;
 	
- 	
- 	/* (non-PHPdoc)
- 	 * @see KalturaObject::getMapBetweenObjects()
- 	 */
- 	public function getMapBetweenObjects()
- 	{
- 		return array_merge(parent::getMapBetweenObjects(), self::$mapBetweenObjects);
- 	}
-	
 	/* (non-PHPdoc)
 	 * @see KalturaObject::toObject()
 	 */

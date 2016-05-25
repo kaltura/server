@@ -16,6 +16,7 @@ class categoryFilter extends baseObjectFilter
 		$this->fields = kArray::makeAssociativeDefaultValue ( array (
 			'_eq_id',
 			'_in_id',
+			'_notin_id',
 			'_eq_parent_id',
 			'_in_parent_id',
 			'_eq_full_name',

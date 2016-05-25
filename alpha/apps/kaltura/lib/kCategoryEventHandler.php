@@ -50,8 +50,9 @@ class kCategoryEventHandler implements kObjectDeletedEventConsumer, kObjectCreat
 	{
 		$filter = new categoryFilter();
 		$filter->set('_mlikeand_aggregation_categories', $aggregationCategoryId);
+		$filter->set('_notin_id', $object->getId());
 		
-		kJobsManager::addDeleteJob($object->getPartnerId(), DeleteObjectType::CATEGORY_ENTRY_AGGREGATION, $filter, $aggregationCategoryId);
+		kJobsManager::addDeleteJob($object->getPartnerId(), DeleteObjectType::CATEGORY_ENTRY_AGGREGATION, $filter);
 	}
 
 	/* (non-PHPdoc)
