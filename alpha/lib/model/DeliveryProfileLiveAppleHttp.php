@@ -120,13 +120,61 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 	}
 	
 	/**
-	 * Build all streaming flavors array
+	 * Fetch the manifest from the remote Wwoza server and build all flavors array
 	 * @param string $url
 	 */
-	private function buildM3u8Flavors($url, array &$flavors, array $kLiveStreamParamsArray, $flavorBitrateInfo = array())
+	private function buildProxiedFlavorsArray($url, array &$flavors, $doaminPrefix)
 	{
-		$domainPrefix = $this->getDeliveryServerNodeUrl(true);
+		if($this->getDisableExtraAttributes())
+			$url = kDeliveryUtils::addQueryParameter($url, "attributes=off");
 		
+		$manifest = KCurlWrapper::getContent($url);
+		if(!$manifest)
+			return;
+		
+		$manifestLines = explode("\n", $manifest);
+		$manifestLine = reset($manifestLines);
+		while($manifestLine)
+		{
+			$lineParts = explode(':', $manifestLine, 2);
+			if($lineParts[0] === '#EXT-X-STREAM-INF')
+			{
+				// passing the url as urlPrefix so that only the path will be tokenized
+				$flavor = array(
+						'url' => '',
+						'urlPrefix' => requestUtils::resolve(next($manifestLines), $url),
+						'domainPrefix' => $domainPrefix,
+						'ext' => 'm3u8',
+				);
+		
+				$attributes = explode(',', $lineParts[1]);
+				foreach($attributes as $attribute)
+				{
+					$attributeParts = explode('=', $attribute, 2);
+					switch($attributeParts[0])
+					{
+						case 'BANDWIDTH':
+							$flavor['bitrate'] = $attributeParts[1] / 1024;
+							break;
+								
+						case 'RESOLUTION':
+							list($flavor['width'], $flavor['height']) = explode('x', $attributeParts[1], 2);
+							break;
+					}
+				}
+				$flavors[] = $flavor;
+			}
+				
+			$manifestLine = next($manifestLines);
+		}
+	}
+	
+	/**
+	 * Build the manifest from the rreported stream information and build all flavors array
+	 * @param string $url
+	 */
+	private function buildStramInfoFlavorsArray($url, array &$flavors, array $kLiveStreamParamsArray, $flavorBitrateInfo, $doaminPrefix)
+	{
 		foreach ($kLiveStreamParamsArray as $kLiveStreamParams)
 		{			
 			/* @var $kLiveStreamParams kLiveStreamParams */
@@ -137,13 +185,30 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 					'domainPrefix' => $domainPrefix,
 					'ext' => 'm3u8',
 			);
-			
+				
 			$flavor['bitrate'] = isset($flavorBitrateInfo[$kLiveStreamParams->getFlavorId()]) ? $flavorBitrateInfo[$kLiveStreamParams->getFlavorId()] : $kLiveStreamParams->getBitrate();
 			$flavor['width'] = $kLiveStreamParams->getWidth();
 			$flavor['height'] = $kLiveStreamParams->getHeight();
 			
 			$flavors[] = $flavor;
 		}
+	}
+	
+	/**
+	 * Build all streaming flavors array
+	 * @param string $url
+	 */
+	private function buildM3u8Flavors($url, array &$flavors, array $kLiveStreamParamsArray, $flavorBitrateInfo = array())
+	{
+		$domainPrefix = $this->getDeliveryServerNodeUrl(true);
+		
+		if($this->getForceProxy())
+		{
+			$this->buildProxiedFlavorsArray($url, $flavors, $domainPrefix);
+			return;
+		}
+		
+		$this->buildStramInfoFlavorsArray($url, $flavors, $kLiveStreamParamsArray, $flavorBitrateInfo, $domainPrefix);
 	}
 
 	protected function getPlayServerUrl($manifestUrl)
@@ -184,8 +249,8 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 		$baseUrl = $this->liveStreamConfig->getUrl();
 		$backupUrl = $this->liveStreamConfig->getBackupUrl();
 		
-		$primaryServerStreams = $this->liveStreamConfig->getPrimaryLiveEntryServerNode() ? $this->liveStreamConfig->getPrimaryLiveEntryServerNode()->getStreams() : array();
-		$backupServerStreams = $this->liveStreamConfig->getBackupLiveEntryServerNode() ? $this->liveStreamConfig->getBackupLiveEntryServerNode()->getStreams() : array();
+		$primaryServerStreams = $this->liveStreamConfig->getPrimaryStreamInfo();
+		$backupServerStreams = $this->liveStreamConfig->getBackupStreamInfo();
 		
 		if(!$this->getForceProxy() || $this->params->getUsePlayServer() || (!count($primaryServerStreams) && !count($backupServerStreams)))
 		{
