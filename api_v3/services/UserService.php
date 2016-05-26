@@ -114,7 +114,7 @@ class UserService extends KalturaBaseUserService
 	{
 		$dbCategoryKuserArray = categoryKuserPeer::retrieveByKuserId($userId);
 		foreach ($dbCategoryKuserArray as $dbCategoryKuser) {
-			$dbCategoryKuser->updateUser($user->id, $user->screenName);
+			$dbCategoryKuser->updateKuser($user->id, $user->screenName);
 			$dbCategoryKuser->save();
 		}
 	}
