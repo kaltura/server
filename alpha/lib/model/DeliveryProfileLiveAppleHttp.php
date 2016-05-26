@@ -128,9 +128,13 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 		if($this->getDisableExtraAttributes())
 			$url = kDeliveryUtils::addQueryParameter($url, "attributes=off");
 		
+		KalturaLog::debug("Fetching manifest content from [$url]");
 		$manifest = KCurlWrapper::getContent($url);
 		if(!$manifest)
+		{
+			KalturaLog::debug("Failed to fetch manifest content");
 			return;
+		}
 		
 		$manifestLines = explode("\n", $manifest);
 		$manifestLine = reset($manifestLines);
