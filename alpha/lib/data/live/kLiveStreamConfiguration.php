@@ -35,14 +35,14 @@ class kLiveStreamConfiguration
 	protected $streamName;
 	
 	/**
-	 * @var LiveEntryServerNode
+	 * @var kLiveStreamParams
 	 */
-	protected $primaryLiveEntryServerNode = null;
+	protected $primaryStreamInfo = null;
 	
 	/**
-	 * @var LiveEntryServerNode
+	 * @var kLiveStreamParams
 	 */
-	protected $backupLiveEntryServerNode = null;
+	protected $backupStreamInfo = null;
 	
 	/**
 	 * @return the $streamName
@@ -116,19 +116,19 @@ class kLiveStreamConfiguration
 		$this->publishUrl = $publishUrl;
 	}
 	
-	public function setPrimaryLiveEntryServerNode($v) {
-		$this->primaryLiveEntryServerNode = $v;
+	public function setPrimaryStreamInfo($v) {
+		$this->primaryStreamInfo = $v;
 	}
 	
-	public function getPrimaryLiveEntryServerNode() {
-		return $this->primaryLiveEntryServerNode;
+	public function getPrimaryStreamInfo() {
+		return $this->primaryStreamInfo;
 	}
 	
-	public function setBackupLiveEntryServerNode($v) {
-		$this->backupLiveEntryServerNode = $v;
+	public function setBackupStreamInfo($v) {
+		$this->backupStreamInfo = $v;
 	}
 	
-	public function getBackupLiveEntryServerNode() {
-		return $this->backupLiveEntryServerNode;
+	public function getBackupStreamInfo() {
+		return $this->backupStreamInfo;
 	}
 }
