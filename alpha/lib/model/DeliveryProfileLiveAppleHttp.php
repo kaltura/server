@@ -173,7 +173,7 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 	 * Build the manifest from the rreported stream information and build all flavors array
 	 * @param string $url
 	 */
-	private function buildStramInfoFlavorsArray($url, array &$flavors, array $kLiveStreamParamsArray, $flavorBitrateInfo, $doaminPrefix)
+	private function buildStreamInfoFlavorsArray($url, array &$flavors, array $kLiveStreamParamsArray, $flavorBitrateInfo, $doaminPrefix)
 	{
 		foreach ($kLiveStreamParamsArray as $kLiveStreamParams)
 		{			
@@ -208,7 +208,7 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 			return;
 		}
 		
-		$this->buildStramInfoFlavorsArray($url, $flavors, $kLiveStreamParamsArray, $flavorBitrateInfo, $domainPrefix);
+		$this->buildStreamInfoFlavorsArray($url, $flavors, $kLiveStreamParamsArray, $flavorBitrateInfo, $domainPrefix);
 	}
 
 	protected function getPlayServerUrl($manifestUrl)
