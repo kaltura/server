@@ -102,7 +102,23 @@ class UserService extends KalturaBaseUserService
 		
 		return $newUser;
 	}
-	
+
+	/**
+	 * check if CategoryKuser need also to be update and if so does it
+	 *
+	 * @param int $userId The user's unique identifier in the partner's system
+	 * @param KalturaUser $user The user parameters to update
+	 *
+	 */
+	private function updateCategoryKuser($userId, KalturaUser $user)
+	{
+		$dbCategoryKuserArray = categoryKuserPeer::retrieveByKuserId($userId);
+		foreach ($dbCategoryKuserArray as $dbCategoryKuser) {
+			$dbCategoryKuser->updateUser($user->id, $user->screenName);
+			$dbCategoryKuser->save();
+		}
+	}
+
 	/**
 	 * Updates an existing user object.
 	 * You can also use this action to update the userId.
@@ -150,6 +166,11 @@ class UserService extends KalturaBaseUserService
 			}			
 			$dbUser = $user->toUpdatableObject($dbUser);
 			$dbUser->save();
+			if (($user->id || $user->screenName) &&
+				categoryKuserPeer::isCategroyKuserExistsForKuser($dbUser->getId()))
+			{
+				$this->updateCategoryKuser($dbUser->getId(),$user);
+			}
 		}
 		catch (kPermissionException $e)
 		{
