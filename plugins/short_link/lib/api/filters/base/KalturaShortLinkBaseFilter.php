@@ -47,7 +47,7 @@ abstract class KalturaShortLinkBaseFilter extends KalturaFilter
 	}
 
 	/**
-	 * @var int
+	 * @var string
 	 */
 	public $idEqual;
 
