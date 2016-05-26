@@ -46,6 +46,21 @@ class Form_Partner_StorageConfiguration extends Form_Partner_BaseStorageConfigur
 		));
 		$this->addElementToDisplayGroup('storage_info', 's3Region');
 
+		$this->addElement('select', 'sseType', array(
+				'label'			=> 'Server-Side Encryption(SSE) Type:',
+				'filters'		=> array('StringTrim'),
+				'multiOptions'	=> array('None' => 'None',
+									'KMS' => 'KMS',
+									'AES256' => 'AES256'
+									),
+		));
+		$this->addElementToDisplayGroup('storage_info', 'sseType');
+		
+		$this->addElement('text', 'sseKmsKeyId', array(
+				'label'			=> 'SSE KMS Key ID:',
+				'filters'		=> array('StringTrim'),
+		));
+		$this->addElementToDisplayGroup('storage_info', 'sseKmsKeyId');
 
 		$this->addElement('checkbox', 'storageFtpPassiveMode', array(
 			'label'			=> 'Storage FTP Passive Mode:',
