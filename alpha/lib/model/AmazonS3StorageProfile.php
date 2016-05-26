@@ -26,7 +26,8 @@ class AmazonS3StorageProfile extends StorageProfile
 	
 	public function setFilesPermissionInS3($v)
 	{
-		if (!is_null($v)){
+		if (!is_null($v))
+		{
 	    	$this->putInCustomData(self::CUSTOM_DATA_FILES_PERMISSION_IN_S3, $v);
 		}
 	}
@@ -39,7 +40,8 @@ class AmazonS3StorageProfile extends StorageProfile
 
 	public function setS3Region($v)
 	{
-		if (!is_null($v)){
+		if (!is_null($v))
+		{
 	    	$this->putInCustomData(self::CUSTOM_DATA_S3_REGION, $v);
 		}
 	}
@@ -52,7 +54,8 @@ class AmazonS3StorageProfile extends StorageProfile
 	
 	public function setSseType($v)
 	{
-		if (!is_null($v)){
+		if (!is_null($v))
+		{
 	    	$this->putInCustomData(self::CUSTOM_DATA_SSE_TYPE, $v);
 		}
 	}
@@ -65,7 +68,8 @@ class AmazonS3StorageProfile extends StorageProfile
 	
 	public function setSseKmsKeyId($v)
 	{
-		if (!is_null($v)){
+		if (!is_null($v))
+		{
 	    	$this->putInCustomData(self::CUSTOM_DATA_SSE_KMS_KEY_ID, $v);
 		}
 	}

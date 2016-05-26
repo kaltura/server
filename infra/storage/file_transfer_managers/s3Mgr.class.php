@@ -29,16 +29,24 @@ class s3Mgr extends kFileTransferMgr
 		parent::__construct($options);
 	
 		if($options && isset($options['filesAcl']))
+		{
 			$this->filesAcl = $options['filesAcl'];
-			
+		}
+		
 		if($options && isset($options['s3Region']))
+		{
 			$this->s3Region = $options['s3Region'];
+		}
 		
 		if($options && isset($options['sseType']))
+		{
 			$this->sseType = $options['sseType'];
+		}
 		
 		if($options && isset($options['sseKmsKeyId']))
+		{
 			$this->sseKmsKeyId = $options['sseKmsKeyId'];
+		}
 		
 		// do nothing
 		$this->connection_id = 1; //SIMULATING!
@@ -68,7 +76,8 @@ class s3Mgr extends kFileTransferMgr
 	//
 	protected function doLogin($sftp_user, $sftp_pass)
 	{
-		if(!class_exists('Aws\S3\S3Client')) {
+		if(!class_exists('Aws\S3\S3Client')) 
+		{
 			KalturaLog::err('Class Aws\S3\S3Client was not found!!');
 			return false;
 		}
@@ -158,7 +167,9 @@ class s3Mgr extends kFileTransferMgr
 
 		$response = $this->s3->getObject( $params );
 		if($response && !$local_file)
+		{
 			return $response['Body'];
+		}
 			
 		return $response;
 	}
@@ -179,7 +190,8 @@ class s3Mgr extends kFileTransferMgr
 	protected function doFileExists($remote_file)
 	{
 		list($bucket, $remote_file) = explode("/",ltrim($remote_file,"/"),2);
-		if($this->isdirectory($remote_file)) {
+		if($this->isdirectory($remote_file)) 
+		{
 			return true;
 		}
 		KalturaLog::debug("remote_file: ".$remote_file);
