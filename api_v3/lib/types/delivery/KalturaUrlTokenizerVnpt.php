@@ -10,9 +10,15 @@ class KalturaUrlTokenizerVnpt extends KalturaUrlTokenizer {
 	 */
 	public $tokenizationFormat;
 
+	/**
+	 * @var bool
+	 */
+	public $shouldIncludeClientIp;
+
 	private static $map_between_objects = array
 	(
 			"tokenizationFormat",
+			"shouldIncludeClientIp",
 	);
 	
 	public function getMapBetweenObjects ( )

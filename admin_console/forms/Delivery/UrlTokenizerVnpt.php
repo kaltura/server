@@ -13,5 +13,11 @@ class Form_Delivery_UrlTokenizerVnpt extends Form_Delivery_DeliveryProfileTokeni
 				'filters'		=> array('Int'),
 				'multiOptions'  => array("vod","live","vod http"),
 		));
+		
+		$this->addElement('select', 'shouldIncludeClientIp', array(
+			'label'                 => 'include client ip',
+			'filters'               => array('Int'),
+			'multiOptions'  => array("no","yes"),
+		));
 	}
 }
