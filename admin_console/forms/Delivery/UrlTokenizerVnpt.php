@@ -11,13 +11,13 @@ class Form_Delivery_UrlTokenizerVnpt extends Form_Delivery_DeliveryProfileTokeni
 		$this->addElement('select', 'tokenizationFormat', array(
 				'label'			=> 'Live Tokenization Format:',
 				'filters'		=> array('Int'),
-				'multiOptions'  => array("vod","live","vod http"),
+				'multiOptions'	=> array("vod","live","vod http"),
 		));
 		
 		$this->addElement('select', 'shouldIncludeClientIp', array(
-			'label'                 => 'include client ip',
-			'filters'               => array('Int'),
-			'multiOptions'  => array("no","yes"),
+				'label'				=> 'include client ip',
+				'filters'			=> array('Int'),
+				'multiOptions'		=> array("no","yes"),
 		));
 	}
 }
