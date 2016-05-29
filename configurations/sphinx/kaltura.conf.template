@@ -523,6 +523,8 @@ index kaltura_schedule_event:kaltura_base
 	rt_field = category_ids
 	rt_field = resource_ids
 	rt_field = plugins_data
+	rt_field = template_entry_categories_ids
+	rt_field = system_names
 }
 
 

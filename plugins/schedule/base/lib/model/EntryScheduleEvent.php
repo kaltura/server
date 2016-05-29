@@ -11,7 +11,7 @@ abstract class EntryScheduleEvent extends ScheduleEvent
 
 	const CATEGORY_PARENT_SEARCH_PERFIX = 'p';
 	const CATEGORIES_INDEXED_FIELD_PREFIX = 'pid';
-	
+
 	/**
 	 * @param string $v
 	 */
@@ -86,4 +86,19 @@ abstract class EntryScheduleEvent extends ScheduleEvent
 		
 		return self::CATEGORIES_INDEXED_FIELD_PREFIX . $this->getPartnerId() . " " .  implode(' ', $index);
 	}
+
+	public function getTemplateEntryCategoriesIdsForIndex()
+	{
+		$val = $this->getTemplateEntryId();
+		$categoryEntrys = categoryEntryPeer::retrieveActiveByEntryId($val);
+		$catgoriesIds = array();
+		foreach($categoryEntrys as $categoryEntry)
+		{
+			$val = $categoryEntry->getCategoryId();
+			array_push($catgoriesIds, $val);
+		}
+
+		return implode(' ', $catgoriesIds);
+	}
+
 }
