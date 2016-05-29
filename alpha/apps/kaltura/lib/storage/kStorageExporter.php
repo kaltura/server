@@ -171,6 +171,13 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 		{
 			self::exportFlavorAsset($flavorAsset, $externalStorage);
 		}
+		
+		$thumbFlavorAssets = assetPeer::retrieveReadyThumbnailsByEntryId($entry->getId());
+		foreach ($thumbFlavorAssets as $thumbFlavorAsset)
+		{
+			self::exportFlavorAsset($thumbFlavorAsset, $externalStorage);
+		}
+		
 		self::exportAdditionalEntryFiles($entry, $externalStorage);		
 	}
 	
