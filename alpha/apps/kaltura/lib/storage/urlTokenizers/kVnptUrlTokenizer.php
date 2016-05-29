@@ -8,15 +8,13 @@ class kVnptUrlTokenizer extends kUrlTokenizer
 	const LIVE_TOKEN_FORMAT = 1;
 	const HTTP_VOD_TOKEN_FORMAT = 2;
 
-	const CLIENT_IP_INCLUDED = 1;
-
 	/**
 	 * @var int
 	 */
 	protected $tokenizationFormat;
 
 	/**
-	 * @var int
+	 * @var bool
 	 */
 	protected $shouldIncludeClientIp;
 
@@ -55,7 +53,7 @@ class kVnptUrlTokenizer extends kUrlTokenizer
 				break;
 		}
 		$stringForTokenization = ":$tokenKey" . ":$expiredTime" . ":$tokenizationSuffix";
-		if($shouldIncludeClientIp == self::CLIENT_IP_INCLUDED)
+		if($shouldIncludeClientIp == true)
 		{
 			$stringForTokenization = $clientIp . $stringForTokenization;
 		}
