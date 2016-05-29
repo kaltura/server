@@ -6,12 +6,17 @@ class kVnptUrlTokenizer extends kUrlTokenizer
 {
 	const VOD_TOKEN_FORMAT = 0;
 	const LIVE_TOKEN_FORMAT = 1;
-	const HTTP_VOD_TOKEN_FORMAT = 2;	
+	const HTTP_VOD_TOKEN_FORMAT = 2;
 
 	/**
 	 * @var int
 	 */
 	protected $tokenizationFormat;
+
+	/**
+	 * @var bool
+	 */
+	protected $shouldIncludeClientIp;
 
 	/**
 	 * @param string $url
@@ -22,6 +27,7 @@ class kVnptUrlTokenizer extends kUrlTokenizer
 		$tokenKey = $this->key;
 		$expiryTimeFrame = $this->window;
 		$tokenizationFormat = $this->getTokenizationFormat();
+		$shouldIncludeClientIp = $this->getShouldIncludeClientIp();
 		
 
 		$clientIp = infraRequestUtils::getIpFromHttpHeader('HTTP_X_FORWARDED_FOR',false);
@@ -46,10 +52,16 @@ class kVnptUrlTokenizer extends kUrlTokenizer
 				$tokenizationSuffix = $url;
 				break;
 		}
-		$url = md5($clientIp . ":$tokenKey" . ":$expiredTime" . ":$tokenizationSuffix") . $expiredTime . $url;
+		$stringForTokenization = ":$tokenKey" . ":$expiredTime" . ":$tokenizationSuffix";
+		if($shouldIncludeClientIp == true)
+		{
+			$stringForTokenization = $clientIp . $stringForTokenization;
+		}
+
+		$url = md5($stringForTokenization) . $expiredTime . $url;
 		if($tokenizationFormat == self::LIVE_TOKEN_FORMAT)
 			$url = "/" . $url;
-		
+
 		return $url;
 	}
 
@@ -66,4 +78,19 @@ class kVnptUrlTokenizer extends kUrlTokenizer
 	public function setTokenizationFormat($tokenizationFormat) {
 		$this->tokenizationFormat = $tokenizationFormat;
 	}
+
+	/**
+	 * @return the $shouldIncludeClientIp value
+	 */
+	public function getShouldIncludeClientIp() {
+		return $this->shouldIncludeClientIp;
+	}
+
+	/**
+	 * param bool $shouldIncludeClientIp
+	 */
+	public function setShouldIncludeClientIp($shouldIncludeClientIp) {
+		$this->shouldIncludeClientIp = $shouldIncludeClientIp;
+	}
+
 }

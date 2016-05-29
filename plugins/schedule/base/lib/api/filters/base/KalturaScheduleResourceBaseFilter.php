@@ -4,7 +4,7 @@
  * @subpackage api.filters.base
  * @abstract
  */
-abstract class KalturaScheduleResourceBaseFilter extends KalturaFilter
+abstract class KalturaScheduleResourceBaseFilter extends KalturaRelatedFilter
 {
 	static private $map_between_objects = array
 	(

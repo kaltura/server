@@ -3,7 +3,7 @@
  * @package Core
  * @subpackage storage
  */
-class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEventConsumer, kObjectDeletedEventConsumer
+class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEventConsumer, kObjectDeletedEventConsumer, kObjectAddedEventConsumer
 {
 	/**
 	 * per session cache of kRule->fulfilled result per storage profile and entry id
@@ -20,8 +20,8 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 		if($object instanceof entry && PermissionPeer::isValidForPartner(PermissionName::FEATURE_REMOTE_STORAGE, $object->getPartnerId()) && in_array(entryPeer::MODERATION_STATUS, $modifiedColumns) && $object->getModerationStatus() == entry::ENTRY_MODERATION_STATUS_APPROVED)
 			return true;
 		
-		// if changed object is flavor asset
-		if($object instanceof flavorAsset && PermissionPeer::isValidForPartner(PermissionName::FEATURE_REMOTE_STORAGE, $object->getPartnerId()) && in_array(assetPeer::STATUS, $modifiedColumns) && $object->isLocalReadyStatus())
+		// if changed object is flavor asset or thumb asset
+		if(($object instanceof flavorAsset || $object instanceof thumbAsset) && PermissionPeer::isValidForPartner(PermissionName::FEATURE_REMOTE_STORAGE, $object->getPartnerId()) && in_array(assetPeer::STATUS, $modifiedColumns) && $object->isLocalReadyStatus())
 			return true;
 			
 		return false;		
@@ -46,7 +46,7 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 		}
 		
 		// if changed object is flavor asset
-		if($object instanceof flavorAsset && in_array(assetPeer::STATUS, $modifiedColumns) && $object->isLocalReadyStatus())
+		if ( ($object instanceof flavorAsset || $object instanceof thumbAsset) && in_array(assetPeer::STATUS, $modifiedColumns) && $object->isLocalReadyStatus())
 		{
 			$entry = $object->getentry();
 			
@@ -62,11 +62,35 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 		return true;
 	}
 
+	public function shouldConsumeAddedEvent(BaseObject $object)
+	{
+		// if changed object is thumb asset
+		if( $object instanceof thumbAsset && PermissionPeer::isValidForPartner(PermissionName::FEATURE_REMOTE_STORAGE, $object->getPartnerId()) && $object->isLocalReadyStatus())
+			return true;
+		
+	}
+
+	public function objectAdded(BaseObject $object, BatchJob $raisedJob = null)
+	{
+		$entry = $object->getentry();
+
+		$externalStorages = StorageProfilePeer::retrieveAutomaticByPartnerId($object->getPartnerId());
+		foreach($externalStorages as $externalStorage)
+		{
+			if ($externalStorage->triggerFitsReadyAsset($entry->getId()))
+			{
+				self::exportFlavorAsset($object, $externalStorage);
+			}
+		}
+		return true;
+	}
+
+
 	/**
 	 * @param flavorAsset $flavor
 	 * @param StorageProfile $externalStorage
 	 */
-	static public function exportFlavorAsset(flavorAsset $flavor, StorageProfile $externalStorage)
+	static public function exportFlavorAsset(asset $flavor, StorageProfile $externalStorage)
 	{
 	    if (!$externalStorage->shouldExportFlavorAsset($flavor)) {
 		    return;
@@ -146,6 +170,13 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 		{
 			self::exportFlavorAsset($flavorAsset, $externalStorage);
 		}
+		
+		$thumbFlavorAssets = assetPeer::retrieveReadyThumbnailsByEntryId($entry->getId());
+		foreach ($thumbFlavorAssets as $thumbFlavorAsset)
+		{
+			self::exportFlavorAsset($thumbFlavorAsset, $externalStorage);
+		}
+		
 		self::exportAdditionalEntryFiles($entry, $externalStorage);		
 	}
 	

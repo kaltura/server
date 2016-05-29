@@ -17,6 +17,21 @@
 
 None.
 
+##  Aggregation categories ## 
+
+- Issue type: new feature
+- Issue ID: TR-948
+
+#### Configuration ####
+
+- configurations/sphinx/kaltura.conf -  add the following line to the kaltura_category index:  
+rt_field = aggregation_categories  
+
+#### Deployment Scripts ####
+
+		php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2016_05_29_enable_category_update_to_partner_-2.php  
+		php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2016_05_29_limit_access_to_isAggregationChannel_property.php  
+
 # Kajam 11.15.0 #
 
 ## new email notifications ##

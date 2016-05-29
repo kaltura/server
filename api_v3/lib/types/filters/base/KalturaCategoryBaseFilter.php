@@ -10,6 +10,7 @@ abstract class KalturaCategoryBaseFilter extends KalturaRelatedFilter
 	(
 		"idEqual" => "_eq_id",
 		"idIn" => "_in_id",
+		"idNotIn" => "_notin_id",
 		"parentIdEqual" => "_eq_parent_id",
 		"parentIdIn" => "_in_parent_id",
 		"depthEqual" => "_eq_depth",
@@ -45,6 +46,8 @@ abstract class KalturaCategoryBaseFilter extends KalturaRelatedFilter
 		"inheritedParentIdIn" => "_in_inherited_parent_id",
 		"partnerSortValueGreaterThanOrEqual" => "_gte_partner_sort_value",
 		"partnerSortValueLessThanOrEqual" => "_lte_partner_sort_value",
+		"aggregationCategoriesMultiLikeOr" => "_mlikeor_aggregation_categories",
+		"aggregationCategoriesMultiLikeAnd" => "_mlikeand_aggregation_categories",
 	);
 
 	static private $order_by_map = array
@@ -90,6 +93,11 @@ abstract class KalturaCategoryBaseFilter extends KalturaRelatedFilter
 	 * @var string
 	 */
 	public $idIn;
+
+	/**
+	 * @var string
+	 */
+	public $idNotIn;
 
 	/**
 	 * @var int
@@ -265,4 +273,14 @@ abstract class KalturaCategoryBaseFilter extends KalturaRelatedFilter
 	 * @var int
 	 */
 	public $partnerSortValueLessThanOrEqual;
+
+	/**
+	 * @var string
+	 */
+	public $aggregationCategoriesMultiLikeOr;
+
+	/**
+	 * @var string
+	 */
+	public $aggregationCategoriesMultiLikeAnd;
 }

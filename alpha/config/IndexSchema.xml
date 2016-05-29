@@ -38,6 +38,7 @@
 	<field name="partner_sort_value" indexName="partner_sort_value" type="bint" orderable="yes" />
 	<field name="dynamic_attributes" indexName="dynamic_attributes" type="json" searchableonly="yes" />
 	<field name="sphinx_match_optimizations" indexName="sphinx_match_optimizations" type="string" />
+	<field name="aggregation_categories" indexName="aggregation_categories" getter="aggregationCategoriesIndexEngine" type="string" matchable="yes"/>
 	<index format="%s">
 		<value field="id" />
 	</index>
