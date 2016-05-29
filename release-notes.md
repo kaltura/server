@@ -1,5 +1,22 @@
 # Kajam 11.16.0 #
 
+## BPM notifications - burnt subtitles##
+
+- Issue Type: New Feature
+- Issue ID: PLAT-5564
+
+#### Configuration ####
+ 
+- None.
+
+#### Deployment Scripts ####
+
+		php /opt/kaltura/app/tests/standAloneClient/exec.php /opt/kaltura/app/tests/standAloneClient/bpmNotificationTemplatesForBurntSubtitles.xml
+
+#### Known Issues & Limitations ####
+
+None.
+
 ## Support Live HLS seamless failover when streamInfo is known ##
 
 - Issue Type: New Feature
