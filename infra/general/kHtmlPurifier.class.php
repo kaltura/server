@@ -34,8 +34,8 @@ class kHtmlPurifier
 				;
 
 			KalturaLog::err( $msg );
-			//throw new KalturaAPIException(KalturaErrors::UNSAFE_HTML_TAGS, $className, $propertyName);
-		}
+			throw new KalturaAPIException(KalturaErrors::UNSAFE_HTML_TAGS, $className, $propertyName);
+		} 
 
 		return $value;
 	}
