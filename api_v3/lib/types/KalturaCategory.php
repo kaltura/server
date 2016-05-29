@@ -282,7 +282,8 @@ class KalturaCategory extends KalturaObject implements IRelatedFilterable
 	public $pendingEntriesCount;
 	
 	/**
- 	 * Flag indicating that the category is an aggregation category 
+ 	 * Flag indicating that the category is an aggregation category
+ 	 * @requiresPermission insert,update 
  	 *  @var KalturaNullableBoolean
  	 */
  	public $isAggregationCategory;
