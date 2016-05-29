@@ -44,11 +44,11 @@ class categoryKuser extends BasecategoryKuser implements IIndexable{
 		$this->setUpdateMethod(UpdateMethodType::MANUAL);
 	}
 
-	public function updateKuser($PuserId = null, $ScreenName = null) {
-		if ($PuserId)
-			parent::setPuserId($PuserId);
-		if ($ScreenName)
-			parent::setScreenName($ScreenName);
+	public function updateKuser($puserId = null, $screenName = null) {
+		if ($puserId)
+			parent::setPuserId($puserId);
+		if ($screenName)
+			parent::setScreenName($screenName);
 	}
 
 	public function setPuserId($puserId)
