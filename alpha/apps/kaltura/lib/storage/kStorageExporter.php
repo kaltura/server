@@ -32,7 +32,6 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 	 */
 	public function objectChanged(BaseObject $object, array $modifiedColumns)
 	{
-		KalturaLog::err("@@NA object changed [".print_r($object,true)."]");
 		// if changed object is entry 
 		if($object instanceof entry && in_array(entryPeer::MODERATION_STATUS, $modifiedColumns) && $object->getModerationStatus() == entry::ENTRY_MODERATION_STATUS_APPROVED)
 		{
