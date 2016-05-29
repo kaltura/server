@@ -123,7 +123,7 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 	 * Fetch the manifest from the remote Wwoza server and build all flavors array
 	 * @param string $url
 	 */
-	private function buildProxiedFlavorsArray($url, array &$flavors, $domainPrefix)
+	private function buildProxiedFlavorsArray($url, array &$flavors, $domainPrefix = null)
 	{
 		if($this->getDisableExtraAttributes())
 			$url = kDeliveryUtils::addQueryParameter($url, "attributes=off");
@@ -177,7 +177,7 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 	 * Build the manifest from the rreported stream information and build all flavors array
 	 * @param string $url
 	 */
-	private function buildStreamInfoFlavorsArray($url, array &$flavors, array $kLiveStreamParamsArray, $flavorBitrateInfo, $doaminPrefix)
+	private function buildStreamInfoFlavorsArray($url, array &$flavors, array $kLiveStreamParamsArray, $flavorBitrateInfo, $domainPrefix = null)
 	{
 		foreach ($kLiveStreamParamsArray as $kLiveStreamParams)
 		{			
