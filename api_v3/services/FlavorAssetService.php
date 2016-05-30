@@ -396,7 +396,7 @@ class FlavorAssetService extends KalturaAssetService
 	public function getAction($id)
 	{
 		$flavorAssetDb = assetPeer::retrieveById($id);
-		if (!$flavorAssetDb || !($flavorAssetDb instanceof flavorAsset))
+		if (!$flavorAssetDb || !($flavorAssetDb instanceof asset))
 			throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND, $id);
 			
 		$flavorAsset = KalturaFlavorAsset::getInstance($flavorAssetDb, $this->getResponseProfile());
