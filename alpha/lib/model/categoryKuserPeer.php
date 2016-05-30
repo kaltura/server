@@ -32,6 +32,21 @@ class categoryKuserPeer extends BasecategoryKuserPeer {
 
 		return categoryKuserPeer::doSelectOne($criteria, $con);
 	}
+
+	/**
+	 *
+	 * @param int $kuserId
+	 * @param $con
+	 *
+	 * @return array Array of categoryKuser
+	 */
+	public static function retrieveByKuserId($kuserId, $con = null)
+	{
+		$criteria = new Criteria();
+		$criteria->add(categoryKuserPeer::KUSER_ID, $kuserId);
+
+		return categoryKuserPeer::doSelect($criteria, $con);
+	}
 	
 	/**
 	 * 
