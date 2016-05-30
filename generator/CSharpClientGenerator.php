@@ -2,7 +2,6 @@
 <?php
 class CSharpClientGenerator extends ClientGeneratorFromXml
 {
-	private $_doc = null;
 	private $_csprojIncludes = array();
 	private $_classInheritance = array();
 	private $_enums = array();
@@ -10,8 +9,6 @@ class CSharpClientGenerator extends ClientGeneratorFromXml
 	function __construct($xmlPath, Zend_Config $config, $sourcePath = "sources/csharp")
 	{
 		parent::__construct($xmlPath, $sourcePath, $config);
-		$this->_doc = new KDOMDocument();
-		$this->_doc->load($this->_xmlFile);
 	}
 	
 	function getSingleLineCommentMarker()
@@ -61,6 +58,9 @@ class CSharpClientGenerator extends ClientGeneratorFromXml
 	function writeEnum(DOMElement $enumNode)
 	{
 		$enumName = $enumNode->getAttribute("name");
+		if(!$this->shouldIncludeType($enumName))
+			return;
+		
 		$s = "";
 		$s .= "namespace Kaltura"."\n";
 		$s .= "{"."\n";
@@ -109,6 +109,9 @@ class CSharpClientGenerator extends ClientGeneratorFromXml
 	function writeClass(DOMElement $classNode)
 	{
 		$type = $classNode->getAttribute("name");
+		if(!$this->shouldIncludeType($type))
+			return;
+		
 		if($type == 'KalturaObject')
 			return;
 		
@@ -433,7 +436,7 @@ class CSharpClientGenerator extends ClientGeneratorFromXml
 	
 	function writeCsproj()
 	{
-		$csprojDoc = new KDOMDocument();
+		$csprojDoc = new DOMDocument();
 		$csprojDoc->formatOutput = true;
 		$csprojDoc->load($this->_sourcePath."/KalturaClient/KalturaClient.csproj");
 		$csprojXPath = new DOMXPath($csprojDoc);
@@ -452,6 +455,10 @@ class CSharpClientGenerator extends ClientGeneratorFromXml
 	
 	function writeService(DOMElement $serviceNode)
 	{
+		$serviceId = $serviceNode->getAttribute("id");
+		if(!$this->shouldIncludeService($serviceId))
+			return;
+	
 		$this->startNewTextBlock();
 		$this->appendLine("using System;");
 		$this->appendLine("using System.Xml;");
@@ -461,7 +468,6 @@ class CSharpClientGenerator extends ClientGeneratorFromXml
 		$this->appendLine("namespace Kaltura");
 		$this->appendLine("{");
 		$serviceName = $serviceNode->getAttribute("name");
-		$serviceId = $serviceNode->getAttribute("id");
 
 		
 		$dotNetServiceName = $this->upperCaseFirstLetter($serviceName)."Service";
@@ -495,6 +501,9 @@ class CSharpClientGenerator extends ClientGeneratorFromXml
 	function writeAction($serviceId, DOMElement $actionNode)
 	{
 		$action = $actionNode->getAttribute("name");
+		if(!$this->shouldIncludeAction($serviceId, $action))
+			return;
+		
 		$resultNode = $actionNode->getElementsByTagName("result")->item(0);
 		$resultType = $resultNode->getAttribute("type");
 		$arrayObjectType = ($resultType == 'array') ? $resultNode->getAttribute("arrayType" ) : null;
@@ -788,6 +797,9 @@ class CSharpClientGenerator extends ClientGeneratorFromXml
 		$this->appendLine("		}");
 		foreach($serviceNodes as $serviceNode)
 		{
+			if(!$this->shouldIncludeService($serviceNode->getAttribute("id")))
+				continue;
+	
 			$serviceName = $serviceNode->getAttribute("name");
 			$dotNetServiceName = $this->upperCaseFirstLetter($serviceName)."Service";
 			$dotNetServiceType = "Kaltura" . $dotNetServiceName;

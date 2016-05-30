@@ -14,6 +14,8 @@ abstract class KalturaAppTokenBaseFilter extends KalturaFilter
 		"createdAtLessThanOrEqual" => "_lte_created_at",
 		"updatedAtGreaterThanOrEqual" => "_gte_updated_at",
 		"updatedAtLessThanOrEqual" => "_lte_updated_at",
+		"statusEqual" => "_eq_status",
+		"statusIn" => "_in_status",
 	);
 
 	static private $order_by_map = array
@@ -35,7 +37,7 @@ abstract class KalturaAppTokenBaseFilter extends KalturaFilter
 	}
 
 	/**
-	 * @var int
+	 * @var string
 	 */
 	public $idEqual;
 
@@ -63,4 +65,14 @@ abstract class KalturaAppTokenBaseFilter extends KalturaFilter
 	 * @var time
 	 */
 	public $updatedAtLessThanOrEqual;
+
+	/**
+	 * @var KalturaAppTokenStatus
+	 */
+	public $statusEqual;
+
+	/**
+	 * @var string
+	 */
+	public $statusIn;
 }

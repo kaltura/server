@@ -2,8 +2,7 @@
 /**
  * @package plugins.tvinciDistribution
  */
-class TvinciDistributionPlugin extends KalturaParentContributedPlugin implements IKalturaPermissions, IKalturaEnumerator, IKalturaPending, IKalturaObjectLoader,
-				IKalturaContentDistributionProvider, IKalturaConfigurator
+class TvinciDistributionPlugin extends KalturaParentContributedPlugin implements IKalturaPermissions, IKalturaEnumerator, IKalturaPending, IKalturaObjectLoader, IKalturaContentDistributionProvider
 {
 	const PLUGIN_NAME = 'tvinciDistribution';
 	const CONTENT_DSTRIBUTION_VERSION_MAJOR = 1;
@@ -215,16 +214,4 @@ class TvinciDistributionPlugin extends KalturaParentContributedPlugin implements
 	{
 		return self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
 	}
-
-	/* (non-PHPdoc)
-	 * @see IKalturaConfigurator::getConfig()
-	 */
-	public static function getConfig($configName)
-	{
-		if($configName == 'generator')
-			return new Zend_Config_Ini(dirname(__FILE__) . '/config/generator.ini');
-
-		return null;
-	}
-
 }

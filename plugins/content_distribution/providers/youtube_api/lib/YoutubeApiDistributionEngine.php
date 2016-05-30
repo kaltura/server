@@ -30,10 +30,15 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 {
 	protected $tempXmlPath;
 	protected $timeout = 90;
+	protected  $processedTimeout = 300;
 	
 	/* (non-PHPdoc)
 	 * @see DistributionEngine::configure()
 	 */
+	const MAXIMUM_NUMBER_OF_UPLOAD_CHUNK_RETRY = 3;
+
+	const TIME_TO_WAIT_FOR_YOUTUBE_TRANSCODING = 5;
+
 	public function configure()
 	{
 		parent::configure();
@@ -54,6 +59,9 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 		{
 			if (isset(KBatchBase::$taskConfig->params->youtubeApi->timeout))
 				$this->timeout = KBatchBase::$taskConfig->params->youtubeApi->timeout;
+
+			if (isset(KBatchBase::$taskConfig->params->youtubeApi->processedTimeout))
+				$this->processedTimeout = KBatchBase::$taskConfig->params->youtubeApi->processedTimeout;
 		}
 		
 		KalturaLog::info('Request timeout was set to ' . $this->timeout . ' seconds');
@@ -224,17 +232,19 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 			
 			$snippet = new Google_Service_YouTube_VideoSnippet();
 			$snippet->setTitle($this->getValueForField(KalturaYouTubeApiDistributionField::MEDIA_TITLE));
-			$snippet->setDescription($this->getValueForField(KalturaYouTubeApiDistributionField::MEDIA_DESCRIPTION));		
+			$snippet->setDescription(self::sanitizeFromHtmlTags($this->getValueForField(KalturaYouTubeApiDistributionField::MEDIA_DESCRIPTION)));
 			$snippet->setTags(explode(',', $this->getValueForField(KalturaYouTubeApiDistributionField::MEDIA_KEYWORDS)));
 			$snippet->setCategoryId($this->translateCategory($youtube, $distributionProfile, $this->getValueForField(KalturaYouTubeApiDistributionField::MEDIA_CATEGORY)));
-	
+
 			$status = new Google_Service_YouTube_VideoStatus();
 			$status->setPrivacyStatus('private');
 			$status->setEmbeddable(false);
 			
 			if($data->entryDistribution->sunStatus == KalturaEntryDistributionSunStatus::AFTER_SUNRISE)
 			{
-				$status->setPrivacyStatus('public');
+				$privacyStatus = $this->getPrivacyStatus($distributionProfile);
+				KalturaLog::debug("Setting privacy status to [$privacyStatus]");
+				$status->setPrivacyStatus($privacyStatus);
 			}
 			if($this->getValueForField(KalturaYouTubeApiDistributionField::ALLOW_EMBEDDING) == 'allowed')
 			{
@@ -257,7 +267,23 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 			while (!$ingestedVideo && !feof($handle)) 
 			{
 				$chunk = fread($handle, $chunkSizeBytes);
-				$ingestedVideo = $media->nextChunk($chunk);
+				$numOfTries = 0;
+				while (true) 
+				{
+					try
+					{
+						$ingestedVideo = $media->nextChunk($chunk);
+						break;
+					} catch (Google_IO_Exception $e)
+					{
+						KalturaLog::info("Uploading chunk to youtube failed with the message '".$e->getMessage()."' number of retries ".$numOfTries);
+						$numOfTries++;
+						if ($numOfTries >= self::MAXIMUM_NUMBER_OF_UPLOAD_CHUNK_RETRY)
+						{
+							throw new kTemporaryException($e->getMessage(), $e->getCode());
+						}
+					}
+				}
 			}
 			/* @var $ingestedVideo Google_Service_YouTube_Video */
 	
@@ -269,6 +295,16 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 			if ($needDel == true)
 			{
 				unlink($videoPath);
+			}
+			
+			$startCheckingReadyTime = time();
+			while (!$this->isVideoReady($youtube, $data->remoteId))
+			{
+				sleep(self::TIME_TO_WAIT_FOR_YOUTUBE_TRANSCODING);
+				if ( (time() - $startCheckingReadyTime) > $this->processedTimeout )
+				{
+					throw new Exception("Video transcoding on youtube has timed out");
+				}
 			}
 		}
 		
@@ -285,7 +321,12 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 		
 		return $distributionProfile->assumeSuccess;
 	}
-	
+
+	private static function sanitizeFromHtmlTags($filed)
+	{
+		return strip_tags(html_entity_decode(preg_replace('/\<br(\s*)?\/?\>/i', "\n", $filed)));
+	}
+
 	protected function doUpdate(KalturaDistributionUpdateJobData $data, KalturaYoutubeApiDistributionProfile $distributionProfile, $enable = true)
 	{
 		$this->fieldValues = unserialize($data->providerData->fieldValues);
@@ -311,7 +352,9 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 		
 		if($enable && $data->entryDistribution->sunStatus == KalturaEntryDistributionSunStatus::AFTER_SUNRISE)
 		{
-			$status['privacyStatus'] = 'public';
+			$privacyStatus = $this->getPrivacyStatus($distributionProfile);
+			KalturaLog::debug("Setting privacy status to [$privacyStatus]");
+			$status['privacyStatus'] = $privacyStatus;
 		}
 		if($this->getValueForField(KalturaYouTubeApiDistributionField::ALLOW_EMBEDDING) == 'allowed')
 		{
@@ -413,7 +456,21 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 		}
 		return null;
 	}
-	
+
+	/**
+	 * @param KalturaYoutubeApiDistributionProfile $distributionProfile
+	 * @return null|string
+	 */
+	protected function getPrivacyStatus(KalturaYoutubeApiDistributionProfile $distributionProfile)
+	{
+		$privacyStatus = $this->getValueForField(KalturaYouTubeApiDistributionField::ENTRY_PRIVACY_STATUS);
+		if ($privacyStatus == "" || is_null($privacyStatus))
+		{
+			$privacyStatus = $distributionProfile->privacyStatus;
+		}
+		return $privacyStatus;
+	}
+
 	private function updateRemoteMediaFileVersion(KalturaDistributionRemoteMediaFileArray &$remoteMediaFiles, KalturaYouTubeApiCaptionDistributionInfo $captionInfo){
 		/* @var $mediaFile KalturaDistributionRemoteMediaFile */
 		foreach ($remoteMediaFiles as $remoteMediaFile){
@@ -549,4 +606,32 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 			$youtube->playlistItems->insert('snippet', $playlistItem);
 		}
 	}
+
+	protected function isVideoReady($youtube, $remoteId)
+	{
+		$listResponse = $youtube->videos->listVideos("status",	array('id' => $remoteId));
+		if (empty($listResponse)) {
+			throw new Exception("Video with remotedId ".$remoteId." not found at google");
+		} else {
+			// Since the request specified a video ID, the response only contains one video resource.
+			$video = $listResponse[0];
+			$videoStatus = $video['status'];
+			switch($videoStatus['uploadStatus'])
+			{
+				case "processed":
+					return true;
+					break;
+				case "rejected":
+					throw new Exception("Video was rejected by youtube, reason [".$videoStatus['rejectionReason']."]");
+					break;
+				case "failed":
+					throw new Exception("Video has failed on youtube, reason [".$videoStatus['failureReason']."]");
+					break;					
+				default: 
+					return false;
+					break;
+			}
+		}
+	}
+	
 }

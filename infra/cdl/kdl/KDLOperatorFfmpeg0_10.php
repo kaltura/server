@@ -66,7 +66,7 @@ $fltStr = null;
 		
 		$filters = $this->generateVideoFilters($vid);
 		if(count($filters)>0){
-			$fltStr = implode(',', $filters);
+			$fltStr = implode(';', $filters);
 			$cmdStr.= " -vf '$fltStr'";
 		}
 		return $cmdStr;
@@ -135,7 +135,6 @@ $fltStr = null;
 			 * For IMX - crop the source
 			 */
 		if(isset($vid->_isCropIMX) && $vid->_isCropIMX==true){
-			$aaa = 0;
 			$filters[] = "crop=in_w:in_h-32:in_w:32";
 		}
 		return $filters;

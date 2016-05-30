@@ -2,7 +2,7 @@
 /**
  * @package plugins.systemPartner
  */
-class SystemPartnerPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaServices, IKalturaConfigurator, IKalturaEnumerator
+class SystemPartnerPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaServices, IKalturaEnumerator
 {
 	const PLUGIN_NAME = 'systemPartner';
 	
@@ -25,20 +25,6 @@ class SystemPartnerPlugin extends KalturaPlugin implements IKalturaPermissions, 
 			return true;
 		
 		return false;
-	}
-	
-	/* (non-PHPdoc)
-	 * @see IKalturaConfigurator::getConfig()
-	 */
-	public static function getConfig($configName)
-	{
-		if($configName == 'testme')
-			return new Zend_Config_Ini(dirname(__FILE__) . '/config/testme.ini');
-		
-		if($configName == 'generator')
-			return new Zend_Config_Ini(dirname(__FILE__) . '/config/generator.ini');
-			
-		return null;
 	}
 	
 	/**

@@ -915,7 +915,7 @@ class KalturaEntryService extends KalturaBaseService
 	protected function prepareEntryForInsert(KalturaBaseEntry $entry, entry $dbEntry = null)
 	{
 		// create a default name if none was given
-		if (!$entry->name)
+		if (!$entry->name && !($dbEntry && $dbEntry->getName()))
 			$entry->name = $this->getPartnerId().'_'.time();
 			
 		if ($entry->licenseType === null)
@@ -953,7 +953,7 @@ class KalturaEntryService extends KalturaBaseService
 	 */
 	protected function add(KalturaBaseEntry $entry, $conversionProfileId = null)
 	{
-		$dbEntry = $this->duplicateTemplateEntry($conversionProfileId);
+		$dbEntry = $this->duplicateTemplateEntry($conversionProfileId, $entry->templateEntryId);
 		if ($dbEntry)
 		{
 			$dbEntry->save();
@@ -961,19 +961,25 @@ class KalturaEntryService extends KalturaBaseService
 		return $this->prepareEntryForInsert($entry, $dbEntry);
 	}
 	
-	protected function duplicateTemplateEntry($conversionProfileId)
+	protected function duplicateTemplateEntry($conversionProfileId, $templateEntryId)
 	{
-		$dbEntry = null;
-		$conversionProfile = myPartnerUtils::getConversionProfile2ForPartner($this->getPartnerId(), $conversionProfileId);
-		if($conversionProfile && $conversionProfile->getDefaultEntryId())
+		if(!$templateEntryId)
 		{
-			$templateEntry = entryPeer::retrieveByPKNoFilter($conversionProfile->getDefaultEntryId(), null, false);
+			$conversionProfile = myPartnerUtils::getConversionProfile2ForPartner($this->getPartnerId(), $conversionProfileId);
+			if($conversionProfile)
+				$templateEntryId = $conversionProfile->getDefaultEntryId();
+		}
+		
+		if($templateEntryId)
+		{
+			$templateEntry = entryPeer::retrieveByPKNoFilter($templateEntryId, null, false);
 			if ($templateEntry)
 			{
-				$dbEntry = $templateEntry->copyTemplate(true);
+				return $templateEntry->copyTemplate(true);
 			}
 		}
-		return $dbEntry;
+		
+		return null;
 	}
 	
 	/**
@@ -1250,15 +1256,19 @@ class KalturaEntryService extends KalturaBaseService
    	 * @param entry $dbEntry
    	 */
 	protected function checkAndSetValidUserInsert(KalturaBaseEntry $entry, entry $dbEntry)
-	{
+	{	
 		// for new entry, puser ID is null - set it from service scope
 		if ($entry->userId === null)
 		{
-			KalturaLog::debug("Set kuser id [" . $this->getKuser()->getId() . "] line [" . __LINE__ . "]");
-			$dbEntry->setPuserId($this->getKuser()->getPuserId());
-			$dbEntry->setKuserId($this->getKuser()->getId());
+			KalturaLog::debug("Set creator id [" . $this->getKuser()->getId() . "] line [" . __LINE__ . "]");
 			$dbEntry->setCreatorKuserId($this->getKuser()->getId());
 			$dbEntry->setCreatorPuserId($this->getKuser()->getPuserId());
+			
+			if(!$dbEntry->getKuserId())
+			{
+				$dbEntry->setPuserId($this->getKuser()->getPuserId());
+				$dbEntry->setKuserId($this->getKuser()->getId());
+			}
 			return;
 		}
 		

@@ -10,7 +10,7 @@ class KalturaCategory extends KalturaObject implements IRelatedFilterable
 	 * 
 	 * @var int
 	 * @readonly
-	 * @filter eq,in
+	 * @filter eq,in,notin
 	 */
 	public $id;
 	
@@ -281,6 +281,20 @@ class KalturaCategory extends KalturaObject implements IRelatedFilterable
 	 */
 	public $pendingEntriesCount;
 	
+	/**
+ 	 * Flag indicating that the category is an aggregation category
+ 	 * @requiresPermission insert,update 
+ 	 *  @var KalturaNullableBoolean
+ 	 */
+ 	public $isAggregationCategory;
+ 	
+ 	/**
+ 	 * List of aggregation channels the category belongs to
+ 	 * @filter mlikeor,mlikeand
+ 	 * @var string
+ 	 */
+ 	public $aggregationCategories;
+	
 	private static $mapBetweenObjects = array
 	(
 		"id",
@@ -316,6 +330,8 @@ class KalturaCategory extends KalturaObject implements IRelatedFilterable
 		"directSubCategoriesCount",
 		"moderation",
 		"pendingEntriesCount",
+		"isAggregationCategory",
+ 		"aggregationCategories",
 	);
 	
 	/* (non-PHPdoc)
@@ -506,6 +522,29 @@ class KalturaCategory extends KalturaObject implements IRelatedFilterable
 			kuserPeer::createKuserForPartner($partnerId, $this->owner);
 		}
 		
+		if (($this->isAggregationCategory && $this->aggregationCategories) ||
+			($this->isAggregationCategory && $sourceObject && $sourceObject->getAggregationCategories()) ||
+			($this->aggregationCategories && $sourceObject && $sourceObject->getIsAggregationCategory()))
+			{
+ 				throw new KalturaAPIException(KalturaErrors::AGGREGATION_CATEGORY_WRONG_ASSOCIATION);
+ 			}
+ 			
+ 		if ($this->aggregationCategories)
+ 		{
+ 			$aggrCatIdsToCheck = explode (',' , $this->aggregationCategories);
+ 			foreach ($aggrCatIdsToCheck as $aggrCatIdToCheck)
+ 			{
+ 				$agrrCat = categoryPeer::retrieveByPK($aggrCatIdToCheck);
+ 				if (!$agrrCat)
+ 				{
+ 					throw new KalturaAPIException(KalturaErrors::CATEGORY_NOT_FOUND, $aggrCatIdToCheck);
+ 				}
+ 				if (!$agrrCat->getIsAggregationCategory())
+ 				{
+ 					throw new KalturaAPIException(KalturaErrors::AGGREGATION_CATEGORY_WRONG_ASSOCIATION);
+ 				}
+ 			}
+ 		}
 	}
 	
 	/* (non-PHPdoc)

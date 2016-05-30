@@ -1,4 +1,191 @@
+# Kajam 11.16.0 #
+
+## play-sever v2.0.0 ##
+- Issue Type: Upgrading
+- Issue ID: PLAT-3508
+
+#### Configuration ####
+- None.
+ 
+#### Deployment Scripts ####
+php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2016_01_17_flavorasset_service_add_play_server_permission.php
+
+#### Known Issues & Limitations ####
+
+None.
+
+## Support Live HLS seamless failover when streamInfo is known ##
+
+- Issue Type: New Feature
+- Issue ID: PLAT-5295
+
+#### Configuration ####
+ 
+- None.
+
+#### Deployment Scripts ####
+
+		php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2016_05_05_add_additional_actions_to_entryServerNode.php
+
+#### Known Issues & Limitations ####
+
+None.
+
+##  Aggregation categories ## 
+
+- Issue type: new feature
+- Issue ID: TR-948
+
+#### Configuration ####
+
+- configurations/sphinx/kaltura.conf -  add the following line to the kaltura_category index:  
+rt_field = aggregation_categories  
+
+#### Deployment Scripts ####
+
+		php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2016_05_29_enable_category_update_to_partner_-2.php  
+		php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2016_05_29_limit_access_to_isAggregationChannel_property.php  
+
+# Kajam 11.15.0 #
+
+## new email notifications ##
+
+- Issue Type: New Feature
+- Issue ID: PLAT-5479
+
+#### Configuration ####
+ 
+- None.
+
+#### Deployment Scripts ####
+
+		php /opt/kaltura/app/tests/standAloneClient/exec.php /opt/kaltura/app/tests/standAloneClient/contentUpdateNotifications.xml
+
+#### Known Issues & Limitations ####
+
+None.
+
+# Kajam 11.14.0 #
+
+## Scheduling plugins ##
+ - Issue Type: missing configuration in plugins.ini for scheduling plugins.
+ - Issue ID: PLAT-5245
+ 
+#### Configuration ####
+Added schedule plugins to plugins.ini
+ 
+#### Deployment scripts####
+Install plugins:
+    php deployment/base/scripts/installPlugins.php
+    
+## Use EntryServerNode Table when validating phantom live entries ##
+
+ - Issue Type: BUG
+ - Issue ID: PLAT-5401
+ 
+#### Configuration ####
+Added the following to batch.ini file under KAsyncValidateLiveMediaServers:
+ 
+ - params.minCreationTime = 120
+ 
+#### Deployment scripts####
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2016_04_26_add_batch_to_entryServerNode.php
+	
+## Added the new analytics service ##
+ 
+ - Issue Type: EPIC
+ - Issue ID: PLAT-4685
+
+#### Configuration ####
+Added the following to local.ini in server-saas-config:
+ 
+ - analytics_internal_API_url = http://dataretrieval-access-stg-491967709.us-west-2.elb.amazonaws.com:9000/query 
+
+#### Deployment scripts####
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2016_04_17_analytics.php
+ 
+#### Known Issues & Limitations ####
+ - None.
+
+## Mediaprep Tvinci distribution profile use dynamic tags ##
+
+ - Issue Type: Story
+ - Issue ID: PLAT-4617
+ 
+#### Configuration ####
+- None.
+ 
+#### Deployment scripts####
+	php /opt/kaltura/app/deployment/updates/scripts/2016_04_05_migrate_tvinci_distribution_tags_to_be_dynamic.php <partner_id> realrun
+ 
+#### Known Issues & Limitations ####
+ - None.
+
+
+# Kajam-11.13.0 #
+
+## Entries are never ready ##
+
+ - Issue Type: Bug
+ - Issue ID: SUP-7477
+
+#### Configuration ####
+- None.
+
+#### Deployment scripts####
+
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2016_04_14_update_batch_service.php
+
+#### Known Issues & Limitations ####
+- None.
+
+## Sphinx Recording Schedule indexes ##
+- Issue Type: Feature Request
+- Issue ID: PLAT-5245
+
+#### Configuration ####
+- copy "index kaltura_schedule_event:kaltura_base" section from /opt/kaltura/app/configurations/sphinx/kaltura.conf.template
+to /opt/kaltura/app/configurations/sphinx/kaltura.conf
+modifiy path to appropriate directory.
+- restart sphinx service
+
+
+## Update comment_was_added_to_entry email notification ##
+
+ - Issue Type: Bug
+ - Issue ID: SUP-7709
+
+#### Configuration ####
+- None.
+
+#### Deployment scripts####
+
+	php /opt/kaltura/app/tests/standAloneClient/exec.php /opt/kaltura/app/deployment/updates/scripts/xml/updateCommentWasAddedToEntryEmailNotificationTemplateCode.xml
+
+#### Known Issues & Limitations ####
+- None.
+
 # Kajam-11.11.0 #
+
+## Automated Recording Schedule ##
+- Issue Type: Feature Request
+- Issue ID: PLAT-5245
+
+#### Configuration ####
+- None.
+
+#### Deployment Scripts ####
+	Update permissions: 
+		php deployment/updates/scripts/add_permissions/2016_03_28_add_schedule_permissions.php
+	
+	Install plugins:
+		php deployment/base/scripts/installPlugins.php
+	
+	Create new tables:
+		mysql -ukaltura -p -P3306 kaltura < deployment/updates/sql/2016_03_17_create_schedule_tables.sql
+
+#### Known Issues & Limitations ####
+- None.
 
 ## fix baseEntryFilter->referenceIdEqueal,referenceIdIn ##
 - Issue Type: Bug
@@ -13,7 +200,7 @@
 #### Known Issues & Limitations ####
 - None.
 
-## Allow media servre partner to list live entries ##
+## Allow media server partner to list live entries ##
 - Issue Type: Task
 - Issue ID: PLAT-5268
 

@@ -12,6 +12,7 @@ class kDeleteJobData extends kJobData
 	private $filter;
 	
 	/**
+	 * 
 	 * @return baseObjectFilter $filter
 	 */
 	public function getFilter()

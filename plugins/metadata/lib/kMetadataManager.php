@@ -702,4 +702,30 @@ class kMetadataManager
 		return kJobsManager::addJob($job, $data, BatchJobType::METADATA_TRANSFORM);
 	}
 	
+	/**
+	 * Receives metadata object ID and a previous version, and returns an array mapping the xpaths of fields changed from version $previousVersion 
+	 * to their new values in the current version
+	 * 
+	 * @param int $metadataObjectId
+	 * @param int $previousVersion
+	 * @return array
+	 */
+	public static function retrieveChangedFieldsAndValues ($metadataObjectId, $previousVersion)
+	{
+		if (!$previousVersion)
+		{
+			//On creation of the metadata object, the previous version would be null, and therefore function should exit here.
+			KalturaLog::info("No previous version - exiting.");
+			return;
+		}
+		
+		$metadataObject = MetadataPeer::retrieveByPK($metadataObjectId);
+		$metadataCurrentData = kFileSyncUtils::file_get_contents($metadataObject->getSyncKey(Metadata::FILE_SYNC_METADATA_DATA));
+		$metadataPreviousData = kFileSyncUtils::file_get_contents($metadataObject->getSyncKey(Metadata::FILE_SYNC_METADATA_DATA, $previousVersion));	
+		
+		$diff = kXml::getDiff ($metadataCurrentData, $metadataPreviousData);
+		return $diff;
+		
+	}
+	
 }

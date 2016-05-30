@@ -294,10 +294,7 @@ class KSecureEntryHelper
 			
 		$this->contextResult = new kEntryContextDataResult();
 		$scope = $this->getAccessControlScope();
-		if (!$this->isKsAdmin())
-			$this->disableCache = $accessControl->applyContext($this->contextResult, $scope);
-		else
-			$this->disableCache = false;
+		$this->disableCache = $accessControl->applyContext($this->contextResult, $scope);
 		
 		if (count ( $this->contextResult->getActions () )) {
 			foreach ( $this->contextResult->getActions () as $action )

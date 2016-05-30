@@ -39,14 +39,24 @@ class Form_YoutubeApiProfileConfiguration extends Form_ConfigurableProfileConfig
 			'label'			=> 'YouTube Account:',
 			'filters'		=> array('StringTrim'),
 		));
-		
+
+		// Privacy Status
+		$this->addElement('select', 'privacy_status', array(
+			'label' => 'Privacy Status:',
+			'multioptions' => array(
+				'public' => 'public',
+				'private' => 'private',
+				'unlisted' => 'unlisted',
+			)
+		));
+
 		$this->addElement('checkbox', 'assume_success', array(
 			'label'			=> 'Assume success (synchronous response)',
 			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt')))
 		));
 
 		$this->addDisplayGroup(
-			array('username', 'assume_success'), 
+			array('username', 'assume_success', 'privacy_status'), 
 			'general', 
 			array('legend' => 'General', 'decorators' => array('FormElements', 'Fieldset'))
 		);

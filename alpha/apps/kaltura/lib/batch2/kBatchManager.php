@@ -262,6 +262,19 @@ class kBatchManager
 				
 		KalturaLog::log("KDLWrap::ConvertMediainfoCdl2FlavorAsset(" . $mediaInfoDb->getId() . ", " . $flavorAsset->getId() . ");");
 		KDLWrap::ConvertMediainfoCdl2FlavorAsset($mediaInfoDb, $flavorAsset);
+		/*
+		 * If the flavorParams has explicit language settings, 
+		 * use the first flavorParams language to set/overwrite the flavorAsset language
+		 */
+		if(isset($flavorParams)){
+			$multiStreamJson = $flavorParams->getMultiStream();
+			$multiStream = json_decode($multiStreamJson);
+			if(isset($multiStream->audio->languages)){
+				$lang = $multiStream->audio->languages[0];
+				KalturaLog::log("Flavor asset(".$flavorAsset->getId().") language overloaded with flavor Params(".$flavorParams->getId().") language($lang)");
+				$flavorAsset->setLanguage($lang);
+			}
+		}
 		$flavorAsset->save();
 
 //		if(!$flavorAsset->hasTag(flavorParams::TAG_MBR))

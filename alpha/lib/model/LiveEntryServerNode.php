@@ -11,29 +11,52 @@ class LiveEntryServerNode extends EntryServerNode
 	const CUSTOM_DATA_APPLICATION_NAME = "application_name";
 	const CUSTOM_DATA_DC = "dc";
 	
-	private $statusChanged = false;
+	/* (non-PHPdoc)
+	 * @see BaseEntryServerNode::postInsert()
+	 */
+	public function postInsert(PropelPDO $con = null)
+	{
+		$this->addTrackEntryInfo(TrackEntry::TRACK_ENTRY_EVENT_TYPE_ADD_MEDIA_SERVER, __METHOD__.":: serverType=".$this->getServerType().":serverNodeId=".$this->getServerNodeId().":status=".$this->getStatus().":dc=".$this->getDc());
+		
+		$liveEntry = $this->getLiveEntry();
+		if($liveEntry)
+		{
+			if($this->getServerType() === EntryServerNodeType::LIVE_PRIMARY)
+			{
+				$liveEntry->setPrimaryServerNodeId($this->getServerNodeId());
+				
+				if(!$liveEntry->getCurrentBroadcastStartTime() && $this->getStatus() === EntryServerNodeStatus::AUTHENTICATED)
+					$liveEntry->setCurrentBroadcastStartTime(time());
+			}
+			
+			if(!$liveEntry->save())
+				$liveEntry->indexToSearchIndex();
+		}
+		
+		parent::postInsert($con);
+	}
 	
 	/* (non-PHPdoc)
-	 * @see BaseEntryServerNode::postSave()
+	 * @see BaseEntryServerNode::postUpdate()
 	 */
-	public function postSave(PropelPDO $con = null)
+	public function postUpdate(PropelPDO $con = null)
 	{
-		if($this->statusChanged)
+		$this->addTrackEntryInfo(TrackEntry::TRACK_ENTRY_EVENT_TYPE_UPDATE_MEDIA_SERVER, __METHOD__.":: serverType=".$this->getServerType().":serverNodeId=".$this->getServerNodeId().":status=".$this->getStatus().":dc=".$this->getDc());
+		
+		$liveEntry = $this->getLiveEntry();
+		if($liveEntry)
 		{
-			$liveEntry = entryPeer::retrieveByPK($this->getEntryId());
-			if($liveEntry)
-			{
-				KalturaLog::debug("Live Status for entry [" . $this->getEntryId() . "] updated to [" . $this->getStatus() . "] re-indexing entry with new live status");
-				$liveEntry->indexToSearchIndex();
-			}
-			else 
-			{
-				KalturaLog::debug("Live entry with id [" . $this->getEntryId() . "] not found, live entry will not be re-indexed to sphinx with new status [" . $this->getStatus() . "]");
-			}
-		}
+			if($this->isColumnModified(EntryServerNodePeer::SERVER_NODE_ID) && $this->getServerType() === EntryServerNodeType::LIVE_PRIMARY && $liveEntry->getPrimaryServerNodeId() !== $this->getServerNodeId())
+				$liveEntry->setPrimaryServerNodeId($this->getServerNodeId());
 			
-		$this->statusChanged = false;
-		parent::postSave($con);
+			if($this->isColumnModified(EntryServerNodePeer::STATUS) && $this->getStatus() === EntryServerNodeStatus::PLAYABLE)
+				$liveEntry->setLastBroadcast(time());
+			
+			if(!$liveEntry->save())
+				$liveEntry->indexToSearchIndex();
+		}
+
+		parent::postUpdate($con);
 	}
 	
 	/* (non-PHPdoc)
@@ -41,28 +64,37 @@ class LiveEntryServerNode extends EntryServerNode
 	 */
 	public function postDelete(PropelPDO $con = null)
 	{
-		$liveEntry = entryPeer::retrieveByPK($this->getEntryId());
+		$this->addTrackEntryInfo(TrackEntry::TRACK_ENTRY_EVENT_TYPE_DELETE_MEDIA_SERVER, __METHOD__.":: serverType=".$this->getServerType().":serverNodeId=".$this->getServerNodeId().":dc=".$this->getDc());
+		
+		$liveEntry = $this->getLiveEntry();
 		if($liveEntry)
 		{
-			KalturaLog::debug("Live Entry server node for entry [" . $this->getEntryId() . "] has been deleted, re-indexing entry with new live status");
-			$liveEntry->indexToSearchIndex();
-		}
-		else
-		{
-			KalturaLog::debug("Live Entry server node for entry [" . $this->getEntryId() . "] has been deleted, but live entry was not found, will not be re-indexed to sphinx with new status");
-		}
+			if($this->getServerType() === EntryServerNodeType::LIVE_PRIMARY)
+			{
+				if($liveEntry->getCurrentBroadcastStartTime())
+					$liveEntry->setCurrentBroadcastStartTime(0);
+			}
 			
+			if(!$liveEntry->save())
+				$liveEntry->indexToSearchIndex();
+		}
+		
 		parent::postDelete($con);
 	}
 
-	public function setStreams(KalturaLiveStreamParamsArray $v) 
+	public function setStreams(array $v) 
 	{ 
-		$this->putInCustomData(self::CUSTOM_DATA_STREAMS, $v); 
+		$this->putInCustomData(self::CUSTOM_DATA_STREAMS, serialize($v));
 	}
 	
 	public function getStreams()
 	{
-		return $this->getFromCustomData(self::CUSTOM_DATA_STREAMS);
+		$streams = $this->getFromCustomData(self::CUSTOM_DATA_STREAMS, null, array());
+		
+		if(count($streams))
+			$streams = unserialize($streams);
+		
+		return $streams;
 	}
 	
 	public function setApplicationName($v)
@@ -85,11 +117,15 @@ class LiveEntryServerNode extends EntryServerNode
 		return $this->getFromCustomData(self::CUSTOM_DATA_DC);
 	}
 	
-	public function setStatus($v)
+	private function getLiveEntry()
 	{
-		if($this->getStatus() !== $v)
-			$this->statusChanged = true;
+		$liveEntry = entryPeer::retrieveByPK($this->getEntryId());
+		if(!$liveEntry)
+		{
+			KalturaLog::debug("Live entry with id [" . $this->getEntryId() . "] not found, live entry data will not be updated");
+			return null;
+		}
 		
-		return parent::setStatus($v);
+		return $liveEntry;
 	}
 }

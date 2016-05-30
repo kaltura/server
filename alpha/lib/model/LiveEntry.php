@@ -215,7 +215,9 @@ abstract class LiveEntry extends entry
 	
 	public function setRecordedEntryId($v)
 	{
-		$this->incInCustomData("recorded_entry_index");
+		if($v)
+			$this->incInCustomData("recorded_entry_index");
+		
 		$this->putInCustomData("recorded_entry_id", $v);
 	}
 	
@@ -329,7 +331,8 @@ abstract class LiveEntry extends entry
 		$backupMediaServer = null;
 		$primaryApplicationName = null;
 		$backupApplicationName = null;
-		$isExternalMediaServerStream = false;
+		$primaryStreamInfo = null;
+		$backupStreamInfo = null;
 		
 		$liveEntryServerNodes = $this->getPlayableEntryServerNodes();
 		if(count($liveEntryServerNodes))
@@ -345,6 +348,7 @@ abstract class LiveEntry extends entry
 					{
 						$primaryMediaServer = $serverNode;
 						$primaryApplicationName = $serverNode->getApplicationName();
+						$primaryStreamInfo = $liveEntryServerNode->getStreams();
 						unset($liveEntryServerNodes[$key]);
 						break;
 					}
@@ -362,7 +366,7 @@ abstract class LiveEntry extends entry
 				{
 					$primaryMediaServer = $serverNode;
 					$primaryApplicationName = $serverNode->getApplicationName();
-					$isExternalMediaServerStream = $primaryMediaServer->getIsExternalMediaServer();
+					$primaryStreamInfo = $liveEntryServerNode->getStreams();
 				} else
 				{
 					KalturaLog::debug("Cannot retrieve extra information for un-registered media server node id  [" . $liveEntryServerNode->getServerNodeId() . "]");
@@ -377,6 +381,7 @@ abstract class LiveEntry extends entry
 				{
 					$backupMediaServer = $serverNode;
 					$backupApplicationName = $serverNode->getApplicationName();
+					$backupStreamInfo = $liveEntryServerNode->getStreams();
 				}
 			}
 		}
@@ -482,40 +487,46 @@ abstract class LiveEntry extends entry
 		$configuration->setProtocol(PlaybackProtocol::HDS);
 		$configuration->setUrl($hdsStreamUrl);
 		$configuration->setBackupUrl($hdsBackupStreamUrl);
-		$configuration->setIsExternalStream($isExternalMediaServerStream);
+		$configuration->setPrimaryStreamInfo($primaryStreamInfo);
+		$configuration->setBackupStreamInfo($backupStreamInfo);
 		$configurations[] = $configuration;
 		
 		$configuration = new kLiveStreamConfiguration();
 		$configuration->setProtocol(PlaybackProtocol::HLS);
 		$configuration->setUrl($hlsStreamUrl);
 		$configuration->setBackupUrl($hlsBackupStreamUrl);
-		$configuration->setIsExternalStream($isExternalMediaServerStream);
+		$configuration->setPrimaryStreamInfo($primaryStreamInfo);
+		$configuration->setBackupStreamInfo($backupStreamInfo);
 		$configurations[] = $configuration;
 		
 		$configuration = new kLiveStreamConfiguration();
 		$configuration->setProtocol(PlaybackProtocol::APPLE_HTTP);
 		$configuration->setUrl($hlsStreamUrl);
 		$configuration->setBackupUrl($hlsBackupStreamUrl);
-		$configuration->setIsExternalStream($isExternalMediaServerStream);
+		$configuration->setPrimaryStreamInfo($primaryStreamInfo);
+		$configuration->setBackupStreamInfo($backupStreamInfo);
 		$configurations[] = $configuration;
 		
 		$configuration = new kLiveStreamConfiguration();
 		$configuration->setProtocol(PlaybackProtocol::APPLE_HTTP_TO_MC);
 		$configuration->setUrl($hlsStreamUrl);
 		$configuration->setBackupUrl($hlsBackupStreamUrl);
-		$configuration->setIsExternalStream($isExternalMediaServerStream);
+		$configuration->setPrimaryStreamInfo($primaryStreamInfo);
+		$configuration->setBackupStreamInfo($backupStreamInfo);
 		$configurations[] = $configuration;
 		
 		$configuration = new kLiveStreamConfiguration();
 		$configuration->setProtocol(PlaybackProtocol::SILVER_LIGHT);
 		$configuration->setUrl($slStreamUrl);
-		$configuration->setIsExternalStream($isExternalMediaServerStream);
+		$configuration->setPrimaryStreamInfo($primaryStreamInfo);
+		$configuration->setBackupStreamInfo($backupStreamInfo);
 		$configurations[] = $configuration;
 		
 		$configuration = new kLiveStreamConfiguration();
 		$configuration->setProtocol(PlaybackProtocol::MPEG_DASH);
 		$configuration->setUrl($mpdStreamUrl);
-		$configuration->setIsExternalStream($isExternalMediaServerStream);
+		$configuration->setPrimaryStreamInfo($primaryStreamInfo);
+		$configuration->setBackupStreamInfo($backupStreamInfo);
 		$configurations[] = $configuration;
 		
 		if ($this->getPushPublishEnabled())
@@ -674,8 +685,6 @@ abstract class LiveEntry extends entry
 				KalturaLog::debug("cached and registered - index: $mediaServerIndex, hostname: $hostname");
 				return;
 			}
-			
-			$this->setLastBroadcast(kApiCache::getTime());
 		}
 		
 		return $dbLiveEntryServerNode;
@@ -697,7 +706,7 @@ abstract class LiveEntry extends entry
 			$dbLiveEntryServerNode->setServerNodeId($serverNodeId);
 			$dbLiveEntryServerNode->setPartnerId($this->getPartnerId());
 			$dbLiveEntryServerNode->setStatus($liveEntryStatus);
-			$dbLiveEntryServerNode->setDC(kDataCenterMgr::getCurrentDcId());
+			$dbLiveEntryServerNode->setDc(kDataCenterMgr::getCurrentDcId());
 			
 			if($applicationName)
 				$dbLiveEntryServerNode->setApplicationName($applicationName);
@@ -915,6 +924,9 @@ abstract class LiveEntry extends entry
 		$this->putInCustomData(LiveEntry::CUSTOM_DATA_RECORD_OPTIONS, serialize($recordingOptions));
 	}
 	
+	/**
+	 * @return kLiveEntryRecordingOptions
+	 */
 	public function getRecordingOptions()
 	{
 		$recordingOptions = $this->getFromCustomData(LiveEntry::CUSTOM_DATA_RECORD_OPTIONS);
@@ -931,9 +943,44 @@ abstract class LiveEntry extends entry
 			return EntryServerNodeStatus::PLAYABLE;
 		elseif ($primaryMediaServerStatus == EntryServerNodeStatus::BROADCASTING || $secondaryMediaServerStatus == EntryServerNodeStatus::BROADCASTING)
 			return EntryServerNodeStatus::BROADCASTING;
-		elseif ($primaryMediaServerStatus == EntryServerNodeStatus::BROADCASTING || $secondaryMediaServerStatus == EntryServerNodeStatus::BROADCASTING)
-			return EntryServerNodeStatus::BROADCASTING;
+		elseif ($primaryMediaServerStatus == EntryServerNodeStatus::AUTHENTICATED || $secondaryMediaServerStatus == EntryServerNodeStatus::AUTHENTICATED)
+			return EntryServerNodeStatus::AUTHENTICATED;
 		else
 			return EntryServerNodeStatus::STOPPED;
+	}
+	
+	public function isStreamAlreadyBroadcasting()
+	{
+		$mediaServer = $this->getMediaServer(true);
+		if($mediaServer)
+		{
+			$url = null;
+			$protocol = null;
+			foreach (array(KalturaPlaybackProtocol::HLS, KalturaPlaybackProtocol::APPLE_HTTP) as $hlsProtocol)
+			{
+				$config = $dbEntry->getLiveStreamConfigurationByProtocol($hlsProtocol, requestUtils::PROTOCOL_HTTP, null, true);
+				if ($config)
+				{
+					$url = $config->getUrl();
+					$protocol = $hlsProtocol;
+					break;
+				}
+			}
+				
+			if($url)
+			{
+				KalturaLog::info('Determining status of live stream URL [' .$url. ']');
+				$dpda= new DeliveryProfileDynamicAttributes();
+				$dpda->setEntryId($entryId);
+				$dpda->setFormat($protocol);
+				$deliveryProfile = DeliveryProfilePeer::getLiveDeliveryProfileByHostName(parse_url($url, PHP_URL_HOST), $dpda);
+				if($deliveryProfile && $deliveryProfile->isLive($url))
+				{
+					return true;
+				}
+			}
+		}
+		
+		return false;
 	}
 }

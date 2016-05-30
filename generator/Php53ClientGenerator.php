@@ -4,16 +4,9 @@ class Php53ClientGenerator extends ClientGeneratorFromXml
 	private $cacheEnums = array();
 	private $cacheTypes = array();
 	
-	/**
-	 * @var DOMDocument
-	 */
-	protected $_doc = null;
-	
 	function __construct($xmlPath, Zend_Config $config, $sourcePath = "sources/php53")
 	{
 		parent::__construct($xmlPath, $sourcePath, $config);
-		$this->_doc = new KDOMDocument();
-		$this->_doc->load($this->_xmlFile);
 	}
 	
 	function getSingleLineCommentMarker()
@@ -128,10 +121,7 @@ class Php53ClientGenerator extends ClientGeneratorFromXml
 		$classNodes = $xpath->query("/xml/classes/class");
 		foreach($classNodes as $classNode)
 		{
-	    	$this->startNewTextBlock();
-			$this->appendLine('<?php');
 			$this->writeClass($classNode);
-    		$this->addFile($this->getTypePath($classNode), $this->getTextBlock());
 		}
 		
 		// services
@@ -368,7 +358,11 @@ class Php53ClientGenerator extends ClientGeneratorFromXml
 	
 	function writeEnum(DOMElement $enumNode)
 	{
-		$enumClassInfo = $this->getEnumClassInfo($enumNode->getAttribute('name'));
+		$type = $enumNode->getAttribute('name');
+		if(!$this->shouldIncludeType($type))
+			return;
+			
+		$enumClassInfo = $this->getEnumClassInfo($type);
 		
 		$this->appendLine('/**');
 		$this->appendLine(' * @namespace');
@@ -405,6 +399,12 @@ class Php53ClientGenerator extends ClientGeneratorFromXml
 	function writeClass(DOMElement $classNode)
 	{
 		$kalturaType = $classNode->getAttribute('name');
+		if(!$this->shouldIncludeType($kalturaType))
+			return;
+			
+    	$this->startNewTextBlock();
+		$this->appendLine('<?php');
+		
 		$description = $classNode->getAttribute("description");
 		$type = $this->getTypeClassInfo($kalturaType);
 		
@@ -463,6 +463,10 @@ class Php53ClientGenerator extends ClientGeneratorFromXml
 		
 			switch ($propType) 
 			{
+				case "file" :
+					KalturaLog::info("File attribute [$propName] are not supported for class [$kalturaType]");
+					return;
+			
 				case "int" :
 				case "float" :
 					$this->appendLine("		if(count(\$xml->{$propName}))");
@@ -576,16 +580,20 @@ class Php53ClientGenerator extends ClientGeneratorFromXml
 
 		// close class
 		$this->appendLine("}");
+    	$this->addFile($this->getTypePath($classNode), $this->getTextBlock());
 	}
 	
 	function writeService(DOMElement $serviceNode)
 	{
+		$serviceId = $serviceNode->getAttribute("id");
+		if(!$this->shouldIncludeService($serviceId))
+			return;
+			
 		$plugin = null;
 		if($serviceNode->hasAttribute('plugin'))
 			$plugin = $serviceNode->getAttribute('plugin');
 			
 		$serviceName = $serviceNode->getAttribute("name");
-		$serviceId = $serviceNode->getAttribute("id");
 		$description = $serviceNode->getAttribute("description");
 					
 		$serviceClassName = $this->getServiceClass($serviceNode, $plugin);
@@ -630,8 +638,11 @@ class Php53ClientGenerator extends ClientGeneratorFromXml
 	
 	function writeAction($serviceId, $serviceName, DOMElement $actionNode, $plugin = null)
 	{
-		$action = $actionNode->getAttribute("name");
-	    $resultNode = $actionNode->getElementsByTagName("result")->item(0);
+	    $action = $actionNode->getAttribute("name");
+	    if(!$this->shouldIncludeAction($serviceId, $action))
+			return;
+			
+		$resultNode = $actionNode->getElementsByTagName("result")->item(0);
 	    $resultType = $resultNode->getAttribute("type");
 	    $arrayObjectType = ($resultType == 'array') ? $resultNode->getAttribute ( "arrayType" ) : null;
 		$description = $actionNode->getAttribute("description");
@@ -884,6 +895,9 @@ class Php53ClientGenerator extends ClientGeneratorFromXml
 	
 		foreach($serviceNodes as $serviceNode)
 		{
+			if(!$this->shouldIncludeService($serviceNode->getAttribute("id")))
+				continue;
+				
 			if($serviceNode->hasAttribute("plugin"))
 				continue;
 				
@@ -912,6 +926,9 @@ class Php53ClientGenerator extends ClientGeneratorFromXml
 	
 		foreach($serviceNodes as $serviceNode)
 		{
+			if(!$this->shouldIncludeService($serviceNode->getAttribute("id")))
+				continue;
+				
 			if($serviceNode->hasAttribute("plugin"))
 				continue;
 				

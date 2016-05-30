@@ -416,7 +416,18 @@ class kBusinessPreConvertDL
 		}
 		
 		$flavorParams->setDynamicAttributes($dynamicAttributes);
-			
+
+		$conversionProfile = myPartnerUtils::getConversionProfile2ForEntry($entryId);
+		if($conversionProfile)
+		{
+			$flavorParamsConversionProfile = flavorParamsConversionProfilePeer::retrieveByFlavorParamsAndConversionProfile($flavorParams->getId(), $conversionProfile->getId());
+			if($flavorParamsConversionProfile){
+				$isEncrypted = $flavorParamsConversionProfile->getIsEncrypted();
+				if(isset($isEncrypted))
+					$flavorParams->setIsEncrypted($isEncrypted);
+			}
+		}
+
 		self::adjustAssetParams($entryId, array($flavorParams));
 		$flavor = self::validateFlavorAndMediaInfo($flavorParams, $mediaInfo, $errDescription);
 		
@@ -440,13 +451,8 @@ class kBusinessPreConvertDL
 		
 		$flavor->_force = true; // force to convert the flavor, even if none complied
 		
-		$conversionProfile = myPartnerUtils::getConversionProfile2ForEntry($entryId);
-		if($conversionProfile)
-		{
-			$flavorParamsConversionProfile = flavorParamsConversionProfilePeer::retrieveByFlavorParamsAndConversionProfile($flavor->getFlavorParamsId(), $conversionProfile->getId());
-			if($flavorParamsConversionProfile)
-				$flavor->setReadyBehavior($flavorParamsConversionProfile->getReadyBehavior());
-		}
+		if($flavorParamsConversionProfile)
+			$flavor->setReadyBehavior($flavorParamsConversionProfile->getReadyBehavior());
 		
 		$flavorAsset = kBatchManager::createFlavorAsset($flavor, $partnerId, $entryId, $flavorAssetId);
 		if (!$flavorAsset)
@@ -555,6 +561,12 @@ class kBusinessPreConvertDL
 		KalturaLog::log("Generate Target " . count($flavors) . " Flavors supplied");
 		$cdl = KDLWrap::CDLGenerateTargetFlavors($mediaInfo, $flavors);
 		KalturaLog::log("Generate Target " . count($cdl->_targetList) . " Flavors returned");
+		foreach($flavors as $flavor) {
+			$flavorParamsConversionProfile = $conversionProfileFlavorParams[$flavor->getId()];
+			$isEncrypted = $flavorParamsConversionProfile->getIsEncrypted();
+			if(isset($isEncrypted))
+				$flavor->setIsEncrypted($isEncrypted);
+		}
 		
 		// check for errors
 		$errDescription = '';
@@ -1125,7 +1137,10 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 		{
 			if($ingestedNeeded)
 			{
-				kJobsManager::updateBatchJob($convertProfileJob, BatchJob::BATCHJOB_STATUS_FINISHED);
+				if ($entry->getStatus() != entryStatus::PRECONVERT)
+				{
+					kJobsManager::updateBatchJob($convertProfileJob, BatchJob::BATCHJOB_STATUS_FINISHED);
+				}
 				return false;
 			}
 			else
@@ -1441,6 +1456,14 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 				
 			self::adjustAssetParams($entryId, array($sourceFlavor));
 			$srcSyncKey = $originalFlavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+			
+			$flavorParamsConversionProfile = flavorParamsConversionProfilePeer::retrieveByFlavorParamsAndConversionProfile($sourceFlavor->getId(), $conversionProfileId);
+			if($flavorParamsConversionProfile){
+				$isEncrypted = $flavorParamsConversionProfile->getIsEncrypted();
+				if(isset($isEncrypted))
+					$sourceFlavor->setIsEncrypted($isEncrypted);
+			}
+			
 			$errDescription = null;
 			$sourceFlavorOutput = self::validateFlavorAndMediaInfo($sourceFlavor, $mediaInfo, $errDescription);
 		

@@ -200,12 +200,12 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 	
 	protected function validatePropertyChanged($sourceObject, $attr)
 	{
-		$attr = $this->getObjectPropertyName($attr);
-		if(!$attr)
+		$resolvedAttrName = $this->getObjectPropertyName($attr);
+		if(!$resolvedAttrName)
 			throw new KalturaAPIException(KalturaErrors::PROPERTY_IS_NOT_DEFINED, $attr, get_class($this));
 		
 		/* @var $sourceObject LiveEntry */
-		$getter = "get" . ucfirst($attr);
+		$getter = "get" . ucfirst($resolvedAttrName);
 		if($sourceObject->$getter() !== $this->$attr && $sourceObject->getLiveStatus() !== KalturaEntryServerNodeStatus::STOPPED)
 		{
 			throw new KalturaAPIException(KalturaErrors::CANNOT_UPDATE_FIELDS_WHILE_ENTRY_BROADCASTING, $attr);
@@ -214,12 +214,12 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 	
 	protected function validateRecordedEntryId($sourceObject, $attr)
 	{
-		$attr = $this->getObjectPropertyName($attr);
-		if(!$attr)
+		$resolvedAttrName = $this->getObjectPropertyName($attr);
+		if(!$resolvedAttrName)
 			throw new KalturaAPIException(KalturaErrors::PROPERTY_IS_NOT_DEFINED, $attr, get_class($this));
 		
 		/* @var $sourceObject LiveEntry */
-		$getter = "get" . ucfirst($attr);
+		$getter = "get" . ucfirst($resolvedAttrName);
 		if($sourceObject->$getter() !== $this->$attr)
 		{
 			$this->validateRecordingDone($sourceObject, $attr);
@@ -232,7 +232,7 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 		$recordedEntry = $sourceObject->getRecordedEntryId() ? entryPeer::retrieveByPK($sourceObject->getRecordedEntryId()) : null;
 		if($recordedEntry)
 		{
-			$validEntryStatuses = array(KalturaEntryStatus::READY, KalturaEntryStatus::ERROR_CONVERTING, KalturaEntryStatus::ERROR_IMPORTING);
+			$validUpdateStatuses = array(KalturaEntryStatus::READY, KalturaEntryStatus::ERROR_CONVERTING, KalturaEntryStatus::ERROR_IMPORTING);
 			if( !in_array($recordedEntry->getStatus(), $validUpdateStatuses) )
 				throw new KalturaAPIException(KalturaErrors::CANNOT_UPDATE_FIELDS_RECORDED_ENTRY_STILL_NOT_READY, $attr);
 			

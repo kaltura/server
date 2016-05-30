@@ -168,10 +168,14 @@ class accessControl extends BaseaccessControl implements IBaseObject
 			$this->setScope($scope);
 
 		$disableCache = false;
+		$isKsAdmin = $this->scope && $this->scope->getKs() && $this->scope->getKs()->isAdmin();
 		
 		$rules = $this->getRulesArray();
 		foreach($rules as $rule)
 		{
+			if($isKsAdmin && !$rule->getForceAdminValidation())
+				continue;
+				
 			/* @var $rule kRule */
 			$fulfilled = $rule->applyContext($context);
 				 

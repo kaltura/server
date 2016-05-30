@@ -44,6 +44,9 @@ abstract class KDeletingEngine
 			case KalturaDeleteObjectType::GROUP_USER:
 				return new KDeletingGroupUserEngine();
 
+			case KalturaDeleteObjectType::CATEGORY_ENTRY_AGGREGATION:
+ 				return new KDeletingAggregationChannelEngine();
+			
 			default:
 				return KalturaPluginManager::loadObject('KDeletingEngine', $objectType);
 		}
@@ -51,10 +54,10 @@ abstract class KDeletingEngine
 	
 	/**
 	 * @param int $partnerId
-	 * @param KalturaClient $client
-	 * @param KSchedularTaskConfig $taskConfig
-	 */
-	public function configure($partnerId)
+	 * @param KalturaDeleteJobData $jobData
+  	 * @param KalturaClient $client
+  	 */
+	public function configure($partnerId, $jobData)
 	{
 		$this->partnerId = $partnerId;
 		$this->batchPartnerId = KBatchBase::$taskConfig->getPartnerId();

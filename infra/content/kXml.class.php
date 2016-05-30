@@ -27,6 +27,12 @@ class XSLTErrorCollector
 	}
 }
 
+function xml_load_for_xslt($xmlStr)
+{
+	$dom = DOMDocument::loadXML($xmlStr);
+	return $dom->documentElement;
+}
+
 /** 
  * @package infra
  * @subpackage utils
@@ -35,7 +41,7 @@ class kXml
 {
 	public static function getXslEnabledPhpFunctions()
 	{
-		return array('date', 'gmdate', 'strtotime','urlencode');
+		return array('date', 'gmdate', 'strtotime','urlencode','xml_load_for_xslt');
 	}
 	
 	//check if the prop's value is valid for xml encoding.
@@ -416,4 +422,46 @@ class kXml
 			$node->nodeValue = htmlspecialchars($value,ENT_QUOTES,'UTF-8');
 		}
 	}	
+	
+/**
+	 * Reutrns array mapping the changed field names to their new values
+	 * @param string $base
+	 * @param string $compare
+	 * 
+	 * @return array
+	 */
+	public static function getDiff ($base, $compare = null)
+	{
+		$baseXml = new SimpleXMLElement($base);
+		$compareXml = new SimpleXMLElement($compare);
+		
+		$baseJson = json_encode($baseXml);
+		$baseArray = json_decode($baseJson, true);
+		
+		$compareJson = json_encode($compareXml);
+		$compareArray = json_decode($compareJson, true);
+		
+		$added = array_udiff_assoc($baseArray, $compareArray, array ('kXml', 'compareValues'));
+		$removed = array_udiff_assoc ($compareArray, $baseArray, array ('kXml', 'compareValues'));
+		
+		//Some values may have been removed, and exist in compare and not in base - these are also changes
+		$diffKeys = array_diff(array_keys($removed), array_keys($added));
+		foreach ($diffKeys as $diffKey)
+		{
+			$added [$diffKey] = "null";
+		}
+		
+		return $added;
+	}
+	
+	public static function compareValues ($val1, $val2)
+	{
+		if ($val1 === $val2)
+		{
+			return 0;
+		}
+		
+		return 1;
+	}
+	
 }

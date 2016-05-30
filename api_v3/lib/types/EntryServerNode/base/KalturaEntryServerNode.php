@@ -36,7 +36,7 @@ abstract class KalturaEntryServerNode extends KalturaObject implements IRelatedF
 	/**
 	 * @var time
 	 * @readonly
-	 * @filter order
+	 * @filter lte,gte,order
 	 */
 	public $createdAt;
 
@@ -69,7 +69,6 @@ abstract class KalturaEntryServerNode extends KalturaObject implements IRelatedF
 		"partnerId",
 		"createdAt",
 		"updatedAt",
-		"heartbeatTime",
 		"status",
 		"serverType"
 	);

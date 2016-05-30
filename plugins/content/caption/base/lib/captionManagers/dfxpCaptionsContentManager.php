@@ -179,6 +179,9 @@ class dfxpCaptionsContentManager extends kCaptionsContentManager
 		try
 		{
 			$xml->loadXML($content);
+			$xml->formatOutput = true;
+			$content = $xml->saveXML();
+			$xml->loadXML($content);
 		}
 		catch(Exception $e)
 		{

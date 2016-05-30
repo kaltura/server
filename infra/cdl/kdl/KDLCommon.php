@@ -242,7 +242,8 @@
 		const ForceKeyframes= "__forceKeyframes__";
 		const WaterMarkFileName = "__waterMarkFileName__";
 		const WaterMarkWidth = "__waterMarkWidth__";
-		const WaterMarkHeight = "__waterMarkHeight__";	
+		const WaterMarkHeight = "__waterMarkHeight__";
+		const SubTitlesFileName = "__subTitlesFileName__";
 	};
 	
 	class KDLContainerTarget {

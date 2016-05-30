@@ -1,11 +1,6 @@
 <?php
 class ObjCClientGenerator extends ClientGeneratorFromXml
 {
-	/**
-	 * @var DOMDocument
-	 */
-	protected $_doc = null;
-	
 	protected $_mFileData = '';
 	protected $_hFileData = '';
 	
@@ -16,8 +11,6 @@ class ObjCClientGenerator extends ClientGeneratorFromXml
 	function __construct($xmlPath, Zend_Config $config, $sourcePath = "sources/objc")
 	{
 		parent::__construct($xmlPath, $sourcePath, $config);
-		$this->_doc = new KDOMDocument();
-		$this->_doc->load($this->_xmlFile);
 	}
 	
 	function getSingleLineCommentMarker()
@@ -50,6 +43,12 @@ class ObjCClientGenerator extends ClientGeneratorFromXml
 		default : // object
 			return "$propType*";
 		}
+	}
+	
+	protected function loadTypesRecursive($type, $strict = true)
+	{
+		if($type != 'string')
+			parent::loadTypesRecursive($type, $strict);
 	}
 	
 	function isSimpleType($propType)
@@ -136,8 +135,8 @@ class ObjCClientGenerator extends ClientGeneratorFromXml
 
 	function renameReservedProperties($propertyName)
 	{
-		if (kString::beginsWith($propertyName, 'new') ||
-			kString::beginsWith($propertyName, 'copy'))
+		if ($this->beginsWith($propertyName, 'new') ||
+			$this->beginsWith($propertyName, 'copy'))
 			return "a$propertyName";		// prefixing with _ still produces the warning, need to use a real letter
 		return $propertyName;
 	}
@@ -236,6 +235,8 @@ class ObjCClientGenerator extends ClientGeneratorFromXml
 	function writeEnum(DOMElement $enumNode)
 	{
 		$enumName = $enumNode->getAttribute("name");
+		if(!$this->shouldIncludeType($enumName))
+			return;
 		
 		if($this->generateDocs)
 		{
@@ -281,6 +282,8 @@ class ObjCClientGenerator extends ClientGeneratorFromXml
 	function writeClass(DOMElement $classNode)
 	{
 		$type = $classNode->getAttribute("name");
+		if(!$this->shouldIncludeType($type))
+			return;
 		
 		if($this->generateDocs)
 		{
@@ -541,8 +544,11 @@ class ObjCClientGenerator extends ClientGeneratorFromXml
 	// services generation
 	function writeService(DOMElement $serviceNode)
 	{
-		$serviceName = $serviceNode->getAttribute("name");
 		$serviceId = $serviceNode->getAttribute("id");
+		if(!$this->shouldIncludeService($serviceId))
+			return;
+				
+		$serviceName = $serviceNode->getAttribute("name");
 		
 		$serviceClassName = "Kaltura".$this->upperCaseFirstLetter($serviceName)."Service";
 		
@@ -555,6 +561,9 @@ class ObjCClientGenerator extends ClientGeneratorFromXml
 		$description = self::buildMultilineComment($serviceNode->getAttribute("description"));
 		if ($description)
 			$this->appendHLine($description);
+
+		$this->handleAliasAction($serviceNode->childNodes);
+
 		$this->appendHLine("@interface $serviceClassName : KalturaServiceBase");
 		$this->appendMLine("@implementation $serviceClassName");
 					
@@ -568,13 +577,48 @@ class ObjCClientGenerator extends ClientGeneratorFromXml
 		}
 		$this->appendHLine("@end\n");
 		$this->appendMLine("@end\n");
+
 	}
+
+	private function handleAliasAction($actionNodes)
+	{
+		foreach($actionNodes as $actionNode)
+		{
+			if ($actionNode->nodeType != XML_ELEMENT_NODE)
+				continue;
+
+			/** @var  $actionNode DOMElement */
+			if($actionNode->getAttribute('actionAlias') == '')
+				continue;
+
+			$resultNode = $actionNode->getElementsByTagName('result')->item(0);
+			$resultType = $resultNode->getAttribute('type');
+			if(!empty($resultType) && ($this->getTypeName($resultType)== 'Object') )
+			{
+				$this->appendHLine("@class $resultType;");
+			}
+
+			$paramNodes = $actionNode->getElementsByTagName('param');
+			foreach($paramNodes as $paramNode)
+			{
+				$paramType = $paramNode->getAttribute('type');
+				if($this->getTypeName($paramType)== 'Object')
+				{
+					$this->appendHLine("@class $paramType;");
+				}
+			}
+		}
+	}
+
 	
 	// actions generation
 	function writeAction($serviceId, DOMElement $actionNode)
 	{
 		$actionName = $actionNode->getAttribute("name");
-	    $resultNode = $actionNode->getElementsByTagName("result")->item(0);
+	    if(!$this->shouldIncludeAction($serviceId, $actionName))
+			return;
+				
+		$resultNode = $actionNode->getElementsByTagName("result")->item(0);
 	    $resultType = $resultNode->getAttribute("type");
 		$paramNodes = $actionNode->getElementsByTagName("param");
 		
@@ -910,7 +954,7 @@ class ObjCClientGenerator extends ClientGeneratorFromXml
 		$services = array();
 		foreach($serviceNamesNodes as $serviceNode)
 		{
-			if($serviceNode->hasAttribute('plugin') && $pluginName == '')
+			if($serviceNode->hasAttribute('plugin') && $pluginName == '' || !$this->shouldIncludeService(strtolower($serviceNode->getAttribute("name"))) )
 				continue;
 				
 			$services[] = $serviceNode->getAttribute("name");

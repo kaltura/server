@@ -9,6 +9,7 @@ class TvinciDistributionFeedHelper
 	const ACTION_UPDATE = 'update';
 	const ACTION_DELETE = 'delete';
 
+	const DELETE_XML = "<feed><export><media co_guid=\"COGUID\" entry_id=\"ENTRYID\" action=\"delete\" is_active=\"true\" erase=\"true\"/></export></feed>";
 
 	/**
 	 * var KalturaTvinciDistributionProfile
@@ -57,38 +58,68 @@ class TvinciDistributionFeedHelper
 		$arguments = array(
 			"distributionProfileId" => $this->distributionProfile->id,
 			"playManifestPrefix" => $prefix);
-		if($this->distributionProfile->ipadnewPpvModule)
-			$arguments["ipadnewPpvModule"] = $this->distributionProfile->ipadnewPpvModule;
-		if($this->distributionProfile->ipadnewFileName)
-			$arguments["ipadnewTypeName"] = $this->distributionProfile->ipadnewFileName;
-		if($this->distributionProfile->ismPpvModule)
-			$arguments["ismPpvModule"] = $this->distributionProfile->ismPpvModule;
-		if($this->distributionProfile->ismFileName)
-			$arguments["ismTypeName"] = $this->distributionProfile->ismFileName;
-		if($this->distributionProfile->iphonenewPpvModule)
-			$arguments["iphonenewPpvModule"] = $this->distributionProfile->iphonenewPpvModule;
-		if($this->distributionProfile->iphonenewFileName)
-			$arguments["iphonenewTypeName"] = $this->distributionProfile->iphonenewFileName;
-		if($this->distributionProfile->mbrPpvModule)
-			$arguments["mbrPpvModule"] = $this->distributionProfile->mbrPpvModule;
-		if($this->distributionProfile->mbrFileName)
-			$arguments["mbrTypeName"] = $this->distributionProfile->mbrFileName;
-		if($this->distributionProfile->dashPpvModule)
-			$arguments["dashPpvModule"] = $this->distributionProfile->dashPpvModule;
-		if($this->distributionProfile->dashFileName)
-			$arguments["dashTypeName"] = $this->distributionProfile->dashFileName;
-		if($this->distributionProfile->widevinePpvModule)
-			$arguments["widevinePpvModule"] = $this->distributionProfile->widevinePpvModule;
-		if($this->distributionProfile->widevineFileName)
-			$arguments["widevineTypeName"] = $this->distributionProfile->widevineFileName;
-		if($this->distributionProfile->widevineMbrPpvModule)
-			$arguments["widevineMbrPpvModule"] = $this->distributionProfile->widevineMbrPpvModule;
-		if($this->distributionProfile->widevineMbrFileName)
-			$arguments["widevineMbrTypeName"] = $this->distributionProfile->widevineMbrFileName;
+
+		$tagsDoc = new DOMDocument();
+		$tagsConfiguration = $tagsDoc->createElement('tagsconfiguration');
+		foreach($this->distributionProfile->tags as $tag)
+		{
+			/**
+			 * @var KalturaTvinciDistributionTag $tag
+			 */
+			$tagXML = $tagsDoc->createElement('tag');
+
+			$tagXML->appendChild($this->createAppendXml($tag, $tagsDoc, 'tagname', 'tagname'));
+			$tagXML->appendChild($this->createAppendXml($tag, $tagsDoc, 'extension', 'extension'));
+			$tagXML->appendChild($this->createAppendXml($tag, $tagsDoc, 'protocol', 'protocol'));
+			$tagXML->appendChild($this->createAppendXml($tag, $tagsDoc, 'format', 'format'));
+			$tagXML->appendChild($this->createAppendXml($tag, $tagsDoc, 'typename', 'filename'));
+			$tagXML->appendChild($this->createAppendXml($tag, $tagsDoc, 'ppvmodule', 'ppvmodule'));
+
+			$tagsConfiguration->appendChild($tagXML);
+
+			if ($tag->tagname == 'ism')
+			{
+				$arguments["ismPpvModule"] = $tag->ppvmodule;
+				$arguments["ismTypeName"] = $tag->filename;
+			}
+			if ($tag->tagname == 'ipadnew')
+			{
+				$arguments["ipadnewPpvModule"] = $tag->ppvmodule;
+				$arguments["ipadnewTypeName"] = $tag->filename;
+			}
+			if ($tag->tagname == 'iphonenew')
+			{
+				$arguments["iphonenewPpvModule"] = $tag->ppvmodule;
+				$arguments["iphonenewTypeName"] = $tag->filename;
+			}
+			if ($tag->tagname == 'mbr')
+			{
+				$arguments["mbrPpvModule"] = $tag->ppvmodule;
+				$arguments["mbrTypeName"] = $tag->filename;
+			}
+			if ($tag->tagname == 'dash')
+			{
+				$arguments["dashPpvModule"] = $tag->ppvmodule;
+				$arguments["dashTypeName"] = $tag->filename;
+			}
+			if ($tag->tagname == 'widevine')
+			{
+				$arguments["widevinePpvModule"] = $tag->ppvmodule;
+				$arguments["widevineTypeName"] = $tag->filename;
+			}
+			if ($tag->tagname == 'widevineMbrFileName')
+			{
+				$arguments["widevineMbrPpvModule"] = $tag->ppvmodule;
+				$arguments["widevineMbrTypeName"] = $tag->filename;
+			}
+		}
+		$tagsDoc->appendChild($tagsConfiguration);
+		$arguments['tagsparam'] = $tagsDoc->saveXML();
+
 		return $arguments;
 	}
 
-	private function createXml()
+	private function createXml( $action )
 	{
 		// Init the document
 		$this->_doc = new DOMDocument();
@@ -97,14 +128,25 @@ class TvinciDistributionFeedHelper
 
 		$feedAsXml = kMrssManager::getEntryMrssXml($this->entry);
 
-		if ($this->distributionProfile->xsltFile &&
-			(strlen($this->distributionProfile->xsltFile) !== 0) ) {
-			// custom non empty xslt
-			$xslt = $this->distributionProfile->xsltFile;
-		} else {
-			$xslt = file_get_contents(__DIR__."/../xml/tvinci_default.xslt");
+		if ( $action != self::ACTION_DELETE )
+		{
+			if ($this->distributionProfile->xsltFile &&
+				(strlen($this->distributionProfile->xsltFile) !== 0) ) {
+				// custom non empty xslt
+				$xslt = $this->distributionProfile->xsltFile;
+			} else {
+				$xslt = file_get_contents(__DIR__."/../xml/tvinci_default.xslt");
+			}
+			$feedAsString = kXml::transformXmlUsingXslt($feedAsXml->saveXML(), $xslt, $this->createArgumentsForXSLT());
 		}
-		$feedAsString = kXml::transformXmlUsingXslt($feedAsXml->saveXML(), $xslt, $this->createArgumentsForXSLT());
+		else {
+			$coguid = $this->entry->getReferenceID();
+			if ( !$coguid )
+				$coguid = $this->entry->getId();
+
+			$feedAsString = str_replace("COGUID", $coguid, self::DELETE_XML);
+			$feedAsString = str_replace("ENTRYID", $this->entry->getId(), $feedAsString);
+		}
 
 		$data = $this->_doc->createElement('data');
 		$data->appendChild($this->_doc->createCDATASection($feedAsString));
@@ -153,6 +195,14 @@ class TvinciDistributionFeedHelper
 	public function getXml()
 	{
 		return $this->_doc->saveXML();
+	}
+	
+	private function createAppendXml($tag, $tagsDoc, $xmlNodeName, $propertyName)
+	{
+		$nameNode = $tagsDoc->createElement($xmlNodeName);
+		$nodeText = $tagsDoc->createTextNode($tag->{$propertyName});
+		$nameNode->appendChild($nodeText);
+		return $nameNode;
 	}
 
 }

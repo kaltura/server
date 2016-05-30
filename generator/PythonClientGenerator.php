@@ -1,16 +1,9 @@
 <?php
 class PythonClientGenerator extends ClientGeneratorFromXml
 {
-	/**
-	 * @var DOMDocument
-	 */
-	protected $_doc = null;
-	
 	function __construct($xmlPath, Zend_Config $config, $sourcePath = "sources/python")
 	{
 		parent::__construct($xmlPath, $sourcePath, $config);
-		$this->_doc = new KDOMDocument();
-		$this->_doc->load($this->_xmlFile);
 	}
 	
 	function getSingleLineCommentMarker()
@@ -88,27 +81,38 @@ class PythonClientGenerator extends ClientGeneratorFromXml
 		$enums = array();
 		foreach($enumNodes as $enumNode)
 		{
+			$type = $enumNode->getAttribute("name");
+			if(!$this->shouldIncludeType($type))
+				continue;
+			
 			if($enumNode->hasAttribute('plugin') && $pluginName == '')
 				continue;
 				
 			$this->writeEnum($enumNode);
-			$enums[] = $enumNode->getAttribute("name");
+			$enums[] = $type;
 		}
 	
 		$this->appendLine('########## classes ##########');
 		$classes = array();
 		foreach($classNodes as $classNode)
 		{
+			$type = $classNode->getAttribute("name");
+			if(!$this->shouldIncludeType($type))
+				continue;
+			
 			if($classNode->hasAttribute('plugin') && $pluginName == '')
 				continue;
 				
 			$this->writeClass($classNode);
-			$classes[] = $classNode->getAttribute("name");
+			$classes[] = $type;
 		}
 	
 		$this->appendLine('########## services ##########');
 		foreach($serviceNodes as $serviceNode)
 		{
+			if(!$this->shouldIncludeService($serviceNode->getAttribute("id")))
+				continue;
+			
 			if($serviceNode->hasAttribute('plugin') && $pluginName == '')
 				continue;
 				
@@ -118,6 +122,9 @@ class PythonClientGenerator extends ClientGeneratorFromXml
 		$services = array();
 		foreach($serviceNamesNodes as $serviceNode)
 		{
+			if(!$this->shouldIncludeService($serviceNode->getAttribute("id")))
+				continue;
+			
 			if($serviceNode->hasAttribute('plugin') && $pluginName == '')
 				continue;
 				
@@ -217,7 +224,7 @@ class PythonClientGenerator extends ClientGeneratorFromXml
 		return "$indent# " . $description;
 	}
 	
-	static function buildMultilineString($description, $indent = "")
+	protected function buildMultilineString($description, $indent = "")
 	{
 		$description = trim($description);
 		if (!$description)
@@ -228,11 +235,11 @@ class PythonClientGenerator extends ClientGeneratorFromXml
 		$description = str_replace("\n", "\n$indent", $description);
 		
 		# make sure the description does not start or end with '"'
-		if (kString::beginsWith($description, '"'))
+		if ($this->beginsWith($description, '"'))
 		{
 			$description = " " . $description;
 		}
-		if (kString::endsWith($description, '"'))
+		if ($this->endsWith($description, '"'))
 		{
 			$description .= " ";
 		}
@@ -256,7 +263,7 @@ class PythonClientGenerator extends ClientGeneratorFromXml
 		else
 			$this->appendLine("class $type(KalturaObjectBase):");
 			
-		$description = self::buildMultilineString($classNode->getAttribute("description"), "    ");
+		$description = $this->buildMultilineString($classNode->getAttribute("description"), "    ");
 		if ($description)
 			$this->appendLine($description . "\n");
 			
@@ -532,8 +539,11 @@ class PythonClientGenerator extends ClientGeneratorFromXml
 	
 	function writeService(DOMElement $serviceNode)
 	{
-		$serviceName = $serviceNode->getAttribute("name");
 		$serviceId = $serviceNode->getAttribute("id");
+		if(!$this->shouldIncludeService($serviceId))
+			return;
+			
+		$serviceName = $serviceNode->getAttribute("name");
 		
 		$serviceClassName = "Kaltura".$this->upperCaseFirstLetter($serviceName)."Service";
 		$this->appendLine();
@@ -546,7 +556,7 @@ class PythonClientGenerator extends ClientGeneratorFromXml
 		
 		$this->appendLine("class $serviceClassName(KalturaServiceBase):");
 		
-		$description = self::buildMultilineString($serviceNode->getAttribute("description"), "    ");
+		$description = $this->buildMultilineString($serviceNode->getAttribute("description"), "    ");
 		if ($description)
 			$this->appendLine($description . "\n");
 			
@@ -567,6 +577,9 @@ class PythonClientGenerator extends ClientGeneratorFromXml
 	function writeAction($serviceId, $serviceName, DOMElement $actionNode)
 	{
 		$action = $actionNode->getAttribute("name");
+		if(!$this->shouldIncludeAction($serviceId, $action))
+			return;
+		
 	    $resultNode = $actionNode->getElementsByTagName("result")->item(0);
 	    $resultType = $resultNode->getAttribute("type");
 	    $arrayObjectType = ($resultType == 'array') ? $resultNode->getAttribute ( "arrayType" ) : null;
@@ -581,7 +594,7 @@ class PythonClientGenerator extends ClientGeneratorFromXml
 		$this->appendLine();	
 		$this->appendLine("    $signature");
 		
-		$description = self::buildMultilineString($actionNode->getAttribute("description"), "        ");
+		$description = $this->buildMultilineString($actionNode->getAttribute("description"), "        ");
 		if ($description)
 			$this->appendLine($description . "\n");
 			

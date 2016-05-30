@@ -306,11 +306,12 @@ class playManifestAction extends kalturaAction
 		if(is_null($this->flavorParamsIds))
 			return;
 
-		if ($this->deliveryAttributes->getFormat() == PlaybackProtocol::APPLE_HTTP)
+		$this->flavorIds = assetPeer::retrieveReadyFlavorsIdsByEntryId($this->entryId, $this->flavorParamsIds);
+		if (!is_null($this->flavorIds) && $this->deliveryAttributes->getFormat() == PlaybackProtocol::APPLE_HTTP)
 		{
-			$this->flavorIds = assetPeer::retrieveReadyFlavorsIdsByEntryId($this->entryId, $this->flavorParamsIds);
+			$this->addAudioOnlyFlavors();
 		}
-		$this->addAudioOnlyFlavors();
+
 	}
 	
 	protected function initFlavorParamsIds()

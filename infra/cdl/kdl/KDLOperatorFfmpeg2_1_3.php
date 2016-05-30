@@ -11,38 +11,95 @@ class KDLOperatorFfmpeg2_1_3 extends KDLOperatorFfmpeg1_1_1 {
     public function generateSinglePassCommandLine(KDLFlavor $design, KDLFlavor $target, $extra=null)
 	{
 		$cmdStr = parent::generateSinglePassCommandLine($design, $target, $extra);
-		if(isset($target->_video) && isset($target->_video->_watermarkData)) {
-				// Fading requires looping of the WM image
-			if(isset($target->_video->_watermarkData->fade)){
-				$loopTime = 0;
-				/*
-				 * The loop time should be minimum of the video duration (_explicitClipDur) and 
-				 * the calculated largest fade time.
-				 * Otherwise set loop time to 60 sec
-				 */
-				if(isset($target->_video->_watermarkFadeLoopTime) && $target->_video->_watermarkFadeLoopTime)
-					$loopTime = $target->_video->_watermarkFadeLoopTime + 0.5;
-				if(isset($target->_explicitClipDur) && $target->_explicitClipDur>0){
-					if($loopTime>0) 
-						$loopTime = min($loopTime, round($target->_explicitClipDur/1000));
-					else $loopTime = round($target->_explicitClipDur/1000);
-				}
-				if($loopTime==0)
-					$loopTime = 60;
-					
-				$loopStr = "-loop 1 -t $loopTime";
+		$cmdValsArr = explode(' ', $cmdStr);
+		
+		/*
+		 * On multi-lingual, add:
+		 * - explicit mapping for video (if required)
+		 * - the required audio channels
+		 */
+		if(isset($target->_audio) && isset($target->_multiStream->audio->languages)
+				&& count($target->_multiStream->audio->languages)>0){
+			$auxArr = array();
+			if(isset($target->_video)) {
+				$auxArr[] = "-map v";
 			}
-			else 
-				$loopStr = null;
-			$cmdStr = str_replace(KDLCmdlinePlaceholders::InFileName, 
-					KDLCmdlinePlaceholders::InFileName." $loopStr -i ".KDLCmdlinePlaceholders::WaterMarkFileName,
-					$cmdStr);
+			// Add language prop to the mapped output audio streams
+			$langIdx = 0;
+			foreach ($target->_multiStream->audio->languages as $lang){
+				$auxArr[] = "-map 0:".$lang->id;
+				$auxArr[] = "-metadata:s:a:$langIdx language=$lang->audioLanguage";
+				$langIdx++;
+			}
+			$insertHere = array_search('-y', $cmdValsArr);
+			array_splice ($cmdValsArr, $insertHere, 0, $auxArr);
 		}
 		
-		$cmdValsArr = explode(' ', $cmdStr);
-		if(self::rearrangeFiltersAndOpts($cmdValsArr)){
-			$cmdStr = implode(" ", $cmdValsArr);
+		/*
+		 * Watermarking ...
+		 */
+		if(isset($target->_video->_watermarkData)) {
+				
+				// Fading requires looping of the WM image
+			if(isset($target->_video->_watermarkFadeLoopTime) && $target->_video->_watermarkFadeLoopTime>0){
+					/*
+					 * The loop time should be minimum of the video duration (_explicitClipDur) and 
+					 * the calculated largest fade time.
+					 * Otherwise set loop time to 60 sec
+					 */
+				$loopTime = $target->_video->_watermarkFadeLoopTime + 0.5;
+				if(isset($target->_explicitClipDur) && $target->_explicitClipDur>0){
+					$loopTime = min($loopTime, round($target->_explicitClipDur/1000));
+				}
+			}
+			$auxArr = array();
+			if(is_array($target->_video->_watermarkData)){
+				$watermarkDataArr = $target->_video->_watermarkData;
+				$wmImgIdx = 1;
+				foreach ($watermarkDataArr as $watermarkData){
+					if(isset($loopTime))
+						array_push($auxArr, "-loop", 1, "-t", $loopTime);
+					array_push($auxArr, "-i",KDLCmdlinePlaceholders::WaterMarkFileName."_$wmImgIdx");
+					$wmImgIdx++;
+				}
+			}
+			else {
+				if(isset($loopTime))
+					array_push($auxArr, "-loop", 1, "-t", $loopTime);
+				array_push($auxArr, "-i",KDLCmdlinePlaceholders::WaterMarkFileName);
+			}
+			$insertHere = end(array_keys($cmdValsArr, '-i'))+2;
+			array_splice ($cmdValsArr, $insertHere, 0, $auxArr);
 		}
+
+		/*
+		 * Subtitles, if any ...
+		 */
+		if(isset($target->_video->_subtitlesData->action) && $target->_video->_subtitlesData->action=='embed'){
+			$subsData = $target->_video->_subtitlesData;
+			$auxArr = array();
+			$auxArr[] = '-i';
+			$insertHere = end(array_keys($cmdValsArr, '-i'))+2;
+			if(isset($subsData->filename))
+				$subsFilename = $subsData->filename;
+			else
+				$subsFilename = KDLCmdlinePlaceholders::SubTitlesFileName;
+			$auxArr = array('-i', $subsFilename, '-c:s','mov_text');
+			if(isset($subsData->language)){
+				$auxArr[] = "-metadata:s";
+				$auxArr[] = "language=".$subsData->language;
+			}
+			// c:s:0 mov_text -metadata:s:s:0 ger
+			array_splice ($cmdValsArr, $insertHere, 0, $auxArr);
+		}
+		
+		if(isset($target->_video) && in_array($target->_video->_id, array(KDLVideoTarget::H264,KDLVideoTarget::H264B,KDLVideoTarget::H264M,KDLVideoTarget::H264H))){
+			self::adjustH264Level($target->_video, $cmdValsArr);
+		}
+		
+		self::rearrangeFiltersAndOpts($cmdValsArr);
+		
+		$cmdStr = implode(" ", $cmdValsArr);
 
 		KalturaLog::log("CmdLine==>".$cmdStr);
 		return $cmdStr;
@@ -169,41 +226,102 @@ class KDLOperatorFfmpeg2_1_3 extends KDLOperatorFfmpeg1_1_1 {
 	protected function generateVideoParams(KDLFlavor $design, KDLFlavor $target)
 	{
 		$cmdStr = parent::generateVideoParams($design, $target);
-		if(!isset($target->_video) || !isset($target->_video->_watermarkData))
+		if(!isset($target->_video)){// || !isset($target->_video->_watermarkData))
 			return $cmdStr;
-
-		$vid = $target->_video;
-		$watermarkStr = $this->generateWatermarkParams($vid);
-
+		}
 		$cmdValsArr = explode(' ', $cmdStr);
 			
 		$key=array_search("-vf", $cmdValsArr);
 		if($key!==false) {
-			$filters = $this->generateVideoFilters($vid);
-			if(isset($filters) && count($filters)>0){
-				$filtersStr = array_shift($filters);
-				foreach($filters as $i=>$filter){
-					$filtersStr.="[vflt$i];[vflt$i]$filter";
+			$cmdValsArr[$key] = '-filter_complex';
+			$cmdStr = implode(" ", $cmdValsArr);
+		}
+		return $cmdStr;
+	}
+	
+	/**
+	 * generateVideoFilters
+	 * @param $vid
+	 * @return array of filters
+	 */
+	protected static function generateVideoFilters($vid)
+	{
+		/*
+		 * Addjust pipes ins/outs
+		 */
+		$nextVidIn = "0:v";
+		$idxFlt = 0;
+		$filters = parent::generateVideoFilters($vid);
+		if(isset($filters) && count($filters)>0){
+			foreach($filters as $idxFlt=>$filter){
+				$filters[$idxFlt] = "[$nextVidIn]".$filters[$idxFlt];
+				$nextVidIn = "vflt$idxFlt";
+				if($idxFlt>0) {
+					$prev = $idxFlt-1;
+					$filters[$prev] = $filters[$prev]."[vflt$prev]";
 				}
 			}
-			unset($cmdValsArr[$key+1]);
-			unset($cmdValsArr[$key]);
-			$cmdStr = implode(' ', $cmdValsArr);
 		}
-		
-		$mergedStr = null;
-		if(isset($watermarkStr)) {
-			$mergedStr = $watermarkStr;
-			if(isset($filtersStr))
-				$mergedStr.="[wm];[wm]$filtersStr";
-		}
-		else if(isset($filtersStr))
-			$mergedStr = $filtersStr;
-		
-		if(isset($mergedStr))
-			$cmdStr.= " -filter_complex '$mergedStr'";
 
-		return $cmdStr;
+		/*
+		 * Watermarking, if any ...
+		 */
+		$watermarkFilterStr = self::generateWatermarkParams($vid, $nextVidIn);
+		if(isset($watermarkFilterStr)){
+			if(count($filters)>0){
+				$filters[$idxFlt] = $filters[$idxFlt]."[$nextVidIn]";
+				$idxFlt++;
+			}
+			$filters[] = $watermarkFilterStr;
+			$nextVidIn = "watermarked";
+		}
+		
+		/*
+		 * Subtitles, if defiended with 'render'(burned_in) mode ...
+		 */
+		if(isset($vid->_subtitlesData->action) && $vid->_subtitlesData->action=='render'){
+			
+			/*
+			 * Scan for preset fields
+			 */
+			$params = array();
+			foreach($vid->_subtitlesData as $k=>$fld) {
+				if(!isset($fld))
+					continue;
+				switch($k){
+					case "filename":
+					case "original_size":
+					case "fontsdir":
+					case "charenc":
+						$params[] = "$k=$fld";
+						break;
+					case "force_style":
+							/*
+							 * Style fields require backslash separator to avoid ffmpeg filter detection ambiguity
+							 * It might be fixed in the future ffmpeg versions.
+							 * Sample style json - {"Alignment":1,"FontSize":20,"MarginL":65}}
+							 */ 
+						$styleArr = array();
+						foreach ($fld as $kStl=>$style){
+							$styleArr[] = "$kStl=$style";
+						}
+						$params[] = "$k=".implode('\,', $styleArr);
+						break;
+				}
+			}
+			if(!isset($vid->_subtitlesData->filename))
+				array_unshift($params, "filename=".KDLCmdlinePlaceholders::SubTitlesFileName);
+			
+			if(count($params)>0){
+				if(count($filters)>0){
+					$filters[$idxFlt] = $filters[$idxFlt]."[$nextVidIn]";
+					$idxFlt++;
+				}
+				$filters[] = "[$nextVidIn]subtitles=".(implode(":",$params));;
+				$nextVidIn = "subtitled";
+			}
+		}
+		return $filters;
 	}
 	
 	/* ---------------------------
@@ -234,25 +352,6 @@ class KDLOperatorFfmpeg2_1_3 extends KDLOperatorFfmpeg1_1_1 {
 		$cmdStr = parent::generateContainerParams($design, $target);
 		if(!isset($target->_container))
 			return $cmdStr;
-		
-		/*
-		 * On multi-lingual, add:
-		 * - explicit mapping for video (if required) 
-		 * - the required audio channels 
-		 */
-		if(isset($target->_audio) && isset($target->_multiStream) && isset($target->_multiStream->audio)
-		&& isset($target->_multiStream->audio->languages) && count($target->_multiStream->audio->languages)>0){
-			if(isset($target->_video)) {
-				$cmdStr.= " -map v";
-			}
-				// Add language prop to the mapped output audio streams
-			$langIdx = 0;
-			foreach ($target->_multiStream->audio->languages as $lang){
-				$cmdStr.= " -map 0:".$lang->id;
-				$cmdStr.= " -metadata:s:a:$langIdx language=$lang->audioLanguage";
-				$langIdx++;
-			}
-		}
 		
 		if(in_array($target->_container->_id, array(KDLContainerTarget::MKV,KDLContainerTarget::WEBM))){
 			$cmdStr.= " -sn";
@@ -386,11 +485,9 @@ class KDLOperatorFfmpeg2_1_3 extends KDLOperatorFfmpeg1_1_1 {
 	/**
 	 * 
 	 * @param unknown_type $targetVid
-	 * @param unknown_type $wmWid
-	 * @param unknown_type $wmHgt
-	 * @return string
+	 * @return Ambigous <NULL, Ambigous, string>
 	 */
-	protected static function generateWatermarkParams($targetVid, $wmWid=KDLCmdlinePlaceholders::WaterMarkWidth, $wmHgt=KDLCmdlinePlaceholders::WaterMarkHeight)
+	protected static function generateWatermarkParams($targetVid, $vidIn)
 	{
 /*
 	Watermark Data
@@ -430,32 +527,84 @@ class KDLOperatorFfmpeg2_1_3 extends KDLOperatorFfmpeg1_1_1 {
 				{"type":"out","start_time":"10","alpha":"1","duration":"0.6"}]}
 		
 */
+/*
+Sample multi WM cmd line - 
+ffmpeg -threads 1 -i VIDEO -i WM1.jpg -loop 1 -t 30 -i WM2.jpg 
+	-c:v libx264 -subq 2 -qcomp 0.6 -qmin 10 -qmax 50 -qdiff 4 -coder 0 -vprofile baseline -force_key_frames expr:'gte(t,n_forced*2)' -pix_fmt yuv420p -b:v 317k -s 320x240 -r 25 -g 50 
+	-filter_complex '[1:0]scale=48:50,setsar=48/50[wmimg1];
+	                 [2:0]scale=48:50,setsar=48/50,fade=in:alpha=1:st=0.1:d=0.5,fade=out:alpha=1:st=6:d=0.5[wmimg2];
+	                 [0:v][wmimg1]overlay=10:10[overlayed1];
+	                 [overlayed1][wmimg2]overlay=(main_w-overlay_w)/2-10:(main_h-overlay_h)/2+10' -aspect 320:240 -c:a libfdk_aac -filter_complex 'aresample=async=1:min_hard_comp=0.100000:first_pts=0' -b:a 64k -ar 44100 -ac 2 -map_chapters -1 -map_metadata -1  -f mp4 -flags +loop+mv4 -cmp 256 -partitions +parti4x4+partp8x8+partb8x8 -trellis 1 -refs 1 -me_range 16 -keyint_min 20 -sc_threshold 40 -i_qfactor 0.71 -bt 100k -maxrate 400k -bufsize 1200k -rc_eq 'blurCplx^(1-qComp)' -level 30  -vsync 1 -threads 4  -y /web/content/shared/tmp/wm_tests.mp4
+ */
+		if(!isset($targetVid->_watermarkData))
+			return null;
+		
 		$watermarkStr = null;
-		if(isset($targetVid->_rotation)){
-			switch ($targetVid->_rotation){
-				case 90:
-					$prepArr[]="transpose=1";
-				case 180:
-					$prepArr[]="transpose=1";
-				case 270:
-				case -90:
-					$prepArr[]="transpose=1";
+		$rotation = null;
+		if(isset($targetVid->_rotation))
+			$rotation = $targetVid->_rotation;
+
+		$watermarkStr = null;
+		$maxFadeDuration = 0;
+		if(is_array($targetVid->_watermarkData))
+			$watermarkDataArr = $targetVid->_watermarkData;
+		else
+			$watermarkDataArr = array($targetVid->_watermarkData);
+
+		$wmImgIdx = 1;
+		foreach($watermarkDataArr as $watermarkData) {
+			if(isset($watermarkStr)){
+				$watermarkStr.="[$vidIn];";
 			}
+			$fadeDur = 0;
+			$watermarkStr.= self::generateSingleWatermark(clone($watermarkData), $vidIn, $fadeDur, $wmImgIdx, $rotation);
+			$maxFadeDuration = max($maxFadeDuration,$fadeDur);
+			$vidIn = "overlayed".$wmImgIdx;
+			$wmImgIdx++;
 		}
+		if($maxFadeDuration>0){
+			$targetVid->_watermarkFadeLoopTime = $maxFadeDuration;
+		}
+		return $watermarkStr;
+		
+	}
 
-			// Don't change the passed WM arg, clone it!!!
-		$wmAux = clone($targetVid->_watermarkData);
-
-		KalturaLog::log("Watermark data:\n".print_r($wmAux,1));
+	/**
+	 * 
+	 * @param unknown_type $watermarkData
+	 * @param unknown_type $vidInIdx - stream index of the input video
+	 * @param unknown_type $maxFadeDuration
+	 * @param unknown_type $wmImgIdx - WM file stream index
+	 * @param unknown_type $rotation
+	 * @return Ambigous <NULL, string>
+	 */
+	protected static function generateSingleWatermark($watermarkData, $vidInIdx, &$maxFadeDuration, $wmImgIdx, $rotation)
+	{
+		$wmHgt=KDLCmdlinePlaceholders::WaterMarkHeight."_$wmImgIdx";
+		$wmWid=KDLCmdlinePlaceholders::WaterMarkWidth."_$wmImgIdx";
+		
+		$watermarkStr = null;
+		$prepArr = array();
+		switch ($rotation){
+			case 90:
+				$prepArr[]="transpose=1";
+			case 180:
+				$prepArr[]="transpose=1";
+			case 270:
+			case -90:
+				$prepArr[]="transpose=1";
+		}
+		
+		KalturaLog::log("Watermark data:\n".print_r($watermarkData,1));
 			// Scaling
-		if(isset($wmAux->scale)) {
-			$wmAux->scale = explode("x",$wmAux->scale);
+		if(isset($watermarkData->scale)) {
+			$watermarkData->scale = explode("x",$watermarkData->scale);
 			$prepArr[] ="scale=$wmWid:$wmHgt,setsar=$wmWid/$wmHgt";
 		}
 			// Fading
-		if(isset($wmAux->fade)){
-			if(is_array($wmAux->fade)) $fadeArr = $wmAux->fade;
-			else $fadeArr = array($wmAux->fade);
+		if(isset($watermarkData->fade)){
+			if(is_array($watermarkData->fade)) $fadeArr = $watermarkData->fade;
+			else $fadeArr = array($watermarkData->fade);
 			$duration = $start_time = 0;
 			foreach($fadeArr as $fade){
 				$params = array();
@@ -474,30 +623,25 @@ class KDLOperatorFfmpeg2_1_3 extends KDLOperatorFfmpeg1_1_1 {
 					$prepArr[] = "fade=".(implode(":",$params));
 			}
 			if($duration>0 || $start_time>0){
-				$targetVid->_watermarkFadeLoopTime = $duration+$start_time;
+				$maxFadeDuration = $duration+$start_time;
 			}
 		}
 		if(isset($prepArr)) {
-			$wmImg = "wmimg";
-			$watermarkStr = "[1:v]".(implode(",", $prepArr))."[$wmImg];";
+			$wmImg = "wmimg$wmImgIdx";
+			$watermarkStr = "[$wmImgIdx:0]".(implode(",", $prepArr))."[$wmImg];";
 		}
 		else {
-			$wmImg = "1:v";
+			$wmImg = "$wmImgIdx:0";
 		}
 		$marginsCrop = null;
 		$marginsOver = null;
-		if(isset($wmAux->margins)) {
-			$wmAux->margins = explode("x",$wmAux->margins);
-			if(isset($rotation) && $rotation!=180){
-				$m=$wmAux->margins[0];
-				$wmAux->margins[0]=$wmAux->margins[1];
-				$wmAux->margins[1]=$m;
-			}
-			$w = $wmAux->margins[0];
+		if(isset($watermarkData->margins)) {
+			$watermarkData->margins = explode("x",$watermarkData->margins);
+			$w = $watermarkData->margins[0];
 			if(($centerW=strstr($w,"center"))!=false) $w = (int)str_replace("center", "",$w);
 			$w = in_array($w, array(null,0,-1))? 0: $w;
 			
-			$h = $wmAux->margins[1];
+			$h = $watermarkData->margins[1];
 			if(($centerH=strstr($h,"center"))!=false) $h = (int)str_replace("center", "",$h);
 			$h = in_array($h, array(null,0,-1))? 0: $h;
 			
@@ -521,18 +665,77 @@ class KDLOperatorFfmpeg2_1_3 extends KDLOperatorFfmpeg1_1_1 {
 		}
 		$marginsOver = str_replace(array("iw","ow","ih","oh"), array("main_w","overlay_w","main_h","overlay_h"), $marginsCrop);
 
-		if(isset($wmAux->opacity)){
-			$watermarkStr.= "[0:v]crop=$wmWid:$wmHgt:".$marginsCrop.",setsar=$wmWid/".$wmHgt."[cropped];";
-			$watermarkStr.= "[cropped][$wmImg]blend=all_mode='overlay':all_opacity=".min(1,$wmAux->opacity)."[blended];";
-			$watermarkStr.= "[0:v][blended]overlay=$marginsOver";
+		if(isset($watermarkData->opacity)){
+			$watermarkStr.= "[$vidInIdx]crop=$wmWid:$wmHgt:".$marginsCrop.",setsar=$wmWid/".$wmHgt."[cropped];";
+			$watermarkStr.= "[cropped][$wmImg]blend=all_mode='overlay':all_opacity=".min(1,$watermarkData->opacity)."[blended];";
+			$watermarkStr.= "[$vidInIdx][blended]overlay=$marginsOver";
 		}
 		else {
-			$watermarkStr.= "[0:v][$wmImg]overlay=$marginsOver";
+			$watermarkStr.= "[$vidInIdx][$wmImg]overlay=$marginsOver";
 		}
 		
 		return $watermarkStr;
 	}
 
+	/**
+	 *
+	 * @param string $cmdStr
+	 */
+	protected static function adjustH264Level($targetVid, array &$cmdValsArr)
+	{
+		$H264LevelMacroBlocks = array(
+				10=>99,
+				11=>192,
+				12=>396,
+				13=>396,
+				20=>396,
+				21=>792,
+				22=>1620,
+				30=>1620,
+				31=>3600,
+				32=>5120,
+				40=>8192,
+				41=>8192,
+				42=>8704,
+				50=>22080,
+				51=>36864,
+				52=>36864
+		);
+		
+			/*
+			 * Adjust only existing 'level' param, don't add a new one
+			 */
+		$key=array_search('-level', $cmdValsArr);
+		if($key==false){
+			return;
+		}
+		
+			/*
+			 * WID and HGT required to calc target macro blocks,
+			 * if npt set ==> leave
+			 */
+		if(!(isset($targetVid->_width) && isset($targetVid->_height))){
+			return;
+		}
+			/*
+			 * Calc target macro blocks
+			 */
+		$targetMacroBlocks = round($targetVid->_width/16)*round($targetVid->_height/16);
+		
+		foreach ($H264LevelMacroBlocks as $level=>$mBlks){
+			if($mBlks>$targetMacroBlocks){
+				if($cmdValsArr[$key+1]<10)
+					$currentLevel = round($cmdValsArr[$key+1]*10);
+				else
+					$currentLevel = $cmdValsArr[$key+1];
+				if($level>$currentLevel){
+					$cmdValsArr[$key+1] = $level;
+				}
+				break;
+			}
+		}
+	}
+	
 	/* ---------------------------
 	 * CheckConstraints
 	 */

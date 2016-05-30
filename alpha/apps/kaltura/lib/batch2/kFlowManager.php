@@ -8,7 +8,7 @@
  * @subpackage Batch
  *
  */
-class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventConsumer, kObjectChangedEventConsumer, kObjectDeletedEventConsumer, kObjectReadyForReplacmentEventConsumer
+class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventConsumer, kObjectChangedEventConsumer, kObjectDeletedEventConsumer, kObjectReadyForReplacmentEventConsumer,kObjectDataChangedEventConsumer
 {
 	public final function __construct()
 	{
@@ -483,55 +483,55 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 	{
 		$entry = $object->getentry();
 
-		if($object->getStatus() == asset::FLAVOR_ASSET_STATUS_QUEUED || $object->getStatus() == asset::FLAVOR_ASSET_STATUS_IMPORTING)
+		if ($object->getStatus() == asset::FLAVOR_ASSET_STATUS_QUEUED || $object->getStatus() == asset::FLAVOR_ASSET_STATUS_IMPORTING)
 		{
-			if(!($object instanceof flavorAsset))
+			if (!($object instanceof flavorAsset))
 			{
 				$object->setStatus(asset::FLAVOR_ASSET_STATUS_READY);
 				$object->save();
-			}
-			elseif($object->getIsOriginal())
+			} elseif ($object->getIsOriginal())
 			{
-				if($entry->getType() == entryType::MEDIA_CLIP)
+				if ($entry->getType() == entryType::MEDIA_CLIP)
 				{
 					$syncKey = $object->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 
-					if(kFileSyncUtils::fileSync_exists($syncKey)) {
+					if (kFileSyncUtils::fileSync_exists($syncKey))
+					{
 
-							// Get the asset fileSync.
-							// For URL typed sync - assume remote and use the relative file path.
-							// For the other types - use the ordinary kFileSyncUtils::getLocalFilePathForKey.
-						$fsArr=kFileSyncUtils::getReadyFileSyncForKey($syncKey,true,false);
-						$fs=$fsArr[0];
-						if($fs->getFileType()==FileSync::FILE_SYNC_FILE_TYPE_URL) {
+						// Get the asset fileSync.
+						// For URL typed sync - assume remote and use the relative file path.
+						// For the other types - use the ordinary kFileSyncUtils::getLocalFilePathForKey.
+						$fsArr = kFileSyncUtils::getReadyFileSyncForKey($syncKey, true, false);
+						$fs = $fsArr[0];
+						if ($fs->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL)
+						{
 							$path = $fs->getFilePath();
-						}
-						else{
+						} else
+						{
 							$path = kFileSyncUtils::getLocalFilePathForKey($syncKey);
 						}
 						kJobsManager::addConvertProfileJob($raisedJob, $entry, $object->getId(), $path);
 					}
 				}
-			}
-			else
+			} else
 			{
 				$object->setStatus(asset::FLAVOR_ASSET_STATUS_VALIDATING);
 				$object->save();
 			}
 		}
 
-		 if($object->getStatus() == asset::FLAVOR_ASSET_STATUS_READY && $object instanceof thumbAsset)
-        {
-                if($object->getFlavorParamsId())
-                        kFlowHelper::generateThumbnailsFromFlavor($object->getEntryId(), $raisedJob, $object->getFlavorParamsId());
-                else
-                        if ($object->hasTag(thumbParams::TAG_DEFAULT_THUMB))
-                                kBusinessConvertDL::setAsDefaultThumbAsset($object);
-                return true;
-        }
+		if ($object->getStatus() == asset::FLAVOR_ASSET_STATUS_READY && $object instanceof thumbAsset)
+		{
+			if ($object->getFlavorParamsId())
+				kFlowHelper::generateThumbnailsFromFlavor($object->getEntryId(), $raisedJob, $object->getFlavorParamsId());
+			else
+				if ($object->hasTag(thumbParams::TAG_DEFAULT_THUMB))
+					kBusinessConvertDL::setAsDefaultThumbAsset($object);
+			return true;
+		}
 
 
-		if($object->getIsOriginal() && $entry->getStatus() == entryStatus::NO_CONTENT)
+		if ($object->getIsOriginal() && $entry->getStatus() == entryStatus::NO_CONTENT)
 		{
 			$entry->setStatus(entryStatus::PENDING);
 			$entry->save();
@@ -746,4 +746,38 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 		return true;
 	}
 
+	/**
+	 * @param BaseObject $object
+	 * @param string $previousVersion
+	 * @return bool true if the consumer should handle the event
+	 */
+	public function shouldConsumeDataChangedEvent(BaseObject $object, $previousVersion = null)
+	{
+		if($object instanceof asset)
+			return true;
+
+		return false;		
+	}
+
+	/**
+	 * @param BaseObject $object
+	 * @param string $previousVersion
+	 * @param BatchJob $raisedJob
+	 * @return bool true if should continue to the next consumer
+	 */
+	public function objectDataChanged(BaseObject $object, $previousVersion = null, BatchJob $raisedJob = null)
+	{
+		if ($object instanceof flavorAsset)
+		{
+			if ($object->getStatus() == asset::FLAVOR_ASSET_STATUS_QUEUED)
+			{
+				if (!$object->getIsOriginal())
+				{
+					$object->setStatus(asset::FLAVOR_ASSET_STATUS_VALIDATING);
+					$object->save();
+				}
+			}
+		}
+		return true;
+	}
 }

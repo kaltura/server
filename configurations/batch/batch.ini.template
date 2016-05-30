@@ -660,6 +660,7 @@ friendlyName										= Validate Live Media Servers
 type												= KAsyncValidateLiveMediaServers
 scriptPath											= batches/ValidateLiveMediaServers/KAsyncValidateLiveMediaServersExe.php
 sleepBetweenStopStart								= 30
+params.minCreationTime								= 120
 
 
 

@@ -486,11 +486,21 @@ $plannedDur = 0;
 			
 			/*
 			 * Fading needs explicit time limitation on the WM image loop. 
-			 * We'll do it with '_explicitClipDur' field 
+			 * We'll do it with '_explicitClipDur' field.
+			 * 
+			 * Check each WM data object for multiple-WM mode
 			 */
-		if(!isset($target->_explicitClipDur) && isset($target->_video)
-		&& isset($target->_video->_watermarkData) && isset($target->_video->_watermarkData->fade)){
-			$target->_explicitClipDur = $sourceDur;
+		if(!isset($target->_explicitClipDur) && isset($target->_video) && isset($target->_video->_watermarkData)){
+			if(is_array($target->_video->_watermarkData))
+				$watermarkDataArr = $target->_video->_watermarkData;
+			else
+				$watermarkDataArr = array($target->_video->_watermarkData);
+			foreach($watermarkDataArr as $watermarkData){
+				if(isset($watermarkData->fade)){
+					$target->_explicitClipDur = $sourceDur;
+					break;
+				}
+			}
 		}
 
 			/*
@@ -502,13 +512,21 @@ $plannedDur = 0;
 		else {
 			$target->_fastSeekTo = true;
 		}
+			/*
+			 * Disable encryption for sources shorter than 10sec (PLAT-5558)
+			 */
+		if(isset($this->_isEncrypted) && $sourceDur<10000) {
+			$target->_isEncrypted = false;
+		}
 		
+
 			/*
 			 * For IMX sources, apply cropping of the top 32 pixs, if the flavor has the ImxCrop flag
 			 * 'IMX' ==> mxf/mpeg2 video/ 720x608
+			 * Turn off this flag for 'COPY' cases ('cropping' needs transcoding, it does not work for 'copy'
 			 */
 		if(isset($this->_video)){
-			if($this->_video->_isCropIMX==true
+			if($this->_video->_isCropIMX==true && $this->_video->_id!=KDLVideoTarget::COPY
 			&& isset($source->_container) && $source->_container->IsFormatOf(array("mxf")) 
 			&& isset($source->_video) && $source->_video->IsFormatOf(array("mpeg video","mpeg2video")) 
 			&& isset($source->_video->_width) && $source->_video->_width==720
@@ -826,33 +844,10 @@ $plannedDur = 0;
 			}
 		}
 
-		/*
-		 * Watermark - evaluate scale value in case of 'percentage-of-the-source'
-		 * Sample 'scale' value "x30%" stands for - 
-		 * make the height to be 30% of the source, calculate the width to match the height
-		 */
-		if(isset($targetVid->_watermarkData) && isset($targetVid->_watermarkData->scale)){
-			$scaleArrNew = array();
-			$scaleArr = explode("x",$targetVid->_watermarkData->scale);
-			foreach ($scaleArr as $i=>$val){
-				if(isset($val) && strlen($val)>0) {
-					$percentArr = explode('%', $val);
-					if(count($percentArr)==2){
-						if(isset($sourceVid->_width) && isset($sourceVid->_height)) {
-							// For 'portrait' sources (rotation -90,90,270) - switch the scaled dims
-							if(isset($sourceVid->_rotation) && in_array($sourceVid->_rotation, array(-90,90,270)))
-								$val =($i==0?$sourceVid->_height: $sourceVid->_width);
-							else 
-								$val =($i==0?$sourceVid->_width: $sourceVid->_height);
-							$val = round($val*$percentArr[0]/100);
-						}
-						else $val = "";
-					}
-				}
-				$scaleArrNew[$i] = $val;
-			}
-			$targetVid->_watermarkData->scale = implode('x', $scaleArrNew);
-		}
+			/*
+			 * Watermarks, if any ...
+			 */
+		self::evaluateTargetWaterMark($sourceVid, $targetVid);
 		
 		$targetVid->_rotation = $sourceVid->_rotation;
 		$targetVid->_scanType = $sourceVid->_scanType;
@@ -1240,6 +1235,55 @@ $plannedDur = 0;
 		return $target->_frameRate;
 	}
 
+	/**
+	 * evaluateTargetWaterMark
+	 * Evaluate scale value in case of 'percentage-of-the-source'
+	 * Sample 'scale' value "x30%" stands for - 
+	 * make the height to be 30% of the source, calculate the width to match the height
+	 * 
+	 * @param KDLVideoData $target
+	 * @param KDLVideoData $target
+	 */
+	private static function evaluateTargetWaterMark(KDLVideoData $sourceVid, KDLVideoData $target) 
+	{
+		if(!isset($target->_watermarkData))
+			return;
+		
+		/*
+		 * Handle multiple WM settings - WMdata array
+		 */
+		if(is_array($target->_watermarkData))
+			$watermarkDataArr = $target->_watermarkData;
+		else
+			$watermarkDataArr = array($target->_watermarkData);
+		foreach($watermarkDataArr as $wmI=>$watermarkData){
+			if(isset($watermarkData->scale)){
+				$scaleArrNew = array();
+				$scaleArr = explode("x",$watermarkData->scale);
+				foreach ($scaleArr as $i=>$val){
+					if(isset($val) && strlen($val)>0) {
+						$percentArr = explode('%', $val);
+						if(count($percentArr)==2){
+							if(isset($sourceVid->_width) && isset($sourceVid->_height)) {
+								// For 'portrait' sources (rotation -90,90,270) - switch the scaled dims
+								if(isset($sourceVid->_rotation) && in_array($sourceVid->_rotation, array(-90,90,270)))
+									$val =($i==0?$sourceVid->_height: $sourceVid->_width);
+								else
+									$val =($i==0?$sourceVid->_width: $sourceVid->_height);
+								$val = round($val*$percentArr[0]/100);
+							}
+							else $val = "";
+						}
+					}
+					$scaleArrNew[$i] = $val;
+				}
+				$watermarkData->scale = implode('x', $scaleArrNew);
+			}
+			$watermarkDataArr[$wmI] = $watermarkData;
+		}
+		$target->_watermarkData = $watermarkDataArr;
+	}
+	
 	/* ---------------------------
 	 * evaluateTargetAudio
 	 */

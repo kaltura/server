@@ -2,7 +2,7 @@
 /**
  * @package plugins.dropFolder
  */
-class DropFolderPlugin extends KalturaPlugin implements IKalturaPending, IKalturaServices, IKalturaPermissions, IKalturaObjectLoader, IKalturaEnumerator, IKalturaAdminConsolePages, IKalturaConfigurator, IKalturaEventConsumers
+class DropFolderPlugin extends KalturaPlugin implements IKalturaPending, IKalturaServices, IKalturaPermissions, IKalturaObjectLoader, IKalturaEnumerator, IKalturaAdminConsolePages, IKalturaEventConsumers
 {
 	const PLUGIN_NAME = 'dropFolder';
 	const DROP_FOLDER_EVENTS_CONSUMER = 'kDropFolderEventsConsumer';
@@ -230,20 +230,6 @@ class DropFolderPlugin extends KalturaPlugin implements IKalturaPending, IKaltur
 		return $pages;
 	}
 	
-	/* (non-PHPdoc)
-	 * @see IKalturaConfigurator::getConfig()
-	 */
-	public static function getConfig($configName)
-	{
-		if($configName == 'generator')
-			return new Zend_Config_Ini(dirname(__FILE__) . '/config/generator.ini');
-			
-		if($configName == 'testme')
-			return new Zend_Config_Ini(dirname(__FILE__) . '/config/testme.ini');
-			
-		return null;
-	}
-	
 	/**
 	 * @return array
 	 */
@@ -252,6 +238,11 @@ class DropFolderPlugin extends KalturaPlugin implements IKalturaPending, IKaltur
 		return array(
 			self::DROP_FOLDER_EVENTS_CONSUMER,
 		);
+	}
+	
+	public static function getBatchJobObjectTypeCoreValue($valueName)
+	{
+		return self::getCoreValue('BatchJobObjectType', $valueName);
 	}
 	
 	/**

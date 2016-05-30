@@ -1,16 +1,9 @@
 <?php
 class Php4ClientGenerator extends ClientGeneratorFromXml
 {
-	/**
-	 * @var DOMDocument
-	 */
-	private $_doc = null;
-	
 	function __construct($xmlPath, Zend_Config $config, $sourcePath = "sources/php4")
 	{
 		parent::__construct($xmlPath, $sourcePath, $config);
-		$this->_doc = new KDOMDocument();
-		$this->_doc->load($this->_xmlFile);
 	}
 	
 	function getSingleLineCommentMarker()
@@ -58,6 +51,9 @@ class Php4ClientGenerator extends ClientGeneratorFromXml
 	function writeEnum(DOMElement $enumNode)
 	{
 		$enumName = $enumNode->getAttribute("name");
+		if(!$this->shouldIncludeType($enumName))
+			return;
+		
 		foreach($enumNode->childNodes as $constNode)
 		{
 			if ($constNode->nodeType != XML_ELEMENT_NODE)
@@ -76,6 +72,8 @@ class Php4ClientGenerator extends ClientGeneratorFromXml
 	function writeClass(DOMElement $classNode)
 	{
 		$type = $classNode->getAttribute("name");
+		if(!$this->shouldIncludeType($type))
+			return;
 		
 		// class definition
 		if ($classNode->hasAttribute("base"))
@@ -135,6 +133,10 @@ class Php4ClientGenerator extends ClientGeneratorFromXml
 	
 	function writeService(DOMElement $serviceNode)
 	{
+		$serviceId = $serviceNode->getAttribute("id");
+		if(!$this->shouldIncludeService($serviceId))
+			return;
+			
 		$serviceName = $serviceNode->getAttribute("name");
 		
 		$serviceClassName = "Kaltura".$this->upperCaseFirstLetter($serviceName)."Service";
@@ -152,15 +154,18 @@ class Php4ClientGenerator extends ClientGeneratorFromXml
 		    if ($actionNode->nodeType != XML_ELEMENT_NODE)
 				continue;
 				
-		    $this->writeAction($serviceName, $actionNode);
+		    $this->writeAction($serviceId, $serviceName, $actionNode);
 		}
 		$this->appendLine("}");
 	}
 	
-	function writeAction($serviceName, DOMElement $actionNode)
+	function writeAction($serviceId, $serviceName, DOMElement $actionNode)
 	{
-		$action = $actionNode->getAttribute("name");
-	    $resultNode = $actionNode->getElementsByTagName("result")->item(0);
+	    $action = $actionNode->getAttribute("name");
+	    if(!$this->shouldIncludeAction($serviceId, $action))
+			return;
+				
+		$resultNode = $actionNode->getElementsByTagName("result")->item(0);
 	    $resultType = $resultNode->getAttribute("type");
 	    
 	    if($resultType == 'file')
@@ -298,6 +303,9 @@ class Php4ClientGenerator extends ClientGeneratorFromXml
 		
 		foreach($serviceNodes as $serviceNode)
 		{
+			if(!$this->shouldIncludeService($serviceNode->getAttribute("id")))
+				continue;
+				
 			$serviceName = $serviceNode->getAttribute("name");
 			$description = $serviceNode->getAttribute("description");
 			$serviceClassName = "Kaltura".$this->upperCaseFirstLetter($serviceName)."Service";

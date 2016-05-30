@@ -79,7 +79,8 @@ class kVoicebaseFlowManager implements kBatchJobStatusEventConsumer
 			if($accuracy)
 				$accuracy = floor($accuracy * 100) / 100;
 
-			$this->setObjectContent($transcript, $contentsArray["TXT"], $accuracy, null, true);
+			if($transcript)
+				$this->setObjectContent($transcript, $contentsArray["TXT"], $accuracy, null, true);
 			unset($contentsArray["TXT"]);
 	
 			foreach ($contentsArray as $format => $content)

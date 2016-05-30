@@ -326,7 +326,8 @@ index kaltura_category
 	rt_attr_timestamp = deleted_at
 	rt_attr_bigint = partner_sort_value
 	rt_attr_json = dynamic_attributes
-	rt_field = sphinx_match_optimizations	
+	rt_field = sphinx_match_optimizations
+	rt_field = aggregation_categories	
 }
 
 index kaltura_kuser:kaltura_kuser_base
@@ -489,6 +490,39 @@ index kaltura_metadata:kaltura_base
 	rt_attr_uint = metadata_status
 	rt_field = plugins_data
 	rt_field = sphinx_match_optimizations
+}
+
+index kaltura_schedule_event:kaltura_base
+{
+	path	 = @BASE_DIR@/sphinx/kaltura_schedule_event_rt
+	rt_attr_uint = int_id
+	rt_field = parent_id
+	rt_attr_bigint = partner_id
+	rt_field = summary
+	rt_field = description
+	rt_attr_uint = schedule_event_type
+	rt_attr_uint = schedule_event_status
+	rt_attr_timestamp = original_start_date
+	rt_attr_timestamp = start_date
+	rt_attr_timestamp = end_date
+	rt_field = reference_id
+	rt_attr_uint = classification_type
+	rt_field = location
+	rt_field = organizer
+	rt_attr_uint = owner_kuser_id
+	rt_attr_uint = priority
+	rt_attr_uint = sequence
+	rt_attr_uint = recurrence_type
+	rt_attr_uint = duration
+	rt_field = contact
+	rt_field = comment
+	rt_field = tags
+	rt_attr_timestamp = created_at
+	rt_attr_timestamp = updated_at
+	rt_field = entry_ids
+	rt_field = category_ids
+	rt_field = resource_ids
+	rt_field = plugins_data
 }
 
 
