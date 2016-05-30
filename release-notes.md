@@ -1,5 +1,26 @@
 # Kajam 11.16.0 #
 
+## Schedule event new filtering options ##
+
+- Issue Type: Story
+- Issue ID: PLAT-5488 PLAT-5484
+
+### Configuration ###
+- update sphinx kaltura.conf:
+	
+		Add the following to kaltura_schedule_event index:
+		- rt_field = template_entry_categories_ids
+		- rt_field = system_names
+
+#### Deployment Scripts ####
+
+		- Need to re-build & re-index the schedule event sphinx table.
+		
+#### Known Issues & Limitations ####
+
+None.
+
+
 ## BPM notifications - burnt subtitles##
 
 - Issue Type: New Feature
