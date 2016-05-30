@@ -1,5 +1,19 @@
 # Kajam 11.16.0 #
 
+## play-sever v2.0.0 ##
+- Issue Type: Upgrading
+- Issue ID: PLAT-3508
+
+#### Configuration ####
+- None.
+ 
+#### Deployment Scripts ####
+php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2016_01_17_flavorasset_service_add_play_server_permission.php
+
+#### Known Issues & Limitations ####
+
+None.
+
 ## Support Live HLS seamless failover when streamInfo is known ##
 
 - Issue Type: New Feature
