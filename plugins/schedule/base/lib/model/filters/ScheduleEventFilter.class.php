@@ -59,6 +59,12 @@ class ScheduleEventFilter extends baseObjectFilter
 				"_like_parent_resource_ids",
 				"_mlikeor_parent_resource_ids",
 				"_mlikeand_parent_resource_ids",
+				"_mlikeor_template_entry_categories_ids",
+				"_mlikeand_template_entry_categories_ids",
+				"_like_template_entry_categories_ids",
+				"_mlikeor_system_names",
+				"_mlikeand_system_names",
+				"_like_system_names",
 			) , NULL );
 
 		$this->allowed_order_fields = array (

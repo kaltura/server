@@ -71,6 +71,8 @@ class ScheduleEventIndex extends BaseIndexObject
 				'entry_ids' => 'entryIds',
 				'category_ids' => 'categoryIdsForIndex',
 				'resource_ids' => 'resourceIdsForIndex',
+				'template_entry_categories_ids' => 'templateEntryCategoriesIdsForIndex',
+				'system_names' => 'systemNamesForIndex',
 			);
 		}
 		return self::$fieldsMap;
@@ -111,6 +113,8 @@ class ScheduleEventIndex extends BaseIndexObject
 				'category_ids' => IIndexable::FIELD_TYPE_STRING,
 				'resource_ids' => IIndexable::FIELD_TYPE_STRING,
 				'plugins_data' => IIndexable::FIELD_TYPE_STRING,
+				'template_entry_categories_ids' => IIndexable::FIELD_TYPE_STRING,
+				'system_names' => IIndexable::FIELD_TYPE_STRING,
 			);
 		}
 		return self::$typesMap;
@@ -163,6 +167,8 @@ class ScheduleEventIndex extends BaseIndexObject
 				'schedule_event.CATEGORY_IDS' => 'category_ids',
 				'schedule_event.RESOURCE_IDS' => 'resource_ids',
 				'schedule_event.PLUGINS_DATA' => 'plugins_data',
+				'schedule_event.TEMPLATE_ENTRY_CATEGORIES_IDS' => 'template_entry_categories_ids',
+				'schedule_event.SYSTEM_NAMES' => 'system_names',
 			);
 		}
 		return self::$searchableFieldsMap;
@@ -210,6 +216,8 @@ class ScheduleEventIndex extends BaseIndexObject
 				"entry_ids",
 				"category_ids",
 				"resource_ids",
+				"template_entry_categories_ids",
+				"system_names",
 			);
 		}
 		return self::$matchableFields;

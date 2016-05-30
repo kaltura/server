@@ -264,5 +264,23 @@ abstract class ScheduleEvent extends BaseScheduleEvent implements IRelatedObject
 	
 		return self::RESOURCES_INDEXED_FIELD_PREFIX . $this->getPartnerId() . " " .  implode(' ', $index);
 	}
-	
+
+	public function getTemplateEntryCategoriesIdsForIndex()
+	{
+		return '';
+	}
+
+	public function getSystemNamesForIndex()
+	{
+		$eventResources = ScheduleEventResourcePeer::retrieveByEventId($this->getId());
+
+		$system_names = array();
+		foreach($eventResources as $eventResource)
+		{
+			$resource = ScheduleResourcePeer::retrieveByPK($eventResource->getResourceId());
+			KalturaLog::info($resource->getSystemName());
+			$system_names[] = $resource->getSystemName;
+		}
+		return implode(' ', $system_names);
+	}
 } // ScheduleEvent

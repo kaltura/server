@@ -13,6 +13,12 @@ class KalturaScheduleEventFilter extends KalturaScheduleEventBaseFilter
 		"parentResourceIdsLike" => "_like_parent_resource_ids",
 		"parentResourceIdsMultiLikeOr" => "_mlikeor_parent_resource_ids",
 		"parentResourceIdsMultiLikeAnd" => "_mlikeand_parent_resource_ids",
+		"templateEntryCategoriesIdsLike" => "_like_template_entry_categories_ids",
+		"templateEntryCategoriesIdsMultiLikeAnd" => "_mlikeand_template_entry_categories_ids",
+		"templateEntryCategoriesIdsMultiLikeOr" => "_mlikeor_template_entry_categories_ids",
+		"systemNamesLike" => "_like_system_names",
+		"systemNamesMultiLikeOr" => "_mlikeor_system_names",
+		"systemNamesMultiLikeAnd" => "_mlikeand_system_names",
 	);
 
 	public function getMapBetweenObjects()
@@ -49,7 +55,38 @@ class KalturaScheduleEventFilter extends KalturaScheduleEventBaseFilter
 	 * @var string
 	 */
 	public $parentResourceIdsMultiLikeAnd;
-	
+
+	/**
+	 * @var string
+	 */
+	public $templateEntryCategoriesIdsMultiLikeAnd;
+
+	/**
+	 * @var string
+	 */
+
+	public $templateEntryCategoriesIdsMultiLikeOr;
+
+	/**
+	 * @var string
+	 */
+	public $templateEntryCategoriesIdsLike;
+
+	/**
+	 * @var string
+	 */
+	public $systemNamesMultiLikeOr;
+
+	/**
+	 * @var string
+	 */
+	public $systemNamesMultiLikeAnd;
+
+	/**
+	 * @var string
+	 */
+	public $systemNamesLike;
+
 	/* (non-PHPdoc)
 	 * @see KalturaFilter::getCoreFilter()
 	 */
