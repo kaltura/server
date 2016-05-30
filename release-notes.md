@@ -1,5 +1,23 @@
 # Kajam 11.16.0 #
 
+## BPM notifications - burnt subtitles##
+
+- Issue Type: New Feature
+- Issue ID: PLAT-5564
+
+#### Configuration ####
+ 
+- None.
+
+#### Deployment Scripts ####
+
+		php /opt/kaltura/app/tests/standAloneClient/exec.php /opt/kaltura/app/tests/standAloneClient/bpmNotificationTemplatesForBurntSubtitles.xml
+
+#### Known Issues & Limitations ####
+
+None.
+
+
 ## play-sever v2.0.0 ##
 - Issue Type: Upgrading
 - Issue ID: PLAT-3508
