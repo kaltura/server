@@ -40,7 +40,7 @@ kalcli -x uploadtoken upload fileData=@$TEST_FLV uploadTokenId=$TOKEN ks=$KS
 inc_counter $?
 ENTRY_ID=`kalcli -x baseentry addFromUploadedFile uploadTokenId=$TOKEN partnerId=$PARTNER_ID ks=$KS entry:objectType=KalturaBaseEntry |awk '$1 == "id" {print $2}'`
 inc_counter $?
-TEST_CAT_NAM=testme012
+TEST_CAT_NAM='testme'+$RANDOM
 kalcli -x category add category:objectType=KalturaCategory category:name=$TEST_CAT_NAM  ks=$KS
 RC=$?
 inc_counter $RC
