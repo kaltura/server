@@ -1,5 +1,22 @@
 # Kajam 11.17.0 #
 
+## Thumb Asset export ##
+
+- Issue Type: Story
+- Issue ID: PLAT-2325
+
+### Configuration ###
+None.
+
+#### Deployment Scripts ####
+
+		- Run 'php deployment/permissions/service.thumbasset.ini'
+		
+#### Known Issues & Limitations ####
+
+None.
+
+
 ## Schedule event new filtering options ##
 
 - Issue Type: Story
