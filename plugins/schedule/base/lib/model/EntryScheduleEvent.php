@@ -94,10 +94,9 @@ abstract class EntryScheduleEvent extends ScheduleEvent
 		$catgoriesIds = array();
 		foreach($categoryEntrys as $categoryEntry)
 		{
-			$val = $categoryEntry->getCategoryId();
-			array_push($catgoriesIds, $val);
+			$categoryId = $categoryEntry->getCategoryId();
+			$catgoriesIds[] = $categoryId;
 		}
-
 		return implode(' ', $catgoriesIds);
 	}
 
