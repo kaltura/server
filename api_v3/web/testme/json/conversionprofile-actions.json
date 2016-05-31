@@ -1,0 +1,1 @@
+[{"action":"setAsDefault","name":"setAsDefault","label":"setAsDefault"},{"action":"getDefault","name":"getDefault","label":"getDefault"},{"action":"add","name":"add","label":"add"},{"action":"get","name":"get","label":"get"},{"action":"update","name":"update","label":"update"},{"action":"delete","name":"delete","label":"delete"},{"action":"list","name":"list","label":"list"}]

@@ -1,0 +1,1 @@
+[{"action":"updatePassword","name":"updatePassword","label":"updatePassword (deprecated)"},{"action":"resetPassword","name":"resetPassword","label":"resetPassword"},{"action":"login","name":"login","label":"login"},{"action":"setInitialPassword","name":"setInitialPassword","label":"setInitialPassword"}]

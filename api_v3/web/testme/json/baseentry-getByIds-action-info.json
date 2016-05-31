@@ -1,0 +1,1 @@
+{"actionParams":[{"type":"string","isSimpleType":true,"isComplexType":false,"isFile":false,"isEnum":false,"isStringEnum":false,"isArray":false,"isAbstract":false,"description":"Comma separated string of entry ids","name":"entryIds","isOptional":false}],"description":"Get an array of KalturaBaseEntry objects by a comma-separated list of ids."}

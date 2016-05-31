@@ -1,0 +1,86 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=windows-1252" />
+	<title>Kaltura - TestMe Console Documentation</title>
+	<link rel="stylesheet" type="text/css" href="../css/main.css" />
+</head>
+<body>
+	<div id="doc">
+		<h2>Kaltura API</h2>
+		<table id="serviceInfo">
+			<tr>
+				<td class="title">Service Name</td>
+				<td class="odd">partner</td>
+			</tr>
+			<tr>
+				<td class="title">Description</td>
+				<td>partner service allows you to change/manage your partner personal details and settings as well<br />
+				</td>
+			</tr>
+			<tr>
+				<td class="title">Actions</td>
+				<td class="odd">
+					<table cellspacing="0" class="service_actions">
+						<tr>
+							<th>Name</th>
+							<th>Description</th>
+						</tr>
+						<tr>
+							<td><a href="../actions/partner.register.html">register</td>
+							<td>Create a new Partner object</td>
+						</tr>
+						<tr>
+							<td><a href="../actions/partner.update.html">update</td>
+							<td>Update details and settings of an existing partner</td>
+						</tr>
+						<tr>
+							<td><a href="../actions/partner.get.html">get</td>
+							<td>Retrieve partner object by Id</td>
+						</tr>
+						<tr>
+							<td><a href="../actions/partner.getSecrets.html">getSecrets</td>
+							<td>Retrieve partner secret and admin secret</td>
+						</tr>
+						<tr>
+							<td><a href="../actions/partner.getInfo.html">getInfo</td>
+							<td>Retrieve all info attributed to the partner
+	 This action expects no parameters. It returns information for the current KS partnerId.</td>
+						</tr>
+						<tr>
+							<td><a href="../actions/partner.getUsage.html">getUsage</td>
+							<td>Get usage statistics for a partner
+	 Calculation is done according to partner's package
+	 Additional data returned is a graph points of streaming usage in a timeframe
+	 The resolution can be "days" or "months"</td>
+						</tr>
+						<tr>
+							<td><a href="../actions/partner.getStatistics.html">getStatistics</td>
+							<td>Get usage statistics for a partner
+	 Calculation is done according to partner's package</td>
+						</tr>
+						<tr>
+							<td><a href="../actions/partner.listPartnersForUser.html">listPartnersForUser</td>
+							<td>Retrieve a list of partner objects which the current user is allowed to access.</td>
+						</tr>
+						<tr>
+							<td><a href="../actions/partner.list.html">list</td>
+							<td>List partners by filter with paging support
+	 Current implementation will only list the sub partners of the partner initiating the api call (using the current KS).
+	 This action is only partially implemented to support listing sub partners of a VAR partner.</td>
+						</tr>
+						<tr>
+							<td><a href="../actions/partner.listFeatureStatus.html">listFeatureStatus</td>
+							<td>List partner's current processes' statuses</td>
+						</tr>
+						<tr>
+							<td><a href="../actions/partner.count.html">count</td>
+							<td>Count partner's existing sub-publishers (count includes the partner itself).</td>
+						</tr>
+					</table>
+				</td>
+			</tr>
+		</table>
+	</div>
+</body>
+</html>

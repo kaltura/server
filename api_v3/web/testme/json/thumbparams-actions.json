@@ -1,0 +1,1 @@
+[{"action":"add","name":"add","label":"add"},{"action":"get","name":"get","label":"get"},{"action":"update","name":"update","label":"update"},{"action":"delete","name":"delete","label":"delete"},{"action":"list","name":"list","label":"list"},{"action":"getByConversionProfileId","name":"getByConversionProfileId","label":"getByConversionProfileId"}]

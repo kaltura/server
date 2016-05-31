@@ -1,21 +1,20 @@
 # Kajam 11.16.0 #
 
-## Thumb Asset export ##
+## entryServerNode validate registered serverNodes ##
 
-- Issue Type: Story
-- Issue ID: PLAT-2325
+- Issue Type: BUG
+- Issue ID: PLAT-5572
 
 ### Configuration ###
 None.
 
 #### Deployment Scripts ####
 
-		- Run 'php deployment/updates/scripts/add_permissions/2013_02_21_add_thumbasset_setasdefault.php'
+		- Run 'php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2016_05_31_add_additional_actions_to_entryServerNode.php'
 		
 #### Known Issues & Limitations ####
 
 None.
-
 
 ## Schedule event new filtering options ##
 

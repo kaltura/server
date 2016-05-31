@@ -1,0 +1,1021 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=windows-1252" />
+	<title>Kaltura - TestMe Console Documentation</title>
+	<link rel="stylesheet" type="text/css" href="../css/main.css" />
+	<script type="text/javascript" src="../../testme/js/jquery-1.3.1.min.js"></script>
+	<script type="text/javascript">
+	
+		$(document).ready(function() {
+			$(".base-attribute").click(function() {
+				var classHeaderTable = $(this).parents("table:first");
+				var propertiesTable = classHeaderTable.parent().find("table:last");
+				if ($(this).attr("src").indexOf("collapsed.gif") >= 0) {
+				$(this).attr("src", "../images/expended.gif");
+					propertiesTable.show();
+				}
+				else {
+					$(this).attr("src", "../images/collapsed.gif");
+					propertiesTable.hide();
+				}
+			});
+		});
+	
+	</script>
+</head>
+<body>
+	<div id="doc">
+		<h2>Kaltura API</h2>
+		<table class="action" width="80%">
+			<tr>
+				<th class="service_action_title">KalturaLiveStreamEntryBaseFilter</th>
+			</tr>
+			<tr>
+				<td class="title">Properties</td>
+			</tr>
+			<tr>
+				<td>
+					<table style="">
+						<tbody>
+							<tr>
+								<td class="inheritedFrom">
+									<b><img class="base-attribute" src="../images/collapsed.gif"> Inherited from KalturaObject</b>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+					<table style="display: none">
+						<tbody>
+							<tr>
+								<th class="subtitle">Name</th>
+								<th class="subtitle">Type</th>
+								<th class="subtitle">Writable</th>
+								<th class="subtitle">Restrictions</th>
+								<th class="subtitle">Description</th>
+							</tr>
+							<tr>
+								<td>relatedObjects</td>
+								<td>map of <a href="KalturaListResponse">KalturaListResponse</a></td>
+								<td></td>
+								<td></td>
+								<td></td>
+							</tr>
+						</tbody>
+					</table>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<table style="">
+						<tbody>
+							<tr>
+								<td class="inheritedFrom">
+									<b><img class="base-attribute" src="../images/collapsed.gif"> Inherited from <a href="KalturaFilter.html">KalturaFilter</a></b>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+					<table style="display: none">
+						<tbody>
+							<tr>
+								<th class="subtitle">Name</th>
+								<th class="subtitle">Type</th>
+								<th class="subtitle">Writable</th>
+								<th class="subtitle">Restrictions</th>
+								<th class="subtitle">Description</th>
+							</tr>
+							<tr >
+								<td>orderBy</td>
+								<td><a href="../enums/KalturaLiveStreamEntryBaseOrderBy.html">KalturaLiveStreamEntryBaseOrderBy</a></td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr class="odd">
+								<td>advancedSearch</td>
+								<td><a href="KalturaSearchItem.html">KalturaSearchItem</a></td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+						</tbody>
+					</table>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<table style="">
+						<tbody>
+							<tr>
+								<td class="inheritedFrom">
+									<b>Inherited from <a href="KalturaRelatedFilter.html">KalturaRelatedFilter</a></b>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<table style="">
+						<tbody>
+							<tr>
+								<td class="inheritedFrom">
+									<b><img class="base-attribute" src="../images/collapsed.gif"> Inherited from <a href="KalturaBaseEntryBaseFilter.html">KalturaBaseEntryBaseFilter</a></b>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+					<table style="display: none">
+						<tbody>
+							<tr>
+								<th class="subtitle">Name</th>
+								<th class="subtitle">Type</th>
+								<th class="subtitle">Writable</th>
+								<th class="subtitle">Restrictions</th>
+								<th class="subtitle">Description</th>
+							</tr>
+							<tr >
+								<td>idEqual</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td>This filter should be in use for retrieving only a specific entry (identified by its entryId).</td>
+							</tr>
+							<tr class="odd">
+								<td>idIn</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td>This filter should be in use for retrieving few specific entries (string should include comma separated list of entryId strings).</td>
+							</tr>
+							<tr >
+								<td>idNotIn</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr class="odd">
+								<td>nameLike</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td>This filter should be in use for retrieving specific entries. It should include only one string to search for in entry names (no wildcards, spaces are treated as part of the string).</td>
+							</tr>
+							<tr >
+								<td>nameMultiLikeOr</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td>This filter should be in use for retrieving specific entries. It could include few (comma separated) strings for searching in entry names, while applying an OR logic to retrieve entries that contain at least one input string (no wildcards, spaces are treated as part of the string).</td>
+							</tr>
+							<tr class="odd">
+								<td>nameMultiLikeAnd</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td>This filter should be in use for retrieving specific entries. It could include few (comma separated) strings for searching in entry names, while applying an AND logic to retrieve entries that contain all input strings (no wildcards, spaces are treated as part of the string).</td>
+							</tr>
+							<tr >
+								<td>nameEqual</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td>This filter should be in use for retrieving entries with a specific name.</td>
+							</tr>
+							<tr class="odd">
+								<td>partnerIdEqual</td>
+								<td>int</td>
+								<td>V</td>
+								<td></td>
+								<td>This filter should be in use for retrieving only entries which were uploaded by/assigned to users of a specific Kaltura Partner (identified by Partner ID).</td>
+							</tr>
+							<tr >
+								<td>partnerIdIn</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td>This filter should be in use for retrieving only entries within Kaltura network which were uploaded by/assigned to users of few Kaltura Partners  (string should include comma separated list of PartnerIDs)</td>
+							</tr>
+							<tr class="odd">
+								<td>userIdEqual</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td>This filter parameter should be in use for retrieving only entries, uploaded by/assigned to a specific user (identified by user Id).</td>
+							</tr>
+							<tr >
+								<td>userIdIn</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr class="odd">
+								<td>creatorIdEqual</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr >
+								<td>tagsLike</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td>This filter should be in use for retrieving specific entries. It should include only one string to search for in entry tags (no wildcards, spaces are treated as part of the string).</td>
+							</tr>
+							<tr class="odd">
+								<td>tagsMultiLikeOr</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td>This filter should be in use for retrieving specific entries. It could include few (comma separated) strings for searching in entry tags, while applying an OR logic to retrieve entries that contain at least one input string (no wildcards, spaces are treated as part of the string).</td>
+							</tr>
+							<tr >
+								<td>tagsMultiLikeAnd</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td>This filter should be in use for retrieving specific entries. It could include few (comma separated) strings for searching in entry tags, while applying an AND logic to retrieve entries that contain all input strings (no wildcards, spaces are treated as part of the string).</td>
+							</tr>
+							<tr class="odd">
+								<td>adminTagsLike</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td>This filter should be in use for retrieving specific entries. It should include only one string to search for in entry tags set by an ADMIN user (no wildcards, spaces are treated as part of the string).</td>
+							</tr>
+							<tr >
+								<td>adminTagsMultiLikeOr</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td>This filter should be in use for retrieving specific entries. It could include few (comma separated) strings for searching in entry tags, set by an ADMIN user, while applying an OR logic to retrieve entries that contain at least one input string (no wildcards, spaces are treated as part of the string).</td>
+							</tr>
+							<tr class="odd">
+								<td>adminTagsMultiLikeAnd</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td>This filter should be in use for retrieving specific entries. It could include few (comma separated) strings for searching in entry tags, set by an ADMIN user, while applying an AND logic to retrieve entries that contain all input strings (no wildcards, spaces are treated as part of the string).</td>
+							</tr>
+							<tr >
+								<td>categoriesMatchAnd</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr class="odd">
+								<td>categoriesMatchOr</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td>All entries within these categories or their child categories.</td>
+							</tr>
+							<tr >
+								<td>categoriesNotContains</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr class="odd">
+								<td>categoriesIdsMatchAnd</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr >
+								<td>categoriesIdsMatchOr</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td>All entries of the categories, excluding their child categories.
+	 To include entries of the child categories, use categoryAncestorIdIn, or categoriesMatchOr.</td>
+							</tr>
+							<tr class="odd">
+								<td>categoriesIdsNotContains</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr >
+								<td>categoriesIdsEmpty</td>
+								<td><a href="../enums/KalturaNullableBoolean.html">KalturaNullableBoolean</a></td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr class="odd">
+								<td>statusEqual</td>
+								<td><a href="../enums/KalturaEntryStatus.html">KalturaEntryStatus</a></td>
+								<td>V</td>
+								<td></td>
+								<td>This filter should be in use for retrieving only entries, at a specific {</td>
+							</tr>
+							<tr >
+								<td>statusNotEqual</td>
+								<td><a href="../enums/KalturaEntryStatus.html">KalturaEntryStatus</a></td>
+								<td>V</td>
+								<td></td>
+								<td>This filter should be in use for retrieving only entries, not at a specific {</td>
+							</tr>
+							<tr class="odd">
+								<td>statusIn</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td>This filter should be in use for retrieving only entries, at few specific {</td>
+							</tr>
+							<tr >
+								<td>statusNotIn</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td>This filter should be in use for retrieving only entries, not at few specific {</td>
+							</tr>
+							<tr class="odd">
+								<td>moderationStatusEqual</td>
+								<td><a href="../enums/KalturaEntryModerationStatus.html">KalturaEntryModerationStatus</a></td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr >
+								<td>moderationStatusNotEqual</td>
+								<td><a href="../enums/KalturaEntryModerationStatus.html">KalturaEntryModerationStatus</a></td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr class="odd">
+								<td>moderationStatusIn</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr >
+								<td>moderationStatusNotIn</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr class="odd">
+								<td>typeEqual</td>
+								<td><a href="../enums/KalturaEntryType.html">KalturaEntryType</a></td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr >
+								<td>typeIn</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td>This filter should be in use for retrieving entries of few {</td>
+							</tr>
+							<tr class="odd">
+								<td>createdAtGreaterThanOrEqual</td>
+								<td>int</td>
+								<td>V</td>
+								<td></td>
+								<td>This filter parameter should be in use for retrieving only entries which were created at Kaltura system after a specific time/date (standard timestamp format).</td>
+							</tr>
+							<tr >
+								<td>createdAtLessThanOrEqual</td>
+								<td>int</td>
+								<td>V</td>
+								<td></td>
+								<td>This filter parameter should be in use for retrieving only entries which were created at Kaltura system before a specific time/date (standard timestamp format).</td>
+							</tr>
+							<tr class="odd">
+								<td>updatedAtGreaterThanOrEqual</td>
+								<td>int</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr >
+								<td>updatedAtLessThanOrEqual</td>
+								<td>int</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr class="odd">
+								<td>totalRankLessThanOrEqual</td>
+								<td>int</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr >
+								<td>totalRankGreaterThanOrEqual</td>
+								<td>int</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr class="odd">
+								<td>groupIdEqual</td>
+								<td>int</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr >
+								<td>searchTextMatchAnd</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td>This filter should be in use for retrieving specific entries while search match the input string within all of the following metadata attributes: name, description, tags, adminTags.</td>
+							</tr>
+							<tr class="odd">
+								<td>searchTextMatchOr</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td>This filter should be in use for retrieving specific entries while search match the input string within at least one of the following metadata attributes: name, description, tags, adminTags.</td>
+							</tr>
+							<tr >
+								<td>accessControlIdEqual</td>
+								<td>int</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr class="odd">
+								<td>accessControlIdIn</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr >
+								<td>startDateGreaterThanOrEqual</td>
+								<td>int</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr class="odd">
+								<td>startDateLessThanOrEqual</td>
+								<td>int</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr >
+								<td>startDateGreaterThanOrEqualOrNull</td>
+								<td>int</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr class="odd">
+								<td>startDateLessThanOrEqualOrNull</td>
+								<td>int</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr >
+								<td>endDateGreaterThanOrEqual</td>
+								<td>int</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr class="odd">
+								<td>endDateLessThanOrEqual</td>
+								<td>int</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr >
+								<td>endDateGreaterThanOrEqualOrNull</td>
+								<td>int</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr class="odd">
+								<td>endDateLessThanOrEqualOrNull</td>
+								<td>int</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr >
+								<td>referenceIdEqual</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr class="odd">
+								<td>referenceIdIn</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr >
+								<td>replacingEntryIdEqual</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr class="odd">
+								<td>replacingEntryIdIn</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr >
+								<td>replacedEntryIdEqual</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr class="odd">
+								<td>replacedEntryIdIn</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr >
+								<td>replacementStatusEqual</td>
+								<td><a href="../enums/KalturaEntryReplacementStatus.html">KalturaEntryReplacementStatus</a></td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr class="odd">
+								<td>replacementStatusIn</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr >
+								<td>partnerSortValueGreaterThanOrEqual</td>
+								<td>int</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr class="odd">
+								<td>partnerSortValueLessThanOrEqual</td>
+								<td>int</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr >
+								<td>rootEntryIdEqual</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr class="odd">
+								<td>rootEntryIdIn</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr >
+								<td>parentEntryIdEqual</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr class="odd">
+								<td>entitledUsersEditMatchAnd</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr >
+								<td>entitledUsersEditMatchOr</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr class="odd">
+								<td>entitledUsersPublishMatchAnd</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr >
+								<td>entitledUsersPublishMatchOr</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr class="odd">
+								<td>tagsNameMultiLikeOr</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr >
+								<td>tagsAdminTagsMultiLikeOr</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr class="odd">
+								<td>tagsAdminTagsNameMultiLikeOr</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr >
+								<td>tagsNameMultiLikeAnd</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr class="odd">
+								<td>tagsAdminTagsMultiLikeAnd</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr >
+								<td>tagsAdminTagsNameMultiLikeAnd</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+						</tbody>
+					</table>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<table style="">
+						<tbody>
+							<tr>
+								<td class="inheritedFrom">
+									<b><img class="base-attribute" src="../images/collapsed.gif"> Inherited from <a href="KalturaBaseEntryFilter.html">KalturaBaseEntryFilter</a></b>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+					<table style="display: none">
+						<tbody>
+							<tr>
+								<th class="subtitle">Name</th>
+								<th class="subtitle">Type</th>
+								<th class="subtitle">Writable</th>
+								<th class="subtitle">Restrictions</th>
+								<th class="subtitle">Description</th>
+							</tr>
+							<tr >
+								<td>freeText</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr class="odd">
+								<td>isRoot</td>
+								<td><a href="../enums/KalturaNullableBoolean.html">KalturaNullableBoolean</a></td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr >
+								<td>categoriesFullNameIn</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr class="odd">
+								<td>categoryAncestorIdIn</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td>All entries within this categoy or in child categories</td>
+							</tr>
+							<tr >
+								<td>redirectFromEntryId</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td>The id of the original entry</td>
+							</tr>
+						</tbody>
+					</table>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<table style="">
+						<tbody>
+							<tr>
+								<td class="inheritedFrom">
+									<b><img class="base-attribute" src="../images/collapsed.gif"> Inherited from <a href="KalturaPlayableEntryBaseFilter.html">KalturaPlayableEntryBaseFilter</a></b>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+					<table style="display: none">
+						<tbody>
+							<tr>
+								<th class="subtitle">Name</th>
+								<th class="subtitle">Type</th>
+								<th class="subtitle">Writable</th>
+								<th class="subtitle">Restrictions</th>
+								<th class="subtitle">Description</th>
+							</tr>
+							<tr >
+								<td>lastPlayedAtGreaterThanOrEqual</td>
+								<td>int</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr class="odd">
+								<td>lastPlayedAtLessThanOrEqual</td>
+								<td>int</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr >
+								<td>durationLessThan</td>
+								<td>int</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr class="odd">
+								<td>durationGreaterThan</td>
+								<td>int</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr >
+								<td>durationLessThanOrEqual</td>
+								<td>int</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr class="odd">
+								<td>durationGreaterThanOrEqual</td>
+								<td>int</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr >
+								<td>durationTypeMatchOr</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+						</tbody>
+					</table>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<table style="">
+						<tbody>
+							<tr>
+								<td class="inheritedFrom">
+									<b>Inherited from <a href="KalturaPlayableEntryFilter.html">KalturaPlayableEntryFilter</a></b>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<table style="">
+						<tbody>
+							<tr>
+								<td class="inheritedFrom">
+									<b><img class="base-attribute" src="../images/collapsed.gif"> Inherited from <a href="KalturaMediaEntryBaseFilter.html">KalturaMediaEntryBaseFilter</a></b>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+					<table style="display: none">
+						<tbody>
+							<tr>
+								<th class="subtitle">Name</th>
+								<th class="subtitle">Type</th>
+								<th class="subtitle">Writable</th>
+								<th class="subtitle">Restrictions</th>
+								<th class="subtitle">Description</th>
+							</tr>
+							<tr >
+								<td>mediaTypeEqual</td>
+								<td><a href="../enums/KalturaMediaType.html">KalturaMediaType</a></td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr class="odd">
+								<td>mediaTypeIn</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr >
+								<td>sourceTypeEqual</td>
+								<td><a href="../enums/KalturaSourceType.html">KalturaSourceType</a></td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr class="odd">
+								<td>sourceTypeNotEqual</td>
+								<td><a href="../enums/KalturaSourceType.html">KalturaSourceType</a></td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr >
+								<td>sourceTypeIn</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr class="odd">
+								<td>sourceTypeNotIn</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr >
+								<td>mediaDateGreaterThanOrEqual</td>
+								<td>int</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr class="odd">
+								<td>mediaDateLessThanOrEqual</td>
+								<td>int</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr >
+								<td>flavorParamsIdsMatchOr</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr class="odd">
+								<td>flavorParamsIdsMatchAnd</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+						</tbody>
+					</table>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<table style="">
+						<tbody>
+							<tr>
+								<td class="inheritedFrom">
+									<b>Inherited from <a href="KalturaMediaEntryFilter.html">KalturaMediaEntryFilter</a></b>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<table style="">
+						<tbody>
+							<tr>
+								<td class="inheritedFrom">
+									<b>Inherited from <a href="KalturaLiveEntryBaseFilter.html">KalturaLiveEntryBaseFilter</a></b>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<table style="">
+						<tbody>
+							<tr>
+								<td class="inheritedFrom">
+									<b><img class="base-attribute" src="../images/collapsed.gif"> Inherited from <a href="KalturaLiveEntryFilter.html">KalturaLiveEntryFilter</a></b>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+					<table style="display: none">
+						<tbody>
+							<tr>
+								<th class="subtitle">Name</th>
+								<th class="subtitle">Type</th>
+								<th class="subtitle">Writable</th>
+								<th class="subtitle">Restrictions</th>
+								<th class="subtitle">Description</th>
+							</tr>
+							<tr >
+								<td>isLive</td>
+								<td><a href="../enums/KalturaNullableBoolean.html">KalturaNullableBoolean</a></td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr class="odd">
+								<td>isRecordedEntryIdEmpty</td>
+								<td><a href="../enums/KalturaNullableBoolean.html">KalturaNullableBoolean</a></td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr >
+								<td>hasMediaServerHostname</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+						</tbody>
+					</table>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<table style="">
+						<tbody>
+							<tr>
+								<td class="inheritedFrom"><b>KalturaLiveStreamEntryBaseFilter</b></td>
+							</tr>
+						</tbody>
+					</table>
+					<table style="">
+						<tbody>
+							<tr>
+								<th class="subtitle">Name</th>
+								<th class="subtitle">Type</th>
+								<th class="subtitle">Writable</th>
+								<th class="subtitle">Restrictions</th>
+								<th class="subtitle">Description</th>
+							</tr>
+						</tbody>
+					</table>
+				</td>
+			</tr>
+			<tr>
+				<td>Sub classes: <a href="KalturaLiveStreamEntryFilter.html">KalturaLiveStreamEntryFilter</a>, <a href="KalturaLiveStreamAdminEntryBaseFilter.html">KalturaLiveStreamAdminEntryBaseFilter</a>, <a href="KalturaLiveStreamAdminEntryFilter.html">KalturaLiveStreamAdminEntryFilter</a></td>
+			</tr>
+		</table>
+	</div>
+</body>
+</html>

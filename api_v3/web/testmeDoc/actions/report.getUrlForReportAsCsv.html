@@ -1,0 +1,136 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=windows-1252" />
+	<title>Kaltura - TestMe Console Documentation</title>
+	<link rel="stylesheet" type="text/css" href="../css/main.css" />
+</head>
+<body>
+	<div id="doc">
+		<h2>Kaltura API</h2>
+		<table class="action">
+			<tr>
+				<th colspan="5" class="service_action_title">getUrlForReportAsCsv.getUrlForReportAsCsv</th>
+			</tr>
+			<tr>
+				<td colspan="5" class="title">Description:</td>
+			</tr>
+			<tr>
+				<td class="description" colspan="5">will create a Csv file for the given report and return the URL to access it</td>
+			</tr>
+			<tr>
+				<td colspan="5" class="title">Input Params</td>
+			</tr>
+			<tr>
+				<th class="subtitle">Name</th>
+				<th class="subtitle">Type</th>
+				<th class="subtitle">Description</th>
+				<th class="subtitle">Required</th>
+				<th class="subtitle">Default Value</th>
+			</tr>
+			<tr>
+				<td>reportTitle</td>
+				<td><a href="../objects/string.html">string</a></td>
+				<td>The title of the report to display at top of CSV</td>
+				<td>V</td>
+				<td></td>
+			</tr>
+			<tr>
+				<td>reportText</td>
+				<td><a href="../objects/string.html">string</a></td>
+				<td>The text of the filter of the report</td>
+				<td>V</td>
+				<td></td>
+			</tr>
+			<tr>
+				<td>headers</td>
+				<td><a href="../objects/string.html">string</a></td>
+				<td>The headers of the columns - a map between the enumerations on the server side and the their display text</td>
+				<td>V</td>
+				<td></td>
+			</tr>
+			<tr>
+				<td>reportType</td>
+				<td><a href="../objects/1.html">1</a></td>
+				<td></td>
+				<td>V</td>
+				<td></td>
+			</tr>
+			<tr>
+				<td>reportInputFilter</td>
+				<td><a href="../objects/KalturaReportInputFilter.html">KalturaReportInputFilter</a></td>
+				<td></td>
+				<td>V</td>
+				<td></td>
+			</tr>
+			<tr>
+				<td>dimension</td>
+				<td><a href="../objects/string.html">string</a></td>
+				<td></td>
+				<td></td>
+				<td>1</td>
+			</tr>
+			<tr>
+				<td>pager</td>
+				<td><a href="../objects/KalturaFilterPager.html">KalturaFilterPager</a></td>
+				<td></td>
+				<td></td>
+				<td>1</td>
+			</tr>
+			<tr>
+				<td>order</td>
+				<td><a href="../objects/string.html">string</a></td>
+				<td></td>
+				<td></td>
+				<td>1</td>
+			</tr>
+			<tr>
+				<td>objectIds</td>
+				<td><a href="../objects/string.html">string</a></td>
+				<td>- one ID or more (separated by ',') of specific objects to query</td>
+				<td></td>
+				<td>1</td>
+			</tr>
+			<tr>
+				<td colspan="5" class="title">Output Type</td>
+			</tr>
+			<tr>
+				<td colspan="5"><a href="../objects/string.html">string</a></td>
+			</tr>
+			<tr>
+				<td colspan="5" class="title">Example HTTP Hit</td>
+			</tr>
+			<tr>
+				<td colspan="5">http://www.kaltura.com/api_v3/service/appToken/action/add<br />
+				<strong>JSON object:</strong>
+				<pre>
+				<div class="post_fields">
+[
+	reportTitle: "value",
+	reportText: "value",
+	headers: "value",
+	reportType: "value",
+	reportInputFilter: {
+		objectType: "KalturaReportInputFilter",
+		keywords: "value",
+		searchInTags: value,
+		searchInAdminTags: value,
+		categories: "value",
+		timeZoneOffset: value,
+		interval: "value"
+	},
+	dimension: "value",
+	pager: {
+		objectType: "KalturaFilterPager",
+		pageSize: value,
+		pageIndex: value
+	},
+	order: "value",
+	objectIds: "value"
+]
+				</pre></td>
+			</tr>
+		</table>
+	</div>
+</body>
+</html>

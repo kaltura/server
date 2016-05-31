@@ -1,0 +1,1 @@
+[{"action":"ping","name":"ping","label":"ping"},{"action":"pingDatabase","name":"pingDatabase","label":"pingDatabase"},{"action":"getTime","name":"getTime","label":"getTime"},{"action":"getVersion","name":"getVersion","label":"getVersion"}]

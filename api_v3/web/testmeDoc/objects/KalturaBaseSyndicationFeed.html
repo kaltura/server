@@ -1,0 +1,248 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=windows-1252" />
+	<title>Kaltura - TestMe Console Documentation</title>
+	<link rel="stylesheet" type="text/css" href="../css/main.css" />
+	<script type="text/javascript" src="../../testme/js/jquery-1.3.1.min.js"></script>
+	<script type="text/javascript">
+	
+		$(document).ready(function() {
+			$(".base-attribute").click(function() {
+				var classHeaderTable = $(this).parents("table:first");
+				var propertiesTable = classHeaderTable.parent().find("table:last");
+				if ($(this).attr("src").indexOf("collapsed.gif") >= 0) {
+				$(this).attr("src", "../images/expended.gif");
+					propertiesTable.show();
+				}
+				else {
+					$(this).attr("src", "../images/collapsed.gif");
+					propertiesTable.hide();
+				}
+			});
+		});
+	
+	</script>
+</head>
+<body>
+	<div id="doc">
+		<h2>Kaltura API</h2>
+		<table class="action" width="80%">
+			<tr>
+				<th class="service_action_title">KalturaBaseSyndicationFeed</th>
+			</tr>
+			<tr>
+				<td class="title">Properties</td>
+			</tr>
+			<tr>
+				<td>
+					<table style="">
+						<tbody>
+							<tr>
+								<td class="inheritedFrom">
+									<b><img class="base-attribute" src="../images/collapsed.gif"> Inherited from KalturaObject</b>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+					<table style="display: none">
+						<tbody>
+							<tr>
+								<th class="subtitle">Name</th>
+								<th class="subtitle">Type</th>
+								<th class="subtitle">Writable</th>
+								<th class="subtitle">Restrictions</th>
+								<th class="subtitle">Description</th>
+							</tr>
+							<tr>
+								<td>relatedObjects</td>
+								<td>map of <a href="KalturaListResponse">KalturaListResponse</a></td>
+								<td></td>
+								<td></td>
+								<td></td>
+							</tr>
+						</tbody>
+					</table>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<table style="">
+						<tbody>
+							<tr>
+								<td class="inheritedFrom"><b>KalturaBaseSyndicationFeed</b></td>
+							</tr>
+						</tbody>
+					</table>
+					<table style="">
+						<tbody>
+							<tr>
+								<th class="subtitle">Name</th>
+								<th class="subtitle">Type</th>
+								<th class="subtitle">Writable</th>
+								<th class="subtitle">Restrictions</th>
+								<th class="subtitle">Description</th>
+							</tr>
+							<tr >
+								<td>id</td>
+								<td>string</td>
+								<td></td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr class="odd">
+								<td>feedUrl</td>
+								<td>string</td>
+								<td></td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr >
+								<td>partnerId</td>
+								<td>int</td>
+								<td></td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr class="odd">
+								<td>playlistId</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td>link a playlist that will set what content the feed will include
+	 if empty, all content will be included in feed</td>
+							</tr>
+							<tr >
+								<td>name</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td>feed name</td>
+							</tr>
+							<tr class="odd">
+								<td>status</td>
+								<td><a href="../enums/KalturaSyndicationFeedStatus.html">KalturaSyndicationFeedStatus</a></td>
+								<td></td>
+								<td></td>
+								<td>feed status</td>
+							</tr>
+							<tr >
+								<td>type</td>
+								<td><a href="../enums/KalturaSyndicationFeedType.html">KalturaSyndicationFeedType</a></td>
+								<td>V</td>
+								<td></td>
+								<td>feed type</td>
+							</tr>
+							<tr class="odd">
+								<td>landingPage</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td>Base URL for each video, on the partners site
+	 This is required by all syndication types.</td>
+							</tr>
+							<tr >
+								<td>createdAt</td>
+								<td>int</td>
+								<td></td>
+								<td></td>
+								<td>Creation date as Unix timestamp (In seconds)</td>
+							</tr>
+							<tr class="odd">
+								<td>allowEmbed</td>
+								<td>bool</td>
+								<td>V</td>
+								<td></td>
+								<td>allow_embed tells google OR yahoo weather to allow embedding the video on google OR yahoo video results
+	 or just to provide a link to the landing page.
+	 it is applied on the video-player_loc property in the XML (google)
+	 and addes media-player tag (yahoo)</td>
+							</tr>
+							<tr >
+								<td>playerUiconfId</td>
+								<td>int</td>
+								<td>V</td>
+								<td></td>
+								<td>Select a uiconf ID as player skin to include in the kwidget url</td>
+							</tr>
+							<tr class="odd">
+								<td>flavorParamId</td>
+								<td>int</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr >
+								<td>transcodeExistingContent</td>
+								<td>bool</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr class="odd">
+								<td>addToDefaultConversionProfile</td>
+								<td>bool</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr >
+								<td>categories</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr class="odd">
+								<td>storageId</td>
+								<td>int</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr >
+								<td>entriesOrderBy</td>
+								<td><a href="../enums/KalturaSyndicationFeedEntriesOrderBy.html">KalturaSyndicationFeedEntriesOrderBy</a></td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr class="odd">
+								<td>enforceEntitlement</td>
+								<td>bool</td>
+								<td>V</td>
+								<td></td>
+								<td>Should enforce entitlement on feed entries</td>
+							</tr>
+							<tr >
+								<td>privacyContext</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td>Set privacy context for search entries that assiged to private and public categories within a category privacy context.</td>
+							</tr>
+							<tr class="odd">
+								<td>updatedAt</td>
+								<td>int</td>
+								<td></td>
+								<td></td>
+								<td>Update date as Unix timestamp (In seconds)</td>
+							</tr>
+							<tr >
+								<td>useCategoryEntries</td>
+								<td>bool</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+						</tbody>
+					</table>
+				</td>
+			</tr>
+			<tr>
+				<td>Sub classes: <a href="KalturaGenericSyndicationFeed.html">KalturaGenericSyndicationFeed</a>, <a href="KalturaGenericXsltSyndicationFeed.html">KalturaGenericXsltSyndicationFeed</a>, <a href="KalturaGoogleVideoSyndicationFeed.html">KalturaGoogleVideoSyndicationFeed</a>, <a href="KalturaITunesSyndicationFeed.html">KalturaITunesSyndicationFeed</a>, <a href="KalturaTubeMogulSyndicationFeed.html">KalturaTubeMogulSyndicationFeed</a>, <a href="KalturaYahooSyndicationFeed.html">KalturaYahooSyndicationFeed</a></td>
+			</tr>
+		</table>
+	</div>
+</body>
+</html>

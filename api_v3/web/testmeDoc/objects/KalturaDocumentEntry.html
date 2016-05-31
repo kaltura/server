@@ -1,0 +1,432 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=windows-1252" />
+	<title>Kaltura - TestMe Console Documentation</title>
+	<link rel="stylesheet" type="text/css" href="../css/main.css" />
+	<script type="text/javascript" src="../../testme/js/jquery-1.3.1.min.js"></script>
+	<script type="text/javascript">
+	
+		$(document).ready(function() {
+			$(".base-attribute").click(function() {
+				var classHeaderTable = $(this).parents("table:first");
+				var propertiesTable = classHeaderTable.parent().find("table:last");
+				if ($(this).attr("src").indexOf("collapsed.gif") >= 0) {
+				$(this).attr("src", "../images/expended.gif");
+					propertiesTable.show();
+				}
+				else {
+					$(this).attr("src", "../images/collapsed.gif");
+					propertiesTable.hide();
+				}
+			});
+		});
+	
+	</script>
+</head>
+<body>
+	<div id="doc">
+		<h2>Kaltura API</h2>
+		<table class="action" width="80%">
+			<tr>
+				<th class="service_action_title">KalturaDocumentEntry</th>
+			</tr>
+			<tr>
+				<td class="title">Properties</td>
+			</tr>
+			<tr>
+				<td>
+					<table style="">
+						<tbody>
+							<tr>
+								<td class="inheritedFrom">
+									<b><img class="base-attribute" src="../images/collapsed.gif"> Inherited from KalturaObject</b>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+					<table style="display: none">
+						<tbody>
+							<tr>
+								<th class="subtitle">Name</th>
+								<th class="subtitle">Type</th>
+								<th class="subtitle">Writable</th>
+								<th class="subtitle">Restrictions</th>
+								<th class="subtitle">Description</th>
+							</tr>
+							<tr>
+								<td>relatedObjects</td>
+								<td>map of <a href="KalturaListResponse">KalturaListResponse</a></td>
+								<td></td>
+								<td></td>
+								<td></td>
+							</tr>
+						</tbody>
+					</table>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<table style="">
+						<tbody>
+							<tr>
+								<td class="inheritedFrom">
+									<b><img class="base-attribute" src="../images/collapsed.gif"> Inherited from <a href="KalturaBaseEntry.html">KalturaBaseEntry</a></b>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+					<table style="display: none">
+						<tbody>
+							<tr>
+								<th class="subtitle">Name</th>
+								<th class="subtitle">Type</th>
+								<th class="subtitle">Writable</th>
+								<th class="subtitle">Restrictions</th>
+								<th class="subtitle">Description</th>
+							</tr>
+							<tr >
+								<td>id</td>
+								<td>string</td>
+								<td></td>
+								<td></td>
+								<td>Auto generated 10 characters alphanumeric string</td>
+							</tr>
+							<tr class="odd">
+								<td>name</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td>Entry name (Min 1 chars)</td>
+							</tr>
+							<tr >
+								<td>description</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td>Entry description</td>
+							</tr>
+							<tr class="odd">
+								<td>partnerId</td>
+								<td>int</td>
+								<td></td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr >
+								<td>userId</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td>The ID of the user who is the owner of this entry</td>
+							</tr>
+							<tr class="odd">
+								<td>creatorId</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td>The ID of the user who created this entry</td>
+							</tr>
+							<tr >
+								<td>tags</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td>Entry tags</td>
+							</tr>
+							<tr class="odd">
+								<td>adminTags</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td>Entry admin tags can be updated only by administrators</td>
+							</tr>
+							<tr >
+								<td>categories</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td>Comma separated list of full names of categories to which this entry belongs. Only categories that don't have entitlement (privacy context) are listed, to retrieve the full list of categories, use the categoryEntry.list action.</td>
+							</tr>
+							<tr class="odd">
+								<td>categoriesIds</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td>Comma separated list of ids of categories to which this entry belongs. Only categories that don't have entitlement (privacy context) are listed, to retrieve the full list of categories, use the categoryEntry.list action.</td>
+							</tr>
+							<tr >
+								<td>status</td>
+								<td><a href="../enums/KalturaEntryStatus.html">KalturaEntryStatus</a></td>
+								<td></td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr class="odd">
+								<td>moderationStatus</td>
+								<td><a href="../enums/KalturaEntryModerationStatus.html">KalturaEntryModerationStatus</a></td>
+								<td></td>
+								<td></td>
+								<td>Entry moderation status</td>
+							</tr>
+							<tr >
+								<td>moderationCount</td>
+								<td>int</td>
+								<td></td>
+								<td></td>
+								<td>Number of moderation requests waiting for this entry</td>
+							</tr>
+							<tr class="odd">
+								<td>type</td>
+								<td><a href="../enums/KalturaEntryType.html">KalturaEntryType</a></td>
+								<td>V</td>
+								<td></td>
+								<td>The type of the entry, this is auto filled by the derived entry object</td>
+							</tr>
+							<tr >
+								<td>createdAt</td>
+								<td>int</td>
+								<td></td>
+								<td></td>
+								<td>Entry creation date as Unix timestamp (In seconds)</td>
+							</tr>
+							<tr class="odd">
+								<td>updatedAt</td>
+								<td>int</td>
+								<td></td>
+								<td></td>
+								<td>Entry update date as Unix timestamp (In seconds)</td>
+							</tr>
+							<tr >
+								<td>rank</td>
+								<td>float</td>
+								<td></td>
+								<td></td>
+								<td>The calculated average rank. rank = totalRank / votes</td>
+							</tr>
+							<tr class="odd">
+								<td>totalRank</td>
+								<td>int</td>
+								<td></td>
+								<td></td>
+								<td>The sum of all rank values submitted to the baseEntry.anonymousRank action</td>
+							</tr>
+							<tr >
+								<td>votes</td>
+								<td>int</td>
+								<td></td>
+								<td></td>
+								<td>A count of all requests made to the baseEntry.anonymousRank action</td>
+							</tr>
+							<tr class="odd">
+								<td>groupId</td>
+								<td>int</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr >
+								<td>partnerData</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td>Can be used to store various partner related data as a string</td>
+							</tr>
+							<tr class="odd">
+								<td>downloadUrl</td>
+								<td>string</td>
+								<td></td>
+								<td></td>
+								<td>Download URL for the entry</td>
+							</tr>
+							<tr >
+								<td>searchText</td>
+								<td>string</td>
+								<td></td>
+								<td></td>
+								<td>Indexed search text for full text search</td>
+							</tr>
+							<tr class="odd">
+								<td>licenseType</td>
+								<td><a href="../enums/KalturaLicenseType.html">KalturaLicenseType</a></td>
+								<td>V</td>
+								<td></td>
+								<td>License type used for this entry</td>
+							</tr>
+							<tr >
+								<td>version</td>
+								<td>int</td>
+								<td></td>
+								<td></td>
+								<td>Version of the entry data</td>
+							</tr>
+							<tr class="odd">
+								<td>thumbnailUrl</td>
+								<td>string</td>
+								<td></td>
+								<td></td>
+								<td>Thumbnail URL</td>
+							</tr>
+							<tr >
+								<td>accessControlId</td>
+								<td>int</td>
+								<td>V</td>
+								<td></td>
+								<td>The Access Control ID assigned to this entry (null when not set, send -1 to remove)</td>
+							</tr>
+							<tr class="odd">
+								<td>startDate</td>
+								<td>int</td>
+								<td>V</td>
+								<td></td>
+								<td>Entry scheduling start date (null when not set, send -1 to remove)</td>
+							</tr>
+							<tr >
+								<td>endDate</td>
+								<td>int</td>
+								<td>V</td>
+								<td></td>
+								<td>Entry scheduling end date (null when not set, send -1 to remove)</td>
+							</tr>
+							<tr class="odd">
+								<td>referenceId</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td>Entry external reference id</td>
+							</tr>
+							<tr >
+								<td>replacingEntryId</td>
+								<td>string</td>
+								<td></td>
+								<td></td>
+								<td>ID of temporary entry that will replace this entry when it's approved and ready for replacement</td>
+							</tr>
+							<tr class="odd">
+								<td>replacedEntryId</td>
+								<td>string</td>
+								<td></td>
+								<td></td>
+								<td>ID of the entry that will be replaced when the replacement approved and this entry is ready</td>
+							</tr>
+							<tr >
+								<td>replacementStatus</td>
+								<td><a href="../enums/KalturaEntryReplacementStatus.html">KalturaEntryReplacementStatus</a></td>
+								<td></td>
+								<td></td>
+								<td>Status of the replacement readiness and approval</td>
+							</tr>
+							<tr class="odd">
+								<td>partnerSortValue</td>
+								<td>int</td>
+								<td>V</td>
+								<td></td>
+								<td>Can be used to store various partner related data as a numeric value</td>
+							</tr>
+							<tr >
+								<td>conversionProfileId</td>
+								<td>int</td>
+								<td>V</td>
+								<td></td>
+								<td>Override the default ingestion profile</td>
+							</tr>
+							<tr class="odd">
+								<td>redirectEntryId</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td>IF not empty, points to an entry ID the should replace this current entry's id.</td>
+							</tr>
+							<tr >
+								<td>rootEntryId</td>
+								<td>string</td>
+								<td></td>
+								<td></td>
+								<td>ID of source root entry, used for clipped, skipped and cropped entries that created from another entry</td>
+							</tr>
+							<tr class="odd">
+								<td>parentEntryId</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td>ID of source root entry, used for defining entires association</td>
+							</tr>
+							<tr >
+								<td>operationAttributes</td>
+								<td>array of <a href="KalturaOperationAttributes.html">KalturaOperationAttributes</a></td>
+								<td>V</td>
+								<td></td>
+								<td>clipping, skipping and cropping attributes that used to create this entry</td>
+							</tr>
+							<tr class="odd">
+								<td>entitledUsersEdit</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td>list of user ids that are entitled to edit the entry (no server enforcement) The difference between entitledUsersEdit and entitledUsersPublish is applicative only</td>
+							</tr>
+							<tr >
+								<td>entitledUsersPublish</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td>list of user ids that are entitled to publish the entry (no server enforcement) The difference between entitledUsersEdit and entitledUsersPublish is applicative only</td>
+							</tr>
+							<tr class="odd">
+								<td>capabilities</td>
+								<td>string</td>
+								<td></td>
+								<td></td>
+								<td>Comma seperated string of the capabilities of the entry. Any capability needed can be added to this list.</td>
+							</tr>
+							<tr >
+								<td>templateEntryId</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td>Template entry id</td>
+							</tr>
+						</tbody>
+					</table>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<table style="">
+						<tbody>
+							<tr>
+								<td class="inheritedFrom"><b>KalturaDocumentEntry</b></td>
+							</tr>
+						</tbody>
+					</table>
+					<table style="">
+						<tbody>
+							<tr>
+								<th class="subtitle">Name</th>
+								<th class="subtitle">Type</th>
+								<th class="subtitle">Writable</th>
+								<th class="subtitle">Restrictions</th>
+								<th class="subtitle">Description</th>
+							</tr>
+							<tr >
+								<td>documentType</td>
+								<td><a href="../enums/KalturaDocumentType.html">KalturaDocumentType</a></td>
+								<td>V</td>
+								<td></td>
+								<td>The type of the document</td>
+							</tr>
+							<tr class="odd">
+								<td>assetParamsIds</td>
+								<td>string</td>
+								<td></td>
+								<td></td>
+								<td>Comma separated asset params ids that exists for this media entry</td>
+							</tr>
+						</tbody>
+					</table>
+				</td>
+			</tr>
+		</table>
+	</div>
+</body>
+</html>

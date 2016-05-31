@@ -174,7 +174,7 @@ class StorageProfile extends BaseStorageProfile implements IBaseObject
 	 * @param flavorAsset $flavorAsset
 	 * @return boolean true if the given flavor asset is configured to be exported or false otherwise
 	 */
-	public function shouldExportFlavorAsset(asset $flavorAsset, $skipFlavorAssetStatusValidation = false)
+	public function shouldExportFlavorAsset(flavorAsset $flavorAsset, $skipFlavorAssetStatusValidation = false)
 	{
 		if(!$skipFlavorAssetStatusValidation && !$flavorAsset->isLocalReadyStatus())
 		{
@@ -316,7 +316,7 @@ class StorageProfile extends BaseStorageProfile implements IBaseObject
 	 * 
 	 * @param flavorAsset $flavorAsset
 	 */
-	protected function isFlavorAssetConfiguredForExport(asset $flavorAsset)
+	protected function isFlavorAssetConfiguredForExport(flavorAsset $flavorAsset)
 	{
 		$configuredForExport = null;
 	    
