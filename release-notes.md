@@ -1,5 +1,22 @@
 # Kajam 11.16.0 #
 
+## entryServerNode validate registered serverNodes ##
+
+- Issue Type: BUG
+- Issue ID: PLAT-5572
+
+### Configuration ###
+None.
+
+#### Deployment Scripts ####
+
+		- Run 'php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2016_05_31_add_additional_actions_to_entryServerNode.php'
+		
+#### Known Issues & Limitations ####
+
+None.
+
+
 ## Thumb Asset export ##
 
 - Issue Type: Story
