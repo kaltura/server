@@ -1,0 +1,1 @@
+{"actionParams":[{"type":"string","isSimpleType":true,"isComplexType":false,"isFile":false,"isEnum":false,"isStringEnum":false,"isArray":false,"isAbstract":false,"description":"","name":"entryId","isOptional":false}],"description":"Approve the media entry and mark the pending flags (if any) as moderated (this will make the entry playable)"}

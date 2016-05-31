@@ -1,0 +1,208 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=windows-1252" />
+	<title>Kaltura - TestMe Console Documentation</title>
+	<link rel="stylesheet" type="text/css" href="../css/main.css" />
+	<script type="text/javascript" src="../../testme/js/jquery-1.3.1.min.js"></script>
+	<script type="text/javascript">
+	
+		$(document).ready(function() {
+			$(".base-attribute").click(function() {
+				var classHeaderTable = $(this).parents("table:first");
+				var propertiesTable = classHeaderTable.parent().find("table:last");
+				if ($(this).attr("src").indexOf("collapsed.gif") >= 0) {
+				$(this).attr("src", "../images/expended.gif");
+					propertiesTable.show();
+				}
+				else {
+					$(this).attr("src", "../images/collapsed.gif");
+					propertiesTable.hide();
+				}
+			});
+		});
+	
+	</script>
+</head>
+<body>
+	<div id="doc">
+		<h2>Kaltura API</h2>
+		<table class="action" width="80%">
+			<tr>
+				<th class="service_action_title">KalturaEventNotificationTemplate</th>
+			</tr>
+			<tr>
+				<td class="title">Properties</td>
+			</tr>
+			<tr>
+				<td>
+					<table style="">
+						<tbody>
+							<tr>
+								<td class="inheritedFrom">
+									<b><img class="base-attribute" src="../images/collapsed.gif"> Inherited from KalturaObject</b>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+					<table style="display: none">
+						<tbody>
+							<tr>
+								<th class="subtitle">Name</th>
+								<th class="subtitle">Type</th>
+								<th class="subtitle">Writable</th>
+								<th class="subtitle">Restrictions</th>
+								<th class="subtitle">Description</th>
+							</tr>
+							<tr>
+								<td>relatedObjects</td>
+								<td>map of <a href="KalturaListResponse">KalturaListResponse</a></td>
+								<td></td>
+								<td></td>
+								<td></td>
+							</tr>
+						</tbody>
+					</table>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<table style="">
+						<tbody>
+							<tr>
+								<td class="inheritedFrom"><b>KalturaEventNotificationTemplate</b></td>
+							</tr>
+						</tbody>
+					</table>
+					<table style="">
+						<tbody>
+							<tr>
+								<th class="subtitle">Name</th>
+								<th class="subtitle">Type</th>
+								<th class="subtitle">Writable</th>
+								<th class="subtitle">Restrictions</th>
+								<th class="subtitle">Description</th>
+							</tr>
+							<tr >
+								<td>id</td>
+								<td>int</td>
+								<td></td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr class="odd">
+								<td>partnerId</td>
+								<td>int</td>
+								<td></td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr >
+								<td>name</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr class="odd">
+								<td>systemName</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr >
+								<td>description</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr class="odd">
+								<td>type</td>
+								<td><a href="../enums/KalturaEventNotificationTemplateType.html">KalturaEventNotificationTemplateType</a></td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr >
+								<td>status</td>
+								<td><a href="../enums/KalturaEventNotificationTemplateStatus.html">KalturaEventNotificationTemplateStatus</a></td>
+								<td></td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr class="odd">
+								<td>createdAt</td>
+								<td>int</td>
+								<td></td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr >
+								<td>updatedAt</td>
+								<td>int</td>
+								<td></td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr class="odd">
+								<td>manualDispatchEnabled</td>
+								<td>bool</td>
+								<td>V</td>
+								<td></td>
+								<td>Define that the template could be dispatched manually from the API</td>
+							</tr>
+							<tr >
+								<td>automaticDispatchEnabled</td>
+								<td>bool</td>
+								<td>V</td>
+								<td></td>
+								<td>Define that the template could be dispatched automatically by the system</td>
+							</tr>
+							<tr class="odd">
+								<td>eventType</td>
+								<td><a href="../enums/KalturaEventNotificationEventType.html">KalturaEventNotificationEventType</a></td>
+								<td>V</td>
+								<td></td>
+								<td>Define the event that should trigger this notification</td>
+							</tr>
+							<tr >
+								<td>eventObjectType</td>
+								<td><a href="../enums/KalturaEventNotificationEventObjectType.html">KalturaEventNotificationEventObjectType</a></td>
+								<td>V</td>
+								<td></td>
+								<td>Define the object that raied the event that should trigger this notification</td>
+							</tr>
+							<tr class="odd">
+								<td>eventConditions</td>
+								<td>array of <a href="KalturaCondition.html">KalturaCondition</a></td>
+								<td>V</td>
+								<td></td>
+								<td>Define the conditions that cause this notification to be triggered</td>
+							</tr>
+							<tr >
+								<td>contentParameters</td>
+								<td>array of <a href="KalturaEventNotificationParameter.html">KalturaEventNotificationParameter</a></td>
+								<td>V</td>
+								<td></td>
+								<td>Define the content dynamic parameters</td>
+							</tr>
+							<tr class="odd">
+								<td>userParameters</td>
+								<td>array of <a href="KalturaEventNotificationParameter.html">KalturaEventNotificationParameter</a></td>
+								<td>V</td>
+								<td></td>
+								<td>Define the content dynamic parameters</td>
+							</tr>
+						</tbody>
+					</table>
+				</td>
+			</tr>
+			<tr>
+				<td>Sub classes: <a href="KalturaBusinessProcessNotificationTemplate.html">KalturaBusinessProcessNotificationTemplate</a>, <a href="KalturaBusinessProcessAbortNotificationTemplate.html">KalturaBusinessProcessAbortNotificationTemplate</a>, <a href="KalturaBusinessProcessSignalNotificationTemplate.html">KalturaBusinessProcessSignalNotificationTemplate</a>, <a href="KalturaBusinessProcessStartNotificationTemplate.html">KalturaBusinessProcessStartNotificationTemplate</a>, <a href="KalturaEmailNotificationTemplate.html">KalturaEmailNotificationTemplate</a>, <a href="KalturaHttpNotificationTemplate.html">KalturaHttpNotificationTemplate</a>, <a href="KalturaPushNotificationTemplate.html">KalturaPushNotificationTemplate</a></td>
+			</tr>
+		</table>
+	</div>
+</body>
+</html>

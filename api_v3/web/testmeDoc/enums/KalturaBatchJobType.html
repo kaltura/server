@@ -1,0 +1,257 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=windows-1252" />
+	<title>Kaltura - TestMe Console Documentation</title>
+	<link rel="stylesheet" type="text/css" href="../css/main.css" />
+</head>
+<body>
+	<div id="doc">
+		<h2>Kaltura API</h2>
+		<table class="action" width="80%">
+			<tr>
+				<th class="service_action_title">KalturaBatchJobType (string)</th>
+			</tr>
+			<tr>
+				<td class="title">Enumerations</td>
+			</tr>
+			<tr>
+				<td>
+					<table style="">
+						<tbody>
+							<tr>
+								<th class="subtitle">Name</th>
+								<th class="subtitle">Value</th>
+							</tr>
+							<tr >
+								<td>PARSE_MULTI_LANGUAGE_CAPTION_ASSET</td>
+								<td>caption.parsemultilanguagecaptionasset</td>
+							</tr>
+							<tr class="odd">
+								<td>PARSE_CAPTION_ASSET</td>
+								<td>captionSearch.parseCaptionAsset</td>
+							</tr>
+							<tr >
+								<td>DISTRIBUTION_DELETE</td>
+								<td>contentDistribution.DistributionDelete</td>
+							</tr>
+							<tr class="odd">
+								<td>DISTRIBUTION_DISABLE</td>
+								<td>contentDistribution.DistributionDisable</td>
+							</tr>
+							<tr >
+								<td>DISTRIBUTION_ENABLE</td>
+								<td>contentDistribution.DistributionEnable</td>
+							</tr>
+							<tr class="odd">
+								<td>DISTRIBUTION_FETCH_REPORT</td>
+								<td>contentDistribution.DistributionFetchReport</td>
+							</tr>
+							<tr >
+								<td>DISTRIBUTION_SUBMIT</td>
+								<td>contentDistribution.DistributionSubmit</td>
+							</tr>
+							<tr class="odd">
+								<td>DISTRIBUTION_SYNC</td>
+								<td>contentDistribution.DistributionSync</td>
+							</tr>
+							<tr >
+								<td>DISTRIBUTION_UPDATE</td>
+								<td>contentDistribution.DistributionUpdate</td>
+							</tr>
+							<tr class="odd">
+								<td>DROP_FOLDER_CONTENT_PROCESSOR</td>
+								<td>dropFolder.DropFolderContentProcessor</td>
+							</tr>
+							<tr >
+								<td>CONVERT</td>
+								<td>0</td>
+							</tr>
+							<tr class="odd">
+								<td>DROP_FOLDER_WATCHER</td>
+								<td>dropFolder.DropFolderWatcher</td>
+							</tr>
+							<tr >
+								<td>EVENT_NOTIFICATION_HANDLER</td>
+								<td>eventNotification.EventNotificationHandler</td>
+							</tr>
+							<tr class="odd">
+								<td>INTEGRATION</td>
+								<td>integration.Integration</td>
+							</tr>
+							<tr >
+								<td>SCHEDULED_TASK</td>
+								<td>scheduledTask.ScheduledTask</td>
+							</tr>
+							<tr class="odd">
+								<td>INDEX_TAGS</td>
+								<td>tagSearch.IndexTagsByPrivacyContext</td>
+							</tr>
+							<tr >
+								<td>TAG_RESOLVE</td>
+								<td>tagSearch.TagResolve</td>
+							</tr>
+							<tr class="odd">
+								<td>VIRUS_SCAN</td>
+								<td>virusScan.VirusScan</td>
+							</tr>
+							<tr >
+								<td>WIDEVINE_REPOSITORY_SYNC</td>
+								<td>widevine.WidevineRepositorySync</td>
+							</tr>
+							<tr class="odd">
+								<td>IMPORT</td>
+								<td>1</td>
+							</tr>
+							<tr >
+								<td>DELETE</td>
+								<td>2</td>
+							</tr>
+							<tr class="odd">
+								<td>FLATTEN</td>
+								<td>3</td>
+							</tr>
+							<tr >
+								<td>BULKUPLOAD</td>
+								<td>4</td>
+							</tr>
+							<tr class="odd">
+								<td>DVDCREATOR</td>
+								<td>5</td>
+							</tr>
+							<tr >
+								<td>DOWNLOAD</td>
+								<td>6</td>
+							</tr>
+							<tr class="odd">
+								<td>OOCONVERT</td>
+								<td>7</td>
+							</tr>
+							<tr >
+								<td>CONVERT_PROFILE</td>
+								<td>10</td>
+							</tr>
+							<tr class="odd">
+								<td>POSTCONVERT</td>
+								<td>11</td>
+							</tr>
+							<tr >
+								<td>EXTRACT_MEDIA</td>
+								<td>14</td>
+							</tr>
+							<tr class="odd">
+								<td>MAIL</td>
+								<td>15</td>
+							</tr>
+							<tr >
+								<td>NOTIFICATION</td>
+								<td>16</td>
+							</tr>
+							<tr class="odd">
+								<td>CLEANUP</td>
+								<td>17</td>
+							</tr>
+							<tr >
+								<td>SCHEDULER_HELPER</td>
+								<td>18</td>
+							</tr>
+							<tr class="odd">
+								<td>BULKDOWNLOAD</td>
+								<td>19</td>
+							</tr>
+							<tr >
+								<td>DB_CLEANUP</td>
+								<td>20</td>
+							</tr>
+							<tr class="odd">
+								<td>PROVISION_PROVIDE</td>
+								<td>21</td>
+							</tr>
+							<tr >
+								<td>CONVERT_COLLECTION</td>
+								<td>22</td>
+							</tr>
+							<tr class="odd">
+								<td>STORAGE_EXPORT</td>
+								<td>23</td>
+							</tr>
+							<tr >
+								<td>PROVISION_DELETE</td>
+								<td>24</td>
+							</tr>
+							<tr class="odd">
+								<td>STORAGE_DELETE</td>
+								<td>25</td>
+							</tr>
+							<tr >
+								<td>EMAIL_INGESTION</td>
+								<td>26</td>
+							</tr>
+							<tr class="odd">
+								<td>METADATA_IMPORT</td>
+								<td>27</td>
+							</tr>
+							<tr >
+								<td>METADATA_TRANSFORM</td>
+								<td>28</td>
+							</tr>
+							<tr class="odd">
+								<td>FILESYNC_IMPORT</td>
+								<td>29</td>
+							</tr>
+							<tr >
+								<td>CAPTURE_THUMB</td>
+								<td>30</td>
+							</tr>
+							<tr class="odd">
+								<td>DELETE_FILE</td>
+								<td>31</td>
+							</tr>
+							<tr >
+								<td>INDEX</td>
+								<td>32</td>
+							</tr>
+							<tr class="odd">
+								<td>MOVE_CATEGORY_ENTRIES</td>
+								<td>33</td>
+							</tr>
+							<tr >
+								<td>COPY</td>
+								<td>34</td>
+							</tr>
+							<tr class="odd">
+								<td>CONCAT</td>
+								<td>35</td>
+							</tr>
+							<tr >
+								<td>CONVERT_LIVE_SEGMENT</td>
+								<td>36</td>
+							</tr>
+							<tr class="odd">
+								<td>COPY_PARTNER</td>
+								<td>37</td>
+							</tr>
+							<tr >
+								<td>VALIDATE_LIVE_MEDIA_SERVERS</td>
+								<td>38</td>
+							</tr>
+							<tr class="odd">
+								<td>SYNC_CATEGORY_PRIVACY_CONTEXT</td>
+								<td>39</td>
+							</tr>
+							<tr >
+								<td>LIVE_REPORT_EXPORT</td>
+								<td>40</td>
+							</tr>
+							<tr class="odd">
+								<td>RECALCULATE_CACHE</td>
+								<td>41</td>
+							</tr>
+						</tbody>
+					</table>
+				</td>
+			</tr>
+		</table>
+	</div>
+</body>
+</html>

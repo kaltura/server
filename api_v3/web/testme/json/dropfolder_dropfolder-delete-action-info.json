@@ -1,0 +1,1 @@
+{"actionParams":[{"type":"int","isSimpleType":true,"isComplexType":false,"isFile":false,"isEnum":false,"isStringEnum":false,"isArray":false,"isAbstract":false,"description":"","name":"dropFolderId","isOptional":false}],"description":"Mark the KalturaDropFolder object as deleted"}

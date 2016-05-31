@@ -1,0 +1,1 @@
+{"actionParams":[{"type":"int","isSimpleType":true,"isComplexType":false,"isFile":false,"isEnum":false,"isStringEnum":false,"isArray":false,"isAbstract":false,"description":"job id","name":"id","isOptional":false}],"description":"serveLog action returns the log file for the bulk-upload job."}

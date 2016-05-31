@@ -1,0 +1,1 @@
+{"actionParams":[{"type":"bigint","isSimpleType":true,"isComplexType":false,"isFile":false,"isEnum":false,"isStringEnum":false,"isArray":false,"isAbstract":false,"description":"job id","name":"id","isOptional":false}],"description":"serveLog action returan the original file."}

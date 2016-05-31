@@ -1,0 +1,215 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=windows-1252" />
+	<title>Kaltura - TestMe Console Documentation</title>
+	<link rel="stylesheet" type="text/css" href="../css/main.css" />
+	<script type="text/javascript" src="../../testme/js/jquery-1.3.1.min.js"></script>
+	<script type="text/javascript">
+	
+		$(document).ready(function() {
+			$(".base-attribute").click(function() {
+				var classHeaderTable = $(this).parents("table:first");
+				var propertiesTable = classHeaderTable.parent().find("table:last");
+				if ($(this).attr("src").indexOf("collapsed.gif") >= 0) {
+				$(this).attr("src", "../images/expended.gif");
+					propertiesTable.show();
+				}
+				else {
+					$(this).attr("src", "../images/collapsed.gif");
+					propertiesTable.hide();
+				}
+			});
+		});
+	
+	</script>
+</head>
+<body>
+	<div id="doc">
+		<h2>Kaltura API</h2>
+		<table class="action" width="80%">
+			<tr>
+				<th class="service_action_title">KalturaScheduleEventRecurrence</th>
+			</tr>
+			<tr>
+				<td class="title">Properties</td>
+			</tr>
+			<tr>
+				<td>
+					<table style="">
+						<tbody>
+							<tr>
+								<td class="inheritedFrom">
+									<b><img class="base-attribute" src="../images/collapsed.gif"> Inherited from KalturaObject</b>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+					<table style="display: none">
+						<tbody>
+							<tr>
+								<th class="subtitle">Name</th>
+								<th class="subtitle">Type</th>
+								<th class="subtitle">Writable</th>
+								<th class="subtitle">Restrictions</th>
+								<th class="subtitle">Description</th>
+							</tr>
+							<tr>
+								<td>relatedObjects</td>
+								<td>map of <a href="KalturaListResponse">KalturaListResponse</a></td>
+								<td></td>
+								<td></td>
+								<td></td>
+							</tr>
+						</tbody>
+					</table>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<table style="">
+						<tbody>
+							<tr>
+								<td class="inheritedFrom"><b>KalturaScheduleEventRecurrence</b></td>
+							</tr>
+						</tbody>
+					</table>
+					<table style="">
+						<tbody>
+							<tr>
+								<th class="subtitle">Name</th>
+								<th class="subtitle">Type</th>
+								<th class="subtitle">Writable</th>
+								<th class="subtitle">Restrictions</th>
+								<th class="subtitle">Description</th>
+							</tr>
+							<tr >
+								<td>name</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr class="odd">
+								<td>frequency</td>
+								<td><a href="../enums/KalturaScheduleEventRecurrenceFrequency.html">KalturaScheduleEventRecurrenceFrequency</a></td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr >
+								<td>until</td>
+								<td>int</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr class="odd">
+								<td>count</td>
+								<td>int</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr >
+								<td>interval</td>
+								<td>int</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr class="odd">
+								<td>bySecond</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td>Comma separated numbers between 0 to 59</td>
+							</tr>
+							<tr >
+								<td>byMinute</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td>Comma separated numbers between 0 to 59</td>
+							</tr>
+							<tr class="odd">
+								<td>byHour</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td>Comma separated numbers between 0 to 23</td>
+							</tr>
+							<tr >
+								<td>byDay</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td>Comma separated of KalturaScheduleEventRecurrenceDay
+	 Each byDay value can also be preceded by a positive (+n) or negative (-n) integer.
+	 If present, this indicates the nth occurrence of the specific day within the MONTHLY or YEARLY RRULE.
+	 For example, within a MONTHLY rule, +1MO (or simply 1MO) represents the first Monday within the month, whereas -1MO represents the last Monday of the month.
+	 If an integer modifier is not present, it means all days of this type within the specified frequency.
+	 For example, within a MONTHLY rule, MO represents all Mondays within the month.</td>
+							</tr>
+							<tr class="odd">
+								<td>byMonthDay</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td>Comma separated of numbers between -31 to 31, excluding 0.
+	 For example, -10 represents the tenth to the last day of the month.</td>
+							</tr>
+							<tr >
+								<td>byYearDay</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td>Comma separated of numbers between -366 to 366, excluding 0.
+	 For example, -1 represents the last day of the year (December 31st) and -306 represents the 306th to the last day of the year (March 1st).</td>
+							</tr>
+							<tr class="odd">
+								<td>byWeekNumber</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td>Comma separated of numbers between -53 to 53, excluding 0.
+	 This corresponds to weeks according to week numbering.
+	 A week is defined as a seven day period, starting on the day of the week defined to be the week start.
+	 Week number one of the calendar year is the first week which contains at least four (4) days in that calendar year.
+	 This rule part is only valid for YEARLY frequency.
+	 For example, 3 represents the third week of the year.</td>
+							</tr>
+							<tr >
+								<td>byMonth</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td>Comma separated numbers between 1 to 12</td>
+							</tr>
+							<tr class="odd">
+								<td>byOffset</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td>Comma separated of numbers between -366 to 366, excluding 0.
+	 Corresponds to the nth occurrence within the set of events specified by the rule.
+	 It must only be used in conjunction with another byrule part.
+	 For example "the last work day of the month" could be represented as: frequency=MONTHLY;byDay=MO,TU,WE,TH,FR;byOffset=-1
+	 Each byOffset value can include a positive (+n) or negative (-n) integer.
+	 If present, this indicates the nth occurrence of the specific occurrence within the set of events specified by the rule.</td>
+							</tr>
+							<tr >
+								<td>weekStartDay</td>
+								<td><a href="../enums/KalturaScheduleEventRecurrenceDay.html">KalturaScheduleEventRecurrenceDay</a></td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+						</tbody>
+					</table>
+				</td>
+			</tr>
+		</table>
+	</div>
+</body>
+</html>
