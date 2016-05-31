@@ -1,0 +1,62 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=windows-1252" />
+	<title>Kaltura - TestMe Console Documentation</title>
+	<link rel="stylesheet" type="text/css" href="../css/main.css" />
+</head>
+<body>
+	<div id="doc">
+		<h2>Kaltura API</h2>
+		<table id="serviceInfo">
+			<tr>
+				<td class="title">Service Name</td>
+				<td class="odd">bulkupload</td>
+			</tr>
+			<tr>
+				<td class="title">Description</td>
+				<td>Bulk upload service is used to upload & manage bulk uploads using CSV files.
+ This service manages only entry bulk uploads.<br />
+				</td>
+			</tr>
+			<tr>
+				<td class="title">Actions</td>
+				<td class="odd">
+					<table cellspacing="0" class="service_actions">
+						<tr>
+							<th>Name</th>
+							<th>Description</th>
+						</tr>
+						<tr>
+							<td><a href="../actions/bulkupload.add.html">add</td>
+							<td>Add new bulk upload batch job
+	 Conversion profile id can be specified in the API or in the CSV file, the one in the CSV file will be stronger.
+	 If no conversion profile was specified, partner's default will be used</td>
+						</tr>
+						<tr>
+							<td><a href="../actions/bulkupload.get.html">get</td>
+							<td>Get bulk upload batch job by id</td>
+						</tr>
+						<tr>
+							<td><a href="../actions/bulkupload.list.html">list</td>
+							<td>List bulk upload batch jobs</td>
+						</tr>
+						<tr>
+							<td><a href="../actions/bulkupload.serve.html">serve</td>
+							<td>serve action returan the original file.</td>
+						</tr>
+						<tr>
+							<td><a href="../actions/bulkupload.serveLog.html">serveLog</td>
+							<td>serveLog action returan the original file.</td>
+						</tr>
+						<tr>
+							<td><a href="../actions/bulkupload.abort.html">abort</td>
+							<td>Aborts the bulk upload and all its child jobs</td>
+						</tr>
+					</table>
+				</td>
+			</tr>
+		</table>
+	</div>
+</body>
+</html>

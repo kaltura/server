@@ -30,13 +30,15 @@ class PythonClientGenerator extends ClientGeneratorFromXml
 			$enumNodes = $xpath->query("/xml/enums/enum[@plugin = '$pluginName']");
 			$classNodes = $xpath->query("/xml/classes/class[@plugin = '$pluginName']");
 			$serviceNodes = $xpath->query("/xml/services/service[@plugin = '$pluginName']");
-			$serviceNamesNodes = $xpath->query("/xml/plugins/plugin[@name = '$pluginName']/pluginService");
-			$this->writePlugin($pluginName, $enumNodes, $classNodes, $serviceNodes, $serviceNamesNodes);
+			
+			if($serviceNodes->length || $classNodes->length || $enumNodes->length)
+				$this->writePlugin($pluginName, $enumNodes, $classNodes, $serviceNodes);
 		}
 	}
 	
-	function writePlugin($pluginName, $enumNodes, $classNodes, $serviceNodes, $serviceNamesNodes)
+	function writePlugin($pluginName, $enumNodes, $classNodes, $serviceNodes)
 	{
+		$xpath = new DOMXPath($this->_doc);
 		if ($pluginName == '')
 		{
 			$pluginClassName = "KalturaCoreClient";
@@ -60,7 +62,6 @@ class PythonClientGenerator extends ClientGeneratorFromXml
 		{
 			$this->appendLine('from Core import *');
 
-			$xpath = new DOMXPath($this->_doc);
 			$dependencyNodes = $xpath->query("/xml/plugins/plugin[@name = '$pluginName']/dependency");
 			foreach($dependencyNodes as $dependencyNode)
 				$this->appendLine('from ' .
@@ -108,6 +109,8 @@ class PythonClientGenerator extends ClientGeneratorFromXml
 		}
 	
 		$this->appendLine('########## services ##########');
+
+		$services = array();
 		foreach($serviceNodes as $serviceNode)
 		{
 			if(!$this->shouldIncludeService($serviceNode->getAttribute("id")))
@@ -115,22 +118,11 @@ class PythonClientGenerator extends ClientGeneratorFromXml
 			
 			if($serviceNode->hasAttribute('plugin') && $pluginName == '')
 				continue;
-				
+
+			$services[] = $serviceNode->getAttribute("name");
 			$this->writeService($serviceNode);
 		}
 		
-		$services = array();
-		foreach($serviceNamesNodes as $serviceNode)
-		{
-			if(!$this->shouldIncludeService($serviceNode->getAttribute("id")))
-				continue;
-			
-			if($serviceNode->hasAttribute('plugin') && $pluginName == '')
-				continue;
-				
-			$services[] = $serviceNode->getAttribute("name");
-		}
-			
 		$this->appendLine('########## main ##########');
 				
 		$this->appendLine("class $pluginClassName(KalturaClientPlugin):");

@@ -1,0 +1,73 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=windows-1252" />
+	<title>Kaltura - TestMe Console Documentation</title>
+	<link rel="stylesheet" type="text/css" href="../css/main.css" />
+</head>
+<body>
+	<div id="doc">
+		<h2>Kaltura API</h2>
+		<table id="serviceInfo">
+			<tr>
+				<td class="title">Service Name</td>
+				<td class="odd">stats</td>
+			</tr>
+			<tr>
+				<td class="title">Description</td>
+				<td>Stats Service<br />
+				</td>
+			</tr>
+			<tr>
+				<td class="title">Actions</td>
+				<td class="odd">
+					<table cellspacing="0" class="service_actions">
+						<tr>
+							<th>Name</th>
+							<th>Description</th>
+						</tr>
+						<tr>
+							<td><a href="../actions/stats.collect.html">collect</td>
+							<td>Will write to the event log a single line representing the event
+	 client version - will help interprete the line structure. different client versions might have slightly different data/data formats in the line
+event_id - number is the row number in yuval's excel
+datetime - same format as MySql's datetime - can change and should reflect the time zone
+session id - can be some big random number or guid
+partner id
+entry id
+unique viewer
+widget id
+ui_conf id
+uid - the puser id as set by the ppartner
+current point - in milliseconds
+duration - milliseconds
+user ip
+process duration - in milliseconds
+control id
+seek
+new point
+referrer
+	
+	
+	 KalturaStatsEvent $event</td>
+						</tr>
+						<tr>
+							<td><a href="../actions/stats.kmcCollect.html">kmcCollect</td>
+							<td>Will collect the kmcEvent sent form the KMC client
+	 // this will actually be an empty function because all events will be sent using GET and will anyway be logged in the apache log</td>
+						</tr>
+						<tr>
+							<td><a href="../actions/stats.reportKceError.html">reportKceError</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td><a href="../actions/stats.reportError.html">reportError</td>
+							<td>Use this action to report errors to the kaltura server.</td>
+						</tr>
+					</table>
+				</td>
+			</tr>
+		</table>
+	</div>
+</body>
+</html>

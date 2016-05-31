@@ -1,0 +1,617 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=windows-1252" />
+	<title>Kaltura - TestMe Console Documentation</title>
+	<link rel="stylesheet" type="text/css" href="../css/main.css" />
+</head>
+<body>
+	<div id="doc">
+		<h2>Kaltura API</h2>
+		<table class="action" width="80%">
+			<tr>
+				<th class="service_action_title">KalturaLanguage (string)</th>
+			</tr>
+			<tr>
+				<td class="title">Enumerations</td>
+			</tr>
+			<tr>
+				<td>
+					<table style="">
+						<tbody>
+							<tr>
+								<th class="subtitle">Name</th>
+								<th class="subtitle">Value</th>
+							</tr>
+							<tr >
+								<td>AB</td>
+								<td>Abkhazian</td>
+							</tr>
+							<tr class="odd">
+								<td>AA</td>
+								<td>Afar</td>
+							</tr>
+							<tr >
+								<td>AF</td>
+								<td>Afrikaans</td>
+							</tr>
+							<tr class="odd">
+								<td>SQ</td>
+								<td>Albanian</td>
+							</tr>
+							<tr >
+								<td>AM</td>
+								<td>Amharic</td>
+							</tr>
+							<tr class="odd">
+								<td>AR</td>
+								<td>Arabic</td>
+							</tr>
+							<tr >
+								<td>HY</td>
+								<td>Armenian</td>
+							</tr>
+							<tr class="odd">
+								<td>AS_</td>
+								<td>Assamese</td>
+							</tr>
+							<tr >
+								<td>AY</td>
+								<td>Aymara</td>
+							</tr>
+							<tr class="odd">
+								<td>AZ</td>
+								<td>Azerbaijani</td>
+							</tr>
+							<tr >
+								<td>BA</td>
+								<td>Bashkir</td>
+							</tr>
+							<tr class="odd">
+								<td>EU</td>
+								<td>Basque</td>
+							</tr>
+							<tr >
+								<td>BN</td>
+								<td>Bengali (Bangla)</td>
+							</tr>
+							<tr class="odd">
+								<td>DZ</td>
+								<td>Bhutani</td>
+							</tr>
+							<tr >
+								<td>BH</td>
+								<td>Bihari</td>
+							</tr>
+							<tr class="odd">
+								<td>BI</td>
+								<td>Bislama</td>
+							</tr>
+							<tr >
+								<td>BR</td>
+								<td>Breton</td>
+							</tr>
+							<tr class="odd">
+								<td>BG</td>
+								<td>Bulgarian</td>
+							</tr>
+							<tr >
+								<td>MY</td>
+								<td>Burmese</td>
+							</tr>
+							<tr class="odd">
+								<td>BE</td>
+								<td>Byelorussian (Belarusian)</td>
+							</tr>
+							<tr >
+								<td>KM</td>
+								<td>Cambodian</td>
+							</tr>
+							<tr class="odd">
+								<td>CA</td>
+								<td>Catalan</td>
+							</tr>
+							<tr >
+								<td>ZH</td>
+								<td>Chinese</td>
+							</tr>
+							<tr class="odd">
+								<td>CO</td>
+								<td>Corsican</td>
+							</tr>
+							<tr >
+								<td>HR</td>
+								<td>Croatian</td>
+							</tr>
+							<tr class="odd">
+								<td>CS</td>
+								<td>Czech</td>
+							</tr>
+							<tr >
+								<td>DA</td>
+								<td>Danish</td>
+							</tr>
+							<tr class="odd">
+								<td>NL</td>
+								<td>Dutch</td>
+							</tr>
+							<tr >
+								<td>EN</td>
+								<td>English</td>
+							</tr>
+							<tr class="odd">
+								<td>EN_US</td>
+								<td>English (American)</td>
+							</tr>
+							<tr >
+								<td>EN_GB</td>
+								<td>English (British)</td>
+							</tr>
+							<tr class="odd">
+								<td>EO</td>
+								<td>Esperanto</td>
+							</tr>
+							<tr >
+								<td>ET</td>
+								<td>Estonian</td>
+							</tr>
+							<tr class="odd">
+								<td>FO</td>
+								<td>Faeroese</td>
+							</tr>
+							<tr >
+								<td>FA</td>
+								<td>Farsi</td>
+							</tr>
+							<tr class="odd">
+								<td>FJ</td>
+								<td>Fiji</td>
+							</tr>
+							<tr >
+								<td>FI</td>
+								<td>Finnish</td>
+							</tr>
+							<tr class="odd">
+								<td>FR</td>
+								<td>French</td>
+							</tr>
+							<tr >
+								<td>FY</td>
+								<td>Frisian</td>
+							</tr>
+							<tr class="odd">
+								<td>GV</td>
+								<td>Gaelic (Manx)</td>
+							</tr>
+							<tr >
+								<td>GD</td>
+								<td>Gaelic (Scottish)</td>
+							</tr>
+							<tr class="odd">
+								<td>GL</td>
+								<td>Galician</td>
+							</tr>
+							<tr >
+								<td>KA</td>
+								<td>Georgian</td>
+							</tr>
+							<tr class="odd">
+								<td>DE</td>
+								<td>German</td>
+							</tr>
+							<tr >
+								<td>EL</td>
+								<td>Greek</td>
+							</tr>
+							<tr class="odd">
+								<td>KL</td>
+								<td>Greenlandic</td>
+							</tr>
+							<tr >
+								<td>GN</td>
+								<td>Guarani</td>
+							</tr>
+							<tr class="odd">
+								<td>GU</td>
+								<td>Gujarati</td>
+							</tr>
+							<tr >
+								<td>HA</td>
+								<td>Hausa</td>
+							</tr>
+							<tr class="odd">
+								<td>HE</td>
+								<td>Hebrew</td>
+							</tr>
+							<tr >
+								<td>IW</td>
+								<td>Hebrew</td>
+							</tr>
+							<tr class="odd">
+								<td>HI</td>
+								<td>Hindi</td>
+							</tr>
+							<tr >
+								<td>HU</td>
+								<td>Hungarian</td>
+							</tr>
+							<tr class="odd">
+								<td>IS</td>
+								<td>Icelandic</td>
+							</tr>
+							<tr >
+								<td>ID</td>
+								<td>Indonesian</td>
+							</tr>
+							<tr class="odd">
+								<td>IN</td>
+								<td>Indonesian</td>
+							</tr>
+							<tr >
+								<td>IA</td>
+								<td>Interlingua</td>
+							</tr>
+							<tr class="odd">
+								<td>IE</td>
+								<td>Interlingue</td>
+							</tr>
+							<tr >
+								<td>IU</td>
+								<td>Inuktitut</td>
+							</tr>
+							<tr class="odd">
+								<td>IK</td>
+								<td>Inupiak</td>
+							</tr>
+							<tr >
+								<td>GA</td>
+								<td>Irish</td>
+							</tr>
+							<tr class="odd">
+								<td>IT</td>
+								<td>Italian</td>
+							</tr>
+							<tr >
+								<td>JA</td>
+								<td>Japanese</td>
+							</tr>
+							<tr class="odd">
+								<td>JV</td>
+								<td>Javanese</td>
+							</tr>
+							<tr >
+								<td>KN</td>
+								<td>Kannada</td>
+							</tr>
+							<tr class="odd">
+								<td>KS</td>
+								<td>Kashmiri</td>
+							</tr>
+							<tr >
+								<td>KK</td>
+								<td>Kazakh</td>
+							</tr>
+							<tr class="odd">
+								<td>RW</td>
+								<td>Kinyarwanda (Ruanda)</td>
+							</tr>
+							<tr >
+								<td>KY</td>
+								<td>Kirghiz</td>
+							</tr>
+							<tr class="odd">
+								<td>RN</td>
+								<td>Kirundi (Rundi)</td>
+							</tr>
+							<tr >
+								<td>KO</td>
+								<td>Korean</td>
+							</tr>
+							<tr class="odd">
+								<td>KU</td>
+								<td>Kurdish</td>
+							</tr>
+							<tr >
+								<td>LO</td>
+								<td>Laothian</td>
+							</tr>
+							<tr class="odd">
+								<td>LA</td>
+								<td>Latin</td>
+							</tr>
+							<tr >
+								<td>LV</td>
+								<td>Latvian (Lettish)</td>
+							</tr>
+							<tr class="odd">
+								<td>LI</td>
+								<td>Limburgish ( Limburger)</td>
+							</tr>
+							<tr >
+								<td>LN</td>
+								<td>Lingala</td>
+							</tr>
+							<tr class="odd">
+								<td>LT</td>
+								<td>Lithuanian</td>
+							</tr>
+							<tr >
+								<td>MK</td>
+								<td>Macedonian</td>
+							</tr>
+							<tr class="odd">
+								<td>MG</td>
+								<td>Malagasy</td>
+							</tr>
+							<tr >
+								<td>MS</td>
+								<td>Malay</td>
+							</tr>
+							<tr class="odd">
+								<td>ML</td>
+								<td>Malayalam</td>
+							</tr>
+							<tr >
+								<td>MT</td>
+								<td>Maltese</td>
+							</tr>
+							<tr class="odd">
+								<td>MI</td>
+								<td>Maori</td>
+							</tr>
+							<tr >
+								<td>MR</td>
+								<td>Marathi</td>
+							</tr>
+							<tr class="odd">
+								<td>MO</td>
+								<td>Moldavian</td>
+							</tr>
+							<tr >
+								<td>MN</td>
+								<td>Mongolian</td>
+							</tr>
+							<tr class="odd">
+								<td>MU</td>
+								<td>Multilingual</td>
+							</tr>
+							<tr >
+								<td>NA</td>
+								<td>Nauru</td>
+							</tr>
+							<tr class="odd">
+								<td>NE</td>
+								<td>Nepali</td>
+							</tr>
+							<tr >
+								<td>NO</td>
+								<td>Norwegian</td>
+							</tr>
+							<tr class="odd">
+								<td>OC</td>
+								<td>Occitan</td>
+							</tr>
+							<tr >
+								<td>OR_</td>
+								<td>Oriya</td>
+							</tr>
+							<tr class="odd">
+								<td>OM</td>
+								<td>Oromo (Afan, Galla)</td>
+							</tr>
+							<tr >
+								<td>PS</td>
+								<td>Pashto (Pushto)</td>
+							</tr>
+							<tr class="odd">
+								<td>PL</td>
+								<td>Polish</td>
+							</tr>
+							<tr >
+								<td>PT</td>
+								<td>Portuguese</td>
+							</tr>
+							<tr class="odd">
+								<td>PA</td>
+								<td>Punjabi</td>
+							</tr>
+							<tr >
+								<td>QU</td>
+								<td>Quechua</td>
+							</tr>
+							<tr class="odd">
+								<td>RM</td>
+								<td>Rhaeto-Romance</td>
+							</tr>
+							<tr >
+								<td>RO</td>
+								<td>Romanian</td>
+							</tr>
+							<tr class="odd">
+								<td>RU</td>
+								<td>Russian</td>
+							</tr>
+							<tr >
+								<td>SM</td>
+								<td>Samoan</td>
+							</tr>
+							<tr class="odd">
+								<td>SG</td>
+								<td>Sangro</td>
+							</tr>
+							<tr >
+								<td>SA</td>
+								<td>Sanskrit</td>
+							</tr>
+							<tr class="odd">
+								<td>SR</td>
+								<td>Serbian</td>
+							</tr>
+							<tr >
+								<td>SH</td>
+								<td>Serbo-Croatian</td>
+							</tr>
+							<tr class="odd">
+								<td>ST</td>
+								<td>Sesotho</td>
+							</tr>
+							<tr >
+								<td>TN</td>
+								<td>Setswana</td>
+							</tr>
+							<tr class="odd">
+								<td>SN</td>
+								<td>Shona</td>
+							</tr>
+							<tr >
+								<td>SD</td>
+								<td>Sindhi</td>
+							</tr>
+							<tr class="odd">
+								<td>SI</td>
+								<td>Sinhalese</td>
+							</tr>
+							<tr >
+								<td>SS</td>
+								<td>Siswati</td>
+							</tr>
+							<tr class="odd">
+								<td>SK</td>
+								<td>Slovak</td>
+							</tr>
+							<tr >
+								<td>SL</td>
+								<td>Slovenian</td>
+							</tr>
+							<tr class="odd">
+								<td>SO</td>
+								<td>Somali</td>
+							</tr>
+							<tr >
+								<td>ES</td>
+								<td>Spanish</td>
+							</tr>
+							<tr class="odd">
+								<td>SU</td>
+								<td>Sundanese</td>
+							</tr>
+							<tr >
+								<td>SW</td>
+								<td>Swahili (Kiswahili)</td>
+							</tr>
+							<tr class="odd">
+								<td>SV</td>
+								<td>Swedish</td>
+							</tr>
+							<tr >
+								<td>TL</td>
+								<td>Tagalog</td>
+							</tr>
+							<tr class="odd">
+								<td>TG</td>
+								<td>Tajik</td>
+							</tr>
+							<tr >
+								<td>TA</td>
+								<td>Tamil</td>
+							</tr>
+							<tr class="odd">
+								<td>TT</td>
+								<td>Tatar</td>
+							</tr>
+							<tr >
+								<td>TE</td>
+								<td>Telugu</td>
+							</tr>
+							<tr class="odd">
+								<td>TH</td>
+								<td>Thai</td>
+							</tr>
+							<tr >
+								<td>BO</td>
+								<td>Tibetan</td>
+							</tr>
+							<tr class="odd">
+								<td>TI</td>
+								<td>Tigrinya</td>
+							</tr>
+							<tr >
+								<td>TO</td>
+								<td>Tonga</td>
+							</tr>
+							<tr class="odd">
+								<td>TS</td>
+								<td>Tsonga</td>
+							</tr>
+							<tr >
+								<td>TR</td>
+								<td>Turkish</td>
+							</tr>
+							<tr class="odd">
+								<td>TK</td>
+								<td>Turkmen</td>
+							</tr>
+							<tr >
+								<td>TW</td>
+								<td>Twi</td>
+							</tr>
+							<tr class="odd">
+								<td>UG</td>
+								<td>Uighur</td>
+							</tr>
+							<tr >
+								<td>UK</td>
+								<td>Ukrainian</td>
+							</tr>
+							<tr class="odd">
+								<td>UR</td>
+								<td>Urdu</td>
+							</tr>
+							<tr >
+								<td>UZ</td>
+								<td>Uzbek</td>
+							</tr>
+							<tr class="odd">
+								<td>VI</td>
+								<td>Vietnamese</td>
+							</tr>
+							<tr >
+								<td>VO</td>
+								<td>Volapuk</td>
+							</tr>
+							<tr class="odd">
+								<td>CY</td>
+								<td>Welsh</td>
+							</tr>
+							<tr >
+								<td>WO</td>
+								<td>Wolof</td>
+							</tr>
+							<tr class="odd">
+								<td>XH</td>
+								<td>Xhosa</td>
+							</tr>
+							<tr >
+								<td>JI</td>
+								<td>Yiddish</td>
+							</tr>
+							<tr class="odd">
+								<td>YI</td>
+								<td>Yiddish</td>
+							</tr>
+							<tr >
+								<td>YO</td>
+								<td>Yoruba</td>
+							</tr>
+							<tr class="odd">
+								<td>ZU</td>
+								<td>Zulu</td>
+							</tr>
+						</tbody>
+					</table>
+				</td>
+			</tr>
+		</table>
+	</div>
+</body>
+</html>

@@ -1,0 +1,86 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=windows-1252" />
+	<title>Kaltura - TestMe Console Documentation</title>
+	<link rel="stylesheet" type="text/css" href="../css/main.css" />
+</head>
+<body>
+	<div id="doc">
+		<h2>Kaltura API</h2>
+		<table class="action">
+			<tr>
+				<th colspan="5" class="service_action_title">impersonateByKs.impersonateByKs</th>
+			</tr>
+			<tr>
+				<td colspan="5" class="title">Description:</td>
+			</tr>
+			<tr>
+				<td class="description" colspan="5">Start an impersonated session with Kaltura's server.
+	 The result KS info contains the session key that you should pass to all services that requires a ticket.
+	 Type, expiry and privileges won't be changed if they're not set</td>
+			</tr>
+			<tr>
+				<td colspan="5" class="title">Input Params</td>
+			</tr>
+			<tr>
+				<th class="subtitle">Name</th>
+				<th class="subtitle">Type</th>
+				<th class="subtitle">Description</th>
+				<th class="subtitle">Required</th>
+				<th class="subtitle">Default Value</th>
+			</tr>
+			<tr>
+				<td>session</td>
+				<td><a href="../objects/string.html">string</a></td>
+				<td>The old KS of the impersonated partner</td>
+				<td>V</td>
+				<td></td>
+			</tr>
+			<tr>
+				<td>type</td>
+				<td><a href="../objects/1.html">1</a></td>
+				<td>Type of the new KS</td>
+				<td></td>
+				<td>1</td>
+			</tr>
+			<tr>
+				<td>expiry</td>
+				<td><a href="../objects/int.html">int</a></td>
+				<td>Expiry time in seconds of the new KS</td>
+				<td></td>
+				<td>1</td>
+			</tr>
+			<tr>
+				<td>privileges</td>
+				<td><a href="../objects/string.html">string</a></td>
+				<td>Privileges of the new KS</td>
+				<td></td>
+				<td>1</td>
+			</tr>
+			<tr>
+				<td colspan="5" class="title">Output Type</td>
+			</tr>
+			<tr>
+				<td colspan="5"><a href="../objects/KalturaSessionInfo.html">KalturaSessionInfo</a></td>
+			</tr>
+			<tr>
+				<td colspan="5" class="title">Example HTTP Hit</td>
+			</tr>
+			<tr>
+				<td colspan="5">http://www.kaltura.com/api_v3/service/appToken/action/add<br />
+				<strong>JSON object:</strong>
+				<pre>
+				<div class="post_fields">
+[
+	session: "value",
+	type: value,
+	expiry: value,
+	privileges: "value"
+]
+				</pre></td>
+			</tr>
+		</table>
+	</div>
+</body>
+</html>

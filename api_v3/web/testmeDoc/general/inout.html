@@ -1,0 +1,198 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+	<title>Kaltura - TestMe Console Documentation</title>
+	<link rel="stylesheet" type="text/css" href="../css/main.css" />
+</head>
+<body>
+	<div id="doc">
+
+		<h2>Request/Response structure</h2>
+
+		<h3>Request Structure</h3>
+		<p>Kaltura API requests are standard HTTP POST/GET, URL encoded
+			requests targeted to a specific API method. Each API method location
+			is concatenated out of base URI, service and action identifiers
+			strings, according to the following format:</p>
+		<pre>
+http://www.kaltura.com/api_v3/?service=[SERVICENAME]&action=[ACTIONNAME]
+</pre>
+		<p>where[SERVICENAME] represents the specific service and
+			[ACTIONNAME] represent an action to be applied on the specific
+			service.</p>
+		<p>For example, a request to activate the “list” action of the
+			“media” service should be posted to the following URL:</p>
+		<pre>
+http://www.kaltura.com/api_v3/?service=media&action=list
+</pre>
+
+		<h3>Request Input Parameters</h3>
+		<p>Each API method receives a different set of input parameters.
+			For all request types:</p>
+		<ul>
+			<li>Input parameters should be sent as a standard URL encoded
+				key-value string.</li>
+			<li>When input parameter is an object, it must be flattened to
+				pairs of ObjectName:Param keys.</li>
+			<li>When date value is being passed as input parameter it should
+				follow the YYYY-MM-DD HH:MM:SS format.</li>
+		</ul>
+		<p>Example:</p>
+		<pre>
+id=abc12&name=name%20with%20spaces&entry:tag=mytag&entry:description=mydesc&cdate=2001-02-04%2003:11:32
+</pre>
+		<p>Within this example the following parameters are being URL
+			encoded and passed as API input parameters:</p>
+		<pre>
+id = “abc”
+name = “name with spaces”
+entry {
+	tag = “mytag”,
+	description = “mydesc”	
+}
+cdate = “2001-02-04 03:11:32”
+</pre>
+		<h3>Response Structure</h3>
+		<p>Kaltura API response content is gziped by default (assuming
+			client specifies it supports gzip). Every response content is wrapped
+			in an XML formatted container object, holding a &lt;result&gt;
+			element.</p>
+
+		<h3>Successful Response</h3>
+		<p>When Kaltura server executes an API request successfully, the
+			&lt;result&gt; element within response’s body will hold a structure
+			of parameters relevant for the specific request. Response’s
+			&lt;result&gt; structure could be simple, holding one or few
+			parameters, or complex, holding many parameters including nested
+			objects.</p>
+		Example of Successful Response:
+
+		<pre>
+
+&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot; ?&gt; 
+&lt;xml&gt;
+  &lt;result&gt;
+    &lt;objectType&gt;KalturaMediaEntry&lt;/objectType&gt;
+	&lt;id&gt;vcnp8h76m8&lt;/id&gt;
+	&lt;name&gt;Demo Video&lt;/name&gt;
+	&lt;description/&gt;
+	&lt;partnerId&gt;1&lt;/partnerId&gt;
+	&lt;userId/&gt;
+	&lt;tags/&gt;
+	&lt;adminTags&gt;demo&lt;/adminTags&gt;
+	&lt;status&gt;2&lt;/status&gt;
+	&lt;type&gt;1&lt;/type&gt;
+	&lt;createdAt&gt;1240844664&lt;/createdAt&gt; 
+  &lt;/result&gt;
+  &lt;executionTime&gt;0.08957796096802&lt;/executionTime&gt; 
+&lt;/xml&gt;
+</pre>
+
+		<h3>Error Response</h3>
+		<p>When Kaltura server fails to execute a specific API request, an
+			&lt;error&gt; element will be nested within response’s &lt;result&gt;
+			element. The &lt;error&gt; element will hold information on response
+			error code and the equivalent error message.</p>
+		<p>The following table lists few possible general API error codes
+			and their equivalent messages:</p>
+
+		<table>
+			<tr>
+				<th>Error Code</th>
+				<th>Error message</th>
+			</tr>
+			<tr class="odd">
+				<td>INTERNAL_SERVERL_ERROR</td>
+				<td>Internal server error occurred</td>
+			</tr>
+			<tr class="">
+				<td>MISSING_KS</td>
+				<td>Missing KS, session not established</td>
+			</tr>
+			<tr class="odd">
+				<td>INVALID_KS</td>
+				<td>Invalid KS "%KS%", Error
+					"%KS_ERROR_CODE%,%KS_ERROR_DESCRIPTION%"</td>
+			</tr>
+			<tr class="">
+				<td>SERVICE_NOT_SPECIFIED</td>
+				<td>Service name was not specified, please specify one</td>
+			</tr>
+			<tr class="odd">
+				<td>SERVICE_DOES_NOT_EXISTS</td>
+				<td>Service "%SERVICE_NAME%" does not exists</td>
+			</tr>
+			<tr class="">
+				<td>ACTION_NOT_SPECIFIED</td>
+				<td>Action name was not specified, please specify one</td>
+			</tr>
+			<tr class="odd">
+				<td>ACTION_DOES_NOT_EXISTS</td>
+				<td>Action "%ACTION_NAME%" does not exists for service
+					"%SERVICE_NAME%"</td>
+			</tr>
+			<tr class="">
+				<td>MISSING_MANDATORY_PARAMETER</td>
+				<td>Missing parameter "%PARAMETER_NAME%"</td>
+			</tr>
+			<tr class="odd">
+				<td>INVALID_OBJECT_TYPE</td>
+				<td>Invalid object type "%OBJECT_TYPE%"</td>
+			</tr>
+			<tr class="">
+				<td>INVALID_ENUM_VALUE</td>
+				<td>Invalid enumeration value "%GIVEN_VALUE%" for parameter
+					"%PARAMETER_NAME%", expecting enumeration type "%ENUM_TYPE%"</td>
+			</tr>
+			<tr class="odd">
+				<td>INVALID_PARTNER_ID</td>
+				<td>Invalid partner id "%PARTNER_ID%"</td>
+			</tr>
+			<tr class="">
+				<td>INVALID_SERVICE_CONFIGURATION</td>
+				<td>Invalid service configuration. Unknown service
+					[%SERVICE_NAME%:%ACTION_NAME%].</td>
+			</tr>
+			<tr class="odd">
+				<td>PROPERTY_VALIDATION_CANNOT_BE_NULL</td>
+				<td>The property "%PROPERTY_NAME%" cannot be null</td>
+			</tr>
+			<tr class="">
+				<td>PROPERTY_VALIDATION_MIN_LENGTH</td>
+				<td>The property "%PROPERTY_NAME%" must have a min length of
+					%MININUM_LENGTH% characters</td>
+			</tr>
+			<tr class="odd">
+				<td>PROPERTY_VALIDATION_MAX_LENGTH</td>
+				<td>The property "%PROPERTY_NAME%" cannot have more than
+					%MAXIMUM_LENGTH% characters</td>
+			</tr>
+			<tr class="">
+				<td>PROPERTY_VALIDATION_NOT_UPDATABLE</td>
+				<td>The property "%PROPERTY_NAME%" cannot be updated</td>
+			</tr>
+			<tr class="odd">
+				<td>INVALID_USER_ID</td>
+				<td>Invalid user id</td>
+			</tr>
+		</table>
+
+		<p>Example of an error Response</p>
+		<pre>
+
+&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot; ?&gt; 
+&lt;xml&gt;
+  &lt;result&gt;
+    &lt;error&gt;
+      &lt;code&gt;MISSING_KS&lt;/code&gt;
+      &lt;message&gt;Missing KS. Session not established&lt;/message&gt;
+    &lt;/error&gt;
+  &lt;/result&gt;
+  &lt;executionTime&gt;0.011207971573&lt;/executionTime&gt;
+&lt;/xml&gt;
+
+		</pre>
+	</div>
+</body>
+</html>

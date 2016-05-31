@@ -1,0 +1,1 @@
+{"actionParams":[{"type":"string","isSimpleType":true,"isComplexType":false,"isFile":false,"isEnum":false,"isStringEnum":false,"isArray":false,"isAbstract":false,"description":"","name":"captionAssetId","isOptional":false}],"description":"Markss the caption as default and removes that mark from all other caption assets of the entry."}
