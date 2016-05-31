@@ -1,0 +1,64 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=windows-1252" />
+	<title>Kaltura - TestMe Console Documentation</title>
+	<link rel="stylesheet" type="text/css" href="../css/main.css" />
+</head>
+<body>
+	<div id="doc">
+		<h2>Kaltura API</h2>
+		<table id="serviceInfo">
+			<tr>
+				<td class="title">Service Name</td>
+				<td class="odd">uploadtoken</td>
+			</tr>
+			<tr>
+				<td class="title">Description</td>
+				<td><br />
+				</td>
+			</tr>
+			<tr>
+				<td class="title">Actions</td>
+				<td class="odd">
+					<table cellspacing="0" class="service_actions">
+						<tr>
+							<th>Name</th>
+							<th>Description</th>
+						</tr>
+						<tr>
+							<td><a href="../actions/uploadtoken.add.html">add</td>
+							<td>Adds new upload token to upload a file</td>
+						</tr>
+						<tr>
+							<td><a href="../actions/uploadtoken.get.html">get</td>
+							<td>Get upload token by id</td>
+						</tr>
+						<tr>
+							<td><a href="../actions/uploadtoken.upload.html">upload</td>
+							<td>Upload a file using the upload token id, returns an error on failure (an exception will be thrown when using one of the Kaltura clients)
+	 Chunks can be uploaded in parallel and they will be appended according to their resumeAt position.
+	 A parallel upload session should have three stages:
+	 1. A single upload with resume=false and finalChunk=false
+	 2. Parallel upload requests each with resume=true,finalChunk=false and the expected resumetAt position.
+	 If a chunk fails to upload it can be re-uploaded.
+	 3. After all of the chunks have been uploaded a final chunk (can be of zero size) should be uploaded 
+	 with resume=true, finalChunk=true and the expected resumeAt position. In case an UPLOAD_TOKEN_CANNOT_MATCH_EXPECTED_SIZE exception
+	 has been returned (indicating not all of the chunks were appended yet) the final request can be retried.</td>
+						</tr>
+						<tr>
+							<td><a href="../actions/uploadtoken.delete.html">delete</td>
+							<td>Deletes the upload token by upload token id</td>
+						</tr>
+						<tr>
+							<td><a href="../actions/uploadtoken.list.html">list</td>
+							<td>List upload token by filter with pager support. 
+	 When using a user session the service will be restricted to users objects only.</td>
+						</tr>
+					</table>
+				</td>
+			</tr>
+		</table>
+	</div>
+</body>
+</html>

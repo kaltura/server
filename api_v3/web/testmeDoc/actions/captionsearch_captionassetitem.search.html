@@ -1,0 +1,103 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=windows-1252" />
+	<title>Kaltura - TestMe Console Documentation</title>
+	<link rel="stylesheet" type="text/css" href="../css/main.css" />
+</head>
+<body>
+	<div id="doc">
+		<h2>Kaltura API</h2>
+		<table class="action">
+			<tr>
+				<th colspan="5" class="service_action_title">search.search</th>
+			</tr>
+			<tr>
+				<td colspan="5" class="title">Description:</td>
+			</tr>
+			<tr>
+				<td class="description" colspan="5">Search caption asset items by filter, pager and free text</td>
+			</tr>
+			<tr>
+				<td colspan="5" class="title">Input Params</td>
+			</tr>
+			<tr>
+				<th class="subtitle">Name</th>
+				<th class="subtitle">Type</th>
+				<th class="subtitle">Description</th>
+				<th class="subtitle">Required</th>
+				<th class="subtitle">Default Value</th>
+			</tr>
+			<tr>
+				<td>entryFilter</td>
+				<td><a href="../objects/KalturaBaseEntryFilter.html">KalturaBaseEntryFilter</a></td>
+				<td></td>
+				<td></td>
+				<td>1</td>
+			</tr>
+			<tr>
+				<td>captionAssetItemFilter</td>
+				<td><a href="../objects/KalturaCaptionAssetItemFilter.html">KalturaCaptionAssetItemFilter</a></td>
+				<td></td>
+				<td></td>
+				<td>1</td>
+			</tr>
+			<tr>
+				<td>captionAssetItemPager</td>
+				<td><a href="../objects/KalturaFilterPager.html">KalturaFilterPager</a></td>
+				<td></td>
+				<td></td>
+				<td>1</td>
+			</tr>
+			<tr>
+				<td colspan="5" class="title">Output Type</td>
+			</tr>
+			<tr>
+				<td colspan="5"><a href="../objects/KalturaCaptionAssetItemListResponse.html">KalturaCaptionAssetItemListResponse</a></td>
+			</tr>
+			<tr>
+				<td colspan="5" class="title">Example HTTP Hit</td>
+			</tr>
+			<tr>
+				<td colspan="5">http://www.kaltura.com/api_v3/service/appToken/action/add<br />
+				<strong>JSON object:</strong>
+				<pre>
+				<div class="post_fields">
+[
+	entryFilter: {
+		objectType: "KalturaBaseEntryFilter",
+		freeText: "value",
+		isRoot: value,
+		categoriesFullNameIn: "value",
+		categoryAncestorIdIn: "value",
+		redirectFromEntryId: "value"
+	},
+	captionAssetItemFilter: {
+		objectType: "KalturaCaptionAssetItemFilter",
+		contentLike: "value",
+		contentMultiLikeOr: "value",
+		contentMultiLikeAnd: "value",
+		partnerDescriptionLike: "value",
+		partnerDescriptionMultiLikeOr: "value",
+		partnerDescriptionMultiLikeAnd: "value",
+		languageEqual: "value",
+		languageIn: "value",
+		labelEqual: "value",
+		labelIn: "value",
+		startTimeGreaterThanOrEqual: value,
+		startTimeLessThanOrEqual: value,
+		endTimeGreaterThanOrEqual: value,
+		endTimeLessThanOrEqual: value
+	},
+	captionAssetItemPager: {
+		objectType: "KalturaFilterPager",
+		pageSize: value,
+		pageIndex: value
+	}
+]
+				</pre></td>
+			</tr>
+		</table>
+	</div>
+</body>
+</html>

@@ -1,0 +1,134 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=windows-1252" />
+	<title>Kaltura - TestMe Console Documentation</title>
+	<link rel="stylesheet" type="text/css" href="../css/main.css" />
+	<script type="text/javascript" src="../../testme/js/jquery-1.3.1.min.js"></script>
+	<script type="text/javascript">
+	
+		$(document).ready(function() {
+			$(".base-attribute").click(function() {
+				var classHeaderTable = $(this).parents("table:first");
+				var propertiesTable = classHeaderTable.parent().find("table:last");
+				if ($(this).attr("src").indexOf("collapsed.gif") >= 0) {
+				$(this).attr("src", "../images/expended.gif");
+					propertiesTable.show();
+				}
+				else {
+					$(this).attr("src", "../images/collapsed.gif");
+					propertiesTable.hide();
+				}
+			});
+		});
+	
+	</script>
+</head>
+<body>
+	<div id="doc">
+		<h2>Kaltura API</h2>
+		<table class="action" width="80%">
+			<tr>
+				<th class="service_action_title">KalturaRelatedFilter</th>
+			</tr>
+			<tr>
+				<td class="title">Properties</td>
+			</tr>
+			<tr>
+				<td>
+					<table style="">
+						<tbody>
+							<tr>
+								<td class="inheritedFrom">
+									<b><img class="base-attribute" src="../images/collapsed.gif"> Inherited from KalturaObject</b>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+					<table style="display: none">
+						<tbody>
+							<tr>
+								<th class="subtitle">Name</th>
+								<th class="subtitle">Type</th>
+								<th class="subtitle">Writable</th>
+								<th class="subtitle">Restrictions</th>
+								<th class="subtitle">Description</th>
+							</tr>
+							<tr>
+								<td>relatedObjects</td>
+								<td>map of <a href="KalturaListResponse">KalturaListResponse</a></td>
+								<td></td>
+								<td></td>
+								<td></td>
+							</tr>
+						</tbody>
+					</table>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<table style="">
+						<tbody>
+							<tr>
+								<td class="inheritedFrom">
+									<b><img class="base-attribute" src="../images/collapsed.gif"> Inherited from <a href="KalturaFilter.html">KalturaFilter</a></b>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+					<table style="display: none">
+						<tbody>
+							<tr>
+								<th class="subtitle">Name</th>
+								<th class="subtitle">Type</th>
+								<th class="subtitle">Writable</th>
+								<th class="subtitle">Restrictions</th>
+								<th class="subtitle">Description</th>
+							</tr>
+							<tr >
+								<td>orderBy</td>
+								<td><a href="../enums/KalturaRelatedOrderBy.html">KalturaRelatedOrderBy</a></td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr class="odd">
+								<td>advancedSearch</td>
+								<td><a href="KalturaSearchItem.html">KalturaSearchItem</a></td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+						</tbody>
+					</table>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<table style="">
+						<tbody>
+							<tr>
+								<td class="inheritedFrom"><b>KalturaRelatedFilter</b></td>
+							</tr>
+						</tbody>
+					</table>
+					<table style="">
+						<tbody>
+							<tr>
+								<th class="subtitle">Name</th>
+								<th class="subtitle">Type</th>
+								<th class="subtitle">Writable</th>
+								<th class="subtitle">Restrictions</th>
+								<th class="subtitle">Description</th>
+							</tr>
+						</tbody>
+					</table>
+				</td>
+			</tr>
+			<tr>
+				<td>Sub classes: <a href="KalturaBaseEntryBaseFilter.html">KalturaBaseEntryBaseFilter</a>, <a href="KalturaBaseEntryFilter.html">KalturaBaseEntryFilter</a>, <a href="KalturaPlayableEntryBaseFilter.html">KalturaPlayableEntryBaseFilter</a>, <a href="KalturaPlayableEntryFilter.html">KalturaPlayableEntryFilter</a>, <a href="KalturaMediaEntryBaseFilter.html">KalturaMediaEntryBaseFilter</a>, <a href="KalturaMediaEntryFilter.html">KalturaMediaEntryFilter</a>, <a href="KalturaMediaEntryFilterForPlaylist.html">KalturaMediaEntryFilterForPlaylist</a>, <a href="KalturaExternalMediaEntryBaseFilter.html">KalturaExternalMediaEntryBaseFilter</a>, <a href="KalturaExternalMediaEntryFilter.html">KalturaExternalMediaEntryFilter</a>, <a href="KalturaLiveEntryBaseFilter.html">KalturaLiveEntryBaseFilter</a>, <a href="KalturaLiveEntryFilter.html">KalturaLiveEntryFilter</a>, <a href="KalturaLiveChannelBaseFilter.html">KalturaLiveChannelBaseFilter</a>, <a href="KalturaLiveChannelFilter.html">KalturaLiveChannelFilter</a>, <a href="KalturaLiveStreamEntryBaseFilter.html">KalturaLiveStreamEntryBaseFilter</a>, <a href="KalturaLiveStreamEntryFilter.html">KalturaLiveStreamEntryFilter</a>, <a href="KalturaLiveStreamAdminEntryBaseFilter.html">KalturaLiveStreamAdminEntryBaseFilter</a>, <a href="KalturaLiveStreamAdminEntryFilter.html">KalturaLiveStreamAdminEntryFilter</a>, <a href="KalturaMixEntryBaseFilter.html">KalturaMixEntryBaseFilter</a>, <a href="KalturaMixEntryFilter.html">KalturaMixEntryFilter</a>, <a href="KalturaDataEntryBaseFilter.html">KalturaDataEntryBaseFilter</a>, <a href="KalturaDataEntryFilter.html">KalturaDataEntryFilter</a>, <a href="KalturaDocumentEntryBaseFilter.html">KalturaDocumentEntryBaseFilter</a>, <a href="KalturaDocumentEntryFilter.html">KalturaDocumentEntryFilter</a>, <a href="KalturaPlaylistBaseFilter.html">KalturaPlaylistBaseFilter</a>, <a href="KalturaPlaylistFilter.html">KalturaPlaylistFilter</a>, <a href="KalturaCategoryUserBaseFilter.html">KalturaCategoryUserBaseFilter</a>, <a href="KalturaCategoryUserFilter.html">KalturaCategoryUserFilter</a>, <a href="KalturaUserBaseFilter.html">KalturaUserBaseFilter</a>, <a href="KalturaUserFilter.html">KalturaUserFilter</a>, <a href="KalturaAdminUserBaseFilter.html">KalturaAdminUserBaseFilter</a>, <a href="KalturaAdminUserFilter.html">KalturaAdminUserFilter</a>, <a href="KalturaAccessControlBaseFilter.html">KalturaAccessControlBaseFilter</a>, <a href="KalturaAccessControlFilter.html">KalturaAccessControlFilter</a>, <a href="KalturaAccessControlProfileBaseFilter.html">KalturaAccessControlProfileBaseFilter</a>, <a href="KalturaAccessControlProfileFilter.html">KalturaAccessControlProfileFilter</a>, <a href="KalturaAssetBaseFilter.html">KalturaAssetBaseFilter</a>, <a href="KalturaAssetFilter.html">KalturaAssetFilter</a>, <a href="KalturaAttachmentAssetBaseFilter.html">KalturaAttachmentAssetBaseFilter</a>, <a href="KalturaAttachmentAssetFilter.html">KalturaAttachmentAssetFilter</a>, <a href="KalturaTranscriptAssetBaseFilter.html">KalturaTranscriptAssetBaseFilter</a>, <a href="KalturaTranscriptAssetFilter.html">KalturaTranscriptAssetFilter</a>, <a href="KalturaCaptionAssetBaseFilter.html">KalturaCaptionAssetBaseFilter</a>, <a href="KalturaCaptionAssetFilter.html">KalturaCaptionAssetFilter</a>, <a href="KalturaCaptionAssetItemFilter.html">KalturaCaptionAssetItemFilter</a>, <a href="KalturaFlavorAssetBaseFilter.html">KalturaFlavorAssetBaseFilter</a>, <a href="KalturaFlavorAssetFilter.html">KalturaFlavorAssetFilter</a>, <a href="KalturaLiveAssetBaseFilter.html">KalturaLiveAssetBaseFilter</a>, <a href="KalturaLiveAssetFilter.html">KalturaLiveAssetFilter</a>, <a href="KalturaWidevineFlavorAssetBaseFilter.html">KalturaWidevineFlavorAssetBaseFilter</a>, <a href="KalturaWidevineFlavorAssetFilter.html">KalturaWidevineFlavorAssetFilter</a>, <a href="KalturaThumbAssetBaseFilter.html">KalturaThumbAssetBaseFilter</a>, <a href="KalturaThumbAssetFilter.html">KalturaThumbAssetFilter</a>, <a href="KalturaTimedThumbAssetBaseFilter.html">KalturaTimedThumbAssetBaseFilter</a>, <a href="KalturaTimedThumbAssetFilter.html">KalturaTimedThumbAssetFilter</a>, <a href="KalturaAssetParamsBaseFilter.html">KalturaAssetParamsBaseFilter</a>, <a href="KalturaAssetParamsFilter.html">KalturaAssetParamsFilter</a>, <a href="KalturaAssetParamsOutputBaseFilter.html">KalturaAssetParamsOutputBaseFilter</a>, <a href="KalturaAssetParamsOutputFilter.html">KalturaAssetParamsOutputFilter</a>, <a href="KalturaCaptionParamsBaseFilter.html">KalturaCaptionParamsBaseFilter</a>, <a href="KalturaCaptionParamsFilter.html">KalturaCaptionParamsFilter</a>, <a href="KalturaFlavorParamsBaseFilter.html">KalturaFlavorParamsBaseFilter</a>, <a href="KalturaFlavorParamsFilter.html">KalturaFlavorParamsFilter</a>, <a href="KalturaDocumentFlavorParamsBaseFilter.html">KalturaDocumentFlavorParamsBaseFilter</a>, <a href="KalturaDocumentFlavorParamsFilter.html">KalturaDocumentFlavorParamsFilter</a>, <a href="KalturaFlavorParamsOutputBaseFilter.html">KalturaFlavorParamsOutputBaseFilter</a>, <a href="KalturaFlavorParamsOutputFilter.html">KalturaFlavorParamsOutputFilter</a>, <a href="KalturaDocumentFlavorParamsOutputBaseFilter.html">KalturaDocumentFlavorParamsOutputBaseFilter</a>, <a href="KalturaDocumentFlavorParamsOutputFilter.html">KalturaDocumentFlavorParamsOutputFilter</a>, <a href="KalturaImageFlavorParamsOutputBaseFilter.html">KalturaImageFlavorParamsOutputBaseFilter</a>, <a href="KalturaImageFlavorParamsOutputFilter.html">KalturaImageFlavorParamsOutputFilter</a>, <a href="KalturaMediaFlavorParamsOutputBaseFilter.html">KalturaMediaFlavorParamsOutputBaseFilter</a>, <a href="KalturaMediaFlavorParamsOutputFilter.html">KalturaMediaFlavorParamsOutputFilter</a>, <a href="KalturaPdfFlavorParamsOutputBaseFilter.html">KalturaPdfFlavorParamsOutputBaseFilter</a>, <a href="KalturaPdfFlavorParamsOutputFilter.html">KalturaPdfFlavorParamsOutputFilter</a>, <a href="KalturaSwfFlavorParamsOutputBaseFilter.html">KalturaSwfFlavorParamsOutputBaseFilter</a>, <a href="KalturaSwfFlavorParamsOutputFilter.html">KalturaSwfFlavorParamsOutputFilter</a>, <a href="KalturaWidevineFlavorParamsOutputBaseFilter.html">KalturaWidevineFlavorParamsOutputBaseFilter</a>, <a href="KalturaWidevineFlavorParamsOutputFilter.html">KalturaWidevineFlavorParamsOutputFilter</a>, <a href="KalturaImageFlavorParamsBaseFilter.html">KalturaImageFlavorParamsBaseFilter</a>, <a href="KalturaImageFlavorParamsFilter.html">KalturaImageFlavorParamsFilter</a>, <a href="KalturaLiveParamsBaseFilter.html">KalturaLiveParamsBaseFilter</a>, <a href="KalturaLiveParamsFilter.html">KalturaLiveParamsFilter</a>, <a href="KalturaMediaFlavorParamsBaseFilter.html">KalturaMediaFlavorParamsBaseFilter</a>, <a href="KalturaMediaFlavorParamsFilter.html">KalturaMediaFlavorParamsFilter</a>, <a href="KalturaPdfFlavorParamsBaseFilter.html">KalturaPdfFlavorParamsBaseFilter</a>, <a href="KalturaPdfFlavorParamsFilter.html">KalturaPdfFlavorParamsFilter</a>, <a href="KalturaSwfFlavorParamsBaseFilter.html">KalturaSwfFlavorParamsBaseFilter</a>, <a href="KalturaSwfFlavorParamsFilter.html">KalturaSwfFlavorParamsFilter</a>, <a href="KalturaWidevineFlavorParamsBaseFilter.html">KalturaWidevineFlavorParamsBaseFilter</a>, <a href="KalturaWidevineFlavorParamsFilter.html">KalturaWidevineFlavorParamsFilter</a>, <a href="KalturaThumbParamsBaseFilter.html">KalturaThumbParamsBaseFilter</a>, <a href="KalturaThumbParamsFilter.html">KalturaThumbParamsFilter</a>, <a href="KalturaThumbParamsOutputBaseFilter.html">KalturaThumbParamsOutputBaseFilter</a>, <a href="KalturaThumbParamsOutputFilter.html">KalturaThumbParamsOutputFilter</a>, <a href="KalturaAuditTrailBaseFilter.html">KalturaAuditTrailBaseFilter</a>, <a href="KalturaAuditTrailFilter.html">KalturaAuditTrailFilter</a>, <a href="KalturaCategoryBaseFilter.html">KalturaCategoryBaseFilter</a>, <a href="KalturaCategoryFilter.html">KalturaCategoryFilter</a>, <a href="KalturaCategoryEntryBaseFilter.html">KalturaCategoryEntryBaseFilter</a>, <a href="KalturaCategoryEntryFilter.html">KalturaCategoryEntryFilter</a>, <a href="KalturaConversionProfileAssetParamsBaseFilter.html">KalturaConversionProfileAssetParamsBaseFilter</a>, <a href="KalturaConversionProfileAssetParamsFilter.html">KalturaConversionProfileAssetParamsFilter</a>, <a href="KalturaConversionProfileBaseFilter.html">KalturaConversionProfileBaseFilter</a>, <a href="KalturaConversionProfileFilter.html">KalturaConversionProfileFilter</a>, <a href="KalturaCuePointBaseFilter.html">KalturaCuePointBaseFilter</a>, <a href="KalturaCuePointFilter.html">KalturaCuePointFilter</a>, <a href="KalturaAdCuePointBaseFilter.html">KalturaAdCuePointBaseFilter</a>, <a href="KalturaAdCuePointFilter.html">KalturaAdCuePointFilter</a>, <a href="KalturaAnnotationBaseFilter.html">KalturaAnnotationBaseFilter</a>, <a href="KalturaAnnotationFilter.html">KalturaAnnotationFilter</a>, <a href="KalturaAnswerCuePointBaseFilter.html">KalturaAnswerCuePointBaseFilter</a>, <a href="KalturaAnswerCuePointFilter.html">KalturaAnswerCuePointFilter</a>, <a href="KalturaCodeCuePointBaseFilter.html">KalturaCodeCuePointBaseFilter</a>, <a href="KalturaCodeCuePointFilter.html">KalturaCodeCuePointFilter</a>, <a href="KalturaEventCuePointBaseFilter.html">KalturaEventCuePointBaseFilter</a>, <a href="KalturaEventCuePointFilter.html">KalturaEventCuePointFilter</a>, <a href="KalturaQuestionCuePointBaseFilter.html">KalturaQuestionCuePointBaseFilter</a>, <a href="KalturaQuestionCuePointFilter.html">KalturaQuestionCuePointFilter</a>, <a href="KalturaThumbCuePointBaseFilter.html">KalturaThumbCuePointBaseFilter</a>, <a href="KalturaThumbCuePointFilter.html">KalturaThumbCuePointFilter</a>, <a href="KalturaEntryDistributionBaseFilter.html">KalturaEntryDistributionBaseFilter</a>, <a href="KalturaEntryDistributionFilter.html">KalturaEntryDistributionFilter</a>, <a href="KalturaEntryServerNodeBaseFilter.html">KalturaEntryServerNodeBaseFilter</a>, <a href="KalturaEntryServerNodeFilter.html">KalturaEntryServerNodeFilter</a>, <a href="KalturaLiveEntryServerNodeBaseFilter.html">KalturaLiveEntryServerNodeBaseFilter</a>, <a href="KalturaLiveEntryServerNodeFilter.html">KalturaLiveEntryServerNodeFilter</a>, <a href="KalturaFileAssetBaseFilter.html">KalturaFileAssetBaseFilter</a>, <a href="KalturaFileAssetFilter.html">KalturaFileAssetFilter</a>, <a href="KalturaGroupUserBaseFilter.html">KalturaGroupUserBaseFilter</a>, <a href="KalturaGroupUserFilter.html">KalturaGroupUserFilter</a>, <a href="KalturaLikeBaseFilter.html">KalturaLikeBaseFilter</a>, <a href="KalturaLikeFilter.html">KalturaLikeFilter</a>, <a href="KalturaLiveChannelSegmentBaseFilter.html">KalturaLiveChannelSegmentBaseFilter</a>, <a href="KalturaLiveChannelSegmentFilter.html">KalturaLiveChannelSegmentFilter</a>, <a href="KalturaMetadataBaseFilter.html">KalturaMetadataBaseFilter</a>, <a href="KalturaMetadataFilter.html">KalturaMetadataFilter</a>, <a href="KalturaPermissionBaseFilter.html">KalturaPermissionBaseFilter</a>, <a href="KalturaPermissionFilter.html">KalturaPermissionFilter</a>, <a href="KalturaPermissionItemBaseFilter.html">KalturaPermissionItemBaseFilter</a>, <a href="KalturaPermissionItemFilter.html">KalturaPermissionItemFilter</a>, <a href="KalturaApiActionPermissionItemBaseFilter.html">KalturaApiActionPermissionItemBaseFilter</a>, <a href="KalturaApiActionPermissionItemFilter.html">KalturaApiActionPermissionItemFilter</a>, <a href="KalturaApiParameterPermissionItemBaseFilter.html">KalturaApiParameterPermissionItemBaseFilter</a>, <a href="KalturaApiParameterPermissionItemFilter.html">KalturaApiParameterPermissionItemFilter</a>, <a href="KalturaQuizFilter.html">KalturaQuizFilter</a>, <a href="KalturaScheduleEventBaseFilter.html">KalturaScheduleEventBaseFilter</a>, <a href="KalturaScheduleEventFilter.html">KalturaScheduleEventFilter</a>, <a href="KalturaEntryScheduleEventBaseFilter.html">KalturaEntryScheduleEventBaseFilter</a>, <a href="KalturaEntryScheduleEventFilter.html">KalturaEntryScheduleEventFilter</a>, <a href="KalturaLiveStreamScheduleEventBaseFilter.html">KalturaLiveStreamScheduleEventBaseFilter</a>, <a href="KalturaLiveStreamScheduleEventFilter.html">KalturaLiveStreamScheduleEventFilter</a>, <a href="KalturaRecordScheduleEventBaseFilter.html">KalturaRecordScheduleEventBaseFilter</a>, <a href="KalturaRecordScheduleEventFilter.html">KalturaRecordScheduleEventFilter</a>, <a href="KalturaScheduleEventResourceBaseFilter.html">KalturaScheduleEventResourceBaseFilter</a>, <a href="KalturaScheduleEventResourceFilter.html">KalturaScheduleEventResourceFilter</a>, <a href="KalturaScheduleResourceBaseFilter.html">KalturaScheduleResourceBaseFilter</a>, <a href="KalturaScheduleResourceFilter.html">KalturaScheduleResourceFilter</a>, <a href="KalturaCameraScheduleResourceBaseFilter.html">KalturaCameraScheduleResourceBaseFilter</a>, <a href="KalturaCameraScheduleResourceFilter.html">KalturaCameraScheduleResourceFilter</a>, <a href="KalturaLiveEntryScheduleResourceBaseFilter.html">KalturaLiveEntryScheduleResourceBaseFilter</a>, <a href="KalturaLiveEntryScheduleResourceFilter.html">KalturaLiveEntryScheduleResourceFilter</a>, <a href="KalturaLocationScheduleResourceBaseFilter.html">KalturaLocationScheduleResourceBaseFilter</a>, <a href="KalturaLocationScheduleResourceFilter.html">KalturaLocationScheduleResourceFilter</a>, <a href="KalturaUserEntryBaseFilter.html">KalturaUserEntryBaseFilter</a>, <a href="KalturaUserEntryFilter.html">KalturaUserEntryFilter</a>, <a href="KalturaQuizUserEntryBaseFilter.html">KalturaQuizUserEntryBaseFilter</a>, <a href="KalturaQuizUserEntryFilter.html">KalturaQuizUserEntryFilter</a>, <a href="KalturaUserLoginDataBaseFilter.html">KalturaUserLoginDataBaseFilter</a>, <a href="KalturaUserLoginDataFilter.html">KalturaUserLoginDataFilter</a>, <a href="KalturaUserRoleBaseFilter.html">KalturaUserRoleBaseFilter</a>, <a href="KalturaUserRoleFilter.html">KalturaUserRoleFilter</a></td>
+			</tr>
+		</table>
+	</div>
+</body>
+</html>

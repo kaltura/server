@@ -1,0 +1,289 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=windows-1252" />
+	<title>Kaltura - TestMe Console Documentation</title>
+	<link rel="stylesheet" type="text/css" href="../css/main.css" />
+</head>
+<body>
+	<div id="doc">
+		<h2>Kaltura API</h2>
+		<table class="action" width="80%">
+			<tr>
+				<th class="service_action_title">KalturaStatsKmcEventType (int)</th>
+			</tr>
+			<tr>
+				<td class="title">Enumerations</td>
+			</tr>
+			<tr>
+				<td>
+					<table style="">
+						<tbody>
+							<tr>
+								<th class="subtitle">Name</th>
+								<th class="subtitle">Value</th>
+							</tr>
+							<tr >
+								<td>CONTENT_PAGE_VIEW</td>
+								<td>1001</td>
+							</tr>
+							<tr class="odd">
+								<td>CONTENT_ADD_PLAYLIST</td>
+								<td>1010</td>
+							</tr>
+							<tr >
+								<td>CONTENT_EDIT_PLAYLIST</td>
+								<td>1011</td>
+							</tr>
+							<tr class="odd">
+								<td>CONTENT_DELETE_PLAYLIST</td>
+								<td>1012</td>
+							</tr>
+							<tr >
+								<td>CONTENT_EDIT_ENTRY</td>
+								<td>1013</td>
+							</tr>
+							<tr class="odd">
+								<td>CONTENT_CHANGE_THUMBNAIL</td>
+								<td>1014</td>
+							</tr>
+							<tr >
+								<td>CONTENT_ADD_TAGS</td>
+								<td>1015</td>
+							</tr>
+							<tr class="odd">
+								<td>CONTENT_REMOVE_TAGS</td>
+								<td>1016</td>
+							</tr>
+							<tr >
+								<td>CONTENT_ADD_ADMIN_TAGS</td>
+								<td>1017</td>
+							</tr>
+							<tr class="odd">
+								<td>CONTENT_REMOVE_ADMIN_TAGS</td>
+								<td>1018</td>
+							</tr>
+							<tr >
+								<td>CONTENT_DOWNLOAD</td>
+								<td>1019</td>
+							</tr>
+							<tr class="odd">
+								<td>CONTENT_APPROVE_MODERATION</td>
+								<td>1020</td>
+							</tr>
+							<tr >
+								<td>CONTENT_REJECT_MODERATION</td>
+								<td>1021</td>
+							</tr>
+							<tr class="odd">
+								<td>CONTENT_BULK_UPLOAD</td>
+								<td>1022</td>
+							</tr>
+							<tr >
+								<td>CONTENT_ADMIN_KCW_UPLOAD</td>
+								<td>1023</td>
+							</tr>
+							<tr class="odd">
+								<td>ACCOUNT_CHANGE_PARTNER_INFO</td>
+								<td>1030</td>
+							</tr>
+							<tr >
+								<td>ACCOUNT_CHANGE_LOGIN_INFO</td>
+								<td>1031</td>
+							</tr>
+							<tr class="odd">
+								<td>ACCOUNT_CONTACT_US_USAGE</td>
+								<td>1032</td>
+							</tr>
+							<tr >
+								<td>ACCOUNT_UPDATE_SERVER_SETTINGS</td>
+								<td>1033</td>
+							</tr>
+							<tr class="odd">
+								<td>ACCOUNT_ACCOUNT_OVERVIEW</td>
+								<td>1034</td>
+							</tr>
+							<tr >
+								<td>ACCOUNT_ACCESS_CONTROL</td>
+								<td>1035</td>
+							</tr>
+							<tr class="odd">
+								<td>ACCOUNT_TRANSCODING_SETTINGS</td>
+								<td>1036</td>
+							</tr>
+							<tr >
+								<td>ACCOUNT_ACCOUNT_UPGRADE</td>
+								<td>1037</td>
+							</tr>
+							<tr class="odd">
+								<td>ACCOUNT_SAVE_SERVER_SETTINGS</td>
+								<td>1038</td>
+							</tr>
+							<tr >
+								<td>ACCOUNT_ACCESS_CONTROL_DELETE</td>
+								<td>1039</td>
+							</tr>
+							<tr class="odd">
+								<td>ACCOUNT_SAVE_TRANSCODING_SETTINGS</td>
+								<td>1040</td>
+							</tr>
+							<tr >
+								<td>LOGIN</td>
+								<td>1041</td>
+							</tr>
+							<tr class="odd">
+								<td>DASHBOARD_IMPORT_CONTENT</td>
+								<td>1042</td>
+							</tr>
+							<tr >
+								<td>DASHBOARD_UPDATE_CONTENT</td>
+								<td>1043</td>
+							</tr>
+							<tr class="odd">
+								<td>DASHBOARD_ACCOUNT_CONTACT_US</td>
+								<td>1044</td>
+							</tr>
+							<tr >
+								<td>DASHBOARD_VIEW_REPORTS</td>
+								<td>1045</td>
+							</tr>
+							<tr class="odd">
+								<td>DASHBOARD_EMBED_PLAYER</td>
+								<td>1046</td>
+							</tr>
+							<tr >
+								<td>DASHBOARD_EMBED_PLAYLIST</td>
+								<td>1047</td>
+							</tr>
+							<tr class="odd">
+								<td>DASHBOARD_CUSTOMIZE_PLAYERS</td>
+								<td>1048</td>
+							</tr>
+							<tr >
+								<td>APP_STUDIO_NEW_PLAYER_SINGLE_VIDEO</td>
+								<td>1050</td>
+							</tr>
+							<tr class="odd">
+								<td>APP_STUDIO_NEW_PLAYER_PLAYLIST</td>
+								<td>1051</td>
+							</tr>
+							<tr >
+								<td>APP_STUDIO_NEW_PLAYER_MULTI_TAB_PLAYLIST</td>
+								<td>1052</td>
+							</tr>
+							<tr class="odd">
+								<td>APP_STUDIO_EDIT_PLAYER_SINGLE_VIDEO</td>
+								<td>1053</td>
+							</tr>
+							<tr >
+								<td>APP_STUDIO_EDIT_PLAYER_PLAYLIST</td>
+								<td>1054</td>
+							</tr>
+							<tr class="odd">
+								<td>APP_STUDIO_EDIT_PLAYER_MULTI_TAB_PLAYLIST</td>
+								<td>1055</td>
+							</tr>
+							<tr >
+								<td>APP_STUDIO_DUPLICATE_PLAYER</td>
+								<td>1056</td>
+							</tr>
+							<tr class="odd">
+								<td>CONTENT_CONTENT_GO_TO_PAGE</td>
+								<td>1057</td>
+							</tr>
+							<tr >
+								<td>CONTENT_DELETE_ITEM</td>
+								<td>1058</td>
+							</tr>
+							<tr class="odd">
+								<td>CONTENT_DELETE_MIX</td>
+								<td>1059</td>
+							</tr>
+							<tr >
+								<td>REPORTS_AND_ANALYTICS_BANDWIDTH_USAGE_TAB</td>
+								<td>1070</td>
+							</tr>
+							<tr class="odd">
+								<td>REPORTS_AND_ANALYTICS_CONTENT_REPORTS_TAB</td>
+								<td>1071</td>
+							</tr>
+							<tr >
+								<td>REPORTS_AND_ANALYTICS_USERS_AND_COMMUNITY_REPORTS_TAB</td>
+								<td>1072</td>
+							</tr>
+							<tr class="odd">
+								<td>REPORTS_AND_ANALYTICS_TOP_CONTRIBUTORS</td>
+								<td>1073</td>
+							</tr>
+							<tr >
+								<td>REPORTS_AND_ANALYTICS_MAP_OVERLAYS</td>
+								<td>1074</td>
+							</tr>
+							<tr class="odd">
+								<td>REPORTS_AND_ANALYTICS_TOP_SYNDICATIONS</td>
+								<td>1075</td>
+							</tr>
+							<tr >
+								<td>REPORTS_AND_ANALYTICS_TOP_CONTENT</td>
+								<td>1076</td>
+							</tr>
+							<tr class="odd">
+								<td>REPORTS_AND_ANALYTICS_CONTENT_DROPOFF</td>
+								<td>1077</td>
+							</tr>
+							<tr >
+								<td>REPORTS_AND_ANALYTICS_CONTENT_INTERACTIONS</td>
+								<td>1078</td>
+							</tr>
+							<tr class="odd">
+								<td>REPORTS_AND_ANALYTICS_CONTENT_CONTRIBUTIONS</td>
+								<td>1079</td>
+							</tr>
+							<tr >
+								<td>REPORTS_AND_ANALYTICS_VIDEO_DRILL_DOWN</td>
+								<td>1080</td>
+							</tr>
+							<tr class="odd">
+								<td>REPORTS_AND_ANALYTICS_CONTENT_DRILL_DOWN_INTERACTION</td>
+								<td>1081</td>
+							</tr>
+							<tr >
+								<td>REPORTS_AND_ANALYTICS_CONTENT_CONTRIBUTIONS_DRILLDOWN</td>
+								<td>1082</td>
+							</tr>
+							<tr class="odd">
+								<td>REPORTS_AND_ANALYTICS_VIDEO_DRILL_DOWN_DROPOFF</td>
+								<td>1083</td>
+							</tr>
+							<tr >
+								<td>REPORTS_AND_ANALYTICS_MAP_OVERLAYS_DRILLDOWN</td>
+								<td>1084</td>
+							</tr>
+							<tr class="odd">
+								<td>REPORTS_AND_ANALYTICS_TOP_SYNDICATIONS_DRILL_DOWN</td>
+								<td>1085</td>
+							</tr>
+							<tr >
+								<td>REPORTS_AND_ANALYTICS_BANDWIDTH_USAGE_VIEW_MONTHLY</td>
+								<td>1086</td>
+							</tr>
+							<tr class="odd">
+								<td>REPORTS_AND_ANALYTICS_BANDWIDTH_USAGE_VIEW_YEARLY</td>
+								<td>1087</td>
+							</tr>
+							<tr >
+								<td>CONTENT_ENTRY_DRILLDOWN</td>
+								<td>1088</td>
+							</tr>
+							<tr class="odd">
+								<td>CONTENT_OPEN_PREVIEW_AND_EMBED</td>
+								<td>1089</td>
+							</tr>
+						</tbody>
+					</table>
+				</td>
+			</tr>
+		</table>
+	</div>
+</body>
+</html>

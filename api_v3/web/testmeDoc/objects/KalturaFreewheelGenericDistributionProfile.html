@@ -1,0 +1,407 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=windows-1252" />
+	<title>Kaltura - TestMe Console Documentation</title>
+	<link rel="stylesheet" type="text/css" href="../css/main.css" />
+	<script type="text/javascript" src="../../testme/js/jquery-1.3.1.min.js"></script>
+	<script type="text/javascript">
+	
+		$(document).ready(function() {
+			$(".base-attribute").click(function() {
+				var classHeaderTable = $(this).parents("table:first");
+				var propertiesTable = classHeaderTable.parent().find("table:last");
+				if ($(this).attr("src").indexOf("collapsed.gif") >= 0) {
+				$(this).attr("src", "../images/expended.gif");
+					propertiesTable.show();
+				}
+				else {
+					$(this).attr("src", "../images/collapsed.gif");
+					propertiesTable.hide();
+				}
+			});
+		});
+	
+	</script>
+</head>
+<body>
+	<div id="doc">
+		<h2>Kaltura API</h2>
+		<table class="action" width="80%">
+			<tr>
+				<th class="service_action_title">KalturaFreewheelGenericDistributionProfile</th>
+			</tr>
+			<tr>
+				<td class="title">Properties</td>
+			</tr>
+			<tr>
+				<td>
+					<table style="">
+						<tbody>
+							<tr>
+								<td class="inheritedFrom">
+									<b><img class="base-attribute" src="../images/collapsed.gif"> Inherited from KalturaObject</b>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+					<table style="display: none">
+						<tbody>
+							<tr>
+								<th class="subtitle">Name</th>
+								<th class="subtitle">Type</th>
+								<th class="subtitle">Writable</th>
+								<th class="subtitle">Restrictions</th>
+								<th class="subtitle">Description</th>
+							</tr>
+							<tr>
+								<td>relatedObjects</td>
+								<td>map of <a href="KalturaListResponse">KalturaListResponse</a></td>
+								<td></td>
+								<td></td>
+								<td></td>
+							</tr>
+						</tbody>
+					</table>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<table style="">
+						<tbody>
+							<tr>
+								<td class="inheritedFrom">
+									<b><img class="base-attribute" src="../images/collapsed.gif"> Inherited from <a href="KalturaDistributionProfile.html">KalturaDistributionProfile</a></b>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+					<table style="display: none">
+						<tbody>
+							<tr>
+								<th class="subtitle">Name</th>
+								<th class="subtitle">Type</th>
+								<th class="subtitle">Writable</th>
+								<th class="subtitle">Restrictions</th>
+								<th class="subtitle">Description</th>
+							</tr>
+							<tr >
+								<td>id</td>
+								<td>int</td>
+								<td></td>
+								<td></td>
+								<td>Auto generated unique id</td>
+							</tr>
+							<tr class="odd">
+								<td>createdAt</td>
+								<td>int</td>
+								<td></td>
+								<td></td>
+								<td>Profile creation date as Unix timestamp (In seconds)</td>
+							</tr>
+							<tr >
+								<td>updatedAt</td>
+								<td>int</td>
+								<td></td>
+								<td></td>
+								<td>Profile last update date as Unix timestamp (In seconds)</td>
+							</tr>
+							<tr class="odd">
+								<td>partnerId</td>
+								<td>int</td>
+								<td></td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr >
+								<td>providerType</td>
+								<td><a href="../enums/KalturaDistributionProviderType.html">KalturaDistributionProviderType</a></td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr class="odd">
+								<td>name</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr >
+								<td>status</td>
+								<td><a href="../enums/KalturaDistributionProfileStatus.html">KalturaDistributionProfileStatus</a></td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr class="odd">
+								<td>submitEnabled</td>
+								<td><a href="../enums/KalturaDistributionProfileActionStatus.html">KalturaDistributionProfileActionStatus</a></td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr >
+								<td>updateEnabled</td>
+								<td><a href="../enums/KalturaDistributionProfileActionStatus.html">KalturaDistributionProfileActionStatus</a></td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr class="odd">
+								<td>deleteEnabled</td>
+								<td><a href="../enums/KalturaDistributionProfileActionStatus.html">KalturaDistributionProfileActionStatus</a></td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr >
+								<td>reportEnabled</td>
+								<td><a href="../enums/KalturaDistributionProfileActionStatus.html">KalturaDistributionProfileActionStatus</a></td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr class="odd">
+								<td>autoCreateFlavors</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td>Comma separated flavor params ids that should be auto converted</td>
+							</tr>
+							<tr >
+								<td>autoCreateThumb</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td>Comma separated thumbnail params ids that should be auto generated</td>
+							</tr>
+							<tr class="odd">
+								<td>optionalFlavorParamsIds</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td>Comma separated flavor params ids that should be submitted if ready</td>
+							</tr>
+							<tr >
+								<td>requiredFlavorParamsIds</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td>Comma separated flavor params ids that required to be ready before submission</td>
+							</tr>
+							<tr class="odd">
+								<td>optionalThumbDimensions</td>
+								<td>array of <a href="KalturaDistributionThumbDimensions.html">KalturaDistributionThumbDimensions</a></td>
+								<td>V</td>
+								<td></td>
+								<td>Thumbnail dimensions that should be submitted if ready</td>
+							</tr>
+							<tr >
+								<td>requiredThumbDimensions</td>
+								<td>array of <a href="KalturaDistributionThumbDimensions.html">KalturaDistributionThumbDimensions</a></td>
+								<td>V</td>
+								<td></td>
+								<td>Thumbnail dimensions that required to be readt before submission</td>
+							</tr>
+							<tr class="odd">
+								<td>optionalAssetDistributionRules</td>
+								<td>array of <a href="KalturaAssetDistributionRule.html">KalturaAssetDistributionRule</a></td>
+								<td>V</td>
+								<td></td>
+								<td>Asset Distribution Rules for assets that should be submitted if ready</td>
+							</tr>
+							<tr >
+								<td>requiredAssetDistributionRules</td>
+								<td>array of <a href="KalturaAssetDistributionRule.html">KalturaAssetDistributionRule</a></td>
+								<td>V</td>
+								<td></td>
+								<td>Assets Asset Distribution Rules for assets that are required to be ready before submission</td>
+							</tr>
+							<tr class="odd">
+								<td>sunriseDefaultOffset</td>
+								<td>int</td>
+								<td>V</td>
+								<td></td>
+								<td>If entry distribution sunrise not specified that will be the default since entry creation time, in seconds</td>
+							</tr>
+							<tr >
+								<td>sunsetDefaultOffset</td>
+								<td>int</td>
+								<td>V</td>
+								<td></td>
+								<td>If entry distribution sunset not specified that will be the default since entry creation time, in seconds</td>
+							</tr>
+							<tr class="odd">
+								<td>recommendedStorageProfileForDownload</td>
+								<td>int</td>
+								<td>V</td>
+								<td></td>
+								<td>The best external storage to be used to download the asset files from</td>
+							</tr>
+							<tr >
+								<td>recommendedDcForDownload</td>
+								<td>int</td>
+								<td>V</td>
+								<td></td>
+								<td>The best Kaltura data center to be used to download the asset files to</td>
+							</tr>
+							<tr class="odd">
+								<td>recommendedDcForExecute</td>
+								<td>int</td>
+								<td>V</td>
+								<td></td>
+								<td>The best Kaltura data center to be used to execute the distribution job</td>
+							</tr>
+						</tbody>
+					</table>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<table style="">
+						<tbody>
+							<tr>
+								<td class="inheritedFrom">
+									<b><img class="base-attribute" src="../images/collapsed.gif"> Inherited from <a href="KalturaConfigurableDistributionProfile.html">KalturaConfigurableDistributionProfile</a></b>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+					<table style="display: none">
+						<tbody>
+							<tr>
+								<th class="subtitle">Name</th>
+								<th class="subtitle">Type</th>
+								<th class="subtitle">Writable</th>
+								<th class="subtitle">Restrictions</th>
+								<th class="subtitle">Description</th>
+							</tr>
+							<tr >
+								<td>fieldConfigArray</td>
+								<td>array of <a href="KalturaDistributionFieldConfig.html">KalturaDistributionFieldConfig</a></td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr class="odd">
+								<td>itemXpathsToExtend</td>
+								<td>array of <a href="KalturaExtendingItemMrssParameter.html">KalturaExtendingItemMrssParameter</a></td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr >
+								<td>useCategoryEntries</td>
+								<td>bool</td>
+								<td>V</td>
+								<td></td>
+								<td>When checking custom XSLT conditions using the fieldConfigArray - address only categories associated with the entry via the categoryEntry object</td>
+							</tr>
+						</tbody>
+					</table>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<table style="">
+						<tbody>
+							<tr>
+								<td class="inheritedFrom"><b>KalturaFreewheelGenericDistributionProfile</b></td>
+							</tr>
+						</tbody>
+					</table>
+					<table style="">
+						<tbody>
+							<tr>
+								<th class="subtitle">Name</th>
+								<th class="subtitle">Type</th>
+								<th class="subtitle">Writable</th>
+								<th class="subtitle">Restrictions</th>
+								<th class="subtitle">Description</th>
+							</tr>
+							<tr >
+								<td>apikey</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr class="odd">
+								<td>email</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr >
+								<td>sftpPass</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr class="odd">
+								<td>sftpLogin</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr >
+								<td>contentOwner</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr class="odd">
+								<td>upstreamVideoId</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr >
+								<td>upstreamNetworkName</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr class="odd">
+								<td>upstreamNetworkId</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr >
+								<td>categoryId</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr class="odd">
+								<td>replaceGroup</td>
+								<td>bool</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr >
+								<td>replaceAirDates</td>
+								<td>bool</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+						</tbody>
+					</table>
+				</td>
+			</tr>
+		</table>
+	</div>
+</body>
+</html>
