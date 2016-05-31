@@ -129,16 +129,14 @@ class LikeService extends KalturaBaseService
 	 */
 	public function listAction(KalturaLikeFilter $filter = null, KalturaFilterPager $pager = null)
 	{
-		if(!$filter)
-			$filter = new KalturaLikeFilter();
-		else	
-		{			
-			if($filter->entryIdEqual && !entryPeer::retrieveByPK($filter->entryIdEqual))			
-				throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $filter->entryIdEqual);			
-			if($filter->userIdEqual && !kuserPeer::getActiveKuserByPartnerAndUid(kCurrentContext::$ks_partner_id, $filter->userIdEqual))
-				throw new KalturaAPIException(KalturaErrors::USER_NOT_FOUND);			
-		}
-		
+		if(!$filter || (!$filter->entryIdEqual && !$filter->userIdEqual && !$filter->entryIdIn))
+			throw new KalturaAPIException(KalturaErrors::MISSING_MANDATORY_PARAMETER ,"entryIdEqual or userIdEqual or entryIdIn");
+
+		if($filter->entryIdEqual && !entryPeer::retrieveByPK($filter->entryIdEqual))
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $filter->entryIdEqual);
+		if($filter->userIdEqual && !kuserPeer::getActiveKuserByPartnerAndUid(kCurrentContext::$ks_partner_id, $filter->userIdEqual))
+			throw new KalturaAPIException(KalturaErrors::USER_NOT_FOUND);
+
 		if(!$pager)
 			$pager = new KalturaFilterPager();
 
