@@ -278,8 +278,7 @@ abstract class ScheduleEvent extends BaseScheduleEvent implements IRelatedObject
 		foreach($eventResources as $eventResource)
 		{
 			$resource = ScheduleResourcePeer::retrieveByPK($eventResource->getResourceId());
-			KalturaLog::info($resource->getSystemName());
-			$system_names[] = $resource->getSystemName;
+			$system_names[] = $resource->getSystemName();
 		}
 		return implode(' ', $system_names);
 	}
