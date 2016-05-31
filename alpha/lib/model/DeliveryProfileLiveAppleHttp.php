@@ -256,7 +256,7 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 		$primaryServerStreams = $this->liveStreamConfig->getPrimaryStreamInfo();
 		$backupServerStreams = $this->liveStreamConfig->getBackupStreamInfo();
 		
-		if(!$this->getForceProxy() || $this->params->getUsePlayServer() || (!count($primaryServerStreams) && !count($backupServerStreams)))
+		if($this->params->getUsePlayServer() || (!$this->getForceProxy() && !count($primaryServerStreams) && !count($backupServerStreams)))
 		{
 			$this->shouldRedirect = true;
 		}

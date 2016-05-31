@@ -29,4 +29,9 @@ class EntryServerNode extends BaseEntryServerNode {
 	
 		TrackEntry::addTrackEntry($te);
 	}
+	
+	public function validateEntryServerNode()
+	{
+		return;
+	}
 } // EntryServerNode

@@ -13,8 +13,6 @@
 class KAsyncValidateLiveMediaServers extends KPeriodicWorker
 {
 	const ENTRY_SERVER_NODE_MIN_CREATION_TIMEE = 120;
-	const ENTRY_ID_FIELD = "entry_id";
-	const PARTNER_ID_FIELD = "partner_id";
 	
 	/* (non-PHPdoc)
 	 * @see KBatchBase::getType()
@@ -48,22 +46,13 @@ class KAsyncValidateLiveMediaServers extends KPeriodicWorker
 		$entryServerNodes = self::$kClient->entryServerNode->listAction($entryServerNodeFilter, $entryServerNodePager);
 		while(count($entryServerNodes->objects))
 		{
-			$entryInfo = array();
-			for($i=0; $i<count($entryServerNodes->objects); $i++)
-			{
-				$entryInfo[$i] = array();
-				$entryInfo[$i][self::ENTRY_ID_FIELD] = $entryServerNodes->objects[$i]->entryId;
-				$entryInfo[$i][self::PARTNER_ID_FIELD] = $entryServerNodes->objects[$i]->partnerId;
-			}
-			$uniqueEntryInfo = array_unique($entryInfo, SORT_REGULAR);
-			
-			foreach($uniqueEntryInfo as $entryInfo)
+			foreach($entryServerNodes->objects as $entryServerNode)
 			{
 				try
 				{
 					/* @var $entryServerNode KalturaEntryServerNode */
-					self::impersonate($entryInfo[self::PARTNER_ID_FIELD]);
-					self::$kClient->liveStream->validateRegisteredMediaServers($entryInfo[self::ENTRY_ID_FIELD]);
+					self::impersonate($entryServerNode->partnerId);
+					self::$kClient->entryServerNode->validateRegisteredEntryServerNode($entryServerNode->id);
 					self::unimpersonate();
 				}
 				catch (KalturaException $e)
