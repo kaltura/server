@@ -1,1 +1,0 @@
-{"actionParams":[{"type":"string","isSimpleType":true,"isComplexType":false,"isFile":false,"isEnum":false,"isStringEnum":false,"isArray":false,"isAbstract":false,"description":"The KS to be parsed, keep it empty to use current session.","name":"session","isOptional":true}],"description":"Parse session key and return its info"}

@@ -1,1 +1,0 @@
-{"actionParams":[{"type":"string","isSimpleType":true,"isComplexType":false,"isFile":false,"isEnum":false,"isStringEnum":false,"isArray":false,"isAbstract":false,"description":"ID of the live channel","name":"id","isOptional":false}],"description":"Delivering the status of a live channel (on-air\/offline)"}

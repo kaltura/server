@@ -1,1 +1,0 @@
-{"actionParams":[{"type":"string","isSimpleType":true,"isComplexType":false,"isFile":false,"isEnum":false,"isStringEnum":false,"isArray":false,"isAbstract":false,"description":"- comma separated key id's","name":"keyIds","isOptional":false}],"description":"Get content keys for input key ids"}
