@@ -1020,20 +1020,4 @@ class ThumbAssetService extends KalturaAssetService
 		return $listResponse;
 	}
 
-	/**
-	 * manually export an asset
-	 *
-	 * @action export
-	 * @param string $assetId
-	 * @param int $storageProfileId
-	 * @throws KalturaErrors::INVALID_FLAVOR_ASSET_ID
-	 * @throws KalturaErrors::STORAGE_PROFILE_ID_NOT_FOUND
-	 * @throws KalturaErrors::INTERNAL_SERVERL_ERROR
-	 * @return KalturaFlavorAsset The exported asset
-	 */
-	public function exportAction ( $assetId , $storageProfileId )
-	{
-		return parent::exportAction($assetId, $storageProfileId);
-	}
-	
 }
