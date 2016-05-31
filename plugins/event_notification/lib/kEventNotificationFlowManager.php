@@ -21,6 +21,16 @@ class kEventNotificationFlowManager implements kGenericEventConsumer
 		{
 			/* @var $notificationTemplate EventNotificationTemplate */
 			$scope = $event->getScope();
+
+			$obj = $event->getObject();
+			$originId = $obj->getFromCustomData('replacedEntryId');
+			$temporary = $obj->getFromCustomData('isTemporary');
+			if ($originId && $temporary == 1)
+			{
+				$originObj = entryPeer::retrieveByPK($originId);
+				$scope = new kEventScope(new kObjectChangedEvent($originObj, array()));
+			}
+
 			$notificationTemplate->dispatch($scope);
 		}
 		return true;
