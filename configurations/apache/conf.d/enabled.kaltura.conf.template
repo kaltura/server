@@ -52,7 +52,7 @@ Alias /sf "/usr/share/pear/data/symfony/web/sf/"
 		FileETag None
 	</FilesMatch>
 	
-	DirectoryIndex index.php
+	DirectoryIndex index.php index.html
 	RedirectMatch permanent ^/index.php/index.php/(.+?)$ /index.php/$1
 	RedirectMatch permanent ^/index.php/index/s/UT/I/(.+?)$ /index.php?s=UT\&I=$1
 	RedirectMatch permanent ^/id/(.+?)/?$ /index.php/browse?kshow_id=$1
