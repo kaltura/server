@@ -39,6 +39,7 @@ $commandLineSwitches = array(
 	array(KalturaCommandLineParser::SWITCH_NO_VALUE, 'g', 'get', 'Use GET instead of POST'),
 	array(KalturaCommandLineParser::SWITCH_NO_VALUE, 'k', 'insecure', 'Ignore ssl certificate errors'),
 	array(KalturaCommandLineParser::SWITCH_NO_VALUE, 'x', 'no-stdin', 'Disable reading of parameters from standard input'),
+	array(KalturaCommandLineParser::SWITCH_NO_VALUE, 'X', 'stdin', 'Force reading of parameters from standard input'),
 	array(KalturaCommandLineParser::SWITCH_NO_VALUE, 'R', 'raw', 'Disable parsing of the response (useful for serve actions)'),
 	array(KalturaCommandLineParser::SWITCH_NO_VALUE, 'n', 'no-renew', 'Disable automatic Kaltura session renewals'),
 	array(KalturaCommandLineParser::SWITCH_NO_VALUE, 'c', 'curl', 'Generate curl command line instead of executing the call'),
