@@ -133,6 +133,15 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject
 		return parent::postSave();	
 	}
 	
+	private function updateCategoryKuser()
+	{
+		$dbCategoryKuserArray = categoryKuserPeer::retrieveByKuserId($this->id);
+		foreach ($dbCategoryKuserArray as $dbCategoryKuser)
+		{
+			$dbCategoryKuser->updateKuser($this->puser_id, $this->screenName);
+			$dbCategoryKuser->save();
+		}
+	}
 
 	/* (non-PHPdoc)
 	 * @see lib/model/om/Basekuser#postUpdate()
@@ -164,8 +173,10 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject
 			$partner->save();
 		}
 		
-		if ($this->isColumnModified(kuserPeer::SCREEN_NAME) && categoryKuserPeer::isCategroyKuserExistsForKuser($this->getId()))
+		if (($this->isColumnModified(kuserPeer::SCREEN_NAME) ||$this->isColumnModified(kuserPeer::PUSER_ID)) && categoryKuserPeer::isCategroyKuserExistsForKuser($this->getId()))
 		{
+			$this->updateCategoryKuser();
+
 			$featureStatusToRemoveIndex = new kFeatureStatus();
 			$featureStatusToRemoveIndex->setType(IndexObjectType::CATEGORY_USER);
 			
@@ -177,6 +188,8 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject
 	
 			kJobsManager::addIndexJob($this->getPartnerId(), IndexObjectType::CATEGORY_USER, $filter, true, $featureStatusesToRemove);
 		}
+
+		if ($this->isColumnModified(kuserPeer::SCREEN_NAME) && categoryKuserPeer::isCategroyKuserExistsForKuser($this->getId()))
 				
 		$ret = parent::postUpdate($con);
 		
