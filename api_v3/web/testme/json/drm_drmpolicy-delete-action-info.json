@@ -1,0 +1,1 @@
+{"actionParams":[{"type":"int","isSimpleType":true,"isComplexType":false,"isFile":false,"isEnum":false,"isStringEnum":false,"isArray":false,"isAbstract":false,"description":"","name":"drmPolicyId","isOptional":false}],"description":"Mark the KalturaDrmPolicy object as deleted"}

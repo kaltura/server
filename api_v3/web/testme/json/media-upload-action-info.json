@@ -1,0 +1,1 @@
+{"actionParams":[{"type":"file","isSimpleType":false,"isComplexType":false,"isFile":true,"isEnum":false,"isStringEnum":false,"isArray":false,"isAbstract":false,"description":"The file data","name":"fileData","isOptional":false}],"description":"Upload a media file to Kaltura, then the file can be used to create a media entry."}

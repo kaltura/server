@@ -1,0 +1,1 @@
+[{"action":"get","name":"get","label":"get"},{"action":"list","name":"list","label":"list"},{"action":"serve","name":"serve","label":"serve"},{"action":"serveLog","name":"serveLog","label":"serveLog"},{"action":"abort","name":"abort","label":"abort"}]

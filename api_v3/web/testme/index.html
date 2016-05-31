@@ -1,0 +1,407 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<title>Kaltura - Test Me Console</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<link rel="stylesheet" type="text/css" href="css/main.css" />
+	<link rel="stylesheet" type="text/css" href="css/code.example.css" />
+	<link rel="stylesheet" type="text/css" href="css/http.spy.css" />
+	<link rel="stylesheet" type="text/css" href="css/jquery.tooltip.css" />
+	<script type="text/javascript" src="js/jquery-1.3.1.min.js"></script>
+	<script type="text/javascript" src="js/jquery.tooltip.js"></script>
+	<script type="text/javascript" src="js/jquery.scrollTo-min.js"></script>
+	<script type="text/javascript" src="js/kCodeExample.js"></script>
+	<script type="text/javascript" src="js/kField.js"></script>
+	<script type="text/javascript" src="js/kDialog.js"></script>
+	<script type="text/javascript" src="js/kTestMe.js"></script>
+	<script type="text/javascript" src="js/ace-builds/src/ace.js"></script>
+	<script type="text/javascript" src="js/kPrettify.js"></script>
+	<script type="text/javascript">
+		kTestMe.registerService("accesscontrolprofile", "accessControlProfile", "", false);
+		kTestMe.registerService("accesscontrol", "accessControl", "", true);
+		kTestMe.registerService("adminuser", "adminUser", "", true);
+		kTestMe.registerService("analytics", "analytics", "", false);
+		kTestMe.registerService("apptoken", "appToken", "", false);
+		kTestMe.registerService("baseentry", "baseEntry", "", false);
+		kTestMe.registerService("batchcontrol", "batchcontrol", "", false);
+		kTestMe.registerService("batch", "batch", "", false);
+		kTestMe.registerService("bulkupload", "bulkUpload", "", true);
+		kTestMe.registerService("categoryentry", "categoryEntry", "", false);
+		kTestMe.registerService("category", "category", "", false);
+		kTestMe.registerService("categoryuser", "categoryUser", "", false);
+		kTestMe.registerService("conversionprofileassetparams", "conversionProfileAssetParams", "", false);
+		kTestMe.registerService("conversionprofile", "conversionProfile", "", false);
+		kTestMe.registerService("data", "data", "", false);
+		kTestMe.registerService("deliveryprofile", "deliveryProfile", "", false);
+		kTestMe.registerService("document", "document", "", true);
+		kTestMe.registerService("emailingestionprofile", "EmailIngestionProfile", "", false);
+		kTestMe.registerService("entryservernode", "entryServerNode", "", false);
+		kTestMe.registerService("fileasset", "fileAsset", "", false);
+		kTestMe.registerService("flavorasset", "flavorAsset", "", false);
+		kTestMe.registerService("flavorparamsoutput", "flavorParamsOutput", "", false);
+		kTestMe.registerService("flavorparams", "flavorParams", "", false);
+		kTestMe.registerService("groupuser", "groupUser", "", false);
+		kTestMe.registerService("jobs", "jobs", "", false);
+		kTestMe.registerService("livechannelsegment", "liveChannelSegment", "", false);
+		kTestMe.registerService("livechannel", "liveChannel", "", false);
+		kTestMe.registerService("livereports", "liveReports", "", false);
+		kTestMe.registerService("livestats", "liveStats", "", false);
+		kTestMe.registerService("livestream", "liveStream", "", false);
+		kTestMe.registerService("mediainfo", "mediaInfo", "", false);
+		kTestMe.registerService("media", "media", "", false);
+		kTestMe.registerService("mixing", "mixing", "", false);
+		kTestMe.registerService("notification", "notification", "", false);
+		kTestMe.registerService("partner", "partner", "", false);
+		kTestMe.registerService("permissionitem", "permissionItem", "", false);
+		kTestMe.registerService("permission", "permission", "", false);
+		kTestMe.registerService("playlist", "playlist", "", false);
+		kTestMe.registerService("report", "report", "", false);
+		kTestMe.registerService("responseprofile", "responseProfile", "", false);
+		kTestMe.registerService("schema", "schema", "", false);
+		kTestMe.registerService("search", "search", "", true);
+		kTestMe.registerService("servernode", "serverNode", "", false);
+		kTestMe.registerService("session", "session", "", false);
+		kTestMe.registerService("stats", "stats", "", false);
+		kTestMe.registerService("storageprofile", "storageProfile", "", false);
+		kTestMe.registerService("syndicationfeed", "syndicationFeed", "", false);
+		kTestMe.registerService("system", "system", "", false);
+		kTestMe.registerService("thumbasset", "thumbAsset", "", false);
+		kTestMe.registerService("thumbparamsoutput", "thumbParamsOutput", "", false);
+		kTestMe.registerService("thumbparams", "thumbParams", "", false);
+		kTestMe.registerService("uiconf", "uiConf", "", false);
+		kTestMe.registerService("upload", "upload", "", true);
+		kTestMe.registerService("uploadtoken", "uploadToken", "", false);
+		kTestMe.registerService("userentry", "userEntry", "", false);
+		kTestMe.registerService("userrole", "userRole", "", false);
+		kTestMe.registerService("user", "user", "", false);
+		kTestMe.registerService("widget", "widget", "", false);
+		kTestMe.registerService("xinternal", "xInternal", "", false);
+		kTestMe.registerService("metadata_metadata", "metadata", "metadata", false);
+		kTestMe.registerService("metadata_metadataprofile", "metadataProfile", "metadata", false);
+		kTestMe.registerService("metadata_metadatabatch", "metadataBatch", "metadata", false);
+		kTestMe.registerService("document_documents", "documents", "document", false);
+		kTestMe.registerService("annotation_annotation", "annotation", "annotation", true);
+		kTestMe.registerService("aspera_aspera", "aspera", "aspera", false);
+		kTestMe.registerService("attuversedistribution_attuverse", "attUverse", "attUverseDistribution", false);
+		kTestMe.registerService("attachment_attachmentasset", "attachmentAsset", "attachment", false);
+		kTestMe.registerService("audit_audittrail", "auditTrail", "audit", false);
+		kTestMe.registerService("avndistribution_avn", "avn", "avnDistribution", false);
+		kTestMe.registerService("bulkupload_bulk", "bulk", "bulkUpload", false);
+		kTestMe.registerService("caption_captionasset", "captionAsset", "caption", false);
+		kTestMe.registerService("caption_captionparams", "captionParams", "caption", false);
+		kTestMe.registerService("captionsearch_captionassetitem", "captionAssetItem", "captionSearch", false);
+		kTestMe.registerService("capturespace_capturespace", "captureSpace", "captureSpace", false);
+		kTestMe.registerService("comcastmrssdistribution_comcastmrss", "comcastMrss", "comcastMrssDistribution", false);
+		kTestMe.registerService("contentdistribution_distributionprofile", "distributionProfile", "contentDistribution", false);
+		kTestMe.registerService("contentdistribution_entrydistribution", "entryDistribution", "contentDistribution", false);
+		kTestMe.registerService("contentdistribution_distributionprovider", "distributionProvider", "contentDistribution", false);
+		kTestMe.registerService("contentdistribution_genericdistributionprovider", "genericDistributionProvider", "contentDistribution", false);
+		kTestMe.registerService("contentdistribution_genericdistributionprovideraction", "genericDistributionProviderAction", "contentDistribution", false);
+		kTestMe.registerService("contentdistribution_contentdistributionbatch", "contentDistributionBatch", "contentDistribution", false);
+		kTestMe.registerService("cuepoint_cuepoint", "cuePoint", "cuePoint", false);
+		kTestMe.registerService("doubleclickdistribution_doubleclick", "doubleClick", "doubleClickDistribution", false);
+		kTestMe.registerService("dropfolder_dropfolder", "dropFolder", "dropFolder", false);
+		kTestMe.registerService("dropfolder_dropfolderfile", "dropFolderFile", "dropFolder", false);
+		kTestMe.registerService("eventnotification_eventnotificationtemplate", "eventNotificationTemplate", "eventNotification", false);
+		kTestMe.registerService("filesync_filesync", "fileSync", "fileSync", false);
+		kTestMe.registerService("kalturasharepointextension_sharepointextension", "sharepointExtension", "sharepointExtension", false);
+		kTestMe.registerService("like_like", "like", "like", false);
+		kTestMe.registerService("multicenters_filesyncimportbatch", "filesyncImportBatch", "multiCenters", false);
+		kTestMe.registerService("ndndistribution_ndn", "ndn", "ndnDistribution", false);
+		kTestMe.registerService("shortlink_shortlink", "shortLink", "shortLink", false);
+		kTestMe.registerService("synacorhbodistribution_synacorhbo", "synacorHbo", "synacorHboDistribution", false);
+		kTestMe.registerService("tvcomdistribution_tvcom", "tvCom", "contentDistribution", false);
+		kTestMe.registerService("tagsearch_tag", "tag", "tagSearch", false);
+		kTestMe.registerService("timewarnerdistribution_timewarner", "timeWarner", "timeWarnerDistribution", false);
+		kTestMe.registerService("uverseclicktoorderdistribution_uverseclicktoorder", "uverseClickToOrder", "uverseClickToOrderDistribution", false);
+		kTestMe.registerService("uversedistribution_uverse", "uverse", "uverseDistribution", false);
+		kTestMe.registerService("varconsole_varconsole", "varConsole", "varConsole", false);
+		kTestMe.registerService("virusscan_virusscanprofile", "virusScanProfile", "virusScan", false);
+		kTestMe.registerService("externalmedia_externalmedia", "externalMedia", "externalMedia", false);
+		kTestMe.registerService("drm_drmpolicy", "drmPolicy", "drm", false);
+		kTestMe.registerService("drm_drmprofile", "drmProfile", "drm", false);
+		kTestMe.registerService("drm_drmlicenseaccess", "drmLicenseAccess", "drm", false);
+		kTestMe.registerService("widevine_widevinedrm", "widevineDrm", "widevine", false);
+		kTestMe.registerService("wowza_liveconversionprofile", "liveConversionProfile", "wowza", false);
+		kTestMe.registerService("scheduledtask_scheduledtaskprofile", "scheduledTaskProfile", "scheduledTask", false);
+		kTestMe.registerService("playready_playreadydrm", "playReadyDrm", "playReady", false);
+		kTestMe.registerService("unicorndistribution_unicorn", "unicorn", "unicornDistribution", false);
+		kTestMe.registerService("integration_integration", "integration", "integration", false);
+		kTestMe.registerService("businessprocessnotification_businessprocessserver", "businessProcessServer", "businessProcessNotification", false);
+		kTestMe.registerService("businessprocessnotification_businessprocesscase", "businessProcessCase", "businessProcessNotification", false);
+		kTestMe.registerService("quiz_quiz", "quiz", "quiz", false);
+		kTestMe.registerService("schedule_scheduleevent", "scheduleEvent", "schedule", false);
+		kTestMe.registerService("schedule_scheduleresource", "scheduleResource", "schedule", false);
+		kTestMe.registerService("schedule_scheduleeventresource", "scheduleEventResource", "schedule", false);
+		kTestMe.registerService("systempartner_systempartner", "systemPartner", "systemPartner", false);
+		kTestMe.registerService("adminconsole_entryadmin", "entryAdmin", "adminConsole", false);
+		kTestMe.registerService("adminconsole_uiconfadmin", "uiConfAdmin", "adminConsole", false);
+		kTestMe.registerService("adminconsole_reportadmin", "reportAdmin", "adminConsole", false);
+		kTestMe.registerService("kalturainternaltools_kalturainternaltoolssystemhelper", "kalturaInternalToolsSystemHelper", "KalturaInternalTools", false);
+	</script>
+	<script type="text/javascript">
+		$(document).ready(function() {
+			var myframe = document.getElementById("hiddenResponse");
+
+			if (myframe.attachEvent) {
+	 			myframe.attachEvent("onload", function(){handleResponse();});
+			} else {
+				myframe.onload = function(){handleResponse();};
+			}
+		});
+
+		function handleResponse(){
+			var myframe = document.getElementById("hiddenResponse");
+			var doc = ( myframe.contentDocument || myframe.contentWindow.document);
+
+			var formatSelector = document.getElementsByName("format");
+			var format = "XML";
+			if (formatSelector && formatSelector.length > 0){
+				format = formatSelector[0].options[formatSelector[0].selectedIndex].text;
+			}
+			var text ="";
+			if ( format == "JSON" &&
+				typeof doc.body != "undefined" &&
+				typeof doc.body.innerText != "undefined"&&
+				(doc.body.innerText.indexOf("{" != -1) )){
+				format = "json";
+				text = indentJSON(doc.body.innerText, "\n", " ");
+			} else if (format == "XML" &&
+				typeof doc.firstChild != "undefined" )  {
+				if ( doc.firstChild.localName == "xml"){
+					var para = document.createElement("div");
+					para.appendChild(doc.firstChild);
+					text = para.innerHTML;
+					text = indentXML(text);
+					format = "xml";
+				} else {
+					var data = doc.getElementsByTagName("pre")[0];
+					text = data.innerHTML;
+				}
+			} else {
+				text = doc;
+				format = "txt";
+			}
+			document.getElementById("response").contentWindow.setAceEditorWithText(text, format);
+			kTestMe.onResponse(text, format);
+		}
+
+	</script>
+</head>
+<body class="body-bg">
+	<ul id="kmcSubMenu">
+		<li class="active"><a href="#">Test Console</a></li>
+		<li><a href="../testmeDoc/">API Documentation</a></li>
+		<li><a href="../xsdDoc/">XML Schema</a></li>
+		<li><a href="client-libs.php">API Client Libraries</a></li>
+	</ul>
+	<div class="left">
+		<form id="request" action="../" method="post" target="hiddenResponse" enctype="multipart/form-data">
+			<div class="left-content">
+				<div class="attr">
+					<label for="history">History: </label>
+					<select id="history">
+						<option>Select request</option>
+					</select>
+				</div>
+
+				<div class="param">
+					<label for="format">Format (int):</label>
+					<select name="format">
+						<option value="2">XML</option>
+						<option value="1">JSON</option>
+					</select>
+				</div>
+				<div class="param">
+					<label for="clientTag">clientTag (string):</label>
+					<input type="text" name="clientTag" size="30" class="" value="testme" />
+					<input id="chk-clientTag" type="checkbox" checked="checked" />
+				</div>
+				<div class="param">
+					<label for="apiVersion">apiVersion (string):</label>
+					<input type="text" name="apiVersion" size="30" class="" value="3.3.0" />
+					<input id="chk-apiVersion" type="checkbox" checked="checked" />
+				</div>
+				<div class="param">
+					<label for="partnerId">Impersonated partner id (int):</label>
+					<input type="text" name="partnerId" size="30" class="" value="" />
+					<input id="chk-partnerId" type="checkbox"  />
+				</div>
+				<div class="param">
+					<label for="ks">Kaltura API session (string):</label>
+					<input type="text" name="ks" size="30" class="" value="" />
+					<input id="chk-ks" type="checkbox"  />
+				</div>
+				<div id="dvService">
+					<div class="attr">
+						<label for="service">Select service:</label>
+						<select name="service">
+							<option value="">Select service</option>
+							<option value="multirequest">Multirequest</option>
+							<option value="accesscontrolprofile" title="accessControlProfile">accessControlProfile</option>
+							<option value="accesscontrol" title="accessControl">accessControl (deprecated)</option>
+							<option value="adminuser" title="adminUser">adminUser (deprecated)</option>
+							<option value="analytics" title="analytics">analytics</option>
+							<option value="apptoken" title="appToken">appToken</option>
+							<option value="baseentry" title="baseEntry">baseEntry</option>
+							<option value="batchcontrol" title="batchcontrol">batchcontrol</option>
+							<option value="batch" title="batch">batch</option>
+							<option value="bulkupload" title="bulkUpload">bulkUpload (deprecated)</option>
+							<option value="categoryentry" title="categoryEntry">categoryEntry</option>
+							<option value="category" title="category">category</option>
+							<option value="categoryuser" title="categoryUser">categoryUser</option>
+							<option value="conversionprofileassetparams" title="conversionProfileAssetParams">conversionProfileAssetParams</option>
+							<option value="conversionprofile" title="conversionProfile">conversionProfile</option>
+							<option value="data" title="data">data</option>
+							<option value="deliveryprofile" title="deliveryProfile">deliveryProfile</option>
+							<option value="document" title="document">document (deprecated)</option>
+							<option value="emailingestionprofile" title="EmailIngestionProfile">EmailIngestionProfile</option>
+							<option value="entryservernode" title="entryServerNode">entryServerNode</option>
+							<option value="fileasset" title="fileAsset">fileAsset</option>
+							<option value="flavorasset" title="flavorAsset">flavorAsset</option>
+							<option value="flavorparamsoutput" title="flavorParamsOutput">flavorParamsOutput</option>
+							<option value="flavorparams" title="flavorParams">flavorParams</option>
+							<option value="groupuser" title="groupUser">groupUser</option>
+							<option value="jobs" title="jobs">jobs</option>
+							<option value="livechannelsegment" title="liveChannelSegment">liveChannelSegment</option>
+							<option value="livechannel" title="liveChannel">liveChannel</option>
+							<option value="livereports" title="liveReports">liveReports</option>
+							<option value="livestats" title="liveStats">liveStats</option>
+							<option value="livestream" title="liveStream">liveStream</option>
+							<option value="mediainfo" title="mediaInfo">mediaInfo</option>
+							<option value="media" title="media">media</option>
+							<option value="mixing" title="mixing">mixing</option>
+							<option value="notification" title="notification">notification</option>
+							<option value="partner" title="partner">partner</option>
+							<option value="permissionitem" title="permissionItem">permissionItem</option>
+							<option value="permission" title="permission">permission</option>
+							<option value="playlist" title="playlist">playlist</option>
+							<option value="report" title="report">report</option>
+							<option value="responseprofile" title="responseProfile">responseProfile</option>
+							<option value="schema" title="schema">schema</option>
+							<option value="search" title="search">search (deprecated)</option>
+							<option value="servernode" title="serverNode">serverNode</option>
+							<option value="session" title="session">session</option>
+							<option value="stats" title="stats">stats</option>
+							<option value="storageprofile" title="storageProfile">storageProfile</option>
+							<option value="syndicationfeed" title="syndicationFeed">syndicationFeed</option>
+							<option value="system" title="system">system</option>
+							<option value="thumbasset" title="thumbAsset">thumbAsset</option>
+							<option value="thumbparamsoutput" title="thumbParamsOutput">thumbParamsOutput</option>
+							<option value="thumbparams" title="thumbParams">thumbParams</option>
+							<option value="uiconf" title="uiConf">uiConf</option>
+							<option value="upload" title="upload">upload (deprecated)</option>
+							<option value="uploadtoken" title="uploadToken">uploadToken</option>
+							<option value="userentry" title="userEntry">userEntry</option>
+							<option value="userrole" title="userRole">userRole</option>
+							<option value="user" title="user">user</option>
+							<option value="widget" title="widget">widget</option>
+							<option value="xinternal" title="xInternal">xInternal</option>
+							<option value="metadata_metadata" title="metadata.metadata">metadata.metadata</option>
+							<option value="metadata_metadataprofile" title="metadata.metadataProfile">metadata.metadataProfile</option>
+							<option value="metadata_metadatabatch" title="metadata.metadataBatch">metadata.metadataBatch</option>
+							<option value="document_documents" title="document.documents">document.documents</option>
+							<option value="annotation_annotation" title="annotation.annotation">annotation.annotation (deprecated)</option>
+							<option value="aspera_aspera" title="aspera.aspera">aspera.aspera</option>
+							<option value="attuversedistribution_attuverse" title="attUverseDistribution.attUverse">attUverseDistribution.attUverse</option>
+							<option value="attachment_attachmentasset" title="attachment.attachmentAsset">attachment.attachmentAsset</option>
+							<option value="audit_audittrail" title="audit.auditTrail">audit.auditTrail</option>
+							<option value="avndistribution_avn" title="avnDistribution.avn">avnDistribution.avn</option>
+							<option value="bulkupload_bulk" title="bulkUpload.bulk">bulkUpload.bulk</option>
+							<option value="caption_captionasset" title="caption.captionAsset">caption.captionAsset</option>
+							<option value="caption_captionparams" title="caption.captionParams">caption.captionParams</option>
+							<option value="captionsearch_captionassetitem" title="captionSearch.captionAssetItem">captionSearch.captionAssetItem</option>
+							<option value="capturespace_capturespace" title="captureSpace.captureSpace">captureSpace.captureSpace</option>
+							<option value="comcastmrssdistribution_comcastmrss" title="comcastMrssDistribution.comcastMrss">comcastMrssDistribution.comcastMrss</option>
+							<option value="contentdistribution_distributionprofile" title="contentDistribution.distributionProfile">contentDistribution.distributionProfile</option>
+							<option value="contentdistribution_entrydistribution" title="contentDistribution.entryDistribution">contentDistribution.entryDistribution</option>
+							<option value="contentdistribution_distributionprovider" title="contentDistribution.distributionProvider">contentDistribution.distributionProvider</option>
+							<option value="contentdistribution_genericdistributionprovider" title="contentDistribution.genericDistributionProvider">contentDistribution.genericDistributionProvider</option>
+							<option value="contentdistribution_genericdistributionprovideraction" title="contentDistribution.genericDistributionProviderAction">contentDistribution.genericDistributionProviderAction</option>
+							<option value="contentdistribution_contentdistributionbatch" title="contentDistribution.contentDistributionBatch">contentDistribution.contentDistributionBatch</option>
+							<option value="cuepoint_cuepoint" title="cuePoint.cuePoint">cuePoint.cuePoint</option>
+							<option value="doubleclickdistribution_doubleclick" title="doubleClickDistribution.doubleClick">doubleClickDistribution.doubleClick</option>
+							<option value="dropfolder_dropfolder" title="dropFolder.dropFolder">dropFolder.dropFolder</option>
+							<option value="dropfolder_dropfolderfile" title="dropFolder.dropFolderFile">dropFolder.dropFolderFile</option>
+							<option value="eventnotification_eventnotificationtemplate" title="eventNotification.eventNotificationTemplate">eventNotification.eventNotificationTemplate</option>
+							<option value="filesync_filesync" title="fileSync.fileSync">fileSync.fileSync</option>
+							<option value="kalturasharepointextension_sharepointextension" title="sharepointExtension.sharepointExtension">sharepointExtension.sharepointExtension</option>
+							<option value="like_like" title="like.like">like.like</option>
+							<option value="multicenters_filesyncimportbatch" title="multiCenters.filesyncImportBatch">multiCenters.filesyncImportBatch</option>
+							<option value="ndndistribution_ndn" title="ndnDistribution.ndn">ndnDistribution.ndn</option>
+							<option value="shortlink_shortlink" title="shortLink.shortLink">shortLink.shortLink</option>
+							<option value="synacorhbodistribution_synacorhbo" title="synacorHboDistribution.synacorHbo">synacorHboDistribution.synacorHbo</option>
+							<option value="tvcomdistribution_tvcom" title="contentDistribution.tvCom">contentDistribution.tvCom</option>
+							<option value="tagsearch_tag" title="tagSearch.tag">tagSearch.tag</option>
+							<option value="timewarnerdistribution_timewarner" title="timeWarnerDistribution.timeWarner">timeWarnerDistribution.timeWarner</option>
+							<option value="uverseclicktoorderdistribution_uverseclicktoorder" title="uverseClickToOrderDistribution.uverseClickToOrder">uverseClickToOrderDistribution.uverseClickToOrder</option>
+							<option value="uversedistribution_uverse" title="uverseDistribution.uverse">uverseDistribution.uverse</option>
+							<option value="varconsole_varconsole" title="varConsole.varConsole">varConsole.varConsole</option>
+							<option value="virusscan_virusscanprofile" title="virusScan.virusScanProfile">virusScan.virusScanProfile</option>
+							<option value="externalmedia_externalmedia" title="externalMedia.externalMedia">externalMedia.externalMedia</option>
+							<option value="drm_drmpolicy" title="drm.drmPolicy">drm.drmPolicy</option>
+							<option value="drm_drmprofile" title="drm.drmProfile">drm.drmProfile</option>
+							<option value="drm_drmlicenseaccess" title="drm.drmLicenseAccess">drm.drmLicenseAccess</option>
+							<option value="widevine_widevinedrm" title="widevine.widevineDrm">widevine.widevineDrm</option>
+							<option value="wowza_liveconversionprofile" title="wowza.liveConversionProfile">wowza.liveConversionProfile</option>
+							<option value="scheduledtask_scheduledtaskprofile" title="scheduledTask.scheduledTaskProfile">scheduledTask.scheduledTaskProfile</option>
+							<option value="playready_playreadydrm" title="playReady.playReadyDrm">playReady.playReadyDrm</option>
+							<option value="unicorndistribution_unicorn" title="unicornDistribution.unicorn">unicornDistribution.unicorn</option>
+							<option value="integration_integration" title="integration.integration">integration.integration</option>
+							<option value="businessprocessnotification_businessprocessserver" title="businessProcessNotification.businessProcessServer">businessProcessNotification.businessProcessServer</option>
+							<option value="businessprocessnotification_businessprocesscase" title="businessProcessNotification.businessProcessCase">businessProcessNotification.businessProcessCase</option>
+							<option value="quiz_quiz" title="quiz.quiz">quiz.quiz</option>
+							<option value="schedule_scheduleevent" title="schedule.scheduleEvent">schedule.scheduleEvent</option>
+							<option value="schedule_scheduleresource" title="schedule.scheduleResource">schedule.scheduleResource</option>
+							<option value="schedule_scheduleeventresource" title="schedule.scheduleEventResource">schedule.scheduleEventResource</option>
+							<option value="systempartner_systempartner" title="systemPartner.systemPartner">systemPartner.systemPartner</option>
+							<option value="adminconsole_entryadmin" title="adminConsole.entryAdmin">adminConsole.entryAdmin</option>
+							<option value="adminconsole_uiconfadmin" title="adminConsole.uiConfAdmin">adminConsole.uiConfAdmin</option>
+							<option value="adminconsole_reportadmin" title="adminConsole.reportAdmin">adminConsole.reportAdmin</option>
+							<option value="kalturainternaltools_kalturainternaltoolssystemhelper" title="KalturaInternalTools.kalturaInternalToolsSystemHelper">KalturaInternalTools.kalturaInternalToolsSystemHelper</option>
+						</select>
+						<img src="images/help.png" class="service-help help" />
+					</div>
+					<div class="attr" style="display: none">
+						<label for="action">Select action:</label>
+						<select name="action"></select>
+						<img src="images/help.png" class="action-help help" title="" />
+					</div>
+					<div class="attr" style="display: none">
+						<input type="button" class="add-request-button button" value="Add Request" />
+					</div>
+
+					<div class="action-params"></div>
+					<div class="objects-containter"></div>
+				</div>
+
+				<div>
+					<button type="submit">Send</button>
+				</div>
+			</div>
+		</form>
+	</div>
+	<div class="right">
+		<iframe class="right-content" id="response" name="response" src="./testme.result.html" scrolling="no"></iframe>
+		<iframe id="hiddenResponse" name="hiddenResponse" src=""></iframe>
+	</div>
+	<ul id="codeSubMenu">
+		<li class="code-menu code-menu-php active"><a href="#" onclick="switchToPHP()">PHP</a></li>
+		<li class="code-menu code-menu-java"><a href="#" onclick="switchToJava()">Java</a></li>
+		<li class="code-menu code-menu-csharp"><a href="#" onclick="switchToCSharp()">C#</a></li>
+		<li class="code-menu code-menu-python"><a href="#" onclick="switchToPython()">Python</a></li>
+		<li class="code-menu code-menu-javascript"><a href="#" onclick="switchToJavascript()">Javascript</a></li>
+		<li class="code-menu"><a class="code-menu-toggle" href="#" onclick="toggleCode()" id="codeToggle">Show Code Example</a></li>
+	</ul>
+	<div class="code" id="codeExample" style="display: none;">
+		<div id="disclaimer"><p>Note: The auto-generated code is for reference purposes and orientation. A direct copy&amp;paste will not work on its own. Please make sure to review the sample and adapt to your own application code.</p></div>
+		<div id="example"></div>
+	</div>
+		<div id="httpSpy" style="display: none;">
+		<div id="httpSpyForm">
+			<input type="file" id="fileHttpSpy" />
+			<input type="button" id="parseHttpSpy" value="Parse"  />
+		</div>
+	</div>
+</body>
+</html>

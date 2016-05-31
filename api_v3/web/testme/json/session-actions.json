@@ -1,0 +1,1 @@
+[{"action":"start","name":"start","label":"start"},{"action":"end","name":"end","label":"end"},{"action":"impersonate","name":"impersonate","label":"impersonate"},{"action":"impersonateByKs","name":"impersonateByKs","label":"impersonateByKs"},{"action":"get","name":"get","label":"get"},{"action":"startWidgetSession","name":"startWidgetSession","label":"startWidgetSession"}]
