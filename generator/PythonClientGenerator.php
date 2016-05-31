@@ -30,12 +30,13 @@ class PythonClientGenerator extends ClientGeneratorFromXml
 			$enumNodes = $xpath->query("/xml/enums/enum[@plugin = '$pluginName']");
 			$classNodes = $xpath->query("/xml/classes/class[@plugin = '$pluginName']");
 			$serviceNodes = $xpath->query("/xml/services/service[@plugin = '$pluginName']");
-			$serviceNamesNodes = $xpath->query("/xml/plugins/plugin[@name = '$pluginName']/pluginService");
-			$this->writePlugin($pluginName, $enumNodes, $classNodes, $serviceNodes, $serviceNamesNodes);
+			
+			if($serviceNodes->length || $classNodes->length || $enumNodes->length)
+				$this->writePlugin($pluginName, $enumNodes, $classNodes, $serviceNodes);
 		}
 	}
 	
-	function writePlugin($pluginName, $enumNodes, $classNodes, $serviceNodes, $serviceNamesNodes)
+	function writePlugin($pluginName, $enumNodes, $classNodes, $serviceNodes)
 	{
 		$xpath = new DOMXPath($this->_doc);
 		if ($pluginName == '')
@@ -108,6 +109,8 @@ class PythonClientGenerator extends ClientGeneratorFromXml
 		}
 	
 		$this->appendLine('########## services ##########');
+
+		$services = array();
 		foreach($serviceNodes as $serviceNode)
 		{
 			if(!$this->shouldIncludeService($serviceNode->getAttribute("id")))
@@ -115,26 +118,11 @@ class PythonClientGenerator extends ClientGeneratorFromXml
 			
 			if($serviceNode->hasAttribute('plugin') && $pluginName == '')
 				continue;
-				
+
+			$services[] = $serviceNode->getAttribute("name");
 			$this->writeService($serviceNode);
 		}
 		
-		$services = array();
-		foreach($serviceNamesNodes as $serviceNameNode)
-		{
-			$serviceName = $serviceNameNode->getAttribute("name");
-			$serviceNodes = $xpath->query("/xml/services/service[@name = '$serviceName']");
-			$serviceNode = $serviceNodes->item(0);
-			
-			if(!$serviceNode || !$this->shouldIncludeService($serviceNode->getAttribute("id")))
-				continue;
-			
-			if($serviceNode->hasAttribute('plugin') && $pluginName == '')
-				continue;
-				
-			$services[] = $serviceName;
-		}
-			
 		$this->appendLine('########## main ##########');
 				
 		$this->appendLine("class $pluginClassName(KalturaClientPlugin):");
