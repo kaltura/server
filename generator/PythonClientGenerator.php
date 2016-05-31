@@ -37,6 +37,7 @@ class PythonClientGenerator extends ClientGeneratorFromXml
 	
 	function writePlugin($pluginName, $enumNodes, $classNodes, $serviceNodes, $serviceNamesNodes)
 	{
+		$xpath = new DOMXPath($this->_doc);
 		if ($pluginName == '')
 		{
 			$pluginClassName = "KalturaCoreClient";
@@ -60,7 +61,6 @@ class PythonClientGenerator extends ClientGeneratorFromXml
 		{
 			$this->appendLine('from Core import *');
 
-			$xpath = new DOMXPath($this->_doc);
 			$dependencyNodes = $xpath->query("/xml/plugins/plugin[@name = '$pluginName']/dependency");
 			foreach($dependencyNodes as $dependencyNode)
 				$this->appendLine('from ' .
@@ -120,15 +120,19 @@ class PythonClientGenerator extends ClientGeneratorFromXml
 		}
 		
 		$services = array();
-		foreach($serviceNamesNodes as $serviceNode)
+		foreach($serviceNamesNodes as $serviceNameNode)
 		{
-			if(!$this->shouldIncludeService($serviceNode->getAttribute("id")))
+			$serviceName = $serviceNameNode->getAttribute("name");
+			$serviceNodes = $xpath->query("/xml/services/service[@name = '$serviceName']");
+			$serviceNode = $serviceNodes->item(0);
+			
+			if(!$serviceNode || !$this->shouldIncludeService($serviceNode->getAttribute("id")))
 				continue;
 			
 			if($serviceNode->hasAttribute('plugin') && $pluginName == '')
 				continue;
 				
-			$services[] = $serviceNode->getAttribute("name");
+			$services[] = $serviceName;
 		}
 			
 		$this->appendLine('########## main ##########');
