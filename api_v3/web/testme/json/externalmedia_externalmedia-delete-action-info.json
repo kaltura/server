@@ -1,1 +1,0 @@
-{"actionParams":[{"type":"string","isSimpleType":true,"isComplexType":false,"isFile":false,"isEnum":false,"isStringEnum":false,"isArray":false,"isAbstract":false,"description":"External media entry id to delete","name":"id","isOptional":false}],"description":"Delete a external media entry."}

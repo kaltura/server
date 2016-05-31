@@ -1,1 +1,0 @@
-{"actionParams":[{"type":"string","isSimpleType":true,"isComplexType":false,"isFile":false,"isEnum":false,"isStringEnum":false,"isArray":false,"isAbstract":false,"description":"The user's unique identifier in the partner's system","name":"userId","isOptional":false}],"description":"Deletes a user from a partner account."}

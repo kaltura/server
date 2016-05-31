@@ -1,1 +1,0 @@
-{"actionParams":[{"type":"string","isSimpleType":true,"isComplexType":false,"isFile":false,"isEnum":false,"isStringEnum":false,"isArray":false,"isAbstract":false,"description":"Entry id to delete","name":"entryId","isOptional":false}],"description":"Delete an entry."}

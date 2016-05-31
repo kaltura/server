@@ -1,1 +1,0 @@
-{"actionParams":[{"type":"string","isSimpleType":true,"isComplexType":false,"isFile":false,"isEnum":false,"isStringEnum":false,"isArray":false,"isAbstract":false,"description":"","name":"assetId","isOptional":false}],"description":"Set a given flavor as the original flavor"}
