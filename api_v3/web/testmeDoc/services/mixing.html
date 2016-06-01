@@ -1,0 +1,82 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=windows-1252" />
+	<title>Kaltura - TestMe Console Documentation</title>
+	<link rel="stylesheet" type="text/css" href="../css/main.css" />
+</head>
+<body>
+	<div id="doc">
+		<h2>Kaltura API</h2>
+		<table id="serviceInfo">
+			<tr>
+				<td class="title">Service Name</td>
+				<td class="odd">mixing</td>
+			</tr>
+			<tr>
+				<td class="title">Description</td>
+				<td>A Mix is an XML unique format invented by Kaltura, it allows the user to create a mix of videos and images, in and out points, transitions, text overlays, soundtrack, effects and much more...
+ Mixing service lets you create a new mix, manage its metadata and make basic manipulations.<br />
+				</td>
+			</tr>
+			<tr>
+				<td class="title">Actions</td>
+				<td class="odd">
+					<table cellspacing="0" class="service_actions">
+						<tr>
+							<th>Name</th>
+							<th>Description</th>
+						</tr>
+						<tr>
+							<td><a href="../actions/mixing.add.html">add</td>
+							<td>Adds a new mix.
+	 If the dataContent is null, a default timeline will be created.</td>
+						</tr>
+						<tr>
+							<td><a href="../actions/mixing.get.html">get</td>
+							<td>Get mix entry by id.</td>
+						</tr>
+						<tr>
+							<td><a href="../actions/mixing.update.html">update</td>
+							<td>Update mix entry. Only the properties that were set will be updated.</td>
+						</tr>
+						<tr>
+							<td><a href="../actions/mixing.delete.html">delete</td>
+							<td>Delete a mix entry.</td>
+						</tr>
+						<tr>
+							<td><a href="../actions/mixing.list.html">list</td>
+							<td>List entries by filter with paging support.
+	 Return parameter is an array of mix entries.</td>
+						</tr>
+						<tr>
+							<td><a href="../actions/mixing.count.html">count</td>
+							<td>Count mix entries by filter.</td>
+						</tr>
+						<tr>
+							<td><a href="../actions/mixing.clone.html">clone</td>
+							<td>Clones an existing mix.</td>
+						</tr>
+						<tr>
+							<td><a href="../actions/mixing.appendMediaEntry.html">appendMediaEntry</td>
+							<td>Appends a media entry to a the end of the mix timeline, this will save the mix timeline as a new version.</td>
+						</tr>
+						<tr>
+							<td><a href="../actions/mixing.getMixesByMediaId.html">getMixesByMediaId</td>
+							<td>Get the mixes in which the media entry is included</td>
+						</tr>
+						<tr>
+							<td><a href="../actions/mixing.getReadyMediaEntries.html">getReadyMediaEntries</td>
+							<td>Get all ready media entries that exist in the given mix id</td>
+						</tr>
+						<tr>
+							<td><a href="../actions/mixing.anonymousRank.html">anonymousRank</td>
+							<td>Anonymously rank a mix entry, no validation is done on duplicate rankings</td>
+						</tr>
+					</table>
+				</td>
+			</tr>
+		</table>
+	</div>
+</body>
+</html>

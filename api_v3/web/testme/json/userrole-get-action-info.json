@@ -1,0 +1,1 @@
+{"actionParams":[{"type":"int","isSimpleType":true,"isComplexType":false,"isFile":false,"isEnum":false,"isStringEnum":false,"isArray":false,"isAbstract":false,"description":"The user role's unique identifier","name":"userRoleId","isOptional":false}],"description":"Retrieves a user role object using its ID."}

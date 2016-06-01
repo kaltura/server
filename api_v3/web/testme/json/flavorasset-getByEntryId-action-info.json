@@ -1,0 +1,1 @@
+{"actionParams":[{"type":"string","isSimpleType":true,"isComplexType":false,"isFile":false,"isEnum":false,"isStringEnum":false,"isArray":false,"isAbstract":false,"description":"","name":"entryId","isOptional":false}],"description":"Get Flavor Assets for Entry"}

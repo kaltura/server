@@ -1,0 +1,169 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=windows-1252" />
+	<title>Kaltura - TestMe Console Documentation</title>
+	<link rel="stylesheet" type="text/css" href="../css/main.css" />
+</head>
+<body>
+	<div id="doc">
+		<h2>Kaltura API</h2>
+		<table id="serviceInfo">
+			<tr>
+				<td class="title">Service Name</td>
+				<td class="odd">media</td>
+			</tr>
+			<tr>
+				<td class="title">Description</td>
+				<td>Media service lets you upload and manage media files (images / videos & audio)<br />
+				</td>
+			</tr>
+			<tr>
+				<td class="title">Actions</td>
+				<td class="odd">
+					<table cellspacing="0" class="service_actions">
+						<tr>
+							<th>Name</th>
+							<th>Description</th>
+						</tr>
+						<tr>
+							<td><a href="../actions/media.add.html">add</td>
+							<td>Add entry</td>
+						</tr>
+						<tr>
+							<td><a href="../actions/media.addContent.html">addContent</td>
+							<td>Add content to media entry which is not yet associated with content (therefore is in status NO_CONTENT).
+     If the requirement is to replace the entry's associated content, use action updateContent.</td>
+						</tr>
+						<tr>
+							<td><a href="../actions/media.addFromBulk.html">addFromBulk</td>
+							<td>Adds new media entry by importing an HTTP or FTP URL.
+	 The entry will be queued for import and then for conversion.
+	 This action should be exposed only to the batches</td>
+						</tr>
+						<tr>
+							<td><a href="../actions/media.addFromUrl.html">addFromUrl</td>
+							<td>Adds new media entry by importing an HTTP or FTP URL.
+	 The entry will be queued for import and then for conversion.</td>
+						</tr>
+						<tr>
+							<td><a href="../actions/media.addFromSearchResult.html">addFromSearchResult</td>
+							<td>Adds new media entry by importing the media file from a search provider.
+	 This action should be used with the search service result.</td>
+						</tr>
+						<tr>
+							<td><a href="../actions/media.addFromUploadedFile.html">addFromUploadedFile</td>
+							<td>Add new entry after the specific media file was uploaded and the upload token id exists</td>
+						</tr>
+						<tr>
+							<td><a href="../actions/media.addFromRecordedWebcam.html">addFromRecordedWebcam</td>
+							<td>Add new entry after the file was recored on the server and the token id exists</td>
+						</tr>
+						<tr>
+							<td><a href="../actions/media.addFromEntry.html">addFromEntry</td>
+							<td>Copy entry into new entry</td>
+						</tr>
+						<tr>
+							<td><a href="../actions/media.addFromFlavorAsset.html">addFromFlavorAsset</td>
+							<td>Copy flavor asset into new entry</td>
+						</tr>
+						<tr>
+							<td><a href="../actions/media.convert.html">convert</td>
+							<td>Convert entry</td>
+						</tr>
+						<tr>
+							<td><a href="../actions/media.get.html">get</td>
+							<td>Get media entry by ID.</td>
+						</tr>
+						<tr>
+							<td><a href="../actions/media.getMrss.html">getMrss</td>
+							<td>Get MRSS by entry id
+     XML will return as an escaped string</td>
+						</tr>
+						<tr>
+							<td><a href="../actions/media.update.html">update</td>
+							<td>Update media entry. Only the properties that were set will be updated.</td>
+						</tr>
+						<tr>
+							<td><a href="../actions/media.updateContent.html">updateContent</td>
+							<td>Replace content associated with the media entry.</td>
+						</tr>
+						<tr>
+							<td><a href="../actions/media.delete.html">delete</td>
+							<td>Delete a media entry.</td>
+						</tr>
+						<tr>
+							<td><a href="../actions/media.approveReplace.html">approveReplace</td>
+							<td>Approves media replacement</td>
+						</tr>
+						<tr>
+							<td><a href="../actions/media.cancelReplace.html">cancelReplace</td>
+							<td>Cancels media replacement</td>
+						</tr>
+						<tr>
+							<td><a href="../actions/media.list.html">list</td>
+							<td>List media entries by filter with paging support.</td>
+						</tr>
+						<tr>
+							<td><a href="../actions/media.count.html">count</td>
+							<td>Count media entries by filter.</td>
+						</tr>
+						<tr>
+							<td><a href="../actions/media.upload.html">upload</td>
+							<td>Upload a media file to Kaltura, then the file can be used to create a media entry.</td>
+						</tr>
+						<tr>
+							<td><a href="../actions/media.updateThumbnail.html">updateThumbnail</td>
+							<td>Update media entry thumbnail by a specified time offset (In seconds)
+	 If flavor params id not specified, source flavor will be used by default</td>
+						</tr>
+						<tr>
+							<td><a href="../actions/media.updateThumbnailFromSourceEntry.html">updateThumbnailFromSourceEntry</td>
+							<td>Update media entry thumbnail from a different entry by a specified time offset (In seconds)
+	 If flavor params id not specified, source flavor will be used by default</td>
+						</tr>
+						<tr>
+							<td><a href="../actions/media.updateThumbnailJpeg.html">updateThumbnailJpeg</td>
+							<td>Update media entry thumbnail using a raw jpeg file</td>
+						</tr>
+						<tr>
+							<td><a href="../actions/media.updateThumbnailFromUrl.html">updateThumbnailFromUrl</td>
+							<td>Update entry thumbnail using url</td>
+						</tr>
+						<tr>
+							<td><a href="../actions/media.requestConversion.html">requestConversion</td>
+							<td>Request a new conversion job, this can be used to convert the media entry to a different format</td>
+						</tr>
+						<tr>
+							<td><a href="../actions/media.flag.html">flag</td>
+							<td>Flag inappropriate media entry for moderation</td>
+						</tr>
+						<tr>
+							<td><a href="../actions/media.reject.html">reject</td>
+							<td>Reject the media entry and mark the pending flags (if any) as moderated (this will make the entry non playable)</td>
+						</tr>
+						<tr>
+							<td><a href="../actions/media.approve.html">approve</td>
+							<td>Approve the media entry and mark the pending flags (if any) as moderated (this will make the entry playable)</td>
+						</tr>
+						<tr>
+							<td><a href="../actions/media.listFlags.html">listFlags</td>
+							<td>List all pending flags for the media entry</td>
+						</tr>
+						<tr>
+							<td><a href="../actions/media.anonymousRank.html">anonymousRank</td>
+							<td>Anonymously rank a media entry, no validation is done on duplicate rankings</td>
+						</tr>
+						<tr>
+							<td><a href="../actions/media.bulkUploadAdd.html">bulkUploadAdd</td>
+							<td>Add new bulk upload batch job
+	 Conversion profile id can be specified in the API or in the CSV file, the one in the CSV file will be stronger.
+	 If no conversion profile was specified, partner's default will be used</td>
+						</tr>
+					</table>
+				</td>
+			</tr>
+		</table>
+	</div>
+</body>
+</html>

@@ -1,0 +1,1 @@
+{"actionParams":[{"type":"int","isSimpleType":true,"isComplexType":false,"isFile":false,"isEnum":false,"isStringEnum":false,"isArray":false,"isAbstract":false,"description":"","name":"virusScanProfileId","isOptional":false}],"description":"Retrieve an virus scan profile object by id"}

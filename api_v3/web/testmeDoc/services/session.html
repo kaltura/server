@@ -1,0 +1,63 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=windows-1252" />
+	<title>Kaltura - TestMe Console Documentation</title>
+	<link rel="stylesheet" type="text/css" href="../css/main.css" />
+</head>
+<body>
+	<div id="doc">
+		<h2>Kaltura API</h2>
+		<table id="serviceInfo">
+			<tr>
+				<td class="title">Service Name</td>
+				<td class="odd">session</td>
+			</tr>
+			<tr>
+				<td class="title">Description</td>
+				<td>Session service<br />
+				</td>
+			</tr>
+			<tr>
+				<td class="title">Actions</td>
+				<td class="odd">
+					<table cellspacing="0" class="service_actions">
+						<tr>
+							<th>Name</th>
+							<th>Description</th>
+						</tr>
+						<tr>
+							<td><a href="../actions/session.start.html">start</td>
+							<td>Start a session with Kaltura's server.
+	 The result KS is the session key that you should pass to all services that requires a ticket.</td>
+						</tr>
+						<tr>
+							<td><a href="../actions/session.end.html">end</td>
+							<td>End a session with the Kaltura server, making the current KS invalid.</td>
+						</tr>
+						<tr>
+							<td><a href="../actions/session.impersonate.html">impersonate</td>
+							<td>Start an impersonated session with Kaltura's server.
+	 The result KS is the session key that you should pass to all services that requires a ticket.</td>
+						</tr>
+						<tr>
+							<td><a href="../actions/session.impersonateByKs.html">impersonateByKs</td>
+							<td>Start an impersonated session with Kaltura's server.
+	 The result KS info contains the session key that you should pass to all services that requires a ticket.
+	 Type, expiry and privileges won't be changed if they're not set</td>
+						</tr>
+						<tr>
+							<td><a href="../actions/session.get.html">get</td>
+							<td>Parse session key and return its info</td>
+						</tr>
+						<tr>
+							<td><a href="../actions/session.startWidgetSession.html">startWidgetSession</td>
+							<td>Start a session for Kaltura's flash widgets</td>
+						</tr>
+					</table>
+				</td>
+			</tr>
+		</table>
+	</div>
+</body>
+</html>

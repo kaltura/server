@@ -1,0 +1,1 @@
+[{"action":"collect","name":"collect","label":"collect"},{"action":"kmcCollect","name":"kmcCollect","label":"kmcCollect"},{"action":"reportKceError","name":"reportKceError","label":"reportKceError"},{"action":"reportError","name":"reportError","label":"reportError"}]

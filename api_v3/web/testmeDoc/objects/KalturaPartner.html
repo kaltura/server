@@ -1,0 +1,464 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=windows-1252" />
+	<title>Kaltura - TestMe Console Documentation</title>
+	<link rel="stylesheet" type="text/css" href="../css/main.css" />
+	<script type="text/javascript" src="../../testme/js/jquery-1.3.1.min.js"></script>
+	<script type="text/javascript">
+	
+		$(document).ready(function() {
+			$(".base-attribute").click(function() {
+				var classHeaderTable = $(this).parents("table:first");
+				var propertiesTable = classHeaderTable.parent().find("table:last");
+				if ($(this).attr("src").indexOf("collapsed.gif") >= 0) {
+				$(this).attr("src", "../images/expended.gif");
+					propertiesTable.show();
+				}
+				else {
+					$(this).attr("src", "../images/collapsed.gif");
+					propertiesTable.hide();
+				}
+			});
+		});
+	
+	</script>
+</head>
+<body>
+	<div id="doc">
+		<h2>Kaltura API</h2>
+		<table class="action" width="80%">
+			<tr>
+				<th class="service_action_title">KalturaPartner</th>
+			</tr>
+			<tr>
+				<td class="title">Properties</td>
+			</tr>
+			<tr>
+				<td>
+					<table style="">
+						<tbody>
+							<tr>
+								<td class="inheritedFrom">
+									<b><img class="base-attribute" src="../images/collapsed.gif"> Inherited from KalturaObject</b>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+					<table style="display: none">
+						<tbody>
+							<tr>
+								<th class="subtitle">Name</th>
+								<th class="subtitle">Type</th>
+								<th class="subtitle">Writable</th>
+								<th class="subtitle">Restrictions</th>
+								<th class="subtitle">Description</th>
+							</tr>
+							<tr>
+								<td>relatedObjects</td>
+								<td>map of <a href="KalturaListResponse">KalturaListResponse</a></td>
+								<td></td>
+								<td></td>
+								<td></td>
+							</tr>
+						</tbody>
+					</table>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<table style="">
+						<tbody>
+							<tr>
+								<td class="inheritedFrom"><b>KalturaPartner</b></td>
+							</tr>
+						</tbody>
+					</table>
+					<table style="">
+						<tbody>
+							<tr>
+								<th class="subtitle">Name</th>
+								<th class="subtitle">Type</th>
+								<th class="subtitle">Writable</th>
+								<th class="subtitle">Restrictions</th>
+								<th class="subtitle">Description</th>
+							</tr>
+							<tr >
+								<td>id</td>
+								<td>int</td>
+								<td></td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr class="odd">
+								<td>name</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr >
+								<td>website</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr class="odd">
+								<td>notificationUrl</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr >
+								<td>appearInSearch</td>
+								<td>int</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr class="odd">
+								<td>createdAt</td>
+								<td>int</td>
+								<td></td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr >
+								<td>adminName</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td>deprecated - lastName and firstName replaces this field</td>
+							</tr>
+							<tr class="odd">
+								<td>adminEmail</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr >
+								<td>description</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr class="odd">
+								<td>commercialUse</td>
+								<td><a href="../enums/KalturaCommercialUseType.html">KalturaCommercialUseType</a></td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr >
+								<td>landingPage</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr class="odd">
+								<td>userLandingPage</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr >
+								<td>contentCategories</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr class="odd">
+								<td>type</td>
+								<td><a href="../enums/KalturaPartnerType.html">KalturaPartnerType</a></td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr >
+								<td>phone</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr class="odd">
+								<td>describeYourself</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr >
+								<td>adultContent</td>
+								<td>bool</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr class="odd">
+								<td>defConversionProfileType</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr >
+								<td>notify</td>
+								<td>int</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr class="odd">
+								<td>status</td>
+								<td><a href="../enums/KalturaPartnerStatus.html">KalturaPartnerStatus</a></td>
+								<td></td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr >
+								<td>allowQuickEdit</td>
+								<td>int</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr class="odd">
+								<td>mergeEntryLists</td>
+								<td>int</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr >
+								<td>notificationsConfig</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr class="odd">
+								<td>maxUploadSize</td>
+								<td>int</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr >
+								<td>partnerPackage</td>
+								<td>int</td>
+								<td></td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr class="odd">
+								<td>secret</td>
+								<td>string</td>
+								<td></td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr >
+								<td>adminSecret</td>
+								<td>string</td>
+								<td></td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr class="odd">
+								<td>cmsPassword</td>
+								<td>string</td>
+								<td></td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr >
+								<td>allowMultiNotification</td>
+								<td>int</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr class="odd">
+								<td>adminLoginUsersQuota</td>
+								<td>int</td>
+								<td></td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr >
+								<td>adminUserId</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr class="odd">
+								<td>firstName</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td>firstName and lastName replace the old (deprecated) adminName</td>
+							</tr>
+							<tr >
+								<td>lastName</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td>lastName and firstName replace the old (deprecated) adminName</td>
+							</tr>
+							<tr class="odd">
+								<td>country</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td>country code (2char) - this field is optional</td>
+							</tr>
+							<tr >
+								<td>state</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td>state code (2char) - this field is optional</td>
+							</tr>
+							<tr class="odd">
+								<td>additionalParams</td>
+								<td>array of <a href="KalturaKeyValue.html">KalturaKeyValue</a></td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr >
+								<td>publishersQuota</td>
+								<td>int</td>
+								<td></td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr class="odd">
+								<td>partnerGroupType</td>
+								<td><a href="../enums/KalturaPartnerGroupType.html">KalturaPartnerGroupType</a></td>
+								<td></td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr >
+								<td>defaultEntitlementEnforcement</td>
+								<td>bool</td>
+								<td></td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr class="odd">
+								<td>defaultDeliveryType</td>
+								<td>string</td>
+								<td></td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr >
+								<td>defaultEmbedCodeType</td>
+								<td>string</td>
+								<td></td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr class="odd">
+								<td>deliveryTypes</td>
+								<td>array of <a href="KalturaPlayerDeliveryType.html">KalturaPlayerDeliveryType</a></td>
+								<td></td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr >
+								<td>embedCodeTypes</td>
+								<td>array of <a href="KalturaPlayerEmbedCodeType.html">KalturaPlayerEmbedCodeType</a></td>
+								<td></td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr class="odd">
+								<td>templatePartnerId</td>
+								<td>int</td>
+								<td></td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr >
+								<td>ignoreSeoLinks</td>
+								<td>bool</td>
+								<td></td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr class="odd">
+								<td>host</td>
+								<td>string</td>
+								<td></td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr >
+								<td>cdnHost</td>
+								<td>string</td>
+								<td></td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr class="odd">
+								<td>isFirstLogin</td>
+								<td>bool</td>
+								<td></td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr >
+								<td>logoutUrl</td>
+								<td>string</td>
+								<td></td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr class="odd">
+								<td>partnerParentId</td>
+								<td>int</td>
+								<td></td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr >
+								<td>crmId</td>
+								<td>string</td>
+								<td></td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr class="odd">
+								<td>referenceId</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr >
+								<td>timeAlignedRenditions</td>
+								<td>bool</td>
+								<td></td>
+								<td></td>
+								<td></td>
+							</tr>
+						</tbody>
+					</table>
+				</td>
+			</tr>
+		</table>
+	</div>
+</body>
+</html>

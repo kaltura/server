@@ -1,0 +1,359 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=windows-1252" />
+	<title>Kaltura - TestMe Console Documentation</title>
+	<link rel="stylesheet" type="text/css" href="../css/main.css" />
+	<script type="text/javascript" src="../../testme/js/jquery-1.3.1.min.js"></script>
+	<script type="text/javascript">
+	
+		$(document).ready(function() {
+			$(".base-attribute").click(function() {
+				var classHeaderTable = $(this).parents("table:first");
+				var propertiesTable = classHeaderTable.parent().find("table:last");
+				if ($(this).attr("src").indexOf("collapsed.gif") >= 0) {
+				$(this).attr("src", "../images/expended.gif");
+					propertiesTable.show();
+				}
+				else {
+					$(this).attr("src", "../images/collapsed.gif");
+					propertiesTable.hide();
+				}
+			});
+		});
+	
+	</script>
+</head>
+<body>
+	<div id="doc">
+		<h2>Kaltura API</h2>
+		<table class="action" width="80%">
+			<tr>
+				<th class="service_action_title">KalturaBatchJob</th>
+			</tr>
+			<tr>
+				<td class="title">Properties</td>
+			</tr>
+			<tr>
+				<td>
+					<table style="">
+						<tbody>
+							<tr>
+								<td class="inheritedFrom">
+									<b><img class="base-attribute" src="../images/collapsed.gif"> Inherited from KalturaObject</b>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+					<table style="display: none">
+						<tbody>
+							<tr>
+								<th class="subtitle">Name</th>
+								<th class="subtitle">Type</th>
+								<th class="subtitle">Writable</th>
+								<th class="subtitle">Restrictions</th>
+								<th class="subtitle">Description</th>
+							</tr>
+							<tr>
+								<td>relatedObjects</td>
+								<td>map of <a href="KalturaListResponse">KalturaListResponse</a></td>
+								<td></td>
+								<td></td>
+								<td></td>
+							</tr>
+						</tbody>
+					</table>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<table style="">
+						<tbody>
+							<tr>
+								<td class="inheritedFrom"><b>KalturaBatchJob</b></td>
+							</tr>
+						</tbody>
+					</table>
+					<table style="">
+						<tbody>
+							<tr>
+								<th class="subtitle">Name</th>
+								<th class="subtitle">Type</th>
+								<th class="subtitle">Writable</th>
+								<th class="subtitle">Restrictions</th>
+								<th class="subtitle">Description</th>
+							</tr>
+							<tr >
+								<td>id</td>
+								<td>bigint</td>
+								<td></td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr class="odd">
+								<td>partnerId</td>
+								<td>int</td>
+								<td></td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr >
+								<td>createdAt</td>
+								<td>int</td>
+								<td></td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr class="odd">
+								<td>updatedAt</td>
+								<td>int</td>
+								<td></td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr >
+								<td>deletedAt</td>
+								<td>int</td>
+								<td></td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr class="odd">
+								<td>lockExpiration</td>
+								<td>int</td>
+								<td></td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr >
+								<td>executionAttempts</td>
+								<td>int</td>
+								<td></td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr class="odd">
+								<td>lockVersion</td>
+								<td>int</td>
+								<td></td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr >
+								<td>entryId</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr class="odd">
+								<td>entryName</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr >
+								<td>jobType</td>
+								<td><a href="../enums/KalturaBatchJobType.html">KalturaBatchJobType</a></td>
+								<td></td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr class="odd">
+								<td>jobSubType</td>
+								<td>int</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr >
+								<td>data</td>
+								<td><a href="KalturaJobData.html">KalturaJobData</a></td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr class="odd">
+								<td>status</td>
+								<td><a href="../enums/KalturaBatchJobStatus.html">KalturaBatchJobStatus</a></td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr >
+								<td>abort</td>
+								<td>int</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr class="odd">
+								<td>checkAgainTimeout</td>
+								<td>int</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr >
+								<td>message</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr class="odd">
+								<td>description</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr >
+								<td>priority</td>
+								<td>int</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr class="odd">
+								<td>history</td>
+								<td>array of <a href="KalturaBatchHistoryData.html">KalturaBatchHistoryData</a></td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr >
+								<td>bulkJobId</td>
+								<td>int</td>
+								<td>V</td>
+								<td></td>
+								<td>The id of the bulk upload job that initiated this job</td>
+							</tr>
+							<tr class="odd">
+								<td>batchVersion</td>
+								<td>int</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr >
+								<td>parentJobId</td>
+								<td>int</td>
+								<td>V</td>
+								<td></td>
+								<td>When one job creates another - the parent should set this parentJobId to be its own id.</td>
+							</tr>
+							<tr class="odd">
+								<td>rootJobId</td>
+								<td>int</td>
+								<td>V</td>
+								<td></td>
+								<td>The id of the root parent job</td>
+							</tr>
+							<tr >
+								<td>queueTime</td>
+								<td>int</td>
+								<td>V</td>
+								<td></td>
+								<td>The time that the job was pulled from the queue</td>
+							</tr>
+							<tr class="odd">
+								<td>finishTime</td>
+								<td>int</td>
+								<td>V</td>
+								<td></td>
+								<td>The time that the job was finished or closed as failed</td>
+							</tr>
+							<tr >
+								<td>errType</td>
+								<td><a href="../enums/KalturaBatchJobErrorTypes.html">KalturaBatchJobErrorTypes</a></td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr class="odd">
+								<td>errNumber</td>
+								<td>int</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr >
+								<td>estimatedEffort</td>
+								<td>int</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr class="odd">
+								<td>urgency</td>
+								<td>int</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr >
+								<td>schedulerId</td>
+								<td>int</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr class="odd">
+								<td>workerId</td>
+								<td>int</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr >
+								<td>batchIndex</td>
+								<td>int</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr class="odd">
+								<td>lastSchedulerId</td>
+								<td>int</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr >
+								<td>lastWorkerId</td>
+								<td>int</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr class="odd">
+								<td>dc</td>
+								<td>int</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr >
+								<td>jobObjectId</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr class="odd">
+								<td>jobObjectType</td>
+								<td>int</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+						</tbody>
+					</table>
+				</td>
+			</tr>
+		</table>
+	</div>
+</body>
+</html>

@@ -1,0 +1,320 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=windows-1252" />
+	<title>Kaltura - TestMe Console Documentation</title>
+	<link rel="stylesheet" type="text/css" href="../css/main.css" />
+	<script type="text/javascript" src="../../testme/js/jquery-1.3.1.min.js"></script>
+	<script type="text/javascript">
+	
+		$(document).ready(function() {
+			$(".base-attribute").click(function() {
+				var classHeaderTable = $(this).parents("table:first");
+				var propertiesTable = classHeaderTable.parent().find("table:last");
+				if ($(this).attr("src").indexOf("collapsed.gif") >= 0) {
+				$(this).attr("src", "../images/expended.gif");
+					propertiesTable.show();
+				}
+				else {
+					$(this).attr("src", "../images/collapsed.gif");
+					propertiesTable.hide();
+				}
+			});
+		});
+	
+	</script>
+</head>
+<body>
+	<div id="doc">
+		<h2>Kaltura API</h2>
+		<table class="action" width="80%">
+			<tr>
+				<th class="service_action_title">KalturaWebexDropFolderFile</th>
+			</tr>
+			<tr>
+				<td class="title">Properties</td>
+			</tr>
+			<tr>
+				<td>
+					<table style="">
+						<tbody>
+							<tr>
+								<td class="inheritedFrom">
+									<b><img class="base-attribute" src="../images/collapsed.gif"> Inherited from KalturaObject</b>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+					<table style="display: none">
+						<tbody>
+							<tr>
+								<th class="subtitle">Name</th>
+								<th class="subtitle">Type</th>
+								<th class="subtitle">Writable</th>
+								<th class="subtitle">Restrictions</th>
+								<th class="subtitle">Description</th>
+							</tr>
+							<tr>
+								<td>relatedObjects</td>
+								<td>map of <a href="KalturaListResponse">KalturaListResponse</a></td>
+								<td></td>
+								<td></td>
+								<td></td>
+							</tr>
+						</tbody>
+					</table>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<table style="">
+						<tbody>
+							<tr>
+								<td class="inheritedFrom">
+									<b><img class="base-attribute" src="../images/collapsed.gif"> Inherited from <a href="KalturaDropFolderFile.html">KalturaDropFolderFile</a></b>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+					<table style="display: none">
+						<tbody>
+							<tr>
+								<th class="subtitle">Name</th>
+								<th class="subtitle">Type</th>
+								<th class="subtitle">Writable</th>
+								<th class="subtitle">Restrictions</th>
+								<th class="subtitle">Description</th>
+							</tr>
+							<tr >
+								<td>id</td>
+								<td>int</td>
+								<td></td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr class="odd">
+								<td>partnerId</td>
+								<td>int</td>
+								<td></td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr >
+								<td>dropFolderId</td>
+								<td>int</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr class="odd">
+								<td>fileName</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr >
+								<td>fileSize</td>
+								<td>float</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr class="odd">
+								<td>fileSizeLastSetAt</td>
+								<td>int</td>
+								<td></td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr >
+								<td>status</td>
+								<td><a href="../enums/KalturaDropFolderFileStatus.html">KalturaDropFolderFileStatus</a></td>
+								<td></td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr class="odd">
+								<td>type</td>
+								<td><a href="../enums/KalturaDropFolderType.html">KalturaDropFolderType</a></td>
+								<td></td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr >
+								<td>parsedSlug</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr class="odd">
+								<td>parsedFlavor</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr >
+								<td>parsedUserId</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr class="odd">
+								<td>leadDropFolderFileId</td>
+								<td>int</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr >
+								<td>deletedDropFolderFileId</td>
+								<td>int</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr class="odd">
+								<td>entryId</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr >
+								<td>errorCode</td>
+								<td><a href="../enums/KalturaDropFolderFileErrorCode.html">KalturaDropFolderFileErrorCode</a></td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr class="odd">
+								<td>errorDescription</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr >
+								<td>lastModificationTime</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr class="odd">
+								<td>createdAt</td>
+								<td>int</td>
+								<td></td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr >
+								<td>updatedAt</td>
+								<td>int</td>
+								<td></td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr class="odd">
+								<td>uploadStartDetectedAt</td>
+								<td>int</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr >
+								<td>uploadEndDetectedAt</td>
+								<td>int</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr class="odd">
+								<td>importStartedAt</td>
+								<td>int</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr >
+								<td>importEndedAt</td>
+								<td>int</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr class="odd">
+								<td>batchJobId</td>
+								<td>int</td>
+								<td></td>
+								<td></td>
+								<td></td>
+							</tr>
+						</tbody>
+					</table>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<table style="">
+						<tbody>
+							<tr>
+								<td class="inheritedFrom"><b>KalturaWebexDropFolderFile</b></td>
+							</tr>
+						</tbody>
+					</table>
+					<table style="">
+						<tbody>
+							<tr>
+								<th class="subtitle">Name</th>
+								<th class="subtitle">Type</th>
+								<th class="subtitle">Writable</th>
+								<th class="subtitle">Restrictions</th>
+								<th class="subtitle">Description</th>
+							</tr>
+							<tr >
+								<td>recordingId</td>
+								<td>int</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr class="odd">
+								<td>webexHostId</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr >
+								<td>description</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr class="odd">
+								<td>confId</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr >
+								<td>contentUrl</td>
+								<td>string</td>
+								<td>V</td>
+								<td></td>
+								<td></td>
+							</tr>
+						</tbody>
+					</table>
+				</td>
+			</tr>
+		</table>
+	</div>
+</body>
+</html>

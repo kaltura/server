@@ -1,0 +1,110 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=windows-1252" />
+	<title>Kaltura - TestMe Console Documentation</title>
+	<link rel="stylesheet" type="text/css" href="../css/main.css" />
+</head>
+<body>
+	<div id="doc">
+		<h2>Kaltura API</h2>
+		<table id="serviceInfo">
+			<tr>
+				<td class="title">Service Name</td>
+				<td class="odd">user</td>
+			</tr>
+			<tr>
+				<td class="title">Description</td>
+				<td>Manage partner users on Kaltura's side
+ The userId in kaltura is the unique Id in the partner's system, and the [partnerId,Id] couple are unique key in kaltura's DB<br />
+				</td>
+			</tr>
+			<tr>
+				<td class="title">Actions</td>
+				<td class="odd">
+					<table cellspacing="0" class="service_actions">
+						<tr>
+							<th>Name</th>
+							<th>Description</th>
+						</tr>
+						<tr>
+							<td><a href="../actions/user.add.html">add</td>
+							<td>Adds a new user to an existing account in the Kaltura database.
+	 Input param $id is the unique identifier in the partner's system.</td>
+						</tr>
+						<tr>
+							<td><a href="../actions/user.update.html">update</td>
+							<td>Updates an existing user object.
+	 You can also use this action to update the userId.</td>
+						</tr>
+						<tr>
+							<td><a href="../actions/user.get.html">get</td>
+							<td>Retrieves a user object for a specified user ID.</td>
+						</tr>
+						<tr>
+							<td><a href="../actions/user.getByLoginId.html">getByLoginId</td>
+							<td>Retrieves a user object for a user's login ID and partner ID.
+	 A login ID is the email address used by a user to log into the system.</td>
+						</tr>
+						<tr>
+							<td><a href="../actions/user.delete.html">delete</td>
+							<td>Deletes a user from a partner account.</td>
+						</tr>
+						<tr>
+							<td><a href="../actions/user.list.html">list</td>
+							<td>Lists user objects that are associated with an account.
+	 Blocked users are listed unless you use a filter to exclude them.
+	 Deleted users are not listed unless you use a filter to include them.</td>
+						</tr>
+						<tr>
+							<td><a href="../actions/user.notifyBan.html">notifyBan</td>
+							<td>Notifies that a user is banned from an account.</td>
+						</tr>
+						<tr>
+							<td><a href="../actions/user.login.html">login</td>
+							<td>Logs a user into a partner account with a partner ID, a partner user ID (puser), and a user password.</td>
+						</tr>
+						<tr>
+							<td><a href="../actions/user.loginByLoginId.html">loginByLoginId</td>
+							<td>Logs a user into a partner account with a user login ID and a user password.</td>
+						</tr>
+						<tr>
+							<td><a href="../actions/user.updateLoginData.html">updateLoginData</td>
+							<td>Updates a user's login data: email, password, name.</td>
+						</tr>
+						<tr>
+							<td><a href="../actions/user.resetPassword.html">resetPassword</td>
+							<td>Reset user's password and send the user an email to generate a new one.</td>
+						</tr>
+						<tr>
+							<td><a href="../actions/user.setInitialPassword.html">setInitialPassword</td>
+							<td>Set initial users password</td>
+						</tr>
+						<tr>
+							<td><a href="../actions/user.enableLogin.html">enableLogin</td>
+							<td>Enables a user to log into a partner account using an email address and a password</td>
+						</tr>
+						<tr>
+							<td><a href="../actions/user.disableLogin.html">disableLogin</td>
+							<td>Disables a user's ability to log into a partner account using an email address and a password.
+	 You may use either a userId or a loginId parameter for this action.</td>
+						</tr>
+						<tr>
+							<td><a href="../actions/user.index.html">index</td>
+							<td>Index an entry by id.</td>
+						</tr>
+						<tr>
+							<td><a href="../actions/user.addFromBulkUpload.html">addFromBulkUpload</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td><a href="../actions/user.checkLoginDataExists.html">checkLoginDataExists</td>
+							<td>Action which checks whther user login</td>
+						</tr>
+					</table>
+				</td>
+			</tr>
+		</table>
+	</div>
+</body>
+</html>

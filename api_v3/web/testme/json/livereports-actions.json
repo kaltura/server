@@ -1,0 +1,1 @@
+[{"action":"getEvents","name":"getEvents","label":"getEvents"},{"action":"getReport","name":"getReport","label":"getReport"},{"action":"exportToCsv","name":"exportToCsv","label":"exportToCsv"},{"action":"serveReport","name":"serveReport","label":"serveReport"}]

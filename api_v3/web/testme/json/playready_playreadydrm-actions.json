@@ -1,0 +1,1 @@
+[{"action":"generateKey","name":"generateKey","label":"generateKey"},{"action":"getContentKeys","name":"getContentKeys","label":"getContentKeys"},{"action":"getEntryContentKey","name":"getEntryContentKey","label":"getEntryContentKey"},{"action":"getLicenseDetails","name":"getLicenseDetails","label":"getLicenseDetails"}]
