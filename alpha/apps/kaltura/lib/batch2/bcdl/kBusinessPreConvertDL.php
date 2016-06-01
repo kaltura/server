@@ -559,14 +559,14 @@ class kBusinessPreConvertDL
 		self::adjustAssetParams($entryId, $flavors);
 		// call the decision layer
 		KalturaLog::log("Generate Target " . count($flavors) . " Flavors supplied");
-		$cdl = KDLWrap::CDLGenerateTargetFlavors($mediaInfo, $flavors);
-		KalturaLog::log("Generate Target " . count($cdl->_targetList) . " Flavors returned");
 		foreach($flavors as $flavor) {
 			$flavorParamsConversionProfile = $conversionProfileFlavorParams[$flavor->getId()];
 			$isEncrypted = $flavorParamsConversionProfile->getIsEncrypted();
 			if(isset($isEncrypted))
 				$flavor->setIsEncrypted($isEncrypted);
 		}
+		$cdl = KDLWrap::CDLGenerateTargetFlavors($mediaInfo, $flavors);
+		KalturaLog::log("Generate Target " . count($cdl->_targetList) . " Flavors returned");
 		
 		// check for errors
 		$errDescription = '';
