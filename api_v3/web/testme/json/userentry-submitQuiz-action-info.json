@@ -1,1 +1,0 @@
-{"actionParams":[{"type":"int","isSimpleType":true,"isComplexType":false,"isFile":false,"isEnum":false,"isStringEnum":false,"isArray":false,"isAbstract":false,"description":"","name":"id","isOptional":false}],"description":"Submits the quiz so that it's status will be submitted and calculates the score for the quiz"}

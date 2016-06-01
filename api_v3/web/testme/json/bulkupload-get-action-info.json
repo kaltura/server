@@ -1,1 +1,0 @@
-{"actionParams":[{"type":"bigint","isSimpleType":true,"isComplexType":false,"isFile":false,"isEnum":false,"isStringEnum":false,"isArray":false,"isAbstract":false,"description":"","name":"id","isOptional":false}],"description":"Get bulk upload batch job by id"}
