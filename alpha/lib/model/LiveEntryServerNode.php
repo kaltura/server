@@ -134,7 +134,7 @@ class LiveEntryServerNode extends EntryServerNode
 		$liveEntry = entryPeer::retrieveByPK($this->getEntryId());
 		if(!$liveEntry)
 		{
-			KalturaLog::debug("Entry with id [{$this->getEntryId()}] not found, will not validate entryServerNode registered");
+			KalturaLog::err("Entry with id [{$this->getEntryId()}] not found, will not validate entryServerNode registered");
 			return;
 		}
 		

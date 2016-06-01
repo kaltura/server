@@ -622,6 +622,9 @@ abstract class LiveEntry extends entry
 	 */
 	public function isCacheValid(LiveEntryServerNode $liveEntryServerNode)
 	{
+		if(!$liveEntryServerNode)
+			return false;
+		
 		$cacheType = self::getCacheType();
 		$cacheStore = kCacheManager::getSingleLayerCache($cacheType);
 		if(! $cacheStore)

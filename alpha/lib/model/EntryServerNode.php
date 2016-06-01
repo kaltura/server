@@ -13,7 +13,9 @@
  * @package Core
  * @subpackage model
  */
-class EntryServerNode extends BaseEntryServerNode {
+abstract class EntryServerNode extends BaseEntryServerNode {
+	
+	abstract public function validateEntryServerNode();
 
 	public function getCacheInvalidationKeys()
 	{
@@ -28,10 +30,5 @@ class EntryServerNode extends BaseEntryServerNode {
 		$te->setDescription($description);
 	
 		TrackEntry::addTrackEntry($te);
-	}
-	
-	public function validateEntryServerNode()
-	{
-		return;
 	}
 } // EntryServerNode
