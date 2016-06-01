@@ -27,8 +27,8 @@ $html5Version = $_GET['playerVersion'];
 	<link href='https://fonts.googleapis.com/css?family=Lato:400,700,300' rel='stylesheet' type='text/css'>
 	
 	<script src="/lib/js/jquery-1.8.3.min.js"></script>
-	<!--script type="text/javascript" src="/html5/html5lib/<?php echo $html5Version; ?>/mwEmbedLoader.php"></script-->
-	<script type="text/javascript" src="http://kgit.html5video.org/tags/v2.42.rc10/mwEmbedLoader.php"></script>
+	<script type="text/javascript" src="/html5/html5lib/<?php echo $html5Version; ?>/mwEmbedLoader.php"></script>
+	<!-- <script type="text/javascript" src="http://kgit.html5video.org/tags/v2.44.rc2/mwEmbedLoader.php"></script> -->
 	<script type="text/javascript" src="swfobject.js"></script>
 	<script>
 		var partnerId = <?php echo $partnerId; ?>;
@@ -78,17 +78,6 @@ $html5Version = $_GET['playerVersion'];
 			});
 		}
 
-		function userPlayerUrl(){
-			log('url', '#cpLog');
-			var entryId = $('#txtEntryId').val();
-			var uiConfId = $('#txtUiConfId').val();
-			var url = location.protocol + '//';
-			url += location.host + '/admin_console/tools/bigRedButtonPtsPocUserPlayer.php?partnerId='
-			url += partnerId + '&entryId=0_oyfjxo3a' + '&uiConfId=15098051' + '&playerVersion=v2.39';
-			log(url, '#cpLog');
-			return url;
-		}
-		
 		function loadUserPlayer(entryId, uiConfId){
             kWidget.embed({
                     targetId: 'userPlayerContainer',
@@ -104,11 +93,15 @@ $html5Version = $_GET['playerVersion'];
                     },
                     "cache_st": 1410340114,
                     "entry_id": entryId,
-					"readyCallback": function( ) {
-						var userVideo = $("#userPlayerContainer_ifp").contents().find(".persistentNativePlayer")[0];
+					"readyCallback": function(playerId ) {
+						/*var userVideo = $("#userPlayerContainer_ifp").contents().find(".persistentNativePlayer")[0];
 						setInterval( function() {
 							onUserTime(userVideo.currentTime);
-						}, 500);
+						}, 500);*/
+						var userKdp = document.getElementById( playerId );
+                                                userKdp.addJsListener( 'hlsUpdatePTS', 'onUserTime');
+                                                userKdp.addJsListener( 'hlsFragParsingData' , 'onUserTime1');
+                                                userKdp.addJsListener( 'playerUpdatePlayhead' , 'onUserTime2');
 					}
             });
 		}
@@ -129,28 +122,114 @@ $html5Version = $_GET['playerVersion'];
 					 },
 					 "cache_st": 1410340114,
 					 "entry_id": entryId,
-					 "readyCallback": function( ) {
+/*					 "readyCallback": function( ) {
 						 var adminVideo = $("#adminPlayerContainer_ifp").contents().find(".persistentNativePlayer")[0];
 						 setInterval( function() {
-							 onAdminTime(adminVideo.currentTime);
-						 }, 500);
-					 }
+							 onCurrentTime(adminVideo.currentTime, "adminTime");
+						 }, 1000);
+					 }*/
+					"readyCallback": function( playerId ) {
+						var adminKdp = document.getElementById( playerId );
+						adminKdp.addJsListener( 'hlsUpdatePTS', 'onAdminTime');
+						adminKdp.addJsListener( 'hlsFragParsingData' , 'onAdminTime1');
+						adminKdp.addJsListener( 'playerUpdatePlayhead' , 'onAdminTime2');
+					}
 			 });
 		}
 		
-		function onAdminTime(t){
+/*		function onCurrentTime(t, isAbsolute){
 			if(t > 0){
 				currentTime = t*1000;
-
 				$('#btnSendAd').removeAttr('disabled');
 				document.getElementById("adminTime").innerHTML = currentTime;
 			}
 		}
+*/
+		function onAdminTime(t){
+			var xxx;
+			if(t.details.PTSKnown){
+				var type = 'none';
+				if ( typeof t.details.fragments[0].startPTS !==  'undefined' ) {
+					xxx = t.details.fragments[0].startPTS;// * 1000 * 90 ;
+					type = 'startPTS';
+					
+				}
+				else 
+				{ 
+					xxx = t.details.fragments[0].start ;//* 1000 * 90 ;
+					type = 'start';
+				} 
+							 
 
-		function onUserTime(t) {
+				$('#btnSendAd').removeAttr('disabled');
+				document.getElementById('adminTime').innerHTML = xxx;
+				document.getElementById('adminTimeType').innerHTML = type;
+			} else {
+				document.getElementById('adminTime').innerHTML = 'No PTS info';
+			}
+		}
+		
+		function onAdminTime1(t){
+
+                        if(t){
+                            //    currentTime = t.details.fragments[0].startPTS*1000;
+
+                            //    $('#btnSendAd').removeAttr('disabled');
+				var xx = t.startPTS;
+                                document.getElementById('adminTime1').innerHTML = xx;
+                        }
+                }
+		function onAdminTime2(t){
+
+                        if(t){
+                               currentTime = t;
+
+                            //    $('#btnSendAd').removeAttr('disabled');
+                                
+                                document.getElementById('adminTime2').innerHTML = new Date(currentTime*1000).toTimeString();;
+                        }
+                }
+
+		function onUserTime(t){
+                        var xxx;
+                        if(t.details.PTSKnown){
+                                var type = 'none';
+                                if ( typeof t.details.fragments[0].startPTS !==  'undefined' ) {
+                                        xxx = t.details.fragments[0].startPTS;// * 1000 * 90 ;
+                                        type = 'startPTS';
+
+                                }
+                                else
+                                {
+                                        xxx = t.details.fragments[0].start ;//* 1000 * 90 ;
+                                        type = 'start';
+                                }
+
+
+                                $('#btnSendAd').removeAttr('disabled');
+                                document.getElementById('userTime').innerHTML = xxx;
+                                document.getElementById('userTimeType').innerHTML = type;
+                        } else {
+                                document.getElementById('userTime').innerHTML = 'No PTS info';
+                        }
+                }
+
+                function onUserTime1(t){
+
+                        if(t){
+                            //    currentTime = t.details.fragments[0].startPTS*1000;
+
+                            //    $('#btnSendAd').removeAttr('disabled');
+                                var xx = t.startPTS;
+                                document.getElementById('userTime1').innerHTML = xx;
+                        }
+                }
+
+
+		function onUserTime2(t) {
 			if(t > 0){
-				userTime = t*1000;
-				document.getElementById("userTime").innerHTML = userTime;
+				userTime = t;
+				document.getElementById("userTime2").innerHTML = new Date(t*1000).toTimeString();;
 
 				var timeDiff = -1;
 				var historyList = document.getElementById("historyList");
@@ -165,12 +244,12 @@ $html5Version = $_GET['playerVersion'];
 					} else {
 						//TODO we might need to multiply by 90 if player fix the PTS time
 						var timeDiffInMS = Math.floor(timeDiff) ;
-						document.getElementById("nextAdTime").innerHTML = getCountdownString(timeDiffInMS)
+						document.getElementById("nextAdTime").innerHTML = getCountdownString(timeDiffInMS);
 						break;
 					}
 				}
 				if ( timeDiff < 0 )
-					document.getElementById("nextAdTime").innerHTML = "..."
+					document.getElementById("nextAdTime").innerHTML = "...";
 			}
 		}
 
@@ -197,7 +276,7 @@ $html5Version = $_GET['playerVersion'];
 					ks: ks,
 					'cuePoint:objectType': 'KalturaAdCuePoint',
 					'cuePoint:entryId': entryId,
-					'cuePoint:startTime': startTime,
+					'cuePoint:triggeredAt': startTime,
 					'cuePoint:protocolType': 'VPAID',
 					'cuePoint:sourceUrl': adUrl,
 					'cuePoint:adType': 1, // VIDEO
@@ -217,7 +296,7 @@ $html5Version = $_GET['playerVersion'];
 					var li = document.createElement("li");
 					li.id = startTime;
 					var timeSpan = document.createElement('span')
-					timeSpan.innerHTML = "Start time " + startTime;
+					timeSpan.innerHTML = "Start time " + new Date(startTime*1000).toTimeString();
 					li.appendChild(document.createTextNode("Cue point created"));
 					li.appendChild(timeSpan);
 					ul.appendChild(li);
@@ -250,14 +329,22 @@ $html5Version = $_GET['playerVersion'];
               <div id="adminPlayerContainer" class="video-content">
                </div>
             </div>
-			<p><strong>Admin</strong> <span>PTS </span><span id="adminTime"> </span></p>
+			<p><strong>Admin 0</strong> <span>PTS </span><span id="adminTime"> </span><span id="adminTimeType"></span></p>
+			<p><strong>Admin 1</strong> <span>PTS </span><span id="adminTime1"> </span></p>	
+			<p><strong>Admin 2</strong> <span>PTS </span><span id="adminTime2"> </span></p>
+			<p><strong>Admin 3</strong> <span>PTS </span><span id="adminTime3"> </span></p>
+			<p><strong>Admin 4</strong> <span>PTS </span><span id="adminTime4"> </span></p>
           </div>
           <div class="col col-sm-6 video-col">
             <div class="video">
               <div id="userPlayerContainer" class="video-content">
               </div>
             </div>
-			  <p><strong>Audience</strong> <span>PTS </span><span id="userTime"> </span></p>
+			  <p><strong>Audience 0</strong> <span>PTS </span><span id="userTime"></span><span id="userTimeType"> </span></p>
+			<p><strong>Audience 1</strong> <span>PTS </span><span id="userTime1"> </span></p>
+			<p><strong>Audience 2</strong> <span>PTS </span><span id="userTime2"> </span></p>
+			<p><strong>Audience 3</strong> <span>PTS </span><span id="userTime3"> </span></p>
+			<p><strong>Audience 4</strong> <span>PTS </span><span id="userTime4"> </span></p>
           </div>
         </div>
       </div>
