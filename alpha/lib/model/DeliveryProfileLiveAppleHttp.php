@@ -191,6 +191,7 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 			);
 				
 			$flavor['bitrate'] = isset($flavorBitrateInfo[$kLiveStreamParams->getFlavorId()]) ? $flavorBitrateInfo[$kLiveStreamParams->getFlavorId()] : $kLiveStreamParams->getBitrate();
+			$flavor['bitrate'] = $flavor['bitrate'] / 1024;
 			$flavor['width'] = $kLiveStreamParams->getWidth();
 			$flavor['height'] = $kLiveStreamParams->getHeight();
 			
@@ -256,7 +257,7 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 		$primaryServerStreams = $this->liveStreamConfig->getPrimaryStreamInfo();
 		$backupServerStreams = $this->liveStreamConfig->getBackupStreamInfo();
 		
-		if($this->params->getUsePlayServer() || (!$this->getForceProxy() && !count($primaryServerStreams) && !count($backupServerStreams)))
+		if(!$this->getForceProxy()  || $this->params->getUsePlayServer() || (!count($primaryServerStreams) && !count($backupServerStreams)))
 		{
 			$this->shouldRedirect = true;
 		}
