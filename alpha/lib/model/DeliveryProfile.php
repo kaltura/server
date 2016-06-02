@@ -270,27 +270,41 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 	
 	protected function getAudioLanguage($flavor) 
 	{
-		$mediaInfoObj = mediaInfoPeer::retrieveByFlavorAssetId($flavor->getId());
-		if (!$mediaInfoObj) 
-			return null;
-		
-		$contentStreams = $mediaInfoObj->getContentStreams();
-		if (!isset($contentStreams)) 
-			return null;
-		
-		$parsedJson = json_decode($contentStreams,true);
-		if (!isset($parsedJson['audio'][0]['audioLanguage'])) 
-			return null;
-		
-		$audioLanguage = $parsedJson['audio'][0]['audioLanguage'];
-		if (defined('LanguageKey::' . strtoupper($audioLanguage))) {
-			$audioLanguageName = constant('LanguageKey::' . strtoupper($audioLanguage));
+		$manager = languageCodeManager::getInstance();
+		$lang = $flavor->getLanguage();
+		$obj = null;
+		$audioLanguage = null;
+		$audioLanguageName = null;
+
+		if(!isset($lang)) { //for backward compatibility
+			$mediaInfoObj = mediaInfoPeer::retrieveByFlavorAssetId($flavor->getId());
+			if (!$mediaInfoObj)
+				return null;
+
+			$contentStreams = $mediaInfoObj->getContentStreams();
+			if (!isset($contentStreams))
+				return null;
+
+			$parsedJson = json_decode($contentStreams, true);
+			if (!isset($parsedJson['audio'][0]['audioLanguage']))
+				return null;
+
+			$audioLanguage = $parsedJson['audio'][0]['audioLanguage'];
+			$obj = $manager->getLanguageObjectFromThreeCode(strtolower($audioLanguage));
+
 		}
 		else {
-			$audioLanguageName = "Unknown ($audioLanguage)";
-			KalturaLog::info("Language code [$audioLanguage] was not found. Setting [$audioLanguageName] instead");	                    
+			$obj = $manager->getLanguageObjectFromKalturaLanguageName($lang);
+			$audioLanguage = $obj[languageCodeManager::THREE_CODE_T];
 		}
-	    
+
+		if(!is_null($obj))
+			$audioLanguageName = $obj[languageCodeManager::LANGUAGE_NAME_KALTURA];
+		else {
+			$audioLanguageName = "Undefined";
+			KalturaLog::info("Language code [$audioLanguage] was not found. Setting [$audioLanguageName] instead");
+		}
+
 		return array($audioLanguage, $audioLanguageName);
 	}
 	

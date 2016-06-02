@@ -237,8 +237,30 @@ class flavorAsset extends asset
 	public function getInterFlowCount() { return $this->getFromCustomData("interFlowCount"); }
 	public function incrementInterFlowCount() { $this->putInCustomData("interFlowCount", $this->getInterFlowCount() ? $this->getInterFlowCount()+1 : 1); }
 	public function removeInterFlowCount() { $this->removeFromCustomData("interFlowCount"); }
-	public function getLanguage()	{ return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_LANGUAGE); }
-	public function setLanguage($v)	{ $this->putInCustomData(self::CUSTOM_DATA_FIELD_LANGUAGE, $v); }
+
+	public function getLanguage()
+	{
+		KalturaLog::debug("@nadav@  called get language [".$this->getFromCustomData(self::CUSTOM_DATA_FIELD_LANGUAGE)."] @nadav@");
+		$languageCode = $this->getFromCustomData(self::CUSTOM_DATA_FIELD_LANGUAGE);
+		if (!is_null($languageCode))
+		{
+			$manObj = languageCodeManager::getInstance();
+			$obj = $manObj->getLanguageObjectFromTwoCode($languageCode);
+			return $obj[languageCodeManager::LANGUAGE_NAME_KALTURA];
+		}
+		return $languageCode;
+		//return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_LANGUAGE);
+	}
+	public function setLanguage($v)
+	{
+		$manObj = languageCodeManager::getInstance();
+		$key = $manObj->isKnownLanguage($v);
+		if(!$key)
+			$key = 'UN'; //Undefined language
+		$this->putInCustomData(self::CUSTOM_DATA_FIELD_LANGUAGE, $key);
+		//$this->putInCustomData(self::CUSTOM_DATA_FIELD_LANGUAGE, $v);
+	}
+
 
 	/**
 	 * @param int $type
