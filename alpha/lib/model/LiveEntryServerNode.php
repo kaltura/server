@@ -141,7 +141,7 @@ class LiveEntryServerNode extends EntryServerNode
 		/* @var $liveEntry LiveEntry */
 		if($this->getDc() === kDataCenterMgr::getCurrentDcId() && !$liveEntry->isCacheValid($this))
 		{
-			KalturaLog::info("Removing media server id [" . $this->getServerNodeId() . "] form liveEntry [" . $this->getEntryId() . "]");
+			KalturaLog::info("Removing media server id [" . $this->getServerNodeId() . "] from liveEntry [" . $this->getEntryId() . "]");
 			$this->delete();
 		}
 	}
