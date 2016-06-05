@@ -123,20 +123,20 @@ class kBroadcastUrlManager
 		
 		$url = "$protocol://$hostname";
 		
-		$params = array(
-			'p' => $this->partnerId,
-			'e' => $entry->getId(),
-			'i' => $mediaServerIndex,
-			't' => $entry->getStreamPassword(),
-		);
+		$params = array();
+		//Support eCDN partner using old live servers that mush recieve additional info to operate
+		if(PermissionPeer::isValidForPartner("FEATURE_HYBRID_ECDN", $entry->getPartnerId()))
+		{
+			$params = array(
+					'p' => $this->partnerId,
+					'e' => $entry->getId(),
+					'i' => $mediaServerIndex,
+			);
+		}
+		$params = array_merge($params, array('t' => $entry->getStreamPassword()));
 		$paramsStr = http_build_query($params);
 		
-		$streamName = '';
-		if($concatStreamName)
-		{
-			$streamName = $entry->getId() . '_%i';
-		}
-		
+		$url .= $concatStreamName ? "/" . $entry->getId() . '_%i' : '';
 		return "$url/$streamName?$paramsStr"; 
 	}
 	
