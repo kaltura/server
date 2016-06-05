@@ -88,7 +88,7 @@ class languageCodeManager
             self::loadLanguageCodeMap();
 
         if(isset(self::$arrayISO639_1[$language]))
-            return self::$arrayISO639_1[$language];
+            return $language;
 
         if(isset(self::$arrayISO639_T[$language]))
             return self::$arrayISO639_T[$language];
