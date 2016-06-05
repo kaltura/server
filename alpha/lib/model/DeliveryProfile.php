@@ -270,7 +270,6 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 	
 	protected function getAudioLanguage($flavor) 
 	{
-		languageCodeManager::loadLanguageCodeMap();
 		$lang = $flavor->getLanguage();
 		$obj = null;
 		$audioLanguage = null;

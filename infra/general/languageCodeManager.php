@@ -50,23 +50,31 @@ class languageCodeManager
 
     public static function getObjectFromTwoCode($codeUppercase)
     {
+        if(!isset(self::$arrayISO639_1))
+            self::loadLanguageCodeMap();
         return isset(self::$arrayISO639_1[$codeUppercase]) ? self::$arrayISO639_1[$codeUppercase] : null;
     }
 
     public static function getObjectFromThreeCode($codeT)
     {
+        if(!isset(self::$arrayISO639_T))
+            self::loadLanguageCodeMap();
         $val = isset(self::$arrayISO639_T[$codeT]) ? self::$arrayISO639_T[$codeT] : null;
         return self::getObjectFromTwoCode($val);
     }
 
     public static function getObjectFromKalturaName($kalturaName)
     {
+        if(!isset(self::$arrayKalturaName))
+            self::loadLanguageCodeMap();
         $val = isset(self::$arrayKalturaName[$kalturaName]) ? self::$arrayKalturaName[$kalturaName] : null;
         return self::getObjectFromTwoCode($val);
     }
 
     public static function getTwoCodeFromKalturaName($kalturaName)
     {
+        if(!isset(self::$arrayKalturaName))
+            self::loadLanguageCodeMap();
         return isset(self::$arrayKalturaName[$kalturaName]) ? self::$arrayKalturaName[$kalturaName] : null;
     }
 
@@ -76,6 +84,9 @@ class languageCodeManager
      */
     public static function getLanguageKey($language,$langaugeKey = null)
     {
+        if(!self::isAlreadyLoaded())
+            self::loadLanguageCodeMap();
+        
         if(isset(self::$arrayISO639_1[$language]))
             return self::$arrayISO639_1[$language];
 

@@ -243,7 +243,6 @@ class flavorAsset extends asset
 		$languageCode = $this->getFromCustomData(self::CUSTOM_DATA_FIELD_LANGUAGE);
 		if (!is_null($languageCode))
 		{
-			languageCodeManager::loadLanguageCodeMap();
 			$obj = languageCodeManager::getObjectFromTwoCode($languageCode);
 			return $obj[languageCodeManager::KALTURA_NAME];
 		}
@@ -251,7 +250,6 @@ class flavorAsset extends asset
 	}
 	public function setLanguage($v)
 	{
-		languageCodeManager::loadLanguageCodeMap();
 		$key = languageCodeManager::getLanguageKey($v,'UN');
 		$this->putInCustomData(self::CUSTOM_DATA_FIELD_LANGUAGE, $key);
 	}
