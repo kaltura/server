@@ -270,7 +270,7 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 	
 	protected function getAudioLanguage($flavor) 
 	{
-		$manager = new languageCodeManager();
+		languageCodeManager::loadLanguageCodeMap();
 		$lang = $flavor->getLanguage();
 		$obj = null;
 		$audioLanguage = null;
@@ -290,11 +290,11 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 				return null;
 
 			$audioLanguage = $parsedJson['audio'][0]['audioLanguage'];
-			$obj = $manager->getObjectFromThreeCode(strtolower($audioLanguage));
+			$obj = languageCodeManager::getObjectFromThreeCode(strtolower($audioLanguage));
 
 		}
 		else {
-			$obj = $manager->getObjectFromKalturaName($lang);
+			$obj = languageCodeManager::getObjectFromKalturaName($lang);
 			$audioLanguage = $obj[languageCodeManager::ISO639_T];
 		}
 

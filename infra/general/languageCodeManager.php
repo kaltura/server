@@ -1,6 +1,6 @@
 <?php
 
-final class languageCodeManager
+class languageCodeManager
 {
     private static $arrayISO639_1 = null;
     private static $arrayISO639_T = null;
@@ -13,18 +13,19 @@ final class languageCodeManager
     const ISO_NATIVE_NAME = 4;
     const KALTURA_NAME = 5;
 
-    public function __construct()
+
+    public static function loadLanguageCodeMap()
     {
-        $cacheFileName = kConf::get("cache_root_path") . "/infra/languages_manager_cache.php";
-        if(file_exists($cacheFileName))
-            @include_once($cacheFileName);
+        $cacheFileName = kConf::get("cache_root_path") . "/infra/languageCodeMapCache.php";
+        if(self::isAlreadyLoaded())
+            return;
         else
         {
             $max_include_retries = 10;
             $cacheFileCode = null;
             while ((!@include_once($cacheFileName)) and $max_include_retries--) {
                 if (!$cacheFileCode) {
-                    $cacheFileCode = $this->generateCacheFile();
+                    $cacheFileCode = self::generateCacheFile();
                     if (!$cacheFileCode)
                         return;
                 }
@@ -40,27 +41,31 @@ final class languageCodeManager
                 throw new Exception("Could not include cached code file - {$cacheFileName}");
             }
         }
-
     }
 
-    public function getObjectFromTwoCode($codeUppercase)
+    private static function isAlreadyLoaded()
+    {
+        return isset(self::$arrayISO639_1) && isset(self::$arrayISO639_T) && isset(self::$arrayKalturaName);
+    }
+
+    public static function getObjectFromTwoCode($codeUppercase)
     {
         return isset(self::$arrayISO639_1[$codeUppercase]) ? self::$arrayISO639_1[$codeUppercase] : null;
     }
 
-    public function getObjectFromThreeCode($codeT)
+    public static function getObjectFromThreeCode($codeT)
     {
         $val = isset(self::$arrayISO639_T[$codeT]) ? self::$arrayISO639_T[$codeT] : null;
-        return $this->getObjectFromTwoCode($val);
+        return self::getObjectFromTwoCode($val);
     }
 
-    public function getObjectFromKalturaName($kalturaName)
+    public static function getObjectFromKalturaName($kalturaName)
     {
         $val = isset(self::$arrayKalturaName[$kalturaName]) ? self::$arrayKalturaName[$kalturaName] : null;
-        return $this->getObjectFromTwoCode($val);
+        return self::getObjectFromTwoCode($val);
     }
 
-    public function getTwoCodeFromKalturaName($kalturaName)
+    public static function getTwoCodeFromKalturaName($kalturaName)
     {
         return isset(self::$arrayKalturaName[$kalturaName]) ? self::$arrayKalturaName[$kalturaName] : null;
     }
@@ -69,7 +74,7 @@ final class languageCodeManager
      * @param $language - the language to search
      * @return the 2 code key or $defaultCode if not known
      */
-    public function getLanguageKey($language,$langaugeKey=null)
+    public static function getLanguageKey($language,$langaugeKey = null)
     {
         if(isset(self::$arrayISO639_1[$language]))
             return self::$arrayISO639_1[$language];
@@ -302,15 +307,16 @@ final class languageCodeManager
         self::addLanguageToArrays($tmpArrTwoCode,$tmpArrThreeCodeT,$tmpArrKalturaName,'MU','mu','mul','mul','Multilingual','Multilingual','Multilingual');
         self::addLanguageToArrays($tmpArrTwoCode,$tmpArrThreeCodeT,$tmpArrKalturaName,'UN', "un", "und", "und", "Undefined", "Undefined","Undefined");
 
-        $strArr = var_export($tmpArrTwoCode,true);
-        $strArr2 = var_export($tmpArrThreeCodeT,true);
-        $strArr3 = var_export($tmpArrKalturaName,true);
-
-        $result = "<?php\n\n"."self::\$arrayISO639_1"." = ".$strArr.";\n\n";
-        $result .= "self::\$arrayISO639_T"." = ".$strArr2.";\n\n";
-        $result .=  "self::\$arrayKalturaName"." = ".$strArr3.";\n\n";
-
+        $result = "<?php\n\n".self::assignArrayToVar($tmpArrTwoCode ,'arrayISO639_1');
+        $result .= self::assignArrayToVar($tmpArrThreeCodeT, 'arrayISO639_T');
+        $result .= self::assignArrayToVar($tmpArrKalturaName ,'arrayKalturaName');
         return $result;
+    }
+
+    private static function assignArrayToVar(&$array ,$varName )
+    {
+        $strArr = var_export($array,true);
+        return "self::\$$varName"." = ".$strArr.";\n\n";
     }
 
 }
