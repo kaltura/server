@@ -270,7 +270,7 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 	
 	protected function getAudioLanguage($flavor) 
 	{
-		$manager = languageCodeManager::getInstance();
+		$manager = new languageCodeManager();
 		$lang = $flavor->getLanguage();
 		$obj = null;
 		$audioLanguage = null;
@@ -290,16 +290,16 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 				return null;
 
 			$audioLanguage = $parsedJson['audio'][0]['audioLanguage'];
-			$obj = $manager->getLanguageObjectFromThreeCode(strtolower($audioLanguage));
+			$obj = $manager->getObjectFromThreeCode(strtolower($audioLanguage));
 
 		}
 		else {
-			$obj = $manager->getLanguageObjectFromKalturaLanguageName($lang);
-			$audioLanguage = $obj[languageCodeManager::THREE_CODE_T];
+			$obj = $manager->getObjectFromKalturaName($lang);
+			$audioLanguage = $obj[languageCodeManager::ISO639_T];
 		}
 
 		if(!is_null($obj))
-			$audioLanguageName = $obj[languageCodeManager::LANGUAGE_NAME_KALTURA];
+			$audioLanguageName = $obj[languageCodeManager::KALTURA_NAME];
 		else {
 			$audioLanguageName = "Undefined";
 			KalturaLog::info("Language code [$audioLanguage] was not found. Setting [$audioLanguageName] instead");

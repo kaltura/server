@@ -240,25 +240,20 @@ class flavorAsset extends asset
 
 	public function getLanguage()
 	{
-		KalturaLog::debug("@nadav@  called get language [".$this->getFromCustomData(self::CUSTOM_DATA_FIELD_LANGUAGE)."] @nadav@");
 		$languageCode = $this->getFromCustomData(self::CUSTOM_DATA_FIELD_LANGUAGE);
 		if (!is_null($languageCode))
 		{
-			$manObj = languageCodeManager::getInstance();
-			$obj = $manObj->getLanguageObjectFromTwoCode($languageCode);
-			return $obj[languageCodeManager::LANGUAGE_NAME_KALTURA];
+			$manObj = new languageCodeManager();
+			$obj = $manObj->getObjectFromTwoCode($languageCode);
+			return $obj[languageCodeManager::KALTURA_NAME];
 		}
 		return $languageCode;
-		//return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_LANGUAGE);
 	}
 	public function setLanguage($v)
 	{
-		$manObj = languageCodeManager::getInstance();
-		$key = $manObj->isKnownLanguage($v);
-		if(!$key)
-			$key = 'UN'; //Undefined language
+		$manObj = new languageCodeManager();
+		$key = $manObj->getLanguageKey($v,'UN');
 		$this->putInCustomData(self::CUSTOM_DATA_FIELD_LANGUAGE, $key);
-		//$this->putInCustomData(self::CUSTOM_DATA_FIELD_LANGUAGE, $v);
 	}
 
 
