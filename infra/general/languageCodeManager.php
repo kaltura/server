@@ -50,14 +50,14 @@ class languageCodeManager
 
     public static function getObjectFromTwoCode($codeUppercase)
     {
-        if(!isset(self::$arrayISO639_1))
+        if(!self::isAlreadyLoaded())
             self::loadLanguageCodeMap();
         return isset(self::$arrayISO639_1[$codeUppercase]) ? self::$arrayISO639_1[$codeUppercase] : null;
     }
 
     public static function getObjectFromThreeCode($codeT)
     {
-        if(!isset(self::$arrayISO639_T))
+        if(!self::isAlreadyLoaded())
             self::loadLanguageCodeMap();
         $val = isset(self::$arrayISO639_T[$codeT]) ? self::$arrayISO639_T[$codeT] : null;
         return self::getObjectFromTwoCode($val);
@@ -65,7 +65,7 @@ class languageCodeManager
 
     public static function getObjectFromKalturaName($kalturaName)
     {
-        if(!isset(self::$arrayKalturaName))
+        if(!self::isAlreadyLoaded())
             self::loadLanguageCodeMap();
         $val = isset(self::$arrayKalturaName[$kalturaName]) ? self::$arrayKalturaName[$kalturaName] : null;
         return self::getObjectFromTwoCode($val);
@@ -73,7 +73,7 @@ class languageCodeManager
 
     public static function getTwoCodeFromKalturaName($kalturaName)
     {
-        if(!isset(self::$arrayKalturaName))
+        if(!self::isAlreadyLoaded())
             self::loadLanguageCodeMap();
         return isset(self::$arrayKalturaName[$kalturaName]) ? self::$arrayKalturaName[$kalturaName] : null;
     }
@@ -86,7 +86,7 @@ class languageCodeManager
     {
         if(!self::isAlreadyLoaded())
             self::loadLanguageCodeMap();
-        
+
         if(isset(self::$arrayISO639_1[$language]))
             return self::$arrayISO639_1[$language];
 
