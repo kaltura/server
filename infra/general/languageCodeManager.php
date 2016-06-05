@@ -108,7 +108,7 @@ class languageCodeManager
         $arrayKalturaName[$kalturaName] = $ISO639_1Upper;
     }
 
-    private function generateCacheFile()
+    private static function generateCacheFile()
     {
         $tmpArrTwoCode = array(); //$arrayISO639_1
         $tmpArrThreeCodeT = array(); //$arrayISO639_T
