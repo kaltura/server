@@ -52,6 +52,9 @@ class LiveEntryServerNode extends EntryServerNode
 			if($this->isColumnModified(EntryServerNodePeer::STATUS) && $this->getStatus() === EntryServerNodeStatus::PLAYABLE)
 				$liveEntry->setLastBroadcast(time());
 			
+			if(!$liveEntry->getCurrentBroadcastStartTime() && $this->isColumnModified(EntryServerNodePeer::STATUS) && $this->getStatus() === EntryServerNodeStatus::AUTHENTICATED)
+				$liveEntry->setCurrentBroadcastStartTime(time());
+			
 			if(!$liveEntry->save())
 				$liveEntry->indexToSearchIndex();
 		}
@@ -69,11 +72,12 @@ class LiveEntryServerNode extends EntryServerNode
 		$liveEntry = $this->getLiveEntry();
 		if($liveEntry)
 		{
-			if($this->getServerType() === EntryServerNodeType::LIVE_PRIMARY)
-			{
-				if($liveEntry->getCurrentBroadcastStartTime())
-					$liveEntry->setCurrentBroadcastStartTime(0);
-			}
+			/* @var $liveEntry LiveEntry */
+			$entryServerNodes = EntryServerNodePeer::retrieveByEntryId($liveEntry->getId());
+			if(!count($entryServerNodes))
+				$liveEntry->unsetMediaServer();
+			
+			$liveEntry->setLastBroadcastEndTime(kApiCache::getTime());
 			
 			if(!$liveEntry->save())
 				$liveEntry->indexToSearchIndex();

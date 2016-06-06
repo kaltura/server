@@ -402,13 +402,6 @@ class KalturaLiveEntryService extends KalturaEntryService
 			throw new KalturaAPIException(KalturaErrors::ENTRY_SERVER_NODE_NOT_FOUND, $entryId, $mediaServerIndex);
 
 		$dbLiveEntryServerNode->delete();
-		$dbLiveEntry->setLastBroadcastEndTime(kApiCache::getTime());
-
-		$dbLiveEntryServerNodes = EntryServerNodePeer::retrieveByEntryId($entryId);
-		if(!count($dbLiveEntryServerNodes))
-			$dbLiveEntry->unsetMediaServer();
-
-		$dbLiveEntry->save();
 
 		$entry = KalturaEntryFactory::getInstanceByType($dbLiveEntry->getType());
 		$entry->fromObject($dbLiveEntry, $this->getResponseProfile());
