@@ -635,13 +635,13 @@
 					<item objectType="KalturaEventNotificationParameter">
 						<key>entry_name</key>
 						<value objectType="KalturaEvalStringField">
-							<code>$scope->getObject()->getName()</code>
+							<code>(($scope->getObject() instanceof entry) &amp;&amp; ($scope->getObject()->getIsTemporary()) &amp;&amp; ($scope->getObject()->getReplacedEntryId()))? entryPeer::retrieveByPK($scope->getObject()->getReplacedEntryId())->getName():$scope->getObject()->getName()</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
 						<key>entry_id</key>
 						<value objectType="KalturaEvalStringField">
-							<code>$scope->getObject()->getId()</code>
+							<code>(($scope->getObject() instanceof entry) &amp;&amp; ($scope->getObject()->getIsTemporary()) &amp;&amp; ($scope->getObject()->getReplacedEntryId()))? $scope->getObject()->getReplacedEntryId():$scope->getObject()->getId()</code>
 						</value>
 					</item>
 				</contentParameters>
