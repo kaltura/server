@@ -120,67 +120,15 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 	}
 	
 	/**
-	 * Fetch the manifest from the remote Wwoza server and build all flavors array
+	 * Build all streaming flavors array
 	 * @param string $url
 	 */
-	private function buildProxiedFlavorsArray($url, array &$flavors, $domainPrefix = null)
+	private function buildM3u8Flavors($url, array &$flavors, array $kLiveStreamParamsArray, $flavorBitrateInfo = array())
 	{
-		if($this->getDisableExtraAttributes())
-			$url = kDeliveryUtils::addQueryParameter($url, "attributes=off");
+		$domainPrefix = $this->getDeliveryServerNodeUrl(true);
 		
-		KalturaLog::debug("Fetching manifest content from [$url]");
-		$manifest = KCurlWrapper::getContent($url);
-		if(!$manifest)
-		{
-			KalturaLog::debug("Failed to fetch manifest content");
-			return;
-		}
-		
-		$manifestLines = explode("\n", $manifest);
-		$manifestLine = reset($manifestLines);
-		while($manifestLine)
-		{
-			$lineParts = explode(':', $manifestLine, 2);
-			if($lineParts[0] === '#EXT-X-STREAM-INF')
-			{
-				// passing the url as urlPrefix so that only the path will be tokenized
-				$flavor = array(
-						'url' => '',
-						'urlPrefix' => requestUtils::resolve(next($manifestLines), $url),
-						'domainPrefix' => $domainPrefix,
-						'ext' => 'm3u8',
-				);
-		
-				$attributes = explode(',', $lineParts[1]);
-				foreach($attributes as $attribute)
-				{
-					$attributeParts = explode('=', $attribute, 2);
-					switch($attributeParts[0])
-					{
-						case 'BANDWIDTH':
-							$flavor['bitrate'] = $attributeParts[1] / 1024;
-							break;
-								
-						case 'RESOLUTION':
-							list($flavor['width'], $flavor['height']) = explode('x', $attributeParts[1], 2);
-							break;
-					}
-				}
-				$flavors[] = $flavor;
-			}
-				
-			$manifestLine = next($manifestLines);
-		}
-	}
-	
-	/**
-	 * Build the manifest from the rreported stream information and build all flavors array
-	 * @param string $url
-	 */
-	private function buildStreamInfoFlavorsArray($url, array &$flavors, array $kLiveStreamParamsArray, $flavorBitrateInfo, $domainPrefix = null)
-	{
 		foreach ($kLiveStreamParamsArray as $kLiveStreamParams)
-		{			
+		{
 			/* @var $kLiveStreamParams kLiveStreamParams */
 			/* @var $stream kLiveStreamParams */
 			$flavor = array(
@@ -189,31 +137,14 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 					'domainPrefix' => $domainPrefix,
 					'ext' => 'm3u8',
 			);
-				
+		
 			$flavor['bitrate'] = isset($flavorBitrateInfo[$kLiveStreamParams->getFlavorId()]) ? $flavorBitrateInfo[$kLiveStreamParams->getFlavorId()] : $kLiveStreamParams->getBitrate();
 			$flavor['bitrate'] = $flavor['bitrate'] / 1024;
 			$flavor['width'] = $kLiveStreamParams->getWidth();
 			$flavor['height'] = $kLiveStreamParams->getHeight();
-			
+				
 			$flavors[] = $flavor;
 		}
-	}
-	
-	/**
-	 * Build all streaming flavors array
-	 * @param string $url
-	 */
-	private function buildM3u8Flavors($url, array &$flavors, array $kLiveStreamParamsArray, $flavorBitrateInfo = array())
-	{
-		$domainPrefix = $this->getDeliveryServerNodeUrl(true);
-		
-		if($this->getForceProxy())
-		{
-			$this->buildProxiedFlavorsArray($url, $flavors, $domainPrefix);
-			return;
-		}
-		
-		$this->buildStreamInfoFlavorsArray($url, $flavors, $kLiveStreamParamsArray, $flavorBitrateInfo, $domainPrefix);
 	}
 
 	protected function getPlayServerUrl($manifestUrl)
@@ -257,18 +188,19 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 		$primaryServerStreams = $this->liveStreamConfig->getPrimaryStreamInfo();
 		$backupServerStreams = $this->liveStreamConfig->getBackupStreamInfo();
 		
-		if(!$this->getForceProxy()  || $this->params->getUsePlayServer() || (!count($primaryServerStreams) && !count($backupServerStreams)))
+		//We do not yet support Audio only stream manifest mreging
+		$isAudioStream = $this->isAudioStream($primaryServerStreams, $backupServerStreams);
+		
+		if($this->params->getUsePlayServer() || $isAudioStream || (!count($primaryServerStreams) && !count($backupServerStreams)))
 		{
 			$this->shouldRedirect = true;
 		}
 		
-		$entry = entryPeer::retrieveByPK($this->params->getEntryId());
-		/* @var $entry LiveEntry */
-		if($entry && $entry->getSyncDCs())
+		if($isAudioStream)
 		{
-			$baseUrl = str_replace('_all.smil', '_publish.smil', $baseUrl);
-			if($backupUrl)
-				$backupUrl = str_replace('_all.smil', '_publish.smil', $backupUrl);
+			$baseUrl = str_replace('_all.smil', '_pass.smil', $baseUrl);
+			$this->liveStreamConfig->setUrl($baseUrl);
+			$this->liveStreamConfig->setBackupUrl(null);
 		}
 		
 		if($this->params->getUsePlayServer()) {
@@ -283,9 +215,9 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 				
 		$flavors = array();
 		$this->buildM3u8Flavors($baseUrl, $flavors, $primaryServerStreams);
-		if($backupUrl)
+		if($backupUrl && $this->getForceProxy())
 		{
-			//Until a full solution will be made on the mediaServer side we need to manually sync bitrates Between primay and backup streams
+			//Until a full solution will be made on the liveServer side we need to manually sync bitrates Between primay and backup streams
 			$priamryFlavorBitrateInfo = $this->buildFlavorBitrateInfoArray($primaryServerStreams);
 			$this->buildM3u8Flavors($backupUrl, $flavors, $backupServerStreams, $priamryFlavorBitrateInfo);
 		}
@@ -323,6 +255,27 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 			$flavorBitrateInfo[$stream->getFlavorId()] = $stream->getBitrate();
 		}
 		return $flavorBitrateInfo;
+	}
+	
+	private function isAudioStream($primaryServerStreams, $backupServerStreams)
+	{
+		if(count($primaryServerStreams))
+		{
+			/* @var $kLiveStreamParams kLiveStreamParams */
+			$kLiveStreamParams = reset($primaryServerStreams);
+			if(!$kLiveStreamParams->getHeight() && !$kLiveStreamParams->getWidth())
+				return true;
+		}
+		
+		if(count($backupServerStreams))
+		{
+			/* @var $kLiveStreamParams kLiveStreamParams */
+			$kLiveStreamParams = reset($backupServerStreams);
+			if(!$kLiveStreamParams->getHeight() && !$kLiveStreamParams->getWidth())
+				return true;
+		}
+		
+		return false;
 	}
 }
 
