@@ -189,7 +189,7 @@ class LogMethod
 	public function __toString()
 	{
 		$backtraceIndex = 3;
-		$backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
+		$backtrace = defined('DEBUG_BACKTRACE_IGNORE_ARGS') ? debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS) : debug_backtrace();
 		
 		while(
 			$backtraceIndex < count($backtrace)
