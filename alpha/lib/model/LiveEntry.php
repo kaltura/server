@@ -620,8 +620,11 @@ abstract class LiveEntry extends entry
 	 * @return bool|mixed
 	 * @throws Exception
 	 */
-	private function isCacheValid(LiveEntryServerNode $liveEntryServerNode)
+	public function isCacheValid(LiveEntryServerNode $liveEntryServerNode)
 	{
+		if(!$liveEntryServerNode)
+			return false;
+		
 		$cacheType = self::getCacheType();
 		$cacheStore = kCacheManager::getSingleLayerCache($cacheType);
 		if(! $cacheStore)

@@ -123,7 +123,7 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 	 * Fetch the manifest from the remote Wwoza server and build all flavors array
 	 * @param string $url
 	 */
-	private function buildProxiedFlavorsArray($url, array &$flavors, $doaminPrefix)
+	private function buildProxiedFlavorsArray($url, array &$flavors, $domainPrefix = null)
 	{
 		if($this->getDisableExtraAttributes())
 			$url = kDeliveryUtils::addQueryParameter($url, "attributes=off");
@@ -177,7 +177,7 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 	 * Build the manifest from the rreported stream information and build all flavors array
 	 * @param string $url
 	 */
-	private function buildStreamInfoFlavorsArray($url, array &$flavors, array $kLiveStreamParamsArray, $flavorBitrateInfo, $doaminPrefix)
+	private function buildStreamInfoFlavorsArray($url, array &$flavors, array $kLiveStreamParamsArray, $flavorBitrateInfo, $domainPrefix = null)
 	{
 		foreach ($kLiveStreamParamsArray as $kLiveStreamParams)
 		{			
@@ -191,6 +191,7 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 			);
 				
 			$flavor['bitrate'] = isset($flavorBitrateInfo[$kLiveStreamParams->getFlavorId()]) ? $flavorBitrateInfo[$kLiveStreamParams->getFlavorId()] : $kLiveStreamParams->getBitrate();
+			$flavor['bitrate'] = $flavor['bitrate'] / 1024;
 			$flavor['width'] = $kLiveStreamParams->getWidth();
 			$flavor['height'] = $kLiveStreamParams->getHeight();
 			
@@ -256,7 +257,7 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 		$primaryServerStreams = $this->liveStreamConfig->getPrimaryStreamInfo();
 		$backupServerStreams = $this->liveStreamConfig->getBackupStreamInfo();
 		
-		if(!$this->getForceProxy() || $this->params->getUsePlayServer() || (!count($primaryServerStreams) && !count($backupServerStreams)))
+		if(!$this->getForceProxy()  || $this->params->getUsePlayServer() || (!count($primaryServerStreams) && !count($backupServerStreams)))
 		{
 			$this->shouldRedirect = true;
 		}

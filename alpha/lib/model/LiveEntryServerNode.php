@@ -128,4 +128,21 @@ class LiveEntryServerNode extends EntryServerNode
 		
 		return $liveEntry;
 	}
+	
+	public function validateEntryServerNode()
+	{
+		$liveEntry = entryPeer::retrieveByPK($this->getEntryId());
+		if(!$liveEntry)
+		{
+			KalturaLog::err("Entry with id [{$this->getEntryId()}] not found, will not validate entryServerNode registered");
+			return;
+		}
+		
+		/* @var $liveEntry LiveEntry */
+		if($this->getDc() === kDataCenterMgr::getCurrentDcId() && !$liveEntry->isCacheValid($this))
+		{
+			KalturaLog::info("Removing media server id [" . $this->getServerNodeId() . "] from liveEntry [" . $this->getEntryId() . "]");
+			$this->delete();
+		}
+	}
 }

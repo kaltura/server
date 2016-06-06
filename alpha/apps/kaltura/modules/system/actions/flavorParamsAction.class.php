@@ -129,7 +129,7 @@ class flavorParamsAction extends kalturaSystemAction
 		}
 			
 		$c = new Criteria();
-    	$c->add(assetParamsPeer::PARTNER_ID, array(0, $this->pid), Criteria::IN);
+    	$c->add(assetParamsPeer::PARTNER_ID, array(0, intval($this->pid)), Criteria::IN);
 		$this->flavorParams = assetParamsPeer::doSelect($c);
 		
 		$this->formats = self::getEnumValues("flavorParams", "CONTAINER_FORMAT");

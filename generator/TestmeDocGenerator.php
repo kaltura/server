@@ -219,7 +219,7 @@ class TestmeDocGenerator extends ClientGeneratorFromXml
 			$this->appendLine('						<tbody>');
 			$this->appendLine('							<tr>');
 			$this->appendLine('								<td class="inheritedFrom">');
-			$this->appendLine('									<b><img class="base-attribute" src="../images/collapsed.gif"> Inherited from KalturaObject</b>');
+			$this->appendLine('									<b><img class="base-attribute" src="../images/collapsed.gif"> Inherited from KalturaObjectBase</b>');
 			$this->appendLine('								</td>');
 			$this->appendLine('							</tr>');
 			$this->appendLine('						</tbody>');
@@ -235,7 +235,7 @@ class TestmeDocGenerator extends ClientGeneratorFromXml
 			$this->appendLine('							</tr>');
 			$this->appendLine('							<tr>');
 			$this->appendLine('								<td>relatedObjects</td>');
-			$this->appendLine('								<td>map of <a href="KalturaListResponse">KalturaListResponse</a></td>');
+			$this->appendLine('								<td>map of <a href="KalturaListResponse.html">KalturaListResponse</a></td>');
 			$this->appendLine('								<td></td>');
 			$this->appendLine('								<td></td>');
 			$this->appendLine('								<td></td>');
@@ -272,14 +272,17 @@ class TestmeDocGenerator extends ClientGeneratorFromXml
 			
 			$restrictions = implode('<br/>', $restrictions);
 
-			if($name == 'orderBy' && $this->endsWith($class, 'Filter'))
+			if($name == 'orderBy' && $this->endsWith($class, 'Filter') && $class != 'KalturaFilter')
 			{
-				$enumType = preg_replace('/Filter$/', 'OrderBy', $class);
+				$enumType = preg_replace('/Filter$/', 'OrderBy', preg_replace('/BaseFilter$/', 'Filter', $class));
 				$type = "<a href=\"../enums/$enumType.html\">$enumType</a>";
 			}
 			elseif($type == 'array' || $type == 'map')
 			{
 				$arrayType = $propertyNode->getAttribute("arrayType");
+				if($arrayType == 'KalturaObject')
+					$arrayType = 'KalturaObjectBase';
+				
 				$type = "$type of <a href=\"$arrayType.html\">$arrayType</a>";
 			}
 			elseif($propertyNode->getAttribute("enumType"))
@@ -378,7 +381,8 @@ class TestmeDocGenerator extends ClientGeneratorFromXml
 		{
 			/* @var $subClass DOMElement */
 			$subClassType = $subClass->getAttribute('name');
-			$links[] = "<a href=\"$subClassType.html\">$subClassType</a>";
+			if($this->shouldIncludeType($subClassType))
+				$links[] = "<a href=\"$subClassType.html\">$subClassType</a>";
 		}
 		
 		if(count($links))
@@ -392,6 +396,9 @@ class TestmeDocGenerator extends ClientGeneratorFromXml
 		$this->appendLine('	</div>');
 		
 		$this->appendFooter();
+		
+		if($type == 'KalturaObject')
+			$type = 'KalturaObjectBase';
 		
 		$this->addFile("objects/$type.html", $this->getTextBlock(), false);
 	}
@@ -581,20 +588,53 @@ class TestmeDocGenerator extends ClientGeneratorFromXml
 		
 			$this->appendLine('			<tr>');
 			$this->appendLine("				<td>$paramName</td>");
-			$this->appendLine("				<td><a href=\"../objects/$paramType.html\">$paramType</a></td>");
+			if($this->isComplexType($paramType))
+			{
+				if($paramType == 'array' || $paramType == 'map')
+				{
+					$arrayType = $paramNode->getAttribute("arrayType");
+					$this->appendLine("				<td colspan=\"5\">$paramType of <a href=\"../objects/$arrayType.html\">$arrayType</a></td>");
+				}
+				else
+				{
+					$this->appendLine("				<td><a href=\"../objects/$paramType.html\">$paramType</a></td>");
+				}
+			}
+			else
+			{
+				$this->appendLine("				<td>$paramType</td>");
+			}
 			$this->appendLine("				<td>$paramDescription</td>");
 			$this->appendLine("				<td>$required</td>");
 			$this->appendLine("				<td>$default</td>");
 			$this->appendLine('			</tr>');
 		}
 		
+		if($resultType)
+		{
+			$this->appendLine('			<tr>');
+			$this->appendLine('				<td colspan="5" class="title">Output Type</td>');
+			$this->appendLine('			</tr>');
+			$this->appendLine('			<tr>');
+			if($this->isComplexType($resultType))
+			{
+				if($resultType == 'array' || $resultType == 'map')
+				{
+					$arrayType = $resultNode->getAttribute("arrayType");
+					$this->appendLine("				<td colspan=\"5\">$resultType of <a href=\"../objects/$arrayType.html\">$arrayType</a></td>");
+				}
+				else
+				{
+					$this->appendLine("				<td colspan=\"5\"><a href=\"../objects/$resultType.html\">$resultType</a></td>");
+				}
+			}
+			else
+			{
+				$this->appendLine("				<td colspan=\"5\">$resultType</td>");
+			}
+			$this->appendLine('			</tr>');
+		}
 		
-		$this->appendLine('			<tr>');
-		$this->appendLine('				<td colspan="5" class="title">Output Type</td>');
-		$this->appendLine('			</tr>');
-		$this->appendLine('			<tr>');
-		$this->appendLine("				<td colspan=\"5\"><a href=\"../objects/$resultType.html\">$resultType</a></td>");
-		$this->appendLine('			</tr>');
 		$this->appendLine('			<tr>');
 		$this->appendLine('				<td colspan="5" class="title">Example HTTP Hit</td>');
 		$this->appendLine('			</tr>');
@@ -662,7 +702,7 @@ class TestmeDocGenerator extends ClientGeneratorFromXml
 		foreach($classNodes as $classNode)
 		{
 			$type = $classNode->getAttribute('name');
-			if(!$this->shouldIncludeType($type))
+			if(!$this->shouldIncludeType($type) || $type == 'KalturaObject')
 				continue;
 					
 			$classes[] = $type;
@@ -747,6 +787,9 @@ class TestmeDocGenerator extends ClientGeneratorFromXml
 			foreach($actionNodes as $actionNode)
 			{
 				$actionId = $actionNode->getAttribute('name');
+				if(!$this->shouldIncludeAction($serviceId, $actionId))
+					continue;
+				
 				$this->appendLine("							<li class=\"action\"><a href=\"actions/$serviceId.$actionId.html\" target=\"main\">$actionId</a></li>");
 			}
 			$this->appendLine('						</ul></li>');

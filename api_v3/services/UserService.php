@@ -102,7 +102,7 @@ class UserService extends KalturaBaseUserService
 		
 		return $newUser;
 	}
-	
+
 	/**
 	 * Updates an existing user object.
 	 * You can also use this action to update the userId.
