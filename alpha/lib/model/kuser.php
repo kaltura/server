@@ -152,6 +152,14 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject
 		if ($this->isColumnModified(kuserPeer::LOGIN_DATA_ID)) {
 			$oldLoginDataId = $this->oldColumnsValues[kuserPeer::LOGIN_DATA_ID];
 		}
+
+		if($this->isColumnModified(kuserPeer::PUSER_ID) &&
+			categoryKuserPeer::isCategroyKuserExistsForKuser($this->getId()))
+		{
+			$userId = $this->getId();
+			$puserId = $this->getPuserId();
+			$this->updateCategoryKuser($userId, $puserId);
+		}
 		
 		if ($this->isColumnModified(kuserPeer::EMAIL) && $this->getIsAccountOwner() && isset($this->oldColumnsValues[kuserPeer::EMAIL]) && !is_null($this->oldColumnsValues[kuserPeer::EMAIL])) {
 			myPartnerUtils::emailChangedEmail($this->getPartnerId(), $this->oldColumnsValues[kuserPeer::EMAIL], $this->getEmail(), $this->getPartner()->getName() , PartnerPeer::KALTURAS_PARTNER_EMAIL_CHANGE );
@@ -163,8 +171,9 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject
 			$partner->setAccountOwnerKuserId($this->getId(), false);
 			$partner->save();
 		}
-		
-		if ($this->isColumnModified(kuserPeer::SCREEN_NAME) && categoryKuserPeer::isCategroyKuserExistsForKuser($this->getId()))
+
+		if (($this->isColumnModified(kuserPeer::SCREEN_NAME) || $this->isColumnModified(kuserPeer::PUSER_ID))
+			&& categoryKuserPeer::isCategroyKuserExistsForKuser($this->getId()))
 		{
 			$featureStatusToRemoveIndex = new kFeatureStatus();
 			$featureStatusToRemoveIndex->setType(IndexObjectType::CATEGORY_USER);
@@ -1247,5 +1256,21 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject
 			$singleValue = $partnerId . $prefix . $singleValue;
 		}
 		return implode(',', $fieldValuesArr);				
+	}
+
+	/**
+	 * check if CategoryKuser need also to be update and if so does it
+	 *
+	 * @param int $userId The user's unique identifier in the partner's system
+	 * @param string $puserId The user parameters to update
+	 *
+	 */
+	private function updateCategoryKuser($userId,  $puserId)
+	{
+		$dbCategoryKuserArray = categoryKuserPeer::retrieveByKuserId($userId);
+		foreach ($dbCategoryKuserArray as $dbCategoryKuser) {
+			$dbCategoryKuser->updateKuser($puserId);
+			$dbCategoryKuser->save();
+		}
 	}
 }
