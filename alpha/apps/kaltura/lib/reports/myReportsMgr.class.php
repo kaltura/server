@@ -665,13 +665,20 @@ class myReportsMgr
 	{
 		// the $val is the date_id -> YYYYMMDD
 		//$date = $val;
+		$h = 0
 		$y = (int)substr ( $val , 0 , 4 );
 		$m = (int)substr ( $val , 4 , 2 );
 		$d = (int)substr ( $val , 6 , 2 );
-		
-		$date = mktime  ( 0,0,0 , $m , $d , $y  ) ;	
+        
+        if (strlen($val) == 10) 
+        	$h = (int)substr ( $val, 8, 2);
+         
+		$date = mktime  ( $h, 0, 0 , $m , $d , $y  ) ;	
+      	
 		return $date;	
 	}
+
+
 	
 	private static function executeQueryByType ( $partner_id , $report_type , $report_flavor , reportsInputFilter $input_filter  ,
 		$page_size , $page_index , $order_by , $object_ids = null , $offset = null)
