@@ -9,6 +9,7 @@ abstract class KalturaEntryScheduleEvent extends KalturaScheduleEvent
 	/**
 	 * Entry to be used as template during content ingestion
 	 * @var string
+	 * @filter eq
 	 */
 	public $templateEntryId;
 

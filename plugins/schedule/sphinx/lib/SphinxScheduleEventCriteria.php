@@ -93,7 +93,49 @@ class SphinxScheduleEventCriteria extends SphinxCriteria
 			$filter->unsetByName('_mlikeand_parent_resource_ids');
 			$filter->set('_mlikeand_resource_ids', implode(',', $ids));
 		}
-		
+
+		if($filter->is_set('_like_resource_system_names'))
+		{
+
+			$systemNames = explode(',', $filter->get('_like_resource_system_names'));
+			$systemNamesMd5 = array();
+			foreach($systemNames as $systemName){
+				if( $systemNames!=null && $systemNames!='' )
+					$systemNamesMd5[] = $this->buildMd5String($systemName);
+			}
+			$filter->set('_like_resource_system_names', implode(',', $systemNamesMd5));
+		}
+
+		if($filter->is_set('_mlikeor_resource_system_names'))
+		{
+
+			$systemNames = explode(',', $filter->get('_mlikeor_resource_system_names'));
+			$systemNamesMd5 = array();
+			foreach($systemNames as $systemName){
+				if( $systemNames!=null && $systemNames!='' )
+					$systemNamesMd5[] = $this->buildMd5String($systemName);
+			}
+			$filter->set('_mlikeor_resource_system_names', implode(',', $systemNamesMd5));
+		}
+
+		if($filter->is_set('_mlikeand_resource_system_names'))
+		{
+			$systemNames = explode(',', $filter->get('_mlikeand_resource_system_names'));
+			$systemNamesMd5 = array();
+			foreach($systemNames as $systemName){
+				if( $systemNames!=null && $systemNames!='' )
+					$systemNamesMd5[] = $this->buildMd5String($systemName);
+			}
+			$filter->set('_mlikeand_resource_system_names', implode(',', $systemNamesMd5));
+		}
+
 		return parent::applyFilterFields($filter);
+	}
+
+	private function buildMd5String($str)
+	{
+//		$notEmpty = kSphinxSearchManager::HAS_VALUE . kCurrentContext::getCurrentPartnerId();
+//		return "\\\" " . mySearchUtils::getMd5EncodedString($str) . " $notEmpty$\\\"";
+		return mySearchUtils::getMd5EncodedString($str);
 	}
 }
