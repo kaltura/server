@@ -82,14 +82,19 @@ class LiveEntryServerNode extends EntryServerNode
 		parent::postDelete($con);
 	}
 
-	public function setStreams(KalturaLiveStreamParamsArray $v) 
+	public function setStreams(array $v) 
 	{ 
-		$this->putInCustomData(self::CUSTOM_DATA_STREAMS, $v); 
+		$this->putInCustomData(self::CUSTOM_DATA_STREAMS, serialize($v));
 	}
 	
 	public function getStreams()
 	{
-		return $this->getFromCustomData(self::CUSTOM_DATA_STREAMS);
+		$streams = $this->getFromCustomData(self::CUSTOM_DATA_STREAMS, null, array());
+		
+		if(count($streams))
+			$streams = unserialize($streams);
+		
+		return $streams;
 	}
 	
 	public function setApplicationName($v)
@@ -122,5 +127,22 @@ class LiveEntryServerNode extends EntryServerNode
 		}
 		
 		return $liveEntry;
+	}
+	
+	public function validateEntryServerNode()
+	{
+		$liveEntry = entryPeer::retrieveByPK($this->getEntryId());
+		if(!$liveEntry)
+		{
+			KalturaLog::err("Entry with id [{$this->getEntryId()}] not found, will not validate entryServerNode registered");
+			return;
+		}
+		
+		/* @var $liveEntry LiveEntry */
+		if($this->getDc() === kDataCenterMgr::getCurrentDcId() && !$liveEntry->isCacheValid($this))
+		{
+			KalturaLog::info("Removing media server id [" . $this->getServerNodeId() . "] from liveEntry [" . $this->getEntryId() . "]");
+			$this->delete();
+		}
 	}
 }

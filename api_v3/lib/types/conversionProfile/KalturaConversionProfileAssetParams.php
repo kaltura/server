@@ -60,6 +60,11 @@ class KalturaConversionProfileAssetParams extends KalturaObject implements IRela
 	 */
 	public $deletePolicy;
 	
+	/**
+	 * @var KalturaNullableBoolean
+	 */
+	public $isEncrypted;
+
 	private static $map_between_objects = array
 	(
 		'conversionProfileId',
@@ -69,6 +74,7 @@ class KalturaConversionProfileAssetParams extends KalturaObject implements IRela
 		'systemName',
 		'forceNoneComplied',
 		'deletePolicy',
+		'isEncrypted',
 	);
 	
 	/* (non-PHPdoc)

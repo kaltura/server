@@ -1,3 +1,106 @@
+# Kajam 11.16.0 #
+
+## entryServerNode validate registered serverNodes ##
+
+- Issue Type: BUG
+- Issue ID: PLAT-5572
+
+### Configuration ###
+None.
+
+#### Deployment Scripts ####
+
+		- Run 'php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2016_05_31_add_additional_actions_to_entryServerNode.php'
+		
+#### Known Issues & Limitations ####
+
+None.
+
+## Schedule event new filtering options ##
+
+- Issue Type: Story
+- Issue ID: PLAT-5488 PLAT-5484
+
+### Configuration ###
+- update sphinx kaltura.conf:
+	
+		Add the following to kaltura_schedule_event index:
+		- rt_field = template_entry_categories_ids
+		- rt_field = system_names
+
+#### Deployment Scripts ####
+
+		- Need to re-build & re-index the schedule event sphinx table.
+		
+#### Known Issues & Limitations ####
+
+None.
+
+
+## BPM notifications - burnt subtitles##
+
+- Issue Type: New Feature
+- Issue ID: PLAT-5564
+
+#### Configuration ####
+ 
+- None.
+
+#### Deployment Scripts ####
+
+		php /opt/kaltura/app/tests/standAloneClient/exec.php /opt/kaltura/app/tests/standAloneClient/bpmNotificationTemplatesForBurntSubtitles.xml
+
+#### Known Issues & Limitations ####
+
+None.
+
+
+## play-sever v2.0.0 ##
+- Issue Type: Upgrading
+- Issue ID: PLAT-3508
+
+#### Configuration ####
+- None.
+ 
+#### Deployment Scripts ####
+php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2016_01_17_flavorasset_service_add_play_server_permission.php
+
+#### Known Issues & Limitations ####
+
+None.
+
+## Support Live HLS seamless failover when streamInfo is known ##
+
+- Issue Type: New Feature
+- Issue ID: PLAT-5295
+
+#### Configuration ####
+ 
+- None.
+
+#### Deployment Scripts ####
+
+		php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2016_05_05_add_additional_actions_to_entryServerNode.php
+
+#### Known Issues & Limitations ####
+
+None.
+
+##  Aggregation categories ## 
+
+- Issue type: new feature
+- Issue ID: TR-948
+
+#### Configuration ####
+
+- configurations/sphinx/kaltura.conf -  add the following line to the kaltura_category index:  
+rt_field = aggregation_categories  
+
+#### Deployment Scripts ####
+
+		php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2016_05_29_enable_category_update_to_partner_-2.php  
+		php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2016_05_29_limit_access_to_isAggregationChannel_property.php  
+
 # Kajam 11.15.0 #
 
 ## new email notifications ##

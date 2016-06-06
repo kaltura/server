@@ -56,7 +56,7 @@ class EntryServerNodeService extends KalturaBaseService
 	 * @return KalturaEntryServerNode|null|object
 	 * @throws KalturaAPIException
 	 */
-	private function updateAction($id, KalturaEntryServerNode $entryServerNode)
+	public function updateAction($id, KalturaEntryServerNode $entryServerNode)
 	{
 		$dbEntryServerNode = EntryServerNodePeer::retrieveByPK($id);
 		if (!$dbEntryServerNode)
@@ -118,5 +118,24 @@ class EntryServerNodeService extends KalturaBaseService
 		$entryServerNode->fromObject($dbEntryServerNode);
 		return $entryServerNode;
 	}
-
+	
+	/**
+	 * Validates server node still registered on entry
+	 *
+	 * @action validateRegisteredEntryServerNode
+	 * @param int $id entry server node id
+	 *
+	 * @throws KalturaAPIException
+	 */
+	public function validateRegisteredEntryServerNodeAction($id)
+	{
+		KalturaResponseCacher::disableCache();
+		
+		$dbEntryServerNode = EntryServerNodePeer::retrieveByPK( $id );
+		if(!$dbEntryServerNode)
+			throw new KalturaAPIException(KalturaErrors::ENTRY_SERVER_NODE_NOT_FOUND, $id);
+		
+		/* @var EntryServerNode $dbEntryServerNode */
+		$dbEntryServerNode->validateEntryServerNode();
+	}
 }

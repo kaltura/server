@@ -1019,4 +1019,5 @@ class ThumbAssetService extends KalturaAssetService
 		$listResponse->totalCount = count($listResponse->objects);
 		return $listResponse;
 	}
+
 }

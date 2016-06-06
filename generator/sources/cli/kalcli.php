@@ -199,7 +199,24 @@ for ($curIndex = 2; $curIndex < $extraArgCount; $curIndex++)
 }
 
 // read parameters from stdin
-if (!isset($options['no-stdin']))
+if (isset($options['no-stdin']))
+{
+	$readStdin = false;
+}
+else if (isset($options['stdin']))
+{
+	$readStdin = true;
+}
+else if (function_exists('posix_isatty') && posix_isatty(STDIN))
+{
+	$readStdin = false;
+}
+else 
+{
+	$readStdin = true;
+}
+
+if ($readStdin)
 {
 	$f = fopen('php://stdin', 'r');
 	while ($line = fgets($f))

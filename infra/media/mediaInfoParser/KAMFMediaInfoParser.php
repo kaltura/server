@@ -2,7 +2,8 @@
 
 class KAMFMediaInfoParser{
 
-    const timestampHexVal = "74696d657374616d70";
+    const timestampHexVal = "74696d657374616d70"; // hax representation of the string "timestamp"
+    const KalturaSyncPointHexVal = '4b616c7475726153796e63506f696e74'; //hax representation of the string "KalturaSyncPoint"
     const AMFNumberDataTypePrefix ="00";
     const IEEE754DoubleFloatInHexLength = 16;
     const MinAMFSizeToTryParse = 205;
@@ -72,7 +73,7 @@ class KAMFMediaInfoParser{
                     $amfTs = $this->getTimestampFromAMF($tmp->data);
                     $amfPts = $tmp->pts;
 
-                    if ($this->shouldSaveAMF($amf, $amfTs, $amfPts)) {
+                    if ($amfTs >= 0 && $this->shouldSaveAMF($amf, $amfTs, $amfPts)) {
                         $amfData = $amfPts . ';' . $amfTs;
                         array_push($amf, $amfData);
                     }
@@ -115,8 +116,15 @@ class KAMFMediaInfoParser{
         return false;
     }
 
+    // get the timestamp field of the KalturaSyncPoint.
+    // if failed, for example, not a KalturaSyncPoint, return -1
     private function getTimestampFromAMF($AMFData){
         $AMFDataStream = $this->getByteStreamFromFFProbeAMFData($AMFData);
+
+        if (strpos($AMFDataStream, self::KalturaSyncPointHexVal) === false){
+            KalturaLog::debug('got AMF not containing KalturaSyncPointHexVal string');
+            return -1;
+        }
 
         // look for 74696d657374616d70 which is the hex encoding of "timestamp"
         // this is fallowed by 00 (AMF for Encoded as IEEE 64-bit double-precision floating point number)

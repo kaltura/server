@@ -97,6 +97,7 @@ abstract class ClientGeneratorFromXml
 	protected function shouldIncludeAction($serviceId, $actionId)
 	{
 		$serviceId = strtolower(strval($serviceId));
+		$actionId = strval($actionId);
 		
 		if(!count($this->_includeServices))
 			return true;
@@ -219,6 +220,9 @@ abstract class ClientGeneratorFromXml
 
 		$alwaysAdd = array(
 				'KalturaApiExceptionArg',
+				'KalturaClientConfiguration',
+				'KalturaRequestConfiguration',
+				'KalturaListResponse',
 		);
 		
 		foreach($alwaysAdd as $additional)

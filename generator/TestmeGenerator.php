@@ -240,9 +240,12 @@ class TestmeGenerator extends ClientGeneratorFromXml
 		$actionNodes = $serviceNode->getElementsByTagName("action");
 		foreach($actionNodes as $actionNode)
 		{
+            $actionName = $actionNode->getAttribute("name");
+			if(!$this->shouldIncludeAction($serviceId, $actionName))
+				continue;
+			
             $this->writeAction($serviceId, $actionNode);
 
-            $actionName = $actionNode->getAttribute("name");
 		    $actionLabel = $actionName;
 		    if ($actionNode->getAttribute("deprecated"))
 		    	$actionLabel .= ' (deprecated)';
@@ -260,9 +263,6 @@ class TestmeGenerator extends ClientGeneratorFromXml
 	function writeAction($serviceId, DOMElement $actionNode)
 	{
 		$actionId = $actionNode->getAttribute('name');
-		if(!$this->shouldIncludeAction($serviceId, $actionId))
-			return;
-		
 		$json = array(
 			'actionParams' => array(),
 		    'description' => $actionNode->getAttribute('description')
@@ -345,16 +345,23 @@ class TestmeGenerator extends ClientGeneratorFromXml
 		$this->appendLine('	<script type="text/javascript" src="js/kPrettify.js"></script>');
 		$this->appendLine('	<script type="text/javascript">');
 		
+		$services = array();
 		foreach($serviceNodes as $serviceNode)
 		{
 			/* @var $serviceNode DOMElement */
 			$serviceId = $serviceNode->getAttribute('id');
+			if(!$this->shouldIncludeService($serviceId))
+				continue;
+			
 			$serviceName = $serviceNode->getAttribute('name');
 			$pluginName = $serviceNode->getAttribute('plugin');
 			$deprecated = $serviceNode->getAttribute('deprecated') ? 'true' : 'false';
 
 			$this->appendLine("		kTestMe.registerService(\"$serviceId\", \"$serviceName\", \"$pluginName\", $deprecated);");
+
+			$services[] = $serviceNode->getAttribute('name');
 		}
+		sort($services);
 		
 		$this->appendLine('	</script>');
 		$this->appendLine('	<script type="text/javascript">');
@@ -488,21 +495,25 @@ class TestmeGenerator extends ClientGeneratorFromXml
 		$this->appendLine('							<option value="">Select service</option>');
 		$this->appendLine('							<option value="multirequest">Multirequest</option>');
 
-		foreach($serviceNodes as $serviceNode)
+		$xpath = new DOMXPath($this->_doc);
+		foreach($services as $serviceName)
 		{
+			$serviceNodes = $xpath->query("/xml/services/service[@name = '$serviceName']");
+			$serviceNode = $serviceNodes->item(0);
+			
 			/* @var $serviceNode DOMElement */
 			$serviceId = $serviceNode->getAttribute('id');
 			$serviceName = $serviceNode->getAttribute('name');
 			$pluginName = $serviceNode->getAttribute('plugin');
 			$deprecated = $serviceNode->getAttribute('deprecated');
 
-			if ($pluginName)
-				$serviceName = "$pluginName.$serviceName";
-
 			$serviceLabel = $serviceName;
 			if ($deprecated)
 				$serviceLabel .= ' (deprecated)';
 
+			if ($pluginName)
+				$serviceName = "$pluginName.$serviceName";
+			
 			$this->appendLine("							<option value=\"$serviceId\" title=\"$serviceName\">$serviceLabel</option>");
 		}
 		

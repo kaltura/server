@@ -173,7 +173,7 @@ class JsClientGenerator extends ClientGeneratorFromXml
 	{
 		$serviceId = $serviceNodes->attributes()->id;
 		if(!$this->shouldIncludeService($serviceId))
-			continue;
+			return;
 				
 		$serviceName = $serviceNodes->attributes()->name;
 		$serviceClassName = "Kaltura".$this->upperCaseFirstLetter($serviceName)."Service";

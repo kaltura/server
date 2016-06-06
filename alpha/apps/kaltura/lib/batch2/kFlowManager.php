@@ -481,7 +481,63 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 	 */
 	public function objectAdded(BaseObject $object, BatchJob $raisedJob = null)
 	{
-		return $this->doObjectAddedOrDataAdded($object, $raisedJob);
+		$entry = $object->getentry();
+
+		if ($object->getStatus() == asset::FLAVOR_ASSET_STATUS_QUEUED || $object->getStatus() == asset::FLAVOR_ASSET_STATUS_IMPORTING)
+		{
+			if (!($object instanceof flavorAsset))
+			{
+				$object->setStatus(asset::FLAVOR_ASSET_STATUS_READY);
+				$object->save();
+			} elseif ($object->getIsOriginal())
+			{
+				if ($entry->getType() == entryType::MEDIA_CLIP)
+				{
+					$syncKey = $object->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+
+					if (kFileSyncUtils::fileSync_exists($syncKey))
+					{
+
+						// Get the asset fileSync.
+						// For URL typed sync - assume remote and use the relative file path.
+						// For the other types - use the ordinary kFileSyncUtils::getLocalFilePathForKey.
+						$fsArr = kFileSyncUtils::getReadyFileSyncForKey($syncKey, true, false);
+						$fs = $fsArr[0];
+						if ($fs->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL)
+						{
+							$path = $fs->getFilePath();
+						} else
+						{
+							$path = kFileSyncUtils::getLocalFilePathForKey($syncKey);
+						}
+						kJobsManager::addConvertProfileJob($raisedJob, $entry, $object->getId(), $path);
+					}
+				}
+			} else
+			{
+				$object->setStatus(asset::FLAVOR_ASSET_STATUS_VALIDATING);
+				$object->save();
+			}
+		}
+
+		if ($object->getStatus() == asset::FLAVOR_ASSET_STATUS_READY && $object instanceof thumbAsset)
+		{
+			if ($object->getFlavorParamsId())
+				kFlowHelper::generateThumbnailsFromFlavor($object->getEntryId(), $raisedJob, $object->getFlavorParamsId());
+			else
+				if ($object->hasTag(thumbParams::TAG_DEFAULT_THUMB))
+					kBusinessConvertDL::setAsDefaultThumbAsset($object);
+			return true;
+		}
+
+
+		if ($object->getIsOriginal() && $entry->getStatus() == entryStatus::NO_CONTENT)
+		{
+			$entry->setStatus(entryStatus::PENDING);
+			$entry->save();
+		}
+
+		return true;
 	}
 
 	/* (non-PHPdoc)
@@ -711,76 +767,17 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 	 */
 	public function objectDataChanged(BaseObject $object, $previousVersion = null, BatchJob $raisedJob = null)
 	{
-		return $this->doObjectAddedOrDataAdded($object, $raisedJob);	
-	}
-
-	/**
-	 * @param BaseObject $object
-	 * @param BatchJob $raisedJob
-	 * @return bool
-	 * @throws Exception
-	 * @throws kCoreException
-	 */
-	protected function doObjectAddedOrDataAdded(BaseObject $object, BatchJob $raisedJob = null)
-	{
-		$entry = $object->getentry();
-
-		if ($object->getStatus() == asset::FLAVOR_ASSET_STATUS_QUEUED || $object->getStatus() == asset::FLAVOR_ASSET_STATUS_IMPORTING)
+		if ($object instanceof flavorAsset)
 		{
-			if (!($object instanceof flavorAsset))
+			if ($object->getStatus() == asset::FLAVOR_ASSET_STATUS_QUEUED)
 			{
-				$object->setStatus(asset::FLAVOR_ASSET_STATUS_READY);
-				$object->save();
-			} elseif ($object->getIsOriginal())
-			{
-				if ($entry->getType() == entryType::MEDIA_CLIP)
+				if (!$object->getIsOriginal())
 				{
-					$syncKey = $object->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-
-					if (kFileSyncUtils::fileSync_exists($syncKey))
-					{
-
-						// Get the asset fileSync.
-						// For URL typed sync - assume remote and use the relative file path.
-						// For the other types - use the ordinary kFileSyncUtils::getLocalFilePathForKey.
-						$fsArr = kFileSyncUtils::getReadyFileSyncForKey($syncKey, true, false);
-						$fs = $fsArr[0];
-						if ($fs->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL)
-						{
-							$path = $fs->getFilePath();
-						} else
-						{
-							$path = kFileSyncUtils::getLocalFilePathForKey($syncKey);
-						}
-						kJobsManager::addConvertProfileJob($raisedJob, $entry, $object->getId(), $path);
-					}
+					$object->setStatus(asset::FLAVOR_ASSET_STATUS_VALIDATING);
+					$object->save();
 				}
-			} else
-			{
-				$object->setStatus(asset::FLAVOR_ASSET_STATUS_VALIDATING);
-				$object->save();
 			}
 		}
-
-		if ($object->getStatus() == asset::FLAVOR_ASSET_STATUS_READY && $object instanceof thumbAsset)
-		{
-			if ($object->getFlavorParamsId())
-				kFlowHelper::generateThumbnailsFromFlavor($object->getEntryId(), $raisedJob, $object->getFlavorParamsId());
-			else
-				if ($object->hasTag(thumbParams::TAG_DEFAULT_THUMB))
-					kBusinessConvertDL::setAsDefaultThumbAsset($object);
-			return true;
-		}
-
-
-		if ($object->getIsOriginal() && $entry->getStatus() == entryStatus::NO_CONTENT)
-		{
-			$entry->setStatus(entryStatus::PENDING);
-			$entry->save();
-		}
-
 		return true;
 	}
-
-
 }

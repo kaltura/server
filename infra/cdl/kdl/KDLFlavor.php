@@ -512,7 +512,14 @@ $plannedDur = 0;
 		else {
 			$target->_fastSeekTo = true;
 		}
+			/*
+			 * Disable encryption for sources shorter than 10sec (PLAT-5558)
+			 */
+		if(isset($this->_isEncrypted) && $sourceDur<10000) {
+			$target->_isEncrypted = false;
+		}
 		
+
 			/*
 			 * For IMX sources, apply cropping of the top 32 pixs, if the flavor has the ImxCrop flag
 			 * 'IMX' ==> mxf/mpeg2 video/ 720x608

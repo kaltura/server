@@ -35,9 +35,14 @@ class kLiveStreamConfiguration
 	protected $streamName;
 	
 	/**
-	 * @var boolean
+	 * @var kLiveStreamParams
 	 */
-	protected $isExternalStream = false;
+	protected $primaryStreamInfo = null;
+	
+	/**
+	 * @var kLiveStreamParams
+	 */
+	protected $backupStreamInfo = null;
 	
 	/**
 	 * @return the $streamName
@@ -111,11 +116,19 @@ class kLiveStreamConfiguration
 		$this->publishUrl = $publishUrl;
 	}
 	
-	public function setIsExternalStream($v) {
-		$this->isExternalStream = $v;
+	public function setPrimaryStreamInfo($v) {
+		$this->primaryStreamInfo = $v;
 	}
 	
-	public function getIsExternalStream() {
-		return $this->isExternalStream;
+	public function getPrimaryStreamInfo() {
+		return $this->primaryStreamInfo;
+	}
+	
+	public function setBackupStreamInfo($v) {
+		$this->backupStreamInfo = $v;
+	}
+	
+	public function getBackupStreamInfo() {
+		return $this->backupStreamInfo;
 	}
 }

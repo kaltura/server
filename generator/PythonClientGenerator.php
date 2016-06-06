@@ -30,13 +30,15 @@ class PythonClientGenerator extends ClientGeneratorFromXml
 			$enumNodes = $xpath->query("/xml/enums/enum[@plugin = '$pluginName']");
 			$classNodes = $xpath->query("/xml/classes/class[@plugin = '$pluginName']");
 			$serviceNodes = $xpath->query("/xml/services/service[@plugin = '$pluginName']");
-			$serviceNamesNodes = $xpath->query("/xml/plugins/plugin[@name = '$pluginName']/pluginService");
-			$this->writePlugin($pluginName, $enumNodes, $classNodes, $serviceNodes, $serviceNamesNodes);
+			
+			if($serviceNodes->length || $classNodes->length || $enumNodes->length)
+				$this->writePlugin($pluginName, $enumNodes, $classNodes, $serviceNodes);
 		}
 	}
 	
-	function writePlugin($pluginName, $enumNodes, $classNodes, $serviceNodes, $serviceNamesNodes)
+	function writePlugin($pluginName, $enumNodes, $classNodes, $serviceNodes)
 	{
+		$xpath = new DOMXPath($this->_doc);
 		if ($pluginName == '')
 		{
 			$pluginClassName = "KalturaCoreClient";
@@ -60,7 +62,6 @@ class PythonClientGenerator extends ClientGeneratorFromXml
 		{
 			$this->appendLine('from Core import *');
 
-			$xpath = new DOMXPath($this->_doc);
 			$dependencyNodes = $xpath->query("/xml/plugins/plugin[@name = '$pluginName']/dependency");
 			foreach($dependencyNodes as $dependencyNode)
 				$this->appendLine('from ' .
@@ -81,45 +82,47 @@ class PythonClientGenerator extends ClientGeneratorFromXml
 		$enums = array();
 		foreach($enumNodes as $enumNode)
 		{
+			$type = $enumNode->getAttribute("name");
+			if(!$this->shouldIncludeType($type))
+				continue;
+			
 			if($enumNode->hasAttribute('plugin') && $pluginName == '')
 				continue;
 				
 			$this->writeEnum($enumNode);
-			$enums[] = $enumNode->getAttribute("name");
+			$enums[] = $type;
 		}
 	
 		$this->appendLine('########## classes ##########');
 		$classes = array();
 		foreach($classNodes as $classNode)
 		{
+			$type = $classNode->getAttribute("name");
+			if(!$this->shouldIncludeType($type))
+				continue;
+			
 			if($classNode->hasAttribute('plugin') && $pluginName == '')
 				continue;
 				
 			$this->writeClass($classNode);
-			$classes[] = $classNode->getAttribute("name");
+			$classes[] = $type;
 		}
 	
 		$this->appendLine('########## services ##########');
-		foreach($serviceNodes as $serviceNode)
-		{
-			if($serviceNode->hasAttribute('plugin') && $pluginName == '')
-				continue;
-				
-			$this->writeService($serviceNode);
-		}
-		
+
 		$services = array();
-		foreach($serviceNamesNodes as $serviceNode)
+		foreach($serviceNodes as $serviceNode)
 		{
 			if(!$this->shouldIncludeService($serviceNode->getAttribute("id")))
 				continue;
 			
 			if($serviceNode->hasAttribute('plugin') && $pluginName == '')
 				continue;
-				
+
 			$services[] = $serviceNode->getAttribute("name");
+			$this->writeService($serviceNode);
 		}
-			
+		
 		$this->appendLine('########## main ##########');
 				
 		$this->appendLine("class $pluginClassName(KalturaClientPlugin):");
@@ -171,9 +174,6 @@ class PythonClientGenerator extends ClientGeneratorFromXml
 	function writeEnum(DOMElement $enumNode)
 	{
 		$enumName = $enumNode->getAttribute("name");
-		if(!$this->shouldIncludeType($enumName))
-			return;
-		
 		$enumBase = "object";
 		
 		if($this->generateDocs)
@@ -242,8 +242,6 @@ class PythonClientGenerator extends ClientGeneratorFromXml
 	function writeClass(DOMElement $classNode)
 	{
 		$type = $classNode->getAttribute("name");
-		if(!$this->shouldIncludeType($type))
-			return;
 		
 		if($this->generateDocs)
 		{

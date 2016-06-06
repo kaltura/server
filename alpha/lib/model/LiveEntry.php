@@ -331,7 +331,8 @@ abstract class LiveEntry extends entry
 		$backupMediaServer = null;
 		$primaryApplicationName = null;
 		$backupApplicationName = null;
-		$isExternalMediaServerStream = false;
+		$primaryStreamInfo = null;
+		$backupStreamInfo = null;
 		
 		$liveEntryServerNodes = $this->getPlayableEntryServerNodes();
 		if(count($liveEntryServerNodes))
@@ -347,6 +348,7 @@ abstract class LiveEntry extends entry
 					{
 						$primaryMediaServer = $serverNode;
 						$primaryApplicationName = $serverNode->getApplicationName();
+						$primaryStreamInfo = $liveEntryServerNode->getStreams();
 						unset($liveEntryServerNodes[$key]);
 						break;
 					}
@@ -364,7 +366,7 @@ abstract class LiveEntry extends entry
 				{
 					$primaryMediaServer = $serverNode;
 					$primaryApplicationName = $serverNode->getApplicationName();
-					$isExternalMediaServerStream = $primaryMediaServer->getIsExternalMediaServer();
+					$primaryStreamInfo = $liveEntryServerNode->getStreams();
 				} else
 				{
 					KalturaLog::debug("Cannot retrieve extra information for un-registered media server node id  [" . $liveEntryServerNode->getServerNodeId() . "]");
@@ -379,6 +381,7 @@ abstract class LiveEntry extends entry
 				{
 					$backupMediaServer = $serverNode;
 					$backupApplicationName = $serverNode->getApplicationName();
+					$backupStreamInfo = $liveEntryServerNode->getStreams();
 				}
 			}
 		}
@@ -484,40 +487,46 @@ abstract class LiveEntry extends entry
 		$configuration->setProtocol(PlaybackProtocol::HDS);
 		$configuration->setUrl($hdsStreamUrl);
 		$configuration->setBackupUrl($hdsBackupStreamUrl);
-		$configuration->setIsExternalStream($isExternalMediaServerStream);
+		$configuration->setPrimaryStreamInfo($primaryStreamInfo);
+		$configuration->setBackupStreamInfo($backupStreamInfo);
 		$configurations[] = $configuration;
 		
 		$configuration = new kLiveStreamConfiguration();
 		$configuration->setProtocol(PlaybackProtocol::HLS);
 		$configuration->setUrl($hlsStreamUrl);
 		$configuration->setBackupUrl($hlsBackupStreamUrl);
-		$configuration->setIsExternalStream($isExternalMediaServerStream);
+		$configuration->setPrimaryStreamInfo($primaryStreamInfo);
+		$configuration->setBackupStreamInfo($backupStreamInfo);
 		$configurations[] = $configuration;
 		
 		$configuration = new kLiveStreamConfiguration();
 		$configuration->setProtocol(PlaybackProtocol::APPLE_HTTP);
 		$configuration->setUrl($hlsStreamUrl);
 		$configuration->setBackupUrl($hlsBackupStreamUrl);
-		$configuration->setIsExternalStream($isExternalMediaServerStream);
+		$configuration->setPrimaryStreamInfo($primaryStreamInfo);
+		$configuration->setBackupStreamInfo($backupStreamInfo);
 		$configurations[] = $configuration;
 		
 		$configuration = new kLiveStreamConfiguration();
 		$configuration->setProtocol(PlaybackProtocol::APPLE_HTTP_TO_MC);
 		$configuration->setUrl($hlsStreamUrl);
 		$configuration->setBackupUrl($hlsBackupStreamUrl);
-		$configuration->setIsExternalStream($isExternalMediaServerStream);
+		$configuration->setPrimaryStreamInfo($primaryStreamInfo);
+		$configuration->setBackupStreamInfo($backupStreamInfo);
 		$configurations[] = $configuration;
 		
 		$configuration = new kLiveStreamConfiguration();
 		$configuration->setProtocol(PlaybackProtocol::SILVER_LIGHT);
 		$configuration->setUrl($slStreamUrl);
-		$configuration->setIsExternalStream($isExternalMediaServerStream);
+		$configuration->setPrimaryStreamInfo($primaryStreamInfo);
+		$configuration->setBackupStreamInfo($backupStreamInfo);
 		$configurations[] = $configuration;
 		
 		$configuration = new kLiveStreamConfiguration();
 		$configuration->setProtocol(PlaybackProtocol::MPEG_DASH);
 		$configuration->setUrl($mpdStreamUrl);
-		$configuration->setIsExternalStream($isExternalMediaServerStream);
+		$configuration->setPrimaryStreamInfo($primaryStreamInfo);
+		$configuration->setBackupStreamInfo($backupStreamInfo);
 		$configurations[] = $configuration;
 		
 		if ($this->getPushPublishEnabled())
@@ -611,8 +620,11 @@ abstract class LiveEntry extends entry
 	 * @return bool|mixed
 	 * @throws Exception
 	 */
-	private function isCacheValid(LiveEntryServerNode $liveEntryServerNode)
+	public function isCacheValid(LiveEntryServerNode $liveEntryServerNode)
 	{
+		if(!$liveEntryServerNode)
+			return false;
+		
 		$cacheType = self::getCacheType();
 		$cacheStore = kCacheManager::getSingleLayerCache($cacheType);
 		if(! $cacheStore)
@@ -697,7 +709,7 @@ abstract class LiveEntry extends entry
 			$dbLiveEntryServerNode->setServerNodeId($serverNodeId);
 			$dbLiveEntryServerNode->setPartnerId($this->getPartnerId());
 			$dbLiveEntryServerNode->setStatus($liveEntryStatus);
-			$dbLiveEntryServerNode->setDC(kDataCenterMgr::getCurrentDcId());
+			$dbLiveEntryServerNode->setDc(kDataCenterMgr::getCurrentDcId());
 			
 			if($applicationName)
 				$dbLiveEntryServerNode->setApplicationName($applicationName);

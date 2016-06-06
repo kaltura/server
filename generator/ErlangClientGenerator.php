@@ -268,7 +268,7 @@ class ErlangClientGenerator extends ClientGeneratorFromXml
 	{
 		$serviceId = $serviceId ? $serviceId : $serviceNode->getAttribute("id");
 		if(!$this->shouldIncludeService($serviceId))
-			continue;
+		    return false;
 
     	$this->startNewTextBlock();
     	

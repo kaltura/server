@@ -13,7 +13,9 @@
  * @package Core
  * @subpackage model
  */
-class EntryServerNode extends BaseEntryServerNode {
+abstract class EntryServerNode extends BaseEntryServerNode {
+	
+	abstract public function validateEntryServerNode();
 
 	public function getCacheInvalidationKeys()
 	{

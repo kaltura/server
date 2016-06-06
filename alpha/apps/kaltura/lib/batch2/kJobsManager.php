@@ -1170,7 +1170,7 @@ class kJobsManager
 	public static function addDeleteJob($partnerId, $objectType, baseObjectFilter $filter)
 	{
 	    $jobData = new kDeleteJobData();
- 		$jobData->setFilter($filter);
+ 		$jobData->setFilter($filter);	
  		
 		$batchJob = new BatchJob();
 		$batchJob->setPartnerId($partnerId);
