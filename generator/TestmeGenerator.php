@@ -240,9 +240,12 @@ class TestmeGenerator extends ClientGeneratorFromXml
 		$actionNodes = $serviceNode->getElementsByTagName("action");
 		foreach($actionNodes as $actionNode)
 		{
+            $actionName = $actionNode->getAttribute("name");
+			if(!$this->shouldIncludeAction($serviceId, $actionName))
+				continue;
+			
             $this->writeAction($serviceId, $actionNode);
 
-            $actionName = $actionNode->getAttribute("name");
 		    $actionLabel = $actionName;
 		    if ($actionNode->getAttribute("deprecated"))
 		    	$actionLabel .= ' (deprecated)';
@@ -260,9 +263,6 @@ class TestmeGenerator extends ClientGeneratorFromXml
 	function writeAction($serviceId, DOMElement $actionNode)
 	{
 		$actionId = $actionNode->getAttribute('name');
-		if(!$this->shouldIncludeAction($serviceId, $actionId))
-			return;
-		
 		$json = array(
 			'actionParams' => array(),
 		    'description' => $actionNode->getAttribute('description')
