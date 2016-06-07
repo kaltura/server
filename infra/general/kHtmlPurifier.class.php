@@ -30,13 +30,6 @@ class kHtmlPurifier
 		{
 			return $modifiedValue;
 		}
-		else if (KalturaBaseService::$HTMLPurifierBehaviour == HTMLPurifierBehaviourType::NOTIFY)
-		{
-//			$this->notifyAboutHtmlPurification($className, $propertyName, $value);
-			KalturaLog::debug("should send notification");
-			return $value;
-		}
-		// If we reach here KalturaBaseService::$HTMLPurifierBehaviour must be BLOCK
 
 		if ( $modifiedValue != $value )
 		{
@@ -46,6 +39,16 @@ class kHtmlPurifier
 				;
 
 			KalturaLog::err( $msg );
+
+			if (KalturaBaseService::$HTMLPurifierBehaviour == HTMLPurifierBehaviourType::NOTIFY)
+			{
+//			$this->notifyAboutHtmlPurification($className, $propertyName, $value);
+				KalturaLog::debug("should send notification");
+				return $value;
+			}
+			// If we reach here KalturaBaseService::$HTMLPurifierBehaviour must be BLOCK
+
+
 			throw new KalturaAPIException(KalturaErrors::UNSAFE_HTML_TAGS, $className, $propertyName);
 		} 
 
