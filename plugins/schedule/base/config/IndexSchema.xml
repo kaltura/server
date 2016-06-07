@@ -30,7 +30,8 @@
 	        <field name="resource_ids" indexName="resource_ids" getter="resourceIdsForIndex" type="string" matchable="yes" />
 	        <field name="plugins_data" indexName="plugins_data" type="string" searchableonly="yes" />
 	        <field name="template_entry_categories_ids" indexName="template_entry_categories_ids" getter="templateEntryCategoriesIdsForIndex" type="string" matchable="yes" />
-	        <field name="system_names" indexName="system_names" getter="systemNamesForIndex" type="string" matchable="yes" />
+	        <field name="resource_system_names" indexName="resource_system_names" getter="resourceSystemNamesForIndex" type="string" matchable="yes" />
+		    <field name="template_entry_id" indexName="template_entry_id" getter="templateEntryIdForIndex" type="string" matchable="yes" />
 
 	        <!--
 	        float is support in sphinx 2.2.10, we don't use that version yet. 

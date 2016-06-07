@@ -181,6 +181,20 @@ class ScheduleEventPeer extends BaseScheduleEventPeer implements IRelatedObjectP
 		
 		return ScheduleEventPeer::doSelect($criteria);
 	}
+
+	/**
+	 * @param int $templateEntryId
+	 * @return array<ScheduleEvent>
+	 */
+	public static function retrieveByTemplateEntryId($templateEntryId)
+	{
+		$c = KalturaCriteria::create(ScheduleEventPeer::OM_CLASS);
+		$filter = new ScheduleEventFilter();
+		$filter->setTemplateEntryIdEqual($templateEntryId);
+		$filter->attachToCriteria($c);
+
+		return self::doSelect($c);
+	}
 	
 	/* (non-PHPdoc)
 	 * @see IRelatedObjectPeer::getRootObjects()
