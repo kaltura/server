@@ -29,7 +29,7 @@ None.
 ### Configuration ###
 	
 script will ask for your:
-IP, userId, password, partner (insert -2 for partner)
+IP, userId and password (of your admin-console account), partner (insert -2 for partner)
 
 #### Deployment Scripts ####
 
