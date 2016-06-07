@@ -116,7 +116,7 @@ class ScheduleEventIndex extends BaseIndexObject
 				'plugins_data' => IIndexable::FIELD_TYPE_STRING,
 				'template_entry_categories_ids' => IIndexable::FIELD_TYPE_STRING,
 				'resource_system_names' => IIndexable::FIELD_TYPE_STRING,
-				'template_entry_categories_ids' => IIndexable::FIELD_TYPE_STRING,
+				'template_entry_id' => IIndexable::FIELD_TYPE_STRING,
 			);
 		}
 		return self::$typesMap;
