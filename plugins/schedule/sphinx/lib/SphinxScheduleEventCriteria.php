@@ -134,8 +134,6 @@ class SphinxScheduleEventCriteria extends SphinxCriteria
 
 	private function buildMd5String($str)
 	{
-//		$notEmpty = kSphinxSearchManager::HAS_VALUE . kCurrentContext::getCurrentPartnerId();
-//		return "\\\" " . mySearchUtils::getMd5EncodedString($str) . " $notEmpty$\\\"";
 		return mySearchUtils::getMd5EncodedString($str);
 	}
 }
