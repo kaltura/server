@@ -186,10 +186,15 @@ class LogTime
  */
 class LogMethod
 {
+	private static $_debugBacktraceOptions = null;
+	
 	public function __toString()
 	{
+		if(!isset(self::$_debugBacktraceOptions))
+			self::$_debugBacktraceOptions = defined('DEBUG_BACKTRACE_IGNORE_ARGS') ? DEBUG_BACKTRACE_IGNORE_ARGS : false;
+		
 		$backtraceIndex = 3;
-		$backtrace = defined('DEBUG_BACKTRACE_IGNORE_ARGS') ? debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS) : debug_backtrace();
+		$backtrace = debug_backtrace(self::$_debugBacktraceOptions);
 		
 		while(
 			$backtraceIndex < count($backtrace)
