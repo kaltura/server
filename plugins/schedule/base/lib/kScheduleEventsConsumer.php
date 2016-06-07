@@ -3,35 +3,22 @@ class kScheduleEventsConsumer implements kObjectChangedEventConsumer, kObjectDel
 {
     public function shouldConsumeCreatedEvent(BaseObject $object)
     {
-        if ($object instanceof categoryEntry)
-        {
+        if ($object instanceof categoryEntry && $object->getStatus() == categoryEntryStatus::ACTIVE)
             return true;
-        }
         return false;
     }
 
     public function shouldConsumeDeletedEvent(BaseObject $object)
     {
         if ($object instanceof categoryEntry)
-        {
             return true;
-        }
         return false;
     }
 
     public function shouldConsumeChangedEvent(BaseObject $object, array $modifiedColumns)
     {
-        try
-        {
-            if ($object instanceof categoryEntry && in_array(categoryEntryPeer::STATUS, $modifiedColumns) && $object->getStatus() == categoryEntryStatus::ACTIVE)
-            {
-                return true;
-            }
-        } catch (Exception $e)
-        {
-            KalturaLog::err('Failed to process shouldConsumeChangedEvent - ' . $e->getMessage());
-        }
-
+        if ($object instanceof categoryEntry && in_array(categoryEntryPeer::STATUS, $modifiedColumns) && $object->getStatus() == categoryEntryStatus::ACTIVE)
+            return true;
         return false;
     }
 
@@ -40,17 +27,7 @@ class kScheduleEventsConsumer implements kObjectChangedEventConsumer, kObjectDel
      */
     public function objectChanged(BaseObject $object, array $modifiedColumns)
     {
-        try
-        {
-            if ($object instanceof categoryEntry)
-            {
-                $this->reindexScheduleEvents($object->getEntryId());
-            }
-        } catch (Exception $e)
-        {
-            KalturaLog::err('Failed to process objectChangedEvent for scheduleEvent ' . $e->getMessage());
-        }
-
+        $this->reindexScheduleEvents($object->getEntryId());
         return true;
     }
 
@@ -59,17 +36,7 @@ class kScheduleEventsConsumer implements kObjectChangedEventConsumer, kObjectDel
      */
     public function objectDeleted(BaseObject $object, BatchJob $raisedJob = null)
     {
-        try
-        {
-            if ($object instanceof categoryEntry)
-            {
-                $this->reindexScheduleEvents($object->getEntryId());
-            }
-        } catch (Exception $e)
-        {
-            KalturaLog::err('Failed to process objectDeleted for scheduleEvent ' . $e->getMessage());
-        }
-
+        $this->reindexScheduleEvents($object->getEntryId());
         return true;
     }
 
@@ -79,17 +46,7 @@ class kScheduleEventsConsumer implements kObjectChangedEventConsumer, kObjectDel
      */
     public function objectCreated(BaseObject $object)
     {
-        try
-        {
-            if ($object instanceof categoryEntry)
-            {
-                $this->reindexScheduleEvents($object->getEntryId());
-            }
-        } catch (Exception $e)
-        {
-            KalturaLog::err('Failed to process objectCreated for scheduleEvent ' . $e->getMessage());
-        }
-
+        $this->reindexScheduleEvents($object->getEntryId());
         return true;
     }
 
