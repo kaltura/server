@@ -236,7 +236,16 @@ abstract class ScheduleEvent extends BaseScheduleEvent implements IRelatedObject
 	{
 		return '';
 	}
-	
+
+	/**
+	 * {@inheritDoc}
+	 * @see IIndexable::getTemplateEntryId()
+	 */
+	public function getTemplateEntryId()
+	{
+		return null;
+	}
+
 	public function getCategoryIdsForIndex()
 	{
 		return '';
