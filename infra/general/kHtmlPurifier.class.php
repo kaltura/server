@@ -26,6 +26,18 @@ class kHtmlPurifier
 		$purifiedValue = self::$purifier->purify( $tokenizedValue );
 		$modifiedValue = $tokenMapper->unTokenize($purifiedValue);
 
+		if (KalturaBaseService::$HTMLPurifierBehaviour == HTMLPurifierBehaviourType::SANITIZE)
+		{
+			return $modifiedValue;
+		}
+		else if (KalturaBaseService::$HTMLPurifierBehaviour == HTMLPurifierBehaviourType::NOTIFY)
+		{
+//			$this->notifyAboutHtmlPurification($className, $propertyName, $value);
+			KalturaLog::debug("should send notification");
+			return $value;
+		}
+		// If we reach here KalturaBaseService::$HTMLPurifierBehaviour must be BLOCK
+
 		if ( $modifiedValue != $value )
 		{
 			$msg = "Potential Unsafe HTML tags found in $className::$propertyName"

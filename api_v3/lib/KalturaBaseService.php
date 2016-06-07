@@ -49,6 +49,8 @@ abstract class KalturaBaseService
 	
 	protected $partnerGroup = null;
 	
+	public static $HTMLPurifierBehaviour = null;
+	
 	public function __construct()
 	{
 		//TODO: initialize $this->serviceName here instead of in initService method
@@ -57,6 +59,7 @@ abstract class KalturaBaseService
 	
 	public function __destruct( )
 	{
+		self::$HTMLPurifierBehaviour = null;
 	}
 	
 	
@@ -148,6 +151,9 @@ abstract class KalturaBaseService
 		}
 		
 		$this->setPartnerFilters($partnerId);
+		
+		$partner = $this->getPartner();
+		self::$HTMLPurifierBehaviour = $partner->getHtmlPurifierBehaviour();
 	}
 
 	/**
