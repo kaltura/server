@@ -64,7 +64,6 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 
 	public function shouldConsumeAddedEvent(BaseObject $object)
 	{
-		// if changed object is thumb asset
 		if( $object instanceof thumbAsset && PermissionPeer::isValidForPartner(PermissionName::FEATURE_REMOTE_STORAGE, $object->getPartnerId()) && $object->isLocalReadyStatus())
 			return true;
 		
@@ -72,12 +71,10 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 
 	public function objectAdded(BaseObject $object, BatchJob $raisedJob = null)
 	{
-		$entry = $object->getentry();
-
 		$externalStorages = StorageProfilePeer::retrieveAutomaticByPartnerId($object->getPartnerId());
 		foreach($externalStorages as $externalStorage)
 		{
-			if ($externalStorage->triggerFitsReadyAsset($entry->getId()))
+			if ($externalStorage->triggerFitsReadyAsset($object->getEntryId()))
 			{
 				self::exportFlavorAsset($object, $externalStorage);
 			}
