@@ -665,7 +665,7 @@ class myReportsMgr
 	{
 		// the $val is the date_id -> YYYYMMDD
 		//$date = $val;
-		$h = 0
+		$h = 0;
 		$y = (int)substr ( $val , 0 , 4 );
 		$m = (int)substr ( $val , 4 , 2 );
 		$d = (int)substr ( $val , 6 , 2 );
