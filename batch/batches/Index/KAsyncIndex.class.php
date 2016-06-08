@@ -42,10 +42,13 @@ class KAsyncIndex extends KJobHandlerWorker
 		
 		if($data->lastIndexId)
 		{
-			
 			$advancedFilter->indexIdGreaterThan = $data->lastIndexId;
+			if($data->lastIndexDepth)
+				$advancedFilter->depthGreaterThanEqual = $data->lastIndexDepth;
+
 			$filter->advancedSearch = $advancedFilter;
 		}
+		
 		
 		$continue = true;
 		while($continue)
@@ -53,11 +56,14 @@ class KAsyncIndex extends KJobHandlerWorker
 			$indexedObjectsCount = $engine->run($filter, $data->shouldUpdate);
 			$continue = (bool) $indexedObjectsCount;
 			$lastIndexId = $engine->getLastIndexId();
+			$lastIndexDepth = $engine->getLastIndexDepth();
 			
 			$data->lastIndexId = $lastIndexId;
+			$data->lastIndexDepth = $lastIndexDepth;
 			$this->updateJob($job, "Indexed $indexedObjectsCount objects", KalturaBatchJobStatus::PROCESSING, $data);
 			
 			$advancedFilter->indexIdGreaterThan = $lastIndexId;
+			$advancedFilter->depthGreaterThanEqual = $lastIndexDepth;
 			$filter->advancedSearch = $advancedFilter;
 		}
 		
