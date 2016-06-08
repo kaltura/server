@@ -39,11 +39,7 @@ class CuePointService extends KalturaBaseService
 			$this->applyPartnerFilterForClass('CuePoint');
 		}
 
-		// when session is not admin, allow access to user entries only
-		if (!$this->getKs() || !$this->getKs()->isAdmin()) {
-			KalturaCriterion::enableTag(KalturaCriterion::TAG_USER_SESSION);
-			CuePointPeer::setUserContentOnly(true);
-		}
+		self::updateUserContentOnlyStateIfNeeded();
 		
 		if (!$this->getKs() || $this->getKs()->isAnonymousSession())
 		{
@@ -184,7 +180,7 @@ class CuePointService extends KalturaBaseService
 		$cuePoint = KalturaCuePoint::getInstance($dbCuePoint, $this->getResponseProfile());
 		if(!$cuePoint)
 			return null;
-			
+
 		return $cuePoint;
 	}
 	
@@ -198,6 +194,8 @@ class CuePointService extends KalturaBaseService
 	 */
 	function listAction(KalturaCuePointFilter $filter = null, KalturaFilterPager $pager = null)
 	{
+		self::updateUserContentOnlyStateIfNeeded($filter->entryIdEqual);
+
 		if (!$pager)
 		{
 			$pager = new KalturaFilterPager();
@@ -207,9 +205,12 @@ class CuePointService extends KalturaBaseService
 		if (!$filter)
 			$filter = new KalturaCuePointFilter();
 			
-		return $filter->getTypeListResponse($pager, $this->getResponseProfile(), $this->getCuePointType());
+		$ret = $filter->getTypeListResponse($pager, $this->getResponseProfile(), $this->getCuePointType());
+
+		self::updateUserContentOnlyStateIfNeeded(null);
+		return $ret;
 	}
-	
+
 	/**
 	 * count cue point objects by filter
 	 * 
@@ -221,7 +222,9 @@ class CuePointService extends KalturaBaseService
 	{
 		if (!$filter)
 			$filter = new KalturaCuePointFilter();
-						
+
+		self::updateUserContentOnlyStateIfNeeded($filter->entryIdEqual);
+
 		$c = KalturaCriteria::create(CuePointPeer::OM_CLASS);
 		if($this->getCuePointType())
 			$c->add(CuePointPeer::TYPE, $this->getCuePointType());
@@ -230,7 +233,10 @@ class CuePointService extends KalturaBaseService
 		$cuePointFilter->attachToCriteria($c);
 		
 		$c->applyFilters();
-		return $c->getRecordsCount();
+		$count = $c->getRecordsCount();
+
+		self::updateUserContentOnlyStateIfNeeded();
+		return $count;
 	}
 	
 	/**
@@ -349,5 +355,25 @@ class CuePointService extends KalturaBaseService
 		
 		$dbCuePoint->setStatus($status);
 		$dbCuePoint->save();
+	}
+
+	/**
+	 * call setUserContentOnly && enable/disable the KalturaCriterion::TAG_USER_SESSION tag
+	 *
+	 * @param string $entryId
+	 */
+	private function updateUserContentOnlyStateIfNeeded($entryId = null){
+		// when session is not admin, allow access to user entries only
+		if ((empty($entryId) && (!$this->getKs() || !$this->getKs()->isAdmin())) ||
+			(!empty($entryId) && (!$this->getKs() || !$this->getKs()->verifyPrivileges(ks::PRIVILEGE_LIST, $entryId))))
+		{
+			KalturaCriterion::enableTag(KalturaCriterion::TAG_USER_SESSION);
+			CuePointPeer::setUserContentOnly(true);
+		}
+		else
+		{
+			KalturaCriterion::disableTag(KalturaCriterion::TAG_USER_SESSION);
+			CuePointPeer::setUserContentOnly(false);
+		}
 	}
 }
