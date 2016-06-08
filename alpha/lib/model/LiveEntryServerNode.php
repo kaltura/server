@@ -25,7 +25,7 @@ class LiveEntryServerNode extends EntryServerNode
 			{
 				$liveEntry->setPrimaryServerNodeId($this->getServerNodeId());
 				
-				if(!$liveEntry->getCurrentBroadcastStartTime() && $this->getStatus() === EntryServerNodeStatus::AUTHENTICATED)
+				if(!$liveEntry->getCurrentBroadcastStartTime())
 					$liveEntry->setCurrentBroadcastStartTime(time());
 			}
 			
@@ -52,7 +52,7 @@ class LiveEntryServerNode extends EntryServerNode
 			if($this->isColumnModified(EntryServerNodePeer::STATUS) && $this->getStatus() === EntryServerNodeStatus::PLAYABLE)
 				$liveEntry->setLastBroadcast(time());
 			
-			if(!$liveEntry->getCurrentBroadcastStartTime() && $this->isColumnModified(EntryServerNodePeer::STATUS) && $this->getStatus() === EntryServerNodeStatus::AUTHENTICATED)
+			if(!$liveEntry->getCurrentBroadcastStartTime() && $this->isColumnModified(EntryServerNodePeer::STATUS) && $this->getStatus() === EntryServerNodeStatus::AUTHENTICATED && $this->getServerType() === EntryServerNodeType::LIVE_PRIMARY)
 				$liveEntry->setCurrentBroadcastStartTime(time());
 			
 			if(!$liveEntry->save())
