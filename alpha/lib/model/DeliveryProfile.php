@@ -270,27 +270,40 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 	
 	protected function getAudioLanguage($flavor) 
 	{
-		$mediaInfoObj = mediaInfoPeer::retrieveByFlavorAssetId($flavor->getId());
-		if (!$mediaInfoObj) 
-			return null;
-		
-		$contentStreams = $mediaInfoObj->getContentStreams();
-		if (!isset($contentStreams)) 
-			return null;
-		
-		$parsedJson = json_decode($contentStreams,true);
-		if (!isset($parsedJson['audio'][0]['audioLanguage'])) 
-			return null;
-		
-		$audioLanguage = $parsedJson['audio'][0]['audioLanguage'];
-		if (defined('LanguageKey::' . strtoupper($audioLanguage))) {
-			$audioLanguageName = constant('LanguageKey::' . strtoupper($audioLanguage));
+		$lang = $flavor->getLanguage();
+		$obj = null;
+		$audioLanguage = null;
+		$audioLanguageName = null;
+
+		if(!isset($lang)) { //for backward compatibility
+			$mediaInfoObj = mediaInfoPeer::retrieveByFlavorAssetId($flavor->getId());
+			if (!$mediaInfoObj)
+				return null;
+
+			$contentStreams = $mediaInfoObj->getContentStreams();
+			if (!isset($contentStreams))
+				return null;
+
+			$parsedJson = json_decode($contentStreams, true);
+			if (!isset($parsedJson['audio'][0]['audioLanguage']))
+				return null;
+
+			$audioLanguage = $parsedJson['audio'][0]['audioLanguage'];
+			$obj = languageCodeManager::getObjectFromThreeCode(strtolower($audioLanguage));
+
 		}
 		else {
-			$audioLanguageName = "Unknown ($audioLanguage)";
-			KalturaLog::info("Language code [$audioLanguage] was not found. Setting [$audioLanguageName] instead");	                    
+			$obj = languageCodeManager::getObjectFromKalturaName($lang);
+			$audioLanguage = $obj[languageCodeManager::ISO639_T];
 		}
-	    
+
+		if(!is_null($obj))
+			$audioLanguageName = $obj[languageCodeManager::KALTURA_NAME];
+		else {
+			$audioLanguageName = "Undefined";
+			KalturaLog::info("Language code [$audioLanguage] was not found. Setting [$audioLanguageName] instead");
+		}
+
 		return array($audioLanguage, $audioLanguageName);
 	}
 	
