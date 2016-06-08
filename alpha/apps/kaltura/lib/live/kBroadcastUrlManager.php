@@ -137,7 +137,7 @@ class kBroadcastUrlManager
 		$paramsStr = http_build_query($params);
 		
 		$url .= $concatStreamName ? "/" . $entry->getId() . '_%i' : '';
-		return "$url/$streamName?$paramsStr"; 
+		return "$url?$paramsStr"; 
 	}
 	
 }
