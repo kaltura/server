@@ -187,7 +187,13 @@ class StorageProfile extends BaseStorageProfile implements IBaseObject
 		}
 
 		$scope = $this->getScope();
-		$scope->setEntryId($flavorAsset->getEntryId());
+		
+		$scopeEntryId = $flavorAsset->getEntryId();
+		$entry = entryPeer::retrieveByPK($scopeEntryId);
+		if($entry && $entry->getReplacedEntryId())
+			$scopeEntryId = $entry->getReplacedEntryId();
+		
+		$scope->setEntryId($scopeEntryId);
 		if(!$this->fulfillsRules($scope))
 		{
 			KalturaLog::log('Storage profile export rules are not fulfilled');
