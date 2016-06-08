@@ -168,8 +168,9 @@ class asset extends Baseasset implements ISyncableFile, IRelatedObject
 		$this->setFileExt($fromAsset->getFileExt());
 		$this->setTags($fromAsset->getTags());
 		$this->setDescription($fromAsset->getDescription());
-		if(isset($fromAsset->getEncryptionKey()))
-			$this->setEncryptionKey($fromAsset->getEncryptionKey());
+		$encKey = $fromAsset->getEncryptionKey();
+		if(isset($encKey))
+			$this->setEncryptionKey($encKey);
 		$this->incrementVersion();
 		$this->setStatusLocalReady();		
 	}
