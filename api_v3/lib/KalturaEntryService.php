@@ -1264,11 +1264,8 @@ class KalturaEntryService extends KalturaBaseService
 			$dbEntry->setCreatorKuserId($this->getKuser()->getId());
 			$dbEntry->setCreatorPuserId($this->getKuser()->getPuserId());
 			
-			if(!$dbEntry->getKuserId())
-			{
-				$dbEntry->setPuserId($this->getKuser()->getPuserId());
-				$dbEntry->setKuserId($this->getKuser()->getId());
-			}
+			$dbEntry->setPuserId($this->getKuser()->getPuserId());
+			$dbEntry->setKuserId($this->getKuser()->getId());
 			return;
 		}
 		
