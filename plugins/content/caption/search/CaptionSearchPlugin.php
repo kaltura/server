@@ -5,6 +5,7 @@
  */
 class CaptionSearchPlugin extends KalturaPlugin implements IKalturaPending, IKalturaPermissions, IKalturaServices, IKalturaEventConsumers, IKalturaEnumerator, IKalturaObjectLoader, IKalturaSearchDataContributor
 {
+	const MAX_CAPTION_FILE_SIZE_FOR_INDEXING = 900000; // limit the size of text which can indexed, the mysql packet size is limited by default to 1M anyway
 	const PLUGIN_NAME = 'captionSearch';
 	const INDEX_NAME = 'caption_item';
 	const SEARCH_FIELD_DATA = 'data';
@@ -128,7 +129,7 @@ class CaptionSearchPlugin extends KalturaPlugin implements IKalturaPending, IKal
 			/* @var $captionAsset CaptionAsset */
 			
 			$syncKey = $captionAsset->getSyncKey(asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-			$content = kFileSyncUtils::file_get_contents($syncKey, true, false);
+			$content = kFileSyncUtils::file_get_contents($syncKey, true, false, self::MAX_CAPTION_FILE_SIZE_FOR_INDEXING);
 			if(!$content)
 				continue;
 				
