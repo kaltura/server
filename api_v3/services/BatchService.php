@@ -572,17 +572,22 @@ class BatchService extends KalturaBatchService
 	function checkEntryIsDoneAction($batchJobId)
 	{
 		$ret_val = false;
+		
 		$dbBatchJob = BatchJobPeer::retrieveByPK($batchJobId);
-
 		if (!$dbBatchJob)
 		{
 			throw new KalturaAPIException(KalturaErrors::INVALID_BATCHJOB_ID, $batchJobId);
 		}
+		
 		$entry = $dbBatchJob->getEntry();
 		if (!$entry)
 		{
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $dbBatchJob->getEntryId());
 		}
+		
+		if($entry->getStatus() === entryStatus::READY)
+			return true;
+		
 		if ($entry->getStatus() == entryStatus::PRECONVERT)
 		{
 			$flavorAssets = assetPeer::retrieveReadyFlavorsByEntryId($entry->getId());
@@ -597,6 +602,7 @@ class BatchService extends KalturaBatchService
 				$ret_val = true;
 			}
 		}
+		
 		return $ret_val;
 	}
 
