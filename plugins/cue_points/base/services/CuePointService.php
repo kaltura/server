@@ -207,7 +207,7 @@ class CuePointService extends KalturaBaseService
 			
 		$ret = $filter->getTypeListResponse($pager, $this->getResponseProfile(), $this->getCuePointType());
 
-		self::updateUserContentOnlyStateIfNeeded(null);
+		self::updateUserContentOnlyStateIfNeeded();
 		return $ret;
 	}
 
@@ -363,17 +363,21 @@ class CuePointService extends KalturaBaseService
 	 * @param string $entryId
 	 */
 	private function updateUserContentOnlyStateIfNeeded($entryId = null){
-		// when session is not admin, allow access to user entries only
-		if ((empty($entryId) && (!$this->getKs() || !$this->getKs()->isAdmin())) ||
-			(!empty($entryId) && (!$this->getKs() || !$this->getKs()->verifyPrivileges(ks::PRIVILEGE_LIST, $entryId))))
-		{
-			KalturaCriterion::enableTag(KalturaCriterion::TAG_USER_SESSION);
-			CuePointPeer::setUserContentOnly(true);
-		}
-		else
+
+		$hasKs = $this->getKs();
+		$isAdminKs = $hasKs && $hasKs->isAdmin();
+		$hasEntryId = !empty($entryId);
+		$hasListPrivilegesForEntry = $hasKs && $hasEntryId && $hasKs->getPrivilegeValue(ks::PRIVILEGE_LIST) === $entryId;
+
+		if ($isAdminKs || $hasListPrivilegesForEntry)
 		{
 			KalturaCriterion::disableTag(KalturaCriterion::TAG_USER_SESSION);
 			CuePointPeer::setUserContentOnly(false);
+		}
+		else
+		{
+			KalturaCriterion::enableTag(KalturaCriterion::TAG_USER_SESSION);
+			CuePointPeer::setUserContentOnly(true);
 		}
 	}
 }
