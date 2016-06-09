@@ -473,6 +473,9 @@ class KalturaFrontController
 				case kCoreException::ID_NOT_FOUND:
 					$object = new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $ex->getData());
 					break;
+				case kCoreException::FILE_PENDING:
+					$object = new KalturaAPIException(KalturaErrors::FILE_PENDING);
+					break;
 						
 				default:
 					KalturaLog::crit($ex);
