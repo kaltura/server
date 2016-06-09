@@ -321,6 +321,8 @@ class KDLWrap
 				$flavor->setAspectRatioProcessingMode($target->_video->_arProcessingMode);
 			if($target->_video->_forceMult16)
 				$flavor->setForceFrameToMultiplication16($target->_video->_forceMult16);
+			if(isset($target->_video->_contentAwareness))
+			 	$flavor->setContentAwareness($target->_video->_contentAwareness);
 			/*
 			 * Watermark
 			 */
@@ -329,7 +331,7 @@ class KDLWrap
 				$toJson = json_encode($target->_video->_watermarkData);
 				$flavor->setWatermarkData($toJson);
 			}
-			
+				
 			/*
 			 * Subtitled
 			 */
@@ -477,6 +479,7 @@ class KDLWrap
 				$kdlFlavor->_video->_maxFrameRate = $cdlFlavor->getMaxFrameRate();
 				$kdlFlavor->_video->_isForcedKeyFrames = !$cdlFlavor->getIsAvoidForcedKeyFrames();
 				$kdlFlavor->_video->_isCropIMX = $cdlFlavor->getIsCropIMX();
+				$kdlFlavor->_video->_contentAwareness = $cdlFlavor->getContentAwareness();
 					/*
 					 * Due to multiple WM support,
 					 * the single WM settings is turned into array as well
@@ -644,6 +647,7 @@ class KDLWrap
 		$medSet->_video->_dar = $cdlMediaInfo->getVideoDar();
 		$medSet->_video->_rotation = $cdlMediaInfo->getVideoRotation();
 		$medSet->_video->_scanType = $cdlMediaInfo->getScanType();
+		$medSet->_video->_complexityValue = $cdlMediaInfo->getComplexityValue();
 /*		{
 				$medLoader = new KDLMediaInfoLoader($cdlMediaInfo->getRawData());
 				$md = new KDLMediadataset();
@@ -704,7 +708,7 @@ class KDLWrap
 		 */
 		$assetBr = max($contBr,$vidBr+$audBr);
 		$fla->setBitrate($assetBr);
-
+		
 		/*
 		 * Set flavorAsset language to mediaInfo first audio language
 		 */
@@ -713,7 +717,7 @@ class KDLWrap
 			KalturaLog::log("Flavor asset(".$fla->getId().") language updated to ($lang)");
 			$fla->setLanguage($lang);
 		}
-		
+
 		KalturaLog::log("CDL fl.Asset==>\n".print_r($fla,true));
 		return $fla;
 	}
