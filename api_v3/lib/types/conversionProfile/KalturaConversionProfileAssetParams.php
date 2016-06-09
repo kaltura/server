@@ -65,6 +65,16 @@ class KalturaConversionProfileAssetParams extends KalturaObject implements IRela
 	 */
 	public $isEncrypted;
 
+	/**
+	 * @var float
+	 */
+	public $contentAwareness;
+	
+	/**
+	 * @var KalturaNullableBoolean
+	 */
+	public $twoPass;
+
 	private static $map_between_objects = array
 	(
 		'conversionProfileId',
@@ -75,6 +85,8 @@ class KalturaConversionProfileAssetParams extends KalturaObject implements IRela
 		'forceNoneComplied',
 		'deletePolicy',
 		'isEncrypted',
+		'contentAwareness',
+		'twoPass',
 	);
 	
 	/* (non-PHPdoc)
