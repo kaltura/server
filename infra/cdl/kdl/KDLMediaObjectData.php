@@ -223,6 +223,8 @@
 		public $_maxFrameRate=0;
 		public $_watermarkData;
 		public $_subtitlesData = null;
+		public $_complexityValue = null;
+		public $_contentAwareness = null;
 		
 		public function GetSectionEnum() { return KDLConstants::VideoIndex; }
 		
