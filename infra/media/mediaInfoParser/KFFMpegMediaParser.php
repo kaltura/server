@@ -14,10 +14,27 @@ class KFFMpegMediaParser extends KBaseMediaParser
 	 * @param string $filePath
 	 * @param string $cmdPath
 	 */
-	public function __construct($filePath, $cmdPath="ffmpeg", $ffprobeBin="ffprobe")
+	public function __construct($filePath, $ffmpegBin=null, $ffprobeBin=null)
 	{
-		$this->cmdPath = $cmdPath;
-		$this->ffprobeBin = $ffprobeBin;
+		if(isset($ffmpegBin)){
+			$this->cmdPath = $ffmpegBin;
+		}
+		else if(kConf::hasParam('bin_path_ffmpeg')) {
+			$this->cmdPath = kConf::get('bin_path_ffmpeg');
+		}
+		else{
+			$this->cmdPath = "ffmpeg";
+		}
+		
+		if(isset($ffprobeBin)){
+			$this->ffprobeBin = $ffprobeBin;
+		}
+		else if (kConf::hasParam('bin_path_ffprobe')) {
+			$this->ffprobeBin = kConf::get('bin_path_ffprobe');
+		}
+		else{
+			$this->ffprobeBin = "ffprobe";
+		}
 		parent::__construct($filePath);
 	}
 	
