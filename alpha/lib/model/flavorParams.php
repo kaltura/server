@@ -165,4 +165,7 @@ class flavorParams extends assetParams
 	public function setIsEncrypted($v){ $this->putInCustomData('IsEncrypted', $v);}
 	public function getIsEncrypted(){return $this->getFromCustomData('IsEncrypted', null, 0);}
 
+	public function setContentAwareness($v){ $this->putInCustomData('ContentAwareness', $v);}
+	public function getContentAwareness(){return $this->getFromCustomData('ContentAwareness', null, null);}
+
 }

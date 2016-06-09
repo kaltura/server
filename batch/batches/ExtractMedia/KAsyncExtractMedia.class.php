@@ -95,13 +95,34 @@ class KAsyncExtractMedia extends KJobHandlerWorker
 		{
 			return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::EXTRACT_MEDIA_FAILED, "Failed to extract media info: $mediaFile", KalturaBatchJobStatus::RETRY);
 		}
-		
+		/*
+		 * Calculate media file 'complexity'
+		 */
+		if(isset(self::$taskConfig->params->localTempPath) && file_exists(self::$taskConfig->params->localTempPath)){
+			$ffmpegBin = isset(self::$taskConfig->params->ffmpegCmd)? self::$taskConfig->params->ffmpegCmd: null;
+			$ffprobeBin = isset(self::$taskConfig->params->ffprobeCmd)? self::$taskConfig->params->ffprobeCmd: null;
+			$mediaInfoBin = isset(self::$taskConfig->params->mediaInfoCmd)? self::$taskConfig->params->mediaInfoCmd: null;
+			$calcComplexity = new KMediaFileComplexity($ffmpegBin, $ffprobeBin, $mediaInfoBin);
+			
+			$baseOutputName = tempnam(self::$taskConfig->params->localTempPath, "/complexitySampled_".pathinfo($mediaFile, PATHINFO_FILENAME)).".mp4";
+			$stat = $calcComplexity->EvaluateSampled($mediaFile, $mediaInfo, $baseOutputName);
+			if(isset($stat->complexityValue)){
+				KalturaLog::log("Complexity: value($stat->complexityValue)");
+				if(isset($stat->y))
+					KalturaLog::log("Complexity: y($stat->y)");
+				$mediaInfo->complexityValue = $stat->complexityValue;
+			}
+		}
+
+		KalturaLog::debug("flavorAssetId [$data->flavorAssetId]");
 		$mediaInfo->flavorAssetId = $data->flavorAssetId;
 		$mediaInfo = $this->getClient()->batch->addMediaInfo($mediaInfo);
 		$data->mediaInfoId = $mediaInfo->id;
-		
+
 		$this->updateJob($job, "Saving media info id $mediaInfo->id", KalturaBatchJobStatus::PROCESSED, $data);
 		$this->closeJob($job, null, null, null, KalturaBatchJobStatus::FINISHED);
+
 		return $job;
 	}
 }
+

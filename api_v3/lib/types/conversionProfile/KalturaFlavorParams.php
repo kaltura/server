@@ -217,6 +217,11 @@ class KalturaFlavorParams extends KalturaAssetParams
 	public $isEncrypted;
 	
 	/**
+	 * @var float
+	 */
+	public $contentAwareness;
+	
+	/**
 	 * @var int
 	 */
 	public $clipOffset;
@@ -263,6 +268,7 @@ class KalturaFlavorParams extends KalturaAssetParams
 		"watermarkData",
 		"subtitlesData",
 		"isEncrypted",
+		"contentAwareness",
 		"clipOffset",
 		"clipDuration",
 	);

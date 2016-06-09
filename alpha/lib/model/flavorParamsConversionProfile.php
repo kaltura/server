@@ -61,7 +61,14 @@ class flavorParamsConversionProfile extends BaseflavorParamsConversionProfile
 			$conversionProfile->save();
 		}
 	}
+	
 	public function setIsEncrypted($v)	{$this->putInCustomData('IsEncrypted', $v);}
 	public function getIsEncrypted()	{return $this->getFromCustomData('IsEncrypted', null, null);}
+
+	public function setContentAwareness($v) {$this->putInCustomData('ContentAwareness', $v);}
+	public function getContentAwareness()	{return $this->getFromCustomData('ContentAwareness', null, null);}
+
+	public function setTwoPass($v)		{$this->putInCustomData('TwoPass', $v);}
+	public function getTwoPass()		{return $this->getFromCustomData('TwoPass', null, null);}
 
 }

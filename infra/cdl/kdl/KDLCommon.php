@@ -46,7 +46,7 @@
 		static $BitrateFactorCategory4 = array("g2m3", "g2m4", "gotomeeting3", "gotomeeting4", "gotomeeting", 
 												"tsc2", "tscc", "techsmith", "mss1", "mss2");
 		
-		public static function NormalizeSourceToTarget($sourceCodec, $sourceBitrate, $targetCodec)
+		public static function NormalizeSourceToTarget($sourceCodec, $sourceBitrate, $targetCodec, $transcodingFactor=self::TranscodingFactor)
 		{
 			$ratioTrg = self::BitrateVP6Factor;
 			if(in_array($targetCodec, self::$BitrateFactorCategory1))
@@ -66,7 +66,7 @@
 			else if(in_array($sourceCodec, self::$BitrateFactorCategory4))
 				$ratioSrc = self::BitrateScreencastFactor;
 	
-			$brSrcNorm = $sourceBitrate*($ratioSrc/$ratioTrg)*self::TranscodingFactor;
+			$brSrcNorm = $sourceBitrate*($ratioSrc/$ratioTrg)*$transcodingFactor;
 			return round($brSrcNorm, 0);								   		}
 		}
 	
