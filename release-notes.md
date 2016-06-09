@@ -10,7 +10,8 @@ None.
  
 ### Deployment scripts ###
 
-(run twice - note the two partner ids)
+run twice - note the two partner ids:
+
 	php /opt/kaltura/app/tests/standAloneClient/exec.php /opt/kaltura/app/tests/standAloneClient/scheduledTaskProfiles/deleteSourceFlavorsOfReadyEntries.xml
 	Input: 
 	- partner ID - 1955031,1956791
