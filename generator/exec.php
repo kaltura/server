@@ -39,12 +39,34 @@
  * 			either create a Nullable Boolean type, or keep a map of changed parameters, then only send the variables in that map.
  */
 error_reporting(E_ALL);
+date_default_timezone_set('America/New_York');
 //the name of the output folder for the generators -
+chdir(__DIR__);
+set_include_path(get_include_path() . PATH_SEPARATOR . __DIR__ . '/lib/infra');
 
-set_include_path(get_include_path() . PATH_SEPARATOR . realpath(__DIR__ . '/../infra'));
+require_once(__DIR__ . "/lib/infra/Zend/Config/Ini.php");
+require_once(__DIR__ . "/lib/infra/KalturaLog.php");
 
-//bootstrap connects the generator to the rest of Kaltura system
-require_once(dirname(__FILE__) . "/../bootstrap.php");
+require_once(__DIR__ . "/lib/ClientGeneratorFromXml.php");
+require_once(__DIR__ . "/lib/JavaClientGenerator.php");
+require_once(__DIR__ . "/lib/AndroidClientGenerator.php");
+require_once(__DIR__ . "/lib/BpmnClientGenerator.php");
+require_once(__DIR__ . "/lib/CliClientGenerator.php");
+require_once(__DIR__ . "/lib/CSharpClientGenerator.php");
+require_once(__DIR__ . "/lib/ErlangClientGenerator.php");
+require_once(__DIR__ . "/lib/JsClientGenerator.php");
+require_once(__DIR__ . "/lib/NodeClientGenerator.php");
+require_once(__DIR__ . "/lib/ObjCClientGenerator.php");
+require_once(__DIR__ . "/lib/Php4ClientGenerator.php");
+require_once(__DIR__ . "/lib/Php53ClientGenerator.php");
+require_once(__DIR__ . "/lib/Php5ClientGenerator.php");
+require_once(__DIR__ . "/lib/PhpZendClientGenerator.php");
+require_once(__DIR__ . "/lib/PojoClientGenerator.php");
+require_once(__DIR__ . "/lib/PythonClientGenerator.php");
+require_once(__DIR__ . "/lib/RubyClientGenerator.php");
+require_once(__DIR__ . "/lib/TestmeDocGenerator.php");
+require_once(__DIR__ . "/lib/TestmeGenerator.php");
+require_once(__DIR__ . "/lib/Xml2As3ClientGenerator.php");
 
 //the name of the summary file that will be used by the UI -
 $summaryFileName = 'summary.kinf';
@@ -121,7 +143,7 @@ if(!file_exists($schemaXmlPath))
 	die("XML file [$schemaXmlPath] not found\n");
 
 //pull the generator config ini
-$config = new Zend_Config_Ini(__DIR__ . '/../config/generator.ini', null, array('allowModifications' => true));
+$config = new Zend_Config_Ini(__DIR__ . '/config/generator.ini', null, array('allowModifications' => true));
 
 $libsToGenerate = null;
 if (strtolower($generateSingle) == 'all')
@@ -130,7 +152,7 @@ if (strtolower($generateSingle) == 'all')
 }
 elseif(!$generateSingle)
 {
-	$libsToGenerate = file(__DIR__ . '/../config/generator.defaults.ini');
+	$libsToGenerate = file(__DIR__ . '/config/generator.defaults.ini');
 	foreach($libsToGenerate as $key => &$default)
 		$default = strtolower(trim($default, " \t\r\n"));
 }

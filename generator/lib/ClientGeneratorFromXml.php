@@ -78,11 +78,11 @@ abstract class ClientGeneratorFromXml
 		if($singleLineCommentMarker === null)
 			$singleLineCommentMarker = '';
 		
-		$this->_licenseBuffer = file_get_contents(dirname(__FILE__).'/sources/license.txt');
+		$this->_licenseBuffer = file_get_contents(__DIR__ . '/../sources/license.txt');
 		$this->_licenseBuffer = str_replace('//', $this->getSingleLineCommentMarker(), $this->_licenseBuffer);
 		$this->_licenseBuffer = str_replace("\r\n", "\n", $this->_licenseBuffer);
 		
-		$this->addFile('agpl.txt', file_get_contents(dirname(__FILE__).'/sources/agpl.txt'), false);
+		$this->addFile('agpl.txt', file_get_contents(__DIR__ . '/../sources/agpl.txt'), false);
 	}
 	
 	protected function shouldIncludeType($type)
