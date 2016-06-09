@@ -39,7 +39,7 @@ class CuePointService extends KalturaBaseService
 			$this->applyPartnerFilterForClass('CuePoint');
 		}
 
-		self::updateUserContentOnlyStateIfNeeded();
+		self::setEntryListPermissions();
 		
 		if (!$this->getKs() || $this->getKs()->isAnonymousSession())
 		{
@@ -194,7 +194,7 @@ class CuePointService extends KalturaBaseService
 	 */
 	function listAction(KalturaCuePointFilter $filter = null, KalturaFilterPager $pager = null)
 	{
-		self::updateUserContentOnlyStateIfNeeded($filter->entryIdEqual);
+		self::setEntryListPermissions($filter->entryIdEqual);
 
 		if (!$pager)
 		{
@@ -207,7 +207,7 @@ class CuePointService extends KalturaBaseService
 			
 		$ret = $filter->getTypeListResponse($pager, $this->getResponseProfile(), $this->getCuePointType());
 
-		self::updateUserContentOnlyStateIfNeeded();
+		self::setEntryListPermissions();
 		return $ret;
 	}
 
@@ -223,7 +223,7 @@ class CuePointService extends KalturaBaseService
 		if (!$filter)
 			$filter = new KalturaCuePointFilter();
 
-		self::updateUserContentOnlyStateIfNeeded($filter->entryIdEqual);
+		self::setEntryListPermissions($filter->entryIdEqual);
 
 		$c = KalturaCriteria::create(CuePointPeer::OM_CLASS);
 		if($this->getCuePointType())
@@ -235,7 +235,7 @@ class CuePointService extends KalturaBaseService
 		$c->applyFilters();
 		$count = $c->getRecordsCount();
 
-		self::updateUserContentOnlyStateIfNeeded();
+		self::setEntryListPermissions();
 		return $count;
 	}
 	
@@ -362,14 +362,19 @@ class CuePointService extends KalturaBaseService
 	 *
 	 * @param string $entryId
 	 */
-	private function updateUserContentOnlyStateIfNeeded($entryId = null){
-
+	private function setEntryListPermissions($entryId = null)
+	{
 		$hasKs = $this->getKs();
 		$isAdminKs = $hasKs && $hasKs->isAdmin();
+		if ($isAdminKs)
+		{
+			return;
+		}
+
 		$hasEntryId = !empty($entryId);
 		$hasListPrivilegesForEntry = $hasKs && $hasEntryId && $hasKs->getPrivilegeValue(ks::PRIVILEGE_LIST) === $entryId;
 
-		if ($isAdminKs || $hasListPrivilegesForEntry)
+		if ($hasListPrivilegesForEntry)
 		{
 			KalturaCriterion::disableTag(KalturaCriterion::TAG_USER_SESSION);
 			CuePointPeer::setUserContentOnly(false);
