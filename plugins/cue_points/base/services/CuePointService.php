@@ -371,10 +371,7 @@ class CuePointService extends KalturaBaseService
 			return;
 		}
 
-		$hasEntryId = !empty($entryId);
-		$hasListPrivilegesForEntry = $hasKs && $hasEntryId && $hasKs->getPrivilegeValue(ks::PRIVILEGE_LIST) === $entryId;
-
-		if ($hasListPrivilegesForEntry)
+		if ($hasKs && $entryId && ($hasKs->getPrivilegeValue(ks::PRIVILEGE_LIST) === $entryId || $hasKs->getPrivilegeValue(ks::PRIVILEGE_LIST) === ks::PATTERN_WILDCARD))
 		{
 			KalturaCriterion::disableTag(KalturaCriterion::TAG_USER_SESSION);
 			CuePointPeer::setUserContentOnly(false);
