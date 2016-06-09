@@ -34,11 +34,6 @@ class kIndexAdvancedFilter extends AdvancedSearchFilterItem
 		elseif($query instanceof Criteria)
 		{
 			$query->add('id', $this->indexIdGreaterThan, Criteria::GREATER_THAN);
-			if(!is_null($this->depthGreaterThanEqual))
-			{
-				$query->add('depth', $this->depthGreaterThanEqual, Criteria::EQUAL);
-				$query->addOr('depth',$this->depthGreaterThanEqual,Criteria::GREATER_THAN);
-			}
 		}
 	}
 	
