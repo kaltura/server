@@ -205,6 +205,8 @@ type												= KAsyncExtractMedia
 scriptPath											= batches/ExtractMedia/KAsyncExtractMediaExe.php
 params.mediaInfoCmd									= @BIN_DIR@/mediainfo
 params.ffprobeCmd									= @BIN_DIR@/ffprobe
+;The path for local temporary generated product
+params.localTempPath 									= @TMP_DIR@/convert
 
 [KAsyncConvertWorker : JobHandlerWorker]
 type												= KAsyncConvert
