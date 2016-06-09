@@ -114,6 +114,41 @@ class kBroadcastUrlManager
 		return $port;
 	}
 	
+	protected function getQueryParams(LiveStreamEntry $entry, $mediaServerIndex)
+	{
+		$broadcastConfig = $this->getConfiguration(kDataCenterMgr::getCurrentDcId());
+		$queryParamsConfig =  $broadcastConfig['queryParams'] ? $broadcastConfig['queryParams'] : "";
+		$queryParamsConfig = explode('.', $queryParamsConfig);
+		
+		$params = array();
+		foreach ($queryParamsConfig as $queryParam)
+		{
+			switch($queryParam)
+			{
+				case "{p}":
+					$params['p'] = $this->partnerId;
+					break;
+				
+				case "{i}":
+					$params['i'] = $mediaServerIndex;
+					break;
+				
+				case "{e}":
+					$params['e'] = $entry->getId();
+					break;
+					
+				case "{t}":
+					$params['t'] = $entry->getStreamPassword();
+					break;
+			}
+		}
+		
+		if(PermissionPeer::isValidForPartner("FEATURE_HYBRID_ECDN", $entry->getPartnerId()))
+			$params = array_merge($params, array('p' => $this->partnerId, 'e' => $entry->getId(), 'i' => $mediaServerIndex));
+				
+		return http_build_query(array_unique($params));
+	}
+	
 	protected function getBroadcastUrl(LiveStreamEntry $entry, $protocol, $hostname, $mediaServerIndex, $concatStreamName = false)
 	{
 		if (!$hostname)
@@ -122,21 +157,9 @@ class kBroadcastUrlManager
 		}
 		
 		$url = "$protocol://$hostname";
-		
-		$params = array();
-		//Support eCDN partner using old live servers that mush recieve additional info to operate
-		if(PermissionPeer::isValidForPartner("FEATURE_HYBRID_ECDN", $entry->getPartnerId()))
-		{
-			$params = array(
-					'p' => $this->partnerId,
-					'e' => $entry->getId(),
-					'i' => $mediaServerIndex,
-			);
-		}
-		$params = array_merge($params, array('t' => $entry->getStreamPassword()));
-		$paramsStr = http_build_query($params);
-		
 		$url .= $concatStreamName ? "/" . $entry->getId() . '_%i' : '';
+		$paramsStr = $this->getQueryParams($entry, $mediaServerIndex);
+		
 		return "$url?$paramsStr"; 
 	}
 	
