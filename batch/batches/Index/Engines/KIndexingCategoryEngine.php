@@ -43,9 +43,12 @@ class KIndexingCategoryEngine extends KIndexingEngine
 		$lastIndexId = end($results);
 		$this->setLastIndexId($lastIndexId);
 
-		$lastIndexDepth = KBatchBase::$kClient->category->get($lastIndexId)->depth;
-		$this->setLastIndexDepth($lastIndexDepth);
-		
+		foreach ($categoriesList->objects as $category)
+		{
+			if($category->id == $lastIndexId)
+				$this->setLastIndexDepth($category->depth);
+		}
+
 		return count($results);
 	}
 }
