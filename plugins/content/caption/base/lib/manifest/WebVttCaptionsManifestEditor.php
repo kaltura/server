@@ -44,9 +44,12 @@ class WebVttCaptionsManifestEditor extends BaseManifestEditor
 		{
 			foreach ($manifestFlavors as &$flavor)
 			{
-				$flavorParts = explode("\n", $flavor);
-				$flavorParts[0] .= ',SUBTITLES="subs"';
-				$flavor = implode("\n", $flavorParts);
+				if(!empty($flavor))
+				{
+					$flavorParts = explode("\n", $flavor);
+					$flavorParts[0] .= ',SUBTITLES="subs"';
+					$flavor = implode("\n", $flavorParts);
+				}
 			}
 		}
 		
