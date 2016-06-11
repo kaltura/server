@@ -118,9 +118,9 @@
 							
 					?>
 					<td><?php echo $entry->id; ?></td>
-					<td><?php echo $entry->name; ?></td>
+					<td><?php echo htmlentities($entry->name); ?></td>
 					<td><?php echo $entry->partnerId; ?></td>
-					<td><?php echo $entry->tags; ?></td>
+					<td><?php echo htmlentities($entry->tags); ?></td>
 					<td><?php echo $entry->adminTags; ?></td>
 					<td><?php echo $status; ?></td>
 					<td><?php echo $this->enumTranslate('Kaltura_Client_Enum_EntryType', $entry->type); ?></td>
