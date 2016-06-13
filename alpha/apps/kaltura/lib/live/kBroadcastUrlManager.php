@@ -114,6 +114,51 @@ class kBroadcastUrlManager
 		return $port;
 	}
 	
+	protected function getExtraQueryParamsConfig(LiveStreamEntry $entry, $mediaServerIndex)
+	{
+		$extraQueryPrams = array();
+		$broadcastConfig = $this->getConfiguration(kDataCenterMgr::getCurrentDcId());
+		$extarQueryParamsConfig =  $broadcastConfig['queryParams'] ? $broadcastConfig['queryParams'] : "";
+		$extarQueryParamsConfigArr = explode('.', $extarQueryParamsConfig);
+		
+		//Support none SaaS envioremnts
+		foreach ($extarQueryParamsConfigArr as $extarQueryParamsConfig)
+		{
+			switch($extarQueryParamsConfig)
+			{
+				case "{p}":
+					$extraQueryPrams['p'] = $this->partnerId;
+					break;
+		
+				case "{i}":
+					$extraQueryPrams['i'] = $mediaServerIndex;
+					break;
+		
+				case "{e}":
+					$extraQueryPrams['e'] = $entry->getId();
+					break;
+			}
+		}
+		
+		return $extraQueryPrams;
+	}
+	
+	protected function getQueryParams(LiveStreamEntry $entry, $mediaServerIndex)
+	{
+		$queryParams = array('t' => $entry->getStreamPassword());
+		
+		//Support eCDN partner using old mediaServers that must recieve additional info to operate
+		if(PermissionPeer::isValidForPartner("FEATURE_HYBRID_ECDN", $entry->getPartnerId()))
+		{
+			$queryParams = array_merge(array('p' => $this->partnerId, 'e' => $entry->getId(), 'i' => $mediaServerIndex), $queryParams);
+			return http_build_query($queryParams);
+		}
+		
+		$extraQueryPrams = $this->getExtraQueryParamsConfig($entry, $mediaServerIndex);
+		$queryParams = array_merge($extraQueryPrams, $queryParams);	
+		return http_build_query($params);
+	}
+	
 	protected function getBroadcastUrl(LiveStreamEntry $entry, $protocol, $hostname, $mediaServerIndex, $concatStreamName = false)
 	{
 		if (!$hostname)
@@ -122,21 +167,9 @@ class kBroadcastUrlManager
 		}
 		
 		$url = "$protocol://$hostname";
-		
-		$params = array();
-		//Support eCDN partner using old live servers that mush recieve additional info to operate
-		if(PermissionPeer::isValidForPartner("FEATURE_HYBRID_ECDN", $entry->getPartnerId()))
-		{
-			$params = array(
-					'p' => $this->partnerId,
-					'e' => $entry->getId(),
-					'i' => $mediaServerIndex,
-			);
-		}
-		$params = array_merge($params, array('t' => $entry->getStreamPassword()));
-		$paramsStr = http_build_query($params);
-		
 		$url .= $concatStreamName ? "/" . $entry->getId() . '_%i' : '';
+		$paramsStr = $this->getQueryParams($entry, $mediaServerIndex);
+		
 		return "$url?$paramsStr"; 
 	}
 	
