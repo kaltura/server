@@ -32,9 +32,9 @@
 		 * @param unknown_type $mediaInfoBin
 		 */
 		public function __construct($ffmpegBin="ffmpeg", $ffprobeBin="ffprobe", $mediaInfoBin="mediainfo") {
-			$this->ffmpegBin = $ffmpegBin;
-			$this->ffprobeBin = $ffprobeBin;
-			$this->mediaInfoBin = $mediaInfoBin;
+			$this->ffmpegBin = isset($ffmpegBin)? $ffmpegBin: "ffmpeg";
+			$this->ffprobeBin = isset($ffprobeBin)? $ffprobeBin: "ffprobe";
+			$this->mediaInfoBin = isset($mediaInfoBin)? $mediaInfoBin: "mediaInfo";
 		}
 
 		const DEFAULT_SAMPLING_POINTS_NUM = 20;
