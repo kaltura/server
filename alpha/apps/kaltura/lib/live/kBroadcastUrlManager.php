@@ -170,7 +170,7 @@ class kBroadcastUrlManager
 		$url .= $concatStreamName ? "/" . $entry->getId() . '_%i' : '';
 		$paramsStr = $this->getQueryParams($entry, $mediaServerIndex);
 		
-		return "$url?$paramsStr"; 
+		return "$url/?$paramsStr"; 
 	}
 	
 }
