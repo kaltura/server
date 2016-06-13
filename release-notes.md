@@ -56,6 +56,22 @@ IP, userId and password (of your admin-console account), partner (insert -2 for 
 
 None.
 
+## Content Aware Encoding  ##
+
+- Issue Type: Feature
+- Issue ID: PLAT-5640
+
+### Configuration ###
+[KAsyncExtractMedia : JobHandlerWorker]
+.
+.
+params.localTempPath = @TMP_DIR@/convert
+
+#### Known Issues & Limitations ####
+
+None.
+
+
 # Kajam 11.16.0 #
 
 ## entryServerNode validate registered serverNodes ##
