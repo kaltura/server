@@ -1,5 +1,27 @@
 # Kajam 11.17.0 #
 
+## Support configuring live brodcast url queryParams ##
+
+- Issue Type: Story
+- Issue ID: PLAT-5643
+
+### Configuration ###
+- update brodcast.ini:
+	
+		Add the following to each DC configuration, If you SaaS like DNS resolver:
+		- queryParams = {t}
+		
+		otherwise add:
+		- queryParams = {p}.{e}.{i}.{t}
+
+#### Deployment Scripts ####
+
+None.
+		
+#### Known Issues & Limitations ####
+
+None.
+
 ## Thumb Asset export ##
 
 - Issue Type: Story
