@@ -27,9 +27,7 @@ class kHtmlPurifier
 		$modifiedValue = $tokenMapper->unTokenize($purifiedValue);
 
 		if (kCurrentContext::$HTMLPurifierBehaviour == HTMLPurifierBehaviourType::SANITIZE)
-		{
 			return $modifiedValue;
-		}
 
 		if ( $modifiedValue != $value )
 		{

@@ -909,8 +909,6 @@ abstract class KalturaObject implements IApiObject
 		if (!isset(kCurrentContext::$HTMLPurifierBehaviour) || kCurrentContext::$HTMLPurifierBehaviour == HTMLPurifierBehaviourType::IGNORE)
 			$this->purifyHtml = false;
 		else
-		{
 			$this->purifyHtml = true;
-		}
 	}
 }

@@ -149,8 +149,7 @@ abstract class KalturaBaseService
 		
 		$this->setPartnerFilters($partnerId);
 		
-		$partner = $this->getPartner();
-		kCurrentContext::$HTMLPurifierBehaviour = $partner->getHtmlPurifierBehaviour();
+		kCurrentContext::$HTMLPurifierBehaviour = $this->getPartner()->getHtmlPurifierBehaviour();
 	}
 
 	/**
