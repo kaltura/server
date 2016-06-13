@@ -1,5 +1,30 @@
 # Kajam 11.17.0 #
 
+## New scheduled task profile - removing all source assets for ready entries##
+
+ - Issue Type: New Feature
+ - Issue ID: PLAT-5565
+
+### Configuration ###
+None.
+ 
+### Deployment scripts ###
+
+run twice - note the two partner ids:
+
+	php /opt/kaltura/app/tests/standAloneClient/exec.php /opt/kaltura/app/tests/standAloneClient/scheduledTaskProfiles/deleteSourceFlavorsOfReadyEntries.xml
+	Input: 
+	- partner ID - 1955031,1956791
+	- Max total count allowed per execution: 500
+	- Host name: www.kaltura.com
+	- Partner email address: admin console admin user
+	- Partner password: user's password
+	- Partner ID: -2
+
+#### Known Issues & Limitations ####
+
+None.
+
 ## Thumb Asset export ##
 
 - Issue Type: Story
