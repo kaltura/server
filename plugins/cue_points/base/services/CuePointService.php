@@ -365,11 +365,8 @@ class CuePointService extends KalturaBaseService
 	private function setEntryListPermissions($entryId = null)
 	{
 		$hasKs = $this->getKs();
-		$isAdminKs = $hasKs && $hasKs->isAdmin();
-		if ($isAdminKs)
-		{
+		if ($hasKs && $hasKs->isAdmin())
 			return;
-		}
 
 		if ($hasKs && $entryId && ($hasKs->getPrivilegeValue(ks::PRIVILEGE_LIST) === $entryId || $hasKs->getPrivilegeValue(ks::PRIVILEGE_LIST) === ks::PATTERN_WILDCARD))
 		{
