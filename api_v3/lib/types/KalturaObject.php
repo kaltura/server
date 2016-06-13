@@ -906,7 +906,7 @@ abstract class KalturaObject implements IApiObject
 
 	protected function enablePurify()
 	{
-		if (!isset(KalturaBaseService::$HTMLPurifierBehaviour) || KalturaBaseService::$HTMLPurifierBehaviour == HTMLPurifierBehaviourType::IGNORE)
+		if (!isset(kCurrentContext::$HTMLPurifierBehaviour) || kCurrentContext::$HTMLPurifierBehaviour == HTMLPurifierBehaviourType::IGNORE)
 			$this->purifyHtml = false;
 		else
 		{
