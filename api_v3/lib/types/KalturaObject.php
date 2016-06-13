@@ -533,7 +533,7 @@ abstract class KalturaObject implements IApiObject
 				if (! kXml::isXMLValidContent($value))
 					throw new KalturaAPIException ( KalturaErrors::INVALID_PARAMETER_CHAR, $this_prop );
 				else if($this->shouldPurify())
-					kHtmlPurifier::purify(get_class($object_to_fill), $object_prop, $value);
+					$value = kHtmlPurifier::purify(get_class($object_to_fill), $object_prop, $value);
 			}
 			
 			$setter_callback = array ( $object_to_fill ,"set{$object_prop}");
@@ -906,6 +906,9 @@ abstract class KalturaObject implements IApiObject
 
 	protected function enablePurify()
 	{
-		$this->purifyHtml = true;
+		if (!isset(kCurrentContext::$HTMLPurifierBehaviour) || kCurrentContext::$HTMLPurifierBehaviour == HTMLPurifierBehaviourType::IGNORE)
+			$this->purifyHtml = false;
+		else
+			$this->purifyHtml = true;
 	}
 }

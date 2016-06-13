@@ -118,6 +118,11 @@ class kCurrentContext
 	 * @var callable
 	 */	
 	public static $serializeCallback;
+
+	/**
+	 * @var int
+	 */
+	public static $HTMLPurifierBehaviour = null;
 	
 	public static function getEntryPoint()
 	{

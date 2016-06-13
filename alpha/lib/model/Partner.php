@@ -60,6 +60,8 @@ class Partner extends BasePartner
 	
 	const CDN_HOST_WHITE_LIST = 'CDNHostWhiteList';
 
+	const HTML_PURIFIER_BEHAVIOUR = "htmlPurifierBehaviour";
+
 	public function save(PropelPDO $con = null)
 	{
 		PartnerPeer::removePartnerFromCache( $this->getId() );
@@ -1756,5 +1758,15 @@ class Partner extends BasePartner
 		$usageWarnings = $this->getUsageWarnings();
 		$usageWarnings[$type.'_'.$percent] = $value;
 		$this->setUsageWarnings($usageWarnings);		
+	}
+	
+	public function getHtmlPurifierBehaviour()
+	{
+		return $this->getFromCustomData( self::HTML_PURIFIER_BEHAVIOUR, null , HTMLPurifierBehaviourType::IGNORE );	
+	}
+
+	public function setHtmlPurifierBehaviour($v)
+	{
+		return $this->putInCustomData( self::HTML_PURIFIER_BEHAVIOUR, $v );
 	}
 }
