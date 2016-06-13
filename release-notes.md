@@ -7,12 +7,9 @@
 
 ### Configuration ###
 - update brodcast.ini:
-	
-		Add the following to each DC configuration, If you SaaS like DNS resolver:
-		- queryParams = {t}
 		
-		otherwise add:
-		- queryParams = {p}.{e}.{i}.{t}
+		For none SaaS environments add to each dc configuration:
+		- queryParams = {p}.{e}.{i}
 
 #### Deployment Scripts ####
 

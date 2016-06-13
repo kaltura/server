@@ -114,40 +114,49 @@ class kBroadcastUrlManager
 		return $port;
 	}
 	
-	protected function getQueryParams(LiveStreamEntry $entry, $mediaServerIndex)
+	protected function getExtraQueryParamsConfig(LiveStreamEntry $entry, $mediaServerIndex)
 	{
+		$extraQueryPrams = array();
 		$broadcastConfig = $this->getConfiguration(kDataCenterMgr::getCurrentDcId());
-		$queryParamsConfig =  $broadcastConfig['queryParams'] ? $broadcastConfig['queryParams'] : "";
-		$queryParamsConfig = explode('.', $queryParamsConfig);
+		$extarQueryParamsConfig =  $broadcastConfig['queryParams'] ? $broadcastConfig['queryParams'] : "";
+		$extarQueryParamsConfigArr = explode('.', $extarQueryParamsConfig);
 		
-		$params = array();
-		foreach ($queryParamsConfig as $queryParam)
+		//Support none SaaS envioremnts
+		foreach ($extarQueryParamsConfigArr as $extarQueryParamsConfig)
 		{
-			switch($queryParam)
+			switch($extarQueryParamsConfig)
 			{
 				case "{p}":
-					$params['p'] = $this->partnerId;
+					$extraQueryPrams['p'] = $this->partnerId;
 					break;
-				
+		
 				case "{i}":
-					$params['i'] = $mediaServerIndex;
+					$extraQueryPrams['i'] = $mediaServerIndex;
 					break;
-				
+		
 				case "{e}":
-					$params['e'] = $entry->getId();
-					break;
-					
-				case "{t}":
-					$params['t'] = $entry->getStreamPassword();
+					$extraQueryPrams['e'] = $entry->getId();
 					break;
 			}
 		}
 		
+		return $extraQueryPrams;
+	}
+	
+	protected function getQueryParams(LiveStreamEntry $entry, $mediaServerIndex)
+	{
+		$queryParams = array('t' => $entry->getStreamPassword());
+		
 		//Support eCDN partner using old mediaServers that must recieve additional info to operate
 		if(PermissionPeer::isValidForPartner("FEATURE_HYBRID_ECDN", $entry->getPartnerId()))
-			$params = array_merge(array('p' => $this->partnerId, 'e' => $entry->getId(), 'i' => $mediaServerIndex), $params);
-				
-		return http_build_query(array_unique($params));
+		{
+			$queryParams = array_merge(array('p' => $this->partnerId, 'e' => $entry->getId(), 'i' => $mediaServerIndex), $queryParams);
+			return http_build_query($queryParams);
+		}
+		
+		$extraQueryPrams = $this->getExtraQueryParamsConfig($entry, $mediaServerIndex);
+		$queryParams = array_merge($extraQueryPrams, $queryParams);	
+		return http_build_query($params);
 	}
 	
 	protected function getBroadcastUrl(LiveStreamEntry $entry, $protocol, $hostname, $mediaServerIndex, $concatStreamName = false)
