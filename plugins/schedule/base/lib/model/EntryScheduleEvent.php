@@ -104,12 +104,4 @@ abstract class EntryScheduleEvent extends ScheduleEvent
 		return implode(' ', $catgoriesIds);
 	}
 
-	public function getTemplateEntryIdForIndex()
-	{
-		$templateEntryId = $this->getTemplateEntryId();
-		if ( !isset($templateEntryId))
-			return '';
-		return $templateEntryId;
-	}
-
 }

@@ -174,7 +174,7 @@ class StorageProfile extends BaseStorageProfile implements IBaseObject
 	 * @param flavorAsset $flavorAsset
 	 * @return boolean true if the given flavor asset is configured to be exported or false otherwise
 	 */
-	public function shouldExportFlavorAsset(flavorAsset $flavorAsset, $skipFlavorAssetStatusValidation = false)
+	public function shouldExportFlavorAsset(asset $flavorAsset, $skipFlavorAssetStatusValidation = false)
 	{
 		if(!$skipFlavorAssetStatusValidation && !$flavorAsset->isLocalReadyStatus())
 		{
@@ -187,7 +187,13 @@ class StorageProfile extends BaseStorageProfile implements IBaseObject
 		}
 
 		$scope = $this->getScope();
-		$scope->setEntryId($flavorAsset->getEntryId());
+		
+		$scopeEntryId = $flavorAsset->getEntryId();
+		$entry = entryPeer::retrieveByPK($scopeEntryId);
+		if($entry && $entry->getReplacedEntryId())
+			$scopeEntryId = $entry->getReplacedEntryId();
+		
+		$scope->setEntryId($scopeEntryId);
 		if(!$this->fulfillsRules($scope))
 		{
 			KalturaLog::log('Storage profile export rules are not fulfilled');
@@ -316,7 +322,7 @@ class StorageProfile extends BaseStorageProfile implements IBaseObject
 	 * 
 	 * @param flavorAsset $flavorAsset
 	 */
-	protected function isFlavorAssetConfiguredForExport(flavorAsset $flavorAsset)
+	protected function isFlavorAssetConfiguredForExport(asset $flavorAsset)
 	{
 		$configuredForExport = null;
 	    

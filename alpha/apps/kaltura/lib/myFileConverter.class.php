@@ -465,6 +465,8 @@ class myFileConverter
 			$target_file = kFile::replaceExt($target_file, $format);
 		
 		// do convertion
+		if (file_exists($target_file))
+			unlink($target_file); // remove target file before converting in order to avoid imagemagick security wrapper script from detetcing irrelevant errors  
 		$status = null;
 		$imageCropper = new KImageMagickCropper($source_file, $target_file, kConf::get('bin_path_imagemagick'));
 		$status = $imageCropper->crop($quality, $crop_type, $width, $height, $src_x, $src_y, $src_w, $src_h, null, null, $bgcolor, $density, null, $stripProfiles);

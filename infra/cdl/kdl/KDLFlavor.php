@@ -512,6 +512,7 @@ $plannedDur = 0;
 		else {
 			$target->_fastSeekTo = true;
 		}
+
 			/*
 			 * Disable encryption for sources shorter than 10sec (PLAT-5558)
 			 */
@@ -538,6 +539,7 @@ $plannedDur = 0;
 			}
 			KalturaLog::log('IsCropImx('.$this->_video->_isCropIMX.')');
 		}
+
 			/*
 			 * Analyse the source to determine whether it contains multi-stream audio.
 			 * In case it does and the flavor has 'multiStream' set to 'auto-detect' (default action) -
@@ -1170,10 +1172,33 @@ $plannedDur = 0;
 		if($target->_isShrinkBitrateToSource!=1) {
 			return $target->_bitRate;
 		}
-		$brSrcNorm = KDLVideoBitrateNormalize::NormalizeSourceToTarget($source->_id, $source->_bitRate, $target->_id);
 		
-		if($target->_bitRate>$brSrcNorm){
-			$target->_bitRate = $brSrcNorm;
+		$maxNormalizedBitrate = KDLVideoBitrateNormalize::NormalizeSourceToTarget($source->_id, $source->_bitRate, $target->_id);
+			/*
+			 * Optional 'contentAwareness' processing, for sources that have 'complexityValue'(bitrate)>500
+			 * and the flavor has 'contentAwareness' field set to positive value (maximal gain level),
+			 * then use the 'complexityValue' (normalized) instead of the source bitrate as the target upper video limit.
+			 */
+		if(isset($source->_complexityValue) && $source->_complexityValue>500 
+		&& isset($target->_contentAwareness) && $target->_contentAwareness>0 && $target->_contentAwareness<=1) {
+			KalturaLog::log("complexityValue($source->_complexityValue),contentAwareness($target->_contentAwareness),targetBR($target->_bitRate)");
+			$complexityNormalizedBitrate = KDLVideoBitrateNormalize::NormalizeSourceToTarget(KDLVideoTarget::H264, $source->_complexityValue, $target->_id,1);
+			KalturaLog::log("maxNormalizedBitrate($maxNormalizedBitrate),complexityNormalizedBitrate($complexityNormalizedBitrate)");
+			/*
+			 * Limit the maximal gain (complexityValue vs. target flavor predifined bitrate), to the 'contentAwareness' limit
+			 */
+			if($complexityNormalizedBitrate < $maxNormalizedBitrate && $complexityNormalizedBitrate < $target->_bitRate){
+				$maxGainLimitedBitrate = $target->_bitRate*(1-$target->_contentAwareness);
+				if($complexityNormalizedBitrate < $maxGainLimitedBitrate)
+					$maxNormalizedBitrate = $maxGainLimitedBitrate;
+				else
+					$maxNormalizedBitrate = $complexityNormalizedBitrate;
+				KalturaLog::log("maxGainLimitedBitrate($maxGainLimitedBitrate), adjsuted maxNormalizedBitrate($maxNormalizedBitrate)");
+			}
+		}
+		
+		if($target->_bitRate>$maxNormalizedBitrate){
+			$target->_bitRate = $maxNormalizedBitrate;
 		}
 		return $target->_bitRate = round($target->_bitRate, 0);
 	}

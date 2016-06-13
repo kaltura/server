@@ -34,14 +34,15 @@ class BpmnClientGenerator extends ClientGeneratorFromXml
 	
 	function writeService(DOMElement $serviceNode, $serviceName = null, $serviceId = null, $actionPrefix = "", $extends = "KalturaServiceBase")
 	{
-		if(!$this->shouldIncludeService($serviceNode->getAttribute('id')))
+		$serviceId = $serviceNode->getAttribute('id');
+		if(!$this->shouldIncludeService($serviceId))
 			return;
-		
+
 		$serviceName = $serviceNode->getAttribute('name');
 		$actionNodes = $serviceNode->getElementsByTagName("action");
 		foreach($actionNodes as $actionNode)
 		{
-			$this->writeAction($serviceName, $actionNode, $actionPrefix);
+			$this->writeAction($serviceId, $serviceName, $actionNode, $actionPrefix);
 		}
 	}
 	
@@ -57,10 +58,10 @@ class BpmnClientGenerator extends ClientGeneratorFromXml
 		}
 	}
 	
-	function writeAction($serviceName, DOMElement $actionNode, $actionPrefix = "")
+	function writeAction($serviceId, $serviceName, DOMElement $actionNode, $actionPrefix = "")
 	{
 		$action = $actionNode->getAttribute("name");
-		if(!$this->shouldIncludeAction($serviceName, $action))
+		if(!$this->shouldIncludeAction($serviceId, $action))
 			return;
 	
 		$method = $this->replaceReservedWords($action);

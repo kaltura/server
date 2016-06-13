@@ -73,7 +73,7 @@ class ScheduleEventIndex extends BaseIndexObject
 				'resource_ids' => 'resourceIdsForIndex',
 				'template_entry_categories_ids' => 'templateEntryCategoriesIdsForIndex',
 				'resource_system_names' => 'resourceSystemNamesForIndex',
-				'template_entry_id' => 'templateEntryIdForIndex',
+				'template_entry_id' => 'templateEntryId',
 			);
 		}
 		return self::$fieldsMap;

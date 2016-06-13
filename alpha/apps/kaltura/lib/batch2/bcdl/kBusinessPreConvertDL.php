@@ -422,9 +422,18 @@ class kBusinessPreConvertDL
 		{
 			$flavorParamsConversionProfile = flavorParamsConversionProfilePeer::retrieveByFlavorParamsAndConversionProfile($flavorParams->getId(), $conversionProfile->getId());
 			if($flavorParamsConversionProfile){
-				$isEncrypted = $flavorParamsConversionProfile->getIsEncrypted();
-				if(isset($isEncrypted))
-					$flavorParams->setIsEncrypted($isEncrypted);
+				/*
+				 * Update flavorParams settings with overloeded params from 'conversionProfileFlavorParams'
+				 */
+				$overrideParam = $flavorParamsConversionProfile->getIsEncrypted();
+				if(isset($overrideParam))
+					$flavorParams->setIsEncrypted($overrideParam);
+				$overrideParam = $flavorParamsConversionProfile->getContentAwareness();
+				if(isset($overrideParam))
+					$flavorParams->setContentAwareness($overrideParam);
+				$overrideParam = $flavorParamsConversionProfile->getTwoPass();
+				if(isset($overrideParam))
+					$flavorParams->setTwoPass($overrideParam);
 			}
 		}
 
@@ -559,11 +568,20 @@ class kBusinessPreConvertDL
 		self::adjustAssetParams($entryId, $flavors);
 		// call the decision layer
 		KalturaLog::log("Generate Target " . count($flavors) . " Flavors supplied");
+		/*
+		 * Update flavorParams settings with overloeded params from 'conversionProfileFlavorParams'
+		 */
 		foreach($flavors as $flavor) {
 			$flavorParamsConversionProfile = $conversionProfileFlavorParams[$flavor->getId()];
-			$isEncrypted = $flavorParamsConversionProfile->getIsEncrypted();
-			if(isset($isEncrypted))
-				$flavor->setIsEncrypted($isEncrypted);
+			$overrideParam = $flavorParamsConversionProfile->getIsEncrypted();
+			if(isset($overrideParam))
+				$flavor->setIsEncrypted($overrideParam);
+			$overrideParam = $flavorParamsConversionProfile->getContentAwareness();
+			if(isset($overrideParam))
+				$flavor->setContentAwareness($overrideParam);
+			$overrideParam = $flavorParamsConversionProfile->getTwoPass();
+			if(isset($overrideParam))
+				$flavor->setTwoPass($overrideParam);
 		}
 		$cdl = KDLWrap::CDLGenerateTargetFlavors($mediaInfo, $flavors);
 		KalturaLog::log("Generate Target " . count($cdl->_targetList) . " Flavors returned");
@@ -1458,10 +1476,19 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 			$srcSyncKey = $originalFlavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 			
 			$flavorParamsConversionProfile = flavorParamsConversionProfilePeer::retrieveByFlavorParamsAndConversionProfile($sourceFlavor->getId(), $conversionProfileId);
+			/*
+			 * Update flavorParams settings with overloeded params from 'conversionProfileFlavorParams'
+			 */
 			if($flavorParamsConversionProfile){
-				$isEncrypted = $flavorParamsConversionProfile->getIsEncrypted();
-				if(isset($isEncrypted))
-					$sourceFlavor->setIsEncrypted($isEncrypted);
+				$overrideParam = $flavorParamsConversionProfile->getIsEncrypted();
+				if(isset($overrideParam))
+					$sourceFlavor->setIsEncrypted($overrideParam);
+				$overrideParam = $flavorParamsConversionProfile->getContentAwareness();
+				if(isset($overrideParam))
+					$sourceFlavor->setContentAwareness($overrideParam);
+				$overrideParam = $flavorParamsConversionProfile->getTwoPass();
+				if(isset($overrideParam))
+					$sourceFlavor->setTwoPass($overrideParam);
 			}
 			
 			$errDescription = null;
