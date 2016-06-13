@@ -685,8 +685,6 @@ class Form_PartnerConfiguration extends Infra_Form
 				$this->setPermissionGroupElementsToDisabled(array('accountPackagesService'));
 			}
 		}
-
-//		$this->setDefaults(array('html_purifier_behaviour' => $object->htmlPurifierBehaviour));
 	}
 	
 	/* (non-PHPdoc)
