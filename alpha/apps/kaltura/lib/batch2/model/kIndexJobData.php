@@ -16,6 +16,13 @@ class kIndexJobData extends kJobData
 	 * @var int
 	 */
 	private $lastIndexId;
+
+
+	/**
+	 * Indicates the last depth that reindexed, used when the batch crached, to re-run from the last crash point.
+	 * @var int
+	 */
+	private $lastIndexDepth;
 	
 	/**
 	 * Indicates that the object columns and attributes values should be recalculated before reindexed.
@@ -59,6 +66,22 @@ class kIndexJobData extends kJobData
 	public function setLastIndexId($lastIndexId)
 	{
 		$this->lastIndexId = $lastIndexId;
+	}
+
+	/**
+	 * @return int $lastIndexDepth
+	 */
+	public function getLastIndexDepth()
+	{
+		return $this->lastIndexDepth;
+	}
+
+	/**
+	 * @param int $lastIndexDepth
+	 */
+	public function setLastIndexDepth($lastIndexDepth)
+	{
+		$this->lastIndexDepth = $lastIndexDepth;
 	}
 	
 	/**

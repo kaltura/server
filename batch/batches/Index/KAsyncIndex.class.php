@@ -39,28 +39,37 @@ class KAsyncIndex extends KJobHandlerWorker
 	
 		$filter = clone $data->filter;
 		$advancedFilter = new KalturaIndexAdvancedFilter();
-		
-		if($data->lastIndexId)
-		{
-			
-			$advancedFilter->indexIdGreaterThan = $data->lastIndexId;
-			$filter->advancedSearch = $advancedFilter;
-		}
-		
+
+		$this->initAdvancedFilter($advancedFilter,$data);
+
+		$filter->advancedSearch = $advancedFilter;
+
 		$continue = true;
 		while($continue)
 		{
 			$indexedObjectsCount = $engine->run($filter, $data->shouldUpdate);
 			$continue = (bool) $indexedObjectsCount;
 			$lastIndexId = $engine->getLastIndexId();
+			$lastIndexDepth = $engine->getLastIndexDepth();
 			
 			$data->lastIndexId = $lastIndexId;
+			$data->lastIndexDepth = $lastIndexDepth;
 			$this->updateJob($job, "Indexed $indexedObjectsCount objects", KalturaBatchJobStatus::PROCESSING, $data);
 			
 			$advancedFilter->indexIdGreaterThan = $lastIndexId;
+			$advancedFilter->depthGreaterThanEqual = $lastIndexDepth;
 			$filter->advancedSearch = $advancedFilter;
 		}
 		
 		return $this->closeJob($job, null, null, "Index objects finished", KalturaBatchJobStatus::FINISHED);
 	}
+
+	private function initAdvancedFilter(&$advancedFilter , &$data)
+	{
+		if($data->lastIndexId)
+			$advancedFilter->indexIdGreaterThan = $data->lastIndexId;
+		if($data->lastIndexDepth)
+			$advancedFilter->depthGreaterThanEqual = $data->lastIndexDepth;
+	}
+
 }
