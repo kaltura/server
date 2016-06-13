@@ -63,8 +63,6 @@ class CaptionAssetService extends KalturaAssetService
     	if(!$dbEntry || !in_array($dbEntry->getType(), $this->getEnabledMediaTypes()) || !in_array($dbEntry->getMediaType(), array(KalturaMediaType::VIDEO, KalturaMediaType::AUDIO)))
     		throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
     	
-		
-			
     	if($captionAsset->captionParamsId)
     	{
     		$dbCaptionAsset = assetPeer::retrieveByEntryIdAndParams($entryId, $captionAsset->captionParamsId);
@@ -570,8 +568,17 @@ class CaptionAssetService extends KalturaAssetService
 	 */
 	public function serveWebVTTAction($captionAssetId, $segmentDuration = 30, $segmentIndex = null, $localTimestamp = 10000)
 	{
-		$captionAsset = $this->validateForDownload($captionAssetId);	
-		
+		$captionAsset = $this->validateForDownload($captionAssetId);
+
+		if ($captionAsset->getContainerFormat() == CaptionType::WEBVTT)
+		{
+			$syncKey = $captionAsset->getSyncKey(asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+			$content = kFileSyncUtils::file_get_contents($syncKey, true, false, self::MAX_SERVE_WEBVTT_FILE_SIZE);
+			if (!$content)
+				throw new KalturaAPIException(KalturaCaptionErrors::CAPTION_ASSET_FILE_NOT_FOUND, $captionAssetId);
+			return new kRendererString($content, 'text/vtt');
+		}
+
 		if (!$segmentIndex)
 		{
 			entryPeer::setUseCriteriaFilter(false);
@@ -582,16 +589,15 @@ class CaptionAssetService extends KalturaAssetService
 
 			return new kRendererString(kWebVTTGenerator::buildWebVTTM3U8File($segmentDuration, (int)$entry->getDuration()), 'application/x-mpegurl');
 		}
-		
 		$syncKey = $captionAsset->getSyncKey(asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 		$content = kFileSyncUtils::file_get_contents($syncKey, true, false, self::MAX_SERVE_WEBVTT_FILE_SIZE);
 		if(!$content)
 			throw new KalturaAPIException(KalturaCaptionErrors::CAPTION_ASSET_FILE_NOT_FOUND, $captionAssetId);
-		
+
 		$captionsContentManager = kCaptionsContentManager::getCoreContentManager($captionAsset->getContainerFormat());
 		if(!$captionsContentManager)
 			throw new KalturaAPIException(KalturaCaptionErrors::CAPTION_ASSET_INVALID_FORMAT, $captionAssetId);
-		
+
 		$parsedCaption = $captionsContentManager->parse($content);
 		if(!$parsedCaption)
 			throw new KalturaAPIException(KalturaCaptionErrors::CAPTION_ASSET_PARSING_FAILED, $captionAssetId);

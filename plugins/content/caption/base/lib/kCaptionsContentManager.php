@@ -34,8 +34,11 @@ abstract class kCaptionsContentManager
 				return srtCaptionsContentManager::get(); 
 				
 			case CaptionType::DFXP:
-				return dfxpCaptionsContentManager::get(); 
-				
+				return dfxpCaptionsContentManager::get();
+
+			case CaptionType::WEBVTT:
+				return webVttCaptionsContentManager::get();
+
 			default:
 				return KalturaPluginManager::loadObject('kCaptionsContentManager', $type);
 		}
@@ -53,8 +56,11 @@ abstract class kCaptionsContentManager
 				return srtCaptionsContentManager::get(); 
 				
 			case KalturaCaptionType::DFXP:
-				return dfxpCaptionsContentManager::get(); 
-				
+				return dfxpCaptionsContentManager::get();
+
+			case CaptionType::WEBVTT:
+				return webVttCaptionsContentManager::get();
+
 			default:
 				return KalturaPluginManager::loadObject('kCaptionsContentManager', $type);
 		}
