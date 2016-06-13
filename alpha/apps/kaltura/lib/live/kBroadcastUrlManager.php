@@ -143,7 +143,7 @@ class kBroadcastUrlManager
 			}
 		}
 		
-		//Support old mediaServer versions
+		//Support eCDN partner using old mediaServers that must recieve additional info to operate
 		if(PermissionPeer::isValidForPartner("FEATURE_HYBRID_ECDN", $entry->getPartnerId()))
 			$params = array_merge(array('p' => $this->partnerId, 'e' => $entry->getId(), 'i' => $mediaServerIndex), $params);
 				
