@@ -26,7 +26,7 @@ class kHtmlPurifier
 		$purifiedValue = self::$purifier->purify( $tokenizedValue );
 		$modifiedValue = $tokenMapper->unTokenize($purifiedValue);
 
-		if (KalturaBaseService::$HTMLPurifierBehaviour == HTMLPurifierBehaviourType::SANITIZE)
+		if (kCurrentContext::$HTMLPurifierBehaviour == HTMLPurifierBehaviourType::SANITIZE)
 		{
 			return $modifiedValue;
 		}
@@ -40,13 +40,13 @@ class kHtmlPurifier
 
 			KalturaLog::err( $msg );
 
-			if (KalturaBaseService::$HTMLPurifierBehaviour == HTMLPurifierBehaviourType::NOTIFY)
+			if (kCurrentContext::$HTMLPurifierBehaviour == HTMLPurifierBehaviourType::NOTIFY)
 			{
 //			$this->notifyAboutHtmlPurification($className, $propertyName, $value);
 				KalturaLog::debug("should send notification");
 				return $value;
 			}
-			// If we reach here KalturaBaseService::$HTMLPurifierBehaviour must be BLOCK
+			// If we reach here kCurrentContext::$HTMLPurifierBehaviour must be BLOCK
 
 
 			throw new KalturaAPIException(KalturaErrors::UNSAFE_HTML_TAGS, $className, $propertyName);
