@@ -143,8 +143,9 @@ class kBroadcastUrlManager
 			}
 		}
 		
+		//Support old mediaServer versions
 		if(PermissionPeer::isValidForPartner("FEATURE_HYBRID_ECDN", $entry->getPartnerId()))
-			$params = array_merge($params, array('p' => $this->partnerId, 'e' => $entry->getId(), 'i' => $mediaServerIndex));
+			$params = array_merge(array('p' => $this->partnerId, 'e' => $entry->getId(), 'i' => $mediaServerIndex), $params);
 				
 		return http_build_query(array_unique($params));
 	}
