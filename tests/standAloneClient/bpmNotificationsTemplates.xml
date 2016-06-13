@@ -831,8 +831,6 @@
 				<automaticDispatchEnabled>1</automaticDispatchEnabled>
 				<eventType>{php:return KalturaEventNotificationEventType::OBJECT_DATA_CHANGED;}</eventType>
 				<eventObjectType>{php:return KalturaEventNotificationEventObjectType::TRANSCRIPT_ASSET;}</eventObjectType>
-				<abortOnDeletion>true</abortOnDeletion>
-				<mainObjectCode>$object->getentry()</mainObjectCode>
 				<contentParameters objectType="array">
 					<item objectType="KalturaEventNotificationParameter">
 						<key>endPoint</key>
@@ -870,6 +868,97 @@
 						</value>
 					</item>
 				</contentParameters>
+			</template>
+		</request>
+		<request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
+			<id>{3:result:id}</id>
+			<status>1</status><!-- EventNotificationTemplateStatus::DISABLED -->
+		</request>
+	</multirequest>
+
+
+	<multirequest continueOnError="1">
+		<!-- Transcript Asset Data Changed, Asset Status Equals -->
+		<request service="eventNotificationTemplate" action="listAction" plugin="eventNotification" partnerId="0">
+			<filter objectType="KalturaEventNotificationTemplateFilter">
+				<typeEqual>{php:return KalturaEventNotificationTemplateType::BPM_START;}</typeEqual>
+				<partnerIdEqual>0</partnerIdEqual>
+				<statusEqual>1</statusEqual>
+				<systemNameEqual>Transcript_Asset_Data_Changed_Asset_Status</systemNameEqual>
+			</filter>
+		</request>
+		<request service="eventNotificationTemplate" action="delete" plugin="eventNotification" partnerId="0">
+			<id>{1:result:objects:0:id}</id>
+		</request>
+		<request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
+			<template objectType="KalturaBusinessProcessStartNotificationTemplate">
+				<name>Transcript Asset Data Changed, Asset Status Equals</name>
+				<systemName>Transcript_Asset_Data_Changed_Asset_Status</systemName>
+				<description>Transcript Asset life-cycle</description>
+				<automaticDispatchEnabled>1</automaticDispatchEnabled>
+				<eventType>{php:return KalturaEventNotificationEventType::OBJECT_DATA_CHANGED;}</eventType>
+				<eventObjectType>{php:return KalturaEventNotificationEventObjectType::TRANSCRIPT_ASSET;}</eventObjectType>
+				<mainObjectCode>$object->getentry()</mainObjectCode>
+				<eventConditions objectType="array">
+					<item objectType="KalturaFieldMatchCondition">
+						<description>Status equals</description>
+						<field objectType="KalturaEvalStringField">
+							<code>$scope->getEvent()->getObject()->getStatus()</code>
+						</field>
+						<values objectType="array">
+							<item objectType="KalturaStringValue">
+								<value>{trigger_status}</value>
+							</item>
+						</values>
+					</item>
+				</eventConditions>
+				<contentParameters objectType="array">
+					<item objectType="KalturaEventNotificationParameter">
+						<key>endPoint</key>
+						<description>Server Host</description>
+						<value objectType="KalturaEvalStringField">
+							<code>kConf::get('apphome_url')</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>partnerId</key>
+						<description>Partner ID</description>
+						<value objectType="KalturaEvalStringField">
+							<code>$scope->getEvent()->getObject()->getPartnerId()</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>adminSecret</key>
+						<description>Partner Administrator Secret</description>
+						<value objectType="KalturaEvalStringField">
+							<code>PartnerPeer::retrieveByPK($scope->getEvent()->getObject()->getPartnerId())->getAdminSecret()</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>entryId</key>
+						<description>Entry ID</description>
+						<value objectType="KalturaEvalStringField">
+							<code>$scope->getEvent()->getObject()->getEntryId()</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>transcriptAssetId</key>
+						<description>Transcript Asset ID</description>
+						<value objectType="KalturaEvalStringField">
+							<code>$scope->getEvent()->getObject()->getId()</code>
+						</value>
+					</item>
+				</contentParameters>
+				<userParameters objectType="array">
+					<item objectType="KalturaEventNotificationParameter">
+						<key>trigger_status</key>
+						<description>Flavor-asset status that triggers the event, See:KalturaFlavorAssetStatus:/api_v3/testmeDoc/?object=KalturaFlavorAssetStatus</description>
+						<value objectType="KalturaStringValue">
+							<description>Ready</description>
+							<value>2</value>
+						</value>
+					</item>
+				</userParameters>
 			</template>
 		</request>
 		<request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
