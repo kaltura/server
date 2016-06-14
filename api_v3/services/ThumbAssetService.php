@@ -222,7 +222,7 @@ class ThumbAssetService extends KalturaAssetService
 		$thumbAsset->setHeight($height);
 		$thumbAsset->setSize(filesize($finalPath));
 		
-		$thumbAsset->setStatus(thumbAsset::ASSET_STATUS_READY);
+		$thumbAsset->setStatusLocalReady();
 		$thumbAsset->save();
 	}
     
@@ -289,7 +289,7 @@ class ThumbAssetService extends KalturaAssetService
 		$thumbAsset->setHeight($height);
 		$thumbAsset->setSize(filesize($finalPath));
 		
-		$thumbAsset->setStatus(thumbAsset::ASSET_STATUS_READY);
+		$thumbAsset->setStatusLocalReady();
 		$thumbAsset->save();
     }
     
@@ -316,7 +316,7 @@ class ThumbAssetService extends KalturaAssetService
 		
 		$thumbAsset->setFileExt($contentResource->getFileExt());
         $thumbAsset->incrementVersion();
-		$thumbAsset->setStatus(thumbAsset::ASSET_STATUS_READY);
+		$thumbAsset->setStatusLocalReady();
         $thumbAsset->save();
         	
         $syncKey = $thumbAsset->getSyncKey(thumbAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
@@ -843,7 +843,7 @@ class ThumbAssetService extends KalturaAssetService
 		$dbThumbAsset->setWidth($width);
 		$dbThumbAsset->setHeight($height);
 		$dbThumbAsset->setSize(filesize($finalPath));
-		$dbThumbAsset->setStatus(thumbAsset::ASSET_STATUS_READY);
+		$thumbAsset->setStatusLocalReady();
 		$dbThumbAsset->save();
 		
 		$thumbAssets = new KalturaThumbAsset();
@@ -887,7 +887,7 @@ class ThumbAssetService extends KalturaAssetService
 		$dbThumbAsset->setWidth($width);
 		$dbThumbAsset->setHeight($height);
 		$dbThumbAsset->setSize(filesize($finalPath));
-		$dbThumbAsset->setStatus(thumbAsset::ASSET_STATUS_READY);
+		$thumbAsset->setStatusLocalReady();
 		$dbThumbAsset->save();
 		
 		$dbEntryThumbs = assetPeer::retrieveThumbnailsByEntryId($entryId);
