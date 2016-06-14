@@ -80,7 +80,7 @@ class kIntegrationFlowManager implements kBatchJobStatusEventConsumer
 			$dcParams = kDataCenterMgr::getCurrentDc();
 			$dcUrl = $dcParams["url"];
 
-			$callBackUrl = "http://" . $dcUrl;
+			$callBackUrl = $dcUrl;
 			$callBackUrl .= "/api_v3/index.php/service/integration_integration/action/notify";
 			$callBackUrl .= "/id/$jobId/ks/$ks";
 
