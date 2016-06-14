@@ -15,6 +15,7 @@ run twice - note the two partner ids
 	php /opt/kaltura/app/tests/standAloneClient/exec.php /opt/kaltura/app/tests/standAloneClient/scheduledTaskProfiles/deleteSourceFlavorsOfReadyEntries.xml
 	Input: 
 	- partner ID - 1955031,1956791
+	- Flavor Params IDs - 0
 	- Max total count allowed per execution: 500
 	- Host name: www.kaltura.com
 	- Partner email address: admin console admin user
