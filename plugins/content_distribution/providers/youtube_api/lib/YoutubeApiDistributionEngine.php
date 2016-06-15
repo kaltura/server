@@ -337,7 +337,7 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 		$client = $this->initClient($distributionProfile);
 		$youtube = new Google_Service_YouTube($client);
 
-		$listRespons = $youtube->videos->listVideos('snippet,status', array('id' => $data->entryDistribution->remoteId));
+		$listResponse = $youtube->videos->listVideos('snippet,status', array('id' => $data->entryDistribution->remoteId));
 		$video = reset($listResponse->getItems());
 		
 //		$props['start_date'] = $this->getValueForField(KalturaYouTubeApiDistributionField::START_DATE);
