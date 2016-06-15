@@ -625,7 +625,14 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 					return true;
 					break;
 				case "rejected":
-					throw new Exception("Video was rejected by youtube, reason [".$videoStatus['rejectionReason']."]");
+					if ($videoStatus['rejectionReason'] == 'duplicate')
+					{
+						return true;
+					}
+					else
+					{
+						throw new Exception("Video was rejected by youtube, reason [" . $videoStatus['rejectionReason'] . "]");
+					}
 					break;
 				case "failed":
 					throw new Exception("Video has failed on youtube, reason [".$videoStatus['failureReason']."]");
