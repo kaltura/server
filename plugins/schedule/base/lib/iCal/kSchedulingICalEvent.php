@@ -110,8 +110,20 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 		foreach (self::$dateFields as $date => $field)
 		{
 			$configurationField = $this->getConfigurationField($field);
-			preg_match('/"([^"]+)"/', $configurationField, $matches);
-			$timezoneFormat = $matches[1];
+			$timezoneFormat = null;
+			if ($configurationField != null)
+			{
+				if (preg_match('/"([^"]+)"/', $configurationField, $matches))
+				{
+					if (isset($matches[1]))
+						$timezoneFormat = $matches[1];
+
+				} elseif (preg_match('/=([^"]+)/', $configurationField, $matches))
+				{
+					if (isset($matches[1]))
+						$timezoneFormat = $matches[1];
+				}
+			}
 			$val = kSchedulingICal::parseDate($this->getField($field), $timezoneFormat);
 			$event->$date = $val;
 		}
