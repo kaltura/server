@@ -306,7 +306,7 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 				sleep(self::TIME_TO_WAIT_FOR_YOUTUBE_TRANSCODING);
 				if ( (time() - $startCheckingReadyTime) > $this->processedTimeout )
 				{
-					throw new Exception("Video transcoding on youtube has timed out");
+					throw new kTemporaryException("Video transcoding on youtube has timed out");
 				}
 			}
 			
@@ -337,7 +337,7 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 		$client = $this->initClient($distributionProfile);
 		$youtube = new Google_Service_YouTube($client);
 
-		$listResponse = $youtube->videos->listVideos('snippet,status', array('id' => $data->entryDistribution->remoteId));
+		$listRespons = $youtube->videos->listVideos('snippet,status', array('id' => $data->entryDistribution->remoteId));
 		$video = reset($listResponse->getItems());
 		
 //		$props['start_date'] = $this->getValueForField(KalturaYouTubeApiDistributionField::START_DATE);
@@ -613,9 +613,10 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 	protected function isVideoReady($youtube, $remoteId)
 	{
 		$listResponse = $youtube->videos->listVideos("status",	array('id' => $remoteId));
-		if (empty($listResponse)) {
+		if (empty($listResponse)) 
 			throw new Exception("Video with remotedId ".$remoteId." not found at google");
-		} else {
+		else 
+		{
 			// Since the request specified a video ID, the response only contains one video resource.
 			$video = $listResponse[0];
 			$videoStatus = $video['status'];
@@ -623,23 +624,18 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 			{
 				case "processed":
 					return true;
-					break;
+
 				case "rejected":
 					if ($videoStatus['rejectionReason'] == 'duplicate')
-					{
 						return true;
-					}
 					else
-					{
 						throw new Exception("Video was rejected by youtube, reason [" . $videoStatus['rejectionReason'] . "]");
-					}
-					break;
+
 				case "failed":
 					throw new Exception("Video has failed on youtube, reason [".$videoStatus['failureReason']."]");
-					break;					
+
 				default: 
 					return false;
-					break;
 			}
 		}
 	}
