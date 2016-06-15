@@ -570,20 +570,11 @@ class CaptionAssetService extends KalturaAssetService
 	{
 		$captionAsset = $this->validateForDownload($captionAssetId);
 
-		if ($captionAsset->getContainerFormat() == CaptionType::WEBVTT)
-		{
-			$syncKey = $captionAsset->getSyncKey(asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-			$content = kFileSyncUtils::file_get_contents($syncKey, true, false, self::MAX_SERVE_WEBVTT_FILE_SIZE);
-			if (!$content)
-				throw new KalturaAPIException(KalturaCaptionErrors::CAPTION_ASSET_FILE_NOT_FOUND, $captionAssetId);
-			return new kRendererString($content, 'text/vtt');
-		}
-
 		if (!$segmentIndex)
 		{
 			entryPeer::setUseCriteriaFilter(false);
 			$entry = entryPeer::retrieveByPK($captionAsset->getEntryId());
-			if(!$entry)
+			if (!$entry)
 				throw new KalturaAPIException(KalturaCaptionErrors::CAPTION_ASSET_ENTRY_ID_NOT_FOUND, $captionAsset->getEntryId());
 			entryPeer::setUseCriteriaFilter(true);
 
@@ -591,18 +582,22 @@ class CaptionAssetService extends KalturaAssetService
 		}
 		$syncKey = $captionAsset->getSyncKey(asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 		$content = kFileSyncUtils::file_get_contents($syncKey, true, false, self::MAX_SERVE_WEBVTT_FILE_SIZE);
-		if(!$content)
+		if (!$content)
 			throw new KalturaAPIException(KalturaCaptionErrors::CAPTION_ASSET_FILE_NOT_FOUND, $captionAssetId);
 
 		$captionsContentManager = kCaptionsContentManager::getCoreContentManager($captionAsset->getContainerFormat());
-		if(!$captionsContentManager)
+		if (!$captionsContentManager)
 			throw new KalturaAPIException(KalturaCaptionErrors::CAPTION_ASSET_INVALID_FORMAT, $captionAssetId);
 
-		$parsedCaption = $captionsContentManager->parse($content);
-		if(!$parsedCaption)
-			throw new KalturaAPIException(KalturaCaptionErrors::CAPTION_ASSET_PARSING_FAILED, $captionAssetId);
-		
-		return new kRendererString(kWebVTTGenerator::buildWebVTTSegment($parsedCaption, $segmentIndex, $segmentDuration, $localTimestamp), 'text/vtt');
+		if ($captionAsset->getContainerFormat() == CaptionType::WEBVTT)
+			return new kRendererString(kWebVTTGenerator::getSegmentFromWebVTT($captionsContentManager, $content, $segmentIndex, $segmentDuration, $localTimestamp), 'text/vtt');
+		else
+		{
+			$parsedCaption = $captionsContentManager->parse($content);
+			if (!$parsedCaption)
+				throw new KalturaAPIException(KalturaCaptionErrors::CAPTION_ASSET_PARSING_FAILED, $captionAssetId);
+			return new kRendererString(kWebVTTGenerator::buildWebVTTSegment($parsedCaption, $segmentIndex, $segmentDuration, $localTimestamp), 'text/vtt');
+		}
 	}
 	
 	/**

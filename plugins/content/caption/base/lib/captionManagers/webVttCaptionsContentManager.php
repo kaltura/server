@@ -9,95 +9,44 @@ class webVttCaptionsContentManager extends kCaptionsContentManager
 	const MAC_LINE_ENDING = "\r";
 	const WINDOWS_LINE_ENDING = "\r\n";
 
-	const TIMECODE_PATTERN = '#^((?:[0-9]{2}:)?[0-9]{2}:[0-9]{2}.[0-9]{3}) --> ((?:[0-9]{2}:)?[0-9]{2}:[0-9]{2}.[0-9]{3})( .*)?$#';
+	const TIMECODE_PATTERN = '#^((?:[0-9]{2}:)?[0-9]{2}:[0-9]{2}\.[0-9]{3}) --> ((?:[0-9]{2}:)?[0-9]{2}:[0-9]{2}\.[0-9]{3})( .*)?$#';
+
+	const BOM_CODE =  "\xEF\xBB\xBF";
+	/**
+	 * @var array
+	 */
+	protected $parsingErrors = array();
 
 	/**
 	 * @var array
 	 */
-	protected $parsing_errors;
+	public $headerInfo = array();
 
 	/* (non-PHPdoc)
 	 * @see kCaptionsContentManager::parse()
 	 */
 	public function parse($content)
 	{
-		$itemsData = array();
+		$itemsData =  $this->parseWebVTT($content);
 
-		$this->parsing_errors = array();
-
-		$fileContentArray = $this->getFileContentAsArray($content);
-		$i = 2; //starting line after WEBVTT header
-
-		// Parse signature.
-		$signature = $this->getNextValueFromArray($fileContentArray);
-
-		if (!$this->validateWebVttHeader($signature))
-			return $this->handleErrors();
-
-		$line = $this->getNextValueFromArray($fileContentArray);
-		while ($line === '')
+		foreach ($itemsData as &$itemData )
 		{
-			$line = $this->getNextValueFromArray($fileContentArray);
-			++$i;
-		}
-
-		// Parse text - ignore comments and ids
-		do
-		{
-			if (strpos($line, 'NOTE') === 0)
+			foreach ($itemData['content'] as &$curChunk)
 			{
-				// Comment continues until there is a blank line. - according to WebVTT standard
-				++$i;
-				while (trim($line = $this->getNextValueFromArray($fileContentArray)) !== '')
-					$i++;
-
-				continue;
+				$val = strip_tags($curChunk['text']);
+				$curChunk['text'] = $val;
 			}
-
-			// Timecode.
-			$matches = array();
-			$timecode_match = preg_match(self::TIMECODE_PATTERN, $line, $matches);
-			if ($timecode_match)
-			{
-				$start = $this->parseStrTTTime($matches[1]);
-				$stop = $this->parseStrTTTime($matches[2]);
-				$text = '';
-				++$i;
-				while (trim($line = $this->getNextValueFromArray($fileContentArray)) !== '')
-				{
-					$line = $this->handleTextLines($line);
-					$text .= $line . self::UNIX_LINE_ENDING;
-					++$i;
-				}
-
-				$itemsData[] = array('startTime' => $start, 'endTime' => $stop, 'content' => array(array('text' => $text)));
-			} elseif ($line !== '')
-			{
-				// Suppose what not empty line before timeline is id.
-			} else
-				$parsing_errors[] = 'Malformed Format for WebVTT file detected at line ' . $i;
-
-			++$i;
-		} while (($line = $this->getNextValueFromArray($fileContentArray)) !== false);
-		if (count($this->parsing_errors) > 0)
-			return $this->handleErrors();
-
+		}
 		return $itemsData;
-	}
-
-	protected function handleErrors()
-	{
-		KalturaLog::err("Error Parsing WebVTT file. The following errors were found while parsing the file: \n" . print_r($this->parsing_errors, true));
-		return array();
 	}
 
 	/**
 	 * @param content
 	 * @return array
 	 */
-	protected function getFileContentAsArray($content)
+	public static function getFileContentAsArray($content)
 	{
-		$TextContent = str_replace( // So we change line endings to one format
+		$textContent = str_replace( // So we change line endings to one format
 			array(
 				self::WINDOWS_LINE_ENDING,
 				self::MAC_LINE_ENDING,
@@ -105,7 +54,7 @@ class webVttCaptionsContentManager extends kCaptionsContentManager
 			self::UNIX_LINE_ENDING,
 			$content
 		);
-		$contentArray = explode(self::UNIX_LINE_ENDING, $TextContent); // Create array from text content
+		$contentArray = explode(self::UNIX_LINE_ENDING, $textContent); // Create array from text content
 		return $contentArray;
 	}
 
@@ -113,7 +62,7 @@ class webVttCaptionsContentManager extends kCaptionsContentManager
 	 * @param array $array
 	 * @return mixed
 	 */
-	protected function getNextValueFromArray(array &$array)
+	public static function getNextValueFromArray(array &$array)
 	{
 		$element = each($array);
 		if (is_array($element))
@@ -123,40 +72,50 @@ class webVttCaptionsContentManager extends kCaptionsContentManager
 		return false;
 	}
 
-	protected function parseTextLines($text)
-	{
-		if (trim($text) === '')
-		{
-			$this->parsing_errors[] = 'No text provided While parsing line for WebVTT file';
-			return array();
-		}
-		return array_map('trim', preg_split('/$\R?^/m', $text));
-	}
-
 	/**
 	 * @param $parsing_errors
 	 * @return array
 	 */
-	protected function validateWebVttHeader($signature)
+	public function validateWebVttHeader($signature)
 	{
-		if (substr($signature, 0, 6) !== 'WEBVTT')
+		if (substr($signature, 0, 6) !== 'WEBVTT' && substr($signature, 0, 9) !== self::BOM_CODE.'WEBVTT')
 		{
-			$this->parsing_errors[] = 'Missing "WEBVTT" at the beginning of the file';
+			$this->parsingErrors[] = 'Missing "WEBVTT" at the beginning of the file';
+			return false;
 		}
-		if (strlen($signature) > 6)
+
+		if (strlen($signature) > 6 && substr($signature, 0, 6) === 'WEBVTT')
 		{
 			if (substr($signature, 0, 7) === 'WEBVTT ')
 			{
 				$fileDescription = substr($signature, 7);
 				if (strpos($fileDescription, '-->') !== false)
 				{
-					$this->parsing_errors[] = 'File description must not contain "-->"';
+					$this->parsingErrors[] = 'File description must not contain "-->"';
 					return false;
 				}
 				return true;
-			} else
+			}
+			else
 			{
-				$this->parsing_errors[] = 'Invalid file header (must be "WEBVTT" with optional description)';
+				$this->parsingErrors[] = 'Invalid file header (must be "WEBVTT" with optional description)';
+				return false;
+			}
+		} elseif (strlen($signature) > 9 && substr($signature, 0, 9) === self::BOM_CODE.'WEBVTT')
+		{
+			if (substr($signature, 0, 10) === self::BOM_CODE.'WEBVTT ')
+			{
+				$fileDescription = substr($signature, 10);
+				if (strpos($fileDescription, '-->') !== false)
+				{
+					$this->parsingErrors[] = 'File description must not contain "-->"';
+					return false;
+				}
+				return true;
+			}
+			else
+			{
+				$this->parsingErrors[] = 'Invalid file header (must be "WEBVTT" with optional description)';
 				return false;
 			}
 		}
@@ -168,16 +127,10 @@ class webVttCaptionsContentManager extends kCaptionsContentManager
 	 * @return string
 	 * @throws Exception
 	 */
-	protected function handleTextLines($line)
+	public static function handleTextLines($line)
 	{
-		if ($line !== '')
-		{
-			$lines = $this->parseTextLines($line);
-			$line = implode(self::UNIX_LINE_ENDING, $lines);
-			$line = strip_tags($line);
-		} else
-			$line = '';
-
+		$lines = array_map('trim', preg_split('/$\R?^/m', $line));
+		$line = implode(self::UNIX_LINE_ENDING, $lines);
 		return $line;
 	}
 
@@ -185,15 +138,42 @@ class webVttCaptionsContentManager extends kCaptionsContentManager
 	 * @param $timeStr
 	 * @return string
 	 */
-	private function parseStrTTTime($timeStr)
+	public function parseStrTTTime($timeStr)
 	{
-		$matches = null;
-		if(preg_match('/(\d+)s/', $timeStr))
-			return intval($matches[1]) * 1000;
-
-		return kXml::timeToInteger($timeStr);
+		$tabs = explode(':', $timeStr);
+		$result = count($tabs);
+		$timeInMilliseconds = null;
+		if ($result == 2){
+			$timeInMilliseconds = self::shortTimeFormatToInteger($timeStr) ;
+		} elseif  ($result == 3){
+			$timeInMilliseconds = kXml::timeToInteger($timeStr);
+		} else {
+			$this->parsingErrors[] = 'Error parsing time to milliseconds. invalid format for '.$timeStr;
+		}
+		return $timeInMilliseconds;
 	}
 
+	private static function shortTimeFormatToInteger($time)
+	{
+		$parts = explode(':', $time);
+		if(!isset($parts[0]) || !is_numeric($parts[0]))
+			return null;
+
+		$ret = intval($parts[0]) * (60 * 1000);  // hours im milliseconds
+
+		if(!isset($parts[1]))
+			return $ret;
+		if(!is_numeric($parts[1]))
+			return null;
+
+		if(!isset($parts[1]))
+			return $ret;
+		if(!is_numeric($parts[1]))
+			return null;
+
+		$ret += floatval($parts[1]) * 1000;  // seconds im milliseconds
+		return round($ret);
+	}
 
 	/* (non-PHPdoc)
 	 * @see kCaptionsContentManager::getContent()
@@ -203,13 +183,16 @@ class webVttCaptionsContentManager extends kCaptionsContentManager
 		$itemsData = null;
 		try
 		{
-			$itemsData = $this->parse($content);
+			$itemsData = $this->parseWebVTT($content);
 
 			$content = '';
 			foreach ($itemsData as $itemData)
 			{
 				foreach ($itemData['content'] as $curChunk)
-					$content .= $curChunk['text'] . ' ';
+				{
+					$text = strip_tags($curChunk['text']);
+					$content .= $text. ' ';
+				}
 			}
 		} catch (Exception $e)
 		{
@@ -225,6 +208,60 @@ class webVttCaptionsContentManager extends kCaptionsContentManager
 	public static function get()
 	{
 		return new webVttCaptionsContentManager();
+	}
+
+	/**
+	 * @param $content
+	 * @return array
+	 */
+	public function parseWebVTT($content)
+	{
+		$this->headerInfo = array();
+		$foundFirstTimeCode = false;
+
+		$itemsData = array();
+
+		$fileContentArray = self::getFileContentAsArray($content);
+
+		// Parse signature.
+		$header = self::getNextValueFromArray($fileContentArray);
+
+		if (!$this->validateWebVttHeader($header))
+		{
+			KalturaLog::err("Error Parsing WebVTT file. The following errors were found while parsing the file: \n" . print_r($this->parsingErrors, true));
+			return array();
+		}
+
+		$this->headerInfo[] = $header.self::UNIX_LINE_ENDING;
+		// Parse text - ignore comments, ids, styles, notes, etc
+		while (($line = self::getNextValueFromArray($fileContentArray)) !== false)
+		{
+			// Timecode.
+			$matches = array();
+			$timecode_match = preg_match(self::TIMECODE_PATTERN, $line, $matches);
+			if ($timecode_match)
+			{
+				$foundFirstTimeCode = true;
+				$start = $this->parseStrTTTime($matches[1]);
+				$stop = $this->parseStrTTTime($matches[2]);
+				$text = '';
+				while (trim($line = self::getNextValueFromArray($fileContentArray)) !== '')
+				{
+					$line = $this->handleTextLines($line);
+					$text .= $line . self::UNIX_LINE_ENDING;
+				}
+
+				$itemsData[] = array('startTime' => $start, 'endTime' => $stop, 'content' => array(array('text' => $text)));
+			}elseif ($foundFirstTimeCode == false)
+					$this->headerInfo[] = $line . self::UNIX_LINE_ENDING;
+
+		};
+		if (count($this->parsingErrors) > 0)
+		{
+			KalturaLog::err("Error Parsing WebVTT file. The following errors were found while parsing the file: \n" . print_r($this->parsingErrors, true));
+			return array();
+		}
+		return $itemsData;
 	}
 
 }
