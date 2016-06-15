@@ -296,7 +296,10 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 			{
 				unlink($videoPath);
 			}
-			
+		}
+		
+		if (!empty($data->providerData->captionsInfo))
+		{
 			$startCheckingReadyTime = time();
 			while (!$this->isVideoReady($youtube, $data->remoteId))
 			{
@@ -306,16 +309,16 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 					throw new Exception("Video transcoding on youtube has timed out");
 				}
 			}
-		}
-		
-		foreach ($data->providerData->captionsInfo as $captionInfo){
-			/* @var $captionInfo KalturaYouTubeApiCaptionDistributionInfo */
-			if ($captionInfo->action == KalturaYouTubeApiDistributionCaptionAction::SUBMIT_ACTION)
+			
+			foreach ($data->providerData->captionsInfo as $captionInfo)
 			{
-				$data->mediaFiles[] = $this->submitCaption($youtube, $captionInfo, $data->remoteId);
+				/* @var $captionInfo KalturaYouTubeApiCaptionDistributionInfo */
+				if ($captionInfo->action == KalturaYouTubeApiDistributionCaptionAction::SUBMIT_ACTION)
+				{
+					$data->mediaFiles[] = $this->submitCaption($youtube, $captionInfo, $data->remoteId);
+				}
 			}
 		}
-		
 		$playlistIds = explode(',', $this->getValueForField(KalturaYouTubeApiDistributionField::MEDIA_PLAYLIST_IDS));
 		$this->syncPlaylistIds($youtube, $data->remoteId, $playlistIds); 
 		
