@@ -843,7 +843,7 @@ class ThumbAssetService extends KalturaAssetService
 		$dbThumbAsset->setWidth($width);
 		$dbThumbAsset->setHeight($height);
 		$dbThumbAsset->setSize(filesize($finalPath));
-		$thumbAsset->setStatusLocalReady();
+		$dbThumbAsset->setStatusLocalReady();
 		$dbThumbAsset->save();
 		
 		$thumbAssets = new KalturaThumbAsset();
@@ -887,7 +887,7 @@ class ThumbAssetService extends KalturaAssetService
 		$dbThumbAsset->setWidth($width);
 		$dbThumbAsset->setHeight($height);
 		$dbThumbAsset->setSize(filesize($finalPath));
-		$thumbAsset->setStatusLocalReady();
+		$dbThumbAsset->setStatusLocalReady();
 		$dbThumbAsset->save();
 		
 		$dbEntryThumbs = assetPeer::retrieveThumbnailsByEntryId($entryId);
