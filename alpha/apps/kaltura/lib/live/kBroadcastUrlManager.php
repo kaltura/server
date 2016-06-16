@@ -156,7 +156,7 @@ class kBroadcastUrlManager
 		
 		$extraQueryPrams = $this->getExtraQueryParamsConfig($entry, $mediaServerIndex);
 		$queryParams = array_merge($extraQueryPrams, $queryParams);	
-		return http_build_query($params);
+		return http_build_query($queryParams);
 	}
 	
 	protected function getBroadcastUrl(LiveStreamEntry $entry, $protocol, $hostname, $mediaServerIndex, $concatStreamName = false)
