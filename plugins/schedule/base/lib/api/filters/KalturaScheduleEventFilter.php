@@ -19,7 +19,6 @@ class KalturaScheduleEventFilter extends KalturaScheduleEventBaseFilter
 		"resourceSystemNamesLike" => "_like_resource_system_names",
 		"resourceSystemNamesMultiLikeOr" => "_mlikeor_resource_system_names",
 		"resourceSystemNamesMultiLikeAnd" => "_mlikeand_resource_system_names",
-		"templateEntryIdEqual" => "_eq_template_entry_id",
 	);
 
 	public function getMapBetweenObjects()
@@ -87,13 +86,6 @@ class KalturaScheduleEventFilter extends KalturaScheduleEventBaseFilter
 	 * @var string
 	 */
 	public $resourceSystemNamesLike;
-
-	/**
-	 * @var string
-	 */
-	public $templateEntryIdEqual;
-
-
 
 	/* (non-PHPdoc)
 	 * @see KalturaFilter::getCoreFilter()
