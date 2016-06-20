@@ -721,7 +721,7 @@ define command{
 
 define command{
 	command_name		kaltura-capture-thumb
-	command_line		$USER1$/check_by_ssh -t30 -H $HOSTADDRESS$ -l$USER4$ -C '@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 2 --error-threshold 5 --script "@APP_DIR@/tests/monitoring/api_v3/capturethumbnail.php --service-url $HOSTADDRESS$ --entry-reference-id MEDIA_CONVERT"'
+	command_line		$USER1$/check_by_ssh -t30 -H $HOSTADDRESS$ -l$USER4$ -C '@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 2 --error-threshold 5 --script "@APP_DIR@/tests/monitoring/api_v3/captureThumbnail.php --service-url $HOSTADDRESS$ --entry-reference-id MEDIA_CONVERT"'
 }
 
 define command{
