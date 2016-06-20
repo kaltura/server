@@ -62,10 +62,10 @@ class CuePointPeer extends BaseCuePointPeer implements IMetadataPeer, IRelatedOb
 				// Temporarily change user filter to (user==kuser OR cuepoint of type THUMB/CODE). Long term fix will be accomplished
 				// by adding a public property on the cuepoint object and checking (user==kuser OR is public)
 				//$c->addAnd(CuePointPeer::KUSER_ID, $kuser->getId());
-				$criterionUserOrPublic = $c->getNewCriterion(CuePointPeer::KUSER_ID, $kuser->getId());
-				$criterionUserOrPublic->addOr($c->getNewCriterion (self::IS_PUBLIC, true, Criteria::EQUAL));
-				$criterionUserOrPublic->addTag(KalturaCriterion::TAG_USER_SESSION);
-				$criterionUserOrPublic->addOr(
+				$criteria = $c->getNewCriterion(CuePointPeer::KUSER_ID, $kuser->getId());
+				$criteria->addOr($c->getNewCriterion (self::IS_PUBLIC, true, Criteria::EQUAL));
+				$criteria->addTag(KalturaCriterion::TAG_USER_SESSION);
+				$criteria->addOr(
 						$c->getNewCriterion(
 								CuePointPeer::TYPE,
 								array(
@@ -76,14 +76,35 @@ class CuePointPeer extends BaseCuePointPeer implements IMetadataPeer, IRelatedOb
 								Criteria::IN
 						)
 				);
-			
-				$c->addAnd($criterionUserOrPublic);
+				KalturaLog::debug("asaf123");
+				$ks = kCurrentContext::$ks_object;
+				KalturaLog::debug("asaf123" . print_r($ks, true));
+				if ($ks) {
+					KalturaLog::debug("asaf123a" . print_r($ks, true));
+					$values = $ks->getPrivilegeValues(ks::PRIVILEGE_LIST);
+
+					if ($values && count($values) > 0)
+					{
+
+						KalturaLog::debug("asaf123b" . print_r($values, true));
+
+						$criteria->addOr(
+							$c->getNewCriterion(
+								CuePointPeer::ENTRY_ID,
+								$values,
+								Criteria::IN));
+					}
+
+					KalturaLog::debug("asaf123c " . print_r($criteria, true));
+				}
+
+				$c->addAnd($criteria);
 			}
 			else if (!$puserId)
 			{
-				$criterionIsPublic = $c->getNewCriterion (self::IS_PUBLIC, true, Criteria::EQUAL);
-				$criterionIsPublic->addTag(KalturaCriterion::TAG_WIDGET_SESSION);
-				$c->add($criterionIsPublic);					
+				$criteria = $c->getNewCriterion (self::IS_PUBLIC, true, Criteria::EQUAL);
+				$criteria->addTag(KalturaCriterion::TAG_WIDGET_SESSION);
+				$c->add($criteria);
  			}
 		}
 		
