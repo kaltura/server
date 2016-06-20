@@ -10,11 +10,8 @@ None.
  
 ### Deployment scripts ###
 
-run twice - note the two partner ids:
-
 	php /opt/kaltura/app/tests/standAloneClient/exec.php /opt/kaltura/app/tests/bpmNotificationTemplatesForBurntSubtitlesAdditionalTriggers.xml
 	Input: 
-	- partner ID - 1955031,1956791
 	- Partner email address: admin console admin user
 	- Partner password: user's password
 	- Partner ID: -2
