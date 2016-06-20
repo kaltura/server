@@ -158,7 +158,9 @@ class kCielo24FlowManager implements kBatchJobStatusEventConsumer
 		$assetObject->save();
 		$syncKey = $assetObject->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
 	
-		kFileSyncUtils::file_put_contents($syncKey, $content); 		
+		kFileSyncUtils::file_put_contents($syncKey, $content);
+
+		kEventsManager::raiseEvent(new kObjectDataChangedEvent($assetObject));
 	
 		$finalPath = kFileSyncUtils::getLocalFilePathForKey($syncKey);
 		$assetObject->setSize(kFile::fileSize($finalPath));
