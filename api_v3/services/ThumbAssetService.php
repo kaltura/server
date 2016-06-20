@@ -222,7 +222,7 @@ class ThumbAssetService extends KalturaAssetService
 		$thumbAsset->setHeight($height);
 		$thumbAsset->setSize(filesize($finalPath));
 		
-		$thumbAsset->setStatus(thumbAsset::ASSET_STATUS_READY);
+		$thumbAsset->setStatusLocalReady();
 		$thumbAsset->save();
 	}
     
@@ -289,7 +289,7 @@ class ThumbAssetService extends KalturaAssetService
 		$thumbAsset->setHeight($height);
 		$thumbAsset->setSize(filesize($finalPath));
 		
-		$thumbAsset->setStatus(thumbAsset::ASSET_STATUS_READY);
+		$thumbAsset->setStatusLocalReady();
 		$thumbAsset->save();
     }
     
@@ -316,7 +316,7 @@ class ThumbAssetService extends KalturaAssetService
 		
 		$thumbAsset->setFileExt($contentResource->getFileExt());
         $thumbAsset->incrementVersion();
-		$thumbAsset->setStatus(thumbAsset::ASSET_STATUS_READY);
+		$thumbAsset->setStatusLocalReady();
         $thumbAsset->save();
         	
         $syncKey = $thumbAsset->getSyncKey(thumbAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
@@ -843,7 +843,7 @@ class ThumbAssetService extends KalturaAssetService
 		$dbThumbAsset->setWidth($width);
 		$dbThumbAsset->setHeight($height);
 		$dbThumbAsset->setSize(filesize($finalPath));
-		$dbThumbAsset->setStatus(thumbAsset::ASSET_STATUS_READY);
+		$dbThumbAsset->setStatusLocalReady();
 		$dbThumbAsset->save();
 		
 		$thumbAssets = new KalturaThumbAsset();
@@ -887,7 +887,7 @@ class ThumbAssetService extends KalturaAssetService
 		$dbThumbAsset->setWidth($width);
 		$dbThumbAsset->setHeight($height);
 		$dbThumbAsset->setSize(filesize($finalPath));
-		$dbThumbAsset->setStatus(thumbAsset::ASSET_STATUS_READY);
+		$dbThumbAsset->setStatusLocalReady();
 		$dbThumbAsset->save();
 		
 		$dbEntryThumbs = assetPeer::retrieveThumbnailsByEntryId($entryId);
@@ -1020,4 +1020,20 @@ class ThumbAssetService extends KalturaAssetService
 		return $listResponse;
 	}
 
+	/**
+	 * manually export an asset
+	 *
+	 * @action export
+	 * @param string $assetId
+	 * @param int $storageProfileId
+	 * @throws KalturaErrors::INVALID_FLAVOR_ASSET_ID
+	 * @throws KalturaErrors::STORAGE_PROFILE_ID_NOT_FOUND
+	 * @throws KalturaErrors::INTERNAL_SERVERL_ERROR
+	 * @return KalturaFlavorAsset The exported asset
+	 */
+	public function exportAction ( $assetId , $storageProfileId )
+	{
+		return parent::exportAction($assetId, $storageProfileId);
+	}
+	
 }

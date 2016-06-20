@@ -237,8 +237,19 @@ class flavorAsset extends asset
 	public function getInterFlowCount() { return $this->getFromCustomData("interFlowCount"); }
 	public function incrementInterFlowCount() { $this->putInCustomData("interFlowCount", $this->getInterFlowCount() ? $this->getInterFlowCount()+1 : 1); }
 	public function removeInterFlowCount() { $this->removeFromCustomData("interFlowCount"); }
-	public function getLanguage()	{ return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_LANGUAGE); }
-	public function setLanguage($v)	{ $this->putInCustomData(self::CUSTOM_DATA_FIELD_LANGUAGE, $v); }
+
+	public function getLanguage()
+	{
+		$languageCode = $this->getFromCustomData(self::CUSTOM_DATA_FIELD_LANGUAGE);
+		$obj = languageCodeManager::getObjectFromTwoCode($languageCode);
+		return !is_null($obj) ? $obj[languageCodeManager::KALTURA_NAME] : $languageCode;
+	}
+	public function setLanguage($v)
+	{
+		$key = languageCodeManager::getLanguageKey($v,$v);
+		$this->putInCustomData(self::CUSTOM_DATA_FIELD_LANGUAGE, $key);
+	}
+
 
 	/**
 	 * @param int $type

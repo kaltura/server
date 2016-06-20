@@ -335,6 +335,11 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	 */
 	public $timeAlignedRenditions;
 
+	/**
+	 * @var int
+	 */
+	public $htmlPurifierBehaviour;
+
 	
 	
 	private static $map_between_objects = array
@@ -401,6 +406,7 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		"liveThumbEntryId",		
 		"deliveryProfileIds",
 	    "timeAlignedRenditions",
+		"htmlPurifierBehaviour",
 	);
 
 	public function getMapBetweenObjects()

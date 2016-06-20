@@ -12,6 +12,11 @@ class myCsvWrapper
 		return date ( "l, F j, Y" , $timestamp );
 	}
 	
+	public function formatTime ( $timestamp )
+        {
+                return date ( "l, F j, Y H:i:s" , $timestamp );
+        }
+	
 	public function add ( $obj )
 	{
 		$args = func_get_args();

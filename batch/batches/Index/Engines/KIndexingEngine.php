@@ -14,6 +14,11 @@ abstract class KIndexingEngine
 	 * @var int
 	 */
 	private $lastIndexId;
+
+	/**
+	 * @var int
+	 */
+	private $lastIndexDepth;
 	
 	/**
 	 * The partner that owns the objects
@@ -68,7 +73,7 @@ abstract class KIndexingEngine
 
 		$this->pager = new KalturaFilterPager();
 		$this->pager->pageSize = 100;
-		
+
 		if(KBatchBase::$taskConfig->params && KBatchBase::$taskConfig->params->pageSize)
 			$this->pager->pageSize = KBatchBase::$taskConfig->params->pageSize;
 	}
@@ -108,6 +113,22 @@ abstract class KIndexingEngine
 	protected function setLastIndexId($lastIndexId)
 	{
 		$this->lastIndexId = $lastIndexId;
+	}
+
+	/**
+	 * @return int $lastIndexDepth
+	 */
+	public function getLastIndexDepth()
+	{
+		return $this->lastIndexDepth;
+	}
+
+	/**
+	 * @param int $lastIndexDepth
+	 */
+	protected function setLastIndexDepth($lastIndexDepth)
+	{
+		$this->lastIndexDepth = $lastIndexDepth;
 	}
 
 	

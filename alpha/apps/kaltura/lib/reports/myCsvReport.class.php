@@ -54,6 +54,10 @@ class myCsvReport
 							$csv->addNewLine( $date->format("M Y"), $value );
 							$added = true;
 						}
+					} else if (strlen($data) == 10) //format is yyyymmddhh
+					{
+						$csv->addNewLine( $csv->formatTime( myReportsMgr::formatDateFromDateId( $data ) ), $value );
+						$added = true;
 					}
 					
 					if(!$added)

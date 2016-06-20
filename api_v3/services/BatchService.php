@@ -572,32 +572,42 @@ class BatchService extends KalturaBatchService
 	function checkEntryIsDoneAction($batchJobId)
 	{
 		$ret_val = false;
+	
 		$dbBatchJob = BatchJobPeer::retrieveByPK($batchJobId);
-
 		if (!$dbBatchJob)
 		{
 			throw new KalturaAPIException(KalturaErrors::INVALID_BATCHJOB_ID, $batchJobId);
 		}
+	
 		$entry = $dbBatchJob->getEntry();
 		if (!$entry)
 		{
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $dbBatchJob->getEntryId());
 		}
-		if ($entry->getStatus() == entryStatus::PRECONVERT)
+	
+		switch ($entry->getStatus())
 		{
-			$flavorAssets = assetPeer::retrieveReadyFlavorsByEntryId($entry->getId());
-			if (!$flavorAssets || count($flavorAssets) == 0)
-			{
-				return $ret_val;
-			}
-			kBusinessPostConvertDL::handleConvertFinished($dbBatchJob, $flavorAssets[0]);
-			$entry = entryPeer::retrieveByPK($entry->getId());
-			if ($entry->getStatus() != entryStatus::PRECONVERT)
-			{
-				$ret_val = true;
-			}
+			case entryStatus::PRECONVERT:
+				$flavorAssets = assetPeer::retrieveReadyFlavorsByEntryId($entry->getId());
+				if (!$flavorAssets || count($flavorAssets) == 0)
+				{
+					return $ret_val;
+				}
+				kBusinessPostConvertDL::handleConvertFinished($dbBatchJob, $flavorAssets[0]);
+				$entry = entryPeer::retrieveByPK($entry->getId());
+				if ($entry->getStatus() != entryStatus::PRECONVERT)
+				{
+					$ret_val = true;
+				}
+				break;
+	
+			case entryStatus::READY:
+				$flavorAssets = assetPeer::retrieveFlavorsByEntryIdAndStatusNotIn($entry->getId(), array(asset::ASSET_STATUS_READY, asset::ASSET_STATUS_ERROR, asset::ASSET_STATUS_NOT_APPLICABLE));
+				if(!count($flavorAssets))
+					$ret_val = true;
+				break;
 		}
+	
 		return $ret_val;
 	}
-
 }

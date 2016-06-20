@@ -16,9 +16,10 @@ class KalturaScheduleEventFilter extends KalturaScheduleEventBaseFilter
 		"templateEntryCategoriesIdsLike" => "_like_template_entry_categories_ids",
 		"templateEntryCategoriesIdsMultiLikeAnd" => "_mlikeand_template_entry_categories_ids",
 		"templateEntryCategoriesIdsMultiLikeOr" => "_mlikeor_template_entry_categories_ids",
-		"systemNamesLike" => "_like_system_names",
-		"systemNamesMultiLikeOr" => "_mlikeor_system_names",
-		"systemNamesMultiLikeAnd" => "_mlikeand_system_names",
+		"resourceSystemNamesLike" => "_like_resource_system_names",
+		"resourceSystemNamesMultiLikeOr" => "_mlikeor_resource_system_names",
+		"resourceSystemNamesMultiLikeAnd" => "_mlikeand_resource_system_names",
+		"templateEntryIdEqual" => "_eq_template_entry_id",
 	);
 
 	public function getMapBetweenObjects()
@@ -70,22 +71,29 @@ class KalturaScheduleEventFilter extends KalturaScheduleEventBaseFilter
 	/**
 	 * @var string
 	 */
+	public $resourceSystemNamesMultiLikeOr;
+
+	/**
+	 * @var string
+	 */
 	public $templateEntryCategoriesIdsLike;
 
 	/**
 	 * @var string
 	 */
-	public $systemNamesMultiLikeOr;
+	public $resourceSystemNamesMultiLikeAnd;
 
 	/**
 	 * @var string
 	 */
-	public $systemNamesMultiLikeAnd;
+	public $resourceSystemNamesLike;
 
 	/**
 	 * @var string
 	 */
-	public $systemNamesLike;
+	public $templateEntryIdEqual;
+
+
 
 	/* (non-PHPdoc)
 	 * @see KalturaFilter::getCoreFilter()
@@ -106,31 +114,35 @@ class KalturaScheduleEventFilter extends KalturaScheduleEventBaseFilter
 	public function getListResponse(KalturaFilterPager $pager, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		$type = $this->getListResponseType();
-		
+
 		if ($this->ownerIdEqual)
 		{
 			$dbKuser = kuserPeer::getKuserByPartnerAndUid(kCurrentContext::$ks_partner_id, $this->ownerIdEqual);
-			if (! $dbKuser) {
-				throw new KalturaAPIException ( KalturaErrors::INVALID_USER_ID );
+			if (!$dbKuser)
+			{
+				throw new KalturaAPIException (KalturaErrors::INVALID_USER_ID);
 			}
 			$this->ownerIdEqual = $dbKuser->getId();
 		}
-		if($this->ownerIdIn){
+		if ($this->ownerIdIn)
+		{
 			$userIds = explode(",", $this->ownerIdIn);
 			$dbKusers = kuserPeer::getKuserByPartnerAndUids(kCurrentContext::$ks_partner_id, $userIds);
-			if (count($dbKusers) < count($userIds)) {
-			    throw new KalturaAPIException ( KalturaErrors::INVALID_USER_ID );
+			if (count($dbKusers) < count($userIds))
+			{
+				throw new KalturaAPIException (KalturaErrors::INVALID_USER_ID);
 			}
 			$kuserIds = array();
-			foreach ($dbKusers as $dbKuser){
+			foreach ($dbKusers as $dbKuser)
+			{
 				$kuserIds[] = $dbKuser->getId();
 			}
-			
+
 			$this->ownerIdIn = implode(',', $kuserIds);
 		}
-		
+
 		$c = KalturaCriteria::create(ScheduleEventPeer::OM_CLASS);
-		if($type)
+		if ($type)
 		{
 			$c->add(ScheduleEventPeer::TYPE, $type);
 		}
@@ -138,9 +150,9 @@ class KalturaScheduleEventFilter extends KalturaScheduleEventBaseFilter
 		$filter = $this->toObject();
 		$filter->attachToCriteria($c);
 		$pager->attachToCriteria($c);
-			
+
 		$list = ScheduleEventPeer::doSelect($c);
-		
+
 		$response = new KalturaScheduleEventListResponse();
 		$response->objects = KalturaScheduleEventArray::fromDbArray($list, $responseProfile);
 		$response->totalCount = $c->getRecordsCount();

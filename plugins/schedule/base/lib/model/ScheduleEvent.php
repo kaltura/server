@@ -236,7 +236,16 @@ abstract class ScheduleEvent extends BaseScheduleEvent implements IRelatedObject
 	{
 		return '';
 	}
-	
+
+	/**
+	 * {@inheritDoc}
+	 * @see IIndexable::getTemplateEntryId()
+	 */
+	public function getTemplateEntryId()
+	{
+		return null;
+	}
+
 	public function getCategoryIdsForIndex()
 	{
 		return '';
@@ -270,15 +279,30 @@ abstract class ScheduleEvent extends BaseScheduleEvent implements IRelatedObject
 		return '';
 	}
 
-	public function getSystemNamesForIndex()
+	public function getResourceSystemNamesForIndex()
 	{
 		$eventResources = ScheduleEventResourcePeer::retrieveByEventId($this->getId());
 
+		$resourceIds = array();
 		$system_names = array();
-		foreach($eventResources as $eventResource)
+
+		foreach ($eventResources as $eventResource)
 		{
-			$resource = ScheduleResourcePeer::retrieveByPK($eventResource->getResourceId());
-			$system_names[] = $resource->getSystemName();
+			$resourceIds[] = $eventResource->getResourceId();
+		}
+
+		$resources = ScheduleResourcePeer::retrieveByPKs($resourceIds);
+		foreach ($resources as $resource)
+		{
+			if ($resource != null)
+			{
+				$resourceSystemName = $resource->getSystemName();
+				if ($resourceSystemName != null)
+				{
+					$resourceSystemName = mySearchUtils::getMd5EncodedString($resourceSystemName);
+					$system_names[] = $resourceSystemName;
+				}
+			}
 		}
 		return implode(' ', $system_names);
 	}

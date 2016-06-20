@@ -42,7 +42,13 @@ class KIndexingCategoryEngine extends KIndexingEngine
 				
 		$lastIndexId = end($results);
 		$this->setLastIndexId($lastIndexId);
-		
+
+		foreach ($categoriesList->objects as $category)
+		{
+			if($category->id == $lastIndexId)
+				$this->setLastIndexDepth($category->depth);
+		}
+
 		return count($results);
 	}
 }

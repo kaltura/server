@@ -58,3 +58,49 @@ params.maxTimeBeforeFail							= 1000000
 # ant
 ```
  - Restart batch: `/etc/init.d/kaltura-batch restart`.
+
+
+#### Activiti Deployment Instructions ####
+
+ - Install [Apache Tomcat 7](http://tomcat.apache.org/tomcat-7.0-doc/setup.html#Unix_daemon "Apache Tomcat 7")
+ - Make sure $CATALINA_BASE is defined.
+ - Install [Apache Ant](http://ant.apache.org/manual/installlist.html "Apache Ant")
+ - Download [Activiti 5.17.0](https://github.com/Activiti/Activiti/releases/download/activiti-5.17.0/activiti-5.17.0.zip "Activiti 5.17.0")
+ - Open zip: `unzip activiti-5.17.0.zip`
+ - Copy WAR files: 
+  - `cp activiti-5.17.0/wars/activiti-explorer.war $CATALINA_BASE/webapps/activiti-explorer##5.17.0.war`
+  - `cp activiti-5.17.0/wars/activiti-rest.war $CATALINA_BASE/webapps/activiti-rest##5.17.0.war`
+ - Restart Apache Tomcat.
+ - Create DB **(replace tokens)**: `mysql -uroot -p`
+
+		CREATE DATABASE activiti;
+		GRANT INSERT,UPDATE,DELETE,SELECT,ALTER,CREATE,INDEX ON activiti.* TO '@DB1_USER@'@'%';
+		FLUSH PRIVILEGES;
+
+ - Edit **(replace tokens)** $CATALINA_BASE/webapps/**activiti-explorer**/WEB-INF/classes/db.properties
+
+		jdbc.driver=com.mysql.jdbc.Driver
+		jdbc.url=jdbc:mysql://@DB1_HOST@:@DB1_PORT@/activiti
+		jdbc.username=@DB1_USER@
+		jdbc.password=@DB1_PASS@
+
+ - Edit **(replace tokens)** $CATALINA_BASE/webapps/**activiti-rest**/WEB-INF/classes/db.properties
+
+		jdbc.driver=com.mysql.jdbc.Driver
+		jdbc.url=jdbc:mysql://@DB1_HOST@:@DB1_PORT@/activiti
+		jdbc.username=@DB1_USER@
+		jdbc.password=@DB1_PASS@
+
+ - Download [mysql jdbc connector 5.0.8](http://cdn.mysql.com/Downloads/Connector-J/mysql-connector-java-5.0.8.zip "mysql jdbc connector 5.0.8")
+ - Open zip: `unzip mysql-connector-java-5.0.8.zip`
+ - Copy the mysql jdbc connector: `cp mysql-connector-java-5.0.8/mysql-connector-java-5.0.8-bin.jar $CATALINA_BASE/lib/`
+ - Restart Apache Tomcat.
+ - Open your browser to validate installation **(replace tokens)**: http://@WWW_HOST@:8080/activiti-explorer/
+	 - Username: kermit
+	 - Password: kermit
+ - Generate java pojo and bpmn clients **(replace tokens)**: `php @APP_DIR@/generator/generate.php pojo,bpmn`
+ - Edit deployment configuration file **(replace tokens)**: `cp @WEB_DIR@/content/clientlibs/bpmn/deploy/src/activiti.cfg.template.xml @WEB_DIR@/content/clientlibs/bpmn/deploy/src/activiti.cfg.xml`
+ - Deploy processes **(replace tokens)**:
+	 - `cd @WEB_DIR@/content/clientlibs/bpmn`
+	 - `ant`
+ - Add Activiti server to Kaltura server using the API **(replace tokens)**: `php @APP_DIR@/tests/standAloneClient/exec.php @APP_DIR@/tests/standAloneClient/activitiServer.xml`

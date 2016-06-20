@@ -439,7 +439,9 @@ class KalturaErrors extends APIErrors
 	const STORAGE_PROFILE_ID_NOT_FOUND = "STORAGE_PROFILE_ID_NOT_FOUND;ID;Storage profile id @ID@ not found";	
 	
 	const STORAGE_PROFILE_RULES_NOT_FULFILLED = "STORAGE_PROFILE_RULES_NOT_FULFILLED;ID;Storage profile rules for profile id @ID@ are not fulfilled";
-
+	
+	const FILE_PENDING = "FILE_PENDING;;File is pending";
+	
 	/*
 	 * resetUserPassword
 	 */

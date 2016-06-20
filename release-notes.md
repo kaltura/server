@@ -1,3 +1,95 @@
+# Kajam 11.17.0 #
+
+## Support configuring live brodcast url queryParams (relvant for none SaaS environments only) ##
+
+- Issue Type: Story
+- Issue ID: PLAT-5643
+
+### Configuration ###
+- update brodcast.ini add for each dc config:
+		
+		- queryParams = {p}.{e}.{i}
+
+#### Deployment Scripts ####
+
+None.
+		
+#### Known Issues & Limitations ####
+
+None.
+
+## Thumb Asset export ##
+
+- Issue Type: Story
+- Issue ID: PLAT-2325
+
+### Configuration ###
+None.
+
+#### Deployment Scripts ####
+
+		- Run 'php deployment/updates/scripts/add_permissions/2013_02_21_add_thumbasset_setasdefault.php''
+		
+#### Known Issues & Limitations ####
+
+None.
+
+
+## Schedule event new filtering options ##
+
+- Issue Type: Story
+- Issue ID: PLAT-5488 PLAT-5484
+
+### Configuration ###
+- update sphinx kaltura.conf:
+	
+		Add the following to kaltura_schedule_event index:
+		- rt_field = template_entry_categories_ids
+		- rt_field = resource_system_names
+		- rt_field = template_entry_id
+
+#### Deployment Scripts ####
+
+		- Need to re-build & re-index the schedule event sphinx table.
+		
+#### Known Issues & Limitations ####
+
+None.
+
+## Update entry ready email notification  ##
+
+- Issue Type: Support
+- Issue ID: SUP-8208
+
+### Configuration ###
+	
+script will ask for your:
+IP, userId and password (of your admin-console account), partner (insert -2 for partner)
+
+#### Deployment Scripts ####
+
+		php /opt/kaltura/app/tests/standAloneClient/exec.php /opt/kaltura/app/deployment/updates/scripts/xml/2016_05_31_updateEntryReadyTemplateForReplace.xml
+		
+#### Known Issues & Limitations ####
+
+None.
+
+## Content Aware Encoding  ##
+
+- Issue Type: Feature
+- Issue ID: PLAT-5640
+
+### Configuration ###
+[KAsyncExtractMedia : JobHandlerWorker]
+.
+.
+params.localTempPath = @TMP_DIR@/convert
+
+#### Known Issues & Limitations ####
+
+None.
+
+
 # Kajam 11.16.0 #
 
 ## entryServerNode validate registered serverNodes ##
@@ -15,27 +107,6 @@ None.
 #### Known Issues & Limitations ####
 
 None.
-
-## Schedule event new filtering options ##
-
-- Issue Type: Story
-- Issue ID: PLAT-5488 PLAT-5484
-
-### Configuration ###
-- update sphinx kaltura.conf:
-	
-		Add the following to kaltura_schedule_event index:
-		- rt_field = template_entry_categories_ids
-		- rt_field = system_names
-
-#### Deployment Scripts ####
-
-		- Need to re-build & re-index the schedule event sphinx table.
-		
-#### Known Issues & Limitations ####
-
-None.
-
 
 ## BPM notifications - burnt subtitles##
 

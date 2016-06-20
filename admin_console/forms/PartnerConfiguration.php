@@ -415,6 +415,17 @@ class Form_PartnerConfiguration extends Infra_Form
 		));
 
 
+		//--------------- HTML purifier behaviour ----------------------------
+		$htmlPurifierOptions = array(
+			Kaltura_Client_Enum_HTMLPurifierBehaviourType::IGNORE => 'Ignore',
+			Kaltura_Client_Enum_HTMLPurifierBehaviourType::NOTIFY => 'Notify',
+			Kaltura_Client_Enum_HTMLPurifierBehaviourType::SANITIZE => 'Sanitize',						
+			Kaltura_Client_Enum_HTMLPurifierBehaviourType::BLOCK => 'Block',						
+		);
+		$this->addElement('select', 'html_purifier_behaviour', array(
+			'label' => 'HTML Purifier Behaviour',
+			'filters' => array('StringTrim')));
+		$this->getElement('html_purifier_behaviour')->setMultiOptions($htmlPurifierOptions);
 //-----------------------------------------------------------------------
 		$this->addElement('hidden', 'crossLine', array(
 			'lable'			=> 'line',
@@ -888,6 +899,7 @@ class Form_PartnerConfiguration extends Infra_Form
 			array('legend' => 'Live Stream Config')
 		);
 		$this->addDisplayGroup(array('cdn_host_white_list'), 'cdnHostWhiteList');
+		$this->addDisplayGroup(array('html_purifier_behaviour'), 'htmlPurifierBehaviour');
 
 
 	}

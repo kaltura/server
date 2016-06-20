@@ -31,7 +31,28 @@
 require_once(dirname(__file__) . '/lib/KalturaCommandLineParser.php');
 require_once(dirname(__file__) . '/lib/KalturaSession.php');
 
+function renewKs($input, $expiry)
+{
+	$ks = $input; 
+	$patterns = array(
+		'/\/ks\/([a-zA-Z0-9+_\-]+=*)/', 
+		'/&ks=([a-zA-Z0-9+\/_\-]+=*)/', 
+		'/\?ks=([a-zA-Z0-9+\/_\-]+=*)/');
+	foreach ($patterns as $pattern)
+	{
+		preg_match_all($pattern, $input, $matches);
+		if ($matches[1])
+		{
+			$ks = reset($matches[1]);
+			break;
+		}
+	}
+	
+	return str_replace($ks, KalturaSession::extendKs($ks, $expiry), $input);
+}
+
 $commandLineSwitches = array(
+	array(KalturaCommandLineParser::SWITCH_NO_VALUE, 'i', 'stdin', 'Read input from stdin'),
 	array(KalturaCommandLineParser::SWITCH_NO_VALUE, 'b', 'bare', 'Print only the KS itself'),
 	array(KalturaCommandLineParser::SWITCH_REQUIRES_VALUE, 'e', 'expiry', 'Session expiry (seconds)'),
 );
@@ -40,34 +61,38 @@ $commandLineSwitches = array(
 $options = KalturaCommandLineParser::parseArguments($commandLineSwitches);
 $arguments = KalturaCommandLineParser::stripCommandLineSwitches($commandLineSwitches, $argv);
 
-if (!$arguments)
+if (!$arguments && !isset($options['stdin']))
 {
 	$usage = "Usage: renewKs [switches] <ks>\nOptions:\n";
 	$usage .= KalturaCommandLineParser::getArgumentsUsage($commandLineSwitches);
 	die($usage);
 }
 
-$input = $arguments[0];
-$ks = $input; 
-$expiry = (isset($options['expiry']) ? $options['expiry'] : 86400);
-
-$patterns = array('/\/ks\/([a-zA-Z0-9+_\-]+=*)/', '/&ks=([a-zA-Z0-9+\/_\-]+=*)/', '/\?ks=([a-zA-Z0-9+\/_\-]+=*)/');
-foreach ($patterns as $pattern)
-{
-	preg_match_all($pattern, $input, $matches);
-	if ($matches[1])
-	{
-		$ks = reset($matches[1]);
-		break;
-	}
-}
-
 KalturaSecretRepository::init();
 
-if (!isset($options['bare']))
-	echo "ks\t";
+$expiry = (isset($options['expiry']) ? $options['expiry'] : 86400);
 
-echo str_replace($ks, KalturaSession::extendKs($ks, $expiry), $input);
+if (!isset($options['stdin']))
+{
+	if (!isset($options['bare']))
+		echo "ks\t";
+	
+	echo renewKs($arguments[0], $expiry);
+	
+	if (!isset($options['bare']))
+		echo "\n";
+	die;
+}
 
-if (!isset($options['bare']))
+$f = fopen('php://stdin', 'r');
+for (;;)
+{
+	$line = fgets($f);
+	if (!$line)
+	{
+		break;
+	}
+	echo renewKs(trim($line), $expiry);
 	echo "\n";
+}
+fclose($f);

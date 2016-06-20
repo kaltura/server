@@ -62,9 +62,10 @@ class ScheduleEventFilter extends baseObjectFilter
 				"_mlikeor_template_entry_categories_ids",
 				"_mlikeand_template_entry_categories_ids",
 				"_like_template_entry_categories_ids",
-				"_mlikeor_system_names",
-				"_mlikeand_system_names",
-				"_like_system_names",
+				"_mlikeor_resource_system_names",
+				"_mlikeand_resource_system_names",
+				"_like_resource_system_names",
+				"_eq_template_entry_id",
 			) , NULL );
 
 		$this->allowed_order_fields = array (
@@ -97,6 +98,11 @@ class ScheduleEventFilter extends baseObjectFilter
 	public function getIdFromPeer()
 	{
 		return ScheduleEventPeer::ID;
+	}
+
+	public function setTemplateEntryIdEqual($v)
+	{
+		$this->set('_eq_template_entry_id', ($v));
 	}
 }
 

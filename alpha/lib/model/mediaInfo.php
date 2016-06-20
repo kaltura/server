@@ -23,4 +23,7 @@ class mediaInfo extends BasemediaInfo
 	
 	public function setContentStreams($v)	{$this->putInCustomData('ContentStreams', $v);}
 	public function getContentStreams()	{return $this->getFromCustomData('ContentStreams', null, null);}
+	
+	public function setComplexityValue($v)	{$this->putInCustomData('ComplexityValue', $v);}
+	public function getComplexityValue()	{return $this->getFromCustomData('ComplexityValue', null, null);}
 }

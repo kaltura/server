@@ -14,6 +14,8 @@ class AmazonS3StorageProfile extends StorageProfile
 	
 	const CUSTOM_DATA_FILES_PERMISSION_IN_S3 = 'files_permission_in_s3';
 	const CUSTOM_DATA_S3_REGION = 's3Region';
+	const CUSTOM_DATA_SSE_TYPE = 'sseType';
+	const CUSTOM_DATA_SSE_KMS_KEY_ID = 'sseKmsKeyId';
 	
 	public function getKalturaObjectType()
 	{
@@ -24,7 +26,8 @@ class AmazonS3StorageProfile extends StorageProfile
 	
 	public function setFilesPermissionInS3($v)
 	{
-		if (!is_null($v)){
+		if (!is_null($v))
+		{
 	    	$this->putInCustomData(self::CUSTOM_DATA_FILES_PERMISSION_IN_S3, $v);
 		}
 	}
@@ -37,7 +40,8 @@ class AmazonS3StorageProfile extends StorageProfile
 
 	public function setS3Region($v)
 	{
-		if (!is_null($v)){
+		if (!is_null($v))
+		{
 	    	$this->putInCustomData(self::CUSTOM_DATA_S3_REGION, $v);
 		}
 	}
@@ -45,6 +49,34 @@ class AmazonS3StorageProfile extends StorageProfile
 	public function getS3Region()
 	{
 	    $v = $this->getFromCustomData(self::CUSTOM_DATA_S3_REGION);
+	    return $v;
+	}
+	
+	public function setSseType($v)
+	{
+		if (!is_null($v))
+		{
+	    	$this->putInCustomData(self::CUSTOM_DATA_SSE_TYPE, $v);
+		}
+	}
+	
+	public function getSseType()
+	{
+	    $v = $this->getFromCustomData(self::CUSTOM_DATA_SSE_TYPE);
+	    return $v;
+	}
+	
+	public function setSseKmsKeyId($v)
+	{
+		if (!is_null($v))
+		{
+	    	$this->putInCustomData(self::CUSTOM_DATA_SSE_KMS_KEY_ID, $v);
+		}
+	}
+	
+	public function getSseKmsKeyId()
+	{
+	    $v = $this->getFromCustomData(self::CUSTOM_DATA_SSE_KMS_KEY_ID);
 	    return $v;
 	}
 }

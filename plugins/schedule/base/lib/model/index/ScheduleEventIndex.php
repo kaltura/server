@@ -72,7 +72,8 @@ class ScheduleEventIndex extends BaseIndexObject
 				'category_ids' => 'categoryIdsForIndex',
 				'resource_ids' => 'resourceIdsForIndex',
 				'template_entry_categories_ids' => 'templateEntryCategoriesIdsForIndex',
-				'system_names' => 'systemNamesForIndex',
+				'resource_system_names' => 'resourceSystemNamesForIndex',
+				'template_entry_id' => 'templateEntryId',
 			);
 		}
 		return self::$fieldsMap;
@@ -114,7 +115,8 @@ class ScheduleEventIndex extends BaseIndexObject
 				'resource_ids' => IIndexable::FIELD_TYPE_STRING,
 				'plugins_data' => IIndexable::FIELD_TYPE_STRING,
 				'template_entry_categories_ids' => IIndexable::FIELD_TYPE_STRING,
-				'system_names' => IIndexable::FIELD_TYPE_STRING,
+				'resource_system_names' => IIndexable::FIELD_TYPE_STRING,
+				'template_entry_id' => IIndexable::FIELD_TYPE_STRING,
 			);
 		}
 		return self::$typesMap;
@@ -168,7 +170,8 @@ class ScheduleEventIndex extends BaseIndexObject
 				'schedule_event.RESOURCE_IDS' => 'resource_ids',
 				'schedule_event.PLUGINS_DATA' => 'plugins_data',
 				'schedule_event.TEMPLATE_ENTRY_CATEGORIES_IDS' => 'template_entry_categories_ids',
-				'schedule_event.SYSTEM_NAMES' => 'system_names',
+				'schedule_event.RESOURCE_SYSTEM_NAMES' => 'resource_system_names',
+				'schedule_event.TEMPLATE_ENTRY_ID' => 'template_entry_id',
 			);
 		}
 		return self::$searchableFieldsMap;
@@ -217,7 +220,8 @@ class ScheduleEventIndex extends BaseIndexObject
 				"category_ids",
 				"resource_ids",
 				"template_entry_categories_ids",
-				"system_names",
+				"resource_system_names",
+				"template_entry_id",
 			);
 		}
 		return self::$matchableFields;

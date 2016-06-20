@@ -21,16 +21,29 @@
 	<target name="verify-version">
 		<fail message="Java 1.7 is required. If Java 1.7 is installed, set JAVA_HOME to its root directory.">
 			<condition>
-				<not><equals arg1="${ant.java.version}" arg2="1.7" /></not>
+				<not>
+					<or>
+						<equals arg1="${ant.java.version}" arg2="1.7" />
+						<equals arg1="${ant.java.version}" arg2="1.8" />
+					</or>
+				</not>
 			</condition>
 		</fail>
 		<input message="Please enter Kaltura client lib version" addproperty="kaltura.client.version" defaultvalue="3.3.1" />
-		<property name="jar.filename" value="${jar.lib.path}/KalturaClient-${kaltura.client.version}.jar" /><!-- change JAR name -->
 	</target>
 		
-	<target name="install-contrib">
-		<get src="http://sourceforge.net/projects/ant-contrib/files/ant-contrib/ant-contrib-0.6/ant-contrib-0.6-bin.zip" dest="ant-contrib-0.6-bin.zip" />
+	<target name="check-contrib">
+		<condition property="contrib.missing">
+			<not><available file="${basedir}/ant-contrib" /></not>
+		</condition>
+	</target>
+	
+	<target name="download-contrib" depends="check-contrib" if="contrib.missing">
+		<get src="http://tenet.dl.sourceforge.net/project/ant-contrib/ant-contrib/ant-contrib-0.6/ant-contrib-0.6-bin.zip" dest="ant-contrib-0.6-bin.zip" />
 		<unzip src="ant-contrib-0.6-bin.zip" dest="ant-contrib"/>
+	</target>
+		
+	<target name="install-contrib" depends="download-contrib">
 		<taskdef resource="net/sf/antcontrib/antcontrib.properties">
 			<classpath>
 				<pathelement location="${basedir}/ant-contrib/lib/ant-contrib-0.6.jar"/>
@@ -58,12 +71,22 @@
 			 		<replacefilter token="@DB1_PASS@" value="${activiti.db.password}" /> 
 			 	</replace>
 		 	</else>
-		 </if>
+		</if>
 	</target>
 
 	<!-- replace with exec task for mvn - skip tests -->
-	<target name="jar" depends="install-contrib">
-		<exec executable="mvn" dir="${java.lib.path}">
+	<target name="jar" depends="install-contrib, verify-version" description="Build POJO client lib JAR file">
+		<if>
+			<os family="windows" />
+			<then>
+			 	<property name="mvn.exe" value="mvn.bat" />
+			</then>
+			<else>
+			 	<property name="mvn.exe" value="mvn" />
+		 	</else>
+		 </if>
+	
+		<exec executable="${mvn.exe}" dir="${java.lib.path}" resolveexecutable="false">
 		    <arg value="clean"/>
 		    <arg value="dependency:copy-dependencies"/>
 		    <arg value="-Dmaven.test.skip=true"/>
@@ -71,13 +94,13 @@
 		</exec>
 	</target>
 	
-	<target name="bar">
+	<target name="bar" description="Zips all BPMN files into a single BAR file">
 		<zip destfile="${bar.filename}">
 			<fileset dir="${basedir}/processes" />
 		</zip>
 	</target>
 	
-	<target name="compile" depends="set-home">
+	<target name="compile" depends="set-home, verify-version">
 		<mkdir dir="${basedir}/deploy/bin"/>
 		<javac srcdir="${basedir}/deploy/src" encoding="UTF-8" destdir="${basedir}/deploy/bin">
 			<classpath>
@@ -89,13 +112,26 @@
 		<copy todir="${basedir}/deploy/bin">
 			<fileset dir="${basedir}/deploy/src" excludes="**/*.java" />
 		</copy>
-	</target>
-	
-	<target name="deploy" depends="verify-version, replace-tokens, jar, bar, compile, set-home">
-		<copy todir="${catalina.home}/lib">
-			<fileset dir="${jar.lib.path}" />
+		</target>
+		
+	<target name="deploy-jar" depends="install-contrib, set-home, verify-version" description="Deploy client library JAR file and its dependencies to tomcat lib directory">
+		<copy todir="${catalina.home}/lib" overwrite="true" verbose="true">
+			<fileset dir="${jar.lib.path}">
+				<include name="*.jar"/>
+			</fileset>
 			<fileset dir="${jar.lib.path}/dependency" />
 		</copy>
+	</target>
+	
+	<target name="deploy-bar" depends="install-contrib, replace-tokens, compile, set-home" description="Deploy processes BAR file to activiti server">
+		<if>
+			<not>
+				<available file="${bar.filename}"/>
+			</not>
+			<then>
+				<fail message="BAR file [${bar.filename}] is missing, please run bar target first." />
+			</then>
+		</if>
 		<java classname="com.kaltura.bpmn.deploy.DeployAllProcesses" failonerror="true">
 			<classpath path="${basedir}/deploy/bin">
 				<fileset dir="${catalina.home}/webapps/activiti-explorer##5.17.0/WEB-INF/lib">
@@ -107,6 +143,9 @@
 			</classpath>
 			<arg value="${bar.filename}" />
 		</java>
+	</target>
+	
+	<target name="deploy" depends="jar, deploy-jar, bar, deploy-bar" description="Build jar, compiles deployment class, package bar and deeploy them all">
 	</target>
 
 </project>

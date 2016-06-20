@@ -77,6 +77,10 @@ class categoryKuserFilter extends baseObjectFilter
 		$this->set('_likex_category_full_ids', $v);
 	}
 
+	public function setDirectMembers($v)
+	{
+		$this->set('_category_direct_members', $v);
+	}
 
 
 

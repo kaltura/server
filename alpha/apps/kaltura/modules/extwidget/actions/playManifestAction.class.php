@@ -130,9 +130,9 @@ class playManifestAction extends kalturaAction
 		return $calcToken == $urlToken;
 	}
 
-	protected function addAudioOnlyFlavors()
+	protected function addAltAudioFlavors()
 	{
-		$extraFlavors = assetPeer::retrieveReadyByEntryIdAndTag($this->entryId, "audio_only");
+		$extraFlavors = assetPeer::retrieveReadyByEntryIdAndTag($this->entryId, assetParams::TAG_ALT_AUDIO);
 		foreach ($extraFlavors as $extraFlavor)
 		{
 			/**
@@ -285,7 +285,7 @@ class playManifestAction extends kalturaAction
 		{
 			if ($this->deliveryAttributes->getFormat() == PlaybackProtocol::APPLE_HTTP)
 			{
-				$this->addAudioOnlyFlavors();
+				$this->addAltAudioFlavors();
 			}
 			return;
 		}
@@ -309,7 +309,7 @@ class playManifestAction extends kalturaAction
 		$this->flavorIds = assetPeer::retrieveReadyFlavorsIdsByEntryId($this->entryId, $this->flavorParamsIds);
 		if (!is_null($this->flavorIds) && $this->deliveryAttributes->getFormat() == PlaybackProtocol::APPLE_HTTP)
 		{
-			$this->addAudioOnlyFlavors();
+			$this->addAltAudioFlavors();
 		}
 
 	}

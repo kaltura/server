@@ -89,11 +89,15 @@ abstract class EntryScheduleEvent extends ScheduleEvent
 
 	public function getTemplateEntryCategoriesIdsForIndex()
 	{
-		$val = $this->getTemplateEntryId();
-		$categoryEntrys = categoryEntryPeer::retrieveActiveByEntryId($val);
+		$templateEntryId = $this->getTemplateEntryId();
+		if ( !isset($templateEntryId))
+			return '';
+
+		$categoryEntries = categoryEntryPeer::retrieveActiveByEntryId($templateEntryId);
 		$catgoriesIds = array();
-		foreach($categoryEntrys as $categoryEntry)
+		foreach($categoryEntries as $categoryEntry)
 		{
+			/* @var $categoryEntry CategoryEntry */
 			$categoryId = $categoryEntry->getCategoryId();
 			$catgoriesIds[] = $categoryId;
 		}

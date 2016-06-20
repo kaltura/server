@@ -168,6 +168,9 @@ class asset extends Baseasset implements ISyncableFile, IRelatedObject
 		$this->setFileExt($fromAsset->getFileExt());
 		$this->setTags($fromAsset->getTags());
 		$this->setDescription($fromAsset->getDescription());
+		$encKey = $fromAsset->getEncryptionKey();
+		if(isset($encKey))
+			$this->setEncryptionKey($encKey);
 		$this->incrementVersion();
 		$this->setStatusLocalReady();		
 	}
@@ -520,10 +523,15 @@ class asset extends Baseasset implements ISyncableFile, IRelatedObject
 		{
 			case StorageProfile::STORAGE_SERVE_PRIORITY_EXTERNAL_ONLY:
 				$serveRemote = true;
-				$fileSync = kFileSyncUtils::getReadyExternalFileSyncForKey($syncKey);
-				if(!$fileSync || $fileSync->getStatus() != FileSync::FILE_SYNC_STATUS_READY)
+				$fileSync = kFileSyncUtils::getReadyPendingExternalFileSyncForKey($syncKey);
+				if(!$fileSync)
+				{
 					throw new kCoreException("File sync not found: $syncKey", kCoreException::FILE_NOT_FOUND);
-				
+				} 
+				else if ($fileSync->getStatus() != FileSync::FILE_SYNC_STATUS_READY)
+				{
+					throw new kCoreException("File sync is pending: $syncKey",kCoreException::FILE_PENDING);
+				}
 				break;
 			
 			case StorageProfile::STORAGE_SERVE_PRIORITY_EXTERNAL_FIRST:
