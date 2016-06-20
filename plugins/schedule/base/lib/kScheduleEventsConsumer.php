@@ -3,22 +3,22 @@ class kScheduleEventsConsumer implements kObjectChangedEventConsumer, kObjectDel
 {
     public function shouldConsumeCreatedEvent(BaseObject $object)
     {
-        if ($object instanceof categoryEntry && $object->getStatus() == categoryEntryStatus::ACTIVE)
-            return true;
+//        if ($object instanceof categoryEntry && $object->getStatus() == categoryEntryStatus::ACTIVE)
+//            return true;
         return false;
     }
 
     public function shouldConsumeDeletedEvent(BaseObject $object)
     {
-        if ($object instanceof categoryEntry)
-            return true;
+//        if ($object instanceof categoryEntry)
+//            return true;
         return false;
     }
 
     public function shouldConsumeChangedEvent(BaseObject $object, array $modifiedColumns)
     {
-        if ($object instanceof categoryEntry && in_array(categoryEntryPeer::STATUS, $modifiedColumns) && $object->getStatus() == categoryEntryStatus::ACTIVE)
-            return true;
+//        if ($object instanceof categoryEntry && in_array(categoryEntryPeer::STATUS, $modifiedColumns) && $object->getStatus() == categoryEntryStatus::ACTIVE)
+//            return true;
         return false;
     }
 
