@@ -7,7 +7,7 @@
 
 ### Installation ###
 ##### BPM #####
--	deploy https://github.com/kaltura/saas-bpm/blob/master/copyChannelMetadataToEntry.bpmn kaltura-burnt-subtitles-update-children.bpmn
+-	deploy https://github.com/kaltura/saas-bpm/blob/master/kaltura-burnt-subtitles-update-children.bpmn
  
 ### Configuration ###
 None.
