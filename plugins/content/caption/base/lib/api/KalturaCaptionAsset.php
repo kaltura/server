@@ -137,9 +137,6 @@ class KalturaCaptionAsset extends KalturaAsset
 	 */
 	public function validateForInsert($propertiesToSkip = array())
 	{
-		if ($this->format == KalturaCaptionType::WEBVTT)
-			throw new KalturaAPIException(KalturaCaptionErrors::CAPTION_ASSET_UNSUPPORTED_FORMAT, $this->format);
-		
 		parent::validateForInsert($propertiesToSkip);
 	}
 }

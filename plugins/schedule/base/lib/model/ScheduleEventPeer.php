@@ -183,7 +183,7 @@ class ScheduleEventPeer extends BaseScheduleEventPeer implements IRelatedObjectP
 	}
 
 	/**
-	 * @param int $templateEntryId
+	 * @param string $templateEntryId
 	 * @return array<ScheduleEvent>
 	 */
 	public static function retrieveByTemplateEntryId($templateEntryId)
