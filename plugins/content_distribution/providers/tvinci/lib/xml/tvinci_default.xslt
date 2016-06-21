@@ -488,9 +488,7 @@
                     <xsl:with-param name="cdnCode" select="concat($playManifestPrefix, $relevantEntryId, '/format/',$tag/format, '/tags/', $tag/tagname, '/protocol/',$tag/protocol,'/f/a.',$tag/extension)"/>
                     <xsl:with-param name="coGuid" select="$coGuid"/>
                     <xsl:with-param name="duration" select="$duration"/>
-                    <xsl:if test="$isChild = false()">
-                      <xsl:with-param name="ppvModule" select="$filePPvMod"/>
-                    </xsl:if>
+                    <xsl:with-param name="ppvModule" select="$filePPvMod"/>
                     <xsl:with-param name="type" select="$typeName"/>
                 </xsl:call-template>
             </xsl:if>
