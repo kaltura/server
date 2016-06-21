@@ -284,6 +284,17 @@ class thumbnailAction extends sfAction
 
 		$partner = $entry->getPartner();
 		
+		//checks whether the thumbnail display should be restricted by KS
+		$base64Referrer = $this->getRequestParameter("referrer");
+		$referrer = base64_decode($base64Referrer);
+		if (!is_string($referrer))
+			$referrer = ""; // base64_decode can return binary data
+		if (!$referrer)
+			$referrer = kApiCache::getHttpReferrer();
+		$ksStr = $this->getRequestParameter("ks");
+		$secureEntryHelper = new KSecureEntryHelper($entry, $ksStr, $referrer, ContextType::THUMBNAIL);
+		$secureEntryHelper->validateForPlay();
+		
 		// not allow capturing frames if the partner has FEATURE_DISALLOW_FRAME_CAPTURE permission
 		if(($vid_sec != -1) || ($vid_slice != -1) || ($vid_slices != -1))
 		{
@@ -291,6 +302,10 @@ class thumbnailAction extends sfAction
 			{
 				KExternalErrors::dieError(KExternalErrors::NOT_ALLOWED_PARAMETER);
 			}
+			
+			$actionList = $secureEntryHelper->getActionList(RuleActionType::LIMIT_THUMBNAIL);
+			if ($actionList)
+				KExternalErrors::dieError(KExternalErrors::NOT_ALLOWED_PARAMETER);
 		}
 
 		if ($partner)
@@ -307,17 +322,6 @@ class thumbnailAction extends sfAction
 		
 		if(is_null($stripProfiles))
 			$stripProfiles = $partner->getStripThumbProfile();
-		
-		//checks whether the thumbnail display should be restricted by KS
-		$base64Referrer = $this->getRequestParameter("referrer");
-		$referrer = base64_decode($base64Referrer);
-		if (!is_string($referrer))
-			$referrer = ""; // base64_decode can return binary data
-		if (!$referrer)
-			$referrer = kApiCache::getHttpReferrer();
-		$ksStr = $this->getRequestParameter("ks");
-		$securyEntryHelper = new KSecureEntryHelper($entry, $ksStr, $referrer, ContextType::THUMBNAIL);
-		$securyEntryHelper->validateForPlay();
 		
 		// multiply the passed $src_* values so that they will relate to the original image size, according to $src_display_*
 		if ($rel_width != -1 && $rel_width) {
@@ -443,8 +447,8 @@ class thumbnailAction extends sfAction
 		}
 		
 		$nocache = false;
-		if ($securyEntryHelper->shouldDisableCache() || kApiCache::hasExtraFields() ||
-			(!$securyEntryHelper->isKsWidget() && $securyEntryHelper->hasRules(ContextType::THUMBNAIL)))
+		if ($secureEntryHelper->shouldDisableCache() || kApiCache::hasExtraFields() ||
+			(!$secureEntryHelper->isKsWidget() && $secureEntryHelper->hasRules(ContextType::THUMBNAIL)))
 			$nocache = true;
 
 		$cache = null;
