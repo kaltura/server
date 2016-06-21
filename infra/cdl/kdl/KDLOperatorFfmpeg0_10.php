@@ -53,6 +53,14 @@ class KDLOperatorFfmpeg0_10 extends KDLOperatorFfmpeg {
 		if(!isset($target->_video))
 			return $cmdStr;
 
+			/*
+			 * On COPY the filters are unrequried/unapplicable - 
+			 * therefore - skip it.
+			 */
+		if($target->_video->IsFormatOf(array(KDLVideoTarget::COPY))){
+			return $cmdStr;
+		}
+		
 $vid = $target->_video;
 $fltStr = null;
 
