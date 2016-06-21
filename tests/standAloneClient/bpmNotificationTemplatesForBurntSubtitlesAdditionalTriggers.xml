@@ -28,7 +28,7 @@
 			<template objectType="KalturaBusinessProcessStartNotificationTemplate">
 				<name>Source Asset Replaced</name>
 				<systemName>BPM_START_SOURCE_ASSET_REPLACED</systemName>
-				<description>entry content finished replacement</description>
+				<description>Entry content finished replacement</description>
 				<automaticDispatchEnabled>1</automaticDispatchEnabled>
 				<eventType>3</eventType> <!-- EventNotificationEventType::OBJECT_CHANGED -->
 				<eventObjectType>1</eventObjectType> <!-- EventNotificationEventObjectType::ENTRY -->
@@ -69,7 +69,7 @@
 						<modifiedColumns>replacementStatus</modifiedColumns>
 					</item>
 					<item objectType="KalturaFieldMatchCondition">
-						<description>replacement status equals</description>
+						<description>Replacement status equals</description>
 						<field objectType="KalturaEvalStringField">
 							<code>$scope->getObject()->getReplacementStatus()</code>
 						</field>
@@ -83,7 +83,7 @@
 				<userParameters objectType="array">
 					<item objectType="KalturaEventNotificationParameter">
 						<key>field_trigger_value</key>
-						<description>fields value for triggering</description>
+						<description>Fields value for triggering</description>
 						<value objectType="KalturaStringValue">
 							<description>none</description>
 							<value>0</value>
@@ -104,7 +104,7 @@
 				<typeEqual>{php:return KalturaEventNotificationTemplateType::BPM_START;}</typeEqual>
 				<partnerIdEqual>0</partnerIdEqual>
 				<statusEqual>1</statusEqual>
-				<systemNameEqual>BPM_START_METADATA_FIELD_CHANGED</systemNameEqual>
+				<systemNameEqual>BPM_START_ENTRY_CUSTOM_METADATA_FIELD_CHANGED</systemNameEqual>
 			</filter>
 		</request>
 		<request service="eventNotificationTemplate" action="delete" plugin="eventNotification" partnerId="0">
@@ -113,12 +113,12 @@
 		<request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
 			<template objectType="KalturaBusinessProcessStartNotificationTemplate">
 				<name>Metadata Field Changed</name>
-				<systemName>BPM_START_METADATA_FIELD_CHANGED</systemName>
+				<systemName>BPM_START_ENTRY_CUSTOM_METADATA_FIELD_CHANGED</systemName>
 				<description>Metadata Field Changed</description>
 				<automaticDispatchEnabled>1</automaticDispatchEnabled>
 				<eventType>6</eventType> <!-- EventNotificationEventType::OBJECT_DATA_CHANGED -->
 				<eventObjectType>metadataEventNotifications.Metadata</eventObjectType> <!-- EventNotificationEventObjectType::METADATA -->
-				<mainObjectCode>$object->getentry()</mainObjectCode>
+				<mainObjectCode>$object->getEntry()</mainObjectCode>
 				<contentParameters objectType="array">
 					<item objectType="KalturaEventNotificationParameter">
 						<key>endPoint</key>
@@ -131,21 +131,21 @@
 						<key>partnerId</key>
 						<description>Partner ID</description>
 						<value objectType="KalturaEvalStringField">
-							<code>$scope->getEvent()->getObject()->getentry()->getPartnerId()</code>
+							<code>$scope->getEvent()->getObject()->getEntry()->getPartnerId()</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
 						<key>adminSecret</key>
 						<description>Partner Administrator Secret</description>
 						<value objectType="KalturaEvalStringField">
-							<code>$scope->getEvent()->getObject()->getentry()->getPartner()->getAdminSecret()</code>
+							<code>$scope->getEvent()->getObject()->getEntry()->getPartner()->getAdminSecret()</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
 						<key>entryId</key>
 						<description>Entry ID</description>
 						<value objectType="KalturaEvalStringField">
-							<code>$scope->getEvent()->getObject()->getentry()->getId()</code>
+							<code>$scope->getEvent()->getObject()->getEntry()->getId()</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
@@ -174,7 +174,7 @@
 					<item objectType="KalturaFieldMatchCondition">
 						<description>No Parent Entry</description>
 						<field objectType="KalturaEvalStringField">
-							<code>$scope->getEvent()->getObject()->getentry()->getParentEntryId()</code>
+							<code>$scope->getEvent()->getObject()->getEntry()->getParentEntryId()</code>
 						</field>
 						<values objectType="array">
 							<item objectType="KalturaStringValue">

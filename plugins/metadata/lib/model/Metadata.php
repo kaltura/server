@@ -209,7 +209,7 @@ class Metadata extends BaseMetadata implements IIndexable, ISyncableFile, IRelat
 	/**
 	 * @return entry
 	 */
-	public function getentry()
+	public function getEntry()
 	{
 		if ($this->getObjectType() == MetadataObjectType::ENTRY)
 			return entryPeer::retrieveByPk($this->object_id);

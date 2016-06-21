@@ -5,10 +5,6 @@
  - Issue Type: New Feature
  - Issue ID: PLAT-5677
 
-### Installation ###
-##### BPM #####
--	deploy https://github.com/kaltura/saas-bpm/blob/master/kaltura-burnt-subtitles-update-children.bpmn
- 
 ### Configuration ###
 None.
  
