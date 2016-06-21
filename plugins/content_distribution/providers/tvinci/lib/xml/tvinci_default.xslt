@@ -559,7 +559,7 @@
     <!-- create the file element -->
     <xsl:template name="create-file-element">
         <xsl:param name="type"/>
-        <xsl:param name="ppvModule" select=""/>
+        <xsl:param name="ppvModule"/>
         <xsl:param name="coGuid"/>
         <xsl:param name="cdnCode"/>
         <xsl:param name="duration"/>
