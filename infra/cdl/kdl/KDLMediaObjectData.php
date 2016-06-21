@@ -330,9 +330,10 @@
 		/* ---------------------
 		 * Data
 		 */
-		public $_channels, 
-			   $_sampleRate,
-			   $_resolution;
+		public	$_channels, 
+			$_sampleRate,
+			$_resolution,
+			$_aac_adtstoasc_filter;
 
 		public function GetSectionEnum() { return KDLConstants::AudioIndex; }
 		
