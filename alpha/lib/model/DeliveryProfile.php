@@ -296,8 +296,8 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 			$audioLanguage = !is_null($obj)? $obj[languageCodeManager::ISO639_T]: $lang;
 		}
 
-		$audioLanguageName = !is_null($obj)? $obj[languageCodeManager::KALTURA_NAME] : 'Undefined';
-		if($audioLanguageName == 'Undefined')
+		$audioLanguageName = !is_null($obj) ? $obj[languageCodeManager::KALTURA_NAME] : $audioLanguage;
+		if($audioLanguageName == $audioLanguage)
 			KalturaLog::info("Language code [$audioLanguage] was not found. Setting [$audioLanguageName] instead");
 
 		return array($audioLanguage, $audioLanguageName);
