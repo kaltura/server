@@ -10,11 +10,7 @@ None.
  
 ### Deployment scripts ###
 
-	php /opt/kaltura/app/tests/standAloneClient/exec.php /opt/kaltura/app/tests/bpmNotificationTemplatesForBurntSubtitlesAdditionalTriggers.xml
-	Input: 
-	- Partner email address: admin console admin user
-	- Partner password: user's password
-	- Partner ID: -2
+	php /opt/kaltura/app/tests/standAloneClient/exec.php /opt/kaltura/app/tests/standAloneClient/bpmNotificationTemplatesForBurntSubtitles.xml
 
 #### Known Issues & Limitations ####
 
