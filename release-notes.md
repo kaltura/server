@@ -15,6 +15,17 @@
 
 None.
 
+## bpm - burn subtitles additional triggers ##
+
+ - Issue Type: New Feature
+ - Issue ID: PLAT-5677
+
+### Configuration ###
+None.
+ 
+### Deployment scripts ###
+
+	php /opt/kaltura/app/tests/standAloneClient/exec.php /opt/kaltura/app/tests/standAloneClient/bpmNotificationTemplatesForBurntSubtitles.xml
 
 # Kajam 11.17.0 #
 

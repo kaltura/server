@@ -175,6 +175,17 @@ class KDLOperatorFfmpeg2_1_3 extends KDLOperatorFfmpeg1_1_1 {
 			return $cmdStr;
 
 			/*
+			 * On COPY the resampling & filters are unrequried/unapplicable - 
+			 * therefore - skip it.
+			 * Handle AAC-ADTS case 
+			 */
+		if($target->_audio->IsFormatOf(array(KDLAudioTarget::COPY))){
+			if(isset($target->_audio->_aac_adtstoasc_filter) && $target->_audio->_aac_adtstoasc_filter==true)
+				$cmdStr.= " -bsf:a aac_adtstoasc";
+			return $cmdStr;
+		}
+		
+			/*
 			 * Handle audio multi stream 
 			 */
 		$filterStr = null;

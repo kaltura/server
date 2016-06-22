@@ -101,17 +101,20 @@ abstract class kSchedulingICalComponent
 				continue;
 			}
 
-			while (count($lines))
+			if ('RRULE' != $this->getType())
 			{
-				$additionalLine = array_shift($lines);
-				if (strpos($additionalLine, ':') !== FALSE)
+				while (count($lines))
 				{
-					array_unshift($lines, $additionalLine);
-					break;
-				} else
-				{
-					$additionalLine = trim($additionalLine);
-					$value .= $additionalLine;
+					$additionalLine = array_shift($lines);
+					if (strpos($additionalLine, ':') !== FALSE)
+					{
+						array_unshift($lines, $additionalLine);
+						break;
+					} else
+					{
+						$additionalLine = trim($additionalLine);
+						$value .= $additionalLine;
+					}
 				}
 			}
 
