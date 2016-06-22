@@ -27,6 +27,10 @@ None.
 
 	php /opt/kaltura/app/tests/standAloneClient/exec.php /opt/kaltura/app/tests/standAloneClient/bpmNotificationTemplatesForBurntSubtitles.xml
 
+#### Known Issues & Limitations ####
+
+None.
+
 # Kajam 11.17.0 #
 
 ## Support configuring live brodcast url queryParams (relvant for none SaaS environments only) ##
