@@ -1,5 +1,20 @@
 # Kajam 11.18.0 #
 
+## allow webcast player to update vote for poll ##
+
+- Issue Type: Story
+- Issue ID: WEBC-796
+
+### Configuration ###
+
+#### Deployment Scripts ####
+
+- Run 'php deployment/updates/scripts/add_permissions/2016_06_20_add_metadata_update_permission_to_qna.php'
+
+#### Known Issues & Limitations ####
+
+None.
+
 ## bpm - burn subtitles additional triggers ##
 
  - Issue Type: New Feature
