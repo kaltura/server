@@ -3,14 +3,14 @@
  * @package api
  * @subpackage objects
  */
-class KalturaAccessControlLimitThumbnailAction extends KalturaRuleAction
+class KalturaAccessControlLimitThumbnailCaptureAction extends KalturaRuleAction
 {
 	/**
 	 * Init object type
 	 */
 	public function __construct() 
 	{
-		$this->type = RuleActionType::LIMIT_THUMBNAIL;
+		$this->type = RuleActionType::LIMIT_THUMBNAIL_CAPTURE;
 	}
 	
 	/* (non-PHPdoc)
@@ -19,7 +19,7 @@ class KalturaAccessControlLimitThumbnailAction extends KalturaRuleAction
 	public function toObject($dbObject = null, $skip = array())
 	{
 		if(!$dbObject)
-			$dbObject = new kAccessControlLimitThumbnailAction();
+			$dbObject = new kAccessControlLimitThumbnailCaptureAction();
 			
 		return parent::toObject($dbObject, $skip);
 	}

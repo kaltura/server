@@ -35,8 +35,8 @@ class KalturaAccessControlActionArray extends KalturaTypedArray
 				return new KalturaAccessControlPreviewAction();
 			case RuleActionType::LIMIT_FLAVORS:
 				return new KalturaAccessControlLimitFlavorsAction();
-			case RuleActionType::LIMIT_THUMBNAIL:
-				return new KalturaAccessControlLimitThumbnailAction();
+			case RuleActionType::LIMIT_THUMBNAIL_CAPTURE:
+				return new KalturaAccessControlLimitThumbnailCaptureAction();
 			default:
 				return KalturaPluginManager::loadObject('KalturaAccessControlAction', $dbObject->getType());
 		}

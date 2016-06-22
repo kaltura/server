@@ -303,7 +303,7 @@ class thumbnailAction extends sfAction
 				KExternalErrors::dieError(KExternalErrors::NOT_ALLOWED_PARAMETER);
 			}
 			
-			$actionList = $secureEntryHelper->getActionList(RuleActionType::LIMIT_THUMBNAIL);
+			$actionList = $secureEntryHelper->getActionList(RuleActionType::LIMIT_THUMBNAIL_CAPTURE);
 			if ($actionList)
 				KExternalErrors::dieError(KExternalErrors::NOT_ALLOWED_PARAMETER);
 		}
@@ -319,6 +319,8 @@ class thumbnailAction extends sfAction
 
 		$thumbParams = new kThumbnailParameters();
 		$thumbParams->setSupportAnimatedThumbnail($partner->getSupportAnimatedThumbnails());
+		
+		
 		
 		if(is_null($stripProfiles))
 			$stripProfiles = $partner->getStripThumbProfile();
