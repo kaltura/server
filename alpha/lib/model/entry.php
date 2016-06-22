@@ -3058,7 +3058,6 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 		$copyObj->setSourceLink($this->source_link);
 		$copyObj->setLicenseType($this->license_type);
 		$copyObj->setCredit($this->credit);
-		$copyObj->setDisplayInSearch($this->display_in_search);
 		$copyObj->setScreenName($this->screen_name);
 		$copyObj->setSiteUrl($this->site_url);
 		$copyObj->setPermissions($this->permissions);
@@ -3070,10 +3069,6 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 		$copyObj->setPuserId($this->puser_id);
 		$copyObj->setAccessControlId($this->access_control_id);
 		$copyObj->setConversionProfileId($this->conversion_profile_id);
-//		$copyObj->setCategories($this->categories);
-//		$copyObj->setCategoriesIds($this->categories_ids);
-// 		$copyObj->setStartDate($this->start_date);
-// 		$copyObj->setEndDate($this->end_date);
 
 		if($coptPartnerId)
 			$copyObj->setPartnerId($this->getPartnerId());
