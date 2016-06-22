@@ -14,6 +14,8 @@ class ThumbAssetService extends KalturaAssetService
 		$liveStreamTypes = KalturaPluginManager::getExtendedTypes(entryPeer::OM_CLASS, KalturaEntryType::LIVE_STREAM);
 		
 		$mediaTypes = array_merge($liveStreamTypes, parent::getEnabledMediaTypes());
+		$mediaTypes[] = KalturaEntryType::AUTOMATIC;
+		
 		$mediaTypes = array_unique($mediaTypes);
 		return $mediaTypes;
 	}
@@ -71,7 +73,7 @@ class ThumbAssetService extends KalturaAssetService
     function addAction($entryId, KalturaThumbAsset $thumbAsset)
     {
     	$dbEntry = entryPeer::retrieveByPK($entryId);
-    	if(!$dbEntry || !in_array($dbEntry->getType(), $this->getEnabledMediaTypes()) || !in_array($dbEntry->getMediaType(), array(KalturaMediaType::VIDEO, KalturaMediaType::AUDIO, KalturaMediaType::LIVE_STREAM_FLASH)))
+    	if(!$dbEntry || !in_array($dbEntry->getType(), $this->getEnabledMediaTypes()) || ($dbEntry->getType() == entryType::MEDIA_CLIP && !in_array($dbEntry->getMediaType(), array(KalturaMediaType::VIDEO, KalturaMediaType::AUDIO, KalturaMediaType::LIVE_STREAM_FLASH))))
     		throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 		
     	if($thumbAsset->thumbParamsId)
