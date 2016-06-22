@@ -1,3 +1,21 @@
+# Kajam 11.18.0 #
+
+## bpm - burn subtitles additional triggers ##
+
+ - Issue Type: New Feature
+ - Issue ID: PLAT-5677
+
+### Configuration ###
+None.
+ 
+### Deployment scripts ###
+
+	php /opt/kaltura/app/tests/standAloneClient/exec.php /opt/kaltura/app/tests/standAloneClient/bpmNotificationTemplatesForBurntSubtitles.xml
+
+#### Known Issues & Limitations ####
+
+None.
+
 # Kajam 11.17.0 #
 
 ## Support configuring live brodcast url queryParams (relvant for none SaaS environments only) ##
