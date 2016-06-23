@@ -310,6 +310,13 @@
 							<value>0</value>
 						</value>
 					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>metadata_profile_system_name</key>
+						<description>Custom metadata profile system name to be used- optional</description>
+						<value objectType="KalturaStringValue">
+							<value></value>
+						</value>
+					</item>
 				</userParameters>
 			</template>
 		</request>
@@ -414,7 +421,7 @@
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
 						<key>metadata_profile_system_name</key>
-						<description>Custom metadata profile system name to be compared</description>
+						<description>Custom metadata profile system name to be compared and used</description>
 						<value objectType="KalturaStringValue">
 							<value></value>
 						</value>
