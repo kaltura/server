@@ -34,7 +34,12 @@ class ReaderThread(Thread):
                 curSlot = []
                 lastSlotIndex = curSlotIndex
             for curMessage in data.split('\0'):
-                curSlot.append(json.loads(curMessage))
+                try:
+                    curSlot.append(json.loads(curMessage))
+                except UnicodeDecodeError:
+                    pass
+                except ValueError:
+                    pass
 
 def safeFloat(num):
     try:
