@@ -6,13 +6,13 @@
 class KalturaAttachmentAssetFilter extends KalturaAttachmentAssetBaseFilter
 {
 	/**
-	 * @dynamicType KalturaAttachmentType
+	 * @dynamicType KalturaAssetType
 	 * @var string
 	 */
 	public $typeIn;
 	
 	/**
-	 * @dynamicType KalturaAttachmentType
+	 * @dynamicType KalturaAssetType
 	 * @var string
 	 */
 	public $typeNotIn;
@@ -21,6 +21,10 @@ class KalturaAttachmentAssetFilter extends KalturaAttachmentAssetBaseFilter
 	(
 		"typeIn" => "_in_type",
 		"typeNotIn" => "_notin_type",
+	);
+	
+	static private $order_by_map = array
+	(
 	);
 	
 	public function getMapBetweenObjects()
