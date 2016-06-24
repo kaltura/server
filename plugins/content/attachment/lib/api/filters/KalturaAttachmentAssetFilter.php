@@ -4,13 +4,7 @@
  * @subpackage api.filters
  */
 class KalturaAttachmentAssetFilter extends KalturaAttachmentAssetBaseFilter
-{
-	/**
-	 * @dynamicType KalturaAssetType
-	 * @var string
-	 */
-	public $typeIn;
-	
+{	
 	/**
 	 * @dynamicType KalturaAssetType
 	 * @var string
@@ -19,7 +13,6 @@ class KalturaAttachmentAssetFilter extends KalturaAttachmentAssetBaseFilter
 	
 	static private $map_between_objects = array
 	(
-		"typeIn" => "_in_type",
 		"typeNotIn" => "_notin_type",
 	);
 	
