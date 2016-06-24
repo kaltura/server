@@ -58,6 +58,11 @@ class KalturaAssetFilter extends KalturaAssetBaseFilter
 		
 		if($types)
 		{
+			if ($flavorAssetFilter->get('_notin_type'))
+			{
+				$typesToRemove = explode (',', $flavorAssetFilter->get('_notin_type'));
+				$types = array_diff($types, $typesToRemove);
+			}
 			$c->add(assetPeer::TYPE, $types, Criteria::IN);
 		}
 
