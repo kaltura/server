@@ -62,7 +62,7 @@ class kAccessControlModifyRequestHostRegexAction extends kRuleAction
 				}
 				else 
 				{
-					$replacement = "$1//" . $serverNode->getHostName() . "/" . EdgeServerNode::EDGE_SERVER_DEFAULT_KAPI_APPLICATION_NAME ."/$2";
+					$replacement = "$1://" . $serverNode->getHostName() . "/" . EdgeServerNode::EDGE_SERVER_DEFAULT_KAPI_APPLICATION_NAME ."/$2";
 				}
 			}
 		}
