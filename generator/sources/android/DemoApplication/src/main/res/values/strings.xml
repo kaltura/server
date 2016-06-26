@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<resources>
+    <string name="hello">Hello World, KalturaActivity!</string>
+    <string name="app_name">Kaltura</string>
+    <!-- Main-->
+    <string name="main_most_popular">Most Popular</string>
+    <string name="main_video_categories">Video Categories</string>
+    <string name="main_upload">Upload</string>
+    <string name="main_settings">Settings</string>
+    <!--Most Popular-->
+    <string name="most_popular">Most Popular</string>
+    <!-- Upload-->
+    <string name="upload_category">Category</string>
+    <string name="upload_title">Title</string>
+    <string name="upload_description">Description</string>
+    <string name="upload_tags">Tags</string>
+    <string name="upload_uploading">Uploading...</string>
+    <string name="upload_thanks">Thank You!</string>
+    <string name="upload_upload_success">Your video was uploaded successfully</string>
+    <!-- Settings-->
+    <string name="settings">Settings</string>
+    <string name="settings_user">User:</string>
+    <string name="settings_password">Password:</string>
+    <!-- Categories-->
+    <string name="action_bar_catigories">Categories</string>
+    <string name="catigories_search_hint">Search</string>
+    <!-- Button-->
+    <string name="settings_ok">Ok</string>
+    <string name="settings_cancel">Cancel</string>
+    <string name="upload_record_video">Record a Video</string>
+    <string name="upload_pick_from_gallery">Pick From Gallery</string>
+    <string name="upload">Upload</string>
+    <!--Info-->
+    <string name="info">Info</string>
+    
+<!-- Facebook events -->
+    <string name="toast_facebook_auth_success">Facebook authentication is successful</string>
+    <string name="toast_facebook_auth_fail">Error was occurred during Facebook authentication</string>
+    <string name="facebook_post_published">Posted to Facebook successfully</string>
+    <string name="facebook_post_publishing_failed">Post publishing was failed</string>
+    <string name="facebook_logged_out">You are logged out</string>
+    <!-- Twitter events -->
+    <string name="toast_twitter_auth_success">Twitter authentication is successful</string>
+    <string name="toast_twitter_auth_fail">Error was occurred during Twitter authentication</string>
+    <string name="twitter_post_published">Tweeted successfully</string>
+    <string name="twitter_post_publishing_failed">Tweet failed</string>
+    <string name="twitter_logged_out">You are logged out</string>    
+</resources>

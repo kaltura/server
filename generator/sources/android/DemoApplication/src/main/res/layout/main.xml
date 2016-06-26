@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center" >
+	
+    <ImageView 
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/main_logo"
+        android:layout_weight="2"/>
+        <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1">
+
+        <LinearLayout 
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:layout_weight="1">
+            
+			<ImageView
+		    	android:id="@+id/ibtn_most_popular"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:onClick="onClick"
+		        android:background="@drawable/main_most_popular_selector"/>
+	
+			<TextView
+			    android:id="@+id/tv_most_popular"
+		    	android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:text="@string/main_most_popular"
+		        android:textColor="@color/white"
+		        android:textSize="15sp"
+		        android:layout_marginTop="10dp"
+		        android:gravity="center"/>
+	
+		    <ImageView
+		    	android:id="@+id/ibtn_upload"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:onClick="onClick"
+		        android:background="@drawable/main_upload_selector"
+		        android:layout_marginTop="80dp" />
+			
+			<TextView
+			    android:id="@+id/tv_upload"			    
+		    	android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:text="@string/main_upload"
+		        android:textColor="@color/white"
+		        android:textSize="15sp"
+		        android:layout_marginTop="10dp"
+		        android:gravity="center" />
+        </LinearLayout>
+        
+        <LinearLayout 
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:layout_weight="1">
+        
+		    <ImageView
+		    	android:id="@+id/ibtn_video_categories"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:onClick="onClick"
+		        android:background="@drawable/main_video_catigories_selector" />
+	
+		    <TextView
+		        android:id="@+id/tv_video_catigories"
+		    	android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:text="@string/main_video_categories"
+		        android:textColor="@color/white"
+		        android:textSize="15sp"
+		        android:layout_marginTop="10dp"
+		        android:gravity="center" />
+	            
+		    <ImageView
+		    	android:id="@+id/ibtn_settings"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:onClick="onClick"
+		        android:background="@drawable/main_settings_selector"
+		        android:layout_marginTop="80dp" />
+	
+		    <TextView
+			    android:id="@+id/tv_settings"		        
+		    	android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:text="@string/main_settings"
+		        android:textColor="@color/white"
+		        android:textSize="15sp"
+		        android:layout_marginTop="10dp"
+		        android:gravity="center" />
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>

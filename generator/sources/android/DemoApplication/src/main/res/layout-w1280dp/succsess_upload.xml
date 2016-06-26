@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout 
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@drawable/background"
+    android:id="@+id/ll_upload_success">
+
+    <RelativeLayout 
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp">
+    	
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/tv_title"
+            android:text="@string/upload"
+            android:textColor="@color/black"
+            android:textSize="30sp"
+            android:layout_centerVertical="true"
+            android:layout_centerHorizontal="true"
+            android:paddingTop="40dp"/>
+        
+        <ImageView
+            android:id="@+id/iv_close"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/close_button"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true" />
+        
+    </RelativeLayout>
+    
+    <ScrollView 
+        android:layout_width="match_parent" 
+        android:layout_height="match_parent"
+        android:layout_margin="15dp">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp"  >
+    
+            <ImageView
+                android:id="@+id/iv_thumb"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:src="@drawable/upload"
+                android:layout_marginBottom="30dp" />
+     
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical|center_horizontal">
+
+                <Button
+                    android:id="@+id/btn_upload_successfully"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/upload_success_button_lscreen_normal"
+                    android:onClick="onClick"
+                    android:layout_marginRight="20dp" />
+    
+                <TextView
+                    android:id="@+id/tv_thank_you"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/upload_thanks"
+                    android:textColor="@color/black"
+                    android:textSize="40sp" />
+            </LinearLayout>
+    
+            <TextView
+                android:id="@+id/tv_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/upload_upload_success"
+                android:textColor="@color/black"
+                android:textSize="20sp"
+                android:gravity="center" />
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>
