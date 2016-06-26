@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="wrap_content"
+	android:layout_height="wrap_content"
+	android:background="@drawable/rate_background_selector"
+	android:paddingLeft="4dp"
+	android:paddingRight="4dp"
+	android:paddingTop="3dp"
+	android:paddingBottom="3dp"
+       >
+		        	
+	<TextView
+		android:id="@+id/tv_rate"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:text="720p"
+		android:textColor="@color/white"
+		android:layout_marginTop="10dp"
+                android:padding="5dp"/>
+		    	    		    	    	
+	<ImageView
+		android:id="@+id/iv_rate_up" 
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:background="@drawable/up_normal"
+		android:layout_toRightOf="@id/tv_rate"
+		android:layout_centerVertical="true"
+		android:layout_marginLeft="10dp"/>
+</RelativeLayout>

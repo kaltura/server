@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/black" >
+ 
+    <include layout="@layout/bar"
+	    android:id="@+id/bar"
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"/>
+     
+    <include layout="@layout/search"
+	    android:id="@+id/search"
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"/>
+
+    
+    <ScrollView 
+        android:id="@+id/scroll" 
+        android:layout_width="match_parent" 
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:fillViewport="true">
+		
+    <LinearLayout 
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+     
+	<RelativeLayout
+	    android:id="@+id/rl_category"
+            android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+             android:layout_weight="1">
+	    
+	    <ImageView
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:id="@+id/iv_thumbnail"
+	        android:onClick="onClick"/>
+	    <ProgressBar
+                android:id="@+id/pb_loading"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_centerVertical="true"
+                android:visibility="visible"/>
+	    <LinearLayout 
+	    	android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:background="#80060606"
+	        android:orientation="vertical"
+	        android:padding="5dp"
+	        android:layout_alignParentBottom="true">
+	        
+	        <TextView 
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:id="@+id/tv_name"
+	            android:text="Name"
+	            android:layout_marginBottom="3dp"
+	            android:textColor="@color/white"
+                    android:textSize="20sp"
+                    android:singleLine="true"/>
+
+		    <RelativeLayout 
+		    	android:layout_width="match_parent"
+		        android:layout_height="wrap_content">
+		        	        	        
+		        <TextView 
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content"
+		            android:id="@+id/tv_episode"
+		            android:text="Episode"
+		            android:textColor="@color/white"/>
+		        
+		        <TextView 
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content"
+		            android:id="@+id/tv_duration"
+		            android:text="Duration"
+		            android:layout_alignParentRight="true"
+		            android:textColor="@color/white"/>
+		        
+			</RelativeLayout>	        	        	            
+	    </LinearLayout>
+	</RelativeLayout>
+        
+        <LinearLayout
+            android:id="@+id/ll_base"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+             android:layout_weight="1"/>
+    </LinearLayout>
+    </ScrollView>
+    
+    
+	<!--<GridView
+		android:id="@+id/gv_category"
+	    android:layout_width="match_parent"
+	    android:layout_height="match_parent"
+	    android:numColumns="2"
+	    android:layout_weight="1"
+	    android:horizontalSpacing="5dp"
+	    android:verticalSpacing="5dp">
+    </GridView>-->
+
+</LinearLayout>

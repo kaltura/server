@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AbsoluteLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center" >
+
+    <RelativeLayout
+        android:id="@+id/rl_test"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
+        
+        
+            
+        <SurfaceView
+            android:id="@+id/surfaceView1"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+            
+        <ImageView
+            android:id="@+id/iv_thumb"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+            
+        <TextView
+            android:id="@+id/tv_done"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Done"
+            android:background="@drawable/rate_background_selector"
+            android:padding="7dp"
+            android:layout_margin="15dp"
+            android:onClick="onClick"
+            android:textColor="@color/white"/>
+            
+        <include
+            android:id="@+id/panel_player"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            layout="@layout/panel_player" />
+
+        <ProgressBar
+            android:id="@+id/pb_loading"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:visibility="gone"/>
+	</RelativeLayout>
+
+        <SeekBar
+            android:id="@+id/vsb_volume"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:thumb="@drawable/thumb"
+            android:progressDrawable="@drawable/seek_bar_progress_duration"
+            android:background="@drawable/volume_background"
+            android:minHeight="10dp"
+            android:maxHeight="10dp"
+            android:paddingLeft="15dp"
+            android:paddingRight="15dp"
+            android:progress="80"
+            android:visibility="gone"/>
+        
+        <include
+            android:id="@+id/rates"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/panel_player"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginRight="100dp"
+            layout="@layout/list_rates" />
+</AbsoluteLayout>

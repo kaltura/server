@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="1dp">
+
+    <ImageView
+	android:id="@+id/iv_thumbnail"
+	android:layout_width="match_parent"	
+        android:layout_height="match_parent"/>
+        
+    <ProgressBar
+        android:id="@+id/pb_loading"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:visibility="visible"/>        
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="#80060606"
+        android:gravity="center_vertical"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:layout_alignParentBottom="true" >
+	
+	    <TextView
+	        android:id="@+id/tv_name"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:text="Name"
+	        android:textColor="@color/white"
+	        android:textSize="17sp"
+	        android:layout_marginBottom="1dp"
+	        android:singleLine="true" />
+	
+	    <TextView
+	        android:id="@+id/tv_episode"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:text="Episode"
+	        android:textColor="@color/white"
+                android:layout_gravity="right"
+	        android:singleLine="true" />
+	</LinearLayout>
+</RelativeLayout>
