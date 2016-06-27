@@ -432,6 +432,31 @@ class KDLOperatorFfmpeg2_1_3 extends KDLOperatorFfmpeg1_1_1 {
 	}
 	
 	/**
+	 * (non-PHPdoc)
+	 * @see KDLOperatorFfmpeg0_10::generateH264params()
+	 */
+	protected function generateH264params($videoObject)
+	{
+		/*
+		 * Add 'stitchable'
+		 */
+		$h264params=parent::generateH264params($videoObject);
+		$h264paramsArr = explode(' ', $h264params);
+		if(in_array('-x264opts', $h264paramsArr)) {	
+			$key = array_search('-x264opts', $h264paramsArr);
+			if(strstr($h264paramsArr[$key+1],"stitchable")==false){
+				$h264paramsArr[$key+1].= ':stitchable';
+			}
+		}
+		else {
+			$h264paramsArr[] = '-x264opts';
+			$h264paramsArr[] = 'stitchable';
+		}
+		$h264params = implode(" ", $h264paramsArr);
+		return $h264params;
+	}
+	
+	/**
 	 * 
 	 * @param string $cmdStr
 	 */
