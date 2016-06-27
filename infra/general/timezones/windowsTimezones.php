@@ -1,6 +1,6 @@
 <?php
 
- return [
+ return array(
 		//Windowszones
 		'AUS Central Standard Time' => 'Australia/Darwin',
 		'AUS Eastern Standard Time' => 'Australia/Sydney',
@@ -107,5 +107,5 @@
 		'West Asia Standard Time' => 'Asia/Tashkent',
 		'West Pacific Standard Time' => 'Pacific/Port_Moresby',
 		'Yakutsk Standard Time' => 'Asia/Yakutsk',
- ];
+ );
 

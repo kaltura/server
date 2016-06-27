@@ -1,6 +1,6 @@
 <?php
 
- return [
+ return array(
 		// Microsoft exchange timezones
 		'Universal Coordinated Time' => 'UTC',
 		'Casablanca, Monrovia' => 'Africa/Casablanca',
@@ -80,5 +80,5 @@
 		'Hawaii' => 'Pacific/Honolulu',
 		'Midway Island, Samoa' => 'Pacific/Midway',
 		'Eniwetok, Kwajalein, Dateline Time' => 'Pacific/Kwajalein',
-];
+);
 
