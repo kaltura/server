@@ -1,6 +1,6 @@
 <?php
 
- return [
+ return array(
 		//Lotus / Domino timezones
 		'Dateline' => 'Etc/GMT-12',
 		'Samoa' => 'Pacific/Apia',
@@ -90,5 +90,5 @@
 		'Fiji' => 'Pacific/Fiji',
 		'New Zealand' => 'Pacific/Auckland',
 		'Tonga' => 'Pacific/Tongatapu',
- ];
+ );
 
