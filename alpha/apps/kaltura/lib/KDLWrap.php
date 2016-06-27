@@ -119,7 +119,8 @@ class KDLWrap
 
 		if($isForWideVine==true) {
 			foreach($profile->_flavors as $k=>$kdlFlavor) {
-				$profile->_flavors[$k]->_video->_forWideVine = true;
+				if(isset($profile->_flavors[$k]->_video))
+					$profile->_flavors[$k]->_video->_forWideVine = true;
 			}
 		}
 
