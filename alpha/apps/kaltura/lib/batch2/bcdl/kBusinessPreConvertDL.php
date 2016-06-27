@@ -1796,13 +1796,19 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 			KalturaLog::err($errMsg);
 			throw new kCoreException($errMsg , KDLErrors::Encryption);
 		}
-		$signingKey = kConf::get('signing_key', 'drm', null);
+		
+		$signingKeys  = kConf::get('partner_signing_key', 'drm', array());
+		if(isset($signingKeys[$partnerId]))
+			$signingKey = $signingKeys[$partnerId];
+		else		
+			$signingKey = kConf::get('signing_key', 'drm', null);
+		
 		if(!(isset($signingKey))) {
 			$errMsg = "Encryption: Missing 'signing_key' ";
 			KalturaLog::err($errMsg);
 			throw new kCoreException($errMsg , KDLErrors::Encryption);
 		}
-		KalturaLog::log("Successfully retrieved UDRM 'internal_encryption_url' and 'signing_key' vals");
+		KalturaLog::log("Successfully retrieved UDRM 'internal_encryption_url' and 'signing_key' vals ($signingKeys)");
 
 			/*
 			 * Prepare data for the UDRM service curl call
@@ -1815,25 +1821,29 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 		$jsonPostData = json_encode($requestInfo);
 		$signature = urlencode(base64_encode(sha1($signingKey . $jsonPostData, true)));
 		$serviceURL = $licenseServerUrl.'/cenc/widevine/encryption?signature=' . $signature;
-		$ch = curl_init($serviceURL);
-		curl_setopt($ch, CURLOPT_HTTPHEADER,array('Content-type: application/json')	);
-		curl_setopt($ch, CURLOPT_POST, true);
-		curl_setopt($ch, CURLOPT_POSTFIELDS, $jsonPostData);
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-		KalturaLog::log("calling UDRM service - serviceURL($serviceURL), data ($jsonPostData)");
-
-		$output = curl_exec($ch);
-		if ($output === false){
-			$errMsg = "Encryption: Could not get UDRM Data,error message 'Curl had an error '".curl_error($ch)."'";
-			KalturaLog::err($errMsg);
-			throw new kCoreException($errMsg , KDLErrors::Encryption);
+		
+		$retryCount = 3;
+		while ($retryCount--) {
+			$ch = curl_init($serviceURL);
+			curl_setopt($ch, CURLOPT_HTTPHEADER,array('Content-type: application/json')	);
+			curl_setopt($ch, CURLOPT_POST, true);
+			curl_setopt($ch, CURLOPT_POSTFIELDS, $jsonPostData);
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+			KalturaLog::log("calling UDRM service - serviceURL($serviceURL), data ($jsonPostData)");
+	
+			$output = curl_exec($ch);
+			if ($output === false){
+				$errMsg = "Encryption: Could not get UDRM Data,error message 'Curl had an error '".curl_error($ch)."'";
+				KalturaLog::err($errMsg);
+				throw new kCoreException($errMsg , KDLErrors::Encryption);
+			}
+			$retVal = json_decode($output);
+			if (is_array($retVal) && isset($retVal[0]->key_id))
+				return $retVal[0];
 		}
-		$retVal = json_decode($output);
-		if (!(is_array($retVal) && isset($retVal[0]->key_id))){
-			$errMsg = "Encryption: Did got invalid result from udrm service, output ($output)";
-			KalturaLog::err($errMsg);
-			throw new kCoreException($errMsg , KDLErrors::Encryption);
-		}
-		return $retVal[0];
+		
+		$errMsg = "Encryption: Did got invalid result from udrm service, output ($output)";
+		KalturaLog::err($errMsg);
+		throw new kCoreException($errMsg , KDLErrors::Encryption);
 	}
 }
