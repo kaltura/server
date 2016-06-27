@@ -19,12 +19,18 @@ class KalturaAccessControlModifyRequestHostRegexAction extends KalturaRuleAction
 	 */
 	public $replacement;
 	
-	
+	/**
+	 * serverNodeId to generate replacment host from
+	 *
+	 * @var int
+	 */
+	public $replacmenServerNodeId;
 	
 	private static $mapBetweenObjects = array
 	(
 		'pattern',
 		'replacement',
+		'replacmenServerNodeId',
 	);
 	/**
 	 * Init object type
