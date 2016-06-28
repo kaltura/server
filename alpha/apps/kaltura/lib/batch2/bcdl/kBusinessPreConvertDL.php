@@ -910,7 +910,7 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 				 * is closer than 15% to the matched flavor,
 				 * otherwise - skip it
 				 */
-				if($diff<0 || $diff/$matchSourceHeightFlavor->getVideoBitrate()>0.5){
+				if($diff<0 || $diff/$matchSourceHeightFlavor->getVideoBitrate()>0.15){
 					continue;
 				}
 KalturaLog::log("Look for redundant: diff($diff),percent(".($diff*100/$matchSourceHeightFlavor->getVideoBitrate()).")");
