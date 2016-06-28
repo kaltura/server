@@ -883,6 +883,52 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 				$first->_force = true; // _create_anyway
 			}
 			*/
+			/*
+			 * Check whether the next closest flavor to the matched one is redundant.
+			 * If so - set it to NonComply.
+			 * Example - 
+			 * Matched flavor is 2700Kbps/1080p, the closest is 2500Kbps/720p. 
+			 * The 2500 flavor is very close to the matched flavor, thus redundant.
+			 */
+			$closest=null;
+			$matchSourceHeightFlavor = $targetFlavorArr[$matchSourceHeightIdx];
+				/*
+				 * Loop for the closest flavor
+				 */
+			foreach($targetFlavorArr as $key=>$flavor){
+				if($key==$matchSourceHeightIdx)
+					continue;
+				/*
+				 * To avoid playback/delivery inconsistency, the aledged redundant flavor 
+				 * should share the same tags like the newly matched
+				 */
+				if($matchSourceHeightFlavor->getTags()!=$flavor->getTags())
+					continue;
+				$diff = $matchSourceHeightFlavor->getVideoBitrate()-$flavor->getVideoBitrate();
+				/*
+				 * The flavor considered to be redundant if it's bitrate
+				 * is closer than 15% to the matched flavor,
+				 * otherwise - skip it
+				 */
+				if($diff<0 || $diff/$matchSourceHeightFlavor->getVideoBitrate()>0.5){
+					continue;
+				}
+KalturaLog::log("Look for redundant: diff($diff),percent(".($diff*100/$matchSourceHeightFlavor->getVideoBitrate()).")");
+				if(!isset($closest)){
+					$closest = $key;
+					$closestDiff = $diff;
+					continue;
+				}
+				if($closestDiff>$diff) {
+					$closest = $key;
+					$closestDiff = $diff;
+				}
+			}
+			if(isset($closest)){
+KalturaLog::log("Found redundant: bitrate ".$targetFlavorArr[$closest]->getVideoBitrate());
+				$targetFlavorArr[$closest]->_isNonComply = true;
+			}
+
 		}
 	}
 	
