@@ -494,11 +494,11 @@ class AttachmentAssetService extends KalturaAssetService
 	 * List attachment Assets by filter and pager
 	 * 
 	 * @action list
-	 * @param KalturaAssetFilter $filter
+	 * @param KalturaAttachmentAssetFilter $filter
 	 * @param KalturaFilterPager $pager
 	 * @return KalturaAttachmentAssetListResponse
 	 */
-	function listAction(KalturaAssetFilter $filter = null, KalturaFilterPager $pager = null)
+	function listAction(KalturaAttachmentAssetFilter $filter = null, KalturaFilterPager $pager = null)
 	{
 		if(!$filter)
 		{
@@ -515,6 +515,7 @@ class AttachmentAssetService extends KalturaAssetService
 		}
 
 		$types = KalturaPluginManager::getExtendedTypes(assetPeer::OM_CLASS, AttachmentPlugin::getAssetTypeCoreValue(AttachmentAssetType::ATTACHMENT));
+		
 		return $filter->getTypeListResponse($pager, $this->getResponseProfile(), $types);
 	}
 	

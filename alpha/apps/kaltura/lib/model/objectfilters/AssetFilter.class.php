@@ -37,6 +37,7 @@ class AssetFilter extends baseObjectFilter
 			"_mlikeor_tags" ,			
 			"_mlikeand_tags" ,
 			"_in_type",
+			"_notin_type",
 		) , NULL );
 
 		$this->allowed_order_fields = array ( 
