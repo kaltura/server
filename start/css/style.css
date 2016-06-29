@@ -87,9 +87,12 @@ li {
 }
 
 #insideWrap {
+	border-radius: 10px;
 	padding: 5px 18px 25px;
-	displays: table;
 	background: #F8F8F8 url(../images/bg.png) repeat-x;
+	margin: 10px auto;
+	width: 90%;
+	border-radius: 15px;
 }
 
 #menu {
