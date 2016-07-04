@@ -883,6 +883,52 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 				$first->_force = true; // _create_anyway
 			}
 			*/
+			/*
+			 * Check whether the next closest flavor to the matched one is redundant.
+			 * If so - set it to NonComply.
+			 * Example - 
+			 * Matched flavor is 2700Kbps/1080p, the closest is 2500Kbps/720p. 
+			 * The 2500 flavor is very close to the matched flavor, thus redundant.
+			 */
+			$closest=null;
+			$matchSourceHeightFlavor = $targetFlavorArr[$matchSourceHeightIdx];
+				/*
+				 * Loop for the closest flavor
+				 */
+			foreach($targetFlavorArr as $key=>$flavor){
+				if($key==$matchSourceHeightIdx)
+					continue;
+				/*
+				 * To avoid playback/delivery inconsistency, the aledged redundant flavor 
+				 * should share the same tags like the newly matched
+				 */
+				if($matchSourceHeightFlavor->getTags()!=$flavor->getTags())
+					continue;
+				$diff = $matchSourceHeightFlavor->getVideoBitrate()-$flavor->getVideoBitrate();
+				/*
+				 * The flavor considered to be redundant if it's bitrate
+				 * is closer than 15% to the matched flavor,
+				 * otherwise - skip it
+				 */
+				if($diff<0 || $diff/$matchSourceHeightFlavor->getVideoBitrate()>0.15){
+					continue;
+				}
+KalturaLog::log("Look for redundant: diff($diff),percent(".($diff*100/$matchSourceHeightFlavor->getVideoBitrate()).")");
+				if(!isset($closest)){
+					$closest = $key;
+					$closestDiff = $diff;
+					continue;
+				}
+				if($closestDiff>$diff) {
+					$closest = $key;
+					$closestDiff = $diff;
+				}
+			}
+			if(isset($closest)){
+KalturaLog::log("Found redundant: bitrate ".$targetFlavorArr[$closest]->getVideoBitrate());
+				$targetFlavorArr[$closest]->_isNonComply = true;
+			}
+
 		}
 	}
 	
@@ -1796,13 +1842,19 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 			KalturaLog::err($errMsg);
 			throw new kCoreException($errMsg , KDLErrors::Encryption);
 		}
-		$signingKey = kConf::get('signing_key', 'drm', null);
+		
+		$signingKeys  = kConf::get('partner_signing_key', 'drm', array());
+		if(isset($signingKeys[$partnerId]))
+			$signingKey = $signingKeys[$partnerId];
+		else		
+			$signingKey = kConf::get('signing_key', 'drm', null);
+		
 		if(!(isset($signingKey))) {
 			$errMsg = "Encryption: Missing 'signing_key' ";
 			KalturaLog::err($errMsg);
 			throw new kCoreException($errMsg , KDLErrors::Encryption);
 		}
-		KalturaLog::log("Successfully retrieved UDRM 'internal_encryption_url' and 'signing_key' vals");
+		KalturaLog::log("Successfully retrieved UDRM 'internal_encryption_url' and 'signing_key' vals ($signingKeys)");
 
 			/*
 			 * Prepare data for the UDRM service curl call
@@ -1815,25 +1867,29 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 		$jsonPostData = json_encode($requestInfo);
 		$signature = urlencode(base64_encode(sha1($signingKey . $jsonPostData, true)));
 		$serviceURL = $licenseServerUrl.'/cenc/widevine/encryption?signature=' . $signature;
-		$ch = curl_init($serviceURL);
-		curl_setopt($ch, CURLOPT_HTTPHEADER,array('Content-type: application/json')	);
-		curl_setopt($ch, CURLOPT_POST, true);
-		curl_setopt($ch, CURLOPT_POSTFIELDS, $jsonPostData);
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-		KalturaLog::log("calling UDRM service - serviceURL($serviceURL), data ($jsonPostData)");
-
-		$output = curl_exec($ch);
-		if ($output === false){
-			$errMsg = "Encryption: Could not get UDRM Data,error message 'Curl had an error '".curl_error($ch)."'";
-			KalturaLog::err($errMsg);
-			throw new kCoreException($errMsg , KDLErrors::Encryption);
+		
+		$retryCount = 3;
+		while ($retryCount--) {
+			$ch = curl_init($serviceURL);
+			curl_setopt($ch, CURLOPT_HTTPHEADER,array('Content-type: application/json')	);
+			curl_setopt($ch, CURLOPT_POST, true);
+			curl_setopt($ch, CURLOPT_POSTFIELDS, $jsonPostData);
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+			KalturaLog::log("calling UDRM service - serviceURL($serviceURL), data ($jsonPostData)");
+	
+			$output = curl_exec($ch);
+			if ($output === false){
+				$errMsg = "Encryption: Could not get UDRM Data,error message 'Curl had an error '".curl_error($ch)."'";
+				KalturaLog::err($errMsg);
+				throw new kCoreException($errMsg , KDLErrors::Encryption);
+			}
+			$retVal = json_decode($output);
+			if (is_array($retVal) && isset($retVal[0]->key_id))
+				return $retVal[0];
 		}
-		$retVal = json_decode($output);
-		if (!(is_array($retVal) && isset($retVal[0]->key_id))){
-			$errMsg = "Encryption: Did got invalid result from udrm service, output ($output)";
-			KalturaLog::err($errMsg);
-			throw new kCoreException($errMsg , KDLErrors::Encryption);
-		}
-		return $retVal[0];
+		
+		$errMsg = "Encryption: Did got invalid result from udrm service, output ($output)";
+		KalturaLog::err($errMsg);
+		throw new kCoreException($errMsg , KDLErrors::Encryption);
 	}
 }

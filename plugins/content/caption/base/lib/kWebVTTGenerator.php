@@ -20,7 +20,7 @@ class kWebVTTGenerator
 		$hours = $timeStamp;
 		return sprintf('%02d:%02d:%02d.%03d', $hours, $minutes, $seconds, $millis);
 	}
-	
+
 	/**
 	 * @param int $segmentDuration
 	 * @param int $entryDuration
@@ -42,7 +42,7 @@ class kWebVTTGenerator
 		$result .= "#EXT-X-ENDLIST\r\n";
 		return $result;
 	}
-	
+
 	/**
 	 * @param array $parsedCaption
 	 * @param int $segmentIndex
@@ -54,14 +54,15 @@ class kWebVTTGenerator
 	{
 		$segmentStartTime = ($segmentIndex - 1) * $segmentDuration * 1000;
 		$segmentEndTime = $segmentIndex * $segmentDuration * 1000;
-		
+
 		$result = "WEBVTT\n";
-		$result .= "X-TIMESTAMP-MAP=MPEGTS:900000,LOCAL:".self::formatWebVTTTimeStamp($localTimestamp)."\n\n";
-	
+		$result .= "X-TIMESTAMP-MAP=MPEGTS:900000,LOCAL:" . self::formatWebVTTTimeStamp($localTimestamp) . "\n\n";
+
 		foreach ($parsedCaption as $curCaption)
 		{
-			if ($segmentIndex != -1  && ($curCaption["startTime"] < $segmentStartTime || $curCaption["startTime"] >= $segmentEndTime) &&
-				($curCaption["endTime"] < $segmentStartTime || $curCaption["endTime"] >= $segmentEndTime))
+			if ($segmentIndex != -1 && ($curCaption["startTime"] < $segmentStartTime || $curCaption["startTime"] >= $segmentEndTime) &&
+				($curCaption["endTime"] < $segmentStartTime || $curCaption["endTime"] >= $segmentEndTime)
+			)
 				continue;
 
 			// calculate line-level styling
@@ -70,7 +71,7 @@ class kWebVTTGenerator
 			if ($firstChunk && isset($firstChunk['style']))
 			{
 				$style = $firstChunk['style'];
-				
+
 				$aligmentMapping = array('left' => 'start', 'right' => 'end', 'center' => 'middle', 'full' => 'middle');
 				if (isset($style['textAlign']))
 				{
@@ -80,12 +81,12 @@ class kWebVTTGenerator
 					else
 						$styling .= $style['align'];
 				}
-				
+
 				$aligmentMapping = array('before' => '0%', 'center' => '50%', 'after' => '100%');
 				if (isset($style['displayAlign']) && isset($aligmentMapping[$style['displayAlign']]))
-					$styling .= ' line:'.$aligmentMapping[$style['displayAlign']];
+					$styling .= ' line:' . $aligmentMapping[$style['displayAlign']];
 			}
-			
+
 			// calculate the line content
 			$content = '';
 			foreach ($curCaption['content'] as $curChunk)
@@ -101,13 +102,54 @@ class kWebVTTGenerator
 				}
 				$content .= $curChunkText;
 			}
-			
+
 			// make sure the content does not contain 2 consecutive newlines
 			$content = preg_replace('/\n+/', "\n", str_replace("\r", '', $content));
-			
-			$result .= self::formatWebVTTTimeStamp($curCaption["startTime"]) . ' --> ' . 
-					   self::formatWebVTTTimeStamp($curCaption["endTime"]) . 
-					   $styling . "\n";
+
+			$result .= self::formatWebVTTTimeStamp($curCaption["startTime"]) . ' --> ' .
+				self::formatWebVTTTimeStamp($curCaption["endTime"]) .
+				$styling . "\n";
+			$result .= trim($content) . "\n\n";
+		}
+		return $result;
+	}
+
+	/**
+	 * @param webVttCaptionsContentManager $captionsContentManager
+	 * @param int $segmentIndex
+	 * @param int $segmentDuration
+	 * @param int $localTimestamp
+	 * @return string
+	 */
+	public static function getSegmentFromWebVTT($captionsContentManager, $webVTTcontent, $segmentIndex, $segmentDuration, $localTimestamp)
+	{
+		$parsedCaption = $captionsContentManager->parseWebVTT($webVTTcontent);
+		$headerInfo = $captionsContentManager->headerInfo;
+
+		$segmentStartTime = ($segmentIndex - 1) * $segmentDuration * 1000;
+		$segmentEndTime = $segmentIndex * $segmentDuration * 1000;
+
+		$result = implode('', $headerInfo);
+		$result .= "X-TIMESTAMP-MAP=MPEGTS:900000,LOCAL:" . self::formatWebVTTTimeStamp($localTimestamp) . "\n\n";
+
+		foreach ($parsedCaption as $curCaption)
+		{
+			if ($segmentIndex != -1 && ($curCaption["startTime"] < $segmentStartTime || $curCaption["startTime"] >= $segmentEndTime) &&
+			($curCaption["endTime"] < $segmentStartTime || $curCaption["endTime"] >= $segmentEndTime))
+			continue;
+			// calculate the line content
+			$content = '';
+			foreach ($curCaption['content'] as $curChunk)
+			{
+				$curChunkText = $curChunk['text'];
+				$content .= $curChunkText;
+			}
+
+			// make sure the content does not contain 2 consecutive newlines
+			$content = preg_replace('/\n+/', "\n", str_replace("\r", '', $content));
+
+			$result .= self::formatWebVTTTimeStamp($curCaption["startTime"]) . ' --> ' .
+				self::formatWebVTTTimeStamp($curCaption["endTime"]) ."\n";
 			$result .= trim($content) . "\n\n";
 		}
 		return $result;

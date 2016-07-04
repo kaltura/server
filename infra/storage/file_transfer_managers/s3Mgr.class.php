@@ -144,7 +144,7 @@ class s3Mgr extends kFileTransferMgr
  		}
 		catch ( Exception $e )
 		{
-			KalturaLog::err("error uploading file ".$local_file." s3 info ".print_r($info, true));
+			KalturaLog::err("error uploading file ".$local_file." s3 info: ".$e->getMessage());
 			return false;
 		}
 	}

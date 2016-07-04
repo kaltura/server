@@ -659,6 +659,17 @@ $plannedDur = 0;
 				}else{
 					$target->_audio = $this->evaluateTargetAudio($source->_audio, $target, null);
 				}
+				
+				/*
+				 * When copying AAC from MPEG-TS source into MP4 target, special bitstream filter should be applied 
+				 */
+				if(isset($source->_container) && $source->_container->IsFormatOf(array("mpeg-ts","mpegts","mts")) 
+					&& $source->_audio->IsFormatOf(array("aac")) 
+					&& isset($target->_audio) && $target->_audio->IsFormatOf(array(KDLAudioTarget::COPY))
+					&& $target->_container->IsFormatOf(array(KDLContainerTarget::MP4))){
+					$target->_audio->_aac_adtstoasc_filter = true;
+				}
+				
 				/*
 				 * On multi-lingual flavor, 
 				 * if required language does not exist - set NonComply flag 

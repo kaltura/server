@@ -191,7 +191,7 @@ class kSchedulingICal
 	 */
 	public static function getIdentifiersBC()
 	{
-		return array_merge(include __DIR__ . '/../../../../../infra/general/timezones/timezonesIdentifiers.php');
+		return array_merge(include __DIR__ . '/../../../../../infra/general/timezones/timezoneIdentifiers.php');
 	}
 
 	/**

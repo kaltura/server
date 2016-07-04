@@ -175,6 +175,17 @@ class KDLOperatorFfmpeg2_1_3 extends KDLOperatorFfmpeg1_1_1 {
 			return $cmdStr;
 
 			/*
+			 * On COPY the resampling & filters are unrequried/unapplicable - 
+			 * therefore - skip it.
+			 * Handle AAC-ADTS case 
+			 */
+		if($target->_audio->IsFormatOf(array(KDLAudioTarget::COPY))){
+			if(isset($target->_audio->_aac_adtstoasc_filter) && $target->_audio->_aac_adtstoasc_filter==true)
+				$cmdStr.= " -bsf:a aac_adtstoasc";
+			return $cmdStr;
+		}
+		
+			/*
 			 * Handle audio multi stream 
 			 */
 		$filterStr = null;
@@ -418,6 +429,31 @@ class KDLOperatorFfmpeg2_1_3 extends KDLOperatorFfmpeg1_1_1 {
 		
 		
 		return $reImplode;
+	}
+	
+	/**
+	 * (non-PHPdoc)
+	 * @see KDLOperatorFfmpeg0_10::generateH264params()
+	 */
+	protected function generateH264params($videoObject)
+	{
+		/*
+		 * Add 'stitchable'
+		 */
+		$h264params=parent::generateH264params($videoObject);
+		$h264paramsArr = explode(' ', $h264params);
+		if(in_array('-x264opts', $h264paramsArr)) {	
+			$key = array_search('-x264opts', $h264paramsArr);
+			if(strstr($h264paramsArr[$key+1],"stitchable")==false){
+				$h264paramsArr[$key+1].= ':stitchable';
+			}
+		}
+		else {
+			$h264paramsArr[] = '-x264opts';
+			$h264paramsArr[] = 'stitchable';
+		}
+		$h264params = implode(" ", $h264paramsArr);
+		return $h264params;
 	}
 	
 	/**

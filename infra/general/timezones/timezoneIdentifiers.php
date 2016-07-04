@@ -13,7 +13,7 @@
  * supported by all PHP version and HHVM.
  */
 
-return [
+return array(
 	'Africa/Asmera',
 	'Africa/Timbuktu',
 	'America/Argentina/ComodRivadavia',
@@ -149,5 +149,5 @@ return [
 	'US/Pacific-New',
 	'US/Samoa',
 	'WET',
-];
+);
 

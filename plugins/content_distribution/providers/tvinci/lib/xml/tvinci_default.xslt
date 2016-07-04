@@ -476,12 +476,19 @@
                 <xsl:variable name="typeName">
                     <xsl:value-of select="concat($tag/typename, $nameSuffix)" />
                 </xsl:variable>
-
+                <xsl:variable name="filePPvMod">
+                    <xsl:if test="$isChild = false()">
+                        <xsl:value-of select="$tag/ppvmodule"/>
+                    </xsl:if>
+                    <xsl:if test="$isChild = true()">
+                        <xsl:value-of select="''"/>
+                    </xsl:if>
+                </xsl:variable>
                 <xsl:call-template name="create-file-element">
                     <xsl:with-param name="cdnCode" select="concat($playManifestPrefix, $relevantEntryId, '/format/',$tag/format, '/tags/', $tag/tagname, '/protocol/',$tag/protocol,'/f/a.',$tag/extension)"/>
                     <xsl:with-param name="coGuid" select="$coGuid"/>
                     <xsl:with-param name="duration" select="$duration"/>
-                    <xsl:with-param name="ppvModule" select="$tag/ppvmodule"/>
+                    <xsl:with-param name="ppvModule" select="$filePPvMod"/>
                     <xsl:with-param name="type" select="$typeName"/>
                 </xsl:call-template>
             </xsl:if>

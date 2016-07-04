@@ -42,6 +42,8 @@ class KalturaRuleActionArray extends KalturaTypedArray
 				return new KalturaAccessControlServeRemoteEdgeServerAction();
 			case RuleActionType::REQUEST_HOST_REGEX:
 				return new KalturaAccessControlModifyRequestHostRegexAction();
+			case RuleActionType::LIMIT_THUMBNAIL_CAPTURE:
+				return new KalturaAccessControlLimitThumbnailCaptureAction();
 			default:
 				return KalturaPluginManager::loadObject('KalturaRuleAction', $dbObject->getType());
 		}		

@@ -24,22 +24,36 @@ class serveFlavorAction extends kalturaAction
 		header("X-Kaltura:cache-key");
 	}
 	
-	protected function getSimpleMappingRenderer($path, $encryptionKey)
+	protected function getSimpleMappingRenderer($path, asset $asset)
 	{
 		$source = array(
 			'type' => 'source',
 			'path' => $path,
 		);
 
-		if ($encryptionKey)
+		if ($asset->getEncryptionKey())
 		{
-			$source['encryptionKey'] = $encryptionKey;
+			$source['encryptionKey'] = $asset->getEncryptionKey();
 		}
-
+		
 		$sequence = array(
 			'clips' => array($source)
 		);
 
+		if (method_exists($asset, 'getLanguage') && $asset->getLanguage())
+		{
+			$language = languageCodeManager::getObjectFromKalturaName($asset->getLanguage());
+			if ($language[1] && $language[1] != 'und')
+			{
+				$sequence['language'] = $language[1];		// ISO639_T
+			}
+		}
+
+		if (method_exists($asset, 'getLabel') && $asset->getLabel())
+		{
+			$sequence['label'] = $asset->getLabel();
+		}
+		
 		$result = array(
 			'sequences' => array($sequence)
 		);
@@ -328,7 +342,7 @@ class serveFlavorAction extends kalturaAction
 				}
 			}
 		
-			$renderer = $this->getSimpleMappingRenderer($path, $flavorAsset->getEncryptionKey());
+			$renderer = $this->getSimpleMappingRenderer($path, $flavorAsset);
 			if ($path)
 			{
 				$this->storeCache($renderer, $flavorAsset->getPartnerId());

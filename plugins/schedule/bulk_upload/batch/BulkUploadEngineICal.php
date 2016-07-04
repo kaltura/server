@@ -164,18 +164,20 @@ class BulkUploadEngineICal extends KBulkUploadEngine
 		$results = KBatchBase::$kClient->doMultiRequest();
 
 		$existingEvents = array();
-		foreach($results as $result)
-		{
-			KBatchBase::$kClient->throwExceptionIfError($result);
-			/* @var $result KalturaScheduleEventListResponse */
-			foreach($result->objects as $scheduleEvent)
-			{
-				/* @var $scheduleEvent KalturaScheduleEvent */
-				$existingEvents[$scheduleEvent->referenceId] = $scheduleEvent->id;
-			}
-		}
-		
-		return $existingEvents;
+	    if (is_array($results) || is_object($results))
+	    {
+		    foreach($results as $result)
+		    {
+			    KBatchBase::$kClient->throwExceptionIfError($result);
+			    /* @var $result KalturaScheduleEventListResponse */
+			    foreach($result->objects as $scheduleEvent)
+			    {
+				    /* @var $scheduleEvent KalturaScheduleEvent */
+				    $existingEvents[$scheduleEvent->referenceId] = $scheduleEvent->id;
+			    }
+		    }
+	    }
+	    return $existingEvents;
     }
     
     protected function createObjects()
