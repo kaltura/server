@@ -1,3 +1,20 @@
+# Kajam 11.19.0 #
+
+## create CAPTURE_DEVICE_ROLE for partner 0 ##
+
+- Issue Type: Story
+- Issue ID: PLAT-5725
+
+### Configuration ###
+
+#### Deployment Scripts ####
+
+- Run 'php deployment/updates/scripts/add_permissions/2016_07_5_add_capture_device_role_and_permissions.php'
+
+#### Known Issues & Limitations ####
+
+None.
+
 # Kajam 11.18.0 #
 
 ## allow webcast player to update vote for poll ##
