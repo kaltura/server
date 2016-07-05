@@ -20,5 +20,5 @@ class TranscriptAssetType implements IKalturaPluginEnum, assetType
 	public static function getAdditionalDescriptions()
 	{
 		return array();
-	}
+	} 
 }
