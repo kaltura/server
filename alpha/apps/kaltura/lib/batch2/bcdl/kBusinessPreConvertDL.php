@@ -423,17 +423,9 @@ class kBusinessPreConvertDL
 			$flavorParamsConversionProfile = flavorParamsConversionProfilePeer::retrieveByFlavorParamsAndConversionProfile($flavorParams->getId(), $conversionProfile->getId());
 			if($flavorParamsConversionProfile){
 				/*
-				 * Update flavorParams settings with overloeded params from 'conversionProfileFlavorParams'
+				 * Update flavorParams settings with overloaded params from 'conversionProfileFlavorParams'
 				 */
-				$overrideParam = $flavorParamsConversionProfile->getIsEncrypted();
-				if(isset($overrideParam))
-					$flavorParams->setIsEncrypted($overrideParam);
-				$overrideParam = $flavorParamsConversionProfile->getContentAwareness();
-				if(isset($overrideParam))
-					$flavorParams->setContentAwareness($overrideParam);
-				$overrideParam = $flavorParamsConversionProfile->getTwoPass();
-				if(isset($overrideParam))
-					$flavorParams->setTwoPass($overrideParam);
+				self::overloadFlavorParamsWithConversionProfileSettings($flavorParams, $flavorParamsConversionProfile);
 			}
 		}
 
@@ -573,15 +565,7 @@ class kBusinessPreConvertDL
 		 */
 		foreach($flavors as $flavor) {
 			$flavorParamsConversionProfile = $conversionProfileFlavorParams[$flavor->getId()];
-			$overrideParam = $flavorParamsConversionProfile->getIsEncrypted();
-			if(isset($overrideParam))
-				$flavor->setIsEncrypted($overrideParam);
-			$overrideParam = $flavorParamsConversionProfile->getContentAwareness();
-			if(isset($overrideParam))
-				$flavor->setContentAwareness($overrideParam);
-			$overrideParam = $flavorParamsConversionProfile->getTwoPass();
-			if(isset($overrideParam))
-				$flavor->setTwoPass($overrideParam);
+			self::overloadFlavorParamsWithConversionProfileSettings($flavor, $flavorParamsConversionProfile);
 		}
 		$cdl = KDLWrap::CDLGenerateTargetFlavors($mediaInfo, $flavors);
 		KalturaLog::log("Generate Target " . count($cdl->_targetList) . " Flavors returned");
@@ -877,59 +861,70 @@ KalturaLog::log("Switch to matchSourceHeightIdx:$matchSourceHeightIdx, matchSour
 		if(isset($matchSourceHeightIdx) && $targetFlavorArr[$matchSourceHeightIdx]->_isNonComply) {
 			$targetFlavorArr[$matchSourceHeightIdx]->_create_anyway = true;
 KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
-			/*
-			$first = reset($targetFlavorArr);
-			if($first->_isNonComply) {
-				$first->_force = true; // _create_anyway
-			}
-			*/
+
 			/*
 			 * Check whether the next closest flavor to the matched one is redundant.
 			 * If so - set it to NonComply.
-			 * Example - 
-			 * Matched flavor is 2700Kbps/1080p, the closest is 2500Kbps/720p. 
-			 * The 2500 flavor is very close to the matched flavor, thus redundant.
 			 */
-			$closest=null;
-			$matchSourceHeightFlavor = $targetFlavorArr[$matchSourceHeightIdx];
-				/*
-				 * Loop for the closest flavor
-				 */
-			foreach($targetFlavorArr as $key=>$flavor){
-				if($key==$matchSourceHeightIdx)
-					continue;
-				/*
-				 * To avoid playback/delivery inconsistency, the aledged redundant flavor 
-				 * should share the same tags like the newly matched
-				 */
-				if($matchSourceHeightFlavor->getTags()!=$flavor->getTags())
-					continue;
-				$diff = $matchSourceHeightFlavor->getVideoBitrate()-$flavor->getVideoBitrate();
-				/*
-				 * The flavor considered to be redundant if it's bitrate
-				 * is closer than 15% to the matched flavor,
-				 * otherwise - skip it
-				 */
-				if($diff<0 || $diff/$matchSourceHeightFlavor->getVideoBitrate()>0.15){
-					continue;
-				}
-KalturaLog::log("Look for redundant: diff($diff),percent(".($diff*100/$matchSourceHeightFlavor->getVideoBitrate()).")");
-				if(!isset($closest)){
-					$closest = $key;
-					$closestDiff = $diff;
-					continue;
-				}
-				if($closestDiff>$diff) {
-					$closest = $key;
-					$closestDiff = $diff;
-				}
-			}
-			if(isset($closest)){
-KalturaLog::log("Found redundant: bitrate ".$targetFlavorArr[$closest]->getVideoBitrate());
-				$targetFlavorArr[$closest]->_isNonComply = true;
-			}
-
+			self::removeClosestRedundantFlavor($targetFlavorArr, $matchSourceHeightIdx);
 		}
+	}
+	
+	/**
+	 * 
+	 * @param unknown_type $targetFlavorArr
+	 * @param unknown_type $flavorIdx
+	 * @param unknown_type $thresholdRatio
+	 */
+	protected static function removeClosestRedundantFlavor(array &$targetFlavorArr, $flavorIdx, $thresholdRatio=0.15)
+	{
+		/*
+		 * Check whether the next closest flavor to the matched one is redundant.
+		 * If so - set it to NonComply.
+		 * Example -
+		 * Matched flavor is 2700Kbps/1080p, the closest is 2500Kbps/720p.
+		 * The 2500 flavor is very close to the matched flavor, thus redundant.
+		 */
+		$closest=null;
+		$matchSourceHeightFlavor = $targetFlavorArr[$flavorIdx];
+		/*
+		 * Loop for the closest flavor
+		 */
+		foreach($targetFlavorArr as $key=>$flavor){
+			if($key==$flavorIdx)
+				continue;
+			/*
+			 * To avoid playback/delivery inconsistency, the aledged redundant flavor
+			 * should share the same tags like the newly matched
+			 */
+			if($matchSourceHeightFlavor->getTags()!=$flavor->getTags())
+				continue;
+			$diff = $matchSourceHeightFlavor->getVideoBitrate()-$flavor->getVideoBitrate();
+			/*
+			 * The flavor considered to be redundant if it's bitrate
+			 * is closer than 15% to the matched flavor,
+			 * otherwise - skip it
+			 */
+			if($diff<0 || $diff/$matchSourceHeightFlavor->getVideoBitrate()>$thresholdRatio){
+				continue;
+			}
+			KalturaLog::log("Look for redundant: diff($diff),percent(".($diff*100/$matchSourceHeightFlavor->getVideoBitrate()).")");
+			if(!isset($closest)){
+				$closest = $key;
+				$closestDiff = $diff;
+				continue;
+			}
+			if($closestDiff>$diff) {
+				$closest = $key;
+				$closestDiff = $diff;
+			}
+		}
+		if(isset($closest)){
+			KalturaLog::log("Found redundant: bitrate ".$targetFlavorArr[$closest]->getVideoBitrate());
+			$targetFlavorArr[$closest]->_isNonComply = true;
+			return true;
+		}
+		return false;
 	}
 	
 	/**
@@ -1523,19 +1518,9 @@ KalturaLog::log("Found redundant: bitrate ".$targetFlavorArr[$closest]->getVideo
 			
 			$flavorParamsConversionProfile = flavorParamsConversionProfilePeer::retrieveByFlavorParamsAndConversionProfile($sourceFlavor->getId(), $conversionProfileId);
 			/*
-			 * Update flavorParams settings with overloeded params from 'conversionProfileFlavorParams'
+			 * Update flavorParams settings with overloaded params from 'conversionProfileFlavorParams'
 			 */
-			if($flavorParamsConversionProfile){
-				$overrideParam = $flavorParamsConversionProfile->getIsEncrypted();
-				if(isset($overrideParam))
-					$sourceFlavor->setIsEncrypted($overrideParam);
-				$overrideParam = $flavorParamsConversionProfile->getContentAwareness();
-				if(isset($overrideParam))
-					$sourceFlavor->setContentAwareness($overrideParam);
-				$overrideParam = $flavorParamsConversionProfile->getTwoPass();
-				if(isset($overrideParam))
-					$sourceFlavor->setTwoPass($overrideParam);
-			}
+			self::overloadFlavorParamsWithConversionProfileSettings($sourceFlavor, $flavorParamsConversionProfile);
 			
 			$errDescription = null;
 			$sourceFlavorOutput = self::validateFlavorAndMediaInfo($sourceFlavor, $mediaInfo, $errDescription);
@@ -1892,4 +1877,28 @@ KalturaLog::log("Found redundant: bitrate ".$targetFlavorArr[$closest]->getVideo
 		KalturaLog::err($errMsg);
 		throw new kCoreException($errMsg , KDLErrors::Encryption);
 	}
+	
+	/**
+	 * 
+	 * @param unknown_type $flavorParams
+	 * @param unknown_type $flavorParamsConversionProfile
+	 */
+	private static function overloadFlavorParamsWithConversionProfileSettings($flavorParams, $flavorParamsConversionProfile)
+	{
+		if($flavorParamsConversionProfile){
+			/*
+			 * Update flavorParams settings with overloaded params from 'conversionProfileFlavorParams'
+			 */
+			$overrideParam = $flavorParamsConversionProfile->getIsEncrypted();
+			if(isset($overrideParam))
+				$flavorParams->setIsEncrypted($overrideParam);
+			$overrideParam = $flavorParamsConversionProfile->getContentAwareness();
+			if(isset($overrideParam))
+				$flavorParams->setContentAwareness($overrideParam);
+			$overrideParam = $flavorParamsConversionProfile->getTwoPass();
+			if(isset($overrideParam))
+				$flavorParams->setTwoPass($overrideParam);
+		}
+	}
+	
 }
