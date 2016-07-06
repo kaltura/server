@@ -24,7 +24,7 @@ class DeliveryProfileAkamaiAppleHttpManifest extends DeliveryProfileAkamaiAppleH
 		return array($flavor);
 	}
 	
-	protected function doGetFlavorAssetUrl(flavorAsset $flavorAsset) {
+	protected function doGetFlavorAssetUrl(asset $flavorAsset) {
 		$url = $this->getBaseUrl($flavorAsset);
 		if($this->params->getFileExtension())
 			$url .= "/name/a." . $this->params->getFileExtension();

@@ -90,9 +90,9 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 	/**
 	 * Derives the delivery profile dynamic attributes from the file sync and the flavor asset.
 	 * @param FileSync $fileSync
-	 * @param flavorAsset $flavorAsset
+	 * @param asset $flavorAsset
 	 */
-	public function initDeliveryDynamicAttributes(FileSync $fileSync = null, flavorAsset $flavorAsset = null) {
+	public function initDeliveryDynamicAttributes(FileSync $fileSync = null, asset $flavorAsset = null) {
 		if ($flavorAsset)
 			$this->params->setContainerFormat($flavorAsset->getContainerFormat());
 	
@@ -338,7 +338,7 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 			$ext = pathinfo($urlPath, PATHINFO_EXTENSION);
 		}
 	
-		$bitrate = ($flavor ? $flavor->getVideoBitrate() : 0);
+		$bitrate = ($flavor && is_callable(array($flavor, 'getVideoBitrate')) ? $flavor->getVideoBitrate() : 0);
 		$width =   ($flavor ? $flavor->getWidth()   : 0);
 		$height =  ($flavor ? $flavor->getHeight()  : 0);
 	
