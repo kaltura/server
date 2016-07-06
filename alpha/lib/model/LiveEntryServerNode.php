@@ -155,7 +155,6 @@ class LiveEntryServerNode extends EntryServerNode
 	
 	/**
 	 * Stores given value in cache for with the given key as an identifier
-	 * @param string $key
 	 * @return bool
 	 * @throws Exception
 	 */
@@ -173,7 +172,6 @@ class LiveEntryServerNode extends EntryServerNode
 	}
 	
 	/**
-	 * @param LiveEntryServerNode $liveEntryServerNode
 	 * @return bool|mixed
 	 * @throws Exception
 	 */
