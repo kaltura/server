@@ -1,5 +1,20 @@
 # Kajam 11.19.0 #
 
+## Add HTTP event notification fired on user creation ##
+
+- Issue Type: Task
+- Issue ID: PLAT-5773
+
+### Configuration ###
+
+#### Deployment Scripts ####
+
+- Run 'php tests/standAloneClient/exec.php tests/standAloneClient/userCreatedHttpNotification.xml'
+
+#### Known Issues & Limitations ####
+
+None.
+
 ## create CAPTURE_DEVICE_ROLE for partner 0 ##
 
 - Issue Type: Story
