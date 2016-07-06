@@ -6,6 +6,7 @@
 class LiveEntryServerNode extends EntryServerNode
 {
 	const OM_CLASS = 'LiveEntryServerNode';
+	const DEFAULT_CACHE_EXPIRY = 120;
 	
 	const CUSTOM_DATA_STREAMS = "streams";
 	const CUSTOM_DATA_APPLICATION_NAME = "application_name";
@@ -134,19 +135,64 @@ class LiveEntryServerNode extends EntryServerNode
 	}
 	
 	public function validateEntryServerNode()
-	{
-		$liveEntry = entryPeer::retrieveByPK($this->getEntryId());
-		if(!$liveEntry)
-		{
-			KalturaLog::err("Entry with id [{$this->getEntryId()}] not found, will not validate entryServerNode registered");
-			return;
-		}
-		
-		/* @var $liveEntry LiveEntry */
-		if($this->getDc() === kDataCenterMgr::getCurrentDcId() && !$liveEntry->isCacheValid($this))
+	{	
+		if($this->getDc() === kDataCenterMgr::getCurrentDcId() && !$this->isCacheValid())
 		{
 			KalturaLog::info("Removing media server id [" . $this->getServerNodeId() . "] from liveEntry [" . $this->getEntryId() . "]");
 			$this->delete();
 		}
+	}
+	
+	private function getCacheKey()
+	{
+		return $this->getEntryId()."_".$this->getServerNodeId()."_".$this->getServerType();
+	}
+	
+	private static function getCacheType()
+	{
+		return kCacheManager::CACHE_TYPE_LIVE_MEDIA_SERVER . '_' . kDataCenterMgr::getCurrentDcId();
+	}
+	
+	/**
+	 * Stores given value in cache for with the given key as an identifier
+	 * @param string $key
+	 * @return bool
+	 * @throws Exception
+	 */
+	public function storeInCache()
+	{
+		$key = $this->getCacheKey();
+		$cacheType = self::getCacheType();
+		$cacheStore = kCacheManager::getSingleLayerCache($cacheType);
+		if(! $cacheStore) {
+			KalturaLog::debug("cacheStore is null. cacheType: $cacheType . returning false");
+			return false;
+		}
+		KalturaLog::debug("Set cache key [$key] from store [$cacheType] ");
+		return $cacheStore->set($key, true, kConf::get('media_server_cache_expiry', 'local', self::DEFAULT_CACHE_EXPIRY));
+	}
+	
+	/**
+	 * @param LiveEntryServerNode $liveEntryServerNode
+	 * @return bool|mixed
+	 * @throws Exception
+	 */
+	public function isCacheValid()
+	{
+		$cacheType = self::getCacheType();
+		$cacheStore = kCacheManager::getSingleLayerCache($cacheType);
+		if(!$cacheStore)
+		{
+			KalturaLog::warning("Cache store [$cacheType] not found");
+			$lastUpdate = time() - $this->getUpdatedAt(null);
+			$expiry = kConf::get('media_server_cache_expiry', 'local', self::DEFAULT_CACHE_EXPIRY);
+	
+			return $lastUpdate <= $expiry;
+		}
+	
+		$key = $this->getCacheKey();
+		$ans = $cacheStore->get($key);
+		KalturaLog::debug("Get cache key [$key] from store [$cacheType] returned [$ans]");
+		return $ans;
 	}
 }
