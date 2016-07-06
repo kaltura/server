@@ -2,7 +2,7 @@
 
 class DeliveryProfileVodPackagerHls extends DeliveryProfileAppleHttp {
 	
-	protected function doGetFlavorAssetUrl(flavorAsset $flavorAsset) 
+	protected function doGetFlavorAssetUrl(asset $flavorAsset) 
 	{
 		$url = $this->getBaseUrl($flavorAsset);
 		if ($this->params->getFileExtension())

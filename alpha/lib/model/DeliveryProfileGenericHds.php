@@ -22,7 +22,7 @@ class DeliveryProfileGenericHds extends DeliveryProfileHds {
 		return $this->getFromCustomData("rendererClass", null, $this->DEFAULT_RENDERER_CLASS);
 	}
 	
-	protected function doGetFlavorAssetUrl(flavorAsset $flavorAsset) 
+	protected function doGetFlavorAssetUrl(asset $flavorAsset) 
 	{
 		$url = parent::doGetFlavorAssetUrl($flavorAsset);
 		if ($this->params->getFileExtension())

@@ -8,7 +8,7 @@ class DeliveryProfileAkamaiRtmp extends DeliveryProfileRtmp {
 		$this->NON_FLV_FILE_EXTENSION = null;
 	}
 	
-	protected function doGetFlavorAssetUrl(flavorAsset $flavorAsset)
+	protected function doGetFlavorAssetUrl(asset $flavorAsset)
 	{
 		$url = parent::doGetFlavorAssetUrl($flavorAsset);
 		if($this->params->getFileExtension())

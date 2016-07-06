@@ -7,7 +7,7 @@ class DeliveryProfileVodPackagerMss extends DeliveryProfileSilverLight {
 		$this->DEFAULT_RENDERER_CLASS = 'kRedirectManifestRenderer';
 	}
 	
-	protected function doGetFlavorAssetUrl(flavorAsset $flavorAsset)
+	protected function doGetFlavorAssetUrl(asset $flavorAsset)
 	{
 		$url = parent::doGetFlavorAssetUrl($flavorAsset);
 		$url .= '/forceproxy/true';

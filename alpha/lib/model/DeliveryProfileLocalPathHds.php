@@ -17,7 +17,7 @@ class DeliveryProfileLocalPathHds extends DeliveryProfileHds {
 		return $this->getFromCustomData("rendererClass", null, $this->DEFAULT_RENDERER_CLASS);
 	}
 	
-	protected function doGetFlavorAssetUrl(flavorAsset $flavorAsset)
+	protected function doGetFlavorAssetUrl(asset $flavorAsset)
 	{
 		$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 		$fileSync = kFileSyncUtils::getReadyInternalFileSyncForKey($syncKey);

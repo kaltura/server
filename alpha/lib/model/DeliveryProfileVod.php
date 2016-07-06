@@ -15,10 +15,10 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 	 * --------------------*/
 	
 	/**
-	 * @param flavorAsset $flavorAsset
+	 * @param asset $flavorAsset
 	 * @return string representing the basic url.
 	 */
-	protected function getBaseUrl(flavorAsset $flavorAsset) {
+	protected function getBaseUrl(asset $flavorAsset) {
 		$entry = entryPeer::retrieveByPK($this->params->getEntryId());
 		$partnerId = $flavorAsset->getPartnerId();
 		$subpId = $entry->getSubpId();
@@ -46,10 +46,10 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 	}
 	
 	/**
-	 * @param flavorAsset $flavorAsset
+	 * @param asset $flavorAsset
 	 * @return string representing the version string
 	 */
-	protected function getFlavorVersionString(flavorAsset $flavorAsset)
+	protected function getFlavorVersionString(asset $flavorAsset)
 	{
 		$entry = $flavorAsset->getentry();
 		$partner = $entry->getPartner();
@@ -63,7 +63,7 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 		($entryFlavorVersion ? "/ev/$entryFlavorVersion" : '');
 	}
 	
-	protected function doGetFlavorAssetUrl(flavorAsset $flavorAsset)
+	protected function doGetFlavorAssetUrl(asset $flavorAsset)
 	{
 		$url = $this->getBaseUrl($flavorAsset);
 		if($this->params->getClipTo())
@@ -96,11 +96,11 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 		$url = null;
 	
 		if($asset instanceof thumbAsset)
-			$url = $this->doGetThumbnailAssetUrl($asset);
-	
-		if($asset instanceof flavorAsset)
 		{
-			
+			$url = $this->doGetThumbnailAssetUrl($asset);
+		}
+		else
+		{
 			$url = $this->doGetFlavorAssetUrl($asset);
 
 			$url = str_replace('\\', '/', $url);
@@ -225,7 +225,7 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 		$flavors = array();
 		foreach($this->params->getflavorAssets() as $flavorAsset)
 		{
-			/* @var $flavorAsset flavorAsset */
+			/* @var $flavorAsset asset */
 			$httpUrl = $this->getFlavorHttpUrl($flavorAsset);
 			if ($httpUrl)
 				$flavors[] = $httpUrl;
@@ -239,10 +239,10 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 	}
 	
 	/**
-	 * @param flavorAsset $flavorAsset
+	 * @param asset $flavorAsset
 	 * @return array
 	 */
-	protected function getFlavorHttpUrl(flavorAsset $flavorAsset)
+	protected function getFlavorHttpUrl(asset $flavorAsset)
 	{
 		if ($this->params->getStorageId()) {
 			return $this->getExternalStorageUrl($flavorAsset);
@@ -284,11 +284,11 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 	}
 		
 	/**
-	 * @param flavorAsset $flavorAsset
+	 * @param asset $flavorAsset
 	 * @param FileSyncKey $key
 	 * @return array
 	 */
-	protected function getExternalStorageUrl(flavorAsset $flavorAsset)
+	protected function getExternalStorageUrl(asset $flavorAsset)
 	{
 		$remoteFileSyncs = $this->params->getRemoteFileSyncs();
 		$fileSync = $remoteFileSyncs[$flavorAsset->getId()];
