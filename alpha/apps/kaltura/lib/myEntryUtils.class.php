@@ -807,8 +807,7 @@ class myEntryUtils
 			if ($processing)
 				KExternalErrors::dieError(KExternalErrors::PROCESSING_CAPTURE_THUMBNAIL);
 
-			$videoRotation = mediaInfoPeer::retrieveOriginalByEntryId($entry->getId())->getVideoRotation();
-			$forceRotation = ($vid_slices > -1 && $videoRotation > 0) ? $videoRotation : null ;
+			$forceRotation = self::shouldRotate($entry->getId(), $vid_slices);
 
 			kFile::fullMkdir($processingThumbPath);
 			if ($crop_provider)
@@ -861,6 +860,12 @@ class myEntryUtils
 		kFile::fullMkdir($finalThumbPath);
 		kFile::moveFile($processingThumbPath, $finalThumbPath);
 		return $finalThumbPath;
+	}
+
+	public static function shouldRotate($entryId , $vidSlices)
+	{
+		$videoRotation = mediaInfoPeer::retrieveOriginalByEntryId($entryId)->getVideoRotation();
+		return ($vidSlices > -1 && $videoRotation > 0) ? $videoRotation : null ;
 	}
 	
 	public static function getLocalImageFilePathByEntry( $entry, $version = null )
