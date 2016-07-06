@@ -636,7 +636,7 @@ class myEntryUtils
 		$entry_status = $entry->getStatus();
 		 
 		$thumbName = $entry->getId()."_{$width}_{$height}_{$type}_{$crop_provider}_{$bgcolor}_{$quality}_{$src_x}_{$src_y}_{$src_w}_{$src_h}_{$vid_sec}_{$vid_slice}_{$vid_slices}_{$entry_status}";
-			
+
 		if ($orig_image_path)
 			$thumbName.= '_oip_'.basename($orig_image_path);
 		if ($density)
@@ -807,10 +807,13 @@ class myEntryUtils
 			if ($processing)
 				KExternalErrors::dieError(KExternalErrors::PROCESSING_CAPTURE_THUMBNAIL);
 
+			$videoRotation = mediaInfoPeer::retrieveOriginalByEntryId($entry->getId())->getVideoRotation();
+			$forceRotation = ($vid_slices > -1 && $videoRotation > 0) ? $videoRotation : null ;
+
 			kFile::fullMkdir($processingThumbPath);
 			if ($crop_provider)
 			{
-				$convertedImagePath = myFileConverter::convertImageUsingCropProvider($orig_image_path, $processingThumbPath, $width, $height, $type, $crop_provider, $bgcolor, true, $quality, $src_x, $src_y, $src_w, $src_h, $density, $stripProfiles);
+				$convertedImagePath = myFileConverter::convertImageUsingCropProvider($orig_image_path, $processingThumbPath, $width, $height, $type, $crop_provider, $bgcolor, true, $quality, $src_x, $src_y, $src_w, $src_h, $density, $stripProfiles,$forceRotation);
 			}
 			else
 			{
@@ -824,7 +827,7 @@ class myEntryUtils
 					$finalThumbPath = kFile::replaceExt($finalThumbPath, "gif");
 				}
 
-				$convertedImagePath = myFileConverter::convertImage($orig_image_path, $processingThumbPath, $width, $height, $type, $bgcolor, true, $quality, $src_x, $src_y, $src_w, $src_h, $density, $stripProfiles, $thumbParams, $format);
+				$convertedImagePath = myFileConverter::convertImage($orig_image_path, $processingThumbPath, $width, $height, $type, $bgcolor, true, $quality, $src_x, $src_y, $src_w, $src_h, $density, $stripProfiles, $thumbParams, $format,$forceRotation);
 			}
 			
 			// die if resize operation failed and add failed resizing to cache
