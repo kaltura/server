@@ -202,10 +202,6 @@ class mySearchUtils
 				} 
 				elseif ( $obj instanceof entry )
 				{
-					// status=READY , type=MEDIACLIP, view permissions of kshow 
-					if($obj->getParentEntryId())
-						$res = mySearchUtils::DISPLAY_IN_SEARCH_SYSTEM;
-					else
 						self::setRes ( $res , true );
 				}
 				else
@@ -215,6 +211,10 @@ class mySearchUtils
 			}
 			
 			$obj->setDisplayInSearch ( $res );
+		}
+		if( $obj instanceof entry && $obj->getParentEntryId())
+		{
+			$obj->setDisplayInSearch( mySearchUtils::DISPLAY_IN_SEARCH_SYSTEM);
 		}
 	}
 	
