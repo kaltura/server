@@ -175,25 +175,25 @@ class PushToNewsDistributionProfile extends ConfigurableDistributionProfile
 	public function getBasePath()						{return $this->getFromCustomData(self::CUSTOM_DATA_BASE_PATH);}
 	public function getUsername()						{return $this->getFromCustomData(self::CUSTOM_DATA_USERNAME);}
 	public function getPassword()						{return $this->getFromCustomData(self::CUSTOM_DATA_PASSWORD);}
-	public function getCertificateKey()                 {return $this->getFromCustomData(self::CUSTOM_DATA_CERTIFICATE_KEY);}
+	public function getCertificateKey()					{return $this->getFromCustomData(self::CUSTOM_DATA_CERTIFICATE_KEY);}
 	
-	public function getIdXslt()                 {return $this->getFromCustomData(self::CUSTOM_METADATA_ID_XSLT);}
-	public function getPublishdatXslt()                 {return $this->getFromCustomData(self::CUSTOM_DATA_PUBLISHDAT_XSLT);}
-	public function getCreationatXslt()						{return $this->getFromCustomData(self::CUSTOM_DATA_CREATIONAT_XSLT);}
-	public function getTitlelanguagedatXslt()                 {return $this->getFromCustomData(self::CUSTOM_METADATA_TITLELANGUAGEDAT_XSLT);}
-	public function getTitleXslt()						{return $this->getFromCustomData(self::CUSTOM_DATA_TITLE_XSLT);}
-	public function getMimetypeXslt()                 {return $this->getFromCustomData(self::CUSTOM_METADATA_MIMETYPE_XSLT);}
-	public function getLanguageXslt()                 {return $this->getFromCustomData(self::CUSTOM_METADATA_LANGUAGE_XSLT);}
-	public function getBodyXslt()                 {return $this->getFromCustomData(self::CUSTOM_METADATA_BODY_XSLT);}
-	public function getAuthorNameXslt()						{return $this->getFromCustomData(self::CUSTOM_DATA_AUTHOR_NAME_XSLT);}
-	public function getAuthorEmailXslt()						{return $this->getFromCustomData(self::CUSTOM_DATA_AUTHOR_EMAIL_XSLT);}
-	public function getRightsinfoCopyrightholderXslt()						{return $this->getFromCustomData(self::CUSTOM_DATA_RIGHTSINFO_COPYRIGHTHOLDER_XSLT);}
-	public function getRightsinfoNameXslt()						{return $this->getFromCustomData(self::CUSTOM_DATA_RIGHTSINFO_NAME_XSLT);}
-	public function getRightsinfoCopyrightnoticeXslt()						{return $this->getFromCustomData(self::CUSTOM_DATA_RIGHTSINFO_COPYRIGHTNOTICE_XSLT);}
-	public function getpProductcodeXslt()                 {return $this->getFromCustomData(self::CUSTOM_METADATA_PRODUCTCODE_XSLT);}
-	public function getAttributionXslt()                 {return $this->getFromCustomData(self::CUSTOM_METADATA_ATTRIBUTION_XSLT);}
-	public function getMetadataOrganizationsXslt()                 {return $this->getFromCustomData(self::CUSTOM_METADATA_METADATA_ORGANIZATIONS_XSLT);}
-	public function getMetadataSubjectsXslt()                 {return $this->getFromCustomData(self::CUSTOM_METADATA_METADATA_SUBJECTS_XSLT);}
+	public function getIdXslt()					{return $this->getFromCustomData(self::CUSTOM_METADATA_ID_XSLT);}
+	public function getPublishdatXslt()			{return $this->getFromCustomData(self::CUSTOM_DATA_PUBLISHDAT_XSLT);}
+	public function getCreationatXslt()			{return $this->getFromCustomData(self::CUSTOM_DATA_CREATIONAT_XSLT);}
+	public function getTitlelanguagedatXslt()	{return $this->getFromCustomData(self::CUSTOM_METADATA_TITLELANGUAGEDAT_XSLT);}
+	public function getTitleXslt()				{return $this->getFromCustomData(self::CUSTOM_DATA_TITLE_XSLT);}
+	public function getMimetypeXslt()			{return $this->getFromCustomData(self::CUSTOM_METADATA_MIMETYPE_XSLT);}
+	public function getLanguageXslt()			{return $this->getFromCustomData(self::CUSTOM_METADATA_LANGUAGE_XSLT);}
+	public function getBodyXslt()				{return $this->getFromCustomData(self::CUSTOM_METADATA_BODY_XSLT);}
+	public function getAuthorNameXslt()					{return $this->getFromCustomData(self::CUSTOM_DATA_AUTHOR_NAME_XSLT);}
+	public function getAuthorEmailXslt()				{return $this->getFromCustomData(self::CUSTOM_DATA_AUTHOR_EMAIL_XSLT);}
+	public function getRightsinfoCopyrightholderXslt()	{return $this->getFromCustomData(self::CUSTOM_DATA_RIGHTSINFO_COPYRIGHTHOLDER_XSLT);}
+	public function getRightsinfoNameXslt()				{return $this->getFromCustomData(self::CUSTOM_DATA_RIGHTSINFO_NAME_XSLT);}
+	public function getRightsinfoCopyrightnoticeXslt()	{return $this->getFromCustomData(self::CUSTOM_DATA_RIGHTSINFO_COPYRIGHTNOTICE_XSLT);}
+	public function getpProductcodeXslt()				{return $this->getFromCustomData(self::CUSTOM_METADATA_PRODUCTCODE_XSLT);}
+	public function getAttributionXslt()				{return $this->getFromCustomData(self::CUSTOM_METADATA_ATTRIBUTION_XSLT);}
+	public function getMetadataOrganizationsXslt()		{return $this->getFromCustomData(self::CUSTOM_METADATA_METADATA_ORGANIZATIONS_XSLT);}
+	public function getMetadataSubjectsXslt()			{return $this->getFromCustomData(self::CUSTOM_METADATA_METADATA_SUBJECTS_XSLT);}
 	
 	
 	public function setProtocol($v)						{$this->putInCustomData(self::CUSTOM_DATA_PROTOCOL, $v);}
@@ -202,24 +202,23 @@ class PushToNewsDistributionProfile extends ConfigurableDistributionProfile
 	public function setBasePath($v)						{$this->putInCustomData(self::CUSTOM_DATA_BASE_PATH, $v);}
 	public function setUsername($v)						{$this->putInCustomData(self::CUSTOM_DATA_USERNAME, $v);}
 	public function setPassword($v)						{$this->putInCustomData(self::CUSTOM_DATA_PASSWORD, $v);}
-	public function setCertificateKey($v)               {$this->putInCustomData(self::CUSTOM_DATA_CERTIFICATE_KEY, $v);}
+	public function setCertificateKey($v)				{$this->putInCustomData(self::CUSTOM_DATA_CERTIFICATE_KEY, $v);}
 	
-	public function setIdXslt($v)               {$this->putInCustomData(self::CUSTOM_METADATA_ID_XSLT, $v);}
-	public function setPublishdatXslt($v)               {$this->putInCustomData(self::CUSTOM_DATA_PUBLISHDAT_XSLT, $v);}
-	public function setCreationatXslt($v)						{$this->putInCustomData(self::CUSTOM_DATA_CREATIONAT_XSLT, $v);}
-	public function setTitlelanguagedatXslt($v)               {$this->putInCustomData(self::CUSTOM_METADATA_TITLELANGUAGEDAT_XSLT, $v);}
-	public function setTitleXslt($v)						{$this->putInCustomData(self::CUSTOM_DATA_TITLE_XSLT, $v);}
-	public function setMimetypeXslt($v)						{$this->putInCustomData(self::CUSTOM_METADATA_MIMETYPE_XSLT, $v);}
-	public function setLanguageXslt($v)						{$this->putInCustomData(self::CUSTOM_METADATA_LANGUAGE_XSLT, $v);}
-	public function setBodyXslt($v)						{$this->putInCustomData(self::CUSTOM_METADATA_BODY_XSLT, $v);}
-	public function setAuthorNameXslt($v)						{$this->putInCustomData(self::CUSTOM_DATA_AUTHOR_NAME_XSLT, $v);}
-	public function setAuthorEmailXslt($v)						{$this->putInCustomData(self::CUSTOM_DATA_AUTHOR_EMAIL_XSLT, $v);}
-	public function setRightsinfoCopyrightholderXslt($v)						{$this->putInCustomData(self::CUSTOM_DATA_RIGHTSINFO_COPYRIGHTHOLDER_XSLT, $v);}
-	public function setRightsinfoNameXslt($v)						{$this->putInCustomData(self::CUSTOM_DATA_RIGHTSINFO_NAME_XSLT, $v);}
-	public function setRightsinfoCopyrightnoticeXslt($v)						{$this->putInCustomData(self::CUSTOM_DATA_RIGHTSINFO_COPYRIGHTNOTICE_XSLT, $v);}
-	public function setProductcodeXslt($v)               {$this->putInCustomData(self::CUSTOM_METADATA_PRODUCTCODE_XSLT, $v);}
-	public function setAttributionXslt($v)               {$this->putInCustomData(self::CUSTOM_METADATA_ATTRIBUTION_XSLT, $v);}
-	public function setMetadataOrganizationsXslt($v)               {$this->putInCustomData(self::CUSTOM_METADATA_METADATA_ORGANIZATIONS_XSLT, $v);}
-	public function setMetadataSubjectsXslt($v)               {$this->putInCustomData(self::CUSTOM_METADATA_METADATA_SUBJECTS_XSLT, $v);}
-
+	public function setIdXslt($v)				{$this->putInCustomData(self::CUSTOM_METADATA_ID_XSLT, $v);}
+	public function setPublishdatXslt($v)		{$this->putInCustomData(self::CUSTOM_DATA_PUBLISHDAT_XSLT, $v);}
+	public function setCreationatXslt($v)		{$this->putInCustomData(self::CUSTOM_DATA_CREATIONAT_XSLT, $v);}
+	public function setTitlelanguagedatXslt($v)	{$this->putInCustomData(self::CUSTOM_METADATA_TITLELANGUAGEDAT_XSLT, $v);}
+	public function setTitleXslt($v)			{$this->putInCustomData(self::CUSTOM_DATA_TITLE_XSLT, $v);}
+	public function setMimetypeXslt($v)			{$this->putInCustomData(self::CUSTOM_METADATA_MIMETYPE_XSLT, $v);}
+	public function setLanguageXslt($v)			{$this->putInCustomData(self::CUSTOM_METADATA_LANGUAGE_XSLT, $v);}
+	public function setBodyXslt($v)				{$this->putInCustomData(self::CUSTOM_METADATA_BODY_XSLT, $v);}
+	public function setAuthorNameXslt($v)		{$this->putInCustomData(self::CUSTOM_DATA_AUTHOR_NAME_XSLT, $v);}
+	public function setAuthorEmailXslt($v)					{$this->putInCustomData(self::CUSTOM_DATA_AUTHOR_EMAIL_XSLT, $v);}
+	public function setRightsinfoCopyrightholderXslt($v)	{$this->putInCustomData(self::CUSTOM_DATA_RIGHTSINFO_COPYRIGHTHOLDER_XSLT, $v);}
+	public function setRightsinfoNameXslt($v)				{$this->putInCustomData(self::CUSTOM_DATA_RIGHTSINFO_NAME_XSLT, $v);}
+	public function setRightsinfoCopyrightnoticeXslt($v)	{$this->putInCustomData(self::CUSTOM_DATA_RIGHTSINFO_COPYRIGHTNOTICE_XSLT, $v);}
+	public function setProductcodeXslt($v)					{$this->putInCustomData(self::CUSTOM_METADATA_PRODUCTCODE_XSLT, $v);}
+	public function setAttributionXslt($v)					{$this->putInCustomData(self::CUSTOM_METADATA_ATTRIBUTION_XSLT, $v);}
+	public function setMetadataOrganizationsXslt($v)		{$this->putInCustomData(self::CUSTOM_METADATA_METADATA_ORGANIZATIONS_XSLT, $v);}
+	public function setMetadataSubjectsXslt($v)				{$this->putInCustomData(self::CUSTOM_METADATA_METADATA_SUBJECTS_XSLT, $v);}
 }
