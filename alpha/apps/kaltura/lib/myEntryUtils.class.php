@@ -864,8 +864,12 @@ class myEntryUtils
 
 	public static function getRotate($entryId , $vidSlices)
 	{
-		$videoRotation = mediaInfoPeer::retrieveOriginalByEntryId($entryId)->getVideoRotation();
-		return ($vidSlices > -1 && $videoRotation > 0) ? $videoRotation : null ;
+		$originalMediaInfo = mediaInfoPeer::retrieveOriginalByEntryId($entryId);
+		$videoRotation = 0;
+		if(!is_null($originalMediaInfo) && $vidSlices > -1)
+			$videoRotation = $originalMediaInfo->getVideoRotation();
+
+		return $videoRotation;
 	}
 	
 	public static function getLocalImageFilePathByEntry( $entry, $version = null )
