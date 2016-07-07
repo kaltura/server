@@ -10,5 +10,6 @@ CREATE TABLE entry_server_node
  	server_type INTEGER,
  	custom_data TEXT,
  	PRIMARY KEY (id),
- 	KEY entry_server_type(entry_id, server_type)
+ 	KEY entry_server_type(entry_id, server_type),
+ 	KEY dc_index(dc)
  )ENGINE=InnoDB COMMENT='Relationship between entry and server node' DEFAULT CHARSET=utf8;

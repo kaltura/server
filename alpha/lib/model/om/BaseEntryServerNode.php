@@ -66,6 +66,12 @@ abstract class BaseEntryServerNode extends BaseObject  implements Persistent {
 	 * @var        int
 	 */
 	protected $server_type;
+	
+	/**
+	 * The value for the dc field.
+	 * @var        int
+	 */
+	protected $dc;
 
 	/**
 	 * The value for the custom_data field.
@@ -256,6 +262,16 @@ abstract class BaseEntryServerNode extends BaseObject  implements Persistent {
 	public function getServerType()
 	{
 		return $this->server_type;
+	}
+	
+	/**
+	 * Get the [dc] column value.
+	 *
+	 * @return     int
+	 */
+	public function getDc()
+	{
+		return $this->dc;
 	}
 
 	/**
@@ -503,6 +519,29 @@ abstract class BaseEntryServerNode extends BaseObject  implements Persistent {
 
 		return $this;
 	} // setServerType()
+	
+	/**
+	 * Set the value of [dc] column.
+	 *
+	 * @param      int $v new value
+	 * @return     EntryServerNode The current object (for fluent API support)
+	 */
+	public function setDc($v)
+	{
+		if(!isset($this->oldColumnsValues[EntryServerNodePeer::DC]))
+		$this->oldColumnsValues[EntryServerNodePeer::DC] = $this->dc;
+
+		if ($v !== null) {
+			$v = (int) $v;
+		}
+		
+		if ($this->dc !== $v) {
+			$this->dc = $v;
+			$this->modifiedColumns[] = EntryServerNodePeer::DC;
+		}
+		
+		return $this;
+	} // setDc()
 
 	/**
 	 * Set the value of [custom_data] column.
@@ -567,7 +606,8 @@ abstract class BaseEntryServerNode extends BaseObject  implements Persistent {
 			$this->updated_at = ($row[$startcol + 5] !== null) ? (string) $row[$startcol + 5] : null;
 			$this->status = ($row[$startcol + 6] !== null) ? (int) $row[$startcol + 6] : null;
 			$this->server_type = ($row[$startcol + 7] !== null) ? (int) $row[$startcol + 7] : null;
-			$this->custom_data = ($row[$startcol + 8] !== null) ? (string) $row[$startcol + 8] : null;
+			$this->dc = ($row[$startcol + 8] !== null) ? (int) $row[$startcol + 8] : null;
+			$this->custom_data = ($row[$startcol + 9] !== null) ? (string) $row[$startcol + 9] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -577,7 +617,7 @@ abstract class BaseEntryServerNode extends BaseObject  implements Persistent {
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 9; // 9 = EntryServerNodePeer::NUM_COLUMNS - EntryServerNodePeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 10; // 10 = EntryServerNodePeer::NUM_COLUMNS - EntryServerNodePeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating EntryServerNode object", $e);
@@ -1122,6 +1162,9 @@ abstract class BaseEntryServerNode extends BaseObject  implements Persistent {
 				return $this->getServerType();
 				break;
 			case 8:
+				return $this->getDc();
+				break;
+			case 9:
 				return $this->getCustomData();
 				break;
 			default:
@@ -1153,7 +1196,8 @@ abstract class BaseEntryServerNode extends BaseObject  implements Persistent {
 			$keys[5] => $this->getUpdatedAt(),
 			$keys[6] => $this->getStatus(),
 			$keys[7] => $this->getServerType(),
-			$keys[8] => $this->getCustomData(),
+			$keys[8] => $this->getDc(),
+			$keys[9] => $this->getCustomData(),
 		);
 		return $result;
 	}
@@ -1210,6 +1254,9 @@ abstract class BaseEntryServerNode extends BaseObject  implements Persistent {
 				$this->setServerType($value);
 				break;
 			case 8:
+				$this->setDc($value);
+				break;
+			case 9:
 				$this->setCustomData($value);
 				break;
 		} // switch()
@@ -1244,7 +1291,8 @@ abstract class BaseEntryServerNode extends BaseObject  implements Persistent {
 		if (array_key_exists($keys[5], $arr)) $this->setUpdatedAt($arr[$keys[5]]);
 		if (array_key_exists($keys[6], $arr)) $this->setStatus($arr[$keys[6]]);
 		if (array_key_exists($keys[7], $arr)) $this->setServerType($arr[$keys[7]]);
-		if (array_key_exists($keys[8], $arr)) $this->setCustomData($arr[$keys[8]]);
+		if (array_key_exists($keys[8], $arr)) $this->setDc($arr[$keys[8]]);
+		if (array_key_exists($keys[9], $arr)) $this->setCustomData($arr[$keys[9]]);
 	}
 
 	/**
@@ -1264,6 +1312,7 @@ abstract class BaseEntryServerNode extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(EntryServerNodePeer::UPDATED_AT)) $criteria->add(EntryServerNodePeer::UPDATED_AT, $this->updated_at);
 		if ($this->isColumnModified(EntryServerNodePeer::STATUS)) $criteria->add(EntryServerNodePeer::STATUS, $this->status);
 		if ($this->isColumnModified(EntryServerNodePeer::SERVER_TYPE)) $criteria->add(EntryServerNodePeer::SERVER_TYPE, $this->server_type);
+		if ($this->isColumnModified(EntryServerNodePeer::DC)) $criteria->add(EntryServerNodePeer::DC, $this->dc);
 		if ($this->isColumnModified(EntryServerNodePeer::CUSTOM_DATA)) $criteria->add(EntryServerNodePeer::CUSTOM_DATA, $this->custom_data);
 
 		return $criteria;
@@ -1356,6 +1405,8 @@ abstract class BaseEntryServerNode extends BaseObject  implements Persistent {
 		$copyObj->setStatus($this->status);
 
 		$copyObj->setServerType($this->server_type);
+		
+		$copyObj->setDc($this->dc);
 
 		$copyObj->setCustomData($this->custom_data);
 

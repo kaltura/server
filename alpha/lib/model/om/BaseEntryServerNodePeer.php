@@ -26,7 +26,7 @@ abstract class BaseEntryServerNodePeer {
 	const TM_CLASS = 'EntryServerNodeTableMap';
 	
 	/** The total number of columns. */
-	const NUM_COLUMNS = 9;
+	const NUM_COLUMNS = 10;
 
 	/** The number of lazy-loaded columns. */
 	const NUM_LAZY_LOAD_COLUMNS = 0;
@@ -54,6 +54,9 @@ abstract class BaseEntryServerNodePeer {
 
 	/** the column name for the SERVER_TYPE field */
 	const SERVER_TYPE = 'entry_server_node.SERVER_TYPE';
+	
+	/** the column name for the DC field */
+	const DC = 'entry_server_node.DC';
 
 	/** the column name for the CUSTOM_DATA field */
 	const CUSTOM_DATA = 'entry_server_node.CUSTOM_DATA';
@@ -68,17 +71,17 @@ abstract class BaseEntryServerNodePeer {
 
 
 	/**
-	 * holds an array of fieldnameskCuePointManager
+	 * holds an array of fieldnames
 	 *
 	 * first dimension keys are the type constants
 	 * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
 	 */
 	private static $fieldNames = array (
-		BasePeer::TYPE_PHPNAME => array ('Id', 'EntryId', 'ServerNodeId', 'PartnerId', 'CreatedAt', 'UpdatedAt', 'Status', 'ServerType', 'CustomData', ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'entryId', 'serverNodeId', 'partnerId', 'createdAt', 'updatedAt', 'status', 'serverType', 'customData', ),
-		BasePeer::TYPE_COLNAME => array (self::ID, self::ENTRY_ID, self::SERVER_NODE_ID, self::PARTNER_ID, self::CREATED_AT, self::UPDATED_AT, self::STATUS, self::SERVER_TYPE, self::CUSTOM_DATA, ),
-		BasePeer::TYPE_FIELDNAME => array ('id', 'entry_id', 'server_node_id', 'partner_id', 'created_at', 'updated_at', 'status', 'server_type', 'custom_data', ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, )
+		BasePeer::TYPE_PHPNAME => array ('Id', 'EntryId', 'ServerNodeId', 'PartnerId', 'CreatedAt', 'UpdatedAt', 'Status', 'ServerType', 'Dc', 'CustomData', ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'entryId', 'serverNodeId', 'partnerId', 'createdAt', 'updatedAt', 'status', 'serverType', 'dc', 'customData', ),
+		BasePeer::TYPE_COLNAME => array (self::ID, self::ENTRY_ID, self::SERVER_NODE_ID, self::PARTNER_ID, self::CREATED_AT, self::UPDATED_AT, self::STATUS, self::SERVER_TYPE, self::DC, self::CUSTOM_DATA, ),
+		BasePeer::TYPE_FIELDNAME => array ('id', 'entry_id', 'server_node_id', 'partner_id', 'created_at', 'updated_at', 'status', 'server_type', 'dc', 'custom_data', ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, )
 	);
 
 	/**
@@ -88,11 +91,11 @@ abstract class BaseEntryServerNodePeer {
 	 * e.g. self::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
 	 */
 	private static $fieldKeys = array (
-		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'EntryId' => 1, 'ServerNodeId' => 2, 'PartnerId' => 3, 'CreatedAt' => 4, 'UpdatedAt' => 5, 'Status' => 6, 'ServerType' => 7, 'CustomData' => 8, ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'entryId' => 1, 'serverNodeId' => 2, 'partnerId' => 3, 'createdAt' => 4, 'updatedAt' => 5, 'status' => 6, 'serverType' => 7, 'customData' => 8, ),
-		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::ENTRY_ID => 1, self::SERVER_NODE_ID => 2, self::PARTNER_ID => 3, self::CREATED_AT => 4, self::UPDATED_AT => 5, self::STATUS => 6, self::SERVER_TYPE => 7, self::CUSTOM_DATA => 8, ),
-		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'entry_id' => 1, 'server_node_id' => 2, 'partner_id' => 3, 'created_at' => 4, 'updated_at' => 5, 'status' => 6, 'server_type' => 7, 'custom_data' => 8, ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, )
+		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'EntryId' => 1, 'ServerNodeId' => 2, 'PartnerId' => 3, 'CreatedAt' => 4, 'UpdatedAt' => 5, 'Status' => 6, 'ServerType' => 7, 'Dc' => 8, 'CustomData' => 9, ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'entryId' => 1, 'serverNodeId' => 2, 'partnerId' => 3, 'createdAt' => 4, 'updatedAt' => 5, 'status' => 6, 'serverType' => 7, 'dc' => 8, 'customData' => 9, ),
+		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::ENTRY_ID => 1, self::SERVER_NODE_ID => 2, self::PARTNER_ID => 3, self::CREATED_AT => 4, self::UPDATED_AT => 5, self::STATUS => 6, self::SERVER_TYPE => 7, self::DC => 8, self::CUSTOM_DATA => 9, ),
+		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'entry_id' => 1, 'server_node_id' => 2, 'partner_id' => 3, 'created_at' => 4, 'updated_at' => 5, 'status' => 6, 'server_type' => 7, 'dc' => 8, 'custom_data' => 9, ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, )
 	);
 
 	/**
@@ -170,6 +173,7 @@ abstract class BaseEntryServerNodePeer {
 		$criteria->addSelectColumn(EntryServerNodePeer::UPDATED_AT);
 		$criteria->addSelectColumn(EntryServerNodePeer::STATUS);
 		$criteria->addSelectColumn(EntryServerNodePeer::SERVER_TYPE);
+		$criteria->addSelectColumn(EntryServerNodePeer::DC);
 		$criteria->addSelectColumn(EntryServerNodePeer::CUSTOM_DATA);
 	}
 

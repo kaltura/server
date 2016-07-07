@@ -3824,10 +3824,15 @@ package="lib.model">
     <column primaryKey="false" required="false"
             autoIncrement="false" lazyLoad="false" name="server_type" type="integer"/>
     <column primaryKey="false" required="false"
+            autoIncrement="false" lazyLoad="false" name="dc" type="integer"/>
+    <column primaryKey="false" required="false"
             autoIncrement="false" lazyLoad="false" name="custom_data" type="longvarchar"/>
     <index name="entry_server_type">
       <index-column name="entry_id"/>
       <index-column name="server_type"/>
+    </index>
+    <index name="dc_index">
+      <index-column name="dc"/>
     </index>
   </table>
 </database>

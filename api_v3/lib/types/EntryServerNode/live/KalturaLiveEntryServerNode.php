@@ -13,7 +13,7 @@ class KalturaLiveEntryServerNode extends KalturaEntryServerNode {
 
 	private static $map_between_objects = array
 	(
-		"streams"
+		"streams",
 	);
 
 	/* (non-PHPdoc)

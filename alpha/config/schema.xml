@@ -2138,11 +2138,14 @@
         <column name="created_at" type="timestamp" />
         <column name="updated_at" type="timestamp" />
         <column name="status" type="integer" />
-        <column name="server_type" type="integer" required="true" />
+        <column name="dc" type="integer" />
         <column name="custom_data" type="longvarchar" />
         <index name="entry_server_type">
             <index-column name="entry_id" />
             <index-column name="server_type" />
+        </index>
+        <index name="dc_index">
+            <index-column name="dc" />
         </index>
     </table>
 </database>

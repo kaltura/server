@@ -45,6 +45,7 @@ class EntryServerNodeTableMap extends TableMap {
 		$this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
 		$this->addColumn('STATUS', 'Status', 'INTEGER', false, null, null);
 		$this->addColumn('SERVER_TYPE', 'ServerType', 'INTEGER', true, null, null);
+		$this->addColumn('DC', 'Dc', 'INTEGER', false, null, null);
 		$this->addColumn('CUSTOM_DATA', 'CustomData', 'LONGVARCHAR', false, null, null);
 		// validators
 	} // initialize()
