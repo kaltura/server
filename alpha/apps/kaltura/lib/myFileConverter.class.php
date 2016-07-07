@@ -426,7 +426,7 @@ class myFileConverter
 	 */
 	static public function convertImage($source_file, $target_file,	$width = self::DEFAULT_THUMBNAIL_WIDTH, $height = self::DEFAULT_THUMBNAIL_HEIGHT,
 		$crop_type = self::CROP_TYPE_ORIGINAL_ASPECT_RATIO, $bgcolor = 0xffffff, $force_jpeg = false, $quality = 0,
-		$src_x = 0, $src_y = 0, $src_w = 0, $src_h = 0, $density = 0, $stripProfiles = false, $thumbParams = null, $format = null)
+		$src_x = 0, $src_y = 0, $src_w = 0, $src_h = 0, $density = 0, $stripProfiles = false, $thumbParams = null, $format = null, $forceRotation = null)
 	{
 		if (is_null($thumbParams) || !($thumbParams instanceof kThumbnailParameters))
 			$thumbParams = new kThumbnailParameters();
@@ -469,7 +469,7 @@ class myFileConverter
 			unlink($target_file); // remove target file before converting in order to avoid imagemagick security wrapper script from detetcing irrelevant errors  
 		$status = null;
 		$imageCropper = new KImageMagickCropper($source_file, $target_file, kConf::get('bin_path_imagemagick'));
-		$status = $imageCropper->crop($quality, $crop_type, $width, $height, $src_x, $src_y, $src_w, $src_h, null, null, $bgcolor, $density, null, $stripProfiles);
+		$status = $imageCropper->crop($quality, $crop_type, $width, $height, $src_x, $src_y, $src_w, $src_h, null, null, $bgcolor, $density, $forceRotation, $stripProfiles);
 		if (!$status)
 			return null;
 		return $target_file;
@@ -495,10 +495,10 @@ class myFileConverter
 	 */
 	static public function convertImageUsingCropProvider ($source_file , $target_file ,
 	$width = self::DEFAULT_THUMBNAIL_WIDTH, $height = self::DEFAULT_THUMBNAIL_HEIGHT, $crop_type = 1, $crop_provider = null, $bgcolor = 0xffffff, $force_jpeg = false,
-	$quality = 0, $src_x = 0, $src_y = 0, $src_w = 0, $src_h = 0, $density = 0, $stripProfiles = false)
+	$quality = 0, $src_x = 0, $src_y = 0, $src_w = 0, $src_h = 0, $density = 0, $stripProfiles = false, $forceRotation = null)
 	{
 		// first we create the thumbnail using the passed size
-		self::convertImage($source_file, $target_file, $width, $height, $crop_type, $bgcolor, $force_jpeg, $quality, $src_x, $src_y, $src_w, $src_h, $density, $stripProfiles);
+		self::convertImage($source_file, $target_file, $width, $height, $crop_type, $bgcolor, $force_jpeg, $quality, $src_x, $src_y, $src_w, $src_h, $density, $stripProfiles, $forceRotation);
 		
 		// now lets load our cropping provider and let it do its work
 		if (!$crop_provider)
