@@ -20,7 +20,6 @@ class Form_PushToNewsProfileConfiguration extends Form_ConfigurableProfileConfig
 	
 	public function getObject($objectType, array $properties, $add_underscore = true, $include_empty_fields = false)
 	{
-		/* @var $object Kaltura_Client_FtpDistribution_Type_FtpDistributionProfile */
 		$object = parent::getObject($objectType, $properties, $add_underscore, true);
 	        $upload = new Zend_File_Transfer_Adapter_Http();
 	        $files = $upload->getFileInfo();
@@ -80,7 +79,6 @@ class Form_PushToNewsProfileConfiguration extends Form_ConfigurableProfileConfig
 	
 	public function populateFromObject($object, $add_underscore = true)
 	{
-        /* @var Kaltura_Client_FtpDistribution_Type_FtpDistributionProfile $object */
 		parent::populateFromObject($object, $add_underscore);
 		$this->addItemXpathsToExtend($object->itemXpathsToExtend);
 		

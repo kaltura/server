@@ -133,7 +133,7 @@ class PushToNewsDistributionPlugin extends KalturaPlugin implements IKalturaPerm
 	public static function getObjectClass($baseClass, $enumValue)
 	{
 		// client side apps like batch and admin console
-		if (class_exists('KalturaClient') && ($enumValue == KalturaDistributionProviderType::FTP))
+		if (class_exists('KalturaClient') && ($enumValue == KalturaDistributionProviderType::PUSH_TO_NEWS))
 		{
 			if($baseClass == 'IDistributionEngineCloseDelete')
 				return 'PushToNewsDistributionEngine';
