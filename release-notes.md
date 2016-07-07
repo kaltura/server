@@ -1,5 +1,20 @@
 # Kajam 11.19.0 #
 
+## Add updated_at index to schedule_event table in DB ##
+
+- Issue Type: Task
+- Issue ID: PLAT-5488
+
+### Configuration ###
+
+#### Deployment Scripts ####
+
+- Run mysql -ukaltura -p -P3306 kaltura < 2016_07_07_alter_schedule_event_table_add_updated_at_key.sql
+
+#### Known Issues & Limitations ####
+
+None.
+
 ## Add HTTP event notification fired on user creation ##
 
 - Issue Type: Task
