@@ -61,15 +61,6 @@ abstract class KalturaEntryServerNode extends KalturaObject implements IRelatedF
 	 */
 	public $serverType;
 	
-	/**
-	 *
-	 * The dc id which object was added from
-	 * @var int
-	 * @readonly
-	 * @filter eq
-	 */
-	public $dc;
-
 	private static $map_between_objects = array
 	(
 		"id",
@@ -80,7 +71,6 @@ abstract class KalturaEntryServerNode extends KalturaObject implements IRelatedF
 		"updatedAt",
 		"status",
 		"serverType",
-		"dc"
 	);
 
 	public function getMapBetweenObjects ( )

@@ -11,9 +11,18 @@ class KalturaLiveEntryServerNode extends KalturaEntryServerNode {
 	 */
 	public $streams;
 
+	/**
+	 * The dc id which object was added from
+	 * @var int
+	 * @readonly
+	 * @filter eq
+	 */
+	public $dc;
+
 	private static $map_between_objects = array
 	(
 		"streams",
+		"dc",
 	);
 
 	/* (non-PHPdoc)
