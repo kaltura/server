@@ -1,5 +1,21 @@
 # Kajam 11.19.0 #
 
+## Push-To-News connector ##
+
+- Issue Type: Task
+- Issue ID: PLAT-5414
+
+### Configuration ###
+
+#### Deployment Scripts ####
+
+	php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+
+#### Known Issues & Limitations ####
+
+None.
+
+
 ## Add updated_at index to schedule_event table in DB ##
 
 - Issue Type: Task
