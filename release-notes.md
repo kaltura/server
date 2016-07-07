@@ -15,7 +15,6 @@
 
 None.
 
-
 ## Add updated_at index to schedule_event table in DB ##
 
 - Issue Type: Task
