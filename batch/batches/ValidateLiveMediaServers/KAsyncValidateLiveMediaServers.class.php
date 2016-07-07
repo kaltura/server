@@ -31,22 +31,23 @@ class KAsyncValidateLiveMediaServers extends KPeriodicWorker
 		if(!$entryServerNodeMinCreationTime)
 			$entryServerNodeMinCreationTime = self::ENTRY_SERVER_NODE_MIN_CREATION_TIMEE;
 		
-		$entryServerNodeFilter = new KalturaEntryServerNodeFilter();
-		$entryServerNodeFilter->orderBy = KalturaEntryServerNodeOrderBy::CREATED_AT_ASC;
-		$entryServerNodeFilter->createdAtLessThanOrEqual = time() - $entryServerNodeMinCreationTime;
+		$liveEntryServerNodeFilter = new KalturaLiveEntryServerNodeFilter();
+		$liveEntryServerNodeFilter->orderBy = KalturaEntryServerNodeOrderBy::CREATED_AT_ASC;
+		$liveEntryServerNodeFilter->createdAtLessThanOrEqual = time() - $entryServerNodeMinCreationTime;
+		$liveEntryServerNodeFilter->currentDcOnly = true;
 		
-		$entryServerNodeFilter->statusIn = KalturaEntryServerNodeStatus::PLAYABLE . ',' . 
+		$liveEntryServerNodeFilter->statusIn = KalturaEntryServerNodeStatus::PLAYABLE . ',' . 
 				KalturaEntryServerNodeStatus::BROADCASTING . ',' .
 				KalturaEntryServerNodeStatus::AUTHENTICATED;
 		
-		$entryServerNodePager = new KalturaFilterPager();
-		$entryServerNodePager->pageSize = 500;
-		$entryServerNodePager->pageIndex = 1;
+		$liveEntryServerNodePager = new KalturaFilterPager();
+		$liveEntryServerNodePager->pageSize = 500;
+		$liveEntryServerNodePager->pageIndex = 1;
 		
-		$entryServerNodes = self::$kClient->entryServerNode->listAction($entryServerNodeFilter, $entryServerNodePager);
-		while(count($entryServerNodes->objects))
+		$liveEntryServerNodes = self::$kClient->entryServerNode->listAction($liveEntryServerNodeFilter, $liveEntryServerNodePager);
+		while(count($liveEntryServerNodes->objects))
 		{
-			foreach($entryServerNodes->objects as $entryServerNode)
+			foreach($liveEntryServerNodes->objects as $entryServerNode)
 			{
 				try
 				{
@@ -62,8 +63,8 @@ class KAsyncValidateLiveMediaServers extends KPeriodicWorker
 				}
 			}
 			
-			$entryServerNodePager->pageIndex++;
-			$entryServerNodes = self::$kClient->entryServerNode->listAction($entryServerNodeFilter, $entryServerNodePager);
+			$liveEntryServerNodePager->pageIndex++;
+			$liveEntryServerNodes = self::$kClient->entryServerNode->listAction($liveEntryServerNodeFilter, $liveEntryServerNodePager);
 		}
 	}
 }
