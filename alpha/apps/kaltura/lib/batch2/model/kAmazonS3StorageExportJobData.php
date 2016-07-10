@@ -43,7 +43,7 @@ class kAmazonS3StorageExportJobData extends kStorageExportJobData
 		$this->setSseType($externalStorage->getSseType());
 		$this->setSseKmsKeyId($externalStorage->getSseKmsKeyId());
 		$this->setSignatureType($externalStorage->getSignatureType());
-		$this->setEndpoint($externalStorage->getEndPoint());
+		$this->setEndPoint($externalStorage->getEndPoint());
 	}
 
 	/**
@@ -136,7 +136,7 @@ class kAmazonS3StorageExportJobData extends kStorageExportJobData
 	/**
 	 * @param $endPoint the endPoint to set
 	 */
-	public function setEndpoint($endPoint)
+	public function setEndPoint($endPoint)
 	{
 		$this->endPoint = $endPoint;	
 	}	
