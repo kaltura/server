@@ -72,7 +72,7 @@ class Form_Partner_StorageConfiguration extends Form_Partner_BaseStorageConfigur
 		$this->addElementToDisplayGroup('storage_info', 'singatureType');
 		
 		$this->addElement('text', 'endPoint', array(
-				'label'			=> 'Service end point:',
+				'label'			=> 'Service endpoint:',
 				'filters'		=> array('StringTrim'),
 		));
 		$this->addElementToDisplayGroup('storage_info', 'endPoint');
