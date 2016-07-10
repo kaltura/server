@@ -47,8 +47,10 @@ class KDLStreamDescriptor {
 		if(isset($this->olayout) && isset($sourceAnalize->byChannelNumber)
 				&& array_key_exists($olayoutNum, $sourceAnalize->byChannelNumber)){
 			$sourceStream = $sourceAnalize->byChannelNumber[$olayoutNum][0];
-			$target->mapping = array($sourceStream->id);
-			return $target;
+			if(!isset($this->mapping) || in_array($sourceStream->id, $this->mapping)){
+				$target->mapping = array($sourceStream->id);
+				return $target;
+			}
 		}
 
 		/*
@@ -89,21 +91,21 @@ class KDLStreamDescriptor {
 		 * or the number of mapping ids is less than required for the olayout
 		 * - fallback to default (stereo)
 		 */
-		if($olayoutNum>count($sourceStreams) || $olayoutNum>count($target->mapping)){
+		if($olayoutNum>count($mappingStreams) || $olayoutNum>count($target->mapping)){
 			$target->olayout = null;
 		}
 		else {
 			/*
 			 * Too many mappedStreams - cut to the number of 'olayout' streams
-			 */
+			 
 			if($olayoutNum<count($sourceStreams)){
 				$sourceStreams = array_slice($sourceStreams, 0, $olayoutNum);
-			}
+			}*/
 			$target->olayout = $this->olayout;
 		}
 
 		$target->mapping = array();
-		foreach ($sourceStreams as $stream){
+		foreach ($mappingStreams as $stream){
 			$target->mapping[] = $stream->id;
 		}
 
@@ -215,7 +217,7 @@ class KDLAudioMultiStreaming {
 	public function getAudioChannels()
 	{
 		$multiStreamChannels = $this->getLayoutChannels();
-		if($multiStreamChannels==0){
+		if($multiStreamChannels==0 && (!isset($this->action) || $this->action!="separate")){
 			$multiStreamChannels = $this->getChannelsNum();
 		}
 		return (int)$multiStreamChannels;
@@ -361,6 +363,7 @@ class KDLAudioMultiStreamingHelper extends KDLAudioMultiStreaming {
 				$targetMultiAudio->streams[] = $stream;
 			}
 		}
+		if(isset($this->action)) $targetMultiAudio->action = $this->action;
 
 		return $targetMultiAudio;
 	}
