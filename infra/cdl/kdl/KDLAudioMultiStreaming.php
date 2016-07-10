@@ -605,7 +605,10 @@ class KDLAudioMultiStreamingHelper extends KDLAudioMultiStreaming {
 			/*
 			 * Currently handle just the first language entity
 			*/
-			$stream = new KDLStreamDescriptor(array($streamsPerLanguage[0]->id),null,$lang);
+			if(isset($streamsPerLanguage[0]->audioChannels))
+				$stream = new KDLStreamDescriptor(array($streamsPerLanguage[0]->id),$streamsPerLanguage[0]->audioChannels,$lang);
+			else
+				$stream = new KDLStreamDescriptor(array($streamsPerLanguage[0]->id),null,$lang);
 			$target->streams[] = $stream;
 		}
 
