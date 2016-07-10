@@ -25,12 +25,24 @@ class KalturaAmazonS3StorageProfile extends KalturaStorageProfile
 	 */
 	public $sseKmsKeyId;
 	
+	/**
+	 * @var string
+	 */
+	public $signatureType;
+	
+	/**
+	 * @var string
+	 */
+	public $endPoint;
+	
 	private static $map_between_objects = array
 	(
 		"filesPermissionInS3",
 		"s3Region",
 		"sseType",
 		"sseKmsKeyId",
+		"signatureType",
+		"endPoint",
 	);
 	
 	public function getMapBetweenObjects()

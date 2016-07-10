@@ -16,6 +16,8 @@ class AmazonS3StorageProfile extends StorageProfile
 	const CUSTOM_DATA_S3_REGION = 's3Region';
 	const CUSTOM_DATA_SSE_TYPE = 'sseType';
 	const CUSTOM_DATA_SSE_KMS_KEY_ID = 'sseKmsKeyId';
+	const CUSTOM_DATA_SIGNATURE_TYPE = 'signatureType';
+	const CUSTOM_DATA_END_POINT = 'endPoint';
 	
 	public function getKalturaObjectType()
 	{
@@ -79,4 +81,33 @@ class AmazonS3StorageProfile extends StorageProfile
 	    $v = $this->getFromCustomData(self::CUSTOM_DATA_SSE_KMS_KEY_ID);
 	    return $v;
 	}
+	
+	public function setSingatureType($v)
+	{
+		if (!is_null($v))
+		{
+			$this->putInCustomData(self::CUSTOM_DATA_SIGNATURE_TYPE, $v);
+		}
+	}
+	
+	public function getSingatureType()
+	{
+		$v = $this->getFromCustomData(self::CUSTOM_DATA_SIGNATURE_TYPE);
+		return $v;
+	}
+	
+	public function setEndPoint($v)
+	{
+		if (!is_null($v))
+		{
+			$this->putInCustomData(self::CUSTOM_DATA_END_POINT, $v);
+		}
+	}
+	
+	public function getEndPoint()
+	{
+		$v = $this->getFromCustomData(self::CUSTOM_DATA_END_POINT);
+		return $v;
+	}
+
 }
