@@ -425,9 +425,14 @@ class KDLOperatorFfmpeg2_1_3 extends KDLOperatorFfmpeg1_1_1 {
 		}
 		
 		if(isset($target->_multiStream->audio)){
-			$mapping = $target->_multiStream->audio->getStreamMapping();
-			if(isset($mapping) && count($mapping)==1)
+			$multiStreamAudio = $target->_multiStream->audio;
+			if(isset($multiStreamAudio->action) && $multiStreamAudio->action=='separate'){
 				return false;
+			}
+			$mapping = $multiStreamAudio->getStreamMapping();
+			if(isset($mapping) && count($mapping)==1){
+				return false;
+			}
 		}
 		
 		/*	
