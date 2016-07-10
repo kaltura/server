@@ -866,7 +866,7 @@ class myEntryUtils
 	{
 		$originalMediaInfo = mediaInfoPeer::retrieveOriginalByEntryId($entryId);
 		$videoRotation = 0;
-		if(!is_null($originalMediaInfo) && $vidSlices > -1)
+		if($originalMediaInfo && $vidSlices > -1)
 			$videoRotation = $originalMediaInfo->getVideoRotation();
 
 		return $videoRotation;
