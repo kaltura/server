@@ -62,6 +62,22 @@ class Form_Partner_StorageConfiguration extends Form_Partner_BaseStorageConfigur
 		));
 		$this->addElementToDisplayGroup('storage_info', 'sseKmsKeyId');
 
+		$this->addElement('select', 'singatureType', array(
+				'label'			=> 'Signature Type:',
+				'filters'		=> array('StringTrim'),
+				'multiOptions'	=> array('None' => '',
+						'S3' => 'S3',
+				),
+		));
+		$this->addElementToDisplayGroup('storage_info', 'singatureType');
+		
+		$this->addElement('text', 'endPoint', array(
+				'label'			=> 'Service end point:',
+				'filters'		=> array('StringTrim'),
+		));
+		$this->addElementToDisplayGroup('storage_info', 'endPoint');
+		
+		
 		$this->addElement('checkbox', 'storageFtpPassiveMode', array(
 			'label'			=> 'Storage FTP Passive Mode:',
 			'filters'		=> array('StringTrim'),
