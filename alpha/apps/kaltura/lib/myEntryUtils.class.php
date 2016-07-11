@@ -759,11 +759,6 @@ class myEntryUtils
 	    					// try the best playable
 							$flavorAsset = assetPeer::retrieveHighestBitrateByEntryId($entry->getId(), null, flavorParams::TAG_SAVE_SOURCE);
 						}
-						if (is_null($flavorAsset))
-						{
-	    						// if no READY ORIGINAL entry is available, try to retrieve a non-READY ORIGINAL entry
-							$flavorAsset = assetPeer::retrieveOriginalByEntryId($entry->getId());
-						}
 					}
 					if (is_null($flavorAsset))
 					{
@@ -775,20 +770,54 @@ class myEntryUtils
 
 					$flavorSyncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 					$entry_data_path = kFileSyncUtils::getReadyLocalFilePathForKey($flavorSyncKey);
-					if(!$entry_data_path) // fileSync is not ready locally, throw exception
+
+					$success = false;
+					
+					if($entry_data_path) // a local flavor was found, capture thumb locally
+					{
+						// close db connections as we won't be requiring the database anymore and capturing a thumbnail may take a long time
+						kFile::closeDbConnections();
+						myFileConverter::autoCaptureFrame($entry_data_path, $capturedThumbPath."temp_", $calc_vid_sec, -1, -1);
+						$success = true;
+					}
+					else // try capturing a remote thumbnail
+					{
+						$packagerCaptureUrl = kConf::get('packager_capture_url', 'local', null);
+						if ($packagerCaptureUrl)
+						{
+							// look for the highest bitrate MBR tagged bitrate (a flavor the packager can parse)
+							$flavorAsset = assetPeer::retrieveHighestBitrateByEntryId($entry->getId(), flavorParams::TAG_MBR, null, true);
+							if (!is_null($flavorAsset))
+							{
+								$flavorSyncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+								$remoteFS = kFileSyncUtils::getReadyExternalFileSyncForKey($flavorSyncKey);
+								if ($remoteFS);
+								{
+									$dp = DeliveryProfilePeer::getRemoteDeliveryByStorageId(DeliveryProfileDynamicAttributes::init($remoteFS->getDc(), $flavorAsset->getEntryId()), null, $flavorAsset);
+									if ($dp)
+									{
+										$url = ltrim($dp->getFileSyncUrl($remoteFS),'/');
+										if (strpos($url, "://") === false)
+											$url = rtrim($dp->getUrl(), "/") . "/".$url ;
+
+										$remoteThumbCapture = $packagerCaptureUrl.str_replace("://", "/", $url)."/thumb-".floor($calc_vid_sec*1000).".jpg";
+										kFile::closeDbConnections();
+										KCurlWrapper::getDataFromFile($remoteThumbCapture, $orig_image_path);
+										$success = true;
+									}
+								}
+							}
+						}
+					}
+						
+	
+					$cache->remove($orig_image_path);
+					if (!$success)
 					{
 						// since this is not really being processed on this server, and will probably cause redirect in thumbnailAction
 						// remove from cache so later requests will still get redirected and will not fail on PROCESSING_CAPTURE_THUMBNAIL
-						$cache->remove($orig_image_path);
 						throw new kFileSyncException('no ready filesync on current DC', kFileSyncException::FILE_DOES_NOT_EXIST_ON_CURRENT_DC);
 					}
-					
-					// close db connections as we won't be requiring the database anymore and capturing a thumbnail may take a long time
-					kFile::closeDbConnections();
-					
-					myFileConverter::autoCaptureFrame($entry_data_path, $capturedThumbPath."temp_", $calc_vid_sec, -1, -1);
-					
-					$cache->remove($orig_image_path);
 				}
 			}
 
