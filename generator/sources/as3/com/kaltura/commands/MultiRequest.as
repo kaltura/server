@@ -28,13 +28,14 @@
 package com.kaltura.commands {
 	import com.kaltura.delegates.MultiRequestDelegate;
 	import com.kaltura.net.KalturaCall;
+	import flash.utils.*;
 
 	public class MultiRequest extends KalturaCall {
 		private var _addedParams:Object = new Object();
 		private var _mapParamArr:Array = new Array();
 
 
-		/**
+		/**d
 		 * a list of KalturaCall-s in this MultiRequest
 		 */
 		public var actions:Array = new Array();
@@ -89,7 +90,7 @@ package com.kaltura.commands {
 				var argsArr:Array = ((actions[j] as KalturaCall).args.toString()).split('&');
 				for (var k:int = 0; k < argsArr.length; k++) {
 					var inMap:Boolean = false;
-					var key:String = decodeURIComponent(argsArr[k].split('=')[0]);
+					var key:String = unescapeMultiByte(argsArr[k].split('=')[0]);
 
 					//search the key in request map
 					for (var m:int = 0; m < _mapParamArr.length; m++) {
@@ -104,7 +105,7 @@ package com.kaltura.commands {
 					if (!inMap && argsArr[k]) //if not in the multi request map
 					{
 						keyArray.push((j + 1) + ":" + key);
-						valueArr.push(decodeURIComponent(argsArr[k].split('=')[1]));
+						valueArr.push(unescapeMultiByte(argsArr[k].split('=')[1]));
 					}
 					//TODO add params which ARE in the map and are NOT in the request (some params are removed if they have default values)
 				}
