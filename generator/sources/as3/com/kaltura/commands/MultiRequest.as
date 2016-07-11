@@ -35,7 +35,7 @@ package com.kaltura.commands {
 		private var _mapParamArr:Array = new Array();
 
 
-		/**d
+		/**
 		 * a list of KalturaCall-s in this MultiRequest
 		 */
 		public var actions:Array = new Array();
