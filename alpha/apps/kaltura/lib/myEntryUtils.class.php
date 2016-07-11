@@ -688,9 +688,16 @@ class myEntryUtils
 		$multi = $vid_slice == -1 && $vid_slices != -1;
 		$count = $multi ? $vid_slices : 1;
 		$im = null;
+		
+		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_PS2);
+		
 		if ($multi)
-			$vid_slice = 0;  
-			
+			$vid_slice = 0;
+		
+		// creating the thumbnail is a very heavy operation prevent calling it in parallel for the same thubmnail for 5 minutes
+		if ($cache && !$cache->add("thumb-processing-resize".$finalThumbPath, true, 5 * 60))
+			KExternalErrors::dieError(KExternalErrors::PROCESSING_CAPTURE_THUMBNAIL);
+		
 		while($count--)
 		{
 			if (
@@ -730,88 +737,26 @@ class myEntryUtils
 					// limit creation of more than XX ffmpeg image extraction processes
 					if (kConf::hasParam("resize_thumb_max_processes_ffmpeg") &&
 						trim(exec("ps -e -ocmd|awk '{print $1}'|grep -c ".kConf::get("bin_path_ffmpeg") )) > kConf::get("resize_thumb_max_processes_ffmpeg"))
+					{
+						
+						if ($cache)
+							$cache->delete("thumb-processing-resize".$finalThumbPath);
+						
 						KExternalErrors::dieError(KExternalErrors::TOO_MANY_PROCESSES);
+					}
 				    
 					// creating the thumbnail is a very heavy operation
 					// prevent calling it in parallel for the same thubmnail for 5 minutes
-					$cache = new myCache("thumb-processing", 5 * 60); // 5 minutes
-					$processing = $cache->get($orig_image_path);
-					if ($processing)
+					
+					if ($cache && !$cache->add("thumb-processing".$orig_image_path, true, 5 * 60))
 						KExternalErrors::dieError(KExternalErrors::PROCESSING_CAPTURE_THUMBNAIL);
 						
-					$cache->put($orig_image_path, true);
-					
-					$flavorAsset = assetPeer::retrieveHighestBitrateByEntryId($entry->getId(), flavorParams::TAG_THUMBSOURCE);
-					if(is_null($flavorAsset))
-					{
-						$flavorAsset = assetPeer::retrieveOriginalReadyByEntryId($entry->getId());
-			                        if($flavorAsset)
-			                        {
-			                            $flavorSyncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-			                            list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($flavorSyncKey,false,false);
-			                            if (!$fileSync)
-			                            {
-			                                $flavorAsset = null;
-			                            }
-			                        }
-		    				if(is_null($flavorAsset) || !($flavorAsset->hasTag(flavorParams::TAG_MBR) || $flavorAsset->hasTag(flavorParams::TAG_WEB)))
-						{
-	    					// try the best playable
-							$flavorAsset = assetPeer::retrieveHighestBitrateByEntryId($entry->getId(), null, flavorParams::TAG_SAVE_SOURCE);
-						}
-					}
-					if (is_null($flavorAsset))
-					{
-						// if no READY ORIGINAL entry is available, try to retrieve a non-READY ORIGINAL entry
-						$flavorAsset = assetPeer::retrieveOriginalByEntryId($entry->getId());
-					}	
-					if (is_null($flavorAsset))
-						KExternalErrors::dieError(KExternalErrors::FLAVOR_NOT_FOUND);
-
-					$flavorSyncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-					$entry_data_path = kFileSyncUtils::getReadyLocalFilePathForKey($flavorSyncKey);
-
-					$success = false;
-					
-					if($entry_data_path) // a local flavor was found, capture thumb locally
-					{
-						// close db connections as we won't be requiring the database anymore and capturing a thumbnail may take a long time
-						kFile::closeDbConnections();
-						myFileConverter::autoCaptureFrame($entry_data_path, $capturedThumbPath."temp_", $calc_vid_sec, -1, -1);
-						$success = true;
-					}
-					else // try capturing a remote thumbnail
-					{
-						$packagerCaptureUrl = kConf::get('packager_capture_url', 'local', null);
-						if ($packagerCaptureUrl)
-						{
-							// look for the highest bitrate MBR tagged bitrate (a flavor the packager can parse)
-							$flavorAsset = assetPeer::retrieveHighestBitrateByEntryId($entry->getId(), flavorParams::TAG_MBR, null, true);
-							if (!is_null($flavorAsset))
-							{
-								$flavorSyncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-								$remoteFS = kFileSyncUtils::getReadyExternalFileSyncForKey($flavorSyncKey);
-								if ($remoteFS);
-								{
-									$dp = DeliveryProfilePeer::getRemoteDeliveryByStorageId(DeliveryProfileDynamicAttributes::init($remoteFS->getDc(), $flavorAsset->getEntryId()), null, $flavorAsset);
-									if ($dp)
-									{
-										$url = ltrim($dp->getFileSyncUrl($remoteFS),'/');
-										if (strpos($url, "://") === false)
-											$url = rtrim($dp->getUrl(), "/") . "/".$url ;
-
-										$remoteThumbCapture = $packagerCaptureUrl.str_replace("://", "/", $url)."/thumb-".floor($calc_vid_sec*1000).".jpg";
-										kFile::closeDbConnections();
-										KCurlWrapper::getDataFromFile($remoteThumbCapture, $orig_image_path);
-										$success = true;
-									}
-								}
-							}
-						}
-					}
+					$success = self::captureLocalThumb($entry, $capturedThumbPath, $calc_vid_sec) || 
+						self::captureRemoteThumb($entry, $orig_image_path, $calc_vid_sec);
 						
-	
-					$cache->remove($orig_image_path);
+					if ($cache)
+						$cache->delete("thumb-processing".$orig_image_path);
+					
 					if (!$success)
 					{
 						// since this is not really being processed on this server, and will probably cause redirect in thumbnailAction
@@ -827,15 +772,14 @@ class myEntryUtils
 			// limit creation of more than XX Imagemagick processes
 			if (kConf::hasParam("resize_thumb_max_processes_imagemagick") &&
 				trim(exec("ps -e -ocmd|awk '{print $1}'|grep -c ".kConf::get("bin_path_imagemagick") )) > kConf::get("resize_thumb_max_processes_imagemagick"))
+			{
+				
+				if ($cache)
+					$cache->delete("thumb-processing-resize".$finalThumbPath);
+				
 				KExternalErrors::dieError(KExternalErrors::TOO_MANY_PROCESSES);
+			}
 								    
-			// resizing (and editing)) an image file that failes results in a long server waiting time
-			// prevent this waiting time (of future requests) in case the resizeing failes
-			$cache = new myCache("thumb-processing-resize", 5 * 60); // 5 minutes
-			$processing = $cache->get($orig_image_path);
-			if ($processing)
-				KExternalErrors::dieError(KExternalErrors::PROCESSING_CAPTURE_THUMBNAIL);
-
 			$forceRotation = self::getRotate($entry->getId(), $vid_slices);
 
 			kFile::fullMkdir($processingThumbPath);
@@ -858,15 +802,11 @@ class myEntryUtils
 				$convertedImagePath = myFileConverter::convertImage($orig_image_path, $processingThumbPath, $width, $height, $type, $bgcolor, true, $quality, $src_x, $src_y, $src_w, $src_h, $density, $stripProfiles, $thumbParams, $format,$forceRotation);
 			}
 			
-			// die if resize operation failed and add failed resizing to cache
+			// die if resize operation failed
 			if ($convertedImagePath === null || !@filesize($convertedImagePath)) {
-				$cache->put($orig_image_path, true);
 				KExternalErrors::dieError(KExternalErrors::IMAGE_RESIZE_FAILED);
 			}
-			// if resizing secceded remove from cache of failed resizing 
-			if ($cache->get($orig_image_path))
-				$cache->remove($orig_image_path, true);
-						
+			
 			if ($multi)
 			{
 				list($w, $h, $type, $attr, $srcIm) = myFileConverter::createImageByFile($processingThumbPath);
@@ -888,7 +828,92 @@ class myEntryUtils
 		
 		kFile::fullMkdir($finalThumbPath);
 		kFile::moveFile($processingThumbPath, $finalThumbPath);
+		
+		if ($cache)
+			$cache->delete("thumb-processing-resize".$finalThumbPath);
+				
 		return $finalThumbPath;
+	}
+	
+	public static function captureLocalThumb($entry, $capturedThumbPath, $calc_vid_sec)
+	{
+		$flavorAsset = assetPeer::retrieveHighestBitrateByEntryId($entry->getId(), flavorParams::TAG_THUMBSOURCE);
+		if(is_null($flavorAsset))
+		{
+			$flavorAsset = assetPeer::retrieveOriginalReadyByEntryId($entry->getId());
+			if($flavorAsset)
+			{
+				$flavorSyncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+				list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($flavorSyncKey,false,false);
+				if (!$fileSync)
+				{
+					$flavorAsset = null;
+				}
+			}
+			if(is_null($flavorAsset) || !($flavorAsset->hasTag(flavorParams::TAG_MBR) || $flavorAsset->hasTag(flavorParams::TAG_WEB)))
+			{
+				// try the best playable
+				$flavorAsset = assetPeer::retrieveHighestBitrateByEntryId($entry->getId(), null, flavorParams::TAG_SAVE_SOURCE);
+			}
+
+			if (is_null($flavorAsset))
+			{
+				// if no READY ORIGINAL entry is available, try to retrieve a non-READY ORIGINAL entry
+				$flavorAsset = assetPeer::retrieveOriginalByEntryId($entry->getId());
+			}
+		}
+		
+		if (is_null($flavorAsset))
+			KExternalErrors::dieError(KExternalErrors::FLAVOR_NOT_FOUND);
+		
+		$flavorSyncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+		$entry_data_path = kFileSyncUtils::getReadyLocalFilePathForKey($flavorSyncKey);
+		
+		if ($entry_data_path)
+		{
+			// close db connections as we won't be requiring the database anymore and capturing a thumbnail may take a long time
+			kFile::closeDbConnections();
+			myFileConverter::autoCaptureFrame($entry_data_path, $capturedThumbPath."temp_", $calc_vid_sec, -1, -1);
+			return true;
+		}
+		
+		return false;
+	}
+	
+	public static function captureRemoteThumb($entry, $orig_image_path, $calc_vid_sec)
+	{
+		$packagerCaptureUrl = kConf::get('packager_thumb_capture_url', 'local', null);
+		if ($packagerCaptureUrl)
+		{
+			// look for the highest bitrate MBR tagged bitrate (a flavor the packager can parse)
+			$flavorAsset = assetPeer::retrieveHighestBitrateByEntryId($entry->getId(), flavorParams::TAG_MBR, null, true);
+			if (!is_null($flavorAsset))
+			{
+				$flavorSyncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+				$remoteFS = kFileSyncUtils::getReadyExternalFileSyncForKey($flavorSyncKey);
+				if ($remoteFS)
+				{
+					$dp = DeliveryProfilePeer::getRemoteDeliveryByStorageId(DeliveryProfileDynamicAttributes::init($remoteFS->getDc(), $flavorAsset->getEntryId()), null, $flavorAsset);
+					if ($dp)
+					{
+						$url = ltrim($dp->getFileSyncUrl($remoteFS),'/');
+						if (strpos($url, "://") === false)
+							$url = rtrim($dp->getUrl(), "/") . "/".ltrim($url);
+
+						$remoteThumbCapture = str_replace(
+								array ( "{url}", "{offset}" ),
+								array ( str_replace("://", "/", $url) , floor($calc_vid_sec*1000)  ) ,
+								$packagerCaptureUrl );
+						
+						kFile::closeDbConnections();
+						KCurlWrapper::getDataFromFile($remoteThumbCapture, $orig_image_path);
+						return true;
+					}
+				}
+			}
+		}
+		
+		return false;
 	}
 
 	public static function getRotate($entryId , $vidSlices)
