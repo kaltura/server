@@ -850,6 +850,7 @@ class myEntryUtils
 					$flavorAsset = null;
 				}
 			}
+
 			if(is_null($flavorAsset) || !($flavorAsset->hasTag(flavorParams::TAG_MBR) || $flavorAsset->hasTag(flavorParams::TAG_WEB)))
 			{
 				// try the best playable
@@ -869,51 +870,47 @@ class myEntryUtils
 		$flavorSyncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 		$entry_data_path = kFileSyncUtils::getReadyLocalFilePathForKey($flavorSyncKey);
 		
-		if ($entry_data_path)
-		{
-			// close db connections as we won't be requiring the database anymore and capturing a thumbnail may take a long time
-			kFile::closeDbConnections();
-			myFileConverter::autoCaptureFrame($entry_data_path, $capturedThumbPath."temp_", $calc_vid_sec, -1, -1);
-			return true;
-		}
+		if (!$entry_data_path)
+			return false;
 		
-		return false;
+		// close db connections as we won't be requiring the database anymore and capturing a thumbnail may take a long time
+		kFile::closeDbConnections();
+		myFileConverter::autoCaptureFrame($entry_data_path, $capturedThumbPath."temp_", $calc_vid_sec, -1, -1);
+		return true;
 	}
 	
 	public static function captureRemoteThumb($entry, $orig_image_path, $calc_vid_sec)
 	{
 		$packagerCaptureUrl = kConf::get('packager_thumb_capture_url', 'local', null);
-		if ($packagerCaptureUrl)
-		{
-			// look for the highest bitrate MBR tagged bitrate (a flavor the packager can parse)
-			$flavorAsset = assetPeer::retrieveHighestBitrateByEntryId($entry->getId(), flavorParams::TAG_MBR, null, true);
-			if (!is_null($flavorAsset))
-			{
-				$flavorSyncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-				$remoteFS = kFileSyncUtils::getReadyExternalFileSyncForKey($flavorSyncKey);
-				if ($remoteFS)
-				{
-					$dp = DeliveryProfilePeer::getRemoteDeliveryByStorageId(DeliveryProfileDynamicAttributes::init($remoteFS->getDc(), $flavorAsset->getEntryId()), null, $flavorAsset);
-					if ($dp)
-					{
-						$url = ltrim($dp->getFileSyncUrl($remoteFS),'/');
-						if (strpos($url, "://") === false)
-							$url = rtrim($dp->getUrl(), "/") . "/".ltrim($url);
-
-						$remoteThumbCapture = str_replace(
-								array ( "{url}", "{offset}" ),
-								array ( str_replace("://", "/", $url) , floor($calc_vid_sec*1000)  ) ,
-								$packagerCaptureUrl );
-						
-						kFile::closeDbConnections();
-						KCurlWrapper::getDataFromFile($remoteThumbCapture, $orig_image_path);
-						return true;
-					}
-				}
-			}
-		}
+		if (!$packagerCaptureUrl)
+			return false;
 		
-		return false;
+		// look for the highest bitrate MBR tagged bitrate (a flavor the packager can parse)
+		$flavorAsset = assetPeer::retrieveHighestBitrateByEntryId($entry->getId(), flavorParams::TAG_MBR, null, true);
+		if (!is_null($flavorAsset))
+			return false;
+		
+		$flavorSyncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+		$remoteFS = kFileSyncUtils::getReadyExternalFileSyncForKey($flavorSyncKey);
+		if (!$remoteFS)
+			return false;
+
+		$dp = DeliveryProfilePeer::getRemoteDeliveryByStorageId(DeliveryProfileDynamicAttributes::init($remoteFS->getDc(), $flavorAsset->getEntryId()), null, $flavorAsset);
+		if (!$dp)
+			return false;
+		
+		$url = ltrim($dp->getFileSyncUrl($remoteFS),'/');
+		if (strpos($url, "://") === false)
+			$url = rtrim($dp->getUrl(), "/") . "/".ltrim($url);
+
+		$remoteThumbCapture = str_replace(
+			array ( "{url}", "{offset}" ),
+			array ( str_replace("://", "/", $url) , floor($calc_vid_sec*1000)  ) ,
+			$packagerCaptureUrl );
+	
+		kFile::closeDbConnections();
+		KCurlWrapper::getDataFromFile($remoteThumbCapture, $orig_image_path);
+		return true;
 	}
 
 	public static function getRotate($entryId , $vidSlices)
