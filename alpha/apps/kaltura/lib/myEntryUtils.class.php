@@ -735,24 +735,14 @@ class myEntryUtils
 				// if we already captured the frame at that second, dont recapture, just use the existing file
 				if (!file_exists($orig_image_path))
 				{
-					// limit creation of more than XX ffmpeg image extraction processes
-					if (kConf::hasParam("resize_thumb_max_processes_ffmpeg") &&
-						trim(exec("ps -e -ocmd|awk '{print $1}'|grep -c ".kConf::get("bin_path_ffmpeg") )) > kConf::get("resize_thumb_max_processes_ffmpeg"))
-					{
-						if ($cache)
-							$cache->delete($cacheLockKey);
-						
-						KExternalErrors::dieError(KExternalErrors::TOO_MANY_PROCESSES);
-					}
-				    
 					// creating the thumbnail is a very heavy operation
-					// prevent calling it in parallel for the same thubmnail for 5 minutes
+					// prevent calling it in parallel for the same thumbnail for 5 minutes
 					
 					$cacheLockKeyProcessing = "thumb-processing".$orig_image_path;
 					if ($cache && !$cache->add($cacheLockKeyProcessing, true, 5 * 60))
 						KExternalErrors::dieError(KExternalErrors::PROCESSING_CAPTURE_THUMBNAIL);
 						
-					$success = self::captureLocalThumb($entry, $capturedThumbPath, $calc_vid_sec) || 
+					$success = self::captureLocalThumb($entry, $capturedThumbPath, $calc_vid_sec, $cache, $cacheLockKey, $cacheLockKeyProcessing) || 
 						self::captureRemoteThumb($entry, $orig_image_path, $calc_vid_sec);
 						
 					if ($cache)
@@ -835,7 +825,7 @@ class myEntryUtils
 		return $finalThumbPath;
 	}
 	
-	public static function captureLocalThumb($entry, $capturedThumbPath, $calc_vid_sec)
+	public static function captureLocalThumb($entry, $capturedThumbPath, $calc_vid_sec, $cache, $cacheLockKey, $cacheLockKeyProcessing)
 	{
 		$flavorAsset = assetPeer::retrieveHighestBitrateByEntryId($entry->getId(), flavorParams::TAG_THUMBSOURCE);
 		if(is_null($flavorAsset))
@@ -872,6 +862,19 @@ class myEntryUtils
 		
 		if (!$entry_data_path)
 			return false;
+
+		// limit creation of more than XX ffmpeg image extraction processes
+		if (kConf::hasParam("resize_thumb_max_processes_ffmpeg") &&
+			trim(exec("ps -e -ocmd|awk '{print $1}'|grep -c ".kConf::get("bin_path_ffmpeg") )) > kConf::get("resize_thumb_max_processes_ffmpeg"))
+		{
+			if ($cache)
+			{
+				$cache->delete($cacheLockKey);
+				$cache->delete($cacheLockKeyProcessing);
+			}
+			
+			KExternalErrors::dieError(KExternalErrors::TOO_MANY_PROCESSES);
+		}
 		
 		// close db connections as we won't be requiring the database anymore and capturing a thumbnail may take a long time
 		kFile::closeDbConnections();
