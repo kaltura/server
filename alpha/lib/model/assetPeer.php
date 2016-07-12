@@ -533,7 +533,7 @@ class assetPeer extends BaseassetPeer implements IRelatedObjectPeer
      * @param string $tag tag filter
      * @return flavorAsset that has a file_sync in status ready
      */
-	public static function retrieveHighestBitrateByEntryId($entryId, $tag = null, $excludeTag = null)
+	public static function retrieveHighestBitrateByEntryId($entryId, $tag = null, $excludeTag = null, $external = false)
     {
 		$c = new Criteria();
 		$c->add(assetPeer::ENTRY_ID, $entryId);
@@ -554,7 +554,11 @@ class assetPeer extends BaseassetPeer implements IRelatedObjectPeer
 		{
 			if (!$ret || $ret->getBitrate() < $flavorAsset->getBitrate()) {
 				$flavorSyncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-				list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($flavorSyncKey,false,false);
+				if ($external)
+					$fileSync = kFileSyncUtils::getReadyPendingExternalFileSyncForKey($flavorSyncKey);
+				else
+					list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($flavorSyncKey,false,false);
+				
 				if ($fileSync){
 					$ret = $flavorAsset;
 				}
