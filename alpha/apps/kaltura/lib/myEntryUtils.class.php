@@ -694,8 +694,9 @@ class myEntryUtils
 		if ($multi)
 			$vid_slice = 0;
 		
+		$cacheLockKey = "thumb-processing-resize".$finalThumbPath;
 		// creating the thumbnail is a very heavy operation prevent calling it in parallel for the same thubmnail for 5 minutes
-		if ($cache && !$cache->add("thumb-processing-resize".$finalThumbPath, true, 5 * 60))
+		if ($cache && !$cache->add($cacheLockKey, true, 5 * 60))
 			KExternalErrors::dieError(KExternalErrors::PROCESSING_CAPTURE_THUMBNAIL);
 		
 		while($count--)
@@ -738,9 +739,8 @@ class myEntryUtils
 					if (kConf::hasParam("resize_thumb_max_processes_ffmpeg") &&
 						trim(exec("ps -e -ocmd|awk '{print $1}'|grep -c ".kConf::get("bin_path_ffmpeg") )) > kConf::get("resize_thumb_max_processes_ffmpeg"))
 					{
-						
 						if ($cache)
-							$cache->delete("thumb-processing-resize".$finalThumbPath);
+							$cache->delete($cacheLockKey);
 						
 						KExternalErrors::dieError(KExternalErrors::TOO_MANY_PROCESSES);
 					}
@@ -748,14 +748,15 @@ class myEntryUtils
 					// creating the thumbnail is a very heavy operation
 					// prevent calling it in parallel for the same thubmnail for 5 minutes
 					
-					if ($cache && !$cache->add("thumb-processing".$orig_image_path, true, 5 * 60))
+					$cacheLockKeyProcessing = "thumb-processing".$orig_image_path;
+					if ($cache && !$cache->add($cacheLockKeyProcessing, true, 5 * 60))
 						KExternalErrors::dieError(KExternalErrors::PROCESSING_CAPTURE_THUMBNAIL);
 						
 					$success = self::captureLocalThumb($entry, $capturedThumbPath, $calc_vid_sec) || 
 						self::captureRemoteThumb($entry, $orig_image_path, $calc_vid_sec);
 						
 					if ($cache)
-						$cache->delete("thumb-processing".$orig_image_path);
+						$cache->delete($cacheLockKeyProcessing);
 					
 					if (!$success)
 					{
@@ -773,9 +774,8 @@ class myEntryUtils
 			if (kConf::hasParam("resize_thumb_max_processes_imagemagick") &&
 				trim(exec("ps -e -ocmd|awk '{print $1}'|grep -c ".kConf::get("bin_path_imagemagick") )) > kConf::get("resize_thumb_max_processes_imagemagick"))
 			{
-				
 				if ($cache)
-					$cache->delete("thumb-processing-resize".$finalThumbPath);
+					$cache->delete($cacheLockKey);
 				
 				KExternalErrors::dieError(KExternalErrors::TOO_MANY_PROCESSES);
 			}
@@ -830,7 +830,7 @@ class myEntryUtils
 		kFile::moveFile($processingThumbPath, $finalThumbPath);
 		
 		if ($cache)
-			$cache->delete("thumb-processing-resize".$finalThumbPath);
+			$cache->delete($cacheLockKey);
 				
 		return $finalThumbPath;
 	}
