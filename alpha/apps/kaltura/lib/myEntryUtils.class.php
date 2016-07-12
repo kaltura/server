@@ -899,9 +899,9 @@ class myEntryUtils
 		if (is_null($dp))
 			return false;
 		
-		$url = ltrim($dp->getFileSyncUrl($remoteFS),'/');
+		$url = $dp->getFileSyncUrl($remoteFS);
 		if (strpos($url, "://") === false)
-			$url = rtrim($dp->getUrl(), "/") . "/".ltrim($url);
+			$url = rtrim($dp->getUrl(), "/") . "/".ltrim($url, '/');
 
 		$remoteThumbCapture = str_replace(
 			array ( "{url}", "{offset}" ),
