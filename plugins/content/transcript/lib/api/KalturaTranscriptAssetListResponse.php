@@ -3,7 +3,7 @@
  * @package plugins.transcript
  * @subpackage api.objects
  */
-class KalturaTranscriptAssetListResponse extends KalturaAttachmentAssetListResponse
+class KalturaTranscriptAssetListResponse extends KalturaListResponse
 {
 	/**
 	 * @var KalturaTranscriptAssetArray

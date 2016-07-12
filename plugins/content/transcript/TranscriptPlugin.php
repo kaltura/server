@@ -38,6 +38,13 @@ class TranscriptPlugin extends KalturaPlugin implements IKalturaEnumerator, IKal
      */
      public static function getExtendedTypes($baseClass, $enumValue)
      {
+        if($baseClass == assetPeer::OM_CLASS && $enumValue == AttachmentPlugin::getAssetTypeCoreValue(AttachmentAssetType::ATTACHMENT))
+        {
+            return array(
+                self::getAssetTypeCoreValue(TranscriptAssetType::TRANSCRIPT)
+            );
+        }
+
         return null;
     }
 
