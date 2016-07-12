@@ -887,7 +887,7 @@ class myEntryUtils
 		
 		// look for the highest bitrate MBR tagged bitrate (a flavor the packager can parse)
 		$flavorAsset = assetPeer::retrieveHighestBitrateByEntryId($entry->getId(), flavorParams::TAG_MBR, null, true);
-		if (!is_null($flavorAsset))
+		if (is_null($flavorAsset))
 			return false;
 		
 		$flavorSyncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
@@ -896,7 +896,7 @@ class myEntryUtils
 			return false;
 
 		$dp = DeliveryProfilePeer::getRemoteDeliveryByStorageId(DeliveryProfileDynamicAttributes::init($remoteFS->getDc(), $flavorAsset->getEntryId()), null, $flavorAsset);
-		if (!$dp)
+		if (is_null($dp))
 			return false;
 		
 		$url = ltrim($dp->getFileSyncUrl($remoteFS),'/');
