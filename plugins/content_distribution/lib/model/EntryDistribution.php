@@ -374,6 +374,8 @@ class EntryDistribution extends BaseEntryDistribution implements IIndexable, ISy
 	public function getUpdateDataVersion()				{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_UPDATE_DATA_VERSION);}
 	public function getDeleteDataVersion()				{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_DELETE_DATA_VERSION);}
 	
+	public function setSubmitDataVersion($v)			{$this->putInCustomData(self::CUSTOM_DATA_FIELD_SUBMIT_DATA_VERSION, $v);}
+	
 	public function incrementSubmitResultsVersion()
 	{
 		$version = kDataCenterMgr::incrementVersion($this->getSubmitResultsVersion());
