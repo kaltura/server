@@ -62,14 +62,14 @@ class Form_Partner_StorageConfiguration extends Form_Partner_BaseStorageConfigur
 		));
 		$this->addElementToDisplayGroup('storage_info', 'sseKmsKeyId');
 
-		$this->addElement('select', 'singatureType', array(
+		$this->addElement('select', 'signatureType', array(
 				'label'			=> 'Signature Type:',
 				'filters'		=> array('StringTrim'),
 				'multiOptions'	=> array('None' => '',
 						'S3' => 'S3',
 				),
 		));
-		$this->addElementToDisplayGroup('storage_info', 'singatureType');
+		$this->addElementToDisplayGroup('storage_info', 'signatureType');
 		
 		$this->addElement('text', 'endPoint', array(
 				'label'			=> 'Service endpoint:',
