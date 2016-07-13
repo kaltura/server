@@ -82,7 +82,7 @@ class AmazonS3StorageProfile extends StorageProfile
 	    return $v;
 	}
 	
-	public function setSingatureType($v)
+	public function setSignatureType($v)
 	{
 		if (!is_null($v))
 		{
@@ -90,7 +90,7 @@ class AmazonS3StorageProfile extends StorageProfile
 		}
 	}
 	
-	public function getSingatureType()
+	public function getSignatureType()
 	{
 		$v = $this->getFromCustomData(self::CUSTOM_DATA_SIGNATURE_TYPE);
 		return $v;
