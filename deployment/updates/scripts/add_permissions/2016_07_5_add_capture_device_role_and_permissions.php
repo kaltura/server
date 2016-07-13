@@ -15,3 +15,12 @@ passthru("php $insertDefaultsScript $config");
 
 $config = realpath(dirname(__FILE__)) . '/../../../permissions/service.uploadtoken.ini';
 passthru("php $addPermissionsAndItemsScript $config");
+
+$config = realpath(dirname(__FILE__)) . '/../../../permissions/service.baseentry.ini';
+passthru("php $addPermissionsAndItemsScript $config");
+
+$config = realpath(dirname(__FILE__)) . '/../../../permissions/service.media.ini';
+passthru("php $addPermissionsAndItemsScript $config");
+
+$config = realpath(dirname(__FILE__)) . '/../../../permissions/service.metadata.metadata.ini';
+passthru("php $addPermissionsAndItemsScript $config");
