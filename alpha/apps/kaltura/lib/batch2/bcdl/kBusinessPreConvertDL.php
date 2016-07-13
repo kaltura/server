@@ -401,8 +401,6 @@ class kBusinessPreConvertDL
 			return null;
 		}
 		
-		// TODO - if source flavor is remote storage, create import job and mark the flavor as FLAVOR_ASSET_STATUS_WAIT_FOR_CONVERT
-		
 		$mediaInfoId = null;
 		$mediaInfo = mediaInfoPeer::retrieveByFlavorAssetId($originalFlavorAsset->getId());
 		if($mediaInfo)
@@ -1656,7 +1654,15 @@ KalturaLog::log("Found redundant: bitrate ".$targetFlavorArr[$closest]->getVideo
 		kJobsManager::addFlavorConvertJob(array($srcSyncKey), $sourceFlavorOutput, $originalFlavorAsset->getId(), $conversionProfileId, $mediaInfoId, $parentJob);
 		return false;
 	}
-	
+		
+	public static function convertSource($flavorAsset, $conversionProfileId = null, $mediaInfoId = null, $dbParentBatchJob = null)
+	{
+		$originalFlavorAsset = assetPeer::retrieveOriginalByEntryId($flavorAsset->getEntryId());
+		$flavorParamOutput = assetParamsOutputPeer::retrieveByAsset($originalFlavorAsset);
+		$srcSyncKeys = array();
+		$srcSyncKeys[] = $originalFlavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+		return kJobsManager::addFlavorConvertJob($srcSyncKeys, $flavorParamOutput, $originalFlavorAsset->getId(), $conversionProfileId, $mediaInfoId, $dbParentBatchJob);
+	}
 		/*
 		 * Save the original source asset in another asset, in order 
 		 * to prevent its liquidation by the inter-source asset.

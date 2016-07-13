@@ -228,7 +228,7 @@ class kFlowHelper
 			foreach($entryFlavors as $entryFlavor)
 			{
 				/* @var $entryFlavor flavorAsset */
-				if($entryFlavor->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_WAIT_FOR_CONVERT && $entryFlavor->getFlavorParamsId())
+				if($entryFlavor->getFlavorParamsId())
 				{
 					$flavor = assetParamsOutputPeer::retrieveByAsset($entryFlavor);
 					kBusinessPreConvertDL::decideFlavorConvert($entryFlavor, $flavor, $originalFlavorAsset, null, null, $dbBatchJob);
@@ -256,16 +256,13 @@ class kFlowHelper
 		return $dbBatchJob;
 	}
 
-	private function excuteClip($flavorAsset, $dbBatchJob) {
-		$entryFlavors = assetPeer::retrieveFlavorsByEntryId($flavorAsset->getEntryId());
-		$originalFlavorAsset = assetPeer::retrieveOriginalByEntryId($flavorAsset->getEntryId());
-		foreach($entryFlavors as $entryFlavor) {
-			$flavor = assetParamsOutputPeer::retrieveByAsset($entryFlavor);
-			kBusinessPreConvertDL::decideFlavorConvert($entryFlavor, $flavor, $originalFlavorAsset, null, null, $dbBatchJob);
-		}
+	private static function excuteClip($flavorAsset, $dbBatchJob)
+	{
+		return kBusinessPreConvertDL::convertSource($flavorAsset, null, null, $dbBatchJob);
 	}
 	
-	private function isClipNeeded($dbEntry) {
+	private static function isClipNeeded($dbEntry)
+	{
 		$arr = $dbEntry->getOperationAttributes();
 		foreach ($arr as $opAttribute) 
 			if ($opAttribute instanceof kClipAttributes)
