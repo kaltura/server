@@ -211,16 +211,12 @@ class kFlowHelper
 		$dbBatchJob->save();
 
 		$convertProfileExist = self::activateConvertProfileJob($dbBatchJob->getEntryId(), $localFilePath);
-		if (self::isClipNeeded($dbEntry))
-		{
-			self::excuteClip($flavorAsset, $dbBatchJob);
-			return;	
-		} 
-		
-		if(($isNewContent || $dbEntry->getStatus() == entryStatus::IMPORT) && !$convertProfileExist)
+
+		if ($isNewContent || $dbEntry->getStatus() == entryStatus::IMPORT && !$convertProfileExist)
 			// check if status == import for importing file of type url (filesync exists, and we want to raise event for conversion profile to start)
 			kEventsManager::raiseEvent(new kObjectAddedEvent($flavorAsset, $dbBatchJob));
 
+		
 		if(!$isNewFlavor)
 		{
 			$entryFlavors = assetPeer::retrieveByEntryIdAndStatus($flavorAsset->getEntryId(), flavorAsset::FLAVOR_ASSET_STATUS_WAIT_FOR_CONVERT);
@@ -228,7 +224,7 @@ class kFlowHelper
 			foreach($entryFlavors as $entryFlavor)
 			{
 				/* @var $entryFlavor flavorAsset */
-				if($entryFlavor->getFlavorParamsId())
+				if($entryFlavor->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_WAIT_FOR_CONVERT && $entryFlavor->getFlavorParamsId())
 				{
 					$flavor = assetParamsOutputPeer::retrieveByAsset($entryFlavor);
 					kBusinessPreConvertDL::decideFlavorConvert($entryFlavor, $flavor, $originalFlavorAsset, null, null, $dbBatchJob);
@@ -255,21 +251,6 @@ class kFlowHelper
 		
 		return $dbBatchJob;
 	}
-
-	private static function excuteClip($flavorAsset, $dbBatchJob)
-	{
-		return kBusinessPreConvertDL::convertSource($flavorAsset, null, null, $dbBatchJob);
-	}
-	
-	private static function isClipNeeded($dbEntry)
-	{
-		$arr = $dbEntry->getOperationAttributes();
-		foreach ($arr as $opAttribute) 
-			if ($opAttribute instanceof kClipAttributes)
-				return true;
-		return false;
-	}
-
 
 	/**
 	 * @param BatchJob $dbBatchJob
