@@ -69,7 +69,7 @@ class Form_Partner_StorageConfiguration extends Form_Partner_BaseStorageConfigur
 						'S3' => 'S3',
 				),
 		));
-		$this->addElementToDisplayGroup('storage_info', 'singatureType');
+		$this->addElementToDisplayGroup('storage_info', 'signatureType');
 		
 		$this->addElement('text', 'endPoint', array(
 				'label'			=> 'Service endpoint:',
