@@ -129,7 +129,18 @@ class KalturaBulkUploadJobData extends KalturaJobData
 		return array_merge ( parent::getMapBetweenObjects() , self::$map_between_objects );
 	}
 	
-
+	/* (non-PHPdoc)
+	 * @see KalturaObject::toObject($object_to_fill, $props_to_skip)
+	 */
+	public function toObject($object_to_fill = null, $props_to_skip = array())
+	{
+		if (is_null($object_to_fill))
+		{
+			$object_to_fill = new kBulkUploadJobData();
+		}
+		
+		return parent::toObject($object_to_fill, $props_to_skip);
+	}
 	
 	/* (non-PHPdoc)
 	 * @see KalturaObject::fromObject()
