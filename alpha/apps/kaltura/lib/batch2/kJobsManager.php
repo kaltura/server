@@ -463,7 +463,6 @@ class kJobsManager
 		}
 		$partner = PartnerPeer::retrieveByPK($flavorAsset->getPartnerId());
 		$srcFileSyncs = array();
-		$waitForImportComplete = false;
 		
 		foreach ($srcSyncKeys as $srcSyncKey) 
 		{		
@@ -482,8 +481,7 @@ class kJobsManager
 				$flavorAsset->save();
 
 				$url = $fileSync->getExternalUrl($flavorAsset->getEntryId());
-				kJobsManager::addImportJob($parentJob, $flavorAsset->getEntryId(), $partner->getId(), $url, $srcFlavorAsset, null, null, true);
-				$waitForImportComplete = true;			
+				return kJobsManager::addImportJob($parentJob, $flavorAsset->getEntryId(), $partner->getId(), $url, $srcFlavorAsset, null, null, true);
 			}
 			else 
 			{
@@ -503,9 +501,6 @@ class kJobsManager
 				$srcFileSyncs[] = $srcFileSyncDescriptor;
 			}
 		}
-		
-		if($waitForImportComplete)
-			return;
 			
 		// creates convert data
 		$convertData = new kConvertJobData();

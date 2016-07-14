@@ -685,9 +685,11 @@ class KalturaEntryService extends KalturaBaseService
 		}
 		
 		$errDescription = '';
-		kBusinessPreConvertDL::decideAddEntryFlavor(null, $dbEntry->getId(), $resource->getAssetParamsId(), $errDescription, $dbAsset->getId(), $operationAttributes);
-		
-		if($isNewAsset)
+		$batchJob = kBusinessPreConvertDL::decideAddEntryFlavor(null, $dbEntry->getId(), $resource->getAssetParamsId(), $errDescription, $dbAsset->getId(), $operationAttributes);
+		$isImportNeeded = false;
+		if ($batchJob && $batchJob->getJobType() == BatchJobType::IMPORT)
+			$isImportNeeded = true;
+		if($isNewAsset && !$isImportNeeded)
 			kEventsManager::raiseEvent(new kObjectAddedEvent($dbAsset));
 		kEventsManager::raiseEvent(new kObjectDataChangedEvent($dbAsset));
 			
