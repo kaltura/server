@@ -247,6 +247,7 @@ KalturaClientBase.prototype.init = function(config){
 	this.debugEnabled = false;
 	this.useMultiRequest = false;
 	this.callsQueue = [];
+	this.customHeaders = [];
 
 	var logger = config.getLogger();
 	if (logger) {
@@ -470,6 +471,14 @@ KalturaClientBase.prototype.doHttpRequest = function (callCompletedCallback, req
 			'Content-Type': 'multipart/form-data; boundary=' + boundary,
 			'Content-Length': multipartBody.length
 		};
+
+		Object.keys(this.customHeaders).forEach(function(key) {
+			var currHeader = This.customHeaders[key];
+			options.headers[key] = currHeader.value;
+			if (currHeader.volatile)
+				This.removeCustomHeader(key);
+		});
+
 		this.sendRequestHelper(options, multipartBody, requestIndex, callCompletedCallback, this.config.timeout);
 
 	} else {
@@ -477,6 +486,14 @@ KalturaClientBase.prototype.doHttpRequest = function (callCompletedCallback, req
 			'Content-Type' : 'application/x-www-form-urlencoded',
 			'Content-Length' : Buffer.byteLength(data)
 		};
+
+		Object.keys(this.customHeaders).forEach(function(key) {
+			var currHeader = This.customHeaders[key];
+			options.headers[key] = currHeader.value;
+			if (currHeader.volatile)
+				This.removeCustomHeader(key);
+		});
+
 		this.sendRequestHelper(options, data, requestIndex, callCompletedCallback);
 	}
 };
@@ -592,6 +609,25 @@ KalturaClientBase.prototype.error = function(msg){
 		this.logger.error(msg);
 	}
 };
+
+/**
+ * @param key - name of the header you want to add to the client requests.
+ * @param value - value of the header you want to add to the client requests
+ * @param volatile - if true the header will be sent for the next request only, if false will be added to all requests by the client.
+ */
+KalturaClientBase.prototype.addCustomHeader = function(key, value, volatile)
+{
+	this.customHeaders[key] = { 'value': value, 'volatile': volatile };
+}
+
+/**
+ * @param key - name of the custom header to be removed.
+ */
+KalturaClientBase.prototype.removeCustomHeader = function(key)
+{
+	delete this.customHeaders[key];
+}
+
 
 /**
  * Abstract base class for all client objects
