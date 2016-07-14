@@ -66,7 +66,7 @@ class Form_Partner_StorageConfiguration extends Form_Partner_BaseStorageConfigur
 				'label'			=> 'Signature Type:',
 				'filters'		=> array('StringTrim'),
 				'multiOptions'	=> array('None' => '',
-						'S3' => 'S3',
+						's3' => 's3',
 				),
 		));
 		$this->addElementToDisplayGroup('storage_info', 'signatureType');
