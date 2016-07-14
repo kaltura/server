@@ -447,8 +447,16 @@ KalturaClientBase.prototype.doHttpRequest = function (callCompletedCallback, req
 	var options = {
 		host : urlInfo.host,
 		path : urlInfo.path,
-		method : 'POST'
+		method : 'POST',
+		headers : {}
 	};
+
+	Object.keys(this.customHeaders).forEach(function(key) {
+		var currHeader = This.customHeaders[key];
+		options.headers[key] = currHeader.value;
+		if (currHeader.volatile)
+			This.removeCustomHeader(key);
+	});
 
 	if(Object.keys(files).length > 0){
 		var crlf = '\r\n';
@@ -468,32 +476,14 @@ KalturaClientBase.prototype.doHttpRequest = function (callCompletedCallback, req
 		postData.push(new Buffer(delimiter + '--'));
 		var multipartBody = Buffer.concat(postData);
 
-		options.headers = {
-			'Content-Type': 'multipart/form-data; boundary=' + boundary,
-			'Content-Length': multipartBody.length
-		};
-
-		Object.keys(this.customHeaders).forEach(function(key) {
-			var currHeader = This.customHeaders[key];
-			options.headers[key] = currHeader.value;
-			if (currHeader.volatile)
-				This.removeCustomHeader(key);
-		});
+		options.headers['Content-Type'] = 'multipart/form-data; boundary=' + boundary;
+		options.headers['Content-Length'] = multipartBody.length;
 
 		this.sendRequestHelper(options, multipartBody, requestIndex, callCompletedCallback, this.config.timeout);
 
 	} else {
-		options.headers = {
-			'Content-Type' : 'application/x-www-form-urlencoded',
-			'Content-Length' : Buffer.byteLength(data)
-		};
-
-		Object.keys(this.customHeaders).forEach(function(key) {
-			var currHeader = This.customHeaders[key];
-			options.headers[key] = currHeader.value;
-			if (currHeader.volatile)
-				This.removeCustomHeader(key);
-		});
+		options.headers['Content-Type'] = 'application/x-www-form-urlencoded';
+		options.headers['Content-Length'] = Buffer.byteLength(data);
 
 		this.sendRequestHelper(options, data, requestIndex, callCompletedCallback);
 	}
