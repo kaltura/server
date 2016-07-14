@@ -178,7 +178,6 @@ class ContentDistributionBulkUploadXmlEnginePlugin extends KalturaPlugin impleme
 			$createdEntryDistribution = $distributionPlugin->entryDistribution->add($entryDistribution);
 			$distributionPlugin->entryDistribution->submitAdd($createdEntryDistribution->id, $submitWhenReady);
 		}
-		KBatchBase::unimpersonate();
 	}
 
 	/* (non-PHPdoc)
