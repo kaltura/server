@@ -441,6 +441,7 @@ KalturaClientBase.prototype.doHttpRequest = function (callCompletedCallback, req
 	var data = http_build_query(params);
 	var debugUrl = requestUrl + '?' + data;
 	var urlInfo = url.parse(debugUrl);
+	var This = this;
 	this.log('Request [' + requestIndex + ']: ' + debugUrl);
 
 	var options = {
