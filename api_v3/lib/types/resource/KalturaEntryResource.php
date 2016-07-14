@@ -51,7 +51,6 @@ class KalturaEntryResource extends KalturaContentResource
 		
 		$key = $srcFlavorAsset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
 		$c = FileSyncPeer::getCriteriaForFileSyncKey($key);
-		$c->addAnd(FileSyncPeer::FILE_TYPE, array(FileSync::FILE_SYNC_FILE_TYPE_FILE, FileSync::FILE_SYNC_FILE_TYPE_URL), Criteria::IN);
 		 
 		$fileSyncs = FileSyncPeer::doSelect($c);
 		if ($fileSyncs)
