@@ -21,24 +21,7 @@ class KDLOperatorFfmpeg extends KDLOperatorBase {
 		$cmdStr.= $this->generateVideoParams($design, $target);
 		$cmdStr.= $this->generateAudioParams($design, $target);
 		$cmdStr.= $this->generateContainerParams($design, $target);
-		/*
-		if(isset($target->_multiStream)) {
-			$videoFieldName = KDLConstants::VideoIndex;
-			$videoMultiStream = $target->_multiStream->$videoFieldName;
-			if(isset($videoMultiStream) ){
-				foreach($videoMultiStream->mapping as $i=>$map) {
-					$cmdStr.= " -map 0:$i";
-				}
-			}
-			$audioFieldName = KDLConstants::AudioIndex;
-			$audioMultiStream = $target->_multiStream->$audioFieldName;
-			if(isset($audioMultiStream) ){
-				foreach($audioMultiStream->mapping as $i=>$map) {
-					$cmdStr.= " -map 0:$i";
-				}
-			}
-		}
-		*/
+
 		$cmdStr = $this->processClipping($target, $cmdStr);
 		
 		if($extra)

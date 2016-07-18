@@ -24,7 +24,7 @@ class DeliveryProfileGenericRtmp extends DeliveryProfileRtmp {
 		return $this->getFromCustomData("rendererClass", null , $this->DEFAULT_RENDERER_CLASS);
 	}
 	
-	protected function doGetFlavorAssetUrl(flavorAsset $flavorAsset) 
+	protected function doGetFlavorAssetUrl(asset $flavorAsset) 
 	{
 		$url = parent::doGetFlavorAssetUrl($flavorAsset);
 		$pattern = $this->getPattern();

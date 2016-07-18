@@ -5,7 +5,7 @@ class DeliveryProfileEdgeCastHttp extends DeliveryProfileHttp
 	 * @param flavorAsset $flavorAsset
 	 * @return string
 	 */
-	protected function doGetFlavorAssetUrl(flavorAsset $flavorAsset)
+	protected function doGetFlavorAssetUrl(asset $flavorAsset)
 	{
 		$url = $this->getBaseUrl($flavorAsset);
 		if($this->params->getClipTo())

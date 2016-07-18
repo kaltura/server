@@ -5,7 +5,7 @@ class DeliveryProfileEdgeCastRtmp extends DeliveryProfileRtmp
 	 * @param flavorAsset $flavorAsset
 	 * @return string
 	 */
-	protected function doGetFlavorAssetUrl(flavorAsset $flavorAsset)
+	protected function doGetFlavorAssetUrl(asset $flavorAsset)
 	{
 		$url = parent::doGetFlavorAssetUrl($flavorAsset);
 		// move version param to "behind" the flavor asset id

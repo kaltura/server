@@ -541,29 +541,10 @@ $plannedDur = 0;
 		}
 
 			/*
-			 * Analyse the source to determine whether it contains multi-stream audio.
-			 * In case it does and the flavor has 'multiStream' set to 'auto-detect' (default action) -
-			 * try to define a multiStream processing setup
+			 * For surround - make sure all streams have the same sampleRate
 			 */
-		if (isset($source->_contentStreams)){
-		    $sourceAnalize = self::analizeSourceContentStreams($source->_contentStreams);
-			    /*
-			    * Check analyze realts for
-			    * - 'streamsAsChannels' - process them as sorround streams
-			    * - 'languages - process them as multi-lingual
-			    * - otherwise remove the 'multiStream' object'
-			    */
-		    if(isset($sourceAnalize->streamsAsChannels)){
-			    $target->_multiStream = self::sorroundAudioSurceToTarget($source, $target->_multiStream, $sourceAnalize->streamsAsChannels);
-		    }
-		    else if(isset($sourceAnalize->languages)){
-			    $target->_multiStream = self::multiLingualAudioSurceToTarget($source, $target->_multiStream, $sourceAnalize->languages);
-		    }
-		    else {
-			    $target->_multiStream = null;
-		    }
-		}
-
+		$target->_multiStream = self::evaluateTargetAudioMultiStream($source, $target);
+		
 		if($target->_container->_id==KDLContainerTarget::COPY){
 			$target->_container->_id=self::EvaluateCopyContainer($source->_container);
 		}
@@ -674,8 +655,7 @@ $plannedDur = 0;
 				 * On multi-lingual flavor, 
 				 * if required language does not exist - set NonComply flag 
 				 */
-				if(isset($target->_multiStream) && isset($target->_multiStream->audio) 
-				&& isset($target->_multiStream->audio->languages) && count($target->_multiStream->audio->languages)==0){
+				if(isset($target->_multiStream->audio->languages) && count($target->_multiStream->audio->languages)==0){
 					$target->_flags = $this->_flags | self::MissingContentNonComplyFlagBit;
 					$target->_warnings[KDLConstants::AudioIndex][] = 
 						KDLWarnings::ToString(KDLWarnings::MissingMediaStream);
@@ -683,11 +663,6 @@ $plannedDur = 0;
 			}
 		}
 		
-		/*
-		 * Handle multi-stream cases
-		 *
-		$target->_multiStream=self::evaluateMultiStream($source->_multiStream, $this->_multiStream);
-		*/
 		return $target;
 	}
 
@@ -1183,7 +1158,6 @@ $plannedDur = 0;
 		if($target->_isShrinkBitrateToSource!=1) {
 			return $target->_bitRate;
 		}
-		
 		$maxNormalizedBitrate = KDLVideoBitrateNormalize::NormalizeSourceToTarget($source->_id, $source->_bitRate, $target->_id);
 			/*
 			 * Optional 'contentAwareness' processing, for sources that have 'complexityValue'(bitrate)>500
@@ -1325,30 +1299,6 @@ $plannedDur = 0;
 	 */
 	public function evaluateTargetAudio(KDLAudioData $source, KDLMediaDataSet $target, $contentStreams=null)
 	{
-		/*
-		 * Adjust source channnels count to match the mapping settings
-		 */
-		if (isset($target->_multiStream)){
-			$multiStream = $target->_multiStream;
-		}else{
-			$multiStream = null;
-		}
-		$multiStreamChannels = null;
-		if(isset($multiStream->audio->mapping) && count($multiStream->audio->mapping)>0) {
-			if(count($multiStream->audio->mapping)>1){
-				$multiStreamChannels = 2;
-			}
-			else if(isset($contentStreams) && isset($contentStreams->audio)){
-				$streams = $contentStreams->audio;
-				foreach ($streams as $stream){
-					if($stream->id==$multiStream->audio->mapping[0]){
-						$multiStreamChannels = $stream->audioChannels;
-						break;
-					}
-				}
-			}
-		}
-		
 		$targetAud = clone $this->_audio;
 		if($targetAud->_id=="" || $targetAud->_id==null) {
 			if($target->_container!=null) {
@@ -1433,13 +1383,22 @@ $plannedDur = 0;
 		&& !($targetAud->_id==KDLAudioTarget::AAC || $targetAud->_id==KDLAudioTarget::PCM || $targetAud->_id==KDLAudioTarget::MPEG2)){
 			$targetAud->_channels=KDLConstants::DefaultAudioChannels;
 		}
-		else if(isset($multiStreamChannels)){
-			$targetAud->_channels=$multiStreamChannels;
-		}
 		else {
-			$targetAud->_channels=min($targetAud->_channels, $source->_channels);
+			/*
+			 * Adjust source channnels count to match the mapping settings
+			 * The evaluated multiStream::olayout overrides the flavor::audioChannel setting
+			 */
+			$multiStreamChannels = 0;
+			if(isset($target->_multiStream->audio)) {
+				$multiStreamChannels = $target->_multiStream->audio->getAudioChannels();
+			}
+			if($multiStreamChannels>0){
+				$targetAud->_channels = $multiStreamChannels;
+			}
+			else {
+				$targetAud->_channels = min($targetAud->_channels, $source->_channels);
+			}
 		}
-
 				/* ----------------
 				 * Normalize sample rate - 
 				 * - FLV/MP3: on auto get sr from the source. Follow the spec valid values - 11025,22050,44100.
@@ -1496,22 +1455,18 @@ $plannedDur = 0;
 			$targetAud->_useResampleFilter = true;
 		}
 			/*
-			 * Check for 'down' mix audio, it requires special ffmpeg processing 
+			 * Check for 'downmix' audio, it requires special ffmpeg processing 
 			 */
-		if(isset($contentStreams) && isset($contentStreams->audio) && count($contentStreams->audio)==1 
+		if(!$targetAud->IsFormatOf(array(KDLAudioTarget::COPY))
+		&& isset($contentStreams) && isset($contentStreams->audio) && count($contentStreams->audio)==1 
 		&& isset($contentStreams->audio[0]->audioChannelLayout)
 		&& $contentStreams->audio[0]->audioChannelLayout==KDLAudioLayouts::DOWNMIX){
-			$targetAud->_downmix = true;
-		}
-
-
-			/*
-			 * Check for 'down' mix audio, it requires special ffmpeg processing 
-			 */
-		if(isset($contentStreams) && isset($contentStreams->audio) && count($contentStreams->audio)==1 
-		&& isset($contentStreams->audio[0]->audioChannelLayout)
-		&& $contentStreams->audio[0]->audioChannelLayout==KDLAudioLayouts::DOWNMIX){
-			$targetAud->_downmix = true;
+			$target->_multiStream = new stdClass();
+			$target->_multiStream->audio = new KDLAudioMultiStreamingHelper(json_decode('{"streams":[{"mapping":[2]}]}'));
+			$stream = new KDLStreamDescriptor(array($contentStreams->audio[0]->id));
+			$target->_multiStream->audio = new KDLAudioMultiStreamingHelper();
+			$target->_multiStream->audio->addStream($stream);
+			$target->_multiStream->audio->streams[0]->downmix = 1;
 		}
 
 		return $targetAud;
@@ -1551,7 +1506,11 @@ $plannedDur = 0;
 		foreach($contentStreams as $t=>$streams) {
 			foreach($streams as $stream){
 				$fld = $t."Duration";
-				$dur = $stream->$fld; //audoDuration or videoDuration or dataDuration
+				if(!isset($stream->$fld)){
+					$dur=0;
+				}
+				else
+					$dur = $stream->$fld; //audoDuration or videoDuration or dataDuration
 				if($dur==0) {
 					$zeroedDur[$t][] = $stream;
 					continue;
@@ -1575,7 +1534,8 @@ $plannedDur = 0;
 		if(array_key_exists('audio', $identicalDur) && count($identicalDur['audio'])>1){
 				// Get all streams that have 'surround' like audio layout - FR, FL, ...
 			$channelStreams = KDLAudioLayouts::matchLayouts($identicalDur['audio']);
-				// Sort the audio streams for chunnel number. We are looking for mono streams
+				
+				// Sort the audio streams for channel number. We are looking for mono streams
 			$chnNumStreams = array();
 			foreach ($channelStreams as $stream){
 				if(isset($stream->audioChannels))
@@ -1617,186 +1577,131 @@ $plannedDur = 0;
 			 
 		}
 		
+////////////////////////
+		if(isset($contentStreams->audio)){
+			// Get all streams that have 'surround' like audio layout - FR, FL, ...
+			// Sort the audio streams for channel number. We are looking for mono streams
+			$byChannelNumber = array();
+			foreach ($contentStreams->audio as $stream){
+				if(isset($stream->audioChannels))
+					$byChannelNumber[$stream->audioChannels][] = $stream;
+			}
+		}
+		
+////////////////////////
 		if(count($identicalDur)>0) $rvAnalize->identicalDur = $identicalDur;
 		if(count($differentDur)>0) $rvAnalize->differentDur = $differentDur;		
 		if(count($zeroedDur)>0) $rvAnalize->zeroedDur = $zeroedDur;
+		if(count($byChannelNumber)>0) $rvAnalize->byChannelNumber = $byChannelNumber;
 		
 		return $rvAnalize;
 	}
-	
+
 	/**
 	 * 
 	 * @param unknown_type $source
-	 * @param unknown_type $analyzedStreams
+	 * @param unknown_type $target
 	 * @return NULL|stdClass
 	 */
-	private static function sorroundAudioSurceToTarget($source, $multiStreamSettings, $analyzedStreams)
+	private static function evaluateTargetAudioMultiStream($source, $target) 
 	{
 		/*
-		 * If there is manually defined multiStream/sorround preset - use it, 
-		 * don't attempt to figure it out automatically
-		 */
-		if((isset($multiStreamSettings)
-		&& !(isset($multiStreamSettings->detect) && $multiStreamSettings->detect=='auto'))){
-			return $multiStreamSettings;
-		}
+		 * Analyse the source to determine whether it contains multi-stream audio.
+		* In case it does and the flavor has 'multiStream' set to 'auto-detect' (default action) -
+		* try to define a multiStream processing setup
+		*
+		* NEW for SURROUND!!!!
+		* Struct:
+		* 	detect (optional) - 'auto', when set all other fields are omitted, 
+		* 	audio - either as a single field or as array
+		* 		languages - array of required languages ("eng","esp")
+		* 		streams - array of source stream ids to map-in (see bellow).
+		* 		action	(optional) - 'merge' (default),'separate'. When set to 'separate' 'olayout' ignored
+		* 		olayout	(optional) - output layout - represents the surround layout, not necessarily the number of audioChannels
+		* 	video
+		* 		...
+		*
+		* Use cases -
+		* Multi-lingual settings (current behavior)
+		* 	Check whether the source contains the requested language(s)
+		* 	Generate if it does.
+		* 
+		* NO Surround settings (current behavior)
+		* 	Check whether the source has minimal detectable surround streams 
+		* 	(or downmix or FL,FR and mono/FC)
+		* 	If it does - use one of those to downmix to stereo.
+		* 	Otherwise - fallback to ffmpeg default ("take what u can")
+		* 
+		* Surround settings (streams and olayout)
+		* 	Filter-in the 'streams' that actually exist in the source.
+		* 	Check whether filtered in streams match the requested output 
+		* 	layout definition (5,5.1,7.1,...).
+		* 	If the source contains surround stream (single multi-channel stream, for example 7.1)  
+		* 	If the source contains separate audio streams, attempt to merge them into required multiSetting::olayout - 
+		* 		if there are detectable surround streams (based on per stream 'audioLayout' notation-FL,FR,FC,...) - use them, 
+		* 		otherwise try to match enough 'undetected' streams (for 5.1 - take first 6 available streams.
+		* 		otherwise - fallback to ffmpeg default "take what u can" (usually the first stream).
+		* 	The matching streams are mapped-in (-map 0:2 ...).
+		* 	
+		* Surround settings - only 'streams' are set
+		* 	Default output audio layout - stereo
+		* 
+		* Surround settings - only output layout ('olayout') is set
+		* 	Try to map-in ALL audio sets
+		* 
+		* 'Mapping-in' -
+		* 	There is source audio stream that has the stream id that listed in the 
+		* 	multiSetting::streams array.
+		* 	For surround - the filtered-in streams must have the same format,duration,
+		* 	sampleRate,number of channels.
+		*
+		* Sample json string:
+		* 		- {"detect":"auto"}
+		* 		- {"audio":{"languages":["eng","esp"]}}
+		* 		- {"audio":{"streams":[1,2]}}
+		* 		- {"audio":{"streams":[1,2,3],"olayout":2}}
+		* 		-- Filter-in audio streams 1,2,3 and merge into stereo
+		* 		- {"audio":{"streams":["all"],"olayout":2}}
+		* 		-- Filter-in ALL audio streams and merge into stereo
+		* 		- {"audio":{"streams":["1","2","3","14"],"action":"separate"},"detect":"auto"}
+		* 		- 
+		* 		-- 'action:separate' to keep separate streams
+		* 		- {"audio":{"streams":["1","2","3","14"],"olayout":5.1},"detect":"auto"}
+		* 		- {"audio":{"streams":["all"],"olayout":5.1},"detect":"auto"}
+		* 		- {"audio":{"olayout":5.1},"detect":"auto"}
+		* 		-- If 'olayout' is set and 'streams' ommitted - assume 'streams:all'
+class Stream {
+	mapping = array();
+	layout
+	language
+}
+class Settings {
+	streams = array(Stream)
+	languages = 
+		*/
+		
+		if (!isset($source->_contentStreams->audio))
+			return null;
 
-		/*
-		 * Sample json string: 
-		 * 		- {"detect":"auto"}
-		 * 		- {"audio":{"mapping":[1,2]}}
-		 * Struct:
-		 * 	detect - 'auto', when set all other fields are omitted, (optional)
-		 * 	audio - either as a single field or as array
-		 * 		mapping - array of stream ids, optionally in ffmpeg syntax (with source file id)
-		 * 		action	- 'merge' (default),'languages', (optional)
-		 * 		output	- output stream (optional)
-		 * 	video
-		 * 		...
-		 *
-		 */
-		$multiStream = new stdClass();
-		$multiStream->audio = new stdClass();
-		$multiStream->audio->mapping = array();
-		/*
-		 * Use 'downnmix' stream, if there is such,
-		 * Otherwise try to map-in FL and FR streams
-		 */
-		$mappedStreams = KDLAudioLayouts::matchLayouts($source->_contentStreams->audio, KDLAudioLayouts::DOWNMIX);
-		if(count($mappedStreams)==0) {
-			$mappedStreams = KDLAudioLayouts::matchLayouts($analyzedStreams, array(KDLAudioLayouts::FL, KDLAudioLayouts::FR, KDLAudioLayouts::MONO,));
-		}
-		foreach ($mappedStreams as $stream){
-			$multiStream->audio->mapping[] = $stream->id;
-		}
-		return $multiStream;
-	}
-	
-	/**
-	 * 
-	 * @param unknown_type $source
-	 * @param unknown_type $languages
-	 * @return - 
-	 * 	null - not applicable for that source (non multi-lingual) or for the required multiStream settings (no multi-lingual requirement)
-	 * 	stdClass obj with set audio-languages array - holding matched languages
-	 * 	stdClass obj with empty audio-languages array - no matched languages
-	 */
-	private static function multiLingualAudioSurceToTarget($source, $multiStreamSettings, $languages)
-	{
+		$sourceAnalize = self::analizeSourceContentStreams($source->_contentStreams);
+		
+		$setupMultiStream = isset($target->_multiStream->audio)? $target->_multiStream->audio: null;
 			/*
-			 * Default behavior - avoid multi-lang processing if not asked for 
+			 * The 'default' flow - 
+			 * Check analyze results for
+			 * - 'streamsAsChannels' - process them as sorround streams
+			 * - 'languages - process them as multi-lingual
+			 * - otherwise remove the 'multiStream' object'
 			 */
-		if(!(isset($multiStreamSettings) && isset($multiStreamSettings->audio) 
-			 && property_exists($multiStreamSettings->audio,"languages"))){
+		$multiStreamHelper = new KDLAudioMultiStreamingHelper($setupMultiStream);
+		$audioStreams = $multiStreamHelper->GetSettings($source->_contentStreams);
+		if(isset($audioStreams)){
+			$targetMultiStream = new stdClass();
+			$targetMultiStream->audio = $audioStreams;
+			return $targetMultiStream;
+		}
+		else 
 			return null;
-		}
-		
-			/*
-			 * If no multi-lingual data in the source, get out
-			 */
-		if(!(is_array($languages) && count($languages)>0)){
-			return null;
-		}
-
-		if(is_array($multiStreamSettings->audio->languages) && count($multiStreamSettings->audio->languages)>0){
-			$settingsLanguages = $multiStreamSettings->audio->languages;
-		}
-		else $settingsLanguages = null;
-		
-		/*
-		 * Sample json string: 
-		 * 		- {"audio":{"languages":["eng","esp"]}}
-		 */
-		$multiStream = new stdClass();
-		$multiStream->audio = new stdClass();
-		$multiStream->audio->languages = array();
-		
-		foreach ($languages as $lang=>$streams){
-			if(isset($settingsLanguages) && !in_array($lang, $settingsLanguages)){
-				continue;
-			}
-			if(count($streams)>1) {
-				return null;
-			}
-			$multiStream->audio->languages[$lang] = $streams[0];
-		}
-		
-		return $multiStream;
-	}
-	
-	/* ---------------------------
-	 * evaluateMultiStream
-	 * 
-	 */
-	private static function evaluateMultiStream($source, $flavor) 
-	{
-/*
-Supprted options
-1.
-{"audio":{"mapping":[["all"]]}}
-
-
-2.
-{"audio":{"mapping":[["all",1]]}}
-
-
-3.
-{"audio":{"mapping":[[7,0],[8,1]]}}
-
- */
-		if(is_null($source) || is_null($flavor)){
-			return null;
-		}
-		
-			/*
-			 * No multiple audio source streams ==> nothing to porcess
-			 */
-		if(!array_key_exists(KDLConstants::AudioIndex, $source)){
-			return null;
-		}
-			/*
-			 * No multiple audio mappings in the target ==> default porcessing
-			 */
-		$audioFieldName = KDLConstants::AudioIndex;
-		if(!array_key_exists(KDLConstants::AudioIndex, $flavor) 
-		|| is_null($flavor->$audioFieldName->mapping)
-		|| !is_array($flavor->$audioFieldName->mapping)
-		|| count($flavor->$audioFieldName->mapping)==0 ){
-			return null;
-		}
-		$mapping=$flavor->$audioFieldName->mapping;
-
-		$target = new stdClass();
-		$target->$audioFieldName = new stdClass();
-		foreach($mapping as $map){
-			if($map[0]=='all') {
-					/*
-					 * When 'count($map)==1' (only the source member is assigned)
-					 * - take ALL source streams and convert each of them separatly into an ouput multi-stream
-					 * - else - take ALL source streams and MERGE them into ONE output stream
-					 */ 
-				foreach($source->$audioFieldName as $i=>$aud) {
-					$target->$audioFieldName->mapping[($aud->streamId)] = count($map)==1? $aud->streamId: $map[1];
-				}
-			}
-			else {
-				$target->$audioFieldName->mapping[$map[0]] = count($map)==1? $map[0]: $map[1];				
-			}
-		}
-
-					/*
-					 * Currently there is no video mapping functionality. 
-					 * Therefore if there is audio mapping and there are video source stream, 
-					 * default video stream is added.  
-					 */
-		if(array_key_exists(KDLConstants::VideoIndex, $source)){
-			$videoFieldName = KDLConstants::VideoIndex;
-			$target->$videoFieldName = new stdClass();
-			$sourceVideoStreams = $source->$videoFieldName;
-			$target->$videoFieldName->mapping[$sourceVideoStreams[0]->streamId] = 0;
-		}
-
-		return $target;
 	}
 
 	/* ---------------------------

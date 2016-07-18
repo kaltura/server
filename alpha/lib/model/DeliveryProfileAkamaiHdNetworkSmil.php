@@ -33,7 +33,7 @@ class DeliveryProfileAkamaiHdNetworkSmil extends DeliveryProfileVod {
 		}
 	}
 	
-	protected function doGetFlavorAssetUrl(flavorAsset $flavorAsset)
+	protected function doGetFlavorAssetUrl(asset $flavorAsset)
 	{
 		$url = parent::doGetFlavorAssetUrl($flavorAsset);
 		$host = preg_replace("(https?://)", "", $this->getUrl() );

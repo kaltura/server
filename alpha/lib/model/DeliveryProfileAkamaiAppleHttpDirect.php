@@ -2,7 +2,7 @@
 
 class DeliveryProfileAkamaiAppleHttpDirect extends DeliveryProfileAkamaiAppleHttp {
 	
-	protected function doGetFlavorAssetUrl(flavorAsset $flavorAsset)
+	protected function doGetFlavorAssetUrl(asset $flavorAsset)
 	{
 		if (strpos($flavorAsset->getTags(), flavorParams::TAG_APPLEMBR) === FALSE)
 		{

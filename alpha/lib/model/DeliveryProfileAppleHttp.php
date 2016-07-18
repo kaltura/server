@@ -7,7 +7,7 @@ class DeliveryProfileAppleHttp extends DeliveryProfileVod {
 		$this->DEFAULT_RENDERER_CLASS = 'kM3U8ManifestRenderer';
 	}
 	
-	protected function doGetFlavorAssetUrl(flavorAsset $flavorAsset)
+	protected function doGetFlavorAssetUrl(asset $flavorAsset)
 	{
 		$url = parent::doGetFlavorAssetUrl($flavorAsset);
 		$url .= "/file/playlist.m3u8";

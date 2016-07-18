@@ -326,6 +326,9 @@
 		const LFE = "lfe";
 		const BL = "bl";
 		const BR = "br";
+		const BC = "bc";
+		const SL = "sl";
+		const SR = "sr";
 		const DOWNMIX = "downmix";
 		const MONO = "mono";
 		const STEREO = "stereo";
@@ -339,13 +342,18 @@
 			self::BR => array("(br)"),			
 			self::DOWNMIX => array("downmix"),
 			self::MONO =>array("mono"),	
-			self::STEREO =>array("stereo"),	
+			self::STEREO =>array("stereo"),
+			"4.0" => array(self::FL, self::FR, self::FC, self::BC),
+			"4.1" => array(self::FL, self::FR, self::FC, self::LFE, self::BC),
+			"5.0" => array(self::FL, self::FR, self::FC, self::BL, self::BR),
+			"5.1" => array(self::FL, self::FR, self::FC, self::LFE, self::BL, self::BR),	
+			"6.0" => array(self::FL, self::FR, self::FC, self::BC, self::SL, self::SR),
+			"6.1" => array(self::FL, self::FR, self::FC, self::LFE, self::BC, self::SL, self::SR),
+			"7.0" => array(self::FL, self::FR, self::FC, self::BL, self::BR, self::SL, self::SR),  
+			"7.1" => array(self::FL, self::FR, self::FC, self::LFE, self::BL, self::BR, self::SL, self::SR),
 		);
 		
-		static $surroundlayoutTypes = array(
-			self::FL,	self::FR, self::FC,
-			self::LFE,	self::BL, self::BR,			
-			self::MONO);
+		static $surroundlayoutTypes = array(self::FL, self::FR, self::FC, self::LFE, self::BL, self::BR, self::MONO);
 		
 		/**
 		 * 
@@ -380,17 +388,36 @@
 		public static function matchLayouts($audioStreams, $layoutTypes = null)
 		{
 			if(!isset($layoutTypes)){
-				$layoutTypes = self::$surroundlayoutTypes;
+				$layoutTypes = array(self::FL, self::FR, self::FC,self::LFE, self::BL, self::BR, self::MONO);
 			}
 			else if(!is_array($layoutTypes))
 				$layoutTypes = array($layoutTypes);
 			$rv = array();
 			foreach ($audioStreams as $stream){
-				if(isset($stream->audioChannelLayout) && in_array($stream->audioChannelLayout, $layoutTypes)){
-					$rv[] = $stream;
+				if(isset($stream->audioChannelLayout)){ 
+					if(in_array($stream->audioChannelLayout, $layoutTypes)){
+						$rv[] = $stream;
+					}
+					else if($stream->audioChannelLayout==self::MONO && in_array(self::FC, $layoutTypes) ){
+						$rv[] = $stream;					
+					}
 				}
 			}
 			return $rv;
+		}
+		
+		/**
+		 * 
+		 * @param unknown_type $layout
+		 * @return number
+		 */
+		public static function getLayoutChannels($layout)
+		{
+			$channelsNum = (int)round($layout);
+			if($channelsNum<$layout){
+				$channelsNum++;
+			}
+			return $channelsNum;
 		}
 	}
 	

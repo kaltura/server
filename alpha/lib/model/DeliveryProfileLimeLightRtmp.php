@@ -9,7 +9,7 @@ class DeliveryProfileLimeLightRtmp extends DeliveryProfileRtmp {
 		$this->REDUNDANT_EXTENSIONS = array();
 	}
 	
-	protected function doGetFlavorAssetUrl(flavorAsset $flavorAsset)
+	protected function doGetFlavorAssetUrl(asset $flavorAsset)
 	{
 		$url = parent::doGetFlavorAssetUrl($flavorAsset);
 		$url = "/s" . $url;
