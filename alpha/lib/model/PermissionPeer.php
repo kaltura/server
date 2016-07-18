@@ -144,7 +144,7 @@ class PermissionPeer extends BasePermissionPeer
 	}
 	
 	
-	public static function isValidForPartner($permissionName, $partnerId, $checkDependency = true)
+	public static function isValidForPartner($permissionName, $partnerId, $checkDependency = true, $preFetch = null)
 	{
 		if(!isset(self::$allowedPermissions[$partnerId]))
 		{
@@ -154,8 +154,8 @@ class PermissionPeer extends BasePermissionPeer
 		{
 			return self::$allowedPermissions[$partnerId][$permissionName];
 		}
-			
-		$permission = self::getByNameAndPartner($permissionName, array($partnerId, PartnerPeer::GLOBAL_PARTNER));
+
+		$permission = ($preFetch && $preFetch instanceof Permission && $permissionName == $preFetch->getName() ) ? $preFetch : self::getByNameAndPartner($permissionName, array($partnerId, PartnerPeer::GLOBAL_PARTNER));
 		if (!$permission) {
 			self::$allowedPermissions[$partnerId][$permissionName] = false;
 			return false;
@@ -208,6 +208,32 @@ class PermissionPeer extends BasePermissionPeer
 		$permission = PermissionPeer::doSelectOne($c);
 		PermissionPeer::setUseCriteriaFilter(true);
 		return $permission;
+	}
+
+	public static function getByNamesAndPartner($permissionNamesArray, $partnerIdsArray) //todo what if permission names is not array
+	{
+		$c = new Criteria();
+
+		if(!is_array($partnerIdsArray))
+			$partnerIdsArray = array($partnerIdsArray);
+
+		if(!in_array('*', $partnerIdsArray, true))
+		{
+			$partnerIdsArray = array_map('strval', $partnerIdsArray);
+			$c->addAnd(PermissionPeer::PARTNER_ID, $partnerIdsArray, Criteria::IN);
+		}
+		if(!in_array('*', $permissionNamesArray, true))
+		{
+			$permissionNamesArray = array_map('strval', $permissionNamesArray);
+			$c->addAnd(PermissionPeer::NAME, $permissionNamesArray, Criteria::IN);
+		}
+		
+		$c->addAscendingOrderByColumn(PermissionPeer::STATUS); // needed in case the permission appears more than once
+		$c->addAscendingOrderByColumn(PermissionPeer::NAME); // needed to sort the results
+		PermissionPeer::setUseCriteriaFilter(false);
+		$permissions = PermissionPeer::doSelect($c); //todo maybe limit 2 ?
+		PermissionPeer::setUseCriteriaFilter(true);
+		return $permissions;
 	}
 	
 	public static function isAllowedPlugin($pluginName, $partnerId)
