@@ -210,7 +210,7 @@ class PermissionPeer extends BasePermissionPeer
 		return $permission;
 	}
 
-	public static function getByNamesAndPartner($permissionNamesArray, $partnerIdsArray) //todo what if permission names is not array
+	public static function getByNamesAndPartner($permissionNamesArray, $partnerIdsArray)
 	{
 		$c = new Criteria();
 
@@ -227,12 +227,20 @@ class PermissionPeer extends BasePermissionPeer
 			$permissionNamesArray = array_map('strval', $permissionNamesArray);
 			$c->addAnd(PermissionPeer::NAME, $permissionNamesArray, Criteria::IN);
 		}
-		
-		$c->addAscendingOrderByColumn(PermissionPeer::STATUS); // needed in case the permission appears more than once
-		$c->addAscendingOrderByColumn(PermissionPeer::NAME); // needed to sort the results
+
+		$c->addGroupByColumn(PermissionPeer::NAME);
+		$c->addGroupByColumn(PermissionPeer::STATUS);
+
+		$c->addAscendingOrderByColumn(PermissionPeer::STATUS);
+		$c->addAscendingOrderByColumn(PermissionPeer::NAME);
+
 		PermissionPeer::setUseCriteriaFilter(false);
-		$permissions = PermissionPeer::doSelect($c); //todo maybe limit 2 ?
+		$critcopy = clone $c;
+		$limit = count($permissionNamesArray);
+		$critcopy->setLimit($limit);//limit 2
+		$permissions = PermissionPeer::doSelect($critcopy);
 		PermissionPeer::setUseCriteriaFilter(true);
+
 		return $permissions;
 	}
 	
