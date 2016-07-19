@@ -13,7 +13,7 @@ jQuery(document).ready(function() {
 	var protocolUpdateView = function( protocol ) {
 
 		setKeyPairSettings(false);
-		
+
 		switch ( protocol )
 		{
 		case "<?php echo Kaltura_Client_Enum_StorageProfileProtocol::S3?>":				
@@ -25,6 +25,10 @@ jQuery(document).ready(function() {
 			jQuery('#sseType').css('visibility', 'visible');
 			jQuery('#sseKmsKeyId-label').css('visibility', 'visible');
 			jQuery('#sseKmsKeyId').css('visibility', 'visible');
+			jQuery('#signatureType-label').css('visibility', 'visible');
+			jQuery('#signatureType').css('visibility', 'visible');
+			jQuery('#endPoint-label').css('visibility', 'visible');
+			jQuery('#endPoint').css('visibility', 'visible');
 			jQuery('#storageFtpPassiveMode').css('visibility', 'hidden');
 			jQuery('#storageFtpPassiveMode-label').css('visibility', 'hidden');
 			break;
@@ -39,6 +43,10 @@ jQuery(document).ready(function() {
 			jQuery('#sseType').css('visibility', 'hidden');
 			jQuery('#sseKmsKeyId-label').css('visibility', 'hidden');
 			jQuery('#sseKmsKeyId').css('visibility', 'hidden');
+			jQuery('#signatureType-label').css('visibility', 'hidden');
+			jQuery('#signatureType').css('visibility', 'hidden');
+			jQuery('#endPoint-label').css('visibility', 'hidden');
+			jQuery('#endPoint').css('visibility', 'hidden');
 			break;
 		case "<?php echo Kaltura_Client_Enum_StorageProfileProtocol::SFTP?>":
 			setKeyPairSettings(true);
@@ -52,6 +60,10 @@ jQuery(document).ready(function() {
 			jQuery('#sseType').css('visibility', 'hidden');
 			jQuery('#sseKmsKeyId-label').css('visibility', 'hidden');
 			jQuery('#sseKmsKeyId').css('visibility', 'hidden');
+			jQuery('#signatureType-label').css('visibility', 'hidden');
+			jQuery('#signatureType').css('visibility', 'hidden');
+			jQuery('#endPoint-label').css('visibility', 'hidden');
+			jQuery('#endPoint').css('visibility', 'hidden');
 			jQuery('#storageFtpPassiveMode').css('visibility', 'hidden');
 			jQuery('#storageFtpPassiveMode-label').css('visibility', 'hidden');
 			break;

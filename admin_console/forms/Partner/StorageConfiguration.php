@@ -62,6 +62,22 @@ class Form_Partner_StorageConfiguration extends Form_Partner_BaseStorageConfigur
 		));
 		$this->addElementToDisplayGroup('storage_info', 'sseKmsKeyId');
 
+		$this->addElement('select', 'signatureType', array(
+				'label'			=> 'Signature Type:',
+				'filters'		=> array('StringTrim'),
+				'multiOptions'	=> array('None' => '',
+						's3' => 's3',
+				),
+		));
+		$this->addElementToDisplayGroup('storage_info', 'signatureType');
+		
+		$this->addElement('text', 'endPoint', array(
+				'label'			=> 'Service endpoint:',
+				'filters'		=> array('StringTrim'),
+		));
+		$this->addElementToDisplayGroup('storage_info', 'endPoint');
+		
+		
 		$this->addElement('checkbox', 'storageFtpPassiveMode', array(
 			'label'			=> 'Storage FTP Passive Mode:',
 			'filters'		=> array('StringTrim'),
@@ -123,8 +139,15 @@ class Form_Partner_StorageConfiguration extends Form_Partner_BaseStorageConfigur
 			'filters'		=> array('StringTrim'),
 		));
 		
-		$this->addElementToDisplayGroup('advanced', 'pathManagerParams'); 
+		$this->addElementToDisplayGroup('advanced', 'pathManagerParams');
 
+		$this->addElement('checkbox', 'shouldExportThumbnails', array(
+			'label'			=> "Should export thumbnail assets",
+			'checked'		=> false,
+			'indicator'		=> 'dynamic',
+			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt')))
+		));
+		$this->addElementToDisplayGroup('advanced', 'shouldExportThumbnails');
 	}
 	
 	
@@ -135,6 +158,7 @@ class Form_Partner_StorageConfiguration extends Form_Partner_BaseStorageConfigur
 	    
 	    parent::populateFromObject($object, $add_underscore);
 	    $this->setDefault('pathManagerParams', json_encode($object->pathManagerParams));
+		$this->setDefault('shouldExportThumbnails', $object->shouldExportThumbs);
 	}
 	
     public function getObject($objectType, array $properties, $add_underscore = true, $include_empty_fields = false)
@@ -166,6 +190,7 @@ class Form_Partner_StorageConfiguration extends Form_Partner_BaseStorageConfigur
 		}
 		
 		$object->pathManagerParams = json_decode($properties['pathManagerParams'], true);
+		$object->shouldExportThumbs = $properties['shouldExportThumbnails'];
 		return $object;
 	}
 	

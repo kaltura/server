@@ -35,6 +35,8 @@ class KFileTransferExportEngine extends KExportEngine
 			$engineOptions['s3Region'] = $this->data->s3Region;
 			$engineOptions['sseType'] = $this->data->sseType;
 			$engineOptions['sseKmsKeyId'] = $this->data->sseKmsKeyId;
+			$engineOptions['signatureType'] = $this->data->signatureType;
+			$engineOptions['endPoint'] = $this->data->endPoint;
 		}
 			
 		$engine = kFileTransferMgr::getInstance($this->protocol, $engineOptions);

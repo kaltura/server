@@ -11,7 +11,7 @@ class DeliveryProfileGenericHttp extends DeliveryProfileHttp {
 		return $this->getFromCustomData("pattern");
 	}
 	
-	protected function doGetFlavorAssetUrl(flavorAsset $flavorAsset) 
+	protected function doGetFlavorAssetUrl(asset $flavorAsset) 
 	{
 		$url = parent::doGetFlavorAssetUrl($flavorAsset);
 		return kDeliveryUtils::formatGenericUrl($url, $this->getPattern(), $this->params);

@@ -32,7 +32,7 @@ class DeliveryProfileRtmp extends DeliveryProfileVod {
 		return $this->getFromCustomData("prefix");
 	}
 	
-	protected function doGetFlavorAssetUrl(flavorAsset $flavorAsset)
+	protected function doGetFlavorAssetUrl(asset $flavorAsset)
 	{
 		$url = parent::doGetFlavorAssetUrl($flavorAsset);
 		$url .= '/forceproxy/true';

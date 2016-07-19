@@ -1,5 +1,6 @@
 from optparse import OptionParser
 from threading import Thread
+from gzip import GzipFile
 from math import isnan
 import SocketServer
 import operator
@@ -19,6 +20,7 @@ class ReaderThread(Thread):
         Thread.__init__(self)
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.sock.bind(parseAddress(options.udpAddress))
+        self.outputFile = None
 
     def run(self):
         global eventsBuffer
@@ -28,7 +30,8 @@ class ReaderThread(Thread):
         while True:
             data, addr = self.sock.recvfrom(4096)
             #print data
-            curSlotIndex = int(time.time()) % options.window
+            curTime = int(time.time())
+            curSlotIndex = curTime % options.window
             if curSlotIndex != lastSlotIndex:
                 eventsBuffer[lastSlotIndex] = curSlot
                 curSlot = []
@@ -40,6 +43,16 @@ class ReaderThread(Thread):
                     pass
                 except ValueError:
                     pass
+            if not options.saveInput:
+                continue
+            if (self.outputFile == None or
+                curTime / options.saveWindow != self.fileOpenWindow):
+                if self.outputFile != None:
+                    self.outputFile.close()
+                self.fileOpenWindow = curTime / options.saveWindow
+                outputFilename = time.strftime(options.outputFileFormat, time.localtime(self.fileOpenWindow * options.saveWindow))
+                self.outputFile = GzipFile(outputFilename, 'a')
+            self.outputFile.write(curMessage.replace('\0', '\n') + '\n')
 
 def safeFloat(num):
     try:
@@ -194,6 +207,7 @@ class CommandHandler(SocketServer.BaseRequestHandler):
         
 class CommandThread(Thread):
     def run(self):
+        SocketServer.TCPServer.allow_reuse_address = True
         server = SocketServer.TCPServer(parseAddress(options.tcpAddress), CommandHandler)
         server.serve_forever()
 
@@ -206,6 +220,12 @@ if __name__ == '__main__':
                       help="the TCP address to listen on", metavar="ADDR")
     parser.add_option("-u", "--udp-address", dest="udpAddress",default=":6005",
                       help="the UDP address to listen on", metavar="ADDR")
+    parser.add_option("-s", "--save-input", dest="saveInput",action="store_true",
+                      help="save the raw input to a file")
+    parser.add_option("-W", "--save-window", dest="saveWindow",default=3600,type="int",
+                      help="determines the interval in seconds for reopening the output file", metavar="SECS")
+    parser.add_option("-f", "--output-format", dest="outputFileFormat",default='/var/log/apimon-%Y-%m-%d-%H.log.gz',
+                      help="sets the output file naming format", metavar="FMT")
     (options, args) = parser.parse_args()
 
     # start the worker threads

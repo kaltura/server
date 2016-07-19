@@ -21,24 +21,7 @@ class KDLOperatorFfmpeg extends KDLOperatorBase {
 		$cmdStr.= $this->generateVideoParams($design, $target);
 		$cmdStr.= $this->generateAudioParams($design, $target);
 		$cmdStr.= $this->generateContainerParams($design, $target);
-		/*
-		if(isset($target->_multiStream)) {
-			$videoFieldName = KDLConstants::VideoIndex;
-			$videoMultiStream = $target->_multiStream->$videoFieldName;
-			if(isset($videoMultiStream) ){
-				foreach($videoMultiStream->mapping as $i=>$map) {
-					$cmdStr.= " -map 0:$i";
-				}
-			}
-			$audioFieldName = KDLConstants::AudioIndex;
-			$audioMultiStream = $target->_multiStream->$audioFieldName;
-			if(isset($audioMultiStream) ){
-				foreach($audioMultiStream->mapping as $i=>$map) {
-					$cmdStr.= " -map 0:$i";
-				}
-			}
-		}
-		*/
+
 		$cmdStr = $this->processClipping($target, $cmdStr);
 		
 		if($extra)
@@ -563,6 +546,77 @@ bad  mencoder32 ~/Media/Canon.Rotated.0_qaqsufbl.avi -of lavf -lavfopts format=m
 				array($forcedKF),
 				$execCmd);
 		return $execCmd;
+	}
+
+	/**
+	 * @method
+	 * @param unknown_type $cmdLine
+	 * @param unknown_type $pipeStr
+	 * @return mixed
+	 */
+	public static function SplitCommandLineForVideoPiping($cmdLine, $pipeStr)
+	{
+		KalturaLog::log("Before:cmdLine($cmdLine)");
+		$cmdLineArr = explode(' ', $cmdLine);
+	
+		$ffmpegBin = $cmdLineArr[0];
+	
+	
+		// Check for '2pass' - 2-pass is compound cmd-line that contain contains twice the source op (one per pass)
+		// Get the source file
+		$kArr = array_keys($cmdLineArr,'-i');
+		$is2pass=(count($kArr)>1);
+		if($is2pass){
+			$keySrc = $kArr[1]+1;
+		}
+		else {
+			$keySrc = $kArr[0]+1;
+		}
+		$srcFile = $cmdLineArr[$keySrc];
+	
+		$kArr = array_keys($cmdLineArr,'-an');
+		if(count($kArr)==0 || ($is2pass && count($kArr)==1)) {
+			/*
+			 * Fix the audio source mapping, to adjust for sepating vidoe and audio sources
+			 * in order to support NGS (video only) piping.
+			 * Audio source mapping changed to 1 (original 0)
+			 */
+			$kArr = array_keys($cmdLineArr,'-filter_complex');
+			if(count($kArr)>0) {
+				$kFilterIdx = end($kArr);
+				$filterStr = $cmdLineArr[$kFilterIdx+1];
+				$filterArr = explode(';', $filterStr);
+				foreach($filterArr as $idx=>$filterStr){
+					/*
+					 * Only audio filters should be fixed (pan,amix,amerge)
+					*/
+					if(preg_match("/\b(pan|amix|amerge)\b/", $filterStr)==1)
+						$filterArr[$idx] = str_replace ('[0:','[1:',$filterStr);
+				}
+				$cmdLineArr[$kFilterIdx+1] = implode(';', $filterArr);
+			}
+			$kArr = array_keys($cmdLineArr,'-map');
+			if(count($kArr)>0) {
+				foreach ($kArr as $kIdx){
+					$mapStr = $cmdLineArr[$kIdx+1];
+					if($mapStr=='v'){
+						$cmdLineArr[$kIdx+1] = "0:v";
+					}
+					else if(strncmp($mapStr,"0:",2)==0 || $mapStr[2]!='a'){
+						$cmdLineArr[$kIdx+1] = str_replace ('0:','1:',$mapStr);
+					}
+				}
+				$pipeStr.= " -i $srcFile";
+			}
+			else
+				$pipeStr.= " -i $srcFile -map 0:v -map 1:a";
+		}
+		KalturaLog::log("Fixed part:$pipeStr");
+		$cmdLineArr[$keySrc].= " $pipeStr";
+		$cmdLine = implode(" ", $cmdLineArr);
+		$cmdLine = str_replace (KDLCmdlinePlaceholders::BinaryName,$ffmpegBin,$cmdLine);
+		KalturaLog::log("After:cmdLine($cmdLine)");
+		return $cmdLine;
 	}
 }
 	

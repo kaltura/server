@@ -753,7 +753,7 @@ class BaseEntryService extends KalturaEntryService
 		$result->storageProfilesXML = $contextDataHelper->getStorageProfilesXML();
 		$result->isAdmin = $contextDataHelper->getIsAdmin();
 		
-		$parentEntryId = $dbEntry->getParentEntryId(); 
+		$parentEntryId = $dbEntry->getSecurityParentId();
 		if ($parentEntryId)
 		{
 			$dbEntry = $dbEntry->getParentEntry();
