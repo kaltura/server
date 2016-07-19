@@ -156,6 +156,12 @@ class PermissionPeer extends BasePermissionPeer
 		}
 			
 		$permission = self::getByNameAndPartner($permissionName, array($partnerId, PartnerPeer::GLOBAL_PARTNER));
+		return self::validatePermission($permissionName, $partnerId, $checkDependency, $permission);
+	}
+
+
+	public static function validatePermission($permissionName ,$partnerId, $checkDependency, $permission)
+	{
 		if (!$permission) {
 			self::$allowedPermissions[$partnerId][$permissionName] = false;
 			return false;
@@ -186,6 +192,7 @@ class PermissionPeer extends BasePermissionPeer
 			}
 		}
 		self::$allowedPermissions[$partnerId][$permissionName] = $permission;
+
 		return $permission;
 	}
 	
@@ -209,7 +216,41 @@ class PermissionPeer extends BasePermissionPeer
 		PermissionPeer::setUseCriteriaFilter(true);
 		return $permission;
 	}
-	
+
+	public static function getByNamesAndPartner($permissionNamesArray, $partnerIdsArray)
+	{
+		$c = new Criteria();
+
+		if(!is_array($partnerIdsArray))
+			$partnerIdsArray = array($partnerIdsArray);
+
+		if(!in_array('*', $partnerIdsArray, true))
+		{
+			$partnerIdsArray = array_map('strval', $partnerIdsArray);
+			$c->addAnd(PermissionPeer::PARTNER_ID, $partnerIdsArray, Criteria::IN);
+		}
+		if(!in_array('*', $permissionNamesArray, true))
+		{
+			$permissionNamesArray = array_map('strval', $permissionNamesArray);
+			$c->addAnd(PermissionPeer::NAME, $permissionNamesArray, Criteria::IN);
+		}
+
+		$c->addGroupByColumn(PermissionPeer::NAME);
+		$c->addGroupByColumn(PermissionPeer::STATUS);
+
+		$c->addAscendingOrderByColumn(PermissionPeer::STATUS);
+		$c->addAscendingOrderByColumn(PermissionPeer::NAME);
+
+		PermissionPeer::setUseCriteriaFilter(false);
+		$critcopy = clone $c;
+		$limit = count($permissionNamesArray);
+		$critcopy->setLimit($limit);//limit 2
+		$permissions = PermissionPeer::doSelect($critcopy);
+		PermissionPeer::setUseCriteriaFilter(true);
+
+		return $permissions;
+	}
+
 	public static function isAllowedPlugin($pluginName, $partnerId)
 	{
 		$permissionName = self::getPermissionNameFromPluginName($pluginName);
