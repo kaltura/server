@@ -905,12 +905,17 @@ class myEntryUtils
 		$url = $dp->getFileSyncUrl($remoteFS);
 		if (strpos($url, "://") === false)
 			$url = rtrim($dp->getUrl(), "/") . "/".ltrim($url, '/');
+		
+		list($baseUrl, $queryString) = explode("?", $url."?");		
 
 		$remoteThumbCapture = str_replace(
 			array ( "{url}", "{offset}" ),
-			array ( str_replace("://", "/", $url) , floor($calc_vid_sec*1000)  ) ,
+			array ( str_replace("://", "/", $baseUrl) , floor($calc_vid_sec*1000)  ) ,
 			$packagerCaptureUrl );
 	
+		if ($queryString)
+			$remoteThumbCapture .= "?$queryString";
+				
 		kFile::closeDbConnections();
 		KCurlWrapper::getDataFromFile($remoteThumbCapture, $orig_image_path);
 		return true;
