@@ -34,7 +34,8 @@ class StorageProfile extends BaseStorageProfile implements IBaseObject
 	const CUSTOM_DATA_READY_BEHAVIOR = 'ready_behavior';
 	const CUSTOM_DATA_RULES = 'rules';
 	const CUSTOM_DATA_CREATE_FILE_LINK ='create_file_link';
-	
+	const CUSTOM_DATA_SHOULD_EXPORT_THUMBS ='should_export_thumbs';
+
 	/**
 	 * @var kStorageProfileScope
 	 */
@@ -180,7 +181,10 @@ class StorageProfile extends BaseStorageProfile implements IBaseObject
 		{
 			return false;
 		}
-					
+
+		if ($flavorAsset instanceof thumbAsset)
+			return $this->getShouldExportThumbs();
+
 		if(!$this->isFlavorAssetConfiguredForExport($flavorAsset))
 		{
 			return false;
@@ -325,7 +329,7 @@ class StorageProfile extends BaseStorageProfile implements IBaseObject
 	protected function isFlavorAssetConfiguredForExport(asset $flavorAsset)
 	{
 		$configuredForExport = null;
-	    
+
 	    // check if flavor params id is in the list to export
 	    $flavorParamsIdsToExport = $this->getFlavorParamsIds();
 	    KalturaLog::log(__METHOD__ . " flavorParamsIds [$flavorParamsIdsToExport]");
@@ -430,4 +434,15 @@ class StorageProfile extends BaseStorageProfile implements IBaseObject
 	public function getPassPhrase() {
 		return $this->getFromCustomData("passPhrase");
 	}
+
+	public function getShouldExportThumbs ()
+	{
+		return $this->getFromCustomData(self::CUSTOM_DATA_SHOULD_EXPORT_THUMBS, null, false);
+	}
+
+	public function setShouldExportThumbs ($v)
+	{
+		$this->putInCustomData(self::CUSTOM_DATA_SHOULD_EXPORT_THUMBS, $v);
+	}
+
 }
