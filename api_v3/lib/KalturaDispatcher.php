@@ -89,7 +89,7 @@ class KalturaDispatcher
 			KalturaLog::debug("Response profile: " . print_r($responseProfile, true));
 		}
 		
-		self::preFetchPermissions();
+		PermissionPeer::preFetchPermissions(array(PermissionName::FEATURE_END_USER_REPORTS, PermissionName::FEATURE_ENTITLEMENT));
 
 		kPermissionManager::init(kConf::get('enable_cache'));
 		kEntitlementUtils::initEntitlementEnforcement();
@@ -142,17 +142,7 @@ class KalturaDispatcher
 		
 		return $res;
 	}
-
-	private static function preFetchPermissions()
-	{
-		$preFetch = PermissionPeer::getByNamesAndPartner(array(PermissionName::FEATURE_END_USER_REPORTS, PermissionName::FEATURE_ENTITLEMENT) , array(kCurrentContext::$ks_partner_id, PartnerPeer::GLOBAL_PARTNER));
-		$endUserReportsPreFetch = (isset($preFetch[0]) && $preFetch[0] instanceof Permission)  ? $preFetch[0] : null;
-		$entitlementPreFetch = (isset($preFetch[1]) && $preFetch[1] instanceof Permission) ? $preFetch[1] : null;
-		
-		PermissionPeer::validatePermission(PermissionName::FEATURE_END_USER_REPORTS, kCurrentContext::$ks_partner_id, true ,$endUserReportsPreFetch);
-		PermissionPeer::validatePermission(PermissionName::FEATURE_ENTITLEMENT, kCurrentContext::$ks_partner_id, true, $entitlementPreFetch);
-		
-	}
+	
 
 	/**
 	 * @param string $objectClass

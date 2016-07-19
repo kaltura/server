@@ -160,7 +160,7 @@ class PermissionPeer extends BasePermissionPeer
 	}
 
 
-	public static function validatePermission($permissionName ,$partnerId, $checkDependency, $permission)
+	private static function validatePermission($permissionName ,$partnerId, $checkDependency, $permission)
 	{
 		if (!$permission) {
 			self::$allowedPermissions[$partnerId][$permissionName] = false;
@@ -217,23 +217,15 @@ class PermissionPeer extends BasePermissionPeer
 		return $permission;
 	}
 
-	public static function getByNamesAndPartner($permissionNamesArray, $partnerIdsArray)
+	public static function getByNamesAndPartner(array $permissionNamesArray, array $partnerIdsArray)
 	{
 		$c = new Criteria();
 
-		if(!is_array($partnerIdsArray))
-			$partnerIdsArray = array($partnerIdsArray);
+		$partnerIdsArray = array_map('strval', $partnerIdsArray);
+		$c->addAnd(PermissionPeer::PARTNER_ID, $partnerIdsArray, Criteria::IN);
 
-		if(!in_array('*', $partnerIdsArray, true))
-		{
-			$partnerIdsArray = array_map('strval', $partnerIdsArray);
-			$c->addAnd(PermissionPeer::PARTNER_ID, $partnerIdsArray, Criteria::IN);
-		}
-		if(!in_array('*', $permissionNamesArray, true))
-		{
-			$permissionNamesArray = array_map('strval', $permissionNamesArray);
-			$c->addAnd(PermissionPeer::NAME, $permissionNamesArray, Criteria::IN);
-		}
+		$permissionNamesArray = array_map('strval', $permissionNamesArray);
+		$c->addAnd(PermissionPeer::NAME, $permissionNamesArray, Criteria::IN);
 
 		$c->addGroupByColumn(PermissionPeer::NAME);
 		$c->addGroupByColumn(PermissionPeer::STATUS);
@@ -242,15 +234,26 @@ class PermissionPeer extends BasePermissionPeer
 		$c->addAscendingOrderByColumn(PermissionPeer::NAME);
 
 		PermissionPeer::setUseCriteriaFilter(false);
-		$critcopy = clone $c;
 		$limit = count($permissionNamesArray);
-		$critcopy->setLimit($limit);//limit 2
-		$permissions = PermissionPeer::doSelect($critcopy);
+		$c->setLimit($limit);
+		$permissions = PermissionPeer::doSelect($c);
 		PermissionPeer::setUseCriteriaFilter(true);
 
 		return $permissions;
 	}
 
+	public static function preFetchPermissions($permissionsNamesArray)
+	{
+		$preFetchPermissions = PermissionPeer::getByNamesAndPartner($permissionsNamesArray , array(kCurrentContext::$ks_partner_id, PartnerPeer::GLOBAL_PARTNER));
+		if(count($permissionsNamesArray) != count($preFetchPermissions))
+			return;
+
+		foreach ($preFetchPermissions as $permission)
+		{
+			PermissionPeer::validatePermission($permission->getName(), kCurrentContext::$ks_partner_id, true ,$permission);
+		}
+	}
+	
 	public static function isAllowedPlugin($pluginName, $partnerId)
 	{
 		$permissionName = self::getPermissionNameFromPluginName($pluginName);
