@@ -18,86 +18,28 @@ class KDLOperatorFfmpeg2_1_3 extends KDLOperatorFfmpeg1_1_1 {
 		 * - explicit mapping for video (if required)
 		 * - the required audio channels
 		 */
-		if(isset($target->_audio) && isset($target->_multiStream->audio->languages)
-				&& count($target->_multiStream->audio->languages)>0){
-			$auxArr = array();
-			if(isset($target->_video)) {
-				$auxArr[] = "-map v";
-			}
-			// Add language prop to the mapped output audio streams
-			$langIdx = 0;
-			foreach ($target->_multiStream->audio->languages as $lang){
-				$auxArr[] = "-map 0:".$lang->id;
-				$auxArr[] = "-metadata:s:a:$langIdx language=$lang->audioLanguage";
-				$langIdx++;
-			}
-			$insertHere = array_search('-y', $cmdValsArr);
-			array_splice ($cmdValsArr, $insertHere, 0, $auxArr);
-		}
+		self::getMappingsForMultiStream($target, $cmdValsArr);
 		
 		/*
 		 * Watermarking ...
 		 */
-		if(isset($target->_video->_watermarkData)) {
-				
-				// Fading requires looping of the WM image
-			if(isset($target->_video->_watermarkFadeLoopTime) && $target->_video->_watermarkFadeLoopTime>0){
-					/*
-					 * The loop time should be minimum of the video duration (_explicitClipDur) and 
-					 * the calculated largest fade time.
-					 * Otherwise set loop time to 60 sec
-					 */
-				$loopTime = $target->_video->_watermarkFadeLoopTime + 0.5;
-				if(isset($target->_explicitClipDur) && $target->_explicitClipDur>0){
-					$loopTime = min($loopTime, round($target->_explicitClipDur/1000));
-				}
-			}
-			$auxArr = array();
-			if(is_array($target->_video->_watermarkData)){
-				$watermarkDataArr = $target->_video->_watermarkData;
-				$wmImgIdx = 1;
-				foreach ($watermarkDataArr as $watermarkData){
-					if(isset($loopTime))
-						array_push($auxArr, "-loop", 1, "-t", $loopTime);
-					array_push($auxArr, "-i",KDLCmdlinePlaceholders::WaterMarkFileName."_$wmImgIdx");
-					$wmImgIdx++;
-				}
-			}
-			else {
-				if(isset($loopTime))
-					array_push($auxArr, "-loop", 1, "-t", $loopTime);
-				array_push($auxArr, "-i",KDLCmdlinePlaceholders::WaterMarkFileName);
-			}
-			$insertHere = end(array_keys($cmdValsArr, '-i'))+2;
-			array_splice ($cmdValsArr, $insertHere, 0, $auxArr);
-		}
-
+		self::adjustForWatermarking($target, $cmdValsArr);
+		
 		/*
 		 * Subtitles, if any ...
 		 */
-		if(isset($target->_video->_subtitlesData->action) && $target->_video->_subtitlesData->action=='embed'){
-			$subsData = $target->_video->_subtitlesData;
-			$auxArr = array();
-			$auxArr[] = '-i';
-			$insertHere = end(array_keys($cmdValsArr, '-i'))+2;
-			if(isset($subsData->filename))
-				$subsFilename = $subsData->filename;
-			else
-				$subsFilename = KDLCmdlinePlaceholders::SubTitlesFileName;
-			$auxArr = array('-i', $subsFilename, '-c:s','mov_text');
-			if(isset($subsData->language)){
-				$auxArr[] = "-metadata:s";
-				$auxArr[] = "language=".$subsData->language;
-			}
-			// c:s:0 mov_text -metadata:s:s:0 ger
-			array_splice ($cmdValsArr, $insertHere, 0, $auxArr);
-		}
+		self::adjustForSubtitles($target, $cmdValsArr);
 		
 		if(isset($target->_video) && in_array($target->_video->_id, array(KDLVideoTarget::H264,KDLVideoTarget::H264B,KDLVideoTarget::H264M,KDLVideoTarget::H264H))){
 			self::adjustH264Level($target->_video, $cmdValsArr);
-		}
+			self::adjustX264Opts($cmdValsArr);
+		}	
 		
-		self::rearrangeFiltersAndOpts($cmdValsArr);
+		/*
+		 * For resample-filter case -
+		 * 'async 2' causes aud-br distortion ==> set to 'async 1'
+		 */
+		self::rearrngeAudioFilters($target, $cmdValsArr);
 		
 		$cmdStr = implode(" ", $cmdValsArr);
 
@@ -190,12 +132,13 @@ class KDLOperatorFfmpeg2_1_3 extends KDLOperatorFfmpeg1_1_1 {
 			 */
 		$filterStr = null;
 		if(isset($target->_multiStream)){
-			$filterStr = self::getMultiStream($target->_multiStream);
+			$filterStr = self::getFiltersForMultiStream($target->_multiStream);
+			if($target->_multiStream->audio->getLayoutChannels()>3){
+				$layout= $target->_multiStream->audio->getStreamLayout();
+				if(isset($layout))
+					$cmdStr.= " -channel_layout $layout";			
+			}
 		}
-		else if(isset($target->_audio->_downmix)){
-			$filterStr = "pan=stereo:c0=c0:c1=c1";
-		}
-		
 		$cmdValsArr = null;
 			/*
 			 * Switch the 'ar' setting to 'aresample' filter, for cases that require it.
@@ -375,23 +318,50 @@ class KDLOperatorFfmpeg2_1_3 extends KDLOperatorFfmpeg1_1_1 {
 	 * @param array $cmdValsArr
 	 * @param unknown_type $multiStream
 	 */
-	protected static function getMultiStream($multiStream)
+	protected static function getFiltersForMultiStream($multiStream)
 	{
-		if(!(isset($multiStream->audio) && isset($multiStream->audio->mapping)))
+			/*
+			 * Get out if there are no streams
+			 * or if the required action does not need filters (merge/pan/mix)
+			 */
+		if(!(isset($multiStream->audio->streams) && count($multiStream->audio->streams)>0)
+		|| (isset($multiStream->audio->action) && $multiStream->audio->action=="separate")){
 			return null;
-		$mapping = $multiStream->audio->mapping;
-		$mapStr = null;
-		foreach($mapping as $m){
-			$mapStr.="[0:$m]";
 		}
-		if(!isset($mapStr))
-			return null;
-		if(count($mapping)==1) {
-			$mapStr = $mapStr."pan=stereo:c0=c0:c1=c1";
+		
+		$mapArr = array();
+		foreach($multiStream->audio->streams as $stream){
+			$mapStr = null;
+			$mapping = $stream->mapping;
+			if(count($mapping)==1 && !(isset($stream->downmix) && $stream->downmix>0))
+				continue;
+			foreach($mapping as $m){
+				$mapStr.="[0:$m]";
+			}
+			if(!isset($mapStr))
+				continue;
+			
+				/*
+				 * The following code (pan=stereo) is a hack to overcome ffmpeg bug with 'downmix' streams
+				 * TO CHECK whether it is relevant for 2.7.2
+				 */
+			switch(count($mapping)){
+				case 1:
+					$mapStr.= "pan=stereo:c0=c0:c1=c1";
+					break;
+				case 2:
+				case 3:
+					$mapStr.= "amix=inputs=".count($mapping);
+					break;
+				default:
+					$mapStr.= "amerge=inputs=".count($mapping);
+					break;
+			}
+			$mapArr[] = $mapStr;
 		}
-		else {
-			$mapStr = $mapStr."amix=inputs=".count($mapping);
-		}
+		
+		if(count($mapArr)>0)
+			$mapStr = implode(';', $mapArr);
 		return $mapStr;
 	}
 	
@@ -399,9 +369,8 @@ class KDLOperatorFfmpeg2_1_3 extends KDLOperatorFfmpeg1_1_1 {
 	 * 
 	 * @param string $cmdStr
 	 */
-	protected static function rearrangeFiltersAndOpts(array &$cmdValsArr)
+	private static function adjustX264Opts(array &$cmdValsArr)
 	{
-		$reImplode = false;
 		$keys=array_keys($cmdValsArr, "-x264opts");
 		if(count($keys>1)) {
 			$first = array_shift($keys);
@@ -416,21 +385,9 @@ class KDLOperatorFfmpeg2_1_3 extends KDLOperatorFfmpeg1_1_1 {
 				unset($cmdValsArr[$key+1]);
 				unset($cmdValsArr[$key]);
 			}
-			$reImplode = true;
 		}
-
-		/*
-		 * For resample-filter case -
-		* 'async 2' causes aud-br distortion ==> set to 'async 1'
-		*/
-		if(self::rearrngeAudioFilters($cmdValsArr)==true) {
-			$reImplode = true;
-		}
-		
-		
-		return $reImplode;
 	}
-	
+
 	/**
 	 * (non-PHPdoc)
 	 * @see KDLOperatorFfmpeg0_10::generateH264params()
@@ -456,22 +413,37 @@ class KDLOperatorFfmpeg2_1_3 extends KDLOperatorFfmpeg1_1_1 {
 		return $h264params;
 	}
 	
+	
 	/**
 	 * 
 	 * @param string $cmdStr
 	 */
-	protected static function rearrngeAudioFilters(array &$cmdValsArr)
+	private static function rearrngeAudioFilters($target, array &$cmdValsArr)
 	{
+		if(!isset($target->_audio)){
+			return false;
+		}
+		
+		if(isset($target->_multiStream->audio)){
+			$multiStreamAudio = $target->_multiStream->audio;
+			if(isset($multiStreamAudio->action) && $multiStreamAudio->action=='separate'){
+				return false;
+			}
+			$mapping = $multiStreamAudio->getStreamMapping();
+			if(isset($mapping) && count($mapping)==1){
+				return false;
+			}
+		}
+		
 		/*	
 		 * Switch the '-async' to 'resample=asyn=...' filter, to follow ffmpeg's runtime notification.
 		 * Since it is a filter, it should be merged intoi the same graph with other audio filters
 		 */
 		$key=array_search("-async", $cmdValsArr);
-		if($key===false)
-		{
+		if($key===false) {
 			return false;
 		}
-			
+
 		unset($cmdValsArr[$key+1]);
 		unset($cmdValsArr[$key]);
 		
@@ -717,7 +689,7 @@ ffmpeg -threads 1 -i VIDEO -i WM1.jpg -loop 1 -t 30 -i WM2.jpg
 	 *
 	 * @param string $cmdStr
 	 */
-	protected static function adjustH264Level($targetVid, array &$cmdValsArr)
+	private static function adjustH264Level($targetVid, array &$cmdValsArr)
 	{
 		$H264LevelMacroBlocks = array(
 				10=>99,
@@ -772,6 +744,111 @@ ffmpeg -threads 1 -i VIDEO -i WM1.jpg -loop 1 -t 30 -i WM2.jpg
 		}
 	}
 	
+	/**
+	 * 
+	 * @param KDLFlavor $target
+	 * @param array $cmdValsArr
+	 */
+	private function getMappingsForMultiStream(KDLFlavor $target, array &$cmdValsArr)
+	{
+		if(!isset($target->_audio))
+			return;
+
+		/*
+		 * On multi-lingual, add:
+		 * - explicit mapping for video (if required)
+		 * - the required audio channels
+		 */
+		if(isset($target->_multiStream->audio->streams) && count($target->_multiStream->audio->streams)>0){
+			$auxArr = array();
+			if(isset($target->_video)) {
+				$auxArr[] = "-map v";
+			}
+			// Add language prop to the mapped output audio streams
+			$auxIdx = 0;
+			foreach ($target->_multiStream->audio->streams as $stream){
+				foreach ($stream->mapping as $m) {
+					$auxArr[] = "-map 0:$m";
+				}
+				if(isset($stream->lang)){
+					$auxArr[] = "-metadata:s:a:$auxIdx language=$stream->lang";
+				}
+				$auxIdx++;
+			}
+			$insertHere = array_search('-y', $cmdValsArr);
+			array_splice ($cmdValsArr, $insertHere, 0, $auxArr);
+		}
+	}
+	
+	/**
+	 * 
+	 * @param unknown_type $target
+	 * @param array $cmdValsArr
+	 */
+	private function adjustForWatermarking($target, array &$cmdValsArr)
+	{
+		if(!isset($target->_video->_watermarkData)) 
+			return;
+		
+		// Fading requires looping of the WM image
+		if(isset($target->_video->_watermarkFadeLoopTime) && $target->_video->_watermarkFadeLoopTime>0){
+			/*
+			 * The loop time should be minimum of the video duration (_explicitClipDur) and
+			* the calculated largest fade time.
+			* Otherwise set loop time to 60 sec
+			*/
+			$loopTime = $target->_video->_watermarkFadeLoopTime + 0.5;
+			if(isset($target->_explicitClipDur) && $target->_explicitClipDur>0){
+				$loopTime = min($loopTime, round($target->_explicitClipDur/1000));
+			}
+		}
+		$auxArr = array();
+		if(is_array($target->_video->_watermarkData)){
+			$watermarkDataArr = $target->_video->_watermarkData;
+			$wmImgIdx = 1;
+			foreach ($watermarkDataArr as $watermarkData){
+				if(isset($loopTime))
+					array_push($auxArr, "-loop", 1, "-t", $loopTime);
+				array_push($auxArr, "-i",KDLCmdlinePlaceholders::WaterMarkFileName."_$wmImgIdx");
+				$wmImgIdx++;
+			}
+		}
+		else {
+			if(isset($loopTime))
+				array_push($auxArr, "-loop", 1, "-t", $loopTime);
+			array_push($auxArr, "-i",KDLCmdlinePlaceholders::WaterMarkFileName);
+		}
+		$insertHere = end(array_keys($cmdValsArr, '-i'))+2;
+		array_splice ($cmdValsArr, $insertHere, 0, $auxArr);
+	}
+	
+	/**
+	 * 
+	 * @param unknown_type $target
+	 * @param array $cmdValsArr
+	 */
+	private function adjustForSubtitles($target, array &$cmdValsArr)
+	{
+		if(!(isset($target->_video->_subtitlesData->action) && $target->_video->_subtitlesData->action=='embed'))
+			return;
+
+		$subsData = $target->_video->_subtitlesData;
+		$auxArr = array();
+		$auxArr[] = '-i';
+		$insertHere = end(array_keys($cmdValsArr, '-i'))+2;
+		if(isset($subsData->filename))
+			$subsFilename = $subsData->filename;
+		else
+			$subsFilename = KDLCmdlinePlaceholders::SubTitlesFileName;
+		$auxArr = array('-i', $subsFilename, '-c:s','mov_text');
+		if(isset($subsData->language)){
+			$auxArr[] = "-metadata:s";
+			$auxArr[] = "language=".$subsData->language;
+		}
+		// c:s:0 mov_text -metadata:s:s:0 ger
+		array_splice ($cmdValsArr, $insertHere, 0, $auxArr);
+	}
+
 	/* ---------------------------
 	 * CheckConstraints
 	 */

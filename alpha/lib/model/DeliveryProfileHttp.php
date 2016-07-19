@@ -7,7 +7,7 @@ class DeliveryProfileHttp extends DeliveryProfileVod {
 		$this->DEFAULT_RENDERER_CLASS = 'kF4MManifestRenderer';
 	}
 	
-	protected function doGetFlavorAssetUrl(flavorAsset $flavorAsset)
+	protected function doGetFlavorAssetUrl(asset $flavorAsset)
 	{
 		$url = parent::doGetFlavorAssetUrl($flavorAsset);
 		if($this->params->getFileExtension())

@@ -22,6 +22,8 @@ class s3Mgr extends kFileTransferMgr
 	protected $s3Region = '';
 	protected $sseType = '';
 	protected $sseKmsKeyId = '';
+	protected $signatureType = null;
+	protected $endPoint = null;
 	
 	// instances of this class should be created usign the 'getInstance' of the 'kFileTransferMgr' class
 	protected function __construct(array $options = null)
@@ -46,6 +48,16 @@ class s3Mgr extends kFileTransferMgr
 		if($options && isset($options['sseKmsKeyId']))
 		{
 			$this->sseKmsKeyId = $options['sseKmsKeyId'];
+		}
+		
+		if($options && isset($options['signatureType']))
+		{
+			$this->signatureType = $options['signatureType'];
+		}
+		
+		if($options && isset($options['endPoint']))
+		{
+			$this->endPoint = $options['endPoint'];
 		}
 		
 		// do nothing
@@ -82,16 +94,19 @@ class s3Mgr extends kFileTransferMgr
 			return false;
 		}
 
-		$this->s3 = S3Client::factory(
-				array(
-						'credentials' => array(
-								'key'    => $sftp_user,
-								'secret' => $sftp_pass,
-						),
-						'region' => $this->s3Region,
-						'signature' => 'v4',
-				)
-		);
+		$config = array(
+					'credentials' => array(
+							'key'    => $sftp_user,
+							'secret' => $sftp_pass,
+					),
+					'region' => $this->s3Region,
+					'signature' => $this->signatureType ? $this->signatureType : 'v4',
+			);
+		
+		if ($this->endPoint)
+			$config['endpoint'] = $this->endPoint;
+		 
+		$this->s3 = S3Client::factory($config);
 		
 		/** 
 		 * There is no way of "checking the credentials" on s3.

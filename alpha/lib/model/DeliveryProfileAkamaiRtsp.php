@@ -2,7 +2,7 @@
 
 class DeliveryProfileAkamaiRtsp extends DeliveryProfileRtsp {
 	
-	protected function doGetFlavorAssetUrl(flavorAsset $flavorAsset)
+	protected function doGetFlavorAssetUrl(asset $flavorAsset)
 	{
 		$partnerId = $flavorAsset->getPartnerId();
 		$flavorAssetId = $flavorAsset->getId();

@@ -25,6 +25,16 @@ class kAmazonS3StorageExportJobData extends kStorageExportJobData
 	*/
 	private $sseKmsKeyId;
     
+	/**
+	* $var string
+	*/
+	private $signatureType;
+    
+		/**
+	* $var string
+	*/
+	private $endPoint;
+    
 	public function setStorageExportJobData(StorageProfile $externalStorage, FileSync $fileSync, $srcFileSyncLocalPath, $force = false)
 	{
 		parent::setStorageExportJobData($externalStorage, $fileSync, $srcFileSyncLocalPath);
@@ -32,6 +42,8 @@ class kAmazonS3StorageExportJobData extends kStorageExportJobData
 		$this->setS3Region($externalStorage->getS3Region());
 		$this->setSseType($externalStorage->getSseType());
 		$this->setSseKmsKeyId($externalStorage->getSseKmsKeyId());
+		$this->setSignatureType($externalStorage->getSignatureType());
+		$this->setEndPoint($externalStorage->getEndPoint());
 	}
 
 	/**
@@ -96,5 +108,36 @@ class kAmazonS3StorageExportJobData extends kStorageExportJobData
 	public function setSseKmsKeyId($sseKmsKeyId)
 	{
 		$this->sseKmsKeyId = $sseKmsKeyId;	
+	}
+		
+	/**
+	 * @return the signature type
+	 */
+	public function getSignatureType()
+	{
+		return $this->signatureType;
+	}
+	
+	/**
+	 * @param $signatureType the signatureType to set
+	 */
+	public function setSignatureType($signatureType)
+	{
+		$this->signatureType = $signatureType;	
+	}	
+	/**
+	 * @return the endPoint
+	 */
+	public function getEndPoint()
+	{
+		return $this->endPoint;
+	}
+	
+	/**
+	 * @param $endPoint the endPoint to set
+	 */
+	public function setEndPoint($endPoint)
+	{
+		$this->endPoint = $endPoint;	
 	}	
 }

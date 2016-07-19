@@ -17,7 +17,7 @@ class DeliveryProfileLocalPathAppleHttp extends DeliveryProfileAppleHttp {
 		return $this->getFromCustomData("rendererClass", null, $this->DEFAULT_RENDERER_CLASS);
 	}
 	
-	protected function doGetFlavorAssetUrl(flavorAsset $flavorAsset)
+	protected function doGetFlavorAssetUrl(asset $flavorAsset)
 	{
 		//In this instance, since we require the local path of the flavor asset, it's the same thing as returning its filesync path.
 		$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);

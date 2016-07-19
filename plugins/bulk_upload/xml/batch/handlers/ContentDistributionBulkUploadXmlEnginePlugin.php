@@ -166,7 +166,6 @@ class ContentDistributionBulkUploadXmlEnginePlugin extends KalturaPlugin impleme
 		if($distribution['submitWhenReady'])
 			$submitWhenReady = true;
 			
-		KBatchBase::impersonate($this->xmlBulkUploadEngine->getCurrentPartnerId());
 		if($entryDistributionId)
 		{
 			$updatedEntryDistribution = $distributionPlugin->entryDistribution->update($entryDistributionId, $entryDistribution);
@@ -178,7 +177,6 @@ class ContentDistributionBulkUploadXmlEnginePlugin extends KalturaPlugin impleme
 			$createdEntryDistribution = $distributionPlugin->entryDistribution->add($entryDistribution);
 			$distributionPlugin->entryDistribution->submitAdd($createdEntryDistribution->id, $submitWhenReady);
 		}
-		KBatchBase::unimpersonate();
 	}
 
 	/* (non-PHPdoc)

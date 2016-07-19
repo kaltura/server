@@ -25,12 +25,24 @@ class KalturaAmazonS3StorageExportJobData extends KalturaStorageExportJobData
 	 */   	
     public $sseKmsKeyId;   
     
-	private static $map_between_objects = array
+	/**
+	 * @var string
+	 */   	
+    public $signatureType;   
+    
+    	/**
+	 * @var string
+	 */   	
+    public $endPoint;   
+    
+    private static $map_between_objects = array
 	(
 		"filesPermissionInS3",	
 		"s3Region",	
 		"sseType",
 		"sseKmsKeyId",
+		"signatureType",
+		"endPoint",
 	);
 
 	public function getMapBetweenObjects ( )
