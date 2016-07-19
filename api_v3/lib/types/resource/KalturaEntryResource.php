@@ -59,9 +59,6 @@ class KalturaEntryResource extends KalturaContentResource
 			if($fileSync->getFileType() != FileSync::FILE_SYNC_FILE_TYPE_LINK)
 				return;
 		}
-		if ($fileSyncs)
-			return;
-
 		throw new KalturaAPIException(KalturaErrors::FILE_DOESNT_EXIST);
 	}
 	
