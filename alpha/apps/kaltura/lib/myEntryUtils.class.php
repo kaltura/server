@@ -906,7 +906,7 @@ class myEntryUtils
 		if (strpos($url, "://") === false)
 			$url = rtrim($dp->getUrl(), "/") . "/".ltrim($url, '/');
 		
-		list($baseUrl, $queryString) = explode("?", $url."?");		
+		@list($baseUrl, $queryString) = explode("?", $url);
 
 		$remoteThumbCapture = str_replace(
 			array ( "{url}", "{offset}" ),
