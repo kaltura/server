@@ -221,9 +221,7 @@ class PermissionPeer extends BasePermissionPeer
 	{
 		$c = new Criteria();
 
-		$partnerIdsArray = array_map('strval', $partnerIdsArray);
 		$c->addAnd(PermissionPeer::PARTNER_ID, $partnerIdsArray, Criteria::IN);
-
 		$c->addAnd(PermissionPeer::NAME, $permissionNamesArray, Criteria::IN);
 		$c->addAnd(PermissionPeer::STATUS, PermissionStatus::ACTIVE, Criteria::EQUAL);
 		$c->addGroupByColumn(PermissionPeer::NAME);
