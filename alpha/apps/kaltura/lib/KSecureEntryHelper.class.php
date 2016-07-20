@@ -71,7 +71,7 @@ class KSecureEntryHelper
 		if(!is_array($contexts))
 			$contexts = array($contexts);
 			
-		if($entry->getParentEntryId())
+		if($entry->getSecurityParentId())
 		{
 			$entry = $entry->getParentEntry();
 			if(!$entry)
