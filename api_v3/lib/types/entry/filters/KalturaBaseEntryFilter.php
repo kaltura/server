@@ -209,8 +209,12 @@ class KalturaBaseEntryFilter extends KalturaBaseEntryBaseFilter
 		$c = $this->prepareEntriesCriteriaFilter($pager);
 		
 		if ($disableWidgetSessionFilters)
+		{
+			if (kEntitlementUtils::getEntitlementEnforcement() && !kCurrentContext::$is_admin_session && entryPeer::getUserContentOnly())
+					entryPeer::setFilterResults(true);
+
 			KalturaCriterion::disableTag(KalturaCriterion::TAG_WIDGET_SESSION);
-			
+		}
 		$list = entryPeer::doSelect($c);
 		$totalCount = $c->getRecordsCount();
 		
