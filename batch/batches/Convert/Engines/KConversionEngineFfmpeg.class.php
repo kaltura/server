@@ -448,7 +448,7 @@ $stub=null;
 		$digSignStub = "-f rawvideo -pix_fmt yuv420p - | %s -w %d -h %d -f %s %s --%s| %s -f rawvideo -s %dx%d -r %s -i -";
 		$digSignStr = sprintf($digSignStub, $ngsBin, $srcWid, $srcHgt, $srcFps, $stub, $prepMode,KDLCmdlinePlaceholders::BinaryName, $srcWid, $srcHgt, $srcFps);
 		$cmdLine = KDLOperatorFfmpeg::SplitCommandLineForVideoPiping($cmdLine, $digSignStr);
-
+		KalturaLog::log("After:cmdLine($cmdLine)");
 		return $cmdLine;
 	}
 
