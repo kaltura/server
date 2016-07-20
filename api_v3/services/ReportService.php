@@ -265,7 +265,7 @@ class ReportService extends KalturaBaseService
 		
 		$execParams = KalturaReportHelper::getValidateExecutionParameters($dbReport, $params);
 		
-		ini_set( "memory_limit","1024M" );
+		ini_set( "memory_limit","256M" );
 
 		$kReportsManager = new kReportManager($dbReport);
 		list($columns, $rows) = $kReportsManager->execute($execParams);
