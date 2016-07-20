@@ -210,12 +210,13 @@ class kFlowHelper
 		$dbBatchJob->setData($data);
 		$dbBatchJob->save();
 
-		$convertProfileExist = self::activateConvertProfileJob($dbBatchJob->getEntryId(), $localFilePath);		
-		
-		if(($isNewContent || $dbEntry->getStatus() == entryStatus::IMPORT) && !$convertProfileExist)
+		$convertProfileExist = self::activateConvertProfileJob($dbBatchJob->getEntryId(), $localFilePath);
+
+		if (($isNewContent || $dbEntry->getStatus() == entryStatus::IMPORT) && !$convertProfileExist)
 			// check if status == import for importing file of type url (filesync exists, and we want to raise event for conversion profile to start)
 			kEventsManager::raiseEvent(new kObjectAddedEvent($flavorAsset, $dbBatchJob));
 
+		
 		if(!$isNewFlavor)
 		{
 			$entryFlavors = assetPeer::retrieveByEntryIdAndStatus($flavorAsset->getEntryId(), flavorAsset::FLAVOR_ASSET_STATUS_WAIT_FOR_CONVERT);
