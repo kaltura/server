@@ -224,18 +224,11 @@ class PermissionPeer extends BasePermissionPeer
 		$partnerIdsArray = array_map('strval', $partnerIdsArray);
 		$c->addAnd(PermissionPeer::PARTNER_ID, $partnerIdsArray, Criteria::IN);
 
-		$permissionNamesArray = array_map('strval', $permissionNamesArray);
 		$c->addAnd(PermissionPeer::NAME, $permissionNamesArray, Criteria::IN);
-
+		$c->addAnd(PermissionPeer::STATUS, PermissionStatus::ACTIVE, Criteria::EQUAL);
 		$c->addGroupByColumn(PermissionPeer::NAME);
-		$c->addGroupByColumn(PermissionPeer::STATUS);
-
-		$c->addAscendingOrderByColumn(PermissionPeer::STATUS);
-		$c->addAscendingOrderByColumn(PermissionPeer::NAME);
 
 		PermissionPeer::setUseCriteriaFilter(false);
-		$limit = count($permissionNamesArray);
-		$c->setLimit($limit);
 		$permissions = PermissionPeer::doSelect($c);
 		PermissionPeer::setUseCriteriaFilter(true);
 
@@ -245,8 +238,6 @@ class PermissionPeer extends BasePermissionPeer
 	public static function preFetchPermissions($permissionsNamesArray)
 	{
 		$preFetchPermissions = PermissionPeer::getByNamesAndPartner($permissionsNamesArray , array(kCurrentContext::$ks_partner_id, PartnerPeer::GLOBAL_PARTNER));
-		if(count($permissionsNamesArray) != count($preFetchPermissions))
-			return;
 
 		foreach ($preFetchPermissions as $permission)
 		{
