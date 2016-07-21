@@ -935,17 +935,30 @@ class FlavorAssetService extends KalturaAssetService
 	 */
 	public function serveAdStitchCmdAction($assetId , $mediaInfoJson)
 	{
-		//todo - implement and return the command line
-		
+		$asset = assetPeer::retrieveById($assetId);
+		if(is_null($asset))
+			throw new KalturaAPIException(KalturaErrors::ASSET_ID_NOT_FOUND, $assetId);
+
+		$flavorParamsId = $asset->getFlavorParamsId();
+
+		$flavorParamsDb = assetParamsPeer::retrieveByPK($flavorParamsId);
+
+		if (!$flavorParamsDb)
+			throw new KalturaAPIException(KalturaErrors::FLAVOR_PARAMS_ID_NOT_FOUND, $flavorParamsId);
+
+		$flavorParamsOutputDb = assetParamsOutputPeer::retrieveByAssetId($assetId);
+
+		if (!$flavorParamsOutputDb)
+			throw new KalturaAPIException(KalturaErrors::FLAVOR_PARAMS_OUTPUT_ID_NOT_FOUND, $assetId);
+
+		$cmdLine = self::generateAdStitchingCmdline($mediaInfoJson, $flavorParamsDb, $flavorParamsOutputDb);
+
+		return $cmdLine;
 	}
 	
 	private static function generateAdStitchingCmdline($ffprobeJson, $flavorParams, $flavorParamsOutput)
 	{
-//		$asset = assetPeer::retreiveById($assetId);
-//		$flavorParamsId = $asset->getFlavorParamsId();
-//		$flavorParams = assetParamsPeer::retrieveByPK($flavorParamsId);
-//		$flavorParamsOutput = assetParamsOutputPeer::retrieveByPK($assetId);
-		
+
 		$parser = new KFFMpegMediaParserAdStitchHelper($ffprobeJson);
 		$srcMedInf = $parser->getMediaInfo();
 		$srcMedSet = KFFMpegMediaParserAdStitchHelper::mediaInfoToKDL($srcMedInf);
