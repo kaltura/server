@@ -115,7 +115,7 @@ class KalturaHttpNotificationObjectData extends KalturaHttpNotificationData
 			case KalturaResponseType::RESPONSE_TYPE_JSON:
 				$serializer = new KalturaJsonSerializer($this->ignoreNull);				
 				$data = $serializer->serialize($notification);
-				$data = urlencode($data);
+				$data = $httpNotificationTemplate->getUrlEncode() ? urlencode($data) : $data;
 				break;
 		}
 		
