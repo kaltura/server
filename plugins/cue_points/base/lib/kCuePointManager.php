@@ -735,6 +735,26 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 			return;
 		}
 		$liveEntryId = $vodEntry->getRootEntryId();
+
+
+
+
+		$jobData = new kLiveToVODJobData();
+		$jobData->setVodEntryId($vodEntryId);
+		$jobData->setLiveEntryId($liveEntryId);
+		$jobData->setTotalVODDuration($totalVODDuration);
+		$jobData->setLastSegmentDuration($lastSegmentDuration);
+		$jobData->setAmfArray($amfArray);
+		KalturaLog::info("create the job");
+		$batchJob = new BatchJob();
+		kJobsManager::addJob($batchJob, $jobData, BatchJobType::LIVE_TO_VOD);
+		return;
+
+
+
+
+
+
 		/** @var $liveEntry KalturaLiveEntry */
 		$liveEntry = entryPeer::retrieveByPK( $liveEntryId );
 		if ( ! $liveEntry || ! $liveEntry instanceof LiveEntry )
@@ -747,6 +767,10 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 		$currentSegmentStartTime = self::getSegmentStartTime($amfArray);
 
 		self::normalizeAMFTimes($amfArray, $totalVODDuration, $lastSegmentDuration);
+		
+		KalturaLog::info("---qwer-- currentSegmentEndTime: $currentSegmentEndTime");
+		KalturaLog::info("---qwer-- currentSegmentStartTime: $currentSegmentStartTime");
+
 
 		KalturaLog::log("Saving the live entry [{$liveEntry->getId()}] cue points into the associated VOD entry [{$vodEntry->getId()}]");
 
