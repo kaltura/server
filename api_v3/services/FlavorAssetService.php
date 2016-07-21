@@ -958,7 +958,6 @@ class FlavorAssetService extends KalturaAssetService
 	
 	private static function generateAdStitchingCmdline($ffprobeJson, $flavorParams, $flavorParamsOutput)
 	{
-
 		$parser = new KFFMpegMediaParserAdStitchHelper($ffprobeJson);
 		$srcMedInf = $parser->getMediaInfo();
 		$srcMedSet = KFFMpegMediaParserAdStitchHelper::mediaInfoToKDL($srcMedInf);
