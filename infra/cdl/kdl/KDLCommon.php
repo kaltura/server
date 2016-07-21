@@ -329,6 +329,8 @@
 		const BC = "bc";
 		const SL = "sl";
 		const SR = "sr";
+		const DR = "dr";
+		const DL = "dl";
 		const DOWNMIX = "downmix";
 		const MONO = "mono";
 		const STEREO = "stereo";
@@ -393,13 +395,17 @@
 			else if(!is_array($layoutTypes))
 				$layoutTypes = array($layoutTypes);
 			$rv = array();
+			$matchedLayouts = array();
 			foreach ($audioStreams as $stream){
-				if(isset($stream->audioChannelLayout)){ 
+				// Make sure that the tested stream layout is unique (if not in matchedLayouts)
+				if(isset($stream->audioChannelLayout) && !in_array($stream->audioChannelLayout, $matchedLayouts)){ 
 					if(in_array($stream->audioChannelLayout, $layoutTypes)){
 						$rv[] = $stream;
+						$matchedLayouts[] = $stream->audioChannelLayout;
 					}
 					else if($stream->audioChannelLayout==self::MONO && in_array(self::FC, $layoutTypes) ){
 						$rv[] = $stream;					
+						$matchedLayouts[] = $stream->audioChannelLayout;
 					}
 				}
 			}
