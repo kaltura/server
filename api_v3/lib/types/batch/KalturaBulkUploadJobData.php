@@ -136,7 +136,7 @@ class KalturaBulkUploadJobData extends KalturaJobData
 	{
 		if (is_null($object_to_fill))
 		{
-			$object_to_fill = new kBulkUploadJobData();
+			throw new KalturaAPIException(KalturaErrors::OBJECT_TYPE_ABSTRACT, "KalturaBulkUploadJobData");
 		}
 		
 		return parent::toObject($object_to_fill, $props_to_skip);
