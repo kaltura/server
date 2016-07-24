@@ -134,6 +134,12 @@ class KalturaDeliveryProfile extends KalturaObject implements IFilterable
 	 */
 	public $extraParams;
 	
+	/**
+	 * A filter that can be used to include additional assets in the URL (e.g. captions)
+	 * @var KalturaAssetFilter
+	 */
+	public $supplementaryAssetsFilter;
+	
  	private static $map_between_objects = array
 	(
 			"createdAt",
@@ -155,6 +161,7 @@ class KalturaDeliveryProfile extends KalturaObject implements IFilterable
 			"mediaProtocols",
 			"priority",
 			"extraParams",
+			"supplementaryAssetsFilter",
 	);
 	
 	public function getMapBetweenObjects ( )
