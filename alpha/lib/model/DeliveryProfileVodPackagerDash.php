@@ -11,8 +11,9 @@ class DeliveryProfileVodPackagerDash extends DeliveryProfileDash {
 	{
 		$url = parent::doGetFlavorAssetUrl($flavorAsset);
 		$url .= '/forceproxy/true';
-		if($this->params->getFileExtension())
-			$url .= "/name/a." . $this->params->getFileExtension();
+		// using mp4 hardcoded, to prevent ugly urls when there are captions, 
+		//	the vod packager does not care anyway...
+		$url .= "/name/a.mp4";
 		$url .= VodPackagerDeliveryUtils::getExtraParams($this->params);
 		return $url;
 	}
