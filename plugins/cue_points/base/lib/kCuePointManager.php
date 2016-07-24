@@ -736,83 +736,15 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 		}
 		$liveEntryId = $vodEntry->getRootEntryId();
 
-
-
-
 		$jobData = new kLiveToVODJobData();
 		$jobData->setVodEntryId($vodEntryId);
 		$jobData->setLiveEntryId($liveEntryId);
 		$jobData->setTotalVODDuration($totalVODDuration);
 		$jobData->setLastSegmentDuration($lastSegmentDuration);
 		$jobData->setAmfArray($amfArray);
-		KalturaLog::info("create the job");
 		$batchJob = new BatchJob();
 		kJobsManager::addJob($batchJob, $jobData, BatchJobType::LIVE_TO_VOD);
 		return;
-
-
-
-
-
-
-		/** @var $liveEntry KalturaLiveEntry */
-		$liveEntry = entryPeer::retrieveByPK( $liveEntryId );
-		if ( ! $liveEntry || ! $liveEntry instanceof LiveEntry )
-		{
-			KalturaLog::err("Can't find live entry with id [$liveEntryId]");
-			return;
-		}
-
-		$currentSegmentEndTime = self::getSegmentEndTime($amfArray, $lastSegmentDuration);
-		$currentSegmentStartTime = self::getSegmentStartTime($amfArray);
-
-		self::normalizeAMFTimes($amfArray, $totalVODDuration, $lastSegmentDuration);
-		
-		KalturaLog::info("---qwer-- currentSegmentEndTime: $currentSegmentEndTime");
-		KalturaLog::info("---qwer-- currentSegmentStartTime: $currentSegmentStartTime");
-
-
-		KalturaLog::log("Saving the live entry [{$liveEntry->getId()}] cue points into the associated VOD entry [{$vodEntry->getId()}]");
-
-		// select up to MAX_CUE_POINTS_TO_COPY_TO_VOD to handle
-		$c = new KalturaCriteria();
-		$c->add( CuePointPeer::ENTRY_ID, $liveEntry->getId() );
-		$c->add( CuePointPeer::CREATED_AT, $currentSegmentEndTime, KalturaCriteria::LESS_EQUAL ); // Don't copy future cuepoints
-		$c->add( CuePointPeer::STATUS, CuePointStatus::READY ); // READY, but not yet HANDLED
-		$c->addAscendingOrderByColumn(CuePointPeer::CREATED_AT);
-		$c->setLimit( self::MAX_CUE_POINTS_TO_COPY_TO_VOD );
-		$liveCuePointsToCopy = CuePointPeer::doSelect($c);
-
-		$numLiveCuePointsToCopy = count($liveCuePointsToCopy);
-		KalturaLog::info("About to copy $numLiveCuePointsToCopy cuepoints from live entry [{$liveEntry->getId()}] to VOD entry [{$vodEntry->getId()}]");
-		$processedCuePointIds = array();
-		if ( $numLiveCuePointsToCopy > 0 )
-		{
-			foreach ( $liveCuePointsToCopy as $liveCuePoint )
-			{
-				$processedCuePointIds[] = $liveCuePoint->getId();
-				$cuePointCreationTime = $liveCuePoint->getCreatedAt(NULL)*1000;
-
-				// if the cp was before the segment start time - move it to the beginning of the segment.
-				$cuePointCreationTime = max($cuePointCreationTime, $currentSegmentStartTime * 1000);
-				$offsetForTS = self::getOffsetForTimestamp($cuePointCreationTime, $amfArray);
-				$copyMsg = "cuepoint [{$liveCuePoint->getId()}] from live entry [{$liveEntry->getId()}] to VOD entry [{$vodEntry->getId()}] cuePointCreationTime= $cuePointCreationTime offsetForTS= $offsetForTS";
-				KalturaLog::debug("Preparing to copy $copyMsg");
-				if ( ! is_null( $offsetForTS ) )
-				{
-					$liveCuePoint->copyFromLiveToVodEntry( $vodEntry, $offsetForTS );
-				}
-				else
-				{
-					KalturaLog::info("Not copying $copyMsg" );
-				}
-			}
-		}
-		KalturaLog::info("Post processing cuePointIds for live entry [{$liveEntry->getId()}]: " . print_r($processedCuePointIds,true) );
-		if ( count($processedCuePointIds) )
-		{
-			self::postProcessCuePoints( $liveEntry, $processedCuePointIds );
-		}
 	}
 
 	private static function getOffsetForTimestamp($timestamp, $amfArray){
