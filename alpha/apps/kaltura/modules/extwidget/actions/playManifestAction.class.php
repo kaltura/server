@@ -828,6 +828,21 @@ class playManifestAction extends kalturaAction
 		if(!$this->deliveryProfile)
 			return null;
 		
+		$filter = $this->deliveryProfile->getSupplementaryAssetsFilter();
+		if ($filter)
+		{
+			$c = new Criteria();
+			$filter->attachToCriteria($c);
+			$c->add(assetPeer::ENTRY_ID, $this->entryId);
+			$c->add(assetPeer::STATUS, asset::ASSET_STATUS_READY);
+			$assets = assetPeer::doSelect($c);
+
+			$assets = array_merge(
+					$this->deliveryAttributes->getFlavorAssets(), 
+					$assets);
+			$this->deliveryAttributes->setFlavorAssets($assets);
+		}
+
 		$this->enforceAudioVideoEntry();
 		
 		$this->deliveryProfile->setDynamicAttributes($this->deliveryAttributes);	
