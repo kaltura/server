@@ -539,6 +539,10 @@ class BaseEntryService extends KalturaEntryService
 		$c->add(entryPeer::DISPLAY_IN_SEARCH, mySearchUtils::DISPLAY_IN_SEARCH_SYSTEM, Criteria::NOT_EQUAL);
 				
 		KalturaCriterion::disableTag(KalturaCriterion::TAG_WIDGET_SESSION);
+
+		if (kEntitlementUtils::getEntitlementEnforcement() && !kCurrentContext::$is_admin_session && entryPeer::getUserContentOnly())
+			entryPeer::setFilterResults(true);
+
 		$list = entryPeer::doSelect($c);
 		KalturaCriterion::restoreTag(KalturaCriterion::TAG_WIDGET_SESSION);
 		
