@@ -151,4 +151,5 @@ class KalturaLanguage extends KalturaStringEnum
 	const YO = 'Yoruba';
 	const ZU = 'Zulu';
 	const MU = 'Multilingual';
+	const UN = 'Undefined';
 }
