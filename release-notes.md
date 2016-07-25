@@ -1,3 +1,17 @@
+# Kajam 11.20.0 #
+
+## bpm - burn subtitles metadata trigger fix ##
+
+ - Issue Type: Bug
+ - Issue ID: PS-2569
+
+### Configuration ###
+None.
+ 
+### Deployment scripts ###
+
+	php /opt/kaltura/app/tests/standAloneClient/exec.php /opt/kaltura/app/tests/standAloneClient/bpmNotificationTemplatesForBurntSubtitles.xml
+
 # Kajam 11.19.0 #
 
 ## Add updated_at index to schedule_event table in DB ##
