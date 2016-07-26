@@ -3,7 +3,7 @@
  * @package api
  * @subpackage objects
  */
-class KalturaLiveToVODJobData extends KalturaJobData
+class KalturaLiveToVodJobData extends KalturaJobData
 {
 	/**
 	 * $vod Entry Id
@@ -58,7 +58,7 @@ class KalturaLiveToVODJobData extends KalturaJobData
 	public function toObject($dbData = null, $props_to_skip = array()) 
 	{
 		if(is_null($dbData))
-			$dbData = new kLiveToVODJobData();
+			$dbData = new kLiveToVodJobData();
 			
 		return parent::toObject($dbData, $props_to_skip);
 	}

@@ -736,7 +736,7 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 		}
 		$liveEntryId = $vodEntry->getRootEntryId();
 
-		$jobData = new kLiveToVODJobData();
+		$jobData = new kLiveToVodJobData();
 		$jobData->setVodEntryId($vodEntryId);
 		$jobData->setLiveEntryId($liveEntryId);
 		$jobData->setTotalVODDuration($totalVODDuration);

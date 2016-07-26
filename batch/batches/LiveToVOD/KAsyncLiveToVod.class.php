@@ -11,7 +11,7 @@
  * @package Scheduler
  * @subpackage Copy
  */
-class KAsyncLiveToVOD extends KJobHandlerWorker
+class KAsyncLiveToVod extends KJobHandlerWorker
 {
 	/* (non-PHPdoc)
 	 * @see KBatchBase::getType()
@@ -40,52 +40,56 @@ class KAsyncLiveToVOD extends KJobHandlerWorker
 	/**
 	 * Will take a data and copy cue points
 	 */
-	private function copyCuePoint(KalturaBatchJob $job, KalturaLiveToVODJobData $data)
+	private function copyCuePoint(KalturaBatchJob $job, KalturaLiveToVodJobData $data)
 	{
 		$amfArray = json_decode($data->amfArray);
 		$currentSegmentStartTime = self::getSegmentStartTime($amfArray);
 		$currentSegmentEndTime = self::getSegmentEndTime($amfArray, $data->lastSegmentDuration);
 		self::normalizeAMFTimes($amfArray, $data->totalVODDuration, $data->lastSegmentDuration);
 
-		$totalCnt = self::getCuePointCount($data->liveEntryId, $currentSegmentEndTime);
-		KalturaLog::info("Total count of cue-point to copy: " .$totalCnt);
-		if ($totalCnt == 0)
+		$totalCount = self::getCuePointCount($data->liveEntryId, $currentSegmentEndTime);
+		KalturaLog::info("Total count of cue-point to copy: " .$totalCount);
+		if ($totalCount == 0)
 			return $this->closeJob($job, null, null, "No cue point to copy", KalturaBatchJobStatus::FINISHED);
 
-		$count = 0;
 		do
 		{
 			$copiedCuePointIds = array();
 			$liveCuePointsToCopy = self::getCuePointlistForEntry($data->liveEntryId, $currentSegmentEndTime, 0 , 1);
-			if (count($liveCuePointsToCopy) == 0) break;
+			if (count($liveCuePointsToCopy) == 0)
+				break;
 
 			//set the parnter ID for adding the new cue points in multi request
 			KBatchBase::impersonate($liveCuePointsToCopy[0]->partnerId);
 			KBatchBase::$kClient->startMultiRequest();
 			foreach ($liveCuePointsToCopy as $liveCuePoint)
-				$copiedCuePointIds[] = self::copyCuePointToVOD($liveCuePoint, $currentSegmentStartTime, $amfArray, $data->vodEntryId);
+			{
+				$copiedCuePointId = self::copyCuePointToVOD($liveCuePoint, $currentSegmentStartTime, $amfArray, $data->vodEntryId);
+				if ($copiedCuePointId)
+					$copiedCuePointIds[] = $copiedCuePointId;
+			}
 			KBatchBase::$kClient->doMultiRequest();
 			KBatchBase::unimpersonate();
 			
 			//start post-process for all copied cue-point
 			KalturaLog::info("Copied [".count($copiedCuePointIds)."] cue-points");
-			KBatchBase::$kClient->startMultiRequest();
-			foreach ($copiedCuePointIds as $copiedLiveCuePointId)
-				self::postProcessCuePoint($copiedLiveCuePointId);
-			KBatchBase::$kClient->doMultiRequest();
+			self::postProcessCuePoints($copiedCuePointIds);
 
-			//increase the count (as the number of cue point return from server)
-			$count += count($liveCuePointsToCopy);
-		} while ($count < $totalCnt);
+			//decrease the totalCount (as the number of cue point return from server)
+			$totalCount -= count($liveCuePointsToCopy);
+		} while ($totalCount);
 
 		return $this->closeJob($job, null, null, "Copy all cue points finished", KalturaBatchJobStatus::FINISHED);
 	}
 
 
 	
-	private static function postProcessCuePoint($cuePointId)
+	private static function postProcessCuePoints($copiedCuePointIds)
 	{
-		return KBatchBase::$kClient->cuePoint->updateStatus($cuePointId, KalturaCuePointStatus::HANDLED);
+		KBatchBase::$kClient->startMultiRequest();
+		foreach ($copiedCuePointIds as $copiedLiveCuePointId)
+			KBatchBase::$kClient->cuePoint->updateStatus($copiedLiveCuePointId, KalturaCuePointStatus::HANDLED);
+		KBatchBase::$kClient->doMultiRequest();
 	}
 
 	private static function getCuePointFilter($entryId, $currentSegmentEndTime)
@@ -93,6 +97,7 @@ class KAsyncLiveToVOD extends KJobHandlerWorker
 		$filter = new KalturaCuePointFilter();
 		$filter->entryIdEqual = $entryId;
 		$filter->statusIn = CuePointStatus::READY;
+		$filter->cuePointTypeIn = 'codeCuePoint.Code,thumbCuePoint.Thumb';
 		$filter->createdAtLessThanOrEqual = $currentSegmentEndTime;
 		return $filter;
 	}
@@ -181,7 +186,7 @@ class KAsyncLiveToVOD extends KJobHandlerWorker
 		return $ret;
 	}
 
-	private static function cloneBaseCuePoint(KalturaCuePoint $src, $dst)
+	private static function cloneBaseCuePoint(KalturaCuePoint $src, KalturaCuePoint $dst)
 	{
 		//foreach (get_object_vars($cuePoint) as $key => $val) // all of them, include id, etc...
 		//	$newCuePoint->$key = $val;
@@ -209,7 +214,7 @@ class KAsyncLiveToVOD extends KJobHandlerWorker
 		$newCuePoint = self::cloneBaseCuePoint($cuePoint,$newCuePoint);
 		return $newCuePoint;
 	}
-	private static function copyCuePointFromLiveToVOD($liveCuePoint, $startTime, $vodEntryId){
+	private static function copyCuePointFromLiveToVod($liveCuePoint, $startTime, $vodEntryId){
 		$newCuePoint = self::cloneCuePoint($liveCuePoint);
 		if (!$newCuePoint)
 			return null;
@@ -226,7 +231,7 @@ class KAsyncLiveToVOD extends KJobHandlerWorker
 
 		$startTimeForCuePoint = self::getOffsetForTimestamp($cuePointCreationTime, $amfArray);
 		if (!is_null($startTimeForCuePoint)) {
-			$VODCuePoint = self::copyCuePointFromLiveToVOD($liveCuePoint, $startTimeForCuePoint, $vodEntryId);
+			$VODCuePoint = self::copyCuePointFromLiveToVod($liveCuePoint, $startTimeForCuePoint, $vodEntryId);
 			if ($VODCuePoint)
 			{
 				KBatchBase::$kClient->cuePoint->add($VODCuePoint);
@@ -234,5 +239,6 @@ class KAsyncLiveToVOD extends KJobHandlerWorker
 			}
 		}
 		else KalturaLog::info("Not copying cue point [$liveCuePoint->id]");
+		return null;
 	}
 }
