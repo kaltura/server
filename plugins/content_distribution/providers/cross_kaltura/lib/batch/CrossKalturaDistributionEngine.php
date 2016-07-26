@@ -237,6 +237,10 @@ class CrossKalturaDistributionEngine extends DistributionEngine implements
                 $flavorAssetsList = $client->flavorAsset->listAction($flavorAssetFilter);
                 foreach ($flavorAssetsList->objects as $asset)
                 {
+					$twoCode = languageCodeManager::getLanguageKey($asset->language);
+					$obj = languageCodeManager::getObjectFromTwoCode($twoCode);
+					$asset->language = !is_null($obj) ? $obj[languageCodeManager::KALTURA_NAME] : null;
+
                     $flavorAssets[$asset->id] = $asset;
                 }
             }
