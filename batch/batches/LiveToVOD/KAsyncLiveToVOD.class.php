@@ -42,10 +42,10 @@ class KAsyncLiveToVOD extends KJobHandlerWorker
 	 */
 	private function copyCuePoint(KalturaBatchJob $job, KalturaLiveToVODJobData $data)
 	{
-		// end time : 1468768326.697, start time : 1468768265.697, cue point creation time : 1468768320
-		$currentSegmentStartTime = self::getSegmentStartTime($data->amfArray);
-		$currentSegmentEndTime = self::getSegmentEndTime($data->amfArray, $data->lastSegmentDuration);
-		self::normalizeAMFTimes($data->amfArray, $data->totalVODDuration, $data->lastSegmentDuration);
+		$amfArray = json_decode($data->amfArray);
+		$currentSegmentStartTime = self::getSegmentStartTime($amfArray);
+		$currentSegmentEndTime = self::getSegmentEndTime($amfArray, $data->lastSegmentDuration);
+		self::normalizeAMFTimes($amfArray, $data->totalVODDuration, $data->lastSegmentDuration);
 
 		$totalCnt = self::getCuePointCount($data->liveEntryId, $currentSegmentEndTime);
 		KalturaLog::info("Total count of cue-point to copy: " .$totalCnt);
@@ -63,7 +63,7 @@ class KAsyncLiveToVOD extends KJobHandlerWorker
 			KBatchBase::impersonate($liveCuePointsToCopy[0]->partnerId);
 			KBatchBase::$kClient->startMultiRequest();
 			foreach ($liveCuePointsToCopy as $liveCuePoint)
-				$copiedCuePointIds[] = self::copyCuePointToVOD($liveCuePoint, $currentSegmentStartTime, $data->amfArray, $data->vodEntryId);
+				$copiedCuePointIds[] = self::copyCuePointToVOD($liveCuePoint, $currentSegmentStartTime, $amfArray, $data->vodEntryId);
 			KBatchBase::$kClient->doMultiRequest();
 			KBatchBase::unimpersonate();
 			

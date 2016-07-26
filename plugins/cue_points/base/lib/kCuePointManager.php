@@ -741,97 +741,12 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 		$jobData->setLiveEntryId($liveEntryId);
 		$jobData->setTotalVODDuration($totalVODDuration);
 		$jobData->setLastSegmentDuration($lastSegmentDuration);
-		$jobData->setAmfArray($amfArray);
+		$jobData->setAmfArray(json_encode($amfArray));
 		$batchJob = new BatchJob();
 		kJobsManager::addJob($batchJob, $jobData, BatchJobType::LIVE_TO_VOD);
 		return;
 	}
 
-	private static function getOffsetForTimestamp($timestamp, $amfArray){
-		KalturaLog::debug('getOffsetForTimestamp ' . $timestamp);
-		KalturaLog::debug('amfArray ' . print_r($amfArray, true));
-
-		$minDistanceAmf = self::getClosestAMF($timestamp, $amfArray);
-
-		$ret = 0;
-		if (is_null($minDistanceAmf)){
-			KalturaLog::debug('minDistanceAmf is null - returning 0');
-		}
-		elseif ($minDistanceAmf->ts > $timestamp){
-			KalturaLog::debug('timestamp is before ' . print_r($minDistanceAmf, true));
-			$ret = $minDistanceAmf->pts - ($minDistanceAmf->ts - $timestamp);
-		}
-		else{
-			KalturaLog::debug('timestamp is after ' . print_r($minDistanceAmf, true));
-			$ret = $minDistanceAmf->pts + ($timestamp - $minDistanceAmf->ts);
-		}
-
-		// make sure we don't get a negative time
-		$ret = max($ret,0);
-
-		KalturaLog::debug('AMFs array is:' . print_r($amfArray, true) . 'getOffsetForTimestamp returning ' . $ret);
-		return $ret;
-	}
-
-	private static function getClosestAMF($timestamp, $amfArray){
-		$len = count($amfArray);
-		$ret = null;
-
-		if ($len == 1){
-			$ret = $amfArray[0];
-		}
-		else if ($timestamp >= $amfArray[$len-1]->ts){
-			$ret = $amfArray[$len-1];
-		}
-		else if ($timestamp <= $amfArray[0]->ts){
-			$ret = $amfArray[0];
-		}
-		else if ($len > 1) {
-			$lo = 0;
-			$hi = $len - 1;
-
-			while ($hi - $lo > 1) {
-				$mid = round(($lo + $hi) / 2);
-				if ($amfArray[$mid]->ts <= $timestamp) {
-					$lo = $mid;
-				} else {
-					$hi = $mid;
-				}
-			}
-
-			if (abs($amfArray[$hi]->ts - $timestamp) > abs($amfArray[$lo]->ts - $timestamp)) {
-				$ret = $amfArray[$lo];
-			} else {
-				$ret = $amfArray[$hi];
-			}
-		}
-
-		KalturaLog::debug('getClosestAMF returning ' . print_r($ret, true));
-		return $ret;
-	}
-
-	// change the PTS of every amf to be relative to the beginning of the recording, and not to the beginning of the segment
-	private static function normalizeAMFTimes(&$amfArray, $totalVODDuration, $currentSegmentDuration){
-		foreach($amfArray as $key=>$amf){
-			$amfArray[$key]->pts = $amfArray[$key]->pts  + $totalVODDuration - $currentSegmentDuration;
-		}
-	}
-
-	private static function getSegmentEndTime($amfArray, $segmentDuration){
-		if (count($amfArray) == 0){
-			KalturaLog::warning("getSegmentEndTime got an empty AMFs array - returning 0 as segment end time");
-			return 0;
-		}
-		return ($amfArray[0]->ts - $amfArray[0]->pts + $segmentDuration) / 1000;
-	}
-
-	private static function getSegmentStartTime($amfArray){
-		if (count($amfArray) == 0){
-			KalturaLog::warning("getSegmentStartTime got an empty AMFs array - returning 0 as segment end time");
-			return 0;
-		}
-		return ($amfArray[0]->ts - $amfArray[0]->pts) / 1000;
-	}
 
 	protected function reIndexCuePointEntry(CuePoint $cuePoint)
 	{
