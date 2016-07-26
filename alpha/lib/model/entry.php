@@ -1869,10 +1869,26 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 		return $parentEntry;
 	}
 	
+	public function getSecurityParentId()
+	{
+		// avoid the permission query if there is no parent
+		if (!$this->getParentEntryId())
+		{
+			return null;
+		}
+
+		if (PermissionPeer::isValidForPartner(PermissionName::FEATURE_DISABLE_PARENT_ENTRY_SECURITY_INHERITANCE, $this->getPartnerId()))
+		{
+			return null;
+		}
+
+		return $this->getParentEntryId();
+	}
+
 	//If entry has parent we need to retrieve access control from the parent
 	public function getaccessControl(PropelPDO $con = null)
 	{
-		if(!$this->getParentEntryId())
+		if(!$this->getSecurityParentId())
 			return accessControlPeer::retrieveByPK($this->access_control_id, $con);
 			
 		$parentEntry = $this->getParentEntry();

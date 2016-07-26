@@ -70,6 +70,15 @@ class KMediaInfoMediaParser extends KBaseMediaParser
 			&& (!isset($kMi->videoDuration) || $kMi->videoDuration==0)){
 				$kMi->videoDuration = $kMi->containerDuration;
 			}
+			/*
+			 * Fix bug in old mediainfo with encrypted sources
+			 */
+			if(isset($kMi->videoFormat) && strstr($kMi->videoFormat,"avc / avc")!==false
+			&& isset($kMi->videoCodecId) && $kMi->videoCodecId=="encv / avc1 / mp4a"
+			&& isset($ffMi)){
+				$ffMi->videoCodecId = "encv / avc1";
+				return $ffMi;
+			}
 		}
 		
 		$durLimit=3600000;

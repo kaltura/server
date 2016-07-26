@@ -401,13 +401,18 @@ class kBusinessPreConvertDL
 			return null;
 		}
 
-		// TODO - if source flavor is remote storage, create import job and mark the flavor as FLAVOR_ASSET_STATUS_WAIT_FOR_CONVERT
-
 		$mediaInfoId = null;
 		$mediaInfo = mediaInfoPeer::retrieveByFlavorAssetId($originalFlavorAsset->getId());
-		if($mediaInfo)
+		if($mediaInfo){
 			$mediaInfoId = $mediaInfo->getId();
-
+			/*
+			 * Auto decrypt
+			 */
+			if($originalFlavorAsset->getEncryptionKey()){
+				KalturaLog::log("Encrypted Source, adding decryption (encryptionKey:".$originalFlavorAsset->getEncryptionKey().")");
+				$mediaInfo->decryptionKey = bin2hex(base64_decode($originalFlavorAsset->getEncryptionKey()));
+			}
+		}
 		$flavorParams = assetParamsPeer::retrieveByPK($flavorParamsId);
 		if (!$flavorParams)
 		{
@@ -1303,6 +1308,13 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 			self::setError($errDescription, $convertProfileJob, BatchJobType::CONVERT_PROFILE, $convertProfileJob->getEntryId());
 			return false;
 		}
+		/*
+		 * Auto-decrypt
+		 */
+		if(isset($mediaInfo) && $originalFlavorAsset->getEncryptionKey()){
+			KalturaLog::log("Encrypted Source, adding decryption (encryptionKey:".$originalFlavorAsset->getEncryptionKey().")");
+			$mediaInfo->decryptionKey = bin2hex(base64_decode($originalFlavorAsset->getEncryptionKey()));
+		}
 
 		$errDescription = null;
 
@@ -1524,6 +1536,19 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 
 			$errDescription = null;
 			$sourceFlavorOutput = self::validateFlavorAndMediaInfo($sourceFlavor, $mediaInfo, $errDescription);
+			/*
+			 * Source encryption at-rest
+			 */
+			if(isset($sourceFlavorOutput->_isEncrypted) && $sourceFlavorOutput->_isEncrypted==true){
+				self::setEncryptionAtRest($sourceFlavorOutput, $originalFlavorAsset);
+			}
+			/*
+			 * Source auto-decrypt
+			 */
+			if(isset($mediaInfo) && $originalFlavorAsset->getEncryptionKey()){
+				KalturaLog::log("Encrypted Source, adding decryption (encryptionKey:".$originalFlavorAsset->getEncryptionKey().")");
+				$mediaInfo->decryptionKey = bin2hex(base64_decode($originalFlavorAsset->getEncryptionKey()));
+			}
 
 			if(!$sourceFlavorOutput)
 			{
@@ -1640,6 +1665,15 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 			$mediaInfoId = $mediaInfo->getId();
 		kJobsManager::addFlavorConvertJob(array($srcSyncKey), $sourceFlavorOutput, $originalFlavorAsset->getId(), $conversionProfileId, $mediaInfoId, $parentJob);
 		return false;
+	}
+
+	public static function convertSource($flavorAsset, $conversionProfileId = null, $mediaInfoId = null, $dbParentBatchJob = null)
+	{
+		$originalFlavorAsset = assetPeer::retrieveOriginalByEntryId($flavorAsset->getEntryId());
+		$flavorParamOutput = assetParamsOutputPeer::retrieveByAsset($originalFlavorAsset);
+		$srcSyncKeys = array();
+		$srcSyncKeys[] = $originalFlavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+		return kJobsManager::addFlavorConvertJob($srcSyncKeys, $flavorParamOutput, $originalFlavorAsset->getId(), $conversionProfileId, $mediaInfoId, $dbParentBatchJob);
 	}
 
 		/*

@@ -442,52 +442,12 @@ $pixFmt = "yuv420p";
 		}
 
 $stub=null;
-	if(strstr($data->flavorParamsOutput->tags,KConversionEngineFfmpeg::TAG_NGS_STUB)!=false)
-		$stub="--stub";
-	//$digSignStub = "-f rawvideo -pix_fmt $srcPixFmt - | $ngsBin -w $srcWid -h $srcHgt -f $srcFps $stub --$prepMode| $ffmpegBin -f rawvideo -s $srcWidx$srcHgt -r $srcFps -i - -i $srcFile -map 0:v -map 1:a ";
-$digSignStub = "-f rawvideo -pix_fmt yuv420p - | %s -w %d -h %d -f %s %s --%s| %s -f rawvideo -s %dx%d -r %s -i -";
-
-		KalturaLog::log("Before:cmdLine($cmdLine)");
-		$cmdLineArr = explode(' ', $cmdLine);
-		$ffmpegBin = $cmdLineArr[0];
-		$kArr = array_keys($cmdLineArr,'-i');
-		$srcFile = $cmdLineArr[$kArr[0]+1];
-		$is2pass=(count($kArr)>1);
-		if($is2pass){
-			$keyId = $kArr[1]+1;
-		}
-		else {
-			$keyId = $kArr[0]+1;
-		}
-		
-		$digSignStr = sprintf($digSignStub, $ngsBin, $srcWid, $srcHgt, $srcFps, $stub, $prepMode, $ffmpegBin, $srcWid, $srcHgt, $srcFps, $srcFile);
-		$kArr = array_keys($cmdLineArr,'-an');
-		if(count($kArr)==0 || ($is2pass && count($kArr)==1)) {
-			$digSignStr.= " -i $srcFile -map 0:v -map 1:a";
-			/*
-			 * Fix the audio source mapping, to adjust for sepating vidoe and audio sources 
-			 * in order to support NGS (video only) piping.
-			 * Audio source mapping changed to 1 (original 0)
-			 */
-			$kArr = array_keys($cmdLineArr,'-filter_complex');
-			if(count($kArr)>0) { 
-				$kArrIdx = end($kArr);
-				$filterStr = $cmdLineArr[$kArrIdx+1];
-				$filterArr = explode(';', $filterStr);
-				foreach($filterArr as $idx=>$filterStr){
-					/*
-					 * Only audio filters should be fixed (pan,amix,amerge)
-					 */
-					if(preg_match("/\b(pan|amix|amerge)\b/", $filterStr)==1)
-						$filterArr[$idx] = str_replace ('[0:','[1:',$filterStr);
-				}
-				$cmdLineArr[$kArrIdx+1] = implode(';', $filterArr);
-			}
-		}
-		KalturaLog::log("Fixed part:$digSignStr");
-		$cmdLineArr[$keyId].= " $digSignStr";
-		$cmdLine = implode(" ", $cmdLineArr);
-		
+		if(strstr($data->flavorParamsOutput->tags,KConversionEngineFfmpeg::TAG_NGS_STUB)!=false)
+			$stub="--stub";
+	
+		$digSignStub = "-f rawvideo -pix_fmt yuv420p - | %s -w %d -h %d -f %s %s --%s| %s -f rawvideo -s %dx%d -r %s -i -";
+		$digSignStr = sprintf($digSignStub, $ngsBin, $srcWid, $srcHgt, $srcFps, $stub, $prepMode,KDLCmdlinePlaceholders::BinaryName, $srcWid, $srcHgt, $srcFps);
+		$cmdLine = KDLOperatorFfmpeg::SplitCommandLineForVideoPiping($cmdLine, $digSignStr);
 		KalturaLog::log("After:cmdLine($cmdLine)");
 		return $cmdLine;
 	}

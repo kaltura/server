@@ -65,19 +65,19 @@ class accessControl extends BaseaccessControl implements IBaseObject
 	}
 	
 	/* (non-PHPdoc)
-	 * @see lib/model/om/BaseaccessControl#postUpdate()
+	 * @see lib/model/om/BaseaccessControl#save()
 	 */
-	public function postSave(PropelPDO $con = null)
+	public function save(PropelPDO $con = null)
 	{
 		// set this profile as partners default
 		$partner = PartnerPeer::retrieveByPK($this->getPartnerId());
-		if ($partner && $this->isDefault === true)
+		if ($partner && $this->isDefault === true && $partner->getDefaultAccessControlId() !== $this->getId())
 		{
 			$partner->setDefaultAccessControlId($this->getId());
 			$partner->save();
 		}
 		
-		parent::postSave($con);
+		return parent::save($con);
 	}
 
 	/* (non-PHPdoc)

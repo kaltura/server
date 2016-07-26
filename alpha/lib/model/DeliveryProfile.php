@@ -418,4 +418,14 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 	{
 		return $this->getFromCustomData("extraParams");
 	}
-} 
+
+	public function setSupplementaryAssetsFilter($v)
+	{
+		$this->putInCustomData("supplementaryAssetsFilter", $v);
+	}
+
+	public function getSupplementaryAssetsFilter()
+	{
+		return $this->getFromCustomData("supplementaryAssetsFilter");
+	}
+}

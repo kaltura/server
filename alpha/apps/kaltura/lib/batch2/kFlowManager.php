@@ -493,25 +493,30 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 			{
 				if ($entry->getType() == entryType::MEDIA_CLIP)
 				{
-					$syncKey = $object->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-
-					if (kFileSyncUtils::fileSync_exists($syncKey))
+					if ($entry->getOperationAttributes() && $object->getIsOriginal())
+						kBusinessPreConvertDL::convertSource($object, null, null, $raisedJob);
+					else
 					{
+						$syncKey = $object->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 
-						// Get the asset fileSync.
-						// For URL typed sync - assume remote and use the relative file path.
-						// For the other types - use the ordinary kFileSyncUtils::getLocalFilePathForKey.
-						$fsArr = kFileSyncUtils::getReadyFileSyncForKey($syncKey, true, false);
-						$fs = $fsArr[0];
-						if ($fs->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL)
+						if (kFileSyncUtils::fileSync_exists($syncKey))
 						{
-							$path = $fs->getFilePath();
-						} else
-						{
-							$path = kFileSyncUtils::getLocalFilePathForKey($syncKey);
+							// Get the asset fileSync.
+							// For URL typed sync - assume remote and use the relative file path.
+							// For the other types - use the ordinary kFileSyncUtils::getLocalFilePathForKey.
+							$fsArr = kFileSyncUtils::getReadyFileSyncForKey($syncKey, true, false);
+							$fs = $fsArr[0];
+							if ($fs->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL)
+							{
+								$path = $fs->getFilePath();
+							} else
+							{
+								$path = kFileSyncUtils::getLocalFilePathForKey($syncKey);
+							}
+							kJobsManager::addConvertProfileJob($raisedJob, $entry, $object->getId(), $path);
 						}
-						kJobsManager::addConvertProfileJob($raisedJob, $entry, $object->getId(), $path);
 					}
+
 				}
 			} else
 			{

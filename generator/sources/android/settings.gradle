@@ -1,3 +1,0 @@
-include ':DemoApplication'
-include ':KalturaClient'
-include ':KalturaClientTester'
