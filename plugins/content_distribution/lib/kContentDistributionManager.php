@@ -634,7 +634,7 @@ class kContentDistributionManager
 
 		return null;
 	}
-	
+
 	/**
 	 * @param EntryDistribution $entryDistribution
 	 * @param DistributionProfile $distributionProfile
@@ -664,44 +664,15 @@ class kContentDistributionManager
 			KalturaLog::notice("Wrong entry distribution status [" . $entryDistribution->getStatus() . "]");
 			return null;
 		}
-		
-		$returnValue = false;
+		$submitNow = (!$submitWhenReady || self::isEntryReady($entryDistribution->getEntryId())) && !self::checkIfSunriseIsLater($entryDistribution, $distributionProfile);
+
 		$validationErrors = $entryDistribution->getValidationErrors();
-		if(!count($validationErrors))
+		if (!$submitNow)
 		{
-		    $returnValue = true;
-			$sunrise = $entryDistribution->getSunrise(null);
-			if($sunrise)
-			{
-				$distributionProvider = $distributionProfile->getProvider();
-				if(!$distributionProvider->isScheduleUpdateEnabled() && !$distributionProvider->isAvailabilityUpdateEnabled())
-				{
-					$sunrise -= $distributionProvider->getJobIntervalBeforeSunrise();
-					if($sunrise > time())
-					{
-						KalturaLog::log("Will be sent on exact time [$sunrise] for sunrise time [" . $entryDistribution->getSunrise() . "]");
-						$entryDistribution->setDirtyStatus(EntryDistributionDirtyStatus::SUBMIT_REQUIRED);
-						$entryDistribution->save();
-						$returnValue = null;
-					}
-				}
-			}
-			if ($returnValue)
-				$returnValue = self::addSubmitAddJob($entryDistribution, $distributionProfile);
-		}
-		$entryDistributionStatus = $entryDistribution->getStatus(); 
-		if(!$returnValue && $submitWhenReady && in_array($entryDistributionStatus, $validStatus))
-		{
-			if (!in_array($entryDistributionStatus, array(EntryDistributionStatus::IMPORT_SUBMITTING, EntryDistributionStatus::IMPORT_UPDATING))) //a submit job will be created on import job finish 
-			{
-				$entryDistribution->setStatus(EntryDistributionStatus::QUEUED);
-				$entryDistribution->save();
-			}
-			KalturaLog::info("Will be submitted when ready");
-		}
-		
-		if(!count($validationErrors))
-			return $returnValue;
+			self::updateStatusToQueued($entryDistribution);
+			return false;
+		} elseif (!count($validationErrors))
+			return self::addSubmitAddJob($entryDistribution, $distributionProfile);
 		
 		KalturaLog::log("Validation errors found");
 		$entry = entryPeer::retrieveByPK($entryDistribution->getEntryId());
@@ -1120,5 +1091,39 @@ class kContentDistributionManager
 		$ret_val = self::assignAssets($entryDistribution,  $dbEntry, $distributionProfile);
 		$entryDistribution->save();
 		return $ret_val;
+	}
+
+	private static function checkIfSunriseIsLater($entryDistribution, $distributionProfile)
+	{
+		$sunrise = $entryDistribution->getSunrise(null);
+		if($sunrise)
+		{
+			$distributionProvider = $distributionProfile->getProvider();
+			if(!$distributionProvider->isScheduleUpdateEnabled() && !$distributionProvider->isAvailabilityUpdateEnabled())
+			{
+				$sunrise -= $distributionProvider->getJobIntervalBeforeSunrise();
+				if($sunrise > time())
+					return true;
+			}
+		}
+		return false;
+	}
+
+	private static function updateStatusToQueued($entryDistribution)
+	{
+		if ($entryDistribution->getStatus() != EntryDistributionStatus::IMPORT_SUBMITTING)
+		{
+			$entryDistribution->setStatus(EntryDistributionStatus::QUEUED);
+			$entryDistribution->save();
+		}
+		KalturaLog::info("Will be submitted when ready");
+	}
+
+	private static function isEntryReady($entryId)
+	{
+		$entry = entryPeer::retrieveByPk($entryId);
+		if (!$entry)
+			return false;
+		return $entry->isReady();
 	}
 }
