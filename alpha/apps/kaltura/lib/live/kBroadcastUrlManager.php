@@ -118,7 +118,7 @@ class kBroadcastUrlManager
 	{
 		$extraQueryPrams = array();
 		$broadcastConfig = $this->getConfiguration(kDataCenterMgr::getCurrentDcId());
-		$extarQueryParamsConfig =  $broadcastConfig['queryParams'] ? $broadcastConfig['queryParams'] : "";
+		$extarQueryParamsConfig =  isset($broadcastConfig['queryParams']) ? $broadcastConfig['queryParams'] : "";
 		$extarQueryParamsConfigArr = explode('.', $extarQueryParamsConfig);
 		
 		//Support none SaaS envioremnts
