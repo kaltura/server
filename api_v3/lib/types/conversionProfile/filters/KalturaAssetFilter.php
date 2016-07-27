@@ -5,6 +5,24 @@
  */
 class KalturaAssetFilter extends KalturaAssetBaseFilter
 {
+	/**
+	 * @dynamicType KalturaAssetType
+	 * @var string
+	 */
+	public $typeIn;
+	
+	const NON_EXISTENT_TYPE = -1;
+	
+	static private $map_between_objects = array
+	(
+		"typeIn" => "_in_type",
+	);
+	
+	public function getMapBetweenObjects()
+	{
+		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
+	}
+	
 	protected function validateEntryIdFiltered()
 	{
 		if(!$this->entryIdEqual && !$this->entryIdIn)
@@ -56,6 +74,12 @@ class KalturaAssetFilter extends KalturaAssetBaseFilter
 		$c = new Criteria();
 		$flavorAssetFilter->attachToCriteria($c);
 		
+		if (isset ($this->typeIn))
+        {
+        	//If the $types array is empty we should not return results on the query.
+        	$types = count (array_intersect($types, explode (',', $this->typeIn))) ? array_intersect($types, explode (',', $this->typeIn)) : array (self::NON_EXISTENT_TYPE);
+        }
+        
 		if($types)
 		{
 			$c->add(assetPeer::TYPE, $types, Criteria::IN);
