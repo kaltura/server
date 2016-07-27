@@ -74,10 +74,10 @@ class KalturaAssetFilter extends KalturaAssetBaseFilter
 		$c = new Criteria();
 		$flavorAssetFilter->attachToCriteria($c);
 		
-		if (isset ($this->typeIn))
+		if ($flavorAssetFilter->get('_in_type'))
         {
         	//If the $types array is empty we should not return results on the query.
-        	$types = count (array_intersect($types, explode (',', $this->typeIn))) ? array_intersect($types, explode (',', $this->typeIn)) : array (self::NON_EXISTENT_TYPE);
+        	$types = count (array_intersect($types, explode (',', $flavorAssetFilter->get('_in_type')))) ? array_intersect($types, explode (',', $flavorAssetFilter->get('_in_type'))) : array (self::NON_EXISTENT_TYPE);
         }
         
 		if($types)
