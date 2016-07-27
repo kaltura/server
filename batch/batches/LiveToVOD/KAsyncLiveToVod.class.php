@@ -55,7 +55,7 @@ class KAsyncLiveToVod extends KJobHandlerWorker
 		do
 		{
 			$copiedCuePointIds = array();
-			$liveCuePointsToCopy = self::getCuePointlistForEntry($data->liveEntryId, $currentSegmentEndTime, 0 , 1);
+			$liveCuePointsToCopy = self::getCuePointlistForEntry($data->liveEntryId, $currentSegmentEndTime);
 			if (count($liveCuePointsToCopy) == 0)
 				break;
 
@@ -108,12 +108,10 @@ class KAsyncLiveToVod extends KJobHandlerWorker
 		return KBatchBase::$kClient->cuePoint->count($filter);
 	}
 
-	private static function getCuePointlistForEntry($entryId, $currentSegmentEndTime, $index = 0, $pageSize = 1000)
+	private static function getCuePointlistForEntry($entryId, $currentSegmentEndTime)
 	{
 		$filter = self::getCuePointFilter($entryId, $currentSegmentEndTime);
 		$pager = new KalturaFilterPager();
-		$pager->pageSize = $pageSize;
-		$pager->pageIndex = $index;
 		$result = KBatchBase::$kClient->cuePoint->listAction($filter, $pager);
 		return $result->objects;
 	}
@@ -188,8 +186,6 @@ class KAsyncLiveToVod extends KJobHandlerWorker
 
 	private static function cloneBaseCuePoint(KalturaCuePoint $src, KalturaCuePoint $dst)
 	{
-		//foreach (get_object_vars($cuePoint) as $key => $val) // all of them, include id, etc...
-		//	$newCuePoint->$key = $val;
 		$dst->partnerData = $src->partnerData;
 		$dst->partnerSortValue = $src->partnerSortValue;
 		$dst->thumbOffset = $src->thumbOffset;
