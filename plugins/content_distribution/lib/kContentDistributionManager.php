@@ -664,8 +664,8 @@ class kContentDistributionManager
 			KalturaLog::notice("Wrong entry distribution status [" . $entryDistribution->getStatus() . "]");
 			return null;
 		}
-		$submitNow = (!$submitWhenReady || self::isEntryReady($entryDistribution->getEntryId())) && !self::checkIfSunriseIsLater($entryDistribution, $distributionProfile);
 
+		$submitNow = self::shouldSubmitNow($submitWhenReady, $entryDistribution, $distributionProfile);
 		$validationErrors = $entryDistribution->getValidationErrors();
 		if (!$submitNow)
 		{
@@ -1125,5 +1125,14 @@ class kContentDistributionManager
 		if (!$entry)
 			return false;
 		return $entry->isReady();
+	}
+
+	private static function shouldSubmitNow($submitWhenReady, $entryDistribution, $distributionProfile)
+	{
+		if ($submitWhenReady && !self::isEntryReady($entryDistribution->getEntryId()))
+			return false;
+		if (self::checkIfSunriseIsLater($entryDistribution, $distributionProfile))
+			return false;
+		return true;
 	}
 }
