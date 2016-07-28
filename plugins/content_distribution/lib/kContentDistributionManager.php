@@ -1093,13 +1093,14 @@ class kContentDistributionManager
 		return $ret_val;
 	}
 
-	private static function checkIfSunriseIsLater($entryDistribution, $distributionProfile)
+	private static function shouldWaitForSunrise($entryDistribution, $distributionProfile)
 	{
 		$sunrise = $entryDistribution->getSunrise(null);
 		if($sunrise)
 		{
 			$distributionProvider = $distributionProfile->getProvider();
-			if(!$distributionProvider->isScheduleUpdateEnabled() && !$distributionProvider->isAvailabilityUpdateEnabled())
+			if($distributionProvider && !$distributionProvider->isScheduleUpdateEnabled()
+				&& !$distributionProvider->isAvailabilityUpdateEnabled())
 			{
 				$sunrise -= $distributionProvider->getJobIntervalBeforeSunrise();
 				if($sunrise > time())
@@ -1116,22 +1117,15 @@ class kContentDistributionManager
 			$entryDistribution->setStatus(EntryDistributionStatus::QUEUED);
 			$entryDistribution->save();
 		}
-		KalturaLog::info("Will be submitted when ready");
-	}
-
-	private static function isEntryReady($entryId)
-	{
-		$entry = entryPeer::retrieveByPk($entryId);
-		if (!$entry)
-			return false;
-		return $entry->isReady();
+		KalturaLog::info("EntryDistribution id [".$entryDistribution->getIntId()."] on Entry [".$entryDistribution->getEntryId() 
+			."] has status [".$entryDistribution->getStatus() ."] and Will be submitted when ready");
 	}
 
 	private static function shouldSubmitNow($submitWhenReady, $entryDistribution, $distributionProfile)
 	{
-		if ($submitWhenReady && !self::isEntryReady($entryDistribution->getEntryId()))
+		if ($submitWhenReady && !myEntryUtils::isEntryReady($entryDistribution->getEntryId()))
 			return false;
-		if (self::checkIfSunriseIsLater($entryDistribution, $distributionProfile))
+		if (self::shouldWaitForSunrise($entryDistribution, $distributionProfile))
 			return false;
 		return true;
 	}
