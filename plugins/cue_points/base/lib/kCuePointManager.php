@@ -12,7 +12,6 @@ class KAMFData
  */
 class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEventConsumer, kObjectChangedEventConsumer, kObjectAddedEventConsumer, kObjectReplacedEventConsumer, kObjectCopiedEventConsumer
 {
-	const MAX_CUE_POINTS_TO_COPY_TO_VOD = 100;
 	const MAX_CUE_POINTS_TO_COPY = 1000;
 
 	/* (non-PHPdoc)

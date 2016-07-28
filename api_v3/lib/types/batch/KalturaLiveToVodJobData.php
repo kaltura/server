@@ -21,7 +21,7 @@ class KalturaLiveToVodJobData extends KalturaJobData
 	 * total VOD Duration
 	 * @var float
 	 */
-	public $totalVODDuration;
+	public $totalVodDuration;
 
 	/** 
 	 * last Segment Duration
@@ -39,7 +39,7 @@ class KalturaLiveToVodJobData extends KalturaJobData
 	(
 		'vodEntryId',
 		'liveEntryId',
-		'totalVODDuration',
+		'totalVodDuration',
 		'lastSegmentDuration',
 		'amfArray',
 	);

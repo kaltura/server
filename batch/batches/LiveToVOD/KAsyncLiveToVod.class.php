@@ -13,6 +13,7 @@
  */
 class KAsyncLiveToVod extends KJobHandlerWorker
 {
+	const MAX_CUE_POINTS_TO_COPY_TO_VOD = 100;
 	/* (non-PHPdoc)
 	 * @see KBatchBase::getType()
 	 */
@@ -68,7 +69,8 @@ class KAsyncLiveToVod extends KJobHandlerWorker
 				if ($copiedCuePointId)
 					$copiedCuePointIds[] = $copiedCuePointId;
 			}
-			KBatchBase::$kClient->doMultiRequest();
+			$response = KBatchBase::$kClient->doMultiRequest();
+			self::checkForErrorInMultiRequestResponse($response);
 			KBatchBase::unimpersonate();
 			
 			//start post-process for all copied cue-point
@@ -83,13 +85,20 @@ class KAsyncLiveToVod extends KJobHandlerWorker
 	}
 
 
-	
+	private static function checkForErrorInMultiRequestResponse($response)
+	{
+		$items = $response->result;
+		foreach ($items as $item)
+			KBatchBase::$kClient->throwExceptionIfError($item);
+	}
+
 	private static function postProcessCuePoints($copiedCuePointIds)
 	{
 		KBatchBase::$kClient->startMultiRequest();
 		foreach ($copiedCuePointIds as $copiedLiveCuePointId)
 			KBatchBase::$kClient->cuePoint->updateStatus($copiedLiveCuePointId, KalturaCuePointStatus::HANDLED);
-		KBatchBase::$kClient->doMultiRequest();
+		$response = KBatchBase::$kClient->doMultiRequest();
+		self::checkForErrorInMultiRequestResponse($response);
 	}
 
 	private static function getCuePointFilter($entryId, $currentSegmentEndTime)
@@ -112,6 +121,7 @@ class KAsyncLiveToVod extends KJobHandlerWorker
 	{
 		$filter = self::getCuePointFilter($entryId, $currentSegmentEndTime);
 		$pager = new KalturaFilterPager();
+		$pager->pageSize = self::MAX_CUE_POINTS_TO_COPY_TO_VOD;
 		$result = KBatchBase::$kClient->cuePoint->listAction($filter, $pager);
 		return $result->objects;
 	}
@@ -210,6 +220,7 @@ class KAsyncLiveToVod extends KJobHandlerWorker
 		$newCuePoint = self::cloneBaseCuePoint($cuePoint,$newCuePoint);
 		return $newCuePoint;
 	}
+
 	private static function copyCuePointFromLiveToVod($liveCuePoint, $startTime, $vodEntryId){
 		$newCuePoint = self::cloneCuePoint($liveCuePoint);
 		if (!$newCuePoint)

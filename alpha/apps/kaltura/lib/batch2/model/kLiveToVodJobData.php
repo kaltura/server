@@ -18,7 +18,7 @@ class kLiveToVodJobData extends kJobData
 	/** total VOD Duration
 	 * @var float
 	 */
-	private $totalVODDuration;
+	private $totalVodDuration;
 
 	/** last Segment Duration
 	 * @var float
@@ -46,11 +46,11 @@ class kLiveToVodJobData extends kJobData
 		return $this->liveEntryId;
 	}
 	/**
-	 * @return float totalVODDuration
+	 * @return float totalVodDuration
 	 */
-	public function getTotalVODDuration()
+	public function gettotalVodDuration()
 	{
-		return $this->totalVODDuration;
+		return $this->totalVodDuration;
 	}
 	/**
 	 * @return float lastSegmentDuration
@@ -83,11 +83,11 @@ class kLiveToVodJobData extends kJobData
 		$this->liveEntryId = $liveEntryId;
 	}
 	/**
-	 * @param float $totalVODDuration
+	 * @param float $totalVodDuration
 	 */
-	public function setTotalVODDuration($totalVODDuration)
+	public function settotalVodDuration($totalVodDuration)
 	{
-		$this->totalVODDuration = $totalVODDuration;
+		$this->totalVodDuration = $totalVodDuration;
 	}
 	/**
 	 * @param float $lastSegmentDuration
