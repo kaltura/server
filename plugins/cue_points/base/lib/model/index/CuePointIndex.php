@@ -70,7 +70,7 @@ class CuePointIndex extends BaseIndexObject
 				'updated_at' => 'updatedAt',
 				'str_entry_id' => 'entryId',
 				'str_cue_point_id' => 'id',
-				'is_public' => 'isPublic',
+				'is_public' => 'isPublicStr',
 			);
 		}
 		return self::$fieldsMap;
@@ -97,9 +97,9 @@ class CuePointIndex extends BaseIndexObject
 				'end_time' => IIndexable::FIELD_TYPE_UINT,
 				'duration' => IIndexable::FIELD_TYPE_UINT,
 				'cue_point_status' => IIndexable::FIELD_TYPE_UINT,
-				'cue_point_type' => IIndexable::FIELD_TYPE_UINT,
+				'cue_point_type' => IIndexable::FIELD_TYPE_STRING,
 				'sub_type' => IIndexable::FIELD_TYPE_UINT,
-				'kuser_id' => IIndexable::FIELD_TYPE_UINT,
+				'kuser_id' => IIndexable::FIELD_TYPE_STRING,
 				'partner_sort_value' => IIndexable::FIELD_TYPE_INTEGER,
 				'depth' => IIndexable::FIELD_TYPE_UINT,
 				'children_count' => IIndexable::FIELD_TYPE_UINT,
@@ -109,7 +109,7 @@ class CuePointIndex extends BaseIndexObject
 				'updated_at' => IIndexable::FIELD_TYPE_DATETIME,
 				'str_entry_id' => IIndexable::FIELD_TYPE_STRING,
 				'str_cue_point_id' => IIndexable::FIELD_TYPE_STRING,
-				'is_public' => IIndexable::FIELD_TYPE_UINT,
+				'is_public' => IIndexable::FIELD_TYPE_STRING,
 				'plugins_data' => IIndexable::FIELD_TYPE_STRING,
 			);
 		}

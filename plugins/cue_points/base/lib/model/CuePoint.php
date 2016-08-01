@@ -227,13 +227,22 @@ abstract class CuePoint extends BaseCuePoint implements IIndexable, IRelatedObje
 	
 
 	public function getForceStop()		{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_FORCE_STOP);}
-	public function getTriggeredAt()		{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_TRIGGERED_AT);}
-	public function getIsPublic()	              {return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_IS_PUBLIC);}	
+	public function getTriggeredAt()	{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_TRIGGERED_AT);}
+	public function getIsPublic()       {return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_IS_PUBLIC);}
+
+	public function getIsPublicStr()
+	{
+		$val = (string)$this->getIsPublic();
+		if (empty($val))
+			return '0';
+		else
+			return $val;
+	}
 
 	public function setForceStop($v)	{return $this->putInCustomData(self::CUSTOM_DATA_FIELD_FORCE_STOP, (bool)$v);}
 	public function setTriggeredAt($v)	{return $this->putInCustomData(self::CUSTOM_DATA_FIELD_TRIGGERED_AT, (int)$v);}
-	public function setIsPublic($v)                  {return $this->putInCustomData(self::CUSTOM_DATA_FIELD_IS_PUBLIC, (bool)$v);}
-	
+	public function setIsPublic($v)     {return $this->putInCustomData(self::CUSTOM_DATA_FIELD_IS_PUBLIC, (bool)$v);}
+
 	public function getCacheInvalidationKeys()
 	{
 		return array("cuePoint:id=".strtolower($this->getId()), "cuePoint:entryId=".strtolower($this->getEntryId()));

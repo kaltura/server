@@ -15,9 +15,9 @@
 	        <field name="end_time" indexName="end_time" type="int" orderable="yes" />
 	        <field name="duration" indexName="duration" type="int" orderable="yes" />
 	        <field name="status" indexName="cue_point_status" getter="status" type="int" />
-	        <field name="type" indexName="cue_point_type" getter="type" type="int" />
+	        <field name="type" indexName="cue_point_type" getter="type" type="string" />
 	        <field name="sub_type" indexName="sub_type" type="int" />
-	        <field name="kuser_id" indexName="kuser_id" type="int" />
+	        <field name="kuser_id" indexName="kuser_id" type="string" />
 	        <field name="partner_sort_value" indexName="partner_sort_value" type="bint" orderable="yes" />
 	        <field name="depth" indexName="depth" type="int" orderable="yes" />
 	        <field name="children_count" indexName="children_count" type="int" orderable="yes" />
@@ -27,7 +27,7 @@
 	        <field name="updated_at" indexName="updated_at" type="datetime" orderable="yes" />
 	        <field name="str_entry_id" indexName="str_entry_id" getter="entryId" type="string" sphinxStringAttribute="string" />
 	        <field name="str_cue_point_id" indexName="str_cue_point_id" getter="id" type="string" sphinxStringAttribute="string" />
-	        <field name="is_public" indexName="is_public" type="int" />
+	        <field name="is_public" indexName="is_public" getter="isPublicStr" type="string" />
 	        <field name="plugins_data" indexName="plugins_data" type="string" searchableonly="yes" />
 	</object>
 </schema>
