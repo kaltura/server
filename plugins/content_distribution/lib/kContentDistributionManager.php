@@ -5,7 +5,6 @@
  */
 class kContentDistributionManager
 {
-	
 	/**
 	 * @param entry $entry
 	 * @param DistributionProfile $distributionProfile
@@ -1118,7 +1117,7 @@ class kContentDistributionManager
 			$entryDistribution->save();
 		}
 		KalturaLog::info("EntryDistribution id [".$entryDistribution->getIntId()."] on Entry [".$entryDistribution->getEntryId() 
-			."] has status [".$entryDistribution->getStatus() ."] and Will be submitted when ready");
+			."] has status [".$entryDistribution->getStatus() ."] and will be submitted when ready");
 	}
 
 	private static function shouldSubmitNow($submitWhenReady, $entryDistribution, $distributionProfile)
