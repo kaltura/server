@@ -139,8 +139,15 @@ class Form_Partner_StorageConfiguration extends Form_Partner_BaseStorageConfigur
 			'filters'		=> array('StringTrim'),
 		));
 		
-		$this->addElementToDisplayGroup('advanced', 'pathManagerParams'); 
+		$this->addElementToDisplayGroup('advanced', 'pathManagerParams');
 
+		$this->addElement('checkbox', 'shouldExportThumbnails', array(
+			'label'			=> "Should export thumbnail assets",
+			'checked'		=> false,
+			'indicator'		=> 'dynamic',
+			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt')))
+		));
+		$this->addElementToDisplayGroup('advanced', 'shouldExportThumbnails');
 	}
 	
 	
@@ -151,6 +158,7 @@ class Form_Partner_StorageConfiguration extends Form_Partner_BaseStorageConfigur
 	    
 	    parent::populateFromObject($object, $add_underscore);
 	    $this->setDefault('pathManagerParams', json_encode($object->pathManagerParams));
+		$this->setDefault('shouldExportThumbnails', $object->shouldExportThumbs);
 	}
 	
     public function getObject($objectType, array $properties, $add_underscore = true, $include_empty_fields = false)
@@ -182,6 +190,7 @@ class Form_Partner_StorageConfiguration extends Form_Partner_BaseStorageConfigur
 		}
 		
 		$object->pathManagerParams = json_decode($properties['pathManagerParams'], true);
+		$object->shouldExportThumbs = $properties['shouldExportThumbnails'];
 		return $object;
 	}
 	

@@ -191,6 +191,9 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 			$tokenizer = $this->getTokenizer();
 			if ($tokenizer)
 			{
+			    if (strpos($url, "://") === false)
+			        $url = "/".ltrim($url,"/");
+
 				$url = $tokenizer->tokenizeSingleUrl($url, $this->getUrlPrefix());
 				kApiCache::disableCache();
 			}

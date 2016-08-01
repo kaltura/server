@@ -520,7 +520,11 @@ $plannedDur = 0;
 			$target->_isEncrypted = false;
 		}
 		
-
+		if(isset($source->_decryptionKey)) {
+			KalturaLog::log("decryptionKey:".$source->_decryptionKey);
+			$target->_decryptionKey = $source->_decryptionKey;
+		}
+		
 			/*
 			 * For IMX sources, apply cropping of the top 32 pixs, if the flavor has the ImxCrop flag
 			 * 'IMX' ==> mxf/mpeg2 video/ 720x608
@@ -990,6 +994,30 @@ $plannedDur = 0;
 						if($target->_width>$widSrc) $target->_width  = $widSrc;
 						$target->_height = $target->_width/$darTrgFrame;
 					}
+				}
+			}
+				/*
+				 * AR Mode - force 16/9 for everything that is not 16:9
+				 */
+			else if($target->_arProcessingMode==3){
+				if($darSrcFrame!=4/3){
+					$darTrgFrame = 16/9;
+				}
+				/*
+				 * The target AR is wider than the source
+				 */
+				if($darTrgFrame>$darSrcFrame){
+					$target->_width = $target->_height*$darTrgFrame;
+				}
+				/*
+				 * The target AR is narrower than the source
+				 */
+				else {
+					$target->_height = $target->_width/$darTrgFrame;
+				}
+				if($shrinkToSource && ($target->_height>$hgtSrc || $target->_width>$widSrc)) {
+					$target->_height = $hgtSrc;
+					$target->_width  = $widSrc;
 				}
 			}
 		}
@@ -1474,131 +1502,6 @@ $plannedDur = 0;
 
 	/**
 	 * 
-	 * @param unknown_type $contentStreams
-	 */
-	private static function analizeSourceContentStreams($contentStreams)
-	{
-		$rvAnalize = new stdClass();
-		
-			/*
-			 * Evaluate stream duration differences
-			 * - calc average duration of each stream type (vid, aud,...)
-			 * - calc delta between the avg and every stream dur (per type - aud, vid,...)
-			 * - evaluate which streams have dur identical to the avg, which one is diff, and which one is zeroed
-			 * - store in array for final part of anaylize logic
-			 */
-		$dursAccm = array();
-		foreach($contentStreams as $t=>$streams) {
-			foreach($streams as $stream){
-				if(!array_key_exists($t, $dursAccm))
-					$dursAccm[$t] = 0;
-				$fld = $t."Duration";
-				$dursAccm[$t] += isset($stream->$fld)?$stream->$fld:0;
-			}
-		}
-		foreach($dursAccm as $t=>$accm){
-			$dursAvg[$t] = $accm>0?$accm/count($contentStreams->$t):0;
-		}
-
-		$identicalDur = array();
-		$zeroedDur = array();
-		$differentDur = array();
-		foreach($contentStreams as $t=>$streams) {
-			foreach($streams as $stream){
-				$fld = $t."Duration";
-				if(!isset($stream->$fld)){
-					$dur=0;
-				}
-				else
-					$dur = $stream->$fld; //audoDuration or videoDuration or dataDuration
-				if($dur==0) {
-					$zeroedDur[$t][] = $stream;
-					continue;
-				}
-				
-				$dlt = abs($dursAvg[$t]-$dur);
-					// Identical concidered to be less than 1sec delta and the delts is less than 0.1% 
-				if($dlt<1000 && $dlt/$dur<0.001)
-					$identicalDur[$t][] = $stream;
-				else
-					$differentDur[$t][] = $stream;
-				
-			}
-		}
-		
-			/*
-			 * For audio streams - 
-			 * Check for 'streamAsChannel' case and for 'multilangual' case
-			 * 'streamAsChannel' considerd to be if there are more than 1 mono streams.
-			 */
-		if(array_key_exists('audio', $identicalDur) && count($identicalDur['audio'])>1){
-				// Get all streams that have 'surround' like audio layout - FR, FL, ...
-			$channelStreams = KDLAudioLayouts::matchLayouts($identicalDur['audio']);
-				
-				// Sort the audio streams for channel number. We are looking for mono streams
-			$chnNumStreams = array();
-			foreach ($channelStreams as $stream){
-				if(isset($stream->audioChannels))
-					$chnNumStreams[$stream->audioChannels][] = $stream;
-			}
-				
-				/*
-				 * The streams that might be used for merging are only mono streams
-				 * otherwise - no streamAsChannel
-				 */ 
-			if(array_key_exists(1, $chnNumStreams) && count($chnNumStreams[1])>1){
-				$channelStreams = $chnNumStreams[1];
-			}
-			else {
-				$channelStreams = array();
-			}
-			
-				/* 
-				 * Check for multi-langual case
-				 * Sort the streams according to stream language
-				 */
-			$langStreams = array();
-			foreach ($identicalDur['audio'] as $stream){
-				if(isset($stream->audioLanguage))
-					$langStreams[$stream->audioLanguage][] = $stream;
-			}
-			
-				// Set 'streamsAsChannels' only if there are more than 2 audio streams in the file
-			if(count($channelStreams)>1){
-				$rvAnalize->streamsAsChannels = $channelStreams;
-			}
-				// Set 'languages' only if there are more than 1 language in the file
-			if(count($langStreams)>1){
-				$rvAnalize->languages = $langStreams;
-			}	// not overlayed streams, probably should be concated
-			if(count($contentStreams->audio)-count($identicalDur['audio'])>2){
-				$rvAnalize = null;
-			}
-			 
-		}
-		
-////////////////////////
-		if(isset($contentStreams->audio)){
-			// Get all streams that have 'surround' like audio layout - FR, FL, ...
-			// Sort the audio streams for channel number. We are looking for mono streams
-			$byChannelNumber = array();
-			foreach ($contentStreams->audio as $stream){
-				if(isset($stream->audioChannels))
-					$byChannelNumber[$stream->audioChannels][] = $stream;
-			}
-		}
-		
-////////////////////////
-		if(count($identicalDur)>0) $rvAnalize->identicalDur = $identicalDur;
-		if(count($differentDur)>0) $rvAnalize->differentDur = $differentDur;		
-		if(count($zeroedDur)>0) $rvAnalize->zeroedDur = $zeroedDur;
-		if(count($byChannelNumber)>0) $rvAnalize->byChannelNumber = $byChannelNumber;
-		
-		return $rvAnalize;
-	}
-
-	/**
-	 * 
 	 * @param unknown_type $source
 	 * @param unknown_type $target
 	 * @return NULL|stdClass
@@ -1683,8 +1586,6 @@ class Settings {
 		if (!isset($source->_contentStreams->audio))
 			return null;
 
-		$sourceAnalize = self::analizeSourceContentStreams($source->_contentStreams);
-		
 		$setupMultiStream = isset($target->_multiStream->audio)? $target->_multiStream->audio: null;
 			/*
 			 * The 'default' flow - 

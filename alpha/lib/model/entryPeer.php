@@ -17,7 +17,7 @@ class entryPeer extends BaseentryPeer
 	const ENTRIES_PER_ACCESS_CONTROL_UPDATE_LIMIT = 1000;
 	
 	private static $s_default_count_limit = 301;
-	private static $filerResults = false;
+	private static $filterResults = false;
 
 	private static $userContentOnly = false;
 	private static $filteredCategoriesIds = array();
@@ -43,6 +43,16 @@ class entryPeer extends BaseentryPeer
 	public static function setUserContentOnly($contentOnly)
 	{
 		self::$userContentOnly = $contentOnly;
+	}
+
+	public static function getUserContentOnly()
+	{
+		return self::$userContentOnly;
+	}
+
+	public static function setFilterResults ($v)
+	{
+		self::$filterResults = $v;
 	}
 
 	/**
@@ -275,10 +285,10 @@ class entryPeer extends BaseentryPeer
 	public static function retrieveByPK($pk, PropelPDO $con = null)
 	{
 		KalturaCriterion::disableTags(array(KalturaCriterion::TAG_ENTITLEMENT_ENTRY, KalturaCriterion::TAG_WIDGET_SESSION));
-		self::$filerResults = true;
+		self::$filterResults = true;
 		$res = parent::retrieveByPK($pk, $con);
 		KalturaCriterion::restoreTags(array(KalturaCriterion::TAG_ENTITLEMENT_ENTRY, KalturaCriterion::TAG_WIDGET_SESSION));
-		self::$filerResults = false;
+		self::$filterResults = false;
 
 		return $res;
 	}
@@ -286,11 +296,11 @@ class entryPeer extends BaseentryPeer
 	public static function retrieveByPKNoFilter ($pk, $con = null, $filterEntitlements = true)
 	{
 		KalturaCriterion::disableTags(array(KalturaCriterion::TAG_ENTITLEMENT_ENTRY, KalturaCriterion::TAG_WIDGET_SESSION));
-		self::$filerResults = $filterEntitlements;
+		self::$filterResults = $filterEntitlements;
 		self::setUseCriteriaFilter ( false );
 		$res = parent::retrieveByPK( $pk , $con );
 		self::setUseCriteriaFilter ( true );
-		self::$filerResults = false;
+		self::$filterResults = false;
 		KalturaCriterion::restoreTags(array(KalturaCriterion::TAG_ENTITLEMENT_ENTRY, KalturaCriterion::TAG_WIDGET_SESSION));
 		return $res;
 	}
@@ -298,11 +308,11 @@ class entryPeer extends BaseentryPeer
 	public static function retrieveByPKsNoFilter ($pks, $con = null)
 	{
 		KalturaCriterion::disableTag(KalturaCriterion::TAG_ENTITLEMENT_ENTRY);
-		self::$filerResults = true;
+		self::$filterResults = true;
 		self::setUseCriteriaFilter ( false );
 		$res = parent::retrieveByPKs( $pks , $con );
 		self::setUseCriteriaFilter ( true );
-		self::$filerResults = false;
+		self::$filterResults = false;
 		KalturaCriterion::restoreTag(KalturaCriterion::TAG_ENTITLEMENT_ENTRY);
 		return $res;
 	}
@@ -588,7 +598,7 @@ class entryPeer extends BaseentryPeer
 		$c = self::prepareEntitlementCriteriaAndFilters( $criteria );
 
 		$results = parent::doSelectJoinkuser($c, $con, $join_behavior);
-		self::$filerResults = false;
+		self::$filterResults = false;
 
 		return $results;
 	}
@@ -606,7 +616,7 @@ class entryPeer extends BaseentryPeer
 		if($c instanceof KalturaCriteria)
 			$criteria->setRecordsCount($c->getRecordsCount());
 
-		self::$filerResults = false;
+		self::$filterResults = false;
 
 		return $queryResult;
 	}
@@ -632,11 +642,11 @@ class entryPeer extends BaseentryPeer
 				$c = $entitlementCrit;
 				$c->setRecordsCount($entitlementCrit->getRecordsCount());
 		 		$skipApplyFilters = true;
-		 		self::$filerResults = true;
+		 		self::$filterResults = true;
 			}
 			else
 			{
-				self::$filerResults = false;
+				self::$filterResults = false;
 				//TODO add header that not full search
 			}
 		}
@@ -745,7 +755,7 @@ class entryPeer extends BaseentryPeer
 
 		$removedRecordsCount = 0;
 		if ((!kEntitlementUtils::getEntitlementEnforcement() && !is_null(kCurrentContext::$ks))||
-			!self::$filerResults ||
+			!self::$filterResults ||
 			!kEntitlementUtils::getInitialized()) // if initEntitlement hasn't run - skip filters.
 			return parent::filterSelectResults($selectResults, $criteria);
 
@@ -776,7 +786,7 @@ class entryPeer extends BaseentryPeer
 			$criteria->setRecordsCount($recordsCount - $removedRecordsCount);
 		}
 
-		self::$filerResults = false;
+		self::$filterResults = false;
 		parent::filterSelectResults($selectResults, $criteria);
 	}
 

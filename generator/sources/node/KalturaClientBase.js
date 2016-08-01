@@ -247,6 +247,7 @@ KalturaClientBase.prototype.init = function(config){
 	this.debugEnabled = false;
 	this.useMultiRequest = false;
 	this.callsQueue = [];
+	this.customHeaders = [];
 
 	var logger = config.getLogger();
 	if (logger) {
@@ -440,13 +441,22 @@ KalturaClientBase.prototype.doHttpRequest = function (callCompletedCallback, req
 	var data = http_build_query(params);
 	var debugUrl = requestUrl + '?' + data;
 	var urlInfo = url.parse(debugUrl);
+	var This = this;
 	this.log('Request [' + requestIndex + ']: ' + debugUrl);
 
 	var options = {
 		host : urlInfo.host,
 		path : urlInfo.path,
-		method : 'POST'
+		method : 'POST',
+		headers : {}
 	};
+
+	Object.keys(this.customHeaders).forEach(function(key) {
+		var currHeader = This.customHeaders[key];
+		options.headers[key] = currHeader.value;
+		if (currHeader.volatile)
+			This.removeCustomHeader(key);
+	});
 
 	if(Object.keys(files).length > 0){
 		var crlf = '\r\n';
@@ -466,17 +476,15 @@ KalturaClientBase.prototype.doHttpRequest = function (callCompletedCallback, req
 		postData.push(new Buffer(delimiter + '--'));
 		var multipartBody = Buffer.concat(postData);
 
-		options.headers = {
-			'Content-Type': 'multipart/form-data; boundary=' + boundary,
-			'Content-Length': multipartBody.length
-		};
+		options.headers['Content-Type'] = 'multipart/form-data; boundary=' + boundary;
+		options.headers['Content-Length'] = multipartBody.length;
+
 		this.sendRequestHelper(options, multipartBody, requestIndex, callCompletedCallback, this.config.timeout);
 
 	} else {
-		options.headers = {
-			'Content-Type' : 'application/x-www-form-urlencoded',
-			'Content-Length' : Buffer.byteLength(data)
-		};
+		options.headers['Content-Type'] = 'application/x-www-form-urlencoded';
+		options.headers['Content-Length'] = Buffer.byteLength(data);
+
 		this.sendRequestHelper(options, data, requestIndex, callCompletedCallback);
 	}
 };
@@ -592,6 +600,25 @@ KalturaClientBase.prototype.error = function(msg){
 		this.logger.error(msg);
 	}
 };
+
+/**
+ * @param key - name of the header you want to add to the client requests.
+ * @param value - value of the header you want to add to the client requests
+ * @param volatile - if true the header will be sent for the next request only, if false will be added to all requests by the client.
+ */
+KalturaClientBase.prototype.addCustomHeader = function(key, value, volatile)
+{
+	this.customHeaders[key] = { 'value': value, 'volatile': volatile };
+}
+
+/**
+ * @param key - name of the custom header to be removed.
+ */
+KalturaClientBase.prototype.removeCustomHeader = function(key)
+{
+	delete this.customHeaders[key];
+}
+
 
 /**
  * Abstract base class for all client objects

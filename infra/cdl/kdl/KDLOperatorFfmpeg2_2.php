@@ -56,6 +56,10 @@ class KDLOperatorFfmpeg2_7_2 extends KDLOperatorFfmpeg2_2 {
 		$cmdStr = parent::generateSinglePassCommandLine($design, $target, $extra);
 		if(!isset($cmdStr)) 
 			return null;
+
+		if(isset($target->_decryptionKey)){
+			$cmdStr = "-decryption_key $target->_decryptionKey $cmdStr";
+		}
 		if($target->_isEncrypted==true) {
 				// Add key & key_if placeholder. To be replaced by real values after asset creation
 			$str = " -encryption_scheme cenc-aes-ctr";
