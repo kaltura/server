@@ -212,10 +212,8 @@ class KProvisionEngineUniversalAkamai extends KProvisionEngine
 		}
 		
 		$httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-		if($httpCode<=200 && $httpCode>300)
-		{
+		if (KCurlHeaderResponse::isError($httpCode))
 			return new KProvisionEngineResult(KalturaBatchJobStatus::FAILED, "Error: delete failed");
-		}
 		
 		return new KProvisionEngineResult(KalturaBatchJobStatus::FINISHED, 'Succesfully deleted stream', $data);
 	}
