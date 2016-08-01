@@ -85,9 +85,9 @@ class CuePointPeer extends BaseCuePointPeer implements IMetadataPeer, IRelatedOb
 				$c->addAnd($criteria);
 			} else if (!$puserId)
 			{
-				$criteria = $c->getNewCriterion(self::IS_PUBLIC, true, Criteria::EQUAL);
-				$criteria->addTag(KalturaCriterion::TAG_WIDGET_SESSION);
-				$c->add($criteria);
+				$criterionIsPublic = $c->getNewCriterion(self::IS_PUBLIC, true, Criteria::EQUAL);
+				$criterionIsPublic->addTag(KalturaCriterion::TAG_WIDGET_SESSION);
+				$c->add($criterionIsPublic);
 			}
 		}
 
