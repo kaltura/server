@@ -628,7 +628,13 @@ class KDLWrap
 			}
 		}
 
-		$medSet->_container->_id=$cdlMediaInfo->getContainerId();
+		/*
+		 * Auto-decryption 
+		 */
+		if(isset($cdlMediaInfo->decryptionKey)){
+			$medSet->_decryptionKey = $cdlMediaInfo->decryptionKey;
+		}
+	$medSet->_container->_id=$cdlMediaInfo->getContainerId();
 		$medSet->_container->_format=$cdlMediaInfo->getContainerFormat();
 		$medSet->_container->_duration=$cdlMediaInfo->getContainerDuration();
 		$medSet->_container->_bitRate=$cdlMediaInfo->getContainerBitRate();

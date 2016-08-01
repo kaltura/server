@@ -409,8 +409,6 @@ class KDLAudioMultiStreamingHelper extends KDLAudioMultiStreaming {
 	 */
 	private static function analizeSourceContentStreams($contentStreams)
 	{
-		$rvAnalize = new stdClass();
-
 		/*
 		 * Evaluate stream duration differences
 		* - calc average duration of each stream type (vid, aud,...)
@@ -448,7 +446,7 @@ class KDLAudioMultiStreamingHelper extends KDLAudioMultiStreaming {
 				}
 
 				$dlt = abs($dursAvg[$t]-$dur);
-				// Identical concidered to be less than 1sec delta and the delts is less than 0.1%
+				// Identical concidered to be less than 1sec delta and the delta is less than 0.1%
 				if($dlt<1000 && $dlt/$dur<0.001)
 					$identicalDur[$t][] = $stream;
 				else
@@ -459,10 +457,12 @@ class KDLAudioMultiStreamingHelper extends KDLAudioMultiStreaming {
 
 		/*
 		 * For audio streams -
-		* Check for 'streamAsChannel' case and for 'multilangual' case
-		* 'streamAsChannel' considerd to be if there are more than 1 mono streams.
-		*/
-		if(array_key_exists('audio', $identicalDur) && count($identicalDur['audio'])>1){
+		 * Check for 'streamAsChannel' and 'multilangual' stream sets.
+		 * If the streams duration is too diverse (>2) - skip (probably should be concated)
+		 * 'streamAsChannel' considered to be if there are more than 1 mono streams.
+		 */
+		if(array_key_exists('audio', $identicalDur) && count($identicalDur['audio'])>1
+		&& (count($contentStreams->audio)-count($identicalDur['audio']))<=2){
 			// Get all streams that have 'surround' like audio layout - FR, FL, ...
 			$channelStreams = KDLAudioLayouts::matchLayouts($identicalDur['audio']);
 
@@ -474,9 +474,9 @@ class KDLAudioMultiStreamingHelper extends KDLAudioMultiStreaming {
 			}
 
 			/*
-				* The streams that might be used for merging are only mono streams
-			* otherwise - no streamAsChannel
-			*/
+			 * The streams that might be used for merging are only mono streams
+			 * otherwise - no streamAsChannel
+			 */
 			if(array_key_exists(1, $chnNumStreams) && count($chnNumStreams[1])>1){
 				$channelStreams = $chnNumStreams[1];
 			}
@@ -485,30 +485,19 @@ class KDLAudioMultiStreamingHelper extends KDLAudioMultiStreaming {
 			}
 				
 			/*
-				* Check for multi-langual case
-			* Sort the streams according to stream language
-			*/
+			 * Check for multi-langual case
+			 * Sort the streams according to stream language
+			 */
 			$langStreams = array();
 			foreach ($identicalDur['audio'] as $stream){
 				if(isset($stream->audioLanguage))
 					$langStreams[$stream->audioLanguage][] = $stream;
 			}
-				
-			// Set 'streamsAsChannels' only if there are more than 2 audio streams in the file
-			if(count($channelStreams)>1){
-				$rvAnalize->streamsAsChannels = $channelStreams;
-			}
-			// Set 'languages' only if there are more than 1 language in the file
-			if(count($langStreams)>1){
-				$rvAnalize->languages = $langStreams;
-			}	// not overlayed streams, probably should be concated
-			if(count($contentStreams->audio)-count($identicalDur['audio'])>2){
-				$rvAnalize = null;
-			}
-
 		}
 
-		////////////////////////
+		/*
+		 * Sort audio streams by the number of channels
+		 */
 		if(isset($contentStreams->audio)){
 			// Get all streams that have 'surround' like audio layout - FR, FL, ...
 			// Sort the audio streams for channel number. We are looking for mono streams
@@ -519,7 +508,15 @@ class KDLAudioMultiStreamingHelper extends KDLAudioMultiStreaming {
 			}
 		}
 
-		////////////////////////
+		$rvAnalize = new stdClass();
+			// Set 'streamsAsChannels' only if there are more than 1 audio streams in the file
+		if(isset($channelStreams) && count($channelStreams)>1){
+			$rvAnalize->streamsAsChannels = $channelStreams;
+		}
+			// Set 'languages' only if there are more than 1 language in the file
+		if(isset($langStreams) && count($langStreams)>1){
+			$rvAnalize->languages = $langStreams;
+		}
 		if(count($identicalDur)>0) $rvAnalize->identicalDur = $identicalDur;
 		if(count($differentDur)>0) $rvAnalize->differentDur = $differentDur;
 		if(count($zeroedDur)>0) $rvAnalize->zeroedDur = $zeroedDur;
@@ -550,6 +547,9 @@ class KDLAudioMultiStreamingHelper extends KDLAudioMultiStreaming {
 		$mappedStreams = KDLAudioLayouts::matchLayouts($sourceStreams->audio, KDLAudioLayouts::DOWNMIX);
 		if(count($mappedStreams)==0) {
 			$mappedStreams = KDLAudioLayouts::matchLayouts($analyzedStreams, array(KDLAudioLayouts::FL, KDLAudioLayouts::FR, KDLAudioLayouts::MONO,));
+			if(count($mappedStreams)==0) {
+				$mappedStreams = KDLAudioLayouts::matchLayouts($analyzedStreams, array(KDLAudioLayouts::DL, KDLAudioLayouts::DR));
+			}
 		}
 		$stream = new KDLStreamDescriptor();
 		foreach ($mappedStreams as $mappedStream){
