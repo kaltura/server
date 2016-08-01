@@ -10,5 +10,5 @@
 require_once (__DIR__ . '/../../bootstrap.php');
 
 $script = realpath(dirname(__FILE__) . '/../../') . '/base/scripts/insertDefaults.php';
-$config = realpath(dirname(__FILE__) . '/../../') . '/base/scripts/init_data/09.MetadataProfile.ini';
+$config = realpath(dirname(__FILE__) . '/../../') . '/base/scripts/init_data/09.MetadataProfile_Polls.ini';
 passthru("php $script $config");

@@ -12,6 +12,10 @@ None.
 
 	php /opt/kaltura/app/deployment/updates/scripts/2016_08_01_create_polls_default_schecma.php
 
+#### Known Issues & Limitations ####
+
+None.
+
 # Kajam 11.20.0 #
 
 ## bpm - burn subtitles metadata trigger fix ##
