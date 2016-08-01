@@ -506,7 +506,7 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 							// For the other types - use the ordinary kFileSyncUtils::getLocalFilePathForKey.
 							$fsArr = kFileSyncUtils::getReadyFileSyncForKey($syncKey, true, false);
 							$fs = $fsArr[0];
-							if ($fs->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL)
+							if ($fs && $fs->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL)
 							{
 								$path = $fs->getFilePath();
 							} else
