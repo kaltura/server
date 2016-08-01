@@ -11,8 +11,6 @@ class KalturaAssetFilter extends KalturaAssetBaseFilter
 	 */
 	public $typeIn;
 	
-	const NON_EXISTENT_TYPE = -1;
-	
 	static private $map_between_objects = array
 	(
 		"typeIn" => "_in_type",
