@@ -278,8 +278,14 @@ class KCurlWrapper
 		$res = $curlWrapper->exec($url, $destFilePath);
 
 		$httpCode = curl_getinfo($curlWrapper->ch, CURLINFO_HTTP_CODE);
-		KalturaLog::info("curl request [$url] return with http-code of [$httpCode]");
-		$res = $res && !KCurlHeaderResponse::isError($httpCode);
+		if (KCurlHeaderResponse::isError($httpCode))
+		{
+			KalturaLog::info("curl request [$url] return with http-code of [$httpCode]");
+			if ($destFilePath)
+				unlink($destFilePath);
+			$res = false;
+		}
+
 
 		$curlWrapper->close();
 		
