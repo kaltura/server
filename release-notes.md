@@ -1,5 +1,27 @@
 # Kajam 11.21.0 #
 
+
+## Modify kaltura_cue_point sphinx index columns from int to text field (for better sphinx querying) ##
+
+ - Issue Type: Bug
+ - Issue ID: PLAT-5742
+
+### Configuration ###
+- update sphinx kaltura.conf:
+	
+		Make sure that to kaltura_cue_point index is modified from rt_attr_uint to rt_field :
+		- rt_field = cue_point_type
+		- rt_field = kuser_id
+		- rt_field = is_public
+
+### Deployment scripts ###
+
+None.
+
+#### Known Issues & Limitations ####
+
+None.
+
 ## install (webcasting) polls metadata profile on partner 0 ##
 
  - Issue Type: Story
