@@ -59,7 +59,7 @@ class CuePointPeer extends BaseCuePointPeer implements IMetadataPeer, IRelatedOb
 
 				// Temporarily change user filter to (user==kuser OR cuepoint of type THUMB/CODE). Long term fix will be accomplished
 				// by adding a public property on the cuepoint object and checking (user==kuser OR is public)
-				$c->addAnd(CuePointPeer::KUSER_ID, $kuser->getId());
+//				$c->addAnd(CuePointPeer::KUSER_ID, $kuser->getId());
 				$criteria = $c->getNewCriterion(self::KUSER_ID, $kuser->getId());
 				$criteria->addOr($c->getNewCriterion(self::IS_PUBLIC, true, Criteria::EQUAL));
 				$criteria->addTag(KalturaCriterion::TAG_USER_SESSION);
