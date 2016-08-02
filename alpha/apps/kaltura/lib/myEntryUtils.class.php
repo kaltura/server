@@ -698,7 +698,9 @@ class myEntryUtils
 		// creating the thumbnail is a very heavy operation prevent calling it in parallel for the same thubmnail for 5 minutes
 		if ($cache && !$cache->add($cacheLockKey, true, 5 * 60))
 			KExternalErrors::dieError(KExternalErrors::PROCESSING_CAPTURE_THUMBNAIL);
-		
+
+		$flavorAssetId = null;
+
 		while($count--)
 		{
 			if (
@@ -742,8 +744,8 @@ class myEntryUtils
 					if ($cache && !$cache->add($cacheLockKeyProcessing, true, 5 * 60))
 						KExternalErrors::dieError(KExternalErrors::PROCESSING_CAPTURE_THUMBNAIL);
 						
-					$success = self::captureLocalThumb($entry, $capturedThumbPath, $calc_vid_sec, $cache, $cacheLockKey, $cacheLockKeyProcessing) || 
-						self::captureRemoteThumb($entry, $orig_image_path, $calc_vid_sec);
+					$success = self::captureLocalThumb($entry, $capturedThumbPath, $calc_vid_sec, $cache, $cacheLockKey, $cacheLockKeyProcessing, $flavorAssetId) ||
+						self::captureRemoteThumb($entry, $orig_image_path, $calc_vid_sec, $flavorAssetId);
 						
 					if ($cache)
 						$cache->delete($cacheLockKeyProcessing);
@@ -770,7 +772,7 @@ class myEntryUtils
 				KExternalErrors::dieError(KExternalErrors::TOO_MANY_PROCESSES);
 			}
 								    
-			$forceRotation = self::getRotate($entry->getId(), $vid_slices);
+			$forceRotation = ($vid_slices > -1) ? self::getRotate($flavorAssetId) : 0;
 
 			kFile::fullMkdir($processingThumbPath);
 			if ($crop_provider)
@@ -825,7 +827,7 @@ class myEntryUtils
 		return $finalThumbPath;
 	}
 	
-	public static function captureLocalThumb($entry, $capturedThumbPath, $calc_vid_sec, $cache, $cacheLockKey, $cacheLockKeyProcessing)
+	public static function captureLocalThumb($entry, $capturedThumbPath, $calc_vid_sec, $cache, $cacheLockKey, $cacheLockKeyProcessing, &$flavorAssetId)
 	{
 		$flavorAsset = assetPeer::retrieveHighestBitrateByEntryId($entry->getId(), flavorParams::TAG_THUMBSOURCE);
 		if(is_null($flavorAsset))
@@ -856,7 +858,8 @@ class myEntryUtils
 		
 		if (is_null($flavorAsset))
 			KExternalErrors::dieError(KExternalErrors::FLAVOR_NOT_FOUND);
-		
+
+		$flavorAssetId = $flavorAsset->getId();
 		$flavorSyncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 		$entry_data_path = kFileSyncUtils::getReadyLocalFilePathForKey($flavorSyncKey);
 		
@@ -882,7 +885,7 @@ class myEntryUtils
 		return true;
 	}
 	
-	public static function captureRemoteThumb($entry, $orig_image_path, $calc_vid_sec)
+	public static function captureRemoteThumb($entry, $orig_image_path, $calc_vid_sec, &$flavorAssetId)
 	{
 		$packagerCaptureUrl = kConf::get('packager_thumb_capture_url', 'local', null);
 		if (!$packagerCaptureUrl)
@@ -892,7 +895,8 @@ class myEntryUtils
 		$flavorAsset = assetPeer::retrieveHighestBitrateByEntryId($entry->getId(), flavorParams::TAG_MBR, null, true);
 		if (is_null($flavorAsset))
 			return false;
-		
+
+		$flavorAssetId = $flavorAsset->getId();
 		$flavorSyncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 		$remoteFS = kFileSyncUtils::getReadyExternalFileSyncForKey($flavorSyncKey);
 		if (!$remoteFS)
@@ -921,12 +925,12 @@ class myEntryUtils
 		return true;
 	}
 
-	public static function getRotate($entryId , $vidSlices)
+	public static function getRotate($flavorAssetId)
 	{
-		$originalMediaInfo = mediaInfoPeer::retrieveOriginalByEntryId($entryId);
+		$mediaInfo = $flavorAssetId ? mediaInfoPeer::retrieveByFlavorAssetId($flavorAssetId) : null;
 		$videoRotation = 0;
-		if($originalMediaInfo && $vidSlices > -1)
-			$videoRotation = $originalMediaInfo->getVideoRotation();
+		if($mediaInfo)
+			$videoRotation = $mediaInfo->getVideoRotation();
 
 		return $videoRotation;
 	}
