@@ -16,7 +16,7 @@
 
 ### Deployment scripts ###
 
-None.
+Reindex sphinx and re-populate cuepoints.
 
 #### Known Issues & Limitations ####
 
