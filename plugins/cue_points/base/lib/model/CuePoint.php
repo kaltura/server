@@ -19,6 +19,8 @@ abstract class CuePoint extends BaseCuePoint implements IIndexable, IRelatedObje
 	const CUSTOM_DATA_FIELD_ROOT_PARENT_ID = 'rootParentId';
 	const CUSTOM_DATA_FIELD_TRIGGERED_AT = 'triggeredAt';
 	const CUSTOM_DATA_FIELD_IS_PUBLIC = 'isPublic';
+
+	const IS_PUBLIC_INDEXED_FIELD_PREFIX = 'pid';
 	
 	public function getIndexObjectName() {
 		return "CuePointIndex";
@@ -234,9 +236,14 @@ abstract class CuePoint extends BaseCuePoint implements IIndexable, IRelatedObje
 	{
 		$val = (string)$this->getIsPublic();
 		if (empty($val))
-			return '0';
+			return self::getIsPublicIndexPrefix($this->getPartnerId()).'0';
 		else
-			return $val;
+			return self::getIsPublicIndexPrefix($this->getPartnerId()).$val;
+	}
+
+	public static function getIsPublicIndexPrefix($partnerId)
+	{
+		return self::IS_PUBLIC_INDEXED_FIELD_PREFIX . $partnerId . "V";
 	}
 
 	public function setForceStop($v)	{return $this->putInCustomData(self::CUSTOM_DATA_FIELD_FORCE_STOP, (bool)$v);}
