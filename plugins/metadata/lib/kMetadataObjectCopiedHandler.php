@@ -183,9 +183,40 @@ class kMetadataObjectCopiedHandler implements kObjectCopiedEventConsumer, kObjec
 	 */
 	public function objectChanged(BaseObject $object, array $modifiedColumns)
 	{
-		/* @var $object Permission */
-		$partner = PartnerPeer::retrieveByPK($object->getPartnerId());
-		$this->partnerPermissionEnabled($partner);
+		if($object instanceof Permission)
+		{
+			/* @var $object Permission */
+			$partner = PartnerPeer::retrieveByPK($object->getPartnerId());
+			$this->partnerPermissionEnabled($partner);
+		}
+
+		if($object instanceof entry)
+		{
+			$tempEntryId = $object->getId();
+			$partnerId = $object->getPartnerId();
+	
+			$metadataObjects = MetadataPeer::retrieveAllByObject(MetadataObjectType::ENTRY , $object->getReplacedEntryId());
+
+			foreach($metadataObjects as $sourceMetadataObject)
+			{
+					$metadataProfileId = $sourceMetadataObject->getMetadataProfileId();
+	
+					$targetMetadata = new Metadata();
+					$targetMetadata->setPartnerId($partnerId);
+					$targetMetadata->setMetadataProfileId($metadataProfileId);
+					$targetMetadata->setObjectType(MetadataObjectType::ENTRY);
+					$targetMetadata->setObjectId($tempEntryId);
+					$targetMetadata->setStatus(KalturaMetadataStatus::VALID);
+
+					$targetMetadata->save();
+	
+					$sourceMetadataKey = $sourceMetadataObject->getSyncKey(Metadata::FILE_SYNC_METADATA_DATA);
+					$sourceXmlData = kFileSyncUtils::file_get_contents($sourceMetadataKey, true, false);
+	
+					$targetMetadataKey = $targetMetadata->getSyncKey(Metadata::FILE_SYNC_METADATA_DATA);
+					kFileSyncUtils::file_put_contents($targetMetadataKey, $sourceXmlData);
+			}
+		}
 	}
 
 	/* (non-PHPdoc)
@@ -210,7 +241,21 @@ class kMetadataObjectCopiedHandler implements kObjectCopiedEventConsumer, kObjec
 		{
 			return true;
 		}
-		
+
+		if($object instanceof entry && isset($modifiedColumns["CUSTOM_DATA"]) && in_array("replacedEntryId", array_keys($modifiedColumns["CUSTOM_DATA"][null])))
+		{
+			if($object->getReplacedEntryId())
+			{
+				$replacedEntry = entryPeer::retrieveByPK($object->getReplacedEntryId());
+				$replacementOptions = $replacedEntry->getReplacementOptions();
+				foreach($replacementOptions->getItems() as $replacementItem)
+				{
+					if($replacementItem instanceof kMetadataReplacementOptionsItem && $replacementItem->getShouldTransferMetadata())
+						return true;
+				}
+			}
+		}
+	
 		return false;
 	}
 

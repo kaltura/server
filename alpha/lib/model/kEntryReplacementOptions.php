@@ -11,6 +11,8 @@ class kEntryReplacementOptions
 {
 	private $keepManualThumbnails;
 	
+	private $items;
+	
 	/**
 	 * @return the $keepManualThumbnails
 	 */
@@ -26,4 +28,20 @@ class kEntryReplacementOptions
 	{
 		$this->keepManualThumbnails = $keepManualThumbnails;
 	}	
+	
+	/**
+	 * @return the $items
+	 */
+	public function getItems() 
+	{
+		return $this->items;
+	}
+
+	/**
+	 * @param field_type $items
+	 */
+	public function setItems($items) 
+	{
+		$this->items = $items;
+	}
 }

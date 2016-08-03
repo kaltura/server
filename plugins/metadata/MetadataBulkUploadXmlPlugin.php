@@ -190,6 +190,61 @@ class MetadataBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPendi
 			</xs:appinfo>
 		</xs:annotation>
 	</xs:element>
+	
+	<xs:complexType name="T_metadataReplacementOptions">
+		<xs:sequence>
+			<xs:element name="shouldTransferMetadata" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:appinfo>
+						<example>
+							<item>
+								<pluginReplacementOptions>
+									...
+									...
+									...
+								</pluginReplacementOptions>
+							</item>
+						</example>
+					</xs:appinfo>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:enumeration value="true"/>
+						<xs:enumeration value="false"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	
+	<xs:complexType name="T_pluginReplacementOptions">
+		<xs:sequence>
+			<xs:element name="metadataReplacementOptions" type="T_metadataReplacementOptions" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:appinfo>
+						<example>
+							<pluginReplacementOptions>
+								<metadataReplacementOptions>
+									<shouldTransferMetadata>false</shouldTransferMetadata>
+								</metadataReplacementOptions>
+							</pluginReplacementOptions>
+						</example>
+					</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	
+	<xs:element name="pluginReplacementOptions" type="T_pluginReplacementOptions" substitutionGroup="item-extension">
+		<xs:annotation>
+			<xs:appinfo>
+				<example>
+					<pluginReplacementOptions>
+					</pluginReplacementOptions>
+				</example>
+			</xs:appinfo>
+		</xs:annotation>
+	</xs:element>
 		';
 		
 		return $xsd;

@@ -609,6 +609,8 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			}
 		}
 		
+		$pluginReplacementOptions = $this->getPluginReplacementOptions($item);
+		
 		switch($contentAssetsAction)
 		{
 			case self::$actionsMap[KalturaBulkUploadAction::UPDATE]:
@@ -617,7 +619,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			case self::$actionsMap[KalturaBulkUploadAction::REPLACE]:
 				$entry = $this->sendItemReplaceData($entryId, $entry, $resource,
 												  $noParamsFlavorAssets, $noParamsFlavorResources,
-												  $noParamsThumbAssets, $noParamsThumbResources);
+												  $noParamsThumbAssets, $noParamsThumbResources, $pluginReplacementOptions);
 				$entryId = $entry->id;
 				break;
 			default :
@@ -675,7 +677,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 */
 	protected function sendItemReplaceData($entryId, KalturaBaseEntry $entry ,KalturaResource $resource = null,
 										array $noParamsFlavorAssets, array $noParamsFlavorResources,
-										array $noParamsThumbAssets, array $noParamsThumbResources)
+										array $noParamsThumbAssets, array $noParamsThumbResources, array $pluginReplacementOptions)
 	{
 		
 		KalturaLog::info("Resource is: " . print_r($resource, true));
@@ -689,9 +691,26 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		$updatedEntryId = $updatedEntry->id;
 		if(!is_null($updatedEntry->replacingEntryId))
 			$updatedEntryId = $updatedEntry->replacingEntryId;
-					
+		
+		$advancedOptions = null;
+		foreach($pluginReplacementOptions as $pluginReplacementObjectName => $options)
+		{
+			if(is_null($advancedOptions))
+			{
+				$advancedOptions = new KalturaEntryReplacementOptions();
+				$advancedOptions->items = array();
+			}
+			$replacementObject = new $pluginReplacementObjectName();
+			foreach($options as $optionName => $optionValue)
+			{
+				$replacementObject->$optionName = $optionValue;
+			}
+			
+			$advancedOptions->items[] = $replacementObject;
+		}
+		
 		if($resource)
-			KBatchBase::$kClient->baseEntry->updateContent($updatedEntryId ,$resource, $entry->conversionProfileId); //to create a temporery entry.
+			KBatchBase::$kClient->baseEntry->updateContent($updatedEntryId ,$resource, $entry->conversionProfileId, $advancedOptions); //to create a temporery entry.
 		
 		foreach($noParamsFlavorAssets as $index => $flavorAsset) // Adds all the entry flavors
 		{
@@ -1026,6 +1045,26 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			}
 		
 		return $requestResults;
+	}
+	
+	
+	/**
+	 * exctracts replacements options from item
+	 * @param SimpleXMLElement $item
+	 * @return array $options
+	 */
+	protected function getPluginReplacementOptions(SimpleXMLElement $item)
+	{
+		$options = array();
+		if(isset($item->pluginReplacementOptions))
+		{
+			if(isset($item->pluginReplacementOptions->metadataReplacementOptions))
+			{
+				if(isset($item->pluginReplacementOptions->metadataReplacementOptions->shouldTransferMetadata) && $item->pluginReplacementOptions->metadataReplacementOptions->shouldTransferMetadata == 'true')
+					$options['KalturaMetadataReplacementOptionsItem'] = array("shouldTransferMetadata" => 1);
+			}
+		}
+		return $options;
 	}
 	
 	/**
