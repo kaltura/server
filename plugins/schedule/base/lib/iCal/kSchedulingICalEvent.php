@@ -169,6 +169,7 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 	public static function fromObject(KalturaScheduleEvent $event)
 	{
 		$object = new kSchedulingICalEvent();
+		$resourceIds = array();
 
 		if ($event->referenceId)
 			$object->setField('uid', $event->referenceId);
@@ -216,6 +217,13 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 				$object->setField('x-kaltura-parent-id', $event->parentId);
 				if ($parent->getReferenceId())
 					$object->setField('x-kaltura-parent-uid', $parent->getReferenceId());
+
+				$resources = ScheduleEventResourcePeer::retrieveByEventId($event->parentId);
+				foreach ($resources as $resource)
+				{
+					/* @var $resource ScheduleEventResource */
+					$resourceIds[] = $resource->getResourceId();
+				}
 			}
 		}
 
@@ -249,7 +257,6 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 		}
 
 		$resources = ScheduleEventResourcePeer::retrieveByEventId($event->id);
-		$resourceIds = array();
 		foreach ($resources as $resource)
 		{
 			/* @var $resource ScheduleEventResource */

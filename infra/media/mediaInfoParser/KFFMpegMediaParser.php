@@ -101,7 +101,7 @@ class KFFMpegMediaParser extends KBaseMediaParser
 		else
 			$mediaInfo->scanType = 0; // Progressive
 		// mov,mp4,m4a,3gp,3g2,mj2 to check is format inside
-		if(in_array($mediaInfo->containerFormat, array("mov","mp4","m4a","3gp","3g2","mj2"))){
+		if(in_array($mediaInfo->containerFormat, array("mov","mp4","m4a","3gp","3g2","mj2")) && isset($this->ffprobeBin)){
 			$mediaInfo->isFastStart = self::checkForFastStart($this->ffprobeBin, $this->filePath);
 		}
 		
@@ -648,6 +648,8 @@ class KFFMpegMediaParser extends KBaseMediaParser
 	[mov,mp4,m4a,3gp,3g2,mj2 @ 0x1493100] error reading header: -541478725
 	[mov,mp4,m4a,3gp,3g2,mj2 @ 0xcb3100] moov atom not found
 */
+		if(!isset($ffprobeBin))
+			return false;
 		/*
 		 * Cannot run linux 'dd' command on Win
 		 */

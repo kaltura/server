@@ -32,7 +32,7 @@ class languageCodeManager
 
                 $cacheDir = dirname($cacheFileName);
                 if (!is_dir($cacheDir)) {
-                    mkdir($cacheDir);
+                    @mkdir($cacheDir);
                     chmod($cacheDir, 0775);
                 }
                 kFile::safeFilePutContents($cacheFileName, $cacheFileCode, 0644);

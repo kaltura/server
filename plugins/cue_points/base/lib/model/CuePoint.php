@@ -19,11 +19,20 @@ abstract class CuePoint extends BaseCuePoint implements IIndexable, IRelatedObje
 	const CUSTOM_DATA_FIELD_ROOT_PARENT_ID = 'rootParentId';
 	const CUSTOM_DATA_FIELD_TRIGGERED_AT = 'triggeredAt';
 	const CUSTOM_DATA_FIELD_IS_PUBLIC = 'isPublic';
-	
+
+	const INDEXED_FIELD_PREFIX = 'pid';
+
 	public function getIndexObjectName() {
 		return "CuePointIndex";
 	}
-	
+	public static function addType(Criteria $c,$partnerId, $type)
+	{
+		$prefix = self::getIndexPrefix($partnerId);
+		$val = $prefix.$type;
+		$c->add(CuePointPeer::TYPE, $val);
+		return $c;
+	}
+
 	public function getChildren()
 	{
 		if ($this->isNew())
@@ -227,13 +236,33 @@ abstract class CuePoint extends BaseCuePoint implements IIndexable, IRelatedObje
 	
 
 	public function getForceStop()		{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_FORCE_STOP);}
-	public function getTriggeredAt()		{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_TRIGGERED_AT);}
-	public function getIsPublic()	              {return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_IS_PUBLIC);}	
+	public function getTriggeredAt()	{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_TRIGGERED_AT);}
+	public function getIsPublic()       {return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_IS_PUBLIC);}
+
+	public function getIsPublicStr()
+	{
+		$val = (string)$this->getIsPublic();
+		if (empty($val))
+			return self::getIndexPrefix($this->getPartnerId()).'0';
+		else
+			return self::getIndexPrefix($this->getPartnerId()).$val;
+	}
+
+	public function getTypeStr()
+	{
+		$val = (string)$this->getType();
+		return self::getIndexPrefix($this->getPartnerId()).$val;
+	}
+
+	public static function getIndexPrefix($partnerId)
+	{
+		return self::INDEXED_FIELD_PREFIX . $partnerId . "V";
+	}
 
 	public function setForceStop($v)	{return $this->putInCustomData(self::CUSTOM_DATA_FIELD_FORCE_STOP, (bool)$v);}
 	public function setTriggeredAt($v)	{return $this->putInCustomData(self::CUSTOM_DATA_FIELD_TRIGGERED_AT, (int)$v);}
-	public function setIsPublic($v)                  {return $this->putInCustomData(self::CUSTOM_DATA_FIELD_IS_PUBLIC, (bool)$v);}
-	
+	public function setIsPublic($v)     {return $this->putInCustomData(self::CUSTOM_DATA_FIELD_IS_PUBLIC, (bool)$v);}
+
 	public function getCacheInvalidationKeys()
 	{
 		return array("cuePoint:id=".strtolower($this->getId()), "cuePoint:entryId=".strtolower($this->getEntryId()));

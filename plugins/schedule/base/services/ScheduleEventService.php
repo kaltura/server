@@ -227,7 +227,7 @@ class ScheduleEventService extends KalturaBaseService
 			$scheduleEvent->setParentId($dbScheduleEvent->getId());
 			$scheduleEvent->setStartDate($date);
 			$scheduleEvent->setOriginalStartDate($date);
-			$scheduleEvent->setEndDate($date + $scheduleEvent->getDuration());
+			$scheduleEvent->setEndDate($date + $dbScheduleEvent->getDuration());
 			$scheduleEvent->save();
 		}
 	}

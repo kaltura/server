@@ -78,6 +78,14 @@ class KCurlHeaderResponse
 		return isset($goodCodes[$this->code]);
 	}
 
+	public static function isError($httpCode)
+	{
+		$restype = floor($httpCode / 100);
+		if ($restype == 4 || $restype == 5)
+			return true;
+		return false;
+	}
+
 	public function storeCookie($value)
 	{
 		$cookieKey=trim($this->getCookieKey($value));
@@ -268,6 +276,17 @@ class KCurlWrapper
 		
 		$curlWrapper = new KCurlWrapper();
 		$res = $curlWrapper->exec($url, $destFilePath);
+
+		$httpCode = curl_getinfo($curlWrapper->ch, CURLINFO_HTTP_CODE);
+		if (KCurlHeaderResponse::isError($httpCode))
+		{
+			KalturaLog::info("curl request [$url] return with http-code of [$httpCode]");
+			if ($destFilePath)
+				unlink($destFilePath);
+			$res = false;
+		}
+
+
 		$curlWrapper->close();
 		
 		return $res;
@@ -479,12 +498,12 @@ class KCurlWrapper
 		curl_setopt($this->ch, CURLOPT_HEADER, false);
 		curl_setopt($this->ch, CURLOPT_NOBODY, false);
 		curl_setopt($this->ch, CURLOPT_RETURNTRANSFER, $returnTransfer);
-		if (!is_null($destFile))
+		if (!is_null($destFd))
 			curl_setopt($this->ch, CURLOPT_FILE, $destFd);
 
 		$ret = curl_exec($this->ch);
 
-		if (!is_null($destFile)) {
+		if (!is_null($destFd)) {
 			fclose($destFd);
 		}
 
