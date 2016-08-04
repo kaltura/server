@@ -15,7 +15,7 @@
 	        <field name="end_time" indexName="end_time" type="int" orderable="yes" />
 	        <field name="duration" indexName="duration" type="int" orderable="yes" />
 	        <field name="status" indexName="cue_point_status" getter="status" type="int" />
-	        <field name="type" indexName="cue_point_type" getter="type" type="string" />
+	        <field name="type" indexName="cue_point_type" getter="typeStr" type="string" />
 	        <field name="sub_type" indexName="sub_type" type="int" />
 	        <field name="kuser_id" indexName="kuser_id" type="string" />
 	        <field name="partner_sort_value" indexName="partner_sort_value" type="bint" orderable="yes" />

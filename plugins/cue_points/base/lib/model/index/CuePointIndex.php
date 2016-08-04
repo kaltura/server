@@ -58,7 +58,7 @@ class CuePointIndex extends BaseIndexObject
 				'end_time' => 'endTime',
 				'duration' => 'duration',
 				'cue_point_status' => 'status',
-				'cue_point_type' => 'type',
+				'cue_point_type' => 'typeStr',
 				'sub_type' => 'subType',
 				'kuser_id' => 'kuserId',
 				'partner_sort_value' => 'partnerSortValue',

@@ -105,7 +105,7 @@ class KalturaCuePointFilter extends KalturaCuePointBaseFilter
 		$c = $this->getCriteria();
 		if($type)
 		{
-			$c->add(CuePointPeer::TYPE, $type);
+			$c = CuePoint::addType($c,kCurrentContext::getCurrentPartnerId(), $type);
 		}
 
 		$entryIds = null;
@@ -137,6 +137,11 @@ class KalturaCuePointFilter extends KalturaCuePointBaseFilter
 	
 	public function getTypeListResponse(KalturaFilterPager $pager, KalturaDetachedResponseProfile $responseProfile = null, $type = null)
 	{
+		if ($type)
+		{
+			$this->cuePointTypeEqual = null;
+			$this->cuePointTypeIn = null;
+		}
 
 		//Was added to avoid braking backward compatibility for old player chapters module
 		if(isset($this->tagsLike) && $this->tagsLike==KalturaAnnotationFilter::CHAPTERS_PUBLIC_TAG)

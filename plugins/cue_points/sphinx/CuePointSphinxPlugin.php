@@ -50,9 +50,9 @@ class CuePointSphinxPlugin extends KalturaPlugin implements IKalturaCriteriaFact
 					'end_time' => SphinxFieldType::RT_ATTR_BIGINT,
 					'duration' => SphinxFieldType::RT_ATTR_BIGINT,
 					'cue_point_status' => SphinxFieldType::RT_ATTR_BIGINT,
-					'cue_point_type' => SphinxFieldType::RT_ATTR_BIGINT,
+					'cue_point_type' => SphinxFieldType::RT_FIELD,
 					'sub_type' => SphinxFieldType::RT_ATTR_BIGINT,
-					'kuser_id' => SphinxFieldType::RT_ATTR_BIGINT,
+					'kuser_id' => SphinxFieldType::RT_FIELD,
 					'partner_sort_value' => SphinxFieldType::RT_ATTR_BIGINT,
 					'force_stop' => SphinxFieldType::RT_ATTR_UINT,
 					
