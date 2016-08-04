@@ -50,7 +50,7 @@ class SphinxCuePointCriteria extends SphinxCriteria
 		{
 		    $this->sphinxSkipped = false;
 		    $isPublic = $filter->get('_eq_is_public');
-		    $this->addCondition('is_public' . " = " . $isPublic);
+		    $this->addAnd(CuePointPeer::IS_PUBLIC, CuePoint::getIndexPrefix(kCurrentContext::getCurrentPartnerId()).$isPublic, Criteria::EQUAL);	
 		}
 		$filter->unsetByName('_eq_is_public');
 
