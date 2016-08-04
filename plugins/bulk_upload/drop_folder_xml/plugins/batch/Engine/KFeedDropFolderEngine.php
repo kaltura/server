@@ -199,8 +199,9 @@ class KFeedDropFolderEngine extends KDropFolderEngine
 		if ($this->user && $this->pass)
 		{
 			$contentUrls = $feedItem->xpath ($this->dropFolder->feedItemInfo->itemContentUrlXPath);
-			foreach ($contentItems as $contentItem)
+			foreach ($contentUrls as $contentItem)
 			{
+				KalturaLog::info ("Reconstructing URL to include user and password: " . $this->user . "/" . $this->pass);
 				$urlComponents = parse_url (strval($contentItem[0]));
 				
 				$protocol = isset ($urlComponents['scheme']) ? $urlComponents['scheme'] : null;
