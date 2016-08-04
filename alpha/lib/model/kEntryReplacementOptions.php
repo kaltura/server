@@ -11,7 +11,7 @@ class kEntryReplacementOptions
 {
 	private $keepManualThumbnails;
 	
-	private $items;
+	private $pluginOptionItems;
 	
 	/**
 	 * @return the $keepManualThumbnails
@@ -30,18 +30,18 @@ class kEntryReplacementOptions
 	}	
 	
 	/**
-	 * @return the $items
+	 * @return the $pluginOptionItems
 	 */
-	public function getItems() 
+	public function getPluginOptionItems() 
 	{
-		return $this->items;
+		return $this->pluginOptionItems;
 	}
 
 	/**
-	 * @param field_type $items
+	 * @param field_type $pluginOptionItems
 	 */
-	public function setItems($items) 
+	public function setPluginOptionItems($pluginOptionItems) 
 	{
-		$this->items = $items;
+		$this->pluginOptionItems = $pluginOptionItems;
 	}
 }

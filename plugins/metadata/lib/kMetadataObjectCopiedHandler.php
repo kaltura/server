@@ -196,7 +196,8 @@ class kMetadataObjectCopiedHandler implements kObjectCopiedEventConsumer, kObjec
 			$partnerId = $object->getPartnerId();
 	
 			$metadataObjects = MetadataPeer::retrieveAllByObject(MetadataObjectType::ENTRY , $object->getReplacedEntryId());
-
+		
+			KalturaLog::debug("YYYYY - temp entry id $tempEntryId partner id $partnerId - " . print_r($metadataObjects, true));
 			foreach($metadataObjects as $sourceMetadataObject)
 			{
 					$metadataProfileId = $sourceMetadataObject->getMetadataProfileId();
@@ -248,9 +249,10 @@ class kMetadataObjectCopiedHandler implements kObjectCopiedEventConsumer, kObjec
 			{
 				$replacedEntry = entryPeer::retrieveByPK($object->getReplacedEntryId());
 				$replacementOptions = $replacedEntry->getReplacementOptions();
-				foreach($replacementOptions->getItems() as $replacementItem)
+				KalturaLog::debug("ZZZZZZZZZZ - options - " . print_r($replacementOptions, true));	
+				foreach($replacementOptions->getPluginOptionItems() as $replacementItem)
 				{
-					if($replacementItem instanceof kMetadataReplacementOptionsItem && $replacementItem->getShouldTransferMetadata())
+					if($replacementItem instanceof kMetadataReplacementOptionsItem && $replacementItem->getShouldCopyMetadata())
 						return true;
 				}
 			}

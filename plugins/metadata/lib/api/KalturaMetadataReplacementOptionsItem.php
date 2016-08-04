@@ -10,11 +10,11 @@ class KalturaMetadataReplacementOptionsItem extends KalturaPluginReplacementOpti
 	 * If true custom-metadata transferred to temp entry on entry replacement
 	 * @var bool
 	 */
-	public $shouldTransferMetadata;
+	public $shouldCopyMetadata;
 
 	private static $mapBetweenObjects = array
 	(
-		'shouldTransferMetadata',
+		'shouldCopyMetadata',
 	);
 	
 	/* (non-PHPdoc)

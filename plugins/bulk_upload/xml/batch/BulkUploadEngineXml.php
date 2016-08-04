@@ -698,7 +698,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			if(is_null($advancedOptions))
 			{
 				$advancedOptions = new KalturaEntryReplacementOptions();
-				$advancedOptions->items = array();
+				$advancedOptions->pluginOptionItems = array();
 			}
 			$replacementObject = new $pluginReplacementObjectName();
 			foreach($options as $optionName => $optionValue)
@@ -706,7 +706,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 				$replacementObject->$optionName = $optionValue;
 			}
 			
-			$advancedOptions->items[] = $replacementObject;
+			$advancedOptions->pluginOptionItems[] = $replacementObject;
 		}
 		
 		if($resource)
@@ -1056,12 +1056,13 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	protected function getPluginReplacementOptions(SimpleXMLElement $item)
 	{
 		$options = array();
+
 		if(isset($item->pluginReplacementOptions))
 		{
-			if(isset($item->pluginReplacementOptions->metadataReplacementOptions))
+			if(isset($item->pluginReplacementOptions->metadataReplacementOptionsItem))
 			{
-				if(isset($item->pluginReplacementOptions->metadataReplacementOptions->shouldTransferMetadata) && $item->pluginReplacementOptions->metadataReplacementOptions->shouldTransferMetadata == 'true')
-					$options['KalturaMetadataReplacementOptionsItem'] = array("shouldTransferMetadata" => 1);
+				if(isset($item->pluginReplacementOptions->metadataReplacementOptionsItem->shouldCopyMetadata) && $item->pluginReplacementOptions->metadataReplacementOptionsItem->shouldCopyMetadata == 'true')
+					$options['KalturaMetadataReplacementOptionsItem'] = array("shouldCopyMetadata" => 1);
 			}
 		}
 		return $options;

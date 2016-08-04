@@ -9,21 +9,21 @@
  */
 class kMetadataReplacementOptionsItem
 {
-	private $shouldTransferMetadata;
+	private $shouldCopyMetadata;
 	
 	/**
-	 * @return the $shouldTransferMetadata
+	 * @return the $shouldCopyMetadata
 	 */
-	public function getShouldTransferMetadata() 
+	public function getShouldCopyMetadata() 
 	{
-		return $this->shouldTransferMetadata;
+		return $this->shouldCopyMetadata;
 	}
 
 	/**
-	 * @param field_type $shouldTransferMetadata
+	 * @param field_type $shouldCopyMetadata
 	 */
-	public function setShouldTransferMetadata($shouldTransferMetadata) 
+	public function setShouldCopyMetadata($shouldCopyMetadata) 
 	{
-		$this->shouldTransferMetadata = $shouldTransferMetadata;
+		$this->shouldCopyMetadata = $shouldCopyMetadata;
 	}	
 }
