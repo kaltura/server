@@ -13,6 +13,10 @@ class KFeedDropFolderEngine extends KDropFolderEngine
 	
 	protected $handledUniqueIds = array();
 	
+	protected $user;
+	
+	protected $pass;
+	
 	/* (non-PHPdoc)
 	 * @see KDropFolderEngine::watchFolder()
 	 */
@@ -190,7 +194,25 @@ class KFeedDropFolderEngine extends KDropFolderEngine
 						unset ($contentItem[0]);
 				}
 			}
-			
+		}
+		
+		if ($this->user && $this->pass)
+		{
+			$contentUrls = $feedItem->xpath ($this->dropFolder->feedItemInfo->itemContentUrlXPath);
+			foreach ($contentUrls as $contentItem)
+			{
+				KalturaLog::info ("Reconstructing URL to include user and password: " . $this->user . "/" . $this->pass);
+				$urlComponents = parse_url (strval($contentItem[0]));
+				
+				$protocol = isset ($urlComponents['scheme']) ? $urlComponents['scheme'] : null;
+				$hostname = isset($urlComponents ['host']) ? $urlComponents ['host'] : null;
+				$port = isset ($urlComponents['port']) ? $urlComponents['port'] : null;
+				$params = isset ($urlComponents['path']) ? $urlComponents['path'] : null;
+				$queryArgs = isset ($urlComponents['query']) ? $urlComponents['query'] : null;
+				$fragment = isset ($urlComponents ['fragment']) ? $urlComponents ['fragment'] : null;
+	
+				$contentItem[0] =  "$protocol://" . urlencode($this->user) . ":" . urlencode($this->pass) . "@$hostname" .  ($port? ":$port" : "") . ($params ? $params : "") . ($queryArgs ? "?$queryArgs" : "") . ($fragment ? "#$fragment" : "");
+			}
 		}
 		
 		$feedFileName = uniqid ("dropFolderFile_{$this->dropFolder->id}_" . time() . '_');
@@ -282,10 +304,10 @@ class KFeedDropFolderEngine extends KDropFolderEngine
 	 */
 	protected function fetchFeedContent ($url)
 	{
-		$user = parse_url ($url, PHP_URL_USER);
-		if (!is_null ($user))
+		$this->user = parse_url ($url, PHP_URL_USER);
+		if (!is_null ($this->user))
 		{
-			$password = parse_url ($url, PHP_URL_PASS);
+			$this->pass = parse_url ($url, PHP_URL_PASS);
 			$urlComponents = parse_url ($url); 
 			$protocol = isset ($urlComponents['scheme']) ? $urlComponents['scheme'] : null;
 			$hostname = isset($urlComponents ['host']) ? $urlComponents ['host'] : null;
@@ -298,9 +320,9 @@ class KFeedDropFolderEngine extends KDropFolderEngine
 		}
 		
 		$ch = curl_init ($url);
-		if (!is_null ($user))
+		if (!is_null ($this->user))
 		{
-			curl_setopt($ch, CURLOPT_USERPWD, "$user:$password");
+			curl_setopt($ch, CURLOPT_USERPWD, $this->user.":".$this->pass);
 			curl_setopt ($ch, CURLOPT_HTTPAUTH, CURLAUTH_ANY);
 		}
 		curl_setopt ($ch, CURLOPT_FOLLOWLOCATION, true);
