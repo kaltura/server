@@ -135,11 +135,18 @@ class KalturaEntryService extends KalturaBaseService
 		
 		$resource->validateEntry($dbEntry);
 		
-		$tempDbEntry = $this->prepareEntryForInsert($tempMediaEntry);
+		// create the temp db entry first and mark it as isTemporary == true
+		$entryType = kPluginableEnumsManager::apiToCore('entryType', $tempMediaEntry->type);
+		$class = entryPeer::getEntryClassByType($entryType);
+			
+		KalturaLog::debug("Creating new entry of API type [$entry->type] core type [$entryType] class [$class]");
+		$tempDbEntry = new $class();
+		$tempDbEntry->setIsTemporary(true);
+		
+		$tempDbEntry = $this->prepareEntryForInsert($tempMediaEntry, $tempDbEntry);
 		$tempDbEntry->setDisplayInSearch(mySearchUtils::DISPLAY_IN_SEARCH_SYSTEM);
 		$tempDbEntry->setPartnerId($dbEntry->getPartnerId());
 		$tempDbEntry->setReplacedEntryId($dbEntry->getId());
-		$tempDbEntry->setIsTemporary(true);
 		$tempDbEntry->save();
 		
 		$dbEntry->setReplacingEntryId($tempDbEntry->getId());
