@@ -61,16 +61,16 @@ class CuePointPeer extends BaseCuePointPeer implements IMetadataPeer, IRelatedOb
 				// by adding a public property on the cuepoint object and checking (user==kuser OR is public)
 //				$c->addAnd(CuePointPeer::KUSER_ID, $kuser->getId());
 				$criteria = $c->getNewCriterion(self::KUSER_ID, $kuser->getId());
-				$criteria->addOr($c->getNewCriterion(self::IS_PUBLIC, CuePoint::getIsPublicIndexPrefix($partnerId).true, Criteria::EQUAL));
+				$criteria->addOr($c->getNewCriterion(self::IS_PUBLIC, CuePoint::getIndexPrefix($partnerId).true, Criteria::EQUAL));
 				$criteria->addTag(KalturaCriterion::TAG_USER_SESSION);
 				$criteria->addOr(
 					$c->getNewCriterion(
 						CuePointPeer::TYPE,
 						array(
-							(string)(ThumbCuePointPlugin::getCuePointTypeCoreValue(ThumbCuePointType::THUMB)),
-							(string)(CodeCuePointPlugin::getCuePointTypeCoreValue(CodeCuePointType::CODE)),
-							(string)(AdCuePointPlugin::getCuePointTypeCoreValue(AdCuePointType::AD)),
-						),
+							CuePoint::getIndexPrefix($partnerId).(ThumbCuePointPlugin::getCuePointTypeCoreValue(ThumbCuePointType::THUMB)),
+							CuePoint::getIndexPrefix($partnerId).(CodeCuePointPlugin::getCuePointTypeCoreValue(CodeCuePointType::CODE)),
+							CuePoint::getIndexPrefix($partnerId).(AdCuePointPlugin::getCuePointTypeCoreValue(AdCuePointType::AD)),
+							),
 						Criteria::IN
 					)
 				);
@@ -86,7 +86,7 @@ class CuePointPeer extends BaseCuePointPeer implements IMetadataPeer, IRelatedOb
 			}
 			else if (!$puserId)
 			{
-				$criterionIsPublic = $c->getNewCriterion(self::IS_PUBLIC, CuePoint::getIsPublicIndexPrefix($partnerId).true, Criteria::EQUAL);
+				$criterionIsPublic = $c->getNewCriterion(self::IS_PUBLIC, CuePoint::getIndexPrefix($partnerId).true, Criteria::EQUAL);
 				$criterionIsPublic->addTag(KalturaCriterion::TAG_WIDGET_SESSION);
 				$c->add($criterionIsPublic);
 			}
