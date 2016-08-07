@@ -1,6 +1,8 @@
 admin_console/lib/Kaltura/Client
 admin_console/lib/tests
 alpha/web/api_v3
+api_v3/web/testme
+api_v3/web/testmeDoc
 cache/
 clients/
 batch/client/

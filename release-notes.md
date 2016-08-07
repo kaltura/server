@@ -19,6 +19,42 @@ update your batch.ini accordingly
 
         restart kaltura-batch service
 
+## Modify kaltura_cue_point sphinx index columns from int to text field (for better sphinx querying) ##
+
+ - Issue Type: Bug
+ - Issue ID: PLAT-5742
+
+### Configuration ###
+- update sphinx kaltura.conf:
+	
+		Make sure that to kaltura_cue_point index is modified from rt_attr_uint to rt_field :
+		- rt_field = cue_point_type
+		- rt_field = kuser_id
+		- rt_field = is_public
+
+### Deployment scripts ###
+
+Reindex sphinx and re-populate cuepoints.
+
+#### Known Issues & Limitations ####
+
+None.
+
+## install (webcasting) polls metadata profile on partner 0 ##
+
+ - Issue Type: Story
+ - Issue ID: WEBC-852
+
+### Configuration ###
+None.
+
+### Deployment scripts ###
+
+	php /opt/kaltura/app/deployment/updates/scripts/2016_08_01_create_polls_default_schecma.php
+
+#### Known Issues & Limitations ####
+
+None.
 
 # Kajam 11.20.0 #
 
