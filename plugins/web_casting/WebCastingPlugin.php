@@ -1,6 +1,6 @@
 <?php
 /**
- * @package plugins.webcast
+ * @package plugins.webCasting
  */
 class WebCastingPlugin extends KalturaPlugin implements IKalturaServices {
 
