@@ -7,8 +7,7 @@
 
 ### Configuration ###
 the follow is added to batch.ini.template:
-- enabledWorkers.KAsyncLiveToVod    	= 1
-and:
+-enabledWorkers.KAsyncLiveToVod    	= 1
 - [KAsyncLiveToVod : KAsyncConvertWorker]
 - id			= 640
 - type			= KAsyncLiveToVod
