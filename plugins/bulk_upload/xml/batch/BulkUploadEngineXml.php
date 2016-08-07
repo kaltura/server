@@ -1062,7 +1062,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			if(isset($item->pluginReplacementOptions->metadataReplacementOptionsItem))
 			{
 				if(isset($item->pluginReplacementOptions->metadataReplacementOptionsItem->shouldCopyMetadata) && $item->pluginReplacementOptions->metadataReplacementOptionsItem->shouldCopyMetadata == 'true')
-					$options['KalturaMetadataReplacementOptionsItem'] = array("shouldCopyMetadata" => 1);
+					$options['KalturaMetadataReplacementOptionsItem'] = array("shouldCopyMetadata" => true);
 			}
 		}
 		return $options;
