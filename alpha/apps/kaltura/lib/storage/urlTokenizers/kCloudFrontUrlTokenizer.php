@@ -89,9 +89,15 @@ class kCloudFrontUrlTokenizer extends kUrlTokenizer
 	{
 		$DateLessThan = time() + $this->window;
 		$conditions = array('"DateLessThan":{"AWS:EpochTime":'.$DateLessThan.'}');
+		$ipStr = "";
 		if ($this->limitIpAddress)
 		{
-			$conditions[] = '"IpAddress":{"AWS:SourceIp":"'.self::getRemoteAddress().'/32"}';
+		    // When multiple equivalent requests hit cloudfront at once, cloudfront may respond with the same response although
+		    // caching headers instruct not to cache the response. When content is secured by IP, one clinet may receive content
+		    // tokenized using the IP of another client.   
+		    $ip = self::getRemoteAddress();
+		    $ipStr = "ip=$ip&";
+			$conditions[] = '"IpAddress":{"AWS:SourceIp":"$ip/32"}';
 		}
 		$policy = '{"Statement":[{"Resource":"'.$acl.'","Condition":{'.implode(',', $conditions).'}}]}';
 		$signature = $this->rsaSha1Sign($policy);
@@ -99,7 +105,7 @@ class kCloudFrontUrlTokenizer extends kUrlTokenizer
 		$policy = self::urlSafeBase64Encode($policy);
 		$signature = self::urlSafeBase64Encode($signature);
 		
-		return 'Policy=' . $policy . '&Signature=' . $signature . '&Key-Pair-Id=' . $this->keyPairId;
+		return $ipStr.'Policy=' . $policy . '&Signature=' . $signature . '&Key-Pair-Id=' . $this->keyPairId;
 	}
 	
 	protected function appendToken($url, $token)
