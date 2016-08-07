@@ -882,7 +882,7 @@
 		<xs:sequence/>
 	</xs:complexType>
 	
-	<xs:complexType name="T_pluginReplacementOptionsItem">
+	<xs:complexType name="T_pluginReplacementOptionsItem" abstract="true">
 		<xs:sequence/>
 	</xs:complexType>
 
