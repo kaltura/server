@@ -877,6 +877,14 @@
 			</xs:element>
 		</xs:sequence>
 	</xs:complexType>
+	
+	<xs:complexType name="T_pluginReplacementOptions">
+		<xs:sequence/>
+	</xs:complexType>
+	
+	<xs:complexType name="T_pluginReplacementOptionsItem" abstract="true">
+		<xs:sequence/>
+	</xs:complexType>
 
 	<xs:element name="mrss" type="T_mrss">
 		<xs:annotation>
