@@ -3,16 +3,16 @@
 ## Add new batch job for copy cue-points from live to VOD ##
 
  - Issue Type: Task
- - Issue ID: PS-5733
+ - Issue ID: PLAT-5733
 
 ### Configuration ###
 the follow is added to batch.ini.template:
-	enabledWorkers.KAsyncLiveToVod      				= 1
+	enabledWorkers.KAsyncLiveToVod    	= 1
 and:
 	[KAsyncLiveToVod : KAsyncConvertWorker]
-	id													= 640
-	type												= KAsyncLiveToVod
-	scriptPath											= batches/LiveToVOD/KAsyncLiveToVodExe.php
+	id			= 640
+	type			= KAsyncLiveToVod
+	scriptPath		= batches/LiveToVOD/KAsyncLiveToVodExe.php
 update your batch.ini accordingly
 
 ### Deployment scripts ###
