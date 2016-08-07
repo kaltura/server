@@ -54,6 +54,29 @@ class SphinxCuePointCriteria extends SphinxCriteria
 		}
 		$filter->unsetByName('_eq_is_public');
 
+		if($filter->get('_eq_type'))
+		{
+			$type = $filter->get('_eq_type');
+			$cuePointType = kPluginableEnumsManager::apiToCore('CuePointType', $type);
+			CuePoint::addTypes($this, kCurrentContext::getCurrentPartnerId(), array($cuePointType));
+			$this->cuePointTypeEqual = null;
+		}
+		$filter->unsetByName('_eq_type');
+
+		if($filter->get('_in_type'))
+		{
+			$types = explode(',', $filter->get('_in_type'));
+			$cuePointTypes = array();
+			foreach ($types as $type)
+			{
+				$cuePointType = kPluginableEnumsManager::apiToCore('CuePointType', $type);
+				if ($cuePointType)
+					$cuePointTypes[] = $cuePointType;
+			}
+			CuePoint::addTypes($this, kCurrentContext::getCurrentPartnerId(), $cuePointTypes);
+		}
+		$filter->unsetByName('_in_type');
+
 		return parent::applyFilterFields($filter);
 	}
 }

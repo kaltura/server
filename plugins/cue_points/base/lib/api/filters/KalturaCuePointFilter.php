@@ -106,32 +106,8 @@ class KalturaCuePointFilter extends KalturaCuePointBaseFilter
 
 		if($type)
 		{
-			$c = CuePoint::addTypes($c,kCurrentContext::getCurrentPartnerId(), array($type));
-			$this->cuePointTypeEqual = null;
+			$this->cuePointTypeEqual = $type;
 			$this->cuePointTypeIn = null;
-		}
-		else
-		{
-			if ($this->cuePointTypeEqual)
-			{
-				$cuePointType = kPluginableEnumsManager::apiToCore('CuePointType', $this->cuePointTypeEqual);
-				$c = CuePoint::addTypes($c, kCurrentContext::getCurrentPartnerId(), array($cuePointType));
-				$this->cuePointTypeEqual = null;
-			}
-
-			if ($this->cuePointTypeIn)
-			{
-				$types = explode(',', $this->cuePointTypeIn);
-				$cuePointTypes = array();
-				foreach ($types as $type)
-				{
-					$cuePointType = kPluginableEnumsManager::apiToCore('CuePointType', $type);
-					if ($cuePointType)
-						$cuePointTypes[] = $cuePointType;
-				}
-				$c = CuePoint::addTypes($c,kCurrentContext::getCurrentPartnerId(), $cuePointTypes);
-				$this->cuePointTypeIn = null;
-			}
 		}
 
 		$entryIds = null;
