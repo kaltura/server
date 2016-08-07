@@ -209,9 +209,14 @@ class KAsyncLiveToVod extends KJobHandlerWorker
 			case "codeCuePoint.Code":
 				$newCuePoint = new KalturaCodeCuePoint();
 				$newCuePoint->code = $cuePoint->code;
+				$newCuePoint->description  = $cuePoint->description ;
 				break;
 			case "thumbCuePoint.Thumb":
 				$newCuePoint = new KalturaThumbCuePoint();
+				$newCuePoint->assetId  = $cuePoint->assetId ;
+				$newCuePoint->description  = $cuePoint->description ;
+				$newCuePoint->title  = $cuePoint->title ;
+				$newCuePoint->subType  = $cuePoint->subType ;
 				break;
 			default:
 				return null;
