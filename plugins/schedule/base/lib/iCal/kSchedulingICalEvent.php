@@ -27,6 +27,21 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 		'endDate' => 'dtend',
 	);
 
+	protected static function formatDurationString($durationStringInSeconds)
+	{
+		$duration = 'PT';
+		$seconds = (int)$durationStringInSeconds;
+		$hours = (int)($seconds / 3600);
+		$minutes = (int)(($seconds - $hours * 3600) / 60);
+		$secondsInt = (int)($seconds - $hours * 3600 - $minutes * 60);
+
+		$duration = $duration . $hours . 'H';
+		$duration = $duration . $minutes . 'M';
+		$duration = $duration . $secondsInt . 'S';
+
+		return $duration;
+	}
+
 	/**
 	 * {@inheritDoc}
 	 * @see kSchedulingICalComponent::getType()
@@ -177,7 +192,14 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 		foreach (self::$stringFields as $string)
 		{
 			if ($event->$string)
-				$object->setField($string, $event->$string);
+			{
+				if ($string == 'duration')
+				{
+					$duration = self::formatDurationString($event->$string);
+					$object->setField($string, $duration);
+				} else
+					$object->setField($string, $event->$string);
+			}
 		}
 
 		foreach (self::$dateFields as $date => $field)
@@ -209,6 +231,13 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 		$object->setField('x-kaltura-owner-id', $event->ownerId);
 
 
+		$resources = ScheduleEventResourcePeer::retrieveByEventId($event->id);
+		foreach ($resources as $resource)
+		{
+			/* @var $resource ScheduleEventResource */
+			$resourceIds[] = $resource->getResourceId();
+		}
+
 		if ($event->parentId)
 		{
 			$parent = ScheduleEventPeer::retrieveByPK($event->parentId);
@@ -218,14 +247,20 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 				if ($parent->getReferenceId())
 					$object->setField('x-kaltura-parent-uid', $parent->getReferenceId());
 
-				$resources = ScheduleEventResourcePeer::retrieveByEventId($event->parentId);
-				foreach ($resources as $resource)
+				if (!count($resourceIds))
 				{
-					/* @var $resource ScheduleEventResource */
-					$resourceIds[] = $resource->getResourceId();
+					$resources = ScheduleEventResourcePeer::retrieveByEventId($event->parentId);
+					foreach ($resources as $resource)
+					{
+						/* @var $resource ScheduleEventResource */
+						$resourceIds[] = $resource->getResourceId();
+					}
 				}
 			}
 		}
+
+		if (count($resourceIds))
+			$object->setField('x-kaltura-resource-ids', implode(',', $resourceIds));
 
 		if ($event->tags)
 			$object->setField('x-kaltura-tags', $event->tags);
@@ -255,15 +290,6 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 					$object->setField('related-to', implode(';', $fullIds));
 			}
 		}
-
-		$resources = ScheduleEventResourcePeer::retrieveByEventId($event->id);
-		foreach ($resources as $resource)
-		{
-			/* @var $resource ScheduleEventResource */
-			$resourceIds[] = $resource->getResourceId();
-		}
-		if (count($resourceIds))
-			$object->setField('x-kaltura-resource-ids', implode(',', $resourceIds));
 
 		return $object;
 	}
