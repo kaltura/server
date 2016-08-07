@@ -103,9 +103,35 @@ class KalturaCuePointFilter extends KalturaCuePointBaseFilter
 		}
 		
 		$c = $this->getCriteria();
+
 		if($type)
 		{
-			$c = CuePoint::addType($c,kCurrentContext::getCurrentPartnerId(), $type);
+			$c = CuePoint::addTypes($c,kCurrentContext::getCurrentPartnerId(), array($type));
+			$this->cuePointTypeEqual = null;
+			$this->cuePointTypeIn = null;
+		}
+		else
+		{
+			if ($this->cuePointTypeEqual)
+			{
+				$cuePointType = kPluginableEnumsManager::apiToCore('CuePointType', $this->cuePointTypeEqual);
+				$c = CuePoint::addTypes($c, kCurrentContext::getCurrentPartnerId(), array($cuePointType));
+				$this->cuePointTypeEqual = null;
+			}
+
+			if ($this->cuePointTypeIn)
+			{
+				$types = explode(',', $this->cuePointTypeIn);
+				$cuePointTypes = array();
+				foreach ($types as $type)
+				{
+					$cuePointType = kPluginableEnumsManager::apiToCore('CuePointType', $type);
+					if ($cuePointType)
+						$cuePointTypes[] = $cuePointType;
+				}
+				$c = CuePoint::addTypes($c,kCurrentContext::getCurrentPartnerId(), $cuePointTypes);
+				$this->cuePointTypeIn = null;
+			}
 		}
 
 		$entryIds = null;
@@ -137,12 +163,6 @@ class KalturaCuePointFilter extends KalturaCuePointBaseFilter
 	
 	public function getTypeListResponse(KalturaFilterPager $pager, KalturaDetachedResponseProfile $responseProfile = null, $type = null)
 	{
-		if ($type)
-		{
-			$this->cuePointTypeEqual = null;
-			$this->cuePointTypeIn = null;
-		}
-
 		//Was added to avoid braking backward compatibility for old player chapters module
 		if(isset($this->tagsLike) && $this->tagsLike==KalturaAnnotationFilter::CHAPTERS_PUBLIC_TAG)
 			KalturaCriterion::disableTag(KalturaCriterion::TAG_WIDGET_SESSION);

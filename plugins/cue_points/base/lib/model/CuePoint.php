@@ -25,11 +25,15 @@ abstract class CuePoint extends BaseCuePoint implements IIndexable, IRelatedObje
 	public function getIndexObjectName() {
 		return "CuePointIndex";
 	}
-	public static function addType(Criteria $c,$partnerId, $type)
+
+	public static function addTypes(Criteria $c,$partnerId, $types )
 	{
 		$prefix = self::getIndexPrefix($partnerId);
-		$val = $prefix.$type;
-		$c->add(CuePointPeer::TYPE, $val);
+		$values = array();
+		foreach ($types as $type)
+			$values[] = $prefix . $type;
+
+		$c->add(CuePointPeer::TYPE, $values,  Criteria::IN);
 		return $c;
 	}
 
@@ -243,9 +247,9 @@ abstract class CuePoint extends BaseCuePoint implements IIndexable, IRelatedObje
 	{
 		$val = (string)$this->getIsPublic();
 		if (empty($val))
-			return self::getIndexPrefix($this->getPartnerId()).'0';
-		else
-			return self::getIndexPrefix($this->getPartnerId()).$val;
+			$val = '0';
+
+		return self::getIndexPrefix($this->getPartnerId()).$val;
 	}
 
 	public function getTypeStr()
