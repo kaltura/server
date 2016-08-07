@@ -46,7 +46,7 @@ class KAsyncLiveToVod extends KJobHandlerWorker
 		$amfArray = json_decode($data->amfArray);
 		$currentSegmentStartTime = self::getSegmentStartTime($amfArray);
 		$currentSegmentEndTime = self::getSegmentEndTime($amfArray, $data->lastSegmentDuration);
-		self::normalizeAMFTimes($amfArray, $data->totalVODDuration, $data->lastSegmentDuration);
+		self::normalizeAMFTimes($amfArray, $data->totalVodDuration, $data->lastSegmentDuration);
 
 		$totalCount = self::getCuePointCount($data->liveEntryId, $currentSegmentEndTime);
 		KalturaLog::info("Total count of cue-point to copy: " .$totalCount);
@@ -141,10 +141,10 @@ class KAsyncLiveToVod extends KJobHandlerWorker
 		return ((self::getSegmentStartTime($amfArray) * 1000) + $segmentDuration) / 1000;
 	}
 	// change the PTS of every amf to be relative to the beginning of the recording, and not to the beginning of the segment
-	private static function normalizeAMFTimes(&$amfArray, $totalVODDuration, $currentSegmentDuration)
+	private static function normalizeAMFTimes(&$amfArray, $totalVodDuration, $currentSegmentDuration)
 	{
 		foreach($amfArray as $key=>$amf)
-			$amfArray[$key]->pts = $amfArray[$key]->pts  + $totalVODDuration - $currentSegmentDuration;
+			$amfArray[$key]->pts = $amfArray[$key]->pts  + $totalVodDuration - $currentSegmentDuration;
 	}
 
 	private static function getOffsetForTimestamp($timestamp, $amfArray)
