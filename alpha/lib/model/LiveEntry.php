@@ -10,8 +10,6 @@ abstract class LiveEntry extends entry
 	const SECONDARY_HOSTNAME = 'backupHostname';
 	const FIRST_BROADCAST = 'first_broadcast';
 	const RECORDED_ENTRY_ID = 'recorded_entry_id';
-
-	const DEFAULT_CACHE_EXPIRY = 120;
 	
 	const CUSTOM_DATA_NAMESPACE_MEDIA_SERVERS = 'mediaServers';
 	const CUSTOM_DATA_RECORD_STATUS = 'record_status';
@@ -609,56 +607,6 @@ abstract class LiveEntry extends entry
 		
 		return !$currentDcOnly;
 	}
-	
-	private static function getCacheType()
-	{
-		return kCacheManager::CACHE_TYPE_LIVE_MEDIA_SERVER . '_' . kDataCenterMgr::getCurrentDcId();
-	}
-
-	/**
-	 * @param LiveEntryServerNode $liveEntryServerNode
-	 * @return bool|mixed
-	 * @throws Exception
-	 */
-	public function isCacheValid(LiveEntryServerNode $liveEntryServerNode)
-	{
-		if(!$liveEntryServerNode)
-			return false;
-		
-		$cacheType = self::getCacheType();
-		$cacheStore = kCacheManager::getSingleLayerCache($cacheType);
-		if(! $cacheStore)
-		{
-			KalturaLog::warning("Cache store [$cacheType] not found");
-			$lastUpdate = time() - $liveEntryServerNode->getUpdatedAt(null);
-			$expiry = kConf::get('media_server_cache_expiry', 'local', self::DEFAULT_CACHE_EXPIRY);
-			
-			return $lastUpdate <= $expiry;
-		}
-		
-		$key = $this->getEntryServerNodeCacheKey($liveEntryServerNode);
-		$ans = $cacheStore->get($key);
-		KalturaLog::debug("Get cache key [$key] from store [$cacheType] returned [$ans]");
-		return $ans;
-	}
-
-	/**
-	 * Stores given value in cache for with the given key as an identifier
-	 * @param string $key
-	 * @return bool
-	 * @throws Exception
-	 */
-	private function storeInCache($key)
-	{
-		$cacheType = self::getCacheType();
-		$cacheStore = kCacheManager::getSingleLayerCache($cacheType);
-		if(! $cacheStore) {
-			KalturaLog::debug("cacheStore is null. cacheType: $cacheType . returning false");
-			return false;
-		}
-		KalturaLog::debug("Set cache key [$key] from store [$cacheType] ");
-		return $cacheStore->set($key, true, kConf::get('media_server_cache_expiry', 'local', self::DEFAULT_CACHE_EXPIRY));
-	}
 
 	/**
 	 * @param EntryServerNodeType $mediaServerIndex
@@ -682,8 +630,7 @@ abstract class LiveEntry extends entry
 			if(is_null($this->getFirstBroadcast()))
 				$this->setFirstBroadcast(kApiCache::getTime());
 			
-			$key = $this->getEntryServerNodeCacheKey($dbLiveEntryServerNode);
-			if($this->storeInCache($key) && $this->isMediaServerRegistered($mediaServerIndex, $hostname))
+			if($dbLiveEntryServerNode->storeInCache() && $this->isMediaServerRegistered($mediaServerIndex, $hostname))
 			{
 				KalturaLog::debug("cached and registered - index: $mediaServerIndex, hostname: $hostname");
 				return;
@@ -756,12 +703,6 @@ abstract class LiveEntry extends entry
 		}
 	}
 
-
-	private function getEntryServerNodeCacheKey(EntryServerNode $entryServerNode)
-	{
-		return $entryServerNode->getEntryId()."_".$entryServerNode->getServerNodeId()."_".$entryServerNode->getServerType();
-	}
-
 	protected function isMediaServerRegistered($index, $hostname)
 	{
 		/* @var $dbLiveEntryServerNode LiveEntryServerNode*/
@@ -781,7 +722,7 @@ abstract class LiveEntry extends entry
 		/* @var $dbLiveEntryServerNode LiveEntryServerNode */
 		foreach($dbLiveEntryServerNodes as $dbLiveEntryServerNode)
 		{
-			if ($dbLiveEntryServerNode->getDc() === kDataCenterMgr::getCurrentDcId() && !$this->isCacheValid($dbLiveEntryServerNode))
+			if ($dbLiveEntryServerNode->getDc() === kDataCenterMgr::getCurrentDcId() && !$dbLiveEntryServerNode->isCacheValid())
 			{
 				KalturaLog::info("Removing media server id [" . $dbLiveEntryServerNode->getServerNodeId() . "]");
 				$dbLiveEntryServerNode->delete();
