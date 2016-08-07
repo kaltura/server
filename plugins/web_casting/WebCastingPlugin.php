@@ -2,7 +2,7 @@
 /**
  * @package plugins.webcast
  */
-class WebcastPlugin extends KalturaPlugin implements IKalturaServices {
+class WebCastingPlugin extends KalturaPlugin implements IKalturaServices {
 
     const PLUGIN_NAME = "webCasting";
 
