@@ -2463,9 +2463,11 @@ CREATE TABLE entry_server_node
 	updated_at DATETIME,
 	status INTEGER,
 	server_type INTEGER  NOT NULL,
+	dc INTEGER,
 	custom_data TEXT,
 	PRIMARY KEY (id),
-	KEY entry_server_type(entry_id, server_type)
+	KEY entry_server_type(entry_id, server_type),
+	KEY dc_index(dc)
 )Type=InnoDB;
 
 # This restores the fkey checks, after having unset them earlier

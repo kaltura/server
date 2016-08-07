@@ -4,15 +4,15 @@
  * @subpackage filters.base
  * @abstract
  */
-abstract class KalturaEntryServerNodeBaseFilter extends KalturaRelatedFilter
+abstract class KalturaEntryServerNodeBaseFilter extends KalturaFilter
 {
 	static private $map_between_objects = array
 	(
 		"entryIdEqual" => "_eq_entry_id",
 		"entryIdIn" => "_in_entry_id",
 		"serverNodeIdEqual" => "_eq_server_node_id",
-		"createdAtGreaterThanOrEqual" => "_gte_created_at",
 		"createdAtLessThanOrEqual" => "_lte_created_at",
+		"createdAtGreaterThanOrEqual" => "_gte_created_at",
 		"updatedAtGreaterThanOrEqual" => "_gte_updated_at",
 		"updatedAtLessThanOrEqual" => "_lte_updated_at",
 		"statusEqual" => "_eq_status",
@@ -56,12 +56,12 @@ abstract class KalturaEntryServerNodeBaseFilter extends KalturaRelatedFilter
 	/**
 	 * @var time
 	 */
-	public $createdAtGreaterThanOrEqual;
+	public $createdAtLessThanOrEqual;
 
 	/**
 	 * @var time
 	 */
-	public $createdAtLessThanOrEqual;
+	public $createdAtGreaterThanOrEqual;
 
 	/**
 	 * @var time
@@ -72,12 +72,12 @@ abstract class KalturaEntryServerNodeBaseFilter extends KalturaRelatedFilter
 	 * @var time
 	 */
 	public $updatedAtLessThanOrEqual;
-	
+
 	/**
 	 * @var KalturaEntryServerNodeStatus
 	 */
 	public $statusEqual;
-	
+
 	/**
 	 * @var string
 	 */

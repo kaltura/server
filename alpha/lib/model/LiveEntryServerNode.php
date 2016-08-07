@@ -111,14 +111,13 @@ class LiveEntryServerNode extends EntryServerNode
 		return $this->getFromCustomData(self::CUSTOM_DATA_APPLICATION_NAME);
 	}
 	
-	public function setDc($v)
-	{
-		$this->putInCustomData(self::CUSTOM_DATA_DC, $v);
-	}
-	
 	public function getDc()
 	{
-		return $this->getFromCustomData(self::CUSTOM_DATA_DC);
+		$dc = parent::getDc();
+		if($dc)
+			$dc = $this->getFromCustomData(self::CUSTOM_DATA_DC);;
+		
+		return $dc;
 	}
 	
 	private function getLiveEntry()

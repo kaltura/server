@@ -2459,9 +2459,11 @@ CREATE TABLE entry_server_node
 	updated_at DATETIME,
 	status INTEGER,
 	server_type INTEGER,
+	dc INTEGER,
 	custom_data TEXT,
 	PRIMARY KEY (id),
-	KEY (entry_id, server_type)
+	KEY (entry_id, server_type),
+	KEY (dc)
 )ENGINE=InnoDB;
 
 CREATE TABLE schedule_event

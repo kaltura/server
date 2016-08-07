@@ -60,7 +60,7 @@ abstract class KalturaEntryServerNode extends KalturaObject implements IRelatedF
 	 * @filter eq
 	 */
 	public $serverType;
-
+	
 	private static $map_between_objects = array
 	(
 		"id",
@@ -70,7 +70,7 @@ abstract class KalturaEntryServerNode extends KalturaObject implements IRelatedF
 		"createdAt",
 		"updatedAt",
 		"status",
-		"serverType"
+		"serverType",
 	);
 
 	public function getMapBetweenObjects ( )
