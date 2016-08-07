@@ -585,7 +585,7 @@ private static function shouldDeleteMissingAssetDuringReplacement($oldAsset,$ent
 		$entry->save();
 	}
 	
-	public static function generateAdStitchingCmdline($ffprobeJson, $flavorParams, $flavorParamsOutput, $duration=null)
+	public static function generateAdStitchingCmdline($flavorParams, $flavorParamsOutput, $ffprobeJson = null, $duration = null)
 	{
 		if(isset($ffprobeJson)){
 			$parser = new KFFMpegMediaParserAdStitchHelper($ffprobeJson);
