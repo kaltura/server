@@ -5,7 +5,7 @@
  */
 class KalturaWebCastingTestResponse extends KalturaObject {
     /**
-     * @var KalturaWebCastingTestResponseInfo
+     * @var string
      */
     public $info;
 }
