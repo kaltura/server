@@ -3,7 +3,7 @@
  * @package plugins
  * @subpackage api
  */
-class KalturaPluginOptionsArray extends KalturaTypedArray
+class KalturaPluginReplacementOptionsArray extends KalturaTypedArray
 {
 	public function __construct( )
 	{

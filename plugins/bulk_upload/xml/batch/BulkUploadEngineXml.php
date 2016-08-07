@@ -1049,7 +1049,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	
 	
 	/**
-	 * exctracts replacements options from item
+	 * Extract replacements options from item
 	 * @param SimpleXMLElement $item
 	 * @return array $options
 	 */
