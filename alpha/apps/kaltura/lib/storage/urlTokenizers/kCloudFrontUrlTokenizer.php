@@ -92,11 +92,11 @@ class kCloudFrontUrlTokenizer extends kUrlTokenizer
 		$ipStr = "";
 		if ($this->limitIpAddress)
 		{
-		    // When multiple equivalent requests hit cloudfront at once, cloudfront may respond with the same response although
-		    // caching headers instruct not to cache the response. When content is secured by IP, one clinet may receive content
-		    // tokenized using the IP of another client.   
-		    $ip = self::getRemoteAddress();
-		    $ipStr = "ip=$ip&";
+			// When multiple equivalent requests hit cloudfront at once, cloudfront may respond with the same response although
+			// caching headers instruct not to cache the response. When content is secured by IP, one clinet may receive content
+			// tokenized using the IP of another client.   
+			$ip = self::getRemoteAddress();
+			$ipStr = "ip=$ip&";
 			$conditions[] = '"IpAddress":{"AWS:SourceIp":"$ip/32"}';
 		}
 		$policy = '{"Statement":[{"Resource":"'.$acl.'","Condition":{'.implode(',', $conditions).'}}]}';
