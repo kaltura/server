@@ -129,7 +129,7 @@ class KalturaCuePointFilter extends KalturaCuePointBaseFilter
 					if ($cuePointType)
 						$cuePointTypes[] = $cuePointType;
 				}
-				$c = CuePoint::addTypes($c,kCurrentContext::getCurrentPartnerId(), $cuePointTypes, Criteria::IN);
+				$c = CuePoint::addTypes($c,kCurrentContext::getCurrentPartnerId(), $cuePointTypes);
 				$this->cuePointTypeIn = null;
 			}
 		}
