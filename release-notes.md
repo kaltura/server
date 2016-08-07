@@ -9,10 +9,10 @@
 the follow is added to batch.ini.template:
 	enabledWorkers.KAsyncLiveToVod    	= 1
 and:
-		[KAsyncLiveToVod : KAsyncConvertWorker]
-		id			= 640
-		type			= KAsyncLiveToVod
-		scriptPath		= batches/LiveToVOD/KAsyncLiveToVodExe.php
+	[KAsyncLiveToVod : KAsyncConvertWorker]
+	id			= 640
+	type			= KAsyncLiveToVod
+	scriptPath		= batches/LiveToVOD/KAsyncLiveToVodExe.php
 update your batch.ini accordingly
 
 ### Deployment scripts ###
