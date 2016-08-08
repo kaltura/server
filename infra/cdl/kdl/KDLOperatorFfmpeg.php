@@ -577,9 +577,11 @@ bad  mencoder32 ~/Media/Canon.Rotated.0_qaqsufbl.avi -of lavf -lavfopts format=m
 		$kArr = array_keys($cmdLineArr,'-an');
 		if(count($kArr)==0 || ($is2pass && count($kArr)==1)) {
 			/*
-			 * Fix the audio source mapping, to adjust for sepating vidoe and audio sources
+			 * Fix the audio source mapping, to adjust for separating video and audio sources
 			 * in order to support NGS (video only) piping.
 			 * Audio source mapping changed to 1 (original 0)
+			 * For 2-pass sessions - the 1st pass should remain as-is
+			 * and this fix should be applied only to the 2nd pass
 			 */
 			$kArr = array_keys($cmdLineArr,'-filter_complex');
 			if(count($kArr)>0) {
@@ -598,6 +600,12 @@ bad  mencoder32 ~/Media/Canon.Rotated.0_qaqsufbl.avi -of lavf -lavfopts format=m
 			$kArr = array_keys($cmdLineArr,'-map');
 			if(count($kArr)>0) {
 				foreach ($kArr as $kIdx){
+					/*
+					 * The mapping fix should be applied only to the 2nd pass
+					 */
+					if($is2pass && $kIdx<=$keySrc){
+						continue;
+					}
 					$mapStr = $cmdLineArr[$kIdx+1];
 					if($mapStr=='v'){
 						$cmdLineArr[$kIdx+1] = "0:v";
