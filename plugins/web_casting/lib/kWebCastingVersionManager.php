@@ -6,26 +6,26 @@
 class kWebCastingVersionManager{
     const INI_FILE_NAME = 'webCastingInfo.ini';
 
-//    private static $supportedOS = array(
-//        'windows',
-//        'osx'
-//    );
-
+    // returns an associative array like below, or null if the $os configuration:
+    //    [minimalVersion] => 2.0.142
+    //    [recommendedVersion] => 2.0.155
+    //    [installationURL] => http://www.kaltura.com/flash/webcastproducer/v2.0.155/KalturaWebCast.exe
     private static function getConfig($os){
-        KalturaLog::info("in getConfig");
-
         $filename = __DIR__ . '/../config/' . self::INI_FILE_NAME;
 
-        KalturaLog::info("filename is " . $filename);
-
         $config = parse_ini_file($filename, true);
-        print_r($config, true);
+        KalturaLog::info(print_r($config, true));
 
-        $osSpecificConfig = $config[strtolower($os)];
-
-        print_r($osSpecificConfig, true);
-
-        return null;
+        $os_lower = strtolower($os);
+        if (array_key_exists($os_lower, $config))
+        {
+            return $config[strtolower($os)];
+        }
+        else
+        {
+            KalturaLog::warning("tried to get non existing configuration for os [" . $os_lower . "]");
+            return null;
+        }
     }
 //
 //    public static function getUpdateHash($os, $version){
@@ -60,6 +60,7 @@ class kWebCastingVersionManager{
     public function getVersionInfo($os, $UIConfId)
     {
         KalturaLog::info("in getVersionInfo");
-        self::getConfig($os);
+        $osSpecificConfig = self::getConfig($os);
+        KalturaLog::debug('got ' . $osSpecificConfig . ' from getConfig for os ' . $os);
     }
 }
