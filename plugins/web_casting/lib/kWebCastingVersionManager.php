@@ -61,6 +61,9 @@ class kWebCastingVersionManager{
     {
         KalturaLog::info("in getVersionInfo");
         $osSpecificConfig = self::getConfig($os);
+        if (!$osSpecificConfig)
+            throw new KalturaAPIException(WebCastingErrors::UNKNOWN_OS, $os);
+
         KalturaLog::debug('got ' . $osSpecificConfig . ' from getConfig for os ' . $os);
     }
 }
