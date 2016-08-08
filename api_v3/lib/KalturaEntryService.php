@@ -142,11 +142,11 @@ class KalturaEntryService extends KalturaBaseService
 		KalturaLog::debug("Creating new entry of API type [$entry->type] core type [$entryType] class [$class]");
 		$tempDbEntry = new $class();
 		$tempDbEntry->setIsTemporary(true);
+		$tempDbEntry->setDisplayInSearch(mySearchUtils::DISPLAY_IN_SEARCH_SYSTEM);
+		$tempDbEntry->setReplacedEntryId($dbEntry->getId());
 		
 		$tempDbEntry = $this->prepareEntryForInsert($tempMediaEntry, $tempDbEntry);
-		$tempDbEntry->setDisplayInSearch(mySearchUtils::DISPLAY_IN_SEARCH_SYSTEM);
 		$tempDbEntry->setPartnerId($dbEntry->getPartnerId());
-		$tempDbEntry->setReplacedEntryId($dbEntry->getId());
 		$tempDbEntry->save();
 		
 		$dbEntry->setReplacingEntryId($tempDbEntry->getId());
