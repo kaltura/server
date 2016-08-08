@@ -43,7 +43,7 @@ class kWebCastingVersionManager{
             throw new KalturaAPIException(WebCastingErrors::UI_CONF_NOT_FOUND, $UIConfId);
 
         KalturaLog::debug('got uiconf: ' . print_r($ui_conf, true));
-        KalturaLog::debug('UIConf->getConfig() ' . print_r($ui_conf->getConfig()));
-        KalturaLog::debug('UIConf->getSwfUrl() ' . print_r($ui_conf->getSwfUrl()));
+        KalturaLog::debug('UIConf->getConfig() ' . print_r($ui_conf->getConfig(), true));
+        KalturaLog::debug('UIConf->getSwfUrl() ' . print_r($ui_conf->getSwfUrl(), true));
     }
 }
