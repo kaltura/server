@@ -27,36 +27,8 @@ class kWebCastingVersionManager{
             return null;
         }
     }
-//
-//    public static function getUpdateHash($os, $version){
-//        $config = self::getConfig($os, self::$osUpdateTypes, $version);
-//        if(!$config){
-//            return null;
-//        }
-//
-//        list($filename, $hash) = $config;
-//        return $hash;
-//    }
-//
-//    public static function getUpdateFile($os, $version){
-//        $config = self::getConfig($os, self::$osUpdateTypes, $version);
-//        if(!$config){
-//            return null;
-//        }
-//
-//        list($filename, $hash) = $config;
-//        return $filename;
-//    }
-//
-//    public static function getInstallFile($os){
-//        $config = self::getConfig($os, self::$osInstallTypes);
-//        if(!$config){
-//            return null;
-//        }
-//
-//        list($filename, $hash) = $config;
-//        return $filename;
-//    }
+
+
     public function getVersionInfo($os, $UIConfId)
     {
         KalturaLog::info("in getVersionInfo");
@@ -71,5 +43,7 @@ class kWebCastingVersionManager{
             throw new KalturaAPIException(WebCastingErrors::UI_CONF_NOT_FOUND, $UIConfId);
 
         KalturaLog::debug('got uiconf: ' . print_r($ui_conf, true));
+        KalturaLog::debug('UIConf->getConfig() ' . print_r($ui_conf->getConfig()));
+        KalturaLog::debug('UIConf->getSwfUrl() ' . print_r($ui_conf->getSwfUrl()));
     }
 }
