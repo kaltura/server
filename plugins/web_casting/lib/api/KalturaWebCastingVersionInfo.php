@@ -18,5 +18,5 @@ class KalturaWebCastingVersionInfo extends KalturaObject {
     /**
      * @var string
      */
-    public $recomandedVersion;
+    public $recommendedVersion;
 }
