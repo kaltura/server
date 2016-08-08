@@ -54,29 +54,32 @@ class SphinxCuePointCriteria extends SphinxCriteria
 		}
 		$filter->unsetByName('_eq_is_public');
 
-		if($filter->get('_eq_type'))
-		{
-			$type = $filter->get('_eq_type');
-			$cuePointType = kPluginableEnumsManager::apiToCore('CuePointType', $type);
-			CuePoint::addTypes($this, kCurrentContext::getCurrentPartnerId(), array($cuePointType));
-			$this->cuePointTypeEqual = null;
-		}
-		$filter->unsetByName('_eq_type');
-
-		if($filter->get('_in_type'))
-		{
-			$types = explode(',', $filter->get('_in_type'));
-			$cuePointTypes = array();
-			foreach ($types as $type)
-			{
-				$cuePointType = kPluginableEnumsManager::apiToCore('CuePointType', $type);
-				if ($cuePointType)
-					$cuePointTypes[] = $cuePointType;
-			}
-			CuePoint::addTypes($this, kCurrentContext::getCurrentPartnerId(), $cuePointTypes);
-		}
-		$filter->unsetByName('_in_type');
-
 		return parent::applyFilterFields($filter);
+	}
+
+	public function translateSphinxCriterion(SphinxCriterion $crit)
+	{
+		$field = $crit->getTable() . '.' . $crit->getColumn();
+		if ($field == CuePointPeer::TYPE && $crit->getComparison() == Criteria::EQUAL)
+		{
+			return array(
+				CuePointPeer::TYPE,
+				Criteria::LIKE,
+				CuePoint::getIndexPrefix(kCurrentContext::getCurrentPartnerId()) . $crit->getValue());
+		} else if ($field == CuePointPeer::TYPE && $crit->getComparison() == Criteria::IN)
+		{
+			return array(
+				CuePointPeer::TYPE,
+				Criteria::IN,
+				$this::addPrefixToArray($crit->getValue(), CuePoint::getIndexPrefix(kCurrentContext::getCurrentPartnerId())));
+		}
+		return parent::translateSphinxCriterion($crit);
+	}
+
+	private function addPrefixToArray(array $strings, $prefix)
+	{
+		foreach ($strings as &$value)
+			$value = $prefix.$value;
+		return $strings;
 	}
 }

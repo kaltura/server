@@ -26,17 +26,6 @@ abstract class CuePoint extends BaseCuePoint implements IIndexable, IRelatedObje
 		return "CuePointIndex";
 	}
 
-	public static function addTypes(Criteria $c,$partnerId, $types )
-	{
-		$prefix = self::getIndexPrefix($partnerId);
-		$values = array();
-		foreach ($types as $type)
-			$values[] = $prefix . $type;
-
-		$c->add(CuePointPeer::TYPE, $values,  Criteria::IN);
-		return $c;
-	}
-
 	public function getChildren()
 	{
 		if ($this->isNew())
