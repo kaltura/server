@@ -6,7 +6,7 @@
  */
 class WebCastingService extends KalturaBaseService
 {
-    function testAction($param1)
+    function testAction()
     {
         $response = new KalturaWebCastingTestResponse();
         $response->info = "momoTheFox";
