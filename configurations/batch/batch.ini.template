@@ -64,7 +64,6 @@ enabledWorkers.KAsyncIntegrate						= 1
 enabledWorkers.KAsyncIntegrateCloser				= 1
 enabledWorkers.KAsyncClearCuePoints					= 1
 enabledWorkers.KAsyncConvertThumbAssetsGenerator	= 1
-enabledWorkers.KAsyncLiveToVod      				= 1
 
 [mainTemplate : template]
 enabledWorkers.DirectoryCleanupShared				= 1
@@ -769,8 +768,3 @@ maximumExecutionTime                    = 36000
 maxJobsEachRun                          = 1
 filter.jobSubTypeIn                     = document.thumbAssets
 params.skipSourceValidation             = 1
-
-[KAsyncLiveToVod : KAsyncConvertWorker]
-id													= 640
-type												= KAsyncLiveToVod
-scriptPath											= batches/LiveToVOD/KAsyncLiveToVodExe.php
