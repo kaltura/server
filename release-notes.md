@@ -1,23 +1,5 @@
 # Kajam 11.21.0 #
 
-## Add new batch job for copy cue-points from live to VOD ##
-
- - Issue Type: Task
- - Issue ID: PLAT-5733
-
-### Configuration ###
-the follow is added to batch.ini.template:
-- enabledWorkers.KAsyncLiveToVod    	= 1
-- [KAsyncLiveToVod : KAsyncConvertWorker]
-- id			= 640
-- type			= KAsyncLiveToVod
-- scriptPath		= batches/LiveToVOD/KAsyncLiveToVodExe.php
-- update your batch.ini accordingly
-
-### Deployment scripts ###
-
-        restart kaltura-batch service
-
 ## Modify kaltura_cue_point sphinx index columns from int to text field (for better sphinx querying) ##
 
  - Issue Type: Bug
