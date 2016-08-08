@@ -14,7 +14,7 @@ class WebCastingService extends KalturaBaseService
      * @return KalturaWebCastingVersionInfo
      * @throws UI_CONF_NOT_FOUND
      */
-    function getVersionInfoAction($UIConfId)
+    function getVersionInfoAction($UIConfId = null)
     {
         $response = new KalturaWebCastingVersionInfo();
         $response->url = "http://www.kaltura.com/" . $UIConfId;
