@@ -65,5 +65,11 @@ class kWebCastingVersionManager{
             throw new KalturaAPIException(WebCastingErrors::UNKNOWN_OS, $os);
 
         KalturaLog::debug('got ' . $osSpecificConfig . ' from getConfig for os ' . $os);
+
+        $ui_conf = uiConfPeer::retrieveByPK($UIConfId);
+        if (!$ui_conf)
+            throw new KalturaAPIException(WebCastingErrors::UI_CONF_NOT_FOUND, $UIConfId);
+
+        KalturaLog::debug('got uiconf: ' . print_r($ui_conf, true));
     }
 }
