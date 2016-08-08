@@ -587,7 +587,7 @@ private static function shouldDeleteMissingAssetDuringReplacement($oldAsset,$ent
 	
 	public static function generateAdStitchingCmdline($flavorParams, $flavorParamsOutput, $ffprobeJson = null, $duration = null)
 	{
-		if(isset($ffprobeJson)){
+		if($ffprobeJson){
 			$parser = new KFFMpegMediaParserAdStitchHelper($ffprobeJson);
 			$srcMedInf = $parser->getMediaInfo();
 			$srcMedSet = KFFMpegMediaParserAdStitchHelper::mediaInfoToKDL($srcMedInf);
@@ -611,7 +611,7 @@ private static function shouldDeleteMissingAssetDuringReplacement($oldAsset,$ent
 			 * make sure that the 'duration' is set,
 			 * otherwise - set to default 10 sec
 			 */
-		if(!isset($duration) && ($isAdImage || !($isAdAudio && $isAdVideo)) ) {
+		if(!($duration) && ($isAdImage || !($isAdAudio && $isAdVideo)) ) {
 			$duration = 10;
 		}
 
@@ -652,7 +652,7 @@ private static function shouldDeleteMissingAssetDuringReplacement($oldAsset,$ent
 		if($flavorParamsOutput->getAudioSampleRate()){
 			$kdlFlavor->_audio->_sampleRate = $flavorParamsOutput->getAudioSampleRate();
 		}
-		if(isset($duration)){
+		if($duration){
 			if($isAdImage) {
 				$kdlFlavor->_transcoders[0]->_extra.= " -t $duration";
 			}
