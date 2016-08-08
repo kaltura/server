@@ -7,14 +7,19 @@
 class WebCastingService extends KalturaBaseService
 {
     /**
-     * Returns the constant string monoTheFox
+     * Returns versionInfo
      *
      * @action test
+     * @param string $uiconf
+     * @return KalturaWebCastingVersionInfo
+     * @throws UI_CONF_NOT_FOUND
      */
-    function testAction()
+    function getVersionInfoAction($UIConfId)
     {
-        $response = new KalturaWebCastingTestResponse();
-        $response->info = "momoTheFox";
+        $response = new KalturaWebCastingVersionInfo();
+        $response->url = "http://www.kaltura.com/" . $UIConfId;
+        $response->minimalVersion = "1.2.3.4";
+        $response->recomandedVersion = "2.3.4.5";
 
         return $response;
     }
