@@ -63,7 +63,7 @@ class KImageMagickCropper extends KBaseCropper
 				$orientation = 4;
 				break;
 			case 270:
-				$orientation = 7;
+				$orientation = 8;
 				break;
 			}
 		}
