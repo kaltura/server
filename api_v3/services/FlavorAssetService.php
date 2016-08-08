@@ -930,11 +930,12 @@ class FlavorAssetService extends KalturaAssetService
 	 *
 	 * @action serveAdStitchCmd
 	 * @param string $assetId
-	 * @param string $mediaInfoJson
+	 * @param string $ffprobeJson
+	 * @param string $duration
 	 *
 	 * @throws KalturaAPIException
 	 */
-	public function serveAdStitchCmdAction($assetId , $mediaInfoJson)
+	public function serveAdStitchCmdAction($assetId, $ffprobeJson = null ,$duration = null)
 	{
 		$asset = assetPeer::retrieveById($assetId);
 		if(is_null($asset))
@@ -952,7 +953,7 @@ class FlavorAssetService extends KalturaAssetService
 		if (!$flavorParamsOutputDb)
 			throw new KalturaAPIException(KalturaErrors::FLAVOR_PARAMS_OUTPUT_ID_NOT_FOUND, $assetId);
 
-		$cmdLine = kBusinessConvertDL::generateAdStitchingCmdline($mediaInfoJson, $flavorParamsDb, $flavorParamsOutputDb);
+		$cmdLine = kBusinessConvertDL::generateAdStitchingCmdline($flavorParamsDb, $flavorParamsOutputDb, $ffprobeJson, $duration);
 
 		return $cmdLine;
 	}
