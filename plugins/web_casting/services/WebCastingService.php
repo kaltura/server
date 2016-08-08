@@ -6,6 +6,11 @@
  */
 class WebCastingService extends KalturaBaseService
 {
+    /**
+     * Returns the constant string monoTheFox
+     *
+     * @action test
+     */
     function testAction()
     {
         $response = new KalturaWebCastingTestResponse();
