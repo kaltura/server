@@ -9,7 +9,7 @@ class WebCastingService extends KalturaBaseService
     /**
      * Returns versionInfo
      *
-     * @action test
+     * @action getVersionInfo
      * @param string $UIConfId (optional)
      * @return KalturaWebCastingVersionInfo
      * @throws UI_CONF_NOT_FOUND
