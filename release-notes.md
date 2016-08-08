@@ -35,6 +35,8 @@ the follow is added to batch.ini.template:
 
 Reindex sphinx and re-populate cuepoints.
 
+Run 'php deployment/updates/scripts/add_permissions/2016_08_07_update_play_server_get_flavor_asset_service_permission.php'
+
 #### Known Issues & Limitations ####
 
 None.
