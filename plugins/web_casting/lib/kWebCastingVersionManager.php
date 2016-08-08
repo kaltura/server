@@ -12,7 +12,12 @@ class kCaptureSpaceVersionManager{
 //    );
 
     private static function getConfig($os){
+        KalturaLog::info("in getConfig");
+
         $filename = __DIR__ . '/../config/' . self::INI_FILE_NAME;
+
+        KalturaLog::info("filename is " . $filename);
+
         $config = parse_ini_file($filename, true);
         print_r($config, true);
 
@@ -54,6 +59,7 @@ class kCaptureSpaceVersionManager{
 //    }
     public function getVersionInfo($os, $UIConfId)
     {
-        getConfig($os);
+        KalturaLog::info("in getVersionInfo");
+        self::getConfig($os);
     }
 }
